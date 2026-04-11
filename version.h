@@ -20,7 +20,9 @@
 
 // tag name so we know what type of build this is
 #ifndef PXBV
-    #ifdef WIN32
+    #ifdef __3DS__
+        #define PXBV  "3DS"
+    #elif defined(WIN32)
         #ifdef D3D
             #define PXBV  "D3D9"
         #else
@@ -34,7 +36,9 @@
 #endif
 
 // architecture
-#ifdef __i386__
+#ifdef __3DS__
+  #define ARCH "ARM"
+#elif defined(__i386__)
   #define ARCH "32"
 #else
   #define ARCH "64"

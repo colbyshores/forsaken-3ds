@@ -123,6 +123,35 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
 		return false;
 	}
 
+#ifdef __3DS__
+	/* PICA200 hard limit: 1024x1024, and must be power-of-two.
+	   Downscale with a 2:1 box filter until it fits. */
+	while (image.w > 1024 || image.h > 1024)
+	{
+		int nw = image.w / 2, nh = image.h / 2;
+		int x, y, c;
+		char *nd = malloc(nw * nh * 4);
+		if (!nd) break;
+		for (y = 0; y < nh; y++)
+			for (x = 0; x < nw; x++)
+			{
+				int si = (y * 2 * image.w + x * 2) * 4;
+				for (c = 0; c < 4; c++)
+					nd[(y * nw + x) * 4 + c] = (
+						(u_int8_t)image.data[si + c] +
+						(u_int8_t)image.data[si + 4 + c] +
+						(u_int8_t)image.data[si + image.w * 4 + c] +
+						(u_int8_t)image.data[si + image.w * 4 + 4 + c]
+					) / 4;
+			}
+		free(image.data);
+		image.data = nd;
+		image.w = nw;
+		image.h = nh;
+		DebugPrintf("create_texture: downscaled to %dx%d\n", nw, nh);
+	}
+#endif
+
 	// return values
 	*width  = (u_int16_t) image.w;
 	*height = (u_int16_t) image.h;
@@ -176,10 +205,16 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
 		CHECK_GL_ERRORS;
 	}
 
+#ifdef __3DS__
+	/* picaGL: no mipmap support, use plain linear filtering */
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+#else
 	// when texture area is small, bilinear filter the closest mipmap
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
 	// when texture area is large, bilinear filter the original
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+#endif
 	// the texture wraps over at the edges (repeat)
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
@@ -188,7 +223,9 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
 	if(caps.anisotropic)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, caps.anisotropic);
 
-#if GL > 1
+#ifdef __3DS__
+	/* No mipmap generation on 3DS - picaGL uses single level only */
+#elif GL > 1
 	glGenerateMipmap( GL_TEXTURE_2D );
 #else
 	// generates full range of mipmaps and scales to nearest power of 2
@@ -225,14 +262,20 @@ bool FSCreateTexture(LPTEXTURE *texture, const char *fileName, u_int16_t *width,
 
 static void print_info( void )
 {
-	GLboolean b;
+	GLboolean b = GL_FALSE;
+#ifndef __3DS__
 	glGetBooleanv(GL_STEREO,&b);
+#endif
 
 	DebugPrintf( "gl vendor='%s', renderer='%s', version='%s', shader='%s', stereo='%s'\n",
 		glGetString(GL_VENDOR),
 		glGetString(GL_RENDERER),
 		glGetString(GL_VERSION),
+#ifdef __3DS__
+		"n/a",
+#else
 		glGetString(GL_SHADING_LANGUAGE_VERSION),
+#endif
 		(b)?"true":"false");
 
 #if GL < 3
@@ -530,9 +573,16 @@ static void detect_caps( void )
 	//check whether anisotropic filtering extension is supported
 	caps.anisotropic = 0.0f;
 
-#if GL < 3
-	if(strstr((char*)glGetString(GL_EXTENSIONS), "GL_EXT_texture_filter_anisotropic"))
-		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &caps.anisotropic );
+#ifdef __3DS__
+	/* PICA200 does not support anisotropic filtering */
+	caps.anisotropic = 0.0f;
+	(void)i; (void)max;
+#elif GL < 3
+	{
+		const char *ext = (const char*)glGetString(GL_EXTENSIONS);
+		if(ext && strstr(ext, "GL_EXT_texture_filter_anisotropic"))
+			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &caps.anisotropic );
+	}
 #else
   #ifdef MACOSX // TODO - Bug in mac drivers.. hopefully everyone also gets a value of 16f
 	// OSX 10.8.2, AMD Radeon HD 6750M, GL 2.1 ATI-1.0.29, shader 1.20
@@ -573,10 +623,13 @@ void render_cleanup( render_info_t * info )
 bool render_mode_select( render_info_t * info )
 {
 	render_cleanup( info );
+#ifdef __3DS__
+	if(!platform_init_video())
+		return false;
+#else
 	if(!sdl_init_video())
 		return false;
-	//if(!render_init( info ))
-	//	return false;
+#endif
 	return true;
 }
 
@@ -603,7 +656,11 @@ void render_set_filter( bool red, bool green, bool blue )
 
 bool render_flip( render_info_t * info )
 {
+#ifdef __3DS__
+	platform_render_present(info);
+#else
 	sdl_render_present(info);
+#endif
 	CHECK_GL_ERRORS;
 	return true;
 }
@@ -642,7 +699,7 @@ void cull_cw( void )
 }
 
 void reset_cull( void )
-{	
+{
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
 	glCullFace(GL_BACK);
@@ -760,6 +817,21 @@ bool FSSetViewPort(render_viewport_t *view)
 	// render_viewport_t x/y starts top/left
 	// but glViewport starts from bottom/left
 	int bottom = render_info.ThisMode.h - (view->Y + view->Height);
+#ifdef __3DS__
+	{
+		static int _vp_logged = 0;
+		if (_vp_logged < 3) {
+			extern void trace(const char *msg);
+			char _b[128];
+			snprintf(_b, sizeof(_b), "viewport: x=%lu y=%lu w=%lu h=%lu bottom=%d mode_h=%d",
+				(unsigned long)view->X, (unsigned long)view->Y,
+				(unsigned long)view->Width, (unsigned long)view->Height,
+				bottom, render_info.ThisMode.h);
+			trace(_b);
+			_vp_logged++;
+		}
+	}
+#endif
 	glViewport(	view->X, bottom, (GLint) view->Width, (GLint) view->Height	);
 	// sets the min/max depth values to render
 	// default is max 1.0f and min 0.0f
@@ -857,6 +929,18 @@ static void reset_modelview( void )
 	MATRIX mv_matrix;
 	glMatrixMode(GL_MODELVIEW);
 	MatrixMultiply( &world_matrix, &view_matrix, &mv_matrix );
+#ifdef __3DS__
+	{
+		/* D3D left-handed → GL right-handed: negate Z row of modelview.
+		 * This is a reflection which fixes inside-out geometry but
+		 * causes text to appear mirrored. */
+		float *m = (float*)&mv_matrix;
+		m[8]  = -m[8];
+		m[9]  = -m[9];
+		m[10] = -m[10];
+		m[11] = -m[11];
+	}
+#endif
 	glLoadMatrixf((GLfloat*)&mv_matrix);
 #else
 	mvp_needs_update = true;

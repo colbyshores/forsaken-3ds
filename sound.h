@@ -2,7 +2,9 @@
 #define SOUND_INCLUDED
 
 #include "main.h"
+#ifndef __3DS__
 #include <SDL.h>
+#endif
 
 //
 // Globals

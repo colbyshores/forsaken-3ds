@@ -8,33 +8,164 @@
 
 #include "main.h"
 
+#ifdef __3DS__
+/* On 3DS we don't have SDL - define the key constants we actually use */
+#define SDLK_LAST    512
+/* Minimal SDL key defines for menu navigation */
+#define SDLK_RETURN  13
+#define SDLK_ESCAPE  27
+#define SDLK_SPACE   32
+#define SDLK_UP      273
+#define SDLK_DOWN    274
+#define SDLK_RIGHT   275
+#define SDLK_LEFT    276
+#define SDLK_BACKSPACE 8
+#define SDLK_DELETE  127
+#define SDLK_TAB     9
+#define SDLK_F1      282
+#define SDLK_F2      283
+#define SDLK_F3      284
+#define SDLK_F4      285
+#define SDLK_F5      286
+#define SDLK_F6      287
+#define SDLK_F7      288
+#define SDLK_F8      289
+#define SDLK_F9      290
+#define SDLK_F10     291
+#define SDLK_F11     292
+#define SDLK_F12     293
+#define SDLK_a       97
+#define SDLK_b       98
+#define SDLK_c       99
+#define SDLK_d       100
+#define SDLK_e       101
+#define SDLK_f       102
+#define SDLK_g       103
+#define SDLK_h       104
+#define SDLK_i       105
+#define SDLK_j       106
+#define SDLK_k       107
+#define SDLK_l       108
+#define SDLK_m       109
+#define SDLK_n       110
+#define SDLK_o       111
+#define SDLK_p       112
+#define SDLK_q       113
+#define SDLK_r       114
+#define SDLK_s       115
+#define SDLK_t       116
+#define SDLK_u       117
+#define SDLK_v       118
+#define SDLK_w       119
+#define SDLK_x       120
+#define SDLK_y       121
+#define SDLK_z       122
+#define SDLK_0       48
+#define SDLK_1       49
+#define SDLK_2       50
+#define SDLK_3       51
+#define SDLK_4       52
+#define SDLK_5       53
+#define SDLK_6       54
+#define SDLK_7       55
+#define SDLK_8       56
+#define SDLK_9       57
+#define SDLK_MINUS   45
+#define SDLK_EQUALS  61
+#define SDLK_LSHIFT  304
+#define SDLK_RSHIFT  303
+#define SDLK_LCTRL   306
+#define SDLK_RCTRL   305
+#define SDLK_LALT    308
+#define SDLK_RALT    307
+#define SDLK_PAGEUP  280
+#define SDLK_PAGEDOWN 281
+#define SDLK_HOME    278
+#define SDLK_END     279
+#define SDLK_INSERT  277
+#define SDLK_KP0     256
+#define SDLK_KP1     257
+#define SDLK_KP2     258
+#define SDLK_KP3     259
+#define SDLK_KP4     260
+#define SDLK_KP5     261
+#define SDLK_KP6     262
+#define SDLK_KP7     263
+#define SDLK_KP8     264
+#define SDLK_KP9     265
+#define SDLK_KP_PERIOD   266
+#define SDLK_KP_DIVIDE   267
+#define SDLK_KP_MULTIPLY 268
+#define SDLK_KP_MINUS    269
+#define SDLK_KP_PLUS     270
+#define SDLK_KP_ENTER    271
+#define SDLK_BACKQUOTE   96
+#define SDLK_COMMA       44
+#define SDLK_PERIOD      46
+#define SDLK_SLASH        47
+#define SDLK_SEMICOLON    59
+#define SDLK_QUOTE        39
+#define SDLK_LEFTBRACKET  91
+#define SDLK_RIGHTBRACKET 93
+#define SDLK_BACKSLASH    92
+#define SDLK_CAPSLOCK    301
+#define SDLK_NUMLOCK     300
+#define SDLK_SCROLLOCK   302
+#define SDLK_PAUSE       19
+#define SDLK_PRINT       316
+
+/* SDL compatibility stubs for 3DS */
+#include <stdio.h>
+#include <string.h>
+
+/* SDL_VERSION_ATLEAST macro - always false on 3DS */
+#define SDL_VERSION_ATLEAST(x,y,z) 0
+
+/* Keyboard state - maintained by input_3ds.c */
+extern u_int8_t _3ds_key_state[SDLK_LAST];
+static inline u_int8_t* SDL_GetKeyboardState(int *numkeys) {
+	if (numkeys) *numkeys = SDLK_LAST;
+	return _3ds_key_state;
+}
+static inline u_int8_t* SDL_GetKeyState(int *numkeys) {
+	return SDL_GetKeyboardState(numkeys);
+}
+
+/* Mod key state - always 0 on 3DS (no keyboard modifiers) */
+#define KMOD_CTRL  0x0040
+#define KMOD_SHIFT 0x0001
+#define KMOD_ALT   0x0100
+static inline int SDL_GetModState(void) { return 0; }
+
+static inline const char* SDL_GetKeyName(int key)
+{
+	static char buf[16];
+	if (key >= 32 && key < 127) { buf[0] = (char)key; buf[1] = 0; return buf; }
+	switch(key) {
+		case SDLK_RETURN: return "return";
+		case SDLK_ESCAPE: return "escape";
+		case SDLK_SPACE:  return "space";
+		case SDLK_UP:     return "up";
+		case SDLK_DOWN:   return "down";
+		case SDLK_LEFT:   return "left";
+		case SDLK_RIGHT:  return "right";
+		case SDLK_BACKSPACE: return "backspace";
+		case SDLK_TAB:    return "tab";
+		case SDLK_LSHIFT: return "left shift";
+		case SDLK_RSHIFT: return "right shift";
+		case SDLK_LCTRL:  return "left ctrl";
+		case SDLK_RCTRL:  return "right ctrl";
+		case SDLK_LALT:   return "left alt";
+		case SDLK_RALT:   return "right alt";
+		default: snprintf(buf, sizeof(buf), "key%d", key); return buf;
+	}
+}
+#else
 #include <SDL.h>
 #if SDL_VERSION_ATLEAST(2,0,0)
-    // TODO
-    //        previously this was the last possible keyboard value that sdl supported (323)
-    //        now supposedly all possible 32 bit values are mostly in use so they removed it
-    //        although forsaken still expects a single number which maps to keyboard, mouse, joystick
-    //        for this to work in sdl 1.2 we simply defined mouse_input_enum below and injected
-    //        mouse values above SDLK_LAST
-    //
-    //        We could try using a larger 64bit type to map mouse/joystick higher up
-    //        But will this cause a ton of vkey_map to be generated that we don't need ?
-    //        Also allot of forsaken code will try to enumerate all of them ?
-    //
-    //        Options:
-    //             Try new values
-    //             Split it up into 3 values for each device
-    // 
-    //        sdl 1.2 = 323
-    //        sdl 2.0 = 2**32
-    //        sdl 2.0 SDL_GetKeyboardState retuns 512 values
-    //
-    //        sdl 2.0 = SDLK_SLEEP (0x8000011A) seems to be the largest number
-    //                  but this easily exhausts all available memory blocks based on xmem.c setting.
-    //                  and causes vkey_map to generate 0x8000011A+ entries...
-    //
     #define SDLK_LAST 512
 #endif
+#endif /* __3DS__ */
 
 #include "controls.h"
 
@@ -137,7 +268,7 @@ extern int Num_Joysticks;
 typedef struct {
 	bool assigned;
 	bool connected;
-#ifndef DINPUTJOY
+#if !defined(DINPUTJOY) && !defined(__3DS__)
 	SDL_Joystick * sdl_joy;
 #endif
 	char *Name;

@@ -2,6 +2,7 @@
 #include "render_gl_shared.h"
 #include "new3d.h"
 #include "lights.h"
+#include "platform.h"
 
 //
 // using the concept of index/vertex buffers in opengl is a bit different
@@ -390,6 +391,10 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 			GLuint texture = *(GLuint*)renderObject->textureGroups[group].texture;
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, texture);
+		}
+		else
+		{
+			glDisable(GL_TEXTURE_2D);
 		}
 
 		glBegin(primitive_type);

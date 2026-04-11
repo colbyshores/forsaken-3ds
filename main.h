@@ -132,14 +132,19 @@ typedef struct
 // really crappy support right now for mingw32
 // since apparently it doesn't work with u_ types
 // support for this coming soon in a newer release
-#ifdef WIN32
+#if defined(WIN32) || defined(__3DS__)
 #include <stdint.h>
 typedef uint8_t  u_int8_t;
 typedef uint16_t u_int16_t;
 typedef uint32_t u_int32_t;
+#ifdef WIN32
 #include <windef.h>
+#endif
 #else
 // winapi compatibility
+typedef u_int32_t DWORD;
+#endif
+#ifdef __3DS__
 typedef u_int32_t DWORD;
 #endif
 typedef u_int8_t  BYTE;

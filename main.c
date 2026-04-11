@@ -1,8 +1,16 @@
 #include "main.h"
+#ifdef __3DS__
+#include "main_3ds.h"
+#include <3ds.h>
+#else
 #include "main_sdl.h"
+#include <SDL.h>
+#endif
 #include <stdio.h>
 #include <string.h>
+#ifndef __3DS__
 #include <search.h>
+#endif
 #include "version.h"
 #include "render.h"
 #include "util.h"
@@ -11,7 +19,6 @@
 #include "title.h"
 #include "lua_common.h"
 #include "sfx.h"
-#include <SDL.h>
 #include "input.h"
 #include "sound.h"
 
@@ -383,7 +390,11 @@ void CleanUpAndPostQuit(void)
 #endif
 
 	// should come last
+#ifdef __3DS__
+	platform_shutdown();
+#else
 	SDL_Quit();
+#endif
 }
 
 //
@@ -451,25 +462,40 @@ static bool AppInit( char * lpCmdLine )
 
 #endif
 
-	//
+#ifdef __3DS__
+	if(!platform_init())
+		return false;
+#else
 	if(!sdl_init())
 		return false;
+#endif
 
+#ifdef __3DS__
+	trace("main: parse_chdir");
+#endif
 	// parse chdir from command line first
 	if(!parse_chdir(lpCmdLine))
 		return false;
 
 	// we are now in the skeleton folder
 	// now we need to see if we are in right place
-
+#ifdef __3DS__
+	trace("main: missing_folders check");
+#endif
 	// check for missing folders
 	if(missing_folders())
 		return false;
 
+#ifdef __3DS__
+	trace("main: lua_init");
+#endif
 	// startup lua
 	if( lua_init() != 0 )
 		return false;
 
+#ifdef __3DS__
+	trace("main: GetGamePrefs");
+#endif
 	// copy game settings from config
 	GetGamePrefs();
 
@@ -480,17 +506,31 @@ static bool AppInit( char * lpCmdLine )
 	if(!ParseCommandLine(lpCmdLine))
 		return false;
 
+#ifdef __3DS__
+	trace("main: platform_init_video");
+#endif
 	//
 	// create and show the window
 	//
+#ifdef __3DS__
+	if(!platform_init_video())
+	{
+		Msg("platform_init_video() returned false");
+		return false;
+	}
+#else
 	if(!sdl_init_video())
 	{
 		Msg("sdl_init_video() returned false");
 		return false;
 	}
+#endif
 
 	// appears dinput has to be after init window
 
+#ifdef __3DS__
+	trace("main: joysticks_init");
+#endif
 	// initialize direct input
 	// This requires an application and window handle
 	// so it most not come earlier than here
@@ -499,11 +539,17 @@ static bool AppInit( char * lpCmdLine )
 		Msg("Failed to initialized joysticks!");
 		return false;
 	}
-	
+
+#ifdef __3DS__
+	trace("main: GetDefaultPilot");
+#endif
 	// this needs to come after joysticks_init
 	// because joysticks_init will wipe the joystick settings
 	GetDefaultPilot();
 
+#ifdef __3DS__
+	trace("main: InitScene");
+#endif
 // this is where it starts to take so long cause it scans directory for dynamic sound files...
 
 	// start the title scene
@@ -512,6 +558,9 @@ static bool AppInit( char * lpCmdLine )
 	if (!InitScene())
 		return false;
 
+#ifdef __3DS__
+	trace("main: InitView");
+#endif
 	// load the view
 	if (!InitView() )
 	{
@@ -526,6 +575,9 @@ static bool AppInit( char * lpCmdLine )
 	//
 	SetSoundLevels( NULL );
 
+#ifdef __3DS__
+	trace("main: AppInit finished");
+#endif
 	// done
 	DebugPrintf("AppInit finished...\n");
     return true;
@@ -540,6 +592,10 @@ extern bool RenderScene( void );
 
 static bool RenderLoop()
 {
+#ifdef __3DS__
+	static int _rl_traced = 0;
+	if (!_rl_traced) { trace("main: RenderLoop first call"); _rl_traced = 1; }
+#endif
     if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
 		return true;
 
@@ -637,7 +693,11 @@ int main( int argc, char* argv[] )
 
 		// command line asks us to sleep and free up sys resources a bit...
 		if ( cliSleep )
+#ifdef __3DS__
+			platform_delay( cliSleep );
+#else
 			SDL_Delay( cliSleep );
+#endif
 
 #if defined(DEBUG_ON) && defined(DEBUG_ALL_MATH_ERRORS)
 		DebugMathErrors();
