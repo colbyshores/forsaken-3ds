@@ -43,6 +43,7 @@ end
 
 function config_save(name)
 	local f = io.open(config_path(name), 'wb')
+	if not f then return end
 	for key, value in table.pairsByKeys(config) do
 		if type(value) == "string" then
 			f:write(("%s = %q\r\n"):format(key, value))

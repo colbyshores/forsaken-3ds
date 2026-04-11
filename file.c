@@ -310,6 +310,10 @@ void find_close( void )
 #else
 
 #include <glob.h>
+/* devkitARM's glob.h uses GLOB_ABEND instead of GLOB_ABORTED */
+#ifndef GLOB_ABORTED
+#define GLOB_ABORTED GLOB_ABEND
+#endif
 
 static glob_t glob_handle;
 static int glob_pos = -1;

@@ -1,0 +1,158 @@
+#
+# Makefile.3ds - ForsakenX 3DS port using devkitPro
+#
+# Usage: make -f Makefile.3ds
+#
+
+#---------------------------------------------------------------------------------
+# Environment
+#---------------------------------------------------------------------------------
+
+ifeq ($(strip $(DEVKITARM)),)
+$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
+endif
+ifeq ($(strip $(DEVKITPRO)),)
+$(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>devkitpro")
+endif
+
+include $(DEVKITARM)/3ds_rules
+
+#---------------------------------------------------------------------------------
+# Build configuration
+#---------------------------------------------------------------------------------
+
+# Root of the project sources
+SRCDIR     := $(CURDIR)
+TARGET     := forsaken3ds
+BUILD      := build_3ds
+
+# picaGL paths
+PICAGL_DIR := $(SRCDIR)/picaGL
+PICAGL_INC := $(PICAGL_DIR)/include
+
+# portlibs
+PORTLIBS   := $(DEVKITPRO)/portlibs/3ds
+
+#---------------------------------------------------------------------------------
+# Source files - exclude SDL/desktop/networking-specific files
+#---------------------------------------------------------------------------------
+
+EXCLUDE_SRC := \
+	main_sdl.c \
+	input_sdl.c \
+	input_dinput.c \
+	sound_openal.c \
+	sound_dsound.c \
+	texture_sdl.c \
+	texture_devil.c \
+	render_gl2.c \
+	render_gl3.c \
+	render_disabled.c \
+	net_enet.c \
+	net_enet_2.c \
+	net_tracker.c \
+	private_address.c \
+	lua_miniupnp.c \
+	botai_actions.c \
+	botai_path.c \
+	botai_sensors.c \
+	lua_bot.c
+
+ALL_SRC := $(notdir $(wildcard $(SRCDIR)/*.c))
+CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
+OFILES  := $(CFILES:.c=.o)
+
+#---------------------------------------------------------------------------------
+# Compiler / Linker flags
+#---------------------------------------------------------------------------------
+
+ARCH := -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
+
+CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
+	-Wno-missing-braces -Wno-pointer-sign -Wno-sign-compare \
+	-Wno-incompatible-pointer-types \
+	-Wno-implicit-function-declaration \
+	-Wno-implicit-int -Wno-int-conversion \
+	-ffunction-sections -fdata-sections -fcommon \
+	-std=gnu99 \
+	-D__3DS__ -DGL=1 \
+	-DBSP \
+	-DTEXTURE_PNG \
+	-DSOUND_SUPPORT \
+	-DLUA_USE_APICHECK
+
+# Include paths - note isystem for the source dir so #include <header.h> works
+CFLAGS += -isystem $(SRCDIR) \
+	-I$(SRCDIR) \
+	-I$(PICAGL_INC) \
+	-I$(PORTLIBS)/include \
+	-I$(PORTLIBS)/include/lua5.1 \
+	-I$(DEVKITPRO)/libctru/include
+
+LDFLAGS := $(ARCH) -specs=3dsx.specs \
+	-Wl,-Map,$(TARGET).map \
+	-L$(PICAGL_DIR)/lib \
+	-L$(PORTLIBS)/lib \
+	-L$(DEVKITPRO)/libctru/lib
+
+# Link order: picaGL before citro3d
+LIBS := -lpicaGL -lcitro3d -lctru -lpng -lz -llua5.1 -lm
+
+#---------------------------------------------------------------------------------
+# SMDH metadata
+#---------------------------------------------------------------------------------
+
+SMDH_ICON := $(SRCDIR)/icon.png
+ifeq ($(wildcard $(SMDH_ICON)),)
+SMDH_ICON := $(DEVKITPRO)/libctru/default_icon.png
+endif
+
+#---------------------------------------------------------------------------------
+# Targets
+#---------------------------------------------------------------------------------
+
+OUTPUT_ELF  := $(SRCDIR)/$(TARGET).elf
+OUTPUT_3DSX := $(SRCDIR)/$(TARGET).3dsx
+OUTPUT_SMDH := $(SRCDIR)/$(TARGET).smdh
+
+# Physical romfs directory (no symlinks - 3dsxtool can't follow them)
+ROMFS_STAGING := $(SRCDIR)/.romfs_staging
+ROMFS_STAMP   := $(ROMFS_STAGING)/.stamp
+
+.PHONY: all clean romfs-clean
+
+all: $(OUTPUT_3DSX)
+
+# Build a physical copy of romfs (resolving all symlinks) once
+$(ROMFS_STAMP): $(SRCDIR)/romfs
+	@echo "Staging romfs data (this may take a while)..."
+	@rm -rf $(ROMFS_STAGING)
+	@cp -rL $(SRCDIR)/romfs $(ROMFS_STAGING)
+	@touch $(ROMFS_STAMP)
+
+$(OUTPUT_SMDH):
+	@echo "Creating SMDH..."
+	smdhtool --create "Forsaken" "3DS port of ForsakenX" "ForsakenX" $(SMDH_ICON) $@
+
+$(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP)
+	@echo "Creating 3DSX..."
+	3dsxtool $< $@ --smdh=$(OUTPUT_SMDH) --romfs=$(ROMFS_STAGING)
+
+$(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
+	@echo "Linking $(notdir $@)..."
+	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
+
+$(BUILD)/%.o: $(SRCDIR)/%.c
+	@echo $(notdir $<)
+	@mkdir -p $(BUILD)
+	$(CC) -MMD -MP -MF $(BUILD)/$*.d $(CFLAGS) -c $< -o $@
+
+clean:
+	@echo "Cleaning 3DS build..."
+	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map
+
+romfs-clean:
+	@echo "Cleaning romfs staging..."
+	@rm -rf $(ROMFS_STAGING)
+
+-include $(wildcard $(BUILD)/*.d)

@@ -29,7 +29,8 @@
 
 local base 	= _G
 local table 	= require("table")
-local http 	= require("socket.http")
+local ok, http = pcall(require, "socket.http")
+if not ok then http = nil end
 local assert	= assert
 local pcall	= pcall
 local loadstring	= loadstring
@@ -40,6 +41,7 @@ local url = "http://fly.thruhere.net/status/games.json"
 
 function get( url )
 	local list = {}
+	if not http then return list end
 	local body, code, headers = http.request(url)
 	if code ~= 200 then return list end
 	body = "return " .. body

@@ -11,3 +11,22 @@ pilots
 savegame
 *.dll
 gmon.out
+
+# 3DS build artifacts
+build_3ds/
+forsaken3ds.3dsx
+forsaken3ds.elf
+forsaken3ds.smdh
+forsaken3ds.map
+.romfs_staging/
+romfs/
+
+# retail game data that ships with the 3dsx rom
+Data/
+Configs/
+Demos/
+DATA.TAG
+data1.cab
+
+# picaGL is maintained as a separate repo (see picaGL/.git)
+picaGL/

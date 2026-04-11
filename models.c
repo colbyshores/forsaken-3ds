@@ -1273,6 +1273,23 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					TempWorld._43 = Models[i].Pos.z;
 					TempWorld._44 = Models[i].InvMat._44;
 
+#ifdef __3DS__
+					if (InTitle) {
+						static int _md_log = 0;
+						if (_md_log < 40) {
+							extern void trace(const char *msg);
+							char _b[192];
+							snprintf(_b, sizeof(_b),
+								"md: i=%u mdl=%u pos=(%.1f,%.1f,%.1f) rot_diag=(%.3f,%.3f,%.3f)",
+								(unsigned)i, (unsigned)Models[i].ModelNum,
+								Models[i].Pos.x, Models[i].Pos.y, Models[i].Pos.z,
+								Models[i].InvMat._11, Models[i].InvMat._22, Models[i].InvMat._33);
+							trace(_b);
+							_md_log++;
+						}
+					}
+#endif
+
 					if (!FSSetWorld(&TempWorld))
 					{
 						Msg( "ModelDisp() SetMatrix1 Failed\n" );

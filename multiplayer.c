@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #include "main.h"
+#include "platform.h"
 #include "net.h"
 #include "render.h"
 #include "title.h"

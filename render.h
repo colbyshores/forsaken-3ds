@@ -9,7 +9,11 @@ extern "C" {
 
 #include "main.h"
 #include "new3d.h"
+#ifdef __3DS__
+#include <3ds.h>
+#else
 #include <SDL.h>
+#endif
 
 extern bool  bSquareOnly;
 
@@ -58,7 +62,10 @@ typedef struct {
 	bool					force_accel;			/* force 3d acelleration on gl */
 	bool					wireframe;
 
-#if SDL_VERSION_ATLEAST(2,0,0)
+#ifdef __3DS__
+	/* no window/renderer handles on 3DS - picaGL manages the framebuffer */
+	int _3ds_reserved;
+#elif SDL_VERSION_ATLEAST(2,0,0)
 	SDL_Window*             window;
 	SDL_Renderer*           renderer;
 #else
@@ -110,7 +117,11 @@ bool FSClearDepth(XYRECT * rect);
 
 #define MAX_LEVEL_TEXTURE_GROUPS 8
 
+#ifdef __3DS__
+#define MAX_TEXTURE_GROUPS 128
+#else
 #define MAX_TEXTURE_GROUPS 600
+#endif
 
 #define INCREASE_TEXTURE_GROUPS( group ) \
 	assert( group->numTextureGroups < MAX_TEXTURE_GROUPS ); \

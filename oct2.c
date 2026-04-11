@@ -2,6 +2,7 @@
 #define BSP_ONLY
 
 #include "main.h"
+#include "platform.h"
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -807,6 +808,25 @@ bool SetFOV( float fov )
 	proj._11 = 2 * viewplane_distance / viewport.Width;
 	proj._22 = 2 * viewplane_distance / ( viewport.Height / pixel_aspect_ratio );
 
+#ifdef __3DS__
+	{
+		static int _fov_logged = 0;
+		if (_fov_logged < 3) {
+			extern void trace(const char *msg);
+			char _b[192];
+			snprintf(_b, sizeof(_b),
+				"SetFOV: fov=%.1f vp=%lux%lu scr=%.0fx%.0f aspect=%.3f pxAR=%.3f _11=%.3f _22=%.3f",
+				fov,
+				(unsigned long)viewport.Width, (unsigned long)viewport.Height,
+				screen_width, screen_height,
+				render_info.aspect_ratio, pixel_aspect_ratio,
+				proj._11, proj._22);
+			trace(_b);
+			_fov_logged++;
+		}
+	}
+#endif
+
 	if( fov > START_FOV )
 	{
 		Scale = ( ( MAX_FOV - fov ) / ( MAX_FOV - START_FOV ) );
@@ -825,6 +845,8 @@ bool SetFOV( float fov )
 	}
 
 	stereo_adjust(&proj);
+
+	/* D3D->OpenGL projection conversion is handled in FSSetProjection on 3DS */
 
 	ProjMatrix._11 = proj._11;
 	ProjMatrix._22 = proj._22;
@@ -2007,6 +2029,10 @@ InitScene(void)
 
 bool InitView( void )
 {
+#ifdef __3DS__
+	extern void trace(const char *msg);
+	trace("InitView: start");
+#endif
 	DebugPrintf("InitView Starting...\n");
 
 	CheatsDisabled = false;
@@ -2023,12 +2049,18 @@ bool InitView( void )
 		case  STATUS_TitleLoadGameStartingSinglePlayer:
 		case  STATUS_StartingMultiplayer:
 		case  STATUS_GetPlayerNum:
+#ifdef __3DS__
+		trace("InitView: InitTitle");
+#endif
 		if( InitTitle() != true ) // bjd
 		{
 			SeriousError = true;
 			return false;
 		}
 
+#ifdef __3DS__
+		trace("InitView: InitializeSound");
+#endif
 		if ( !bSoundEnabled )
 		{
 			if (! InitializeSound( DESTROYSOUND_All ))
@@ -2039,43 +2071,62 @@ bool InitView( void )
 			}
 		}
 
+#ifdef __3DS__
+		trace("InitView: InitRenderBufs");
+#endif
 		InitRenderBufs();
-	    
+
 		if( !SetMatrixViewPort() )
 		{
 		  SeriousError = true;
 		  Msg( "SetMatrixViewPort() Failed\n" );
 		  return false;
 		}
+#ifdef __3DS__
+		trace("InitView: InitTload");
+#endif
 		// Init the Texture Handler
 		InitTload( &Tloadheader );
 
+#ifdef __3DS__
+		trace("InitView: Load_All_Off_Files");
+#endif
 		if( !Load_All_Off_Files( &Title_OffsetFiles[ 0 ] ) )
 		{
 		  SeriousError = true;
 		  return false;
 		}
-	    
+
+#ifdef __3DS__
+		trace("InitView: PreLoadFlyGirl");
+#endif
 		if( !PreLoadFlyGirl() )
 		{
 		  SeriousError = true;
 		  return false;
 		}
-	    
 
+#ifdef __3DS__
+		trace("InitView: PreInitModel");
+#endif
 		if( !PreInitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
 		  return false;
 		}
-	    
+
+#ifdef __3DS__
+		trace("InitView: Tload");
+#endif
 		//  Load in And if nescessary ReScale Textures...
 		if( !Tload( &Tloadheader ) )
 		{
 		  SeriousError = true;
 		  return false;
 		}
-
+#ifdef __3DS__
+		trace("InitView: Tload done, InitModel");
+#endif
 		if( !InitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
@@ -2100,6 +2151,9 @@ bool InitView( void )
 			Tloadheader.PlaceHolder[ DummyTextureIndex ] = true;
 		}
 
+#ifdef __3DS__
+		trace("InitView: MenuRestart");
+#endif
 		if ( !CurrentMenu )
 		  MenuRestart( &MENU_Start );
     break;
@@ -2176,7 +2230,6 @@ void Build_View()
   VECTOR  Trans;
   VECTOR  Trans2;
 
-  
   Trans.x = -CurrentCamera.Pos.x;
   Trans.y = -CurrentCamera.Pos.y;
   Trans.z = -CurrentCamera.Pos.z;
@@ -2197,7 +2250,7 @@ void Build_View()
   view._32 = CurrentCamera.Mat._32;
   view._33 = CurrentCamera.Mat._33;
   view._34 = CurrentCamera.Mat._34;
-                                        
+
   view._41 = Trans2.x;
   view._42 = Trans2.y;
   view._43 = Trans2.z;

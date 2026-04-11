@@ -1,7 +1,9 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
+#ifndef __3DS__
 #include <SDL.h>
+#endif
 #include "main.h"
 #include "config.h"
 
