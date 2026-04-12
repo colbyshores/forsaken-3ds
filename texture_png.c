@@ -97,12 +97,27 @@ int load_image( texture_image_t * image, int mipmap )
   if (!(color_type & PNG_COLOR_MASK_COLOR))
       return -1;
 
-  /* detect if has alpha */
-  image->colorkey = (color_type & PNG_COLOR_MASK_ALPHA);
-  
-  // add alpha layer
-  if(!image->colorkey)
-	png_set_add_alpha(png_ptr, (png_uint_32)255, PNG_FILLER_AFTER);
+  /* "colorkey" here is the flag the downstream create_texture()
+   * consults to decide whether to replace pure-black RGB pixels with
+   * alpha=0. Forsaken's classic UI atlases (VDU font, HUD sheets)
+   * ship as RGB PNGs with black backgrounds representing
+   * transparency — the original 90s-era convention. We want those to
+   * be color-keyed. PNGs that already carry a real alpha channel
+   * carry their own transparency and do not need the black-key pass.
+   *
+   * Previously this was written as
+   *   image->colorkey = (color_type & PNG_COLOR_MASK_ALPHA);
+   * which set the flag only when the PNG already had alpha — the
+   * exact opposite of what the downstream loop needs. Fonts loaded
+   * as fully-opaque black-on-green and rendered invisible over the
+   * in-scene VDU panel (green on green with black background
+   * additively blended = no visible characters). */
+  {
+    int has_alpha = (color_type & PNG_COLOR_MASK_ALPHA) != 0;
+    image->colorkey = !has_alpha;
+    if (!has_alpha)
+      png_set_add_alpha(png_ptr, (png_uint_32)255, PNG_FILLER_AFTER);
+  }
 
   /* update info structure to apply transformations */
   png_read_update_info (png_ptr, info_ptr);

@@ -82,9 +82,19 @@ bool platform_init(void)
 
 /* ---- video / picaGL init ---- */
 
-/* 3DS top screen is 400x240 */
-#define SCREEN_WIDTH  400
-#define SCREEN_HEIGHT 240
+/* 3DS top screen is physically 400x240 (5:3 landscape).
+ * Forsaken's title screen, HUD, and camera authoring target 4:3 (the
+ * Windows/SDL build defaults to 800x600). Rendering at the full 400x240
+ * crops the vertical framing by ~27%, making the title crate overflow
+ * top/bottom. We letterbox instead: the game sees a 320x240 (4:3)
+ * logical screen and renders into a 320x240 viewport centered on the
+ * 400-pixel physical width, with 40-pixel black bars on each side.
+ * FSSetViewPort applies LETTERBOX_OFFSET_X when calling glViewport. */
+#define PHYS_SCREEN_WIDTH   400
+#define PHYS_SCREEN_HEIGHT  240
+#define SCREEN_WIDTH        320   /* logical 4:3 */
+#define SCREEN_HEIGHT       240
+#define LETTERBOX_OFFSET_X  ((PHYS_SCREEN_WIDTH - SCREEN_WIDTH) / 2)  /* 40 */
 
 bool platform_init_video(void)
 {

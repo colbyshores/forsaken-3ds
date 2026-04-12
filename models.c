@@ -1275,17 +1275,23 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 #ifdef __3DS__
 					if (InTitle) {
-						static int _md_log = 0;
-						if (_md_log < 40) {
+						/* Snapshot model positions AFTER title animations
+						 * settle (LowerStack runs 0.3-1.2s). We use a
+						 * frame counter fed by oct2.c Build_View. */
+						extern int _fs3ds_title_frame;
+						static int _md_snapshot_done = 0;
+						if (_fs3ds_title_frame >= 180 && !_md_snapshot_done) {
 							extern void trace(const char *msg);
 							char _b[192];
 							snprintf(_b, sizeof(_b),
-								"md: i=%u mdl=%u pos=(%.1f,%.1f,%.1f) rot_diag=(%.3f,%.3f,%.3f)",
+								"md[f=%d]: i=%u mdl=%u pos=(%.1f,%.1f,%.1f) rot_diag=(%.3f,%.3f,%.3f)",
+								_fs3ds_title_frame,
 								(unsigned)i, (unsigned)Models[i].ModelNum,
 								Models[i].Pos.x, Models[i].Pos.y, Models[i].Pos.z,
 								Models[i].InvMat._11, Models[i].InvMat._22, Models[i].InvMat._33);
 							trace(_b);
-							_md_log++;
+							/* Mark done once we log a full pass (roughly 14 models) */
+							if ((unsigned)i == 0) _md_snapshot_done = 1;
 						}
 					}
 #endif
