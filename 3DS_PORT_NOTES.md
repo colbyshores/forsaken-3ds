@@ -124,177 +124,474 @@ Also fixed `GL_MAX_TEXTURE_SIZE` from 128 to 1024 (PICA200 actual limit).
 | `picaGL/include/GL/glu.h` | GLU function declarations |
 | `picaGL/include/GL/glext.h` | Missing GL extension defines |
 
-### 17. D3D Left-Handed to GL Right-Handed Conversion (`render_gl_shared.c`) ★ KEY FIX
-**Problem:** The game's matrices are built for D3D's left-handed coordinate system
-where +Z points into the screen. PICA200 (via picaGL or citro3d) uses right-handed
-coordinates where -Z points into the screen. Without conversion, the scene renders
-"inside-out" — back faces appear in front of front faces, geometry looks inverted.
-This issue affects BOTH picaGL and native citro3d rendering paths.
-**Fix:** Negate the Z basis vector (3rd row, elements [8..11]) of the modelview matrix
-in `reset_modelview()` before passing to `glLoadMatrixf()`. This flips the Z axis,
-converting D3D left-handed to GL right-handed. In the citro3d path, the same negation
-should be applied to row[2] of the C3D_Mtx modelview before upload.
+### 17-21. D3D→PICA200 Pipeline — THE CORRECT FIX ★★★ CORE BREAKTHROUGH ★★★
 
-### 18. picaGL D3D Depth Range Detection (`picaGL/source/utils/math_utils.c`) ★ KEY FIX
-**Problem:** picaGL's `fix_projection` assumed GL projection convention (depth [-1,1])
-and applied `z' = 0.5z - 0.5w` to remap to PICA's [-1,0]. But Forsaken uses a D3D
-projection (depth [0,1]) which needs `z' = z - w`. The wrong remap caused depth
-buffer issues.
-**Fix:** Auto-detect D3D vs GL by checking `row[3].z` sign (+1 = D3D, -1 = GL) and
-apply the correct depth remap: `z - w` for D3D, `0.5z - 0.5w` for GL.
+**Background on the wrong path.** An earlier iteration tried to fix the D3D→GL
+mismatch with three layered "reflection" hacks:
+1. Negate View.z / Look.z in `DisplayTitle` (reposition camera)
+2. Negate modelview row 3 (`m[8..11]`) in `reset_modelview` (introduce reflection)
+3. Modify picaGL's `fix_projection` rotation matrix + `GX_TRANSFER_FLIP_VERT`
+   to un-mirror the resulting horizontal flip
 
-### 19. Skip to New Menu System (`oct2.c`) — REVERTED
-**Tried:** On 3DS, `MenuRestart(&MENU_NEW_Start)` to skip straight to disc menu.
-**Why reverted:** This skipped the camera's start→disc zoom animation, which
-is needed for the camera position to be correct. Keep the original `MENU_Start`.
+This "worked" in the sense that geometry rendered right-side-out, but it had
+ugly side effects:
+- The modelview row-3 negate is mathematically `v.z → -v.z`. Since `mv = world * view`
+  in row-vector form, this negates the **local** Z of every model vertex, not
+  the world Z. Symmetric geometry (stacked discs rotating around Y) was fine;
+  **asymmetric geometry (the Mtop/Mbot mechanism cage, the VDU screens)
+  rendered front-to-back flipped**, looking like a 180° rotation around Z.
+- The camera Z flip preserved distances only because the modelview reflection
+  happened to partially cancel it — fragile.
+- Horizontal mirror required GX_TRANSFER_FLIP_VERT as a separate display-level
+  correction, which couldn't be reasoned about in the same coordinate space as
+  the matrix hacks.
 
-### 20. Camera Handedness Fix via LookAt (`title.c` DisplayTitle) ★ KEY FIX
-**Problem:** The Z basis row negate in `reset_modelview` fixes inside-out geometry
-but leaves the camera on the WRONG SIDE of the scene (looking at the back of objects).
-The camera's orientation is built via `MakeViewMatrix(View, Look, Up, Mat)` — a
-classic LookAt function. The direction vector `Look - View` determines the camera's
-forward basis. In D3D convention, this produces a left-handed basis; in GL
-convention, right-handed.
-**Fix:** Negate BOTH `View.z` (camera position) AND `Look.z` (target position)
-before calling `MakeViewMatrix`. Both Z values must be flipped together so the
-direction vector `Look - View` is preserved — only the absolute positions
-mirror across the XY plane. This puts the camera on the opposite side of the
-scene while maintaining the correct relative orientation to its target. Because
-`MakeViewMatrix` is called every frame during camera animations (the start→disc
-zoom), the fix works continuously throughout the title room pan.
+The real diagnosis is that D3D→PICA200 is not one problem — it's **two independent
+problems**, and each has a clean one-line fix:
+
+---
+
+#### A. Depth range conversion (`FSSetProjection`) ★ CORE FIX ★
+
+**Problem:** The game builds a D3D LH projection matrix:
+```
+_33 =  F/(F-N)    _34 = 1
+_43 = -F*N/(F-N)  _44 = 0
+```
+After perspective divide this produces `NDC.z ∈ [0, 1]` (D3D convention).
+
+picaGL's `fix_projection` expects **GL** NDC `z ∈ [-1, 1]` and applies
+`z' = 0.5*z - 0.5*w` to remap to PICA's native `[-1, 0]`. If you feed it the
+D3D matrix directly you get `[-0.5, 0]` — half the depth precision **and** a
+busted near plane.
+
+**Fix:** Rescale two elements of the D3D projection in `FSSetProjection` on 3DS
+to produce GL NDC before picaGL's remap runs:
 
 ```c
 #ifdef __3DS__
-VECTOR View_flipped = View;
-VECTOR Look_flipped = Look;
-View_flipped.z = -View.z;
-Look_flipped.z = -Look.z;
-MakeViewMatrix(&View_flipped, &Look_flipped, &Up, &CurrentCamera.Mat);
-MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
-CurrentCamera.Pos = View_flipped;
+    RENDERMATRIX gl_proj;
+    memmove(&gl_proj, matrix, sizeof(RENDERMATRIX));
+    gl_proj._33 = 2.0f * matrix->_33 - 1.0f;  // (F+N)/(F-N)
+    gl_proj._43 = 2.0f * matrix->_43;         // -2FN/(F-N)
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf((GLfloat*)&gl_proj.m);
 #else
-MakeViewMatrix(&View, &Look, &Up, &CurrentCamera.Mat);
-MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
-CurrentCamera.Pos = View;
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf((GLfloat*)&matrix->m);
 #endif
 ```
 
-### 21. Horizontal Mirror Fix via Hardware Display Flip (`picaGL/source/picaGL.c`) ★★ CRITICAL FIX ★★
-**Problem:** The modelview Z row negate is mathematically a reflection (one axis
-negated = determinant becomes -1). Reflections fix the inside-out appearance of
-geometry (handedness conversion) but have an unavoidable side effect: the final
-scene appears horizontally mirrored on screen. Text reads backwards.
+`_34 = 1` is **left alone** — the game's D3D view matrix produces `v.z > 0`
+for in-front points, so keeping `clip.w = +v.z` is correct. The view matrix
+does NOT need to be touched.
 
-We tried MANY approaches to un-mirror via matrix math (all failed, each one
-broke a different thing):
-  - Negate `row[0].y` in `fix_projection` → made scene inside-out
-  - Negate `row[1].x` in `fix_projection` → made scene inside-out
-  - Negate both X and Z rows of modelview (180° rotation) → camera on wrong side again
-  - Negate `_11` in projection → broke depth
-  - Negate X column of modelview → broke geometry
-  - Flip View/Look.x along with Z in LookAt → camera in wrong place
+Two-step depth pipeline on 3DS is now:
+- D3D `[0, 1]` → GL `[-1, 1]` via `_33, _43` rewrite in FSSetProjection
+- GL `[-1, 1]` → PICA `[-1, 0]` via picaGL's existing `0.5z - 0.5w` remap
 
-**The math reason:** a single reflection changes handedness (fixes inside-out),
-a second reflection would cancel it back (breaks handedness again), and a rotation
-(two reflections composed) preserves handedness but doesn't fix the mirror. You
-cannot fix inside-out AND un-mirror using pure matrix operations on the same pipeline.
+Full PICA depth precision, correct near/far, no view matrix changes.
 
-**THE SOLUTION: Hardware display-level flip.** The 3DS's `GX_DisplayTransfer`
-hardware unit supports a vertical flip (`GX_TRANSFER_FLIP_VERT(1)`) during the
-copy from the framebuffer to the physical display. Because picaGL renders to a
-240×400 PORTRAIT framebuffer that the display hardware rotates to 400×240
-LANDSCAPE for output, a vertical flip on the portrait buffer corresponds to a
-HORIZONTAL flip on the final landscape image.
+---
 
-This is a **pure display-level operation** that runs after all matrix math is
-done. It doesn't interact with the rendering pipeline at all. The GPU renders
-the already-handedness-corrected (but mirrored) scene normally, and the display
-hardware flips it as it sends pixels to the screen.
+#### B. Winding / culling for CW-front meshes (`reset_cull`, `cull_cw`) ★ CORE FIX ★
 
+**The PICA200 hardware only supports CCW-front culling modes.** From libctru
+`<3ds/gpu/enums.h>`:
 ```c
-/* In picaGL/source/picaGL.c pglSwapBuffers() */
-if(pglState->display == GFX_TOP)
-{
-    GX_DisplayTransfer(
-        (u32*)pglState->colorBuffer, GX_BUFFER_DIM(240, 400),
-        output_framebuffer, GX_BUFFER_DIM(240, 400),
-        GX_TRANSFER_OUT_FORMAT(output_format) | GX_TRANSFER_FLIP_VERT(1));
-}
-else
-{
-    GX_DisplayTransfer(
-        (u32*)pglState->colorBuffer + (240*80),GX_BUFFER_DIM(240, 320),
-        output_framebuffer, GX_BUFFER_DIM(240, 320),
-        GX_TRANSFER_OUT_FORMAT(output_format) | GX_TRANSFER_FLIP_VERT(1));
-}
+typedef enum {
+    GPU_CULL_NONE      = 0,
+    GPU_CULL_FRONT_CCW = 1,  // "Front, counter-clockwise"
+    GPU_CULL_BACK_CCW  = 2,  // "Back, counter-clockwise"
+} GPU_CULLMODE;
 ```
+There is **no `GPU_CULL_*_CW` mode in hardware.** The GPU always assumes CCW
+is front and lets you pick which face to cull.
 
-**Key insight:** the 3DS screen rotation is the trick. Because the physical
-framebuffer is portrait but displayed as landscape, the hardware vertical flip
-on the portrait axis becomes a horizontal flip on screen. This lets us fix the
-mirror without ANY matrix manipulation — it's purely a display-time operation
-that runs at zero cost.
+And picaGL's `glFrontFace` is a no-op stub (`picaGL/source/stubs.c:75`). So
+the game's `glFrontFace(GL_CW)` in `reset_cull` is **silently ignored**. The
+engine's D3D-authored meshes have CW-front triangles, but picaGL always treats
+them as if CCW were front, meaning:
 
-## Key Learnings About Camera Handedness
+- Game calls `glCullFace(GL_BACK)` — intent: "cull back faces"
+- picaGL maps it to `GPU_CULL_BACK_CCW` — hardware: "cull the back where front=CCW"
+- Hardware culls CW triangles — i.e., **culls the game's front faces**
+- Only back faces are visible → scene looks inside-out
 
-The camera has its own handedness that's embedded in how LookAt functions compute
-the view matrix. When `MakeViewMatrix(eye, target, up)` builds the rotation:
-- D3D: forward = normalize(target - eye), right = cross(up, forward), up = cross(forward, right)
-  — this creates a left-handed basis where +Z points INTO the screen
-- GL: forward = normalize(eye - target), right = cross(up, forward), up = cross(forward, right)
-  — this creates a right-handed basis where -Z points INTO the screen
-
-The ForsakenX engine uses the D3D convention. Passing the D3D view matrix
-directly to picaGL causes the camera to look the WRONG way because picaGL's
-`fix_projection` applies GL-convention transforms on top of it. Flipping the
-input View/Look Z coordinates before MakeViewMatrix effectively changes which
-convention is used, producing a GL-compatible view matrix.
-
-**Side effects:** The Z flip of view/look produces a scene that is horizontally
-mirrored (determinant of the total transform changes sign). This is corrected
-by negating `row[0].y` in picaGL's `fix_projection` 90° tilt rotation.
-
-### 22. FOV / Aspect Ratio Swap for Screen Rotation (`oct2.c` SetFOV) ★ KEY FIX
-**Problem:** picaGL's `fix_projection` applies a 90° screen rotation that swaps
-the projection's X and Y output axes (to convert from landscape rendering to
-the 3DS's portrait framebuffer). The game's `SetFOV()` computes `proj._11` (X
-scale) using `viewport.Width` (400) and `proj._22` (Y scale) using
-`viewport.Height` (240). After the rotation swap, `_11` ends up on the screen
-Y axis and `_22` ends up on the screen X axis — the aspect ratio is inverted.
-Effect: the horizontal FOV becomes effectively ~55° instead of 90°, making
-objects appear zoomed in by ~1.67x.
-**Fix:** On 3DS, swap Width and Height in the projection scale calculation
-and invert the pixel aspect ratio. After picaGL's rotation swap, the scales
-land on the correct screen axes.
+**Fix:** Invert the `glCullFace` argument on 3DS only. Swap `GL_BACK`↔`GL_FRONT`
+so picaGL's CCW-front assumption lines up with what we want.
 
 ```c
+void reset_cull(void)
+{
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
 #ifdef __3DS__
-/* Pre-swap to compensate for picaGL's 90° rotation */
-pixel_aspect_ratio = 1.0f / (render_info.aspect_ratio * screen_height / screen_width);
-viewplane_distance = (float)( viewport.Height / ( 2 * tan( DEG2RAD(fov) * 0.5 ) ) );
-proj._11 = 2 * viewplane_distance / viewport.Height;
-proj._22 = 2 * viewplane_distance / ( viewport.Width / pixel_aspect_ratio );
+    /* picaGL's glFrontFace is a no-op and PICA200 hardware only has
+     * CCW-front modes. Our meshes are CW-front, so we flip the cull
+     * sense here: asking for GL_FRONT makes picaGL emit
+     * GPU_CULL_FRONT_CCW, which culls CCW triangles in hardware
+     * (i.e., the real back faces of our D3D meshes). */
+    glCullFace(GL_FRONT);
 #else
-pixel_aspect_ratio = render_info.aspect_ratio * screen_height / screen_width;
-viewplane_distance = (float)( viewport.Width / ( 2 * tan( DEG2RAD(fov) * 0.5 ) ) );
-proj._11 = 2 * viewplane_distance / viewport.Width;
-proj._22 = 2 * viewplane_distance / ( viewport.Height / pixel_aspect_ratio );
+    glCullFace(GL_BACK);
 #endif
+}
+
+void cull_cw(void)
+{
+#ifdef __3DS__
+    glCullFace(GL_BACK);   // same inversion
+#else
+    glCullFace(GL_FRONT);
+#endif
+}
 ```
 
-## Key Concepts for PICA200 Porting
+**Why this is the clean fix:** it involves zero reflections, zero matrix
+manipulations, and has no interaction with the rest of the pipeline. It just
+tells the hardware to cull the other face because the hardware assumes the
+opposite handedness from what the data is authored for. Asymmetric geometry
+renders identically to the PC build. No FLIP_VERT needed. No modelview hacks.
+No View.z flip.
 
-### D3D vs OpenGL Coordinate Handedness
-D3D uses a **left-handed** coordinate system (+Z into screen). OpenGL/PICA200 uses
-**right-handed** (-Z into screen). Games ported from D3D will render inside-out unless
-the Z axis is negated in the modelview matrix. This affects:
-- picaGL path: negate row 2 of modelview before `glLoadMatrixf`
-- citro3d path: negate `r[2]` of C3D_Mtx modelview before `C3D_FVUnifMtx4x4`
+---
 
-### D3D vs OpenGL Depth Range
-D3D projection outputs depth in [0, 1]. OpenGL outputs [-1, 1]. PICA200 needs [-1, 0].
-- D3D → PICA: `z_pica = z_d3d - 1` (or matrix: `row[2] -= row[3]`)
-- GL → PICA: `z_pica = 0.5 * z_gl - 0.5` (picaGL's default `fix_projection`)
+#### Files that are NOT touched on 3DS (and why)
+
+- `title.c` DisplayTitle: **no** View.z/Look.z flip. The raw D3D camera is
+  passed to `MakeViewMatrix` unchanged.
+- `render_gl_shared.c` `reset_modelview`: **no** modelview Z-row negate. Combined
+  `world * view` is loaded as-is.
+- `picaGL/source/picaGL.c` `pglSwapBuffers`: **no** `GX_TRANSFER_FLIP_VERT`. The
+  scene already renders correctly oriented; a hardware flip would re-mirror it.
+- `new3d.c` `MakeViewMatrix`: unchanged. Still uses D3D LH convention
+  (`vz = Look - View`, `vx = cross(Up, vz)`). The resulting view matrix, when
+  GL's column-major reinterpretation transposes it, produces mathematically
+  correct view-space coordinates. The earlier worry about "D3D's vx is opposite
+  sign from GL's vx" is a conceptual difference, not a pipeline error — the
+  numeric result going through `glLoadMatrixf` is the same either way.
+
+---
+
+### 22. Letterbox 320×240 viewport centered on 400×240 physical screen ★ FRAMING FIX ★
+
+**Problem:** The 3DS top screen is **5:3** (400×240). Forsaken's title camera
+positions, room layout, HUD, and `SetFOV` defaults were all authored for **4:3**
+(Windows/SDL build defaults to 800×600). Rendering at the full 400×240 gives
+a correct-aspect projection but cuts ~27% off the vertical framing — the title
+crate overflows top and bottom, the VDUs fall off the edges, the entire
+background room feels cramped.
+
+**Fix:** Lie to the engine about the screen size. Use 320×240 as the logical
+screen (render_info.ThisMode, window_size, WindowsDisplay), which naturally
+computes the correct 4:3 aspect in `SetFOV`. When the game calls `glViewport`,
+shift it horizontally by 40 pixels so the 320×240 viewport is centered on the
+400-pixel physical width, leaving 40-pixel black bars on each side.
+
+`glClearColor(0,0,0,1)` is already the game default and picaGL's `glClear`
+always fills the entire physical framebuffer (hard-coded `_picaViewport(0, 0, 240, 400)`
+in `picaGL/source/misc.c`), so the black bars stay black every frame without
+any extra work.
+
+```c
+/* main_3ds.c */
+#define PHYS_SCREEN_WIDTH   400
+#define PHYS_SCREEN_HEIGHT  240
+#define SCREEN_WIDTH        320     /* logical 4:3 */
+#define SCREEN_HEIGHT       240
+#define LETTERBOX_OFFSET_X  ((PHYS_SCREEN_WIDTH - SCREEN_WIDTH) / 2)  /* 40 */
+```
+
+```c
+/* main_3ds.h — shared with render_gl_shared.c */
+#define FS3DS_LETTERBOX_OFFSET_X 40
+```
+
+```c
+/* render_gl_shared.c FSSetViewPort */
+int vp_x = (int)view->X;
+#ifdef __3DS__
+vp_x += FS3DS_LETTERBOX_OFFSET_X;
+#endif
+glViewport(vp_x, bottom, (GLint)view->Width, (GLint)view->Height);
+```
+
+This preserves the Windows-era 4:3 framing faithfully on the 5:3 hardware.
+
+---
+
+### 23. picaGL `fix_projection` rotation — keep the modified rotation ★
+
+picaGL's upstream `fix_projection` premultiplies the projection with a matrix
+that rotates the 240×400 portrait framebuffer's output to display as 400×240
+landscape. The upstream version uses `row[1].x = 1.0` which is actually a
+**reflection** (determinant −1), not a rotation. We keep the local modification
+`row[1].x = -1.0` (proper 90° rotation, determinant +1):
+
+```c
+/* picaGL/source/utils/math_utils.c matrix4x4_fix_projection */
+mp.row[0].x = 0.0;
+mp.row[0].y = 1.0;
+mp.row[1].x = -1.0;  /* proper rotation, not reflection */
+mp.row[1].y = 0.0;
+```
+
+Rationale: the culling fix (Section B above) depends on hardware seeing CCW as
+front for D3D-authored meshes when combined with the inverted `glCullFace`.
+The upstream reflection (det=−1) would flip winding once, which would combine
+with our cull inversion to break the culling again. A proper rotation (det=+1)
+preserves winding, letting the cull inversion land cleanly.
+
+## Key Concepts for PICA200 Porting (Generalized — use for citro3d port)
+
+The D3D LH → PICA200 conversion is **two orthogonal problems**, and each has
+a single-site fix. **Do not conflate them.** The earlier hack stack tried to
+solve them simultaneously with matrix reflections and paid for it with
+asymmetric-geometry bugs.
+
+### Problem 1: Depth Range
+D3D projection produces `NDC.z ∈ [0, 1]` (near=0, far=1).
+PICA200 depth hardware wants `z ∈ [-1, 0]` (near=-1, far=0).
+OpenGL convention is `NDC.z ∈ [-1, 1]` (near=-1, far=1).
+
+**Fix (both picaGL and citro3d paths):** rescale the projection matrix's
+`_33` and `_43` elements at upload time to produce GL-style `[-1, 1]`:
+```c
+_33' = 2 * _33 - 1     // (F+N)/(F-N)
+_43' = 2 * _43         // -2FN/(F-N)
+// leave _34 = 1 so clip.w = +v.z matches D3D view-space sign
+```
+
+For the picaGL path, picaGL's existing `0.5z - 0.5w` depth remap then takes
+the result to PICA's `[-1, 0]`.
+
+For a native citro3d port, either:
+- Apply the same `_33, _43` rewrite + a second `0.5z - 0.5w` matrix composed
+  into the uploaded projection, or
+- Go directly from D3D `[0, 1]` to PICA `[-1, 0]` with `_33' = _33 - 1`,
+  `_43' = _43` (which is matrix-wise `row[2] -= row[3]`) and skip GL as an
+  intermediate.
+
+**Leave the view matrix alone.** D3D `v.z > 0` for in-front points is fine;
+clip.w stays positive.
+
+### Problem 2: Winding / Culling Handedness
+D3D meshes are **CW-front** (clockwise winding = front face in D3D convention).
+PICA200 hardware **only** supports CCW-front modes (`GPU_CULL_FRONT_CCW`,
+`GPU_CULL_BACK_CCW`). There is **no hardware knob** to change this.
+
+**Fix (picaGL path):** invert the argument to `glCullFace` in the game code.
+`glCullFace(GL_FRONT)` on 3DS instead of `GL_BACK`, because picaGL's
+`glFrontFace` is a no-op and it always assumes CCW-front. This makes picaGL
+cull the CCW triangles which, on CW-front data, are the real back faces.
+
+**Fix (citro3d path):** call `C3D_CullFace(GPU_CULL_FRONT_CCW)` when the game
+wants back-face culling, and `C3D_CullFace(GPU_CULL_BACK_CCW)` when it wants
+front-face culling. Just swap the two enum values in whatever translation
+layer maps the game's cull state to citro3d.
+
+**Do NOT reflect the geometry** to flip winding — reflections flip local-Z
+on asymmetric models and introduce visual artifacts like the Mtop/Mbot cage
+appearing front-to-back flipped relative to the stacked discs.
+
+### What you do NOT need to do
+- You do NOT need to negate `View.z`/`Look.z` in camera setup.
+- You do NOT need to negate any row or column of the modelview matrix.
+- You do NOT need `GX_TRANSFER_FLIP_VERT` for any handedness reason.
+- You do NOT need to touch `MakeViewMatrix` / `CalcViewAxes`. The D3D LH
+  cross-product convention is fine when the final image only has the two
+  fixes above.
+
+### View matrix & column-major note
+The game stores matrices row-major with row-vector convention (`v_row * M`).
+OpenGL and citro3d interpret the same memory as column-major with column-vector
+convention (`M * v_col`). This implicit transpose is **mathematically the
+identity** for D3D matrices: `(M_row)ᵀ` applied column-major gives the same
+result as `M_row` applied row-major. So the row-major memory layout of the
+game's D3D view matrix produces correct view-space coordinates on GL/PICA
+without any conversion. The only real conversions needed are Problem 1 and
+Problem 2 above.
+
+## The WHY — Debugging Journey and Reasoning
+
+This section is the most important part of the document for anyone attempting
+a citro3d port or another PICA200 port. The TL;DR above tells you *what* to
+do; this section tells you *why*, so you don't accidentally reinvent the
+layered hack stack we had to back out of.
+
+### Why the old hack stack existed at all
+
+The original port noticed that geometry rendered **inside-out** (you could see
+the back walls of every closed mesh through the front faces). The intuitive
+interpretation was "D3D LH vs GL RH handedness mismatch" — the ingredients
+of which are:
+- D3D uses left-handed coords with +Z going INTO the screen
+- GL uses right-handed coords with −Z going INTO the screen
+- A handedness change requires negating one axis somewhere
+
+So the fix was assumed to be "negate Z somewhere in the matrix chain." Doing
+that on the modelview (the Z-row negate hack) did fix the inside-out symptom
+because **any matrix reflection flips triangle winding as a side effect** —
+the scene's apparent CW triangles became CCW after the reflection, and
+PICA200's CCW-front hardware then rendered them.
+
+This worked for most geometry. Symmetric shapes (the stacked menu discs, the
+room walls) looked fine because local-Z flipping a cylinder you're viewing
+side-on is invisible.
+
+But asymmetric geometry revealed the truth. The Mtop/Mbot mechanism cage has
+a distinct "front" and "back" in its local coordinate system, and reflecting
+its local-Z axis turned the cage front-to-back. That's why the user described
+it as "rotated 180° around Z" — the mechanism's facing direction had literally
+been mirrored in model space. Similarly, the VDU's green screen text ended up
+on what should have been the back face of the monitor model.
+
+The Z-row hack was not a handedness fix. **It was a winding-order hack that
+happened to be labeled "handedness" because it used the same mathematical
+operation a real handedness conversion would use.** Two very different root
+causes with the same matrix signature.
+
+### What actually goes wrong end-to-end
+
+Once we stopped conflating "handedness" with "winding order" and traced them
+separately, the picture cleared up. These are the real, independent things
+that differ between D3D LH and PICA200:
+
+1. **Depth range of the projection output.** D3D projection outputs
+   `NDC.z ∈ [0, 1]`. GL outputs `[−1, 1]`. PICA hardware uses `[−1, 0]`.
+   If you feed a D3D projection through picaGL's GL-assuming `0.5z − 0.5w`
+   remap, you get `[−0.5, 0]` — half the depth precision and a wrong near
+   plane. The fix is to rescale two elements of the projection matrix so
+   it produces GL-style `[−1, 1]` before picaGL's remap runs. **This is a
+   pure projection-matrix rewrite. It touches nothing else in the pipeline.**
+
+2. **Triangle winding convention vs hardware culling.** D3D authors meshes
+   as CW-front. The PICA200 GPU has exactly two hardware cull modes,
+   `GPU_CULL_FRONT_CCW` and `GPU_CULL_BACK_CCW`. Both assume CCW is front.
+   There is **no CW-front mode in hardware, ever, under any API** — it's a
+   physical limitation of the PICA200 face-culling unit. And picaGL's
+   `glFrontFace` is a no-op stub, so `glFrontFace(GL_CW)` never reaches
+   the hardware (it couldn't do anything with it even if it did).
+
+   The game says `glCullFace(GL_BACK)` intending "cull what D3D considers
+   back." picaGL translates this to `GPU_CULL_BACK_CCW` which means "cull
+   what hardware considers back, assuming front=CCW." Hardware then culls
+   CW triangles — i.e., the game's actual front faces. The visible result
+   is back-faces-only. Inside-out.
+
+   The fix is **telling the hardware to cull the opposite face.** In the
+   picaGL path that means `glCullFace(GL_FRONT)` in `reset_cull` on 3DS,
+   which picaGL maps to `GPU_CULL_FRONT_CCW`, which culls CCW in hardware —
+   i.e., the game's real back faces. No matrix touches. No reflections.
+   No geometry changes. Just "the hardware assumes the opposite winding, so
+   ask it to cull the opposite face."
+
+3. **Authored aspect ratio.** Unrelated to handedness, but worth knowing:
+   Forsaken's title camera, HUD, and room layout were all authored for
+   **4:3** (Windows 800×600). The 3DS top screen is **5:3** (400×240).
+   Rendering full-screen gives a correct 5:3 projection but cuts ~27% off
+   the vertical framing — the title crate overflows, the VDUs fall out of
+   frame, etc. The fix is to letterbox: render to a centered 320×240
+   viewport inside the 400×240 screen, leave the side 40-pixel columns
+   black. This makes the engine compute a 4:3 projection matrix naturally
+   via its existing `SetFOV` math, and it matches the Windows framing
+   exactly.
+
+### Why "handedness" was a red herring
+
+If you think about the GL→PICA path mathematically, nothing actually needs
+to change for a D3D LH view matrix to produce correct view-space coordinates
+on GL. Here's the reason:
+
+- The game stores matrices **row-major** with row-vector convention
+  (`v_row * M`). Every multiplication in the game uses this.
+- OpenGL and citro3d expect **column-major** with column-vector convention
+  (`M * v_col`).
+- Reading the same 16-float memory layout under the opposite convention is
+  equivalent to transposing the matrix. But the transpose is **mathematically
+  the identity** for these rendering operations: `M_row · v_row` produces
+  the same coordinates as `M_rowᵀ · v_col` (column form). The resulting
+  clip-space coordinates are identical.
+
+So passing the game's D3D view matrix to picaGL via `glLoadMatrixf` gives
+**mathematically correct** world→view transforms. No negation, no flipping,
+no reflection needed for the matrix math itself. The only places we actually
+have to intervene are the two physical hardware realities above: the depth
+range mapping and the culling winding.
+
+### Why we spent time on the wrong fixes
+
+Every one of the layered hacks we removed was solving the right **symptom**
+with the wrong **cause**:
+
+- **View.z/Look.z flip:** this was put in because the Z-row negate hack
+  moved the camera to the wrong side of the scene (the reflection flipped
+  where "in front" was). The camera flip partially cancelled the side
+  effect. Once we remove the Z-row negate, the camera flip is not only
+  unnecessary, it actively makes things wrong.
+- **Modelview Z-row negate:** as explained, this was a winding-order fix
+  disguised as a handedness fix, with a nasty local-Z side effect on
+  asymmetric geometry.
+- **Modified picaGL `fix_projection` rotation (`row[1].x = -1`):** this
+  changed the upstream reflection to a proper rotation. With the rest of
+  the hack stack gone, either value ends up producing the correct final
+  image because the cull inversion handles winding separately. We kept
+  the modified rotation because it's conceptually cleaner (det=+1,
+  preserves winding).
+- **`GX_TRANSFER_FLIP_VERT`:** this was needed to un-mirror the image that
+  the Z-row reflection produced. With no reflection in the pipeline, there
+  is no mirror to un-do, so we disable it.
+
+Every hack made sense as a local fix for the symptom it addressed. The
+problem was that they accumulated — each new hack had to work around the
+side effects of the previous one, and by the end there were four layered
+compensations entangled across three files and picaGL. Ripping them all
+out simultaneously and applying the two real fixes (projection depth
+rewrite + cull inversion) produces a pipeline where every step is
+individually justifiable and nothing depends on a distant compensation.
+
+### What this means for the native citro3d port
+
+When porting to citro3d directly (bypassing picaGL), apply the same two
+fixes at the citro3d-equivalent sites:
+
+1. **Depth range.** Build the projection with either:
+   - `C3D_Mtx` populated by `Mtx_PerspTilt` (which already handles the 3DS
+     portrait→landscape rotation) — then manually rescale row 2 so
+     `C3D_Mtx` produces `[−1, 0]` directly. Or:
+   - Take the game's D3D `RENDERMATRIX`, apply `_33' = _33 − 1`,
+     `_43' = _43` (the one-shot D3D→PICA depth remap, equivalent to
+     `row[2] −= row[3]`), and upload to `C3D_FVUnifMtx4x4` for the
+     projection uniform.
+
+2. **Culling.** When the game calls `reset_cull` / `cull_cw` / `cull_none`,
+   translate to `C3D_CullFace()`:
+   - `reset_cull` (game wants back-face culling of CW-front meshes) →
+     `C3D_CullFace(GPU_CULL_FRONT_CCW)`. Swap the enums compared to what
+     the name suggests, for the same reason we inverted `glCullFace` above.
+   - `cull_cw` (game wants front-face culling) →
+     `C3D_CullFace(GPU_CULL_BACK_CCW)`.
+   - `cull_none` → `C3D_CullFace(GPU_CULL_NONE)`.
+
+3. **View matrix** goes straight to `C3D_FVUnifMtx4x4` unchanged (you'll
+   need to transpose it to `C3D_Mtx`'s `.r[i].c[j]` convention, which is
+   what the D3D→GL column-major reinterpretation already does implicitly).
+   Don't touch view.z, don't touch the basis, don't scale anything.
+
+4. **Modelview** same as view — no row/column negation. Just upload
+   `world * view` and let the shader multiply.
+
+5. **Letterbox** via `C3D_SetViewport(offset_x=40, offset_y=0, width=320,
+   height=240)` on the 400×240 top screen render target, and `C3D_RenderTargetClear`
+   the whole target to black once per frame so the side bars stay filled.
+
+If you find yourself reaching for a matrix reflection or a `Z` negation
+during a citro3d port, stop and ask: "am I actually solving a winding-order
+problem by applying a depth/handedness operation?" If yes, the answer is
+almost certainly at the `C3D_CullFace` call, not in the matrix. The PICA200
+hardware will never, under any API, let you set CW as front — you either
+swap the cull enum or you reauthor the meshes.
 
 ## Known Remaining Issues
 

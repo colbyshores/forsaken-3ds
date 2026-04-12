@@ -695,14 +695,39 @@ void cull_none( void )
 
 void cull_cw( void )
 {
+#ifdef __3DS__
+	/* See reset_cull above: on PICA200 we invert glCullFace because
+	 * picaGL's hardware only does CCW-front. cull_cw means "cull CW
+	 * triangles" which are the game's front faces; with picaGL that
+	 * maps to culling the BACK (since picaGL thinks CW = back). */
+	glCullFace(GL_BACK);
+#else
 	glCullFace(GL_FRONT); // cw is the front for us
+#endif
 }
 
 void reset_cull( void )
 {
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
+#ifdef __3DS__
+	/* PICA200 hardware culling only has CCW-front modes
+	 * (GPU_CULL_FRONT_CCW / GPU_CULL_BACK_CCW) — there is no CW-front
+	 * mode in the GPU. picaGL's glFrontFace is a no-op stub, so the
+	 * game's glFrontFace(GL_CW) is silently ignored, and picaGL always
+	 * treats CCW as front.
+	 *
+	 * Our meshes are CW-front (D3D convention). With picaGL assuming
+	 * CCW-front, glCullFace(GL_BACK) would cull CW — i.e., cull our
+	 * actual front faces, leaving only back faces visible (inside-out).
+	 *
+	 * Fix: invert the sense of glCullFace here so picaGL's CCW-front
+	 * interpretation culls CCW (our real back faces). This gives the
+	 * correct visible result with the game's unmodified CW meshes. */
+	glCullFace(GL_FRONT);
+#else
 	glCullFace(GL_BACK);
+#endif
 }
 
 void set_normal_states( void )
@@ -817,22 +842,28 @@ bool FSSetViewPort(render_viewport_t *view)
 	// render_viewport_t x/y starts top/left
 	// but glViewport starts from bottom/left
 	int bottom = render_info.ThisMode.h - (view->Y + view->Height);
+	int vp_x = (int)view->X;
 #ifdef __3DS__
+	/* Letterbox the 320x240 logical screen into the center of the
+	 * 400x240 physical top screen (40px black bars left/right). */
+	vp_x += FS3DS_LETTERBOX_OFFSET_X;
 	{
 		static int _vp_logged = 0;
 		if (_vp_logged < 3) {
 			extern void trace(const char *msg);
-			char _b[128];
-			snprintf(_b, sizeof(_b), "viewport: x=%lu y=%lu w=%lu h=%lu bottom=%d mode_h=%d",
+			char _b[160];
+			snprintf(_b, sizeof(_b), "viewport: x=%lu y=%lu w=%lu h=%lu bottom=%d mode_h=%d -> glViewport(%d,%d,%lu,%lu)",
 				(unsigned long)view->X, (unsigned long)view->Y,
 				(unsigned long)view->Width, (unsigned long)view->Height,
-				bottom, render_info.ThisMode.h);
+				bottom, render_info.ThisMode.h,
+				vp_x, bottom,
+				(unsigned long)view->Width, (unsigned long)view->Height);
 			trace(_b);
 			_vp_logged++;
 		}
 	}
 #endif
-	glViewport(	view->X, bottom, (GLint) view->Width, (GLint) view->Height	);
+	glViewport(	vp_x, bottom, (GLint) view->Width, (GLint) view->Height	);
 	// sets the min/max depth values to render
 	// default is max 1.0f and min 0.0f
 	// this is here for compatibility with d3d9
@@ -929,18 +960,13 @@ static void reset_modelview( void )
 	MATRIX mv_matrix;
 	glMatrixMode(GL_MODELVIEW);
 	MatrixMultiply( &world_matrix, &view_matrix, &mv_matrix );
-#ifdef __3DS__
-	{
-		/* D3D left-handed → GL right-handed: negate Z row of modelview.
-		 * This is a reflection which fixes inside-out geometry but
-		 * causes text to appear mirrored. */
-		float *m = (float*)&mv_matrix;
-		m[8]  = -m[8];
-		m[9]  = -m[9];
-		m[10] = -m[10];
-		m[11] = -m[11];
-	}
-#endif
+	/* Note: the D3D LH → GL RH handedness conversion is handled once
+	 * in FSSetProjection by rescaling the projection's _33/_43, not
+	 * per-model here. That keeps individual models' local coordinate
+	 * frames untouched — the old Z-row negate on the modelview acted
+	 * as a per-vertex local Z flip that left discs (symmetric along Y)
+	 * looking fine but made asymmetric geometry (the Mtop/Mbot cage,
+	 * the VDUs) render front-to-back flipped. */
 	glLoadMatrixf((GLfloat*)&mv_matrix);
 #else
 	mvp_needs_update = true;
@@ -971,8 +997,45 @@ bool FSSetProjection( RENDERMATRIX *matrix )
 {
 	memmove(&proj_matrix,&matrix->m,sizeof(proj_matrix));//memcpy
 #if GL == 1
+#ifdef __3DS__
+	{
+		/* D3D LH → GL RH projection conversion.
+		 *
+		 * The game computes a D3D left-handed projection matrix with:
+		 *   _33 =  F/(F-N),  _34 = 1
+		 *   _43 = -F*N/(F-N), _44 = 0
+		 * which produces NDC.z in [0, 1] after perspective divide
+		 * (D3D's depth convention, with positive view-space Z
+		 * being "in front of camera").
+		 *
+		 * picaGL's fix_projection expects GL-style NDC.z in [-1, 1]
+		 * and then remaps to PICA's [-1, 0] via 0.5*z - 0.5*w. If we
+		 * feed it D3D NDC.z [0, 1] it ends up at [-0.5, 0] — half the
+		 * depth precision and wrong near plane.
+		 *
+		 * Convert D3D depth [0, 1] -> GL depth [-1, 1] by:
+		 *   clip.z_gl = 2*clip.z_d3d - w  =  (2*_33 - 1)*v.z + 2*_43
+		 * which means we can just rewrite the matrix as:
+		 *   _33' = 2*_33 - 1 = (F+N)/(F-N)
+		 *   _43' = 2*_43     = -2*F*N/(F-N)
+		 * leaving _34 = 1 so clip.w stays = +v.z (D3D convention,
+		 * which the view matrix produces since we no longer flip it).
+		 *
+		 * With this single fix in place, no other handedness hacks
+		 * are needed — view matrix, modelview, culling, and picaGL's
+		 * fix_projection rotation all just work.
+		 */
+		RENDERMATRIX gl_proj;
+		memmove(&gl_proj, matrix, sizeof(RENDERMATRIX));
+		gl_proj._33 = 2.0f * matrix->_33 - 1.0f;
+		gl_proj._43 = 2.0f * matrix->_43;
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf((GLfloat*)&gl_proj.m);
+	}
+#else
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf((GLfloat*)&matrix->m);
+#endif
 #else
 	// These matrices are eventually combined (multiplied together) at
 	// render time. We update them locally and mark the combined

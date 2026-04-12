@@ -24,6 +24,10 @@
 #include "util.h"
 #include "timer.h"
 #include "oct2.h"
+#include "render.h"
+#ifdef __3DS__
+#include <GL/gl.h>
+#endif
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -258,9 +262,9 @@ u_int16_t FindFreeScrPoly( void )
 
 	i = FirstScrPolyFree;
 	if( i == (u_int16_t) -1 ) return i;
- 
+
 	ScrPolys[i].Prev = FirstScrPolyUsed;
-							 
+
 	if ( FirstScrPolyUsed != (u_int16_t) -1)
 	{
 		ScrPolys[ FirstScrPolyUsed ].Next = i;
@@ -2078,10 +2082,12 @@ bool DisplaySolidScrPolys( RENDEROBJECT *renderObject )
 			return( true );
 
 		disable_zbuff();
+		cull_none();
 
 		if (!draw_2d_object(renderObject))
 			return false;
 
+		reset_cull();
 		reset_zbuff();
 	}
 
@@ -2102,10 +2108,25 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 			return( true );
 
 		disable_zbuff();
+		cull_none();
+#ifdef __3DS__
+		/* DEBUG: force 2D polys fully opaque on 3DS to see if they
+		 * reach the screen at all. If text appears as BLACK boxes
+		 * with green characters on the VDU, the polys ARE rendering
+		 * and the problem is the blend mode making them invisible.
+		 * If we still see nothing, the problem is upstream (culling,
+		 * coords, texture binding, etc). */
+		glDisable(GL_BLEND);
+		glDisable(GL_ALPHA_TEST);
+#endif
 
 		if (!draw_2d_object(renderObject))
 			return false;
 
+#ifdef __3DS__
+		glEnable(GL_BLEND);
+#endif
+		reset_cull();
 		reset_zbuff();
 	}
 

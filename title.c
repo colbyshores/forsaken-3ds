@@ -3186,6 +3186,13 @@ bool ForceConfigSave = false;
 bool TitleOnceOnly = true;
 
 VECTOR View, Look, Up, PanFrom, PanTo, PanFrom2, PanTo2, VDULookPos, DiscLookPos, DiscViewPos, VDUViewPos, StartLookPos, StartViewPos;
+
+#ifdef __3DS__
+/* Title-screen frame counter incremented in DisplayTitle each frame.
+ * Used by debug traces in models.c to delay snapshots until title
+ * animations (LowerStack, etc.) have settled. */
+int _fs3ds_title_frame = 0;
+#endif
 float CurrentFOV;
 float CurrentCameraPanTheta, CurrentCameraPanTheta2;
 VECTOR OrigPos[NUMOFTITLEMODELS];
@@ -5069,38 +5076,28 @@ bool DisplayTitle(void)
 
 	//Set up camera
 #ifdef __3DS__
-	/* Flip Z of View/Look to place camera on front side of the scene. */
-	{
-		VECTOR View_flipped = View;
-		VECTOR Look_flipped = Look;
-		View_flipped.z = -View.z;
-		Look_flipped.z = -Look.z;
-		MakeViewMatrix(&View_flipped, &Look_flipped, &Up, &CurrentCamera.Mat);
-		MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
-		CurrentCamera.Pos = View_flipped;
-
-		{
-			static int _cam_tick = 0;
-			if ((_cam_tick++ & 63) == 0) {
-				extern void trace(const char *msg);
-				char _b[192];
-				float dx = Look.x - View.x;
-				float dy = Look.y - View.y;
-				float dz = Look.z - View.z;
-				float dist = sqrtf(dx*dx + dy*dy + dz*dz);
-				snprintf(_b, sizeof(_b),
-					"cam: V=(%.1f,%.1f,%.1f) L=(%.1f,%.1f,%.1f) dist=%.1f",
-					View.x, View.y, View.z,
-					Look.x, Look.y, Look.z,
-					dist);
-				trace(_b);
-			}
-		}
-	}
-#else
+	/* Shared title-screen frame counter (used by models.c debug traces too). */
+	++_fs3ds_title_frame;
+#endif
 	MakeViewMatrix(&View, &Look, &Up, &CurrentCamera.Mat);
 	MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
 	CurrentCamera.Pos = View;
+#ifdef __3DS__
+	if ((_fs3ds_title_frame & 63) == 1) {
+		extern void trace(const char *msg);
+		char _b[192];
+		float dx = Look.x - View.x;
+		float dy = Look.y - View.y;
+		float dz = Look.z - View.z;
+		float dist = sqrtf(dx*dx + dy*dy + dz*dz);
+		snprintf(_b, sizeof(_b),
+			"cam[f=%d]: V=(%.1f,%.1f,%.1f) L=(%.1f,%.1f,%.1f) dist=%.1f",
+			_fs3ds_title_frame,
+			View.x, View.y, View.z,
+			Look.x, Look.y, Look.z,
+			dist);
+		trace(_b);
+	}
 #endif
 	CurrentCamera.GroupImIn = -1;
 	CurrentCamera.Viewport = viewport;	
@@ -12023,15 +12020,15 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 			ScrPolys[TempPoly].Pos.y = ypos;
 			if (TextInfo->flags & TEXTFLAG_NotImplemented)
 			{
-				ScrPolys[TempPoly].R = 100;					
+				ScrPolys[TempPoly].R = 100;
 				ScrPolys[TempPoly].G = 100;
-				ScrPolys[TempPoly].B = 100;				  
+				ScrPolys[TempPoly].B = 100;
 			}
 			else
 			{
-				ScrPolys[TempPoly].R = 255;					
-				ScrPolys[TempPoly].G = 255;					
-				ScrPolys[TempPoly].B = 255;				  
+				ScrPolys[TempPoly].R = 255;
+				ScrPolys[TempPoly].G = 255;
+				ScrPolys[TempPoly].B = 255;
 			}
 
 			ScrPolys[TempPoly].Trans = 255;				
