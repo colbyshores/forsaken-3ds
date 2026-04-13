@@ -2538,6 +2538,33 @@ bool RenderScene( void )
   case STATUS_Title:
 	DebugState("STATUS_Title\n");
 
+#ifdef __3DS_DEBUG__
+  {
+    /* [3DS_DEBUG] Auto-boot directly to Volcano level (NewLevelNum=0).
+     * Runs DisplayTitle() for 3 frames first so it can complete its
+     * one-time initialization (title models, HoloModel, etc.), then
+     * calls StartASinglePlayerGame() to skip manual menu navigation.
+     * Enabled by: make -f Makefile.3ds DEBUG=1 */
+    static int _autoboot_frames = 0;
+    extern bool StartASinglePlayerGame(MENUITEM*);
+    extern void trace_enable(void); extern void trace(const char*);
+
+    if (_autoboot_frames < 3) {
+        _autoboot_frames++;
+        trace_enable();
+        { char _b[64]; snprintf(_b,sizeof(_b),"autoboot: title frame %d/3", _autoboot_frames); trace(_b); }
+        if (!DisplayTitle()) { SeriousError = true; return false; }
+        break;
+    }
+    /* Frame 3+: fire the game */
+    trace("autoboot: calling StartASinglePlayerGame");
+    NewLevelNum = 0;   /* Volcano level (vol2, first in levels.dat) */
+    VduClear();
+    input_buffer_reset();
+    StartASinglePlayerGame(NULL);
+    break;
+  }
+#endif
 
   // ??
   case STATUS_BetweenLevels:

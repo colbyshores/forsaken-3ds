@@ -346,9 +346,22 @@ static void set_alpha_ignore( void )
 	float x = 100.f;
 	/* picaGL does not implement GL_ALPHA_TEST (PICA200 has no direct analog).
 	 * Use alpha blending so black pixels (alpha=0 after colorkey conversion)
-	 * are discarded visually.  Keep GL_ALPHA_TEST for non-picaGL builds. */
+	 * are discarded visually.  Keep GL_ALPHA_TEST for non-picaGL builds.
+	 *
+	 * For glow/particle effects (render_lighting_use_only_light_color_and_blend=1),
+	 * use additive blending (GL_SRC_ALPHA, GL_ONE) so dark fringe pixels contribute
+	 * nothing to the framebuffer — eliminates the black ring around plasma balls,
+	 * explosions, hoops, etc.  The original D3D path used DESTBLEND=D3DBLEND_ONE
+	 * for exactly these effects. */
 	glEnable(GL_BLEND);
+#ifdef __3DS__
+	if (render_lighting_use_only_light_color_and_blend)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);            /* additive: glow/particles */
+	else
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); /* normal alpha */
+#else
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#endif
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER,(x/255.0f));
 }
@@ -390,23 +403,34 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 		int numVerts   = renderObject->textureGroups[group].numVerts;
 
 		if(renderObject->textureGroups[group].colourkey)
+		{
 			set_alpha_ignore();
+#ifdef __3DS__
+			/* Additive-blended glow objects must not write depth so they
+			 * don't occlude geometry rendered behind them. */
+			if (!orthographic && render_lighting_use_only_light_color_and_blend)
+				glDepthMask(GL_FALSE);
+#endif
+		}
 
 		if( renderObject->textureGroups[group].texture )
 		{
 			GLuint texture = *(GLuint*)renderObject->textureGroups[group].texture;
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, texture);
-			/* [3DS/picaGL] Font textures (and other 2D HUD sprites) are RGBA PNGs
-			 * with alpha=0 for transparent areas.  picaGL does not honour
-			 * GL_ALPHA_TEST on PICA200, so transparent pixels write black unless we
-			 * enable alpha blending.  colourkey=true textures (RGB PNGs) are already
-			 * handled by set_alpha_ignore(), but RGBA textures have colourkey=false
-			 * and need blending enabled explicitly here. */
-			if(orthographic && !renderObject->textureGroups[group].colourkey)
+			/* [3DS/picaGL] picaGL does not honour GL_ALPHA_TEST on PICA200, so
+			 * transparent/semi-transparent pixels write black unless GL_BLEND is
+			 * enabled.  colourkey=true textures (RGB PNGs, black=transparent) are
+			 * handled by set_alpha_ignore().  colourkey=false textures are RGBA
+			 * PNGs with a real alpha channel — this covers both 2D HUD sprites
+			 * (orthographic) and 3D effects like projectiles and explosions. */
+			if(!renderObject->textureGroups[group].colourkey)
 			{
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				/* Don't let transparent fragments block geometry behind them. */
+				if(!orthographic)
+					glDepthMask(GL_FALSE);
 			}
 		}
 		else
@@ -446,12 +470,22 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 		if( renderObject->textureGroups[group].texture )
 		{
 			glDisable(GL_TEXTURE_2D);
-			if(orthographic && !renderObject->textureGroups[group].colourkey)
+			if(!renderObject->textureGroups[group].colourkey)
+			{
 				glDisable(GL_BLEND);
+				if(!orthographic)
+					glDepthMask(GL_TRUE);
+			}
 		}
 
 		if(renderObject->textureGroups[group].colourkey)
+		{
+#ifdef __3DS__
+			if (!orthographic && render_lighting_use_only_light_color_and_blend)
+				glDepthMask(GL_TRUE);
+#endif
 			unset_alpha_ignore();
+		}
 	}
 
 	if(orthographic)
