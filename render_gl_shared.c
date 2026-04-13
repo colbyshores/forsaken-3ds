@@ -177,8 +177,14 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
 				image.data[index+2] = (char) gamma_table[ (u_int8_t) image.data[index+2]];  // blue
 				image.data[index+3] = (char) gamma_table[ (u_int8_t) image.data[index+3]];  // alpha
 
-				// colour key
-				if( image.colorkey && (image.data[index] + image.data[index+1] + image.data[index+2]) == 0 )
+				/* colour key — black RGB pixels become alpha=0.
+				 * Applied unconditionally (not just for colorkey=true textures)
+				 * because RGBA PNGs are sometimes exported with the black
+				 * background at alpha=255 instead of alpha=0 (e.g. font512.png,
+				 * fontbig.png).  Applying this to all textures is safe: 3D
+				 * textures with colourkey=false still don't have blend/alpha-test
+				 * enabled during rendering, so their alpha channel is ignored. */
+				if( (image.data[index] + image.data[index+1] + image.data[index+2]) == 0 )
 					image.data[index+3] = 0; // alpha - pixel will not be rendered do to alpha value tests
 
 			}

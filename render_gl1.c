@@ -344,12 +344,18 @@ static void draw_vert( void * _vert, bool orthographic )
 static void set_alpha_ignore( void )
 {
 	float x = 100.f;
+	/* picaGL does not implement GL_ALPHA_TEST (PICA200 has no direct analog).
+	 * Use alpha blending so black pixels (alpha=0 after colorkey conversion)
+	 * are discarded visually.  Keep GL_ALPHA_TEST for non-picaGL builds. */
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER,(x/255.0f));
 }
 
 static void unset_alpha_ignore( void )
 {
+	glDisable(GL_BLEND);
 	glDisable(GL_ALPHA_TEST);
 }
 
@@ -391,6 +397,17 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 			GLuint texture = *(GLuint*)renderObject->textureGroups[group].texture;
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, texture);
+			/* [3DS/picaGL] Font textures (and other 2D HUD sprites) are RGBA PNGs
+			 * with alpha=0 for transparent areas.  picaGL does not honour
+			 * GL_ALPHA_TEST on PICA200, so transparent pixels write black unless we
+			 * enable alpha blending.  colourkey=true textures (RGB PNGs) are already
+			 * handled by set_alpha_ignore(), but RGBA textures have colourkey=false
+			 * and need blending enabled explicitly here. */
+			if(orthographic && !renderObject->textureGroups[group].colourkey)
+			{
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			}
 		}
 		else
 		{
@@ -427,7 +444,11 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 		glEnd();
 
 		if( renderObject->textureGroups[group].texture )
+		{
 			glDisable(GL_TEXTURE_2D);
+			if(orthographic && !renderObject->textureGroups[group].colourkey)
+				glDisable(GL_BLEND);
+		}
 
 		if(renderObject->textureGroups[group].colourkey)
 			unset_alpha_ignore();
