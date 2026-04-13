@@ -95,8 +95,8 @@ int input_buffer_find(int code)
 	int i;
 	for (i = 0; i < input_buffer_count; i++)
 		if (input_buffer[i] == code)
-			return i;
-	return -1;
+			return 1;  /* found — truthy; return index would make index 0 falsy */
+	return 0;  /* not found — falsy */
 }
 
 void input_buffer_reset(void)

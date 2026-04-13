@@ -1097,6 +1097,13 @@ MENU	MENU_NEW_StartSinglePlayer = {
 		{ 0, 200, 200, 50, 0,
 			LT_MENU_NEW_StartSinglePlayer1/*"start"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,
 #ifdef __3DS__
+			/* [3DS] Skip the between-levels briefing screen.
+			 * On PC, pressing Start navigates to MENU_NEW_BetweenLevels via
+			 * MenuChange, which plays the VDU camera fly-in animation and
+			 * displays mission text before a 2-second hold.  On 3DS that
+			 * animation produces a long black screen that makes the game feel
+			 * broken/hung.  We jump directly to GoToNextLevel instead; mission
+			 * briefing text is still readable in the level-select menus. */
 			NULL, NULL, GoToNextLevel, DrawFlatMenuItem, NULL, 0 } ,
 #else
 			NULL, &MENU_NEW_BetweenLevels, MenuChange, DrawFlatMenuItem, NULL, 0 } ,
@@ -5092,6 +5099,25 @@ bool DisplayTitle(void)
 									   RENDERVAL(2 * CurrentCamera.Viewport.dvScaleY));
 */
 
+#ifdef __3DS__
+	/* [3DS] Mirror the gameplay slider logic: enable hardware stereo in menus
+	 * only when the slider is pushed, otherwise render mono. */
+	{
+		float _slider = osGet3DSliderState();
+		if (_slider > 0.0f)
+		{
+			render_info.stereo_enabled = true;
+			render_info.stereo_mode    = STEREO_MODE_3DS;
+			render_info.stereo_eye_sep = _slider * 30.0f;
+			gfxSet3D(true);
+		}
+		else
+		{
+			render_info.stereo_enabled = false;
+			gfxSet3D(false);
+		}
+	}
+#endif
 	if( render_info.stereo_enabled )
 	{
 		if(!RenderCurrentCameraInStereo(RenderCurrentMenu))
@@ -5195,6 +5221,26 @@ static int SelectionColour( void )
 ===================================================================*/
 void MenuRestart( MENU * Menu )
 {
+#ifdef __3DS__
+	/* [3DS] Block all in-game menus during gameplay.  Something is calling
+	 * MenuRestart() every frame despite the ESCAPE handler and MenuProcess()
+	 * being disabled.  Trace the call so we can identify the caller later,
+	 * then return early so CurrentMenu stays NULL. */
+	if (MyGameStatus == STATUS_SinglePlayer) {
+		extern void trace(const char*);
+		extern const char *_3ds_mr_ctx;
+		static int _mr_logged = 0;
+		if (_mr_logged < 8) {
+			char _mr_b[96];
+			snprintf(_mr_b, sizeof(_mr_b), "MenuRestart: BLOCKED '%s' ctx=%s",
+				(Menu && Menu->Name) ? Menu->Name : "?",
+				_3ds_mr_ctx ? _3ds_mr_ctx : "none");
+			trace(_mr_b);
+			_mr_logged++;
+		}
+		return;
+	}
+#endif
 	if ( MyGameStatus == STATUS_SinglePlayer )
 	{
 		PauseAllSfx();
@@ -14620,6 +14666,37 @@ void SelectVDUList ( MENUITEM *Item )
 
 void GoToNextLevel( MENUITEM *Item )
 {
+#ifdef __3DS__
+	/* [3DS] Force VDU flush before handing off to the game-status machine.
+	 *
+	 * MenuAbort() (called later inside STATUS_StartingSinglePlayer) only invokes
+	 * VduClear() when CameraStatus == CAMERA_AtLeftVDU || CAMERA_AtRightVDU.
+	 * When GoToNextLevel is triggered from the disc/bike-select menu the camera
+	 * is NOT positioned at either VDU, so that guard never fires.
+	 *
+	 * The result: SCRTYPE_Normal screen-poly boxes (text backgrounds, slider
+	 * backgrounds) and the TextStack[] entries are left live.  Those polys are
+	 * re-submitted every frame and render on top of the 3D scene as a
+	 * "hall of mirrors" text overlay throughout gameplay.
+	 *
+	 * Fix: call VduClear() here unconditionally so everything is flushed
+	 * before the status machine takes over, regardless of camera position. */
+	VduClear();
+
+	/* [3DS] Flush the input buffer before entering gameplay.
+	 *
+	 * The 3DS input layer accumulates key events across ReadInput() calls.
+	 * Title-screen navigation (D-pad, A, Start/B = SDLK_ESCAPE) can leave
+	 * buffered SDLK_ESCAPE events.  When the game status machine reaches
+	 * STATUS_SinglePlayer, MainGame() calls MenuProcess() on its very first
+	 * frame.  Any queued SDLK_ESCAPE is immediately consumed there and opens
+	 * the in-game escape menu (MENU_InGameSingle), whose first visible item
+	 * is "Set Up Biker" -> MENU_SetUpBiker.  That menu then renders over the
+	 * 3D scene every frame, producing the persistent text overlay.
+	 *
+	 * Fix: drop all buffered input here so MenuProcess() starts clean. */
+	input_buffer_reset();
+#endif
 	StartASinglePlayerGame( NULL );
 }
 

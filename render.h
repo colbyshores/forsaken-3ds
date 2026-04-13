@@ -40,7 +40,7 @@ typedef struct
 } CLIENTSIZE;
 
 // stereo related enums
-typedef enum { STEREO_MODE_COLOR, STEREO_MODE_HALF_HEIGHT, STEREO_MODE_HALF_WIDTH } stereo_mode_t;
+typedef enum { STEREO_MODE_COLOR, STEREO_MODE_HALF_HEIGHT, STEREO_MODE_HALF_WIDTH, STEREO_MODE_3DS } stereo_mode_t;
 typedef enum { ST_CENTER, ST_LEFT, ST_RIGHT } stereo_position_t;
 typedef enum { ST_GREEN, ST_BLUE, ST_CYAN } stereo_right_color_t;
 
@@ -118,9 +118,28 @@ bool FSClearDepth(XYRECT * rect);
 #define MAX_LEVEL_TEXTURE_GROUPS 8
 
 #ifdef __3DS__
-/* 64 texture groups per render object — in-game HUD screen polys need >32.
- * ModelHeaders[512]+MxaModelHeaders[512] BSS ≈27MB; combined with 64MB heap
- * gives ~94MB total, fitting New 3DS's ~96MB app memory. */
+/*
+ * MAX_TEXTURE_GROUPS — 3DS value (64 vs. 600 on PC).
+ *
+ * RENDEROBJECT embeds textureGroups[MAX_TEXTURE_GROUPS] inline (not a
+ * pointer), so every live RENDEROBJECT consumes this many TEXTUREGROUP
+ * slots in BSS/stack.  ModelHeaders[512] + MxaModelHeaders[512] alone
+ * account for ~27 MB of BSS at 64 groups each; combined with the 64 MB
+ * heap this fits comfortably within New 3DS's ~96 MB application memory.
+ * Raising the limit further would push total memory usage over budget.
+ *
+ * PC can afford 600 groups because desktop RAM is not a concern and the
+ * in-game scene geometry rarely drives group counts that high.  On 3DS,
+ * however, the loading screen and menu renderers call INCREASE_TEXTURE_GROUPS
+ * once per sprite blit — hundreds of times per frame — so even 64 groups
+ * can be exhausted before a single screen is fully composited.
+ *
+ * The mid-draw flush mechanism in screenpolys.c (ScrPolyDispSolid /
+ * ScrPolyDispNonSolid) acts as a safety net: when numTextureGroups reaches
+ * MAX_TEXTURE_GROUPS the current batch is flushed (unlock → draw → re-lock)
+ * and the counter is reset to 0, preventing the assert/abort that
+ * INCREASE_TEXTURE_GROUPS would otherwise trigger on overflow.
+ */
 #define MAX_TEXTURE_GROUPS 64
 #else
 #define MAX_TEXTURE_GROUPS 600

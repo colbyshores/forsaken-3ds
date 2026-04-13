@@ -821,6 +821,12 @@ bool FSGetViewPort(render_viewport_t *view)
 	// xywh
 	glGetIntegerv( GL_VIEWPORT, i );
 	view->X	= i[0];
+#ifdef __3DS__
+	/* FSSetViewPort adds FS3DS_LETTERBOX_OFFSET_X to the game's logical X
+	 * before calling glViewport.  Strip it back out here so that the game's
+	 * viewport.X always holds the logical (letterbox-free) coordinate. */
+	view->X -= FS3DS_LETTERBOX_OFFSET_X;
+#endif
 	view->Y	= render_info.ThisMode.h - (i[1] + i[3]);
 	view->Width	= i[2];
 	view->Height = i[3];
