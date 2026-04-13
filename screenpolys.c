@@ -2462,6 +2462,41 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
 								start_index += ntris*3; // each triangle has three indexes...
 								StartVert += 4;
+								/*
+								 * 3DS mid-draw flush — textured quad path (ScrPolyDispSolid).
+								 *
+								 * WHY THIS EXISTS:
+								 *   On PC, INCREASE_TEXTURE_GROUPS() contains
+								 *   assert(numTextureGroups < MAX_TEXTURE_GROUPS).  On 3DS
+								 *   assert() calls abort(), crashing the console.  Loading
+								 *   screens and menus allocate one TEXTUREGROUP per sprite blit
+								 *   and easily exceed the 64-slot fixed array (see
+								 *   MAX_TEXTURE_GROUPS in render.h).  Growing the array further
+								 *   would push RENDEROBJECT past the ~80 MB RAM budget.
+								 *
+								 * WHAT THE FIX DOES:
+								 *   After committing each group we check whether the array is
+								 *   full.  If so, we flush the accumulated batch immediately:
+								 *   unlock vertex/index buffers, issue draw_2d_object, then
+								 *   re-lock.  numTextureGroups, start_index, and batchVert are
+								 *   all reset to 0 so the next group fills the array from the
+								 *   beginning.  Each partial batch is a complete draw call.
+								 *
+								 * WHY batchVert INSTEAD OF StartVert FOR startVert:
+								 *   StartVert is a cumulative counter across the entire function
+								 *   call (unchanged on PC).  After a flush the vertex buffer is
+								 *   re-locked from offset 0, so the next group's vertices land
+								 *   at position 0 in the new buffer — not at whatever StartVert
+								 *   has accumulated.  batchVert tracks position within the
+								 *   current batch only; it resets to 0 on every flush so that
+								 *   textureGroup.startVert indices stay correct.
+								 *
+								 * CRITICAL ORDERING:
+								 *   start_index, StartVert, and batchVert are ALL advanced
+								 *   BEFORE this flush check.  If the check came first, the group
+								 *   just committed would record stale startVert/startIndex from
+								 *   the previous iteration, corrupting that draw call.
+								 */
 #ifdef __3DS__
 								batchVert += 4;
 								if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
@@ -2605,6 +2640,20 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
 							start_index += ntris*3; // each triangle has three indexes...
 							StartVert += 4;
+							/*
+							 * 3DS mid-draw flush — untextured quad path (ScrPolyDispSolid).
+							 *
+							 * Same overflow-prevention mechanism as the textured-quad path
+							 * above.  INCREASE_TEXTURE_GROUPS() would assert/abort on overflow;
+							 * instead we flush (unlock → draw → re-lock) and reset the
+							 * group/index/vertex cursors before continuing.
+							 * batchVert is used for startVert rather than StartVert because it
+							 * resets to 0 on each flush, keeping vertex indices correct
+							 * relative to the freshly re-locked buffer.  Advances
+							 * (start_index, StartVert, batchVert) happen BEFORE this check so
+							 * the group just committed has already recorded correct offsets
+							 * before the counters are zeroed.
+							 */
 #ifdef __3DS__
 							batchVert += 4;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
@@ -3015,6 +3064,41 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 
 							start_index += ntris*3; // each triangle has three indexes...
 							StartVert += 4;
+							/*
+							 * 3DS mid-draw flush — textured quad path (ScrPolyDispNonSolid).
+							 *
+							 * WHY THIS EXISTS:
+							 *   On PC, INCREASE_TEXTURE_GROUPS() contains
+							 *   assert(numTextureGroups < MAX_TEXTURE_GROUPS).  On 3DS
+							 *   assert() calls abort(), crashing the console.  Loading
+							 *   screens and menus allocate one TEXTUREGROUP per sprite blit
+							 *   and easily exceed the 64-slot fixed array (see
+							 *   MAX_TEXTURE_GROUPS in render.h).  Growing the array further
+							 *   would push RENDEROBJECT past the ~80 MB RAM budget.
+							 *
+							 * WHAT THE FIX DOES:
+							 *   After committing each group we check whether the array is
+							 *   full.  If so, we flush the accumulated batch immediately:
+							 *   unlock vertex/index buffers, issue draw_2d_object, then
+							 *   re-lock.  numTextureGroups, start_index, and batchVert are
+							 *   all reset to 0 so the next group fills the array from the
+							 *   beginning.  Each partial batch is a complete draw call.
+							 *
+							 * WHY batchVert INSTEAD OF StartVert FOR startVert:
+							 *   StartVert is a cumulative counter across the entire function
+							 *   call (unchanged on PC).  After a flush the vertex buffer is
+							 *   re-locked from offset 0, so the next group's vertices land
+							 *   at position 0 in the new buffer — not at whatever StartVert
+							 *   has accumulated.  batchVert tracks position within the
+							 *   current batch only; it resets to 0 on every flush so that
+							 *   textureGroup.startVert indices stay correct.
+							 *
+							 * CRITICAL ORDERING:
+							 *   start_index, StartVert, and batchVert are ALL advanced
+							 *   BEFORE this flush check.  If the check came first, the group
+							 *   just committed would record stale startVert/startIndex from
+							 *   the previous iteration, corrupting that draw call.
+							 */
 #ifdef __3DS__
 							batchVert += 4;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
@@ -3177,6 +3261,20 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 
 							start_index += ntris*3; // each triangle has three indexes...
 							StartVert += 4;
+							/*
+							 * 3DS mid-draw flush — untextured quad path (ScrPolyDispNonSolid).
+							 *
+							 * Same overflow-prevention mechanism as the textured-quad path
+							 * above.  INCREASE_TEXTURE_GROUPS() would assert/abort on overflow;
+							 * instead we flush (unlock → draw → re-lock) and reset the
+							 * group/index/vertex cursors before continuing.
+							 * batchVert is used for startVert rather than StartVert because it
+							 * resets to 0 on each flush, keeping vertex indices correct
+							 * relative to the freshly re-locked buffer.  Advances
+							 * (start_index, StartVert, batchVert) happen BEFORE this check so
+							 * the group just committed has already recorded correct offsets
+							 * before the counters are zeroed.
+							 */
 #ifdef __3DS__
 							batchVert += 4;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {

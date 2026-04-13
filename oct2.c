@@ -453,6 +453,18 @@ bool InitViewport( void );
 BYTE  InitView_MyGameStatus;
 BYTE  ChangeLevel_MyGameStatus;
 
+#ifdef __3DS__
+/* One-shot flag: cleared on the FIRST STATUS_SinglePlayer frame to suppress
+ * a spurious SDLK_ESCAPE that can be injected by handle_events() between
+ * STATUS_PostStartingSinglePlayer and STATUS_SinglePlayer, which would
+ * otherwise open MENU_InGameSingle on the first gameplay frame. */
+static bool _gameplay_start_guard = false;
+
+/* Context string for MenuRestart caller tracking — set at key call sites
+ * so the BLOCKED trace in MenuRestart can identify which function called it. */
+const char *_3ds_mr_ctx = "startup";
+#endif
+
 //LPDIRECTDRAWPALETTE ddpal;
 
 void ProcessGameKeys( void );
@@ -887,6 +899,13 @@ void ProcessGameKeys( void )
   }
 
   // ESCAPE
+#ifndef __3DS__
+  /* [3DS] In-game pause menus (MENU_InGameSingle, MENU_InGame) are disabled
+   * on 3DS.  Stale SDLK_ESCAPE events injected by handle_events() during
+   * and after ChangeLevel() cause the menu to open on the very first gameplay
+   * frame and auto-navigate through sub-menus via continuous key injection.
+   * Re-enable once root cause (stale HID kDown / MenuProcess interaction) is
+   * understood and fixed. */
   if ( input_buffer_find( SDLK_ESCAPE ) )
 	{
     // if were not currently in a menu
@@ -904,7 +923,7 @@ void ProcessGameKeys( void )
       else
 		  {
 				// show the multi-player menu
-				if(GameStatus[WhoIAm] != STATUS_PlayingDemo && 
+				if(GameStatus[WhoIAm] != STATUS_PlayingDemo &&
 					GameStatus[WhoIAm] != STATUS_SinglePlayer)
 				{
 					MenuRestart( &MENU_InGame );
@@ -924,6 +943,7 @@ void ProcessGameKeys( void )
       JustExitedMenu = false;
 		}
 	}
+#endif /* !__3DS__ */
 
   // debuggin keys
   if ( DebugInfo ) 
@@ -1909,6 +1929,9 @@ ReleaseScene(void)
 
 void ReleaseView(void)
 {
+#ifdef __3DS__
+  { extern void trace(const char*); char _b[64]; snprintf(_b,sizeof(_b),"ReleaseView: status=%d",(int)MyGameStatus); trace(_b); }
+#endif
   switch( MyGameStatus )
   {
   case  STATUS_StartingMultiplayer:
@@ -2320,8 +2343,14 @@ bool RenderScene( void )
   if ( SeriousError )
     return false;
 
+#ifdef __3DS__
+  _3ds_mr_ctx = "pre-ReadInput";
+#endif
   // This is where in game we are getting input data read
   ReadInput();
+#ifdef __3DS__
+  _3ds_mr_ctx = "post-ReadInput";
+#endif
 
   //if ( !Bsp_Identical( &Bsp_Header[ 0 ], &Bsp_Original ) )
   //  hr = 0;
@@ -2344,23 +2373,40 @@ bool RenderScene( void )
 
   case STATUS_WaitingToStartSinglePlayer:
 	DebugState("STATUS_WaitingToStartSinglePlayer\n");
+#ifdef __3DS__
+	{ extern void trace_enable(void); extern void trace(const char*);
+	  static int _wtss_count = 0;
+	  if (_wtss_count == 0) { trace_enable(); trace("WTSS: first frame"); }
+	  _wtss_count++;
+	  if (_wtss_count == 10) trace("WTSS: frame 10");
+	  if (_wtss_count == 60) trace("WTSS: frame 60 (VduFinished not done?)");
+	}
+#endif
 
     if( DisplayTitle() != true )
     {
       SeriousError = true;
       return false;
     }
-    
+
     done = VduFinished( &MENU_NEW_BetweenLevels );
-      
+#ifdef __3DS__
+	{ extern void trace(const char*); static int _vf_logged = 0;
+	  if (done && !_vf_logged) { _vf_logged=1; trace("WTSS: VduFinished=true"); }
+	}
+#endif
+
     if ( done )
       WaitFrames--;
     if ( !WaitFrames )
     {
       WaitFrames = 2;
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("WTSS: calling StartASinglePlayerGame"); }
+#endif
       StartASinglePlayerGame( NULL );
     }
-    
+
     break;
 
 
@@ -2491,6 +2537,33 @@ bool RenderScene( void )
   // the main menu screen
   case STATUS_Title:
 	DebugState("STATUS_Title\n");
+
+#ifdef __3DS__
+  {
+    /* [3DS] Auto-boot directly to Volcano level (NewLevelNum=0) for debugging.
+     * Runs DisplayTitle() for 3 frames first so it can complete its one-time
+     * initialization (loading title models, HoloModel, etc.), then immediately
+     * calls StartASinglePlayerGame() to skip manual menu navigation. */
+    static int _autoboot_frames = 0;
+    extern bool StartASinglePlayerGame(MENUITEM*);
+    extern void trace_enable(void); extern void trace(const char*);
+
+    if (_autoboot_frames < 3) {
+        _autoboot_frames++;
+        trace_enable();
+        { char _b[64]; snprintf(_b,sizeof(_b),"autoboot: title frame %d/3", _autoboot_frames); trace(_b); }
+        if (!DisplayTitle()) { SeriousError = true; return false; }
+        break;
+    }
+    /* Frame 3+: fire the game */
+    trace("autoboot: calling StartASinglePlayerGame");
+    NewLevelNum = 0;   /* Volcano level (vol2, first in levels.dat) */
+    VduClear();
+    input_buffer_reset();
+    StartASinglePlayerGame(NULL);
+    break;
+  }
+#endif
 
   // ??
   case STATUS_BetweenLevels:
@@ -3203,6 +3276,9 @@ bool RenderScene( void )
 
   case STATUS_InitView_0:
 	DebugState("STATUS_InitView_0\n");
+#ifdef __3DS__
+	{ extern void trace_enable(void); extern void trace(const char*); trace_enable(); trace("IV0: entry"); }
+#endif
 
     if( IsHost )
     {
@@ -3314,11 +3390,17 @@ bool RenderScene( void )
 			return false;
 		}
     //  Load in And if nescessary ReScale Textures...
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: Tload"); }
+#endif
     if( !Tload( &Tloadheader ) )
     {
       SeriousError = true;
       return false;
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: Tload OK"); }
+#endif
 
 /*
     MyGameStatus = STATUS_InitView_2;
@@ -3364,11 +3446,17 @@ bool RenderScene( void )
     ReceiveGameMessages();
 */
 
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: InitModel"); }
+#endif
     if( !InitModel( &ModelNames[0] ) )
     {
        SeriousError = true;
        return false;               // all 3d models....
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: InitModel OK"); }
+#endif
 
 /*
     MyGameStatus = STATUS_InitView_4;
@@ -3392,11 +3480,17 @@ bool RenderScene( void )
 
     ReceiveGameMessages();
 */
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: Mload"); }
+#endif
     if( !Mload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
     {
       SeriousError = true;
       return false; // the model and visipoly data
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: Mload OK"); }
+#endif
 
     InitVisiStats( &Mloadheader );
 
@@ -3553,6 +3647,12 @@ bool RenderScene( void )
 
   case STATUS_ChangeLevelPostInitView:
 	DebugState("STATUS_ChangeLevelPostInitView\n");
+#ifdef __3DS__
+	/* [3DS] Debug traces for the level-load sequence.  Each checkpoint writes
+	 * to sdmc:/forsaken_trace.txt so a crash can be pinpointed without a
+	 * debugger.  Safe to remove once the port is stable. */
+	{ extern void trace(const char*); trace("CLPIV: entry"); }
+#endif
 
     Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], ".NOD" );
     if( !Nodeload( NodeName ) )
@@ -3560,12 +3660,18 @@ bool RenderScene( void )
       SeriousError = true;
       return( false );
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: Nodeload OK"); }
+#endif
 
     if( !LoadBGOFiles() )
     {
       SeriousError = true;
       return( false );
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: LoadBGOFiles OK"); }
+#endif
 
     if( !LoadEnemies() )
     {
@@ -3573,6 +3679,9 @@ bool RenderScene( void )
       Msg( "LoadEnemies() failed\n" );
       return( false );
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: LoadEnemies OK"); }
+#endif
 
     if( !LoadSpotFX() )
     {
@@ -3594,12 +3703,18 @@ bool RenderScene( void )
       Msg( "LoadRestartPoints() failed\n" );
       return( false );
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: LoadRestartPoints OK"); }
+#endif
 
       if ( !InitializeSound( DESTROYSOUND_All ))
       {
         Msg("InitializeSound() failed\n");
         return false;
       }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: InitializeSound OK"); }
+#endif
 
     Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], ".CAM" );
 
@@ -3608,6 +3723,9 @@ bool RenderScene( void )
       SeriousError = true;
       return( false );
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: Cameraload OK"); }
+#endif
 
     // might not be any real-time lights
     LoadRTLights();
@@ -3630,6 +3748,9 @@ bool RenderScene( void )
       Msg( "LoadPickupsPositions() failed\n" );
       return( false );
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: LoadPickupsPositions OK"); }
+#endif
 
     // might not be any External Forces...
     ExternalForcesLoad( (char*) &ExternalForceNames[LevelNum][0] );
@@ -3641,6 +3762,9 @@ bool RenderScene( void )
     TriggerAreaload( (char*) &ZoneNames[LevelNum][0] );
 
     InitShipsChangeLevel(&Mloadheader);
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: InitShipsChangeLevel OK"); }
+#endif
 
     if( ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
       ( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
@@ -3660,6 +3784,9 @@ bool RenderScene( void )
     GodModeOnceOnly = true;
 
     MyGameStatus = ChangeLevel_MyGameStatus;
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[64]; snprintf(_b,sizeof(_b),"CLPIV: done, MyGameStatus=%d",(int)MyGameStatus); trace(_b); }
+#endif
 
     PrintInitViewStatus( MyGameStatus );
 
@@ -3706,6 +3833,9 @@ bool RenderScene( void )
 
   case  STATUS_StartingSinglePlayer:
 	DebugState("STATUS_StartingSinglePlayer\n");
+#ifdef __3DS__
+	{ extern void trace_enable(void); extern void trace(const char*); trace_enable(); trace("SSP: entry"); }
+#endif
 
     MenuAbort();
     ReleaseView();
@@ -3721,11 +3851,76 @@ bool RenderScene( void )
     }
     GameCompleted = GAMECOMPLETE_NotComplete;
     if( !ChangeLevel() ) return( false );
+#ifdef __3DS__
+    /* [3DS] Clear picaGL color buffer to black after level load completes.
+     *
+     * ChangeLevel() contains its own internal render loop (STATUS_InitView_0,
+     * STATUS_ChangeLevelPostInitView, etc.) that renders loading-screen frames
+     * into the picaGL color buffer and pumps pglSwapBuffers(), updating GX
+     * display buffer A.  When ChangeLevel returns, one of the two GX display
+     * buffers (A) still contains the last loading-screen frame.
+     *
+     * On the STATUS_StartingSinglePlayer break, pglSwapBuffers() is called once
+     * more by platform_render_present(); this frame uses whatever is currently
+     * in the picaGL color buffer (the last loading frame).  That result is
+     * DMA'd into GX display buffer B, contaminating the second buffer too.
+     *
+     * Fix: clear the picaGL color buffer to black here so that the
+     * pglSwapBuffers() call at the end of this frame sends black to display B
+     * instead of the stale loading frame.  STATUS_PostStartingSinglePlayer
+     * (next frame) clears it again, which sends black to display A.
+     * Both GX display buffers are now black before the first gameplay frame
+     * renders, eliminating the alternating stale-frame flicker. */
+    FSClearBlack();
+#endif
     break;
 
 
   case  STATUS_PostStartingSinglePlayer:
 	DebugState("STATUS_PostStartingSinglePlayer\n");
+
+#ifdef __3DS__
+    /* [3DS] Second black-frame clear — flushes the remaining GX display buffer.
+     *
+     * The GX double-buffer scheme means there are always two display buffers
+     * (A and B) alternating each swap.  STATUS_StartingSinglePlayer's
+     * FSClearBlack() + pglSwapBuffers() cleared buffer B.  This frame's
+     * FSClearBlack() + pglSwapBuffers() clears buffer A.  After both frames
+     * complete, both display buffers contain black and neither holds stale
+     * loading-screen or title-screen content.  The first STATUS_SinglePlayer
+     * frame renders real gameplay into clean buffers. */
+    FSClearBlack();
+
+    /* [3DS] Eliminate stale ESCAPE injection that opens MENU_InGameSingle.
+     *
+     * Three-step fix:
+     *
+     * 1. hidScanInput() — updates the libctru HID "previous state" baseline.
+     *    ChangeLevel() blocks for several seconds without calling hidScanInput(),
+     *    so buttons pressed during loading appear as kDown (fresh press) on the
+     *    first post-load handle_events() scan.  Calling it here means the next
+     *    handle_events() scan sees those buttons as kHeld, not kDown — so no
+     *    spurious SDLK_ESCAPE is injected on Frame N+1.
+     *
+     * 2. input_buffer_reset() — clears any SDLK_ESCAPE that THIS frame's
+     *    handle_events() already added before we ran.  handle_events() runs
+     *    first in the main loop (before RenderScene), so the escape key is
+     *    already in input_buffer by the time we reach STATUS_PostStartingSinglePlayer.
+     *    ProcessGameKeys() is only called from STATUS_SinglePlayer (next frame),
+     *    but we clear the buffer here so the next frame's handle_events()
+     *    input_buffer_reset() at line 151 has a clean slate.
+     *
+     * 3. MenuAbort() — directly sets CurrentMenu = NULL as a hard safety net.
+     *    Even if SDLK_ESCAPE somehow reached MenuRestart via an earlier code
+     *    path, this ensures no menu is active when STATUS_SinglePlayer begins.
+     */
+    hidScanInput();
+    input_buffer_reset();
+    MenuAbort();
+    _gameplay_start_guard = true;  /* arm one-shot for STATUS_SinglePlayer */
+    { extern void trace(const char*); trace("PostSSP: guard armed, CurrentMenu cleared"); }
+    { extern void trace(const char*); char _b[64]; snprintf(_b,sizeof(_b),"PostSSP: input_buf_count=%d TotalScrPolys=%d", input_buffer_count, (int)TotalScrPolysInUse); trace(_b); }
+#endif
 
     smallinitShip( WhoIAm );
 	//    if( CountDownOn )
@@ -3733,7 +3928,7 @@ bool RenderScene( void )
 	//      CreateCountdownDigits();
 	//      StartCountDown( (int16_t) TimeLimit.value, 0 );
 	//    }
-    
+
 #ifdef DEMO_SUPPORT
     QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
 #endif
@@ -3751,14 +3946,45 @@ bool RenderScene( void )
   case STATUS_SinglePlayer:
 	DebugState("STATUS_SinglePlayer\n");
 
+#ifdef __3DS__
+    /* [3DS] One-shot guard: on the very first STATUS_SinglePlayer frame, clear
+     * any SDLK_ESCAPE that handle_events() may have injected this frame
+     * (from stale kDown of buttons held during ChangeLevel), and ensure
+     * CurrentMenu is NULL.  This fires BEFORE MainGame() / ProcessGameKeys()
+     * so no spurious MENU_InGameSingle can open on the first gameplay frame. */
+    if (_gameplay_start_guard) {
+        _gameplay_start_guard = false;
+        input_buffer_reset();
+        MenuAbort();
+        /* Flush any accumulated screen polys (menu text, VDU text) that were
+         * added during the title/loading phase but never killed.  Without this
+         * they all render on the first gameplay frame producing the hall-of-
+         * mirrors text overlay. */
+        /* Kill ALL persistent screen polys (menu items, VDU text, level
+         * description text) left over from the title screen.  VduClear() only
+         * clears VDU-specific entries; InitScrPolys() resets the entire
+         * ScrPolys[] linked list so nothing stale renders this frame. */
+        extern void InitScrPolys(void);
+        extern void trace(const char*);
+        InitScrPolys();
+        trace("gameplay_guard: InitScrPolys done");
+    }
+#endif
+
     if( MainGame() != true ) // bjd
       return false;
 
+#ifdef __3DS__
+    _3ds_mr_ctx = "post-MainGame";
+#endif
     if ( bSoundEnabled && !CurrentMenu )
     {
       ProcessLoopingSfx();
       ProcessEnemyBikerTaunt();
     }
+#ifdef __3DS__
+    _3ds_mr_ctx = "post-SoundProcessing";
+#endif
 
     LevelTimeTaken += timer_run( &level_timer );
 
@@ -4081,6 +4307,13 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
         	render_set_filter( 1, 0, 0 );
         if( !render_camera() )
           return false;
+#ifdef __3DS__
+	if(render_info.stereo_mode == STEREO_MODE_3DS)
+	{
+		extern void pglTransferEye(unsigned int eye);
+		pglTransferEye(GFX_LEFT);
+	}
+#endif
 	//
 	// render right eye
 	//
@@ -4115,6 +4348,13 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	}
         if( !render_camera() )
           return false;
+#ifdef __3DS__
+	if(render_info.stereo_mode == STEREO_MODE_3DS)
+	{
+		extern void pglTransferEye(unsigned int eye);
+		pglTransferEye(GFX_RIGHT);
+	}
+#endif
 	//
 	// reset back to normal center camera
 	//
@@ -4228,6 +4468,33 @@ bool MainGameRender(void)
 
       CurrentCamera.UseLowestLOD = false;
 
+#ifdef __3DS__
+      /* [3DS] Drive stereo from the 3D slider.
+       * When the slider is pushed in the game renders two passes via the
+       * existing RenderCurrentCameraInStereo() path — the camera math is
+       * already correct — but routes each eye to the hardware GFX_LEFT /
+       * GFX_RIGHT framebuffers via pglTransferEye() instead of compositing
+       * into a single anaglyph image.  When the slider is at zero we render
+       * mono as usual and keep gfxSet3D(false). */
+      {
+          float slider = osGet3DSliderState();
+          if (slider > 0.0f)
+          {
+              render_info.stereo_enabled = true;
+              render_info.stereo_mode    = STEREO_MODE_3DS;
+              /* Scale eye separation with the slider (max ~30 units at full depth).
+               * stereo_focal_dist retains its config value for asymmetric frustum. */
+              render_info.stereo_eye_sep = slider * 30.0f;
+              gfxSet3D(true);
+          }
+          else
+          {
+              render_info.stereo_enabled = false;
+              gfxSet3D(false);
+          }
+      }
+#endif
+
       if( render_info.stereo_enabled )
       {
 				if(!RenderCurrentCameraInStereo(RenderCurrentCameraWithMainGameMenu))
@@ -4241,7 +4508,18 @@ bool MainGameRender(void)
 				}
 	  	}
   
+#ifdef __3DS__
+      /* [3DS] Rear camera disabled on 3DS.
+       * The rear camera requires a second full render pass (BSP traversal,
+       * texture binding, GPU command submission) into a sub-viewport.  The
+       * PICA200 renders ~1-2M triangles/sec practical, so the extra pass can
+       * drop the frame below 20fps and cause the GX command queue to overflow,
+       * producing tearing artefacts.  The rear-view feature is removed for now;
+       * it can be re-enabled if performance allows. */
+      if( false )
+#else
       if( RearCameraActive && !RearCameraDisable )
+#endif
       {
         CameraRendering = CAMRENDERING_Rear;
 
@@ -4454,7 +4732,13 @@ bool MainGame( void ) // bjd
   if( ActiveRemoteCamera || (MissileCameraActive && MissileCameraEnable) )
     AddIndirectVisible( (u_int16_t) ( ( ActiveRemoteCamera ) ? ActiveRemoteCamera->Group : SecBulls[ CameraMissile ].GroupImIn ) );
 
+#ifdef __3DS__
+  _3ds_mr_ctx = "pre-MainRoutines";
+#endif
   MainRoutines();
+#ifdef __3DS__
+  _3ds_mr_ctx = "post-MainRoutines";
+#endif
 
   if( MyGameStatus == STATUS_QuitCurrentGame )
     return true;
@@ -4465,13 +4749,43 @@ bool MainGame( void ) // bjd
   for( i = 0 ; i < MAX_SFX ; i++ )
     LastDistance[i] = 100000.0F;
 
+#ifdef __3DS__
+  {
+    extern void trace(const char*);
+    static int _mg_frame = 0;
+    if (_mg_frame < 20) {
+        char _b[160];
+        snprintf(_b,sizeof(_b),"MainGame frame %d: ScrPolys=%d CurrentMenu=%p input_buf=%d stereo=%d vp_x=%lu cam_x=%.2f",
+            _mg_frame, (int)TotalScrPolysInUse, (void*)CurrentMenu, input_buffer_count,
+            (int)render_info.stereo_enabled,
+            (unsigned long)viewport.X,
+            (double)MainCamera.Pos.x);
+        trace(_b);
+        _mg_frame++;
+    }
+  }
+#endif
+
   if(!MainGameRender())
     return false;
 
+#ifdef __3DS__
+  _3ds_mr_ctx = "post-MainGameRender";
+#endif
+#ifndef __3DS__
+  /* [3DS] MenuProcess disabled — in-game menus are fully disabled on 3DS
+   * (see ESCAPE handler in ProcessGameKeys).  Calling MenuProcess() when
+   * CurrentMenu is somehow non-NULL would auto-navigate via stale keys. */
   MenuProcess(); // menu keys are processed here
+#endif
   ProcessGameKeys(); // here is where we process F keys
- 
+#ifdef __3DS__
+  _3ds_mr_ctx = "post-ProcessGameKeys";
+#endif
   ScreenPolyProcess();
+#ifdef __3DS__
+  _3ds_mr_ctx = "post-ScreenPolyProcess";
+#endif
 
 #ifdef INSIDE_BSP
   Inside = PointInsideSkin( &Ships[WhoIAm].Object.Pos, Ships[WhoIAm].Object.Group );

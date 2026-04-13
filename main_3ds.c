@@ -25,9 +25,16 @@ extern render_info_t render_info;
 extern bool render_init(render_info_t *info);
 
 /* ---- 3DS heap configuration ---- */
-/* 64MB heap: BSS≈18MB + code≈4MB + heap=64MB + stack≈1MB ≈87MB total.
- * Fits New 3DS's ~96MB app memory. Previously 80MB, reduced to accommodate
- * larger BSS from MAX_TEXTURE_GROUPS=32 and MAXMODELHEADERS=512. */
+/* [3DS] Heap reduced from 80 MB to 64 MB to avoid OOM during level transitions.
+ *
+ * The level-load path allocates two full copies of MODELHEADERS[512] and
+ * MXAMODELHEADERS[512] simultaneously (old level still resident while the new
+ * level is loading), plus texture upload staging buffers.  At 80 MB the
+ * combined allocation exceeded available RAM on some levels.
+ *
+ * New 3DS has ~124 MB of application RAM.  With a 64 MB heap the remaining
+ * ~60 MB covers the OS, linear (GPU-accessible) heap, and thread stacks.
+ * BSS ≈ 18 MB + code ≈ 4 MB + heap 64 MB + stack ≈ 1 MB ≈ 87 MB total. */
 u32 __ctru_heap_size = 64 * 1024 * 1024;
 
 /* ---- init state tracking ---- */
@@ -132,6 +139,10 @@ bool platform_init_video(void)
 
 	/* Initialize 3DS graphics service (GSP) - required before picaGL */
 	gfxInitDefault();
+	/* [3DS] Hardware stereoscopic 3D starts disabled; the 3D slider logic in
+	 * MainGameRender / DisplayTitle calls gfxSet3D(true/false) each frame based
+	 * on osGet3DSliderState().  Initialise to false so the first frame is always
+	 * mono regardless of slider position at boot. */
 	gfxSet3D(false);
 
 	trace("platform_init_video: pglInit");
