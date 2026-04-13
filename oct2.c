@@ -4277,10 +4277,16 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	VECTOR cam_offset;
 	render_viewport_t old_viewport = viewport;
 
-        cam_offset.x = render_info.stereo_eye_sep / 2.0f;
-        cam_offset.y = 0.0f;
-        cam_offset.z = 0.0f;
-        ApplyMatrix( &CurrentCamera.Mat, &cam_offset, &cam_offset );
+        /* Compute the camera-right offset in world space.
+         * In D3D row-vector convention (FinalMat), the camera local X axis in
+         * world space is the first ROW of the rotation submatrix: (_11,_12,_13).
+         * Do NOT use ApplyMatrix — it adds _41/_42/_43 (world translation). */
+        {
+                float half_sep = render_info.stereo_eye_sep / 2.0f;
+                cam_offset.x = CurrentCamera.Mat._11 * half_sep;
+                cam_offset.y = CurrentCamera.Mat._12 * half_sep;
+                cam_offset.z = CurrentCamera.Mat._13 * half_sep;
+        }
 
 	if(render_info.stereo_mode == STEREO_MODE_HALF_HEIGHT)
 	{
@@ -4401,9 +4407,7 @@ bool RenderMainCamera2dPolys(void);
 bool RenderCurrentCameraWithMainGameMenu(void)
 {
 	if(!RenderCurrentCamera())
-	{
 		return false;
-	}
 	DrawMainGameMenu();
 	RenderMainCamera2dPolys(); // screen polys like menu and lense flair
 	return true;
@@ -4477,7 +4481,8 @@ bool MainGameRender(void)
        * into a single anaglyph image.  When the slider is at zero we render
        * mono as usual and keep gfxSet3D(false). */
       {
-          float slider = osGet3DSliderState();
+          extern float platform_get_3d_slider(void);
+          float slider = platform_get_3d_slider();
           if (slider > 0.0f)
           {
               render_info.stereo_enabled = true;
@@ -4485,12 +4490,10 @@ bool MainGameRender(void)
               /* Scale eye separation with the slider (max ~30 units at full depth).
                * stereo_focal_dist retains its config value for asymmetric frustum. */
               render_info.stereo_eye_sep = slider * 30.0f;
-              gfxSet3D(true);
           }
           else
           {
               render_info.stereo_enabled = false;
-              gfxSet3D(false);
           }
       }
 #endif
@@ -5386,9 +5389,7 @@ bool RenderCurrentCamera( void )
 
 	// display background
 	if ( !DisplayBackground( &Mloadheader, &CurrentCamera ) )
-	{
 		return false;
-	}
 
 	// reset all the normal execute status flags...
 	if( WhiteOut == 0.0F)

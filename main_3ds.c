@@ -183,6 +183,25 @@ bool platform_init_video(void)
 	return true;
 }
 
+/* ---- 3D slider with emulator override ---- */
+
+float platform_get_3d_slider(void)
+{
+	extern float config_get_float(const char *opt, float _default);
+	/* Check for a test override first (useful when testing in Mandarine/Citra
+	 * which return garbage from osGet3DSliderState).
+	 * Set   stereo_test_slider = 0.5   in Configs/main.txt or debug.txt.
+	 * A negative value means "use the real hardware slider". */
+	float override = config_get_float("stereo_test_slider", -1.0f);
+	if (override >= 0.0f)
+		return override > 1.0f ? 1.0f : override;
+	/* Clamp hardware value — emulator stubs may return garbage outside [0,1]. */
+	float v = osGet3DSliderState();
+	if (v < 0.0f) v = 0.0f;
+	if (v > 1.0f) v = 1.0f;
+	return v;
+}
+
 /* ---- frame present ---- */
 
 void platform_render_present(render_info_t *info)
