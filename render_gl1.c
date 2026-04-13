@@ -403,15 +403,7 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 		int numVerts   = renderObject->textureGroups[group].numVerts;
 
 		if(renderObject->textureGroups[group].colourkey)
-		{
 			set_alpha_ignore();
-#ifdef __3DS__
-			/* Additive-blended glow objects must not write depth so they
-			 * don't occlude geometry rendered behind them. */
-			if (!orthographic && render_lighting_use_only_light_color_and_blend)
-				glDepthMask(GL_FALSE);
-#endif
-		}
 
 		if( renderObject->textureGroups[group].texture )
 		{
@@ -428,9 +420,6 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 			{
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				/* Don't let transparent fragments block geometry behind them. */
-				if(!orthographic)
-					glDepthMask(GL_FALSE);
 			}
 		}
 		else
@@ -473,19 +462,11 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 			if(!renderObject->textureGroups[group].colourkey)
 			{
 				glDisable(GL_BLEND);
-				if(!orthographic)
-					glDepthMask(GL_TRUE);
 			}
 		}
 
 		if(renderObject->textureGroups[group].colourkey)
-		{
-#ifdef __3DS__
-			if (!orthographic && render_lighting_use_only_light_color_and_blend)
-				glDepthMask(GL_TRUE);
-#endif
 			unset_alpha_ignore();
-		}
 	}
 
 	if(orthographic)
