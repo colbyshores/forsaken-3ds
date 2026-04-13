@@ -593,6 +593,87 @@ almost certainly at the `C3D_CullFace` call, not in the matrix. The PICA200
 hardware will never, under any API, let you set CW as front — you either
 swap the cull enum or you reauthor the meshes.
 
+## Hardware Stereoscopic 3D
+
+### Overview
+
+The 3DS top screen uses an autostereoscopic parallax-barrier display driven by
+two separate framebuffers: `GFX_LEFT` and `GFX_RIGHT`. Stereo depth is
+controlled by the physical 3D slider (`osGet3DSliderState()`, range 0.0–1.0).
+
+### Implementation
+
+Stereo is implemented as **two sequential render passes** — one per eye — using
+the game's existing `RenderCurrentCameraInStereo()` path:
+
+1. **Eye separation**: `platform_get_3d_slider()` reads the slider (or a config
+   override `stereo_test_slider` in `Configs/main.txt`). Eye separation is
+   `slider × 30` world units (max 30 at full depth, 15 at half).
+
+2. **Camera offset**: The camera is shifted left/right by `eye_sep / 2` along
+   the camera's local X axis. The offset vector is computed by scaling the
+   **first row** of `FinalMat` (`_11, _12, _13`) — which is the camera-right
+   unit vector in D3D row-vector convention. `ApplyMatrix` must NOT be used
+   here because it adds the translation components (`_41, _42, _43`), producing
+   a world-position-scale offset instead of a direction offset.
+
+3. **Eye routing**: `pglTransferEye(eye)` is called after each pass. Currently
+   a no-op stub — on real hardware it should call `glFinish()` +
+   `GX_DisplayTransfer` into the `GFX_LEFT` / `GFX_RIGHT` framebuffer.
+   `gfxSet3D(true)` must also be called once per frame when stereo is active.
+
+4. **Performance**: Two full render passes ≈ 2× CPU+GPU cost. At ~60 fps mono
+   this gives ~26–30 fps stereo (measured in Mandarine). Slider = 0 disables
+   stereo and restores full framerate.
+
+### Bugs Fixed During Development
+
+**Bug 1 — `ApplyMatrix` adds world translation to eye offset**
+The original code:
+```c
+cam_offset.x = render_info.stereo_eye_sep / 2.0f;
+cam_offset.y = cam_offset.z = 0.0f;
+ApplyMatrix( &CurrentCamera.Mat, &cam_offset, &cam_offset );
+```
+`ApplyMatrix` computes `result = Mat._41 + Mat._1x * v`, so when `Mat` is
+`FinalMat` (which includes world position in `_41/_42/_43`), the result is
+`world_position + tiny_offset` ≈ ±2 billion units. Fix: multiply `_11/_12/_13`
+directly, which are the rotation-only components.
+
+**Bug 2 — hardfp ABI mismatch on `platform_get_3d_slider()` call sites**
+`oct2.c` and `title.c` called `platform_get_3d_slider()` without a forward
+declaration. With `-mfloat-abi=hard`, float returns go in VFP register `s0`,
+but callers assumed `int` return (from `r0`). The compiler emitted
+`vcvt.f32.s32` after the call, converting whatever garbage was in `r0` (~65535)
+to float, giving `eye_sep = 65535 × 30 = 1,966,050`. Fix: add
+`extern float platform_get_3d_slider(void)` at each call site.
+
+**Bug 3 — `osGet3DSliderState()` returns garbage in Mandarine**
+Mandarine's stub for `osGet3DSliderState()` reads from unmapped memory and
+returns ~134 million. Fix: clamp the return value to `[0, 1]` in
+`platform_get_3d_slider()`, and provide a `stereo_test_slider` config key in
+`Configs/main.txt` for emulator testing without relying on the hardware stub.
+
+### Emulator Notes
+
+Mandarine has no autostereoscopic display simulation. Since `pglTransferEye`
+is a no-op, both eye passes render into the same framebuffer and only the
+right-eye output is visible. This is expected — stereo separation is only
+observable on real hardware (or with an anaglyph compositing step added to
+`pglTransferEye`).
+
+### Future: citro3d Display-List Replay (Optimal Stereo)
+
+The current two-pass approach doubles all draw calls. The PICA200 hardware
+has no built-in camera-doubling shortcut; however, native **citro3d** (not
+picaGL) supports recording a GPU command list and replaying it with a
+different projection uniform — geometry is submitted once to the GPU, replayed
+twice with left/right projection offsets. This is the lowest-cost stereo path
+on the hardware, but requires replacing picaGL immediate mode with a
+citro3d retained-mode VBO approach.
+
+---
+
 ## Known Remaining Issues
 
 1. **Texture loading speed** - ~2 minutes on emulated ARM (2048x2048 PNG decompression)
@@ -600,3 +681,4 @@ swap the cull enum or you reauthor the meshes.
 3. **Input navigation** - HID input connected but menu navigation needs testing
 4. **Sound not tested** - ndsp init code present but audio playback not verified
 5. **Lighting** - Scene may appear darker than reference; vertex colors may need adjustment
+6. **pglTransferEye stub** - must implement `glFinish` + `GX_DisplayTransfer` per eye + `gfxSet3D(true)` for real hardware stereo output
