@@ -118,7 +118,10 @@ bool FSClearDepth(XYRECT * rect);
 #define MAX_LEVEL_TEXTURE_GROUPS 8
 
 #ifdef __3DS__
-#define MAX_TEXTURE_GROUPS 128
+/* 64 texture groups per render object — in-game HUD screen polys need >32.
+ * ModelHeaders[512]+MxaModelHeaders[512] BSS ≈27MB; combined with 64MB heap
+ * gives ~94MB total, fitting New 3DS's ~96MB app memory. */
+#define MAX_TEXTURE_GROUPS 64
 #else
 #define MAX_TEXTURE_GROUPS 600
 #endif

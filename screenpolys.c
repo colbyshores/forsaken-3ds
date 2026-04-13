@@ -2109,23 +2109,10 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 
 		disable_zbuff();
 		cull_none();
-#ifdef __3DS__
-		/* DEBUG: force 2D polys fully opaque on 3DS to see if they
-		 * reach the screen at all. If text appears as BLACK boxes
-		 * with green characters on the VDU, the polys ARE rendering
-		 * and the problem is the blend mode making them invisible.
-		 * If we still see nothing, the problem is upstream (culling,
-		 * coords, texture binding, etc). */
-		glDisable(GL_BLEND);
-		glDisable(GL_ALPHA_TEST);
-#endif
 
 		if (!draw_2d_object(renderObject))
 			return false;
 
-#ifdef __3DS__
-		glEnable(GL_BLEND);
-#endif
 		reset_cull();
 		reset_zbuff();
 	}
@@ -2165,6 +2152,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	bool			Textured;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
+#ifdef __3DS__
+	int				batchVert = 0;  /* buffer position within current draw batch */
+#endif
 
 /*===================================================================
 		Find out how may verts involved in Exec Buffer
@@ -2456,14 +2446,41 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
       		
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+								renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+#ifdef __3DS__
+								renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+#else
+								renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+#endif
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-							INCREASE_TEXTURE_GROUPS(renderObject);
+#ifdef __3DS__
+								renderObject->numTextureGroups++;
+#else
+								INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
 
-							start_index += ntris*3; // each triangle has three indexes...
-							StartVert += 4;
+								start_index += ntris*3; // each triangle has three indexes...
+								StartVert += 4;
+#ifdef __3DS__
+								batchVert += 4;
+								if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+									FSUnlockVertexBuffer(renderObject);
+									FSUnlockIndexBuffer(renderObject);
+									disable_zbuff();
+									cull_none();
+									draw_2d_object(renderObject);
+									reset_cull();
+									reset_zbuff();
+									renderObject->numTextureGroups = 0;
+									start_index = 0;
+									batchVert = 0;
+									FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
+									FSLockIndexBuffer(renderObject, &lpIndices);
+									ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
+									ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+								}
+#endif
 	      					Off_Ptr++;
 						}
 					}
@@ -2573,13 +2590,40 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+#ifdef __3DS__
+							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+#else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+#endif
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
+#ifdef __3DS__
+							renderObject->numTextureGroups++;
+#else
 							INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
 
 							start_index += ntris*3; // each triangle has three indexes...
 							StartVert += 4;
+#ifdef __3DS__
+							batchVert += 4;
+							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+								FSUnlockVertexBuffer(renderObject);
+								FSUnlockIndexBuffer(renderObject);
+								disable_zbuff();
+								cull_none();
+								draw_2d_object(renderObject);
+								reset_cull();
+								reset_zbuff();
+								renderObject->numTextureGroups = 0;
+								start_index = 0;
+								batchVert = 0;
+								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
+								FSLockIndexBuffer(renderObject, &lpIndices);
+								ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
+								ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+							}
+#endif
 						}
 					}
 				}
@@ -2644,6 +2688,9 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	bool			Textured;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
+#ifdef __3DS__
+	int				batchVert = 0;
+#endif
 
 /*===================================================================
 		Find out how may verts involved in Exec Buffer
@@ -2715,7 +2762,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	}
 
 	ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
-		
+
 //	lpBufStart = ExecBuffer_debdesc.lpData;
 	ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
 	//lpPointer = (LPVOID) ( ScrPolyVertPnt + TotalVerts );
@@ -2953,13 +3000,40 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+#ifdef __3DS__
+							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+#else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+#endif
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
+#ifdef __3DS__
+							renderObject->numTextureGroups++;
+#else
 							INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
 
 							start_index += ntris*3; // each triangle has three indexes...
 							StartVert += 4;
+#ifdef __3DS__
+							batchVert += 4;
+							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+								FSUnlockVertexBuffer(renderObject);
+								FSUnlockIndexBuffer(renderObject);
+								disable_zbuff();
+								cull_none();
+								draw_2d_object(renderObject);
+								reset_cull();
+								reset_zbuff();
+								renderObject->numTextureGroups = 0;
+								start_index = 0;
+								batchVert = 0;
+								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
+								FSLockIndexBuffer(renderObject, &lpIndices);
+								ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
+								ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+							}
+#endif
 	      					Off_Ptr++;
 						}
 					}
@@ -3088,13 +3162,40 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+#ifdef __3DS__
+							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+#else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+#endif
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
+#ifdef __3DS__
+							renderObject->numTextureGroups++;
+#else
 							INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
 
 							start_index += ntris*3; // each triangle has three indexes...
 							StartVert += 4;
+#ifdef __3DS__
+							batchVert += 4;
+							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+								FSUnlockVertexBuffer(renderObject);
+								FSUnlockIndexBuffer(renderObject);
+								disable_zbuff();
+								cull_none();
+								draw_2d_object(renderObject);
+								reset_cull();
+								reset_zbuff();
+								renderObject->numTextureGroups = 0;
+								start_index = 0;
+								batchVert = 0;
+								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
+								FSLockIndexBuffer(renderObject, &lpIndices);
+								ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
+								ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+							}
+#endif
 						}
 					}
 				}

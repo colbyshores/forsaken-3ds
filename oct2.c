@@ -3,6 +3,9 @@
 
 #include "main.h"
 #include "platform.h"
+#ifdef __3DS__
+#include <GL/gl.h>
+#endif
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -808,25 +811,6 @@ bool SetFOV( float fov )
 	proj._11 = 2 * viewplane_distance / viewport.Width;
 	proj._22 = 2 * viewplane_distance / ( viewport.Height / pixel_aspect_ratio );
 
-#ifdef __3DS__
-	{
-		static int _fov_logged = 0;
-		if (_fov_logged < 3) {
-			extern void trace(const char *msg);
-			char _b[192];
-			snprintf(_b, sizeof(_b),
-				"SetFOV: fov=%.1f vp=%lux%lu scr=%.0fx%.0f aspect=%.3f pxAR=%.3f _11=%.3f _22=%.3f",
-				fov,
-				(unsigned long)viewport.Width, (unsigned long)viewport.Height,
-				screen_width, screen_height,
-				render_info.aspect_ratio, pixel_aspect_ratio,
-				proj._11, proj._22);
-			trace(_b);
-			_fov_logged++;
-		}
-	}
-#endif
-
 	if( fov > START_FOV )
 	{
 		Scale = ( ( MAX_FOV - fov ) / ( MAX_FOV - START_FOV ) );
@@ -1417,7 +1401,9 @@ bool InitLevels( char * levels_list )
 
   f = file_open( levels_file, "r" );
   if (!f )
+  {
     return false;
+  }
 
   // scan each level name into ShortLevelNames[j]
   j=0;
@@ -1453,6 +1439,7 @@ bool InitLevels( char * levels_list )
 
   NumLevels = j;
   fclose( f );
+
 
   // no levels were found
   // this should never happen
@@ -2029,10 +2016,6 @@ InitScene(void)
 
 bool InitView( void )
 {
-#ifdef __3DS__
-	extern void trace(const char *msg);
-	trace("InitView: start");
-#endif
 	DebugPrintf("InitView Starting...\n");
 
 	CheatsDisabled = false;
@@ -2049,18 +2032,12 @@ bool InitView( void )
 		case  STATUS_TitleLoadGameStartingSinglePlayer:
 		case  STATUS_StartingMultiplayer:
 		case  STATUS_GetPlayerNum:
-#ifdef __3DS__
-		trace("InitView: InitTitle");
-#endif
 		if( InitTitle() != true ) // bjd
 		{
 			SeriousError = true;
 			return false;
 		}
 
-#ifdef __3DS__
-		trace("InitView: InitializeSound");
-#endif
 		if ( !bSoundEnabled )
 		{
 			if (! InitializeSound( DESTROYSOUND_All ))
@@ -2071,68 +2048,45 @@ bool InitView( void )
 			}
 		}
 
-#ifdef __3DS__
-		trace("InitView: InitRenderBufs");
-#endif
 		InitRenderBufs();
-
 		if( !SetMatrixViewPort() )
 		{
 		  SeriousError = true;
 		  Msg( "SetMatrixViewPort() Failed\n" );
 		  return false;
 		}
-#ifdef __3DS__
-		trace("InitView: InitTload");
-#endif
 		// Init the Texture Handler
 		InitTload( &Tloadheader );
 
-#ifdef __3DS__
-		trace("InitView: Load_All_Off_Files");
-#endif
 		if( !Load_All_Off_Files( &Title_OffsetFiles[ 0 ] ) )
 		{
 		  SeriousError = true;
 		  return false;
 		}
 
-#ifdef __3DS__
-		trace("InitView: PreLoadFlyGirl");
-#endif
 		if( !PreLoadFlyGirl() )
 		{
 		  SeriousError = true;
 		  return false;
 		}
 
-#ifdef __3DS__
-		trace("InitView: PreInitModel");
-#endif
 		if( !PreInitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
 		  return false;
 		}
 
-#ifdef __3DS__
-		trace("InitView: Tload");
-#endif
 		//  Load in And if nescessary ReScale Textures...
 		if( !Tload( &Tloadheader ) )
 		{
 		  SeriousError = true;
 		  return false;
 		}
-#ifdef __3DS__
-		trace("InitView: Tload done, InitModel");
-#endif
 		if( !InitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
 		  return false;
 		}
-	      
 		if ( !AllocateCompFlyGirl() )
 		{
 		  SeriousError = true;
@@ -2151,15 +2105,11 @@ bool InitView( void )
 			Tloadheader.PlaceHolder[ DummyTextureIndex ] = true;
 		}
 
-#ifdef __3DS__
-		trace("InitView: MenuRestart");
-#endif
 		if ( !CurrentMenu )
 		  MenuRestart( &MENU_Start );
     break;
 
   case STATUS_ViewingScore:
-
 		InitScoreDisplay();
 
 		// just the basics to get text to render
@@ -3266,20 +3216,18 @@ bool RenderScene( void )
     clear_black();
 
     MenuFrozen = false; // ensure that menus are OK to use once in game
-    JustExitedMenu = false; 
+    JustExitedMenu = false;
 
     QuickStart = QUICKSTART_None;
     WaitingToQuit = false;
-  
+
     ReceiveGameMessages();
-  
     if( !SetMatrixViewPort() )
     {
       SeriousError = true;
       Msg( "SetMatrixViewPort() failed\n" );
       return false;
     }
-    
     InitFont();
 
 /*
@@ -3305,7 +3253,7 @@ bool RenderScene( void )
 */
 
     ReMakeSimplePanel = true;
-    
+
 		// InitVisiExecList( lpDev );
     InitSkinExecs();
     InitPortalExecs();
@@ -3318,7 +3266,7 @@ bool RenderScene( void )
       Msg( "InitTLoad failed\n" );
       return false;
     }
-  
+
     //  Prep the Texture Handler.....
     if( !PreMload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
     {
@@ -3328,23 +3276,20 @@ bool RenderScene( void )
 
     // Can Cope with no .Wat file!!!
     PreWaterLoad( (char*) &WaterNames[LevelNum][0] );
-    
+
     if( OnceOnlyChangeLevel )
     {
       OnceOnlyChangeLevel = false;
-
       if( !PreLoadShips() )
       {
         SeriousError = true;
         return false;
       }
-
       if( !PreLoadBGOFiles() )
       {
         SeriousError = true;
         return false;
       }
-
       if( !PreLoadRestartPoints() )
       {
         SeriousError = true;
@@ -3358,20 +3303,17 @@ bool RenderScene( void )
     }
 
     EnableRelavantModels( &ModelNames[0] );
-
 		if( !PreInitModel( /*lpDev,*/ &ModelNames[0] ) ) // bjd
 		{
 			SeriousError = true;
 			return false;
 		}
-
 		if( !Load_All_Off_Files( &OffsetFiles[ 0 ] ) )
 		{
 			SeriousError = true;
 			return false;
 		}
-
-    //  Load in And if nescessary ReScale Textures... 
+    //  Load in And if nescessary ReScale Textures...
     if( !Tload( &Tloadheader ) )
     {
       SeriousError = true;
@@ -3432,7 +3374,7 @@ bool RenderScene( void )
     MyGameStatus = STATUS_InitView_4;
     PrintInitViewStatus( MyGameStatus );
     break;
-  
+
 
   case STATUS_InitView_4:
 	DebugState("STATUS_InitView_4\n");
@@ -3450,7 +3392,6 @@ bool RenderScene( void )
 
     ReceiveGameMessages();
 */
-
     if( !Mload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
     {
       SeriousError = true;
@@ -3509,9 +3450,9 @@ bool RenderScene( void )
     WaterLoad();
 
     ReadTxtFile( (char*) &TextNames[LevelNum][0] );
-    
+
     ReadMsgFile( (char*) &MsgNames[LevelNum][0] );
-    
+
     if( !MCload( (char*) &CollisionNames[LevelNum][0] , &MCloadheader ) )
     {
       SeriousError = true;
@@ -3524,7 +3465,7 @@ bool RenderScene( void )
       Msg( "MCload zero failed\n" );
       return false; // the collision data skin thickness 0
     }
-  
+
     SetUpShips();
 
 /*
@@ -3550,8 +3491,8 @@ bool RenderScene( void )
 */
 
     InitSoundInfo( &Mloadheader );
- 
-/*   
+
+/*
     MyGameStatus = STATUS_InitView_7;
     PrintInitViewStatus( MyGameStatus );
     break;
@@ -3660,7 +3601,6 @@ bool RenderScene( void )
         return false;
       }
 
-
     Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], ".CAM" );
 
     if( !Cameraload( NodeName ) )
@@ -3696,10 +3636,9 @@ bool RenderScene( void )
 
     // might not be any Teleports...
     TeleportsLoad( (char*) &TeleportNames[LevelNum][0] );
-	
+
     // Can Cope with no Zone file!!!
     TriggerAreaload( (char*) &ZoneNames[LevelNum][0] );
-
 
     InitShipsChangeLevel(&Mloadheader);
 
@@ -3723,6 +3662,7 @@ bool RenderScene( void )
     MyGameStatus = ChangeLevel_MyGameStatus;
 
     PrintInitViewStatus( MyGameStatus );
+
 
     break;
 
@@ -3767,10 +3707,9 @@ bool RenderScene( void )
   case  STATUS_StartingSinglePlayer:
 	DebugState("STATUS_StartingSinglePlayer\n");
 
-    //clear_black();
     MenuAbort();
     ReleaseView();
-    // tell them all to load up a level
+
     MyGameStatus = STATUS_PostStartingSinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
     SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
@@ -4221,7 +4160,10 @@ void DrawMainGameMenu(void)
 bool RenderMainCamera2dPolys(void);
 bool RenderCurrentCameraWithMainGameMenu(void)
 {
-	if(!RenderCurrentCamera()) return false;
+	if(!RenderCurrentCamera())
+	{
+		return false;
+	}
 	DrawMainGameMenu();
 	RenderMainCamera2dPolys(); // screen polys like menu and lense flair
 	return true;
@@ -4256,7 +4198,9 @@ void SetFOVBasedOnShipSpeed(void)
 bool MainGameRender(void)
 {
 	if (!FSBeginScene())
+	{
 		return false;
+	}
 
 	// show the stats screen
 	if(ShowStats)
@@ -4292,7 +4236,9 @@ bool MainGameRender(void)
       else // non stereo - normal rendering
 	  	{
 				if( RenderCurrentCameraWithMainGameMenu() != true ) // bjd
+				{
 					return false;
+				}
 	  	}
   
       if( RearCameraActive && !RearCameraDisable )
@@ -4472,7 +4418,9 @@ bool MainGameRender(void)
   }
 
   if (!FSEndScene())
+  {
         return false;
+  }
 
   return true;
 }
@@ -5036,18 +4984,18 @@ void ReleaseRenderBufs( void )
 bool RenderMainCamera2dPolys( void) // renders in game menu and other 2d elements
 {
   set_alpha_states();
-  
   DoLensflareEffect();
   DoAllSecBullLensflare();
-
   if( !DisplayNonSolidScrPolys( &RenderBufs[ 3 ] ) )
+  {
     return false;
-
+  }
 	set_normal_states();
 
   if( !DisplaySolidScrPolys( &RenderBufs[ 3 ] ) )
+  {
     return false;
-
+  }
   return true;
 }
 
@@ -5063,13 +5011,12 @@ bool RenderCurrentCamera( void )
 	u_int16_t  group;
 //	float R, G, B;
 	NumOfTransExe = 0;
-
 	Build_View();
 	CurrentCamera.View = view;
-
 	if (!FSSetView(&view))
+	{
 		return false;
-
+	}
     if (!FSSetViewPort(&CurrentCamera.Viewport)) {
 #ifdef DEBUG_VIEWPORT
     SetViewportError( "RenderCurrentCamera1", &CurrentCamera.Viewport );
@@ -5111,8 +5058,9 @@ bool RenderCurrentCamera( void )
   */
 
   if (ClearBuffers() != true )
+  {
     return false;
-
+  }
 	// reset all the normal execute status flags...
 	set_normal_states();
 
@@ -5124,7 +5072,9 @@ bool RenderCurrentCamera( void )
 
 	// display background
 	if ( !DisplayBackground( &Mloadheader, &CurrentCamera ) )
+	{
 		return false;
+	}
 
 	// reset all the normal execute status flags...
 	if( WhiteOut == 0.0F)

@@ -24,6 +24,12 @@
 extern render_info_t render_info;
 extern bool render_init(render_info_t *info);
 
+/* ---- 3DS heap configuration ---- */
+/* 64MB heap: BSS≈18MB + code≈4MB + heap=64MB + stack≈1MB ≈87MB total.
+ * Fits New 3DS's ~96MB app memory. Previously 80MB, reduced to accommodate
+ * larger BSS from MAX_TEXTURE_GROUPS=32 and MAXMODELHEADERS=512. */
+u32 __ctru_heap_size = 64 * 1024 * 1024;
+
 /* ---- init state tracking ---- */
 
 static bool _video_initialized = false;
@@ -46,11 +52,32 @@ void platform_delay(u_int32_t ms)
 
 /* ---- debug trace (writes to sdmc so Mandarine can show it) ---- */
 
+/* Tracing: use low-level write() to bypass stdio buffering.
+   Opens once when trace_enable() is called. */
+#include <fcntl.h>
+static int _trace_fd = -1;
+static int _trace_enabled = 0;
+
+void trace_enable(void) {
+	_trace_enabled = 1;
+	if (_trace_fd < 0) {
+		_trace_fd = open("sdmc:/forsaken_trace.txt", O_WRONLY|O_CREAT|O_TRUNC, 0666);
+	}
+}
+
 void trace(const char *msg)
 {
-	FILE *f = fopen("sdmc:/forsaken_debug.txt", "a");
-	if (f) { fputs(msg, f); fputc('\n', f); fclose(f); }
 	svcOutputDebugString(msg, strlen(msg));
+	if (_trace_enabled && _trace_fd >= 0) {
+		int len = strlen(msg);
+		write(_trace_fd, msg, len);
+		write(_trace_fd, "\n", 1);
+		fsync(_trace_fd);
+	}
+}
+
+void trace_dump(void) {
+	if (_trace_fd >= 0) { close(_trace_fd); _trace_fd = -1; }
 }
 
 /* ---- platform init ---- */
@@ -58,6 +85,9 @@ void trace(const char *msg)
 bool platform_init(void)
 {
 	_ticks_base = svcGetSystemTick();
+
+	/* Ensure trace ring is dumped on any exit */
+	atexit(trace_dump);
 
 	trace("platform_init: start");
 
@@ -154,6 +184,8 @@ void platform_render_present(render_info_t *info)
 
 void platform_shutdown(void)
 {
+	trace("platform_shutdown: dumping trace ring");
+	trace_dump();
 	if (_video_initialized)
 	{
 		pglExit();

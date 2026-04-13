@@ -370,8 +370,17 @@ bool Load_All_Off_Files( OFF_FILES * FileInfo )
 	strcpy ( &TitleFontFile[ 0 ], VduFont512 );
 
 	//
+#ifdef __3DS__
+	/* 3DS: 320x240 is smaller than the 512x384 font atlas, so the
+	   floor() used on PC (for crisp integer-pixel scaling at 640x480+)
+	   would truncate the ratio to 0, making all text invisible.
+	   Use the raw ratio instead — text will be slightly downscaled. */
+	VduScaleX = (float)render_info.window_size.cx / 512.0F;
+	VduScaleY = (float)render_info.window_size.cy / 384.0F;
+#else
 	VduScaleX = (float)floor((double)((float)render_info.window_size.cx / 512.0F));
 	VduScaleY = (float)floor((double)((float)render_info.window_size.cy / 384.0F));
+#endif
 
 	last_tpage = 0;
 

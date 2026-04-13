@@ -719,7 +719,9 @@ bool Triggerload( char * Filename )
 
 
 	File_Size = Get_File_Size( Filename );
-	if( !File_Size ) return true;
+	if( !File_Size ) {
+		return true;
+	}
 
 	Buffer = malloc( File_Size );
 
@@ -816,6 +818,7 @@ bool Triggerload( char * Filename )
 	NumOfEvents = *intpnt++;
 	NumOfConditions = *intpnt++;
 	NumOfActiveConditions = 0;
+
 
 	if ( NumOfTrigVars )
 	{
@@ -1135,7 +1138,7 @@ bool Triggerload( char * Filename )
 			TVpnt++;
 		}
 	}
-/*ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ*/
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
 
 	for( i = 0 ; i < NumOfTrigModQues ; i++ )
 	{
