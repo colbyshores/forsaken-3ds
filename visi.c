@@ -1102,6 +1102,15 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		g->projection._22 = ( cam->Proj._22 * v->viewport->Height ) / vp->Height;
 		lr = 2.0F * ( ( v->viewport->X + v->viewport->Width * 0.5F ) - ( vp->X + vp->Width * 0.5F ) );
 
+		/* For STEREO_MODE_3DS the camera position offset provides the stereo
+		 * separation; skip the asymmetric frustum BSP adjustment which
+		 * shifts the visibility frustum planes and culls all level geometry
+		 * when stereo_eye_sep is in a different unit scale than the BSP
+		 * extents expect.  The other stereo modes (COLOR/HALF_HEIGHT/
+		 * HALF_WIDTH) are PC-only and retain the original adjustment. */
+#ifdef __3DS__
+		if (render_info.stereo_mode != STEREO_MODE_3DS)
+#endif
 		switch( render_info.stereo_position )
 		{
 		case ST_LEFT:

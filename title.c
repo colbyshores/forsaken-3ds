@@ -5103,18 +5103,17 @@ bool DisplayTitle(void)
 	/* [3DS] Mirror the gameplay slider logic: enable hardware stereo in menus
 	 * only when the slider is pushed, otherwise render mono. */
 	{
-		float _slider = osGet3DSliderState();
+		extern float platform_get_3d_slider(void);
+		float _slider = platform_get_3d_slider();
 		if (_slider > 0.0f)
 		{
 			render_info.stereo_enabled = true;
 			render_info.stereo_mode    = STEREO_MODE_3DS;
 			render_info.stereo_eye_sep = _slider * 30.0f;
-			gfxSet3D(true);
 		}
 		else
 		{
 			render_info.stereo_enabled = false;
-			gfxSet3D(false);
 		}
 	}
 #endif
