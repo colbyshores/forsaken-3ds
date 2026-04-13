@@ -1,8 +1,14 @@
 #
 # Makefile.3ds - ForsakenX 3DS port using devkitPro
 #
-# Usage: make -f Makefile.3ds
+# Usage:
+#   make -f Makefile.3ds           # release build
+#   make -f Makefile.3ds DEBUG=1   # debug build (__3DS_DEBUG__ defined)
+#                                   # enables: autoboot to Volcano level
 #
+
+# Debug flag — set to 1 to enable __3DS_DEBUG__ features
+DEBUG ?= 0
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -80,6 +86,10 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-DTEXTURE_PNG \
 	-DSOUND_SUPPORT \
 	-DLUA_USE_APICHECK
+
+ifeq ($(DEBUG),1)
+CFLAGS += -D__3DS_DEBUG__
+endif
 
 # Include paths - note isystem for the source dir so #include <header.h> works
 CFLAGS += -isystem $(SRCDIR) \

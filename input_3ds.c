@@ -63,7 +63,7 @@ bool joysticks_init(void)
 
 	Num_Joysticks = 1;
 
-	JoystickInfo[0].assigned  = true;
+	JoystickInfo[0].assigned  = false; /* let DefaultJoystickSettings bind buttons */
 	JoystickInfo[0].connected = true;
 	JoystickInfo[0].Name      = "3DS Controls";
 	JoystickInfo[0].NumButtons = 12;

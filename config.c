@@ -1238,12 +1238,28 @@ void DefaultJoystickSettings( USERCONFIG *u )
 				JoystickInfo[ j ].Axis[ AXIS_XAxis ].action = SHIPACTION_RotateLeft;
 				JoystickInfo[ j ].Axis[ AXIS_YAxis ].action = SHIPACTION_RotateUp;
 			}
+#ifdef __3DS__
+			/* 3DS button layout (matches input_3ds.c indices):
+			 *  0=A fire_primary  1=B fire_secondary  2=X next_weapon
+			 *  3=Y prev_weapon   4=L roll_left        5=R roll_right
+			 *  6=Start menu      7=Select rear_view   8=ZL nitro
+			 *  9=ZR drop_mine */
+			AddButton( j, 0, &u->fire_primary );
+			AddButton( j, 1, &u->fire_secondary );
+			AddButton( j, 2, &u->select_next_primary );
+			AddButton( j, 3, &u->select_prev_primary );
+			AddButton( j, 4, &u->roll_left );
+			AddButton( j, 5, &u->roll_right );
+			AddButton( j, 7, &u->full_rear_view );
+			AddButton( j, 9, &u->fire_mine );
+#else
 			AddButton( j, 0, &u->fire_primary );
 			AddButton( j, 1, &u->fire_secondary );
 			AddButton( j, 2, &u->turbo );
 			AddButton( j, 3, &u->fire_mine );
 			AddButton( j, 4, &u->select_next_primary );
 			AddButton( j, 5, &u->select_next_secondary );
+#endif
 			JoystickInfo[ j ].assigned = true;
 			SetUpJoystickAxis( j );
 		}
@@ -1372,6 +1388,10 @@ read_config( USERCONFIG *u, char *cfg_name )
 
 		// tell debuggers
 		DebugPrintf( "read_config: couldn't open '%s'\n", cfg_name );
+
+		// Still apply default joystick bindings so controls work
+		// even without a saved pilot config (e.g. first boot on 3DS).
+		DefaultJoystickSettings( u );
 
 		// failed ...
 		return 0;
