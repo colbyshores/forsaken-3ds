@@ -124,10 +124,17 @@ ROMFS_STAMP   := $(ROMFS_STAGING)/.stamp
 all: $(OUTPUT_3DSX)
 
 # Build a physical copy of romfs (resolving all symlinks) once
+# After copying, lowercase all file/directory names so convert_path() lookups work
+# (original game data has mixed-case Windows filenames; 3DS romfs is case-sensitive)
 $(ROMFS_STAMP): $(SRCDIR)/romfs
 	@echo "Staging romfs data (this may take a while)..."
 	@rm -rf $(ROMFS_STAGING)
 	@cp -rL $(SRCDIR)/romfs $(ROMFS_STAGING)
+	@echo "Lowercasing romfs filenames..."
+	@cd $(ROMFS_STAGING) && find . -depth -name '*[A-Z]*' | while read f; do \
+		d=$$(dirname "$$f"); b=$$(basename "$$f"); lb=$$(echo "$$b" | tr 'A-Z' 'a-z'); \
+		if [ "$$b" != "$$lb" ]; then mv "$$d/$$b" "$$d/$$lb"; fi; \
+	done
 	@touch $(ROMFS_STAMP)
 
 $(OUTPUT_SMDH):

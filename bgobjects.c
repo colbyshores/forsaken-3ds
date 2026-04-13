@@ -3,7 +3,6 @@
 ===================================================================*/
 #include <stdio.h>
 #include <math.h>
-
 #include "main.h"
 #include "new3d.h"
 #include "quat.h"
@@ -1085,14 +1084,14 @@ bool PreLoadBGOFiles( void )
 
 				switch( FilePtr->Type )
 				{
-/*ддддддддд	STATIC ANIM ддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	STATIC ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 					case BGOTYPE_Static:
 						FilePtr->open_event = -1;
 						FilePtr->CloseEvent = -1;
 						break;
 
-/*ддддддддд	DOOR дддддддддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	DOOR О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 					case BGOTYPE_Door:
 						fread( &FilePtr->open_event, sizeof( int16_t ), 1, fp );
@@ -1106,7 +1105,7 @@ bool PreLoadBGOFiles( void )
 						RequestDoorTypeSFX( FilePtr->DoorSfxType );
 						break;
 
-/*ддддддддд	LOOPING ANIM дддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	LOOPING ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 					case BGOTYPE_Looping_Anim:
 						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
@@ -1116,7 +1115,7 @@ bool PreLoadBGOFiles( void )
 						fread( &FilePtr->Delay, sizeof( float ), 1, fp );
 						break;
 
-/*ддддддддд	ONEOFF ANIM ддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	ONEOFF ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 					case BGOTYPE_OneOff_Anim:
 						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
@@ -1127,7 +1126,7 @@ bool PreLoadBGOFiles( void )
 						fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
 						break;
 
-/*ддддддддд	MULTISTEP ANIM дддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	MULTISTEP ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 					case BGOTYPE_MultipleStep_Anim:
 						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
@@ -1139,12 +1138,12 @@ bool PreLoadBGOFiles( void )
 						fread( &FilePtr->DamagePerInterval, sizeof( float ), 1, fp );
 						break;
 
-/*ддддддддд	SEQUENCES ANIM дддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	SEQUENCES ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 					case BGOTYPE_Sequences:
 						break;
 
-/*ддддддддд	UNKNOWN ANIM дддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	UNKNOWN ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 					default:
 						break;
@@ -1325,7 +1324,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 
 		switch( Type )
 		{
-/*ддддддддд	STATIC ANIM ддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	STATIC ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 			case BGOTYPE_Static:
 				Object->OpenTrigMod = -1;
@@ -1340,7 +1339,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->EndTrigModPtr = NULL;
 				break;
 
-/*ддддддддд	DOOR дддддддддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	DOOR О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 			case BGOTYPE_Door:
 				Object->OpenTrigMod = OpenTrigMod;
@@ -1363,7 +1362,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->DoorSfxType = DoorSfxType;
 				break;
 	
-/*ддддддддд	LOOPING ANIM дддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	LOOPING ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 			case BGOTYPE_Looping_Anim:
 				Object->OpenTrigMod = -1;
@@ -1396,7 +1395,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				}
 				break;
 
-/*ддддддддд	ONEOFF ANIM ддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	ONEOFF ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 			case BGOTYPE_OneOff_Anim:
 				Object->OpenTrigMod = -1;
@@ -1430,7 +1429,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				}
 				break;
 
-/*ддддддддд	MULTISTEP ANIM дддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	MULTISTEP ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 			case BGOTYPE_MultipleStep_Anim:
 				Object->OpenTrigMod = -1;
@@ -1450,12 +1449,12 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->OpenedBy = OpenedBy;
 				break;
 
-/*ддддддддд	SEQUENCES ANIM дддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	SEQUENCES ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 			case BGOTYPE_Sequences:
 				break;
 
-/*ддддддддд	UNKNOWN ANIM дддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	UNKNOWN ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 			default:
 				break;
@@ -1632,17 +1631,17 @@ void StartBGOAnim( u_int16_t Index )
 
 	switch( Object->Type )
 	{
-/*ддддддддд	STATIC ANIM ддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	STATIC ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 		case BGOTYPE_Static:
 			break;
 
-/*ддддддддд	DOOR дддддддддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	DOOR О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 		case BGOTYPE_Door:
 			break;
 
-/*ддддддддд	LOOPING ANIM дддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	LOOPING ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 		case BGOTYPE_Looping_Anim:
 			switch( Object->State )
@@ -1670,7 +1669,7 @@ void StartBGOAnim( u_int16_t Index )
 			}
 			break;
 
-/*ддддддддд	ONEOFF ANIM ддддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	ONEOFF ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 		case BGOTYPE_OneOff_Anim:
 			switch( Object->State )
@@ -1700,17 +1699,17 @@ void StartBGOAnim( u_int16_t Index )
 			}
 			break;
 
-/*ддддддддд	MULTISTEP ANIM дддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	MULTISTEP ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 		case BGOTYPE_MultipleStep_Anim:
 			break;
 
-/*ддддддддд	SEQUENCES ANIM дддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	SEQUENCES ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 		case BGOTYPE_Sequences:
 			break;
 
-/*ддддддддд	UNKNOWN ANIM дддддддддддддддддддддддддддддддддддддддддд*/
+/*О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫	UNKNOWN ANIM О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫*/
 
 		default:
 			break;

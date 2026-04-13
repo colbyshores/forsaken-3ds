@@ -21,7 +21,9 @@
 #define NUMOFTITLEMODELS	32
 #define NUM_INTERLEVEL_MODELS 17
 #ifdef __3DS__
-#define	MAXMODELHEADERS		128
+/* Need >= MODEL_ExtraModels (283) + dynamic ships/enemies/BGOs.
+ * With MAX_TEXTURE_GROUPS=32, ModelHeaders[512] costs ~4.9MB BSS — fits New 3DS. */
+#define	MAXMODELHEADERS		512
 #else
 #define	MAXMODELHEADERS		1024
 #endif

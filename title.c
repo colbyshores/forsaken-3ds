@@ -7,7 +7,6 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-
 #include "main.h"
 #include "platform.h"
 
@@ -1097,7 +1096,11 @@ MENU	MENU_NEW_StartSinglePlayer = {
 
 		{ 0, 200, 200, 50, 0,
 			LT_MENU_NEW_StartSinglePlayer1/*"start"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,
+#ifdef __3DS__
+			NULL, NULL, GoToNextLevel, DrawFlatMenuItem, NULL, 0 } ,
+#else
 			NULL, &MENU_NEW_BetweenLevels, MenuChange, DrawFlatMenuItem, NULL, 0 } ,
+#endif
 
 		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
@@ -3187,12 +3190,6 @@ bool TitleOnceOnly = true;
 
 VECTOR View, Look, Up, PanFrom, PanTo, PanFrom2, PanTo2, VDULookPos, DiscLookPos, DiscViewPos, VDUViewPos, StartLookPos, StartViewPos;
 
-#ifdef __3DS__
-/* Title-screen frame counter incremented in DisplayTitle each frame.
- * Used by debug traces in models.c to delay snapshots until title
- * animations (LowerStack, etc.) have settled. */
-int _fs3ds_title_frame = 0;
-#endif
 float CurrentFOV;
 float CurrentCameraPanTheta, CurrentCameraPanTheta2;
 VECTOR OrigPos[NUMOFTITLEMODELS];
@@ -5075,30 +5072,10 @@ bool DisplayTitle(void)
 	}
 
 	//Set up camera
-#ifdef __3DS__
-	/* Shared title-screen frame counter (used by models.c debug traces too). */
-	++_fs3ds_title_frame;
-#endif
 	MakeViewMatrix(&View, &Look, &Up, &CurrentCamera.Mat);
 	MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
 	CurrentCamera.Pos = View;
-#ifdef __3DS__
-	if ((_fs3ds_title_frame & 63) == 1) {
-		extern void trace(const char *msg);
-		char _b[192];
-		float dx = Look.x - View.x;
-		float dy = Look.y - View.y;
-		float dz = Look.z - View.z;
-		float dist = sqrtf(dx*dx + dy*dy + dz*dz);
-		snprintf(_b, sizeof(_b),
-			"cam[f=%d]: V=(%.1f,%.1f,%.1f) L=(%.1f,%.1f,%.1f) dist=%.1f",
-			_fs3ds_title_frame,
-			View.x, View.y, View.z,
-			Look.x, Look.y, Look.z,
-			dist);
-		trace(_b);
-	}
-#endif
+	/* camera traces disabled — waste sdmc write budget */
 	CurrentCamera.GroupImIn = -1;
 	CurrentCamera.Viewport = viewport;	
 	CurrentCamera.Viewport.X = 0;
@@ -12009,14 +11986,14 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 			break;
 		}
 
-		TempPoly = FindFreeScrPoly();					
+		TempPoly = FindFreeScrPoly();
 		if( TempPoly != (u_int16_t ) -1 )
 		{
-					   	
+
 			ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
 			ScrPolys[TempPoly].Flags = SCRFLAG_Nothing;
 
-			ScrPolys[TempPoly].Pos.x = xpos;			  
+			ScrPolys[TempPoly].Pos.x = xpos;
 			ScrPolys[TempPoly].Pos.y = ypos;
 			if (TextInfo->flags & TEXTFLAG_NotImplemented)
 			{
@@ -14677,7 +14654,7 @@ void InitSelectedLevelText( MENU *Menu )
 void PrepareNextLevelStart( MENU *Menu )
 {
 	LoadLevelText( NULL );
-	MyGameStatus = STATUS_WaitingToStartSinglePlayer; 
+	MyGameStatus = STATUS_WaitingToStartSinglePlayer;
 }
 
 void HostAboutToStart( MENUITEM *Item )

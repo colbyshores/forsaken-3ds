@@ -91,20 +91,20 @@ bool StartASinglePlayerGame( MENUITEM * Item )
 	SetBikeMods( (u_int16_t) (SelectedBike+2) );
 
 	SetupNetworkGame();
-	
+
 	for( i = 0 ; i < MAX_PLAYERS ; i++ )
 		GameStatus[i] = STATUS_Null;
-	
+
 	WhoIAm = 0;								// I was the first to join...
 	Current_Camera_View = 0;				// set camera to that view
 	WatchPlayerSelect.value = 0;
 	SwitchedToWatchMode = false;
 	Ships[WhoIAm].enable = 1;
-	
+
 	memset(&Names, 0, sizeof(SHORTNAMETYPE) );
 	set_my_player_name();
 	Ships[ WhoIAm ].BikeNum = ( SelectedBike % MAXBIKETYPES );
-	
+
 	CountDownOn = false;
 
 	MyGameStatus = STATUS_StartingSinglePlayer;

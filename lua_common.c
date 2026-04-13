@@ -144,19 +144,12 @@ static void assign_loaders( void )
 static int lua_create(void)
 {
 	/* luaL_Reg x[] = { { NULL, NULL } }; */
-#ifdef __3DS__
-	extern void trace(const char *msg);
-	trace("lua_create: luaL_newstate");
-#endif
 	L1 = luaL_newstate();
 	if (!L1)
 	{
 		Msg("error: while initializing Lua!\n");
 		return 1;
 	}
-#ifdef __3DS__
-	trace("lua_create: luaL_openlibs");
-#endif
 	luaL_openlibs(L1);
 	assign_loaders();
 	return 0;
@@ -164,23 +157,10 @@ static int lua_create(void)
 
 int lua_init()
 {
-#ifdef __3DS__
-	extern void trace(const char *msg);
-	trace("lua_init: lua_create");
-#endif
 	ASSERT(lua_create());
-#ifdef __3DS__
-	trace("lua_init: load_init_file");
-#endif
 	ASSERT(lua_register_funcs());
 	ASSERT(load_init_file());
-#ifdef __3DS__
-	trace("lua_init: run_init_func");
-#endif
 	ASSERT(run_init_func());
-#ifdef __3DS__
-	trace("lua_init: done");
-#endif
 	return 0;
 }
 

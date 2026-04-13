@@ -31,7 +31,9 @@
 #define MAXMXATEXTUREGROUPSPER 8
 #define	MAXTPAGESPERMXALOAD		8
 #ifdef __3DS__
-#define	MAXMXAMODELHEADERS		128
+/* Must be >= MAXMODELHEADERS since model indices are shared between MX and MXA headers.
+ * With MAX_TEXTURE_GROUPS=16, MxaModelHeaders[512] costs ~4.9MB BSS. */
+#define	MAXMXAMODELHEADERS		512
 #else
 #define	MAXMXAMODELHEADERS		1024
 #endif
