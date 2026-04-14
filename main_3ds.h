@@ -4,10 +4,10 @@
 #include <3ds.h>
 #include "render.h"
 
-/* Letterbox: render a 320x240 (4:3) logical screen into the center of
- * the 400x240 physical top screen. Shared with FSSetViewPort so it
- * knows to offset glViewport by 40 pixels. */
-#define FS3DS_LETTERBOX_OFFSET_X 40
+/* No letterboxing — render at the native 400x240 (5:3) resolution.
+ * The Open Pandora port (800x480, also 5:3) proves this aspect ratio
+ * works correctly with the engine's projection and HUD layout. */
+#define FS3DS_LETTERBOX_OFFSET_X 0
 
 bool platform_init(void);
 bool platform_init_video(void);
