@@ -1,0 +1,6 @@
+-- ForsakenX default config
+
+-- [3DS] Stereo slider override for emulator testing.
+-- Set to 0.0-1.0 to simulate the 3D slider in an emulator.
+-- Set to -1 (or remove) to use the real hardware slider.
+stereo_test_slider = 0.5

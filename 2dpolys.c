@@ -1920,10 +1920,27 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-							INCREASE_TEXTURE_GROUPS(renderObject);
 
 							start_index += ntris*3; // each triangle has three indexes...
 							StartVert += 4;
+
+#ifdef __3DS__
+							renderObject->numTextureGroups++;
+							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+								FSUnlockVertexBuffer(renderObject);
+								FSUnlockIndexBuffer(renderObject);
+								draw_object(renderObject);
+								renderObject->numTextureGroups = 0;
+								start_index = 0;
+								StartVert = 0;
+								FSLockVertexBuffer(renderObject, &lpBufStart);
+								FSLockIndexBuffer(renderObject, &lpIndices);
+								FmPolyVertPnt = (LPLVERTEX) lpBufStart;
+								FmPolyFacePnt = (LPTRIANGLE) lpIndices;
+							}
+#else
+							INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
 
 							Off_Ptr++;
 						}
@@ -2281,10 +2298,27 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-							INCREASE_TEXTURE_GROUPS(renderObject);
 
 							start_index += ntris*3; // 3 indexes in a triangle
 							StartVert += 4;
+
+#ifdef __3DS__
+							renderObject->numTextureGroups++;
+							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+								FSUnlockVertexBuffer(renderObject);
+								FSUnlockIndexBuffer(renderObject);
+								draw_object(renderObject);
+								renderObject->numTextureGroups = 0;
+								start_index = 0;
+								StartVert = 0;
+								FSLockVertexBuffer(renderObject, &lpBufStart);
+								FSLockIndexBuffer(renderObject, &lpIndices);
+								FmPolyVertPnt = (LPLVERTEX) lpBufStart;
+								FmPolyFacePnt = (LPTRIANGLE) lpIndices;
+							}
+#else
+							INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
 
 							Off_Ptr++;
 						}
