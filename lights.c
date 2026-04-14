@@ -4,6 +4,7 @@
 *	All routines to do with Lights...
 ===================================================================*/
 #include <stdio.h>
+#include <string.h>
 
 #include "new3d.h"
 #include "quat.h"
@@ -359,8 +360,13 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						lpLVERTEX = lpPointer+ *u_int32Pnt++;
 						TanimUV = PolyAnim->UVs;
 						TanimUV += e + (PolyAnim->vertices * PolyAnim->newframe);
+#ifdef ARM
+						memcpy(&lpLVERTEX->tu, &TanimUV->u, 4);
+						memcpy(&lpLVERTEX->tv, &TanimUV->v, 4);
+#else
 						lpLVERTEX->tu = TanimUV->u;
 						lpLVERTEX->tv = TanimUV->v;
+#endif
 					}
 
 					PolyAnim->currentframe = PolyAnim->newframe;
