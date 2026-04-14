@@ -836,9 +836,8 @@ bool FSGetViewPort(render_viewport_t *view)
 	glGetIntegerv( GL_VIEWPORT, i );
 	view->X	= i[0];
 #ifdef __3DS__
-	/* FSSetViewPort adds FS3DS_LETTERBOX_OFFSET_X to the game's logical X
-	 * before calling glViewport.  Strip it back out here so that the game's
-	 * viewport.X always holds the logical (letterbox-free) coordinate. */
+	/* Strip any viewport X offset (FS3DS_LETTERBOX_OFFSET_X) applied by
+	 * FSSetViewPort so the game always sees logical coordinates. */
 	view->X -= FS3DS_LETTERBOX_OFFSET_X;
 #endif
 	view->Y	= render_info.ThisMode.h - (i[1] + i[3]);
@@ -864,24 +863,8 @@ bool FSSetViewPort(render_viewport_t *view)
 	int bottom = render_info.ThisMode.h - (view->Y + view->Height);
 	int vp_x = (int)view->X;
 #ifdef __3DS__
-	/* Letterbox the 320x240 logical screen into the center of the
-	 * 400x240 physical top screen (40px black bars left/right). */
+	/* Apply any viewport X offset (currently 0 — full 400x240 native). */
 	vp_x += FS3DS_LETTERBOX_OFFSET_X;
-	{
-		static int _vp_logged = 0;
-		if (_vp_logged < 3) {
-			extern void trace(const char *msg);
-			char _b[160];
-			snprintf(_b, sizeof(_b), "viewport: x=%lu y=%lu w=%lu h=%lu bottom=%d mode_h=%d -> glViewport(%d,%d,%lu,%lu)",
-				(unsigned long)view->X, (unsigned long)view->Y,
-				(unsigned long)view->Width, (unsigned long)view->Height,
-				bottom, render_info.ThisMode.h,
-				vp_x, bottom,
-				(unsigned long)view->Width, (unsigned long)view->Height);
-			trace(_b);
-			_vp_logged++;
-		}
-	}
 #endif
 	glViewport(	vp_x, bottom, (GLint) view->Width, (GLint) view->Height	);
 	// sets the min/max depth values to render
