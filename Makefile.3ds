@@ -81,7 +81,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-Wno-implicit-int -Wno-int-conversion \
 	-ffunction-sections -fdata-sections -fcommon \
 	-std=gnu99 \
-	-D__3DS__ -DGL=1 \
+	-D__3DS__ -DARM -DGL=1 \
 	-DBSP \
 	-DTEXTURE_PNG \
 	-DSOUND_SUPPORT \

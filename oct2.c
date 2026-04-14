@@ -3392,7 +3392,23 @@ bool RenderScene( void )
 		}
     //  Load in And if nescessary ReScale Textures...
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Tload"); }
+	{
+		extern void trace(const char*);
+		char _tb[128];
+		snprintf(_tb, sizeof(_tb), "IV0: Tload — %d textures queued (max %d)",
+			Tloadheader.num_texture_files, MAXTPAGESPERTLOAD);
+		trace(_tb);
+		FILE *_f = fopen("sdmc:/forsaken_texload.log","w");
+		if (_f) {
+			int _ti;
+			fprintf(_f, "Tloadheader: %d / %d textures\n",
+				Tloadheader.num_texture_files, MAXTPAGESPERTLOAD);
+			for (_ti = 0; _ti < Tloadheader.num_texture_files; _ti++)
+				fprintf(_f, "  [%d] %s ck=%d\n", _ti,
+					Tloadheader.ImageFile[_ti], Tloadheader.ColourKey[_ti]);
+			fclose(_f);
+		}
+	}
 #endif
     if( !Tload( &Tloadheader ) )
     {

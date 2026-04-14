@@ -623,6 +623,15 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			{
 				FirePointPtr->ID = *Uint16Pnt++;				// ID ( u_int16_t )
 				FloatPnt = (float *) Uint16Pnt;
+
+#ifdef ARM
+				memcpy(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
+				FloatPnt+=3;
+				memcpy(&FirePointPtr->Dir, FloatPnt, 3*4);				// Dir ( 3 floats )
+				FloatPnt+=3;
+				memcpy(&FirePointPtr->Up, FloatPnt, 3*4);				// Up ( 3 floats )
+				FloatPnt+=3;
+#else
 				FirePointPtr->Pos.x = *FloatPnt++;				// Pos ( 3 floats )
 				FirePointPtr->Pos.y = *FloatPnt++;
 				FirePointPtr->Pos.z = *FloatPnt++;
@@ -632,6 +641,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				FirePointPtr->Up.x = *FloatPnt++;				// Up ( 3 floats )
 				FirePointPtr->Up.y = *FloatPnt++;
 				FirePointPtr->Up.z = *FloatPnt++;
+#endif
 				Uint16Pnt = (u_int16_t *) FloatPnt;
 				FirePointPtr++;
 			}
@@ -661,6 +671,18 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			{
 				SpotFXPtr->Type = *Uint16Pnt++;				// Type ( u_int16_t )
 				FloatPnt = (float *) Uint16Pnt;
+
+#ifdef ARM
+				memcpy(&SpotFXPtr->Pos, FloatPnt, 4*3);
+				FloatPnt+=3;
+				memcpy(&SpotFXPtr->DirVector.x, FloatPnt, 4*3);
+				FloatPnt+=3;
+				memcpy(&SpotFXPtr->UpVector, FloatPnt, 4*3);
+				FloatPnt+=3;
+				memcpy(&SpotFXPtr->StartDelay, FloatPnt++, 4); SpotFXPtr->StartDelay*= ANIM_SECOND;	// Start Delay
+				memcpy(&SpotFXPtr->ActiveDelay, FloatPnt++,4); SpotFXPtr->ActiveDelay*= ANIM_SECOND;	// Active Delay
+				memcpy(&SpotFXPtr->InactiveDelay, FloatPnt++, 4); SpotFXPtr->InactiveDelay*= ANIM_SECOND;	// Inactive Delay
+#else
 				SpotFXPtr->Pos.x = *FloatPnt++;				// Pos ( 3 floats )
 				SpotFXPtr->Pos.y = *FloatPnt++;
 				SpotFXPtr->Pos.z = *FloatPnt++;
@@ -673,6 +695,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				SpotFXPtr->StartDelay = ( *FloatPnt++ * ANIM_SECOND );	// Start Delay
 				SpotFXPtr->ActiveDelay = ( *FloatPnt++ * ANIM_SECOND );	// Active Delay
 				SpotFXPtr->InactiveDelay = ( *FloatPnt++ * ANIM_SECOND );	// Inactive Delay
+#endif
 				Int16Pnt = (int16_t *) FloatPnt;
 				SpotFXPtr->Primary = (int8_t) *Int16Pnt++;	// Primary ( int16_t )
 				SpotFXPtr->Secondary = (int8_t) *Int16Pnt++;	// Secondary ( int16_t )
@@ -712,8 +735,13 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				}
 
 				FloatPnt = (float *) Int8Pnt;
+#ifdef ARM
+				memcpy(&SpotFXPtr->SoundFXVolume, FloatPnt++, 4);
+				memcpy(&SpotFXPtr->SoundFXSpeed, FloatPnt++, 4);
+#else
 				SpotFXPtr->SoundFXVolume = *FloatPnt++;
 				SpotFXPtr->SoundFXSpeed = *FloatPnt++;
+#endif
 				Uint16Pnt = (u_int16_t *) FloatPnt;
 #else
 				Uint16Pnt = (u_int16_t *) Uint32Pnt;
@@ -1001,11 +1029,22 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 
 				for( num_anim_vertices = 0 ; num_anim_vertices <  Mxaloadheader->num_anim_vertices[FromFrame][group][execbuf][texgroup] ; num_anim_vertices++ )
 				{
+#ifdef ARM
+					MXAVERT fromVert, toVert;
+					memcpy(&fromVert, FromVert, sizeof(MXAVERT));
+					memcpy(&toVert, ToVert, sizeof(MXAVERT));		// To have them correctly alligned for ARM...
+#endif
 					if ( FromVert->flags & MXA_ANIM_POS )
 					{
+#ifdef ARM
+						lpLVERTEX->x = fromVert.x + ( toVert.x - fromVert.x ) * Interp;
+						lpLVERTEX->y = fromVert.y + ( toVert.y - fromVert.y ) * Interp;
+						lpLVERTEX->z = fromVert.z + ( toVert.z - fromVert.z ) * Interp;
+#else
 						lpLVERTEX->x = FromVert->x + ( ToVert->x - FromVert->x ) * Interp;
 						lpLVERTEX->y = FromVert->y + ( ToVert->y - FromVert->y ) * Interp;
 						lpLVERTEX->z = FromVert->z + ( ToVert->z - FromVert->z ) * Interp;
+#endif
 					}
 					if ( FromVert->flags & MXA_ANIM_RGB )
 					{
@@ -1023,8 +1062,13 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 					}
 					if ( FromVert->flags & MXA_ANIM_UV )
 					{
+#ifdef ARM
+						lpLVERTEX->tu = fromVert.tu + ( toVert.tu - fromVert.tu ) * Interp;
+						lpLVERTEX->tv = fromVert.tv + ( toVert.tv - fromVert.tv ) * Interp;
+#else
 						lpLVERTEX->tu = FromVert->tu + ( ToVert->tu - FromVert->tu ) * Interp;
 						lpLVERTEX->tv = FromVert->tv + ( ToVert->tv - FromVert->tv ) * Interp;
+#endif
 					}
 
 					lpLVERTEX++;
