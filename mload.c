@@ -620,6 +620,24 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]];
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mloadheader->TloadIndex[tpage]];
 
+#ifdef __3DS__
+				{
+					static int _ml_logged = 0;
+					if (_ml_logged < 50) {
+						FILE *_f = fopen("sdmc:/forsaken_mload_bind.log","a");
+						if (_f) {
+							void *_tp = Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]];
+							unsigned _id = _tp ? *(unsigned*)_tp : 0;
+							fprintf(_f, "grp=%d eb=%d tg=%d tpage=%d TloadIdx=%d ptr=%p gl_id=%u\n",
+								group, execbuf, i, tpage, Mloadheader->TloadIndex[tpage],
+								Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]], (unsigned)_id);
+							fclose(_f);
+						}
+						_ml_logged++;
+					}
+				}
+#endif
+
 				{
 					LEVELRENDEROBJECT * obj = &(Mloadheader->Group[group].renderObject[execbuf]);
 					INCREASE_TEXTURE_GROUPS( obj );
@@ -1118,6 +1136,27 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 							TanimUV++;
 						}
 						Buffer = ( char * ) FloatPnt;
+#ifdef __3DS__
+						{
+							static int _pa_logged = 0;
+							if (_pa_logged < 10) {
+								FILE *_f = fopen("sdmc:/forsaken_polyanim.log","a");
+								if (_f) {
+									TANIMUV *_uv = PolyAnim->UVs;
+									fprintf(_f, "PolyAnim[grp=%d eb=%d i=%d]: anim=%d frames=%d verts=%d\n",
+										group, execbuf, i, PolyAnim->animation, PolyAnim->frames, PolyAnim->vertices);
+									int _fi;
+									for (_fi = 0; _fi < PolyAnim->frames && _fi < 4; _fi++) {
+										fprintf(_f, "  frame %d: u=%.4f v=%.4f\n", _fi,
+											_uv[_fi * PolyAnim->vertices].u,
+											_uv[_fi * PolyAnim->vertices].v);
+									}
+									fclose(_f);
+								}
+								_pa_logged++;
+							}
+						}
+#endif
 						FixUV_Anim( PolyAnim, lpLVERTEX, Mloadheader->Group[group].originalVerts[execbuf] );
 						PolyAnim++;
 					}
@@ -1522,8 +1561,19 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 			 	Msg( "PreMLoad : Too many TPages\n" );
 				return( false );
 			}
+#ifdef __3DS__
+			{
+				FILE *_f = fopen("sdmc:/forsaken_tloadindex.log","a");
+				if (_f) {
+					fprintf(_f, "TloadIndex[%d] = %d  file='%s'  path='%s'\n",
+						i, Mloadheader->TloadIndex[i],
+						Mloadheader->ImageFile[i], TempFilename);
+					fclose(_f);
+				}
+			}
+#endif
 		}
-	
+
 	}
 
 	Mloadheader->Buffer = Buffer;
