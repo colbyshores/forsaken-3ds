@@ -4486,6 +4486,7 @@ bool MainGameRender(void)
           float slider = platform_get_3d_slider();
           if (slider > 0.0f)
           {
+              gfxSet3D(true);
               render_info.stereo_enabled = true;
               render_info.stereo_mode    = STEREO_MODE_3DS;
               /* Scale eye separation with the slider (max ~30 units at full depth).
@@ -4494,6 +4495,7 @@ bool MainGameRender(void)
           }
           else
           {
+              gfxSet3D(false);
               render_info.stereo_enabled = false;
           }
       }

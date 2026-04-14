@@ -5107,12 +5107,14 @@ bool DisplayTitle(void)
 		float _slider = platform_get_3d_slider();
 		if (_slider > 0.0f)
 		{
+			gfxSet3D(true);
 			render_info.stereo_enabled = true;
 			render_info.stereo_mode    = STEREO_MODE_3DS;
 			render_info.stereo_eye_sep = _slider * 30.0f;
 		}
 		else
 		{
+			gfxSet3D(false);
 			render_info.stereo_enabled = false;
 		}
 	}
