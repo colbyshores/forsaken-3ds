@@ -141,14 +141,16 @@ bool handle_events(void)
 		return true;
 	}
 
-	/* swap input buffers */
-	old_input = new_input;
-	new_input = (new_input + 1) % INPUT_BUFFERS;
+	/* Do NOT swap old_input/new_input here — ReadInput() in controls.c
+	 * handles the swap.  The SDL input path (input_sdl.c) also does not
+	 * swap here.  Double-swapping breaks button release detection: the
+	 * old_input buffer is never written by joystick_poll, so
+	 * JOYSTICK_BUTTON_RELEASED always returns false and AnyKeyReleased()
+	 * never fires — preventing respawn after death. */
 
-	/* clear new state */
+	/* clear current state */
 	memset(joy_button_state[0], 0, sizeof(joy_button_state[0]));
 	memset(joy_hat_state[0],    0, sizeof(joy_hat_state[0]));
-	memset(&mouse_states[new_input], 0, sizeof(mouse_state_t));
 	input_buffer_reset();
 
 	/* ---- analog sticks ---- */

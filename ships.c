@@ -1443,9 +1443,9 @@ bool ProcessShips()
 				}
 			}
 // End of Special Stuff for other players Ship Movement..Carries on even if no new packet arrives..
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 			Set the Banking Matrix
-/*===================================================================ÄÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½ï¿½*/
 			MakeQuat( 0.0F , 0.0F , ShipObjPnt->Bank, &StepQuat );
 			QuatMultiply(  &ShipObjPnt->Quat , &StepQuat , &ShipObjPnt->FinalQuat );
 			QuatToMatrix( &ShipObjPnt->FinalQuat, &ShipObjPnt->FinalMat );
@@ -1836,11 +1836,11 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 
 
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 			Work Out How Much Damage Ive Taken
 			Input : Nothing....Ships[WhoIAm].Damage must be set
 			Output: 0 no kill...1 last hit killed me...
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 int16_t DoDamage( bool OverrideInvul )
 {
 	u_int8_t	Message[ 128 ];
@@ -1943,11 +1943,11 @@ int16_t DoDamage( bool OverrideInvul )
 	return 0;
 }
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	InitShipRandomStartPos
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void InitShipRandomPos( int16_t i )
 {
 	int16_t	e;
@@ -2054,12 +2054,12 @@ void InitShipRandomPos( int16_t i )
 }
 
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	InitShipStartPos
 	Input		:	int16_t which Ship
 					int16_t which pos
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void InitShipStartPos( int16_t i, int16_t pos )
 {
 	u_int16_t startpos;
@@ -2173,12 +2173,12 @@ void InitShipStartPos( int16_t i, int16_t pos )
 
 
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	GotoRoom
 	Input		:	int16_t	which ship
 					char *	roomname
 	Output		:	true if room found, false otherwise
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 bool GotoRoom( int16_t i, char *roomname )
 {
 	u_int16_t startpos;
@@ -2268,11 +2268,11 @@ bool GotoRoom( int16_t i, char *roomname )
 
 
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Ship Mode 0	Normal Ship...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void ShipMode0( GLOBALSHIP * ShipPnt , BYTE i )
 {
 
@@ -2331,11 +2331,11 @@ void ShipMode0( GLOBALSHIP * ShipPnt , BYTE i )
 	ShipPnt->Object.Speed.y += control.up;
 }
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Ship Mode 1	Death Mode...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 #include "input.h"
 void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 {
@@ -2413,18 +2413,32 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 
 	if( (ShipPnt->Timer < (RESPAWN_TIMER*0.5f)) || Impact )
 	{
+#ifdef __3DS__
+#define DEATH_LOG(msg) { FILE *_df = fopen("sdmc:/forsaken_death.log","a"); if(_df){ fputs(msg "\n",_df); fclose(_df); } }
+#else
+#define DEATH_LOG(msg) DebugPrintf(msg "\n")
+#endif
+		DEATH_LOG("DEATH: begin death sequence");
 		ScatterDir = ShipPnt->LastMove;
 		NormaliseVector( &ScatterDir );
+		DEATH_LOG("DEATH: ScatterWeapons");
 		ScatterWeapons( &ScatterDir, MAXSCATTERED );		// Scatter weapons in all directions.
 
+		DEATH_LOG("DEATH: CreateShockwave");
 		CreateShockwave( OWNER_SHIP, WhoIAm, &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, 6.0F, (BYTE) -1 );
+		DEATH_LOG("DEATH: CreateShockwaveSend");
 		CreateShockwaveSend( OWNER_SHIP, WhoIAm, &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, 6.0F, (BYTE) -1 );
 
 		ShipPnt->Object.Mode = LIMBO_MODE;
 
+		DEATH_LOG("DEATH: ThrowOutRider");
 		ThrowOutRider( i );
+		DEATH_LOG("DEATH: PlayPannedSfx");
 		PlayPannedSfx( SFX_BikeExplode, Ships[ WhoIAm ].Object.Group , &Ships[WhoIAm].Object.Pos, 0.0F );
+		DEATH_LOG("DEATH: StopTaunt");
 		StopTaunt();
+		DEATH_LOG("DEATH: death sequence complete");
+#undef DEATH_LOG
 	}
 	else
 	{
@@ -2434,11 +2448,11 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 		}
 	}
 }
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Ship Mode 2	Limbo Mode...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 extern void clear_last_mouse_state(void);
 void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 {
@@ -2533,11 +2547,11 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 		}
 	}
 }
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Ship Mode 4	Game over mode...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void ShipMode4( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	input_grab(false);
@@ -2558,11 +2572,11 @@ void ShipMode4( GLOBALSHIP * ShipPnt , BYTE i )
 	}
 }
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Watch Mode 5	enables watching other players...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void WatchMode5( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	VECTOR	ScatterDir;
@@ -2594,21 +2608,21 @@ void WatchMode5( GLOBALSHIP * ShipPnt , BYTE i )
 
 }
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	What the Remote Camera Does...
 	Input		:	Nothing
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void Process_Remote_Camera( void )
 {
  	( * RemoteCameraModeControl[ Ships[MAX_PLAYERS].Object.Mode ] )( &Ships[MAX_PLAYERS] , MAX_PLAYERS );		//go off and do his thing...
 }
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Remote Camera Mode 0	Normal Ship...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	VECTOR	Move_Dir;
@@ -2707,11 +2721,11 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 	MakeViewMatrix( &ShipPnt->Object.Pos, &Ships[WhoIAm].Object.Pos, &Move_Dir, &ShipPnt->Object.FinalMat);
 	MatrixTranspose( &ShipPnt->Object.FinalMat, &ShipPnt->Object.FinalInvMat );
 }
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Remote Camera Mode 1	Death Mode...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void RemoteCameraMode1( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	VECTOR	Bob;
@@ -2836,11 +2850,11 @@ bool	IsStartPosVacantVisibleGroup( int16_t i , u_int16_t startpos )
 }
 
 
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 	Procedure	:	Remote Camera Mode 3	Demo Playback...
 	Input		:	int16_t which Ship
 	Output		:	Nothing
-/*===================================================================ÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½*/
 void RemoteCameraMode3( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	framelag = Oldframelag;

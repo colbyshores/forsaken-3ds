@@ -4,6 +4,8 @@
 ===================================================================*/
 #include "main.h"
 #include <stdio.h>
+#include <stddef.h>
+#include <string.h>
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -44,7 +46,20 @@ void AddTransExe( /*LPD3DMATRIX Matrix*/RENDERMATRIX *Matrix , /*LPDIRECT3DEXECU
 			TransExe[NumOfTransExe].Matrix = *Matrix;
 		}
 //		TransExe[NumOfTransExe].lpExBuf = lpExBuf;
+#ifdef __3DS__
+		/* Safe copy: the source may be a LEVELRENDEROBJECT (8 texture groups)
+		 * cast to RENDEROBJECT* (64 groups).  A full struct copy would overread
+		 * the source by (64-8)*sizeof(TEXTUREGROUP) bytes.  Copy only the
+		 * header + the actually-used texture groups. */
+		{
+			size_t hdr = offsetof(RENDEROBJECT, textureGroups);
+			size_t used = renderObject->numTextureGroups * sizeof(TEXTUREGROUP);
+			memset(&TransExe[NumOfTransExe].renderObject, 0, sizeof(RENDEROBJECT));
+			memcpy(&TransExe[NumOfTransExe].renderObject, renderObject, hdr + used);
+		}
+#else
 		TransExe[NumOfTransExe].renderObject = (*renderObject);
+#endif
 		TransExe[NumOfTransExe].Model = Model;
 		TransExe[NumOfTransExe].NumVerts = NumVerts;
 		TransExe[NumOfTransExe].group = group;
