@@ -107,6 +107,16 @@ bool StartASinglePlayerGame( MENUITEM * Item )
 
 	CountDownOn = false;
 
+#ifdef __3DS_DEBUG__
+	/* Debug: god mode + all weapons for easier testing */
+	{
+		extern bool GodMode;
+		extern void GivemeAllWeapons(void);
+		GodMode = true;
+		GivemeAllWeapons();
+	}
+#endif
+
 	MyGameStatus = STATUS_StartingSinglePlayer;
 
 	return true;

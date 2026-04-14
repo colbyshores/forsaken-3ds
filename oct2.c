@@ -2556,7 +2556,6 @@ bool RenderScene( void )
         if (!DisplayTitle()) { SeriousError = true; return false; }
         break;
     }
-    /* Frame 3+: fire the game */
     trace("autoboot: calling StartASinglePlayerGame");
     NewLevelNum = 0;   /* Volcano level (vol2, first in levels.dat) */
     VduClear();
@@ -3416,7 +3415,25 @@ bool RenderScene( void )
       return false;
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Tload OK"); }
+	{
+		extern void trace(const char*); trace("IV0: Tload OK");
+		FILE *_f = fopen("sdmc:/forsaken_texids.log","w");
+		if (_f) {
+			int _ti;
+			fprintf(_f, "After Tload: texture pointers and GL IDs\n");
+			for (_ti = 0; _ti < Tloadheader.num_texture_files; _ti++) {
+				if (Tloadheader.lpTexture[_ti]) {
+					GLuint id = *(GLuint*)Tloadheader.lpTexture[_ti];
+					fprintf(_f, "  [%d] ptr=%p gl_id=%u %s\n", _ti,
+						Tloadheader.lpTexture[_ti], (unsigned)id,
+						Tloadheader.ImageFile[_ti]);
+				} else {
+					fprintf(_f, "  [%d] NULL %s\n", _ti, Tloadheader.ImageFile[_ti]);
+				}
+			}
+			fclose(_f);
+		}
+	}
 #endif
 
 /*
