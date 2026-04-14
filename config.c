@@ -1253,12 +1253,21 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			AddButton( j, 7, &u->full_rear_view );
 			AddButton( j, 9, &u->fire_mine );
 #else
-			AddButton( j, 0, &u->fire_primary );
-			AddButton( j, 1, &u->fire_secondary );
-			AddButton( j, 2, &u->turbo );
-			AddButton( j, 3, &u->fire_mine );
-			AddButton( j, 4, &u->select_next_primary );
-			AddButton( j, 5, &u->select_next_secondary );
+			/* Xbox controller layout (SDL 1.2 xpad driver):
+			 *  0=A thrust       1=B reverse       2=X fire_primary
+			 *  3=Y fire_secondary  4=LB strafe_left  5=RB strafe_right
+			 * D-pad (hat 0): up/down = next/prev primary,
+			 *                right/left = next/prev secondary */
+			AddButton( j, 0, &u->move_forward );
+			AddButton( j, 1, &u->move_backward );
+			AddButton( j, 2, &u->fire_primary );
+			AddButton( j, 3, &u->fire_secondary );
+			AddButton( j, 4, &u->move_left );
+			AddButton( j, 5, &u->move_right );
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_UP]    = SHIPACTION_SelectNextPrimary;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_DOWN]  = SHIPACTION_SelectPrevPrimary;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_RIGHT] = SHIPACTION_SelectNextSecondary;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_LEFT]  = SHIPACTION_SelectPrevSecondary;
 #endif
 			JoystickInfo[ j ].assigned = true;
 			SetUpJoystickAxis( j );
