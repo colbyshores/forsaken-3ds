@@ -5107,9 +5107,16 @@ bool DisplayTitle(void)
 		float _slider = platform_get_3d_slider();
 		if (_slider > 0.0f)
 		{
-			gfxSet3D(true);
+			extern float config_get_float(const char *, float);
+			float _ov = config_get_float("stereo_test_slider", -1.0f);
 			render_info.stereo_enabled = true;
-			render_info.stereo_mode    = STEREO_MODE_3DS;
+			if (_ov >= 0.0f)
+				render_info.stereo_mode = STEREO_MODE_COLOR;
+			else
+			{
+				gfxSet3D(true);
+				render_info.stereo_mode = STEREO_MODE_3DS;
+			}
 			render_info.stereo_eye_sep = _slider * 30.0f;
 		}
 		else

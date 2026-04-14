@@ -1243,7 +1243,9 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			 *  0=A fire_primary  1=B fire_secondary  2=X next_weapon
 			 *  3=Y prev_weapon   4=L roll_left        5=R roll_right
 			 *  6=Start menu      7=Select rear_view   8=ZL nitro
-			 *  9=ZR drop_mine */
+			 *  9=ZR drop_mine
+			 * Circle pad = camera (axis 0/1 → yaw/pitch, set above)
+			 * D-pad (hat 0) = weapon selection */
 			AddButton( j, 0, &u->fire_primary );
 			AddButton( j, 1, &u->fire_secondary );
 			AddButton( j, 2, &u->select_next_primary );
@@ -1252,6 +1254,10 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			AddButton( j, 5, &u->roll_right );
 			AddButton( j, 7, &u->full_rear_view );
 			AddButton( j, 9, &u->fire_mine );
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_UP]    = SHIPACTION_SelectNextPrimary;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_DOWN]  = SHIPACTION_SelectPrevPrimary;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_RIGHT] = SHIPACTION_SelectNextSecondary;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_LEFT]  = SHIPACTION_SelectPrevSecondary;
 #else
 			/* Xbox controller layout (SDL 1.2 xpad driver):
 			 *  0=A thrust       1=B reverse       2=X fire_primary

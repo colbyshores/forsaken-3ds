@@ -4486,11 +4486,22 @@ bool MainGameRender(void)
           float slider = platform_get_3d_slider();
           if (slider > 0.0f)
           {
-              gfxSet3D(true);
+              extern float config_get_float(const char *, float);
+              float _ov = config_get_float("stereo_test_slider", -1.0f);
               render_info.stereo_enabled = true;
-              render_info.stereo_mode    = STEREO_MODE_3DS;
-              /* Scale eye separation with the slider (max ~30 units at full depth).
-               * stereo_focal_dist retains its config value for asymmetric frustum. */
+              if (_ov >= 0.0f)
+              {
+                  /* Emulator: stereo_test_slider override is active —
+                   * use anaglyph (color) mode since the emulator can't
+                   * display hardware stereoscopic 3D. */
+                  render_info.stereo_mode = STEREO_MODE_COLOR;
+              }
+              else
+              {
+                  /* Real hardware: use native 3DS stereoscopic output. */
+                  gfxSet3D(true);
+                  render_info.stereo_mode = STEREO_MODE_3DS;
+              }
               render_info.stereo_eye_sep = slider * 30.0f;
           }
           else
