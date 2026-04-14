@@ -74,6 +74,14 @@ int render_lighting_point_lights_only = 1;
 int render_lighting_use_only_light_color = 0;
 int render_lighting_use_only_light_color_and_blend = 0;
 
+#ifdef __3DS__
+/* Set true by set_alpha_states(), cleared by set_normal_states().
+ * When active, the TransExe (translucent) rendering pass has already
+ * set up additive blending (GL_SRC_ALPHA, GL_ONE) and disabled depth
+ * writes.  draw_render_object must not override these. */
+bool _3ds_additive_blend_active = false;
+#endif
+
 int render_light_ambience = 0;
 int render_light_ambience_alpha = 255.0f;
 
@@ -346,19 +354,17 @@ static void set_alpha_ignore( void )
 	float x = 100.f;
 	/* picaGL does not implement GL_ALPHA_TEST (PICA200 has no direct analog).
 	 * Use alpha blending so black pixels (alpha=0 after colorkey conversion)
-	 * are discarded visually.  Keep GL_ALPHA_TEST for non-picaGL builds.
-	 *
-	 * For glow/particle effects (render_lighting_use_only_light_color_and_blend=1),
-	 * use additive blending (GL_SRC_ALPHA, GL_ONE) so dark fringe pixels contribute
-	 * nothing to the framebuffer — eliminates the black ring around plasma balls,
-	 * explosions, hoops, etc.  The original D3D path used DESTBLEND=D3DBLEND_ONE
-	 * for exactly these effects. */
+	 * are discarded visually.  Keep GL_ALPHA_TEST for non-picaGL builds. */
 	glEnable(GL_BLEND);
 #ifdef __3DS__
-	if (render_lighting_use_only_light_color_and_blend)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);            /* additive: glow/particles */
-	else
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); /* normal alpha */
+	/* When the TransExe pass is active (_3ds_additive_blend_active),
+	 * set_alpha_states() has already set GL_SRC_ALPHA, GL_ONE (additive).
+	 * Preserve it — additive blend makes dark fringe pixels contribute
+	 * nothing, eliminating the black ring around glowing projectiles,
+	 * explosions, hoops, etc.  Outside the TransExe pass, use standard
+	 * alpha blend for colorkey cutout objects (gates, windows, etc.). */
+	if (!_3ds_additive_blend_active)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #else
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #endif
@@ -368,6 +374,11 @@ static void set_alpha_ignore( void )
 
 static void unset_alpha_ignore( void )
 {
+#ifdef __3DS__
+	/* Don't disable blend during the TransExe additive pass —
+	 * set_alpha_states() expects it to stay on for the whole batch. */
+	if (!_3ds_additive_blend_active)
+#endif
 	glDisable(GL_BLEND);
 	glDisable(GL_ALPHA_TEST);
 }
@@ -419,6 +430,9 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 			if(!renderObject->textureGroups[group].colourkey)
 			{
 				glEnable(GL_BLEND);
+#ifdef __3DS__
+				if (!_3ds_additive_blend_active)
+#endif
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			}
 		}
@@ -453,7 +467,7 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 				else
 					draw_vert( &verts[i], orthographic );
 		}
-		
+
 		glEnd();
 
 		if( renderObject->textureGroups[group].texture )
@@ -461,6 +475,9 @@ bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool or
 			glDisable(GL_TEXTURE_2D);
 			if(!renderObject->textureGroups[group].colourkey)
 			{
+#ifdef __3DS__
+				if (!_3ds_additive_blend_active)
+#endif
 				glDisable(GL_BLEND);
 			}
 		}
