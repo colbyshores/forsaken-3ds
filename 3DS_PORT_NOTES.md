@@ -674,11 +674,78 @@ citro3d retained-mode VBO approach.
 
 ---
 
+## ARM Unaligned Access Fixes (from OpenPandora port)
+
+The 3DS (ARM11 ARMv6K) and OpenPandora (Cortex-A8) share the same ARM unaligned
+memory access behavior. Forsaken's binary file parsers cast `char*` buffers to
+`float*` after reading `u_int16_t` fields, leaving the pointer 2-byte aligned
+instead of 4-byte aligned. On ARM, unaligned float dereference produces garbage
+values or data aborts.
+
+The OpenPandora port (`/tmp/forsaken-pandora/`) added `#ifdef ARM` guards using
+`memcpy` at 33 sites. We ported all of these plus 1 additional site in `lights.c`
+that the Pandora port also missed.
+
+**Build flag:** `-DARM` in Makefile.3ds activates all guards.
+
+| File | Sites | Data Protected |
+|------|-------|---------------|
+| bsp.c | 1 | BSP plane normal/offset |
+| camera.c | 1 | Camera pos/dir/up vectors |
+| extforce.c | 3 | External force fields, zone normals |
+| goal.c | 2 | Goal positions, zone normals |
+| **lights.c** | **1** | **POLYANIM UV application (animated textures — lava, fire)** |
+| mload.c | 6 | Level vertices, cell data, UV animation loading, SoundInfo |
+| mxaload.c | 6 | Animated model fire points, spot FX, vertex interpolation |
+| mxload.c | 5 | Static model UV animation, fire points, spot FX |
+| node.c | 1 | AI node positions/radii |
+| teleport.c | 2 | Teleport positions, zone normals |
+| trigarea.c | 3 | Trigger area positions, zone normals |
+| triggers.c | 1 | Trigger timing |
+| water.c | 3 | Water positions, sizes, fill/drain rates |
+
+**The `lights.c` fix is critical** — without it, animated textures (lava, fire) show
+garbage because the UV values are applied to vertices with an unaligned read every frame,
+even though the UV *loading* in mload.c was fixed. This fix was NOT present in the
+Pandora port.
+
+## Additional 3DS-Specific Fixes
+
+### Texture Group Overflow (2dpolys.c, polys.c, screenpolys.c)
+`MAX_TEXTURE_GROUPS` = 64 on 3DS (vs 600 on PC). Explosion/death effects can spawn
+enough FmPolys/Polys to overflow this in a single frame. Mid-draw flush pattern:
+when `numTextureGroups >= MAX_TEXTURE_GROUPS`, flush the batch and reset counters.
+
+### TransExe Struct Overread (transexe.c)
+`AddTransExe()` copies `RENDEROBJECT` (64 groups) from `LEVELRENDEROBJECT*` (8 groups).
+Fixed with partial `memcpy` of header + valid texture groups only.
+
+### Input Double-Swap (input_3ds.c)
+`handle_events()` must NOT swap `old_input`/`new_input` — `ReadInput()` in controls.c
+handles the swap. Double-swapping breaks all key/button release detection, preventing
+respawn after death.
+
+### Axis Exists Flag (input_3ds.c)
+`JoystickInfo[0].Axis[i].exists` must be set to `true` in `joysticks_init()`.
+Without this, `ReadJoystickInput()` skips all axis processing (circle pad does nothing).
+
+### picaGL Stereoscopic 3D (picaGL/source/picaGL.c, misc.c)
+- `pglTransferEye()`: DMA-transfers color buffer to GFX_LEFT/GFX_RIGHT framebuffers.
+- `pglSwapBuffers()`: Skips mono transfer when `stereo_frame=true`, swaps with stereo.
+- `glClear()`: Respects `glColorMask` write mask (needed for anaglyph stereo).
+- `gfxSet3D(true/false)`: Called per-frame based on slider state.
+
+### BSP Portal Frustum (visi.c)
+Skip asymmetric frustum shift when `stereo_enabled=true` on 3DS — camera offset in
+`RenderCurrentCameraInStereo` already provides separation.
+
+### Additive Blend for TransExe (render_gl1.c)
+`_3ds_additive_blend_active` flag preserves `GL_SRC_ALPHA, GL_ONE` blend set by
+`set_alpha_states()` during the translucent rendering pass.
+
 ## Known Remaining Issues
 
-1. **Texture loading speed** - ~2 minutes on emulated ARM (2048x2048 PNG decompression)
-2. **No save support** - romfs is read-only; need sdmc redirect for pilot/config saves
-3. **Input navigation** - HID input connected but menu navigation needs testing
-4. **Sound not tested** - ndsp init code present but audio playback not verified
-5. **Lighting** - Scene may appear darker than reference; vertex colors may need adjustment
-6. **pglTransferEye stub** - must implement `glFinish` + `GX_DisplayTransfer` per eye + `gfxSet3D(true)` for real hardware stereo output
+1. **Animated textures** — Lava/fire may still show artifacts if additional unaligned sites exist
+2. **No save support** — romfs is read-only; need sdmc redirect for pilot/config saves
+3. **Rear camera disabled** — PICA200 can't sustain two full render passes at playable FPS
+4. **No multiplayer** — Networking stubbed
