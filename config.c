@@ -1230,8 +1230,8 @@ void DefaultJoystickSettings( USERCONFIG *u )
 				for ( k = AXIS_Start; k <= AXIS_End; k++ )
 				{
 					JoystickInfo[ j ].Axis[ k ].action = SHIPACTION_Nothing;
-					JoystickInfo[ j ].Axis[ k ].sensitivity = 0.02F;
-					JoystickInfo[ j ].Axis[ k ].deadzone = 20;
+					JoystickInfo[ j ].Axis[ k ].sensitivity = 0.01F;
+					JoystickInfo[ j ].Axis[ k ].deadzone = 28;
 					JoystickInfo[ j ].Axis[ k ].inverted = false;
 					JoystickInfo[ j ].Axis[ k ].fine = true;
 				}
@@ -1239,42 +1239,36 @@ void DefaultJoystickSettings( USERCONFIG *u )
 				JoystickInfo[ j ].Axis[ AXIS_YAxis ].action = SHIPACTION_RotateUp;
 			}
 #ifdef __3DS__
-			/* 3DS button layout (matches input_3ds.c indices):
-			 *  0=A fire_primary  1=B fire_secondary  2=X next_weapon
-			 *  3=Y prev_weapon   4=L roll_left        5=R roll_right
-			 *  6=Start menu      7=Select rear_view   8=ZL nitro
-			 *  9=ZR drop_mine
+			/* 3DS / Xbox controller layout:
+			 *  0=A fire_primary  1=B fire_secondary
+			 *  2=X forward       3=Y backward
+			 *  4=L strafe_left   5=R strafe_right
+			 *  7=Select rear_view  9=ZR drop_mine
 			 * Circle pad = camera (axis 0/1 → yaw/pitch, set above)
 			 * D-pad (hat 0) = weapon selection */
 			AddButton( j, 0, &u->fire_primary );
 			AddButton( j, 1, &u->fire_secondary );
-			AddButton( j, 2, &u->select_next_primary );
-			AddButton( j, 3, &u->select_prev_primary );
+			AddButton( j, 2, &u->move_forward );
+			AddButton( j, 3, &u->move_backward );
 			AddButton( j, 4, &u->roll_left );
 			AddButton( j, 5, &u->roll_right );
 			AddButton( j, 7, &u->full_rear_view );
 			AddButton( j, 9, &u->fire_mine );
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_UP]    = SHIPACTION_SelectNextPrimary;
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_DOWN]  = SHIPACTION_SelectPrevPrimary;
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_RIGHT] = SHIPACTION_SelectNextSecondary;
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_LEFT]  = SHIPACTION_SelectPrevSecondary;
 #else
-			/* Xbox controller layout (SDL 1.2 xpad driver):
-			 *  0=A thrust       1=B reverse       2=X fire_primary
-			 *  3=Y fire_secondary  4=LB strafe_left  5=RB strafe_right
-			 * D-pad (hat 0): up/down = next/prev primary,
-			 *                right/left = next/prev secondary */
-			AddButton( j, 0, &u->move_forward );
-			AddButton( j, 1, &u->move_backward );
-			AddButton( j, 2, &u->fire_primary );
-			AddButton( j, 3, &u->fire_secondary );
+			/* Xbox controller (SDL 1.2 xpad):
+			 *  0=A fire_primary  1=B fire_secondary
+			 *  2=X forward       3=Y backward
+			 *  4=LB strafe_left  5=RB strafe_right */
+			AddButton( j, 0, &u->fire_primary );
+			AddButton( j, 1, &u->fire_secondary );
+			AddButton( j, 2, &u->move_forward );
+			AddButton( j, 3, &u->move_backward );
 			AddButton( j, 4, &u->move_left );
 			AddButton( j, 5, &u->move_right );
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_UP]    = SHIPACTION_SelectNextPrimary;
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_DOWN]  = SHIPACTION_SelectPrevPrimary;
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_RIGHT] = SHIPACTION_SelectNextSecondary;
-			JoystickInfo[ j ].POV[0].action[JOY_HAT_LEFT]  = SHIPACTION_SelectPrevSecondary;
 #endif
+			/* D-pad left/right = next/prev weapon */
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_RIGHT] = SHIPACTION_SelectNextPrimary;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_LEFT]  = SHIPACTION_SelectPrevPrimary;
 			JoystickInfo[ j ].assigned = true;
 			SetUpJoystickAxis( j );
 		}

@@ -73,6 +73,7 @@ bool joysticks_init(void)
 	/* name the axes */
 	for (i = 0; i < JoystickInfo[0].NumAxis; i++)
 	{
+		JoystickInfo[0].Axis[i].exists = true;
 		JoystickInfo[0].Axis[i].action = SHIPACTION_Nothing;
 		JoystickInfo[0].Axis[i].inverted = false;
 		JoystickInfo[0].Axis[i].deadzone = 30;
@@ -197,14 +198,13 @@ bool handle_events(void)
 	if (kDown & KEY_START)
 		input_buffer[input_buffer_count++] = SDLK_ESCAPE;
 
-	/* populate key_state for any code that reads it */
+	/* populate key_state for any code that reads it.
+	 * D-pad is NOT mapped here — the default keyboard config maps arrow keys
+	 * to camera movement, which would override the D-pad POV hat weapon
+	 * selection.  D-pad menu navigation uses input_buffer (kDown events above). */
 	memset(_3ds_key_state, 0, sizeof(_3ds_key_state));
 	if (kHeld & KEY_A)      _3ds_key_state[SDLK_RETURN] = 1;
 	if (kHeld & KEY_B)      _3ds_key_state[SDLK_ESCAPE] = 1;
-	if (kHeld & KEY_DUP)    _3ds_key_state[SDLK_UP]     = 1;
-	if (kHeld & KEY_DDOWN)  _3ds_key_state[SDLK_DOWN]   = 1;
-	if (kHeld & KEY_DLEFT)  _3ds_key_state[SDLK_LEFT]   = 1;
-	if (kHeld & KEY_DRIGHT) _3ds_key_state[SDLK_RIGHT]  = 1;
 	if (kHeld & KEY_START)  _3ds_key_state[SDLK_ESCAPE]  = 1;
 	if (kHeld & KEY_X)      _3ds_key_state[SDLK_SPACE]  = 1;
 
