@@ -184,22 +184,6 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
 				 * fontbig.png).  Applying this to all textures is safe: 3D
 				 * textures with colourkey=false still don't have blend/alpha-test
 				 * enabled during rendering, so their alpha channel is ignored. */
-#ifdef __3DS__
-				if (image.colorkey) {
-					/* picaGL has no GL_ALPHA_TEST, so the standard "exact black → alpha=0"
-					 * trick leaves near-black fringe pixels opaque, creating a black halo
-					 * around glowing objects (plasma balls, hoops, explosions).
-					 * Fix: derive alpha from pixel brightness (max channel).  Dark pixels
-					 * become proportionally transparent; bright pixels stay opaque.
-					 * This matches what the D3D colorkey + alpha-test path achieved. */
-					u_int8_t r = (u_int8_t)image.data[index];
-					u_int8_t g = (u_int8_t)image.data[index+1];
-					u_int8_t b = (u_int8_t)image.data[index+2];
-					u_int8_t lum = r > g ? r : g;
-					if (b > lum) lum = b;
-					image.data[index+3] = lum;
-				} else
-#endif
 				if( (image.data[index] + image.data[index+1] + image.data[index+2]) == 0 )
 					image.data[index+3] = 0; // alpha - pixel will not be rendered do to alpha value tests
 
@@ -756,6 +740,10 @@ void set_normal_states( void )
 {
 	reset_zbuff();
 	reset_trans();
+#ifdef __3DS__
+	extern bool _3ds_additive_blend_active;
+	_3ds_additive_blend_active = false;
+#endif
 }
 
 static void set_trans_state_9()
@@ -768,6 +756,10 @@ void set_alpha_states( void )
 	disable_zbuff_write();
 	glEnable(GL_BLEND);
 	set_trans_state_9();
+#ifdef __3DS__
+	extern bool _3ds_additive_blend_active;
+	_3ds_additive_blend_active = true;
+#endif
 }
 
 extern float framelag;
