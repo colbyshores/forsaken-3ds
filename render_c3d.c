@@ -300,13 +300,14 @@ static void upload_matrices(void)
 
 	matrix_to_c3d((const RENDERMATRIX*)&mvp, &c3d_mvp);
 
-	/* PICA depth remap: D3D [0,1] → PICA [-1,0] */
+	/* PICA depth remap: D3D [0,1] → PICA [-1,0]
+	 * z_pica = z_d3d - w, in matrix form: row[2] -= row[3] */
 	c3d_mvp.r[2].x -= c3d_mvp.r[3].x;
 	c3d_mvp.r[2].y -= c3d_mvp.r[3].y;
 	c3d_mvp.r[2].z -= c3d_mvp.r[3].z;
 	c3d_mvp.r[2].w -= c3d_mvp.r[3].w;
 
-	/* 90° screen rotation */
+	/* 90° screen rotation: swap rows 0/1, negate new row 1 */
 	{
 		C3D_FVec row0 = c3d_mvp.r[0];
 		c3d_mvp.r[0] = c3d_mvp.r[1];
@@ -316,7 +317,7 @@ static void upload_matrices(void)
 		c3d_mvp.r[1].w = -row0.w;
 	}
 
-	/* Upload to picaGL's projection uniform (register 0) */
+	/* Upload to projection uniform (register 0) */
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, 0, &c3d_mvp);
 }
 
@@ -556,7 +557,29 @@ bool FSGetViewPort(render_viewport_t *view)
 bool FSSetViewPort(render_viewport_t *view)
 {
 	s_viewport = *view;
-	/* TODO: C3D_SetViewport when rendering */
+
+	/* Map game viewport (landscape, top-left origin) to PICA200 viewport
+	 * (portrait framebuffer). Must match picaGL's glViewport → _picaViewport
+	 * chain exactly:
+	 *   GL: bottom = screenH - Y - Height; glViewport(X, bottom, W, H)
+	 *   picaGL: viewportX = (screenW - W) - X; viewportY = bottom
+	 *   PICA: _picaViewport(viewportY, viewportX, H, W)
+	 * So: PICA x = 240 - Y - H, y = (400 - W) - X, w = H, h = W */
+	{
+		int bottom = (int)render_info.ThisMode.h - (int)(view->Y + view->Height);
+		int gl_x = (int)view->X;
+		/* picaGL transform: viewportX = (400 - W) - X, viewportY = bottom */
+		int pica_x = bottom;
+		int pica_y = (400 - (int)view->Width) - gl_x;
+		int pica_w = (int)view->Height;
+		int pica_h = (int)view->Width;
+
+		if (pica_x < 0) pica_x = 0;
+		if (pica_y < 0) pica_y = 0;
+
+		C3D_SetViewport((u32)pica_x, (u32)pica_y, (u32)pica_w, (u32)pica_h);
+	}
+
 	return true;
 }
 
