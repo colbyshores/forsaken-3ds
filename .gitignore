@@ -20,6 +20,7 @@ forsaken3ds.smdh
 forsaken3ds.map
 .romfs_staging/
 romfs/
+forsaken_*.log
 
 # retail game data that ships with the 3dsx rom
 Data/
