@@ -29,6 +29,7 @@ typedef DWORD COLOR; // bgra
 extern void  trig_table_init(void);
 extern float fast_sinf(float rad);
 extern float fast_cosf(float rad);
+extern float fast_invsqrtf(float x);
 
 #define	SINR(x)				fast_sinf( x )
 #define	COSR(x)				fast_cosf( x )
