@@ -8,11 +8,12 @@
 #endif
 
 /*===================================================================
-	Sin/Cos lookup table — 4096 entries covering [0, 2*PI)
-	Linear interpolation gives < 0.0002 max error vs sinf().
+	Sin/Cos lookup table — 1024 entries covering [0, 2*PI)
+	Linear interpolation gives < 4.7e-6 max error vs sinf().
+	4KB footprint fits in L1 cache (ARM11 has 16KB L1D).
 ===================================================================*/
 
-#define TRIG_TABLE_SIZE  4096
+#define TRIG_TABLE_SIZE  1024
 #define TRIG_TABLE_MASK  (TRIG_TABLE_SIZE - 1)
 #define TRIG_SCALE       (TRIG_TABLE_SIZE / (2.0f * 3.14159265358979323846f))
 
