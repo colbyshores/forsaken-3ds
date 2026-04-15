@@ -59,6 +59,7 @@ void platform_delay(u_int32_t ms)
 
 /* ---- debug trace (writes to sdmc so Mandarine can show it) ---- */
 
+#ifdef __3DS_DEBUG__
 /* Tracing: use low-level write() to bypass stdio buffering.
    Opens once when trace_enable() is called. */
 #include <fcntl.h>
@@ -86,6 +87,11 @@ void trace(const char *msg)
 void trace_dump(void) {
 	if (_trace_fd >= 0) { close(_trace_fd); _trace_fd = -1; }
 }
+#else
+void trace_enable(void) {}
+void trace(const char *msg) { (void)msg; }
+void trace_dump(void) {}
+#endif
 
 /* ---- platform init ---- */
 

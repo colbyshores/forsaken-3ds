@@ -620,23 +620,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]];
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mloadheader->TloadIndex[tpage]];
 
-#ifdef __3DS__
-				{
-					static int _ml_logged = 0;
-					if (_ml_logged < 50) {
-						FILE *_f = fopen("sdmc:/forsaken_mload_bind.log","a");
-						if (_f) {
-							void *_tp = Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]];
-							unsigned _id = _tp ? *(unsigned*)_tp : 0;
-							fprintf(_f, "grp=%d eb=%d tg=%d tpage=%d TloadIdx=%d ptr=%p gl_id=%u\n",
-								group, execbuf, i, tpage, Mloadheader->TloadIndex[tpage],
-								Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]], (unsigned)_id);
-							fclose(_f);
-						}
-						_ml_logged++;
-					}
-				}
-#endif
 
 				{
 					LEVELRENDEROBJECT * obj = &(Mloadheader->Group[group].renderObject[execbuf]);
@@ -1136,72 +1119,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 							TanimUV++;
 						}
 						Buffer = ( char * ) FloatPnt;
-						{
-							static int _pa_logged = 0;
-							if (_pa_logged < 5) {
-								FILE *_f = fopen(
-#ifdef __3DS__
-									"sdmc:/forsaken_polyanim.log",
-#else
-									"forsaken_polyanim.log",
-#endif
-									"a");
-								if (_f) {
-									TANIMUV *_uv = PolyAnim->UVs;
-									int *_vi = PolyAnim->vert;
-									fprintf(_f, "PolyAnim[grp=%d eb=%d i=%d]: anim=%d frames=%d verts=%d\n",
-										group, execbuf, i, PolyAnim->animation, PolyAnim->frames, PolyAnim->vertices);
-									fprintf(_f, "  vert indices:");
-									{ int _ve; for (_ve = 0; _ve < PolyAnim->vertices; _ve++) fprintf(_f, " %d", _vi[_ve]); }
-									fprintf(_f, "\n");
-									{ int _fi, _ve;
-									for (_fi = 0; _fi < PolyAnim->frames; _fi++) {
-										fprintf(_f, "  frame %d:", _fi);
-										for (_ve = 0; _ve < PolyAnim->vertices; _ve++) {
-											TANIMUV *t = &_uv[_fi * PolyAnim->vertices + _ve];
-											fprintf(_f, " (%.4f,%.4f)", t->u, t->v);
-										}
-										fprintf(_f, "\n");
-									} }
-									fclose(_f);
-								}
-								_pa_logged++;
-							}
-						}
 						FixUV_Anim( PolyAnim, lpLVERTEX, Mloadheader->Group[group].originalVerts[execbuf] );
-						{
-							static int _pa2 = 0;
-							if (_pa2 < 3) {
-								FILE *_f = fopen(
-#ifdef __3DS__
-									"sdmc:/forsaken_polyanim_post.log",
-#else
-									"forsaken_polyanim_post.log",
-#endif
-									"a");
-								if (_f) {
-									TANIMUV *_uv = PolyAnim->UVs;
-									int *_vi = PolyAnim->vert;
-									fprintf(_f, "AFTER FixUV_Anim [grp=%d eb=%d]: verts=%d frames=%d\n",
-										group, execbuf, PolyAnim->vertices, PolyAnim->frames);
-									fprintf(_f, "  static vert UVs:");
-									{ int _ve; for (_ve = 0; _ve < PolyAnim->vertices; _ve++)
-										fprintf(_f, " v%d=(%.4f,%.4f)", _vi[_ve],
-											lpLVERTEX[_vi[_ve]].tu, lpLVERTEX[_vi[_ve]].tv); }
-									fprintf(_f, "\n");
-									{ int _fi, _ve;
-									for (_fi = 0; _fi < PolyAnim->frames; _fi++) {
-										fprintf(_f, "  frame %d:", _fi);
-										for (_ve = 0; _ve < PolyAnim->vertices; _ve++)
-											fprintf(_f, " (%.4f,%.4f)", _uv[_fi * PolyAnim->vertices + _ve].u,
-												_uv[_fi * PolyAnim->vertices + _ve].v);
-										fprintf(_f, "\n");
-									} }
-									fclose(_f);
-								}
-								_pa2++;
-							}
-						}
 						PolyAnim++;
 					}
 
@@ -1605,17 +1523,6 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 			 	Msg( "PreMLoad : Too many TPages\n" );
 				return( false );
 			}
-#ifdef __3DS__
-			{
-				FILE *_f = fopen("sdmc:/forsaken_tloadindex.log","a");
-				if (_f) {
-					fprintf(_f, "TloadIndex[%d] = %d  file='%s'  path='%s'\n",
-						i, Mloadheader->TloadIndex[i],
-						Mloadheader->ImageFile[i], TempFilename);
-					fclose(_f);
-				}
-			}
-#endif
 		}
 
 	}
