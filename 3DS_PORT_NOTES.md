@@ -855,6 +855,21 @@ texcoord[2]}` = 36 bytes. Colors pre-normalized from LVERTEX's packed u32 ARGB.
 2. GPU buffers + draw path: linearAlloc, C3D_DrawArrays, state management
 3. Textures: GPU_RGBA4 Morton tiling, C3D_TexBind, C3D_TexEnv combiner
 
+### Portal Viewport Fix (render_c3d.c)
+`FSSetViewPort` was storing the viewport but never calling `C3D_SetViewport`,
+causing portal geometry to render at full screen regardless of the BSP group's
+clipped viewport extent. This produced "wobbly" portals that shifted as the
+camera moved and eventually caused crashes from out-of-bounds rendering.
+
+**Fix:** Map game viewport (landscape, top-left origin) to PICA200 viewport
+(portrait framebuffer) matching picaGL's exact transform chain:
+```
+GL: bottom = screenH - Y - Height; glViewport(X, bottom, W, H)
+picaGL: viewportX = (400 - W) - X; viewportY = bottom
+PICA: _picaViewport(viewportY, viewportX, H, W)
+Result: C3D_SetViewport(bottom, (400-W)-X, H, W)
+```
+
 ### Remaining Phases
 4. 2D/HUD rendering polish
 5. Single-pass stereo (render list + projection swap — the main perf goal)
