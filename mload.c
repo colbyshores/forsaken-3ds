@@ -1124,7 +1124,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						FloatPnt = (float*) Buffer;
 						for( o = 0 ; o < vertices*frames ; o++ )
 						{
-#ifdef __3DS__
+#ifdef ARM
 							/* ARM unaligned access fix: buffer pointer may not
 							 * be 4-byte aligned after reading u_int16_t data. */
 							memcpy(&TanimUV->u, FloatPnt++, 4);
@@ -1136,28 +1136,72 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 							TanimUV++;
 						}
 						Buffer = ( char * ) FloatPnt;
-#ifdef __3DS__
 						{
 							static int _pa_logged = 0;
-							if (_pa_logged < 10) {
-								FILE *_f = fopen("sdmc:/forsaken_polyanim.log","a");
+							if (_pa_logged < 5) {
+								FILE *_f = fopen(
+#ifdef __3DS__
+									"sdmc:/forsaken_polyanim.log",
+#else
+									"forsaken_polyanim.log",
+#endif
+									"a");
 								if (_f) {
 									TANIMUV *_uv = PolyAnim->UVs;
+									int *_vi = PolyAnim->vert;
 									fprintf(_f, "PolyAnim[grp=%d eb=%d i=%d]: anim=%d frames=%d verts=%d\n",
 										group, execbuf, i, PolyAnim->animation, PolyAnim->frames, PolyAnim->vertices);
-									int _fi;
-									for (_fi = 0; _fi < PolyAnim->frames && _fi < 4; _fi++) {
-										fprintf(_f, "  frame %d: u=%.4f v=%.4f\n", _fi,
-											_uv[_fi * PolyAnim->vertices].u,
-											_uv[_fi * PolyAnim->vertices].v);
-									}
+									fprintf(_f, "  vert indices:");
+									{ int _ve; for (_ve = 0; _ve < PolyAnim->vertices; _ve++) fprintf(_f, " %d", _vi[_ve]); }
+									fprintf(_f, "\n");
+									{ int _fi, _ve;
+									for (_fi = 0; _fi < PolyAnim->frames; _fi++) {
+										fprintf(_f, "  frame %d:", _fi);
+										for (_ve = 0; _ve < PolyAnim->vertices; _ve++) {
+											TANIMUV *t = &_uv[_fi * PolyAnim->vertices + _ve];
+											fprintf(_f, " (%.4f,%.4f)", t->u, t->v);
+										}
+										fprintf(_f, "\n");
+									} }
 									fclose(_f);
 								}
 								_pa_logged++;
 							}
 						}
-#endif
 						FixUV_Anim( PolyAnim, lpLVERTEX, Mloadheader->Group[group].originalVerts[execbuf] );
+						{
+							static int _pa2 = 0;
+							if (_pa2 < 3) {
+								FILE *_f = fopen(
+#ifdef __3DS__
+									"sdmc:/forsaken_polyanim_post.log",
+#else
+									"forsaken_polyanim_post.log",
+#endif
+									"a");
+								if (_f) {
+									TANIMUV *_uv = PolyAnim->UVs;
+									int *_vi = PolyAnim->vert;
+									fprintf(_f, "AFTER FixUV_Anim [grp=%d eb=%d]: verts=%d frames=%d\n",
+										group, execbuf, PolyAnim->vertices, PolyAnim->frames);
+									fprintf(_f, "  static vert UVs:");
+									{ int _ve; for (_ve = 0; _ve < PolyAnim->vertices; _ve++)
+										fprintf(_f, " v%d=(%.4f,%.4f)", _vi[_ve],
+											lpLVERTEX[_vi[_ve]].tu, lpLVERTEX[_vi[_ve]].tv); }
+									fprintf(_f, "\n");
+									{ int _fi, _ve;
+									for (_fi = 0; _fi < PolyAnim->frames; _fi++) {
+										fprintf(_f, "  frame %d:", _fi);
+										for (_ve = 0; _ve < PolyAnim->vertices; _ve++)
+											fprintf(_f, " (%.4f,%.4f)", _uv[_fi * PolyAnim->vertices + _ve].u,
+												_uv[_fi * PolyAnim->vertices + _ve].v);
+										fprintf(_f, "\n");
+									} }
+									fclose(_f);
+								}
+								_pa2++;
+							}
+						}
 						PolyAnim++;
 					}
 
