@@ -3,12 +3,46 @@
  *
  * Replaces the picaGL (GL1 immediate mode) path with direct citro3d
  * calls, enabling:
- *   - GPU-side modelview+projection transforms via vertex shader
- *   - Cached vertex/index buffers in linear VRAM
+ *   - GPU-side modelview+projection transforms via PICA200 vertex shader
+ *   - Cached vertex/index buffers in linear VRAM (linearAlloc)
  *   - Single-pass stereo (same geometry, swap projection uniform)
  *
- * Build with RENDERER_C3D defined (and GL != 1) to use this renderer.
- * The picaGL path (render_gl1.c + GL=1) remains as fallback.
+ * Build:
+ *   make -f Makefile.3ds RENDERER=citro3d   # this renderer
+ *   make -f Makefile.3ds                    # picaGL fallback (GL=1)
+ *
+ * Architecture:
+ *   - picaGL is NOT linked. We provide our own pglInit/pglSwapBuffers/pglExit
+ *     stubs that use citro3d directly for GPU init and frame presentation.
+ *   - pglInit() calls C3D_Init(). c3d_renderer_init() creates the render
+ *     target, shader, and scratch buffer.
+ *   - FSBeginScene() calls C3D_FrameBegin + C3D_FrameDrawOn + binds shader
+ *     + initializes GPU state (AttrInfo, TexEnv, depth, cull, uniforms).
+ *   - draw_render_object() converts LVERTEX/TLVERTEX to gpu_vertex_t (36 bytes,
+ *     all floats) in a linearAlloc scratch buffer, then C3D_DrawArrays.
+ *   - pglSwapBuffers() calls C3D_FrameEnd which triggers the auto display
+ *     transfer via C3D_RenderTargetSetOutput. DO NOT call picaGL's real
+ *     pglSwapBuffers — its GX_DisplayTransfer conflicts with citro3d's
+ *     auto-transfer and produces a black screen.
+ *
+ * Key lessons learned during development:
+ *   1. Mandarine emulator DOES support citro3d render targets + auto-transfer.
+ *      The earlier black screen was caused by pglSwapBuffers conflicting with
+ *      C3D_FrameEnd's display transfer, NOT emulator limitations.
+ *   2. GPU state (AttrInfo, BufInfo, TexEnv, DepthTest, CullFace) must be
+ *      explicitly initialized in FSBeginScene. Uninitialized GPU registers
+ *      cause invisible geometry (no crash, just no output).
+ *   3. The shader has two uniform matrix slots: projection (reg 0-3) and
+ *      modelView (reg 4-7). upload_matrices() writes combined MVP to
+ *      projection and FSBeginScene writes identity to modelView. Both
+ *      must be initialized or the shader reads garbage.
+ *   4. Engine matrices are column-major (despite [4][4] declaration).
+ *      matrix_to_c3d() transposes using the picaGL glLoadMatrixf pattern:
+ *      dst->r[i].x = m[0+i], .y = m[4+i], .z = m[8+i], .w = m[12+i].
+ *   5. Textures use GPU_RGBA4 (16-bit) to avoid VRAM exhaustion. GPU_RGBA8
+ *      runs out after ~7 1024x1024 textures.
+ *   6. Vertex colors are packed u32 ARGB in LVERTEX but the shader needs
+ *      normalized floats. gpu_vertex_t stores pre-normalized float[4] colors.
  */
 
 #ifdef RENDERER_C3D

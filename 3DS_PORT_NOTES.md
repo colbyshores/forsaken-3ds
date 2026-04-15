@@ -791,8 +791,79 @@ forsaken_polyanim.log, forsaken_polyanim_post.log, forsaken_mload_bind.log,
 forsaken_tloadindex.log, forsaken_texload.log, forsaken_texids.log). The `trace()`
 infrastructure in `main_3ds.c` compiles to a no-op unless `__3DS_DEBUG__` is defined.
 
+## Native Citro3D Renderer (render_c3d.c)
+
+Alternative renderer bypassing picaGL for direct PICA200 GPU access. Branch:
+`3ds-citro3d`. Toggle: `make -f Makefile.3ds RENDERER=citro3d`.
+
+### Build Architecture
+- picaGL is **not linked** for the citro3d path
+- `render_c3d.c` implements all 41 functions from `render_gl1.c` + `render_gl_shared.c`
+- Own `pglInit`/`pglSwapBuffers`/`pglExit` stubs provided
+- Vertex shader: `shaders/render_c3d.v.pica` (12 instructions, MVP transform)
+- Shader binary embedded via `render_c3d_shbin.h` (compiled with picasso)
+
+### Frame Lifecycle
+```
+pglInit()           → C3D_Init()
+c3d_renderer_init() → C3D_RenderTargetCreate + C3D_RenderTargetSetOutput + shader load
+FSBeginScene()      → C3D_FrameBegin + C3D_RenderTargetClear + C3D_FrameDrawOn
+                      + C3D_BindProgram + GPU state init (AttrInfo, TexEnv, depth, cull)
+                      + modelView uniform = identity
+draw_render_object()→ Convert LVERTEX → gpu_vertex_t, upload MVP, C3D_DrawArrays
+pglSwapBuffers()    → C3D_FrameEnd (triggers auto display transfer)
+```
+
+### Critical Findings
+
+**pglSwapBuffers conflict:** picaGL's `pglSwapBuffers` calls `glFinish` →
+`GX_DisplayTransfer` → `gfxScreenSwapBuffers`. This conflicts with citro3d's
+`C3D_RenderTargetSetOutput` auto-transfer triggered by `C3D_FrameEnd`. The
+result is a black screen. Solution: override `pglSwapBuffers` to only call
+`C3D_FrameEnd` when a frame is active.
+
+**GPU state initialization:** The PICA200 GPU registers for attribute layout
+(`AttrInfo`), texture environment (`TexEnv`), depth test, and cull face must
+be explicitly set in `FSBeginScene` after `C3D_FrameDrawOn`. Uninitialized
+registers produce invisible geometry (no crash, no error, just no output).
+
+**Uniform initialization:** The vertex shader reads `modelView[4]` (uniform
+registers 4-7) and `projection[4]` (registers 0-3). `upload_matrices()` writes
+combined MVP to registers 0-3. Registers 4-7 must be explicitly set to identity
+in `FSBeginScene` — uninitialized uniforms contain garbage from the previous
+frame or from picaGL's setup.
+
+**Matrix convention:** Engine matrices are column-major (see `render_gl_shared.c`
+line 929). `matrix_to_c3d()` transposes using the picaGL `glLoadMatrixf` pattern:
+`r[i].x = m[0+i], r[i].y = m[4+i], r[i].z = m[8+i], r[i].w = m[12+i]`.
+
+**Depth remap:** D3D [0,1] → PICA [-1,0] via `row[2] -= row[3]` on the
+combined MVP matrix. NOT the two-step D3D→GL→PICA conversion.
+
+**Screen rotation:** 90° tilt for portrait→landscape: swap rows 0 and 1,
+negate new row 1. Matches picaGL's `matrix4x4_fix_projection`.
+
+**VRAM budget:** GPU_RGBA8 (32-bit) textures exhaust VRAM after ~7 1024x1024
+textures. GPU_RGBA4 (16-bit) halves VRAM usage, matching picaGL's default.
+
+**Vertex format:** `gpu_vertex_t` = `{float pos[3], float color[4], float
+texcoord[2]}` = 36 bytes. Colors pre-normalized from LVERTEX's packed u32 ARGB.
+256KB `linearAlloc` scratch buffer holds ~7000 vertices per frame.
+
+### Completed Phases
+1. Scaffold: render_c3d.c skeleton, vertex shader, Makefile toggle
+2. GPU buffers + draw path: linearAlloc, C3D_DrawArrays, state management
+3. Textures: GPU_RGBA4 Morton tiling, C3D_TexBind, C3D_TexEnv combiner
+
+### Remaining Phases
+4. 2D/HUD rendering polish
+5. Single-pass stereo (render list + projection swap — the main perf goal)
+6. GPU lighting (move light_vert to vertex shader)
+
 ## Known Remaining Issues
 
 1. **No save support** — romfs is read-only; need sdmc redirect for pilot/config saves
 2. **Rear camera disabled** — PICA200 can't sustain two full render passes at playable FPS
 3. **No multiplayer** — Networking stubbed
+4. **Citro3d renderer: no per-vertex lighting** — light_vert sets full-bright white
+5. **Citro3d renderer: no stereo** — single-pass stereo not yet implemented
