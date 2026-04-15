@@ -52,9 +52,21 @@ static C3D_RenderTarget *s_targetLeft  = NULL;
 static C3D_RenderTarget *s_targetRight = NULL;
 static C3D_RenderTarget *s_targetBot   = NULL;
 
+/* ---- GPU vertex format (all floats, matches shader inputs) ---- */
+typedef struct {
+	float pos[3];
+	float color[4];
+	float texcoord[2];
+} gpu_vertex_t;  /* 36 bytes */
+
+/* Scratch buffer for vertex conversion (256KB = ~7000 verts) */
+#define GPU_SCRATCH_SIZE  (256 * 1024)
+static gpu_vertex_t *s_scratch = NULL;
+static int s_scratchUsed = 0;
+static int s_scratchMax = 0;
+
 /* ---- vertex attribute layout ---- */
 static C3D_AttrInfo s_attrInfo3D;
-static C3D_AttrInfo s_attrInfo2D;
 
 /* ---- globals expected by the engine ---- */
 
@@ -73,16 +85,32 @@ typedef struct {
 	bool    initialized;
 } texture_t;
 
+/* debug trace to SD card */
+static void c3d_trace(const char *msg)
+{
+	FILE *f = fopen("sdmc:/forsaken_c3d.log", "a");
+	if (f) { fputs(msg, f); fputc('\n', f); fclose(f); }
+}
+
 /* bSquareOnly — shared global, always true on 3DS */
 bool bSquareOnly = true;
 
 /* Additive blend flag (matches GL1 behavior) */
 bool _additive_blend_active = false;
 
-/* picaGL replacement functions — initialize/teardown citro3d directly */
+/* Frame state tracking */
+static bool s_inFrame = false;
+
+
+/* picaGL is NOT linked for the citro3d renderer. We provide our own
+ * pglInit/pglExit/pglSwapBuffers/pglTransferEye implementations. */
 void pglInit(void)
 {
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	{
+		FILE *f = fopen("sdmc:/forsaken_c3d.log", "w");
+		if (f) { fputs("pglInit: C3D_Init done\n", f); fclose(f); }
+	}
 }
 
 void pglExit(void)
@@ -93,7 +121,16 @@ void pglExit(void)
 
 void pglSwapBuffers(void)
 {
-	C3D_FrameEnd(0);
+	/* End the citro3d frame if one is active.
+	 * C3D_FrameEnd triggers the auto display transfer via
+	 * C3D_RenderTargetSetOutput. If no frame was started
+	 * (e.g. during loading screens before FSBeginScene is called),
+	 * this is safely a no-op. */
+	if (s_inFrame)
+	{
+		C3D_FrameEnd(0);
+		s_inFrame = false;
+	}
 }
 
 void pglTransferEye(unsigned int eye) { (void)eye; }
@@ -127,47 +164,53 @@ void build_gamma_table(double gamma)
 
 bool c3d_renderer_init(void)
 {
+	c3d_trace("c3d_renderer_init: start");
 	s_shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
 	if (!s_shaderDVLB)
+	{
+		c3d_trace("c3d_renderer_init: DVLB_ParseFile FAILED");
 		return false;
+	}
+	c3d_trace("c3d_renderer_init: shader parsed");
 
 	shaderProgramInit(&s_shaderProgram);
 	if (shaderProgramSetVsh(&s_shaderProgram, &s_shaderDVLB->DVLE[0]) < 0)
 		return false;
 
-	/* 3D vertex: pos(3f) + color(4ub) + texcoord(2f) = 20 bytes */
+	/* GPU vertex layout: pos(3f) + color(4f) + texcoord(2f) = 36 bytes
+	 * We convert LVERTEX/TLVERTEX → gpu_vertex_t on CPU before drawing */
 	AttrInfo_Init(&s_attrInfo3D);
-	AttrInfo_AddLoader(&s_attrInfo3D, 0, GPU_FLOAT, 3);
-	AttrInfo_AddLoader(&s_attrInfo3D, 1, GPU_UNSIGNED_BYTE, 4);
-	AttrInfo_AddLoader(&s_attrInfo3D, 2, GPU_FLOAT, 2);
+	AttrInfo_AddLoader(&s_attrInfo3D, 0, GPU_FLOAT, 3);  /* v0: position */
+	AttrInfo_AddLoader(&s_attrInfo3D, 1, GPU_FLOAT, 4);  /* v1: color (normalized) */
+	AttrInfo_AddLoader(&s_attrInfo3D, 2, GPU_FLOAT, 2);  /* v2: texcoord */
 
-	/* 2D vertex: pos(4f) + color(4ub) + texcoord(2f) = 24 bytes */
-	AttrInfo_Init(&s_attrInfo2D);
-	AttrInfo_AddLoader(&s_attrInfo2D, 0, GPU_FLOAT, 4);
-	AttrInfo_AddLoader(&s_attrInfo2D, 1, GPU_UNSIGNED_BYTE, 4);
-	AttrInfo_AddLoader(&s_attrInfo2D, 2, GPU_FLOAT, 2);
+	/* Allocate scratch buffer for vertex conversion */
+	s_scratch = (gpu_vertex_t*)linearAlloc(GPU_SCRATCH_SIZE);
+	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
+	s_scratchUsed = 0;
 
-	/* Render targets */
-	s_targetLeft  = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
-	s_targetRight = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
-	s_targetBot   = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
-
-	u32 transfer_flags =
+	/* Create render target and link to display output */
+	s_targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
+	if (!s_targetLeft) {
+		c3d_trace("FAILED to create render target");
+		return false;
+	}
+	C3D_RenderTargetSetOutput(s_targetLeft, GFX_TOP, GFX_LEFT,
 		GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(0) |
 		GX_TRANSFER_RAW_COPY(0) |
 		GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
 		GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) |
-		GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO);
-
-	C3D_RenderTargetSetOutput(s_targetLeft,  GFX_TOP,    GFX_LEFT,  transfer_flags);
-	C3D_RenderTargetSetOutput(s_targetRight, GFX_TOP,    GFX_RIGHT, transfer_flags);
-	C3D_RenderTargetSetOutput(s_targetBot,   GFX_BOTTOM, GFX_LEFT,  transfer_flags);
+		GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO));
+	c3d_trace("render target created and linked to display");
 
 	Mtx_Identity(&s_projection);
 	Mtx_Identity(&s_modelview);
 
+	/* Match picaGL depth map: scale=1.0, offset=1.0 */
+	C3D_DepthMap(true, 1.0f, 1.0f);
+
 	s_shaderReady = true;
-	DebugPrintf("c3d_renderer_init: shader loaded, render targets created\n");
+	c3d_trace("c3d_renderer_init: OK — shader ready, render targets created");
 	return true;
 }
 
@@ -191,21 +234,56 @@ void c3d_renderer_cleanup(void)
 
 static void matrix_to_c3d(const RENDERMATRIX *src, C3D_Mtx *dst)
 {
-	/* RENDERMATRIX.m is [4][4] row-major.
-	 * C3D_Mtx.r[row] is C3D_FVec with WZYX internal layout:
-	 *   r[row].x = col3, r[row].y = col2, r[row].z = col1, r[row].w = col0
-	 * We use the flat m[16] accessor: m[row*4 + col] maps to
-	 * the WZYX-reversed storage so col 0→index 3, col 1→index 2, etc. */
-	int r, c;
-	for (r = 0; r < 4; r++)
-		for (c = 0; c < 4; c++)
-			dst->m[r * 4 + (3 - c)] = src->m[r][c];
+	/* Engine matrices are column-major in memory (see render_gl_shared.c
+	 * line 929-937). The raw float[16] IS the GL column-major data.
+	 * Load it the same way picaGL's glLoadMatrixf does:
+	 *   row[i].x = m[0+i]   (column 0, row i)
+	 *   row[i].y = m[4+i]   (column 1, row i)
+	 *   row[i].z = m[8+i]   (column 2, row i)
+	 *   row[i].w = m[12+i]  (column 3, row i)
+	 * C3D_FVec x/y/z/w accessors handle the WZYX storage internally. */
+	const float *m = (const float *)src;
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		dst->r[i].x = m[0 + i];
+		dst->r[i].y = m[4 + i];
+		dst->r[i].z = m[8 + i];
+		dst->r[i].w = m[12 + i];
+	}
 }
 
 static void upload_matrices(void)
 {
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &s_projection);
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW,  &s_modelview);
+	/* Compute combined MVP on CPU, apply PICA fix, upload to uniform 0
+	 * (picaGL's projection slot). picaGL's shader does: outpos = projection * pos.
+	 * We pre-combine world*view*proj so the shader just needs one multiply. */
+	MATRIX mvp;
+	C3D_Mtx c3d_mvp;
+
+	MatrixMultiply(&world_matrix, &view_matrix, &mvp);
+	MatrixMultiply(&mvp, &proj_matrix, &mvp);
+
+	matrix_to_c3d((const RENDERMATRIX*)&mvp, &c3d_mvp);
+
+	/* PICA depth remap: D3D [0,1] → PICA [-1,0] */
+	c3d_mvp.r[2].x -= c3d_mvp.r[3].x;
+	c3d_mvp.r[2].y -= c3d_mvp.r[3].y;
+	c3d_mvp.r[2].z -= c3d_mvp.r[3].z;
+	c3d_mvp.r[2].w -= c3d_mvp.r[3].w;
+
+	/* 90° screen rotation */
+	{
+		C3D_FVec row0 = c3d_mvp.r[0];
+		c3d_mvp.r[0] = c3d_mvp.r[1];
+		c3d_mvp.r[1].x = -row0.x;
+		c3d_mvp.r[1].y = -row0.y;
+		c3d_mvp.r[1].z = -row0.z;
+		c3d_mvp.r[1].w = -row0.w;
+	}
+
+	/* Upload to picaGL's projection uniform (register 0) */
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, 0, &c3d_mvp);
 }
 
 /*===================================================================
@@ -262,6 +340,8 @@ void render_set_filter(bool red, bool green, bool blue)
 
 bool render_flip(render_info_t *info)
 {
+	/* platform_render_present calls our pglSwapBuffers which calls
+	 * C3D_FrameEnd if a frame is active */
 	platform_render_present(info);
 	return true;
 }
@@ -284,11 +364,18 @@ void render_mode_fill(void) { /* always fill on PICA200 */ }
 	Scene begin / end
 ===================================================================*/
 
+
 bool FSBeginScene(void)
 {
-	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-	C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0);
-	C3D_FrameDrawOn(s_targetLeft);
+	s_scratchUsed = 0;
+	if (!s_inFrame)
+	{
+		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+		C3D_FrameDrawOn(s_targetLeft);
+		C3D_BindProgram(&s_shaderProgram);
+		s_inFrame = true;
+	}
 	return true;
 }
 
@@ -366,23 +453,27 @@ void set_whiteout_state(void)
 	Clear
 ===================================================================*/
 
+
 bool FSClear(XYRECT *rect)
 {
 	(void)rect;
-	C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0);
+	if (s_targetLeft)
+		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 	return true;
 }
 
 bool FSClearBlack(void)
 {
-	C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_COLOR, 0x000000FF, 0);
+	if (s_targetLeft)
+		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_COLOR, 0x000000FF, 0);
 	return true;
 }
 
 bool FSClearDepth(XYRECT *rect)
 {
 	(void)rect;
-	C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_DEPTH, 0, 0);
+	if (s_targetLeft)
+		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
 	return true;
 }
 
@@ -438,15 +529,9 @@ bool FSGetWorld(RENDERMATRIX *matrix)
 
 bool FSSetProjection(RENDERMATRIX *matrix)
 {
-	RENDERMATRIX gl_proj;
+	/* Just store the raw projection matrix — PICA fix is applied in
+	 * upload_matrices() to the combined MVP, matching render_3ds.c */
 	memmove(&proj_matrix, &matrix->m, sizeof(proj_matrix));
-
-	/* D3D LH [0,1] depth → GL RH [-1,1] depth conversion */
-	memmove(&gl_proj, matrix, sizeof(RENDERMATRIX));
-	gl_proj._33 = 2.0f * matrix->_33 - 1.0f;
-	gl_proj._43 = 2.0f * matrix->_43;
-
-	matrix_to_c3d(&gl_proj, &s_projection);
 	return true;
 }
 
@@ -572,7 +657,7 @@ static inline u32 _mortonInterleave(u32 x, u32 y)
 	return xlut[x & 7] + ylut[y & 7];
 }
 
-static void tile_rgba8(const u_int8_t *src, u_int8_t *dst, int w, int h)
+static void tile_rgba4(const u_int8_t *src, u_int16_t *dst, int w, int h)
 {
 	int x, y;
 	for (y = 0; y < h; y++)
@@ -582,13 +667,14 @@ static void tile_rgba8(const u_int8_t *src, u_int8_t *dst, int w, int h)
 		for (x = 0; x < w; x++)
 		{
 			u32 morton = _mortonInterleave(x, out_y);
-			u32 offset = (morton + coarse_y * w + (x & ~7) * 8) * 4;
+			u32 offset = morton + coarse_y * w + (x & ~7) * 8;
 			int si = (y * w + x) * 4;
-			/* RGBA → ABGR byte order for GPU_RGBA8 */
-			dst[offset + 0] = src[si + 3]; /* A */
-			dst[offset + 1] = src[si + 2]; /* B */
-			dst[offset + 2] = src[si + 1]; /* G */
-			dst[offset + 3] = src[si + 0]; /* R */
+			/* RGBA8 → RGBA4444 packed u16 for GPU_RGBA4 */
+			u_int8_t r = src[si + 0] >> 4;
+			u_int8_t g = src[si + 1] >> 4;
+			u_int8_t b = src[si + 2] >> 4;
+			u_int8_t a = src[si + 3] >> 4;
+			dst[offset] = (r << 12) | (g << 8) | (b << 4) | a;
 		}
 	}
 }
@@ -675,21 +761,31 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 			}
 		}
 
-		if (!C3D_TexInit(&texdata->tex, image.w, image.h, GPU_RGBA8))
 		{
-			DebugPrintf("C3D_TexInit failed: %dx%d\n", image.w, image.h);
-			if (is_new) free(texdata);
+			char buf[128];
+			snprintf(buf, sizeof(buf), "create_texture: C3D_TexInit %dx%d", image.w, image.h);
+			c3d_trace(buf);
+		}
+		if (!C3D_TexInit(&texdata->tex, image.w, image.h, GPU_RGBA4))
+		{
+			c3d_trace("create_texture: C3D_TexInit FAILED (VRAM full?)");
+			texdata->initialized = false;
+			*t = (LPTEXTURE)texdata;
 			destroy_image(&image);
-			return false;
+			return true; /* non-fatal — draw path falls back to vertex color */
 		}
 
-		/* Morton-tile RGBA → ABGR into the texture's linear buffer */
-		tiled = linearAlloc(image.w * image.h * 4);
+		/* Morton-tile RGBA8 → RGBA4444 into the texture's linear buffer */
+		tiled = linearAlloc(image.w * image.h * 2); /* 2 bytes per pixel for RGBA4 */
 		if (tiled)
 		{
-			tile_rgba8((u_int8_t*)image.data, tiled, image.w, image.h);
+			tile_rgba4((u_int8_t*)image.data, (u_int16_t*)tiled, image.w, image.h);
 			C3D_TexUpload(&texdata->tex, tiled);
 			linearFree(tiled);
+		}
+		else
+		{
+			c3d_trace("create_texture: linearAlloc for tiled data FAILED");
 		}
 
 		C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
@@ -749,51 +845,127 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 
 void light_vert(LVERTEX *vert, u_int8_t *color)
 {
-	/* Phase 2: no per-vertex lighting yet. Phase 6 moves to GPU. */
-	(void)vert; (void)color;
+	/* No per-vertex lighting yet — set full-bright white so geometry
+	 * is visible. Without this, vertices stay at black (0xFF000000)
+	 * and GPU_MODULATE (texture × vertex color) produces all black. */
+	vert->color = 0xFFFFFFFF;  /* ARGB: opaque white */
+	(void)color;
 }
 
 /*===================================================================
-	Draw functions — Phase 2 citro3d draw path
+	Draw functions — GL-based via picaGL (proves pipeline correctness)
+	TODO: replace with raw citro3d C3D_DrawArrays once visual output confirmed
 ===================================================================*/
 
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
 {
 	int group;
-	C3D_BufInfo bufInfo;
+	C3D_BufInfo *bufInfo;
 
-	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer)
+	static int _dc = 0;
+
+	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
 		return false;
 
-	C3D_BindProgram(&s_shaderProgram);
-	C3D_SetAttrInfo(orthographic ? &s_attrInfo2D : &s_attrInfo3D);
+	if (_dc < 5) {
+		char b[128];
+		snprintf(b,sizeof(b),"draw[%d] groups=%d ortho=%d scratch=%d/%d",
+			_dc, renderObject->numTextureGroups, orthographic, s_scratchUsed, s_scratchMax);
+		c3d_trace(b);
+	}
+	_dc++;
+
+	/* Using picaGL's shader — no C3D_BindProgram */
 
 	if (!orthographic)
 		upload_matrices();
 	else
 	{
-		/* 2D: identity modelview, orthographic projection */
-		C3D_Mtx ortho, identity;
-		Mtx_Identity(&identity);
+		/* Orthographic — upload to picaGL's uniform 0 (projection slot) */
+		C3D_Mtx ortho;
 		Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
-			render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, false);
-		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
-		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
+			render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
+		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, 0, &ortho);
 	}
-
-	/* Set up vertex buffer */
-	BufInfo_Init(&bufInfo);
-	BufInfo_Add(&bufInfo, renderObject->lpVertexBuffer,
-		orthographic ? sizeof(TLVERTEX) : sizeof(LVERTEX),
-		3, /* 3 attributes: pos, color, texcoord */
-		orthographic ? 0x210 : 0x210);
-	C3D_SetBufInfo(&bufInfo);
 
 	for (group = 0; group < renderObject->numTextureGroups; group++)
 	{
 		TEXTUREGROUP *tg = &renderObject->textureGroups[group];
+		int numIndices = tg->numTriangles * 3;
+		int startVert = tg->startVert;
+		bool has_texture = false;
+		int totalVerts, i;
+		gpu_vertex_t *dst;
 
-		/* Alpha test for colorkey textures */
+		if (numIndices <= 0) continue;
+		if (s_scratchUsed + numIndices > s_scratchMax) continue; /* overflow guard */
+
+		dst = s_scratch + s_scratchUsed;
+
+		/* Convert LVERTEX/TLVERTEX → gpu_vertex_t, expanding indices */
+		if (renderObject->lpIndexBuffer)
+		{
+			WORD *indices = (WORD*)renderObject->lpIndexBuffer + tg->startIndex;
+
+			if (orthographic)
+			{
+				TLVERTEX *verts = (TLVERTEX*)renderObject->lpVertexBuffer;
+				for (i = 0; i < numIndices; i++)
+				{
+					TLVERTEX *v = &verts[startVert + indices[i]];
+					dst[i].pos[0] = v->x;
+					dst[i].pos[1] = v->y;
+					dst[i].pos[2] = v->z;
+					dst[i].color[0] = ((v->color >> 16) & 0xFF) / 255.0f;
+					dst[i].color[1] = ((v->color >> 8)  & 0xFF) / 255.0f;
+					dst[i].color[2] = ((v->color)       & 0xFF) / 255.0f;
+					dst[i].color[3] = ((v->color >> 24) & 0xFF) / 255.0f;
+					dst[i].texcoord[0] = v->tu;
+					dst[i].texcoord[1] = v->tv;
+				}
+			}
+			else
+			{
+				LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
+				for (i = 0; i < numIndices; i++)
+				{
+					LVERTEX *v = &verts[startVert + indices[i]];
+					dst[i].pos[0] = v->x;
+					dst[i].pos[1] = v->y;
+					dst[i].pos[2] = v->z;
+					dst[i].color[0] = ((v->color >> 16) & 0xFF) / 255.0f;
+					dst[i].color[1] = ((v->color >> 8)  & 0xFF) / 255.0f;
+					dst[i].color[2] = ((v->color)       & 0xFF) / 255.0f;
+					dst[i].color[3] = ((v->color >> 24) & 0xFF) / 255.0f;
+					dst[i].texcoord[0] = v->tu;
+					dst[i].texcoord[1] = v->tv;
+				}
+			}
+			totalVerts = numIndices;
+		}
+		else
+		{
+			/* Non-indexed: use vertex list directly */
+			LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
+			int numVerts = tg->numVerts;
+			if (s_scratchUsed + numVerts > s_scratchMax) continue;
+			for (i = 0; i < numVerts; i++)
+			{
+				LVERTEX *v = &verts[startVert + i];
+				dst[i].pos[0] = v->x;
+				dst[i].pos[1] = v->y;
+				dst[i].pos[2] = v->z;
+				dst[i].color[0] = ((v->color >> 16) & 0xFF) / 255.0f;
+				dst[i].color[1] = ((v->color >> 8)  & 0xFF) / 255.0f;
+				dst[i].color[2] = ((v->color)       & 0xFF) / 255.0f;
+				dst[i].color[3] = ((v->color >> 24) & 0xFF) / 255.0f;
+				dst[i].texcoord[0] = v->tu;
+				dst[i].texcoord[1] = v->tv;
+			}
+			totalVerts = numVerts;
+		}
+
+		/* GPU state */
 		if (tg->colourkey)
 		{
 			C3D_AlphaTest(true, GPU_GREATER, 0x64);
@@ -803,7 +975,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 		}
 
-		/* Bind texture and set up texture combiner */
+		/* Texture binding */
 		{
 			C3D_TexEnv *env = C3D_GetTexEnv(0);
 			C3D_TexEnvInit(env);
@@ -814,37 +986,36 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				if (texdata->initialized)
 				{
 					C3D_TexBind(0, &texdata->tex);
-					/* Combine: texture color × vertex color */
 					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
 					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-				}
-				else
-				{
-					/* No valid texture — use vertex color only */
-					C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-					C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+					has_texture = true;
 				}
 			}
-			else
+			if (!has_texture)
 			{
-				/* No texture — vertex color only */
 				C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
 				C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 			}
 		}
 
-		/* Draw indexed triangles */
-		if (renderObject->lpIndexBuffer && tg->numTriangles > 0)
+		/* Configure vertex attributes and buffer — use global citro3d state
+		 * getters (C3D_GetAttrInfo/C3D_GetBufInfo) as the working renderer does */
 		{
-			WORD *indices = (WORD*)renderObject->lpIndexBuffer + tg->startIndex;
-			C3D_DrawElements(
-				primitive_type == 1 ? GPU_GEOMETRY_PRIM : GPU_TRIANGLES,
-				tg->numTriangles * 3,
-				C3D_UNSIGNED_SHORT,
-				indices);
+			C3D_AttrInfo *attrInfo = C3D_GetAttrInfo();
+			C3D_BufInfo *bufInfo = C3D_GetBufInfo();
+			AttrInfo_Init(attrInfo);
+			AttrInfo_AddLoader(attrInfo, 0, GPU_FLOAT, 3);  /* v0: pos */
+			AttrInfo_AddLoader(attrInfo, 1, GPU_FLOAT, 4);  /* v1: color */
+			AttrInfo_AddLoader(attrInfo, 2, GPU_FLOAT, 2);  /* v2: texcoord */
+			BufInfo_Init(bufInfo);
+			BufInfo_Add(bufInfo, dst, sizeof(gpu_vertex_t), 3, 0x210);
 		}
 
-		/* Restore state after colorkey */
+		C3D_DrawArrays(GPU_TRIANGLES, 0, totalVerts);
+
+		s_scratchUsed += totalVerts;
+
+		/* Restore state */
 		if (tg->colourkey)
 		{
 			C3D_AlphaTest(false, GPU_ALWAYS, 0);
