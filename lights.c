@@ -441,11 +441,11 @@ clear:					mov		eax, [esi]
 						x = (float)((int) (lpLVERTEX2->x * 0.35F) % 360);
 						y = (float)((int) (lpLVERTEX2->y * 0.35F) % 360);
 						z = (float)((int) (lpLVERTEX2->z * 0.35F) % 360);
-						//					distance = (float) sqrt( (x*x) + (y*y) + (z*z) );
+						//					distance = (float) sqrtf( (x*x) + (y*y) + (z*z) );
 						col = lpLVERTEX2->color;
 						col &= 0xffff;
-						//					tal = 128.0F + 127.0F * (float) sin( (distance+cral) * (PI / 180.0F ) );
-						b = (int)  ( ( sin( D2R( x + cral ) ) + sin( D2R( y + cral ) ) + sin( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+						//					tal = 128.0F + 127.0F * (float) sinf( (distance+cral) * (PI / 180.0F ) );
+						b = (int)  ( ( sinf( D2R( x + cral ) ) + sinf( D2R( y + cral ) ) + sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 						b+= intWhiteOut;
 						if( b > 255 )
 							b = 255;
@@ -476,7 +476,7 @@ clear:					mov		eax, [esi]
 					r >>=2;
 					g >>=2;
 					b >>=2;
-					intensity = (float) ( ( sin( D2R( x + cral ) ) + sin( D2R( y + cral ) ) + sin( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+					intensity = (float) ( ( sinf( D2R( x + cral ) ) + sinf( D2R( y + cral ) ) + sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 					r += (int) (GroupWaterIntensity_Red[group] * intensity);
 					if( r > 255 )
 						r = 255;
@@ -512,7 +512,7 @@ clear:					mov		eax, [esi]
 						r >>=2;
 						g >>=2;
 						b >>=2;
-						intensity = (float) ( ( sin( D2R( x + cral ) ) + sin( D2R( y + cral ) ) + sin( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+						intensity = (float) ( ( sinf( D2R( x + cral ) ) + sinf( D2R( y + cral ) ) + sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 						r += (int) (GroupWaterIntensity_Red[group] * intensity);
 						if( r > 255 )
 							r = 255;
@@ -591,12 +591,12 @@ clear:					mov		eax, [esi]
 						CellIndex.x = Posx - Mloadheader->Group[group].cell_origin[execbuf].x;
 						CellIndex.y = Posy - Mloadheader->Group[group].cell_origin[execbuf].y;
 						CellIndex.z = Posz - Mloadheader->Group[group].cell_origin[execbuf].z;
-						CellIndex_x = (int) floor( (CellIndex.x - OSize) * CellSize );
-						CellIndex_y = (int) floor( (CellIndex.y - OSize) * CellSize );
-						CellIndex_z = (int) floor( (CellIndex.z - OSize) * CellSize );
-						CellRange_x = (int) floor( (CellIndex.x + OSize) * CellSize );
-						CellRange_y = (int) floor( (CellIndex.y + OSize) * CellSize );
-						CellRange_z = (int) floor( (CellIndex.z + OSize) * CellSize );
+						CellIndex_x = (int) floorf( (CellIndex.x - OSize) * CellSize );
+						CellIndex_y = (int) floorf( (CellIndex.y - OSize) * CellSize );
+						CellIndex_z = (int) floorf( (CellIndex.z - OSize) * CellSize );
+						CellRange_x = (int) floorf( (CellIndex.x + OSize) * CellSize );
+						CellRange_y = (int) floorf( (CellIndex.y + OSize) * CellSize );
+						CellRange_z = (int) floorf( (CellIndex.z + OSize) * CellSize );
 					
 					
 						if( CellIndex_x < 0 )
@@ -836,7 +836,7 @@ __asm
 											x = lpLVERTEX->x - Posx;
 											y = lpLVERTEX->y - Posy;
 											z = lpLVERTEX->z - Posz;
-											//distance = (float) sqrt( (x*x) + (y*y) + (z*z)); 
+											//distance = (float) sqrtf( (x*x) + (y*y) + (z*z)); 
 											distance = (x*x) + (y*y) + (z*z); 
 					
 											if ( distance <  SizeX2  )
@@ -845,7 +845,7 @@ __asm
 							
 												if( distance > 0.0F )
 												{
-													distance = (float) sqrt( distance );
+													distance = (float) sqrtf( distance );
 													rlen = 1.0F / distance;
 													x *= rlen;
 													y *= rlen;
@@ -1082,7 +1082,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 								{
 									if( distance > 0.0F )
 									{
-										distance = (float) sqrt( distance );
+										distance = (float) sqrtf( distance );
 										rlen = 1.0F / distance;
 										x *= rlen;
 										y *= rlen;
@@ -1304,14 +1304,14 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
 								z = Temp.z - Posz;
-								//distance = (float) sqrt( (x*x) + (y*y) + (z*z)); 
+								//distance = (float) sqrtf( (x*x) + (y*y) + (z*z)); 
 								distance = (x*x) + (y*y) + (z*z); 
 		
 								if ( distance <  SizeX2  )
 								{
 									if( distance > 0.0F )
 									{
-										distance = (float) sqrt( distance );
+										distance = (float) sqrtf( distance );
 										rlen = 1.0F / distance;
 										x *= rlen;
 										y *= rlen;
@@ -1411,9 +1411,9 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 	CellIndex.x = Pos->x - Mloadheader->Group[group].cell_origin[0].x;
 	CellIndex.y = Pos->y - Mloadheader->Group[group].cell_origin[0].y;
 	CellIndex.z = Pos->z - Mloadheader->Group[group].cell_origin[0].z;
-	CellIndex_x = (int) floor( CellIndex.x * CellSize );
-	CellIndex_y = (int) floor( CellIndex.y * CellSize );
-	CellIndex_z = (int) floor( CellIndex.z * CellSize );
+	CellIndex_x = (int) floorf( CellIndex.x * CellSize );
+	CellIndex_y = (int) floorf( CellIndex.y * CellSize );
+	CellIndex_z = (int) floorf( CellIndex.z * CellSize );
 	if( CellIndex_x < 0 )
 	{
 		CellIndex_x = -1;

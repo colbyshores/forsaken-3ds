@@ -237,7 +237,7 @@ bool BOTAI_WillHomingMissileHit(VECTOR * MyPos)
 	else if ( Cos > 1.0F ) Cos = 1.0F;
 
 	// get angle difference in radians
-	Angle = (float) acos( Cos );
+	Angle = (float) acosf( Cos );
 
 	// calculate the amount of angle to turn 
 	if( Angle ) qlerp.time = ( ( D2R( MissCopy.TurnSpeed ) * framelag ) / Angle );
@@ -779,8 +779,8 @@ float BOTAI_WhenWillBulletHitMe(VECTOR * MyPos)
 					TempVector.y = Ships[ WhoIAm ].Object.Pos.y - PrimBulls[i].Pos.y;
 					TempVector.z = Ships[ WhoIAm ].Object.Pos.z - PrimBulls[i].Pos.z;
 					NormaliseVector( &TempVector );
-					Cos = (float) ( 1.0F - fabs( DotProduct( &TempVector, &PrimBulls[i].Dir ) ) );
-					Cos = (float) ( Cos * ( 1.0F - fabs( DotProduct( &TempVector, &PrimBulls[i].UpVector ) ) ) );
+					Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, &PrimBulls[i].Dir ) ) );
+					Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, &PrimBulls[i].UpVector ) ) ) );
 					ShipRadius = SHIP_RADIUS + ( PrimBulls[i].ColRadius * Cos );
 					break;
 
@@ -896,7 +896,7 @@ void BOTAI_LookAhead( float Accuracy, VECTOR * SPos, BYTE TargetID, VECTOR * New
 
 	// only predict forward if they have nitro
 	if(Ships[TargetID].Object.Flags & SHIP_Turbo)
-		Accuracy = fabs(Accuracy);
+		Accuracy = fabsf(Accuracy);
 
 	NewPos->x = Ships[TargetID].Object.Pos.x + ( Ships[TargetID].Move_Off.x * Time * Accuracy );
 	NewPos->y = Ships[TargetID].Object.Pos.y + ( Ships[TargetID].Move_Off.y * Time * Accuracy );

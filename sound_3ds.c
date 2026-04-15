@@ -365,7 +365,7 @@ void sound_volume(sound_source_t *src, long millibels)
 	if (!src || src->channel < 0) return;
 
 	if (millibels > 0) millibels = 0;
-	gain = (float)pow(10.0, millibels / 2000.0);
+	gain = (float)powf(10.0, millibels / 2000.0);
 	src->volume = gain;
 
 	/* apply pan: -1 (left) to +1 (right) */

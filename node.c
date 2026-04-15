@@ -285,7 +285,7 @@ bool Nodeload( char * Filename )
 		SetNetworkDistance();
 		for ( j = 0; j < NodeNetworkHeader.NumOfNodes * NodeNetworkHeader.NumOfNodes; j++ )
 		{
-			if ( fabs( NodeArray[ j ] - NodeArray2[ j ] ) > 0.1F )
+			if ( fabsf( NodeArray[ j ] - NodeArray2[ j ] ) > 0.1F )
 			{
 				errs++;
 			}

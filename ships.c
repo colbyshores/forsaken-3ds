@@ -737,7 +737,7 @@ bool ProcessShips()
 #if 0
 	for( i = 0 ; i < 10 ; i ++ )
 	{
-		DebugPrintf( "pow( 0.9 ,framelag %f ) = %f \n", 1.0F - (i / 10.0F) , (float) pow( 0.9 , 1.0F - (i / 10.0F) ) );
+		DebugPrintf( "powf( 0.9 ,framelag %f ) = %f \n", 1.0F - (i / 10.0F) , (float) powf( 0.9 , 1.0F - (i / 10.0F) ) );
 	}
 #endif
 
@@ -814,7 +814,7 @@ bool ProcessShips()
 						ShipObjPnt->Flags |= SHIP_Light;
 
 						XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
-						XLights[ShipObjPnt->light].CosArc = (float)cos(D2R(35));
+						XLights[ShipObjPnt->light].CosArc = (float)cosf(D2R(35));
 						
 						ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
 						XLights[ShipObjPnt->light].r = 192.0F;
@@ -885,7 +885,7 @@ bool ProcessShips()
 						if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
 						{
 							// update bonus 4 (stats.c) -- bounty hunt points
-							UpdateBonusStats(i,(int16_t) floor( BountyTime / BountyBonusInterval ));
+							UpdateBonusStats(i,(int16_t) floorf( BountyTime / BountyBonusInterval ));
 							BountyTime = FMOD( BountyTime, BountyBonusInterval );
 						}
 					}
@@ -1431,7 +1431,7 @@ bool ProcessShips()
 							if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
 							{
 								// update bonus 7 (stats.c) -- bounty hunt points
-								UpdateBonusStats(i,(int16_t) floor( BountyTime / BountyBonusInterval ));
+								UpdateBonusStats(i,(int16_t) floorf( BountyTime / BountyBonusInterval ));
 								BountyTime = FMOD( BountyTime, BountyBonusInterval );
 							}
 						}					
@@ -1458,7 +1458,7 @@ bool ProcessShips()
 			if( ShipObjPnt->light != (u_int16_t) -1 )
 			{
 				XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
-				XLights[ShipObjPnt->light].CosArc = (float)cos(D2R(35));
+				XLights[ShipObjPnt->light].CosArc = (float)cosf(D2R(35));
 				
 				ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
 				XLights[ShipObjPnt->light].r = 255.0F;
@@ -1639,7 +1639,7 @@ float AutoLevelRot( u_int16_t ship, float autolevel_rate )
 	{
 		return 0.0F; // autolevelling disabled
 	}
-	if ( fabs( Ships[ ship ].Object.Angle.z ) > MIN_AUTOLEVEL_ROLL_TOLERANCE )
+	if ( fabsf( Ships[ ship ].Object.Angle.z ) > MIN_AUTOLEVEL_ROLL_TOLERANCE )
 	{
 		return 0.0F; // ship still rolling under player control
 	}
@@ -1650,7 +1650,7 @@ float AutoLevelRot( u_int16_t ship, float autolevel_rate )
 		cos_pitch = -1.0F;
 	else if ( cos_pitch > 1.0F )
 		cos_pitch = 1.0F;
-	pitch = (float) acos( cos_pitch );
+	pitch = (float) acosf( cos_pitch );
 	if ( pitch < MIN_AUTOLEVEL_PITCH || pitch > MAX_AUTOLEVEL_PITCH )
 	{
 		return 0.0F;
@@ -1663,10 +1663,10 @@ float AutoLevelRot( u_int16_t ship, float autolevel_rate )
 		cos_roll = -1.0F;
 	else if ( cos_roll > 1.0F )
 		cos_roll = 1.0F;
-	roll = (float) acos( cos_roll );
+	roll = (float) acosf( cos_roll );
 	autolevel = ( R2D( roll ) - 90.0F );
 	rot = autolevel_rate * autolevel;
-	if ( fabs( rot ) > fabs( autolevel ) )
+	if ( fabsf( rot ) > fabsf( autolevel ) )
 		rot = autolevel;
 	return rot;
 }
@@ -1678,11 +1678,11 @@ void BobShip( u_int16_t ship, VECTOR *bob )
 	float move_len;
 
 	move = Ships[ ship ].Object.Speed;
-	move_len = (float) sqrt( move.x * move.x + move.y * move.y + move.z * move.z );
+	move_len = (float) sqrtf( move.x * move.x + move.y * move.y + move.z * move.z );
 	if ( move_len < MOVE_TOLERANCE && !DebugInfo )
 	{
-		move.x = BOB_XSIZE * (float) sin( Ships[ ship ].Object.BobCount * BOB_XFREQ );
-		move.y = BOB_YSIZE * (float) sin( Ships[ ship ].Object.BobCount * BOB_YFREQ );
+		move.x = BOB_XSIZE * (float) sinf( Ships[ ship ].Object.BobCount * BOB_XFREQ );
+		move.y = BOB_YSIZE * (float) sinf( Ships[ ship ].Object.BobCount * BOB_YFREQ );
 		move.z = 0.0F;
 		ApplyMatrix( &Ships[ ship ].Object.Mat, &move, bob );
 		Ships[ ship ].Object.BobCount += framelag;
@@ -2148,7 +2148,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	for ( j = 0; j < 30; j++ )
 	{
 		autolevel = AutoLevelRot( i, 1.0F );
-		if ( fabs( autolevel ) < 0.01 )
+		if ( fabsf( autolevel ) < 0.01 )
 			break;
 		MakeQuat( 0.0F, 0.0F, autolevel, &StepQuat );
 		QuatMultiply(  &Ships[i].Quat , &StepQuat , &Ships[i].Quat );
@@ -2627,7 +2627,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		temp.x = ShipPnt->Object.Pos.x - Ships[WhoIAm].Object.Pos.x; 
 		temp.y = ShipPnt->Object.Pos.y - Ships[WhoIAm].Object.Pos.y; 
 		temp.z = ShipPnt->Object.Pos.z - Ships[WhoIAm].Object.Pos.z;
-		if( (float) sqrt( (temp.x*temp.x) + (temp.y*temp.y) + (temp.z*temp.z) ) <= (SHIP_RADIUS+(SHIP_RADIUS*0.5F) ) )
+		if( (float) sqrtf( (temp.x*temp.x) + (temp.y*temp.y) + (temp.z*temp.z) ) <= (SHIP_RADIUS+(SHIP_RADIUS*0.5F) ) )
 		{
 			Current_Camera_View = WhoIAm;
 		}else{

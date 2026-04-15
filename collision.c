@@ -279,15 +279,15 @@ bool RayPolyIntersect( float * P0 , float * P1 , float * P2 , float * P3 ,
 /*===================================================================
 	Work out best axis to cast polygon onto
 ===================================================================*/
-	if( fabs( FaceNormal->nx ) >= fabs( FaceNormal->ny ) &&
-		fabs( FaceNormal->nx ) >= fabs( FaceNormal->nz ) )
+	if( fabsf( FaceNormal->nx ) >= fabsf( FaceNormal->ny ) &&
+		fabsf( FaceNormal->nx ) >= fabsf( FaceNormal->nz ) )
 	{
 		i1 = ourY;						/* Y Axis		*/
 		i2 = ourZ;						/* and Z axis	*/
 	}else{
  		i1 = ourX;					/* X Axis		*/
-		if( fabs( FaceNormal->ny ) >= fabs( FaceNormal->nx ) &&
-		    fabs( FaceNormal->ny ) >= fabs( FaceNormal->nz ) )
+		if( fabsf( FaceNormal->ny ) >= fabsf( FaceNormal->nx ) &&
+		    fabsf( FaceNormal->ny ) >= fabsf( FaceNormal->nz ) )
 		{
 			i2 = ourZ;					/* and Z axis	*/
 		}else{
@@ -699,7 +699,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 			dv.x = epos.x - StartPos->x;
 			dv.y = epos.y - StartPos->y;
 			dv.z = epos.z - StartPos->z;
-			dist_bg = (float) sqrt( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
+			dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 			
 			pg = &Bsp_Portal_Header.group[ group ];
 			for ( j = 0; j < pg->portals; j++ )
@@ -708,7 +708,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 				if ( DotProduct( &bp->normal, MoveOffset ) < 0.0F )
 				{
 					d = epos.x * bp->normal.x + epos.y * bp->normal.y + epos.z * bp->normal.z + bp->offset;
-					if ( fabs( d ) < POINT_ON_PORTAL_TOLERANCE )
+					if ( fabsf( d ) < POINT_ON_PORTAL_TOLERANCE )
 					{
 						if ( PISDistRecursive( &epos, bp->bsp.Root ) )
 						{
@@ -779,9 +779,9 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 		EndPos->y = StartPos->y + MoveOffset->y;
 		EndPos->z = StartPos->z + MoveOffset->z;
 	}
-	dv.x = (float) fabs( EndPos->x - m->Group[ *EndGroup ].center.x );
-	dv.y = (float) fabs( EndPos->y - m->Group[ *EndGroup ].center.y );
-	dv.z = (float) fabs( EndPos->z - m->Group[ *EndGroup ].center.z );
+	dv.x = (float) fabsf( EndPos->x - m->Group[ *EndGroup ].center.x );
+	dv.y = (float) fabsf( EndPos->y - m->Group[ *EndGroup ].center.y );
+	dv.z = (float) fabsf( EndPos->z - m->Group[ *EndGroup ].center.z );
 	outside_group = dv.x > m->Group[ *EndGroup ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
 					dv.y > m->Group[ *EndGroup ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
 					dv.z > m->Group[ *EndGroup ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
@@ -826,7 +826,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 			dv.x = epos.x - StartPos->x;
 			dv.y = epos.y - StartPos->y;
 			dv.z = epos.z - StartPos->z;
-			dist_portal = (float) sqrt( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
+			dist_portal = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 			pmove.x += ppos.x - epos.x;
 			pmove.y += ppos.y - epos.y;
 			pmove.z += ppos.z - epos.z;
@@ -840,7 +840,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 			dv.x = epos.x - StartPos->x;
 			dv.y = epos.y - StartPos->y;
 			dv.z = epos.z - StartPos->z;
-			dist_bg = (float) sqrt( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
+			dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 			if ( Bsp_Portal_Header.state )
 			{
 				BSP_PORTAL_GROUP	*pg;
@@ -855,7 +855,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 					if ( DotProduct( &bp->normal, MoveOffset ) < 0.0F )
 					{
 						d = epos.x * bp->normal.x + epos.y * bp->normal.y + epos.z * bp->normal.z + bp->offset;
-						if ( fabs( d ) < POINT_ON_PORTAL_TOLERANCE )
+						if ( fabsf( d ) < POINT_ON_PORTAL_TOLERANCE )
 						{
 							if ( PISDistRecursive( &epos, bp->bsp.Root ) )
 							{
@@ -875,7 +875,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 			}
 			if ( hit_portal )
 			{
-				if ( Bsp_Portal_Header.state || (float) fabs( dist_bg - dist_portal ) < 0.1F )
+				if ( Bsp_Portal_Header.state || (float) fabsf( dist_bg - dist_portal ) < 0.1F )
 				{
 					hit_bg = false;
 				}
@@ -957,9 +957,9 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 		EndPos->y = StartPos->y + MoveOffset->y;
 		EndPos->z = StartPos->z + MoveOffset->z;
 	}
-	dv.x = (float) fabs( EndPos->x - m->Group[ *EndGroup ].center.x );
-	dv.y = (float) fabs( EndPos->y - m->Group[ *EndGroup ].center.y );
-	dv.z = (float) fabs( EndPos->z - m->Group[ *EndGroup ].center.z );
+	dv.x = (float) fabsf( EndPos->x - m->Group[ *EndGroup ].center.x );
+	dv.y = (float) fabsf( EndPos->y - m->Group[ *EndGroup ].center.y );
+	dv.z = (float) fabsf( EndPos->z - m->Group[ *EndGroup ].center.z );
 	outside_group = dv.x > m->Group[ *EndGroup ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
 					dv.y > m->Group[ *EndGroup ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
 					dv.z > m->Group[ *EndGroup ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
@@ -1030,7 +1030,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 			if ( DotProduct( &bp->normal, MoveOffset ) < 0.0F )
 			{
 				d = epos.x * bp->normal.x + epos.y * bp->normal.y + epos.z * bp->normal.z + bp->offset;
-				if ( fabs( d ) < POINT_ON_PORTAL_TOLERANCE )
+				if ( fabsf( d ) < POINT_ON_PORTAL_TOLERANCE )
 				{
 					if ( PISDistRecursive( &epos, bp->bsp.Root ) )
 					{
@@ -1055,7 +1055,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 			dv.x = epos.x - StartPos->x;
 			dv.y = epos.y - StartPos->y;
 			dv.z = epos.z - StartPos->z;
-			dist_bg = (float) sqrt( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
+			dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 			dv = *MoveOffset;
 			NormaliseVector( &dv );
 			impact_dotp = -( dv.x * fnorm.nx + dv.y * fnorm.ny + dv.z * fnorm.nz );
@@ -1128,7 +1128,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 		dv.x = epos.x - StartPos->x;
 		dv.y = epos.y - StartPos->y;
 		dv.z = epos.z - StartPos->z;
-		dist_portal = (float) sqrt( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
+		dist_portal = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 		pmove.x += ppos.x - epos.x;
 		pmove.y += ppos.y - epos.y;
 		pmove.z += ppos.z - epos.z;
@@ -1140,7 +1140,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 		dv.x = epos.x - StartPos->x;
 		dv.y = epos.y - StartPos->y;
 		dv.z = epos.z - StartPos->z;
-		dist_bg = (float) sqrt( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
+		dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 		if ( Bsp_Portal_Header.state )
 		{
 			BSP_PORTAL_GROUP	*pg;
@@ -1155,7 +1155,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 				if ( DotProduct( &bp->normal, MoveOffset ) < 0.0F )
 				{
 					d = epos.x * bp->normal.x + epos.y * bp->normal.y + epos.z * bp->normal.z + bp->offset;
-					if ( fabs( d ) < POINT_ON_PORTAL_TOLERANCE )
+					if ( fabsf( d ) < POINT_ON_PORTAL_TOLERANCE )
 					{
 						if ( PISDistRecursive( &epos, bp->bsp.Root ) )
 						{
@@ -1173,7 +1173,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 		}
 		if ( hit_portal )
 		{
-			if ( Bsp_Portal_Header.state || (float) fabs( dist_bg - dist_portal ) < 0.1F )
+			if ( Bsp_Portal_Header.state || (float) fabsf( dist_bg - dist_portal ) < 0.1F )
 			{
 				hit_bg = false;
 			}
@@ -1293,9 +1293,9 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 		}
 	} while ( hit_portal );
 
-	dv.x = (float) fabs( StartPos->x + MoveOffset->x - m->Group[ group ].center.x );
-	dv.y = (float) fabs( StartPos->y + MoveOffset->y - m->Group[ group ].center.y );
-	dv.z = (float) fabs( StartPos->z + MoveOffset->z - m->Group[ group ].center.z );
+	dv.x = (float) fabsf( StartPos->x + MoveOffset->x - m->Group[ group ].center.x );
+	dv.y = (float) fabsf( StartPos->y + MoveOffset->y - m->Group[ group ].center.y );
+	dv.z = (float) fabsf( StartPos->z + MoveOffset->z - m->Group[ group ].center.z );
 	outside_group = dv.x > m->Group[ group ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
 					dv.y > m->Group[ group ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
 					dv.z > m->Group[ group ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
@@ -1337,9 +1337,9 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 		} while ( hit_portal );
 	}
 
-	dv.x = (float) fabs( StartPos->x + MoveOffset->x - m->Group[ group ].center.x );
-	dv.y = (float) fabs( StartPos->y + MoveOffset->y - m->Group[ group ].center.y );
-	dv.z = (float) fabs( StartPos->z + MoveOffset->z - m->Group[ group ].center.z );
+	dv.x = (float) fabsf( StartPos->x + MoveOffset->x - m->Group[ group ].center.x );
+	dv.y = (float) fabsf( StartPos->y + MoveOffset->y - m->Group[ group ].center.y );
+	dv.z = (float) fabsf( StartPos->z + MoveOffset->z - m->Group[ group ].center.z );
 	outside_group = dv.x > m->Group[ group ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
 					dv.y > m->Group[ group ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
 					dv.z > m->Group[ group ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
@@ -1543,7 +1543,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , 
 		   	
 			nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
 		   		
-			D = ( (float) fabs(nDOTe) ) + COLLISION_FUDGE ; 
+			D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
 		   	
 			Dn.x = D * FaceNormal->nx; 
 			Dn.y = D * FaceNormal->ny; 
@@ -1569,7 +1569,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , 
 	   	
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
 	   		
-		D = ( (float) fabs(nDOTe) ) + COLLISION_FUDGE ; 
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
 	   	
 		Dn.x = D * FaceNormal->nx; 
 		Dn.y = D * FaceNormal->ny; 
@@ -1744,7 +1744,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , 
 		   	
 			nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
 		   		
-			D = ( (float) fabs(nDOTe) ) + COLLISION_FUDGE ; 
+			D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
 		   	
 			Dn.x = D * FaceNormal->nx; 
 			Dn.y = D * FaceNormal->ny; 
@@ -1770,7 +1770,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , 
 	   	
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
 	   		
-		D = ( (float) fabs(nDOTe) ) + COLLISION_FUDGE ; 
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
 	   	
 		Dn.x = D * FaceNormal->nx; 
 		Dn.y = D * FaceNormal->ny; 
@@ -1991,9 +1991,9 @@ bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup )
 {
 	VECTOR	dv;
 
-	dv.x = (float) fabs( EndPos->x - m->Group[ EndGroup ].center.x );
-	dv.y = (float) fabs( EndPos->y - m->Group[ EndGroup ].center.y );
-	dv.z = (float) fabs( EndPos->z - m->Group[ EndGroup ].center.z );
+	dv.x = (float) fabsf( EndPos->x - m->Group[ EndGroup ].center.x );
+	dv.y = (float) fabsf( EndPos->y - m->Group[ EndGroup ].center.y );
+	dv.z = (float) fabsf( EndPos->z - m->Group[ EndGroup ].center.z );
 	return( dv.x > m->Group[ EndGroup ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
 			dv.y > m->Group[ EndGroup ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
 			dv.z > m->Group[ EndGroup ].half_size.z + OUTSIDE_GROUP_TOLERANCE );
@@ -2080,7 +2080,7 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 	
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
 		
-		D = ( (float) fabs(nDOTe) ) + COLLISION_FUDGE ; 
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
 	
 		Dn.x = D * FaceNormal->nx; 
 		Dn.y = D * FaceNormal->ny; 
@@ -2160,7 +2160,7 @@ bool CheckRestartPointCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint
 	
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
 		
-		D = ( (float) fabs(nDOTe) ) + COLLISION_FUDGE ; 
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
 	
 		Dn.x = D * FaceNormal->nx; 
 		Dn.y = D * FaceNormal->ny; 
@@ -2256,7 +2256,7 @@ SkipIt:
 	
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
 		
-		D = ( (float) fabs(nDOTe) ) + COLLISION_FUDGE ; 
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
 	
 		Dn.x = D * FaceNormal->nx; 
 		Dn.y = D * FaceNormal->ny; 
@@ -2980,7 +2980,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 		MoveDist = VectorLength( &Move );
 #endif
 #ifdef THIS_SHOULD_WORK_BUT_DOESNT		
-		MaxPerpendicularAccel = (float) fabs( DotProduct( &Move_Dir, (VECTOR *)&ImpactNormal ) ) * TurboAccell * MaxTurboSpeed * framelag * framelag;
+		MaxPerpendicularAccel = (float) fabsf( DotProduct( &Move_Dir, (VECTOR *)&ImpactNormal ) ) * TurboAccell * MaxTurboSpeed * framelag * framelag;
 		//								DebugPrintf( "MaxPerpAccel = %f\n", MaxPerpendicularAccel );
 #else
 #if 1

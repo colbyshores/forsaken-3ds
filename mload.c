@@ -240,12 +240,12 @@ void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert
 		k = ( j + 1 ) % 3;
 		du = u[ k ] - u[ j ];
 		dv = v[ k ] - v[ j ];
-		if ( fabs( du * Xsize ) < SAME_UV )
+		if ( fabsf( du * Xsize ) < SAME_UV )
 		{
 			uz = j;
 			zu++;
 		}
-		if ( fabs( dv * Ysize ) < SAME_UV )
+		if ( fabsf( dv * Ysize ) < SAME_UV )
 		{
 			vz = j;
 			zv++;
@@ -270,15 +270,15 @@ void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert
 	dv = ( UV_Fix / Ysize );
 	su = du * ( ( TriVert[ ( uz + 2 ) % 3 ]->tu > TriVert[ uz ]->tu ) ? 1 : -1 );
 	sv = dv * ( ( TriVert[ ( vz + 2 ) % 3 ]->tv > TriVert[ vz ]->tv ) ? 1 : -1 );
-	if ( fabs( TriVert[ uz ]->tu + su - Orig_TriVert[ uz ]->tu ) <= du )
+	if ( fabsf( TriVert[ uz ]->tu + su - Orig_TriVert[ uz ]->tu ) <= du )
 		TriVert[ uz ]->tu += su;
 	k = ( uz + 1 ) % 3;
-	if ( fabs( TriVert[ k ]->tu + su - Orig_TriVert[ k ]->tu ) <= du )
+	if ( fabsf( TriVert[ k ]->tu + su - Orig_TriVert[ k ]->tu ) <= du )
 		TriVert[ k ]->tu += su;
-	if ( fabs( TriVert[ vz ]->tv + sv - Orig_TriVert[ vz ]->tv ) <= dv )
+	if ( fabsf( TriVert[ vz ]->tv + sv - Orig_TriVert[ vz ]->tv ) <= dv )
 		TriVert[ vz ]->tv += sv;
 	k = ( vz + 1 ) % 3;
-	if ( fabs( TriVert[ k ]->tv + sv - Orig_TriVert[ k ]->tv ) <= dv )
+	if ( fabsf( TriVert[ k ]->tv + sv - Orig_TriVert[ k ]->tv ) <= dv )
 		TriVert[ k ]->tv += sv;
 }
 

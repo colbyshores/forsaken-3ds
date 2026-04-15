@@ -625,14 +625,14 @@ void DoLensflareEffect( void )
 					Cos = DotProduct( &TempVector, &TempVector2 );
 					if( Cos < -1.0F ) Cos = -1.0F;
 					else if ( Cos > 1.0F ) Cos = 1.0F;
-					Angle = (float) R2D( acos( Cos ) );
+					Angle = (float) R2D( acosf( Cos ) );
 					
 					ApplyMatrix( &Ships[ Count ].Object.FinalMat, &Forward, &TempVector );
 					NormaliseVector( &TempVector );
 					Cos2 = DotProduct( &TempVector, &TempVector2 );
 					if( Cos2 < -1.0F ) Cos2 = -1.0F;
 					else if ( Cos2 > 1.0F ) Cos2 = 1.0F;
-					Angle2 = (float) R2D( acos( Cos2 ) );
+					Angle2 = (float) R2D( acosf( Cos2 ) );
 					
 					if( DistToShip < CUTOFF ) DistFactor = 1.0F;
 					else DistFactor = ( 1.0F - ( ( DistToShip - CUTOFF ) / CUTOFF ) );
@@ -1009,14 +1009,14 @@ void SecBullLensflare( u_int16_t i )
 	Cos = DotProduct( &TempVector, &TempVector2 );
 	if( Cos < -1.0F ) Cos = -1.0F;
 	else if ( Cos > 1.0F ) Cos = 1.0F;
-	Angle = (float) R2D( acos( Cos ) );
+	Angle = (float) R2D( acosf( Cos ) );
 
 	ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &TempVector );
 	NormaliseVector( &TempVector );
 	Cos2 = DotProduct( &TempVector, &TempVector2 );
 	if( Cos2 < -1.0F ) Cos2 = -1.0F;
 	else if ( Cos2 > 1.0F ) Cos2 = 1.0F;
-	Angle2 = (float) R2D( acos( Cos2 ) );
+	Angle2 = (float) R2D( acosf( Cos2 ) );
 
 	if( DistToBull < CUTOFF ) DistFactor = 1.0F;
 	else DistFactor = ( 1.0F - ( ( DistToBull - CUTOFF ) / CUTOFF ) );
@@ -1771,8 +1771,8 @@ void ShowScreenMultiples( void )
 
 		if( Model != (u_int16_t) -1 )
 		{
-			Rotation.x = (float) sin( D2R( Models[ Model ].AxisRot + 180.0F ) );
-			Rotation.y = (float) cos( D2R( Models[ Model ].AxisRot + 180.0F ) );
+			Rotation.x = (float) sinf( D2R( Models[ Model ].AxisRot + 180.0F ) );
+			Rotation.y = (float) cosf( D2R( Models[ Model ].AxisRot + 180.0F ) );
 
 			i = FindFreeScrPoly();
 	

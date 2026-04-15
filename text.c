@@ -346,7 +346,7 @@ void	PlayerMessageQuePrint( void )
 	int i,y,z,MAX, ypos;
 	char MessageBuff[150];
 
-	MAX = floor((render_info.window_size.cx-FontWidth*27)/FontWidth);
+	MAX = floorf((render_info.window_size.cx-FontWidth*27)/FontWidth);
 	if(MAX < 10) MAX = 10;
 	else if(MAX > 149) MAX = 149;
 
@@ -402,7 +402,7 @@ void	MessageQuePrint( void )
 	int i,y,z,MAX;
 	char MessageBuff[150];
 
-	MAX = floor((render_info.window_size.cx-FontWidth*25)/FontWidth);
+	MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
 	if(MAX < 10) MAX = 10;
 	else if(MAX > 149) MAX = 149;
 
@@ -441,7 +441,7 @@ void	MessageQuePrintAll( void )
 	int i,y,z,MAX;
 	char MessageBuff[150];
 
-	MAX = floor((render_info.window_size.cx-FontWidth*25)/FontWidth);
+	MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
 	if(MAX < 10) MAX = 10;
 	else if(MAX > 149) MAX = 149;
 
@@ -752,7 +752,7 @@ void PrintScoreSort( void )
                         // Show % Health
                         if(ShowPlayerHealthByScores && GameStatus[ShipID] != STATUS_Left)
                         {
-							sprintf( (char*) &buf[0], "H:%d", (u_int16_t) ceil(((PlayerHealths[ShipID].Shield + PlayerHealths[ShipID].Hull) /2.56F)));
+							sprintf( (char*) &buf[0], "H:%d", (u_int16_t) ceilf(((PlayerHealths[ShipID].Shield + PlayerHealths[ShipID].Hull) /2.56F)));
 							Print4x5TextSmall( &buf[0], left_offset+60.0F, top_offset+((FontHeight-8.0F)/2.0F), ShipHealthColour[ShipID] );
                         }
 

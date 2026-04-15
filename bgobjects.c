@@ -456,7 +456,7 @@ void ProcessBGObjects( bool Collide )
 
 							if( Object->Time >= Object->OverallTime )
 							{
-								Object->Time -= ( (float) floor( Object->Time / Object->OverallTime ) * Object->OverallTime );
+								Object->Time -= ( (float) floorf( Object->Time / Object->OverallTime ) * Object->OverallTime );
 							}
 						}
 						break;

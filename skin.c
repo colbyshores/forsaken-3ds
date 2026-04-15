@@ -239,7 +239,7 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				C.x = 0.5F + 0.5F * C.x;
 				C.y = 0.5F + 0.5F * C.y;
 				C.z = 0.5F + 0.5F * C.z;
-				color = RGB_MAKE( (int32_t) floor(C.x * 255), (int32_t) floor(C.y * 255), (int32_t) floor(C.z * 255) );
+				color = RGB_MAKE( (int32_t) floorf(C.x * 255), (int32_t) floorf(C.y * 255), (int32_t) floorf(C.z * 255) );
 			}
 
 			SkinVerts[ SkinVertCount ].x = Verts[ 0 ].x;
@@ -1677,16 +1677,16 @@ void KillBoxLines( void )
 
 int GetMajorAxis( VECTOR * vec_ptr )
 {
-	if( fabs( vec_ptr->x ) > fabs( vec_ptr->y ) )
+	if( fabsf( vec_ptr->x ) > fabsf( vec_ptr->y ) )
 	{
-		if( fabs( vec_ptr->x ) > fabs( vec_ptr->z ) )
+		if( fabsf( vec_ptr->x ) > fabsf( vec_ptr->z ) )
 			return 0;
 		else
 			return 2;
 	}
 	else
 	{
-		if( fabs( vec_ptr->y ) > fabs( vec_ptr->z ) )
+		if( fabsf( vec_ptr->y ) > fabsf( vec_ptr->z ) )
 			return 1;
 		else
 			return 2;

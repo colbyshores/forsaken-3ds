@@ -538,7 +538,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	float * VertPnt;
 	float	org;
 
-	Damp = (float)pow( 1.0 - 0.01, framelag * framelag);
+	Damp = (float)powf( 1.0 - 0.01, framelag * framelag);
 	Tick = 0.04F * framelag;
 
 
@@ -787,8 +787,8 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 	WaterY = ( Delta.z + ( (Wo->YVerts * WATER_CELLSIZE ) * 0.5F ) ) / WATER_CELLSIZE;
 
 
-	IWaterX = (int) floor( WaterX );
-	IWaterY = (int) floor( WaterY );
+	IWaterX = (int) floorf( WaterX );
+	IWaterY = (int) floorf( WaterY );
 	if ( IWaterX < 0 || IWaterX >= Wo->XVerts || IWaterY < 0 || IWaterY >= Wo->YVerts )
 		return false;
 
@@ -808,8 +808,8 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 		// shooting from below.....
 		Impact *= -0.25F;
 
-	dx = 1.0F - (float) ( WaterX - floor( WaterX ) );
-	dy = 1.0F - (float) ( WaterY - floor( WaterY ) );
+	dx = 1.0F - (float) ( WaterX - floorf( WaterX ) );
+	dy = 1.0F - (float) ( WaterY - floorf( WaterY ) );
 
 	Vels = Wo->Vels;
 

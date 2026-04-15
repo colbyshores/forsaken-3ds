@@ -246,7 +246,7 @@ void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 	ApplyMatrix( InvMat, &WantedDir, &TempDir );			/* Calc Direction Vector */
 
 	NormaliseVector( &TempDir );
-	Angle = (float) acos( TempDir.x );
+	Angle = (float) acosf( TempDir.x );
 	Angle = 90.0F - R2D( Angle );
 	if( TempDir.z < 0.0F )
 		Angle = 180.0F - Angle;
@@ -266,7 +266,7 @@ void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 		AimData.Flags |= AI_CONTROL_TURNLEFT;
 	}
 	
-	Angle = (float) acos( TempDir.y );
+	Angle = (float) acosf( TempDir.y );
 	Angle = 90.0F - R2D( Angle );
 	Angle *= -1.0F;
 	if( Angle > 180.0F )

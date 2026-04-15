@@ -1218,8 +1218,8 @@ static int16_t	OnceOnlyFlag = 0;
 
 							for( Count = 0; Count < 8; Count++ )
 							{
-								Dir.x = (float) sin( D2R( ( 360.0F / 8.0F ) * Count ) );
-								Dir.y = (float) cos( D2R( ( 360.0F / 8.0F ) * Count ) );
+								Dir.x = (float) sinf( D2R( ( 360.0F / 8.0F ) * Count ) );
+								Dir.y = (float) cosf( D2R( ( 360.0F / 8.0F ) * Count ) );
 								Dir.z = 0.0F;
 								UpVector.x = 0.0F;
 								UpVector.y = 0.0F;
@@ -1731,7 +1731,7 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 						NormaliseVector( &XLights[ light ].Dir );
 						XLights[ light ].Type = SPOT_LIGHT;
 						XLights[ light ].Pos = SecBulls[i].Pos;
-						XLights[ light ].CosArc = (float)cos(D2R(30));
+						XLights[ light ].CosArc = (float)cosf(D2R(30));
 						XLights[ light ].Size = ( 4096.0F * GLOBAL_SCALE ); //PickupAttribs[ Type ].Lightsize;
 						XLights[ light ].SizeCount = 0.0F;
 						XLights[ light ].r = SecondaryWeaponAttribs[ Weapon ].r;
@@ -2379,7 +2379,7 @@ bool ProcessMines( u_int16_t i )
    	
 				if( Cos < -1.0F ) Cos = -1.0F;
 				else if ( Cos > 1.0F ) Cos = 1.0F;
-				Angle = (float) acos( Cos );
+				Angle = (float) acosf( Cos );
 				if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * framelag ) / Angle );
 				else qlerp.time = 1.0F;
 				if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
@@ -2704,7 +2704,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
    				SecBulls[ i ].DropCount -= NewFramelag; //framelag;
    				if( SecBulls[ i ].DropCount < 0.0F )
 				{
-					SecBulls[ i ].FramelagAddition = (float) fabs( SecBulls[i].DropCount );
+					SecBulls[ i ].FramelagAddition = (float) fabsf( SecBulls[i].DropCount );
 					SecBulls[ i ].DropCount = 0.0F;
 				}
    			}
@@ -2930,7 +2930,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 				if( Cos < -1.0F ) Cos = -1.0F;
 				else if ( Cos > 1.0F ) Cos = 1.0F;
-   				Angle = (float) acos( Cos );
+   				Angle = (float) acosf( Cos );
    				if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * NewFramelag ) / Angle ); //framelag ) / Angle );
    				else qlerp.time = 1.0F;
    				if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
@@ -2974,10 +2974,10 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		Should never be in here
 ===================================================================*/
    		case MIS_SPIRALING:												/* Spiraling missile */
-			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) - ( floor( ( SecBulls[i].LifeCount * 6.0F ) / 360.0F ) * 360.0F ) ) );
+			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) - ( floorf( ( SecBulls[i].LifeCount * 6.0F ) / 360.0F ) * 360.0F ) ) );
 
-			Rotation.x = (float) sin( Angle );
-			Rotation.y = (float) cos( Angle );
+			Rotation.x = (float) sinf( Angle );
+			Rotation.y = (float) cosf( Angle );
 			Rotation.z = 0.0F;
 			ApplyMatrix( &SecBulls[i].StartMat, &Rotation, &UpVector );	// Calc Up Vector
 
@@ -2985,10 +2985,10 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 			TempPoint1.y = ( UpVector.y * SPIRAL_RADIUS );
 			TempPoint1.z = ( UpVector.z * SPIRAL_RADIUS );
 
-			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) - ( floor( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) / 360.0F ) * 360.0F ) );
+			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) - ( floorf( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) / 360.0F ) * 360.0F ) );
 
-			Rotation.x = (float) sin( Angle );
-			Rotation.y = (float) cos( Angle );
+			Rotation.x = (float) sinf( Angle );
+			Rotation.y = (float) cosf( Angle );
 			Rotation.z = 0.0F;
 			ApplyMatrix( &SecBulls[i].StartMat, &Rotation, &UpVector );	// Calc Up Vector
 
@@ -3119,16 +3119,16 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				{
 					SecBulls[i].ColFlag = 1;
 					SecBulls[i].ColStart = SecBulls[i].Pos;
-					SecBulls[i].ColDist = (float) fabs( DistanceVert2Vector( (VERT*) &SecBulls[i].ColPoint, &SecBulls[i].Pos ) );
+					SecBulls[i].ColDist = (float) fabsf( DistanceVert2Vector( (VERT*) &SecBulls[i].ColPoint, &SecBulls[i].Pos ) );
 				}
 			}
 
-			DistFromStart = (float) fabs( DistanceVert2Vector( (VERT*) &NewPos, &SecBulls[i].ColStart ) );
+			DistFromStart = (float) fabsf( DistanceVert2Vector( (VERT*) &NewPos, &SecBulls[i].ColStart ) );
 	
 			if( SecBulls[i].ColDist < DistFromStart )
 	   		{
 				HitWall = 0;
-				DistToInt = (float) fabs( DistanceVert2Vector( (VERT*) &SecBulls[i].ColPoint, &SecBulls[i].Pos ) );
+				DistToInt = (float) fabsf( DistanceVert2Vector( (VERT*) &SecBulls[i].ColPoint, &SecBulls[i].Pos ) );
 			}
 
 			if( HitWall == (u_int16_t) -1 )
@@ -3137,7 +3137,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 					 (VECTOR *) &SecBulls[i].ColPoint, &SecBulls[i].ColPointNormal, &TempVector, &BGObject, 0.0F ) )
 				{
 					HitWall = 0;
-					DistToInt = (float) fabs( DistanceVert2Vector( (VERT*) &SecBulls[i].ColPoint, &SecBulls[i].Pos ) );
+					DistToInt = (float) fabsf( DistanceVert2Vector( (VERT*) &SecBulls[i].ColPoint, &SecBulls[i].Pos ) );
 
 					if( BGObject )
 					{
@@ -6664,7 +6664,7 @@ void DispHUDNames( void )
                 Ship = VisibleShipsPos[ Count ].Ship;
 
 				// format the ship health as a percentage
-                sprintf( (char*) &buf[0] ,"%d", (u_int16_t) ceil((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
+                sprintf( (char*) &buf[0] ,"%d", (u_int16_t) ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
 
 				// display using whatever scaled font player has chosen
                 if(ScaleFontPlayerHealthAboveBikes)
@@ -6964,7 +6964,7 @@ void CreateScatterTrail( u_int16_t i )
 	Green1 = 255;
 	Blue1 = 255;
 
-	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( floor( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
+	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( floorf( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
 					* ScatterTrail_Header->Num_Frames ) );
 
 	for( Count = 0; Count < SecBulls[ i ].NumOldPos; Count++ )
@@ -7109,7 +7109,7 @@ void CreateTentacle( u_int16_t i )
 	Green2 = 64;
 	Blue2 = 64;
 
-	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( floor( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
+	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( floorf( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
 					* ScatterTrail_Header->Num_Frames ) );
 
 	for( Count = (int16_t) SecBulls[i].RetractPos; Count < SecBulls[ i ].NumOldPos; Count++ )
@@ -8272,9 +8272,9 @@ void CreateSmokeRing( VECTOR * Pos, VECTOR * DirVector, VECTOR * UpVector, u_int
 
 	for( Count = 0; Count < 20; Count++ )
 	{
-		TempDir.x = (float) sin( D2R( Count * 18 ) );
+		TempDir.x = (float) sinf( D2R( Count * 18 ) );
 		TempDir.y = 0.0F;
-		TempDir.z = (float) cos( D2R( Count * 18 ) );
+		TempDir.z = (float) cosf( D2R( Count * 18 ) );
 
 		ApplyMatrix( &TempMat, &TempDir, &TempDir );
 
@@ -8340,9 +8340,9 @@ void CreateSplash( VECTOR * Pos, VECTOR * DirVector, u_int16_t Group )
 
 	for( Count = 0; Count < 20; Count++ )
 	{
-		TempDir.x = (float) cos( D2R( Count * 18 ) );
+		TempDir.x = (float) cosf( D2R( Count * 18 ) );
 		TempDir.y = 0.0F;
-		TempDir.z = (float) sin( D2R( Count * 18 ) );
+		TempDir.z = (float) sinf( D2R( Count * 18 ) );
 
 		Scalar = 1.5F + ( DotProduct( &TempDir, &RevDir ) * -( ( ( (float) Random_Range( 10000 ) ) / 2000.0F ) ) + 1.5F );
 		TempDir.y = 1.0F;

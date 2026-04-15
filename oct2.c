@@ -819,7 +819,7 @@ bool SetFOV( float fov )
 	}
 
 	pixel_aspect_ratio = render_info.aspect_ratio * screen_height / screen_width;
-	viewplane_distance = (float) ( viewport.Width / ( 2 * tan( DEG2RAD( fov ) * 0.5 ) ) );
+	viewplane_distance = (float) ( viewport.Width / ( 2 * tanf( DEG2RAD( fov ) * 0.5 ) ) );
 	proj._11 = 2 * viewplane_distance / viewport.Width;
 	proj._22 = 2 * viewplane_distance / ( viewport.Height / pixel_aspect_ratio );
 
@@ -1295,13 +1295,13 @@ ResizeViewport( void )
 
 	if ( scale < 1.01F )
 	{
-		width = (int) floor( maxwidth * scale );
+		width = (int) floorf( maxwidth * scale );
 		if ( width < MIN_VIEWPORT_WIDTH )
 		{
 			width = MIN_VIEWPORT_WIDTH;
 			scale = (float) width / maxwidth;
 		}
-		height = (int) floor( maxheight * scale );
+		height = (int) floorf( maxheight * scale );
 
 		NewDrawPanel = false;
 
@@ -4426,12 +4426,12 @@ void SetFOVBasedOnShipSpeed(void)
     }
     else
     {
-      fov_inc *= (float) pow( 0.95, framelag );
+      fov_inc *= (float) powf( 0.95, framelag );
     }
   }
   else
   {
-    fov_inc *= (float) pow( 0.95, framelag );
+    fov_inc *= (float) powf( 0.95, framelag );
   }
   SetFOV( chosen_fov + fov_inc );
 }
@@ -4877,7 +4877,7 @@ bool StatsNamePulse( void )
 	pulse += real_framelag;
 
 	if (pulse > 1.0F)
-		pulse -= (float) floor( (double) pulse );
+		pulse -= (float) floorf( (double) pulse );
 
 	if (pulse <= 0.5F)
 		return true;
@@ -5914,7 +5914,7 @@ bool DispTracker( void ) // bjd
 	if (!FSSetViewPort(&newviewport))
 		return false;
 
-	viewplane_distance = (float) ( newviewport.Width / ( 2 * tan( DEG2RAD( normal_fov ) * 0.5 ) ) );
+	viewplane_distance = (float) ( newviewport.Width / ( 2 * tanf( DEG2RAD( normal_fov ) * 0.5 ) ) );
 	panelproj._11 = 2 * viewplane_distance / newviewport.Width;
 	panelproj._22 = 2 * viewplane_distance / ( newviewport.Height / pixel_aspect_ratio );
 

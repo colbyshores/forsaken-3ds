@@ -3806,7 +3806,7 @@ void (* EnemyControlType[ ])( ENEMY * Enemy ) = {
 
 void AccellDecell(  float *  value ,  float  Decell ) 
 {
-	*value *= (float) (pow( 1.0 - Decell, framelag) );
+	*value *= (float) (powf( 1.0 - Decell, framelag) );
 }
 #define MIN_AUTOLEVEL_PITCH	D2R(5.0F) 
 #define MAX_AUTOLEVEL_PITCH	D2R(175.0F)
@@ -3829,11 +3829,11 @@ void ObjectBob( OBJECT * Object, VECTOR *bob )
 	float move_len;
 
 	move = Object->Speed;
-	move_len = (float) sqrt( move.x * move.x + move.y * move.y + move.z * move.z );
+	move_len = (float) sqrtf( move.x * move.x + move.y * move.y + move.z * move.z );
 	if ( move_len < MOVE_TOLERANCE )
 	{
-		move.x = BOB_XSIZE * (float) sin( Object->BobCount * BOB_XFREQ );
-		move.y = BOB_YSIZE * (float) sin( Object->BobCount * BOB_YFREQ );
+		move.x = BOB_XSIZE * (float) sinf( Object->BobCount * BOB_XFREQ );
+		move.y = BOB_YSIZE * (float) sinf( Object->BobCount * BOB_YFREQ );
 		move.z = 0.0F;
 		ApplyMatrix( &Object->Mat, &move, bob );
 		Object->BobCount += framelag;
@@ -3867,7 +3867,7 @@ float ObjectAutoLevelRot( OBJECT * Object, float autolevel_rate )
 	{
 		return 0.0F; // autolevelling disabled
 	}
-	if ( fabs( Object->Angle.z ) > MIN_AUTOLEVEL_ROLL_TOLERANCE )
+	if ( fabsf( Object->Angle.z ) > MIN_AUTOLEVEL_ROLL_TOLERANCE )
 	{
 		return 0.0F; // ship still rolling under player control
 	}
@@ -3878,7 +3878,7 @@ float ObjectAutoLevelRot( OBJECT * Object, float autolevel_rate )
 		cos_pitch = -1.0F;
 	else if ( cos_pitch > 1.0F )
 		cos_pitch = 1.0F;
-	pitch = (float) acos( cos_pitch );
+	pitch = (float) acosf( cos_pitch );
 	if ( pitch < MIN_AUTOLEVEL_PITCH || pitch > MAX_AUTOLEVEL_PITCH )
 	{
 		return 0.0F;
@@ -3891,10 +3891,10 @@ float ObjectAutoLevelRot( OBJECT * Object, float autolevel_rate )
 		cos_roll = -1.0F;
 	else if ( cos_roll > 1.0F )
 		cos_roll = 1.0F;
-	roll = (float) acos( cos_roll );
+	roll = (float) acosf( cos_roll );
 	autolevel = ( R2D( roll ) - 90.0F );
 	rot = autolevel_rate * autolevel;
-	if ( fabs( rot ) > fabs( autolevel ) )
+	if ( fabsf( rot ) > fabsf( autolevel ) )
 		rot = autolevel;
 	return rot;
 }
@@ -5770,7 +5770,7 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTO
 						TempVector.y = ( Enemy->Object.Pos.y - Pos->y );
 						TempVector.z = ( Enemy->Object.Pos.z - Pos->z );
 						NormaliseVector( &TempVector );
-						Cos = (float) ( 1.0F - fabs( DotProduct( &TempVector, Dir ) ) );
+						Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
 						ColRadius = ( EnemyTypes[Enemy->Type].Radius + ( WeaponRadius * Cos ) );
 						break;
 
@@ -5779,8 +5779,8 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTO
 						TempVector.y = ( Enemy->Object.Pos.y - Pos->y );
 						TempVector.z = ( Enemy->Object.Pos.z - Pos->z );
 						NormaliseVector( &TempVector );
-						Cos = (float) ( 1.0F - fabs( DotProduct( &TempVector, Dir ) ) );
-						Cos = (float) ( Cos * ( 1.0F - fabs( DotProduct( &TempVector, UpDir ) ) ) );
+						Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
+						Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, UpDir ) ) ) );
 						ColRadius = ( EnemyTypes[Enemy->Type].Radius + ( WeaponRadius * Cos ) );
 						break;
 

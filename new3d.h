@@ -24,13 +24,13 @@ typedef DWORD COLOR; // bgra
 #endif
 #define	D2R(x)				( ( x ) * ( 1.0F / 57.2957F) )		/* Nick Pelling changed */
 #define	R2D(x)				( ( x ) * 57.2957F )
-#define	SINR(x)				sin( x )
-#define	COSR(x)				cos( x )
-#define	SIND(x)				( sin( D2R( x ) ) )
-#define	COSD(x)				( cos( D2R( x ) ) )
-#define ATAND(y, x)			R2D( atan2(y, x) )
-#define FMOD( NUM, DIV )	( (NUM) - (DIV) * ( (float) floor( (NUM) / (DIV) ) ) )
-#define FDIV( NUM, DIV )	( (DIV) * ( (float) floor( (NUM) / (DIV) ) ) )
+#define	SINR(x)				sinf( x )
+#define	COSR(x)				cosf( x )
+#define	SIND(x)				( sinf( D2R( x ) ) )
+#define	COSD(x)				( cosf( D2R( x ) ) )
+#define ATAND(y, x)			R2D( atan2f(y, x) )
+#define FMOD( NUM, DIV )	( (NUM) - (DIV) * floorf( (NUM) / (DIV) ) )
+#define FDIV( NUM, DIV )	( (DIV) * floorf( (NUM) / (DIV) ) )
 
 /*===================================================================
 	Structures
