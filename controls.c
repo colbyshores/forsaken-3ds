@@ -673,13 +673,13 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 
 // TODO
 // win32 appear to return greator values even in some resolution
-// we should also configure a fine control setting for the mouse to turn on/off the fabs() trick
+// we should also configure a fine control setting for the mouse to turn on/off the fabsf() trick
 #ifdef WIN32
-	mouse_dx = mouse_dx * (float) fabs( mouse_dx ) * MouseXFactor; // factor = 0.000625
-	mouse_dy = mouse_dy * (float) fabs( mouse_dy ) * MouseYFactor; // factor = -0.000625
+	mouse_dx = mouse_dx * (float) fabsf( mouse_dx ) * MouseXFactor; // factor = 0.000625
+	mouse_dy = mouse_dy * (float) fabsf( mouse_dy ) * MouseYFactor; // factor = -0.000625
 #else
-	mouse_dx = mouse_dx * (float) fabs( mouse_dx ) * 0.01f; // tweaked for linux
-	mouse_dy = mouse_dy * (float) fabs( mouse_dy ) * -0.01f;
+	mouse_dx = mouse_dx * (float) fabsf( mouse_dx ) * 0.01f; // tweaked for linux
+	mouse_dy = mouse_dy * (float) fabsf( mouse_dy ) * -0.01f;
 #endif
 
 #if 0
@@ -1608,7 +1608,7 @@ void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum)
 
 			/* if were using fine control */
 			if ( joyaxis->fine )
-				amount *= (float) fabs( amount );
+				amount *= (float) fabsf( amount );
 
 			/* if the axis is inverted */
 			if ( joyaxis->inverted )

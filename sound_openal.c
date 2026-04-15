@@ -212,7 +212,7 @@ void sound_volume( sound_source_t * source, long millibels )
 	// gain is scaled to (silence) 0.0f through (no change) 1.0f
 	// millibels = hundredths of decibels (dB)
 	// defined in Dsound.h as (no change) 0 and (silence) -10,000
-	f = (ALfloat) pow(10.0, millibels/2000.0);
+	f = (ALfloat) powf(10.0, millibels/2000.0);
 	alSourcef(source->id, AL_GAIN, f);
 	//DebugPrintf("sound_volume: %ld\n",millibels);
 }
@@ -224,7 +224,7 @@ void sound_pan( sound_source_t * source, long _pan )
 	// probably need to scale down by 10,000, since dsound goes from -10000 to +10000
 	// so:
 	float pan = (float) _pan / 10000.0f;
-	float pan2 = (float) sqrt(1 - pan*pan);
+	float pan2 = (float) sqrtf(1 - pan*pan);
 	//DebugPrintf("sound_pan: %f - %f\n",pan,pan2);
 	alSource3f(source->id, AL_POSITION, pan, pan2, 0.0f);
 }

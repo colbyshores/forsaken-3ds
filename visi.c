@@ -489,7 +489,7 @@ bool FindGroupConnections( MLOADHEADER *m )
 
 	InitConnections = true;
 
-	GTabRowSize = (int)ceil(MAXGROUPS/32.0F);
+	GTabRowSize = (int)ceilf(MAXGROUPS/32.0F);
 	tabsize = MAXGROUPS * GTabRowSize * sizeof( u_int32_t );
 	if ( !ConnectedGroup.table )
 	{
@@ -984,7 +984,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	float lr;
 
 	// calculate clipping planes
-	w = (float) tan( hfov );
+	w = (float) tanf( hfov );
 	h = w / render_info.aspect_ratio;
 	clip_right.x = w;
 	clip_right.y = 0.0F;
@@ -1065,10 +1065,10 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	// set viewport and projection matrix for each visible group
 	for ( g = v->first_visible; g; g = g->next_visible )
 	{
-		clip.x1 = (long) floor( g->extent.min.x );
-		clip.y1 = (long) floor( g->extent.min.y );
-		clip.x2 = (long) ceil( g->extent.max.x );
-		clip.y2 = (long) ceil( g->extent.max.y );
+		clip.x1 = (long) floorf( g->extent.min.x );
+		clip.y1 = (long) floorf( g->extent.min.y );
+		clip.x2 = (long) ceilf( g->extent.max.x );
+		clip.y2 = (long) ceilf( g->extent.max.y );
 		if ( clip.x1 < 0 )
 			clip.x1 = 0;
 		if ( clip.y1 < 0 )

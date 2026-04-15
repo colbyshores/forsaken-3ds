@@ -2019,7 +2019,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 		Temp.y = SfxPos->y - Ships[ Current_Camera_View ].Object.Pos.y;
 		Temp.z = SfxPos->z - Ships[ Current_Camera_View ].Object.Pos.z;
 
-		Distance = (float) sqrt( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
+		Distance = (float) sqrtf( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
 
 		Distance += Modify;
 
@@ -2368,7 +2368,7 @@ void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECT
 			// we only care about x plane because we only have left/right speakers in panning
 			// z is probably used to adjust for field of view (as things get farther away they
 			// move towards the center of screen)
-			currentdist = (float) sqrt( ( Temp2.x * Temp2.x ) + ( Temp2.z * Temp2.z ) );
+			currentdist = (float) sqrtf( ( Temp2.x * Temp2.x ) + ( Temp2.z * Temp2.z ) );
 		
 			if( currentdist )
 			{
@@ -2383,7 +2383,7 @@ void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECT
 
 				// the bigger z is than x becomes smaller hence sound shrinks into center of
 				// view with distance
-				Pan = (long) ( ( 1.0F - fabs(nz) )* ( sx ) );
+				Pan = (long) ( ( 1.0F - fabsf(nz) )* ( sx ) );
 			}
 			else
 			{
@@ -2720,7 +2720,7 @@ void ProcessLoopingSfx( void )
 			Temp.y = Pos.y - Ships[ Current_Camera_View ].Object.Pos.y;
 			Temp.z = Pos.z - Ships[ Current_Camera_View ].Object.Pos.z;
 
-			Distance = (float) sqrt( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
+			Distance = (float) sqrtf( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
 			Distance += Modify;
 			MaxDistance = 24 * 1024 * GLOBAL_SCALE * LOOPING_SFX_SCALE;
 			if( Distance >= MaxDistance ) 
@@ -2919,7 +2919,7 @@ float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *li
 	if ( Modify < 0.0F )
 		return -1.0F;
 
-	dist = (float) sqrt( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
+	dist = (float) sqrtf( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
 	dist += Modify;
 
 	if ( dist > MAX_DISTANCE )

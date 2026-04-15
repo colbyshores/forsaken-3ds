@@ -6514,7 +6514,7 @@ void SetVolumeLevels( void )
 	temp.y = Models[BackgroundModel[TITLE_MODEL_VDU]].Pos.y - View.y;
 	temp.z = Models[BackgroundModel[TITLE_MODEL_VDU]].Pos.z - View.z;
 
-	dist = (float) sqrt( ( temp.x * temp.x ) + ( temp.y * temp.y ) + ( temp.z * temp.z ) );
+	dist = (float) sqrtf( ( temp.x * temp.x ) + ( temp.y * temp.y ) + ( temp.z * temp.z ) );
 	if ( dist < 540.0F )
 	{
 		if ( !TitleLoopId[ TITLE_LOOP_VduAmbience ] )
@@ -6675,7 +6675,7 @@ void DrawSlider( MENUITEM *Item )
 	sx = Print4x5Text( " ", -1, y, InGameMenuColour );
 
 	// calculate end position
-	ex = sx + (int) floor( ( 128 >> 1 ) * ModeScaleX );
+	ex = sx + (int) floorf( ( 128 >> 1 ) * ModeScaleX );
 
 	// get the slider start/current/stop values
 	s = (SLIDER *) (Item->Variable);
@@ -7183,7 +7183,7 @@ void InitControls( MENU *Menu )
     Autoleveling = Config.autolevel_rate != 0 ? true : false;
 
     float s = Config.mouse_x_sensitivity;
-    SensitivityXSlider.value = s * fabs(SensitivityXSlider.max - SensitivityXSlider.min);
+    SensitivityXSlider.value = s * fabsf(SensitivityXSlider.max - SensitivityXSlider.min);
     if (SensitivityXSlider.value < SensitivityXSlider.min) {
         SensitivityXSlider.value = SensitivityXSlider.min;
     } else if (SensitivityXSlider.value > SensitivityXSlider.max) {
@@ -7191,7 +7191,7 @@ void InitControls( MENU *Menu )
     }
 
     s = Config.mouse_y_sensitivity;
-    SensitivityYSlider.value = s * fabs(SensitivityYSlider.max - SensitivityYSlider.min);
+    SensitivityYSlider.value = s * fabsf(SensitivityYSlider.max - SensitivityYSlider.min);
     if (SensitivityYSlider.value < SensitivityYSlider.min) {
         SensitivityYSlider.value = SensitivityYSlider.min;
     } else if (SensitivityYSlider.value > SensitivityYSlider.max) {
@@ -7212,9 +7212,9 @@ void SetAutolevel( MENUITEM *item )
 void ExitControls( MENU *Menu )
 {
     float sX = SensitivityXSlider.value /
-        fabs(SensitivityXSlider.max - SensitivityXSlider.min);
+        fabsf(SensitivityXSlider.max - SensitivityXSlider.min);
     float sY = SensitivityYSlider.value /
-        fabs(SensitivityYSlider.max - SensitivityYSlider.min);
+        fabsf(SensitivityYSlider.max - SensitivityYSlider.min);
     Config.mouse_x_sensitivity = sX;
     Config.mouse_y_sensitivity = sY;
     ExitBikerMenu(NULL);
@@ -7975,7 +7975,7 @@ void DrawTextItem( MENUITEM *Item )
 	t = (TEXT *)(Item->Variable);
 
 	// get the maximum number of characters we can print on a line
-	MAX = floor((render_info.window_size.cx-tx-(FontWidth*3.0))/FontWidth);
+	MAX = floorf((render_info.window_size.cx-tx-(FontWidth*3.0))/FontWidth);
 	if(MAX < 10) MAX = 10;
 	else if(MAX > 149) MAX = 149;
 
@@ -11111,11 +11111,11 @@ void UpdateSlider (MENUITEM *Item)
 	ymin = (Item->y + VDUoffsetY + decreaseY) * ModeScaleY;
 	ymax = (Item->ymax + VDUoffsetY - decreaseY) * ModeScaleY;
 
-	height = (float)floor(ymax - ymin);
+	height = (float)floorf(ymax - ymin);
 
-	xmin = (float)ceil(xmin);
-	xmax = (float)ceil(xmax);
-	ymin = (float)floor(ymin);
+	xmin = (float)ceilf(xmin);
+	xmax = (float)ceilf(xmax);
+	ymin = (float)floorf(ymin);
 	ymax = ymin + height;
 	
 	ScrPolys[Slider->poly].x1 = xmin;
@@ -11319,9 +11319,9 @@ void RedrawFlatMenuSlider( MENUITEM *Item )
 		if (slider->value != slider->oldvalue)
 		{
 			if (slider->value > slider->oldvalue)
-				slider->dt = (float)fabs(slider->dt);
+				slider->dt = (float)fabsf(slider->dt);
 			else
-				slider->dt = 0.0F - (float)fabs(slider->dt);
+				slider->dt = 0.0F - (float)fabsf(slider->dt);
 		}
 	}
 }
@@ -12423,7 +12423,7 @@ void ProcessTextItems (void)
 	CurrentHighlightItem = 0;
 
 	TeleTypeTimer += framelag/(0.05F * 60.0F);
-	TeleTypeSkip = (int)floor((float)TeleTypeTimer);
+	TeleTypeSkip = (int)floorf((float)TeleTypeTimer);
 
 	TeleTypeTimer -= (float)TeleTypeSkip;
 
@@ -13857,8 +13857,8 @@ void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 
 	font = GetScreenFont(TextInfo->font);
 
-	widthX = (float)ceil(ModeScaleX);
-	widthY = (float)ceil(ModeScaleY);
+	widthX = (float)ceilf(ModeScaleX);
+	widthY = (float)ceilf(ModeScaleY);
 
 	height = 0.0F;
 	length = 0.0F;
@@ -14269,7 +14269,7 @@ void InitJoystickAxisConfig ( MENU *Menu)
 	DeadzoneSlider.value = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].deadzone; 
 	sensitivity = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].sensitivity;
 	SensitivitySlider.value =
-		( sensitivity < 1.0F ) ? (int) floor( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100;
+		( sensitivity < 1.0F ) ? (int) floorf( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100;
 
 	// set up axis test scrpolys
 	for (i = 0; i < NUM_AXIS_TEST_SCRPOLYS; i++)
@@ -14449,7 +14449,7 @@ void ChooseJoyAxis( MENUITEM *Item )
 	sensitivity = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[ axis ].sensitivity;
 	SensitivitySlider.oldvalue = SensitivitySlider.value;
 	SensitivitySlider.value =
-		( sensitivity < 1.0F ) ? (int) floor( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100;
+		( sensitivity < 1.0F ) ? (int) floorf( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100;
 	RedrawFlatMenuSlider( SensitivityItem );
 
 	LastMenu = CurrentMenu;
@@ -14576,7 +14576,7 @@ void CheckJoyAxis( int *dummy )
 	pos = pos * JoystickInfo[ joystick ].Axis[ axis ].sensitivity;
 
 	if ( JoystickInfo[ joystick ].Axis[ axis ].fine )
-		pos *= (float) fabs( pos );
+		pos *= (float) fabsf( pos );
 
 	UpdateAxisPtr( pos );
 
@@ -15402,7 +15402,7 @@ void ProcessHoloModel( void )
 		}
 		if( FlyGirlActive )
 		{
-			ProcessFlyGirl((float)fabs(HoloModelTimer));
+			ProcessFlyGirl((float)fabsf(HoloModelTimer));
 		}
 		return;
 	case HOLOMODEL_Expand:
@@ -15413,7 +15413,7 @@ void ProcessHoloModel( void )
 		if ( HoloModelTimer < 0.0F )
 		{
 			HoloModelMode = HOLOMODEL_Expand;
-			HoloModelTimer = (float)fabs(HoloModelTimer);
+			HoloModelTimer = (float)fabsf(HoloModelTimer);
 			reload = true;
 		}
 		break;
@@ -15448,11 +15448,11 @@ void ProcessHoloModel( void )
 
 	if( FlyGirlActive )
 	{
-		ProcessFlyGirl((float)fabs(HoloModelTimer));
+		ProcessFlyGirl((float)fabsf(HoloModelTimer));
 	}else
 	{
 		UpdateFlyGirl( &BikePos, &MATRIX_Identity, false );
-		ScaleHoloModel( (float)fabs(HoloModelTimer));
+		ScaleHoloModel( (float)fabsf(HoloModelTimer));
 	}
 
 	if( ( HoloModelMode == HOLOMODEL_Done ) && ( !FlyGirlActive ) )
@@ -17130,7 +17130,7 @@ void MenuProcess()
 	// used for flashing text
 	Pulse += framelag/60.0F;
 	if (Pulse > 1.0F)
-		Pulse -= (float)floor((double)Pulse);
+		Pulse -= (float)floorf((double)Pulse);
 
 	// TODO - need to handle MENU_NEW_Error and MenuFrozen
 

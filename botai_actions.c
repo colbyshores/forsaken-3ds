@@ -288,7 +288,7 @@ bool BOTAI_MoveToTargetNew(VECTOR * TPos)
 	return false;
 
 	// left/right angle
-	xAngle = (float) acos( WantedVector.x );
+	xAngle = (float) acosf( WantedVector.x );
 	xAngle = 90.0F - R2D( xAngle );
 	if( WantedVector.z < 0.0F )
 		xAngle = 180.0F - xAngle;
@@ -297,7 +297,7 @@ bool BOTAI_MoveToTargetNew(VECTOR * TPos)
 	////DebugPrintf("X Angle %f\n", xAngle);
 
 	// up/down angle
-	yAngle = (float) acos( WantedVector.y );
+	yAngle = (float) acosf( WantedVector.y );
 	yAngle = 90.0F - R2D( yAngle );
 	yAngle *= -1.0F;
 	if( yAngle > 180.0F )
@@ -350,7 +350,7 @@ bool BOTAI_MoveToTarget(VECTOR * TPos)
 	////DebugPrintf("x = %f y = %f z = %f\n", DirVector.x, DirVector.y, DirVector.z);
 
 	// left/right angle
-	xAngle = (float) acos( DirVector.x );
+	xAngle = (float) acosf( DirVector.x );
 	xAngle = 90.0F - R2D( xAngle );
 	if( DirVector.z < 0.0F )
 		xAngle = 180.0F - xAngle;
@@ -359,7 +359,7 @@ bool BOTAI_MoveToTarget(VECTOR * TPos)
 	////DebugPrintf("X Angle %f\n", xAngle);
 
 	// up/down angle
-	yAngle = (float) acos( DirVector.y );
+	yAngle = (float) acosf( DirVector.y );
 	yAngle = 90.0F - R2D( yAngle );
 	yAngle *= -1.0F;
 	if( yAngle > 180.0F )
@@ -433,7 +433,7 @@ bool BOTAI_SlideToTarget(VECTOR * TPos)
 	////DebugPrintf("x = %f y = %f z = %f\n", DirVector.x, DirVector.y, DirVector.z);
 
 	// left/right angle
-	xAngle = (float) acos( DirVector.x );
+	xAngle = (float) acosf( DirVector.x );
 	xAngle = 90.0F - R2D( xAngle );
 	if( DirVector.z < 0.0F )
 		xAngle = 180.0F - xAngle;
@@ -442,7 +442,7 @@ bool BOTAI_SlideToTarget(VECTOR * TPos)
 	////DebugPrintf("X Angle %f\n", xAngle);
 
 	// up/down angle
-	yAngle = (float) acos( DirVector.y );
+	yAngle = (float) acosf( DirVector.y );
 	yAngle = 90.0F - R2D( yAngle );
 	yAngle *= -1.0F;
 	if( yAngle > 180.0F )
@@ -643,7 +643,7 @@ bool BOTAI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 	ApplyMatrix( InvMat, &WantedDir, &TempDir );
 
 	NormaliseVector( &TempDir );
-	Angle = (float) acos( TempDir.x );
+	Angle = (float) acosf( TempDir.x );
 	Angle = 90.0F - R2D( Angle );
 
 	if( TempDir.z < 0.0F )
@@ -665,7 +665,7 @@ bool BOTAI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 			OnTarget = false;
 	}
 
-	Angle = (float) acos( TempDir.y );
+	Angle = (float) acosf( TempDir.y );
 	Angle = 90.0F - R2D( Angle );
 	Angle *= -1.0F;
 
@@ -713,7 +713,7 @@ void BOTAI_AvoidHomingMissiles()
 
 
 		// left/right angle
-		xAngle = (float) acos( MissileOrigDirVector.x );
+		xAngle = (float) acosf( MissileOrigDirVector.x );
 		xAngle = 90.0F - R2D( xAngle );
 		if( MissileOrigDirVector.z < 0.0F )
 			xAngle = 180.0F - xAngle;
@@ -722,7 +722,7 @@ void BOTAI_AvoidHomingMissiles()
 		//DebugPrintf("x = %f\n", xAngle);
 
 		// up/down angle
-		yAngle = (float) acos( MissileOrigDirVector.y );
+		yAngle = (float) acosf( MissileOrigDirVector.y );
 		yAngle = 90.0F - R2D( yAngle );
 		yAngle *= -1.0F;
 		if( yAngle > 180.0F )

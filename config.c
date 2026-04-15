@@ -1863,7 +1863,7 @@ write_config( USERCONFIG *u, char *cfg_name )
 						JoystickInfo[joystick].Axis[axis].inverted, 
 						JoystickInfo[joystick].Axis[axis].deadzone, 
 						( sensitivity < 1.0F ) ?
-						(int) floor( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100,
+						(int) floorf( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100,
 						JoystickInfo[ joystick ].Axis[ axis ].fine,
 						JoystickInfo[joystick].Axis[axis].action );
 				}

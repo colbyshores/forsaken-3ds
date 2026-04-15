@@ -166,7 +166,7 @@ void QuatNormalise( QUAT * q )
 	sq.y = ( q->y * q->y );
 	sq.z = ( q->z * q->z );
 
-	len = (float) sqrt( ( sq.x + sq.y + sq.z ) + ( q->w * q->w ) );
+	len = (float) sqrtf( ( sq.x + sq.y + sq.z ) + ( q->w * q->w ) );
 
 	if ( len )
 	{
@@ -356,15 +356,15 @@ void QuatFromVector( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Calculate ANGLE between TARGET and LOOK vectors
 ===================================================================*/
-	angle = (float) ( acos( Tv->z ) / 2 );
+	angle = (float) ( acosf( Tv->z ) / 2 );
 
 /*===================================================================
 	Finally build TARGET QUATERNION
 ===================================================================*/
-	q->x = (float) ( sin( angle ) * Av.x );
-	q->y = (float) ( sin( angle ) * Av.y );
+	q->x = (float) ( sinf( angle ) * Av.x );
+	q->y = (float) ( sinf( angle ) * Av.y );
 	q->z = 0.0F;
-	q->w = (float) cos( angle );
+	q->w = (float) cosf( angle );
 
 	QuatNormalise( q );
 }
@@ -396,15 +396,15 @@ void QuatFromVector2( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Calculate ANGLE between TARGET and LOOK vectors
 ===================================================================*/
-	angle = (float) ( acos( -Tv->z ) / 2 );
+	angle = (float) ( acosf( -Tv->z ) / 2 );
 
 /*===================================================================
 	Finally build TARGET QUATERNION
 ===================================================================*/
-	q->x = (float) ( sin( angle ) * Av.x );
-	q->y = (float) ( sin( angle ) * Av.y );
+	q->x = (float) ( sinf( angle ) * Av.x );
+	q->y = (float) ( sinf( angle ) * Av.y );
 	q->z = 0.0F;
-	q->w = (float) cos( angle );
+	q->w = (float) cosf( angle );
 
 	QuatNormalise( q );
 }
@@ -449,11 +449,11 @@ void Quaternion_Slerp( float alpha, QUAT * a, QUAT * b, QUAT * q, int spin )
  	}
 	else
 	{				/* normal case */
- 		theta	= ( (float) acos( cos_t ) );
+ 		theta	= ( (float) acosf( cos_t ) );
  		phi		= ( theta + ( spin * M_PI ) );
- 		sin_t	= ( (float) sin( theta ) );
- 		beta	= ( (float) sin( theta - ( alpha * phi ) ) / sin_t );
- 		alpha	= ( (float) sin( alpha * phi ) / sin_t );
+ 		sin_t	= ( (float) sinf( theta ) );
+ 		beta	= ( (float) sinf( theta - ( alpha * phi ) ) / sin_t );
+ 		alpha	= ( (float) sinf( alpha * phi ) / sin_t );
  	}
 
 	if( bflip ) alpha = -alpha;
@@ -514,18 +514,18 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 
 	CrossProduct( &u1 , &u2, &axis );
 /*
-** | u1 X u2 | = |u1||u2|sin(theta)
+** | u1 X u2 | = |u1||u2|sinf(theta)
 **
 ** Since u1 and u2 are normalized, 
 **
 **  theta = arcsin(|axis|)
 */
-	crossProductMagnitude = (float) sqrt( DotProduct( &axis , &axis ) );
+	crossProductMagnitude = (float) sqrtf( DotProduct( &axis , &axis ) );
 
 /*
 ** Occasionally, even though the vectors are normalized, the magnitude will
 ** be calculated to be slightly greater than one.  If this happens, just
-** set it to 1 or asin() will barf.
+** set it to 1 or asinf() will barf.
 */
 	if( crossProductMagnitude > 1.0F )
 	   crossProductMagnitude = 1.0F;
@@ -533,10 +533,10 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 ** Take arcsin of magnitude of rotation axis to compute rotation angle.
 ** Since crossProductMagnitude=[0,1], we will have theta=[0,pi/2].
 */
-	theta = (float) asin( crossProductMagnitude );
+	theta = (float) asinf( crossProductMagnitude );
 	theta_complement = PI - theta;
 /*
-** If cos(theta) < 0, use complement of theta as rotation angle.
+** If cosf(theta) < 0, use complement of theta as rotation angle.
 */
 	if( DotProduct( &u1 , &u2 ) < 0.0F )
 	{
@@ -593,7 +593,7 @@ QuatMake( QUAT * destQuat, float x, float y, float z, float angle)
 {
     float length, cosA, sinA;
 	/* normalize vector */
-	length = (float) sqrt( x*x + y*y + z*z );
+	length = (float) sqrtf( x*x + y*y + z*z );
 
 	/* if zero vector passed in, just return identity quaternion	*/
 	if ( length < EPS )
@@ -608,8 +608,8 @@ QuatMake( QUAT * destQuat, float x, float y, float z, float angle)
 	y /= length;
 	z /= length;
 
-	cosA = (float) cos(angle * 0.5F);
-	sinA = (float) sin(angle * 0.5F);
+	cosA = (float) cosf(angle * 0.5F);
+	sinA = (float) sinf(angle * 0.5F);
 
 	destQuat->w = cosA;
 	destQuat->x = sinA * x;
@@ -636,7 +636,7 @@ MatrixToQuat(QUAT * destQuat, MATRIX * srcMatrix)
 
 if (trace > 0.0F)
     {
-    s = (float) sqrt(trace + 1.0F);
+    s = (float) sqrtf(trace + 1.0F);
     destQuat->w = s * 0.5F;
     s = 0.5F / s;
     
@@ -661,7 +661,7 @@ else
     j = next[i];  
     k = next[j];
     
-    s = (float) sqrt( (Temp[i][i] - (Temp[j][j]+Temp[k][k])) + 1.0F );
+    s = (float) sqrtf( (Temp[i][i] - (Temp[j][j]+Temp[k][k])) + 1.0F );
 	if( i == 0)
 		destQuat->x = s*0.5F;
 	if( i == 1)

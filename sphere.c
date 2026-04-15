@@ -106,7 +106,7 @@ float sqrt_D;
 	    return 0.0F;
 
     // two real roots
-    sqrt_D = (float) sqrt(D);
+    sqrt_D = (float) sqrtf(D);
     s[0] = sqrt_D - p;
     s[1] = -sqrt_D - p;
     return 2.0F;
@@ -172,7 +172,7 @@ float RaytoSphere(VECTOR * sphere_pos, float radius , VECTOR * ray_org, VECTOR *
 		return 0.0F;
 
 	// two real roots
-	sqrt_D = (float) sqrt(D);
+	sqrt_D = (float) sqrtf(D);
 	s0 = sqrt_D - p;
 	s1 = -sqrt_D - p;
 
@@ -217,7 +217,7 @@ bool RaytoSphere2( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rd
 
 	if ( disc < 0.0F ) return false;
 
-	d  = (float) sqrt( disc );
+	d  = (float) sqrtf( disc );
 	d0 = d - v;
 	d1 = ( -d ) - v;
 
@@ -272,7 +272,7 @@ int16_t RaytoSphere3( VECTOR * SphereCenter, float Radius, VECTOR * RayStart,
 
 	if ( disc < 0.0F ) return( R2S_MISSED );				// Ray does not IntPointsect sphere!
 
-	d  = (float) sqrt( disc );
+	d  = (float) sqrtf( disc );
 	d0 = d - v;
 	d1 = ( -d ) - v;
 
@@ -319,7 +319,7 @@ bool RaytoSphereShort( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR 
 
 	if( disc < 0.0F ) return( false );				// Ray does not hit sphere
 
-	d  = (float) sqrt( disc );
+	d  = (float) sqrtf( disc );
 	d0 = d - v;
 	d1 = ( -d ) - v;
 

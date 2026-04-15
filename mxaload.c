@@ -1094,11 +1094,11 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 
 						from_color = (COLOR_RGBA *) &FromVert->color;
 						to_color = (COLOR_RGBA *) &ToVert->color;
-						color->r = from_color->r + (int8_t) floor( ( to_color->r - from_color->r ) * Interp );
-						color->g = from_color->g + (int8_t) floor( ( to_color->g - from_color->g ) * Interp );
-						color->b = from_color->b + (int8_t) floor( ( to_color->b - from_color->b ) * Interp );
+						color->r = from_color->r + (int8_t) floorf( ( to_color->r - from_color->r ) * Interp );
+						color->g = from_color->g + (int8_t) floorf( ( to_color->g - from_color->g ) * Interp );
+						color->b = from_color->b + (int8_t) floorf( ( to_color->b - from_color->b ) * Interp );
 #ifdef DOES_NOT_WORK_FOR_BLASTER
-						color->a = from_color->a + (int8_t) floor( ( to_color->a - from_color->a ) * Interp );
+						color->a = from_color->a + (int8_t) floorf( ( to_color->a - from_color->a ) * Interp );
 #endif
 					}
 					if ( FromVert->flags & MXA_ANIM_UV )

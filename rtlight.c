@@ -228,7 +228,7 @@ bool LoadRTLights( void )
 					if ( light->type == LIGHT_SPOT )
 					{
 						xlight->Type = SPOT_LIGHT;
-						xlight->CosArc = (float) cos( D2R( light->spot.cone * 0.5F ) );
+						xlight->CosArc = (float) cosf( D2R( light->spot.cone * 0.5F ) );
 					}
 				}
 			}
@@ -283,10 +283,10 @@ static void InterpLightOn( RT_LIGHT *light, float t, PULSETYPE type )
 	case PULSE_RAMP:
 		break;
 	case PULSE_HALFWAVE:
-		t = (float) sin( HALF_PI * t );
+		t = (float) sinf( HALF_PI * t );
 		break;
 	case PULSE_WAVE:
-		t = 0.5F + 0.5F * (float) sin( PI * t - HALF_PI );
+		t = 0.5F + 0.5F * (float) sinf( PI * t - HALF_PI );
 		break;
 	}
 	xlight->r = t * light->r;
@@ -311,10 +311,10 @@ static void InterpLightOff( RT_LIGHT *light, float t, PULSETYPE type )
 		t = 1.0F - t;
 		break;
 	case PULSE_HALFWAVE:
-		t = (float) sin( HALF_PI + HALF_PI * t );
+		t = (float) sinf( HALF_PI + HALF_PI * t );
 		break;
 	case PULSE_WAVE:
-		t = 0.5F + 0.5F * (float) sin( PI * t + HALF_PI );
+		t = 0.5F + 0.5F * (float) sinf( PI * t + HALF_PI );
 		break;
 	}
 	xlight->r = t * light->r;
@@ -338,10 +338,10 @@ static float TurnOnPoint( RT_LIGHT *light, PULSETYPE type )
 		t = light->intensity;
 		break;
 	case PULSE_HALFWAVE:
-		t = (float) asin( light->intensity ) / HALF_PI;
+		t = (float) asinf( light->intensity ) / HALF_PI;
 		break;
 	case PULSE_WAVE:
-		t = ( (float) asin( light->intensity ) + HALF_PI ) / PI;
+		t = ( (float) asinf( light->intensity ) + HALF_PI ) / PI;
 		break;
 	}
 
@@ -362,10 +362,10 @@ static float TurnOffPoint( RT_LIGHT *light, PULSETYPE type )
 		t = 1.0F - light->intensity;
 		break;
 	case PULSE_HALFWAVE:
-		t = ( HALF_PI - (float) asin( light->intensity ) ) / HALF_PI;
+		t = ( HALF_PI - (float) asinf( light->intensity ) ) / HALF_PI;
 		break;
 	case PULSE_WAVE:
-		t = ( HALF_PI - (float) asin( light->intensity ) ) / PI;
+		t = ( HALF_PI - (float) asinf( light->intensity ) ) / PI;
 		break;
 	}
 

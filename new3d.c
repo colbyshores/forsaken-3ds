@@ -420,7 +420,7 @@ void ReflectVector( VECTOR * old, NORMAL * normal, VECTOR * new1 )
 
    lambda= ( -2 * ( (normal->nx * old->x ) + (normal->ny * old->y ) + (normal->nz * old->z ) ) );
 
-   if( fabs( lambda ) < EPS )
+   if( fabsf( lambda ) < EPS )
    {
         new1->x = old->x;
         new1->y = old->y;
@@ -444,7 +444,7 @@ void ReflectVector( VECTOR * old, NORMAL * normal, VECTOR * new1 )
 ===================================================================*/
 void NormaliseVector( VECTOR *  v )
 {
-	float inv_mod = (float) sqrt( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) );
+	float inv_mod = (float) sqrtf( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) );
 
 	if ( !inv_mod )
 		return;
@@ -463,7 +463,7 @@ void NormaliseVector( VECTOR *  v )
 ===================================================================*/
 float VectorLength( VECTOR * v ) 
 {
-	return( (float) sqrt( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) ) ); 
+	return( (float) sqrtf( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) ) ); 
 }
 
 /*===================================================================
@@ -482,7 +482,7 @@ float DistanceVert2Vector( VERT *  a , VECTOR * b )
 	y = a->y - b->y;
 	z = a->z - b->z;
 
-	return( (float) sqrt( (double)((x*x) + (y*y) + (z*z)) ) ); 
+	return( (float) sqrtf( (double)((x*x) + (y*y) + (z*z)) ) ); 
 }
 /*===================================================================
 	Procedure	:	Calculate the Distance between a VERT and a VECTOR
@@ -500,7 +500,7 @@ float DistanceVector2Vector( VECTOR *  a , VECTOR * b )
 	y = a->y - b->y;
 	z = a->z - b->z;
 
-	return( (float) sqrt( (double)((x*x) + (y*y) + (z*z)) ) ); 
+	return( (float) sqrtf( (double)((x*x) + (y*y) + (z*z)) ) ); 
 }
 
 /*===================================================================
@@ -608,8 +608,8 @@ float	QuickDistance2d( float x , float y )
 {
 	float Min;
 
-	x = (float) fabs( x );
-	y = (float) fabs( y );
+	x = (float) fabsf( x );
+	y = (float) fabsf( y );
 
 	if( x > y )
 	{
@@ -724,8 +724,8 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 	MATRIX	rotx, rotangle;
 	float	xz, xyz, s, c;
 
-	xz	= (float) sqrt( axis->x * axis->x + axis->z * axis->z );
-	xyz	= (float) sqrt( axis->x * axis->x + axis->y * axis->y + axis->z * axis->z ) ;
+	xz	= (float) sqrtf( axis->x * axis->x + axis->z * axis->z );
+	xyz	= (float) sqrtf( axis->x * axis->x + axis->y * axis->y + axis->z * axis->z ) ;
 
 	if( xz != 0.0F )
 	{
@@ -772,8 +772,8 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 		rotx._44 = 1.0F;
 	}
 
-	c = (float) cos( angle );
-	s = (float) sin( angle );
+	c = (float) cosf( angle );
+	s = (float) sinf( angle );
 
    	rotangle._11 = 1.0F;
    	rotangle._12 = 0.0F;

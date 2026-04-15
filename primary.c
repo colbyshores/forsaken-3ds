@@ -1160,8 +1160,8 @@ static int16_t	OnceOnlyFlag = 0;
 							Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
 							Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
 		
-							Rotation.x = (float) sin( D2R( Models[ Model ].AxisRot ) );
-							Rotation.y = (float) cos( D2R( Models[ Model ].AxisRot ) );
+							Rotation.x = (float) sinf( D2R( Models[ Model ].AxisRot ) );
+							Rotation.y = (float) cosf( D2R( Models[ Model ].AxisRot ) );
 							Rotation.z = 0.0F;
 							ApplyMatrix( &Ships[ WhoIAm ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 							ApplyMatrix( &Ships[ WhoIAm ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
@@ -1822,11 +1822,11 @@ void ProcessPrimaryBullets( void )
 				else PrimBulls[i].ColFlag = 1;
 
 				PrimBulls[i].ColStart = PrimBulls[i].Pos;
-				PrimBulls[i].ColDist = (float) fabs( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
+				PrimBulls[i].ColDist = (float) fabsf( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
 			}
 
 /*컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�*/
-			DistFromStart = (float) fabs( DistanceVert2Vector( (VERT*) &NewPos, &PrimBulls[i].ColStart ) );
+			DistFromStart = (float) fabsf( DistanceVert2Vector( (VERT*) &NewPos, &PrimBulls[i].ColStart ) );
 
 			HitWall = (u_int16_t) -1;
 			DistToInt = 100000.0F;									/* Distance to Intersection */
@@ -1835,12 +1835,12 @@ void ProcessPrimaryBullets( void )
 			if( PrimBulls[i].ColDist < DistFromStart )
 		   	{
 				HitWall = 0;
-				DistToInt = (float) fabs( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
+				DistToInt = (float) fabsf( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
 
 				if( OneGroupBGObjectCol( DistToInt, 1, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, &MoveOffsetVector,
 										 (VECTOR *) &BGPoint, &BGNormal, &TempVector, &BGObject, 0.0F ) )
 				{
-					DistToInt = (float) fabs( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
+					DistToInt = (float) fabsf( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
 					PrimBulls[i].ColPoint = BGPoint;
 					PrimBulls[i].ColPointNormal = BGNormal;
 					if( BGObject ) PrimBulls[i].ColGroup = BGObject->Group;
@@ -1859,7 +1859,7 @@ void ProcessPrimaryBullets( void )
 				if( OneGroupBGObjectCol( 0.0F, 0, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, &MoveOffsetVector,
 										 (VECTOR *) &BGPoint, &BGNormal, &TempVector, &BGObject, 0.0F ) )
 				{
-					DistToInt = (float) fabs( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
+					DistToInt = (float) fabsf( DistanceVert2Vector( &BGPoint, &PrimBulls[i].Pos ) );
 					PrimBulls[i].ColPoint = BGPoint;
 					PrimBulls[i].ColPointNormal = BGNormal;
 					if( BGObject ) PrimBulls[i].ColGroup = BGObject->Group;
@@ -6363,7 +6363,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 /*===================================================================
 	Create new polys
 ===================================================================*/
-	NumSegments = (int16_t) ceil( Distance / SubDivision );
+	NumSegments = (int16_t) ceilf( Distance / SubDivision );
 
 	if( PrimBulls[i].LifeCount < 4.0F )
 	{
@@ -6733,7 +6733,7 @@ void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * IntPos2, u_int1
 			TempVector2.z = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 			NormaliseVector( &TempVector2 );
 		
-			Angle = (float) acos( DotProduct( &TempVector, &TempVector2 ) );
+			Angle = (float) acosf( DotProduct( &TempVector, &TempVector2 ) );
 			if( Angle ) Time = D2R( ( 2.0F / Angle ) );
 			else Time = 1.0F;
 			if( Time > 1.0F ) Time = 1.0F;
@@ -6857,7 +6857,7 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 							TempVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
 #ifdef OLD_METHOD
 							NormaliseVector( &TempVector );
-							Cos = (float) ( 1.0F - fabs( DotProduct( &TempVector, Dir ) ) );
+							Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
 							ShipRadius = ( SHIP_RADIUS + ( WeaponRadius * Cos ) );
 #else
 							Cos = DotProduct( &TempVector, Dir );
@@ -6873,8 +6873,8 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 							TempVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
 							TempVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
 							NormaliseVector( &TempVector );
-							Cos = (float) ( 1.0F - fabs( DotProduct( &TempVector, Dir ) ) );
-							Cos = (float) ( Cos * ( 1.0F - fabs( DotProduct( &TempVector, UpDir ) ) ) );
+							Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
+							Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, UpDir ) ) ) );
 							ShipRadius = ( SHIP_RADIUS + ( WeaponRadius * Cos ) );
 							break;
 					
@@ -7042,7 +7042,7 @@ u_int16_t CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR
 						TempVector.y = ( SecBull->Pos.y - Pos->y );
 						TempVector.z = ( SecBull->Pos.z - Pos->z );
 						NormaliseVector( &TempVector );
-						Cos = (float) ( 1.0F - fabs( DotProduct( &TempVector, Dir ) ) );
+						Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
 						SecBullRadius = ( MINE_RADIUS + ( WeaponRadius * Cos ) );
 						break;
 				
@@ -7051,8 +7051,8 @@ u_int16_t CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR
 						TempVector.y = ( SecBull->Pos.y - Pos->y );
 						TempVector.z = ( SecBull->Pos.z - Pos->z );
 						NormaliseVector( &TempVector );
-						Cos = (float) ( 1.0F - fabs( DotProduct( &TempVector, Dir ) ) );
-						Cos = (float) ( Cos * ( 1.0F - fabs( DotProduct( &TempVector, UpDir ) ) ) );
+						Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
+						Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, UpDir ) ) ) );
 						SecBullRadius = ( MINE_RADIUS + ( WeaponRadius * Cos ) );
 						break;
 				
@@ -7250,8 +7250,8 @@ void FirePrimaryWeapons( u_int8_t Ship )
 			
 			if( Model != (u_int16_t) -1 )
 			{
-				Rotation.x = (float) sin( D2R( Models[ Model ].AxisRot ) );
-				Rotation.y = (float) cos( D2R( Models[ Model ].AxisRot ) );
+				Rotation.x = (float) sinf( D2R( Models[ Model ].AxisRot ) );
+				Rotation.y = (float) cosf( D2R( Models[ Model ].AxisRot ) );
 				Rotation.z = 0.0F;
 				ApplyMatrix( &Ships[ Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 				ApplyMatrix( &Ships[ Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
@@ -8541,7 +8541,7 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 				TempVector2.z = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 				NormaliseVector( &TempVector2 );
 			
-				Angle = (float) acos( DotProduct( &TempVector, &TempVector2 ) );
+				Angle = (float) acosf( DotProduct( &TempVector, &TempVector2 ) );
 				if( Angle ) Time = D2R( ( 2.0F / Angle ) );
 				else Time = 1.0F;
 				if( Time > 1.0F ) Time = 1.0F;

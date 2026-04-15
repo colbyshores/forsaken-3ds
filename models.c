@@ -1941,8 +1941,8 @@ void ProcessModels( void )
 						if( ( Ships[ Models[ i ].Ship ].Object.Flags & SHIP_Stealth ) ) Models[ i ].ModelNum = MODEL_OrbitPulsar_Light;
 						else Models[ i ].ModelNum = MODEL_OrbitPulsar;
 
-						Rotation.x = (float) sin( D2R( Models[ i ].AxisRot ) );
-						Rotation.y = (float) cos( D2R( Models[ i ].AxisRot ) );
+						Rotation.x = (float) sinf( D2R( Models[ i ].AxisRot ) );
+						Rotation.y = (float) cosf( D2R( Models[ i ].AxisRot ) );
 						Rotation.z = 0.0F;
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
@@ -5936,7 +5936,7 @@ void RefreshModel( u_int16_t model )
 				distance = POINT_TO_PLANE( &point, &Models[ model ].IntersectionPlane );
 				distance = 0.0F - distance;
 				
-				//distance = (float)fabs((double)distance);
+				//distance = (float)fabsf((double)distance);
 				if ( ( distance > 0.0F ) &&  ( distance < SCAN_WINDOW_WIDTH ) )
 				{
 					//refresh_value = 1.0F;
@@ -6021,7 +6021,7 @@ u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_
 	switch( OwnerType )
 	{
 		case OWNER_SHIP:
-			fracspeed = (float)fabs( (double) ( Speed / MAXMOVESPEED ) );
+			fracspeed = (float)fabsf( (double) ( Speed / MAXMOVESPEED ) );
 			newfreq = fracspeed * ( SHIP_MAX_FREQ - SHIP_MIN_FREQ ) + SHIP_MIN_FREQ;
 			//DebugPrintf("using frequency of %f\n", newfreq );
 			ModifyLoopingSfx( SoundFX_ID, newfreq, 0.0F );

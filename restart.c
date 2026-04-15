@@ -418,7 +418,7 @@ bool LoadRestartPoints( void )
 				if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, &Pos, Group, &RayVector, &Int_Point2, &Int_Group2,
 										&Int_Normal2, &TempVector, false, NULL ) )
 				{
-					Msg( "LoadRestartPoijnts() Restart point didn't collide with floor()\n" );
+					Msg( "LoadRestartPoijnts() Restart point didn't collide with floorf()\n" );
 					return( false );
 				}
 
