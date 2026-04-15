@@ -740,9 +740,8 @@ void set_normal_states( void )
 {
 	reset_zbuff();
 	reset_trans();
-#ifdef __3DS__
-	extern bool _3ds_additive_blend_active;
-	_3ds_additive_blend_active = false;
+#if GL == 1
+	{ extern bool _additive_blend_active; _additive_blend_active = false; }
 #endif
 }
 
@@ -756,9 +755,8 @@ void set_alpha_states( void )
 	disable_zbuff_write();
 	glEnable(GL_BLEND);
 	set_trans_state_9();
-#ifdef __3DS__
-	extern bool _3ds_additive_blend_active;
-	_3ds_additive_blend_active = true;
+#if GL == 1
+	{ extern bool _additive_blend_active; _additive_blend_active = true; }
 #endif
 }
 
