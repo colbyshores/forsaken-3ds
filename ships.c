@@ -814,7 +814,7 @@ bool ProcessShips()
 						ShipObjPnt->Flags |= SHIP_Light;
 
 						XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
-						XLights[ShipObjPnt->light].CosArc = (float)cosf(D2R(35));
+						XLights[ShipObjPnt->light].CosArc = (float)fast_cosf(D2R(35));
 						
 						ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
 						XLights[ShipObjPnt->light].r = 192.0F;
@@ -1458,7 +1458,7 @@ bool ProcessShips()
 			if( ShipObjPnt->light != (u_int16_t) -1 )
 			{
 				XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
-				XLights[ShipObjPnt->light].CosArc = (float)cosf(D2R(35));
+				XLights[ShipObjPnt->light].CosArc = (float)fast_cosf(D2R(35));
 				
 				ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
 				XLights[ShipObjPnt->light].r = 255.0F;
@@ -1681,8 +1681,8 @@ void BobShip( u_int16_t ship, VECTOR *bob )
 	move_len = (float) sqrtf( move.x * move.x + move.y * move.y + move.z * move.z );
 	if ( move_len < MOVE_TOLERANCE && !DebugInfo )
 	{
-		move.x = BOB_XSIZE * (float) sinf( Ships[ ship ].Object.BobCount * BOB_XFREQ );
-		move.y = BOB_YSIZE * (float) sinf( Ships[ ship ].Object.BobCount * BOB_YFREQ );
+		move.x = BOB_XSIZE * (float) fast_sinf( Ships[ ship ].Object.BobCount * BOB_XFREQ );
+		move.y = BOB_YSIZE * (float) fast_sinf( Ships[ ship ].Object.BobCount * BOB_YFREQ );
 		move.z = 0.0F;
 		ApplyMatrix( &Ships[ ship ].Object.Mat, &move, bob );
 		Ships[ ship ].Object.BobCount += framelag;

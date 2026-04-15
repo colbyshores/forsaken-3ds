@@ -361,10 +361,10 @@ void QuatFromVector( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Finally build TARGET QUATERNION
 ===================================================================*/
-	q->x = (float) ( sinf( angle ) * Av.x );
-	q->y = (float) ( sinf( angle ) * Av.y );
+	q->x = (float) ( fast_sinf( angle ) * Av.x );
+	q->y = (float) ( fast_sinf( angle ) * Av.y );
 	q->z = 0.0F;
-	q->w = (float) cosf( angle );
+	q->w = (float) fast_cosf( angle );
 
 	QuatNormalise( q );
 }
@@ -401,10 +401,10 @@ void QuatFromVector2( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Finally build TARGET QUATERNION
 ===================================================================*/
-	q->x = (float) ( sinf( angle ) * Av.x );
-	q->y = (float) ( sinf( angle ) * Av.y );
+	q->x = (float) ( fast_sinf( angle ) * Av.x );
+	q->y = (float) ( fast_sinf( angle ) * Av.y );
 	q->z = 0.0F;
-	q->w = (float) cosf( angle );
+	q->w = (float) fast_cosf( angle );
 
 	QuatNormalise( q );
 }
@@ -451,9 +451,9 @@ void Quaternion_Slerp( float alpha, QUAT * a, QUAT * b, QUAT * q, int spin )
 	{				/* normal case */
  		theta	= ( (float) acosf( cos_t ) );
  		phi		= ( theta + ( spin * M_PI ) );
- 		sin_t	= ( (float) sinf( theta ) );
- 		beta	= ( (float) sinf( theta - ( alpha * phi ) ) / sin_t );
- 		alpha	= ( (float) sinf( alpha * phi ) / sin_t );
+ 		sin_t	= ( (float) fast_sinf( theta ) );
+ 		beta	= ( (float) fast_sinf( theta - ( alpha * phi ) ) / sin_t );
+ 		alpha	= ( (float) fast_sinf( alpha * phi ) / sin_t );
  	}
 
 	if( bflip ) alpha = -alpha;
@@ -514,7 +514,7 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 
 	CrossProduct( &u1 , &u2, &axis );
 /*
-** | u1 X u2 | = |u1||u2|sinf(theta)
+** | u1 X u2 | = |u1||u2|fast_sinf(theta)
 **
 ** Since u1 and u2 are normalized, 
 **
@@ -536,7 +536,7 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 	theta = (float) asinf( crossProductMagnitude );
 	theta_complement = PI - theta;
 /*
-** If cosf(theta) < 0, use complement of theta as rotation angle.
+** If fast_cosf(theta) < 0, use complement of theta as rotation angle.
 */
 	if( DotProduct( &u1 , &u2 ) < 0.0F )
 	{
@@ -608,8 +608,8 @@ QuatMake( QUAT * destQuat, float x, float y, float z, float angle)
 	y /= length;
 	z /= length;
 
-	cosA = (float) cosf(angle * 0.5F);
-	sinA = (float) sinf(angle * 0.5F);
+	cosA = (float) fast_cosf(angle * 0.5F);
+	sinA = (float) fast_sinf(angle * 0.5F);
 
 	destQuat->w = cosA;
 	destQuat->x = sinA * x;

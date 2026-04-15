@@ -1218,8 +1218,8 @@ static int16_t	OnceOnlyFlag = 0;
 
 							for( Count = 0; Count < 8; Count++ )
 							{
-								Dir.x = (float) sinf( D2R( ( 360.0F / 8.0F ) * Count ) );
-								Dir.y = (float) cosf( D2R( ( 360.0F / 8.0F ) * Count ) );
+								Dir.x = (float) fast_sinf( D2R( ( 360.0F / 8.0F ) * Count ) );
+								Dir.y = (float) fast_cosf( D2R( ( 360.0F / 8.0F ) * Count ) );
 								Dir.z = 0.0F;
 								UpVector.x = 0.0F;
 								UpVector.y = 0.0F;
@@ -1731,7 +1731,7 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 						NormaliseVector( &XLights[ light ].Dir );
 						XLights[ light ].Type = SPOT_LIGHT;
 						XLights[ light ].Pos = SecBulls[i].Pos;
-						XLights[ light ].CosArc = (float)cosf(D2R(30));
+						XLights[ light ].CosArc = (float)fast_cosf(D2R(30));
 						XLights[ light ].Size = ( 4096.0F * GLOBAL_SCALE ); //PickupAttribs[ Type ].Lightsize;
 						XLights[ light ].SizeCount = 0.0F;
 						XLights[ light ].r = SecondaryWeaponAttribs[ Weapon ].r;
@@ -2976,8 +2976,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
    		case MIS_SPIRALING:												/* Spiraling missile */
 			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) - ( floorf( ( SecBulls[i].LifeCount * 6.0F ) / 360.0F ) * 360.0F ) ) );
 
-			Rotation.x = (float) sinf( Angle );
-			Rotation.y = (float) cosf( Angle );
+			Rotation.x = (float) fast_sinf( Angle );
+			Rotation.y = (float) fast_cosf( Angle );
 			Rotation.z = 0.0F;
 			ApplyMatrix( &SecBulls[i].StartMat, &Rotation, &UpVector );	// Calc Up Vector
 
@@ -2987,8 +2987,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) - ( floorf( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) / 360.0F ) * 360.0F ) );
 
-			Rotation.x = (float) sinf( Angle );
-			Rotation.y = (float) cosf( Angle );
+			Rotation.x = (float) fast_sinf( Angle );
+			Rotation.y = (float) fast_cosf( Angle );
 			Rotation.z = 0.0F;
 			ApplyMatrix( &SecBulls[i].StartMat, &Rotation, &UpVector );	// Calc Up Vector
 
@@ -8272,9 +8272,9 @@ void CreateSmokeRing( VECTOR * Pos, VECTOR * DirVector, VECTOR * UpVector, u_int
 
 	for( Count = 0; Count < 20; Count++ )
 	{
-		TempDir.x = (float) sinf( D2R( Count * 18 ) );
+		TempDir.x = (float) fast_sinf( D2R( Count * 18 ) );
 		TempDir.y = 0.0F;
-		TempDir.z = (float) cosf( D2R( Count * 18 ) );
+		TempDir.z = (float) fast_cosf( D2R( Count * 18 ) );
 
 		ApplyMatrix( &TempMat, &TempDir, &TempDir );
 
@@ -8340,9 +8340,9 @@ void CreateSplash( VECTOR * Pos, VECTOR * DirVector, u_int16_t Group )
 
 	for( Count = 0; Count < 20; Count++ )
 	{
-		TempDir.x = (float) cosf( D2R( Count * 18 ) );
+		TempDir.x = (float) fast_cosf( D2R( Count * 18 ) );
 		TempDir.y = 0.0F;
-		TempDir.z = (float) sinf( D2R( Count * 18 ) );
+		TempDir.z = (float) fast_sinf( D2R( Count * 18 ) );
 
 		Scalar = 1.5F + ( DotProduct( &TempDir, &RevDir ) * -( ( ( (float) Random_Range( 10000 ) ) / 2000.0F ) ) + 1.5F );
 		TempDir.y = 1.0F;

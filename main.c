@@ -470,6 +470,8 @@ static bool AppInit( char * lpCmdLine )
 		return false;
 #endif
 
+	trig_table_init();
+
 	// parse chdir from command line first
 	if(!parse_chdir(lpCmdLine))
 		return false;

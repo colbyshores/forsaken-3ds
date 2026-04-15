@@ -1160,8 +1160,8 @@ static int16_t	OnceOnlyFlag = 0;
 							Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
 							Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
 		
-							Rotation.x = (float) sinf( D2R( Models[ Model ].AxisRot ) );
-							Rotation.y = (float) cosf( D2R( Models[ Model ].AxisRot ) );
+							Rotation.x = (float) fast_sinf( D2R( Models[ Model ].AxisRot ) );
+							Rotation.y = (float) fast_cosf( D2R( Models[ Model ].AxisRot ) );
 							Rotation.z = 0.0F;
 							ApplyMatrix( &Ships[ WhoIAm ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 							ApplyMatrix( &Ships[ WhoIAm ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
@@ -7250,8 +7250,8 @@ void FirePrimaryWeapons( u_int8_t Ship )
 			
 			if( Model != (u_int16_t) -1 )
 			{
-				Rotation.x = (float) sinf( D2R( Models[ Model ].AxisRot ) );
-				Rotation.y = (float) cosf( D2R( Models[ Model ].AxisRot ) );
+				Rotation.x = (float) fast_sinf( D2R( Models[ Model ].AxisRot ) );
+				Rotation.y = (float) fast_cosf( D2R( Models[ Model ].AxisRot ) );
 				Rotation.z = 0.0F;
 				ApplyMatrix( &Ships[ Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 				ApplyMatrix( &Ships[ Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector

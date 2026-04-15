@@ -24,10 +24,16 @@ typedef DWORD COLOR; // bgra
 #endif
 #define	D2R(x)				( ( x ) * ( 1.0F / 57.2957F) )		/* Nick Pelling changed */
 #define	R2D(x)				( ( x ) * 57.2957F )
-#define	SINR(x)				sinf( x )
-#define	COSR(x)				cosf( x )
-#define	SIND(x)				( sinf( D2R( x ) ) )
-#define	COSD(x)				( cosf( D2R( x ) ) )
+
+/* Fast sin/cos via 4096-entry LUT with linear interpolation */
+extern void  trig_table_init(void);
+extern float fast_sinf(float rad);
+extern float fast_cosf(float rad);
+
+#define	SINR(x)				fast_sinf( x )
+#define	COSR(x)				fast_cosf( x )
+#define	SIND(x)				fast_sinf( D2R( x ) )
+#define	COSD(x)				fast_cosf( D2R( x ) )
 #define ATAND(y, x)			R2D( atan2f(y, x) )
 #define FMOD( NUM, DIV )	( (NUM) - (DIV) * floorf( (NUM) / (DIV) ) )
 #define FDIV( NUM, DIV )	( (DIV) * floorf( (NUM) / (DIV) ) )

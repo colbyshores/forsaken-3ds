@@ -444,8 +444,8 @@ clear:					mov		eax, [esi]
 						//					distance = (float) sqrtf( (x*x) + (y*y) + (z*z) );
 						col = lpLVERTEX2->color;
 						col &= 0xffff;
-						//					tal = 128.0F + 127.0F * (float) sinf( (distance+cral) * (PI / 180.0F ) );
-						b = (int)  ( ( sinf( D2R( x + cral ) ) + sinf( D2R( y + cral ) ) + sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+						//					tal = 128.0F + 127.0F * (float) fast_sinf( (distance+cral) * (PI / 180.0F ) );
+						b = (int)  ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 						b+= intWhiteOut;
 						if( b > 255 )
 							b = 255;
@@ -476,7 +476,7 @@ clear:					mov		eax, [esi]
 					r >>=2;
 					g >>=2;
 					b >>=2;
-					intensity = (float) ( ( sinf( D2R( x + cral ) ) + sinf( D2R( y + cral ) ) + sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+					intensity = (float) ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 					r += (int) (GroupWaterIntensity_Red[group] * intensity);
 					if( r > 255 )
 						r = 255;
@@ -512,7 +512,7 @@ clear:					mov		eax, [esi]
 						r >>=2;
 						g >>=2;
 						b >>=2;
-						intensity = (float) ( ( sinf( D2R( x + cral ) ) + sinf( D2R( y + cral ) ) + sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+						intensity = (float) ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 						r += (int) (GroupWaterIntensity_Red[group] * intensity);
 						if( r > 255 )
 							r = 255;

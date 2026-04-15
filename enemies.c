@@ -3832,8 +3832,8 @@ void ObjectBob( OBJECT * Object, VECTOR *bob )
 	move_len = (float) sqrtf( move.x * move.x + move.y * move.y + move.z * move.z );
 	if ( move_len < MOVE_TOLERANCE )
 	{
-		move.x = BOB_XSIZE * (float) sinf( Object->BobCount * BOB_XFREQ );
-		move.y = BOB_YSIZE * (float) sinf( Object->BobCount * BOB_YFREQ );
+		move.x = BOB_XSIZE * (float) fast_sinf( Object->BobCount * BOB_XFREQ );
+		move.y = BOB_YSIZE * (float) fast_sinf( Object->BobCount * BOB_YFREQ );
 		move.z = 0.0F;
 		ApplyMatrix( &Object->Mat, &move, bob );
 		Object->BobCount += framelag;

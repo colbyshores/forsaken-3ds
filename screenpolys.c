@@ -1771,8 +1771,8 @@ void ShowScreenMultiples( void )
 
 		if( Model != (u_int16_t) -1 )
 		{
-			Rotation.x = (float) sinf( D2R( Models[ Model ].AxisRot + 180.0F ) );
-			Rotation.y = (float) cosf( D2R( Models[ Model ].AxisRot + 180.0F ) );
+			Rotation.x = (float) fast_sinf( D2R( Models[ Model ].AxisRot + 180.0F ) );
+			Rotation.y = (float) fast_cosf( D2R( Models[ Model ].AxisRot + 180.0F ) );
 
 			i = FindFreeScrPoly();
 	

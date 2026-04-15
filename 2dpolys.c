@@ -327,8 +327,8 @@ void FmPolyProcess( void )
 		   		FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
 		   		if( FmPolys[ i ].Rot > 360.0F ) FmPolys[ i ].Rot -= 360.0F;
 		   		else if( FmPolys[ i ].Rot < 0.0F ) FmPolys[ i ].Rot += 360.0F;
-				Rotation.x = (float) sinf( D2R( FmPolys[ i ].Rot ) );
-				Rotation.y = (float) cosf( D2R( FmPolys[ i ].Rot ) );
+				Rotation.x = (float) fast_sinf( D2R( FmPolys[ i ].Rot ) );
+				Rotation.y = (float) fast_cosf( D2R( FmPolys[ i ].Rot ) );
 				Rotation.z = 0.0F;
 				ApplyMatrix( &FmPolys[ i ].Mat, &Rotation, &FmPolys[ i ].UpVector );
 		   		break;
@@ -1036,14 +1036,14 @@ void FmPolyProcess( void )
 				OldPos = FmPolys[i].Pos;
 
 				Speed = ( FmPolys[i].UpSpeed * framelag );
-	   			FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed ) + ( (float) sinf( FmPolys[i].LifeCount * ( 0.10F ) ) * framelag );
-	   			FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed ) + ( (float) sinf( FmPolys[i].LifeCount * ( 0.05F ) ) * framelag );
-	   			FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed ) + ( (float) sinf( FmPolys[i].LifeCount * ( 0.15F ) ) * framelag );
+	   			FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.10F ) ) * framelag );
+	   			FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.05F ) ) * framelag );
+	   			FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.15F ) ) * framelag );
 
 				Speed = ( FmPolys[i].Speed * framelag );
-	   			FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed ) + ( (float) sinf( FmPolys[i].LifeCount * ( 0.10F ) ) * framelag );
-	   			FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed ) + ( (float) sinf( FmPolys[i].LifeCount * ( 0.05F ) ) * framelag );
-	   			FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed ) + ( (float) sinf( FmPolys[i].LifeCount * ( 0.15F ) ) * framelag );
+	   			FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.10F ) ) * framelag );
+	   			FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.05F ) ) * framelag );
+	   			FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.15F ) ) * framelag );
 
 	   			if( FmPolys[i].Speed > 0.0F )
 	   			{
@@ -1183,14 +1183,14 @@ void FmPolyProcess( void )
 		   		FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
 		   		FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
 
-				FmPolys[i].ysize = (float) ( ( sinf( FmPolys[ i ].Rot ) * 4.0F ) );
+				FmPolys[i].ysize = (float) ( ( fast_sinf( FmPolys[ i ].Rot ) * 4.0F ) );
 				break;
 
 			case FM_BLUEPHOTON:
 		   		FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
 		   		FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
 
-				FmPolys[i].ysize = (float) ( ( sinf( FmPolys[ i ].Rot ) * 6.0F ) );
+				FmPolys[i].ysize = (float) ( ( fast_sinf( FmPolys[ i ].Rot ) * 6.0F ) );
 				break;
 
 		   	case FM_SPOTFX_BURNING:
@@ -1750,8 +1750,8 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 						}
 						else
 						{
-							YVector.x = (float) sinf( D2R( FmPolys[ i ].Rot ) ); /* Calc Up Vector */
-							YVector.y = (float) cosf( D2R( FmPolys[ i ].Rot ) );
+							YVector.x = (float) fast_sinf( D2R( FmPolys[ i ].Rot ) ); /* Calc Up Vector */
+							YVector.y = (float) fast_cosf( D2R( FmPolys[ i ].Rot ) );
 							YVector.z = 0.0F;
 							ZVector = Forward;
 
@@ -2128,8 +2128,8 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 						}
 						else
 						{
-							YVector.x = (float) sinf( D2R( FmPolys[ i ].Rot ) ); /* Calc Up Vector */
-							YVector.y = (float) cosf( D2R( FmPolys[ i ].Rot ) );
+							YVector.x = (float) fast_sinf( D2R( FmPolys[ i ].Rot ) ); /* Calc Up Vector */
+							YVector.y = (float) fast_cosf( D2R( FmPolys[ i ].Rot ) );
 							YVector.z = 0.0F;
 							ZVector = Forward;
 

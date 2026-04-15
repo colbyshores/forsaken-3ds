@@ -8,6 +8,44 @@
 #endif
 
 /*===================================================================
+	Sin/Cos lookup table — 4096 entries covering [0, 2*PI)
+	Linear interpolation gives < 0.0002 max error vs sinf().
+===================================================================*/
+
+#define TRIG_TABLE_SIZE  4096
+#define TRIG_TABLE_MASK  (TRIG_TABLE_SIZE - 1)
+#define TRIG_SCALE       (TRIG_TABLE_SIZE / (2.0f * 3.14159265358979323846f))
+
+static float _sin_table[TRIG_TABLE_SIZE + 1]; /* +1 for interpolation at boundary */
+
+void trig_table_init(void)
+{
+	int i;
+	for (i = 0; i <= TRIG_TABLE_SIZE; i++)
+		_sin_table[i] = sinf((float)i * (2.0f * 3.14159265358979323846f / TRIG_TABLE_SIZE));
+}
+
+float fast_sinf(float rad)
+{
+	float idx = rad * TRIG_SCALE;
+	int i;
+	float f;
+
+	/* Normalize to [0, TRIG_TABLE_SIZE) */
+	idx = idx - floorf(idx / TRIG_TABLE_SIZE) * TRIG_TABLE_SIZE;
+	i = (int)idx;
+	f = idx - i;
+	i &= TRIG_TABLE_MASK;
+
+	return _sin_table[i] + (_sin_table[i + 1] - _sin_table[i]) * f;
+}
+
+float fast_cosf(float rad)
+{
+	return fast_sinf(rad + 1.5707963267948966f); /* rad + PI/2 */
+}
+
+/*===================================================================
 	Globals
 ===================================================================*/
 u_int16_t	Seed1 = 0x1234;
@@ -772,8 +810,8 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 		rotx._44 = 1.0F;
 	}
 
-	c = (float) cosf( angle );
-	s = (float) sinf( angle );
+	c = (float) fast_cosf( angle );
+	s = (float) fast_sinf( angle );
 
    	rotangle._11 = 1.0F;
    	rotangle._12 = 0.0F;
