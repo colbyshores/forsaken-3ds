@@ -2,13 +2,17 @@
 # Makefile.3ds - ForsakenX 3DS port using devkitPro
 #
 # Usage:
-#   make -f Makefile.3ds           # release build
+#   make -f Makefile.3ds                    # release build (picaGL)
+#   make -f Makefile.3ds RENDERER=citro3d   # native citro3d renderer
 #   make -f Makefile.3ds DEBUG=1   # debug build (__3DS_DEBUG__ defined)
 #                                   # enables: autoboot to Volcano level
 #
 
 # Debug flag — set to 1 to enable __3DS_DEBUG__ features
 DEBUG ?= 0
+
+# Renderer: picagl (default) or citro3d
+RENDERER ?= picagl
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -81,11 +85,19 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-Wno-implicit-int -Wno-int-conversion \
 	-ffunction-sections -fdata-sections -fcommon \
 	-std=gnu99 \
-	-D__3DS__ -DARM -DGL=1 \
+	-D__3DS__ -DARM \
 	-DBSP \
 	-DTEXTURE_PNG \
 	-DSOUND_SUPPORT \
 	-DLUA_USE_APICHECK
+
+ifeq ($(RENDERER),citro3d)
+CFLAGS += -DRENDERER_C3D
+EXCLUDE_SRC += render_gl1.c render_gl_shared.c
+else
+CFLAGS += -DGL=1
+EXCLUDE_SRC += render_c3d.c
+endif
 
 ifeq ($(DEBUG),1)
 CFLAGS += -D__3DS_DEBUG__
@@ -106,7 +118,12 @@ LDFLAGS := $(ARCH) -specs=3dsx.specs \
 	-L$(DEVKITPRO)/libctru/lib
 
 # Link order: picaGL before citro3d
-LIBS := -lpicaGL -lcitro3d -lctru -lpng -lz -llua5.1 -lm
+ifeq ($(RENDERER),citro3d)
+LIBS := -lcitro3d
+else
+LIBS := -lpicaGL -lcitro3d
+endif
+LIBS += -lctru -lpng -lz -llua5.1 -lm
 
 #---------------------------------------------------------------------------------
 # SMDH metadata
