@@ -67,8 +67,11 @@ MATRIX proj_matrix;
 MATRIX view_matrix;
 MATRIX world_matrix;
 
-/* Texture handle — stores citro3d texture ID (stub for now) */
-typedef struct { u32 id; } texture_t;
+/* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*) */
+typedef struct {
+	C3D_Tex tex;
+	bool    initialized;
+} texture_t;
 
 /* bSquareOnly — shared global, always true on 3DS */
 bool bSquareOnly = true;
@@ -550,8 +553,44 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject)
 void release_texture(LPTEXTURE texture)
 {
 	if (!texture) return;
-	/* TODO Phase 2: C3D_TexDelete */
-	free(texture);
+	texture_t *texdata = (texture_t*)texture;
+	if (texdata->initialized)
+		C3D_TexDelete(&texdata->tex);
+	free(texdata);
+}
+
+/*===================================================================
+	Morton tiling for PICA200 textures
+	PICA200 requires textures in 8x8-block Morton/Z-order layout.
+	Input: linear RGBA8 (R,G,B,A bytes). Output: tiled ABGR8 (A,B,G,R).
+===================================================================*/
+
+static inline u32 _mortonInterleave(u32 x, u32 y)
+{
+	static const u32 xlut[] = {0x00,0x01,0x04,0x05,0x10,0x11,0x14,0x15};
+	static const u32 ylut[] = {0x00,0x02,0x08,0x0a,0x20,0x22,0x28,0x2a};
+	return xlut[x & 7] + ylut[y & 7];
+}
+
+static void tile_rgba8(const u_int8_t *src, u_int8_t *dst, int w, int h)
+{
+	int x, y;
+	for (y = 0; y < h; y++)
+	{
+		int out_y = h - 1 - y;  /* flip Y for PICA200 */
+		u32 coarse_y = out_y & ~7;
+		for (x = 0; x < w; x++)
+		{
+			u32 morton = _mortonInterleave(x, out_y);
+			u32 offset = (morton + coarse_y * w + (x & ~7) * 8) * 4;
+			int si = (y * w + x) * 4;
+			/* RGBA → ABGR byte order for GPU_RGBA8 */
+			dst[offset + 0] = src[si + 3]; /* A */
+			dst[offset + 1] = src[si + 2]; /* B */
+			dst[offset + 2] = src[si + 1]; /* G */
+			dst[offset + 3] = src[si + 0]; /* R */
+		}
+	}
 }
 
 static bool create_texture(LPTEXTURE *t, const char *path,
@@ -615,12 +654,48 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 			}
 	}
 
-	/* TODO Phase 2: create C3D_Tex, tile with C3D_TexInitVRAM, upload.
-	 * For now, allocate a stub texture_t so the pointer is non-NULL. */
-	if (!*t)
 	{
-		texture_t *texdata = malloc(sizeof(texture_t));
-		texdata->id = 0;
+		texture_t *texdata;
+		u_int8_t *tiled;
+		bool is_new = (*t == NULL);
+
+		if (is_new)
+		{
+			texdata = malloc(sizeof(texture_t));
+			if (!texdata) { destroy_image(&image); return false; }
+			memset(texdata, 0, sizeof(texture_t));
+		}
+		else
+		{
+			texdata = (texture_t*)*t;
+			if (texdata->initialized)
+			{
+				C3D_TexDelete(&texdata->tex);
+				texdata->initialized = false;
+			}
+		}
+
+		if (!C3D_TexInit(&texdata->tex, image.w, image.h, GPU_RGBA8))
+		{
+			DebugPrintf("C3D_TexInit failed: %dx%d\n", image.w, image.h);
+			if (is_new) free(texdata);
+			destroy_image(&image);
+			return false;
+		}
+
+		/* Morton-tile RGBA → ABGR into the texture's linear buffer */
+		tiled = linearAlloc(image.w * image.h * 4);
+		if (tiled)
+		{
+			tile_rgba8((u_int8_t*)image.data, tiled, image.w, image.h);
+			C3D_TexUpload(&texdata->tex, tiled);
+			linearFree(tiled);
+		}
+
+		C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
+		C3D_TexSetWrap(&texdata->tex, GPU_REPEAT, GPU_REPEAT);
+
+		texdata->initialized = true;
 		*t = (LPTEXTURE)texdata;
 	}
 
@@ -728,7 +803,35 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 		}
 
-		/* TODO Phase 2: bind tg->texture as C3D_Tex */
+		/* Bind texture and set up texture combiner */
+		{
+			C3D_TexEnv *env = C3D_GetTexEnv(0);
+			C3D_TexEnvInit(env);
+
+			if (tg->texture)
+			{
+				texture_t *texdata = (texture_t*)tg->texture;
+				if (texdata->initialized)
+				{
+					C3D_TexBind(0, &texdata->tex);
+					/* Combine: texture color × vertex color */
+					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+				}
+				else
+				{
+					/* No valid texture — use vertex color only */
+					C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+					C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+				}
+			}
+			else
+			{
+				/* No texture — vertex color only */
+				C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+				C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+			}
+		}
 
 		/* Draw indexed triangles */
 		if (renderObject->lpIndexBuffer && tg->numTriangles > 0)
