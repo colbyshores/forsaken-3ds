@@ -567,20 +567,16 @@ bool FSSetViewPort(render_viewport_t *view)
 {
 	s_viewport = *view;
 
-	/* Map game viewport to PICA200 portrait framebuffer, matching
-	 * picaGL's glViewport → _picaViewport coordinate chain. */
+	/* Map game viewport to PICA200 portrait framebuffer */
 	{
 		int bottom = (int)render_info.ThisMode.h - (int)(view->Y + view->Height);
 		int gl_x = (int)view->X;
-		int pica_x = bottom;
+		int pica_x = bottom < 0 ? 0 : bottom;
 		int pica_y = (400 - (int)view->Width) - gl_x;
-		int pica_w = (int)view->Height;
-		int pica_h = (int)view->Width;
-
-		if (pica_x < 0) pica_x = 0;
 		if (pica_y < 0) pica_y = 0;
 
-		C3D_SetViewport((u32)pica_x, (u32)pica_y, (u32)pica_w, (u32)pica_h);
+		C3D_SetViewport((u32)pica_x, (u32)pica_y,
+			(u32)view->Height, (u32)view->Width);
 	}
 
 	return true;
@@ -954,6 +950,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
 		return false;
+
 
 	if (_dc < 5) {
 		char b[128];
