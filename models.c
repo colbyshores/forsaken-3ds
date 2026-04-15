@@ -1941,8 +1941,8 @@ void ProcessModels( void )
 						if( ( Ships[ Models[ i ].Ship ].Object.Flags & SHIP_Stealth ) ) Models[ i ].ModelNum = MODEL_OrbitPulsar_Light;
 						else Models[ i ].ModelNum = MODEL_OrbitPulsar;
 
-						Rotation.x = (float) sinf( D2R( Models[ i ].AxisRot ) );
-						Rotation.y = (float) cosf( D2R( Models[ i ].AxisRot ) );
+						Rotation.x = (float) fast_sinf( D2R( Models[ i ].AxisRot ) );
+						Rotation.y = (float) fast_cosf( D2R( Models[ i ].AxisRot ) );
 						Rotation.z = 0.0F;
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector

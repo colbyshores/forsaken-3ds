@@ -127,9 +127,9 @@ void do_water_effect( VECTOR * pos, COLOR * color )
 	seconds = SDL_GetTicks() / 1000.0f;
 	intensity = (float) (
 		( 
-			sinf( D2R( x + seconds * speed ) ) +  // cral = seconds * speed
-			sinf( D2R( y + seconds * speed ) ) + 
-			sinf( D2R( z + seconds * speed ) ) 
+			fast_sinf( D2R( x + seconds * speed ) ) +  // cral = seconds * speed
+			fast_sinf( D2R( y + seconds * speed ) ) + 
+			fast_sinf( D2R( z + seconds * speed ) ) 
 		) * 127.0F * 0.3333333F + 128.0F 
 	);
 	r += render_lighting_env_water_red   * intensity;
@@ -154,9 +154,9 @@ void do_whiteout_effect( VECTOR * pos, COLOR * color )
 	seconds = SDL_GetTicks() / 1000.0f;
 	intensity = (int) (
 		( 
-			sinf( D2R( x + seconds * speed ) ) +  // cral = seconds * speed
-			sinf( D2R( y + seconds * speed ) ) + 
-			sinf( D2R( z + seconds * speed ) ) 
+			fast_sinf( D2R( x + seconds * speed ) ) +  // cral = seconds * speed
+			fast_sinf( D2R( y + seconds * speed ) ) + 
+			fast_sinf( D2R( z + seconds * speed ) ) 
 		) * 127.0F * 0.3333333F + 128.0F 
 	);
 	intensity += render_lighting_env_whiteout;
