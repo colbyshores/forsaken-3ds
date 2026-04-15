@@ -374,6 +374,36 @@ bool FSBeginScene(void)
 		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 		C3D_FrameDrawOn(s_targetLeft);
 		C3D_BindProgram(&s_shaderProgram);
+
+		/* Initialize GPU state for the frame — without this, the first
+		 * draw call operates on uninitialized GPU registers */
+		{
+			C3D_AttrInfo *ai = C3D_GetAttrInfo();
+			AttrInfo_Init(ai);
+			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);  /* v0: pos */
+			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);  /* v1: color */
+			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);  /* v2: texcoord */
+		}
+		{
+			C3D_TexEnv *env = C3D_GetTexEnv(0);
+			C3D_TexEnvInit(env);
+			C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+		}
+		C3D_DepthTest(true, GPU_LESS, GPU_WRITE_ALL);
+		C3D_CullFace(GPU_CULL_FRONT_CCW);
+		C3D_DepthMap(true, 1.0f, 1.0f);
+
+		/* Initialize modelView uniform (register 4) to identity.
+		 * upload_matrices writes combined MVP to register 0 (projection),
+		 * so the shader's modelView * pos must be identity to avoid
+		 * double-transforming the already-combined MVP result. */
+		{
+			C3D_Mtx identity;
+			Mtx_Identity(&identity);
+			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
+		}
+
 		s_inFrame = true;
 	}
 	return true;
