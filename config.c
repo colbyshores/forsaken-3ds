@@ -1230,8 +1230,8 @@ void DefaultJoystickSettings( USERCONFIG *u )
 				for ( k = AXIS_Start; k <= AXIS_End; k++ )
 				{
 					JoystickInfo[ j ].Axis[ k ].action = SHIPACTION_Nothing;
-					JoystickInfo[ j ].Axis[ k ].sensitivity = 0.01F;
-					JoystickInfo[ j ].Axis[ k ].deadzone = 28;
+					JoystickInfo[ j ].Axis[ k ].sensitivity = 0.02F;
+					JoystickInfo[ j ].Axis[ k ].deadzone = 20;
 					JoystickInfo[ j ].Axis[ k ].inverted = false;
 					JoystickInfo[ j ].Axis[ k ].fine = true;
 				}
@@ -1250,8 +1250,8 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			AddButton( j, 1, &u->fire_secondary );
 			AddButton( j, 2, &u->move_forward );
 			AddButton( j, 3, &u->move_backward );
-			AddButton( j, 4, &u->roll_left );
-			AddButton( j, 5, &u->roll_right );
+			AddButton( j, 4, &u->move_left );
+			AddButton( j, 5, &u->move_right );
 			AddButton( j, 7, &u->full_rear_view );
 			AddButton( j, 9, &u->fire_mine );
 #else

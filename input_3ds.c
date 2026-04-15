@@ -5,7 +5,7 @@
  *   Circle Pad  -> pitch / yaw
  *   C-Stick     -> strafe / vertical thrust  (New 3DS only)
  *   D-Pad       -> strafe / vertical thrust  (Old 3DS fallback)
- *   L/R         -> roll
+ *   L/R         -> strafe left/right
  *   A           -> fire primary
  *   B           -> fire secondary
  *   X           -> next weapon
@@ -115,15 +115,18 @@ mouse_state_t* read_mouse(void)
 
 /* ---- main event handler called every frame ---- */
 
-/* Scale factor: circle pad raw range is roughly -155..+155
-   We map to joystick axis range expected by the engine (±32767) */
-#define CPAD_SCALE  (32767.0f / 155.0f)
+/* Scale factor: circle pad raw range is roughly -155..+155.
+ * The engine expects axis values in the range ±100 (NOT ±32767).
+ * The SDL path divides SDL's ±32768 by 327.67 to get ±100.
+ * We do the same: map ±155 to ±100. */
+#define CPAD_SCALE  (100.0f / 155.0f)
 
 bool handle_events(void)
 {
 	circlePosition cpad;
 	circlePosition cstick;
 	u_int32_t kDown, kHeld, kUp;
+	int deadzone;
 
 	/* pump HID */
 	hidScanInput();
@@ -157,13 +160,32 @@ bool handle_events(void)
 	hidCircleRead(&cpad);
 	hidCstickRead(&cstick);
 
-	/* axis 0/1 = circle pad (yaw / pitch) */
-	joy_axis_state[0][0] = (long)(cpad.dx  * CPAD_SCALE);
-	joy_axis_state[0][1] = (long)(-cpad.dy * CPAD_SCALE); /* invert Y */
+	/* Log raw circle pad values to verify range */
+	{
+		static int _cpad_log = 0;
+		if (_cpad_log < 300 && (cpad.dx != 0 || cpad.dy != 0)) {
+			FILE *_f = fopen("sdmc:/forsaken_cpad.log","a");
+			if (_f) { fprintf(_f, "raw dx=%d dy=%d scaled=%.1f,%.1f\n",
+				cpad.dx, cpad.dy, cpad.dx * CPAD_SCALE, cpad.dy * CPAD_SCALE);
+				fclose(_f); }
+			_cpad_log++;
+		}
+	}
 
-	/* axis 2/3 = C-stick (strafe / vertical) */
-	joy_axis_state[0][2] = (long)(cstick.dx * CPAD_SCALE);
-	joy_axis_state[0][3] = (long)(-cstick.dy * CPAD_SCALE);
+	/* axis 0/1 = circle pad (yaw / pitch)
+	 * Apply deadzone matching the SDL path (app_joy_axis in input_sdl.c). */
+	{
+		long ax0 = (long)(cpad.dx  * CPAD_SCALE);
+		long ax1 = (long)(-cpad.dy * CPAD_SCALE);  /* invert Y */
+		long ax2 = (long)(cstick.dx * CPAD_SCALE);
+		long ax3 = (long)(-cstick.dy * CPAD_SCALE);
+
+		deadzone = JoystickInfo[0].Axis[0].deadzone;
+		joy_axis_state[0][0] = (abs(ax0) > deadzone) ? ax0 : 0;
+		joy_axis_state[0][1] = (abs(ax1) > deadzone) ? ax1 : 0;
+		joy_axis_state[0][2] = (abs(ax2) > deadzone) ? ax2 : 0;
+		joy_axis_state[0][3] = (abs(ax3) > deadzone) ? ax3 : 0;
+	}
 
 	/* ---- buttons ---- */
 	/* Map 3DS buttons to joystick button indices */
@@ -171,8 +193,8 @@ bool handle_events(void)
 	joy_button_state[0][1] = (kHeld & KEY_B)     ? true : false; /* fire secondary */
 	joy_button_state[0][2] = (kHeld & KEY_X)     ? true : false; /* next weapon */
 	joy_button_state[0][3] = (kHeld & KEY_Y)     ? true : false; /* prev weapon */
-	joy_button_state[0][4] = (kHeld & KEY_L)     ? true : false; /* roll left */
-	joy_button_state[0][5] = (kHeld & KEY_R)     ? true : false; /* roll right */
+	joy_button_state[0][4] = (kHeld & KEY_L)     ? true : false; /* strafe left */
+	joy_button_state[0][5] = (kHeld & KEY_R)     ? true : false; /* strafe right */
 	joy_button_state[0][6] = (kHeld & KEY_START) ? true : false; /* menu */
 	joy_button_state[0][7] = (kHeld & KEY_SELECT)? true : false; /* rear view */
 	joy_button_state[0][8] = (kHeld & KEY_ZL)    ? true : false; /* nitro */
