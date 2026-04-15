@@ -105,6 +105,9 @@ typedef struct MXALOADHEADER{
 	u_int16_t				num_anim_vertices[MAX_ANIM_FRAMES][MAX_MXAGROUPS][MAXEXECBUFSPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...	
 	MXAVERT		*		frame_pnts[MAX_ANIM_FRAMES][MAX_MXAGROUPS][MAXEXECBUFSPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...	
 #endif
+#ifdef ARM
+	void		*		aligned_verts;	  // aligned copy of all MXAVERT frame data (avoids per-frame memcpy)
+#endif
 	int					AllocateTPage;
 	u_int16_t				NumFirePoints;							// Number of FirePoints
 	PVFIREPOINT	*		FirePoints;								// FirePoints

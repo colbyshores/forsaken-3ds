@@ -498,45 +498,91 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Msg( "Mxaload() calloc(num_frames=%d) failed in %s\n", Mxaloadheader->num_frames, Filename );
 				return false;
 			}
-			
-			for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
-			{
-				for( group=0 ; group<Mxaloadheader->num_groups; group++)
-				{
-					for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
-					{
-						if (!(FSLockVertexBuffer(&Mxaloadheader->Group[ group ].renderObject[execbuf], &lpLVERTEX)))
-						{
-							Msg( "Mxaload : Lock VertexBuffer failed\n" );
-							return false;
-						}
-
-						for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
-						{
-							Uint16Pnt = (u_int16_t *) Buffer;
-							num_anim_vertices = *Uint16Pnt++;
-							Buffer = (char * ) Uint16Pnt;
-							Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup] = num_anim_vertices;
-							Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] = (MXAVERT*) Buffer;
-							lpLVERTEX = 	( LPLVERTEX ) ( lpLVERTEX +( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
-							lpLVERTEX += 8;
-							//lpLVERTEX2 =	( LPOLDLVERTEX ) ( (char*) Mxaloadheader->Group[group].org_vertpnt[execbuf] +( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
-							//lpLVERTEX2 += 8;
-#ifdef FIX_MXA_UV
-							FixUV_MXA( Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup],
-								Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup],
-								lpLVERTEX, lpLVERTEX2 );
+#ifdef ARM
+			Mxaloadheader->aligned_verts = NULL;
 #endif
-							Buffer += ( num_anim_vertices * sizeof( MXAVERT ) );
-						}
 
-						if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
+			{
+#ifdef ARM
+				/* First pass: record frame_pnts into raw buffer and count total
+				 * MXAVERT bytes.  We'll allocate an aligned copy afterwards so
+				 * InterpFrames can use direct pointer access instead of per-vertex
+				 * memcpy on every frame. */
+				char *BufferStart = Buffer;
+#endif
+				for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
+				{
+					for( group=0 ; group<Mxaloadheader->num_groups; group++)
+					{
+						for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
 						{
-							Msg( "Mxaload : Unlock VertexBuffer failed\n" );
-							return false ;
+							if (!(FSLockVertexBuffer(&Mxaloadheader->Group[ group ].renderObject[execbuf], &lpLVERTEX)))
+							{
+								Msg( "Mxaload : Lock VertexBuffer failed\n" );
+								return false;
+							}
+
+							for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+							{
+								Uint16Pnt = (u_int16_t *) Buffer;
+								num_anim_vertices = *Uint16Pnt++;
+								Buffer = (char * ) Uint16Pnt;
+								Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup] = num_anim_vertices;
+								Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] = (MXAVERT*) Buffer;
+								lpLVERTEX = 	( LPLVERTEX ) ( lpLVERTEX +( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
+								lpLVERTEX += 8;
+#ifdef FIX_MXA_UV
+								FixUV_MXA( Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup],
+									Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup],
+									lpLVERTEX, lpLVERTEX2 );
+#endif
+								Buffer += ( num_anim_vertices * sizeof( MXAVERT ) );
+							}
+
+							if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
+							{
+								Msg( "Mxaload : Unlock VertexBuffer failed\n" );
+								return false ;
+							}
 						}
 					}
 				}
+
+#ifdef ARM
+				/* Allocate a single 4-byte-aligned buffer containing all MXAVERT
+				 * data, then update frame_pnts to point into it.  The raw file
+				 * buffer may leave MXAVERT pointers 2-byte aligned (after u_int16_t
+				 * count fields), which causes data aborts on ARM.  By copying once
+				 * at load time we eliminate the per-vertex memcpy that was running
+				 * every frame in InterpFrames. */
+				{
+					size_t total = (size_t)(Buffer - BufferStart);
+					void *aligned = malloc( total );
+					if ( aligned )
+					{
+						memcpy( aligned, BufferStart, total );
+						Mxaloadheader->aligned_verts = aligned;
+
+						/* Fixup all frame_pnts: shift from raw buffer into aligned copy */
+						for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
+						{
+							for( group=0 ; group<Mxaloadheader->num_groups; group++)
+							{
+								for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
+								{
+									for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+									{
+										char *orig = (char*) Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup];
+										ptrdiff_t off = orig - BufferStart;
+										Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] =
+											(MXAVERT*)( (char*)aligned + off );
+									}
+								}
+							}
+						}
+					}
+				}
+#endif
 			}
 		}
 		else
@@ -873,6 +919,12 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 		if ( Mxaloadheader->frame_pnts )
 			free ( Mxaloadheader->frame_pnts );
 		Mxaloadheader->frame_pnts = NULL;
+
+#ifdef ARM
+		if ( Mxaloadheader->aligned_verts )
+			free( Mxaloadheader->aligned_verts );
+		Mxaloadheader->aligned_verts = NULL;
+#endif
 	}
 
 	Mxaloadheader->state = false;
@@ -1029,22 +1081,11 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 
 				for( num_anim_vertices = 0 ; num_anim_vertices <  Mxaloadheader->num_anim_vertices[FromFrame][group][execbuf][texgroup] ; num_anim_vertices++ )
 				{
-#ifdef ARM
-					MXAVERT fromVert, toVert;
-					memcpy(&fromVert, FromVert, sizeof(MXAVERT));
-					memcpy(&toVert, ToVert, sizeof(MXAVERT));		// To have them correctly alligned for ARM...
-#endif
 					if ( FromVert->flags & MXA_ANIM_POS )
 					{
-#ifdef ARM
-						lpLVERTEX->x = fromVert.x + ( toVert.x - fromVert.x ) * Interp;
-						lpLVERTEX->y = fromVert.y + ( toVert.y - fromVert.y ) * Interp;
-						lpLVERTEX->z = fromVert.z + ( toVert.z - fromVert.z ) * Interp;
-#else
 						lpLVERTEX->x = FromVert->x + ( ToVert->x - FromVert->x ) * Interp;
 						lpLVERTEX->y = FromVert->y + ( ToVert->y - FromVert->y ) * Interp;
 						lpLVERTEX->z = FromVert->z + ( ToVert->z - FromVert->z ) * Interp;
-#endif
 					}
 					if ( FromVert->flags & MXA_ANIM_RGB )
 					{
@@ -1062,13 +1103,8 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 					}
 					if ( FromVert->flags & MXA_ANIM_UV )
 					{
-#ifdef ARM
-						lpLVERTEX->tu = fromVert.tu + ( toVert.tu - fromVert.tu ) * Interp;
-						lpLVERTEX->tv = fromVert.tv + ( toVert.tv - fromVert.tv ) * Interp;
-#else
 						lpLVERTEX->tu = FromVert->tu + ( ToVert->tu - FromVert->tu ) * Interp;
 						lpLVERTEX->tv = FromVert->tv + ( ToVert->tv - FromVert->tv ) * Interp;
-#endif
 					}
 
 					lpLVERTEX++;
