@@ -46,6 +46,21 @@ float fast_cosf(float rad)
 }
 
 /*===================================================================
+	Fast inverse square root (Quake III method + one Newton-Raphson
+	iteration).  Max relative error ~0.17% — sufficient for vector
+	normalization where the result is multiplied into geometry.
+===================================================================*/
+float fast_invsqrtf(float x)
+{
+	float xhalf = 0.5f * x;
+	union { float f; u_int32_t i; } conv;
+	conv.f = x;
+	conv.i = 0x5f3759df - (conv.i >> 1);      /* initial guess */
+	conv.f = conv.f * (1.5f - xhalf * conv.f * conv.f); /* Newton-Raphson */
+	return conv.f;
+}
+
+/*===================================================================
 	Globals
 ===================================================================*/
 u_int16_t	Seed1 = 0x1234;
@@ -482,14 +497,16 @@ void ReflectVector( VECTOR * old, NORMAL * normal, VECTOR * new1 )
 ===================================================================*/
 void NormaliseVector( VECTOR *  v )
 {
-	float inv_mod = (float) sqrtf( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) );
+	float dot = v->x * v->x + v->y * v->y + v->z * v->z;
+	float inv;
 
-	if ( !inv_mod )
+	if ( dot < 1e-14f )
 		return;
 
-	v->x /= inv_mod;
-	v->y /= inv_mod;
-	v->z /= inv_mod;
+	inv = fast_invsqrtf( dot );
+	v->x *= inv;
+	v->y *= inv;
+	v->z *= inv;
 }
 
 
@@ -520,7 +537,7 @@ float DistanceVert2Vector( VERT *  a , VECTOR * b )
 	y = a->y - b->y;
 	z = a->z - b->z;
 
-	return( (float) sqrtf( (double)((x*x) + (y*y) + (z*z)) ) ); 
+	return sqrtf( x*x + y*y + z*z );
 }
 /*===================================================================
 	Procedure	:	Calculate the Distance between a VERT and a VECTOR
@@ -528,17 +545,17 @@ float DistanceVert2Vector( VERT *  a , VECTOR * b )
 				:	VECTOR	*  VECTOR
 	Output		:	float		Dot Product
 ===================================================================*/
-float DistanceVector2Vector( VECTOR *  a , VECTOR * b ) 
+float DistanceVector2Vector( VECTOR *  a , VECTOR * b )
 {
 	float x;
 	float y;
 	float z;
-	
+
 	x = a->x - b->x;
 	y = a->y - b->y;
 	z = a->z - b->z;
 
-	return( (float) sqrtf( (double)((x*x) + (y*y) + (z*z)) ) ); 
+	return sqrtf( x*x + y*y + z*z );
 }
 
 /*===================================================================

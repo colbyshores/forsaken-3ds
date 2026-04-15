@@ -166,15 +166,16 @@ void QuatNormalise( QUAT * q )
 	sq.y = ( q->y * q->y );
 	sq.z = ( q->z * q->z );
 
-	len = (float) sqrtf( ( sq.x + sq.y + sq.z ) + ( q->w * q->w ) );
-
-	if ( len )
 	{
-		len = 1 / len;
-		q->x = ( q->x * len );
-		q->y = ( q->y * len );
-		q->z = ( q->z * len );
-		q->w = ( q->w * len );
+		float dot = ( sq.x + sq.y + sq.z ) + ( q->w * q->w );
+		if ( dot > 1e-14f )
+		{
+			len = fast_invsqrtf( dot );
+			q->x *= len;
+			q->y *= len;
+			q->z *= len;
+			q->w *= len;
+		}
 	}			   
 }
 
@@ -593,20 +594,24 @@ QuatMake( QUAT * destQuat, float x, float y, float z, float angle)
 {
     float length, cosA, sinA;
 	/* normalize vector */
-	length = (float) sqrtf( x*x + y*y + z*z );
-
-	/* if zero vector passed in, just return identity quaternion	*/
-	if ( length < EPS )
 	{
-		destQuat->x = 0.0F;
-		destQuat->y = 0.0F;
-		destQuat->z = 0.0F;
-		destQuat->w = 1.0F;
-		return;
+		float dot = x*x + y*y + z*z;
+		float inv;
+
+		/* if zero vector passed in, just return identity quaternion	*/
+		if ( dot < EPS * EPS )
+		{
+			destQuat->x = 0.0F;
+			destQuat->y = 0.0F;
+			destQuat->z = 0.0F;
+			destQuat->w = 1.0F;
+			return;
+		}
+		inv = fast_invsqrtf( dot );
+		x *= inv;
+		y *= inv;
+		z *= inv;
 	}
-	x /= length;
-	y /= length;
-	z /= length;
 
 	cosA = (float) fast_cosf(angle * 0.5F);
 	sinA = (float) fast_sinf(angle * 0.5F);
@@ -636,7 +641,7 @@ MatrixToQuat(QUAT * destQuat, MATRIX * srcMatrix)
 
 if (trace > 0.0F)
     {
-    s = (float) sqrtf(trace + 1.0F);
+    s = sqrtf(trace + 1.0F);
     destQuat->w = s * 0.5F;
     s = 0.5F / s;
     
