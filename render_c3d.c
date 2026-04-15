@@ -76,10 +76,23 @@ bool bSquareOnly = true;
 /* Additive blend flag (matches GL1 behavior) */
 bool _additive_blend_active = false;
 
-/* picaGL stub functions for code that references them outside #ifdef GL */
-void pglInit(void) {}
-void pglExit(void) {}
-void pglSwapBuffers(void) {}
+/* picaGL replacement functions — initialize/teardown citro3d directly */
+void pglInit(void)
+{
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+}
+
+void pglExit(void)
+{
+	c3d_renderer_cleanup();
+	C3D_Fini();
+}
+
+void pglSwapBuffers(void)
+{
+	C3D_FrameEnd(0);
+}
+
 void pglTransferEye(unsigned int eye) { (void)eye; }
 
 /* Gamma table for texture loading */
@@ -205,7 +218,7 @@ bool render_init(render_info_t *info)
 {
 	detect_caps();
 	build_gamma_table(1.0);
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	/* C3D_Init already called by pglInit() stub */
 	if (!c3d_renderer_init())
 		return false;
 	info->ok_to_render = true;
@@ -214,8 +227,7 @@ bool render_init(render_info_t *info)
 
 void render_cleanup(render_info_t *info)
 {
-	c3d_renderer_cleanup();
-	C3D_Fini();
+	/* Cleanup handled by pglExit() stub */
 	info->ok_to_render = false;
 }
 
@@ -269,7 +281,14 @@ void render_mode_fill(void) { /* always fill on PICA200 */ }
 	Scene begin / end
 ===================================================================*/
 
-bool FSBeginScene(void) { return true; }
+bool FSBeginScene(void)
+{
+	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+	C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0);
+	C3D_FrameDrawOn(s_targetLeft);
+	return true;
+}
+
 bool FSEndScene(void) { return true; }
 
 /*===================================================================
