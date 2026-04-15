@@ -138,11 +138,11 @@ int load_image( texture_image_t * image, int mipmap )
   /* setup a pointer array.  Each one points at the begening of a row. */
   row_pointers = (png_bytep *)malloc (sizeof (png_bytep) * image->h);
 
-  // TODO - need to detect *row-order* 
+  // TODO - need to detect *row-order*
   // in case y axis is stored up side down
   for (i = 0; i < image->h; ++i)
-      row_pointers[i] = (png_bytep)(image->data + 
-	  (/*(image->h - (i + 1))*/ i * image->w * 4));
+      row_pointers[i] = (png_bytep)(image->data +
+	  (i * image->w * 4));
 
   /* read pixel data using row pointers */
   png_read_image (png_ptr, row_pointers);

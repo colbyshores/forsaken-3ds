@@ -107,7 +107,7 @@ bool StartASinglePlayerGame( MENUITEM * Item )
 
 	CountDownOn = false;
 
-#ifdef __3DS_DEBUG__
+#if defined(__3DS_DEBUG__) || defined(DEBUG_ON)
 	/* Debug: god mode + all weapons for easier testing */
 	{
 		extern bool GodMode;
