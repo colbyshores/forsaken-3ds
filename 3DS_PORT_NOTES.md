@@ -743,9 +743,56 @@ Skip asymmetric frustum shift when `stereo_enabled=true` on 3DS — camera offse
 `_3ds_additive_blend_active` flag preserves `GL_SRC_ALPHA, GL_ONE` blend set by
 `set_alpha_states()` during the translucent rendering pass.
 
+### InterpFrames Load-Time Alignment (mxaload.c, mxaload.h)
+The Pandora port's ARM fix for `InterpFrames()` added two `memcpy(&fromVert, FromVert,
+sizeof(MXAVERT))` calls per animated vertex per frame — a **~30% framerate drop**.
+The `frame_pnts` pointers point into the raw file buffer at 2-byte-aligned offsets
+(after `u_int16_t` count fields), requiring the memcpy for ARM safety.
+
+**Fix:** Allocate one contiguous 4-byte-aligned buffer at model load time, `memcpy`
+all MXAVERT frame data into it once, then fixup all `frame_pnts` pointers to reference
+the aligned copy. Added `aligned_verts` field to `MXALOADHEADER` (`#ifdef ARM`).
+`InterpFrames()` now uses direct pointer dereference — zero per-vertex overhead.
+
+### TransExe Memset Removal (transexe.c)
+The safe partial `memcpy` in `AddTransExe()` previously did `memset(dest, 0,
+sizeof(RENDEROBJECT))` before the partial copy. Since the renderer only reads up to
+`numTextureGroups`, the memset of unused slots was unnecessary overhead per
+translucent object per frame. Removed.
+
+### Animated Texture Atlas Fix (tload.c, Makefile.3ds)
+Level-specific BMP textures (e.g. `therma.bmp` in vol2) have different atlas layouts
+than the global re-packed PNGs in `Data/textures/`. POLYANIM UVs are authored for the
+original BMPs. `GetLevelTexturePath()` in `tload.c` checks level-specific files first,
+falling through to global textures if not found. Without per-level PNGs, animated
+textures (lava, fire) showed wrong content.
+
+**Fix:** `Makefile.3ds` auto-converts level BMP textures to 24-bit RGB PNGs during
+romfs staging. 267 BMPs converted across all levels. The PNG loader in `texture_png.c`
+handles 24-bit RGB the same as 32-bit RGBA.
+
+### GL1 Additive Blend Backport (render_gl1.c, render_gl_shared.c)
+`_additive_blend_active` flag (originally `#ifdef __3DS__` only) backported to all GL1
+builds. `set_alpha_ignore()` and `unset_alpha_ignore()` check the flag unconditionally
+to preserve `GL_SRC_ALPHA, GL_ONE` blending during the translucent rendering pass.
+Fixes explosion/projectile rendering on PC GL1 as well.
+
+### Controls (config.c, input_3ds.c)
+- L/R shoulder buttons mapped to strafe left/right (not roll)
+- Circle pad axis scale: `100.0f / 155.0f` (engine expects ±100, not ±32767)
+- Deadzone applied in `handle_events()` matching SDL's `app_joy_axis` pattern
+- D-pad mapped as POV hat for weapon selection (not key_state, which would override camera)
+- X = forward, Y = backward, A = fire primary, B = fire secondary
+- Start+Select = quit
+
+### Debug Logging
+All diagnostic file logging removed (forsaken_cpad.log, forsaken_death.log,
+forsaken_polyanim.log, forsaken_polyanim_post.log, forsaken_mload_bind.log,
+forsaken_tloadindex.log, forsaken_texload.log, forsaken_texids.log). The `trace()`
+infrastructure in `main_3ds.c` compiles to a no-op unless `__3DS_DEBUG__` is defined.
+
 ## Known Remaining Issues
 
-1. **Animated textures** — Lava/fire may still show artifacts if additional unaligned sites exist
-2. **No save support** — romfs is read-only; need sdmc redirect for pilot/config saves
-3. **Rear camera disabled** — PICA200 can't sustain two full render passes at playable FPS
-4. **No multiplayer** — Networking stubbed
+1. **No save support** — romfs is read-only; need sdmc redirect for pilot/config saves
+2. **Rear camera disabled** — PICA200 can't sustain two full render passes at playable FPS
+3. **No multiplayer** — Networking stubbed
