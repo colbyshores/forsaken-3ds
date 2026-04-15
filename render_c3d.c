@@ -94,7 +94,7 @@ typedef struct {
 } gpu_vertex_t;  /* 36 bytes */
 
 /* Scratch buffer for vertex conversion (256KB = ~7000 verts) */
-#define GPU_SCRATCH_SIZE  (256 * 1024)
+#define GPU_SCRATCH_SIZE  (512 * 1024)
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
@@ -155,16 +155,22 @@ void pglExit(void)
 
 void pglSwapBuffers(void)
 {
-	/* End the citro3d frame if one is active.
-	 * C3D_FrameEnd triggers the auto display transfer via
-	 * C3D_RenderTargetSetOutput. If no frame was started
-	 * (e.g. during loading screens before FSBeginScene is called),
-	 * this is safely a no-op. */
+	static int _frame = 0;
 	if (s_inFrame)
 	{
+		/* Log scratch usage every 60 frames and on overflow */
+		if (_frame % 60 == 0 || s_scratchUsed > s_scratchMax - 100)
+		{
+			char b[80];
+			snprintf(b, sizeof(b), "frame %d: scratch=%d/%d (%.0f%%)",
+				_frame, s_scratchUsed, s_scratchMax,
+				100.0f * s_scratchUsed / s_scratchMax);
+			c3d_trace(b);
+		}
 		C3D_FrameEnd(0);
 		s_inFrame = false;
 	}
+	_frame++;
 }
 
 void pglTransferEye(unsigned int eye) { (void)eye; }
@@ -289,25 +295,24 @@ static void matrix_to_c3d(const RENDERMATRIX *src, C3D_Mtx *dst)
 
 static void upload_matrices(void)
 {
-	/* Compute combined MVP on CPU, apply PICA fix, upload to uniform 0
-	 * (picaGL's projection slot). picaGL's shader does: outpos = projection * pos.
-	 * We pre-combine world*view*proj so the shader just needs one multiply. */
+	/* Match the working trash/forsaken renderer exactly:
+	 * compute combined MVP in engine format, convert to C3D_Mtx,
+	 * apply PICA fix, upload via C3D_FVUnifMtx4x4. */
 	MATRIX mvp;
-	C3D_Mtx c3d_mvp;
+	C3D_Mtx c3d_mvp, identity;
 
 	MatrixMultiply(&world_matrix, &view_matrix, &mvp);
 	MatrixMultiply(&mvp, &proj_matrix, &mvp);
 
 	matrix_to_c3d((const RENDERMATRIX*)&mvp, &c3d_mvp);
 
-	/* PICA depth remap: D3D [0,1] → PICA [-1,0]
-	 * z_pica = z_d3d - w, in matrix form: row[2] -= row[3] */
+	/* PICA depth remap: D3D [0,1] → PICA [-1,0] */
 	c3d_mvp.r[2].x -= c3d_mvp.r[3].x;
 	c3d_mvp.r[2].y -= c3d_mvp.r[3].y;
 	c3d_mvp.r[2].z -= c3d_mvp.r[3].z;
 	c3d_mvp.r[2].w -= c3d_mvp.r[3].w;
 
-	/* 90° screen rotation: swap rows 0/1, negate new row 1 */
+	/* 90° screen rotation */
 	{
 		C3D_FVec row0 = c3d_mvp.r[0];
 		c3d_mvp.r[0] = c3d_mvp.r[1];
@@ -317,8 +322,9 @@ static void upload_matrices(void)
 		c3d_mvp.r[1].w = -row0.w;
 	}
 
-	/* Upload to projection uniform (register 0) */
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, 0, &c3d_mvp);
+	Mtx_Identity(&identity);
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &c3d_mvp);
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 }
 
 /*===================================================================
@@ -433,10 +439,13 @@ bool FSBeginScene(void)
 		 * upload_matrices writes combined MVP to register 0 (projection),
 		 * so the shader's modelView * pos must be identity to avoid
 		 * double-transforming the already-combined MVP result. */
+		/* Write identity to modelView uniform (register 4) via GPUCMD */
 		{
-			C3D_Mtx identity;
-			Mtx_Identity(&identity);
-			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
+			float id[16] = {
+				1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1
+			};
+			GPUCMD_AddWrite(GPUREG_VSH_FLOATUNIFORM_CONFIG, 0x80000000 | UNIFORM_MODELVIEW);
+			GPUCMD_AddWrites(GPUREG_VSH_FLOATUNIFORM_DATA, (u32*)id, 16);
 		}
 
 		s_inFrame = true;
@@ -558,17 +567,11 @@ bool FSSetViewPort(render_viewport_t *view)
 {
 	s_viewport = *view;
 
-	/* Map game viewport (landscape, top-left origin) to PICA200 viewport
-	 * (portrait framebuffer). Must match picaGL's glViewport → _picaViewport
-	 * chain exactly:
-	 *   GL: bottom = screenH - Y - Height; glViewport(X, bottom, W, H)
-	 *   picaGL: viewportX = (screenW - W) - X; viewportY = bottom
-	 *   PICA: _picaViewport(viewportY, viewportX, H, W)
-	 * So: PICA x = 240 - Y - H, y = (400 - W) - X, w = H, h = W */
+	/* Map game viewport to PICA200 portrait framebuffer, matching
+	 * picaGL's glViewport → _picaViewport coordinate chain. */
 	{
 		int bottom = (int)render_info.ThisMode.h - (int)(view->Y + view->Height);
 		int gl_x = (int)view->X;
-		/* picaGL transform: viewportX = (400 - W) - X, viewportY = bottom */
 		int pica_x = bottom;
 		int pica_y = (400 - (int)view->Width) - gl_x;
 		int pica_w = (int)view->Height;
@@ -616,8 +619,6 @@ bool FSGetWorld(RENDERMATRIX *matrix)
 
 bool FSSetProjection(RENDERMATRIX *matrix)
 {
-	/* Just store the raw projection matrix — PICA fix is applied in
-	 * upload_matrices() to the combined MVP, matching render_3ds.c */
 	memmove(&proj_matrix, &matrix->m, sizeof(proj_matrix));
 	return true;
 }
@@ -968,11 +969,20 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		upload_matrices();
 	else
 	{
-		/* Orthographic — upload to picaGL's uniform 0 (projection slot) */
+		/* Orthographic — write directly via GPUCMD */
 		C3D_Mtx ortho;
+		float uniforms[16];
+		int j;
 		Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
 			render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
-		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, 0, &ortho);
+		for (j = 0; j < 4; j++) {
+			uniforms[j*4+0] = ortho.r[j].x;
+			uniforms[j*4+1] = ortho.r[j].y;
+			uniforms[j*4+2] = ortho.r[j].z;
+			uniforms[j*4+3] = ortho.r[j].w;
+		}
+		GPUCMD_AddWrite(GPUREG_VSH_FLOATUNIFORM_CONFIG, 0x80000000 | 0);
+		GPUCMD_AddWrites(GPUREG_VSH_FLOATUNIFORM_DATA, (u32*)uniforms, 16);
 	}
 
 	for (group = 0; group < renderObject->numTextureGroups; group++)
@@ -985,7 +995,25 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		gpu_vertex_t *dst;
 
 		if (numIndices <= 0) continue;
-		if (s_scratchUsed + numIndices > s_scratchMax) continue; /* overflow guard */
+
+		/* Mid-frame flush: if scratch is nearly full, split the frame
+		 * to flush pending GPU commands and reset the scratch pointer.
+		 * This prevents overflow during heavy particle/explosion frames. */
+		if (s_scratchUsed + numIndices > s_scratchMax)
+		{
+			if (s_inFrame)
+			{
+				c3d_trace("WARNING: scratch overflow — FrameSplit triggered!");
+				C3D_FrameSplit(0);
+				s_scratchUsed = 0;
+				/* Re-bind shader and re-upload uniforms — FrameSplit
+				 * may reset GPU state */
+				C3D_BindProgram(&s_shaderProgram);
+				upload_matrices();
+			}
+			if (s_scratchUsed + numIndices > s_scratchMax)
+				continue; /* still too big after flush */
+		}
 
 		dst = s_scratch + s_scratchUsed;
 
@@ -1085,15 +1113,14 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			}
 		}
 
-		/* Configure vertex attributes and buffer — use global citro3d state
-		 * getters (C3D_GetAttrInfo/C3D_GetBufInfo) as the working renderer does */
+		/* Configure vertex attributes and buffer */
 		{
 			C3D_AttrInfo *attrInfo = C3D_GetAttrInfo();
 			C3D_BufInfo *bufInfo = C3D_GetBufInfo();
 			AttrInfo_Init(attrInfo);
-			AttrInfo_AddLoader(attrInfo, 0, GPU_FLOAT, 3);  /* v0: pos */
-			AttrInfo_AddLoader(attrInfo, 1, GPU_FLOAT, 4);  /* v1: color */
-			AttrInfo_AddLoader(attrInfo, 2, GPU_FLOAT, 2);  /* v2: texcoord */
+			AttrInfo_AddLoader(attrInfo, 0, GPU_FLOAT, 3);
+			AttrInfo_AddLoader(attrInfo, 1, GPU_FLOAT, 4);
+			AttrInfo_AddLoader(attrInfo, 2, GPU_FLOAT, 2);
 			BufInfo_Init(bufInfo);
 			BufInfo_Add(bufInfo, dst, sizeof(gpu_vertex_t), 3, 0x210);
 		}
