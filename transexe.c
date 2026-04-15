@@ -47,14 +47,12 @@ void AddTransExe( /*LPD3DMATRIX Matrix*/RENDERMATRIX *Matrix , /*LPDIRECT3DEXECU
 		}
 //		TransExe[NumOfTransExe].lpExBuf = lpExBuf;
 #ifdef __3DS__
-		/* Safe copy: the source may be a LEVELRENDEROBJECT (8 texture groups)
-		 * cast to RENDEROBJECT* (64 groups).  A full struct copy would overread
-		 * the source by (64-8)*sizeof(TEXTUREGROUP) bytes.  Copy only the
-		 * header + the actually-used texture groups. */
+		/* Safe partial copy: the source may be a LEVELRENDEROBJECT (8 texture
+		 * groups) cast to RENDEROBJECT* (64 groups).  A full struct copy would
+		 * overread the source.  Copy only the header + used texture groups. */
 		{
 			size_t hdr = offsetof(RENDEROBJECT, textureGroups);
 			size_t used = renderObject->numTextureGroups * sizeof(TEXTUREGROUP);
-			memset(&TransExe[NumOfTransExe].renderObject, 0, sizeof(RENDEROBJECT));
 			memcpy(&TransExe[NumOfTransExe].renderObject, renderObject, hdr + used);
 		}
 #else
