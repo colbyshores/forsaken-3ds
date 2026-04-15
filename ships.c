@@ -2413,32 +2413,18 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 
 	if( (ShipPnt->Timer < (RESPAWN_TIMER*0.5f)) || Impact )
 	{
-#ifdef __3DS__
-#define DEATH_LOG(msg) { FILE *_df = fopen("sdmc:/forsaken_death.log","a"); if(_df){ fputs(msg "\n",_df); fclose(_df); } }
-#else
-#define DEATH_LOG(msg) DebugPrintf(msg "\n")
-#endif
-		DEATH_LOG("DEATH: begin death sequence");
 		ScatterDir = ShipPnt->LastMove;
 		NormaliseVector( &ScatterDir );
-		DEATH_LOG("DEATH: ScatterWeapons");
 		ScatterWeapons( &ScatterDir, MAXSCATTERED );		// Scatter weapons in all directions.
 
-		DEATH_LOG("DEATH: CreateShockwave");
 		CreateShockwave( OWNER_SHIP, WhoIAm, &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, 6.0F, (BYTE) -1 );
-		DEATH_LOG("DEATH: CreateShockwaveSend");
 		CreateShockwaveSend( OWNER_SHIP, WhoIAm, &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, 6.0F, (BYTE) -1 );
 
 		ShipPnt->Object.Mode = LIMBO_MODE;
 
-		DEATH_LOG("DEATH: ThrowOutRider");
 		ThrowOutRider( i );
-		DEATH_LOG("DEATH: PlayPannedSfx");
 		PlayPannedSfx( SFX_BikeExplode, Ships[ WhoIAm ].Object.Group , &Ships[WhoIAm].Object.Pos, 0.0F );
-		DEATH_LOG("DEATH: StopTaunt");
 		StopTaunt();
-		DEATH_LOG("DEATH: death sequence complete");
-#undef DEATH_LOG
 	}
 	else
 	{

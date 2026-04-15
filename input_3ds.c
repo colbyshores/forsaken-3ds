@@ -160,18 +160,6 @@ bool handle_events(void)
 	hidCircleRead(&cpad);
 	hidCstickRead(&cstick);
 
-	/* Log raw circle pad values to verify range */
-	{
-		static int _cpad_log = 0;
-		if (_cpad_log < 300 && (cpad.dx != 0 || cpad.dy != 0)) {
-			FILE *_f = fopen("sdmc:/forsaken_cpad.log","a");
-			if (_f) { fprintf(_f, "raw dx=%d dy=%d scaled=%.1f,%.1f\n",
-				cpad.dx, cpad.dy, cpad.dx * CPAD_SCALE, cpad.dy * CPAD_SCALE);
-				fclose(_f); }
-			_cpad_log++;
-		}
-	}
-
 	/* axis 0/1 = circle pad (yaw / pitch)
 	 * Apply deadzone matching the SDL path (app_joy_axis in input_sdl.c). */
 	{

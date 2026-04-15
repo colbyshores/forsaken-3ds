@@ -3397,51 +3397,11 @@ bool RenderScene( void )
 			return false;
 		}
     //  Load in And if nescessary ReScale Textures...
-#ifdef __3DS__
-	{
-		extern void trace(const char*);
-		char _tb[128];
-		snprintf(_tb, sizeof(_tb), "IV0: Tload — %d textures queued (max %d)",
-			Tloadheader.num_texture_files, MAXTPAGESPERTLOAD);
-		trace(_tb);
-		FILE *_f = fopen("sdmc:/forsaken_texload.log","w");
-		if (_f) {
-			int _ti;
-			fprintf(_f, "Tloadheader: %d / %d textures\n",
-				Tloadheader.num_texture_files, MAXTPAGESPERTLOAD);
-			for (_ti = 0; _ti < Tloadheader.num_texture_files; _ti++)
-				fprintf(_f, "  [%d] %s ck=%d\n", _ti,
-					Tloadheader.ImageFile[_ti], Tloadheader.ColourKey[_ti]);
-			fclose(_f);
-		}
-	}
-#endif
     if( !Tload( &Tloadheader ) )
     {
       SeriousError = true;
       return false;
     }
-#ifdef __3DS__
-	{
-		extern void trace(const char*); trace("IV0: Tload OK");
-		FILE *_f = fopen("sdmc:/forsaken_texids.log","w");
-		if (_f) {
-			int _ti;
-			fprintf(_f, "After Tload: texture pointers and GL IDs\n");
-			for (_ti = 0; _ti < Tloadheader.num_texture_files; _ti++) {
-				if (Tloadheader.lpTexture[_ti]) {
-					GLuint id = *(GLuint*)Tloadheader.lpTexture[_ti];
-					fprintf(_f, "  [%d] ptr=%p gl_id=%u %s\n", _ti,
-						Tloadheader.lpTexture[_ti], (unsigned)id,
-						Tloadheader.ImageFile[_ti]);
-				} else {
-					fprintf(_f, "  [%d] NULL %s\n", _ti, Tloadheader.ImageFile[_ti]);
-				}
-			}
-			fclose(_f);
-		}
-	}
-#endif
 
 /*
     MyGameStatus = STATUS_InitView_2;
@@ -3959,8 +3919,6 @@ bool RenderScene( void )
     input_buffer_reset();
     MenuAbort();
     _gameplay_start_guard = true;  /* arm one-shot for STATUS_SinglePlayer */
-    { extern void trace(const char*); trace("PostSSP: guard armed, CurrentMenu cleared"); }
-    { extern void trace(const char*); char _b[64]; snprintf(_b,sizeof(_b),"PostSSP: input_buf_count=%d TotalScrPolys=%d", input_buffer_count, (int)TotalScrPolysInUse); trace(_b); }
 #endif
 
     smallinitShip( WhoIAm );
@@ -4006,9 +3964,7 @@ bool RenderScene( void )
          * clears VDU-specific entries; InitScrPolys() resets the entire
          * ScrPolys[] linked list so nothing stale renders this frame. */
         extern void InitScrPolys(void);
-        extern void trace(const char*);
         InitScrPolys();
-        trace("gameplay_guard: InitScrPolys done");
     }
 #endif
 
@@ -4806,22 +4762,6 @@ bool MainGame( void ) // bjd
   for( i = 0 ; i < MAX_SFX ; i++ )
     LastDistance[i] = 100000.0F;
 
-#ifdef __3DS__
-  {
-    extern void trace(const char*);
-    static int _mg_frame = 0;
-    if (_mg_frame < 20) {
-        char _b[160];
-        snprintf(_b,sizeof(_b),"MainGame frame %d: ScrPolys=%d CurrentMenu=%p input_buf=%d stereo=%d vp_x=%lu cam_x=%.2f",
-            _mg_frame, (int)TotalScrPolysInUse, (void*)CurrentMenu, input_buffer_count,
-            (int)render_info.stereo_enabled,
-            (unsigned long)viewport.X,
-            (double)MainCamera.Pos.x);
-        trace(_b);
-        _mg_frame++;
-    }
-  }
-#endif
 
   if(!MainGameRender())
     return false;
