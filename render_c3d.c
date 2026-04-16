@@ -78,13 +78,7 @@
 static DVLB_s          *s_shaderDVLB    = NULL;
 static shaderProgram_s  s_shaderProgram;
 static bool             s_shaderReady   = false;
-static C3D_Mtx          s_projection;
-static C3D_Mtx          s_modelview;
-
-/* Render targets for stereo */
 static C3D_RenderTarget *s_targetLeft  = NULL;
-static C3D_RenderTarget *s_targetRight = NULL;
-static C3D_RenderTarget *s_targetBot   = NULL;
 
 /* ---- GPU vertex format (all floats, matches shader inputs) ---- */
 typedef struct {
@@ -98,9 +92,6 @@ typedef struct {
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
-
-/* ---- vertex attribute layout ---- */
-static C3D_AttrInfo s_attrInfo3D;
 
 /* ---- globals expected by the engine ---- */
 
@@ -141,10 +132,6 @@ static bool s_inFrame = false;
 void pglInit(void)
 {
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	{
-		FILE *f = fopen("sdmc:/forsaken_c3d.log", "w");
-		if (f) { fputs("pglInit: C3D_Init done\n", f); fclose(f); }
-	}
 }
 
 void pglExit(void)
@@ -155,22 +142,11 @@ void pglExit(void)
 
 void pglSwapBuffers(void)
 {
-	static int _frame = 0;
 	if (s_inFrame)
 	{
-		/* Log scratch usage every 60 frames and on overflow */
-		if (_frame % 60 == 0 || s_scratchUsed > s_scratchMax - 100)
-		{
-			char b[80];
-			snprintf(b, sizeof(b), "frame %d: scratch=%d/%d (%.0f%%)",
-				_frame, s_scratchUsed, s_scratchMax,
-				100.0f * s_scratchUsed / s_scratchMax);
-			c3d_trace(b);
-		}
 		C3D_FrameEnd(0);
 		s_inFrame = false;
 	}
-	_frame++;
 }
 
 void pglTransferEye(unsigned int eye) { (void)eye; }
@@ -217,13 +193,6 @@ bool c3d_renderer_init(void)
 	if (shaderProgramSetVsh(&s_shaderProgram, &s_shaderDVLB->DVLE[0]) < 0)
 		return false;
 
-	/* GPU vertex layout: pos(3f) + color(4f) + texcoord(2f) = 36 bytes
-	 * We convert LVERTEX/TLVERTEX → gpu_vertex_t on CPU before drawing */
-	AttrInfo_Init(&s_attrInfo3D);
-	AttrInfo_AddLoader(&s_attrInfo3D, 0, GPU_FLOAT, 3);  /* v0: position */
-	AttrInfo_AddLoader(&s_attrInfo3D, 1, GPU_FLOAT, 4);  /* v1: color (normalized) */
-	AttrInfo_AddLoader(&s_attrInfo3D, 2, GPU_FLOAT, 2);  /* v2: texcoord */
-
 	/* Allocate scratch buffer for vertex conversion */
 	s_scratch = (gpu_vertex_t*)linearAlloc(GPU_SCRATCH_SIZE);
 	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
@@ -242,9 +211,6 @@ bool c3d_renderer_init(void)
 		GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) |
 		GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO));
 	c3d_trace("render target created and linked to display");
-
-	Mtx_Identity(&s_projection);
-	Mtx_Identity(&s_modelview);
 
 	/* Match picaGL depth map: scale=1.0, offset=1.0 */
 	C3D_DepthMap(true, 1.0f, 1.0f);
@@ -586,24 +552,15 @@ bool FSSetViewPort(render_viewport_t *view)
 	Matrix state
 ===================================================================*/
 
-static void reset_modelview(void)
-{
-	MATRIX mv;
-	MatrixMultiply(&world_matrix, &view_matrix, &mv);
-	matrix_to_c3d((const RENDERMATRIX*)&mv, &s_modelview);
-}
-
 bool FSSetView(RENDERMATRIX *matrix)
 {
 	memmove(&view_matrix, &matrix->m, sizeof(view_matrix));
-	reset_modelview();
 	return true;
 }
 
 bool FSSetWorld(RENDERMATRIX *matrix)
 {
 	memmove(&world_matrix, &matrix->m, sizeof(world_matrix));
-	reset_modelview();
 	return true;
 }
 
@@ -950,21 +907,9 @@ void light_vert(LVERTEX *vert, u_int8_t *color)
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
 {
 	int group;
-	C3D_BufInfo *bufInfo;
-
-	static int _dc = 0;
 
 	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
 		return false;
-
-
-	if (_dc < 5) {
-		char b[128];
-		snprintf(b,sizeof(b),"draw[%d] groups=%d ortho=%d scratch=%d/%d",
-			_dc, renderObject->numTextureGroups, orthographic, s_scratchUsed, s_scratchMax);
-		c3d_trace(b);
-	}
-	_dc++;
 
 	/* Using picaGL's shader — no C3D_BindProgram */
 
