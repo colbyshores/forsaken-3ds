@@ -1,33 +1,103 @@
-*.sh
+# ============================================================
+# ForsakenX 3DS Port — .gitignore
+# Only code, headers, configs, makefiles, and docs are tracked.
+# ============================================================
+
+# ---- Compiled objects and binaries ----
 *.o
+*.a
+*.so
+*.dll
+*.exe
+*.elf
+*.3dsx
+*.smdh
+*.map
+*.bin
+*.cia
+gmon.out
+
+# ---- 3DS build artifacts ----
+build_3ds/
+forsaken3ds.*
+.romfs_staging/
+forsaken_*.log
+
+# ---- PC build artifacts ----
 projectx*
 libs*
 unix*
 mingw*
-data
-configs
-logs
-pilots
-savegame
-*.dll
-gmon.out
 
-# 3DS build artifacts
-build_3ds/
-forsaken3ds.3dsx
-forsaken3ds.elf
-forsaken3ds.smdh
-forsaken3ds.map
-.romfs_staging/
-romfs/
-forsaken_*.log
-
-# retail game data that ships with the 3dsx rom
+# ---- Game data / assets (large binaries, not code) ----
+# Retail game data directories (textures, models, sounds, levels)
 Data/
-Configs/
+data/
 Demos/
+Pilots/
+pilots/
+romfs/
+savegame/
+logs/
 DATA.TAG
 data1.cab
 
-# picaGL is maintained as a separate repo (see picaGL/.git)
+# Config directories (lowercase = runtime copies, uppercase = tracked overrides)
+configs/
+
+# ---- Asset file types ----
+*.bmp
+*.BMP
+*.png
+*.PNG
+*.jpg
+*.jpeg
+*.gif
+*.tga
+*.pcx
+*.ico
+*.wav
+*.WAV
+*.mp3
+*.ogg
+*.mid
+*.ppm
+*.PPM
+
+# ---- Model / level data ----
+*.mx
+*.mxa
+*.cob
+*.dat
+
+# ---- picaGL (separate submodule/repo) ----
 picaGL/
+
+# ---- IDE and editor files ----
+*.vcxproj*
+*.sln
+*.suo
+*.user
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ---- Shell scripts (development utilities) ----
+*.sh
+
+# ---- Misc ----
+net_test/
+.claude/
+
+# ---- Exceptions: tracked files that match patterns above ----
+# Lua game scripts (code, not assets)
+!scripts/
+!scripts/**
+# Configs override for 3DS
+!Configs/
+!Configs/main.txt
+# CI workflows
+!.github/
+!.github/**
