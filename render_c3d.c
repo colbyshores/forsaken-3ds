@@ -87,8 +87,10 @@ typedef struct {
 	float texcoord[2];
 } gpu_vertex_t;  /* 36 bytes */
 
-/* Scratch buffer for vertex conversion (256KB = ~7000 verts) */
-#define GPU_SCRATCH_SIZE  (512 * 1024)
+/* Scratch buffer for vertex conversion.
+ * 1MB = ~29000 verts at 36 bytes each.  Needs to handle heavy
+ * particle frames (lava tunnel, explosions) without FrameSplit. */
+#define GPU_SCRATCH_SIZE  (1024 * 1024)
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
@@ -131,7 +133,12 @@ static bool s_inFrame = false;
  * pglInit/pglExit/pglSwapBuffers/pglTransferEye implementations. */
 void pglInit(void)
 {
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	/* Double the default GPU command buffer (256KB → 512KB).
+	 * Forsaken draws hundreds of texture groups per frame, each a
+	 * separate C3D_DrawArrays call that appends GPU commands.  Heavy
+	 * particle scenes (lava tunnel, explosions) can overflow the
+	 * default 256KB command buffer. */
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 2);
 }
 
 void pglExit(void)
@@ -914,23 +921,20 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	/* Using picaGL's shader — no C3D_BindProgram */
 
 	if (!orthographic)
+	{
 		upload_matrices();
+	}
 	else
 	{
-		/* Orthographic — write directly via GPUCMD */
-		C3D_Mtx ortho;
-		float uniforms[16];
-		int j;
+		/* Orthographic projection + identity modelView.
+		 * Must write BOTH uniforms — the shader does modelView * pos
+		 * first, so stale 3D MVP in register 4 would corrupt 2D text. */
+		C3D_Mtx ortho, identity;
 		Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
 			render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
-		for (j = 0; j < 4; j++) {
-			uniforms[j*4+0] = ortho.r[j].x;
-			uniforms[j*4+1] = ortho.r[j].y;
-			uniforms[j*4+2] = ortho.r[j].z;
-			uniforms[j*4+3] = ortho.r[j].w;
-		}
-		GPUCMD_AddWrite(GPUREG_VSH_FLOATUNIFORM_CONFIG, 0x80000000 | 0);
-		GPUCMD_AddWrites(GPUREG_VSH_FLOATUNIFORM_DATA, (u32*)uniforms, 16);
+		Mtx_Identity(&identity);
+		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
+		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 	}
 
 	for (group = 0; group < renderObject->numTextureGroups; group++)
@@ -951,13 +955,28 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		{
 			if (s_inFrame)
 			{
-				c3d_trace("WARNING: scratch overflow — FrameSplit triggered!");
 				C3D_FrameSplit(0);
 				s_scratchUsed = 0;
-				/* Re-bind shader and re-upload uniforms — FrameSplit
-				 * may reset GPU state */
+				/* Re-initialize GPU state after FrameSplit */
 				C3D_BindProgram(&s_shaderProgram);
-				upload_matrices();
+				{
+					C3D_AttrInfo *ai = C3D_GetAttrInfo();
+					AttrInfo_Init(ai);
+					AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
+					AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+					AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
+				}
+				if (!orthographic)
+					upload_matrices();
+				else
+				{
+					C3D_Mtx ortho, identity;
+					Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
+						render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
+					Mtx_Identity(&identity);
+					C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
+					C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
+				}
 			}
 			if (s_scratchUsed + numIndices > s_scratchMax)
 				continue; /* still too big after flush */
