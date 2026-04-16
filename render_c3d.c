@@ -1362,17 +1362,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
 		return false;
 
-	/* Using picaGL's shader — no C3D_BindProgram */
-
 	if (!orthographic)
 	{
 		upload_matrices();
 	}
 	else
 	{
-		/* Orthographic projection + identity modelView.
-		 * Must write BOTH uniforms — the shader does modelView * pos
-		 * first, so stale 3D MVP in register 4 would corrupt 2D text. */
 		C3D_Mtx ortho, identity;
 		Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
 			render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
@@ -1381,27 +1376,65 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 	}
 
+	/* ---- Draw call batching ----
+	 * Accumulate consecutive texture groups with the same GPU state
+	 * (texture, colourkey, blend) into a single C3D_DrawArrays call.
+	 * Vertices are contiguous in the scratch buffer so batching just
+	 * extends the vertex count without issuing intermediate draws. */
+	int   batch_startOffset = 0;
+	int   batch_vertCount   = 0;
+	void *batch_texture     = NULL;
+	bool  batch_colourkey   = false;
+	bool  batch_hasTexture  = false;
+
+/* Macro: flush the current batch (draw + display list + state restore) */
+#define FLUSH_BATCH() do { \
+	if (batch_vertCount > 0) { \
+		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
+		BufInfo_Init(_bi); \
+		BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
+		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
+		if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES) { \
+			dl_entry_t *_e = &s_dl[s_dlCount++]; \
+			_e->scratchOffset = batch_startOffset; \
+			_e->vertexCount   = batch_vertCount; \
+			memmove(&_e->worldMatrix, &world_matrix, sizeof(MATRIX)); \
+			memmove(&_e->projMatrix,  &proj_matrix,  sizeof(MATRIX)); \
+			_e->viewport       = s_viewport; \
+			_e->texture        = batch_texture; \
+			_e->colourkey      = batch_colourkey; \
+			_e->orthographic   = orthographic; \
+			_e->additive_blend = _additive_blend_active; \
+			_e->has_texture    = batch_hasTexture; \
+		} \
+		if (batch_colourkey) \
+			C3D_AlphaTest(false, GPU_ALWAYS, 0); \
+		if (batch_hasTexture && !_additive_blend_active) \
+			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, \
+				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO); \
+		batch_vertCount = 0; \
+	} \
+} while(0)
+
 	for (group = 0; group < renderObject->numTextureGroups; group++)
 	{
 		TEXTUREGROUP *tg = &renderObject->textureGroups[group];
 		int numIndices = tg->numTriangles * 3;
 		int startVert = tg->startVert;
-		bool has_texture = false;
 		int totalVerts, i;
 		gpu_vertex_t *dst;
 
 		if (numIndices <= 0) continue;
 
-		/* Mid-frame flush: if scratch is nearly full, split the frame
-		 * to flush pending GPU commands and reset the scratch pointer.
-		 * This prevents overflow during heavy particle/explosion frames. */
+		/* Mid-frame flush: if scratch is nearly full, flush pending batch
+		 * and split the frame to reset the scratch pointer. */
 		if (s_scratchUsed + numIndices > s_scratchMax)
 		{
 			if (s_inFrame)
 			{
+				FLUSH_BATCH();
 				C3D_FrameSplit(0);
 				s_scratchUsed = 0;
-				/* Re-initialize GPU state after FrameSplit */
 				C3D_BindProgram(&s_shaderProgram);
 				{
 					C3D_AttrInfo *ai = C3D_GetAttrInfo();
@@ -1410,7 +1443,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
 					AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 				}
-				/* Reset TexEnv cache — FrameSplit invalidates GPU state */
 				s_lastBoundTexture = NULL;
 				s_lastTexEnvTextured = false;
 				if (!orthographic)
@@ -1426,7 +1458,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				}
 			}
 			if (s_scratchUsed + numIndices > s_scratchMax)
-				continue; /* still too big after flush */
+				continue;
 		}
 
 		dst = s_scratch + s_scratchUsed;
@@ -1474,7 +1506,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 		else
 		{
-			/* Non-indexed: use vertex list directly */
 			LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
 			int numVerts = tg->numVerts;
 			if (s_scratchUsed + numVerts > s_scratchMax) continue;
@@ -1494,23 +1525,43 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			totalVerts = numVerts;
 		}
 
-		/* GPU state — enable alpha blend for all textured surfaces
-		 * (matching picaGL GL1 path).  All textures have alpha=0 for
-		 * black pixels from the colourkey conversion in create_texture. */
-		if (tg->colourkey)
-			C3D_AlphaTest(true, GPU_GREATER, 0x64);
-		if (tg->texture && !_additive_blend_active)
-			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
-				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
-				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
-
-		/* Texture binding — cached to skip redundant GPU state changes */
+		/* Determine effective texture state for this group */
+		bool eff_hasTexture = false;
 		if (tg->texture)
 		{
 			texture_t *texdata = (texture_t*)tg->texture;
 			if (texdata->initialized)
+				eff_hasTexture = true;
+		}
+
+		/* Check if we need to break the batch — state changed */
+		if (batch_vertCount > 0 &&
+		    ((void*)tg->texture != batch_texture ||
+		     tg->colourkey      != batch_colourkey ||
+		     eff_hasTexture     != batch_hasTexture))
+		{
+			FLUSH_BATCH();
+		}
+
+		/* Start a new batch if needed — set GPU state */
+		if (batch_vertCount == 0)
+		{
+			batch_startOffset = s_scratchUsed;
+			batch_texture     = (void*)tg->texture;
+			batch_colourkey   = tg->colourkey;
+			batch_hasTexture  = eff_hasTexture;
+
+			if (tg->colourkey)
+				C3D_AlphaTest(true, GPU_GREATER, 0x64);
+			if (eff_hasTexture && !_additive_blend_active)
+				C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
+					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
+
+			/* Texture binding with TexEnv cache */
+			if (eff_hasTexture)
 			{
-				/* Only update TexEnv if texture changed or mode switched */
+				texture_t *texdata = (texture_t*)tg->texture;
 				if ((void*)texdata != s_lastBoundTexture || !s_lastTexEnvTextured)
 				{
 					C3D_TexBind(0, &texdata->tex);
@@ -1523,57 +1574,29 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				}
 				else
 				{
-					/* Same texture — just rebind (fast) */
 					C3D_TexBind(0, &texdata->tex);
 				}
-				has_texture = true;
+			}
+			else if (s_lastTexEnvTextured)
+			{
+				C3D_TexEnv *env = C3D_GetTexEnv(0);
+				C3D_TexEnvInit(env);
+				C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+				C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+				s_lastBoundTexture = NULL;
+				s_lastTexEnvTextured = false;
 			}
 		}
-		if (!has_texture && s_lastTexEnvTextured)
-		{
-			C3D_TexEnv *env = C3D_GetTexEnv(0);
-			C3D_TexEnvInit(env);
-			C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
-			s_lastBoundTexture = NULL;
-			s_lastTexEnvTextured = false;
-		}
 
-		/* Buffer pointer — AttrInfo is set once per frame in FSBeginScene,
-		 * only BufInfo changes per draw (different scratch offset). */
-		{
-			C3D_BufInfo *bufInfo = C3D_GetBufInfo();
-			BufInfo_Init(bufInfo);
-			BufInfo_Add(bufInfo, dst, sizeof(gpu_vertex_t), 3, 0x210);
-		}
-
-		C3D_DrawArrays(GPU_TRIANGLES, 0, totalVerts);
-
-		/* Record to display list for single-pass stereo replay */
-		if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES)
-		{
-			dl_entry_t *e = &s_dl[s_dlCount++];
-			e->scratchOffset = s_scratchUsed;
-			e->vertexCount   = totalVerts;
-			memmove(&e->worldMatrix, &world_matrix, sizeof(MATRIX));
-			memmove(&e->projMatrix,  &proj_matrix,  sizeof(MATRIX));
-			e->viewport       = s_viewport;
-			e->texture        = tg->texture;
-			e->colourkey      = tg->colourkey;
-			e->orthographic   = orthographic;
-			e->additive_blend = _additive_blend_active;
-			e->has_texture    = has_texture;
-		}
-
+		/* Accumulate into current batch */
+		batch_vertCount += totalVerts;
 		s_scratchUsed += totalVerts;
-
-		/* Restore state */
-		if (tg->colourkey)
-			C3D_AlphaTest(false, GPU_ALWAYS, 0);
-		if (tg->texture && !_additive_blend_active)
-			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
-				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
 	}
+
+	/* Flush the final pending batch */
+	FLUSH_BATCH();
+
+#undef FLUSH_BATCH
 
 	return true;
 }
