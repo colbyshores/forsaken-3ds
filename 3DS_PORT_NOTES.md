@@ -870,9 +870,45 @@ PICA: _picaViewport(viewportY, viewportX, H, W)
 Result: C3D_SetViewport(bottom, (400-W)-X, H, W)
 ```
 
+### Stereo Ghost-Offset Fix (main_3ds.c + render_c3d.c)
+
+The citro3d renderer exhibited a persistent ~5-10 pixel horizontal "twitching"
+on all textured surfaces, doubled enemies/projectiles, floor z-fighting, and
+crashes on death/explosions.  All four symptoms had a single root cause:
+**unwanted stereo rendering**.
+
+**Root cause:** `osGet3DSliderState()` returns garbage (non-zero) on
+Mandarine/Citra emulators.  Additionally, `stereo_test_slider = 0.5` in
+`Configs/main.txt` overrides the slider for emulator testing.  Either path
+caused `platform_get_3d_slider()` to return > 0, enabling stereo mode in
+`oct2.c:MainGameRender`.  The engine then rendered the scene **twice** per
+frame with offset camera positions via `RenderCurrentCameraInStereo()`.
+
+In the picaGL build this produces correct red/cyan anaglyph because:
+- `render_set_filter()` calls `glColorMask()` which picaGL implements
+- `pglTransferEye()` routes each eye to GFX_LEFT/GFX_RIGHT framebuffers
+
+In the citro3d build both mechanisms are stubs:
+- `render_set_filter()` computes the mask but never applies it (no
+  `C3D_DepthTest` writemask or framebuffer channel control implemented)
+- `pglTransferEye()` is a no-op
+
+Result: both eyes rendered in full color to the same render target, producing:
+1. **~5-10px ghost offset** on all geometry (stereo eye separation)
+2. **Doubled enemies/projectiles** (two full-color copies overlaid)
+3. **Floor z-fighting** (two nearly-coplanar copies of level geometry)
+4. **Death/explosion crashes** (2× draw volume overflowed scratch buffer)
+
+The shift direction changed with camera rotation because the stereo offset
+is in camera-local space (the camera-right vector).
+
+**Fix:** `platform_get_3d_slider()` returns `0.0f` unconditionally when
+`RENDERER_C3D` is defined, disabling stereo until Phase 5 implements
+`pglTransferEye` and `render_set_filter` for citro3d.
+
 ### Remaining Phases
 4. 2D/HUD rendering polish
-5. Single-pass stereo (render list + projection swap — the main perf goal)
+5. Single-pass stereo (requires `pglTransferEye` + `render_set_filter`)
 6. GPU lighting (move light_vert to vertex shader)
 
 ## Known Remaining Issues
@@ -881,4 +917,4 @@ Result: C3D_SetViewport(bottom, (400-W)-X, H, W)
 2. **Rear camera disabled** — PICA200 can't sustain two full render passes at playable FPS
 3. **No multiplayer** — Networking stubbed
 4. **Citro3d renderer: no per-vertex lighting** — light_vert sets full-bright white
-5. **Citro3d renderer: no stereo** — single-pass stereo not yet implemented
+5. **Citro3d renderer: no stereo** — Phase 5; needs `pglTransferEye` + `render_set_filter`
