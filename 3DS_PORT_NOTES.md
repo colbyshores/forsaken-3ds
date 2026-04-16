@@ -953,8 +953,18 @@ is in camera-local space (the camera-right vector).
 
 **Re-enabled `platform_get_3d_slider`** for citro3d builds (was forced to 0).
 
-### Remaining Phases
-6. GPU lighting (move light_vert to vertex shader)
+### Phase 6: Per-Vertex Lighting (render_c3d.c)
+
+CPU-side per-vertex lighting ported from `render_gl1.c`. All lighting
+globals, `GetRealLightAmbientWorldSpace` (point + spot lights with
+distance/angular attenuation), `do_water_effect`, `do_whiteout_effect`,
+and `light_vert` color blend mixing are identical to the GL1 path.
+
+GPU-side lighting was evaluated but deferred: float24 precision risk,
+8-light uniform register limit, no spot light support without significant
+shader complexity, and lighting is only ~10% of per-frame CPU cost.
+
+### All Phases Complete
 
 ## Known Remaining Issues
 
