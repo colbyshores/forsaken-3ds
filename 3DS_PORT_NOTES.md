@@ -929,9 +929,31 @@ is in camera-local space (the camera-right vector).
 `RENDERER_C3D` is defined, disabling stereo until Phase 5 implements
 `pglTransferEye` and `render_set_filter` for citro3d.
 
+### Phase 5: Stereoscopic 3D (render_c3d.c + main_3ds.c)
+
+**Hardware stereo (STEREO_MODE_3DS)** — real 3DS with parallax barrier:
+- Two render targets: `s_targetLeft` → GFX_LEFT, `s_targetRight` → GFX_RIGHT
+- `s_targetCurrent` tracks active target for FSClear operations
+- **Single-pass display list**: first eye records all texture group draws
+  into `dl_entry_t s_dl[]` (scratch offset, vertex count, world/proj matrices,
+  viewport, texture pointer, blend/colourkey state). `pglTransferEye(GFX_LEFT)`
+  switches to the right target. The first `draw_render_object` call of the
+  engine's second render pass triggers `replay_display_list()`, which redraws
+  all entries with the updated view matrix. Subsequent draw calls are skipped.
+- Savings: no BSP traversal, no LVERTEX→gpu_vertex_t conversion, no engine-side
+  object processing for the second eye. Only MVP recomputation + GPU draws.
+
+**Anaglyph stereo (STEREO_MODE_COLOR)** — emulator testing only:
+- `render_set_filter()` stores per-channel GPU_WRITEMASK in `s_colorMask`
+- All depth test functions (`reset_zbuff`, `disable_zbuff_write`, `disable_zbuff`)
+  respect the mask
+- `FSClear` uses depth-only clear when mask active (hardware clear ignores masks)
+- Two-pass rendering (no display list — `pglTransferEye` not called for anaglyph)
+- Known artifacts: shared depth buffer causes red bleed on coplanar geometry
+
+**Re-enabled `platform_get_3d_slider`** for citro3d builds (was forced to 0).
+
 ### Remaining Phases
-4. 2D/HUD rendering polish
-5. Single-pass stereo (requires `pglTransferEye` + `render_set_filter`)
 6. GPU lighting (move light_vert to vertex shader)
 
 ## Known Remaining Issues
