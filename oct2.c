@@ -898,14 +898,7 @@ void ProcessGameKeys( void )
     return;
   }
 
-  // ESCAPE
-#ifndef __3DS__
-  /* [3DS] In-game pause menus (MENU_InGameSingle, MENU_InGame) are disabled
-   * on 3DS.  Stale SDLK_ESCAPE events injected by handle_events() during
-   * and after ChangeLevel() cause the menu to open on the very first gameplay
-   * frame and auto-navigate through sub-menus via continuous key injection.
-   * Re-enable once root cause (stale HID kDown / MenuProcess interaction) is
-   * understood and fixed. */
+  // ESCAPE — toggle in-game pause menu (Start button on 3DS)
   if ( input_buffer_find( SDLK_ESCAPE ) )
 	{
     // if were not currently in a menu
@@ -943,7 +936,6 @@ void ProcessGameKeys( void )
       JustExitedMenu = false;
 		}
 	}
-#endif /* !__3DS__ */
 
   // debuggin keys
   if ( DebugInfo ) 

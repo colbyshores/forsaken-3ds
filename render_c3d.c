@@ -162,6 +162,11 @@ bool _additive_blend_active = false;
 /* Frame state tracking */
 static bool s_inFrame = false;
 
+/* TexEnv cache: skip redundant GPU state changes when consecutive
+ * draws use the same texture or same untextured mode. */
+static void *s_lastBoundTexture = NULL;  /* last texture_t* passed to C3D_TexBind */
+static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs vertex-only */
+
 
 /* picaGL is NOT linked for the citro3d renderer. We provide our own
  * pglInit/pglExit/pglSwapBuffers/pglTransferEye implementations. */
@@ -201,6 +206,9 @@ void pglSwapBuffers(void)
 static void replay_display_list(void)
 {
 	int i;
+	void *dl_lastTex = NULL;
+	bool dl_lastTextured = false;
+
 	for (i = 0; i < s_dlCount; i++)
 	{
 		dl_entry_t *e = &s_dl[i];
@@ -256,37 +264,42 @@ static void replay_display_list(void)
 			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 		}
 
-		/* Texture binding */
+		/* Texture binding — cached within replay */
+		if (e->has_texture && e->texture)
 		{
-			C3D_TexEnv *env = C3D_GetTexEnv(0);
-			C3D_TexEnvInit(env);
-			if (e->has_texture && e->texture)
+			texture_t *texdata = (texture_t*)e->texture;
+			if (texdata->initialized)
 			{
-				texture_t *texdata = (texture_t*)e->texture;
-				if (texdata->initialized)
+				if ((void*)texdata != dl_lastTex || !dl_lastTextured)
 				{
 					C3D_TexBind(0, &texdata->tex);
+					C3D_TexEnv *env = C3D_GetTexEnv(0);
+					C3D_TexEnvInit(env);
 					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
 					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+					dl_lastTex = (void*)texdata;
+					dl_lastTextured = true;
 				}
-				else goto notex;
+				else
+					C3D_TexBind(0, &texdata->tex);
 			}
-			else
-			{
-			notex:
-				C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-				C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
-			}
+			else if (dl_lastTextured)
+				goto dl_notex;
+		}
+		else if (dl_lastTextured)
+		{
+		dl_notex:;
+			C3D_TexEnv *env = C3D_GetTexEnv(0);
+			C3D_TexEnvInit(env);
+			C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+			dl_lastTex = NULL;
+			dl_lastTextured = false;
 		}
 
-		/* Draw from cached vertex data */
+		/* Buffer pointer only — AttrInfo set once in pglTransferEye */
 		{
-			C3D_AttrInfo *ai = C3D_GetAttrInfo();
 			C3D_BufInfo *bi = C3D_GetBufInfo();
-			AttrInfo_Init(ai);
-			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
-			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 			BufInfo_Init(bi);
 			BufInfo_Add(bi, dst, sizeof(gpu_vertex_t), 3, 0x210);
 		}
@@ -312,6 +325,13 @@ void pglTransferEye(unsigned int eye)
 
 		/* Re-initialize GPU state for the new render target */
 		C3D_BindProgram(&s_shaderProgram);
+		{
+			C3D_AttrInfo *ai = C3D_GetAttrInfo();
+			AttrInfo_Init(ai);
+			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
+			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
+		}
 		C3D_DepthTest(true, GPU_LESS, s_colorMask);
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
@@ -598,6 +618,10 @@ bool FSBeginScene(void)
 		C3D_DepthTest(true, GPU_LESS, s_colorMask);
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
+
+		/* Reset TexEnv cache — force first draw to set up GPU state */
+		s_lastBoundTexture = NULL;
+		s_lastTexEnvTextured = false;
 
 		/* Initialize modelView uniform (register 4) to identity.
 		 * upload_matrices writes combined MVP to register 0 (projection),
@@ -1373,6 +1397,9 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
 					AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 				}
+				/* Reset TexEnv cache — FrameSplit invalidates GPU state */
+				s_lastBoundTexture = NULL;
+				s_lastTexEnvTextured = false;
 				if (!orthographic)
 					upload_matrices();
 				else
@@ -1464,37 +1491,45 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
 				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 
-		/* Texture binding */
+		/* Texture binding — cached to skip redundant GPU state changes */
+		if (tg->texture)
+		{
+			texture_t *texdata = (texture_t*)tg->texture;
+			if (texdata->initialized)
+			{
+				/* Only update TexEnv if texture changed or mode switched */
+				if ((void*)texdata != s_lastBoundTexture || !s_lastTexEnvTextured)
+				{
+					C3D_TexBind(0, &texdata->tex);
+					C3D_TexEnv *env = C3D_GetTexEnv(0);
+					C3D_TexEnvInit(env);
+					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+					s_lastBoundTexture = (void*)texdata;
+					s_lastTexEnvTextured = true;
+				}
+				else
+				{
+					/* Same texture — just rebind (fast) */
+					C3D_TexBind(0, &texdata->tex);
+				}
+				has_texture = true;
+			}
+		}
+		if (!has_texture && s_lastTexEnvTextured)
 		{
 			C3D_TexEnv *env = C3D_GetTexEnv(0);
 			C3D_TexEnvInit(env);
-
-			if (tg->texture)
-			{
-				texture_t *texdata = (texture_t*)tg->texture;
-				if (texdata->initialized)
-				{
-					C3D_TexBind(0, &texdata->tex);
-					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-					has_texture = true;
-				}
-			}
-			if (!has_texture)
-			{
-				C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-				C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
-			}
+			C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+			s_lastBoundTexture = NULL;
+			s_lastTexEnvTextured = false;
 		}
 
-		/* Configure vertex attributes and buffer */
+		/* Buffer pointer — AttrInfo is set once per frame in FSBeginScene,
+		 * only BufInfo changes per draw (different scratch offset). */
 		{
-			C3D_AttrInfo *attrInfo = C3D_GetAttrInfo();
 			C3D_BufInfo *bufInfo = C3D_GetBufInfo();
-			AttrInfo_Init(attrInfo);
-			AttrInfo_AddLoader(attrInfo, 0, GPU_FLOAT, 3);
-			AttrInfo_AddLoader(attrInfo, 1, GPU_FLOAT, 4);
-			AttrInfo_AddLoader(attrInfo, 2, GPU_FLOAT, 2);
 			BufInfo_Init(bufInfo);
 			BufInfo_Add(bufInfo, dst, sizeof(gpu_vertex_t), 3, 0x210);
 		}
