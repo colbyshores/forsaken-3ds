@@ -1376,6 +1376,32 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 	}
 
+	/* ---- Texture sorting ----
+	 * Sort texture groups by texture pointer so consecutive groups share
+	 * the same texture, maximizing draw call batching below.  Uses a
+	 * local index array (not modifying the renderObject) and insertion
+	 * sort — fast for the small N (max 64 on 3DS). */
+	int sorted_order[MAX_TEXTURE_GROUPS];
+	int numGroups = renderObject->numTextureGroups;
+	{
+		int si, sj;
+		for (si = 0; si < numGroups; si++)
+			sorted_order[si] = si;
+		for (si = 1; si < numGroups; si++)
+		{
+			int key = sorted_order[si];
+			void *key_tex = (void*)renderObject->textureGroups[key].texture;
+			sj = si - 1;
+			while (sj >= 0 &&
+			       (void*)renderObject->textureGroups[sorted_order[sj]].texture > key_tex)
+			{
+				sorted_order[sj + 1] = sorted_order[sj];
+				sj--;
+			}
+			sorted_order[sj + 1] = key;
+		}
+	}
+
 	/* ---- Draw call batching ----
 	 * Accumulate consecutive texture groups with the same GPU state
 	 * (texture, colourkey, blend) into a single C3D_DrawArrays call.
@@ -1416,9 +1442,9 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	} \
 } while(0)
 
-	for (group = 0; group < renderObject->numTextureGroups; group++)
+	for (group = 0; group < numGroups; group++)
 	{
-		TEXTUREGROUP *tg = &renderObject->textureGroups[group];
+		TEXTUREGROUP *tg = &renderObject->textureGroups[sorted_order[group]];
 		int numIndices = tg->numTriangles * 3;
 		int startVert = tg->startVert;
 		int totalVerts, i;
