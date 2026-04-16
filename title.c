@@ -3031,12 +3031,18 @@ MENU	MENU_InGame = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGam
 MENU	MENU_InGameSingle = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGameMenu , NULL,	0,
 			{
 					  OLDMENUITEM( 200, 112, LT_MENU_InGame1  /*"Set Up Biker"				*/,	(void *)biker_name,			&MENU_SetUpBiker,		MenuChange,				DrawNameVar),
+#ifndef __3DS__
 					  OLDMENUITEM( 200, 128, LT_MENU_InGame2  /*"Toggle Full Screen"		*/,	NULL,						NULL,					MenuGoFullScreen,		MenuItemDrawName),
+#endif
 					  OLDMENUITEM( 200, 144, LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 160, LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
+#ifndef __3DS__
 					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
+#endif
 					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
+#ifndef __3DS__
 					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
+#endif
 #ifndef EXTERNAL_DEMO
 #ifdef DEBUG_ON
 					  OLDMENUITEM( 200, 272, LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					DebugModeChanged,		SelectToggle,			DrawToggle),
@@ -3181,6 +3187,10 @@ char *BikerText[MAXBIKETYPES] =
 
 MENU * CurrentMenu = NULL;
 MENUITEM * CurrentMenuItem = NULL;
+
+/* Called from input_3ds.c to check if a menu is open without
+ * pulling in the full title.h dependency chain. */
+int _3ds_is_menu_open(void) { return CurrentMenu != NULL; }
 TEXTINFO * HighlightItem[MAXHIGHLIGHTITEMS];
 int HighlightStatus[MAXHIGHLIGHTITEMS];
 int CurrentHighlightItem;
@@ -5229,26 +5239,11 @@ static int SelectionColour( void )
 ===================================================================*/
 void MenuRestart( MENU * Menu )
 {
-#ifdef __3DS__
-	/* [3DS] Block all in-game menus during gameplay.  Something is calling
-	 * MenuRestart() every frame despite the ESCAPE handler and MenuProcess()
-	 * being disabled.  Trace the call so we can identify the caller later,
-	 * then return early so CurrentMenu stays NULL. */
-	if (MyGameStatus == STATUS_SinglePlayer) {
-		extern void trace(const char*);
-		extern const char *_3ds_mr_ctx;
-		static int _mr_logged = 0;
-		if (_mr_logged < 8) {
-			char _mr_b[96];
-			snprintf(_mr_b, sizeof(_mr_b), "MenuRestart: BLOCKED '%s' ctx=%s",
-				(Menu && Menu->Name) ? Menu->Name : "?",
-				_3ds_mr_ctx ? _3ds_mr_ctx : "none");
-			trace(_mr_b);
-			_mr_logged++;
-		}
-		return;
-	}
-#endif
+	/* [3DS] Previously blocked during STATUS_SinglePlayer due to stale
+	 * SDLK_ESCAPE events from level loading.  Fixed by three-step guard
+	 * in oct2.c: hidScanInput + input_buffer_reset + MenuAbort in
+	 * STATUS_PostStartingSinglePlayer, plus one-shot guard on first
+	 * STATUS_SinglePlayer frame. */
 	if ( MyGameStatus == STATUS_SinglePlayer )
 	{
 		PauseAllSfx();

@@ -118,6 +118,11 @@ bool platform_init(void)
 	/* Set working directory so relative paths (Data/, Configs/) resolve */
 	chdir("romfs:/");
 
+	/* Create save game directory on SD card (romfs is read-only) */
+	mkdir("sdmc:/3ds", 0777);
+	mkdir("sdmc:/3ds/forsaken", 0777);
+	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
+
 	trace("platform_init: done");
 
 	return true;

@@ -4,10 +4,15 @@
 /*
  * Defines
  */
-//#define SAVEGAME_SLOTS
+#define SAVEGAME_SLOTS
 #include "main.h"
 
+#ifdef __3DS__
+/* 3DS: saves go to SD card (romfs is read-only) */
+#define SAVEGAME_FOLDER			"sdmc:/3ds/forsaken/savegame"
+#else
 #define SAVEGAME_FOLDER			"Savegame"
+#endif
 #define SNAPSHOT_FOLDER			"ScreenShots"
 #define FMVSNAPSHOT_FOLDER		"ScreenShots"
 #define SAVEGAME_EXTENSION		".SAV"
