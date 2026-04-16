@@ -78,7 +78,15 @@
 static DVLB_s          *s_shaderDVLB    = NULL;
 static shaderProgram_s  s_shaderProgram;
 static bool             s_shaderReady   = false;
-static C3D_RenderTarget *s_targetLeft  = NULL;
+static C3D_RenderTarget *s_targetLeft    = NULL;
+static C3D_RenderTarget *s_targetRight   = NULL;
+static C3D_RenderTarget *s_targetCurrent = NULL;  /* active render target */
+static bool              s_stereoFrame   = false;
+
+/* Per-channel color write mask for anaglyph stereo.
+ * Default GPU_WRITE_ALL allows all channels.  render_set_filter()
+ * modifies this to mask channels (e.g. red-only for left eye). */
+static GPU_WRITEMASK s_colorMask = GPU_WRITE_ALL;
 
 /* ---- GPU vertex format (all floats, matches shader inputs) ---- */
 typedef struct {
@@ -154,9 +162,40 @@ void pglSwapBuffers(void)
 		C3D_FrameEnd(0);
 		s_inFrame = false;
 	}
+	/* Reset stereo state for next frame */
+	s_stereoFrame = false;
+	s_colorMask = GPU_WRITE_ALL;
 }
 
-void pglTransferEye(unsigned int eye) { (void)eye; }
+void pglTransferEye(unsigned int eye)
+{
+	if (eye == GFX_LEFT)
+	{
+		/* Left eye just finished rendering to s_targetLeft.
+		 * Switch to right eye target: clear it and start drawing. */
+		C3D_RenderTargetClear(s_targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+		C3D_FrameDrawOn(s_targetRight);
+		s_targetCurrent = s_targetRight;
+
+		/* Re-initialize GPU state for the new render target */
+		C3D_BindProgram(&s_shaderProgram);
+		{
+			C3D_AttrInfo *ai = C3D_GetAttrInfo();
+			AttrInfo_Init(ai);
+			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
+			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
+		}
+		C3D_DepthTest(true, GPU_LESS, s_colorMask);
+		C3D_CullFace(GPU_CULL_FRONT_CCW);
+		C3D_DepthMap(true, 1.0f, 1.0f);
+
+		/* Reset scratch for second eye */
+		s_scratchUsed = 0;
+	}
+	/* GFX_RIGHT: no-op — C3D_FrameEnd auto-transfers both targets */
+	s_stereoFrame = true;
+}
 
 /* Gamma table for texture loading */
 u_int8_t gamma_table[256];
@@ -205,19 +244,32 @@ bool c3d_renderer_init(void)
 	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
 	s_scratchUsed = 0;
 
-	/* Create render target and link to display output */
-	s_targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
-	if (!s_targetLeft) {
-		c3d_trace("FAILED to create render target");
-		return false;
+	/* Create render targets and link to display output.
+	 * Both left and right eye targets are created unconditionally —
+	 * the right target is only drawn to when stereo is active. */
+	{
+		u32 transferFlags =
+			GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(0) |
+			GX_TRANSFER_RAW_COPY(0) |
+			GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
+			GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) |
+			GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO);
+
+		s_targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
+		if (!s_targetLeft) {
+			c3d_trace("FAILED to create left render target");
+			return false;
+		}
+		C3D_RenderTargetSetOutput(s_targetLeft, GFX_TOP, GFX_LEFT, transferFlags);
+
+		s_targetRight = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
+		if (!s_targetRight) {
+			c3d_trace("FAILED to create right render target");
+			return false;
+		}
+		C3D_RenderTargetSetOutput(s_targetRight, GFX_TOP, GFX_RIGHT, transferFlags);
 	}
-	C3D_RenderTargetSetOutput(s_targetLeft, GFX_TOP, GFX_LEFT,
-		GX_TRANSFER_FLIP_VERT(0) | GX_TRANSFER_OUT_TILED(0) |
-		GX_TRANSFER_RAW_COPY(0) |
-		GX_TRANSFER_IN_FORMAT(GX_TRANSFER_FMT_RGBA8) |
-		GX_TRANSFER_OUT_FORMAT(GX_TRANSFER_FMT_RGB8) |
-		GX_TRANSFER_SCALING(GX_TRANSFER_SCALE_NO));
-	c3d_trace("render target created and linked to display");
+	c3d_trace("render targets created and linked to display");
 
 	/* Match picaGL depth map: scale=1.0, offset=1.0 */
 	C3D_DepthMap(true, 1.0f, 1.0f);
@@ -342,14 +394,15 @@ bool render_reset(render_info_t *info)
 
 void render_set_filter(bool red, bool green, bool blue)
 {
-	/* citro3d color mask for anaglyph stereo */
-	u8 mask = 0;
-	if (red)   mask |= GPU_WRITE_RED;
-	if (green) mask |= GPU_WRITE_GREEN;
-	if (blue)  mask |= GPU_WRITE_BLUE;
-	mask |= GPU_WRITE_ALPHA;
-	C3D_ColorLogicOp(GPU_LOGICOP_COPY);
-	/* TODO: implement proper per-channel write mask via C3D_FrameBuf */
+	/* Per-channel color write mask for anaglyph stereo.
+	 * Stored globally and applied via C3D_DepthTest which controls
+	 * both depth test and write mask on PICA200. */
+	s_colorMask = GPU_WRITE_DEPTH | GPU_WRITE_ALPHA;
+	if (red)   s_colorMask |= GPU_WRITE_RED;
+	if (green) s_colorMask |= GPU_WRITE_GREEN;
+	if (blue)  s_colorMask |= GPU_WRITE_BLUE;
+	/* Apply immediately to current GPU state */
+	C3D_DepthTest(true, GPU_LESS, s_colorMask);
 }
 
 bool render_flip(render_info_t *info)
@@ -387,6 +440,7 @@ bool FSBeginScene(void)
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 		C3D_FrameDrawOn(s_targetLeft);
+		s_targetCurrent = s_targetLeft;
 		C3D_BindProgram(&s_shaderProgram);
 
 		/* Initialize GPU state for the frame — without this, the first
@@ -404,7 +458,7 @@ bool FSBeginScene(void)
 			C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
 			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 		}
-		C3D_DepthTest(true, GPU_LESS, GPU_WRITE_ALL);
+		C3D_DepthTest(true, GPU_LESS, s_colorMask);
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
@@ -441,17 +495,20 @@ void reset_trans(void)
 
 void reset_zbuff(void)
 {
-	C3D_DepthTest(true, GPU_LESS, GPU_WRITE_ALL);
+	C3D_DepthTest(true, GPU_LESS, s_colorMask);
 }
 
 void disable_zbuff_write(void)
 {
-	C3D_DepthTest(true, GPU_LESS, GPU_WRITE_COLOR);
+	/* Write color only (no depth), respecting anaglyph channel mask */
+	GPU_WRITEMASK mask = s_colorMask & ~GPU_WRITE_DEPTH;
+	C3D_DepthTest(true, GPU_LESS, mask);
 }
 
 void disable_zbuff(void)
 {
-	C3D_DepthTest(false, GPU_ALWAYS, GPU_WRITE_COLOR);
+	GPU_WRITEMASK mask = s_colorMask & ~GPU_WRITE_DEPTH;
+	C3D_DepthTest(false, GPU_ALWAYS, mask);
 }
 
 void cull_none(void)
@@ -504,23 +561,33 @@ void set_whiteout_state(void)
 bool FSClear(XYRECT *rect)
 {
 	(void)rect;
-	if (s_targetLeft)
-		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+	if (!s_targetCurrent) return true;
+
+	/* In anaglyph stereo, only clear depth — the hardware clear ignores
+	 * color masks and would wipe the other eye's channel data. */
+	if (s_colorMask != GPU_WRITE_ALL)
+		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
+	else
+		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 	return true;
 }
 
 bool FSClearBlack(void)
 {
-	if (s_targetLeft)
-		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_COLOR, 0x000000FF, 0);
+	if (!s_targetCurrent) return true;
+
+	if (s_colorMask != GPU_WRITE_ALL)
+		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0);
+	else
+		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_COLOR, 0x000000FF, 0);
 	return true;
 }
 
 bool FSClearDepth(XYRECT *rect)
 {
 	(void)rect;
-	if (s_targetLeft)
-		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
+	if (s_targetCurrent)
+		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
 	return true;
 }
 

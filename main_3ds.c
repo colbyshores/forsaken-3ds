@@ -186,14 +186,6 @@ bool platform_init_video(void)
 
 float platform_get_3d_slider(void)
 {
-#ifdef RENDERER_C3D
-	/* Citro3d renderer: stereo not yet implemented (Phase 5).
-	 * pglTransferEye is a no-op and render_set_filter doesn't apply
-	 * per-channel write masks, so both eyes render in full color to
-	 * the same target — producing a ~5-10px ghost offset on all
-	 * geometry.  Force mono until stereo support is added. */
-	return 0.0f;
-#else
 	extern float config_get_float(const char *opt, float _default);
 	/* Check for a test override first (useful when testing in Mandarine/Citra
 	 * which return garbage from osGet3DSliderState).
@@ -207,7 +199,6 @@ float platform_get_3d_slider(void)
 	if (v < 0.0f) v = 0.0f;
 	if (v > 1.0f) v = 1.0f;
 	return v;
-#endif
 }
 
 /* ---- frame present ---- */
