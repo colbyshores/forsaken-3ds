@@ -112,7 +112,7 @@ typedef struct {
 	bool     has_texture;
 } dl_entry_t;
 
-#define MAX_DL_ENTRIES 4096
+#define MAX_DL_ENTRIES 2048
 static dl_entry_t s_dl[MAX_DL_ENTRIES];
 static int  s_dlCount     = 0;
 static bool s_dlRecording = false;
@@ -167,12 +167,12 @@ static bool s_inFrame = false;
  * pglInit/pglExit/pglSwapBuffers/pglTransferEye implementations. */
 void pglInit(void)
 {
-	/* Double the default GPU command buffer (256KB → 512KB).
+	/* 4× the default GPU command buffer (256KB → 1MB).
 	 * Forsaken draws hundreds of texture groups per frame, each a
-	 * separate C3D_DrawArrays call that appends GPU commands.  Heavy
-	 * particle scenes (lava tunnel, explosions) can overflow the
-	 * default 256KB command buffer. */
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 2);
+	 * separate C3D_DrawArrays call that appends ~100 bytes of GPU
+	 * commands.  Laser beams and heavy particle scenes can produce
+	 * thousands of draw calls that overflow smaller buffers. */
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
 }
 
 void pglExit(void)
@@ -563,13 +563,14 @@ void render_mode_fill(void) { /* always fill on PICA200 */ }
 
 bool FSBeginScene(void)
 {
-	/* Start recording display list for single-pass stereo.
-	 * If s_dlReplay is set, the second eye was already drawn by
-	 * replay_display_list in pglTransferEye — skip this frame. */
+	/* Single-pass stereo: if replay already drew the second eye, skip. */
 	if (s_dlReplay)
 		return true;
+	/* Only record display list when hardware stereo is active —
+	 * recording is wasted work for mono and anaglyph modes. */
 	s_dlCount = 0;
-	s_dlRecording = true;
+	s_dlRecording = (render_info.stereo_enabled &&
+	                 render_info.stereo_mode == STEREO_MODE_3DS);
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
