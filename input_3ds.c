@@ -195,9 +195,13 @@ bool handle_events(void)
 	if (kHeld & KEY_DLEFT)  joy_hat_state[0][0][JOY_HAT_LEFT]  = 1;
 
 	/* ---- inject key presses into input buffer for menu nav ---- */
+	/* B only injects ESCAPE when a menu is open (go back / close).
+	 * During gameplay B is fire secondary (joy button 1). */
+	{extern int _3ds_is_menu_open(void);
+	int menu_open = _3ds_is_menu_open();
 	if (kDown & KEY_A)
 		input_buffer[input_buffer_count++] = SDLK_RETURN;
-	if (kDown & KEY_B)
+	if ((kDown & KEY_B) && menu_open)
 		input_buffer[input_buffer_count++] = SDLK_ESCAPE;
 	if (kDown & KEY_DUP)
 		input_buffer[input_buffer_count++] = SDLK_UP;
@@ -207,7 +211,9 @@ bool handle_events(void)
 		input_buffer[input_buffer_count++] = SDLK_LEFT;
 	if (kDown & KEY_DRIGHT)
 		input_buffer[input_buffer_count++] = SDLK_RIGHT;
-	if (kDown & KEY_START)
+	/* Only inject ESCAPE from Start when Select is NOT held — Select+Start
+	 * is a common combo that crashes if the menu opens during rear view. */
+	if ((kDown & KEY_START) && !(kHeld & KEY_SELECT))
 		input_buffer[input_buffer_count++] = SDLK_ESCAPE;
 
 	/* populate key_state for any code that reads it.
@@ -216,8 +222,11 @@ bool handle_events(void)
 	 * selection.  D-pad menu navigation uses input_buffer (kDown events above). */
 	memset(_3ds_key_state, 0, sizeof(_3ds_key_state));
 	if (kHeld & KEY_A)      _3ds_key_state[SDLK_RETURN] = 1;
-	if (kHeld & KEY_B)      _3ds_key_state[SDLK_ESCAPE] = 1;
-	if (kHeld & KEY_START)  _3ds_key_state[SDLK_ESCAPE]  = 1;
+	if ((kHeld & KEY_B) && menu_open)
+		_3ds_key_state[SDLK_ESCAPE] = 1;
+	}
+	if ((kHeld & KEY_START) && !(kHeld & KEY_SELECT))
+		_3ds_key_state[SDLK_ESCAPE] = 1;
 	if (kHeld & KEY_X)      _3ds_key_state[SDLK_SPACE]  = 1;
 
 	return true;

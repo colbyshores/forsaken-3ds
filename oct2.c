@@ -4761,12 +4761,7 @@ bool MainGame( void ) // bjd
 #ifdef __3DS__
   _3ds_mr_ctx = "post-MainGameRender";
 #endif
-#ifndef __3DS__
-  /* [3DS] MenuProcess disabled — in-game menus are fully disabled on 3DS
-   * (see ESCAPE handler in ProcessGameKeys).  Calling MenuProcess() when
-   * CurrentMenu is somehow non-NULL would auto-navigate via stale keys. */
   MenuProcess(); // menu keys are processed here
-#endif
   ProcessGameKeys(); // here is where we process F keys
 #ifdef __3DS__
   _3ds_mr_ctx = "post-ProcessGameKeys";

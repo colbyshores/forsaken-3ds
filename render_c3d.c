@@ -65,6 +65,7 @@
 #include "main_3ds.h"
 #include "lights.h"
 #include "platform.h"
+#include "camera.h"
 
 /* ---- shader binary (compiled from shaders/render_c3d.v.pica) ---- */
 #include "render_c3d_shbin.h"
@@ -723,6 +724,18 @@ bool FSClear(XYRECT *rect)
 {
 	(void)rect;
 	if (!s_targetCurrent || s_dlReplay) return true;
+
+	/* Sub-viewports (missile cam, PIP, rear view) render AFTER the main
+	 * camera.  C3D_RenderTargetClear wipes the entire framebuffer — it
+	 * cannot clear a sub-region.  Only clear depth so the sub-viewport
+	 * draws on top of the main view without destroying it. */
+	extern int16_t CameraRendering;
+	if (CameraRendering != CAMRENDERING_None &&
+	    CameraRendering != CAMRENDERING_Main)
+	{
+		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
+		return true;
+	}
 
 	/* In anaglyph stereo, only clear depth — the hardware clear ignores
 	 * color masks and would wipe the other eye's channel data. */
