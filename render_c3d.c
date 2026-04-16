@@ -1073,40 +1073,229 @@ bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName,
 }
 
 /*===================================================================
-	Lighting (Phase 2: CPU-side same as GL1)
+	Lighting — CPU-side per-vertex, ported from render_gl1.c
 ===================================================================*/
+
+/* Lighting globals — set by the engine's TransExe system per object */
+int render_color_blend_red   = 0;
+int render_color_blend_green = 0;
+int render_color_blend_blue  = 0;
+
+int render_lighting_enabled = 0;
+int render_lighting_point_lights_only = 1;
+int render_lighting_use_only_light_color = 0;
+int render_lighting_use_only_light_color_and_blend = 0;
+
+int render_light_ambience = 0;
+int render_light_ambience_alpha = 255.0f;
+
+int render_lighting_env_water         = 0;
+int render_lighting_env_water_level   = 0;
+float render_lighting_env_water_red   = 0.0f;
+float render_lighting_env_water_green = 0.0f;
+float render_lighting_env_water_blue  = 0.0f;
+
+int render_lighting_env_whiteout = 0;
 
 void render_reset_lighting_variables(void)
 {
-	/* Reset per-frame light list — implementation shared with GL1 */
+	render_color_blend_red   = 0;
+	render_color_blend_green = 0;
+	render_color_blend_blue  = 0;
+	render_lighting_enabled = 0;
+	render_lighting_point_lights_only = 1;
+	render_lighting_use_only_light_color = 0;
+	render_lighting_use_only_light_color_and_blend = 0;
+	render_light_ambience = 0;
+	render_light_ambience_alpha = 255.0f;
+	render_lighting_env_water         = 0;
+	render_lighting_env_water_level   = 0;
+	render_lighting_env_water_red   = 0.0f;
+	render_lighting_env_water_green = 0.0f;
+	render_lighting_env_water_blue  = 0.0f;
+	render_lighting_env_whiteout = 0;
 }
 
 void do_water_effect(VECTOR *pos, COLOR *color)
 {
-	/* TODO: port from render_gl1.c */
-	(void)pos; (void)color;
+	u_int32_t r, g, b;
+	int x, y, z;
+	float intensity, seconds;
+	static float speed = 71.0f;
+	if (render_lighting_env_water == 2 && pos->y >= render_lighting_env_water_level)
+		return;
+	r = color[2] >> 2;
+	g = color[1] >> 2;
+	b = color[0] >> 2;
+	x = (float)((int)(pos->x * 0.35f) % 360);
+	y = (float)((int)(pos->y * 0.35f) % 360);
+	z = (float)((int)(pos->z * 0.35f) % 360);
+	seconds = SDL_GetTicks() / 1000.0f;
+	intensity = (float)(
+		(fast_sinf(D2R(x + seconds * speed)) +
+		 fast_sinf(D2R(y + seconds * speed)) +
+		 fast_sinf(D2R(z + seconds * speed))
+		) * 127.0f * 0.3333333f + 128.0f
+	);
+	r += render_lighting_env_water_red   * intensity;
+	g += render_lighting_env_water_green * intensity;
+	b += render_lighting_env_water_blue  * intensity;
+	if (r > 255) r = 255;
+	if (g > 255) g = 255;
+	if (b > 255) b = 255;
+	color[2] = (u_int8_t)r;
+	color[1] = (u_int8_t)g;
+	color[0] = (u_int8_t)b;
 }
 
 void do_whiteout_effect(VECTOR *pos, COLOR *color)
 {
-	/* TODO: port from render_gl1.c */
-	(void)pos; (void)color;
+	int x, y, z, intensity;
+	float seconds;
+	static float speed = 71.0f;
+	x = (float)((int)(pos->x * 0.35f) % 360);
+	y = (float)((int)(pos->y * 0.35f) % 360);
+	z = (float)((int)(pos->z * 0.35f) % 360);
+	seconds = SDL_GetTicks() / 1000.0f;
+	intensity = (int)(
+		(fast_sinf(D2R(x + seconds * speed)) +
+		 fast_sinf(D2R(y + seconds * speed)) +
+		 fast_sinf(D2R(z + seconds * speed))
+		) * 127.0f * 0.3333333f + 128.0f
+	);
+	intensity += render_lighting_env_whiteout;
+	if (intensity > 255) intensity = 255;
+	*color &= 0xffff;
+	*color |= (intensity << 24) + (intensity << 16);
 }
+
+extern XLIGHT *FirstLightVisible;
 
 void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, float *A)
 {
-	/* TODO: port from render_gl1.c */
-	*R = *G = *B = 1.0f;
-	*A = 1.0f;
+	VECTOR ray;
+	float rlen, rlen2, lsize2, intensity, cosa, cosarc2;
+	XLIGHT *LightPnt = FirstLightVisible;
+
+	*R = *G = *B = render_light_ambience;
+	*A = render_light_ambience_alpha;
+
+	while (LightPnt)
+	{
+		ray.x = Pos->x - LightPnt->Pos.x;
+		ray.y = Pos->y - LightPnt->Pos.y;
+		ray.z = Pos->z - LightPnt->Pos.z;
+
+		rlen2 = ray.x * ray.x + ray.y * ray.y + ray.z * ray.z;
+		lsize2 = LightPnt->Size * LightPnt->Size;
+
+		if (rlen2 < lsize2)
+		{
+			if (render_lighting_point_lights_only || LightPnt->Type == POINT_LIGHT)
+			{
+				intensity = 1.0f - rlen2 / (int)lsize2;
+			}
+			else if (LightPnt->Type == SPOT_LIGHT)
+			{
+				if (rlen2 > 0.0f)
+				{
+					rlen = sqrtf(rlen2);
+					ray.x /= rlen;
+					ray.y /= rlen;
+					ray.z /= rlen;
+				}
+				cosa = ray.x * LightPnt->Dir.x +
+				       ray.y * LightPnt->Dir.y +
+				       ray.z * LightPnt->Dir.z;
+
+				if (rlen2 > lsize2 * 0.5f)
+				{
+					if (cosa > LightPnt->CosArc)
+						intensity = ((lsize2 - rlen2) / (0.75f * lsize2)) *
+						            ((cosa - LightPnt->CosArc) / (1.0f - LightPnt->CosArc));
+					else
+						goto NEXT_LIGHT;
+				}
+				else if (rlen2 > MIN_LIGHT_SIZE)
+				{
+					cosarc2 = LightPnt->CosArc *
+						(1.0f - (lsize2 * 0.5f - rlen2) / (lsize2 * 0.5f - MIN_LIGHT_SIZE));
+					if (cosa > cosarc2)
+						intensity = ((lsize2 - rlen2) / (lsize2 - MIN_LIGHT_SIZE)) *
+						            ((cosa - cosarc2) / (1.0f - cosarc2));
+					else
+						goto NEXT_LIGHT;
+				}
+				else
+				{
+					intensity = (cosa > 0.0f) ? 1.0f : 1.0f + cosa;
+				}
+			}
+			else
+				goto NEXT_LIGHT;
+
+			*R += LightPnt->r * intensity;
+			*G += LightPnt->g * intensity;
+			*B += LightPnt->b * intensity;
+			*A += 255.0f * intensity;
+		}
+
+NEXT_LIGHT:
+		LightPnt = LightPnt->NextVisible;
+	}
+
+	if (*R > 255.0f) *R = 255.0f;
+	if (*G > 255.0f) *G = 255.0f;
+	if (*B > 255.0f) *B = 255.0f;
+	if (*A > 255.0f) *A = 255.0f;
 }
+
+#define MINUS(X, Y) \
+	tmp = X; tmp -= Y; \
+	X = (tmp < 0) ? 0 : (tmp > 255) ? 255 : tmp
+
+#define ADD(X, Y) MINUS(X, -Y)
+
+#define MIX_COLOR_BLEND_LIGHT(COLOR, BLEND, LIGHT) \
+	ADD(COLOR, LIGHT); MINUS(COLOR, BLEND)
 
 void light_vert(LVERTEX *vert, u_int8_t *color)
 {
-	/* No per-vertex lighting yet — set full-bright white so geometry
-	 * is visible. Without this, vertices stay at black (0xFF000000)
-	 * and GPU_MODULATE (texture × vertex color) produces all black. */
-	vert->color = 0xFFFFFFFF;  /* ARGB: opaque white */
-	(void)color;
+	int tmp;
+	float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
+	VECTOR world, v = { vert->x, vert->y, vert->z };
+	MxV(&world_matrix, &v, &world);
+	if (render_lighting_env_whiteout)
+		do_whiteout_effect(&world, color);
+	else if (render_lighting_env_water)
+		do_water_effect(&world, color);
+#ifndef LIGHT_EVERYTHING
+	if (render_lighting_enabled)
+#endif
+		GetRealLightAmbientWorldSpace(&world, &r, &g, &b, &a);
+	if (render_lighting_use_only_light_color)
+	{
+		color[0] = b;
+		color[1] = g;
+		color[2] = r;
+		color[3] = a;
+	}
+	else if (render_lighting_use_only_light_color_and_blend)
+	{
+		color[0] = b;
+		color[1] = g;
+		color[2] = r;
+		color[3] = a;
+		ADD(color[0], render_color_blend_blue);
+		ADD(color[1], render_color_blend_green);
+		ADD(color[2], render_color_blend_red);
+	}
+	else
+	{
+		MIX_COLOR_BLEND_LIGHT(color[0], render_color_blend_blue,  b);
+		MIX_COLOR_BLEND_LIGHT(color[1], render_color_blend_green, g);
+		MIX_COLOR_BLEND_LIGHT(color[2], render_color_blend_red,   r);
+	}
 }
 
 /*===================================================================
