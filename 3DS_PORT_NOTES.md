@@ -850,6 +850,29 @@ textures. GPU_RGBA4 (16-bit) halves VRAM usage, matching picaGL's default.
 texcoord[2]}` = 36 bytes. Colors pre-normalized from LVERTEX's packed u32 ARGB.
 256KB `linearAlloc` scratch buffer holds ~7000 vertices per frame.
 
+### Colourkey Transparency Fix (render_c3d.c)
+
+Black pixels on textured surfaces (grates, shadows, overlays) rendered as
+opaque black instead of transparent.
+
+**Root cause:** `build_gamma_table()` clamps `gamma_table[0]` to 1 (not 0).
+After gamma correction, pure black pixels (0,0,0) became (1,1,1). The
+colourkey check `if (R+G+B == 0)` ran AFTER gamma, so it never triggered
+and alpha stayed 255 (opaque).
+
+Additionally, alpha blending was only enabled for `colourkey=true` texture
+groups. The picaGL GL1 path enables blending for ALL textured surfaces
+(colourkey and non-colourkey), since all textures have alpha=0 for black
+pixels from the loader's colourkey conversion.
+
+**Fix (3 parts):**
+1. Move colourkey check BEFORE gamma correction — test raw pixel values
+2. Skip gamma on the alpha channel for colourkey pixels (gamma would turn
+   alpha=0 back to 1)
+3. Enable `SRC_ALPHA`/`ONE_MINUS_SRC_ALPHA` blending for ALL textured
+   surfaces, matching picaGL. Also added `C3D_TexFlush` after
+   `C3D_TexUpload` (matching SM64 3DS pattern).
+
 ### Completed Phases
 1. Scaffold: render_c3d.c skeleton, vertex shader, Makefile toggle
 2. GPU buffers + draw path: linearAlloc, C3D_DrawArrays, state management

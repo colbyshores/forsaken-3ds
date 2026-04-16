@@ -815,12 +815,17 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 			for (x = 0; x < image.w; x++)
 			{
 				DWORD idx = y * pitch + x * 4;
+				/* Colourkey: pure black (0,0,0) → alpha=0 for transparency.
+				 * Check BEFORE gamma because gamma_table clamps 0→1,
+				 * turning (0,0,0) into (1,1,1) and breaking R+G+B==0. */
+				bool is_colorkey = (((u_int8_t)image.data[idx] + (u_int8_t)image.data[idx+1] + (u_int8_t)image.data[idx+2]) == 0);
 				image.data[idx]   = (char)gamma_table[(u_int8_t)image.data[idx]];
 				image.data[idx+1] = (char)gamma_table[(u_int8_t)image.data[idx+1]];
 				image.data[idx+2] = (char)gamma_table[(u_int8_t)image.data[idx+2]];
-				image.data[idx+3] = (char)gamma_table[(u_int8_t)image.data[idx+3]];
-				if ((image.data[idx] + image.data[idx+1] + image.data[idx+2]) == 0)
+				if (is_colorkey)
 					image.data[idx+3] = 0;
+				else
+					image.data[idx+3] = (char)gamma_table[(u_int8_t)image.data[idx+3]];
 			}
 	}
 
@@ -865,6 +870,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		{
 			tile_rgba4((u_int8_t*)image.data, (u_int16_t*)tiled, image.w, image.h);
 			C3D_TexUpload(&texdata->tex, tiled);
+			C3D_TexFlush(&texdata->tex);
 			linearFree(tiled);
 		}
 		else
@@ -1077,15 +1083,15 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			totalVerts = numVerts;
 		}
 
-		/* GPU state */
+		/* GPU state — enable alpha blend for all textured surfaces
+		 * (matching picaGL GL1 path).  All textures have alpha=0 for
+		 * black pixels from the colourkey conversion in create_texture. */
 		if (tg->colourkey)
-		{
 			C3D_AlphaTest(true, GPU_GREATER, 0x64);
-			if (!_additive_blend_active)
-				C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
-					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
-					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
-		}
+		if (tg->texture && !_additive_blend_active)
+			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
+				GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 
 		/* Texture binding */
 		{
@@ -1128,12 +1134,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 		/* Restore state */
 		if (tg->colourkey)
-		{
 			C3D_AlphaTest(false, GPU_ALWAYS, 0);
-			if (!_additive_blend_active)
-				C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
-					GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
-		}
+		if (tg->texture && !_additive_blend_active)
+			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
 	}
 
 	return true;
