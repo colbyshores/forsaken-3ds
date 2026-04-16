@@ -95,6 +95,29 @@ typedef struct {
 	float texcoord[2];
 } gpu_vertex_t;  /* 36 bytes */
 
+/* ---- Single-pass stereo display list ---- */
+
+/* Records one texture group draw for replay on the second eye.
+ * Vertex data stays in the scratch buffer; only the MVP changes. */
+typedef struct {
+	int      scratchOffset;   /* index into s_scratch */
+	int      vertexCount;
+	MATRIX   worldMatrix;
+	MATRIX   projMatrix;
+	render_viewport_t viewport;
+	void    *texture;         /* texture_t* or NULL */
+	bool     colourkey;
+	bool     orthographic;
+	bool     additive_blend;
+	bool     has_texture;
+} dl_entry_t;
+
+#define MAX_DL_ENTRIES 4096
+static dl_entry_t s_dl[MAX_DL_ENTRIES];
+static int  s_dlCount     = 0;
+static bool s_dlRecording = false;
+static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
+
 /* Scratch buffer for vertex conversion.
  * 1MB = ~29000 verts at 36 bytes each.  Needs to handle heavy
  * particle frames (lava tunnel, explosions) without FrameSplit. */
@@ -109,6 +132,9 @@ render_info_t render_info;
 
 typedef struct { float anisotropic; } gl_caps_t;
 gl_caps_t caps;
+
+/* Forward declarations */
+static void upload_matrices(void);
 
 MATRIX proj_matrix;
 MATRIX view_matrix;
@@ -165,33 +191,136 @@ void pglSwapBuffers(void)
 	/* Reset stereo state for next frame */
 	s_stereoFrame = false;
 	s_colorMask = GPU_WRITE_ALL;
+	s_dlReplay = false;
+	s_dlRecording = false;
+}
+
+/* Replay the display list recorded during the first eye.
+ * Reuses vertex data already in the scratch buffer — only
+ * recomputes the MVP with the updated view matrix. */
+static void replay_display_list(void)
+{
+	int i;
+	for (i = 0; i < s_dlCount; i++)
+	{
+		dl_entry_t *e = &s_dl[i];
+		gpu_vertex_t *dst = s_scratch + e->scratchOffset;
+
+		/* Restore per-entry state */
+		if (e->additive_blend)
+		{
+			C3D_DepthTest(true, GPU_LESS, s_colorMask & ~GPU_WRITE_DEPTH);
+			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+				GPU_SRC_ALPHA, GPU_ONE, GPU_SRC_ALPHA, GPU_ONE);
+		}
+		else
+		{
+			C3D_DepthTest(true, GPU_LESS, s_colorMask);
+			if (e->has_texture)
+				C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
+					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
+			else
+				C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+					GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
+		}
+
+		if (e->colourkey)
+			C3D_AlphaTest(true, GPU_GREATER, 0x64);
+
+		/* Viewport */
+		{
+			int bottom = (int)render_info.ThisMode.h - (int)(e->viewport.Y + e->viewport.Height);
+			int pica_x = bottom < 0 ? 0 : bottom;
+			int pica_y = (400 - (int)e->viewport.Width) - (int)e->viewport.X;
+			if (pica_y < 0) pica_y = 0;
+			C3D_SetViewport((u32)pica_x, (u32)pica_y,
+				(u32)e->viewport.Height, (u32)e->viewport.Width);
+		}
+
+		/* Recompute MVP with new view matrix (eye offset already applied
+		 * by the engine before pglTransferEye was called) */
+		if (!e->orthographic)
+		{
+			memmove(&world_matrix, &e->worldMatrix, sizeof(MATRIX));
+			memmove(&proj_matrix, &e->projMatrix, sizeof(MATRIX));
+			upload_matrices();
+		}
+		else
+		{
+			C3D_Mtx ortho, identity;
+			Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
+				render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
+			Mtx_Identity(&identity);
+			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
+			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
+		}
+
+		/* Texture binding */
+		{
+			C3D_TexEnv *env = C3D_GetTexEnv(0);
+			C3D_TexEnvInit(env);
+			if (e->has_texture && e->texture)
+			{
+				texture_t *texdata = (texture_t*)e->texture;
+				if (texdata->initialized)
+				{
+					C3D_TexBind(0, &texdata->tex);
+					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+				}
+				else goto notex;
+			}
+			else
+			{
+			notex:
+				C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+				C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+			}
+		}
+
+		/* Draw from cached vertex data */
+		{
+			C3D_AttrInfo *ai = C3D_GetAttrInfo();
+			C3D_BufInfo *bi = C3D_GetBufInfo();
+			AttrInfo_Init(ai);
+			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
+			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
+			BufInfo_Init(bi);
+			BufInfo_Add(bi, dst, sizeof(gpu_vertex_t), 3, 0x210);
+		}
+		C3D_DrawArrays(GPU_TRIANGLES, 0, e->vertexCount);
+
+		/* Restore */
+		if (e->colourkey)
+			C3D_AlphaTest(false, GPU_ALWAYS, 0);
+	}
 }
 
 void pglTransferEye(unsigned int eye)
 {
 	if (eye == GFX_LEFT)
 	{
-		/* Left eye just finished rendering to s_targetLeft.
-		 * Switch to right eye target: clear it and start drawing. */
+		/* Left eye finished. Stop recording, prepare for replay. */
+		s_dlRecording = false;
+
+		/* Switch to right eye target */
 		C3D_RenderTargetClear(s_targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 		C3D_FrameDrawOn(s_targetRight);
 		s_targetCurrent = s_targetRight;
 
 		/* Re-initialize GPU state for the new render target */
 		C3D_BindProgram(&s_shaderProgram);
-		{
-			C3D_AttrInfo *ai = C3D_GetAttrInfo();
-			AttrInfo_Init(ai);
-			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
-			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
-		}
 		C3D_DepthTest(true, GPU_LESS, s_colorMask);
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
-		/* Reset scratch for second eye */
-		s_scratchUsed = 0;
+		/* DON'T replay yet — the engine hasn't updated the camera
+		 * position for the right eye.  Set the flag so the first
+		 * draw_render_object call triggers the replay with the
+		 * correct view matrix. */
+		s_dlReplay = true;
 	}
 	/* GFX_RIGHT: no-op — C3D_FrameEnd auto-transfers both targets */
 	s_stereoFrame = true;
@@ -434,6 +563,13 @@ void render_mode_fill(void) { /* always fill on PICA200 */ }
 
 bool FSBeginScene(void)
 {
+	/* Start recording display list for single-pass stereo.
+	 * If s_dlReplay is set, the second eye was already drawn by
+	 * replay_display_list in pglTransferEye — skip this frame. */
+	if (s_dlReplay)
+		return true;
+	s_dlCount = 0;
+	s_dlRecording = true;
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
@@ -561,7 +697,7 @@ void set_whiteout_state(void)
 bool FSClear(XYRECT *rect)
 {
 	(void)rect;
-	if (!s_targetCurrent) return true;
+	if (!s_targetCurrent || s_dlReplay) return true;
 
 	/* In anaglyph stereo, only clear depth — the hardware clear ignores
 	 * color masks and would wipe the other eye's channel data. */
@@ -982,6 +1118,20 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 {
 	int group;
 
+	/* Single-pass stereo: on the first draw call of the second eye,
+	 * replay the entire display list with the updated view matrix
+	 * (the engine has now set up the right eye camera).  Then skip
+	 * all subsequent draw calls for this pass. */
+	if (s_dlReplay)
+	{
+		if (s_dlCount > 0)
+		{
+			replay_display_list();
+			s_dlCount = 0;  /* prevent re-replay */
+		}
+		return true;
+	}
+
 	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
 		return false;
 
@@ -1160,6 +1310,22 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 
 		C3D_DrawArrays(GPU_TRIANGLES, 0, totalVerts);
+
+		/* Record to display list for single-pass stereo replay */
+		if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES)
+		{
+			dl_entry_t *e = &s_dl[s_dlCount++];
+			e->scratchOffset = s_scratchUsed;
+			e->vertexCount   = totalVerts;
+			memmove(&e->worldMatrix, &world_matrix, sizeof(MATRIX));
+			memmove(&e->projMatrix,  &proj_matrix,  sizeof(MATRIX));
+			e->viewport       = s_viewport;
+			e->texture        = tg->texture;
+			e->colourkey      = tg->colourkey;
+			e->orthographic   = orthographic;
+			e->additive_blend = _additive_blend_active;
+			e->has_texture    = has_texture;
+		}
 
 		s_scratchUsed += totalVerts;
 
