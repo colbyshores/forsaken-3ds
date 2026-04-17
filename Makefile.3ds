@@ -171,6 +171,10 @@ $(ROMFS_STAMP): $(SRCDIR)/romfs
 		d=$$(dirname "$$f"); b=$$(basename "$$f"); lb=$$(echo "$$b" | tr 'A-Z' 'a-z'); \
 		if [ "$$b" != "$$lb" ]; then mv "$$d/$$b" "$$d/$$lb"; fi; \
 	done
+	@if [ -d $(SRCDIR)/romfs_hd ]; then \
+		echo "Copying HD textures..."; \
+		cp -r $(SRCDIR)/romfs_hd/. $(ROMFS_STAGING)/hd/; \
+	fi
 	@touch $(ROMFS_STAMP)
 
 $(OUTPUT_SMDH):

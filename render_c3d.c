@@ -957,10 +957,136 @@ static void tile_rgba4(const u_int8_t *src, u_int16_t *dst, int w, int h)
 	}
 }
 
+/* Try loading a pre-converted ETC1A4 HD texture.
+ * Path mapping: data\textures\foo.bmp → romfs:/hd/textures/foo.etc1
+ *               data\levels\vol2\textures\bar.bmp → romfs:/hd/levels/vol2/textures/bar.etc1
+ * Returns true if loaded, false to fall back to standard path. */
+static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
+	u_int16_t *width, u_int16_t *height, bool *colorkey)
+{
+	char hd_path[512];
+	char *p;
+	FILE *f;
+	const int HD_SIZE = 256;
+	u_int32_t data_size = HD_SIZE * HD_SIZE;  /* ETC1A4: 1 byte/pixel for 256x256 */
+	void *data;
+	texture_t *texdata;
+
+	/* Build HD path: convert backslashes, prepend "romfs:/hd/", change ext to .etc1 */
+	{
+		const char *base = path;
+		/* Skip leading drive/path to get to data\ */
+		const char *data_start = NULL;
+		int i;
+
+		/* Find "data\" or "Data\" in the path */
+		for (i = 0; path[i]; i++)
+		{
+			if ((path[i] == 'd' || path[i] == 'D') &&
+			    (path[i+1] == 'a' || path[i+1] == 'A') &&
+			    (path[i+2] == 't' || path[i+2] == 'T') &&
+			    (path[i+3] == 'a' || path[i+3] == 'A') &&
+			    (path[i+4] == '\\' || path[i+4] == '/'))
+			{
+				data_start = &path[i+5]; /* skip "data\" */
+				break;
+			}
+		}
+
+		if (!data_start)
+			return false;
+
+		snprintf(hd_path, sizeof(hd_path), "romfs:/hd/%s", data_start);
+
+		/* Convert backslashes and lowercase */
+		for (p = hd_path; *p; p++)
+		{
+			if (*p == '\\') *p = '/';
+			if (*p >= 'A' && *p <= 'Z') *p += 32;
+		}
+
+		/* Change extension to .etc1 */
+		p = strrchr(hd_path, '.');
+		if (p)
+			strcpy(p, ".etc1");
+		else
+			strcat(hd_path, ".etc1");
+	}
+
+	f = fopen(hd_path, "rb");
+	if (!f)
+		return false;
+
+	/* Get file size to verify */
+	fseek(f, 0, SEEK_END);
+	data_size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	/* Allocate texture */
+	if (*t == NULL)
+	{
+		texdata = malloc(sizeof(texture_t));
+		if (!texdata) { fclose(f); return false; }
+		memset(texdata, 0, sizeof(texture_t));
+	}
+	else
+	{
+		texdata = (texture_t*)*t;
+		if (texdata->initialized)
+		{
+			C3D_TexDelete(&texdata->tex);
+			texdata->initialized = false;
+		}
+	}
+
+	if (!C3D_TexInit(&texdata->tex, HD_SIZE, HD_SIZE, GPU_ETC1A4))
+	{
+		DebugPrintf("HD texture: C3D_TexInit ETC1A4 failed for %s\n", hd_path);
+		fclose(f);
+		if (*t == NULL) free(texdata);
+		return false;
+	}
+
+	/* Read ETC1A4 data directly into the texture — already in GPU-ready format
+	 * (tex3ds -r output is Morton-tiled ETC1A4 matching PICA200 layout) */
+	data = linearAlloc(data_size);
+	if (!data)
+	{
+		C3D_TexDelete(&texdata->tex);
+		fclose(f);
+		if (*t == NULL) free(texdata);
+		return false;
+	}
+
+	fread(data, 1, data_size, f);
+	fclose(f);
+
+	C3D_TexUpload(&texdata->tex, data);
+	C3D_TexFlush(&texdata->tex);
+	linearFree(data);
+
+	C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
+	C3D_TexSetWrap(&texdata->tex, GPU_REPEAT, GPU_REPEAT);
+
+	texdata->initialized = true;
+	*t = (LPTEXTURE)texdata;
+	*width = HD_SIZE;
+	*height = HD_SIZE;
+	*colorkey = true; /* ETC1A4 has alpha channel for colorkey */
+
+	DebugPrintf("HD texture: loaded %s (ETC1A4 %dx%d, %u bytes)\n",
+		hd_path, HD_SIZE, HD_SIZE, data_size);
+	return true;
+}
+
 static bool create_texture(LPTEXTURE *t, const char *path,
 	u_int16_t *width, u_int16_t *height, int numMips, bool *colorkey)
 {
 	texture_image_t image;
+
+	/* Try HD ETC1A4 texture first */
+	if (try_load_hd_texture(t, path, width, height, colorkey))
+		return true;
 
 	Change_Ext(path, image.path, ".PNG");
 	if (!File_Exists((char*)image.path))
