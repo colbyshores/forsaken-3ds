@@ -25,18 +25,35 @@ This fork provides a complete, playable 3DS homebrew build with a custom GPU ren
 - [picaGL](https://github.com/masterfeizz/picaGL) (only for the `GL=1` renderer path)
 
 ### Game Data
-You need a legitimate copy of Forsaken. Place the game data directories (`Data/`, `Configs/`, `Pilots/`, `Demos/`, `Scripts/`) inside a `romfs/` directory at the project root. The build process embeds this into the `.3dsx` file.
+You need a legitimate copy of Forsaken. The easiest way to set up game assets is with the included extraction script:
+
+```bash
+# Install dependencies
+sudo apt install p7zip-full bchunk ffmpeg
+
+# Extract everything from a BIN/CUE image (game data + CD audio)
+python3 extract_assets.py "Forsaken (USA).bin"
+
+# Or from an ISO (game data only — no CD audio)
+python3 extract_assets.py "Forsaken (USA).iso"
+
+# Extract only the music tracks (if you already have game data set up)
+python3 extract_assets.py --music-only "Forsaken (USA).bin"
+```
+
+This automatically extracts game data, converts CD audio tracks to the correct format (16-bit PCM mono 32kHz), lowercases all filenames, and populates the `romfs/` directory:
 
 ```
 forsaken-3ds/
   romfs/
-    data/         <- Data/ from Forsaken install
-    configs/      <- Configs/
-    pilots/       <- Pilots/
-    scripts/      <- scripts/ (Lua files from this repo)
+    data/         <- game levels, models, textures, sounds
+    configs/      <- game configuration
+    pilots/       <- player profiles
+    scripts/      <- Lua scripts
+    music/        <- CD audio tracks (track02.wav - track10.wav)
 ```
 
-File and directory names inside `romfs/` must be **lowercase** — the Makefile handles this automatically during the staging step.
+**Manual setup:** You can also manually copy the game data directories (`Data/`, `Configs/`, `Pilots/`, `Scripts/`) into `romfs/`. File and directory names inside `romfs/` must be **lowercase** — the Makefile handles this automatically during the staging step.
 
 ### Running
 - **Real hardware**: Copy `forsaken3ds.3dsx` to your SD card and launch via a homebrew launcher (Luma3DS + Rosalina recommended). **New 3DS strongly recommended** for performance.
