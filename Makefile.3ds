@@ -68,9 +68,6 @@ EXCLUDE_SRC := \
 	botai_sensors.c \
 	lua_bot.c
 
-ALL_SRC := $(notdir $(wildcard $(SRCDIR)/*.c))
-CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
-OFILES  := $(CFILES:.c=.o)
 
 #---------------------------------------------------------------------------------
 # Compiler / Linker flags
@@ -98,6 +95,10 @@ else
 CFLAGS += -DGL=1
 EXCLUDE_SRC += render_c3d.c
 endif
+
+ALL_SRC := $(notdir $(wildcard $(SRCDIR)/*.c))
+CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
+OFILES  := $(CFILES:.c=.o)
 
 ifeq ($(DEBUG),1)
 CFLAGS += -D__3DS_DEBUG__

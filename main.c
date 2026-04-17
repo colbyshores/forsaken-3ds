@@ -21,6 +21,9 @@
 #include "sfx.h"
 #include "input.h"
 #include "sound.h"
+#ifdef __3DS__
+#include "music.h"
+#endif
 
 #ifndef WIN32
 #include <unistd.h>
@@ -384,6 +387,11 @@ void CleanUpAndPostQuit(void)
 
 #ifdef SOUND_SUPPORT
 
+#ifdef __3DS__
+	// cleanup music
+	music_shutdown();
+#endif
+
 	// cleanup sound system
 	sound_destroy();
 
@@ -536,6 +544,10 @@ static bool AppInit( char * lpCmdLine )
 	if (!InitScene())
 		return false;
 
+#ifdef __3DS__
+	music_init();
+#endif
+
 	// load the view
 	if (!InitView() )
 	{
@@ -658,6 +670,11 @@ int main( int argc, char* argv[] )
 			}
 
         }
+
+#ifdef __3DS__
+		// refill music stream buffers
+		music_update();
+#endif
 
 		// command line asks us to sleep and free up sys resources a bit...
 		if ( cliSleep )
