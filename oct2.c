@@ -62,6 +62,9 @@
 #include "render.h"
 #include "input.h"
 #include "oct2.h"
+#ifdef __3DS__
+#include "music.h"
+#endif
 
 #ifdef SHADOWTEST
 #include "triangles.h"
@@ -2236,6 +2239,10 @@ bool ChangeLevel( void )
 	//  return true;
 
 	LevelNum = NewLevelNum;
+
+#ifdef __3DS__
+	music_play_for_level(LevelNum);
+#endif
 
 	//NumGoldBars = 0;
 
