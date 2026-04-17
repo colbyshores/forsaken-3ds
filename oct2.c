@@ -4470,33 +4470,18 @@ bool MainGameRender(void)
 
 #ifdef __3DS__
       /* [3DS] Drive stereo from the 3D slider.
-       * When the slider is pushed in the game renders two passes via the
-       * existing RenderCurrentCameraInStereo() path — the camera math is
-       * already correct — but routes each eye to the hardware GFX_LEFT /
-       * GFX_RIGHT framebuffers via pglTransferEye() instead of compositing
-       * into a single anaglyph image.  When the slider is at zero we render
-       * mono as usual and keep gfxSet3D(false). */
+       * Only the citro3d renderer supports stereo efficiently via display
+       * list replay (one BSP pass, replayed for the second eye).  picaGL
+       * would need two full render passes which halves the framerate. */
+#ifdef RENDERER_C3D
       {
           extern float platform_get_3d_slider(void);
           float slider = platform_get_3d_slider();
           if (slider > 0.0f)
           {
-              extern float config_get_float(const char *, float);
-              float _ov = config_get_float("stereo_test_slider", -1.0f);
               render_info.stereo_enabled = true;
-              if (_ov >= 0.0f)
-              {
-                  /* Emulator: stereo_test_slider override is active —
-                   * use anaglyph (color) mode since the emulator can't
-                   * display hardware stereoscopic 3D. */
-                  render_info.stereo_mode = STEREO_MODE_COLOR;
-              }
-              else
-              {
-                  /* Real hardware: use native 3DS stereoscopic output. */
-                  gfxSet3D(true);
-                  render_info.stereo_mode = STEREO_MODE_3DS;
-              }
+              gfxSet3D(true);
+              render_info.stereo_mode = STEREO_MODE_3DS;
               render_info.stereo_eye_sep = slider * 30.0f;
           }
           else
@@ -4505,6 +4490,9 @@ bool MainGameRender(void)
               render_info.stereo_enabled = false;
           }
       }
+#else
+      render_info.stereo_enabled = false;
+#endif
 #endif
 
       if( render_info.stereo_enabled )

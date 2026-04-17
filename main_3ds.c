@@ -191,19 +191,24 @@ bool platform_init_video(void)
 
 float platform_get_3d_slider(void)
 {
+#ifndef RENDERER_C3D
+	/* picaGL: stereo not supported (no display list replay = half framerate).
+	 * Always return 0 to keep stereo disabled. */
+	return 0.0f;
+#else
 	extern float config_get_float(const char *opt, float _default);
 	/* Check for a test override first (useful when testing in Mandarine/Citra
-	 * which return garbage from osGet3DSliderState).
-	 * Set   stereo_test_slider = 0.5   in Configs/main.txt or debug.txt.
+	 * which may return 0 from osGet3DSliderState).
+	 * Set   stereo_test_slider = 0.5   in Configs/debug.txt.
 	 * A negative value means "use the real hardware slider". */
 	float override = config_get_float("stereo_test_slider", -1.0f);
 	if (override >= 0.0f)
 		return override > 1.0f ? 1.0f : override;
-	/* Clamp hardware value — emulator stubs may return garbage outside [0,1]. */
 	float v = osGet3DSliderState();
 	if (v < 0.0f) v = 0.0f;
 	if (v > 1.0f) v = 1.0f;
 	return v;
+#endif
 }
 
 /* ---- frame present ---- */
