@@ -57,6 +57,9 @@
 #include "file.h"
 #include "oct2.h"
 #include "tload.h"
+#ifdef __3DS__
+#include "music.h"
+#endif
 
 
 #define MAX_SAVEGAME_SLOTS		16
@@ -5006,6 +5009,9 @@ bool DisplayTitle(void)
 
 	if (!TitleInitDone && (( MyGameStatus == STATUS_Title ) || ( MyGameStatus == STATUS_BetweenLevels )))
 	{
+#ifdef __3DS__
+		music_play_title();
+#endif
 
 		DarkenRoomForStart( NULL );
 		TitleInitDone = true;
