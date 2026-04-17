@@ -544,14 +544,10 @@ bool render_reset(render_info_t *info)
 
 void render_set_filter(bool red, bool green, bool blue)
 {
-	/* Per-channel color write mask for anaglyph stereo.
-	 * Stored globally and applied via C3D_DepthTest which controls
-	 * both depth test and write mask on PICA200. */
 	s_colorMask = GPU_WRITE_DEPTH | GPU_WRITE_ALPHA;
 	if (red)   s_colorMask |= GPU_WRITE_RED;
 	if (green) s_colorMask |= GPU_WRITE_GREEN;
 	if (blue)  s_colorMask |= GPU_WRITE_BLUE;
-	/* Apply immediately to current GPU state */
 	C3D_DepthTest(true, GPU_LESS, s_colorMask);
 }
 
@@ -587,8 +583,8 @@ bool FSBeginScene(void)
 	/* Single-pass stereo: if replay already drew the second eye, skip. */
 	if (s_dlReplay)
 		return true;
-	/* Only record display list when hardware stereo is active —
-	 * recording is wasted work for mono and anaglyph modes. */
+	/* Record display list only for hardware stereo (STEREO_MODE_3DS).
+	 * Anaglyph uses a different compositing approach. */
 	s_dlCount = 0;
 	s_dlRecording = (render_info.stereo_enabled &&
 	                 render_info.stereo_mode == STEREO_MODE_3DS);
@@ -737,23 +733,14 @@ bool FSClear(XYRECT *rect)
 		return true;
 	}
 
-	/* In anaglyph stereo, only clear depth — the hardware clear ignores
-	 * color masks and would wipe the other eye's channel data. */
-	if (s_colorMask != GPU_WRITE_ALL)
-		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
-	else
-		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+	C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 	return true;
 }
 
 bool FSClearBlack(void)
 {
 	if (!s_targetCurrent) return true;
-
-	if (s_colorMask != GPU_WRITE_ALL)
-		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0);
-	else
-		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_COLOR, 0x000000FF, 0);
+	C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_COLOR, 0x000000FF, 0);
 	return true;
 }
 
