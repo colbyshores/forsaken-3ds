@@ -343,7 +343,12 @@ void pglTransferEye(unsigned int eye)
 		 * correct view matrix. */
 		s_dlReplay = true;
 	}
-	/* GFX_RIGHT: no-op — C3D_FrameEnd auto-transfers both targets */
+	if (eye == GFX_RIGHT)
+	{
+		/* Right eye done. Clear replay flag so post-stereo rendering
+		 * (missile camera, rear view, HUD overlays) draws normally. */
+		s_dlReplay = false;
+	}
 	s_stereoFrame = true;
 }
 
