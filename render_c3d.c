@@ -84,10 +84,9 @@ static C3D_RenderTarget *s_targetRight   = NULL;
 static C3D_RenderTarget *s_targetCurrent = NULL;  /* active render target */
 static bool              s_stereoFrame   = false;
 
-/* Per-channel color write mask for anaglyph stereo.
- * Default GPU_WRITE_ALL allows all channels.  render_set_filter()
- * modifies this to mask channels (e.g. red-only for left eye). */
-static GPU_WRITEMASK s_colorMask = GPU_WRITE_ALL;
+/* Color write mask — always GPU_WRITE_ALL on citro3d (software anaglyph
+ * removed; hardware stereo uses separate render targets instead). */
+#define s_colorMask GPU_WRITE_ALL
 
 /* ---- GPU vertex format (all floats, matches shader inputs) ---- */
 typedef struct {
@@ -196,7 +195,6 @@ void pglSwapBuffers(void)
 	}
 	/* Reset stereo state for next frame */
 	s_stereoFrame = false;
-	s_colorMask = GPU_WRITE_ALL;
 	s_dlReplay = false;
 	s_dlRecording = false;
 }
@@ -549,11 +547,10 @@ bool render_reset(render_info_t *info)
 
 void render_set_filter(bool red, bool green, bool blue)
 {
-	s_colorMask = GPU_WRITE_DEPTH | GPU_WRITE_ALPHA;
-	if (red)   s_colorMask |= GPU_WRITE_RED;
-	if (green) s_colorMask |= GPU_WRITE_GREEN;
-	if (blue)  s_colorMask |= GPU_WRITE_BLUE;
-	C3D_DepthTest(true, GPU_LESS, s_colorMask);
+	/* No-op on citro3d — software anaglyph removed.
+	 * Hardware stereo uses separate render targets instead of color masking.
+	 * Function retained because shared code in oct2.c calls it. */
+	(void)red; (void)green; (void)blue;
 }
 
 bool render_flip(render_info_t *info)
