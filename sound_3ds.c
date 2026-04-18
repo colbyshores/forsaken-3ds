@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/stat.h>     /* mkdir() for dspfirm.cdc bootstrap */
 
 #include "main.h"
 #include "util.h"
@@ -100,10 +101,44 @@ static void free_channel(int ch)
 
 static bool ndsp_initialized = false;
 
+/* On first launch from a CIA install we may be missing the DSP firmware
+ * blob at sdmc:/3ds/dspfirm.cdc, which ndspInit absolutely requires.
+ * The CIA bundles a copy in romfs; lazily extract it on demand if the
+ * SD copy is missing or zero-length. Bootstrapping in-band so the user
+ * doesn't have to run a separate dumper before launching the game. */
+static void ensure_dspfirm_on_sd(void)
+{
+	const char *sd_path  = "sdmc:/3ds/dspfirm.cdc";
+	const char *src_path = "romfs:/dspfirm.cdc";
+	FILE *test = fopen(sd_path, "rb");
+	if (test) {
+		fseek(test, 0, SEEK_END);
+		long sz = ftell(test);
+		fclose(test);
+		if (sz > 0) return;        /* already there */
+	}
+	FILE *src = fopen(src_path, "rb");
+	if (!src) return;              /* no bundled copy — user is on their own */
+
+	mkdir("sdmc:/3ds", 0777);      /* harmless if it already exists */
+
+	FILE *dst = fopen(sd_path, "wb");
+	if (!dst) { fclose(src); return; }
+	char buf[4096];
+	size_t n;
+	while ((n = fread(buf, 1, sizeof(buf), src)) > 0)
+		fwrite(buf, 1, n, dst);
+	fclose(dst);
+	fclose(src);
+	DebugPrintf("sound_init: extracted dspfirm.cdc to %s\n", sd_path);
+}
+
 bool sound_init(void)
 {
 	if (ndsp_initialized)
 		return true;
+
+	ensure_dspfirm_on_sd();
 
 	Result rc = ndspInit();
 	if (R_FAILED(rc))

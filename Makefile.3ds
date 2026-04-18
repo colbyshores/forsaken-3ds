@@ -130,7 +130,7 @@ LIBS += -lctru -lpng -lz -llua5.1 -lm
 # SMDH metadata
 #---------------------------------------------------------------------------------
 
-SMDH_ICON := $(SRCDIR)/icon.png
+SMDH_ICON := $(SRCDIR)/assets/icon.png
 ifeq ($(wildcard $(SMDH_ICON)),)
 SMDH_ICON := $(DEVKITPRO)/libctru/default_icon.png
 endif
@@ -192,10 +192,75 @@ $(BUILD)/%.o: $(SRCDIR)/%.c
 
 clean:
 	@echo "Cleaning 3DS build..."
-	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map
+	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA)
 
 romfs-clean:
 	@echo "Cleaning romfs staging..."
 	@rm -rf $(ROMFS_STAGING)
+
+# ─── CIA build (for installable home-menu title) ──────────────────────
+# Requires:
+#   - tools/makerom    (downloaded by `make tools-fetch`)
+#   - tools/bannertool ("                                          ")
+#   - assets/icon.png         (48x48 home-menu icon)
+#   - assets/banner.png       (256x128 home-menu banner)
+#   - assets/banner.wav       (silent or short clip, used as banner audio)
+#   - assets/forsaken.rsf     (makerom config)
+#   - romfs/dspfirm.cdc       (extracted to sdmc:/3ds/ on first boot by
+#                              sound_init() so users don't need to dump it
+#                              separately. Personal-use only — Nintendo
+#                              firmware blob.)
+
+TOOLS_DIR    := $(SRCDIR)/tools
+MAKEROM      := $(TOOLS_DIR)/makerom
+BANNERTOOL   := $(TOOLS_DIR)/bannertool
+
+ASSETS_DIR   := $(SRCDIR)/assets
+ICON_PNG     := $(ASSETS_DIR)/icon.png
+BANNER_PNG   := $(ASSETS_DIR)/banner.png
+BANNER_WAV   := $(ASSETS_DIR)/banner.wav
+RSF_FILE     := $(ASSETS_DIR)/forsaken.rsf
+
+OUTPUT_BNR   := $(SRCDIR)/$(TARGET).bnr
+OUTPUT_CIA   := $(SRCDIR)/$(TARGET).cia
+
+.PHONY: cia tools-fetch
+
+# Fetch makerom + bannertool into ./tools/ (one-time setup for CIA builds)
+tools-fetch:
+	@mkdir -p $(TOOLS_DIR)
+	@if [ ! -x $(MAKEROM) ]; then \
+		echo "Downloading makerom..."; \
+		cd $(TOOLS_DIR) && \
+		wget -q -O makerom.zip "https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.18.4/makerom-v0.18.4-ubuntu_x86_64.zip" && \
+		unzip -o makerom.zip && chmod +x makerom && rm makerom.zip; \
+	fi
+	@if [ ! -x $(BANNERTOOL) ]; then \
+		echo "Downloading bannertool..."; \
+		cd $(TOOLS_DIR) && \
+		wget -q -O bannertool.zip "https://github.com/carstene1ns/3ds-bannertool/releases/download/1.2.2/bannertool-1.2.2-linux.zip" && \
+		unzip -o bannertool.zip && \
+		mv bannertool-1.2.2-linux/bannertool ./bannertool && \
+		chmod +x bannertool && rm -rf bannertool.zip bannertool-1.2.2-linux; \
+	fi
+	@echo "tools ready: $(MAKEROM) + $(BANNERTOOL)"
+
+$(OUTPUT_BNR): $(BANNER_PNG) $(BANNER_WAV) | tools-fetch
+	@echo "Creating banner..."
+	$(BANNERTOOL) makebanner -i $(BANNER_PNG) -a $(BANNER_WAV) -o $@
+
+$(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(ROMFS_STAMP) | tools-fetch
+	@echo "Building CIA..."
+	$(MAKEROM) -f cia -o $@ \
+		-rsf $(RSF_FILE) \
+		-target t -exefslogo \
+		-elf $(OUTPUT_ELF) \
+		-icon $(OUTPUT_SMDH) \
+		-banner $(OUTPUT_BNR) \
+		-DAPP_ROMFS=$(ROMFS_STAGING)
+	@echo "CIA written: $@"
+	@echo "Install on a 3DS via FBI (open the .cia → Install)."
+
+cia: $(OUTPUT_CIA)
 
 -include $(wildcard $(BUILD)/*.d)
