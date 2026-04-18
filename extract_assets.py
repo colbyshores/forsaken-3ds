@@ -254,29 +254,106 @@ def setup_romfs(extracted_dir, output_dir):
     return True
 
 
+def find_dspadpcm_encoder():
+    """Locate the gc-dspadpcm-encode binary; return path or None."""
+    found = shutil.which("dspadpcm")
+    if found:
+        return found
+    for p in ["/tmp/dspadpcm/dspadpcm", "./dspadpcm",
+              os.path.expanduser("~/dspadpcm")]:
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+def convert_to_dsp_adpcm(wav_path, dsp_path, encoder):
+    """WAV → Nintendo DSP-ADPCM (~3.6:1 compression). Returns True on success."""
+    try:
+        run([encoder, wav_path, dsp_path],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return os.path.isfile(dsp_path) and os.path.getsize(dsp_path) > 0
+    except subprocess.CalledProcessError:
+        return False
+
+
 def setup_music(audio_files, output_dir):
-    """Convert and copy audio tracks to romfs/music/."""
+    """Convert CD audio tracks → DSP-ADPCM (decoded by 3DS DSP hardware,
+    ~3.6× smaller than WAV). Falls back to WAV if encoder not installed."""
     print(f"\n── Converting CD audio tracks ──")
     music_dir = os.path.join(output_dir, "music")
     os.makedirs(music_dir, exist_ok=True)
+
+    encoder = find_dspadpcm_encoder()
+    if not encoder:
+        print("  WARN: gc-dspadpcm-encode not found — falling back to WAV.")
+        print("        Build it from https://github.com/jackoalan/gc-dspadpcm-encode")
+        print("        or place the binary at ~/dspadpcm or /tmp/dspadpcm/dspadpcm.")
 
     for track_num, audio_path in sorted(audio_files):
         if track_num not in AUDIO_TRACKS:
             continue
 
-        out_path = os.path.join(music_dir, f"track{track_num:02d}.wav")
+        wav_path = os.path.join(music_dir, f"track{track_num:02d}.wav")
+        dsp_path = os.path.join(music_dir, f"track{track_num:02d}.dsp")
         name = AUDIO_TRACKS[track_num]
         print(f"  Track {track_num:02d}: \"{name}\"")
 
+        # Step 1: Get a WAV (32kHz mono PCM16) from the source audio
         if audio_path.lower().endswith(".wav"):
-            convert_wav_audio_track(audio_path, out_path)
+            convert_wav_audio_track(audio_path, wav_path)
         else:
-            # Raw PCM (.cdr) from bchunk
-            convert_audio_track(audio_path, out_path)
+            convert_audio_track(audio_path, wav_path)
 
-    converted = len(glob.glob(os.path.join(music_dir, "track*.wav")))
-    print(f"  {converted} audio tracks converted to romfs/music/")
-    return converted > 0
+        # Step 2: WAV → DSP-ADPCM (if encoder available); strip WAV on success
+        if encoder and convert_to_dsp_adpcm(wav_path, dsp_path, encoder):
+            os.remove(wav_path)
+            print(f"    → {os.path.basename(dsp_path)}")
+        else:
+            print(f"    → {os.path.basename(wav_path)} (WAV fallback)")
+
+    dsp_count = len(glob.glob(os.path.join(music_dir, "track*.dsp")))
+    wav_count = len(glob.glob(os.path.join(music_dir, "track*.wav")))
+    print(f"  {dsp_count} DSP + {wav_count} WAV tracks in romfs/music/")
+    return (dsp_count + wav_count) > 0
+
+
+def setup_hd_textures(output_dir, project_root):
+    """Optionally regenerate the HD texture set if a 4K texture pack and
+    the regen script are present.  Skips silently if either is missing —
+    the engine falls back to the standard PNG path for any texture lacking
+    an HD variant."""
+    print(f"\n── HD textures ──")
+    pack = os.path.expanduser("~/Downloads/4ktexturepack.rar")
+    extracted = "/tmp/4k_pack"
+    regen = os.path.join(project_root, "regen_hd_old_4k.sh")
+
+    if not os.path.exists(regen):
+        print("  No regen_hd_old_4k.sh — skipping HD textures.")
+        return False
+
+    if not os.path.isdir(extracted):
+        if not os.path.isfile(pack):
+            print(f"  No 4K pack at {pack} — skipping HD textures.")
+            print("  (Engine will use the standard PNGs in romfs/data/textures/)")
+            return False
+        if not check_tool("unrar"):
+            print("  unrar not installed — skipping HD textures.")
+            return False
+        print(f"  Extracting 4K pack ({pack}) to {extracted}…")
+        os.makedirs(extracted, exist_ok=True)
+        run(["unrar", "x", "-o+", pack, extracted + "/"],
+            stdout=subprocess.DEVNULL)
+        # kpf files are zip archives; extract them all into the same tree
+        for kpf in sorted(glob.glob(os.path.join(extracted, "mods/*.kpf"))):
+            run(["unzip", "-oq", kpf, "-d", extracted],
+                stdout=subprocess.DEVNULL)
+
+    print("  Running regen_hd_old_4k.sh…")
+    run(["bash", regen], cwd=project_root)
+    t3x_count = len(glob.glob(os.path.join(output_dir, "hd_old/**/*.t3x"),
+                              recursive=True))
+    print(f"  {t3x_count} HD textures generated in romfs/hd_old/")
+    return t3x_count > 0
 
 
 def extract_from_iso(iso_path, output_dir):

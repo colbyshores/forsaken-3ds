@@ -100,3 +100,5 @@ net_test/
 # CI workflows
 !.github/
 !.github/**
+# HD texture regeneration pipeline (tooling shipped with the port)
+!regen_hd_old_4k.sh

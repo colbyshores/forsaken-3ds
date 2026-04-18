@@ -957,72 +957,55 @@ static void tile_rgba4(const u_int8_t *src, u_int16_t *dst, int w, int h)
 	}
 }
 
-/* Try loading a pre-converted ETC1A4 HD texture.
- * Path mapping: data\textures\foo.bmp → romfs:/hd/textures/foo.etc1
- *               data\levels\vol2\textures\bar.bmp → romfs:/hd/levels/vol2/textures/bar.etc1
- * Returns true if loaded, false to fall back to standard path. */
+/* Try loading an HD texture in t3x format (ETC1A4 compressed).
+ * Path mapping: data\textures\foo.bmp → romfs:/hd/textures/foo.t3x
+ * Uses Tex3DS_TextureImportStdio which handles format, tiling, VRAM. */
+#include <tex3ds.h>
+
 static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	u_int16_t *width, u_int16_t *height, bool *colorkey)
 {
 	char hd_path[512];
 	char *p;
+	const char *data_start = NULL;
+	int i;
 	FILE *f;
-	const int HD_SIZE = 256;
-	u_int32_t data_size = HD_SIZE * HD_SIZE;  /* ETC1A4: 1 byte/pixel for 256x256 */
-	void *data;
 	texture_t *texdata;
+	Tex3DS_Texture t3x;
 
-	/* Build HD path: convert backslashes, prepend "romfs:/hd/", change ext to .etc1 */
+	/* Find "data\" in path */
+	for (i = 0; path[i]; i++)
 	{
-		const char *base = path;
-		/* Skip leading drive/path to get to data\ */
-		const char *data_start = NULL;
-		int i;
-
-		/* Find "data\" or "Data\" in the path */
-		for (i = 0; path[i]; i++)
+		if ((path[i] == 'd' || path[i] == 'D') &&
+		    (path[i+1] == 'a' || path[i+1] == 'A') &&
+		    (path[i+2] == 't' || path[i+2] == 'T') &&
+		    (path[i+3] == 'a' || path[i+3] == 'A') &&
+		    (path[i+4] == '\\' || path[i+4] == '/'))
 		{
-			if ((path[i] == 'd' || path[i] == 'D') &&
-			    (path[i+1] == 'a' || path[i+1] == 'A') &&
-			    (path[i+2] == 't' || path[i+2] == 'T') &&
-			    (path[i+3] == 'a' || path[i+3] == 'A') &&
-			    (path[i+4] == '\\' || path[i+4] == '/'))
-			{
-				data_start = &path[i+5]; /* skip "data\" */
-				break;
-			}
+			data_start = &path[i+5];
+			break;
 		}
-
-		if (!data_start)
-			return false;
-
-		snprintf(hd_path, sizeof(hd_path), "romfs:/hd/%s", data_start);
-
-		/* Convert backslashes and lowercase */
-		for (p = hd_path; *p; p++)
-		{
-			if (*p == '\\') *p = '/';
-			if (*p >= 'A' && *p <= 'Z') *p += 32;
-		}
-
-		/* Change extension to .etc1 */
-		p = strrchr(hd_path, '.');
-		if (p)
-			strcpy(p, ".etc1");
-		else
-			strcat(hd_path, ".etc1");
 	}
+	if (!data_start)
+		return false;
+
+	/* Force hd_old (512×512 max) for now. Will re-enable hd_new dynamic
+	 * selection once we verify hd_old works correctly. */
+	snprintf(hd_path, sizeof(hd_path), "romfs:/hd_old/%s", data_start);
+	for (p = hd_path; *p; p++)
+	{
+		if (*p == '\\') *p = '/';
+		if (*p >= 'A' && *p <= 'Z') *p += 32;
+	}
+	p = strrchr(hd_path, '.');
+	if (p) strcpy(p, ".t3x");
+	else strcat(hd_path, ".t3x");
 
 	f = fopen(hd_path, "rb");
 	if (!f)
 		return false;
 
-	/* Get file size to verify */
-	fseek(f, 0, SEEK_END);
-	data_size = ftell(f);
-	fseek(f, 0, SEEK_SET);
-
-	/* Allocate texture */
+	/* Allocate texture_t wrapper */
 	if (*t == NULL)
 	{
 		texdata = malloc(sizeof(texture_t));
@@ -1039,43 +1022,41 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 		}
 	}
 
-	if (!C3D_TexInit(&texdata->tex, HD_SIZE, HD_SIZE, GPU_ETC1A4))
-	{
-		DebugPrintf("HD texture: C3D_TexInit ETC1A4 failed for %s\n", hd_path);
-		fclose(f);
-		if (*t == NULL) free(texdata);
-		return false;
-	}
-
-	/* Read ETC1A4 data directly into the texture — already in GPU-ready format
-	 * (tex3ds -r output is Morton-tiled ETC1A4 matching PICA200 layout) */
-	data = linearAlloc(data_size);
-	if (!data)
-	{
-		C3D_TexDelete(&texdata->tex);
-		fclose(f);
-		if (*t == NULL) free(texdata);
-		return false;
-	}
-
-	fread(data, 1, data_size, f);
+	/* Tex3DS handles everything: format detection, decompression,
+	 * tiling, and upload. Use linear memory (vram=false) since 6MB
+	 * VRAM can't hold all HD textures at once. */
+	t3x = Tex3DS_TextureImportStdio(f, &texdata->tex, NULL, false);
 	fclose(f);
 
-	C3D_TexUpload(&texdata->tex, data);
-	C3D_TexFlush(&texdata->tex);
-	linearFree(data);
+	if (!t3x)
+	{
+		DebugPrintf("HD texture: Tex3DS import failed for %s\n", hd_path);
+		if (*t == NULL) free(texdata);
+		return false;
+	}
 
+	/* Bilinear-mipmap (GPU_NEAREST for mip selection): picks ONE mip level
+	 * per fragment, then bilinear-filters within it. Gives anti-moiré
+	 * without the trilinear softness or the doubled per-fragment texture
+	 * taps. If the t3x has no mip chain, GPU clamps to mip 0. */
 	C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
+	C3D_TexSetFilterMipmap(&texdata->tex, GPU_NEAREST);
 	C3D_TexSetWrap(&texdata->tex, GPU_REPEAT, GPU_REPEAT);
+
+	*width = texdata->tex.width;
+	*height = texdata->tex.height;
+	/* Match colorkey to the texture format. ETC1 has no alpha plane
+	 * at all, so enabling alpha-test on it would just always pass.
+	 * ETC1A4 carries real per-pixel alpha for sprites/grates. */
+	*colorkey = (texdata->tex.fmt == GPU_ETC1A4);
 
 	texdata->initialized = true;
 	*t = (LPTEXTURE)texdata;
-	*width = HD_SIZE;
-	*height = HD_SIZE;
-	*colorkey = true; /* ETC1A4 has alpha channel for colorkey */
 
-	DebugPrintf("HD texture: loaded %s (ETC1A4 %dx%d, %u bytes)\n",
-		hd_path, HD_SIZE, HD_SIZE, data_size);
+	Tex3DS_TextureFree(t3x);
+
+	DebugPrintf("HD texture: loaded %s (%dx%d)\n",
+		hd_path, texdata->tex.width, texdata->tex.height);
 	return true;
 }
 
@@ -1084,7 +1065,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 {
 	texture_image_t image;
 
-	/* Try HD ETC1A4 texture first */
+	/* Try HD texture first (4K source → 512x512 ETC1A4 via tex3ds) */
 	if (try_load_hd_texture(t, path, width, height, colorkey))
 		return true;
 
