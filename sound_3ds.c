@@ -51,26 +51,48 @@ struct sound_source_t {
 	char path[MAX_PATH_LEN];
 };
 
-/* channel allocation bitmap */
-static bool channel_used[MAX_CHANNELS];
+/* SFX channel pool. The DSP firmware mixes channels in software and starts
+ * skipping audio when too many channels are active simultaneously (which
+ * killed both SFX and music under heavy combat). Capping total concurrent
+ * SFX voices keeps the DSP under its mixing budget. Music owns channel 23
+ * directly via music_3ds.c; SFX stay in 0-(MAX_SFX_VOICES-1).
+ *
+ * When all SFX slots are full, alloc evicts the OLDEST-allocated channel
+ * (round-robin replacement) so a new gunshot doesn't get silently dropped. */
+#define MAX_SFX_VOICES 8
+static bool       channel_used[MAX_CHANNELS];
+static u_int64_t  channel_alloc_time[MAX_CHANNELS];
+static u_int64_t  s_alloc_seq = 0;
 
 static int alloc_channel(void)
 {
-	int i;
-	for (i = 0; i < MAX_CHANNELS; i++)
+	int i, oldest_idx = 0;
+	u_int64_t oldest = (u_int64_t)-1;
+
+	for (i = 0; i < MAX_SFX_VOICES; i++)
 	{
 		if (!channel_used[i])
 		{
 			channel_used[i] = true;
+			channel_alloc_time[i] = ++s_alloc_seq;
 			return i;
 		}
+		if (channel_alloc_time[i] < oldest)
+		{
+			oldest = channel_alloc_time[i];
+			oldest_idx = i;
+		}
 	}
-	return -1;
+
+	/* All slots full — evict the oldest. */
+	ndspChnReset(oldest_idx);
+	channel_alloc_time[oldest_idx] = ++s_alloc_seq;
+	return oldest_idx;
 }
 
 static void free_channel(int ch)
 {
-	if (ch >= 0 && ch < MAX_CHANNELS)
+	if (ch >= 0 && ch < MAX_SFX_VOICES)
 		channel_used[ch] = false;
 }
 
