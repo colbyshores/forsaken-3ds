@@ -45,6 +45,7 @@ static void       *s_stream_buf = NULL;          /* linearAlloc'd scratch (DSP D
 static ndspWaveBuf s_wavebufs[NUM_WAVEBUFS];
 
 static FILE       *s_file = NULL;
+static char        s_file_path[128];        /* saved so we can reopen on loop */
 static u_int32_t   s_data_offset = 0;
 static u_int32_t   s_data_size = 0;
 static u_int32_t   s_data_read = 0;
@@ -126,13 +127,15 @@ static bool fill_buffer(int buf_index)
 
 	remaining = s_data_size - s_data_read;
 	if (remaining == 0) {
-		/* End of track — loop back to the start. clearerr() is required
-		 * because some stdlib implementations latch the EOF flag on the
-		 * FILE* after a short read, and subsequent fread() calls keep
-		 * returning 0 even after a successful fseek. The predictor
-		 * history is reset to the file-header initial state since we're
-		 * about to decode the first sample again. */
-		clearerr(s_file);
+		/* End of track — close + reopen the file, then seek back to
+		 * the data start. fseek+clearerr alone is unreliable on
+		 * libctru's romfs FILE* (EOF flag latches and subsequent
+		 * freads keep returning 0). Predictor history reset to the
+		 * file-header initial state since we're decoding from
+		 * sample 1 again. */
+		fclose(s_file);
+		s_file = fopen(s_file_path, "rb");
+		if (!s_file) return false;
 		fseek(s_file, s_data_offset, SEEK_SET);
 		s_data_read = 0;
 		remaining = s_data_size;
@@ -169,19 +172,20 @@ static bool fill_buffer(int buf_index)
 
 static bool open_track(int track)
 {
-	char path[128];
 	FILE *f;
 	u_int8_t hdr[96];
-	u_int32_t total_nibbles, num_frames;
 	int i;
 
-	snprintf(path, sizeof(path), "romfs:/music/track%02d.dsp", track);
-	f = fopen(path, "rb");
-	if (!f) { DebugPrintf("music: cannot open %s\n", path); return false; }
+	snprintf(s_file_path, sizeof(s_file_path),
+		"romfs:/music/track%02d.dsp", track);
+	f = fopen(s_file_path, "rb");
+	if (!f) { DebugPrintf("music: cannot open %s\n", s_file_path); return false; }
 
 	if (fread(hdr, 1, 96, f) != 96) { fclose(f); return false; }
 
-	total_nibbles = bs32(*(u_int32_t*)&hdr[4]);
+	/* Header field at offset 4 is num_adpcm_nibbles, but encoders disagree
+	 * on whether it counts data nibbles only or includes per-frame header
+	 * nibbles. We trust the file size (below) instead — much simpler. */
 
 	for (i = 0; i < 16; i++)
 		s_adpcm_coefs[i] = bs16(*(u_int16_t*)&hdr[28 + i*2]);
@@ -191,12 +195,23 @@ static bool open_track(int track)
 	s_adpcm_initial.history1 = (s16)bs16(*(u_int16_t*)&hdr[66]);
 	s_adpcm_running = s_adpcm_initial;
 
-	/* Frame-aligned data size: each frame is 8 bytes (1 header + 14 data
-	 * nibbles). Original commit miscounted nibbles/2 = 7 bytes, undercutting
-	 * the audio by ~12.5% and causing premature EOF mid-track. */
-	num_frames = total_nibbles / 14;
+	/* Trust the file size, not the header's nibble count. Different DSP
+	 * encoders disagree about whether `nibble_count` covers data nibbles
+	 * only (14/frame) or includes the per-frame header nibbles (16/frame).
+	 * gc-dspadpcm-encode writes the latter, so num_nibbles/14 over-counts
+	 * frames and produces a data_size larger than the file → fread returns
+	 * 0 at the real EOF, our loop logic never fires (remaining > 0), and
+	 * the track never restarts.
+	 *
+	 * Just round file size down to a frame boundary and call it a day. */
 	s_data_offset = 96;
-	s_data_size = num_frames * 8;
+	fseek(f, 0, SEEK_END);
+	{
+		long file_size = ftell(f);
+		u_int32_t audio_bytes = (file_size > 96) ? (file_size - 96) : 0;
+		s_data_size = (audio_bytes / 8) * 8;   /* frame-align */
+	}
+	fseek(f, s_data_offset, SEEK_SET);
 	s_data_read = 0;
 	s_file = f;
 
@@ -223,6 +238,31 @@ static void music_thread_fn(void *arg)
 			for (i = 0; i < NUM_WAVEBUFS; i++)
 				if (s_wavebufs[i].status == NDSP_WBUF_DONE)
 					fill_buffer(i);
+
+			/* Track-loop kickstart: at the end of a track all 4 buffers
+			 * finish in quick succession and the DSP channel goes fully
+			 * idle. Just refilling those slots isn't enough — once the
+			 * channel has drained completely, ndsp won't auto-resume
+			 * playback when you ndspChnWaveBufAdd new buffers. Have to
+			 * tear down + reconfigure to wake it. */
+			if (!ndspChnIsPlaying(MUSIC_CHANNEL)) {
+				int j;
+				ndspChnWaveBufClear(MUSIC_CHANNEL);
+				ndspChnReset(MUSIC_CHANNEL);
+				ndspChnSetInterp(MUSIC_CHANNEL, NDSP_INTERP_LINEAR);
+				ndspChnSetRate(MUSIC_CHANNEL, (float)MUSIC_SAMPLE_RATE);
+				ndspChnSetFormat(MUSIC_CHANNEL, NDSP_FORMAT_MONO_ADPCM);
+				ndspChnSetAdpcmCoefs(MUSIC_CHANNEL, s_adpcm_coefs);
+				{
+					float mix[12] = {0};
+					mix[0] = s_volume; mix[1] = s_volume;
+					ndspChnSetMix(MUSIC_CHANNEL, mix);
+				}
+				for (j = 0; j < NUM_WAVEBUFS; j++)
+					memset(&s_wavebufs[j], 0, sizeof(ndspWaveBuf));
+				for (j = 0; j < NUM_WAVEBUFS; j++)
+					fill_buffer(j);
+			}
 		}
 		LightLock_Unlock(&s_lock);
 		svcSleepThread(25 * 1000 * 1000ULL);
