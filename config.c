@@ -182,10 +182,13 @@ USERCONFIG my_controls = {
 	{ 2,	{ LEFT_MOUSE	} },	// fire primary
 	{ 2,	{ RIGHT_MOUSE	} },		// fire secondary
 	{ 1,	{ SDLK_b } },						// fire mine
-	{ 1,	{ SDLK_PAGEDOWN } },						// select next primary
-	{ 1,	{ SDLK_PAGEUP } },					// select prev primary
-	{ 1,	{ SDLK_HOME } },						// select next secondary
-	{ 1,	{ SDLK_END } },						// select prev secondary
+	/* D-pad UP/DOWN cycles primary (cannons), LEFT/RIGHT cycles secondary
+	 * (missiles). Joystick 0 POV 0, dirs: UP=0 RIGHT=1 DOWN=2 LEFT=3 — see
+	 * joy_hat_enum in input.h. Keyboard fallbacks kept for SDL builds. */
+	{ 2,	{ SDLK_PAGEDOWN, JOYSTICK_POVDIR_KEYCODE(0,0,0) } },	// select next primary  (D-pad UP)
+	{ 2,	{ SDLK_PAGEUP,   JOYSTICK_POVDIR_KEYCODE(0,0,2) } },	// select prev primary  (D-pad DOWN)
+	{ 2,	{ SDLK_HOME,     JOYSTICK_POVDIR_KEYCODE(0,0,1) } },	// select next secondary (D-pad RIGHT)
+	{ 2,	{ SDLK_END,      JOYSTICK_POVDIR_KEYCODE(0,0,3) } },	// select prev secondary (D-pad LEFT)
 	{ 1,	{ SDLK_r } },						// select rear view
 	{ 1,	{ SDLK_h } },						// toggle headlights
 	{

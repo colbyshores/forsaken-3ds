@@ -1,132 +1,205 @@
 # Forsaken 3DS
 
-A native Nintendo 3DS port of [ForsakenX](https://github.com/ForsakenX/forsaken), the community source port of Acclaim's 1998 six-degrees-of-freedom space combat game *Forsaken*.
+A native Nintendo 3DS port of [ForsakenX](https://github.com/ForsakenX/forsaken),
+the community source port of Acclaim's 1998 six-degrees-of-freedom space combat
+game *Forsaken*.
 
-This fork provides a complete, playable 3DS homebrew build with a custom GPU renderer, hardware stereoscopic 3D, and full single-player campaign support.
+A complete, playable build with a custom GPU renderer, hardware stereoscopic
+3D, the full single-player campaign, and HD-source textures sized to fit
+PICA200's budget. Holds a mostly stable 60 fps in stereoscopic 3D at 512×512
+texture resolution on New 3DS.
 
-## Features
+## Highlights
 
-- **Native citro3d renderer** — bypasses picaGL for direct PICA200 GPU access with draw call batching, texture sorting, and per-frame state caching
-- **Hardware stereoscopic 3D** — single-pass display list replay driven by the 3D slider, with anaglyph fallback for emulators
-- **CPU per-vertex lighting** — full point light and spot light support ported from the GL1 path
-- **60 FPS** at native 400x240 resolution on New 3DS (804 MHz), with dips to 30+ during heavy particle effects
-- **In-game pause menu** — Start button toggles save/load/quit menu with D-pad + A/B navigation
-- **Save/Load** — 16 save slots on SD card (`sdmc:/3ds/forsaken/savegame/`)
-- **ARM alignment fixes** — 34+ unaligned access sites fixed for ARM11 (ARMv6K)
-- **Optimized animated models** — load-time vertex alignment eliminates per-frame memcpy overhead
+- **Single-pass stereo via display list replay.** The first eye records GPU
+  draw commands; the second eye replays them with an updated view matrix —
+  no second BSP traversal, no second vertex transform pass. That headroom is
+  what lets HD textures and stereo coexist at 60 fps.
+- **HD textures (ETC1 / ETC1A4) with selective mipmaps.** Per-level walls
+  upscaled from a 4K source pack, downscaled to 512×512 ETC1 with bilinear
+  mipmaps. Sprites and grates use ETC1A4 with an alpha-from-original-palette
+  detector so see-through pixels survive. Mipmaps are skipped on
+  POLYANIM-animated lava/fire/water surfaces (alpha+mip = halo holes).
+- **Threaded DSP-ADPCM music.** Tracks are streamed from romfs in 0.5 s
+  chunks on a background thread (25 ms tick), decoded by the DSP hardware
+  for zero CPU cost. Per-buffer ADPCM context tracking eliminates
+  buffer-boundary glitches.
+- **Concurrent-voice cap on the SFX pool** (8 voices, oldest-evict). PICA200's
+  DSP firmware mixes channels in software and starts skipping audio — and
+  burning ARM cycles — when too many voices are active. The cap recovered
+  the music channel under heavy combat AND took back ~15 fps.
+- **CPU per-vertex lighting**, ported from the GL1 path. Single-pass stereo
+  leaves enough CPU headroom to do this without a framerate hit; in exchange
+  we avoid PICA's hardware 8-light cap.
 
-## Requirements
+## Quick start
 
-### Build Tools
-- [devkitPro](https://devkitpro.org/) with devkitARM (ARM cross-compiler)
-- [libctru](https://github.com/devkitPro/libctru) (3DS standard library)
-- [citro3d](https://github.com/devkitPro/citro3d) (GPU library)
-- libpng, zlib, lua5.1 (install via `(dkp-)pacman -S 3ds-libpng 3ds-zlib 3ds-lua`)
-- [picaGL](https://github.com/masterfeizz/picaGL) (only for the `GL=1` renderer path)
-
-### Game Data
-You need a legitimate copy of Forsaken. The easiest way to set up game assets is with the included extraction script:
-
-```bash
-# Install dependencies
-sudo apt install p7zip-full bchunk ffmpeg
-
-# Extract everything from a BIN/CUE image (game data + CD audio)
-python3 extract_assets.py "Forsaken (USA).bin"
-
-# Or from an ISO (game data only — no CD audio)
-python3 extract_assets.py "Forsaken (USA).iso"
-
-# Extract only the music tracks (if you already have game data set up)
-python3 extract_assets.py --music-only "Forsaken (USA).bin"
-```
-
-This automatically extracts game data, converts CD audio tracks to the correct format (16-bit PCM mono 32kHz), lowercases all filenames, and populates the `romfs/` directory:
-
-```
-forsaken-3ds/
-  romfs/
-    data/         <- game levels, models, textures, sounds
-    configs/      <- game configuration
-    pilots/       <- player profiles
-    scripts/      <- Lua scripts
-    music/        <- CD audio tracks (track02.wav - track10.wav)
-```
-
-**Manual setup:** You can also manually copy the game data directories (`Data/`, `Configs/`, `Pilots/`, `Scripts/`) into `romfs/`. File and directory names inside `romfs/` must be **lowercase** — the Makefile handles this automatically during the staging step.
-
-### Running
-- **Real hardware**: Copy `forsaken3ds.3dsx` to your SD card and launch via a homebrew launcher (Luma3DS + Rosalina recommended). **New 3DS strongly recommended** for performance.
-- **Emulator**: [Mandarine](https://github.com/mandarine3ds/mandarine) or Citra. For audio, place `dspfirm.cdc` in the emulator's `sysdata/` directory and enable `LLE\DSP=true` and `audio_emulation=1` in the config.
-
-## Building
+### Build the 3DSX (homebrew launcher)
 
 ```bash
-# Set devkitPro environment (if not already in your shell profile)
+# Set devkitPro environment (skip if already in your shell profile)
 export DEVKITPRO=/opt/devkitpro
 export DEVKITARM=$DEVKITPRO/devkitARM
 
 # Native citro3d renderer (recommended)
 make -f Makefile.3ds RENDERER=citro3d
 
-# picaGL (OpenGL 1.x shim) renderer
-make -f Makefile.3ds
-
-# Debug build (autoboot to Volcano level, trace logging)
-make -f Makefile.3ds RENDERER=citro3d DEBUG=1
-
-# Clean
-make -f Makefile.3ds clean
-
-# Clean romfs staging (re-copies and lowercases all game data)
-make -f Makefile.3ds romfs-clean
+# Output: forsaken3ds.3dsx
 ```
 
-Output: `forsaken3ds.3dsx` (ready to run on 3DS or emulator).
+### Build a CIA (installable home-menu title)
+
+```bash
+# One-time: fetch makerom + bannertool (~5 MB)
+make -f Makefile.3ds tools-fetch
+
+# You also need to dump dspfirm.cdc from your own 3DS
+# (use https://github.com/zoogie/DSP1) and place it at:
+#   assets/dspfirm.cdc
+# The CIA bundles this and extracts it to sdmc:/3ds/dspfirm.cdc on first
+# launch so audio works without a separate setup step on the install side.
+
+make -f Makefile.3ds RENDERER=citro3d cia
+
+# Output: forsaken3ds.cia (~440 MB; install via FBI on your 3DS)
+```
+
+See [`assets/README.md`](assets/README.md) for asset / CIA pipeline details.
+
+## Game data
+
+Forsaken's level / model / sound data is not included. Provide it via the
+included extraction script — pointed at a legitimate disc image you already
+own:
+
+```bash
+sudo apt install p7zip-full bchunk ffmpeg
+pip install --user yt-dlp demucs   # only if you want to rebuild banner audio
+
+# From a BIN/CUE (gives you music too)
+python3 extract_assets.py "Forsaken (USA).bin"
+
+# Or from an ISO (game data only — no CD audio)
+python3 extract_assets.py "Forsaken (USA).iso"
+```
+
+The script extracts game data, converts CD audio to DSP-ADPCM (via
+`gc-dspadpcm-encode` if available, falling back to WAV), lowercases all
+filenames, and populates `romfs/`. To regenerate HD textures from the
+Forsaken Remastered 4K texture pack, run `./regen_hd_old_4k.sh` — see the
+script's header for source-pack expectations.
+
+## Controls
+
+| Input | Action |
+|---|---|
+| Circle Pad | Pitch / yaw |
+| C-Stick (New 3DS) | Strafe / vertical thrust |
+| A | Fire primary |
+| B | Fire secondary |
+| L / R | Strafe left / right |
+| ZL / ZR | Nitro / drop mine |
+| **D-pad up / down** | **Cycle cannons (next / previous primary)** |
+| **D-pad left / right** | **Cycle missiles (next / previous secondary)** |
+| Start | Pause menu (save / load / quit) |
+| Select | Rear view |
+| 3D slider | Stereoscopic depth (hardware) |
+
+In the in-game pause menu, D-pad navigates and A confirms / B backs out.
+
+## Performance
+
+| Test | Old 3DS | New 3DS |
+|---|---|---|
+| Single-eye, no HD textures | 60 fps | 60 fps |
+| Single-eye, HD textures | ~50 fps | 60 fps |
+| Stereoscopic, HD textures | ~30 fps | mostly stable 60 fps |
+| Heavy combat (10+ enemies firing) | dips | brief dips |
+
+PICA200 fillrate is the dominant cost in stereo + HD. Old 3DS doesn't have
+the headroom; New 3DS holds 60 fps almost everywhere with occasional dips
+during dense particle scenes.
+
+## Architecture notes
+
+### Renderer (`render_c3d.c`)
+- Vertex shader (`shaders/render_c3d.v.pica`) does MVP transform with
+  separate projection / modelView uniforms.
+- LVERTEX (24 B: `xyz` + packed `COLOR` + `tu/tv`) is converted to a
+  shader-friendly `gpu_vertex_t` (36 B) in a 1 MB linear scratch buffer.
+- Consecutive draws with matching state and texture are merged before
+  submission. Groups are sorted by texture pointer first to maximise
+  batching potential.
+- Stereo replay records `s_dl[2048]` of `dl_entry_t` (scratch offset, vertex
+  count, matrices, viewport, texture, blend state). The second eye triggers
+  a single `replay_display_list()` and skips all per-object draw calls.
+- HD texture loader (`try_load_hd_texture`) uses `Tex3DS_TextureImportStdio`
+  for ETC1 / ETC1A4 t3x files. Sets colorkey from the texture format
+  (only ETC1A4 enables alpha test).
+- 1 MB GPU command buffer (4× default) needed for laser-beam / explosion
+  frames that produce thousands of draws.
+
+### Audio (`sound_3ds.c`, `music_3ds.c`)
+- SFX: capped at 8 concurrent voices on channels 0-7, oldest-evict round
+  robin replacement. Music owns channel 23 separately.
+- Music: streams DSP-ADPCM from romfs in 0.5 s chunks, 4-buffer queue
+  (~2 s headroom). Background thread refills DONE buffers on a 25 ms tick
+  guarded by a `LightLock`. Track size is derived from `ftell` on the file
+  rather than the DSP header's `num_adpcm_nibbles` field, because
+  `gc-dspadpcm-encode` writes that count including frame-header nibbles
+  and our division by 14 over-estimated end-of-file.
+- ndspInit's `dspfirm.cdc` requirement is bootstrapped on first launch:
+  the CIA bundles a copy in romfs and `sound_init()` writes it to
+  `sdmc:/3ds/dspfirm.cdc` if absent, so a fresh install plays audio
+  without a separate setup step.
+
+### HD texture pipeline (`regen_hd_old_4k.sh`)
+- Source: Forsaken Remastered 4K texture pack (`~/Downloads/4ktexturepack.rar`).
+  KPF files are zip archives; the script extracts them once into `/tmp/4k_pack/`.
+- Per-level textures take their atlas from the 4K pack (verified to match
+  the original layout). Globals (UI, sprites, fonts) take their atlas from
+  `Data/textures/` originals — Night Dive's 4K versions of those textures
+  re-arranged the menu UI atlas, breaking UV math.
+- Walls: `tex3ds -f etc1 -m bilinear` (no alpha plane, mipmaps).
+- Grates / sprites / pickups: `tex3ds -f auto-etc1` (auto picks ETC1A4 if
+  alpha is present, no mipmaps).
+- Alpha detection uses the **original BMP's palette** (presence of pure
+  `(0, 0, 0)`) rather than scanning the upscaled image — AI upscaling
+  introduces stray pure-black pixels into nearly every wall, which breaks
+  count-based heuristics.
+- Animated POLYANIM textures (`therma`, `nuke*`, `lava*`, etc.) are
+  hard-blacklisted from mipmaps regardless — alpha and animated UVs both
+  produce visible block-edge artifacts at distance.
+
+### ARM / engine fixes
+- 34+ unaligned-access sites fixed under `#ifdef ARM` (`bsp.c`, `mload.c`,
+  `mxaload.c`, `lights.c`, `goal.c`, `node.c`, `water.c`, etc.). PICA200's
+  ARM11 cannot dereference misaligned `float*` cast from `char*` after a
+  `u_int16_t` field read — the original Forsaken file parsers do this
+  constantly.
+- `MAX_TEXTURE_GROUPS` reduced from 600 (PC) to 64 with a mid-draw flush
+  pattern in `screenpolys.c`, `2dpolys.c`, `polys.c`. Heavy sprite scenes
+  used to overflow.
+- `InterpFrames()` in `mxaload.c` aligns animated-vertex data once at load
+  time rather than memcpy-ing two structs per vertex per frame —
+  reclaimed ~30 % framerate on sequences with many animated models.
 
 ## Branches
 
 | Branch | Description |
-|--------|-------------|
-| `master` | Stable, merged — all features from both port branches |
-| `3ds-citro3d` | Native citro3d renderer development (recommended) |
-| `3ds-port` | Earlier picaGL-based port (functional, less optimized) |
+|---|---|
+| `master` | Stable merged feature set |
+| `3ds-citro3d` | Native citro3d renderer development |
+| `hd-textures` | HD texture pipeline + CIA build (current) |
+| `3ds-port` | Earlier picaGL-based port |
 
-## Controls
+## Known limitations
 
-| Button | Action |
-|--------|--------|
-| Circle Pad | Move / strafe |
-| C-Stick | Look / aim |
-| A | Fire primary |
-| B | Fire secondary |
-| X | Next primary weapon |
-| Y | Previous primary weapon |
-| L / R | Strafe left / right |
-| D-pad | Cycle secondary weapons |
-| Start | Pause menu (save/load/quit) |
-| Select | Rear view |
-| ZL | Nitro |
-| ZR | Drop mine |
-
-## Architecture
-
-The citro3d renderer (`render_c3d.c`) replaces the entire OpenGL rendering pipeline:
-
-- **Vertex shader** (`shaders/render_c3d.v.pica`) — MVP transform with separate projection and modelView uniforms
-- **GPU_RGBA4 textures** — 16-bit with Morton/Z-order tiling and colourkey transparency (black = alpha 0)
-- **Draw call batching** — consecutive texture groups with matching state merged into single `C3D_DrawArrays` calls
-- **Texture sorting** — groups sorted by texture pointer before batching to maximize coherence
-- **Display list replay** — stereo second eye replays recorded draw calls with updated view matrix (no second BSP traversal)
-- **1MB scratch buffer** — vertex conversion from LVERTEX (20 bytes) to gpu_vertex_t (36 bytes, float colors)
-- **1MB GPU command buffer** — 4x default, handles heavy particle/laser beam frames
-
-## Known Limitations
-
-- Missile chase camera has limited draw distance (BSP portal visibility issue under investigation)
-- No bottom screen usage (map/HUD could be offloaded there in future)
-- No multiplayer/networking on 3DS
-- Audio requires DSP firmware dump (`dspfirm.cdc`) on emulators
+- Missile chase camera has limited draw distance (BSP portal visibility
+  issue, under investigation).
+- Bottom screen is unused (map / HUD overlay candidate for the future).
+- No multiplayer / networking on 3DS.
+- Old 3DS will drop frames in stereo + HD textures; New 3DS recommended.
 
 ## Credits
 
@@ -134,7 +207,10 @@ The citro3d renderer (`render_c3d.c`) replaces the entire OpenGL rendering pipel
 - **Community source port**: [ForsakenX](https://github.com/ForsakenX/forsaken)
 - **3DS port**: Colby Shores
 - **picaGL**: [masterfeizz](https://github.com/masterfeizz/picaGL)
+- **HD texture source**: Forsaken Remastered 4K texture pack
+- **CIA tooling**: 3DSGuy/Project_CTR (`makerom`),
+  carstene1ns/3ds-bannertool
 
 ## License
 
-The original source code is considered Abandonware. See [LICENSE](LICENSE) for details.
+Same as upstream ForsakenX (BSD-style; see `COPYING`).
