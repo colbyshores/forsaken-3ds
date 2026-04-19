@@ -85,9 +85,40 @@ python3 extract_assets.py "Forsaken (USA).iso"
 
 The script extracts game data, converts CD audio to DSP-ADPCM (via
 `gc-dspadpcm-encode` if available, falling back to WAV), lowercases all
-filenames, and populates `romfs/`. To regenerate HD textures from the
-Forsaken Remastered 4K texture pack, run `./regen_hd_old_4k.sh` — see the
-script's header for source-pack expectations.
+filenames, and populates `romfs/`.
+
+### HD textures (optional, recommended)
+
+Source pack: **[Upscaled Forsaken Textures — 4K Texture Pack][4kpack]**
+on Moddb (~7.5 GB).
+
+[4kpack]: https://www.moddb.com/mods/upscaled-forsaken-textures/addons/4k-texture-pack
+
+Moddb is behind Cloudflare's bot challenge so the download has to be done
+manually in a browser. Save the `.rar` anywhere convenient — the regen
+script auto-detects:
+
+```
+./4ktexturepack.rar          (project root)
+./assets/4ktexturepack.rar
+~/Downloads/4ktexturepack.rar
+$FORSAKEN_4K_PACK            (env var override)
+```
+
+Then:
+
+```bash
+sudo apt install unrar unzip imagemagick
+./regen_hd_old_4k.sh
+```
+
+The script extracts the pack (one-time, cached at `/tmp/4k_pack/`), then
+generates ETC1 / ETC1A4 t3x files into `romfs/hd_old/`. ~3 minutes on a
+modern desktop with 14-thread parallelism. Subsequent runs reuse the
+extracted cache and re-encode in <1 minute.
+
+If you skip this step the engine just falls back to the standard PNGs in
+`romfs/data/textures/` — game still runs, no HD uplift.
 
 ## Controls
 

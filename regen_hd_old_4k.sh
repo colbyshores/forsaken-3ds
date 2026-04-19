@@ -1,15 +1,31 @@
 #!/bin/bash
-# Regenerate HD textures from 4K source pack with correct per-level atlas layouts.
+# Regenerate HD textures from the 4K Forsaken Remastered texture pack.
 #
 # Source priority (per texture):
-#   1. /tmp/4k_pack/<path>.bmp (4K Forsaken Remastered pack — highest quality)
-#   2. Data/Levels/<lvl>/textures/<name>.{bmp,png} (per-level original — correct atlas)
-#   3. Data/textures/<name>.png (global original — fallback)
+#   1. $K4_PACK/<path>.bmp           — 4K Forsaken Remastered pack (preferred)
+#   2. Data/Levels/<lvl>/textures/   — original per-level BMP/PNG (correct atlas)
+#   3. Data/textures/<name>.png      — global original (fallback)
 #
 # Output: romfs/hd_old/{textures,levels/<lvl>/textures}/<name>.t3x
-# Each t3x is downscaled to fit within 512x512 (Old 3DS budget) preserving aspect.
+# Each t3x is downscaled to fit within 512x512 preserving aspect.
 #
-# CPU-capped to cores 0-7 via taskset.
+# Setup — the 4K pack is hosted on Moddb behind Cloudflare so it cannot be
+# scripted-downloaded. Get it once, manually:
+#
+#   1. Open https://www.moddb.com/mods/upscaled-forsaken-textures/addons/4k-texture-pack
+#   2. Click "Download Now". Save the .rar (~7.5 GB) anywhere convenient —
+#      this script auto-detects all the common locations below.
+#
+# Detected paths (in order):
+#   $FORSAKEN_4K_PACK   (env var override, points at the .rar OR an
+#                        already-extracted dir)
+#   ./4ktexturepack.rar
+#   ./assets/4ktexturepack.rar
+#   ~/Downloads/4ktexturepack.rar
+#   /tmp/4k_pack/                           (already-extracted cache)
+#
+# If found as a .rar, the script extracts it into /tmp/4k_pack/ once; the
+# extracted ~7.5 GB tree is cached there for subsequent runs.
 set -e
 cd "$(dirname "$0")"
 
@@ -20,6 +36,75 @@ K4_PACK=/tmp/4k_pack
 OUT=romfs/hd_old
 TMP=/tmp/hd_regen_$$
 mkdir -p "$OUT/textures" "$OUT/levels" "$TMP"
+
+# ─── locate / extract the 4K pack ──────────────────────────────────────
+ensure_4k_pack() {
+    # Already extracted at $K4_PACK with the expected layout? Done.
+    if [ -d "$K4_PACK/textures" ] && [ -d "$K4_PACK/levels" ]; then
+        return 0
+    fi
+
+    # Search likely locations for the .rar
+    local cand candidates=(
+        "$FORSAKEN_4K_PACK"
+        "$(pwd)/4ktexturepack.rar"
+        "$(pwd)/assets/4ktexturepack.rar"
+        "$HOME/Downloads/4ktexturepack.rar"
+    )
+    local rar=""
+    for cand in "${candidates[@]}"; do
+        [ -n "$cand" ] && [ -f "$cand" ] && { rar="$cand"; break; }
+    done
+
+    if [ -z "$rar" ]; then
+        cat <<EOF >&2
+
+  ⚠  4K texture pack not found.
+
+  This pipeline upscales Forsaken's textures from the community 4K pack.
+  It's hosted on ModDB behind Cloudflare's bot challenge, so we can't fetch
+  it automatically — please download once, manually:
+
+      https://www.moddb.com/mods/upscaled-forsaken-textures/addons/4k-texture-pack
+
+  Then either drop the .rar in any of these locations:
+
+      ./4ktexturepack.rar
+      ./assets/4ktexturepack.rar
+      ~/Downloads/4ktexturepack.rar
+
+  …or set FORSAKEN_4K_PACK=/path/to/4ktexturepack.rar  before re-running.
+
+  (~7.5 GB; only fetched once — subsequent runs reuse /tmp/4k_pack/.)
+
+EOF
+        exit 1
+    fi
+
+    if ! command -v unrar >/dev/null 2>&1; then
+        echo "Need 'unrar' to extract $rar (sudo apt install unrar)." >&2
+        exit 1
+    fi
+    if ! command -v unzip >/dev/null 2>&1; then
+        echo "Need 'unzip' to crack the .kpf archives inside the pack." >&2
+        exit 1
+    fi
+
+    echo "Extracting 4K pack from $rar (~7.5 GB; one-time, ~2 min on SSD)…"
+    rm -rf "$K4_PACK"
+    mkdir -p "$K4_PACK"
+    unrar x -o+ "$rar" "$K4_PACK/" >/dev/null
+    # The .rar contains mods/4kN.kpf files; each .kpf is a zip archive of
+    # textures/ + levels/<lvl>/textures/. Unpack them all into $K4_PACK so
+    # the resolve_source() lookups below find the BMPs by predictable path.
+    for kpf in "$K4_PACK"/mods/*.kpf; do
+        [ -f "$kpf" ] || continue
+        unzip -oq "$kpf" -d "$K4_PACK"
+    done
+    echo "4K pack ready at $K4_PACK ($(du -sh "$K4_PACK" | cut -f1))"
+}
+
+ensure_4k_pack
 
 PARALLEL_JOBS=14
 MAX_DIM=512   # Old 3DS hd_old budget; New 3DS would use 1024
