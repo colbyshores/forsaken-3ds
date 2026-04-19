@@ -118,6 +118,25 @@ assets/dspfirm.cdc
 *.cia
 *.bnr
 
+# Python bytecode caches (from extract/regen helper scripts)
+__pycache__/
+*.pyc
+
+# HD-texture intermediate output (scratch from older runs of the regen
+# pipeline; current pipeline writes to romfs/hd_old/ which IS tracked-as-
+# absent via romfs/ rules)
+romfs_hd/
+
+# Per-developer debug overlay (ships in Configs/debug.txt locally; never commit)
+Configs/debug.txt
+
+# Top-level symlinks pointing into Data/Pilots/Configs source trees.
+# The trailing-slash forms below match directories only, not symlinks,
+# so we list these explicitly.
+/configs
+/data
+/pilots
+
 # CIA build assets (small + needed to build the .cia)
 !assets/icon.png
 !assets/banner.png
