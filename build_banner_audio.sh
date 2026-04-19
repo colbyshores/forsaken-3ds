@@ -21,9 +21,10 @@ cd "$(dirname "$0")"
 SOURCE_URL="https://www.youtube.com/watch?v=xhlmGpsQNT0"
 TRIM_START=33.0           # seconds into the ad where the line begins
 TRIM_LENGTH=3.5           # raw clip length before head-trim
-HEAD_TRIM=1.0             # seconds to drop from the start of the boosted clip
+HEAD_TRIM=1.5             # seconds to drop from the start of the boosted clip
 GAIN_BOOST_DB=18          # boost applied to the demucs vocals (they're quiet)
-FINAL_TRIM_DB=-6          # final level cut for taste
+FINAL_TRIM_DB=-10         # final level cut for taste
+FADE_DURATION=0.2         # fade-in / fade-out duration on the FINAL clip
 DEMUCS_MODEL=mdx_extra    # gives noticeably cleaner voice than the default htdemucs
 
 OUT=assets/banner.wav
@@ -66,19 +67,34 @@ ffmpeg -hide_banner -loglevel error -y \
     -acodec pcm_s16le \
     "$WORK/clip.wav"
 
-# ── 4. Gain + fades + head trim + final level ─────────────────────────
-echo "[4/4] Gain +${GAIN_BOOST_DB} dB, head-trim ${HEAD_TRIM}s, final ${FINAL_TRIM_DB} dB…"
-FADE_OUT_START=$(awk "BEGIN { print $TRIM_LENGTH - 0.05 }")
+# ── 4. Gain, head-trim, fades, final level ───────────────────────────
+# Fades are applied AFTER the head-trim so they land on the final clip's
+# timeline (not the pre-trim clip's — the fade-in used to live in the
+# cut-off leading seconds and never made it into the output).
+FINAL_LENGTH=$(awk "BEGIN { print $TRIM_LENGTH - $HEAD_TRIM }")
+FADE_OUT_START=$(awk "BEGIN { print $FINAL_LENGTH - $FADE_DURATION }")
+echo "[4/4] Gain +${GAIN_BOOST_DB} dB → head-trim ${HEAD_TRIM}s → fades ${FADE_DURATION}s → final ${FINAL_TRIM_DB} dB (output ${FINAL_LENGTH}s)…"
+
+# Pass 1: raw gain on the full 3.5 s clip
 ffmpeg -hide_banner -loglevel error -y \
     -i "$WORK/clip.wav" \
-    -af "volume=${GAIN_BOOST_DB}dB,afade=t=in:st=0:d=0.05,afade=t=out:st=${FADE_OUT_START}:d=0.05" \
+    -af "volume=${GAIN_BOOST_DB}dB" \
     -acodec pcm_s16le \
     "$WORK/boosted.wav"
 
+# Pass 2: drop the leading $HEAD_TRIM seconds (separate invocation so
+# the new PTS starts at 0; combining -ss with afade in one command
+# drives the fade filter off the source timeline and silences output).
 ffmpeg -hide_banner -loglevel error -y \
     -i "$WORK/boosted.wav" \
     -ss "$HEAD_TRIM" \
-    -af "volume=${FINAL_TRIM_DB}dB" \
+    -acodec pcm_s16le \
+    "$WORK/cut.wav"
+
+# Pass 3: final level + symmetric fade in/out on the trimmed clip.
+ffmpeg -hide_banner -loglevel error -y \
+    -i "$WORK/cut.wav" \
+    -af "volume=${FINAL_TRIM_DB}dB,afade=t=in:st=0:d=${FADE_DURATION},afade=t=out:st=${FADE_OUT_START}:d=${FADE_DURATION}" \
     -acodec pcm_s16le \
     "$OUT"
 
