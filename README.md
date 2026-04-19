@@ -7,7 +7,9 @@ game *Forsaken*.
 A complete, playable build with a custom GPU renderer, hardware stereoscopic
 3D, the full single-player campaign, and HD-source textures sized to fit
 PICA200's budget. Holds a mostly stable 60 fps in stereoscopic 3D at 512×512
-texture resolution on New 3DS.
+texture resolution on **both Old and New 3DS** — the original game's draw
+counts are tiny by modern standards, and the close-to-metal renderer plus
+single-pass stereo leave plenty of headroom on either platform.
 
 ## Highlights
 
@@ -140,16 +142,23 @@ In the in-game pause menu, D-pad navigates and A confirms / B backs out.
 
 ## Performance
 
-| Test | Old 3DS | New 3DS |
+| Scenario | Old 3DS | New 3DS |
 |---|---|---|
 | Single-eye, no HD textures | 60 fps | 60 fps |
-| Single-eye, HD textures | ~50 fps | 60 fps |
-| Stereoscopic, HD textures | ~30 fps | mostly stable 60 fps |
-| Heavy combat (10+ enemies firing) | dips | brief dips |
+| Single-eye, HD textures | 60 fps | 60 fps |
+| Stereoscopic, HD textures | mostly stable 60 fps | mostly stable 60 fps |
+| Heavy combat (10+ enemies firing) | brief dips | brief dips |
 
-PICA200 fillrate is the dominant cost in stereo + HD. Old 3DS doesn't have
-the headroom; New 3DS holds 60 fps almost everywhere with occasional dips
-during dense particle scenes.
+There's almost no difference between the two platforms in practice. PICA200
+even at the Old 3DS clock has more than enough vertex / fragment headroom for
+Forsaken's draw counts, and the renderer side is single-pass stereo + ETC1
+single-tap fragments → no fillrate or bandwidth wall to hit. The "heavy
+combat" dips are particle-overdraw bound, not platform-specific.
+
+Context: Forsaken originally targeted a Pentium 166 with Direct3D 3.0 in
+1998. The compute and memory budget the game actually asks for is small;
+most of the savings here come from removing the high-level-API tax (citro3d
+direct submission) and not paying for stereo twice (display list replay).
 
 ## Architecture notes
 
@@ -230,7 +239,6 @@ during dense particle scenes.
   issue, under investigation).
 - Bottom screen is unused (map / HUD overlay candidate for the future).
 - No multiplayer / networking on 3DS.
-- Old 3DS will drop frames in stereo + HD textures; New 3DS recommended.
 
 ## Credits
 
