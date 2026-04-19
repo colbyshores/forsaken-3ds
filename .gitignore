@@ -102,6 +102,8 @@ net_test/
 !.github/**
 # HD texture regeneration pipeline (tooling shipped with the port)
 !regen_hd_old_4k.sh
+# Banner audio rebuild (deterministic — fetches YT clip + demucs)
+!build_banner_audio.sh
 
 # CIA build pipeline — fetched binaries (run `make tools-fetch`)
 tools/
