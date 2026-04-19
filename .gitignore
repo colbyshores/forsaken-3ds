@@ -101,3 +101,24 @@ net_test/
 # CI workflows
 !.github/
 !.github/**
+# HD texture regeneration pipeline (tooling shipped with the port)
+!regen_hd_old_4k.sh
+# Banner audio rebuild (deterministic — fetches YT clip + demucs)
+!build_banner_audio.sh
+
+# CIA build pipeline — fetched binaries (run `make tools-fetch`)
+tools/
+
+# Nintendo firmware blob — bundled into the CIA for personal use only.
+# Dump from your own 3DS (DSP1 by zoogie) and place at this path before
+# building the CIA. Never commit this file to a public repository.
+assets/dspfirm.cdc
+
+# Build artifacts
+*.cia
+*.bnr
+
+# CIA build assets (small + needed to build the .cia)
+!assets/icon.png
+!assets/banner.png
+!assets/banner.wav

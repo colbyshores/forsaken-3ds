@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/stat.h>     /* mkdir() for dspfirm.cdc bootstrap */
 
 #include "main.h"
 #include "util.h"
@@ -51,26 +52,48 @@ struct sound_source_t {
 	char path[MAX_PATH_LEN];
 };
 
-/* channel allocation bitmap */
-static bool channel_used[MAX_CHANNELS];
+/* SFX channel pool. The DSP firmware mixes channels in software and starts
+ * skipping audio when too many channels are active simultaneously (which
+ * killed both SFX and music under heavy combat). Capping total concurrent
+ * SFX voices keeps the DSP under its mixing budget. Music owns channel 23
+ * directly via music_3ds.c; SFX stay in 0-(MAX_SFX_VOICES-1).
+ *
+ * When all SFX slots are full, alloc evicts the OLDEST-allocated channel
+ * (round-robin replacement) so a new gunshot doesn't get silently dropped. */
+#define MAX_SFX_VOICES 8
+static bool       channel_used[MAX_CHANNELS];
+static u_int64_t  channel_alloc_time[MAX_CHANNELS];
+static u_int64_t  s_alloc_seq = 0;
 
 static int alloc_channel(void)
 {
-	int i;
-	for (i = 0; i < MAX_CHANNELS; i++)
+	int i, oldest_idx = 0;
+	u_int64_t oldest = (u_int64_t)-1;
+
+	for (i = 0; i < MAX_SFX_VOICES; i++)
 	{
 		if (!channel_used[i])
 		{
 			channel_used[i] = true;
+			channel_alloc_time[i] = ++s_alloc_seq;
 			return i;
 		}
+		if (channel_alloc_time[i] < oldest)
+		{
+			oldest = channel_alloc_time[i];
+			oldest_idx = i;
+		}
 	}
-	return -1;
+
+	/* All slots full — evict the oldest. */
+	ndspChnReset(oldest_idx);
+	channel_alloc_time[oldest_idx] = ++s_alloc_seq;
+	return oldest_idx;
 }
 
 static void free_channel(int ch)
 {
-	if (ch >= 0 && ch < MAX_CHANNELS)
+	if (ch >= 0 && ch < MAX_SFX_VOICES)
 		channel_used[ch] = false;
 }
 
@@ -78,10 +101,44 @@ static void free_channel(int ch)
 
 static bool ndsp_initialized = false;
 
+/* On first launch from a CIA install we may be missing the DSP firmware
+ * blob at sdmc:/3ds/dspfirm.cdc, which ndspInit absolutely requires.
+ * The CIA bundles a copy in romfs; lazily extract it on demand if the
+ * SD copy is missing or zero-length. Bootstrapping in-band so the user
+ * doesn't have to run a separate dumper before launching the game. */
+static void ensure_dspfirm_on_sd(void)
+{
+	const char *sd_path  = "sdmc:/3ds/dspfirm.cdc";
+	const char *src_path = "romfs:/dspfirm.cdc";
+	FILE *test = fopen(sd_path, "rb");
+	if (test) {
+		fseek(test, 0, SEEK_END);
+		long sz = ftell(test);
+		fclose(test);
+		if (sz > 0) return;        /* already there */
+	}
+	FILE *src = fopen(src_path, "rb");
+	if (!src) return;              /* no bundled copy — user is on their own */
+
+	mkdir("sdmc:/3ds", 0777);      /* harmless if it already exists */
+
+	FILE *dst = fopen(sd_path, "wb");
+	if (!dst) { fclose(src); return; }
+	char buf[4096];
+	size_t n;
+	while ((n = fread(buf, 1, sizeof(buf), src)) > 0)
+		fwrite(buf, 1, n, dst);
+	fclose(dst);
+	fclose(src);
+	DebugPrintf("sound_init: extracted dspfirm.cdc to %s\n", sd_path);
+}
+
 bool sound_init(void)
 {
 	if (ndsp_initialized)
 		return true;
+
+	ensure_dspfirm_on_sd();
 
 	Result rc = ndspInit();
 	if (R_FAILED(rc))
