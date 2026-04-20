@@ -66,26 +66,29 @@ static volatile bool s_thread_exit = false;
 
 /* ---- level→track mapping ---- */
 
-/* Level → CD audio track. Indices line up with Data/Levels/mission.dat.
- * Track values are the actual romfs track numbers (track02.dsp .. track10.dsp);
- * we only have 9 unique tracks across 15 levels, so themes repeat the same
- * way the original 1998 CD soundtrack did (same tonal pairings preserved). */
+/* Level → CD audio track. Indices line up with Data/Levels/mission.dat
+ * (the authoritative 1998 SP campaign order). Track values were
+ * extracted from ForsakenHW.exe strings on the original 1998 CD —
+ * the exe embeds an internal array of "<levelname> <trackN>" entries
+ * where N is the CDDA track number (2-10 on the music CD). This is
+ * the AUTHORITATIVE 1998 mapping straight from the shipped binary.
+ * 9 distinct tracks, themes repeat across 15 levels as in the original. */
 static const int s_level_track[] = {
-	5,   /*  1. vol2       (Volcano)               - Volcano               */
-	8,   /*  2. sewer      (Abandoned Subway)      - Condemned             */
-	6,   /*  3. nukerf     (Nuclear Power Station) - Reactor               */
-	5,   /*  4. thermal    (Thermal Power Station) - Volcano               */
-	8,   /*  5. Fedbankv   (Federal Bank Vault)    - Condemned             */
-	9,   /*  6. Pship      (Prison Ship)           - Flameout              */
-	10,  /*  7. azchb      (Asteroid Base)         - The Dead System       */
-	6,   /*  8. Bio-sphere (Bio-sphere)            - Reactor               */
-	8,   /*  9. Asubchb    (Subterranean Complex)  - Condemned             */
-	9,   /* 10. Capship    (Capsized Ship)         - Flameout              */
-	10,  /* 11. high       (Orbital Station)       - The Dead System       */
-	7,   /* 12. nedwheel   (Shuttle Bay)           - Pure Bitch Power      */
-	4,   /* 13. military   (Military Base)         - Sanctuary of Tloloc   */
-	4,   /* 14. oldtemple  (Tloloc Temple)         - Sanctuary of Tloloc   */
-	2,   /* 15. endscene   (Ancient Temple, Final) - Forsaken (main theme) */
+	5,   /*  1. vol2       (Volcano)               */
+	9,   /*  2. asubchb    (Abandoned Subway)      */
+	6,   /*  3. nps-sp01   (Nuclear Power Station) */
+	3,   /*  4. thermal    (Thermal Power Station) */
+	2,   /*  5. fedbankv   (Federal Bank Vault)    */
+	8,   /*  6. pship      (Prison Ship)           */
+	4,   /*  7. spc-sp01   (Asteroid Base)         */
+	9,   /*  8. bio-sphere (Bio-Sphere)            */
+	3,   /*  9. nukerf     (Subterranean Complex)  */
+	7,   /* 10. capship    (Capsized Ship)         */
+	8,   /* 11. space      (Orbital Space Station) */
+	10,  /* 12. high       (Shuttle Bay)           */
+	5,   /* 13. military   (Military Base)         */
+	3,   /* 14. azt-sp01   (Tloloc Temple)         */
+	6,   /* 15. azchb      (Ancient Temple)        */
 };
 #define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
 
