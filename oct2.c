@@ -4385,18 +4385,32 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	return true;
 }
 
+#if defined(__3DS__) && defined(RENDERER_C3D)
+extern bool pglHudBeginBottom(void);
+extern void pglHudEndBottom(void);
+#endif
+
 void DrawMainGameMenu(void)
 {
     if( CurrentMenu && CurrentMenuItem )
     {
       MenuDraw( CurrentMenu );
       MenuItemDrawCursor( CurrentMenuItem );
-      DrawSimplePanel();
     }
-    else
+    /* [3DS citro3d] Gameplay text HUD renders on the mono bottom screen so
+     * the stereo 3D image above isn't cluttered. pglHudBeginBottom returns
+     * true only for the first eye-callback of the frame (HUD is mono; one
+     * copy is all we need). Non-3DS and picaGL builds keep the HUD as a
+     * top-screen overlay as before. */
+#if defined(__3DS__) && defined(RENDERER_C3D)
+    if (pglHudBeginBottom())
     {
-          DrawSimplePanel();
+        DrawSimplePanel();
+        pglHudEndBottom();
     }
+#else
+    DrawSimplePanel();
+#endif
 }
 
 bool RenderMainCamera2dPolys(void);
