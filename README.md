@@ -130,15 +130,16 @@ If you skip this step the engine just falls back to the standard PNGs in
 | Input | Action |
 |---|---|
 | Circle Pad | Pitch / yaw |
-| C-Stick (New 3DS) | Strafe / vertical thrust |
 | A | Fire primary |
 | B | Fire secondary |
+| X | Move forward |
+| Y | Move backward |
 | L / R | Strafe left / right |
-| ZL / ZR | Nitro / drop mine |
-| **D-pad up / down** | **Cycle cannons (next / previous primary)** |
-| **D-pad left / right** | **Cycle missiles (next / previous secondary)** |
+| ZR | Drop mine |
+| D-pad left / right | Cycle primary weapons (cannons) |
 | Start | Pause menu (save / load / quit) |
 | Select | Rear view |
+| Start + Select | Quit to HOME |
 | 3D slider | Stereoscopic depth (hardware) |
 
 In the in-game pause menu, D-pad navigates and A confirms / B backs out.
