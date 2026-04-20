@@ -346,6 +346,9 @@ publish-public:
 	  git clone --quiet --mirror \
 	    git@github.com:colbyshores/forsaken-3ds-private.git $$mirror; \
 	  cd $$mirror; \
+	  echo "Scrubbing private-only docs from all history..."; \
+	  git-filter-repo --invert-paths --force \
+	    --path 3DS_PORT_NOTES.md >/dev/null; \
 	  echo "Force-pushing heads + tags to public..."; \
 	  git push --force --prune \
 	    git@github.com:colbyshores/forsaken-3ds.git \
