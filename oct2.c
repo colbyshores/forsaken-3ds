@@ -1703,11 +1703,26 @@ void DrawSimplePanel()
 
 			// Add Crosshair Polygon..
 			if(!CurrentMenu)
-				AddScreenPolyText( 
-					(u_int16_t) 63 , 
-					(float) (viewport.X + (viewport.Width>>1)) , 
-					(float) (viewport.Y + (viewport.Height>>1)) , 
+			{
+#if defined(__3DS__) && defined(RENDERER_C3D)
+				/* Crosshair/reticle is an in-world overlay tied to the 3D
+				   camera viewport — it belongs on the stereo top screen, not
+				   the mono bottom. Temporarily clear the bottom-HUD routing
+				   so this AddScreenPolyText creates a top-screen poly. */
+				extern bool ScrPolyGetRouteBottom(void);
+				extern void ScrPolySetRouteBottom(bool b);
+				bool _was_routing = ScrPolyGetRouteBottom();
+				ScrPolySetRouteBottom(false);
+#endif
+				AddScreenPolyText(
+					(u_int16_t) 63 ,
+					(float) (viewport.X + (viewport.Width>>1)) ,
+					(float) (viewport.Y + (viewport.Height>>1)) ,
 					r, g, b, 255 );
+#if defined(__3DS__) && defined(RENDERER_C3D)
+				ScrPolySetRouteBottom(_was_routing);
+#endif
+			}
 
 			// Game Clock
 			if(ShowClockOnHUD)
@@ -1855,16 +1870,36 @@ void DrawSimplePanel()
 			extern float platform_get_3d_slider(void);
 			char _dbg[64];
 			float _slider = platform_get_3d_slider();
-			/* Raw slider (osGet3DSliderState on hardware, config override
-			   on emulators) + derived eye-separation + enabled state.
-			   If slider is continuous but the perceived 3D is binary,
-			   the bug is downstream of stereo_eye_sep. */
+			/* On-screen overlay: raw slider, derived eye_sep, enabled state.
+			   Also mirrored to sdmc:/forsaken_stereo.txt (latest frame
+			   only, overwrite mode) so the user can FTP it and see the
+			   values the game is reading if the on-screen text is hard
+			   to read on stereo top screen. */
 			sprintf(_dbg, "slider: %.3f",  _slider);
 			Print4x5Text(_dbg, FontWidth, FontHeight*2, 1);
 			sprintf(_dbg, "eye_sep: %.2f", render_info.stereo_eye_sep);
 			Print4x5Text(_dbg, FontWidth, FontHeight*3, 1);
 			sprintf(_dbg, "stereo: %s", render_info.stereo_enabled ? "on" : "off");
 			Print4x5Text(_dbg, FontWidth, FontHeight*4, 1);
+
+			/* File log — overwrites every frame so user sees the live
+			   value. Low overhead: ~100 bytes/frame. */
+			{
+				static int _stereo_log_throttle = 0;
+				if ((++_stereo_log_throttle & 0x3F) == 0)  /* every 64 frames */
+				{
+					FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "w");
+					if (_f)
+					{
+						fprintf(_f, "slider   = %.6f\n", _slider);
+						fprintf(_f, "eye_sep  = %.6f\n", render_info.stereo_eye_sep);
+						fprintf(_f, "stereo   = %s\n", render_info.stereo_enabled ? "on" : "off");
+						fprintf(_f, "focal    = %.6f\n", render_info.stereo_focal_dist);
+						fprintf(_f, "mode     = %d\n",   (int)render_info.stereo_mode);
+						fclose(_f);
+					}
+				}
+			}
 		}
 	}
 #endif
@@ -4410,6 +4445,9 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 #if defined(__3DS__) && defined(RENDERER_C3D)
 extern bool pglHudBeginBottom(void);
 extern void pglHudEndBottom(void);
+extern bool g_hud_on_bottom;
+extern void ScrPolySetRouteBottom(bool b);
+extern void ScrPolySetDisplayMode(int mode);
 #endif
 
 void DrawMainGameMenu(void)
@@ -4419,7 +4457,37 @@ void DrawMainGameMenu(void)
       MenuDraw( CurrentMenu );
       MenuItemDrawCursor( CurrentMenuItem );
     }
+#if defined(__3DS__) && defined(RENDERER_C3D)
+    /* [3DS citro3d] Tag every screen poly added inside DrawSimplePanel with
+       SCRFLAG_BottomHUD so the two-pass screen-poly drain routes it to the
+       bottom screen. In-world overlays added earlier (reticles, enemy
+       markers, damage flash) already exist in the pool WITHOUT the flag
+       and stay on the stereo top screen. */
+    bool _saved_route = false;
+    if (g_hud_on_bottom)
+    {
+        _saved_route = true;
+        ScrPolySetRouteBottom(true);
+        /* Override window dims so Print4x5Text's position math targets
+           320×240 instead of the top-screen 400×240. pglHudBeginBottom
+           will set the same values at render time. */
+        render_info.window_size.cx = 320;
+        render_info.window_size.cy = 240;
+        render_info.ThisMode.w = 320;
+        render_info.ThisMode.h = 240;
+    }
+#endif
     DrawSimplePanel();
+#if defined(__3DS__) && defined(RENDERER_C3D)
+    if (_saved_route)
+    {
+        ScrPolySetRouteBottom(false);
+        render_info.window_size.cx = 400;
+        render_info.window_size.cy = 240;
+        render_info.ThisMode.w = 400;
+        render_info.ThisMode.h = 240;
+    }
+#endif
 }
 
 bool RenderMainCamera2dPolys(void);
@@ -4428,18 +4496,26 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	if(!RenderCurrentCamera())
 		return false;
 	DrawMainGameMenu();
-	/* [3DS citro3d] Gameplay 2D pass (HUD text, pause menu overlays, lens
-	 * flares) renders to the mono bottom screen so the stereo top screen
-	 * stays clean. pglHudBeginBottom is a no-op on the second eye pass —
-	 * one mono draw per frame is enough. In-world 3D elements (targeting
-	 * reticle, missile viewport) render in RenderCurrentCamera above and
-	 * stay on the stereo top screen. */
 #if defined(__3DS__) && defined(RENDERER_C3D)
+	/* [3DS citro3d] Two-pass screen-poly drain:
+	 *   Pass 1: mode=1, current (stereo top) target — draws everything
+	 *           WITHOUT SCRFLAG_BottomHUD (in-world overlays: aim reticle,
+	 *           enemy markers, damage flash).
+	 *   Pass 2: mode=2, bottom target — draws only polys WITH
+	 *           SCRFLAG_BottomHUD (gameplay text HUD tagged inside
+	 *           DrawSimplePanel).
+	 * Mode=0 restored so Display* runs outside this path (title, crate
+	 * menu) behave as before. pglHudBeginBottom is a no-op on the second
+	 * eye pass; the bottom screen is mono and doesn't need a second copy. */
+	ScrPolySetDisplayMode(1);
+	RenderMainCamera2dPolys();
 	if (pglHudBeginBottom())
 	{
+		ScrPolySetDisplayMode(2);
 		RenderMainCamera2dPolys();
 		pglHudEndBottom();
 	}
+	ScrPolySetDisplayMode(0);
 #else
 	RenderMainCamera2dPolys();
 #endif
