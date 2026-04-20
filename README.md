@@ -43,8 +43,9 @@ single-pass stereo leave plenty of headroom on either platform.
 export DEVKITPRO=/opt/devkitpro
 export DEVKITARM=$DEVKITPRO/devkitARM
 
-# Native citro3d renderer (recommended)
-make -f Makefile.3ds RENDERER=citro3d
+# Default renderer is citro3d (native, hardware stereo).
+# `RENDERER=picagl` builds the mono fallback path.
+make -f Makefile.3ds
 
 # Output: forsaken3ds.3dsx
 ```
@@ -55,15 +56,17 @@ make -f Makefile.3ds RENDERER=citro3d
 # One-time: fetch makerom + bannertool (~5 MB)
 make -f Makefile.3ds tools-fetch
 
-# You also need to dump dspfirm.cdc from your own 3DS
-# (use https://github.com/zoogie/DSP1) and place it at:
-#   assets/dspfirm.cdc
-# The CIA bundles this and extracts it to sdmc:/3ds/dspfirm.cdc on first
-# launch so audio works without a separate setup step on the install side.
+# CIA builds do NOT bundle dspfirm.cdc — CFW users on real hardware
+# already have sdmc:/3ds/dspfirm.cdc from the standard DSP1 dump step
+# (https://github.com/zoogie/DSP1). The .3dsx path does bundle it
+# (from assets/dspfirm.cdc) so emulator testing is zero-friction:
+# sound_init() auto-copies it to the virtual SD on first launch.
+# Either way, dump the blob from your own 3DS before building the
+# .3dsx and place it at assets/dspfirm.cdc.
 
-make -f Makefile.3ds RENDERER=citro3d cia
+make -f Makefile.3ds cia
 
-# Output: forsaken3ds.cia (~440 MB; install via FBI on your 3DS)
+# Output: forsaken3ds.cia (~279 MB; install via FBI on your 3DS)
 ```
 
 See [`assets/README.md`](assets/README.md) for asset / CIA pipeline details.
@@ -188,10 +191,13 @@ direct submission) and not paying for stereo twice (display list replay).
   rather than the DSP header's `num_adpcm_nibbles` field, because
   `gc-dspadpcm-encode` writes that count including frame-header nibbles
   and our division by 14 over-estimated end-of-file.
-- ndspInit's `dspfirm.cdc` requirement is bootstrapped on first launch:
-  the CIA bundles a copy in romfs and `sound_init()` writes it to
-  `sdmc:/3ds/dspfirm.cdc` if absent, so a fresh install plays audio
-  without a separate setup step.
+- ndspInit's `dspfirm.cdc` requirement is met differently per build:
+  the **.3dsx** bundles a copy in romfs and `sound_init()` writes it to
+  `sdmc:/3ds/dspfirm.cdc` if absent so emulator testing plays audio
+  without a separate setup step. The **CIA** does NOT bundle it; CFW
+  users installing on real hardware already have `sdmc:/3ds/dspfirm.cdc`
+  from the DSP1 dump step, and leaving the firmware out of the CIA
+  avoids redistributing a Nintendo blob.
 
 ### HD texture pipeline (`regen_hd_old_4k.sh`)
 - Source: Forsaken Remastered 4K texture pack (`~/Downloads/4ktexturepack.rar`).
@@ -224,15 +230,6 @@ direct submission) and not paying for stereo twice (display list replay).
   time rather than memcpy-ing two structs per vertex per frame —
   reclaimed ~30 % framerate on sequences with many animated models.
 
-## Branches
-
-| Branch | Description |
-|---|---|
-| `master` | Stable merged feature set |
-| `3ds-citro3d` | Native citro3d renderer development |
-| `hd-textures` | HD texture pipeline + CIA build (current) |
-| `3ds-port` | Earlier picaGL-based port |
-
 ## Known limitations
 
 - Missile chase camera has limited draw distance (BSP portal visibility
@@ -252,4 +249,7 @@ direct submission) and not paying for stereo twice (display list replay).
 
 ## License
 
-Same as upstream ForsakenX (BSD-style; see `COPYING`).
+GNU General Public License, version 2 — same as upstream ForsakenX.
+Full text in [`LICENSE`](LICENSE). Original 1998 Forsaken source is
+considered abandonware; portions have been substantially modified or
+replaced, and the combined work is distributed under GPLv2.
