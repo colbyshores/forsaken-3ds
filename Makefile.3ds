@@ -154,10 +154,30 @@ all: $(OUTPUT_3DSX)
 # Build a physical copy of romfs (resolving all symlinks) once
 # After copying, lowercase all file/directory names so convert_path() lookups work
 # (original game data has mixed-case Windows filenames; 3DS romfs is case-sensitive)
-$(ROMFS_STAMP): $(SRCDIR)/romfs
+#
+# Freshness check: a phony target compares the newest file under romfs/
+# (following symlinks) against the stamp's mtime and deletes the stamp if
+# anything is newer. That forces the real stamp rule below to rerun. We do
+# this via a phony rule rather than listing all romfs files as prerequisites
+# because the game assets contain filenames with literal spaces which Make's
+# space-separated prerequisite list cannot express.
+.PHONY: romfs-freshness-check
+romfs-freshness-check:
+	@if [ -f $(ROMFS_STAMP) ] && [ -z "$$(find -L $(SRCDIR)/romfs -type f -newer $(ROMFS_STAMP) -print -quit 2>/dev/null)" ]; then \
+		: ; \
+	else \
+		rm -f $(ROMFS_STAMP) ; \
+	fi
+
+# Order-only dependency on the phony check — make runs the check first
+# (which may delete the stamp if a source file is newer) but doesn't
+# consider the phony's "always out of date" timestamp when deciding
+# whether the stamp itself is up-to-date. Net result: restage only when
+# the check deleted the stamp.
+$(ROMFS_STAMP): | romfs-freshness-check
 	@echo "Staging romfs data (this may take a while)..."
-	@rm -rf $(ROMFS_STAGING)
-	@cp -rL $(SRCDIR)/romfs $(ROMFS_STAGING)
+	@mkdir -p $(ROMFS_STAGING)
+	@rsync -aL --delete --exclude='.stamp' $(SRCDIR)/romfs/ $(ROMFS_STAGING)/
 	@echo "Converting level BMP textures to PNG..."
 	@cd $(ROMFS_STAGING) && find . -path '*/levels/*/textures/*.bmp' -o -path '*/levels/*/textures/*.BMP' | while read bmp; do \
 		d=$$(dirname "$$bmp"); b=$$(basename "$$bmp"); \
@@ -169,7 +189,13 @@ $(ROMFS_STAMP): $(SRCDIR)/romfs
 	@echo "Lowercasing romfs filenames..."
 	@cd $(ROMFS_STAGING) && find . -depth -name '*[A-Z]*' | while read f; do \
 		d=$$(dirname "$$f"); b=$$(basename "$$f"); lb=$$(echo "$$b" | tr 'A-Z' 'a-z'); \
-		if [ "$$b" != "$$lb" ]; then mv "$$d/$$b" "$$d/$$lb"; fi; \
+		if [ "$$b" != "$$lb" ]; then \
+			if [ -e "$$d/$$lb" ]; then \
+				rm -rf "$$d/$$b"; \
+			else \
+				mv "$$d/$$b" "$$d/$$lb"; \
+			fi; \
+		fi; \
 	done
 	@touch $(ROMFS_STAMP)
 
