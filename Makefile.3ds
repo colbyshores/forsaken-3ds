@@ -197,6 +197,17 @@ $(ROMFS_STAMP): | romfs-freshness-check
 			fi; \
 		fi; \
 	done
+	@echo "Placing .keep files so makerom doesn't strip empty critical dirs..."
+	@# missing_folders() in main.c requires all four to exist. The .3dsx
+	@# ships fine because 3dsxtool preserves empty directories; makerom
+	@# strips them. A tiny .keep file guarantees the dir survives the
+	@# romfs pack on both paths. convert_path() lowercases lookups, and
+	@# the lowercase step above lowercases staged names, so these literal
+	@# lowercase folder names are all the game will ever look for.
+	@for d in configs data pilots scripts; do \
+		mkdir -p $(ROMFS_STAGING)/$$d; \
+		touch $(ROMFS_STAGING)/$$d/.keep; \
+	done
 	@touch $(ROMFS_STAMP)
 
 $(OUTPUT_SMDH):
