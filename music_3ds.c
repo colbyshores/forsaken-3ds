@@ -66,8 +66,26 @@ static volatile bool s_thread_exit = false;
 
 /* ---- level→track mapping ---- */
 
+/* Level → CD audio track. Indices line up with Data/Levels/mission.dat.
+ * Track values are the actual romfs track numbers (track02.dsp .. track10.dsp);
+ * we only have 9 unique tracks across 15 levels, so themes repeat the same
+ * way the original 1998 CD soundtrack did (same tonal pairings preserved). */
 static const int s_level_track[] = {
-	5, 3, 6, 4, 8, 7, 9, 3, 5, 4, 6, 8, 9, 7, 10, 2,
+	5,   /*  1. vol2       (Volcano)               - Volcano               */
+	8,   /*  2. sewer      (Abandoned Subway)      - Condemned             */
+	6,   /*  3. nukerf     (Nuclear Power Station) - Reactor               */
+	5,   /*  4. thermal    (Thermal Power Station) - Volcano               */
+	8,   /*  5. Fedbankv   (Federal Bank Vault)    - Condemned             */
+	9,   /*  6. Pship      (Prison Ship)           - Flameout              */
+	10,  /*  7. azchb      (Asteroid Base)         - The Dead System       */
+	6,   /*  8. Bio-sphere (Bio-sphere)            - Reactor               */
+	8,   /*  9. Asubchb    (Subterranean Complex)  - Condemned             */
+	9,   /* 10. Capship    (Capsized Ship)         - Flameout              */
+	10,  /* 11. high       (Orbital Station)       - The Dead System       */
+	7,   /* 12. nedwheel   (Shuttle Bay)           - Pure Bitch Power      */
+	4,   /* 13. military   (Military Base)         - Sanctuary of Tloloc   */
+	4,   /* 14. oldtemple  (Tloloc Temple)         - Sanctuary of Tloloc   */
+	2,   /* 15. endscene   (Ancient Temple, Final) - Forsaken (main theme) */
 };
 #define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
 

@@ -237,12 +237,12 @@ convert_one() {
     # (animated/polyanim'd textures look bad downsampled).
     if [ "$is_wall_opaque" = 1 ]; then
         if [ "$skip_mips" = 1 ]; then
-            tex3ds -f etc1 -q low "$tmp_png" -o "$dst" 2>/dev/null
+            tex3ds -f etc1 -q high "$tmp_png" -o "$dst" 2>/dev/null
         else
-            tex3ds -f etc1 -q low -m bilinear "$tmp_png" -o "$dst" 2>/dev/null
+            tex3ds -f etc1 -q high -m bilinear "$tmp_png" -o "$dst" 2>/dev/null
         fi
     else
-        tex3ds -f auto-etc1 -q low "$tmp_png" -o "$dst" 2>/dev/null
+        tex3ds -f auto-etc1 -q high "$tmp_png" -o "$dst" 2>/dev/null
     fi
     rm -f "$tmp_png"
 }
