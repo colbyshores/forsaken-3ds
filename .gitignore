@@ -21,6 +21,7 @@ gmon.out
 build_3ds/
 forsaken3ds.*
 .romfs_staging/
+.romfs_staging_cia/
 forsaken_*.log
 
 # ---- PC build artifacts ----
@@ -112,9 +113,13 @@ net_test/
 # CIA build pipeline — fetched binaries (run `make tools-fetch`)
 tools/
 
-# Nintendo firmware blob — bundled into the CIA for personal use only.
-# Dump from your own 3DS (DSP1 by zoogie) and place at this path before
-# building the CIA. Never commit this file to a public repository.
+# Nintendo DSP firmware blob. NOT bundled in the CIA — CFW users on real
+# hardware already have sdmc:/3ds/dspfirm.cdc from the standard DSP1 dump
+# (zoogie's tool). It IS bundled in the .3dsx so emulator testing has
+# audio out of the box; ensure_dspfirm_on_sd() auto-copies it to the
+# virtual SD on first launch. Dump from your own 3DS and place at this
+# path before building the .3dsx. Never commit this file to any
+# repository — public or otherwise.
 assets/dspfirm.cdc
 
 # Build artifacts
