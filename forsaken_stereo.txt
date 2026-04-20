@@ -1,0 +1,2 @@
+state    = platform_init_done
+waiting  = for gameplay frames to overwrite this

@@ -1881,23 +1881,22 @@ void DrawSimplePanel()
 			Print4x5Text(_dbg, FontWidth, FontHeight*4, 1);
 		}
 
-		/* File log — writes sdmc:/forsaken_stereo.txt every ~1 s whether
-		   the overlay toggle is on or not, so the FTP-path diagnosis
-		   doesn't depend on finding the menu entry. Overwrite mode so
-		   the file always holds the latest frame. */
+		/* File log — APPEND mode so one FTP pull gives us a time-series
+		   of slider values as the user moves the physical slider. One
+		   sample every ~1/3 s. Header row is written at game startup
+		   (see platform_init). Restart the game to reset the log. */
 		{
 			static int _stereo_log_throttle = 0;
-			if ((++_stereo_log_throttle & 0x3F) == 0)  /* every 64 frames */
+			if ((++_stereo_log_throttle % 20) == 0)  /* every 20 frames */
 			{
-				FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "w");
+				FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "a");
 				if (_f)
 				{
-					fprintf(_f, "slider   = %.6f\n", _slider);
-					fprintf(_f, "eye_sep  = %.6f\n", render_info.stereo_eye_sep);
-					fprintf(_f, "stereo   = %s\n", render_info.stereo_enabled ? "on" : "off");
-					fprintf(_f, "focal    = %.6f\n", render_info.stereo_focal_dist);
-					fprintf(_f, "mode     = %d\n",   (int)render_info.stereo_mode);
-					fprintf(_f, "frame    = %d\n",   _stereo_log_throttle);
+					fprintf(_f, "frame=%d  slider=%.4f  eye_sep=%.2f  stereo=%s  mode=%d\n",
+						_stereo_log_throttle, _slider,
+						render_info.stereo_eye_sep,
+						render_info.stereo_enabled ? "on" : "off",
+						(int)render_info.stereo_mode);
 					fclose(_f);
 				}
 			}
