@@ -4346,7 +4346,12 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
         	render_set_filter( 1, 0, 0 );
         if( !render_camera() )
           return false;
-#ifdef __3DS__
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	/* Hardware stereo is citro3d-only. picaGL builds force
+	 * platform_get_3d_slider() to 0, so stereo_mode is never set to
+	 * STEREO_MODE_3DS and this branch is dead there — but we also
+	 * gate the symbol reference at compile time so picaGL doesn't
+	 * have to export pglTransferEye at all. */
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
 		extern void pglTransferEye(unsigned int eye);
@@ -4387,7 +4392,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	}
         if( !render_camera() )
           return false;
-#ifdef __3DS__
+#if defined(__3DS__) && defined(RENDERER_C3D)
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
 		extern void pglTransferEye(unsigned int eye);
