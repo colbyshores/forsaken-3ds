@@ -81,7 +81,15 @@ static shaderProgram_s  s_shaderProgram;
 static bool             s_shaderReady   = false;
 static C3D_RenderTarget *s_targetLeft    = NULL;
 static C3D_RenderTarget *s_targetRight   = NULL;
+static C3D_RenderTarget *s_targetBottom  = NULL;  /* mono 320×240 for HUD */
 static C3D_RenderTarget *s_targetCurrent = NULL;  /* active render target */
+static C3D_RenderTarget *s_targetSaved   = NULL;  /* stashed target for HUD restore */
+static bool s_hudDrawnThisFrame = false;          /* HUD drawn once per frame */
+/* Saved render_info state during HUD-on-bottom pass (restored on End) */
+static int  s_hudSavedThisModeW = 0;
+static int  s_hudSavedThisModeH = 0;
+static int  s_hudSavedWinCx     = 0;
+static int  s_hudSavedWinCy     = 0;
 static bool              s_stereoFrame   = false;
 
 /* Color write mask — always GPU_WRITE_ALL on citro3d (software anaglyph
@@ -197,6 +205,90 @@ void pglSwapBuffers(void)
 	s_stereoFrame = false;
 	s_dlReplay = false;
 	s_dlRecording = false;
+	s_hudDrawnThisFrame = false;
+}
+
+/*===================================================================
+	HUD bottom-screen redirection
+	-------------------------------------------------------------------
+	The gameplay HUD (ammo / weapons / shield / messages) is rendered
+	on the mono bottom screen instead of overlaying the stereo top
+	screen. pglHudBeginBottom() stashes the current top-screen target,
+	clears the bottom target, switches C3D's draw target to it, and
+	returns true if the caller should actually issue draws. It returns
+	false on the second eye's pass so we only draw the HUD once per
+	frame (bottom is mono — one copy is all we need).
+===================================================================*/
+bool pglHudBeginBottom(void)
+{
+	if (!s_targetBottom || !s_inFrame)
+		return false;
+	if (s_hudDrawnThisFrame)
+		return false;
+	s_hudDrawnThisFrame = true;
+
+	/* Save + override dimensions so Print4x5Text / 2D layout math
+	   targets 320×240 instead of 400×240. */
+	s_hudSavedThisModeW = (int)render_info.ThisMode.w;
+	s_hudSavedThisModeH = (int)render_info.ThisMode.h;
+	s_hudSavedWinCx     = (int)render_info.window_size.cx;
+	s_hudSavedWinCy     = (int)render_info.window_size.cy;
+	render_info.ThisMode.w    = 320;
+	render_info.ThisMode.h    = 240;
+	render_info.window_size.cx = 320;
+	render_info.window_size.cy = 240;
+
+	s_targetSaved = s_targetCurrent;
+	C3D_RenderTargetClear(s_targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+	C3D_FrameDrawOn(s_targetBottom);
+	s_targetCurrent = s_targetBottom;
+	/* PICA portrait viewport for the 240×320 bottom target. */
+	C3D_SetViewport(0, 0, 240, 320);
+
+	/* Re-bind shader state for the new target (matches pglTransferEye). */
+	C3D_BindProgram(&s_shaderProgram);
+	{
+		C3D_AttrInfo *ai = C3D_GetAttrInfo();
+		AttrInfo_Init(ai);
+		AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
+		AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+		AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
+	}
+	C3D_DepthTest(true, GPU_LESS, s_colorMask);
+	C3D_CullFace(GPU_CULL_FRONT_CCW);
+	C3D_DepthMap(true, 1.0f, 1.0f);
+	return true;
+}
+
+void pglHudEndBottom(void)
+{
+	if (!s_targetSaved)
+		return;
+	C3D_FrameDrawOn(s_targetSaved);
+	s_targetCurrent = s_targetSaved;
+	s_targetSaved = NULL;
+
+	/* Restore saved dimensions. */
+	render_info.ThisMode.w     = s_hudSavedThisModeW;
+	render_info.ThisMode.h     = s_hudSavedThisModeH;
+	render_info.window_size.cx = s_hudSavedWinCx;
+	render_info.window_size.cy = s_hudSavedWinCy;
+
+	/* Restore top-screen PICA portrait viewport (240×400). */
+	C3D_SetViewport(0, 0, 240, 400);
+
+	/* Re-bind shader state for the restored top target. */
+	C3D_BindProgram(&s_shaderProgram);
+	{
+		C3D_AttrInfo *ai = C3D_GetAttrInfo();
+		AttrInfo_Init(ai);
+		AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
+		AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+		AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
+	}
+	C3D_DepthTest(true, GPU_LESS, s_colorMask);
+	C3D_CullFace(GPU_CULL_FRONT_CCW);
+	C3D_DepthMap(true, 1.0f, 1.0f);
 }
 
 /* Replay the display list recorded during the first eye.
@@ -335,11 +427,10 @@ void pglTransferEye(unsigned int eye)
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
-		/* DON'T replay yet — the engine hasn't updated the camera
-		 * position for the right eye.  Set the flag so the first
-		 * draw_render_object call triggers the replay with the
-		 * correct view matrix. */
-		s_dlReplay = true;
+		/* Replay disabled (see FSBeginScene comment). The right eye pass
+		 * runs the callback fully, so we just need the target switch
+		 * above — no replay flag. */
+		s_dlReplay = false;
 	}
 	if (eye == GFX_RIGHT)
 	{
@@ -421,6 +512,16 @@ bool c3d_renderer_init(void)
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetRight, GFX_TOP, GFX_RIGHT, transferFlags);
+
+		/* Bottom screen (320×240, mono). Stored in GPU as 240×320 portrait
+		 * like the top. Used for gameplay HUD text so the stereo 3D image
+		 * above isn't cluttered. */
+		s_targetBottom = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
+		if (!s_targetBottom) {
+			c3d_trace("FAILED to create bottom render target");
+			return false;
+		}
+		C3D_RenderTargetSetOutput(s_targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
 	}
 	c3d_trace("render targets created and linked to display");
 
@@ -585,11 +686,21 @@ bool FSBeginScene(void)
 	/* Single-pass stereo: if replay already drew the second eye, skip. */
 	if (s_dlReplay)
 		return true;
-	/* Record display list only for hardware stereo (STEREO_MODE_3DS).
-	 * Anaglyph uses a different compositing approach. */
+	/* Single-pass stereo replay is DISABLED.
+	 *
+	 * The replay mechanism recorded left-eye draws into s_dl[] and re-submitted
+	 * them with the right-eye view matrix, saving one BSP traversal per frame.
+	 * But it silently dropped any 2D/HUD draw issued AFTER the replay was
+	 * triggered on the second eye — menu text, reticles, missile viewport
+	 * all ended up on only one eye as a result. Disabling replay makes both
+	 * eye callbacks run fully (CPU cost ~2x 3D traversal in stereo mode), so
+	 * every draw lands on both targets naturally.
+	 *
+	 * If FPS on Old 3DS drops too far, the smarter fix is to skip replay
+	 * for ortho (2D) draws only, or to split the callback into "3D once + 2D
+	 * twice" explicitly. Leaving that for later. */
 	s_dlCount = 0;
-	s_dlRecording = (render_info.stereo_enabled &&
-	                 render_info.stereo_mode == STEREO_MODE_3DS);
+	s_dlRecording = false;
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
