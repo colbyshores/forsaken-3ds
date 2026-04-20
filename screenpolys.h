@@ -52,6 +52,8 @@
 #define	SCRFLAG_Onscreen	4
 #define	SCRFLAG_Solid		8
 #define	SCRFLAG_Rot90		16
+#define	SCRFLAG_BottomHUD	32  /* [3DS] route this poly to the mono bottom screen
+                                      instead of the stereo top screen */
 
 /*===================================================================
 	Process Sequences
@@ -122,6 +124,11 @@ typedef struct SCRPOLY {
 void InitScrPolys( void );
 void KillUsedScrPoly( u_int16_t i );
 u_int16_t FindFreeScrPoly( void );
+
+/* [3DS bottom-screen HUD routing] */
+void ScrPolySetRouteBottom(bool b);
+void ScrPolySetDisplayMode(int mode);
+bool ScrPolyGetRouteBottom(void);
 void ScreenPolyProcess( void );
 void DoLensflareEffect( void );
 void Conv3DTo2D( VECTOR * SrcVert, VECTOR * DstVert, MATRIX * FinalMat );

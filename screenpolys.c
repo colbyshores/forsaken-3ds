@@ -121,8 +121,37 @@ u_int16_t	ScreenMultiples[ MAXMULTIPLES ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0x
 int		SinglePlayerTimeLimit = 0;
 u_int16_t	ThermoScrPoly = (u_int16_t) -1;
 u_int16_t	FlashScreenPoly	= (u_int16_t) -1;
+
+/* [3DS bottom-screen HUD routing] When g_scrpoly_route_bottom is true at
+   Add-time, the new screen poly gets SCRFLAG_BottomHUD. At display time,
+   g_scrpoly_display_mode selects which subset to render:
+     0 = all polys (pre-routing behavior)
+     1 = only polys WITHOUT SCRFLAG_BottomHUD (stereo top screen)
+     2 = only polys WITH    SCRFLAG_BottomHUD (mono bottom screen)
+   Two-pass render keeps in-world overlays (aim reticle, enemy markers,
+   damage flash) on the stereo top screen while the gameplay text HUD
+   (ammo/shield/messages) moves to the bottom. */
+bool g_scrpoly_route_bottom    = false;
+int  g_scrpoly_display_mode    = 0;
+
+void ScrPolySetRouteBottom(bool b)    { g_scrpoly_route_bottom = b; }
+void ScrPolySetDisplayMode(int mode)  { g_scrpoly_display_mode = mode; }
+bool ScrPolyGetRouteBottom(void)      { return g_scrpoly_route_bottom; }
+
 u_int32_t	TotalScrPolysInUse = 0;
 SCRPOLY	ScrPolys[ MAXNUMOFSCRPOLYS ];
+
+/* Skip-filter used inside ScrPolyDispSolid / ScrPolyDispNonSolid to drop
+   polys that don't belong on the current render target. Declared after
+   ScrPolys[] so the inline body can reference it. */
+static inline bool scrpoly_skip(u_int16_t i)
+{
+	if (g_scrpoly_display_mode == 1 && (ScrPolys[i].Flags & SCRFLAG_BottomHUD))
+		return true;
+	if (g_scrpoly_display_mode == 2 && !(ScrPolys[i].Flags & SCRFLAG_BottomHUD))
+		return true;
+	return false;
+}
 u_int16_t	FirstScrPolyUsed;
 u_int16_t	FirstScrPolyFree;
 float	Countdown_Float = 3000.0F;	// 30 Seconds
@@ -167,7 +196,7 @@ u_int16_t	Hun0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xf
 // defaults a screen poly
 void InitScrPoly( u_int16_t i )
 {
-		ScrPolys[i].Flags = SCRFLAG_Nothing;
+		ScrPolys[i].Flags = g_scrpoly_route_bottom ? SCRFLAG_BottomHUD : SCRFLAG_Nothing;
 		ScrPolys[i].Type = SCRTYPE_Normal;
 		ScrPolys[i].R = 255;
 		ScrPolys[i].G = 255;
@@ -1613,6 +1642,9 @@ void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u
 	{
 		if( Trans == 255 ) ScrPolys[ i ].Flags = SCRFLAG_Solid;
 		else ScrPolys[ i ].Flags = SCRFLAG_Nothing;
+		/* [3DS] OR in the bottom-HUD bit when routing active so this poly
+		   gets drained to the bottom screen instead of the stereo top. */
+		if (g_scrpoly_route_bottom) ScrPolys[ i ].Flags |= SCRFLAG_BottomHUD;
 		ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
 		ScrPolys[ i ].Pos.x = XPos;
 		ScrPolys[ i ].Pos.y = YPos;
@@ -1723,6 +1755,7 @@ void AddScreenPolyTextScale( u_int16_t Frame, float XPos, float YPos, float XSca
 	{
 		if( Trans == 255 ) ScrPolys[ i ].Flags = SCRFLAG_Solid;
 		else ScrPolys[ i ].Flags = SCRFLAG_Nothing;
+		if (g_scrpoly_route_bottom) ScrPolys[ i ].Flags |= SCRFLAG_BottomHUD;
 		ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
 		ScrPolys[ i ].Pos.x = XPos;
 		ScrPolys[ i ].Pos.y = YPos;
@@ -2175,7 +2208,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
 		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
 		{
-			if( ScrPolys[ i ].Flags & SCRFLAG_Solid )
+			if( !scrpoly_skip( i ) && ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 			{
 				if( Textured )
 				{
@@ -2192,7 +2225,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 					NumVerts += 4;
 				}
 			}
-			
+
 			i = ScrPolys[ i ].NextInTPage;
 		}
 
@@ -2260,13 +2293,13 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	
 			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
-				if( ScrPolys[ i ].Flags & SCRFLAG_Solid )
+				if( !scrpoly_skip( i ) && ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 				{
 					if( Textured && ScrPolys[i].Frm_Info && (*ScrPolys[i].Frm_Info ) )
 					{
 	   					Bit_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Bit_Info + (int16_t) ScrPolys[ i ].Frame );
 	   					Off_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-      		
+
 		  				for( BitCount = 0; BitCount < Bit_Ptr->numbits; BitCount++ )
 	      				{
 							int ntris = 0;
@@ -2760,7 +2793,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 
 		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
 		{
-			if( !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
+			if( !scrpoly_skip( i ) && !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 			{
 				if( Textured )
 				{
@@ -2863,7 +2896,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	
 			while( ( i != (u_int16_t) -1 ) && ( i < MAXNUMOFSCRPOLYS ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
-				if( !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
+				if( !scrpoly_skip( i ) && !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 				{
 					if( Textured && ScrPolys[i].Frm_Info && (*ScrPolys[i].Frm_Info ) )
 					{
