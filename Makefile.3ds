@@ -147,6 +147,17 @@ OUTPUT_SMDH := $(SRCDIR)/$(TARGET).smdh
 ROMFS_STAGING := $(SRCDIR)/.romfs_staging
 ROMFS_STAMP   := $(ROMFS_STAGING)/.stamp
 
+# CIA-specific romfs staging excludes dspfirm.cdc. Nintendo's DSP
+# firmware blob is bundled into the .3dsx for emulator convenience
+# (ensure_dspfirm_on_sd() in sound_3ds.c auto-copies it to the virtual
+# SD on first launch), but we don't ship it inside the CIA — CFW users
+# installing on real hardware already have dspfirm.cdc on their SD from
+# the standard DSP1 dump step, and shipping the blob in a redistributable
+# archive is a licensing grey area.
+# Hardlinked from ROMFS_STAGING so there's ~zero disk overhead.
+CIA_ROMFS       := $(SRCDIR)/.romfs_staging_cia
+CIA_ROMFS_STAMP := $(CIA_ROMFS)/.stamp
+
 .PHONY: all clean romfs-clean
 
 all: $(OUTPUT_3DSX)
@@ -210,6 +221,16 @@ $(ROMFS_STAMP): | romfs-freshness-check
 	done
 	@touch $(ROMFS_STAMP)
 
+# CIA romfs: hardlinked mirror of the main staging minus dspfirm.cdc.
+# --link-dest plus --delete make this idempotent and near-free.
+$(CIA_ROMFS_STAMP): $(ROMFS_STAMP)
+	@echo "Staging CIA romfs (excludes dspfirm.cdc)..."
+	@mkdir -p $(CIA_ROMFS)
+	@rsync -a --delete --link-dest=$(ROMFS_STAGING) \
+		--exclude='.stamp' --exclude='dspfirm.cdc' \
+		$(ROMFS_STAGING)/ $(CIA_ROMFS)/
+	@touch $(CIA_ROMFS_STAMP)
+
 $(OUTPUT_SMDH):
 	@echo "Creating SMDH..."
 	smdhtool --create "Forsaken" "3DS port of ForsakenX" "ForsakenX" $(SMDH_ICON) $@
@@ -233,7 +254,7 @@ clean:
 
 romfs-clean:
 	@echo "Cleaning romfs staging..."
-	@rm -rf $(ROMFS_STAGING)
+	@rm -rf $(ROMFS_STAGING) $(CIA_ROMFS)
 
 # ─── CIA build (for installable home-menu title) ──────────────────────
 # Requires:
@@ -286,7 +307,7 @@ $(OUTPUT_BNR): $(BANNER_PNG) $(BANNER_WAV) | tools-fetch
 	@echo "Creating banner..."
 	$(BANNERTOOL) makebanner -i $(BANNER_PNG) -a $(BANNER_WAV) -o $@
 
-$(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(ROMFS_STAMP) | tools-fetch
+$(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(CIA_ROMFS_STAMP) | tools-fetch
 	@echo "Building CIA..."
 	$(MAKEROM) -f cia -o $@ \
 		-rsf $(RSF_FILE) \
@@ -294,7 +315,7 @@ $(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(ROMFS_ST
 		-elf $(OUTPUT_ELF) \
 		-icon $(OUTPUT_SMDH) \
 		-banner $(OUTPUT_BNR) \
-		-DAPP_ROMFS=$(ROMFS_STAGING)
+		-DAPP_ROMFS=$(CIA_ROMFS)
 	@echo "CIA written: $@"
 	@echo "Install on a 3DS via FBI (open the .cia → Install)."
 
