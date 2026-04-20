@@ -10,7 +10,9 @@
 #   4. boosts gain, applies tiny fades, cuts a leading silent second,
 #      then drops the level by 6 dB to taste
 #
-# Output: assets/banner.wav (mono PCM16 22050 Hz, ~2.5 s, ~ -14 dB mean)
+# Output: assets/banner.wav (stereo PCM16 22050 Hz, ~2.5 s, ~ -14 dB mean).
+# HOME menu does not play mono banner audio (CBMD's CWAV must be stereo),
+# so the final stage upmixes the demucs vocal track to 2 channels.
 #
 # Reproduces the exact file that ships with the CIA. Re-run after any
 # upstream change to the script or the source video.
@@ -59,11 +61,11 @@ VOCALS="$WORK/sep/$DEMUCS_MODEL/ad/vocals.wav"
 # IMPORTANT: this MUST be a separate ffmpeg invocation from the gain stage.
 # Combining `-ss` with `afade` in one command drives afade off the source
 # timeline (not the trimmed timeline) and silences everything.
-echo "[3/4] Trimming to $TRIM_START s + $TRIM_LENGTH s, mono 22050 Hz…"
+echo "[3/4] Trimming to $TRIM_START s + $TRIM_LENGTH s, stereo 22050 Hz…"
 ffmpeg -hide_banner -loglevel error -y \
     -i "$VOCALS" \
     -ss "$TRIM_START" -t "$TRIM_LENGTH" \
-    -ac 1 -ar 22050 \
+    -ac 2 -ar 22050 \
     -acodec pcm_s16le \
     "$WORK/clip.wav"
 

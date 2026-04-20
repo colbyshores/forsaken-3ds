@@ -2059,7 +2059,7 @@ InitScene(void)
     }
     break;
   }
-  
+
   return true;
 
 }
