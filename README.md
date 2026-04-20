@@ -235,7 +235,6 @@ direct submission) and not paying for stereo twice (display list replay).
 
 - Missile chase camera has limited draw distance (BSP portal visibility
   issue, under investigation).
-- Bottom screen is unused (map / HUD overlay candidate for the future).
 - No multiplayer / networking on 3DS.
 
 ## Credits
