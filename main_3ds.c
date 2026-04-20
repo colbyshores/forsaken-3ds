@@ -146,21 +146,6 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds/forsaken", 0777);
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
 
-	/* Startup sentinel — TRUNCATE sdmc:/forsaken_stereo.txt so each
-	   game run starts fresh. Subsequent DrawSimplePanel writes APPEND a
-	   time-series so one FTP pull shows slider movement over time. */
-	{
-		FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "w");
-		if (_f)
-		{
-			fprintf(_f, "=== stereo log, one sample per ~20 frames ===\n");
-			fprintf(_f, "move the 3D slider up and down then FTP this file.\n");
-			fprintf(_f, "if slider values stay constant, hw/override bug.\n");
-			fprintf(_f, "if slider varies smoothly, scale/perception bug.\n\n");
-			fclose(_f);
-		}
-	}
-
 	trace("platform_init: done");
 
 	return true;
