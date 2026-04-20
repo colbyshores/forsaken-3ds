@@ -1863,43 +1863,23 @@ void DrawSimplePanel()
 			2 );
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
+	/* Stereo diagnostic overlay — kept behind the "Show stereo debug"
+	   menu toggle. The SD-card file log was removed: fopen / fprintf /
+	   fclose on sdmc:/ every 20 frames cost enough milliseconds per
+	   write to visibly hitch frame pacing. On-screen text is free. */
 	{
 		extern bool g_show_stereo_debug;
-		extern float platform_get_3d_slider(void);
-		float _slider = platform_get_3d_slider();
-
-		/* On-screen overlay (gated by menu toggle so casual users don't
-		   see it). */
 		if (g_show_stereo_debug)
 		{
+			extern float platform_get_3d_slider(void);
 			char _dbg[64];
+			float _slider = platform_get_3d_slider();
 			sprintf(_dbg, "slider: %.3f",  _slider);
 			Print4x5Text(_dbg, FontWidth, FontHeight*2, 1);
 			sprintf(_dbg, "eye_sep: %.2f", render_info.stereo_eye_sep);
 			Print4x5Text(_dbg, FontWidth, FontHeight*3, 1);
 			sprintf(_dbg, "stereo: %s", render_info.stereo_enabled ? "on" : "off");
 			Print4x5Text(_dbg, FontWidth, FontHeight*4, 1);
-		}
-
-		/* File log — APPEND mode so one FTP pull gives us a time-series
-		   of slider values as the user moves the physical slider. One
-		   sample every ~1/3 s. Header row is written at game startup
-		   (see platform_init). Restart the game to reset the log. */
-		{
-			static int _stereo_log_throttle = 0;
-			if ((++_stereo_log_throttle % 20) == 0)  /* every 20 frames */
-			{
-				FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "a");
-				if (_f)
-				{
-					fprintf(_f, "frame=%d  slider=%.4f  eye_sep=%.2f  stereo=%s  mode=%d\n",
-						_stereo_log_throttle, _slider,
-						render_info.stereo_eye_sep,
-						render_info.stereo_enabled ? "on" : "off",
-						(int)render_info.stereo_mode);
-					fclose(_f);
-				}
-			}
 		}
 	}
 #endif
