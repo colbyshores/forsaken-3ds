@@ -93,6 +93,11 @@ void trace(const char *msg) { (void)msg; }
 void trace_dump(void) {}
 #endif
 
+/* Runtime flag — when true, DrawSimplePanel prints raw 3D-slider value,
+ * stereo_eye_sep, and the on/off state so we can diagnose binary-seeming
+ * slider behavior. Config key: ShowStereoDebug. Default off. */
+bool g_show_stereo_debug = false;
+
 /* ---- unaligned memcpy for ARM -----------------------------------------
  *
  * GCC compiles a constant-size `memcpy(a, b, N)` into `ldm/stm` when it

@@ -1730,6 +1730,17 @@ MENU	MENU_NEW_VisualsStereo = {
 	}
 };
 
+#if defined(__3DS__) && defined(RENDERER_C3D)
+/* Declared in render_c3d.c — runtime-togglable flag controlling whether the
+ * gameplay text HUD draws on the bottom screen (true, default) or as a
+ * top-screen overlay (false). Saved to config as HudOnBottom. */
+extern bool g_hud_on_bottom;
+/* Declared in main_3ds.c — when true, DrawSimplePanel prints raw slider /
+ * eye-sep / stereo-state to the HUD for diagnosing slider behavior. Saved
+ * to config as ShowStereoDebug. */
+extern bool g_show_stereo_debug;
+#endif
+
 MENU	MENU_NEW_Visuals = {
 	"", NULL, NULL, NULL, TITLE_TIMER_Visuals,
 	{
@@ -1737,12 +1748,18 @@ MENU	MENU_NEW_Visuals = {
 		{ 20,  40, 200,  50, 0,					LT_MENU_NEW_Visuals1 /*"Change Detail Levels"*/,	FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_DetailLevels,		MenuChange,				DrawFlatMenuItem,	NULL, 0 },
 		{ 20,  60, 200,  70, 0,					LT_MENU_NEW_Visuals2 /*"Change Screen Res"*/,		FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_ScreenRes,		MenuChange,				DrawFlatMenuItem,	NULL, 0 },
 		{ 20, 80,  50, 90, SLIDER_Percent,	LT_MENU_NEW_Visuals4 /*"gamma"*/,					FONT_Small,	TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &GammaSlider,	NULL,						SelectSlider,			DrawFlatMenuSlider, NULL, 0 },
-		
+
 		{ 20, 100, 200, 100, 0,					LT_MENU_InGame2  /*"Toggle Full Screen" */,			FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuGoFullScreen,		DrawFlatMenuItem,	NULL, 0 },
 		{ 20, 112, 150, 112, 0,					"Vertical Sync (requires restart)",			FONT_Small, TEXTFLAG_CentreY,	&render_info.vsync,	NewMenuSelectMode,	SelectFlatMenuToggle, DrawFlatMenuToggle,		NULL, 0 },
-		{ 20, 124, 200, 124, 0,					"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	NULL, 0 },		 
-		{ 20, 136, 150, 136, 0,					"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },		 
-		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },		 
+		{ 20, 124, 200, 124, 0,					"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	NULL, 0 },
+		{ 20, 136, 150, 136, 0,					"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		{ 20, 148, 150, 148, 0,					"HUD on bottom screen",							FONT_Small, TEXTFLAG_CentreY,		&g_hud_on_bottom,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20, 160, 150, 160, 0,					"Show stereo debug",							FONT_Small, TEXTFLAG_CentreY,		&g_show_stereo_debug,	NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20, 176, 100, 176, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
+#else
+		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
+#endif
 		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -9451,11 +9468,11 @@ void GetGamePrefs( void )
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	/* [3DS citro3d] Route gameplay HUD text (ammo/shield/messages) to the
-	 * mono bottom screen when true. Set to false to keep the HUD as a top-
-	 * screen overlay. Default true — bottom screen keeps the stereo 3D
-	 * image clean. Configurable via Configs/main.txt (HudOnBottom = ...). */
-	{ extern bool g_hud_on_bottom;
-	  g_hud_on_bottom = config_get_bool( "HudOnBottom", true ); }
+	 * mono bottom screen when true. Default true. Also load the stereo
+	 * debug toggle — ShowStereoDebug prints raw slider and eye-sep
+	 * values in the HUD for diagnostics. */
+	g_hud_on_bottom     = config_get_bool( "HudOnBottom",     true  );
+	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
 #endif
 
 	// Stereo options
@@ -9583,6 +9600,11 @@ void SetGamePrefs( void )
 	config_set_float( "StereoEyeSep",		render_info.stereo_eye_sep );
 	config_set_float( "StereoFocalDist",		render_info.stereo_focal_dist );
 	config_set_float( "StereoRightColor",		render_info.stereo_right_color );
+
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	config_set_bool( "HudOnBottom",     g_hud_on_bottom );
+	config_set_bool( "ShowStereoDebug", g_show_stereo_debug );
+#endif
 
 	config_save();
 }

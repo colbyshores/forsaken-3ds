@@ -138,9 +138,13 @@ bool handle_events(void)
 	/* check for quit (Start + Select together) */
 	if ((kHeld & KEY_START) && (kHeld & KEY_SELECT))
 	{
+		/* Only SIGNAL quit here — running CleanUpAndPostQuit in the middle
+		 * of the input-poll call crashes on return, because ReadInput and
+		 * the game loop continue to use render/sound/lua resources that
+		 * the teardown just freed. Main loop sees QuitRequested on its
+		 * next iteration and cleanup runs cleanly post-loop. */
 		extern bool QuitRequested;
-		extern void CleanUpAndPostQuit(void);
-		CleanUpAndPostQuit();
+		QuitRequested = true;
 		return true;
 	}
 

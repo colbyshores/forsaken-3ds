@@ -1842,10 +1842,32 @@ void DrawSimplePanel()
 	}
 
 	if( Ships[WhoIAm].Object.Mode == GAMEOVER_MODE )
-		CenterPrint4x5Text( 
-			"Game Over" , 
-			(render_info.window_size.cy >> 1) - (FontHeight*2) , 
+		CenterPrint4x5Text(
+			"Game Over" ,
+			(render_info.window_size.cy >> 1) - (FontHeight*2) ,
 			2 );
+
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	{
+		extern bool g_show_stereo_debug;
+		if (g_show_stereo_debug)
+		{
+			extern float platform_get_3d_slider(void);
+			char _dbg[64];
+			float _slider = platform_get_3d_slider();
+			/* Raw slider (osGet3DSliderState on hardware, config override
+			   on emulators) + derived eye-separation + enabled state.
+			   If slider is continuous but the perceived 3D is binary,
+			   the bug is downstream of stereo_eye_sep. */
+			sprintf(_dbg, "slider: %.3f",  _slider);
+			Print4x5Text(_dbg, FontWidth, FontHeight*2, 1);
+			sprintf(_dbg, "eye_sep: %.2f", render_info.stereo_eye_sep);
+			Print4x5Text(_dbg, FontWidth, FontHeight*3, 1);
+			sprintf(_dbg, "stereo: %s", render_info.stereo_enabled ? "on" : "off");
+			Print4x5Text(_dbg, FontWidth, FontHeight*4, 1);
+		}
+	}
+#endif
 }
 
 void ReleaseLevel(void)
