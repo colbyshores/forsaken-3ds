@@ -42,6 +42,10 @@ logs/
 DATA.TAG
 data1.cab
 
+# Data/Levels/mission.dat is force-tracked (git add -f) so the
+# authoritative 15-level 1998 SP campaign order survives a fresh
+# clone, even though Data/ itself is ignored.
+
 # Config directories (lowercase = runtime copies, uppercase = tracked overrides)
 configs/
 
