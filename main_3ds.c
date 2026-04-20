@@ -146,16 +146,17 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds/forsaken", 0777);
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
 
-	/* Startup sentinel — write to sdmc:/forsaken_stereo.txt so the user
-	   can confirm the SD-write path works (and find the right folder via
-	   FTP) before even entering a level. DrawSimplePanel will overwrite
-	   this with live slider state once gameplay starts. */
+	/* Startup sentinel — TRUNCATE sdmc:/forsaken_stereo.txt so each
+	   game run starts fresh. Subsequent DrawSimplePanel writes APPEND a
+	   time-series so one FTP pull shows slider movement over time. */
 	{
 		FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "w");
 		if (_f)
 		{
-			fprintf(_f, "state    = platform_init_done\n");
-			fprintf(_f, "waiting  = for gameplay frames to overwrite this\n");
+			fprintf(_f, "=== stereo log, one sample per ~20 frames ===\n");
+			fprintf(_f, "move the 3D slider up and down then FTP this file.\n");
+			fprintf(_f, "if slider values stay constant, hw/override bug.\n");
+			fprintf(_f, "if slider varies smoothly, scale/perception bug.\n\n");
 			fclose(_f);
 		}
 	}
@@ -202,6 +203,11 @@ bool platform_init_video(void)
 	render_info.WindowsDisplay.h = SCREEN_HEIGHT;
 	render_info.NumModes = 1;
 	render_info.CurrMode = 0;
+	/* Mode is a dynamic-mode list on PC/SDL (populated by render_mode_select).
+	 * On 3DS we have exactly one fixed mode — point Mode at the inline
+	 * ThisMode so code like `render_info.Mode[CurrMode].w` (SetGamePrefs,
+	 * shutdown path) doesn't dereference NULL and data-abort. */
+	render_info.Mode = &render_info.ThisMode;
 	render_info.fullscreen = true;
 
 	/* Standard landscape aspect ratio. picaGL's matrix4x4_fix_projection
