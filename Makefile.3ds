@@ -2,8 +2,8 @@
 # Makefile.3ds - ForsakenX 3DS port using devkitPro
 #
 # Usage:
-#   make -f Makefile.3ds                    # release build (picaGL)
-#   make -f Makefile.3ds RENDERER=citro3d   # native citro3d renderer
+#   make -f Makefile.3ds                    # release build (citro3d — shipping)
+#   make -f Makefile.3ds RENDERER=picagl    # picaGL fallback (no stereo 3D)
 #   make -f Makefile.3ds DEBUG=1   # debug build (__3DS_DEBUG__ defined)
 #                                   # enables: autoboot to Volcano level
 #
@@ -11,8 +11,8 @@
 # Debug flag — set to 1 to enable __3DS_DEBUG__ features
 DEBUG ?= 0
 
-# Renderer: picagl (default) or citro3d
-RENDERER ?= picagl
+# Renderer: citro3d (default — shipping CIA) or picagl (fallback, no stereo 3D)
+RENDERER ?= citro3d
 
 #---------------------------------------------------------------------------------
 # Environment
