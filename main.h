@@ -146,6 +146,14 @@ typedef u_int32_t DWORD;
 #endif
 #ifdef __3DS__
 typedef u_int32_t DWORD;
+
+/* Byte-wise memcpy GCC cannot inline to ldm/stm. Use when copying
+ * structs (especially 12+ byte multi-float VECTORs) out of a file
+ * buffer that was byte-parsed at u16/string granularity and is only
+ * 2-byte aligned. Plain memcpy(a, b, 12) gets fused to `ldm` which
+ * requires 4-byte source alignment and faults on ARM11. Defined in
+ * main_3ds.c. */
+void memcpy_unaligned(void *dst, const void *src, size_t n);
 #endif
 typedef u_int8_t  BYTE;
 typedef u_int16_t WORD;

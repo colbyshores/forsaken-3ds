@@ -249,7 +249,16 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			for ( i=0 ; i<num_vertices; i++)
 			{
 
+#ifdef ARM
+				/* lpLVERTEX2 points into a buffer at variable alignment
+				   (filename strings precede it); copy 32-byte OLDLVERTEX
+				   to a stack-aligned local before float reads. */
+				__typeof__(*lpLVERTEX2) _ovx_local;
+				memcpy_unaligned(&_ovx_local, lpLVERTEX2, sizeof(*lpLVERTEX2));
+				LPOLDLVERTEX old = &_ovx_local;
+#else
 				LPOLDLVERTEX old = lpLVERTEX2;
+#endif
 
 				lpLVERTEX[i].x = old->x;
 				lpLVERTEX[i].y = old->y;
@@ -378,9 +387,15 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 					lpIndices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
+#ifdef ARM
+					memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
+					memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
+					memcpy(&lpNormals->nz, &MFacePnt->nz, 4);
+#else
 					lpNormals->nx = MFacePnt->nx;
 					lpNormals->ny = MFacePnt->ny;
 					lpNormals->nz = MFacePnt->nz;
+#endif
 
 					if ( MFacePnt->pad & 1 )
 					{
@@ -549,33 +564,53 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				}
 
 #ifdef ARM
-				/* Allocate a single 4-byte-aligned buffer containing all MXAVERT
-				 * data, then update frame_pnts to point into it.  The raw file
-				 * buffer may leave MXAVERT pointers 2-byte aligned (after u_int16_t
-				 * count fields), which causes data aborts on ARM.  By copying once
-				 * at load time we eliminate the per-vertex memcpy that was running
-				 * every frame in InterpFrames. */
+				/* Allocate a single aligned buffer and pack MXAVERT arrays
+				 * consecutively (without the u16 count-fields that appear
+				 * between them in the raw file).  malloc returns 8-byte
+				 * aligned; MXAVERT is 32 bytes; so every packed array is
+				 * 4-byte aligned and vldr in InterpFrames is safe.
+				 *
+				 * Important: the previous implementation preserved raw
+				 * offsets, which meant a frame_pnts that landed at
+				 * BufferStart+2 stayed at aligned+2 — still 2-mod-4 and
+				 * still crashing on ARM11. Packing fixes that. */
 				{
-					size_t total = (size_t)(Buffer - BufferStart);
-					void *aligned = malloc( total );
-					if ( aligned )
-					{
-						memcpy( aligned, BufferStart, total );
-						Mxaloadheader->aligned_verts = aligned;
+					size_t total = 0;
+					for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
+						for( group=0 ; group<Mxaloadheader->num_groups; group++)
+							for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
+								for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+									total += (size_t)Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup]
+									         * sizeof(MXAVERT);
 
-						/* Fixup all frame_pnts: shift from raw buffer into aligned copy */
-						for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
+					if ( total )
+					{
+						char *aligned = malloc( total );
+						if ( aligned )
 						{
-							for( group=0 ; group<Mxaloadheader->num_groups; group++)
+							char *dst = aligned;
+							Mxaloadheader->aligned_verts = aligned;
+
+							for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
 							{
-								for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
+								for( group=0 ; group<Mxaloadheader->num_groups; group++)
 								{
-									for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+									for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
 									{
-										char *orig = (char*) Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup];
-										ptrdiff_t off = orig - BufferStart;
-										Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] =
-											(MXAVERT*)( (char*)aligned + off );
+										for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+										{
+											size_t nbytes =
+												(size_t)Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup]
+												* sizeof(MXAVERT);
+											/* Source is the raw pointer (possibly 2-mod-4); use
+											   byte-wise copy so GCC doesn't fuse it to `ldm`. */
+											memcpy_unaligned( dst,
+												Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup],
+												nbytes );
+											Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] =
+												(MXAVERT*) dst;
+											dst += nbytes;
+										}
 									}
 								}
 							}
@@ -671,11 +706,11 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				FloatPnt = (float *) Uint16Pnt;
 
 #ifdef ARM
-				memcpy(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
+				memcpy_unaligned(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
 				FloatPnt+=3;
-				memcpy(&FirePointPtr->Dir, FloatPnt, 3*4);				// Dir ( 3 floats )
+				memcpy_unaligned(&FirePointPtr->Dir, FloatPnt, 3*4);				// Dir ( 3 floats )
 				FloatPnt+=3;
-				memcpy(&FirePointPtr->Up, FloatPnt, 3*4);				// Up ( 3 floats )
+				memcpy_unaligned(&FirePointPtr->Up, FloatPnt, 3*4);				// Up ( 3 floats )
 				FloatPnt+=3;
 #else
 				FirePointPtr->Pos.x = *FloatPnt++;				// Pos ( 3 floats )
@@ -719,11 +754,11 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				FloatPnt = (float *) Uint16Pnt;
 
 #ifdef ARM
-				memcpy(&SpotFXPtr->Pos, FloatPnt, 4*3);
+				memcpy_unaligned(&SpotFXPtr->Pos, FloatPnt, 4*3);
 				FloatPnt+=3;
-				memcpy(&SpotFXPtr->DirVector.x, FloatPnt, 4*3);
+				memcpy_unaligned(&SpotFXPtr->DirVector.x, FloatPnt, 4*3);
 				FloatPnt+=3;
-				memcpy(&SpotFXPtr->UpVector, FloatPnt, 4*3);
+				memcpy_unaligned(&SpotFXPtr->UpVector, FloatPnt, 4*3);
 				FloatPnt+=3;
 				memcpy(&SpotFXPtr->StartDelay, FloatPnt++, 4); SpotFXPtr->StartDelay*= ANIM_SECOND;	// Start Delay
 				memcpy(&SpotFXPtr->ActiveDelay, FloatPnt++,4); SpotFXPtr->ActiveDelay*= ANIM_SECOND;	// Active Delay

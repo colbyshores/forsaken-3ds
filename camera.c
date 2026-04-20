@@ -112,11 +112,11 @@ bool Cameraload( char * Filename )
 		CamPnt->Group = *int16Pnt++;
 		FloatPnt = (float*) int16Pnt;
 #ifdef ARM
-		memcpy(&CamPnt->Pos, FloatPnt, 4*3);
+		memcpy_unaligned(&CamPnt->Pos, FloatPnt, 4*3);
 		FloatPnt+=3;
-		memcpy(&CamPnt->Dir, FloatPnt, 4*3);
+		memcpy_unaligned(&CamPnt->Dir, FloatPnt, 4*3);
 		FloatPnt+=3;
-		memcpy(&CamPnt->Up, FloatPnt, 4*3);
+		memcpy_unaligned(&CamPnt->Up, FloatPnt, 4*3);
 		FloatPnt+=3;
 #else
 		CamPnt->Pos.x = *FloatPnt++;

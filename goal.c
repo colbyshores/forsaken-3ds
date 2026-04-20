@@ -140,13 +140,13 @@ bool GoalLoad( void )
 
 		floatpnt = (float * ) u_int16_tpnt;
 #ifdef ARM
-		memcpy(&GoalPnt->pos, floatpnt, 4*3);
+		memcpy_unaligned(&GoalPnt->pos, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&GoalPnt->half_size, floatpnt, 4*3);
+		memcpy_unaligned(&GoalPnt->half_size, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&GoalPnt->dir, floatpnt, 4*3);
+		memcpy_unaligned(&GoalPnt->dir, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&GoalPnt->up, floatpnt, 4*3);
+		memcpy_unaligned(&GoalPnt->up, floatpnt, 4*3);
 		floatpnt+=3;
 		memcpy(&GoalPnt->width, floatpnt++, 4);
 		memcpy(&GoalPnt->height, floatpnt++, 4);
@@ -193,7 +193,7 @@ bool GoalLoad( void )
 			for( j = 0 ; j < GoalPnt->num_sides ; j++ )
 			{
 #ifdef ARM
-				memcpy(&ZonePnt->normal, floatpnt, 4*3);
+				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
 				floatpnt+=3;
 				memcpy(&ZonePnt->offset, floatpnt++, 4);
 #else

@@ -171,9 +171,9 @@ bool TriggerAreaload( char * Filename )
 
 		floatpnt = (float * ) u_int16_tpnt;
 #ifdef ARM
-		memcpy(&AreaPnt->pos, floatpnt, 4*3);
+		memcpy_unaligned(&AreaPnt->pos, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&AreaPnt->half_size, floatpnt, 4*3);
+		memcpy_unaligned(&AreaPnt->half_size, floatpnt, 4*3);
 		floatpnt+=3;
 #else
 		AreaPnt->pos.x = *floatpnt++;
@@ -198,7 +198,7 @@ bool TriggerAreaload( char * Filename )
 			for( j = 0 ; j < AreaPnt->num_sides ; j++ )
 			{
 #ifdef ARM
-				memcpy(&ZonePnt->normal, floatpnt, 4*3);
+				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
 				floatpnt+=3;
 				memcpy(&ZonePnt->offset, floatpnt++, 4);
 #else
