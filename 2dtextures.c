@@ -273,7 +273,15 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 			return( NULL );
 		}
 																			
+#ifdef ARM
+		/* +8 bytes headroom: we may need to memmove the post-filenames
+		   section forward by up to 3 bytes to make BOX_INFO* 4-byte
+		   aligned (BOX_INFO has float fields, and ARM's vldr requires
+		   4-byte alignment). See alignment shim below. */
+		Off_Buffer = malloc( File_Size + 8 );
+#else
 		Off_Buffer = malloc( File_Size );									// Allocate memory to load file into
+#endif
 		if( Off_Buffer == NULL )
 		{
 			free( Frm_Info );
@@ -321,6 +329,23 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 
 		Short_Ptr = (int16_t *) Char_Ptr;
 		Num_Boxes = *Short_Ptr++;											// Number of Boxes
+
+#ifdef ARM
+		/* BOX_INFO contains floats; ARM's vldr requires 4-byte alignment.
+		   Short_Ptr here has skidded off 4-byte alignment because of the
+		   variable-length filename section above. Shift the remaining
+		   bytes forward just enough to land Short_Ptr on a 4-byte boundary
+		   (Off_Buffer was malloc'd with +8 headroom for this). */
+		if( ((uintptr_t)Short_Ptr) & 3 )
+		{
+			size_t pad = (4 - (((uintptr_t)Short_Ptr) & 3)) & 3;
+			size_t used = (size_t)( (int8_t*)Short_Ptr - Off_Buffer );
+			size_t remaining = (size_t)File_Size - used;
+			memmove( (int8_t*)Short_Ptr + pad, Short_Ptr, remaining );
+			Short_Ptr = (int16_t *)( (int8_t*)Short_Ptr + pad );
+		}
+#endif
+
 		Box_Info = (BOX_INFO *) Short_Ptr;
 
 		Short_Ptr = (int16_t *) ( Box_Info + Num_Boxes );

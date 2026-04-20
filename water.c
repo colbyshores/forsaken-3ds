@@ -221,7 +221,7 @@ bool WaterLoad( void )
 		WO->Group = *Uint16Pnt++;
 		FloatPnt = (float*) Uint16Pnt;
 #ifdef ARM
-		memcpy(&WO->Pos, FloatPnt, 4*3);
+		memcpy_unaligned(&WO->Pos, FloatPnt, 4*3);
 		FloatPnt+=3;
 #else
 		WO->Pos.x = *FloatPnt++;

@@ -261,7 +261,16 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			/*	copy the vertex data into the execute buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
+#ifdef ARM
+				/* lpLVERTEX2 points into a buffer at variable alignment
+				   (filename strings precede it); copy 32-byte OLDLVERTEX
+				   to a stack-aligned local before float reads. */
+				__typeof__(*lpLVERTEX2) _ovx_local;
+				memcpy_unaligned(&_ovx_local, lpLVERTEX2, sizeof(*lpLVERTEX2));
+				LPOLDLVERTEX old = &_ovx_local;
+#else
 				LPOLDLVERTEX old = lpLVERTEX2;
+#endif
 
 				lpLVERTEX[i].x = old->x;
 				lpLVERTEX[i].y = old->y;
@@ -431,9 +440,15 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 					lpIndices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
+#ifdef ARM
+          memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
+          memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
+          memcpy(&lpNormals->nz, &MFacePnt->nz, 4);
+#else
           lpNormals->nx = MFacePnt->nx;
           lpNormals->ny = MFacePnt->ny;
           lpNormals->nz = MFacePnt->nz;
+#endif
 
 					if ( MFacePnt->pad & 1 )
 					{
@@ -712,11 +727,11 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				FloatPnt = (float *) Uint16Pnt;
 
 #ifdef ARM
-				memcpy(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
+				memcpy_unaligned(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
 				FloatPnt+=3;
-				memcpy(&FirePointPtr->Dir, FloatPnt, 4*3);				// Dir ( 3 floats )
+				memcpy_unaligned(&FirePointPtr->Dir, FloatPnt, 4*3);				// Dir ( 3 floats )
 				FloatPnt+=3;
-				memcpy(&FirePointPtr->Up, FloatPnt, 4*3);				// Up ( 3 floats )
+				memcpy_unaligned(&FirePointPtr->Up, FloatPnt, 4*3);				// Up ( 3 floats )
 				FloatPnt+=3;
 #else
 				FirePointPtr->Pos.x = *FloatPnt++;				// Pos ( 3 floats )
@@ -760,11 +775,11 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				FloatPnt = (float *) Uint16Pnt;
 
 #ifdef ARM
-				memcpy(&SpotFXPtr->Pos, FloatPnt, 3*4);				// Pos ( 3 floats )
+				memcpy_unaligned(&SpotFXPtr->Pos, FloatPnt, 3*4);				// Pos ( 3 floats )
 				FloatPnt+=3;
-				memcpy(&SpotFXPtr->DirVector, FloatPnt, 3*4);		// Dir ( 3 floats )
+				memcpy_unaligned(&SpotFXPtr->DirVector, FloatPnt, 3*4);		// Dir ( 3 floats )
 				FloatPnt+=3;
-				memcpy(&SpotFXPtr->UpVector, FloatPnt, 3*4);		// Up ( 3 floats )
+				memcpy_unaligned(&SpotFXPtr->UpVector, FloatPnt, 3*4);		// Up ( 3 floats )
 				FloatPnt+=3;
 				memcpy(&SpotFXPtr->StartDelay, FloatPnt++, 4); SpotFXPtr->StartDelay  *= ANIM_SECOND;	// Start Delay
 				memcpy(&SpotFXPtr->ActiveDelay, FloatPnt++, 4); SpotFXPtr->ActiveDelay *= ANIM_SECOND;	// Active Delay

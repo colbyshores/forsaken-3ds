@@ -169,7 +169,7 @@ bool Nodeload( char * Filename )
 		
 		NodePnt->NodeNum = e;
 #ifdef ARM
-		memcpy(&NodePnt->Pos, FloatPnt, 4*3);
+		memcpy_unaligned(&NodePnt->Pos, FloatPnt, 4*3);
 		FloatPnt+=3;
 		memcpy(&NodePnt->Radius, FloatPnt++, 4);
 #else

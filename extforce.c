@@ -148,11 +148,11 @@ bool ExternalForcesLoad( char * Filename )
 
 		floatpnt = (float *) Buffer;
 #ifdef ARM
-		memcpy(&EFpnt->Origin, floatpnt, 4*3);
+		memcpy_unaligned(&EFpnt->Origin, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&EFpnt->Dir, floatpnt, 4*3);
+		memcpy_unaligned(&EFpnt->Dir, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&EFpnt->Up, floatpnt, 4*3);
+		memcpy_unaligned(&EFpnt->Up, floatpnt, 4*3);
 		floatpnt+=3;
 		memcpy(&EFpnt->MinForce, floatpnt++, 4);
 		memcpy(&EFpnt->MaxForce, floatpnt++, 4);
@@ -184,9 +184,9 @@ bool ExternalForcesLoad( char * Filename )
 		floatpnt = (float *) Buffer;
 
 #ifdef ARM
-		memcpy(&EFpnt->Pos, floatpnt, 4*3);
+		memcpy_unaligned(&EFpnt->Pos, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&EFpnt->half_size, floatpnt, 4*3);
+		memcpy_unaligned(&EFpnt->half_size, floatpnt, 4*3);
 		floatpnt+=3;
 #else
 		EFpnt->Pos.x = *floatpnt++;
@@ -221,7 +221,7 @@ bool ExternalForcesLoad( char * Filename )
 // but we were told that there was more data...
 // we would need to properly track the location in the stream and not go over the stream size
 #ifdef ARM
-				memcpy(&ZonePnt->normal, floatpnt, 4*3);
+				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
 				floatpnt+=3;
 				memcpy(&ZonePnt->offset, floatpnt++, 4);
 #else

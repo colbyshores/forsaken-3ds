@@ -93,6 +93,24 @@ void trace(const char *msg) { (void)msg; }
 void trace_dump(void) {}
 #endif
 
+/* ---- unaligned memcpy for ARM -----------------------------------------
+ *
+ * GCC compiles a constant-size `memcpy(a, b, N)` into `ldm/stm` when it
+ * infers either pointer is 4-byte aligned from its declared type. On ARM11
+ * the 3DS enables unaligned access for single ldr/ldrh, but `ldm` *always*
+ * requires 4-byte alignment — a misaligned `ldm` produces a Data Abort
+ * (Alignment). For load-time parsers that read struct data out of a raw
+ * file buffer at byte granularity, we need a copy that GCC cannot unroll
+ * into ldm. `noinline` stops GCC in its tracks. Cost: one function call
+ * per copy, paid once at level load. */
+__attribute__((noinline))
+void memcpy_unaligned(void *dst, const void *src, size_t n)
+{
+	unsigned char *d = (unsigned char *)dst;
+	const unsigned char *s = (const unsigned char *)src;
+	while (n--) *d++ = *s++;
+}
+
 /* ---- platform init ---- */
 
 bool platform_init(void)

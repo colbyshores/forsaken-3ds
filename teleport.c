@@ -160,15 +160,15 @@ bool TeleportsLoad( char * Filename )
 		Buffer = (char *) Uint16Pnt;
 		floatpnt = (float *) Buffer;
 #ifdef ARM
-		memcpy(&TPpnt->Pos, floatpnt, 4*3);
+		memcpy_unaligned(&TPpnt->Pos, floatpnt, 4*3);
 		floatpnt+=3;
 #if TELEPORTS_VERSION_NUMBER >= 2
-		memcpy(&TPpnt->Dir, floatpnt, 4*3);
+		memcpy_unaligned(&TPpnt->Dir, floatpnt, 4*3);
 		floatpnt+=3;
-		memcpy(&TPpnt->Up, floatpnt, 4*3);
+		memcpy_unaligned(&TPpnt->Up, floatpnt, 4*3);
 		floatpnt+=3;
 #endif
-		memcpy(&TPpnt->half_size, floatpnt, 4*3);
+		memcpy_unaligned(&TPpnt->half_size, floatpnt, 4*3);
 		floatpnt+=3;
 #else
 		TPpnt->Pos.x = *floatpnt++;
@@ -214,7 +214,7 @@ bool TeleportsLoad( char * Filename )
 			for( j = 0 ; j < TPpnt->num_sides ; j++ )
 			{
 #ifdef ARM
-				memcpy(&ZonePnt->normal, floatpnt, 4*3);
+				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
 				floatpnt+=3;
 				memcpy(&ZonePnt->offset, floatpnt++, 4);
 #else

@@ -17,6 +17,11 @@ u_int32_t platform_get_ticks(void);
 void platform_delay(u_int32_t ms);
 void trace(const char *msg);
 
+/* Byte-wise memcpy that GCC cannot inline to `ldm/stm` (which require
+ * 4-byte alignment on ARM and fault on misaligned file-buffer sources).
+ * Use when copying structs out of a raw byte-parsed buffer. */
+void memcpy_unaligned(void *dst, const void *src, size_t n);
+
 /* Returns the 3D slider state (0.0–1.0).
  * On real hardware this is osGet3DSliderState().
  * In emulators that always return 0 you can override it by setting
