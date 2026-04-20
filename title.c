@@ -9449,6 +9449,15 @@ void GetGamePrefs( void )
     GameType                         = config_get_int( "GameType",					GAME_Normal );
 	CLAMP( GameType, MAX_GAMETYPE );
 
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	/* [3DS citro3d] Route gameplay HUD text (ammo/shield/messages) to the
+	 * mono bottom screen when true. Set to false to keep the HUD as a top-
+	 * screen overlay. Default true — bottom screen keeps the stereo 3D
+	 * image clean. Configurable via Configs/main.txt (HudOnBottom = ...). */
+	{ extern bool g_hud_on_bottom;
+	  g_hud_on_bottom = config_get_bool( "HudOnBottom", true ); }
+#endif
+
 	// Stereo options
 	render_info.stereo_enabled = config_get_bool( "StereoEnabled", false );
 	render_info.stereo_mode = config_get_float( "StereoMode", STEREO_MODE_COLOR );

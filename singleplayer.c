@@ -40,9 +40,17 @@ extern	bool	TeamGame;
 extern  BYTE          MyGameStatus;
 extern SLIDER WatchPlayerSelect;
 
+extern bool InitLevels( char *levels_list );
+
 bool LoadASinglePlayerGame( MENUITEM * Item )
 {
 	int i;
+	/* Force the global level list back to the single-player mission list.
+	 * Title-screen init loads both SP and MP lists (last call wins → MP),
+	 * and any detour through a multiplayer host/join menu re-clobbers it.
+	 * Without this, NewLevelNum indexes into the 31-entry multiplayer
+	 * list, so SP level 2+ sends the player to a deathmatch arena. */
+	InitLevels( SINGLEPLAYER_LEVELS );
 	PlayDemo = false;
 	IsHost = true;
 	RandomStartPosModify = 0;
@@ -78,6 +86,10 @@ bool LoadASinglePlayerGame( MENUITEM * Item )
 bool StartASinglePlayerGame( MENUITEM * Item )
 {
 	int i;
+
+	/* See comment in LoadASinglePlayerGame — ensure single-player level
+	 * list is active before starting the campaign. */
+	InitLevels( SINGLEPLAYER_LEVELS );
 
 	PlayDemo = false;
 	IsHost = true;
