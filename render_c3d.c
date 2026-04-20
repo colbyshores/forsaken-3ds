@@ -82,10 +82,6 @@ static bool             s_shaderReady   = false;
 static C3D_RenderTarget *s_targetLeft    = NULL;
 static C3D_RenderTarget *s_targetRight   = NULL;
 static C3D_RenderTarget *s_targetBottom  = NULL;  /* mono 320×240 for HUD */
-/* Runtime toggle — set from Configs/main.txt HudOnBottom=true|false.
- * Default true. When false, pglHudBeginBottom is a no-op so the HUD
- * stays on the top screen as an overlay (pre-bottom-screen behavior). */
-bool g_hud_on_bottom = true;
 static C3D_RenderTarget *s_targetCurrent = NULL;  /* active render target */
 static C3D_RenderTarget *s_targetSaved   = NULL;  /* stashed target for HUD restore */
 static bool s_hudDrawnThisFrame = false;          /* HUD drawn once per frame */
@@ -225,8 +221,6 @@ void pglSwapBuffers(void)
 ===================================================================*/
 bool pglHudBeginBottom(void)
 {
-	if (!g_hud_on_bottom)
-		return false;
 	if (!s_targetBottom || !s_inFrame)
 		return false;
 	if (s_hudDrawnThisFrame)
