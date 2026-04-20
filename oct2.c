@@ -1865,39 +1865,40 @@ void DrawSimplePanel()
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	{
 		extern bool g_show_stereo_debug;
+		extern float platform_get_3d_slider(void);
+		float _slider = platform_get_3d_slider();
+
+		/* On-screen overlay (gated by menu toggle so casual users don't
+		   see it). */
 		if (g_show_stereo_debug)
 		{
-			extern float platform_get_3d_slider(void);
 			char _dbg[64];
-			float _slider = platform_get_3d_slider();
-			/* On-screen overlay: raw slider, derived eye_sep, enabled state.
-			   Also mirrored to sdmc:/forsaken_stereo.txt (latest frame
-			   only, overwrite mode) so the user can FTP it and see the
-			   values the game is reading if the on-screen text is hard
-			   to read on stereo top screen. */
 			sprintf(_dbg, "slider: %.3f",  _slider);
 			Print4x5Text(_dbg, FontWidth, FontHeight*2, 1);
 			sprintf(_dbg, "eye_sep: %.2f", render_info.stereo_eye_sep);
 			Print4x5Text(_dbg, FontWidth, FontHeight*3, 1);
 			sprintf(_dbg, "stereo: %s", render_info.stereo_enabled ? "on" : "off");
 			Print4x5Text(_dbg, FontWidth, FontHeight*4, 1);
+		}
 
-			/* File log — overwrites every frame so user sees the live
-			   value. Low overhead: ~100 bytes/frame. */
+		/* File log — writes sdmc:/forsaken_stereo.txt every ~1 s whether
+		   the overlay toggle is on or not, so the FTP-path diagnosis
+		   doesn't depend on finding the menu entry. Overwrite mode so
+		   the file always holds the latest frame. */
+		{
+			static int _stereo_log_throttle = 0;
+			if ((++_stereo_log_throttle & 0x3F) == 0)  /* every 64 frames */
 			{
-				static int _stereo_log_throttle = 0;
-				if ((++_stereo_log_throttle & 0x3F) == 0)  /* every 64 frames */
+				FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "w");
+				if (_f)
 				{
-					FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "w");
-					if (_f)
-					{
-						fprintf(_f, "slider   = %.6f\n", _slider);
-						fprintf(_f, "eye_sep  = %.6f\n", render_info.stereo_eye_sep);
-						fprintf(_f, "stereo   = %s\n", render_info.stereo_enabled ? "on" : "off");
-						fprintf(_f, "focal    = %.6f\n", render_info.stereo_focal_dist);
-						fprintf(_f, "mode     = %d\n",   (int)render_info.stereo_mode);
-						fclose(_f);
-					}
+					fprintf(_f, "slider   = %.6f\n", _slider);
+					fprintf(_f, "eye_sep  = %.6f\n", render_info.stereo_eye_sep);
+					fprintf(_f, "stereo   = %s\n", render_info.stereo_enabled ? "on" : "off");
+					fprintf(_f, "focal    = %.6f\n", render_info.stereo_focal_dist);
+					fprintf(_f, "mode     = %d\n",   (int)render_info.stereo_mode);
+					fprintf(_f, "frame    = %d\n",   _stereo_log_throttle);
+					fclose(_f);
 				}
 			}
 		}
