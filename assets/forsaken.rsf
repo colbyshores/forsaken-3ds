@@ -59,6 +59,10 @@ AccessControlInfo:
   ReleaseKernelMajor            : "02"
   ReleaseKernelMinor            : "33"
   MemoryType                    : Application
+  SystemMode                    : 96MB    # Old 3DS extended (HIMEM) mode —
+                                          # suspends Miiverse / Browser to free
+                                          # ~32MB extra for the app, total ~96MB
+  SystemModeExt                 : 124MB   # New 3DS — full app slice (124MB)
   HandleTableSize               : 512
 
   IORegisterMapping:
