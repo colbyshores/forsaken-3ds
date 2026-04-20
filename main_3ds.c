@@ -146,6 +146,20 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds/forsaken", 0777);
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
 
+	/* Startup sentinel — write to sdmc:/forsaken_stereo.txt so the user
+	   can confirm the SD-write path works (and find the right folder via
+	   FTP) before even entering a level. DrawSimplePanel will overwrite
+	   this with live slider state once gameplay starts. */
+	{
+		FILE *_f = fopen("sdmc:/forsaken_stereo.txt", "w");
+		if (_f)
+		{
+			fprintf(_f, "state    = platform_init_done\n");
+			fprintf(_f, "waiting  = for gameplay frames to overwrite this\n");
+			fclose(_f);
+		}
+	}
+
 	trace("platform_init: done");
 
 	return true;
