@@ -4445,7 +4445,6 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 #if defined(__3DS__) && defined(RENDERER_C3D)
 extern bool pglHudBeginBottom(void);
 extern void pglHudEndBottom(void);
-extern bool g_hud_on_bottom;
 extern void ScrPolySetRouteBottom(bool b);
 extern void ScrPolySetDisplayMode(int mode);
 #endif
@@ -4458,35 +4457,25 @@ void DrawMainGameMenu(void)
       MenuItemDrawCursor( CurrentMenuItem );
     }
 #if defined(__3DS__) && defined(RENDERER_C3D)
-    /* [3DS citro3d] Tag every screen poly added inside DrawSimplePanel with
-       SCRFLAG_BottomHUD so the two-pass screen-poly drain routes it to the
-       bottom screen. In-world overlays added earlier (reticles, enemy
-       markers, damage flash) already exist in the pool WITHOUT the flag
-       and stay on the stereo top screen. */
-    bool _saved_route = false;
-    if (g_hud_on_bottom)
-    {
-        _saved_route = true;
-        ScrPolySetRouteBottom(true);
-        /* Override window dims so Print4x5Text's position math targets
-           320×240 instead of the top-screen 400×240. pglHudBeginBottom
-           will set the same values at render time. */
-        render_info.window_size.cx = 320;
-        render_info.window_size.cy = 240;
-        render_info.ThisMode.w = 320;
-        render_info.ThisMode.h = 240;
-    }
-#endif
+    /* [3DS citro3d] Unconditionally tag DrawSimplePanel's screen polys with
+       SCRFLAG_BottomHUD so the two-pass drain routes them to the mono
+       bottom screen. The in-world crosshair inside DrawSimplePanel clears
+       the flag locally so it stays on the stereo top screen. Override
+       render_info dims to 320×240 around the call so Print4x5Text's
+       position math targets the bottom resolution. */
+    ScrPolySetRouteBottom(true);
+    render_info.window_size.cx = 320;
+    render_info.window_size.cy = 240;
+    render_info.ThisMode.w = 320;
+    render_info.ThisMode.h = 240;
     DrawSimplePanel();
-#if defined(__3DS__) && defined(RENDERER_C3D)
-    if (_saved_route)
-    {
-        ScrPolySetRouteBottom(false);
-        render_info.window_size.cx = 400;
-        render_info.window_size.cy = 240;
-        render_info.ThisMode.w = 400;
-        render_info.ThisMode.h = 240;
-    }
+    ScrPolySetRouteBottom(false);
+    render_info.window_size.cx = 400;
+    render_info.window_size.cy = 240;
+    render_info.ThisMode.w = 400;
+    render_info.ThisMode.h = 240;
+#else
+    DrawSimplePanel();
 #endif
 }
 

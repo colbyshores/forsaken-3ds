@@ -1731,10 +1731,6 @@ MENU	MENU_NEW_VisualsStereo = {
 };
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-/* Declared in render_c3d.c — runtime-togglable flag controlling whether the
- * gameplay text HUD draws on the bottom screen (true, default) or as a
- * top-screen overlay (false). Saved to config as HudOnBottom. */
-extern bool g_hud_on_bottom;
 /* Declared in main_3ds.c — when true, DrawSimplePanel prints raw slider /
  * eye-sep / stereo-state to the HUD for diagnosing slider behavior. Saved
  * to config as ShowStereoDebug. */
@@ -1754,9 +1750,8 @@ MENU	MENU_NEW_Visuals = {
 		{ 20, 124, 200, 124, 0,					"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	NULL, 0 },
 		{ 20, 136, 150, 136, 0,					"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
 #if defined(__3DS__) && defined(RENDERER_C3D)
-		{ 20, 148, 150, 148, 0,					"HUD on bottom screen",							FONT_Small, TEXTFLAG_CentreY,		&g_hud_on_bottom,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
-		{ 20, 160, 150, 160, 0,					"Show stereo debug",							FONT_Small, TEXTFLAG_CentreY,		&g_show_stereo_debug,	NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
-		{ 20, 176, 100, 176, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
+		{ 20, 148, 150, 148, 0,					"Show stereo debug",							FONT_Small, TEXTFLAG_CentreY,		&g_show_stereo_debug,	NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
 #else
 		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
 #endif
@@ -9467,11 +9462,8 @@ void GetGamePrefs( void )
 	CLAMP( GameType, MAX_GAMETYPE );
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-	/* [3DS citro3d] Route gameplay HUD text (ammo/shield/messages) to the
-	 * mono bottom screen when true. Default true. Also load the stereo
-	 * debug toggle — ShowStereoDebug prints raw slider and eye-sep
-	 * values in the HUD for diagnostics. */
-	g_hud_on_bottom     = config_get_bool( "HudOnBottom",     true  );
+	/* ShowStereoDebug prints raw slider / eye-sep / state in the HUD +
+	 * writes sdmc:/forsaken_stereo.txt every ~1 s for remote diagnosis. */
 	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
 #endif
 
@@ -9602,7 +9594,6 @@ void SetGamePrefs( void )
 	config_set_float( "StereoRightColor",		render_info.stereo_right_color );
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-	config_set_bool( "HudOnBottom",     g_hud_on_bottom );
 	config_set_bool( "ShowStereoDebug", g_show_stereo_debug );
 #endif
 
