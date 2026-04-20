@@ -354,9 +354,13 @@ extern void ReleaseScene(void);
 bool QuitRequested = false;
 void CleanUpAndPostQuit(void)
 {
-	// check if this function was ran already
-    if (QuitRequested)
+	/* Idempotent — a separate "cleaned up" flag guards re-entry.
+	 * QuitRequested is now just the signal telling the main loop to
+	 * exit, not a proxy for "teardown done". */
+	static bool _cleaned = false;
+	if (_cleaned)
 		return;
+	_cleaned = true;
 
 	// kill stuff
     ReleaseView();
@@ -698,6 +702,13 @@ int main( int argc, char* argv[] )
 		DebugMathErrors();
 #endif
 	}
+
+	/* Normal-exit teardown. On 3DS, QuitRequested is set by the
+	 * Start+Select input handler or aptMainLoop returning false
+	 * (HOME → Close). Cleanup runs ONCE here after the render loop
+	 * has finished its current iteration so no freed resources get
+	 * touched. */
+	CleanUpAndPostQuit();
 
 	DebugPrintf("exit(0)\n");
 
