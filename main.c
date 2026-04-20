@@ -645,7 +645,17 @@ int main( int argc, char* argv[] )
     if(!AppInit(cli))
 		goto FAILURE;
 
+#ifdef __3DS__
+	/* aptMainLoop() must gate the main loop on 3DS. It handles HOME menu
+	 * display, suspend on sleep-mode, and resume-from-sleep restoration.
+	 * Without this, the app never yields to the OS for these events —
+	 * HOME button is ignored and closing the lid freezes the game.
+	 * Returns false when the OS signals the app should exit (user picked
+	 * "Close" from HOME, or the console is being powered off). */
+	while( aptMainLoop() && !QuitRequested )
+#else
 	while( !QuitRequested )
+#endif
 	{
 		// process system events
 		if(!handle_events())

@@ -4397,20 +4397,7 @@ void DrawMainGameMenu(void)
       MenuDraw( CurrentMenu );
       MenuItemDrawCursor( CurrentMenuItem );
     }
-    /* [3DS citro3d] Gameplay text HUD renders on the mono bottom screen so
-     * the stereo 3D image above isn't cluttered. pglHudBeginBottom returns
-     * true only for the first eye-callback of the frame (HUD is mono; one
-     * copy is all we need). Non-3DS and picaGL builds keep the HUD as a
-     * top-screen overlay as before. */
-#if defined(__3DS__) && defined(RENDERER_C3D)
-    if (pglHudBeginBottom())
-    {
-        DrawSimplePanel();
-        pglHudEndBottom();
-    }
-#else
     DrawSimplePanel();
-#endif
 }
 
 bool RenderMainCamera2dPolys(void);
@@ -4419,7 +4406,21 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	if(!RenderCurrentCamera())
 		return false;
 	DrawMainGameMenu();
-	RenderMainCamera2dPolys(); // screen polys like menu and lense flair
+	/* [3DS citro3d] Gameplay 2D pass (HUD text, pause menu overlays, lens
+	 * flares) renders to the mono bottom screen so the stereo top screen
+	 * stays clean. pglHudBeginBottom is a no-op on the second eye pass —
+	 * one mono draw per frame is enough. In-world 3D elements (targeting
+	 * reticle, missile viewport) render in RenderCurrentCamera above and
+	 * stay on the stereo top screen. */
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	if (pglHudBeginBottom())
+	{
+		RenderMainCamera2dPolys();
+		pglHudEndBottom();
+	}
+#else
+	RenderMainCamera2dPolys();
+#endif
 	return true;
 }
 
