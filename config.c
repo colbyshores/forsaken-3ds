@@ -1246,7 +1246,7 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			 *  0=A fire_primary  1=B fire_secondary
 			 *  2=X forward       3=Y backward
 			 *  4=L strafe_left   5=R strafe_right
-			 *  7=Select rear_view  9=ZR drop_mine
+			 *  7=Select rear_view  8=ZL turbo  9=ZR drop_mine
 			 * Circle pad = camera (axis 0/1 → yaw/pitch, set above)
 			 * D-pad (hat 0) = weapon selection */
 			AddButton( j, 0, &u->fire_primary );
@@ -1256,6 +1256,7 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			AddButton( j, 4, &u->move_left );
 			AddButton( j, 5, &u->move_right );
 			AddButton( j, 7, &u->full_rear_view );
+			AddButton( j, 8, &u->turbo );
 			AddButton( j, 9, &u->fire_mine );
 #else
 			/* Xbox controller (SDL 1.2 xpad):

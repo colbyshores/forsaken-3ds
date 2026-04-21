@@ -135,6 +135,7 @@ If you skip this step the engine just falls back to the standard PNGs in
 | X | Move forward |
 | Y | Move backward |
 | L / R | Strafe left / right |
+| ZL | Turbo (consumes nitro fuel) |
 | ZR | Drop mine |
 | D-pad left / right | Cycle primary weapons (cannons) |
 | Start | Pause menu (save / load / quit) |
