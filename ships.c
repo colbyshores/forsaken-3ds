@@ -974,6 +974,13 @@ bool ProcessShips()
 					MakeQuat( ShipObjPnt->Angle.x * framelag, ShipObjPnt->Angle.y * framelag, ShipObjPnt->Angle.z * framelag + ShipObjPnt->Autolevel, &StepQuat );
 					QuatMultiply(  &ShipObjPnt->Quat , &StepQuat , &ShipObjPnt->Quat );
 					QuatMultiply(  &ShipObjPnt->RotationForce , &ShipObjPnt->Quat , &ShipObjPnt->Quat );
+					/* Without this, each QuatMultiply bleeds tiny float
+					 * error into the quaternion's length. Unnormalized,
+					 * QuatToMatrix produces a non-orthonormal matrix —
+					 * visible as direction-dependent view stretching +
+					 * ship-velocity scaling after many rotations on
+					 * twist-heavy levels (e.g. asubchb subway). */
+					QuatNormalise( &ShipObjPnt->Quat );
 					QuatToMatrix( &ShipObjPnt->Quat, &ShipObjPnt->Mat );
 					MakeQuat( 0.0F, 0.0F, 0.0F, &ShipObjPnt->RotationForce );
 				
