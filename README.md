@@ -135,13 +135,15 @@ If you skip this step the engine just falls back to the standard PNGs in
 | X | Move forward |
 | Y | Move backward |
 | L / R | Strafe left / right |
-| ZL | Turbo (consumes nitro fuel) |
-| ZR | Drop mine |
+| ZL *(New 3DS only)* | Turbo (consumes nitro fuel) |
+| ZR *(New 3DS only)* | Drop mine |
 | D-pad left / right | Cycle primary weapons (cannons) |
 | Start | Pause menu (save / load / quit) |
 | Select | Rear view |
 | Start + Select | Quit to HOME |
-| 3D slider | Stereoscopic depth (hardware) |
+| 3D slider *(hardware)* | Stereoscopic depth |
+
+Old 3DS doesn't have ZL/ZR — those buttons were added in the New 3DS hardware refresh (2014). Every core control (aim, fire, forward/back, strafe, weapon select, menu) sits on buttons present on both hardware generations, so the game is fully playable on Old 3DS. Turbo and mine are New-3DS-only conveniences.
 
 In the in-game pause menu, D-pad navigates and A confirms / B backs out.
 
