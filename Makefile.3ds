@@ -351,7 +351,6 @@ publish-public:
 	  git-filter-repo --force \
 	    --invert-paths \
 	    --path 3DS_PORT_NOTES.md \
-	    --path assets/README.md \
 	    --replace-message $$tmp/replace-msg.txt >/dev/null; \
 	  echo "Force-pushing heads + tags to public..."; \
 	  git push --force --prune \
