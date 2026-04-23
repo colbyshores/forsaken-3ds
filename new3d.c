@@ -504,7 +504,20 @@ void NormaliseVector( VECTOR *  v )
 	if ( dot < 1e-14f )
 		return;
 
-	inv = fast_invsqrtf( dot );
+	/* Use precise 1/sqrtf instead of fast_invsqrtf here. The ~0.175%
+	 * error from fisr leaves normalized vectors at length ~0.99825
+	 * rather than exactly 1. That's fine for most uses, but
+	 * QuatFrom2Vectors takes the cross product of two such vectors,
+	 * whose magnitude then sits at ~0.9965 instead of 1.0, and passes
+	 * the result to asinf() to recover the angle. asin is highly
+	 * sensitive near 1 — 0.35% magnitude error becomes ~5 degrees of
+	 * angle error. That manifests as every BG object's initial
+	 * orientation matrix being rotated ~5 degrees off: doors look
+	 * slightly crooked, and animated translations (train path)
+	 * accumulate a perpendicular offset proportional to path length.
+	 * The precision cost here is negligible — sqrtf is a handful of
+	 * extra cycles and NormaliseVector is not in a tight inner loop. */
+	inv = 1.0f / sqrtf( dot );
 	v->x *= inv;
 	v->y *= inv;
 	v->z *= inv;
