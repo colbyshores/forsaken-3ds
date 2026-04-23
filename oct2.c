@@ -4470,6 +4470,74 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	if(!RenderCurrentCamera())
 		return false;
 	DrawMainGameMenu();
+
+	/* Missile / Pip camera inset — must render here (per-eye) rather
+	 * than after the stereo block. In stereo mode, RenderCurrentCameraInStereo
+	 * invokes this callback twice (once per eye target). Rendering the
+	 * inset outside the stereo block means it only lands in one eye's
+	 * target, producing a visible "primary bleed-through" in the other
+	 * eye's inset region. Putting it inside here gives both eyes a
+	 * consistent inset.
+	 *
+	 * We save/restore CurrentCamera + CameraRendering so the stereo
+	 * dispatcher's per-eye position offset math (applied to
+	 * CurrentCamera.Pos) uses the SHIP's matrix between eye calls,
+	 * not the leftover missile state from this block. */
+	if( ActiveRemoteCamera || (MissileCameraActive && MissileCameraEnable) )
+	{
+		CAMERA saved_camera = CurrentCamera;
+		int16_t saved_cam_rendering = CameraRendering;
+		BYTE saved_current_cam_view = Current_Camera_View;
+		float main_fov;
+
+		TempMissileCam = Current_Camera_View;
+		Current_Camera_View = INVALID_CAMERA_VIEW;
+		if( ActiveRemoteCamera )
+		{
+			CameraRendering = CAMRENDERING_Pip;
+			CurrentCamera.enable = 1;
+			CurrentCamera.GroupImIn = ActiveRemoteCamera->Group;
+			CurrentCamera.Mat = ActiveRemoteCamera->Mat;
+			CurrentCamera.InvMat = ActiveRemoteCamera->InvMat;
+			CurrentCamera.Pos = ActiveRemoteCamera->Pos;
+		}
+		else
+		{
+			CameraRendering = CAMRENDERING_Missile;
+			CurrentCamera.enable = 1;
+			CurrentCamera.GroupImIn = SecBulls[ CameraMissile ].GroupImIn;
+			CurrentCamera.Mat = SecBulls[ CameraMissile ].Mat;
+			MatrixTranspose( &SecBulls[ CameraMissile ].Mat, &CurrentCamera.InvMat );
+			CurrentCamera.Pos = SecBulls[ CameraMissile ].Pos;
+		}
+		CurrentCamera.Viewport = viewport;
+		main_fov = hfov;
+		SetFOV( normal_fov );
+		CurrentCamera.Proj = proj;
+
+		CurrentCamera.Viewport.X = viewport.X + (viewport.Width >>4);
+		CurrentCamera.Viewport.Y = viewport.Y + (viewport.Height >>4);
+		CurrentCamera.Viewport.Width = viewport.Width >>2;
+		CurrentCamera.Viewport.Height = viewport.Height >>2;
+		CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / (float)2.0;
+		CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / (float)2.0;
+
+		CurrentCamera.UseLowestLOD = true;
+
+		if( RenderCurrentCamera() != true )
+			return false;
+
+		Current_Camera_View = TempMissileCam;
+		SetFOV( main_fov );
+
+		/* Restore ship's camera state so the next eye iteration's
+		 * stereo-offset math operates on the ship, not on leftover
+		 * missile position. */
+		CurrentCamera = saved_camera;
+		CameraRendering = saved_cam_rendering;
+		Current_Camera_View = saved_current_cam_view;
+	}
+
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	/* [3DS citro3d] Two-pass screen-poly drain:
 	 *   Pass 1: mode=1, current (stereo top) target — draws everything
@@ -4649,58 +4717,12 @@ bool MainGameRender(void)
             return false;
       }
 
-      if( ActiveRemoteCamera || (MissileCameraActive && MissileCameraEnable) )
-      {
-        float main_fov;
-
-        TempMissileCam = Current_Camera_View;
-        Current_Camera_View = INVALID_CAMERA_VIEW;
-        if( ActiveRemoteCamera )
-        {
-          CameraRendering = CAMRENDERING_Pip;
-          CurrentCamera.enable = 1;
-          CurrentCamera.GroupImIn = ActiveRemoteCamera->Group;  
-          CurrentCamera.Mat = ActiveRemoteCamera->Mat;  
-          CurrentCamera.InvMat = ActiveRemoteCamera->InvMat;  
-          CurrentCamera.Pos = ActiveRemoteCamera->Pos;
-        }
-				else
-				{
-          CameraRendering = CAMRENDERING_Missile;
-
-          CurrentCamera.enable = 1;
-          CurrentCamera.GroupImIn = SecBulls[ CameraMissile ].GroupImIn;  
-          CurrentCamera.Mat = SecBulls[ CameraMissile ].Mat;  
-          MatrixTranspose( &SecBulls[ CameraMissile ].Mat, &CurrentCamera.InvMat );
-          CurrentCamera.Pos = SecBulls[ CameraMissile ].Pos;
-        }
-        CurrentCamera.Viewport = viewport;
-        main_fov = hfov;
-        SetFOV( normal_fov ); // was SetFOV( START_FOV ), but this doesn't work for wide angle fov
-        CurrentCamera.Proj = proj;  
-        
-        CurrentCamera.Viewport.X = viewport.X + (viewport.Width >>4);
-        CurrentCamera.Viewport.Y = viewport.Y + (viewport.Height >>4);
-        CurrentCamera.Viewport.Width = viewport.Width >>2;
-        CurrentCamera.Viewport.Height = viewport.Height >>2;
-        CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / (float)2.0;
-        CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / (float)2.0;
-/* bjd 
-        CurrentCamera.Viewport.dvMaxX = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.wWidth),
-                           RENDERVAL(2 * CurrentCamera.Viewport.dvScaleX));
-        CurrentCamera.Viewport.dvMaxY = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.Height),
-                           RENDERVAL(2 * CurrentCamera.Viewport.dvScaleY));
-*/        
-        
-        CurrentCamera.UseLowestLOD = true;
-
-        if( RenderCurrentCamera() != true ) // bjd
-            return false;
-       
-        Current_Camera_View=TempMissileCam;
-        SetFOV( main_fov );
-
-      }
+      /* Missile / Pip camera inset is now rendered inside
+       * RenderCurrentCameraWithMainGameMenu so that, in stereo mode,
+       * both eye targets get a consistent inset rather than only the
+       * right eye (which made the other eye show primary geometry
+       * where the inset should be, visible in anaglyph as
+       * "primary clipping through"). */
 
 			// Observatory - show four ship camaras
 	    if( SwitchedToWatchMode && WatchPlayerSelect.value == MAX_PLAYERS+1 )

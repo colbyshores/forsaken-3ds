@@ -828,6 +828,71 @@ void set_whiteout_state(void)
 	Clear
 ===================================================================*/
 
+/* Scissored sub-viewport clear via rasterized quad. C3D_RenderTargetClear
+ * can only clear the entire render target (no scissor support), so a
+ * sub-viewport (missile cam, PIP, rear view) can't rely on it to wipe
+ * just its inset rectangle. Instead we draw a full-NDC black quad at
+ * z=1 with GPU_ALWAYS + depth write: the rasterizer naturally clips it
+ * to the currently-bound C3D_SetViewport, writing black color and
+ * far-plane depth only within the inset. This kills primary's
+ * color-bleed-through and gives secondary's GPU_LESS draws a clean
+ * depth slate. */
+static void clear_sub_viewport_via_quad(void)
+{
+	if (!s_scratch || s_scratchUsed + 6 > s_scratchMax) return;
+
+	gpu_vertex_t *dst = s_scratch + s_scratchUsed;
+	s_scratchUsed += 6;
+
+	/* PICA's clip range is [-1, 0] in z (not [-1, 1] like GL), so
+	 * z=1 would be clipped. Use z=0 (far plane in this convention). */
+	static const float verts[6][3] = {
+		{-1.0f, -1.0f, 0.0f},
+		{ 1.0f, -1.0f, 0.0f},
+		{ 1.0f,  1.0f, 0.0f},
+		{-1.0f, -1.0f, 0.0f},
+		{ 1.0f,  1.0f, 0.0f},
+		{-1.0f,  1.0f, 0.0f},
+	};
+
+	for (int i = 0; i < 6; i++) {
+		dst[i].pos[0] = verts[i][0];
+		dst[i].pos[1] = verts[i][1];
+		dst[i].pos[2] = verts[i][2];
+		dst[i].color[0] = 0.0f;
+		dst[i].color[1] = 0.0f;
+		dst[i].color[2] = 0.0f;
+		dst[i].color[3] = 1.0f;
+		dst[i].texcoord[0] = 0.0f;
+		dst[i].texcoord[1] = 0.0f;
+	}
+
+	/* Identity MVP so NDC vertices go straight to clip space; the
+	 * viewport transform maps them onto the inset rectangle. */
+	C3D_Mtx identity;
+	Mtx_Identity(&identity);
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &identity);
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW,  &identity);
+
+	C3D_DepthTest(true, GPU_ALWAYS, s_colorMask);
+	C3D_CullFace(GPU_CULL_NONE);
+
+	C3D_TexEnv *env = C3D_GetTexEnv(0);
+	C3D_TexEnvInit(env);
+	C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
+	C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+	C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
+		GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
+
+	C3D_BufInfo *bi = C3D_GetBufInfo();
+	BufInfo_Init(bi);
+	BufInfo_Add(bi, dst, sizeof(gpu_vertex_t), 3, 0x210);
+	C3D_DrawArrays(GPU_TRIANGLES, 0, 6);
+
+	/* Restore standard game-draw state */
+	C3D_DepthTest(true, GPU_LESS, s_colorMask);
+	C3D_CullFace(GPU_CULL_FRONT_CCW);
+}
 
 bool FSClear(XYRECT *rect)
 {
@@ -835,14 +900,14 @@ bool FSClear(XYRECT *rect)
 	if (!s_targetCurrent || s_dlReplay) return true;
 
 	/* Sub-viewports (missile cam, PIP, rear view) render AFTER the main
-	 * camera.  C3D_RenderTargetClear wipes the entire framebuffer — it
-	 * cannot clear a sub-region.  Only clear depth so the sub-viewport
-	 * draws on top of the main view without destroying it. */
+	 * camera. Rasterized quad clear scissored to viewport via the
+	 * rasterizer — wipes color + depth inside just the inset rect.
+	 * See clear_sub_viewport_via_quad comment for why. */
 	extern int16_t CameraRendering;
 	if (CameraRendering != CAMRENDERING_None &&
 	    CameraRendering != CAMRENDERING_Main)
 	{
-		C3D_RenderTargetClear(s_targetCurrent, C3D_CLEAR_DEPTH, 0, 0xFFFFFF);
+		clear_sub_viewport_via_quad();
 		return true;
 	}
 
