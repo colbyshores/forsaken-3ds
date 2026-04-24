@@ -120,16 +120,18 @@ typedef struct {
 	bool     has_texture;
 } dl_entry_t;
 
-#define MAX_DL_ENTRIES 2048
+#define MAX_DL_ENTRIES 4096
 static dl_entry_t s_dl[MAX_DL_ENTRIES];
 static int  s_dlCount     = 0;
 static bool s_dlRecording = false;
 static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
 
 /* Scratch buffer for vertex conversion.
- * 1MB = ~29000 verts at 36 bytes each.  Needs to handle heavy
- * particle frames (lava tunnel, explosions) without FrameSplit. */
-#define GPU_SCRATCH_SIZE  (1024 * 1024)
+ * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
+ * firefight frames (many ships + projectiles + explosion particles +
+ * laser beams + mipped BSP walls) without FrameSplit stalls or
+ * silent geometry drops at the overflow-after-flush fallback. */
+#define GPU_SCRATCH_SIZE  (4 * 1024 * 1024)
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
