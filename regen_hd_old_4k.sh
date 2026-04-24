@@ -199,48 +199,34 @@ convert_one() {
         fi
     fi
 
-    # ─── ANTIPATTERN (necessary workaround) ─────────────────────────────
-    # Hardcoded mipmap blacklist for textures that produce visible block-
-    # edge artifacts at smaller mip levels.
-    #
-    # Why this is an antipattern: it's content-aware logic in a build script,
-    # which means new levels / new texture packs may need this list updated
-    # by hand. The proper fix would be either (a) per-texture quality
-    # validation (encode + compare to bilinear-downsampled source, taint if
-    # RMSE too high), or (b) a per-texture metadata file shipped with the
-    # asset pack saying "no mips please."
-    #
-    # Why we ship it anyway: we tried automated detection (count pure-black
-    # pixels to identify alpha textures) and AI upscaling produced enough
-    # noise that nearly every wall got mis-classified, stripping mipmaps
-    # everywhere. A name list is at least deterministic. If a user's texture
-    # pack has a different naming convention, this list won't catch their
-    # animated walls and they'll see artifacts — that's the cost.
-    #
-    # Names below cover Forsaken's animated POLYANIM'd surfaces:
-    #   therm[a-d], thermal, adstherm[a-d], adsherm[a-d]  → lava floors
-    #   nuke[a-d], nukerf                                 → radioactive walls
-    #   lava*, fire*, water*, magma*, acid*, plasma*, flow*  → generic patterns
-    local skip_mips=0
-    case "$base" in
-        therm[a-d]|thermal|adstherm[a-d]|adsherm[a-d]|nuke[a-d]|nukerf|lava*|fire*|water*|magma*|acid*|plasma*|flow*)
-            skip_mips=1 ;;
-    esac
-
     if [ "$is_wall_opaque" = 1 ] || [[ "$base" == m-tpage* ]]; then
         convert "$src" -resize "${tw}x${th}!" -flip -alpha off "PNG24:$tmp_png" 2>/dev/null
     else
         convert "$src" -resize "${tw}x${th}!" -flip -alpha set -transparent "rgb(0,0,0)" "PNG32:$tmp_png" 2>/dev/null
     fi
 
-    # Walls: force -f etc1 (no alpha plane). Mipmap unless name-blacklisted
-    # (animated/polyanim'd textures look bad downsampled).
+    # Walls: Gaussian-mipped.
+    #
+    # Opaque walls → ETC1 (no alpha plane). Previously we name-listed
+    # animated POLYANIM textures (lava, nuke, fire, etc.) as mip-skips
+    # because bilinear downsampling amplified chromatic outliers in the
+    # 4K source pack. Gaussian distributes each outlier's influence
+    # across a wide kernel, so the blacklist is no longer needed.
+    #
+    # Alpha walls (grates, lava-cutout floors) → ETC1A4 (per-pixel
+    # alpha). Bilinear mips used to halo alpha edges into black ghost
+    # rings at distance, so these were mip-skipped. Gaussian's wider
+    # kernel softens the alpha edge more gradually, trading a sharp
+    # halo for a diffuse fade — visually acceptable and gives proper
+    # anti-aliasing on distant grate/cutout geometry.
+    #
+    # Everything else (sprites, menu pages, global HUD/UI) → auto-etc1
+    # with no mips. They're drawn near 1:1 pixel ratio; mips are never
+    # sampled, and adding them wastes RAM.
     if [ "$is_wall_opaque" = 1 ]; then
-        if [ "$skip_mips" = 1 ]; then
-            tex3ds -f etc1 -q high "$tmp_png" -o "$dst" 2>/dev/null
-        else
-            tex3ds -f etc1 -q high -m gaussian "$tmp_png" -o "$dst" 2>/dev/null
-        fi
+        tex3ds -f etc1 -q high -m gaussian "$tmp_png" -o "$dst" 2>/dev/null
+    elif [ "$is_wall_alpha" = 1 ]; then
+        tex3ds -f auto-etc1 -q high -m gaussian "$tmp_png" -o "$dst" 2>/dev/null
     else
         tex3ds -f auto-etc1 -q high "$tmp_png" -o "$dst" 2>/dev/null
     fi
