@@ -6,8 +6,12 @@
 #   2. Data/Levels/<lvl>/textures/   — original per-level BMP/PNG (correct atlas)
 #   3. Data/textures/<name>.png      — global original (fallback)
 #
-# Output: romfs/hd_old/{textures,levels/<lvl>/textures}/<name>.t3x
-# Each t3x is downscaled to fit within 512x512 preserving aspect.
+# Output: romfs/hd_textures/{textures,levels/<lvl>/textures}/<name>.t3x
+# Each t3x is downscaled to fit within 512x512 preserving aspect, with
+# a full Gaussian mip chain. At runtime the engine loads the whole
+# chain on New 3DS (512 base) and strips mip 0 on OG 3DS (effective
+# 256 base) — one pack, both targets. See render_c3d.c's
+# try_load_hd_texture.
 #
 # Setup — the 4K pack is hosted on Moddb behind Cloudflare so it cannot be
 # scripted-downloaded. Get it once, manually:
@@ -33,7 +37,7 @@ export MAGICK_THREAD_LIMIT=1
 export OMP_NUM_THREADS=1
 
 K4_PACK=/tmp/4k_pack
-OUT=romfs/hd_old
+OUT=romfs/hd_textures
 TMP=/tmp/hd_regen_$$
 mkdir -p "$OUT/textures" "$OUT/levels" "$TMP"
 
@@ -107,7 +111,7 @@ EOF
 ensure_4k_pack
 
 PARALLEL_JOBS=14
-MAX_DIM=512   # Old 3DS hd_old budget; New 3DS would use 1024
+MAX_DIM=512   # New 3DS base level; OG 3DS strips mip 0 at load (→ 256 effective)
 TASKSET_CPUS=0-13  # leaves cores 14,15 free for OS/desktop
 
 # Convert one source image to t3x.
@@ -292,12 +296,13 @@ done
 # Sources of truth, unioned:
 #   1. Data/Levels/<lvl>/textures/*.{bmp,png}  — local per-level files
 #   2. /tmp/4k_pack/levels/<lvl>/textures/*.bmp  — 4K pack per-level files
-#   3. Old broken hd_old/levels/<lvl>/textures/*.t3x — engine path expectations
-#      (it referenced these paths even when no per-level BMP existed locally)
+#   3. Any prior HD texture tree — engine path expectations (it referenced
+#      these paths even when no per-level BMP existed locally)
 {
     find Data/Levels -mindepth 3 -type f \( -iname '*.bmp' -o -iname '*.png' \) 2>/dev/null
     find /tmp/4k_pack/levels -mindepth 3 -type f \( -iname '*.bmp' -o -iname '*.png' \) 2>/dev/null
     find /tmp/backup_hd_old_squashed_*/levels -mindepth 3 -type f -name '*.t3x' 2>/dev/null
+    find romfs/hd_old/levels -mindepth 3 -type f -name '*.t3x' 2>/dev/null
 } | awk -F/ '{
     # Find the index of the "levels" or "Levels" dir, level name follows it
     for (i=1; i<=NF; i++) if (tolower($i) == "levels") { lvl=tolower($(i+1)); break }

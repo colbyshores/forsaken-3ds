@@ -32,10 +32,34 @@ extern bool render_init(render_info_t *info);
  * level is loading), plus texture upload staging buffers.  At 80 MB the
  * combined allocation exceeded available RAM on some levels.
  *
- * New 3DS has ~124 MB of application RAM.  With a 64 MB heap the remaining
- * ~60 MB covers the OS, linear (GPU-accessible) heap, and thread stacks.
- * BSS ≈ 18 MB + code ≈ 4 MB + heap 64 MB + stack ≈ 1 MB ≈ 87 MB total. */
-u32 __ctru_heap_size = 64 * 1024 * 1024;
+/* ---- heap sizing ----
+ *
+ * OG 3DS has 80 MB app RAM; New has 124 MB.  Both allocations must
+ * fit inside the smaller budget for a single binary to work on both.
+ *
+ * Rough layout on OG (RSF has SpecialMemoryArrange for the 80 MB mode):
+ *   code            ~4 MB
+ *   BSS             ~18 MB   (level data, model data, static arrays)
+ *   malloc heap     24 MB    (this variable)
+ *   linear heap     24 MB    (GPU-accessible; textures, scratch, cmd buf)
+ *   stack           ~1 MB
+ *   OS reserve      ~8 MB    (services, IPC, filesystem buffers)
+ *   ---
+ *   total           ~79 MB    (fits)
+ *
+ * Rationale for 24/24 vs the old 64/default-32:
+ *   * 64 MB malloc was wildly over what the engine needs (Lua + small
+ *     runtime allocations); it starved the linear heap.
+ *   * 24 MB linear needs to hold: post-strip HD texture set
+ *     (~30 walls × ~45 KB = ~1.4 MB), 4 MB GPU scratch, 1 MB command
+ *     buffer, PNG fallback textures (up to ~10 MB worst case for
+ *     several big bigexp*.png at 1024² RGBA4), audio buffers (~1 MB),
+ *     misc linear allocations. Total ~18 MB peak, 6 MB margin.
+ *
+ * On New 3DS this leaves ~45 MB unused overhead but that's fine —
+ * we're not memory-optimizing for New. */
+u32 __ctru_heap_size        = 24 * 1024 * 1024;
+u32 __ctru_linear_heap_size = 24 * 1024 * 1024;
 
 /* ---- init state tracking ---- */
 

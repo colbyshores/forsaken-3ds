@@ -1167,9 +1167,7 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	if (!data_start)
 		return false;
 
-	/* Force hd_old (512×512 max) for now. Will re-enable hd_new dynamic
-	 * selection once we verify hd_old works correctly. */
-	snprintf(hd_path, sizeof(hd_path), "romfs:/hd_old/%s", data_start);
+	snprintf(hd_path, sizeof(hd_path), "romfs:/hd_textures/%s", data_start);
 	for (p = hd_path; *p; p++)
 	{
 		if (*p == '\\') *p = '/';
@@ -1211,6 +1209,56 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 		DebugPrintf("HD texture: Tex3DS import failed for %s\n", hd_path);
 		if (*t == NULL) free(texdata);
 		return false;
+	}
+
+	/* OG 3DS mip-0 strip.
+	 *
+	 * The pack ships 512x512 base textures with a full Gaussian mip chain.
+	 * New 3DS uses the whole thing. OG 3DS has a ~4x smaller linear heap
+	 * and can't afford those full-size textures, so we rebuild each one
+	 * at half dimensions (256 base, one fewer mip level), copying mip 1..N
+	 * from the imported texture into mip 0..N-1 of a smaller allocation.
+	 *
+	 * PICA200 morton tiling is a function of mip dimensions only — mip 1
+	 * of a 512 texture has the identical byte layout as mip 0 of a 256
+	 * texture, so memcpy per level works without any tiling conversion.
+	 *
+	 * Peak memory during the rebuild is ~1.25x one texture (old + new
+	 * briefly coexist); textures load serially so this doesn't compound.
+	 */
+	{
+		bool is_new_3ds = false;
+		APT_CheckNew3DS(&is_new_3ds);
+		if (!is_new_3ds && texdata->tex.maxLevel > 0)
+		{
+			C3D_Tex small;
+			u16 sw = texdata->tex.width  / 2;
+			u16 sh = texdata->tex.height / 2;
+			int new_max = texdata->tex.maxLevel - 1;
+			if (!C3D_TexInitWithParams(&small, NULL, (C3D_TexInitParams){
+				sw, sh, (u8)new_max,
+				texdata->tex.fmt, GPU_TEX_2D, false
+			}))
+			{
+				c3d_trace("try_load_hd_texture: OG mip-0 strip alloc FAILED");
+				C3D_TexDelete(&texdata->tex);
+				Tex3DS_TextureFree(t3x);
+				if (*t == NULL) free(texdata);
+				return false;
+			}
+			{
+				int level;
+				for (level = 0; level <= new_max; level++)
+				{
+					u32 size = 0;
+					void *src = C3D_Tex2DGetImagePtr(&texdata->tex, level + 1, &size);
+					void *dst = C3D_Tex2DGetImagePtr(&small,         level,     NULL);
+					if (src && dst && size) memcpy(dst, src, size);
+				}
+			}
+			C3D_TexDelete(&texdata->tex);
+			texdata->tex = small;
+		}
 	}
 
 	/* Bilinear-mipmap (GPU_NEAREST for mip selection): picks ONE mip level
