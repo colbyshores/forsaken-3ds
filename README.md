@@ -17,11 +17,14 @@ single-pass stereo leave plenty of headroom on either platform.
   draw commands; the second eye replays them with an updated view matrix —
   no second BSP traversal, no second vertex transform pass. That headroom is
   what lets HD textures and stereo coexist at 60 fps.
-- **HD textures (ETC1 / ETC1A4) with selective mipmaps.** Per-level walls
-  upscaled from a 4K source pack, downscaled to 512×512 ETC1 with bilinear
-  mipmaps. Sprites and grates use ETC1A4 with an alpha-from-original-palette
-  detector so see-through pixels survive. Mipmaps are skipped on
-  POLYANIM-animated lava/fire/water surfaces (alpha+mip = halo holes).
+- **HD textures (ETC1 / ETC1A4) with Gaussian mipmaps.** Per-level walls
+  upscaled from a 4K source pack, downscaled to 512×512 ETC1 with Gaussian
+  mip chains — the wider kernel dissolves AI-upscaler hallucination pixels
+  that bilinear mips would amplify into sparkle on distant walls. Sprites
+  and grates use ETC1A4 with an alpha-from-original-palette detector so
+  see-through pixels survive. A single unified pack serves both 3DS
+  generations; OG 3DS strips the base level at load time to fit its
+  tighter linear-heap budget.
 - **Threaded DSP-ADPCM music.** Tracks are streamed from romfs in 0.5 s
   chunks on a background thread (25 ms tick), decoded by the DSP hardware
   for zero CPU cost. Per-buffer ADPCM context tracking eliminates
@@ -114,11 +117,11 @@ Then:
 
 ```bash
 sudo apt install unrar unzip imagemagick
-./regen_hd_old_4k.sh
+./regen_hd_textures_4k.sh
 ```
 
 The script extracts the pack (one-time, cached at `/tmp/4k_pack/`), then
-generates ETC1 / ETC1A4 t3x files into `romfs/hd_old/`. ~3 minutes on a
+generates ETC1 / ETC1A4 t3x files into `romfs/hd_textures/`. ~3 minutes on a
 modern desktop with 14-thread parallelism. Subsequent runs reuse the
 extracted cache and re-encode in <1 minute.
 
@@ -201,25 +204,32 @@ direct submission) and not paying for stereo twice (display list replay).
   without a separate setup step. The **CIA** does NOT bundle it; CFW
   users installing on real hardware already have `sdmc:/3ds/dspfirm.cdc`
   from the DSP1 dump step, and leaving the firmware out of the CIA
-  avoids redistributing a Nintendo blob.
+  avoids redistributing a Nintendo blob. If a CIA user skipped `dsp1`,
+  the engine shows a pre-boot console screen with instructions instead
+  of booting into silent audio with no explanation.
 
-### HD texture pipeline (`regen_hd_old_4k.sh`)
+### HD texture pipeline (`regen_hd_textures_4k.sh`)
 - Source: Forsaken Remastered 4K texture pack (`~/Downloads/4ktexturepack.rar`).
   KPF files are zip archives; the script extracts them once into `/tmp/4k_pack/`.
 - Per-level textures take their atlas from the 4K pack (verified to match
   the original layout). Globals (UI, sprites, fonts) take their atlas from
   `Data/textures/` originals — Night Dive's 4K versions of those textures
   re-arranged the menu UI atlas, breaking UV math.
-- Walls: `tex3ds -f etc1 -m bilinear` (no alpha plane, mipmaps).
+- Walls: `tex3ds -f etc1 -m gaussian` (no alpha plane, Gaussian-kernel
+  mip chain). Gaussian's wider footprint dilutes isolated outlier pixels
+  from the AI upscaler that bilinear mips would amplify into distant-wall
+  sparkle.
 - Grates / sprites / pickups: `tex3ds -f auto-etc1` (auto picks ETC1A4 if
-  alpha is present, no mipmaps).
+  alpha is present).
 - Alpha detection uses the **original BMP's palette** (presence of pure
   `(0, 0, 0)`) rather than scanning the upscaled image — AI upscaling
   introduces stray pure-black pixels into nearly every wall, which breaks
   count-based heuristics.
-- Animated POLYANIM textures (`therma`, `nuke*`, `lava*`, etc.) are
-  hard-blacklisted from mipmaps regardless — alpha and animated UVs both
-  produce visible block-edge artifacts at distance.
+- Unified pack for both 3DS generations. OG 3DS rebuilds each texture at
+  half dimensions at load time (memcpy'ing mip 1..N into mip 0..N-1 of a
+  smaller allocation) to fit its tighter linear-heap budget. PICA200's
+  Morton tiling is dimension-dependent per mip level, so the byte
+  layouts match with no tiling conversion.
 
 ### ARM / engine fixes
 - 34+ unaligned-access sites fixed under `#ifdef ARM` (`bsp.c`, `mload.c`,
@@ -237,7 +247,7 @@ direct submission) and not paying for stereo twice (display list replay).
 ## Known limitations
 
 - Missile chase camera has limited draw distance (BSP portal visibility
-  issue, under investigation).
+  edge case).
 - No multiplayer / networking on 3DS.
 
 ## Credits
