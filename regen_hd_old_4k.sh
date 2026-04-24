@@ -239,7 +239,7 @@ convert_one() {
         if [ "$skip_mips" = 1 ]; then
             tex3ds -f etc1 -q high "$tmp_png" -o "$dst" 2>/dev/null
         else
-            tex3ds -f etc1 -q high -m bilinear "$tmp_png" -o "$dst" 2>/dev/null
+            tex3ds -f etc1 -q high -m gaussian "$tmp_png" -o "$dst" 2>/dev/null
         fi
     else
         tex3ds -f auto-etc1 -q high "$tmp_png" -o "$dst" 2>/dev/null
