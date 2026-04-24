@@ -196,6 +196,19 @@ bool platform_init_video(void)
 	 * mono regardless of slider position at boot. */
 	gfxSet3D(false);
 
+	/* CIA installs don't bundle the Nintendo DSP firmware (legal blob), so
+	 * users who haven't run dsp1 separately will boot with no audio and no
+	 * explanation. Check now — while we still have a plain framebuffer that
+	 * the console library can render to — and show a friendly warning with
+	 * dsp1 instructions if the blob is missing. Dismissing the screen hands
+	 * the top screen back to citro3d as usual. */
+	{
+		extern bool sound_check_dsp_firmware_available(void);
+		extern void sound_show_missing_firmware_warning(void);
+		if (!sound_check_dsp_firmware_available())
+			sound_show_missing_firmware_warning();
+	}
+
 	trace("platform_init_video: pglInit");
 
 	/* Initialize citro3d-backed picaGL */

@@ -133,6 +133,86 @@ static void ensure_dspfirm_on_sd(void)
 	DebugPrintf("sound_init: extracted dspfirm.cdc to %s\n", sd_path);
 }
 
+/* Returns true if we expect ndspInit() to succeed later — either the
+ * firmware blob is on the virtual SD already, or we have a copy in romfs
+ * that ensure_dspfirm_on_sd() will install on first launch. Called at
+ * startup (before pglInit) so we can show a user-friendly warning if
+ * the firmware is missing on a CIA install. */
+bool sound_check_dsp_firmware_available(void)
+{
+	FILE *f = fopen("sdmc:/3ds/dspfirm.cdc", "rb");
+	if (f)
+	{
+		fseek(f, 0, SEEK_END);
+		long sz = ftell(f);
+		fclose(f);
+		if (sz > 0) return true;
+	}
+	f = fopen("romfs:/dspfirm.cdc", "rb");
+	if (f)
+	{
+		fseek(f, 0, SEEK_END);
+		long sz = ftell(f);
+		fclose(f);
+		if (sz > 0) return true;       /* 3DSX build, will be auto-copied */
+	}
+	return false;
+}
+
+/* Top-screen console warning shown on CIA installs where the user has
+ * not run dsp1 yet. Runs before pglInit so we can cleanly hand over
+ * the top screen to citro3d once the user dismisses it.
+ *
+ * Requires gfxInitDefault() to have run already. */
+void sound_show_missing_firmware_warning(void)
+{
+	consoleInit(GFX_TOP, NULL);
+
+	printf("\x1b[2J");                 /* clear */
+	printf("\n  FORSAKEN 3DS: AUDIO DISABLED\n");
+	printf("  ----------------------------\n\n");
+	printf("  The 3DS DSP firmware is missing.\n\n");
+	printf("  Installing custom firmware on a 3DS\n");
+	printf("  does not automatically dump it -- there\n");
+	printf("  is a separate one-time tool for that.\n\n");
+	printf("  To enable audio:\n\n");
+	printf("    1. Download dsp1.3dsx from\n");
+	printf("         github.com/zoogie/DSP1\n");
+	printf("    2. Run it from the Homebrew Launcher\n");
+	printf("    3. Relaunch Forsaken\n\n");
+	printf("  Press A to continue without audio.\n");
+
+	/* Block until A is pressed. */
+	while (aptMainLoop())
+	{
+		hidScanInput();
+		u32 down = hidKeysDown();
+		if (down & KEY_A) break;
+		if (down & (KEY_START | KEY_SELECT)) break;
+		gspWaitForVBlank();
+	}
+
+	/* Clear the console so when citro3d takes over the top screen
+	 * there's no leftover text bleeding through the first frame. */
+	printf("\x1b[2J");
+	gfxFlushBuffers();
+	gfxSwapBuffers();
+	gspWaitForVBlank();
+
+	/* consoleInit disables double buffering on the target screen so text
+	 * writes don't flicker. citro3d assumes double-buffered output and
+	 * will race the display if we leave it single-buffered, producing
+	 * striped corruption on every frame. Restore the default format and
+	 * re-enable double buffering before handing the screen back. */
+	gfxSetScreenFormat(GFX_TOP, GSP_BGR8_OES);
+	gfxSetDoubleBuffering(GFX_TOP, true);
+	gfxFlushBuffers();
+	gfxSwapBuffers();
+	gspWaitForVBlank();
+	gfxSwapBuffers();
+	gspWaitForVBlank();
+}
+
 bool sound_init(void)
 {
 	if (ndsp_initialized)
