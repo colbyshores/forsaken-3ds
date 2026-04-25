@@ -34,18 +34,22 @@ extern bool render_init(render_info_t *info);
  *
 /* ---- heap sizing ----
  *
- * OG 3DS has 80 MB app RAM; New has 124 MB.  Both allocations must
- * fit inside the smaller budget for a single binary to work on both.
+ * OG 3DS in HIMEM mode has 96 MB app RAM (forsaken.rsf:SystemMode=96MB,
+ * SpecialMemoryArrange=true; suspends Miiverse/Browser to free ~32 MB
+ * over the default 64 MB). New has 124 MB. Both allocations must fit
+ * inside the smaller budget for a single binary to work on both.
  *
- * Rough layout on OG (RSF has SpecialMemoryArrange for the 80 MB mode):
+ * Rough layout on OG (HIMEM):
  *   code            ~4 MB
- *   BSS             ~18 MB   (level data, model data, static arrays)
+ *   BSS             ~32 MB   (level data, model data, static arrays;
+ *                             dominated by ModelHeaders[608] +
+ *                             MxaModelHeaders[608] at ~9.6 KB/entry each)
  *   malloc heap     24 MB    (this variable)
  *   linear heap     24 MB    (GPU-accessible; textures, scratch, cmd buf)
  *   stack           ~1 MB
  *   OS reserve      ~8 MB    (services, IPC, filesystem buffers)
  *   ---
- *   total           ~79 MB    (fits)
+ *   total           ~93 MB   (fits 96 MB with ~3 MB margin)
  *
  * Rationale for 24/24 vs the old 64/default-32:
  *   * 64 MB malloc was wildly over what the engine needs (Lua + small
@@ -56,7 +60,7 @@ extern bool render_init(render_info_t *info);
  *     several big bigexp*.png at 1024² RGBA4), audio buffers (~1 MB),
  *     misc linear allocations. Total ~18 MB peak, 6 MB margin.
  *
- * On New 3DS this leaves ~45 MB unused overhead but that's fine —
+ * On New 3DS this leaves ~30 MB unused overhead but that's fine —
  * we're not memory-optimizing for New. */
 u32 __ctru_heap_size        = 24 * 1024 * 1024;
 u32 __ctru_linear_heap_size = 24 * 1024 * 1024;
@@ -148,6 +152,19 @@ bool platform_init(void)
 
 	/* Ensure trace ring is dumped on any exit */
 	atexit(trace_dump);
+
+	/* Disable upstream's Debug flag. WinMain on PC sets Debug=false during
+	 * startup (main.c:161), but on 3DS we don't run WinMain so the flag
+	 * stays at its global initialiser of true. That routes scattered
+	 * DebugPrintf("...%f...", ...) calls in level loaders (e.g. node.c
+	 * NodeLoad's per-node move_len trace) through vsnprintf -> _dtoa_r.
+	 * On larger levels the cost compounds and has been observed to crash
+	 * inside _dtoa_r mid-load on hardware. Force the flag off here, before
+	 * any loader can fire, so DebugPrintf returns immediately. */
+	{
+		extern bool Debug;
+		Debug = false;
+	}
 
 	trace("platform_init: start");
 

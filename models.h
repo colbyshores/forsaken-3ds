@@ -21,9 +21,14 @@
 #define NUMOFTITLEMODELS	32
 #define NUM_INTERLEVEL_MODELS 17
 #ifdef __3DS__
-/* Need >= MODEL_ExtraModels (283) + dynamic ships/enemies/BGOs.
- * With MAX_TEXTURE_GROUPS=32, ModelHeaders[512] costs ~4.9MB BSS — fits New 3DS. */
-#define	MAXMODELHEADERS		512
+/* Sized to the peak model index observed across the SP campaign.
+ * Military Base sets the high-water mark at ~584 (BGOs + ship/enemy
+ * comp objects loaded for that level). 608 gives a ~24-entry margin.
+ * Per-header BSS cost scales with MAX_TEXTURE_GROUPS=64 (~9.6 KB per
+ * entry), so each +N is ~9.6N KB — keep tight to fit OG 3DS budget.
+ * If a future level crashes during PreLoadCompObj("Too many models"),
+ * bump this AND MAXMXAMODELHEADERS together (they share index space). */
+#define	MAXMODELHEADERS		608
 #else
 #define	MAXMODELHEADERS		1024
 #endif
