@@ -232,6 +232,32 @@ bool platform_init_video(void)
 	 * render targets (~2 MB) plus headroom; HD textures stay in linear
 	 * heap (vram=false on Tex3DS_TextureImportStdio). */
 	gfxInit(GSP_BGR8_OES, GSP_BGR8_OES, true);
+
+	/* VRAM framebuffers come up holding whatever was last written to those
+	 * addresses (GPU debris, a previous .3dsx's render target, or just
+	 * uninitialised noise).  gfxInitDefault() never exposed this because
+	 * linearAlloc returns zeroed pages; VRAM does not.  Sweep both screens'
+	 * front + back buffers to black before any code can render — otherwise
+	 * the title-screen load and bottom-screen HUD show garbage until
+	 * something draws over it. */
+	{
+		int screen, swap;
+		for (screen = 0; screen < 2; screen++) {
+			gfxScreen_t s = (screen == 0) ? GFX_TOP : GFX_BOTTOM;
+			for (swap = 0; swap < 2; swap++) {
+				u16 fbw, fbh;
+				u8 *fb = gfxGetFramebuffer(s, GFX_LEFT, &fbw, &fbh);
+				if (fb) memset(fb, 0, (size_t)fbw * fbh * 3);  /* BGR8 */
+				if (s == GFX_TOP) {
+					u8 *fbr = gfxGetFramebuffer(s, GFX_RIGHT, NULL, NULL);
+					if (fbr && fbr != fb)
+						memset(fbr, 0, (size_t)fbw * fbh * 3);
+				}
+				gfxScreenSwapBuffers(s, true);
+			}
+		}
+	}
+
 	/* [3DS] Hardware stereoscopic 3D starts disabled; the 3D slider logic in
 	 * MainGameRender / DisplayTitle calls gfxSet3D(true/false) each frame based
 	 * on osGet3DSliderState().  Initialise to false so the first frame is always
