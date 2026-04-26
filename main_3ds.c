@@ -205,8 +205,33 @@ bool platform_init_video(void)
 {
 	trace("platform_init_video: gfxInitDefault");
 
-	/* Initialize 3DS graphics service (GSP) - required before picaGL */
-	gfxInitDefault();
+	/* Initialize 3DS graphics service (GSP) - required before picaGL.
+	 *
+	 * Use VRAM for framebuffers (third arg `true`).  gfxInitDefault()
+	 * places framebuffers at the START of the linear heap (top buffer at
+	 * 0x30000000, ~280 KB each, double-buffered) without marking those
+	 * pages as occupied in libctru's linearAlloc bookkeeping.  Subsequent
+	 * linearAlloc() calls — including every BSP vertex buffer Mload
+	 * allocates — happily return overlapping addresses.  Each frame, the
+	 * GPU's display transfer (VRAM render target → libctru framebuffer)
+	 * writes the rendered top-screen image into those linear-heap pages,
+	 * clobbering whatever buffer happens to share the address space.
+	 * Where the screen pixels are black (clear / skybox / sky portal),
+	 * the corresponding bytes in the overlapping linearAlloc buffer
+	 * become 0 — vertex floats turn to 0.0f, triangles collapse to the
+	 * origin, and that BSP geometry vanishes.
+	 *
+	 * Tloloc Temple was hit hardest because its BSP layout placed many
+	 * groups in the framebuffer-overlapping address range.  Hardware-only
+	 * — Mandarine/Citra emulators don't model the linearAlloc/framebuffer
+	 * overlap so the bug never surfaces in emulation.
+	 *
+	 * Putting the framebuffers in VRAM (0x1F000000+) takes them entirely
+	 * off the linear heap and removes the overlap.  VRAM has 6 MB on OG
+	 * 3DS — easily room for the framebuffers (~2 MB total) plus citro3d
+	 * render targets (~2 MB) plus headroom; HD textures stay in linear
+	 * heap (vram=false on Tex3DS_TextureImportStdio). */
+	gfxInit(GSP_BGR8_OES, GSP_BGR8_OES, true);
 	/* [3DS] Hardware stereoscopic 3D starts disabled; the 3D slider logic in
 	 * MainGameRender / DisplayTitle calls gfxSet3D(true/false) each frame based
 	 * on osGet3DSliderState().  Initialise to false so the first frame is always
