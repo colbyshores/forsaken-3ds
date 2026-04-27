@@ -624,6 +624,46 @@ bool render_init(render_info_t *info)
 	/* C3D_Init already called by pglInit() stub */
 	if (!c3d_renderer_init())
 		return false;
+
+	/* Wipe the VRAM framebuffers via the GPU before any engine code
+	 * can render.  gfxInit(..., true) hands us framebuffers backed by
+	 * VRAM which comes up holding whatever was last written to those
+	 * addresses — GPU debris, the previous .3dsx's render target,
+	 * uninitialised noise.  The engine's title-screen load takes
+	 * ~2 seconds during which the top framebuffer would otherwise
+	 * display garbage, and the bottom screen would stay garbage until
+	 * the gameplay HUD first drew over it.
+	 *
+	 * CPU memset is unsafe at this stage — the VRAM mapping is not
+	 * fully writable from CPU before the first GPU frame, so naive
+	 * memset crashes with a data abort on FAR=0x1f300000.
+	 *
+	 * The GPU-side pattern: C3D_RenderTargetClear queues a clear
+	 * command, but the clear only actually executes once the target
+	 * is bound via C3D_FrameDrawOn inside a frame, and the cleared
+	 * pixels only reach the visible buffer after C3D_FrameEnd
+	 * triggers display transfer.  Bind every target each frame and
+	 * run a few frame cycles to catch both halves of the
+	 * double-buffer pair on top + bottom. */
+	{
+		int i;
+		for (i = 0; i < 3; i++)
+		{
+			C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
+			C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+			C3D_FrameDrawOn(s_targetLeft);
+
+			C3D_RenderTargetClear(s_targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+			C3D_FrameDrawOn(s_targetRight);
+
+			C3D_RenderTargetClear(s_targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+			C3D_FrameDrawOn(s_targetBottom);
+
+			C3D_FrameEnd(0);
+		}
+	}
+
 	info->ok_to_render = true;
 	return true;
 }
