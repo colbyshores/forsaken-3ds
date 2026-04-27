@@ -45,7 +45,10 @@ data1.cab
 
 # Data/Levels/mission.dat is force-tracked (git add -f) so the
 # authoritative 15-level 1998 SP campaign order survives a fresh
-# clone, even though Data/ itself is ignored.
+# clone, even though Data/ itself is ignored. The Remaster build
+# flavour keeps its own SP / MP orderings under
+# assets/level_orderings/, which is tracked normally and substituted
+# into staging by Makefile.3ds when EDITION=remaster.
 
 # Config directories (lowercase = runtime copies, uppercase = tracked overrides)
 configs/

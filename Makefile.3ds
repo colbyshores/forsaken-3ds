@@ -2,7 +2,15 @@
 # Makefile.3ds - ForsakenX 3DS port using devkitPro
 #
 # Usage:
-#   make -f Makefile.3ds                    # release build (citro3d — shipping)
+#   make -f Makefile.3ds                    # release build (citro3d, 1998 original)
+#   make -f Makefile.3ds EDITION=remaster   # Remaster build: extra levels +
+#                                           # Remaster's authoritative level
+#                                           # ordering + new music tracks 11-19.
+#                                           # Requires running both
+#                                           # extract_assets.py (for the 1998
+#                                           # ISO assets + tracks 02-10) and
+#                                           # extract_remaster_levels.py (for
+#                                           # the KPF levels + tracks 11-19).
 #   make -f Makefile.3ds RENDERER=picagl    # picaGL fallback (no stereo 3D)
 #   make -f Makefile.3ds DEBUG=1   # debug build (__3DS_DEBUG__ defined)
 #                                   # enables: autoboot to Volcano level
@@ -13,6 +21,11 @@ DEBUG ?= 0
 
 # Renderer: citro3d (default — shipping CIA) or picagl (fallback, no stereo 3D)
 RENDERER ?= citro3d
+
+# Edition: original (default — 1998 game) or remaster (Forsaken Remastered
+# levels + music). The remaster build still uses the 1998 ISO for UI assets
+# (fonts, splash, decals) since the KPF lacks them — see README.
+EDITION ?= original
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -102,6 +115,10 @@ OFILES  := $(CFILES:.c=.o)
 
 ifeq ($(DEBUG),1)
 CFLAGS += -D__3DS_DEBUG__
+endif
+
+ifeq ($(EDITION),remaster)
+CFLAGS += -DEDITION_REMASTER
 endif
 
 # Include paths - note isystem for the source dir so #include <header.h> works
@@ -208,6 +225,22 @@ $(ROMFS_STAMP): | romfs-freshness-check
 			fi; \
 		fi; \
 	done
+ifeq ($(EDITION),remaster)
+	@# EDITION=remaster: substitute Remaster's authoritative SP / MP
+	@# orderings (from assets/level_orderings/) over the 1998 originals
+	@# that came in via extract_assets.py. music_3ds.c's s_level_track[]
+	@# is keyed on this 32-entry SP ordering when -DEDITION_REMASTER is
+	@# set, so the substitution is mandatory — fail the build if either
+	@# source file is missing rather than silently producing a CIA whose
+	@# level menu and music table disagree.
+	@echo "Applying EDITION=remaster level orderings..."
+	@LDIR=$(ROMFS_STAGING)/data/levels; SDIR=$(SRCDIR)/assets/level_orderings; \
+	if [ ! -f $$SDIR/mission.dat ] || [ ! -f $$SDIR/battle.dat ]; then \
+		echo "ERROR: $$SDIR/{mission,battle}.dat missing. These should be tracked in git; if you've just rebased a stale branch, run 'git checkout assets/level_orderings/'." >&2; exit 1; \
+	fi; \
+	cp -f $$SDIR/mission.dat $$LDIR/mission.dat; \
+	cp -f $$SDIR/battle.dat  $$LDIR/battle.dat
+endif
 	@echo "Placing .keep files so makerom doesn't strip empty critical dirs..."
 	@# missing_folders() in main.c requires all four to exist. The .3dsx
 	@# ships fine because 3dsxtool preserves empty directories; makerom

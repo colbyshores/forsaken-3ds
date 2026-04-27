@@ -66,7 +66,55 @@ static volatile bool s_thread_exit = false;
 
 /* ---- level→track mapping ---- */
 
-/* Level → CD audio track. Indices line up with Data/Levels/mission.dat
+#ifdef EDITION_REMASTER
+/* Remaster build: indices line up with Data/Levels/mission_remaster.dat
+ * (Remaster's authoritative 24-entry SP order + 8 N64 secret levels).
+ * Track values come from defs/mapInfo.txt in the Remaster's KPF, where
+ * Night Dive curated a "musictrack N" assignment per level (N is 1-indexed
+ * against their 18-track OGG library). On disk the DSP-ADPCM files are
+ * named track02.dsp..track19.dsp (CD-style 1-offset numbering preserved
+ * so the existing 1998 audio files at track02-10 stay valid for the
+ * tracks they share by composition with the Remaster's OGG 01-09).
+ * extract_remaster_levels.py converts OGG 10-18 → track11.dsp..track19.dsp. */
+static const int s_level_track[] = {
+	/* SP campaign — Remaster authoritative order */
+	 5,  /*  1. vol2        Remaster track  4 -> 1998 CD #5    */
+	 9,  /*  2. asubchb     Remaster track  8 -> 1998 CD #9    */
+	 6,  /*  3. nps-sp01    Remaster track  5 -> 1998 CD #6    */
+	 3,  /*  4. thermal     Remaster track  2 -> 1998 CD #3    */
+	 2,  /*  5. fedbankv    Remaster track  1 -> 1998 CD #2    */
+	13,  /*  6. defend2     Remaster track 12 -> NEW track13   */
+	 8,  /*  7. pship       Remaster track  7 -> 1998 CD #8    */
+	10,  /*  8. stableizers Remaster track  9 -> 1998 CD #10   */
+	 7,  /*  9. powerdown   Remaster track  6 -> 1998 CD #7    */
+	 4,  /* 10. spc-sp01    Remaster track  3 -> 1998 CD #4    */
+	12,  /* 11. starship    Remaster track 11 -> NEW track12   */
+	 9,  /* 12. bio-sphere  Remaster track  8 -> 1998 CD #9    */
+	 3,  /* 13. nukerf      Remaster track  2 -> 1998 CD #3    */
+	15,  /* 14. battlebase  Remaster track 14 -> NEW track15   */
+	 7,  /* 15. capship     Remaster track  6 -> 1998 CD #7    */
+	 8,  /* 16. space       Remaster track  7 -> 1998 CD #8    */
+	10,  /* 17. high        Remaster track  9 -> 1998 CD #10   */
+	 5,  /* 18. military    Remaster track  4 -> 1998 CD #5    */
+	14,  /* 19. munitions   Remaster track 13 -> NEW track14   */
+	 4,  /* 20. biolab      Remaster track  3 -> 1998 CD #4    */
+	11,  /* 21. ramqan      Remaster track 10 -> NEW track11   */
+	 2,  /* 22. temple      Remaster track  1 -> 1998 CD #2    */
+	 3,  /* 23. azt-sp01    Remaster track  2 -> 1998 CD #3    */
+	 6,  /* 24. azchb       Remaster track  5 -> 1998 CD #6    */
+	/* N64 secret levels — unlocked by crystal counts in original Remaster */
+	16,  /* 25. nuken64     Remaster track 15 -> NEW track16   */
+	12,  /* 26. shipn64     Remaster track 11 -> NEW track12   */
+	13,  /* 27. aztec64     Remaster track 12 -> NEW track13   */
+	11,  /* 28. blackhole   Remaster track 10 -> NEW track11   */
+	18,  /* 29. genstation  Remaster track 17 -> NEW track18   */
+	15,  /* 30. tuben64     Remaster track 14 -> NEW track15   */
+	 7,  /* 31. fishy       Remaster track  6 -> 1998 CD #7    */
+	 8,  /* 32. final       Remaster track  7 -> 1998 CD #8    */
+};
+#define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
+#else
+/* Original 1998 build: indices line up with Data/Levels/mission.dat
  * (the authoritative 1998 SP campaign order). Track values were
  * extracted from ForsakenHW.exe strings on the original 1998 CD —
  * the exe embeds an internal array of "<levelname> <trackN>" entries
@@ -91,6 +139,7 @@ static const int s_level_track[] = {
 	6,   /* 15. azchb      (Ancient Temple)        */
 };
 #define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
+#endif
 
 /* ---- byte-swap helpers (DSP headers are big-endian) ---- */
 

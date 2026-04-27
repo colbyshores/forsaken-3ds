@@ -22,7 +22,17 @@
  */
 
 #define MUSIC_FIRST_TRACK   2
+#ifdef EDITION_REMASTER
+/* Remaster: 18 OGG tracks from Forsaken Remastered's music/OGG/ library
+ * (tracks 1-9 are the original CD compositions, 10-18 are new — Labyrinth,
+ * Nubia, Pyrolite, the Force-Of-Angels remix, four N64 arrangements, and
+ * Cyclotron). On disk we keep CD-style 1-offset numbering so the user's
+ * existing track02-10 from extract_assets.py stay valid; OGG 10-18 land
+ * at track11.dsp..track19.dsp. extract_remaster_levels.py converts them. */
+#define MUSIC_LAST_TRACK   19
+#else
 #define MUSIC_LAST_TRACK   10
+#endif
 #define MUSIC_NUM_TRACKS   (MUSIC_LAST_TRACK - MUSIC_FIRST_TRACK + 1)
 
 /* Title screen track */

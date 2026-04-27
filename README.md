@@ -95,36 +95,84 @@ The script extracts game data, converts CD audio to DSP-ADPCM (via
 `gc-dspadpcm-encode` if available, falling back to WAV), lowercases all
 filenames, and populates `romfs/`.
 
-### Forsaken Remastered extra levels (optional)
+### Forsaken Remastered build flavour (optional)
 
-Forsaken Remastered (Night Dive Studios, 2018) ships ~28 extra levels —
-the unused-in-1998 single-player maps (defend2, stableizers, powerdown,
-starship, battlebase, munitions, biolab, ramqan, temple), the N64-port
-secret levels (nuken64, shipn64, aztec64, blackhole, genstation, tuben64,
-fishy, final), and additional multiplayer arenas (dabiz, fourball, gas,
-smalls, storm, sunk, tworooms, astro, tunnels, ians, geodome). Their
-.bsp / .mxv / .gol / etc. files are byte-identical to the 1998 format,
-so the engine loader handles them with no code changes.
-
-If you own Forsaken Remastered on Steam, you can import these into the
-3DS port after running `extract_assets.py`:
+The default build (`make -f Makefile.3ds`) ships the 1998 game: 15-level
+SP campaign, 30 MP arenas, 9 CD-audio tracks. Build a **Remaster flavour**
+that adds 28 extra levels and 9 new music tracks like this:
 
 ```bash
+# 1. Extract the 1998 ISO/BIN (gives UI assets + tracks 02-10).
+python3 extract_assets.py "Forsaken (USA).bin"
+
+# 2. Extract Remaster's extra levels and convert its OGG-only tracks 10-18
+#    to DSP-ADPCM (track11.dsp..track19.dsp).
 python3 extract_remaster_levels.py \
     ~/.steam/steam/steamapps/common/Forsaken\ Remastered/ForsakenEX.kpf
+
+# 3. Build with the Remaster edition flag.
+make -f Makefile.3ds EDITION=remaster
 ```
 
-The script copies the level directories into `Data/Levels/` (skipping
-the 1280×720 PNG loading screens — the engine uses the existing `.pic`
-files) and appends each level name to `Data/Levels/levels.dat` and
-`Data/Levels/battle.dat` so the level-select menu picks them up. It is
-idempotent — re-running adds nothing if the levels are already present.
+`EDITION=remaster` does two things during the build:
 
-Per-level RAM cost is unchanged: only one level loads at a time, and
-the new MXV / BSP sizes are within the existing per-level envelope
-(largest new map: `biolab`, 1.8 MB MXV vs `thermal`'s 1.77 MB). On-SD
-storage grows by ~40 MB for the level data plus ~5–10 MB for the
-extracted per-level texture PNGs.
+- Defines `-DEDITION_REMASTER`, which switches `music_3ds.c`'s
+  level→track mapping to a 32-entry table keyed on the Remaster's
+  authoritative `defs/mapInfo.txt` curation (vol2 → track 5,
+  defend2 → new track 13, biolab → track 4, …).
+- Substitutes `Data/Levels/mission_remaster.dat` (24 SP campaign
+  entries + 8 N64 secret levels) and `Data/Levels/battle_remaster.dat`
+  (24 MP arenas) over the 1998 originals during ROMFS staging, so the
+  in-game crate menu sees the expanded line-up.
+
+Both `_remaster.dat` files and the original `mission.dat` / `battle.dat`
+are force-tracked in git, so a fresh clone has both orderings ready and
+the build flag picks one.
+
+#### Why both the ISO **and** the Remaster KPF are needed
+
+I audited the KPF against an extracted 1998 ISO before going down this
+road. The KPF is *almost* a complete asset source — `/levels`, `/models`,
+`/bgobjects`, `/sounds/{generic,mapped}` are all byte-identical to the
+1998 originals — but it's missing **14 small UI/font/effect textures**
+the 3DS port's HUD and menu code hard-references (`chars1`, `chars2`,
+`font512`, `fontbig`, `levels1-3`, `credits`, `splat`, `hoop`, `ring_03`,
+`f512x384`, `dummy`, `various`; ~3.8 MB total). Night Dive replaced these
+with TTF fonts and PNG widgets in the Remaster's own UI; we still need
+the bitmap originals from the 1998 disc.
+
+If you only have one of the two assets, build the matching flavour:
+the 1998-only build is `make -f Makefile.3ds`, the Remaster build needs
+both sources.
+
+#### What's included in each flavour
+
+|                          | `make`                    | `make EDITION=remaster`     |
+|--------------------------|---------------------------|------------------------------|
+| Single-player campaign   | 15 levels (1998)          | 24 levels (Remaster) + 8 N64 secrets |
+| Multiplayer arenas       | 30                        | 24 (Remaster's curated set)  |
+| Music tracks             | 9 (`track02-10.dsp`)      | 18 (`track02-19.dsp`)        |
+| Level→track mapping      | 1998 CD                   | Remaster `mapInfo.txt`       |
+| Level data fidelity      | Lossless from CD          | Lossless from CD (same files) |
+| New-track audio source   | n/a                       | OGG Vorbis 256 kbps → DSP-ADPCM (lossy) |
+
+The new music tracks (10–18 in the OGG library, surfaced as
+`track11.dsp`–`track19.dsp` on disk) are `Labyrinth`, `Nubia`,
+`Pyrolite`, `The Dead System [Force Of Angels Remix]`, four N64
+arrangements (`The Dead System`, `Condemned`, `Pure Power`,
+`Flame Out`), and `Cyclotron`. Tracks 1–9 of the Remaster's OGG library
+are the same compositions as the 1998 CD's tracks 02–10, so the
+existing CD-rip DSPs are kept as-is — lossless source preserved where
+it exists. There's no legitimate lossless release of tracks 10–18; the
+OGG → DSP-ADPCM path is the highest-fidelity option available for them
+to end users.
+
+**Per-level RAM cost is unchanged** in either flavour — only one level
+loads at a time, and the new MXV / BSP sizes are within the existing
+per-level envelope (largest new map: `biolab.mxv` 1.8 MB vs the
+existing largest `thermal.mxv` 1.77 MB). On-SD storage for the
+Remaster build grows by ~40 MB for level data, ~5–10 MB for per-level
+texture PNGs, and ~36 MB for the 9 new music tracks.
 
 ### HD textures (optional, recommended)
 
