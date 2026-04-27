@@ -233,30 +233,18 @@ bool platform_init_video(void)
 	 * heap (vram=false on Tex3DS_TextureImportStdio). */
 	gfxInit(GSP_BGR8_OES, GSP_BGR8_OES, true);
 
-	/* VRAM framebuffers come up holding whatever was last written to those
-	 * addresses (GPU debris, a previous .3dsx's render target, or just
-	 * uninitialised noise).  gfxInitDefault() never exposed this because
-	 * linearAlloc returns zeroed pages; VRAM does not.  Sweep both screens'
-	 * front + back buffers to black before any code can render — otherwise
-	 * the title-screen load and bottom-screen HUD show garbage until
-	 * something draws over it. */
-	{
-		int screen, swap;
-		for (screen = 0; screen < 2; screen++) {
-			gfxScreen_t s = (screen == 0) ? GFX_TOP : GFX_BOTTOM;
-			for (swap = 0; swap < 2; swap++) {
-				u16 fbw, fbh;
-				u8 *fb = gfxGetFramebuffer(s, GFX_LEFT, &fbw, &fbh);
-				if (fb) memset(fb, 0, (size_t)fbw * fbh * 3);  /* BGR8 */
-				if (s == GFX_TOP) {
-					u8 *fbr = gfxGetFramebuffer(s, GFX_RIGHT, NULL, NULL);
-					if (fbr && fbr != fb)
-						memset(fbr, 0, (size_t)fbw * fbh * 3);
-				}
-				gfxScreenSwapBuffers(s, true);
-			}
-		}
-	}
+	/* TODO: VRAM framebuffers come up holding whatever was last written to
+	 * those addresses (GPU debris, a previous .3dsx's render target, or
+	 * just uninitialised noise).  Manifests as ~2 s of corruption on the
+	 * top screen during the title-screen load and persistent garbage on
+	 * the bottom screen until the gameplay HUD first draws over it.
+	 *
+	 * A naive `memset(gfxGetFramebuffer(...), 0, w*h*3)` here crashes with
+	 * a data abort writing to VRAM (FAR=0x1f300000) — the framebuffer
+	 * mapping isn't fully writable from CPU at this point in init.  The
+	 * proper fix is GPU-side: clear via C3D_RenderTargetClear after
+	 * c3d_renderer_init has created the targets.  Punted for now;
+	 * the initial corruption is cosmetic and short-lived. */
 
 	/* [3DS] Hardware stereoscopic 3D starts disabled; the 3D slider logic in
 	 * MainGameRender / DisplayTitle calls gfxSet3D(true/false) each frame based
