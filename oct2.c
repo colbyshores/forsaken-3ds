@@ -3213,6 +3213,12 @@ bool RenderScene( void )
     ReleaseView();
     ReleaseLevel();
     MyGameStatus = STATUS_Title;
+#if defined(__3DS__) && defined(RENDERER_C3D)
+    /* Wipe the gameplay HUD off the bottom screen — the title screen
+     * never draws there, so without this the last HUD frame stays
+     * frozen until the next gameplay session takes over. */
+    pglClearBottomScreen();
+#endif
     InitScene();
     InitView();
 
@@ -4430,6 +4436,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 #if defined(__3DS__) && defined(RENDERER_C3D)
 extern bool pglHudBeginBottom(void);
 extern void pglHudEndBottom(void);
+extern void pglClearBottomScreen(void);
 extern void ScrPolySetRouteBottom(bool b);
 extern void ScrPolySetDisplayMode(int mode);
 #endif

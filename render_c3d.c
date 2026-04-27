@@ -262,6 +262,38 @@ bool pglHudBeginBottom(void)
 	return true;
 }
 
+/* Wipe the bottom-screen render target via the same GPU-side pattern
+ * used in render_init().  Call this when leaving gameplay for the
+ * title screen — without it, the gameplay HUD's last frame stays
+ * frozen on the bottom screen until the next gameplay session draws
+ * over it (the title screen never touches the bottom target).
+ *
+ * Safe to call between frames; if the engine is in an open frame,
+ * close it first so the C3D_FrameBegin below doesn't conflict. */
+void pglClearBottomScreen(void)
+{
+	if (!s_targetBottom)
+		return;
+
+	if (s_inFrame)
+	{
+		C3D_FrameEnd(0);
+		s_inFrame = false;
+	}
+
+	int i;
+	for (i = 0; i < 3; i++)
+	{
+		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+		C3D_RenderTargetClear(s_targetBottom, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
+		C3D_FrameDrawOn(s_targetBottom);
+		C3D_FrameEnd(0);
+	}
+
+	s_targetCurrent = NULL;
+	s_hudDrawnThisFrame = false;
+}
+
 void pglHudEndBottom(void)
 {
 	if (!s_targetSaved)
