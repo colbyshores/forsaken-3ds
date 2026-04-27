@@ -166,15 +166,108 @@ def import_levels(kpf_path, output_dir):
 # ----- OGG → DSP-ADPCM music conversion --------------------------------------
 
 def find_dspadpcm_encoder():
-    """Reproduce extract_assets.py's encoder search order."""
+    """Reproduce extract_assets.py's encoder search order, plus our
+    persistent build cache under ~/.cache/."""
     found = shutil.which("dspadpcm")
     if found:
         return found
-    for p in ["/tmp/dspadpcm/dspadpcm", "./dspadpcm",
-              os.path.expanduser("~/dspadpcm")]:
-        if os.path.isfile(p):
+    candidates = [
+        "/tmp/dspadpcm/dspadpcm",
+        "./dspadpcm",
+        os.path.expanduser("~/dspadpcm"),
+        os.path.expanduser("~/.cache/forsaken-3ds-port/gc-dspadpcm-encode/dspadpcm"),
+    ]
+    for p in candidates:
+        if os.path.isfile(p) and os.access(p, os.X_OK):
             return p
     return None
+
+
+def build_dspadpcm_encoder():
+    """Clone and build gc-dspadpcm-encode into ~/.cache/, returning the
+    path to the produced binary. Cache survives reboots — unlike
+    /tmp/dspadpcm/ where extract_assets.py historically dropped it.
+
+    The upstream repo (jackoalan/gc-dspadpcm-encode) ships a Qt qmake
+    project file rather than a Makefile, so we invoke the compiler
+    directly with the two .c sources and the alsa library it needs.
+
+    Returns None on failure (missing git / cc, missing libasound, or
+    compile error)."""
+    cache_root = os.path.expanduser("~/.cache/forsaken-3ds-port")
+    src_dir = os.path.join(cache_root, "gc-dspadpcm-encode")
+    binary = os.path.join(src_dir, "dspadpcm")
+
+    if os.path.isfile(binary) and os.access(binary, os.X_OK):
+        return binary
+
+    if shutil.which("git") is None:
+        print("  ERROR: 'git' not on PATH — can't fetch "
+              "gc-dspadpcm-encode source.", file=sys.stderr)
+        return None
+    cc = shutil.which("cc") or shutil.which("gcc")
+    if cc is None:
+        print("  ERROR: no C compiler ('cc' or 'gcc') on PATH.",
+              file=sys.stderr)
+        return None
+
+    os.makedirs(cache_root, exist_ok=True)
+
+    # Clone (or refresh a stale partial checkout).
+    if not os.path.isfile(os.path.join(src_dir, "main.c")):
+        if os.path.isdir(src_dir):
+            shutil.rmtree(src_dir)
+        print(f"  Cloning gc-dspadpcm-encode -> {src_dir}")
+        try:
+            subprocess.run(
+                ["git", "clone", "--depth=1",
+                 "https://github.com/jackoalan/gc-dspadpcm-encode", src_dir],
+                check=True,
+                stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"  git clone failed: {e.stderr.decode(errors='replace')}",
+                  file=sys.stderr)
+            return None
+
+    sources = [os.path.join(src_dir, "main.c"),
+               os.path.join(src_dir, "grok.c")]
+    for s in sources:
+        if not os.path.isfile(s):
+            print(f"  ERROR: expected source {s} missing after clone.",
+                  file=sys.stderr)
+            return None
+
+    print(f"  Compiling gc-dspadpcm-encode -> {binary}")
+    try:
+        subprocess.run(
+            [cc, "-O2", "-o", binary, *sources, "-lasound", "-lm"],
+            check=True,
+            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+        )
+    except subprocess.CalledProcessError as e:
+        msg = e.stderr.decode(errors="replace")
+        if "asound" in msg or "alsa" in msg.lower():
+            msg += ("\n  Hint: install ALSA dev headers — "
+                    "Debian/Ubuntu: 'sudo apt install libasound2-dev'")
+        print(f"  compile failed: {msg}", file=sys.stderr)
+        return None
+
+    if not (os.path.isfile(binary) and os.access(binary, os.X_OK)):
+        print(f"  ERROR: compile reported success but binary missing "
+              f"at {binary}", file=sys.stderr)
+        return None
+
+    return binary
+
+
+def ensure_dspadpcm_encoder():
+    """Find or build gc-dspadpcm-encode. Returns path or None."""
+    found = find_dspadpcm_encoder()
+    if found:
+        return found
+    print("  gc-dspadpcm-encode not found — building from source...")
+    return build_dspadpcm_encoder()
 
 
 def convert_ogg_to_dsp(ogg_path, dsp_path, encoder):
@@ -220,12 +313,12 @@ def import_music(steam_dir, music_output):
               file=sys.stderr)
         return False
 
-    encoder = find_dspadpcm_encoder()
+    encoder = ensure_dspadpcm_encoder()
     if not encoder:
-        print("ERROR: gc-dspadpcm-encode binary not found.\n"
-              "  extract_assets.py installs it to /tmp/dspadpcm/dspadpcm —\n"
-              "  run extract_assets.py first, or place 'dspadpcm' on PATH.\n"
-              "  Use --skip-music to skip music conversion.",
+        print("ERROR: gc-dspadpcm-encode unavailable. Build it manually with:\n"
+              "  git clone https://github.com/jackoalan/gc-dspadpcm-encode\n"
+              "  cd gc-dspadpcm-encode && make\n"
+              "Or pass --skip-music to skip music conversion.",
               file=sys.stderr)
         return False
 
