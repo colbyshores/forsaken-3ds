@@ -1377,6 +1377,17 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 				free( Mloadheader->Group[group].colour_cell_pnt[i] );
 			Mloadheader->Group[group].colour_cell_pnt[i] = NULL;
 
+			/* Per-execbuf vertex copy allocated at mload.c:507. Without
+			 * this free the buffer leaks every level transition — about
+			 * 1–2 MB per level depending on geometry density, which
+			 * accumulates and exhausts the OG 3DS 24 MB malloc heap by
+			 * the fifth level load. */
+			if ( Mloadheader->Group[group].originalVerts[i] )
+			{
+				free( Mloadheader->Group[group].originalVerts[i] );
+				Mloadheader->Group[group].originalVerts[i] = NULL;
+			}
+
 			PolyAnim = Mloadheader->Group[group].polyanim[i];
 			
 			for( e = 0 ; e < Mloadheader->Group[group].num_animating_polys[i] ; e++ )
