@@ -176,11 +176,13 @@ direct submission) and not paying for stereo twice (display list replay).
 - Vertex shader (`shaders/render_c3d.v.pica`) does MVP transform with
   separate projection / modelView uniforms.
 - LVERTEX (24 B: `xyz` + packed `COLOR` + `tu/tv`) is converted to a
-  shader-friendly `gpu_vertex_t` (36 B) in a 1 MB linear scratch buffer.
+  shader-friendly `gpu_vertex_t` (36 B) in a 4 MB linear scratch buffer
+  (sized for worst-case combat frames with thousands of laser / explosion
+  vertices).
 - Consecutive draws with matching state and texture are merged before
   submission. Groups are sorted by texture pointer first to maximise
   batching potential.
-- Stereo replay records `s_dl[2048]` of `dl_entry_t` (scratch offset, vertex
+- Stereo replay records `s_dl[4096]` of `dl_entry_t` (scratch offset, vertex
   count, matrices, viewport, texture, blend state). The second eye triggers
   a single `replay_display_list()` and skips all per-object draw calls.
 - HD texture loader (`try_load_hd_texture`) uses `Tex3DS_TextureImportStdio`
@@ -243,6 +245,14 @@ direct submission) and not paying for stereo twice (display list replay).
 - `InterpFrames()` in `mxaload.c` aligns animated-vertex data once at load
   time rather than memcpy-ing two structs per vertex per frame —
   reclaimed ~30 % framerate on sequences with many animated models.
+- Cross-level memory hygiene. The original level / model / animated-model
+  loaders allocate per-execbuf vertex copies (`originalVerts[]` in
+  `mload.c`, `mxload.c`, `mxaload.c`) but never free them. On a constrained
+  24 MB malloc heap this accumulates ~3–5 MB per level transition and
+  exhausts the heap on the fifth load, manifesting as a hard crash mid-
+  campaign on Old 3DS. The matching frees are now in each
+  `ReleaseM*loadheader` so malloc stays flat at 10–14 MB across the full
+  15-level set.
 
 ## Known limitations
 
