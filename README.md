@@ -95,6 +95,37 @@ The script extracts game data, converts CD audio to DSP-ADPCM (via
 `gc-dspadpcm-encode` if available, falling back to WAV), lowercases all
 filenames, and populates `romfs/`.
 
+### Forsaken Remastered extra levels (optional)
+
+Forsaken Remastered (Night Dive Studios, 2018) ships ~28 extra levels —
+the unused-in-1998 single-player maps (defend2, stableizers, powerdown,
+starship, battlebase, munitions, biolab, ramqan, temple), the N64-port
+secret levels (nuken64, shipn64, aztec64, blackhole, genstation, tuben64,
+fishy, final), and additional multiplayer arenas (dabiz, fourball, gas,
+smalls, storm, sunk, tworooms, astro, tunnels, ians, geodome). Their
+.bsp / .mxv / .gol / etc. files are byte-identical to the 1998 format,
+so the engine loader handles them with no code changes.
+
+If you own Forsaken Remastered on Steam, you can import these into the
+3DS port after running `extract_assets.py`:
+
+```bash
+python3 extract_remaster_levels.py \
+    ~/.steam/steam/steamapps/common/Forsaken\ Remastered/ForsakenEX.kpf
+```
+
+The script copies the level directories into `Data/Levels/` (skipping
+the 1280×720 PNG loading screens — the engine uses the existing `.pic`
+files) and appends each level name to `Data/Levels/levels.dat` and
+`Data/Levels/battle.dat` so the level-select menu picks them up. It is
+idempotent — re-running adds nothing if the levels are already present.
+
+Per-level RAM cost is unchanged: only one level loads at a time, and
+the new MXV / BSP sizes are within the existing per-level envelope
+(largest new map: `biolab`, 1.8 MB MXV vs `thermal`'s 1.77 MB). On-SD
+storage grows by ~40 MB for the level data plus ~5–10 MB for the
+extracted per-level texture PNGs.
+
 ### HD textures (optional, recommended)
 
 Source pack: **[Upscaled Forsaken Textures — 4K Texture Pack][4kpack]**
