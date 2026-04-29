@@ -931,6 +931,20 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 }
 
 
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+/* Per-frame portal rejection counters — incremented in ProcessVisiblePortal
+ * each time a portal is silently dropped (either entirely clipped by the
+ * main viewport, or its post-minimise extent is empty). The black-void
+ * symptom on stableizers/powerdown/starship/battlebase fires when a portal
+ * connecting current-group to the visible-but-not-yet-current group is in
+ * one of these reject paths — the "next room" group never gets marked
+ * visible, so the BSP-clipped geometry through that doorway never draws.
+ * Reset by FindVisible at start of each frame. */
+int _vt_portal_rej_clipped = 0;
+int _vt_portal_rej_empty   = 0;
+int _vt_portal_accepted    = 0;
+#endif
+
 static void
 ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 {
@@ -945,11 +959,17 @@ ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 	p = t->portal;
 	if ( !VisiblePortalExtent( cam, v, p, &extent ) )
 	{
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+		_vt_portal_rej_clipped++;
+#endif
 		return; // portal entirely clipped by main viewport
 	}
 	MinimiseXYExtent( &extent, e, &extent );
 	if ( !EmptyXYExtent( &extent ) )
 	{
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+		_vt_portal_accepted++;
+#endif
 		adj_group = &v->group[ t->group ];
 		if ( adj_group->visible )
 		{
@@ -968,6 +988,12 @@ ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 			ProcessVisiblePortal( cam, v, tvis, &extent );
 		}
 	}
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	else
+	{
+		_vt_portal_rej_empty++;
+	}
+#endif
 }
 
 void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
@@ -1038,6 +1064,16 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	g->extent.max.y = (float) ( v->viewport->Y + v->viewport->Height );
 	g->extent.max.z = HUGE_VALUE;
 
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	/* Per-frame portal counters reset before traversal. Logged once per
+	 * second below so each level's "average" portal rejection rate gets a
+	 * single summary line — easy to compare BAD vs OK levels without
+	 * flooding the trace file. */
+	_vt_portal_rej_clipped = 0;
+	_vt_portal_rej_empty   = 0;
+	_vt_portal_accepted    = 0;
+#endif
+
 	// process visible portals
 	if ( outside_map )
 	{
@@ -1060,6 +1096,83 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		{
 			ProcessVisiblePortal( cam, v, &Mloadheader->Group[ cam->GroupImIn ].Portal [ j ].visible, &g->extent );
 		}
+
+#ifdef __3DS__
+		/* Flood-fill expansion: after the engine's pre-computed VISTREE
+		 * traversal completes, walk every currently-visible group's own
+		 * Portal[] array and project each portal against the camera. If
+		 * the portal projects onto a non-empty screen extent, add the
+		 * destination group to the visible list with that extent.
+		 *
+		 * Forsaken's pre-computed visibility (VISTREE) is baked at
+		 * level-build time and on Remaster's stableizers / powerdown /
+		 * starship / battlebase the trees terminate before including all
+		 * groups whose geometry the player can actually see through
+		 * chained doorways. Without this expansion the visible list
+		 * stops at the first hop; through-portal apertures show the
+		 * immediate next room but the room beyond it (or the floor /
+		 * ceiling that fills the rest of the aperture from a different
+		 * group) is missing — manifested as black rectangles inside the
+		 * doorway frame.
+		 *
+		 * Visited groups tracked via VISGROUP.visible (already
+		 * incremented on first add). Loop bounded to 8 passes as a
+		 * safety against infinite recursion via portal cycles. Cost
+		 * scales with camera line-of-sight depth, not total level size,
+		 * so we don't pay the outside_map=1 overdraw that crashes
+		 * scratch on big levels. */
+		{
+			bool added_one;
+			int safety_pass;
+			/* 16 passes covers typical level geometry — most chained-portal
+			 * sightlines wrap up well under that. Each pass walks every
+			 * currently-visible group's portals once. */
+			for (safety_pass = 0; safety_pass < 16; safety_pass++) {
+				added_one = false;
+				VISGROUP *current_visible_end = v->last_visible;
+				for ( g = v->first_visible; g; g = g->next_visible ) {
+					u_int16_t gid = g->group;
+					int p;
+					for (p = 0; p < Mloadheader->Group[gid].num_portals; p++) {
+						u_int16_t dst = Mloadheader->Group[gid].Portal[p].visible.group;
+						if (dst >= v->groups) continue;
+						if (v->group[dst].visible) continue;
+						EXTENT extent;
+						PORTAL *p_obj = &Mloadheader->Group[gid].Portal[p];
+						if (!VisiblePortalExtent(cam, v, p_obj, &extent))
+							continue;
+						/* Inherit the source group's full extent for the
+						 * new visible group rather than intersecting with
+						 * the new portal's projected extent. This is
+						 * intentionally less tight: the strict intersection
+						 * collapses to empty in some chained-portal cases
+						 * (e.g. when the through-portal-group's far wall
+						 * is itself a portal whose verts barely touch the
+						 * source aperture), losing geometry that should
+						 * fill the aperture. The relaxed inheritance lets
+						 * each new group draw into the same screen rect as
+						 * its source — over-includes, but the per-group
+						 * scissor in FSSetViewPort still confines pixel
+						 * writes to the chained aperture, so visually the
+						 * result is just "more triangles considered for the
+						 * same pixels" — a small extra overdraw cost rather
+						 * than a correctness issue. */
+						(void)extent;
+						VISGROUP *adj = &v->group[dst];
+						adj->extent = g->extent;
+						adj->group = dst;
+						adj->visible = 1;
+						adj->next_visible = NULL;
+						v->last_visible->next_visible = adj;
+						v->last_visible = adj;
+						added_one = true;
+					}
+					if (g == current_visible_end) break;
+				}
+				if (!added_one) break;
+			}
+		}
+#endif
 	}
 
 	// set viewport and projection matrix for each visible group
@@ -1097,6 +1210,18 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		}
 		vp->ScaleX = vp->Width * 0.5F;
 		vp->ScaleY = vp->Height * 0.5F;
+#ifdef __3DS__
+		/* On 3DS, render every visible group with the camera's normal
+		 * projection. Pair with FSSetViewPort's scissor-based clipping
+		 * (render_c3d.c) which restricts pixel writes to the portal
+		 * aperture screen rect. The per-group magnified projection
+		 * approach (the #else branch below) produced black voids on
+		 * Remaster levels — see render_c3d.c FSSetViewPort comment for
+		 * the full reasoning. The flood-fill expansion above ensures
+		 * enough groups are visible to fill chained doorway views; this
+		 * keeps the rasteriser inside the right pixel rect. */
+		g->projection = cam->Proj;
+#else
 		g->projection = cam->Proj;
 		g->projection._11 = ( cam->Proj._11 * v->viewport->Width ) / vp->Width;
 		g->projection._22 = ( cam->Proj._22 * v->viewport->Height ) / vp->Height;
@@ -1123,6 +1248,60 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		g->projection._32 = -2.0F * ( ( v->viewport->Y + v->viewport->Height * 0.5F )
 									- ( vp->Y + vp->Height * 0.5F ) )
 							/ vp->Height;
+#endif
+
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+		/* Portal black-void detector: a visible group whose final
+		 * viewport collapses to zero width or height produces a
+		 * divide-by-zero in the projection-matrix construction above
+		 * (vp->Width / vp->Height denominators on _11, _22, _31, _32).
+		 * Float div-by-zero on ARM gives +inf, the engine then renders
+		 * geometry with NaN clip coords, the GPU drops every triangle,
+		 * and the player sees a black void where the portal opens onto
+		 * that group's geometry. Symptom on Remaster's stableizers /
+		 * powerdown / starship / battlebase levels.
+		 *
+		 * Trace it (rate-limited via the same _vt_flip_remaining counter
+		 * autotest_tick uses) so we can correlate the broken viewport
+		 * with the source group, the camera's GroupImIn, and the
+		 * portal-traversal extents. */
+		{
+			extern int _vt_flip_remaining;
+			static int s_traced_for_level = -1;
+			static int s_total_visible_in_frame = 0;
+			static int s_zero_vp_in_frame = 0;
+			extern int16_t LevelNum;
+
+			if (s_traced_for_level != LevelNum) {
+				s_traced_for_level = LevelNum;
+				s_total_visible_in_frame = 0;
+				s_zero_vp_in_frame = 0;
+			}
+
+			s_total_visible_in_frame++;
+			if (vp->Width <= 0 || vp->Height <= 0) {
+				s_zero_vp_in_frame++;
+				/* Only trace the first ~32 zero-vp groups per process to
+				 * avoid flooding the log when the bug fires every frame. */
+				static int s_traced = 0;
+				if (s_traced < 32) {
+					s_traced++;
+					extern void trace(const char*);
+					char _b[200];
+					snprintf(_b, sizeof(_b),
+					         "VISI: GROUP_INVISIBLE level=%d g=%u groupImIn=%u "
+					         "vp=(%dx%d) clip=(%ld,%ld,%ld,%ld) "
+					         "extent=(%.1f,%.1f,%.1f,%.1f)",
+					         (int)LevelNum, (unsigned)g->group, (unsigned)cam->GroupImIn,
+					         (int)vp->Width, (int)vp->Height,
+					         clip.x1, clip.y1, clip.x2, clip.y2,
+					         g->extent.min.x, g->extent.min.y,
+					         g->extent.max.x, g->extent.max.y);
+					trace(_b);
+				}
+			}
+		}
+#endif
 	}
 
 	// sort visible groups in depth order
@@ -1152,6 +1331,36 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		GroupsVisible[ NumGroupsVisible++ ] = g->group;
 		IsGroupVisible[ g->group ] = 1;
 	}
+
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	/* Per-second summary log: once every 60 frames per camera. Keeps the
+	 * volume manageable while still catching trends. Useful columns:
+	 *   visGroups   = how many groups end up in the visible list
+	 *   numGroups   = total groups in the level (denominator)
+	 *   accepted    = portals processed where the through-group got added
+	 *   rejClipped  = portals fully outside the main viewport
+	 *   rejEmpty    = portals with non-empty pre-minimise extent but
+	 *                 empty post-minimise extent (the most likely culprit
+	 *                 for the black-void bug — through-portal group
+	 *                 silently dropped before visible-list insertion). */
+	{
+		static int s_frame = 0;
+		s_frame++;
+		if ((s_frame % 60) == 0) {
+			extern void trace(const char*);
+			extern int16_t LevelNum;
+			char _b[200];
+			snprintf(_b, sizeof(_b),
+			         "VISI: frame=%d level=%d visGroups=%u/%u groupImIn=%u "
+			         "accepted=%d rejClipped=%d rejEmpty=%d",
+			         s_frame, (int)LevelNum,
+			         (unsigned)NumGroupsVisible, (unsigned)v->groups,
+			         (unsigned)cam->GroupImIn,
+			         _vt_portal_accepted, _vt_portal_rej_clipped, _vt_portal_rej_empty);
+			trace(_b);
+		}
+	}
+#endif
 }
 
 int ClipGroup( CAMERA *cam, u_int16_t group )
@@ -1232,6 +1441,36 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 
 			if ( XLight1Group(  Mloadheader, GroupsVisible[i] ) != true  )
 				return false;
+
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+			/* Per-visible-group draw trace, rate-limited to once-per-second
+			 * via the same s_frame counter as the VISI: summary above.
+			 * Logs the group's triangle budget (GroupTris) and execbuf
+			 * count just before its level-mesh draw fires. If a visible
+			 * group has GroupTris > 0 but no geometry appears on screen
+			 * (the user-reported "black void through portal"), the bug is
+			 * downstream of this point — most likely in a stale/corrupt
+			 * LEVELRENDEROBJECT pointer (lpVertexBuffer, lpIndexBuffer)
+			 * or a bad viewport from the per-group ClipGroup above. */
+			{
+				static int s_dbg_frame = 0;
+				if (g == cam->visible.first_visible) s_dbg_frame++;
+				if ((s_dbg_frame % 60) == 0) {
+					extern void trace(const char*);
+					char _b[200];
+					snprintf(_b, sizeof(_b),
+					         "VISI_DRAW: f=%d level=%d g=%u execbufs=%u tris=%u "
+					         "vp=(%dx%d) ext=(%.0f,%.0f,%.0f,%.0f)",
+					         s_dbg_frame, (int)LevelNum, (unsigned)g->group,
+					         (unsigned)Mloadheader->Group[g->group].num_execbufs,
+					         (unsigned)GroupTris[g->group],
+					         (int)g->viewport.Width, (int)g->viewport.Height,
+					         g->extent.min.x, g->extent.min.y,
+					         g->extent.max.x, g->extent.max.y);
+					trace(_b);
+				}
+			}
+#endif
 
  			if ( ExecuteSingleGroupMloadHeader(  Mloadheader, (u_int16_t) g->group ) != true  )
 				return false;

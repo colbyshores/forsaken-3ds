@@ -1051,16 +1051,41 @@ bool FSSetViewPort(render_viewport_t *view)
 {
 	s_viewport = *view;
 
-	/* Map game viewport to PICA200 portrait framebuffer */
+	/* 3DS portal rendering: full-screen viewport + GPU scissor to the
+	 * portal-aperture sub-rect. The original engine path used a sub-rect
+	 * viewport plus a magnified projection (visi.c:1098-1125 unmodified
+	 * branch) to fit the through-portal frustum into the aperture; on
+	 * citro3d that produced black voids on Remaster's stableizers /
+	 * powerdown / starship / battlebase (vol2 happened to dodge it
+	 * because of specific portal-aperture positions, not because the
+	 * math was sound). The naive replacement (cam->Proj + sub-rect
+	 * viewport) squishes the full camera view into the aperture, which
+	 * is wrong scale.
+	 *
+	 * This path keeps the engine's per-group g->viewport semantics
+	 * (= portal-aperture screen rect) but applies it as a scissor at
+	 * the GPU rather than a viewport. Geometry renders at correct
+	 * screen positions via cam's projection, and only the aperture
+	 * pixels get written. Bonus: visible-group count stays small
+	 * because portal traversal is unchanged, so we don't pay the
+	 * outside_map=1 overdraw cost that crashes scratch on big levels. */
 	{
+		/* Translate game-space sub-rect into PICA portrait scissor coords. */
 		int bottom = (int)render_info.ThisMode.h - (int)(view->Y + view->Height);
 		int gl_x = (int)view->X;
 		int pica_x = bottom < 0 ? 0 : bottom;
 		int pica_y = (400 - (int)view->Width) - gl_x;
 		if (pica_y < 0) pica_y = 0;
+		int pica_w = (int)view->Height;
+		int pica_h = (int)view->Width;
 
-		C3D_SetViewport((u32)pica_x, (u32)pica_y,
-			(u32)view->Height, (u32)view->Width);
+		/* Full-screen viewport for the actual rasterisation. */
+		C3D_SetViewport(0, 0, 240, 400);
+		/* Scissor restricts color/depth writes to the portal-aperture
+		 * sub-rect. C3D_SCISSOR_NORMAL means "draw inside the rect". */
+		C3D_SetScissor(GPU_SCISSOR_NORMAL,
+		               (u32)pica_x, (u32)pica_y,
+		               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
 	}
 
 	return true;
@@ -1784,8 +1809,34 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		return true;
 	}
 
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	/* Draw-side detector for the portal black-void bug: log when a draw
+	 * is rejected here — most commonly because lpVertexBuffer is NULL,
+	 * which would explain the "next room geometry doesn't render" symptom
+	 * when an earlier load step (or memory overflow into this struct)
+	 * clobbered the buffer pointer. Once-per-second per failure path. */
+	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
+	{
+		static int s_rej_count = 0;
+		s_rej_count++;
+		if ((s_rej_count % 60) == 1) {
+			extern void trace(const char*);
+			char _b[160];
+			snprintf(_b, sizeof(_b),
+			         "DRAW_REJ: shaderReady=%d renderObject=%p lpVertex=%p s_scratch=%p numTG=%d (rej#%d)",
+			         (int)s_shaderReady, (void*)renderObject,
+			         renderObject ? renderObject->lpVertexBuffer : NULL,
+			         (void*)s_scratch,
+			         renderObject ? renderObject->numTextureGroups : -1,
+			         s_rej_count);
+			trace(_b);
+		}
+		return false;
+	}
+#else
 	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
 		return false;
+#endif
 
 	if (!orthographic)
 	{

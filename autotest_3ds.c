@@ -32,27 +32,26 @@ extern int16_t LevelNum;
 extern char ShortLevelNames[][32];   /* MAXLEVELS x 32 */
 
 /* mission_remaster.dat layout (32 entries):
- *   0..4   1998 SP entries (vol2..fedbankv) — already work, skip
+ *   0..4   1998 SP entries (vol2..fedbankv)
  *   5..23  Remaster's 19 SP additions (defend2..azchb)
  *   24..31 N64 secret levels (nuken64..final)
  *
- * Iter 9: cycle ONLY through the 4 levels confirmed to have the portal
- * black-void issue, so visual diagnosis is fast (4 minutes, not 30).
- *   7  stableizers
- *   8  powerdown
- *  10  starship
- *  13  battlebase
- * Levels 5,6,9,11,12 looked fine in iter7 — skip them. After we find
- * the root cause we go back to the full sweep. */
-#define AUTOTEST_USE_BAD_LIST  1
+ * Full-sweep mode: cycle all 32 levels at 60 s each so the user can
+ * visually validate the portal fix across every level (1998 base,
+ * Remaster SP, N64 ports). The previous BAD-only list mode is kept
+ * compiled out via the #define for quick re-enabling during diagnosis. */
+#define AUTOTEST_USE_BAD_LIST  0
 static const int s_bad_levels[] = { 7, 8, 10, 13 };
 #define S_BAD_LEVELS_COUNT (sizeof(s_bad_levels) / sizeof(s_bad_levels[0]))
 static int s_bad_idx = 0;
-#define AUTOTEST_FIRST_LEVEL  7
+#define AUTOTEST_FIRST_LEVEL  0
 
-/* 60 seconds at 60 Hz. main.c's main loop runs RenderScene → game tick
- * once per video frame, so a flat frame counter is the right unit. */
-#define AUTOTEST_FRAMES_PER_LEVEL  3600
+/* 30 seconds at 60 Hz. main.c's main loop runs RenderScene → game tick
+ * once per video frame, so a flat frame counter is the right unit.
+ * 30 s is enough for a visual sanity check at each level when sweeping
+ * all 32 in one go (16 minutes total wall-clock at 60 Hz, longer in
+ * mandarine where it tends to run sub-realtime). */
+#define AUTOTEST_FRAMES_PER_LEVEL  1800
 
 static int  s_frames_in_level = 0;
 static int  s_last_level_logged = -1;
