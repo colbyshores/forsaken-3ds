@@ -162,6 +162,12 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 	DebugPrintf("Mxload - %s\n",Filename);
 
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[256];
+	  snprintf(_b, sizeof(_b), "Mxload: enter file=%.180s panel=%d storeTri=%d",
+	           Filename, (int)Panel, (int)StoreTriangles); trace(_b); }
+#endif
+
 	// Mxloadheader is not valid until everything has been done..
 	Mxloadheader->state = false;
 
@@ -169,6 +175,9 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	{
 		if( DrawPanel == false )
 		{
+#ifdef __3DS__
+			{ extern void trace(const char*); trace("Mxload: skip panel (DrawPanel false)"); }
+#endif
 			return true;
 		}
 	}
@@ -189,6 +198,10 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	if( Buffer == NULL)
 	{
 		Msg( "Mxload() Buffer was not allocated in %s\n", Filename );
+#ifdef __3DS__
+		{ extern void trace(const char*); char _b[256];
+		  snprintf(_b, sizeof(_b), "Mxload: FAIL Buffer NULL file=%.180s", Filename); trace(_b); }
+#endif
 		return false;
 	}
 
@@ -197,14 +210,25 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	Mxloadheader->num_groups = *Uint16Pnt++;
 	Buffer = (char *) Uint16Pnt;
 
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[96];
+	  snprintf(_b, sizeof(_b), "Mxload: num_groups=%d", Mxloadheader->num_groups); trace(_b); }
+#endif
+
 	if ( Mxloadheader->num_groups > MAXGROUPS )
 	{
 		Msg( "Mxload() Num groups > MAXGROUPS in %s\n", Filename );
+#ifdef __3DS__
+		{ extern void trace(const char*); char _b[160];
+		  snprintf(_b, sizeof(_b), "Mxload: FAIL num_groups=%d > MAXGROUPS file=%.150s",
+		           Mxloadheader->num_groups, Filename); trace(_b); }
+#endif
 		return false;
 	}
 
 	for( group=0 ; group<Mxloadheader->num_groups; group++)
 	{
+		TR("Mxload: g=%d/%d", group, Mxloadheader->num_groups);
 
 		/*	get the number of execbufs in this group	*/
 		Uint16Pnt = (u_int16_t *) Buffer;
@@ -214,8 +238,11 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		if ( Mxloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
 		{
 			Msg( "Mxload() numexecbufs > MAXEXECBUFSPERGROUP in %s\n", Filename );
+			TR("Mxload: FAIL numexec=%d > MAXEXECBUFSPERGROUP g=%d",
+			   Mxloadheader->Group[group].num_execbufs, group);
 			return false;
 		}
+		TR("Mxload: g=%d num_execbufs=%d", group, Mxloadheader->Group[group].num_execbufs);
 
 		for( execbuf=0 ; execbuf<Mxloadheader->Group[group].num_execbufs; execbuf++)
 		{
@@ -238,14 +265,19 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			/*	record how many verts there are in the exec buffer	*/
 			Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
 
+			TR("Mxload: g=%d e=%d type=%d nverts=%d execsize=%d",
+			   group, execbuf, exec_type, num_vertices, ExecSize);
+
 			lpLVERTEX2 = (LPOLDLVERTEX ) Buffer;
 
 			/*	create a vertex buffer	*/
 			if (!FSCreateVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], num_vertices))
 			{
 				Msg( "Mxload : MakeExecBuffer Failed\n" );
+				TR("Mxload: FAIL FSCreateVertexBuffer g=%d e=%d nv=%d", group, execbuf, num_vertices);
 				return false;
 			}
+			TR("Mxload: g=%d e=%d FSCreateVertexBuffer OK", group, execbuf);
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 

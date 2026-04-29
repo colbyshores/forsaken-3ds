@@ -171,40 +171,64 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	Mxaloadheader->Time = 0.0F;
 
 	DebugPrintf("MxaLoad\n");
-	
+
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[256];
+	  snprintf(_b, sizeof(_b), "Mxaload: enter file=%.180s storeTri=%d",
+	           Filename, (int)StoreTriangles); trace(_b); }
+#endif
+
 	Buffer = Mxaloadheader->Buffer;
 	if( Buffer == NULL)
 	{
 		Msg( "Mxaload() Unable to allocate buffer in %s\n", Filename );
+#ifdef __3DS__
+		{ extern void trace(const char*); char _b[256];
+		  snprintf(_b, sizeof(_b), "Mxaload: FAIL Buffer NULL file=%.180s", Filename); trace(_b); }
+#endif
 		return false;
 	}
-	
+
 
 	/*	get the number of groups	*/
 	Uint16Pnt = (u_int16_t *) Buffer;
 	Mxaloadheader->num_groups = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;		
+	Buffer = (char *) Uint16Pnt;
+
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[96];
+	  snprintf(_b, sizeof(_b), "Mxaload: num_groups=%d", Mxaloadheader->num_groups); trace(_b); }
+#endif
 
 	if ( Mxaloadheader->num_groups > MAXGROUPS )
 	{
 		Msg( "Mxaload() num_groups > MAXGROUPS\n", Filename );
+#ifdef __3DS__
+		{ extern void trace(const char*); char _b[160];
+		  snprintf(_b, sizeof(_b), "Mxaload: FAIL num_groups=%d > MAXGROUPS file=%.140s",
+		           Mxaloadheader->num_groups, Filename); trace(_b); }
+#endif
 		return false;
 	}
 
 	for( group=0 ; group<Mxaloadheader->num_groups; group++)
 	{
-		
+		TR("Mxaload: g=%d/%d", group, Mxaloadheader->num_groups);
+
 		/*	get the number of execbufs in this group	*/
 		Uint16Pnt = (u_int16_t *) Buffer;
 		Mxaloadheader->Group[group].num_execbufs = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;		
-	
+		Buffer = (char *) Uint16Pnt;
+
 		if ( Mxaloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
 		{
 			Msg( "Mxaload() num_execbufs > MAXEXECBUFSPERGROUP\n", Filename );
+			TR("Mxaload: FAIL numexec=%d > MAXEXECBUFSPERGROUP g=%d",
+			   Mxaloadheader->Group[group].num_execbufs, group);
 			return false;
 		}
-		
+		TR("Mxaload: g=%d num_execbufs=%d", group, Mxaloadheader->Group[group].num_execbufs);
+
 		for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
 		{
 			Uint16Pnt = (u_int16_t *) Buffer;
@@ -215,14 +239,17 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			/*	get the type of execution buffer	*/
 			exec_type = *Uint16Pnt++;
 			/*	get the number of verts in execution buffer	*/
-			num_vertices =	*Uint16Pnt++;     
-			Buffer = (char *) Uint16Pnt;		
-	
+			num_vertices =	*Uint16Pnt++;
+			Buffer = (char *) Uint16Pnt;
+
 			/*	record how what type of exec buffer	*/
 			Mxaloadheader->Group[group].exec_type[execbuf] = exec_type;
 
 			/*	record how many verts there are in the exec buffer	*/
 			Mxaloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
+
+			TR("Mxaload: g=%d e=%d type=%d nverts=%d execsize=%d",
+			   group, execbuf, exec_type, num_vertices, ExecSize);
 
 			lpLVERTEX2 = (LPOLDLVERTEX ) Buffer;
 
@@ -231,8 +258,10 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			/*	create a vertex buffer	*/
 			if (!FSCreateVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], num_vertices))
 			{
+				TR("Mxaload: FAIL FSCreateVertexBuffer g=%d e=%d nv=%d", group, execbuf, num_vertices);
 				return false;
 			}
+			TR("Mxaload: g=%d e=%d FSCreateVertexBuffer OK", group, execbuf);
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 

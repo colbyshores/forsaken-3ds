@@ -661,6 +661,21 @@ int main( int argc, char* argv[] )
 	while( !QuitRequested )
 #endif
 	{
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+		{ extern void trace(const char*); extern unsigned char MyGameStatus;
+		  static unsigned long _ml_n = 0;
+		  static unsigned char _ml_last = 255;
+		  /* Only emit when status changes or every 600 frames so we don't
+		   * spam the log. Cheap canary that proves the loop is iterating. */
+		  if (MyGameStatus != _ml_last || (_ml_n % 600) == 0) {
+		    char _b[64];
+		    snprintf(_b, sizeof(_b), "MAIN: iter=%lu status=%u", _ml_n, (unsigned)MyGameStatus);
+		    trace(_b);
+		    _ml_last = MyGameStatus;
+		  }
+		  _ml_n++;
+		}
+#endif
 		// process system events
 		if(!handle_events())
 			goto FAILURE;
@@ -673,12 +688,25 @@ int main( int argc, char* argv[] )
 
 			if( SeriousError )
 			{
+#ifdef AUTOTEST_REMASTER
+				/* Level failed to load (most likely InitView returned
+				 * false). Hop back to the netload_stub so the next
+				 * 3dslink push can iterate, instead of leaving the
+				 * device stuck. autotest_on_serious_error logs which
+				 * level died and triggers hb:ldr chain-load. */
+				extern void autotest_on_serious_error(void);
+				autotest_on_serious_error();
+#endif
 				CleanUpAndPostQuit();
 				break;
 			}
 
 			if (failcount == 3) {
 				DebugPrintf("Rendering has failed too many times.  Aborting execution.\n");
+#ifdef AUTOTEST_REMASTER
+				extern void autotest_on_serious_error(void);
+				autotest_on_serious_error();
+#endif
 				CleanUpAndPostQuit();
 				break;
 			}

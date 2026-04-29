@@ -115,7 +115,28 @@ bool FSClearBlack(void);
 bool FSClear(XYRECT * rect);
 bool FSClearDepth(XYRECT * rect);
 
-#define MAX_LEVEL_TEXTURE_GROUPS 8
+/* MAX_LEVEL_TEXTURE_GROUPS — per-execbuf texture group cap inside a
+ * LEVELRENDEROBJECT (the level-mesh form of RENDEROBJECT, distinct from
+ * the model RENDEROBJECT which uses MAX_TEXTURE_GROUPS).
+ *
+ * Was 8 on 3DS. The unguarded INCREASE_TEXTURE_GROUPS at mload.c:664
+ * checks against MAX_TEXTURE_GROUPS (64) — not MAX_LEVEL_TEXTURE_GROUPS —
+ * so when a level mesh execbuf used more than 8 unique textures, the
+ * loader silently wrote textureGroups[8..N] past the end of the 8-slot
+ * array, clobbering the start of the next execbuf's LEVELRENDEROBJECT
+ * (lpVertexBuffer, lpIndexBuffer, vbLocked). At render time the next
+ * execbuf's draws fed garbage pointers to the GPU and produced nothing —
+ * presenting as the "black void where the next room should be" portal
+ * regression on Remaster / N64-port levels (vol2 stays under 8 textures
+ * per execbuf so it never triggered).
+ *
+ * Raised to 64 to match MAX_TEXTURE_GROUPS so the array and the
+ * INCREASE_TEXTURE_GROUPS assert agree and overflow is properly caught
+ * (or in release, properly bounded). Cost ~2.7 MB extra BSS in
+ * Mloadheader's per-group renderObject[MAXEXECBUFSPERGROUP] arrays —
+ * small fraction of the existing ~27 MB ModelHeaders BSS, fits comfortably
+ * inside the OG 3DS application memory budget. */
+#define MAX_LEVEL_TEXTURE_GROUPS 64
 
 #ifdef __3DS__
 /*

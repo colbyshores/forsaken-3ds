@@ -157,5 +157,42 @@ void memcpy_unaligned(void *dst, const void *src, size_t n);
 #endif
 typedef u_int8_t  BYTE;
 typedef u_int16_t WORD;
- 
+
+/*
+ * Verbose trace infrastructure. Compile with VERBOSE_TRACE=1 to enable.
+ *
+ * Drop TR() / TRMSG() at function entries, loop iterations, file
+ * opens, every conditional in a hot path — wherever you need to know
+ * the engine got there. Each fires a single trace() write with one
+ * fsync(), so this absolutely tanks framerate and bloats the log
+ * (intentionally — used for hardware-iteration diagnosis where
+ * cadence doesn't matter and seeing the last line before a crash
+ * matters a lot).
+ *
+ * Disabled at compile time when VERBOSE_TRACE isn't defined: macros
+ * expand to `do {} while(0)`, no string formatting, no I/O, zero
+ * runtime cost. Production EDITION=remaster builds are unaffected.
+ *
+ *   TR("loop i=%d ptr=%p", i, ptr);   - printf-style
+ *   TRMSG("entered foo");              - literal string, slightly cheaper
+ *
+ * Output goes to sdmc:/forsaken_trace.txt via main_3ds.c:trace().
+ */
+#ifdef __3DS__
+extern void trace(const char *msg);
+#endif
+
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+#include <stdio.h>
+#define TR(fmt, ...) do { \
+    char _vt_buf[256]; \
+    snprintf(_vt_buf, sizeof(_vt_buf), fmt, ##__VA_ARGS__); \
+    trace(_vt_buf); \
+} while(0)
+#define TRMSG(msg) do { trace(msg); } while(0)
+#else
+#define TR(fmt, ...)   do {} while(0)
+#define TRMSG(msg)     do {} while(0)
+#endif
+
 #endif	// MAIN_INCLUDED

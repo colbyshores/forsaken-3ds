@@ -79,8 +79,9 @@ bool Tload( TLOADHEADER * Tloadheader  )
 	int LeastScaledThatCanbe;
 	int LeastScaledThatCanbeScale;
 
+	TR("Tload: enter num_texture_files=%d", Tloadheader->num_texture_files);
 	build_gamma_table( Gamma );
- 
+
 	// Tloadheader is not valid until everything has been done..
 	Tloadheader->state = false;
 
@@ -97,12 +98,15 @@ bool Tload( TLOADHEADER * Tloadheader  )
 
 	if ( Tloadheader->num_texture_files != 0 )
 	{
+		TR("Tload: -> TloadAllTextures");
 		//	load in and convert all textures
 		if ( TloadAllTextures( Tloadheader ) != true)
 		{
 			Msg( "TLoadAllTextures() Failed\n" );
+			TR("Tload: FAIL TloadAllTextures");
 			return false;
 		}
+		TR("Tload: TloadAllTextures OK");
 	}
 	
 	for( e = 0 ; e < Tloadheader->num_texture_files*MAXSCALE ; e ++ )
@@ -240,8 +244,11 @@ bool TloadAllTextures(TLOADHEADER * Tloadheader)
 
     for (i = 0; i < Tloadheader->num_texture_files; i++)
 	{
+		TR("TloadAllTextures: i=%d/%d name=%s", i, Tloadheader->num_texture_files,
+		   &Tloadheader->ImageFile[i][0]);
         if(!TloadTextureSurf( Tloadheader, i ))
 		{
+			TR("TloadAllTextures: FAIL i=%d name=%s", i, &Tloadheader->ImageFile[i][0]);
 			goto exit_with_error;
 		}
 	}

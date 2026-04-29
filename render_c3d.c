@@ -182,6 +182,19 @@ static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs verte
  * pglInit/pglExit/pglSwapBuffers/pglTransferEye implementations. */
 void pglInit(void)
 {
+	/* Idempotent: paired with c3d_renderer_init's own idempotency. If
+	 * we let C3D_Init re-fire on a render_mode_select retrigger, it
+	 * resets citro3d's context state — but the render targets we
+	 * created in the previous c3d_renderer_init are tied to the OLD
+	 * context. They become orphaned pointers with stale GPU bookkeeping
+	 * and subsequent draws end up in undefined state. The portal
+	 * "black void" regression on the autotest sweep traced to this:
+	 * primary geometry rendered fine but through-portal groups landed
+	 * on a target citro3d no longer treated as live. */
+	static bool _pglInited = false;
+	if (_pglInited) return;
+	_pglInited = true;
+
 	/* 4× the default GPU command buffer (256KB → 1MB).
 	 * Forsaken draws hundreds of texture groups per frame, each a
 	 * separate C3D_DrawArrays call that appends ~100 bytes of GPU
@@ -504,6 +517,23 @@ void build_gamma_table(double gamma)
 
 bool c3d_renderer_init(void)
 {
+	/* Idempotent: subsequent calls (engine triggers render_mode_select on
+	 * stereo toggles, mode changes, fullscreen flips, etc.) would otherwise
+	 * leak ~5MB of linear memory each time — shader DVLB, 4MB scratch, three
+	 * render targets — because render_cleanup is a no-op. After ~5 calls
+	 * linear heap is exhausted and FSCreateIndexBuffer starts returning NULL.
+	 * Diagnosed via 246 "render targets created" lines in forsaken_c3d.log
+	 * paired with 10+ "FSCreateIndexBuffer: linearAlloc FAILED" entries near
+	 * EOF, immediately preceding GPUCMD_AddInternal's full-buffer svcBreak. */
+	{
+		char _b[64];
+		snprintf(_b, sizeof(_b), "c3d_renderer_init: enter shaderReady=%d", (int)s_shaderReady);
+		c3d_trace(_b);
+	}
+	if (s_shaderReady) {
+		c3d_trace("c3d_renderer_init: already initialized, skipping");
+		return true;
+	}
 	c3d_trace("c3d_renderer_init: start");
 	s_shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
 	if (!s_shaderDVLB)
@@ -569,6 +599,7 @@ bool c3d_renderer_init(void)
 
 void c3d_renderer_cleanup(void)
 {
+	c3d_trace("c3d_renderer_cleanup: called");
 	if (s_shaderReady)
 	{
 		shaderProgramFree(&s_shaderProgram);

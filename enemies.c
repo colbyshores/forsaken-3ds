@@ -4292,6 +4292,42 @@ bool PreLoadEnemies( void )
 			fread( &Formationlink, sizeof( int16_t ), 1, fp );
 			fread( &GenerationDelay, sizeof( float ), 1, fp );
 
+			/* Forsaken Remastered's .nme files reference enemy IDs from
+			 * the Remaster's expanded roster (n64Enemies, etc.) that go
+			 * up to 108. Our 1998 Enemies.txt only populates indices
+			 * 0..21 inside an array of MAX_ENEMY_TYPES=56 slots, and
+			 * any further IDs would either index past the array (UB)
+			 * or hit a slot whose ModelFilename pointer was never
+			 * initialized (NULL deref on the [0] check below).
+			 *
+			 * Substitute the OOB ModelNum with the first populated
+			 * slot rather than continue-skipping. Skipping leaves a
+			 * spawn hole that the level's goal handler / AI may try
+			 * to dereference (e.g., defend2's Protect-Drone goal
+			 * crashes in AI_SPLINE_FOLLOWPATH when the drone is
+			 * absent â€” diagnosed via Luma3DS dump on hardware). The
+			 * substituted spawn looks visually wrong but the entity
+			 * exists for downstream code to find. */
+			if( ModelNum >= MAX_ENEMY_TYPES ||
+			    EnemyTypes[ ModelNum ].ModelFilename == NULL )
+			{
+				int j, fallback = -1;
+				for( j = 0; j < MAX_ENEMY_TYPES; j++ )
+				{
+					if( EnemyTypes[ j ].ModelFilename &&
+					    EnemyTypes[ j ].ModelFilename[ 0 ] )
+					{ fallback = j; break; }
+				}
+#ifdef __3DS__
+				{ extern void trace(const char*); char _b[160];
+				  snprintf(_b, sizeof(_b),
+				    "PreLoadEnemies: enemy[%d/%d] ModelNum=%d -> fallback=%d",
+				    Count, NumInitEnemies, ModelNum, fallback); trace(_b); }
+#endif
+				if( fallback < 0 ) continue;  /* nothing populated at all */
+				ModelNum = fallback;
+			}
+
 			if( EnemyTypes[ ModelNum ].ModelFilename[ 0 ] )
 			{
 
@@ -4504,6 +4540,25 @@ bool LoadEnemies( void )
 			fread( &GenerationDelay, sizeof( float ), 1, fp );
 
 			ModelNum = EnemyType;
+
+			/* Substitute, don't skip â€” see PreLoadEnemies for rationale.
+			 * Skipping the spawn leaves goal handlers / AI controllers
+			 * with dangling references that crash on first tick
+			 * (defend2 Protect-Drone case). */
+			if( ModelNum >= MAX_ENEMY_TYPES ||
+			    EnemyTypes[ ModelNum ].ModelFilename == NULL )
+			{
+				int j, fallback = -1;
+				for( j = 0; j < MAX_ENEMY_TYPES; j++ )
+				{
+					if( EnemyTypes[ j ].ModelFilename &&
+					    EnemyTypes[ j ].ModelFilename[ 0 ] )
+					{ fallback = j; break; }
+				}
+				if( fallback < 0 ) continue;
+				ModelNum = fallback;
+				EnemyType = fallback;
+			}
 
 			if( (EnemyType != ENEMY_Boss_Exogenon) || (Exogenon_Num_StartPos == 0) )
 			{
@@ -6312,9 +6367,9 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 			Enemy->TShip = NULL;
 		}
 	}
-/*===================================================================ÄÄÄÄ
+/*===================================================================ï¿½ï¿½ï¿½ï¿½
 			Set the Banking Matrix
-/*===================================================================ÄÄÄÄ*/
+/*===================================================================ï¿½ï¿½ï¿½ï¿½*/
 	MakeQuat( 0.0F , 0.0F , Object->Bank, &StepQuat );
 	QuatMultiply(  &Object->Quat , &StepQuat , &Object->FinalQuat );
 	QuatToMatrix( &Object->FinalQuat, &Object->FinalMat );

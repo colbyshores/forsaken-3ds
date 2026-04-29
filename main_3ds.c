@@ -87,22 +87,46 @@ void platform_delay(u_int32_t ms)
 
 /* ---- debug trace (writes to sdmc so Mandarine can show it) ---- */
 
-#ifdef __3DS_DEBUG__
-/* Tracing: use low-level write() to bypass stdio buffering.
-   Opens once when trace_enable() is called. */
+/* Tracing: use low-level write() to bypass stdio buffering. Compiles
+ * unconditionally — the production EDITION=remaster build doesn't
+ * define __3DS_DEBUG__ but still needs the post-crash trace to survive
+ * on SD for diagnosis. Cost when nothing's broken is ~200 bytes of
+ * writes per level load (one open, a handful of writes + one fsync per
+ * checkpoint). Negligible.
+ *
+ * Truncation policy: the file is truncated EXACTLY ONCE per process
+ * lifetime, on the very first call to either trace_enable() or trace().
+ * Subsequent re-opens (e.g., after a trace_dump() close) use O_APPEND so
+ * we don't lose what was written before the close. Without this, the
+ * autotest's "DONE -> trace_dump() -> chain-load" path was wiping the
+ * whole trace because platform_shutdown's later trace() call would
+ * re-open with O_TRUNC. */
 #include <fcntl.h>
-static int _trace_fd = -1;
-static int _trace_enabled = 0;
+static int  _trace_fd = -1;
+static int  _trace_enabled = 0;
+static int  _trace_truncated_once = 0;
+
+static void _trace_open(void) {
+	int flags = O_WRONLY | O_CREAT |
+	            (_trace_truncated_once ? O_APPEND : O_TRUNC);
+	_trace_fd = open("sdmc:/forsaken_trace.txt", flags, 0666);
+	_trace_truncated_once = 1;
+}
 
 void trace_enable(void) {
 	_trace_enabled = 1;
-	if (_trace_fd < 0) {
-		_trace_fd = open("sdmc:/forsaken_trace.txt", O_WRONLY|O_CREAT|O_TRUNC, 0666);
-	}
+	if (_trace_fd < 0) _trace_open();
 }
 
 void trace(const char *msg)
 {
+	/* Auto-open the trace file on first call even if trace_enable()
+	 * hasn't been called yet, so unsolicited trace points (e.g. a
+	 * checkpoint deep inside the loader) still survive a crash. */
+	if (_trace_fd < 0) {
+		_trace_open();
+		_trace_enabled = 1;
+	}
 	svcOutputDebugString(msg, strlen(msg));
 	if (_trace_enabled && _trace_fd >= 0) {
 		int len = strlen(msg);
@@ -113,13 +137,12 @@ void trace(const char *msg)
 }
 
 void trace_dump(void) {
-	if (_trace_fd >= 0) { close(_trace_fd); _trace_fd = -1; }
+	/* Flush only — don't close. Re-opens with O_APPEND would still
+	 * preserve content per the truncated-once policy, but keeping the
+	 * fd open avoids the open()/close() cost on chain-load paths that
+	 * call trace() again immediately afterward. */
+	if (_trace_fd >= 0) fsync(_trace_fd);
 }
-#else
-void trace_enable(void) {}
-void trace(const char *msg) { (void)msg; }
-void trace_dump(void) {}
-#endif
 
 /* Runtime flag — when true, DrawSimplePanel prints raw 3D-slider value,
  * stereo_eye_sep, and the on/off state so we can diagnose binary-seeming
@@ -176,8 +199,44 @@ bool platform_init(void)
 
 	trace("platform_init: romfsInit");
 
-	/* Initialize romfs - game data is embedded in the 3DSX */
-	romfsInit();
+	/* romfs precedence: try the .3dsx's embedded romfs FIRST. If that
+	 * fails (slim build with no embedded section), fall back to
+	 * sdmc:/3ds/forsaken/forsaken.romfs.
+	 *
+	 * Why this order: the embedded romfs ships in lock-step with the
+	 * code, so a FULL build always boots a self-consistent dataset.
+	 * The SD file is a long-lived blob from a previous SLIM iteration
+	 * and can drift behind the code (e.g., a level-list update only
+	 * landed in the last build's romfs). Letting it win silently led
+	 * to autotest cycling 1998 SP slots even with an EDITION=remaster
+	 * code build.
+	 *
+	 * Production CIA installs never set up the SD file, so they hit
+	 * the embedded path on the first try — behaviour unchanged. */
+	{
+		Result rc = romfsInit();
+		if (R_SUCCEEDED(rc)) {
+			trace("platform_init: using embedded romfs");
+		} else {
+			trace("platform_init: no embedded romfs, trying sdmc fallback");
+			static const u16 ext_path[] = u"/3ds/forsaken/forsaken.romfs";
+			FS_Path apath = { PATH_EMPTY, 1, (u8*)"" };
+			FS_Path fpath = { PATH_UTF16, sizeof(ext_path), (u8*)ext_path };
+			Handle fh = 0;
+			rc = FSUSER_OpenFileDirectly(&fh, ARCHIVE_SDMC, apath, fpath, FS_OPEN_READ, 0);
+			if (R_SUCCEEDED(rc)) {
+				rc = romfsMountFromFile(fh, 0, "romfs");
+				if (R_SUCCEEDED(rc)) {
+					trace("platform_init: mounted external sdmc romfs");
+				} else {
+					FSFILE_Close(fh);
+					trace("platform_init: ERROR — sdmc romfs mount failed");
+				}
+			} else {
+				trace("platform_init: ERROR — no romfs available");
+			}
+		}
+	}
 
 	/* Set working directory so relative paths (Data/, Configs/) resolve */
 	chdir("romfs:/");
@@ -203,6 +262,7 @@ bool platform_init(void)
 
 bool platform_init_video(void)
 {
+	trace("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
 	trace("platform_init_video: gfxInitDefault");
 
 	/* Initialize 3DS graphics service (GSP) - required before picaGL.
@@ -334,10 +394,33 @@ float platform_get_3d_slider(void)
 
 /* ---- frame present ---- */
 
+#ifdef VERBOSE_TRACE
+/* Counter armed by autotest_tick before a hot-jump. Decremented on each
+ * frame present so we get enter/exit traces around the first ~8 swaps
+ * after the transition — enough to see if the GPU hangs in pglSwapBuffers
+ * or if we stop entering present at all. */
+int _vt_flip_remaining = 0;
+#endif
+
 void platform_render_present(render_info_t *info)
 {
 	(void)info;
+#ifdef VERBOSE_TRACE
+	if (_vt_flip_remaining > 0) {
+		char _b[48];
+		snprintf(_b, sizeof(_b), "FLIP: enter (%d left)", _vt_flip_remaining);
+		trace(_b);
+	}
 	pglSwapBuffers();
+	if (_vt_flip_remaining > 0) {
+		char _b[48];
+		snprintf(_b, sizeof(_b), "FLIP: exit (%d left)", _vt_flip_remaining);
+		trace(_b);
+		_vt_flip_remaining--;
+	}
+#else
+	pglSwapBuffers();
+#endif
 }
 
 /* ---- shutdown ---- */

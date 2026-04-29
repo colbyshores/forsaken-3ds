@@ -22,6 +22,7 @@ build_3ds/
 forsaken3ds.*
 .romfs_staging/
 .romfs_staging_cia/
+forsaken.romfs
 forsaken_*.log
 
 # ---- PC build artifacts ----

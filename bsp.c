@@ -282,12 +282,21 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[160];
+	  snprintf(_b, sizeof(_b), "Bspload: enter file=%s", Filename); trace(_b); }
+#endif
+
 	Bsp_Header->State = false;
 
-	File_Size = Get_File_Size( Filename );	
+	File_Size = Get_File_Size( Filename );
 	if( !File_Size )
 	{
 		Msg( "Bspload() no BSP file %s", Filename );
+#ifdef __3DS__
+		{ extern void trace(const char*); char _b[160];
+		  snprintf(_b, sizeof(_b), "Bspload: FAIL file_size=0 file=%s", Filename); trace(_b); }
+#endif
 		return false;
 	}
 
@@ -309,29 +318,51 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != BSP_VERSION_NUMBER  ) )
 	{
 		Msg( "Bspload() Incompatible BSP file %s", Filename );
+#ifdef __3DS__
+		{ extern void trace(const char*); char _b[160];
+		  snprintf(_b, sizeof(_b), "Bspload: FAIL bad magic file=%s", Filename); trace(_b); }
+#endif
 		return( false );
 	}
 	int16_tpnt = ( int16_t * ) Buffer;
 	Bsp_Header->NumGroups = *int16_tpnt++;
 	Buffer = (char * ) int16_tpnt;
 
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[96];
+	  snprintf(_b, sizeof(_b), "Bspload: NumGroups=%d", Bsp_Header->NumGroups); trace(_b); }
+#endif
+
 	for( i = 0 ; i < Bsp_Header->NumGroups ; i++ )
 	{
 		if ( !BSP_Loadtree( &Bsp_Header->Bsp_Tree[ i ], &Buffer ) )
 		{
+#ifdef __3DS__
+			{ extern void trace(const char*); char _b[96];
+			  snprintf(_b, sizeof(_b), "Bspload: FAIL BSP_Loadtree group=%d", i); trace(_b); }
+#endif
 			return false;
 		}
 	}
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("Bspload: BSP_Loadtree all groups OK"); }
+#endif
 	free( OrgBuffer );
 
 #endif
 	Bsp_Header->State = true;
 
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("Bspload: -> BSP_LoadPortals"); }
+#endif
 #ifdef BSP_ONLY
 	if ( !BSP_LoadPortals( Filename ) )
 		return false;
 #else
 	BSP_LoadPortals( Filename );
+#endif
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("Bspload: success"); }
 #endif
 
 	return true;

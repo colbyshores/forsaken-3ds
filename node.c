@@ -192,8 +192,38 @@ bool Nodeload( char * Filename )
 		
 		if( NodePnt->NumOfLinks > MAXLINKSPERNODE )
 		{
+#ifdef EDITION_REMASTER
+			/* Forsaken Remastered's .NOD files raise the per-node link
+			 * cap above the 1998 engine's MAXLINKSPERNODE=16 (e.g.
+			 * starship has nodes with 17–18 links). Proper port would
+			 * bump MAXLINKSPERNODE in node.h and resize the NODE struct
+			 * (including all NodeLink array uses + serialization paths);
+			 * for the autotest sweep we keep the first 16 links and skip
+			 * the rest so AI pathing is degraded rather than the level
+			 * failing to load entirely. */
+			{
+				extern void trace(const char*);
+				char _b[160];
+				snprintf(_b, sizeof(_b),
+				         "NODES: clamping node[%d] NumOfLinks=%d -> %d (file=%s)",
+				         (int)e, (int)NodePnt->NumOfLinks, (int)MAXLINKSPERNODE, Filename);
+				trace(_b);
+			}
+			int over = NodePnt->NumOfLinks - MAXLINKSPERNODE;
+			NodePnt->NumOfLinks = MAXLINKSPERNODE;
+			int32Pnt = (int32_t*) int16Pnt;
+			for( o = 0 ; o < MAXLINKSPERNODE ; o++ )
+			{
+				NodePnt->NodeLink[o] = NodeNetworkHeader.FirstNode + *int32Pnt++;
+			}
+			/* skip the extra link IDs in the file */
+			int32Pnt += over;
+			int16Pnt = (int16_t*) int32Pnt;
+			goto _skipped_extra_links;
+#else
 			Msg( "NoadLoad failed too many Nodelinks in network , Node %d \n", e );
 			return false;
+#endif
 		}
 		if( !NodePnt->NumOfLinks )
 		{
@@ -202,9 +232,12 @@ bool Nodeload( char * Filename )
 		int32Pnt = (int32_t*) int16Pnt;
 		for( o = 0 ; o < NodePnt->NumOfLinks ; o++ )
 		{
-			
+
 			NodePnt->NodeLink[o] = NodeNetworkHeader.FirstNode + *int32Pnt++;
 		}
+#ifdef EDITION_REMASTER
+_skipped_extra_links: ;
+#endif
 
 		NodePnt->SolidPos = NodePnt->Pos;
 		// we need a Point on the background that is below the Node...

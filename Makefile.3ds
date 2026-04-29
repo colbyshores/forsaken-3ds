@@ -121,6 +121,27 @@ ifeq ($(EDITION),remaster)
 CFLAGS += -DEDITION_REMASTER
 endif
 
+# AUTOTEST_REMASTER=1 is a hardware-iteration helper. With it set, the
+# build autoboots into mission.dat[5] (defend2 — first new SP slot)
+# and cycles through the rest of the SP campaign one minute per level,
+# tracing each transition to sdmc:/forsaken_trace.txt and chain-loading
+# back to sdmc:/3ds/netload_stub.3dsx after the last level. Used to
+# validate Remaster levels without manual menu navigation.
+ifeq ($(AUTOTEST_REMASTER),1)
+CFLAGS += -DAUTOTEST_REMASTER
+endif
+
+# VERBOSE_TRACE=1 enables the TR() / TRMSG() macros in main.h. Lots of
+# trace points get sprinkled through the loaders so a crash leaves the
+# last reached point visible at the tail of sdmc:/forsaken_trace.txt.
+# Tanks framerate + bloats the log — fine for crash bisection on
+# hardware, off for production. Macros expand to do-nothing when this
+# flag is absent so the trace points stay sprinkled in source without
+# perf cost on shipping builds.
+ifeq ($(VERBOSE_TRACE),1)
+CFLAGS += -DVERBOSE_TRACE
+endif
+
 # Include paths - note isystem for the source dir so #include <header.h> works
 CFLAGS += -isystem $(SRCDIR) \
 	-I$(SRCDIR) \
@@ -268,9 +289,24 @@ $(OUTPUT_SMDH):
 	@echo "Creating SMDH..."
 	smdhtool --create "Forsaken" "3DS port of ForsakenX" "ForsakenX" $(SMDH_ICON) $@
 
+ifeq ($(SLIM),1)
+# SLIM=1: build a tiny .3dsx (no embedded romfs) plus a separate
+# forsaken.romfs file. Used for the iteration loop — push the small
+# .3dsx via 3dslink (~5 MB / ~12 sec) and keep the romfs uploaded
+# once at sdmc:/3ds/forsaken/forsaken.romfs. The engine's
+# platform_init() prefers the SD romfs over the embedded one.
+$(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP) forsaken.romfs
+	@echo "Creating slim 3DSX (no embedded romfs)..."
+	3dsxtool $< $@ --smdh=$(OUTPUT_SMDH)
+
+forsaken.romfs: $(ROMFS_STAMP)
+	@echo "Building standalone forsaken.romfs..."
+	$(DEVKITPRO)/tools/bin/mkromfs3ds $(ROMFS_STAGING) $@
+else
 $(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP)
 	@echo "Creating 3DSX..."
 	3dsxtool $< $@ --smdh=$(OUTPUT_SMDH) --romfs=$(ROMFS_STAGING)
+endif
 
 $(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
 	@echo "Linking $(notdir $@)..."

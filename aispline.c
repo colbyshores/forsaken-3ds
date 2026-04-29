@@ -62,6 +62,26 @@ void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
 		//We have to start
 		TNode = Enemy->Object.NearestNode;
 
+		/* Defensive: NearestNode can be NULL when an enemy spawns at a
+		 * position the node-network builder didn't tag (e.g., Remaster
+		 * level data with sparse nodes around the spawn). Initialising
+		 * SplineNode2 to NULL then taking &Node2->Pos a few lines down
+		 * dereferences NULL — diagnosed via Luma3DS arm11 crash dump
+		 * (PC=DistanceVector2Vector, FAR=0x0c) on defend2's first
+		 * gameplay frame. Bail out cleanly instead. AI_THINK is still
+		 * called by the per-frame caller; the enemy just won't move
+		 * along a spline this frame. */
+		if (!TNode)
+		{
+			extern void trace(const char*);
+			char _b[128];
+			snprintf(_b, sizeof(_b),
+			    "AI_SPLINE_FOLLOWPATH: SKIP enemy Type=%d Pos=%.1f,%.1f,%.1f (NearestNode=NULL)",
+			    Enemy->Type, Enemy->Object.Pos.x, Enemy->Object.Pos.y, Enemy->Object.Pos.z);
+			trace(_b);
+			return;
+		}
+
 		Enemy->SplineNode1 = (void*) TNode;
 		Enemy->SplineNode2 = (void*) TNode;
 		Node1 = (NODE*)Enemy->SplineNode1;
@@ -76,6 +96,12 @@ void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
 	Node3 = (NODE*)Enemy->SplineNode3;
 	Node4 = (NODE*)Enemy->SplineNode4;
 
+	/* Same defensive bail: any of Node1..Node4 could be NULL if
+	 * FindSuitableSplineNode hit the early "NodeNetworkHeader.State
+	 * false" return (or the network was loaded but the per-enemy
+	 * starting node wasn't reached). All four are dereferenced
+	 * unconditionally below. */
+	if (!Node1 || !Node2 || !Node3 || !Node4) return;
 
 	WantedDistance = (EnemyTypes[Enemy->Type].MaxMoveRate*0.65F) * framelag;
 
@@ -106,6 +132,9 @@ void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
 			
 			Enemy->SplineNode4 = (void*) FindSuitableSplineNodeRandom( Enemy->Object.NodeNetwork ,Node3 , Node1 , Node2 , Node3 , NULL );
 			Node4 = (NODE*)Enemy->SplineNode4;
+			/* Defensive: FindSuitableSplineNodeRandom can return NULL.
+			 * Node4 is dereferenced via &Node4->Pos in spline() below. */
+			if (!Node4) return;
 			Tstep = ( WantedDistance / DistanceVector2Vector( &Node2->Pos , &Node3->Pos ) ) * 0.1F;
 
 			if( Node3 && (Node3->Flags&NODE_TERMINATE) )

@@ -853,6 +853,12 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 	VECTOR		TopLeft;
 	VECTOR		BottomRight;
 
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[96];
+	  snprintf(_b, sizeof(_b), "InitModel: enter (MAXMODELHEADERS=%d)", MAXMODELHEADERS);
+	  trace(_b); }
+#endif
+
 	for( i = 0 ; i < MAXMODELHEADERS ; i++ )
 	{
 		if( NamePnt->Name[0] != 0 )
@@ -861,11 +867,24 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 			{
 				strcpy( &TempFilename[0], NamePnt->Name );
 
+#ifdef __3DS__
+				{ extern void trace(const char*); char _b[256];
+				  snprintf(_b, sizeof(_b), "InitModel: i=%d morph=%d name=%.180s",
+				           i, (int)NamePnt->DoIMorph, NamePnt->Name); trace(_b); }
+#endif
+
 				if( NamePnt->DoIMorph )
 				{
 //					DebugPrintf( "Loading MXA File %s\n", &TempFilename[ 0 ] );
 
-					if( !Mxaload( &TempFilename[0] , &MxaModelHeaders[i], NamePnt->StoreTriangles ) ) return false;	// the model and visipoly data
+					if( !Mxaload( &TempFilename[0] , &MxaModelHeaders[i], NamePnt->StoreTriangles ) ) {
+#ifdef __3DS__
+						{ extern void trace(const char*); char _b[256];
+						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxaload i=%d name=%.180s",
+						           i, NamePnt->Name); trace(_b); }
+#endif
+						return false;	// the model and visipoly data
+					}
 					ModelHeaders[i].LOD = NamePnt->LOD;
 
 					TopLeft = TempVector;
@@ -882,7 +901,14 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 				{
 //					DebugPrintf( "Loading MX File %s\n", &TempFilename[ 0 ] );
 
-					if( !Mxload( &TempFilename[0] , &ModelHeaders[i] , NamePnt->Panel, NamePnt->StoreTriangles) ) return false;	// the model and visipoly data
+					if( !Mxload( &TempFilename[0] , &ModelHeaders[i] , NamePnt->Panel, NamePnt->StoreTriangles) ) {
+#ifdef __3DS__
+						{ extern void trace(const char*); char _b[256];
+						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxload i=%d name=%.180s",
+						           i, NamePnt->Name); trace(_b); }
+#endif
+						return false;	// the model and visipoly data
+					}
 					ModelHeaders[i].LOD = NamePnt->LOD;
 
 					TopLeft = TempVector;
@@ -901,6 +927,10 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 		}
 		else break;
 	}
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[64];
+	  snprintf(_b, sizeof(_b), "InitModel: done after i=%d", i); trace(_b); }
+#endif
 	return	true;
 }
 

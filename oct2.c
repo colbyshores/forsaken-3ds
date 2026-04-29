@@ -2376,6 +2376,16 @@ bool RenderScene( void )
 
   //DebugPrintf("RenderScene Started\n");
 
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+  { extern void trace(const char*); extern int _vt_flip_remaining;
+    if (_vt_flip_remaining > 0) {
+      char _b[64];
+      snprintf(_b, sizeof(_b), "RS: entry status=%u SeriousError=%d", (unsigned)MyGameStatus, (int)SeriousError);
+      trace(_b);
+    }
+  }
+#endif
+
   if ( SeriousError )
     return false;
 
@@ -2574,12 +2584,14 @@ bool RenderScene( void )
   case STATUS_Title:
 	DebugState("STATUS_Title\n");
 
-#if defined(__3DS_DEBUG__) || defined(DEBUG_ON)
+#if defined(__3DS_DEBUG__) || defined(DEBUG_ON) || defined(AUTOTEST_REMASTER)
   {
-    /* Auto-boot directly to Volcano level (NewLevelNum=0).
-     * Runs DisplayTitle() for N frames first so it can complete its
-     * one-time initialization (title models, HoloModel, etc.), then
-     * calls StartASinglePlayerGame() to skip manual menu navigation. */
+    /* Auto-boot directly into a level. Default target = Volcano
+     * (NewLevelNum=0). With AUTOTEST_REMASTER set, target becomes the
+     * first new Remaster slot (defend2). Either way: run DisplayTitle()
+     * for N frames first so it can complete its one-time initialization
+     * (title models, HoloModel, etc.), then call StartASinglePlayerGame()
+     * to skip manual menu navigation. */
     static int _autoboot_frames = 0;
     extern bool StartASinglePlayerGame(MENUITEM*);
 #ifdef __3DS__
@@ -2595,15 +2607,28 @@ bool RenderScene( void )
         break;
     }
     DebugPrintf("autoboot: calling StartASinglePlayerGame\n");
+    VduClear();
+    input_buffer_reset();
+    StartASinglePlayerGame(NULL);
+    /* StartASinglePlayerGame -> InitLevels(SINGLEPLAYER_LEVELS) resets
+     * NewLevelNum to 0 as a side effect (singleplayer.c:99). Apply our
+     * desired starting level AFTER the call so it survives. */
+#ifdef AUTOTEST_REMASTER
+    {
+      extern int autotest_first_level(void);
+      NewLevelNum = autotest_first_level();
+      extern void trace(const char*);
+      char _b[96]; snprintf(_b, sizeof(_b),
+        "AUTOTEST: autoboot override -> NewLevelNum=%d", (int)NewLevelNum); trace(_b);
+    }
+#else
     NewLevelNum = 0;   /* Volcano level (vol2, first in levels.dat) */
     /* Start at checkpoint 1 (lava tube area) for easier debugging */
     {
         extern u_int16_t last_start_position;
         last_start_position = 1;
     }
-    VduClear();
-    input_buffer_reset();
-    StartASinglePlayerGame(NULL);
+#endif
     break;
   }
 #endif
@@ -3384,6 +3409,11 @@ bool RenderScene( void )
     InitPortalExecs();
     InitRenderBufs();
 
+#ifdef __3DS__
+	{ extern void trace(const char*); char _b[96];
+	  snprintf(_b, sizeof(_b), "IV0: InitTload start (LevelNum=%d name=%s)",
+	           LevelNum, LevelNames[LevelNum]); trace(_b); }
+#endif
     // Init the Texture Handler
     if( !InitTload( &Tloadheader ) )
     {
@@ -3391,6 +3421,9 @@ bool RenderScene( void )
       Msg( "InitTLoad failed\n" );
       return false;
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: InitTload OK -> PreMload"); }
+#endif
 
     //  Prep the Texture Handler.....
     if( !PreMload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
@@ -3398,52 +3431,88 @@ bool RenderScene( void )
       SeriousError = true;
       return false; // the model and visipoly data
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: PreMload OK -> PreWaterLoad"); }
+#endif
 
     // Can Cope with no .Wat file!!!
     PreWaterLoad( (char*) &WaterNames[LevelNum][0] );
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: PreWaterLoad OK"); }
+#endif
 
     if( OnceOnlyChangeLevel )
     {
       OnceOnlyChangeLevel = false;
+#ifdef __3DS__
+	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadShips"); }
+#endif
       if( !PreLoadShips() )
       {
         SeriousError = true;
         return false;
       }
+#ifdef __3DS__
+	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadBGOFiles"); }
+#endif
       if( !PreLoadBGOFiles() )
       {
         SeriousError = true;
         return false;
       }
+#ifdef __3DS__
+	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadRestartPoints"); }
+#endif
       if( !PreLoadRestartPoints() )
       {
         SeriousError = true;
         return false;
       }
+#ifdef __3DS__
+	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadEnemies"); }
+#endif
       if( !PreLoadEnemies() )
       {
         SeriousError = true;
         return false;
       }
+#ifdef __3DS__
+	  { extern void trace(const char*); trace("IV0: OnceOnly done"); }
+#endif
     }
 
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: EnableRelavantModels"); }
+#endif
     EnableRelavantModels( &ModelNames[0] );
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: EnableRelavantModels OK -> PreInitModel"); }
+#endif
 		if( !PreInitModel( /*lpDev,*/ &ModelNames[0] ) ) // bjd
 		{
 			SeriousError = true;
 			return false;
 		}
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: PreInitModel OK -> Load_All_Off_Files"); }
+#endif
 		if( !Load_All_Off_Files( &OffsetFiles[ 0 ] ) )
 		{
 			SeriousError = true;
 			return false;
 		}
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: Load_All_Off_Files OK -> Tload"); }
+#endif
     //  Load in And if nescessary ReScale Textures...
     if( !Tload( &Tloadheader ) )
     {
       SeriousError = true;
       return false;
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: Tload OK"); }
+#endif
 
 /*
     MyGameStatus = STATUS_InitView_2;
@@ -3532,10 +3601,14 @@ bool RenderScene( void )
       return false; // the model and visipoly data
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Mload OK"); }
+	{ extern void trace(const char*); trace("IV0: Mload OK -> InitVisiStats"); }
 #endif
 
     InitVisiStats( &Mloadheader );
+
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: InitVisiStats OK -> Bspload"); }
+#endif
 
 /*
     MyGameStatus = STATUS_InitView_5;
@@ -3576,6 +3649,9 @@ bool RenderScene( void )
 #endif
     Bsp_Header[ 1 ].State = false; // no non-zero .BSP any more
 #endif
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: Bspload OK -> WaterLoad"); }
+#endif
 	//    if ( !Bsp_Duplicate( &Bsp_Header[ 0 ], &Bsp_Original ) )
 	//    {
 	//		    SeriousError = true;
@@ -3585,25 +3661,40 @@ bool RenderScene( void )
     
     // might not be any water...
     WaterLoad();
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: WaterLoad OK -> ReadTxt/MsgFile"); }
+#endif
 
     ReadTxtFile( (char*) &TextNames[LevelNum][0] );
 
     ReadMsgFile( (char*) &MsgNames[LevelNum][0] );
 
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: TxtMsg OK -> MCload"); }
+#endif
     if( !MCload( (char*) &CollisionNames[LevelNum][0] , &MCloadheader ) )
     {
       SeriousError = true;
       Msg( "MCload non zero failed\n" );
       return false;   // the collision data
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: MCload nz OK -> MCload zero"); }
+#endif
     if( !MCload( (char*) &CollisionZNames[LevelNum][0] , &MCloadheadert0 ) )
     {
       SeriousError = true;
       Msg( "MCload zero failed\n" );
       return false; // the collision data skin thickness 0
     }
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: MCload zero OK -> SetUpShips"); }
+#endif
 
     SetUpShips();
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("IV0: SetUpShips OK"); }
+#endif
 
 /*
     MyGameStatus = STATUS_InitView_6;
@@ -3921,6 +4012,9 @@ bool RenderScene( void )
 
   case  STATUS_PostStartingSinglePlayer:
 	DebugState("STATUS_PostStartingSinglePlayer\n");
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("PSP: entry"); }
+#endif
 
 #ifdef __3DS__
     /* [3DS] Second black-frame clear — flushes the remaining GX display buffer.
@@ -3963,7 +4057,13 @@ bool RenderScene( void )
     _gameplay_start_guard = true;  /* arm one-shot for STATUS_SinglePlayer */
 #endif
 
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("PSP: -> smallinitShip"); }
+#endif
     smallinitShip( WhoIAm );
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("PSP: smallinitShip OK"); }
+#endif
 	//    if( CountDownOn )
 	//    {
 	//      CreateCountdownDigits();
@@ -3976,6 +4076,9 @@ bool RenderScene( void )
 
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("PSP: -> STATUS_SinglePlayer"); }
+#endif
     LevelTimeTaken = 0.0F;
     timer_run( &level_time );
 
@@ -3986,6 +4089,11 @@ bool RenderScene( void )
 
   case STATUS_SinglePlayer:
 	DebugState("STATUS_SinglePlayer\n");
+
+#ifdef __3DS__
+	{ static int _sp_first = 1; extern void trace(const char*);
+	  if (_sp_first) { _sp_first = 0; trace("SP: first frame entry"); } }
+#endif
 
 #ifdef __3DS__
     /* [3DS] One-shot guard: on the very first STATUS_SinglePlayer frame, clear
@@ -4010,8 +4118,25 @@ bool RenderScene( void )
     }
 #endif
 
+#ifdef __3DS__
+	{ static int _mg_first = 1; extern void trace(const char*);
+	  if (_mg_first) { _mg_first = 0; trace("SP: -> MainGame (first frame)"); } }
+#endif
     if( MainGame() != true ) // bjd
       return false;
+#ifdef __3DS__
+	{ static int _mg_first_done = 1; extern void trace(const char*);
+	  if (_mg_first_done) { _mg_first_done = 0; trace("SP: MainGame OK (first frame)"); } }
+#endif
+
+#ifdef AUTOTEST_REMASTER
+    /* Per-gameplay-frame tick of the autonomous level cycler. Runs after
+     * MainGame() so the level is fully initialised before its frame is
+     * counted. autotest_tick() advances NewLevelNum and forces LevelNum
+     * = -1 once the dwell expires (the existing "if NewLevelNum != LevelNum"
+     * branch below picks that up and triggers ReleaseView/InitView). */
+    { extern void autotest_tick(void); autotest_tick(); }
+#endif
 
 #ifdef __3DS__
     _3ds_mr_ctx = "post-MainGame";
@@ -6170,19 +6295,98 @@ void PrintInitViewStatus( BYTE Status )
 {
 	int i;
 	RENDEROBJECT ro;
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	{ extern void trace(const char*); extern int _vt_flip_remaining;
+	  if (_vt_flip_remaining > 0) {
+	    char _b[64];
+	    snprintf(_b, sizeof(_b), "PIVS: enter status=%u", (unsigned)Status);
+	    trace(_b);
+	  }
+	}
+#endif
 	ZERO_STACK_MEM(ro);
-	FSCreateDynamic2dVertexBuffer(&ro, 32767);
-	FSCreateIndexBuffer(&ro, 32767*3);
+	{
+		bool _vok = FSCreateDynamic2dVertexBuffer(&ro, 32767);
+		bool _iok = FSCreateIndexBuffer(&ro, 32767*3);
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+		{ extern void trace(const char*); extern int _vt_flip_remaining;
+		  if (_vt_flip_remaining > 0) {
+		    char _b[64];
+		    snprintf(_b, sizeof(_b), "PIVS: alloc v=%d i=%d", (int)_vok, (int)_iok);
+		    trace(_b);
+		  }
+		}
+#endif
+		/* If either allocation failed (linear heap exhausted/fragmented),
+		 * skip the draw rather than feeding NULL buffers into the renderer. */
+		if (!_vok || !_iok) {
+			FSReleaseRenderObject(&ro);
+			render_flip(&render_info);
+			return;
+		}
+	}
 	for( i = 0 ; i < ( Status - STATUS_InitView_0 )+1 ; i ++ )
 		CenterPrint4x5Text(
 			InitViewMessages[i],
-			( render_info.window_size.cy >> 2 ) + 
-			( i * ( FontHeight + ( FontHeight>>1 ) ) ) , 
+			( render_info.window_size.cy >> 2 ) +
+			( i * ( FontHeight + ( FontHeight>>1 ) ) ) ,
 			GREEN );
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	{ extern void trace(const char*); extern int _vt_flip_remaining;
+	  if (_vt_flip_remaining > 0) {
+	    extern u_int16_t FirstScrPolyUsed;
+	    extern TPAGEINFO ScrPolyTPages[];
+	    /* Scan every TPage. ScrPolyTPages has MAXTPAGESPERTLOAD+1 entries
+	     * (51 total). My earlier probe only looked at index 0, but
+	     * ScrPolyDispNonSolid iterates the full range. If any TPage holds
+	     * polys, TotalVerts > 0 and the early-exit at screenpolys.c:2825
+	     * is not taken — we fall through to draw_2d_object → draw_render_object
+	     * → C3D_DrawArrays, matching the stack walk from crash dump _17. */
+	    int nz = 0;
+	    int firstNz = -1;
+	    for (int t = 0; t <= 50; t++) {
+	      if (ScrPolyTPages[t].FirstPoly != (u_int16_t)-1) {
+	        if (firstNz < 0) firstNz = t;
+	        nz++;
+	      }
+	    }
+	    char _b[160];
+	    snprintf(_b, sizeof(_b),
+	             "PIVS: pre-DisplayScrPolys FirstUsed=%u TPnz=%d firstNzTP=%d firstNzPoly=%u",
+	             (unsigned)FirstScrPolyUsed, nz, firstNz,
+	             firstNz >= 0 ? (unsigned)ScrPolyTPages[firstNz].FirstPoly : 65535);
+	    trace(_b);
+
+	    /* WORKAROUND: if FirstScrPolyUsed shows the used list is empty but
+	     * a TPage still references a poly, the engine's TPage state is
+	     * inconsistent — InitScrPolys cleared the used list and TPages but
+	     * something reset only ScrPolyTPages[N].FirstPoly between the
+	     * InitScrPolys call and now. Walking that stale pointer in
+	     * ScrPolyDispNonSolid gives bogus NumVerts and crashes the GPU
+	     * command buffer in draw_2d_object. Re-clear all TPages here so
+	     * DisplayScrPolys becomes a clean no-op. */
+	    if (FirstScrPolyUsed == (u_int16_t)-1 && nz > 0) {
+	      extern void InitScrPolyTPages(void);
+	      trace("PIVS: stale TPage detected, calling InitScrPolyTPages");
+	      InitScrPolyTPages();
+	    }
+	  }
+	}
+#endif
 	DisplayNonSolidScrPolys(&ro);
 	DisplaySolidScrPolys(&ro);
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	{ extern void trace(const char*); extern int _vt_flip_remaining;
+	  if (_vt_flip_remaining > 0) trace("PIVS: post-DisplayScrPolys");
+	}
+#endif
 	FSReleaseRenderObject(&ro);
 	render_flip(&render_info);
+#if defined(VERBOSE_TRACE) && defined(__3DS__)
+	{ extern void trace(const char*); extern int _vt_flip_remaining;
+	  if (_vt_flip_remaining > 0) trace("PIVS: exit");
+	}
+#endif
 }
 
 /*===================================================================
