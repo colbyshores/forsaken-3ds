@@ -791,15 +791,22 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 	int8_t		TempFilename[ 256 ];
 	int8_t		Ext[ 32 ];
 
-	/* Lazy malloc of ModelHeaders / MxaModelHeaders sized to the active
-	 * MODELNAME count (slot 0 .. first empty Name). ReleaseView frees
-	 * these and resets the pointers to NULL on level transition; next
-	 * call lands here and re-allocates at the new level's exact count.
+	/* Free + re-allocate ModelHeaders / MxaModelHeaders sized to the
+	 * active MODELNAME count (slot 0 .. first empty Name). The arrays
+	 * stay live through ReleaseView so ReleaseLevel teardown can still
+	 * read MxaModelHeaders[i].NumSpotFX safely (set to 0 by the
+	 * preceding ReleaseModels). Any previous allocation is freed
+	 * here, just before we size the new one to the new caller's
+	 * model count.
 	 *
 	 * Why plain malloc/free vs the Q3 hunk allocator: this is two
 	 * allocations per level lifecycle, no fragmentation concern. The
-	 * hunk pays off for many-small-allocs (the planned per-execbuf
-	 * textureGroups[] migration is the right place for it). */
+	 * hunk pays off for many-small-allocs (per-execbuf textureGroups,
+	 * already migrated). */
+	{
+		free(ModelHeaders);    ModelHeaders    = NULL;
+		free(MxaModelHeaders); MxaModelHeaders = NULL;
+	}
 	if (!ModelHeaders || !MxaModelHeaders)
 	{
 		int count = 0;

@@ -142,6 +142,19 @@ ifeq ($(VERBOSE_TRACE),1)
 CFLAGS += -DVERBOSE_TRACE
 endif
 
+# DEATH_SIM=1 simulates the game-over (lose-all-lives) code path on
+# boot. Autoboots into a level (vol2 by default) and after ~3 s of
+# gameplay forces MyGameStatus = STATUS_QuitCurrentGame, exercising
+# the same teardown→title chain as a real death sequence. Granular
+# trace points fire across STATUS_QuitCurrentGame / ReleaseLevel /
+# InitScene / InitView / InitTitle so a crash leaves the last reached
+# point at the tail of sdmc:/forsaken_trace.txt. After the title
+# screen is reachable for ~3 s, chain-loads back to netload_stub so
+# the host can pull the trace via 3dslink. Diagnostic build only.
+ifeq ($(DEATH_SIM),1)
+CFLAGS += -DDEATH_SIM -D__3DS_DEBUG__
+endif
+
 # Include paths - note isystem for the source dir so #include <header.h> works
 CFLAGS += -isystem $(SRCDIR) \
 	-I$(SRCDIR) \

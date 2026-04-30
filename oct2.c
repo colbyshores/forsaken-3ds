@@ -1887,38 +1887,64 @@ void DrawSimplePanel()
 
 void ReleaseLevel(void)
 {
+#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#define _RL_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/RL: " s); } while(0)
+#else
+#define _RL_TRACE(s) ((void)0)
+#endif
+  _RL_TRACE("enter");
   switch( MyGameStatus )
   {
   case  STATUS_Title:
   case  STATUS_BetweenLevels:
   case  STATUS_StartingSinglePlayer:
   case  STATUS_TitleLoadGameStartingSinglePlayer:
+    _RL_TRACE("skip-list branch");
     break;
-  
+
   default:
+    _RL_TRACE("default branch");
     if( GodMode ) LoseAllWeapons();
 
+    _RL_TRACE("ReleaseComponentedShips");
     ReleaseComponentedShips();
+    _RL_TRACE("KillThermo");
     KillThermo();
+    _RL_TRACE("NodeRelease");
     NodeRelease();
+    _RL_TRACE("CameraRelease");
     CameraRelease();
+    _RL_TRACE("ReleaseExternalForces");
     ReleaseExternalForces();
+    _RL_TRACE("ReleaseTeleports");
     ReleaseTeleports();
+    _RL_TRACE("ReleaseTriggers");
     ReleaseTriggers();
+    _RL_TRACE("ReleaseTriggerArea");
     ReleaseTriggerArea();
+    _RL_TRACE("ReleaseRTLights");
     ReleaseRTLights();
+    _RL_TRACE("ReleaseGoal");
     ReleaseGoal();
 
     if( CountDownOn )
+    {
+      _RL_TRACE("DeleteCountdownDigits");
       DeleteCountdownDigits();
+    }
 
+    _RL_TRACE("KillAllBGObjects");
     KillAllBGObjects();
+    _RL_TRACE("ReleaseAllEnemies");
     ReleaseAllEnemies();
+    _RL_TRACE("ReleaseAllRestartPoints");
     ReleaseAllRestartPoints();
+    _RL_TRACE("DestroySound");
     DestroySound( DESTROYSOUND_All );
+    _RL_TRACE("default DONE");
     break;
   }
-
+#undef _RL_TRACE
 }
 
 
@@ -1982,17 +2008,18 @@ void ReleaseView(void)
     ReleaseTitleModels();
     Free_All_Off_Files( &Title_OffsetFiles[ 0 ] );
     ReleaseRenderBufs();
-    /* Free the title's per-level model header arrays (allocated in
-     * PreInitModel sized to the title's actual model count). Reset
-     * to NULL so the next PreInitModel re-allocates at the new
-     * caller's count. Hunk_FreeAll(TAG_LEVEL) bulk-releases all the
-     * per-execbuf textureGroups[] arrays the title loaders set up. */
+    /* Hunk_FreeAll(TAG_LEVEL) bulk-releases all the per-execbuf
+     * textureGroups[] arrays the title loaders set up. ModelHeaders
+     * and MxaModelHeaders are intentionally NOT freed here — the
+     * next PreInitModel re-frees-and-allocs them, and leaving them
+     * live across this point keeps ReleaseLevel teardown
+     * (KillUsedModel → KillAttachedSoundFX, which reads
+     * MxaModelHeaders[i].NumSpotFX) safe in QuitCurrentGame /
+     * level-end paths that call ReleaseView before ReleaseLevel.
+     * After ReleaseTitleModels above, NumSpotFX is 0 so the read
+     * is a no-op. */
     {
-      extern MXLOADHEADER  *ModelHeaders;
-      extern MXALOADHEADER *MxaModelHeaders;
       extern void Hunk_FreeAll(int);
-      free(ModelHeaders);    ModelHeaders    = NULL;
-      free(MxaModelHeaders); MxaModelHeaders = NULL;
       Hunk_FreeAll(/*TAG_LEVEL=*/1);
     }
     break;
@@ -2043,13 +2070,11 @@ void ReleaseView(void)
     FreeTxtFile();
     _RV_TRACE("FreeMsgFile");
     FreeMsgFile();
-    /* Same per-level free as the title-cleanup branch above. */
+    /* Same per-level Hunk teardown as the title-cleanup branch above.
+     * ModelHeaders / MxaModelHeaders are intentionally kept live until
+     * the next PreInitModel — see the title-branch comment for why. */
     {
-      extern MXLOADHEADER  *ModelHeaders;
-      extern MXALOADHEADER *MxaModelHeaders;
       extern void Hunk_FreeAll(int);
-      free(ModelHeaders);    ModelHeaders    = NULL;
-      free(MxaModelHeaders); MxaModelHeaders = NULL;
       Hunk_FreeAll(/*TAG_LEVEL=*/1);
     }
     _RV_TRACE("default DONE");
@@ -2062,25 +2087,46 @@ InitScene(void)
 {
   int i;
 
+#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#define _IS_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/IS: " s); } while(0)
+#else
+#define _IS_TRACE(s) ((void)0)
+#endif
+  _IS_TRACE("enter");
+  _IS_TRACE("OnceOnlyInitModel");
   OnceOnlyInitModel();
+  _IS_TRACE("InitXLights");
   InitXLights();
+  _IS_TRACE("InitPrimBulls");
   InitPrimBulls();
+  _IS_TRACE("InitSecBulls");
   InitSecBulls();
+  _IS_TRACE("InitFmPoly");
   InitFmPoly();
 
 #ifdef SHADOWTEST
   InitTriangles();
 #endif
 
+  _IS_TRACE("InitPolys");
   InitPolys();
+  _IS_TRACE("InitScrPolys");
   InitScrPolys();
+  _IS_TRACE("InitLines");
   InitLines();
+  _IS_TRACE("SetupSpotFX");
   SetupSpotFX();
+  _IS_TRACE("InitPickups");
   InitPickups();
+  _IS_TRACE("InitAmmoUsed");
   InitAmmoUsed();
+  _IS_TRACE("InitAfterBurners");
   InitAfterBurners();
+  _IS_TRACE("InitBGObjects");
   InitBGObjects();
+  _IS_TRACE("InitRestartPoints");
   InitRestartPoints();
+  _IS_TRACE("InitEnemies");
   InitEnemies();
 
   for( i = 0 ; i < MAX_PLAYERS ; i++ )
@@ -2096,12 +2142,16 @@ InitScene(void)
   case  STATUS_TitleLoadGameStartingSinglePlayer:
   case  STATUS_StartingMultiplayer:
   case  STATUS_GetPlayerNum:
+    _IS_TRACE("LoadTitleModels");
     if (!LoadTitleModels())
     { Msg( "LoadTitleModels failed.\n" );
+      _IS_TRACE("LoadTitleModels FAILED");
       return false;
     }
     break;
   }
+  _IS_TRACE("DONE");
+#undef _IS_TRACE
 
   return true;
 
@@ -2116,10 +2166,18 @@ bool InitView( void )
 {
 	DebugPrintf("InitView Starting...\n");
 
+#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#define _IV_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/IV: " s); } while(0)
+#else
+#define _IV_TRACE(s) ((void)0)
+#endif
+	_IV_TRACE("enter");
+
 	CheatsDisabled = false;
 
 	input_buffer_reset();
 
+	_IV_TRACE("InitModeCase");
 	InitModeCase();
 
 	switch( MyGameStatus )
@@ -2130,14 +2188,17 @@ bool InitView( void )
 		case  STATUS_TitleLoadGameStartingSinglePlayer:
 		case  STATUS_StartingMultiplayer:
 		case  STATUS_GetPlayerNum:
+		_IV_TRACE("title-branch InitTitle");
 		if( InitTitle() != true ) // bjd
 		{
+			_IV_TRACE("InitTitle FAILED");
 			SeriousError = true;
 			return false;
 		}
 
 		if ( !bSoundEnabled )
 		{
+			_IV_TRACE("InitializeSound");
 			if (! InitializeSound( DESTROYSOUND_All ))
 			{
 				DebugPrintf("unable to initialise sound in initview\n");
@@ -2146,7 +2207,9 @@ bool InitView( void )
 			}
 		}
 
+		_IV_TRACE("InitRenderBufs");
 		InitRenderBufs();
+		_IV_TRACE("SetMatrixViewPort");
 		if( !SetMatrixViewPort() )
 		{
 		  SeriousError = true;
@@ -2154,20 +2217,24 @@ bool InitView( void )
 		  return false;
 		}
 		// Init the Texture Handler
+		_IV_TRACE("InitTload");
 		InitTload( &Tloadheader );
 
+		_IV_TRACE("Load_All_Off_Files");
 		if( !Load_All_Off_Files( &Title_OffsetFiles[ 0 ] ) )
 		{
 		  SeriousError = true;
 		  return false;
 		}
 
+		_IV_TRACE("PreLoadFlyGirl");
 		if( !PreLoadFlyGirl() )
 		{
 		  SeriousError = true;
 		  return false;
 		}
 
+		_IV_TRACE("PreInitModel(TitleModelSet)");
 		if( !PreInitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
@@ -2175,16 +2242,19 @@ bool InitView( void )
 		}
 
 		//  Load in And if nescessary ReScale Textures...
+		_IV_TRACE("Tload");
 		if( !Tload( &Tloadheader ) )
 		{
 		  SeriousError = true;
 		  return false;
 		}
+		_IV_TRACE("InitModel(TitleModelSet)");
 		if( !InitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
 		  return false;
 		}
+		_IV_TRACE("AllocateCompFlyGirl");
 		if ( !AllocateCompFlyGirl() )
 		{
 		  SeriousError = true;
@@ -2195,6 +2265,7 @@ bool InitView( void )
 		  UpdateFlyGirl( &BikePos, &MATRIX_Identity, false );
 		}
 
+		_IV_TRACE("FindTexture(dummy)");
 		DummyTextureIndex = FindTexture( &Tloadheader, "data\\textures\\dummy.bmp" );
 		if ( DummyTextureIndex != -1 )
 		{
@@ -2204,7 +2275,11 @@ bool InitView( void )
 		}
 
 		if ( !CurrentMenu )
+		{
+		  _IV_TRACE("MenuRestart(MENU_Start)");
 		  MenuRestart( &MENU_Start );
+		}
+		_IV_TRACE("title-branch DONE");
     break;
 
   case STATUS_ViewingScore:
@@ -2261,6 +2336,8 @@ bool InitView( void )
     CameraStatus = CAMERA_AtStart;  //prevents on screen menus from being suppressed
     break;
   }
+  _IV_TRACE("DONE");
+#undef _IV_TRACE
 
 
   return true;
@@ -2431,6 +2508,10 @@ bool RenderScene( void )
 
   if ( SeriousError )
     return false;
+
+#ifdef DEATH_SIM
+  { extern void death_sim_tick(void); death_sim_tick(); }
+#endif
 
 #ifdef __3DS__
   _3ds_mr_ctx = "pre-ReadInput";
@@ -3283,22 +3364,40 @@ bool RenderScene( void )
   case STATUS_QuitCurrentGame:
 	DebugState("STATUS_QuitCurrentGame\n");
 
+#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#define _DS_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/QCG: " s); } while(0)
+#else
+#define _DS_TRACE(s) ((void)0)
+#endif
+    _DS_TRACE("enter case");
+    _DS_TRACE("OutputVisiStats");
     OutputVisiStats( &Mloadheader, LevelNames[ LevelNum ] );
+    _DS_TRACE("MenuAbort");
     MenuAbort();
+    _DS_TRACE("MenuRestart");
     MenuRestart( &MENU_Start );
+    _DS_TRACE("DestroyGame");
     DestroyGame();  // DestroyGame changes MyGameStatus..So Set it back
     MyGameStatus = STATUS_QuitCurrentGame;
+    _DS_TRACE("ReleaseView");
     ReleaseView();
+    _DS_TRACE("ReleaseLevel");
     ReleaseLevel();
+    _DS_TRACE("set STATUS_Title");
     MyGameStatus = STATUS_Title;
 #if defined(__3DS__) && defined(RENDERER_C3D)
     /* Wipe the gameplay HUD off the bottom screen — the title screen
      * never draws there, so without this the last HUD frame stays
      * frozen until the next gameplay session takes over. */
+    _DS_TRACE("pglClearBottomScreen");
     pglClearBottomScreen();
 #endif
+    _DS_TRACE("InitScene");
     InitScene();
+    _DS_TRACE("InitView");
     InitView();
+    _DS_TRACE("QCG complete");
+#undef _DS_TRACE
 
     break;
 
