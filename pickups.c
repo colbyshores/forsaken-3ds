@@ -290,6 +290,20 @@ char	*	Messages[] = {
 			"",								// flag 4
 };
 
+/* Pickup-type → message string lookup with bounds-check. Messages[] is
+ * sized by the static initializer above (~46 entries — 1998 pickup
+ * count). MAXPICKUPTYPES is now 128 (Remaster N64 pickups 100..105 plus
+ * potential future expansion). Death-drops or .pic spawns that land on
+ * a high-ID type can index past the array; without this guard the
+ * Messages[Type] read returns adjacent-BSS garbage that gets fed to
+ * sprintf("%s", ...) → strcpy → fault. */
+static const char *PickupMessage( u_int16_t Type )
+{
+	const int n = (int)(sizeof(Messages) / sizeof(Messages[0]));
+	if ((int)Type < n && Messages[Type]) return Messages[Type];
+	return "";
+}
+
 QUEDPICKUP		QuedPickups[ MAXPICKUPS ];
 QUEDPICKUP	*	FirstQuedPickupUsed = NULL;
 QUEDPICKUP	*	FirstQuedPickupFree = NULL;
@@ -1245,7 +1259,7 @@ bool CollectPickup( u_int16_t i )
 	bool	ShowTextAnyway = false;
 	bool	Speech = true;
 	
-	sprintf( &Message[0], "%s", Messages[ Pickups[i].Type ] );
+	sprintf( &Message[0], "%s", PickupMessage( Pickups[i].Type ) );
 
 	if( i != (u_int16_t) -1 )
 	{
@@ -6037,7 +6051,7 @@ bool ActuallyCollectPickup( u_int16_t i )
 	bool	ShowTextAnyway = false;
 	bool	Speech = true;
 	
-	sprintf( &Message[0], "%s", Messages[ Pickups[i].Type ] );
+	sprintf( &Message[0], "%s", PickupMessage( Pickups[i].Type ) );
 
 	if( i != (u_int16_t) -1 )
 	{
@@ -6636,7 +6650,7 @@ bool PretendCollectPickup( u_int16_t i )
 	bool	ShowTextAnyway = false;
 	bool	Speech = true;
 	
-	sprintf( &Message[0], "%s", Messages[ Pickups[i].Type ] );
+	sprintf( &Message[0], "%s", PickupMessage( Pickups[i].Type ) );
 
 	if( i != (u_int16_t) -1 )
 	{

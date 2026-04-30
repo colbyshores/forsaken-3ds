@@ -791,18 +791,25 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 	int8_t		TempFilename[ 256 ];
 	int8_t		Ext[ 32 ];
 
-	/* Free + re-allocate ModelHeaders / MxaModelHeaders sized to the
-	 * active MODELNAME count (slot 0 .. first empty Name). The arrays
-	 * stay live through ReleaseView so ReleaseLevel teardown can still
-	 * read MxaModelHeaders[i].NumSpotFX safely (set to 0 by the
-	 * preceding ReleaseModels). Any previous allocation is freed
-	 * here, just before we size the new one to the new caller's
-	 * model count.
+	/* Free + re-allocate ModelHeaders / MxaModelHeaders sized to cover
+	 * every populated MODELNAME slot. Slots are NOT laid out densely:
+	 * regular models occupy [0..*_ExtraModels-1], then PreLoadCompObj
+	 * (called by PreLoadFlyGirl, PreLoadShips, PreLoadBGOFiles, etc.)
+	 * registers component-object children into [*_ExtraModels..NextNewModel-1]
+	 * with a zero-terminator after each contiguous run. So a naive
+	 * "count up to first empty Name" stops at the regular section's
+	 * terminator and misses the appended FlyGirl/ship/bgobject entries —
+	 * SetupModelSpotFX(ModelHeaders[high_index]) then reads past the
+	 * malloc'd buffer and faults on a misaligned SpotFX pointer.
 	 *
-	 * Why plain malloc/free vs the Q3 hunk allocator: this is two
-	 * allocations per level lifecycle, no fragmentation concern. The
-	 * hunk pays off for many-small-allocs (per-execbuf textureGroups,
-	 * already migrated). */
+	 * Fix: scan the full MODELNAME array for the highest populated
+	 * index, then size to that. Adjacent runs are separated by a
+	 * terminator entry; ignore it and keep scanning.
+	 *
+	 * The arrays stay live through ReleaseView so ReleaseLevel teardown
+	 * can still read MxaModelHeaders[i].NumSpotFX safely (set to 0 by
+	 * the preceding ReleaseModels). Any previous allocation is freed
+	 * here, just before we size the new one. */
 	{
 		free(ModelHeaders);    ModelHeaders    = NULL;
 		free(MxaModelHeaders); MxaModelHeaders = NULL;
@@ -810,8 +817,13 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 	if (!ModelHeaders || !MxaModelHeaders)
 	{
 		int count = 0;
+		int max_idx = -1;
 		MODELNAME *p = NamePnt;
-		while (count < MAXMODELHEADERS && p->Name[0]) { count++; p++; }
+		for (int idx = 0; idx < MAXMODELHEADERS; idx++)
+		{
+			if (p[idx].Name[0]) max_idx = idx;
+		}
+		count = max_idx + 1;
 		if (count == 0) count = 1; /* defensive: never alloc 0 */
 		ModelHeaders    = (MXLOADHEADER *)  calloc(count, sizeof(MXLOADHEADER));
 		MxaModelHeaders = (MXALOADHEADER *) calloc(count, sizeof(MXALOADHEADER));
