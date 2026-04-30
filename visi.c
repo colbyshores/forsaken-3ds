@@ -125,6 +125,18 @@ MATRIX	VisPolyMatrix = {
 				0.0F, 0.0F, 1.0F, 0.0F,
 				0.0F, 0.0F, 0.0F, 1.0F };
 u_int16_t	IsGroupVisible[MAXGROUPS];
+/* Parallel to IsGroupVisible[], set during the flood-fill BFS expansion
+ * in FindVisible. Object renderers (enemies / pickups / models /
+ * BGObjects / secondary FX) gate on `IsGroupVisible[g] &&
+ * !IsGroupFloodFilled[g]` so the through-portal rooms render their
+ * level geometry without paying for object draws. The level mesh
+ * itself still renders (the geometry visible through the portal
+ * aperture is the whole point of the flood-fill); we skip only the
+ * downstream object lists.
+ *
+ * Reset alongside IsGroupVisible at the top of RenderCurrentCamera
+ * (oct2.c). Set per-group during the flood-fill BFS in FindVisible. */
+u_int16_t	IsGroupFloodFilled[MAXGROUPS];
 
 struct
 {
@@ -1345,6 +1357,15 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 						adj->next_visible = NULL;
 						v->last_visible->next_visible = adj;
 						v->last_visible = adj;
+						/* Tag this group as flood-fill-added so object
+						 * renderers can skip it. The level geometry
+						 * still draws — only enemies / pickups /
+						 * models / BGObjects / secondary FX in this
+						 * group are gated out, since they're 1-2
+						 * portal hops away and the FPS cost of
+						 * rendering them isn't worth the visual
+						 * fidelity. */
+						IsGroupFloodFilled[dst] = 1;
 						flooded++;
 						added_this_pass++;
 					}
@@ -1666,8 +1687,19 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 			GroupInVisibleList = i;
 			group = GroupsVisible[i];
 
-			if ( XLight1Group(  Mloadheader, GroupsVisible[i] ) != true  )
-				return false;
+			/* Skip per-vertex dynamic light contribution for flood-fill
+			 * groups (1-2 portal hops away). Their level geometry still
+			 * renders with the baked vertex colors from the .mxv file —
+			 * just no per-frame XLight contribution from blaster shots /
+			 * RT lights. Cheaper than the full lit path because
+			 * XLight1Group locks every execbuf's vertex buffer and walks
+			 * `FirstLightVisible` per vertex; skipping it saves both
+			 * CPU work and the linearAlloc lock/unlock pair per execbuf. */
+			if ( !IsGroupFloodFilled[ GroupsVisible[i] ] )
+			{
+				if ( XLight1Group(  Mloadheader, GroupsVisible[i] ) != true  )
+					return false;
+			}
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
 			/* Per-visible-group draw trace, rate-limited to once-per-second
