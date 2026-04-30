@@ -424,6 +424,23 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
         return false;
       }
 
+			/* Allocate this execbuf's textureGroups[] from the TAG_LEVEL
+			 * hunk, sized to num_texture_groups. Bulk-freed via
+			 * Hunk_FreeAll(TAG_LEVEL) on level transition. */
+			if ( num_texture_groups > 0 )
+			{
+				extern void *Hunk_Alloc(int, size_t);
+				Mxloadheader->Group[group].renderObject[execbuf].textureGroups =
+				    (TEXTUREGROUP *) Hunk_Alloc(/*TAG_LEVEL=*/1,
+				                                num_texture_groups * sizeof(TEXTUREGROUP));
+				if ( !Mxloadheader->Group[group].renderObject[execbuf].textureGroups )
+				{
+					Msg( "Mxload() hunk-alloc failed for textureGroups[%u] %s\n",
+					     (unsigned)num_texture_groups, Filename );
+					return false;
+				}
+			}
+
 			ibIndex = 0;
 			indexOffset = 0;
 

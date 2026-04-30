@@ -195,6 +195,17 @@ typedef struct {
     float a;
 } COLORVALUE;
 
+/* RENDEROBJECT / LEVELRENDEROBJECT: textureGroups is a TAG_LEVEL hunk
+ * pointer sized to numTextureGroups at load time. Was an inline
+ * MAX_TEXTURE_GROUPS-element array (~2 KB per RENDEROBJECT, ~256 KB
+ * per Mloadheader.Group[g].renderObject[16] BSS) — moved to dynamic
+ * allocation so each entry costs exactly numTextureGroups *
+ * sizeof(TEXTUREGROUP) instead of 2 KB. Per-execbuf textureGroups[]
+ * across an entire level fits comfortably in an 8 MB hunk.
+ *
+ * The two struct types are now structurally identical; LEVELRENDEROBJECT
+ * is kept distinct for now so call-site signatures don't churn, but it's
+ * a candidate for a follow-up unification. */
 typedef struct RENDEROBJECT
 {
 	LPVERTEXBUFFER	lpVertexBuffer;
@@ -202,7 +213,7 @@ typedef struct RENDEROBJECT
 	LPINDEXBUFFER	lpIndexBuffer;
 	bool			vbLocked;
 	int numTextureGroups;
-	TEXTUREGROUP textureGroups[MAX_TEXTURE_GROUPS];
+	TEXTUREGROUP *textureGroups;
 } RENDEROBJECT;
 
 typedef struct LEVELRENDEROBJECT
@@ -212,7 +223,7 @@ typedef struct LEVELRENDEROBJECT
 	LPINDEXBUFFER	lpIndexBuffer;
 	bool			vbLocked;
 	int numTextureGroups;
-	TEXTUREGROUP textureGroups[MAX_LEVEL_TEXTURE_GROUPS];
+	TEXTUREGROUP *textureGroups;
 } LEVELRENDEROBJECT;
 
 typedef struct {

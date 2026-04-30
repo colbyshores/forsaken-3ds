@@ -1985,12 +1985,15 @@ void ReleaseView(void)
     /* Free the title's per-level model header arrays (allocated in
      * PreInitModel sized to the title's actual model count). Reset
      * to NULL so the next PreInitModel re-allocates at the new
-     * caller's count. */
+     * caller's count. Hunk_FreeAll(TAG_LEVEL) bulk-releases all the
+     * per-execbuf textureGroups[] arrays the title loaders set up. */
     {
       extern MXLOADHEADER  *ModelHeaders;
       extern MXALOADHEADER *MxaModelHeaders;
+      extern void Hunk_FreeAll(int);
       free(ModelHeaders);    ModelHeaders    = NULL;
       free(MxaModelHeaders); MxaModelHeaders = NULL;
+      Hunk_FreeAll(/*TAG_LEVEL=*/1);
     }
     break;
 
@@ -2044,8 +2047,10 @@ void ReleaseView(void)
     {
       extern MXLOADHEADER  *ModelHeaders;
       extern MXALOADHEADER *MxaModelHeaders;
+      extern void Hunk_FreeAll(int);
       free(ModelHeaders);    ModelHeaders    = NULL;
       free(MxaModelHeaders); MxaModelHeaders = NULL;
+      Hunk_FreeAll(/*TAG_LEVEL=*/1);
     }
     _RV_TRACE("default DONE");
 #undef _RV_TRACE
@@ -3018,7 +3023,9 @@ bool RenderScene( void )
 
 {
 	RENDEROBJECT ro;
+	TEXTUREGROUP ro_groups[MAX_TEXTURE_GROUPS];
 	ZERO_STACK_MEM(ro);
+	ro.textureGroups = ro_groups;
 	FSCreateDynamic2dVertexBuffer(&ro, 32767);
 	FSCreateIndexBuffer(&ro, 32767*3);
 
@@ -5650,8 +5657,17 @@ bool ClearZBuffer()
 }
 
 
+/* Process-lifetime scratch storage for the dynamic per-frame poly
+ * batchers (polys.c / 2dpolys.c / screenpolys.c). They write
+ * textureGroups[numTextureGroups++] for each face accumulated this
+ * frame. Was an inline RENDEROBJECT.textureGroups[64] BSS field
+ * before the textureGroups migration; now an explicit MAX_TEXTURE_GROUPS-
+ * sized scratch attached to each RenderBuf at InitRenderBufs time. */
+static TEXTUREGROUP s_renderbuf_groups[4][MAX_TEXTURE_GROUPS];
+
 void InitRenderBufs(/* LPDIRECT3DDEVICE lpDev */) // bjd
 {
+	int i;
 	DebugPrintf("InitRenderBufs\n");
 	ReleaseRenderBufs();
 	// just vertex data
@@ -5663,6 +5679,8 @@ void InitRenderBufs(/* LPDIRECT3DDEVICE lpDev */) // bjd
 	// indexed pre-transformed (2d)
 	FSCreateDynamic2dVertexBuffer(&RenderBufs[3], 32767);
 	FSCreateDynamicIndexBuffer(&RenderBufs[3], 32767*3);
+	for (i = 0; i < 4; i++)
+		RenderBufs[i].textureGroups = s_renderbuf_groups[i];
 }
 
 void ReleaseRenderBufs( void )
@@ -6555,6 +6573,7 @@ void PrintInitViewStatus( BYTE Status )
 {
 	int i;
 	RENDEROBJECT ro;
+	TEXTUREGROUP ro_groups[MAX_TEXTURE_GROUPS];
 #ifdef __3DS__
 	/* Per-status one-shot diagnostic trace. Fires on the FIRST call to
 	 * PIVS for each distinct Status value so we can pinpoint a hang
@@ -6573,6 +6592,7 @@ void PrintInitViewStatus( BYTE Status )
 	#define _PIVS_STAGE(s) ((void)0)
 #endif
 	ZERO_STACK_MEM(ro);
+	ro.textureGroups = ro_groups;
 	_PIVS_STAGE("pre-FSCreate");
 	{
 		bool _vok = FSCreateDynamic2dVertexBuffer(&ro, 32767);

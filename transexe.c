@@ -46,18 +46,17 @@ void AddTransExe( /*LPD3DMATRIX Matrix*/RENDERMATRIX *Matrix , /*LPDIRECT3DEXECU
 			TransExe[NumOfTransExe].Matrix = *Matrix;
 		}
 //		TransExe[NumOfTransExe].lpExBuf = lpExBuf;
-#ifdef __3DS__
-		/* Safe partial copy: the source may be a LEVELRENDEROBJECT (8 texture
-		 * groups) cast to RENDEROBJECT* (64 groups).  A full struct copy would
-		 * overread the source.  Copy only the header + used texture groups. */
-		{
-			size_t hdr = offsetof(RENDEROBJECT, textureGroups);
-			size_t used = renderObject->numTextureGroups * sizeof(TEXTUREGROUP);
-			memcpy(&TransExe[NumOfTransExe].renderObject, renderObject, hdr + used);
-		}
-#else
+		/* Plain shallow struct copy. The textureGroups field is now a
+		 * pointer to a TAG_LEVEL hunk allocation rather than an inline
+		 * MAX_TEXTURE_GROUPS array, so copying the struct just copies
+		 * the pointer — both src and dst reference the same array,
+		 * which is fine because TransExe entries are short-lived
+		 * (per-frame) and the hunk allocation lives until level
+		 * transition. RENDEROBJECT and LEVELRENDEROBJECT are now
+		 * structurally identical, so the LEVELRENDEROBJECT* cast to
+		 * RENDEROBJECT* that used to overread the source is no
+		 * longer a concern (same size, same layout). */
 		TransExe[NumOfTransExe].renderObject = (*renderObject);
-#endif
 		TransExe[NumOfTransExe].Model = Model;
 		TransExe[NumOfTransExe].NumVerts = NumVerts;
 		TransExe[NumOfTransExe].group = group;

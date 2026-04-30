@@ -580,9 +580,26 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				return false;
 			}
 
+			/* Allocate this execbuf's textureGroups[] from the TAG_LEVEL
+			 * hunk, sized to the file's `num_triangle_groups` count.
+			 * Bulk-freed in ReleaseView via Hunk_FreeAll(TAG_LEVEL). */
+			if ( num_triangle_groups > 0 )
+			{
+				extern void *Hunk_Alloc(int, size_t);
+				Mloadheader->Group[group].renderObject[execbuf].textureGroups =
+				    (TEXTUREGROUP *) Hunk_Alloc(/*TAG_LEVEL=*/1,
+				                                num_triangle_groups * sizeof(TEXTUREGROUP));
+				if ( !Mloadheader->Group[group].renderObject[execbuf].textureGroups )
+				{
+					Msg( "Mload() hunk-alloc failed for textureGroups[%u] %s\n",
+					     (unsigned)num_triangle_groups, Filename );
+					return false;
+				}
+			}
+
 			ibIndex = 0;
 			indexOffset = 0;
-			
+
 			for ( i=0 ; i<num_triangle_groups; i++)
 			{
 				Uint16Pnt = (u_int16_t *) Buffer;

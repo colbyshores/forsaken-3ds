@@ -235,6 +235,24 @@ bool platform_init(void)
 		trace(_b);
 	}
 
+	/* Q3-style hunk arena for per-execbuf textureGroups[] arrays. The
+	 * level mesh's Mloadheader.Group[].renderObject[].textureGroups[]
+	 * and the model loaders' Mx(a)loadheader.Group.renderObject[]
+	 * .textureGroups[] used to be inline MAX_TEXTURE_GROUPS-sized
+	 * arrays in BSS; they're now small per-execbuf hunk allocations
+	 * sized to numTextureGroups. Hundreds of small allocs per level
+	 * is exactly what the hunk is for — bulk-freed via
+	 * Hunk_FreeAll(TAG_LEVEL) on level transition. 8 MB easily covers
+	 * the densest level. */
+	{
+		extern bool Hunk_Init(size_t);
+		bool ok = Hunk_Init(8 * 1024 * 1024);
+		char _b[96];
+		snprintf(_b, sizeof(_b), "Hunk_Init: %s (8MB)", ok ? "OK" : "FAILED");
+		trace(_b);
+		if (!ok) return false;
+	}
+
 	trace("platform_init: romfsInit");
 
 	/* romfs precedence: try the .3dsx's embedded romfs FIRST. If that
