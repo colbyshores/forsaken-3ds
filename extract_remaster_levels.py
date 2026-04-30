@@ -163,6 +163,71 @@ def import_levels(kpf_path, output_dir):
     return True
 
 
+# ----- N64 enemy / pickup model extraction -----------------------------------
+#
+# The Remaster ships single-mesh .mx files for the simpler N64 enemies
+# (Cargodrone, Enforcer, Ghost) and pickups (StablizerCrystal, BlackHole-
+# GunPart1..4). Pull just those into Data/models/n64/ so the engine's
+# template-copy step can point ModelFilename / ModelType at the real
+# meshes instead of substituting 1998-era visuals.
+#
+# Multi-component bosses (Manmech, Maldroid, Ramqan, DreadNaught, Shield-
+# Turret) and N64-specific FX (n64Shockwave) are skipped — they need
+# component-tree authoring that the 1998 engine doesn't know about, and
+# "Remaster N64 Enemy/Pickup Slot Approximation" for that follow-up scope.
+
+N64_SINGLE_MESH_FILES = [
+    # enemies (single-mesh)
+    "models/n64/cargodrone.mx",
+    "models/n64/enforcer.mx",
+    "models/n64/ghost.mx",
+    # pickups (all single-mesh)
+    "models/n64/stcrys.mx",
+    "models/n64/bhgun1.mx",
+    "models/n64/bhgun2.mx",
+    "models/n64/bhgun3.mx",
+    "models/n64/bhgun4.mx",
+]
+
+
+def import_n64_models(kpf_path, models_output):
+    """Extract single-mesh N64 enemy/pickup .mx files into models_output/n64/."""
+    dst_root = os.path.join(models_output, "n64")
+    if not os.path.isdir(models_output):
+        print(f"ERROR: --models-output dir does not exist: {models_output}",
+              file=sys.stderr)
+        return False
+    os.makedirs(dst_root, exist_ok=True)
+
+    copied = []
+    skipped_existing = []
+    missing = []
+
+    with zipfile.ZipFile(kpf_path) as z:
+        names = set(z.namelist())
+        for src in N64_SINGLE_MESH_FILES:
+            basename = os.path.basename(src)
+            dst = os.path.join(dst_root, basename)
+            if os.path.exists(dst):
+                skipped_existing.append(basename)
+                continue
+            if src not in names:
+                missing.append(src)
+                continue
+            with z.open(src) as src_f, open(dst, "wb") as dst_f:
+                shutil.copyfileobj(src_f, dst_f)
+            copied.append(basename)
+
+    print(f"N64 models: copied {len(copied)} "
+          f"({', '.join(copied) if copied else 'none'}) -> {dst_root}")
+    if skipped_existing:
+        print(f"  Already present, left untouched: "
+              f"{', '.join(skipped_existing)}")
+    if missing:
+        print(f"  WARNING: not found in KPF: {', '.join(missing)}")
+    return True
+
+
 # ----- OGG → DSP-ADPCM music conversion --------------------------------------
 
 def find_dspadpcm_encoder():
@@ -362,10 +427,14 @@ def main():
                     help="Destination level directory (default: Data/Levels)")
     ap.add_argument("--music-output", default="romfs/music",
                     help="Destination music directory (default: romfs/music)")
+    ap.add_argument("--models-output", default="Data/models",
+                    help="Destination models directory (default: Data/models)")
     ap.add_argument("--skip-levels", action="store_true",
                     help="Don't import level data")
     ap.add_argument("--skip-music", action="store_true",
                     help="Don't convert OGG music tracks")
+    ap.add_argument("--skip-models", action="store_true",
+                    help="Don't import N64 enemy/pickup models")
     args = ap.parse_args()
 
     if not os.path.isfile(args.kpf):
@@ -379,6 +448,8 @@ def main():
         ok = import_levels(args.kpf, args.levels_output) and ok
     if not args.skip_music:
         ok = import_music(steam_dir, args.music_output) and ok
+    if not args.skip_models:
+        ok = import_n64_models(args.kpf, args.models_output) and ok
 
     return 0 if ok else 1
 

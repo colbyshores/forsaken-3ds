@@ -4274,14 +4274,23 @@ bool PreLoadEnemies( void )
 		{
 			_n64_extra_init_done = true;
 
+			/* For each N64-only enemy that has a real .mx mesh in the
+			 * romfs (extracted from ForsakenEX.kpf), use it; otherwise
+			 * fall back to the 1998 template's mesh. The check lets
+			 * the same .3dsx boot against either an old romfs (no
+			 * n64/*.mx) or a new one without conditional compilation. */
+			extern bool File_Exists( char * );
+
 			/* Boss_Manmech (100): big walking boss → Mekton template */
 			EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "Mekton.mx";
 			EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
 
-			/* CargoDrone (101): floating utility object → AmmoDump template */
+			/* CargoDrone (101): AmmoDump brain + real N64 mesh. */
 			EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_AmmoDump ];
-			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "Dump.cob";
+			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename =
+				File_Exists("data\\models\\n64\\cargodrone.mx")
+				    ? "n64\\cargodrone.mx" : "Dump.cob";
 
 			/* Boss_Ramqan (102): big stationary boss → Boss_Metatank template */
 			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Boss_Metatank ];
@@ -4298,9 +4307,11 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "Mekton.mx";
 			EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
 
-			/* Enforcer (105): regular flying combatant → Hunter template */
+			/* Enforcer (105): Hunter brain + real N64 mesh. */
 			EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
-			EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "Hunter.mx";
+			EnemyTypes[ ENEMY_Enforcer ].ModelFilename =
+				File_Exists("data\\models\\n64\\enforcer.mx")
+				    ? "n64\\enforcer.mx" : "Hunter.mx";
 
 			/* Boss_DreadNaught2 (106): unused but populate for safety */
 			EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
@@ -4312,9 +4323,11 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "Avatar.cob";
 			EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
 
-			/* Ghost (108): fast stealthy attacker → Shade template */
+			/* Ghost (108): Shade brain + real N64 mesh. */
 			EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
-			EnemyTypes[ ENEMY_Ghost ].ModelFilename = "Shade.mx";
+			EnemyTypes[ ENEMY_Ghost ].ModelFilename =
+				File_Exists("data\\models\\n64\\ghost.mx")
+				    ? "n64\\ghost.mx" : "Shade.mx";
 		}
 	}
 

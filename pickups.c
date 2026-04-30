@@ -3359,6 +3359,74 @@ bool CheckValidRegenSlot( int16_t Slot )
 }
 
 
+#ifdef EDITION_REMASTER
+/* Slot indices (into ModelNames[]) where PreLoadPickups registers each
+ * N64 pickup mesh. ModelType in PickupAttribs is just an index into this
+ * table, so once the slots are reserved we point the new pickup IDs at
+ * them. -1 means the slot wasn't allocated (e.g., PreLoadPickups skipped
+ * because the OnceOnly init didn't fire). */
+static int16_t s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
+
+/*===================================================================
+	Procedure	:	PreLoadPickups
+	Input		:	Nothing
+	Output		:	bool	True/False
+	Notes		:	Registers the Remaster's N64 single-mesh pickup .mx
+				:	files into fresh ModelNames[] slots and bumps
+				:	NextNewModel past them so subsequent BG-object /
+				:	enemy / etc. registrations don't collide. Called
+				:	from oct2.c's IV0 OnceOnly block, after PreLoadEnemies
+				:	(which is the last consumer of NextNewModel before
+				:	PreInitModel runs the actual model load).
+===================================================================*/
+bool PreLoadPickups( void )
+{
+	extern int16_t NextNewModel;
+	extern bool File_Exists( char * );
+
+	static const char * const n64_pickup_files[5] = {
+		"n64\\stcrys.mx",   /* PICKUP_StablizerCrystal (100) */
+		"n64\\bhgun1.mx",   /* PICKUP_BlackHoleGunPart1 (102) */
+		"n64\\bhgun2.mx",   /* PICKUP_BlackHoleGunPart2 (103) */
+		"n64\\bhgun3.mx",   /* PICKUP_BlackHoleGunPart3 (104) */
+		"n64\\bhgun4.mx",   /* PICKUP_BlackHoleGunPart4 (105) */
+	};
+	static const char * const n64_pickup_check_paths[5] = {
+		"data\\models\\n64\\stcrys.mx",
+		"data\\models\\n64\\bhgun1.mx",
+		"data\\models\\n64\\bhgun2.mx",
+		"data\\models\\n64\\bhgun3.mx",
+		"data\\models\\n64\\bhgun4.mx",
+	};
+
+	int i;
+	for (i = 0; i < 5; i++)
+	{
+		/* Skip cleanly if the .mx isn't present (e.g., the device's
+		 * SD romfs predates the N64 mesh extraction). The pickup ID
+		 * stays mapped to the 1998 template via the existing
+		 * LoadPickupsPositions block, which only overrides ModelType
+		 * if s_n64_pickup_model_idx[i] >= 0. */
+		if (!File_Exists((char *)n64_pickup_check_paths[i]))
+			continue;
+		if (NextNewModel >= MAXMODELHEADERS)
+			return false;
+		strcpy( &ModelNames[ NextNewModel ].Name[0], n64_pickup_files[i] );
+		ModelNames[ NextNewModel ].LOD             = 0;
+		ModelNames[ NextNewModel ].Panel           = false;
+		ModelNames[ NextNewModel ].DoIMorph        = false;
+		ModelNames[ NextNewModel ].ModelIndex      = NextNewModel;
+		ModelNames[ NextNewModel ].StoreTriangles  = false;
+		ModelNames[ NextNewModel ].AllocateTpage   = LOAD_TPAGES;
+		ModelNames[ NextNewModel ].LevelSpecific   = NOT_LEVEL_SPECIFIC;
+		ModelNames[ NextNewModel ].LoadEnable      = true;
+		s_n64_pickup_model_idx[i] = NextNewModel;
+		NextNewModel++;
+	}
+	return true;
+}
+#endif /* EDITION_REMASTER */
+
 /*===================================================================
 	Procedure	:	Save Pickup Positions
 	Input		:	Nothing
@@ -3401,17 +3469,32 @@ bool LoadPickupsPositions( void )
        * initialise PickupAttribs (the actual rendering / light /
        * model-type metadata for each pickup slot). */
 
-      /* StablizerCrystal (100): glowing crystal pickup → Crystal template */
+      /* StablizerCrystal (100): glowing crystal pickup → Crystal template
+       * for light/glow attribs, then override ModelType to the real
+       * N64 mesh registered by PreLoadPickups. */
       PickupAttribs[ PICKUP_StablizerCrystal ] = PickupAttribs[ PICKUP_Crystal ];
+      if (s_n64_pickup_model_idx[0] >= 0)
+        PickupAttribs[ PICKUP_StablizerCrystal ].ModelType = s_n64_pickup_model_idx[0];
 
-      /* ComputerCapsule (101): pickup capsule → Computer template */
+      /* ComputerCapsule (101): pickup capsule → Computer template
+       * (no real mesh extracted — not used by any level in the SP
+       * mission set, kept for completeness). */
       PickupAttribs[ PICKUP_ComputerCapsule ] = PickupAttribs[ PICKUP_Computer ];
 
-      /* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod template */
+      /* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod
+       * template for light/glow + real per-part N64 mesh. */
       PickupAttribs[ PICKUP_BlackHoleGunPart1 ] = PickupAttribs[ PICKUP_PowerPod ];
       PickupAttribs[ PICKUP_BlackHoleGunPart2 ] = PickupAttribs[ PICKUP_PowerPod ];
       PickupAttribs[ PICKUP_BlackHoleGunPart3 ] = PickupAttribs[ PICKUP_PowerPod ];
       PickupAttribs[ PICKUP_BlackHoleGunPart4 ] = PickupAttribs[ PICKUP_PowerPod ];
+      if (s_n64_pickup_model_idx[1] >= 0)
+        PickupAttribs[ PICKUP_BlackHoleGunPart1 ].ModelType = s_n64_pickup_model_idx[1];
+      if (s_n64_pickup_model_idx[2] >= 0)
+        PickupAttribs[ PICKUP_BlackHoleGunPart2 ].ModelType = s_n64_pickup_model_idx[2];
+      if (s_n64_pickup_model_idx[3] >= 0)
+        PickupAttribs[ PICKUP_BlackHoleGunPart3 ].ModelType = s_n64_pickup_model_idx[3];
+      if (s_n64_pickup_model_idx[4] >= 0)
+        PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
     }
   }
 

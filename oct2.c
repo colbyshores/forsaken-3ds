@@ -3628,6 +3628,23 @@ bool RenderScene( void )
         SeriousError = true;
         return false;
       }
+#ifdef EDITION_REMASTER
+      /* Reserve ModelNames[] slots for the N64 single-mesh pickups
+       * (extracted from ForsakenEX.kpf). Must run after PreLoadEnemies
+       * (which writes back to NextNewModel) so the pickup slots end
+       * up past the enemy slots. PreInitModel below loads everything
+       * registered up to NextNewModel. */
+#ifdef __3DS__
+      { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadPickups"); }
+#endif
+      { extern bool PreLoadPickups(void);
+        if( !PreLoadPickups() )
+        {
+          SeriousError = true;
+          return false;
+        }
+      }
+#endif /* EDITION_REMASTER */
 #ifdef __3DS__
 	  { extern void trace(const char*); trace("IV0: OnceOnly done"); }
 #endif
