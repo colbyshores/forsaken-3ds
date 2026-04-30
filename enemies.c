@@ -4281,9 +4281,15 @@ bool PreLoadEnemies( void )
 			 * n64/*.mx) or a new one without conditional compilation. */
 			extern bool File_Exists( char * );
 
-			/* Boss_Manmech (100): big walking boss → Mekton template */
+			/* Boss_Manmech (100): walking boss with body + cannon +
+			 * 2 arms. Real Remaster .cob assembles the 4 .mx limbs
+			 * into a COMP_OBJ hierarchy. Falls back to the Mekton
+			 * single-mesh template when n64\\manmech.cob isn't on
+			 * the SD romfs. */
 			EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "Mekton.mx";
+			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename =
+				File_Exists("data\\bgobjects\\n64\\manmech.cob")
+				    ? "n64\\manmech.cob" : "Mekton.mx";
 			EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
 
 			/* CargoDrone (101): AmmoDump brain + real N64 mesh. */
@@ -4292,19 +4298,33 @@ bool PreLoadEnemies( void )
 				File_Exists("data\\models\\n64\\cargodrone.mx")
 				    ? "n64\\cargodrone.mx" : "Dump.cob";
 
-			/* Boss_Ramqan (102): big stationary boss → Boss_Metatank template */
+			/* Boss_Ramqan (102): 19-part walking boss with body + spine
+			 * + 4 legs + head + spring tendrils. Real Remaster .cob
+			 * assembles all 19 .mx limbs. Falls back to Metatank's
+			 * single-cob template when n64\\ramqan.cob is missing. */
 			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Boss_Metatank ];
-			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "Metatank.cob";
+			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename =
+				File_Exists("data\\bgobjects\\n64\\ramqan.cob")
+				    ? "n64\\ramqan.cob" : "Metatank.cob";
 			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 8000;
 
-			/* ShieldTurret (103): stationary turret → BeamTurret template */
+			/* ShieldTurret (103): 3-part stationary turret with base +
+			 * pivot + gun. Real Remaster .cob assembles all 3 parts.
+			 * Falls back to BeamTurret single-cob when missing. */
 			EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
-			EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "Beamtrt.cob";
+			EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename =
+				File_Exists("data\\bgobjects\\n64\\shieldturret.cob")
+				    ? "n64\\shieldTurret.cob" : "Beamtrt.cob";
 			EnemyTypes[ ENEMY_ShieldTurret ].Shield = 384;
 
-			/* Boss_Maldroid (104): walking boss → Mekton template */
+			/* Boss_Maldroid (104): 12-part walking boss (body + torso +
+			 * hip + arms + cannons + legs + shins + ankles + feet).
+			 * Real Remaster .cob assembles all 12 .mx limbs. Falls back
+			 * to Mekton single-mesh when n64\\maldroid.cob is missing. */
 			EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "Mekton.mx";
+			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename =
+				File_Exists("data\\bgobjects\\n64\\maldroid.cob")
+				    ? "n64\\maldroid.cob" : "Mekton.mx";
 			EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
 
 			/* Enforcer (105): Hunter brain + real N64 mesh. */
@@ -4313,14 +4333,22 @@ bool PreLoadEnemies( void )
 				File_Exists("data\\models\\n64\\enforcer.mx")
 				    ? "n64\\enforcer.mx" : "Hunter.mx";
 
-			/* Boss_DreadNaught2 (106): unused but populate for safety */
+			/* Boss_DreadNaught2 (106): unused (no level references it)
+			 * but populate for safety. 4-part heavy bomber: base +
+			 * 3 guns. Falls back to Avatar's cob when missing. */
 			EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename = "Avatar.cob";
+			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename =
+				File_Exists("data\\bgobjects\\n64\\dreadnaught.cob")
+				    ? "n64\\dreadnaught.cob" : "Avatar.cob";
 			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].Shield = 7500;
 
-			/* Boss_DreadNaught (107): heavy bomber-class → Boss_Avatar template */
+			/* Boss_DreadNaught (107): 4-part heavy bomber-class. Real
+			 * Remaster .cob assembles base + 3 guns. Falls back to
+			 * Avatar's cob when n64\\dreadnaught.cob is missing. */
 			EnemyTypes[ ENEMY_Boss_DreadNaught ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "Avatar.cob";
+			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename =
+				File_Exists("data\\bgobjects\\n64\\dreadnaught.cob")
+				    ? "n64\\dreadnaught.cob" : "Avatar.cob";
 			EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
 
 			/* Ghost (108): Shade brain + real N64 mesh. */

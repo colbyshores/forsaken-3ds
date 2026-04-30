@@ -189,9 +189,60 @@ N64_SINGLE_MESH_FILES = [
     "models/n64/bhgun4.mx",
 ]
 
+# Boss .cob component files. KEX .cob and 1998 .cob share the PRJX magic
+# + version 2 layout (verified empirically: same NumModels int16 + null-
+# terminated path strings + binary tree section). The 1998 PreLoadCompObj
+# / LoadCompObj loaders should accept these without code changes.
+N64_BOSS_COB_FILES = [
+    "bgobjects/n64/cargodrone.cob",   # already covered by single-mesh path,
+                                      # included for completeness / .cob parity
+    "bgobjects/n64/dreadnaught.cob",
+    "bgobjects/n64/maldroid.cob",
+    "bgobjects/n64/manmech.cob",
+    "bgobjects/n64/ramqan.cob",
+    "bgobjects/n64/shieldTurret.cob",
+]
+
+# Per-limb .mx prefixes for the multi-component bosses. extract_kpf_dir()
+# pulls everything under each prefix into the matching local dir, preserving
+# subdirectory structure (the .cob files reference paths like
+# n64/manmech/manmech_body.mx so the on-disk layout has to match).
+N64_BOSS_MESH_DIRS = [
+    "models/n64/dreadnaught/",
+    "models/n64/maldroid/",
+    "models/n64/manmech/",
+    "models/n64/ramqan/",
+    "models/n64/shieldTurret/",
+]
+
+
+def _copy_kpf_files(kpf_path, paths, dst_dirs_relative_to, dst_root_label):
+    """Copy a list of KPF entries into local dirs, preserving structure
+    relative to dst_dirs_relative_to (e.g., 'models/' so models/n64/foo.mx
+    lands under <dst_root>/n64/foo.mx)."""
+    copied = []
+    skipped_existing = []
+    missing = []
+    with zipfile.ZipFile(kpf_path) as z:
+        names = set(z.namelist())
+        for src in paths:
+            if src not in names:
+                missing.append(src)
+                continue
+            rel = src[len(dst_dirs_relative_to):]
+            dst = os.path.join(dst_root_label, rel)
+            if os.path.exists(dst):
+                skipped_existing.append(rel)
+                continue
+            os.makedirs(os.path.dirname(dst) or ".", exist_ok=True)
+            with z.open(src) as src_f, open(dst, "wb") as dst_f:
+                shutil.copyfileobj(src_f, dst_f)
+            copied.append(rel)
+    return copied, skipped_existing, missing
+
 
 def import_n64_models(kpf_path, models_output):
-    """Extract single-mesh N64 enemy/pickup .mx files into models_output/n64/."""
+    """Extract N64 enemy/pickup/boss .mx files into models_output/n64/."""
     dst_root = os.path.join(models_output, "n64")
     if not os.path.isdir(models_output):
         print(f"ERROR: --models-output dir does not exist: {models_output}",
@@ -199,6 +250,7 @@ def import_n64_models(kpf_path, models_output):
         return False
     os.makedirs(dst_root, exist_ok=True)
 
+    # Single-mesh files: directly into dst_root (n64/foo.mx).
     copied = []
     skipped_existing = []
     missing = []
@@ -218,11 +270,53 @@ def import_n64_models(kpf_path, models_output):
                 shutil.copyfileobj(src_f, dst_f)
             copied.append(basename)
 
-    print(f"N64 models: copied {len(copied)} "
-          f"({', '.join(copied) if copied else 'none'}) -> {dst_root}")
+        # Multi-part boss meshes: preserve the per-boss subdir layout.
+        # KEX .cob files reference n64/<boss>/<part>.mx so the engine's
+        # PreInitModel will look for data\\models\\n64\\<boss>\\<part>.mx.
+        for prefix in N64_BOSS_MESH_DIRS:
+            for src in sorted(names):
+                if not src.startswith(prefix) or src.endswith("/"):
+                    continue
+                rel = src[len("models/"):]
+                dst = os.path.join(models_output, rel)
+                if os.path.exists(dst):
+                    skipped_existing.append(rel)
+                    continue
+                os.makedirs(os.path.dirname(dst) or ".", exist_ok=True)
+                with z.open(src) as src_f, open(dst, "wb") as dst_f:
+                    shutil.copyfileobj(src_f, dst_f)
+                copied.append(rel)
+
+    print(f"N64 models: copied {len(copied)} files -> {models_output}")
+    if copied:
+        for c in copied:
+            print(f"    {c}")
     if skipped_existing:
         print(f"  Already present, left untouched: "
-              f"{', '.join(skipped_existing)}")
+              f"{len(skipped_existing)} file(s)")
+    if missing:
+        print(f"  WARNING: not found in KPF: {', '.join(missing)}")
+    return True
+
+
+def import_n64_cobs(kpf_path, bgobjects_output):
+    """Extract N64 boss .cob component files into bgobjects_output/n64/."""
+    dst_root = os.path.join(bgobjects_output, "n64")
+    if not os.path.isdir(bgobjects_output):
+        print(f"ERROR: --bgobjects-output dir does not exist: {bgobjects_output}",
+              file=sys.stderr)
+        return False
+    os.makedirs(dst_root, exist_ok=True)
+
+    copied, skipped_existing, missing = _copy_kpf_files(
+        kpf_path, N64_BOSS_COB_FILES, "bgobjects/", bgobjects_output)
+
+    print(f"N64 .cob files: copied {len(copied)} -> {dst_root}")
+    if copied:
+        for c in copied:
+            print(f"    {c}")
+    if skipped_existing:
+        print(f"  Already present, left untouched: {', '.join(skipped_existing)}")
     if missing:
         print(f"  WARNING: not found in KPF: {', '.join(missing)}")
     return True
@@ -429,6 +523,9 @@ def main():
                     help="Destination music directory (default: romfs/music)")
     ap.add_argument("--models-output", default="Data/models",
                     help="Destination models directory (default: Data/models)")
+    ap.add_argument("--bgobjects-output", default="Data/bgobjects",
+                    help="Destination bgobjects directory for boss .cob files "
+                         "(default: Data/bgobjects)")
     ap.add_argument("--skip-levels", action="store_true",
                     help="Don't import level data")
     ap.add_argument("--skip-music", action="store_true",
@@ -450,6 +547,7 @@ def main():
         ok = import_music(steam_dir, args.music_output) and ok
     if not args.skip_models:
         ok = import_n64_models(args.kpf, args.models_output) and ok
+        ok = import_n64_cobs(args.kpf, args.bgobjects_output) and ok
 
     return 0 if ok else 1
 
