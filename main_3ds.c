@@ -78,15 +78,22 @@ extern bool render_init(render_info_t *info);
  *
  * On OG 3DS this 56 MB total may push past the partition budget; OG
  * "Surgical Q3-style memory refactor"). */
-/* Q3 memory refactor (this branch): malloc heap raised from 24 MB
- * to 28 MB to absorb ModelHeaders + MxaModelHeaders (now sized
- * per-level to the actual model count, freed on level transition).
- * Densest level peaks at ~16 MB combined; 28 MB malloc gives ~12 MB
- * remaining for the rest of per-level/per-frame allocations. The
- * +4 MB on malloc is paid for by the ~8 MB BSS recovered from those
- * arrays moving out of BSS, so the net heap-vs-total-budget impact
- * is -4 MB on N3DS. */
-u32 __ctru_heap_size        = 28 * 1024 * 1024;
+/* Heap sizing post-Q3 refactor:
+ *   - 24 MB malloc — restored to the OG-friendly value. The
+ *     textureGroups migration shrank each MXLOADHEADER from ~17 KB
+ *     to ~600 bytes, so the per-level ModelHeaders+MxaModelHeaders
+ *     malloc dropped from ~16 MB to ~580 KB. Gameplay malloc usage
+ *     comfortably fits 24 MB with headroom for the per-execbuf
+ *     textureGroups[] hunk (8 MB pulled from this heap at boot).
+ *   - 32 MB linear — unchanged from before the refactor.
+ *
+ * Total heap = 24 + 32 = 56 MB (same as pre-refactor). The
+ * ~20 MB of BSS the refactor recovered shows up as headroom in
+ * the OS / total-app-budget, not as bigger heaps. That's the
+ * intentional outcome on N3DS (124 MB budget, lots of slack);
+ * on OG 3DS (80 MB budget) the recovered budget is what makes
+ * the previously OOM-prone Remaster levels fit. */
+u32 __ctru_heap_size        = 24 * 1024 * 1024;
 u32 __ctru_linear_heap_size = 32 * 1024 * 1024;
 
 /* ---- init state tracking ---- */
