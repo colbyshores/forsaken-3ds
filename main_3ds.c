@@ -227,6 +227,25 @@ bool platform_init(void)
 		trace(_b);
 	}
 
+	/* Q3-style hunk arena for per-level large allocations. Pulls one
+	 * block from the malloc heap at boot; ModelHeaders / MxaModelHeaders
+	 * / per-execbuf textureGroups[] all live inside this arena and get
+	 * bulk-freed via Hunk_FreeAll(TAG_LEVEL) on level transition.
+	 * Sized at 12 MB — covers worst-case Remaster levels (~6 MB
+	 * ModelHeaders + ~6 MB MxaModelHeaders at full 608-entry occupancy
+	 * plus a few hundred KB of textureGroup arrays). The corresponding
+	 * BSS regions are now empty so the net effect on total budget is
+	 * a recovery of ~16 MB of formerly-locked BSS at the cost of 12 MB
+	 * dynamic. */
+	{
+		extern bool Hunk_Init(size_t);
+		bool ok = Hunk_Init(12 * 1024 * 1024);
+		char _b[96];
+		snprintf(_b, sizeof(_b), "Hunk_Init: %s (12MB)", ok ? "OK" : "FAILED");
+		trace(_b);
+		if (!ok) return false;
+	}
+
 	trace("platform_init: romfsInit");
 
 	/* romfs precedence: try the .3dsx's embedded romfs FIRST. If that
