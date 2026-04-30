@@ -284,10 +284,17 @@ resolve_source() {
     return 1
 }
 
-# Global textures (every texture in Data/textures/, prefer original for atlas)
-for png in Data/textures/*.png; do
-    [ -f "$png" ] || continue
-    name=$(basename "$png" .png | tr 'A-Z' 'a-z')
+# Global textures (every texture in Data/textures/, prefer original for atlas).
+# The Remaster build pipeline (extract_remaster_levels.py) ships textures as
+# .bmp from the KPF; the 1998 ISO pipeline (extract_assets.py) historically
+# left both .bmp and .png. Iterate both extensions and dedupe by basename so
+# either source layout produces a complete HD texture pack.
+declare -A SEEN_GLOBAL
+for src_orig in Data/textures/*.png Data/textures/*.bmp; do
+    [ -f "$src_orig" ] || continue
+    name=$(basename "$src_orig" | sed 's/\.[^.]*$//' | tr 'A-Z' 'a-z')
+    [ -n "${SEEN_GLOBAL[$name]}" ] && continue
+    SEEN_GLOBAL[$name]=1
     src=$(resolve_source global "" "$name")
     [ -n "$src" ] && echo "$src $OUT/textures/${name}.t3x" >> "$JOB_FILE"
 done

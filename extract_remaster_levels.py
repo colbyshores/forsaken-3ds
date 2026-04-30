@@ -165,10 +165,10 @@ def _downscale_banner_png(src_fileobj, out_path):
 
 
 def import_levels(kpf_path, output_dir):
-    if not os.path.isdir(output_dir):
-        print(f"ERROR: --levels-output dir does not exist: {output_dir}",
-              file=sys.stderr)
-        return False
+    # Create the output dir if missing — keeps the script self-bootstrapping
+    # when running against an empty Data/ tree. The bulk extract usually
+    # creates this already, but the per-level overlay can run standalone too.
+    os.makedirs(output_dir, exist_ok=True)
 
     available = kpf_levels(kpf_path)
     copied = []
@@ -216,9 +216,12 @@ def import_banners(kpf_path, output_dir):
     populated Data/Levels/ — existing banners get overwritten in place,
     matching how the romfs-staging rsync expects to see them."""
     if not os.path.isdir(output_dir):
-        print(f"ERROR: --levels-output dir does not exist: {output_dir}",
-              file=sys.stderr)
-        return False
+        # Banners are level-specific overwrites — if the dir doesn't
+        # exist there's nothing to write. Skip without erroring; this
+        # happens when the user passes --skip-bulk --skip-levels and
+        # also has no pre-existing Data/Levels.
+        print(f"  (no levels at {output_dir}, skipping banners)")
+        return True
 
     written = []
     no_kpf_match = []
@@ -497,7 +500,12 @@ def import_kpf_assets(kpf_path, data_output):
                 if (len(level_parts) == 2
                         and level_parts[1].lower().endswith(".png")):
                     continue
-            local_top = KPF_DIR_MAP[top].lower()
+            # Top-level dir name keeps the KPF_DIR_MAP case (Levels with
+            # cap L, Demos with cap D — matches the 1998 ISO convention
+            # extract_assets.py produces, and matches Data/Levels/mission.dat
+            # which is force-tracked in git). Inner paths lowercased so the
+            # engine's lowercase fopen lookups resolve correctly.
+            local_top = KPF_DIR_MAP[top]
             out_path = os.path.join(data_output, local_top, rest.lower())
             os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
             with z.open(info) as src, open(out_path, "wb") as dst:

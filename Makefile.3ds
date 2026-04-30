@@ -240,14 +240,28 @@ $(ROMFS_STAMP): | romfs-freshness-check
 	@echo "Staging romfs data (this may take a while)..."
 	@mkdir -p $(ROMFS_STAGING)
 	@rsync -aL --delete --exclude='.stamp' $(SRCDIR)/romfs/ $(ROMFS_STAGING)/
-	@echo "Converting level BMP textures to PNG..."
-	@cd $(ROMFS_STAGING) && find . -path '*/levels/*/textures/*.bmp' -o -path '*/levels/*/textures/*.BMP' | while read bmp; do \
-		d=$$(dirname "$$bmp"); b=$$(basename "$$bmp"); \
-		png=$$(echo "$$b" | sed 's/\.[bB][mM][pP]$$/.png/'); \
-		if [ ! -f "$$d/$$png" ]; then \
-			convert "$$bmp" -type TrueColor "PNG24:$$d/$$png" 2>/dev/null; \
-		fi; \
-	done
+	@echo "Converting BMP textures to PNG (level-specific + global)..."
+	@# The 3DS texture loader (render_c3d.c::FSCreateTexture) substitutes
+	@# a .png extension at lookup time, so the engine looks for <name>.png
+	@# even when the data ships as <name>.bmp. Convert both per-level
+	@# atlases AND the global UI/weapon/sprite atlas so neither falls
+	@# through to "file not found" at runtime. Skipped: the per-level
+	@# .bmp at the level root (banner — written as 256x128 .png by
+	@# extract_remaster_levels.py's import_banners()).
+	@cd $(ROMFS_STAGING) && \
+	  find . \( -path '*/levels/*/textures/*.bmp' \
+	         -o -path '*/levels/*/textures/*.BMP' \
+	         -o -path '*/data/textures/*.bmp' \
+	         -o -path '*/data/textures/*.BMP' \
+	         -o -path '*/data/splash/*.bmp' \
+	         -o -path '*/data/splash/*.BMP' \) | \
+	  while read bmp; do \
+	    d=$$(dirname "$$bmp"); b=$$(basename "$$bmp"); \
+	    png=$$(echo "$$b" | sed 's/\.[bB][mM][pP]$$/.png/'); \
+	    if [ ! -f "$$d/$$png" ]; then \
+	      convert "$$bmp" -type TrueColor "PNG24:$$d/$$png" 2>/dev/null; \
+	    fi; \
+	  done
 	@echo "Lowercasing romfs filenames..."
 	@cd $(ROMFS_STAGING) && find . -depth -name '*[A-Z]*' | while read f; do \
 		d=$$(dirname "$$f"); b=$$(basename "$$f"); lb=$$(echo "$$b" | tr 'A-Z' 'a-z'); \
