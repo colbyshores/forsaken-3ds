@@ -227,6 +227,24 @@ bool WaterLoad( void )
 	for( i = 0 ; i < NumOfWaterObjects ; i++ )
 	{
 		WO->Status = WATERSTATUS_STATIC;
+
+		/* Each water object uses exactly one texture group at draw time
+		 * (see line ~496 below). Post-Q3-refactor, RENDEROBJECT's
+		 * textureGroups is a pointer rather than an inline array, so
+		 * we allocate one slot per water object from the TAG_LEVEL
+		 * hunk. Bulk-freed via Hunk_FreeAll(TAG_LEVEL) at level
+		 * transition. */
+		{
+			extern void *Hunk_Alloc(int, size_t);
+			WO->renderObject.textureGroups =
+			    (TEXTUREGROUP *) Hunk_Alloc(/*TAG_LEVEL=*/1, sizeof(TEXTUREGROUP));
+			if ( !WO->renderObject.textureGroups )
+			{
+				Msg( "WaterLoad: hunk-alloc failed for WO[%d].textureGroups", i );
+				goto load_fail;
+			}
+		}
+
 		Uint16Pnt = (u_int16_t *) Buffer;
 		WO->Group = *Uint16Pnt++;
 		FloatPnt = (float*) Uint16Pnt;
