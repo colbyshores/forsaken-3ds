@@ -208,7 +208,7 @@ extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
 extern	POLY   			Polys[MAXPOLYS];
 extern  SCRPOLY			ScrPolys[ MAXNUMOFSCRPOLYS ];
 extern	LINE			Lines[ MAXLINES ];
-extern	MXALOADHEADER	MxaModelHeaders[ MAXMXAMODELHEADERS ];
+extern	MXALOADHEADER	*MxaModelHeaders;
 extern	FRAME_INFO	*	Title_Fonts_Header;
 extern	FRAME_INFO	*	Title_Chars1_Header;
 extern	FRAME_INFO	*	Title_Chars2_Header;
@@ -260,7 +260,7 @@ extern	MODEL	Models[];
 u_int16_t	BackgroundModel[NUMOFTITLEMODELS];
 extern	TLOADHEADER Tloadheader;
 extern	float	LastDistance[];
-extern	MXLOADHEADER ModelHeaders[];
+extern	MXLOADHEADER *ModelHeaders;
 extern	MODELNAME	TitleModelNames[]; 
 extern	MODELNAME	InterLevelModelNames[];
 extern	char *PrimaryDescription[];
@@ -3242,7 +3242,10 @@ bool Turned[6], LastTurned[6], RotateSetup, DoHighlight,
 	 OnRotateVDU, OnVDUflip, RotVDU, PanDone, VDU_Active;
 
 
-MXLOADHEADER ModelHeaders[MAXMODELHEADERS];	//as defined in models.c
+/* (extern declaration of ModelHeaders is at the top of this file —
+ * the duplicate static definition that used to live here merged
+ * with the real one in models.c only because of -fcommon, which
+ * doesn't survive the array→pointer migration.) */
 
 POLYANIM *PolyAnim[6];
 MXLOADHEADER * Mxloadheader[6];

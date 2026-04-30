@@ -58,8 +58,8 @@ extern	u_int16_t			IsGroupVisible[MAXGROUPS];
 extern	MODELNAME		ModelNames[MAXMODELHEADERS];
 extern	TRIGGERMOD	*	TrigMods;
 extern	int				NumOfTrigMods;
-extern	MXLOADHEADER	ModelHeaders[MAXMODELHEADERS];
-extern	MXALOADHEADER	MxaModelHeaders[MAXMODELHEADERS];
+extern	MXLOADHEADER	*ModelHeaders;
+extern	MXALOADHEADER	*MxaModelHeaders;
 extern	LINE			Lines[ MAXLINES ];
 extern	MLOADHEADER		Mloadheader;
 

@@ -78,7 +78,15 @@ extern bool render_init(render_info_t *info);
  *
  * On OG 3DS this 56 MB total may push past the partition budget; OG
  * "Surgical Q3-style memory refactor"). */
-u32 __ctru_heap_size        = 24 * 1024 * 1024;
+/* Q3 memory refactor (this branch): malloc heap raised from 24 MB
+ * to 28 MB to absorb ModelHeaders + MxaModelHeaders (now sized
+ * per-level to the actual model count, freed on level transition).
+ * Densest level peaks at ~16 MB combined; 28 MB malloc gives ~12 MB
+ * remaining for the rest of per-level/per-frame allocations. The
+ * +4 MB on malloc is paid for by the ~8 MB BSS recovered from those
+ * arrays moving out of BSS, so the net heap-vs-total-budget impact
+ * is -4 MB on N3DS. */
+u32 __ctru_heap_size        = 28 * 1024 * 1024;
 u32 __ctru_linear_heap_size = 32 * 1024 * 1024;
 
 /* ---- init state tracking ---- */
@@ -225,25 +233,6 @@ bool platform_init(void)
 		         (unsigned)(__ctru_heap_size >> 20),
 		         (unsigned)(__ctru_linear_heap_size >> 20));
 		trace(_b);
-	}
-
-	/* Q3-style hunk arena for per-level large allocations. Pulls one
-	 * block from the malloc heap at boot; ModelHeaders / MxaModelHeaders
-	 * / per-execbuf textureGroups[] all live inside this arena and get
-	 * bulk-freed via Hunk_FreeAll(TAG_LEVEL) on level transition.
-	 * Sized at 12 MB — covers worst-case Remaster levels (~6 MB
-	 * ModelHeaders + ~6 MB MxaModelHeaders at full 608-entry occupancy
-	 * plus a few hundred KB of textureGroup arrays). The corresponding
-	 * BSS regions are now empty so the net effect on total budget is
-	 * a recovery of ~16 MB of formerly-locked BSS at the cost of 12 MB
-	 * dynamic. */
-	{
-		extern bool Hunk_Init(size_t);
-		bool ok = Hunk_Init(12 * 1024 * 1024);
-		char _b[96];
-		snprintf(_b, sizeof(_b), "Hunk_Init: %s (12MB)", ok ? "OK" : "FAILED");
-		trace(_b);
-		if (!ok) return false;
 	}
 
 	trace("platform_init: romfsInit");

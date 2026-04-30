@@ -345,7 +345,7 @@ extern  bool ShowStats;
 
 extern  u_int16_t  IsGroupVisible[MAXGROUPS];
 
-extern  MXLOADHEADER ModelHeaders[MAXMODELHEADERS];
+extern  MXLOADHEADER *ModelHeaders;
 extern  MODELNAME TitleModelNames[MAXMODELHEADERS]; 
 
 extern  char  TitleNames[8][64];  
@@ -1982,6 +1982,16 @@ void ReleaseView(void)
     ReleaseTitleModels();
     Free_All_Off_Files( &Title_OffsetFiles[ 0 ] );
     ReleaseRenderBufs();
+    /* Free the title's per-level model header arrays (allocated in
+     * PreInitModel sized to the title's actual model count). Reset
+     * to NULL so the next PreInitModel re-allocates at the new
+     * caller's count. */
+    {
+      extern MXLOADHEADER  *ModelHeaders;
+      extern MXALOADHEADER *MxaModelHeaders;
+      free(ModelHeaders);    ModelHeaders    = NULL;
+      free(MxaModelHeaders); MxaModelHeaders = NULL;
+    }
     break;
 
   case STATUS_ViewingScore:
@@ -2030,6 +2040,13 @@ void ReleaseView(void)
     FreeTxtFile();
     _RV_TRACE("FreeMsgFile");
     FreeMsgFile();
+    /* Same per-level free as the title-cleanup branch above. */
+    {
+      extern MXLOADHEADER  *ModelHeaders;
+      extern MXALOADHEADER *MxaModelHeaders;
+      free(ModelHeaders);    ModelHeaders    = NULL;
+      free(MxaModelHeaders); MxaModelHeaders = NULL;
+    }
     _RV_TRACE("default DONE");
 #undef _RV_TRACE
   }

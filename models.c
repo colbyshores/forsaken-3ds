@@ -47,7 +47,7 @@ extern	MLOADHEADER		Mloadheader;
 extern	MCLOADHEADER	MCloadheader;
 extern	MCLOADHEADER	MCloadheadert0;
 extern	CAMERA			CurrentCamera;
-extern	MXALOADHEADER	MxaModelHeaders[ MAXMXAMODELHEADERS ];
+extern	MXALOADHEADER	*MxaModelHeaders;
 
 extern	BYTE			WhoIAm;
 extern	float			framelag;
@@ -130,7 +130,13 @@ bool	ShowBoundingBoxes = false;
 
 int8_t	*	ModelPath = "data\\models\\";
 
-MXLOADHEADER ModelHeaders[MAXMODELHEADERS];
+/* Pointer to a TAG_LEVEL hunk allocation, sized at level load to
+ * the active model count (see PreInitModel). Was a static
+ * MXLOADHEADER[MAXMODELHEADERS] BSS array; moved to the hunk to
+ * give back ~6 MB of always-locked BSS budget on small/medium
+ * levels. ModelHeaders[i] indexing works identically with either
+ * declaration. */
+MXLOADHEADER *ModelHeaders = NULL;
 
 #define	RETAIN_POLYS		true
 #define	DISCARD_POLYS		false
@@ -784,6 +790,48 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 	int			i;
 	int8_t		TempFilename[ 256 ];
 	int8_t		Ext[ 32 ];
+
+	/* Lazy malloc of ModelHeaders / MxaModelHeaders sized to the active
+	 * MODELNAME count (slot 0 .. first empty Name). ReleaseView frees
+	 * these and resets the pointers to NULL on level transition; next
+	 * call lands here and re-allocates at the new level's exact count.
+	 *
+	 * Why plain malloc/free vs the Q3 hunk allocator: this is two
+	 * allocations per level lifecycle, no fragmentation concern. The
+	 * hunk pays off for many-small-allocs (the planned per-execbuf
+	 * textureGroups[] migration is the right place for it). */
+	if (!ModelHeaders || !MxaModelHeaders)
+	{
+		int count = 0;
+		MODELNAME *p = NamePnt;
+		while (count < MAXMODELHEADERS && p->Name[0]) { count++; p++; }
+		if (count == 0) count = 1; /* defensive: never alloc 0 */
+		ModelHeaders    = (MXLOADHEADER *)  calloc(count, sizeof(MXLOADHEADER));
+		MxaModelHeaders = (MXALOADHEADER *) calloc(count, sizeof(MXALOADHEADER));
+		if (!ModelHeaders || !MxaModelHeaders)
+		{
+#ifdef __3DS__
+			extern void trace(const char *);
+			char _b[160];
+			snprintf(_b, sizeof(_b),
+			    "PreInitModel: malloc FAILED for ModelHeaders/MxaModelHeaders (count=%d, %u KB requested)",
+			    count,
+			    (unsigned)((count * (sizeof(MXLOADHEADER) + sizeof(MXALOADHEADER))) >> 10));
+			trace(_b);
+#endif
+			free(ModelHeaders);    ModelHeaders    = NULL;
+			free(MxaModelHeaders); MxaModelHeaders = NULL;
+			return false;
+		}
+#ifdef __3DS__
+		{ extern void trace(const char *); char _b[160];
+		  snprintf(_b, sizeof(_b),
+		      "PreInitModel: malloc ModelHeaders=%d entries (%u KB total)",
+		      count,
+		      (unsigned)((count * (sizeof(MXLOADHEADER) + sizeof(MXALOADHEADER))) >> 10));
+		  trace(_b); }
+#endif
+	}
 
 	for( i = 0 ; i < MAXMODELHEADERS ; i++ )
 	{
@@ -1551,6 +1599,12 @@ bool ReleaseTitleModels( )
 {
 	int i;
 
+	/* ModelHeaders / MxaModelHeaders are TAG_LEVEL hunk allocations.
+	 * If neither has been allocated yet (e.g. ReleaseView fires before
+	 * the first PreInitModel on the boot path), there's nothing to
+	 * release — bail out cleanly. */
+	if (!ModelHeaders || !MxaModelHeaders) return true;
+
 	for( i = 0 ; i < MAXMODELHEADERS; i++ )
 	{
 		if( TitleModelSet[i].Name[0] != 0 )
@@ -1578,6 +1632,8 @@ bool ReleaseTitleModels( )
 bool ReleaseModels( )
 {
 	int i;
+
+	if (!ModelHeaders || !MxaModelHeaders) return true;
 
 	for( i = 0 ; i < MAXMODELHEADERS ; i++ )
 	{

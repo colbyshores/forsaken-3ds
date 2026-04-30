@@ -62,7 +62,7 @@ extern	ENEMY			Enemies[ MAXENEMIES ];
 extern	ENEMY		*	EnemyGroups[ MAXGROUPS ];
 extern	ENEMY_TYPES		EnemyTypes[ MAX_ENEMY_TYPES ];
 extern	PICKUP	*		PickupGroups[ MAXGROUPS ];
-extern	MXLOADHEADER	ModelHeaders[MAXMODELHEADERS];
+extern	MXLOADHEADER	*ModelHeaders;
 extern	ENEMY	*		FirstEnemyUsed;
 extern	int16_t			PickupsGot[ MAXPICKUPTYPES ];
 extern	int16_t			BikeModels[ MAXBIKETYPES ];

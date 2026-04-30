@@ -93,7 +93,9 @@ extern	RENDERMATRIX  TempWorld;
 /*===================================================================
 		Globals...	
 ===================================================================*/
-MXALOADHEADER MxaModelHeaders[MAXMXAMODELHEADERS];
+/* Pointer to a TAG_LEVEL hunk allocation. See ModelHeaders comment
+ * in models.c — same migration, same rationale. */
+MXALOADHEADER *MxaModelHeaders = NULL;
 
 static void
 FixUV_MXA( u_int16_t vertices, MXAVERT *MXA_Vert, LPLVERTEX Vert, LPLVERTEX Orig_Vert )
