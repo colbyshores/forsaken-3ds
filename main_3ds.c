@@ -62,8 +62,24 @@ extern bool render_init(render_info_t *info);
  *
  * On New 3DS this leaves ~30 MB unused overhead but that's fine —
  * we're not memory-optimizing for New. */
+/* File-scope heap sizes consumed by libctru's default
+ * __system_allocateHeaps. 24 MB malloc + 32 MB linear = 56 MB total.
+ *
+ * malloc heap: peak gameplay ~14 MB, 24 MB has comfortable headroom.
+ *
+ * linear heap holds: 4 MB GPU command buffer (raised from 1 MB to
+ * absorb the multi-pass flood-fill's extra draw calls in
+ * visi.c FindVisible) + render targets + HD textures + level
+ * vertex/index buffers + audio buffers. With 24 MB linear,
+ * powerdown's model load was hitting linearAlloc=NULL inside Mxload
+ * (`InitModel: FAIL Mxload i=372 name=barrel.mx`, AUTOTEST:
+ * SeriousError). 32 MB gives ~6-8 MB headroom for the full Remaster
+ * level set.
+ *
+ * On OG 3DS this 56 MB total may push past the partition budget; OG
+ * "Surgical Q3-style memory refactor"). */
 u32 __ctru_heap_size        = 24 * 1024 * 1024;
-u32 __ctru_linear_heap_size = 24 * 1024 * 1024;
+u32 __ctru_linear_heap_size = 32 * 1024 * 1024;
 
 /* ---- init state tracking ---- */
 
@@ -196,6 +212,20 @@ bool platform_init(void)
 	APT_CheckNew3DS(&is_n3ds);
 	if (is_n3ds)
 		osSetSpeedupEnable(true);
+
+	/* Log the actual heap sizes that __system_allocateHeaps ended up
+	 * with so a "no trace, just crashed in boot" failure can be told
+	 * apart from "boot worked, app crashed later". The override caps
+	 * sizes to remaining commit budget; we want to see what landed. */
+	{
+		char _b[160];
+		snprintf(_b, sizeof(_b),
+		         "heap: is_n3ds=%d malloc=%uMB linear=%uMB",
+		         (int)is_n3ds,
+		         (unsigned)(__ctru_heap_size >> 20),
+		         (unsigned)(__ctru_linear_heap_size >> 20));
+		trace(_b);
+	}
 
 	trace("platform_init: romfsInit");
 

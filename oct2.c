@@ -1989,28 +1989,49 @@ void ReleaseView(void)
     break;
 
   default:
+#ifdef __3DS__
+#define _RV_TRACE(s) do { extern void trace(const char*); trace("ReleaseView/default: " s); } while(0)
+#else
+#define _RV_TRACE(s) ((void)0)
+#endif
+    _RV_TRACE("Bspfree");
     Bspfree();
+    _RV_TRACE("FreeAllLastAFrameScrPolys");
     FreeAllLastAFrameScrPolys();
+    _RV_TRACE("ReleaseMloadheader");
     ReleaseMloadheader(&Mloadheader);
+    _RV_TRACE("ReleaseTloadheader");
     ReleaseTloadheader( &Tloadheader );
+    _RV_TRACE("ReleaseModels");
     ReleaseModels();
     if ( MCloadheader.Buffer )
     {
+      _RV_TRACE("free MCloadheader.Buffer");
       free( MCloadheader.Buffer );
       MCloadheader.Buffer = NULL;
     }
     if ( MCloadheadert0.Buffer )
     {
+      _RV_TRACE("free MCloadheadert0.Buffer");
       free( MCloadheadert0.Buffer );
       MCloadheadert0.Buffer = NULL;
     }
+    _RV_TRACE("Free_All_Off_Files");
 		Free_All_Off_Files( &OffsetFiles[ 0 ] );
+    _RV_TRACE("ReleaseSkinExecs");
     ReleaseSkinExecs();
+    _RV_TRACE("ReleasePortalExecs");
     ReleasePortalExecs();
+    _RV_TRACE("ReleaseRenderBufs");
     ReleaseRenderBufs();
-		WaterRelease();	
+    _RV_TRACE("WaterRelease");
+		WaterRelease();
+    _RV_TRACE("FreeTxtFile");
     FreeTxtFile();
+    _RV_TRACE("FreeMsgFile");
     FreeMsgFile();
+    _RV_TRACE("default DONE");
+#undef _RV_TRACE
   }
 }
 
@@ -2643,6 +2664,14 @@ bool RenderScene( void )
       SeriousError = true;
       return false;
     }
+#ifdef AUTOTEST_REMASTER
+    /* Natural-mode autotest hook: counts BetweenLevels frames while a
+     * transition is in flight and auto-confirms the inter-level menu
+     * via StartASinglePlayerGame(NULL) once a short dwell elapses.
+     * No-op when no transition is armed (s_advancing == false). */
+    { extern void autotest_between_levels_tick(void);
+      autotest_between_levels_tick(); }
+#endif
     break;
 
 
@@ -3923,6 +3952,9 @@ bool RenderScene( void )
 #endif
 
     PrintInitViewStatus( MyGameStatus );
+#ifdef __3DS__
+	{ extern void trace(const char*); trace("CLPIV: post-PrintInitViewStatus"); }
+#endif
 
 
     break;
@@ -4119,14 +4151,27 @@ bool RenderScene( void )
 #endif
 
 #ifdef __3DS__
-	{ static int _mg_first = 1; extern void trace(const char*);
-	  if (_mg_first) { _mg_first = 0; trace("SP: -> MainGame (first frame)"); } }
+	/* Per-level first-frame trace markers — fire once per level
+	 * transition so we can see whether MainGame() itself completes
+	 * for each level. The original `_mg_first` static fired only on
+	 * the very first STATUS_SinglePlayer frame in the whole process,
+	 * which is useless for diagnosing late-sweep crashes. */
+	{ static int _mg_last_level = -2; extern void trace(const char*);
+	  extern int16_t LevelNum;
+	  if (LevelNum != _mg_last_level) {
+	    _mg_last_level = LevelNum;
+	    char _b[64]; snprintf(_b,sizeof(_b),"SP: -> MainGame first frame for level %d", (int)LevelNum); trace(_b);
+	  } }
 #endif
     if( MainGame() != true ) // bjd
       return false;
 #ifdef __3DS__
-	{ static int _mg_first_done = 1; extern void trace(const char*);
-	  if (_mg_first_done) { _mg_first_done = 0; trace("SP: MainGame OK (first frame)"); } }
+	{ static int _mg_done_last_level = -2; extern void trace(const char*);
+	  extern int16_t LevelNum;
+	  if (LevelNum != _mg_done_last_level) {
+	    _mg_done_last_level = LevelNum;
+	    char _b[64]; snprintf(_b,sizeof(_b),"SP: MainGame OK first frame for level %d", (int)LevelNum); trace(_b);
+	  } }
 #endif
 
 #ifdef AUTOTEST_REMASTER
@@ -4438,6 +4483,21 @@ void CheckLevelEnd ( void )
 
 bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 {
+#ifdef __3DS__
+	static int _rcs_stage_last_level = -2;
+	bool _rcs_stage_trace = false;
+	{
+		extern int16_t LevelNum;
+		if (LevelNum != _rcs_stage_last_level) {
+			_rcs_stage_last_level = LevelNum;
+			_rcs_stage_trace = true;
+		}
+	}
+	#define _RCS_STAGE(s) do { if (_rcs_stage_trace) { extern void trace(const char*); trace("RCS/" s); } } while(0)
+#else
+	#define _RCS_STAGE(s) ((void)0)
+#endif
+	_RCS_STAGE("entry");
 	VECTOR cam_offset;
 	render_viewport_t old_viewport = viewport;
 
@@ -4475,8 +4535,10 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
         CurrentCamera.Pos.z -= cam_offset.z;
 	if(render_info.stereo_mode == STEREO_MODE_COLOR)
         	render_set_filter( 1, 0, 0 );
+        _RCS_STAGE("calling render_camera (LEFT)");
         if( !render_camera() )
           return false;
+        _RCS_STAGE("post render_camera (LEFT)");
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	/* Hardware stereo is citro3d-only. picaGL builds force
 	 * platform_get_3d_slider() to 0, so stereo_mode is never set to
@@ -4486,7 +4548,9 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
 		extern void pglTransferEye(unsigned int eye);
+		_RCS_STAGE("pglTransferEye(LEFT)");
 		pglTransferEye(GFX_LEFT);
+		_RCS_STAGE("post pglTransferEye(LEFT)");
 	}
 #endif
 	//
@@ -4521,13 +4585,17 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	        viewport.X += viewport.Width; // already split in 2 above
 	        CurrentCamera.Viewport.X = viewport.X;
 	}
+        _RCS_STAGE("calling render_camera (RIGHT)");
         if( !render_camera() )
           return false;
+        _RCS_STAGE("post render_camera (RIGHT)");
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
 		extern void pglTransferEye(unsigned int eye);
+		_RCS_STAGE("pglTransferEye(RIGHT)");
 		pglTransferEye(GFX_RIGHT);
+		_RCS_STAGE("post pglTransferEye(RIGHT)");
 	}
 #endif
 	//
@@ -4546,7 +4614,8 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	CurrentCamera.Viewport.X = viewport.X;
 	if(render_info.stereo_mode == STEREO_MODE_COLOR)
         	render_set_filter( 1, 1, 1 );
-	if (!FSSetViewPort(&viewport)) 
+	_RCS_STAGE("pre FSSetViewPort");
+	if (!FSSetViewPort(&viewport))
 	{
 	#ifdef DEBUG_VIEWPORT
 	    SetViewportError( "RenderCurrentCamera2", &viewport );
@@ -4555,6 +4624,8 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	#endif
 	    return false;
 	}
+	_RCS_STAGE("exit OK");
+	#undef _RCS_STAGE
 	return true;
 }
 
@@ -4681,6 +4752,21 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	 * Mode=0 restored so Display* runs outside this path (title, crate
 	 * menu) behave as before. pglHudBeginBottom is a no-op on the second
 	 * eye pass; the bottom screen is mono and doesn't need a second copy. */
+	/* FPS overlay — queue an FPS-counter text poly with the bottom-HUD
+	 * route flag so RenderMainCamera2dPolys's pass-2 (mode=2) picks it
+	 * up. Bottom screen is 320×240, so position in the top-right
+	 * corner clear of the existing HUD elements. */
+	{
+		extern void ScrPolySetRouteBottom(bool b);
+		extern int  forsaken_get_fps(void);
+		extern int  Print4x5Text(char *Text, int x, int y, int color);
+		char fps_buf[24];
+		snprintf(fps_buf, sizeof(fps_buf), "FPS:%d", forsaken_get_fps());
+		ScrPolySetRouteBottom(true);
+		Print4x5Text(fps_buf, 250, 4, 1 /* white */);
+		ScrPolySetRouteBottom(false);
+	}
+
 	ScrPolySetDisplayMode(1);
 	RenderMainCamera2dPolys();
 	if (pglHudBeginBottom())
@@ -4724,34 +4810,60 @@ void SetFOVBasedOnShipSpeed(void)
 
 bool MainGameRender(void)
 {
+#ifdef __3DS__
+	/* Per-level first-frame stage trace. Same pattern as MainGame's
+	 * stage tracing: fires once per level transition. */
+	static int _mgr_stage_last_level = -2;
+	bool _mgr_stage_trace = false;
+	{
+		extern int16_t LevelNum;
+		if (LevelNum != _mgr_stage_last_level) {
+			_mgr_stage_last_level = LevelNum;
+			_mgr_stage_trace = true;
+		}
+	}
+	#define _MGR_STAGE(s) do { if (_mgr_stage_trace) { extern void trace(const char*); trace("MGR/" s); } } while(0)
+#else
+	#define _MGR_STAGE(s) ((void)0)
+#endif
+
+	_MGR_STAGE("entry");
 	if (!FSBeginScene())
 	{
+		_MGR_STAGE("FSBeginScene FAILED");
 		return false;
 	}
+	_MGR_STAGE("post-FSBeginScene");
 
 	// show the stats screen
 	if(ShowStats)
 	{
+		_MGR_STAGE("ShowStats branch");
 		ScoreDisplay();
 	}
 
    // show regular view
    else if( !FullRearView )
    {
+      _MGR_STAGE("regular-view branch");
       CameraRendering = CAMRENDERING_Main;
       MainCamera.enable = 1;
-      MainCamera.GroupImIn = Ships[Current_Camera_View].Object.Group; 
-      MainCamera.Mat = Ships[Current_Camera_View].Object.FinalMat;  
-      MainCamera.InvMat = Ships[Current_Camera_View].Object.FinalInvMat;  
-      MainCamera.Pos = Ships[Current_Camera_View].Object.Pos; 
-      MainCamera.Viewport = viewport; 
-      MainCamera.Proj = proj; 
+      MainCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;
+      MainCamera.Mat = Ships[Current_Camera_View].Object.FinalMat;
+      MainCamera.InvMat = Ships[Current_Camera_View].Object.FinalInvMat;
+      MainCamera.Pos = Ships[Current_Camera_View].Object.Pos;
+      MainCamera.Viewport = viewport;
+      MainCamera.Proj = proj;
 
       CurrentCamera = MainCamera;
+      _MGR_STAGE("post-camera-setup");
 
       HUDNames();
+      _MGR_STAGE("post-HUDNames");
       DispHUDNames();
+      _MGR_STAGE("post-DispHUDNames");
       DispUntriggeredNMEs();
+      _MGR_STAGE("post-DispUntriggeredNMEs");
 
       CurrentCamera.UseLowestLOD = false;
 
@@ -4782,17 +4894,22 @@ bool MainGameRender(void)
 #endif
 #endif
 
+      _MGR_STAGE("pre-render-camera");
       if( render_info.stereo_enabled )
       {
+				_MGR_STAGE("calling RenderCurrentCameraInStereo");
 				if(!RenderCurrentCameraInStereo(RenderCurrentCameraWithMainGameMenu))
 					return false;
+				_MGR_STAGE("post-RenderCurrentCameraInStereo");
       }
       else // non stereo - normal rendering
 	  	{
+				_MGR_STAGE("calling RenderCurrentCameraWithMainGameMenu");
 				if( RenderCurrentCameraWithMainGameMenu() != true ) // bjd
 				{
 					return false;
 				}
+				_MGR_STAGE("post-RenderCurrentCameraWithMainGameMenu");
 	  	}
   
 #ifdef __3DS__
@@ -4954,7 +5071,28 @@ bool MainGame( void ) // bjd
 {
   int i;
 
+#ifdef __3DS__
+  /* Per-level first-MainGame stage trace. Fires the FIRST time
+   * MainGame is called for each new level so a hang inside MainGame
+   * can be pinpointed to a specific stage. Cheap (5 lines per level
+   * transition, not per frame). */
+  static int _mg_stage_last_level = -2;
+  bool _mg_stage_trace = false;
+  {
+    extern int16_t LevelNum;
+    if (LevelNum != _mg_stage_last_level) {
+      _mg_stage_last_level = LevelNum;
+      _mg_stage_trace = true;
+    }
+  }
+  #define _MG_STAGE(s) do { if (_mg_stage_trace) { extern void trace(const char*); trace("MG/" s); } } while(0)
+#else
+  #define _MG_STAGE(s) ((void)0)
+#endif
+
+  _MG_STAGE("entry");
   MainGameDemoRoutines();
+  _MG_STAGE("post-MainGameDemoRoutines");
 
 #ifdef DEBUG_ON
   if ( framelag > 10.0F ) // check framelag out of reasonable range -> probably debugging
@@ -4973,6 +5111,7 @@ bool MainGame( void ) // bjd
   if( ActiveRemoteCamera || (MissileCameraActive && MissileCameraEnable) )
     AddIndirectVisible( (u_int16_t) ( ( ActiveRemoteCamera ) ? ActiveRemoteCamera->Group : SecBulls[ CameraMissile ].GroupImIn ) );
 
+  _MG_STAGE("pre-MainRoutines");
 #ifdef __3DS__
   _3ds_mr_ctx = "pre-MainRoutines";
 #endif
@@ -4980,6 +5119,7 @@ bool MainGame( void ) // bjd
 #ifdef __3DS__
   _3ds_mr_ctx = "post-MainRoutines";
 #endif
+  _MG_STAGE("post-MainRoutines");
 
   if( MyGameStatus == STATUS_QuitCurrentGame )
     return true;
@@ -4990,9 +5130,10 @@ bool MainGame( void ) // bjd
   for( i = 0 ; i < MAX_SFX ; i++ )
     LastDistance[i] = 100000.0F;
 
-
+  _MG_STAGE("pre-MainGameRender");
   if(!MainGameRender())
     return false;
+  _MG_STAGE("post-MainGameRender");
 
 #ifdef __3DS__
   _3ds_mr_ctx = "post-MainGameRender";
@@ -5020,6 +5161,8 @@ bool MainGame( void ) // bjd
   if(!PlayDemo)
     NetworkGameUpdate();
 
+  _MG_STAGE("exit OK");
+  #undef _MG_STAGE
   return true;
 }
 
@@ -5540,17 +5683,43 @@ bool RenderMainCamera2dPolys( void) // renders in game menu and other 2d element
 ===================================================================*/
 bool RenderCurrentCamera( void )
 {
+#ifdef __3DS__
+	/* Per-level first-call diagnostic. Fires once per level transition.
+	 * IMPORTANT: do NOT add an eye-check here — stereo rendering
+	 * alternates left/right per call, so any per-eye gate fires the
+	 * trace on every single call. With ~18 stages × write() syscall
+	 * to SD per fire, that's ~30 SD writes per frame = ~300 ms/frame
+	 * = ~3 fps. (Diagnosed empirically: FPS log showed 0-1 fps with
+	 * an eye-check; sweep traces showed 82 firings of stages that
+	 * should have fired 3 times. The eye-check is what introduced
+	 * the perf regression.) */
+	static int _rc_stage_last_level = -2;
+	bool _rc_stage_trace = false;
+	{
+		extern int16_t LevelNum;
+		if (LevelNum != _rc_stage_last_level) {
+			_rc_stage_last_level = LevelNum;
+			_rc_stage_trace = true;
+		}
+	}
+	#define _RC_STAGE(s) do { if (_rc_stage_trace) { extern void trace(const char*); trace("RC/" s); } } while(0)
+#else
+	#define _RC_STAGE(s) ((void)0)
+#endif
+	_RC_STAGE("entry");
 	int16_t Count;
 	VISGROUP  *g;
 	u_int16_t  group;
 //	float R, G, B;
 	NumOfTransExe = 0;
 	Build_View();
+	_RC_STAGE("post-Build_View");
 	CurrentCamera.View = view;
 	if (!FSSetView(&view))
 	{
 		return false;
 	}
+	_RC_STAGE("post-FSSetView");
     if (!FSSetViewPort(&CurrentCamera.Viewport)) {
 #ifdef DEBUG_VIEWPORT
     SetViewportError( "RenderCurrentCamera1", &CurrentCamera.Viewport );
@@ -5559,17 +5728,22 @@ bool RenderCurrentCamera( void )
 #endif
         return false;
     }
+	_RC_STAGE("post-FSSetViewPort");
 
   // Ship Model Enable/Disable
   SetShipsVisibleFlag();
+  _RC_STAGE("post-SetShipsVisibleFlag");
 
   // find visible groups
   FindVisible( &CurrentCamera, &Mloadheader );
+  _RC_STAGE("post-FindVisible");
 
   BuildVisibleLightList( CurrentCamera.GroupImIn );
+  _RC_STAGE("post-BuildVisibleLightList");
 
   UpdateBGObjectsClipGroup( &CurrentCamera );
   UpdateEnemiesClipGroup( &CurrentCamera );
+  _RC_STAGE("post-UpdateClipGroups");
 
   /*
   if( CurrentCamera.GroupImIn != (u_int16_t) -1 )
@@ -5595,6 +5769,7 @@ bool RenderCurrentCamera( void )
   {
     return false;
   }
+  _RC_STAGE("post-ClearBuffers");
 	// reset all the normal execute status flags...
 	set_normal_states();
 
@@ -5607,6 +5782,7 @@ bool RenderCurrentCamera( void )
 	// display background
 	if ( !DisplayBackground( &Mloadheader, &CurrentCamera ) )
 		return false;
+	_RC_STAGE("post-DisplayBackground");
 
 	// reset all the normal execute status flags...
 	if( WhiteOut == 0.0F)
@@ -5619,50 +5795,86 @@ bool RenderCurrentCamera( void )
 ===================================================================*/
     if( !DisplaySolidGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
+    _RC_STAGE("post-DisplaySolidGroupUnclippedPolys");
 
 #ifdef SHADOWTEST
     if( !DisplaySolidGroupUnclippedTriangles( RenderBufs[ 0 ], lpDev, lpView ) )
         return false;
 #endif
-  
+
+  /* Per-group draw loop. Trace iteration count so an infinite loop or
+   * hang on a specific group is visible. Counter resets per-call. */
+#ifdef __3DS__
+  int _rc_group_iter = 0;
+#endif
+  _RC_STAGE("entering opaque-draw loop");
   // display clipped opaque objects
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
     group = g->group;
+#ifdef __3DS__
+    if (_rc_stage_trace && _rc_group_iter < 8) {
+      char _b[64]; snprintf(_b,sizeof(_b),"RC/opaque-loop iter=%d group=%d", _rc_group_iter, (int)group);
+      extern void trace(const char*); trace(_b);
+    }
+    _rc_group_iter++;
+#endif
 
     // Do the Background animation for that group.....
     BackGroundTextureAnimation( &Mloadheader , group );
+
+#ifdef __3DS__
+    /* Per-group sub-stage trace. Fires only on the FIRST few iterations
+     * of the FIRST per-level call so we can pinpoint the exact sub-call
+     * that hangs without spamming the trace at 60 fps. */
+    bool _rc_substage_trace = (_rc_stage_trace && _rc_group_iter <= 3);
+    #define _RC_SUBSTAGE(s) do { if (_rc_substage_trace) { extern void trace(const char*); \
+        char _b[80]; snprintf(_b,sizeof(_b),"RC/group=%d %s",(int)group,s); trace(_b); } } while(0)
+#else
+    #define _RC_SUBSTAGE(s) ((void)0)
+#endif
+    _RC_SUBSTAGE("post-BackGroundTextureAnimation");
 
 #ifdef CLIP_LINES
     ClipGroup( &CurrentCamera, group );
 #else
     ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
 #endif
+    _RC_SUBSTAGE("post-ClipGroup-1");
 
 	ExecuteLines( group, &RenderBufs[ 0 ] );
+    _RC_SUBSTAGE("post-ExecuteLines");
 
     ClipGroup( &CurrentCamera, group );
+    _RC_SUBSTAGE("post-ClipGroup-2");
 
+    _RC_SUBSTAGE("calling ModelDisp");
       if( !ModelDisp( group, /*lpDev,*/ &ModelNames[0] ) ) // bjd
         return false;
+    _RC_SUBSTAGE("post-ModelDisp");
 
 /*===================================================================
   Display Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
 
+    _RC_SUBSTAGE("calling DisplaySolidGroupClippedPolys");
   if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
     return false;
+    _RC_SUBSTAGE("post-DisplaySolidGroupClippedPolys");
 #ifdef SHADOWTEST
   if( !DisplaySolidGroupClippedTriangles( RenderBufs[ 1 ], group, lpDev, lpView ) )
     return false;
 #endif
-
+    #undef _RC_SUBSTAGE
   }
+  _RC_STAGE("opaque-loop EXIT");
 
   ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
+  _RC_STAGE("post-ClipGroup-cam");
 
 	// set all the Translucent execute status flags...
   	set_alpha_states();
+  _RC_STAGE("post-set_alpha_states-1");
 
 
 /*===================================================================
@@ -5696,13 +5908,37 @@ bool RenderCurrentCamera( void )
   }
 
 		set_alpha_states();
+  _RC_STAGE("post-set_alpha_states-2");
 
+  /* Translucent draw loop. Trace each iteration's group ID for the
+   * first ~3 iterations on the first per-level call so a hang in
+   * GroupWaterProcessDisplay / DisplayGroupClippedPolys / etc. on a
+   * specific group is visible. */
+#ifdef __3DS__
+  int _rc_trans_iter = 0;
+#endif
+  _RC_STAGE("entering translucent-draw loop");
   // display clipped translucencies
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
     group = g->group;
+#ifdef __3DS__
+    bool _rc_trans_substage_trace = (_rc_stage_trace && _rc_trans_iter <= 3);
+    if (_rc_trans_substage_trace) {
+      char _b[80]; snprintf(_b,sizeof(_b),"RC/trans-loop iter=%d group=%d",_rc_trans_iter,(int)group);
+      extern void trace(const char*); trace(_b);
+    }
+    _rc_trans_iter++;
+    #define _RC_TRANS_SUBSTAGE(s) do { if (_rc_trans_substage_trace) { extern void trace(const char*); \
+        char _b[80]; snprintf(_b,sizeof(_b),"RC/trans-group=%d %s",(int)group,s); trace(_b); } } while(0)
+#else
+    #define _RC_TRANS_SUBSTAGE(s) ((void)0)
+#endif
+
     ClipGroup( &CurrentCamera, group );
+    _RC_TRANS_SUBSTAGE("post-ClipGroup");
     GroupWaterProcessDisplay( group );
+    _RC_TRANS_SUBSTAGE("post-GroupWaterProcessDisplay");
 
 
 
@@ -5712,6 +5948,7 @@ bool RenderCurrentCamera( void )
 
   if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
     return false;
+    _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedPolys");
 
 #ifdef SHADOWTEST
   if( !DisplayGroupClippedTriangles( RenderBufs[ 1 ], group, lpDev, lpView ) )
@@ -5724,13 +5961,17 @@ Display Group Clipped Faceme Transluecent Polys
 
   if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], group ) ) // bjd
       return false;
+    _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedFmPolys");
 
   ExecuteTransExe( group );
-
+    _RC_TRANS_SUBSTAGE("post-ExecuteTransExe");
+    #undef _RC_TRANS_SUBSTAGE
   }
+  _RC_STAGE("translucent-loop EXIT");
 
 
   ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
+  _RC_STAGE("post-ClipGroup-cam-2");
 
 
 /*===================================================================
@@ -5739,12 +5980,14 @@ Display Group Clipped Faceme Transluecent Polys
 
     if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
+  _RC_STAGE("post-DisplayGroupUnclippedFmPolys");
 
 /*===================================================================
   Display Non Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
     if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
+  _RC_STAGE("post-DisplayGroupUnclippedPolys");
 #ifdef SHADOWTEST
     if( !DisplayGroupUnclippedTriangles( RenderBufs[ 0 ], lpDev, lpView ) )
       return false;
@@ -6295,16 +6538,25 @@ void PrintInitViewStatus( BYTE Status )
 {
 	int i;
 	RENDEROBJECT ro;
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	{ extern void trace(const char*); extern int _vt_flip_remaining;
-	  if (_vt_flip_remaining > 0) {
-	    char _b[64];
-	    snprintf(_b, sizeof(_b), "PIVS: enter status=%u", (unsigned)Status);
+#ifdef __3DS__
+	/* Per-status one-shot diagnostic trace. Fires on the FIRST call to
+	 * PIVS for each distinct Status value so we can pinpoint a hang
+	 * without spamming on every IV phase. */
+	{ static int _pivs_last_status = -1;
+	  if ((int)Status != _pivs_last_status) {
+	    _pivs_last_status = (int)Status;
+	    extern void trace(const char*); char _b[64];
+	    snprintf(_b, sizeof(_b), "PIVS/enter status=%u", (unsigned)Status);
 	    trace(_b);
 	  }
 	}
+	bool _pivs_trace_now = (Status == 33);
+	#define _PIVS_STAGE(s) do { if (_pivs_trace_now) { extern void trace(const char*); trace("PIVS/" s); } } while(0)
+#else
+	#define _PIVS_STAGE(s) ((void)0)
 #endif
 	ZERO_STACK_MEM(ro);
+	_PIVS_STAGE("pre-FSCreate");
 	{
 		bool _vok = FSCreateDynamic2dVertexBuffer(&ro, 32767);
 		bool _iok = FSCreateIndexBuffer(&ro, 32767*3);
@@ -6317,9 +6569,17 @@ void PrintInitViewStatus( BYTE Status )
 		  }
 		}
 #endif
+#ifdef __3DS__
+		if (_pivs_trace_now) {
+			extern void trace(const char*); char _b[64];
+			snprintf(_b, sizeof(_b), "PIVS/post-FSCreate v=%d i=%d", (int)_vok, (int)_iok);
+			trace(_b);
+		}
+#endif
 		/* If either allocation failed (linear heap exhausted/fragmented),
 		 * skip the draw rather than feeding NULL buffers into the renderer. */
 		if (!_vok || !_iok) {
+			_PIVS_STAGE("alloc-fail early-return");
 			FSReleaseRenderObject(&ro);
 			render_flip(&render_info);
 			return;
@@ -6331,62 +6591,58 @@ void PrintInitViewStatus( BYTE Status )
 			( render_info.window_size.cy >> 2 ) +
 			( i * ( FontHeight + ( FontHeight>>1 ) ) ) ,
 			GREEN );
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	{ extern void trace(const char*); extern int _vt_flip_remaining;
-	  if (_vt_flip_remaining > 0) {
-	    extern u_int16_t FirstScrPolyUsed;
-	    extern TPAGEINFO ScrPolyTPages[];
-	    /* Scan every TPage. ScrPolyTPages has MAXTPAGESPERTLOAD+1 entries
-	     * (51 total). My earlier probe only looked at index 0, but
-	     * ScrPolyDispNonSolid iterates the full range. If any TPage holds
-	     * polys, TotalVerts > 0 and the early-exit at screenpolys.c:2825
-	     * is not taken — we fall through to draw_2d_object → draw_render_object
-	     * → C3D_DrawArrays, matching the stack walk from crash dump _17. */
-	    int nz = 0;
-	    int firstNz = -1;
-	    for (int t = 0; t <= 50; t++) {
-	      if (ScrPolyTPages[t].FirstPoly != (u_int16_t)-1) {
-	        if (firstNz < 0) firstNz = t;
-	        nz++;
-	      }
-	    }
-	    char _b[160];
-	    snprintf(_b, sizeof(_b),
-	             "PIVS: pre-DisplayScrPolys FirstUsed=%u TPnz=%d firstNzTP=%d firstNzPoly=%u",
-	             (unsigned)FirstScrPolyUsed, nz, firstNz,
-	             firstNz >= 0 ? (unsigned)ScrPolyTPages[firstNz].FirstPoly : 65535);
-	    trace(_b);
 
-	    /* WORKAROUND: if FirstScrPolyUsed shows the used list is empty but
-	     * a TPage still references a poly, the engine's TPage state is
-	     * inconsistent — InitScrPolys cleared the used list and TPages but
-	     * something reset only ScrPolyTPages[N].FirstPoly between the
-	     * InitScrPolys call and now. Walking that stale pointer in
-	     * ScrPolyDispNonSolid gives bogus NumVerts and crashes the GPU
-	     * command buffer in draw_2d_object. Re-clear all TPages here so
-	     * DisplayScrPolys becomes a clean no-op. */
-	    if (FirstScrPolyUsed == (u_int16_t)-1 && nz > 0) {
-	      extern void InitScrPolyTPages(void);
-	      trace("PIVS: stale TPage detected, calling InitScrPolyTPages");
-	      InitScrPolyTPages();
-	    }
-	  }
+#ifdef __3DS__
+	/* Stale screen-poly safety, ALWAYS-ON.
+	 *
+	 * `PrintInitViewStatus` is called on every IV phase during a level
+	 * load to render the "Loading: …" status text. The text is added via
+	 * `CenterPrint4x5Text` which calls `AddScrPolyToTPage` — those polys
+	 * accumulate in `ScrPolys[]` across the whole load, plus whatever
+	 * the title screen / inter-level menu added before that. By the
+	 * final PIVS call (called with `Status = STATUS_PostStartingSinglePlayer`
+	 * = 33), the for-loop above adds zero new text (it gates on
+	 * `Status >= STATUS_InitView_0 = 128`), but `DisplayNonSolidScrPolys`
+	 * still walks the full accumulated list and renders every poly.
+	 *
+	 * The polys reference texture data via `Frm_Info` pointers. When
+	 * `ChangeLevel` swapped from title `Tloadheader` to gameplay, the
+	 * title-side textures were freed — leaving stale `Frm_Info` pointers
+	 * in the still-live ScrPolys entries. Walking them dereferences
+	 * freed memory: data abort.
+	 *
+	 * Triggered first on fishy (level 30, 86 BSP groups) — possibly
+	 * because its much larger Tloadheader caused different malloc
+	 * arena state that made the freed pointers consistently invalid,
+	 * whereas earlier levels happened to land on still-mapped
+	 * (but logically-stale) memory.
+	 *
+	 * Fix: clear the ScrPolys list at status=33 entry. Status messages
+	 * from earlier IV phases were already rendered + flipped in their
+	 * own PIVS calls, so clearing now is purely losing the redundant
+	 * post-load redraw. The title-screen state is also cleaned up
+	 * naturally because every ScrPoly was added by code that's done
+	 * with it now.
+	 *
+	 * The narrow earlier check ("FirstScrPolyUsed empty but a TPage
+	 * has polys") was a different inconsistency — that one matters too
+	 * but it's a subset of this broader cleanup. Calling InitScrPolys
+	 * always at status=33 covers both. */
+	if (Status == 33) {
+		extern void InitScrPolys(void);
+		InitScrPolys();
 	}
 #endif
+	_PIVS_STAGE("pre-DisplayNonSolidScrPolys");
 	DisplayNonSolidScrPolys(&ro);
+	_PIVS_STAGE("post-DisplayNonSolidScrPolys");
 	DisplaySolidScrPolys(&ro);
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	{ extern void trace(const char*); extern int _vt_flip_remaining;
-	  if (_vt_flip_remaining > 0) trace("PIVS: post-DisplayScrPolys");
-	}
-#endif
+	_PIVS_STAGE("post-DisplaySolidScrPolys");
 	FSReleaseRenderObject(&ro);
+	_PIVS_STAGE("post-FSReleaseRenderObject");
 	render_flip(&render_info);
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	{ extern void trace(const char*); extern int _vt_flip_remaining;
-	  if (_vt_flip_remaining > 0) trace("PIVS: exit");
-	}
-#endif
+	_PIVS_STAGE("exit OK");
+	#undef _PIVS_STAGE
 }
 
 /*===================================================================

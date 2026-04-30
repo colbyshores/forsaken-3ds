@@ -4255,6 +4255,69 @@ bool PreLoadEnemies( void )
 
 	ReadEnemyTxtFile( "data\\txt\\Enemies.txt" );
 
+	/* Populate Remaster N64 enemy slots (100-108) by template-copying
+	 * from a similar 1998 enemy, then overriding the model filename.
+	 * One-shot — guarded by static flag so subsequent level loads don't
+	 * keep re-templating after enemies.txt has tuned the values.
+	 *
+	 * The visual is approximate: each new enemy uses an existing 1998
+	 * model that's tonally similar (Boss_Manmech => Mekton's model,
+	 * CargoDrone => AmmoDump, etc.). The proper fix is to extract the
+	 * Remaster's actual N64 .mx mesh files from ForsakenEX.kpf and
+	 * Slot Approximation" for the workaround scope. The choice of
+	 * 1998 template also drives the AI behaviour: bosses crawl/walk
+	 * (Mekton brain), drones fly (AirMoble brain), ShieldTurret holds
+	 * its position (BeamTurret brain). */
+	{
+		static bool _n64_extra_init_done = false;
+		if (!_n64_extra_init_done)
+		{
+			_n64_extra_init_done = true;
+
+			/* Boss_Manmech (100): big walking boss → Mekton template */
+			EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
+			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "Mekton.mx";
+			EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
+
+			/* CargoDrone (101): floating utility object → AmmoDump template */
+			EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_AmmoDump ];
+			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "Dump.cob";
+
+			/* Boss_Ramqan (102): big stationary boss → Boss_Metatank template */
+			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Boss_Metatank ];
+			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "Metatank.cob";
+			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 8000;
+
+			/* ShieldTurret (103): stationary turret → BeamTurret template */
+			EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
+			EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "Beamtrt.cob";
+			EnemyTypes[ ENEMY_ShieldTurret ].Shield = 384;
+
+			/* Boss_Maldroid (104): walking boss → Mekton template */
+			EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
+			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "Mekton.mx";
+			EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
+
+			/* Enforcer (105): regular flying combatant → Hunter template */
+			EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
+			EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "Hunter.mx";
+
+			/* Boss_DreadNaught2 (106): unused but populate for safety */
+			EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
+			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename = "Avatar.cob";
+			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].Shield = 7500;
+
+			/* Boss_DreadNaught (107): heavy bomber-class → Boss_Avatar template */
+			EnemyTypes[ ENEMY_Boss_DreadNaught ] = EnemyTypes[ ENEMY_Boss_Avatar ];
+			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "Avatar.cob";
+			EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
+
+			/* Ghost (108): fast stealthy attacker → Shade template */
+			EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
+			EnemyTypes[ ENEMY_Ghost ].ModelFilename = "Shade.mx";
+		}
+	}
+
 	NextEnemyModel = NextNewModel;
 
 	for( Count = 0; Count < MAX_ENEMY_TYPES; Count++ ) EnemyTypes[ Count ].ModelNumber = -1;
@@ -7962,12 +8025,29 @@ static int read_EnemyType( FILE *f, char *last_token )
 		{"ENEMY_LEADER_AirMoble", 	 ENEMY_LEADER_AirMoble } ,
 		{"ENEMY_Fodder1", 			 ENEMY_Fodder1 } ,
 		{"ENEMY_Boss_LittleGeek",	ENEMY_Boss_LittleGeek },
-		{"ENEMY_Bike_FlyGirl",      ENEMY_Bike_FlyGirl } ,  		 	
+		{"ENEMY_Bike_FlyGirl",      ENEMY_Bike_FlyGirl } ,
+		/* Remaster N64 enemy IDs (slots 100-108). See enemies.h. */
+		{"ENEMY_Boss_Manmech",      ENEMY_Boss_Manmech },
+		{"ENEMY_CargoDrone",        ENEMY_CargoDrone },
+		{"ENEMY_Boss_Ramqan",       ENEMY_Boss_Ramqan },
+		{"ENEMY_ShieldTurret",      ENEMY_ShieldTurret },
+		{"ENEMY_Boss_Maldroid",     ENEMY_Boss_Maldroid },
+		{"ENEMY_Enforcer",          ENEMY_Enforcer },
+		{"ENEMY_Boss_DreadNaught2", ENEMY_Boss_DreadNaught2 },
+		{"ENEMY_Boss_DreadNaught",  ENEMY_Boss_DreadNaught },
+		{"ENEMY_Ghost",             ENEMY_Ghost },
 	};
 
+	/* Iterate the actual table size, not ENEMY_LAST. ENEMY_LAST is the
+	 * highest reserved enum value (109 after the N64 imports), but the
+	 * keyword table has 65 entries (56 original + 9 N64). The original
+	 * loop bound `i < ENEMY_LAST` worked when the two were equal but
+	 * indexes past the end with the new enum gap (slots 56-99 are
+	 * reserved but have no keyword entries). */
+	const int tab_size = (int)(sizeof(tab) / sizeof(tab[0]));
 	if ( fscanf( f, " %80s", last_token ) == 1 )
 	{
-		for( i = 0 ; i < ENEMY_LAST ; i++ )
+		for( i = 0 ; i < tab_size ; i++ )
 		{
 			if (
 				(tab[i].keyword != NULL) &&
@@ -7975,7 +8055,7 @@ static int read_EnemyType( FILE *f, char *last_token )
 			)
 				break;
 		}
-		if( i < ENEMY_LAST )
+		if( i < tab_size )
 		{
 			CurrentEnemy = tab[i].EnemyType;
 		}else{

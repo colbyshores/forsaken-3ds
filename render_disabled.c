@@ -75,6 +75,7 @@ bool FSClearBlack(void){return true;}
 bool FSClearDepth(XYRECT * rect){return true;}
 bool FSGetViewPort(render_viewport_t *view){return true;}
 bool FSSetViewPort(render_viewport_t *view){return true;}
+void FSSetNextViewPortScissorMode(bool b){(void)b;}
 bool FSSetProjection( RENDERMATRIX *matrix ){return true;}
 bool FSSetView( RENDERMATRIX *matrix ){return true;}
 bool FSSetWorld( RENDERMATRIX *matrix ){return true;}

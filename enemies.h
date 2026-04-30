@@ -247,7 +247,26 @@ enum
 	ENEMY_Fodder1,				// 53
 	ENEMY_Boss_LittleGeek,		// 54
 	ENEMY_Bike_FlyGirl,			// 55
-	
+
+	/* N64 enemy IDs imported from Forsaken Remastered. The Remaster's
+	 * .nme files reference these IDs in the 100-108 range, beyond the
+	 * original 1998 enemy roster. We populate slots 100-108 at runtime
+	 * (PreLoadEnemies one-shot init) by template-copying from a similar
+	 * existing 1998 enemy and overriding ModelFilename + a few stats —
+	 * the visual is approximate (Mekton model shown for Manmech, etc.)
+	 * but the spawn lands in a real slot rather than being substituted.
+	 * Extracting the actual Remaster .mx model meshes from ForsakenEX.kpf
+	 * Slot Approximation" for the workaround scope. */
+	ENEMY_Boss_Manmech     = 100,	// 100
+	ENEMY_CargoDrone       = 101,	// 101
+	ENEMY_Boss_Ramqan      = 102,	// 102
+	ENEMY_ShieldTurret     = 103,	// 103
+	ENEMY_Boss_Maldroid    = 104,	// 104
+	ENEMY_Enforcer         = 105,	// 105
+	ENEMY_Boss_DreadNaught2= 106,	// 106 (not referenced by any imported level — defined for completeness)
+	ENEMY_Boss_DreadNaught = 107,	// 107
+	ENEMY_Ghost            = 108,	// 108
+
 	ENEMY_LAST,					//	This one should allways be last!!!
 
 };
@@ -338,7 +357,11 @@ enum
 
 #define	FIRSTENEMYMODEL			0 //MODEL_BeamTurret
 #define	MAXENEMIES				256
-#define	MAX_ENEMY_TYPES			56
+/* Bumped 56 -> 128 to fit Remaster N64 enemy IDs at slots 100-108
+ * (Boss_Manmech .. Ghost). Slots 56-99 stay zero-initialised; nothing
+ * references them. Memory cost: 72 unused slots × sizeof(ENEMY_TYPES)
+ * (~150 bytes) ≈ 11 KB BSS, negligible. */
+#define	MAX_ENEMY_TYPES			128
 
 #define	YES_STEALTH_MODE		true
 #define	NO_STEALTH_MODE			false

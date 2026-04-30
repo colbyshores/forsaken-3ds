@@ -4,7 +4,13 @@
 #include "main.h"
 #include "object.h"
 
-#define	MAXLINKSPERNODE 16
+/* Bumped 16 -> 32 to fit Remaster nodes that exceed the 1998 cap.
+ * starship has nodes with 17-18 links per the runtime trace; 32
+ * gives headroom for other Remaster levels with wider connectivity.
+ * Memory cost: per-NODE struct grows by (32-16) × sizeof(struct NODE*)
+ * = 64 bytes × number of nodes per level (typically 100-300) =
+ * ~6-20 KB extra heap per level. Negligible. */
+#define	MAXLINKSPERNODE 32
 
 #define	NODE_DECISION		(1<<0)
 #define	NODE_DROPMINES		(1<<1)

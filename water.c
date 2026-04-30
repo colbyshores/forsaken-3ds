@@ -209,7 +209,17 @@ bool WaterLoad( void )
 		return( false );
 	}
 	
-	memset(FirstWaterObject, 0, NumOfWaterObjects * sizeof(FirstWaterObject));	
+	/* Bug fix: sizeof(FirstWaterObject) is sizeof(pointer) = 4 bytes,
+	 * not sizeof(WATEROBJECT). The original line zeroed only ~N×4 bytes
+	 * of the N×sizeof(WATEROBJECT) buffer, leaving each element's
+	 * embedded RENDEROBJECT (lpNormalBuffer / lpIndexBuffer /
+	 * numTextureGroups / textureGroups[]) full of malloc residue.
+	 * FSReleaseRenderObject then linearFree'd those garbage pointers
+	 * and iterated `for (i=0; i<numTextureGroups; i++)` with a garbage
+	 * count, hanging WaterRelease somewhere around the 20th level
+	 * transition (when the heap had accumulated enough residue for the
+	 * fields to read non-zero). */
+	memset(FirstWaterObject, 0, NumOfWaterObjects * sizeof(WATEROBJECT));
 	
 	WO = FirstWaterObject;
 	WO->Group = 0;
@@ -258,18 +268,18 @@ bool WaterLoad( void )
 			DebugPrintf("Not loading water, either xVerts or yVerts was less than 1\n");
 			DebugPrintf("xVerts=%d, yVerts=%d, xSize=%d, ySize=%d, cellSize=%d\n",
 				WO->XVerts,WO->YVerts,WO->XSize,WO->YSize,WATER_CELLSIZE);
-			return false;
+			goto load_fail;
 		}
 
-		if( ( WO->XVerts * WO->YVerts ) > 1024)
+		if( ( WO->XVerts * WO->YVerts ) > MAXMESHX * MAXMESHY )
 		{
 			Msg( "Water Load : Water is to big\n" );
-			return( false );
+			goto load_fail;
 		}
 		if( !InitWaterObject( WO ) )
 		{
 			Msg( "Water Load : Unable to init water object\n" );
-			return( false );
+			goto load_fail;
 
 		}
 		AddWaterLink(WO);
@@ -311,6 +321,27 @@ bool WaterLoad( void )
 	}
 	free( OrgBuffer );
 	return true;
+
+load_fail:
+	/* Bail-out cleanup. Without this, FirstWaterObject is left malloc'd
+	 * with partially populated WATEROBJECTs (Group, XVerts, YVerts set
+	 * from the file but Verts/Vels/renderObject still NULL because
+	 * InitWaterObject hasn't run). The caller in oct2.c ignores
+	 * WaterLoad's return value, so the engine continues into gameplay
+	 * with that half-loaded state. The first frame's
+	 * GroupWaterProcessDisplay then matches WO->Group and calls
+	 * UpdateWaterMesh, which dereferences NULL Verts/Vels via the
+	 * x/y mesh-update loops — data abort.
+	 *
+	 * Tuben64 hits the size cap (37×29 = 1073 > MAXMESHX*MAXMESHY) and
+	 * was the first level in the autotest sweep to expose this gap. */
+	if (FirstWaterObject) {
+		free(FirstWaterObject);
+		FirstWaterObject = NULL;
+	}
+	NumOfWaterObjects = 0;
+	free(OrgBuffer);
+	return false;
 }
 
 /*===================================================================

@@ -19,7 +19,19 @@
 #define	PIC_VERSION_NUMBER	1
 								
 #define	MAXPICKUPS				256
-#define MAXPICKUPTYPES			46
+/* Bumped 46 -> 128 to fit Remaster N64 pickup IDs at slots 100-105
+ * (StablizerCrystal + ComputerCapsule + 4 BlackHoleGun parts). Slots
+ * 46-99 + 106-127 stay zero-initialised. Memory cost: 82 unused
+ * slots × ~24 bytes (PICKUPATTRIB + REGENPICKUPINFO + per-type
+ * counters) ≈ 2 KB BSS. Negligible.
+ *
+ * Counterpart to the MAX_ENEMY_TYPES bump in enemies.h — same minimal-
+ * correct pattern: extend the cap, add enum entries with explicit
+ * values, populate the new slots at runtime via template-copy from a
+ * tonally-similar 1998 pickup. Visual is approximate (Stabilizer
+ * Crystal reuses Crystal model) but the pickup spawns into a real
+ * slot rather than being substituted to PICKUP_GeneralAmmo. */
+#define MAXPICKUPTYPES			128
 #define	PICKUP_RADIUS			( 562.5F * GLOBAL_SCALE )
 #define	PICKUPLIGHT_RADIUS		( 1536.0F * GLOBAL_SCALE )
 #define	PICKUP_SPEED			( 40.0F * GLOBAL_SCALE )
@@ -97,6 +109,16 @@ enum {
 	PICKUP_Flag2,				// 43
 	PICKUP_Flag3,				// 44
 	PICKUP_Flag4,				// 45
+
+	/* Remaster N64 pickup IDs imported from defs/n64Pickups.txt.
+	 * Slots 100-105 populated at runtime in LoadPickupsPositions
+	 * by template-copying from tonally-similar 1998 pickups. See
+	PICKUP_StablizerCrystal      = 100,	// 100  (template: PICKUP_Crystal)
+	PICKUP_ComputerCapsule       = 101,	// 101  (template: PICKUP_Computer)
+	PICKUP_BlackHoleGunPart1     = 102,	// 102  (template: PICKUP_PowerPod)
+	PICKUP_BlackHoleGunPart2     = 103,	// 103  (template: PICKUP_PowerPod)
+	PICKUP_BlackHoleGunPart3     = 104,	// 104  (template: PICKUP_PowerPod)
+	PICKUP_BlackHoleGunPart4     = 105,	// 105  (template: PICKUP_PowerPod)
 };
 
 /*===================================================================

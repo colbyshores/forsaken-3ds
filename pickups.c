@@ -3385,6 +3385,36 @@ bool LoadPickupsPositions( void )
   DebugPrintf( "pickups: RandomSeeds %d, %d : NumPrimaryPickups %d\n", CopyOfSeed1, CopyOfSeed2, NumPrimaryPickups );
 #endif
 
+  /* Populate Remaster N64 pickup slots (100-105) by template-copying
+   * from a similar 1998 pickup. One-shot — guarded by a static flag
+   * so subsequent level loads don't re-template after any tuning has
+   * happened. The visual is approximate (StablizerCrystal uses 1998's
+   * Crystal model, BlackHoleGun parts use PowerPod, etc.); proper
+   * fidelity needs the .mx files extracted from the Remaster KPF —
+  {
+    static bool _n64_pickup_init_done = false;
+    if (!_n64_pickup_init_done)
+    {
+      _n64_pickup_init_done = true;
+
+      /* RegenPickupInfo is in dead `#if 0` code so we only need to
+       * initialise PickupAttribs (the actual rendering / light /
+       * model-type metadata for each pickup slot). */
+
+      /* StablizerCrystal (100): glowing crystal pickup → Crystal template */
+      PickupAttribs[ PICKUP_StablizerCrystal ] = PickupAttribs[ PICKUP_Crystal ];
+
+      /* ComputerCapsule (101): pickup capsule → Computer template */
+      PickupAttribs[ PICKUP_ComputerCapsule ] = PickupAttribs[ PICKUP_Computer ];
+
+      /* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod template */
+      PickupAttribs[ PICKUP_BlackHoleGunPart1 ] = PickupAttribs[ PICKUP_PowerPod ];
+      PickupAttribs[ PICKUP_BlackHoleGunPart2 ] = PickupAttribs[ PICKUP_PowerPod ];
+      PickupAttribs[ PICKUP_BlackHoleGunPart3 ] = PickupAttribs[ PICKUP_PowerPod ];
+      PickupAttribs[ PICKUP_BlackHoleGunPart4 ] = PickupAttribs[ PICKUP_PowerPod ];
+    }
+  }
+
   /* convert the level_name into level_name.pic */
   Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
 

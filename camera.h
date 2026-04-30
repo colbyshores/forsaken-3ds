@@ -35,6 +35,15 @@ struct _VISGROUP
 	render_viewport_t viewport;
 	RENDERMATRIX	projection;
 	VISGROUP	*next_visible;
+	/* When true, this group's projection is the camera's unmagnified
+	 * cam->Proj because the engine's per-portal magnification math
+	 * would have produced clip-space coords the GPU rejects (thin
+	 * sliver portal, see visi.c FindVisible MAX_MAG / MAX_OFFSET
+	 * checks). The renderer must pair this with a full-screen GPU
+	 * viewport + GPU scissor to the per-group sub-rect, NOT a
+	 * sub-rect viewport — sub-rect viewport on cam->Proj output
+	 * compresses the world view into the sub-rect. */
+	bool		use_scissor_mode;
 };
 
 

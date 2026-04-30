@@ -16,6 +16,8 @@
  * else. Look for "AUTOTEST:" lines.
  */
 
+#include <stdbool.h>
+
 #ifdef AUTOTEST_REMASTER
 
 #include <3ds.h>
@@ -44,18 +46,61 @@ extern char ShortLevelNames[][32];   /* MAXLEVELS x 32 */
 static const int s_bad_levels[] = { 7, 8, 10, 13 };
 #define S_BAD_LEVELS_COUNT (sizeof(s_bad_levels) / sizeof(s_bad_levels[0]))
 static int s_bad_idx = 0;
+/* Default: full 32-level sweep from slot 0. Override AUTOTEST_FIRST_LEVEL
+ * at compile time to focus on a subset (e.g. -DAUTOTEST_FIRST_LEVEL=5
+ * for Night-Dive + N64 only). */
+#ifndef AUTOTEST_FIRST_LEVEL
 #define AUTOTEST_FIRST_LEVEL  0
+#endif
 
-/* 30 seconds at 60 Hz. main.c's main loop runs RenderScene → game tick
- * once per video frame, so a flat frame counter is the right unit.
- * 30 s is enough for a visual sanity check at each level when sweeping
- * all 32 in one go (16 minutes total wall-clock at 60 Hz, longer in
- * mandarine where it tends to run sub-realtime). */
-#define AUTOTEST_FRAMES_PER_LEVEL  1800
+#ifndef AUTOTEST_MAX_LEVELS_TO_SWEEP
+#define AUTOTEST_MAX_LEVELS_TO_SWEEP  32
+#endif
 
-static int  s_frames_in_level = 0;
+/* Two transition modes:
+ *   AUTOTEST_MODE_HOTJUMP — manual cleanup (ReleaseLevel + ReleaseView +
+ *                           InitScrPolys) followed by a direct jump to
+ *                           STATUS_StartingSinglePlayer. Skips the
+ *                           engine's natural ViewingStats / BetweenLevels
+ *                           menu chain. Diagnostic mode for measuring
+ *                           how robust the manual cleanup is.
+ *   AUTOTEST_MODE_NATURAL — set NewLevelNum and let oct2.c's own
+ *                           STATUS_SinglePlayer detector
+ *                           (`NewLevelNum != LevelNum`) trigger
+ *                           STATUS_ViewingStats. autotest_between_levels_tick
+ *                           then auto-confirms the inter-level menu by
+ *                           calling StartASinglePlayerGame(NULL) after
+ *                           a short dwell. Mirrors the path a real
+ *                           player takes by exiting via the level's
+ *                           end portal — the path that has worked since
+ *                           1998. Use this when validating that a level
+ *                           itself is intact. */
+#define AUTOTEST_MODE_HOTJUMP  0
+#define AUTOTEST_MODE_NATURAL  1
+#ifndef AUTOTEST_MODE
+#define AUTOTEST_MODE  AUTOTEST_MODE_NATURAL
+#endif
+
+/* Per-level dwell measured in WALL-CLOCK milliseconds via osGetTime(),
+ * not a frame counter. tuben64's water mesh + lighting brought the
+ * frame rate down to ~0.6 fps after the water cap was raised — at the
+ * old 1800-frame budget that meant ~52 minutes of wall-clock just to
+ * advance past one level. With wall-time we sweep on schedule
+ * regardless of per-level frame rate; visual inspection still works
+ * because the user reads the screen in real time, not in frames. */
+#define AUTOTEST_MS_PER_LEVEL  60000   /* 1 minute */
+
+static u64  s_level_enter_time_ms = 0;
 static int  s_last_level_logged = -1;
 static bool s_done = false;
+
+/* Natural-mode state. When s_advancing is true, autotest_tick is just
+ * waiting for the engine's natural ViewingStats → BetweenLevels →
+ * StartASinglePlayerGame chain to deposit us back in STATUS_SinglePlayer
+ * with the new LevelNum. The "entered" detector below clears it. */
+static bool s_advancing = false;
+static int  s_target_level_natural = -1;
+static int  s_between_levels_frames = 0;
 
 bool autotest_active(void)
 {
@@ -123,12 +168,20 @@ void autotest_tick(void)
 		         (int)LevelNum, &ShortLevelNames[LevelNum][0]);
 		trace(buf);
 		s_last_level_logged = LevelNum;
-		s_frames_in_level = 0;
+		s_level_enter_time_ms = osGetTime();
+		s_advancing = false;
+		s_between_levels_frames = 0;
+		s_target_level_natural = -1;
 		return;
 	}
 
-	s_frames_in_level++;
-	if (s_frames_in_level < AUTOTEST_FRAMES_PER_LEVEL) return;
+	/* Natural mode: once we've armed an advance, just wait for the
+	 * engine to land us on the target level. autotest_tick may continue
+	 * firing during the brief window before STATUS_SinglePlayer hands
+	 * off to STATUS_ViewingStats, so don't double-arm. */
+	if (s_advancing) return;
+
+	if ((osGetTime() - s_level_enter_time_ms) < AUTOTEST_MS_PER_LEVEL) return;
 
 	/* Time's up — advance. */
 #if AUTOTEST_USE_BAD_LIST
@@ -149,7 +202,15 @@ void autotest_tick(void)
 	int next = s_bad_levels[s_bad_idx];
 #else
 	int next = LevelNum + 1;
-	if (next >= NumLevels)
+	/* End-of-sweep detection. Three conditions that all stop the
+	 * sweep: real mission end (empty level name), array end
+	 * (next >= NumLevels), or hitting the AUTOTEST_MAX_LEVELS_TO_SWEEP
+	 * cap. The cap lets us short-circuit a full 32-level run during
+	 * focused diagnosis (e.g. perf work on the early levels). */
+	int swept = (next - AUTOTEST_FIRST_LEVEL);
+	if (next >= NumLevels
+	    || ShortLevelNames[next][0] == '\0'
+	    || swept >= AUTOTEST_MAX_LEVELS_TO_SWEEP)
 	{
 		trace("AUTOTEST: DONE — chain-loading back to netload_stub");
 		s_done = true;
@@ -163,44 +224,67 @@ void autotest_tick(void)
 	{
 		char buf[160];
 		snprintf(buf, sizeof(buf),
-		         "AUTOTEST: 60s elapsed in LevelNum=%d (%s) — advancing to %d (%s)",
+		         "AUTOTEST: dwell elapsed in LevelNum=%d (%s) — advancing to %d (%s)",
 		         (int)LevelNum, &ShortLevelNames[LevelNum][0],
 		         next, &ShortLevelNames[next][0]);
 		trace(buf);
 	}
 
-	NewLevelNum = next;
-	/* Setting NewLevelNum alone is not enough: the STATUS_SinglePlayer
-	 * case in oct2.c (~line 4128) checks `NewLevelNum != LevelNum` AFTER
-	 * autotest_tick() returns and, if true, forces MyGameStatus =
-	 * STATUS_ViewingStats which pops the stats screen and bounces back
-	 * to the title menu (verified in the trace: ReleaseView status=35,
-	 * WTSS: first frame, ...). Set LevelNum = NewLevelNum here so the
-	 * mismatch check is silent, then set MyGameStatus to
-	 * STATUS_StartingSinglePlayer. STATUS_StartingSinglePlayer's
-	 * handler resets LevelNum to -1 and calls ChangeLevel(), which will
-	 * load the new NewLevelNum value as a fresh level — true hot-jump
-	 * with no menu in between.
+#if AUTOTEST_MODE == AUTOTEST_MODE_NATURAL
+	/* NATURAL MODE
+	 * ---------------------------------------------------------------
+	 * Just set NewLevelNum and let the engine handle everything else.
+	 * oct2.c's STATUS_SinglePlayer case at ~line 4163 already detects
+	 * NewLevelNum != LevelNum on the same frame and transitions:
+	 *   SP -> ViewingStats (ReleaseLevel, ReleaseView, InitScene,
+	 *                       MenuRestart for stats)
+	 *      -> BetweenLevels (DisplayTitle with menu)
+	 *      -> WaitingToStartSinglePlayer (VDU finishes)
+	 *      -> StartASinglePlayerGame -> TitleStartingSinglePlayer
+	 *      -> CLPIV -> SP (with new LevelNum).
 	 *
-	 * Also: STATUS_StartingSinglePlayer's ReleaseView() doesn't free
+	 * The inter-level menu blocks until the player confirms; we
+	 * auto-confirm via autotest_between_levels_tick().
+	 *
+	 * s_advancing prevents autotest_tick from re-arming on subsequent
+	 * frames while the engine works through the chain. The "entered"
+	 * branch above clears it once the new level is live. */
+	NewLevelNum = next;
+	s_target_level_natural = next;
+	s_advancing = true;
+	s_between_levels_frames = 0;
+	trace("AUTOTEST: natural transition armed (NewLevelNum set, awaiting engine)");
+#else
+	/* HOT-JUMP MODE
+	 * ---------------------------------------------------------------
+	 * Bypass the engine's ViewingStats / BetweenLevels chain. Manually
+	 * release the level + view, then jump straight to
+	 * STATUS_StartingSinglePlayer. STATUS_StartingSinglePlayer's
+	 * handler resets LevelNum to -1 and calls ChangeLevel() to load
+	 * the new NewLevelNum value as a fresh level.
+	 *
+	 * STATUS_StartingSinglePlayer's own ReleaseView() doesn't free
 	 * the level's model / texture / Mloadheader buffers (those are
-	 * gated on the OUTGOING status, and StartingSinglePlayer is in the
-	 * skip-list of ReleaseLevel/ReleaseScene). So we must call
-	 * ReleaseLevel + ReleaseView ourselves NOW, while MyGameStatus is
+	 * gated on the OUTGOING status, and StartingSinglePlayer is in
+	 * the skip-list of ReleaseLevel/ReleaseScene). So we call
+	 * ReleaseLevel + ReleaseView ourselves NOW while MyGameStatus is
 	 * still STATUS_Normal — otherwise each hot-jump leaks a level's
-	 * worth of linearAlloc, and after 2-3 transitions the linear heap
-	 * runs out and FSCreateVertexBuffer starts returning NULL inside
-	 * InitModel (verified: spc-sp01 died at xcop400.mxa model #153). */
-	/* CRITICAL: end the current GPU frame BEFORE releasing buffers.
-	 * autotest_tick runs from STATUS_SinglePlayer in oct2.c, between
-	 * MainGame()'s render and main.c's render_flip()/pglSwapBuffers().
-	 * That means s_inFrame == true and the C3D command stream has
-	 * pending references to vertex/normal/index buffers we're about
-	 * to free in ReleaseLevel(). Without flushing first, the dangling
-	 * commands stay queued, and the next level's first frame trips
-	 * GPUCMD_AddInternal's full-buffer svcBreak() — diagnosed via
-	 * Luma3DS dump (PC=svcBreak, LR=GPUCMD_AddInternal) on the
-	 * defend2 -> pship hot-jump. */
+	 * worth of linearAlloc.
+	 *
+	 * CRITICAL: end the current GPU frame BEFORE releasing buffers.
+	 * autotest_tick runs between MainGame()'s render and
+	 * render_flip()/pglSwapBuffers(), so s_inFrame == true and the
+	 * C3D command stream has pending references to vertex/normal/
+	 * index buffers we're about to free. Without flushing first, the
+	 * dangling commands stay queued and the next level's first frame
+	 * trips GPUCMD_AddInternal's full-buffer svcBreak.
+	 *
+	 * Also clear the screen-poly list — gameplay frames added HUD /
+	 * weapon / VDU text polys that reference textures we just freed.
+	 * CLPIV's PrintInitViewStatus renders the entire ScrPolys list;
+	 * stale polys overflow citro3d's command buffer. The natural
+	 * ViewingStats path eventually clears this list on its own. */
+	NewLevelNum = next;
 	extern void pglSwapBuffers(void);
 	extern void ReleaseLevel(void);
 	extern void ReleaseView(void);
@@ -210,25 +294,13 @@ void autotest_tick(void)
 	trace("AUTOTEST: ReleaseLevel + ReleaseView before transition");
 	ReleaseLevel();
 	ReleaseView();
-	/* CRITICAL: clear the screen-poly list before the next ChangeLevel
-	 * cycle. defend2's gameplay frames added HUD / weapon / VDU text
-	 * polys that reference textures we just freed in ReleaseLevel.
-	 * CLPIV calls PrintInitViewStatus which renders the entire ScrPolys
-	 * list — issuing GPU commands for thousands of stale polys overflows
-	 * citro3d's 1MB command buffer and trips GPUCMD_AddInternal's
-	 * svcBreak() guard. Diagnosed via Luma3DS dump (PC=svcBreak,
-	 * LR=GPUCMD_AddInternal, addtl="3dsx_app") on the defend2 -> pship
-	 * hot-jump's PrintInitViewStatus draw step. The engine's normal
-	 * level-transition flow goes through STATUS_ViewingStats which
-	 * eventually clears the list; the autotest hot-jump skips that
-	 * intermediate state and inherits stale polys without this call. */
 	trace("AUTOTEST: InitScrPolys (clear stale screen-poly list)");
 	InitScrPolys();
 	trace("AUTOTEST: release done");
 	LevelNum = next;
 	extern BYTE MyGameStatus;
 	MyGameStatus = STATUS_StartingSinglePlayer;
-	s_frames_in_level = 0;
+	s_level_enter_time_ms = osGetTime();
 
 #ifdef VERBOSE_TRACE
 	/* Arm the FLIP enter/exit traces so we can tell if pglSwapBuffers
@@ -237,13 +309,45 @@ void autotest_tick(void)
 	extern int _vt_flip_remaining;
 	_vt_flip_remaining = 30;
 #endif
+#endif /* AUTOTEST_MODE */
+}
+
+/* Called once per frame from oct2.c's STATUS_BetweenLevels case while
+ * we are mid-natural-transition. The engine sits in BetweenLevels
+ * displaying the inter-level menu (MENU_NEW_NumberOfCrystals). After a
+ * short dwell we call StartASinglePlayerGame(NULL) — the same call the
+ * engine itself makes from STATUS_WaitingToStartSinglePlayer once VDU
+ * playback finishes — which dismisses the menu and advances to
+ * STATUS_TitleStartingSinglePlayer / CLPIV / next level load.
+ *
+ * Only fires while s_advancing is true so it doesn't auto-skip the
+ * very first menu the user might want at boot. */
+void autotest_between_levels_tick(void)
+{
+	if (s_done) return;
+	if (!s_advancing) return;
+
+	s_between_levels_frames++;
+	/* ~30 frames at 60 Hz = 0.5 s in BetweenLevels before we confirm.
+	 * Long enough for the menu / VDU plumbing to finish initialising,
+	 * short enough that the autotest sweep doesn't drag. */
+	if (s_between_levels_frames == 30)
+	{
+		trace("AUTOTEST: BetweenLevels dwell elapsed -> StartASinglePlayerGame");
+		/* MENUITEM* is the formal type but autoboot in oct2.c also
+		 * passes NULL — engine treats NULL as "no menu context, just
+		 * proceed". Using void* to avoid pulling menu.h here. */
+		extern bool StartASinglePlayerGame(void *);
+		StartASinglePlayerGame(NULL);
+	}
 }
 
 #else  /* !AUTOTEST_REMASTER */
 
-bool autotest_active(void)        { return false; }
-int  autotest_first_level(void)   { return 0; }
-void autotest_tick(void)          {}
-void autotest_on_serious_error(void) {}
+bool autotest_active(void)              { return false; }
+int  autotest_first_level(void)         { return 0; }
+void autotest_tick(void)                {}
+void autotest_between_levels_tick(void) {}
+void autotest_on_serious_error(void)    {}
 
 #endif

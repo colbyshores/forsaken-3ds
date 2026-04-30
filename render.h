@@ -260,6 +260,16 @@ bool FSGetViewPort(render_viewport_t *returnViewPort);
 bool FSBeginScene(void);
 bool FSEndScene(void);
 bool FSSetViewPort(render_viewport_t *newViewPort);
+
+/* When set to true, the NEXT FSSetViewPort call uses a full-screen
+ * GPU viewport plus a GPU scissor rect to the passed-in viewport,
+ * instead of collapsing the GPU viewport to that sub-rect. The flag
+ * auto-resets to false after one FSSetViewPort call so other callers
+ * (HUD, missile cam, stats screen, title) keep the engine standard
+ * behaviour. Set by visi.c ClipGroup for groups whose use_scissor_mode
+ * is true — see VISGROUP::use_scissor_mode in camera.h for the why. */
+void FSSetNextViewPortScissorMode(bool scissor_mode);
+
 bool FSGetWorld(RENDERMATRIX *matrix);
 bool FSSetWorld( RENDERMATRIX *matrix );
 bool FSSetProjection( RENDERMATRIX *matrix );

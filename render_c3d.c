@@ -118,6 +118,13 @@ typedef struct {
 	bool     orthographic;
 	bool     additive_blend;
 	bool     has_texture;
+	/* True if this draw used the scissor-mode viewport (full-screen
+	 * GPU viewport + GPU scissor to the sub-rect). False for normal
+	 * sub-rect viewport draws. The replay path uses this to re-apply
+	 * the same dispatch on the second eye — without it, the second
+	 * eye re-renders the same group with sub-rect viewport, undoing
+	 * the visi.c portal-void fix on that eye. */
+	bool     scissor_mode;
 } dl_entry_t;
 
 #define MAX_DL_ENTRIES 4096
@@ -156,11 +163,18 @@ typedef struct {
 	bool    initialized;
 } texture_t;
 
-/* debug trace to SD card */
+/* Debug trace to SD card. Truncate once on first call per process so
+ * each run starts a fresh log; subsequent calls append. Without this
+ * the log accumulates across every run since the project began,
+ * making "13 cleanups, 21 inits" look like in-run churn when really
+ * it is multi-month history. forsaken_trace.txt does the same trick
+ * via O_TRUNC vs O_APPEND in main_3ds.c. */
 static void c3d_trace(const char *msg)
 {
-	FILE *f = fopen("sdmc:/forsaken_c3d.log", "a");
-	if (f) { fputs(msg, f); fputc('\n', f); fclose(f); }
+	static bool _truncated_once = false;
+	const char *mode = _truncated_once ? "a" : "w";
+	FILE *f = fopen("sdmc:/forsaken_c3d.log", mode);
+	if (f) { fputs(msg, f); fputc('\n', f); fclose(f); _truncated_once = true; }
 }
 
 /* bSquareOnly — shared global, always true on 3DS */
@@ -195,12 +209,25 @@ void pglInit(void)
 	if (_pglInited) return;
 	_pglInited = true;
 
-	/* 4× the default GPU command buffer (256KB → 1MB).
-	 * Forsaken draws hundreds of texture groups per frame, each a
-	 * separate C3D_DrawArrays call that appends ~100 bytes of GPU
-	 * commands.  Laser beams and heavy particle scenes can produce
-	 * thousands of draw calls that overflow smaller buffers. */
-	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 4);
+	/* 16× the default GPU command buffer (256 KB → 4 MB).
+	 *
+	 * Required for the multi-pass flood-fill expansion in
+	 * visi.c FindVisible: each pass adds visible groups for chained
+	 * portal traversal, which cleans up the "black wall through
+	 * doorway" symptom on Remaster levels (powerdown, starship,
+	 * spc-sp01 — geometry rendered black because dynamic-light
+	 * iterator never reached those groups). 4 passes × up to 64
+	 * extra groups = significantly more draw calls per frame than
+	 * the 1 MB cmd buffer can absorb. Specifically, asubchb subway
+	 * (small dense interconnected portals) trips
+	 * GPUCMD_AddInternal's svcBreak with the 1 MB budget when
+	 * flood-fill is on.
+	 *
+	 * Memory cost: +3 MB linear heap. Fine on N3DS (24 MB linear
+	 * heap, ~14 MB peak gameplay use). On OG 3DS this might push
+	 * past available — but OG support is gated on the Q3 memory
+	 * refactor"). */
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 16);
 }
 
 void pglExit(void)
@@ -208,6 +235,18 @@ void pglExit(void)
 	c3d_renderer_cleanup();
 	C3D_Fini();
 }
+
+/* Frame-rate counter. Updated once per swap, exposed via the
+ * `forsaken_get_fps()` accessor so the HUD overlay can draw it. The
+ * 10-second sample logs to forsaken_trace.txt for off-device
+ * monitoring. */
+static u64    s_fps_last_swap_ms  = 0;
+static u32    s_fps_frames_in_win = 0;
+static u64    s_fps_window_start_ms = 0;
+static int    s_fps_current       = 0;
+static u64    s_fps_last_log_ms   = 0;
+
+int forsaken_get_fps(void) { return s_fps_current; }
 
 void pglSwapBuffers(void)
 {
@@ -221,6 +260,32 @@ void pglSwapBuffers(void)
 	s_dlReplay = false;
 	s_dlRecording = false;
 	s_hudDrawnThisFrame = false;
+
+	/* FPS measurement. Roll the count over a 1-second window so the
+	 * displayed value is stable. Log every 10 seconds. */
+	u64 now = osGetTime();
+	if (s_fps_window_start_ms == 0)
+	{
+		s_fps_window_start_ms = now;
+		s_fps_last_log_ms = now;
+	}
+	s_fps_last_swap_ms = now;
+	s_fps_frames_in_win++;
+	u64 elapsed = now - s_fps_window_start_ms;
+	if (elapsed >= 1000)
+	{
+		s_fps_current = (int)((s_fps_frames_in_win * 1000ULL) / elapsed);
+		s_fps_window_start_ms = now;
+		s_fps_frames_in_win = 0;
+	}
+	if ((now - s_fps_last_log_ms) >= 10000)
+	{
+		extern void trace(const char*);
+		char _b[64];
+		snprintf(_b, sizeof(_b), "FPS: %d", s_fps_current);
+		trace(_b);
+		s_fps_last_log_ms = now;
+	}
 }
 
 /*===================================================================
@@ -374,14 +439,31 @@ static void replay_display_list(void)
 		if (e->colourkey)
 			C3D_AlphaTest(true, GPU_GREATER, 0x64);
 
-		/* Viewport */
+		/* Viewport / scissor — match the dispatch the original draw
+		 * used. e->scissor_mode is recorded by FLUSH_BATCH from the
+		 * FSSetViewPort dispatch on the first eye. Without this, the
+		 * second eye renders every recorded draw with sub-rect
+		 * viewport, undoing visi.c's portal-void fix on that eye. */
 		{
 			int bottom = (int)render_info.ThisMode.h - (int)(e->viewport.Y + e->viewport.Height);
 			int pica_x = bottom < 0 ? 0 : bottom;
 			int pica_y = (400 - (int)e->viewport.Width) - (int)e->viewport.X;
 			if (pica_y < 0) pica_y = 0;
-			C3D_SetViewport((u32)pica_x, (u32)pica_y,
-				(u32)e->viewport.Height, (u32)e->viewport.Width);
+			int pica_w = (int)e->viewport.Height;
+			int pica_h = (int)e->viewport.Width;
+			if (e->scissor_mode)
+			{
+				C3D_SetViewport(0, 0, 240, 400);
+				C3D_SetScissor(GPU_SCISSOR_NORMAL,
+				               (u32)pica_x, (u32)pica_y,
+				               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
+			}
+			else
+			{
+				C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
+				C3D_SetViewport((u32)pica_x, (u32)pica_y,
+				                (u32)pica_w, (u32)pica_h);
+			}
 		}
 
 		/* Recompute MVP with new view matrix (eye offset already applied
@@ -1047,45 +1129,66 @@ bool FSGetViewPort(render_viewport_t *view)
 	return true;
 }
 
+/* One-shot flag set by FSSetNextViewPortScissorMode() and consumed
+ * (then reset) by the next FSSetViewPort() call. Allows visi.c
+ * ClipGroup to hand-off per-group "use scissor instead of sub-rect
+ * viewport" decisions without changing FSSetViewPort's signature
+ * (which would touch every caller). */
+static bool s_next_view_use_scissor = false;
+/* Persistent record of the most recent FSSetViewPort dispatch — read
+ * by FLUSH_BATCH when recording the display list so the second eye's
+ * replay can re-apply the same dispatch (full-vp+scissor vs sub-rect
+ * vp). Without this, the replay path uses sub-rect viewport for
+ * every recorded draw and undoes the scissor-mode fix on the second
+ * eye. */
+static bool s_current_view_used_scissor = false;
+
+void FSSetNextViewPortScissorMode(bool scissor_mode)
+{
+	s_next_view_use_scissor = scissor_mode;
+}
+
 bool FSSetViewPort(render_viewport_t *view)
 {
 	s_viewport = *view;
 
-	/* 3DS portal rendering: full-screen viewport + GPU scissor to the
-	 * portal-aperture sub-rect. The original engine path used a sub-rect
-	 * viewport plus a magnified projection (visi.c:1098-1125 unmodified
-	 * branch) to fit the through-portal frustum into the aperture; on
-	 * citro3d that produced black voids on Remaster's stableizers /
-	 * powerdown / starship / battlebase (vol2 happened to dodge it
-	 * because of specific portal-aperture positions, not because the
-	 * math was sound). The naive replacement (cam->Proj + sub-rect
-	 * viewport) squishes the full camera view into the aperture, which
-	 * is wrong scale.
-	 *
-	 * This path keeps the engine's per-group g->viewport semantics
-	 * (= portal-aperture screen rect) but applies it as a scissor at
-	 * the GPU rather than a viewport. Geometry renders at correct
-	 * screen positions via cam's projection, and only the aperture
-	 * pixels get written. Bonus: visible-group count stays small
-	 * because portal traversal is unchanged, so we don't pay the
-	 * outside_map=1 overdraw cost that crashes scratch on big levels. */
-	{
-		/* Translate game-space sub-rect into PICA portrait scissor coords. */
-		int bottom = (int)render_info.ThisMode.h - (int)(view->Y + view->Height);
-		int gl_x = (int)view->X;
-		int pica_x = bottom < 0 ? 0 : bottom;
-		int pica_y = (400 - (int)view->Width) - gl_x;
-		if (pica_y < 0) pica_y = 0;
-		int pica_w = (int)view->Height;
-		int pica_h = (int)view->Width;
+	/* Translate game-space sub-rect into PICA portrait coordinates.
+	 * The engine viewport is 400×240 landscape; PICA top-screen target
+	 * is 240×400 portrait (Y is across the long edge after the 90°
+	 * rotation). Compute the same x/y/w/h pair regardless of which
+	 * dispatch path we take below. */
+	int bottom = (int)render_info.ThisMode.h - (int)(view->Y + view->Height);
+	int gl_x = (int)view->X;
+	int pica_x = bottom < 0 ? 0 : bottom;
+	int pica_y = (400 - (int)view->Width) - gl_x;
+	if (pica_y < 0) pica_y = 0;
+	int pica_w = (int)view->Height;
+	int pica_h = (int)view->Width;
 
-		/* Full-screen viewport for the actual rasterisation. */
+	bool use_scissor = s_next_view_use_scissor;
+	s_next_view_use_scissor = false;	/* one-shot — reset after consume */
+
+	s_current_view_used_scissor = use_scissor;
+	if (use_scissor)
+	{
+		/* Scissor path for portal-aperture groups whose engine
+		 * magnification would have voided. Geometry rendered with
+		 * cam's projection at correct world-scale, scissor cuts
+		 * color/depth writes to the aperture rect. Pairs with
+		 * VISGROUP::use_scissor_mode set in visi.c FindVisible. */
 		C3D_SetViewport(0, 0, 240, 400);
-		/* Scissor restricts color/depth writes to the portal-aperture
-		 * sub-rect. C3D_SCISSOR_NORMAL means "draw inside the rect". */
 		C3D_SetScissor(GPU_SCISSOR_NORMAL,
 		               (u32)pica_x, (u32)pica_y,
 		               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
+	}
+	else
+	{
+		/* Engine standard: sub-rect viewport, no scissor. Pairs with
+		 * the per-group magnified projection in visi.c. The mag math
+		 * is clip-cull friendly so vertex throughput stays low. */
+		C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
+		C3D_SetViewport((u32)pica_x, (u32)pica_y,
+		                (u32)pica_w, (u32)pica_h);
 	}
 
 	return true;
@@ -1908,6 +2011,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			_e->orthographic   = orthographic; \
 			_e->additive_blend = _additive_blend_active; \
 			_e->has_texture    = batch_hasTexture; \
+			_e->scissor_mode   = s_current_view_used_scissor; \
 		} \
 		if (batch_colourkey) \
 			C3D_AlphaTest(false, GPU_ALWAYS, 0); \

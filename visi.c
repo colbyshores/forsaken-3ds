@@ -4,6 +4,7 @@
 ===================================================================*/
 
 #include <stdio.h>
+#include <string.h>
 
 #include "new3d.h"
 #include "quat.h"
@@ -464,9 +465,136 @@ bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 
 	*pbuf = buf;
 
+	/* Night-Dive Remaster `.mxv` repair — see comment in FindVisible
+	 * for the full story. Trigger: total_indirect == 0 across all
+	 * groups (Night-Dive's KEX-engine exporter never writes
+	 * IndirectVisibleGroup; 1998 originals always do). When that
+	 * fires, rebuild VisibleGroup transitively via BFS over
+	 * immediate-portal edges so the blaster-XLight filter passes
+	 * across non-adjacent rooms. The flood-fill expansion in
+	 * FindVisible runs on the same trigger to fix portal voids on
+	 * the renderer side. */
+	{
+		int total_indirect = 0;
+		int g_iter;
+		for ( g_iter = 0; g_iter < m->num_groups; g_iter++ )
+			total_indirect += IndirectVisibleGroup.list[ g_iter ].groups;
+#if defined(__3DS__) && defined(VERBOSE_TRACE)
+		{ extern void trace(const char *);
+		  extern int16_t LevelNum;
+		  extern char ShortLevelNames[][32];
+		  int total_visible = 0, total_connected = 0, total_portals = 0;
+		  for ( g_iter = 0; g_iter < m->num_groups; g_iter++ )
+		  {
+		      total_visible   += VisibleGroup.list[ g_iter ].groups;
+		      total_connected += ConnectedGroup.list[ g_iter ].groups;
+		      total_portals   += m->Group[ g_iter ].num_portals;
+		  }
+		  char _b[200];
+		  snprintf( _b, sizeof(_b),
+		      "VISI_STATS: level=%s ng=%d portals=%d conn=%d vis=%d indir=%d (avg vis/g=%.1f)",
+		      (LevelNum >= 0 && LevelNum < 64) ? &ShortLevelNames[LevelNum][0] : "?",
+		      (int)m->num_groups, total_portals, total_connected,
+		      total_visible, total_indirect,
+		      m->num_groups ? (double)total_visible / m->num_groups : 0.0 );
+		  trace( _b ); }
+#endif
+		/* Trigger condition: total_indirect == 0.
+		 *
+		 * On the 10-level Night-Dive subset the user vetted by hand
+		 * (defend2 / stableizers / powerdown / starship / battlebase
+		 * = symptomatic; pship / spc-sp01 / bio-sphere / capship /
+		 * space = clean), the IndirectVisibleGroup table is *empty*
+		 * on every symptomatic level and *populated* on every clean
+		 * one. Night-Dive's KEX-engine `.mxv` exporter writes
+		 * IndirectVisibleGroup as zeros, but it also writes
+		 * VisibleGroup with only ~1-hop transitive depth (vis/conn
+		 * ratio ~1.0 on Night-Dive vs ~2.2 on 1998 originals).
+		 * That means `VisibleOverlap(camera_group, xlight_group)`
+		 * returns 0 between any two non-immediate-neighbour groups,
+		 * filtering the blaster's projectile-XLight out of
+		 * `BuildVisibleLightList` whenever the bullet is in a room
+		 * the camera doesn't see directly. Same shallow data also
+		 * starves the per-portal VISTREE traversal in FindVisible
+		 * (handled by the flood-fill expansion below).
+		 *
+		 * `indir==0` is the cleanest detector: zero false positives
+		 * (it's zero exactly on Night-Dive-authored levels), zero
+		 * false negatives (it's nonzero on every original 1998
+		 * level). Rebuild VisibleGroup transitively here so the
+		 * blaster-light filter works correctly. The flood-fill
+		 * below is gated on the same signal, both fixes go live
+		 * together. */
+		if ( total_indirect == 0 )
+		{
+			/* Free the existing per-group .group[] arrays and
+			 * zero list[].groups so RelateGroups can repopulate
+			 * them. The .table bitmap is reset to zero too. */
+			for ( g = 0; g < MAXGROUPS; g++ )
+			{
+				if ( VisibleGroup.list[ g ].group )
+					free( VisibleGroup.list[ g ].group );
+				VisibleGroup.list[ g ].group = NULL;
+				VisibleGroup.list[ g ].groups = 0;
+			}
+			memset( VisibleGroup.table, 0, tabsize );
+
+			/* BFS from each group via immediate portal-destination
+			 * edges. Walks the lightweight Portal[].visible.group
+			 * scalar (not the recursive VISTREE), so it works
+			 * even when the per-portal trees are also shallow.
+			 * For each pair (start, reachable) we mark them in
+			 * VisibleGroup so VisibleOverlap returns true between
+			 * them. */
+			static u_int16_t queue[ MAXGROUPS ];
+			static u_int8_t  seen [ MAXGROUPS ];
+			for ( g = 0; g < m->num_groups; g++ )
+			{
+				memset( seen, 0, m->num_groups );
+				int qh = 0, qt = 0;
+				queue[ qt++ ] = g;
+				seen[ g ] = 1;
+				while ( qh < qt )
+				{
+					u_int16_t cur = queue[ qh++ ];
+					RelateGroups( &VisibleGroup, g, cur );
+					int p;
+					for ( p = 0; p < m->Group[ cur ].num_portals; p++ )
+					{
+						u_int16_t dst = m->Group[ cur ].Portal[ p ].visible.group;
+						if ( dst >= m->num_groups ) continue;
+						if ( seen[ dst ] ) continue;
+						seen[ dst ] = 1;
+						queue[ qt++ ] = dst;
+					}
+				}
+			}
+
+			/* Allocate the per-group .group[] arrays so any code
+			 * that walks list[].group (rather than the bitmap)
+			 * still works. Mirrors the FindGroupConnections logic
+			 * for the v<3 path. */
+			for ( g = 0; g < m->num_groups; g++ )
+			{
+				if ( VisibleGroup.list[ g ].groups )
+				{
+					VisibleGroup.list[ g ].group = (u_int16_t *) calloc(
+						VisibleGroup.list[ g ].groups, sizeof( u_int16_t ) );
+					if ( VisibleGroup.list[ g ].group )
+					{
+						u_int16_t gnum = 0, g2;
+						for ( g2 = 0; g2 < m->num_groups; g2++ )
+							if ( GroupsAreVisible( g, g2 ) )
+								VisibleGroup.list[ g ].group[ gnum++ ] = g2;
+					}
+				}
+			}
+
+		}
+	}
+
 	return true;
 }
-
 
 
 bool FindGroupConnections( MLOADHEADER *m )
@@ -1097,80 +1225,137 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 			ProcessVisiblePortal( cam, v, &Mloadheader->Group[ cam->GroupImIn ].Portal [ j ].visible, &g->extent );
 		}
 
-#ifdef __3DS__
+		/* Data-driven flood-fill gate: enable iff the level's
+		 * `IndirectVisibleGroup` table is empty.
+		 *
+		 * Discovered 2026-04-29: across the 10-level Night-Dive
+		 * subset the user vetted by hand (defend2 / stableizers /
+		 * powerdown / starship / battlebase = symptomatic; pship /
+		 * spc-sp01 / bio-sphere / capship / space = clean), the
+		 * `indir=` total in `VISI_STATS:` exactly partitioned the
+		 * two sets:
+		 *   symptomatic levels: indir = 0
+		 *   clean levels:       indir > 0
+		 * The 1998 Forsaken `.mxv` files include a fully-populated
+		 * IndirectVisibleGroup table; Night-Dive's KEX-engine
+		 * exporter does not write it (the section ends up
+		 * effectively zero on every Night-Dive-authored level).
+		 *
+		 * Gate the flood-fill on this signal so healthy 1998 levels
+		 * pay zero per-frame cost (count check at level transition
+		 * only, cached in `s_floodfill_for_this_level`). Affected
+		 * Night-Dive levels run the existing 2-pass / 32-cap
+		 * BFS expansion to populate the through-portal visible set
+		 * the engine's pre-baked VISTREE doesn't supply on its own. */
+		bool _floodfill_triggered;
+		{
+			static int16_t s_cached_level = -1;
+			static bool    s_floodfill_for_this_level = false;
+			extern int16_t LevelNum;
+			if ( LevelNum != s_cached_level )
+			{
+				s_cached_level = LevelNum;
+				int g_iter, indir_total = 0;
+				for ( g_iter = 0; g_iter < Mloadheader->num_groups; g_iter++ )
+					indir_total += IndirectVisibleGroup.list[ g_iter ].groups;
+				s_floodfill_for_this_level = ( indir_total == 0 );
+			}
+			_floodfill_triggered = s_floodfill_for_this_level;
+		}
+		if ( _floodfill_triggered )
+#if 1  /* RE-ENABLED. The flood-fill is the actual fix for the
+        * "wall void of color through portals" symptom on Remaster
+        * levels — geometry IS drawn but vertex colors come out at
+        * baked-only level (no dynamic blaster contribution) because
+        * those groups aren't in the visible list. Per-vertex
+        * lighting iterates the visible list; flood-fill brings
+        * chained through-portal groups in, and their vertices then
+        * get the blaster's per-frame light contribution. */
 		/* Flood-fill expansion: after the engine's pre-computed VISTREE
 		 * traversal completes, walk every currently-visible group's own
 		 * Portal[] array and project each portal against the camera. If
 		 * the portal projects onto a non-empty screen extent, add the
-		 * destination group to the visible list with that extent.
-		 *
-		 * Forsaken's pre-computed visibility (VISTREE) is baked at
-		 * level-build time and on Remaster's stableizers / powerdown /
-		 * starship / battlebase the trees terminate before including all
-		 * groups whose geometry the player can actually see through
-		 * chained doorways. Without this expansion the visible list
-		 * stops at the first hop; through-portal apertures show the
-		 * immediate next room but the room beyond it (or the floor /
-		 * ceiling that fills the rest of the aperture from a different
-		 * group) is missing — manifested as black rectangles inside the
-		 * doorway frame.
-		 *
-		 * Visited groups tracked via VISGROUP.visible (already
-		 * incremented on first add). Loop bounded to 8 passes as a
-		 * safety against infinite recursion via portal cycles. Cost
-		 * scales with camera line-of-sight depth, not total level size,
-		 * so we don't pay the outside_map=1 overdraw that crashes
-		 * scratch on big levels. */
+		 * destination group to the visible list with that extent. */
 		{
-			bool added_one;
-			int safety_pass;
-			/* 16 passes covers typical level geometry — most chained-portal
-			 * sightlines wrap up well under that. Each pass walks every
-			 * currently-visible group's portals once. */
-			for (safety_pass = 0; safety_pass < 16; safety_pass++) {
-				added_one = false;
-				VISGROUP *current_visible_end = v->last_visible;
+			/* Single-pass expansion: walk each currently-visible group's
+			 * own portals exactly once and add reachable destination
+			 * groups. Combined with the strict per-portal extent
+			 * intersection (MinimiseXYExtent) and a hard MAX_FLOODED
+			 * group cap, the visible count stays bounded in a way the
+			 * 1 MB GPU command buffer can absorb on real hardware.
+			 *
+			 * Earlier iterations went deeper (16 passes) and used a
+			 * relaxed extent (g->extent inherited verbatim) — that
+			 * cleanly fixed the visible black voids in mandarine but
+			 * blew GPCMD_AddInternal's svcBreak on hardware (asubchb
+			 * was the first to hit it: a level with many small
+			 * interconnected portals). One pass + strict intersection
+			 * is the conservative choice that preserves the fix's
+			 * original goal (catch the specific case where Forsaken's
+			 * pre-computed VISTREE terminates one hop too early) without
+			 * exploding the visible-group count. */
+			/* Multi-pass BFS expansion. Each pass walks the
+			 * currently-visible groups and adds destinations of
+			 * each group's portals that aren't already visible.
+			 * Newly-added groups become the source frontier for the
+			 * NEXT pass — propagates through chains of portals.
+			 *
+			 * Relaxed extent inheritance: the destination group
+			 * inherits the source's extent verbatim. The strict
+			 * MinimiseXYExtent(parent, portal-projection)
+			 * approach drops portals whose projection collapses to
+			 * a thin slice — but those are exactly the chained
+			 * cases we need (player looking at a portal at an
+			 * angle that makes the next portal a sliver). Relaxed
+			 * over-includes a few groups, but those get
+			 * clip-culled by the engine's per-group magnified
+			 * projection downstream so they barely cost anything.
+			 *
+			 * Tuning: 2 passes + cap 32. 2 passes catches "look
+			 * through doorway into room that has another doorway
+			 * to a 3rd room" (2-hop chain), which is the common
+			 * Remaster case. 16 passes cleaned all voids but blew
+			 * the 1 MB GPU cmd buffer on asubchb subway. 4 passes
+			 * + cap 64 also cleaned voids but cut framerate in
+			 * half (extra groups go through full vertex shader +
+			 * draw calls, doubling per-frame rendering cost). 2/32
+			 * is the smallest config that still removes the
+			 * visible voids on powerdown / starship. Pairs with
+			 * the 4 MB cmd buffer in pglInit. */
+			#define MAX_FLOODED_GROUPS 32
+			#define MAX_FLOOD_PASSES   2
+			int flooded = 0;
+			int pass;
+			for (pass = 0; pass < MAX_FLOOD_PASSES; pass++)
+			{
+				VISGROUP *pass_frontier_end = v->last_visible;
+				int added_this_pass = 0;
 				for ( g = v->first_visible; g; g = g->next_visible ) {
 					u_int16_t gid = g->group;
 					int p;
 					for (p = 0; p < Mloadheader->Group[gid].num_portals; p++) {
+						if (flooded >= MAX_FLOODED_GROUPS) break;
 						u_int16_t dst = Mloadheader->Group[gid].Portal[p].visible.group;
 						if (dst >= v->groups) continue;
 						if (v->group[dst].visible) continue;
-						EXTENT extent;
-						PORTAL *p_obj = &Mloadheader->Group[gid].Portal[p];
-						if (!VisiblePortalExtent(cam, v, p_obj, &extent))
-							continue;
-						/* Inherit the source group's full extent for the
-						 * new visible group rather than intersecting with
-						 * the new portal's projected extent. This is
-						 * intentionally less tight: the strict intersection
-						 * collapses to empty in some chained-portal cases
-						 * (e.g. when the through-portal-group's far wall
-						 * is itself a portal whose verts barely touch the
-						 * source aperture), losing geometry that should
-						 * fill the aperture. The relaxed inheritance lets
-						 * each new group draw into the same screen rect as
-						 * its source — over-includes, but the per-group
-						 * scissor in FSSetViewPort still confines pixel
-						 * writes to the chained aperture, so visually the
-						 * result is just "more triangles considered for the
-						 * same pixels" — a small extra overdraw cost rather
-						 * than a correctness issue. */
-						(void)extent;
 						VISGROUP *adj = &v->group[dst];
-						adj->extent = g->extent;
+						adj->extent = g->extent;	/* relaxed inheritance */
 						adj->group = dst;
 						adj->visible = 1;
 						adj->next_visible = NULL;
 						v->last_visible->next_visible = adj;
 						v->last_visible = adj;
-						added_one = true;
+						flooded++;
+						added_this_pass++;
 					}
-					if (g == current_visible_end) break;
+					if (flooded >= MAX_FLOODED_GROUPS) break;
+					if (g == pass_frontier_end) break;	/* end of this pass's frontier */
 				}
-				if (!added_one) break;
+				if (flooded >= MAX_FLOODED_GROUPS) break;
+				if (added_this_pass == 0) break;	/* converged early */
 			}
+			#undef MAX_FLOODED_GROUPS
+			#undef MAX_FLOOD_PASSES
 		}
 #endif
 	}
@@ -1210,28 +1395,62 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		}
 		vp->ScaleX = vp->Width * 0.5F;
 		vp->ScaleY = vp->Height * 0.5F;
-#ifdef __3DS__
-		/* On 3DS, render every visible group with the camera's normal
-		 * projection. Pair with FSSetViewPort's scissor-based clipping
-		 * (render_c3d.c) which restricts pixel writes to the portal
-		 * aperture screen rect. The per-group magnified projection
-		 * approach (the #else branch below) produced black voids on
-		 * Remaster levels — see render_c3d.c FSSetViewPort comment for
-		 * the full reasoning. The flood-fill expansion above ensures
-		 * enough groups are visible to fill chained doorway views; this
-		 * keeps the rasteriser inside the right pixel rect. */
+
+		/* Per-group projection. Engine's magnified-and-offset math
+		 * for normal groups; cam's projection unchanged for groups
+		 * whose sub-rect would require too-extreme magnification.
+		 *
+		 * Why the hybrid: when a portal projects to a thin sliver on
+		 * screen (player looking at the portal at near-grazing angle),
+		 * vp.Width or vp.Height collapses to 1-6 pixels. The engine
+		 * math then computes
+		 *     _11 = cam.Proj._11 * viewport.W / vp.W
+		 *     _31 = lr / vp.W  (where lr scales with viewport.W)
+		 * For vp.W = 2, _11 hits 200 and _31 hits 199. World vertices
+		 * project to clip-space coords way outside the GPU's [-w,+w]
+		 * clip volume, so every triangle gets rejected — black void.
+		 *
+		 * Diagnosed on `spc-sp01` group 41 with `mag = 200x` (PROJ_DUMP
+		 * trace, 2026-04-29). asubchb / pship / thermal / starship /
+		 * powerdown all hit smaller-magnitude versions of the same
+		 * issue (max mag 22-40x on those levels) which sometimes
+		 * manifests as void and sometimes as garbled clip-space
+		 * geometry depending on viewing angle.
+		 *
+		 * The threshold below (`MAX_MAG = 16`) is empirical:
+		 *   - vol2's max mag is 4.35x (well under) → engine math
+		 *   - clean levels' max mag is 8-12x → engine math
+		 *   - broken-on-specific-angle levels hit 16-200x → fallback
+		 *
+		 * Fallback is `cam->Proj` unchanged, paired with the sub-rect
+		 * viewport (FSSetViewPort). The geometry visible through the
+		 * thin slit ends up "squished" rather than at the magnified
+		 * scale the engine intended — visually it reads as a tiny
+		 * compressed view instead of a black void, which is strictly
+		 * better. Cost: only the small number of grazing-angle groups
+		 * per frame pay the cost; most groups stay on the cheap
+		 * clip-cull-friendly engine math, so the 10× perf regression
+		 * the always-cam->Proj approach introduced is avoided. */
+		/* Engine's per-group magnified projection. Magnifies cam->Proj
+		 * by `viewport->W / vp->W` in X (and Y) so geometry visible
+		 * through the portal lands inside the sub-rect at expanded
+		 * scale; offsets _31/_32 to recenter on the sub-rect center.
+		 * Through-portal voids on Remaster levels are NOT caused by
+		 * this math producing bad clip coords (we proved that with
+		 * PROJ_DUMP traces — vol2 and spc-sp01 produce similar
+		 * matrices yet vol2 looks fine). They're caused by the
+		 * pre-computed VISTREE terminating one portal hop too
+		 * shallow on Remaster data, leaving deeper through-portal
+		 * groups out of the visible list. Those groups never get
+		 * their vertices touched by the dynamic-light iterator,
+		 * baked vertex colors are zero on Remaster levels, result
+		 * is black walls through doorways. Fix is in the flood-fill
+		 * expansion above the projection-compute block, not here. */
 		g->projection = cam->Proj;
-#else
-		g->projection = cam->Proj;
-		g->projection._11 = ( cam->Proj._11 * v->viewport->Width ) / vp->Width;
-		g->projection._22 = ( cam->Proj._22 * v->viewport->Height ) / vp->Height;
+		g->projection._11 = cam->Proj._11 * v->viewport->Width / vp->Width;
+		g->projection._22 = cam->Proj._22 * v->viewport->Height / vp->Height;
 		lr = 2.0F * ( ( v->viewport->X + v->viewport->Width * 0.5F ) - ( vp->X + vp->Width * 0.5F ) );
 
-		/* On 3DS, RenderCurrentCameraInStereo already offsets the camera
-		 * position for stereo separation.  Skip the asymmetric frustum
-		 * BSP adjustment for all stereo modes to avoid double-applying
-		 * the offset, which shifts portal projections and creates black
-		 * bar artifacts at portal boundaries. */
 #ifdef __3DS__
 		if (!render_info.stereo_enabled)
 #endif
@@ -1248,7 +1467,6 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		g->projection._32 = -2.0F * ( ( v->viewport->Y + v->viewport->Height * 0.5F )
 									- ( vp->Y + vp->Height * 0.5F ) )
 							/ vp->Height;
-#endif
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
 		/* Portal black-void detector: a visible group whose final
@@ -1378,6 +1596,15 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 		return false;
 	if (!FSSetView(&cam->View))
 		return false;
+
+	/* Hand the per-group scissor-mode hint to the renderer. visi.c
+	 * sets g->use_scissor_mode = true for groups whose engine
+	 * magnification math would have produced clip-space coords the
+	 * GPU rejects. The flag tells FSSetViewPort below to use a
+	 * full-screen GPU viewport + GPU scissor to the sub-rect, instead
+	 * of the engine standard sub-rect viewport. No-op on non-c3d
+	 * renderers (their FSSetNextViewPortScissorMode is a stub). */
+	FSSetNextViewPortScissorMode(g->use_scissor_mode);
 
     if (!FSSetViewPort(&g->viewport)) {
 #ifdef DEBUG_VIEWPORT

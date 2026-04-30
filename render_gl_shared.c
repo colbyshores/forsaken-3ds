@@ -854,6 +854,16 @@ bool FSGetViewPort(render_viewport_t *view)
 
 static bool ortho_matrix_needs_update = true;
 
+/* Stub: the GL1 / picaGL paths don't implement the per-group scissor
+ * mode that visi.c uses for thin-portal fallback (see camera.h
+ * VISGROUP::use_scissor_mode). The flag is silently ignored — those
+ * renderers stick with sub-rect viewport for every group, which is
+ * the engine standard and the pre-fix behaviour. If the void issue
+ * manifests on PC GL1 too (different GPU clip range, different
+ * precision), implementing a glScissor-based path here would mirror
+ * the citro3d implementation in render_c3d.c. */
+void FSSetNextViewPortScissorMode(bool b) { (void)b; }
+
 bool FSSetViewPort(render_viewport_t *view)
 {
 	// render_viewport_t x/y starts top/left
