@@ -98,28 +98,51 @@ filenames, and populates `romfs/`.
 ### Forsaken Remastered build flavour (optional)
 
 The default build (`make -f Makefile.3ds`) ships the 1998 game: 15-level
-SP campaign, 30 MP arenas, 9 CD-audio tracks. Build a **Remaster flavour**
-that adds 28 extra levels and 9 new music tracks like this:
+SP campaign, 30 MP arenas, 9 CD-audio tracks. The **Remaster flavour**
+adds 28 extra levels (9 SP, 8 N64-secret, 11 MP), 9 new music tracks,
+N64-specific enemy/pickup/boss meshes, and the Remaster's colorized
+crate-menu banners. Two source-of-truth pipelines, pick one:
+
+**Option A: Build from the Remaster KPF (no 1998 ISO needed).**
 
 ```bash
-# 1. Extract the 1998 ISO/BIN (gives UI assets + tracks 02-10).
-python3 extract_assets.py "Forsaken (USA).bin"
-
-# 2. Extract Remaster's extra levels and convert its OGG-only tracks 10-18
-#    to DSP-ADPCM (track11.dsp..track19.dsp).
+sudo apt install p7zip-full bchunk ffmpeg
 python3 extract_remaster_levels.py \
     ~/.steam/steam/steamapps/common/Forsaken\ Remastered/ForsakenEX.kpf
-
-# 3. Build with the Remaster edition flag.
 make -f Makefile.3ds EDITION=remaster
 ```
 
-`EDITION=remaster` does two things during the build:
+The KPF is a complete superset of the 1998 game data — every `.mx`/`.cob`/
+`.bsp`/`.mxv`/texture/sound is byte-for-byte identical to the 1998 originals.
+The script bulk-extracts every asset into `Data/`, downscales the Remaster's
+1280×720 loading-screen art to 256×128 crate-menu banners, and converts
+the OGG-only tracks 10–18 to DSP-ADPCM. The ~110 KB of 1998-engine-runtime
+data KEX dropped (`.off` sprite-offsets, font files, `enemies.txt`/
+`statsmessages.txt` engine config, the splash icon) ships with the port
+in `assets/engine_runtime_1998/` and is copied automatically.
+
+**Option B: Build from the 1998 ISO + KPF overlay.**
+
+```bash
+sudo apt install p7zip-full bchunk ffmpeg
+python3 extract_assets.py "Forsaken (USA).bin"
+python3 extract_remaster_levels.py --skip-bulk --skip-runtime \
+    ~/.steam/steam/steamapps/common/Forsaken\ Remastered/ForsakenEX.kpf
+make -f Makefile.3ds EDITION=remaster
+```
+
+Use this if you'd rather seed `Data/` from a 1998 ISO you already own
+and just layer the Remaster additions on top. Functionally equivalent
+to Option A.
+
+`EDITION=remaster` does two things at build time:
 
 - Defines `-DEDITION_REMASTER`, which switches `music_3ds.c`'s
   level→track mapping to a 32-entry table keyed on the Remaster's
-  authoritative `defs/mapInfo.txt` curation (vol2 → track 5,
-  defend2 → new track 13, biolab → track 4, …).
+  authoritative `defs/mapInfo.txt` curation, and activates runtime
+  template-copy entries for the new N64 enemy/pickup IDs (100–108
+  enemies, 100–105 pickups) so they render with real Remaster meshes
+  and behave with the closest-matching 1998 AI brain.
 - Substitutes `Data/Levels/mission_remaster.dat` (24 SP campaign
   entries + 8 N64 secret levels) and `Data/Levels/battle_remaster.dat`
   (24 MP arenas) over the 1998 originals during ROMFS staging, so the
@@ -128,22 +151,6 @@ make -f Makefile.3ds EDITION=remaster
 Both `_remaster.dat` files and the original `mission.dat` / `battle.dat`
 are force-tracked in git, so a fresh clone has both orderings ready and
 the build flag picks one.
-
-#### Why both the ISO **and** the Remaster KPF are needed
-
-I audited the KPF against an extracted 1998 ISO before going down this
-road. The KPF is *almost* a complete asset source — `/levels`, `/models`,
-`/bgobjects`, `/sounds/{generic,mapped}` are all byte-identical to the
-1998 originals — but it's missing **14 small UI/font/effect textures**
-the 3DS port's HUD and menu code hard-references (`chars1`, `chars2`,
-`font512`, `fontbig`, `levels1-3`, `credits`, `splat`, `hoop`, `ring_03`,
-`f512x384`, `dummy`, `various`; ~3.8 MB total). Night Dive replaced these
-with TTF fonts and PNG widgets in the Remaster's own UI; we still need
-the bitmap originals from the 1998 disc.
-
-If you only have one of the two assets, build the matching flavour:
-the 1998-only build is `make -f Makefile.3ds`, the Remaster build needs
-both sources.
 
 #### What's included in each flavour
 

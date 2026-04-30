@@ -1,43 +1,53 @@
 #!/usr/bin/env python3
 """
-extract_remaster_levels.py - Import Forsaken Remastered (Night Dive) extras
+extract_remaster_levels.py - Build a complete EDITION=remaster Data/ tree
+from Forsaken Remastered's ForsakenEX.kpf
 
-Pulls 28 extra levels and 9 new music tracks out of Forsaken Remastered's
-ForsakenEX.kpf and the Steam install's music/OGG/ directory, in shape for an
-EDITION=remaster build of the 3DS port. The Remaster's level data files
-(BSP/MXV/GOL/...) are byte-identical to the 1998 originals, so the engine
-loader handles them with no code changes — we only need to copy the per-level
-directories into Data/Levels/ so the Makefile staging step picks them up.
+Designed to fully replace extract_assets.py for a Remaster build — the user
+does NOT need the 1998 ISO. The Remaster KPF is a complete superset of the
+1998 game data: every .mx model, .cob component file, .bsp/.mxv level binary,
+.bmp/.png texture, and sound sample is byte-for-byte identical to the 1998
+ISO contents (verified empirically against the original disc image). The
+Remaster also adds 28 new levels (SP additions, N64-secret levels, MP arenas),
+9 new music compositions, N64 enemy/pickup .mx meshes, and N64 boss .cob
+component files.
 
-Levels imported:
-    SP   - defend2, stableizers, powerdown, starship, battlebase, munitions,
-           biolab, ramqan, temple
-    N64  - nuken64, shipn64, aztec64, blackhole, genstation, tuben64, fishy,
-           final
-    MP   - dabiz, fourball, gas, smalls, storm, sunk, tworooms, astro,
-           tunnels, ians, geodome
+The only 1998-runtime data NOT shipped in the KPF is engine-required runtime
+config: ~50 .off sprite-offset files used for fonts/effects, the engine's
+enemies.txt and statsmessages.txt tuning files, and the projectx-32x32.bmp
+splash icon. KEX dropped these because its renderer doesn't use them. We
+ship them with the port itself in assets/engine_runtime_1998/ — about 110 KB,
+treated as part of the engine port, not as game content.
 
-Skipped: placeholder1, testmap, unknownN64Level1, unknownN64Level2 (incomplete
-or test-only — missing critical files like .stp / .gol / .mis).
+Pipeline (no 1998 ISO required):
 
-The 1280x720 loading-screen .png at each level's root is also skipped — the
-engine uses the existing .pic file for in-engine loading screens.
+    python3 extract_remaster_levels.py <ForsakenEX.kpf>
 
-Music: the Remaster ships an 18-track OGG library in music/OGG/. Tracks 1-9
-are the same compositions as the 1998 CD audio (which extract_assets.py has
-already extracted to track02.dsp..track10.dsp), so this script only converts
-the 9 tracks unique to the Remaster — Labyrinth, Nubia, Pyrolite, the Force
-Of Angels remix of The Dead System, four N64 arrangements, and Cyclotron —
-into track11.dsp..track19.dsp at romfs/music/. Requires ffmpeg and a
-gc-dspadpcm-encode binary on PATH (or in the locations extract_assets.py
-also probes).
+    → Populates Data/{Levels,models,bgobjects,textures,sound,splash,Demos}
+      from the KPF, downscaled crate-menu banners (256x128) per level,
+      Data/{offsets,txt} + Data/projectx-32x32.bmp from the port repo,
+      and 9 new music tracks at romfs/music/track11..19.dsp.
+
+If you'd rather build from the 1998 ISO, use extract_assets.py against the
+disc image instead. The two pipelines are mutually exclusive — pick one.
+
+Compatibility note: the EDITION=remaster build's per-level enemy spawns
+(.nme files) reference 8 N64 enemy types (IDs 100-108) and 6 N64 pickup
+types (IDs 100-105) that the original 1998 game doesn't define. The engine
+template-copies a tonally-similar 1998 enemy/pickup at runtime to fill those
+slots and overrides ModelFilename to point at the real Remaster mesh —
+behaviourally approximate, visually correct.
 
 Usage:
     python3 extract_remaster_levels.py <ForsakenEX.kpf> \\
         [--steam-dir /path/to/Forsaken\\ Remastered] \\
         [--levels-output Data/Levels] \\
+        [--models-output Data/models] \\
+        [--bgobjects-output Data/bgobjects] \\
+        [--data-output Data] \\
         [--music-output romfs/music] \\
-        [--skip-music] [--skip-levels]
+        [--skip-music] [--skip-levels] [--skip-models] \\
+        [--skip-banners] [--skip-bulk] [--skip-runtime]
 
 The script auto-detects the Steam install dir adjacent to ForsakenEX.kpf if
 --steam-dir is omitted.
@@ -124,7 +134,10 @@ def extract_level(z, src_dir, dst_dir):
             continue
         if info.filename.startswith(locale_prefixes):
             continue
-        out_path = os.path.join(dst_dir, rel)
+        # Lowercase the output path so this pipeline produces the same
+        # tree shape as extract_assets.py's lowercase_tree() pass on the
+        # 1998 ISO. The engine lowercases at fopen time anyway.
+        out_path = os.path.join(dst_dir, rel.lower())
         os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
         # Level-root .png is the loading-screen banner — downscale to
         # the 1998 256x128 dimension so MissionTextPics resolution
@@ -168,7 +181,9 @@ def import_levels(kpf_path, output_dir):
             if not actual:
                 missing.append(level)
                 continue
-            dst = os.path.join(output_dir, actual)
+            # Output dir is always lowercase to align with the bulk
+            # extractor and extract_assets.py's lowercase_tree() pass.
+            dst = os.path.join(output_dir, actual.lower())
             if os.path.isdir(dst):
                 skipped_existing.append(actual)
                 continue
@@ -299,7 +314,8 @@ N64_BOSS_MESH_DIRS = [
 def _copy_kpf_files(kpf_path, paths, dst_dirs_relative_to, dst_root_label):
     """Copy a list of KPF entries into local dirs, preserving structure
     relative to dst_dirs_relative_to (e.g., 'models/' so models/n64/foo.mx
-    lands under <dst_root>/n64/foo.mx)."""
+    lands under <dst_root>/n64/foo.mx). Output paths are lowercased to
+    match the bulk extractor + extract_assets.py's lowercase_tree() pass."""
     copied = []
     skipped_existing = []
     missing = []
@@ -309,7 +325,7 @@ def _copy_kpf_files(kpf_path, paths, dst_dirs_relative_to, dst_root_label):
             if src not in names:
                 missing.append(src)
                 continue
-            rel = src[len(dst_dirs_relative_to):]
+            rel = src[len(dst_dirs_relative_to):].lower()
             dst = os.path.join(dst_root_label, rel)
             if os.path.exists(dst):
                 skipped_existing.append(rel)
@@ -338,7 +354,7 @@ def import_n64_models(kpf_path, models_output):
     with zipfile.ZipFile(kpf_path) as z:
         names = set(z.namelist())
         for src in N64_SINGLE_MESH_FILES:
-            basename = os.path.basename(src)
+            basename = os.path.basename(src).lower()
             dst = os.path.join(dst_root, basename)
             if os.path.exists(dst):
                 skipped_existing.append(basename)
@@ -353,11 +369,14 @@ def import_n64_models(kpf_path, models_output):
         # Multi-part boss meshes: preserve the per-boss subdir layout.
         # KEX .cob files reference n64/<boss>/<part>.mx so the engine's
         # PreInitModel will look for data\\models\\n64\\<boss>\\<part>.mx.
+        # Output paths lowercased to match the bulk extractor; the engine's
+        # convert_path() lowercases at fopen time so the .cob's mixed-case
+        # internal references resolve correctly against the lowercased disk.
         for prefix in N64_BOSS_MESH_DIRS:
             for src in sorted(names):
                 if not src.startswith(prefix) or src.endswith("/"):
                     continue
-                rel = src[len("models/"):]
+                rel = src[len("models/"):].lower()
                 dst = os.path.join(models_output, rel)
                 if os.path.exists(dst):
                     skipped_existing.append(rel)
@@ -399,6 +418,129 @@ def import_n64_cobs(kpf_path, bgobjects_output):
         print(f"  Already present, left untouched: {', '.join(skipped_existing)}")
     if missing:
         print(f"  WARNING: not found in KPF: {', '.join(missing)}")
+    return True
+
+
+# ----- Bulk KPF asset extraction (full Data/ tree from KPF) ------------------
+#
+# A full Remaster build doesn't need the 1998 ISO at all — the KPF is a
+# complete superset of the original game data. This step walks the KPF's
+# top-level dirs and lays them out under the local Data/ tree using 1998
+# path conventions (e.g., KPF "sounds/" → "Data/sound/").
+#
+# Skipped: KEX-engine-only directories (defs/, particles/, sprites/, gfx/,
+# progs/, trails/, fonts/, lensflares/, localization/, localized/) and
+# per-locale subdirectories under levels/ and other paths.
+#
+# Run once per asset refresh; subsequent runs are idempotent (overwrites
+# existing files in place — fine because content is byte-identical to the
+# previous extract). To redo from scratch, rm -rf Data/ first.
+
+# Map KPF top-level dir → local Data/ subdir. Anything not in this map
+# is skipped (KEX-only assets the 1998 engine can't read anyway).
+KPF_DIR_MAP = {
+    "levels":    "Levels",
+    "models":    "models",
+    "bgobjects": "bgobjects",
+    "textures":  "textures",
+    "sounds":    "sound",     # name change: KPF plural → 1998 singular
+    "splash":    "splash",
+    "demos":     "Demos",
+}
+
+# Per-locale subdir prefixes inside levels/<level>/ that we always skip.
+LOCALE_SUBDIRS = ("de", "es", "fr", "it", "jp", "ru")
+
+
+def _is_locale_path(rel_path):
+    """True if a path is under a localized subdirectory we should skip."""
+    parts = rel_path.split("/")
+    return any(p in LOCALE_SUBDIRS for p in parts[:-1])
+
+
+def import_kpf_assets(kpf_path, data_output):
+    """Bulk-extract every asset directory the 1998 engine reads from the
+    KPF into data_output. Replaces what extract_assets.py would copy from
+    the 1998 ISO (Data/{models,bgobjects,levels,textures,sound,splash,
+    Demos}). Idempotent — re-running overwrites files in place.
+
+    All output paths are lowercased to match extract_assets.py's
+    lowercase_tree() pass — the engine's convert_path() lowercases at
+    fopen time so the on-disk casing isn't load-bearing, but matching
+    the 1998 pipeline's shape keeps both pipelines interchangeable."""
+    if not os.path.isdir(data_output):
+        os.makedirs(data_output, exist_ok=True)
+
+    written = 0
+    skipped_locale = 0
+    skipped_other_dir = set()
+
+    with zipfile.ZipFile(kpf_path) as z:
+        for info in z.infolist():
+            if info.is_dir():
+                continue
+            parts = info.filename.split("/", 1)
+            if len(parts) < 2:
+                continue
+            top = parts[0]
+            rest = parts[1]
+            if top not in KPF_DIR_MAP:
+                skipped_other_dir.add(top)
+                continue
+            if _is_locale_path(rest):
+                skipped_locale += 1
+                continue
+            # Skip per-level loading-screen .png at level root —
+            # import_banners() handles those (downscales to 256x128).
+            if top == "levels":
+                level_parts = rest.split("/")
+                if (len(level_parts) == 2
+                        and level_parts[1].lower().endswith(".png")):
+                    continue
+            local_top = KPF_DIR_MAP[top].lower()
+            out_path = os.path.join(data_output, local_top, rest.lower())
+            os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+            with z.open(info) as src, open(out_path, "wb") as dst:
+                shutil.copyfileobj(src, dst)
+            written += 1
+
+    print(f"KPF bulk extract: wrote {written} files -> {data_output}/")
+    if skipped_locale:
+        print(f"  Skipped {skipped_locale} per-locale entries (de/es/fr/it/jp/ru)")
+    if skipped_other_dir:
+        print(f"  Skipped KEX-only top-level dirs: "
+              f"{', '.join(sorted(skipped_other_dir))}")
+    return True
+
+
+def import_engine_runtime_1998(repo_root, data_output):
+    """Copy the small ~110 KB of 1998-engine-required runtime data from
+    assets/engine_runtime_1998/ (committed to the port repo) into
+    data_output. KEX dropped these from its asset pipeline because its
+    renderer doesn't use them, but the 1998 engine does — fonts, sprite
+    offsets, the engine's per-gun tuning .txt files, and the splash icon.
+    Treated as part of the engine port, not game content."""
+    src = os.path.join(repo_root, "assets", "engine_runtime_1998")
+    if not os.path.isdir(src):
+        print(f"WARNING: {src} missing — engine-runtime files not staged. "
+              f"Build will fail to load fonts / .off effects.",
+              file=sys.stderr)
+        return False
+    if not os.path.isdir(data_output):
+        os.makedirs(data_output, exist_ok=True)
+
+    written = 0
+    for root, _dirs, files in os.walk(src):
+        rel = os.path.relpath(root, src)
+        out_dir = data_output if rel == "." else os.path.join(data_output, rel)
+        os.makedirs(out_dir, exist_ok=True)
+        for f in files:
+            # copy() not copy2() — copy2 tries to preserve xattrs which
+            # fails on some filesystems (NAS-mounted cifs/nfs).
+            shutil.copy(os.path.join(root, f), os.path.join(out_dir, f))
+            written += 1
+    print(f"Engine runtime (1998-required): wrote {written} files -> "
+          f"{data_output}/{{offsets,txt}}/, projectx-32x32.bmp")
     return True
 
 
@@ -606,14 +748,28 @@ def main():
     ap.add_argument("--bgobjects-output", default="Data/bgobjects",
                     help="Destination bgobjects directory for boss .cob files "
                          "(default: Data/bgobjects)")
+    ap.add_argument("--data-output", default="Data",
+                    help="Destination Data/ root for bulk asset extraction "
+                         "(default: Data). The bulk pass populates "
+                         "Data/{Levels,models,bgobjects,textures,sound,"
+                         "splash,Demos} from the KPF and Data/{offsets,txt}+"
+                         "Data/projectx-32x32.bmp from "
+                         "assets/engine_runtime_1998/.")
     ap.add_argument("--skip-levels", action="store_true",
-                    help="Don't import level data")
+                    help="Don't import the per-level overlay (NEW_LEVELS list)")
     ap.add_argument("--skip-music", action="store_true",
                     help="Don't convert OGG music tracks")
     ap.add_argument("--skip-models", action="store_true",
-                    help="Don't import N64 enemy/pickup models")
+                    help="Don't import N64 enemy/pickup/boss meshes + .cobs")
     ap.add_argument("--skip-banners", action="store_true",
                     help="Don't (re-)import the 256x128 crate-menu banners")
+    ap.add_argument("--skip-bulk", action="store_true",
+                    help="Don't bulk-extract the full Data/ tree from the KPF "
+                         "(use if you've already populated Data/ via "
+                         "extract_assets.py and just want Remaster overlays)")
+    ap.add_argument("--skip-runtime", action="store_true",
+                    help="Don't copy assets/engine_runtime_1998/ into Data/. "
+                         "Implies you've populated those bits some other way.")
     args = ap.parse_args()
 
     if not os.path.isfile(args.kpf):
@@ -621,8 +777,17 @@ def main():
         return 1
 
     steam_dir = args.steam_dir or os.path.dirname(os.path.abspath(args.kpf))
+    repo_root = os.path.dirname(os.path.abspath(__file__))
 
     ok = True
+    # Bulk first — lays down the full Data/ tree from the KPF.
+    if not args.skip_bulk:
+        ok = import_kpf_assets(args.kpf, args.data_output) and ok
+    if not args.skip_runtime:
+        ok = import_engine_runtime_1998(repo_root, args.data_output) and ok
+    # Per-feature passes layered on top (idempotent — overwrite specific
+    # files inside the bulk-extracted tree). Banners need import_levels to
+    # have created the per-level dirs, so order matters.
     if not args.skip_levels:
         ok = import_levels(args.kpf, args.levels_output) and ok
     if not args.skip_music:
