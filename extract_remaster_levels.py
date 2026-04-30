@@ -100,9 +100,15 @@ def kpf_levels(kpf_path):
 def extract_level(z, src_dir, dst_dir):
     """Extract a level directory from the open zip into dst_dir.
 
-    Skips the level-root .png (1280x720 loading screen — not used) and
-    every per-locale subdirectory (de/es/fr/it/jp/ru). Per-level texture
-    PNGs (under textures/) are kept since they're real game textures.
+    Per-locale subdirectories (de/es/fr/it/jp/ru) are skipped. The
+    level-root .png is the 1280x720 loading-screen banner — the engine
+    expects 256x128 at <level>.png (the 1998 dimensions; loaded via
+    MissionTextPics → tload.c → Change_Ext to .PNG → 3DS texture
+    pipeline). We downscale here so the banner appears in the
+    crate-menu green screen for Remaster levels.
+
+    Per-level texture PNGs (under textures/) are kept untouched —
+    they're real game textures, not banners.
     """
     locale_prefixes = tuple(
         f"{src_dir}/{loc}/" for loc in ("de", "es", "fr", "it", "jp", "ru")
@@ -118,14 +124,31 @@ def extract_level(z, src_dir, dst_dir):
             continue
         if info.filename.startswith(locale_prefixes):
             continue
-        # Skip level-root loading-screen PNG (e.g., levels/biolab/biolab.png).
-        # Per-level texture PNGs (textures/*.png) are kept.
-        if "/" not in rel and rel.lower().endswith(".png"):
-            continue
         out_path = os.path.join(dst_dir, rel)
         os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+        # Level-root .png is the loading-screen banner — downscale to
+        # the 1998 256x128 dimension so MissionTextPics resolution
+        # matches what tload.c / FSCreateTexture expect.
+        if "/" not in rel and rel.lower().endswith(".png"):
+            with z.open(info) as src_f:
+                _downscale_banner_png(src_f, out_path)
+            continue
         with z.open(info) as src, open(out_path, "wb") as dst:
             shutil.copyfileobj(src, dst)
+
+
+def _downscale_banner_png(src_fileobj, out_path):
+    """Read a PNG from src_fileobj, resize to 256x128 with high-quality
+    Lanczos resampling, and write as 8-bit RGB PNG to out_path. Matches
+    the 1998 banner layout (256x128, RGB)."""
+    from PIL import Image
+    img = Image.open(src_fileobj)
+    # Drop any alpha — banners are opaque, and the engine's BMP-style
+    # loader doesn't read RGBA.
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+    img = img.resize((256, 128), Image.Resampling.LANCZOS)
+    img.save(out_path, format="PNG", optimize=True)
 
 
 def import_levels(kpf_path, output_dir):
@@ -160,6 +183,63 @@ def import_levels(kpf_path, output_dir):
               f"{', '.join(skipped_existing)}")
     if missing:
         print(f"  WARNING: not found in KPF: {', '.join(missing)}")
+    return True
+
+
+def import_banners(kpf_path, output_dir):
+    """Idempotent banner import for the EDITION=remaster build: walk
+    every level directory under output_dir and (re-)write its 256x128
+    crate-menu banner from the matching 1280x720 PNG in the KPF. This
+    intentionally overwrites the original 1998 ISO's greyscale banners
+    with Remaster's colorized art — for a Remaster build, the original
+    banners shouldn't show up alongside the new ones.
+
+    Levels with no matching KPF entry (intro/cutscene maps like
+    accworld, endscene, probeworld) keep their existing banner.
+
+    Lives outside import_levels() so it can run against a fully-
+    populated Data/Levels/ — existing banners get overwritten in place,
+    matching how the romfs-staging rsync expects to see them."""
+    if not os.path.isdir(output_dir):
+        print(f"ERROR: --levels-output dir does not exist: {output_dir}",
+              file=sys.stderr)
+        return False
+
+    written = []
+    no_kpf_match = []
+
+    # Build a lowercase → actual-case index of every level-root PNG in
+    # the KPF so we can match against local dir names case-insensitively.
+    with zipfile.ZipFile(kpf_path) as z:
+        kpf_banners = {}
+        for name in z.namelist():
+            parts = name.split("/")
+            if (len(parts) == 3 and parts[0] == "levels"
+                    and parts[2].lower().endswith(".png")):
+                kpf_banners[parts[1].lower()] = name
+
+        # Walk every local level dir and overwrite its banner if the
+        # KPF has a colorized source.
+        for entry in sorted(os.listdir(output_dir)):
+            local_dir = os.path.join(output_dir, entry)
+            if not os.path.isdir(local_dir):
+                continue
+            kpf_src = kpf_banners.get(entry.lower())
+            if not kpf_src:
+                no_kpf_match.append(entry)
+                continue
+            # Output filename matches the local dir's basename, lowercased
+            # (the romfs staging step lowercases everything anyway, so
+            # this stays in sync regardless of the dir's stored case).
+            out_path = os.path.join(local_dir, f"{entry.lower()}.png")
+            with z.open(kpf_src) as src_f:
+                _downscale_banner_png(src_f, out_path)
+            written.append(entry)
+
+    print(f"Banners: wrote {len(written)} 256x128 PNGs (Remaster colorized)")
+    if no_kpf_match:
+        print(f"  No KPF source — kept existing banner: "
+              f"{', '.join(no_kpf_match)}")
     return True
 
 
@@ -532,6 +612,8 @@ def main():
                     help="Don't convert OGG music tracks")
     ap.add_argument("--skip-models", action="store_true",
                     help="Don't import N64 enemy/pickup models")
+    ap.add_argument("--skip-banners", action="store_true",
+                    help="Don't (re-)import the 256x128 crate-menu banners")
     args = ap.parse_args()
 
     if not os.path.isfile(args.kpf):
@@ -548,6 +630,8 @@ def main():
     if not args.skip_models:
         ok = import_n64_models(args.kpf, args.models_output) and ok
         ok = import_n64_cobs(args.kpf, args.bgobjects_output) and ok
+    if not args.skip_banners:
+        ok = import_banners(args.kpf, args.levels_output) and ok
 
     return 0 if ok else 1
 
