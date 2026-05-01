@@ -112,14 +112,25 @@ python3 extract_remaster_levels.py \
 make -f Makefile.3ds EDITION=remaster
 ```
 
-The KPF is a complete superset of the 1998 game data — every `.mx`/`.cob`/
-`.bsp`/`.mxv`/texture/sound is byte-for-byte identical to the 1998 originals.
-The script bulk-extracts every asset into `Data/`, downscales the Remaster's
-1280×720 loading-screen art to 256×128 crate-menu banners, and converts
-the OGG-only tracks 10–18 to DSP-ADPCM. The ~110 KB of 1998-engine-runtime
-data KEX dropped (`.off` sprite-offsets, font files, `enemies.txt`/
-`statsmessages.txt` engine config, the splash icon) ships with the port
-in `assets/engine_runtime_1998/` and is copied automatically.
+The KPF is mostly a superset of the 1998 game data — for the levels
+the 1998 game shipped, every `.mx`/`.cob`/`.bsp`/`.mxv`/texture/sound
+is byte-for-byte identical to the 1998 originals. Levels Night Dive
+authored from scratch (defend2, stableizers, powerdown, biolab, plus
+the rest of the 22 KEX-original maps) ship with stripped visibility
+data — KEX's renderer uses runtime portal-frustum culling and doesn't
+need the 1998 engine's pre-baked PVS tables or recursive VISTREE.
+`extract_remaster_levels.py` runs `mxv_visi_repair.py` as its final
+pass to rebuild both at extract time so the 1998 engine sees a
+healthy file. Idempotent and gated on the data signal — runs only on
+"Visibility-Table Repair" for the algorithm.
+
+The script also bulk-extracts every asset into `Data/`, downscales
+the Remaster's 1280×720 loading-screen art to 256×128 crate-menu
+banners, and converts the OGG-only tracks 10–18 to DSP-ADPCM. The
+~110 KB of 1998-engine-runtime data KEX dropped (`.off` sprite-
+offsets, font files, `enemies.txt`/`statsmessages.txt` engine config,
+the splash icon) ships with the port in `assets/engine_runtime_1998/`
+and is copied automatically.
 
 **Option B: Build from the 1998 ISO + KPF overlay.**
 
@@ -160,7 +171,7 @@ the build flag picks one.
 | Multiplayer arenas       | 30                        | 24 (Remaster's curated set)  |
 | Music tracks             | 9 (`track02-10.dsp`)      | 18 (`track02-19.dsp`)        |
 | Level→track mapping      | 1998 CD                   | Remaster `mapInfo.txt`       |
-| Level data fidelity      | Lossless from CD          | Lossless from CD (same files) |
+| Level data fidelity      | Lossless from CD          | Lossless from CD for shared levels; KEX-authored levels get visibility tables/VISTREE rebuilt offline |
 | New-track audio source   | n/a                       | OGG Vorbis 256 kbps → DSP-ADPCM (lossy) |
 
 The new music tracks (10–18 in the OGG library, surfaced as
