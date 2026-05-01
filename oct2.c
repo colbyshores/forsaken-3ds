@@ -5265,8 +5265,6 @@ bool MainGame( void ) // bjd
     return true;
 
   memset( (void*) &IsGroupVisible[0] , 0 , MAXGROUPS * sizeof(u_int16_t) );
-  { extern u_int16_t IsGroupFloodFilled[MAXGROUPS];
-    memset( (void*) &IsGroupFloodFilled[0] , 0 , MAXGROUPS * sizeof(u_int16_t) ); }
   cral += (framelag*2.0F);
 
   for( i = 0 ; i < MAX_SFX ; i++ )

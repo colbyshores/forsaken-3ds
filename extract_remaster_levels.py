@@ -529,33 +529,15 @@ def import_kpf_assets(kpf_path, data_output):
 def import_engine_runtime_1998(repo_root, data_output):
     """Copy the 1998-engine-required runtime data from
     assets/engine_runtime_1998/ (committed to the port repo) into
-    data_output. Two purposes:
+    data_output.
 
-    1. **KEX-dropped assets** (~110 KB): KEX's renderer doesn't use
-       the .off sprite-offset files, the engine's per-gun tuning
-       .txt, or the projectx-32x32.bmp splash icon, so the KPF
-       doesn't ship them. We treat these as part of the engine port.
+    KEX's renderer doesn't use the .off sprite-offset files, the
+    engine's per-gun tuning .txt, or the projectx-32x32.bmp splash
+    icon, so the KPF doesn't ship them (~110 KB). We treat these as
+    part of the engine port.
 
-    2. **9 SP-campaign level dirs** (~17 MB) that KEX stripped vertex-
-       lighting data from: asubchb, bio-sphere, fedbankv, military,
-       nps-sp01, nukerf, pship, space, thermal. Same .mxv size as
-       the 1998 originals but the per-LVERTEX RGB color field is
-       zeroed (KEX uses dynamic lighting and doesn't need the bake).
-       The 1998 engine reads those zeros as black walls — looks
-       identical to the through-portal void symptom we fixed for
-       Night-Dive levels but originates from data, not vis tables.
-       Empirically the visi.c flood-fill detector (total_indirect==0)
-       doesn't catch these because the IndirectVisibleGroup section
-       was preserved; only the per-vertex RGBs were stripped.
-       Shipping the 1998 ISO's intact level dirs is cleaner than
-       trying to re-derive vertex colors from .rtl + light data at
-       load time. import_kpf_assets() runs before this pass and
-       lays down the (broken) KEX versions; this pass overwrites
-       them with the 1998 originals.
-
-    Both pieces ride on the same os.walk() — anything under
-    assets/engine_runtime_1998/ ends up at the matching path under
-    data_output. Idempotent."""
+    Anything under assets/engine_runtime_1998/ ends up at the
+    matching path under data_output. Idempotent."""
     src = os.path.join(repo_root, "assets", "engine_runtime_1998")
     if not os.path.isdir(src):
         print(f"WARNING: {src} missing — engine-runtime files not staged. "
@@ -576,8 +558,7 @@ def import_engine_runtime_1998(repo_root, data_output):
             shutil.copy(os.path.join(root, f), os.path.join(out_dir, f))
             written += 1
     print(f"Engine runtime (1998-required): wrote {written} files -> "
-          f"{data_output}/ (offsets, txt, projectx-32x32.bmp, "
-          f"+ 9 SP-campaign level overrides)")
+          f"{data_output}/ (offsets, txt, projectx-32x32.bmp)")
     return True
 
 
@@ -768,6 +749,115 @@ def import_music(steam_dir, music_output):
     return True
 
 
+# ----- visibility-table repair (Night-Dive levels) ---------------------------
+
+def repair_visibility_tables(data_output):
+    """Scan every extracted .mxv under data_output/levels/ and rebuild the
+    Connected/Visible/IndirectVisibleGroup tables on any level whose
+    IndirectVisibleGroup section is zeroed out.
+
+    KEX's level cooker omits the IndirectVisibleGroup section (writes zeros)
+    for levels it authored from scratch — defend2, stableizers, powerdown,
+    starship, battlebase, plus most other Night-Dive-only maps. Without the
+    repair, the 1998 engine reads those zeros and two systems break:
+
+      - BuildVisibleLightList -> VisibleOverlap returns 0 for every non-
+        immediate-neighbour group pair, so dynamic blaster XLights are
+        filtered out -> walls don't get colored light.
+      - FindVisible's per-portal walk terminates one hop too shallow ->
+        through-portal rooms render as black voids until the player flies
+        across the portal.
+
+    The repair runs BFS over the file's preserved per-portal VISTREE edges
+    (1 hop = ConnectedGroup, 2 hops = VisibleGroup, 4 hops =
+    IndirectVisibleGroup) and writes the rebuilt tables back into the .mxv.
+    Approximation of the original 1998 cooker's geometry-based PVS — over-
+    includes some groups (harmless: at worst one extra dynamic light passes
+    the filter), never under-includes (the visible bug).
+
+    1998 originals and the 9 KPF-preserved 1998 SP-campaign levels (asubchb,
+    bio-sphere, fedbankv, military, nps-sp01, nukerf, pship, space, thermal)
+    have IndirectVisibleGroup populated correctly and skip the repair. The
+    diagnostic gate is the .mxv's own IndirectVisibleGroup byte total — no
+    edition flag needed."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from mxv_visi_repair import parse_mxv, repair_mxv
+        import struct as _s
+    except ImportError as e:
+        print(f"WARNING: mxv_visi_repair unavailable ({e}); "
+              f"runtime visi.c repair will handle it.", file=sys.stderr)
+        return True
+
+    levels_dir = os.path.join(data_output, "levels")
+    if not os.path.isdir(levels_dir):
+        return True
+
+    repaired = []
+    skipped = 0
+    failed = []
+    for lvl in sorted(os.listdir(levels_dir)):
+        lvl_path = os.path.join(levels_dir, lvl)
+        if not os.path.isdir(lvl_path):
+            continue
+        mxv_files = [f for f in os.listdir(lvl_path) if f.lower().endswith('.mxv')]
+        if not mxv_files:
+            continue
+        mxv_path = os.path.join(lvl_path, mxv_files[0])
+        try:
+            with open(mxv_path, 'rb') as f:
+                data = f.read()
+            parsed = parse_mxv(data)
+            # Repair if EITHER the IndirectVisibleGroup table is empty
+            # (KEX never wrote it) OR the per-portal VISTREE is flat
+            # (KEX wrote zero children on every portal). Both are
+            # KEX-authored markers; 1998 cooker output sets both.
+            # Walk the vistree section: scan each portal's root
+            # num_visible field. If any > 0, the file already has a
+            # populated VISTREE.
+            r_off = parsed['vistree'][0]
+            any_portal_has_children = False
+            for g in range(parsed['num_groups']):
+                for _p in range(parsed['groups'][g]['num_portals']):
+                    r_off += 2  # visible_group
+                    nv = _s.unpack_from('<H', data, r_off)[0]; r_off += 2
+                    if nv > 0:
+                        any_portal_has_children = True
+                    # Skip over children tree without parsing — sized in bytes
+                    # by the existing recursive structure. Simpler: parse it.
+                    for _ in range(nv):
+                        # Each child node: u16+u16+u16 + recursive children.
+                        # Walk via the existing helper.
+                        from mxv_visi_repair import walk_vistree as _walk
+                        r_off, _ = _walk(data, r_off)
+            _, list_start, _ = parsed['indirect']
+            o = list_start
+            indir_total = 0
+            for _g in range(parsed['num_groups']):
+                cnt = _s.unpack_from('<H', data, o)[0]
+                o += 2 + cnt * 2
+                indir_total += cnt
+            needs_repair = (indir_total == 0) or (not any_portal_has_children)
+            if not needs_repair:
+                skipped += 1
+                continue
+            new_data = repair_mxv(data)
+            with open(mxv_path, 'wb') as f:
+                f.write(new_data)
+            repaired.append(lvl)
+        except Exception as e:
+            failed.append((lvl, str(e)))
+
+    print(f"Visibility-table repair: rebuilt {len(repaired)} levels, "
+          f"left {skipped} healthy levels alone")
+    if repaired:
+        print(f"  Repaired: {', '.join(repaired)}")
+    if failed:
+        print(f"  WARNING: failed on {len(failed)}: "
+              f"{', '.join(f'{n} ({e})' for n, e in failed)}")
+    return True
+
+
 # ----- entry point -----------------------------------------------------------
 
 def main():
@@ -807,6 +897,11 @@ def main():
     ap.add_argument("--skip-runtime", action="store_true",
                     help="Don't copy assets/engine_runtime_1998/ into Data/. "
                          "Implies you've populated those bits some other way.")
+    ap.add_argument("--skip-visi-repair", action="store_true",
+                    help="Don't rebuild Connected/Visible/IndirectVisibleGroup "
+                         "tables on .mxv files with zeroed IndirectVisibleGroup. "
+                         "Use only if you want the runtime visi.c rebuild to "
+                         "handle them instead.")
     args = ap.parse_args()
 
     if not os.path.isfile(args.kpf):
@@ -834,6 +929,10 @@ def main():
         ok = import_n64_cobs(args.kpf, args.bgobjects_output) and ok
     if not args.skip_banners:
         ok = import_banners(args.kpf, args.levels_output) and ok
+    # Visi-table repair must run last — after every pass that could touch a
+    # .mxv. Operates in-place on the final on-disk files.
+    if not args.skip_visi_repair:
+        ok = repair_visibility_tables(args.data_output) and ok
 
     return 0 if ok else 1
 

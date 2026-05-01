@@ -4356,6 +4356,33 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Ghost ].ModelFilename =
 				File_Exists("data\\models\\n64\\ghost.mx")
 				    ? "n64\\ghost.mx" : "Shade.mx";
+
+			/* Disable StealthMode on any N64 template-copy whose
+			 * ModelFilename has a path separator. The PreLoadEnemies
+			 * loader auto-creates a stealth variant by prepending 'S'
+			 * to the filename byte 0 — fine for "Shade.mx" => "SShade.mx"
+			 * (which exists in 1998's models directory), but for
+			 * "n64\\ghost.mx" it produces "Sn64\\ghost.mx" which doesn't
+			 * exist, and PreInitModel returns false on the missing file.
+			 * The Ghost brain handles invisibility separately from the
+			 * model swap, so disabling the second-mesh load only loses
+			 * the visual stealth effect, not the gameplay behaviour. */
+			{
+				int _n64_ids[] = {
+					ENEMY_Boss_Manmech, ENEMY_CargoDrone, ENEMY_Boss_Ramqan,
+					ENEMY_ShieldTurret, ENEMY_Boss_Maldroid, ENEMY_Enforcer,
+					ENEMY_Boss_DreadNaught2, ENEMY_Boss_DreadNaught, ENEMY_Ghost,
+				};
+				int _i;
+				for (_i = 0; _i < (int)(sizeof(_n64_ids)/sizeof(_n64_ids[0])); _i++) {
+					int _id = _n64_ids[_i];
+					if (EnemyTypes[_id].ModelFilename &&
+					    strchr(EnemyTypes[_id].ModelFilename, '\\') != NULL)
+					{
+						EnemyTypes[_id].StealthMode = false;
+					}
+				}
+			}
 		}
 	}
 
