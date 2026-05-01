@@ -33,9 +33,15 @@ single-pass stereo leave plenty of headroom on either platform.
   DSP firmware mixes channels in software and starts skipping audio — and
   burning ARM cycles — when too many voices are active. The cap recovered
   the music channel under heavy combat AND took back ~15 fps.
-- **CPU per-vertex lighting**, ported from the GL1 path. Single-pass stereo
-  leaves enough CPU headroom to do this without a framerate hit; in exchange
-  we avoid PICA's hardware 8-light cap.
+- **Hybrid GPU vertex lighting.** A custom PICA200 vshader does the
+  per-vertex point-light contribution on the level mesh — ambient +
+  per-light distance falloff for up to 8 simultaneous lights, sorted by
+  camera distance so the closest lights win when the visible-light count
+  exceeds the slot budget (observed up to 59 in dense firefights). A
+  per-group BSP-visibility filter mirrors the 1998 engine's
+  `GroupsAreVisible` check so lights don't bleed through walls. Frees
+  the CPU's per-vertex lighting cycles for OG 3DS in particular, where
+  the pre-GPU-lighting path was the bottleneck.
 - **Visibility data baked offline.** Forsaken Remastered's KEX-engine cooker
   ships flat per-portal VISTREE + zeroed `IndirectVisibleGroup` for the 22
   Night-Dive-authored levels (KEX uses runtime portal-frustum culling, not

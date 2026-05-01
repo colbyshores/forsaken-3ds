@@ -103,6 +103,11 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 
 ifeq ($(RENDERER),citro3d)
 CFLAGS += -DRENDERER_C3D
+# Hybrid GPU vertex lighting: shader does ambient + per-vertex point-light
+# falloff + accumulation, replacing the per-vertex CPU dynamic-light loop
+# in lights.c::XLight1Group. Validated on hardware; default-on for citro3d.
+# picaGL builds keep CPU lighting since picaGL has no programmable shader.
+CFLAGS += -DGPU_LIGHTING
 EXCLUDE_SRC += render_gl1.c render_gl_shared.c
 else
 CFLAGS += -DGL=1
@@ -226,6 +231,27 @@ CIA_ROMFS_STAMP := $(CIA_ROMFS)/.stamp
 .PHONY: all clean romfs-clean
 
 all: $(OUTPUT_3DSX)
+
+# Compile PICA200 vertex shader and embed into a C header for source inclusion.
+# render_c3d.c does `#include "render_c3d_shbin.h"` to get the shader bytecode
+# baked into the binary. Without this rule, a developer who edited the .pica
+# would see no behavioral change because picasso runs but xxd never gets called
+SHADER_PICA   := $(SRCDIR)/shaders/render_c3d.v.pica
+SHADER_SHBIN  := $(SRCDIR)/shaders/render_c3d.shbin
+SHADER_HEADER := $(SRCDIR)/render_c3d_shbin.h
+
+$(SHADER_SHBIN): $(SHADER_PICA)
+	@echo "Compiling vertex shader $<..."
+	@$(DEVKITPRO)/tools/bin/picasso -o $@ $<
+
+$(SHADER_HEADER): $(SHADER_SHBIN)
+	@echo "Generating $@..."
+	@cd $(SRCDIR) && xxd -i shaders/render_c3d.shbin | \
+	  sed 's/shaders_render_c3d_shbin/render_c3d_shbin/g' > render_c3d_shbin.h
+
+# Force render_c3d.o to depend on the shader header so editing .pica triggers
+# both the shader rebuild and the renderer source recompile.
+$(BUILD)/render_c3d.o: $(SHADER_HEADER)
 
 # Build a physical copy of romfs (resolving all symlinks) once
 # After copying, lowercase all file/directory names so convert_path() lookups work

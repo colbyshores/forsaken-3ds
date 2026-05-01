@@ -71,8 +71,15 @@
 #include "render_c3d_shbin.h"
 
 /* ---- uniform register locations (must match .v.pica) ---- */
-#define UNIFORM_PROJECTION  0
-#define UNIFORM_MODELVIEW   4
+#define UNIFORM_PROJECTION   0   /* fvec4[4] — full MVP */
+#define UNIFORM_MODELVIEW    4   /* fvec4[4] — identity (kept for compat) */
+#define UNIFORM_AMBIENT      8   /* fvec4    — .xyz=ambient, .w=unused */
+#define UNIFORM_LIGHT_COUNT  9   /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
+#define UNIFORM_LIGHTS      10   /* fvec4[12]— GPU_MAX_LIGHTS × 3 fvec4 each
+                                  *   light[3i+0] = (Pos.xyz, invSizeSq)
+                                  *   light[3i+1] = (r, g, b, type)
+                                  *   light[3i+2] = (Dir.xyz, CosArc)  */
+#define GPU_MAX_LIGHTS       8   /* must match .v.pica `lights[24]` (= 8*3) */
 
 /* ---- citro3d state ---- */
 
@@ -91,6 +98,12 @@ static int  s_hudSavedThisModeH = 0;
 static int  s_hudSavedWinCx     = 0;
 static int  s_hudSavedWinCy     = 0;
 static bool              s_stereoFrame   = false;
+
+/* GPU lighting uniform locations, resolved at init from the shader DVLE
+ * (don't depend on picasso's declaration-order register assignment). */
+static s8 s_loc_ambient     = -1;
+static s8 s_loc_light_count = -1;
+static s8 s_loc_lights      = -1;
 
 /* Color write mask — always GPU_WRITE_ALL on citro3d (software anaglyph
  * removed; hardware stereo uses separate render targets instead). */
@@ -674,6 +687,15 @@ bool c3d_renderer_init(void)
 	/* Match picaGL depth map: scale=1.0, offset=1.0 */
 	C3D_DepthMap(true, 1.0f, 1.0f);
 
+	/* GPU-lighting uniform register IDs are hardcoded to match the
+	 * declaration order in shaders/render_c3d.v.pica. libctru's
+	 * shaderInstanceGetUniformLocation / DVLE_GetUniformRegister return
+	 * -1 for fvec uniforms beyond projection/modelView even though they
+	 * appear in the binary's symbol table — works around that. */
+	s_loc_ambient     = UNIFORM_AMBIENT;
+	s_loc_light_count = UNIFORM_LIGHT_COUNT;
+	s_loc_lights      = UNIFORM_LIGHTS;
+
 	s_shaderReady = true;
 	c3d_trace("c3d_renderer_init: OK — shader ready, render targets created");
 	return true;
@@ -752,6 +774,141 @@ static void upload_matrices(void)
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &c3d_mvp);
 	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 }
+
+/*===================================================================
+	Hybrid GPU vertex lighting — point lights, level mesh.
+
+	The vertex shader sums ambient + per-light distance falloff for up
+	to GPU_MAX_LIGHTS lights, replacing the per-vertex CPU iteration in
+	lights.c::XLight1Group. Models still use CPU lighting (their
+	per-vertex baseline restoration in mxload / mxaload is not yet
+	hooked into this path). SPOT lights are treated as points (no cone
+	math) — visually negligible for Forsaken's transient blaster/RT
+	lights and keeps the shader simple.
+
+	See shaders/render_c3d.v.pica for the shader side.
+===================================================================*/
+
+/* Ambient contribution. Zero matches the engine's XLight1Group baseline
+ * (no global ambient term). Tunable per art direction. */
+static float s_ambient_r = 0.0f;
+static float s_ambient_g = 0.0f;
+static float s_ambient_b = 0.0f;
+
+extern struct XLIGHT * FirstLightVisible;
+extern CAMERA          CurrentCamera;
+extern bool            GroupsAreVisible(u_int16_t g1, u_int16_t g2);
+
+/* Zero all lighting uniforms. Called from FSBeginScene so each frame
+ * starts clean — without this, UI / crate-menu / title-screen frames
+ * inherit the previous gameplay frame's lights as stale shading on
+ * menu meshes. The gameplay path repopulates via c3d_upload_xlights{,_for_group}. */
+void c3d_clear_xlights(void)
+{
+	if (s_loc_lights < 0) return;
+	if (s_loc_ambient >= 0)
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_ambient, 0.0f, 0.0f, 0.0f, 0.0f);
+	if (s_loc_light_count >= 0)
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_light_count, 0.0f, 0.0f, 0.0f, 0.0f);
+	C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER, s_loc_lights, GPU_MAX_LIGHTS * 3);
+	memset(dst, 0, sizeof(C3D_FVec) * GPU_MAX_LIGHTS * 3);
+}
+
+/*  filter_group < 0  → all visible XLights eligible
+ *  filter_group >= 0 → keep only XLights BSP-visible from this geometry group
+ *
+ *  Among eligible lights, the closest GPU_MAX_LIGHTS to the camera win.
+ *  Distance ranking prevents on/off flicker on the blaster's own XLight
+ *  in dense scenes (>8 visible) where naive first-N selection depends
+ *  on linked-list traversal order. Per-group filter mirrors CPU
+ *  lights.c::XLight1Group's GroupsAreVisible check and prevents lights
+ *  bleeding through walls. */
+static void upload_xlights_filtered(int filter_group)
+{
+	if (s_loc_lights < 0) return;
+
+	C3D_FVec lights_buf[GPU_MAX_LIGHTS * 3];
+
+	struct XLIGHT *top[GPU_MAX_LIGHTS];
+	float          top_d2[GPU_MAX_LIGHTS];
+	int            n_top = 0;
+	float cx = CurrentCamera.Pos.x;
+	float cy = CurrentCamera.Pos.y;
+	float cz = CurrentCamera.Pos.z;
+	for (struct XLIGHT *L = FirstLightVisible; L; L = ((XLIGHT*)L)->NextVisible)
+	{
+		if (filter_group >= 0 &&
+		    !GroupsAreVisible((u_int16_t)filter_group, ((XLIGHT*)L)->Group))
+			continue;
+
+		float dx = ((XLIGHT*)L)->Pos.x - cx;
+		float dy = ((XLIGHT*)L)->Pos.y - cy;
+		float dz = ((XLIGHT*)L)->Pos.z - cz;
+		float d2 = dx*dx + dy*dy + dz*dz;
+
+		if (n_top < GPU_MAX_LIGHTS) {
+			top[n_top]    = L;
+			top_d2[n_top] = d2;
+			n_top++;
+		} else {
+			int worst = 0;
+			for (int k = 1; k < GPU_MAX_LIGHTS; k++)
+				if (top_d2[k] > top_d2[worst]) worst = k;
+			if (d2 < top_d2[worst]) {
+				top[worst]    = L;
+				top_d2[worst] = d2;
+			}
+		}
+	}
+
+	int n_packed = 0;
+	for (; n_packed < n_top; n_packed++)
+	{
+		struct XLIGHT *L = top[n_packed];
+		float size = ((XLIGHT*)L)->Size;
+		float invSizeSq = (size > 0.0f) ? (1.0f / (size * size)) : 0.0f;
+		lights_buf[n_packed * 3 + 0] = FVec4_New(
+			((XLIGHT*)L)->Pos.x,
+			((XLIGHT*)L)->Pos.y,
+			((XLIGHT*)L)->Pos.z,
+			invSizeSq);
+
+		float r = ((XLIGHT*)L)->r / 255.0f;
+		float g = ((XLIGHT*)L)->g / 255.0f;
+		float b = ((XLIGHT*)L)->b / 255.0f;
+		float type = (((XLIGHT*)L)->Type == SPOT_LIGHT) ? 1.0f : 0.0f;
+		lights_buf[n_packed * 3 + 1] = FVec4_New(r, g, b, type);
+
+		lights_buf[n_packed * 3 + 2] = FVec4_New(
+			((XLIGHT*)L)->Dir.x,
+			((XLIGHT*)L)->Dir.y,
+			((XLIGHT*)L)->Dir.z,
+			((XLIGHT*)L)->CosArc);
+	}
+
+	while (n_packed < GPU_MAX_LIGHTS) {
+		lights_buf[n_packed * 3 + 0] = FVec4_New(0.0f, 0.0f, 0.0f, 0.0f);
+		lights_buf[n_packed * 3 + 1] = FVec4_New(0.0f, 0.0f, 0.0f, 0.0f);
+		lights_buf[n_packed * 3 + 2] = FVec4_New(0.0f, 0.0f, 0.0f, 0.0f);
+		n_packed++;
+	}
+
+	if (s_loc_ambient >= 0) {
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_ambient,
+			s_ambient_r, s_ambient_g, s_ambient_b, 0.0f);
+	}
+	if (s_loc_light_count >= 0) {
+		C3D_FVUnifSet(GPU_VERTEX_SHADER, s_loc_light_count,
+			(float)GPU_MAX_LIGHTS, 0.0f, 0.0f, 0.0f);
+	}
+	{
+		C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER, s_loc_lights, GPU_MAX_LIGHTS * 3);
+		memcpy(dst, lights_buf, sizeof(lights_buf));
+	}
+}
+
+void c3d_upload_xlights(void)              { upload_xlights_filtered(-1); }
+void c3d_upload_xlights_for_group(int g)   { upload_xlights_filtered(g); }
 
 /*===================================================================
 	Render init / cleanup / flip
@@ -932,6 +1089,10 @@ bool FSBeginScene(void)
 			GPUCMD_AddWrite(GPUREG_VSH_FLOATUNIFORM_CONFIG, 0x80000000 | UNIFORM_MODELVIEW);
 			GPUCMD_AddWrites(GPUREG_VSH_FLOATUNIFORM_DATA, (u32*)id, 16);
 		}
+
+#if defined(GPU_LIGHTING)
+		c3d_clear_xlights();
+#endif
 
 		s_inFrame = true;
 	}

@@ -1,22 +1,32 @@
-; render_c3d.v.pica — Forsaken citro3d vertex shader
+; render_c3d.v.pica — Forsaken citro3d vertex shader.
 ;
-; Uniforms:
-;   projection[0..3]  (registers 0-3)   — eye-specific projection matrix
-;   modelView[0..3]   (registers 4-7)   — per-object modelview matrix
+; Hybrid GPU vertex lighting: full MVP transform + ambient + per-vertex
+; point-light contribution. Replaces the per-vertex CPU dynamic-light
+; loop in lights.c::XLight1Group for the level mesh path.
 ;
-; Inputs:
-;   v0  position  (x, y, z)  — 3 floats
-;   v1  color     (r, g, b, a) — 4 floats, pre-normalized [0,1]
-;   v2  texcoord  (u, v) — 2 floats
+; Uniforms (register layout matches render_c3d.c UNIFORM_* defines):
+;   projection[0..3]  (c0..c3)   — full MVP (engine pre-multiplies)
+;   modelView[0..3]   (c4..c7)   — identity today; reserved for the
+;                                   model-vs-mesh split if models move
+;                                   to this lighting path
+;   ambient           (c8)       — .xyz = ambient color, .w unused
+;   light_count       (c9)       — .x = active light count (0..8)
+;   lights[24]        (c10..c33) — 8 lights × 3 fvec4
+;     light[3i+0] = (Pos.x, Pos.y, Pos.z, invSizeSq)  ; CPU pre-divides
+;     light[3i+1] = (r, g, b, type)                    ; type 0=point
+;     light[3i+2] = (Dir.x, Dir.y, Dir.z, CosArc)      ; reserved for spot
 ;
-; Outputs:
-;   outpos   clip-space position
-;   outclr   vertex color
-;   outtc0   texture coordinate
+; Inputs:  v0=pos, v1=baked color (rgba 0..1), v2=texcoord
+; Outputs: outpos (clip), outclr (baked+lights, saturated), outtc0
+;
+; Instruction count: ~74 ops of PICA200's 96-instruction vshader limit.
 
-; Uniforms
+; Uniforms — register layout pinned via API uniform-name resolution
 .fvec projection[4]
 .fvec modelView[4]
+.fvec ambient[1]
+.fvec light_count[1]
+.fvec lights[24]
 
 ; Constants
 .constf myconst(0.0, 1.0, -1.0, 0.0)
@@ -34,24 +44,122 @@
 .alias intex v2
 
 .proc main
-	; r0 = (inpos.xyz, 1.0)
+	; r0 = (inpos.xyz, 1.0) — model/world position
 	mov r0.xyz, inpos
 	mov r0.w,   ones
 
-	; r1 = modelView * r0
+	; r1 = modelView * r0  (identity today; folded into projection upload)
 	dp4 r1.x, modelView[0], r0
 	dp4 r1.y, modelView[1], r0
 	dp4 r1.z, modelView[2], r0
 	dp4 r1.w, modelView[3], r0
 
-	; outpos = projection * r1
+	; outpos = projection * r1 = MVP * inpos  (existing clip-space math)
 	dp4 outpos.x, projection[0], r1
 	dp4 outpos.y, projection[1], r1
 	dp4 outpos.z, projection[2], r1
 	dp4 outpos.w, projection[3], r1
 
-	; Pass through color and texcoord
-	mov outclr, inclr
+	; --- Per-vertex lighting ---
+	; Phase A: assume inpos IS worldspace (true for level mesh; world
+	; transform is folded into MVP register-side since world=identity
+	; for level mesh objects). Models still use CPU lighting.
+	;
+	; Accumulator r3 = baked vertex color + ambient.xyz, alpha untouched.
+	; Uniform must be src1 in add (PICA encoding restricts src2 to
+	; temp/attribute), so ambient comes first.
+	add r3.xyz, ambient[0], inclr
+	mov r3.w,   inclr
+
+	; Worldspace vertex pos in r2.xyz (= inpos for level mesh)
+	mov r2.xyz, inpos
+
+	; --- Light 0 ---
+	; r4.xyz = lightPos - vertPos
+	add r4.xyz, lights[0], -r2
+	; r5.x = dist²
+	dp3 r5.x, r4, r4
+	; r5.x = dist² × invSizeSq (= dist² / Size²)
+	mul r5.x, lights[0].wwww, r5
+	; r5.x = 1 - dist²/Size²  (linear falloff)
+	add r5.x, ones, -r5
+	; r5.x = max(0, falloff) — soft cutoff outside radius
+	max r5.x, zeros, r5
+	; r3.xyz += light_color × falloff (broadcast .x to all channels)
+	mul r6.xyz, lights[1], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; --- Light 1 ---
+	add r4.xyz, lights[3], -r2
+	dp3 r5.x, r4, r4
+	mul r5.x, lights[3].wwww, r5
+	add r5.x, ones, -r5
+	max r5.x, zeros, r5
+	mul r6.xyz, lights[4], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; --- Light 2 ---
+	add r4.xyz, lights[6], -r2
+	dp3 r5.x, r4, r4
+	mul r5.x, lights[6].wwww, r5
+	add r5.x, ones, -r5
+	max r5.x, zeros, r5
+	mul r6.xyz, lights[7], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; --- Light 3 ---
+	add r4.xyz, lights[9], -r2
+	dp3 r5.x, r4, r4
+	mul r5.x, lights[9].wwww, r5
+	add r5.x, ones, -r5
+	max r5.x, zeros, r5
+	mul r6.xyz, lights[10], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; --- Light 4 ---
+	add r4.xyz, lights[12], -r2
+	dp3 r5.x, r4, r4
+	mul r5.x, lights[12].wwww, r5
+	add r5.x, ones, -r5
+	max r5.x, zeros, r5
+	mul r6.xyz, lights[13], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; --- Light 5 ---
+	add r4.xyz, lights[15], -r2
+	dp3 r5.x, r4, r4
+	mul r5.x, lights[15].wwww, r5
+	add r5.x, ones, -r5
+	max r5.x, zeros, r5
+	mul r6.xyz, lights[16], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; --- Light 6 ---
+	add r4.xyz, lights[18], -r2
+	dp3 r5.x, r4, r4
+	mul r5.x, lights[18].wwww, r5
+	add r5.x, ones, -r5
+	max r5.x, zeros, r5
+	mul r6.xyz, lights[19], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; --- Light 7 ---
+	add r4.xyz, lights[21], -r2
+	dp3 r5.x, r4, r4
+	mul r5.x, lights[21].wwww, r5
+	add r5.x, ones, -r5
+	max r5.x, zeros, r5
+	mul r6.xyz, lights[22], r5.xxxx
+	add r3.xyz, r6, r3
+
+	; Saturate to [0,1] (light_count.x masks unused-light contribution
+	; — CPU sets unused light slots to color=0/invSizeSq=0 so they're
+	; effectively no-ops; light_count uniform reserved for future use)
+	min r3.xyz, ones, r3
+	max r3.xyz, zeros, r3
+
+	; Output
+	mov outclr, r3
 	mov outtc0, intex
 
 	end

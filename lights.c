@@ -532,6 +532,12 @@ clear:					mov		eax, [esi]
 				// ****************** End of Water Effect ******************************
 			}
 		}
+#ifdef GPU_LIGHTING
+		/* Skip the per-vertex CPU dynamic-light loop — the vertex shader
+		 * adds light contribution on top of the baked-color baseline that
+		 * was already restored above. See render_c3d.c::upload_xlights_filtered
+		 * and shaders/render_c3d.v.pica. */
+#else
 		if( WhiteOut == 0.0F )
 		{
 
@@ -541,8 +547,8 @@ clear:					mov		eax, [esi]
 			half_sizex	=	Mloadheader->Group[group].half_size.x;
 			half_sizey	=	Mloadheader->Group[group].half_size.y;
 			half_sizez	=	Mloadheader->Group[group].half_size.z;
-			
-			
+
+
 
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
@@ -908,11 +914,12 @@ __asm
 				XLightPnt = XLightPnt->NextVisible;
 			}
 		}
+#endif /* GPU_LIGHTING */
 		/*	unlock the execute buffer	*/
 		if(!FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf]))
 			return false;
 	}
-	
+
 	return true;
 }
 
