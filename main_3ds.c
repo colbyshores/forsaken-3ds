@@ -111,8 +111,23 @@ extern bool render_init(render_info_t *info);
  * fragile in OG-CIA testing, the right fix is a __system_allocateHeaps
  * weak override that splits per-platform: keep 32+32 on N3DS, drop
  * to 28+24 on OG. Defer until OG-CIA validation proves it necessary. */
-u32 __ctru_heap_size        = 32 * 1024 * 1024;
-u32 __ctru_linear_heap_size = 32 * 1024 * 1024;
+/* Heap budgets are overridable from the Makefile so a developer can
+ * simulate OG-CIA's 1 MB margin (or tighter) on N3DS hardware without
+ * actually installing the CIA. Defaults match the OG-CIA HIMEM target.
+ *
+ *   make ... OG_SIM=1     → 30+30 = 60 MB heap (paranoid: tightens past
+ *                            OG-CIA's 1 MB margin to verify the engine
+ *                            runs with even less). Anything that fits
+ *                            here is bulletproof on real OG hardware.
+ *   make ... MALLOC_HEAP_MB=N LINEAR_HEAP_MB=N  → custom override. */
+#ifndef MALLOC_HEAP_MB
+#define MALLOC_HEAP_MB 32
+#endif
+#ifndef LINEAR_HEAP_MB
+#define LINEAR_HEAP_MB 32
+#endif
+u32 __ctru_heap_size        = MALLOC_HEAP_MB * 1024 * 1024;
+u32 __ctru_linear_heap_size = LINEAR_HEAP_MB * 1024 * 1024;
 
 /* ---- init state tracking ---- */
 

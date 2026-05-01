@@ -291,7 +291,13 @@ void pglSwapBuffers(void)
 		s_fps_window_start_ms = now;
 		s_fps_frames_in_win = 0;
 	}
+	/* Trace cadence: 1s under AUTOTEST so a hard lock pinpoints to within
+	 * a second; 10s otherwise so SD I/O doesn't drown normal play. */
+#ifdef AUTOTEST_REMASTER
+	if ((now - s_fps_last_log_ms) >= 1000)
+#else
 	if ((now - s_fps_last_log_ms) >= 10000)
+#endif
 	{
 		extern void trace(const char*);
 		char _b[64];

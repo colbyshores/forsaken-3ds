@@ -192,6 +192,16 @@ bool handle_events(void)
 	joy_button_state[0][8] = (kHeld & KEY_ZL)    ? true : false; /* nitro */
 	joy_button_state[0][9] = (kHeld & KEY_ZR)    ? true : false; /* drop mine */
 
+#ifdef AUTOTEST_REMASTER
+	/* Hold the primary-fire button so the autotest sweep produces visible
+	 * dynamic blaster light on every level — without the user manually
+	 * holding A, the GPU lighting path has no transient lights to validate.
+	 * The engine's primary cooldown enforces natural fire rate; this just
+	 * keeps the trigger pulled. Safe outside gameplay too — the engine's
+	 * status state machine won't act on it from menus/title. */
+	joy_button_state[0][0] = true;
+#endif
+
 	/* ---- D-pad as POV hat ---- */
 	if (kHeld & KEY_DUP)    joy_hat_state[0][0][JOY_HAT_UP]    = 1;
 	if (kHeld & KEY_DRIGHT) joy_hat_state[0][0][JOY_HAT_RIGHT] = 1;

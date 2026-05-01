@@ -136,12 +136,32 @@ ifeq ($(AUTOTEST_REMASTER),1)
 CFLAGS += -DAUTOTEST_REMASTER
 endif
 
+# OG_SIM=1 tightens the heap budget to 30+30 MB (60 MB total), simulating
+# real OG-CIA HIMEM more pessimistically than the default 32+32 = 64 MB
+# (which already matches OG-CIA HIMEM with 1 MB margin). If a build runs
+# cleanly with OG_SIM=1 on N3DS hardware, OG-CIA install is bulletproof.
+# Custom overrides: MALLOC_HEAP_MB=N LINEAR_HEAP_MB=N
+ifeq ($(OG_SIM),1)
+MALLOC_HEAP_MB ?= 30
+LINEAR_HEAP_MB ?= 30
+endif
+ifdef MALLOC_HEAP_MB
+CFLAGS += -DMALLOC_HEAP_MB=$(MALLOC_HEAP_MB)
+endif
+ifdef LINEAR_HEAP_MB
+CFLAGS += -DLINEAR_HEAP_MB=$(LINEAR_HEAP_MB)
+endif
+
 # AUTOTEST_FIRST_LEVEL=N overrides the sweep's starting slot so we can
 # resume a sweep from where the previous run failed without re-cycling
 # already-validated levels. Pass on the make command line:
 #   make ... AUTOTEST_REMASTER=1 AUTOTEST_FIRST_LEVEL=10
 ifneq ($(AUTOTEST_FIRST_LEVEL),)
 CFLAGS += -DAUTOTEST_FIRST_LEVEL=$(AUTOTEST_FIRST_LEVEL)
+# Force autotest_3ds.o to always recompile so a slot change picks up
+# without manual `rm` (CFLAGS aren't tracked as deps by default).
+$(BUILD)/autotest_3ds.o: FORCE
+.PHONY: FORCE
 endif
 
 # AUTOTEST_MAX_LEVELS_TO_SWEEP=N caps how many levels the sweep covers
