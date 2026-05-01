@@ -440,15 +440,18 @@ def import_n64_cobs(kpf_path, bgobjects_output):
 # previous extract). To redo from scratch, rm -rf Data/ first.
 
 # Map KPF top-level dir → local Data/ subdir. Anything not in this map
-# is skipped (KEX-only assets the 1998 engine can't read anyway).
+# is skipped (KEX-only assets the 1998 engine can't read anyway). Output
+# names are lowercase to match extract_assets.py's lowercase_tree() output
+# and the Makefile's romfs-staging expectations (BMP→PNG find pattern,
+# EDITION=remaster mission.dat copy target both use lowercase paths).
 KPF_DIR_MAP = {
-    "levels":    "Levels",
+    "levels":    "levels",
     "models":    "models",
     "bgobjects": "bgobjects",
     "textures":  "textures",
     "sounds":    "sound",     # name change: KPF plural → 1998 singular
     "splash":    "splash",
-    "demos":     "Demos",
+    "demos":     "demos",
 }
 
 # Per-locale subdir prefixes inside levels/<level>/ that we always skip.
@@ -500,12 +503,14 @@ def import_kpf_assets(kpf_path, data_output):
                 if (len(level_parts) == 2
                         and level_parts[1].lower().endswith(".png")):
                     continue
-            # Top-level dir name keeps the KPF_DIR_MAP case (Levels with
-            # cap L, Demos with cap D — matches the 1998 ISO convention
-            # extract_assets.py produces, and matches Data/Levels/mission.dat
-            # which is force-tracked in git). Inner paths lowercased so the
-            # engine's lowercase fopen lookups resolve correctly.
-            local_top = KPF_DIR_MAP[top]
+            # All paths lowercased to match extract_assets.py's
+            # lowercase_tree() output. The Makefile's romfs-staging
+            # BMP→PNG step and EDITION=remaster mission.dat copy
+            # target both expect lowercase, so an uppercase Levels/
+            # would (a) miss the find-pattern conversion and (b)
+            # collide with the lowercase mission.dat copy at the
+            # lowercase pass that follows, getting rm -rf'd.
+            local_top = KPF_DIR_MAP[top]  # already lowercase per the map
             out_path = os.path.join(data_output, local_top, rest.lower())
             os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
             with z.open(info) as src, open(out_path, "wb") as dst:
@@ -522,12 +527,35 @@ def import_kpf_assets(kpf_path, data_output):
 
 
 def import_engine_runtime_1998(repo_root, data_output):
-    """Copy the small ~110 KB of 1998-engine-required runtime data from
+    """Copy the 1998-engine-required runtime data from
     assets/engine_runtime_1998/ (committed to the port repo) into
-    data_output. KEX dropped these from its asset pipeline because its
-    renderer doesn't use them, but the 1998 engine does — fonts, sprite
-    offsets, the engine's per-gun tuning .txt files, and the splash icon.
-    Treated as part of the engine port, not game content."""
+    data_output. Two purposes:
+
+    1. **KEX-dropped assets** (~110 KB): KEX's renderer doesn't use
+       the .off sprite-offset files, the engine's per-gun tuning
+       .txt, or the projectx-32x32.bmp splash icon, so the KPF
+       doesn't ship them. We treat these as part of the engine port.
+
+    2. **9 SP-campaign level dirs** (~17 MB) that KEX stripped vertex-
+       lighting data from: asubchb, bio-sphere, fedbankv, military,
+       nps-sp01, nukerf, pship, space, thermal. Same .mxv size as
+       the 1998 originals but the per-LVERTEX RGB color field is
+       zeroed (KEX uses dynamic lighting and doesn't need the bake).
+       The 1998 engine reads those zeros as black walls — looks
+       identical to the through-portal void symptom we fixed for
+       Night-Dive levels but originates from data, not vis tables.
+       Empirically the visi.c flood-fill detector (total_indirect==0)
+       doesn't catch these because the IndirectVisibleGroup section
+       was preserved; only the per-vertex RGBs were stripped.
+       Shipping the 1998 ISO's intact level dirs is cleaner than
+       trying to re-derive vertex colors from .rtl + light data at
+       load time. import_kpf_assets() runs before this pass and
+       lays down the (broken) KEX versions; this pass overwrites
+       them with the 1998 originals.
+
+    Both pieces ride on the same os.walk() — anything under
+    assets/engine_runtime_1998/ ends up at the matching path under
+    data_output. Idempotent."""
     src = os.path.join(repo_root, "assets", "engine_runtime_1998")
     if not os.path.isdir(src):
         print(f"WARNING: {src} missing — engine-runtime files not staged. "
@@ -548,7 +576,8 @@ def import_engine_runtime_1998(repo_root, data_output):
             shutil.copy(os.path.join(root, f), os.path.join(out_dir, f))
             written += 1
     print(f"Engine runtime (1998-required): wrote {written} files -> "
-          f"{data_output}/{{offsets,txt}}/, projectx-32x32.bmp")
+          f"{data_output}/ (offsets, txt, projectx-32x32.bmp, "
+          f"+ 9 SP-campaign level overrides)")
     return True
 
 
@@ -747,8 +776,8 @@ def main():
     ap.add_argument("--steam-dir", default=None,
                     help="Forsaken Remastered Steam install dir "
                          "(default: directory containing the KPF)")
-    ap.add_argument("--levels-output", default="Data/Levels",
-                    help="Destination level directory (default: Data/Levels)")
+    ap.add_argument("--levels-output", default="Data/levels",
+                    help="Destination level directory (default: Data/levels)")
     ap.add_argument("--music-output", default="romfs/music",
                     help="Destination music directory (default: romfs/music)")
     ap.add_argument("--models-output", default="Data/models",
