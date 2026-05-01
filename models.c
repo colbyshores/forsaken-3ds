@@ -1247,32 +1247,14 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 		if( Models[ i ].Visible )
 		{
-			/* Skip rendering decorations / pickups / spotFX in
-			 * flood-fill groups (1-2 portal hops away through
-			 * chained doorways). Enemies stay visible so the
-			 * player can see and shoot at them through portals.
-			 *
-			 * Discriminator is Models[i].OwnerType:
-			 *   OWNER_ENEMY (2)      — KEEP, render through portals
-			 *   OWNER_SHIP  (1)      — SKIP (pickups, dropped weapons)
-			 *   OWNER_BGOBJECT (3)   — SKIP (decorations)
-			 *   OWNER_NOBODY (0)     — SKIP (ambient spotFX)
-			 *   OWNER_MINE  (4)      — SKIP (mines, no need to see at distance)
-			 *   OWNER_MODELSPOTFX (5)— SKIP (FX models)
-			 *
-			 * Title screen path is unaffected (no flood-fill active). */
-			extern u_int16_t IsGroupFloodFilled[MAXGROUPS];
-			bool _skip_floodfill = !InTitle
-			                       && IsGroupFloodFilled[ Models[ i ].Group ]
-			                       && Models[ i ].OwnerType != OWNER_ENEMY;
-			if( !_skip_floodfill && (InTitle || IsGroupVisible[ Models[ i ].Group ] || (
+			if( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
 				CAMERA_VIEW_IS_VALID &&
 				VisibleOverlap(
 					Ships[ Current_Camera_View ].Object.Group,
 					Models[ i ].Group,
 					NULL
 				)
-			)))
+			))
 			{
 				if( Models[ i ].Flags & MODFLAG_UseClipGroup ) 
 					ClipGroup = Models[i].ClipGroup;
