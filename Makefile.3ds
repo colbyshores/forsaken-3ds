@@ -131,6 +131,20 @@ ifeq ($(AUTOTEST_REMASTER),1)
 CFLAGS += -DAUTOTEST_REMASTER
 endif
 
+# AUTOTEST_FIRST_LEVEL=N overrides the sweep's starting slot so we can
+# resume a sweep from where the previous run failed without re-cycling
+# already-validated levels. Pass on the make command line:
+#   make ... AUTOTEST_REMASTER=1 AUTOTEST_FIRST_LEVEL=10
+ifneq ($(AUTOTEST_FIRST_LEVEL),)
+CFLAGS += -DAUTOTEST_FIRST_LEVEL=$(AUTOTEST_FIRST_LEVEL)
+endif
+
+# AUTOTEST_MAX_LEVELS_TO_SWEEP=N caps how many levels the sweep covers
+# before chain-loading back. Default 32; reduce for focused diagnosis.
+ifneq ($(AUTOTEST_MAX_LEVELS_TO_SWEEP),)
+CFLAGS += -DAUTOTEST_MAX_LEVELS_TO_SWEEP=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)
+endif
+
 # VERBOSE_TRACE=1 enables the TR() / TRMSG() macros in main.h. Lots of
 # trace points get sprinkled through the loaders so a crash leaves the
 # last reached point visible at the tail of sdmc:/forsaken_trace.txt.

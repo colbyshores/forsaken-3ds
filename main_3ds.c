@@ -78,22 +78,40 @@ extern bool render_init(render_info_t *info);
  *
  * On OG 3DS this 56 MB total may push past the partition budget; OG
  * "Surgical Q3-style memory refactor"). */
-/* Heap sizing post-Q3 refactor:
- *   - 24 MB malloc — restored to the OG-friendly value. The
- *     textureGroups migration shrank each MXLOADHEADER from ~17 KB
- *     to ~600 bytes, so the per-level ModelHeaders+MxaModelHeaders
- *     malloc dropped from ~16 MB to ~580 KB. Gameplay malloc usage
- *     comfortably fits 24 MB with headroom for the per-execbuf
- *     textureGroups[] hunk (8 MB pulled from this heap at boot).
- *   - 32 MB linear — unchanged from before the refactor.
+/* Heap sizing post-Q3 refactor + military Remaster level support:
+ *   - 32 MB malloc (was 24 MB; bumped 2026-04-30 to fit military's
+ *     205-enemy COMP_OBJ tree allocations). The 12th .cob load
+ *     (Legz, 8 children) was hitting malloc=NULL on N3DS at 24 MB
+ *     after ~20 MB consumed by the per-enemy COMP_OBJ trees in the
+ *     LoadEnemies path (sizeof(COMP_OBJ)=688 bytes × N children ×
+ *     205 enemies). Reproduced via the autotest harness sweep
+ *     (AUTOTEST_REMASTER=1 AUTOTEST_FIRST_LEVEL=17). Probing both
+ *     1KB and 64B mallocs returned NULL — confirmed full heap
+ *     exhaustion, not fragmentation.
+ *   - 32 MB linear — unchanged. Holds 4 MB GPU command buffer,
+ *     render targets, HD textures, level vertex/index buffers,
+ *     audio. ~6-8 MB headroom across the Remaster set.
  *
- * Total heap = 24 + 32 = 56 MB (same as pre-refactor). The
- * ~20 MB of BSS the refactor recovered shows up as headroom in
- * the OS / total-app-budget, not as bigger heaps. That's the
- * intentional outcome on N3DS (124 MB budget, lots of slack);
- * on OG 3DS (80 MB budget) the recovered budget is what makes
- * the previously OOM-prone Remaster levels fit. */
-u32 __ctru_heap_size        = 24 * 1024 * 1024;
+ * Total heap = 32 + 32 = 64 MB.
+ *
+ * Platform fit:
+ *   - N3DS (124 MB SystemModeExt): 4 code + 18 BSS + 64 heap +
+ *     1 stack + ~9 OS = ~96 MB → 28 MB headroom.
+ *   - OG 3DS HIMEM (96 MB SystemMode in forsaken.rsf): same
+ *     ~96 MB total → 1 MB headroom. Tight but fits — provided
+ *     the build is installed as a CIA (HIMEM is only granted to
+ *     installed applications, not .3dsx via Homebrew Launcher).
+ *   - OG `.3dsx` via HBL applet: applet mode carves out less
+ *     than HIMEM. Current heap config may not fit there; the .3dsx
+ *     path is for development iteration, shipping path is CIA.
+ *
+ * The 8 MB malloc bump consumed budget that was previously sitting
+ * unused as N3DS slack. On OG it consumes the previous "recovered
+ * BSS" headroom, hence the tight 1 MB margin. If that margin proves
+ * fragile in OG-CIA testing, the right fix is a __system_allocateHeaps
+ * weak override that splits per-platform: keep 32+32 on N3DS, drop
+ * to 28+24 on OG. Defer until OG-CIA validation proves it necessary. */
+u32 __ctru_heap_size        = 32 * 1024 * 1024;
 u32 __ctru_linear_heap_size = 32 * 1024 * 1024;
 
 /* ---- init state tracking ---- */

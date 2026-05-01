@@ -109,8 +109,17 @@ bool autotest_active(void)
 
 int autotest_first_level(void)
 {
-	if (AUTOTEST_FIRST_LEVEL < NumLevels) return AUTOTEST_FIRST_LEVEL;
-	return 0;
+	/* Trust AUTOTEST_FIRST_LEVEL even if NumLevels is 0 / uninitialized at
+	 * the autoboot site — autoboot fires inside StartASinglePlayerGame's
+	 * frame which has just called InitLevels, but in some build orderings
+	 * NumLevels is the OUTGOING level count (from a previous load) or
+	 * still-zero. The downstream engine validates LevelNum against
+	 * ShortLevelNames at level load anyway, so a higher AUTOTEST_FIRST_LEVEL
+	 * than NumLevels falls through to slot 0 there. The earlier
+	 * `if (AUTOTEST_FIRST_LEVEL < NumLevels)` guard silently demoted to
+	 * slot 0 whenever it fired with NumLevels uninitialized — defeating
+	 * the resume-from-last-failure ralph-wiggum loop convention. */
+	return AUTOTEST_FIRST_LEVEL;
 }
 
 /* Shared chain-load to stub. Used by both the normal "all levels done"
