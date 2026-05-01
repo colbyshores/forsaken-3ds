@@ -36,6 +36,14 @@ single-pass stereo leave plenty of headroom on either platform.
 - **CPU per-vertex lighting**, ported from the GL1 path. Single-pass stereo
   leaves enough CPU headroom to do this without a framerate hit; in exchange
   we avoid PICA's hardware 8-light cap.
+- **Visibility data baked offline.** Forsaken Remastered's KEX-engine cooker
+  ships flat per-portal VISTREE + zeroed `IndirectVisibleGroup` for the 22
+  Night-Dive-authored levels (KEX uses runtime portal-frustum culling, not
+  the 1998 PVS). The 1998 engine reads zeros as "no visibility" → black voids
+  through doorways + missing dynamic blaster light. `mxv_visi_repair.py`
+  rebuilds both the recursive VISTREE and the flat tables at extract time
+  via BFS over the preserved portal graph. Runtime engine reads healthy
+  data on every level — no flood-fill, no per-frame BFS.
 
 ## Quick start
 
@@ -267,6 +275,49 @@ Context: Forsaken originally targeted a Pentium 166 with Direct3D 3.0 in
 most of the savings here come from removing the high-level-API tax (citro3d
 direct submission) and not paying for stereo twice (display list replay).
 
+## Memory budgets
+
+3DS hardware partitions a fixed amount of RAM to the running application.
+Which partition you get depends on how the build is launched and what
+the `.rsf` declares:
+
+| Mode | Total app RAM | Use |
+|---|---|---|
+| OG `.3dsx` via Homebrew Launcher (applet) | ~64 MB | dev iteration |
+| OG CIA, `SystemMode: 96MB` (HIMEM) | 96 MB | shipping target |
+| New 3DS CIA, `SystemModeExt: 124MB` | 124 MB | shipping target |
+
+`assets/forsaken.rsf` declares both HIMEM (OG) and SystemModeExt (N3DS),
+so installed CIAs get the larger budget on each platform.
+
+The build's heap layout (set in `main_3ds.c`):
+
+```
+4 MB code + 18 MB BSS + 32 MB malloc + 32 MB linear + 1 MB stack +
+9 MB OS reserve ≈ 96 MB
+```
+
+This fits New 3DS comfortably (29 MB headroom) and OG CIA HIMEM tightly
+(1 MB margin). It does not fit OG `.3dsx` HBL applet mode — that path is
+for development iteration only; **installed CIA is the shipping target**
+on OG.
+
+The 32 MB malloc figure was chosen after the autotest harness caught a
+heap-exhaustion crash in `LoadCompObj` on Forsaken Remastered's denser
+levels (military.nme has 205 enemies, each instantiating a `COMP_OBJ`
+tree of ~1-15 KB). The previous 24 MB heap was overrun by ~5 MB on
+those levels.
+
+The linear heap holds the 4 MB GPU command buffer, render targets, HD
+texture pages, level vertex/index buffers, and audio. OG strips HD
+texture base dimensions in half at boot (512² → 256²) so the linear
+heap fits within the OG budget; New 3DS uses textures at full size.
+
+If the OG-CIA 1 MB margin proves fragile in production testing, the
+right fix is a `__system_allocateHeaps` weak override that splits
+per-platform (32+32 on N3DS, 28+24 on OG). Available but not yet
+needed.
+
 ## Architecture notes
 
 ### Renderer (`render_c3d.c`)
@@ -344,12 +395,11 @@ direct submission) and not paying for stereo twice (display list replay).
   reclaimed ~30 % framerate on sequences with many animated models.
 - Cross-level memory hygiene. The original level / model / animated-model
   loaders allocate per-execbuf vertex copies (`originalVerts[]` in
-  `mload.c`, `mxload.c`, `mxaload.c`) but never free them. On a constrained
-  24 MB malloc heap this accumulates ~3–5 MB per level transition and
+  `mload.c`, `mxload.c`, `mxaload.c`) but never free them. Without the
+  matching releases this accumulates ~3–5 MB per level transition and
   exhausts the heap on the fifth load, manifesting as a hard crash mid-
-  campaign on Old 3DS. The matching frees are now in each
-  `ReleaseM*loadheader` so malloc stays flat at 10–14 MB across the full
-  15-level set.
+  campaign. The matching frees are now in each `ReleaseM*loadheader` so
+  malloc stays flat at 10–14 MB across the full 15-level 1998 SP set.
 
 ## Known limitations
 
