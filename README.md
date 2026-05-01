@@ -8,15 +8,16 @@ A complete, playable build with a custom GPU renderer, hardware stereoscopic
 3D, the full single-player campaign, and HD-source textures sized to fit
 PICA200's budget. Holds a mostly stable 60 fps in stereoscopic 3D at 512×512
 texture resolution on **both Old and New 3DS** — the original game's draw
-counts are tiny by modern standards, and the close-to-metal renderer plus
-single-pass stereo leave plenty of headroom on either platform.
+counts are tiny by modern standards, and the close-to-metal citro3d
+submission plus on-GPU per-vertex lighting leave plenty of headroom on
+either platform.
 
 ## Highlights
 
-- **Single-pass stereo via display list replay.** The first eye records GPU
-  draw commands; the second eye replays them with an updated view matrix —
-  no second BSP traversal, no second vertex transform pass. That headroom is
-  what lets HD textures and stereo coexist at 60 fps.
+- **Hardware stereoscopic 3D.** Two render targets (left/right) bound per
+  frame; the engine's per-eye callback runs fully for each. The 3D slider
+  drives eye separation. ETC1 textures + single-tap fragment shading
+  leave plenty of GPU headroom on both Old and New 3DS.
 - **HD textures (ETC1 / ETC1A4) with Gaussian mipmaps.** Per-level walls
   upscaled from a 4K source pack, downscaled to 512×512 ETC1 with Gaussian
   mip chains — the wider kernel dissolves AI-upscaler hallucination pixels
@@ -278,8 +279,9 @@ combat" dips are particle-overdraw bound, not platform-specific.
 
 Context: Forsaken originally targeted a Pentium 166 with Direct3D 3.0 in
 1998. The compute and memory budget the game actually asks for is small;
-most of the savings here come from removing the high-level-API tax (citro3d
-direct submission) and not paying for stereo twice (display list replay).
+most of the savings here come from direct citro3d submission (no
+high-level-API tax) and moving per-vertex lighting from CPU to the
+PICA200 vshader, which had spare ALU on both 3DS generations.
 
 ## Memory budgets
 
@@ -327,8 +329,15 @@ needed.
 ## Architecture notes
 
 ### Renderer (`render_c3d.c`)
-- Vertex shader (`shaders/render_c3d.v.pica`) does MVP transform with
-  separate projection / modelView uniforms.
+- Vertex shader (`shaders/render_c3d.v.pica`) does the MVP transform plus
+  per-vertex point-light contribution: ambient + per-light distance
+  falloff for up to 8 simultaneous lights, saturated to [0, 1]. Lights
+  are uploaded once per camera pass (camera-level filter) and re-uploaded
+  per visible level-mesh group with a BSP-visibility filter so lights
+  don't bleed through walls. Distance-to-camera ranking decides which 8
+  lights win when more than 8 are visible (observed up to 59 in dense
+  combat). Replaces the 1998 engine's per-vertex CPU dynamic-light loop
+  on the level mesh; static models still use CPU lighting.
 - LVERTEX (24 B: `xyz` + packed `COLOR` + `tu/tv`) is converted to a
   shader-friendly `gpu_vertex_t` (36 B) in a 4 MB linear scratch buffer
   (sized for worst-case combat frames with thousands of laser / explosion
@@ -336,14 +345,17 @@ needed.
 - Consecutive draws with matching state and texture are merged before
   submission. Groups are sorted by texture pointer first to maximise
   batching potential.
-- Stereo replay records `s_dl[4096]` of `dl_entry_t` (scratch offset, vertex
-  count, matrices, viewport, texture, blend state). The second eye triggers
-  a single `replay_display_list()` and skips all per-object draw calls.
+- Hardware stereo runs both eye callbacks fully each frame, drawing into
+  separate left/right render targets. An earlier display-list-replay
+  optimisation that recorded the first eye and replayed it for the
+  second was removed because it silently dropped any 2D / HUD draw
+  issued after the replay trigger (menu text, reticles, missile inset)
+  — visual correctness wins over the saved BSP traversal.
 - HD texture loader (`try_load_hd_texture`) uses `Tex3DS_TextureImportStdio`
   for ETC1 / ETC1A4 t3x files. Sets colorkey from the texture format
   (only ETC1A4 enables alpha test).
-- 1 MB GPU command buffer (4× default) needed for laser-beam / explosion
-  frames that produce thousands of draws.
+- 4 MB GPU command buffer (16× citro3d default) needed for laser-beam /
+  explosion frames that produce thousands of draws.
 
 ### Audio (`sound_3ds.c`, `music_3ds.c`)
 - SFX: capped at 8 concurrent voices on channels 0-7, oldest-evict round
@@ -416,6 +428,12 @@ needed.
 ## Credits
 
 - **Original game**: Probe Entertainment / Acclaim (1998)
+- **Forsaken 64**: Iguana Entertainment (1998) — origin of the N64-port
+  level / enemy / boss meshes that ship in the Remaster build flavour
+- **Forsaken Remastered**: Night Dive Studios (2018) — source of the
+  Remaster level set, additional music tracks, colorized crate-menu
+  banners, and KEX-engine asset format reverse-engineered into the
+  KPF extraction pipeline
 - **Community source port**: [ForsakenX](https://github.com/ForsakenX/forsaken)
 - **3DS port**: Colby Shores
 - **picaGL**: [masterfeizz](https://github.com/masterfeizz/picaGL)
