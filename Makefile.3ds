@@ -118,8 +118,20 @@ ALL_SRC := $(notdir $(wildcard $(SRCDIR)/*.c))
 CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
 OFILES  := $(CFILES:.c=.o)
 
+#
+# __3DS_DEBUG__ is the unified diagnostic gate. When defined:
+#   - god mode + all weapons + autoboot enabled (singleplayer.c)
+#   - trace() writes to sdmc:/forsaken_trace.txt and dispatches via
+#     svcOutputDebugString (main_3ds.c — release builds get an empty
+#     body so call sites compile to nothing, no SD I/O on shipping CIAs)
+#   - VERBOSE_TRACE-gated #ifdef blocks are activated (see below)
+#
+# Set it via `make DEBUG=1`. AUTOTEST_REMASTER=1 implies it (the sweep
+# harness needs traces to record each level transition) and so does
+# DEATH_SIM=1.
+#
 ifeq ($(DEBUG),1)
-CFLAGS += -D__3DS_DEBUG__
+CFLAGS += -D__3DS_DEBUG__ -DVERBOSE_TRACE
 endif
 
 # DEBUG_AUTOBOOT_SLOT=N overrides the DEBUG-build autoboot target (which
@@ -151,7 +163,7 @@ endif
 # back to sdmc:/3ds/netload_stub.3dsx after the last level. Used to
 # validate Remaster levels without manual menu navigation.
 ifeq ($(AUTOTEST_REMASTER),1)
-CFLAGS += -DAUTOTEST_REMASTER
+CFLAGS += -DAUTOTEST_REMASTER -D__3DS_DEBUG__ -DVERBOSE_TRACE
 endif
 
 # OG_SIM=1 tightens the heap budget to 30+30 MB (60 MB total), simulating
@@ -209,7 +221,7 @@ endif
 # screen is reachable for ~3 s, chain-loads back to netload_stub so
 # the host can pull the trace via 3dslink. Diagnostic build only.
 ifeq ($(DEATH_SIM),1)
-CFLAGS += -DDEATH_SIM -D__3DS_DEBUG__
+CFLAGS += -DDEATH_SIM -D__3DS_DEBUG__ -DVERBOSE_TRACE
 endif
 
 # Include paths - note isystem for the source dir so #include <header.h> works

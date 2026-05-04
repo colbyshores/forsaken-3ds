@@ -151,21 +151,26 @@ void platform_delay(u_int32_t ms)
 
 /* ---- debug trace (writes to sdmc so Mandarine can show it) ---- */
 
-/* Tracing: use low-level write() to bypass stdio buffering. Compiles
- * unconditionally — the production EDITION=remaster build doesn't
- * define __3DS_DEBUG__ but still needs the post-crash trace to survive
- * on SD for diagnosis. Cost when nothing's broken is ~200 bytes of
- * writes per level load (one open, a handful of writes + one fsync per
- * checkpoint). Negligible.
+/* Tracing: use low-level write() to bypass stdio buffering.
  *
- * Truncation policy: the file is truncated EXACTLY ONCE per process
- * lifetime, on the very first call to either trace_enable() or trace().
- * Subsequent re-opens (e.g., after a trace_dump() close) use O_APPEND so
- * we don't lose what was written before the close. Without this, the
- * autotest's "DONE -> trace_dump() -> chain-load" path was wiping the
- * whole trace because platform_shutdown's later trace() call would
- * re-open with O_TRUNC. */
+ * Gated on __3DS_DEBUG__ — release builds (the shipping CIA) get a
+ * stub that compiles to nothing, so end-user installs don't write
+ * to their SD card every level load. Diagnostic builds (`make
+ * DEBUG=1`, which defines __3DS_DEBUG__) get the full path, with
+ * every level-load checkpoint and per-frame counter-gated trace
+ * persisted to sdmc:/forsaken_trace.txt for post-crash analysis.
+ *
+ * Truncation policy (debug builds only): the file is truncated
+ * EXACTLY ONCE per process lifetime, on the very first call to
+ * either trace_enable() or trace(). Subsequent re-opens (e.g., after
+ * a trace_dump() close) use O_APPEND so we don't lose what was
+ * written before the close. Without this, the autotest's "DONE ->
+ * trace_dump() -> chain-load" path was wiping the whole trace
+ * because platform_shutdown's later trace() call would re-open with
+ * O_TRUNC. */
 #include <fcntl.h>
+
+#ifdef __3DS_DEBUG__
 static int  _trace_fd = -1;
 static int  _trace_enabled = 0;
 static int  _trace_truncated_once = 0;
@@ -199,13 +204,22 @@ void trace(const char *msg)
 		fsync(_trace_fd);
 	}
 }
+#else
+/* Release: no trace infrastructure at all. Call sites still resolve
+ * (the function exists), but the body is empty so the optimizer
+ * deletes the snprintf chain that built the trace string. */
+void trace_enable(void) {}
+void trace(const char *msg) { (void)msg; }
+#endif /* __3DS_DEBUG__ */
 
 void trace_dump(void) {
+#ifdef __3DS_DEBUG__
 	/* Flush only — don't close. Re-opens with O_APPEND would still
 	 * preserve content per the truncated-once policy, but keeping the
 	 * fd open avoids the open()/close() cost on chain-load paths that
 	 * call trace() again immediately afterward. */
 	if (_trace_fd >= 0) fsync(_trace_fd);
+#endif
 }
 
 /* Runtime flag — when true, DrawSimplePanel prints raw 3D-slider value,
