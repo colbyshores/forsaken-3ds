@@ -122,6 +122,24 @@ ifeq ($(DEBUG),1)
 CFLAGS += -D__3DS_DEBUG__
 endif
 
+# DEBUG_AUTOBOOT_SLOT=N overrides the DEBUG-build autoboot target (which
+# defaults to slot 0 / vol2). Useful for testing a specific level's boss
+# rendering: e.g. DEBUG_AUTOBOOT_SLOT=19 boots biolab (Maldroid),
+# DEBUG_AUTOBOOT_SLOT=18 boots munitions (DreadNaught). Independent of
+# AUTOTEST_REMASTER (which has its own AUTOTEST_FIRST_LEVEL knob).
+ifneq ($(DEBUG_AUTOBOOT_SLOT),)
+CFLAGS += -DDEBUG_AUTOBOOT_SLOT=$(DEBUG_AUTOBOOT_SLOT)
+endif
+
+# DEBUG_WARP_TO_BOSS=1 + DEBUG_AUTOBOOT_SLOT=N teleports the player
+# directly to that level's boss room at spawn, bypassing all triggers
+# and door progression. Used for boss-AI iteration. Coordinates per
+# slot live in ships.c::InitShipStartPos under #ifdef DEBUG_WARP_TO_BOSS;
+# add a new # if DEBUG_AUTOBOOT_SLOT == X branch when wiring a new boss.
+ifeq ($(DEBUG_WARP_TO_BOSS),1)
+CFLAGS += -DDEBUG_WARP_TO_BOSS
+endif
+
 ifeq ($(EDITION),remaster)
 CFLAGS += -DEDITION_REMASTER
 endif
@@ -158,10 +176,10 @@ endif
 #   make ... AUTOTEST_REMASTER=1 AUTOTEST_FIRST_LEVEL=10
 ifneq ($(AUTOTEST_FIRST_LEVEL),)
 CFLAGS += -DAUTOTEST_FIRST_LEVEL=$(AUTOTEST_FIRST_LEVEL)
-# Force autotest_3ds.o to always recompile so a slot change picks up
-# without manual `rm` (CFLAGS aren't tracked as deps by default).
-$(BUILD)/autotest_3ds.o: FORCE
-.PHONY: FORCE
+# (Force-rebuild rule for autotest_3ds.o is appended after `all:` below
+# so it doesn't accidentally become the default target — putting an
+# explicit rule with no commands before `all:` made make's first target
+# `$(BUILD)/autotest_3ds.o`, breaking plain `make` for everyone.)
 endif
 
 # AUTOTEST_MAX_LEVELS_TO_SWEEP=N caps how many levels the sweep covers
@@ -251,6 +269,16 @@ CIA_ROMFS_STAMP := $(CIA_ROMFS)/.stamp
 .PHONY: all clean romfs-clean
 
 all: $(OUTPUT_3DSX)
+
+# Force autotest_3ds.o to always recompile when AUTOTEST_FIRST_LEVEL is set,
+# so a slot change picks up without manual `rm`. CFLAGS aren't tracked as
+# deps by default. Defined AFTER `all:` so `make` with no target still
+# resolves to `all` and not to this internal .o rule.
+ifneq ($(AUTOTEST_FIRST_LEVEL),)
+$(BUILD)/autotest_3ds.o: FORCE
+endif
+.PHONY: FORCE
+FORCE: ;
 
 # Compile PICA200 vertex shader and embed into a C header for source inclusion.
 # render_c3d.c does `#include "render_c3d_shbin.h"` to get the shader bytecode

@@ -3783,6 +3783,7 @@ void EnemyUnderSplineControl( ENEMY * Enemy );
 void EnemyUnderExogenonControl( ENEMY * Enemy );
 void EnemyUnderFleshMorphControl( ENEMY * Enemy );
 void EnemyUnderLittleGeekControl( ENEMY * Enemy );
+void EnemyJumpUnderAiControl( ENEMY * Enemy );
 void InitGuns( BYTE how_many_guns , u_int16_t * GunType , OBJECT * Object );
 void SetWheelPos( VECTOR * DestPos , VECTOR * SourcePos , float xoff , float zoff , VECTOR * Right, VECTOR * Forward, u_int16_t Group , u_int16_t * DestGroup );
 bool Enemy2EnemyCollide( ENEMY * SEnemy , VECTOR * Move );
@@ -3802,6 +3803,7 @@ void (* EnemyControlType[ ])( ENEMY * Enemy ) = {
 	EnemyUnderExogenonControl,
 	EnemyUnderLittleGeekControl,
 	EnemyUnderFleshMorphControl,
+	EnemyJumpUnderAiControl,	/* ENEMY_CONTROLTYPE_JUMP_AI */
 };
 
 void AccellDecell(  float *  value ,  float  Decell ) 
@@ -4283,30 +4285,39 @@ bool PreLoadEnemies( void )
 
 			/* Boss_Manmech (100): walking boss with body + cannon +
 			 * 2 arms. Real Remaster .cob assembles the 4 .mx limbs
-			 * into a COMP_OBJ hierarchy. Falls back to the Mekton
-			 * single-mesh template when n64\\manmech.cob isn't on
-			 * the SD romfs. */
+			 * into a COMP_OBJ hierarchy. Falls back to Mekton's
+			 * .cob (multi-component, walking) when n64\\manmech.cob
+			 * isn't on the SD romfs. */
 			EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename =
 				File_Exists("data\\bgobjects\\n64\\manmech.cob")
-				    ? "n64\\manmech.cob" : "Mekton.mx";
+				    ? "n64\\manmech.cob" : "Mekton.cob";
 			EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
 
-			/* CargoDrone (101): AmmoDump brain + real N64 mesh. */
-			EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_AmmoDump ];
+			/* CargoDrone (101): patrols on a path along the floor.
+			 * KEX defs/n64Enemies.txt assigns brainClass
+			 * "kexForsakenAIBrainCrawl" — confirmed authoritative.
+			 * Mekton template provides CRAWL_AI; AmmoDump (NONE)
+			 * was wrong (kept it stationary). */
+			EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename =
-				File_Exists("data\\models\\n64\\cargodrone.mx")
-				    ? "n64\\cargodrone.mx" : "Dump.cob";
+				File_Exists("data\\bgobjects\\n64\\cargodrone.cob")
+				    ? "n64\\cargodrone.cob"
+				    : (File_Exists("data\\models\\n64\\cargodrone.mx")
+				        ? "n64\\cargodrone.mx" : "Mekton.cob");
 
 			/* Boss_Ramqan (102): 19-part walking boss with body + spine
-			 * + 4 legs + head + spring tendrils. Real Remaster .cob
-			 * assembles all 19 .mx limbs. Falls back to Metatank's
-			 * single-cob template when n64\\ramqan.cob is missing. */
-			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Boss_Metatank ];
+			 * + 4 legs + head + spring tendrils. KEX defs assign
+			 * "kexForsakenAIBrainJump" — ported as ENEMY_CONTROLTYPE_JUMP_AI
+			 * (see aijump.c). The brain hops between AI nodes on a
+			 * parametric parabolic arc instead of crawling.
+			 * Shield is overridden to 8000 (boss-grade). */
+			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename =
 				File_Exists("data\\bgobjects\\n64\\ramqan.cob")
-				    ? "n64\\ramqan.cob" : "Metatank.cob";
+				    ? "n64\\ramqan.cob" : "Mekton.cob";
 			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 8000;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
 
 			/* ShieldTurret (103): 3-part stationary turret with base +
 			 * pivot + gun. Real Remaster .cob assembles all 3 parts.
@@ -4320,14 +4331,21 @@ bool PreLoadEnemies( void )
 			/* Boss_Maldroid (104): 12-part walking boss (body + torso +
 			 * hip + arms + cannons + legs + shins + ankles + feet).
 			 * Real Remaster .cob assembles all 12 .mx limbs. Falls back
-			 * to Mekton single-mesh when n64\\maldroid.cob is missing. */
+			 * to Mekton's .cob when n64\\maldroid.cob is missing. */
 			EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename =
 				File_Exists("data\\bgobjects\\n64\\maldroid.cob")
-				    ? "n64\\maldroid.cob" : "Mekton.mx";
+				    ? "n64\\maldroid.cob" : "Mekton.cob";
 			EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
 
-			/* Enforcer (105): Hunter brain + real N64 mesh. */
+			/* Enforcer (105): KEX defs/n64Enemies.txt assigns brainClass
+			 * "kexForsakenAIBrainFly" — flying enemy, authoritative.
+			 * An earlier session re-mapped this to Mekton (CRAWL_AI)
+			 * based on a YouTube observation that "tanks should be on
+			 * the ground"; that observation was wrong (the high-altitude
+			 * tanks the player saw in biolab are correct — they're
+			 * meant to fly above the player). Hunter template restores
+			 * FLY_AI behavior. Real N64 enforcer.mx mesh loads on top. */
 			EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
 			EnemyTypes[ ENEMY_Enforcer ].ModelFilename =
 				File_Exists("data\\models\\n64\\enforcer.mx")
@@ -6178,6 +6196,21 @@ void EnemyCrawlUnderAiControl( ENEMY * Enemy )
 		
 		AutoMovementCrawl( &Enemy->Object , Enemy );
 	}
+}
+
+/*===================================================================
+	Procedure	:	Jump-Brain Enemy Under AI Control (Boss_Ramqan).
+
+	The arc handler writes Object.Pos directly each frame; we just
+	keep the per-frame display matrix in sync. AutoMovementCrawl is
+	intentionally not called — there's no Speed-driven locomotion
+	to integrate; the parametric arc is authoritative.
+===================================================================*/
+void EnemyJumpUnderAiControl( ENEMY * Enemy )
+{
+	Enemy->AIMoveFlags = 0;
+	AI_JUMP( Enemy );
+	AutoDisplay( &Enemy->Object );
 }
 
 /*===================================================================

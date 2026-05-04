@@ -2132,6 +2132,27 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
 #endif
 		Ships[i].Object.Group = StartPositions[startpos].Group;
+
+#ifdef DEBUG_WARP_TO_BOSS
+		/* Compile-time warp for boss-AI testing. The autoboot slot
+		 * determines which boss room to warp into; coordinates lifted
+		 * from the level's .nme file (the boss spawn position) and
+		 * pulled back along x by ~500 units so we land outside the
+		 * boss model rather than inside it. Add new entries when
+		 * adding boss-AI test paths. */
+# if DEBUG_AUTOBOOT_SLOT == 19   /* ramqan slot — Boss_Ramqan @ group 44 */
+		Ships[i].Object.Pos.x = -1296.0F;   /* -1796 + 500 */
+		Ships[i].Object.Pos.y =  1704.0F;
+		Ships[i].Object.Pos.z =   487.0F;
+		Ships[i].Object.Group = 44;
+		MineVec = Ships[i].Object.Pos;
+		/* Aim toward the boss along -x. */
+		Start_Dir.x = -1.0F;
+		Start_Dir.y =  0.0F;
+		Start_Dir.z =  0.0F;
+		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
+# endif
+#endif
 	}else{
 		Ships[i].Object.Pos.x = -1.0F;
 		Ships[i].Object.Pos.y = -1.0F;

@@ -267,6 +267,8 @@ void AI_SPLINE( ENEMY * Enemy );
 void AI_EXOGENON( ENEMY * Enemy );
 void AI_LITTLEGEEK( ENEMY * Enemy );
 void AI_FLESHMORPH( ENEMY * Enemy );
+void AI_JUMP( ENEMY * Enemy );
+void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy );
 bool Enemy2EnemyFriendlyFireCheck( ENEMY * SEnemy );
 
 // AIIDLE.C

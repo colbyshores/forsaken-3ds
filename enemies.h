@@ -124,6 +124,16 @@ struct ENEMY * FormationLink;
 #endif
 
 	float TauntPause;
+
+#ifdef EDITION_REMASTER
+	/* Jump AI state (Boss_Ramqan only). Inactive/zero on every other
+	 * enemy — see aijump.c for the parametric-arc hop logic. */
+	float	JumpT;			/* tick counter, 0..JUMP_DURATION_TICKS */
+	bool	JumpInAir;
+	VECTOR	JumpStart;
+	VECTOR	JumpTarget;
+	float	JumpApexY;		/* parabola apex world Y (= target node->Pos.y) */
+#endif
 } ENEMY;
 
 typedef struct AI_BEHAVIOUR{
@@ -310,6 +320,7 @@ enum {
 	ENEMY_CONTROLTYPE_EXOGENON,		// Boss Specifics for Exogenon...
 	ENEMY_CONTROLTYPE_LITTLEGEEK,	// Boss Specifics for LittleGeek...
 	ENEMY_CONTROLTYPE_FLESHMORPH,	// Boss Specifics for LittleGeek...
+	ENEMY_CONTROLTYPE_JUMP_AI,		// Remaster: parametric-arc hopping (Boss_Ramqan)
 };
 
 enum {

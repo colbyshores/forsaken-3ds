@@ -2746,12 +2746,20 @@ bool RenderScene( void )
         "AUTOTEST: autoboot override -> NewLevelNum=%d", (int)NewLevelNum); trace(_b);
     }
 #else
-    NewLevelNum = 0;   /* Volcano level (vol2, first in levels.dat) */
+    /* DEBUG-build autoboot target. Defaults to slot 0 (vol2 / volcano) but
+     * can be overridden via -DDEBUG_AUTOBOOT_SLOT=N for boss-rendering /
+     * level-specific tests. */
+#ifndef DEBUG_AUTOBOOT_SLOT
+#define DEBUG_AUTOBOOT_SLOT 0
+#endif
+    NewLevelNum = DEBUG_AUTOBOOT_SLOT;
+#if DEBUG_AUTOBOOT_SLOT == 0
     /* Start at checkpoint 1 (lava tube area) for easier debugging */
     {
         extern u_int16_t last_start_position;
         last_start_position = 1;
     }
+#endif
 #endif
     break;
   }
