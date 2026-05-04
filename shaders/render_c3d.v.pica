@@ -5,10 +5,11 @@
 ; loop in lights.c::XLight1Group for the level mesh path.
 ;
 ; Uniforms (register layout matches render_c3d.c UNIFORM_* defines):
-;   projection[0..3]  (c0..c3)   — full MVP (engine pre-multiplies)
-;   modelView[0..3]   (c4..c7)   — identity today; reserved for the
-;                                   model-vs-mesh split if models move
-;                                   to this lighting path
+;   projection[0..3]  (c0..c3)   — view × proj, with PICA depth remap
+;                                   and 90° screen rotation applied
+;   modelView[0..3]   (c4..c7)   — model→world (= identity for level
+;                                   mesh, real model transform for
+;                                   animated/static model meshes)
 ;   ambient           (c8)       — .xyz = ambient color, .w unused
 ;   light_count       (c9)       — .x = active light count (0..8)
 ;   lights[24]        (c10..c33) — 8 lights × 3 fvec4
@@ -48,22 +49,23 @@
 	mov r0.xyz, inpos
 	mov r0.w,   ones
 
-	; r1 = modelView * r0  (identity today; folded into projection upload)
+	; r1 = modelView * r0 — world-space vertex position
+	;   Level mesh: modelView = identity, so r1 == r0 == inpos.
+	;   Animated/static model: modelView = real model→world transform.
 	dp4 r1.x, modelView[0], r0
 	dp4 r1.y, modelView[1], r0
 	dp4 r1.z, modelView[2], r0
 	dp4 r1.w, modelView[3], r0
 
-	; outpos = projection * r1 = MVP * inpos  (existing clip-space math)
+	; outpos = projection * r1 = (view*proj) * world * inpos = MVP * inpos
 	dp4 outpos.x, projection[0], r1
 	dp4 outpos.y, projection[1], r1
 	dp4 outpos.z, projection[2], r1
 	dp4 outpos.w, projection[3], r1
 
 	; --- Per-vertex lighting ---
-	; Phase A: assume inpos IS worldspace (true for level mesh; world
-	; transform is folded into MVP register-side since world=identity
-	; for level mesh objects). Models still use CPU lighting.
+	; r1.xyz is worldspace pos (level mesh and models alike). Lights
+	; live in worldspace; distance math is now correct on both paths.
 	;
 	; Accumulator r3 = baked vertex color + ambient.xyz, alpha untouched.
 	; Uniform must be src1 in add (PICA encoding restricts src2 to
@@ -71,8 +73,8 @@
 	add r3.xyz, ambient[0], inclr
 	mov r3.w,   inclr
 
-	; Worldspace vertex pos in r2.xyz (= inpos for level mesh)
-	mov r2.xyz, inpos
+	; Worldspace vertex pos in r2.xyz (lighting reads r2)
+	mov r2.xyz, r1
 
 	; --- Light 0 ---
 	; r4.xyz = lightPos - vertPos

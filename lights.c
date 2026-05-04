@@ -1003,16 +1003,21 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 			while( vert --)
 			{
 				lpLVERTEX->color = lpLVERTEX2->color;
-				lpLVERTEX++;		
-				lpLVERTEX2++;		
+				lpLVERTEX++;
+				lpLVERTEX2++;
 			}
-		
 
+#ifndef GPU_LIGHTING
+			/* Vertex shader adds dynamic-light contribution on top of
+			 * the baseline restored above (using world-space vertex
+			 * pos via the modelView uniform = model→world transform).
+			 * Skip the per-vertex per-light CPU loop. See
+			 * render_c3d.c::upload_matrices and render_c3d.v.pica. */
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
 			{
 				{
-					
+
 					Posx = XLightPnt->Pos.x;
 					Posy = XLightPnt->Pos.y;
 					Posz = XLightPnt->Pos.z;
@@ -1159,6 +1164,7 @@ PLOP:
 				}
 				XLightPnt = XLightPnt->NextVisible;
 			}
+#endif /* !GPU_LIGHTING */
 			/*	unlock the execute buffer	*/
 //			if ( MXloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( MXloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
 //				return false;
@@ -1232,16 +1238,21 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 			while( vert --)
 			{
 				lpLVERTEX->color = lpLVERTEX2->color;
-				lpLVERTEX++;		
-				lpLVERTEX2++;		
+				lpLVERTEX++;
+				lpLVERTEX2++;
 			}
-		
 
+#ifndef GPU_LIGHTING
+			/* Vertex shader adds dynamic-light contribution on top of
+			 * the baseline restored above (using world-space vertex
+			 * pos via the modelView uniform = model→world transform).
+			 * Skip the per-vertex per-light CPU loop. See
+			 * render_c3d.c::upload_matrices and render_c3d.v.pica. */
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
 			{
 				{
-					
+
 					Posx = XLightPnt->Pos.x;
 					Posy = XLightPnt->Pos.y;
 					Posz = XLightPnt->Pos.z;
@@ -1388,6 +1399,7 @@ PLOP2:
 				}
 				XLightPnt = XLightPnt->NextVisible;
 			}
+#endif /* !GPU_LIGHTING */
 			/*	unlock the execute buffer	*/
 //			if ( MXloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( MXloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
 //				return false;

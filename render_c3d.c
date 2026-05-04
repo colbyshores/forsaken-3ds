@@ -749,36 +749,48 @@ static void matrix_to_c3d(const RENDERMATRIX *src, C3D_Mtx *dst)
 
 static void upload_matrices(void)
 {
-	/* Match the working trash/forsaken renderer exactly:
-	 * compute combined MVP in engine format, convert to C3D_Mtx,
-	 * apply PICA fix, upload via C3D_FVUnifMtx4x4. */
-	MATRIX mvp;
-	C3D_Mtx c3d_mvp, identity;
+	/* Split the combined MVP into:
+	 *   modelView slot = world_matrix       (model→world transform)
+	 *   projection slot = view × proj        (camera + projection,
+	 *                                          PICA depth/rotation tweaks)
+	 *
+	 * Shader composes them as `outpos = projection * (modelView * inpos)`,
+	 * which algebraically equals `MVP * inpos` so existing draws are
+	 * pixel-identical. The split lets the shader read the world-space
+	 * vertex position out of `modelView * inpos` for lighting math —
+	 * required for models, where `inpos` is in MODEL space and a single
+	 * combined-MVP shader can't compute distance to world-space lights.
+	 *
+	 * The PICA row tweaks (depth remap, 90° rotation) commute with
+	 * right-multiplication by world_matrix, so applying them only to the
+	 * view×proj half is mathematically equivalent to applying them to
+	 * the full MVP. */
+	MATRIX vp;
+	C3D_Mtx c3d_vp, c3d_world;
 
-	MatrixMultiply(&world_matrix, &view_matrix, &mvp);
-	MatrixMultiply(&mvp, &proj_matrix, &mvp);
-
-	matrix_to_c3d((const RENDERMATRIX*)&mvp, &c3d_mvp);
+	MatrixMultiply(&view_matrix, &proj_matrix, &vp);
+	matrix_to_c3d((const RENDERMATRIX*)&vp, &c3d_vp);
 
 	/* PICA depth remap: D3D [0,1] → PICA [-1,0] */
-	c3d_mvp.r[2].x -= c3d_mvp.r[3].x;
-	c3d_mvp.r[2].y -= c3d_mvp.r[3].y;
-	c3d_mvp.r[2].z -= c3d_mvp.r[3].z;
-	c3d_mvp.r[2].w -= c3d_mvp.r[3].w;
+	c3d_vp.r[2].x -= c3d_vp.r[3].x;
+	c3d_vp.r[2].y -= c3d_vp.r[3].y;
+	c3d_vp.r[2].z -= c3d_vp.r[3].z;
+	c3d_vp.r[2].w -= c3d_vp.r[3].w;
 
 	/* 90° screen rotation */
 	{
-		C3D_FVec row0 = c3d_mvp.r[0];
-		c3d_mvp.r[0] = c3d_mvp.r[1];
-		c3d_mvp.r[1].x = -row0.x;
-		c3d_mvp.r[1].y = -row0.y;
-		c3d_mvp.r[1].z = -row0.z;
-		c3d_mvp.r[1].w = -row0.w;
+		C3D_FVec row0 = c3d_vp.r[0];
+		c3d_vp.r[0] = c3d_vp.r[1];
+		c3d_vp.r[1].x = -row0.x;
+		c3d_vp.r[1].y = -row0.y;
+		c3d_vp.r[1].z = -row0.z;
+		c3d_vp.r[1].w = -row0.w;
 	}
 
-	Mtx_Identity(&identity);
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &c3d_mvp);
-	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
+	matrix_to_c3d((const RENDERMATRIX*)&world_matrix, &c3d_world);
+
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &c3d_vp);
+	C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW,  &c3d_world);
 }
 
 /*===================================================================
