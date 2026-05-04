@@ -35,14 +35,25 @@ either platform.
   burning ARM cycles — when too many voices are active. The cap recovered
   the music channel under heavy combat AND took back ~15 fps.
 - **Hybrid GPU vertex lighting.** A custom PICA200 vshader does the
-  per-vertex point-light contribution on the level mesh — ambient +
-  per-light distance falloff for up to 8 simultaneous lights, sorted by
-  camera distance so the closest lights win when the visible-light count
-  exceeds the slot budget (observed up to 59 in dense firefights). A
-  per-group BSP-visibility filter mirrors the 1998 engine's
-  `GroupsAreVisible` check so lights don't bleed through walls. Frees
-  the CPU's per-vertex lighting cycles for OG 3DS in particular, where
-  the pre-GPU-lighting path was the bottleneck.
+  per-vertex point-light contribution for **both** the level mesh and
+  animated/static model meshes — ambient + per-light distance falloff
+  for up to 8 simultaneous lights, sorted by camera distance so the
+  closest lights win when the visible-light count exceeds the slot
+  budget (observed up to 59 in dense firefights). The vshader reads
+  world-space position from a separate `model→world` uniform, so
+  ship/enemy/pickup models that pass vertices in MODEL space get
+  correctly world-spaced light distances without a CPU pre-transform.
+  Frees the CPU's per-vertex lighting cycles for OG 3DS in particular,
+  where the pre-GPU-lighting path was the dominant bottleneck.
+- **Boss_Ramqan jump AI port.** The Forsaken Remastered N64-port enemy
+  Boss_Ramqan uses a parametric-arc hop brain (`kexForsakenAIBrainJump`)
+  that has no 1998 counterpart; the boss is supposed to leap between
+  rock pads in his lava lair. Constants extracted from the Remaster
+  binary (.rodata), algorithm decompiled and ported to a 1998-style
+  state machine in `aijump.c`. Lands on `SolidPos` (Nodeload's
+  floor-snapped target), apex set from the authored `Pos.y` (above the
+  pad), with a 30%-of-horizontal-distance fallback for KEX-authored
+  decomp-to-1998 mapping.
 - **Visibility data baked offline.** Forsaken Remastered's KEX-engine cooker
   ships flat per-portal VISTREE + zeroed `IndirectVisibleGroup` for the 22
   Night-Dive-authored levels (KEX uses runtime portal-frustum culling, not
@@ -130,10 +141,11 @@ make -f Makefile.3ds EDITION=remaster
 The KPF is mostly a superset of the 1998 game data — for the levels
 the 1998 game shipped, every `.mx`/`.cob`/`.bsp`/`.mxv`/texture/sound
 is byte-for-byte identical to the 1998 originals. Levels Night Dive
-authored from scratch (defend2, stableizers, powerdown, biolab, plus
-the rest of the 22 KEX-original maps) ship with stripped visibility
-data — KEX's renderer uses runtime portal-frustum culling and doesn't
-need the 1998 engine's pre-baked PVS tables or recursive VISTREE.
+authored from scratch (defend2, stableizers, powerdown, plus the rest
+of the 21 KEX-original maps that ship in the port — biolab dropped
+with stripped visibility data — KEX's renderer uses runtime
+portal-frustum culling and doesn't need the 1998 engine's pre-baked
+PVS tables or recursive VISTREE.
 `extract_remaster_levels.py` runs `mxv_visi_repair.py` as its final
 pass to rebuild both at extract time so the 1998 engine sees a
 healthy file. Idempotent and gated on the data signal — runs only on
@@ -182,7 +194,7 @@ the build flag picks one.
 
 |                          | `make`                    | `make EDITION=remaster`     |
 |--------------------------|---------------------------|------------------------------|
-| Single-player campaign   | 15 levels (1998)          | 24 levels (Remaster) + 8 N64 secrets |
+| Single-player campaign   | 15 levels (1998)          | 23 levels (Remaster) + 8 N64 secrets |
 | Multiplayer arenas       | 30                        | 24 (Remaster's curated set)  |
 | Music tracks             | 9 (`track02-10.dsp`)      | 18 (`track02-19.dsp`)        |
 | Level→track mapping      | 1998 CD                   | Remaster `mapInfo.txt`       |
@@ -202,10 +214,11 @@ to end users.
 
 **Per-level RAM cost is unchanged** in either flavour — only one level
 loads at a time, and the new MXV / BSP sizes are within the existing
-per-level envelope (largest new map: `biolab.mxv` 1.8 MB vs the
-existing largest `thermal.mxv` 1.77 MB). On-SD storage for the
-Remaster build grows by ~40 MB for level data, ~5–10 MB for per-level
-texture PNGs, and ~36 MB for the 9 new music tracks.
+per-level envelope (largest new map: `temple.mxv` 1.7 MB, comparable
+to the existing largest 1998 map `thermal.mxv` at 1.77 MB). On-SD
+storage for the Remaster build grows by ~38 MB for level data,
+~5–10 MB for per-level texture PNGs, and ~36 MB for the 9 new music
+tracks.
 
 ### HD textures (optional, recommended)
 
@@ -254,11 +267,19 @@ If you skip this step the engine just falls back to the standard PNGs in
 | ZR *(New 3DS only)* | Drop mine |
 | D-pad left / right | Cycle primary weapons (cannons) |
 | Start | Pause menu (save / load / quit) |
-| Select | Rear view |
-| Start + Select | Quit to HOME |
+| Select | Rear view *(New 3DS)* / **Turbo (nitro)** *(Old 3DS)* |
+| Start + Select | Quit to HOME *(New 3DS only)* |
 | 3D slider *(hardware)* | Stereoscopic depth |
 
-Old 3DS doesn't have ZL/ZR — those buttons were added in the New 3DS hardware refresh (2014). Every core control (aim, fire, forward/back, strafe, weapon select, menu) sits on buttons present on both hardware generations, so the game is fully playable on Old 3DS. Turbo and mine are New-3DS-only conveniences.
+Old 3DS doesn't have ZL/ZR — those buttons were added in the New 3DS
+hardware refresh (2014). Without ZL there's no way to engage turbo,
+which the third SP level (`thermal`) requires to clear a long lava
+chase, so on Old 3DS the SELECT button is re-bound to **turbo (nitro)**.
+Rear-view and the Start+Select quit chord are dropped on Old 3DS as a
+result — the player can quit via HOME instead. Drop-mine has no
+binding on OG since ZR also doesn't exist; primary fire, secondaries,
+and weapon-switching cover the rest. Platform detected at startup via
+`APT_CheckNew3DS`.
 
 In the in-game pause menu, D-pad navigates and A confirms / B backs out.
 
