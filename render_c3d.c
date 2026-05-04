@@ -803,12 +803,11 @@ static float s_ambient_b = 0.0f;
 
 extern struct XLIGHT * FirstLightVisible;
 extern CAMERA          CurrentCamera;
-extern bool            GroupsAreVisible(u_int16_t g1, u_int16_t g2);
 
 /* Zero all lighting uniforms. Called from FSBeginScene so each frame
  * starts clean — without this, UI / crate-menu / title-screen frames
  * inherit the previous gameplay frame's lights as stale shading on
- * menu meshes. The gameplay path repopulates via c3d_upload_xlights{,_for_group}. */
+ * menu meshes. The gameplay path repopulates via c3d_upload_xlights. */
 void c3d_clear_xlights(void)
 {
 	if (s_loc_lights < 0) return;
