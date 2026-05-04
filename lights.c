@@ -69,6 +69,36 @@ XLIGHT	XLights[MAXXLIGHTS];
 u_int16_t	FirstXLightUsed;
 u_int16_t	FirstXLightFree;
 
+WORD	status;		
+DWORD	chop_status;		
+
+/*===================================================================
+	Floating Point Cull Mode
+===================================================================*/
+#ifdef USEASM
+__inline
+void	start_chop(void)
+{
+__asm
+	{
+		fstcw word ptr status
+		mov eax,dword ptr status
+		or eax,3072
+		mov dword ptr chop_status,eax
+		fldcw word ptr chop_status
+	}
+}
+
+__inline
+void	end_chop(void)
+{
+__asm
+	{
+		fldcw word ptr status
+	}
+}
+#endif
+
 /*===================================================================
 	Procedure	:	Set up And Init all XLights
 	Input		:	nothing
@@ -358,13 +388,37 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			{
 				if( WhiteOut == 0.0F )
 				{
+#ifdef	USEASM
+					__asm
+					{
+						mov		eax, DWORD PTR ShowPlaneRGB
+						or		eax, eax
+						jnz		useplanergb
+						mov		esi, [lpLVERTEX2]
+						add		esi,16
+						jmp		go
+useplanergb:
+						mov		esi, [lpLVERTEX2]
+						add		esi,12
+go:
+						mov		edi, [lpLVERTEX]
+						add		edi,16
+						mov		ecx, vert
+clear:					mov		eax, [esi]
+						add		esi, 32
+						mov		[edi],eax
+						add		edi, 32
+						dec		ecx
+						jnz		clear
+					}
+#else	//USEASM
 					if ( ShowPlaneRGB )
 					{
 						while( vert --)
 						{
 //							lpLVERTEX->color = (COLOR) lpLVERTEX2->dwReserved;
-							lpLVERTEX++;
-							lpLVERTEX2++;
+							lpLVERTEX++;		
+							lpLVERTEX2++;		
 						}
 					}
 					else
@@ -372,10 +426,11 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						while( vert --)
 						{
 							lpLVERTEX->color = lpLVERTEX2->color;
-							lpLVERTEX++;
-							lpLVERTEX2++;
+							lpLVERTEX++;		
+							lpLVERTEX2++;		
 						}
 					}
+#endif	//USEASM
 					
 				}
 				else
@@ -598,7 +653,10 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						{
 						case POINT_LIGHT:
 							Cellz = CellIndex_z;
-
+#ifdef	USEASM
+							start_chop();
+#endif	//USEASM
+			
 							while( Cellz <= CellRange_z )
 							{			   
 								Celly = CellIndex_y;
@@ -633,6 +691,85 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 											{
 												//											NumOfVertsTouched++;
 												distance = 1.0F - ( distance * Size );	// float
+#ifdef	USEASM
+__asm
+{
+#if 1		
+														fld		rlf				;float load rlf
+														fmul	distance		;float mul distance 2
+														fld		blf				;float load blf
+														fmul	distance		;float mul distance	1
+														fld		glf				;float load glf
+														fmul	distance		;float mul distance	0
+														fxch	st(2)
+														fistp	tempiR			;float int store tempiR
+														fxch	st(1)
+														fistp	tempiG			;float int store tempiG
+														fxch	st(0)
+														fistp	tempiB			;float int store tempiG
+			
+ 												mov	esi , [lpLVERTEX];set up the pointer
+												mov	ecx , [esi+16]		;int ecx = col   get the color
+
+												mov edi , ecx			; edi = col..
+												and ecx , 0x00ffffff	; and out the alpha
+												and edi , 0xff000000	; keep the alpha for later
+												
+												mov ebx , tempiR		;move the red into inc
+												mov edx , ecx			;edx = col
+												shl ebx , 8				;shift it up 8 bits
+												or  ebx , tempiG		;or in the green
+												shl ebx , 8				;shift it up 8 bits
+												or  ebx , tempiB		;or in the Blue
+			
+			
+#else		
+			
+			
+														fld rlf					;float load rlf        
+														fmul distance			;float mul distance    
+ 												mov	esi , [lpLVERTEX];set up the pointer
+														fistp tempiR			;float int store tempiR
+												mov	ecx , [esi+16]		;int ecx = col   get the color
+														fld glf					;float load glf
+														fmul distance			;float mul distance
+
+												mov edi , ecx			; edi = col..
+												and ecx , 0x00ffffff	; and out the alpha
+												and edi , 0xff000000	; keep the alpha for later
+
+												mov ebx , tempiR		;move the red into inc
+														fistp	tempiG			;float int store tempiG
+												shl ebx , 8				;shift it up 8 bits
+														fld blf					;float load blf
+														fmul distance			;float mul distance
+												or  ebx , tempiG		;or in the green
+												mov edx , ecx			;edx = col
+														fistp	tempiB			;float int store tempiG
+												shl ebx , 8				;shift it up 8 bits
+												or  ebx , tempiB		;or in the Blue
+#endif
+												add ecx , ebx			;ecx = col + inc
+												xor edx , ebx			;edx = col ^ inc
+												xor edx , ecx			;edx = ( col + inc ) ^ ( col ^ inc )
+												and edx	, 0x01010100	;edx = carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100
+												mov eax , edx			;eax = carry
+												shr	edx , 8				;edx = ( carry >> 8 )
+												sub eax , edx			;eax = clamp = carry - ( carry >> 8 )
+												sub ecx , edx			;ecx = (col + inc) - carry
+												or  ecx , eax			;col = ecx | clamp
+			
+												or  ecx , edi			; or back in the alpha..
+
+												mov [esi+16] , ecx		;int put the color back
+												// carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100;
+												// clamp = carry - ( carry >> 8 );
+												// col = ( col + inc - carry ) | clamp;
+											}
+
+#else	//USEASM
+
+
 												col = lpLVERTEX->color;
 #ifdef TESTING_SUBTRACTIVE
 												tempiA = col & 0xff000000;
@@ -666,6 +803,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 #endif
 			
 												lpLVERTEX->color = col;
+#endif	//USEASM
 											}
 										}
 			
@@ -675,6 +813,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 								}
 								Cellz++;
 							}
+#ifdef USEASM
+							end_chop();
+#endif		
 							break;
 						case SPOT_LIGHT:
 							Cellz = CellIndex_z;
