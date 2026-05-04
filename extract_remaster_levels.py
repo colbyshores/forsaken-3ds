@@ -65,7 +65,7 @@ import zipfile
 NEW_LEVELS = [
     # SP campaign extras
     "defend2", "stableizers", "powerdown", "starship", "battlebase",
-    "munitions", "biolab", "ramqan", "temple",
+    "munitions", "ramqan", "temple",
     # N64-secret levels
     "nuken64", "shipn64", "aztec64", "blackhole", "genstation",
     "tuben64", "fishy", "final",
@@ -73,6 +73,14 @@ NEW_LEVELS = [
     "dabiz", "fourball", "gas", "smalls", "storm", "sunk", "tworooms",
     "astro", "tunnels", "ians", "geodome",
 ]
+
+
+# Levels skipped entirely — bulk pass + per-level overlay both filter
+# them, mission.dat doesn't list them, romfs doesn't ship them. See
+# on each entry.
+DROPPED_LEVELS = {
+    "biolab",
+}
 
 
 # Music tracks unique to the Remaster (compositions 10-18 of the OGG library).
@@ -502,6 +510,9 @@ def import_kpf_assets(kpf_path, data_output):
                 level_parts = rest.split("/")
                 if (len(level_parts) == 2
                         and level_parts[1].lower().endswith(".png")):
+                    continue
+                # DROPPED_LEVELS — skip the whole subdir.
+                if level_parts and level_parts[0].lower() in DROPPED_LEVELS:
                     continue
             # All paths lowercased to match extract_assets.py's
             # lowercase_tree() output. The Makefile's romfs-staging
