@@ -11,7 +11,15 @@
  *   X           -> next weapon
  *   Y           -> prev weapon
  *   Start       -> menu / pause
- *   Select      -> rear view
+ *   Select      -> rear view (N3DS) / nitro (OG 3DS — no ZL)
+ *   ZL          -> nitro    (N3DS only)
+ *   ZR          -> drop mine (N3DS only — drops on OG 3DS)
+ *
+ * OG 3DS lacks the ZL/ZR shoulder buttons that the New 3DS adds.
+ * Without ZL there's no way to engage nitro, which is mandatory to
+ * complete the third SP level. Re-binding SELECT to nitro on OG
+ * costs the rear-view function but unblocks progression. The
+ * binding swap is platform-detected at startup.
  */
 
 #ifdef __3DS__
@@ -25,6 +33,11 @@
 /* ---- globals expected by the engine ---- */
 
 int Num_Joysticks = 1; /* pretend we have one joystick (the circle pad) */
+
+/* Cached at first poll. APT_CheckNew3DS is cheap but not free, no
+ * point hitting it every frame. */
+static bool s_is_n3ds = false;
+static bool s_n3ds_checked = false;
 
 JOYSTICKINFO JoystickInfo[MAX_JOYSTICKS];
 
@@ -135,8 +148,17 @@ bool handle_events(void)
 	kHeld = hidKeysHeld();
 	kUp   = hidKeysUp();
 
-	/* check for quit (Start + Select together) */
-	if ((kHeld & KEY_START) && (kHeld & KEY_SELECT))
+	if (!s_n3ds_checked)
+	{
+		APT_CheckNew3DS(&s_is_n3ds);
+		s_n3ds_checked = true;
+	}
+
+	/* check for quit (Start + Select together) — N3DS only.
+	 * On OG 3DS, SELECT is the nitro button so this chord would
+	 * fire any time the player paused while nitroing. The player
+	 * can quit via HOME on OG. */
+	if (s_is_n3ds && (kHeld & KEY_START) && (kHeld & KEY_SELECT))
 	{
 		/* Only SIGNAL quit here — running CleanUpAndPostQuit in the middle
 		 * of the input-poll call crashes on return, because ReadInput and
@@ -188,9 +210,23 @@ bool handle_events(void)
 	joy_button_state[0][4] = (kHeld & KEY_L)     ? true : false; /* strafe left */
 	joy_button_state[0][5] = (kHeld & KEY_R)     ? true : false; /* strafe right */
 	joy_button_state[0][6] = (kHeld & KEY_START) ? true : false; /* menu */
-	joy_button_state[0][7] = (kHeld & KEY_SELECT)? true : false; /* rear view */
-	joy_button_state[0][8] = (kHeld & KEY_ZL)    ? true : false; /* nitro */
-	joy_button_state[0][9] = (kHeld & KEY_ZR)    ? true : false; /* drop mine */
+
+	if (s_is_n3ds)
+	{
+		/* New 3DS — full ZL/ZR available, original mapping. */
+		joy_button_state[0][7] = (kHeld & KEY_SELECT) ? true : false; /* rear view */
+		joy_button_state[0][8] = (kHeld & KEY_ZL)     ? true : false; /* nitro */
+		joy_button_state[0][9] = (kHeld & KEY_ZR)     ? true : false; /* drop mine */
+	}
+	else
+	{
+		/* Old 3DS — no ZL/ZR. Sacrifice rear-view to give SELECT to
+		 * nitro (mandatory for SP level 3 progression). Drop-mine
+		 * has no binding on this hardware. */
+		joy_button_state[0][7] = false;                                /* rear view (dropped) */
+		joy_button_state[0][8] = (kHeld & KEY_SELECT) ? true : false;  /* nitro on SELECT */
+		joy_button_state[0][9] = false;                                /* drop mine (dropped) */
+	}
 
 #ifdef AUTOTEST_REMASTER
 	/* Hold the primary-fire button so the autotest sweep produces visible
@@ -225,9 +261,11 @@ bool handle_events(void)
 		input_buffer[input_buffer_count++] = SDLK_LEFT;
 	if (kDown & KEY_DRIGHT)
 		input_buffer[input_buffer_count++] = SDLK_RIGHT;
-	/* Only inject ESCAPE from Start when Select is NOT held — Select+Start
-	 * is a common combo that crashes if the menu opens during rear view. */
-	if ((kDown & KEY_START) && !(kHeld & KEY_SELECT))
+	/* Only inject ESCAPE from Start when Select is NOT held (N3DS only)
+	 * — Select+Start is a common combo that crashes if the menu opens
+	 * during rear view. On OG 3DS, SELECT is nitro so the player holds
+	 * it constantly; the gate would block all pauses mid-flight. */
+	if ((kDown & KEY_START) && (!s_is_n3ds || !(kHeld & KEY_SELECT)))
 		input_buffer[input_buffer_count++] = SDLK_ESCAPE;
 
 	/* populate key_state for any code that reads it.
