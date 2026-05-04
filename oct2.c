@@ -594,7 +594,6 @@ bool SeriousError = false;
 bool DoClipping = true;
 bool OnceOnlyChangeLevel = false;
 
-//bjdLPDIRECT3DEXECUTEBUFFER RenderBufs[ 2 ] = { NULL, NULL };
 RENDEROBJECT RenderBufs[4];
 
 void InitRenderBufs(/*LPDIRECT3DDEVICE lpDev*/ ); // bjd
@@ -1372,12 +1371,6 @@ bool FullScreenViewport()
     viewport.Height = height;
     viewport.ScaleX = viewport.Width / (float)2.0;
     viewport.ScaleY = viewport.Height / (float)2.0;
-/* bjd 
-    viewport.dvMaxX = (float)D3DDivide(RENDERVAL(viewport.dwWidth),
-                                       RENDERVAL(2 * viewport.dvScaleX));
-    viewport.dvMaxY = (float)D3DDivide(RENDERVAL(viewport.dwHeight),
-                                       RENDERVAL(2 * viewport.dvScaleY));
-*/
 
 	if (!FSSetViewPort(&viewport))
 	{
@@ -1492,10 +1485,6 @@ bool SetMatrixViewPort( void )
 		return false;
 	}
 */
-
-#if 0 // bjd - TODO - CHECK
-      STATE_DATA(D3DLIGHTSTATE_AMBIENT, RGBA_MAKE(255, 255, 255, 0), lpPointer);
-#endif
 
 	FSSetProjection(&proj);
 	FSSetView(&identity);
@@ -6063,15 +6052,6 @@ bool RenderCurrentCamera( void )
 		}
 	}
 
-#if 0
-    for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
-    {
-		group = g->group;
-		ClipGroup( &CurrentCamera, group );
-		ExecuteLines( group, &RenderBufs[ 0 ] );
-    }
-#endif
-
   }
 
 		set_alpha_states();
@@ -6538,13 +6518,6 @@ bool DispTracker( void ) // bjd
     newviewport.ScaleX = newviewport.Width / (float)2.0;
     newviewport.ScaleY = newviewport.Height / (float)2.0;
 
-#if 0 //bjd
-    newviewport.dvMaxX = (float)D3DDivide(RENDERVAL(newviewport.dwWidth),
-                                       RENDERVAL(2 * newviewport.dvScaleX));
-    newviewport.dvMaxY = (float)D3DDivide(RENDERVAL(newviewport.dwHeight),
-                                       RENDERVAL(2 * newviewport.dvScaleY));
-#endif
-
 	if (!FSSetViewPort(&newviewport))
 		return false;
 
@@ -6601,11 +6574,7 @@ bool DispTracker( void ) // bjd
 	if (ReallyExecuteMxloadHeader( &ModelHeaders[MODEL_Tracker], (u_int16_t) -1 ) != true )
 		return false;
 
-#if 0
-  i = FindClosestPickup();
-#else
   i = FindClosestShip();
-#endif
   
   if( i != (u_int16_t) -1 )
   {
@@ -6613,15 +6582,9 @@ bool DispTracker( void ) // bjd
     Green = 255.0F;
     Blue = 255.0F;
     Trans = 255.0F;
-#if 0
-    TempVector.x = ( ( Pickups[ i ].Pos.x - Ships[ WhoIAm ].Object.Pos.x ) / 50.0F );
-    TempVector.y = ( ( Pickups[ i ].Pos.y - Ships[ WhoIAm ].Object.Pos.y ) / 50.0F );
-    TempVector.z = ( ( Pickups[ i ].Pos.z - Ships[ WhoIAm ].Object.Pos.z ) / 50.0F );
-#else
     TempVector.x = ( ( Ships[ i ].Object.Pos.x - Ships[ WhoIAm ].Object.Pos.x ) / 50.0F );
     TempVector.y = ( ( Ships[ i ].Object.Pos.y - Ships[ WhoIAm ].Object.Pos.y ) / 50.0F );
     TempVector.z = ( ( Ships[ i ].Object.Pos.z - Ships[ WhoIAm ].Object.Pos.z ) / 50.0F );
-#endif
     TargetDistance = VectorLength( &TempVector );
 
     if( TargetDistance > ( 130.0F * GLOBAL_SCALE ) )
@@ -6946,40 +6909,6 @@ int16_t GetBitShift( int32_t Mask )
 ===================================================================*/
 void RenderSnapshot( void )
 {
-#if 0 // bjd - CHECK
-//  LPDIRECT3DDEVICE lpDev = render_info.lpD3DDevice;
-    render_viewport_t View = render_info.D3DViewport;
-
-//bjd  lpDev->lpVtbl->BeginScene(lpDev);
-
-  CurrentCamera.enable = 1;
-  CurrentCamera.UseLowestLOD = true;
-  CurrentCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;  
-  CurrentCamera.Mat = Ships[Current_Camera_View].Object.FinalMat; 
-  CurrentCamera.InvMat = Ships[Current_Camera_View].Object.FinalInvMat; 
-  CurrentCamera.Pos = Ships[Current_Camera_View].Object.Pos;  
-  CurrentCamera.Viewport = viewport;  
-  CurrentCamera.Proj = proj;  
-  
-  CurrentCamera.Viewport.X = 0;
-  CurrentCamera.Viewport.Y = 0;
-  CurrentCamera.Viewport.Width = 128;
-  CurrentCamera.Viewport.Height = 128;
-  CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.dwWidth / (float)2.0;
-  CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.dwHeight / (float)2.0;
-
-/* bjd
-  CurrentCamera.Viewport.dvMaxX = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.dwWidth),
-                     RENDERVAL(2 * CurrentCamera.Viewport.dvScaleX));
-  CurrentCamera.Viewport.dvMaxY = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.dwHeight),
-                     RENDERVAL(2 * CurrentCamera.Viewport.dvScaleY));
-*/
-
-  CurrentCamera.UseLowestLOD = true;
-  if( RenderCurrentCamera() != true ) // bjd
-    return;
-#endif
-//bjd  lpDev->lpVtbl->EndScene(lpDev);
 }
 
 /*===================================================================
@@ -7104,67 +7033,6 @@ bool SavePPM( u_int8_t * Filename, u_int8_t * ScreenPtr, u_int32_t Width, u_int3
 bool SaveSnapShot( int8_t * Filename )
 {
 	return true;
-#if 0 // bjd
-  HRESULT     hr;
-  DDSURFACEDESC SurfaceDesc;
-
-  FreeAllLastAFrameScrPolys();
-  RenderSnapshot();
-
-  memset( &SurfaceDesc, 0, sizeof( SurfaceDesc ) );
-  SurfaceDesc.dwSize = sizeof( SurfaceDesc );
-
-  hr = render_info.lpBackBuffer->lpVtbl->Lock( render_info.lpBackBuffer, NULL, &SurfaceDesc,
-        DDLOCK_SURFACEMEMORYPTR | DDLOCK_WAIT | DDLOCK_READONLY, NULL );
-
-  if ( hr != DD_OK )
-  {
-    switch( hr )
-    {
-      case DDERR_INVALIDOBJECT:
-        DebugPrintf( "Error Locking Surface ( Invalid Object )\n" );
-        break;
-
-      case DDERR_INVALIDPARAMS:
-        DebugPrintf( "Error Locking Surface ( Invalid Params )\n" );
-        break;
-
-      case DDERR_OUTOFMEMORY:
-        DebugPrintf( "Error Locking Surface ( Out of Memory )\n" );
-        break;
-
-      case DDERR_SURFACEBUSY:
-        DebugPrintf( "Error Locking Surface ( Surface Busy )\n" );
-        break;
-
-      case DDERR_SURFACELOST:
-        DebugPrintf( "Error Locking Surface ( Surface Lost )\n" );
-        break;
-
-      case DDERR_WASSTILLDRAWING:
-        DebugPrintf( "Error Locking Surface ( Was Still Drawing )\n" );
-        break;
-    }
-    return( false );
-  }
-
-  SavePPM( Filename, SurfaceDesc.lpSurface, SurfaceDesc.dwWidth, SurfaceDesc.dwHeight,
-        ( ( SurfaceDesc.ddpfPixelFormat.dwRGBBitCount + 7 )  / 8 ),
-        SurfaceDesc.lPitch, SurfaceDesc.ddpfPixelFormat.dwRBitMask, SurfaceDesc.ddpfPixelFormat.dwGBitMask,
-        SurfaceDesc.ddpfPixelFormat.dwBBitMask, 0, 0, 128, 128 );
-
-  hr = render_info.lpBackBuffer->lpVtbl->Unlock( render_info.lpBackBuffer, NULL );
-  if ( hr != DD_OK )
-  {
-    DebugPrintf( "Error Unlocking Surface\n" );
-    return( false );
-  }
-
-  if( CurrentMenu ) MenuDraw( CurrentMenu );
-  MainGame( /*render_info.lpD3DDevice,*/ render_info.lpD3DViewport ); // bjd
-
-  return( true );
-#endif
 }
 
 // if we met the max kills limit then set flag to change level
