@@ -465,6 +465,7 @@ clear:					mov		eax, [esi]
 				//	Special Lighting effects
 				while( vert --)
 				{
+					int orig_a;
 					x = (float)((int) (lpLVERTEX2->x * 0.35F) % 360);
 					y = (float)((int) (lpLVERTEX2->y * 0.35F) % 360);
 					z = (float)((int) (lpLVERTEX2->z * 0.35F) % 360);
@@ -472,6 +473,7 @@ clear:					mov		eax, [esi]
 					r = RGBA_GETRED(col);
 					g = RGBA_GETGREEN(col);
 					b = RGBA_GETBLUE(col);
+					orig_a = RGBA_GETALPHA(col);
 
 					r >>=2;
 					g >>=2;
@@ -486,9 +488,17 @@ clear:					mov		eax, [esi]
 					b += (int) (GroupWaterIntensity_Blue[group] * intensity);
 					if( b > 255 )
 						b = 255;
-					lpLVERTEX->color = RGBA_MAKE( r ,g ,b , 128 );
-					lpLVERTEX++;		
-					lpLVERTEX2++;		
+					/* Preserve the baked vertex alpha (typically 255 for
+					 * solid level mesh). The 1998 code wrote 128 here
+					 * because the D3D renderer had alpha-blend disabled
+					 * on the opaque level-mesh pass and ignored vertex
+					 * alpha entirely; in our citro3d/picaGL pipeline
+					 * alpha-blend is uniformly enabled for textured
+					 * surfaces, so a hardcoded 128 made underwater
+					 * walls look 50% transparent. */
+					lpLVERTEX->color = RGBA_MAKE( r ,g ,b , orig_a );
+					lpLVERTEX++;
+					lpLVERTEX2++;
 				}
 				// ****************** End of Water Effect ******************************
 			}else{
@@ -501,6 +511,7 @@ clear:					mov		eax, [esi]
 				{
 					if( lpLVERTEX2->y < GroupWaterLevel[group] )
 					{
+						int orig_a;
 						x = (float)((int) (lpLVERTEX2->x * 0.35F) % 360);
 						y = (float)((int) (lpLVERTEX2->y * 0.35F) % 360);
 						z = (float)((int) (lpLVERTEX2->z * 0.35F) % 360);
@@ -508,7 +519,8 @@ clear:					mov		eax, [esi]
 						r = RGBA_GETRED(col);
 						g = RGBA_GETGREEN(col);
 						b = RGBA_GETBLUE(col);
-						
+						orig_a = RGBA_GETALPHA(col);
+
 						r >>=2;
 						g >>=2;
 						b >>=2;
@@ -522,12 +534,14 @@ clear:					mov		eax, [esi]
 						b += (int) (GroupWaterIntensity_Blue[group] * intensity);
 						if( b > 255 )
 							b = 255;
-						lpLVERTEX->color = RGBA_MAKE( r ,g ,b , 128 );
+						/* Preserve baked alpha — see ALLWATER branch
+						 * above for the rationale. */
+						lpLVERTEX->color = RGBA_MAKE( r ,g ,b , orig_a );
 					}else{
   						lpLVERTEX->color = lpLVERTEX2->color;
 					}
-					lpLVERTEX++;		
-					lpLVERTEX2++;		
+					lpLVERTEX++;
+					lpLVERTEX2++;
 				}
 				// ****************** End of Water Effect ******************************
 			}
