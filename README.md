@@ -23,9 +23,10 @@ either platform.
   mip chains — the wider kernel dissolves AI-upscaler hallucination pixels
   that bilinear mips would amplify into sparkle on distant walls. Sprites
   and grates use ETC1A4 with an alpha-from-original-palette detector so
-  see-through pixels survive. A single unified pack serves both 3DS
-  generations; OG 3DS strips the base level at load time to fit its
-  tighter linear-heap budget.
+  see-through pixels survive. The full 512×512 pack loads on **both Old
+  and New 3DS** post-Q3-memory-refactor — the recovered ~20 MB BSS gave
+  OG enough linear-heap headroom that the earlier OG-only mip-0 strip
+  is no longer needed.
 - **Threaded DSP-ADPCM music.** Tracks are streamed from romfs in 0.5 s
   chunks on a background thread (25 ms tick), decoded by the DSP hardware
   for zero CPU cost. Per-buffer ADPCM context tracking eliminates
@@ -338,9 +339,12 @@ tree of ~1-15 KB). The previous 24 MB heap was overrun by ~5 MB on
 those levels.
 
 The linear heap holds the 4 MB GPU command buffer, render targets, HD
-texture pages, level vertex/index buffers, and audio. OG strips HD
-texture base dimensions in half at boot (512² → 256²) so the linear
-heap fits within the OG budget; New 3DS uses textures at full size.
+texture pages, level vertex/index buffers, and audio. **Both Old and
+New 3DS load the full 512×512 HD pack** — the OG mip-0 strip (carried
+over from the pre-Q3 24 MB linear heap) was retired once the bumped
+32 MB linear heap proved to fit OG with comfortable headroom across
+the heaviest Remaster levels (validated on military, the historical
+worst-case).
 
 If the OG-CIA 1 MB margin proves fragile in production testing, the
 right fix is a `__system_allocateHeaps` weak override that splits

@@ -1618,55 +1618,16 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 		return false;
 	}
 
-	/* OG 3DS mip-0 strip.
-	 *
-	 * The pack ships 512x512 base textures with a full Gaussian mip chain.
-	 * New 3DS uses the whole thing. OG 3DS has a ~4x smaller linear heap
-	 * and can't afford those full-size textures, so we rebuild each one
-	 * at half dimensions (256 base, one fewer mip level), copying mip 1..N
-	 * from the imported texture into mip 0..N-1 of a smaller allocation.
-	 *
-	 * PICA200 morton tiling is a function of mip dimensions only — mip 1
-	 * of a 512 texture has the identical byte layout as mip 0 of a 256
-	 * texture, so memcpy per level works without any tiling conversion.
-	 *
-	 * Peak memory during the rebuild is ~1.25x one texture (old + new
-	 * briefly coexist); textures load serially so this doesn't compound.
-	 */
-	{
-		bool is_new_3ds = false;
-		APT_CheckNew3DS(&is_new_3ds);
-		if (!is_new_3ds && texdata->tex.maxLevel > 0)
-		{
-			C3D_Tex small;
-			u16 sw = texdata->tex.width  / 2;
-			u16 sh = texdata->tex.height / 2;
-			int new_max = texdata->tex.maxLevel - 1;
-			if (!C3D_TexInitWithParams(&small, NULL, (C3D_TexInitParams){
-				sw, sh, (u8)new_max,
-				texdata->tex.fmt, GPU_TEX_2D, false
-			}))
-			{
-				c3d_trace("try_load_hd_texture: OG mip-0 strip alloc FAILED");
-				C3D_TexDelete(&texdata->tex);
-				Tex3DS_TextureFree(t3x);
-				if (*t == NULL) free(texdata);
-				return false;
-			}
-			{
-				int level;
-				for (level = 0; level <= new_max; level++)
-				{
-					u32 size = 0;
-					void *src = C3D_Tex2DGetImagePtr(&texdata->tex, level + 1, &size);
-					void *dst = C3D_Tex2DGetImagePtr(&small,         level,     NULL);
-					if (src && dst && size) memcpy(dst, src, size);
-				}
-			}
-			C3D_TexDelete(&texdata->tex);
-			texdata->tex = small;
-		}
-	}
+	/* Both OG and N3DS now load the full 512x512 base + Gaussian mip
+	 * chain. The earlier OG-only mip-0 strip was carried over from the
+	 * pre-Q3-refactor heap layout (24 MB linear) where full-size HD
+	 * textures spilled the linear heap on heavier levels. Post-refactor
+	 * the linear heap is 32 MB on both platforms with ~6-8 MB headroom
+	 * across the whole Remaster level set, so OG can take the full
+	 * pack. Reinstate the strip if a future level pushes back into the
+	 * red — see git history for the half-dimension rebuild that mips-
+	 * shifted via memcpy (Morton tiling is dimension-only, so mip 1 of
+	 * 512² has the same byte layout as mip 0 of 256²). */
 
 	/* Bilinear-mipmap (GPU_NEAREST for mip selection): picks ONE mip level
 	 * per fragment, then bilinear-filters within it. Gives anti-moiré
