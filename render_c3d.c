@@ -820,16 +820,20 @@ void c3d_clear_xlights(void)
 	memset(dst, 0, sizeof(C3D_FVec) * GPU_MAX_LIGHTS * 3);
 }
 
-/*  filter_group < 0  → all visible XLights eligible
- *  filter_group >= 0 → keep only XLights BSP-visible from this geometry group
+/*  Pack the closest GPU_MAX_LIGHTS visible XLights into the shader
+ *  uniform. Distance ranking prevents on/off flicker on the blaster's
+ *  own XLight in dense scenes (>8 visible) where naive first-N
+ *  selection depends on linked-list traversal order.
  *
- *  Among eligible lights, the closest GPU_MAX_LIGHTS to the camera win.
- *  Distance ranking prevents on/off flicker on the blaster's own XLight
- *  in dense scenes (>8 visible) where naive first-N selection depends
- *  on linked-list traversal order. Per-group filter mirrors CPU
- *  lights.c::XLight1Group's GroupsAreVisible check and prevents lights
- *  bleeding through walls. */
-static void upload_xlights_filtered(int filter_group)
+ *  No occlusion / wall-clipping: the shader has no way to know
+ *  there's geometry between a light and the vertex it's touching, so
+ *  blaster light bleeds through thin walls. A per-group GroupsAreVisible
+ *  filter was tried; it's ineffective in practice because Forsaken
+ *  levels are typically one large BSP group per visible area, leaving
+ *  the bulk of the bleed (intra-group walls) unfiltered. Per-vertex
+ *  shadow rays or per-light camera-occlusion raycasts would actually
+ *  fix it but cost too much CPU on PICA200 at 60 Hz. */
+void c3d_upload_xlights(void)
 {
 	if (s_loc_lights < 0) return;
 
@@ -843,10 +847,6 @@ static void upload_xlights_filtered(int filter_group)
 	float cz = CurrentCamera.Pos.z;
 	for (struct XLIGHT *L = FirstLightVisible; L; L = ((XLIGHT*)L)->NextVisible)
 	{
-		if (filter_group >= 0 &&
-		    !GroupsAreVisible((u_int16_t)filter_group, ((XLIGHT*)L)->Group))
-			continue;
-
 		float dx = ((XLIGHT*)L)->Pos.x - cx;
 		float dy = ((XLIGHT*)L)->Pos.y - cy;
 		float dz = ((XLIGHT*)L)->Pos.z - cz;
@@ -913,8 +913,6 @@ static void upload_xlights_filtered(int filter_group)
 	}
 }
 
-void c3d_upload_xlights(void)              { upload_xlights_filtered(-1); }
-void c3d_upload_xlights_for_group(int g)   { upload_xlights_filtered(g); }
 
 /*===================================================================
 	Render init / cleanup / flip

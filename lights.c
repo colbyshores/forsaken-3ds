@@ -535,7 +535,7 @@ clear:					mov		eax, [esi]
 #ifdef GPU_LIGHTING
 		/* Skip the per-vertex CPU dynamic-light loop — the vertex shader
 		 * adds light contribution on top of the baked-color baseline that
-		 * was already restored above. See render_c3d.c::upload_xlights_filtered
+		 * was already restored above. See render_c3d.c::c3d_upload_xlights
 		 * and shaders/render_c3d.v.pica. */
 #else
 		if( WhiteOut == 0.0F )

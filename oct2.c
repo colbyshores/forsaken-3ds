@@ -5901,8 +5901,9 @@ bool RenderCurrentCamera( void )
   _RC_STAGE("post-BuildVisibleLightList");
 
 #if defined(RENDERER_C3D) && defined(GPU_LIGHTING)
-  /* Camera-level light upload (no per-group filter). Per-group draw
-   * loops below override with c3d_upload_xlights_for_group(group). */
+  /* Pack the camera's visible XLight list into the shader uniform
+   * once per pass. No per-group filter — see c3d_upload_xlights for
+   * why occlusion-aware filtering isn't tractable on PICA200. */
   { extern void c3d_upload_xlights(void); c3d_upload_xlights(); }
   _RC_STAGE("post-c3d_upload_xlights");
 #endif
@@ -5988,13 +5989,6 @@ bool RenderCurrentCamera( void )
 
     // Do the Background animation for that group.....
     BackGroundTextureAnimation( &Mloadheader , group );
-
-#if defined(RENDERER_C3D) && defined(GPU_LIGHTING)
-    /* Per-group light filter: only lights BSP-visible from this group
-     * contribute to its mesh, matching CPU XLight1Group's behavior. */
-    { extern void c3d_upload_xlights_for_group(int);
-      c3d_upload_xlights_for_group((int)group); }
-#endif
 
 #ifdef __3DS__
     /* Per-group sub-stage trace. Fires only on the FIRST few iterations
@@ -6095,13 +6089,6 @@ bool RenderCurrentCamera( void )
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
     group = g->group;
-
-#if defined(RENDERER_C3D) && defined(GPU_LIGHTING)
-    /* Per-group light filter for translucent draws (matches the opaque
-     * loop above). */
-    { extern void c3d_upload_xlights_for_group(int);
-      c3d_upload_xlights_for_group((int)group); }
-#endif
 
 #ifdef __3DS__
     bool _rc_trans_substage_trace = (_rc_stage_trace && _rc_trans_iter <= 3);
