@@ -1885,12 +1885,20 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		mode = TEXENV_MODE_DIFFUSE;
 
 	C3D_TexBind(0, &texdata->tex);
+
+	/* Cache check first — most adjacent draws share the same texture
+	 * and mode, so we early-out and skip all the per-mode setup work
+	 * (proctex coefs rewrite, color LUT rebind, TexEnv reconfig). */
+	if (mode == s_lastTexEnvMode &&
+	    s_lastBoundTexture == (void*)texdata &&
+	    s_lastTexEnvTextured)
+		return;
+
 	if (mode == TEXENV_MODE_AUX)
 	{
-		/* Bind the per-material ProcTex preset + matching color LUT.
-		 * Reapply the texture's phase hash so two walls of the same
-		 * class get distinct pattern positions (deterministic per
-		 * texture path — same level always renders the same noise). */
+		/* Per-material ProcTex preset + matching color LUT. Only
+		 * runs on cache miss (texture or mode changed) so the per-
+		 * draw cost is amortised across batches. */
 		material_class_t mc =
 		    (material_class_t)texdata->material_class;
 		float freq;
@@ -1907,11 +1915,6 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
 		C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
 	}
-
-	if (mode == s_lastTexEnvMode &&
-	    s_lastBoundTexture == (void*)texdata &&
-	    s_lastTexEnvTextured)
-		return;
 
 	if (mode == TEXENV_MODE_AUX)
 		configure_texenv_aux(texdata);
