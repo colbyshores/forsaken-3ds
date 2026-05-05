@@ -12,6 +12,11 @@
 #include "bgobjects.h"
 #include "object.h"
 #include "networking.h"
+/* OWNER_BGOBJECT (= 3) — defined in primary.h, but that header pulls
+ * in FRAME_INFO etc.; inlined to avoid the include cascade. */
+#ifndef OWNER_BGOBJECT
+#define OWNER_BGOBJECT 3
+#endif
 
 #include "transexe.h"
 #include "models.h"
@@ -161,7 +166,28 @@ void ExecuteTransExe( u_int16_t group )
 			}
 
 			if( Display )
-					draw_object(&TransExe[i].renderObject);
+			{
+#ifdef RENDERER_C3D
+				/* Same eligibility check as models.c: BGOBJECTs
+				 * (doors, vents, animated decorations) shouldn't
+				 * get Phong shine. The TransExe path renders
+				 * animating/transparent geometry — moving doors go
+				 * here, so without this gate they'd flicker shine
+				 * on while opening/closing. TransExe[i].Model is
+				 * the Models[] index; check OwnerType. */
+				{
+					extern void c3d_set_object_shine_eligible(bool);
+					u_int16_t mi = TransExe[i].Model;
+					bool eligible = !(mi < MAXNUMOFMODELS &&
+					                  Models[mi].OwnerType == OWNER_BGOBJECT);
+					c3d_set_object_shine_eligible(eligible);
+				}
+#endif
+				draw_object(&TransExe[i].renderObject);
+#ifdef RENDERER_C3D
+				{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
+#endif
+			}
 
 #ifdef NEW_LIGHTING
 			render_reset_lighting_variables();
@@ -257,7 +283,21 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 			}
 
 			if( Display )
-					draw_object(&TransExe[i].renderObject);
+			{
+#ifdef RENDERER_C3D
+				{
+					extern void c3d_set_object_shine_eligible(bool);
+					u_int16_t mi = TransExe[i].Model;
+					bool eligible = !(mi < MAXNUMOFMODELS &&
+					                  Models[mi].OwnerType == OWNER_BGOBJECT);
+					c3d_set_object_shine_eligible(eligible);
+				}
+#endif
+				draw_object(&TransExe[i].renderObject);
+#ifdef RENDERER_C3D
+				{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
+#endif
+			}
 
 #ifdef NEW_LIGHTING
 			render_reset_lighting_variables();
