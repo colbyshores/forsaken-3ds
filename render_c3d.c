@@ -231,7 +231,6 @@ static u8 classify_texture(const char *path)
 {
 	const char *base;
 	if (!path) return MAT_METAL;
-	/* Strip directory: find last '/' or '\'. */
 	base = path;
 	for (const char *p = path; *p; p++)
 		if (*p == '/' || *p == '\\') base = p + 1;
@@ -245,6 +244,20 @@ static u8 classify_texture(const char *path)
 	return MAT_METAL;
 }
 
+/* Deterministic phase offset derived from the texture path. Two
+ * different textures of the same material class get distinct noise
+ * tile positions; the same texture always gets the same phase across
+ * level loads (no flicker on respawn). FNV-1a 32-bit, scaled into
+ * [0,1) for the ProcTex phase argument. */
+static float proctex_phase_from_path(const char *path)
+{
+	u32 h = 0x811C9DC5u;
+	if (path)
+		for (const char *p = path; *p; p++)
+			h = (h ^ (u8)*p) * 0x01000193u;
+	return (float)(h & 0xFFFFu) / 65536.0f;
+}
+
 MATRIX proj_matrix;
 MATRIX view_matrix;
 MATRIX world_matrix;
@@ -252,11 +265,16 @@ MATRIX world_matrix;
 /* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*).
  * material_class is set at load time by classify_texture() based on
  * the source filename; consumed by configure_texenv_aux to pick which
- * ProcTex preset to bind on wall draws. */
+ * ProcTex preset to bind. proctex_phase is a deterministic hash of
+ * the texture path that's used as the noise phase offset, so two
+ * walls of the same material class don't share the same noise tile
+ * position — but each individual texture's pattern is identical from
+ * one level load to the next (deterministic, no flicker on respawn). */
 typedef struct texture_s {
 	C3D_Tex tex;
 	bool    initialized;
-	u8      material_class;  /* material_class_t enum value */
+	u8      material_class;
+	float   proctex_phase;
 } texture_t;
 
 /* Debug trace to SD card. Truncate once on first call per process so
@@ -834,15 +852,28 @@ bool c3d_renderer_init(void)
 		 * (Ranges asymmetric on purpose — slightly more dark stops
 		 * than bright, leaning the look toward "lived-in".) */
 
-		/* MAT_METAL — fine high-frequency speckle, neutral cool tint.
-		 * Reads as paint grain / micro-scratches. */
+		/* All three classes use GPU_PT_RGB combiner — looks up the
+		 * color LUT independently on U and V noise channels rather
+		 * than via the radial sqrt(U²+V²) metric, which previously
+		 * produced visible elliptical / oval blob artifacts at low
+		 * frequency. RGB combiner gives uniform per-pixel speckle.
+		 * Frequencies bumped to 8-12 cycles per UV face so noise is
+		 * fine grain, not big blobs. NoiseCoefs phase is rewritten
+		 * per draw with the texture's hash so two walls of the same
+		 * material class get distinct pattern positions.
+		 *
+		 * Palettes still narrow (ADD_SIGNED contribution ~+/-5%) and
+		 * biased slightly below grey 0.5 so noise reads as wear/
+		 * grime, not wash-out. Diffuse stays the dominant signal. */
+
+		/* MAT_METAL — fine paint-grain / micro-scratches. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_METAL], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_METAL],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_METAL],
-		                      C3D_ProcTex_UV, 0.20f, 4.0f, 0.0f);
+		                      C3D_ProcTex_UV, 0.20f, 12.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_METAL], false,
-		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
+		                    GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_METAL], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_METAL], true);
 		{
@@ -851,16 +882,14 @@ bool c3d_renderer_init(void)
 			                      colors, 0, 2);
 		}
 
-		/* MAT_ROCK — lower-frequency mottle, warm tint for the thermal
-		 * / lava chambers. Slightly wider band than METAL so the
-		 * larger blobs are still visible, but kept subtle. */
+		/* MAT_ROCK — coarser pitted speckle, warm tint. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ROCK], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ROCK],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ROCK],
-		                      C3D_ProcTex_UV, 0.30f, 2.0f, 0.0f);
+		                      C3D_ProcTex_UV, 0.30f, 8.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ROCK], false,
-		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
+		                    GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ROCK], true);
 		{
@@ -869,15 +898,14 @@ bool c3d_renderer_init(void)
 			                      colors, 0, 2);
 		}
 
-		/* MAT_ORGANIC — mid-frequency, faint green tint for biological
-		 * surfaces. Same narrow band as METAL. */
+		/* MAT_ORGANIC — mid-frequency, faint green tint. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ORGANIC], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ORGANIC],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ORGANIC],
-		                      C3D_ProcTex_UV, 0.25f, 2.8f, 0.0f);
+		                      C3D_ProcTex_UV, 0.25f, 10.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ORGANIC], false,
-		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
+		                    GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ORGANIC], true);
 		{
@@ -1860,12 +1888,22 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	if (mode == TEXENV_MODE_AUX)
 	{
 		/* Bind the per-material ProcTex preset + matching color LUT.
-		 * Color LUT is global state; rebind on every AUX draw because
-		 * the cache check below may early-out without coming back
-		 * through here. Cheap (1 register write). */
+		 * Reapply the texture's phase hash so two walls of the same
+		 * class get distinct pattern positions (deterministic per
+		 * texture path — same level always renders the same noise). */
 		material_class_t mc =
 		    (material_class_t)texdata->material_class;
+		float freq;
 		if ((unsigned)mc >= MAT_COUNT) mc = MAT_METAL;
+		freq = (mc == MAT_ROCK)    ?  8.0f
+		     : (mc == MAT_ORGANIC) ? 10.0f
+		                           : 12.0f;
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[mc],
+		    C3D_ProcTex_UV,
+		    (mc == MAT_ROCK)    ? 0.30f
+		  : (mc == MAT_ORGANIC) ? 0.25f
+		                        : 0.20f,
+		    freq, texdata->proctex_phase);
 		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
 		C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
 	}
@@ -2049,6 +2087,7 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 
 	texdata->initialized   = true;
 	texdata->material_class = classify_texture(path);
+	texdata->proctex_phase  = proctex_phase_from_path(path);
 	*t = (LPTEXTURE)texdata;
 
 	Tex3DS_TextureFree(t3x);
@@ -2183,6 +2222,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 
 		texdata->initialized   = true;
 		texdata->material_class = classify_texture(path);
+	texdata->proctex_phase  = proctex_phase_from_path(path);
 		*t = (LPTEXTURE)texdata;
 	}
 
