@@ -32,18 +32,22 @@ for src in "$SRC"/*.bmp "$SRC"/*.BMP "$SRC"/*.png "$SRC"/*.PNG; do
 
 	echo "[gen-aux] $stem"
 
-	# High-pass with TIGHT level clamp (45%..55%) so the detail
-	# texture stays close to grey 0.5. Combined with ADD_SIGNED in
-	# the wall TexEnv (stage 1: result = previous + detail - 0.5),
-	# this caps contribution at +/- 0.05 per pixel — close-range
-	# texture sharpening with no wash-out in flat or dark areas.
-	# Was 30%..70% earlier (+/-0.20), which brightened mid-tone walls.
+	# High-pass via -compose mathematics so negatives don't clamp:
+	#   result = 0.5 + 0.5 * (original - blurred)
+	# Args 0,0.5,-0.5,0.5 evaluate to a*0 + b*0.5 + a*(-0.5) + 0.5
+	# = 0.5 + 0.5*(b - a) where a = blurred (clone), b = original.
+	# Output is signed-symmetric around grey 0.5: high-frequency
+	# features above the local average produce >0.5 (brighten via
+	# ADD_SIGNED), below produce <0.5 (darken). A naive `-compose
+	# minus -evaluate add 50%` clamps the negative half to 0 first,
+	# producing a detail map biased entirely upward — every pixel
+	# only ever brightens, washing out walls.
 	convert "$src" \
 		\( +clone -blur 0x8 \) \
-		-compose minus -composite \
-		-evaluate add 50% \
+		-compose mathematics \
+		-define compose:args="0,0.5,-0.5,0.5" \
+		-composite \
 		-colorspace Gray \
-		-level 45%,55% \
 		"$TMP/${stem}_d.png"
 
 	tex3ds -f auto-etc1 -q high -m gaussian "$TMP/${stem}_d.png" -o "$DST/${stem}_d.t3x"

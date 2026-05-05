@@ -111,15 +111,12 @@ static bool          s_objLightReady = false;
 
 /* User-toggleable graphics features (persisted via title.c's config_*).
  * Renderer reads these per-draw to decide whether to apply Phong shine
- * and detail-map ADD.
- *
- * g_object_shine defaults true — Phong specular on enemies/pickups
- * looks good and adds visible polish.
- * g_wall_detail defaults false — even with the tightened high-pass
- * band, ADD_SIGNED on certain mid-tone wall textures washes out the
- * baked color. Users can flip it on per-preference. */
+ * and detail-map ADD. Both default true; the detail map is now
+ * grey-centred (high-pass via -compose mathematics) so ADD_SIGNED
+ * contributes signed-symmetric per-pixel modulation rather than
+ * brightening-only. */
 bool g_object_shine = true;
-bool g_wall_detail  = false;
+bool g_wall_detail  = true;
 
 static C3D_RenderTarget *s_targetLeft    = NULL;
 static C3D_RenderTarget *s_targetRight   = NULL;

@@ -9483,7 +9483,7 @@ void GetGamePrefs( void )
 	 * writes sdmc:/forsaken_stereo.txt every ~1 s for remote diagnosis. */
 	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
 	g_object_shine      = config_get_bool( "ObjectShine",     true );
-	g_wall_detail       = config_get_bool( "WallDetail",      false );
+	g_wall_detail       = config_get_bool( "WallDetail",      true );
 #endif
 
 	// Stereo options
