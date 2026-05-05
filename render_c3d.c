@@ -110,11 +110,16 @@ static C3D_LightLut  s_objLightLut;
 static bool          s_objLightReady = false;
 
 /* User-toggleable graphics features (persisted via title.c's config_*).
- * Both default true on a fresh install; load_config flips them based on
- * the user's saved Configs/main.txt. Renderer reads these per-draw to
- * decide whether to apply Phong shine and detail-map ADD. */
+ * Renderer reads these per-draw to decide whether to apply Phong shine
+ * and detail-map ADD.
+ *
+ * g_object_shine defaults true — Phong specular on enemies/pickups
+ * looks good and adds visible polish.
+ * g_wall_detail defaults false — even with the tightened high-pass
+ * band, ADD_SIGNED on certain mid-tone wall textures washes out the
+ * baked color. Users can flip it on per-preference. */
 bool g_object_shine = true;
-bool g_wall_detail  = true;
+bool g_wall_detail  = false;
 
 static C3D_RenderTarget *s_targetLeft    = NULL;
 static C3D_RenderTarget *s_targetRight   = NULL;

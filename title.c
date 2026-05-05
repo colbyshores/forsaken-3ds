@@ -3067,9 +3067,7 @@ MENU	MENU_InGameSingle = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , Exi
 #endif
 					  OLDMENUITEM( 200, 144, LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 160, LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
-#ifndef __3DS__
 					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
-#endif
 					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 #ifndef __3DS__
 					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
@@ -9485,7 +9483,7 @@ void GetGamePrefs( void )
 	 * writes sdmc:/forsaken_stereo.txt every ~1 s for remote diagnosis. */
 	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
 	g_object_shine      = config_get_bool( "ObjectShine",     true );
-	g_wall_detail       = config_get_bool( "WallDetail",      true );
+	g_wall_detail       = config_get_bool( "WallDetail",      false );
 #endif
 
 	// Stereo options
