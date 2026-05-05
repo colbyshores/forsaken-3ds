@@ -821,58 +821,67 @@ bool c3d_renderer_init(void)
 		 * end. Both straddle grey 0.5 so ADD_SIGNED contributes signed
 		 * symmetric per-pixel modulation. */
 
-		/* MAT_METAL — fine grit + brushed-metal scratches. Low-amp
-		 * (0.30), high-frequency (4.0): fine speckle, narrow band so
-		 * mid-tone walls don't shift. Tonal LUT goes from cool dark
-		 * (worn metal) to warm light (highlight). */
+		/* The diffuse texture stays the dominant signal; ProcTex is a
+		 * faint per-class accent that gives each material kind a hint
+		 * of unique surface character. All three classes use the same
+		 * narrow tonal band centred slightly below grey 0.5 so the
+		 * ADD_SIGNED contribution biases toward a subtle darkening
+		 * (reads as grime / wear, not as wash-out). Class differences
+		 * are driven by noise frequency (pattern scale) and palette
+		 * tint, both kept gentle. Magnitudes:
+		 *   palette 0x70..0x82 = 0.439..0.510 → ADD_SIGNED: -6%..+1%
+		 *   palette 0x70..0x8C = 0.439..0.549 → ADD_SIGNED: -6%..+5%
+		 * (Ranges asymmetric on purpose — slightly more dark stops
+		 * than bright, leaning the look toward "lived-in".) */
+
+		/* MAT_METAL — fine high-frequency speckle, neutral cool tint.
+		 * Reads as paint grain / micro-scratches. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_METAL], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_METAL],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_METAL],
-		                      C3D_ProcTex_UV, 0.30f, 4.0f, 0.0f);
+		                      C3D_ProcTex_UV, 0.20f, 4.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_METAL], false,
 		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_METAL], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_METAL], true);
 		{
-			u32 colors[2] = { 0xFF606060u, 0xFFA0A0A0u };
+			u32 colors[2] = { 0xFF707070u, 0xFF828282u };
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_METAL],
 			                      colors, 0, 2);
 		}
 
-		/* MAT_ROCK — coarse pitted noise for thermal / lava chambers.
-		 * Higher amplitude (0.55), lower frequency (1.8): big mottled
-		 * blobs, wider tonal range to read as porous rock. Warmer
-		 * palette (charcoal → ember). */
+		/* MAT_ROCK — lower-frequency mottle, warm tint for the thermal
+		 * / lava chambers. Slightly wider band than METAL so the
+		 * larger blobs are still visible, but kept subtle. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ROCK], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ROCK],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ROCK],
-		                      C3D_ProcTex_UV, 0.55f, 1.8f, 0.0f);
+		                      C3D_ProcTex_UV, 0.30f, 2.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ROCK], false,
 		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ROCK], true);
 		{
-			u32 colors[2] = { 0xFF404048u, 0xFFA89880u };
+			u32 colors[2] = { 0xFF6C7078u, 0xFF8C8888u };
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_ROCK],
 			                      colors, 0, 2);
 		}
 
-		/* MAT_ORGANIC — softer, smoother grain for biological surfaces.
-		 * Medium-amp (0.40), medium-freq (2.5). Slightly green-tinted
-		 * palette to read as organic / fleshy. */
+		/* MAT_ORGANIC — mid-frequency, faint green tint for biological
+		 * surfaces. Same narrow band as METAL. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ORGANIC], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ORGANIC],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ORGANIC],
-		                      C3D_ProcTex_UV, 0.40f, 2.5f, 0.0f);
+		                      C3D_ProcTex_UV, 0.25f, 2.8f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ORGANIC], false,
 		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ORGANIC], true);
 		{
-			u32 colors[2] = { 0xFF506050u, 0xFF98A898u };
+			u32 colors[2] = { 0xFF707470u, 0xFF828680u };
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_ORGANIC],
 			                      colors, 0, 2);
 		}
