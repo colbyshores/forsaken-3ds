@@ -1515,14 +1515,30 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							if( DoDisplay )
 							{
 								//count++;
+#ifdef RENDERER_C3D
+								/* Same eligibility check as the
+								 * static-mxload path: BGOBJECT models
+								 * (animated doors, vents) get no shine. */
+								{
+									extern void c3d_set_object_shine_eligible(bool);
+									c3d_set_object_shine_eligible(
+									    Models[i].OwnerType != OWNER_BGOBJECT);
+								}
+#endif
 								if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
 								{
+#ifdef RENDERER_C3D
+									{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
+#endif
 									Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
 #ifdef NEW_LIGHTING
 									render_reset_lighting_variables();
 #endif
 									return false;
 								}
+#ifdef RENDERER_C3D
+								{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
+#endif
 							}
 
 #ifdef NEW_LIGHTING

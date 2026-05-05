@@ -176,6 +176,12 @@ void ExecuteTransExe( u_int16_t group )
 				 * on while opening/closing. TransExe[i].Model is
 				 * the Models[] index; check OwnerType. */
 				{
+					/* Same eligibility check as models.c: BGOBJECT
+					 * (doors, vents, animated decorations) gets no
+					 * Phong shine. TransExe[i].Model is the Models[]
+					 * index; can be -1 (= 0xFFFF) for animated mxa
+					 * draws with no associated Models entry, in
+					 * which case default to eligible. */
 					extern void c3d_set_object_shine_eligible(bool);
 					u_int16_t mi = TransExe[i].Model;
 					bool eligible = !(mi < MAXNUMOFMODELS &&
@@ -286,6 +292,12 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 			{
 #ifdef RENDERER_C3D
 				{
+					/* Same eligibility check as models.c: BGOBJECT
+					 * (doors, vents, animated decorations) gets no
+					 * Phong shine. TransExe[i].Model is the Models[]
+					 * index; can be -1 (= 0xFFFF) for animated mxa
+					 * draws with no associated Models entry, in
+					 * which case default to eligible. */
 					extern void c3d_set_object_shine_eligible(bool);
 					u_int16_t mi = TransExe[i].Model;
 					bool eligible = !(mi < MAXNUMOFMODELS &&
