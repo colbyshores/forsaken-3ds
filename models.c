@@ -1577,8 +1577,23 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							if( DoDisplay )
 							{
 								//count++;
+#ifdef RENDERER_C3D
+								/* Phong specular reads as tacky on
+								 * BGOBJECT models (doors, vents, large
+								 * flat decorations). Disable shine for
+								 * those, keep it on enemies / pickups /
+								 * mines / nobody-owned. */
+								{
+									extern void c3d_set_object_shine_eligible(bool);
+									c3d_set_object_shine_eligible(
+									    Models[i].OwnerType != OWNER_BGOBJECT);
+								}
+#endif
 								if( ExecuteMxloadHeader( &ModelHeaders[ ModelNum ], i ) != true)
 								{
+#ifdef RENDERER_C3D
+									{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
+#endif
 									Msg( "ModelDisp() ExecuteMxloadHeader for %s Failed\n",
 										&ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
 #ifdef NEW_LIGHTING
@@ -1586,6 +1601,9 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 #endif
 									return false;
 								}
+#ifdef RENDERER_C3D
+								{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
+#endif
 							}
 
 #ifdef NEW_LIGHTING

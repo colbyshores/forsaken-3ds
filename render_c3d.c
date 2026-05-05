@@ -316,13 +316,24 @@ typedef enum {
 } texenv_mode_t;
 static texenv_mode_t s_lastTexEnvMode = TEXENV_MODE_NONE;
 
-/* Toggle: enable proctex micro-grain on the next textured draw. Set by
+/* Toggle: enable Phong-shine path for the next textured draw. Set by
  * mxload.c / mxaload.c around their draw_object calls so model + enemy
- * meshes get the close-range surface grain that walls (which use the
- * detail-map path) explicitly don't. */
+ * meshes get the specular highlight. (Name preserved for ABI; misnomer
+ * since proctex was retired.) */
 void c3d_set_object_proctex(bool enable)
 {
 	s_objProcTexOn = enable;
+}
+
+/* Per-call eligibility gate for the OBJECT shine path. Defaults true
+ * (every object draw gets shine). Set false by callers that want to
+ * suppress shine for a specific model — currently used by models.c
+ * for OWNER_BGOBJECT models (doors, vents, animated decorations)
+ * where Phong specular reads as tacky on the large flat surfaces. */
+static bool s_objShineEligible = true;
+void c3d_set_object_shine_eligible(bool enable)
+{
+	s_objShineEligible = enable;
 }
 
 
@@ -1877,7 +1888,8 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	 * both, but the object toggle wraps narrow draw_object call sites
 	 * while AUX is the fall-through path for level-mesh draws. */
 	texenv_mode_t mode;
-	if (s_objProcTexOn && s_objLightReady && g_object_shine)
+	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
+	    s_objShineEligible)
 		mode = TEXENV_MODE_OBJECT;
 	else if (s_procTexReady && g_wall_detail)
 		mode = TEXENV_MODE_AUX;
