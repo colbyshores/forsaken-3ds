@@ -24,34 +24,47 @@ mkdir -p "$DST"
 TMP=$(mktemp -d)
 trap "rm -rf $TMP" EXIT
 
+# Synthesize ONE universal "metal grit" tile and reuse for every wall
+# texture. Forsaken's painted atlases are too smooth to high-pass
+# meaningfully — the source has no rivets, scratches, or weave for the
+# extractor to find, so high-pass output is sub-perceptible. A real
+# synthesized grit pattern (UT3-era convention) gives uniform surface
+# microtexture that reads as "metal that's been scuffed", not "wall
+# texture I painted with smooth gradients".
+#
+# Three superimposed layers, all centred on grey 0.5:
+#   1. Fine gaussian speckle  — dust / paint-grain
+#   2. Diagonal motion-blurred noise — brushed-metal scratches
+#   3. Low-frequency Perlin-style — uneven wear and patina
+# Mean preserved by averaging the three layers, then blended with a
+# shifted copy of itself for tileability.
+echo "[gen-aux] synthesising universal metal-grit tile"
+convert -size 256x256 xc:gray50 -attenuate 0.5 +noise gaussian \
+	-blur 0x0.4 "$TMP/_grit.png"
+convert -size 256x256 xc:gray50 -attenuate 1.5 +noise gaussian \
+	-motion-blur 0x6+30 -level 35%,65% "$TMP/_scratches.png"
+convert -size 64x64 xc:gray50 -attenuate 1 +noise gaussian \
+	-resize 256x256 -blur 0x4 "$TMP/_wear.png"
+convert "$TMP/_grit.png" "$TMP/_scratches.png" "$TMP/_wear.png" \
+	-evaluate-sequence mean -colorspace Gray "$TMP/_combined.png"
+# Tileability: roll by half, blend with original, roll back. Edges
+# match seamlessly when the tile repeats.
+convert "$TMP/_combined.png" -roll +128+128 \
+	\( "$TMP/_combined.png" \) -compose blend \
+	-define compose:args=50 -composite \
+	-roll +128+128 "$TMP/_grit_tile.png"
+# Pre-pack the universal tile once; copy per-texture below.
+tex3ds -f auto-etc1 -q high -m gaussian "$TMP/_grit_tile.png" \
+	-o "$TMP/_grit_d.t3x"
+
 shopt -s nullglob
 for src in "$SRC"/*.bmp "$SRC"/*.BMP "$SRC"/*.png "$SRC"/*.PNG; do
 	[[ -e "$src" ]] || continue
 	name=$(basename "$src")
 	stem=${name%.*}
-
-	echo "[gen-aux] $stem"
-
-	# High-pass via -compose mathematics so negatives don't clamp:
-	#   result = 0.5 + 0.5 * (original - blurred)
-	# Args 0,0.5,-0.5,0.5 evaluate to a*0 + b*0.5 + a*(-0.5) + 0.5
-	# = 0.5 + 0.5*(b - a) where a = blurred (clone), b = original.
-	# Output is signed-symmetric around grey 0.5: high-frequency
-	# features above the local average produce >0.5 (brighten via
-	# ADD_SIGNED), below produce <0.5 (darken). A naive `-compose
-	# minus -evaluate add 50%` clamps the negative half to 0 first,
-	# producing a detail map biased entirely upward — every pixel
-	# only ever brightens, washing out walls.
-	convert "$src" \
-		\( +clone -blur 0x8 \) \
-		-compose mathematics \
-		-define compose:args="0,0.5,-0.5,0.5" \
-		-composite \
-		-colorspace Gray \
-		"$TMP/${stem}_d.png"
-
-	tex3ds -f auto-etc1 -q high -m gaussian "$TMP/${stem}_d.png" -o "$DST/${stem}_d.t3x"
+	cp "$TMP/_grit_d.t3x" "$DST/${stem}_d.t3x"
 done
 
 echo "[gen-aux] wrote detail maps to $DST"
-ls -lh "$DST"/*_d.t3x 2>/dev/null | awk '{print "  ",$NF,$5}'
+ls -lh "$DST"/*_d.t3x 2>/dev/null | head -3 | awk '{print "  ",$NF,$5}'
+echo "  ($(ls "$DST"/*_d.t3x 2>/dev/null | wc -l) files, all identical universal grit tile)"
