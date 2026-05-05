@@ -109,6 +109,13 @@ static C3D_Light     s_objLight;
 static C3D_LightLut  s_objLightLut;
 static bool          s_objLightReady = false;
 
+/* User-toggleable graphics features (persisted via title.c's config_*).
+ * Both default true on a fresh install; load_config flips them based on
+ * the user's saved Configs/main.txt. Renderer reads these per-draw to
+ * decide whether to apply Phong shine and detail-map ADD. */
+bool g_object_shine = true;
+bool g_wall_detail  = true;
+
 static C3D_RenderTarget *s_targetLeft    = NULL;
 static C3D_RenderTarget *s_targetRight   = NULL;
 static C3D_RenderTarget *s_targetBottom  = NULL;  /* mono 320×240 for HUD */
@@ -1752,9 +1759,9 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	 * even if some shared global texture happens to have one — the
 	 * micro-grain is the right effect for low-res model skins. */
 	texenv_mode_t mode;
-	if (s_objProcTexOn && s_objLightReady)
+	if (s_objProcTexOn && s_objLightReady && g_object_shine)
 		mode = TEXENV_MODE_OBJECT;
-	else if (texdata->has_detail)
+	else if (texdata->has_detail && g_wall_detail)
 		mode = TEXENV_MODE_AUX;
 	else
 		mode = TEXENV_MODE_DIFFUSE;

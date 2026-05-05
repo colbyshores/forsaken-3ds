@@ -1735,6 +1735,16 @@ MENU	MENU_NEW_VisualsStereo = {
  * eye-sep / stereo-state to the HUD for diagnosing slider behavior. Saved
  * to config as ShowStereoDebug. */
 extern bool g_show_stereo_debug;
+
+/* Declared in render_c3d.c. Toggle the new graphics features:
+ *   g_object_shine — Phong specular highlight on enemy / pickup / crate
+ *                    surfaces. Free if disabled (skips fragment-lighting
+ *                    binding + extra TexEnv stage).
+ *   g_wall_detail  — ADD_SIGNED detail-map modulation on wall textures
+ *                    that ship with a sibling <name>_d.t3x file.
+ * Saved as ObjectShine / WallDetail in Configs/main.txt. */
+extern bool g_object_shine;
+extern bool g_wall_detail;
 #endif
 
 MENU	MENU_NEW_Visuals = {
@@ -1750,8 +1760,10 @@ MENU	MENU_NEW_Visuals = {
 		{ 20, 124, 200, 124, 0,					"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	NULL, 0 },
 		{ 20, 136, 150, 136, 0,					"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
 #if defined(__3DS__) && defined(RENDERER_C3D)
-		{ 20, 148, 150, 148, 0,					"Show stereo debug",							FONT_Small, TEXTFLAG_CentreY,		&g_show_stereo_debug,	NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
-		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
+		{ 20, 148, 150, 148, 0,					"Object shine",									FONT_Small, TEXTFLAG_CentreY,		&g_object_shine,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20, 156, 150, 156, 0,					"Wall detail",									FONT_Small, TEXTFLAG_CentreY,		&g_wall_detail,			NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20, 164, 150, 164, 0,					"Show stereo debug",							FONT_Small, TEXTFLAG_CentreY,		&g_show_stereo_debug,	NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20, 176, 100, 176, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
 #else
 		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
 #endif
@@ -9468,6 +9480,8 @@ void GetGamePrefs( void )
 	/* ShowStereoDebug prints raw slider / eye-sep / state in the HUD +
 	 * writes sdmc:/forsaken_stereo.txt every ~1 s for remote diagnosis. */
 	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
+	g_object_shine      = config_get_bool( "ObjectShine",     true );
+	g_wall_detail       = config_get_bool( "WallDetail",      true );
 #endif
 
 	// Stereo options
@@ -9598,6 +9612,8 @@ void SetGamePrefs( void )
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	config_set_bool( "ShowStereoDebug", g_show_stereo_debug );
+	config_set_bool( "ObjectShine",     g_object_shine );
+	config_set_bool( "WallDetail",      g_wall_detail );
 #endif
 
 	config_save();
