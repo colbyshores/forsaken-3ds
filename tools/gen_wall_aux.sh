@@ -32,12 +32,18 @@ for src in "$SRC"/*.bmp "$SRC"/*.BMP "$SRC"/*.png "$SRC"/*.PNG; do
 
 	echo "[gen-aux] $stem"
 
+	# High-pass with TIGHT level clamp (45%..55%) so the detail
+	# texture stays close to grey 0.5. Combined with ADD_SIGNED in
+	# the wall TexEnv (stage 1: result = previous + detail - 0.5),
+	# this caps contribution at +/- 0.05 per pixel — close-range
+	# texture sharpening with no wash-out in flat or dark areas.
+	# Was 30%..70% earlier (+/-0.20), which brightened mid-tone walls.
 	convert "$src" \
 		\( +clone -blur 0x8 \) \
 		-compose minus -composite \
 		-evaluate add 50% \
 		-colorspace Gray \
-		-level 30%,70% \
+		-level 45%,55% \
 		"$TMP/${stem}_d.png"
 
 	tex3ds -f auto-etc1 -q high -m gaussian "$TMP/${stem}_d.png" -o "$DST/${stem}_d.t3x"

@@ -2908,6 +2908,10 @@ MENU	MENU_Visuals = {
 		{ 200, 128 + ( 10*16 ), 0, 0, 0, LT_MENU_InGame33	/*"pickup messages"			*/, 0, 0,	&PickupMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
 		{ 200, 128 + ( 11*16 ), 0, 0, 0, LT_MENU_InGame34	/*"taunt messages"			*/, 0, 0,	&TauntMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
 		{ 200, 128 + ( 12*16 ), 0, 0, 0, LT_MENU_InGame35	/*"your messages"			*/, 0, 0,	&MyMessageColour,				NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		{ 200, 128 + ( 13*16 ), 0, 0, 0, "Object shine",	 0, 0, &g_object_shine, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 14*16 ), 0, 0, 0, "Wall detail",		 0, 0, &g_wall_detail,  NULL, SelectToggle, DrawToggle, NULL, 0 },
+#endif
 		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
