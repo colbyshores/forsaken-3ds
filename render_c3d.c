@@ -87,17 +87,37 @@ static DVLB_s          *s_shaderDVLB    = NULL;
 static shaderProgram_s  s_shaderProgram;
 static bool             s_shaderReady   = false;
 
-/* PICA200 ProcTex — procedural texture unit. Used as a free per-pixel
- * micro-grain modulator on object (model / enemy / crate / pickup)
- * draws to break up the airbrush-flat look of low-res model skins.
- * Not bound on wall / level-mesh draws — those use the detail-map
- * AUX path. See c3d_set_object_proctex(). */
-static C3D_ProcTex          s_objProcTex;
-static C3D_ProcTexLut       s_objProcTexNoise;
-static C3D_ProcTexLut       s_objProcTexMap;
-static C3D_ProcTexColorLut  s_objProcTexColor;
-static bool                 s_procTexReady   = false;
-static bool                 s_objProcTexOn   = false;  /* per-draw toggle */
+/* PICA200 ProcTex — procedural texture unit, used as a per-class
+ * detail-noise generator on wall draws. Free per-pixel modulation,
+ * zero VRAM cost. Three preconfigured classes capture the dominant
+ * material types in Forsaken's atlases:
+ *
+ *   MAT_METAL    — fine grit + brushed-metal scratches (default)
+ *   MAT_ROCK     — coarser pitted noise for thermal / lava chambers
+ *   MAT_ORGANIC  — softer grain for biological surfaces
+ *
+ * Each class has its own C3D_ProcTex (noise coefs + filter + clamp)
+ * and C3D_ProcTexColorLut (tonal palette). Per-draw apply_texenv binds
+ * the matching pair. Shared LUTs (noise smoothstep, RGBmap) bound
+ * once at init.
+ *
+ * Replaces the per-texture _d.t3x detail-map pipeline — Forsaken's
+ * painted source art has no high-frequency content to extract, so
+ * derived detail maps were imperceptible. Synthesized noise is more
+ * visible, identical RAM footprint on OG and N3DS, no asset pipeline. */
+typedef enum {
+	MAT_METAL    = 0,
+	MAT_ROCK,
+	MAT_ORGANIC,
+	MAT_COUNT
+} material_class_t;
+
+static C3D_ProcTex          s_wallProcTex[MAT_COUNT];
+static C3D_ProcTexColorLut  s_wallProcColor[MAT_COUNT];
+static C3D_ProcTexLut       s_wallProcNoise;   /* shared smoothstep */
+static C3D_ProcTexLut       s_wallProcMap;     /* shared RGB map */
+static bool                 s_procTexReady = false;
+static bool                 s_objProcTexOn = false;  /* per-draw toggle */
 
 /* PICA200 fragment-lighting for object Phong shading. Vshader outputs
  * a pseudo-normal-derived quaternion (outnq) per vertex; the hardware
@@ -201,22 +221,42 @@ typedef struct texture_s texture_t;
 static void apply_texenv_for_texture(struct texture_s *texdata);
 static void apply_texenv_untextured(void);
 
+/* Pick a material class from the source texture filename. Forsaken's
+ * atlas naming is consistent enough for prefix matching: thermal /
+ * lava / nuclear chambers all use therm/nuke/lava/fire prefixes;
+ * biological surfaces (Foetoid, the Flesh Morph, bio-organic walls)
+ * use bio/foe/flsh; everything else is industrial-metal. Path can be
+ * NULL in fallback paths — returns MAT_METAL. */
+static u8 classify_texture(const char *path)
+{
+	const char *base;
+	if (!path) return MAT_METAL;
+	/* Strip directory: find last '/' or '\'. */
+	base = path;
+	for (const char *p = path; *p; p++)
+		if (*p == '/' || *p == '\\') base = p + 1;
+	if (strstr(base, "therm") || strstr(base, "nuke") ||
+	    strstr(base, "lava")  || strstr(base, "fire") ||
+	    strstr(base, "rock")  || strstr(base, "stone"))
+		return MAT_ROCK;
+	if (strstr(base, "bio")   || strstr(base, "foe")  ||
+	    strstr(base, "flsh")  || strstr(base, "guts"))
+		return MAT_ORGANIC;
+	return MAT_METAL;
+}
+
 MATRIX proj_matrix;
 MATRIX view_matrix;
 MATRIX world_matrix;
 
 /* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*).
- *
- * Optional detail map (`<name>_d.t3x` next to the diffuse t3x in
- * romfs/hd_textures/) loaded by try_load_hd_texture. When present,
- * has_detail flips on and the AUX TexEnv combiner ADD_SIGNEDs the
- * detail map onto the diffuse-modulate result. Absent on the legacy
- * PNG fallback path. */
+ * material_class is set at load time by classify_texture() based on
+ * the source filename; consumed by configure_texenv_aux to pick which
+ * ProcTex preset to bind on wall draws. */
 typedef struct texture_s {
 	C3D_Tex tex;
 	bool    initialized;
-	C3D_Tex detail_tex;
-	bool    has_detail;
+	u8      material_class;  /* material_class_t enum value */
 } texture_t;
 
 /* Debug trace to SD card. Truncate once on first call per process so
@@ -761,46 +801,84 @@ bool c3d_renderer_init(void)
 
 	if (!s_procTexReady)
 	{
-		C3D_ProcTexInit(&s_objProcTex, 0, 2);
-		C3D_ProcTexClamp(&s_objProcTex, GPU_PT_REPEAT, GPU_PT_REPEAT);
-		/* Higher amplitude (0.60), lower frequency (1.5) — the
-		 * pattern spans more of each UV face rather than tiling
-		 * down to single-pixel speckle, so the grain reads as
-		 * surface texture rather than aliasing edges. */
-		C3D_ProcTexNoiseCoefs(&s_objProcTex, C3D_ProcTex_UV,
-		                      0.60f, 1.5f, 0.0f);
-		C3D_ProcTexCombiner(&s_objProcTex, false, GPU_PT_SQRT2,
-		                    GPU_PT_SQRT2);
-		C3D_ProcTexFilter(&s_objProcTex, GPU_PT_LINEAR);
-		C3D_ProcTexNoiseEnable(&s_objProcTex, true);
-
+		/* Shared LUTs — noise smoothstep + RGB map. Both are linear
+		 * identity ramps; per-class character comes from the noise
+		 * coefficients and the color palette LUT, not these. Bound
+		 * once at init; PICA200 keeps them globally until rebound. */
 		{
 			float ramp[129];
 			int i;
 			for (i = 0; i <= 128; i++)
 				ramp[i] = (float)i / 128.0f;
-			ProcTexLut_FromArray(&s_objProcTexNoise, ramp);
-			C3D_ProcTexLutBind(GPU_LUT_NOISE, &s_objProcTexNoise);
-			ProcTexLut_FromArray(&s_objProcTexMap, ramp);
-			C3D_ProcTexLutBind(GPU_LUT_RGBMAP, &s_objProcTexMap);
+			ProcTexLut_FromArray(&s_wallProcNoise, ramp);
+			C3D_ProcTexLutBind(GPU_LUT_NOISE, &s_wallProcNoise);
+			ProcTexLut_FromArray(&s_wallProcMap, ramp);
+			C3D_ProcTexLutBind(GPU_LUT_RGBMAP, &s_wallProcMap);
 		}
 
-		/* Chromatic LUT — cool blue at noise-low stops, warm amber at
-		 * noise-high stops, both centred near grey 0.5 so ADD_SIGNED
-		 * shifts pixels by a small color tint rather than just
-		 * brightness. Reads as a metallic/oily sheen across model
-		 * surfaces. Format: 0xAABBGGRR. */
+		/* Per-class noise coefs + color LUT. Color LUT uses 2 stops:
+		 * dark stop at the low-noise end, light stop at the high-noise
+		 * end. Both straddle grey 0.5 so ADD_SIGNED contributes signed
+		 * symmetric per-pixel modulation. */
+
+		/* MAT_METAL — fine grit + brushed-metal scratches. Low-amp
+		 * (0.30), high-frequency (4.0): fine speckle, narrow band so
+		 * mid-tone walls don't shift. Tonal LUT goes from cool dark
+		 * (worn metal) to warm light (highlight). */
+		C3D_ProcTexInit(&s_wallProcTex[MAT_METAL], 0, 2);
+		C3D_ProcTexClamp(&s_wallProcTex[MAT_METAL],
+		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_METAL],
+		                      C3D_ProcTex_UV, 0.30f, 4.0f, 0.0f);
+		C3D_ProcTexCombiner(&s_wallProcTex[MAT_METAL], false,
+		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
+		C3D_ProcTexFilter(&s_wallProcTex[MAT_METAL], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_METAL], true);
 		{
-			u32 colors[2] = {
-				0xFF804D33u,  /* dark cool: R=0x33 G=0x4D B=0x80 */
-				0xFF4D9FB3u,  /* warm light: R=0xB3 G=0x9F B=0x4D */
-			};
-			ProcTexColorLut_Write(&s_objProcTexColor, colors, 0, 2);
-			C3D_ProcTexColorLutBind(&s_objProcTexColor);
+			u32 colors[2] = { 0xFF606060u, 0xFFA0A0A0u };
+			ProcTexColorLut_Write(&s_wallProcColor[MAT_METAL],
+			                      colors, 0, 2);
+		}
+
+		/* MAT_ROCK — coarse pitted noise for thermal / lava chambers.
+		 * Higher amplitude (0.55), lower frequency (1.8): big mottled
+		 * blobs, wider tonal range to read as porous rock. Warmer
+		 * palette (charcoal → ember). */
+		C3D_ProcTexInit(&s_wallProcTex[MAT_ROCK], 0, 2);
+		C3D_ProcTexClamp(&s_wallProcTex[MAT_ROCK],
+		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ROCK],
+		                      C3D_ProcTex_UV, 0.55f, 1.8f, 0.0f);
+		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ROCK], false,
+		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
+		C3D_ProcTexFilter(&s_wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ROCK], true);
+		{
+			u32 colors[2] = { 0xFF404048u, 0xFFA89880u };
+			ProcTexColorLut_Write(&s_wallProcColor[MAT_ROCK],
+			                      colors, 0, 2);
+		}
+
+		/* MAT_ORGANIC — softer, smoother grain for biological surfaces.
+		 * Medium-amp (0.40), medium-freq (2.5). Slightly green-tinted
+		 * palette to read as organic / fleshy. */
+		C3D_ProcTexInit(&s_wallProcTex[MAT_ORGANIC], 0, 2);
+		C3D_ProcTexClamp(&s_wallProcTex[MAT_ORGANIC],
+		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ORGANIC],
+		                      C3D_ProcTex_UV, 0.40f, 2.5f, 0.0f);
+		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ORGANIC], false,
+		                    GPU_PT_SQRT2, GPU_PT_SQRT2);
+		C3D_ProcTexFilter(&s_wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ORGANIC], true);
+		{
+			u32 colors[2] = { 0xFF506050u, 0xFF98A898u };
+			ProcTexColorLut_Write(&s_wallProcColor[MAT_ORGANIC],
+			                      colors, 0, 2);
 		}
 
 		s_procTexReady = true;
-		c3d_trace("c3d_renderer_init: object ProcTex initialised");
+		c3d_trace("c3d_renderer_init: wall ProcTex (3 classes) initialised");
 	}
 
 	if (!s_objLightReady)
@@ -1687,12 +1765,13 @@ static void configure_texenv_none(void)
 
 static void configure_texenv_aux(texture_t *texdata)
 {
-	/* Detail map only. Stage 0 is the legacy diffuse-modulate path so
-	 * walls keep proper color + baked lighting; stage 1 ADD_SIGNEDs
-	 * the high-pass detail map (centred grey = identity, lighter
-	 * brightens the surface, darker darkens). The detail-map alpha
-	 * channel is irrelevant — REPLACE preserves stage 0's alpha so
-	 * colour-keyed transparent textures still work. */
+	/* Wall detail via ProcTex unit. Stage 0 is the legacy diffuse-
+	 * modulate path so walls keep proper color + baked lighting;
+	 * stage 1 ADD_SIGNEDs the procedural noise (TEXTURE3 = proctex
+	 * output). The proctex configuration was selected per material
+	 * class by the caller binding s_wallProcTex[texdata->material_class].
+	 * Alpha REPLACE preserves stage 0's alpha so colour-keyed
+	 * transparent textures still work. */
 	{
 		C3D_TexEnv *env = C3D_GetTexEnv(0);
 		C3D_TexEnvInit(env);
@@ -1704,12 +1783,12 @@ static void configure_texenv_aux(texture_t *texdata)
 	{
 		C3D_TexEnv *env = C3D_GetTexEnv(1);
 		C3D_TexEnvInit(env);
-		C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_TEXTURE1,
+		C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_TEXTURE3,
 		              GPU_PRIMARY_COLOR);
 		C3D_TexEnvFunc(env, C3D_RGB,   GPU_ADD_SIGNED);
 		C3D_TexEnvFunc(env, C3D_Alpha, GPU_REPLACE);
 	}
-	(void)texdata; /* arg kept for future per-texture variants */
+	(void)texdata;
 }
 
 static void configure_texenv_object(void)
@@ -1756,23 +1835,31 @@ static void configure_texenv_object(void)
  * cached state if needed (currently no callers care). */
 static void apply_texenv_for_texture(texture_t *texdata)
 {
-	/* Per-draw object mode (proctex grain) takes precedence over
-	 * detail-map AUX. Object draws shouldn't use wall detail maps
-	 * even if some shared global texture happens to have one — the
-	 * micro-grain is the right effect for low-res model skins. */
+	/* OBJECT (Phong shine on enemies / pickups) takes precedence over
+	 * AUX (wall ProcTex grain) — the same texture would never want
+	 * both, but the object toggle wraps narrow draw_object call sites
+	 * while AUX is the fall-through path for level-mesh draws. */
 	texenv_mode_t mode;
 	if (s_objProcTexOn && s_objLightReady && g_object_shine)
 		mode = TEXENV_MODE_OBJECT;
-	else if (texdata->has_detail && g_wall_detail)
+	else if (s_procTexReady && g_wall_detail)
 		mode = TEXENV_MODE_AUX;
 	else
 		mode = TEXENV_MODE_DIFFUSE;
 
 	C3D_TexBind(0, &texdata->tex);
 	if (mode == TEXENV_MODE_AUX)
-		C3D_TexBind(1, &texdata->detail_tex);
-	else if (mode == TEXENV_MODE_OBJECT)
-		C3D_ProcTexBind(0, &s_objProcTex);
+	{
+		/* Bind the per-material ProcTex preset + matching color LUT.
+		 * Color LUT is global state; rebind on every AUX draw because
+		 * the cache check below may early-out without coming back
+		 * through here. Cheap (1 register write). */
+		material_class_t mc =
+		    (material_class_t)texdata->material_class;
+		if ((unsigned)mc >= MAT_COUNT) mc = MAT_METAL;
+		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
+		C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
+	}
 
 	if (mode == s_lastTexEnvMode &&
 	    s_lastBoundTexture == (void*)texdata &&
@@ -1811,8 +1898,6 @@ void release_texture(LPTEXTURE texture)
 	texture_t *texdata = (texture_t*)texture;
 	if (texdata->initialized)
 		C3D_TexDelete(&texdata->tex);
-	if (texdata->has_detail)
-		C3D_TexDelete(&texdata->detail_tex);
 	free(texdata);
 }
 
@@ -1855,66 +1940,6 @@ static void tile_rgba4(const u_int8_t *src, u_int16_t *dst, int w, int h)
  * Path mapping: data\textures\foo.bmp → romfs:/hd/textures/foo.t3x
  * Uses Tex3DS_TextureImportStdio which handles format, tiling, VRAM. */
 #include <tex3ds.h>
-
-/* Phase 3 of wall-normal-detail-mapping: load an auxiliary map
- * (normal or detail) into a C3D_Tex. Suffix is "_n" or "_d";
- * inserted before the .t3x extension. Returns true on success
- * (caller marks the corresponding has_* flag). Quiet failure when
- * the file is absent — auxiliary maps are entirely optional, every
- * diffuse texture that doesn't have one just renders without
- * normal/detail contribution. */
-static bool try_load_aux_t3x(C3D_Tex *out, const char *diffuse_path,
-	const char *suffix)
-{
-	char aux_path[512];
-	char *p;
-	FILE *f;
-	Tex3DS_Texture t3x;
-	size_t len;
-
-	strncpy(aux_path, diffuse_path, sizeof(aux_path) - 4);
-	aux_path[sizeof(aux_path) - 4] = '\0';
-	p = strrchr(aux_path, '.');
-	if (!p)
-		return false;
-	len = p - aux_path;
-	if (len + strlen(suffix) + 4 >= sizeof(aux_path))
-		return false;
-	memmove(p + strlen(suffix), p, strlen(p) + 1);
-	memcpy(p, suffix, strlen(suffix));
-
-	f = fopen(aux_path, "rb");
-	if (!f)
-	{
-		char _b[256];
-		snprintf(_b, sizeof(_b), "AUX-fopen-fail: %s", aux_path);
-		c3d_trace(_b);
-		return false;
-	}
-
-	{
-		char _b[256];
-		snprintf(_b, sizeof(_b), "AUX-fopen-ok: %s", aux_path);
-		c3d_trace(_b);
-	}
-
-	t3x = Tex3DS_TextureImportStdio(f, out, NULL, false);
-	fclose(f);
-	if (!t3x)
-	{
-		char _b[256];
-		snprintf(_b, sizeof(_b), "AUX-import-fail: %s", aux_path);
-		c3d_trace(_b);
-		return false;
-	}
-
-	C3D_TexSetFilter(out, GPU_LINEAR, GPU_LINEAR);
-	C3D_TexSetFilterMipmap(out, GPU_NEAREST);
-	C3D_TexSetWrap(out, GPU_REPEAT, GPU_REPEAT);
-
-	Tex3DS_TextureFree(t3x);
-	return true;
-}
 
 static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	u_int16_t *width, u_int16_t *height, bool *colorkey)
@@ -1972,11 +1997,6 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 			C3D_TexDelete(&texdata->tex);
 			texdata->initialized = false;
 		}
-		if (texdata->has_detail)
-		{
-			C3D_TexDelete(&texdata->detail_tex);
-			texdata->has_detail = false;
-		}
 	}
 
 	/* Tex3DS handles everything: format detection, decompression,
@@ -2018,25 +2038,15 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	 * ETC1A4 carries real per-pixel alpha for sprites/grates. */
 	*colorkey = (texdata->tex.fmt == GPU_ETC1A4);
 
-	texdata->initialized = true;
+	texdata->initialized   = true;
+	texdata->material_class = classify_texture(path);
 	*t = (LPTEXTURE)texdata;
 
 	Tex3DS_TextureFree(t3x);
 
-	/* Optional detail map. Quiet on absence — every diffuse without a
-	 * matching `<name>_d.t3x` just renders without detail contribution. */
-	texdata->has_detail = try_load_aux_t3x(&texdata->detail_tex,
-		hd_path, "_d");
-
-	DebugPrintf("HD texture: loaded %s (%dx%d)%s\n",
+	DebugPrintf("HD texture: loaded %s (%dx%d) class=%u\n",
 		hd_path, texdata->tex.width, texdata->tex.height,
-		texdata->has_detail ? " +detail" : "");
-	if (texdata->has_detail)
-	{
-		char _b[160];
-		snprintf(_b, sizeof(_b), "AUX: %s +detail", hd_path);
-		c3d_trace(_b);
-	}
+		(unsigned)texdata->material_class);
 	return true;
 }
 
@@ -2162,7 +2172,8 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
 		C3D_TexSetWrap(&texdata->tex, GPU_REPEAT, GPU_REPEAT);
 
-		texdata->initialized = true;
+		texdata->initialized   = true;
+		texdata->material_class = classify_texture(path);
 		*t = (LPTEXTURE)texdata;
 	}
 
@@ -2692,7 +2703,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 			/* Texture binding with TexEnv cache. apply_texenv_*
 			 * picks single-stage diffuse vs two-stage detail-add
-			 * based on the texture's has_detail flag. */
+			 * based on the texture's material_class. */
 			if (eff_hasTexture)
 				apply_texenv_for_texture((texture_t*)tg->texture);
 			else
