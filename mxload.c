@@ -1092,7 +1092,14 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 
 					if( Display )
 					{
-						if (!draw_object(&Mxloadheader->Group[group].renderObject[i]))
+#ifdef RENDERER_C3D
+						{ extern void c3d_set_object_proctex(bool); c3d_set_object_proctex(true); }
+#endif
+						bool ok = draw_object(&Mxloadheader->Group[group].renderObject[i]);
+#ifdef RENDERER_C3D
+						{ extern void c3d_set_object_proctex(bool); c3d_set_object_proctex(false); }
+#endif
+						if (!ok)
 						{
 #ifdef NEW_LIGHTING
 							render_reset_lighting_variables();
@@ -1334,7 +1341,14 @@ bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model )
 		{
 			for ( i=0 ; i<Mxloadheader->Group[group].num_execbufs; i++)
 			{
-				if (!draw_object(&Mxloadheader->Group[group].renderObject[i]))
+#ifdef RENDERER_C3D
+				{ extern void c3d_set_object_proctex(bool); c3d_set_object_proctex(true); }
+#endif
+				bool ok = draw_object(&Mxloadheader->Group[group].renderObject[i]);
+#ifdef RENDERER_C3D
+				{ extern void c3d_set_object_proctex(bool); c3d_set_object_proctex(false); }
+#endif
+				if (!ok)
 				{
 					return false;
 				}

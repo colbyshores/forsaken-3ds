@@ -38,6 +38,8 @@
 .out outpos position
 .out outclr color
 .out outtc0 texcoord0
+.out outnq  normalquat   ; per-vertex quat for fragment-lighting (objects)
+.out outview view         ; view vector for fragment-lighting
 
 ; Inputs
 .alias inpos v0
@@ -62,6 +64,40 @@
 	dp4 outpos.y, projection[1], r1
 	dp4 outpos.z, projection[2], r1
 	dp4 outpos.w, projection[3], r1
+
+	; --- Object Phong support: per-vertex tangent-frame quat + view ---
+	; For object draws (modelView != identity), use vertex position as
+	; a proxy for the surface normal — works for the convex / spherical
+	; models in Forsaken (ships, enemies, crates, pickups). For walls
+	; (modelView = identity) the result is bogus but harmless: the wall
+	; TexEnv path doesn't bind the LightEnv, so the normalquat is never
+	; consumed. Saves us from wiring a per-vertex normal attribute.
+	;
+	; r7 = (inpos.xyz, 0) — direction from model origin to vertex
+	mov r7.xyz, inpos
+	mov r7.w,   zeros
+	; r8.xyz = modelView * r7 — direction in world space
+	dp4 r8.x, modelView[0], r7
+	dp4 r8.y, modelView[1], r7
+	dp4 r8.z, modelView[2], r7
+	; Normalise r8 → world-space pseudo-normal N
+	dp3 r9.x, r8, r8
+	rsq r9.x, r9.x
+	mul r8.xyz, r8.xyz, r9.x
+	; Build quaternion that rotates Z+ to N:
+	;   axis = (0,0,1) × N = (-N.y, N.x, 0)
+	;   q = (axis, 1+N.z)  then normalise
+	; Layout: (x, y, z, w) — vector part first, scalar last.
+	mov r10.x, -r8.y
+	mov r10.y, r8.x
+	mov r10.z, zeros
+	add r10.w, ones, r8.z
+	dp4 r11.x, r10, r10
+	rsq r11.x, r11.x
+	mul outnq, r10, r11.x
+	; outview = -r1 (vertex toward camera/origin in world space). The
+	; fragment-lighting hardware refuses to fire if outview is unwritten.
+	mov outview, -r1
 
 	; --- Per-vertex lighting ---
 	; r1.xyz is worldspace pos (level mesh and models alike). Lights

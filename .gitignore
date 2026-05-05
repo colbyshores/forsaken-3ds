@@ -117,7 +117,11 @@ net_test/
 !build_banner_audio.sh
 
 # CIA build pipeline — fetched binaries (run `make tools-fetch`)
-tools/
+# Ignore everything in tools/ EXCEPT tracked Python helpers (the
+# fetched binaries — makerom, bannertool, the enet-build clone, etc.
+# — stay out of version control).
+tools/*
+!tools/*.py
 
 # Nintendo DSP firmware blob. NOT bundled in the CIA — CFW users on real
 # hardware already have sdmc:/3ds/dspfirm.cdc from the standard DSP1 dump
