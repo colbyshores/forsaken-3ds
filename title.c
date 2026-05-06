@@ -15692,34 +15692,12 @@ void SetTitleNotify( char *str )
 
 void InitInGameLevelSelect( MENU *menu )
 {
-	extern char *CurrentLevelsList;
 	MENUITEM *item;
-	int i;
 
 	for ( item = menu->Item; item->x >= 0; item++ )
 	{
 		if ( item->FuncDraw == DrawToggle )
 				item->Variable = &IsHost;
-	}
-
-	/* Force re-load the SP campaign list so all mission.dat entries
-	 * (1998 + Remaster + N64 ports) appear, regardless of whether the
-	 * player has been through the multiplayer-host path which would
-	 * have left LevelList holding battle.dat's 24-entry MP set. Without
-	 * this, the in-game Level Select shows whatever LevelList happened
-	 * to contain — which on a save-game reload was a stale 16-entry
-	 * remnant of a previous campaign-progression session. */
-	if ( !CurrentLevelsList || strcmp(CurrentLevelsList, SINGLEPLAYER_LEVELS) != 0 )
-		InitLevels( SINGLEPLAYER_LEVELS );
-
-	LevelList.items = 0;
-	LevelList.top_item = 0;
-	LevelList.display_items = 8;
-	for ( i = 0; i < NumLevels; i++ )
-	{
-		strcpy( (char*)&LevelList.item[LevelList.items][0],
-		        (char*)&ShortLevelNames[i][0] );
-		LevelList.items++;
 	}
 }
 
