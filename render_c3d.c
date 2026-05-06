@@ -1534,6 +1534,16 @@ static void clear_sub_viewport_via_quad(void)
 	/* Restore standard game-draw state */
 	C3D_DepthTest(true, GPU_LESS, s_colorMask);
 	C3D_CullFace(GPU_CULL_FRONT_CCW);
+
+	/* Quad clear writes TexEnv stage 0 directly without going through
+	 * apply_texenv_*. Invalidate the TexEnv cache so the next textured
+	 * draw re-runs configure_texenv_* — otherwise the cache lies and
+	 * subsequent walls render untextured (chase-cam regression). */
+	s_lastTexEnvMode     = TEXENV_MODE_NONE;
+	s_lastBoundTexture   = NULL;
+	s_lastTexEnvTextured = false;
+	s_lastMatClass       = -1;
+	s_lastPhaseBucket    = -1;
 }
 
 bool FSClear(XYRECT *rect)
