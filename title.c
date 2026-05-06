@@ -3063,7 +3063,11 @@ MENU	MENU_InGame = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGam
 					  OLDMENUITEM( 200, 128, LT_MENU_InGame2  /*"Toggle Full Screen"		*/,	NULL,						NULL,					MenuGoFullScreen,		MenuItemDrawName),
 					  OLDMENUITEM( 200, 144, LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 160, LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
+#if defined(__3DS__) && defined(RENDERER_C3D)
+					  OLDMENUITEM( 200, 176, "3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
+#else
 					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
+#endif
 					  OLDMENUITEM( 200, 192, LT_MENU_InGame26 /*"Host Options"				*/,	NULL,						&MENU_Host_Options,		MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
@@ -3090,7 +3094,11 @@ MENU	MENU_InGameSingle = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , Exi
 #endif
 					  OLDMENUITEM( 200, 144, LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 160, LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
+#if defined(__3DS__) && defined(RENDERER_C3D)
+					  OLDMENUITEM( 200, 176, "3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
+#else
 					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
+#endif
 					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 #ifndef __3DS__
 					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),

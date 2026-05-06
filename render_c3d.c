@@ -887,52 +887,83 @@ bool c3d_renderer_init(void)
 		 * biased slightly below grey 0.5 so noise reads as wear/
 		 * grime, not wash-out. Diffuse stays the dominant signal. */
 
-		/* MAT_METAL — fine paint-grain / micro-scratches. */
+		/* "Lived in" wear pass. Palettes widened from ±~5% to ±~12%
+		 * around grey 0.5 — symmetric so the ProcTex contributes equal
+		 * darkening (scuffs / dirt) and brightening (highlights / wear
+		 * polish) rather than only darkening (which read as fog).
+		 * Frequencies bumped 30% so features are finer and more
+		 * defined. Amplitudes bumped ~30% so the modulation actually
+		 * registers visually rather than fading into a wash. */
+
+		/* 4-stop stepped palettes break up the bilinear color blend
+		 * that produces splotches with 2-stop ramps. The output as
+		 * noise sweeps 0→1 oscillates dark→mid→light→mid instead of
+		 * smoothly fading dark→light, which reads as small bumps and
+		 * wear features rather than large flat blobs. Each stop stays
+		 * within ±6% of grey 0.5 (ADD_SIGNED) so contribution is
+		 * subtle and symmetric. */
+
+		/* MAT_METAL — fine paint-grain + brushed sheen. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_METAL], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_METAL],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_METAL],
-		                      C3D_ProcTex_UV, 0.20f, 12.0f, 0.0f);
+		                      C3D_ProcTex_UV, 0.25f, 16.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_METAL], false,
 		                    GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_METAL], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_METAL], true);
 		{
-			u32 colors[2] = { 0xFF707070u, 0xFF828282u };
+			u32 colors[4] = {
+				0xFF727272u,  /*  -7% */
+				0xFF909090u,  /*  +6% */
+				0xFF787878u,  /*  -3% */
+				0xFF8C8C8Cu,  /*  +5% */
+			};
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_METAL],
-			                      colors, 0, 2);
+			                      colors, 0, 4);
 		}
 
-		/* MAT_ROCK — coarser pitted speckle, warm tint. */
+		/* MAT_ROCK — pitted, cool/warm wear pattern. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ROCK], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ROCK],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ROCK],
-		                      C3D_ProcTex_UV, 0.30f, 8.0f, 0.0f);
+		                      C3D_ProcTex_UV, 0.31f, 13.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ROCK], false,
 		                    GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ROCK], true);
 		{
-			u32 colors[2] = { 0xFF6C7078u, 0xFF8C8888u };
+			u32 colors[4] = {
+				0xFF70757Cu,  /* cool dark */
+				0xFF938D86u,  /* warm light */
+				0xFF767A80u,  /* cool mid */
+				0xFF8E8783u,  /* warm mid-light */
+			};
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_ROCK],
-			                      colors, 0, 2);
+			                      colors, 0, 4);
 		}
 
-		/* MAT_ORGANIC — mid-frequency, faint green tint. */
+		/* MAT_ORGANIC — soft, faint green tint. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ORGANIC], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ORGANIC],
 		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ORGANIC],
-		                      C3D_ProcTex_UV, 0.25f, 10.0f, 0.0f);
+		                      C3D_ProcTex_UV, 0.27f, 14.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ORGANIC], false,
 		                    GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ORGANIC], true);
 		{
-			u32 colors[2] = { 0xFF707470u, 0xFF828680u };
+			u32 colors[4] = {
+				0xFF72766Eu,
+				0xFF90948Cu,
+				0xFF787C76u,
+				0xFF8C9088u,
+			};
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_ORGANIC],
-			                      colors, 0, 2);
+			                      colors, 0, 4);
 		}
 
 		s_procTexReady = true;
@@ -1957,12 +1988,12 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		 * ProcTexBind. The color LUT (256 entries) stays cached unless
 		 * the material class changed. */
 		material_class_t mc = desired_mc;
-		float base_freq = (mc == MAT_ROCK)    ?  8.0f
-		                : (mc == MAT_ORGANIC) ? 10.0f
-		                                      : 12.0f;
-		float amp       = (mc == MAT_ROCK)    ? 0.30f
-		                : (mc == MAT_ORGANIC) ? 0.25f
-		                                      : 0.20f;
+		float base_freq = (mc == MAT_ROCK)    ? 13.0f
+		                : (mc == MAT_ORGANIC) ? 14.0f
+		                                      : 16.0f;
+		float amp       = (mc == MAT_ROCK)    ? 0.31f
+		                : (mc == MAT_ORGANIC) ? 0.27f
+		                                      : 0.25f;
 		float phase = ((float)desired_bucket + 0.5f)
 		            * (1.0f / (float)ATLAS_PHASE_BUCKETS);
 		/* Use the low 3 bits of the bucket as an orthogonal frequency
