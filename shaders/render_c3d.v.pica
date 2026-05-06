@@ -127,6 +127,7 @@
 	; the wall the rocket is right next to picks up the colour. Avoids
 	; the whole-room over-saturation when 4+ rockets overlap.
 	mul r5.x, r5, r5
+	mul r5.x, r5, r5
 	; r3.xyz += light_color × falloff² (broadcast .x to all channels)
 	mul r6.xyz, lights[1], r5.xxxx
 	add r3.xyz, r6, r3
@@ -138,6 +139,7 @@
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
 	mul r5.x, r5, r5
+	mul r5.x, r5, r5
 	mul r6.xyz, lights[4], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -147,6 +149,7 @@
 	mul r5.x, lights[6].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
+	mul r5.x, r5, r5
 	mul r5.x, r5, r5
 	mul r6.xyz, lights[7], r5.xxxx
 	add r3.xyz, r6, r3
@@ -158,6 +161,7 @@
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
 	mul r5.x, r5, r5
+	mul r5.x, r5, r5
 	mul r6.xyz, lights[10], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -167,6 +171,7 @@
 	mul r5.x, lights[12].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
+	mul r5.x, r5, r5
 	mul r5.x, r5, r5
 	mul r6.xyz, lights[13], r5.xxxx
 	add r3.xyz, r6, r3
@@ -178,6 +183,7 @@
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
 	mul r5.x, r5, r5
+	mul r5.x, r5, r5
 	mul r6.xyz, lights[16], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -188,6 +194,7 @@
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
 	mul r5.x, r5, r5
+	mul r5.x, r5, r5
 	mul r6.xyz, lights[19], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -197,6 +204,7 @@
 	mul r5.x, lights[21].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
+	mul r5.x, r5, r5
 	mul r5.x, r5, r5
 	mul r6.xyz, lights[22], r5.xxxx
 	add r3.xyz, r6, r3

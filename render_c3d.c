@@ -1220,7 +1220,7 @@ void c3d_upload_xlights(void)
 		 * 8 × 0.4 = 3.2 max additive contribution — still saturates
 		 * close to a dense cluster, but fades cleanly into the baked
 		 * color across the rest of the room. */
-		const float kDynScale = 0.4f;
+		const float kDynScale = 0.25f;
 		float r = ((XLIGHT*)L)->r * (kDynScale / 255.0f);
 		float g = ((XLIGHT*)L)->g * (kDynScale / 255.0f);
 		float b = ((XLIGHT*)L)->b * (kDynScale / 255.0f);
