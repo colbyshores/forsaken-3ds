@@ -308,6 +308,7 @@ void release_texture( LPTEXTURE texture );
 bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool orthographic );
 bool draw_line_object(RENDEROBJECT *renderObject);
 bool draw_object(RENDEROBJECT *renderObject);
+bool draw_billboard_object(RENDEROBJECT *renderObject);
 bool draw_2d_object(RENDEROBJECT *renderObject);
 
 void FSReleaseRenderObject(RENDEROBJECT *renderObject);

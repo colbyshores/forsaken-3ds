@@ -598,7 +598,7 @@ bool DisplayGroupClippedPolys(RENDEROBJECT *renderObject, u_int16_t Group )
 
 		cull_none();
 
-		if (!draw_object(renderObject))
+		if (!draw_billboard_object(renderObject))
 			return false;
 
 		reset_cull();
@@ -625,7 +625,7 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 
 		cull_none();
 
-		if (!draw_object(renderObject))
+		if (!draw_billboard_object(renderObject))
 			return false;
 
 		reset_cull();
@@ -839,7 +839,7 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
-								draw_object(renderObject);
+								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								StartVert = 0;
@@ -1087,7 +1087,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
-								draw_object(renderObject);
+								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								StartVert = 0;
@@ -1147,7 +1147,7 @@ bool DisplaySolidGroupClippedPolys( RENDEROBJECT *renderObject, u_int16_t Group 
 
 		cull_none();
 
-		if (!draw_object(renderObject))
+		if (!draw_billboard_object(renderObject))
 			return false;
 
 		reset_cull();
@@ -1171,7 +1171,7 @@ bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject )
 
 		cull_none();
 
-		if (!draw_object(renderObject))
+		if (!draw_billboard_object(renderObject))
 			return false;
 
 		reset_cull();
@@ -1386,7 +1386,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
-								draw_object(renderObject);
+								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								StartVert = 0;
@@ -1634,7 +1634,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
-								draw_object(renderObject);
+								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								StartVert = 0;

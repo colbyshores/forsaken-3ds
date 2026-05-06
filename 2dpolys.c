@@ -1566,7 +1566,7 @@ bool DisplayGroupClippedFmPolys( RENDEROBJECT *renderObject, u_int16_t Group )
 
 		cull_none();
 
-		if (!draw_object(renderObject))
+		if (!draw_billboard_object(renderObject))
 			return false;
 
 		reset_cull();
@@ -1590,7 +1590,7 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 
 		cull_none();
 
-		if (!draw_object(renderObject))
+		if (!draw_billboard_object(renderObject))
 			return false;
 
 		reset_cull();
@@ -1929,7 +1929,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
-								draw_object(renderObject);
+								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								StartVert = 0;
@@ -2307,7 +2307,7 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
-								draw_object(renderObject);
+								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								StartVert = 0;

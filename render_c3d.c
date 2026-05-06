@@ -321,6 +321,15 @@ static int  s_lastPhaseBucket  = -1;
  * tint reads as garbage, same shape for HUD glyphs and menu icons. */
 static bool s_isOrthoDraw      = false;
 
+/* Sticky flag: caller-managed. Wraps world-space billboard / particle
+ * batches (explosion sprites, smoke puffs, lens flares, weapon trails)
+ * so apply_texenv_for_texture skips AUX-mode ProcTex on them too. The
+ * orthographic auto-flag covers HUD/screen-poly draws; this covers
+ * 3D-space sprites that *aren't* orthographic but still shouldn't get
+ * wall grain. */
+static bool s_skipAuxProcTex   = false;
+void c3d_set_skip_aux_proctex(bool enable) { s_skipAuxProcTex = enable; }
+
 /* Phase 4 of wall-normal-detail-mapping: track the last TexEnv mode
  * so we can re-init when transitioning between single-stage (legacy
  * MODULATE) and multi-stage (aux normal/detail) draws. */
@@ -1950,7 +1959,8 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
 	    s_objShineEligible)
 		mode = TEXENV_MODE_OBJECT;
-	else if (s_procTexReady && g_wall_detail && !s_isOrthoDraw)
+	else if (s_procTexReady && g_wall_detail && !s_isOrthoDraw &&
+	         !s_skipAuxProcTex)
 		mode = TEXENV_MODE_AUX;
 	else
 		mode = TEXENV_MODE_DIFFUSE;
@@ -2890,6 +2900,17 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 bool draw_object(RENDEROBJECT *renderObject)
 {
 	return draw_render_object(renderObject, 0, false);
+}
+
+/* World-space billboards / sprites / particles (explosions, weapon
+ * trails, smoke). Same as draw_object but flags the batch as
+ * not-eligible for AUX-mode ProcTex so wall grain doesn't apply. */
+bool draw_billboard_object(RENDEROBJECT *renderObject)
+{
+	s_skipAuxProcTex = true;
+	bool ok = draw_render_object(renderObject, 0, false);
+	s_skipAuxProcTex = false;
+	return ok;
 }
 
 bool draw_2d_object(RENDEROBJECT *renderObject)
