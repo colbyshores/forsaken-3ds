@@ -313,7 +313,7 @@ static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs verte
 static u32  s_atlasSeed        = 0;
 static int  s_lastMatClass     = -1;
 static int  s_lastPhaseBucket  = -1;
-#define ATLAS_PHASE_BUCKETS    16
+#define ATLAS_PHASE_BUCKETS    64
 
 /* Phase 4 of wall-normal-detail-mapping: track the last TexEnv mode
  * so we can re-init when transitioning between single-stage (legacy
@@ -1957,14 +1957,21 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		 * ProcTexBind. The color LUT (256 entries) stays cached unless
 		 * the material class changed. */
 		material_class_t mc = desired_mc;
-		float freq = (mc == MAT_ROCK)    ?  8.0f
-		           : (mc == MAT_ORGANIC) ? 10.0f
-		                                 : 12.0f;
-		float amp  = (mc == MAT_ROCK)    ? 0.30f
-		           : (mc == MAT_ORGANIC) ? 0.25f
-		                                 : 0.20f;
+		float base_freq = (mc == MAT_ROCK)    ?  8.0f
+		                : (mc == MAT_ORGANIC) ? 10.0f
+		                                      : 12.0f;
+		float amp       = (mc == MAT_ROCK)    ? 0.30f
+		                : (mc == MAT_ORGANIC) ? 0.25f
+		                                      : 0.20f;
 		float phase = ((float)desired_bucket + 0.5f)
 		            * (1.0f / (float)ATLAS_PHASE_BUCKETS);
+		/* Use the low 3 bits of the bucket as an orthogonal frequency
+		 * axis — same phase value × 8 different frequencies = 8× the
+		 * visible variants per phase position. Combined with 64 phase
+		 * buckets this is effectively 64 distinct surface "looks" per
+		 * material class. */
+		int   freq_step = desired_bucket & 7;          /* 0..7 */
+		float freq      = base_freq * (1.0f + freq_step * 0.06f);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[mc],
 		    C3D_ProcTex_UV, amp, freq, phase);
 		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
