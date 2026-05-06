@@ -315,6 +315,12 @@ static int  s_lastMatClass     = -1;
 static int  s_lastPhaseBucket  = -1;
 #define ATLAS_PHASE_BUCKETS    64
 
+/* True while inside an orthographic draw_render_object (HUD, screen
+ * polys, damage-flash overlay). apply_texenv_for_texture suppresses
+ * AUX-mode ProcTex for those — wall grain on a fullscreen red damage
+ * tint reads as garbage, same shape for HUD glyphs and menu icons. */
+static bool s_isOrthoDraw      = false;
+
 /* Phase 4 of wall-normal-detail-mapping: track the last TexEnv mode
  * so we can re-init when transitioning between single-stage (legacy
  * MODULATE) and multi-stage (aux normal/detail) draws. */
@@ -1944,7 +1950,7 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
 	    s_objShineEligible)
 		mode = TEXENV_MODE_OBJECT;
-	else if (s_procTexReady && g_wall_detail)
+	else if (s_procTexReady && g_wall_detail && !s_isOrthoDraw)
 		mode = TEXENV_MODE_AUX;
 	else
 		mode = TEXENV_MODE_DIFFUSE;
@@ -2587,7 +2593,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * Stable for the lifetime of the level, distinct per execbuf, so
 	 * walls in different execbufs sharing the same base texture each
 	 * land in their own ProcTex phase bucket. */
-	s_atlasSeed = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
+	s_atlasSeed   = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
+	s_isOrthoDraw = orthographic;
 
 	/* Single-pass stereo: on the first draw call of the second eye,
 	 * replay the entire display list with the updated view matrix
