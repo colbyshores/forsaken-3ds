@@ -325,7 +325,9 @@ $(BUILD)/render_c3d.o: $(SHADER_HEADER)
 # space-separated prerequisite list cannot express.
 .PHONY: romfs-freshness-check
 romfs-freshness-check:
-	@if [ -f $(ROMFS_STAMP) ] && [ -z "$$(find -L $(SRCDIR)/romfs -type f -newer $(ROMFS_STAMP) -print -quit 2>/dev/null)" ]; then \
+	@if [ -f $(ROMFS_STAMP) ] && \
+	   [ -z "$$(find -L $(SRCDIR)/romfs -type f -newer $(ROMFS_STAMP) -print -quit 2>/dev/null)" ] && \
+	   [ -z "$$(find -L $(SRCDIR)/assets/level_orderings -type f -newer $(ROMFS_STAMP) -print -quit 2>/dev/null)" ]; then \
 		: ; \
 	else \
 		rm -f $(ROMFS_STAMP) ; \
