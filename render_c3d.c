@@ -305,6 +305,16 @@ static bool s_inFrame = false;
 static void *s_lastBoundTexture = NULL;  /* last texture_t* passed to C3D_TexBind */
 static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs vertex-only */
 
+/* Per-execbuf ProcTex phase variation. draw_render_object writes a
+ * per-renderObject seed; apply_texenv_for_texture reads it to pick a
+ * phase bucket so two adjacent walls sharing the same base texture
+ * get visually distinct grain. Folded into g_wall_detail — there's no
+ * scenario where you'd want detail-grain on but the repeating version. */
+static u32  s_atlasSeed        = 0;
+static int  s_lastMatClass     = -1;
+static int  s_lastPhaseBucket  = -1;
+#define ATLAS_PHASE_BUCKETS    16
+
 /* Phase 4 of wall-normal-detail-mapping: track the last TexEnv mode
  * so we can re-init when transitioning between single-stage (legacy
  * MODULATE) and multi-stage (aux normal/detail) draws. */
@@ -1358,6 +1368,8 @@ bool FSBeginScene(void)
 		s_lastBoundTexture = NULL;
 		s_lastTexEnvTextured = false;
 		s_lastTexEnvMode = TEXENV_MODE_NONE;
+		s_lastMatClass = -1;
+		s_lastPhaseBucket = -1;
 
 		/* Initialize modelView uniform (register 4) to identity.
 		 * upload_matrices writes combined MVP to register 0 (projection),
@@ -1898,42 +1910,69 @@ static void apply_texenv_for_texture(texture_t *texdata)
 
 	C3D_TexBind(0, &texdata->tex);
 
-	/* Cache check first — most adjacent draws share the same texture
-	 * and mode, so we early-out and skip all the per-mode setup work
-	 * (proctex coefs rewrite, color LUT rebind, TexEnv reconfig). */
-	if (mode == s_lastTexEnvMode &&
-	    s_lastBoundTexture == (void*)texdata &&
-	    s_lastTexEnvTextured)
-		return;
-
+	/* Compute desired ProcTex state up front so the cache key includes
+	 * the per-execbuf atlas bucket. Two adjacent execbufs sharing the
+	 * same texture but different atlas seeds will land in different
+	 * buckets and force a (cheap) NoiseCoefs rewrite — the color LUT
+	 * stays cached across the bucket change. */
+	material_class_t desired_mc = MAT_METAL;
+	int desired_bucket = -1;
 	if (mode == TEXENV_MODE_AUX)
 	{
-		/* Per-material ProcTex preset + matching color LUT. Only
-		 * runs on cache miss (texture or mode changed) so the per-
-		 * draw cost is amortised across batches. */
-		material_class_t mc =
-		    (material_class_t)texdata->material_class;
-		float freq;
-		if ((unsigned)mc >= MAT_COUNT) mc = MAT_METAL;
-		freq = (mc == MAT_ROCK)    ?  8.0f
-		     : (mc == MAT_ORGANIC) ? 10.0f
-		                           : 12.0f;
-		C3D_ProcTexNoiseCoefs(&s_wallProcTex[mc],
-		    C3D_ProcTex_UV,
-		    (mc == MAT_ROCK)    ? 0.30f
-		  : (mc == MAT_ORGANIC) ? 0.25f
-		                        : 0.20f,
-		    freq, texdata->proctex_phase);
-		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
-		C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
+		desired_mc = (material_class_t)texdata->material_class;
+		if ((unsigned)desired_mc >= MAT_COUNT) desired_mc = MAT_METAL;
+		float seed_phase =
+		    ((s_atlasSeed >> 8) & 0xFFFF) * (1.0f / 65536.0f);
+		float combined = texdata->proctex_phase + seed_phase;
+		combined -= floorf(combined);
+		desired_bucket = (int)(combined * (float)ATLAS_PHASE_BUCKETS);
+		if (desired_bucket >= ATLAS_PHASE_BUCKETS)
+			desired_bucket = ATLAS_PHASE_BUCKETS - 1;
 	}
 
-	if (mode == TEXENV_MODE_AUX)
-		configure_texenv_aux(texdata);
-	else if (mode == TEXENV_MODE_OBJECT)
-		configure_texenv_object();
-	else
-		configure_texenv_diffuse();
+	bool mode_changed = (mode != s_lastTexEnvMode) || !s_lastTexEnvTextured;
+	bool aux_state_changed = (mode == TEXENV_MODE_AUX) &&
+	    (desired_bucket != s_lastPhaseBucket ||
+	     (int)desired_mc != s_lastMatClass);
+
+	/* Cache check — same mode + same texture + (for AUX) same atlas
+	 * bucket means no GPU state change needed. */
+	if (!mode_changed && !aux_state_changed &&
+	    s_lastBoundTexture == (void*)texdata)
+		return;
+
+	if (mode == TEXENV_MODE_AUX && (mode_changed || aux_state_changed))
+	{
+		/* Cheap path when only the bucket changed: rewrite NoiseCoefs +
+		 * ProcTexBind. The color LUT (256 entries) stays cached unless
+		 * the material class changed. */
+		material_class_t mc = desired_mc;
+		float freq = (mc == MAT_ROCK)    ?  8.0f
+		           : (mc == MAT_ORGANIC) ? 10.0f
+		                                 : 12.0f;
+		float amp  = (mc == MAT_ROCK)    ? 0.30f
+		           : (mc == MAT_ORGANIC) ? 0.25f
+		                                 : 0.20f;
+		float phase = ((float)desired_bucket + 0.5f)
+		            * (1.0f / (float)ATLAS_PHASE_BUCKETS);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[mc],
+		    C3D_ProcTex_UV, amp, freq, phase);
+		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
+		if (mode_changed || (int)mc != s_lastMatClass)
+			C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
+		s_lastMatClass    = (int)mc;
+		s_lastPhaseBucket = desired_bucket;
+	}
+
+	if (mode_changed)
+	{
+		if (mode == TEXENV_MODE_AUX)
+			configure_texenv_aux(texdata);
+		else if (mode == TEXENV_MODE_OBJECT)
+			configure_texenv_object();
+		else
+			configure_texenv_diffuse();
+	}
 
 	s_lastTexEnvMode      = mode;
 	s_lastBoundTexture    = (void*)texdata;
@@ -2495,6 +2534,12 @@ void light_vert(LVERTEX *vert, u_int8_t *color)
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
 {
 	int group;
+
+	/* Per-execbuf atlas seed — hash of the renderObject pointer.
+	 * Stable for the lifetime of the level, distinct per execbuf, so
+	 * walls in different execbufs sharing the same base texture each
+	 * land in their own ProcTex phase bucket. */
+	s_atlasSeed = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
 
 	/* Single-pass stereo: on the first draw call of the second eye,
 	 * replay the entire display list with the updated view matrix
