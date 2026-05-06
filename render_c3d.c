@@ -1212,9 +1212,18 @@ void c3d_upload_xlights(void)
 			((XLIGHT*)L)->Pos.z,
 			invSizeSq);
 
-		float r = ((XLIGHT*)L)->r / 255.0f;
-		float g = ((XLIGHT*)L)->g / 255.0f;
-		float b = ((XLIGHT*)L)->b / 255.0f;
+		/* Dynamic-light scale: per-light max contribution is capped to
+		 * this fraction of the raw color so that 8 close-range XLights
+		 * (rocket volley + explosion sprites all in frame) summed and
+		 * added to the baked vertex color don't push every channel to
+		 * saturation. Combined with the shader's quadratic falloff,
+		 * 8 × 0.4 = 3.2 max additive contribution — still saturates
+		 * close to a dense cluster, but fades cleanly into the baked
+		 * color across the rest of the room. */
+		const float kDynScale = 0.4f;
+		float r = ((XLIGHT*)L)->r * (kDynScale / 255.0f);
+		float g = ((XLIGHT*)L)->g * (kDynScale / 255.0f);
+		float b = ((XLIGHT*)L)->b * (kDynScale / 255.0f);
 		float type = (((XLIGHT*)L)->Type == SPOT_LIGHT) ? 1.0f : 0.0f;
 		lights_buf[n_packed * 3 + 1] = FVec4_New(r, g, b, type);
 
