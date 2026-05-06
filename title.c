@@ -1735,6 +1735,16 @@ MENU	MENU_NEW_VisualsStereo = {
  * eye-sep / stereo-state to the HUD for diagnosing slider behavior. Saved
  * to config as ShowStereoDebug. */
 extern bool g_show_stereo_debug;
+
+/* Declared in render_c3d.c. Toggle the new graphics features:
+ *   g_object_shine — Phong specular highlight on enemy / pickup / crate
+ *                    surfaces. Free if disabled (skips fragment-lighting
+ *                    binding + extra TexEnv stage).
+ *   g_wall_detail  — ADD_SIGNED detail-map modulation on wall textures
+ *                    that ship with a sibling <name>_d.t3x file.
+ * Saved as ObjectShine / WallDetail in Configs/main.txt. */
+extern bool g_object_shine;
+extern bool g_wall_detail;
 #endif
 
 MENU	MENU_NEW_Visuals = {
@@ -1749,15 +1759,24 @@ MENU	MENU_NEW_Visuals = {
 		{ 20, 112, 150, 112, 0,					"Vertical Sync (requires restart)",			FONT_Small, TEXTFLAG_CentreY,	&render_info.vsync,	NewMenuSelectMode,	SelectFlatMenuToggle, DrawFlatMenuToggle,		NULL, 0 },
 		{ 20, 124, 200, 124, 0,					"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	NULL, 0 },
 		{ 20, 136, 150, 136, 0,					"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
-#if defined(__3DS__) && defined(RENDERER_C3D)
-		{ 20, 148, 150, 148, 0,					"Show stereo debug",							FONT_Small, TEXTFLAG_CentreY,		&g_show_stereo_debug,	NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
 		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
-#else
-		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
-#endif
 		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
+
+#if defined(__3DS__) && defined(RENDERER_C3D)
+MENU	MENU_NEW_3DS_Visuals = {
+	"", NULL, NULL, NULL, TITLE_TIMER_Visuals,
+	{
+		{  0,   0, 200,  20, 0, "3DS Visual Settings",	FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 },
+		{ 20,  40, 150,  40, 0, "Object shine",			FONT_Small, TEXTFLAG_CentreY, &g_object_shine,      NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20,  56, 150,  56, 0, "Wall detail",			FONT_Small, TEXTFLAG_CentreY, &g_wall_detail,       NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20,  72, 150,  72, 0, "Show stereo debug",	FONT_Small, TEXTFLAG_CentreY, &g_show_stereo_debug, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20, 100, 100, 100, 0, "back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
+		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+	}
+};
+#endif
 
 MENU	MENU_NEW_JoinWaitingToStart = {
 	"" , InitHostWaitingToStart, BailMultiplayerFrontEnd , UpdateSessions, TITLE_TIMER_PanToLeftVDU,
@@ -2246,7 +2265,11 @@ MENU	MENU_NEW_Options = {
 	{
 		{ 0, TITLE_MODEL_Disc1, 0, 0, 5,LT_MENU_NEW_Options0 /*"Options"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 		{ 0, TITLE_MODEL_Disc2, 0, 0, 8, LT_MENU_NEW_Options1 /*"Sound"*/, 0, 0, NULL, &MENU_NEW_Sound, MenuChange, NULL, NULL, 0 },
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, "3DS Visual Settings", 0, 0, NULL, &MENU_NEW_3DS_Visuals, MenuChange, NULL, NULL, 0 },
+#else
 		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, LT_MENU_NEW_Options2 /*"Visuals"*/, 0, 0, NULL, &MENU_NEW_Visuals, MenuChange, NULL, NULL, 0 },
+#endif
 		{ 0, TITLE_MODEL_Disc4, 0, 0, 2, LT_MENU_NEW_Options3 /*"back"*/, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
 		{ 0, TITLE_MODEL_Disc5, 0, 0, 2, "blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, "Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
@@ -2900,13 +2923,29 @@ MENU	MENU_Visuals = {
 	}
 };
 
+#if defined(__3DS__) && defined(RENDERER_C3D)
+MENU	MENU_3DS_Visuals = {
+	"3DS Visual Settings", NULL, NULL, NULL, 0,
+	{
+		{ 200, 128 + ( 0*16 ), 0, 0, 0, "Object shine",      0, 0, &g_object_shine,      NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 1*16 ), 0, 0, 0, "Wall detail",       0, 0, &g_wall_detail,       NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 2*16 ), 0, 0, 0, "Show stereo debug", 0, 0, &g_show_stereo_debug, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+	}
+};
+#endif
+
 extern bool ShowFrameRate;
 extern bool ShowInfo;
 
 MENU	MENU_Options = {
 	LT_MENU_Options0/*"Options"*/, NULL, (MenuFunc) SetGamePrefs, NULL, 0,
 	{
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		{ 200, 128, 0, 0, 0, "3DS Visual Settings",			0, 0, NULL,						&MENU_3DS_Visuals,		MenuChange,		MenuItemDrawName,	NULL, 0 },
+#else
 		{ 200, 128, 0, 0, 0, LT_MENU_Options1	/*"Visuals"*/,				0, 0, NULL,						&MENU_Visuals,			MenuChange,		MenuItemDrawName,	NULL, 0 },
+#endif
 		{ 200, 144, 0, 0, 0, LT_MENU_Options2	/*"Sound FX and Music"*/,	0, 0, NULL,						&MENU_NEW_InGameSound,	MenuChange,		MenuItemDrawName,	NULL, 0 },
 		{ 200, 160, 0, 0, 0, LT_MENU_Options3	/*"Detail Levels"*/,		0, 0, NULL,						&MENU_Detail,			MenuChange,		MenuItemDrawName,	NULL, 0 },
 		{ 200, 176, 0, 0, 0, LT_MENU_Options4	/*"Show Frame Rate "*/,		0, 0, &ShowFrameRate,	NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
@@ -3051,9 +3090,7 @@ MENU	MENU_InGameSingle = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , Exi
 #endif
 					  OLDMENUITEM( 200, 144, LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 160, LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
-#ifndef __3DS__
 					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
-#endif
 					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 #ifndef __3DS__
 					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
@@ -9468,6 +9505,8 @@ void GetGamePrefs( void )
 	/* ShowStereoDebug prints raw slider / eye-sep / state in the HUD +
 	 * writes sdmc:/forsaken_stereo.txt every ~1 s for remote diagnosis. */
 	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
+	g_object_shine      = config_get_bool( "ObjectShine",     true );
+	g_wall_detail       = config_get_bool( "WallDetail",      true );
 #endif
 
 	// Stereo options
@@ -9598,6 +9637,8 @@ void SetGamePrefs( void )
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	config_set_bool( "ShowStereoDebug", g_show_stereo_debug );
+	config_set_bool( "ObjectShine",     g_object_shine );
+	config_set_bool( "WallDetail",      g_wall_detail );
 #endif
 
 	config_save();

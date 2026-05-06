@@ -55,6 +55,32 @@ either platform.
   floor-snapped target), apex set from the authored `Pos.y` (above the
   pad), with a 30%-of-horizontal-distance fallback for KEX-authored
   decomp-to-1998 mapping.
+- **PICA200 fragment-lighting Phong shine on objects.** Per-vertex
+  tangent-frame quaternion built in the vshader from the world-space
+  pseudo-normal of each enemy / pickup / mine; the GPU's fragment-
+  lighting hardware computes a moving specular highlight per pixel via
+  a Phong-30 LUT. Costs ~0.1–0.5 ms/frame in busy combat scenes,
+  active only on small / curved / metallic surfaces. Doors and other
+  level-decoration BG objects (`Models[i].OwnerType == OWNER_BGOBJECT`)
+  are explicitly excluded across all three render paths (static MX,
+  animated MXA, and the translucent `TransExe` queue) so flat panels
+  don't get tacky-looking moving highlights.
+- **PICA200 ProcTex wall detail with per-material classes.** Three
+  preconfigured noise styles selected at level load by texture
+  filename: `MAT_METAL` (fine paint-grain, default), `MAT_ROCK`
+  (coarser pitted noise for thermal / lava chambers), `MAT_ORGANIC`
+  (softer green-tinted grain for biological surfaces). Per-texture
+  phase hash so same-class adjacent walls don't tile identically. Zero
+  VRAM cost (silicon-generated). Per-draw rebind cached by mode +
+  texture pointer to skip the GPU register pressure that would
+  otherwise produce a visible micro-stutter.
+- **In-game graphics toggles + persistence.** Pause → Options → Visuals
+  exposes "Object shine" and "Wall detail" toggles, persisted via
+  `Configs/main.txt` (keys `ObjectShine` / `WallDetail`). Each toggle
+  is a free fast-path when off — the renderer falls through to the
+  legacy diffuse-modulate path without binding the LightEnv or extra
+  TexEnv stages. Lets users on tighter OG-3DS frames buy back ~1-2 ms
+  by disabling the more expensive features.
 - **Visibility data baked offline.** Forsaken Remastered's KEX-engine cooker
   ships flat per-portal VISTREE + zeroed `IndirectVisibleGroup` for the 22
   Night-Dive-authored levels (KEX uses runtime portal-frustum culling, not

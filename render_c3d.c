@@ -86,6 +86,58 @@
 static DVLB_s          *s_shaderDVLB    = NULL;
 static shaderProgram_s  s_shaderProgram;
 static bool             s_shaderReady   = false;
+
+/* PICA200 ProcTex — procedural texture unit, used as a per-class
+ * detail-noise generator on wall draws. Free per-pixel modulation,
+ * zero VRAM cost. Three preconfigured classes capture the dominant
+ * material types in Forsaken's atlases:
+ *
+ *   MAT_METAL    — fine grit + brushed-metal scratches (default)
+ *   MAT_ROCK     — coarser pitted noise for thermal / lava chambers
+ *   MAT_ORGANIC  — softer grain for biological surfaces
+ *
+ * Each class has its own C3D_ProcTex (noise coefs + filter + clamp)
+ * and C3D_ProcTexColorLut (tonal palette). Per-draw apply_texenv binds
+ * the matching pair. Shared LUTs (noise smoothstep, RGBmap) bound
+ * once at init.
+ *
+ * Replaces the per-texture _d.t3x detail-map pipeline — Forsaken's
+ * painted source art has no high-frequency content to extract, so
+ * derived detail maps were imperceptible. Synthesized noise is more
+ * visible, identical RAM footprint on OG and N3DS, no asset pipeline. */
+typedef enum {
+	MAT_METAL    = 0,
+	MAT_ROCK,
+	MAT_ORGANIC,
+	MAT_COUNT
+} material_class_t;
+
+static C3D_ProcTex          s_wallProcTex[MAT_COUNT];
+static C3D_ProcTexColorLut  s_wallProcColor[MAT_COUNT];
+static C3D_ProcTexLut       s_wallProcNoise;   /* shared smoothstep */
+static C3D_ProcTexLut       s_wallProcMap;     /* shared RGB map */
+static bool                 s_procTexReady = false;
+static bool                 s_objProcTexOn = false;  /* per-draw toggle */
+
+/* PICA200 fragment-lighting for object Phong shading. Vshader outputs
+ * a pseudo-normal-derived quaternion (outnq) per vertex; the hardware
+ * uses it + the bound light env to compute FRAGMENT_PRIMARY_COLOR
+ * (diffuse) and FRAGMENT_SECONDARY_COLOR (specular). The OBJECT
+ * TexEnv mode reads SECONDARY for the moving shine highlight. */
+static C3D_LightEnv  s_objLightEnv;
+static C3D_Light     s_objLight;
+static C3D_LightLut  s_objLightLut;
+static bool          s_objLightReady = false;
+
+/* User-toggleable graphics features (persisted via title.c's config_*).
+ * Renderer reads these per-draw to decide whether to apply Phong shine
+ * and detail-map ADD. Both default true; the detail map is now
+ * grey-centred (high-pass via -compose mathematics) so ADD_SIGNED
+ * contributes signed-symmetric per-pixel modulation rather than
+ * brightening-only. */
+bool g_object_shine = true;
+bool g_wall_detail  = true;
+
 static C3D_RenderTarget *s_targetLeft    = NULL;
 static C3D_RenderTarget *s_targetRight   = NULL;
 static C3D_RenderTarget *s_targetBottom  = NULL;  /* mono 320×240 for HUD */
@@ -165,15 +217,64 @@ gl_caps_t caps;
 
 /* Forward declarations */
 static void upload_matrices(void);
+typedef struct texture_s texture_t;
+static void apply_texenv_for_texture(struct texture_s *texdata);
+static void apply_texenv_untextured(void);
+
+/* Pick a material class from the source texture filename. Forsaken's
+ * atlas naming is consistent enough for prefix matching: thermal /
+ * lava / nuclear chambers all use therm/nuke/lava/fire prefixes;
+ * biological surfaces (Foetoid, the Flesh Morph, bio-organic walls)
+ * use bio/foe/flsh; everything else is industrial-metal. Path can be
+ * NULL in fallback paths — returns MAT_METAL. */
+static u8 classify_texture(const char *path)
+{
+	const char *base;
+	if (!path) return MAT_METAL;
+	base = path;
+	for (const char *p = path; *p; p++)
+		if (*p == '/' || *p == '\\') base = p + 1;
+	if (strstr(base, "therm") || strstr(base, "nuke") ||
+	    strstr(base, "lava")  || strstr(base, "fire") ||
+	    strstr(base, "rock")  || strstr(base, "stone"))
+		return MAT_ROCK;
+	if (strstr(base, "bio")   || strstr(base, "foe")  ||
+	    strstr(base, "flsh")  || strstr(base, "guts"))
+		return MAT_ORGANIC;
+	return MAT_METAL;
+}
+
+/* Deterministic phase offset derived from the texture path. Two
+ * different textures of the same material class get distinct noise
+ * tile positions; the same texture always gets the same phase across
+ * level loads (no flicker on respawn). FNV-1a 32-bit, scaled into
+ * [0,1) for the ProcTex phase argument. */
+static float proctex_phase_from_path(const char *path)
+{
+	u32 h = 0x811C9DC5u;
+	if (path)
+		for (const char *p = path; *p; p++)
+			h = (h ^ (u8)*p) * 0x01000193u;
+	return (float)(h & 0xFFFFu) / 65536.0f;
+}
 
 MATRIX proj_matrix;
 MATRIX view_matrix;
 MATRIX world_matrix;
 
-/* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*) */
-typedef struct {
+/* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*).
+ * material_class is set at load time by classify_texture() based on
+ * the source filename; consumed by configure_texenv_aux to pick which
+ * ProcTex preset to bind. proctex_phase is a deterministic hash of
+ * the texture path that's used as the noise phase offset, so two
+ * walls of the same material class don't share the same noise tile
+ * position — but each individual texture's pattern is identical from
+ * one level load to the next (deterministic, no flicker on respawn). */
+typedef struct texture_s {
 	C3D_Tex tex;
 	bool    initialized;
+	u8      material_class;
+	float   proctex_phase;
 } texture_t;
 
 /* Debug trace to SD card. Truncate once on first call per process so
@@ -203,6 +304,47 @@ static bool s_inFrame = false;
  * draws use the same texture or same untextured mode. */
 static void *s_lastBoundTexture = NULL;  /* last texture_t* passed to C3D_TexBind */
 static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs vertex-only */
+
+/* Per-execbuf ProcTex phase variation. draw_render_object writes a
+ * per-renderObject seed; apply_texenv_for_texture reads it to pick a
+ * phase bucket so two adjacent walls sharing the same base texture
+ * get visually distinct grain. Folded into g_wall_detail — there's no
+ * scenario where you'd want detail-grain on but the repeating version. */
+static u32  s_atlasSeed        = 0;
+static int  s_lastMatClass     = -1;
+static int  s_lastPhaseBucket  = -1;
+#define ATLAS_PHASE_BUCKETS    16
+
+/* Phase 4 of wall-normal-detail-mapping: track the last TexEnv mode
+ * so we can re-init when transitioning between single-stage (legacy
+ * MODULATE) and multi-stage (aux normal/detail) draws. */
+typedef enum {
+	TEXENV_MODE_NONE = 0,    /* untextured / vertex-only */
+	TEXENV_MODE_DIFFUSE,     /* single-stage diffuse * vertex */
+	TEXENV_MODE_AUX,         /* wall: diffuse + ADD_SIGNED detail */
+	TEXENV_MODE_OBJECT,      /* model: diffuse * vertex * proctex grain */
+} texenv_mode_t;
+static texenv_mode_t s_lastTexEnvMode = TEXENV_MODE_NONE;
+
+/* Toggle: enable Phong-shine path for the next textured draw. Set by
+ * mxload.c / mxaload.c around their draw_object calls so model + enemy
+ * meshes get the specular highlight. (Name preserved for ABI; misnomer
+ * since proctex was retired.) */
+void c3d_set_object_proctex(bool enable)
+{
+	s_objProcTexOn = enable;
+}
+
+/* Per-call eligibility gate for the OBJECT shine path. Defaults true
+ * (every object draw gets shine). Set false by callers that want to
+ * suppress shine for a specific model — currently used by models.c
+ * for OWNER_BGOBJECT models (doors, vents, animated decorations)
+ * where Phong specular reads as tacky on the large flat surfaces. */
+static bool s_objShineEligible = true;
+void c3d_set_object_shine_eligible(bool enable)
+{
+	s_objShineEligible = enable;
+}
 
 
 /* picaGL is NOT linked for the citro3d renderer. We provide our own
@@ -503,35 +645,29 @@ static void replay_display_list(void)
 			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 		}
 
-		/* Texture binding — cached within replay */
+		/* Texture binding — apply_texenv_* uses the global TexEnv mode
+		 * cache (s_lastTexEnvMode), so the dl_lastTex local cache is
+		 * redundant once the helpers are in. Caller invalidates
+		 * s_lastTexEnvMode at replay start so the first draw re-binds. */
 		if (e->has_texture && e->texture)
 		{
 			texture_t *texdata = (texture_t*)e->texture;
 			if (texdata->initialized)
 			{
-				if ((void*)texdata != dl_lastTex || !dl_lastTextured)
-				{
-					C3D_TexBind(0, &texdata->tex);
-					C3D_TexEnv *env = C3D_GetTexEnv(0);
-					C3D_TexEnvInit(env);
-					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-					dl_lastTex = (void*)texdata;
-					dl_lastTextured = true;
-				}
-				else
-					C3D_TexBind(0, &texdata->tex);
+				apply_texenv_for_texture(texdata);
+				dl_lastTex = (void*)texdata;
+				dl_lastTextured = true;
 			}
 			else if (dl_lastTextured)
-				goto dl_notex;
+			{
+				apply_texenv_untextured();
+				dl_lastTex = NULL;
+				dl_lastTextured = false;
+			}
 		}
 		else if (dl_lastTextured)
 		{
-		dl_notex:;
-			C3D_TexEnv *env = C3D_GetTexEnv(0);
-			C3D_TexEnvInit(env);
-			C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-			C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+			apply_texenv_untextured();
 			dl_lastTex = NULL;
 			dl_lastTextured = false;
 		}
@@ -701,6 +837,146 @@ bool c3d_renderer_init(void)
 	s_loc_ambient     = UNIFORM_AMBIENT;
 	s_loc_light_count = UNIFORM_LIGHT_COUNT;
 	s_loc_lights      = UNIFORM_LIGHTS;
+
+	if (!s_procTexReady)
+	{
+		/* Shared LUTs — noise smoothstep + RGB map. Both are linear
+		 * identity ramps; per-class character comes from the noise
+		 * coefficients and the color palette LUT, not these. Bound
+		 * once at init; PICA200 keeps them globally until rebound. */
+		{
+			float ramp[129];
+			int i;
+			for (i = 0; i <= 128; i++)
+				ramp[i] = (float)i / 128.0f;
+			ProcTexLut_FromArray(&s_wallProcNoise, ramp);
+			C3D_ProcTexLutBind(GPU_LUT_NOISE, &s_wallProcNoise);
+			ProcTexLut_FromArray(&s_wallProcMap, ramp);
+			C3D_ProcTexLutBind(GPU_LUT_RGBMAP, &s_wallProcMap);
+		}
+
+		/* Per-class noise coefs + color LUT. Color LUT uses 2 stops:
+		 * dark stop at the low-noise end, light stop at the high-noise
+		 * end. Both straddle grey 0.5 so ADD_SIGNED contributes signed
+		 * symmetric per-pixel modulation. */
+
+		/* The diffuse texture stays the dominant signal; ProcTex is a
+		 * faint per-class accent that gives each material kind a hint
+		 * of unique surface character. All three classes use the same
+		 * narrow tonal band centred slightly below grey 0.5 so the
+		 * ADD_SIGNED contribution biases toward a subtle darkening
+		 * (reads as grime / wear, not as wash-out). Class differences
+		 * are driven by noise frequency (pattern scale) and palette
+		 * tint, both kept gentle. Magnitudes:
+		 *   palette 0x70..0x82 = 0.439..0.510 → ADD_SIGNED: -6%..+1%
+		 *   palette 0x70..0x8C = 0.439..0.549 → ADD_SIGNED: -6%..+5%
+		 * (Ranges asymmetric on purpose — slightly more dark stops
+		 * than bright, leaning the look toward "lived-in".) */
+
+		/* All three classes use GPU_PT_RGB combiner — looks up the
+		 * color LUT independently on U and V noise channels rather
+		 * than via the radial sqrt(U²+V²) metric, which previously
+		 * produced visible elliptical / oval blob artifacts at low
+		 * frequency. RGB combiner gives uniform per-pixel speckle.
+		 * Frequencies bumped to 8-12 cycles per UV face so noise is
+		 * fine grain, not big blobs. NoiseCoefs phase is rewritten
+		 * per draw with the texture's hash so two walls of the same
+		 * material class get distinct pattern positions.
+		 *
+		 * Palettes still narrow (ADD_SIGNED contribution ~+/-5%) and
+		 * biased slightly below grey 0.5 so noise reads as wear/
+		 * grime, not wash-out. Diffuse stays the dominant signal. */
+
+		/* MAT_METAL — fine paint-grain / micro-scratches. */
+		C3D_ProcTexInit(&s_wallProcTex[MAT_METAL], 0, 2);
+		C3D_ProcTexClamp(&s_wallProcTex[MAT_METAL],
+		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_METAL],
+		                      C3D_ProcTex_UV, 0.20f, 12.0f, 0.0f);
+		C3D_ProcTexCombiner(&s_wallProcTex[MAT_METAL], false,
+		                    GPU_PT_ADD, GPU_PT_ADD);
+		C3D_ProcTexFilter(&s_wallProcTex[MAT_METAL], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_METAL], true);
+		{
+			u32 colors[2] = { 0xFF707070u, 0xFF828282u };
+			ProcTexColorLut_Write(&s_wallProcColor[MAT_METAL],
+			                      colors, 0, 2);
+		}
+
+		/* MAT_ROCK — coarser pitted speckle, warm tint. */
+		C3D_ProcTexInit(&s_wallProcTex[MAT_ROCK], 0, 2);
+		C3D_ProcTexClamp(&s_wallProcTex[MAT_ROCK],
+		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ROCK],
+		                      C3D_ProcTex_UV, 0.30f, 8.0f, 0.0f);
+		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ROCK], false,
+		                    GPU_PT_ADD, GPU_PT_ADD);
+		C3D_ProcTexFilter(&s_wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ROCK], true);
+		{
+			u32 colors[2] = { 0xFF6C7078u, 0xFF8C8888u };
+			ProcTexColorLut_Write(&s_wallProcColor[MAT_ROCK],
+			                      colors, 0, 2);
+		}
+
+		/* MAT_ORGANIC — mid-frequency, faint green tint. */
+		C3D_ProcTexInit(&s_wallProcTex[MAT_ORGANIC], 0, 2);
+		C3D_ProcTexClamp(&s_wallProcTex[MAT_ORGANIC],
+		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ORGANIC],
+		                      C3D_ProcTex_UV, 0.25f, 10.0f, 0.0f);
+		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ORGANIC], false,
+		                    GPU_PT_ADD, GPU_PT_ADD);
+		C3D_ProcTexFilter(&s_wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
+		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ORGANIC], true);
+		{
+			u32 colors[2] = { 0xFF707470u, 0xFF828680u };
+			ProcTexColorLut_Write(&s_wallProcColor[MAT_ORGANIC],
+			                      colors, 0, 2);
+		}
+
+		s_procTexReady = true;
+		c3d_trace("c3d_renderer_init: wall ProcTex (3 classes) initialised");
+	}
+
+	if (!s_objLightReady)
+	{
+		C3D_LightEnvInit(&s_objLightEnv);
+
+		/* Phong-30 LUT — tight specular highlight so the shine reads
+		 * as a moving spot rather than a broad glow. */
+		LightLut_Phong(&s_objLightLut, 30.0f);
+		C3D_LightEnvLut(&s_objLightEnv, GPU_LUT_D0, GPU_LUTINPUT_LN,
+		                false, &s_objLightLut);
+
+		/* Material — strong specular, modest diffuse. We don't sample
+		 * FRAGMENT_PRIMARY_COLOR (diffuse stays in the legacy TEX0 ×
+		 * PRIMARY path), only FRAGMENT_SECONDARY_COLOR (specular). */
+		{
+			static const C3D_Material s_objMaterial = {
+				{ 0.0f, 0.0f, 0.0f },  /* ambient — unused */
+				{ 0.0f, 0.0f, 0.0f },  /* diffuse — unused */
+				{ 0.6f, 0.6f, 0.6f },  /* specular0 — moving shine */
+				{ 0.0f, 0.0f, 0.0f },  /* specular1 */
+				{ 0.0f, 0.0f, 0.0f },  /* emission */
+			};
+			C3D_LightEnvMaterial(&s_objLightEnv, &s_objMaterial);
+		}
+
+		C3D_LightInit(&s_objLight, &s_objLightEnv);
+		C3D_LightColor(&s_objLight, 1.0f, 1.0f, 1.0f);
+
+		/* Positional light far up + forward — same convention as the
+		 * earlier wall light. Distance falloff is dot-based via the
+		 * LUT, not range-based, so absolute coords don't matter much. */
+		{
+			C3D_FVec pos = FVec4_New(500.0f, 500.0f, 200.0f, 1.0f);
+			C3D_LightPosition(&s_objLight, &pos);
+		}
+
+		s_objLightReady = true;
+		c3d_trace("c3d_renderer_init: object Phong LightEnv initialised");
+	}
 
 	s_shaderReady = true;
 	c3d_trace("c3d_renderer_init: OK — shader ready, render targets created");
@@ -1091,6 +1367,9 @@ bool FSBeginScene(void)
 		/* Reset TexEnv cache — force first draw to set up GPU state */
 		s_lastBoundTexture = NULL;
 		s_lastTexEnvTextured = false;
+		s_lastTexEnvMode = TEXENV_MODE_NONE;
+		s_lastMatClass = -1;
+		s_lastPhaseBucket = -1;
 
 		/* Initialize modelView uniform (register 4) to identity.
 		 * upload_matrices writes combined MVP to register 0 (projection),
@@ -1495,6 +1774,222 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject)
 }
 
 /*===================================================================
+	TexEnv combiner pipeline.
+
+	Three modes the renderer can put the GPU into per draw:
+
+	  TEXENV_MODE_NONE     — untextured (HUD vertex-color paths).
+	  TEXENV_MODE_DIFFUSE  — single-stage modulate: TEX0 × PRIMARY_COLOR.
+	                         Used for every textured draw without a
+	                         detail map.
+	  TEXENV_MODE_AUX      — two stages: TEX0 × PRIMARY (legacy diffuse)
+	                         then ADD_SIGNED TEX1 (high-pass detail map
+	                         centred on grey). Detail brightens raised
+	                         midfreq features, darkens the rest, giving
+	                         close-range surface texture without the
+	                         multiply-induced wash-out a modulate would.
+
+	Cached per-mode + per-texdata pointer so identical adjacent draws
+	skip GPU state changes.
+===================================================================*/
+
+static void configure_texenv_diffuse(void)
+{
+	/* Stage 0: TEXTURE0 * PRIMARY_COLOR (vertex color carries baked
+	 * lighting + per-vertex GPU light contribution). Stages 1+2
+	 * always reset — across-frame state could otherwise leak the
+	 * prior frame's AUX/OBJECT stage config since lastTexEnvMode
+	 * resets to NONE at frame start (not OBJECT/AUX), so a
+	 * conditional reset wouldn't fire. */
+	C3D_TexEnv *env = C3D_GetTexEnv(0);
+	C3D_TexEnvInit(env);
+	C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR,
+	              GPU_PRIMARY_COLOR);
+	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+
+	C3D_TexEnvInit(C3D_GetTexEnv(1));
+	C3D_TexEnvInit(C3D_GetTexEnv(2));
+}
+
+static void configure_texenv_none(void)
+{
+	C3D_TexEnv *env = C3D_GetTexEnv(0);
+	C3D_TexEnvInit(env);
+	C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR,
+	              GPU_PRIMARY_COLOR);
+	C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
+
+	C3D_TexEnvInit(C3D_GetTexEnv(1));
+	C3D_TexEnvInit(C3D_GetTexEnv(2));
+}
+
+static void configure_texenv_aux(texture_t *texdata)
+{
+	/* Wall detail via ProcTex unit. Stage 0 is the legacy diffuse-
+	 * modulate path so walls keep proper color + baked lighting;
+	 * stage 1 ADD_SIGNEDs the procedural noise (TEXTURE3 = proctex
+	 * output). The proctex configuration was selected per material
+	 * class by the caller binding s_wallProcTex[texdata->material_class].
+	 * Alpha REPLACE preserves stage 0's alpha so colour-keyed
+	 * transparent textures still work. */
+	{
+		C3D_TexEnv *env = C3D_GetTexEnv(0);
+		C3D_TexEnvInit(env);
+		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR,
+		              GPU_PRIMARY_COLOR);
+		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+	}
+
+	{
+		C3D_TexEnv *env = C3D_GetTexEnv(1);
+		C3D_TexEnvInit(env);
+		C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_TEXTURE3,
+		              GPU_PRIMARY_COLOR);
+		C3D_TexEnvFunc(env, C3D_RGB,   GPU_ADD_SIGNED);
+		C3D_TexEnvFunc(env, C3D_Alpha, GPU_REPLACE);
+	}
+	(void)texdata;
+}
+
+static void configure_texenv_object(void)
+{
+	/* Bind the object Phong light env so fragment-lighting hardware
+	 * computes FRAGMENT_SECONDARY_COLOR (specular highlight) using
+	 * the per-vertex outnq quat from the vshader. */
+	C3D_LightEnvBind(&s_objLightEnv);
+
+	/* Stage 0: legacy TEX0 × PRIMARY — proper model color + baked
+	 * lighting + GPU vertex-light contribution preserved. */
+	{
+		C3D_TexEnv *env = C3D_GetTexEnv(0);
+		C3D_TexEnvInit(env);
+		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR,
+		              GPU_PRIMARY_COLOR);
+		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
+	}
+
+	/* Stage 1: + FRAGMENT_SECONDARY_COLOR (Phong specular). The
+	 * hardware computes this from the per-vertex normal-quat × the
+	 * scene light × the material specular coefficient. Adds a moving
+	 * highlight as the camera angle changes. */
+	{
+		C3D_TexEnv *env = C3D_GetTexEnv(1);
+		C3D_TexEnvInit(env);
+		C3D_TexEnvSrc(env, C3D_RGB, GPU_PREVIOUS,
+		              GPU_FRAGMENT_SECONDARY_COLOR, 0);
+		C3D_TexEnvFunc(env, C3D_RGB, GPU_ADD);
+	}
+
+	/* Stage 2: ADD_SIGNED proctex grain on top — chromatic micro-noise
+	 * that breaks up flat surface tones. Uncommenting this layers the
+	 * proctex grain over the Phong-shaded surface. Disabled now
+	 * because the visual budget is being spent on shine; re-enable
+	 * later if the model surfaces still look flat in shadowed areas. */
+	C3D_TexEnvInit(C3D_GetTexEnv(2));
+}
+
+/* Apply the right TexEnv mode for a textured draw, given the bound
+ * texture handle. Caches by mode + texdata pointer to skip redundant
+ * GPU state changes within a batch. Returns true if the texture was
+ * (re)bound — caller can use this to know whether to invalidate other
+ * cached state if needed (currently no callers care). */
+static void apply_texenv_for_texture(texture_t *texdata)
+{
+	/* OBJECT (Phong shine on enemies / pickups) takes precedence over
+	 * AUX (wall ProcTex grain) — the same texture would never want
+	 * both, but the object toggle wraps narrow draw_object call sites
+	 * while AUX is the fall-through path for level-mesh draws. */
+	texenv_mode_t mode;
+	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
+	    s_objShineEligible)
+		mode = TEXENV_MODE_OBJECT;
+	else if (s_procTexReady && g_wall_detail)
+		mode = TEXENV_MODE_AUX;
+	else
+		mode = TEXENV_MODE_DIFFUSE;
+
+	C3D_TexBind(0, &texdata->tex);
+
+	/* Compute desired ProcTex state up front so the cache key includes
+	 * the per-execbuf atlas bucket. Two adjacent execbufs sharing the
+	 * same texture but different atlas seeds will land in different
+	 * buckets and force a (cheap) NoiseCoefs rewrite — the color LUT
+	 * stays cached across the bucket change. */
+	material_class_t desired_mc = MAT_METAL;
+	int desired_bucket = -1;
+	if (mode == TEXENV_MODE_AUX)
+	{
+		desired_mc = (material_class_t)texdata->material_class;
+		if ((unsigned)desired_mc >= MAT_COUNT) desired_mc = MAT_METAL;
+		float seed_phase =
+		    ((s_atlasSeed >> 8) & 0xFFFF) * (1.0f / 65536.0f);
+		float combined = texdata->proctex_phase + seed_phase;
+		combined -= floorf(combined);
+		desired_bucket = (int)(combined * (float)ATLAS_PHASE_BUCKETS);
+		if (desired_bucket >= ATLAS_PHASE_BUCKETS)
+			desired_bucket = ATLAS_PHASE_BUCKETS - 1;
+	}
+
+	bool mode_changed = (mode != s_lastTexEnvMode) || !s_lastTexEnvTextured;
+	bool aux_state_changed = (mode == TEXENV_MODE_AUX) &&
+	    (desired_bucket != s_lastPhaseBucket ||
+	     (int)desired_mc != s_lastMatClass);
+
+	/* Cache check — same mode + same texture + (for AUX) same atlas
+	 * bucket means no GPU state change needed. */
+	if (!mode_changed && !aux_state_changed &&
+	    s_lastBoundTexture == (void*)texdata)
+		return;
+
+	if (mode == TEXENV_MODE_AUX && (mode_changed || aux_state_changed))
+	{
+		/* Cheap path when only the bucket changed: rewrite NoiseCoefs +
+		 * ProcTexBind. The color LUT (256 entries) stays cached unless
+		 * the material class changed. */
+		material_class_t mc = desired_mc;
+		float freq = (mc == MAT_ROCK)    ?  8.0f
+		           : (mc == MAT_ORGANIC) ? 10.0f
+		                                 : 12.0f;
+		float amp  = (mc == MAT_ROCK)    ? 0.30f
+		           : (mc == MAT_ORGANIC) ? 0.25f
+		                                 : 0.20f;
+		float phase = ((float)desired_bucket + 0.5f)
+		            * (1.0f / (float)ATLAS_PHASE_BUCKETS);
+		C3D_ProcTexNoiseCoefs(&s_wallProcTex[mc],
+		    C3D_ProcTex_UV, amp, freq, phase);
+		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
+		if (mode_changed || (int)mc != s_lastMatClass)
+			C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
+		s_lastMatClass    = (int)mc;
+		s_lastPhaseBucket = desired_bucket;
+	}
+
+	if (mode_changed)
+	{
+		if (mode == TEXENV_MODE_AUX)
+			configure_texenv_aux(texdata);
+		else if (mode == TEXENV_MODE_OBJECT)
+			configure_texenv_object();
+		else
+			configure_texenv_diffuse();
+	}
+
+	s_lastTexEnvMode      = mode;
+	s_lastBoundTexture    = (void*)texdata;
+	s_lastTexEnvTextured  = true;
+}
+
+static void apply_texenv_untextured(void)
+{
+	if (s_lastTexEnvMode == TEXENV_MODE_NONE && !s_lastTexEnvTextured)
+		return;
+	configure_texenv_none();
+	s_lastTexEnvMode     = TEXENV_MODE_NONE;
+	s_lastBoundTexture   = NULL;
+	s_lastTexEnvTextured = false;
+}
+
+/*===================================================================
 	Texture management
 ===================================================================*/
 
@@ -1644,13 +2139,16 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	 * ETC1A4 carries real per-pixel alpha for sprites/grates. */
 	*colorkey = (texdata->tex.fmt == GPU_ETC1A4);
 
-	texdata->initialized = true;
+	texdata->initialized   = true;
+	texdata->material_class = classify_texture(path);
+	texdata->proctex_phase  = proctex_phase_from_path(path);
 	*t = (LPTEXTURE)texdata;
 
 	Tex3DS_TextureFree(t3x);
 
-	DebugPrintf("HD texture: loaded %s (%dx%d)\n",
-		hd_path, texdata->tex.width, texdata->tex.height);
+	DebugPrintf("HD texture: loaded %s (%dx%d) class=%u\n",
+		hd_path, texdata->tex.width, texdata->tex.height,
+		(unsigned)texdata->material_class);
 	return true;
 }
 
@@ -1776,7 +2274,9 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
 		C3D_TexSetWrap(&texdata->tex, GPU_REPEAT, GPU_REPEAT);
 
-		texdata->initialized = true;
+		texdata->initialized   = true;
+		texdata->material_class = classify_texture(path);
+	texdata->proctex_phase  = proctex_phase_from_path(path);
 		*t = (LPTEXTURE)texdata;
 	}
 
@@ -2035,6 +2535,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 {
 	int group;
 
+	/* Per-execbuf atlas seed — hash of the renderObject pointer.
+	 * Stable for the lifetime of the level, distinct per execbuf, so
+	 * walls in different execbufs sharing the same base texture each
+	 * land in their own ProcTex phase bucket. */
+	s_atlasSeed = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
+
 	/* Single-pass stereo: on the first draw call of the second eye,
 	 * replay the entire display list with the updated view matrix
 	 * (the engine has now set up the right eye camera).  Then skip
@@ -2188,6 +2694,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				}
 				s_lastBoundTexture = NULL;
 				s_lastTexEnvTextured = false;
+				s_lastTexEnvMode = TEXENV_MODE_NONE;
 				if (!orthographic)
 					upload_matrices();
 				else
@@ -2233,7 +2740,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
 				for (i = 0; i < numIndices; i++)
 				{
-					LVERTEX *v = &verts[startVert + indices[i]];
+					int vi = startVert + indices[i];
+					LVERTEX *v = &verts[vi];
 					dst[i].pos[0] = v->x;
 					dst[i].pos[1] = v->y;
 					dst[i].pos[2] = v->z;
@@ -2254,7 +2762,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			if (s_scratchUsed + numVerts > s_scratchMax) continue;
 			for (i = 0; i < numVerts; i++)
 			{
-				LVERTEX *v = &verts[startVert + i];
+				int vi = startVert + i;
+				LVERTEX *v = &verts[vi];
 				dst[i].pos[0] = v->x;
 				dst[i].pos[1] = v->y;
 				dst[i].pos[2] = v->z;
@@ -2301,34 +2810,13 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
 					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
 
-			/* Texture binding with TexEnv cache */
+			/* Texture binding with TexEnv cache. apply_texenv_*
+			 * picks single-stage diffuse vs two-stage detail-add
+			 * based on the texture's material_class. */
 			if (eff_hasTexture)
-			{
-				texture_t *texdata = (texture_t*)tg->texture;
-				if ((void*)texdata != s_lastBoundTexture || !s_lastTexEnvTextured)
-				{
-					C3D_TexBind(0, &texdata->tex);
-					C3D_TexEnv *env = C3D_GetTexEnv(0);
-					C3D_TexEnvInit(env);
-					C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-					C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
-					s_lastBoundTexture = (void*)texdata;
-					s_lastTexEnvTextured = true;
-				}
-				else
-				{
-					C3D_TexBind(0, &texdata->tex);
-				}
-			}
-			else if (s_lastTexEnvTextured)
-			{
-				C3D_TexEnv *env = C3D_GetTexEnv(0);
-				C3D_TexEnvInit(env);
-				C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR);
-				C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
-				s_lastBoundTexture = NULL;
-				s_lastTexEnvTextured = false;
-			}
+				apply_texenv_for_texture((texture_t*)tg->texture);
+			else
+				apply_texenv_untextured();
 		}
 
 		/* Accumulate into current batch */
