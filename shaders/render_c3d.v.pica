@@ -126,8 +126,13 @@
 	; r5.x = falloff² — quadratic, so distant walls fade fast and only
 	; the wall the rocket is right next to picks up the colour. Avoids
 	; the whole-room over-saturation when 4+ rockets overlap.
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	; r3.xyz += light_color × falloff² (broadcast .x to all channels)
 	mul r6.xyz, lights[1], r5.xxxx
 	add r3.xyz, r6, r3
@@ -138,8 +143,13 @@
 	mul r5.x, lights[3].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	mul r6.xyz, lights[4], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -149,8 +159,13 @@
 	mul r5.x, lights[6].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	mul r6.xyz, lights[7], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -160,8 +175,13 @@
 	mul r5.x, lights[9].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	mul r6.xyz, lights[10], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -171,8 +191,13 @@
 	mul r5.x, lights[12].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	mul r6.xyz, lights[13], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -182,8 +207,13 @@
 	mul r5.x, lights[15].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	mul r6.xyz, lights[16], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -193,8 +223,13 @@
 	mul r5.x, lights[18].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	mul r6.xyz, lights[19], r5.xxxx
 	add r3.xyz, r6, r3
 
@@ -204,8 +239,13 @@
 	mul r5.x, lights[21].wwww, r5
 	add r5.x, ones, -r5
 	max r5.x, zeros, r5
-	mul r5.x, r5, r5
-	mul r5.x, r5, r5
+	; Linear falloff to match lights.c::XLight1Group exactly:
+	;   attenuation = 1 - dist²/Size²  (already in r5.x from above)
+	; CPU spatial culling (GroupsAreVisible / bbox / per-cell) is what
+	; keeps the CPU path from over-saturating; GPU falloff is identical
+	; math, but GPU lacks those filters so a cross-room light still
+	; reaches every visible vertex within Size. The c3d_upload_xlights
+	; group-visibility filter is what closes that gap.
 	mul r6.xyz, lights[22], r5.xxxx
 	add r3.xyz, r6, r3
 
