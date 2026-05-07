@@ -1175,6 +1175,14 @@ void c3d_upload_xlights(void)
 	struct XLIGHT *top[GPU_MAX_LIGHTS];
 	float          top_d2[GPU_MAX_LIGHTS];
 	int            n_top = 0;
+
+	/* Phong-tint tracking: the nearest XLight whose Size sphere actually
+	 * reaches the camera position. Drives s_objLight's color so enemy
+	 * specular highlights pick up the dominant nearby light's hue (yellow
+	 * near rockets, etc.) instead of always being neutral white. */
+	struct XLIGHT *phong_tint = NULL;
+	float          phong_tint_d2 = 0.0f;
+
 	float cx = CurrentCamera.Pos.x;
 	float cy = CurrentCamera.Pos.y;
 	float cz = CurrentCamera.Pos.z;
@@ -1184,6 +1192,15 @@ void c3d_upload_xlights(void)
 		float dy = ((XLIGHT*)L)->Pos.y - cy;
 		float dz = ((XLIGHT*)L)->Pos.z - cz;
 		float d2 = dx*dx + dy*dy + dz*dz;
+
+		/* Track nearest XLight whose Size² covers the camera position. */
+		float size = ((XLIGHT*)L)->Size;
+		if (d2 < size * size) {
+			if (!phong_tint || d2 < phong_tint_d2) {
+				phong_tint    = L;
+				phong_tint_d2 = d2;
+			}
+		}
 
 		if (n_top < GPU_MAX_LIGHTS) {
 			top[n_top]    = L;
@@ -1198,6 +1215,27 @@ void c3d_upload_xlights(void)
 				top_d2[worst] = d2;
 			}
 		}
+	}
+
+	/* Update Phong specular tint. With no nearby light, restore neutral
+	 * white. With a nearby light, blend its color toward white based on
+	 * how far inside its radius we are — at the centre = full hue, at
+	 * the edge = mostly white, smooth transition. Avoids on/off pop
+	 * when the player flies in and out of a single rocket's radius. */
+	if (s_objLightReady) {
+		float r = 1.0f, g = 1.0f, b = 1.0f;
+		if (phong_tint) {
+			float size  = ((XLIGHT*)phong_tint)->Size;
+			float falloff = 1.0f - (phong_tint_d2 / (size * size));
+			if (falloff < 0.0f) falloff = 0.0f;
+			float lr = ((XLIGHT*)phong_tint)->r / 255.0f;
+			float lg = ((XLIGHT*)phong_tint)->g / 255.0f;
+			float lb = ((XLIGHT*)phong_tint)->b / 255.0f;
+			r = 1.0f + (lr - 1.0f) * falloff;
+			g = 1.0f + (lg - 1.0f) * falloff;
+			b = 1.0f + (lb - 1.0f) * falloff;
+		}
+		C3D_LightColor(&s_objLight, r, g, b);
 	}
 
 	int n_packed = 0;
