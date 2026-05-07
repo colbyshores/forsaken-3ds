@@ -200,6 +200,12 @@ ifneq ($(AUTOTEST_MAX_LEVELS_TO_SWEEP),)
 CFLAGS += -DAUTOTEST_MAX_LEVELS_TO_SWEEP=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)
 endif
 
+# AUTOTEST_MS_PER_LEVEL=N overrides the per-level dwell (default 60000
+# ms = 60s). Useful for fast smoke tests.
+ifneq ($(AUTOTEST_MS_PER_LEVEL),)
+CFLAGS += -DAUTOTEST_MS_PER_LEVEL=$(AUTOTEST_MS_PER_LEVEL)
+endif
+
 # VERBOSE_TRACE=1 enables the TR() / TRMSG() macros in main.h. Lots of
 # trace points get sprinkled through the loaders so a crash leaves the
 # last reached point visible at the tail of sdmc:/forsaken_trace.txt.

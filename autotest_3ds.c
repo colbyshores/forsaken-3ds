@@ -88,7 +88,9 @@ static int s_bad_idx = 0;
  * advance past one level. With wall-time we sweep on schedule
  * regardless of per-level frame rate; visual inspection still works
  * because the user reads the screen in real time, not in frames. */
-#define AUTOTEST_MS_PER_LEVEL  60000   /* 1 minute */
+#ifndef AUTOTEST_MS_PER_LEVEL
+#define AUTOTEST_MS_PER_LEVEL  60000   /* 1 minute (override via -D for smoke tests) */
+#endif
 
 static u64  s_level_enter_time_ms = 0;
 static int  s_last_level_logged = -1;
@@ -334,7 +336,11 @@ void autotest_tick(void)
 void autotest_between_levels_tick(void)
 {
 	if (s_done) return;
-	if (!s_advancing) return;
+	/* Was gated on s_advancing (set after the first SP→BetweenLevels
+	 * transition), but that left the autoboot's first crate-menu entry
+	 * stuck waiting for player input — fine on real hardware, blocks
+	 * headless mandarine sweeps. Drop the gate: in an AUTOTEST_REMASTER
+	 * build, every BetweenLevels dwell auto-confirms. */
 
 	s_between_levels_frames++;
 	/* ~30 frames at 60 Hz = 0.5 s in BetweenLevels before we confirm.
