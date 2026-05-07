@@ -109,18 +109,11 @@ void	InitXLights()
 	u_int16_t	i;
 	FirstXLightUsed = (u_int16_t) -1;
 	FirstXLightFree = 0;
-	/* Reset the visible-list chain — the array is reused across levels
-	 * and stale FirstLightVisible pointers from the previous level can
-	 * survive into render code (e.g. Phong-tint sampling) that runs
-	 * before BuildVisibleLightList rebuilds the list on the new level. */
-	FirstLightVisible = NULL;
 	for( i = 0 ; i < MAXXLIGHTS ; i++ )
 	{
 		XLights[i].Index = i;
 		XLights[i].Next = i + 1;
 		XLights[i].Prev = (u_int16_t) -1;
-		XLights[i].NextVisible = NULL;
-		XLights[i].Visible = false;
 		XLights[i].Type = POINT_LIGHT;
 	}
 
