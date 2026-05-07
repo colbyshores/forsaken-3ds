@@ -1281,12 +1281,16 @@ void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 	float ar, ag, ab, aa;
 	GetRealLightAmbientWorldSpace(world_pos, &ar, &ag, &ab, &aa);
 
-	/* Normalise to 0..1 and clamp. Cap below 1.0 so the highlight
-	 * never goes pure white from saturated ambient — keeps a hint of
-	 * the room hue at all times. */
-	ar = ar / 255.0f; if (ar < 0.0f) ar = 0.0f; if (ar > 1.0f) ar = 1.0f;
-	ag = ag / 255.0f; if (ag < 0.0f) ag = 0.0f; if (ag > 1.0f) ag = 1.0f;
-	ab = ab / 255.0f; if (ab < 0.0f) ab = 0.0f; if (ab > 1.0f) ab = 1.0f;
+	/* Normalise to 0..1 and apply a 70%-white floor. Without
+	 * NEW_LIGHTING the engine's baked ambient is 0, so a quiet area
+	 * with no nearby XLights would otherwise zero out the Phong light
+	 * colour and kill the highlight entirely. The floor keeps the
+	 * specular visible everywhere; tinted samples just shift the
+	 * remaining 30% headroom. */
+	const float kFloor = 0.70f;
+	ar = ar / 255.0f; if (ar < kFloor) ar = kFloor; if (ar > 1.0f) ar = 1.0f;
+	ag = ag / 255.0f; if (ag < kFloor) ag = kFloor; if (ag > 1.0f) ag = 1.0f;
+	ab = ab / 255.0f; if (ab < kFloor) ab = kFloor; if (ab > 1.0f) ab = 1.0f;
 
 	/* Find nearest XLight whose radius covers this object position. */
 	struct XLIGHT *nearest = NULL;
