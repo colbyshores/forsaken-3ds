@@ -4391,6 +4391,26 @@ bool PreLoadEnemies( void )
 			fread( &Formationlink, sizeof( int16_t ), 1, fp );
 			fread( &GenerationDelay, sizeof( float ), 1, fp );
 
+#if defined(__3DS__) && defined(VERBOSE_TRACE)
+			/* Per-enemy spawn log: ModelNum (.nme record value) plus the
+			 * ModelFilename it resolves to via EnemyTypes[]. Useful when
+			 * a level shows visually-wrong enemies and we need to know
+			 * whether the issue is wrong ModelNum in the .nme, missing
+			 * substitution, or ambiguous file resolution. Gated on
+			 * VERBOSE_TRACE — release builds compile this out. */
+			{
+				extern void trace(const char *);
+				char _b[160];
+				const char *fn =
+					(ModelNum < MAX_ENEMY_TYPES && EnemyTypes[ModelNum].ModelFilename)
+						? EnemyTypes[ModelNum].ModelFilename : "(NULL)";
+				snprintf(_b, sizeof(_b),
+					"NME[%d]: ModelNum=%u file=%s",
+					Count, (unsigned)ModelNum, fn);
+				trace(_b);
+			}
+#endif
+
 			/* Forsaken Remastered's .nme files reference enemy IDs from
 			 * the Remaster's expanded roster (n64Enemies, etc.) that go
 			 * up to 108. Our 1998 Enemies.txt only populates indices
@@ -6717,6 +6737,32 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			Enemy->AIMoveRestrictClearTime = 30.0F + Random_Range_Float (30.0F) ;
 		}
 	}
+
+#ifdef EDITION_REMASTER
+	/* Per-frame ground-snap. CRAWL_AI bots (Mekton, Snub Bot, Laz Bot)
+	 * follow AI nodes whose Y is pre-snapped at level load by Nodeload's
+	 * downward raycast. KEX-authored Remaster levels (tube64 specifically,
+	 * confirmed via NME trace: 4 LEADER_Mekton + 2 Mekton + 4 Snub Bot +
+	 * 2 LEADER_LazerBot all spawned ground-class) place AI nodes mid-
+	 * volume in curved tube interiors where the load-time raycast misses.
+	 * SolidPos.y stays at the un-snapped authored Y, so the bots fly at
+	 * that altitude. Re-raycast every frame from the bot's current
+	 * position to clamp Y to actual mesh-poly floor regardless of where
+	 * the AI node ended up. Mirrors Nodeload's snap math. */
+	{
+		VECTOR	GroundOff = { 0.0F, -MaxColDistance, 0.0F };
+		VECTOR	GroundPos, GroundNewTgt;
+		u_int16_t	GroundGroup;
+		NORMAL	GroundNormal;
+		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
+		                        &Object->Pos, Object->Group, &GroundOff,
+		                        &GroundPos, &GroundGroup, &GroundNormal,
+		                        &GroundNewTgt, false, NULL ) )
+		{
+			Object->Pos.y = GroundPos.y + 75.0F;
+		}
+	}
+#endif
 }
 
 
