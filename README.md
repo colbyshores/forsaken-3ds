@@ -117,6 +117,20 @@ either platform.
   legacy diffuse-modulate path without binding the LightEnv or extra
   TexEnv stages. Lets users on tighter OG-3DS frames buy back ~1-2 ms
   by disabling the more expensive features.
+- **One-shot Remaster KPF importer (`extract_remaster_levels.py`).**
+  Steam's Forsaken Remastered ships its game data in a single
+  KEX-engine `ForsakenEX.kpf` archive. The importer converts the
+  whole pack into a `Data/` tree the 1998 engine can read: bulk-
+  walks every engine-readable top-level dir into 1998 path
+  conventions, pulls per-limb `.mx` meshes for N64 boss components
+  into `Data/models/n64/`, downscales 1280×720 loading-screen art
+  to 256×128 crate-menu banners, transcodes the 9 OGG-only music
+  tracks to DSP-ADPCM via `gc-dspadpcm-encode`, and runs
+  `mxv_visi_repair.py` as the final pass to rebuild visibility
+  tables. Idempotent, layerable on top of an existing 1998 ISO
+  extract via `--skip-*` flags, and self-sufficient (no 1998 ISO
+  required) when starting from scratch. Build with
+  `make EDITION=remaster` and the engine sees the expanded line-up.
 - **Visibility data baked offline.** Forsaken Remastered's KEX-engine cooker
   ships flat per-portal VISTREE + zeroed `IndirectVisibleGroup` for the 22
   Night-Dive-authored levels (KEX uses runtime portal-frustum culling, not
