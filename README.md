@@ -524,6 +524,15 @@ needed.
 
 ## Known limitations
 
+- **N64 boss AI is work-in-progress.** Manmech, Maldroid, Ramqan,
+  DreadNaught, and ShieldTurret render with their authored Remaster
+  meshes but currently run on the closest-matching 1998 boss brain
+  (Mekton / Boss_Avatar / Boss_Metatank), since the KEX-engine brains
+  (`kexForsakenAIBrainCrawl`, `kexForsakenAIBrainFly`, etc.) aren't
+  ported. Encounters are functional and beatable; behavioural
+  fidelity to the Remaster intent is approximate. Boss_Ramqan's
+  parametric-arc hop AI *is* fully ported (see `aijump.c`); the
+  rest will follow.
 - Missile chase camera has limited draw distance (BSP portal visibility
   edge case).
 - No multiplayer / networking on 3DS.
