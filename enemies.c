@@ -6767,32 +6767,6 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			Enemy->AIMoveRestrictClearTime = 30.0F + Random_Range_Float (30.0F) ;
 		}
 	}
-
-#ifdef EDITION_REMASTER
-	/* Ground-snap final clamp: tracked CRAWL_AI bots (Laz Bot, Snub Bot,
-	 * Mek Ton, Legz) are documented as ground-hugging in the manual but
-	 * follow AI nodes whose pre-snapped Y comes from Nodeload's load-
-	 * time downward raycast. Some KEX-authored levels (tuben64 in
-	 * particular) place AI nodes mid-volume where the load-time raycast
-	 * misses or hits the wrong surface; the bots then "fly" at the un-
-	 * snapped node altitude. Forcing a per-frame downward raycast from
-	 * the bot's current position re-anchors it to the actual floor
-	 * regardless of node placement. Mirrors Nodeload's math: ray length
-	 * MaxColDistance, clamp result + 75. */
-	{
-		VECTOR	GroundOff = { 0.0F, -MaxColDistance, 0.0F };
-		VECTOR	GroundPos, GroundNewTgt;
-		u_int16_t	GroundGroup;
-		NORMAL	GroundNormal;
-		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
-		                        &Object->Pos, Object->Group, &GroundOff,
-		                        &GroundPos, &GroundGroup, &GroundNormal,
-		                        &GroundNewTgt, false, NULL ) )
-		{
-			Object->Pos.y = GroundPos.y + 75.0F;
-		}
-	}
-#endif
 }
 
 
