@@ -1176,13 +1176,6 @@ void c3d_upload_xlights(void)
 	float          top_d2[GPU_MAX_LIGHTS];
 	int            n_top = 0;
 
-	/* Phong-tint tracking: the nearest XLight whose Size sphere actually
-	 * reaches the camera position. Drives s_objLight's color so enemy
-	 * specular highlights pick up the dominant nearby light's hue (yellow
-	 * near rockets, etc.) instead of always being neutral white. */
-	struct XLIGHT *phong_tint = NULL;
-	float          phong_tint_d2 = 0.0f;
-
 	float cx = CurrentCamera.Pos.x;
 	float cy = CurrentCamera.Pos.y;
 	float cz = CurrentCamera.Pos.z;
@@ -1192,15 +1185,6 @@ void c3d_upload_xlights(void)
 		float dy = ((XLIGHT*)L)->Pos.y - cy;
 		float dz = ((XLIGHT*)L)->Pos.z - cz;
 		float d2 = dx*dx + dy*dy + dz*dz;
-
-		/* Track nearest XLight whose Size² covers the camera position. */
-		float size = ((XLIGHT*)L)->Size;
-		if (d2 < size * size) {
-			if (!phong_tint || d2 < phong_tint_d2) {
-				phong_tint    = L;
-				phong_tint_d2 = d2;
-			}
-		}
 
 		if (n_top < GPU_MAX_LIGHTS) {
 			top[n_top]    = L;
@@ -1217,26 +1201,9 @@ void c3d_upload_xlights(void)
 		}
 	}
 
-	/* Update Phong specular tint. With no nearby light, restore neutral
-	 * white. With a nearby light, blend its color toward white based on
-	 * how far inside its radius we are — at the centre = full hue, at
-	 * the edge = mostly white, smooth transition. Avoids on/off pop
-	 * when the player flies in and out of a single rocket's radius. */
-	if (s_objLightReady) {
-		float r = 1.0f, g = 1.0f, b = 1.0f;
-		if (phong_tint) {
-			float size  = ((XLIGHT*)phong_tint)->Size;
-			float falloff = 1.0f - (phong_tint_d2 / (size * size));
-			if (falloff < 0.0f) falloff = 0.0f;
-			float lr = ((XLIGHT*)phong_tint)->r / 255.0f;
-			float lg = ((XLIGHT*)phong_tint)->g / 255.0f;
-			float lb = ((XLIGHT*)phong_tint)->b / 255.0f;
-			r = 1.0f + (lr - 1.0f) * falloff;
-			g = 1.0f + (lg - 1.0f) * falloff;
-			b = 1.0f + (lb - 1.0f) * falloff;
-		}
-		C3D_LightColor(&s_objLight, r, g, b);
-	}
+	/* Phong-tint follows per-object world position now — see
+	 * c3d_update_phong_tint_for_object_pos(). Called from
+	 * apply_texenv_for_texture when entering OBJECT mode. */
 
 	int n_packed = 0;
 	for (; n_packed < n_top; n_packed++)
@@ -1284,6 +1251,73 @@ void c3d_upload_xlights(void)
 		C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER, s_loc_lights, GPU_MAX_LIGHTS * 3);
 		memcpy(dst, lights_buf, sizeof(lights_buf));
 	}
+}
+
+/* Phong-tint per-object update.
+ *
+ * Sample the level's lit ambient at the object's world position
+ * (GetRealLightAmbientWorldSpace = baked grey base + every active
+ * XLight's contribution at that point), then blend toward the nearest
+ * dominant XLight's hue with a falloff scale based on how deep the
+ * object is inside that light's radius.
+ *
+ * Effect: enemies in vol2's lava chambers naturally pick up warm
+ * baked tone in their specular highlight even with no rockets nearby;
+ * a yellow rocket flying close shifts the highlight more strongly
+ * yellow; both signals blend continuously instead of switching.
+ *
+ * Call at the start of every OBJECT-mode draw. Cost: one
+ * GetRealLightAmbientWorldSpace walk (~50-200 cycles per visible
+ * light, sums all of FirstLightVisible) + a C3D_LightColor bind. At
+ * ~10 enemies per frame and ~20 visible lights, total ~40 K cycles
+ * per frame — under 1% of OG 3DS frame budget. */
+void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
+{
+	if (!s_objLightReady || !world_pos) return;
+
+	/* Sampled ambient at object position: baked level base + every
+	 * visible XLight's per-position contribution (linear falloff, same
+	 * math as lights.c::XLight1Group). Returned in 0..255 range. */
+	float ar, ag, ab, aa;
+	GetRealLightAmbientWorldSpace(world_pos, &ar, &ag, &ab, &aa);
+
+	/* Normalise to 0..1 and clamp. Cap below 1.0 so the highlight
+	 * never goes pure white from saturated ambient — keeps a hint of
+	 * the room hue at all times. */
+	ar = ar / 255.0f; if (ar < 0.0f) ar = 0.0f; if (ar > 1.0f) ar = 1.0f;
+	ag = ag / 255.0f; if (ag < 0.0f) ag = 0.0f; if (ag > 1.0f) ag = 1.0f;
+	ab = ab / 255.0f; if (ab < 0.0f) ab = 0.0f; if (ab > 1.0f) ab = 1.0f;
+
+	/* Find nearest XLight whose radius covers this object position. */
+	struct XLIGHT *nearest = NULL;
+	float          nearest_d2 = 0.0f;
+	for (struct XLIGHT *L = FirstLightVisible; L; L = ((XLIGHT*)L)->NextVisible) {
+		float dx = ((XLIGHT*)L)->Pos.x - world_pos->x;
+		float dy = ((XLIGHT*)L)->Pos.y - world_pos->y;
+		float dz = ((XLIGHT*)L)->Pos.z - world_pos->z;
+		float d2 = dx*dx + dy*dy + dz*dz;
+		float size = ((XLIGHT*)L)->Size;
+		if (d2 < size * size) {
+			if (!nearest || d2 < nearest_d2) {
+				nearest    = L;
+				nearest_d2 = d2;
+			}
+		}
+	}
+
+	float r = ar, g = ag, b = ab;
+	if (nearest) {
+		float size  = ((XLIGHT*)nearest)->Size;
+		float falloff = 1.0f - (nearest_d2 / (size * size));
+		if (falloff < 0.0f) falloff = 0.0f;
+		float lr = ((XLIGHT*)nearest)->r / 255.0f;
+		float lg = ((XLIGHT*)nearest)->g / 255.0f;
+		float lb = ((XLIGHT*)nearest)->b / 255.0f;
+		r = ar + (lr - ar) * falloff;
+		g = ag + (lg - ag) * falloff;
+		b = ab + (lb - ab) * falloff;
+	}
+	C3D_LightColor(&s_objLight, r, g, b);
 }
 
 
@@ -2645,6 +2679,19 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * land in their own ProcTex phase bucket. */
 	s_atlasSeed   = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
 	s_isOrthoDraw = orthographic;
+
+	/* For object-mode draws (s_objProcTexOn set by mxload/mxaload),
+	 * sample the lit ambient at the object's world position and blend
+	 * with the dominant nearby XLight to drive the Phong specular hue.
+	 * world_matrix's translation row holds the object's world pos. */
+	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
+	    s_objShineEligible && !orthographic) {
+		VECTOR pos;
+		pos.x = world_matrix._41;
+		pos.y = world_matrix._42;
+		pos.z = world_matrix._43;
+		c3d_update_phong_tint_for_object_pos(&pos);
+	}
 
 	/* Single-pass stereo: on the first draw call of the second eye,
 	 * replay the entire display list with the updated view matrix
