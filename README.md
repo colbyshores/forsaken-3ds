@@ -533,8 +533,6 @@ needed.
   fidelity to the Remaster intent is approximate. Boss_Ramqan's
   parametric-arc hop AI *is* fully ported (see `aijump.c`); the
   rest will follow.
-- Missile chase camera has limited draw distance (BSP portal visibility
-  edge case).
 - No multiplayer / networking on 3DS.
 
 ## Credits
