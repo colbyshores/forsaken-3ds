@@ -68,7 +68,7 @@ either platform.
   state machine in `aijump.c`. Lands on `SolidPos` (Nodeload's
   floor-snapped target), apex set from the authored `Pos.y` (above the
   pad), with a 30%-of-horizontal-distance fallback for KEX-authored
-  decomp-to-1998 mapping.
+  pads where Pos == SolidPos.
 - **PICA200 fragment-lighting Phong shine on objects, tinted by the
   scene.** Per-vertex tangent-frame quaternion built in the vshader
   from the world-space pseudo-normal of each enemy / pickup / mine;
@@ -205,14 +205,15 @@ The KPF is mostly a superset of the 1998 game data — for the levels
 the 1998 game shipped, every `.mx`/`.cob`/`.bsp`/`.mxv`/texture/sound
 is byte-for-byte identical to the 1998 originals. Levels Night Dive
 authored from scratch (defend2, stableizers, powerdown, plus the rest
-of the 21 KEX-original maps that ship in the port — biolab dropped
+of the 21 KEX-original maps that ship in the port — biolab and
+tuben64 dropped upstream for engine-incompatibility reasons) ship
 with stripped visibility data — KEX's renderer uses runtime
 portal-frustum culling and doesn't need the 1998 engine's pre-baked
 PVS tables or recursive VISTREE.
 `extract_remaster_levels.py` runs `mxv_visi_repair.py` as its final
 pass to rebuild both at extract time so the 1998 engine sees a
 healthy file. Idempotent and gated on the data signal — runs only on
-"Visibility-Table Repair" for the algorithm.
+levels missing the data, leaves the rest alone.
 
 The script also bulk-extracts every asset into `Data/`, downscales
 the Remaster's 1280×720 loading-screen art to 256×128 crate-menu
@@ -245,7 +246,8 @@ to Option A.
   enemies, 100–105 pickups) so they render with real Remaster meshes
   and behave with the closest-matching 1998 AI brain.
 - Substitutes `Data/Levels/mission_remaster.dat` (23 SP campaign
-  entries + 7 N64 secret levels; biolab and tuben64 dropped, see
+  entries + 7 N64 secret levels; biolab and tuben64 dropped for
+  engine-incompatibility reasons) and `Data/Levels/battle_remaster.dat`
   (24 MP arenas) over the 1998 originals during ROMFS staging, so the
   in-game crate menu sees the expanded line-up.
 
