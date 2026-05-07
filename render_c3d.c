@@ -1201,10 +1201,6 @@ void c3d_upload_xlights(void)
 		}
 	}
 
-	/* Phong-tint follows per-object world position now — see
-	 * c3d_update_phong_tint_for_object_pos(). Called from
-	 * apply_texenv_for_texture when entering OBJECT mode. */
-
 	int n_packed = 0;
 	for (; n_packed < n_top; n_packed++)
 	{
