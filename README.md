@@ -55,25 +55,47 @@ either platform.
   floor-snapped target), apex set from the authored `Pos.y` (above the
   pad), with a 30%-of-horizontal-distance fallback for KEX-authored
   decomp-to-1998 mapping.
-- **PICA200 fragment-lighting Phong shine on objects.** Per-vertex
-  tangent-frame quaternion built in the vshader from the world-space
-  pseudo-normal of each enemy / pickup / mine; the GPU's fragment-
-  lighting hardware computes a moving specular highlight per pixel via
-  a Phong-30 LUT. Costs ~0.1–0.5 ms/frame in busy combat scenes,
-  active only on small / curved / metallic surfaces. Doors and other
-  level-decoration BG objects (`Models[i].OwnerType == OWNER_BGOBJECT`)
+- **PICA200 fragment-lighting Phong shine on objects, tinted by the
+  scene.** Per-vertex tangent-frame quaternion built in the vshader
+  from the world-space pseudo-normal of each enemy / pickup / mine;
+  the GPU's fragment-lighting hardware computes a moving specular
+  highlight per pixel via a Phong-30 LUT. The highlight *colour* is
+  sampled per-object from the level's lit ambient at the object's
+  world position (baked grey base + every active XLight's contribution
+  blended toward the nearest dominant light's hue), so an enemy
+  flying through a red corridor picks up red shine, a blue lab picks
+  up blue, and quiet areas keep a 70%-floored neutral white so the
+  highlight stays visible. Costs ~0.1–0.5 ms/frame in busy combat
+  scenes, active only on small / curved / metallic surfaces. Doors
+  and level-decoration BG objects (`Models[i].OwnerType == OWNER_BGOBJECT`)
   are explicitly excluded across all three render paths (static MX,
   animated MXA, and the translucent `TransExe` queue) so flat panels
   don't get tacky-looking moving highlights.
-- **PICA200 ProcTex wall detail with per-material classes.** Three
-  preconfigured noise styles selected at level load by texture
-  filename: `MAT_METAL` (fine paint-grain, default), `MAT_ROCK`
-  (coarser pitted noise for thermal / lava chambers), `MAT_ORGANIC`
-  (softer green-tinted grain for biological surfaces). Per-texture
-  phase hash so same-class adjacent walls don't tile identically. Zero
-  VRAM cost (silicon-generated). Per-draw rebind cached by mode +
-  texture pointer to skip the GPU register pressure that would
-  otherwise produce a visible micro-stutter.
+- **PICA200 ProcTex wall detail with per-material classes + per-execbuf
+  variance.** Three preconfigured noise styles selected at level load
+  by texture filename: `MAT_METAL` (fine paint-grain, default),
+  `MAT_ROCK` (coarser pitted noise for thermal / lava chambers),
+  `MAT_ORGANIC` (softer green-tinted grain for biological surfaces).
+  Each class uses a 4-stop colour palette LUT for richer variation
+  than a 2-stop ramp would produce. Per-execbuf phase variance
+  (64 buckets × per-bucket frequency nudge) means same-class adjacent
+  walls don't tile identically — the noise on one wall is genuinely
+  different from the wall next to it, so the level reads as
+  hand-aged rather than tiled. Per-texture phase hash adds another
+  layer of variance across textures sharing a class. Zero VRAM cost
+  (silicon-generated). Per-draw rebind cached by mode + texture
+  pointer to skip the GPU register pressure that would otherwise
+  produce a visible micro-stutter.
+- **Per-group GPU scissor for level-mesh draws on citro3d.** Engine's
+  standard per-portal rendering uses a sub-rect viewport + per-group
+  magnified projection, but on PICA200 that produced 1-2px cracks
+  and through-portal geometry flicker at room boundaries (the same
+  data rendered correctly through picaGL's GL1 shim — diagnostic
+  was a renderer comparison build). Fix routes every visible level-
+  mesh group through one shared `cam->Proj` projection paired with a
+  GPU scissor masking writes to the per-group sub-rect, so shared
+  vertices project to bit-identical screen pixels in every group
+  that draws them. picaGL keeps the engine standard.
 - **In-game graphics toggles + persistence.** Pause → Options → Visuals
   exposes "Object shine" and "Wall detail" toggles, persisted via
   `Configs/main.txt` (keys `ObjectShine` / `WallDetail`). Each toggle
