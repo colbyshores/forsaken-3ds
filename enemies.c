@@ -4259,22 +4259,16 @@ bool PreLoadEnemies( void )
 
 	/* Populate Remaster N64 enemy slots (100-108) by template-copying
 	 * from a similar 1998 enemy, then overriding the model filename.
-	 * One-shot — guarded by static flag so subsequent level loads don't
-	 * keep re-templating after enemies.txt has tuned the values.
 	 *
-	 * The visual is approximate: each new enemy uses an existing 1998
-	 * model that's tonally similar (Boss_Manmech => Mekton's model,
-	 * CargoDrone => AmmoDump, etc.). The proper fix is to extract the
-	 * Remaster's actual N64 .mx mesh files from ForsakenEX.kpf and
-	 * Slot Approximation" for the workaround scope. The choice of
-	 * 1998 template also drives the AI behaviour: bosses crawl/walk
-	 * (Mekton brain), drones fly (AirMoble brain), ShieldTurret holds
-	 * its position (BeamTurret brain). */
+	 * Re-applied on every level load because ReadEnemyTxtFile() above
+	 * resets the entire EnemyTypes[] array from enemies.txt, which
+	 * clobbers any prior substitution. enemies.txt doesn't define
+	 * the N64-only IDs (100-108), so without re-applying here those
+	 * slots silently revert to whatever uninitialized template they
+	 * inherited — visible symptom: Tube64's Enforcer (flying-eye
+	 * shape) renders as a Mekton tank after the first level
+	 * transition. */
 	{
-		static bool _n64_extra_init_done = false;
-		if (!_n64_extra_init_done)
-		{
-			_n64_extra_init_done = true;
 
 			/* For each N64-only enemy that has a real .mx mesh in the
 			 * romfs (extracted from ForsakenEX.kpf), use it; otherwise
@@ -4401,7 +4395,6 @@ bool PreLoadEnemies( void )
 					}
 				}
 			}
-		}
 	}
 
 	NextEnemyModel = NextNewModel;
