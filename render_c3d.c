@@ -1167,13 +1167,16 @@ void c3d_clear_xlights(void)
  *  shadow rays or per-light camera-occlusion raycasts would actually
  *  fix it but cost too much CPU on PICA200 at 60 Hz. */
 /* Per-group light upload — see c3d_upload_xlights() for the unfiltered
- * variant. Filters FirstLightVisible by VisibleOverlap(group, light->Group)
- * so a light from a non-overlapping group doesn't reach this group's
- * vertices. Matches the CPU's GroupsAreVisible(group, light->Group) gate
- * in lights.c::XLight1Group line 570. */
+ * variant. Filters FirstLightVisible by GroupsAreVisible(group, light->Group)
+ * so a light from a non-visible group doesn't reach this group's vertices.
+ * Exact match for the CPU's gate in lights.c::XLight1Group line 570 —
+ * NOT VisibleOverlap (which is much more permissive: returns true if the
+ * two groups' visible-sets merely intersect, even if neither can see the
+ * other directly). */
 void c3d_upload_xlights_for_group(u_int16_t group)
 {
-	extern int VisibleOverlap(u_int16_t g1, u_int16_t g2, u_int16_t *o);
+	extern bool GroupsAreVisible(u_int16_t g1, u_int16_t g2);
+	extern MLOADHEADER Mloadheader;
 
 	if (s_loc_lights < 0) return;
 
@@ -1187,10 +1190,32 @@ void c3d_upload_xlights_for_group(u_int16_t group)
 	float cz = CurrentCamera.Pos.z;
 	for (struct XLIGHT *L = FirstLightVisible; L; L = ((XLIGHT*)L)->NextVisible)
 	{
-		/* Reject lights whose group doesn't overlap the rendered group. */
+		/* Reject lights whose group isn't visible from the rendered
+		 * group — same gate the CPU uses. */
 		if (group != (u_int16_t)-1 &&
-		    !VisibleOverlap(group, ((XLIGHT*)L)->Group, NULL))
+		    !GroupsAreVisible(group, ((XLIGHT*)L)->Group))
 			continue;
+
+		/* Per-group mesh-bbox vs light-sphere AABB test — exact mirror
+		 * of lights.c::XLight1Group line 583. Even if the light's
+		 * group is visible, if its Size-radius sphere doesn't actually
+		 * reach this group's mesh, skip it. Closes the cross-portal
+		 * bleed-through where a rocket on one side of a hub paints
+		 * the wall on the opposite side. */
+		if (group != (u_int16_t)-1)
+		{
+			float OSize = ((XLIGHT*)L)->Size;
+			float dx = ((XLIGHT*)L)->Pos.x - Mloadheader.Group[group].center.x;
+			float dy = ((XLIGHT*)L)->Pos.y - Mloadheader.Group[group].center.y;
+			float dz = ((XLIGHT*)L)->Pos.z - Mloadheader.Group[group].center.z;
+			if (dx < 0) dx = -dx;
+			if (dy < 0) dy = -dy;
+			if (dz < 0) dz = -dz;
+			if (dx > Mloadheader.Group[group].half_size.x + OSize ||
+			    dy > Mloadheader.Group[group].half_size.y + OSize ||
+			    dz > Mloadheader.Group[group].half_size.z + OSize)
+				continue;
+		}
 
 		float dx = ((XLIGHT*)L)->Pos.x - cx;
 		float dy = ((XLIGHT*)L)->Pos.y - cy;
