@@ -1166,6 +1166,84 @@ void c3d_clear_xlights(void)
  *  the bulk of the bleed (intra-group walls) unfiltered. Per-vertex
  *  shadow rays or per-light camera-occlusion raycasts would actually
  *  fix it but cost too much CPU on PICA200 at 60 Hz. */
+/* Per-group light upload — see c3d_upload_xlights() for the unfiltered
+ * variant. Filters FirstLightVisible by VisibleOverlap(group, light->Group)
+ * so a light from a non-overlapping group doesn't reach this group's
+ * vertices. Matches the CPU's GroupsAreVisible(group, light->Group) gate
+ * in lights.c::XLight1Group line 570. */
+void c3d_upload_xlights_for_group(u_int16_t group)
+{
+	extern int VisibleOverlap(u_int16_t g1, u_int16_t g2, u_int16_t *o);
+
+	if (s_loc_lights < 0) return;
+
+	C3D_FVec lights_buf[GPU_MAX_LIGHTS * 3];
+
+	struct XLIGHT *top[GPU_MAX_LIGHTS];
+	float          top_d2[GPU_MAX_LIGHTS];
+	int            n_top = 0;
+	float cx = CurrentCamera.Pos.x;
+	float cy = CurrentCamera.Pos.y;
+	float cz = CurrentCamera.Pos.z;
+	for (struct XLIGHT *L = FirstLightVisible; L; L = ((XLIGHT*)L)->NextVisible)
+	{
+		/* Reject lights whose group doesn't overlap the rendered group. */
+		if (group != (u_int16_t)-1 &&
+		    !VisibleOverlap(group, ((XLIGHT*)L)->Group, NULL))
+			continue;
+
+		float dx = ((XLIGHT*)L)->Pos.x - cx;
+		float dy = ((XLIGHT*)L)->Pos.y - cy;
+		float dz = ((XLIGHT*)L)->Pos.z - cz;
+		float d2 = dx*dx + dy*dy + dz*dz;
+
+		if (n_top < GPU_MAX_LIGHTS) {
+			top[n_top]    = L;
+			top_d2[n_top] = d2;
+			n_top++;
+		} else {
+			int worst = 0;
+			for (int k = 1; k < GPU_MAX_LIGHTS; k++)
+				if (top_d2[k] > top_d2[worst]) worst = k;
+			if (d2 < top_d2[worst]) {
+				top[worst]    = L;
+				top_d2[worst] = d2;
+			}
+		}
+	}
+
+	int n_packed = 0;
+	for (; n_packed < n_top; n_packed++)
+	{
+		struct XLIGHT *L = top[n_packed];
+		float size = ((XLIGHT*)L)->Size;
+		float invSizeSq = (size > 0.0f) ? (1.0f / (size * size)) : 0.0f;
+		lights_buf[n_packed * 3 + 0] = FVec4_New(
+			((XLIGHT*)L)->Pos.x, ((XLIGHT*)L)->Pos.y, ((XLIGHT*)L)->Pos.z,
+			invSizeSq);
+		float r = ((XLIGHT*)L)->r / 255.0f;
+		float g = ((XLIGHT*)L)->g / 255.0f;
+		float b = ((XLIGHT*)L)->b / 255.0f;
+		float type = (((XLIGHT*)L)->Type == SPOT_LIGHT) ? 1.0f : 0.0f;
+		lights_buf[n_packed * 3 + 1] = FVec4_New(r, g, b, type);
+		lights_buf[n_packed * 3 + 2] = FVec4_New(
+			((XLIGHT*)L)->Dir.x, ((XLIGHT*)L)->Dir.y, ((XLIGHT*)L)->Dir.z,
+			((XLIGHT*)L)->CosArc);
+	}
+	while (n_packed < GPU_MAX_LIGHTS) {
+		lights_buf[n_packed * 3 + 0] = FVec4_New(0.0f, 0.0f, 0.0f, 0.0f);
+		lights_buf[n_packed * 3 + 1] = FVec4_New(0.0f, 0.0f, 0.0f, 0.0f);
+		lights_buf[n_packed * 3 + 2] = FVec4_New(0.0f, 0.0f, 0.0f, 0.0f);
+		n_packed++;
+	}
+	{
+		C3D_FVec *dst = C3D_FVUnifWritePtr(GPU_VERTEX_SHADER,
+		                                   s_loc_lights,
+		                                   GPU_MAX_LIGHTS * 3);
+		memcpy(dst, lights_buf, sizeof(lights_buf));
+	}
+}
+
 void c3d_upload_xlights(void)
 {
 	if (s_loc_lights < 0) return;
