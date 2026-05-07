@@ -80,6 +80,7 @@ NEW_LEVELS = [
 # on each entry.
 DROPPED_LEVELS = {
     "biolab",
+    "tuben64",
 }
 
 
