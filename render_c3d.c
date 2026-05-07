@@ -1756,11 +1756,12 @@ bool FSSetViewPort(render_viewport_t *view)
 	s_current_view_used_scissor = use_scissor;
 	if (use_scissor)
 	{
-		/* Scissor path for portal-aperture groups whose engine
-		 * magnification would have voided. Geometry rendered with
-		 * cam's projection at correct world-scale, scissor cuts
-		 * color/depth writes to the aperture rect. Pairs with
-		 * VISGROUP::use_scissor_mode set in visi.c FindVisible. */
+		/* Per-group draws (level-mesh visibility groups). Full-screen
+		 * GPU viewport + scissor to the sub-rect, paired with the
+		 * unmagnified cam->Proj that visi.c uploads. Every visible
+		 * group shares the same projection — eliminates the per-group
+		 * magnified-projection flicker / cracks at portal boundaries
+		 * that PICA200 produced under the sub-rect-viewport path. */
 		C3D_SetViewport(0, 0, 240, 400);
 		C3D_SetScissor(GPU_SCISSOR_NORMAL,
 		               (u32)pica_x, (u32)pica_y,
@@ -1768,9 +1769,9 @@ bool FSSetViewPort(render_viewport_t *view)
 	}
 	else
 	{
-		/* Engine standard: sub-rect viewport, no scissor. Pairs with
-		 * the per-group magnified projection in visi.c. The mag math
-		 * is clip-cull friendly so vertex throughput stays low. */
+		/* HUD / 2D / orthographic dispatch — sub-rect viewport, no
+		 * scissor. Used for non-3D-mesh draws which don't go through
+		 * visi.c's per-group projection setup. */
 		C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 		C3D_SetViewport((u32)pica_x, (u32)pica_y,
 		                (u32)pica_w, (u32)pica_h);

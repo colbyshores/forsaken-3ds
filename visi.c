@@ -1229,6 +1229,15 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 									- ( vp->Y + vp->Height * 0.5F ) )
 							/ vp->Height;
 
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		/* citro3d uses scissor + unmagnified cam->Proj for every group
+		 * (see ClipGroup). Pairing comment lives in ClipGroup; this
+		 * just overrides the magnified projection the engine just
+		 * computed. The magnified math above is left intact for other
+		 * renderers / the precise stereo offset adjustment in lr. */
+		g->projection = cam->Proj;
+#endif
+
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
 		/* Portal black-void detector: a visible group whose final
 		 * viewport collapses to zero width or height produces a
@@ -1358,14 +1367,17 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 	if (!FSSetView(&cam->View))
 		return false;
 
-	/* Hand the per-group scissor-mode hint to the renderer. visi.c
-	 * sets g->use_scissor_mode = true for groups whose engine
-	 * magnification math would have produced clip-space coords the
-	 * GPU rejects. The flag tells FSSetViewPort below to use a
-	 * full-screen GPU viewport + GPU scissor to the sub-rect, instead
-	 * of the engine standard sub-rect viewport. No-op on non-c3d
-	 * renderers (their FSSetNextViewPortScissorMode is a stub). */
-	FSSetNextViewPortScissorMode(g->use_scissor_mode);
+	/* citro3d: route every group through the GPU-scissor path so all
+	 * groups share the same unmagnified cam->Proj. Eliminates the
+	 * portal-edge flicker and 1-2px cracks that the engine's standard
+	 * per-group-magnified-projection produced on PICA200 (picaGL was
+	 * unaffected — its viewport handling differs). Other renderers
+	 * keep the engine standard (sub-rect viewport + magnified proj). */
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	FSSetNextViewPortScissorMode(true);
+#else
+	FSSetNextViewPortScissorMode(false);
+#endif
 
     if (!FSSetViewPort(&g->viewport)) {
 #ifdef DEBUG_VIEWPORT
