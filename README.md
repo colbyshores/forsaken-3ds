@@ -18,15 +18,29 @@ either platform.
   frame; the engine's per-eye callback runs fully for each. The 3D slider
   drives eye separation. ETC1 textures + single-tap fragment shading
   leave plenty of GPU headroom on both Old and New 3DS.
-- **HD textures (ETC1 / ETC1A4) with Gaussian mipmaps.** Per-level walls
-  upscaled from a 4K source pack, downscaled to 512×512 ETC1 with Gaussian
-  mip chains — the wider kernel dissolves AI-upscaler hallucination pixels
-  that bilinear mips would amplify into sparkle on distant walls. Sprites
-  and grates use ETC1A4 with an alpha-from-original-palette detector so
-  see-through pixels survive. The full 512×512 pack loads on **both Old
-  and New 3DS** post-Q3-memory-refactor — the recovered ~20 MB BSS gave
-  OG enough linear-heap headroom that the earlier OG-only mip-0 strip
-  is no longer needed.
+- **HD textures (ETC1 / ETC1A4) with Gaussian mipmaps — full 512×512
+  on both Old and New 3DS.** Per-level walls upscaled from a 4K source
+  pack, downscaled to 512×512 ETC1 with Gaussian mip chains — the wider
+  kernel dissolves AI-upscaler hallucination pixels that bilinear mips
+  would amplify into sparkle on distant walls. Sprites and grates use
+  ETC1A4 with an alpha-from-original-palette detector so see-through
+  pixels survive. The earlier OG-only mip-0 strip (a 256×256 fallback
+  the OG 3DS used while the linear heap was tighter) is **retired** —
+  every 3DS now ships the same texture data.
+- **Quake 3-style two-tag hunk allocator (`hunk_alloc.c`).** A single
+  fixed-size buffer carved from malloc with two cursors growing toward
+  each other. `TAG_STARTUP` allocations (process-lifetime data: title
+  meshes, base UI, etc.) grow from the low end; `TAG_LEVEL` allocations
+  (per-level transient data: render-object texture-group arrays, etc.)
+  grow from the high end and are bulk-freed in one operation
+  (`Hunk_FreeAll(TAG_LEVEL)`) on level transition. Eliminated the
+  per-execbuf `TEXTUREGROUP[64]` BSS arrays in `RENDEROBJECT` /
+  `LEVELRENDEROBJECT` and similar long-lived holes — recovered ~20 MB
+  of BSS that the OG 3DS's tighter memory budget needed for HD textures.
+  Paired with demoting `ModelHeaders[608]` / `MxaModelHeaders[608]`
+  from BSS arrays to per-level `calloc`/`free` sized exactly to the
+  active count. The recovered budget is what made the unified
+  512×512 texture pack possible on OG.
 - **Threaded DSP-ADPCM music.** Tracks are streamed from romfs in 0.5 s
   chunks on a background thread (25 ms tick), decoded by the DSP hardware
   for zero CPU cost. Per-buffer ADPCM context tracking eliminates
