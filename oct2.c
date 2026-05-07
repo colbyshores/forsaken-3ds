@@ -5976,15 +5976,6 @@ bool RenderCurrentCamera( void )
     _rc_group_iter++;
 #endif
 
-#if defined(RENDERER_C3D) && defined(GPU_LIGHTING)
-    /* Filter the GPU light uniform to lights whose group overlaps
-     * this rendered group — matches CPU's per-group GroupsAreVisible
-     * gate in lights.c::XLight1Group. Closes the cross-room bleed-
-     * through that the unfiltered single-pass upload exposed. */
-    { extern void c3d_upload_xlights_for_group(u_int16_t);
-      c3d_upload_xlights_for_group(group); }
-#endif
-
     // Do the Background animation for that group.....
     BackGroundTextureAnimation( &Mloadheader , group );
 
@@ -6079,11 +6070,6 @@ bool RenderCurrentCamera( void )
   {
     group = g->group;
 
-#if defined(RENDERER_C3D) && defined(GPU_LIGHTING)
-    { extern void c3d_upload_xlights_for_group(u_int16_t);
-      c3d_upload_xlights_for_group(group); }
-#endif
-
 #ifdef __3DS__
     bool _rc_trans_substage_trace = (_rc_stage_trace && _rc_trans_iter <= 3);
     if (_rc_trans_substage_trace) {
@@ -6159,10 +6145,6 @@ Display Group Clipped Faceme Transluecent Polys
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
     group = g->group;
-#if defined(RENDERER_C3D) && defined(GPU_LIGHTING)
-    { extern void c3d_upload_xlights_for_group(u_int16_t);
-      c3d_upload_xlights_for_group(group); }
-#endif
     ExecuteTransExeUnclipped( group );
   }
 
