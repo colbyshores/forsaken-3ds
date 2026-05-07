@@ -208,8 +208,8 @@ to Option A.
   template-copy entries for the new N64 enemy/pickup IDs (100–108
   enemies, 100–105 pickups) so they render with real Remaster meshes
   and behave with the closest-matching 1998 AI brain.
-- Substitutes `Data/Levels/mission_remaster.dat` (24 SP campaign
-  entries + 8 N64 secret levels) and `Data/Levels/battle_remaster.dat`
+- Substitutes `Data/Levels/mission_remaster.dat` (23 SP campaign
+  entries + 7 N64 secret levels; biolab and tuben64 dropped, see
   (24 MP arenas) over the 1998 originals during ROMFS staging, so the
   in-game crate menu sees the expanded line-up.
 
@@ -221,7 +221,7 @@ the build flag picks one.
 
 |                          | `make`                    | `make EDITION=remaster`     |
 |--------------------------|---------------------------|------------------------------|
-| Single-player campaign   | 15 levels (1998)          | 23 levels (Remaster) + 8 N64 secrets |
+| Single-player campaign   | 15 levels (1998)          | 23 levels (Remaster) + 7 N64 secrets |
 | Multiplayer arenas       | 30                        | 24 (Remaster's curated set)  |
 | Music tracks             | 9 (`track02-10.dsp`)      | 18 (`track02-19.dsp`)        |
 | Level→track mapping      | 1998 CD                   | Remaster `mapInfo.txt`       |
