@@ -4270,104 +4270,61 @@ bool PreLoadEnemies( void )
 	 * transition. */
 	{
 
-			/* For each N64-only enemy that has a real .mx mesh in the
-			 * romfs (extracted from ForsakenEX.kpf), use it; otherwise
-			 * fall back to the 1998 template's mesh. The check lets
-			 * the same .3dsx boot against either an old romfs (no
-			 * n64/*.mx) or a new one without conditional compilation. */
-			extern bool File_Exists( char * );
+			/* Each N64-only enemy uses its real Remaster mesh. Asset
+			 * extraction (extract_remaster_levels.py from ForsakenEX.kpf)
+			 * is a hard prereq — if the n64/ files aren't there the
+			 * model loader fails visibly rather than silently falling
+			 * back to the wrong shape. The 1998 template provides AI
+			 * brain + behaviour; ModelFilename overrides the visual. */
 
-			/* Boss_Manmech (100): walking boss with body + cannon +
-			 * 2 arms. Real Remaster .cob assembles the 4 .mx limbs
-			 * into a COMP_OBJ hierarchy. Falls back to Mekton's
-			 * .cob (multi-component, walking) when n64\\manmech.cob
-			 * isn't on the SD romfs. */
+			/* Boss_Manmech (100): walking boss, 4-part .cob (body +
+			 * cannon + 2 arms). Mekton template = CRAWL_AI. */
 			EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename =
-				File_Exists("data\\bgobjects\\n64\\manmech.cob")
-				    ? "n64\\manmech.cob" : "Mekton.cob";
+			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "n64\\manmech.cob";
 			EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
 
-			/* CargoDrone (101): patrols on a path along the floor.
-			 * KEX defs/n64Enemies.txt assigns brainClass
-			 * "kexForsakenAIBrainCrawl" — confirmed authoritative.
-			 * Mekton template provides CRAWL_AI; AmmoDump (NONE)
-			 * was wrong (kept it stationary). */
+			/* CargoDrone (101): floor-patrol drone. KEX defs assign
+			 * "kexForsakenAIBrainCrawl" — Mekton template provides it. */
 			EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename =
-				File_Exists("data\\bgobjects\\n64\\cargodrone.cob")
-				    ? "n64\\cargodrone.cob"
-				    : (File_Exists("data\\models\\n64\\cargodrone.mx")
-				        ? "n64\\cargodrone.mx" : "Mekton.cob");
+			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "n64\\cargodrone.mx";
 
-			/* Boss_Ramqan (102): 19-part walking boss with body + spine
-			 * + 4 legs + head + spring tendrils. KEX defs assign
-			 * "kexForsakenAIBrainJump" — ported as ENEMY_CONTROLTYPE_JUMP_AI
-			 * (see aijump.c). The brain hops between AI nodes on a
-			 * parametric parabolic arc instead of crawling.
-			 * Shield is overridden to 8000 (boss-grade). */
+			/* Boss_Ramqan (102): 19-part walking boss with parametric-
+			 * arc hop locomotion (kexForsakenAIBrainJump → JUMP_AI,
+			 * see aijump.c). */
 			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename =
-				File_Exists("data\\bgobjects\\n64\\ramqan.cob")
-				    ? "n64\\ramqan.cob" : "Mekton.cob";
+			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
 			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 8000;
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
 
-			/* ShieldTurret (103): 3-part stationary turret with base +
-			 * pivot + gun. Real Remaster .cob assembles all 3 parts.
-			 * Falls back to BeamTurret single-cob when missing. */
+			/* ShieldTurret (103): 3-part stationary turret. */
 			EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
-			EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename =
-				File_Exists("data\\bgobjects\\n64\\shieldturret.cob")
-				    ? "n64\\shieldTurret.cob" : "Beamtrt.cob";
+			EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "n64\\shieldTurret.cob";
 			EnemyTypes[ ENEMY_ShieldTurret ].Shield = 384;
 
-			/* Boss_Maldroid (104): 12-part walking boss (body + torso +
-			 * hip + arms + cannons + legs + shins + ankles + feet).
-			 * Real Remaster .cob assembles all 12 .mx limbs. Falls back
-			 * to Mekton's .cob when n64\\maldroid.cob is missing. */
+			/* Boss_Maldroid (104): 12-part walking boss. */
 			EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename =
-				File_Exists("data\\bgobjects\\n64\\maldroid.cob")
-				    ? "n64\\maldroid.cob" : "Mekton.cob";
+			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "n64\\maldroid.cob";
 			EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
 
-			/* Enforcer (105): KEX defs/n64Enemies.txt assigns brainClass
-			 * "kexForsakenAIBrainFly" — flying enemy, authoritative.
-			 * An earlier session re-mapped this to Mekton (CRAWL_AI)
-			 * based on a YouTube observation that "tanks should be on
-			 * the ground"; that observation was wrong (the high-altitude
-			 * tanks the player saw in biolab are correct — they're
-			 * meant to fly above the player). Hunter template restores
-			 * FLY_AI behavior. Real N64 enforcer.mx mesh loads on top. */
+			/* Enforcer (105): flying enemy. Hunter template = FLY_AI. */
 			EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
-			EnemyTypes[ ENEMY_Enforcer ].ModelFilename =
-				File_Exists("data\\models\\n64\\enforcer.mx")
-				    ? "n64\\enforcer.mx" : "Hunter.mx";
+			EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "n64\\enforcer.mx";
 
-			/* Boss_DreadNaught2 (106): unused (no level references it)
-			 * but populate for safety. 4-part heavy bomber: base +
-			 * 3 guns. Falls back to Avatar's cob when missing. */
+			/* Boss_DreadNaught2 (106): 4-part heavy bomber. Unused by
+			 * current level set — populated for safety / future maps. */
 			EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename =
-				File_Exists("data\\bgobjects\\n64\\dreadnaught.cob")
-				    ? "n64\\dreadnaught.cob" : "Avatar.cob";
+			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename = "n64\\dreadnaught.cob";
 			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].Shield = 7500;
 
-			/* Boss_DreadNaught (107): 4-part heavy bomber-class. Real
-			 * Remaster .cob assembles base + 3 guns. Falls back to
-			 * Avatar's cob when n64\\dreadnaught.cob is missing. */
+			/* Boss_DreadNaught (107): same 4-part heavy bomber, real
+			 * encounter. */
 			EnemyTypes[ ENEMY_Boss_DreadNaught ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename =
-				File_Exists("data\\bgobjects\\n64\\dreadnaught.cob")
-				    ? "n64\\dreadnaught.cob" : "Avatar.cob";
+			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "n64\\dreadnaught.cob";
 			EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
 
-			/* Ghost (108): Shade brain + real N64 mesh. */
+			/* Ghost (108): stealth flier. Shade template = stealth brain. */
 			EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
-			EnemyTypes[ ENEMY_Ghost ].ModelFilename =
-				File_Exists("data\\models\\n64\\ghost.mx")
-				    ? "n64\\ghost.mx" : "Shade.mx";
+			EnemyTypes[ ENEMY_Ghost ].ModelFilename = "n64\\ghost.mx";
 
 			/* Disable StealthMode on any N64 template-copy whose
 			 * ModelFilename has a path separator. The PreLoadEnemies
