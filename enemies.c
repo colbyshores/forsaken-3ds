@@ -5579,7 +5579,21 @@ void ProcessEnemies( void )
 					if( GunObject->BurstTime < 0.0F )
 						GunObject->BurstTime = 0.0F;
 					
-					GetLastCompDispMatrix( &Enemy->Object, &GunObject->Mat, &GunObject->InvMat, &GunObject->FirePos , GunObject->GunNum);
+					if( !GetLastCompDispMatrix( &Enemy->Object, &GunObject->Mat, &GunObject->InvMat, &GunObject->FirePos , GunObject->GunNum) )
+				{
+					/* Fallback for bosses whose .cob lacks a UserContComps
+					 * gun-mount component (e.g. Boss_Ramqan: Mekton-template
+					 * gun config + ramqan.cob with 19 different bones).
+					 * Without this, GunObject->Mat is uninitialized (malloc
+					 * heap garbage); the per-gun BurstAngle gate in
+					 * AI_UPDATEGUNS rejects every shot because AI_Angle is
+					 * nonsense. Use body matrix → gun fires straight forward
+					 * from body center. Works because JUMP_AI rotates the
+					 * body to face the player each frame. */
+					GunObject->Mat    = Enemy->Object.Mat;
+					GunObject->InvMat = Enemy->Object.InvMat;
+					GunObject->FirePos = Enemy->Object.Pos;
+				}
 					GunObject = GunObject->Next;
 				}
 

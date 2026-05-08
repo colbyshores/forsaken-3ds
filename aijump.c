@@ -140,6 +140,48 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 extern u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
                             u_int16_t StartGroup, VECTOR * MoveOffset );
 extern MLOADHEADER Mloadheader;
+extern VECTOR Forward;
+
+/* Snap-rotate the boss to face TShip every frame. The JUMP brain
+ * has no per-frame body-rotation step (unlike crawl/fly which call
+ * AI_AimAtTarget). Without this, the boss stays locked in spawn
+ * orientation; AI_THINK's viewcone check fails (so AI_ICANSEEPLAYER
+ * never sets) and the per-gun BurstAngle gate inside AI_UPDATEGUNS
+ * rejects every shot when the player isn't within the boss's
+ * forward cone. KEX rotates per-frame; we snap because we don't
+ * have a turn-rate budget to interpolate against. */
+static void JumpFaceTarget( ENEMY * Enemy )
+{
+	OBJECT * T = (OBJECT*) Enemy->TShip;
+	VECTOR dir;
+	float len;
+
+
+	/* Yaw-only: project to horizontal plane so body stays upright.
+	 * Without this, dir-to-player includes Y (player above/below the
+	 * boss) and the rotation pitches/rolls the body, so the boss
+	 * lands tilted on its pad. KEX rotates only around world Y. */
+	dir.x = T->Pos.x - Enemy->Object.Pos.x;
+	dir.y = 0.0F;
+	dir.z = T->Pos.z - Enemy->Object.Pos.z;
+	len = sqrtf( dir.x*dir.x + dir.z*dir.z );
+	if( len < 0.001F ) return;
+	dir.x /= len; dir.z /= len;
+
+	/* Build a quat that rotates Forward (+Z) onto dir, then bake
+	 * to Mat / InvMat so AI_UPDATEGUNS's per-gun aim math sees a
+	 * matrix whose forward points at the target. */
+	QuatFrom2Vectors( &Enemy->Object.Quat, &Forward, &dir );
+	QuatToMatrix( &Enemy->Object.Quat, &Enemy->Object.Mat );
+	Enemy->Object.InvMat = Enemy->Object.Mat;
+	/* Transpose for inverse (rotation-only matrix). */
+	{
+		float t;
+		t = Enemy->Object.InvMat._12; Enemy->Object.InvMat._12 = Enemy->Object.InvMat._21; Enemy->Object.InvMat._21 = t;
+		t = Enemy->Object.InvMat._13; Enemy->Object.InvMat._13 = Enemy->Object.InvMat._31; Enemy->Object.InvMat._31 = t;
+		t = Enemy->Object.InvMat._23; Enemy->Object.InvMat._23 = Enemy->Object.InvMat._32; Enemy->Object.InvMat._32 = t;
+	}
+}
 
 /* Per-frame parametric arc — pure lerp in xz, parabolic in y.
  * Updates Object.Group via MoveGroup so the engine's per-frame
@@ -160,7 +202,13 @@ static void JumpDoMovement( ENEMY * Enemy )
 	{
 		Enemy->Object.Pos = *d;
 		Enemy->JumpInAir  = 0;
-		SetCurAnimSeq( 4, &Enemy->Object );
+		/* Per KEX decomp of MODE_FollowPath: state-0 (waiting on pad)
+		 * runs SetAnimSeq(1) — that's the leg-cycle / body-bob loop
+		 * authored on the boss's component rig. Was seq 4 ("land
+		 * flourish"); single-frame land poses freeze Animating=false
+		 * and the rig stops moving on the pad. Seq 1 keeps legs
+		 * articulating during the dwell. */
+		SetCurAnimSeq( 1, &Enemy->Object );
 		/* Stationary fire phase: dwell long enough for AI_UPDATEGUNS
 		 * to cycle through several cooldown periods. Per research,
 		 * Boss_Ramqan in Remaster fires for ~3s between leaps before
@@ -210,7 +258,31 @@ void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
 {
 	NODE * pick;
 
+	/* Acquire a target before AI_THINK so the LoS / viewcone block
+	 * inside AI_THINK can set AI_ICANSEEPLAYER. Without TShip set,
+	 * AI_THINK skips that block and AI_UPDATEGUNS's gating
+	 * (`AIFlags & AI_ICANSEEPLAYER`) silently filters out every
+	 * shot — boss hops correctly but never fires. Mirrors the
+	 * `SET_TARGET_PLAYERS` + `Tinfo->TObject` acquisition pattern
+	 * in aifollow.c / aiscan.c. */
+	Tinfo->Flags = 0;
+	SET_TARGET_PLAYERS;
+	AI_GetDistToNearestTarget( Enemy );
+	if( Tinfo->TObject ) Enemy->TShip = Tinfo->TObject;
+
+	/* Rotate body toward target BEFORE AI_THINK so AI_THINK's
+	 * viewcone check sees the boss facing the player. */
+	JumpFaceTarget( Enemy );
+
 	AI_THINK( Enemy, false, false );
+
+	/* Per Ghidra decomp of kexForsakenAIBrainJump::MODE_FollowPath:
+	 * KEX calls UpdateGuns unconditionally every frame, including
+	 * during the arc — boss fires while airborne, just like he does
+	 * during dwell. The aifire.c:130 gate has been extended to
+	 * bypass AI_ICANSEEPLAYER for JUMP_AI (mirroring the SPLINE
+	 * bypass) so the per-gun BurstAngle check is what gates fire. */
+	AI_UPDATEGUNS( Enemy );
 
 	if( Enemy->JumpInAir )
 	{
@@ -220,25 +292,9 @@ void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
 
 	if( !(Enemy->AIFlags & AI_ANYPLAYERINRANGE) ) return;
 
-	/* Stationary fire phase between leaps. Per research, Boss_Ramqan
-	 * in Forsaken Remastered fires red lasers, scatter missiles,
-	 * solaris missiles, homing missiles between his arc-leaps. He's
-	 * not silent during the dwell — the dwell IS his fire window.
-	 *
-	 * The Timer is set in JumpDoMovement when he lands. We use it to
-	 * gate the dwell duration — while it's positive he's stationary
-	 * and shooting; when it expires, he leaps to the next node.
-	 *
-	 * AI_UPDATEGUNS handles the actual gun cooldown / fire cadence
-	 * via the standard engine path. He fires whatever guns the
-	 * EnemyTypes[Boss_Ramqan] template has (inherited from Mekton).
-	 * Frame-perfect KEX-fidelity weapon mix is post-1.0 work.
-	 *
-	 * AI_ICANSEEPLAYER must be set for AI_UPDATEGUNS to fire — it
-	 * acts as the "I have line-of-sight, engage" gate. AI_THINK
-	 * computes it at the top of this function based on visibility
-	 * to the player; if the player is hidden, no firing (correct). */
-	AI_UPDATEGUNS( Enemy );
+	/* Dwell timer between leaps. AI_UPDATEGUNS already ran above
+	 * (KEX-faithful unconditional call) — this loop just waits out
+	 * the post-landing pause before picking the next pad. */
 
 	Enemy->Timer -= framelag;
 	if( Enemy->Timer > 0.0F ) return;
