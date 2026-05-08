@@ -120,7 +120,21 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 	Enemy->TNode     = target;
 	Enemy->Object.NearestNode = target;
 
-	SetCurAnimSeq( 2, &Enemy->Object );
+	/* Don't lock the rig to seq 2 ("jump pose") at takeoff. Sequences
+	 * authored as a single-frame pose (StartTime == EndTime) freeze
+	 * the per-frame anim time advance, so the multi-part rig stops
+	 * animating mid-air — visually the boss looks frozen during the
+	 * arc, which reads as broken. Letting the previous animation
+	 * seq (idle / walk-cycle) continue produces a continuous body
+	 * animation that's clearly "the boss is still alive and moving"
+	 * even if it isn't a leg-tucked jump pose specifically.
+	 *
+	 * The frame-exact KEX behaviour is a per-component anim during
+	 * the arc (legs cycle, body bobs); reproducing that requires
+	 * decompiled per-component frame data we don't have. The 80-85%
+	 * fidelity bar is "boss visibly animates during arc" — left in
+	 * the previous seq, that holds. SetCurAnimSeq(4) at landing
+	 * still fires for the land flourish. */
 }
 
 extern u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
@@ -147,7 +161,12 @@ static void JumpDoMovement( ENEMY * Enemy )
 		Enemy->Object.Pos = *d;
 		Enemy->JumpInAir  = 0;
 		SetCurAnimSeq( 4, &Enemy->Object );
-		Enemy->Timer = ONE_SECOND * 0.5F;
+		/* Stationary fire phase: dwell long enough for AI_UPDATEGUNS
+		 * to cycle through several cooldown periods. Per research,
+		 * Boss_Ramqan in Remaster fires for ~3s between leaps before
+		 * picking the next pad. Was 0.5s (just a hop dwell) which
+		 * left him silent and motion-less the whole encounter. */
+		Enemy->Timer = ONE_SECOND * 3.0F;
 	}
 	else
 	{
@@ -200,6 +219,26 @@ void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
 	}
 
 	if( !(Enemy->AIFlags & AI_ANYPLAYERINRANGE) ) return;
+
+	/* Stationary fire phase between leaps. Per research, Boss_Ramqan
+	 * in Forsaken Remastered fires red lasers, scatter missiles,
+	 * solaris missiles, homing missiles between his arc-leaps. He's
+	 * not silent during the dwell — the dwell IS his fire window.
+	 *
+	 * The Timer is set in JumpDoMovement when he lands. We use it to
+	 * gate the dwell duration — while it's positive he's stationary
+	 * and shooting; when it expires, he leaps to the next node.
+	 *
+	 * AI_UPDATEGUNS handles the actual gun cooldown / fire cadence
+	 * via the standard engine path. He fires whatever guns the
+	 * EnemyTypes[Boss_Ramqan] template has (inherited from Mekton).
+	 * Frame-perfect KEX-fidelity weapon mix is post-1.0 work.
+	 *
+	 * AI_ICANSEEPLAYER must be set for AI_UPDATEGUNS to fire — it
+	 * acts as the "I have line-of-sight, engage" gate. AI_THINK
+	 * computes it at the top of this function based on visibility
+	 * to the player; if the player is hidden, no firing (correct). */
+	AI_UPDATEGUNS( Enemy );
 
 	Enemy->Timer -= framelag;
 	if( Enemy->Timer > 0.0F ) return;
