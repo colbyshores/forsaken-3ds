@@ -1230,20 +1230,21 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 							/ vp->Height;
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-		/* citro3d uses scissor + unmagnified cam->Proj only when the
-		 * parent viewport (v->viewport) spans the full screen — the
-		 * main camera's case. Sub-cameras (missile chase, rear view)
-		 * render into an offset sub-rect of the screen, and need the
-		 * engine's per-group _31/_32 offset math to translate their
-		 * geometry into that sub-rect's pixels; the unmagnified
-		 * cam->Proj path centers geometry at NDC origin which lands
-		 * at screen center after the full-screen viewport mapping —
-		 * the scissor then masks everything outside the chase-camera
-		 * inset, leaving the camera looking like it's pointed wrong. */
-		if (v->viewport->X == 0 && v->viewport->Y == 0
-		    && v->viewport->Width  == (long)render_info.ThisMode.w
-		    && v->viewport->Height == (long)render_info.ThisMode.h)
-		{
+		/* citro3d uses scissor + unmagnified cam->Proj only for the
+		 * main camera. Sub-cameras (missile chase, rear view) render
+		 * into an offset sub-rect of the screen and need the engine's
+		 * per-group _31/_32 offset math to translate their geometry
+		 * into that sub-rect's pixels; the unmagnified cam->Proj path
+		 * centers geometry at NDC origin which lands at screen center
+		 * after the full-screen viewport mapping — the scissor then
+		 * masks everything outside the chase-camera inset, leaving the
+		 * camera looking like it's pointed wrong.
+		 *
+		 * Gate on camera *identity* (== &CurrentCamera) rather than
+		 * viewport dimensions — render_info.ThisMode shifts to
+		 * 320×240 during HUD render passes, which broke the earlier
+		 * dimension-comparison gate. */
+		if (cam == &CurrentCamera) {
 			g->projection = cam->Proj;
 		}
 #endif
@@ -1384,20 +1385,15 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 	 * unaffected — its viewport handling differs). Other renderers
 	 * keep the engine standard (sub-rect viewport + magnified proj).
 	 *
-	 * Gated on the parent viewport (cam->visible.viewport) being the
-	 * full screen — sub-cameras like the missile chase camera render
+	 * Gated on camera identity — only the main camera (CurrentCamera)
+	 * uses scissor mode. Sub-cameras (missile chase, rear view) render
 	 * into an offset sub-rect and need the engine's per-group
 	 * magnified-projection + sub-rect-viewport path so their geometry
 	 * lands in the chase-camera inset's pixels rather than at screen
-	 * center. */
+	 * center. (Earlier dimension-based gate broke when ThisMode
+	 * shifted during HUD render passes.) */
 #if defined(__3DS__) && defined(RENDERER_C3D)
-	{
-		render_viewport_t *_pv = cam->visible.viewport;
-		bool _full_screen = (_pv->X == 0 && _pv->Y == 0
-		                     && _pv->Width  == (long)render_info.ThisMode.w
-		                     && _pv->Height == (long)render_info.ThisMode.h);
-		FSSetNextViewPortScissorMode(_full_screen);
-	}
+	FSSetNextViewPortScissorMode(cam == &CurrentCamera);
 #else
 	FSSetNextViewPortScissorMode(false);
 #endif
