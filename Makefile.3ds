@@ -526,3 +526,130 @@ $(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(CIA_ROMF
 cia: $(OUTPUT_CIA)
 
 -include $(wildcard $(BUILD)/*.d)
+
+# ─── Release pipeline ────────────────────────────────────────────────
+#
+# `make -f Makefile.3ds release` produces three artifacts ready to
+# upload to archive.org, all from a clean tree:
+#
+#   forsaken3ds.cia            — UniqueId 0xff4ba (current shipping)
+#   forsaken3ds_alt.cia        — UniqueId 0xff4bb (alternate ID for
+#                                Title-ID-collision recovery: if a user
+#                                has another homebrew on 0xff4ba already,
+#                                they install this variant instead)
+#   forsaken3ds.3dsx           — fat build with full romfs (dspfirm.cdc
+#                                bundled, auto-stages on first boot).
+#                                For Homebrew Launcher users who do not
+#                                want a CIA install.
+#
+# **HARD RULE — DO NOT VIOLATE**:
+#   Production builds MUST NOT include any debug flag. The release
+#   target asserts this and refuses to build if any of the following
+#   are set in the environment or on the make command line:
+#
+#       DEBUG, AUTOTEST_REMASTER, DEBUG_AUTOBOOT_SLOT,
+#       DEBUG_WARP_TO_BOSS, DEATH_SIM, AUTOBOOT_SP, DEBUG_RAMQAN_FIRE
+#
+#   Background: 2026-05-07 we shipped a CIA with AUTOTEST_REMASTER baked
+#   in because a previous diagnostic build's .o files were reused
+#   without `make clean`. Players got a level-cycler instead of a game.
+#   The release target guards against that with three layers:
+#     1. Refuse to run if any debug flag env var is set
+#     2. Force `make clean` before invoking the production builds
+#     3. arm-none-eabi-strings | grep "AUTOTEST:|autoboot:|autotest_tick"
+#        must return zero hits before any artifact is allowed to upload
+#
+# Add new debug flags to the FORBIDDEN_FLAGS list when you introduce
+# them. Better to over-block than ship another sweep build by accident.
+
+FORBIDDEN_FLAGS := DEBUG AUTOTEST_REMASTER DEBUG_AUTOBOOT_SLOT \
+                   DEBUG_WARP_TO_BOSS DEATH_SIM AUTOBOOT_SP \
+                   DEBUG_RAMQAN_FIRE
+
+OUTPUT_CIA_ALT      := $(SRCDIR)/$(TARGET)_alt.cia
+RSF_FILE_ALT        := $(BUILD)/forsaken_alt.rsf
+
+.PHONY: release release-check $(OUTPUT_CIA_ALT)
+
+release-check:
+	@echo "[release] Verifying no debug flags are set..."
+	@for f in $(FORBIDDEN_FLAGS); do \
+		v=$$(eval echo \$$$$f); \
+		if [ -n "$$v" ]; then \
+			echo "[release] ABORT: forbidden flag $$f=$$v is set."; \
+			echo "[release] Production builds must have NO debug flags."; \
+			echo "[release] Unset it in your environment and re-run."; \
+			exit 1; \
+		fi; \
+	done
+	@echo "[release] Clean flag environment confirmed."
+
+# Generate alt RSF by substituting the UniqueId. Idempotent — the
+# rule re-runs whenever the source RSF changes.
+$(RSF_FILE_ALT): $(RSF_FILE) | $(BUILD)
+	@mkdir -p $(BUILD)
+	@sed 's/UniqueId\s*:\s*0xff4ba/UniqueId                : 0xff4bb/' \
+		$(RSF_FILE) > $(RSF_FILE_ALT)
+	@echo "[release] Generated alt RSF with UniqueId 0xff4bb"
+
+# Alt CIA: same ELF + assets as the primary CIA, just a different
+# UniqueId. Builds standalone — does not depend on the primary CIA
+# rule, so `make release` can build both in parallel.
+$(OUTPUT_CIA_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
+	@echo "[release] Building alt CIA (UniqueId 0xff4bb)..."
+	$(MAKEROM) -f cia -o $@ \
+		-rsf $(RSF_FILE_ALT) \
+		-target t -exefslogo \
+		-elf $(OUTPUT_ELF) \
+		-icon $(OUTPUT_SMDH) \
+		-banner $(OUTPUT_BNR) \
+		-DAPP_ROMFS=$(CIA_ROMFS)
+	@echo "[release] Alt CIA written: $@"
+
+# Production 3dsx: rebuilds $(OUTPUT_3DSX) using CIA_ROMFS (no
+# dspfirm.cdc, full game assets) so the file is safe to
+# redistribute. The dev default (make) still bundles dspfirm
+# for emulator convenience; the release target overwrites that
+# as a deliberate terminal step inside the clean tree.
+.PHONY: release-3dsx
+release-3dsx: $(OUTPUT_ELF) $(OUTPUT_SMDH) $(CIA_ROMFS_STAMP)
+	@echo "[release] Re-creating 3dsx with CIA romfs (no dspfirm)..."
+	@rm -f $(OUTPUT_3DSX)
+	3dsxtool $(OUTPUT_ELF) $(OUTPUT_3DSX) --smdh=$(OUTPUT_SMDH) --romfs=$(CIA_ROMFS)
+	@echo "[release] Production 3dsx written: $(OUTPUT_3DSX)"
+
+# Strings-grep sanity check. Catches any debug-flag string that snuck
+# into the binary (defense in depth — release-check blocks the env,
+# this catches a stale .o that bypassed the clean somehow). Runs
+# AFTER all artifacts build so a fresh ELF is on disk.
+.PHONY: release-strings-check
+release-strings-check: $(OUTPUT_ELF)
+	@echo "[release] Sanity-grepping ELF for debug strings..."
+	@n=$$(arm-none-eabi-strings $(OUTPUT_ELF) | grep -cE "AUTOTEST:|autoboot:|autotest_tick|DEATH_SIM|DEBUG_RAMQAN" || true); \
+	if [ "$$n" != "0" ]; then \
+		echo "[release] ABORT: $$n debug-flag strings present in $(OUTPUT_ELF)."; \
+		echo "[release] Aborting before any artifact ships. Investigate."; \
+		exit 1; \
+	fi
+	@echo "[release] ELF is clean ✓"
+
+# Top-level release target. Forces a clean build first so no stale .o
+# files survive from previous diagnostic runs.
+release: release-check
+	@echo "[release] Running 'make clean' to guarantee fresh .o files..."
+	@$(MAKE) -f Makefile.3ds clean
+	@echo "[release] Building production CIA + alt CIA + dspfirm-less 3dsx..."
+	@$(MAKE) -f Makefile.3ds RENDERER=citro3d EDITION=remaster \
+		$(OUTPUT_CIA) $(OUTPUT_CIA_ALT) release-3dsx \
+		release-strings-check
+	@echo
+	@echo "============================================================"
+	@echo "[release] DONE — three artifacts ready for archive.org:"
+	@ls -lh $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) 2>/dev/null
+	@echo
+	@echo "[release] SHA1 sums:"
+	@sha1sum $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) 2>/dev/null
+	@echo
+	@echo "[release] Production 3dsx is dspfirm-free (Nintendo firmware blob"
+	@echo "[release] excluded — archive.org distribution safe)."
+	@echo "============================================================"
