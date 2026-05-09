@@ -5160,6 +5160,13 @@ bool LoadEnemies( void )
 							 *   gun 2 (R cannon): UserContComps[4]/[5] = comp 10/13
 							 * The body yaw comp is shared across all three since
 							 * KEX only authors one turret base for this rig. */
+							/* Force axes unconditionally — ramqan.cob may carry
+							 * authored RotateAxis properties for these comps
+							 * that GetCompObjAxis would honour and skip our
+							 * fallback, leaving the comp rotating around a
+							 * non-yaw axis that doesn't track. KEX's
+							 * AimAtTarget feeds the turret yaw + pitch directly
+							 * regardless of authored axis, so we mirror that. */
 							{
 								static const int8_t comp_base[3] = { 10, 10, 10 };
 								static const int8_t comp_gun[3]  = { 11, 14, 13 };
@@ -5174,35 +5181,23 @@ bool LoadEnemies( void )
 									{
 										TempComp = Enemy->Object.UserContComps[ slot_base ];
 										TempComp->UserControl = true;
-										if( !GetCompObjAxis( TempComp ) )
-										{
-											TempComp->UserAxis.x = 0.0F;
-											TempComp->UserAxis.y = 1.0F;
-											TempComp->UserAxis.z = 0.0F;
-											TempComp->UserAxisPoint.x = 0.0F;
-											TempComp->UserAxisPoint.y = 0.0F;
-											TempComp->UserAxisPoint.z = 0.0F;
-										}
+										TempComp->UserAxis.x = 0.0F;
+										TempComp->UserAxis.y = 1.0F;
+										TempComp->UserAxis.z = 0.0F;
+										TempComp->UserAxisPoint.x = 0.0F;
+										TempComp->UserAxisPoint.y = 0.0F;
+										TempComp->UserAxisPoint.z = 0.0F;
 									}
 									if( Enemy->Object.UserContComps[ slot_gun ] )
 									{
 										TempComp = Enemy->Object.UserContComps[ slot_gun ];
 										TempComp->UserControl = true;
-										if( !GetCompObjAxis( TempComp ) )
-										{
-											TempComp->UserAxis.x = 1.0F;
-											TempComp->UserAxis.y = 0.0F;
-											TempComp->UserAxis.z = 0.0F;
-											TempComp->UserAxisPoint.x = 0.0F;
-											TempComp->UserAxisPoint.y = 0.0F;
-											TempComp->UserAxisPoint.z = 0.0F;
-										}
-										if( TempComp->UserAxis.x > 0.0F )		// match other turret cases
-										{
-											TempComp->UserAxis.x = -TempComp->UserAxis.x;
-											TempComp->UserAxis.y = -TempComp->UserAxis.y;
-											TempComp->UserAxis.z = -TempComp->UserAxis.z;
-										}
+										TempComp->UserAxis.x = -1.0F;
+										TempComp->UserAxis.y = 0.0F;
+										TempComp->UserAxis.z = 0.0F;
+										TempComp->UserAxisPoint.x = 0.0F;
+										TempComp->UserAxisPoint.y = 0.0F;
+										TempComp->UserAxisPoint.z = 0.0F;
 									}
 								}
 							}

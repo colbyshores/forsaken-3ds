@@ -149,45 +149,18 @@ extern u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
 extern MLOADHEADER Mloadheader;
 extern VECTOR Forward;
 
-/* Snap-rotate the boss to face TShip every frame. The JUMP brain
- * has no per-frame body-rotation step (unlike crawl/fly which call
- * AI_AimAtTarget). Without this, the boss stays locked in spawn
- * orientation; AI_THINK's viewcone check fails (so AI_ICANSEEPLAYER
- * never sets) and the per-gun BurstAngle gate inside AI_UPDATEGUNS
- * rejects every shot when the player isn't within the boss's
- * forward cone. KEX rotates per-frame; we snap because we don't
- * have a turn-rate budget to interpolate against. */
+/* Body rotation deliberately removed.
+ *
+ * Per Ghidra decomp of kexForsakenAIBrain::AimAtTarget, KEX does
+ * NOT rotate the body — it computes (target - boss) in body-local
+ * space (via inverse body matrix), produces yaw + pitch angles, and
+ * writes them to the turret comp. The body stays in spawn
+ * orientation, the turret swivels. We follow the same shape: the
+ * UserContComps[] wired in enemies.c carries the aim, body matrix
+ * stays static. */
 static void JumpFaceTarget( ENEMY * Enemy )
 {
-	OBJECT * T = (OBJECT*) Enemy->TShip;
-	VECTOR dir;
-	float len;
-
-
-	/* Yaw-only: project to horizontal plane so body stays upright.
-	 * Without this, dir-to-player includes Y (player above/below the
-	 * boss) and the rotation pitches/rolls the body, so the boss
-	 * lands tilted on its pad. KEX rotates only around world Y. */
-	dir.x = T->Pos.x - Enemy->Object.Pos.x;
-	dir.y = 0.0F;
-	dir.z = T->Pos.z - Enemy->Object.Pos.z;
-	len = sqrtf( dir.x*dir.x + dir.z*dir.z );
-	if( len < 0.001F ) return;
-	dir.x /= len; dir.z /= len;
-
-	/* Build a quat that rotates Forward (+Z) onto dir, then bake
-	 * to Mat / InvMat so AI_UPDATEGUNS's per-gun aim math sees a
-	 * matrix whose forward points at the target. */
-	QuatFrom2Vectors( &Enemy->Object.Quat, &Forward, &dir );
-	QuatToMatrix( &Enemy->Object.Quat, &Enemy->Object.Mat );
-	Enemy->Object.InvMat = Enemy->Object.Mat;
-	/* Transpose for inverse (rotation-only matrix). */
-	{
-		float t;
-		t = Enemy->Object.InvMat._12; Enemy->Object.InvMat._12 = Enemy->Object.InvMat._21; Enemy->Object.InvMat._21 = t;
-		t = Enemy->Object.InvMat._13; Enemy->Object.InvMat._13 = Enemy->Object.InvMat._31; Enemy->Object.InvMat._31 = t;
-		t = Enemy->Object.InvMat._23; Enemy->Object.InvMat._23 = Enemy->Object.InvMat._32; Enemy->Object.InvMat._32 = t;
-	}
+	(void) Enemy;
 }
 
 /* Per-frame parametric arc — pure lerp in xz, parabolic in y.
