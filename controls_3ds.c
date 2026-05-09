@@ -208,13 +208,13 @@ int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
 	No modal loop, no consoleInit, no DisplayTransfer dance.
 ===================================================================*/
 
-#define ROW_CSTICK_X      (CTRL_NUM_ACTIONS + 0)
-#define ROW_CSTICK_Y      (CTRL_NUM_ACTIONS + 1)
-#define ROW_CSTICK_INV_X  (CTRL_NUM_ACTIONS + 2)
-#define ROW_CSTICK_INV_Y  (CTRL_NUM_ACTIONS + 3)
-#define ROW_SAVE          (CTRL_NUM_ACTIONS + 4)
-#define ROW_CANCEL        (CTRL_NUM_ACTIONS + 5)
-#define MENU_ROWS         (CTRL_NUM_ACTIONS + 6)
+/* C-stick rows used to live here (axis routing + inversion). Removed
+ * from the UI because c-stick isn't bound in the engine's mapping
+ * path — toggling them did nothing visible. cstick_* fields stay
+ * in the struct + cfg file for forwards compatibility. */
+#define ROW_SAVE          (CTRL_NUM_ACTIONS + 0)
+#define ROW_CANCEL        (CTRL_NUM_ACTIONS + 1)
+#define MENU_ROWS         (CTRL_NUM_ACTIONS + 2)
 
 static bool s_menu_open = false;
 static int  s_selected = 0;
@@ -252,37 +252,10 @@ void controls_3ds_render_overlay(void)
 		y += 10;
 	}
 
-	{
-		char line[64];
-		int row;
-
-		row = ROW_CSTICK_X;
-		snprintf(line, sizeof(line), "%s C-STICK X AXIS    %d",
-		         (s_selected == row) ? ">" : " ", s_controls.cstick_axis_x);
-		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
-
-		row = ROW_CSTICK_Y;
-		snprintf(line, sizeof(line), "%s C-STICK Y AXIS    %d",
-		         (s_selected == row) ? ">" : " ", s_controls.cstick_axis_y);
-		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
-
-		row = ROW_CSTICK_INV_X;
-		snprintf(line, sizeof(line), "%s C-STICK INVERT X  %s",
-		         (s_selected == row) ? ">" : " ",
-		         s_controls.cstick_invert_x ? "ON" : "OFF");
-		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
-
-		row = ROW_CSTICK_INV_Y;
-		snprintf(line, sizeof(line), "%s C-STICK INVERT Y  %s",
-		         (s_selected == row) ? ">" : " ",
-		         s_controls.cstick_invert_y ? "ON" : "OFF");
-		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
-
-		Print4x5Text((s_selected == ROW_SAVE)   ? "> [SAVE & EXIT]" : "  [SAVE & EXIT]",
-		             8, y, (s_selected == ROW_SAVE) ? FG_HL : FG); y += 10;
-		Print4x5Text((s_selected == ROW_CANCEL) ? "> [CANCEL]"      : "  [CANCEL]",
-		             8, y, (s_selected == ROW_CANCEL) ? FG_HL : FG);
-	}
+	Print4x5Text((s_selected == ROW_SAVE)   ? "> [SAVE & EXIT]" : "  [SAVE & EXIT]",
+	             8, y, (s_selected == ROW_SAVE) ? FG_HL : FG); y += 10;
+	Print4x5Text((s_selected == ROW_CANCEL) ? "> [CANCEL]"      : "  [CANCEL]",
+	             8, y, (s_selected == ROW_CANCEL) ? FG_HL : FG);
 }
 
 bool controls_3ds_handle_input(u32 kDown, u32 kHeld)
@@ -315,10 +288,6 @@ bool controls_3ds_handle_input(u32 kDown, u32 kHeld)
 	} else if (kDown & KEY_A) {
 		if (s_selected < CTRL_NUM_ACTIONS) {
 			s_rebinding = true;
-		} else if (s_selected == ROW_CSTICK_INV_X) {
-			s_controls.cstick_invert_x ^= 1;
-		} else if (s_selected == ROW_CSTICK_INV_Y) {
-			s_controls.cstick_invert_y ^= 1;
 		} else if (s_selected == ROW_SAVE) {
 			controls_3ds_save();
 			s_menu_open = false;
@@ -326,16 +295,6 @@ bool controls_3ds_handle_input(u32 kDown, u32 kHeld)
 			s_controls = s_backup;
 			s_menu_open = false;
 		}
-	} else if ((kDown & KEY_DLEFT) || (kDown & KEY_L)) {
-		if (s_selected == ROW_CSTICK_X)
-			s_controls.cstick_axis_x = (s_controls.cstick_axis_x + 3) % 4;
-		else if (s_selected == ROW_CSTICK_Y)
-			s_controls.cstick_axis_y = (s_controls.cstick_axis_y + 3) % 4;
-	} else if ((kDown & KEY_DRIGHT) || (kDown & KEY_R)) {
-		if (s_selected == ROW_CSTICK_X)
-			s_controls.cstick_axis_x = (s_controls.cstick_axis_x + 1) % 4;
-		else if (s_selected == ROW_CSTICK_Y)
-			s_controls.cstick_axis_y = (s_controls.cstick_axis_y + 1) % 4;
 	} else if (kDown & KEY_START) {
 		controls_3ds_save();
 		s_menu_open = false;

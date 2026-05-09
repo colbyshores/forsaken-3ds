@@ -4900,9 +4900,12 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	 * menu) behave as before. pglHudBeginBottom is a no-op on the second
 	 * eye pass; the bottom screen is mono and doesn't need a second copy. */
 	/* FPS overlay — queue an FPS-counter text poly with the bottom-HUD
-	 * route flag so RenderMainCamera2dPolys's pass-2 (mode=2) picks it
-	 * up. Bottom screen is 320×240, so position in the top-right
-	 * corner clear of the existing HUD elements. */
+	 * route flag so RenderMainCamera2dPolys's pass-2 (mode=2) picks
+	 * it up. Sits just above the lower-left game clock readout (drawn
+	 * at y = window_cy - FontWidth*5 in DrawSimplePanel). Top-right
+	 * placement collided with the secondary-weapon name slot which
+	 * cycles through "Quantum" / "Solaris" / etc and obscured the
+	 * counter completely. */
 	{
 		extern void ScrPolySetRouteBottom(bool b);
 		extern int  forsaken_get_fps(void);
@@ -4910,7 +4913,12 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		char fps_buf[24];
 		snprintf(fps_buf, sizeof(fps_buf), "FPS:%d", forsaken_get_fps());
 		ScrPolySetRouteBottom(true);
-		Print4x5Text(fps_buf, 250, 4, 1 /* white */);
+		/* Bottom screen is 320×240. Clock sits at y = 240 - 30 = 210
+		 * (DrawSimplePanel) but the actual character glyphs render
+		 * up from a baseline that starts a few px above the y arg,
+		 * so y=200 had the FPS overlap with the clock. y=190 leaves
+		 * a clean ~10px gap between FPS row and clock row. */
+		Print4x5Text(fps_buf, 6, 190, 1 /* white */);
 		ScrPolySetRouteBottom(false);
 	}
 

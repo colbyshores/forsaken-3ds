@@ -185,19 +185,7 @@ bool handle_events(void)
 		}
 	}
 
-	/* Open the controls-rebind menu: SELECT + L + R held together.
-	 * Three-finger chord, unlikely to fire accidentally during normal
-	 * play (SELECT alone is rear-view on N3DS / nitro on OG; L and R
-	 * are strafe). The menu takes over the bottom screen modally and
-	 * returns once the user saves or cancels. */
-	if ((kDown & (KEY_SELECT | KEY_L | KEY_R)) &&
-	    (kHeld & KEY_SELECT) && (kHeld & KEY_L) && (kHeld & KEY_R))
-	{
-		controls_3ds_remap_menu();
-		return true;
-	}
-
-	/* check for quit (Start + Select together) — N3DS only.
+/* check for quit (Start + Select together) — N3DS only.
 	 * On OG 3DS, SELECT is the nitro button so this chord would
 	 * fire any time the player paused while nitroing. The player
 	 * can quit via HOME on OG. */
