@@ -95,7 +95,14 @@ static void JumpEnterIdle( ENEMY * Enemy )
 
 	Enemy->Timer = idle + (float) Random_Range( (u_int16_t) idle );
 	Enemy->JumpInAir = 0;
-	SetCurAnimSeq( 0, &Enemy->Object );
+	/* Free-run the .cob's authored Trans data — Ramqan.cob carries 99
+	 * Trans entries (mostly per-leg-joint ROT keys + body TRANS) that
+	 * play continuously when CurAnimSeq=-1. The Mekton template's
+	 * MektonTurretSeqs are all {Start==End} single-frame poses; using
+	 * them via SetCurAnimSeq(N) freezes Object.Time and the legs go
+	 * static. -1 routes ProcessEnemies into its free-run loop branch
+	 * (Time += framelag*AnimSpeed, wraps at OverallTime). */
+	Enemy->Object.CurAnimSeq = -1;
 }
 
 /* Snapshot start/target, switch into airborne sub-state.
@@ -182,13 +189,13 @@ static void JumpDoMovement( ENEMY * Enemy )
 	{
 		Enemy->Object.Pos = *d;
 		Enemy->JumpInAir  = 0;
-		/* Per KEX decomp of MODE_FollowPath: state-0 (waiting on pad)
-		 * runs SetAnimSeq(1) — that's the leg-cycle / body-bob loop
-		 * authored on the boss's component rig. Was seq 4 ("land
-		 * flourish"); single-frame land poses freeze Animating=false
-		 * and the rig stops moving on the pad. Seq 1 keeps legs
-		 * articulating during the dwell. */
-		SetCurAnimSeq( 1, &Enemy->Object );
+		/* Free-run the .cob's per-component anim track (see
+		 * JumpEnterIdle for full rationale). Mekton template's
+		 * AnimSeqs are single-frame poses — any SetCurAnimSeq(N)
+		 * freezes time. CurAnimSeq=-1 routes ProcessEnemies into
+		 * the free-run branch and the .cob's 99 ROT/TRANS keys
+		 * (per-leg joint cycle, body bob, springs) play continuously. */
+		Enemy->Object.CurAnimSeq = -1;
 		/* Stationary fire phase: dwell long enough for AI_UPDATEGUNS
 		 * to cycle through several cooldown periods. Per research,
 		 * Boss_Ramqan in Remaster fires for ~3s between leaps before
