@@ -193,205 +193,165 @@ int controls_3ds_cstick_axis_y(void)   { return s_controls.cstick_axis_y; }
 int controls_3ds_cstick_invert_x(void) { return s_controls.cstick_invert_x; }
 int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
 
-/*===================================================================
-	Bottom-screen rebind menu.
-
-	Modal — takes over the bottom screen with consoleInit, runs its
-	own input loop, returns when user picks "Save & Exit" or hits B
-	at the top of the action list. Caller is responsible for
-	restoring whatever it had on the bottom screen afterward.
-===================================================================*/
-
 #define MENU_ITEMS (CTRL_NUM_ACTIONS + 4 + 2)
 /* layout: 10 actions + 4 c-stick rows + "Save & Exit" + "Cancel" */
 
-/* On-screen touchable button zones (drawn during rebind mode).
- * Bottom screen is 320x240; console is 40x30 chars at 8x8 px each.
- * Reserve the last console row (row 29 = pixel y 232..239) for two
- * touchable rectangles: CLEAR (left half, x 0..159) and ABORT
- * (right half, x 160..319). Plain hardware buttons can't safely be
- * reserved as control keys here because every one of them can be
- * a player-rebound action. */
-#define TOUCH_BAR_Y_PX  216    /* console row 27 */
-#define TOUCH_BAR_H_PX  24     /* 3 rows */
-#define TOUCH_MID_X     160
+/*===================================================================
+	Hooked menu — replaces the old modal loop.
 
-static void draw_touch_bar(void)
-{
-	/* Print the two virtual buttons on the last 3 rows. ANSI inverse
-	 * video so they read as buttons against the surrounding text. */
-	printf("\x1b[28;1H");                      /* row 28, col 1 */
-	printf("\x1b[7m   [ CLEAR ]   \x1b[0m");   /* 14 chars left */
-	printf("\x1b[7m   [ ABORT ]   \x1b[0m");   /* 14 chars right */
-}
+	State machine lives in two functions called from the engine:
+	  controls_3ds_render_overlay() runs per-frame from the bottom-
+	    screen draw block (oct2.c), emits text via Print4x5Text.
+	  controls_3ds_handle_input() runs at the top of handle_events,
+	    consumes navigation/rebind input. Returns true to suppress
+	    normal input propagation while menu is up.
+	No modal loop, no consoleInit, no DisplayTransfer dance.
+===================================================================*/
 
-static void draw_menu(int selected, bool rebinding)
+#define ROW_CSTICK_X      (CTRL_NUM_ACTIONS + 0)
+#define ROW_CSTICK_Y      (CTRL_NUM_ACTIONS + 1)
+#define ROW_CSTICK_INV_X  (CTRL_NUM_ACTIONS + 2)
+#define ROW_CSTICK_INV_Y  (CTRL_NUM_ACTIONS + 3)
+#define ROW_SAVE          (CTRL_NUM_ACTIONS + 4)
+#define ROW_CANCEL        (CTRL_NUM_ACTIONS + 5)
+#define MENU_ROWS         (CTRL_NUM_ACTIONS + 6)
+
+static bool s_menu_open = false;
+static int  s_selected = 0;
+static bool s_rebinding = false;
+static controls_3ds_t s_backup;
+
+bool controls_3ds_menu_is_open(void) { return s_menu_open; }
+
+void controls_3ds_render_overlay(void)
 {
-	consoleClear();
-	printf("\x1b[1;1H\x1b[37mForsaken Controls\x1b[0m\n");
-	printf("DPad: select   A: rebind   L/R: cycle\n");
-	printf("START: save+exit   B: cancel\n");
-	printf("------------------------------------\n");
+	extern int Print4x5Text(char *text, int x, int y, int color);
+	if (!s_menu_open) return;
+
+	const int FG = 7;        /* white */
+	const int FG_HL = 4;     /* yellow-ish (for selected row) */
+	int y = 6;
+
+	Print4x5Text("FORSAKEN CONTROLS", 20, y, FG);
+	y += 12;
+	if (s_rebinding) {
+		Print4x5Text("PRESS A BUTTON TO BIND", 20, y, FG_HL);
+	} else {
+		Print4x5Text("DPAD: SELECT  A: SET", 20, y, FG);
+	}
+	y += 14;
 
 	for (int i = 0; i < CTRL_NUM_ACTIONS; i++) {
-		const char *cursor = (i == selected) ? ">" : " ";
-		const char *hl     = (i == selected && rebinding) ? "\x1b[33m" : "";
-		const char *rs     = (i == selected && rebinding) ? "\x1b[0m"  : "";
-		printf("%s %-16s %s%s%s\n", cursor, k_action_labels[i], hl,
-		       button_name(s_controls.button[i]), rs);
+		int color = (i == s_selected) ? FG_HL : FG;
+		char line[64];
+		snprintf(line, sizeof(line), "%s %-15s %s",
+		         (i == s_selected) ? ">" : " ",
+		         k_action_labels[i],
+		         button_name(s_controls.button[i]));
+		Print4x5Text(line, 8, y, color);
+		y += 10;
 	}
-	int row = CTRL_NUM_ACTIONS;
-	printf("%s %-16s axis %d\n",
-	       (selected == row+0) ? ">" : " ",
-	       "C-stick X axis",
-	       s_controls.cstick_axis_x);
-	printf("%s %-16s axis %d\n",
-	       (selected == row+1) ? ">" : " ",
-	       "C-stick Y axis",
-	       s_controls.cstick_axis_y);
-	printf("%s %-16s %s\n",
-	       (selected == row+2) ? ">" : " ",
-	       "C-stick invert X",
-	       s_controls.cstick_invert_x ? "on" : "off");
-	printf("%s %-16s %s\n",
-	       (selected == row+3) ? ">" : " ",
-	       "C-stick invert Y",
-	       s_controls.cstick_invert_y ? "on" : "off");
 
-	printf("%s %s\n", (selected == CTRL_NUM_ACTIONS+4) ? ">" : " ", "[Save & Exit]");
-	printf("%s %s\n", (selected == CTRL_NUM_ACTIONS+5) ? ">" : " ", "[Cancel]");
+	{
+		char line[64];
+		int row;
 
-	if (rebinding && selected < CTRL_NUM_ACTIONS) {
-		printf("\n  Press a hardware button to bind.\n");
-		printf("  Touch screen for CLEAR / ABORT.\n");
-		draw_touch_bar();
+		row = ROW_CSTICK_X;
+		snprintf(line, sizeof(line), "%s C-STICK X AXIS    %d",
+		         (s_selected == row) ? ">" : " ", s_controls.cstick_axis_x);
+		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
+
+		row = ROW_CSTICK_Y;
+		snprintf(line, sizeof(line), "%s C-STICK Y AXIS    %d",
+		         (s_selected == row) ? ">" : " ", s_controls.cstick_axis_y);
+		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
+
+		row = ROW_CSTICK_INV_X;
+		snprintf(line, sizeof(line), "%s C-STICK INVERT X  %s",
+		         (s_selected == row) ? ">" : " ",
+		         s_controls.cstick_invert_x ? "ON" : "OFF");
+		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
+
+		row = ROW_CSTICK_INV_Y;
+		snprintf(line, sizeof(line), "%s C-STICK INVERT Y  %s",
+		         (s_selected == row) ? ">" : " ",
+		         s_controls.cstick_invert_y ? "ON" : "OFF");
+		Print4x5Text(line, 8, y, (s_selected == row) ? FG_HL : FG); y += 10;
+
+		Print4x5Text((s_selected == ROW_SAVE)   ? "> [SAVE & EXIT]" : "  [SAVE & EXIT]",
+		             8, y, (s_selected == ROW_SAVE) ? FG_HL : FG); y += 10;
+		Print4x5Text((s_selected == ROW_CANCEL) ? "> [CANCEL]"      : "  [CANCEL]",
+		             8, y, (s_selected == ROW_CANCEL) ? FG_HL : FG);
 	}
+}
+
+bool controls_3ds_handle_input(u32 kDown, u32 kHeld)
+{
+	(void)kHeld;
+	if (!s_menu_open) return false;
+
+	if (s_rebinding) {
+		/* Wait for any single hardware button to commit the bind.
+		 * START aborts (no change). Touchscreen would clear (when
+		 * we add it) — for now plain hardware-button only. */
+		if (kDown & KEY_START) {
+			s_rebinding = false;
+		} else {
+			for (size_t i = 0; i < NUM_BUTTONS; i++) {
+				if (kDown & k_buttons[i].mask) {
+					s_controls.button[s_selected] = k_buttons[i].mask;
+					s_rebinding = false;
+					break;
+				}
+			}
+		}
+		return true;
+	}
+
+	if (kDown & KEY_DUP) {
+		s_selected = (s_selected - 1 + MENU_ROWS) % MENU_ROWS;
+	} else if (kDown & KEY_DDOWN) {
+		s_selected = (s_selected + 1) % MENU_ROWS;
+	} else if (kDown & KEY_A) {
+		if (s_selected < CTRL_NUM_ACTIONS) {
+			s_rebinding = true;
+		} else if (s_selected == ROW_CSTICK_INV_X) {
+			s_controls.cstick_invert_x ^= 1;
+		} else if (s_selected == ROW_CSTICK_INV_Y) {
+			s_controls.cstick_invert_y ^= 1;
+		} else if (s_selected == ROW_SAVE) {
+			controls_3ds_save();
+			s_menu_open = false;
+		} else if (s_selected == ROW_CANCEL) {
+			s_controls = s_backup;
+			s_menu_open = false;
+		}
+	} else if ((kDown & KEY_DLEFT) || (kDown & KEY_L)) {
+		if (s_selected == ROW_CSTICK_X)
+			s_controls.cstick_axis_x = (s_controls.cstick_axis_x + 3) % 4;
+		else if (s_selected == ROW_CSTICK_Y)
+			s_controls.cstick_axis_y = (s_controls.cstick_axis_y + 3) % 4;
+	} else if ((kDown & KEY_DRIGHT) || (kDown & KEY_R)) {
+		if (s_selected == ROW_CSTICK_X)
+			s_controls.cstick_axis_x = (s_controls.cstick_axis_x + 1) % 4;
+		else if (s_selected == ROW_CSTICK_Y)
+			s_controls.cstick_axis_y = (s_controls.cstick_axis_y + 1) % 4;
+	} else if (kDown & KEY_START) {
+		controls_3ds_save();
+		s_menu_open = false;
+	} else if (kDown & KEY_B) {
+		s_controls = s_backup;
+		s_menu_open = false;
+	}
+	return true;
 }
 
 void controls_3ds_remap_menu(void)
 {
-	PrintConsole console;
-	int selected = 0;
-	bool rebinding = false;
-	controls_3ds_t backup = s_controls;
-
-	consoleInit(GFX_BOTTOM, &console);
-
-	/* Drain pending key state so the chord that opened the menu doesn't
-	 * also count as the first navigation press. */
-	hidScanInput(); hidKeysDown();
-
-	draw_menu(selected, rebinding);
-
-	for (;;) {
-		hidScanInput();
-		u32 kDown = hidKeysDown();
-
-		if (rebinding) {
-			/* Touchscreen handles CLEAR / ABORT (virtual buttons in
-			 * the bar drawn at the bottom of the screen). Every
-			 * hardware button — including A, B, SELECT, START —
-			 * binds when pressed alone. */
-			if (kDown & KEY_TOUCH) {
-				touchPosition tp;
-				hidTouchRead(&tp);
-				if (tp.py >= TOUCH_BAR_Y_PX && tp.py < TOUCH_BAR_Y_PX + TOUCH_BAR_H_PX) {
-					if (tp.px < TOUCH_MID_X) {
-						s_controls.button[selected] = 0;  /* CLEAR */
-					}
-					/* right half = ABORT (no binding change) */
-					rebinding = false;
-				}
-			} else {
-				for (size_t i = 0; i < NUM_BUTTONS; i++) {
-					if (kDown & k_buttons[i].mask) {
-						s_controls.button[selected] = k_buttons[i].mask;
-						rebinding = false;
-						break;
-					}
-				}
-			}
-			if (!rebinding) draw_menu(selected, false);
-		} else {
-			if (kDown & KEY_DUP) {
-				selected = (selected - 1 + MENU_ITEMS) % MENU_ITEMS;
-				draw_menu(selected, false);
-			} else if (kDown & KEY_DDOWN) {
-				selected = (selected + 1) % MENU_ITEMS;
-				draw_menu(selected, false);
-			} else if (kDown & KEY_A) {
-				if (selected < CTRL_NUM_ACTIONS) {
-					rebinding = true;
-					draw_menu(selected, true);
-				} else {
-					int row = CTRL_NUM_ACTIONS;
-					if (selected == row+2) s_controls.cstick_invert_x ^= 1;
-					else if (selected == row+3) s_controls.cstick_invert_y ^= 1;
-					else if (selected == CTRL_NUM_ACTIONS+4) {
-						controls_3ds_save();
-						break;
-					}
-					else if (selected == CTRL_NUM_ACTIONS+5) {
-						s_controls = backup;
-						break;
-					}
-					draw_menu(selected, false);
-				}
-			} else if ((kDown & KEY_L) || (kDown & KEY_DLEFT)) {
-				int row = CTRL_NUM_ACTIONS;
-				if (selected == row+0)
-					s_controls.cstick_axis_x = (s_controls.cstick_axis_x + 3) % 4;
-				else if (selected == row+1)
-					s_controls.cstick_axis_y = (s_controls.cstick_axis_y + 3) % 4;
-				draw_menu(selected, false);
-			} else if ((kDown & KEY_R) || (kDown & KEY_DRIGHT)) {
-				int row = CTRL_NUM_ACTIONS;
-				if (selected == row+0)
-					s_controls.cstick_axis_x = (s_controls.cstick_axis_x + 1) % 4;
-				else if (selected == row+1)
-					s_controls.cstick_axis_y = (s_controls.cstick_axis_y + 1) % 4;
-				draw_menu(selected, false);
-			} else if (kDown & KEY_START) {
-				controls_3ds_save();
-				break;
-			} else if (kDown & KEY_B) {
-				s_controls = backup;
-				break;
-			}
-		}
-
-		gspWaitForVBlank();
-		gfxFlushBuffers();
-		gfxSwapBuffers();
-	}
-
-	/* Bottom-screen restore. consoleInit changes the screen format
-	 * AND disables double-buffering. If we don't reset the format,
-	 * gfxGetFramebuffer may return a buffer whose stride/size doesn't
-	 * match what the display controller is actually scanning out —
-	 * memset hits the "wrong" buffer and corruption persists.
-	 *
-	 * Order matters:
-	 *   1. consoleClear() wipes the console character grid
-	 *   2. gfxSetScreenFormat → BGR8 (libctru default, 3 bytes/pixel)
-	 *   3. Re-enable double-buffering
-	 *   4. swap+vblank to commit the format change
-	 *   5. Four memset+swap+vblank cycles — covers both halves of
-	 *      the swap chain twice, ensuring whichever buffer the
-	 *      display controller latches onto is black. */
-	consoleClear();
-	gfxSetScreenFormat(GFX_BOTTOM, GSP_BGR8_OES);
-	gfxSetDoubleBuffering(GFX_BOTTOM, true);
-	gfxFlushBuffers(); gfxSwapBuffers(); gspWaitForVBlank();
-
-	for (int i = 0; i < 4; i++) {
-		u16 fbw = 0, fbh = 0;
-		u8 *fb = gfxGetFramebuffer(GFX_BOTTOM, GFX_LEFT, &fbw, &fbh);
-		if (fb) memset(fb, 0, (size_t)fbw * (size_t)fbh * 3);
-		gfxFlushBuffers();
-		gfxSwapBuffers();
-		gspWaitForVBlank();
-	}
+	s_backup = s_controls;
+	s_selected = 0;
+	s_rebinding = false;
+	s_menu_open = true;
 }
 
 #endif /* __3DS__ */

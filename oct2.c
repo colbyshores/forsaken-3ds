@@ -4793,7 +4793,17 @@ void DrawMainGameMenu(void)
     render_info.window_size.cy = 240;
     render_info.ThisMode.w = 320;
     render_info.ThisMode.h = 240;
-    DrawSimplePanel();
+    {
+      extern bool controls_3ds_menu_is_open(void);
+      extern void controls_3ds_render_overlay(void);
+      if (controls_3ds_menu_is_open()) {
+        /* Menu open: skip HUD, draw menu text only. The next
+         * frame after menu closes restores HUD automatically. */
+        controls_3ds_render_overlay();
+      } else {
+        DrawSimplePanel();
+      }
+    }
     ScrPolySetRouteBottom(false);
     render_info.window_size.cx = 400;
     render_info.window_size.cy = 240;

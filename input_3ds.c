@@ -159,6 +159,32 @@ bool handle_events(void)
 		controls_3ds_init(s_is_n3ds);
 	}
 
+/* Controls menu input — runs first so menu can intercept B,
+	 * D-pad, A, etc. before the engine's own handlers see them.
+	 * Returns true if menu consumed input, in which case we still
+	 * fall through to update axis/button state but the menu will
+	 * have already absorbed the relevant kDown bits. */
+	{
+		extern bool controls_3ds_handle_input(u32 kDown, u32 kHeld);
+		if (controls_3ds_handle_input(kDown, kHeld)) {
+			/* Menu open — fully suppress input propagation:
+			 *   joy_*: gameplay axes/buttons
+			 *   _3ds_key_state[]: SDL-shaped keyboard state the
+			 *     engine's menu reads (without clearing here, the
+			 *     pause menu sees stale RETURN/ESCAPE from prior
+			 *     frames and re-fires "3DS Controls" → menu beeps
+			 *     and selection resets every frame).
+			 *   input_buffer[]: edge-triggered key events queue,
+			 *     same problem — must be drained too. */
+			memset(joy_button_state[0], 0, sizeof(joy_button_state[0]));
+			memset(joy_axis_state[0],   0, sizeof(joy_axis_state[0]));
+			memset(joy_hat_state[0],    0, sizeof(joy_hat_state[0]));
+			memset(_3ds_key_state,      0, sizeof(_3ds_key_state));
+			input_buffer_reset();
+			return true;
+		}
+	}
+
 	/* Open the controls-rebind menu: SELECT + L + R held together.
 	 * Three-finger chord, unlikely to fire accidentally during normal
 	 * play (SELECT alone is rear-view on N3DS / nitro on OG; L and R

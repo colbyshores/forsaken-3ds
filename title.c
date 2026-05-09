@@ -1012,6 +1012,10 @@ DEFKEY KDsend_speech = { &Config.send_speech, 0 };
 extern void controls_3ds_remap_menu(void);
 static void SelectControlsRemap(MENUITEM *Item) {
 	(void)Item;
+	/* Just open the controls menu — leave the pause menu open
+	 * underneath so the game stays paused. Our input hook's
+	 * early-return suppresses input propagation, so the pause
+	 * menu won't process A/B presses while controls menu is up. */
 	controls_3ds_remap_menu();
 }
 #endif
