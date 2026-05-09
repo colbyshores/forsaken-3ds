@@ -297,6 +297,11 @@ enum
 	GUN_MetaTankMain,		// 11
 	GUN_Avatar,				// 12
 	GUN_Avatar2,			// 13
+#ifdef EDITION_REMASTER
+	GUN_Ramqan,				// 14 — Boss_Ramqan L cannon: Solaris rockets
+	GUN_RamqanBody,			// 15 — Boss_Ramqan body: Pulsar
+	GUN_RamqanScatter,		// 16 — Boss_Ramqan R cannon: Scatter
+#endif
 };
 
 

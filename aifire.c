@@ -190,7 +190,15 @@ void AI_UPDATEGUNS( register ENEMY * Enemy )
 								&TempOffset, GunTypes[GObject->Type].WeaponType, false );
 							
 						}else{
-							Weapon = BodgePrimaryWeapon( GunTypes[GObject->Type].WeaponType, Enemy->PickupHeld );
+							/* BodgePrimaryWeapon rewrites NME_* weapons to player
+							 * pickups when PickupHeld <= PICKUP_Laser. For NME_*
+							 * enemy weapons (Pulsar etc.) the rewrite produces
+							 * a player weapon that EnemyFirePrimary silently
+							 * drops — skip it for already-NME slots. */
+							if( GunTypes[GObject->Type].WeaponType >= NME_PULSAR )
+								Weapon = GunTypes[GObject->Type].WeaponType;
+							else
+								Weapon = BodgePrimaryWeapon( GunTypes[GObject->Type].WeaponType, Enemy->PickupHeld );
 
 							i = EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 										Enemy->Object.Group, &Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,
@@ -233,7 +241,7 @@ void AI_UPDATEGUNS( register ENEMY * Enemy )
 					{
 						ApplyMatrix( &GObject->Mat, &Forward, &TempVector );
 						ApplyMatrix( &GObject->Mat, &SlideUp, &TempUpVector );
-						
+
 						if(Enemy->Object.ControlType == ENEMY_CONTROLTYPE_TURRET_AI)
 						{
 							if( !Enemy->Object.Animating && (Enemy->Type != ENEMY_MissileTurret) )
@@ -249,7 +257,15 @@ void AI_UPDATEGUNS( register ENEMY * Enemy )
 								&TempOffset, GunTypes[GObject->Type].WeaponType, false );
 							
 						}else{
-							Weapon = BodgePrimaryWeapon( GunTypes[GObject->Type].WeaponType, Enemy->PickupHeld );
+							/* BodgePrimaryWeapon rewrites NME_* weapons to player
+							 * pickups when PickupHeld <= PICKUP_Laser. For NME_*
+							 * enemy weapons (Pulsar etc.) the rewrite produces
+							 * a player weapon that EnemyFirePrimary silently
+							 * drops — skip it for already-NME slots. */
+							if( GunTypes[GObject->Type].WeaponType >= NME_PULSAR )
+								Weapon = GunTypes[GObject->Type].WeaponType;
+							else
+								Weapon = BodgePrimaryWeapon( GunTypes[GObject->Type].WeaponType, Enemy->PickupHeld );
 
 							i = EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 										Enemy->Object.Group, &Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,

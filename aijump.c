@@ -114,6 +114,13 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 	Enemy->JumpT       = 0.0F;
 	Enemy->JumpStart   = Enemy->Object.Pos;
 	Enemy->JumpTarget  = target->SolidPos;     /* land on the pad */
+	/* Nodeload's downward floor-snap adds +75 to put the object pivot
+	 * above the floor (calibrated for Mekton-sized enemies whose pivot
+	 * is at body center). KEX's SetupJump lands at the raw raycast hit
+	 * — no offset — so a Ramqan-sized rig with its pivot near the
+	 * pelvis ends up hovering ~75 units off the pad. Subtract the
+	 * Nodeload offset back out so the boss's feet kiss the floor. */
+	Enemy->JumpTarget.y -= 75.0F;
 	Enemy->JumpApexY   = target->Pos.y;        /* apex from raw node Y */
 
 	Enemy->LastTNode = Enemy->TNode;

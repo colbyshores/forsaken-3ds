@@ -437,6 +437,62 @@ GUNTYPE	GunTypes[] = {
 		SOLARISMISSILE,	//WeaponType
 		false,	//PreciseRotation
 	},
+#ifdef EDITION_REMASTER
+	{//	GUN_Ramqan — Boss_Ramqan rockets, fired while perched / mid-arc
+		2.00F,	//MaxTurnSpeed
+		0.065F,	//TurnAccell
+		0.070F,	//TurnDecell
+		30.0F,	//ReloadTime — matches KEX Gun_RamqanLCannon
+		600.0F,	//BurstMasterTime
+		4,		//BurstMasterCount — KEX fires 4-rocket bursts
+		80.0F,	//BurstAngle — KEX uses 80°; we need wide because no per-component aim
+		-30.0F,	//XRotMin
+		30.0F,	//XRotMax
+		-45.0F,	//YRotMin
+		45.0F,	//YRotMax
+		0.0F,	//Range
+		0,		//PowerLevel
+		true,	// Secondary (ENEMYHOMINGMISSILE lives in secondary.h)
+		SOLARISMISSILE,	//WeaponType — Solaris tank rockets, per KEX defs/enemyGuns.txt Gun_RamqanLCannon
+		false,	//PreciseRotation
+	},
+	{//	GUN_RamqanBody — body-mounted Pulsar, KEX Gun_RamqanBody
+		4.00F,	//MaxTurnSpeed
+		0.076F,	//TurnAccell
+		0.072F,	//TurnDecell
+		5.0F,	//ReloadTime — KEX 5.0
+		400.0F,	//BurstMasterTime
+		20,		//BurstMasterCount
+		15.0F,	//BurstAngle — slightly looser than KEX 10° to compensate for our snap-rotation body yaw being yaw-only
+		-30.0F,	//XRotMin
+		30.0F,	//XRotMax
+		-45.0F,	//YRotMin
+		45.0F,	//YRotMax
+		0.0F,	//Range
+		0,		//PowerLevel
+		false,	// Primary
+		NME_PULSAR,	//WeaponType — KEX Pulsar_Ramqan ≈ NME_PULSAR
+		false,	//PreciseRotation
+	},
+	{//	GUN_RamqanScatter — right cannon scatter, KEX Gun_RamqanRCannon
+		4.00F,	//MaxTurnSpeed
+		0.076F,	//TurnAccell
+		0.072F,	//TurnDecell
+		20.0F,	//ReloadTime — bullets within a single cluster tightly spaced
+		900.0F,	//BurstMasterTime — KEX Gun_RamqanRCannon: 900 ticks (~15s) between cluster fires
+		6,		//BurstMasterCount — KEX fires 1 SECFIRE_SINGLE Scatter; we approximate with 6 bullets to read as a cluster
+		80.0F,	//BurstAngle
+		-30.0F,	//XRotMin
+		30.0F,	//XRotMax
+		-45.0F,	//YRotMin
+		45.0F,	//YRotMax
+		0.0F,	//Range
+		0,		//PowerLevel
+		false,	// Primary
+		NME_SUSS_GUN,	//WeaponType — Suss Gun (verified PrimaryWeaponAttribs[12] defined + sus.mx is NOT_LEVEL_SPECIFIC DO_LOAD)
+		false,	//PreciseRotation
+	},
+#endif
 
 
 
@@ -930,6 +986,36 @@ VECTOR	SnubotAimPos = { ( 0.0F * GLOBAL_SCALE ), ( 320.0F * GLOBAL_SCALE ), ( -2
 VECTOR	MislTurretAimPos = { ( 0.0F * GLOBAL_SCALE ), ( 480.0F * GLOBAL_SCALE ), ( 0.0F * GLOBAL_SCALE ) };
 VECTOR	DuelTurretAimPos = { ( 0.0F * GLOBAL_SCALE ), ( 540.0F * GLOBAL_SCALE ), ( -100.0F * GLOBAL_SCALE ) };
 VECTOR	MektonTurretAimPos = { ( -60.0F * GLOBAL_SCALE ), ( 180.0F * GLOBAL_SCALE ), ( -60.0F * GLOBAL_SCALE ) };
+
+#ifdef EDITION_REMASTER
+/* Boss_Ramqan fire positions. KEX is Z-up; we're Y-up. KEX
+ * gunAimPositions per defs/n64Enemies.txt:
+ *   body : (   0, -64, 148)
+ *   L can: ( -61, -64, 153)
+ *   R can: (  61, -64, 153)
+ * Mapped to Forsaken Y-up: (X, KEX_Z, KEX_Y) with KEX_Y negated so
+ * "forward" = +Z. Body sits up high (~150) above pivot; cannons are
+ * higher still and offset ±61 to the sides — visibly mounted near
+ * the boss's head/shoulders rather than its body center. */
+FIREPOS RamqanBodyFirePos = {
+	1,
+	{ { (    0.0F * GLOBAL_SCALE ), ( 150.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) } },
+	{ { 0.0F, 0.0F, 1.0F } }
+};
+FIREPOS RamqanLCannonFirePos = {
+	1,
+	{ { ( -110.0F * GLOBAL_SCALE ), ( 200.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) } },
+	{ { 0.0F, 0.0F, 1.0F } }
+};
+FIREPOS RamqanRCannonFirePos = {
+	1,
+	{ { (  110.0F * GLOBAL_SCALE ), ( 200.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) } },
+	{ { 0.0F, 0.0F, 1.0F } }
+};
+VECTOR RamqanBodyAimPos     = { (    0.0F * GLOBAL_SCALE ), ( 150.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) };
+VECTOR RamqanLCannonAimPos  = { ( -110.0F * GLOBAL_SCALE ), ( 200.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) };
+VECTOR RamqanRCannonAimPos  = { (  110.0F * GLOBAL_SCALE ), ( 200.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) };
+#endif
 VECTOR	SupresAimPos = { ( 0.0F * GLOBAL_SCALE ), ( -160.0F * GLOBAL_SCALE ), ( 560.0F * GLOBAL_SCALE ) };
 VECTOR	LevitankAimPos = { ( -110.0F * GLOBAL_SCALE ), ( 150.0F * GLOBAL_SCALE ), ( -80.0F * GLOBAL_SCALE ) };
 VECTOR	GuardBotAimPos = { ( -100.0F * GLOBAL_SCALE ), ( 480.0F * GLOBAL_SCALE ), ( 240.0F * GLOBAL_SCALE ) };
@@ -4295,6 +4381,31 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
 			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 8000;
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
+			/* Three turret guns per KEX defs/n64Enemies.txt:
+			 *   gun 0: body-mounted Pulsar (Gun_RamqanBody)
+			 *   gun 1: left  cannon Solaris rocket (Gun_RamqanLCannon)
+			 *   gun 2: right cannon Scatter (Gun_RamqanRCannon)
+			 * Without per-COMP_OBJ aim wiring all three fire from the
+			 * body matrix, but the per-gun FirePos offsets place the
+			 * projectile origins near the head/shoulders so it visually
+			 * reads as cannon-fire instead of body-fire. */
+			/* Three guns per KEX defs/n64Enemies.txt:
+			 *   gun 0: body-mounted Pulsar (Gun_RamqanBody, comp 11)
+			 *   gun 1: left  cannon Solaris rocket (comp 14)
+			 *   gun 2: right cannon Suss-bullet cluster ≈ KEX Scatter (comp 13)
+			 * Per-COMP_OBJ aim is wired in PreInitEnemies's UserContComps
+			 * switch case, so each gun's matrix actually points at the
+			 * player and the per-gun BurstAngle gates work correctly. */
+			EnemyTypes[ ENEMY_Boss_Ramqan ].NumOfGuns = 3;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[0] = GUN_RamqanBody;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[1] = GUN_Ramqan;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[2] = GUN_RamqanScatter;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[0] = &RamqanBodyFirePos;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[1] = &RamqanLCannonFirePos;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[2] = &RamqanRCannonFirePos;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[0]     = &RamqanBodyAimPos;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[1]     = &RamqanLCannonAimPos;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[2]     = &RamqanRCannonAimPos;
 
 			/* ShieldTurret (103): 3-part stationary turret. */
 			EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
@@ -5028,6 +5139,75 @@ bool LoadEnemies( void )
 								}
 							}
 							break;
+
+#ifdef EDITION_REMASTER
+						case ENEMY_Boss_Ramqan:
+							/* KEX defs/n64Enemies.txt for Boss_Ramqan:
+							 *   turretBaseComponent_1   10  (body yaw)
+							 *   turretGunComponent_1    11  (body pitch — Pulsar)
+							 *   turretGunComponent_2    14  (L cannon — Solaris)
+							 *   turretGunComponent_3    13  (R cannon — Suss-bullet cluster)
+							 * The .cob doesn't carry PROPSTATE_UserControl markers
+							 * for these comps, so the loader leaves
+							 * UserContComps[] empty and every gun falls back to the
+							 * body matrix (firing straight forward).  Wire the
+							 * pairs (base/yaw + gun/pitch) here; SetTurretVector
+							 * + UpdateCompObjChildren + GetLastCompDispMatrix then
+							 * give each gun a real aim matrix.  GunNum=i*2 (see
+							 * InitGuns) so:
+							 *   gun 0 (body)    : UserContComps[0]/[1] = comp 10/11
+							 *   gun 1 (L cannon): UserContComps[2]/[3] = comp 10/14
+							 *   gun 2 (R cannon): UserContComps[4]/[5] = comp 10/13
+							 * The body yaw comp is shared across all three since
+							 * KEX only authors one turret base for this rig. */
+							{
+								static const int8_t comp_base[3] = { 10, 10, 10 };
+								static const int8_t comp_gun[3]  = { 11, 14, 13 };
+								int g;
+								for( g = 0; g < 3; g++ )
+								{
+									int slot_base = g * 2;
+									int slot_gun  = g * 2 + 1;
+									Enemy->Object.UserContComps[ slot_base ] = GetCompObjAddress( comp_base[g], 1, Comp );
+									Enemy->Object.UserContComps[ slot_gun  ] = GetCompObjAddress( comp_gun[g],  1, Comp );
+									if( Enemy->Object.UserContComps[ slot_base ] )
+									{
+										TempComp = Enemy->Object.UserContComps[ slot_base ];
+										TempComp->UserControl = true;
+										if( !GetCompObjAxis( TempComp ) )
+										{
+											TempComp->UserAxis.x = 0.0F;
+											TempComp->UserAxis.y = 1.0F;
+											TempComp->UserAxis.z = 0.0F;
+											TempComp->UserAxisPoint.x = 0.0F;
+											TempComp->UserAxisPoint.y = 0.0F;
+											TempComp->UserAxisPoint.z = 0.0F;
+										}
+									}
+									if( Enemy->Object.UserContComps[ slot_gun ] )
+									{
+										TempComp = Enemy->Object.UserContComps[ slot_gun ];
+										TempComp->UserControl = true;
+										if( !GetCompObjAxis( TempComp ) )
+										{
+											TempComp->UserAxis.x = 1.0F;
+											TempComp->UserAxis.y = 0.0F;
+											TempComp->UserAxis.z = 0.0F;
+											TempComp->UserAxisPoint.x = 0.0F;
+											TempComp->UserAxisPoint.y = 0.0F;
+											TempComp->UserAxisPoint.z = 0.0F;
+										}
+										if( TempComp->UserAxis.x > 0.0F )		// match other turret cases
+										{
+											TempComp->UserAxis.x = -TempComp->UserAxis.x;
+											TempComp->UserAxis.y = -TempComp->UserAxis.y;
+											TempComp->UserAxis.z = -TempComp->UserAxis.z;
+										}
+									}
+								}
+							}
+							break;
+#endif
 
 						case ENEMY_AirMoble:
 						case ENEMY_AmmoDump:
