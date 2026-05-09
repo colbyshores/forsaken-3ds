@@ -301,6 +301,7 @@ enum
 	GUN_Ramqan,				// 14 — Boss_Ramqan L cannon: Solaris rockets
 	GUN_RamqanBody,			// 15 — Boss_Ramqan body: Pulsar
 	GUN_RamqanScatter,		// 16 — Boss_Ramqan R cannon: Scatter
+	GUN_ShieldTurretGun,	// 17 — ShieldTurret: Pulsar_Enemy_Blue
 #endif
 };
 

@@ -474,6 +474,24 @@ GUNTYPE	GunTypes[] = {
 		NME_PULSAR,	//WeaponType — KEX Pulsar_Ramqan ≈ NME_PULSAR
 		false,	//PreciseRotation
 	},
+	{//	GUN_ShieldTurretGun — KEX Gun_ShieldTurret (Pulsar_Enemy_Blue)
+		3.00F,	//MaxTurnSpeed   — KEX 3.0
+		0.060F,	//TurnAccell     — KEX 0.060
+		0.060F,	//TurnDecell     — KEX 0.060
+		6.0F,	//ReloadTime     — KEX 6.0
+		100.0F,	//BurstMasterTime— KEX 100.0
+		3,		//BurstMasterCount — KEX 3
+		3.0F,	//BurstAngle     — KEX 3.0 (tight; OK because comp aim is wired)
+		0.0F,	//XRotMin
+		0.0F,	//XRotMax
+		-90.0F,	//YRotMin        — KEX -90
+		30.0F,	//YRotMax        — KEX 30
+		0.0F,	//Range          — KEX range=0 means infinite (engine treats 0 as no limit)
+		2,		//PowerLevel     — KEX 2
+		false,	// Primary
+		NME_PULSAR_BLUE,	//WeaponType — KEX Pulsar_Enemy_Blue (custom #17): blue plasma matching pulsar_enemy_blue.particle (light_color={0,0,1}, sprite=PULSAR). Same weapon as Ghost's blasters in KEX.
+		false,	//PreciseRotation — KEX bPreciseRotation FALSE
+	},
 	{//	GUN_RamqanScatter — right cannon scatter, KEX Gun_RamqanRCannon
 		4.00F,	//MaxTurnSpeed
 		0.076F,	//TurnAccell
@@ -1015,6 +1033,17 @@ FIREPOS RamqanRCannonFirePos = {
 VECTOR RamqanBodyAimPos     = { (    0.0F * GLOBAL_SCALE ), ( 150.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) };
 VECTOR RamqanLCannonAimPos  = { ( -110.0F * GLOBAL_SCALE ), ( 200.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) };
 VECTOR RamqanRCannonAimPos  = { (  110.0F * GLOBAL_SCALE ), ( 200.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) };
+
+/* ShieldTurret fire-position. KEX gunAimPositions_1 = "0 0 136.18"
+ * (KEX is Z-up so KEX z=136.18 → our y=136.18). The gun is the
+ * top of the turret stack; project bullets emerge from the gun
+ * comp's local origin transformed into world space. */
+FIREPOS ShieldTurretFirePos = {
+	1,
+	{ { ( 0.0F * GLOBAL_SCALE ), ( 136.0F * GLOBAL_SCALE ), ( 0.0F * GLOBAL_SCALE ) } },
+	{ { 0.0F, 0.0F, 1.0F } }
+};
+VECTOR ShieldTurretAimPos = { ( 0.0F * GLOBAL_SCALE ), ( 136.0F * GLOBAL_SCALE ), ( 0.0F * GLOBAL_SCALE ) };
 #endif
 VECTOR	SupresAimPos = { ( 0.0F * GLOBAL_SCALE ), ( -160.0F * GLOBAL_SCALE ), ( 560.0F * GLOBAL_SCALE ) };
 VECTOR	LevitankAimPos = { ( -110.0F * GLOBAL_SCALE ), ( 150.0F * GLOBAL_SCALE ), ( -80.0F * GLOBAL_SCALE ) };
@@ -4407,10 +4436,22 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[1]     = &RamqanLCannonAimPos;
 			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[2]     = &RamqanRCannonAimPos;
 
-			/* ShieldTurret (103): 3-part stationary turret. */
+			/* ShieldTurret (103): 3-part stationary turret per KEX defs/n64Enemies.txt:
+			 *   model bgobjects/n64/shieldturret.cob
+			 *   brainClass kexForsakenAIBrainTurret  (1998 TURRET_AI ✓ via BeamTurret template)
+			 *   gun_1 Gun_ShieldTurret → primaryWeaponDef Pulsar_Enemy_Blue
+			 *   turretBaseComponent_1 = 2 (flat-idx, .cob ID = 1, the pivot)
+			 *   turretGunComponent_1  = 3 (flat-idx, .cob ID = 2, the gun)
+			 *   shield = 256, viewCone 360°, maxRange 8192, reload 6.0, burst 3 @3°
+			 * .cob has 4 ANI_TRANS entries on the gun comp (recoil ROT) which we
+			 * sacrifice in exchange for runtime aim via UserContComps[]. */
 			EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
 			EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "n64\\shieldTurret.cob";
-			EnemyTypes[ ENEMY_ShieldTurret ].Shield = 384;
+			EnemyTypes[ ENEMY_ShieldTurret ].Shield = 256;
+			EnemyTypes[ ENEMY_ShieldTurret ].NumOfGuns = 1;
+			EnemyTypes[ ENEMY_ShieldTurret ].GunType[0] = GUN_ShieldTurretGun;
+			EnemyTypes[ ENEMY_ShieldTurret ].GunFirePoints[0] = &ShieldTurretFirePos;
+			EnemyTypes[ ENEMY_ShieldTurret ].GunAimPos[0]     = &ShieldTurretAimPos;
 
 			/* Boss_Maldroid (104): 12-part walking boss. */
 			EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
@@ -5141,6 +5182,40 @@ bool LoadEnemies( void )
 							break;
 
 #ifdef EDITION_REMASTER
+						case ENEMY_ShieldTurret:
+							/* KEX defs/n64Enemies.txt for ShieldTurret:
+							 *   turretBaseComponent_1 = 2  (flat depth-first idx → .cob ID = 1, the pivot)
+							 *   turretGunComponent_1  = 3  (flat idx → .cob ID = 2, the gun)
+							 * cob_dump.py confirms the .cob hierarchy:
+							 *   root id=-1 → id=0 (base) → id=1 (pivot) → id=2 (gun)
+							 * KEX uses flat indices, GetCompObjAddress takes .cob ID — so
+							 * pass 1 (pivot) and 2 (gun), not 2 and 3. */
+							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun ]  = GetCompObjAddress( 2, 1, Comp );
+							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+							{
+								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+								TempComp->UserControl = true;
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+							{
+								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+								TempComp->UserControl = true;
+								TempComp->UserAxis.x = -1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+							break;
+
 						case ENEMY_Boss_Ramqan:
 							/* KEX defs/n64Enemies.txt for Boss_Ramqan:
 							 *   turretBaseComponent_1   10  (body yaw)
