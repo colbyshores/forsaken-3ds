@@ -4398,10 +4398,25 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "n64\\manmech.cob";
 			EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
 
-			/* CargoDrone (101): floor-patrol drone. KEX defs assign
-			 * "kexForsakenAIBrainCrawl" — Mekton template provides it. */
+			/* CargoDrone (101): non-combat floor-patrol drone.  KEX
+			 * defs/n64Enemies.txt:
+			 *   brainClass        kexForsakenAIBrainCrawl  (= CRAWL_AI ✓)
+			 *   primaryWeaponDef  (none)
+			 *   secondaryWeaponDef(none)
+			 *   shield            25000  (effectively invulnerable on touch)
+			 *   ai.bAttackOnSite  FALSE  (ignores player)
+			 *   ai.thinkRange     262144 (very far — patrols regardless)
+			 * Mekton template = CRAWL + 1 gun.  Suppress weapons
+			 * (NumOfGuns=0, PrimaryWeaponType=NO_PRIMARY) so the drone
+			 * patrols inertly as KEX intends. */
 			EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "n64\\cargodrone.mx";
+			EnemyTypes[ ENEMY_CargoDrone ].NumOfGuns = 0;
+			EnemyTypes[ ENEMY_CargoDrone ].PrimaryWeaponType = NO_PRIMARY;
+			EnemyTypes[ ENEMY_CargoDrone ].Shield = 25000;
+			EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_ONSITE;
+			EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_FIND;
+			EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_PROVOKE;
 
 			/* Boss_Ramqan (102): 19-part walking boss with parametric-
 			 * arc hop locomotion (kexForsakenAIBrainJump → JUMP_AI,
@@ -4458,9 +4473,27 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "n64\\maldroid.cob";
 			EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
 
-			/* Enforcer (105): flying enemy. Hunter template = FLY_AI. */
+			/* Enforcer (105): flying combatant.  KEX
+			 * defs/n64Enemies.txt:
+			 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
+			 *   primaryWeaponDef   "Pulsar"      → NME_PULSAR (red)
+			 *   secondaryWeaponDef "Gravgon"     → no exact 1998
+			 *                                      match; leave Hunter
+			 *                                      template's secondary
+			 *                                      (MULTIPLEMISSILE)
+			 *   shield             320
+			 *   primaryFireRate    8.0
+			 *   maxRange           1024  (Hunter default ✓)
+			 *   ai.bAttackOnSite   TRUE
+			 * Hunter template = FLY_AI + MULTIPLEMISSILE secondary +
+			 * NME_SUSS_GUN primary (green snub bullets).  Override
+			 * primary to NME_PULSAR for KEX-faithful red Pulsar
+			 * shots; FLY_AI brain reads PrimaryWeaponType directly
+			 * (aidogfight.c:87).  Secondary stays Hunter default. */
 			EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
 			EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "n64\\enforcer.mx";
+			EnemyTypes[ ENEMY_Enforcer ].PrimaryWeaponType = NME_PULSAR;
+			EnemyTypes[ ENEMY_Enforcer ].Shield = 320;
 
 			/* Boss_DreadNaught2 (106): 4-part heavy bomber. Unused by
 			 * current level set — populated for safety / future maps. */
@@ -4474,9 +4507,26 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "n64\\dreadnaught.cob";
 			EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
 
-			/* Ghost (108): stealth flier. Shade template = stealth brain. */
+			/* Ghost (108): flying enemy with blue plasma.  KEX
+			 * defs/n64Enemies.txt:
+			 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
+			 *   primaryWeaponDef   "Pulsar_Enemy_Blue"  → NME_PULSAR_BLUE
+			 *   (no secondary)
+			 *   shield             80
+			 *   primaryFireRate    24.0
+			 *   ai.bAttackOnSite   TRUE
+			 *   bStealth           (not set — KEX Ghost is NOT stealthed
+			 *                       despite the name)
+			 * Shade template = stealth FLY (CLOAK behaviour).  KEX
+			 * Ghost is just a regular flying enemy; clear the cloak
+             * flag and override primary to the new blue plasma
+             * weapon (matches KEX particle/pulsar_enemy_blue.particle:
+             * light_color={0,0,1}, blackColor1={0.25,0.25,1.0}). */
 			EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
 			EnemyTypes[ ENEMY_Ghost ].ModelFilename = "n64\\ghost.mx";
+			EnemyTypes[ ENEMY_Ghost ].PrimaryWeaponType = NME_PULSAR_BLUE;
+			EnemyTypes[ ENEMY_Ghost ].Shield = 80;
+			EnemyTypes[ ENEMY_Ghost ].Behave.Flags &= ~AI_BEHAVIOUR_CLOAK;
 
 			/* Disable StealthMode on any N64 template-copy whose
 			 * ModelFilename has a path separator. The PreLoadEnemies
