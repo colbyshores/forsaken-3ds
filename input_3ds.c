@@ -29,6 +29,7 @@
 #include "main.h"
 #include "input.h"
 #include "util.h"
+#include "controls_3ds.h"
 
 /* ---- globals expected by the engine ---- */
 
@@ -152,9 +153,39 @@ bool handle_events(void)
 	{
 		APT_CheckNew3DS(&s_is_n3ds);
 		s_n3ds_checked = true;
+		/* First-poll initialisation of the user-rebindable controls.
+		 * Loads defaults (platform-aware via is_n3ds) then overlays
+		 * any saved customisations from sdmc:/3ds/forsaken/controls.cfg. */
+		controls_3ds_init(s_is_n3ds);
 	}
 
-	/* check for quit (Start + Select together) — N3DS only.
+/* Controls menu input — runs first so menu can intercept B,
+	 * D-pad, A, etc. before the engine's own handlers see them.
+	 * Returns true if menu consumed input, in which case we still
+	 * fall through to update axis/button state but the menu will
+	 * have already absorbed the relevant kDown bits. */
+	{
+		extern bool controls_3ds_handle_input(u32 kDown, u32 kHeld);
+		if (controls_3ds_handle_input(kDown, kHeld)) {
+			/* Menu open — fully suppress input propagation:
+			 *   joy_*: gameplay axes/buttons
+			 *   _3ds_key_state[]: SDL-shaped keyboard state the
+			 *     engine's menu reads (without clearing here, the
+			 *     pause menu sees stale RETURN/ESCAPE from prior
+			 *     frames and re-fires "3DS Controls" → menu beeps
+			 *     and selection resets every frame).
+			 *   input_buffer[]: edge-triggered key events queue,
+			 *     same problem — must be drained too. */
+			memset(joy_button_state[0], 0, sizeof(joy_button_state[0]));
+			memset(joy_axis_state[0],   0, sizeof(joy_axis_state[0]));
+			memset(joy_hat_state[0],    0, sizeof(joy_hat_state[0]));
+			memset(_3ds_key_state,      0, sizeof(_3ds_key_state));
+			input_buffer_reset();
+			return true;
+		}
+	}
+
+/* check for quit (Start + Select together) — N3DS only.
 	 * On OG 3DS, SELECT is the nitro button so this chord would
 	 * fire any time the player paused while nitroing. The player
 	 * can quit via HOME on OG. */
@@ -191,41 +222,32 @@ bool handle_events(void)
 	{
 		long ax0 = (long)(cpad.dx  * CPAD_SCALE);
 		long ax1 = (long)(-cpad.dy * CPAD_SCALE);  /* invert Y */
-		long ax2 = (long)(cstick.dx * CPAD_SCALE);
-		long ax3 = (long)(-cstick.dy * CPAD_SCALE);
+		long sx  = (long)(cstick.dx * CPAD_SCALE);
+		long sy  = (long)(-cstick.dy * CPAD_SCALE);
+		int  cstick_x_axis = controls_3ds_cstick_axis_x();
+		int  cstick_y_axis = controls_3ds_cstick_axis_y();
+		if (controls_3ds_cstick_invert_x()) sx = -sx;
+		if (controls_3ds_cstick_invert_y()) sy = -sy;
 
 		deadzone = JoystickInfo[0].Axis[0].deadzone;
 		joy_axis_state[0][0] = (abs(ax0) > deadzone) ? ax0 : 0;
 		joy_axis_state[0][1] = (abs(ax1) > deadzone) ? ax1 : 0;
-		joy_axis_state[0][2] = (abs(ax2) > deadzone) ? ax2 : 0;
-		joy_axis_state[0][3] = (abs(ax3) > deadzone) ? ax3 : 0;
+		joy_axis_state[0][2] = 0;
+		joy_axis_state[0][3] = 0;
+		/* Route C-stick into the user-selected engine axes. Bounds-
+		 * check so a corrupted save can't write past the array. */
+		if (cstick_x_axis >= 0 && cstick_x_axis < 4 && abs(sx) > deadzone)
+			joy_axis_state[0][cstick_x_axis] = sx;
+		if (cstick_y_axis >= 0 && cstick_y_axis < 4 && abs(sy) > deadzone)
+			joy_axis_state[0][cstick_y_axis] = sy;
 	}
 
 	/* ---- buttons ---- */
-	/* Map 3DS buttons to joystick button indices */
-	joy_button_state[0][0] = (kHeld & KEY_A)     ? true : false; /* fire primary */
-	joy_button_state[0][1] = (kHeld & KEY_B)     ? true : false; /* fire secondary */
-	joy_button_state[0][2] = (kHeld & KEY_X)     ? true : false; /* next weapon */
-	joy_button_state[0][3] = (kHeld & KEY_Y)     ? true : false; /* prev weapon */
-	joy_button_state[0][4] = (kHeld & KEY_L)     ? true : false; /* strafe left */
-	joy_button_state[0][5] = (kHeld & KEY_R)     ? true : false; /* strafe right */
-	joy_button_state[0][6] = (kHeld & KEY_START) ? true : false; /* menu */
-
-	if (s_is_n3ds)
-	{
-		/* New 3DS — full ZL/ZR available, original mapping. */
-		joy_button_state[0][7] = (kHeld & KEY_SELECT) ? true : false; /* rear view */
-		joy_button_state[0][8] = (kHeld & KEY_ZL)     ? true : false; /* nitro */
-		joy_button_state[0][9] = (kHeld & KEY_ZR)     ? true : false; /* drop mine */
-	}
-	else
-	{
-		/* Old 3DS — no ZL/ZR. Sacrifice rear-view to give SELECT to
-		 * nitro (mandatory for SP level 3 progression). Drop-mine
-		 * has no binding on this hardware. */
-		joy_button_state[0][7] = false;                                /* rear view (dropped) */
-		joy_button_state[0][8] = (kHeld & KEY_SELECT) ? true : false;  /* nitro on SELECT */
-		joy_button_state[0][9] = false;                                /* drop mine (dropped) */
+	/* Drive joystick button slots from the user-rebindable bindings.
+	 * Action enum index is the joy-button slot (see controls_3ds.h). */
+	for (int act = 0; act < CTRL_NUM_ACTIONS; act++) {
+		u32 mask = controls_3ds_button((controls_action_t)act);
+		joy_button_state[0][act] = (mask && (kHeld & mask)) ? true : false;
 	}
 
 #ifdef AUTOTEST_REMASTER

@@ -1003,6 +1003,23 @@ DEFKEY KDsend_speech = { &Config.send_speech, 0 };
 #define OLDMENUITEM( X, Y, STR, VAR, VAL, SELECTFUNC, DRAWFUNC )\
 		{ (X), (Y), 0, 0, 0, (STR), 0, 0, (VAR), (VAL), (SELECTFUNC), (DRAWFUNC), NULL, 0 }
 
+#if defined(__3DS__)
+/* Launch the touchscreen controls-remap menu from within the
+ * in-game pause menu. Defined in controls_3ds.c — extern'd here
+ * so the menu select callback can fire it directly. The remap UI
+ * is modal: takes over the bottom screen, returns when the player
+ * saves or cancels. */
+extern void controls_3ds_remap_menu(void);
+static void SelectControlsRemap(MENUITEM *Item) {
+	(void)Item;
+	/* Just open the controls menu — leave the pause menu open
+	 * underneath so the game stays paused. Our input hook's
+	 * early-return suppresses input propagation, so the pause
+	 * menu won't process A/B presses while controls menu is up. */
+	controls_3ds_remap_menu();
+}
+#endif
+
 MENU	MENU_NotYet = {
 	"Not Implemented Yet", NULL, NULL, NULL, 0,
 	{
@@ -3068,6 +3085,9 @@ MENU	MENU_InGame = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGam
 #else
 					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
 #endif
+#if defined(__3DS__)
+					  OLDMENUITEM( 200, 208, "3DS Controls",                                NULL,                       NULL,                    SelectControlsRemap,    MenuItemDrawName),
+#endif
 					  OLDMENUITEM( 200, 192, LT_MENU_InGame26 /*"Host Options"				*/,	NULL,						&MENU_Host_Options,		MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
@@ -3098,6 +3118,9 @@ MENU	MENU_InGameSingle = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , Exi
 					  OLDMENUITEM( 200, 176, "3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
 #else
 					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
+#endif
+#if defined(__3DS__)
+					  OLDMENUITEM( 200, 208, "3DS Controls",                                NULL,                       NULL,                    SelectControlsRemap,    MenuItemDrawName),
 #endif
 					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 #ifndef __3DS__
