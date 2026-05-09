@@ -680,13 +680,14 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 	},
 /*===================================================================
 	Weapon 17, NME Pulsar Blue (KEX Pulsar_Enemy_Blue)
-	Cloned from Weapon 8 (Nme Pulsar) but with the blue light tint
-	from KEX particles/pulsar_enemy_blue.particle:
-	  light_color   = { 0.0  0.0  1.0 }   (pure blue)
-	  blackColor1   = { 0.25 0.25 1.0 }   (blue-tinted dark)
-	Translated to per-power-level light values that match the
-	1998 engine's NME_PULSAR damage/speed shape but flip red→blue.
-	Used by ShieldTurret + Ghost; matches KEX visual exactly.
+	Mekton-bullet sprite (FM_NMEBULLET1 / NMEBullet_Header) tinted
+	blue.  KEX renders Pulsar_Enemy_Blue as a chunky blue ball; the
+	1998 engine's Mekton bullet IS chunky-ball-shaped, so use that
+	sprite as the base.  Light color from KEX
+	particles/pulsar_enemy_blue.particle: light_color={0,0,1}.
+	Used by ShieldTurret (and Ghost when wired); per-bullet
+	color tint (R/G/B) is overridden in InitOnePrimBull's NME_PULSAR_BLUE
+	branch since case NME_BULLET1 hardcodes the Mekton red tint.
 ===================================================================*/
 	{
 		{( 128.0F * GLOBAL_SCALE ),							// Speed
@@ -696,16 +697,16 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 		{ 13, 16, 10 },										// FireDelay
 		{ 2.0F, 4.0F, 6.0F },								// AmmoUsage
 		{ 30.0F, 31.0F, 32.0F },							// Damage
-		{ PULSAR_COLRADIUS,
-		  PULSAR_COLRADIUS,
-		  PULSAR_COLRADIUS },
+		{ NMEBUL1_COLRADIUS,
+		  NMEBUL1_COLRADIUS,
+		  NMEBUL1_COLRADIUS },
 		COLTYPE_Point,
 		( 1536.0F * GLOBAL_SCALE ),							// lightsize
 		{ 0.0F, 0.0F, 0.0F },								// Light red value
 		{ 0.0F, 0.0F, 0.0F },								// Light green value
 		{ 108.0F, 180.0F, 255.0F },							// Light blue value (PURE BLUE — matches KEX)
-		FM_PULSAR,											// FmSeq — same chunky pulsar sprite
-		&Pulsar_Header										// FmFrmInfo
+		FM_NMEBULLET1,										// FmSeq — Mekton bullet sprite
+		&NMEBullet_Header									// FmFrmInfo — chunky ball
 	},
 };
 
@@ -1799,6 +1800,7 @@ void ProcessPrimaryBullets( void )
    	   			case TROJAX:
    	   			case SUSS_GUN:
    	   			case ORBITPULSAR:
+   	   			case NME_PULSAR_BLUE:
    	   			case NME_BULLET1:
    	   			case NME_PULSAR:
    	   			case NME_TROJAX:
@@ -1986,6 +1988,7 @@ void ProcessPrimaryBullets( void )
 				switch( PrimBulls[ i ].Weapon )
 				{
 					case PULSAR:
+	   	   			case NME_PULSAR_BLUE:
 	   	   			case NME_BULLET1:
 	   	   			case NME_PULSAR:
 	   	   			case NME_TROJAX:
@@ -2083,6 +2086,7 @@ void ProcessPrimaryBullets( void )
 
 				switch( PrimBulls[ i ].Weapon )
 				{
+	   	   			case NME_PULSAR_BLUE:
 	   	   			case NME_BULLET1:
 						CleanUpPrimBull( i, false );
 						Killed = true;
@@ -2210,6 +2214,7 @@ void ProcessPrimaryBullets( void )
 
    				switch( PrimBulls[i].Weapon )
    				{
+					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 						CreateSparks( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
    						CleanUpPrimBull( i, false );
@@ -2371,6 +2376,7 @@ void ProcessPrimaryBullets( void )
    					case PYROLITE_RIFLE:
    					case SUSS_GUN:
    					case ORBITPULSAR:
+					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 					case NME_PULSAR:
 					case NME_TROJAX:
@@ -2483,6 +2489,7 @@ void ProcessPrimaryBullets( void )
 		    				case LASER:
 								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 200, 200, 255 );
 								break;
+							case NME_PULSAR_BLUE:
 							case NME_BULLET1:
 								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 0, 255, 0 );
 								break;
@@ -2494,6 +2501,7 @@ void ProcessPrimaryBullets( void )
 					{
 						switch( PrimBulls[ i ].Weapon )
 						{
+							case NME_PULSAR_BLUE:
 							case NME_BULLET1:
 							case NME_PULSAR:
 							case NME_TROJAX:
@@ -2539,6 +2547,7 @@ void ProcessPrimaryBullets( void )
 
 				switch( PrimBulls[ i ].Weapon )
 				{
+					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 						if( Ships[ HitTarget ].Invul )
 						{
@@ -2824,6 +2833,7 @@ void ProcessPrimaryBullets( void )
 
 				switch( PrimBulls[ i ].Weapon )
 				{
+					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 						CleanUpPrimBull( i, false );
 						Killed = true;
@@ -4438,6 +4448,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 /*===================================================================
 			NME BULLET1
 ===================================================================*/
+			case NME_PULSAR_BLUE:
 			case NME_BULLET1:
 				if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 				{
@@ -4485,6 +4496,17 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
    					FmPolys[ fmpoly ].ysize = NMEBUL1_FMSIZE;
    					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
+				   	if( Weapon == NME_PULSAR_BLUE )
+				   	{
+				   		/* KEX Pulsar_Enemy_Blue — Mekton-bullet sprite
+				   		 * tinted blue to match KEX's blue plasma ball
+				   		 * visual.  Sprite shape stays the chunky Mekton
+				   		 * bullet; only the per-poly color modulator
+				   		 * shifts to blue. */
+				   		FmPolys[ fmpoly ].R = 64;
+				   		FmPolys[ fmpoly ].G = 64;
+				   		FmPolys[ fmpoly ].B = 255;
+				   	}
    					PrimBulls[i].numfmpolys++;
    					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -7889,6 +7911,7 @@ void GetDeathString( BYTE WeaponType, BYTE Weapon, char * DstString )
 				case ORBITPULSAR:
 					sprintf( DstString, LT_DEATHMETHOD_ORBITOR );
 					break;
+				case NME_PULSAR_BLUE:
 				case NME_BULLET1:
 					sprintf( DstString, LT_DEATHMETHOD_NME_BULLET1 );
 					break;
@@ -8676,6 +8699,7 @@ u_int16_t EnemyFirePrimary( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bu
 		case TRANSPULSE_CANNON:
 		case LASER:
 		case ORBITPULSAR:
+		case NME_PULSAR_BLUE:
 		case NME_BULLET1:
 		case NME_PULSAR:
 		case NME_TROJAX:

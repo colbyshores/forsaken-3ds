@@ -474,13 +474,13 @@ GUNTYPE	GunTypes[] = {
 		NME_PULSAR,	//WeaponType — KEX Pulsar_Ramqan ≈ NME_PULSAR
 		false,	//PreciseRotation
 	},
-	{//	GUN_ShieldTurretGun — KEX Gun_ShieldTurret (Pulsar_Enemy_Blue)
+	{//	GUN_ShieldTurretGun — KEX Gun_ShieldTurret (authentic, all values from KEX def)
 		3.00F,	//MaxTurnSpeed   — KEX 3.0
 		0.060F,	//TurnAccell     — KEX 0.060
 		0.060F,	//TurnDecell     — KEX 0.060
-		6.0F,	//ReloadTime     — KEX 6.0
-		100.0F,	//BurstMasterTime— KEX 100.0
-		3,		//BurstMasterCount — KEX 3
+		6.0F,	//ReloadTime     — KEX 6.0 (within-burst spacing ~0.1s)
+		100.0F,	//BurstMasterTime— KEX 100.0 (~1.67s between bursts)
+		3,		//BurstMasterCount — KEX 3 (3-shot burst)
 		3.0F,	//BurstAngle     — KEX 3.0 (tight; OK because comp aim is wired)
 		0.0F,	//XRotMin
 		0.0F,	//XRotMax
@@ -9546,6 +9546,24 @@ bool Enemy_Load( FILE * fp )
 
 		fread( &Enemies[i].Type, sizeof( Enemies[i].Type ), 1, fp );
 		fread( &Enemies[i].AIMoveFlags, sizeof( Enemies[i].AIMoveFlags ), 1, fp );
+
+		/* Re-apply per-enemy GunType from the current EnemyTypes
+		 * template after Gun_Load.  Old saves preserve GunObject->Type
+		 * from when the save was made, so any gun-config changes we
+		 * make to EnemyTypes[] (e.g. EDITION_REMASTER overrides for
+		 * ShieldTurret/Boss_Ramqan/etc.) get clobbered when the save
+		 * is loaded.  Forcing GunType[] back from the template keeps
+		 * old saves consistent with the latest weapon mappings. */
+		{
+			GUNOBJECT *_g = Enemies[i].Object.FirstGun;
+			BYTE _ng = Enemies[i].Object.HowManyGuns;
+			BYTE _ji;
+			for( _ji = 0; _g && _ji < _ng; _ji++ )
+			{
+				_g->Type = EnemyTypes[ Enemies[i].Type ].GunType[ _ji ];
+				_g = _g->Next;
+			}
+		}
 		fread( &Enemies[i].AIFlags, sizeof( Enemies[i].AIFlags ), 1, fp );
 		fread( &Enemies[i].AI_Angle, sizeof( Enemies[i].AI_Angle ), 1, fp );
 		fread( &Enemies[i].Timer, sizeof( Enemies[i].Timer ), 1, fp );

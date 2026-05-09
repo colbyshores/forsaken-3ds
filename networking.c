@@ -4958,6 +4958,7 @@ bool UpdateAmmoAndValidateMessage( void * Message )
 					case PULSAR:
 					case TRANSPULSE_CANNON:
 					case LASER:
+					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 					case NME_PULSAR:
 					case NME_TRANSPULSE:
@@ -5148,6 +5149,7 @@ bool UpdateAmmoAndValidateMessage( void * Message )
 					case PULSAR:
 					case TRANSPULSE_CANNON:
 					case LASER:
+					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 					case NME_PULSAR:
 					case NME_TRANSPULSE:
@@ -5339,6 +5341,7 @@ bool UpdateAmmoAndValidateMessage( void * Message )
 					case PULSAR:
 					case TRANSPULSE_CANNON:
 					case LASER:
+					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 					case NME_PULSAR:
 					case NME_TRANSPULSE:
@@ -5422,6 +5425,7 @@ bool UpdateAmmoAndValidateMessage( void * Message )
 				case PULSAR:
 				case TRANSPULSE_CANNON:
 				case LASER:
+				case NME_PULSAR_BLUE:
 				case NME_BULLET1:
 				case NME_PULSAR:
 				case NME_TRANSPULSE:
