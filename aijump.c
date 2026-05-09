@@ -114,18 +114,54 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 	Enemy->JumpT       = 0.0F;
 	Enemy->JumpStart   = Enemy->Object.Pos;
 	Enemy->JumpTarget  = target->SolidPos;     /* land on the pad */
+	/* Nodeload's downward floor-snap adds +75 to put the object pivot
+	 * above the floor (calibrated for Mekton-sized enemies whose pivot
+	 * is at body center). KEX's SetupJump lands at the raw raycast hit
+	 * — no offset — so a Ramqan-sized rig with its pivot near the
+	 * pelvis ends up hovering ~75 units off the pad. Subtract the
+	 * Nodeload offset back out so the boss's feet kiss the floor. */
+	Enemy->JumpTarget.y -= 75.0F;
 	Enemy->JumpApexY   = target->Pos.y;        /* apex from raw node Y */
 
 	Enemy->LastTNode = Enemy->TNode;
 	Enemy->TNode     = target;
 	Enemy->Object.NearestNode = target;
 
-	SetCurAnimSeq( 2, &Enemy->Object );
+	/* Don't lock the rig to seq 2 ("jump pose") at takeoff. Sequences
+	 * authored as a single-frame pose (StartTime == EndTime) freeze
+	 * the per-frame anim time advance, so the multi-part rig stops
+	 * animating mid-air — visually the boss looks frozen during the
+	 * arc, which reads as broken. Letting the previous animation
+	 * seq (idle / walk-cycle) continue produces a continuous body
+	 * animation that's clearly "the boss is still alive and moving"
+	 * even if it isn't a leg-tucked jump pose specifically.
+	 *
+	 * The frame-exact KEX behaviour is a per-component anim during
+	 * the arc (legs cycle, body bobs); reproducing that requires
+	 * decompiled per-component frame data we don't have. The 80-85%
+	 * fidelity bar is "boss visibly animates during arc" — left in
+	 * the previous seq, that holds. SetCurAnimSeq(4) at landing
+	 * still fires for the land flourish. */
 }
 
 extern u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
                             u_int16_t StartGroup, VECTOR * MoveOffset );
 extern MLOADHEADER Mloadheader;
+extern VECTOR Forward;
+
+/* Body rotation deliberately removed.
+ *
+ * Per Ghidra decomp of kexForsakenAIBrain::AimAtTarget, KEX does
+ * NOT rotate the body — it computes (target - boss) in body-local
+ * space (via inverse body matrix), produces yaw + pitch angles, and
+ * writes them to the turret comp. The body stays in spawn
+ * orientation, the turret swivels. We follow the same shape: the
+ * UserContComps[] wired in enemies.c carries the aim, body matrix
+ * stays static. */
+static void JumpFaceTarget( ENEMY * Enemy )
+{
+	(void) Enemy;
+}
 
 /* Per-frame parametric arc — pure lerp in xz, parabolic in y.
  * Updates Object.Group via MoveGroup so the engine's per-frame
@@ -146,8 +182,19 @@ static void JumpDoMovement( ENEMY * Enemy )
 	{
 		Enemy->Object.Pos = *d;
 		Enemy->JumpInAir  = 0;
-		SetCurAnimSeq( 4, &Enemy->Object );
-		Enemy->Timer = ONE_SECOND * 0.5F;
+		/* Per KEX decomp of MODE_FollowPath: state-0 (waiting on pad)
+		 * runs SetAnimSeq(1) — that's the leg-cycle / body-bob loop
+		 * authored on the boss's component rig. Was seq 4 ("land
+		 * flourish"); single-frame land poses freeze Animating=false
+		 * and the rig stops moving on the pad. Seq 1 keeps legs
+		 * articulating during the dwell. */
+		SetCurAnimSeq( 1, &Enemy->Object );
+		/* Stationary fire phase: dwell long enough for AI_UPDATEGUNS
+		 * to cycle through several cooldown periods. Per research,
+		 * Boss_Ramqan in Remaster fires for ~3s between leaps before
+		 * picking the next pad. Was 0.5s (just a hop dwell) which
+		 * left him silent and motion-less the whole encounter. */
+		Enemy->Timer = ONE_SECOND * 3.0F;
 	}
 	else
 	{
@@ -191,7 +238,31 @@ void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
 {
 	NODE * pick;
 
+	/* Acquire a target before AI_THINK so the LoS / viewcone block
+	 * inside AI_THINK can set AI_ICANSEEPLAYER. Without TShip set,
+	 * AI_THINK skips that block and AI_UPDATEGUNS's gating
+	 * (`AIFlags & AI_ICANSEEPLAYER`) silently filters out every
+	 * shot — boss hops correctly but never fires. Mirrors the
+	 * `SET_TARGET_PLAYERS` + `Tinfo->TObject` acquisition pattern
+	 * in aifollow.c / aiscan.c. */
+	Tinfo->Flags = 0;
+	SET_TARGET_PLAYERS;
+	AI_GetDistToNearestTarget( Enemy );
+	if( Tinfo->TObject ) Enemy->TShip = Tinfo->TObject;
+
+	/* Rotate body toward target BEFORE AI_THINK so AI_THINK's
+	 * viewcone check sees the boss facing the player. */
+	JumpFaceTarget( Enemy );
+
 	AI_THINK( Enemy, false, false );
+
+	/* Per Ghidra decomp of kexForsakenAIBrainJump::MODE_FollowPath:
+	 * KEX calls UpdateGuns unconditionally every frame, including
+	 * during the arc — boss fires while airborne, just like he does
+	 * during dwell. The aifire.c:130 gate has been extended to
+	 * bypass AI_ICANSEEPLAYER for JUMP_AI (mirroring the SPLINE
+	 * bypass) so the per-gun BurstAngle check is what gates fire. */
+	AI_UPDATEGUNS( Enemy );
 
 	if( Enemy->JumpInAir )
 	{
@@ -200,6 +271,10 @@ void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
 	}
 
 	if( !(Enemy->AIFlags & AI_ANYPLAYERINRANGE) ) return;
+
+	/* Dwell timer between leaps. AI_UPDATEGUNS already ran above
+	 * (KEX-faithful unconditional call) — this loop just waits out
+	 * the post-landing pause before picking the next pad. */
 
 	Enemy->Timer -= framelag;
 	if( Enemy->Timer > 0.0F ) return;
