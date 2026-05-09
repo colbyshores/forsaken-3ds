@@ -263,6 +263,16 @@ void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
 
 	AI_THINK( Enemy, false, false );
 
+	/* Boss_Ramqan is a single-encounter boss — KEX keeps him locked
+	 * onto the player at all times.  Force AI_ANYPLAYERINRANGE so
+	 * (a) AI_UPDATEGUNS keeps firing through the entire encounter
+	 * and (b) the per-frame SetTurretVector loop in ProcessEnemies
+	 * runs every tick, keeping the head/cannons aimed at the player
+	 * (without it the head visibly sags between AI_THINK refreshes
+	 * because UserAngle stops updating). */
+	if( Enemy->TShip )
+		Enemy->AIFlags |= AI_ANYPLAYERINRANGE | AI_ICANSEEPLAYER;
+
 	/* Per Ghidra decomp of kexForsakenAIBrainJump::MODE_FollowPath:
 	 * KEX calls UpdateGuns unconditionally every frame, including
 	 * during the arc — boss fires while airborne, just like he does

@@ -702,9 +702,9 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 		  NMEBUL1_COLRADIUS },
 		COLTYPE_Point,
 		( 1536.0F * GLOBAL_SCALE ),							// lightsize
-		{ 0.0F, 0.0F, 0.0F },								// Light red value
-		{ 0.0F, 0.0F, 0.0F },								// Light green value
-		{ 108.0F, 180.0F, 255.0F },							// Light blue value (PURE BLUE — matches KEX)
+		{ 0.0F, 0.0F, 0.0F },								// Light red value — none
+		{ 64.0F, 96.0F, 128.0F },							// Light green value — slight cyan tint
+		{ 192.0F, 224.0F, 255.0F },							// Light blue value — dominant
 		FM_NMEBULLET1,										// FmSeq — Mekton bullet sprite
 		&NMEBullet_Header									// FmFrmInfo — chunky ball
 	},
@@ -4503,8 +4503,12 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   		 * visual.  Sprite shape stays the chunky Mekton
 				   		 * bullet; only the per-poly color modulator
 				   		 * shifts to blue. */
-				   		FmPolys[ fmpoly ].R = 64;
-				   		FmPolys[ fmpoly ].G = 64;
+				   		/* No hint of red — pure blue plasma.  Some green
+				   		 * keeps the energy-plasma cyan glow alive so it
+				   		 * reads as bright blue plasma rather than flat
+				   		 * dark blue. */
+				   		FmPolys[ fmpoly ].R = 0;
+				   		FmPolys[ fmpoly ].G = 96;
 				   		FmPolys[ fmpoly ].B = 255;
 				   	}
    					PrimBulls[i].numfmpolys++;

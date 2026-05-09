@@ -474,24 +474,6 @@ GUNTYPE	GunTypes[] = {
 		NME_PULSAR,	//WeaponType — KEX Pulsar_Ramqan ≈ NME_PULSAR
 		false,	//PreciseRotation
 	},
-	{//	GUN_ShieldTurretGun — KEX Gun_ShieldTurret (authentic, all values from KEX def)
-		3.00F,	//MaxTurnSpeed   — KEX 3.0
-		0.060F,	//TurnAccell     — KEX 0.060
-		0.060F,	//TurnDecell     — KEX 0.060
-		6.0F,	//ReloadTime     — KEX 6.0 (within-burst spacing ~0.1s)
-		100.0F,	//BurstMasterTime— KEX 100.0 (~1.67s between bursts)
-		3,		//BurstMasterCount — KEX 3 (3-shot burst)
-		3.0F,	//BurstAngle     — KEX 3.0 (tight; OK because comp aim is wired)
-		0.0F,	//XRotMin
-		0.0F,	//XRotMax
-		-90.0F,	//YRotMin        — KEX -90
-		30.0F,	//YRotMax        — KEX 30
-		0.0F,	//Range          — KEX range=0 means infinite (engine treats 0 as no limit)
-		2,		//PowerLevel     — KEX 2
-		false,	// Primary
-		NME_PULSAR_BLUE,	//WeaponType — KEX Pulsar_Enemy_Blue (custom #17): blue plasma matching pulsar_enemy_blue.particle (light_color={0,0,1}, sprite=PULSAR). Same weapon as Ghost's blasters in KEX.
-		false,	//PreciseRotation — KEX bPreciseRotation FALSE
-	},
 	{//	GUN_RamqanScatter — right cannon scatter, KEX Gun_RamqanRCannon
 		4.00F,	//MaxTurnSpeed
 		0.076F,	//TurnAccell
@@ -509,6 +491,24 @@ GUNTYPE	GunTypes[] = {
 		false,	// Primary
 		NME_SUSS_GUN,	//WeaponType — Suss Gun (verified PrimaryWeaponAttribs[12] defined + sus.mx is NOT_LEVEL_SPECIFIC DO_LOAD)
 		false,	//PreciseRotation
+	},
+	{//	GUN_ShieldTurretGun — KEX Gun_ShieldTurret (authentic, all values from KEX def)
+		3.00F,	//MaxTurnSpeed   — KEX 3.0
+		0.060F,	//TurnAccell     — KEX 0.060
+		0.060F,	//TurnDecell     — KEX 0.060
+		6.0F,	//ReloadTime     — KEX 6.0 (within-burst spacing ~0.1s)
+		100.0F,	//BurstMasterTime— KEX 100.0 (~1.67s between bursts)
+		3,		//BurstMasterCount — KEX 3 (3-shot burst)
+		3.0F,	//BurstAngle     — KEX 3.0 (tight; OK because comp aim is wired)
+		0.0F,	//XRotMin
+		0.0F,	//XRotMax
+		-90.0F,	//YRotMin        — KEX -90
+		30.0F,	//YRotMax        — KEX 30
+		0.0F,	//Range          — KEX range=0 means infinite (engine treats 0 as no limit)
+		2,		//PowerLevel     — KEX 2
+		false,	// Primary
+		NME_PULSAR_BLUE,	//WeaponType — KEX Pulsar_Enemy_Blue (custom #17): blue plasma matching pulsar_enemy_blue.particle (light_color={0,0,1}, sprite=PULSAR). Same weapon as Ghost's blasters in KEX.
+		false,	//PreciseRotation — KEX bPreciseRotation FALSE
 	},
 #endif
 
