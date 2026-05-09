@@ -967,13 +967,58 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 
 			if( Children->UserControl )
 			{
+				/* Compose KEX-style: authored TRANSLATE keys position
+				 * the comp at its bind-pose offset, then user rotation
+				 * happens around UserAxisPoint on top.  Authored ROTATE
+				 * keys are skipped (user rotation replaces them), but
+				 * TRANSLATE keys must still play so child comps stay
+				 * anchored at their authored joint positions.
+				 *
+				 * Without this, multi-comp KEX bosses (Ramqan, Manmech,
+				 * Maldroid, DreadNaught) collapse children onto their
+				 * parent's origin when the parent comp is UserControl —
+				 * head visibly slides off the body, etc.
+				 *
+				 * The original 1998 single-axis behaviour
+				 * (Mekton/MetaTank/LeviTank turret) is preserved when
+				 * the comp has no authored TRANSLATE keys: the loop
+				 * leaves NewPos at zero, and the rotation displacement
+				 * math below produces the same result as the old code. */
 				Children->LocalMatrix = MATRIX_Identity;
+				NewPos.x = 0.0F;
+				NewPos.y = 0.0F;
+				NewPos.z = 0.0F;
+
+				if( Children->NumTrans )
+				{
+					for( Trans = 0; Trans < Children->NumTrans; Trans++ )
+					{
+						if( Children->Trans[ Trans ].Type != TRANS_TRANSLATE )
+							continue;
+						Start = Children->Trans[ Trans ].TimeStart;
+						Duration = Children->Trans[ Trans ].TimeDuration;
+						End = ( Start + Duration );
+						if( Time >= Start )
+						{
+							if( Time < End ) Scale = ( ( Time - Start ) / Duration );
+							else Scale = 1.0F;
+							TransData = (ANI_TRANSLATE *) Children->Trans[ Trans ].Data;
+							NewPos.x += ( TransData->Trans.x * Scale );
+							NewPos.y += ( TransData->Trans.y * Scale );
+							NewPos.z += ( TransData->Trans.z * Scale );
+						}
+					}
+				}
+
 				MatrixFromAxisAndAngle( Children->UserAngle, &Children->UserAxis, &RotMatrix );
 				MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
-				ApplyMatrix( &Children->LocalMatrix, &Children->UserAxisPoint, &NewPos );
-				NewPos.x -= Children->UserAxisPoint.x;
-				NewPos.y -= Children->UserAxisPoint.y;
-				NewPos.z -= Children->UserAxisPoint.z;
+
+				/* Rotation displacement around UserAxisPoint, additive
+				 * to the authored translate already in NewPos. */
+				ApplyMatrix( &Children->LocalMatrix, &Children->UserAxisPoint, &NewPos2 );
+				NewPos.x += ( NewPos2.x - Children->UserAxisPoint.x );
+				NewPos.y += ( NewPos2.y - Children->UserAxisPoint.y );
+				NewPos.z += ( NewPos2.z - Children->UserAxisPoint.z );
 
 				ApplyMatrix( ParentMatrix, &NewPos, &NewPos );
 				NewPos.x += ParentPos->x;
