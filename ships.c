@@ -2141,6 +2141,22 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		 * boss model rather than inside it. Add new entries when
 		 * adding boss-AI test paths. */
 # if DEBUG_AUTOBOOT_SLOT == 19   /* ramqan slot — Boss_Ramqan @ group 44 */
+#  ifdef DEBUG_WARP_TO_TURRET
+		/* ShieldTurret cluster in ramqan room — 4 turrets at Y=-3113
+		 * forming a square ~2000 units wide. Land in the middle of
+		 * the cluster facing -X toward one of the corner turrets.
+		 * Group 0 = let engine resolve from position via MoveGroup
+		 * during the first frame. */
+		Ships[i].Object.Pos.x = 1400.0F;
+		Ships[i].Object.Pos.y = -3013.0F;   /* lifted 100 above turret Y */
+		Ships[i].Object.Pos.z = 4600.0F;
+		Ships[i].Object.Group = 0;
+		MineVec = Ships[i].Object.Pos;
+		Start_Dir.x = -1.0F;
+		Start_Dir.y =  0.0F;
+		Start_Dir.z =  0.0F;
+		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
+#  else
 		Ships[i].Object.Pos.x = -1296.0F;   /* -1796 + 500 */
 		Ships[i].Object.Pos.y =  1704.0F;
 		Ships[i].Object.Pos.z =   487.0F;
@@ -2151,6 +2167,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		Start_Dir.y =  0.0F;
 		Start_Dir.z =  0.0F;
 		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
+#  endif
 # endif
 #endif
 	}else{

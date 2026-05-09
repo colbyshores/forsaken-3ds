@@ -152,6 +152,12 @@ ifeq ($(DEBUG_WARP_TO_BOSS),1)
 CFLAGS += -DDEBUG_WARP_TO_BOSS
 endif
 
+# DEBUG_WARP_TO_TURRET=1 + DEBUG_WARP_TO_BOSS=1 + DEBUG_AUTOBOOT_SLOT=19
+# warps to a ShieldTurret position in ramqan instead of the boss spawn.
+ifeq ($(DEBUG_WARP_TO_TURRET),1)
+CFLAGS += -DDEBUG_WARP_TO_TURRET
+endif
+
 ifeq ($(EDITION),remaster)
 CFLAGS += -DEDITION_REMASTER
 endif
@@ -563,8 +569,8 @@ cia: $(OUTPUT_CIA)
 # them. Better to over-block than ship another sweep build by accident.
 
 FORBIDDEN_FLAGS := DEBUG AUTOTEST_REMASTER DEBUG_AUTOBOOT_SLOT \
-                   DEBUG_WARP_TO_BOSS DEATH_SIM AUTOBOOT_SP \
-                   DEBUG_RAMQAN_FIRE
+                   DEBUG_WARP_TO_BOSS DEBUG_WARP_TO_TURRET DEATH_SIM \
+                   AUTOBOOT_SP DEBUG_RAMQAN_FIRE
 
 OUTPUT_CIA_ALT      := $(SRCDIR)/$(TARGET)_alt.cia
 RSF_FILE_ALT        := $(BUILD)/forsaken_alt.rsf
