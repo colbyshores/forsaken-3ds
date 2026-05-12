@@ -736,7 +736,7 @@ void EVENT_EnemySetTargetNode( u_int8_t * Data )
 		best->Object.Group  = (u_int16_t)target->Group;
 
 		best->TNode         = target;
-		best->NextTNode     = target;
+		best->NextTNode     = NULL;
 		best->LastTNode     = NULL;
 		best->PickNewNodeNow = true;
 		s_last_redirected_drone = best;
@@ -757,8 +757,10 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
 	target = NodeNetworkHeader.FirstNode + node_idx;
 
+	/* Mark the lift-base node as "last visited" so the drone won't immediately
+	 * backtrack through the lift shaft after reaching the top. */
 	if( s_last_redirected_drone && ( s_last_redirected_drone->Used ) )
-		s_last_redirected_drone->NextTNode = target;
+		s_last_redirected_drone->LastTNode = target;
 }
 #endif /* EDITION_REMASTER */
 
