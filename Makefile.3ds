@@ -143,6 +143,11 @@ ifneq ($(DEBUG_AUTOBOOT_SLOT),)
 CFLAGS += -DDEBUG_AUTOBOOT_SLOT=$(DEBUG_AUTOBOOT_SLOT)
 endif
 
+# DEBUG_WARP_TO_BOSS=1 - branch-local one-shot warp.
+ifeq ($(DEBUG_WARP_TO_BOSS),1)
+CFLAGS += -DDEBUG_WARP_TO_BOSS
+endif
+
 ifeq ($(EDITION),remaster)
 CFLAGS += -DEDITION_REMASTER
 endif

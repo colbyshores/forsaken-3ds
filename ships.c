@@ -2132,6 +2132,25 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
 #endif
 		Ships[i].Object.Group = StartPositions[startpos].Group;
+
+#ifdef DEBUG_WARP_TO_BOSS
+		/* Branch-local one-shot warp for boss/enemy iteration.
+		 * Per-slot coordinates from the corrected .nme scan via
+		 * /tmp/scan_all_correct.py.  Replace with
+		 * DEBUG_WARP_TO_ENEMY=<id> Phase 2.0 scaffold once the
+		 * runtime Enemies[] scan is in place. */
+# if DEBUG_AUTOBOOT_SLOT == 5  /* defend2 — CargoDrone @ group 19 */
+		Ships[i].Object.Pos.x = -3689.0F;
+		Ships[i].Object.Pos.y = -1967.0F;
+		Ships[i].Object.Pos.z =  4475.0F;     /* 500u back from drone z=4975 */
+		Ships[i].Object.Group = 19;
+		MineVec = Ships[i].Object.Pos;
+		Start_Dir.x = 0.0F;
+		Start_Dir.y = 0.0F;
+		Start_Dir.z = 1.0F;
+		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
+# endif
+#endif
 	}else{
 		Ships[i].Object.Pos.x = -1.0F;
 		Ships[i].Object.Pos.y = -1.0F;
