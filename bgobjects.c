@@ -551,6 +551,7 @@ void ProcessBGObjects( bool Collide )
 									if( drone->Type != ENEMY_CargoDrone ) continue;
 									if( !drone->TNode ) continue;
 									if( !( ((NODE*)drone->TNode)->Flags & 0x40 ) ) continue;
+									if(    ((NODE*)drone->TNode)->Flags & 0x20   ) continue;
 									dx = drone->Object.Pos.x - Object->Pos.x;
 									dz = drone->Object.Pos.z - Object->Pos.z;
 									if( dx*dx + dz*dz > 500.0F*500.0F ) continue;
