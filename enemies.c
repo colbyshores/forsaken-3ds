@@ -6997,6 +6997,21 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			Enemy->ImInNodeTransition = false;
 		}
 
+#ifdef EDITION_REMASTER
+		/* Lift-wait: CargoDrone parks at node with flag 0x40 (KEX lift-base marker)
+		 * rather than trying to climb through the shaft wall to the node above.
+		 * EVENT_EnemySetTargetNode teleports it to the top when the lift ends. */
+		if( Enemy->Type == ENEMY_CargoDrone &&
+		    (TNode->Flags & 0x40) &&
+		    DistanceVector2Vector( &Object->Pos, &TNode->SolidPos ) < length + 16.0F )
+		{
+			Object->Speed.z    = 0.0F;
+			Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
+			Enemy->PickNewNodeNow = false;
+		}
+		else
+#endif
+		{
 		Move_Off.x = Move_Off.x * Object->Speed.z * framelag;
 		Move_Off.y = Move_Off.y * Object->Speed.z * framelag;
 		Move_Off.z = Move_Off.z * Object->Speed.z * framelag;
@@ -7004,17 +7019,21 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		Object->Pos.x += Move_Off.x;
 		Object->Pos.y += Move_Off.y;
 		Object->Pos.z += Move_Off.z;
-		
+		}
+
 		BuildRotMatrix( XRot , -(Object->Angle.y * framelag), 0.0F, &StepMat );
 		MatrixMultiply( &Object->Mat , &StepMat , &Object->Mat );
 		Object->Group = MoveGroup( &Mloadheader, &StartPos, OldGroup, &Move_Off );
 
-		
+
 		if(Enemy->ImInNodeTransition && (TNode = (NODE*) Enemy->TNode) )
 		{
 			ApplyMatrix( &Object->InvMat, &AimPos, &TempPos );
 			if( TempPos.z <= 0.0F )
 			{
+#ifdef EDITION_REMASTER
+				if( !(Enemy->Type == ENEMY_CargoDrone && (TNode->Flags & 0x40)) )
+#endif
 				Enemy->PickNewNodeNow = true;
 			}
 		}
@@ -7062,7 +7081,14 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 	 * SolidPos.y stays at the un-snapped authored Y, so the bots fly at
 	 * that altitude. Re-raycast every frame from the bot's current
 	 * position to clamp Y to actual mesh-poly floor regardless of where
-	 * the AI node ended up. Mirrors Nodeload's snap math. */
+	 * the AI node ended up. Mirrors Nodeload's snap math.
+	 *
+	 * CargoDrone excluded: its nodes are authored at the correct floor Y
+	 * already, and in lift-shaft areas the collision mesh floor is the
+	 * structural bottom of the shaft (far below the node Y), not the lift
+	 * platform (a BGO). Snapping there pulls the drone into the floor and
+	 * takes it below Zone[39]'s Y range, preventing Drone1Wait from firing. */
+	if( Enemy->Type != ENEMY_CargoDrone )
 	{
 		VECTOR	GroundOff = { 0.0F, -MaxColDistance, 0.0F };
 		VECTOR	GroundPos, GroundNewTgt;

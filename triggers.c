@@ -377,6 +377,10 @@ void ProcessActiveConditions( void )
 /*===================================================================
 	Function	:	Event List Procs..
 ===================================================================*/
+#ifdef EDITION_REMASTER
+void EVENT_EnemySetTargetNode( u_int8_t * Data );
+void EVENT_EnemySetNextTargetNode( u_int8_t * Data );
+#endif
 void (* EventList[ ])( u_int8_t * Data ) = {
 		EVENT_PickupGenerate,			// TRIGGEREVENT_Pickup				0     
 		EVENT_EnemyGenerate,			// TRIGGEREVENT_Enemy				1     
@@ -403,8 +407,13 @@ void (* EventList[ ])( u_int8_t * Data ) = {
 		EVENT_TriggerAreaDisable,		// TRIGGEREVENT_TriggerAreaDisable	22
 		EVENT_CameraEnable,				// TRIGGEREVENT_CameraEnable		23
 		EVENT_CameraDisable,			// TRIGGEREVENT_CameraDisable		24
+#ifdef EDITION_REMASTER
+		EVENT_EnemySetTargetNode,		// TRIGGEREVENT_EnemySetTargetNode		25
+		EVENT_EnemySetNextTargetNode,	// TRIGGEREVENT_EnemySetNextTargetNode	26
+#else
 		NULL,
 		NULL,
+#endif
 		NULL,
 		NULL,
 		NULL,
@@ -678,6 +687,80 @@ void EVENT_TeleportDisable( u_int8_t * Data )
 	StopTeleport( (u_int16_t *) Data );
 }
 
+
+#ifdef EDITION_REMASTER
+extern	NODENETWORKHEADER	NodeNetworkHeader;
+extern	ENEMY *	FirstEnemyUsed;
+static	ENEMY *	s_last_redirected_drone = NULL;
+
+/*===================================================================
+	Procedure	:		Redirect nearest CargoDrone to a target node
+	Input		:		u_int8_t * Data  (u32 node index)
+	Output		:		nothing
+===================================================================*/
+void EVENT_EnemySetTargetNode( u_int8_t * Data )
+{
+	u_int32_t	node_idx;
+	NODE		*	target;
+	ENEMY		*	e;
+	ENEMY		*	best = NULL;
+	float			best_dist = -1.0F;
+	float			d;
+
+	memcpy( &node_idx, Data, sizeof( u_int32_t ) );
+	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
+	target = NodeNetworkHeader.FirstNode + node_idx;
+
+	for( e = FirstEnemyUsed; e; e = e->NextUsed )
+	{
+		if( e->Type != ENEMY_CargoDrone ) continue;
+		d = DistanceVector2Vector( &e->Object.Pos, &target->SolidPos );
+		if( best_dist < 0.0F || d < best_dist )
+		{
+			best_dist = d;
+			best = e;
+		}
+	}
+	s_last_redirected_drone = NULL;
+	if( best )
+	{
+		/* Redirect navigation target — no teleport. The drone is already
+		 * stopped at the lift-base node (0x40 flag) inside the shaft.
+		 * Setting TNode = node 235 (shaft top) releases the 0x40 hold and
+		 * lets AutoMovementCrawl carry the drone straight up to the target.
+		 * Teleporting caused the lift to appear stuck under the drone because
+		 * the drone's Pos jumped before the lift animation completed. */
+		u_int16_t old_group = best->Object.Group;
+		if( (u_int16_t)target->Group != old_group )
+			MoveEnemyToGroup( best, old_group, (u_int16_t)target->Group );
+		best->Object.Group  = (u_int16_t)target->Group;
+
+		best->TNode         = target;
+		best->NextTNode     = target;
+		best->LastTNode     = NULL;
+		best->PickNewNodeNow = true;
+		s_last_redirected_drone = best;
+	}
+}
+
+/*===================================================================
+	Procedure	:		Set NextTNode on the last redirected CargoDrone
+	Input		:		u_int8_t * Data  (u32 node index)
+	Output		:		nothing
+===================================================================*/
+void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
+{
+	u_int32_t	node_idx;
+	NODE		*	target;
+
+	memcpy( &node_idx, Data, sizeof( u_int32_t ) );
+	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
+	target = NodeNetworkHeader.FirstNode + node_idx;
+
+	if( s_last_redirected_drone && ( s_last_redirected_drone->Used ) )
+		s_last_redirected_drone->NextTNode = target;
+}
+#endif /* EDITION_REMASTER */
 
 /*===================================================================
 	Procedure	:		Load .Trg File
