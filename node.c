@@ -287,7 +287,16 @@ _skipped_extra_links: ;
 		}else{
 			DebugPrintf( "Node %d Is not in any Legal Group..This is Very Bad...FIX IT!\n", e );
 		}
-		
+
+#ifdef EDITION_REMASTER
+		/* CargoDrone network nodes (0x80000): the authored Pos.y is the correct
+		 * navigation altitude. The downward raycast finds the static mesh floor
+		 * which in lift-shaft areas is far below the authored node Y (the lift
+		 * platform is a BGO, not in the collision mesh). Use Pos directly. */
+		if( NodePnt->NetMask & 0x00080000 )
+			NodePnt->SolidPos = NodePnt->Pos;
+#endif
+
 		NodePnt->LegalGroup = LegalGroup;
 		
 		NodePnt->NextNodeInGroup = NodeInGroup[NodePnt->Group];

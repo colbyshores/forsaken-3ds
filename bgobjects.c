@@ -539,6 +539,35 @@ void ProcessBGObjects( bool Collide )
 						if( Object->Time < Object->OverallTime )
 						{
 							Object->Time += framelag;
+#ifdef EDITION_REMASTER
+							/* Sync any CargoDrone waiting at a lift-base node (0x40)
+							 * with this BGO's animation progress so the drone rides
+							 * the platform rather than being passed through. */
+							{
+								ENEMY * drone;
+								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
+								{
+									float dx, dz;
+									if( drone->Type != ENEMY_CargoDrone ) continue;
+									if( !drone->TNode ) continue;
+									if( !( ((NODE*)drone->TNode)->Flags & 0x40 ) ) continue;
+									dx = drone->Object.Pos.x - Object->Pos.x;
+									dz = drone->Object.Pos.z - Object->Pos.z;
+									if( dx*dx + dz*dz > 500.0F*500.0F ) continue;
+									/* Lerp drone Y from wait node Y to next node Y */
+									{
+										NODE * wait_node = (NODE*)drone->TNode;
+										NODE * upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
+										if( upper_node )
+										{
+											float progress = Object->Time / Object->OverallTime;
+											if( progress > 1.0F ) progress = 1.0F;
+											drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
+										}
+									}
+								}
+							}
+#endif
 						}
 						else
 						{
@@ -2039,6 +2068,19 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 
 				if( CheckBGObjectCollision( &Enemy->Object.Pos, Object, &PushVector, &Damage, EnemyTypes[ Enemy->Type ].Radius ) )
 				{
+#ifdef EDITION_REMASTER
+					/* CargoDrone riding a lift (0x40 wait node): suppress HitFlag so
+					 * UndoBGObjectAnim is NOT called. Y position is driven by the
+					 * lerp in the OneOff_Anim update block above; PushVector.y here
+					 * would double-count and fight the lerp. */
+					if( Enemy->Type == ENEMY_CargoDrone &&
+					    Enemy->TNode && ( ((NODE*)Enemy->TNode)->Flags & 0x40 ) )
+					{
+						/* intentionally empty — no HitFlag, no pos change */
+					}
+					else
+#endif
+					{
 					HitFlag = true;
 
 //					if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, EnemyTypes[ Enemy->Type ].Radius, NULL ) )
@@ -2062,6 +2104,7 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 					Enemy->Object.ExternalForce.x += PushVector.x;
 					Enemy->Object.ExternalForce.y += PushVector.y;
 					Enemy->Object.ExternalForce.z += PushVector.z;
+					}
 				}
 			}
 			
