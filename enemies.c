@@ -6998,18 +6998,27 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		}
 
 #ifdef EDITION_REMASTER
-		/* Lift-wait: CargoDrone parks at node with flag 0x40 (KEX lift-base marker)
-		 * rather than trying to climb through the shaft wall to the node above.
-		 * EVENT_EnemySetTargetNode teleports it to the top when the lift ends. */
-		if( Enemy->Type == ENEMY_CargoDrone &&
-		    (TNode->Flags & 0x40) &&
-		    DistanceVector2Vector( &Object->Pos, &TNode->SolidPos ) < length + 16.0F )
+		/* Lift-wait: CargoDrone parks at a node with flag 0x40 (KEX lift-base marker).
+		 * 0x40 alone = wait for lift.  0x40|0x20 = post-lift arrival, keep moving.
+		 * XZ-only distance so the wait holds while the lift raises the drone
+		 * vertically — 3D distance would release the drone as it rises away from
+		 * TNode->SolidPos.y, causing it to fight the lift and go off-track. */
 		{
-			Object->Speed.z    = 0.0F;
-			Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
-			Enemy->PickNewNodeNow = false;
+		bool _drone_waiting = false;
+		if( Enemy->Type == ENEMY_CargoDrone &&
+		    (TNode->Flags & 0x40) && !(TNode->Flags & 0x20) )
+		{
+			float _dx = Object->Pos.x - TNode->SolidPos.x;
+			float _dz = Object->Pos.z - TNode->SolidPos.z;
+			if( _dx*_dx + _dz*_dz < (length + 16.0F) * (length + 16.0F) )
+			{
+				Object->Speed.z    = 0.0F;
+				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
+				Enemy->PickNewNodeNow = false;
+				_drone_waiting = true;
+			}
 		}
-		else
+		if( !_drone_waiting )
 #endif
 		{
 		Move_Off.x = Move_Off.x * Object->Speed.z * framelag;
@@ -7020,6 +7029,9 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		Object->Pos.y += Move_Off.y;
 		Object->Pos.z += Move_Off.z;
 		}
+#ifdef EDITION_REMASTER
+		} /* close _drone_waiting block */
+#endif
 
 		BuildRotMatrix( XRot , -(Object->Angle.y * framelag), 0.0F, &StepMat );
 		MatrixMultiply( &Object->Mat , &StepMat , &Object->Mat );
@@ -7032,7 +7044,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			if( TempPos.z <= 0.0F )
 			{
 #ifdef EDITION_REMASTER
-				if( !(Enemy->Type == ENEMY_CargoDrone && (TNode->Flags & 0x40)) )
+				if( !(Enemy->Type == ENEMY_CargoDrone && (TNode->Flags & 0x40) && !(TNode->Flags & 0x20)) )
 #endif
 				Enemy->PickNewNodeNow = true;
 			}
