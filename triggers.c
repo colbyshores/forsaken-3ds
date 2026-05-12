@@ -722,23 +722,37 @@ void EVENT_EnemySetTargetNode( u_int8_t * Data )
 		}
 	}
 	s_last_redirected_drone = NULL;
-	if( best )
-	{
-		/* Redirect navigation target — no teleport. The drone is already
-		 * stopped at the lift-base node (0x40 flag) inside the shaft.
-		 * Setting TNode = node 235 (shaft top) releases the 0x40 hold and
-		 * lets AutoMovementCrawl carry the drone straight up to the target.
-		 * Teleporting caused the lift to appear stuck under the drone because
-		 * the drone's Pos jumped before the lift animation completed. */
-		u_int16_t old_group = best->Object.Group;
-		if( (u_int16_t)target->Group != old_group )
-			MoveEnemyToGroup( best, old_group, (u_int16_t)target->Group );
-		best->Object.Group  = (u_int16_t)target->Group;
+	if( !best ) return;
 
-		best->TNode         = target;
-		best->NextTNode     = NULL;
-		best->LastTNode     = NULL;
-		best->PickNewNodeNow = true;
+	/* Train-switch semantics: drone must never leave the node track.
+	 *
+	 * STOPPED at lift-wait (pure 0x40, not 0x60): directly update TNode
+	 *   so the AutoMovementCrawl suppressor releases from the lift-base
+	 *   position and the drone resumes from the raised position.
+	 *
+	 * IN TRANSIT: do nothing — KEX BrainCrawl (bAttackFind=false) just
+	 *   follows the spline track hop-by-hop with no destination override.
+	 *   The drone reaches the target node naturally and stops there if it
+	 *   carries the 0x40 wait flag. */
+	{
+		bool stopped_at_lift = best->TNode &&
+			( ((NODE*)best->TNode)->Flags & 0x40 ) &&
+			!( ((NODE*)best->TNode)->Flags & 0x20 );
+
+		best->Object.Group = (u_int16_t)target->Group;
+
+		if( stopped_at_lift )
+		{
+			best->TNode          = target;
+			best->NextTNode      = NULL;
+			best->LastTNode      = NULL;
+			best->PickNewNodeNow = true;
+		}
+		else
+		{
+			/* In-transit: store destination; aifollow.c routes hop-by-hop */
+			best->NextTNode = target;
+		}
 		s_last_redirected_drone = best;
 	}
 }
