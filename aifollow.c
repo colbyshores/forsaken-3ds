@@ -251,13 +251,44 @@ void AI_CRAWL_FOLLOWPATH( register ENEMY * Enemy )
 
 			Enemy->LastTNode = TNode;
 
+#ifdef EDITION_REMASTER
+			/* CargoDrone: route hop-by-hop toward a pending destination.
+			 * When NextTNode is pre-set to a far target node (switch redirect
+			 * while in-transit), take the natural spline hop each arrival and
+			 * re-check adjacency next turn rather than jumping directly. */
+			if( Enemy->Type == ENEMY_CargoDrone && Enemy->NextTNode )
+			{
+				NODE * dest = (NODE *) Enemy->NextTNode;
+				NODE * cur  = (NODE *) TNode;
+				bool   is_neighbor = false;
+				int    li;
+				for( li = 0; li < cur->NumOfLinks; li++ )
+				{
+					if( cur->NodeLink[li] == dest ) { is_neighbor = true; break; }
+				}
+				if( !is_neighbor )
+				{
+					/* Not adjacent yet — take natural spline hop, keep dest */
+					Enemy->NextTNode = NULL;
+					Enemy->Object.NearestNode = TNode;
+					Enemy->NextTNode = FindSuitableSplineNode( Enemy->Object.NodeNetwork, Enemy->Object.NearestNode, Enemy->Object.NearestNode, Enemy->LastTNode, Enemy->NextTNode, Enemy->TNode );
+					TNode = Enemy->NextTNode;
+					Enemy->TNode = TNode;
+					if( TNode )
+						Enemy->Object.NearestNode = TNode;
+					Enemy->NextTNode = dest; /* preserve destination for next hop check */
+					return;
+				}
+				/* dest is adjacent — fall through to use it directly */
+			}
+#endif
 
 			if( !Enemy->NextTNode )
 			{
 				Enemy->Object.NearestNode = TNode;
 				Enemy->NextTNode = FindSuitableSplineNode( Enemy->Object.NodeNetwork, Enemy->Object.NearestNode , Enemy->Object.NearestNode , Enemy->LastTNode , Enemy->NextTNode , Enemy->TNode );
 			}
-			
+
 			TNode = Enemy->NextTNode;
 			Enemy->TNode = TNode;
 

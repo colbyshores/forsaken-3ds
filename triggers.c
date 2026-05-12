@@ -724,37 +724,25 @@ void EVENT_EnemySetTargetNode( u_int8_t * Data )
 	s_last_redirected_drone = NULL;
 	if( !best ) return;
 
-	/* Train-switch semantics: the drone must never leave the node track.
+	/* Train-switch semantics: drone must never leave the node track.
 	 *
-	 * Two cases based on whether the drone is currently stopped at a lift-wait
-	 * node (pure 0x40, not 0x60) or actively moving between nodes.
+	 * STOPPED at lift-wait (pure 0x40, not 0x60): directly update TNode
+	 *   so the AutoMovementCrawl suppressor releases from the lift-base
+	 *   position and the drone resumes from the raised position.
 	 *
-	 * STOPPED at lift-wait (0x40 WAIT, drone held by AutoMovementCrawl suppressor):
-	 *   The BGO lift animation just completed and physically raised the drone
-	 *   to near the target node's position.  Directly update TNode so the 0x40
-	 *   suppressor releases and the drone resumes from the new position.
-	 *   Without this the suppressor keeps PickNewNodeNow=false forever (the
-	 *   drone stays at the old 0x40 node's XZ coordinates — identical after a
-	 *   vertical lift — and never moves again).
-	 *
-	 * IN TRANSIT (drone is moving toward its current TNode):
-	 *   Set NextTNode only.  aifollow.c's PickNewNodeNow handler uses NextTNode
-	 *   as a pre-fetched switch: when the drone arrives at its current TNode it
-	 *   takes NextTNode instead of calling FindSuitableSplineNode.  The drone
-	 *   finishes its current leg on the track before the switch takes effect. */
+	 * IN TRANSIT: do nothing — KEX BrainCrawl (bAttackFind=false) just
+	 *   follows the spline track hop-by-hop with no destination override.
+	 *   The drone reaches the target node naturally and stops there if it
+	 *   carries the 0x40 wait flag. */
 	{
 		bool stopped_at_lift = best->TNode &&
 			( ((NODE*)best->TNode)->Flags & 0x40 ) &&
 			!( ((NODE*)best->TNode)->Flags & 0x20 );
 
-		u_int16_t old_group = best->Object.Group;
-		if( (u_int16_t)target->Group != old_group )
-			MoveEnemyToGroup( best, old_group, (u_int16_t)target->Group );
 		best->Object.Group = (u_int16_t)target->Group;
 
 		if( stopped_at_lift )
 		{
-			/* Immediate release from lift-wait. */
 			best->TNode          = target;
 			best->NextTNode      = NULL;
 			best->LastTNode      = NULL;
@@ -762,10 +750,9 @@ void EVENT_EnemySetTargetNode( u_int8_t * Data )
 		}
 		else
 		{
-			/* Deferred switch: completes current leg first. */
+			/* In-transit: store destination; aifollow.c routes hop-by-hop */
 			best->NextTNode = target;
 		}
-
 		s_last_redirected_drone = best;
 	}
 }
@@ -784,8 +771,6 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
 	target = NodeNetworkHeader.FirstNode + node_idx;
 
-	/* Mark the lift-base node as "last visited" so the drone won't immediately
-	 * backtrack through the lift shaft after reaching the top. */
 	if( s_last_redirected_drone && ( s_last_redirected_drone->Used ) )
 		s_last_redirected_drone->LastTNode = target;
 }
