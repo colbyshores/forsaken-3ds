@@ -6850,6 +6850,9 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 	float	Distance;
 	VECTOR	Up;
 	float	XRot = 0.0F;
+#ifdef EDITION_REMASTER
+	BGOBJECT * BGObject;
+#endif
 
 	StartPos = Object->Pos;
 	OldGroup = Object->Group;
@@ -7025,9 +7028,24 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		Move_Off.y = Move_Off.y * Object->Speed.z * framelag;
 		Move_Off.z = Move_Off.z * Object->Speed.z * framelag;
 
+#ifdef EDITION_REMASTER
+		if( Enemy->Type == ENEMY_CargoDrone && Object->Group != (u_int16_t) -1 )
+		{
+			BGObject = NULL;
+			if( ObjectCollide( Object, &Move_Off, EnemyTypes[Enemy->Type].Radius, &BGObject ) )
+			{
+				Object->Speed.z = 0.0F;
+				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
+			}
+			if( BGObject ) ChangeBGState( BGObject, OWNER_ENEMY, Enemy->Index, BUMP, 0.0F );
+		}
+		else
+#endif
+		{
 		Object->Pos.x += Move_Off.x;
 		Object->Pos.y += Move_Off.y;
 		Object->Pos.z += Move_Off.z;
+		}
 		}
 #ifdef EDITION_REMASTER
 		} /* close _drone_waiting block */
