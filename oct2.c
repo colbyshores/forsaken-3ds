@@ -5880,6 +5880,15 @@ bool RenderCurrentCamera( void )
 	NumOfTransExe = 0;
 	Build_View();
 	_RC_STAGE("post-Build_View");
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	/* Vertex Frame Gen: smooth the view matrix before it is committed to
+	 * CurrentCamera.View and FSSetView.  Doing it here — after Build_View
+	 * but before ClipGroup runs — ensures every visible group's FSSetView
+	 * call sees the same smoothed matrix, so shared portal-edge vertices
+	 * project identically and there are no gaps.  The missile PIP camera
+	 * never reaches this function so it is naturally excluded. */
+	{ extern void c3d_smooth_view(RENDERMATRIX *, int); c3d_smooth_view(&view, CameraRendering); }
+#endif
 	CurrentCamera.View = view;
 	if (!FSSetView(&view))
 	{
