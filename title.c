@@ -1762,6 +1762,7 @@ extern bool g_show_stereo_debug;
  * Saved as ObjectShine / WallDetail in Configs/main.txt. */
 extern bool g_object_shine;
 extern bool g_wall_detail;
+extern bool g_gpu_morph;
 #endif
 
 MENU	MENU_NEW_Visuals = {
@@ -1788,8 +1789,9 @@ MENU	MENU_NEW_3DS_Visuals = {
 		{  0,   0, 200,  20, 0, "3DS Visual Settings",	FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 },
 		{ 20,  40, 150,  40, 0, "Object shine",			FONT_Small, TEXTFLAG_CentreY, &g_object_shine,      NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
 		{ 20,  56, 150,  56, 0, "Wall detail",			FONT_Small, TEXTFLAG_CentreY, &g_wall_detail,       NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20,  72, 150,  72, 0, "Show stereo debug",	FONT_Small, TEXTFLAG_CentreY, &g_show_stereo_debug, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20, 100, 100, 100, 0, "back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
+		{ 20,  72, 150,  72, 0, "Vertex Frame Gen",		FONT_Small, TEXTFLAG_CentreY, &g_gpu_morph,         NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20,  88, 150,  88, 0, "Show stereo debug",	FONT_Small, TEXTFLAG_CentreY, &g_show_stereo_debug, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20, 110, 100, 110, 0, "back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
 		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -2946,7 +2948,8 @@ MENU	MENU_3DS_Visuals = {
 	{
 		{ 200, 128 + ( 0*16 ), 0, 0, 0, "Object shine",      0, 0, &g_object_shine,      NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 128 + ( 1*16 ), 0, 0, 0, "Wall detail",       0, 0, &g_wall_detail,       NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 128 + ( 2*16 ), 0, 0, 0, "Show stereo debug", 0, 0, &g_show_stereo_debug, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 2*16 ), 0, 0, 0, "Vertex Frame Gen",  0, 0, &g_gpu_morph,         NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 3*16 ), 0, 0, 0, "Show stereo debug", 0, 0, &g_show_stereo_debug, NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
@@ -9538,6 +9541,7 @@ void GetGamePrefs( void )
 	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
 	g_object_shine      = config_get_bool( "ObjectShine",     true );
 	g_wall_detail       = config_get_bool( "WallDetail",      true );
+	g_gpu_morph         = config_get_bool( "GpuMorph",        true );
 #endif
 
 	// Stereo options
@@ -9670,6 +9674,7 @@ void SetGamePrefs( void )
 	config_set_bool( "ShowStereoDebug", g_show_stereo_debug );
 	config_set_bool( "ObjectShine",     g_object_shine );
 	config_set_bool( "WallDetail",      g_wall_detail );
+	config_set_bool( "GpuMorph",        g_gpu_morph );
 #endif
 
 	config_save();

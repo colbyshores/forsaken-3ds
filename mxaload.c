@@ -1181,9 +1181,21 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 				{
 					if ( FromVert->flags & MXA_ANIM_POS )
 					{
+#ifdef GPU_LIGHTING
+						/* GPU lerp path: write from_pos to the locked VBO (v0)
+						 * and to_pos into originalVerts (v3 source).  The vertex
+						 * shader lerps them using UNIFORM_INTERP_ALPHA. */
+						lpLVERTEX->x = FromVert->x;
+						lpLVERTEX->y = FromVert->y;
+						lpLVERTEX->z = FromVert->z;
+						lpLVERTEX2->x = ToVert->x;
+						lpLVERTEX2->y = ToVert->y;
+						lpLVERTEX2->z = ToVert->z;
+#else
 						lpLVERTEX->x = FromVert->x + ( ToVert->x - FromVert->x ) * Interp;
 						lpLVERTEX->y = FromVert->y + ( ToVert->y - FromVert->y ) * Interp;
 						lpLVERTEX->z = FromVert->z + ( ToVert->z - FromVert->z ) * Interp;
+#endif
 					}
 					if ( FromVert->flags & MXA_ANIM_RGB )
 					{
@@ -1220,9 +1232,17 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 			{
 				return false;
 			}
+#ifdef GPU_LIGHTING
+			/* Tell draw_render_object to use the GPU lerp path for this execbuf.
+			 * originalVerts holds the "to" positions written above.
+			 * Cleared by draw_render_object after consumption. */
+			Mxaloadheader->Group[group].renderObject[execbuf].gpu_interp_to_verts =
+				Mxaloadheader->Group[group].originalVerts[execbuf];
+			Mxaloadheader->Group[group].renderObject[execbuf].gpu_interp_alpha = Interp;
+#endif
 		}
 	}
-	
+
 	return true;
 }
 

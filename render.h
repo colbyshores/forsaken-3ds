@@ -214,6 +214,16 @@ typedef struct RENDEROBJECT
 	bool			vbLocked;
 	int numTextureGroups;
 	TEXTUREGROUP *textureGroups;
+#ifdef GPU_LIGHTING
+	/* Set by InterpFrames each frame for animated models; NULL otherwise.
+	 * Points to originalVerts (same layout as lpVertexBuffer) where
+	 * InterpFrames stores the "to" frame positions.  draw_render_object
+	 * reads both this and lpVertexBuffer ("from" positions) to build
+	 * gpu_anim_vertex_t and uploads them to the GPU for shader-side lerp.
+	 * Cleared by draw_render_object after consumption. */
+	LPLVERTEX	gpu_interp_to_verts;
+	float		gpu_interp_alpha;   /* 0..1, the InterpFrames Interp factor */
+#endif
 } RENDEROBJECT;
 
 typedef struct LEVELRENDEROBJECT
