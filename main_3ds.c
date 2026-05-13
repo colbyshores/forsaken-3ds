@@ -128,6 +128,7 @@ extern bool render_init(render_info_t *info);
 #endif
 u32 __ctru_heap_size        = MALLOC_HEAP_MB * 1024 * 1024;
 u32 __ctru_linear_heap_size = LINEAR_HEAP_MB * 1024 * 1024;
+u32 __stacksize__           = 256 * 1024; /* override libctru's 32 KB default */
 
 /* ---- init state tracking ---- */
 
