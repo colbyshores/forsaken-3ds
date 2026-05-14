@@ -95,14 +95,10 @@ static void JumpEnterIdle( ENEMY * Enemy )
 
 	Enemy->Timer = idle + (float) Random_Range( (u_int16_t) idle );
 	Enemy->JumpInAir = 0;
-	/* Free-run the .cob's authored Trans data — Ramqan.cob carries 99
-	 * Trans entries (mostly per-leg-joint ROT keys + body TRANS) that
-	 * play continuously when CurAnimSeq=-1. The Mekton template's
-	 * MektonTurretSeqs are all {Start==End} single-frame poses; using
-	 * them via SetCurAnimSeq(N) freezes Object.Time and the legs go
-	 * static. -1 routes ProcessEnemies into its free-run loop branch
-	 * (Time += framelag*AnimSpeed, wraps at OverallTime). */
-	Enemy->Object.CurAnimSeq = -1;
+	/* Seq 0 (idle, degenerate 0→0): standing rest pose between hops.
+	 * SetCurAnimSeq sets Object.Time = StartTime = 0, clamped there
+	 * each frame — the rig holds the authored standing pose. */
+	SetCurAnimSeq( 0, &Enemy->Object );
 }
 
 /* Snapshot start/target, switch into airborne sub-state.
@@ -134,21 +130,12 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 	Enemy->TNode     = target;
 	Enemy->Object.NearestNode = target;
 
-	/* Don't lock the rig to seq 2 ("jump pose") at takeoff. Sequences
-	 * authored as a single-frame pose (StartTime == EndTime) freeze
-	 * the per-frame anim time advance, so the multi-part rig stops
-	 * animating mid-air — visually the boss looks frozen during the
-	 * arc, which reads as broken. Letting the previous animation
-	 * seq (idle / walk-cycle) continue produces a continuous body
-	 * animation that's clearly "the boss is still alive and moving"
-	 * even if it isn't a leg-tucked jump pose specifically.
-	 *
-	 * The frame-exact KEX behaviour is a per-component anim during
-	 * the arc (legs cycle, body bobs); reproducing that requires
-	 * decompiled per-component frame data we don't have. The 80-85%
-	 * fidelity bar is "boss visibly animates during arc" — left in
-	 * the previous seq, that holds. SetCurAnimSeq(4) at landing
-	 * still fires for the land flourish. */
+	/* Seq 2 (jump takeoff, 60→78 ticks): KEX calls SetAnimSeq(2) inside
+	 * SetupJump itself (our JumpBegin equivalent). Sets Object.Time = 60
+	 * and clamps to 78 — the rig plays the authored takeoff keyframes
+	 * over the first portion of the arc then the JumpT >= 60 gate above
+	 * transitions to seq 3 (frozen mid-air hold). */
+	SetCurAnimSeq( 2, &Enemy->Object );
 }
 
 extern u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
@@ -189,13 +176,13 @@ static void JumpDoMovement( ENEMY * Enemy )
 	{
 		Enemy->Object.Pos = *d;
 		Enemy->JumpInAir  = 0;
-		/* Free-run the .cob's per-component anim track (see
-		 * JumpEnterIdle for full rationale). Mekton template's
-		 * AnimSeqs are single-frame poses — any SetCurAnimSeq(N)
-		 * freezes time. CurAnimSeq=-1 routes ProcessEnemies into
-		 * the free-run branch and the .cob's 99 ROT/TRANS keys
-		 * (per-leg joint cycle, body bob, springs) play continuously. */
-		Enemy->Object.CurAnimSeq = -1;
+		/* Seq 4 (land, 78→120 ticks): touchdown animation. KEX calls
+		 * SetAnimSeq(4) at landing. SetCurAnimSeq advances time from
+		 * StartTime (78) to EndTime (120) across subsequent frames then
+		 * holds — the rig plays the authored landing flourish and settles.
+		 * JumpEnterIdle (called next from AI_JUMP_FOLLOWPATH after Timer
+		 * expires) will switch to seq 0 (idle rest pose) for the dwell. */
+		SetCurAnimSeq( 4, &Enemy->Object );
 		/* Stationary fire phase: dwell long enough for AI_UPDATEGUNS
 		 * to cycle through several cooldown periods. Per research,
 		 * Boss_Ramqan in Remaster fires for ~3s between leaps before
@@ -212,6 +199,19 @@ static void JumpDoMovement( ENEMY * Enemy )
 
 		t   = Enemy->JumpT / JUMP_DURATION_TICKS;
 		omt = t - (t * t);
+
+		/* Seq 2 (jump takeoff, 60→78 ticks) plays during the first 60
+		 * ticks of the arc while the rig plays the authored takeoff
+		 * animation. Once the squat anim has played through (JumpT >= 60),
+		 * switch to seq 3 (jump idle, degenerate 78→78): KEX holds the rig
+		 * frozen at the mid-air pose for the remainder of the arc. This is
+		 * what prevents the backward-lean cycle from continuing mid-hop. */
+		/* Once the takeoff anim (seq 2, 60→78) has played through,
+		 * switch to seq 3 (degenerate 78→78) to hold the frozen
+		 * mid-air pose for the rest of the arc. */
+		if( Enemy->Object.CurAnimSeq == 2 &&
+		    Enemy->Object.Time >= 1.3F * ANIM_SECOND )
+			SetCurAnimSeq( 3, &Enemy->Object );
 
 		/* arc_height = (apex_y - landing_y) * 4 — mirrors KEX's
 		 * `(node[+0x10] - target.z) * _UNK_00b1cb1c`. Landing is

@@ -542,6 +542,23 @@ ANIM_SEQ	SnubTurretSeqs[] = {
 	{ 1.5F * ANIM_SECOND, 1.5F * ANIM_SECOND },	// Fire
 };
 
+/* RamqanSeqs — from ForsakenEX.kpf defs/animSeq.txt "RamqanSeqs".
+ * Times in seconds × ANIM_SECOND (60) = engine ticks.
+ * KEX's state machine: idle → squat → SetupJump (seq 2) → arc hold
+ * (seq 3, degenerate) → land (seq 4) → back to idle.
+ * Seq 3 (jump idle) is intentionally degenerate: Start==End clamps
+ * Object.Time to 78 ticks (the mid-air frozen pose), which is exactly
+ * what KEX does during the 75-tick arc. That's also what prevents the
+ * backward-lean from free-running — the rig is held at the authored
+ * airborne pose, not looping through the full body-bob cycle. */
+ANIM_SEQ	RamqanSeqs[] = {
+	{ 0.0F * ANIM_SECOND, 0.0F * ANIM_SECOND },	// 0: idle (degenerate — standing rest pose)
+	{ 0.0F * ANIM_SECOND, 1.0F * ANIM_SECOND },	// 1: squat (pre-jump crouch, 0→60 ticks)
+	{ 1.0F * ANIM_SECOND, 1.3F * ANIM_SECOND },	// 2: jump takeoff (60→78 ticks)
+	{ 1.3F * ANIM_SECOND, 1.3F * ANIM_SECOND },	// 3: jump idle (degenerate — held at 78 ticks mid-arc)
+	{ 1.3F * ANIM_SECOND, 2.0F * ANIM_SECOND },	// 4: land (78→120 ticks)
+};
+
 ANIM_SEQ	MektonTurretSeqs[] = {
 	{ 0.0F * ANIM_SECOND, 0.0F * ANIM_SECOND },	// Closed
 	{ 0.0F * ANIM_SECOND, 0.0F * ANIM_SECOND },	// Opening
@@ -4423,7 +4440,7 @@ bool PreLoadEnemies( void )
 			 * see aijump.c). */
 			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
-			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 8000;
+			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 15000; /* KEX defs/n64Enemies.txt */
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
 			/* Three turret guns per KEX defs/n64Enemies.txt:
 			 *   gun 0: body-mounted Pulsar (Gun_RamqanBody)
@@ -4450,6 +4467,10 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[0]     = &RamqanBodyAimPos;
 			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[1]     = &RamqanLCannonAimPos;
 			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[2]     = &RamqanRCannonAimPos;
+			/* Wire the KPF-sourced anim sequences so JumpBegin/JumpDoMovement
+			 * can drive the rig through the correct poses at each phase.
+			 * See RamqanSeqs[] above for the per-index time ranges. */
+			EnemyTypes[ ENEMY_Boss_Ramqan ].AnimSeqs = RamqanSeqs;
 
 			/* ShieldTurret (103): 3-part stationary turret per KEX defs/n64Enemies.txt:
 			 *   model bgobjects/n64/shieldturret.cob
@@ -7038,6 +7059,11 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
 			}
 			if( BGObject ) ChangeBGState( BGObject, OWNER_ENEMY, Enemy->Index, BUMP, 0.0F );
+			/* Apply position whether or not a collision occurred — if
+			 * ObjectCollide blocked us Move_Off is already zeroed above. */
+			Object->Pos.x += Move_Off.x;
+			Object->Pos.y += Move_Off.y;
+			Object->Pos.z += Move_Off.z;
 		}
 		else
 #endif
