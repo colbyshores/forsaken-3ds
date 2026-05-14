@@ -894,6 +894,7 @@ NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
 		NodeLink = NodeFrom->NodeLink[i];
+		if( (NodeLink->Flags & 0x20) ) continue;	/* KEX: skip 0x20 (disabled/shaft) nodes */
 		if( (NodeLink != Node1 ) &&
 			(NodeLink != Node2 ) &&
 			(NodeLink != Node3 ) &&
@@ -904,6 +905,7 @@ NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
 		NodeLink = NodeFrom->NodeLink[i];
+		if( (NodeLink->Flags & 0x20) ) continue;	/* KEX: skip 0x20 (disabled/shaft) nodes */
 		if( NodeLink->NetMask&Network )
 			return NodeLink;
 	}
