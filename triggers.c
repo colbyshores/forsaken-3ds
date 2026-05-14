@@ -772,7 +772,7 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	target = NodeNetworkHeader.FirstNode + node_idx;
 
 	if( s_last_redirected_drone && ( s_last_redirected_drone->Used ) )
-		s_last_redirected_drone->LastTNode = target;
+		s_last_redirected_drone->NextTNode = target;
 }
 #endif /* EDITION_REMASTER */
 

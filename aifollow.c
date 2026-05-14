@@ -284,14 +284,38 @@ void AI_CRAWL_FOLLOWPATH( register ENEMY * Enemy )
 				}
 				if( !is_neighbor )
 				{
-					/* Not adjacent yet — take natural spline hop, keep dest */
-					Enemy->NextTNode = NULL;
-					Enemy->Object.NearestNode = TNode;
-					Enemy->NextTNode = FindSuitableSplineNode( Enemy->Object.NodeNetwork, Enemy->Object.NearestNode, Enemy->Object.NearestNode, Enemy->LastTNode, Enemy->NextTNode, Enemy->TNode );
-					TNode = Enemy->NextTNode;
-					Enemy->TNode = TNode;
-					if( TNode )
+					NODE * next_hop;
+					/* Not adjacent yet — take one hop toward dest.
+					 * If current node is a shaft pass-through (0x20 set), its links
+					 * are all 0x20-flagged so FindSuitableSplineNode won't pick them.
+					 * Walk the link list directly; take the first link that is not
+					 * LastTNode and is closer to dest along the shaft. */
+					if( cur->Flags & 0x20 )
+					{
+						next_hop = NULL;
+						for( li = 0; li < cur->NumOfLinks; li++ )
+						{
+							NODE * candidate = cur->NodeLink[li];
+							if( !candidate ) continue;
+							if( candidate == (NODE*)Enemy->LastTNode ) continue;
+							next_hop = candidate;
+							break;
+						}
+						/* If no forward link (dead-end), allow back-link */
+						if( !next_hop && cur->NumOfLinks > 0 )
+							next_hop = cur->NodeLink[0];
+					}
+					else
+					{
+						next_hop = FindSuitableSplineNode( Enemy->Object.NodeNetwork,
+							TNode, TNode, Enemy->LastTNode, NULL, (NODE*)Enemy->TNode );
+					}
+					if( next_hop )
+					{
+						TNode = next_hop;
+						Enemy->TNode = TNode;
 						Enemy->Object.NearestNode = TNode;
+					}
 					Enemy->NextTNode = dest; /* preserve destination for next hop check */
 					return;
 				}
