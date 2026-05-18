@@ -284,90 +284,37 @@ MATRIX world_matrix;
  * the GPU.  This system smooths the CAMERA view matrix between frames
  * on the CPU, so world geometry also glides rather than snapping.
  *
- * Architecture — why we smooth at the CAMERA level, not in upload_matrices:
- *   An earlier attempt lerped inside upload_matrices() using a local
- *   smoothed_view copy.  That broke in two ways:
- *
- *   1. Portal edge gaps: ClipGroup (visi.c) calls FSSetView(&cam->View)
- *      for every visible group.  Adjacent groups share portal-edge vertices
- *      that must project to the SAME screen pixels from both sides.  If each
- *      group's upload_matrices sees a different view_matrix (because
- *      view_matrix was snapped at a slightly different moment), shared
- *      vertices project differently, leaving 1-2px gaps at every portal edge.
- *
- *   2. Missile camera bleed: the PIP missile camera called FSSetView with
- *      its own view matrix, overwriting view_matrix.  The next frame's
- *      snapshot captured the missile camera position rather than the ship
- *      camera, so the main camera lerped from missile→ship, smearing the
- *      entire level geometry across the screen.
- *
- * Fix: smooth the view matrix ONCE per primary-camera frame, BEFORE
- * ClipGroup runs.  RenderCurrentCamera (oct2.c) calls c3d_smooth_view()
- * right after Build_View() computes the real view and before FSSetView
- * stores it.  c3d_smooth_view() lerps the new view against the previous
- * frame's smoothed view and writes the result back into the RENDERMATRIX
- * the caller is about to pass to FSSetView.  Every downstream ClipGroup
- * then calls FSSetView(&cam->View) with the already-smoothed matrix —
- * all groups share the same camera, shared vertices project identically,
- * no portal gaps.  The missile PIP camera never goes through
- * RenderCurrentCamera so it is naturally excluded.
+ * How it works:
+ *   - At FSBeginScene (start of each frame), the current view_matrix
+ *     still holds LAST frame's camera — we snapshot it as s_prev_view_matrix
+ *     before the game overwrites it via FSSetView.
+ *   - In upload_matrices(), when g_gpu_morph is ON, we lerp element-by-
+ *     element between s_prev_view_matrix and the new view_matrix by
+ *     CAMERA_LERP_ALPHA before building view×proj.
  *
  * Why element-wise lerp on a rotation matrix works here:
  *   Between two consecutive 60Hz frames the camera rotates by at most
  *   a few degrees.  Linear interpolation of the rotation columns for
- *   such small angles is visually indistinguishable from SLERP — the
- *   non-orthonormality error is sub-pixel.  SLERP would need ~10 extra
- *   ops (dot, acos, sin, div) that aren't free on ARM11.
+ *   such small angles produces a matrix that is visually indistinguishable
+ *   from true SLERP — the non-orthonormality error is sub-pixel.  SLERP
+ *   would need ~10 extra ops (dot, acos, sin, div) which aren't free.
  *
  * Trade-off — CAMERA_LERP_ALPHA:
  *   0.5 = rendered view is halfway between previous and current frame.
- *         Maximum smoothness, adds ~8ms perceived camera lag at 60Hz.
- *   0.85 = mostly current frame, mild smoothing, less lag.
- *   Tune to taste; 0.5 is the default for maximum visible effect.
+ *         Maximum smoothness, but adds ~8ms of perceived camera lag at 60Hz.
+ *         Noticeable on fast mouse/stick swings; great for slow sweeps.
+ *   0.85 = mostly current frame with mild smoothing. Less lag, less smooth.
+ *   Tune to taste; 0.5 makes the effect clearly visible for A/B testing.
  *
- * s_prev_view_valid gates the lerp on the very first frame and after
- * level loads / hard camera cuts (c3d_renderer_init clears it). */
+ * Same toggle as GPU morph-target lerp (g_gpu_morph / "Vertex Frame Gen")
+ * so players can A/B test the combined effect of both systems together.
+ *
+ * s_prev_view_valid gates the lerp on the very first frame (where there
+ * is no meaningful previous camera) and after hard camera cuts (missile
+ * cam switch, level load) where lerping would smear the cut. */
 #define CAMERA_LERP_ALPHA  0.5f
 static MATRIX s_prev_view_matrix;
 static bool   s_prev_view_valid = false;
-
-/* Called from RenderCurrentCamera (oct2.c) immediately after Build_View().
- * Lerps `view` in-place toward the previous frame's smoothed view when
- * g_gpu_morph is ON, then snapshots the result as the new previous frame.
- *
- * camera_rendering must be the current CameraRendering value.  Smoothing
- * and snapshotting only happen for CAMRENDERING_Main and CAMRENDERING_Rear.
- * PIP / missile camera calls (CAMRENDERING_Pip, CAMRENDERING_Missile) pass
- * through unchanged — this prevents the missile inset from overwriting
- * s_prev_view_matrix with its own view, which would cause the ship camera
- * to lerp from missile→ship on the next frame and smear world geometry. */
-void c3d_smooth_view( RENDERMATRIX *view, int camera_rendering )
-{
-	/* Only smooth the primary (ship) camera passes. */
-	if (camera_rendering != CAMRENDERING_Main &&
-	    camera_rendering != CAMRENDERING_Rear)
-		return;
-
-	if (!g_gpu_morph || !s_prev_view_valid)
-	{
-		/* VFG off or first frame — snapshot real view, return unchanged. */
-		memmove(&s_prev_view_matrix, view, sizeof(MATRIX));
-		s_prev_view_valid = true;
-		return;
-	}
-
-	/* Element-wise lerp: smoothed = prev + (current - prev) * alpha.
-	 * RENDERMATRIX and MATRIX are both 16-float flat structs — cast is safe. */
-	const float *src_prev = (const float *)&s_prev_view_matrix;
-	const float *src_cur  = (const float *)view;
-	float       *dst      = (float *)view;
-	int i;
-	for (i = 0; i < 16; i++)
-		dst[i] = src_prev[i] + (src_cur[i] - src_prev[i]) * CAMERA_LERP_ALPHA;
-
-	/* Snapshot the smoothed result as next frame's "previous". */
-	memmove(&s_prev_view_matrix, view, sizeof(MATRIX));
-}
 
 /* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*).
  * material_class is set at load time by classify_texture() based on
@@ -1223,8 +1170,30 @@ static void upload_matrices(void)
 	MATRIX vp;
 	C3D_Mtx c3d_vp, c3d_world;
 
-	/* view_matrix was already smoothed by c3d_smooth_view() in
-	 * RenderCurrentCamera before FSSetView was called — use it directly. */
+	/* Camera temporal smoothing (CPU side of "Vertex Frame Gen").
+	 *
+	 * When enabled, blend the previous frame's view matrix toward the
+	 * current frame's view matrix before composing view×proj.  This is
+	 * the CPU counterpart to the GPU morph-target lerp in the vertex
+	 * shader: that system smooths model vertex positions between animation
+	 * keyframes; this system smooths the camera between frames so the
+	 * entire rendered world glides smoothly rather than snapping.
+	 *
+	 * We lerp element-by-element (see block comment near s_prev_view_matrix
+	 * declaration for why this is valid and how CAMERA_LERP_ALPHA works).
+	 * The lerped matrix is used only for this upload — view_matrix itself
+	 * is not modified, so game logic reading view_matrix for frustum culling,
+	 * portal clipping, or collision always sees the true current camera. */
+	/* Camera temporal smoothing is disabled: the portal scissor system in
+	 * visi.c computes scissor rectangles from the real view_matrix, but the
+	 * smoothed matrix moves vertices slightly differently — causing 1-2px gaps
+	 * at portal edges.  Additionally, the missile-camera PIP overwrites
+	 * view_matrix mid-frame, so the next frame's snapshot would lerp from the
+	 * missile camera position rather than the ship camera, smearing world
+	 * geometry across the screen.  Both issues require per-camera snapshot
+	 * tracking to fix correctly; parked for a follow-up branch.
+	 * The GPU morph-target lerp (animated .mxa models, controlled by the same
+	 * g_gpu_morph toggle) is unaffected and continues to work. */
 	MatrixMultiply(&view_matrix, &proj_matrix, &vp);
 	matrix_to_c3d((const RENDERMATRIX*)&vp, &c3d_vp);
 
