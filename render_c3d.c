@@ -1184,17 +1184,24 @@ static void upload_matrices(void)
 	 * The lerped matrix is used only for this upload — view_matrix itself
 	 * is not modified, so game logic reading view_matrix for frustum culling,
 	 * portal clipping, or collision always sees the true current camera. */
-	/* Camera temporal smoothing is disabled: the portal scissor system in
-	 * visi.c computes scissor rectangles from the real view_matrix, but the
-	 * smoothed matrix moves vertices slightly differently — causing 1-2px gaps
-	 * at portal edges.  Additionally, the missile-camera PIP overwrites
-	 * view_matrix mid-frame, so the next frame's snapshot would lerp from the
-	 * missile camera position rather than the ship camera, smearing world
-	 * geometry across the screen.  Both issues require per-camera snapshot
-	 * tracking to fix correctly; parked for a follow-up branch.
-	 * The GPU morph-target lerp (animated .mxa models, controlled by the same
-	 * g_gpu_morph toggle) is unaffected and continues to work. */
-	MatrixMultiply(&view_matrix, &proj_matrix, &vp);
+	MATRIX smoothed_view;
+	if (g_gpu_morph && s_prev_view_valid)
+	{
+		/* MATRIX has no array accessor — treat as flat float[16]. */
+		const float *src_prev = (const float *)&s_prev_view_matrix;
+		const float *src_cur  = (const float *)&view_matrix;
+		float       *dst      = (float *)&smoothed_view;
+		int i;
+		for (i = 0; i < 16; i++)
+			dst[i] = src_prev[i] + (src_cur[i] - src_prev[i]) * CAMERA_LERP_ALPHA;
+	}
+	else
+	{
+		/* VFG off or first frame — use raw camera, no smoothing. */
+		memmove(&smoothed_view, &view_matrix, sizeof(MATRIX));
+	}
+
+	MatrixMultiply(&smoothed_view, &proj_matrix, &vp);
 	matrix_to_c3d((const RENDERMATRIX*)&vp, &c3d_vp);
 
 	/* PICA depth remap: D3D [0,1] → PICA [-1,0] */
@@ -1561,6 +1568,12 @@ bool FSBeginScene(void)
 	s_dlCount = 0;
 	s_dlRecording = false;
 	s_scratchBytesUsed = 0;
+
+	/* Camera temporal smoothing: snapshot view_matrix BEFORE the game
+	 * overwrites it this frame via FSSetView.  At this point view_matrix
+	 * still holds last frame's camera — exactly the "from" we want. */
+	memmove(&s_prev_view_matrix, &view_matrix, sizeof(MATRIX));
+	s_prev_view_valid = true;
 
 	if (!s_inFrame)
 	{
