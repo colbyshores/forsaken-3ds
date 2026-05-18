@@ -71,16 +71,14 @@
 #include "render_c3d_shbin.h"
 
 /* ---- uniform register locations (must match .v.pica) ---- */
-#define UNIFORM_PROJECTION    0   /* fvec4[4] — full MVP */
-#define UNIFORM_MODELVIEW     4   /* fvec4[4] — identity (kept for compat) */
-#define UNIFORM_AMBIENT       8   /* fvec4    — .xyz=ambient, .w=unused */
-#define UNIFORM_LIGHT_COUNT   9   /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
-#define UNIFORM_LIGHTS       10   /* fvec4[24]— GPU_MAX_LIGHTS × 3 fvec4 each
-                                   * (c10..c33); layout per light:
-                                   *   light[3i+0] = (Pos.xyz, invSizeSq)
-                                   *   light[3i+1] = (r, g, b, type)
-                                   *   light[3i+2] = (Dir.xyz, CosArc)  */
-#define UNIFORM_INTERP_ALPHA 34   /* fvec4    — .x=morph-target lerp alpha (0..1) */
+#define UNIFORM_PROJECTION   0   /* fvec4[4] — full MVP */
+#define UNIFORM_MODELVIEW    4   /* fvec4[4] — identity (kept for compat) */
+#define UNIFORM_AMBIENT      8   /* fvec4    — .xyz=ambient, .w=unused */
+#define UNIFORM_LIGHT_COUNT  9   /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
+#define UNIFORM_LIGHTS      10   /* fvec4[12]— GPU_MAX_LIGHTS × 3 fvec4 each
+                                  *   light[3i+0] = (Pos.xyz, invSizeSq)
+                                  *   light[3i+1] = (r, g, b, type)
+                                  *   light[3i+2] = (Dir.xyz, CosArc)  */
 #define GPU_MAX_LIGHTS       8   /* must match .v.pica `lights[24]` (= 8*3) */
 
 /* ---- citro3d state ---- */
@@ -139,7 +137,6 @@ static bool          s_objLightReady = false;
  * brightening-only. */
 bool g_object_shine = true;
 bool g_wall_detail  = true;
-bool g_gpu_morph    = true;  /* GPU morph-target lerp (animated models); toggle via 3DS Visual Settings */
 
 static C3D_RenderTarget *s_targetLeft    = NULL;
 static C3D_RenderTarget *s_targetRight   = NULL;
@@ -164,33 +161,24 @@ static s8 s_loc_lights      = -1;
  * removed; hardware stereo uses separate render targets instead). */
 #define s_colorMask GPU_WRITE_ALL
 
-/* ---- GPU vertex formats (all floats, match shader inputs) ---- */
+/* ---- GPU vertex format (all floats, matches shader inputs) ---- */
 typedef struct {
 	float pos[3];
 	float color[4];
 	float texcoord[2];
-} gpu_vertex_t;  /* 36 bytes — used for all non-animated draws */
-
-/* Animated morph-target draws: v0=from_pos, v1=color, v2=texcoord, v3=to_pos.
- * Shader lerps from_pos→to_pos using UNIFORM_INTERP_ALPHA. */
-typedef struct {
-	float from_pos[3];   /* v0 — "from" animation keyframe position */
-	float color[4];      /* v1 */
-	float texcoord[2];   /* v2 */
-	float to_pos[3];     /* v3 — "to" animation keyframe position */
-} gpu_anim_vertex_t;  /* 48 bytes */
+} gpu_vertex_t;  /* 36 bytes */
 
 /* ---- Single-pass stereo display list ---- */
 
 /* Records one texture group draw for replay on the second eye.
  * Vertex data stays in the scratch buffer; only the MVP changes. */
 typedef struct {
-	int      scratchByteOffset; /* byte offset into s_scratch */
+	int      scratchOffset;   /* index into s_scratch */
 	int      vertexCount;
 	MATRIX   worldMatrix;
 	MATRIX   projMatrix;
 	render_viewport_t viewport;
-	void    *texture;           /* texture_t* or NULL */
+	void    *texture;         /* texture_t* or NULL */
 	bool     colourkey;
 	bool     orthographic;
 	bool     additive_blend;
@@ -202,10 +190,6 @@ typedef struct {
 	 * eye re-renders the same group with sub-rect viewport, undoing
 	 * the visi.c portal-void fix on that eye. */
 	bool     scissor_mode;
-	/* True when vertex data uses gpu_anim_vertex_t (48 bytes, 4 attrs)
-	 * rather than gpu_vertex_t (36 bytes, 3 attrs). */
-	bool     anim_verts;
-	float    interp_alpha;      /* only valid when anim_verts == true */
 } dl_entry_t;
 
 #define MAX_DL_ENTRIES 4096
@@ -221,7 +205,8 @@ static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
  * silent geometry drops at the overflow-after-flush fallback. */
 #define GPU_SCRATCH_SIZE  (4 * 1024 * 1024)
 static gpu_vertex_t *s_scratch = NULL;
-static int s_scratchBytesUsed = 0;  /* bytes consumed in s_scratch this frame */
+static int s_scratchUsed = 0;
+static int s_scratchMax = 0;
 
 /* ---- globals expected by the engine ---- */
 
@@ -276,45 +261,6 @@ static float proctex_phase_from_path(const char *path)
 MATRIX proj_matrix;
 MATRIX view_matrix;
 MATRIX world_matrix;
-
-/* ---- CPU-side camera temporal smoothing (Vertex Frame Gen) ----
- *
- * Companion to the GPU morph-target lerp in the vertex shader.  That
- * system smooths animated MODEL vertex positions between keyframes on
- * the GPU.  This system smooths the CAMERA view matrix between frames
- * on the CPU, so world geometry also glides rather than snapping.
- *
- * How it works:
- *   - At FSBeginScene (start of each frame), the current view_matrix
- *     still holds LAST frame's camera — we snapshot it as s_prev_view_matrix
- *     before the game overwrites it via FSSetView.
- *   - In upload_matrices(), when g_gpu_morph is ON, we lerp element-by-
- *     element between s_prev_view_matrix and the new view_matrix by
- *     CAMERA_LERP_ALPHA before building view×proj.
- *
- * Why element-wise lerp on a rotation matrix works here:
- *   Between two consecutive 60Hz frames the camera rotates by at most
- *   a few degrees.  Linear interpolation of the rotation columns for
- *   such small angles produces a matrix that is visually indistinguishable
- *   from true SLERP — the non-orthonormality error is sub-pixel.  SLERP
- *   would need ~10 extra ops (dot, acos, sin, div) which aren't free.
- *
- * Trade-off — CAMERA_LERP_ALPHA:
- *   0.5 = rendered view is halfway between previous and current frame.
- *         Maximum smoothness, but adds ~8ms of perceived camera lag at 60Hz.
- *         Noticeable on fast mouse/stick swings; great for slow sweeps.
- *   0.85 = mostly current frame with mild smoothing. Less lag, less smooth.
- *   Tune to taste; 0.5 makes the effect clearly visible for A/B testing.
- *
- * Same toggle as GPU morph-target lerp (g_gpu_morph / "Vertex Frame Gen")
- * so players can A/B test the combined effect of both systems together.
- *
- * s_prev_view_valid gates the lerp on the very first frame (where there
- * is no meaningful previous camera) and after hard camera cuts (missile
- * cam switch, level load) where lerping would smear the cut. */
-#define CAMERA_LERP_ALPHA  0.5f
-static MATRIX s_prev_view_matrix;
-static bool   s_prev_view_valid = false;
 
 /* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*).
  * material_class is set at load time by classify_texture() based on
@@ -645,7 +591,7 @@ static void replay_display_list(void)
 	for (i = 0; i < s_dlCount; i++)
 	{
 		dl_entry_t *e = &s_dl[i];
-		void *dst = (char*)s_scratch + e->scratchByteOffset;
+		gpu_vertex_t *dst = s_scratch + e->scratchOffset;
 
 		/* Restore per-entry state */
 		if (e->additive_blend)
@@ -741,34 +687,11 @@ static void replay_display_list(void)
 			dl_lastTextured = false;
 		}
 
-		/* BufInfo + AttrInfo: animated draws use 4-attr 48-byte format,
-		 * non-animated use the standard 3-attr 36-byte format. */
+		/* Buffer pointer only — AttrInfo set once in pglTransferEye */
 		{
-			C3D_AttrInfo *ai = C3D_GetAttrInfo();
-			C3D_BufInfo *bi  = C3D_GetBufInfo();
-			if (e->anim_verts)
-			{
-				C3D_FVUnifSet(GPU_VERTEX_SHADER, UNIFORM_INTERP_ALPHA,
-				              e->interp_alpha, 0.0f, 0.0f, 0.0f);
-				AttrInfo_Init(ai);
-				AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);  /* v0: from_pos */
-				AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);  /* v1: color */
-				AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);  /* v2: texcoord */
-				AttrInfo_AddLoader(ai, 3, GPU_FLOAT, 3);  /* v3: to_pos */
-				BufInfo_Init(bi);
-				BufInfo_Add(bi, dst, sizeof(gpu_anim_vertex_t), 4, 0x3210);
-			}
-			else
-			{
-				C3D_FVUnifSet(GPU_VERTEX_SHADER, UNIFORM_INTERP_ALPHA,
-				              0.0f, 0.0f, 0.0f, 0.0f);
-				AttrInfo_Init(ai);
-				AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-				AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
-				AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
-				BufInfo_Init(bi);
-				BufInfo_Add(bi, dst, sizeof(gpu_vertex_t), 3, 0x210);
-			}
+			C3D_BufInfo *bi = C3D_GetBufInfo();
+			BufInfo_Init(bi);
+			BufInfo_Add(bi, dst, sizeof(gpu_vertex_t), 3, 0x210);
 		}
 		C3D_DrawArrays(GPU_TRIANGLES, 0, e->vertexCount);
 
@@ -878,7 +801,8 @@ bool c3d_renderer_init(void)
 
 	/* Allocate scratch buffer for vertex conversion */
 	s_scratch = (gpu_vertex_t*)linearAlloc(GPU_SCRATCH_SIZE);
-	s_scratchBytesUsed = 0;
+	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
+	s_scratchUsed = 0;
 
 	/* Create render targets and link to display output.
 	 * Both left and right eye targets are created unconditionally —
@@ -1101,10 +1025,6 @@ bool c3d_renderer_init(void)
 	}
 
 	s_shaderReady = true;
-	/* Invalidate the camera smoothing history on renderer (re-)init so the
-	 * first frame after a level load doesn't lerp from a stale camera
-	 * position (which would smear the cut). */
-	s_prev_view_valid = false;
 	c3d_trace("c3d_renderer_init: OK — shader ready, render targets created");
 	return true;
 }
@@ -1170,38 +1090,7 @@ static void upload_matrices(void)
 	MATRIX vp;
 	C3D_Mtx c3d_vp, c3d_world;
 
-	/* Camera temporal smoothing (CPU side of "Vertex Frame Gen").
-	 *
-	 * When enabled, blend the previous frame's view matrix toward the
-	 * current frame's view matrix before composing view×proj.  This is
-	 * the CPU counterpart to the GPU morph-target lerp in the vertex
-	 * shader: that system smooths model vertex positions between animation
-	 * keyframes; this system smooths the camera between frames so the
-	 * entire rendered world glides smoothly rather than snapping.
-	 *
-	 * We lerp element-by-element (see block comment near s_prev_view_matrix
-	 * declaration for why this is valid and how CAMERA_LERP_ALPHA works).
-	 * The lerped matrix is used only for this upload — view_matrix itself
-	 * is not modified, so game logic reading view_matrix for frustum culling,
-	 * portal clipping, or collision always sees the true current camera. */
-	MATRIX smoothed_view;
-	if (g_gpu_morph && s_prev_view_valid)
-	{
-		/* MATRIX has no array accessor — treat as flat float[16]. */
-		const float *src_prev = (const float *)&s_prev_view_matrix;
-		const float *src_cur  = (const float *)&view_matrix;
-		float       *dst      = (float *)&smoothed_view;
-		int i;
-		for (i = 0; i < 16; i++)
-			dst[i] = src_prev[i] + (src_cur[i] - src_prev[i]) * CAMERA_LERP_ALPHA;
-	}
-	else
-	{
-		/* VFG off or first frame — use raw camera, no smoothing. */
-		memmove(&smoothed_view, &view_matrix, sizeof(MATRIX));
-	}
-
-	MatrixMultiply(&smoothed_view, &proj_matrix, &vp);
+	MatrixMultiply(&view_matrix, &proj_matrix, &vp);
 	matrix_to_c3d((const RENDERMATRIX*)&vp, &c3d_vp);
 
 	/* PICA depth remap: D3D [0,1] → PICA [-1,0] */
@@ -1567,14 +1456,7 @@ bool FSBeginScene(void)
 	 * twice" explicitly. Leaving that for later. */
 	s_dlCount = 0;
 	s_dlRecording = false;
-	s_scratchBytesUsed = 0;
-
-	/* Camera temporal smoothing: snapshot view_matrix BEFORE the game
-	 * overwrites it this frame via FSSetView.  At this point view_matrix
-	 * still holds last frame's camera — exactly the "from" we want. */
-	memmove(&s_prev_view_matrix, &view_matrix, sizeof(MATRIX));
-	s_prev_view_valid = true;
-
+	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -1719,10 +1601,10 @@ void set_whiteout_state(void)
  * depth slate. */
 static void clear_sub_viewport_via_quad(void)
 {
-	if (!s_scratch || s_scratchBytesUsed + 6 * (int)sizeof(gpu_vertex_t) > GPU_SCRATCH_SIZE) return;
+	if (!s_scratch || s_scratchUsed + 6 > s_scratchMax) return;
 
-	gpu_vertex_t *dst = (gpu_vertex_t*)((char*)s_scratch + s_scratchBytesUsed);
-	s_scratchBytesUsed += 6 * (int)sizeof(gpu_vertex_t);
+	gpu_vertex_t *dst = s_scratch + s_scratchUsed;
+	s_scratchUsed += 6;
 
 	/* PICA's clip range is [-1, 0] in z (not [-1, 1] like GL), so
 	 * z=1 would be clipped. Use z=0 (far plane in this convention). */
@@ -2895,140 +2777,28 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 	}
 
-#ifdef GPU_LIGHTING
-	/* ---- Animated morph-target draw path ----
-	 * When InterpFrames populated gpu_interp_to_verts, build gpu_anim_vertex_t
-	 * records (48 bytes, 4 attrs) and draw immediately — bypass the batch
-	 * system since the vertex format differs from the standard 36-byte path. */
-	if (g_gpu_morph && renderObject->gpu_interp_to_verts != NULL)
-	{
-		LVERTEX *from_verts = (LVERTEX*)renderObject->lpVertexBuffer;
-		LVERTEX *to_verts   = (LVERTEX*)renderObject->gpu_interp_to_verts;
-		float    alpha      = renderObject->gpu_interp_alpha;
-
-		int      g, k;
-
-		C3D_FVUnifSet(GPU_VERTEX_SHADER, UNIFORM_INTERP_ALPHA,
-		              alpha, 0.0f, 0.0f, 0.0f);
-
-		C3D_AttrInfo *aai = C3D_GetAttrInfo();
-		AttrInfo_Init(aai);
-		AttrInfo_AddLoader(aai, 0, GPU_FLOAT, 3);  /* v0: from_pos */
-		AttrInfo_AddLoader(aai, 1, GPU_FLOAT, 4);  /* v1: color */
-		AttrInfo_AddLoader(aai, 2, GPU_FLOAT, 2);  /* v2: texcoord */
-		AttrInfo_AddLoader(aai, 3, GPU_FLOAT, 3);  /* v3: to_pos */
-
-		for (g = 0; g < numGroups; g++)
-		{
-			TEXTUREGROUP *tg = &renderObject->textureGroups[sorted_order[g]];
-			int numIdx = tg->numTriangles * 3;
-			if (numIdx <= 0) continue;
-
-			int needed = numIdx * (int)sizeof(gpu_anim_vertex_t);
-			if (s_scratchBytesUsed + needed > GPU_SCRATCH_SIZE) continue;
-
-			int startByteOff = s_scratchBytesUsed;
-			gpu_anim_vertex_t *adst =
-				(gpu_anim_vertex_t*)((char*)s_scratch + s_scratchBytesUsed);
-			s_scratchBytesUsed += needed;
-
-			WORD *idx = (WORD*)renderObject->lpIndexBuffer + tg->startIndex;
-			for (k = 0; k < numIdx; k++)
-			{
-				int vi = tg->startVert + idx[k];
-				LVERTEX *fv = &from_verts[vi];
-				LVERTEX *tv = &to_verts[vi];
-				adst[k].from_pos[0] = fv->x;
-				adst[k].from_pos[1] = fv->y;
-				adst[k].from_pos[2] = fv->z;
-				adst[k].color[0] = ((fv->color >> 16) & 0xFF) / 255.0f;
-				adst[k].color[1] = ((fv->color >> 8)  & 0xFF) / 255.0f;
-				adst[k].color[2] = ((fv->color)        & 0xFF) / 255.0f;
-				adst[k].color[3] = ((fv->color >> 24)  & 0xFF) / 255.0f;
-				adst[k].texcoord[0] = fv->tu;
-				adst[k].texcoord[1] = fv->tv;
-				adst[k].to_pos[0] = tv->x;
-				adst[k].to_pos[1] = tv->y;
-				adst[k].to_pos[2] = tv->z;
-			}
-
-			bool eff_tex = tg->texture &&
-			               ((texture_t*)tg->texture)->initialized;
-			if (eff_tex)
-				apply_texenv_for_texture((texture_t*)tg->texture);
-			else
-				apply_texenv_untextured();
-
-			if (tg->colourkey)
-				C3D_AlphaTest(true, GPU_GREATER, 0x64);
-
-			C3D_BufInfo *abi = C3D_GetBufInfo();
-			BufInfo_Init(abi);
-			BufInfo_Add(abi, adst, sizeof(gpu_anim_vertex_t), 4, 0x3210);
-			C3D_DrawArrays(GPU_TRIANGLES, 0, numIdx);
-
-			if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES)
-			{
-				dl_entry_t *ae = &s_dl[s_dlCount++];
-				ae->scratchByteOffset = startByteOff;
-				ae->vertexCount       = numIdx;
-				ae->anim_verts        = true;
-				ae->interp_alpha      = alpha;
-				memmove(&ae->worldMatrix, &world_matrix, sizeof(MATRIX));
-				memmove(&ae->projMatrix,  &proj_matrix,  sizeof(MATRIX));
-				ae->viewport       = s_viewport;
-				ae->texture        = (void*)tg->texture;
-				ae->colourkey      = tg->colourkey;
-				ae->orthographic   = orthographic;
-				ae->additive_blend = _additive_blend_active;
-				ae->has_texture    = eff_tex;
-				ae->scissor_mode   = s_current_view_used_scissor;
-			}
-
-			if (tg->colourkey)
-				C3D_AlphaTest(false, GPU_ALWAYS, 0);
-		}
-
-		/* Restore standard 3-attr AttrInfo and clear the consumed flag */
-		{
-			C3D_AttrInfo *rai = C3D_GetAttrInfo();
-			AttrInfo_Init(rai);
-			AttrInfo_AddLoader(rai, 0, GPU_FLOAT, 3);
-			AttrInfo_AddLoader(rai, 1, GPU_FLOAT, 4);
-			AttrInfo_AddLoader(rai, 2, GPU_FLOAT, 2);
-		}
-		C3D_FVUnifSet(GPU_VERTEX_SHADER, UNIFORM_INTERP_ALPHA,
-		              0.0f, 0.0f, 0.0f, 0.0f);
-		renderObject->gpu_interp_to_verts = NULL;
-		return true;
-	}
-#endif /* GPU_LIGHTING */
-
 	/* ---- Draw call batching ----
 	 * Accumulate consecutive texture groups with the same GPU state
 	 * (texture, colourkey, blend) into a single C3D_DrawArrays call.
 	 * Vertices are contiguous in the scratch buffer so batching just
 	 * extends the vertex count without issuing intermediate draws. */
-	int   batch_startByteOffset = 0;
-	int   batch_vertCount       = 0;
-	void *batch_texture         = NULL;
-	bool  batch_colourkey       = false;
-	bool  batch_hasTexture      = false;
+	int   batch_startOffset = 0;
+	int   batch_vertCount   = 0;
+	void *batch_texture     = NULL;
+	bool  batch_colourkey   = false;
+	bool  batch_hasTexture  = false;
 
 /* Macro: flush the current batch (draw + display list + state restore) */
 #define FLUSH_BATCH() do { \
 	if (batch_vertCount > 0) { \
 		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
 		BufInfo_Init(_bi); \
-		BufInfo_Add(_bi, (gpu_vertex_t*)((char*)s_scratch + batch_startByteOffset), \
-		            sizeof(gpu_vertex_t), 3, 0x210); \
+		BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
 		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
 		if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES) { \
 			dl_entry_t *_e = &s_dl[s_dlCount++]; \
-			_e->scratchByteOffset = batch_startByteOffset; \
-			_e->vertexCount       = batch_vertCount; \
-			_e->anim_verts        = false; \
-			_e->interp_alpha      = 0.0f; \
+			_e->scratchOffset = batch_startOffset; \
+			_e->vertexCount   = batch_vertCount; \
 			memmove(&_e->worldMatrix, &world_matrix, sizeof(MATRIX)); \
 			memmove(&_e->projMatrix,  &proj_matrix,  sizeof(MATRIX)); \
 			_e->viewport       = s_viewport; \
@@ -3060,14 +2830,13 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 		/* Mid-frame flush: if scratch is nearly full, flush pending batch
 		 * and split the frame to reset the scratch pointer. */
-		int needed_bytes = numIndices * (int)sizeof(gpu_vertex_t);
-		if (s_scratchBytesUsed + needed_bytes > GPU_SCRATCH_SIZE)
+		if (s_scratchUsed + numIndices > s_scratchMax)
 		{
 			if (s_inFrame)
 			{
 				FLUSH_BATCH();
 				C3D_FrameSplit(0);
-				s_scratchBytesUsed = 0;
+				s_scratchUsed = 0;
 				C3D_BindProgram(&s_shaderProgram);
 				{
 					C3D_AttrInfo *ai = C3D_GetAttrInfo();
@@ -3091,11 +2860,11 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 				}
 			}
-			if (s_scratchBytesUsed + needed_bytes > GPU_SCRATCH_SIZE)
+			if (s_scratchUsed + numIndices > s_scratchMax)
 				continue;
 		}
 
-		dst = (gpu_vertex_t*)((char*)s_scratch + s_scratchBytesUsed);
+		dst = s_scratch + s_scratchUsed;
 
 		/* Convert LVERTEX/TLVERTEX → gpu_vertex_t, expanding indices */
 		if (renderObject->lpIndexBuffer)
@@ -3143,7 +2912,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		{
 			LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
 			int numVerts = tg->numVerts;
-			if (s_scratchBytesUsed + numVerts * (int)sizeof(gpu_vertex_t) > GPU_SCRATCH_SIZE) continue;
+			if (s_scratchUsed + numVerts > s_scratchMax) continue;
 			for (i = 0; i < numVerts; i++)
 			{
 				int vi = startVert + i;
@@ -3182,7 +2951,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		/* Start a new batch if needed — set GPU state */
 		if (batch_vertCount == 0)
 		{
-			batch_startByteOffset = s_scratchBytesUsed;
+			batch_startOffset = s_scratchUsed;
 			batch_texture     = (void*)tg->texture;
 			batch_colourkey   = tg->colourkey;
 			batch_hasTexture  = eff_hasTexture;
@@ -3205,7 +2974,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 		/* Accumulate into current batch */
 		batch_vertCount += totalVerts;
-		s_scratchBytesUsed += totalVerts * (int)sizeof(gpu_vertex_t);
+		s_scratchUsed += totalVerts;
 	}
 
 	/* Flush the final pending batch */

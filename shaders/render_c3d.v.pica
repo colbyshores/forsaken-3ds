@@ -1,46 +1,12 @@
 ; render_c3d.v.pica — Forsaken citro3d vertex shader.
 ;
-; === "Vertex Frame Gen" — two-part smoothing system ===
-;
-; This shader is one half of Forsaken 3DS's "Vertex Frame Gen" feature
-; (toggled via Pause → 3DS Visual Settings → Vertex Frame Gen).  The full
-; system has two components:
-;
-;   1. GPU morph-target lerp (THIS SHADER, v3 attribute path)
-;      Animated model vertices (ships, enemies, pickups) are stored as two
-;      keyframes: "from_pos" (v0) from the locked VBO (current anim frame)
-;      and "to_pos" (v3) written into originalVerts by InterpFrames each
-;      tick.  The shader lerps between them using interp_alpha (c34).
-;      This replaces the per-vertex CPU lerp loop in InterpFrames that was
-;      the single most expensive operation on the OG 3DS ARM11 at 268MHz.
-;      Formula: pos = from + (to - from) * alpha
-;               alpha=0 → from_pos (non-animated or VFG off)
-;               alpha=1 → to_pos   (fully interpolated)
-;
-;   2. CPU camera temporal smoothing (render_c3d.c upload_matrices)
-;      The view matrix is lerped element-by-element between the previous
-;      frame's camera and the current frame's camera before composing
-;      view×proj.  This makes world geometry glide smoothly rather than
-;      snapping each frame, complementing the per-model vertex smoothing
-;      above.  Done on the CPU before this shader runs; the projection
-;      uniform (c0..c3) already contains the smoothed view×proj.
-;
-; Together these make every moving object AND the camera itself transition
-; smoothly between game-logic ticks, giving the appearance of sub-tick
-; temporal resolution using only 4 extra shader instructions and a handful
-; of CPU float ops per frame.
-;
-; === Hybrid GPU vertex lighting ===
-;
-; Full MVP transform + ambient + per-vertex point-light contribution.
-; Replaces the per-vertex CPU dynamic-light loop in lights.c::XLight1Group
-; for the level mesh path, and XLightMxaloadHeader / XLightMxloadHeader
-; for model meshes.
+; Hybrid GPU vertex lighting: full MVP transform + ambient + per-vertex
+; point-light contribution. Replaces the per-vertex CPU dynamic-light
+; loop in lights.c::XLight1Group for the level mesh path.
 ;
 ; Uniforms (register layout matches render_c3d.c UNIFORM_* defines):
-;   projection[0..3]  (c0..c3)   — view × proj, with PICA depth remap,
-;                                   90° screen rotation, AND camera temporal
-;                                   smoothing applied (see component 2 above)
+;   projection[0..3]  (c0..c3)   — view × proj, with PICA depth remap
+;                                   and 90° screen rotation applied
 ;   modelView[0..3]   (c4..c7)   — model→world (= identity for level
 ;                                   mesh, real model transform for
 ;                                   animated/static model meshes)
@@ -50,15 +16,11 @@
 ;     light[3i+0] = (Pos.x, Pos.y, Pos.z, invSizeSq)  ; CPU pre-divides
 ;     light[3i+1] = (r, g, b, type)                    ; type 0=point
 ;     light[3i+2] = (Dir.x, Dir.y, Dir.z, CosArc)      ; reserved for spot
-;   interp_alpha[1]   (c34)      — .x = morph-target lerp factor (0..1)
-;                                   0 = show from_pos (non-animated / VFG off)
-;                                   1 = show to_pos   (fully interpolated)
 ;
-; Inputs:  v0=from_pos, v1=baked color (rgba 0..1), v2=texcoord
-;          v3=to_pos (only valid when interp_alpha > 0, i.e. animated draws)
+; Inputs:  v0=pos, v1=baked color (rgba 0..1), v2=texcoord
 ; Outputs: outpos (clip), outclr (baked+lights, saturated), outtc0
 ;
-; Instruction count: ~92 ops of PICA200's 96-instruction vshader limit.
+; Instruction count: ~74 ops of PICA200's 96-instruction vshader limit.
 
 ; Uniforms — register layout pinned via API uniform-name resolution
 .fvec projection[4]
@@ -66,8 +28,6 @@
 .fvec ambient[1]
 .fvec light_count[1]
 .fvec lights[24]
-.fvec interp_alpha[1]  ; c34 — .x = morph-target lerp factor (0..1)
-                       ;        0 = show from_pos (non-animated), 1 = show to_pos
 
 ; Constants
 .constf myconst(0.0, 1.0, -1.0, 0.0)
@@ -82,22 +42,13 @@
 .out outview view         ; view vector for fragment-lighting
 
 ; Inputs
-.alias inpos v0   ; from_pos (all draws) — "from" keyframe for animated models
+.alias inpos v0
 .alias inclr v1
 .alias intex v2
-.alias into_pos v3  ; to_pos  — "to"   keyframe; only valid when interp_alpha > 0
 
 .proc main
-	; GPU morph-target lerp: lerp(from_pos, to_pos, interp_alpha.x)
-	; For non-animated draws interp_alpha = 0, result = from_pos = inpos.
-	; For animated draws InterpFrames sets interp_alpha = Interp (0..1),
-	; from_pos = FromFrame positions, to_pos = ToFrame positions.
-	; PICA200 constraint: two v-regs can't both be src in one instruction;
-	; stage into_pos through r12 first.
-	mov r12.xyz, into_pos                   ; r12 = to_pos (v3 → temp)
-	add r12.xyz, r12, -inpos                ; r12 = to - from
-	mul r12.xyz, interp_alpha[0].xxxx, r12  ; r12 = (to-from)*alpha
-	add r0.xyz, inpos, r12                  ; r0 = from + (to-from)*alpha
+	; r0 = (inpos.xyz, 1.0) — model/world position
+	mov r0.xyz, inpos
 	mov r0.w,   ones
 
 	; r1 = modelView * r0 — world-space vertex position
