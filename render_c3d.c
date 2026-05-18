@@ -326,20 +326,10 @@ MATRIX world_matrix;
  *   Tune to taste; 0.5 is the default for maximum visible effect.
  *
  * s_prev_view_valid gates the lerp on the very first frame and after
- * level loads / hard camera cuts (c3d_renderer_init clears it).
- *
- * s_smooth_view_done_this_frame prevents double-lerp in stereo mode.
- * RenderCurrentCamera is called once per eye, so without this gate the
- * second eye call re-lerps the already-lerped matrix and updates
- * s_prev_view_matrix with the re-lerped result.  Left eye then gets
- * 50%-smoothed view, right eye gets ~75%-smoothed view (different
- * camera matrix per eye).  Visible outcome: portal-group visibility
- * differs between eyes, so some groups render in only one eye and
- * appear as flat "floating polygon" sheets in the 3D image. */
+ * level loads / hard camera cuts (c3d_renderer_init clears it). */
 #define CAMERA_LERP_ALPHA  0.5f
 static MATRIX s_prev_view_matrix;
-static bool   s_prev_view_valid       = false;
-static bool   s_smooth_view_done_this_frame = false;
+static bool   s_prev_view_valid = false;
 
 /* Called from RenderCurrentCamera (oct2.c) immediately after Build_View().
  * Lerps `view` in-place toward the previous frame's smoothed view when
@@ -357,14 +347,6 @@ void c3d_smooth_view( RENDERMATRIX *view, int camera_rendering )
 	if (camera_rendering != CAMRENDERING_Main &&
 	    camera_rendering != CAMRENDERING_Rear)
 		return;
-
-	/* Stereo guard: only lerp + snapshot once per frame.  The second
-	 * eye call re-uses whatever view the caller passes (which is the
-	 * same global `view` that was already smoothed on the first call),
-	 * so it naturally gets the same smoothed matrix without re-lerping. */
-	if (s_smooth_view_done_this_frame)
-		return;
-	s_smooth_view_done_this_frame = true;
 
 	if (!g_gpu_morph || !s_prev_view_valid)
 	{
@@ -1610,7 +1592,6 @@ bool FSBeginScene(void)
 	s_dlCount = 0;
 	s_dlRecording = false;
 	s_scratchBytesUsed = 0;
-	s_smooth_view_done_this_frame = false;
 
 	if (!s_inFrame)
 	{
