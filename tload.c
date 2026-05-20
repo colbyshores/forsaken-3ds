@@ -80,6 +80,14 @@ bool Tload( TLOADHEADER * Tloadheader  )
 	int LeastScaledThatCanbeScale;
 
 	TR("Tload: enter num_texture_files=%d", Tloadheader->num_texture_files);
+#ifdef __3DS__
+	{
+		char _b[96];
+		snprintf(_b, sizeof(_b), "[tload] enter num_textures=%d",
+			Tloadheader->num_texture_files);
+		boot_log(_b);
+	}
+#endif
 	build_gamma_table( Gamma );
 
 	// Tloadheader is not valid until everything has been done..
@@ -104,9 +112,15 @@ bool Tload( TLOADHEADER * Tloadheader  )
 		{
 			Msg( "TLoadAllTextures() Failed\n" );
 			TR("Tload: FAIL TloadAllTextures");
+#ifdef __3DS__
+			boot_log("[tload] FAIL TloadAllTextures");
+#endif
 			return false;
 		}
 		TR("Tload: TloadAllTextures OK");
+#ifdef __3DS__
+		boot_log("[tload] TloadAllTextures OK");
+#endif
 	}
 	
 	for( e = 0 ; e < Tloadheader->num_texture_files*MAXSCALE ; e ++ )
@@ -249,10 +263,29 @@ bool TloadAllTextures(TLOADHEADER * Tloadheader)
         if(!TloadTextureSurf( Tloadheader, i ))
 		{
 			TR("TloadAllTextures: FAIL i=%d name=%s", i, &Tloadheader->ImageFile[i][0]);
+#ifdef __3DS__
+			{
+				char _b[160];
+				snprintf(_b, sizeof(_b),
+					"[tload] FAIL i=%d/%d name=%s",
+					i, Tloadheader->num_texture_files,
+					&Tloadheader->ImageFile[i][0]);
+				boot_log(_b);
+			}
+#endif
 			goto exit_with_error;
 		}
 	}
 
+#ifdef __3DS__
+	{
+		char _b[80];
+		snprintf(_b, sizeof(_b),
+			"[tload] TloadAllTextures done %d textures",
+			Tloadheader->num_texture_files);
+		boot_log(_b);
+	}
+#endif
     return true;
 
 exit_with_error:

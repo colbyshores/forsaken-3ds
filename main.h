@@ -180,6 +180,10 @@ typedef u_int16_t WORD;
  */
 #ifdef __3DS__
 extern void trace(const char *msg);
+/* Always-on boot diagnostic.  Writes to sdmc:/forsaken_boot.log.
+ * Unlike trace() it is NOT gated on __3DS_DEBUG__ — works in any
+ * build, including release CIAs. */
+extern void boot_log(const char *msg);
 #endif
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)

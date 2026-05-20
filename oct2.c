@@ -2178,9 +2178,15 @@ bool InitView( void )
 		case  STATUS_StartingMultiplayer:
 		case  STATUS_GetPlayerNum:
 		_IV_TRACE("title-branch InitTitle");
+#ifdef __3DS__
+		boot_log("[iv] title-branch InitTitle");
+#endif
 		if( InitTitle() != true ) // bjd
 		{
 			_IV_TRACE("InitTitle FAILED");
+#ifdef __3DS__
+		boot_log("[iv] InitTitle FAILED");
+#endif
 			SeriousError = true;
 			return false;
 		}
@@ -2188,6 +2194,9 @@ bool InitView( void )
 		if ( !bSoundEnabled )
 		{
 			_IV_TRACE("InitializeSound");
+#ifdef __3DS__
+		boot_log("[iv] InitializeSound");
+#endif
 			if (! InitializeSound( DESTROYSOUND_All ))
 			{
 				DebugPrintf("unable to initialise sound in initview\n");
@@ -2197,8 +2206,14 @@ bool InitView( void )
 		}
 
 		_IV_TRACE("InitRenderBufs");
+#ifdef __3DS__
+		boot_log("[iv] InitRenderBufs");
+#endif
 		InitRenderBufs();
 		_IV_TRACE("SetMatrixViewPort");
+#ifdef __3DS__
+		boot_log("[iv] SetMatrixViewPort");
+#endif
 		if( !SetMatrixViewPort() )
 		{
 		  SeriousError = true;
@@ -2207,9 +2222,15 @@ bool InitView( void )
 		}
 		// Init the Texture Handler
 		_IV_TRACE("InitTload");
+#ifdef __3DS__
+		boot_log("[iv] InitTload");
+#endif
 		InitTload( &Tloadheader );
 
 		_IV_TRACE("Load_All_Off_Files");
+#ifdef __3DS__
+		boot_log("[iv] Load_All_Off_Files");
+#endif
 		if( !Load_All_Off_Files( &Title_OffsetFiles[ 0 ] ) )
 		{
 		  SeriousError = true;
@@ -2217,6 +2238,9 @@ bool InitView( void )
 		}
 
 		_IV_TRACE("PreLoadFlyGirl");
+#ifdef __3DS__
+		boot_log("[iv] PreLoadFlyGirl");
+#endif
 		if( !PreLoadFlyGirl() )
 		{
 		  SeriousError = true;
@@ -2224,6 +2248,9 @@ bool InitView( void )
 		}
 
 		_IV_TRACE("PreInitModel(TitleModelSet)");
+#ifdef __3DS__
+		boot_log("[iv] PreInitModel(TitleModelSet)");
+#endif
 		if( !PreInitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
@@ -2232,18 +2259,27 @@ bool InitView( void )
 
 		//  Load in And if nescessary ReScale Textures...
 		_IV_TRACE("Tload");
+#ifdef __3DS__
+		boot_log("[iv] Tload");
+#endif
 		if( !Tload( &Tloadheader ) )
 		{
 		  SeriousError = true;
 		  return false;
 		}
 		_IV_TRACE("InitModel(TitleModelSet)");
+#ifdef __3DS__
+		boot_log("[iv] InitModel(TitleModelSet)");
+#endif
 		if( !InitModel( TitleModelSet ) ) // bjd
 		{
 		  SeriousError = true;
 		  return false;
 		}
 		_IV_TRACE("AllocateCompFlyGirl");
+#ifdef __3DS__
+		boot_log("[iv] AllocateCompFlyGirl");
+#endif
 		if ( !AllocateCompFlyGirl() )
 		{
 		  SeriousError = true;
@@ -2255,6 +2291,9 @@ bool InitView( void )
 		}
 
 		_IV_TRACE("FindTexture(dummy)");
+#ifdef __3DS__
+		boot_log("[iv] FindTexture(dummy)");
+#endif
 		DummyTextureIndex = FindTexture( &Tloadheader, "data\\textures\\dummy.bmp" );
 		if ( DummyTextureIndex != -1 )
 		{
@@ -2266,9 +2305,15 @@ bool InitView( void )
 		if ( !CurrentMenu )
 		{
 		  _IV_TRACE("MenuRestart(MENU_Start)");
+#ifdef __3DS__
+		boot_log("[iv] MenuRestart(MENU_Start)");
+#endif
 		  MenuRestart( &MENU_Start );
 		}
 		_IV_TRACE("title-branch DONE");
+#ifdef __3DS__
+		boot_log("[iv] title-branch DONE");
+#endif
     break;
 
   case STATUS_ViewingScore:
@@ -2476,6 +2521,12 @@ char NodeName[256];
 extern void ReleaseView(void);
 bool RenderScene( void )
 {
+#ifdef __3DS__
+  {
+    static int s_first_rs = 1;
+    if (s_first_rs) { boot_log("[frame] first RenderScene"); s_first_rs = 0; }
+  }
+#endif
   u_int16_t  i,e;
   char  buf[256];
   //struct _stat stat_buf;

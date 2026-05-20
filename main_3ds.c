@@ -213,6 +213,34 @@ void trace_enable(void) {}
 void trace(const char *msg) { (void)msg; }
 #endif /* __3DS_DEBUG__ */
 
+/* boot_log — always-on diagnostic write for boot-time failure tracking.
+ * Writes to sdmc:/forsaken_boot.log.  Unlike trace() this is NOT gated
+ * on __3DS_DEBUG__; useful for diagnosing CIA installs that fail to
+ * boot in the field (e.g. LOMEM bring-up).  The last line in the file
+ * is the last checkpoint the boot path reached before failure.
+ *
+ * Truncates the file on the very first call this process, then appends.
+ * Each call also flushes via fsync so a sudden process termination
+ * doesn't lose recent writes. */
+static int  _boot_log_fd        = -1;
+static int  _boot_log_truncated = 0;
+
+void boot_log(const char *msg)
+{
+	if (_boot_log_fd < 0) {
+		int flags = O_WRONLY | O_CREAT |
+		            (_boot_log_truncated ? O_APPEND : O_TRUNC);
+		_boot_log_fd = open("sdmc:/forsaken_boot.log", flags, 0666);
+		_boot_log_truncated = 1;
+	}
+	if (_boot_log_fd >= 0) {
+		int len = (int)strlen(msg);
+		write(_boot_log_fd, msg, len);
+		write(_boot_log_fd, "\n", 1);
+		fsync(_boot_log_fd);
+	}
+}
+
 void trace_dump(void) {
 #ifdef __3DS_DEBUG__
 	/* Flush only — don't close. Re-opens with O_APPEND would still
@@ -269,6 +297,7 @@ bool platform_init(void)
 	}
 
 	trace("platform_init: start");
+	boot_log("[boot] platform_init: start");
 
 	/* Enable New3DS 804 MHz mode when available */
 	bool is_n3ds = false;
@@ -358,6 +387,7 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
 
 	trace("platform_init: done");
+	boot_log("[boot] platform_init: done OK");
 
 	return true;
 }
@@ -373,6 +403,7 @@ bool platform_init(void)
 
 bool platform_init_video(void)
 {
+	boot_log("[boot] platform_init_video: entry");
 	trace("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
 	trace("platform_init_video: gfxInitDefault");
 
@@ -436,6 +467,7 @@ bool platform_init_video(void)
 			sound_show_missing_firmware_warning();
 	}
 
+	boot_log("[boot] platform_init_video: pre-pglInit");
 	trace("platform_init_video: pglInit");
 
 	/* Initialize citro3d-backed picaGL */
@@ -443,6 +475,7 @@ bool platform_init_video(void)
 
 	_video_initialized = true;
 	trace("platform_init_video: pglInit done");
+	boot_log("[boot] platform_init_video: pglInit done");
 
 	render_info.ThisMode.w = SCREEN_WIDTH;
 	render_info.ThisMode.h = SCREEN_HEIGHT;
@@ -470,12 +503,15 @@ bool platform_init_video(void)
 	DebugPrintf("platform_init_video: picaGL context created %dx%d\n",
 		SCREEN_WIDTH, SCREEN_HEIGHT);
 
+	boot_log("[boot] platform_init_video: pre-render_init");
 	if (!render_init(&render_info))
 	{
 		DebugPrintf("platform_init_video: render_init failed\n");
+		boot_log("[boot] platform_init_video: FAIL render_init returned false");
 		return false;
 	}
 
+	boot_log("[boot] platform_init_video: done OK");
 	return true;
 }
 

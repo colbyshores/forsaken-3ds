@@ -787,20 +787,29 @@ bool c3d_renderer_init(void)
 		return true;
 	}
 	c3d_trace("c3d_renderer_init: start");
+	boot_log("[boot] c3d_renderer_init: start");
 	s_shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
 	if (!s_shaderDVLB)
 	{
 		c3d_trace("c3d_renderer_init: DVLB_ParseFile FAILED");
+		boot_log("[boot] c3d_renderer_init: FAIL DVLB_ParseFile");
 		return false;
 	}
 	c3d_trace("c3d_renderer_init: shader parsed");
 
 	shaderProgramInit(&s_shaderProgram);
-	if (shaderProgramSetVsh(&s_shaderProgram, &s_shaderDVLB->DVLE[0]) < 0)
+	if (shaderProgramSetVsh(&s_shaderProgram, &s_shaderDVLB->DVLE[0]) < 0) {
+		boot_log("[boot] c3d_renderer_init: FAIL shaderProgramSetVsh");
 		return false;
+	}
 
 	/* Allocate scratch buffer for vertex conversion */
 	s_scratch = (gpu_vertex_t*)linearAlloc(GPU_SCRATCH_SIZE);
+	if (!s_scratch) {
+		boot_log("[boot] c3d_renderer_init: FAIL linearAlloc(GPU_SCRATCH_SIZE)");
+		return false;
+	}
+	boot_log("[boot] c3d_renderer_init: s_scratch linearAlloc OK");
 	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
 	s_scratchUsed = 0;
 
@@ -818,13 +827,16 @@ bool c3d_renderer_init(void)
 		s_targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetLeft) {
 			c3d_trace("FAILED to create left render target");
+			boot_log("[boot] c3d_renderer_init: FAIL left render target");
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetLeft, GFX_TOP, GFX_LEFT, transferFlags);
+		boot_log("[boot] c3d_renderer_init: left RT OK");
 
 		s_targetRight = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetRight) {
 			c3d_trace("FAILED to create right render target");
+			boot_log("[boot] c3d_renderer_init: FAIL right render target");
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetRight, GFX_TOP, GFX_RIGHT, transferFlags);
@@ -835,11 +847,13 @@ bool c3d_renderer_init(void)
 		s_targetBottom = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetBottom) {
 			c3d_trace("FAILED to create bottom render target");
+			boot_log("[boot] c3d_renderer_init: FAIL bottom render target");
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
 	}
 	c3d_trace("render targets created and linked to display");
+	boot_log("[boot] c3d_renderer_init: render targets OK");
 
 	/* Match picaGL depth map: scale=1.0, offset=1.0 */
 	C3D_DepthMap(true, 1.0f, 1.0f);
@@ -1026,6 +1040,7 @@ bool c3d_renderer_init(void)
 
 	s_shaderReady = true;
 	c3d_trace("c3d_renderer_init: OK — shader ready, render targets created");
+	boot_log("[boot] c3d_renderer_init: OK");
 	return true;
 }
 
@@ -1438,6 +1453,11 @@ void render_mode_fill(void) { /* always fill on PICA200 */ }
 
 bool FSBeginScene(void)
 {
+	static int s_first_begin_scene = 1;
+	if (s_first_begin_scene) {
+		boot_log("[frame] first FSBeginScene");
+		s_first_begin_scene = 0;
+	}
 	/* Single-pass stereo: if replay already drew the second eye, skip. */
 	if (s_dlReplay)
 		return true;
@@ -2252,16 +2272,75 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 		return false;
 	}
 
-	/* Both OG and N3DS now load the full 512x512 base + Gaussian mip
-	 * chain. The earlier OG-only mip-0 strip was carried over from the
-	 * pre-Q3-refactor heap layout (24 MB linear) where full-size HD
-	 * textures spilled the linear heap on heavier levels. Post-refactor
-	 * the linear heap is 32 MB on both platforms with ~6-8 MB headroom
-	 * across the whole Remaster level set, so OG can take the full
-	 * pack. Reinstate the strip if a future level pushes back into the
-	 * red — see git history for the half-dimension rebuild that mips-
-	 * shifted via memcpy (Morton tiling is dimension-only, so mip 1 of
-	 * 512² has the same byte layout as mip 0 of 256²). */
+	/* Default (HIMEM CIA): both OG and N3DS load the full 512x512 base
+	 * + Gaussian mip chain.  The linear heap (32 MB on both platforms
+	 * post-Q3-refactor) has ~6-8 MB headroom across the whole Remaster
+	 * level set, so OG can take the full pack.
+	 *
+	 * LOMEM CIA: rebuilds every imported HD texture at half dimensions
+	 * (256x256 base, one fewer mip level) by memcpy-ing mip 1..N of the
+	 * full-size import into mip 0..N-1 of a smaller C3D_Tex.  PICA200
+	 * Morton tiling is a function of mip dimensions only — mip 1 of a
+	 * 512 texture has the identical byte layout as mip 0 of a 256
+	 * texture, so the memcpy per level works without any tiling
+	 * conversion.  Peak memory during the rebuild is ~1.25x one texture
+	 * (old + new briefly coexist); textures load serially so this
+	 * doesn't compound.  Combined with -DLINEAR_HEAP_MB=18 in the LOMEM
+	 * ELF build, the resident texture footprint drops enough to fit in
+	 * the standard 64 MB Application-mode budget instead of requiring
+	 * HIMEM (96 MB).  Same romfs serves both CIA variants. */
+#ifdef LOMEM
+	{
+		static int s_lomem_strip_count = 0;
+		if (s_lomem_strip_count < 4) {
+			char _b[160];
+			snprintf(_b, sizeof(_b), "[lomem-strip] #%d %s w=%u h=%u maxLevel=%u",
+				s_lomem_strip_count, hd_path,
+				(unsigned)texdata->tex.width, (unsigned)texdata->tex.height,
+				(unsigned)texdata->tex.maxLevel);
+			boot_log(_b);
+		}
+		s_lomem_strip_count++;
+
+		if (texdata->tex.maxLevel > 0)
+		{
+			C3D_Tex small;
+			u16 sw = texdata->tex.width  / 2;
+			u16 sh = texdata->tex.height / 2;
+			int new_max = texdata->tex.maxLevel - 1;
+			if (!C3D_TexInitWithParams(&small, NULL, (C3D_TexInitParams){
+				sw, sh, (u8)new_max,
+				texdata->tex.fmt, GPU_TEX_2D, false
+			}))
+			{
+				c3d_trace("try_load_hd_texture: LOMEM mip-0 strip alloc FAILED");
+				{
+					char _b[160];
+					snprintf(_b, sizeof(_b), "[lomem-strip] FAIL alloc #%d %s sw=%u sh=%u",
+						s_lomem_strip_count - 1, hd_path,
+						(unsigned)sw, (unsigned)sh);
+					boot_log(_b);
+				}
+				C3D_TexDelete(&texdata->tex);
+				Tex3DS_TextureFree(t3x);
+				if (*t == NULL) free(texdata);
+				return false;
+			}
+			{
+				int level;
+				for (level = 0; level <= new_max; level++)
+				{
+					u32 size = 0;
+					void *src = C3D_Tex2DGetImagePtr(&texdata->tex, level + 1, &size);
+					void *dst = C3D_Tex2DGetImagePtr(&small,         level,     NULL);
+					if (src && dst && size) memcpy(dst, src, size);
+				}
+			}
+			C3D_TexDelete(&texdata->tex);
+			texdata->tex = small;
+		}
+	}
+#endif
 
 	/* Bilinear-mipmap (GPU_NEAREST for mip selection): picks ONE mip level
 	 * per fragment, then bilinear-filters within it. Gives anti-moiré

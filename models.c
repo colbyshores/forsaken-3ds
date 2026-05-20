@@ -914,6 +914,9 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 ===================================================================*/
 bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 {
+#ifdef __3DS__
+	boot_log("[initmodel] entry");
+#endif
 	int i;
 	int8_t		TempFilename[ 256 ];
 	VECTOR		TempVector = { 0.0F, 0.0F, 0.0F };
@@ -948,7 +951,9 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 #ifdef __3DS__
 						{ extern void trace(const char*); char _b[256];
 						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxaload i=%d name=%.180s",
-						           i, NamePnt->Name); trace(_b); }
+						           i, NamePnt->Name); trace(_b);
+						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxaload i=%d name=%.180s",
+						           i, NamePnt->Name); boot_log(_b); }
 #endif
 						return false;	// the model and visipoly data
 					}
@@ -972,7 +977,9 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 #ifdef __3DS__
 						{ extern void trace(const char*); char _b[256];
 						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxload i=%d name=%.180s",
-						           i, NamePnt->Name); trace(_b); }
+						           i, NamePnt->Name); trace(_b);
+						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxload i=%d name=%.180s",
+						           i, NamePnt->Name); boot_log(_b); }
 #endif
 						return false;	// the model and visipoly data
 					}

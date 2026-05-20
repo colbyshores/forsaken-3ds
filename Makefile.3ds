@@ -178,6 +178,16 @@ ifdef LINEAR_HEAP_MB
 CFLAGS += -DLINEAR_HEAP_MB=$(LINEAR_HEAP_MB)
 endif
 
+# LOMEM=1 builds the OG-3DS standard-Application-mode variant: enables
+# the runtime mip-0 strip in render_c3d.c::try_load_hd_texture so HD
+# textures load at 256x256 (one fewer mip level) instead of 512x512,
+# letting the linear heap fit in the standard 64 MB Application-mode
+# budget without HIMEM.  The release pipeline pairs LOMEM=1 with
+# LINEAR_HEAP_MB=30 and a separate build dir, RSF and CIA UniqueIds.
+ifeq ($(LOMEM),1)
+CFLAGS += -DLOMEM
+endif
+
 # AUTOTEST_FIRST_LEVEL=N overrides the sweep's starting slot so we can
 # resume a sweep from where the previous run failed without re-cycling
 # already-validated levels. Pass on the make command line:
@@ -450,7 +460,7 @@ $(BUILD)/%.o: $(SRCDIR)/%.c
 
 clean:
 	@echo "Cleaning 3DS build..."
-	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA)
+	@rm -rf $(BUILD) $(BUILD_LOMEM) $(OUTPUT_ELF) $(OUTPUT_ELF_LOMEM) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT)
 
 romfs-clean:
 	@echo "Cleaning romfs staging..."
@@ -601,6 +611,80 @@ $(OUTPUT_CIA_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_ALT) $(
 		-DAPP_ROMFS=$(CIA_ROMFS)
 	@echo "[release] Alt CIA written: $@"
 
+
+#---------------------------------------------------------------------------------
+# LOMEM build: OG-3DS standard-Application-mode CIA.
+#
+# Same ELF source as the HIMEM CIA, but compiled with -DLOMEM
+# (triggers the runtime mip-0 strip in render_c3d.c) and a smaller
+# linear heap (LINEAR_HEAP_MB=30) so HD textures fit in the standard
+# 64 MB Application-mode budget without HIMEM.  Uses a separate build
+# dir and ELF output so HIMEM + LOMEM artifacts can coexist.  RSF
+# drops `SystemMode: 96MB`.  UniqueIds 0xff4bc (primary) /
+# 0xff4bd (alt) live in a distinct title slot from the HIMEM CIAs
+# so a user can install both side-by-side.
+#---------------------------------------------------------------------------------
+BUILD_LOMEM          := $(SRCDIR)/build_3ds_lomem
+OUTPUT_ELF_LOMEM     := $(SRCDIR)/$(TARGET)_lomem.elf
+OUTPUT_CIA_LOMEM     := $(SRCDIR)/$(TARGET)_lomem.cia
+OUTPUT_CIA_LOMEM_ALT := $(SRCDIR)/$(TARGET)_lomem_alt.cia
+RSF_FILE_LOMEM       := $(ASSETS_DIR)/forsaken_lomem.rsf
+RSF_FILE_LOMEM_ALT   := $(BUILD)/forsaken_lomem_alt.rsf
+
+.PHONY: $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT)
+
+# Generate the LOMEM alt RSF by substituting the UniqueId. Same
+# pattern as the HIMEM alt RSF, just one bump up.
+$(RSF_FILE_LOMEM_ALT): $(RSF_FILE_LOMEM) | $(BUILD)
+	@mkdir -p $(BUILD)
+	@sed 's/UniqueId\s*:\s*0xff4bc/UniqueId                : 0xff4bd/' \
+		$(RSF_FILE_LOMEM) > $(RSF_FILE_LOMEM_ALT)
+	@echo "[release] Generated LOMEM alt RSF with UniqueId 0xff4bd"
+
+
+# Build the LOMEM ELF via a recursive make that overrides BUILD,
+# OUTPUT_ELF, LOMEM and LINEAR_HEAP_MB. Same source files, different
+# CFLAGS + output path.  Gated on LOMEM != 1 so the inner make
+# (which sets LOMEM=1) does not recurse into this rule — inside
+# the recursive call the rule below is not defined, and the
+# standard $(OUTPUT_ELF) rule applies with $(OUTPUT_ELF)
+# overridden to the LOMEM path.
+ifneq ($(LOMEM),1)
+$(OUTPUT_ELF_LOMEM):
+	@echo "[release] Building LOMEM ELF (-DLOMEM -DLINEAR_HEAP_MB=30)..."
+	@$(MAKE) -f Makefile.3ds \
+		RENDERER=citro3d EDITION=remaster \
+		BUILD=$(BUILD_LOMEM) \
+		OUTPUT_ELF=$(OUTPUT_ELF_LOMEM) \
+		LOMEM=1 \
+		LINEAR_HEAP_MB=30 \
+		$(OUTPUT_ELF_LOMEM)
+endif
+
+# LOMEM primary CIA — UniqueId 0xff4bc.
+$(OUTPUT_CIA_LOMEM): $(OUTPUT_ELF_LOMEM) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_LOMEM) $(CIA_ROMFS_STAMP) | tools-fetch
+	@echo "[release] Building LOMEM CIA (UniqueId 0xff4bc)..."
+	$(MAKEROM) -f cia -o $@ \
+		-rsf $(RSF_FILE_LOMEM) \
+		-target t -exefslogo \
+		-elf $(OUTPUT_ELF_LOMEM) \
+		-icon $(OUTPUT_SMDH) \
+		-banner $(OUTPUT_BNR) \
+		-DAPP_ROMFS=$(CIA_ROMFS)
+	@echo "[release] LOMEM CIA written: $@"
+
+# LOMEM alt CIA — UniqueId 0xff4bd, same ELF + assets.
+$(OUTPUT_CIA_LOMEM_ALT): $(OUTPUT_ELF_LOMEM) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_LOMEM_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
+	@echo "[release] Building LOMEM alt CIA (UniqueId 0xff4bd)..."
+	$(MAKEROM) -f cia -o $@ \
+		-rsf $(RSF_FILE_LOMEM_ALT) \
+		-target t -exefslogo \
+		-elf $(OUTPUT_ELF_LOMEM) \
+		-icon $(OUTPUT_SMDH) \
+		-banner $(OUTPUT_BNR) \
+		-DAPP_ROMFS=$(CIA_ROMFS)
+	@echo "[release] LOMEM alt CIA written: $@"
+
 # Production 3dsx: rebuilds $(OUTPUT_3DSX) using CIA_ROMFS (no
 # dspfirm.cdc, full game assets) so the file is safe to
 # redistribute. The dev default (make) still bundles dspfirm
@@ -618,32 +702,38 @@ release-3dsx: $(OUTPUT_ELF) $(OUTPUT_SMDH) $(CIA_ROMFS_STAMP)
 # this catches a stale .o that bypassed the clean somehow). Runs
 # AFTER all artifacts build so a fresh ELF is on disk.
 .PHONY: release-strings-check
-release-strings-check: $(OUTPUT_ELF)
-	@echo "[release] Sanity-grepping ELF for debug strings..."
-	@n=$$(arm-none-eabi-strings $(OUTPUT_ELF) | grep -cE "AUTOTEST:|autoboot:|autotest_tick|DEATH_SIM|DEBUG_RAMQAN" || true); \
-	if [ "$$n" != "0" ]; then \
-		echo "[release] ABORT: $$n debug-flag strings present in $(OUTPUT_ELF)."; \
-		echo "[release] Aborting before any artifact ships. Investigate."; \
-		exit 1; \
-	fi
-	@echo "[release] ELF is clean ✓"
-
+release-strings-check: $(OUTPUT_ELF) $(OUTPUT_ELF_LOMEM)
+	@echo "[release] Sanity-grepping HIMEM + LOMEM ELFs for debug strings..."
+	@for elf in $(OUTPUT_ELF) $(OUTPUT_ELF_LOMEM); do \
+		[ -f $$elf ] || continue; \
+		n=$$(arm-none-eabi-strings $$elf | grep -cE "AUTOTEST:|autoboot:|autotest_tick|DEATH_SIM|DEBUG_RAMQAN" || true); \
+		if [ "$$n" != "0" ]; then \
+			echo "[release] ABORT: $$n debug-flag strings present in $$elf."; \
+			echo "[release] Aborting before any artifact ships. Investigate."; \
+			exit 1; \
+		fi; \
+		echo "[release] $$elf is clean ✓"; \
+	done
 # Top-level release target. Forces a clean build first so no stale .o
 # files survive from previous diagnostic runs.
 release: release-check
 	@echo "[release] Running 'make clean' to guarantee fresh .o files..."
 	@$(MAKE) -f Makefile.3ds clean
-	@echo "[release] Building production CIA + alt CIA + dspfirm-less 3dsx..."
+	@echo "[release] Building HIMEM artifacts (primary + alt CIA + dspfirm-less 3dsx)..."
 	@$(MAKE) -f Makefile.3ds RENDERER=citro3d EDITION=remaster \
-		$(OUTPUT_CIA) $(OUTPUT_CIA_ALT) release-3dsx \
-		release-strings-check
+		$(OUTPUT_CIA) $(OUTPUT_CIA_ALT) release-3dsx
+	@echo "[release] Building LOMEM artifacts (LOMEM primary + alt CIA)..."
+	@$(MAKE) -f Makefile.3ds RENDERER=citro3d EDITION=remaster \
+		$(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT)
+	@echo "[release] Final sanity-grep on HIMEM + LOMEM ELFs..."
+	@$(MAKE) -f Makefile.3ds release-strings-check
 	@echo
 	@echo "============================================================"
-	@echo "[release] DONE — three artifacts ready for archive.org:"
-	@ls -lh $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) 2>/dev/null
+	@echo "[release] DONE — five artifacts ready for archive.org:"
+	@ls -lh $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT) 2>/dev/null
 	@echo
 	@echo "[release] SHA1 sums:"
-	@sha1sum $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) 2>/dev/null
+	@sha1sum $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT) 2>/dev/null
 	@echo
 	@echo "[release] Production 3dsx is dspfirm-free (Nintendo firmware blob"
 	@echo "[release] excluded — archive.org distribution safe)."

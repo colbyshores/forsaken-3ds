@@ -434,6 +434,9 @@ extern RENDEROBJECT RenderBufs[4];
 
 static bool AppInit( char * lpCmdLine )
 {
+#ifdef __3DS__
+	boot_log("[boot] AppInit: entry");
+#endif
 #ifdef DEBUG_ON
 	InitMathErrors();
 #endif
@@ -475,28 +478,48 @@ static bool AppInit( char * lpCmdLine )
 #endif
 
 #ifdef __3DS__
-	if(!platform_init())
+	if(!platform_init()) {
+		boot_log("[boot] AppInit: FAIL platform_init returned false");
 		return false;
+	}
 #else
 	if(!sdl_init())
 		return false;
 #endif
 
 	trig_table_init();
+#ifdef __3DS__
+	boot_log("[boot] AppInit: post platform_init");
+#endif
 
 	// parse chdir from command line first
-	if(!parse_chdir(lpCmdLine))
+	if(!parse_chdir(lpCmdLine)) {
+#ifdef __3DS__
+		boot_log("[boot] AppInit: FAIL parse_chdir");
+#endif
 		return false;
+	}
 
 	// we are now in the skeleton folder
 	// now we need to see if we are in right place
 	// check for missing folders
-	if(missing_folders())
+	if(missing_folders()) {
+#ifdef __3DS__
+		boot_log("[boot] AppInit: FAIL missing_folders");
+#endif
 		return false;
+	}
 
 	// startup lua
-	if( lua_init() != 0 )
+	if( lua_init() != 0 ) {
+#ifdef __3DS__
+		boot_log("[boot] AppInit: FAIL lua_init");
+#endif
 		return false;
+	}
+#ifdef __3DS__
+	boot_log("[boot] AppInit: post lua_init");
+#endif
 
 	// copy game settings from config
 	GetGamePrefs();
@@ -505,8 +528,12 @@ static bool AppInit( char * lpCmdLine )
 	// now we can check the command line for overrides
 
 	// parse the command line
-	if(!ParseCommandLine(lpCmdLine))
+	if(!ParseCommandLine(lpCmdLine)) {
+#ifdef __3DS__
+		boot_log("[boot] AppInit: FAIL ParseCommandLine");
+#endif
 		return false;
+	}
 
 	//
 	// create and show the window
@@ -515,8 +542,10 @@ static bool AppInit( char * lpCmdLine )
 	if(!platform_init_video())
 	{
 		Msg("platform_init_video() returned false");
+		boot_log("[boot] AppInit: FAIL platform_init_video");
 		return false;
 	}
+	boot_log("[boot] AppInit: post platform_init_video");
 #else
 	if(!sdl_init_video())
 	{
@@ -533,6 +562,9 @@ static bool AppInit( char * lpCmdLine )
 	if (!joysticks_init())
 	{
 		Msg("Failed to initialized joysticks!");
+#ifdef __3DS__
+		boot_log("[boot] AppInit: FAIL joysticks_init");
+#endif
 		return false;
 	}
 
@@ -544,21 +576,41 @@ static bool AppInit( char * lpCmdLine )
 
 	// start the title scene
 	MyGameStatus = STATUS_Title;
+#ifdef __3DS__
+	boot_log("[boot] AppInit: pre-InitScene");
+#endif
 
-	if (!InitScene())
+	if (!InitScene()) {
+#ifdef __3DS__
+		boot_log("[boot] AppInit: FAIL InitScene");
+#endif
 		return false;
+	}
+#ifdef __3DS__
+	boot_log("[boot] AppInit: post InitScene");
+#endif
 
 #ifdef __3DS__
 	music_init();
+	boot_log("[boot] AppInit: post music_init");
 #endif
 
 	// load the view
+#ifdef __3DS__
+	boot_log("[boot] AppInit: pre-InitView");
+#endif
 	if (!InitView() )
 	{
 	    Msg("InitView failed.\n");
+#ifdef __3DS__
+		boot_log("[boot] AppInit: FAIL InitView");
+#endif
 		//CleanUpAndPostQuit();
         return false;
 	}
+#ifdef __3DS__
+	boot_log("[boot] AppInit: post InitView");
+#endif
 
 	// exclusively grab input in fullscreen mode
 	input_grab( render_info.fullscreen );
@@ -568,6 +620,9 @@ static bool AppInit( char * lpCmdLine )
 
 	// done
 	DebugPrintf("AppInit finished...\n");
+#ifdef __3DS__
+	boot_log("[boot] AppInit: SUCCESS — entering main loop");
+#endif
     return true;
 
 }
@@ -626,6 +681,9 @@ extern void CleanUpAndPostQuit(void);
 
 int main( int argc, char* argv[] )
 {
+#ifdef __3DS__
+	boot_log("[boot] main: entry");
+#endif
 	int i;
 	char cli[500];
     int failcount = 0; // number of times RenderLoop has failed
@@ -650,6 +708,7 @@ int main( int argc, char* argv[] )
 		goto FAILURE;
 
 #ifdef __3DS__
+	boot_log("[boot] entering main render loop");
 	/* aptMainLoop() must gate the main loop on 3DS. It handles HOME menu
 	 * display, suspend on sleep-mode, and resume-from-sleep restoration.
 	 * Without this, the app never yields to the OS for these events —
