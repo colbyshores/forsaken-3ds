@@ -150,7 +150,7 @@ USERCONFIG default_config = {
 	"Time to die...",					// taunt 2 ( F10 )
 	"I will tear your soul apart...",	// taunt 3 ( F11 )
 
-	0.0F,								// aim_assist_strength — off by default
+	0.25F,                              // aim_assist_strength — 25% default subtle pull
 };
 
 
@@ -274,7 +274,7 @@ USERCONFIG my_controls = {
 	"Time to die...",					// taunt 2 ( F10 )
 	"I will tear your soul apart...",	// taunt 3 ( F11 )
 
-	0.0F,								// aim_assist_strength — off by default
+	0.25F,                              // aim_assist_strength — 25% default subtle pull
 };
 
 
