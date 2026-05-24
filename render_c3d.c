@@ -202,7 +202,11 @@ static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
  * firefight frames (many ships + projectiles + explosion particles +
  * laser beams + mipped BSP walls) without FrameSplit stalls or
- * silent geometry drops at the overflow-after-flush fallback. */
+ * silent geometry drops at the overflow-after-flush fallback.
+ *
+ * Same value on both the OG-tier and N3DS-tier paths of the unified
+ * CIA. On OG (22 MB linear heap) this is ~18% of the budget — tight
+ * but validated working on real hardware. */
 #define GPU_SCRATCH_SIZE  (4 * 1024 * 1024)
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
@@ -787,7 +791,9 @@ bool c3d_renderer_init(void)
 		return true;
 	}
 	c3d_trace("c3d_renderer_init: start");
-	boot_log("[boot] c3d_renderer_init: start");
+	{ char _b[96]; snprintf(_b, sizeof(_b),
+	    "[boot] c3d_renderer_init: start linearFree=%u KB",
+	    linearSpaceFree() >> 10); boot_log(_b); }
 	s_shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
 	if (!s_shaderDVLB)
 	{
@@ -809,7 +815,9 @@ bool c3d_renderer_init(void)
 		boot_log("[boot] c3d_renderer_init: FAIL linearAlloc(GPU_SCRATCH_SIZE)");
 		return false;
 	}
-	boot_log("[boot] c3d_renderer_init: s_scratch linearAlloc OK");
+	{ char _b[96]; snprintf(_b, sizeof(_b),
+	    "[boot] c3d_renderer_init: scratch OK linearFree=%u KB",
+	    linearSpaceFree() >> 10); boot_log(_b); }
 	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
 	s_scratchUsed = 0;
 
@@ -853,7 +861,9 @@ bool c3d_renderer_init(void)
 		C3D_RenderTargetSetOutput(s_targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
 	}
 	c3d_trace("render targets created and linked to display");
-	boot_log("[boot] c3d_renderer_init: render targets OK");
+	{ char _b[96]; snprintf(_b, sizeof(_b),
+	    "[boot] c3d_renderer_init: targets OK linearFree=%u KB",
+	    linearSpaceFree() >> 10); boot_log(_b); }
 
 	/* Match picaGL depth map: scale=1.0, offset=1.0 */
 	C3D_DepthMap(true, 1.0f, 1.0f);
@@ -2201,6 +2211,46 @@ static void tile_rgba4(const u_int8_t *src, u_int16_t *dst, int w, int h)
  * Uses Tex3DS_TextureImportStdio which handles format, tiling, VRAM. */
 #include <tex3ds.h>
 
+/* Pick the HD texture dir to load from, based on the actual memory
+ * region size the OS gave us. Cached after the first call.
+ *
+ * Memory region (not hardware model) is the right signal because it
+ * directly tracks whether we have room for the 512² pack:
+ *   - Unified CIA on OG:        64 MB region  → 256² (hd_textures_lomem)
+ *   - Unified CIA on N3DS:     124 MB region  → 512² (hd_textures)
+ *   - HIMEM CIA on OG w/ grant: 96 MB region  → 512² (hd_textures)
+ *   - HIMEM CIA on N3DS:       124 MB region  → 512² (hd_textures)
+ *
+ * Single-pack CIAs (LOMEM-only or HIMEM-only) still work — the fallback
+ * dir is tried if the preferred one isn't shipped. */
+static const char *s_hd_textures_dir = NULL;
+static const char *s_hd_textures_fallback = NULL;
+
+static void resolve_hd_textures_dirs(void)
+{
+	if (s_hd_textures_dir) return;
+	u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
+	if (region_size >= 96ull * 1024 * 1024) {
+		s_hd_textures_dir      = "hd_textures";
+		s_hd_textures_fallback = "hd_textures_lomem";
+	} else {
+		s_hd_textures_dir      = "hd_textures_lomem";
+		s_hd_textures_fallback = "hd_textures";
+	}
+	/* Lands in sdmc:/forsaken_boot.log on every boot. Pair this with
+	 * the [platform] tier line emitted from platform_init to verify
+	 * from the host which texture pack a given install is using. */
+	{
+		extern void boot_log(const char *);
+		char _b[160];
+		snprintf(_b, sizeof(_b),
+		         "[hd_textures] region=%uMB primary=%s fallback=%s",
+		         (unsigned)(region_size >> 20),
+		         s_hd_textures_dir, s_hd_textures_fallback);
+		boot_log(_b);
+	}
+}
+
 static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	u_int16_t *width, u_int16_t *height, bool *colorkey)
 {
@@ -2211,6 +2261,8 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	FILE *f;
 	texture_t *texdata;
 	Tex3DS_Texture t3x;
+
+	resolve_hd_textures_dirs();
 
 	/* Find "data\" in path */
 	for (i = 0; path[i]; i++)
@@ -2228,7 +2280,7 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	if (!data_start)
 		return false;
 
-	snprintf(hd_path, sizeof(hd_path), "romfs:/hd_textures/%s", data_start);
+	snprintf(hd_path, sizeof(hd_path), "romfs:/%s/%s", s_hd_textures_dir, data_start);
 	for (p = hd_path; *p; p++)
 	{
 		if (*p == '\\') *p = '/';
@@ -2240,7 +2292,22 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 
 	f = fopen(hd_path, "rb");
 	if (!f)
-		return false;
+	{
+		/* Preferred dir isn't shipped — try the fallback. Defensive;
+		 * production CIAs always ship both packs, but this lets a
+		 * future single-pack variant work without code changes. */
+		snprintf(hd_path, sizeof(hd_path), "romfs:/%s/%s", s_hd_textures_fallback, data_start);
+		for (p = hd_path; *p; p++)
+		{
+			if (*p == '\\') *p = '/';
+			if (*p >= 'A' && *p <= 'Z') *p += 32;
+		}
+		p = strrchr(hd_path, '.');
+		if (p) strcpy(p, ".t3x");
+		else strcat(hd_path, ".t3x");
+		f = fopen(hd_path, "rb");
+		if (!f) return false;
+	}
 
 	/* Allocate texture_t wrapper */
 	if (*t == NULL)
@@ -2272,75 +2339,10 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 		return false;
 	}
 
-	/* Default (HIMEM CIA): both OG and N3DS load the full 512x512 base
-	 * + Gaussian mip chain.  The linear heap (32 MB on both platforms
-	 * post-Q3-refactor) has ~6-8 MB headroom across the whole Remaster
-	 * level set, so OG can take the full pack.
-	 *
-	 * LOMEM CIA: rebuilds every imported HD texture at half dimensions
-	 * (256x256 base, one fewer mip level) by memcpy-ing mip 1..N of the
-	 * full-size import into mip 0..N-1 of a smaller C3D_Tex.  PICA200
-	 * Morton tiling is a function of mip dimensions only — mip 1 of a
-	 * 512 texture has the identical byte layout as mip 0 of a 256
-	 * texture, so the memcpy per level works without any tiling
-	 * conversion.  Peak memory during the rebuild is ~1.25x one texture
-	 * (old + new briefly coexist); textures load serially so this
-	 * doesn't compound.  Combined with -DLINEAR_HEAP_MB=18 in the LOMEM
-	 * ELF build, the resident texture footprint drops enough to fit in
-	 * the standard 64 MB Application-mode budget instead of requiring
-	 * HIMEM (96 MB).  Same romfs serves both CIA variants. */
-#ifdef LOMEM
-	{
-		static int s_lomem_strip_count = 0;
-		if (s_lomem_strip_count < 4) {
-			char _b[160];
-			snprintf(_b, sizeof(_b), "[lomem-strip] #%d %s w=%u h=%u maxLevel=%u",
-				s_lomem_strip_count, hd_path,
-				(unsigned)texdata->tex.width, (unsigned)texdata->tex.height,
-				(unsigned)texdata->tex.maxLevel);
-			boot_log(_b);
-		}
-		s_lomem_strip_count++;
-
-		if (texdata->tex.maxLevel > 0)
-		{
-			C3D_Tex small;
-			u16 sw = texdata->tex.width  / 2;
-			u16 sh = texdata->tex.height / 2;
-			int new_max = texdata->tex.maxLevel - 1;
-			if (!C3D_TexInitWithParams(&small, NULL, (C3D_TexInitParams){
-				sw, sh, (u8)new_max,
-				texdata->tex.fmt, GPU_TEX_2D, false
-			}))
-			{
-				c3d_trace("try_load_hd_texture: LOMEM mip-0 strip alloc FAILED");
-				{
-					char _b[160];
-					snprintf(_b, sizeof(_b), "[lomem-strip] FAIL alloc #%d %s sw=%u sh=%u",
-						s_lomem_strip_count - 1, hd_path,
-						(unsigned)sw, (unsigned)sh);
-					boot_log(_b);
-				}
-				C3D_TexDelete(&texdata->tex);
-				Tex3DS_TextureFree(t3x);
-				if (*t == NULL) free(texdata);
-				return false;
-			}
-			{
-				int level;
-				for (level = 0; level <= new_max; level++)
-				{
-					u32 size = 0;
-					void *src = C3D_Tex2DGetImagePtr(&texdata->tex, level + 1, &size);
-					void *dst = C3D_Tex2DGetImagePtr(&small,         level,     NULL);
-					if (src && dst && size) memcpy(dst, src, size);
-				}
-			}
-			C3D_TexDelete(&texdata->tex);
-			texdata->tex = small;
-		}
-	}
-#endif
+	/* Tex3DS imported the texture at whatever size the romfs pack
+	 * shipped (512² for N3DS via hd_textures/, 256² for OG via
+	 * hd_textures_lomem/ — picked at runtime by resolve_hd_textures_dirs).
+	 * No further size munging needed. */
 
 	/* Bilinear-mipmap (GPU_NEAREST for mip selection): picks ONE mip level
 	 * per fragment, then bilinear-filters within it. Gives anti-moiré

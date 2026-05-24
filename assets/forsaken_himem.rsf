@@ -1,15 +1,18 @@
-# RSF for Forsaken 3DS LOMEM CIA — OG 3DS standard Application mode.
+# RSF for the HIMEM "use-at-your-own-risk" Forsaken 3DS CIA variant.
 #
-# Differences from forsaken.rsf (the HIMEM build):
-#   - UniqueId 0xff4bc (vs 0xff4ba) — distinct title slot
-#   - SystemMode: 96MB line removed — uses default Application mode
-#     (~64 MB total budget on OG 3DS) instead of HIMEM (~96 MB).
-#     Paired with -DLOMEM in the LOMEM ELF build, which triggers the
-#     runtime mip-0 strip in render_c3d.c::try_load_hd_texture so HD
-#     textures fit in the smaller linear heap.
+# This is the opt-in advanced build for OG 3DS users who want full
+# 512² textures and have a HOME menu that successfully grants the
+# `SystemMode: 96MB` allocation.
 #
-# The alt LOMEM RSF (UniqueId 0xff4bd) is auto-generated from this
-# file via sed in Makefile.3ds.
+# Same source ELF as the unified forsaken.rsf — only the memory grant
+# request and UniqueId differ. The engine's __system_allocateHeaps
+# override (main_3ds.c) auto-detects the granted region size and picks
+# the right heap. The render_c3d.c texture loader auto-selects 512² vs
+# 256² based on the same signal.
+#
+# Failure mode if the menu rejects the HIMEM grant: HOME menu crashes
+# before our code runs (NULL pointer write in the menu process). User
+# uninstalls this CIA and falls back to the unified or LOMEM variant.
 
 BasicInfo:
   Title                   : "Forsaken"
@@ -19,7 +22,7 @@ BasicInfo:
   Logo                    : Nintendo
 
 TitleInfo:
-  UniqueId                : 0xff4bc
+  UniqueId                : 0xff4be
   Category                : Application
 
 CardInfo:
@@ -61,9 +64,13 @@ AccessControlInfo:
   ReleaseKernelMajor            : "02"
   ReleaseKernelMinor            : "33"
   MemoryType                    : Application
-  # SystemMode intentionally omitted — defaults to standard Application
-  # mode (~64 MB usable on OG 3DS), no HIMEM grant required from the
-  # HOME menu's launch path.  Pairs with -DLINEAR_HEAP_MB=18 in CFLAGS.
+  SystemMode                    : 96MB    # OG-HIMEM grant — DELIBERATE.
+                                          # This is the opt-in advanced build;
+                                          # the unified forsaken.rsf has this
+                                          # line removed to sidestep the grant
+                                          # entirely. OG users who can run
+                                          # HIMEM get 512² textures + 32+32 MB
+                                          # heap auto-detected by the runtime.
   SystemModeExt                 : 124MB   # New 3DS — full app slice (124MB)
   HandleTableSize               : 512
 

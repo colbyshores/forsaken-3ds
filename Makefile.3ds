@@ -178,16 +178,6 @@ ifdef LINEAR_HEAP_MB
 CFLAGS += -DLINEAR_HEAP_MB=$(LINEAR_HEAP_MB)
 endif
 
-# LOMEM=1 builds the OG-3DS standard-Application-mode variant: enables
-# the runtime mip-0 strip in render_c3d.c::try_load_hd_texture so HD
-# textures load at 256x256 (one fewer mip level) instead of 512x512,
-# letting the linear heap fit in the standard 64 MB Application-mode
-# budget without HIMEM.  The release pipeline pairs LOMEM=1 with
-# LINEAR_HEAP_MB=30 and a separate build dir, RSF and CIA UniqueIds.
-ifeq ($(LOMEM),1)
-CFLAGS += -DLOMEM
-endif
-
 # AUTOTEST_FIRST_LEVEL=N overrides the sweep's starting slot so we can
 # resume a sweep from where the previous run failed without re-cycling
 # already-validated levels. Pass on the make command line:
@@ -460,7 +450,7 @@ $(BUILD)/%.o: $(SRCDIR)/%.c
 
 clean:
 	@echo "Cleaning 3DS build..."
-	@rm -rf $(BUILD) $(BUILD_LOMEM) $(OUTPUT_ELF) $(OUTPUT_ELF_LOMEM) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT)
+	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
 
 romfs-clean:
 	@echo "Cleaning romfs staging..."
@@ -613,77 +603,56 @@ $(OUTPUT_CIA_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_ALT) $(
 
 
 #---------------------------------------------------------------------------------
-# LOMEM build: OG-3DS standard-Application-mode CIA.
-#
-# Same ELF source as the HIMEM CIA, but compiled with -DLOMEM
-# (triggers the runtime mip-0 strip in render_c3d.c) and a smaller
-# linear heap (LINEAR_HEAP_MB=30) so HD textures fit in the standard
-# 64 MB Application-mode budget without HIMEM.  Uses a separate build
-# dir and ELF output so HIMEM + LOMEM artifacts can coexist.  RSF
-# drops `SystemMode: 96MB`.  UniqueIds 0xff4bc (primary) /
-# 0xff4bd (alt) live in a distinct title slot from the HIMEM CIAs
-# so a user can install both side-by-side.
+# HIMEM build: opt-in "use-at-your-own-risk" CIA that requests the OG
+# HIMEM grant (`SystemMode: 96MB`).  For users with HIMEM-capable HOME
+# menus who want full 512² textures on OG.  Uses the SAME ELF + romfs
+# as the unified primary — only the RSF differs (and the UniqueId).
+# Auto-detection in main_3ds.c / render_c3d.c picks the right heap
+# sizes + texture pack based on the granted region.
+# UniqueIds 0xff4be (primary) / 0xff4bf (alt).
 #---------------------------------------------------------------------------------
-BUILD_LOMEM          := $(SRCDIR)/build_3ds_lomem
-OUTPUT_ELF_LOMEM     := $(SRCDIR)/$(TARGET)_lomem.elf
-OUTPUT_CIA_LOMEM     := $(SRCDIR)/$(TARGET)_lomem.cia
-OUTPUT_CIA_LOMEM_ALT := $(SRCDIR)/$(TARGET)_lomem_alt.cia
-RSF_FILE_LOMEM       := $(ASSETS_DIR)/forsaken_lomem.rsf
-RSF_FILE_LOMEM_ALT   := $(BUILD)/forsaken_lomem_alt.rsf
+OUTPUT_CIA_HIMEM     := $(SRCDIR)/$(TARGET)_himem.cia
+OUTPUT_CIA_HIMEM_ALT := $(SRCDIR)/$(TARGET)_himem_alt.cia
+RSF_FILE_HIMEM       := $(ASSETS_DIR)/forsaken_himem.rsf
+RSF_FILE_HIMEM_ALT   := $(BUILD)/forsaken_himem_alt.rsf
 
-.PHONY: $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT)
+.PHONY: $(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
 
-# Generate the LOMEM alt RSF by substituting the UniqueId. Same
-# pattern as the HIMEM alt RSF, just one bump up.
-$(RSF_FILE_LOMEM_ALT): $(RSF_FILE_LOMEM) | $(BUILD)
+# Generate the HIMEM alt RSF by substituting the UniqueId — same
+# pattern as the LOMEM and unified-alt rules.
+$(RSF_FILE_HIMEM_ALT): $(RSF_FILE_HIMEM) | $(BUILD)
 	@mkdir -p $(BUILD)
-	@sed 's/UniqueId\s*:\s*0xff4bc/UniqueId                : 0xff4bd/' \
-		$(RSF_FILE_LOMEM) > $(RSF_FILE_LOMEM_ALT)
-	@echo "[release] Generated LOMEM alt RSF with UniqueId 0xff4bd"
+	@sed 's/UniqueId\s*:\s*0xff4be/UniqueId                : 0xff4bf/' \
+		$(RSF_FILE_HIMEM) > $(RSF_FILE_HIMEM_ALT)
+	@echo "[release] Generated HIMEM alt RSF with UniqueId 0xff4bf"
 
-
-# Build the LOMEM ELF via a recursive make that overrides BUILD,
-# OUTPUT_ELF, LOMEM and LINEAR_HEAP_MB. Same source files, different
-# CFLAGS + output path.  Gated on LOMEM != 1 so the inner make
-# (which sets LOMEM=1) does not recurse into this rule — inside
-# the recursive call the rule below is not defined, and the
-# standard $(OUTPUT_ELF) rule applies with $(OUTPUT_ELF)
-# overridden to the LOMEM path.
-ifneq ($(LOMEM),1)
-$(OUTPUT_ELF_LOMEM):
-	@echo "[release] Building LOMEM ELF (-DLOMEM -DLINEAR_HEAP_MB=30)..."
-	@$(MAKE) -f Makefile.3ds \
-		RENDERER=citro3d EDITION=remaster \
-		BUILD=$(BUILD_LOMEM) \
-		OUTPUT_ELF=$(OUTPUT_ELF_LOMEM) \
-		LOMEM=1 \
-		LINEAR_HEAP_MB=30 \
-		$(OUTPUT_ELF_LOMEM)
-endif
-
-# LOMEM primary CIA — UniqueId 0xff4bc.
-$(OUTPUT_CIA_LOMEM): $(OUTPUT_ELF_LOMEM) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_LOMEM) $(CIA_ROMFS_STAMP) | tools-fetch
-	@echo "[release] Building LOMEM CIA (UniqueId 0xff4bc)..."
+# HIMEM primary CIA — UniqueId 0xff4be.  Reuses the unified ELF + the
+# unified CIA_ROMFS staging (both texture packs); the engine picks
+# 512² at runtime because the HIMEM grant lifts region_size into the
+# 96 MB tier.
+$(OUTPUT_CIA_HIMEM): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_HIMEM) $(CIA_ROMFS_STAMP) | tools-fetch
+	@echo "[release] Building HIMEM CIA (UniqueId 0xff4be — opt-in)..."
 	$(MAKEROM) -f cia -o $@ \
-		-rsf $(RSF_FILE_LOMEM) \
+		-rsf $(RSF_FILE_HIMEM) \
 		-target t -exefslogo \
-		-elf $(OUTPUT_ELF_LOMEM) \
+		-elf $(OUTPUT_ELF) \
 		-icon $(OUTPUT_SMDH) \
 		-banner $(OUTPUT_BNR) \
 		-DAPP_ROMFS=$(CIA_ROMFS)
-	@echo "[release] LOMEM CIA written: $@"
+	@echo "[release] HIMEM CIA written: $@"
 
-# LOMEM alt CIA — UniqueId 0xff4bd, same ELF + assets.
-$(OUTPUT_CIA_LOMEM_ALT): $(OUTPUT_ELF_LOMEM) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_LOMEM_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
-	@echo "[release] Building LOMEM alt CIA (UniqueId 0xff4bd)..."
+# HIMEM alt CIA — UniqueId 0xff4bf, same ELF + assets.
+$(OUTPUT_CIA_HIMEM_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_HIMEM_ALT) $(CIA_ROMFS_STAMP) | tools-fetch
+	@echo "[release] Building HIMEM alt CIA (UniqueId 0xff4bf)..."
 	$(MAKEROM) -f cia -o $@ \
-		-rsf $(RSF_FILE_LOMEM_ALT) \
+		-rsf $(RSF_FILE_HIMEM_ALT) \
 		-target t -exefslogo \
-		-elf $(OUTPUT_ELF_LOMEM) \
+		-elf $(OUTPUT_ELF) \
 		-icon $(OUTPUT_SMDH) \
 		-banner $(OUTPUT_BNR) \
 		-DAPP_ROMFS=$(CIA_ROMFS)
-	@echo "[release] LOMEM alt CIA written: $@"
+	@echo "[release] HIMEM alt CIA written: $@"
+
 
 # Production 3dsx: rebuilds $(OUTPUT_3DSX) using CIA_ROMFS (no
 # dspfirm.cdc, full game assets) so the file is safe to
@@ -702,39 +671,49 @@ release-3dsx: $(OUTPUT_ELF) $(OUTPUT_SMDH) $(CIA_ROMFS_STAMP)
 # this catches a stale .o that bypassed the clean somehow). Runs
 # AFTER all artifacts build so a fresh ELF is on disk.
 .PHONY: release-strings-check
-release-strings-check: $(OUTPUT_ELF) $(OUTPUT_ELF_LOMEM)
-	@echo "[release] Sanity-grepping HIMEM + LOMEM ELFs for debug strings..."
-	@for elf in $(OUTPUT_ELF) $(OUTPUT_ELF_LOMEM); do \
-		[ -f $$elf ] || continue; \
-		n=$$(arm-none-eabi-strings $$elf | grep -cE "AUTOTEST:|autoboot:|autotest_tick|DEATH_SIM|DEBUG_RAMQAN" || true); \
-		if [ "$$n" != "0" ]; then \
-			echo "[release] ABORT: $$n debug-flag strings present in $$elf."; \
-			echo "[release] Aborting before any artifact ships. Investigate."; \
-			exit 1; \
-		fi; \
-		echo "[release] $$elf is clean ✓"; \
-	done
+release-strings-check: $(OUTPUT_ELF)
+	@echo "[release] Sanity-grepping production ELF for debug strings..."
+	@n=$$(arm-none-eabi-strings $(OUTPUT_ELF) | grep -cE "AUTOTEST:|autoboot:|autotest_tick|DEATH_SIM|DEBUG_RAMQAN" || true); \
+	if [ "$$n" != "0" ]; then \
+		echo "[release] ABORT: $$n debug-flag strings present in $(OUTPUT_ELF)."; \
+		echo "[release] Aborting before any artifact ships. Investigate."; \
+		exit 1; \
+	fi; \
+	echo "[release] $(OUTPUT_ELF) is clean ✓"
 # Top-level release target. Forces a clean build first so no stale .o
 # files survive from previous diagnostic runs.
 release: release-check
 	@echo "[release] Running 'make clean' to guarantee fresh .o files..."
 	@$(MAKE) -f Makefile.3ds clean
-	@echo "[release] Building HIMEM artifacts (primary + alt CIA + dspfirm-less 3dsx)..."
+	@echo "[release] Building unified primary + alt CIA + dspfirm-less 3dsx..."
 	@$(MAKE) -f Makefile.3ds RENDERER=citro3d EDITION=remaster \
 		$(OUTPUT_CIA) $(OUTPUT_CIA_ALT) release-3dsx
-	@echo "[release] Building LOMEM artifacts (LOMEM primary + alt CIA)..."
+	@echo "[release] Building HIMEM opt-in CIAs (primary + alt)..."
 	@$(MAKE) -f Makefile.3ds RENDERER=citro3d EDITION=remaster \
-		$(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT)
-	@echo "[release] Final sanity-grep on HIMEM + LOMEM ELFs..."
+		$(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
+	@echo "[release] Final sanity-grep on production ELF..."
 	@$(MAKE) -f Makefile.3ds release-strings-check
 	@echo
 	@echo "============================================================"
 	@echo "[release] DONE — five artifacts ready for archive.org:"
-	@ls -lh $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT) 2>/dev/null
+	@ls -lh $(OUTPUT_3DSX) \
+		$(OUTPUT_CIA) $(OUTPUT_CIA_ALT) \
+		$(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT) 2>/dev/null
 	@echo
 	@echo "[release] SHA1 sums:"
-	@sha1sum $(OUTPUT_3DSX) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_LOMEM) $(OUTPUT_CIA_LOMEM_ALT) 2>/dev/null
+	@sha1sum $(OUTPUT_3DSX) \
+		$(OUTPUT_CIA) $(OUTPUT_CIA_ALT) \
+		$(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT) 2>/dev/null
 	@echo
 	@echo "[release] Production 3dsx is dspfirm-free (Nintendo firmware blob"
 	@echo "[release] excluded — archive.org distribution safe)."
+	@echo
+	@echo "[release] Artifact roles:"
+	@echo "  forsaken3ds.cia          — UNIFIED primary (recommended default;"
+	@echo "                             auto-detects OG vs N3DS, picks 256² or 512²)"
+	@echo "  forsaken3ds_alt.cia      — UNIFIED alt (title-slot collision fallback)"
+	@echo "  forsaken3ds_himem.cia    — HIMEM opt-in (may not boot on all OG;"
+	@echo "                             OG users with working HIMEM grant get 512²)"
+	@echo "  forsaken3ds_himem_alt.cia — HIMEM alt"
+	@echo "  forsaken3ds.3dsx         — HBL (dev iteration, not for general install)"
 	@echo "============================================================"

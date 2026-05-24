@@ -545,7 +545,11 @@ static bool AppInit( char * lpCmdLine )
 		boot_log("[boot] AppInit: FAIL platform_init_video");
 		return false;
 	}
-	boot_log("[boot] AppInit: post platform_init_video");
+	{ extern u32 linearSpaceFree(void); char _b[96];
+	  snprintf(_b, sizeof(_b),
+	    "[boot] AppInit: post platform_init_video linearFree=%u KB",
+	    linearSpaceFree() >> 10);
+	  boot_log(_b); }
 #else
 	if(!sdl_init_video())
 	{
@@ -587,7 +591,11 @@ static bool AppInit( char * lpCmdLine )
 		return false;
 	}
 #ifdef __3DS__
-	boot_log("[boot] AppInit: post InitScene");
+	{ extern u32 linearSpaceFree(void); char _b[96];
+	  snprintf(_b, sizeof(_b),
+	    "[boot] AppInit: post InitScene linearFree=%u KB",
+	    linearSpaceFree() >> 10);
+	  boot_log(_b); }
 #endif
 
 #ifdef __3DS__

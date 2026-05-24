@@ -82,9 +82,12 @@ bool Tload( TLOADHEADER * Tloadheader  )
 	TR("Tload: enter num_texture_files=%d", Tloadheader->num_texture_files);
 #ifdef __3DS__
 	{
-		char _b[96];
-		snprintf(_b, sizeof(_b), "[tload] enter num_textures=%d",
-			Tloadheader->num_texture_files);
+		char _b[128];
+		extern u32 linearSpaceFree(void);
+		snprintf(_b, sizeof(_b),
+			"[tload] enter num_textures=%d linearFree=%u KB",
+			Tloadheader->num_texture_files,
+			linearSpaceFree() >> 10);
 		boot_log(_b);
 	}
 #endif
@@ -279,10 +282,12 @@ bool TloadAllTextures(TLOADHEADER * Tloadheader)
 
 #ifdef __3DS__
 	{
-		char _b[80];
+		char _b[128];
+		extern u32 linearSpaceFree(void);
 		snprintf(_b, sizeof(_b),
-			"[tload] TloadAllTextures done %d textures",
-			Tloadheader->num_texture_files);
+			"[tload] done %d textures linearFree=%u KB",
+			Tloadheader->num_texture_files,
+			linearSpaceFree() >> 10);
 		boot_log(_b);
 	}
 #endif

@@ -59,9 +59,15 @@ AccessControlInfo:
   ReleaseKernelMajor            : "02"
   ReleaseKernelMinor            : "33"
   MemoryType                    : Application
-  SystemMode                    : 96MB    # Old 3DS extended (HIMEM) mode —
-                                          # suspends Miiverse / Browser to free
-                                          # ~32MB extra for the app, total ~96MB
+  # SystemMode (OG-HIMEM 96MB) intentionally omitted. The HIMEM grant
+  # crashes some OG HOME menus (NULL pointer write in the menu process,
+  # before our code runs) — observed on multiple OG units across EUR
+  # and USA regions. Without the grant, OG runs in standard 64 MB
+  # Application mode. The unified CIA ships both hd_textures/ (512²,
+  # for N3DS) and hd_textures_lomem/ (256², for OG) packs in romfs;
+  # render_c3d.c picks the right one at runtime via APT_CheckNew3DS,
+  # so N3DS users still get full visual quality while OG users get
+  # a working install.
   SystemModeExt                 : 124MB   # New 3DS — full app slice (124MB)
   HandleTableSize               : 512
 

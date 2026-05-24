@@ -915,7 +915,11 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 {
 #ifdef __3DS__
-	boot_log("[initmodel] entry");
+	{ char _b[96]; extern u32 linearSpaceFree(void);
+	  snprintf(_b, sizeof(_b),
+	    "[initmodel] entry linearFree=%u KB",
+	    linearSpaceFree() >> 10);
+	  boot_log(_b); }
 #endif
 	int i;
 	int8_t		TempFilename[ 256 ];
@@ -941,6 +945,17 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 				{ extern void trace(const char*); char _b[256];
 				  snprintf(_b, sizeof(_b), "InitModel: i=%d morph=%d name=%.180s",
 				           i, (int)NamePnt->DoIMorph, NamePnt->Name); trace(_b); }
+				/* Periodic linear-heap snapshot during model load — every
+				 * 50th model.  Gives us a curve so we can see where the
+				 * heap drains. */
+				if ((i % 50) == 0) {
+					extern u32 linearSpaceFree(void);
+					char _b[128];
+					snprintf(_b, sizeof(_b),
+					    "[initmodel] i=%d name=%.80s linearFree=%u KB",
+					    i, NamePnt->Name, linearSpaceFree() >> 10);
+					boot_log(_b);
+				}
 #endif
 
 				if( NamePnt->DoIMorph )
@@ -952,8 +967,9 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 						{ extern void trace(const char*); char _b[256];
 						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxaload i=%d name=%.180s",
 						           i, NamePnt->Name); trace(_b);
-						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxaload i=%d name=%.180s",
-						           i, NamePnt->Name); boot_log(_b); }
+						  extern u32 linearSpaceFree(void);
+						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxaload i=%d name=%.140s linearFree=%u KB",
+						           i, NamePnt->Name, linearSpaceFree() >> 10); boot_log(_b); }
 #endif
 						return false;	// the model and visipoly data
 					}
@@ -978,8 +994,9 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 						{ extern void trace(const char*); char _b[256];
 						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxload i=%d name=%.180s",
 						           i, NamePnt->Name); trace(_b);
-						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxload i=%d name=%.180s",
-						           i, NamePnt->Name); boot_log(_b); }
+						  extern u32 linearSpaceFree(void);
+						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxload i=%d name=%.140s linearFree=%u KB",
+						           i, NamePnt->Name, linearSpaceFree() >> 10); boot_log(_b); }
 #endif
 						return false;	// the model and visipoly data
 					}

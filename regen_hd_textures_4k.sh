@@ -224,15 +224,17 @@ convert_one() {
     # halo for a diffuse fade — visually acceptable and gives proper
     # anti-aliasing on distant grate/cutout geometry.
     #
-    # Everything else (sprites, menu pages, global HUD/UI) → auto-etc1
-    # with no mips. They're drawn near 1:1 pixel ratio; mips are never
-    # sampled, and adding them wastes RAM.
+    # Mip chains on EVERY texture (sprites, menu pages, HUD/UI included).
+    # Cost: ~10 KB per texture on disk (~1-2 MB total romfs growth).
+    # Benefits: PICA200 picks the right mip for distance-sampled draws
+    # automatically — no aliasing on distant walls, no extra cost when
+    # the texture is drawn at 1:1 (mip 0 sampled).
     if [ "$is_wall_opaque" = 1 ]; then
         tex3ds -f etc1 -q high -m gaussian "$tmp_png" -o "$dst" 2>/dev/null
     elif [ "$is_wall_alpha" = 1 ]; then
         tex3ds -f auto-etc1 -q high -m gaussian "$tmp_png" -o "$dst" 2>/dev/null
     else
-        tex3ds -f auto-etc1 -q high "$tmp_png" -o "$dst" 2>/dev/null
+        tex3ds -f auto-etc1 -q high -m gaussian "$tmp_png" -o "$dst" 2>/dev/null
     fi
     rm -f "$tmp_png"
 }

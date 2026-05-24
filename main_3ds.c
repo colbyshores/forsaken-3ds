@@ -32,94 +32,27 @@ extern bool render_init(render_info_t *info);
  * level is loading), plus texture upload staging buffers.  At 80 MB the
  * combined allocation exceeded available RAM on some levels.
  *
-/* ---- heap sizing ----
+/* Heap sizing — runtime-detected via __system_allocateHeaps override.
  *
- * OG 3DS in HIMEM mode has 96 MB app RAM (forsaken.rsf:SystemMode=96MB,
- * SpecialMemoryArrange=true; suspends Miiverse/Browser to free ~32 MB
- * over the default 64 MB). New has 124 MB. Both allocations must fit
- * inside the smaller budget for a single binary to work on both.
+ * The shipping unified CIA (assets/forsaken.rsf) requests SystemModeExt
+ * (124 MB on N3DS) but deliberately omits SystemMode: 96MB (the OG HIMEM
+ * grant request, which crashes some OG HOME menus before our code can
+ * run). The opt-in HIMEM CIA (assets/forsaken_himem.rsf) does request
+ * SystemMode for OG users who want full quality and have a working menu.
  *
- * Rough layout on OG (HIMEM):
- *   code            ~4 MB
- *   BSS             ~32 MB   (level data, model data, static arrays;
- *                             dominated by ModelHeaders[608] +
- *                             MxaModelHeaders[608] at ~9.6 KB/entry each)
- *   malloc heap     24 MB    (this variable)
- *   linear heap     24 MB    (GPU-accessible; textures, scratch, cmd buf)
- *   stack           ~1 MB
- *   OS reserve      ~8 MB    (services, IPC, filesystem buffers)
- *   ---
- *   total           ~93 MB   (fits 96 MB with ~3 MB margin)
+ * In either case we don't know at compile time how much memory the OS
+ * will hand us, so the heap sizes have to be picked at runtime in the
+ * __system_allocateHeaps weak override below. Detection signal:
+ * osGetMemRegionSize(MEMREGION_APPLICATION) — the actual region the OS
+ * gave us:
+ *   - >= 96 MB (N3DS SystemModeExt = 124 MB, or OG HIMEM = 96 MB):
+ *     32+32 MB heap, 512² texture pack via render_c3d.c.
+ *   - <  96 MB (OG without HIMEM grant = 64 MB):
+ *     32+22 MB heap, 256² texture pack via render_c3d.c.
  *
- * Rationale for 24/24 vs the old 64/default-32:
- *   * 64 MB malloc was wildly over what the engine needs (Lua + small
- *     runtime allocations); it starved the linear heap.
- *   * 24 MB linear needs to hold: post-strip HD texture set
- *     (~30 walls × ~45 KB = ~1.4 MB), 4 MB GPU scratch, 1 MB command
- *     buffer, PNG fallback textures (up to ~10 MB worst case for
- *     several big bigexp*.png at 1024² RGBA4), audio buffers (~1 MB),
- *     misc linear allocations. Total ~18 MB peak, 6 MB margin.
- *
- * On New 3DS this leaves ~30 MB unused overhead but that's fine —
- * we're not memory-optimizing for New. */
-/* File-scope heap sizes consumed by libctru's default
- * __system_allocateHeaps. 24 MB malloc + 32 MB linear = 56 MB total.
- *
- * malloc heap: peak gameplay ~14 MB, 24 MB has comfortable headroom.
- *
- * linear heap holds: 4 MB GPU command buffer (raised from 1 MB to
- * absorb the multi-pass flood-fill's extra draw calls in
- * visi.c FindVisible) + render targets + HD textures + level
- * vertex/index buffers + audio buffers. With 24 MB linear,
- * powerdown's model load was hitting linearAlloc=NULL inside Mxload
- * (`InitModel: FAIL Mxload i=372 name=barrel.mx`, AUTOTEST:
- * SeriousError). 32 MB gives ~6-8 MB headroom for the full Remaster
- * level set.
- *
- * On OG 3DS this 56 MB total may push past the partition budget; OG
- * "Surgical Q3-style memory refactor"). */
-/* Heap sizing post-Q3 refactor + military Remaster level support:
- *   - 32 MB malloc (was 24 MB; bumped 2026-04-30 to fit military's
- *     205-enemy COMP_OBJ tree allocations). The 12th .cob load
- *     (Legz, 8 children) was hitting malloc=NULL on N3DS at 24 MB
- *     after ~20 MB consumed by the per-enemy COMP_OBJ trees in the
- *     LoadEnemies path (sizeof(COMP_OBJ)=688 bytes × N children ×
- *     205 enemies). Reproduced via the autotest harness sweep
- *     (AUTOTEST_REMASTER=1 AUTOTEST_FIRST_LEVEL=17). Probing both
- *     1KB and 64B mallocs returned NULL — confirmed full heap
- *     exhaustion, not fragmentation.
- *   - 32 MB linear — unchanged. Holds 4 MB GPU command buffer,
- *     render targets, HD textures, level vertex/index buffers,
- *     audio. ~6-8 MB headroom across the Remaster set.
- *
- * Total heap = 32 + 32 = 64 MB.
- *
- * Platform fit:
- *   - N3DS (124 MB SystemModeExt): 4 code + 18 BSS + 64 heap +
- *     1 stack + ~9 OS = ~96 MB → 28 MB headroom.
- *   - OG 3DS HIMEM (96 MB SystemMode in forsaken.rsf): same
- *     ~96 MB total → 1 MB headroom. Tight but fits — provided
- *     the build is installed as a CIA (HIMEM is only granted to
- *     installed applications, not .3dsx via Homebrew Launcher).
- *   - OG `.3dsx` via HBL applet: applet mode carves out less
- *     than HIMEM. Current heap config may not fit there; the .3dsx
- *     path is for development iteration, shipping path is CIA.
- *
- * The 8 MB malloc bump consumed budget that was previously sitting
- * unused as N3DS slack. On OG it consumes the previous "recovered
- * BSS" headroom, hence the tight 1 MB margin. If that margin proves
- * fragile in OG-CIA testing, the right fix is a __system_allocateHeaps
- * weak override that splits per-platform: keep 32+32 on N3DS, drop
- * to 28+24 on OG. Defer until OG-CIA validation proves it necessary. */
-/* Heap budgets are overridable from the Makefile so a developer can
- * simulate OG-CIA's 1 MB margin (or tighter) on N3DS hardware without
- * actually installing the CIA. Defaults match the OG-CIA HIMEM target.
- *
- *   make ... OG_SIM=1     → 30+30 = 60 MB heap (paranoid: tightens past
- *                            OG-CIA's 1 MB margin to verify the engine
- *                            runs with even less). Anything that fits
- *                            here is bulletproof on real OG hardware.
- *   make ... MALLOC_HEAP_MB=N LINEAR_HEAP_MB=N  → custom override. */
+ * The link-time defaults below are only honored if the override is
+ * disabled via -DFORSAKEN_HEAP_FIXED — used for synthetic OG-tight-budget
+ * tests on N3DS hardware. */
 #ifndef MALLOC_HEAP_MB
 #define MALLOC_HEAP_MB 32
 #endif
@@ -129,6 +62,57 @@ extern bool render_init(render_info_t *info);
 u32 __ctru_heap_size        = MALLOC_HEAP_MB * 1024 * 1024;
 u32 __ctru_linear_heap_size = LINEAR_HEAP_MB * 1024 * 1024;
 u32 __stacksize__           = 256 * 1024; /* override libctru's 32 KB default */
+
+/* __system_allocateHeaps — weak override of libctru's default. Runs
+ * before C++ ctors and main() but after svc syscalls are wired up, so
+ * osGetMemRegionSize is safe to call here. Mirrors the steps in
+ * libctru-2.7.0's default (svcControlMemory ×2 + mappableInit + sbrk
+ * fakes); diverges only in choosing heap sizes based on region. */
+#ifndef FORSAKEN_HEAP_FIXED
+#include <3ds/os.h>
+#include <3ds/svc.h>
+#include <3ds/allocator/mappable.h>
+
+extern u32 __ctru_heap;
+extern u32 __ctru_linear_heap;
+extern char *fake_heap_start, *fake_heap_end;
+
+void __system_allocateHeaps(void)
+{
+	u32 tmp = 0;
+	u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
+
+	if (region_size >= 96 * 1024 * 1024) {
+		/* N3DS SystemModeExt (124 MB) or OG HIMEM (96 MB) — full heap. */
+		__ctru_heap_size        = 32 * 1024 * 1024;
+		__ctru_linear_heap_size = 32 * 1024 * 1024;
+	} else {
+		/* OG Application (64 MB), no HIMEM — tight-budget heap.
+		 * Validated on real OG hardware via YandyTheGnome's testing. */
+		__ctru_heap_size        = 32 * 1024 * 1024;
+		__ctru_linear_heap_size = 22 * 1024 * 1024;
+	}
+
+	__ctru_heap = 0x08000000;
+	svcControlMemory(&tmp, __ctru_heap, 0, __ctru_heap_size,
+	                 MEMOP_ALLOC, MEMPERM_READ | MEMPERM_WRITE);
+
+	svcControlMemory(&__ctru_linear_heap, 0, 0, __ctru_linear_heap_size,
+	                 MEMOP_ALLOC_LINEAR, MEMPERM_READ | MEMPERM_WRITE);
+
+	/* CRITICAL: initialize the "mappable" allocator that backs
+	 * mappableAlloc() — gspInit uses this to reserve the virtual
+	 * address for svcMapMemoryBlock(GSP_SHARED_MEM). Skipping this
+	 * step causes a NULL-deref crash deep in libctru's gspInit on
+	 * the first gfxInit(). libctru 2.7.0's default __system_allocateHeaps
+	 * does this call right after the two svcControlMemory calls;
+	 * any override has to mirror it. */
+	mappableInit(0x10000000, 0x14000000);
+
+	fake_heap_start = (char *)__ctru_heap;
+	fake_heap_end   = (char *)__ctru_heap + __ctru_heap_size;
+}
+#endif
 
 /* ---- init state tracking ---- */
 
@@ -305,18 +289,22 @@ bool platform_init(void)
 	if (is_n3ds)
 		osSetSpeedupEnable(true);
 
-	/* Log the actual heap sizes that __system_allocateHeaps ended up
-	 * with so a "no trace, just crashed in boot" failure can be told
-	 * apart from "boot worked, app crashed later". The override caps
-	 * sizes to remaining commit budget; we want to see what landed. */
+	/* Always-on boot_log of the platform-detection result. This lands
+	 * in sdmc:/forsaken_boot.log on every boot — lets us verify from
+	 * the host which heap tier + texture pack ended up selected,
+	 * without needing to do per-texture memory-consumption math. */
 	{
-		char _b[160];
+		u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
+		const char *tier = region_size >= 96ull * 1024 * 1024 ? "HIMEM (512²)" : "LOMEM (256²)";
+		char _b[200];
 		snprintf(_b, sizeof(_b),
-		         "heap: is_n3ds=%d malloc=%uMB linear=%uMB",
+		         "[platform] is_n3ds=%d region=%uMB tier=%s malloc=%uMB linear=%uMB",
 		         (int)is_n3ds,
+		         (unsigned)(region_size >> 20),
+		         tier,
 		         (unsigned)(__ctru_heap_size >> 20),
 		         (unsigned)(__ctru_linear_heap_size >> 20));
-		trace(_b);
+		boot_log(_b);
 	}
 
 	/* Q3-style hunk arena for per-execbuf textureGroups[] arrays. The
