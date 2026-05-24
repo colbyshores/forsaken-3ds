@@ -1743,22 +1743,45 @@ void ProcessPrimaryBullets( void )
 							break;
 
 						case OWNER_MODELSPOTFX:
+							/* Mirror the defensive pattern used by the other
+							 * OWNER_MODELSPOTFX sites in this file (lines
+							 * 5844 / 6026 / 6205 / 6361): fetch the SpotFX
+							 * array base separately and NULL-check before
+							 * the +SpotFX index offset.  Without the check
+							 * a bullet that outlives its owner model (or
+							 * whose owner slot got reused for a model with
+							 * no spotfx data) dereferences NULL+offset and
+							 * crashes deep in ApplyMatrix.  Symptom seen on
+							 * reactor core: FAR=0x58, PC in ApplyMatrix,
+							 * LR in ProcessPrimaryBullets. */
 							if( ModelNames[ Models[ PrimBulls[i].Owner ].ModelNum ].DoIMorph )
 							{
-								SpotFXPtr = ( MxaModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX + PrimBulls[i].SpotFX );
+								SpotFXPtr = MxaModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX;
 							}
 							else
 							{
-								SpotFXPtr = ( ModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX + PrimBulls[i].SpotFX );
+								SpotFXPtr = ModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX;
 							}
 
-							ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->Pos, &TempVector );
-							PrimBulls[i].Pos.x = ( Models[ PrimBulls[i].Owner ].Pos.x + TempVector.x );
-							PrimBulls[i].Pos.y = ( Models[ PrimBulls[i].Owner ].Pos.y + TempVector.y );
-							PrimBulls[i].Pos.z = ( Models[ PrimBulls[i].Owner ].Pos.z + TempVector.z );
-							PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Models[ PrimBulls[i].Owner ].Pos, Models[ PrimBulls[i].Owner ].Group, &TempVector );
-							ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->DirVector, &PrimBulls[i].Dir );
-							PrimBulls[i].ColFlag = 0;
+							if( SpotFXPtr )
+							{
+								SpotFXPtr += PrimBulls[i].SpotFX;
+
+								ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->Pos, &TempVector );
+								PrimBulls[i].Pos.x = ( Models[ PrimBulls[i].Owner ].Pos.x + TempVector.x );
+								PrimBulls[i].Pos.y = ( Models[ PrimBulls[i].Owner ].Pos.y + TempVector.y );
+								PrimBulls[i].Pos.z = ( Models[ PrimBulls[i].Owner ].Pos.z + TempVector.z );
+								PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Models[ PrimBulls[i].Owner ].Pos, Models[ PrimBulls[i].Owner ].Group, &TempVector );
+								ApplyMatrix( &Models[ PrimBulls[i].Owner ].Mat, &SpotFXPtr->DirVector, &PrimBulls[i].Dir );
+								PrimBulls[i].ColFlag = 0;
+							}
+							else
+							{
+								/* Owner model has no (or no longer has)
+								 * a SpotFX array — kill this orphaned
+								 * bullet rather than crash. */
+								PrimBulls[i].LifeCount = 0.0F;
+							}
 							break;
 
 						default:
@@ -8865,15 +8888,12 @@ void GetLaserLocalVector( u_int16_t i, VECTOR * LocalVector )
 					break;
 
 				case OWNER_MODELSPOTFX:
-					if( ModelNames[ Models[ PrimBulls[i].Owner ].ModelNum ].DoIMorph )
-					{
-						SpotFXPtr = ( MxaModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX + PrimBulls[i].SpotFX );
-					}
-					else
-					{
-						SpotFXPtr = ( ModelHeaders[ Models[ PrimBulls[i].Owner ].ModelNum ].SpotFX + PrimBulls[i].SpotFX );
-					}
-
+					/* The original 1998 code computed SpotFXPtr here but
+					 * never used it before the ApplyMatrix call below — the
+					 * ApplyMatrix takes &PrimBulls[i].Dir directly, not
+					 * anything from the spotfx struct. Dropped the dead
+					 * lookup so a NULL SpotFX array (orphaned bullet) can't
+					 * cause a load fault here even via dead read. */
 					ApplyMatrix( &Models[ PrimBulls[i].Owner ].InvMat, &PrimBulls[i].Dir, LocalVector );
 					break;
 
