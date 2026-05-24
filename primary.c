@@ -1840,6 +1840,19 @@ void ProcessPrimaryBullets( void )
 				goto loop;
 			}
 
+			/* Aim-assist hook: subtle steering on player-fired primary
+			 * bullets toward the nearest valid target. No-op (single
+			 * float compare + return) when Config.aim_assist_strength
+			 * is 0. Runs BEFORE the position advance below so the
+			 * adjusted Dir is what propels the bullet this frame. */
+			if( PrimBulls[i].OwnerType == OWNER_SHIP )
+			{
+				extern bool aim_assist_steer( VECTOR *pos, VECTOR *dir,
+				                              u_int16_t group, int8_t weapon );
+				aim_assist_steer( &PrimBulls[i].Pos, &PrimBulls[i].Dir,
+				                  PrimBulls[i].GroupImIn, PrimBulls[i].Weapon );
+			}
+
 			Speed = ( PrimBulls[ i ].Speed * NewFramelag ); //framelag );
 			NewPos.x = PrimBulls[ i ].Pos.x + ( PrimBulls[ i ].Dir.x * Speed );
 			NewPos.y = PrimBulls[ i ].Pos.y + ( PrimBulls[ i ].Dir.y * Speed );

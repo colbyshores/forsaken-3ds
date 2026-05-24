@@ -105,6 +105,7 @@ typedef struct {
 	char macro1[ MAXTEXTMSG ];
 	char macro2[ MAXTEXTMSG ];
 	char macro3[ MAXTEXTMSG ];
+	float aim_assist_strength;   /* 0.0 = off, 1.0 = full subtle assist */
 } USERCONFIG;
 
 

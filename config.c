@@ -149,6 +149,8 @@ USERCONFIG default_config = {
 	"you ugly son of a bitch...",		// taunt 1 ( F9 )
 	"Time to die...",					// taunt 2 ( F10 )
 	"I will tear your soul apart...",	// taunt 3 ( F11 )
+
+	0.0F,								// aim_assist_strength — off by default
 };
 
 
@@ -271,6 +273,8 @@ USERCONFIG my_controls = {
 	"you ugly son of a bitch...",		// taunt 1 ( F9 )
 	"Time to die...",					// taunt 2 ( F10 )
 	"I will tear your soul apart...",	// taunt 3 ( F11 )
+
+	0.0F,								// aim_assist_strength — off by default
 };
 
 
@@ -789,6 +793,22 @@ read_autolevel( FILE *f, USERCONFIG *u, char *last_token )
 {
 	if ( fscanf( f, " %f", &u->autolevel_rate ) == 1 )
 	{
+		fscanf( f, " %80s", last_token );
+		return 1;
+	}
+	else
+		return 0;
+}
+
+/* AIMASSIST <float>  — 0.0 off, ~0.25-0.35 typical, 1.0 strong */
+static int
+read_aim_assist( FILE *f, USERCONFIG *u, char *last_token )
+{
+	if ( fscanf( f, " %f", &u->aim_assist_strength ) == 1 )
+	{
+		/* clamp to sane range */
+		if ( u->aim_assist_strength < 0.0F ) u->aim_assist_strength = 0.0F;
+		if ( u->aim_assist_strength > 1.0F ) u->aim_assist_strength = 1.0F;
 		fscanf( f, " %80s", last_token );
 		return 1;
 	}
@@ -1369,6 +1389,7 @@ read_config( USERCONFIG *u, char *cfg_name )
 		{ "bike",			read_bike					},
 		{ "bikecomp",		read_bikecomp				},
 		{ "autolevel",		read_autolevel				},
+		{ "aimassist",		read_aim_assist				},
 		{ "preferred1",		read_preferred_primary		},
 		{ "preferred2",		read_preferred_secondary	},
 		{ "drop1",			read_drop_primary			},
@@ -1710,6 +1731,7 @@ write_config( USERCONFIG *u, char *cfg_name )
 	fprintf( f, "BIKE\t\t%hd\n", u->bike );
 	fprintf( f, "BIKECOMP\t\t%hd\n", u->bikecomp );
 	fprintf( f, "AUTOLEVEL\t\t%f\n", u->autolevel_rate );
+	fprintf( f, "AIMASSIST\t\t%f\n", u->aim_assist_strength );
 	fprintf( f, "INVERT\t\t%d\n", u->invert_pitch );
 	fprintf( f, "INVERT_TURN\t%d\n", u->invert_turn );
 	fprintf( f, "SENSITIVITY\t\t%f %f\n", u->mouse_x_sensitivity, u->mouse_y_sensitivity );
