@@ -6717,7 +6717,15 @@ void DispPowerLevel( void )
 			break;
 	}
 
-	if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
+	/* Defensive bounds check on the array index.  Ships[WhoIAm].Primary
+	 * is a BYTE (0..255) and the engine clamps it to 0..MAXPRIMARYWEAPONS-1
+	 * via GetNext/PrevValidPrimaryWeapon() at every assignment, but GCC's
+	 * value-range analyzer can't prove that across functions and emits an
+	 * array-bounds warning here.  Explicit bound makes the invariant
+	 * visible to both compiler and reader; the compare costs nothing
+	 * compared to the HUD render that follows. */
+	u_int8_t prim = Ships[ WhoIAm ].Primary;
+	if( prim < MAXPRIMARYWEAPONS && PrimaryWeaponsGot[ prim ] )
 	{
 		if( Steps != 0 )
 		{
