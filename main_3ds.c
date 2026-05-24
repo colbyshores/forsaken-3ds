@@ -283,6 +283,32 @@ bool platform_init(void)
 	trace("platform_init: start");
 	boot_log("[boot] platform_init: start");
 
+	/* Verify __system_allocateHeaps set up mappableInit correctly.  Our
+	 * override mirrors libctru's default init sequence (svcControlMemory
+	 * ×2 + mappableInit + sbrk fakes) — if a future libctru version
+	 * changes that sequence and we miss the update, gfxInit() crashes
+	 * deep in gspInit (NULL deref at FAR=0x800) instead of failing
+	 * loudly here.  Catch the regression at the right place: probe
+	 * mappableAlloc and verify it returns an address inside the
+	 * range our override passed to mappableInit. */
+	{
+		extern void mappableInit(u32, u32);
+		extern void *mappableAlloc(size_t);
+		extern void  mappableFree(void *);
+		void *probe = mappableAlloc(4096);
+		uintptr_t addr = (uintptr_t)probe;
+		if (probe == NULL || addr < 0x10000000 || addr >= 0x14000000) {
+			char _b[160];
+			snprintf(_b, sizeof(_b),
+			         "[boot] FATAL: mappableAlloc returned %p (expected in [0x10000000,0x14000000)). "
+			         "libctru ABI changed — re-audit __system_allocateHeaps override.",
+			         probe);
+			boot_log(_b);
+			svcBreak(USERBREAK_PANIC);
+		}
+		mappableFree(probe);
+	}
+
 	/* Enable New3DS 804 MHz mode when available */
 	bool is_n3ds = false;
 	APT_CheckNew3DS(&is_n3ds);
