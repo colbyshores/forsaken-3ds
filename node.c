@@ -909,6 +909,24 @@ NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 
 		if( NodeLink->NetMask&Network )
 			return NodeLink;
 	}
+	/* Pass 3+4: drone is inside a shaft where every neighbor is 0x20 —
+	 * allow 0x20 links as last resort so it can traverse the shaft chain. */
+	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
+	{
+		NodeLink = NodeFrom->NodeLink[i];
+		if( (NodeLink != Node1 ) &&
+			(NodeLink != Node2 ) &&
+			(NodeLink != Node3 ) &&
+			(NodeLink != Node4 ) &&
+			(NodeLink->NetMask&Network) )
+			return NodeLink;
+	}
+	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
+	{
+		NodeLink = NodeFrom->NodeLink[i];
+		if( NodeLink->NetMask&Network )
+			return NodeLink;
+	}
 	return NodeFrom;
 }
 NODE * FindSuitableSplineNodeRandom( u_int32_t Network, NODE * NodeFrom , NODE *Node1 , NODE *Node2 , NODE *Node3 , NODE *Node4 )

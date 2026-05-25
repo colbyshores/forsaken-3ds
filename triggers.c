@@ -771,8 +771,14 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
 	target = NodeNetworkHeader.FirstNode + node_idx;
 
-	if( s_last_redirected_drone && ( s_last_redirected_drone->Used ) )
-		s_last_redirected_drone->NextTNode = target;
+	/* SetNextTargetNode is a no-op in our engine.  KEX uses it to pass an
+	 * anti-backtrack hint (LastTNode) to the drone.  aifollow.c overwrites
+	 * Enemy->LastTNode at the very top of the PickNewNodeNow block, so any
+	 * value we write here is immediately replaced.  Shaft traversal is
+	 * handled by FindSuitableSplineNode's 0x20-fallback passes (node.c).
+	 * Setting NextTNode here would route the drone backward toward the
+	 * node-below after each shaft-lift step. */
+	(void) target;
 }
 #endif /* EDITION_REMASTER */
 

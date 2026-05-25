@@ -6871,9 +6871,6 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 	float	Distance;
 	VECTOR	Up;
 	float	XRot = 0.0F;
-#ifdef EDITION_REMASTER
-	BGOBJECT * BGObject;
-#endif
 
 	StartPos = Object->Pos;
 	OldGroup = Object->Group;
@@ -7050,28 +7047,51 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		Move_Off.z = Move_Off.z * Object->Speed.z * framelag;
 
 #ifdef EDITION_REMASTER
-		if( Enemy->Type == ENEMY_CargoDrone && Object->Group != (u_int16_t) -1 )
+		/* CargoDrone barrier stop: halt when a CLOSED OneOff_Anim BGObject
+		 * (State == WaitForTrigger, animation not yet played) is within
+		 * stopping distance ahead in the same group.
+		 *
+		 * ObjectCollide was too coarse — it tripped on every wall in tight
+		 * corridors and parked the drone in corners, never reaching the
+		 * next barrier.  Walking the BGObject list directly matches what
+		 * the level designer intended: only ACTUAL barrier doors stop
+		 * the drone, and only while they're still closed.
+		 *
+		 * Open doors (Time >= OverallTime) are skipped so the drone can
+		 * proceed through a barrier the moment a switch trigger animates
+		 * it. */
+		if( Enemy->Type == ENEMY_CargoDrone )
 		{
-			BGObject = NULL;
-			if( ObjectCollide( Object, &Move_Off, EnemyTypes[Enemy->Type].Radius, &BGObject ) )
+			extern BGOBJECT * FirstBGObjectUsed;
+			float stop_r = EnemyTypes[ Enemy->Type ].Radius + 60.0F;
+			BGOBJECT * bgo;
+			for( bgo = FirstBGObjectUsed; bgo; bgo = bgo->NextUsed )
 			{
-				Object->Speed.z = 0.0F;
+				float bx, by, bz, d2, dot;
+				if( bgo->Type  != BGOTYPE_OneOff_Anim )       continue;
+				if( bgo->State != ONEOFFANIM_WaitForTrigger ) continue;
+				/* Once anim plays, Time == OverallTime and State resets
+				 * to WaitForTrigger — that's an OPEN door, skip it. */
+				if( bgo->Time  >= bgo->OverallTime )          continue;
+				if( bgo->Group != Object->Group )             continue;
+				bx = bgo->Pos.x - Object->Pos.x;
+				by = bgo->Pos.y - Object->Pos.y;
+				bz = bgo->Pos.z - Object->Pos.z;
+				d2 = bx*bx + by*by + bz*bz;
+				if( d2 >= stop_r * stop_r ) continue;
+				/* Only stop if the barrier is roughly ahead (dot > 0). */
+				dot = bx * Move_Off.x + by * Move_Off.y + bz * Move_Off.z;
+				if( dot <= 0.0F ) continue;
 				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
+				Object->Speed.z = 0.0F;
+				break;
 			}
-			if( BGObject ) ChangeBGState( BGObject, OWNER_ENEMY, Enemy->Index, BUMP, 0.0F );
-			/* Apply position whether or not a collision occurred — if
-			 * ObjectCollide blocked us Move_Off is already zeroed above. */
-			Object->Pos.x += Move_Off.x;
-			Object->Pos.y += Move_Off.y;
-			Object->Pos.z += Move_Off.z;
 		}
-		else
 #endif
-		{
+
 		Object->Pos.x += Move_Off.x;
 		Object->Pos.y += Move_Off.y;
 		Object->Pos.z += Move_Off.z;
-		}
 		}
 #ifdef EDITION_REMASTER
 		} /* close _drone_waiting block */
