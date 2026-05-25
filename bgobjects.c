@@ -618,10 +618,33 @@ void ProcessBGObjects( bool Collide )
 #endif
 										continue;
 									}
-									/* Lerp drone Y from wait node Y to next node Y */
+									/* Lerp drone Y from wait node Y to TOP-OF-SHAFT Y.
+									 *
+									 * For multi-segment shafts (lift 2 = 187→186→185→184,
+									 * lift 4 = 174→173, lift 5 = 172→171, lift 6 = 136→
+									 * 176) the wait node's immediate NodeLink[0] is just
+									 * the FIRST shaft step.  Walking the chain via
+									 * NodeLink[0] until we hit a non-shaft node (flag
+									 * neither 0x40 nor 0x20) finds the actual lift top,
+									 * matching what the visual lift platform's mesh
+									 * animation rises to.  Without this, lift 2 only
+									 * Y-lerped one segment (~637u), then the post-lift
+									 * redirect set TNode to the actual top (~1840u up)
+									 * and the drone tried to climb the remaining 1200u
+									 * via AI movement, clipping through the shaft wall. */
 									{
-										upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
-										if( upper_node )
+										NODE * top = wait_node;
+										int    hops = 0;
+										while( top->NumOfLinks > 0 && hops < 8 )
+										{
+											NODE * next = top->NodeLink[0];
+											if( !next ) break;
+											if( !( next->Flags & 0x60 ) ) break; /* next is regular track */
+											top = next;
+											hops++;
+										}
+										upper_node = top;
+										if( upper_node && upper_node != wait_node )
 										{
 											float progress = Object->Time / Object->OverallTime;
 											if( progress > 1.0F ) progress = 1.0F;
@@ -632,9 +655,10 @@ void ProcessBGObjects( bool Collide )
 											{
 												extern void boot_log(const char *);
 												char _b[180];
+												int _top_idx = (int)( upper_node - NodeNetworkHeader.FirstNode );
 												snprintf(_b, sizeof(_b),
-												         "[ylerp] PASS TNode=%d progress=%.2f Y: %.0f -> %.0f",
-												         _tnode_idx, progress,
+												         "[ylerp] PASS TNode=%d top=%d progress=%.2f Y: %.0f -> %.0f",
+												         _tnode_idx, _top_idx, progress,
 												         wait_node->Pos.y, upper_node->Pos.y);
 												boot_log(_b);
 											}
