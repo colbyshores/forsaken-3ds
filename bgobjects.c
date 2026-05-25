@@ -696,14 +696,13 @@ void ProcessBGObjects( bool Collide )
 							 * to wait.Pos.y, undoing the lift visually. */
 							if( Object->IsCargoDroneLift )
 							{
-								extern bool TriggerAreaEnemyCheck( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group );
 								ENEMY * drone;
 								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
 								{
 									NODE * wait_node;
 									NODE * upper_node;
 									float dx, dz;
-									VECTOR oldPos;
+									bool upper_is_intermediate_wait;
 									if( drone->Type != ENEMY_CargoDrone ) continue;
 									if( !drone->TNode ) continue;
 									wait_node = (NODE*)drone->TNode;
@@ -714,28 +713,40 @@ void ProcessBGObjects( bool Collide )
 									if( dx*dx + dz*dz > 200.0F*200.0F ) continue;
 									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
 									if( !upper_node ) continue;
-									/* Capture old pos for the area-enter fire-up. */
-									oldPos = drone->Object.Pos;
-									/* Teleport to upper_node's SOLID position (floor-snapped,
-									 * computed at Nodeload via downward raycast).  Using Pos
-									 * puts the drone slightly above the surface so subsequent
-									 * AI movement that targets SolidPos drives the drone
-									 * through the floor on flat segments. */
-									drone->Object.Pos.x = upper_node->SolidPos.x;
-									drone->Object.Pos.y = upper_node->SolidPos.y;
-									drone->Object.Pos.z = upper_node->SolidPos.z;
+									/* Always advance the drone's TNode forward — the post-
+									 * lift NodeDisable(wait) + NodeEnable(upper) trigger pair
+									 * has already fired by now, so wait_node is 0x60-disabled
+									 * and upper_node is either 0x40 (intermediate shaft wait)
+									 * or 0x00 (regular track). */
 									drone->TNode         = upper_node;
 									drone->NextTNode     = NULL;
 									drone->LastTNode     = wait_node;
 									drone->PickNewNodeNow = true;
-									/* Fire area-enter triggers for the new position: drone
-									 * has effectively moved from oldPos to upper_node.Pos.
-									 * Without this, intermediate shaft zones (Drone3Wait at
-									 * node 186, Drone4Wait at 185) never get the
-									 * enemy-entered signal they need to gate the next
-									 * lever's lift. */
-									TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
-									drone->Object.Group = (u_int16_t)upper_node->Group;
+
+									/* Only teleport drone POSITION when upper_node is now an
+									 * intermediate shaft wait (0x40 set, e.g. lift 2 shaft).
+									 * For those, the drone must "be there" so the wait
+									 * suppressor parks it and the next switch's
+									 * Drone<N>Wait zone-enter fires.
+									 *
+									 * For single-segment lifts (1, 5, 6, 7, 8 + lift 2's top
+									 * segment) upper_node ends up 0x00 — regular track.
+									 * Don't teleport position there.  Just advancing TNode
+									 * is enough; the AI will walk the drone from the
+									 * wait's XZ over to upper_node naturally, no visible
+									 * jump on lift end. */
+									upper_is_intermediate_wait = (upper_node->Flags & 0x40) != 0;
+									if( upper_is_intermediate_wait )
+									{
+										extern bool TriggerAreaEnemyCheck( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group );
+										VECTOR oldPos = drone->Object.Pos;
+										drone->Object.Pos.x = upper_node->SolidPos.x;
+										drone->Object.Pos.y = upper_node->SolidPos.y;
+										drone->Object.Pos.z = upper_node->SolidPos.z;
+										drone->Object.Group = (u_int16_t)upper_node->Group;
+										TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
+									}
+
 #ifdef DEFEND2_TRACE
 									{
 										extern void boot_log(const char *);
@@ -744,9 +755,9 @@ void ProcessBGObjects( bool Collide )
 										int _w = (int)( wait_node - NodeNetworkHeader.FirstNode );
 										int _u = (int)( upper_node - NodeNetworkHeader.FirstNode );
 										snprintf(_b, sizeof(_b),
-										         "[lift-end] BGO #%d: drone snap %d->%d, new TNode=%d(f=0x%02x) solidY=%.0f",
-										         (int)Object->Index, _w, _u, _u, (unsigned)upper_node->Flags,
-										         upper_node->SolidPos.y);
+										         "[lift-end] BGO #%d: drone TNode %d->%d (f=0x%02x) %s",
+										         (int)Object->Index, _w, _u, (unsigned)upper_node->Flags,
+										         upper_is_intermediate_wait ? "TELEPORT" : "walk");
 										boot_log(_b);
 									}
 #endif

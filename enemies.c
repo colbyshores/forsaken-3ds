@@ -7066,12 +7066,17 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			if( _dx*_dx + _dz*_dz < (length + 16.0F) * (length + 16.0F) )
 			{
 				Object->Speed.z    = 0.0F;
-				/* Also zero the yaw rate so the drone doesn't tilt
-				 * trying to look at the wait node while the lift
-				 * Y-lerps it above the wait position.  Without this
-				 * the AI keeps aiming at TNode (below) and the drone
-				 * visibly pitches/yaws on the lift. */
+				/* Also zero the yaw rate AND pitch (XRot) so the drone
+				 * doesn't tilt/pitch trying to look at the wait node
+				 * while the lift Y-lerps it above the wait position.
+				 * Without these the AI keeps aiming at TNode (below)
+				 * and the drone visibly pitches/yaws on the lift.
+				 *
+				 * XRot may have been set earlier in the close-to-TNode
+				 * slope branches; the matrix update at the end of this
+				 * function would apply it.  Suppress it during wait. */
 				Object->Angle.y    = 0.0F;
+				XRot               = 0.0F;
 				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
 				Enemy->PickNewNodeNow = false;
 				_drone_waiting = true;
