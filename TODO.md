@@ -56,38 +56,17 @@ visually.  Returning here after other priorities.
 
 ---
 
-## CargoDrone slight off-track / overshoot on switch ~10-11 lift
+## Resolved (kept for history)
 
-**Level:** `defend2`
+### CargoDrone off-track on switch ~10-11 lift — defend2 — RESOLVED
 
-**Symptom:** On one of the lifts (user identified as "switch 10 or
-11", which maps to either lift 1 / BGO[27] in grp 19 or one of the
-knob-triggered lifts), the drone after the lift is slightly off the
-track, moves in the direction of the track, reaches the end of
-something, and turns around to correct itself.
+Was: drone post-lift slightly off-track, walked the wrong direction
+toward dead end, turned around to correct.
 
-**Hypothesis:** After lift end, drone is at `(wait_node XZ,
-upper_node Y)`.  TNode is advanced past `upper_node` to next-next
-in the next AI frame.  The straight line from drone's position to
-next-next can cross corridor geometry sideways if `upper_node` XZ
-is significantly offset from `wait_node` XZ.
+Apparently resolved by the pitch-lock fix in `enemies.c` (commit
+603c710).  The pitched matrix was probably skewing the AI's
+movement direction enough to push the drone laterally off the
+intended track.  With pitch locked to 0, the drone walks straight
+between nodes.
 
-**Tried:** Always-teleport drone to `upper_node` SolidPos at lift
-end (for XZ-offset > 50u).  Worked geometrically but visually
-jumped the drone backward off the lift platform — wrong.
-
-**Approach options for retry:**
-
-1. Reverse-engineer the KEX behavior — look for `kexCargoDrone` or
-   similar in Ghidra.  The original game must have handled
-   single-segment-lift-with-offset-upper somehow.
-
-2. Smaller XZ correction: instead of full teleport to upper, nudge
-   drone toward upper's XZ by some fraction each frame after lift
-   end until the drone is on-axis.
-
-3. Replace the AI's straight-line path-following with a "must visit
-   upper_node" intermediate step after lift end.
-
-**Status:** Deferred.  Behavior is occasional and recoverable;
-addressing barriers first.
+If this returns on any future testing, re-open this item.
