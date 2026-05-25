@@ -216,24 +216,12 @@ void ModifyTriggerVar( TRIGGERVAR * TrigVar , int Op , int Val )
 
 #ifdef DEFEND2_TRACE
 	{
-		/* Focus on the defend2 CargoDrone trigger chain: any switch
-		 * (Lever<N> / Lever<N>Done), wait flag (Drone<N>Wait), or
-		 * lift-done flag (Lift<N>Done).  Drone<N> Set-to-2 fires the
-		 * post-lift node redirect, also worth logging. */
-		const char * n = TrigVar->Name;
-		bool _is_lever = (strncasecmp(n, "Lever", 5) == 0);
-		bool _is_wait  = (strncasecmp(n, "Drone", 5) == 0) && strstr(n, "Wait");
-		bool _is_done  = (strncasecmp(n, "Lift",  4) == 0) && strstr(n, "Done");
-		bool _is_drone = (strncasecmp(n, "Drone", 5) == 0) && !_is_wait;
-		if( _is_lever || _is_wait || _is_done || _is_drone )
-		{
-			extern void boot_log(const char *);
-			char _b[160];
-			snprintf(_b, sizeof(_b),
-			         "[trig] %s : %d -> %d (op=%d val=%d)",
-			         n, old_state, TrigVar->State, Op, Val);
-			boot_log(_b);
-		}
+		extern void boot_log(const char *);
+		char _b[160];
+		snprintf(_b, sizeof(_b),
+		         "[trig] %.32s : %d -> %d (op=%d val=%d)",
+		         TrigVar->Name, old_state, TrigVar->State, Op, Val);
+		boot_log(_b);
 	}
 #endif
 
@@ -714,94 +702,74 @@ void EVENT_TeleportDisable( u_int8_t * Data )
 #ifdef EDITION_REMASTER
 extern	NODENETWORKHEADER	NodeNetworkHeader;
 extern	ENEMY *	FirstEnemyUsed;
-static	ENEMY *	s_last_redirected_drone = NULL;
 
 /*===================================================================
-	Procedure	:		Redirect nearest CargoDrone to a target node
-	Input		:		u_int8_t * Data  (u32 node index)
-	Output		:		nothing
+	KEX event 25 = NodeEnable.  Verified via Ghidra decompile of
+	kexForsakenNodeManager::EnableNode @ 0x697020:
+	    node->flags &= 0xffdf;  (clears the 0x20 disabled bit)
+
+	The .trg file's "TRIGGEREVENT_EnemySetTargetNode" name is
+	misleading — KEX uses this event to enable a node in the AI
+	spline graph at runtime.  Combined with NodeDisable (event 26)
+	on the previous wait, this transitions the drone forward one
+	shaft segment per switch.
+
+	The drone's TNode advance happens implicitly: when a lift
+	completes its lever's trigger pair fires (EnableNode on the
+	next wait/top, DisableNode on the current wait), the wait
+	suppressor in enemies.c releases (because the now-disabled
+	wait has 0x20 set), the close-to-TNode logic sets
+	PickNewNodeNow, and FindSuitableSplineNode picks the newly
+	enabled neighbor.
 ===================================================================*/
 void EVENT_EnemySetTargetNode( u_int8_t * Data )
 {
 	u_int32_t	node_idx;
-	NODE		*	target;
-	ENEMY		*	e;
-	ENEMY		*	best = NULL;
-	float			best_dist = -1.0F;
-	float			d;
+	NODE		*	node;
 
 	memcpy( &node_idx, Data, sizeof( u_int32_t ) );
 	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
-	target = NodeNetworkHeader.FirstNode + node_idx;
-
-	for( e = FirstEnemyUsed; e; e = e->NextUsed )
+	node = NodeNetworkHeader.FirstNode + node_idx;
+	node->Flags &= ~0x20;
+#ifdef DEFEND2_TRACE
 	{
-		if( e->Type != ENEMY_CargoDrone ) continue;
-		d = DistanceVector2Vector( &e->Object.Pos, &target->SolidPos );
-		if( best_dist < 0.0F || d < best_dist )
-		{
-			best_dist = d;
-			best = e;
-		}
+		extern void boot_log(const char *);
+		char _b[140];
+		snprintf(_b, sizeof(_b),
+		         "[node] Enable  idx=%u flags now=0x%02x",
+		         (unsigned)node_idx, (unsigned)node->Flags);
+		boot_log(_b);
 	}
-	s_last_redirected_drone = NULL;
-	if( !best ) return;
-
-	/* Train-switch semantics: drone must never leave the node track.
-	 *
-	 * STOPPED at lift-wait (pure 0x40, not 0x60): directly update TNode
-	 *   so the AutoMovementCrawl suppressor releases from the lift-base
-	 *   position and the drone resumes from the raised position.
-	 *
-	 * IN TRANSIT: do nothing — KEX BrainCrawl (bAttackFind=false) just
-	 *   follows the spline track hop-by-hop with no destination override.
-	 *   The drone reaches the target node naturally and stops there if it
-	 *   carries the 0x40 wait flag. */
-	{
-		bool stopped_at_lift = best->TNode &&
-			( ((NODE*)best->TNode)->Flags & 0x40 ) &&
-			!( ((NODE*)best->TNode)->Flags & 0x20 );
-
-		best->Object.Group = (u_int16_t)target->Group;
-
-		if( stopped_at_lift )
-		{
-			best->TNode          = target;
-			best->NextTNode      = NULL;
-			best->LastTNode      = NULL;
-			best->PickNewNodeNow = true;
-		}
-		else
-		{
-			/* In-transit: store destination; aifollow.c routes hop-by-hop */
-			best->NextTNode = target;
-		}
-		s_last_redirected_drone = best;
-	}
+#endif
 }
 
 /*===================================================================
-	Procedure	:		Set NextTNode on the last redirected CargoDrone
-	Input		:		u_int8_t * Data  (u32 node index)
-	Output		:		nothing
+	KEX event 26 = NodeDisable.  Verified via Ghidra decompile of
+	kexForsakenNodeManager::DisableNode @ 0x697070:
+	    node->flags |= 0x20;  (sets the disabled bit)
+
+	Paired with NodeEnable on the next wait/top in the same lift's
+	post-anim trigger conditions.
 ===================================================================*/
 void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 {
 	u_int32_t	node_idx;
-	NODE		*	target;
+	NODE		*	node;
 
 	memcpy( &node_idx, Data, sizeof( u_int32_t ) );
 	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
-	target = NodeNetworkHeader.FirstNode + node_idx;
-
-	/* SetNextTargetNode is a no-op in our engine.  KEX uses it to pass an
-	 * anti-backtrack hint (LastTNode) to the drone.  aifollow.c overwrites
-	 * Enemy->LastTNode at the very top of the PickNewNodeNow block, so any
-	 * value we write here is immediately replaced.  Shaft traversal is
-	 * handled by FindSuitableSplineNode's 0x20-fallback passes (node.c).
-	 * Setting NextTNode here would route the drone backward toward the
-	 * node-below after each shaft-lift step. */
-	(void) target;
+	node = NodeNetworkHeader.FirstNode + node_idx;
+	node->Flags |= 0x20;
+#ifdef DEFEND2_TRACE
+	{
+		extern void boot_log(const char *);
+		char _b[140];
+		snprintf(_b, sizeof(_b),
+		         "[node] Disable idx=%u flags now=0x%02x",
+		         (unsigned)node_idx, (unsigned)node->Flags);
+		boot_log(_b);
+	}
+#endif
 }
 #endif /* EDITION_REMASTER */
 

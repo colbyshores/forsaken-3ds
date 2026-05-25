@@ -6857,14 +6857,41 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 ===================================================================*/
 void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 {
-	VECTOR	Move_Off = { 0.0F , 0.0F , 0.0F };	
-	MATRIX	StepMat;	
+	VECTOR	Move_Off = { 0.0F , 0.0F , 0.0F };
+	MATRIX	StepMat;
 	VECTOR	StartPos;
 	u_int16_t	OldGroup;
 	NODE	* TNode;
 	NODE	* NextTNode;
 	NODE	* LastTNode;
 	float	length = 75.0F;
+
+#if defined(DEFEND2_TRACE) && defined(EDITION_REMASTER)
+	/* Periodic drone state dump: every ~2 seconds (120 frames) print
+	 * CargoDrone position + TNode + speed.  Lets us see if the drone
+	 * parks at a wait or keeps moving past it. */
+	if( Enemy->Type == ENEMY_CargoDrone )
+	{
+		static int _dump_tick = 0;
+		_dump_tick++;
+		if( _dump_tick >= 120 )
+		{
+			extern void boot_log(const char *);
+			extern NODENETWORKHEADER NodeNetworkHeader;
+			NODE * tn = (NODE*)Enemy->TNode;
+			char _b[200];
+			int  _ti = tn ? (int)(tn - NodeNetworkHeader.FirstNode) : -1;
+			snprintf(_b, sizeof(_b),
+			         "[drone] pos=(%.0f,%.0f,%.0f) grp=%u TNode=%d(f=0x%02x) Spd=%.2f",
+			         Object->Pos.x, Object->Pos.y, Object->Pos.z,
+			         (unsigned)Object->Group,
+			         _ti, tn ? (unsigned)tn->Flags : 0,
+			         Object->Speed.z);
+			boot_log(_b);
+			_dump_tick = 0;
+		}
+	}
+#endif
 	VECTOR	AimPos;
 	VECTOR	TempPos;
 	VECTOR	AnglePos;
@@ -7034,6 +7061,12 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			if( _dx*_dx + _dz*_dz < (length + 16.0F) * (length + 16.0F) )
 			{
 				Object->Speed.z    = 0.0F;
+				/* Also zero the yaw rate so the drone doesn't tilt
+				 * trying to look at the wait node while the lift
+				 * Y-lerps it above the wait position.  Without this
+				 * the AI keeps aiming at TNode (below) and the drone
+				 * visibly pitches/yaws on the lift. */
+				Object->Angle.y    = 0.0F;
 				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
 				Enemy->PickNewNodeNow = false;
 				_drone_waiting = true;

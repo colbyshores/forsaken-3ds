@@ -553,10 +553,22 @@ void ProcessBGObjects( bool Collide )
 								ENEMY * drone;
 #ifdef DEFEND2_TRACE
 								extern NODENETWORKHEADER NodeNetworkHeader;
-								/* Log Y-lerp gate decisions per drone, once per
-								 * second (every 60 frames) to avoid flooding. */
-								static int _ylerp_tick = 0;
-								_ylerp_tick++;
+								/* Log on the first frame of this specific BGO's
+								 * animation (Object->Time small, just after the
+								 * += framelag).  Using a per-BGO Time check
+								 * instead of a shared static counter so EVERY
+								 * lift's first-frame is captured. */
+								bool _log_this_frame = (Object->Time < 2.0F * framelag);
+								if( _log_this_frame )
+								{
+									extern void boot_log(const char *);
+									char _b[160];
+									snprintf(_b, sizeof(_b),
+									         "[ylerp] BGO #%d START animating (IsLift=1, pos=%.0f,%.0f,%.0f, OvT=%.1f)",
+									         (int)Object->Index, Object->Pos.x, Object->Pos.y, Object->Pos.z,
+									         Object->OverallTime);
+									boot_log(_b);
+								}
 #endif
 								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
 								{
@@ -578,7 +590,7 @@ void ProcessBGObjects( bool Collide )
 									if( !( wait_node->Flags & 0x40 ) )
 									{
 #ifdef DEFEND2_TRACE
-										if( _ylerp_tick == 1 )
+										if( _log_this_frame )
 										{
 											extern void boot_log(const char *);
 											char _b[160];
@@ -604,7 +616,7 @@ void ProcessBGObjects( bool Collide )
 									if( dx*dx + dz*dz > 200.0F*200.0F )
 									{
 #ifdef DEFEND2_TRACE
-										if( _ylerp_tick == 1 )
+										if( _log_this_frame )
 										{
 											extern void boot_log(const char *);
 											char _b[180];
@@ -618,59 +630,47 @@ void ProcessBGObjects( bool Collide )
 #endif
 										continue;
 									}
-									/* Lerp drone Y from wait node Y to TOP-OF-SHAFT Y.
+									/* Lerp drone Y from wait node to its IMMEDIATE upper
+									 * neighbor (NodeLink[0]) — Y only, not XZ.  Lerping
+									 * X/Z too is geometrically correct for slanted shafts,
+									 * but it breaks the wait suppressor's XZ-distance
+									 * check (drone moves away from wait_node XZ → wait
+									 * disengages → drone tries AI movement → chaos).
 									 *
-									 * For multi-segment shafts (lift 2 = 187→186→185→184,
-									 * lift 4 = 174→173, lift 5 = 172→171, lift 6 = 136→
-									 * 176) the wait node's immediate NodeLink[0] is just
-									 * the FIRST shaft step.  Walking the chain via
-									 * NodeLink[0] until we hit a non-shaft node (flag
-									 * neither 0x40 nor 0x20) finds the actual lift top,
-									 * matching what the visual lift platform's mesh
-									 * animation rises to.  Without this, lift 2 only
-									 * Y-lerped one segment (~637u), then the post-lift
-									 * redirect set TNode to the actual top (~1840u up)
-									 * and the drone tried to climb the remaining 1200u
-									 * via AI movement, clipping through the shaft wall. */
+									 * Trade-off: drone Y-rises straight up at wait_node's
+									 * XZ; lift platform mesh may visually pull away on
+									 * slanted shafts.  Better to look slightly off than
+									 * to break parking.  After lift completion, the
+									 * trigger pair (NodeEnable next-wait / NodeDisable
+									 * current-wait) advances the drone's TNode and the
+									 * spline-pick brings it to the next node correctly. */
+									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
+									if( upper_node )
 									{
-										NODE * top = wait_node;
-										int    hops = 0;
-										while( top->NumOfLinks > 0 && hops < 8 )
-										{
-											NODE * next = top->NodeLink[0];
-											if( !next ) break;
-											if( !( next->Flags & 0x60 ) ) break; /* next is regular track */
-											top = next;
-											hops++;
-										}
-										upper_node = top;
-										if( upper_node && upper_node != wait_node )
-										{
-											float progress = Object->Time / Object->OverallTime;
-											if( progress > 1.0F ) progress = 1.0F;
-											drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
+										float progress = Object->Time / Object->OverallTime;
+										if( progress > 1.0F ) progress = 1.0F;
+										drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
 #ifdef DEFEND2_TRACE
-											_passed = true;
-											if( _ylerp_tick == 1 )
-											{
-												extern void boot_log(const char *);
-												char _b[180];
-												int _top_idx = (int)( upper_node - NodeNetworkHeader.FirstNode );
-												snprintf(_b, sizeof(_b),
-												         "[ylerp] PASS TNode=%d top=%d progress=%.2f Y: %.0f -> %.0f",
-												         _tnode_idx, _top_idx, progress,
-												         wait_node->Pos.y, upper_node->Pos.y);
-												boot_log(_b);
-											}
-#endif
+										_passed = true;
+										if( _log_this_frame )
+										{
+											extern void boot_log(const char *);
+											char _b[200];
+											int _up_idx = (int)( upper_node - NodeNetworkHeader.FirstNode );
+											snprintf(_b, sizeof(_b),
+											         "[ylerp] PASS TNode=%d upper=%d progress=%.2f Y: %.0f -> %.0f",
+											         _tnode_idx, _up_idx, progress,
+											         wait_node->Pos.y, upper_node->Pos.y);
+											boot_log(_b);
 										}
+#endif
 									}
 #ifdef DEFEND2_TRACE
 									(void)_passed;
 #endif
 								}
 #ifdef DEFEND2_TRACE
-								if( _ylerp_tick >= 60 ) _ylerp_tick = 0;
+								/* no shared counter needed */
 #endif
 							}
 #endif
@@ -681,7 +681,78 @@ void ProcessBGObjects( bool Collide )
 							{
 								ApplyTriggerMod( Object->EndTrigModPtr );
 							}
-
+#ifdef EDITION_REMASTER
+							/* Lift just finished animating.  EndTrigMod fired the
+							 * Lift<N>Done state change, which fires NodeEnable on
+							 * the upper node and NodeDisable on the wait.  Drone is
+							 * sitting at wait_node.XZ with Y at the lerped top; we
+							 * need to (a) snap drone position to upper_node and
+							 * (b) advance drone TNode to upper_node so its
+							 * subsequent AI behavior aims at the next forward
+							 * neighbor instead of the now-disabled wait below it.
+							 *
+							 * Without this, drone TNode stays at the (now 0x60-
+							 * disabled) wait and AI tries to navigate back down
+							 * to wait.Pos.y, undoing the lift visually. */
+							if( Object->IsCargoDroneLift )
+							{
+								extern bool TriggerAreaEnemyCheck( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group );
+								ENEMY * drone;
+								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
+								{
+									NODE * wait_node;
+									NODE * upper_node;
+									float dx, dz;
+									VECTOR oldPos;
+									if( drone->Type != ENEMY_CargoDrone ) continue;
+									if( !drone->TNode ) continue;
+									wait_node = (NODE*)drone->TNode;
+									/* Drone must have been parked at wait associated
+									 * with this lift (XZ-close). */
+									dx = drone->Object.Pos.x - wait_node->Pos.x;
+									dz = drone->Object.Pos.z - wait_node->Pos.z;
+									if( dx*dx + dz*dz > 200.0F*200.0F ) continue;
+									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
+									if( !upper_node ) continue;
+									/* Capture old pos for the area-enter fire-up. */
+									oldPos = drone->Object.Pos;
+									/* Teleport to upper_node's SOLID position (floor-snapped,
+									 * computed at Nodeload via downward raycast).  Using Pos
+									 * puts the drone slightly above the surface so subsequent
+									 * AI movement that targets SolidPos drives the drone
+									 * through the floor on flat segments. */
+									drone->Object.Pos.x = upper_node->SolidPos.x;
+									drone->Object.Pos.y = upper_node->SolidPos.y;
+									drone->Object.Pos.z = upper_node->SolidPos.z;
+									drone->TNode         = upper_node;
+									drone->NextTNode     = NULL;
+									drone->LastTNode     = wait_node;
+									drone->PickNewNodeNow = true;
+									/* Fire area-enter triggers for the new position: drone
+									 * has effectively moved from oldPos to upper_node.Pos.
+									 * Without this, intermediate shaft zones (Drone3Wait at
+									 * node 186, Drone4Wait at 185) never get the
+									 * enemy-entered signal they need to gate the next
+									 * lever's lift. */
+									TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
+									drone->Object.Group = (u_int16_t)upper_node->Group;
+#ifdef DEFEND2_TRACE
+									{
+										extern void boot_log(const char *);
+										extern NODENETWORKHEADER NodeNetworkHeader;
+										char _b[200];
+										int _w = (int)( wait_node - NodeNetworkHeader.FirstNode );
+										int _u = (int)( upper_node - NodeNetworkHeader.FirstNode );
+										snprintf(_b, sizeof(_b),
+										         "[lift-end] BGO #%d: drone snap %d->%d, new TNode=%d(f=0x%02x) solidY=%.0f",
+										         (int)Object->Index, _w, _u, _u, (unsigned)upper_node->Flags,
+										         upper_node->SolidPos.y);
+										boot_log(_b);
+									}
+#endif
+								}
+							}
+#endif
 							Object->Time = Object->OverallTime;
 							if( Object->DestroyAtEnd )
 							{
@@ -1613,6 +1684,16 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 			}
 			if( strncasecmp( base, "lift", 4 ) == 0 )
 				Object->IsCargoDroneLift = true;
+#ifdef DEFEND2_TRACE
+			{
+				extern void boot_log(const char *);
+				char _b[200];
+				snprintf(_b, sizeof(_b),
+				         "[bgo]  Load fn='%s' base='%s' IsLift=%d",
+				         (const char*)Filename, base, (int)Object->IsCargoDroneLift);
+				boot_log(_b);
+			}
+#endif
 		}
 #endif
 		Object->StartPos = *Pos;
