@@ -7042,6 +7042,26 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			if( TNode && LastTNode )
 			{
 				AI_AimAtTarget( &Enemy->Object.InvMat , &LastTNode->SolidPos, &TNode->SolidPos);
+#ifdef EDITION_REMASTER
+				/* CargoDrone is a fixed-orientation craft — its body
+				 * should never pitch.  Without this skip, the slope
+				 * between LastTNode and TNode adds XRot every frame:
+				 *
+				 *   - Defend2 lift 8 approach: #137 (y=1556) -> wait
+				 *     #138 (y=1411).  145u Y drop over 1272u horizontal
+				 *     -> drone visibly tilts forward through the whole
+				 *     1.3k-unit approach until the wait suppressor
+				 *     fires at XZ-close range.
+				 *
+				 *   - Post-lift walk to next-next on any lift whose
+				 *     wait -> upper has a Y delta the suppressor doesn't
+				 *     fully recover from before the drone is moving
+				 *     again.
+				 *
+				 * Yaw (Angle.y) is left alone so the drone still turns
+				 * through corners — only pitch is locked. */
+				if( Enemy->Type != ENEMY_CargoDrone )
+#endif
 				if( AimData.Angle.y > -3.0F && AimData.Angle.y < 3.0F )
 				{
 					XRot = (AimData.Angle.x * (0.1F * framelag));
