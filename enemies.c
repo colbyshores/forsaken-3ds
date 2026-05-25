@@ -7080,6 +7080,36 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
 				Enemy->PickNewNodeNow = false;
 				_drone_waiting = true;
+
+				/* Level out drone matrix at the wait. Approach to the
+				 * wait can accumulate roll/pitch (the slope branches
+				 * preserve previous-Mat Up in MakeViewMatrix; corner
+				 * turns inject roll that autolevel doesn't fully shed
+				 * before arrival). Once at the wait, the lift only
+				 * moves Y — heading is fixed — so rebuilding the matrix
+				 * from horizontal forward + world-up clears any residual
+				 * tilt without changing what the drone is facing.
+				 *
+				 * Symptom this addresses: final lift on defend2 (BGO 31,
+				 * TNode 138 -> 67) arrives tilted ~22 deg, then the
+				 * Angle.y/XRot zeros above lock that orientation in
+				 * place for the duration of the descent. */
+				{
+					VECTOR fwd, look_at, world_up = { 0.0F, 1.0F, 0.0F };
+					float fwd_len2;
+					ApplyMatrix( &Object->Mat, &Forward, &fwd );
+					fwd.y = 0.0F;
+					fwd_len2 = fwd.x * fwd.x + fwd.z * fwd.z;
+					if( fwd_len2 > 0.0001F )
+					{
+						NormaliseVector( &fwd );
+						look_at.x = Object->Pos.x + fwd.x;
+						look_at.y = Object->Pos.y;
+						look_at.z = Object->Pos.z + fwd.z;
+						MakeViewMatrix( &Object->Pos, &look_at,
+						                &world_up, &Object->Mat );
+					}
+				}
 			}
 		}
 		if( !_drone_waiting )
@@ -7102,7 +7132,15 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		 *
 		 * Open doors (Time >= OverallTime) are skipped so the drone can
 		 * proceed through a barrier the moment a switch trigger animates
-		 * it. */
+		 * it.
+		 *
+		 * Use bgo->Center (computed bounding-box center) rather than
+		 * bgo->Pos for distance check.  Some barriers (trackBarrier01/02/
+		 * 03 on defend2) are authored with Pos=(0,0,0) and rely on their
+		 * .cob children's authored world coordinates — Pos is at the
+		 * level origin, not the barrier's actual location.  Center
+		 * reflects the world-space bounding box after children transform
+		 * and gives the real barrier position. */
 		if( Enemy->Type == ENEMY_CargoDrone )
 		{
 			extern BGOBJECT * FirstBGObjectUsed;
@@ -7117,9 +7155,15 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 				 * to WaitForTrigger — that's an OPEN door, skip it. */
 				if( bgo->Time  >= bgo->OverallTime )          continue;
 				if( bgo->Group != Object->Group )             continue;
-				bx = bgo->Pos.x - Object->Pos.x;
-				by = bgo->Pos.y - Object->Pos.y;
-				bz = bgo->Pos.z - Object->Pos.z;
+				/* Skip lift BGOs — their Center can lie ahead of the
+				 * drone before it reaches the wait node, but the lift
+				 * IS the path forward, not a barrier to halt at.  Lift
+				 * stopping is handled by the TNode 0x40 wait suppressor
+				 * above. */
+				if( bgo->IsCargoDroneLift )                   continue;
+				bx = bgo->Center.x - Object->Pos.x;
+				by = bgo->Center.y - Object->Pos.y;
+				bz = bgo->Center.z - Object->Pos.z;
 				d2 = bx*bx + by*by + bz*bz;
 				if( d2 >= stop_r * stop_r ) continue;
 				/* Only stop if the barrier is roughly ahead (dot > 0). */
