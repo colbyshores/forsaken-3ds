@@ -542,30 +542,112 @@ void ProcessBGObjects( bool Collide )
 #ifdef EDITION_REMASTER
 							/* Sync any CargoDrone waiting at a lift-base node (0x40)
 							 * with this BGO's animation progress so the drone rides
-							 * the platform rather than being passed through. */
+							 * the platform rather than being passed through.
+							 *
+							 * Gate on Object->IsCargoDroneLift so the Y-lerp only
+							 * fires for actual lift BGOs (filename "lift*.cob") —
+							 * not for lever/door/decoration BGOs that happen to be
+							 * animating while the drone sits at a wait node. */
+							if( Object->IsCargoDroneLift )
 							{
 								ENEMY * drone;
+#ifdef DEFEND2_TRACE
+								extern NODENETWORKHEADER NodeNetworkHeader;
+								/* Log Y-lerp gate decisions per drone, once per
+								 * second (every 60 frames) to avoid flooding. */
+								static int _ylerp_tick = 0;
+								_ylerp_tick++;
+#endif
 								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
 								{
 									float dx, dz;
+									NODE * wait_node;
+									NODE * upper_node;
+#ifdef DEFEND2_TRACE
+									bool _passed = false;
+									int _tnode_idx = -1;
+									unsigned _tnode_flags = 0;
+#endif
 									if( drone->Type != ENEMY_CargoDrone ) continue;
 									if( !drone->TNode ) continue;
-									if( !( ((NODE*)drone->TNode)->Flags & 0x40 ) ) continue;
-									dx = drone->Object.Pos.x - Object->Pos.x;
-									dz = drone->Object.Pos.z - Object->Pos.z;
-									if( dx*dx + dz*dz > 500.0F*500.0F ) continue;
+									wait_node = (NODE*)drone->TNode;
+#ifdef DEFEND2_TRACE
+									_tnode_idx   = (int)( wait_node - NodeNetworkHeader.FirstNode );
+									_tnode_flags = wait_node->Flags;
+#endif
+									if( !( wait_node->Flags & 0x40 ) )
+									{
+#ifdef DEFEND2_TRACE
+										if( _ylerp_tick == 1 )
+										{
+											extern void boot_log(const char *);
+											char _b[160];
+											snprintf(_b, sizeof(_b),
+											         "[ylerp] SKIP TNode=%d f=0x%02x !0x40 (drone_pos=%.0f,%.0f,%.0f)",
+											         _tnode_idx, _tnode_flags,
+											         drone->Object.Pos.x, drone->Object.Pos.y, drone->Object.Pos.z);
+											boot_log(_b);
+										}
+#endif
+										continue;
+									}
+									/* Gate on drone-to-wait-node XZ distance — the drone is
+									 * parked at the wait node when the lift fires, and the
+									 * wait node lives in world coords.  BGO origins are
+									 * level-designer-placed and can be far from their wait
+									 * node (lift 2's BGO is at world origin (0,0,0); lift 5's
+									 * BGO is 380u from its wait node; only lift 1 happens to
+									 * be near its wait at 213u).  A tight wait-node-based
+									 * gate works uniformly for every lift. */
+									dx = drone->Object.Pos.x - wait_node->Pos.x;
+									dz = drone->Object.Pos.z - wait_node->Pos.z;
+									if( dx*dx + dz*dz > 200.0F*200.0F )
+									{
+#ifdef DEFEND2_TRACE
+										if( _ylerp_tick == 1 )
+										{
+											extern void boot_log(const char *);
+											char _b[180];
+											snprintf(_b, sizeof(_b),
+											         "[ylerp] SKIP drone-to-WAIT XZ=%.0f > 200 (TNode=%d, drone=%.0f,%.0f,%.0f, wait=%.0f,%.0f,%.0f)",
+											         sqrtf(dx*dx + dz*dz), _tnode_idx,
+											         drone->Object.Pos.x, drone->Object.Pos.y, drone->Object.Pos.z,
+											         wait_node->Pos.x, wait_node->Pos.y, wait_node->Pos.z);
+											boot_log(_b);
+										}
+#endif
+										continue;
+									}
 									/* Lerp drone Y from wait node Y to next node Y */
 									{
-										NODE * wait_node = (NODE*)drone->TNode;
-										NODE * upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
+										upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
 										if( upper_node )
 										{
 											float progress = Object->Time / Object->OverallTime;
 											if( progress > 1.0F ) progress = 1.0F;
 											drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
+#ifdef DEFEND2_TRACE
+											_passed = true;
+											if( _ylerp_tick == 1 )
+											{
+												extern void boot_log(const char *);
+												char _b[180];
+												snprintf(_b, sizeof(_b),
+												         "[ylerp] PASS TNode=%d progress=%.2f Y: %.0f -> %.0f",
+												         _tnode_idx, progress,
+												         wait_node->Pos.y, upper_node->Pos.y);
+												boot_log(_b);
+											}
+#endif
 										}
 									}
+#ifdef DEFEND2_TRACE
+									(void)_passed;
+#endif
 								}
+#ifdef DEFEND2_TRACE
+								if( _ylerp_tick >= 60 ) _ylerp_tick = 0;
+#endif
 							}
 #endif
 						}
@@ -1491,6 +1573,24 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 
 		Object->Type = Type;
 		Object->Group = Group;
+#ifdef EDITION_REMASTER
+		/* Tag CargoDrone lift BGOs by filename so the Y-lerp gate can
+		 * distinguish them from levers/doors/etc.  Filenames like
+		 * "data\levels\defend2\bgobjects\lift1.cob" — check the last
+		 * path component. */
+		Object->IsCargoDroneLift = false;
+		{
+			const char * fn = (const char *)Filename;
+			const char * base = fn;
+			const char * p;
+			for( p = fn; *p; p++ )
+			{
+				if( *p == '\\' || *p == '/' ) base = p + 1;
+			}
+			if( strncasecmp( base, "lift", 4 ) == 0 )
+				Object->IsCargoDroneLift = true;
+		}
+#endif
 		Object->StartPos = *Pos;
 		Object->Pos = *Pos;
 		Object->DirVector = *DirVector;
@@ -1657,6 +1757,19 @@ void StartBGOAnim( u_int16_t Index )
 	BGOBJECT * Object;
 
 	Object = &BGObjects[ Index ];
+
+#ifdef DEFEND2_TRACE
+	{
+		extern void boot_log(const char *);
+		char _b[160];
+		snprintf(_b, sizeof(_b),
+		         "[bgo]  StartBGOAnim idx=%u type=%d state=%d pos=(%.0f,%.0f,%.0f) grp=%u",
+		         (unsigned)Index, (int)Object->Type, (int)Object->State,
+		         Object->Pos.x, Object->Pos.y, Object->Pos.z,
+		         (unsigned)Object->Group);
+		boot_log(_b);
+	}
+#endif
 
 	switch( Object->Type )
 	{

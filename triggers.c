@@ -214,6 +214,29 @@ void ModifyTriggerVar( TRIGGERVAR * TrigVar , int Op , int Val )
 		TrigVar->Name, old_state, Op, Val, TrigVar->State );
 #endif
 
+#ifdef DEFEND2_TRACE
+	{
+		/* Focus on the defend2 CargoDrone trigger chain: any switch
+		 * (Lever<N> / Lever<N>Done), wait flag (Drone<N>Wait), or
+		 * lift-done flag (Lift<N>Done).  Drone<N> Set-to-2 fires the
+		 * post-lift node redirect, also worth logging. */
+		const char * n = TrigVar->Name;
+		bool _is_lever = (strncasecmp(n, "Lever", 5) == 0);
+		bool _is_wait  = (strncasecmp(n, "Drone", 5) == 0) && strstr(n, "Wait");
+		bool _is_done  = (strncasecmp(n, "Lift",  4) == 0) && strstr(n, "Done");
+		bool _is_drone = (strncasecmp(n, "Drone", 5) == 0) && !_is_wait;
+		if( _is_lever || _is_wait || _is_done || _is_drone )
+		{
+			extern void boot_log(const char *);
+			char _b[160];
+			snprintf(_b, sizeof(_b),
+			         "[trig] %s : %d -> %d (op=%d val=%d)",
+			         n, old_state, TrigVar->State, Op, Val);
+			boot_log(_b);
+		}
+	}
+#endif
+
 	for( i = 0 ; i < TrigVar->NumOfTriggers ; i++ )
 	{
 		Trig = TrigVar->Triggers[i];

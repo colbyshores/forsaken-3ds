@@ -135,6 +135,15 @@ typedef struct BGOBJECT {
 	int16_t		DoorSfxType;
 	u_int32_t		SoundFX_ID;
 
+#ifdef EDITION_REMASTER
+	/* Tagged at LoadBGObjectData when the filename matches "lift*.cob".
+	 * The defend2 CargoDrone Y-lerp gate uses this to distinguish lift
+	 * BGOs from lever/door BGOs that happen to be animating while the
+	 * drone is parked at a wait node.  Geometric gates don't suffice:
+	 * some lift BGOs are placed at world origin (0,0,0). */
+	bool		IsCargoDroneLift;
+#endif
+
 	struct	BGOBJECT	*	PrevUsed;
 	struct	BGOBJECT	*	NextUsed;
 	struct	BGOBJECT	*	PrevFree;
