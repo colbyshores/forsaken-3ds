@@ -56,6 +56,62 @@ visually.  Returning here after other priorities.
 
 ---
 
+## CargoDrone out-of-order final-switch routing — defend2
+
+**Level:** `defend2` (Remaster SP slot 5)
+
+**Symptom:** The 2nd-to-last switch is supposed to route the
+CargoDrone to the last lift.  If the player flips it in order
+(barrier lowered first via 3rd-to-last switch, then 2nd-to-last
+switch), the drone correctly diverts to the final lift.
+
+But if the player flips the 2nd-to-last switch FIRST and only THEN
+lowers the barrier (3rd-to-last switch), the drone ignores the
+diversion and continues looping its main path.
+
+**Expected:** 2nd-to-last switch should latch a "go to last lift"
+intent on the drone, applied whenever the drone next becomes free
+to move — regardless of whether the barrier was already down at
+flip time.
+
+**Hypothesis:** The 2nd-to-last switch's trigger fires
+`EnemySetTargetNode` (or `EnemySetNextTargetNode`) on the drone.
+If the drone is currently blocked by the 3rd-to-last barrier,
+its TNode/NextTNode state may already be locked to the looping
+path, and the redirect event has no effect because:
+- The redirect targets a node that's currently NOT a valid
+  successor of the drone's TNode (drone behind closed barrier).
+- OR the redirect is consumed/cleared before the barrier opens
+  and re-enables the drone's movement.
+- OR `aifollow.c`'s adjacency check in
+  `PickNewNodeNow` (for `Enemy->Type == ENEMY_CargoDrone &&
+  Enemy->NextTNode`) doesn't preserve the redirect across barrier
+  release.
+
+**Approach options:**
+
+1. Trace the trigger sequence for the 2nd-to-last switch via
+   `parse_trg.py` to see which TrigVars/TrigMods/Events fire and
+   in what order.  Cross-reference against `triggers.c`'s
+   `EVENT_EnemySetTargetNode` / `EVENT_EnemySetNextTargetNode`
+   implementations to see whether the redirect persists across
+   the barrier-still-closed state.
+
+2. In `aifollow.c::PickNewNodeNow`, the CargoDrone hop-by-hop
+   block already preserves `NextTNode` for the next adjacency
+   check.  But if a barrier-induced full stop clears the
+   redirect (or the redirect's target is unreachable until the
+   barrier opens), the state is lost.
+
+3. Reverse-engineer KEX Forsaken Remastered via Ghidra MCP — the
+   original game must handle this correctly; check the switch's
+   linked-trigger expansion for any "pending intent" pattern.
+
+**Status:** Deferred alongside barrier stop-position work.
+Player-recoverable (flip in order on retry).
+
+---
+
 ## Resolved (kept for history)
 
 ### CargoDrone off-track on switch ~10-11 lift — defend2 — RESOLVED
