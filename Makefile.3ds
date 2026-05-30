@@ -94,6 +94,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-Wno-implicit-function-declaration \
 	-Wno-implicit-int -Wno-int-conversion \
 	-ffunction-sections -fdata-sections -fcommon \
+	-fno-math-errno \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
 	-DBSP \

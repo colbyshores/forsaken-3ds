@@ -29,7 +29,20 @@ typedef DWORD COLOR; // bgra
 extern void  trig_table_init(void);
 extern float fast_sinf(float rad);
 extern float fast_cosf(float rad);
-extern float fast_invsqrtf(float x);
+
+/* Inverse square root.  On the 3DS ARM1176 (VFPv2) the classic Quake III
+ * bit-hack is a PESSIMISATION: it forces two int<->VFP register transfers
+ * (vmov r,s then vmov s,r) per call, each a serialising crossing of the
+ * decoupled VFP11 pipeline, and only reaches ~0.17% accuracy.  VFPv2 has a
+ * hardware vsqrt.f32, so the exact form below is both faster (stays
+ * VFP-side, no crossing) and accurate.  Declared static inline so it folds
+ * into the caller: at the call sites the argument is a guarded sum of
+ * squares, which lets GCC prove x > 0 and drop the sqrt errno branch,
+ * leaving a bare vsqrt.f32 + vdiv.f32.
+ *
+ * NOTE: VFPv2 has NO NEON, so the reciprocal-estimate instructions
+ * VRSQRTE / VRECPE are unavailable on this CPU — do not reach for them. */
+static inline float fast_invsqrtf(float x) { return 1.0f / sqrtf( x ); }
 
 #define	SINR(x)				fast_sinf( x )
 #define	COSR(x)				fast_cosf( x )
