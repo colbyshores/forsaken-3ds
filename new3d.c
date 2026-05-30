@@ -46,20 +46,11 @@ float fast_cosf(float rad)
 	return fast_sinf(rad + 1.5707963267948966f); /* rad + PI/2 */
 }
 
-/*===================================================================
-	Fast inverse square root (Quake III method + one Newton-Raphson
-	iteration).  Max relative error ~0.17% — sufficient for vector
-	normalization where the result is multiplied into geometry.
-===================================================================*/
-float fast_invsqrtf(float x)
-{
-	float xhalf = 0.5f * x;
-	union { float f; u_int32_t i; } conv;
-	conv.f = x;
-	conv.i = 0x5f3759df - (conv.i >> 1);      /* initial guess */
-	conv.f = conv.f * (1.5f - xhalf * conv.f * conv.f); /* Newton-Raphson */
-	return conv.f;
-}
+/* fast_invsqrtf moved to new3d.h as a static inline wrapping the VFPv2
+ * hardware vsqrt.f32 (1.0f/sqrtf).  The Quake III bit-hack that used to
+ * live here forced int<->VFP register crossings that stall the ARM1176
+ * VFP11 pipeline; the hardware path is both faster and exact.  See the
+ * comment on the declaration in new3d.h. */
 
 /*===================================================================
 	Globals
@@ -504,19 +495,16 @@ void NormaliseVector( VECTOR *  v )
 	if ( dot < 1e-14f )
 		return;
 
-	/* Use precise 1/sqrtf instead of fast_invsqrtf here. The ~0.175%
-	 * error from fisr leaves normalized vectors at length ~0.99825
-	 * rather than exactly 1. That's fine for most uses, but
-	 * QuatFrom2Vectors takes the cross product of two such vectors,
-	 * whose magnitude then sits at ~0.9965 instead of 1.0, and passes
-	 * the result to asinf() to recover the angle. asin is highly
-	 * sensitive near 1 — 0.35% magnitude error becomes ~5 degrees of
-	 * angle error. That manifests as every BG object's initial
-	 * orientation matrix being rotated ~5 degrees off: doors look
-	 * slightly crooked, and animated translations (train path)
-	 * accumulate a perpendicular offset proportional to path length.
-	 * The precision cost here is negligible — sqrtf is a handful of
-	 * extra cycles and NormaliseVector is not in a tight inner loop. */
+	/* dot is a guarded sum of squares, so GCC proves it > 0 and emits a
+	 * bare vsqrt.f32 + vdiv.f32 here (no errno branch, no register
+	 * crossing).  This is now identical to fast_invsqrtf (which is also
+	 * just 1.0f/sqrtf on VFPv2) — the old Quake III bit-hack that
+	 * fast_invsqrtf used to be was deliberately avoided at this site:
+	 * its ~0.175% error left vectors at length ~0.99825, and
+	 * QuatFrom2Vectors feeds the cross product of two such vectors into
+	 * asinf(), which is highly sensitive near 1 (a 0.35% magnitude error
+	 * became ~5 degrees of angle error -> crooked doors, drifting train
+	 * paths).  With the bit-hack retired that hazard is gone everywhere. */
 	inv = 1.0f / sqrtf( dot );
 	v->x *= inv;
 	v->y *= inv;
