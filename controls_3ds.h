@@ -16,20 +16,30 @@
 #include <stdbool.h>
 #include <3ds.h>
 
-/* The actions the engine cares about. Order matches the 10 slots
- * input_3ds.c writes into joy_button_state[0][N], so the index
- * doubles as the joy-button slot. */
+/* The actions the engine cares about. The index doubles as BOTH the
+ * joy-button slot input_3ds.c writes into joy_button_state[0][N] AND
+ * the engine joystick-button index config.c::DefaultJoystickSettings
+ * binds via AddButton( j, N, &u->... ). Those two MUST stay in lockstep
+ * — a mismatch is exactly the "Next Weapon actually does Thrust Forward"
+ * class of bug. Slots 2/3 are thrust (not weapon switch); real weapon
+ * switching lives on slots 10-13 and on the D-pad POV (see config.c). */
 typedef enum {
-	CTRL_FIRE_PRIMARY = 0,    /* slot 0 */
-	CTRL_FIRE_SECONDARY,      /* slot 1 */
-	CTRL_NEXT_WEAPON,         /* slot 2 */
-	CTRL_PREV_WEAPON,         /* slot 3 */
-	CTRL_STRAFE_LEFT,         /* slot 4 */
-	CTRL_STRAFE_RIGHT,        /* slot 5 */
-	CTRL_MENU,                /* slot 6 */
-	CTRL_REAR_VIEW,           /* slot 7 */
-	CTRL_NITRO,               /* slot 8 */
-	CTRL_DROP_MINE,           /* slot 9 */
+	CTRL_FIRE_PRIMARY = 0,    /* slot 0  -> fire primary    */
+	CTRL_FIRE_SECONDARY,      /* slot 1  -> fire secondary  */
+	CTRL_MOVE_FORWARD,        /* slot 2  -> thrust forward  */
+	CTRL_MOVE_BACK,           /* slot 3  -> thrust back     */
+	CTRL_STRAFE_LEFT,         /* slot 4  -> strafe left     */
+	CTRL_STRAFE_RIGHT,        /* slot 5  -> strafe right    */
+	CTRL_HEADLIGHTS,          /* slot 6  -> headlights      */
+	CTRL_REAR_VIEW,           /* slot 7  -> rear view       */
+	CTRL_NITRO,               /* slot 8  -> turbo / nitro   */
+	CTRL_DROP_MINE,           /* slot 9  -> drop mine       */
+	CTRL_NEXT_PRIMARY,        /* slot 10 -> next primary    */
+	CTRL_PREV_PRIMARY,        /* slot 11 -> prev primary    */
+	CTRL_NEXT_SECONDARY,      /* slot 12 -> next secondary  */
+	CTRL_PREV_SECONDARY,      /* slot 13 -> prev secondary  */
+	CTRL_SLIDE_UP,            /* slot 14 -> slide up        */
+	CTRL_SLIDE_DOWN,          /* slot 15 -> slide down      */
 	CTRL_NUM_ACTIONS
 } controls_action_t;
 
@@ -56,6 +66,10 @@ void controls_3ds_init(bool is_n3ds);
 
 /* Save current bindings to sdmc:/3ds/forsaken/controls.cfg. */
 void controls_3ds_save(void);
+
+/* Restore the platform-default bindings (OG vs N3DS aware). Used by the
+ * rebind menu's "Reset to Default" row. Does not save on its own. */
+void controls_3ds_reset_defaults(void);
 
 /* Get current KEY_* mask for an action. 0 if unbound. */
 u32  controls_3ds_button(controls_action_t action);

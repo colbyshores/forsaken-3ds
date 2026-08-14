@@ -382,6 +382,26 @@ sound_buffer_t *sound_load(char *path)
 		return NULL;
 	}
 
+	/* WAV 8-bit PCM is UNSIGNED (silence = 128), but ndsp's
+	 * NDSP_FORMAT_*_PCM8 decodes SIGNED 8-bit (silence = 0). Feeding the
+	 * unsigned bytes straight to the DSP puts a half-scale DC offset on
+	 * every sample and splits the waveform around the silence level, which
+	 * reads as loud garble. This bites ~70% of Forsaken's sound set — every
+	 * biker taunt and the bike-computer / pickup announcer voice (e.g.
+	 * BRE = Brenda) are 8-bit, which is exactly what sounded broken.
+	 * Convert unsigned -> signed in place by flipping the sign bit
+	 * (0..255 -> -128..127, silence 128 -> 0); correct for interleaved
+	 * stereo too since each byte is one sample. 16-bit WAV is already
+	 * signed and matches PCM16, so it is left untouched. */
+	if (buffer->bits == 8 && buffer->data)
+	{
+		u_int8_t *p = (u_int8_t *)buffer->data;
+		u_int32_t k;
+		for (k = 0; k < buffer->size; k++)
+			p[k] ^= 0x80u;
+		DSP_FlushDataCache(buffer->data, buffer->size);
+	}
+
 	DebugPrintf("sound_load: loaded %s (%u Hz, %d ch, %d bit, %u bytes)\n",
 		file_path, buffer->sample_rate, buffer->channels,
 		buffer->bits, buffer->size);

@@ -1762,6 +1762,10 @@ extern bool g_show_stereo_debug;
  * Saved as ObjectShine / WallDetail in Configs/main.txt. */
 extern bool g_object_shine;
 extern bool g_wall_detail;
+/* Declared in oct2.c. Flips the stereoscopic per-eye parallax sign so the
+ * 3D reads as receding depth vs. popping out of the screen. Saved as
+ * Invert3D in Configs/main.txt. */
+extern bool g_stereo_invert;
 #endif
 
 MENU	MENU_NEW_Visuals = {
@@ -1789,7 +1793,8 @@ MENU	MENU_NEW_3DS_Visuals = {
 		{ 20,  40, 150,  40, 0, "Object shine",			FONT_Small, TEXTFLAG_CentreY, &g_object_shine,      NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
 		{ 20,  56, 150,  56, 0, "Wall detail",			FONT_Small, TEXTFLAG_CentreY, &g_wall_detail,       NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
 		{ 20,  72, 150,  72, 0, "Show stereo debug",	FONT_Small, TEXTFLAG_CentreY, &g_show_stereo_debug, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20, 100, 100, 100, 0, "back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
+		{ 20,  88, 150,  88, 0, "Invert 3D depth",		FONT_Small, TEXTFLAG_CentreY, &g_stereo_invert,     NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20, 104, 100, 104, 0, "back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
 		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -2947,6 +2952,7 @@ MENU	MENU_3DS_Visuals = {
 		{ 200, 128 + ( 0*16 ), 0, 0, 0, "Object shine",      0, 0, &g_object_shine,      NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 128 + ( 1*16 ), 0, 0, 0, "Wall detail",       0, 0, &g_wall_detail,       NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 128 + ( 2*16 ), 0, 0, 0, "Show stereo debug", 0, 0, &g_show_stereo_debug, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 3*16 ), 0, 0, 0, "Invert 3D depth",   0, 0, &g_stereo_invert,     NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
@@ -9538,6 +9544,7 @@ void GetGamePrefs( void )
 	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
 	g_object_shine      = config_get_bool( "ObjectShine",     true );
 	g_wall_detail       = config_get_bool( "WallDetail",      true );
+	g_stereo_invert     = config_get_bool( "Invert3D",        false );
 #endif
 
 	// Stereo options
@@ -9670,6 +9677,7 @@ void SetGamePrefs( void )
 	config_set_bool( "ShowStereoDebug", g_show_stereo_debug );
 	config_set_bool( "ObjectShine",     g_object_shine );
 	config_set_bool( "WallDetail",      g_wall_detail );
+	config_set_bool( "Invert3D",        g_stereo_invert );
 #endif
 
 	config_save();

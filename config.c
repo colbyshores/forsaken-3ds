@@ -1262,22 +1262,42 @@ void DefaultJoystickSettings( USERCONFIG *u )
 				JoystickInfo[ j ].Axis[ AXIS_YAxis ].action = SHIPACTION_RotateUp;
 			}
 #ifdef __3DS__
-			/* 3DS / Xbox controller layout:
-			 *  0=A fire_primary  1=B fire_secondary
-			 *  2=X forward       3=Y backward
-			 *  4=L strafe_left   5=R strafe_right
-			 *  7=Select rear_view  8=ZL turbo  9=ZR drop_mine
-			 * Circle pad = camera (axis 0/1 → yaw/pitch, set above)
-			 * D-pad (hat 0) = weapon selection */
-			AddButton( j, 0, &u->fire_primary );
-			AddButton( j, 1, &u->fire_secondary );
-			AddButton( j, 2, &u->move_forward );
-			AddButton( j, 3, &u->move_backward );
-			AddButton( j, 4, &u->move_left );
-			AddButton( j, 5, &u->move_right );
-			AddButton( j, 7, &u->full_rear_view );
-			AddButton( j, 8, &u->turbo );
-			AddButton( j, 9, &u->fire_mine );
+			/* 3DS button layout. The button INDEX here MUST match the
+			 * controls_action_t slot in controls_3ds.h that input_3ds.c
+			 * writes into joy_button_state[0][index] — a mismatch is the
+			 * "Next Weapon actually does Thrust Forward" bug:
+			 *  0=A  fire_primary    1=B  fire_secondary
+			 *  2=X  thrust_forward  3=Y  thrust_back
+			 *  4=L  strafe_left     5=R  strafe_right
+			 *  6    headlights(opt) 7=Select rear_view
+			 *  8=ZL turbo/nitro     9=ZR drop_mine
+			 *  10-13 weapon switch (next/prev primary/secondary)
+			 *  14-15 slide up/down
+			 * Circle pad = camera (axis 0/1 → yaw/pitch, set above).
+			 * The D-pad (POV hat 0) is the DEFAULT weapon-switch + slide
+			 * scheme (L/R = prev/next primary, U/D = slide down/up); the
+			 * 10-15 face-button binds default unbound in controls_3ds.c
+			 * and are opt-in. */
+			AddButton( j, 0,  &u->fire_primary );
+			AddButton( j, 1,  &u->fire_secondary );
+			AddButton( j, 2,  &u->move_forward );
+			AddButton( j, 3,  &u->move_backward );
+			AddButton( j, 4,  &u->move_left );
+			AddButton( j, 5,  &u->move_right );
+			AddButton( j, 6,  &u->headlights );
+			AddButton( j, 7,  &u->full_rear_view );
+			AddButton( j, 8,  &u->turbo );
+			AddButton( j, 9,  &u->fire_mine );
+			AddButton( j, 10, &u->select_next_primary );
+			AddButton( j, 11, &u->select_prev_primary );
+			AddButton( j, 12, &u->select_next_secondary );
+			AddButton( j, 13, &u->select_prev_secondary );
+			AddButton( j, 14, &u->move_up );    /* slide up   */
+			AddButton( j, 15, &u->move_down );  /* slide down */
+			/* D-pad up/down = slide up/down (left/right weapon-switch is
+			 * bound below, shared with the PC path). */
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_UP]   = SHIPACTION_SlideUp;
+			JoystickInfo[ j ].POV[0].action[JOY_HAT_DOWN] = SHIPACTION_SlideDown;
 #else
 			/* Xbox controller (SDL 1.2 xpad):
 			 *  0=A fire_primary  1=B fire_secondary

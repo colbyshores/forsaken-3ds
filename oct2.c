@@ -4669,6 +4669,14 @@ void CheckLevelEnd ( void )
 }
 
 
+/* "Invert 3D depth" toggle (3DS crate menu Options -> 3DS Visual Settings,
+ * persisted as Invert3D in Configs/main.txt). Flips the sign of the per-eye
+ * parallax offset below, swapping pop-out vs. recede-into-depth without
+ * touching the eye->panel (GFX_LEFT/RIGHT) mapping. Default false = the
+ * shipped behaviour. Defined here (always compiled) so the flip works for
+ * every stereo mode; the toggle UI is citro3d-only. */
+bool g_stereo_invert = false;
+
 bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 {
 #ifdef __3DS__
@@ -4695,6 +4703,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
          * Do NOT use ApplyMatrix — it adds _41/_42/_43 (world translation). */
         {
                 float half_sep = render_info.stereo_eye_sep / 2.0f;
+                if (g_stereo_invert) half_sep = -half_sep;  /* pop-out <-> depth */
                 cam_offset.x = CurrentCamera.Mat._11 * half_sep;
                 cam_offset.y = CurrentCamera.Mat._12 * half_sep;
                 cam_offset.z = CurrentCamera.Mat._13 * half_sep;

@@ -17,6 +17,7 @@
 #define CFG_PATH "sdmc:/3ds/forsaken/controls.cfg"
 
 static controls_3ds_t s_controls;
+static bool s_defaults_is_n3ds = false;  /* platform captured at init, for Reset to Default */
 
 /* Catalog of buttons the user can bind, in the order shown by the
  * rebind menu. Each entry pairs a stable name (used in the cfg
@@ -61,39 +62,57 @@ static u32 button_mask_from_name(const char *name)
 static const char * const k_action_names[CTRL_NUM_ACTIONS] = {
 	"fire_primary",
 	"fire_secondary",
-	"next_weapon",
-	"prev_weapon",
+	"move_forward",
+	"move_backward",
 	"strafe_left",
 	"strafe_right",
-	"menu",
+	"headlights",
 	"rear_view",
 	"nitro",
 	"drop_mine",
+	"next_primary",
+	"prev_primary",
+	"next_secondary",
+	"prev_secondary",
+	"slide_up",
+	"slide_down",
 };
 
 /* Human-readable labels used by the rebind menu. */
 static const char * const k_action_labels[CTRL_NUM_ACTIONS] = {
 	"Fire Primary",
 	"Fire Secondary",
-	"Next Weapon",
-	"Prev Weapon",
+	"Thrust Forward",
+	"Thrust Back",
 	"Strafe Left",
 	"Strafe Right",
-	"Pause Menu",
+	"Headlights",
 	"Rear View",
 	"Nitro / Turbo",
 	"Drop Mine",
+	"Next Weapon",
+	"Prev Weapon",
+	"Next Special",
+	"Prev Special",
+	"Slide Up",
+	"Slide Down",
 };
 
 static void apply_defaults(bool is_n3ds)
 {
+	/* Clear every slot first so the weapon-switch (10-13), slide (14-15)
+	 * and optional Headlights (6) rows default to unbound. */
+	memset(s_controls.button, 0, sizeof(s_controls.button));
+
 	s_controls.button[CTRL_FIRE_PRIMARY]   = KEY_A;
 	s_controls.button[CTRL_FIRE_SECONDARY] = KEY_B;
-	s_controls.button[CTRL_NEXT_WEAPON]    = KEY_X;
-	s_controls.button[CTRL_PREV_WEAPON]    = KEY_Y;
+	s_controls.button[CTRL_MOVE_FORWARD]   = KEY_X;
+	s_controls.button[CTRL_MOVE_BACK]      = KEY_Y;
 	s_controls.button[CTRL_STRAFE_LEFT]    = KEY_L;
 	s_controls.button[CTRL_STRAFE_RIGHT]   = KEY_R;
-	s_controls.button[CTRL_MENU]           = KEY_START;
+	/* Headlights (slot 6) unbound by default — START always opens the
+	 * pause menu via the engine's own ESCAPE path, independent of any
+	 * joystick binding, so this slot is a free optional bind. */
 	if (is_n3ds) {
 		s_controls.button[CTRL_REAR_VIEW]  = KEY_SELECT;
 		s_controls.button[CTRL_NITRO]      = KEY_ZL;
@@ -105,6 +124,11 @@ static void apply_defaults(bool is_n3ds)
 		s_controls.button[CTRL_NITRO]      = KEY_SELECT;
 		s_controls.button[CTRL_DROP_MINE]  = 0;
 	}
+	/* Weapon-switch (Next/Prev Primary+Special) and Slide Up/Down are
+	 * unbound by default: the D-pad already drives them through the POV
+	 * hat (config.c binds POV left/right = prev/next primary, up/down =
+	 * slide down/up). These rows let the player additionally map them to
+	 * face buttons. */
 
 	/* C-stick defaults: drive engine axes 2 (yaw) and 3 (pitch),
 	 * non-inverted. Matches the historical behaviour before the
@@ -153,6 +177,7 @@ void controls_3ds_init(bool is_n3ds)
 	FILE *f;
 	char line[128];
 
+	s_defaults_is_n3ds = is_n3ds;
 	apply_defaults(is_n3ds);
 
 	f = fopen(CFG_PATH, "r");
@@ -182,6 +207,11 @@ void controls_3ds_save(void)
 	fclose(f);
 }
 
+void controls_3ds_reset_defaults(void)
+{
+	apply_defaults(s_defaults_is_n3ds);
+}
+
 u32 controls_3ds_button(controls_action_t action)
 {
 	if ((unsigned)action >= CTRL_NUM_ACTIONS) return 0;
@@ -192,9 +222,6 @@ int controls_3ds_cstick_axis_x(void)   { return s_controls.cstick_axis_x; }
 int controls_3ds_cstick_axis_y(void)   { return s_controls.cstick_axis_y; }
 int controls_3ds_cstick_invert_x(void) { return s_controls.cstick_invert_x; }
 int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
-
-#define MENU_ITEMS (CTRL_NUM_ACTIONS + 4 + 2)
-/* layout: 10 actions + 4 c-stick rows + "Save & Exit" + "Cancel" */
 
 /*===================================================================
 	Hooked menu — replaces the old modal loop.
@@ -218,9 +245,10 @@ int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
  * On Save & Exit we also persist via write_config so the value
  * survives across sessions. */
 #define ROW_AIM_ASSIST    (CTRL_NUM_ACTIONS + 0)
-#define ROW_SAVE          (CTRL_NUM_ACTIONS + 1)
-#define ROW_CANCEL        (CTRL_NUM_ACTIONS + 2)
-#define MENU_ROWS         (CTRL_NUM_ACTIONS + 3)
+#define ROW_RESET         (CTRL_NUM_ACTIONS + 1)
+#define ROW_SAVE          (CTRL_NUM_ACTIONS + 2)
+#define ROW_CANCEL        (CTRL_NUM_ACTIONS + 3)
+#define MENU_ROWS         (CTRL_NUM_ACTIONS + 4)
 
 /* Bridge to USERCONFIG so the aim-assist row reads/writes the same
  * value the engine uses at runtime. write_config persists it to the
@@ -298,6 +326,8 @@ void controls_3ds_render_overlay(void)
 		y += 10;
 	}
 
+	Print4x5Text((s_selected == ROW_RESET)  ? "> [RESET TO DEFAULT]" : "  [RESET TO DEFAULT]",
+	             8, y, (s_selected == ROW_RESET) ? FG_HL : FG); y += 10;
 	Print4x5Text((s_selected == ROW_SAVE)   ? "> [SAVE & EXIT]" : "  [SAVE & EXIT]",
 	             8, y, (s_selected == ROW_SAVE) ? FG_HL : FG); y += 10;
 	Print4x5Text((s_selected == ROW_CANCEL) ? "> [CANCEL]"      : "  [CANCEL]",
@@ -338,6 +368,10 @@ bool controls_3ds_handle_input(u32 kDown, u32 kHeld)
 	} else if (kDown & KEY_A) {
 		if (s_selected < CTRL_NUM_ACTIONS) {
 			s_rebinding = true;
+		} else if (s_selected == ROW_RESET) {
+			/* Restore platform defaults; stay in the menu so the
+			 * change is visible. Persists only on Save & Exit. */
+			controls_3ds_reset_defaults();
 		} else if (s_selected == ROW_SAVE) {
 			controls_3ds_save();
 			if (player_config) write_config(player_config, biker_config);
