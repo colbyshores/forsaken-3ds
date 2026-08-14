@@ -25,10 +25,63 @@ typedef DWORD COLOR; // bgra
 #define	D2R(x)				( ( x ) * ( 1.0F / 57.2957F) )		/* Nick Pelling changed */
 #define	R2D(x)				( ( x ) * 57.2957F )
 
-/* Fast sin/cos via 4096-entry LUT with linear interpolation */
+/*===================================================================
+	Fast sin/cos via a 1024-entry LUT with linear interpolation.
+	Table is built once by trig_table_init() (new3d.c, called from
+	main.c); max error vs sinf() is < 4.7e-6.  4 KB fits in the
+	ARM11's 16 KB L1D.
+
+	Both accessors are static inline for the same reason
+	fast_invsqrtf below is: they are a handful of VFP ops, and the
+	~127 SINR/COSR/SIND/COSD call sites should not each pay a
+	non-leaf `bl fast_sinf` (plus its register spills) to reach them.
+
+	★ The range reduction deliberately does NOT use floorf().  VFPv2
+	has no float-floor instruction, so floorf() — and __builtin_floorf,
+	which looks like it must be free — compiles to a real `bl floorf`
+	into newlib.  That turns this "lookup" into a non-leaf function
+	wrapping a libm call, forces callers to spill VFP registers around
+	it (vpush {d8}), and drags in newlib's VFP->ARM flag transfers
+	(vmov + vcmpe / vmrs APSR_nzcv, fpscr) which stall the ARM1176
+	pipeline — i.e. the "optimisation" can cost more than the sinf() it
+	replaced.  -fno-math-errno does not help; there is simply no VFPv2
+	instruction to emit.
+
+	Instead: truncate with a (int) cast and correct toward -inf by
+	hand.  `i &= TRIG_TABLE_MASK` then does the modulo wrap for free
+	in two's complement (-1 & 1023 == 1023), so no explicit
+	range-reduction step is needed at all.  This is exact, not an
+	approximation — it selects the same table index and the same
+	fraction as the floorf form.
+
+	DOMAIN: (int)idx is undefined once |rad * TRIG_SCALE| >= 2^31,
+	i.e. |rad| >= ~1.3e7 radians.  Every caller here feeds either a
+	bounded angle or a per-object/per-frame accumulator, none of which
+	approach that; if a future caller passes an unbounded time-derived
+	phase, wrap it before the call rather than adding a branch here.
+===================================================================*/
+
+#define TRIG_TABLE_SIZE  1024
+#define TRIG_TABLE_MASK  (TRIG_TABLE_SIZE - 1)
+#define TRIG_SCALE       (TRIG_TABLE_SIZE / (2.0f * 3.14159265358979323846f))
+
 extern void  trig_table_init(void);
-extern float fast_sinf(float rad);
-extern float fast_cosf(float rad);
+extern float fast_sin_table[TRIG_TABLE_SIZE + 1]; /* +1 for the interpolation boundary */
+
+static inline float fast_sinf(float rad)
+{
+	const float idx = rad * TRIG_SCALE;
+	int   i = (int)idx;               /* truncates toward zero */
+	float f = idx - (float)i;
+	if (f < 0.0f) { --i; f += 1.0f; } /* -> floor(idx), fraction back into [0,1) */
+	i &= TRIG_TABLE_MASK;             /* two's complement modulo wrap */
+	return fast_sin_table[i] + (fast_sin_table[i + 1] - fast_sin_table[i]) * f;
+}
+
+static inline float fast_cosf(float rad)
+{
+	return fast_sinf(rad + 1.5707963267948966f); /* rad + PI/2 */
+}
 
 /* Inverse square root.  On the 3DS ARM1176 (VFPv2) the classic Quake III
  * bit-hack is a PESSIMISATION: it forces two int<->VFP register transfers

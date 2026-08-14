@@ -11,39 +11,21 @@
 	Sin/Cos lookup table — 1024 entries covering [0, 2*PI)
 	Linear interpolation gives < 4.7e-6 max error vs sinf().
 	4KB footprint fits in L1 cache (ARM11 has 16KB L1D).
+
+	Only the table storage and its one-shot builder live here; the
+	fast_sinf / fast_cosf accessors are static inline in new3d.h so
+	the call sites don't pay an out-of-line call.  See the comment
+	block there for why the range reduction must not use floorf() on
+	VFPv2.
 ===================================================================*/
 
-#define TRIG_TABLE_SIZE  1024
-#define TRIG_TABLE_MASK  (TRIG_TABLE_SIZE - 1)
-#define TRIG_SCALE       (TRIG_TABLE_SIZE / (2.0f * 3.14159265358979323846f))
-
-static float _sin_table[TRIG_TABLE_SIZE + 1]; /* +1 for interpolation at boundary */
+float fast_sin_table[TRIG_TABLE_SIZE + 1]; /* +1 for interpolation at boundary */
 
 void trig_table_init(void)
 {
 	int i;
 	for (i = 0; i <= TRIG_TABLE_SIZE; i++)
-		_sin_table[i] = sinf((float)i * (2.0f * 3.14159265358979323846f / TRIG_TABLE_SIZE));
-}
-
-float fast_sinf(float rad)
-{
-	float idx = rad * TRIG_SCALE;
-	int i;
-	float f;
-
-	/* Normalize to [0, TRIG_TABLE_SIZE) */
-	idx = idx - floorf(idx / TRIG_TABLE_SIZE) * TRIG_TABLE_SIZE;
-	i = (int)idx;
-	f = idx - i;
-	i &= TRIG_TABLE_MASK;
-
-	return _sin_table[i] + (_sin_table[i + 1] - _sin_table[i]) * f;
-}
-
-float fast_cosf(float rad)
-{
-	return fast_sinf(rad + 1.5707963267948966f); /* rad + PI/2 */
+		fast_sin_table[i] = sinf((float)i * (2.0f * 3.14159265358979323846f / TRIG_TABLE_SIZE));
 }
 
 /* fast_invsqrtf moved to new3d.h as a static inline wrapping the VFPv2
