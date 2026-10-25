@@ -357,6 +357,7 @@ void QuatFromVector( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Calculate ANGLE between TARGET and LOOK vectors
 ===================================================================*/
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	angle = (float) ( acosf( Tv->z ) / 2 );
 
 /*===================================================================
@@ -397,6 +398,7 @@ void QuatFromVector2( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Calculate ANGLE between TARGET and LOOK vectors
 ===================================================================*/
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	angle = (float) ( acosf( -Tv->z ) / 2 );
 
 /*===================================================================

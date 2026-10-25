@@ -338,9 +338,11 @@ static float TurnOnPoint( RT_LIGHT *light, PULSETYPE type )
 		t = light->intensity;
 		break;
 	case PULSE_HALFWAVE:
+		/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 		t = (float) asinf( light->intensity ) / HALF_PI;
 		break;
 	case PULSE_WAVE:
+		/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 		t = ( (float) asinf( light->intensity ) + HALF_PI ) / PI;
 		break;
 	}
@@ -362,9 +364,11 @@ static float TurnOffPoint( RT_LIGHT *light, PULSETYPE type )
 		t = 1.0F - light->intensity;
 		break;
 	case PULSE_HALFWAVE:
+		/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 		t = ( HALF_PI - (float) asinf( light->intensity ) ) / HALF_PI;
 		break;
 	case PULSE_WAVE:
+		/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 		t = ( HALF_PI - (float) asinf( light->intensity ) ) / PI;
 		break;
 	}

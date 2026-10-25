@@ -677,6 +677,7 @@ void DoLensflareEffect( void )
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					else if ( Cos > 1.0F ) Cos = 1.0F;
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+					/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 					Angle = (float) R2D( acosf( Cos ) );
 					
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -685,7 +686,7 @@ void DoLensflareEffect( void )
 					Cos2 = DotProduct( &TempVector, &TempVector2 );
 					if( Cos2 < -1.0F ) Cos2 = -1.0F;
 					else if ( Cos2 > 1.0F ) Cos2 = 1.0F;
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+					/* @vfp-exempt R3,R6 — angle clamp + acosf: inverse trig has no LUT form and the clamp compare is gameplay-facing; integerizing changes output. measured n/a. Verified 2026-10-25. */
 					Angle2 = (float) R2D( acosf( Cos2 ) );
 					
 					if( DistToShip < CUTOFF ) DistFactor = 1.0F;
@@ -1063,6 +1064,7 @@ void SecBullLensflare( u_int16_t i )
 	Cos = DotProduct( &TempVector, &TempVector2 );
 	if( Cos < -1.0F ) Cos = -1.0F;
 	else if ( Cos > 1.0F ) Cos = 1.0F;
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	Angle = (float) R2D( acosf( Cos ) );
 
 	ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &TempVector );
@@ -1070,6 +1072,7 @@ void SecBullLensflare( u_int16_t i )
 	Cos2 = DotProduct( &TempVector, &TempVector2 );
 	if( Cos2 < -1.0F ) Cos2 = -1.0F;
 	else if ( Cos2 > 1.0F ) Cos2 = 1.0F;
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	Angle2 = (float) R2D( acosf( Cos2 ) );
 
 	if( DistToBull < CUTOFF ) DistFactor = 1.0F;

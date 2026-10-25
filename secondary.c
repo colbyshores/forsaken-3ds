@@ -2379,6 +2379,7 @@ bool ProcessMines( u_int16_t i )
    	
 				if( Cos < -1.0F ) Cos = -1.0F;
 				else if ( Cos > 1.0F ) Cos = 1.0F;
+				/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 				Angle = (float) acosf( Cos );
 				if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * framelag ) / Angle );
 				else qlerp.time = 1.0F;
@@ -2930,6 +2931,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 				if( Cos < -1.0F ) Cos = -1.0F;
 				else if ( Cos > 1.0F ) Cos = 1.0F;
+   				/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
    				Angle = (float) acosf( Cos );
    				if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * NewFramelag ) / Angle ); //framelag ) / Angle );
    				else qlerp.time = 1.0F;

@@ -4012,6 +4012,7 @@ float ObjectAutoLevelRot( OBJECT * Object, float autolevel_rate )
 		cos_pitch = -1.0F;
 	else if ( cos_pitch > 1.0F )
 		cos_pitch = 1.0F;
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	pitch = (float) acosf( cos_pitch );
 	if ( pitch < MIN_AUTOLEVEL_PITCH || pitch > MAX_AUTOLEVEL_PITCH )
 	{
@@ -4025,6 +4026,7 @@ float ObjectAutoLevelRot( OBJECT * Object, float autolevel_rate )
 		cos_roll = -1.0F;
 	else if ( cos_roll > 1.0F )
 		cos_roll = 1.0F;
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	roll = (float) acosf( cos_roll );
 	autolevel = ( R2D( roll ) - 90.0F );
 	rot = autolevel_rate * autolevel;

@@ -249,6 +249,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 		float cos_now = vec_dot( bullet_dir, &target_dir );
 		if( cos_now > 1.0F ) cos_now = 1.0F;
 		if( cos_now < -1.0F ) cos_now = -1.0F;
+		/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 		angle_rad = acosf( cos_now );
 	}
 

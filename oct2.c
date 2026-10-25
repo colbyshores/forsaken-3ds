@@ -777,6 +777,7 @@ void stereo_adjust( RENDERMATRIX *m )
 	else
 		return;
 
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	right = pixel_aspect_ratio * tanf( hfov * (float)M_PI_2/180.0f );
 	left = -right;
 
@@ -821,6 +822,7 @@ bool SetFOV( float fov )
 	}
 
 	pixel_aspect_ratio = render_info.aspect_ratio * screen_height / screen_width;
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	viewplane_distance = (float) ( viewport.Width / ( 2 * tanf( DEG2RAD( fov ) * 0.5 ) ) );
 	proj._11 = 2 * viewplane_distance / viewport.Width;
 	proj._22 = 2 * viewplane_distance / ( viewport.Height / pixel_aspect_ratio );

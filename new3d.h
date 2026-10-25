@@ -129,6 +129,7 @@ static inline float fast_ceilf(float x)
 #define	COSR(x)				fast_cosf( x )
 #define	SIND(x)				fast_sinf( D2R( x ) )
 #define	COSD(x)				fast_cosf( D2R( x ) )
+/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 #define ATAND(y, x)			R2D( atan2f(y, x) )
 #define FMOD( NUM, DIV )	( (NUM) - (DIV) * fast_floorf( (NUM) / (DIV) ) )
 #define FDIV( NUM, DIV )	( (DIV) * fast_floorf( (NUM) / (DIV) ) )

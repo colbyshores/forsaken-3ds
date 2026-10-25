@@ -6856,6 +6856,7 @@ void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * IntPos2, u_int1
 			TempVector2.z = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 			NormaliseVector( &TempVector2 );
 		
+			/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 			Angle = (float) acosf( DotProduct( &TempVector, &TempVector2 ) );
 			if( Angle ) Time = D2R( ( 2.0F / Angle ) );
 			else Time = 1.0F;
@@ -8665,6 +8666,7 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 				TempVector2.z = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 				NormaliseVector( &TempVector2 );
 			
+				/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 				Angle = (float) acosf( DotProduct( &TempVector, &TempVector2 ) );
 				if( Angle ) Time = D2R( ( 2.0F / Angle ) );
 				else Time = 1.0F;

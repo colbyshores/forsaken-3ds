@@ -249,6 +249,7 @@ void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 	ApplyMatrix( InvMat, &WantedDir, &TempDir );			/* Calc Direction Vector */
 
 	NormaliseVector( &TempDir );
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	Angle = (float) acosf( TempDir.x );
 	Angle = 90.0F - R2D( Angle );
 	if( TempDir.z < 0.0F )
@@ -269,6 +270,7 @@ void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 		AimData.Flags |= AI_CONTROL_TURNLEFT;
 	}
 	
+	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	Angle = (float) acosf( TempDir.y );
 	Angle = 90.0F - R2D( Angle );
 	Angle *= -1.0F;

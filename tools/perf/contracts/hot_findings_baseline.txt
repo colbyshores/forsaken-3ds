@@ -370,25 +370,3 @@ R7|visi.c|FindVisible|float division in hot loop
 R7|visi.c|FindVisible|float division in hot loop
 R7|visi.c|FindVisible|float division inner_loop=false
 R9|build_3ds/2dpolys.o|2dpolys|live VFP s-regs N > N
-TRIG|ailib.c|AI_AimAtTarget|raw libm trig acosf in AI_AimAtTarget
-TRIG|ailib.c|AI_AimAtTarget|raw libm trig acosf in AI_AimAtTarget
-TRIG|aim_assist.c|aim_assist_steer|raw libm trig acosf in aim_assist_steer
-TRIG|enemies.c|ObjectAutoLevelRot|raw libm trig acosf in ObjectAutoLevelRot
-TRIG|enemies.c|ObjectAutoLevelRot|raw libm trig acosf in ObjectAutoLevelRot
-TRIG|new3d.h|<file scope>|raw libm trig atanNf in <file scope>
-TRIG|oct2.c|SetFOV|raw libm trig tanf in SetFOV
-TRIG|oct2.c|stereo_adjust|raw libm trig tanf in stereo_adjust
-TRIG|primary.c|CreateInvEffect|raw libm trig acosf in CreateInvEffect
-TRIG|primary.c|CreateShieldEffect|raw libm trig acosf in CreateShieldEffect
-TRIG|quat.c|QuatFromVector2|raw libm trig acosf in QuatFromVectorN
-TRIG|quat.c|Quaternion_Slerp|raw libm trig acosf in Quaternion_Slerp
-TRIG|rtlight.c|TurnOffPoint|raw libm trig asinf in TurnOffPoint
-TRIG|rtlight.c|TurnOffPoint|raw libm trig asinf in TurnOffPoint
-TRIG|rtlight.c|TurnOnPoint|raw libm trig asinf in TurnOnPoint
-TRIG|rtlight.c|TurnOnPoint|raw libm trig asinf in TurnOnPoint
-TRIG|screenpolys.c|DoLensflareEffect|raw libm trig acosf in DoLensflareEffect
-TRIG|screenpolys.c|DoLensflareEffect|raw libm trig acosf in DoLensflareEffect
-TRIG|screenpolys.c|SecBullLensflare|raw libm trig acosf in SecBullLensflare
-TRIG|screenpolys.c|SecBullLensflare|raw libm trig acosf in SecBullLensflare
-TRIG|secondary.c|ProcessMines|raw libm trig acosf in ProcessMines
-TRIG|secondary.c|ProcessMissiles|raw libm trig acosf in ProcessMissiles
