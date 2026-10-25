@@ -40,7 +40,7 @@ bool perf_call_maingamerender(void)
 	return r;
 }
 
-#define PERF_BUCKETS 64
+#define PERF_BUCKETS 128   /* 8 ms each -> covers 0..1024 ms (frame mean ~154 ms) */
 
 typedef struct {
 	unsigned long count;
@@ -52,6 +52,19 @@ static perf_acc g_stage[PERF_S_MAX];
 static unsigned long g_frame_ticks[PERF_BUCKETS + 1];
 static unsigned long long g_t0[PERF_S_MAX];
 static unsigned long g_frames;
+
+static void perf_reset(void)
+{
+	int i;
+	for (i = 0; i < PERF_S_MAX; i++) {
+		g_stage[i].count = 0;
+		g_stage[i].total = 0;
+		g_stage[i].max = 0;
+	}
+	for (i = 0; i <= PERF_BUCKETS; i++)
+		g_frame_ticks[i] = 0;
+	g_frames = 0;
+}
 
 void perf_stage_begin(int stage)
 {
@@ -72,7 +85,7 @@ void perf_stage_end(int stage, int stereo_pass)
 	if (d > g_stage[stage].max)
 		g_stage[stage].max = (unsigned long)d;
 	if (stage == PERF_S_FRAME) {
-		unsigned b = (unsigned)(d / 33ULL); /* ~1 ms buckets (2^15 Hz tick) */
+		unsigned b = (unsigned)(d / 262ULL); /* 8 ms buckets (2^15 Hz tick) */
 		if (b > PERF_BUCKETS)
 			b = PERF_BUCKETS;
 		g_frame_ticks[b]++;
@@ -91,8 +104,10 @@ static void perf_out(const char *msg)
 {
 	int len;
 	if (g_perf_fd < 0) {
+		/* Append: one autotest sweep chain-loads per process, and the
+		 * profiling loop wants every level's row in one file. */
 		g_perf_fd = open("sdmc:/forsaken_perf.txt",
-		                 O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		                 O_WRONLY | O_CREAT | O_APPEND, 0666);
 		if (g_perf_fd < 0)
 			return;
 	}
@@ -102,13 +117,12 @@ static void perf_out(const char *msg)
 	fsync(g_perf_fd);
 }
 
-void perf_dump(void)
+static void perf_dump_body(void)
 {
 	static char line[128];
 	static char line2[128];
 	int i;
 
-	perf_out("PERF: dump begin");
 	for (i = 0; i < PERF_S_MAX; i++) {
 		snprintf(line, sizeof(line),
 		         "PERF: stage=%d count=%lu total=%llu max=%lu",
@@ -118,12 +132,28 @@ void perf_dump(void)
 	for (i = 0; i <= PERF_BUCKETS; i++) {
 		if (g_frame_ticks[i]) {
 			snprintf(line2, sizeof(line2), "PERF: hist ms<=%d count=%lu",
-			         i == PERF_BUCKETS ? 9999 : i + 1, g_frame_ticks[i]);
+			         (i + 1) * 8, g_frame_ticks[i]);
 			perf_out(line2);
 		}
 	}
 	snprintf(line, sizeof(line), "PERF: frames=%lu", g_frames);
 	perf_out(line);
+}
+
+void perf_level_marker(const char *level_name)
+{
+	static char line[160];
+	snprintf(line, sizeof(line), "PERF: === level=%s ===",
+	         level_name ? level_name : "?");
+	perf_out(line);
+	perf_dump_body();
+	perf_reset();
+}
+
+void perf_dump(void)
+{
+	perf_out("PERF: dump begin");
+	perf_dump_body();
 	perf_out("PERF: dump end");
 }
 

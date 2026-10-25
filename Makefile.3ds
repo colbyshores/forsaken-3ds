@@ -169,7 +169,9 @@ endif
 # back to sdmc:/3ds/netload_stub.3dsx after the last level. Used to
 # validate Remaster levels without manual menu navigation.
 ifeq ($(AUTOTEST_REMASTER),1)
-CFLAGS += -DAUTOTEST_REMASTER -D__3DS_DEBUG__ -DVERBOSE_TRACE
+# profiling branch: VERBOSE_TRACE dropped — per-line fsync (5-10 ms, P5)
+# poisons the PERF_CAPTURE timings this build is meant to measure.
+CFLAGS += -DAUTOTEST_REMASTER -D__3DS_DEBUG__
 endif
 
 # OG_SIM=1 tightens the heap budget to 30+30 MB (60 MB total), simulating

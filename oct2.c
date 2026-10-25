@@ -5046,7 +5046,8 @@ bool MainGameRender(void)
 #endif
 
 	_MGR_STAGE("entry");
-	if (!FSBeginScene())
+	perf_stage_begin(PERF_S_FSBEGIN);
+	if (!perf_guarded(PERF_S_FSBEGIN, FSBeginScene()))
 	{
 		_MGR_STAGE("FSBeginScene FAILED");
 		return false;
@@ -5116,14 +5117,16 @@ bool MainGameRender(void)
       if( render_info.stereo_enabled )
       {
 				_MGR_STAGE("calling RenderCurrentCameraInStereo");
-				if(!RenderCurrentCameraInStereo(RenderCurrentCameraWithMainGameMenu))
+				perf_stage_begin(PERF_S_CAM);
+				if(!perf_guarded(PERF_S_CAM, RenderCurrentCameraInStereo(RenderCurrentCameraWithMainGameMenu)))
 					return false;
 				_MGR_STAGE("post-RenderCurrentCameraInStereo");
       }
       else // non stereo - normal rendering
 	  	{
 				_MGR_STAGE("calling RenderCurrentCameraWithMainGameMenu");
-				if( RenderCurrentCameraWithMainGameMenu() != true ) // bjd
+				perf_stage_begin(PERF_S_CAM);
+				if( perf_guarded(PERF_S_CAM, RenderCurrentCameraWithMainGameMenu() != true) ) // bjd
 				{
 					return false;
 				}
@@ -5271,7 +5274,8 @@ bool MainGameRender(void)
 		set_normal_states();
   }
 
-  if (!FSEndScene())
+  perf_stage_begin(PERF_S_FSEND);
+  if (!perf_guarded(PERF_S_FSEND, FSEndScene()))
   {
         return false;
   }
@@ -5333,7 +5337,9 @@ bool MainGame( void ) // bjd
 #ifdef __3DS__
   _3ds_mr_ctx = "pre-MainRoutines";
 #endif
+  perf_stage_begin(PERF_S_MROUT);
   MainRoutines();
+  perf_stage_end(PERF_S_MROUT, -1);
 #ifdef __3DS__
   _3ds_mr_ctx = "post-MainRoutines";
 #endif

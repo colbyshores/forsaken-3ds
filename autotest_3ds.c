@@ -26,6 +26,7 @@
 
 #include "main.h"
 #include "title.h"
+#include "perf_capture.h"
 
 extern void trace(const char *msg);
 extern int  NumLevels;
@@ -240,6 +241,10 @@ void autotest_tick(void)
 		         next, &ShortLevelNames[next][0]);
 		trace(buf);
 	}
+
+	/* profiling branch: flush this level's perf row, then reset so the
+	 * next level starts from zero. No-op unless PERF_CAPTURE is set. */
+	PERF_LEVEL_MARKER(&ShortLevelNames[LevelNum][0]);
 
 #if AUTOTEST_MODE == AUTOTEST_MODE_NATURAL
 	/* NATURAL MODE
