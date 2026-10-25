@@ -125,9 +125,25 @@ def float_operand_names(text):
 
 OPERAND_BEFORE = re.compile(r"([A-Za-z_]\w*)\s*[/%]")
 OPERAND_AFTER = re.compile(r"[/%]\s*([A-Za-z_]\w*)")
+MEMBER_NAME = re.compile(r"(?:->|\.)\s*([A-Za-z_]\w*)")
 
 
-def looks_float(code, int_names, float_names=frozenset()):
+def header_float_members():
+    """Names declared `float`/`double` in root-tree headers. Used ONLY to judge
+    `->member`/`.member` operands, never bare locals, so a header `float x;`
+    cannot silence an integer `x % n` in a .c file. Name test, not proof."""
+    names = set()
+    for h in sorted(ROOT.glob("*.h")):
+        try:
+            txt = h.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        txt = BLOCK_COMMENT.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), txt)
+        names.update(FLOAT_DECL.findall(txt))
+    return names
+
+
+def looks_float(code, int_names, float_names=frozenset(), member_floats=frozenset()):
     """Is the `/` or `%` on this line a float operation? (name test, not proof)"""
     if FLOAT_STRONG.search(code):
         return True
@@ -139,6 +155,10 @@ def looks_float(code, int_names, float_names=frozenset()):
             for m in rx.finditer(code):
                 if m.group(1) in float_names:
                     return True
+    if member_floats:
+        for m in MEMBER_NAME.finditer(code):
+            if m.group(1) in member_floats:
+                return True
     return False
 
 
@@ -168,6 +188,7 @@ def scan(show_all=False):
     cold = load_cold()
     files = in_scope_files()
     consts = collect_constants(files)
+    hfloats = header_float_members()
     hits, filtered = [], {"cold_file": 0, "not_in_loop": 0,
                           "constant_divisor": 0, "float_expr": 0,
                           "static_assert": 0, "pinned": 0}
@@ -218,7 +239,7 @@ def scan(show_all=False):
                     filtered["constant_divisor"] += 1
                     if not show_all:
                         continue
-                elif looks_float(code, int_names, float_names):
+                elif looks_float(code, int_names, float_names, hfloats):
                     filtered["float_expr"] += 1
                     if not show_all:
                         continue
