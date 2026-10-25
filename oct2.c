@@ -70,6 +70,7 @@
 #include "triangles.h"
 #include "shadows.h"
 #endif
+#include "perf_capture.h"
 
 void SetCam(int ship, int Cam);
 
@@ -2837,7 +2838,7 @@ bool RenderScene( void )
     if( IMustQuit )
       SpecialDestroyGame();
 
-    if( MainGame() != true ) // bjd
+    if( PERF_MAINGAME() != true ) // bjd
       return false;
 
     if ( bSoundEnabled )
@@ -3544,7 +3545,7 @@ bool RenderScene( void )
       framelag *= Demoframelag;
     }
 
-    if( MainGame() != true ) // bjd
+    if( PERF_MAINGAME() != true ) // bjd
       return false;
 
     break;
@@ -4353,7 +4354,7 @@ bool RenderScene( void )
 	    char _b[64]; snprintf(_b,sizeof(_b),"SP: -> MainGame first frame for level %d", (int)LevelNum); trace(_b);
 	  } }
 #endif
-    if( MainGame() != true ) // bjd
+    if( PERF_MAINGAME() != true ) // bjd
       return false;
 #ifdef __3DS__
 	{ static int _mg_done_last_level = -2; extern void trace(const char*);
@@ -5348,7 +5349,7 @@ bool MainGame( void ) // bjd
     LastDistance[i] = 100000.0F;
 
   _MG_STAGE("pre-MainGameRender");
-  if(!MainGameRender())
+  if(!PERF_MAINGAME_RENDER())
     return false;
   _MG_STAGE("post-MainGameRender");
 

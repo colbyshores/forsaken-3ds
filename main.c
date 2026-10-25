@@ -24,6 +24,7 @@
 #ifdef __3DS__
 #include "music.h"
 #endif
+#include "perf_capture.h"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -740,6 +741,7 @@ int main( int argc, char* argv[] )
 	while( !QuitRequested )
 #endif
 	{
+		PERF_FRAME_BEGIN();
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
 		{ extern void trace(const char*); extern unsigned char MyGameStatus;
 		  static unsigned long _ml_n = 0;
@@ -808,7 +810,10 @@ int main( int argc, char* argv[] )
 #if defined(DEBUG_ON) && defined(DEBUG_ALL_MATH_ERRORS)
 		DebugMathErrors();
 #endif
+		PERF_FRAME_END();
 	}
+
+	PERF_DUMP();
 
 	/* Normal-exit teardown. On 3DS, QuitRequested is set by the
 	 * Start+Select input handler or aptMainLoop returning false

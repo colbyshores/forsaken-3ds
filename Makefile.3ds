@@ -26,6 +26,8 @@ RENDERER ?= citro3d
 # levels + music). The remaster build still uses the 1998 ISO for UI assets
 # (fonts, splash, decals) since the KPF lacks them — see README.
 EDITION ?= original
+# PERF_CAPTURE=1 adds in-memory frame/stage counters + teardown trace dump (hardware capture only)
+PERF_CFLAGS := $(if $(PERF_CAPTURE),-DPERF_CAPTURE,)
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -95,6 +97,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-Wno-implicit-int -Wno-int-conversion \
 	-ffunction-sections -fdata-sections -fcommon \
 	-fno-math-errno \
+	$(PERF_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
 	-DBSP \
