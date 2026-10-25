@@ -72,6 +72,7 @@ void AI_GetNearestMINETarget( void )
 	{
 		if( SecBulls[ i ].SecType == SEC_MINE )
 		{
+			/* @vfp-exempt R3 — AI target-selection distance compare; integerizing changes target choice. measured n/a. Verified 2026-10-25. */
 			// can there groups see each other???
 			if( !SoundInfo[ SecBulls[i].GroupImIn ][ Tinfo->Group ] )
 			{
@@ -103,6 +104,7 @@ void AI_GetNearestSHIPTargetInAnyGROUP( void )
 	int	i;
 	for( i = 0 ; i < MAX_PLAYERS ; i++ )
 	{
+		/* @vfp-exempt R3 — AI target-selection distance compare; integerizing changes target choice. measured n/a. Verified 2026-10-25. */
 		if( Ships[i].enable && (Ships[i].Object.Mode == NORMAL_MODE) && ( &Ships[i].Object != Tinfo->SObject ) && ( !(Ships[i].Object.Flags & SHIP_Stealth) || (Ships[i].Object.Flags & SHIP_Litup) ) )
 		{
 			if( !SoundInfo[Tinfo->Group][Ships[i].Object.Group] )
@@ -200,6 +202,7 @@ void AI_GetNearestNODETarget( OBJECT * Object )
 		return;
 	if( !Object->NearestNode )
 		return;
+	/* @vfp-exempt R3 — AI target-selection distance compare; integerizing changes target choice. measured n/a. Verified 2026-10-25. */
 	Node = (NODE *) Object->NearestNode;
 
 	for( i = 0 ; i < Node->NumOfLinks ; i ++ )

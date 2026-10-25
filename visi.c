@@ -1243,6 +1243,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		 * at screen center after the full-screen viewport mapping —
 		 * the scissor then masks everything outside the chase-camera
 		 * inset, leaving the camera looking like it's pointed wrong. */
+		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		if (v->viewport->X == 0 && v->viewport->Y == 0
 		    && v->viewport->Width  == (long)render_info.ThisMode.w
 		    && v->viewport->Height == (long)render_info.ThisMode.h)

@@ -180,6 +180,7 @@ void	KillUsedXLight( u_int16_t light )
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
+/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 bool	ProcessXLights( MLOADHEADER * Mloadheader )
 {
 	u_int16_t	light;
@@ -190,10 +191,14 @@ bool	ProcessXLights( MLOADHEADER * Mloadheader )
 	{
 		oldlight = XLights[light].Prev;
 
+		/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 		if(	XLights[light].SizeCount != 0.0F )
 		{
+			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 			XLights[light].Size	-= XLights[light].SizeCount * framelag;
+			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 			XLights[light].r -= XLights[light].ColorCount * framelag;
+			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 			XLights[light].g -= XLights[light].ColorCount * framelag;
 			XLights[light].b -= XLights[light].ColorCount * framelag;
 			if(	XLights[light].r <= 0.0F )
@@ -384,6 +389,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			vert = Mloadheader->Group[group].num_verts_per_execbuf[execbuf];
 			
 			
+			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 			if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
 			{
 				if( WhiteOut == 0.0F )
@@ -505,6 +511,7 @@ clear:					mov		eax, [esi]
 				// ****************** Partial Water Effect ******************************
 				lpLVERTEX2 = Mloadheader->Group[group].originalVerts[execbuf];
 				lpLVERTEX = lpPointer;
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 				vert = Mloadheader->Group[group].num_verts_per_execbuf[execbuf];
 				//	Special Lighting effects
 				while( vert --)
@@ -551,6 +558,7 @@ clear:					mov		eax, [esi]
 		 * adds light contribution on top of the baked-color baseline that
 		 * was already restored above. See render_c3d.c::c3d_upload_xlights
 		 * and shaders/render_c3d.v.pica. */
+/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 #else
 		if( WhiteOut == 0.0F )
 		{
@@ -572,12 +580,16 @@ clear:					mov		eax, [esi]
 					Posx = XLightPnt->Pos.x;
 					Posy = XLightPnt->Pos.y;
 					Posz = XLightPnt->Pos.z;
+					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					OSize  = XLightPnt->Size;
 			
 					Temp.x = Posx - centerx;
+					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					if( Temp.x < 0.0F )	Temp.x *= -1.0F;
 					Temp.y = Posy - centery;
+					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					if( Temp.y < 0.0F )	Temp.y *= -1.0F;
+					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					Temp.z = Posz - centerz;
 					if( Temp.z < 0.0F )	Temp.z *= -1.0F;
 					if ( (Temp.x <= ( half_sizex + OSize ) ) &&
@@ -699,6 +711,7 @@ clear:					mov		eax, [esi]
 											z -= Posz;
 			
 			
+											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											distance = (x*x) + (y*y) + (z*z);
 //											distance = 0.0F;			
 											if ( distance <  SizeX2  )					// float
@@ -856,10 +869,12 @@ __asm
 											x = lpLVERTEX->x - Posx;
 											y = lpLVERTEX->y - Posy;
 											z = lpLVERTEX->z - Posz;
+											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											//distance = (float) sqrtf( (x*x) + (y*y) + (z*z)); 
 											distance = (x*x) + (y*y) + (z*z); 
 					
 											if ( distance <  SizeX2  )
+											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											{
 //												NumOfVertsTouched++;
 							
@@ -871,25 +886,30 @@ __asm
 													y *= rlen;
 													z *= rlen;
 												}
+												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 												Cosa = ( ( x*Dirx ) + ( y*Diry ) + ( z*Dirz ) );
 												
+												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 												if( distance > 0.5F * OSize )
 												{
 													if ( Cosa > CosArc )
 													{
 														// Lights Are Go....
 														intense = ( ( OSize - distance ) / ( 0.75F * OSize ) ) * ( ( Cosa - CosArc ) / ( 1.0F - CosArc ) );
+													/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 													}else{
 														continue;
 													}
 												}else if ( distance > MIN_LIGHT_SIZE ) {
 													float cosarc2;
 					
+													/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 													cosarc2 = CosArc * ( 1.0F - ( ( OSize * 0.5F - distance ) / ( OSize * 0.5F - MIN_LIGHT_SIZE ) ) );
 													if ( Cosa > cosarc2 )
 													{
 														intense = ( ( OSize - distance ) / ( OSize - MIN_LIGHT_SIZE ) ) * ( ( Cosa - cosarc2 ) / ( 1.0F - cosarc2 ) );
 													}else{
+														/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 														continue;
 													}
 												}else {

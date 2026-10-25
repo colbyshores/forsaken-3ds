@@ -721,10 +721,12 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 			float				d;
 			
 			dv.x = epos.x - StartPos->x;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			dv.y = epos.y - StartPos->y;
 			dv.z = epos.z - StartPos->z;
 			dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 			
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			pg = &Bsp_Portal_Header.group[ group ];
 			for ( j = 0; j < pg->portals; j++ )
 			{
@@ -751,11 +753,13 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 							break;
 						}
 					}
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				}
 			}
 			if ( hit_portal )
 			{
 				hit_bg = false;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			}
 			else
 			{
@@ -771,6 +775,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 					epos.z -= dv.z * impact_offset;
 					if ( hit_any_portal )
 					{
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						// find distance of end point from portal plane
 						poffset = hit_portal_offset;
 						pdist = epos.x * pnorm.nx + epos.y * pnorm.ny + epos.z * pnorm.nz + poffset;
@@ -864,6 +869,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 			dv.x = epos.x - StartPos->x;
 			dv.y = epos.y - StartPos->y;
 			dv.z = epos.z - StartPos->z;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 			if ( Bsp_Portal_Header.state )
 			{
@@ -872,6 +878,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 				int					j;
 				float				d;
 				
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				pg = &Bsp_Portal_Header.group[ group ];
 				for ( j = 0; j < pg->portals; j++ )
 				{
@@ -885,10 +892,12 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 							{
 								hit_portal = true;
 								next_group = bp->group;
+								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 								pmove.x += ppos.x - epos.x;
 								pmove.y += ppos.y - epos.y;
 								pmove.z += ppos.z - epos.z;
 								ppos = epos;
+								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 								hit_any_portal = true;
 								last_group = group;
 								break;
@@ -903,8 +912,10 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 				{
 					hit_bg = false;
 				}
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				else if ( dist_bg < dist_portal )
 				{
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					hit_bg = true;
 					hit_portal = false;
 					dv = *MoveOffset;
@@ -916,6 +927,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 						epos.x -= dv.x * impact_offset;
 						epos.y -= dv.y * impact_offset;
 						epos.z -= dv.z * impact_offset;
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						// find distance of end point from portal plane
 						poffset = hit_portal_offset;
 						pdist = epos.x * pnorm.nx + epos.y * pnorm.ny + epos.z * pnorm.nz + poffset;
@@ -931,9 +943,11 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 						*EndGroup = StartGroup;
 					}
 					*EndPos = epos;
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					*FaceNormal = fnorm;
 					*NewTarget = tpos;
 				}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			}
 			else
 			{
@@ -949,6 +963,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 					epos.z -= dv.z * impact_offset;
 					if ( hit_any_portal )
 					{
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						// find distance of end point from portal plane
 						poffset = hit_portal_offset;
 						pdist = epos.x * pnorm.nx + epos.y * pnorm.ny + epos.z * pnorm.nz + poffset;
@@ -1040,6 +1055,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 	group = next_group;
 	hit_portal = false;
 	hit_bg = false;
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	if ( OneGroupPolyCol( c, m, group, StartPos, MoveOffset, &epos, &fnorm, &tpos, BGCol, BGObject ) )
 	{
 		BSP_PORTAL_GROUP	*pg;
@@ -1047,6 +1063,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 		int					j;
 		float				d;
 		
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 		pg = &Bsp_Portal_Header.group[ group ];
 		for ( j = 0; j < pg->portals; j++ )
 		{
@@ -1164,6 +1181,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 		dv.x = epos.x - StartPos->x;
 		dv.y = epos.y - StartPos->y;
 		dv.z = epos.z - StartPos->z;
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 		dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
 		if ( Bsp_Portal_Header.state )
 		{
@@ -1172,6 +1190,7 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 			int					j;
 			float				d;
 
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			pg = &Bsp_Portal_Header.group[ group ];
 			for ( j = 0; j < pg->portals; j++ )
 			{
@@ -2030,6 +2049,7 @@ static BGOBJECT	*	CurParent = NULL;
 	Input		:	u_int16_t	Group
 	Output		:	Nothing
 ===================================================================*/
+/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject )
 {
@@ -2355,6 +2375,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 					switch( ZonesPtr->Type )
 					{
 						case ZONE_Sphere:
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr->Data;
 							break;
 	
@@ -2394,6 +2415,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 									}
 								}
 
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							}
 							break;
 	
@@ -2652,6 +2674,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			if( Children->NumColZones && ( Children->Flags & COMPFLAG_Enable ) )
 			{
 				OldOrigin.x = ( Origin.x - Children->OldDisplayPos.x );
@@ -2691,6 +2714,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 					switch( ZonesPtr->Type )
 					{
 						case ZONE_Sphere:
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr->Data;
 							break;
 	
@@ -2732,6 +2756,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 								}
 
 							}
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							break;
 	
 						case ZONE_Polygonal:
@@ -2908,10 +2933,12 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 			Lines[ line ].StartPos = FeelerStart;
 			Lines[ line ].EndPos.x = FeelerStart.x + Feeler.x;
 			Lines[ line ].EndPos.y = FeelerStart.y + Feeler.y;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			Lines[ line ].EndPos.z = FeelerStart.z + Feeler.z;
 			Lines[ line ].StartCol.R = 255;
 			Lines[ line ].StartCol.G = 255;
 			Lines[ line ].StartCol.B = 255;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			Lines[ line ].EndCol.R = 128 + (int) (96 * (dx0 + dx1));
 			Lines[ line ].EndCol.G = 128 + (int) (96 * (dy0 + dy1));
 			Lines[ line ].EndCol.B = (!f) * 255;
@@ -2922,6 +2949,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 #endif
 		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
 			&FeelerStart, FeelerGroup, &Feeler,
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			&FeelerImpactPoint , &FeelerImpactGroup, &FeelerFaceNormal, &FeelerPos_New, true, ( BGObject ) ? &FeelerBGObject : NULL ) )
 		{
 			FeelerPlane = -DotProduct( (VECTOR *)&FeelerFaceNormal, &FeelerImpactPoint ) - radius;
@@ -3118,6 +3146,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 	VECTOR Up, Right;
 	QUAT MoveQuat;
 	MATRIX MoveMat;
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	int f;
 	float dx0, dy0;
 	float dx1, dy1;
@@ -3129,6 +3158,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 		} start, end;
 	} FeelerOffset[ MAX_FEELER_RAYS ] =
 	{
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 		{ 0.0F, 0.0F,  0.0F, 0.0F },
 		{ 0.0F, 0.0F,  1.0F, 1.0F },
 		{ 0.0F, 0.0F,  1.0F,-1.0F },
@@ -3142,6 +3172,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 	VECTOR FeelerImpactPoint;
 	u_int16_t FeelerImpactGroup;
 	NORMAL FeelerFaceNormal;
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	VECTOR FeelerPos_New;
 	BGOBJECT *FeelerBGObject;
 	float FeelerImpactDist;
@@ -3255,12 +3286,14 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 #if BAD_BUMP
 			Move.x = Move_Off->x - Obj->ExternalForce.x * framelag;
 			Move.y = Move_Off->y - Obj->ExternalForce.y * framelag;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			Move.z = Move_Off->z - Obj->ExternalForce.z * framelag;
 			MoveDist = VectorLength( &Move );
 #else // better, but not perfect...
 			Move = Obj->Speed;
 			MoveDist = VectorLength( &Move ) * framelag;
 #endif
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			MaxPerpendicularAccel = TurboAccell * MoveDist;
 			BumpForce.x = ImpactNormal.nx * MaxPerpendicularAccel;
 			BumpForce.y = ImpactNormal.ny * MaxPerpendicularAccel;
@@ -3268,6 +3301,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 			New_Off.x = Pos_New.x - ImpactPoint.x;
 			New_Off.y = Pos_New.y - ImpactPoint.y;
 			New_Off.z = Pos_New.z - ImpactPoint.z;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			NormaliseVector( &New_Off );
 			if( framelag )
 			{

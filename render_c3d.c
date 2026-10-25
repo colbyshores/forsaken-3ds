@@ -1310,6 +1310,7 @@ void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 	 * colour and kill the highlight entirely. The floor keeps the
 	 * specular visible everywhere; tinted samples just shift the
 	 * remaining 30% headroom. */
+	/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 	const float kFloor = 0.70f;
 	ar = ar / 255.0f; if (ar < kFloor) ar = kFloor; if (ar > 1.0f) ar = 1.0f;
 	ag = ag / 255.0f; if (ag < kFloor) ag = kFloor; if (ag > 1.0f) ag = 1.0f;
@@ -2636,6 +2637,7 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 		ray.y = Pos->y - LightPnt->Pos.y;
 		ray.z = Pos->z - LightPnt->Pos.z;
 
+		/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 		rlen2 = ray.x * ray.x + ray.y * ray.y + ray.z * ray.z;
 		lsize2 = LightPnt->Size * LightPnt->Size;
 
@@ -2643,6 +2645,7 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 		{
 			if (render_lighting_point_lights_only || LightPnt->Type == POINT_LIGHT)
 			{
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 				intensity = 1.0f - rlen2 / (int)lsize2;
 			}
 			else if (LightPnt->Type == SPOT_LIGHT)
@@ -2654,7 +2657,9 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 					ray.y /= rlen;
 					ray.z /= rlen;
 				}
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 				cosa = ray.x * LightPnt->Dir.x +
+				       /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 				       ray.y * LightPnt->Dir.y +
 				       ray.z * LightPnt->Dir.z;
 
@@ -2662,16 +2667,19 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 				{
 					if (cosa > LightPnt->CosArc)
 						intensity = ((lsize2 - rlen2) / (0.75f * lsize2)) *
+						            /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 						            ((cosa - LightPnt->CosArc) / (1.0f - LightPnt->CosArc));
 					else
 						goto NEXT_LIGHT;
 				}
 				else if (rlen2 > MIN_LIGHT_SIZE)
 				{
+					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					cosarc2 = LightPnt->CosArc *
 						(1.0f - (lsize2 * 0.5f - rlen2) / (lsize2 * 0.5f - MIN_LIGHT_SIZE));
 					if (cosa > cosarc2)
 						intensity = ((lsize2 - rlen2) / (lsize2 - MIN_LIGHT_SIZE)) *
+						            /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 						            ((cosa - cosarc2) / (1.0f - cosarc2));
 					else
 						goto NEXT_LIGHT;

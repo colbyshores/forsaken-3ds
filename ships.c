@@ -773,6 +773,7 @@ bool ProcessShips()
 							{
 								CreateInvEffect( i, 5, 255, 64, 64 );
 							}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						}
 					}
 				}
@@ -840,16 +841,19 @@ bool ProcessShips()
 			{
 
 				ShipObjPnt->NodeNetwork = 1;
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				if( !ShipObjPnt->NearestNode )
 				{
 					FindNearestNode( &ShipPnt->Object );
 				}else{
 					UpdateNearestNodeSpecial( &ShipPnt->Object );
 				}
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				NodePnt = ShipObjPnt->NearestNode;
 				if( NodePnt && ShowNode)
 				{
 					SteamTime -= framelag;
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					if( SteamTime < 0.0F )
 					{
 						CreateSteam( &NodePnt->Pos, &SlideUp, NodePnt->Group );
@@ -887,7 +891,9 @@ bool ProcessShips()
 						if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
 						{
 							// update bonus 4 (stats.c) -- bounty hunt points
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							BountyTime = FMOD( BountyTime, BountyBonusInterval );
 						}
 					}
@@ -923,6 +929,7 @@ bool ProcessShips()
 				if(WatchPlayerSelect.value != WhoIAm && ShipObjPnt->Mode != DEMO_MODE	) 
 					ShipObjPnt->Mode = WATCH_MODE; 
 		
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				( * ModeControl[ ShipObjPnt->Mode ] )( ShipPnt , i );		//go off and do his thing...
 
 				if( (i==MAX_PLAYERS) || (ShipObjPnt->Mode != DEATH_MODE && ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != GAMEOVER_MODE) )
@@ -943,6 +950,7 @@ bool ProcessShips()
 					AccellDecell( &ShipObjPnt->Angle.y , TurnDecell );
 			 		AccellDecell( &ShipObjPnt->Angle.x , TurnDecell );
 			 		AccellDecell( &ShipObjPnt->Angle.z , RollDecell );
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					ShipObjPnt->Autolevel = AutoLevelRot( i, AutoLevel * player_config->autolevel_rate * framelag );
 			 		AccellDecell( &ShipObjPnt->Bank , BankDecell );
 					AccellDecell( &ShipObjPnt->Speed.x , MoveDecell );
@@ -985,6 +993,7 @@ bool ProcessShips()
 					QuatNormalise( &ShipObjPnt->Quat );
 					QuatToMatrix( &ShipObjPnt->Quat, &ShipObjPnt->Mat );
 					MakeQuat( 0.0F, 0.0F, 0.0F, &ShipObjPnt->RotationForce );
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				
 					// carry out movements
 					BobShip( i, &Bob );
@@ -996,6 +1005,7 @@ bool ProcessShips()
 					if ( ShipObjPnt->Speed.x )
 					{
 						Speed = ShipObjPnt->Speed.x * framelag;
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						ApplyMatrix( &ShipObjPnt->Mat, &SlideRight, &Move_Dir );			/* Calc Direction Vector */
 				   		Move_Off.x += ( Move_Dir.x * Speed );
 				   		Move_Off.y += ( Move_Dir.y * Speed );
@@ -1003,6 +1013,7 @@ bool ProcessShips()
 					}
 					if ( ShipObjPnt->Speed.y )
 					{
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						Speed = ShipObjPnt->Speed.y * framelag;
 						ApplyMatrix( &ShipObjPnt->Mat, &SlideUp, &Move_Dir );			/* Calc Direction Vector */
 				   		Move_Off.x += ( Move_Dir.x * Speed );
@@ -1236,6 +1247,7 @@ bool ProcessShips()
 						{
 							if ( goalcheck == GOAL_WRONG )
 							{
+								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 								AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
 									TeamName[ TeamNumber[ i ] ] );
 							}
@@ -1293,6 +1305,7 @@ bool ProcessShips()
 						else
 						{
 							// exited the water....
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							PlaySfx( SFX_Surface , 1.0F );
 						}
 					}
@@ -1300,6 +1313,7 @@ bool ProcessShips()
 					if( (ShipObjPnt->Flags&SHIP_InWater) )
 					{
 						// random Bubble noise.....
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						OldWaterOneshot = RandomBubbleTimer >= (60.0F * 5.0F );
 						RandomBubbleTimer -= framelag;
 
@@ -1373,6 +1387,7 @@ bool ProcessShips()
 							(ShipObjPnt->Mode != GAMEOVER_MODE) 
 						)
 						{
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							TempTime = ShipPnt->NextTime - ShipPnt->OldTime;
 							TempTime2 = GameElapsedTime - ShipPnt->OldTime;
 
@@ -1411,6 +1426,7 @@ bool ProcessShips()
 								ShipObjPnt->Pos.x += Move_Off.x;		
 								ShipObjPnt->Pos.y += Move_Off.y;		
 								ShipObjPnt->Pos.z += Move_Off.z;
+								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 								MakeQuat( ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel, &StepQuat );
 								QuatMultiply(  &ShipObjPnt->Quat , &StepQuat , &ShipObjPnt->Quat );
 

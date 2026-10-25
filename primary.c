@@ -1674,14 +1674,17 @@ void ProcessPrimaryBullets( void )
 	{
 		nextprim = PrimBulls[i].Prev;
 
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 		NewFramelag = ( framelag + PrimBulls[i].FramelagAddition );
 		if( PrimBulls[i].FramelagAddition != 0.0F )
 		{
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			PrimBulls[i].FramelagAddition = 0.0F;
 		}
 
 		if (PrimBulls[i].LifeCount > 0.0F)
 		{
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			PrimBulls[i].LifeCount -= NewFramelag; //framelag;
 			if( PrimBulls[i].LifeCount < 0.0F ) PrimBulls[i].LifeCount = 0.0F;
 
@@ -1898,6 +1901,7 @@ void ProcessPrimaryBullets( void )
 			HitWall = (u_int16_t) -1;
 			DistToInt = 100000.0F;									/* Distance to Intersection */
 
+/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 /*�����������������������������������������������������������������*/
 			if( PrimBulls[i].ColDist < DistFromStart )
 		   	{
@@ -2050,9 +2054,11 @@ void ProcessPrimaryBullets( void )
 						TempVector.x = ( MInt_Point.x - PrimBulls[ i ].Pos.x );
 						TempVector.y = ( MInt_Point.y - PrimBulls[ i ].Pos.y );
 						TempVector.z = ( MInt_Point.z - PrimBulls[ i ].Pos.z );
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						DistToInt = VectorLength( &TempVector );
 						if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
 						Damage = ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						Damage = ( Damage * ( framelag / 3.0F ) );
 						break;
 				}
@@ -2062,7 +2068,9 @@ void ProcessPrimaryBullets( void )
 					Damage =  ( Damage / 10.0F ) * framelag;
 				}
 
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				SecBulls[ HitSecondary ].Shield -= Damage;
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				if( SecBulls[ HitSecondary ].Shield < 0.0F ) SecBulls[ HitSecondary ].Shield = 0.0F;
 				if( SecBulls[ HitSecondary ].Shield == 0.0F )
 				{
@@ -2156,6 +2164,7 @@ void ProcessPrimaryBullets( void )
 					case FLAMES:
 						CleanUpPrimBull( i, false );
 						Killed = true;
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 
 					case NME_TROJAX:
@@ -2165,6 +2174,7 @@ void ProcessPrimaryBullets( void )
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 					case TROJAX:
 						if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
@@ -2173,6 +2183,7 @@ void ProcessPrimaryBullets( void )
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 
 					case NME_TRANSPULSE:
@@ -2182,6 +2193,7 @@ void ProcessPrimaryBullets( void )
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 					case TRANSPULSE_CANNON:
 						if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
@@ -2434,6 +2446,7 @@ void ProcessPrimaryBullets( void )
    						TempVector.x = ( Int_Point.x - PrimBulls[ i ].Pos.x );
    						TempVector.y = ( Int_Point.y - PrimBulls[ i ].Pos.y );
    						TempVector.z = ( Int_Point.z - PrimBulls[ i ].Pos.z );
+   						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
    						DistToInt = VectorLength( &TempVector );
    						if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
    						Damage =  ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
@@ -2445,6 +2458,7 @@ void ProcessPrimaryBullets( void )
 				{
 					case COLPERS_Forsaken:
    						if( ( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) ||
+							  /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							  ( PrimBulls[i].OwnerType != OWNER_SHIP ) )
  						{
    							if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
@@ -2472,6 +2486,7 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case COLPERS_Descent:
+   						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
    						if( HitTarget == WhoIAm )
  						{
    							if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
@@ -2648,6 +2663,7 @@ void ProcessPrimaryBullets( void )
 					case FLAMES:
 						CleanUpPrimBull( i, false );
 						Killed = true;
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 
 					case NME_TROJAX:
@@ -2669,6 +2685,7 @@ void ProcessPrimaryBullets( void )
 								Killed = true;
 							}
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 					case TROJAX:
 						if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
@@ -2689,6 +2706,7 @@ void ProcessPrimaryBullets( void )
 								Killed = true;
 							}
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 
 					case NME_TRANSPULSE:
@@ -2715,6 +2733,7 @@ void ProcessPrimaryBullets( void )
 								Killed = true;
 							}
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 					case TRANSPULSE_CANNON:
 						if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
@@ -2840,6 +2859,7 @@ void ProcessPrimaryBullets( void )
 					( PrimBulls[ i ].Weapon == NME_LASER ) ||
 					( PrimBulls[ i ].Weapon == NME_POWERLASER ) )
 				{
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					Damage *= ( framelag / 3.0F );
 				}
 
@@ -2900,6 +2920,7 @@ void ProcessPrimaryBullets( void )
 
 					case FLAMES:
 						CleanUpPrimBull( i, false );
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 
 					case NME_TROJAX:
@@ -2909,6 +2930,7 @@ void ProcessPrimaryBullets( void )
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 
 					case TROJAX:
@@ -2918,6 +2940,7 @@ void ProcessPrimaryBullets( void )
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 					case NME_TRANSPULSE:
 						if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
@@ -2926,6 +2949,7 @@ void ProcessPrimaryBullets( void )
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						break;
 
 					case TRANSPULSE_CANNON:

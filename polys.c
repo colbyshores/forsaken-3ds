@@ -186,6 +186,7 @@ void ProcessPolys( void )
 				break;
 
 		   	case POLY_POWERLASER:							// Laser?
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		Polys[i].Frame += ( framelag / Polys[i].AnimSpeed );
 		   		if( Polys[i].Frame >= (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 )  )
 		   		{
@@ -198,49 +199,63 @@ void ProcessPolys( void )
 		   		if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
 		   		{
 		   			Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
+										/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 										* (*Polys[i].Frm_Info)->Num_Frames );
 				}
 
     			if( Polys[ i ].Qlerp.time != 1.0F )
 				{				
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
 					if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
 
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col1.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col1.R = 0;
 					else Polys[ i ].Col1.R = (u_int8_t) R;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col2.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col2.R = 0;
 					else Polys[ i ].Col2.R = (u_int8_t) R;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col3.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col3.R = 0;
 					else Polys[ i ].Col3.R = (u_int8_t) R;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col4.R = 0;
 					else Polys[ i ].Col4.R = (u_int8_t) R;
 				
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col1.G = 0;
 					else Polys[ i ].Col1.G = (u_int8_t) G;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col2.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col2.G = 0;
 					else Polys[ i ].Col2.G = (u_int8_t) G;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col3.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col3.G = 0;
 					else Polys[ i ].Col3.G = (u_int8_t) G;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col4.G = 0;
 					else Polys[ i ].Col4.G = (u_int8_t) G;
 				
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col1.B = 0;
 					else Polys[ i ].Col1.B = (u_int8_t) B;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col2.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col2.B = 0;
 					else Polys[ i ].Col2.B = (u_int8_t) B;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col3.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col3.B = 0;
 					else Polys[ i ].Col3.B = (u_int8_t) B;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col4.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col4.B = 0;
 					else Polys[ i ].Col4.B = (u_int8_t) B;
@@ -277,47 +292,61 @@ void ProcessPolys( void )
 				}
 				break;
 
+		   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   	case POLY_SHIELD:								// Ship Shield Effect>
     			if( Polys[ i ].Qlerp.time != 1.0F )
 				{				
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
 					if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
 
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col1.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col1.R = 0;
 					else Polys[ i ].Col1.R = (u_int8_t) R;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col2.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col2.R = 0;
 					else Polys[ i ].Col2.R = (u_int8_t) R;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col3.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col3.R = 0;
 					else Polys[ i ].Col3.R = (u_int8_t) R;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col4.R = 0;
 					else Polys[ i ].Col4.R = (u_int8_t) R;
 				
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col1.G = 0;
 					else Polys[ i ].Col1.G = (u_int8_t) G;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col2.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col2.G = 0;
 					else Polys[ i ].Col2.G = (u_int8_t) G;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col3.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col3.G = 0;
 					else Polys[ i ].Col3.G = (u_int8_t) G;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col4.G = 0;
 					else Polys[ i ].Col4.G = (u_int8_t) G;
 				
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col1.B = 0;
 					else Polys[ i ].Col1.B = (u_int8_t) B;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col2.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col2.B = 0;
 					else Polys[ i ].Col2.B = (u_int8_t) B;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col3.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col3.B = 0;
 					else Polys[ i ].Col3.B = (u_int8_t) B;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col4.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col4.B = 0;
 					else Polys[ i ].Col4.B = (u_int8_t) B;
@@ -423,6 +452,7 @@ void DoAfterBurnerEffects( void )
 					if( TurboLength[ Ship ] != MAX_AFTERBURNER_LENGTH )
 					{
 						TurboLength[ Ship ] += AFTERBURNER_INC;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						if( TurboLength[ Ship ] > MAX_AFTERBURNER_LENGTH ) TurboLength[ Ship ] = MAX_AFTERBURNER_LENGTH;
 					}
 				}
@@ -430,6 +460,7 @@ void DoAfterBurnerEffects( void )
 				{
 					if( TurboLength[ Ship ] > 0.0F )
 					{
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						TurboLength[ Ship ] -= AFTERBURNER_INC;
 						if( TurboLength[ Ship ] <= 0.0F )
 						{

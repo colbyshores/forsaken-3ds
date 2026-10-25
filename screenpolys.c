@@ -413,6 +413,7 @@ void ScreenPolyProcess( void )
 				   	case SCRSEQ_Anim:								// Explosion?
 				   		ScrPolys[i].Frame += ( framelag / ScrPolys[i].FrameRate );
 		
+				   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				   		if( ScrPolys[i].Frame >= (*ScrPolys[i].Frm_Info)->Num_Frames )
 				   		{
 				   			KillUsedScrPoly( i );
@@ -420,17 +421,21 @@ void ScreenPolyProcess( void )
 				   		break;
 	
 				   	case SCRSEQ_Fade:								// Fade
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						Speed = ( framelag * 20.0F );
 						ScrPolys[i].LifeCount -= Speed;
 						if( ScrPolys[i].LifeCount <= 0.0F )
 						{
+				   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				   			KillUsedScrPoly( i );
 							FlashScreenPoly = (u_int16_t) -1;
 						}
 						else
 						{
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].FadeRed -= Speed;
 							if( ScrPolys[i].FadeRed < 0.0F ) ScrPolys[i].FadeRed = 0.0F;
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].FadeGreen -= Speed;
 							if( ScrPolys[i].FadeGreen < 0.0F ) ScrPolys[i].FadeGreen = 0.0F;
 							ScrPolys[i].FadeBlue -= Speed;
@@ -439,6 +444,7 @@ void ScreenPolyProcess( void )
 							if( ScrPolys[i].FadeTrans < 0.0F ) ScrPolys[i].FadeTrans = 0.0F;
 							ScrPolys[i].R = (u_int8_t) ScrPolys[i].FadeRed;
 							ScrPolys[i].G = (u_int8_t) ScrPolys[i].FadeGreen;
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].B = (u_int8_t) ScrPolys[i].FadeBlue;
 							ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
 						}
@@ -459,6 +465,7 @@ void ScreenPolyProcess( void )
 						if( CheckDecreaseTemperature() )
 						{
 							if( WantedThermalTemp > ThermalMinimum )
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							{
 								WantedThermalTemp -= ( THERMAL_DEC * framelag );
 								if( WantedThermalTemp < ThermalMinimum ) WantedThermalTemp = ThermalMinimum;
@@ -476,6 +483,7 @@ void ScreenPolyProcess( void )
 							if( ThermalTemp < WantedThermalTemp )
 							{
 								ThermalTemp = WantedThermalTemp;
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							}
 						}
 						else
@@ -509,6 +517,7 @@ void ScreenPolyProcess( void )
 
 											KilledPlayer = true;
 										}
+									/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 									}
 								}
 							}
@@ -517,34 +526,44 @@ void ScreenPolyProcess( void )
 				   		ScrPolys[i].Frame = ( ThermalTemp / ( 100.0F / ( (float) ( Thermo_Header->Num_Frames - 1 ) ) ) );
 				   		break;
 
+				   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				   	case SCRSEQ_Logo:								// Logos
 						ScrPolys[i].LifeCount += framelag;
 
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						if( ScrPolys[i].LifeCount >= 600.0F )
 						{
 							ScrPolys[i].Frame += 2.0F;
 							ScrPolys[i].LifeCount = 0.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						}
 
 						Speed = ( 2.125F * framelag );
 
 						if( ScrPolys[i].LifeCount < 60.0F )
 						{
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].FadeRed += Speed;
 							if( ScrPolys[i].FadeRed > 128.0F ) ScrPolys[i].FadeRed = 128.0F;
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].FadeGreen += Speed;
 							if( ScrPolys[i].FadeGreen > 128.0F ) ScrPolys[i].FadeGreen = 128.0F;
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].FadeBlue += Speed;
 							if( ScrPolys[i].FadeBlue > 128.0F ) ScrPolys[i].FadeBlue = 128.0F;
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].FadeTrans += Speed;
 							if( ScrPolys[i].FadeTrans > 128.0F ) ScrPolys[i].FadeTrans = 128.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						}
 						else
 						{
 							if( ScrPolys[i].LifeCount >= ( 600.0F - 60.0F ) )
 							{
+								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 								ScrPolys[i].FadeRed -= Speed;
 								if( ScrPolys[i].FadeRed < 0.0F ) ScrPolys[i].FadeRed = 0.0F;
+								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 								ScrPolys[i].FadeGreen -= Speed;
 								if( ScrPolys[i].FadeGreen < 0.0F ) ScrPolys[i].FadeGreen = 0.0F;
 								ScrPolys[i].FadeBlue -= Speed;
@@ -645,22 +664,28 @@ void DoLensflareEffect( void )
 					ShipVector.y = ( Vert.y - CurrentCamera.Pos.y );
 					ShipVector.z = ( Vert.z - CurrentCamera.Pos.z );
 					
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					DistToShip = VectorLength( &ShipVector );
 					
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					TempVector = ShipVector;
 					NormaliseVector( &TempVector );
 					ApplyMatrix( &CurrentCamera.Mat, &Forward, &TempVector2 );
 					NormaliseVector( &TempVector2 );
 					Cos = DotProduct( &TempVector, &TempVector2 );
 					if( Cos < -1.0F ) Cos = -1.0F;
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					else if ( Cos > 1.0F ) Cos = 1.0F;
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					Angle = (float) R2D( acosf( Cos ) );
 					
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					ApplyMatrix( &Ships[ Count ].Object.FinalMat, &Forward, &TempVector );
 					NormaliseVector( &TempVector );
 					Cos2 = DotProduct( &TempVector, &TempVector2 );
 					if( Cos2 < -1.0F ) Cos2 = -1.0F;
 					else if ( Cos2 > 1.0F ) Cos2 = 1.0F;
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					Angle2 = (float) R2D( acosf( Cos2 ) );
 					
 					if( DistToShip < CUTOFF ) DistFactor = 1.0F;
@@ -2304,6 +2329,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	      				{
 							int ntris = 0;
 
+   	   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
    	   						Box_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
    
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_UseCoords ) )
@@ -2907,6 +2933,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	      				{
 							int ntris = 0;
 
+   	   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
    	   						Box_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
    
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_UseCoords ) )

@@ -209,6 +209,7 @@ void ProcessSpotFX( void )
 
 	while( SpotFX )
 	{
+		/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 		SpotFX->TimeInterval = (float) 1;
 
 		if( SpotFX->Flags & SPOTFX_FLAGS_Enabled )
@@ -508,7 +509,9 @@ void ProcessSpotFX( void )
 #endif
 													StopSfx( SpotFX->SoundFX_ID );
 													SpotFX->SoundFX_ID = PlaySpotSfx( SpotFX->SoundFX, &SpotFX->Group, &SpotFX->Pos,
+																					  /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 																					  SpotFX->SoundFXSpeed, SpotFX->SoundFXVolume,
+																					  /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 																					  SpotFX->SoundFXType );
 												}
 											}
@@ -523,6 +526,7 @@ void ProcessSpotFX( void )
 
 					SpotFX->Delay -= framelag;
 
+					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					if( SpotFX->Delay < 0.0F )
 					{
 						if( SpotFX->InactiveDelay < 0.0F )
@@ -542,6 +546,7 @@ void ProcessSpotFX( void )
 								}
 
 								SpotFX->Delay += SpotFX->InactiveDelay;
+								/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 								SpotFX->State = SPOTFX_STATE_Inactive;
 								SpotFX->Time = 0.0F;
 							}

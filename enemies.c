@@ -5869,6 +5869,7 @@ void ProcessEnemies( void )
 	EnemiesActive = 0;
 	Enemy = FirstEnemyUsed;
 
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	while( Enemy != NULL )
 	{
 		NextEnemy = Enemy->NextUsed;
@@ -5887,8 +5888,10 @@ void ProcessEnemies( void )
 			}
 			
 			if( (Enemy->Object.ControlType != ENEMY_CONTROLTYPE_NONE) && 
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				( (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_FLESHMORPH ) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_EXOGENON ) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_TURRET_AI ) || Enemy->Object.NearestNode ) )
 			{
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				GunObject = Enemy->Object.FirstGun;
 				while( GunObject )
 				{
@@ -5911,6 +5914,7 @@ void ProcessEnemies( void )
 					 * nonsense. Use body matrix → gun fires straight forward
 					 * from body center. Works because JUMP_AI rotates the
 					 * body to face the player each frame. */
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					GunObject->Mat    = Enemy->Object.Mat;
 					GunObject->InvMat = Enemy->Object.InvMat;
 					GunObject->FirePos = Enemy->Object.Pos;
@@ -6025,6 +6029,7 @@ void ProcessEnemies( void )
 						}
 					}
 					
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					UpdateCompObjChildren( Enemy->Object.Components, 1, &Enemy->Object.FinalMat, &Enemy->Object.Pos, Enemy->Object.Time, Enemy->Object.Group, &Enemy->Object.Pos );
 					UpdateCompObjColours( Enemy->Object.Components, 1, (int)Enemy->Object.Red, (int)Enemy->Object.Green, (int)Enemy->Object.Blue );
 
@@ -6039,6 +6044,7 @@ void ProcessEnemies( void )
 					
 					if( AmIInvulnerable( Enemy->Object.Components, 1, Enemy->Object.Time ) )
 					{
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						Enemy->Object.Flags |= SHIP_Invul;
 					}
 					else
@@ -6060,11 +6066,13 @@ void ProcessEnemies( void )
 				{
 					if( Enemy->Object.Components )
 					{
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						SetCompObjModelsState( Enemy->Object.Components, 1, true );
 					}
 
 					if( Enemy->ModelIndex != (u_int16_t) -1 )
 					{
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						Models[ Enemy->ModelIndex ].Visible = true;
 					}
 

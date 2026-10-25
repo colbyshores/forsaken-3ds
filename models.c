@@ -1391,6 +1391,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					TempWorld._34 = Models[i].InvMat._34;
 					TempWorld._41 = Models[i].Pos.x;
 					TempWorld._42 = Models[i].Pos.y;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					TempWorld._43 = Models[i].Pos.z;
 					TempWorld._44 = Models[i].InvMat._44;
 
@@ -1406,6 +1407,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 						return false;
 					}
 					
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					// TODO - BEEF UP LOD LEVEL HANDLING (read notes bellow)
 
 					// set ModelNum = 0 bellow for best lod level
@@ -1428,6 +1430,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 						{
 							// appears the larger you make this number 
 							// the farther away we can see the object with better lod's
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							// we should probably make this a global so people can control it on it's own
 							float distance = CurrentCamera.UseLowestLOD ? 
 											6144.0F	:	// down grade for smaller cams

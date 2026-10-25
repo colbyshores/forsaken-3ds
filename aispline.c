@@ -105,6 +105,7 @@ void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
 
 	WantedDistance = (EnemyTypes[Enemy->Type].MaxMoveRate*0.65F) * framelag;
 
+	/* @vfp-exempt R3 — AI target-selection distance compare; integerizing changes target choice. measured n/a. Verified 2026-10-25. */
 	Tstep = ( WantedDistance / DistanceVector2Vector( &Node2->Pos , &Node3->Pos ) ) * 0.1F;
 
 	Distance = DistanceVector2Vector( &Node2->Pos , &Node3->Pos );

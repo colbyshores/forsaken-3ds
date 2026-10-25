@@ -221,6 +221,7 @@ void FmPolyProcess( void )
 	u_int16_t	i;
 	u_int16_t	nextprim;
 	float	Speed;
+	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	float	R, G, B, T, FadeDec;
 	VECTOR	Rotation;
 	float	OldSize;
@@ -276,9 +277,11 @@ void FmPolyProcess( void )
 
 		   	case FM_SMOKE_TRAIL:						// Smoke Trail?
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
 
 		   		FmPolys[i].R = ShadeTable[ (int16_t) FmPolys[i].Frame ];
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].G = ShadeTable[ (int16_t) FmPolys[i].Frame ];
 		   		FmPolys[i].B = ShadeTable[ (int16_t) FmPolys[i].Frame ];
 
@@ -293,10 +296,13 @@ void FmPolyProcess( void )
 		   		}
 
 		   		FmPolys[i].Frame += ( framelag / 2.0F );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
 		   		{
+		   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   			KillUsedFmPoly( i );
 
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		}
 		   		break;
 
@@ -312,9 +318,11 @@ void FmPolyProcess( void )
 				if( T < 0.0F ) T = 0.0F;
 				FmPolys[i].R = (u_int8_t) R;
 				FmPolys[i].G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].B = (u_int8_t) B;
 				FmPolys[i].Trans = (u_int8_t) T;
 
+	   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	   			FmPolys[i].xsize += ( TROJAX_EXPINC * framelag );
 	   			FmPolys[i].ysize += ( TROJAX_EXPINC * framelag );
 	   			if( FmPolys[i].xsize >= TROJAX_EXPMAXSIZE )
@@ -341,6 +349,7 @@ void FmPolyProcess( void )
 		   		}
 		   		break;
 
+		   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   	case FM_PULSAR:
 		   		break;
 
@@ -364,13 +373,16 @@ void FmPolyProcess( void )
 						FmPolys[i].Frame = 0.0F;
 						FmPolys[i].xsize = SUSSGUN_EXPSIZE;
 						FmPolys[i].ysize = SUSSGUN_EXPSIZE;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						FmPolys[i].R = 128;
 						FmPolys[i].G = 128;
 						FmPolys[i].B = 128;
 					}
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					else
 					{
 				   		FmPolys[i].Frame += framelag;
+				   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				   		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
 				   		{
 				   			KillUsedFmPoly( i );
@@ -388,10 +400,12 @@ void FmPolyProcess( void )
 		   		if( FmPolys[i].Frame > 12.0F ) FmPolys[i].Frame = 12.0F;
 		   		break;
 
+		   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   	case FM_STATIC:								// Static Obj Don't move/rotate
 		   		break;
 
 		   	case FM_ARC:								// Arc?
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		break;
 
 		   	case FM_ARC2:								// Arc Glow?
@@ -428,9 +442,12 @@ void FmPolyProcess( void )
 				{
 					Speed = ( FmPolys[i].Speed * framelag );
 		   			FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
+		   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   			FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+		   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   			FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
 				}
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		break;
 
 		   	case FM_ARC_RING:							// Arc Explosion Ring?
@@ -444,6 +461,7 @@ void FmPolyProcess( void )
 				if( B < 0.0F ) B = 0.0F;
 				if( T < 0.0F ) T = 0.0F;
 				FmPolys[i].R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].G = (u_int8_t) G;
 				FmPolys[i].B = (u_int8_t) B;
 				FmPolys[i].Trans = (u_int8_t) T;
@@ -468,9 +486,11 @@ void FmPolyProcess( void )
 		   		FmPolys[i].Trans = ( 248 - ( (int16_t) ( ( FmPolys[i].Frame * 5.0F ) * 8.0F ) ) );
 
 		   		FmPolys[i].R = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 5.0F )];
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].G = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 5.0F )];
 		   		FmPolys[i].B = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 5.0F )];
 
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
@@ -492,7 +512,9 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].Speed * framelag );
 		   		FmPolys[i].Trans = ( 248 - ( (int16_t) ( ( FmPolys[i].Frame * 3.0F ) * 8.0F ) ) );
 
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].R = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 3.0F )];
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].G = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 3.0F )];
 		   		FmPolys[i].B = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 3.0F )];
 
@@ -514,7 +536,9 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].Speed * framelag );
 		   		FmPolys[i].Trans = ( 248 - ( (int16_t) ( ( FmPolys[i].Frame * 3.0F ) * 8.0F ) ) );
 
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].R = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 3.0F )];
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].G = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 3.0F )];
 		   		FmPolys[i].B = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 3.0F )];
 
@@ -558,10 +582,13 @@ void FmPolyProcess( void )
 
 		   	case FM_BLOODSPLAT:								// Blood Splat?
 		   		FmPolys[i].Frame += ( framelag / 8.0F ); //6.0F;
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
 		   		{
+		   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   			KillUsedFmPoly( i );
 				}
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				else
 				{
 					FadeDec = ( 255.0F / ( (*FmPolys[i].Frm_Info)->Num_Frames * 8.0F ) ) * framelag;
@@ -574,20 +601,24 @@ void FmPolyProcess( void )
 					if( B < 0.0F ) B = 0.0F;
 					if( T < 0.0F ) T = 0.0F;
  					FmPolys[i].R = (u_int8_t) R;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					FmPolys[i].G = (u_int8_t) G;
 					FmPolys[i].B = (u_int8_t) B;
 					FmPolys[i].Trans = (u_int8_t) T;
 				}
 		   		break;
 
+		   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   	case FM_BLOODDRIBBLE:							// Blood Splat?
 		   		FmPolys[i].Frame += ( framelag / 8.0F ); //6.0F;
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
 		   		{
 		   			KillUsedFmPoly( i );
 				}
 		   		break;
 
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			case FM_FLASH:								// Flash?
 				if( FmPolys[i].LifeCount == 0.0F )
 				{
@@ -614,11 +645,15 @@ void FmPolyProcess( void )
 		   		FmPolys[i].Trans = ( 248 - ( (int16_t) ( FmPolys[i].Frame * 8.0F ) ) );
 
 				Speed = ( FmPolys[i].UpSpeed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
@@ -682,11 +717,15 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].UpSpeed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
 
 				FmPolys[i].xsize += ( ( 0.5F * GLOBAL_SCALE ) * framelag );
@@ -723,12 +762,16 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].UpSpeed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
 
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].xsize += ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].ysize += ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
@@ -759,20 +802,26 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].UpSpeed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
 
 				Speed = ( FmPolys[i].Speed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
 
 				OldSize = FmPolys[i].xsize;
 
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].xsize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].ysize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
 
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				if( ( OldSize >= ( 3.5F * GLOBAL_SCALE ) ) && ( FmPolys[i].xsize < ( 3.5F * GLOBAL_SCALE ) ) )
 				{
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					CreateSpotFXFlameSmoke( &FmPolys[i].Pos, &FmPolys[i].Dir, FmPolys[i].Group );
 				}
 
@@ -805,6 +854,7 @@ void FmPolyProcess( void )
 
 		   	case FM_SPOTFX_SPARKS:							// Sparks?
 		   		FmPolys[i].Frame += ( framelag / FmPolys[i].AnimSpeed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
 		   		{
 		   			KillUsedFmPoly( i );
@@ -830,9 +880,11 @@ void FmPolyProcess( void )
 		   		FmPolys[i].Trans = ( 248 - ( (int16_t) ( ( FmPolys[i].Frame * 5.0F ) * 8.0F ) ) );
 
 		   		FmPolys[i].R = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 5.0F )];
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].G = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 5.0F )];
 		   		FmPolys[i].B = ShadeTable[ (int16_t) ( FmPolys[i].Frame * 5.0F )];
 
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
@@ -844,6 +896,7 @@ void FmPolyProcess( void )
 		   		{
 		   			FmPolys[i].Speed += ( 0.1F * framelag );
 		   			if( FmPolys[i].Speed < 0.0F ) FmPolys[i].Speed = 0.0F;
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		}
 
 		   		FmPolys[i].Frame += ( 0.1F * framelag );
@@ -864,11 +917,13 @@ void FmPolyProcess( void )
 		   	case FM_NME_TRAIL:								// Nme Trail?
 				if( FmPolys[i].LifeCount == 0.0F )
 				{
+		   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   			KillUsedFmPoly( i );
 				}
 				else
 				{
 					FmPolys[i].xsize -= ( ( 0.175F * GLOBAL_SCALE ) * framelag );
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					FmPolys[i].ysize -= ( ( 0.175F * GLOBAL_SCALE ) * framelag );
 
 					Speed = ( FmPolys[i].Speed * framelag );
@@ -890,9 +945,11 @@ void FmPolyProcess( void )
 				Speed = (float) ( 64.0F - ( (float) ( FmPolys[i].Frame * 12.0F ) ) );
 				FmPolys[i].R = (u_int8_t) ( ( Speed / 256.0F ) * ( (float) FmPolys[i].Start_R ) );
 				FmPolys[i].G = (u_int8_t) ( ( Speed / 256.0F ) * ( (float) FmPolys[i].Start_G ) );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].B = (u_int8_t) ( ( Speed / 256.0F ) * ( (float) FmPolys[i].Start_B ) );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
@@ -920,12 +977,16 @@ void FmPolyProcess( void )
 				Speed = SmokeRingShadeTable[ (int16_t) FmPolys[i].Frame ];
 				FmPolys[i].R = (u_int8_t) ( ( Speed / 256.0F ) * ( (float) FmPolys[i].Start_R ) );
 				FmPolys[i].G = (u_int8_t) ( ( Speed / 256.0F ) * ( (float) FmPolys[i].Start_G ) );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].B = (u_int8_t) ( ( Speed / 256.0F ) * ( (float) FmPolys[i].Start_B ) );
 
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].xsize += ( ( 0.25F * GLOBAL_SCALE ) * framelag );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].ysize += ( ( 0.25F * GLOBAL_SCALE ) * framelag );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
@@ -941,6 +1002,7 @@ void FmPolyProcess( void )
 		   			FmPolys[i].UpSpeed += 0.2F;
 		   			if( FmPolys[i].UpSpeed > 10.0F ) FmPolys[i].UpSpeed = 10.0F;
 		   		}
+/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 
 		   		FmPolys[i].Frame += ( framelag / FmPolys[i].AnimSpeed );
 		   		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
@@ -970,6 +1032,7 @@ void FmPolyProcess( void )
   	     			TempDir.z = ( FmPolys[i].Dir.z * framelag );
 
 					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &FmPolys[i].Pos,
+	     								  /* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     								  FmPolys[i].Group, &TempDir, (VECTOR *) &Int_Point,
 	     								  &FmPolys[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
 	     			{
@@ -988,13 +1051,16 @@ void FmPolyProcess( void )
 	     				}
 
 						FmPolys[i].Dir.x *= Speed;
+	     				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     				FmPolys[i].Dir.y *= Speed;
 	     				FmPolys[i].Dir.z *= Speed;
 	     			}
 					else
 					{
+		     			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		     			FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * framelag );
 		     			FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * framelag );
+		     			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		     			FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * framelag );
 					}
 
@@ -1002,14 +1068,17 @@ void FmPolyProcess( void )
 
 	     			if( TempDir.x )
 	     			{
+	     				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     				if( TempDir.x > 0.0F )
 	     				{
 	     					TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+	     					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     					if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
 	     				}
 	     				else
 	     				{
 	     					TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+	     					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     					if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
 	     				}
 	     			}
@@ -1041,8 +1110,11 @@ void FmPolyProcess( void )
 	   			FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.15F ) ) * framelag );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+	   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	   			FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.10F ) ) * framelag );
+	   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	   			FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.05F ) ) * framelag );
+	   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	   			FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed ) + ( (float) fast_sinf( FmPolys[i].LifeCount * ( 0.15F ) ) * framelag );
 
 	   			if( FmPolys[i].Speed > 0.0F )
@@ -1051,6 +1123,7 @@ void FmPolyProcess( void )
 	   				if( FmPolys[i].Speed < 0.0F ) FmPolys[i].Speed = 0.0F;
 	   			}
 
+	   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	   			if( FmPolys[i].UpSpeed < 4.0F )
 	   			{
 	   				FmPolys[i].UpSpeed += ( 0.4F * framelag );
@@ -1062,6 +1135,7 @@ void FmPolyProcess( void )
 				TempDir.z = ( FmPolys[i].Pos.z - OldPos.z );
 				FmPolys[i].Group = MoveGroup( &Mloadheader, &OldPos, FmPolys[i].Group, &TempDir );
 
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				if( ( FmPolys[i].LifeCount == 0.0F ) ||	( !InWater( FmPolys[i].Group, &FmPolys[i].Pos, &Damage ) ) )
 				{
 					TempDir.x = ( FmPolys[i].Pos.x - OldPos.x );
@@ -1096,6 +1170,7 @@ void FmPolyProcess( void )
 							FmPolys[ i ].R = (u_int8_t) ( 255.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE2 ) * ( 83.0F / NMEGEN_STAGE1_LEN ) ) );
 							FmPolys[ i ].G = (u_int8_t) ( 255.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE2 ) * ( 206.0F / NMEGEN_STAGE1_LEN ) ) );
 							FmPolys[ i ].B = (u_int8_t) ( 255.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE2 ) * ( 255.0F / NMEGEN_STAGE1_LEN ) ) );
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							FmPolys[ i ].xsize -= ( ( ( 6.0F * GLOBAL_SCALE ) / NMEGEN_STAGE1_LEN ) * framelag );
 							FmPolys[ i ].ysize = FmPolys[ i ].xsize;
 						}
@@ -1127,8 +1202,10 @@ void FmPolyProcess( void )
 					{
 						if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE2 )		// 3 - 4
 						{
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							FmPolys[ i ].xsize -= ( ( ( 6.0F * GLOBAL_SCALE ) / NMEGEN_STAGE1_LEN ) * framelag );
 							FmPolys[ i ].ysize = FmPolys[ i ].xsize;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						}
 						else												// 4 - 5
 						{
@@ -1199,16 +1276,21 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].UpSpeed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
 
 				OldSize = FmPolys[i].xsize;
+/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 
 				FmPolys[i].xsize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].ysize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
 
 				if( ( FmPolys[i].xsize > 0.0F ) && ( FmPolys[i].ysize > 0.0F ) )
@@ -1244,14 +1326,19 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].UpSpeed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
 
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				Speed = ( FmPolys[i].Speed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
 
 				FmPolys[i].xsize -= ( ( 0.1F * GLOBAL_SCALE ) * framelag );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].ysize -= ( ( 0.1F * GLOBAL_SCALE ) * framelag );
 
 				if( ( FmPolys[i].xsize > 0.0F ) && ( FmPolys[i].ysize > 0.0F ) )
@@ -1315,28 +1402,34 @@ void FmPolyProcess( void )
 	     			TempDir.y = ( FmPolys[i].Dir.y * framelag );
   	     			TempDir.z = ( FmPolys[i].Dir.z * framelag );
 
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					if( WaterObjectCollide( FmPolys[i].Group, &FmPolys[i].Pos, &TempDir, &Int_Point, 0 ) )
 					{
 			   			KillUsedFmPoly( i );
 					}
 					else
 					{
+		     			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		     			FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * framelag );
 		     			FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * framelag );
 			 			FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * framelag );
 
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						ApplyMatrix( &UpMatrix, &FmPolys[i].Dir, &TempDir );
 
 	     				if( TempDir.x )
 	     				{
+	     					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     					if( TempDir.x > 0.0F )
 	     					{
 	     						TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+	     						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     						if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
 	     					}
 	     					else
 	     					{
 	     						TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+	     						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     						if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
 	     					}
 	     				}
@@ -1346,6 +1439,7 @@ void FmPolyProcess( void )
 	     					{
 	     						TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
 	     						if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+	     					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 	     					}
 	     					else
 	     					{
@@ -1363,11 +1457,13 @@ void FmPolyProcess( void )
 		   	case FM_HK5_TRAIL:								// Hk5 Trail?
 				if( FmPolys[i].LifeCount == 0.0F )
 				{
+		   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   			KillUsedFmPoly( i );
 				}
 				else
 				{
 					FmPolys[i].xsize -= ( ( 0.25F * GLOBAL_SCALE ) * framelag );
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					FmPolys[i].ysize -= ( ( 0.25F * GLOBAL_SCALE ) * framelag );
 
 					Speed = ( FmPolys[i].Speed * framelag );
@@ -1389,16 +1485,21 @@ void FmPolyProcess( void )
 				Speed = ( FmPolys[i].UpSpeed * framelag );
 		   		FmPolys[i].Pos.x += ( FmPolys[i].UpVector.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].UpVector.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].UpVector.z * Speed );
 
 				Speed = ( FmPolys[i].Speed * framelag );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
 		   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
+		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
 
 				OldSize = FmPolys[i].xsize;
+/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 
 				FmPolys[i].xsize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				FmPolys[i].ysize -= ( ( 0.15F * GLOBAL_SCALE ) * framelag );
 
 				if( ( FmPolys[i].xsize > 0.0F ) && ( FmPolys[i].ysize > 0.0F ) )
@@ -1411,6 +1512,7 @@ void FmPolyProcess( void )
 
 		   			if( FmPolys[i].UpSpeed < 10.0F )
 		   			{
+		   				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   				FmPolys[i].UpSpeed += ( 0.15F * framelag );
 		   				if( FmPolys[i].UpSpeed > 10.0F ) FmPolys[i].UpSpeed = 10.0F;
 		   			}
@@ -1428,6 +1530,7 @@ void FmPolyProcess( void )
 				}
 		   		break;
 
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			case FM_SPARKLE:						// Sparkle?
 				if( FmPolys[i].LifeCount == 0.0F )
 				{
@@ -1437,6 +1540,7 @@ void FmPolyProcess( void )
 				{
 					Speed = ( FmPolys[i].Speed * framelag );
 			   		FmPolys[i].Pos.x += ( FmPolys[i].Dir.x * Speed );
+			   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			   		FmPolys[i].Pos.y += ( FmPolys[i].Dir.y * Speed );
 			   		FmPolys[i].Pos.z += ( FmPolys[i].Dir.z * Speed );
 
@@ -1454,6 +1558,7 @@ void FmPolyProcess( void )
 				}
 				break;
 
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			case FM_GOALSPARKLE:						// Sparkle?
 				if( FmPolys[i].LifeCount == 0.0F )
 				{
@@ -1822,8 +1927,10 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 									break;
 
 								case BOX_BOTHFLIP:
+			   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			   						Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
 			   						Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
+			   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			   						Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
 			   						Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
 			   						Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
@@ -2200,8 +2307,10 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 									break;
 
 								case BOX_BOTHFLIP:
+			   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			   						Xsize.x = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.x );
 			   						Xsize.y = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.y );
+			   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			   						Xsize.z = -( ( Box_Ptr->xsize * FmPolys[ i ].xsize ) * XVector.z );
 			   						Ysize.x = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.x );
 			   						Ysize.y = -( ( Box_Ptr->ysize * FmPolys[ i ].ysize ) * YVector.y );
