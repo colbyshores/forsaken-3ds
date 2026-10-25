@@ -4,10 +4,12 @@
  * builds compile these macros to the plain calls / nothing: no new symbols
  * in the shipped binary (perf_capture_3ds.c is an empty TU when off).
  *
- * write is 5-10 ms, so NOTHING here writes per frame. Counters live in
- * static memory; exactly ONE trace() dump sequence happens at teardown.
- * Tick source is timerGetTicks() (26 MHz / 8 = 3.35544 MHz); conversion to
- * ms is done offline so on-device cost is one tick read per gate.
+ * with fsync is 5-10 ms, so NOTHING here writes per frame. Counters live
+ * in static memory; exactly ONE dump sequence to sdmc:/forsaken_perf.txt
+ * happens at teardown, through perf_capture_3ds.c's own fd (the trace()
+ * path is __3DS_DEBUG__-gated and would drag in autoboot/god-mode).
+ * Tick source is svcGetSystemTick() (32768 Hz); conversion to ms is done
+ * offline so on-device cost is one tick read per gate.
  */
 #ifndef PERF_CAPTURE_INCLUDED
 #define PERF_CAPTURE_INCLUDED

@@ -23,11 +23,20 @@ does not exist yet. It stays baselined.
 ## 1. Pre-session state (verify before travel)
 
 - Branch `experimental/performance_contract`, `tools/perf/check.sh` → ALL GATES PASS.
-- Instrumented build: `make -f Makefile.3ds EDITION=remaster PERF_CAPTURE=1`
-  (verified to link 2026-10-25). Default builds are unaffected: with the flag
-  off, `perf_capture_3ds.o` is empty and no perf symbols exist.
-- Bring: SD card with the `.3dsx`, a serial/`3dslink` trace sink (the PERF
-  dump goes through `trace()`), and both build binaries (A/B below).
+- Instrumented build: `make -f Makefile.3ds PERF_CAPTURE=1 SLIM=1`
+  (verified to link and run 2026-10-25). Do NOT add `EDITION=remaster` or
+  `DEBUG=1` to a capture build: both force `-DVERBOSE_TRACE`, whose
+  per-line fsync (5–10 ms each, P5) would poison the timing being measured,
+  and `__3DS_DEBUG__` additionally enables autoboot + god mode. Default
+  builds are unaffected: with the flag off, `perf_capture_3ds.o` is empty
+  and no perf symbols exist.
+- The dump goes to `sdmc:/forsaken_perf.txt` through perf_capture_3ds.c's
+  own fd — no trace/serial sink needed.
+- Make does not track CFLAGS changes: when toggling `PERF_CAPTURE`,
+  `touch perf_capture_3ds.c main.c oct2.c` (or clean-build) or the stale
+  object is relinked silently.
+- Bring: SD card with the `.3dsx` plus the SD romfs, and both build
+  binaries (A/B below).
 
 ## 2. P6 environment record — fill in, do not skip
 
@@ -51,13 +60,16 @@ A New-clocked run is not an OG pass. Record both if you have both.
      one),
    - a quiet level (baseline floor),
    - title screen (cold-path reference).
-3. Exit normally (HOME → Close, or Start+Select). The teardown emits one
-   `PERF: dump begin` … `PERF: dump end` block into the trace log — one SD
-   write sequence, never per-frame (P5).
-4. Copy the trace log off the card verbatim →
+3. Exit normally (HOME → Close, or Start+Select — both are the clean
+   `aptMainLoop()` exit path, not a crash). The teardown emits one
+   `PERF: dump begin` … `PERF: dump end` block into
+   `sdmc:/forsaken_perf.txt` — one SD write sequence, never per-frame (P5).
+   If the file is missing after exit, the run did not reach teardown
+   (check `sdmc:/forsaken_boot.log`, which is always-on).
+4. Copy `forsaken_perf.txt` off the card verbatim →
    `docs/validation/perf-YYYY-MM-DD-capture.log`.
 
-Log format (ticks are `timerGetTicks()`, 26 MHz/8 = 3.35544 MHz):
+Log format (ticks are `svcGetSystemTick()`, 2^15 Hz = 32768 Hz):
 
 ```
 PERF: stage=0 count=N total=T max=M     (0=frame, 1=MainGame, 2=MainGameRender)
@@ -67,7 +79,7 @@ PERF: frames=N
 
 ## 4. Corpus update procedure (offline, after the session)
 
-1. ms-per-frame per stage = `total / count / 3355440 * 1000`.
+1. ms-per-frame per stage = `total / count / 32768 * 1000`. Histogram buckets are 33 ticks (~1.007 ms).
 2. A function qualifies HOT if it runs ≥1×/frame AND is top-15 by total, or
    ≥256×/frame (AGENTS.md §2). Stage counters cover frame structure; for
    per-function granularity beyond MainGame/MainGameRender, note it as a
