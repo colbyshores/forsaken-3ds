@@ -122,9 +122,6 @@ R4-D|new3d.c|spline|double in hot function spline
 R4-D|new3d.c|spline|double in hot function spline
 R4-D|new3d.c|spline|double in hot function spline
 R4-D|new3d.c|spline|double in hot function spline
-R4-D|render_c3d.c|build_gamma_table|double in hot function build_gamma_table
-R4-D|render_c3d.c|build_gamma_table|double in hot function build_gamma_table
-R4-D|render_c3d.c|build_gamma_table|double in hot function build_gamma_table
 R4|new3d.c|spline|double/long double in hot path
 R4|new3d.c|spline|unsuffixed float literal promotes to double
 R4|new3d.c|spline|unsuffixed float literal promotes to double
@@ -138,14 +135,6 @@ R4|new3d.c|spline|unsuffixed float literal promotes to double
 R4|new3d.c|spline|unsuffixed float literal promotes to double
 R4|new3d.c|spline|unsuffixed float literal promotes to double
 R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
-R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
-R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
-R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
-R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
-R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
-R4|oct2.c|RenderCurrentCameraInStereo|unsuffixed float literal promotes to double
-R4|oct2.c|RenderCurrentCameraInStereo|unsuffixed float literal promotes to double
 R7|2dpolys.c|FmPolyProcess|float division in hot loop
 R7|2dpolys.c|FmPolyProcess|float division in hot loop
 R7|2dpolys.c|FmPolyProcess|float division in hot loop

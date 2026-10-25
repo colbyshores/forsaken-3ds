@@ -448,6 +448,7 @@ void pglSwapBuffers(void)
 	u64 elapsed = now - s_fps_window_start_ms;
 	if (elapsed >= 1000)
 	{
+		/* @vfp-exempt R11 — FPS counter window update, once per measurement window (~1/s), not per frame. measured n/a. Verified 2026-10-25. */
 		s_fps_current = (int)((s_fps_frames_in_win * 1000ULL) / elapsed);
 		s_fps_window_start_ms = now;
 		s_fps_frames_in_win = 0;

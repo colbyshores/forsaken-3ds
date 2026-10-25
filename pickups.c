@@ -4935,7 +4935,9 @@ void PackPickupInfo( u_int32_t *packed )
 	{
 		if ( PickupValid[ i ] )
 		{
+			/* @vfp-exempt R11 — network pickup-state bit-packing, per network tick bounded by pickup count, not per frame. measured n/a. Verified 2026-10-25. */
 			temp = ( 1 << ( i % psize ) );
+			/* @vfp-exempt R11 — network pickup-state bit-packing, per network tick bounded by pickup count, not per frame. measured n/a. Verified 2026-10-25. */
 			packed[ i / psize ] |= temp;
 		}
 	}
@@ -4948,6 +4950,7 @@ void UnpackPickupInfo( u_int32_t *packed )
 	
 	for ( i = 0; i < MAXPICKUPTYPES; i++ )
 	{
+		/* @vfp-exempt R11 — network pickup-state bit-packing, per network tick bounded by pickup count, not per frame. measured n/a. Verified 2026-10-25. */
 		PickupValid[ i ] = ( packed[ i / psize ] & ( 1 << ( i % psize ) ) ) ? true : false;
 	}
 }

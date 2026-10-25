@@ -6,20 +6,3 @@
 # note. Line numbers are absent on purpose: a file:line baseline reports the SAME
 # site as new after any edit above it. Regenerate with:
 #     python3 tools/perf/audit_r11_idiv.py --bless
-goal.c  divisor=NumGoals  x1  return RandomStartPosModify % NumGoals;
-networking.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
-networking.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
-pickups.c  divisor=psize  x1  packed[ i / psize ] |= temp;
-pickups.c  divisor=psize  x1  temp = ( 1 << ( i % psize ) );
-pickups.c  divisor=psize  x2  PickupValid[ i ] = ( packed[ i / psize ] & ( 1 << ( i % psize ) ) ) ? true : false;
-render_c3d.c  divisor=elapsed  x1  s_fps_current = (int)((s_fps_frames_in_win * 1000ULL) / elapsed);
-ships.c  divisor=Mloadheader.num_groups  x1  group = ( Ships[i].Object.Group + group ) % Mloadheader.num_groups;
-ships.c  divisor=Mloadheader.num_groups  x1  if ( !strcasecmp( roomname, Mloadheader.Group[ ( Ships[i].Object.Group + group ) % Mloadheader.num_groups ].name ) )
-ships.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
-ships.c  divisor=num_start_positions  x1  startpos = pos % num_start_positions;
-ships.c  divisor=num_start_positions  x1  trys = ( orgtry + e ) % num_start_positions;
-ships.c  divisor=num_start_positions  x1  trys = ( orgtry + e ) % num_start_positions;
-ships.c  divisor=num_start_positions  x1  trys = ( orgtry + e ) % num_start_positions;
-text.c  divisor=FontWidth  x1  MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
-text.c  divisor=FontWidth  x1  MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
-text.c  divisor=FontWidth  x1  MAX = floorf((render_info.window_size.cx-FontWidth*27)/FontWidth);

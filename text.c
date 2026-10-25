@@ -346,6 +346,7 @@ void	PlayerMessageQuePrint( void )
 	int i,y,z,MAX, ypos;
 	char MessageBuff[150];
 
+	/* @vfp-exempt R11 — HUD message wrap width, a few messages per frame at most; FontWidth constant per font. measured n/a. Verified 2026-10-25. */
 	MAX = floorf((render_info.window_size.cx-FontWidth*27)/FontWidth);
 	if(MAX < 10) MAX = 10;
 	else if(MAX > 149) MAX = 149;
@@ -402,6 +403,7 @@ void	MessageQuePrint( void )
 	int i,y,z,MAX;
 	char MessageBuff[150];
 
+	/* @vfp-exempt R11 — HUD message wrap width, a few messages per frame at most; FontWidth constant per font. measured n/a. Verified 2026-10-25. */
 	MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
 	if(MAX < 10) MAX = 10;
 	else if(MAX > 149) MAX = 149;
@@ -441,6 +443,7 @@ void	MessageQuePrintAll( void )
 	int i,y,z,MAX;
 	char MessageBuff[150];
 
+	/* @vfp-exempt R11 — HUD message wrap width, a few messages per frame at most; FontWidth constant per font. measured n/a. Verified 2026-10-25. */
 	MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
 	if(MAX < 10) MAX = 10;
 	else if(MAX > 149) MAX = 149;

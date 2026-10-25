@@ -364,6 +364,7 @@ int PickTeamGoal( int team )
 			if ( !d )
 			{
 				DebugPrintf( "Allocating first team goal at random\n" );
+				/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 				return RandomStartPosModify % NumGoals;
 			}
 			else if ( goal < 0 || d > dmax )

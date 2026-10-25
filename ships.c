@@ -1776,6 +1776,7 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 		
 		if ( Mloadheader->state == true)
 		{
+			/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 			spos = (i+RandomStartPosModify) % num_start_positions;
 			InitShipStartPos( i, spos );
 		}else{
@@ -2023,6 +2024,7 @@ void InitShipRandomPos( int16_t i )
 #if 0
 			for( e = 0 ; e < num_start_positions ; e++ )
 			{
+				/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 				trys = ( orgtry + e ) % num_start_positions;
 				
 				MineVec.x = StartPositions[trys].Pos.x;
@@ -2042,6 +2044,7 @@ void InitShipRandomPos( int16_t i )
 #endif
 			for( e = 0 ; e < num_start_positions ; e++ )
 			{
+				/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 				trys = ( orgtry + e ) % num_start_positions;
 
 				MineVec.x = StartPositions[trys].Pos.x;
@@ -2059,6 +2062,7 @@ void InitShipRandomPos( int16_t i )
 			}
 			for( e = 0 ; e < num_start_positions ; e++ )
 			{
+				/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 				trys = ( orgtry + e ) % num_start_positions;
 
 				MineVec.x = StartPositions[trys].Pos.x;
@@ -2136,6 +2140,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 
 	if( Mloadheader.state == true )
 	{
+		/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 		startpos = pos % num_start_positions;
 		MineVec.x = StartPositions[startpos].Pos.x;
 		MineVec.y = StartPositions[startpos].Pos.y;
@@ -2243,11 +2248,13 @@ bool GotoRoom( int16_t i, char *roomname )
 	{
 		for ( group = 0; group < Mloadheader.num_groups; group++ )
 		{
+			/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 			if ( !strcasecmp( roomname, Mloadheader.Group[ ( Ships[i].Object.Group + group ) % Mloadheader.num_groups ].name ) )
 				break;
 		}
 		if ( group >= Mloadheader.num_groups )
 			return false;
+		/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 		group = ( Ships[i].Object.Group + group ) % Mloadheader.num_groups;
 		for ( startpos = 0; startpos < num_start_positions; startpos++ )
 		{

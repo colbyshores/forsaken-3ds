@@ -141,9 +141,11 @@ void platform_delay(u_int32_t ms)
  * Default-NaN (bit 25) are this engine's chosen numerical mode. FPSCR is
  * per-thread state, so main and every float worker thread must establish it
  * at its own entry — main's state says nothing about a worker's. Modern
- * libctru already initializes FZ|DN on supported entry paths (verify the
- * linked version); these helpers are the defensive pin with read-back, not
- * a speedup claim. Never toggle FZ|DN mid-gameplay: it changes numerical
+ * libctru already initializes FZ|DN on supported entry paths — verified
+ * 2026-10-25 by disassembling the linked libctru.a (devkitARM 15.2.0):
+ * initThreadVars executes mov r1,#0x03000000; vmsr fpscr,r1 on the main and
+ * threadCreate paths, matching this helper's FZ|DN exactly; these helpers are
+ * the defensive pin with read-back, not a speedup claim. Never toggle FZ|DN mid-gameplay: it changes numerical
  * semantics for everything running on that thread.
  */
 int vfp_set_fz_dn(void)

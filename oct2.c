@@ -4806,9 +4806,9 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
         CurrentCamera.Pos.y -= cam_offset.y;
         CurrentCamera.Pos.z -= cam_offset.z;
 	CurrentCamera.Viewport.Height = viewport.Height;
-	CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / (float)2.0;
+	CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / 2.0f;
 	CurrentCamera.Viewport.Width = viewport.Width;
-	CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / (float)2.0;
+	CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / 2.0f;
 	CurrentCamera.Viewport.Y = viewport.Y;
 	CurrentCamera.Viewport.X = viewport.X;
 	if(render_info.stereo_mode == STEREO_MODE_COLOR)
@@ -5168,8 +5168,8 @@ bool MainGameRender(void)
         CurrentCamera.Viewport.Y = viewport.Y + (viewport.Height >>4);
         CurrentCamera.Viewport.Width = viewport.Width >>2;
         CurrentCamera.Viewport.Height = viewport.Height >>2;
-        CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / (float)2.0;
-        CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / (float)2.0;
+        CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / 2.0f;
+        CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / 2.0f;
 
 /* bjd
         CurrentCamera.Viewport.dvMaxX = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.dwWidth),
@@ -5199,10 +5199,10 @@ bool MainGameRender(void)
         CameraRendering = CAMRENDERING_Pip;
         CurrentCamera.enable = 1;
         CurrentCamera.Viewport = viewport;
-        CurrentCamera.Viewport.Width = viewport.Width / (float)2.0;
-        CurrentCamera.Viewport.Height = viewport.Height / (float)2.0;
-        CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / (float)2.0;
-        CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / (float)2.0;
+        CurrentCamera.Viewport.Width = viewport.Width / 2.0f;
+        CurrentCamera.Viewport.Height = viewport.Height / 2.0f;
+        CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / 2.0f;
+        CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / 2.0f;
         CurrentCamera.UseLowestLOD = true;
         main_fov = hfov;
         SetFOV( normal_fov );

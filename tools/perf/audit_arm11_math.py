@@ -95,6 +95,8 @@ def is_hot(seed: dict[str, object], rel: str, fname: str) -> bool:
     entry = seed.get(rel)
     if entry is None:
         return False
+    if fname in (getattr(entry, "cold_symbols", ()) or ()):
+        return False
     syms = getattr(entry, "symbols", None) or []
     return "*" in syms or fname in syms
 

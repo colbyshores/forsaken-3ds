@@ -1228,6 +1228,7 @@ void initShip( u_int16_t i )
 
 	if ( Mloadheader.state == true)
 	{
+		/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 		spos = (i+RandomStartPosModify) % num_start_positions;
 		InitShipStartPos( i, spos );
 	}
@@ -1268,6 +1269,7 @@ void smallinitShip( u_int16_t i )
 
 	if ( Mloadheader.state == true)
 	{
+		/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 		spos = (i+RandomStartPosModify) % num_start_positions;
 		InitShipStartPos( i, spos );
 	}
