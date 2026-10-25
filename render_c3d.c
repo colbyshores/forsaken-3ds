@@ -751,6 +751,8 @@ u_int8_t gamma_table[256];
 	Gamma table (shared with texture loader)
 ===================================================================*/
 
+/* @vfp-exempt R6 — one-shot gamma table build at init, not a per-frame path;
+   pow output IS the table. measured n/a. Verified 2026-10-25. */
 void build_gamma_table(double gamma)
 {
 	int i;
@@ -2086,7 +2088,7 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		float seed_phase =
 		    ((s_atlasSeed >> 8) & 0xFFFF) * (1.0f / 65536.0f);
 		float combined = texdata->proctex_phase + seed_phase;
-		combined -= floorf(combined);
+		combined -= fast_floorf(combined);
 		desired_bucket = (int)(combined * (float)ATLAS_PHASE_BUCKETS);
 		if (desired_bucket >= ATLAS_PHASE_BUCKETS)
 			desired_bucket = ATLAS_PHASE_BUCKETS - 1;

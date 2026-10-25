@@ -611,12 +611,12 @@ clear:					mov		eax, [esi]
 						CellIndex.x = Posx - Mloadheader->Group[group].cell_origin[execbuf].x;
 						CellIndex.y = Posy - Mloadheader->Group[group].cell_origin[execbuf].y;
 						CellIndex.z = Posz - Mloadheader->Group[group].cell_origin[execbuf].z;
-						CellIndex_x = (int) floorf( (CellIndex.x - OSize) * CellSize );
-						CellIndex_y = (int) floorf( (CellIndex.y - OSize) * CellSize );
-						CellIndex_z = (int) floorf( (CellIndex.z - OSize) * CellSize );
-						CellRange_x = (int) floorf( (CellIndex.x + OSize) * CellSize );
-						CellRange_y = (int) floorf( (CellIndex.y + OSize) * CellSize );
-						CellRange_z = (int) floorf( (CellIndex.z + OSize) * CellSize );
+						CellIndex_x = (int) fast_floorf( (CellIndex.x - OSize) * CellSize );
+						CellIndex_y = (int) fast_floorf( (CellIndex.y - OSize) * CellSize );
+						CellIndex_z = (int) fast_floorf( (CellIndex.z - OSize) * CellSize );
+						CellRange_x = (int) fast_floorf( (CellIndex.x + OSize) * CellSize );
+						CellRange_y = (int) fast_floorf( (CellIndex.y + OSize) * CellSize );
+						CellRange_z = (int) fast_floorf( (CellIndex.z + OSize) * CellSize );
 					
 					
 						if( CellIndex_x < 0 )
@@ -1444,9 +1444,9 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 	CellIndex.x = Pos->x - Mloadheader->Group[group].cell_origin[0].x;
 	CellIndex.y = Pos->y - Mloadheader->Group[group].cell_origin[0].y;
 	CellIndex.z = Pos->z - Mloadheader->Group[group].cell_origin[0].z;
-	CellIndex_x = (int) floorf( CellIndex.x * CellSize );
-	CellIndex_y = (int) floorf( CellIndex.y * CellSize );
-	CellIndex_z = (int) floorf( CellIndex.z * CellSize );
+	CellIndex_x = (int) fast_floorf( CellIndex.x * CellSize );
+	CellIndex_y = (int) fast_floorf( CellIndex.y * CellSize );
+	CellIndex_z = (int) fast_floorf( CellIndex.z * CellSize );
 	if( CellIndex_x < 0 )
 	{
 		CellIndex_x = -1;

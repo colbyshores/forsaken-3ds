@@ -2974,7 +2974,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		Should never be in here
 ===================================================================*/
    		case MIS_SPIRALING:												/* Spiraling missile */
-			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) - ( floorf( ( SecBulls[i].LifeCount * 6.0F ) / 360.0F ) * 360.0F ) ) );
+			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) - ( fast_floorf( ( SecBulls[i].LifeCount * 6.0F ) / 360.0F ) * 360.0F ) ) );
 
 			Rotation.x = (float) fast_sinf( Angle );
 			Rotation.y = (float) fast_cosf( Angle );
@@ -2985,7 +2985,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 			TempPoint1.y = ( UpVector.y * SPIRAL_RADIUS );
 			TempPoint1.z = ( UpVector.z * SPIRAL_RADIUS );
 
-			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) - ( floorf( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) / 360.0F ) * 360.0F ) );
+			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) - ( fast_floorf( ( ( SecBulls[i].LifeCount * 6.0F ) + 30.0F ) / 360.0F ) * 360.0F ) );
 
 			Rotation.x = (float) fast_sinf( Angle );
 			Rotation.y = (float) fast_cosf( Angle );
@@ -6664,7 +6664,7 @@ void DispHUDNames( void )
                 Ship = VisibleShipsPos[ Count ].Ship;
 
 				// format the ship health as a percentage
-                sprintf( (char*) &buf[0] ,"%d", (u_int16_t) ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
+                sprintf( (char*) &buf[0] ,"%d", (u_int16_t) fast_ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
 
 				// display using whatever scaled font player has chosen
                 if(ScaleFontPlayerHealthAboveBikes)
@@ -6964,7 +6964,7 @@ void CreateScatterTrail( u_int16_t i )
 	Green1 = 255;
 	Blue1 = 255;
 
-	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( floorf( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
+	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( fast_floorf( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
 					* ScatterTrail_Header->Num_Frames ) );
 
 	for( Count = 0; Count < SecBulls[ i ].NumOldPos; Count++ )
@@ -7109,7 +7109,7 @@ void CreateTentacle( u_int16_t i )
 	Green2 = 64;
 	Blue2 = 64;
 
-	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( floorf( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
+	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( fast_floorf( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
 					* ScatterTrail_Header->Num_Frames ) );
 
 	for( Count = (int16_t) SecBulls[i].RetractPos; Count < SecBulls[ i ].NumOldPos; Count++ )

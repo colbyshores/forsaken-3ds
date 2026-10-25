@@ -30,6 +30,7 @@
 #include "main.h"
 #include "util.h"
 #include "music.h"
+#include "main_3ds.h"
 
 /* ---- configuration ---- */
 
@@ -301,6 +302,12 @@ static void close_track(void)
 static void music_thread_fn(void *arg)
 {
 	(void)arg;
+	/* R1 (AGENTS.md §3): FPSCR is per-thread state and this worker touches
+	 * floats in the channel-restart path (ndspChnSetRate / ndspChnSetMix).
+	 * Establish Flush-to-Zero (FZ) + Default-NaN (DN) at entry so denormal
+	 * results cannot stall the VFP11 on this thread, independent of what
+	 * libctru initialized. See main_3ds.h for the full rationale. */
+	vfp_thread_fz_dn();
 	while (!s_thread_exit) {
 		LightLock_Lock(&s_lock);
 		if (s_initialized && s_playing && s_file) {

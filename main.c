@@ -691,6 +691,18 @@ int main( int argc, char* argv[] )
 {
 #ifdef __3DS__
 	boot_log("[boot] main: entry");
+
+	/* R1 (AGENTS.md §3): establish FPSCR Flush-to-Zero (FZ) + Default-NaN
+	 * (DN) on this thread before any float math runs. Denormal results
+	 * stall the VFP11; FZ|DN are this engine's chosen numerical mode.
+	 * FPSCR is per-thread state, so every thread that touches float
+	 * establishes it at its own entry (workers do the same). Modern
+	 * libctru initializes it on supported entry paths; this is the
+	 * defensive pin with read-back, not a speedup claim. Refuse to run if
+	 * the bits cannot be verified rather than silently run in a different
+	 * numerical mode. */
+	if (!vfp_set_fz_dn())
+		return 1;
 #endif
 	int i;
 	char cli[500];

@@ -97,13 +97,41 @@ static inline float fast_cosf(float rad)
  * VRSQRTE / VRECPE are unavailable on this CPU — do not reach for them. */
 static inline float fast_invsqrtf(float x) { return 1.0f / sqrtf( x ); }
 
+/* Floor / ceil without libm.  VFPv2 has no float-result floor instruction,
+ * so floorf/ceilf are a real `bl` into newlib with vmrs/vmsr flag transfers
+ * and a spill frame (see the fast_sinf rationale above); the (int) vcvt
+ * below is one conversion with no boundary round trip.  Bit-identical to
+ * floorf/ceilf on the domain |x| < 2^31 EXCEPT the sign of zero results:
+ * fast_floorf(-0.0f) returns +0.0f and fast_ceilf of a negative fraction
+ * returns +0.0f where libm returns -0.0f.  IEEE comparison treats ±0 as
+ * equal, and every call site in this tree casts the result to an integer
+ * type or feeds it into FMOD/FDIV below, where the sign of zero cannot
+ * change the output — do not introduce a consumer that divides by or
+ * sign-tests these results without revisiting this.  Outside |x| < 2^31
+ * the (int) cast is UB, same caveat as fast_sinf.  Game coordinates,
+ * texture phases, and cell indices are all far inside that domain.
+ * R6/R2 standing exemption: this IS the sanctioned floor for hot paths. */
+static inline float fast_floorf(float x)
+{
+	int   i = (int)x;
+	float t = (float)i;
+	return (x < t) ? t - 1.0f : t;
+}
+
+static inline float fast_ceilf(float x)
+{
+	int   i = (int)x;
+	float t = (float)i;
+	return (x > t) ? t + 1.0f : t;
+}
+
 #define	SINR(x)				fast_sinf( x )
 #define	COSR(x)				fast_cosf( x )
 #define	SIND(x)				fast_sinf( D2R( x ) )
 #define	COSD(x)				fast_cosf( D2R( x ) )
 #define ATAND(y, x)			R2D( atan2f(y, x) )
-#define FMOD( NUM, DIV )	( (NUM) - (DIV) * floorf( (NUM) / (DIV) ) )
-#define FDIV( NUM, DIV )	( (DIV) * floorf( (NUM) / (DIV) ) )
+#define FMOD( NUM, DIV )	( (NUM) - (DIV) * fast_floorf( (NUM) / (DIV) ) )
+#define FDIV( NUM, DIV )	( (DIV) * fast_floorf( (NUM) / (DIV) ) )
 
 /*===================================================================
 	Structures

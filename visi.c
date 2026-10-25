@@ -1033,6 +1033,9 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	float lr;
 
 	// calculate clipping planes
+	/* @vfp-exempt R6 — tanf runs once per FindVisible call (per camera pass),
+	   not per iteration; a LUT swap would change clip-plane rounding.
+	   measured n/a. Verified 2026-10-25. */
 	w = (float) tanf( hfov );
 	h = w / render_info.aspect_ratio;
 	clip_right.x = w;
@@ -1124,10 +1127,10 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	// set viewport and projection matrix for each visible group
 	for ( g = v->first_visible; g; g = g->next_visible )
 	{
-		clip.x1 = (long) floorf( g->extent.min.x );
-		clip.y1 = (long) floorf( g->extent.min.y );
-		clip.x2 = (long) ceilf( g->extent.max.x );
-		clip.y2 = (long) ceilf( g->extent.max.y );
+		clip.x1 = (long) fast_floorf( g->extent.min.x );
+		clip.y1 = (long) fast_floorf( g->extent.min.y );
+		clip.x2 = (long) fast_ceilf( g->extent.max.x );
+		clip.y2 = (long) fast_ceilf( g->extent.max.y );
 		if ( clip.x1 < 0 )
 			clip.x1 = 0;
 		if ( clip.y1 < 0 )

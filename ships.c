@@ -734,6 +734,8 @@ bool ProcessShips()
 
 	RearCameraDisable = false;
 
+/* @vfp-exempt R6 — dead diagnostic block disabled by #if 0, never compiled
+   into any build. measured n/a. Verified 2026-10-25. */
 #if 0
 	for( i = 0 ; i < 10 ; i ++ )
 	{
@@ -885,7 +887,7 @@ bool ProcessShips()
 						if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
 						{
 							// update bonus 4 (stats.c) -- bounty hunt points
-							UpdateBonusStats(i,(int16_t) floorf( BountyTime / BountyBonusInterval ));
+							UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
 							BountyTime = FMOD( BountyTime, BountyBonusInterval );
 						}
 					}
@@ -1438,7 +1440,7 @@ bool ProcessShips()
 							if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
 							{
 								// update bonus 7 (stats.c) -- bounty hunt points
-								UpdateBonusStats(i,(int16_t) floorf( BountyTime / BountyBonusInterval ));
+								UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
 								BountyTime = FMOD( BountyTime, BountyBonusInterval );
 							}
 						}					

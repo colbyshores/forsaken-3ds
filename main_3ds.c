@@ -134,6 +134,41 @@ void platform_delay(u_int32_t ms)
 	svcSleepThread((u_int64_t)ms * 1000000ULL);
 }
 
+/* ---- R1: FPSCR FZ|DN (AGENTS.md §3) ----
+ *
+ * Rationale (keep with the asm): decay loops can reach denormal (subnormal)
+ * values, and the VFP11 handles denormals slowly; Flush-to-Zero (bit 24) and
+ * Default-NaN (bit 25) are this engine's chosen numerical mode. FPSCR is
+ * per-thread state, so main and every float worker thread must establish it
+ * at its own entry — main's state says nothing about a worker's. Modern
+ * libctru already initializes FZ|DN on supported entry paths (verify the
+ * linked version); these helpers are the defensive pin with read-back, not
+ * a speedup claim. Never toggle FZ|DN mid-gameplay: it changes numerical
+ * semantics for everything running on that thread.
+ */
+int vfp_set_fz_dn(void)
+{
+	uint32_t fpscr;
+
+	__asm__ __volatile__("vmrs %0, fpscr" : "=r"(fpscr));
+	fpscr |= (1u << 24) | (1u << 25); /* FZ | DN */
+	__asm__ __volatile__("vmsr fpscr, %0" : : "r"(fpscr) : "cc");
+
+	/* Read back: a toolchain or CPU that dropped the write must stop us
+	 * before gameplay, not silently run in a different numerical mode. */
+	__asm__ __volatile__("vmrs %0, fpscr" : "=r"(fpscr));
+	return (fpscr & ((1u << 24) | (1u << 25))) == ((1u << 24) | (1u << 25));
+}
+
+void vfp_thread_fz_dn(void)
+{
+	/* Worker entry: same FZ|DN establishment as main (per-thread FPSCR,
+	 * denormal stall rationale above). A worker has no clean failure path
+	 * mid-audio; set and continue — main has already verified the hardware
+	 * honors the write before gameplay started. */
+	(void)vfp_set_fz_dn();
+}
+
 /* ---- debug trace (writes to sdmc so Mandarine can show it) ---- */
 
 /* Tracing: use low-level write() to bypass stdio buffering.

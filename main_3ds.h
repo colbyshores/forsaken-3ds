@@ -9,6 +9,18 @@
  * works correctly with the engine's projection and HUD layout. */
 #define FS3DS_LETTERBOX_OFFSET_X 0
 
+/* R1 (AGENTS.md §3): establish FPSCR Flush-to-Zero (FZ) + Default-NaN (DN)
+ * on every thread that executes float math, at thread entry, before any hot
+ * path runs. Denormal (subnormal) results stall the VFP11; FZ|DN are this
+ * engine's chosen numerical mode. FPSCR is per-thread state, so main and
+ * every worker establish it themselves — modern libctru initializes it on
+ * supported entry paths and these helpers are the defensive pin with
+ * read-back, not a speedup claim. vfp_set_fz_dn returns 1 when the bits are
+ * verified set; main must refuse to run on failure rather than silently run
+ * in a different numerical mode. */
+int  vfp_set_fz_dn(void);
+void vfp_thread_fz_dn(void);
+
 bool platform_init(void);
 bool platform_init_video(void);
 void platform_render_present(render_info_t *info);
