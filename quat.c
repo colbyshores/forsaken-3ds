@@ -450,6 +450,9 @@ void Quaternion_Slerp( float alpha, QUAT * a, QUAT * b, QUAT * q, int spin )
  	}
 	else
 	{				/* normal case */
+		/* @vfp-exempt R6 — acosf has no LUT form (fast trig is sin/cos only);
+		 * quaternion slerp angle per-ship-per-frame; LUT-izing inverse trig is
+		 * new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
  		theta	= ( (float) acosf( cos_t ) );
  		phi		= ( theta + ( spin * M_PI ) );
  		sin_t	= ( (float) fast_sinf( theta ) );
@@ -534,6 +537,8 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 ** Take arcsin of magnitude of rotation axis to compute rotation angle.
 ** Since crossProductMagnitude=[0,1], we will have theta=[0,pi/2].
 */
+	/* @vfp-exempt R6 — asinf has no LUT form; quaternion build from vector
+	 * pair, fidelity-sensitive orientation math. measured n/a. Verified 2026-10-25. */
 	theta = (float) asinf( crossProductMagnitude );
 	theta_complement = PI - theta;
 /*

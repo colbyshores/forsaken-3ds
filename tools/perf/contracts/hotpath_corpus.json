@@ -6,112 +6,172 @@
   "seed": [
     {
       "file": "oct2.c",
-      "symbols": ["RenderScene", "MainGame", "MainRoutines", "MainGameRender", "RenderCurrentCamera", "RenderCurrentCameraInStereo", "CalculateFramelag"],
+      "symbols": [
+        "RenderScene",
+        "MainGame",
+        "MainRoutines",
+        "MainGameRender",
+        "RenderCurrentCamera",
+        "RenderCurrentCameraInStereo",
+        "CalculateFramelag"
+      ],
       "why": "frame loop: dispatch, entity tick, camera render (twice/frame in stereo)"
     },
     {
       "file": "new3d.h",
-      "symbols": ["fast_sinf", "fast_cosf"],
+      "symbols": [
+        "fast_sinf",
+        "fast_cosf"
+      ],
       "why": "inlined into per-frame/per-entity trig sites"
     },
     {
       "file": "new3d.c",
-      "symbols": ["MatrixMultiply", "ApplyMatrix", "BuildRotMatrix", "NormaliseVector", "spline"],
+      "symbols": [
+        "MatrixMultiply",
+        "ApplyMatrix",
+        "BuildRotMatrix",
+        "NormaliseVector",
+        "spline"
+      ],
       "why": "per-entity matrix/vector math every frame; spline drives AI movement"
     },
     {
       "file": "visi.c",
-      "symbols": ["FindVisible", "ProcessVisiblePortal"],
+      "symbols": [
+        "FindVisible",
+        "ProcessVisiblePortal"
+      ],
       "why": "portal PVS traversal per camera pass, per visible group"
     },
     {
       "file": "polys.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "per-group poly transform/clip/display batches"
     },
     {
       "file": "models.c",
-      "symbols": ["ModelDisp"],
+      "symbols": [
+        "ModelDisp"
+      ],
       "why": "per-group model display, per-model matrix apply"
     },
     {
       "file": "mxaload.c",
-      "symbols": ["InterpFrames"],
+      "symbols": [
+        "InterpFrames"
+      ],
       "why": "per-vertex animation interpolation per animated model"
     },
     {
       "file": "render_c3d.c",
-      "symbols": ["*"],
-      "why": "CPU draw build/issue: LVERTEX->gpu_vertex_t per draw, per frame"
+      "symbols": [
+        "*"
+      ],
+      "why": "CPU draw build/issue: LVERTEX->gpu_vertex_t per draw, per frame; build_gamma_table cold: called at init (render_c3d.c:1364) and gamma change (tload.c:94), not per-frame",
+      "cold_symbols": [
+        "build_gamma_table"
+      ]
     },
     {
       "file": "collision.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "per moving object per frame (ObjectCollide/QCollide/MoveGroup)"
     },
     {
       "file": "ships.c",
-      "symbols": ["ProcessShips"],
+      "symbols": [
+        "ProcessShips"
+      ],
       "why": "per player per frame"
     },
     {
       "file": "enemies.c",
-      "symbols": ["ProcessEnemies"],
+      "symbols": [
+        "ProcessEnemies"
+      ],
       "why": "per enemy per frame"
     },
     {
       "file": "aimain.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "AI_THINK/AI_AIR/AI_TURRET per enemy per frame"
     },
     {
       "file": "ailib.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "AI helpers (LookAhead/AimAtTarget/ClearLOS) per enemy per frame"
     },
     {
       "file": "primary.c",
-      "symbols": ["ProcessPrimaryBullets"],
+      "symbols": [
+        "ProcessPrimaryBullets"
+      ],
       "why": "per projectile per frame"
     },
     {
       "file": "secondary.c",
-      "symbols": ["ProcessSecondaryBullets"],
+      "symbols": [
+        "ProcessSecondaryBullets"
+      ],
       "why": "per projectile per frame"
     },
     {
       "file": "lights.c",
-      "symbols": ["ProcessXLights", "XLight1Group"],
+      "symbols": [
+        "ProcessXLights",
+        "XLight1Group"
+      ],
       "why": "CPU lighting path (partly compiled out under GPU_LIGHTING)"
     },
     {
       "file": "quat.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "per-frame orientation math incl. fast trig"
     },
     {
       "file": "2dpolys.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "per-frame 2D poly/HUD batches"
     },
     {
       "file": "screenpolys.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "screen effect polys per frame"
     },
     {
       "file": "spotfx.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "impact/spot effects per frame"
     },
     {
       "file": "water.c",
-      "symbols": ["WaterProcess"],
+      "symbols": [
+        "WaterProcess"
+      ],
       "why": "per-frame water surface update"
     },
     {
       "file": "aispline.c",
-      "symbols": ["*"],
+      "symbols": [
+        "*"
+      ],
       "why": "per-entity spline movement per frame (drives new3d.c spline)"
     }
   ],

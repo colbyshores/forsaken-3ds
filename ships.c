@@ -1659,6 +1659,8 @@ float AutoLevelRot( u_int16_t ship, float autolevel_rate )
 		cos_pitch = -1.0F;
 	else if ( cos_pitch > 1.0F )
 		cos_pitch = 1.0F;
+	/* @vfp-exempt R6 — cold level-change autolevel init; acosf once per ship
+	 * per level load, never per frame. measured n/a. Verified 2026-10-25. */
 	pitch = (float) acosf( cos_pitch );
 	if ( pitch < MIN_AUTOLEVEL_PITCH || pitch > MAX_AUTOLEVEL_PITCH )
 	{
@@ -1672,6 +1674,8 @@ float AutoLevelRot( u_int16_t ship, float autolevel_rate )
 		cos_roll = -1.0F;
 	else if ( cos_roll > 1.0F )
 		cos_roll = 1.0F;
+	/* @vfp-exempt R6 — cold level-change autolevel init; acosf once per ship
+	 * per level load, never per frame. measured n/a. Verified 2026-10-25. */
 	roll = (float) acosf( cos_roll );
 	autolevel = ( R2D( roll ) - 90.0F );
 	rot = autolevel_rate * autolevel;

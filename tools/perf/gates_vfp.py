@@ -232,6 +232,7 @@ class HotEntry:
     symbols: tuple[str, ...]
     why: str
     source: str
+    cold_symbols: tuple[str, ...] = ()
 
 
 def repo_rel(path: Path) -> str:
@@ -445,8 +446,42 @@ def match_braces(text: str, open_idx: int) -> int:
     return n - 1
 
 
+IF0_RE = re.compile(r"^\s*#\s*if\s+0\b")
+IF_OPEN_RE = re.compile(r"^\s*#\s*(if|ifdef|ifndef)\b")
+IF_END_RE = re.compile(r"^\s*#\s*endif\b")
+IF_BRANCH_RE = re.compile(r"^\s*#\s*(else|elif)\b")
+
+
+def strip_if0_keep_lines(text: str) -> str:
+    """Blank `#if 0` dead branches (line count preserved) so dead code is not
+    scanned. The `#else`/`#elif` arm of an `#if 0` chain stays live; nested
+    conditionals inside a dead branch stay dead."""
+    lines = text.split("\n")
+    out = list(lines)
+    stack: list[str] = []
+    for i, line in enumerate(lines):
+        top = stack[-1] if stack else None
+        if top == "dead":
+            out[i] = ""
+        if IF_OPEN_RE.match(line):
+            if top == "dead":
+                stack.append("dead")
+            elif IF0_RE.match(line):
+                stack.append("dead")
+                out[i] = ""
+            else:
+                stack.append("live")
+        elif IF_BRANCH_RE.match(line):
+            if stack and stack[-1] == "dead":
+                stack[-1] = "live"
+        elif IF_END_RE.match(line):
+            if stack:
+                stack.pop()
+    return "\n".join(out)
+
+
 def parse_functions(text: str) -> list[Function]:
-    cleaned = strip_comments_keep_lines(text)
+    cleaned = strip_if0_keep_lines(strip_comments_keep_lines(text))
     functions: list[Function] = []
     for match in FUNC_RE.finditer(cleaned):
         name = match.group("name")
@@ -633,6 +668,8 @@ def classify_hot(
     entry = seed.get(rel)
     if entry is None:
         return False, ""
+    if func.name in entry.cold_symbols:
+        return False, ""
     if "*" in entry.symbols:
         if is_init_symbol(func.name):
             return False, ""
@@ -653,7 +690,9 @@ def seed_map(corpus: Mapping[str, object], extra: Sequence[HotEntry] | None = No
             symbols_raw = item.get("symbols", [])
             symbols = tuple(str(s) for s in symbols_raw) if isinstance(symbols_raw, list) else ("*",)
             why = str(item.get("why", "seed"))
-            out[file_name] = HotEntry(file_name, symbols, why, "seed")
+            cold_raw = item.get("cold_symbols", [])
+            cold_syms = tuple(str(s) for s in cold_raw) if isinstance(cold_raw, list) else ()
+            out[file_name] = HotEntry(file_name, symbols, why, "seed", cold_syms)
     if extra:
         for item in extra:
             out[item.rel] = item
