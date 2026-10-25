@@ -1304,6 +1304,7 @@ void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 	float ar, ag, ab, aa;
 	GetRealLightAmbientWorldSpace(world_pos, &ar, &ag, &ab, &aa);
 
+	/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 	/* Normalise to 0..1 and apply a 70%-white floor. Without
 	 * NEW_LIGHTING the engine's baked ambient is 0, so a quiet area
 	 * with no nearby XLights would otherwise zero out the Phong light

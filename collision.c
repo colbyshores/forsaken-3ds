@@ -2044,6 +2044,7 @@ bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup )
 
 static BGOBJECT	*	CurParent = NULL;
 
+/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 /*===================================================================
 	Procedure	:	Check Ship to Background Objects Collision
 	Input		:	u_int16_t	Group

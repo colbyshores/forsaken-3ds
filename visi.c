@@ -1233,6 +1233,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 							/ vp->Height;
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
+		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		/* citro3d uses scissor + unmagnified cam->Proj only when the
 		 * parent viewport (v->viewport) spans the full screen — the
 		 * main camera's case. Sub-cameras (missile chase, rear view)

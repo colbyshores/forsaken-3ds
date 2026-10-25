@@ -115,10 +115,6 @@ R2|visi.c|FindVisible|float-to-int cast in loop body
 R2|visi.c|FindVisible|float-to-int cast in loop body
 R2|visi.c|FindVisible|float-to-int cast in loop body
 R2|visi.c|FindVisible|float-to-int cast in loop body
-R3|collision.c|CheckBGObjectsCol|float comparison driving control flow in hot loop
-R3|render_c3d.c|c3d_update_phong_tint_for_object_pos|float comparison driving control flow in hot loop
-R3|render_c3d.c|c3d_update_phong_tint_for_object_pos|float comparison driving control flow in hot loop
-R3|visi.c|FindVisible|float comparison driving control flow in hot loop
 R4-D|new3d.c|spline|double in hot function spline
 R4-D|new3d.c|spline|double in hot function spline
 R4-D|new3d.c|spline|double in hot function spline
