@@ -423,6 +423,38 @@ pass.
 
 ---
 
+## 10b. Autonomous hardware loop — netload_stub (no FTP, no hands)
+
+Full runbook: port-docs vault `20-runbooks/3ds-autonomous-hardware-profiling-loop.md`.
+This is THE way to collect hardware data; FTP/ftpd-pro is not part of the loop.
+
+Mechanism (all on the 3DS, one human launch of `sdmc:/3ds/netload_stub.3dsx`):
+
+1. **Push**: `3dslink -a <3DS-IP> forsaken3ds.3dsx` — the stub (TCP :17491) saves to
+   `sdmc:/3ds/` and chain-loads it via Luma `hb:ldr`.
+2. **Run**: the autotest build (`EDITION=remaster AUTOTEST_REMASTER=1`) sweeps levels,
+   then chain-loads back to the stub itself (`autotest_chainload_to_stub`, driven by
+   `QuitRequested` so normal teardown — and the PERF dump — still runs).
+3. **Completion signal**: **:8080 down then up**. The stub serves `GET http://<IP>:8080/<path>`
+   from `sdmc:/` (404 = absent — the clean absent-vs-empty discriminator). Poll the port;
+   never sleep a fixed duration.
+4. **Pull results over HTTP**: `curl http://<IP>:8080/forsaken_perf.txt` (also
+   `forsaken_trace.txt`, `forsaken_boot.log`). Verify freshness by md5 — an unchanged
+   hash means the run wrote nothing; analyze stale data at your peril.
+5. Re-push for the next cycle. `tools/perf/ralph_loop.sh <N>` automates N cycles.
+
+Rules:
+- **Never wait on a human to report loop state.** When a loop or device wait is in
+  flight, schedule a wakeup or a watcher process that acts when the condition fires.
+- Capture builds must not enable `VERBOSE_TRACE` (per-line fsync poisons timings);
+  `PERF_CAPTURE=1` writes `sdmc:/forsaken_perf.txt` at teardown via its own fd.
+- The Makefile does not track flag changes — `make clean` (or touch every affected
+  TU) on any `-D` flip, or a stale object silently relinks.
+- The harness never ships: autotest/PERF builds are branch-local and must not be
+  merged to a release branch.
+
+---
+
 ## 11. References and revision record
 
 1. ARM11 MPCore TRM (DDI 0360F), §19.11 / Table 19-16.
