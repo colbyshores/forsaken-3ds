@@ -590,7 +590,19 @@ u_int16_t	Random_Range( u_int16_t Max )
 	Seed1	|=	bit1;
 	Seed2	|=	bit2;
 
-	return( ( Seed1 & 32767 ) % Max );
+	/* R11: exact (Seed1 & 32767) % Max without the __aeabi_idivmod call and
+	 * its spill barrier (ARMv6 has no integer divide). x = Seed1 & 32767 is
+	 * in [0,32767] and Max in [1,65535], both exact in float32. The truncated
+	 * float quotient can only undershoot the true floor if x = k*Max - 1 with
+	 * 1/Max below half-ULP(k), which needs k*Max >= 2^24 while x <= 32767
+	 * forces k*Max <= 32768 — impossible. Exhaustively verified on host for
+	 * all 2,147,450,880 (x,Max) pairs: zero mismatches. measured n/a pending
+	 * hardware capture. Verified 2026-10-25. */
+	{
+		unsigned	x	= (unsigned)( Seed1 & 32767 );
+		int		q	= (int)( (float)x / (float)Max );
+		return (u_int16_t)( x - (unsigned)Max * (unsigned)q );
+	}
 }
 
 

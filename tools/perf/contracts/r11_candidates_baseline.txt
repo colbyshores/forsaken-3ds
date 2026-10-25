@@ -10,7 +10,6 @@ bgobjects.c  divisor=NumIntervals  x1  Object->StepInterval = ( Object->OverallT
 goal.c  divisor=NumGoals  x1  return RandomStartPosModify % NumGoals;
 networking.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
 networking.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
-new3d.c  divisor=Max  x1  return( ( Seed1 & 32767 ) % Max );
 pickups.c  divisor=psize  x1  packed[ i / psize ] |= temp;
 pickups.c  divisor=psize  x1  temp = ( 1 << ( i % psize ) );
 pickups.c  divisor=psize  x2  PickupValid[ i ] = ( packed[ i / psize ] & ( 1 << ( i % psize ) ) ) ? true : false;
