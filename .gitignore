@@ -122,6 +122,12 @@ net_test/
 # — stay out of version control).
 tools/*
 !tools/*.py
+# Perf-contract tooling (AGENTS.md gates) is tracked source, not fetched
+# binaries. Baselines inside it are tracked adoption debt — never let the
+# tools/* rule swallow them. Run logs stay out.
+!tools/perf/
+!tools/perf/**
+tools/perf/logs/
 
 # Nintendo DSP firmware blob. NOT bundled in the CIA — CFW users on real
 # hardware already have sdmc:/3ds/dspfirm.cdc from the standard DSP1 dump

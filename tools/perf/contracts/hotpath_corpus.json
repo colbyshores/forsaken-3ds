@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "provisional": true,
+  "captured": null,
+  "capture_note": "STATIC SEED, NOT A PROFILE. Every entry below was classified by reading the frame loop (main.c:726 -> RenderScene oct2.c:2522 -> MainGame oct2.c:5285 -> MainRoutines oct2.c:4551 / MainGameRender oct2.c:5026 -> RenderCurrentCamera oct2.c:5910) and applying AGENTS.md 2's per-frame and >=256x/frame criteria to the call graph. No hardware capture exists yet, so 'top 15 of a captured profile' is not in force and the corpus age clock is dormant while provisional is true. gates_vfp prints a loud note while this flag is set. To promote: take a real capture, write it to docs/validation/perf-YYYY-MM-DD-*.log, set provisional=false and captured to the capture date, and re-derive this seed from the profile -- the seed is a starting scope, never a substitute for the measurement.",
+  "seed": [
+    {
+      "file": "oct2.c",
+      "symbols": ["RenderScene", "MainGame", "MainRoutines", "MainGameRender", "RenderCurrentCamera", "RenderCurrentCameraInStereo", "CalculateFramelag"],
+      "why": "frame loop: dispatch, entity tick, camera render (twice/frame in stereo)"
+    },
+    {
+      "file": "new3d.h",
+      "symbols": ["fast_sinf", "fast_cosf"],
+      "why": "inlined into per-frame/per-entity trig sites"
+    },
+    {
+      "file": "new3d.c",
+      "symbols": ["MatrixMultiply", "ApplyMatrix", "BuildRotMatrix", "NormaliseVector", "spline"],
+      "why": "per-entity matrix/vector math every frame; spline drives AI movement"
+    },
+    {
+      "file": "visi.c",
+      "symbols": ["FindVisible", "ProcessVisiblePortal"],
+      "why": "portal PVS traversal per camera pass, per visible group"
+    },
+    {
+      "file": "polys.c",
+      "symbols": ["*"],
+      "why": "per-group poly transform/clip/display batches"
+    },
+    {
+      "file": "models.c",
+      "symbols": ["ModelDisp"],
+      "why": "per-group model display, per-model matrix apply"
+    },
+    {
+      "file": "mxaload.c",
+      "symbols": ["InterpFrames"],
+      "why": "per-vertex animation interpolation per animated model"
+    },
+    {
+      "file": "render_c3d.c",
+      "symbols": ["*"],
+      "why": "CPU draw build/issue: LVERTEX->gpu_vertex_t per draw, per frame"
+    },
+    {
+      "file": "collision.c",
+      "symbols": ["*"],
+      "why": "per moving object per frame (ObjectCollide/QCollide/MoveGroup)"
+    },
+    {
+      "file": "ships.c",
+      "symbols": ["ProcessShips"],
+      "why": "per player per frame"
+    },
+    {
+      "file": "enemies.c",
+      "symbols": ["ProcessEnemies"],
+      "why": "per enemy per frame"
+    },
+    {
+      "file": "aimain.c",
+      "symbols": ["*"],
+      "why": "AI_THINK/AI_AIR/AI_TURRET per enemy per frame"
+    },
+    {
+      "file": "ailib.c",
+      "symbols": ["*"],
+      "why": "AI helpers (LookAhead/AimAtTarget/ClearLOS) per enemy per frame"
+    },
+    {
+      "file": "primary.c",
+      "symbols": ["ProcessPrimaryBullets"],
+      "why": "per projectile per frame"
+    },
+    {
+      "file": "secondary.c",
+      "symbols": ["ProcessSecondaryBullets"],
+      "why": "per projectile per frame"
+    },
+    {
+      "file": "lights.c",
+      "symbols": ["ProcessXLights", "XLight1Group"],
+      "why": "CPU lighting path (partly compiled out under GPU_LIGHTING)"
+    },
+    {
+      "file": "quat.c",
+      "symbols": ["*"],
+      "why": "per-frame orientation math incl. fast trig"
+    },
+    {
+      "file": "2dpolys.c",
+      "symbols": ["*"],
+      "why": "per-frame 2D poly/HUD batches"
+    },
+    {
+      "file": "screenpolys.c",
+      "symbols": ["*"],
+      "why": "screen effect polys per frame"
+    },
+    {
+      "file": "spotfx.c",
+      "symbols": ["*"],
+      "why": "impact/spot effects per frame"
+    },
+    {
+      "file": "water.c",
+      "symbols": ["WaterProcess"],
+      "why": "per-frame water surface update"
+    },
+    {
+      "file": "aispline.c",
+      "symbols": ["*"],
+      "why": "per-entity spline movement per frame (drives new3d.c spline)"
+    }
+  ],
+  "cold_always": [
+    "main_3ds.c",
+    "main.c",
+    "title.c",
+    "loadsave.c",
+    "bsp.c",
+    "tload.c",
+    "mload.c",
+    "restart.c",
+    "config.c",
+    "stats.c",
+    "controls.c",
+    "input_3ds.c",
+    "controls_3ds.c"
+  ]
+}

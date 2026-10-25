@@ -1,0 +1,747 @@
+# Adoption-debt hot-path baseline -- contracts/vfp_hotpath.md §4 (Baseline != exemption).
+#
+# One finding key per line:  <rule>|<file>|<symbol>|<normalized-detail>
+# normalized-detail is whitespace-collapsed and digit runs replaced with N, so a
+# key survives line shifts. Findings whose key is here are SUPPRESSED but counted
+# ("baselined: N"); any finding NOT here (and not exempted) is NEW and FAILS.
+# This is tracked debt with a ratchet: it may only SHRINK. Regenerate with:
+#     python3 tools/perf/gates_vfp.py --bless
+# (audit_arm11_math.py --bless writes the TRIG / R4-D lines and preserves these.)
+R1|main.c|main|no FPSCR FZ|DN helper on main (file or include closure)
+R1|music_3ds.c|threadCreate|thread-creation site whose worker never establishes FPSCR FZ|DN (worker body checked, then the include closure)
+R2|2dpolys.c|FmPolyDispGroupClipped|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyDispGroupClipped|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyDispGroupUnclipped|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyDispGroupUnclipped|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.c|SaveFmPolys|float-to-int cast in loop body
+R2|2dpolys.c|SaveFmPolys|float-to-int cast in loop body
+R2|2dpolys.c|SaveFmPolys|float-to-int cast in loop body
+R2|collision.c|ObjectCollide|float-to-int cast in loop body
+R2|collision.c|ObjectCollide|float-to-int cast in loop body
+R2|enemies.c|ProcessEnemies|float-to-int cast in loop body
+R2|enemies.c|ProcessEnemies|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|lights.c|XLight1Group|float-to-int cast in loop body
+R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.c|RenderScene|untyped-heuristic: float-to-int cast in loop body
+R2|polys.c|PolyDispGroupClipped|float-to-int cast in loop body
+R2|polys.c|PolyDispGroupClipped|float-to-int cast in loop body
+R2|polys.c|PolyDispGroupUnclipped|float-to-int cast in loop body
+R2|polys.c|PolyDispGroupUnclipped|float-to-int cast in loop body
+R2|polys.c|SavePolys|float-to-int cast in loop body
+R2|polys.c|SavePolys|float-to-int cast in loop body
+R2|polys.c|SavePolys|float-to-int cast in loop body
+R2|polys.c|SolidPolyDispGroupClipped|float-to-int cast in loop body
+R2|polys.c|SolidPolyDispGroupClipped|float-to-int cast in loop body
+R2|polys.c|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
+R2|polys.c|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
+R2|primary.c|ProcessPrimaryBullets|float-to-int cast in loop body
+R2|render_c3d.c|GetRealLightAmbientWorldSpace|float-to-int cast in loop body
+R2|render_c3d.c|replay_display_list|float-to-int cast in loop body
+R2|render_c3d.c|replay_display_list|untyped-heuristic: float-to-int cast in loop body
+R2|render_c3d.c|replay_display_list|untyped-heuristic: float-to-int cast in loop body
+R2|screenpolys.c|ScrPolyDispNonSolid|float-to-int cast in loop body
+R2|screenpolys.c|ScrPolyDispNonSolid|float-to-int cast in loop body
+R2|screenpolys.c|ScrPolyDispSolid|float-to-int cast in loop body
+R2|screenpolys.c|ScrPolyDispSolid|float-to-int cast in loop body
+R2|ships.c|ProcessShips|untyped-heuristic: float-to-int cast in loop body
+R2|ships.c|ProcessShips|untyped-heuristic: float-to-int cast in loop body
+R2|spotfx.c|SaveAllSpotFX|float-to-int cast in loop body
+R2|spotfx.c|SaveAllSpotFX|float-to-int cast in loop body
+R2|visi.c|FindVisible|float-to-int cast in loop body
+R2|visi.c|FindVisible|float-to-int cast in loop body
+R2|visi.c|FindVisible|float-to-int cast in loop body
+R2|visi.c|FindVisible|float-to-int cast in loop body
+R2|visi.c|FindVisible|float-to-int cast in loop body
+R2|visi.c|FindVisible|float-to-int cast in loop body
+R2|visi.c|FindVisible|float-to-int cast in loop body
+R3|2dpolys.c|FmPolyDispGroupClipped|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyDispGroupClipped|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyDispGroupUnclipped|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyDispGroupUnclipped|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|2dpolys.c|FmPolyProcess|float comparison driving control flow in hot loop
+R3|ailib.c|AI_GetNearestMINETarget|float comparison driving control flow in hot loop
+R3|ailib.c|AI_GetNearestNODETarget|float comparison driving control flow in hot loop
+R3|ailib.c|AI_GetNearestSHIPTargetInAnyGROUP|float comparison driving control flow in hot loop
+R3|aispline.c|AI_SPLINE_FOLLOWPATH|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollideOneGroup|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollideOneGroup|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollideOneGroup|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollideOneGroup|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float comparison driving control flow in hot loop
+R3|collision.c|BackgroundCollide|float ternary in hot loop
+R3|collision.c|BackgroundCollide|float ternary in hot loop
+R3|collision.c|BackgroundCollide|float ternary in hot loop
+R3|collision.c|CheckBGObjectsCol|float comparison driving control flow in hot loop
+R3|collision.c|CollideBGOChildren|float comparison driving control flow in hot loop
+R3|collision.c|CollideBGOChildren|float comparison driving control flow in hot loop
+R3|collision.c|CollideBGOToCompObjChildren|float comparison driving control flow in hot loop
+R3|collision.c|CollideBGOToCompObjChildren|float comparison driving control flow in hot loop
+R3|collision.c|CollideBGOToCompObjChildren|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollideOnly|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollideOnly|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollideOnly|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.c|QCollide|float comparison driving control flow in hot loop
+R3|collision.c|QCollide|float comparison driving control flow in hot loop
+R3|collision.c|QCollide|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|enemies.c|ProcessEnemies|float comparison driving control flow in hot loop
+R3|lights.c|ProcessXLights|float comparison driving control flow in hot loop
+R3|lights.c|ProcessXLights|float comparison driving control flow in hot loop
+R3|lights.c|ProcessXLights|float comparison driving control flow in hot loop
+R3|lights.c|ProcessXLights|float comparison driving control flow in hot loop
+R3|lights.c|ProcessXLights|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|lights.c|XLight1Group|float comparison driving control flow in hot loop
+R3|models.c|ModelDisp|float comparison driving control flow in hot loop
+R3|models.c|ModelDisp|float comparison driving control flow in hot loop
+R3|models.c|ModelDisp|float ternary in hot loop
+R3|polys.c|DoAfterBurnerEffects|float comparison driving control flow in hot loop
+R3|polys.c|DoAfterBurnerEffects|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|polys.c|ProcessPolys|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|primary.c|ProcessPrimaryBullets|float comparison driving control flow in hot loop
+R3|render_c3d.c|GetRealLightAmbientWorldSpace|float comparison driving control flow in hot loop
+R3|render_c3d.c|GetRealLightAmbientWorldSpace|float comparison driving control flow in hot loop
+R3|render_c3d.c|GetRealLightAmbientWorldSpace|float comparison driving control flow in hot loop
+R3|render_c3d.c|GetRealLightAmbientWorldSpace|float comparison driving control flow in hot loop
+R3|render_c3d.c|GetRealLightAmbientWorldSpace|float comparison driving control flow in hot loop
+R3|render_c3d.c|GetRealLightAmbientWorldSpace|float comparison driving control flow in hot loop
+R3|render_c3d.c|GetRealLightAmbientWorldSpace|float ternary in hot loop
+R3|render_c3d.c|c3d_update_phong_tint_for_object_pos|float comparison driving control flow in hot loop
+R3|render_c3d.c|c3d_update_phong_tint_for_object_pos|float comparison driving control flow in hot loop
+R3|screenpolys.c|DoLensflareEffect|float comparison driving control flow in hot loop
+R3|screenpolys.c|DoLensflareEffect|float comparison driving control flow in hot loop
+R3|screenpolys.c|DoLensflareEffect|float comparison driving control flow in hot loop
+R3|screenpolys.c|DoLensflareEffect|float comparison driving control flow in hot loop
+R3|screenpolys.c|DoLensflareEffect|float comparison driving control flow in hot loop
+R3|screenpolys.c|DoLensflareEffect|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScrPolyDispNonSolid|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScrPolyDispSolid|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|screenpolys.c|ScreenPolyProcess|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|ships.c|ProcessShips|float comparison driving control flow in hot loop
+R3|spotfx.c|ProcessSpotFX|float comparison driving control flow in hot loop
+R3|spotfx.c|ProcessSpotFX|float comparison driving control flow in hot loop
+R3|spotfx.c|ProcessSpotFX|float comparison driving control flow in hot loop
+R3|spotfx.c|ProcessSpotFX|float comparison driving control flow in hot loop
+R3|spotfx.c|ProcessSpotFX|float comparison driving control flow in hot loop
+R3|visi.c|FindVisible|float comparison driving control flow in hot loop
+R4-D|new3d.c|spline|double in hot function spline
+R4-D|new3d.c|spline|double in hot function spline
+R4-D|new3d.c|spline|double in hot function spline
+R4-D|new3d.c|spline|double in hot function spline
+R4-D|new3d.c|spline|double in hot function spline
+R4-D|new3d.c|spline|double in hot function spline
+R4-D|new3d.c|spline|double in hot function spline
+R4-D|render_c3d.c|build_gamma_table|double in hot function build_gamma_table
+R4-D|render_c3d.c|build_gamma_table|double in hot function build_gamma_table
+R4-D|render_c3d.c|build_gamma_table|double in hot function build_gamma_table
+R4|new3d.c|spline|double/long double in hot path
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
+R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
+R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
+R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
+R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
+R4|oct2.c|MainGameRender|unsuffixed float literal promotes to double
+R4|oct2.c|RenderCurrentCameraInStereo|unsuffixed float literal promotes to double
+R4|oct2.c|RenderCurrentCameraInStereo|unsuffixed float literal promotes to double
+R4|render_c3d.c|build_gamma_table|double/long double in hot path
+R4|render_c3d.c|build_gamma_table|unsuffixed float literal promotes to double
+R4|render_c3d.c|build_gamma_table|unsuffixed float literal promotes to double
+R4|render_c3d.c|build_gamma_table|unsuffixed float literal promotes to double
+R4|screenpolys.c|IsMMX|unsuffixed float literal promotes to double
+R4|ships.c|ProcessShips|unsuffixed float literal promotes to double
+R6|lights.c|XLight1Group|libm transcendental in hot path
+R6|lights.c|XLight1Group|libm transcendental in hot path
+R6|lights.c|XLight1Group|libm transcendental in hot path
+R6|lights.c|XLight1Group|libm transcendental in hot path
+R6|lights.c|XLight1Group|libm transcendental in hot path
+R6|lights.c|XLight1Group|libm transcendental in hot path
+R6|mxaload.c|InterpFrames|libm transcendental in hot path
+R6|mxaload.c|InterpFrames|libm transcendental in hot path
+R6|mxaload.c|InterpFrames|libm transcendental in hot path
+R6|mxaload.c|InterpFrames|libm transcendental in hot path
+R6|render_c3d.c|apply_texenv_for_texture|libm transcendental in hot path
+R6|render_c3d.c|build_gamma_table|libm transcendental in hot path
+R6|render_c3d.c|build_gamma_table|libm transcendental in hot path
+R6|ships.c|ProcessShips|libm transcendental in hot path
+R6|ships.c|ProcessShips|libm transcendental in hot path
+R6|ships.c|ProcessShips|libm transcendental in hot path
+R6|visi.c|FindVisible|libm transcendental in hot path
+R6|visi.c|FindVisible|libm transcendental in hot path
+R6|visi.c|FindVisible|libm transcendental in hot path
+R6|visi.c|FindVisible|libm transcendental in hot path
+R6|visi.c|FindVisible|libm transcendental in hot path
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|2dpolys.c|FmPolyProcess|float division in hot loop
+R7|ailib.c|AI_LookAhead|float division inner_loop=false
+R7|aimain.c|AI_AVOIDCHECK|float division inner_loop=false
+R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division in hot loop
+R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division in hot loop
+R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
+R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
+R7|collision.c|BackgroundCollideOneGroup|float division inner_loop=false
+R7|collision.c|BackgroundCollideOneGroup|float division inner_loop=false
+R7|collision.c|BackgroundCollideOneGroup|float division inner_loop=false
+R7|collision.c|BackgroundCollideOneGroup|sqrtf inner_loop=false
+R7|collision.c|BackgroundCollideOneGroup|sqrtf inner_loop=false
+R7|collision.c|BackgroundCollideOneGroup|sqrtf inner_loop=false
+R7|collision.c|BackgroundCollide|float division in hot loop
+R7|collision.c|BackgroundCollide|float division in hot loop
+R7|collision.c|BackgroundCollide|float division in hot loop
+R7|collision.c|BackgroundCollide|sqrtf in hot loop
+R7|collision.c|BackgroundCollide|sqrtf in hot loop
+R7|collision.c|BackgroundCollide|sqrtf in hot loop
+R7|collision.c|ColRayPlaneIntersect|float division inner_loop=false
+R7|collision.c|ColRayPolyIntersect|float division inner_loop=false
+R7|collision.c|ObjectCollideOnly|float division in hot loop
+R7|collision.c|ObjectCollide|float division in hot loop
+R7|collision.c|ObjectCollide|float division in hot loop
+R7|collision.c|ObjectCollide|float division inner_loop=false
+R7|collision.c|ObjectCollide|float division inner_loop=false
+R7|collision.c|ObjectCollide|float division inner_loop=false
+R7|collision.c|ObjectCollide|float division inner_loop=false
+R7|collision.c|ObjectCollide|float division inner_loop=false
+R7|collision.c|QCollide|float division in hot loop
+R7|collision.c|RayPolyIntersect|float division inner_loop=false
+R7|collision.c|RayPolyIntersect|float division inner_loop=false
+R7|collision.c|RayPolyIntersect|float division inner_loop=false
+R7|lights.c|XLight1Group|float division in hot loop
+R7|lights.c|XLight1Group|float division in hot loop
+R7|lights.c|XLight1Group|float division in hot loop
+R7|lights.c|XLight1Group|float division in hot loop
+R7|lights.c|XLight1Group|float division in hot loop
+R7|lights.c|XLight1Group|float division in hot loop
+R7|lights.c|XLight1Group|float division in hot loop
+R7|lights.c|XLight1Group|sqrtf in hot loop
+R7|models.c|ModelDisp|float division in hot loop
+R7|new3d.c|NormaliseVector|float division inner_loop=false
+R7|new3d.c|NormaliseVector|sqrtf inner_loop=false
+R7|oct2.c|MainGameRender|float division inner_loop=false
+R7|oct2.c|MainGameRender|float division inner_loop=false
+R7|oct2.c|MainGameRender|float division inner_loop=false
+R7|oct2.c|MainGameRender|float division inner_loop=false
+R7|oct2.c|MainGameRender|float division inner_loop=false
+R7|oct2.c|MainGameRender|float division inner_loop=false
+R7|oct2.c|RenderCurrentCameraInStereo|float division inner_loop=false
+R7|oct2.c|RenderCurrentCameraInStereo|float division inner_loop=false
+R7|oct2.c|RenderCurrentCameraInStereo|float division inner_loop=false
+R7|oct2.c|RenderScene|float division inner_loop=false
+R7|oct2.c|RenderScene|float division inner_loop=false
+R7|oct2.c|RenderScene|float division inner_loop=false
+R7|oct2.c|RenderScene|float division inner_loop=false
+R7|oct2.c|RenderScene|float division inner_loop=false
+R7|polys.c|ProcessPolys|float division in hot loop
+R7|polys.c|ProcessPolys|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|primary.c|ProcessPrimaryBullets|float division in hot loop
+R7|quat.c|MatrixToQuat|float division inner_loop=false
+R7|quat.c|MatrixToQuat|float division inner_loop=false
+R7|quat.c|MatrixToQuat|sqrtf inner_loop=false
+R7|quat.c|MatrixToQuat|sqrtf inner_loop=false
+R7|quat.c|QuatFrom2Vectors|sqrtf inner_loop=false
+R7|quat.c|QuatFromVector2|float division inner_loop=false
+R7|quat.c|QuatFromVector|float division inner_loop=false
+R7|quat.c|QuatInverse|float division inner_loop=false
+R7|quat.c|Quaternion_Slerp|float division inner_loop=false
+R7|quat.c|Quaternion_Slerp|float division inner_loop=false
+R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.c|GetRealLightAmbientWorldSpace|sqrtf in hot loop
+R7|render_c3d.c|apply_texenv_for_texture|float division inner_loop=false
+R7|render_c3d.c|apply_texenv_for_texture|float division inner_loop=false
+R7|render_c3d.c|build_gamma_table|float division in hot loop
+R7|render_c3d.c|build_gamma_table|float division inner_loop=false
+R7|render_c3d.c|build_gamma_table|float division inner_loop=false
+R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.c|do_water_effect|float division inner_loop=false
+R7|render_c3d.c|do_whiteout_effect|float division inner_loop=false
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|draw_render_object|float division in hot loop
+R7|render_c3d.c|proctex_phase_from_path|float division inner_loop=false
+R7|screenpolys.c|AddScreenPolyTextScale|float division inner_loop=false
+R7|screenpolys.c|AddScreenPolyTextScale|float division inner_loop=false
+R7|screenpolys.c|AddScreenPolyText|float division inner_loop=false
+R7|screenpolys.c|AddScreenPolyText|float division inner_loop=false
+R7|screenpolys.c|ClipBox|float division inner_loop=false
+R7|screenpolys.c|ClipBox|float division inner_loop=false
+R7|screenpolys.c|ClipBox|float division inner_loop=false
+R7|screenpolys.c|ClipBox|float division inner_loop=false
+R7|screenpolys.c|DoLensflareEffect|float division in hot loop
+R7|screenpolys.c|DoLensflareEffect|float division in hot loop
+R7|screenpolys.c|DoLensflareEffect|float division in hot loop
+R7|screenpolys.c|DoLensflareEffect|float division in hot loop
+R7|screenpolys.c|DoLensflareEffect|float division in hot loop
+R7|screenpolys.c|DoLensflareEffect|float division inner_loop=false
+R7|screenpolys.c|DoLensflareEffect|float division inner_loop=false
+R7|screenpolys.c|ScrPolyDispNonSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispNonSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispNonSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispNonSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispNonSolid|float division inner_loop=false
+R7|screenpolys.c|ScrPolyDispSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispSolid|float division in hot loop
+R7|screenpolys.c|ScrPolyDispSolid|float division inner_loop=false
+R7|screenpolys.c|ScreenPolyProcess|float division in hot loop
+R7|screenpolys.c|ScreenPolyProcess|float division in hot loop
+R7|screenpolys.c|SecBullLensflare|float division inner_loop=false
+R7|screenpolys.c|SecBullLensflare|float division inner_loop=false
+R7|screenpolys.c|SecBullLensflare|float division inner_loop=false
+R7|screenpolys.c|SecBullLensflare|float division inner_loop=false
+R7|screenpolys.c|SecBullLensflare|float division inner_loop=false
+R7|screenpolys.c|SecBullLensflare|float division inner_loop=false
+R7|screenpolys.c|SecBullLensflare|float division inner_loop=false
+R7|screenpolys.c|ShowBountyOnShip|float division inner_loop=false
+R7|screenpolys.c|ShowBountyOnShip|float division inner_loop=false
+R7|screenpolys.c|ShowBounty|float division inner_loop=false
+R7|screenpolys.c|ShowCTFFlagsOnShip|float division inner_loop=false
+R7|screenpolys.c|ShowCTFFlagsOnShip|float division inner_loop=false
+R7|screenpolys.c|ShowCTFFlags|float division inner_loop=false
+R7|screenpolys.c|ShowFlagOnShip|float division inner_loop=false
+R7|screenpolys.c|ShowFlagOnShip|float division inner_loop=false
+R7|screenpolys.c|ShowFlag|float division inner_loop=false
+R7|screenpolys.c|ShowScreenMultiples|float division inner_loop=false
+R7|screenpolys.c|ShowScreenMultiples|float division inner_loop=false
+R7|screenpolys.c|UpdateCountdownDigits|float division inner_loop=false
+R7|screenpolys.c|UpdateCountdownDigits|float division inner_loop=false
+R7|screenpolys.c|UpdateCountdownDigits|float division inner_loop=false
+R7|screenpolys.c|UpdateCountdownDigits|float division inner_loop=false
+R7|screenpolys.c|UpdateCountdownDigits|float division inner_loop=false
+R7|screenpolys.c|UpdateCountdownDigits|float division inner_loop=false
+R7|screenpolys.c|UpdateDigit|float division inner_loop=false
+R7|screenpolys.c|UpdateDigit|float division inner_loop=false
+R7|secondary.c|ProcessSecondaryBullets|float division inner_loop=false
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division in hot loop
+R7|ships.c|ProcessShips|float division inner_loop=false
+R7|visi.c|FindVisible|float division in hot loop
+R7|visi.c|FindVisible|float division in hot loop
+R7|visi.c|FindVisible|float division in hot loop
+R7|visi.c|FindVisible|float division in hot loop
+R7|visi.c|FindVisible|float division in hot loop
+R7|visi.c|FindVisible|float division inner_loop=false
+R9|build_3ds/2dpolys.o|2dpolys|live VFP s-regs N > N
+TRIG|ailib.c|AI_AimAtTarget|raw libm trig acosf in AI_AimAtTarget
+TRIG|ailib.c|AI_AimAtTarget|raw libm trig acosf in AI_AimAtTarget
+TRIG|aim_assist.c|aim_assist_steer|raw libm trig acosf in aim_assist_steer
+TRIG|enemies.c|ObjectAutoLevelRot|raw libm trig acosf in ObjectAutoLevelRot
+TRIG|enemies.c|ObjectAutoLevelRot|raw libm trig acosf in ObjectAutoLevelRot
+TRIG|new3d.h|<file scope>|raw libm trig atanNf in <file scope>
+TRIG|oct2.c|SetFOV|raw libm trig tanf in SetFOV
+TRIG|oct2.c|stereo_adjust|raw libm trig tanf in stereo_adjust
+TRIG|primary.c|CreateInvEffect|raw libm trig acosf in CreateInvEffect
+TRIG|primary.c|CreateShieldEffect|raw libm trig acosf in CreateShieldEffect
+TRIG|quat.c|QuatFrom2Vectors|raw libm trig asinf in QuatFromNVectors
+TRIG|quat.c|QuatFromVector2|raw libm trig acosf in QuatFromVectorN
+TRIG|quat.c|QuatFromVector|raw libm trig acosf in QuatFromVector
+TRIG|quat.c|Quaternion_Slerp|raw libm trig acosf in Quaternion_Slerp
+TRIG|rtlight.c|TurnOffPoint|raw libm trig asinf in TurnOffPoint
+TRIG|rtlight.c|TurnOffPoint|raw libm trig asinf in TurnOffPoint
+TRIG|rtlight.c|TurnOnPoint|raw libm trig asinf in TurnOnPoint
+TRIG|rtlight.c|TurnOnPoint|raw libm trig asinf in TurnOnPoint
+TRIG|screenpolys.c|DoLensflareEffect|raw libm trig acosf in DoLensflareEffect
+TRIG|screenpolys.c|DoLensflareEffect|raw libm trig acosf in DoLensflareEffect
+TRIG|screenpolys.c|SecBullLensflare|raw libm trig acosf in SecBullLensflare
+TRIG|screenpolys.c|SecBullLensflare|raw libm trig acosf in SecBullLensflare
+TRIG|secondary.c|ProcessMines|raw libm trig acosf in ProcessMines
+TRIG|secondary.c|ProcessMissiles|raw libm trig acosf in ProcessMissiles
+TRIG|ships.c|AutoLevelRot|raw libm trig acosf in AutoLevelRot
+TRIG|ships.c|AutoLevelRot|raw libm trig acosf in AutoLevelRot
+TRIG|visi.c|FindVisible|raw libm trig tanf in FindVisible

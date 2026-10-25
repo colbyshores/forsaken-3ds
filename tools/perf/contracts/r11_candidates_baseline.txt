@@ -1,0 +1,91 @@
+# R11 candidate baseline -- contracts/vfp_hotpath.md R11 (screen, not proof).
+# One LINE-INDEPENDENT signature per candidate integer div/mod site reported by
+# tools/perf/audit_r11_idiv.py --sig:
+#     <file>  divisor=EXPR  xN  <normalized statement>
+# A NEW signature fails the build; a removed signature (fixed site) passes with a
+# note. Line numbers are absent on purpose: a file:line baseline reports the SAME
+# site as new after any edit above it. Regenerate with:
+#     python3 tools/perf/audit_r11_idiv.py --bless
+bgobjects.c  divisor=NumIntervals  x1  Object->StepInterval = ( Object->OverallTime / NumIntervals );
+goal.c  divisor=NumGoals  x1  return RandomStartPosModify % NumGoals;
+networking.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
+networking.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
+new3d.c  divisor=Max  x1  return( ( Seed1 & 32767 ) % Max );
+pickups.c  divisor=psize  x1  packed[ i / psize ] |= temp;
+pickups.c  divisor=psize  x1  temp = ( 1 << ( i % psize ) );
+pickups.c  divisor=psize  x2  PickupValid[ i ] = ( packed[ i / psize ] & ( 1 << ( i % psize ) ) ) ? true : false;
+render_c3d.c  divisor=elapsed  x1  s_fps_current = (int)((s_fps_frames_in_win * 1000ULL) / elapsed);
+rtlight.c  divisor=fixed  x1  InterpLightOff( light, light->now_time / fixed->off_time, fixed->off_type );
+rtlight.c  divisor=fixed  x1  InterpLightOff( light, light->now_time / fixed->off_time, fixed->off_type );
+rtlight.c  divisor=fixed  x1  InterpLightOn( light, light->now_time / fixed->on_time, fixed->on_type );
+rtlight.c  divisor=pulse  x1  InterpLightOff( light, ( light->now_time - pulse->stay_on_point ) / pulse->off_time, pulse->type );
+rtlight.c  divisor=pulse  x1  InterpLightOff( light, light->now_time / pulse->off_time, pulse->type );
+rtlight.c  divisor=pulse  x1  InterpLightOn( light, light->now_time / pulse->on_time, pulse->type );
+screenpolys.c  divisor=dy  x1  bottomright->tv -= dv * ( bottomright->sy - ymax ) / dy;
+screenpolys.c  divisor=dy  x1  topleft->tv += dv * ( ymin - topleft->sy ) / dy;
+ships.c  divisor=Mloadheader.num_groups  x1  group = ( Ships[i].Object.Group + group ) % Mloadheader.num_groups;
+ships.c  divisor=Mloadheader.num_groups  x1  if ( !strcasecmp( roomname, Mloadheader.Group[ ( Ships[i].Object.Group + group ) % Mloadheader.num_groups ].name ) )
+ships.c  divisor=num_start_positions  x1  spos = (i+RandomStartPosModify) % num_start_positions;
+ships.c  divisor=num_start_positions  x1  startpos = pos % num_start_positions;
+ships.c  divisor=num_start_positions  x1  trys = ( orgtry + e ) % num_start_positions;
+ships.c  divisor=num_start_positions  x1  trys = ( orgtry + e ) % num_start_positions;
+ships.c  divisor=num_start_positions  x1  trys = ( orgtry + e ) % num_start_positions;
+skin.c  divisor=FacePtr  x1  x = -( FacePtr->D + ( y * FacePtr->ny + z * FacePtr->nz ) ) / FacePtr->nx;
+skin.c  divisor=FacePtr  x1  y = -( FacePtr->D + ( x * FacePtr->nx + z * FacePtr->nz ) ) / FacePtr->ny;
+skin.c  divisor=FacePtr  x1  z = -( FacePtr->D + ( x * FacePtr->nx + y * FacePtr->ny ) ) / FacePtr->nz;
+skin.c  divisor=PolyPtr  x1  x = -( PolyPtr->D + ( y * PolyPtr->ny + z * PolyPtr->nz ) ) / PolyPtr->nx;
+skin.c  divisor=PolyPtr  x1  y = -( PolyPtr->D + ( x * PolyPtr->nx + z * PolyPtr->nz ) ) / PolyPtr->ny;
+skin.c  divisor=PolyPtr  x1  z = -( PolyPtr->D + ( x * PolyPtr->nx + y * PolyPtr->ny ) ) / PolyPtr->nz;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+skin.c  divisor=plane_ptr  x1  x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+skin.c  divisor=plane_ptr  x1  y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+skin.c  divisor=plane_ptr  x1  z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+skin.c  divisor=vec_ptr  x1  x = -( vec_ptr->z * z + vec_ptr->y * y + offset ) / vec_ptr->x;
+skin.c  divisor=vec_ptr  x1  x = -( vec_ptr->z * z + vec_ptr->y * y + offset ) / vec_ptr->x;
+skin.c  divisor=vec_ptr  x1  x = -( vec_ptr->z * z + vec_ptr->y * y + offset ) / vec_ptr->x;
+skin.c  divisor=vec_ptr  x1  x = -( vec_ptr->z * z + vec_ptr->y * y + offset ) / vec_ptr->x;
+skin.c  divisor=vec_ptr  x1  y = -( vec_ptr->x * x + vec_ptr->z * z + offset ) / vec_ptr->y;
+skin.c  divisor=vec_ptr  x1  y = -( vec_ptr->x * x + vec_ptr->z * z + offset ) / vec_ptr->y;
+skin.c  divisor=vec_ptr  x1  y = -( vec_ptr->x * x + vec_ptr->z * z + offset ) / vec_ptr->y;
+skin.c  divisor=vec_ptr  x1  y = -( vec_ptr->x * x + vec_ptr->z * z + offset ) / vec_ptr->y;
+skin.c  divisor=vec_ptr  x1  z = -( vec_ptr->x * x + vec_ptr->y * y + offset ) / vec_ptr->z;
+skin.c  divisor=vec_ptr  x1  z = -( vec_ptr->x * x + vec_ptr->y * y + offset ) / vec_ptr->z;
+skin.c  divisor=vec_ptr  x1  z = -( vec_ptr->x * x + vec_ptr->y * y + offset ) / vec_ptr->z;
+skin.c  divisor=vec_ptr  x1  z = -( vec_ptr->x * x + vec_ptr->y * y + offset ) / vec_ptr->z;
+text.c  divisor=FontWidth  x1  MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
+text.c  divisor=FontWidth  x1  MAX = floorf((render_info.window_size.cx-FontWidth*25)/FontWidth);
+text.c  divisor=FontWidth  x1  MAX = floorf((render_info.window_size.cx-FontWidth*27)/FontWidth);
+visi.c  divisor=vp  x1  / vp->Height;
+visi.c  divisor=vp  x1  g->projection._22 = cam->Proj._22 * v->viewport->Height / vp->Height;
