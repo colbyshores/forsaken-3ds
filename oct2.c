@@ -5989,6 +5989,7 @@ bool RenderCurrentCamera( void )
   UpdateEnemiesClipGroup( &CurrentCamera );
   _RC_STAGE("post-UpdateClipGroups");
   perf_stage_end(PERF_S_VIS, -1);
+  perf_stage_begin(PERF_S_BG);
 
   /*
   if( CurrentCamera.GroupImIn != (u_int16_t) -1 )
@@ -6052,6 +6053,7 @@ bool RenderCurrentCamera( void )
 #ifdef __3DS__
   int _rc_group_iter = 0;
 #endif
+  perf_stage_end(PERF_S_BG, -1);
   perf_stage_begin(PERF_S_OPAQUE);
   _RC_STAGE("entering opaque-draw loop");
   // display clipped opaque objects

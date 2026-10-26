@@ -32,6 +32,7 @@ enum perf_stage {
 	PERF_S_CAM,         /* RenderCurrentCamera* (oct2.c) — traversal+submit */
 	PERF_S_FSEND,       /* FSEndScene (render_c3d.c) — GPU submit+wait */
 	PERF_S_VIS,         /* RenderCurrentCamera: FindVisible+setup (per call) */
+	PERF_S_BG,          /* RenderCurrentCamera: clear+background+unclipped */
 	PERF_S_OPAQUE,      /* RenderCurrentCamera: opaque draw loop (per call) */
 	PERF_S_TRANS,       /* RenderCurrentCamera: translucent phase (per call) */
 	PERF_S_MAX
