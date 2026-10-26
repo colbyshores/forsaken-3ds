@@ -979,6 +979,27 @@ NODE * FindSuitableSplineNodeRandom( u_int32_t Network, NODE * NodeFrom , NODE *
 	Output		:		Nothing
 ===================================================================*/
 
+#ifdef NODE_SQDIST
+/* Squared-distance candidate (wave-6 fidelity experiment). Correctly
+ * rounded sqrtf is monotonic, so Temp<Distance and Temp^2<Distance^2
+ * agree except at ULP ties where two distinct squared distances share
+ * one sqrt result; the fidelity checksum (sdmc:/forsaken_fidelity.txt)
+ * is the gate that proves no tie is ever hit in a full sweep. Removes
+ * one sqrtf per candidate node from the NodeInGroup traversal, the
+ * measured fishy hotspot (wave-4f: memory-bound traversal, zero LOS
+ * rays). */
+static float DistanceSqVector2Vector( const VECTOR * a, const VECTOR * b )
+{
+	float x = a->x - b->x;
+	float y = a->y - b->y;
+	float z = a->z - b->z;
+	return x*x + y*y + z*z;
+}
+#define NODE_DIST(a,b)  DistanceSqVector2Vector( (a), (b) )
+#else
+#define NODE_DIST(a,b)  DistanceVector2Vector( (VECTOR*)(a), (VECTOR*)(b) )
+#endif
+
 void UpdateNearestNodeSpecial( OBJECT * Object )
 {
 	float Distance;
@@ -994,7 +1015,7 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 	if( !Node )
 		return;
 	
-	Distance = DistanceVector2Vector( (VECTOR*) &Node->Pos , (VECTOR*) &Object->Pos );
+	Distance = NODE_DIST( &Node->Pos , &Object->Pos );
 	
 	for( i = 0 ; i < Node->NumOfLinks ; i ++ )
 	{
@@ -1007,7 +1028,7 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 		if( ( Object->NodeNetwork & NodeLink->NetMask ) &&
 			( Object->Group != NodeLink->Group ) )
 		{
-			Temp = DistanceVector2Vector( (VECTOR*) &NodeLink->Pos , (VECTOR*) &Object->Pos );
+			Temp = NODE_DIST( &NodeLink->Pos , &Object->Pos );
 			if( Temp < Distance )
 			{
 				bool _los;
@@ -1027,7 +1048,7 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 	{
 		if( (Object->NodeNetwork & Node->NetMask) && (Node != Object->NearestNode) )
 		{
-			Temp = DistanceVector2Vector( (VECTOR*) &Node->Pos , (VECTOR*) &Object->Pos );
+			Temp = NODE_DIST( &Node->Pos , &Object->Pos );
 			if( Temp < Distance )
 			{
 				bool _los;

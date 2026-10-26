@@ -30,6 +30,8 @@ EDITION ?= original
 PERF_CFLAGS := $(if $(PERF_CAPTURE),-DPERF_CAPTURE,)
 # FIDELITY_DUMP=1 adds per-tick gameplay-state checksums to sdmc:/forsaken_fidelity.txt (A/B fidelity proof, harness builds only)
 FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
+# NODE_SQDIST=1 selects the squared-distance candidate in UpdateNearestNodeSpecial (fidelity-gated experiment)
+NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -101,6 +103,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-fno-math-errno \
 	$(PERF_CFLAGS) \
 	$(FIDELITY_CFLAGS) \
+	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
 	-DBSP \
