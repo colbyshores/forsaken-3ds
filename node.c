@@ -998,16 +998,20 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 	for( i = 0 ; i < Node->NumOfLinks ; i ++ )
 	{
 		NodeLink = Node->NodeLink[i];
-		
-		Temp = DistanceVector2Vector( (VECTOR*) &NodeLink->Pos , (VECTOR*) &Object->Pos );
-		
+		/* Integer gates first: DistanceVector2Vector (sqrtf) and the
+		 * BackgroundCollide ray in AI_ClearLOS are the per-link cost
+		 * (wave-4: 4.4 ms/frame on fishy). Short-circuit order is
+		 * bit-identical to the previous unconditional Temp compute. */
 		if( ( Object->NodeNetwork & NodeLink->NetMask ) &&
-			( Object->Group != NodeLink->Group ) &&
-			( Temp < Distance ) &&
-			AI_ClearLOS( &Object->Pos ,Object->Group, &NodeLink->Pos ) )
+			( Object->Group != NodeLink->Group ) )
 		{
-			Distance = Temp;
-			Object->NearestNode = (void*) NodeLink;
+			Temp = DistanceVector2Vector( (VECTOR*) &NodeLink->Pos , (VECTOR*) &Object->Pos );
+			if( ( Temp < Distance ) &&
+				AI_ClearLOS( &Object->Pos ,Object->Group, &NodeLink->Pos ) )
+			{
+				Distance = Temp;
+				Object->NearestNode = (void*) NodeLink;
+			}
 		}
 	}
 	Node = (NODE *) NodeInGroup[Object->Group];
@@ -1016,8 +1020,7 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 		if( (Object->NodeNetwork & Node->NetMask) && (Node != Object->NearestNode) )
 		{
 			Temp = DistanceVector2Vector( (VECTOR*) &Node->Pos , (VECTOR*) &Object->Pos );
-			if( ( Temp < Distance ) && AI_ClearLOS( &Object->Pos ,Object->Group, &Node->Pos ) )
-			{
+			if( ( Temp < Distance ) && AI_ClearLOS( &Object->Pos ,Object->Group, &Node->Pos ) )			{
 				Distance = Temp;
 				
 				Object->NearestNode = (void*) Node;
