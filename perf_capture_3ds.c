@@ -5,7 +5,8 @@
  * Evidence recorded per stage: call count, total ticks, max ticks (worst
  * frame for that stage). Plus a frame-tick histogram (64 buckets, linear
  * 1 ms each up to 64 ms at 71 Hz budget ~14.1 ms) for the whole frame.
- * All on-device cost: one svcGetSystemTick() per gate, integer adds.
+ * All on-device cost: one svcGetSystemTick() per gate (SYSCLOCK_ARM11
+ * 268.11184 MHz), integer adds.
  * Dump writes sdmc:/forsaken_perf.txt at teardown (SD writes once, not
  * per frame) via its own fd — independent of the __3DS_DEBUG__ trace gate.
  */
@@ -85,7 +86,7 @@ void perf_stage_end(int stage, int stereo_pass)
 	if (d > g_stage[stage].max)
 		g_stage[stage].max = (unsigned long)d;
 	if (stage == PERF_S_FRAME) {
-		unsigned b = (unsigned)(d / 262ULL); /* 8 ms buckets (2^15 Hz tick) */
+		unsigned b = (unsigned)(d / 2144895ULL); /* 8 ms buckets (268.11184 MHz) */
 		if (b > PERF_BUCKETS)
 			b = PERF_BUCKETS;
 		g_frame_ticks[b]++;

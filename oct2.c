@@ -5942,6 +5942,7 @@ bool RenderCurrentCamera( void )
 	#define _RC_STAGE(s) ((void)0)
 #endif
 	_RC_STAGE("entry");
+	perf_stage_begin(PERF_S_VIS);
 	int16_t Count;
 	VISGROUP  *g;
 	u_int16_t  group;
@@ -5987,6 +5988,7 @@ bool RenderCurrentCamera( void )
   UpdateBGObjectsClipGroup( &CurrentCamera );
   UpdateEnemiesClipGroup( &CurrentCamera );
   _RC_STAGE("post-UpdateClipGroups");
+  perf_stage_end(PERF_S_VIS, -1);
 
   /*
   if( CurrentCamera.GroupImIn != (u_int16_t) -1 )
@@ -6050,6 +6052,7 @@ bool RenderCurrentCamera( void )
 #ifdef __3DS__
   int _rc_group_iter = 0;
 #endif
+  perf_stage_begin(PERF_S_OPAQUE);
   _RC_STAGE("entering opaque-draw loop");
   // display clipped opaque objects
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
@@ -6111,6 +6114,7 @@ bool RenderCurrentCamera( void )
     #undef _RC_SUBSTAGE
   }
   _RC_STAGE("opaque-loop EXIT");
+  perf_stage_end(PERF_S_OPAQUE, -1);
 
   ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
   _RC_STAGE("post-ClipGroup-cam");
@@ -6118,6 +6122,7 @@ bool RenderCurrentCamera( void )
 	// set all the Translucent execute status flags...
   	set_alpha_states();
   _RC_STAGE("post-set_alpha_states-1");
+  perf_stage_begin(PERF_S_TRANS);
 
 
 /*===================================================================
@@ -6264,6 +6269,7 @@ Display Group Clipped Faceme Transluecent Polys
         return false;
     }
 
+  perf_stage_end(PERF_S_TRANS, -1);
   return true;
 }
   

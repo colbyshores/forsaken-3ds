@@ -8,8 +8,9 @@
  * in static memory; exactly ONE dump sequence to sdmc:/forsaken_perf.txt
  * happens at teardown, through perf_capture_3ds.c's own fd (the trace()
  * path is __3DS_DEBUG__-gated and would drag in autoboot/god-mode).
- * Tick source is svcGetSystemTick() (32768 Hz); conversion to ms is done
- * offline so on-device cost is one tick read per gate.
+ * Tick source is svcGetSystemTick() (SYSCLOCK_ARM11 = 268.11184 MHz);
+ * conversion to ms is done offline so on-device cost is one tick read
+ * per gate.
  */
 #ifndef PERF_CAPTURE_INCLUDED
 #define PERF_CAPTURE_INCLUDED
@@ -30,6 +31,9 @@ enum perf_stage {
 	PERF_S_MROUT,       /* MainRoutines (oct2.c) — object/AI routines */
 	PERF_S_CAM,         /* RenderCurrentCamera* (oct2.c) — traversal+submit */
 	PERF_S_FSEND,       /* FSEndScene (render_c3d.c) — GPU submit+wait */
+	PERF_S_VIS,         /* RenderCurrentCamera: FindVisible+setup (per call) */
+	PERF_S_OPAQUE,      /* RenderCurrentCamera: opaque draw loop (per call) */
+	PERF_S_TRANS,       /* RenderCurrentCamera: translucent phase (per call) */
 	PERF_S_MAX
 };
 
@@ -45,6 +49,13 @@ bool perf_call_maingamerender(void);
 
 /* end-the-stage-and-forward-result helper for `if (!X())` call sites */
 static inline bool perf_guarded(int stage, bool r)
+{
+	perf_stage_end(stage, -1);
+	return r;
+}
+
+/* end-the-stage-and-forward-int helper (RenderCurrentCamera returns int) */
+static inline int perf_guarded_i(int stage, int r)
 {
 	perf_stage_end(stage, -1);
 	return r;
