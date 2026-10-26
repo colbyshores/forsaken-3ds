@@ -32,6 +32,8 @@ PERF_CFLAGS := $(if $(PERF_CAPTURE),-DPERF_CAPTURE,)
 FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
 # NODE_SQDIST=1 selects the squared-distance candidate in UpdateNearestNodeSpecial (fidelity-gated experiment)
 NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
+# FIDELITY_CHECKPOINTS=1 adds per-tick-interval hash checkpoints to the fidelity file (divergence localization)
+FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -103,6 +105,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-fno-math-errno \
 	$(PERF_CFLAGS) \
 	$(FIDELITY_CFLAGS) \
+	$(FIDCK_CFLAGS) \
 	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \

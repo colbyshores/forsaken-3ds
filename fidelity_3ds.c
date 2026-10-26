@@ -31,6 +31,15 @@ static u_int32_t g_hash = 2166136261u;
 static unsigned long g_ticks;
 static int g_fd = -1;
 
+static void fid_out(const char *line, int len)
+{
+	if (g_fd < 0)
+		g_fd = open("sdmc:/forsaken_fidelity.txt",
+		            O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	if (g_fd < 0) return;
+	if (write(g_fd, line, (size_t)len) < 0) { /* SD full/removed: ignore */ }
+}
+
 static void hi(u_int32_t v)
 {
 	g_hash ^= v;
@@ -102,6 +111,16 @@ void fidelity_tick(void)
 	hi((u_int32_t)sec_count);
 
 	g_ticks++;
+
+#ifdef FIDELITY_CHECKPOINTS
+	if ((g_ticks % (unsigned long)FIDELITY_CHECKPOINT_TICKS) == 0) {
+		char cl[128];
+		int clen = snprintf(cl, sizeof(cl),
+		                    "FIDC: tick=%lu hash=%08lx\n", g_ticks,
+		                    (unsigned long)g_hash);
+		if (clen > 0) fid_out(cl, clen);
+	}
+#endif
 }
 
 void fidelity_level(const char *level_name)
@@ -109,17 +128,10 @@ void fidelity_level(const char *level_name)
 	char line[128];
 	int len;
 
-	if (g_fd < 0)
-		g_fd = open("sdmc:/forsaken_fidelity.txt",
-		            O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	if (g_fd < 0) return;
-
 	len = snprintf(line, sizeof(line), "FID: level=%s ticks=%lu hash=%08lx\n",
 	               level_name ? level_name : "?", g_ticks,
 	               (unsigned long)g_hash);
-	if (len > 0) {
-		if (write(g_fd, line, (size_t)len) < 0) { /* SD full/removed: ignore */ }
-	}
+	if (len > 0) fid_out(line, len);
 	g_hash = 2166136261u;
 	g_ticks = 0;
 }

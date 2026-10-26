@@ -23,6 +23,17 @@ void fidelity_tick(void);
 void fidelity_level(const char *level_name);
 unsigned long fidelity_level_ticks(void);
 
+#ifdef FIDELITY_CHECKPOINTS
+/* Emits a hash checkpoint every FIDELITY_CHECKPOINT_TICKS simulation ticks
+ * (line "FIDC: level=<name> tick=<n> hash=<hex>") so a divergence between
+ * two builds can be localized to the exact tick instead of only the level
+ * boundary. Off by default: it changes the file format, so a checkpointed
+ * file is only comparable with another checkpointed file. */
+#ifndef FIDELITY_CHECKPOINT_TICKS
+#define FIDELITY_CHECKPOINT_TICKS 250
+#endif
+#endif
+
 #else
 
 #define fidelity_tick() ((void)0)
