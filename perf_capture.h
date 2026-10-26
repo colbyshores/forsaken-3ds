@@ -35,6 +35,14 @@ enum perf_stage {
 	PERF_S_BG,          /* RenderCurrentCamera: clear+background+unclipped */
 	PERF_S_OPAQUE,      /* RenderCurrentCamera: opaque draw loop (per call) */
 	PERF_S_TRANS,       /* RenderCurrentCamera: translucent phase (per call) */
+	PERF_S_ENEMIES,     /* MainRoutines: ProcessEnemies (AI) */
+	PERF_S_SPOTFX,      /* MainRoutines: ProcessSpotFX (effects) */
+	PERF_S_BGOBJ,       /* MainRoutines: ProcessBGObjects */
+	PERF_S_MODELS,      /* MainRoutines: ProcessModels */
+	PERF_S_POLYS,       /* MainRoutines: ProcessPolys */
+	PERF_S_RTLIGHTS,    /* MainRoutines: ProcessRTLights */
+	PERF_S_WATER,       /* MainRoutines: WaterProcess */
+	PERF_S_BULLETS,     /* MainRoutines: primary+secondary bullets */
 	PERF_S_MAX
 };
 

@@ -4567,16 +4567,28 @@ void MainRoutines( void )
 
   FirePrimary();
   FireSecondary();
+  perf_stage_begin(PERF_S_ENEMIES);
   ProcessEnemies();
+  perf_stage_end(PERF_S_ENEMIES, -1);
+  perf_stage_begin(PERF_S_SPOTFX);
   ProcessSpotFX();
+  perf_stage_end(PERF_S_SPOTFX, -1);
+  perf_stage_begin(PERF_S_BULLETS);
   ProcessPrimaryBullets();
   ProcessSecondaryBullets();
+  perf_stage_end(PERF_S_BULLETS, -1);
   if( !PlayDemo ) RegeneratePickups();
   ProcessPickups();
+  perf_stage_begin(PERF_S_BGOBJ);
   ProcessBGObjects( true );
+  perf_stage_end(PERF_S_BGOBJ, -1);
   ProcessRestartPoints();
+  perf_stage_begin(PERF_S_MODELS);
   ProcessModels();
+  perf_stage_end(PERF_S_MODELS, -1);
+  perf_stage_begin(PERF_S_POLYS);
   ProcessPolys();
+  perf_stage_end(PERF_S_POLYS, -1);
   ProcessXLights( &Mloadheader );
   DoAfterBurnerEffects();
   FmPolyProcess();
@@ -4601,8 +4613,12 @@ void MainRoutines( void )
     ShipDiedSend( WEPTYPE_Primary, 0);
   }
 #endif
+  perf_stage_begin(PERF_S_WATER);
   WaterProcess();
+  perf_stage_end(PERF_S_WATER, -1);
+  perf_stage_begin(PERF_S_RTLIGHTS);
   ProcessRTLights();
+  perf_stage_end(PERF_S_RTLIGHTS, -1);
   
 	//DebugPrintf("MainRoutines Finished...\n");
 }
