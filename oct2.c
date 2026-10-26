@@ -4558,15 +4558,19 @@ void MainRoutines( void )
     DemoPlayingNetworkGameUpdate();
   }
 
+  perf_stage_begin(PERF_S_SHIPS);
   ProcessShips();
+  perf_stage_end(PERF_S_SHIPS, -1);
 
 #ifdef SHADOWTEST
 //  CreateSpotLight( (u_int16_t) WhoIAm, SHIP_RADIUS, &Mloadheader );
 //  CreateShadowsForShips();
 #endif
 
+  perf_stage_begin(PERF_S_FIRES);
   FirePrimary();
   FireSecondary();
+  perf_stage_end(PERF_S_FIRES, -1);
   perf_stage_begin(PERF_S_ENEMIES);
   ProcessEnemies();
   perf_stage_end(PERF_S_ENEMIES, -1);
@@ -4578,7 +4582,9 @@ void MainRoutines( void )
   ProcessSecondaryBullets();
   perf_stage_end(PERF_S_BULLETS, -1);
   if( !PlayDemo ) RegeneratePickups();
+  perf_stage_begin(PERF_S_PICKUPS);
   ProcessPickups();
+  perf_stage_end(PERF_S_PICKUPS, -1);
   perf_stage_begin(PERF_S_BGOBJ);
   ProcessBGObjects( true );
   perf_stage_end(PERF_S_BGOBJ, -1);
@@ -4589,15 +4595,25 @@ void MainRoutines( void )
   perf_stage_begin(PERF_S_POLYS);
   ProcessPolys();
   perf_stage_end(PERF_S_POLYS, -1);
+  perf_stage_begin(PERF_S_XLIGHTS);
   ProcessXLights( &Mloadheader );
+  perf_stage_end(PERF_S_XLIGHTS, -1);
+  perf_stage_begin(PERF_S_AFTERBRN);
   DoAfterBurnerEffects();
+  perf_stage_end(PERF_S_AFTERBRN, -1);
+  perf_stage_begin(PERF_S_FMPOLY);
   FmPolyProcess();
+  perf_stage_end(PERF_S_FMPOLY, -1);
   CheckTimeLimit();
   if( CountDownOn ) UpdateCountdownDigits();
 	if(!CurrentMenu)
 	  ShowScreenMultiples();
+  perf_stage_begin(PERF_S_CONDITIONS);
   ProcessActiveConditions();
+  perf_stage_end(PERF_S_CONDITIONS, -1);
+  perf_stage_begin(PERF_S_TRIGGERS);
   ProcessTriggerAreas();
+  perf_stage_end(PERF_S_TRIGGERS, -1);
   ProcessGoals();
 #ifdef DOESNT_WORK_AND_A_BAD_IDEA_ANYWAY
   if ( outside_map && !DebugInfo && ( Ships[WhoIAm].Object.Mode != DEATH_MODE ) && ( Ships[WhoIAm].Object.Mode != LIMBO_MODE ) )

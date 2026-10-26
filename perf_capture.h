@@ -43,6 +43,14 @@ enum perf_stage {
 	PERF_S_RTLIGHTS,    /* MainRoutines: ProcessRTLights */
 	PERF_S_WATER,       /* MainRoutines: WaterProcess */
 	PERF_S_BULLETS,     /* MainRoutines: primary+secondary bullets */
+	PERF_S_SHIPS,       /* MainRoutines: ProcessShips */
+	PERF_S_FIRES,       /* MainRoutines: FirePrimary+FireSecondary */
+	PERF_S_PICKUPS,     /* MainRoutines: ProcessPickups */
+	PERF_S_XLIGHTS,     /* MainRoutines: ProcessXLights */
+	PERF_S_AFTERBRN,    /* MainRoutines: DoAfterBurnerEffects */
+	PERF_S_FMPOLY,      /* MainRoutines: FmPolyProcess */
+	PERF_S_CONDITIONS,  /* MainRoutines: ProcessActiveConditions */
+	PERF_S_TRIGGERS,    /* MainRoutines: ProcessTriggerAreas */
 	PERF_S_MAX
 };
 
