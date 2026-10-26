@@ -147,6 +147,14 @@ void perf_level_marker(const char *level_name)
 	snprintf(line, sizeof(line), "PERF: === level=%s ===",
 	         level_name ? level_name : "?");
 	perf_out(line);
+	{
+		extern size_t Hunk_Used(int), Hunk_Available(void), Hunk_Total(void);
+		snprintf(line, sizeof(line),
+		         "PERF: hunk level_used=%u startup_used=%u avail=%u total=%u",
+		         (unsigned)Hunk_Used(1), (unsigned)Hunk_Used(0),
+		         (unsigned)Hunk_Available(), (unsigned)Hunk_Total());
+		perf_out(line);
+	}
 	perf_dump_body();
 	perf_reset();
 }

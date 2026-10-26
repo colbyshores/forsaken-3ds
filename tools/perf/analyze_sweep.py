@@ -14,7 +14,7 @@ STAGES = ["frame","maingame","render","fsbegin","mROUT","cam","fsend","vis","bg"
           "opaque","trans","enemies","spotfx","bgobj","models","polys","rtlights","water",
           "bullets","ships","fires","pickups","xlights","afterbrn","fmpoly","conditions","triggers",
           "regen","restart","time","multiples","goals","shipmode","shipcollide",
-          "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode"]
+          "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode","losnode"]
 TICK = 268111840.0
 
 def load(path):
