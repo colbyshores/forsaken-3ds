@@ -6634,7 +6634,7 @@ void CalculateFramelag( void )
    * advance by an identical step every tick so per-tick state hashes are
    * reproducible across runs (wall-clock framelag makes the trajectory
    * timing-dependent). 1.0F = one 71 Hz step per frame. */
-  real_framelag = 1.0F / 71.0F;
+  real_framelag = 0.014084507042253521126760563380282F; /* 1/71, exact-folded */
   framelag = 1.0F;
 #endif
 
