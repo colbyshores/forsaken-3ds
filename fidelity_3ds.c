@@ -31,6 +31,16 @@ static u_int32_t g_hash = 2166136261u;
 static unsigned long g_ticks;
 static int g_fd = -1;
 
+/* Component digests: parallel accumulators over the same data the global
+ * hash folds, so a checkpoint line can name WHICH subsystem diverged
+ * (ships / enemies / bullets) instead of only "the state differs". The
+ * global hash's byte stream is unchanged by this - the component hashes
+ * are folded in addition, never instead. */
+static u_int32_t g_h_ship = 2166136261u;
+static u_int32_t g_h_enem = 2166136261u;
+static u_int32_t g_h_prim = 2166136261u;
+static u_int32_t g_h_sec = 2166136261u;
+
 static void fid_out(const char *line, int len)
 {
 	if (g_fd < 0)
@@ -46,6 +56,12 @@ static void hi(u_int32_t v)
 	g_hash *= 16777619u;
 }
 
+static void hi_c(u_int32_t *comp, u_int32_t v)
+{
+	*comp ^= v;
+	*comp *= 16777619u;
+}
+
 static void hf(float f)
 {
 	u_int32_t u;
@@ -54,11 +70,26 @@ static void hf(float f)
 	hi(u);
 }
 
+static void hf_c(u_int32_t *comp, float f)
+{
+	u_int32_t u;
+	memcpy(&u, &f, sizeof(u));
+	if (u == 0x80000000u) u = 0;
+	hi_c(comp, u);
+}
+
 static void hvec(const VECTOR *v)
 {
 	hf(v->x);
 	hf(v->y);
 	hf(v->z);
+}
+
+static void hvec_c(u_int32_t *comp, const VECTOR *v)
+{
+	hf_c(comp, v->x);
+	hf_c(comp, v->y);
+	hf_c(comp, v->z);
 }
 
 void fidelity_tick(void)
@@ -77,9 +108,16 @@ void fidelity_tick(void)
 		hi(Ships[i].Object.Group);
 		hf(Ships[i].Object.Shield);
 		hf(Ships[i].Damage);
+		hi_c(&g_h_ship, (u_int32_t)i);
+		hvec_c(&g_h_ship, &Ships[i].Object.Pos);
+		hvec_c(&g_h_ship, &Ships[i].Object.Angle);
+		hi_c(&g_h_ship, Ships[i].Object.Group);
+		hf_c(&g_h_ship, Ships[i].Object.Shield);
+		hf_c(&g_h_ship, Ships[i].Damage);
 		if (i == (int)WhoIAm && Ships[i].Object.NearestNode) {
 			NODE *nd = (NODE *)Ships[i].Object.NearestNode;
 			hvec(&nd->Pos);
+			hvec_c(&g_h_ship, &nd->Pos);
 		}
 	}
 
@@ -92,32 +130,45 @@ void fidelity_tick(void)
 		hi(Enemies[i].Object.Group);
 		hf(Enemies[i].Object.Shield);
 		hi((u_int32_t)Enemies[i].Type);
+		hi_c(&g_h_enem, (u_int32_t)i);
+		hi_c(&g_h_enem, (u_int32_t)Enemies[i].Alive);
+		hvec_c(&g_h_enem, &Enemies[i].Object.Pos);
+		hvec_c(&g_h_enem, &Enemies[i].Object.Angle);
+		hi_c(&g_h_enem, Enemies[i].Object.Group);
+		hf_c(&g_h_enem, Enemies[i].Object.Shield);
+		hi_c(&g_h_enem, (u_int32_t)Enemies[i].Type);
 	}
 
 	n = FirstPrimBullUsed;
 	while (n != (u_int16_t)-1 && prim_count <= MAXPRIMARYWEAPONBULLETS) {
 		hvec(&PrimBulls[n].Pos);
+		hvec_c(&g_h_prim, &PrimBulls[n].Pos);
 		prim_count++;
 		n = PrimBulls[n].Prev;
 	}
 	hi((u_int32_t)prim_count);
+	hi_c(&g_h_prim, (u_int32_t)prim_count);
 
 	n = FirstSecBullUsed;
 	while (n != (u_int16_t)-1 && sec_count <= MAXSECONDARYWEAPONBULLETS) {
 		hvec(&SecBulls[n].Pos);
+		hvec_c(&g_h_sec, &SecBulls[n].Pos);
 		sec_count++;
 		n = SecBulls[n].Next;
 	}
 	hi((u_int32_t)sec_count);
+	hi_c(&g_h_sec, (u_int32_t)sec_count);
 
 	g_ticks++;
 
 #ifdef FIDELITY_CHECKPOINTS
 	if ((g_ticks % (unsigned long)FIDELITY_CHECKPOINT_TICKS) == 0) {
-		char cl[128];
+		char cl[192];
 		int clen = snprintf(cl, sizeof(cl),
-		                    "FIDC: tick=%lu hash=%08lx\n", g_ticks,
-		                    (unsigned long)g_hash);
+		                    "FIDC: tick=%lu hash=%08lx ship=%08lx enem=%08lx prim=%08lx sec=%08lx\n",
+		                    g_ticks, (unsigned long)g_hash,
+		                    (unsigned long)g_h_ship, (unsigned long)g_h_enem,
+		                    (unsigned long)g_h_prim, (unsigned long)g_h_sec);
 		if (clen > 0) fid_out(cl, clen);
 	}
 #endif

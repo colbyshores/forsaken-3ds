@@ -14,7 +14,10 @@ done
 sleep 5
 for i in 1 2 3 4 5; do
   if curl -s --max-time 30 "http://$IP:8080/forsaken_fidelity.txt" -o "$OUT" 2>/dev/null \
-     && [ "$(grep -c '^FID: level=' "$OUT")" -ge 28 ]; then
+     && [ "$(grep -c '^FID: level=' "$OUT")" -ge ${2:-28} ]; then
+    # optional 3rd arg: minimum FIDC checkpoint lines (stale-file guard for
+    # checkpointed runs - an old non-checkpointed file has zero).
+    if [ -n "${3:-}" ] && [ "$(grep -c '^FIDC:' "$OUT")" -lt "$3" ]; then sleep 5; continue; fi
     echo "FID SWEEP OK lines=$(grep -c '^FID: level=' "$OUT") md5=$(md5sum "$OUT" | cut -d' ' -f1)"
     exit 0
   fi

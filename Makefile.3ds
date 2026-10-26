@@ -305,6 +305,23 @@ CIA_ROMFS_STAMP := $(CIA_ROMFS)/.stamp
 
 all: $(OUTPUT_3DSX)
 
+# --- Build-flag stamp -------------------------------------------------------
+# The -D flag set (PERF_CAPTURE, FIDELITY_DUMP, FIDELITY_CHECKPOINTS,
+# NODE_SQDIST, AUTOTEST_*_REMASTER/FIRST_LEVEL/MAX_LEVELS...) changes object
+# code but is invisible to the -MMD dependency files, so switching flags
+# left stale objects that silently relinked wrong behavior (three incidents
+# this program: 2026-10-26, ships.o + perf_capture_3ds.o link failures and
+# a stale-binary push). This stamp records the flag set; when it changes,
+# the stamp file is rewritten with a fresh mtime, and because every object
+# depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
+# the old stamp mtime, so normal incremental builds are untouched.
+STAMP := $(BUILD)/.dflags.stamp
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ED=$(EDITION)|SLIM=$(SLIM)
+$(STAMP): FORCE
+	@mkdir -p $(BUILD)
+	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
+	@if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; echo "build flags changed -> full rebuild"; fi
+
 # Force autotest_3ds.o to always recompile when AUTOTEST_FIRST_LEVEL is set,
 # so a slot change picks up without manual `rm`. CFLAGS aren't tracked as
 # deps by default. Defined AFTER `all:` so `make` with no target still
@@ -464,7 +481,7 @@ $(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
 	@echo "Linking $(notdir $@)..."
 	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
 
-$(BUILD)/%.o: $(SRCDIR)/%.c
+$(BUILD)/%.o: $(SRCDIR)/%.c $(STAMP)
 	@echo $(notdir $<)
 	@mkdir -p $(BUILD)
 	$(CC) -MMD -MP -MF $(BUILD)/$*.d $(CFLAGS) -c $< -o $@
