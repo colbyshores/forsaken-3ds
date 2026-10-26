@@ -28,6 +28,7 @@
 #include "networking.h"
 #include "file.h"
 #include "triggers.h"
+#include "perf_capture.h"
 #include "models.h"
 #include "enemies.h"
 #include "mload.h"
@@ -998,19 +999,26 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 	for( i = 0 ; i < Node->NumOfLinks ; i ++ )
 	{
 		NodeLink = Node->NodeLink[i];
-		/* Integer gates first: DistanceVector2Vector (sqrtf) and the
-		 * BackgroundCollide ray in AI_ClearLOS are the per-link cost
-		 * (wave-4: 4.4 ms/frame on fishy). Short-circuit order is
-		 * bit-identical to the previous unconditional Temp compute. */
+		/* Integer gates first: strictly-less work, bit-identical
+		 * short-circuit. Measured (wave-4f fishy): zero AI_ClearLOS
+		 * rays fire here - the cost is the NodeInGroup traversal +
+		 * sqrtf over the group's node list (memory-bound), inherent
+		 * to the ported algorithm. Reorder kept, gains ~0. */
 		if( ( Object->NodeNetwork & NodeLink->NetMask ) &&
 			( Object->Group != NodeLink->Group ) )
 		{
 			Temp = DistanceVector2Vector( (VECTOR*) &NodeLink->Pos , (VECTOR*) &Object->Pos );
-			if( ( Temp < Distance ) &&
-				AI_ClearLOS( &Object->Pos ,Object->Group, &NodeLink->Pos ) )
+			if( Temp < Distance )
 			{
-				Distance = Temp;
-				Object->NearestNode = (void*) NodeLink;
+				bool _los;
+				perf_stage_begin(PERF_S_LOSNODE);
+				_los = AI_ClearLOS( &Object->Pos ,Object->Group, &NodeLink->Pos );
+				perf_stage_end(PERF_S_LOSNODE, -1);
+				if( _los )
+				{
+					Distance = Temp;
+					Object->NearestNode = (void*) NodeLink;
+				}
 			}
 		}
 	}
@@ -1020,10 +1028,17 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 		if( (Object->NodeNetwork & Node->NetMask) && (Node != Object->NearestNode) )
 		{
 			Temp = DistanceVector2Vector( (VECTOR*) &Node->Pos , (VECTOR*) &Object->Pos );
-			if( ( Temp < Distance ) && AI_ClearLOS( &Object->Pos ,Object->Group, &Node->Pos ) )			{
-				Distance = Temp;
-				
-				Object->NearestNode = (void*) Node;
+			if( Temp < Distance )
+			{
+				bool _los;
+				perf_stage_begin(PERF_S_LOSNODE);
+				_los = AI_ClearLOS( &Object->Pos ,Object->Group, &Node->Pos );
+				perf_stage_end(PERF_S_LOSNODE, -1);
+				if( _los )
+				{
+					Distance = Temp;
+					Object->NearestNode = (void*) Node;
+				}
 			}
 		}
 		Node = Node->NextNodeInGroup;
