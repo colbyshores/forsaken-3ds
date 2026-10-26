@@ -1,0 +1,3809 @@
+PERF: dump begin
+PERF: stage=0 count=103695 total=822040680142 max=3230234148
+PERF: stage=1 count=102672 total=479828749834 max=625464438
+PERF: stage=2 count=102672 total=388522627824 max=579334888
+PERF: hist ms<=9999 count=103695
+PERF: frames=103695
+PERF: dump end
+PERF: === level=vol2 ===
+PERF: stage=0 count=3538 total=24682365524 max=3415678926
+PERF: stage=1 count=3531 total=16011361872 max=515421290
+PERF: stage=2 count=3531 total=14504361998 max=457715050
+PERF: hist ms<=8 count=2
+PERF: hist ms<=16 count=68
+PERF: hist ms<=24 count=3402
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=384 count=1
+PERF: hist ms<=664 count=1
+PERF: hist ms<=1032 count=2
+PERF: frames=3538
+PERF: === level=asubchb ===
+PERF: stage=0 count=3555 total=26148146718 max=3614853578
+PERF: stage=1 count=3520 total=16084770958 max=622009210
+PERF: stage=2 count=3520 total=13541535734 max=573166548
+PERF: hist ms<=16 count=71
+PERF: hist ms<=24 count=3412
+PERF: hist ms<=40 count=44
+PERF: hist ms<=48 count=18
+PERF: hist ms<=56 count=2
+PERF: hist ms<=88 count=1
+PERF: hist ms<=104 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=656 count=1
+PERF: hist ms<=776 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3555
+PERF: === level=nps-sp01 ===
+PERF: stage=0 count=3544 total=27617886324 max=723457920
+PERF: stage=1 count=3509 total=16061717584 max=572336624
+PERF: stage=2 count=3509 total=13277153630 max=522871970
+PERF: hist ms<=16 count=57
+PERF: hist ms<=24 count=3410
+PERF: hist ms<=32 count=7
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=23
+PERF: hist ms<=64 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=104 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=768 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3544
+PERF: === level=thermal ===
+PERF: stage=0 count=3534 total=26752883214 max=4144532840
+PERF: stage=1 count=3499 total=16005663252 max=565023154
+PERF: stage=2 count=3499 total=11040049272 max=518386768
+PERF: hist ms<=16 count=43
+PERF: hist ms<=24 count=3408
+PERF: hist ms<=32 count=13
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=23
+PERF: hist ms<=88 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=768 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3534
+PERF: === level=fedbankv ===
+PERF: stage=0 count=3549 total=30301484772 max=3088953200
+PERF: stage=1 count=3514 total=15966524690 max=480192916
+PERF: stage=2 count=3514 total=11482178484 max=437239276
+PERF: hist ms<=16 count=52
+PERF: hist ms<=24 count=3425
+PERF: hist ms<=32 count=3
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=4
+PERF: hist ms<=72 count=1
+PERF: hist ms<=80 count=2
+PERF: hist ms<=752 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3549
+PERF: === level=defend2 ===
+PERF: stage=0 count=3520 total=27470807678 max=618435382
+PERF: stage=1 count=3485 total=15944724376 max=482004848
+PERF: stage=2 count=3485 total=11632192764 max=433303976
+PERF: hist ms<=16 count=43
+PERF: hist ms<=24 count=3371
+PERF: hist ms<=32 count=34
+PERF: hist ms<=40 count=34
+PERF: hist ms<=48 count=28
+PERF: hist ms<=56 count=3
+PERF: hist ms<=96 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=752 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3520
+PERF: === level=pship ===
+PERF: stage=0 count=3546 total=29553081534 max=2484779798
+PERF: stage=1 count=3511 total=15948512246 max=482091448
+PERF: stage=2 count=3511 total=12552103092 max=432650108
+PERF: hist ms<=16 count=62
+PERF: hist ms<=24 count=3407
+PERF: hist ms<=32 count=7
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=760 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3546
+PERF: === level=stableizers ===
+PERF: stage=0 count=3530 total=28128744848 max=1422008374
+PERF: stage=1 count=3495 total=16052652432 max=609334662
+PERF: stage=2 count=3495 total=11321374602 max=559258816
+PERF: hist ms<=16 count=45
+PERF: hist ms<=24 count=3394
+PERF: hist ms<=32 count=18
+PERF: hist ms<=40 count=33
+PERF: hist ms<=48 count=28
+PERF: hist ms<=56 count=4
+PERF: hist ms<=72 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=776 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3530
+PERF: === level=powerdown ===
+PERF: stage=0 count=2333 total=29910458906 max=1838513506
+PERF: stage=1 count=2298 total=16165891456 max=622349678
+PERF: stage=2 count=2298 total=13082404000 max=576757554
+PERF: hist ms<=16 count=2
+PERF: hist ms<=24 count=1084
+PERF: hist ms<=32 count=1042
+PERF: hist ms<=40 count=139
+PERF: hist ms<=48 count=27
+PERF: hist ms<=56 count=26
+PERF: hist ms<=64 count=4
+PERF: hist ms<=88 count=2
+PERF: hist ms<=120 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=760 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=2333
+PERF: === level=spc-sp01 ===
+PERF: stage=0 count=3527 total=28436472448 max=1545890140
+PERF: stage=1 count=3492 total=16051569164 max=606638646
+PERF: stage=2 count=3492 total=12212066172 max=563673528
+PERF: hist ms<=16 count=58
+PERF: hist ms<=24 count=3376
+PERF: hist ms<=32 count=20
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=2
+PERF: hist ms<=72 count=2
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=720 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3527
+PERF: === level=starship ===
+PERF: stage=0 count=3468 total=26022042706 max=3551387406
+PERF: stage=1 count=3433 total=15976531578 max=564131560
+PERF: stage=2 count=3433 total=13700032652 max=523862126
+PERF: hist ms<=8 count=2
+PERF: hist ms<=16 count=48
+PERF: hist ms<=24 count=3275
+PERF: hist ms<=32 count=65
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=26
+PERF: hist ms<=56 count=3
+PERF: hist ms<=72 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=640 count=1
+PERF: hist ms<=776 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3468
+PERF: === level=bio-sphere ===
+PERF: stage=0 count=3553 total=26838091154 max=4209062618
+PERF: stage=1 count=3518 total=16037806020 max=563720158
+PERF: stage=2 count=3518 total=13290213878 max=523486450
+PERF: hist ms<=8 count=7
+PERF: hist ms<=16 count=57
+PERF: hist ms<=24 count=3417
+PERF: hist ms<=32 count=1
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=4
+PERF: hist ms<=64 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=832 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3553
+PERF: === level=nukerf ===
+PERF: stage=0 count=3556 total=28433119466 max=1558172176
+PERF: stage=1 count=3521 total=15962655306 max=478754314
+PERF: stage=2 count=3521 total=14301276470 max=434270612
+PERF: hist ms<=8 count=9
+PERF: hist ms<=16 count=51
+PERF: hist ms<=24 count=3424
+PERF: hist ms<=40 count=41
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=3
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=816 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3556
+PERF: === level=battlebase ===
+PERF: stage=0 count=3558 total=25829610260 max=3490170456
+PERF: stage=1 count=3523 total=15849394264 max=388298512
+PERF: stage=2 count=3523 total=13030395136 max=343480180
+PERF: hist ms<=8 count=2
+PERF: hist ms<=16 count=56
+PERF: hist ms<=24 count=3431
+PERF: hist ms<=40 count=34
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=2
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=768 count=1
+PERF: hist ms<=824 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3558
+PERF: === level=capship ===
+PERF: stage=0 count=3555 total=27031066156 max=514861912
+PERF: stage=1 count=3520 total=15922174898 max=477888778
+PERF: stage=2 count=3520 total=12799006422 max=429117924
+PERF: hist ms<=8 count=8
+PERF: hist ms<=16 count=48
+PERF: hist ms<=24 count=3430
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=22
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=792 count=1
+PERF: hist ms<=840 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3555
+PERF: === level=space ===
+PERF: stage=0 count=3561 total=29284598434 max=2266724406
+PERF: stage=1 count=3526 total=15986827840 max=493525002
+PERF: stage=2 count=3526 total=13180433488 max=443765620
+PERF: hist ms<=16 count=63
+PERF: hist ms<=24 count=3427
+PERF: hist ms<=32 count=1
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=23
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=2
+PERF: hist ms<=128 count=1
+PERF: hist ms<=792 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3561
+PERF: === level=high ===
+PERF: stage=0 count=3561 total=28025406702 max=1250991634
+PERF: stage=1 count=3526 total=15971412994 max=475585272
+PERF: stage=2 count=3526 total=12623485974 max=431093324
+PERF: hist ms<=16 count=58
+PERF: hist ms<=24 count=3434
+PERF: hist ms<=40 count=30
+PERF: hist ms<=48 count=29
+PERF: hist ms<=56 count=2
+PERF: hist ms<=88 count=2
+PERF: hist ms<=120 count=1
+PERF: hist ms<=752 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3561
+PERF: === level=military ===
+PERF: stage=0 count=3558 total=31355037884 max=637049752
+PERF: stage=1 count=3523 total=15857492972 max=393428950
+PERF: stage=2 count=3523 total=13450349944 max=341906154
+PERF: hist ms<=16 count=56
+PERF: hist ms<=24 count=3433
+PERF: hist ms<=40 count=34
+PERF: hist ms<=48 count=24
+PERF: hist ms<=56 count=3
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=136 count=1
+PERF: hist ms<=736 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3558
+PERF: === level=munitions ===
+PERF: stage=0 count=3560 total=25924106992 max=3327507448
+PERF: stage=1 count=3525 total=15965240676 max=474785852
+PERF: stage=2 count=3525 total=14741134912 max=436224308
+PERF: hist ms<=8 count=10
+PERF: hist ms<=16 count=45
+PERF: hist ms<=24 count=3436
+PERF: hist ms<=40 count=35
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=2
+PERF: hist ms<=128 count=1
+PERF: hist ms<=752 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3560
+PERF: === level=ramqan ===
+PERF: stage=0 count=2016 total=29516778700 max=2246877950
+PERF: stage=1 count=1981 total=16151212624 max=629762462
+PERF: stage=2 count=1981 total=12904033536 max=584463488
+PERF: hist ms<=16 count=1
+PERF: hist ms<=24 count=469
+PERF: hist ms<=32 count=473
+PERF: hist ms<=40 count=1000
+PERF: hist ms<=48 count=8
+PERF: hist ms<=56 count=34
+PERF: hist ms<=64 count=19
+PERF: hist ms<=72 count=4
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=744 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=2016
+PERF: === level=temple ===
+PERF: stage=0 count=3526 total=27786592088 max=907623616
+PERF: stage=1 count=3491 total=16026422278 max=564545156
+PERF: stage=2 count=3491 total=10474008934 max=524698266
+PERF: hist ms<=16 count=36
+PERF: hist ms<=24 count=3395
+PERF: hist ms<=32 count=24
+PERF: hist ms<=40 count=32
+PERF: hist ms<=48 count=27
+PERF: hist ms<=56 count=3
+PERF: hist ms<=72 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=840 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3526
+PERF: === level=azt-sp01 ===
+PERF: stage=0 count=3550 total=29575814120 max=2348647804
+PERF: stage=1 count=3515 total=15955248756 max=477415472
+PERF: stage=2 count=3515 total=12389131520 max=433232836
+PERF: hist ms<=16 count=54
+PERF: hist ms<=24 count=3424
+PERF: hist ms<=32 count=3
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=2
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=3
+PERF: hist ms<=800 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3550
+PERF: === level=azchb ===
+PERF: stage=0 count=3550 total=27080118078 max=595073114
+PERF: stage=1 count=3515 total=16040569080 max=567250222
+PERF: stage=2 count=3515 total=14337566026 max=523387370
+PERF: hist ms<=16 count=59
+PERF: hist ms<=24 count=3422
+PERF: hist ms<=32 count=1
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=744 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3550
+PERF: === level=nuken64 ===
+PERF: stage=0 count=3549 total=25592515676 max=2957908896
+PERF: stage=1 count=3514 total=16020701138 max=562196048
+PERF: stage=2 count=3514 total=14386274536 max=521775346
+PERF: hist ms<=16 count=63
+PERF: hist ms<=24 count=3411
+PERF: hist ms<=40 count=45
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=1
+PERF: hist ms<=64 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=760 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3549
+PERF: === level=shipn64 ===
+PERF: stage=0 count=3556 total=25407740670 max=3162095658
+PERF: stage=1 count=3521 total=15865370266 max=350467960
+PERF: stage=2 count=3521 total=14741519436 max=314677872
+PERF: hist ms<=8 count=2
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3428
+PERF: hist ms<=40 count=57
+PERF: hist ms<=48 count=5
+PERF: hist ms<=56 count=2
+PERF: hist ms<=72 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=552 count=1
+PERF: hist ms<=824 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3556
+PERF: === level=aztec64 ===
+PERF: stage=0 count=3564 total=25547990678 max=3179462332
+PERF: stage=1 count=3529 total=16053994216 max=559584940
+PERF: stage=2 count=3529 total=13339840086 max=518336642
+PERF: hist ms<=8 count=10
+PERF: hist ms<=16 count=57
+PERF: hist ms<=24 count=3428
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=21
+PERF: hist ms<=88 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=496 count=1
+PERF: hist ms<=736 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3564
+PERF: === level=blackhole ===
+PERF: stage=0 count=3517 total=25589740760 max=3300922934
+PERF: stage=1 count=3482 total=15814784498 max=385031838
+PERF: stage=2 count=3482 total=13624100842 max=340801406
+PERF: hist ms<=8 count=2
+PERF: hist ms<=16 count=69
+PERF: hist ms<=24 count=3344
+PERF: hist ms<=32 count=21
+PERF: hist ms<=40 count=45
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=3
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=648 count=1
+PERF: hist ms<=768 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3517
+PERF: === level=genstation ===
+PERF: stage=0 count=3529 total=26290140830 max=3409844060
+PERF: stage=1 count=3494 total=16059859310 max=623152698
+PERF: stage=2 count=3494 total=13231704644 max=568323766
+PERF: hist ms<=16 count=58
+PERF: hist ms<=24 count=3376
+PERF: hist ms<=32 count=22
+PERF: hist ms<=40 count=41
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=2
+PERF: hist ms<=64 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=104 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=824 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3529
+PERF: === level=fishy ===
+PERF: stage=0 count=3506 total=29333449322 max=2254141942
+PERF: stage=1 count=3471 total=15959060080 max=486278154
+PERF: stage=2 count=3471 total=7565670814 max=431244964
+PERF: hist ms<=16 count=20
+PERF: hist ms<=24 count=3365
+PERF: hist ms<=32 count=43
+PERF: hist ms<=40 count=48
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=792 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3506
+PERF: dump begin
+PERF: stage=0 count=3567 total=25609227746 max=3201509438
+PERF: stage=1 count=3531 total=15973561110 max=479489686
+PERF: stage=2 count=3531 total=14880539826 max=433788534
+PERF: hist ms<=8 count=11
+PERF: hist ms<=16 count=54
+PERF: hist ms<=24 count=3433
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=23
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=696 count=1
+PERF: hist ms<=768 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3567
+PERF: dump end
+PERF: === level=ramqan ===
+PERF: stage=0 count=2011 total=28342357732 max=2260358428
+PERF: stage=1 count=2004 total=16148792762 max=634711056
+PERF: stage=2 count=2004 total=12847358074 max=581118038
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=1
+PERF: hist ms<=24 count=485
+PERF: hist ms<=32 count=496
+PERF: hist ms<=40 count=964
+PERF: hist ms<=48 count=12
+PERF: hist ms<=56 count=30
+PERF: hist ms<=64 count=12
+PERF: hist ms<=72 count=3
+PERF: hist ms<=80 count=2
+PERF: hist ms<=104 count=1
+PERF: hist ms<=392 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=2011
+PERF: dump begin
+PERF: stage=0 count=3523 total=27840587678 max=906502958
+PERF: stage=1 count=3487 total=16031603528 max=571141838
+PERF: stage=2 count=3487 total=10459878022 max=518696972
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3365
+PERF: hist ms<=32 count=26
+PERF: hist ms<=40 count=46
+PERF: hist ms<=48 count=23
+PERF: hist ms<=56 count=1
+PERF: hist ms<=88 count=3
+PERF: hist ms<=112 count=1
+PERF: hist ms<=840 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3523
+PERF: dump end
+PERF: === level=vol2 ===
+PERF: stage=0 count=3536 total=24715932470 max=3455588876
+PERF: stage=1 count=3529 total=16000793754 max=508661244
+PERF: stage=2 count=3529 total=14449015506 max=451842198
+PERF: stage=3 count=3529 total=10100250572 max=3720634
+PERF: stage=4 count=3529 total=1424870502 max=12859618
+PERF: stage=5 count=3529 total=4198019028 max=392643802
+PERF: stage=6 count=3529 total=377878 max=162
+PERF: stage=7 count=7058 total=224422990 max=46851748
+PERF: stage=8 count=7058 total=1140127490 max=20898566
+PERF: stage=9 count=7058 total=1043488186 max=168338380
+PERF: stage=10 count=7058 total=1052650780 max=139617050
+PERF: stage=11 count=3529 total=87488428 max=48568
+PERF: stage=12 count=3529 total=26648554 max=179894
+PERF: stage=13 count=3529 total=6642656 max=32606
+PERF: stage=14 count=3529 total=99620928 max=206736
+PERF: stage=15 count=3529 total=5140872 max=14342
+PERF: stage=16 count=3529 total=16273544 max=19392
+PERF: stage=17 count=3529 total=637048 max=470
+PERF: stage=18 count=3529 total=827366288 max=442228
+PERF: stage=19 count=3529 total=188847396 max=241288
+PERF: stage=20 count=3529 total=51041530 max=8961486
+PERF: stage=21 count=3529 total=12608390 max=17688
+PERF: stage=22 count=3529 total=15951002 max=19008
+PERF: stage=23 count=3529 total=2499732 max=12796
+PERF: stage=24 count=3529 total=17750520 max=20902
+PERF: stage=25 count=3529 total=10835758 max=3510266
+PERF: stage=26 count=3529 total=4024962 max=13966
+PERF: stage=27 count=3529 total=5037966 max=19432
+PERF: stage=28 count=3529 total=580074 max=472
+PERF: stage=29 count=3529 total=25499604 max=24332
+PERF: stage=30 count=3529 total=8000730 max=15456
+PERF: stage=31 count=3529 total=946064 max=11388
+PERF: stage=32 count=3529 total=19417432 max=22742
+PERF: stage=33 count=3529 total=98605890 max=66104
+PERF: hist ms<=8 count=7
+PERF: hist ms<=16 count=61
+PERF: hist ms<=24 count=3402
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=2
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=376 count=1
+PERF: hist ms<=664 count=1
+PERF: hist ms<=1032 count=2
+PERF: frames=3536
+PERF: === level=asubchb ===
+PERF: stage=0 count=3546 total=26349437546 max=3639404048
+PERF: stage=1 count=3511 total=16062051976 max=602470960
+PERF: stage=2 count=3511 total=13460165844 max=564548426
+PERF: stage=3 count=3511 total=8374228072 max=4307862
+PERF: stage=4 count=3511 total=2488360740 max=9294476
+PERF: stage=5 count=3511 total=4907251218 max=502133636
+PERF: stage=6 count=3511 total=376316 max=138
+PERF: stage=7 count=7022 total=247141004 max=44763894
+PERF: stage=8 count=7022 total=1048456372 max=17089996
+PERF: stage=9 count=7022 total=2070131710 max=176828874
+PERF: stage=10 count=7022 total=964203698 max=179114478
+PERF: stage=11 count=3511 total=659422012 max=4851596
+PERF: stage=12 count=3511 total=31156688 max=28090
+PERF: stage=13 count=3511 total=10386414 max=74636
+PERF: stage=14 count=3511 total=203953752 max=99828
+PERF: stage=15 count=3511 total=3432174 max=14402
+PERF: stage=16 count=3511 total=16263622 max=24576
+PERF: stage=17 count=3511 total=1409110 max=1138
+PERF: stage=18 count=3511 total=959120446 max=6031508
+PERF: stage=19 count=3511 total=230952776 max=239998
+PERF: stage=20 count=3511 total=53546280 max=8917860
+PERF: stage=21 count=3511 total=20132766 max=28184
+PERF: stage=22 count=3511 total=15635702 max=19166
+PERF: stage=23 count=3511 total=2762590 max=15874
+PERF: stage=24 count=3511 total=234604126 max=282252
+PERF: stage=25 count=3511 total=8030740 max=22046
+PERF: stage=26 count=3511 total=5944454 max=21060
+PERF: stage=27 count=3511 total=5988394 max=173270
+PERF: stage=28 count=3511 total=667870 max=504
+PERF: stage=29 count=3511 total=1877084 max=8364
+PERF: stage=30 count=3511 total=9958782 max=20692
+PERF: stage=31 count=3511 total=1263366 max=16768
+PERF: stage=32 count=3511 total=19290032 max=22832
+PERF: stage=33 count=3511 total=134823062 max=83282
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=46
+PERF: hist ms<=24 count=3426
+PERF: hist ms<=40 count=44
+PERF: hist ms<=48 count=18
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=664 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3546
+PERF: === level=nps-sp01 ===
+PERF: stage=0 count=3546 total=27801217396 max=705454896
+PERF: stage=1 count=3511 total=16063304160 max=581362610
+PERF: stage=2 count=3511 total=13201388906 max=531547458
+PERF: stage=3 count=3511 total=7275773550 max=4416012
+PERF: stage=4 count=3511 total=2745534588 max=9590750
+PERF: stage=5 count=3511 total=5746943564 max=474753588
+PERF: stage=6 count=3511 total=376806 max=212
+PERF: stage=7 count=7022 total=312678402 max=48748342
+PERF: stage=8 count=7022 total=1229648996 max=17626534
+PERF: stage=9 count=7022 total=2585401484 max=182390668
+PERF: stage=10 count=7022 total=1037591860 max=141495092
+PERF: stage=11 count=3511 total=320368602 max=277338
+PERF: stage=12 count=3511 total=41436734 max=4508038
+PERF: stage=13 count=3511 total=112388758 max=225508
+PERF: stage=14 count=3511 total=243773030 max=282672
+PERF: stage=15 count=3511 total=4580000 max=13152
+PERF: stage=16 count=3511 total=35119762 max=30766
+PERF: stage=17 count=3511 total=1846570 max=2684
+PERF: stage=18 count=3511 total=871755920 max=616732
+PERF: stage=19 count=3511 total=354075676 max=761092
+PERF: stage=20 count=3511 total=54031834 max=9052804
+PERF: stage=21 count=3511 total=9654536 max=17748
+PERF: stage=22 count=3511 total=25998794 max=29300
+PERF: stage=23 count=3511 total=2574682 max=15926
+PERF: stage=24 count=3511 total=593027638 max=617582
+PERF: stage=25 count=3511 total=33113206 max=8549854
+PERF: stage=26 count=3511 total=13469798 max=19300
+PERF: stage=27 count=3511 total=4911926 max=13662
+PERF: stage=28 count=3511 total=816768 max=700
+PERF: stage=29 count=3511 total=1449662 max=14030
+PERF: stage=30 count=3511 total=8302224 max=16592
+PERF: stage=31 count=3511 total=983802 max=734
+PERF: stage=32 count=3511 total=19282032 max=24166
+PERF: stage=33 count=3511 total=254648134 max=278246
+PERF: hist ms<=16 count=51
+PERF: hist ms<=24 count=3420
+PERF: hist ms<=32 count=5
+PERF: hist ms<=40 count=36
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=1
+PERF: hist ms<=72 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3546
+PERF: === level=thermal ===
+PERF: stage=0 count=3534 total=26913839114 max=4131317664
+PERF: stage=1 count=3499 total=15991437486 max=560786980
+PERF: stage=2 count=3499 total=11127161362 max=517366772
+PERF: stage=3 count=3499 total=5791846004 max=4347302
+PERF: stage=4 count=3499 total=4746342590 max=9945076
+PERF: stage=5 count=3499 total=5160305426 max=457980110
+PERF: stage=6 count=3499 total=374778 max=168
+PERF: stage=7 count=6998 total=309142256 max=48343142
+PERF: stage=8 count=6998 total=933852868 max=16930436
+PERF: stage=9 count=6998 total=2416924518 max=171699096
+PERF: stage=10 count=6998 total=928310666 max=142697648
+PERF: stage=11 count=3499 total=399577522 max=321862
+PERF: stage=12 count=3499 total=60078794 max=4932438
+PERF: stage=13 count=3499 total=24291260 max=79286
+PERF: stage=14 count=3499 total=265150296 max=239072
+PERF: stage=15 count=3499 total=3635458 max=13142
+PERF: stage=16 count=3499 total=21467216 max=23260
+PERF: stage=17 count=3499 total=709472 max=4232
+PERF: stage=18 count=3499 total=1100728058 max=576354
+PERF: stage=19 count=3499 total=2294855746 max=872704
+PERF: stage=20 count=3499 total=51872504 max=8944628
+PERF: stage=21 count=3499 total=14572558 max=23384
+PERF: stage=22 count=3499 total=14488946 max=23412
+PERF: stage=23 count=3499 total=2553822 max=12770
+PERF: stage=24 count=3499 total=434991400 max=377684
+PERF: stage=25 count=3499 total=18194630 max=183560
+PERF: stage=26 count=3499 total=9793746 max=15906
+PERF: stage=27 count=3499 total=7172280 max=15852
+PERF: stage=28 count=3499 total=702914 max=12668
+PERF: stage=29 count=3499 total=858458 max=4166
+PERF: stage=30 count=3499 total=7722906 max=14246
+PERF: stage=31 count=3499 total=1009936 max=14886
+PERF: stage=32 count=3499 total=23335286 max=26862
+PERF: stage=33 count=3499 total=117122544 max=226632
+PERF: hist ms<=16 count=58
+PERF: hist ms<=24 count=3385
+PERF: hist ms<=32 count=21
+PERF: hist ms<=40 count=36
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=1
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3534
+PERF: === level=fedbankv ===
+PERF: stage=0 count=3558 total=30516221480 max=3137447138
+PERF: stage=1 count=3523 total=15963741538 max=478978526
+PERF: stage=2 count=3523 total=11411477126 max=432904038
+PERF: stage=3 count=3523 total=7559795486 max=4409204
+PERF: stage=4 count=3523 total=4433461526 max=9950992
+PERF: stage=5 count=3523 total=3687989802 max=371016442
+PERF: stage=6 count=3523 total=376900 max=152
+PERF: stage=7 count=7046 total=455510996 max=48943206
+PERF: stage=8 count=7046 total=656258186 max=17352378
+PERF: stage=9 count=7046 total=1386211414 max=118607936
+PERF: stage=10 count=7046 total=604337454 max=103473016
+PERF: stage=11 count=3523 total=710868498 max=425558
+PERF: stage=12 count=3523 total=52551574 max=36688
+PERF: stage=13 count=3523 total=489337106 max=417268
+PERF: stage=14 count=3523 total=398872290 max=292420
+PERF: stage=15 count=3523 total=3342588 max=11266
+PERF: stage=16 count=3523 total=10522424 max=22712
+PERF: stage=17 count=3523 total=1340020 max=5226
+PERF: stage=18 count=3523 total=2123823250 max=931586
+PERF: stage=19 count=3523 total=475890986 max=2336610
+PERF: stage=20 count=3523 total=52308946 max=8951910
+PERF: stage=21 count=3523 total=13146626 max=20438
+PERF: stage=22 count=3523 total=10599244 max=16544
+PERF: stage=23 count=3523 total=2432292 max=16104
+PERF: stage=24 count=3523 total=12270110 max=18336
+PERF: stage=25 count=3523 total=31578094 max=189390
+PERF: stage=26 count=3523 total=9934384 max=13894
+PERF: stage=27 count=3523 total=12174534 max=21608
+PERF: stage=28 count=3523 total=950096 max=3224
+PERF: stage=29 count=3523 total=850252 max=12762
+PERF: stage=30 count=3523 total=7242038 max=17744
+PERF: stage=31 count=3523 total=885232 max=3776
+PERF: stage=32 count=3523 total=19451278 max=23578
+PERF: stage=33 count=3523 total=381837572 max=313058
+PERF: hist ms<=16 count=60
+PERF: hist ms<=24 count=3427
+PERF: hist ms<=32 count=2
+PERF: hist ms<=40 count=36
+PERF: hist ms<=48 count=23
+PERF: hist ms<=56 count=1
+PERF: hist ms<=64 count=1
+PERF: hist ms<=88 count=3
+PERF: hist ms<=1032 count=5
+PERF: frames=3558
+PERF: === level=defend2 ===
+PERF: stage=0 count=3521 total=27622930514 max=587015310
+PERF: stage=1 count=3486 total=15950122102 max=490639446
+PERF: stage=2 count=3486 total=11543606480 max=435445438
+PERF: stage=3 count=3486 total=4556914548 max=4403012
+PERF: stage=4 count=3486 total=4110387948 max=13432792
+PERF: stage=5 count=3486 total=6787174894 max=373879062
+PERF: stage=6 count=3486 total=373960 max=176
+PERF: stage=7 count=6972 total=411638612 max=46715392
+PERF: stage=8 count=6972 total=1661976474 max=21180862
+PERF: stage=9 count=6972 total=2181483550 max=114837290
+PERF: stage=10 count=6972 total=820548588 max=108479314
+PERF: stage=11 count=3486 total=1637003408 max=810864
+PERF: stage=12 count=3486 total=36057202 max=6482642
+PERF: stage=13 count=3486 total=12728206 max=177560
+PERF: stage=14 count=3486 total=201789676 max=121436
+PERF: stage=15 count=3486 total=3316238 max=13318
+PERF: stage=16 count=3486 total=6133606 max=15222
+PERF: stage=17 count=3486 total=649708 max=500
+PERF: stage=18 count=3486 total=1285926472 max=6170748
+PERF: stage=19 count=3486 total=293552148 max=331480
+PERF: stage=20 count=3486 total=50150652 max=8978438
+PERF: stage=21 count=3486 total=9394918 max=5657942
+PERF: stage=22 count=3486 total=6551732 max=20210
+PERF: stage=23 count=3486 total=2616382 max=4936
+PERF: stage=24 count=3486 total=464614020 max=410252
+PERF: stage=25 count=3486 total=42130352 max=3528938
+PERF: stage=26 count=3486 total=8598718 max=16364
+PERF: stage=27 count=3486 total=4801064 max=16274
+PERF: stage=28 count=3486 total=644942 max=9104
+PERF: stage=29 count=3486 total=23943070 max=23024
+PERF: stage=30 count=3486 total=7353798 max=20136
+PERF: stage=31 count=3486 total=924138 max=686
+PERF: stage=32 count=3486 total=19385106 max=25268
+PERF: stage=33 count=3486 total=199549740 max=265690
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3359
+PERF: hist ms<=32 count=38
+PERF: hist ms<=40 count=32
+PERF: hist ms<=48 count=31
+PERF: hist ms<=56 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3521
+PERF: === level=pship ===
+PERF: stage=0 count=3542 total=29785718476 max=2529519512
+PERF: stage=1 count=3507 total=15936740410 max=481204806
+PERF: stage=2 count=3507 total=12568314306 max=433591692
+PERF: stage=3 count=3507 total=7432876176 max=4475904
+PERF: stage=4 count=3507 total=3253377414 max=9746018
+PERF: stage=5 count=3507 total=4977420180 max=371134982
+PERF: stage=6 count=3507 total=376126 max=160
+PERF: stage=7 count=7014 total=405026176 max=47540280
+PERF: stage=8 count=7014 total=946732468 max=16008502
+PERF: stage=9 count=7014 total=1979072634 max=119335060
+PERF: stage=10 count=7014 total=1066073614 max=106277214
+PERF: stage=11 count=3507 total=142320922 max=215438
+PERF: stage=12 count=3507 total=160005936 max=6358116
+PERF: stage=13 count=3507 total=127861112 max=415414
+PERF: stage=14 count=3507 total=394113182 max=165802
+PERF: stage=15 count=3507 total=4061344 max=14998
+PERF: stage=16 count=3507 total=14041674 max=21970
+PERF: stage=17 count=3507 total=662808 max=10762
+PERF: stage=18 count=3507 total=1721066080 max=719970
+PERF: stage=19 count=3507 total=430154440 max=1353394
+PERF: stage=20 count=3507 total=48653374 max=8947908
+PERF: stage=21 count=3507 total=11477672 max=20244
+PERF: stage=22 count=3507 total=18154754 max=176346
+PERF: stage=23 count=3507 total=2661734 max=13954
+PERF: stage=24 count=3507 total=63649830 max=219740
+PERF: stage=25 count=3507 total=58616914 max=48604
+PERF: stage=26 count=3507 total=10293748 max=15610
+PERF: stage=27 count=3507 total=21928448 max=25522
+PERF: stage=28 count=3507 total=1099324 max=14218
+PERF: stage=29 count=3507 total=1395188 max=13684
+PERF: stage=30 count=3507 total=8508250 max=19344
+PERF: stage=31 count=3507 total=902644 max=1096
+PERF: stage=32 count=3507 total=19538918 max=189150
+PERF: stage=33 count=3507 total=341033702 max=304510
+PERF: hist ms<=16 count=54
+PERF: hist ms<=24 count=3409
+PERF: hist ms<=32 count=9
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=22
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=2
+PERF: hist ms<=144 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3542
+PERF: === level=stableizers ===
+PERF: stage=0 count=3527 total=28285187904 max=1422291686
+PERF: stage=1 count=3492 total=16048381756 max=604813088
+PERF: stage=2 count=3492 total=11343164704 max=561658136
+PERF: stage=3 count=3492 total=5891862344 max=4421086
+PERF: stage=4 count=3492 total=4587065342 max=18081400
+PERF: stage=5 count=3492 total=5207596996 max=500848542
+PERF: stage=6 count=3492 total=375056 max=184
+PERF: stage=7 count=6984 total=422941124 max=45506620
+PERF: stage=8 count=6984 total=1032241602 max=18797034
+PERF: stage=9 count=6984 total=1937273110 max=179076706
+PERF: stage=10 count=6984 total=1239523868 max=176326204
+PERF: stage=11 count=3492 total=1588385686 max=5198442
+PERF: stage=12 count=3492 total=28553376 max=4492416
+PERF: stage=13 count=3492 total=28802816 max=117518
+PERF: stage=14 count=3492 total=216212638 max=119272
+PERF: stage=15 count=3492 total=4325056 max=17668
+PERF: stage=16 count=3492 total=25361376 max=25776
+PERF: stage=17 count=3492 total=649518 max=3594
+PERF: stage=18 count=3492 total=1943113360 max=8632968
+PERF: stage=19 count=3492 total=279945776 max=585554
+PERF: stage=20 count=3492 total=47744940 max=8938556
+PERF: stage=21 count=3492 total=4146158 max=36894
+PERF: stage=22 count=3492 total=20164988 max=173572
+PERF: stage=23 count=3492 total=2713840 max=16388
+PERF: stage=24 count=3492 total=351346102 max=336454
+PERF: stage=25 count=3492 total=9381240 max=3562150
+PERF: stage=26 count=3492 total=3037540 max=15320
+PERF: stage=27 count=3492 total=10889510 max=22670
+PERF: stage=28 count=3492 total=769928 max=4016
+PERF: stage=29 count=3492 total=1035616 max=7594
+PERF: stage=30 count=3492 total=7522784 max=19440
+PERF: stage=31 count=3492 total=942918 max=4160
+PERF: stage=32 count=3492 total=19265206 max=25440
+PERF: stage=33 count=3492 total=196838420 max=266382
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3386
+PERF: hist ms<=32 count=14
+PERF: hist ms<=40 count=42
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=2
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3527
+PERF: === level=powerdown ===
+PERF: stage=0 count=2298 total=29866185644 max=1833790952
+PERF: stage=1 count=2263 total=16141813892 max=622180276
+PERF: stage=2 count=2263 total=13086541254 max=574548074
+PERF: stage=3 count=2263 total=5799817948 max=4583544
+PERF: stage=4 count=2263 total=2957963288 max=23604760
+PERF: stage=5 count=2263 total=7083699970 max=515890026
+PERF: stage=6 count=2263 total=243736 max=190
+PERF: stage=7 count=4526 total=664900876 max=46750232
+PERF: stage=8 count=4526 total=1409853850 max=21543974
+PERF: stage=9 count=4526 total=3992801052 max=186760288
+PERF: stage=10 count=4526 total=590043520 max=174354632
+PERF: stage=11 count=2263 total=1032543560 max=4961384
+PERF: stage=12 count=2263 total=14592424 max=27094
+PERF: stage=13 count=2263 total=37543668 max=4961960
+PERF: stage=14 count=2263 total=193271906 max=285810
+PERF: stage=15 count=2263 total=2179114 max=9344
+PERF: stage=16 count=2263 total=4774712 max=12148
+PERF: stage=17 count=2263 total=1720148 max=11440
+PERF: stage=18 count=2263 total=1277551420 max=6322498
+PERF: stage=19 count=2263 total=247831442 max=951368
+PERF: stage=20 count=2263 total=46262636 max=8974234
+PERF: stage=21 count=2263 total=8204386 max=5582030
+PERF: stage=22 count=2263 total=4573072 max=16326
+PERF: stage=23 count=2263 total=1744396 max=14694
+PERF: stage=24 count=2263 total=48600172 max=4524246
+PERF: stage=25 count=2263 total=12872130 max=3562580
+PERF: stage=26 count=2263 total=3805848 max=10748
+PERF: stage=27 count=2263 total=5457116 max=17252
+PERF: stage=28 count=2263 total=429860 max=522
+PERF: stage=29 count=2263 total=596486 max=822
+PERF: stage=30 count=2263 total=5091026 max=14566
+PERF: stage=31 count=2263 total=604016 max=9056
+PERF: stage=32 count=2263 total=12515532 max=188446
+PERF: stage=33 count=2263 total=190606108 max=281138
+PERF: hist ms<=16 count=2
+PERF: hist ms<=24 count=1027
+PERF: hist ms<=32 count=983
+PERF: hist ms<=40 count=220
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=28
+PERF: hist ms<=64 count=9
+PERF: hist ms<=72 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=2298
+PERF: === level=spc-sp01 ===
+PERF: stage=0 count=3525 total=28829909880 max=1669556756
+PERF: stage=1 count=3490 total=16044474308 max=603695460
+PERF: stage=2 count=3490 total=12101493726 max=560996278
+PERF: stage=3 count=3490 total=5404528532 max=4484116
+PERF: stage=4 count=3490 total=3826800594 max=12021078
+PERF: stage=5 count=3490 total=6508512570 max=503509820
+PERF: stage=6 count=3490 total=373104 max=182
+PERF: stage=7 count=6980 total=343480142 max=50044336
+PERF: stage=8 count=6980 total=1070935174 max=17876648
+PERF: stage=9 count=6980 total=2757734660 max=175499532
+PERF: stage=10 count=6980 total=1749000066 max=178918924
+PERF: stage=11 count=3490 total=1109932752 max=4906188
+PERF: stage=12 count=3490 total=55725124 max=4946120
+PERF: stage=13 count=3490 total=141708622 max=198192
+PERF: stage=14 count=3490 total=354128566 max=306278
+PERF: stage=15 count=3490 total=2622246 max=14096
+PERF: stage=16 count=3490 total=29337838 max=29958
+PERF: stage=17 count=3490 total=698560 max=874
+PERF: stage=18 count=3490 total=837591440 max=5867046
+PERF: stage=19 count=3490 total=333035664 max=1810394
+PERF: stage=20 count=3490 total=58234960 max=11372412
+PERF: stage=21 count=3490 total=11381996 max=29530
+PERF: stage=22 count=3490 total=20493508 max=179016
+PERF: stage=23 count=3490 total=2732520 max=4622
+PERF: stage=24 count=3490 total=823832196 max=543310
+PERF: stage=25 count=3490 total=11148996 max=22588
+PERF: stage=26 count=3490 total=6645118 max=15498
+PERF: stage=27 count=3490 total=4848392 max=17862
+PERF: stage=28 count=3490 total=1027406 max=692
+PERF: stage=29 count=3490 total=1142504 max=13074
+PERF: stage=30 count=3490 total=7515094 max=19850
+PERF: stage=31 count=3490 total=938062 max=630
+PERF: stage=32 count=3490 total=19345060 max=26054
+PERF: stage=33 count=3490 total=240657742 max=282462
+PERF: hist ms<=16 count=58
+PERF: hist ms<=24 count=3368
+PERF: hist ms<=32 count=26
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=24
+PERF: hist ms<=56 count=2
+PERF: hist ms<=72 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3525
+PERF: === level=starship ===
+PERF: stage=0 count=3496 total=26218575048 max=3544481646
+PERF: stage=1 count=3461 total=16018245022 max=561774842
+PERF: stage=2 count=3461 total=13775864098 max=521865568
+PERF: stage=3 count=3461 total=8920344234 max=4477942
+PERF: stage=4 count=3461 total=2122517452 max=14826400
+PERF: stage=5 count=3461 total=4510258600 max=458416072
+PERF: stage=6 count=3461 total=370754 max=160
+PERF: stage=7 count=6922 total=260659264 max=45910628
+PERF: stage=8 count=6922 total=1133547466 max=17464842
+PERF: stage=9 count=6922 total=1731766814 max=173579292
+PERF: stage=10 count=6922 total=813201136 max=139850020
+PERF: stage=11 count=3461 total=578838220 max=4918934
+PERF: stage=12 count=3461 total=2994046 max=12776
+PERF: stage=13 count=3461 total=17902948 max=5560492
+PERF: stage=14 count=3461 total=178902172 max=250486
+PERF: stage=15 count=3461 total=3690752 max=15544
+PERF: stage=16 count=3461 total=7208372 max=18478
+PERF: stage=17 count=3461 total=742860 max=564
+PERF: stage=18 count=3461 total=826642850 max=8244134
+PERF: stage=19 count=3461 total=337407630 max=418822
+PERF: stage=20 count=3461 total=53222328 max=8904400
+PERF: stage=21 count=3461 total=3848526 max=20470
+PERF: stage=22 count=3461 total=7660728 max=19570
+PERF: stage=23 count=3461 total=2954590 max=13746
+PERF: stage=24 count=3461 total=49920158 max=35580
+PERF: stage=25 count=3461 total=15898186 max=8681920
+PERF: stage=26 count=3461 total=2819422 max=13656
+PERF: stage=27 count=3461 total=6440872 max=15624
+PERF: stage=28 count=3461 total=641298 max=454
+PERF: stage=29 count=3461 total=1839460 max=15624
+PERF: stage=30 count=3461 total=10329328 max=174226
+PERF: stage=31 count=3461 total=1213940 max=728
+PERF: stage=32 count=3461 total=19278742 max=23194
+PERF: stage=33 count=3461 total=250424252 max=274062
+PERF: hist ms<=16 count=55
+PERF: hist ms<=24 count=3313
+PERF: hist ms<=32 count=51
+PERF: hist ms<=40 count=35
+PERF: hist ms<=48 count=30
+PERF: hist ms<=56 count=3
+PERF: hist ms<=72 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=640 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3496
+PERF: === level=bio-sphere ===
+PERF: stage=0 count=3553 total=26985642172 max=4196918382
+PERF: stage=1 count=3518 total=16029811050 max=565207250
+PERF: stage=2 count=3518 total=13234532234 max=523668212
+PERF: stage=3 count=3518 total=9104671748 max=4457838
+PERF: stage=4 count=3518 total=2678426794 max=15280472
+PERF: stage=5 count=3518 total=3956384114 max=461029850
+PERF: stage=6 count=3518 total=394076 max=8738
+PERF: stage=7 count=7036 total=200265714 max=46174678
+PERF: stage=8 count=7036 total=1051949328 max=16228876
+PERF: stage=9 count=7036 total=1571989044 max=170957842
+PERF: stage=10 count=7036 total=546941744 max=143140842
+PERF: stage=11 count=3518 total=1180860086 max=7030398
+PERF: stage=12 count=3518 total=74067090 max=43576
+PERF: stage=13 count=3518 total=80657550 max=211348
+PERF: stage=14 count=3518 total=244889358 max=278564
+PERF: stage=15 count=3518 total=3493812 max=13342
+PERF: stage=16 count=3518 total=27600248 max=28358
+PERF: stage=17 count=3518 total=3295230 max=14538
+PERF: stage=18 count=3518 total=652505118 max=10918352
+PERF: stage=19 count=3518 total=242608988 max=523208
+PERF: stage=20 count=3518 total=50878520 max=8950604
+PERF: stage=21 count=3518 total=17067768 max=33870
+PERF: stage=22 count=3518 total=23960956 max=27136
+PERF: stage=23 count=3518 total=3174134 max=18628
+PERF: stage=24 count=3518 total=20458288 max=70790
+PERF: stage=25 count=3518 total=10852982 max=21294
+PERF: stage=26 count=3518 total=9314888 max=19336
+PERF: stage=27 count=3518 total=7201634 max=17044
+PERF: stage=28 count=3518 total=802784 max=2990
+PERF: stage=29 count=3518 total=1732690 max=10800
+PERF: stage=30 count=3518 total=10112290 max=19458
+PERF: stage=31 count=3518 total=1198892 max=3716
+PERF: stage=32 count=3518 total=19283096 max=24098
+PERF: stage=33 count=3518 total=145184666 max=235196
+PERF: hist ms<=8 count=10
+PERF: hist ms<=16 count=52
+PERF: hist ms<=24 count=3419
+PERF: hist ms<=32 count=1
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=2
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3553
+PERF: === level=nukerf ===
+PERF: stage=0 count=3557 total=28598509970 max=1555658864
+PERF: stage=1 count=3522 total=15954881600 max=474161538
+PERF: stage=2 count=3522 total=14245131864 max=430674504
+PERF: stage=3 count=3522 total=10727169358 max=4414550
+PERF: stage=4 count=3522 total=1590981600 max=9313010
+PERF: stage=5 count=3522 total=3360845476 max=370360066
+PERF: stage=6 count=3522 total=387778 max=8688
+PERF: stage=7 count=7044 total=280478506 max=43549518
+PERF: stage=8 count=7044 total=533159656 max=20227028
+PERF: stage=9 count=7044 total=1396712894 max=116291594
+PERF: stage=10 count=7044 total=568093116 max=105993126
+PERF: stage=11 count=3522 total=99282654 max=5583174
+PERF: stage=12 count=3522 total=32671196 max=28816
+PERF: stage=13 count=3522 total=116451824 max=241252
+PERF: stage=14 count=3522 total=233548434 max=129470
+PERF: stage=15 count=3522 total=3159640 max=14370
+PERF: stage=16 count=3522 total=68979418 max=45260
+PERF: stage=17 count=3522 total=1233646 max=12610
+PERF: stage=18 count=3522 total=567120670 max=5998216
+PERF: stage=19 count=3522 total=276707638 max=556536
+PERF: stage=20 count=3522 total=49498784 max=9007710
+PERF: stage=21 count=3522 total=10092378 max=33828
+PERF: stage=22 count=3522 total=46803668 max=184846
+PERF: stage=23 count=3522 total=2633450 max=13936
+PERF: stage=24 count=3522 total=14659052 max=31274
+PERF: stage=25 count=3522 total=24443114 max=41320
+PERF: stage=26 count=3522 total=13753804 max=23140
+PERF: stage=27 count=3522 total=6780858 max=15456
+PERF: stage=28 count=3522 total=1243906 max=834
+PERF: stage=29 count=3522 total=1182058 max=974
+PERF: stage=30 count=3522 total=8361898 max=16984
+PERF: stage=31 count=3522 total=1014902 max=14324
+PERF: stage=32 count=3522 total=19632156 max=23962
+PERF: stage=33 count=3522 total=186674604 max=84164
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=62
+PERF: hist ms<=24 count=3421
+PERF: hist ms<=40 count=31
+PERF: hist ms<=48 count=33
+PERF: hist ms<=56 count=1
+PERF: hist ms<=72 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3557
+PERF: === level=battlebase ===
+PERF: stage=0 count=3561 total=26004001594 max=3479759182
+PERF: stage=1 count=3526 total=15852966210 max=389805864
+PERF: stage=2 count=3526 total=12981302396 max=340883704
+PERF: stage=3 count=3526 total=10372766450 max=4401174
+PERF: stage=4 count=3526 total=2755503306 max=9598578
+PERF: stage=5 count=3526 total=2421126608 max=280272280
+PERF: stage=6 count=3526 total=376226 max=126
+PERF: stage=7 count=7052 total=191253724 max=46726830
+PERF: stage=8 count=7052 total=507524546 max=15817310
+PERF: stage=9 count=7052 total=690450212 max=65978540
+PERF: stage=10 count=7052 total=451758234 max=68321386
+PERF: stage=11 count=3526 total=970774320 max=525466
+PERF: stage=12 count=3526 total=25286200 max=4568064
+PERF: stage=13 count=3526 total=12736926 max=22204
+PERF: stage=14 count=3526 total=137357640 max=214440
+PERF: stage=15 count=3526 total=3493784 max=17518
+PERF: stage=16 count=3526 total=6310042 max=16914
+PERF: stage=17 count=3526 total=671906 max=12640
+PERF: stage=18 count=3526 total=562035784 max=550218
+PERF: stage=19 count=3526 total=207977866 max=227676
+PERF: stage=20 count=3526 total=53188768 max=9000858
+PERF: stage=21 count=3526 total=4872018 max=9702
+PERF: stage=22 count=3526 total=8290290 max=19730
+PERF: stage=23 count=3526 total=3201022 max=11748
+PERF: stage=24 count=3526 total=718566612 max=483742
+PERF: stage=25 count=3526 total=8465420 max=16808
+PERF: stage=26 count=3526 total=1973720 max=9554
+PERF: stage=27 count=3526 total=5892198 max=17322
+PERF: stage=28 count=3526 total=845496 max=15802
+PERF: stage=29 count=3526 total=1376272 max=1140
+PERF: stage=30 count=3526 total=8789348 max=19728
+PERF: stage=31 count=3526 total=1007316 max=5322
+PERF: stage=32 count=3526 total=19538910 max=23408
+PERF: stage=33 count=3526 total=122182556 max=56264
+PERF: hist ms<=8 count=7
+PERF: hist ms<=16 count=55
+PERF: hist ms<=24 count=3430
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=22
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=816 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3561
+PERF: === level=capship ===
+PERF: stage=0 count=3554 total=27214308558 max=513479438
+PERF: stage=1 count=3519 total=15914782094 max=474875254
+PERF: stage=2 count=3519 total=12780597442 max=427494862
+PERF: stage=3 count=3519 total=9294616754 max=4431732
+PERF: stage=4 count=3519 total=3014266380 max=9754274
+PERF: stage=5 count=3519 total=3309917176 max=370553284
+PERF: stage=6 count=3519 total=392140 max=8612
+PERF: stage=7 count=7038 total=195528082 max=44280054
+PERF: stage=8 count=7038 total=634804340 max=18220646
+PERF: stage=9 count=7038 total=1306713194 max=117416580
+PERF: stage=10 count=7038 total=586528538 max=107794498
+PERF: stage=11 count=3519 total=493821950 max=335286
+PERF: stage=12 count=3519 total=21868174 max=26044
+PERF: stage=13 count=3519 total=58935324 max=189500
+PERF: stage=14 count=3519 total=240675982 max=254976
+PERF: stage=15 count=3519 total=2355150 max=14388
+PERF: stage=16 count=3519 total=25721996 max=24286
+PERF: stage=17 count=3519 total=1757732 max=1234
+PERF: stage=18 count=3519 total=411624128 max=353944
+PERF: stage=19 count=3519 total=1622273806 max=679108
+PERF: stage=20 count=3519 total=49058234 max=8955056
+PERF: stage=21 count=3519 total=6818916 max=15062
+PERF: stage=22 count=3519 total=13874198 max=19884
+PERF: stage=23 count=3519 total=2520654 max=13750
+PERF: stage=24 count=3519 total=19943410 max=24604
+PERF: stage=25 count=3519 total=11951374 max=3657018
+PERF: stage=26 count=3519 total=5764830 max=16392
+PERF: stage=27 count=3519 total=3497402 max=15164
+PERF: stage=28 count=3519 total=730798 max=632
+PERF: stage=29 count=3519 total=846864 max=3152
+PERF: stage=30 count=3519 total=7784414 max=17354
+PERF: stage=31 count=3519 total=952470 max=13790
+PERF: stage=32 count=3519 total=22035348 max=21052
+PERF: stage=33 count=3519 total=103294412 max=48144
+PERF: hist ms<=8 count=9
+PERF: hist ms<=16 count=47
+PERF: hist ms<=24 count=3429
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=2
+PERF: hist ms<=64 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=832 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3554
+PERF: === level=space ===
+PERF: stage=0 count=3560 total=29454586602 max=2258984278
+PERF: stage=1 count=3525 total=15967475768 max=483832826
+PERF: stage=2 count=3525 total=13086376126 max=435465118
+PERF: stage=3 count=3525 total=9494464214 max=4249866
+PERF: stage=4 count=3525 total=2762539934 max=9460520
+PERF: stage=5 count=3525 total=3435803150 max=371782752
+PERF: stage=6 count=3525 total=387242 max=8286
+PERF: stage=7 count=7050 total=385221770 max=46923008
+PERF: stage=8 count=7050 total=652554984 max=17797216
+PERF: stage=9 count=7050 total=1205305354 max=119569280
+PERF: stage=10 count=7050 total=611060168 max=104740148
+PERF: stage=11 count=3525 total=156478298 max=249226
+PERF: stage=12 count=3525 total=66528824 max=4882444
+PERF: stage=13 count=3525 total=257818634 max=294242
+PERF: stage=14 count=3525 total=306154538 max=160160
+PERF: stage=15 count=3525 total=2414386 max=3830
+PERF: stage=16 count=3525 total=31716780 max=29728
+PERF: stage=17 count=3525 total=1311894 max=14964
+PERF: stage=18 count=3525 total=484467408 max=685880
+PERF: stage=19 count=3525 total=385019114 max=2006862
+PERF: stage=20 count=3525 total=52762566 max=9020486
+PERF: stage=21 count=3525 total=27878706 max=174090
+PERF: stage=22 count=3525 total=26983144 max=26128
+PERF: stage=23 count=3525 total=2667208 max=10822
+PERF: stage=24 count=3525 total=892024866 max=932018
+PERF: stage=25 count=3525 total=20770554 max=22086
+PERF: stage=26 count=3525 total=10860318 max=21540
+PERF: stage=27 count=3525 total=12940674 max=19402
+PERF: stage=28 count=3525 total=1497310 max=936
+PERF: stage=29 count=3525 total=1193408 max=12498
+PERF: stage=30 count=3525 total=8287830 max=18736
+PERF: stage=31 count=3525 total=1040278 max=4908
+PERF: stage=32 count=3525 total=19767700 max=186964
+PERF: stage=33 count=3525 total=289516668 max=129042
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=59
+PERF: hist ms<=24 count=3430
+PERF: hist ms<=40 count=32
+PERF: hist ms<=48 count=26
+PERF: hist ms<=56 count=4
+PERF: hist ms<=72 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3560
+PERF: === level=high ===
+PERF: stage=0 count=3551 total=28222223690 max=1259222424
+PERF: stage=1 count=3516 total=15960920196 max=470578182
+PERF: stage=2 count=3516 total=12609667300 max=426712802
+PERF: stage=3 count=3516 total=9436272572 max=4387626
+PERF: stage=4 count=3516 total=3232562190 max=9911306
+PERF: stage=5 count=3516 total=2997252238 max=372278898
+PERF: stage=6 count=3516 total=383226 max=8656
+PERF: stage=7 count=7032 total=252102496 max=45609472
+PERF: stage=8 count=7032 total=567087060 max=19793654
+PERF: stage=9 count=7032 total=1144050582 max=117096374
+PERF: stage=10 count=7032 total=447185100 max=102948282
+PERF: stage=11 count=3516 total=1409172882 max=665578
+PERF: stage=12 count=3516 total=30645154 max=46752
+PERF: stage=13 count=3516 total=119093072 max=233334
+PERF: stage=14 count=3516 total=231114078 max=289172
+PERF: stage=15 count=3516 total=3000502 max=13946
+PERF: stage=16 count=3516 total=12879328 max=19312
+PERF: stage=17 count=3516 total=1250138 max=862
+PERF: stage=18 count=3516 total=939540178 max=491646
+PERF: stage=19 count=3516 total=356460756 max=699940
+PERF: stage=20 count=3516 total=52037646 max=9025698
+PERF: stage=21 count=3516 total=8216566 max=17312
+PERF: stage=22 count=3516 total=9236488 max=15572
+PERF: stage=23 count=3516 total=2593242 max=12274
+PERF: stage=24 count=3516 total=11211380 max=17980
+PERF: stage=25 count=3516 total=11467860 max=20536
+PERF: stage=26 count=3516 total=5890844 max=14928
+PERF: stage=27 count=3516 total=5722638 max=16068
+PERF: stage=28 count=3516 total=760310 max=12310
+PERF: stage=29 count=3516 total=1198512 max=16434
+PERF: stage=30 count=3516 total=7940774 max=17230
+PERF: stage=31 count=3516 total=975974 max=11908
+PERF: stage=32 count=3516 total=19314144 max=23980
+PERF: stage=33 count=3516 total=257261908 max=262438
+PERF: hist ms<=16 count=48
+PERF: hist ms<=24 count=3434
+PERF: hist ms<=40 count=36
+PERF: hist ms<=48 count=25
+PERF: hist ms<=72 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3551
+PERF: === level=military ===
+PERF: stage=0 count=3561 total=31529391186 max=4284975088
+PERF: stage=1 count=3526 total=15854930698 max=390692636
+PERF: stage=2 count=3526 total=13391403738 max=343477074
+PERF: stage=3 count=3526 total=10404574734 max=3800152
+PERF: stage=4 count=3526 total=2346075336 max=9385456
+PERF: stage=5 count=3526 total=2793898266 max=280766794
+PERF: stage=6 count=3526 total=374700 max=146
+PERF: stage=7 count=7052 total=408327238 max=46408534
+PERF: stage=8 count=7052 total=621143236 max=16270774
+PERF: stage=9 count=7052 total=799170422 max=67868282
+PERF: stage=10 count=7052 total=382640916 max=69539192
+PERF: stage=11 count=3526 total=233313256 max=131922
+PERF: stage=12 count=3526 total=27117408 max=38992
+PERF: stage=13 count=3526 total=120343118 max=469880
+PERF: stage=14 count=3526 total=553814362 max=369728
+PERF: stage=15 count=3526 total=2956302 max=18684
+PERF: stage=16 count=3526 total=11843566 max=16884
+PERF: stage=17 count=3526 total=648704 max=428
+PERF: stage=18 count=3526 total=803335580 max=847894
+PERF: stage=19 count=3526 total=432807708 max=2077670
+PERF: stage=20 count=3526 total=49685040 max=8959126
+PERF: stage=21 count=3526 total=8166956 max=17290
+PERF: stage=22 count=3526 total=13193288 max=21170
+PERF: stage=23 count=3526 total=2696174 max=3870
+PERF: stage=24 count=3526 total=12564614 max=37086
+PERF: stage=25 count=3526 total=26348924 max=3665092
+PERF: stage=26 count=3526 total=15190448 max=18694
+PERF: stage=27 count=3526 total=9508672 max=16786
+PERF: stage=28 count=3526 total=816960 max=12844
+PERF: stage=29 count=3526 total=927002 max=844
+PERF: stage=30 count=3526 total=8225122 max=20546
+PERF: stage=31 count=3526 total=902448 max=736
+PERF: stage=32 count=3526 total=19469700 max=27896
+PERF: stage=33 count=3526 total=336981990 max=306742
+PERF: hist ms<=8 count=4
+PERF: hist ms<=16 count=57
+PERF: hist ms<=24 count=3431
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=22
+PERF: hist ms<=56 count=1
+PERF: hist ms<=88 count=2
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3561
+PERF: === level=munitions ===
+PERF: stage=0 count=3559 total=26111969508 max=3336622550
+PERF: stage=1 count=3524 total=15966018190 max=476110598
+PERF: stage=2 count=3524 total=14711708056 max=431627224
+PERF: stage=3 count=3524 total=10522812986 max=4448572
+PERF: stage=4 count=3524 total=1133976736 max=9245114
+PERF: stage=5 count=3524 total=4040009948 max=369553542
+PERF: stage=6 count=3524 total=377164 max=128
+PERF: stage=7 count=7048 total=228058118 max=45408350
+PERF: stage=8 count=7048 total=1376302530 max=18227586
+PERF: stage=9 count=7048 total=1263674714 max=116174636
+PERF: stage=10 count=7048 total=592046104 max=107199540
+PERF: stage=11 count=3524 total=217466352 max=109522
+PERF: stage=12 count=3524 total=4794668 max=18638
+PERF: stage=13 count=3524 total=11774698 max=36330
+PERF: stage=14 count=3524 total=60336998 max=72818
+PERF: stage=15 count=3524 total=3513034 max=13566
+PERF: stage=16 count=3524 total=1426332 max=12144
+PERF: stage=17 count=3524 total=598044 max=526
+PERF: stage=18 count=3524 total=535533596 max=364156
+PERF: stage=19 count=3524 total=182467010 max=251392
+PERF: stage=20 count=3524 total=48662722 max=9003472
+PERF: stage=21 count=3524 total=3398686 max=13566
+PERF: stage=22 count=3524 total=5711268 max=13436
+PERF: stage=23 count=3524 total=2236554 max=12416
+PERF: stage=24 count=3524 total=12864226 max=18012
+PERF: stage=25 count=3524 total=8790572 max=17600
+PERF: stage=26 count=3524 total=1738300 max=1602
+PERF: stage=27 count=3524 total=10952528 max=19222
+PERF: stage=28 count=3524 total=586026 max=546
+PERF: stage=29 count=3524 total=1270726 max=12798
+PERF: stage=30 count=3524 total=7794366 max=15252
+PERF: stage=31 count=3524 total=882066 max=592
+PERF: stage=32 count=3524 total=19352340 max=23060
+PERF: stage=33 count=3524 total=90184330 max=223560
+PERF: hist ms<=8 count=7
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3430
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3559
+PERF: === level=ramqan ===
+PERF: stage=0 count=2066 total=29701111526 max=2248505922
+PERF: stage=1 count=2031 total=16146626230 max=625499856
+PERF: stage=2 count=2031 total=12804975466 max=581857422
+PERF: stage=3 count=2031 total=6453842822 max=4511070
+PERF: stage=4 count=2031 total=3257731244 max=11333192
+PERF: stage=5 count=2031 total=6201290952 max=521888884
+PERF: stage=6 count=2031 total=227344 max=9386
+PERF: stage=7 count=4310 total=793579922 max=47439110
+PERF: stage=8 count=4310 total=2043350056 max=16998748
+PERF: stage=9 count=4310 total=1626999032 max=196478460
+PERF: stage=10 count=4310 total=1347941012 max=177233278
+PERF: stage=11 count=2031 total=847400846 max=6126630
+PERF: stage=12 count=2031 total=42295630 max=43094
+PERF: stage=13 count=2031 total=10498320 max=83832
+PERF: stage=14 count=2031 total=120970858 max=111476
+PERF: stage=15 count=2031 total=1664384 max=9472
+PERF: stage=16 count=2031 total=932666 max=11686
+PERF: stage=17 count=2031 total=757564 max=3622
+PERF: stage=18 count=2031 total=1871684550 max=7287174
+PERF: stage=19 count=2031 total=152269500 max=758404
+PERF: stage=20 count=2031 total=46152030 max=8937640
+PERF: stage=21 count=2031 total=7689602 max=5681778
+PERF: stage=22 count=2031 total=8220828 max=17768
+PERF: stage=23 count=2031 total=1441836 max=5076
+PERF: stage=24 count=2031 total=112221490 max=251722
+PERF: stage=25 count=2031 total=14339348 max=5095196
+PERF: stage=26 count=2031 total=2004034 max=18736
+PERF: stage=27 count=2031 total=3596790 max=12738
+PERF: stage=28 count=2031 total=359874 max=3254
+PERF: stage=29 count=2031 total=814322 max=9160
+PERF: stage=30 count=2031 total=5190448 max=13560
+PERF: stage=31 count=2031 total=594850 max=862
+PERF: stage=32 count=2031 total=11262254 max=23528
+PERF: stage=33 count=2031 total=97400852 max=244832
+PERF: hist ms<=24 count=567
+PERF: hist ms<=32 count=570
+PERF: hist ms<=40 count=855
+PERF: hist ms<=48 count=10
+PERF: hist ms<=56 count=32
+PERF: hist ms<=64 count=22
+PERF: hist ms<=72 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=2066
+PERF: === level=temple ===
+PERF: stage=0 count=3521 total=27973632270 max=903811652
+PERF: stage=1 count=3486 total=16025106438 max=564338578
+PERF: stage=2 count=3486 total=10388936860 max=524346524
+PERF: stage=3 count=3486 total=4993783224 max=4481820
+PERF: stage=4 count=3486 total=5521587004 max=10846274
+PERF: stage=5 count=3486 total=5194890196 max=462681412
+PERF: stage=6 count=3486 total=373350 max=184
+PERF: stage=7 count=6972 total=304297868 max=46757066
+PERF: stage=8 count=6972 total=1626272820 max=18342560
+PERF: stage=9 count=6972 total=1708469606 max=171697610
+PERF: stage=10 count=6972 total=981153962 max=142685468
+PERF: stage=11 count=3486 total=1580739670 max=703152
+PERF: stage=12 count=3486 total=33232510 max=45910
+PERF: stage=13 count=3486 total=8835044 max=92142
+PERF: stage=14 count=3486 total=191727026 max=245260
+PERF: stage=15 count=3486 total=5719932 max=13450
+PERF: stage=16 count=3486 total=1253674 max=8088
+PERF: stage=17 count=3486 total=558544 max=348
+PERF: stage=18 count=3486 total=3286013574 max=10192926
+PERF: stage=19 count=3486 total=285951104 max=672988
+PERF: stage=20 count=3486 total=49053612 max=8846150
+PERF: stage=21 count=3486 total=8481912 max=5623180
+PERF: stage=22 count=3486 total=8550348 max=13470
+PERF: stage=23 count=3486 total=2159836 max=8460
+PERF: stage=24 count=3486 total=16949886 max=23198
+PERF: stage=25 count=3486 total=12616130 max=3590050
+PERF: stage=26 count=3486 total=3397150 max=8820
+PERF: stage=27 count=3486 total=6610924 max=12962
+PERF: stage=28 count=3486 total=531432 max=246
+PERF: stage=29 count=3486 total=893958 max=7790
+PERF: stage=30 count=3486 total=6515230 max=9826
+PERF: stage=31 count=3486 total=863468 max=7910
+PERF: stage=32 count=3486 total=19130850 max=23182
+PERF: stage=33 count=3486 total=198966832 max=229104
+PERF: hist ms<=16 count=50
+PERF: hist ms<=24 count=3368
+PERF: hist ms<=32 count=24
+PERF: hist ms<=40 count=47
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=5
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3521
+PERF: === level=azt-sp01 ===
+PERF: stage=0 count=3555 total=29736723018 max=2341745734
+PERF: stage=1 count=3520 total=15949526870 max=476043532
+PERF: stage=2 count=3520 total=12320604048 max=430981370
+PERF: stage=3 count=3520 total=7817385854 max=4470310
+PERF: stage=4 count=3520 total=3391148084 max=13358180
+PERF: stage=5 count=3520 total=4341593900 max=374178274
+PERF: stage=6 count=3520 total=376808 max=214
+PERF: stage=7 count=7040 total=331013250 max=45945692
+PERF: stage=8 count=7040 total=857367174 max=20025530
+PERF: stage=9 count=7040 total=1444014584 max=117099218
+PERF: stage=10 count=7040 total=496487834 max=106651994
+PERF: stage=11 count=3520 total=875373878 max=531434
+PERF: stage=12 count=3520 total=129149250 max=227272
+PERF: stage=13 count=3520 total=57111476 max=210926
+PERF: stage=14 count=3520 total=383576426 max=311510
+PERF: stage=15 count=3520 total=2736038 max=14228
+PERF: stage=16 count=3520 total=23349000 max=26172
+PERF: stage=17 count=3520 total=2454360 max=4612
+PERF: stage=18 count=3520 total=1244568276 max=608962
+PERF: stage=19 count=3520 total=414605980 max=1953678
+PERF: stage=20 count=3520 total=49320300 max=8950434
+PERF: stage=21 count=3520 total=26927250 max=30558
+PERF: stage=22 count=3520 total=27886472 max=181744
+PERF: stage=23 count=3520 total=2542848 max=5004
+PERF: stage=24 count=3520 total=14351198 max=21846
+PERF: stage=25 count=3520 total=73033860 max=3545944
+PERF: stage=26 count=3520 total=29265336 max=28696
+PERF: stage=27 count=3520 total=12072518 max=191034
+PERF: stage=28 count=3520 total=691986 max=636
+PERF: stage=29 count=3520 total=1341708 max=12556
+PERF: stage=30 count=3520 total=8014610 max=14472
+PERF: stage=31 count=3520 total=981174 max=3930
+PERF: stage=32 count=3520 total=19490528 max=22404
+PERF: stage=33 count=3520 total=326360004 max=311260
+PERF: hist ms<=16 count=57
+PERF: hist ms<=24 count=3424
+PERF: hist ms<=32 count=5
+PERF: hist ms<=40 count=31
+PERF: hist ms<=48 count=28
+PERF: hist ms<=56 count=1
+PERF: hist ms<=72 count=2
+PERF: hist ms<=88 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3555
+PERF: === level=azchb ===
+PERF: stage=0 count=3561 total=27294788366 max=606037644
+PERF: stage=1 count=3526 total=16043133102 max=574657260
+PERF: stage=2 count=3526 total=14293897598 max=524141606
+PERF: stage=3 count=3526 total=9365064452 max=4117982
+PERF: stage=4 count=3526 total=1632372988 max=9734612
+PERF: stage=5 count=3526 total=4775151074 max=464326556
+PERF: stage=6 count=3526 total=386188 max=8974
+PERF: stage=7 count=7052 total=235230348 max=47183758
+PERF: stage=8 count=7052 total=1376313102 max=18483248
+PERF: stage=9 count=7052 total=1130889362 max=174808902
+PERF: stage=10 count=7052 total=1454235910 max=143040944
+PERF: stage=11 count=3526 total=40980328 max=38726
+PERF: stage=12 count=3526 total=35585760 max=26716
+PERF: stage=13 count=3526 total=8593664 max=58344
+PERF: stage=14 count=3526 total=203873098 max=114446
+PERF: stage=15 count=3526 total=4740252 max=16754
+PERF: stage=16 count=3526 total=5247094 max=14000
+PERF: stage=17 count=3526 total=928124 max=760
+PERF: stage=18 count=3526 total=930590280 max=688898
+PERF: stage=19 count=3526 total=244505834 max=525442
+PERF: stage=20 count=3526 total=50924838 max=8988622
+PERF: stage=21 count=3526 total=8009834 max=14872
+PERF: stage=22 count=3526 total=11021262 max=178530
+PERF: stage=23 count=3526 total=2453934 max=13702
+PERF: stage=24 count=3526 total=16601232 max=19740
+PERF: stage=25 count=3526 total=26667372 max=24116
+PERF: stage=26 count=3526 total=13928630 max=19140
+PERF: stage=27 count=3526 total=5873846 max=15162
+PERF: stage=28 count=3526 total=583234 max=444
+PERF: stage=29 count=3526 total=1146456 max=11862
+PERF: stage=30 count=3526 total=7994706 max=15394
+PERF: stage=31 count=3526 total=972530 max=12018
+PERF: stage=32 count=3526 total=19682372 max=23260
+PERF: stage=33 count=3526 total=145045022 max=245962
+PERF: hist ms<=8 count=5
+PERF: hist ms<=16 count=67
+PERF: hist ms<=24 count=3421
+PERF: hist ms<=40 count=42
+PERF: hist ms<=48 count=16
+PERF: hist ms<=56 count=3
+PERF: hist ms<=88 count=1
+PERF: hist ms<=136 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3561
+PERF: === level=nuken64 ===
+PERF: stage=0 count=3546 total=25627689394 max=2868040940
+PERF: stage=1 count=3511 total=16007791214 max=517634094
+PERF: stage=2 count=3511 total=14327224020 max=480299778
+PERF: stage=3 count=3511 total=9638218420 max=5005960
+PERF: stage=4 count=3511 total=1567311896 max=9298922
+PERF: stage=5 count=3511 total=4526346950 max=423196504
+PERF: stage=6 count=3511 total=377340 max=754
+PERF: stage=7 count=7022 total=574772560 max=41432920
+PERF: stage=8 count=7022 total=1183126804 max=15093646
+PERF: stage=9 count=7022 total=1383158882 max=164388978
+PERF: stage=10 count=7022 total=816168528 max=129171766
+PERF: stage=11 count=3511 total=683771980 max=6409466
+PERF: stage=12 count=3511 total=1610152 max=13462
+PERF: stage=13 count=3511 total=1283204 max=13444
+PERF: stage=14 count=3511 total=146346024 max=241170
+PERF: stage=15 count=3511 total=2389262 max=13238
+PERF: stage=16 count=3511 total=1559826 max=1192
+PERF: stage=17 count=3511 total=651698 max=12542
+PERF: stage=18 count=3511 total=368614664 max=5849122
+PERF: stage=19 count=3511 total=191119796 max=266328
+PERF: stage=20 count=3511 total=53753354 max=9046458
+PERF: stage=21 count=3511 total=3583604 max=14136
+PERF: stage=22 count=3511 total=4909566 max=14448
+PERF: stage=23 count=3511 total=2435892 max=13164
+PERF: stage=24 count=3511 total=76385484 max=93072
+PERF: stage=25 count=3511 total=1914498 max=13118
+PERF: stage=26 count=3511 total=1102262 max=3360
+PERF: stage=27 count=3511 total=3367632 max=13358
+PERF: stage=28 count=3511 total=561518 max=402
+PERF: stage=29 count=3511 total=1392962 max=3012
+PERF: stage=30 count=3511 total=8309088 max=15208
+PERF: stage=31 count=3511 total=969128 max=11938
+PERF: stage=32 count=3511 total=20326366 max=24208
+PERF: stage=33 count=3511 total=99900794 max=228560
+PERF: hist ms<=16 count=72
+PERF: hist ms<=24 count=3395
+PERF: hist ms<=32 count=4
+PERF: hist ms<=40 count=62
+PERF: hist ms<=48 count=3
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=2
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3546
+PERF: === level=shipn64 ===
+PERF: stage=0 count=3554 total=25662984862 max=3214937086
+PERF: stage=1 count=3519 total=15860540012 max=382867294
+PERF: stage=2 count=3519 total=14676249902 max=340977184
+PERF: stage=3 count=3519 total=11983903490 max=3687218
+PERF: stage=4 count=3519 total=1066045712 max=9270844
+PERF: stage=5 count=3519 total=2540765396 max=284198842
+PERF: stage=6 count=3519 total=375916 max=162
+PERF: stage=7 count=7038 total=127945722 max=47636318
+PERF: stage=8 count=7038 total=776497336 max=18449848
+PERF: stage=9 count=7038 total=659010514 max=62017118
+PERF: stage=10 count=7038 total=391425154 max=71028580
+PERF: stage=11 count=3519 total=337836636 max=6636284
+PERF: stage=12 count=3519 total=1674734 max=15912
+PERF: stage=13 count=3519 total=41041834 max=38664
+PERF: stage=14 count=3519 total=110226076 max=230890
+PERF: stage=15 count=3519 total=2537204 max=3008
+PERF: stage=16 count=3519 total=1592600 max=3944
+PERF: stage=17 count=3519 total=644826 max=16036
+PERF: stage=18 count=3519 total=248277096 max=5745548
+PERF: stage=19 count=3519 total=204270490 max=172992
+PERF: stage=20 count=3519 total=52485374 max=8981854
+PERF: stage=21 count=3519 total=3711784 max=16532
+PERF: stage=22 count=3519 total=4225036 max=14304
+PERF: stage=23 count=3519 total=2741330 max=15330
+PERF: stage=24 count=3519 total=16795160 max=27636
+PERF: stage=25 count=3519 total=8391696 max=5068778
+PERF: stage=26 count=3519 total=1412756 max=14070
+PERF: stage=27 count=3519 total=4835402 max=16436
+PERF: stage=28 count=3519 total=755632 max=636
+PERF: stage=29 count=3519 total=1093382 max=854
+PERF: stage=30 count=3519 total=8792356 max=20050
+PERF: stage=31 count=3519 total=998998 max=11506
+PERF: stage=32 count=3519 total=19359610 max=24738
+PERF: stage=33 count=3519 total=111518578 max=68486
+PERF: hist ms<=8 count=8
+PERF: hist ms<=16 count=54
+PERF: hist ms<=24 count=3417
+PERF: hist ms<=40 count=44
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=104 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=592 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3554
+PERF: === level=aztec64 ===
+PERF: stage=0 count=3561 total=25798378748 max=3182213040
+PERF: stage=1 count=3526 total=16053340738 max=563700008
+PERF: stage=2 count=3526 total=13214639684 max=523498154
+PERF: stage=3 count=3526 total=9025587578 max=4458526
+PERF: stage=4 count=3526 total=2721824986 max=11909672
+PERF: stage=5 count=3526 total=4017727652 max=458044102
+PERF: stage=6 count=3526 total=385986 max=8266
+PERF: stage=7 count=7052 total=265182024 max=48158012
+PERF: stage=8 count=7052 total=764822100 max=16181826
+PERF: stage=9 count=7052 total=1303724294 max=173976362
+PERF: stage=10 count=7052 total=1110335678 max=142026842
+PERF: stage=11 count=3526 total=592213664 max=412172
+PERF: stage=12 count=3526 total=1833236 max=15468
+PERF: stage=13 count=3526 total=23656300 max=23862
+PERF: stage=14 count=3526 total=153243490 max=245180
+PERF: stage=15 count=3526 total=5021276 max=23392
+PERF: stage=16 count=3526 total=1854610 max=14748
+PERF: stage=17 count=3526 total=652272 max=16558
+PERF: stage=18 count=3526 total=1403184478 max=916946
+PERF: stage=19 count=3526 total=394931654 max=330322
+PERF: stage=20 count=3526 total=54582096 max=11525120
+PERF: stage=21 count=3526 total=3514114 max=12336
+PERF: stage=22 count=3526 total=8129068 max=15556
+PERF: stage=23 count=3526 total=2790654 max=3044
+PERF: stage=24 count=3526 total=43863630 max=34332
+PERF: stage=25 count=3526 total=2619368 max=14326
+PERF: stage=26 count=3526 total=1117248 max=15882
+PERF: stage=27 count=3526 total=4612228 max=13352
+PERF: stage=28 count=3526 total=697388 max=3288
+PERF: stage=29 count=3526 total=1436050 max=3022
+PERF: stage=30 count=3526 total=9160706 max=189660
+PERF: stage=31 count=3526 total=1086202 max=13224
+PERF: stage=32 count=3526 total=19710834 max=23246
+PERF: stage=33 count=3526 total=69765556 max=202978
+PERF: hist ms<=8 count=8
+PERF: hist ms<=16 count=60
+PERF: hist ms<=24 count=3424
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=496 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3561
+PERF: === level=blackhole ===
+PERF: stage=0 count=3466 total=25768370266 max=3282077500
+PERF: stage=1 count=3431 total=15811392778 max=381366678
+PERF: stage=2 count=3431 total=13572087898 max=341279576
+PERF: stage=3 count=3431 total=8368862440 max=4477032
+PERF: stage=4 count=3431 total=2124351076 max=9275664
+PERF: stage=5 count=3431 total=4970849812 max=280408486
+PERF: stage=6 count=3431 total=366888 max=174
+PERF: stage=7 count=6862 total=251675934 max=49345594
+PERF: stage=8 count=6862 total=682667978 max=14566502
+PERF: stage=9 count=6862 total=1433098306 max=66436402
+PERF: stage=10 count=6862 total=2031891832 max=67796586
+PERF: stage=11 count=3431 total=794964632 max=8140392
+PERF: stage=12 count=3431 total=8543706 max=19680
+PERF: stage=13 count=3431 total=2659556 max=13858
+PERF: stage=14 count=3431 total=187723538 max=231462
+PERF: stage=15 count=3431 total=2558614 max=15814
+PERF: stage=16 count=3431 total=1887674 max=1150
+PERF: stage=17 count=3431 total=1456644 max=966
+PERF: stage=18 count=3431 total=516218018 max=5718886
+PERF: stage=19 count=3431 total=207884112 max=368752
+PERF: stage=20 count=3431 total=51292532 max=9042028
+PERF: stage=21 count=3431 total=6920796 max=34240
+PERF: stage=22 count=3431 total=5402730 max=17182
+PERF: stage=23 count=3431 total=2639236 max=13386
+PERF: stage=24 count=3431 total=295588134 max=302210
+PERF: stage=25 count=3431 total=8520358 max=21766
+PERF: stage=26 count=3431 total=1112148 max=16200
+PERF: stage=27 count=3431 total=3811534 max=14818
+PERF: stage=28 count=3431 total=621008 max=15120
+PERF: stage=29 count=3431 total=1885044 max=14198
+PERF: stage=30 count=3431 total=9986448 max=22794
+PERF: stage=31 count=3431 total=1163140 max=15244
+PERF: stage=32 count=3431 total=23606790 max=42534
+PERF: stage=33 count=3431 total=110606552 max=215314
+PERF: hist ms<=8 count=3
+PERF: hist ms<=16 count=55
+PERF: hist ms<=24 count=3264
+PERF: hist ms<=32 count=62
+PERF: hist ms<=40 count=44
+PERF: hist ms<=48 count=23
+PERF: hist ms<=56 count=7
+PERF: hist ms<=88 count=2
+PERF: hist ms<=128 count=1
+PERF: hist ms<=648 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3466
+PERF: === level=genstation ===
+PERF: stage=0 count=3533 total=26460529006 max=3412911792
+PERF: stage=1 count=3498 total=16052520458 max=613606170
+PERF: stage=2 count=3498 total=13320411664 max=569757340
+PERF: stage=3 count=3498 total=5885065734 max=4459470
+PERF: stage=4 count=3498 total=2615840802 max=15041804
+PERF: stage=5 count=3498 total=7252885542 max=508114344
+PERF: stage=6 count=3498 total=375474 max=182
+PERF: stage=7 count=6996 total=536975494 max=49396632
+PERF: stage=8 count=6996 total=1848737132 max=17194662
+PERF: stage=9 count=6996 total=2438081396 max=182987768
+PERF: stage=10 count=6996 total=1853442106 max=178255968
+PERF: stage=11 count=3498 total=440961980 max=5658240
+PERF: stage=12 count=3498 total=29150216 max=5007134
+PERF: stage=13 count=3498 total=29463842 max=45708
+PERF: stage=14 count=3498 total=181944770 max=99788
+PERF: stage=15 count=3498 total=3456408 max=13686
+PERF: stage=16 count=3498 total=1794336 max=16212
+PERF: stage=17 count=3498 total=707978 max=454
+PERF: stage=18 count=3498 total=825902786 max=6020782
+PERF: stage=19 count=3498 total=252139764 max=643720
+PERF: stage=20 count=3498 total=49837504 max=8988256
+PERF: stage=21 count=3498 total=12578320 max=5554740
+PERF: stage=22 count=3498 total=6024068 max=14096
+PERF: stage=23 count=3498 total=2589960 max=170786
+PERF: stage=24 count=3498 total=721591328 max=551900
+PERF: stage=25 count=3498 total=24158138 max=5276492
+PERF: stage=26 count=3498 total=3092304 max=16608
+PERF: stage=27 count=3498 total=6934096 max=16126
+PERF: stage=28 count=3498 total=636978 max=2878
+PERF: stage=29 count=3498 total=1313556 max=12822
+PERF: stage=30 count=3498 total=8909196 max=19210
+PERF: stage=31 count=3498 total=1141090 max=15298
+PERF: stage=32 count=3498 total=19430640 max=26778
+PERF: stage=33 count=3498 total=149651332 max=251112
+PERF: hist ms<=16 count=74
+PERF: hist ms<=24 count=3366
+PERF: hist ms<=32 count=16
+PERF: hist ms<=40 count=48
+PERF: hist ms<=48 count=20
+PERF: hist ms<=64 count=1
+PERF: hist ms<=88 count=2
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3533
+PERF: === level=fishy ===
+PERF: stage=0 count=3520 total=29503366946 max=2253319376
+PERF: stage=1 count=3485 total=15949333954 max=484917408
+PERF: stage=2 count=3485 total=7637983286 max=432968156
+PERF: stage=3 count=3485 total=3296291980 max=4160126
+PERF: stage=4 count=3485 total=8195763892 max=18305186
+PERF: stage=5 count=3485 total=4187485478 max=375683422
+PERF: stage=6 count=3485 total=374138 max=188
+PERF: stage=7 count=6970 total=403491452 max=46139460
+PERF: stage=8 count=6970 total=1419568152 max=17696880
+PERF: stage=9 count=6970 total=1095015100 max=118602352
+PERF: stage=10 count=6970 total=680329594 max=106771926
+PERF: stage=11 count=3485 total=1271382714 max=584820
+PERF: stage=12 count=3485 total=79703202 max=9690456
+PERF: stage=13 count=3485 total=112227420 max=321452
+PERF: stage=14 count=3485 total=258109392 max=255168
+PERF: stage=15 count=3485 total=2038398 max=9292
+PERF: stage=16 count=3485 total=26350906 max=24020
+PERF: stage=17 count=3485 total=2548450 max=8402
+PERF: stage=18 count=3485 total=810552964 max=501808
+PERF: stage=19 count=3485 total=4388436480 max=1496110
+PERF: stage=20 count=3485 total=45875512 max=11510412
+PERF: stage=21 count=3485 total=16121804 max=15264
+PERF: stage=22 count=3485 total=22176600 max=175154
+PERF: stage=23 count=3485 total=2277972 max=12520
+PERF: stage=24 count=3485 total=1103640188 max=4585468
+PERF: stage=25 count=3485 total=19904908 max=15966
+PERF: stage=26 count=3485 total=9295684 max=12394
+PERF: stage=27 count=3485 total=5517342 max=10378
+PERF: stage=28 count=3485 total=611618 max=544
+PERF: stage=29 count=3485 total=923350 max=524
+PERF: stage=30 count=3485 total=5881266 max=10188
+PERF: stage=31 count=3485 total=806530 max=492
+PERF: stage=32 count=3485 total=20374504 max=181722
+PERF: stage=33 count=3485 total=148443026 max=234180
+PERF: hist ms<=16 count=26
+PERF: hist ms<=24 count=3388
+PERF: hist ms<=32 count=36
+PERF: hist ms<=40 count=36
+PERF: hist ms<=48 count=22
+PERF: hist ms<=56 count=3
+PERF: hist ms<=88 count=3
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3520
+PERF: dump begin
+PERF: stage=0 count=3562 total=25809783968 max=3224116596
+PERF: stage=1 count=3526 total=15956644328 max=470812056
+PERF: stage=2 count=3526 total=14812244512 max=432926644
+PERF: stage=3 count=3526 total=11521113354 max=4399320
+PERF: stage=4 count=3526 total=1030666754 max=9014136
+PERF: stage=5 count=3526 total=3146988424 max=374065256
+PERF: stage=6 count=3526 total=390784 max=13156
+PERF: stage=7 count=7052 total=187852650 max=44725084
+PERF: stage=8 count=7052 total=847877220 max=17075726
+PERF: stage=9 count=7052 total=763266416 max=119174416
+PERF: stage=10 count=7052 total=766194418 max=107300506
+PERF: stage=11 count=3526 total=30358932 max=32908
+PERF: stage=12 count=3526 total=12196876 max=19888
+PERF: stage=13 count=3526 total=3681962 max=18896
+PERF: stage=14 count=3526 total=64535434 max=181300
+PERF: stage=15 count=3526 total=4175226 max=14100
+PERF: stage=16 count=3526 total=1486780 max=12210
+PERF: stage=17 count=3526 total=589630 max=412
+PERF: stage=18 count=3526 total=495189576 max=339132
+PERF: stage=19 count=3526 total=304606042 max=129422
+PERF: stage=20 count=3526 total=49789026 max=8864402
+PERF: stage=21 count=3526 total=3636004 max=16636
+PERF: stage=22 count=3526 total=7689128 max=13530
+PERF: stage=23 count=3526 total=2487058 max=11742
+PERF: stage=24 count=3526 total=15238866 max=19630
+PERF: stage=25 count=3526 total=3709444 max=13828
+PERF: stage=26 count=3526 total=1712088 max=12624
+PERF: stage=27 count=3526 total=7347600 max=15154
+PERF: stage=28 count=3526 total=587062 max=3098
+PERF: stage=29 count=3526 total=1452120 max=1292
+PERF: stage=30 count=3526 total=8025266 max=14522
+PERF: stage=31 count=3526 total=899724 max=11960
+PERF: stage=32 count=3526 total=21944290 max=19590
+PERF: stage=33 count=3526 total=41774324 max=29228
+PERF: hist ms<=16 count=58
+PERF: hist ms<=24 count=3434
+PERF: hist ms<=40 count=32
+PERF: hist ms<=48 count=26
+PERF: hist ms<=56 count=4
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=696 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3562
+PERF: dump end
+PERF: dump begin
+PERF: stage=0 count=3486 total=28183169294 max=2252734244
+PERF: stage=1 count=3478 total=15955297626 max=494531656
+PERF: stage=2 count=3478 total=7646479906 max=434236746
+PERF: stage=3 count=3478 total=3297053398 max=4459914
+PERF: stage=4 count=3478 total=8194055084 max=20816618
+PERF: stage=5 count=3478 total=4187579160 max=368130818
+PERF: stage=6 count=3478 total=398378 max=8728
+PERF: stage=7 count=6956 total=404341152 max=46569272
+PERF: stage=8 count=6956 total=1420758304 max=16236938
+PERF: stage=9 count=6956 total=1095229286 max=119693788
+PERF: stage=10 count=6956 total=685702038 max=106064522
+PERF: stage=11 count=3478 total=1269851468 max=594942
+PERF: stage=12 count=3478 total=80677084 max=9594264
+PERF: stage=13 count=3478 total=111074234 max=303226
+PERF: stage=14 count=3478 total=256618200 max=126034
+PERF: stage=15 count=3478 total=2172806 max=9446
+PERF: stage=16 count=3478 total=26273192 max=16784
+PERF: stage=17 count=3478 total=2578530 max=10030
+PERF: stage=18 count=3478 total=822313226 max=1239360
+PERF: stage=19 count=3478 total=4368741676 max=1501854
+PERF: stage=20 count=3478 total=44283390 max=9072208
+PERF: stage=21 count=3478 total=16062088 max=14908
+PERF: stage=22 count=3478 total=22313608 max=15988
+PERF: stage=23 count=3478 total=2301246 max=9632
+PERF: stage=24 count=3478 total=1114889762 max=5094956
+PERF: stage=25 count=3478 total=19714226 max=15166
+PERF: stage=26 count=3478 total=9188576 max=12078
+PERF: stage=27 count=3478 total=5319320 max=10664
+PERF: stage=28 count=3478 total=586352 max=8722
+PERF: stage=29 count=3478 total=894494 max=540
+PERF: stage=30 count=3478 total=5957022 max=10018
+PERF: stage=31 count=3478 total=838832 max=9484
+PERF: stage=32 count=3478 total=20472046 max=21012
+PERF: stage=33 count=3478 total=147902688 max=241262
+PERF: stage=34 count=3478 total=4126882310 max=1417484
+PERF: stage=35 count=0 total=0 max=0
+PERF: stage=36 count=55648 total=22822686 max=166562
+PERF: stage=37 count=3478 total=1864832 max=4674
+PERF: hist ms<=16 count=32
+PERF: hist ms<=24 count=3339
+PERF: hist ms<=32 count=40
+PERF: hist ms<=40 count=43
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=384 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3486
+PERF: dump end
+PERF: dump begin
+PERF: stage=0 count=3489 total=28185653082 max=2255419314
+PERF: stage=1 count=3481 total=15952113812 max=490830370
+PERF: stage=2 count=3481 total=7548025432 max=432096204
+PERF: stage=3 count=3481 total=3194468170 max=4470168
+PERF: stage=4 count=3481 total=8290287800 max=20668870
+PERF: stage=5 count=3481 total=4196692400 max=371699938
+PERF: stage=6 count=3481 total=395696 max=182
+PERF: stage=7 count=6962 total=403240316 max=45353754
+PERF: stage=8 count=6962 total=1421132004 max=16702578
+PERF: stage=9 count=6962 total=1097654540 max=120005680
+PERF: stage=10 count=6962 total=690064326 max=106266254
+PERF: stage=11 count=3481 total=1274230212 max=561778
+PERF: stage=12 count=3481 total=80017760 max=9554490
+PERF: stage=13 count=3481 total=110985352 max=311372
+PERF: stage=14 count=3481 total=257140604 max=263650
+PERF: stage=15 count=3481 total=2088248 max=10160
+PERF: stage=16 count=3481 total=26458136 max=20186
+PERF: stage=17 count=3481 total=2524868 max=1556
+PERF: stage=18 count=3481 total=822730860 max=1262244
+PERF: stage=19 count=3481 total=4369004250 max=1490268
+PERF: stage=20 count=3481 total=44153918 max=8958752
+PERF: stage=21 count=3481 total=16159928 max=14132
+PERF: stage=22 count=3481 total=22305026 max=15882
+PERF: stage=23 count=3481 total=2267852 max=9158
+PERF: stage=24 count=3481 total=1205759878 max=5029756
+PERF: stage=25 count=3481 total=19875414 max=17080
+PERF: stage=26 count=3481 total=9302732 max=11710
+PERF: stage=27 count=3481 total=5126102 max=10358
+PERF: stage=28 count=3481 total=573598 max=810
+PERF: stage=29 count=3481 total=918368 max=504
+PERF: stage=30 count=3481 total=6041072 max=10718
+PERF: stage=31 count=3481 total=815488 max=1356
+PERF: stage=32 count=3481 total=20120258 max=22336
+PERF: stage=33 count=3481 total=148394024 max=239730
+PERF: stage=34 count=3481 total=4126145310 max=1426326
+PERF: stage=35 count=3481 total=184258906 max=249838
+PERF: stage=36 count=55696 total=22938552 max=14900
+PERF: stage=37 count=3481 total=1924310 max=14480
+PERF: stage=38 count=3481 total=2055602 max=12344
+PERF: stage=39 count=3481 total=4120211082 max=1424048
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=24
+PERF: hist ms<=24 count=3353
+PERF: hist ms<=32 count=37
+PERF: hist ms<=40 count=44
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=384 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3489
+PERF: dump end
+PERF: dump begin
+PERF: stage=0 count=3490 total=28200912094 max=2269555472
+PERF: stage=1 count=3482 total=15957184466 max=494252266
+PERF: stage=2 count=3482 total=7557288048 max=433962818
+PERF: stage=3 count=3482 total=3201076830 max=4448416
+PERF: stage=4 count=3482 total=8284690936 max=20922138
+PERF: stage=5 count=3482 total=4193138300 max=369653202
+PERF: stage=6 count=3482 total=391794 max=8230
+PERF: stage=7 count=6964 total=405755646 max=47947796
+PERF: stage=8 count=6964 total=1418512414 max=14864016
+PERF: stage=9 count=6964 total=1096606604 max=120289968
+PERF: stage=10 count=6964 total=689674340 max=105984770
+PERF: stage=11 count=3482 total=1279381406 max=587942
+PERF: stage=12 count=3482 total=80718702 max=9640432
+PERF: stage=13 count=3482 total=110966690 max=318846
+PERF: stage=14 count=3482 total=256210700 max=103242
+PERF: stage=15 count=3482 total=2197966 max=14878
+PERF: stage=16 count=3482 total=26401998 max=20276
+PERF: stage=17 count=3482 total=2394806 max=9164
+PERF: stage=18 count=3482 total=823619560 max=1246068
+PERF: stage=19 count=3482 total=4363391138 max=1503432
+PERF: stage=20 count=3482 total=44004140 max=9121548
+PERF: stage=21 count=3482 total=16232940 max=16488
+PERF: stage=22 count=3482 total=22276802 max=20538
+PERF: stage=23 count=3482 total=2359624 max=13588
+PERF: stage=24 count=3482 total=1199411666 max=5067078
+PERF: stage=25 count=3482 total=19867458 max=15642
+PERF: stage=26 count=3482 total=9455430 max=14156
+PERF: stage=27 count=3482 total=5376958 max=10780
+PERF: stage=28 count=3482 total=669334 max=8298
+PERF: stage=29 count=3482 total=912814 max=790
+PERF: stage=30 count=3482 total=6180988 max=11900
+PERF: stage=31 count=3482 total=825748 max=602
+PERF: stage=32 count=3482 total=20087198 max=24972
+PERF: stage=33 count=3482 total=148004902 max=206296
+PERF: stage=34 count=3482 total=4120526708 max=1439402
+PERF: stage=35 count=3482 total=184104042 max=224890
+PERF: stage=36 count=55712 total=22899230 max=166416
+PERF: stage=37 count=3482 total=1890390 max=4886
+PERF: stage=38 count=3482 total=2089554 max=13230
+PERF: stage=39 count=3482 total=4114483240 max=1437676
+PERF: hist ms<=16 count=31
+PERF: hist ms<=24 count=3356
+PERF: hist ms<=32 count=28
+PERF: hist ms<=40 count=48
+PERF: hist ms<=48 count=17
+PERF: hist ms<=56 count=4
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=376 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3490
+PERF: dump end
+PERF: dump begin
+PERF: stage=0 count=3483 total=28187913804 max=2262598578
+PERF: stage=1 count=3475 total=15957947200 max=495584896
+PERF: stage=2 count=3475 total=7560159332 max=433109210
+PERF: stage=3 count=3475 total=3213803904 max=4477020
+PERF: stage=4 count=3475 total=8280725156 max=20796096
+PERF: stage=5 count=3475 total=4187147564 max=369272154
+PERF: stage=6 count=3475 total=382818 max=230
+PERF: stage=7 count=6950 total=401280888 max=45293372
+PERF: stage=8 count=6950 total=1419610246 max=18741072
+PERF: stage=9 count=6950 total=1092415802 max=117478948
+PERF: stage=10 count=6950 total=691753038 max=106529044
+PERF: stage=11 count=3475 total=1272825212 max=586250
+PERF: stage=12 count=3475 total=79518022 max=9623262
+PERF: stage=13 count=3475 total=110894478 max=303020
+PERF: stage=14 count=3475 total=256599456 max=263794
+PERF: stage=15 count=3475 total=2195534 max=14166
+PERF: stage=16 count=3475 total=26453144 max=187746
+PERF: stage=17 count=3475 total=2583954 max=167300
+PERF: stage=18 count=3475 total=822525210 max=1244434
+PERF: stage=19 count=3475 total=4357286482 max=1488528
+PERF: stage=20 count=3475 total=43888416 max=9036688
+PERF: stage=21 count=3475 total=16245414 max=15752
+PERF: stage=22 count=3475 total=22519166 max=20132
+PERF: stage=23 count=3475 total=2293952 max=12370
+PERF: stage=24 count=3475 total=1209858246 max=5061678
+PERF: stage=25 count=3475 total=19873272 max=15842
+PERF: stage=26 count=3475 total=9375870 max=12008
+PERF: stage=27 count=3475 total=5410586 max=10190
+PERF: stage=28 count=3475 total=672372 max=8048
+PERF: stage=29 count=3475 total=914066 max=508
+PERF: stage=30 count=3475 total=6158496 max=11046
+PERF: stage=31 count=3475 total=830482 max=8136
+PERF: stage=32 count=3475 total=20099918 max=24604
+PERF: stage=33 count=3475 total=147799896 max=225476
+PERF: stage=34 count=3475 total=4115119436 max=1416776
+PERF: stage=35 count=3475 total=183822902 max=236214
+PERF: stage=36 count=55600 total=22821002 max=13526
+PERF: stage=37 count=3475 total=1900812 max=4490
+PERF: stage=38 count=3475 total=2117612 max=12288
+PERF: stage=39 count=3475 total=4109075110 max=1414402
+PERF: hist ms<=16 count=18
+PERF: hist ms<=24 count=3349
+PERF: hist ms<=32 count=42
+PERF: hist ms<=40 count=44
+PERF: hist ms<=48 count=24
+PERF: hist ms<=96 count=1
+PERF: hist ms<=104 count=1
+PERF: hist ms<=392 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3483
+PERF: dump end
+PERF: dump begin
+PERF: stage=0 count=3483 total=28200823216 max=2265287856
+PERF: stage=1 count=3475 total=15953683534 max=492422756
+PERF: stage=2 count=3475 total=7601922768 max=434087598
+PERF: stage=3 count=3475 total=3239958924 max=4481872
+PERF: stage=4 count=3475 total=8238963358 max=20784692
+PERF: stage=5 count=3475 total=4203663836 max=370485752
+PERF: stage=6 count=3475 total=379488 max=8806
+PERF: stage=7 count=6950 total=403912536 max=46313112
+PERF: stage=8 count=6950 total=1418524562 max=15788042
+PERF: stage=9 count=6950 total=1110442860 max=120817098
+PERF: stage=10 count=6950 total=685791570 max=106131760
+PERF: stage=11 count=3475 total=1269030452 max=590666
+PERF: stage=12 count=3475 total=81868266 max=9586008
+PERF: stage=13 count=3475 total=111681518 max=318830
+PERF: stage=14 count=3475 total=254579706 max=270426
+PERF: stage=15 count=3475 total=2180098 max=12882
+PERF: stage=16 count=3475 total=25988738 max=17226
+PERF: stage=17 count=3475 total=2565948 max=9206
+PERF: stage=18 count=3475 total=821212132 max=1321374
+PERF: stage=19 count=3475 total=4370202444 max=1520348
+PERF: stage=20 count=3475 total=43976472 max=9005660
+PERF: stage=21 count=3475 total=16112014 max=15986
+PERF: stage=22 count=3475 total=22383172 max=16126
+PERF: stage=23 count=3475 total=2202144 max=9476
+PERF: stage=24 count=3475 total=1159233450 max=5088266
+PERF: stage=25 count=3475 total=20159072 max=181734
+PERF: stage=26 count=3475 total=9274030 max=11924
+PERF: stage=27 count=3475 total=5686230 max=10712
+PERF: stage=28 count=3475 total=573812 max=9346
+PERF: stage=29 count=3475 total=986388 max=6254
+PERF: stage=30 count=3475 total=6398804 max=12400
+PERF: stage=31 count=3475 total=826618 max=490
+PERF: stage=32 count=3475 total=20211100 max=20166
+PERF: stage=33 count=3475 total=147717882 max=246518
+PERF: stage=34 count=3475 total=4128528698 max=1428126
+PERF: stage=35 count=3475 total=183197774 max=256188
+PERF: stage=36 count=55600 total=22604342 max=18118
+PERF: stage=37 count=3475 total=1928646 max=10806
+PERF: stage=38 count=3475 total=2228282 max=19074
+PERF: stage=39 count=3475 total=4122400818 max=1425880
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=23
+PERF: hist ms<=24 count=3345
+PERF: hist ms<=32 count=40
+PERF: hist ms<=40 count=48
+PERF: hist ms<=48 count=17
+PERF: hist ms<=56 count=4
+PERF: hist ms<=80 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=392 count=1
+PERF: hist ms<=1032 count=3
+PERF: frames=3483
+PERF: dump end
+PERF: === level=vol2 ===
+PERF: hunk level_used=12456 startup_used=0 avail=8376152 total=8388608
+PERF: stage=0 count=3534 total=24724359106 max=3454957352
+PERF: stage=1 count=3527 total=15991826076 max=513480056
+PERF: stage=2 count=3527 total=14425435824 max=456091254
+PERF: stage=3 count=3527 total=10079171538 max=4419204
+PERF: stage=4 count=3527 total=1439605928 max=13166980
+PERF: stage=5 count=3527 total=4195426586 max=393818974
+PERF: stage=6 count=3527 total=391874 max=174
+PERF: stage=7 count=7054 total=224522630 max=47388230
+PERF: stage=8 count=7054 total=1138527254 max=20668572
+PERF: stage=9 count=7054 total=1044153364 max=169072286
+PERF: stage=10 count=7054 total=1050285748 max=140196390
+PERF: stage=11 count=3527 total=85516766 max=45826
+PERF: stage=12 count=3527 total=29933678 max=38818
+PERF: stage=13 count=3527 total=6393968 max=37082
+PERF: stage=14 count=3527 total=100548814 max=207080
+PERF: stage=15 count=3527 total=5286970 max=14784
+PERF: stage=16 count=3527 total=15721158 max=20350
+PERF: stage=17 count=3527 total=633826 max=468
+PERF: stage=18 count=3527 total=823675426 max=466846
+PERF: stage=19 count=3527 total=203049410 max=240534
+PERF: stage=20 count=3527 total=53099636 max=9102352
+PERF: stage=21 count=3527 total=11808598 max=16750
+PERF: stage=22 count=3527 total=16134914 max=23078
+PERF: stage=23 count=3527 total=2511124 max=13908
+PERF: stage=24 count=3527 total=17616968 max=18970
+PERF: stage=25 count=3527 total=11012150 max=3668386
+PERF: stage=26 count=3527 total=4267272 max=13604
+PERF: stage=27 count=3527 total=5406290 max=14320
+PERF: stage=28 count=3527 total=560506 max=11064
+PERF: stage=29 count=3527 total=25766212 max=28868
+PERF: stage=30 count=3527 total=7853496 max=19780
+PERF: stage=31 count=3527 total=909788 max=694
+PERF: stage=32 count=3527 total=19403706 max=25440
+PERF: stage=33 count=3527 total=97798740 max=45006
+PERF: stage=34 count=3527 total=9248766 max=148626
+PERF: stage=35 count=3527 total=135475218 max=212500
+PERF: stage=36 count=56432 total=23491078 max=16132
+PERF: stage=37 count=3527 total=1993290 max=7420
+PERF: stage=38 count=3527 total=2202666 max=1454
+PERF: stage=39 count=3527 total=3371504 max=147224
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=67
+PERF: hist ms<=24 count=3400
+PERF: hist ms<=40 count=32
+PERF: hist ms<=48 count=26
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=392 count=1
+PERF: hist ms<=672 count=1
+PERF: hist ms<=1032 count=2
+PERF: frames=3534
+PERF: === level=asubchb ===
+PERF: hunk level_used=13152 startup_used=0 avail=8375456 total=8388608
+PERF: stage=0 count=3549 total=26420592554 max=3651853136
+PERF: stage=1 count=3514 total=16053849536 max=606389554
+PERF: stage=2 count=3514 total=13432745860 max=565171994
+PERF: stage=3 count=3514 total=8327342360 max=4456286
+PERF: stage=4 count=3514 total=2503784834 max=9639400
+PERF: stage=5 count=3514 total=4921722140 max=497330068
+PERF: stage=6 count=3514 total=416444 max=9336
+PERF: stage=7 count=7028 total=249902172 max=46323958
+PERF: stage=8 count=7028 total=1049121086 max=16409948
+PERF: stage=9 count=7028 total=2079080268 max=176621108
+PERF: stage=10 count=7028 total=966784632 max=178508718
+PERF: stage=11 count=3514 total=652210448 max=4859008
+PERF: stage=12 count=3514 total=31613452 max=29878
+PERF: stage=13 count=3514 total=10328228 max=56800
+PERF: stage=14 count=3514 total=203080246 max=252836
+PERF: stage=15 count=3514 total=3694034 max=15600
+PERF: stage=16 count=3514 total=15819426 max=24588
+PERF: stage=17 count=3514 total=1445196 max=17372
+PERF: stage=18 count=3514 total=966379852 max=6049032
+PERF: stage=19 count=3514 total=248018686 max=253138
+PERF: stage=20 count=3514 total=50658970 max=9239844
+PERF: stage=21 count=3514 total=19671104 max=27236
+PERF: stage=22 count=3514 total=15341138 max=30848
+PERF: stage=23 count=3514 total=2795936 max=15830
+PERF: stage=24 count=3514 total=236116536 max=247770
+PERF: stage=25 count=3514 total=8047284 max=20656
+PERF: stage=26 count=3514 total=6003030 max=18162
+PERF: stage=27 count=3514 total=6260852 max=16560
+PERF: stage=28 count=3514 total=609224 max=12128
+PERF: stage=29 count=3514 total=1819338 max=13420
+PERF: stage=30 count=3514 total=10488754 max=21498
+PERF: stage=31 count=3514 total=1212654 max=812
+PERF: stage=32 count=3514 total=19235324 max=190574
+PERF: stage=33 count=3514 total=133613842 max=79416
+PERF: stage=34 count=3514 total=12842876 max=206586
+PERF: stage=35 count=3514 total=168625948 max=90722
+PERF: stage=36 count=56224 total=29183414 max=14458
+PERF: stage=37 count=3514 total=1894332 max=11290
+PERF: stage=38 count=3514 total=2194368 max=14006
+PERF: stage=39 count=3514 total=6975704 max=205062
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=62
+PERF: hist ms<=24 count=3413
+PERF: hist ms<=32 count=1
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=672 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3549
+PERF: === level=nps-sp01 ===
+PERF: hunk level_used=16656 startup_used=0 avail=8371952 total=8388608
+PERF: stage=0 count=3561 total=27876918756 max=741224240
+PERF: stage=1 count=3526 total=16080176238 max=566183456
+PERF: stage=2 count=3526 total=13170022364 max=517843244
+PERF: stage=3 count=3526 total=7227129614 max=4297684
+PERF: stage=4 count=3526 total=2794783596 max=9671938
+PERF: stage=5 count=3526 total=5765007806 max=461860542
+PERF: stage=6 count=3526 total=397918 max=194
+PERF: stage=7 count=7052 total=312244620 max=46930294
+PERF: stage=8 count=7052 total=1238917684 max=17180804
+PERF: stage=9 count=7052 total=2584669662 max=171487706
+PERF: stage=10 count=7052 total=1043126236 max=142446790
+PERF: stage=11 count=3526 total=323830060 max=290796
+PERF: stage=12 count=3526 total=42485172 max=4522268
+PERF: stage=13 count=3526 total=112498000 max=230560
+PERF: stage=14 count=3526 total=245191472 max=273064
+PERF: stage=15 count=3526 total=4711280 max=14698
+PERF: stage=16 count=3526 total=34835356 max=30744
+PERF: stage=17 count=3526 total=1857296 max=3370
+PERF: stage=18 count=3526 total=880941894 max=700910
+PERF: stage=19 count=3526 total=369452470 max=764762
+PERF: stage=20 count=3526 total=52487480 max=9145114
+PERF: stage=21 count=3526 total=8953940 max=16078
+PERF: stage=22 count=3526 total=26035226 max=30416
+PERF: stage=23 count=3526 total=2663126 max=15102
+PERF: stage=24 count=3526 total=611895420 max=562472
+PERF: stage=25 count=3526 total=33497136 max=8625462
+PERF: stage=26 count=3526 total=13671766 max=21026
+PERF: stage=27 count=3526 total=5211970 max=13764
+PERF: stage=28 count=3526 total=635068 max=778
+PERF: stage=29 count=3526 total=1405782 max=12440
+PERF: stage=30 count=3526 total=8867006 max=18154
+PERF: stage=31 count=3526 total=1024306 max=13706
+PERF: stage=32 count=3526 total=19309574 max=23168
+PERF: stage=33 count=3526 total=253605904 max=276358
+PERF: stage=34 count=3526 total=10859550 max=698568
+PERF: stage=35 count=3526 total=293975820 max=288118
+PERF: stage=36 count=56416 total=28393938 max=16138
+PERF: stage=37 count=3526 total=1922574 max=12628
+PERF: stage=38 count=3526 total=2223068 max=12858
+PERF: stage=39 count=3526 total=4961344 max=696950
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=73
+PERF: hist ms<=24 count=3416
+PERF: hist ms<=32 count=2
+PERF: hist ms<=40 count=59
+PERF: hist ms<=48 count=2
+PERF: hist ms<=56 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3561
+PERF: === level=thermal ===
+PERF: hunk level_used=16320 startup_used=0 avail=8372288 total=8388608
+PERF: stage=0 count=3535 total=26832616086 max=4063094138
+PERF: stage=1 count=3500 total=15993806998 max=559600668
+PERF: stage=2 count=3500 total=11062551124 max=521903580
+PERF: stage=3 count=3500 total=5727442736 max=4441666
+PERF: stage=4 count=3500 total=4819135448 max=10007982
+PERF: stage=5 count=3500 total=5161843308 max=463547362
+PERF: stage=6 count=3500 total=405224 max=8536
+PERF: stage=7 count=7000 total=306764556 max=46250100
+PERF: stage=8 count=7000 total=934851946 max=19044976
+PERF: stage=9 count=7000 total=2416318040 max=171172540
+PERF: stage=10 count=7000 total=922499642 max=142203404
+PERF: stage=11 count=3500 total=399307462 max=352322
+PERF: stage=12 count=3500 total=61573216 max=5034356
+PERF: stage=13 count=3500 total=24793156 max=77990
+PERF: stage=14 count=3500 total=272770596 max=298082
+PERF: stage=15 count=3500 total=3852026 max=15532
+PERF: stage=16 count=3500 total=20387290 max=22880
+PERF: stage=17 count=3500 total=684680 max=7846
+PERF: stage=18 count=3500 total=1118199580 max=556292
+PERF: stage=19 count=3500 total=2345014298 max=876934
+PERF: stage=20 count=3500 total=51018776 max=8985988
+PERF: stage=21 count=3500 total=13554252 max=20794
+PERF: stage=22 count=3500 total=15523314 max=23064
+PERF: stage=23 count=3500 total=2716202 max=15764
+PERF: stage=24 count=3500 total=433313756 max=415162
+PERF: stage=25 count=3500 total=17274044 max=20152
+PERF: stage=26 count=3500 total=9219552 max=13532
+PERF: stage=27 count=3500 total=7690766 max=15224
+PERF: stage=28 count=3500 total=632770 max=2096
+PERF: stage=29 count=3500 total=810022 max=8654
+PERF: stage=30 count=3500 total=7462148 max=12120
+PERF: stage=31 count=3500 total=968906 max=7866
+PERF: stage=32 count=3500 total=23069296 max=22424
+PERF: stage=33 count=3500 total=118827912 max=212442
+PERF: stage=34 count=3500 total=2102774376 max=809222
+PERF: stage=35 count=3500 total=168152798 max=241578
+PERF: stage=36 count=56000 total=34962264 max=26486
+PERF: stage=37 count=3500 total=2787642 max=16012
+PERF: stage=38 count=3500 total=2187654 max=12794
+PERF: stage=39 count=3500 total=2096524768 max=806762
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=52
+PERF: hist ms<=24 count=3393
+PERF: hist ms<=32 count=20
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=22
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3535
+PERF: === level=fedbankv ===
+PERF: hunk level_used=19944 startup_used=0 avail=8368664 total=8388608
+PERF: stage=0 count=3555 total=30556127106 max=3116598476
+PERF: stage=1 count=3520 total=15975856320 max=490785664
+PERF: stage=2 count=3520 total=11429832914 max=442288888
+PERF: stage=3 count=3520 total=7573545528 max=4078926
+PERF: stage=4 count=3520 total=4424820626 max=10189320
+PERF: stage=5 count=3520 total=3697332390 max=384753636
+PERF: stage=6 count=3520 total=428502 max=8744
+PERF: stage=7 count=7040 total=451396116 max=43723750
+PERF: stage=8 count=7040 total=662572346 max=23887488
+PERF: stage=9 count=7040 total=1393956372 max=127072680
+PERF: stage=10 count=7040 total=598746202 max=104051342
+PERF: stage=11 count=3520 total=707912408 max=409758
+PERF: stage=12 count=3520 total=53540218 max=192792
+PERF: stage=13 count=3520 total=483000134 max=426356
+PERF: stage=14 count=3520 total=393357734 max=189852
+PERF: stage=15 count=3520 total=3436718 max=16446
+PERF: stage=16 count=3520 total=10183584 max=16516
+PERF: stage=17 count=3520 total=1256058 max=10428
+PERF: stage=18 count=3520 total=2115151428 max=931510
+PERF: stage=19 count=3520 total=493839432 max=2338876
+PERF: stage=20 count=3520 total=49096622 max=9153756
+PERF: stage=21 count=3520 total=12495814 max=21608
+PERF: stage=22 count=3520 total=10573846 max=15504
+PERF: stage=23 count=3520 total=2507846 max=11602
+PERF: stage=24 count=3520 total=12109836 max=18932
+PERF: stage=25 count=3520 total=31322130 max=27690
+PERF: stage=26 count=3520 total=9529640 max=17022
+PERF: stage=27 count=3520 total=12430262 max=23236
+PERF: stage=28 count=3520 total=720892 max=4022
+PERF: stage=29 count=3520 total=805804 max=3688
+PERF: stage=30 count=3520 total=7527572 max=17414
+PERF: stage=31 count=3520 total=909780 max=10304
+PERF: stage=32 count=3520 total=19103084 max=26598
+PERF: stage=33 count=3520 total=379629980 max=310136
+PERF: stage=34 count=3520 total=12341386 max=2254416
+PERF: stage=35 count=3520 total=415704300 max=319572
+PERF: stage=36 count=56320 total=28150062 max=16150
+PERF: stage=37 count=3520 total=2086288 max=11696
+PERF: stage=38 count=3520 total=2191126 max=12106
+PERF: stage=39 count=3520 total=6515540 max=2252838
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3433
+PERF: hist ms<=40 count=36
+PERF: hist ms<=48 count=25
+PERF: hist ms<=88 count=2
+PERF: hist ms<=96 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3555
+PERF: === level=defend2 ===
+PERF: hunk level_used=14520 startup_used=0 avail=8374088 total=8388608
+PERF: stage=0 count=3521 total=27608931690 max=542476828
+PERF: stage=1 count=3486 total=15928668812 max=474176242
+PERF: stage=2 count=3486 total=11502565302 max=427885534
+PERF: stage=3 count=3486 total=4537009556 max=4461326
+PERF: stage=4 count=3486 total=4129698400 max=9555834
+PERF: stage=5 count=3486 total=6769759848 max=371943162
+PERF: stage=6 count=3486 total=433184 max=8428
+PERF: stage=7 count=6972 total=410396982 max=45781520
+PERF: stage=8 count=6972 total=1657715024 max=19352510
+PERF: stage=9 count=6972 total=2180414822 max=115891904
+PERF: stage=10 count=6972 total=810251900 max=107694964
+PERF: stage=11 count=3486 total=1635803494 max=787570
+PERF: stage=12 count=3486 total=35638960 max=4489798
+PERF: stage=13 count=3486 total=12810122 max=130580
+PERF: stage=14 count=3486 total=202478826 max=241604
+PERF: stage=15 count=3486 total=3381560 max=13974
+PERF: stage=16 count=3486 total=5870690 max=15028
+PERF: stage=17 count=3486 total=619708 max=2814
+PERF: stage=18 count=3486 total=1304248482 max=6053506
+PERF: stage=19 count=3486 total=308038876 max=343210
+PERF: stage=20 count=3486 total=51058504 max=9006392
+PERF: stage=21 count=3486 total=8677672 max=5540298
+PERF: stage=22 count=3486 total=6436218 max=15796
+PERF: stage=23 count=3486 total=2662488 max=1818
+PERF: stage=24 count=3486 total=450573114 max=298376
+PERF: stage=25 count=3486 total=42076642 max=3687898
+PERF: stage=26 count=3486 total=8744916 max=18452
+PERF: stage=27 count=3486 total=5214074 max=14926
+PERF: stage=28 count=3486 total=591390 max=508
+PERF: stage=29 count=3486 total=24713122 max=26886
+PERF: stage=30 count=3486 total=7150640 max=17108
+PERF: stage=31 count=3486 total=925616 max=678
+PERF: stage=32 count=3486 total=19307704 max=25582
+PERF: stage=33 count=3486 total=198164614 max=265864
+PERF: stage=34 count=3486 total=11602328 max=293812
+PERF: stage=35 count=3486 total=237795656 max=283766
+PERF: stage=36 count=55776 total=23761286 max=16370
+PERF: stage=37 count=3486 total=2014566 max=11526
+PERF: stage=38 count=3486 total=2205218 max=5732
+PERF: stage=39 count=3486 total=5655938 max=292390
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=45
+PERF: hist ms<=24 count=3381
+PERF: hist ms<=32 count=24
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3521
+PERF: === level=pship ===
+PERF: hunk level_used=18792 startup_used=0 avail=8369816 total=8388608
+PERF: stage=0 count=3556 total=29803113348 max=2487036162
+PERF: stage=1 count=3521 total=15951106624 max=490559866
+PERF: stage=2 count=3521 total=12486001432 max=433749862
+PERF: stage=3 count=3521 total=7310838618 max=4481472
+PERF: stage=4 count=3521 total=3349165694 max=17517460
+PERF: stage=5 count=3521 total=5017045618 max=372312634
+PERF: stage=6 count=3521 total=425168 max=9166
+PERF: stage=7 count=7042 total=413104668 max=50546560
+PERF: stage=8 count=7042 total=952236254 max=15662304
+PERF: stage=9 count=7042 total=1992424434 max=119476302
+PERF: stage=10 count=7042 total=1075910696 max=106318740
+PERF: stage=11 count=3521 total=145457842 max=261108
+PERF: stage=12 count=3521 total=179288262 max=6353918
+PERF: stage=13 count=3521 total=125071220 max=390248
+PERF: stage=14 count=3521 total=387810938 max=350540
+PERF: stage=15 count=3521 total=4449694 max=14864
+PERF: stage=16 count=3521 total=14568370 max=17514
+PERF: stage=17 count=3521 total=664076 max=8330
+PERF: stage=18 count=3521 total=1789382036 max=1402340
+PERF: stage=19 count=3521 total=445304826 max=1346812
+PERF: stage=20 count=3521 total=50037662 max=9152008
+PERF: stage=21 count=3521 total=10952956 max=29498
+PERF: stage=22 count=3521 total=17562466 max=173888
+PERF: stage=23 count=3521 total=2636156 max=13254
+PERF: stage=24 count=3521 total=61662542 max=61936
+PERF: stage=25 count=3521 total=57992112 max=201272
+PERF: stage=26 count=3521 total=10982564 max=18288
+PERF: stage=27 count=3521 total=21059240 max=23996
+PERF: stage=28 count=3521 total=698750 max=13350
+PERF: stage=29 count=3521 total=1232766 max=1364
+PERF: stage=30 count=3521 total=8600794 max=14336
+PERF: stage=31 count=3521 total=930682 max=11390
+PERF: stage=32 count=3521 total=19253698 max=24594
+PERF: stage=33 count=3521 total=340602656 max=285430
+PERF: stage=34 count=3521 total=13460318 max=1271300
+PERF: stage=35 count=3521 total=374299476 max=299706
+PERF: stage=36 count=56336 total=22649754 max=16314
+PERF: stage=37 count=3521 total=1974020 max=11152
+PERF: stage=38 count=3521 total=2237902 max=14572
+PERF: stage=39 count=3521 total=7518672 max=1269644
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=72
+PERF: hist ms<=24 count=3410
+PERF: hist ms<=32 count=5
+PERF: hist ms<=40 count=36
+PERF: hist ms<=48 count=24
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3556
+PERF: === level=stableizers ===
+PERF: hunk level_used=12960 startup_used=0 avail=8375648 total=8388608
+PERF: stage=0 count=3530 total=28289061716 max=4290656664
+PERF: stage=1 count=3495 total=16052167640 max=604636108
+PERF: stage=2 count=3495 total=11390910736 max=558366080
+PERF: stage=3 count=3495 total=5986445824 max=4468152
+PERF: stage=4 count=3495 total=4544967468 max=18270142
+PERF: stage=5 count=3495 total=5170242658 max=500948090
+PERF: stage=6 count=3495 total=420162 max=8252
+PERF: stage=7 count=6990 total=424844904 max=46044376
+PERF: stage=8 count=6990 total=1033186506 max=18312058
+PERF: stage=9 count=6990 total=1913666614 max=176868110
+PERF: stage=10 count=6990 total=1218102404 max=177690832
+PERF: stage=11 count=3495 total=1568648124 max=5181854
+PERF: stage=12 count=3495 total=30655954 max=4564612
+PERF: stage=13 count=3495 total=28969518 max=107234
+PERF: stage=14 count=3495 total=213815212 max=110400
+PERF: stage=15 count=3495 total=4405144 max=16782
+PERF: stage=16 count=3495 total=24892336 max=22554
+PERF: stage=17 count=3495 total=646322 max=16968
+PERF: stage=18 count=3495 total=1918109528 max=6194746
+PERF: stage=19 count=3495 total=292663470 max=584824
+PERF: stage=20 count=3495 total=47189280 max=8989662
+PERF: stage=21 count=3495 total=3468010 max=36318
+PERF: stage=22 count=3495 total=19851670 max=181916
+PERF: stage=23 count=3495 total=2728792 max=15476
+PERF: stage=24 count=3495 total=342106870 max=451496
+PERF: stage=25 count=3495 total=9508258 max=3639982
+PERF: stage=26 count=3495 total=3022440 max=11388
+PERF: stage=27 count=3495 total=11205310 max=17282
+PERF: stage=28 count=3495 total=688436 max=12708
+PERF: stage=29 count=3495 total=992428 max=4070
+PERF: stage=30 count=3495 total=7802656 max=19130
+PERF: stage=31 count=3495 total=919220 max=4162
+PERF: stage=32 count=3495 total=19087132 max=24998
+PERF: stage=33 count=3495 total=195045354 max=238216
+PERF: stage=34 count=3495 total=9695570 max=538870
+PERF: stage=35 count=3495 total=226219290 max=254906
+PERF: stage=36 count=55920 total=22581302 max=181316
+PERF: stage=37 count=3495 total=1880648 max=5074
+PERF: stage=38 count=3495 total=2180164 max=12960
+PERF: stage=39 count=3495 total=3893324 max=537376
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=63
+PERF: hist ms<=24 count=3374
+PERF: hist ms<=32 count=23
+PERF: hist ms<=40 count=30
+PERF: hist ms<=48 count=29
+PERF: hist ms<=56 count=1
+PERF: hist ms<=64 count=1
+PERF: hist ms<=80 count=2
+PERF: hist ms<=112 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3530
+PERF: === level=powerdown ===
+PERF: hunk level_used=17880 startup_used=0 avail=8370728 total=8388608
+PERF: stage=0 count=2290 total=30071327990 max=1839077638
+PERF: stage=1 count=2255 total=16144604634 max=615933302
+PERF: stage=2 count=2255 total=13090726366 max=571099210
+PERF: stage=3 count=2255 total=5826892504 max=4587410
+PERF: stage=4 count=2255 total=2959573710 max=24076864
+PERF: stage=5 count=2255 total=7062238116 max=514251722
+PERF: stage=6 count=2255 total=302110 max=3876
+PERF: stage=7 count=4510 total=663729274 max=46636228
+PERF: stage=8 count=4510 total=1408846820 max=21377504
+PERF: stage=9 count=4510 total=3979555242 max=186062584
+PERF: stage=10 count=4510 total=585621146 max=176587522
+PERF: stage=11 count=2255 total=1029650126 max=5038460
+PERF: stage=12 count=2255 total=15156286 max=28502
+PERF: stage=13 count=2255 total=38983544 max=5040200
+PERF: stage=14 count=2255 total=192069854 max=280150
+PERF: stage=15 count=2255 total=2287652 max=12796
+PERF: stage=16 count=2255 total=4628410 max=14708
+PERF: stage=17 count=2255 total=1794814 max=13478
+PERF: stage=18 count=2255 total=1269173824 max=6523414
+PERF: stage=19 count=2255 total=255843666 max=963650
+PERF: stage=20 count=2255 total=45823484 max=9197668
+PERF: stage=21 count=2255 total=7883392 max=5638660
+PERF: stage=22 count=2255 total=4357422 max=5476
+PERF: stage=23 count=2255 total=1789970 max=9488
+PERF: stage=24 count=2255 total=52553764 max=4592682
+PERF: stage=25 count=2255 total=12960956 max=3681798
+PERF: stage=26 count=2255 total=3799402 max=18588
+PERF: stage=27 count=2255 total=5817558 max=21718
+PERF: stage=28 count=2255 total=429280 max=3344
+PERF: stage=29 count=2255 total=622770 max=3772
+PERF: stage=30 count=2255 total=5357700 max=15188
+PERF: stage=31 count=2255 total=596208 max=3652
+PERF: stage=32 count=2255 total=12170728 max=24972
+PERF: stage=33 count=2255 total=189917820 max=126162
+PERF: stage=34 count=2255 total=7785978 max=897084
+PERF: stage=35 count=2255 total=211834176 max=139936
+PERF: stage=36 count=36080 total=14345674 max=14082
+PERF: stage=37 count=2255 total=1162024 max=11222
+PERF: stage=38 count=2255 total=1423958 max=17208
+PERF: stage=39 count=2255 total=4007418 max=895496
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=24 count=1011
+PERF: hist ms<=32 count=970
+PERF: hist ms<=40 count=242
+PERF: hist ms<=48 count=18
+PERF: hist ms<=56 count=29
+PERF: hist ms<=64 count=11
+PERF: hist ms<=72 count=1
+PERF: hist ms<=104 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=2290
+PERF: === level=spc-sp01 ===
+PERF: hunk level_used=19920 startup_used=0 avail=8368688 total=8388608
+PERF: stage=0 count=3529 total=28847798612 max=1652072102
+PERF: stage=1 count=3494 total=16051620904 max=605030856
+PERF: stage=2 count=3494 total=12133145868 max=562238940
+PERF: stage=3 count=3494 total=5468224490 max=4483014
+PERF: stage=4 count=3494 total=3802096046 max=9588982
+PERF: stage=5 count=3494 total=6474893430 max=502304206
+PERF: stage=6 count=3494 total=403882 max=346
+PERF: stage=7 count=6988 total=346054842 max=50197260
+PERF: stage=8 count=6988 total=1076515672 max=17384692
+PERF: stage=9 count=6988 total=2752289440 max=175196624
+PERF: stage=10 count=6988 total=1709633994 max=178627532
+PERF: stage=11 count=3494 total=1096801818 max=4986308
+PERF: stage=12 count=3494 total=55768158 max=4419552
+PERF: stage=13 count=3494 total=143252374 max=195694
+PERF: stage=14 count=3494 total=350923914 max=316406
+PERF: stage=15 count=3494 total=2722972 max=15004
+PERF: stage=16 count=3494 total=29042488 max=29228
+PERF: stage=17 count=3494 total=693770 max=11632
+PERF: stage=18 count=3494 total=839264048 max=5946832
+PERF: stage=19 count=3494 total=350971252 max=1825514
+PERF: stage=20 count=3494 total=52694454 max=8940350
+PERF: stage=21 count=3494 total=10806950 max=20738
+PERF: stage=22 count=3494 total=19336908 max=23916
+PERF: stage=23 count=3494 total=2831964 max=15318
+PERF: stage=24 count=3494 total=800364534 max=505078
+PERF: stage=25 count=3494 total=11122524 max=15820
+PERF: stage=26 count=3494 total=6479764 max=20344
+PERF: stage=27 count=3494 total=5340454 max=14592
+PERF: stage=28 count=3494 total=774062 max=518
+PERF: stage=29 count=3494 total=1157108 max=13060
+PERF: stage=30 count=3494 total=7864612 max=16836
+PERF: stage=31 count=3494 total=993012 max=13426
+PERF: stage=32 count=3494 total=19227356 max=23372
+PERF: stage=33 count=3494 total=239495960 max=267826
+PERF: stage=34 count=3494 total=11981934 max=1770118
+PERF: stage=35 count=3494 total=273399914 max=281478
+PERF: stage=36 count=55904 total=28049668 max=16456
+PERF: stage=37 count=3494 total=2225008 max=11754
+PERF: stage=38 count=3494 total=2195210 max=13790
+PERF: stage=39 count=3494 total=6087108 max=1768622
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=51
+PERF: hist ms<=24 count=3387
+PERF: hist ms<=32 count=18
+PERF: hist ms<=40 count=41
+PERF: hist ms<=48 count=23
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=104 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3529
+PERF: === level=starship ===
+PERF: hunk level_used=11160 startup_used=0 avail=8377448 total=8388608
+PERF: stage=0 count=3402 total=26249759178 max=3543683148
+PERF: stage=1 count=3367 total=15980761104 max=568922712
+PERF: stage=2 count=3367 total=13632393042 max=519073900
+PERF: stage=3 count=3367 total=8877138716 max=4482934
+PERF: stage=4 count=3367 total=2230297634 max=9772104
+PERF: stage=5 count=3367 total=4421029938 max=455841922
+PERF: stage=6 count=3367 total=389828 max=8778
+PERF: stage=7 count=6734 total=250009142 max=47723118
+PERF: stage=8 count=6734 total=1008222616 max=14929186
+PERF: stage=9 count=6734 total=1603864842 max=172870792
+PERF: stage=10 count=6734 total=999225676 max=139886808
+PERF: stage=11 count=3367 total=547028926 max=4875092
+PERF: stage=12 count=3367 total=2936942 max=17470
+PERF: stage=13 count=3367 total=19690648 max=5718036
+PERF: stage=14 count=3367 total=192040880 max=246444
+PERF: stage=15 count=3367 total=3784458 max=20602
+PERF: stage=16 count=3367 total=7241946 max=21324
+PERF: stage=17 count=3367 total=792962 max=13278
+PERF: stage=18 count=3367 total=915643712 max=8224372
+PERF: stage=19 count=3367 total=348566056 max=424274
+PERF: stage=20 count=3367 total=52013250 max=9059050
+PERF: stage=21 count=3367 total=3679920 max=20676
+PERF: stage=22 count=3367 total=7654072 max=17412
+PERF: stage=23 count=3367 total=3221636 max=171212
+PERF: stage=24 count=3367 total=72683390 max=247306
+PERF: stage=25 count=3367 total=16130826 max=8775994
+PERF: stage=26 count=3367 total=3302642 max=19124
+PERF: stage=27 count=3367 total=7603976 max=16426
+PERF: stage=28 count=3367 total=633978 max=402
+PERF: stage=29 count=3367 total=1749846 max=14878
+PERF: stage=30 count=3367 total=10711534 max=24280
+PERF: stage=31 count=3367 total=1221016 max=746
+PERF: stage=32 count=3367 total=18458856 max=24676
+PERF: stage=33 count=3367 total=248673332 max=267618
+PERF: stage=34 count=3367 total=9822798 max=367124
+PERF: stage=35 count=3367 total=280534678 max=281934
+PERF: stage=36 count=53872 total=24283766 max=16262
+PERF: stage=37 count=3367 total=1888578 max=11938
+PERF: stage=38 count=3367 total=2123434 max=14788
+PERF: stage=39 count=3367 total=4189670 max=365762
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=39
+PERF: hist ms<=24 count=3157
+PERF: hist ms<=32 count=128
+PERF: hist ms<=40 count=41
+PERF: hist ms<=48 count=21
+PERF: hist ms<=56 count=8
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=648 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3402
+PERF: === level=bio-sphere ===
+PERF: hunk level_used=16176 startup_used=0 avail=8372432 total=8388608
+PERF: stage=0 count=3554 total=27038731782 max=4199801258
+PERF: stage=1 count=3519 total=16030658916 max=567559976
+PERF: stage=2 count=3519 total=13198248054 max=524939334
+PERF: stage=3 count=3519 total=9013141302 max=4349222
+PERF: stage=4 count=3519 total=2716012064 max=24574894
+PERF: stage=5 count=3519 total=4010107728 max=462457476
+PERF: stage=6 count=3519 total=424958 max=212
+PERF: stage=7 count=7038 total=199689090 max=45862442
+PERF: stage=8 count=7038 total=1058090870 max=17834124
+PERF: stage=9 count=7038 total=1600388684 max=171918178
+PERF: stage=10 count=7038 total=561284974 max=142202326
+PERF: stage=11 count=3519 total=1185038972 max=5333174
+PERF: stage=12 count=3519 total=75115338 max=57832
+PERF: stage=13 count=3519 total=82649944 max=51846
+PERF: stage=14 count=3519 total=262001050 max=281746
+PERF: stage=15 count=3519 total=3741272 max=21816
+PERF: stage=16 count=3519 total=27745404 max=30552
+PERF: stage=17 count=3519 total=3231856 max=17040
+PERF: stage=18 count=3519 total=659152154 max=11140112
+PERF: stage=19 count=3519 total=257561052 max=503500
+PERF: stage=20 count=3519 total=49136040 max=9118114
+PERF: stage=21 count=3519 total=12659842 max=21392
+PERF: stage=22 count=3519 total=20704488 max=26176
+PERF: stage=23 count=3519 total=3225338 max=16498
+PERF: stage=24 count=3519 total=19071324 max=24844
+PERF: stage=25 count=3519 total=10738224 max=20826
+PERF: stage=26 count=3519 total=9463132 max=21288
+PERF: stage=27 count=3519 total=8053866 max=20590
+PERF: stage=28 count=3519 total=741294 max=14016
+PERF: stage=29 count=3519 total=1739166 max=16334
+PERF: stage=30 count=3519 total=10591302 max=18984
+PERF: stage=31 count=3519 total=1195002 max=754
+PERF: stage=32 count=3519 total=19196402 max=24534
+PERF: stage=33 count=3519 total=145776536 max=254982
+PERF: stage=34 count=3519 total=12506468 max=463846
+PERF: stage=35 count=3519 total=179387326 max=264350
+PERF: stage=36 count=56304 total=29414348 max=19478
+PERF: stage=37 count=3519 total=1860936 max=11276
+PERF: stage=38 count=3519 total=2194428 max=4074
+PERF: stage=39 count=3519 total=6613894 max=462274
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=63
+PERF: hist ms<=24 count=3421
+PERF: hist ms<=40 count=33
+PERF: hist ms<=48 count=25
+PERF: hist ms<=56 count=1
+PERF: hist ms<=64 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3554
+PERF: === level=nukerf ===
+PERF: hunk level_used=16368 startup_used=0 avail=8372240 total=8388608
+PERF: stage=0 count=3561 total=28683256826 max=1571022196
+PERF: stage=1 count=3526 total=15961602124 max=477811434
+PERF: stage=2 count=3526 total=14247208084 max=431506760
+PERF: stage=3 count=3526 total=10739998684 max=4201706
+PERF: stage=4 count=3526 total=1593008208 max=9503798
+PERF: stage=5 count=3526 total=3354352474 max=372277174
+PERF: stage=6 count=3526 total=391624 max=194
+PERF: stage=7 count=7052 total=281986712 max=43901654
+PERF: stage=8 count=7052 total=533960486 max=23917122
+PERF: stage=9 count=7052 total=1393044400 max=113009540
+PERF: stage=10 count=7052 total=555390950 max=103753622
+PERF: stage=11 count=3526 total=97648280 max=6418012
+PERF: stage=12 count=3526 total=35493370 max=28554
+PERF: stage=13 count=3526 total=120360018 max=244934
+PERF: stage=14 count=3526 total=230614442 max=138530
+PERF: stage=15 count=3526 total=3338590 max=33566
+PERF: stage=16 count=3526 total=71803332 max=50536
+PERF: stage=17 count=3526 total=1209856 max=11938
+PERF: stage=18 count=3526 total=552305886 max=5986112
+PERF: stage=19 count=3526 total=289030678 max=569472
+PERF: stage=20 count=3526 total=48944788 max=9195430
+PERF: stage=21 count=3526 total=10121102 max=38898
+PERF: stage=22 count=3526 total=47354570 max=39074
+PERF: stage=23 count=3526 total=2644166 max=15920
+PERF: stage=24 count=3526 total=13199984 max=18022
+PERF: stage=25 count=3526 total=24438342 max=24144
+PERF: stage=26 count=3526 total=13258308 max=16844
+PERF: stage=27 count=3526 total=7161562 max=17024
+PERF: stage=28 count=3526 total=690556 max=13494
+PERF: stage=29 count=3526 total=1167988 max=2786
+PERF: stage=30 count=3526 total=8698194 max=15780
+PERF: stage=31 count=3526 total=1019430 max=12464
+PERF: stage=32 count=3526 total=19255238 max=24234
+PERF: stage=33 count=3526 total=185923704 max=252192
+PERF: stage=34 count=3526 total=9586266 max=522474
+PERF: stage=35 count=3526 total=221625984 max=266474
+PERF: stage=36 count=56416 total=23315450 max=17858
+PERF: stage=37 count=3526 total=1858868 max=4708
+PERF: stage=38 count=3526 total=2188186 max=12836
+PERF: stage=39 count=3526 total=3661934 max=520896
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=9
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3427
+PERF: hist ms<=32 count=1
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=22
+PERF: hist ms<=56 count=1
+PERF: hist ms<=72 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3561
+PERF: === level=battlebase ===
+PERF: hunk level_used=10560 startup_used=0 avail=8378048 total=8388608
+PERF: stage=0 count=3558 total=26079665274 max=3496528190
+PERF: stage=1 count=3523 total=15859055626 max=393817400
+PERF: stage=2 count=3523 total=12957394166 max=345753116
+PERF: stage=3 count=3523 total=10335790634 max=4487976
+PERF: stage=4 count=3523 total=2786964706 max=9640454
+PERF: stage=5 count=3523 total=2434263478 max=284845360
+PERF: stage=6 count=3523 total=396096 max=238
+PERF: stage=7 count=7046 total=192305022 max=47431146
+PERF: stage=8 count=7046 total=515482028 max=17780772
+PERF: stage=9 count=7046 total=688825330 max=66699138
+PERF: stage=10 count=7046 total=454542950 max=68368652
+PERF: stage=11 count=3523 total=956433734 max=516186
+PERF: stage=12 count=3523 total=27883602 max=4996398
+PERF: stage=13 count=3523 total=12563772 max=22356
+PERF: stage=14 count=3523 total=135593008 max=76346
+PERF: stage=15 count=3523 total=3403464 max=17646
+PERF: stage=16 count=3523 total=6030200 max=14616
+PERF: stage=17 count=3523 total=674678 max=14222
+PERF: stage=18 count=3523 total=562808126 max=587368
+PERF: stage=19 count=3523 total=225201448 max=228332
+PERF: stage=20 count=3523 total=53796542 max=9047548
+PERF: stage=21 count=3523 total=4241452 max=16528
+PERF: stage=22 count=3523 total=7673106 max=26890
+PERF: stage=23 count=3523 total=3074890 max=4934
+PERF: stage=24 count=3523 total=745449874 max=489816
+PERF: stage=25 count=3523 total=8534338 max=20670
+PERF: stage=26 count=3523 total=1983406 max=14592
+PERF: stage=27 count=3523 total=5863728 max=19034
+PERF: stage=28 count=3523 total=735246 max=4076
+PERF: stage=29 count=3523 total=1433292 max=12166
+PERF: stage=30 count=3523 total=9257398 max=23690
+PERF: stage=31 count=3523 total=999676 max=4520
+PERF: stage=32 count=3523 total=19195514 max=25136
+PERF: stage=33 count=3523 total=120064286 max=77516
+PERF: stage=34 count=3523 total=10020814 max=190912
+PERF: stage=35 count=3523 total=151721222 max=90476
+PERF: stage=36 count=56368 total=26175028 max=16212
+PERF: stage=37 count=3523 total=2904010 max=5832
+PERF: stage=38 count=3523 total=2196856 max=12808
+PERF: stage=39 count=3523 total=4148110 max=189302
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=3
+PERF: hist ms<=16 count=53
+PERF: hist ms<=24 count=3433
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=21
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=816 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3558
+PERF: === level=capship ===
+PERF: hunk level_used=14424 startup_used=0 avail=8374184 total=8388608
+PERF: stage=0 count=3558 total=27289979636 max=528498956
+PERF: stage=1 count=3523 total=15938613660 max=491520800
+PERF: stage=2 count=3523 total=12773349002 max=445377768
+PERF: stage=3 count=3523 total=9246192932 max=4288660
+PERF: stage=4 count=3523 total=3046653710 max=10085034
+PERF: stage=5 count=3523 total=3348561846 max=385341426
+PERF: stage=6 count=3523 total=406902 max=8542
+PERF: stage=7 count=7046 total=199249162 max=45685840
+PERF: stage=8 count=7046 total=638168720 max=19316564
+PERF: stage=9 count=7046 total=1311353490 max=115980986
+PERF: stage=10 count=7046 total=608514094 max=120959790
+PERF: stage=11 count=3523 total=495704896 max=363106
+PERF: stage=12 count=3523 total=22394454 max=26446
+PERF: stage=13 count=3523 total=58211280 max=79938
+PERF: stage=14 count=3523 total=239557360 max=261088
+PERF: stage=15 count=3523 total=2436968 max=3838
+PERF: stage=16 count=3523 total=25507368 max=24278
+PERF: stage=17 count=3523 total=1756514 max=13346
+PERF: stage=18 count=3523 total=428181968 max=680254
+PERF: stage=19 count=3523 total=1632774890 max=722024
+PERF: stage=20 count=3523 total=49633288 max=9353868
+PERF: stage=21 count=3523 total=6302662 max=20688
+PERF: stage=22 count=3523 total=14038012 max=174376
+PERF: stage=23 count=3523 total=2595990 max=19046
+PERF: stage=24 count=3523 total=22780778 max=181912
+PERF: stage=25 count=3523 total=12206206 max=3768628
+PERF: stage=26 count=3523 total=5961912 max=15196
+PERF: stage=27 count=3523 total=3929606 max=15032
+PERF: stage=28 count=3523 total=626266 max=506
+PERF: stage=29 count=3523 total=865600 max=16032
+PERF: stage=30 count=3523 total=8161746 max=18478
+PERF: stage=31 count=3523 total=970956 max=3274
+PERF: stage=32 count=3523 total=22209566 max=185906
+PERF: stage=33 count=3523 total=101422806 max=219464
+PERF: stage=34 count=3523 total=1425635832 max=653590
+PERF: stage=35 count=3523 total=142784736 max=234302
+PERF: stage=36 count=56368 total=26747676 max=16744
+PERF: stage=37 count=3523 total=2142964 max=3320
+PERF: stage=38 count=3523 total=2232144 max=14036
+PERF: stage=39 count=3523 total=1419426238 max=651920
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=8
+PERF: hist ms<=16 count=55
+PERF: hist ms<=24 count=3426
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=23
+PERF: hist ms<=56 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=856 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3558
+PERF: === level=space ===
+PERF: hunk level_used=19608 startup_used=0 avail=8369000 total=8388608
+PERF: stage=0 count=3558 total=29525850204 max=2276683626
+PERF: stage=1 count=3523 total=15969813172 max=483959264
+PERF: stage=2 count=3523 total=13031749060 max=430540830
+PERF: stage=3 count=3523 total=9437331508 max=4336168
+PERF: stage=4 count=3523 total=2814697166 max=9787440
+PERF: stage=5 count=3523 total=3442393930 max=373365572
+PERF: stage=6 count=3523 total=394228 max=218
+PERF: stage=7 count=7046 total=384601306 max=46926292
+PERF: stage=8 count=7046 total=658066860 max=18693926
+PERF: stage=9 count=7046 total=1198354886 max=118557208
+PERF: stage=10 count=7046 total=614351148 max=104416654
+PERF: stage=11 count=3523 total=157044374 max=259288
+PERF: stage=12 count=3523 total=72737534 max=5022702
+PERF: stage=13 count=3523 total=260678906 max=284026
+PERF: stage=14 count=3523 total=303446014 max=139230
+PERF: stage=15 count=3523 total=2592440 max=16988
+PERF: stage=16 count=3523 total=32486266 max=43116
+PERF: stage=17 count=3523 total=1289294 max=14388
+PERF: stage=18 count=3523 total=472705148 max=334634
+PERF: stage=19 count=3523 total=396315264 max=2016176
+PERF: stage=20 count=3523 total=50746976 max=9145158
+PERF: stage=21 count=3523 total=27539966 max=31546
+PERF: stage=22 count=3523 total=26229088 max=22960
+PERF: stage=23 count=3523 total=2691722 max=13136
+PERF: stage=24 count=3523 total=938260022 max=791552
+PERF: stage=25 count=3523 total=20881000 max=26602
+PERF: stage=26 count=3523 total=11198530 max=19232
+PERF: stage=27 count=3523 total=13167264 max=17240
+PERF: stage=28 count=3523 total=754874 max=552
+PERF: stage=29 count=3523 total=1132442 max=13230
+PERF: stage=30 count=3523 total=8705194 max=19704
+PERF: stage=31 count=3523 total=1070714 max=15156
+PERF: stage=32 count=3523 total=19304668 max=26664
+PERF: stage=33 count=3523 total=286589846 max=294740
+PERF: stage=34 count=3523 total=12256150 max=1950814
+PERF: stage=35 count=3523 total=326689730 max=313470
+PERF: stage=36 count=56368 total=22838872 max=14566
+PERF: stage=37 count=3523 total=1875092 max=11258
+PERF: stage=38 count=3523 total=2213586 max=12894
+PERF: stage=39 count=3523 total=6373656 max=1949282
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=61
+PERF: hist ms<=24 count=3427
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3558
+PERF: === level=high ===
+PERF: hunk level_used=17880 startup_used=0 avail=8370728 total=8388608
+PERF: stage=0 count=3559 total=28288989806 max=1278674812
+PERF: stage=1 count=3524 total=15955966400 max=471341900
+PERF: stage=2 count=3524 total=12581446394 max=431447946
+PERF: stage=3 count=3524 total=9390860898 max=4388416
+PERF: stage=4 count=3524 total=3260113776 max=10217284
+PERF: stage=5 count=3524 total=3009256082 max=371877730
+PERF: stage=6 count=3524 total=393944 max=194
+PERF: stage=7 count=7048 total=257444356 max=49987940
+PERF: stage=8 count=7048 total=571663858 max=16619946
+PERF: stage=9 count=7048 total=1147633534 max=119292168
+PERF: stage=10 count=7048 total=449465754 max=105423286
+PERF: stage=11 count=3524 total=1403748722 max=638630
+PERF: stage=12 count=3524 total=31628314 max=48978
+PERF: stage=13 count=3524 total=118272010 max=230246
+PERF: stage=14 count=3524 total=233046336 max=274306
+PERF: stage=15 count=3524 total=3039740 max=15330
+PERF: stage=16 count=3524 total=12820610 max=21888
+PERF: stage=17 count=3524 total=1231164 max=12416
+PERF: stage=18 count=3524 total=955049736 max=557916
+PERF: stage=19 count=3524 total=371833814 max=722962
+PERF: stage=20 count=3524 total=51007896 max=9303386
+PERF: stage=21 count=3524 total=8042540 max=20558
+PERF: stage=22 count=3524 total=9189838 max=16556
+PERF: stage=23 count=3524 total=2667436 max=4272
+PERF: stage=24 count=3524 total=10916508 max=15954
+PERF: stage=25 count=3524 total=11343044 max=19662
+PERF: stage=26 count=3524 total=5824312 max=17824
+PERF: stage=27 count=3524 total=6538164 max=16324
+PERF: stage=28 count=3524 total=612816 max=3634
+PERF: stage=29 count=3524 total=1157600 max=3322
+PERF: stage=30 count=3524 total=8606152 max=179440
+PERF: stage=31 count=3524 total=983996 max=12582
+PERF: stage=32 count=3524 total=19275800 max=192310
+PERF: stage=33 count=3524 total=256587764 max=277192
+PERF: stage=34 count=3524 total=12933718 max=658592
+PERF: stage=35 count=3524 total=294896176 max=288842
+PERF: stage=36 count=56384 total=28089534 max=175492
+PERF: stage=37 count=3524 total=1904034 max=11088
+PERF: stage=38 count=3524 total=2160662 max=1150
+PERF: stage=39 count=3524 total=7074710 max=657184
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=8
+PERF: hist ms<=16 count=50
+PERF: hist ms<=24 count=3432
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=17
+PERF: hist ms<=56 count=3
+PERF: hist ms<=64 count=1
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3559
+PERF: === level=military ===
+PERF: hunk level_used=24936 startup_used=0 avail=8363672 total=8388608
+PERF: stage=0 count=3554 total=31385490704 max=4073115902
+PERF: stage=1 count=3519 total=15851033804 max=391863420
+PERF: stage=2 count=3519 total=13397564246 max=342864746
+PERF: stage=3 count=3519 total=10420981846 max=4479918
+PERF: stage=4 count=3519 total=2334367040 max=9957658
+PERF: stage=5 count=3519 total=2786522940 max=281968684
+PERF: stage=6 count=3519 total=392290 max=196
+PERF: stage=7 count=7038 total=409013126 max=48516318
+PERF: stage=8 count=7038 total=625006148 max=17803848
+PERF: stage=9 count=7038 total=793441230 max=65266742
+PERF: stage=10 count=7038 total=377604298 max=72194358
+PERF: stage=11 count=3519 total=235082934 max=255796
+PERF: stage=12 count=3519 total=27420480 max=25292
+PERF: stage=13 count=3519 total=122527954 max=481806
+PERF: stage=14 count=3519 total=549416276 max=366346
+PERF: stage=15 count=3519 total=3162080 max=15492
+PERF: stage=16 count=3519 total=11984788 max=19322
+PERF: stage=17 count=3519 total=677614 max=11684
+PERF: stage=18 count=3519 total=781544602 max=465010
+PERF: stage=19 count=3519 total=445162030 max=2093440
+PERF: stage=20 count=3519 total=47128790 max=9056474
+PERF: stage=21 count=3519 total=7906240 max=14200
+PERF: stage=22 count=3519 total=12623730 max=176588
+PERF: stage=23 count=3519 total=2692722 max=13096
+PERF: stage=24 count=3519 total=11417370 max=23060
+PERF: stage=25 count=3519 total=26324582 max=3740040
+PERF: stage=26 count=3519 total=15700144 max=22038
+PERF: stage=27 count=3519 total=10319076 max=20450
+PERF: stage=28 count=3519 total=679188 max=2956
+PERF: stage=29 count=3519 total=880876 max=1224
+PERF: stage=30 count=3519 total=8596694 max=17666
+PERF: stage=31 count=3519 total=934514 max=12924
+PERF: stage=32 count=3519 total=19081172 max=23756
+PERF: stage=33 count=3519 total=335438552 max=296948
+PERF: stage=34 count=3519 total=12100786 max=2010122
+PERF: stage=35 count=3519 total=375846396 max=308796
+PERF: stage=36 count=56304 total=22637226 max=18382
+PERF: stage=37 count=3519 total=1949650 max=4254
+PERF: stage=38 count=3519 total=2202984 max=13220
+PERF: stage=39 count=3519 total=6213166 max=2008446
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=4
+PERF: hist ms<=16 count=47
+PERF: hist ms<=24 count=3434
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=19
+PERF: hist ms<=56 count=3
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3554
+PERF: === level=munitions ===
+PERF: hunk level_used=11688 startup_used=0 avail=8376920 total=8388608
+PERF: stage=0 count=3555 total=26169828988 max=3343747302
+PERF: stage=1 count=3520 total=15959239658 max=473851428
+PERF: stage=2 count=3520 total=14696614224 max=435962576
+PERF: stage=3 count=3520 total=10504311882 max=4478140
+PERF: stage=4 count=3520 total=1148739564 max=9360754
+PERF: stage=5 count=3520 total=4041770768 max=372000172
+PERF: stage=6 count=3520 total=397206 max=224
+PERF: stage=7 count=7040 total=227581042 max=45715348
+PERF: stage=8 count=7040 total=1374865486 max=16139376
+PERF: stage=9 count=7040 total=1266186952 max=119802226
+PERF: stage=10 count=7040 total=589626536 max=107006392
+PERF: stage=11 count=3520 total=213271384 max=253212
+PERF: stage=12 count=3520 total=4833772 max=15614
+PERF: stage=13 count=3520 total=11659058 max=36606
+PERF: stage=14 count=3520 total=58459952 max=64416
+PERF: stage=15 count=3520 total=3661436 max=14532
+PERF: stage=16 count=3520 total=1078754 max=2752
+PERF: stage=17 count=3520 total=611626 max=11536
+PERF: stage=18 count=3520 total=539069660 max=360516
+PERF: stage=19 count=3520 total=196802062 max=193062
+PERF: stage=20 count=3520 total=51218248 max=9118086
+PERF: stage=21 count=3520 total=2917450 max=13946
+PERF: stage=22 count=3520 total=5871908 max=170544
+PERF: stage=23 count=3520 total=2313076 max=12258
+PERF: stage=24 count=3520 total=12678546 max=16720
+PERF: stage=25 count=3520 total=8614692 max=16080
+PERF: stage=26 count=3520 total=1874630 max=14684
+PERF: stage=27 count=3520 total=11608330 max=16120
+PERF: stage=28 count=3520 total=559602 max=12060
+PERF: stage=29 count=3520 total=1124140 max=3178
+PERF: stage=30 count=3520 total=7958572 max=15358
+PERF: stage=31 count=3520 total=893490 max=2942
+PERF: stage=32 count=3520 total=19483532 max=25876
+PERF: stage=33 count=3520 total=88742516 max=48848
+PERF: stage=34 count=3520 total=14943196 max=159484
+PERF: stage=35 count=3520 total=123843644 max=77634
+PERF: stage=36 count=56320 total=23470858 max=16998
+PERF: stage=37 count=3520 total=1936464 max=13630
+PERF: stage=38 count=3520 total=2195424 max=12568
+PERF: stage=39 count=3520 total=9099342 max=157834
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=3
+PERF: hist ms<=16 count=55
+PERF: hist ms<=24 count=3428
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=22
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3555
+PERF: === level=ramqan ===
+PERF: hunk level_used=14232 startup_used=0 avail=8374376 total=8388608
+PERF: stage=0 count=2029 total=29735797276 max=2247700616
+PERF: stage=1 count=1994 total=16147211920 max=629349370
+PERF: stage=2 count=1994 total=12927679092 max=580473116
+PERF: stage=3 count=1994 total=6609964142 max=4487904
+PERF: stage=4 count=1994 total=3130809808 max=20739114
+PERF: stage=5 count=1994 total=6168591190 max=517147686
+PERF: stage=6 count=1994 total=267974 max=274
+PERF: stage=7 count=4238 total=775541942 max=45098344
+PERF: stage=8 count=4238 total=2014292658 max=19499730
+PERF: stage=9 count=4238 total=1699872682 max=194768554
+PERF: stage=10 count=4238 total=1292089128 max=175932444
+PERF: stage=11 count=1994 total=838781208 max=7400490
+PERF: stage=12 count=1994 total=42899678 max=58802
+PERF: stage=13 count=1994 total=11026076 max=74816
+PERF: stage=14 count=1994 total=120548458 max=259750
+PERF: stage=15 count=1994 total=1698166 max=9448
+PERF: stage=16 count=1994 total=694510 max=7826
+PERF: stage=17 count=1994 total=714478 max=3078
+PERF: stage=18 count=1994 total=1757494216 max=6583554
+PERF: stage=19 count=1994 total=158359778 max=766218
+PERF: stage=20 count=1994 total=44480664 max=9219652
+PERF: stage=21 count=1994 total=7420726 max=5684728
+PERF: stage=22 count=1994 total=6679208 max=14976
+PERF: stage=23 count=1994 total=1457332 max=4554
+PERF: stage=24 count=1994 total=103909994 max=241644
+PERF: stage=25 count=1994 total=14423448 max=5196434
+PERF: stage=26 count=1994 total=2066488 max=9406
+PERF: stage=27 count=1994 total=4337806 max=176526
+PERF: stage=28 count=1994 total=331112 max=422
+PERF: stage=29 count=1994 total=701588 max=996
+PERF: stage=30 count=1994 total=5298994 max=12360
+PERF: stage=31 count=1994 total=584116 max=3932
+PERF: stage=32 count=1994 total=11061366 max=24222
+PERF: stage=33 count=1994 total=95996160 max=250518
+PERF: stage=34 count=1994 total=5962908 max=722496
+PERF: stage=35 count=1994 total=119553234 max=265890
+PERF: stage=36 count=31904 total=13082332 max=15202
+PERF: stage=37 count=1994 total=1086974 max=11570
+PERF: stage=38 count=1994 total=1290870 max=18656
+PERF: stage=39 count=1994 total=2571242 max=721046
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=24 count=496
+PERF: hist ms<=32 count=474
+PERF: hist ms<=40 count=992
+PERF: hist ms<=48 count=14
+PERF: hist ms<=56 count=29
+PERF: hist ms<=64 count=13
+PERF: hist ms<=72 count=2
+PERF: hist ms<=88 count=2
+PERF: hist ms<=96 count=1
+PERF: hist ms<=128 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=2029
+PERF: === level=temple ===
+PERF: hunk level_used=13800 startup_used=0 avail=8374808 total=8388608
+PERF: stage=0 count=3523 total=28000805588 max=902425460
+PERF: stage=1 count=3488 total=16025712000 max=561129668
+PERF: stage=2 count=3488 total=10460071836 max=521365856
+PERF: stage=3 count=3488 total=5099068624 max=4448862
+PERF: stage=4 count=3488 total=5451269900 max=24327638
+PERF: stage=5 count=3488 total=5164698120 max=463010806
+PERF: stage=6 count=3488 total=414662 max=234
+PERF: stage=7 count=6976 total=302004990 max=49053832
+PERF: stage=8 count=6976 total=1641319880 max=18215798
+PERF: stage=9 count=6976 total=1687577392 max=170627704
+PERF: stage=10 count=6976 total=956010322 max=142187552
+PERF: stage=11 count=3488 total=1565562882 max=705826
+PERF: stage=12 count=3488 total=35260042 max=31172
+PERF: stage=13 count=3488 total=8752360 max=93384
+PERF: stage=14 count=3488 total=190438618 max=239568
+PERF: stage=15 count=3488 total=5753836 max=9690
+PERF: stage=16 count=3488 total=975018 max=11248
+PERF: stage=17 count=3488 total=556976 max=670
+PERF: stage=18 count=3488 total=3217303956 max=7596780
+PERF: stage=19 count=3488 total=300211506 max=677130
+PERF: stage=20 count=3488 total=48776140 max=8947920
+PERF: stage=21 count=3488 total=8018174 max=5486820
+PERF: stage=22 count=3488 total=7536466 max=12066
+PERF: stage=23 count=3488 total=2233868 max=10224
+PERF: stage=24 count=3488 total=16261324 max=27172
+PERF: stage=25 count=3488 total=12574270 max=3599170
+PERF: stage=26 count=3488 total=3454000 max=12992
+PERF: stage=27 count=3488 total=7149158 max=10296
+PERF: stage=28 count=3488 total=510210 max=7260
+PERF: stage=29 count=3488 total=822518 max=738
+PERF: stage=30 count=3488 total=6845352 max=14560
+PERF: stage=31 count=3488 total=856624 max=7952
+PERF: stage=32 count=3488 total=19014430 max=24118
+PERF: stage=33 count=3488 total=198360638 max=261356
+PERF: stage=34 count=3488 total=13081340 max=619158
+PERF: stage=35 count=3488 total=230159352 max=275828
+PERF: stage=36 count=55808 total=22722790 max=23874
+PERF: stage=37 count=3488 total=1932148 max=5526
+PERF: stage=38 count=3488 total=2160430 max=12842
+PERF: stage=39 count=3488 total=7272694 max=617556
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=40
+PERF: hist ms<=24 count=3383
+PERF: hist ms<=32 count=30
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=18
+PERF: hist ms<=56 count=2
+PERF: hist ms<=72 count=2
+PERF: hist ms<=104 count=1
+PERF: hist ms<=112 count=1
+PERF: hist ms<=136 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3523
+PERF: === level=azt-sp01 ===
+PERF: hunk level_used=19656 startup_used=0 avail=8368952 total=8388608
+PERF: stage=0 count=3555 total=29749770962 max=2305032144
+PERF: stage=1 count=3520 total=15957658384 max=480819666
+PERF: stage=2 count=3520 total=12315208326 max=432638080
+PERF: stage=3 count=3520 total=7791893160 max=4488384
+PERF: stage=4 count=3520 total=3401972230 max=13798692
+PERF: stage=5 count=3520 total=4358518774 max=372252838
+PERF: stage=6 count=3520 total=405656 max=240
+PERF: stage=7 count=7040 total=334071448 max=47480310
+PERF: stage=8 count=7040 total=868319248 max=20226668
+PERF: stage=9 count=7040 total=1447185882 max=116403136
+PERF: stage=10 count=7040 total=492782508 max=103957892
+PERF: stage=11 count=3520 total=857502568 max=486074
+PERF: stage=12 count=3520 total=151770576 max=240224
+PERF: stage=13 count=3520 total=54489982 max=208904
+PERF: stage=14 count=3520 total=372358078 max=333454
+PERF: stage=15 count=3520 total=3116782 max=14830
+PERF: stage=16 count=3520 total=23230856 max=28210
+PERF: stage=17 count=3520 total=2496356 max=8576
+PERF: stage=18 count=3520 total=1251045530 max=620558
+PERF: stage=19 count=3520 total=427339474 max=1965982
+PERF: stage=20 count=3520 total=48246492 max=9237140
+PERF: stage=21 count=3520 total=25301208 max=27420
+PERF: stage=22 count=3520 total=28664498 max=183050
+PERF: stage=23 count=3520 total=2651012 max=9962
+PERF: stage=24 count=3520 total=14567922 max=34358
+PERF: stage=25 count=3520 total=72818464 max=3687196
+PERF: stage=26 count=3520 total=30821972 max=29024
+PERF: stage=27 count=3520 total=11626638 max=17890
+PERF: stage=28 count=3520 total=617138 max=12928
+PERF: stage=29 count=3520 total=1273874 max=12480
+PERF: stage=30 count=3520 total=8515082 max=18082
+PERF: stage=31 count=3520 total=997386 max=2992
+PERF: stage=32 count=3520 total=19138966 max=22928
+PERF: stage=33 count=3520 total=324912056 max=299348
+PERF: stage=34 count=3520 total=11393996 max=1893940
+PERF: stage=35 count=3520 total=359598384 max=309364
+PERF: stage=36 count=56320 total=22020358 max=172204
+PERF: stage=37 count=3520 total=1852102 max=4116
+PERF: stage=38 count=3520 total=2231282 max=13860
+PERF: stage=39 count=3520 total=5463256 max=1892400
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=64
+PERF: hist ms<=24 count=3418
+PERF: hist ms<=32 count=4
+PERF: hist ms<=40 count=31
+PERF: hist ms<=48 count=28
+PERF: hist ms<=56 count=1
+PERF: hist ms<=72 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3555
+PERF: === level=azchb ===
+PERF: hunk level_used=13872 startup_used=0 avail=8374736 total=8388608
+PERF: stage=0 count=3556 total=27348016526 max=591214564
+PERF: stage=1 count=3521 total=16028219824 max=562057670
+PERF: stage=2 count=3521 total=14268457412 max=521626834
+PERF: stage=3 count=3521 total=9348077802 max=4130024
+PERF: stage=4 count=3521 total=1644601784 max=11761512
+PERF: stage=5 count=3521 total=4766522774 max=461055394
+PERF: stage=6 count=3521 total=399210 max=794
+PERF: stage=7 count=7042 total=232107632 max=45517694
+PERF: stage=8 count=7042 total=1372789522 max=19703230
+PERF: stage=9 count=7042 total=1127856468 max=172262172
+PERF: stage=10 count=7042 total=1449067240 max=141790784
+PERF: stage=11 count=3521 total=40130258 max=188504
+PERF: stage=12 count=3521 total=44442814 max=28728
+PERF: stage=13 count=3521 total=8682710 max=61764
+PERF: stage=14 count=3521 total=204211922 max=263754
+PERF: stage=15 count=3521 total=4806528 max=13412
+PERF: stage=16 count=3521 total=5090966 max=22184
+PERF: stage=17 count=3521 total=1123636 max=722
+PERF: stage=18 count=3521 total=920617558 max=632752
+PERF: stage=19 count=3521 total=255814578 max=543992
+PERF: stage=20 count=3521 total=52514278 max=11534540
+PERF: stage=21 count=3521 total=7800064 max=174890
+PERF: stage=22 count=3521 total=10857228 max=17166
+PERF: stage=23 count=3521 total=2410258 max=12960
+PERF: stage=24 count=3521 total=16764644 max=34950
+PERF: stage=25 count=3521 total=26336632 max=29346
+PERF: stage=26 count=3521 total=13908430 max=22852
+PERF: stage=27 count=3521 total=6444534 max=15474
+PERF: stage=28 count=3521 total=549506 max=2596
+PERF: stage=29 count=3521 total=1131610 max=11990
+PERF: stage=30 count=3521 total=8250370 max=15644
+PERF: stage=31 count=3521 total=997974 max=12278
+PERF: stage=32 count=3521 total=19187444 max=25738
+PERF: stage=33 count=3521 total=142044598 max=241752
+PERF: stage=34 count=3521 total=9588174 max=503652
+PERF: stage=35 count=3521 total=180000692 max=261030
+PERF: stage=36 count=56336 total=29525424 max=17554
+PERF: stage=37 count=3521 total=1878768 max=17600
+PERF: stage=38 count=3521 total=2183418 max=12442
+PERF: stage=39 count=3521 total=3687092 max=502138
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=8
+PERF: hist ms<=16 count=54
+PERF: hist ms<=24 count=3425
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=3
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3556
+PERF: === level=nuken64 ===
+PERF: hunk level_used=10800 startup_used=0 avail=8377808 total=8388608
+PERF: stage=0 count=3557 total=25788517074 max=2929671924
+PERF: stage=1 count=3522 total=16023899356 max=564342174
+PERF: stage=2 count=3522 total=14255217760 max=523458492
+PERF: stage=3 count=3522 total=9591355472 max=3612498
+PERF: stage=4 count=3522 total=1651748918 max=9401814
+PERF: stage=5 count=3522 total=4488231032 max=460572224
+PERF: stage=6 count=3522 total=394264 max=192
+PERF: stage=7 count=7044 total=548052562 max=45809922
+PERF: stage=8 count=7044 total=1124596712 max=16187286
+PERF: stage=9 count=7044 total=1386106218 max=170543090
+PERF: stage=10 count=7044 total=843167624 max=143213934
+PERF: stage=11 count=3522 total=714547228 max=6542058
+PERF: stage=12 count=3522 total=1738172 max=4218
+PERF: stage=13 count=3522 total=1404328 max=982
+PERF: stage=14 count=3522 total=157771898 max=233540
+PERF: stage=15 count=3522 total=2583762 max=15078
+PERF: stage=16 count=3522 total=1226798 max=1002
+PERF: stage=17 count=3522 total=675134 max=12774
+PERF: stage=18 count=3522 total=380577650 max=5845750
+PERF: stage=19 count=3522 total=209071724 max=260566
+PERF: stage=20 count=3522 total=53415690 max=9133448
+PERF: stage=21 count=3522 total=3014060 max=14920
+PERF: stage=22 count=3522 total=4573022 max=17686
+PERF: stage=23 count=3522 total=2513532 max=12630
+PERF: stage=24 count=3522 total=87846034 max=77072
+PERF: stage=25 count=3522 total=1947496 max=14550
+PERF: stage=26 count=3522 total=1298110 max=3154
+PERF: stage=27 count=3522 total=3705832 max=14000
+PERF: stage=28 count=3522 total=581916 max=14030
+PERF: stage=29 count=3522 total=1422636 max=12704
+PERF: stage=30 count=3522 total=8983526 max=19322
+PERF: stage=31 count=3522 total=975414 max=786
+PERF: stage=32 count=3522 total=22100862 max=23838
+PERF: stage=33 count=3522 total=97607480 max=70464
+PERF: stage=34 count=3522 total=12587964 max=188326
+PERF: stage=35 count=3522 total=133516846 max=83548
+PERF: stage=36 count=56352 total=24877042 max=177684
+PERF: stage=37 count=3522 total=2104084 max=12760
+PERF: stage=38 count=3522 total=2286422 max=13868
+PERF: stage=39 count=3522 total=6419080 max=186782
+PERF: stage=40 count=5 total=52608 max=16082
+PERF: hist ms<=8 count=9
+PERF: hist ms<=16 count=66
+PERF: hist ms<=24 count=3408
+PERF: hist ms<=40 count=44
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=2
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3557
+PERF: === level=shipn64 ===
+PERF: hunk level_used=10344 startup_used=0 avail=8378264 total=8388608
+PERF: stage=0 count=3558 total=25707413550 max=3200697328
+PERF: stage=1 count=3523 total=15870716100 max=385692626
+PERF: stage=2 count=3523 total=14690310218 max=343718522
+PERF: stage=3 count=3523 total=11996187148 max=3721900
+PERF: stage=4 count=3523 total=1062904908 max=13229080
+PERF: stage=5 count=3523 total=2541410658 max=283442224
+PERF: stage=6 count=3523 total=390798 max=180
+PERF: stage=7 count=7046 total=130362418 max=50375420
+PERF: stage=8 count=7046 total=776203440 max=16326840
+PERF: stage=9 count=7046 total=656254188 max=63697160
+PERF: stage=10 count=7046 total=391548494 max=70930690
+PERF: stage=11 count=3523 total=324810628 max=8121550
+PERF: stage=12 count=3523 total=1696706 max=15550
+PERF: stage=13 count=3523 total=40411112 max=33862
+PERF: stage=14 count=3523 total=109590980 max=57410
+PERF: stage=15 count=3523 total=2663522 max=15152
+PERF: stage=16 count=3523 total=1247838 max=16238
+PERF: stage=17 count=3523 total=625176 max=486
+PERF: stage=18 count=3523 total=241221742 max=5849884
+PERF: stage=19 count=3523 total=219319828 max=271480
+PERF: stage=20 count=3523 total=55192792 max=11335300
+PERF: stage=21 count=3523 total=3167764 max=14172
+PERF: stage=22 count=3523 total=4058042 max=17430
+PERF: stage=23 count=3523 total=2773954 max=16174
+PERF: stage=24 count=3523 total=17239174 max=38884
+PERF: stage=25 count=3523 total=8219748 max=4900202
+PERF: stage=26 count=3523 total=1424008 max=12802
+PERF: stage=27 count=3523 total=4981870 max=16906
+PERF: stage=28 count=3523 total=608608 max=448
+PERF: stage=29 count=3523 total=1101956 max=11836
+PERF: stage=30 count=3523 total=9070750 max=16480
+PERF: stage=31 count=3523 total=989012 max=704
+PERF: stage=32 count=3523 total=19251606 max=25608
+PERF: stage=33 count=3523 total=108902868 max=233758
+PERF: stage=34 count=3523 total=12397680 max=135056
+PERF: stage=35 count=3523 total=145698372 max=248962
+PERF: stage=36 count=56368 total=25175338 max=17312
+PERF: stage=37 count=3523 total=2394910 max=4994
+PERF: stage=38 count=3523 total=2223138 max=12818
+PERF: stage=39 count=3523 total=6514054 max=133700
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=2
+PERF: hist ms<=16 count=59
+PERF: hist ms<=24 count=3425
+PERF: hist ms<=40 count=38
+PERF: hist ms<=48 count=25
+PERF: hist ms<=72 count=2
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=592 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3558
+PERF: === level=aztec64 ===
+PERF: hunk level_used=11352 startup_used=0 avail=8377256 total=8388608
+PERF: stage=0 count=3559 total=25820343344 max=3168507424
+PERF: stage=1 count=3524 total=16045379784 max=559407628
+PERF: stage=2 count=3524 total=13217814412 max=517710812
+PERF: stage=3 count=3524 total=9031012296 max=4467458
+PERF: stage=4 count=3524 total=2709795876 max=9564772
+PERF: stage=5 count=3524 total=4018595336 max=459046156
+PERF: stage=6 count=3524 total=393364 max=198
+PERF: stage=7 count=7048 total=260769198 max=44833944
+PERF: stage=8 count=7048 total=766705878 max=18456726
+PERF: stage=9 count=7048 total=1299661590 max=171316608
+PERF: stage=10 count=7048 total=1107066920 max=140840296
+PERF: stage=11 count=3524 total=581054866 max=387688
+PERF: stage=12 count=3524 total=1909868 max=12706
+PERF: stage=13 count=3524 total=23397876 max=175674
+PERF: stage=14 count=3524 total=148652720 max=247136
+PERF: stage=15 count=3524 total=5076888 max=15628
+PERF: stage=16 count=3524 total=1378904 max=13004
+PERF: stage=17 count=3524 total=651400 max=11262
+PERF: stage=18 count=3524 total=1404687086 max=893828
+PERF: stage=19 count=3524 total=405091560 max=339282
+PERF: stage=20 count=3524 total=50727030 max=9194708
+PERF: stage=21 count=3524 total=3013500 max=14154
+PERF: stage=22 count=3524 total=8238730 max=18008
+PERF: stage=23 count=3524 total=2918466 max=172164
+PERF: stage=24 count=3524 total=40189726 max=34140
+PERF: stage=25 count=3524 total=2582394 max=16486
+PERF: stage=26 count=3524 total=1107084 max=1124
+PERF: stage=27 count=3524 total=4835660 max=15040
+PERF: stage=28 count=3524 total=569860 max=398
+PERF: stage=29 count=3524 total=1394250 max=12224
+PERF: stage=30 count=3524 total=9032162 max=18580
+PERF: stage=31 count=3524 total=1043788 max=2842
+PERF: stage=32 count=3524 total=19703138 max=19772
+PERF: stage=33 count=3524 total=67919818 max=34948
+PERF: stage=34 count=3524 total=243638466 max=272590
+PERF: stage=35 count=3524 total=103638558 max=205326
+PERF: stage=36 count=56384 total=23134786 max=16926
+PERF: stage=37 count=3524 total=1815360 max=11010
+PERF: stage=38 count=3524 total=2193696 max=4090
+PERF: stage=39 count=3524 total=237538766 max=269792
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=66
+PERF: hist ms<=24 count=3423
+PERF: hist ms<=32 count=1
+PERF: hist ms<=40 count=39
+PERF: hist ms<=48 count=20
+PERF: hist ms<=56 count=2
+PERF: hist ms<=80 count=1
+PERF: hist ms<=96 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=496 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3559
+PERF: === level=blackhole ===
+PERF: hunk level_used=11280 startup_used=0 avail=8377328 total=8388608
+PERF: stage=0 count=3474 total=25820847344 max=3278448056
+PERF: stage=1 count=3439 total=15800749378 max=382317062
+PERF: stage=2 count=3439 total=13609173996 max=342619784
+PERF: stage=3 count=3439 total=8637718412 max=4477412
+PERF: stage=4 count=3439 total=2076432308 max=9369036
+PERF: stage=5 count=3439 total=4742073294 max=280082380
+PERF: stage=6 count=3439 total=398348 max=8744
+PERF: stage=7 count=6878 total=187211148 max=48013210
+PERF: stage=8 count=6878 total=452458288 max=15890068
+PERF: stage=9 count=6878 total=1593911888 max=67029330
+PERF: stage=10 count=6878 total=1933360622 max=67745964
+PERF: stage=11 count=3439 total=645570906 max=5718584
+PERF: stage=12 count=3439 total=8867676 max=23374
+PERF: stage=13 count=3439 total=2651898 max=13260
+PERF: stage=14 count=3439 total=188391986 max=258288
+PERF: stage=15 count=3439 total=2709548 max=12298
+PERF: stage=16 count=3439 total=1563816 max=14714
+PERF: stage=17 count=3439 total=1523072 max=16422
+PERF: stage=18 count=3439 total=582749538 max=8256616
+PERF: stage=19 count=3439 total=226486602 max=377310
+PERF: stage=20 count=3439 total=48070030 max=9101558
+PERF: stage=21 count=3439 total=5060048 max=14688
+PERF: stage=22 count=3439 total=5041982 max=15970
+PERF: stage=23 count=3439 total=2642798 max=3614
+PERF: stage=24 count=3439 total=314221222 max=220788
+PERF: stage=25 count=3439 total=8880640 max=20632
+PERF: stage=26 count=3439 total=1201032 max=15366
+PERF: stage=27 count=3439 total=4231274 max=15996
+PERF: stage=28 count=3439 total=600818 max=11092
+PERF: stage=29 count=3439 total=1980512 max=15458
+PERF: stage=30 count=3439 total=10942742 max=22342
+PERF: stage=31 count=3439 total=1156152 max=664
+PERF: stage=32 count=3439 total=26180960 max=24448
+PERF: stage=33 count=3439 total=111604998 max=219220
+PERF: stage=34 count=3439 total=12167332 max=342884
+PERF: stage=35 count=3439 total=148605756 max=232810
+PERF: stage=36 count=55024 total=23664460 max=16744
+PERF: stage=37 count=3439 total=1921968 max=12252
+PERF: stage=38 count=3439 total=2391024 max=16482
+PERF: stage=39 count=3439 total=5603280 max=341466
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=1
+PERF: hist ms<=16 count=90
+PERF: hist ms<=24 count=3243
+PERF: hist ms<=32 count=60
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=29
+PERF: hist ms<=56 count=2
+PERF: hist ms<=64 count=1
+PERF: hist ms<=88 count=2
+PERF: hist ms<=128 count=1
+PERF: hist ms<=656 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3474
+PERF: === level=genstation ===
+PERF: hunk level_used=12192 startup_used=0 avail=8376416 total=8388608
+PERF: stage=0 count=3530 total=26541324728 max=3435367362
+PERF: stage=1 count=3495 total=16048120212 max=617707602
+PERF: stage=2 count=3495 total=13265971764 max=565995228
+PERF: stage=3 count=3495 total=5988770650 max=4487494
+PERF: stage=4 count=3495 total=2662909228 max=15831550
+PERF: stage=5 count=3495 total=7084070268 max=508785008
+PERF: stage=6 count=3495 total=432164 max=9444
+PERF: stage=7 count=6990 total=535444056 max=45022574
+PERF: stage=8 count=6990 total=1835310816 max=20428472
+PERF: stage=9 count=6990 total=2360864068 max=179218814
+PERF: stage=10 count=6990 total=1769871946 max=179405244
+PERF: stage=11 count=3495 total=472841716 max=4810448
+PERF: stage=12 count=3495 total=27836620 max=4654104
+PERF: stage=13 count=3495 total=29342554 max=36546
+PERF: stage=14 count=3495 total=183031308 max=106378
+PERF: stage=15 count=3495 total=3490700 max=13172
+PERF: stage=16 count=3495 total=1420376 max=11916
+PERF: stage=17 count=3495 total=696464 max=512
+PERF: stage=18 count=3495 total=856783522 max=6207354
+PERF: stage=19 count=3495 total=270478054 max=661006
+PERF: stage=20 count=3495 total=49988120 max=9630978
+PERF: stage=21 count=3495 total=8612596 max=5717422
+PERF: stage=22 count=3495 total=5652100 max=14974
+PERF: stage=23 count=3495 total=2462830 max=14088
+PERF: stage=24 count=3495 total=691567026 max=494746
+PERF: stage=25 count=3495 total=24328006 max=5340498
+PERF: stage=26 count=3495 total=3078910 max=17014
+PERF: stage=27 count=3495 total=6980010 max=15564
+PERF: stage=28 count=3495 total=609134 max=11196
+PERF: stage=29 count=3495 total=1243646 max=12704
+PERF: stage=30 count=3495 total=9458866 max=26378
+PERF: stage=31 count=3495 total=1143076 max=15856
+PERF: stage=32 count=3495 total=19411436 max=26974
+PERF: stage=33 count=3495 total=152974662 max=238366
+PERF: stage=34 count=3495 total=11336930 max=614506
+PERF: stage=35 count=3495 total=199197232 max=256474
+PERF: stage=36 count=55920 total=25048908 max=174578
+PERF: stage=37 count=3495 total=1830758 max=4692
+PERF: stage=38 count=3495 total=2222390 max=16366
+PERF: stage=39 count=3495 total=5429636 max=612594
+PERF: stage=40 count=2 total=53144 max=28280
+PERF: hist ms<=16 count=64
+PERF: hist ms<=24 count=3370
+PERF: hist ms<=32 count=22
+PERF: hist ms<=40 count=40
+PERF: hist ms<=48 count=25
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=2
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3530
+PERF: === level=fishy ===
+PERF: hunk level_used=20568 startup_used=0 avail=8368040 total=8388608
+PERF: stage=0 count=3514 total=29511872872 max=2218548456
+PERF: stage=1 count=3479 total=15953537560 max=489444150
+PERF: stage=2 count=3479 total=7549486752 max=436527422
+PERF: stage=3 count=3479 total=3196327688 max=4472452
+PERF: stage=4 count=3479 total=8287740840 max=11802012
+PERF: stage=5 count=3479 total=4193884570 max=372825588
+PERF: stage=6 count=3479 total=436006 max=12686
+PERF: stage=7 count=6958 total=408872398 max=51475950
+PERF: stage=8 count=6958 total=1413318484 max=15513660
+PERF: stage=9 count=6958 total=1094739884 max=118030870
+PERF: stage=10 count=6958 total=690214658 max=106618092
+PERF: stage=11 count=3479 total=1264409024 max=576558
+PERF: stage=12 count=3479 total=81903654 max=9764478
+PERF: stage=13 count=3479 total=111406196 max=303436
+PERF: stage=14 count=3479 total=255655118 max=261176
+PERF: stage=15 count=3479 total=2219662 max=9082
+PERF: stage=16 count=3479 total=25938952 max=184720
+PERF: stage=17 count=3479 total=2518824 max=9562
+PERF: stage=18 count=3479 total=823048448 max=1236874
+PERF: stage=19 count=3479 total=4380473316 max=1492138
+PERF: stage=20 count=3479 total=43847934 max=8997632
+PERF: stage=21 count=3479 total=15827014 max=15254
+PERF: stage=22 count=3479 total=21967148 max=19786
+PERF: stage=23 count=3479 total=2322728 max=9818
+PERF: stage=24 count=3479 total=1200980628 max=5159284
+PERF: stage=25 count=3479 total=19878188 max=17066
+PERF: stage=26 count=3479 total=9248650 max=11920
+PERF: stage=27 count=3479 total=5651852 max=10142
+PERF: stage=28 count=3479 total=538796 max=418
+PERF: stage=29 count=3479 total=918456 max=8056
+PERF: stage=30 count=3479 total=6239990 max=10668
+PERF: stage=31 count=3479 total=814008 max=2626
+PERF: stage=32 count=3479 total=20428320 max=25710
+PERF: stage=33 count=3479 total=149038768 max=231616
+PERF: stage=34 count=3479 total=4136218300 max=1414058
+PERF: stage=35 count=3479 total=185024798 max=249438
+PERF: stage=36 count=55664 total=23317378 max=176238
+PERF: stage=37 count=3479 total=1882172 max=4546
+PERF: stage=38 count=3479 total=2176086 max=12224
+PERF: stage=39 count=3479 total=4130242614 max=1412416
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=16 count=21
+PERF: hist ms<=24 count=3383
+PERF: hist ms<=32 count=33
+PERF: hist ms<=40 count=48
+PERF: hist ms<=48 count=17
+PERF: hist ms<=56 count=3
+PERF: hist ms<=64 count=1
+PERF: hist ms<=80 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=1032 count=5
+PERF: frames=3514
+PERF: dump begin
+PERF: stage=0 count=3564 total=25894716812 max=3242029338
+PERF: stage=1 count=3528 total=15961263618 max=472546656
+PERF: stage=2 count=3528 total=14796236870 max=432326754
+PERF: stage=3 count=3528 total=11495682602 max=4297982
+PERF: stage=4 count=3528 total=1049228006 max=9361110
+PERF: stage=5 count=3528 total=3148130538 max=367858840
+PERF: stage=6 count=3528 total=391616 max=194
+PERF: stage=7 count=7056 total=189042766 max=46637752
+PERF: stage=8 count=7056 total=851352656 max=16187828
+PERF: stage=9 count=7056 total=764321604 max=118794348
+PERF: stage=10 count=7056 total=763613020 max=106899392
+PERF: stage=11 count=3528 total=28636872 max=22840
+PERF: stage=12 count=3528 total=13593842 max=19170
+PERF: stage=13 count=3528 total=3789292 max=20452
+PERF: stage=14 count=3528 total=64539100 max=210074
+PERF: stage=15 count=3528 total=4322636 max=14368
+PERF: stage=16 count=3528 total=1155776 max=13588
+PERF: stage=17 count=3528 total=593718 max=452
+PERF: stage=18 count=3528 total=496934470 max=334028
+PERF: stage=19 count=3528 total=317975406 max=288320
+PERF: stage=20 count=3528 total=53279418 max=9205182
+PERF: stage=21 count=3528 total=3164220 max=18100
+PERF: stage=22 count=3528 total=7342656 max=15202
+PERF: stage=23 count=3528 total=2415798 max=12856
+PERF: stage=24 count=3528 total=15495758 max=178118
+PERF: stage=25 count=3528 total=3660698 max=14976
+PERF: stage=26 count=3528 total=1611762 max=12876
+PERF: stage=27 count=3528 total=7698204 max=16822
+PERF: stage=28 count=3528 total=559556 max=426
+PERF: stage=29 count=3528 total=1374192 max=13558
+PERF: stage=30 count=3528 total=8282290 max=15896
+PERF: stage=31 count=3528 total=925954 max=11540
+PERF: stage=32 count=3528 total=21113008 max=20330
+PERF: stage=33 count=3528 total=40818120 max=27016
+PERF: stage=34 count=3528 total=178612078 max=94348
+PERF: stage=35 count=3528 total=78163716 max=42164
+PERF: stage=36 count=56448 total=24340698 max=174162
+PERF: stage=37 count=3528 total=2146398 max=10356
+PERF: stage=38 count=3528 total=2187416 max=1312
+PERF: stage=39 count=3528 total=172586856 max=92158
+PERF: stage=40 count=0 total=0 max=0
+PERF: hist ms<=8 count=10
+PERF: hist ms<=16 count=50
+PERF: hist ms<=24 count=3434
+PERF: hist ms<=40 count=37
+PERF: hist ms<=48 count=23
+PERF: hist ms<=56 count=2
+PERF: hist ms<=72 count=1
+PERF: hist ms<=88 count=1
+PERF: hist ms<=120 count=1
+PERF: hist ms<=704 count=1
+PERF: hist ms<=1032 count=4
+PERF: frames=3564
+PERF: dump end
