@@ -13,7 +13,8 @@ from collections import defaultdict
 STAGES = ["frame","maingame","render","fsbegin","mROUT","cam","fsend","vis","bg",
           "opaque","trans","enemies","spotfx","bgobj","models","polys","rtlights","water",
           "bullets","ships","fires","pickups","xlights","afterbrn","fmpoly","conditions","triggers",
-          "regen","restart","time","multiples","goals","shipmode","shipcollide"]
+          "regen","restart","time","multiples","goals","shipmode","shipcollide",
+          "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode"]
 TICK = 268111840.0
 
 def load(path):
@@ -56,14 +57,15 @@ def main():
         fm = frame_ms(d)
         r = {s: perframe(d, s) for s in STAGES}
         out.append((r["mROUT"], lvl, 1000 / fm if fm else 0, r))
-    hdr = (f"{'level':<13}{'fps':>5}{'mROUT':>6}{'ships':>6}{'shipmd':>7}{'shpcoll':>8}"
-           f"{'enem':>6}{'bull':>6}{'regen':>6}{'rstart':>7}{'mult':>6}{'goals':>6}"
-           f"{'spotfx':>7}{'bobj':>6}{'model':>6}{'cam':>6}{'bg':>6}{'trans':>6}")
+    hdr = (f"{'level':<13}{'fps':>5}{'mROUT':>6}{'ships':>6}{'shpre':>6}{'shdmg':>6}"
+           f"{'shnode':>7}{'shpost':>7}{'shmodl':>7}{'shcam':>6}{'shpcoll':>8}"
+           f"{'enem':>6}{'bull':>6}{'spotfx':>7}{'bobj':>6}{'model':>6}{'cam':>6}{'bg':>6}{'trans':>6}")
     lines = [hdr]
     for mr, lvl, fps, r in sorted(out, reverse=True):
-        lines.append(f"{lvl:<13}{fps:>5.1f}{r['mROUT']:>6.1f}{r['ships']:>6.1f}{r['shipmode']:>7.1f}"
-                     f"{r['shipcollide']:>8.1f}{r['enemies']:>6.1f}{r['bullets']:>6.1f}"
-                     f"{r['regen']:>6.1f}{r['restart']:>7.1f}{r['multiples']:>6.1f}{r['goals']:>6.1f}"
+        lines.append(f"{lvl:<13}{fps:>5.1f}{r['mROUT']:>6.1f}{r['ships']:>6.1f}{r['shippre']:>6.1f}"
+                     f"{r['shipdmg']:>6.1f}{r['shipnode']:>7.1f}"
+                     f"{r['shippost']:>7.1f}{r['shipmodel']:>7.1f}{r['shipcam']:>6.1f}{r['shipcollide']:>8.1f}"
+                     f"{r['enemies']:>6.1f}{r['bullets']:>6.1f}"
                      f"{r['spotfx']:>7.1f}{r['bgobj']:>6.1f}{r['models']:>6.1f}"
                      f"{r['cam']:>6.1f}{r['bg']:>6.1f}{r['trans']:>6.1f}")
     txt = "\n".join(lines)

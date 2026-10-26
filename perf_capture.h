@@ -58,6 +58,12 @@ enum perf_stage {
 	PERF_S_GOALS,       /* MainRoutines: ProcessGoals */
 	PERF_S_SHIPMODE,    /* ProcessShips: ModeControl dispatch per ship */
 	PERF_S_SHIPCOLLIDE, /* ProcessShips: ship/enemy/background collide block */
+	PERF_S_SHIPPRE,     /* ProcessShips: per-ship head (nearest-node, damage fx) */
+	PERF_S_SHIPPOST,    /* ProcessShips: per-ship tail (area checks, goals, CTF) */
+	PERF_S_SHIPMODEL,   /* ProcessShips: UpdateShipModel per ship */
+	PERF_S_SHIPCAM,     /* ProcessShips: Process_Remote_Camera + listener */
+	PERF_S_SHIPDMG,     /* ProcessShips: DoDamagedEffects per ship */
+	PERF_S_SHIPNODE,    /* ProcessShips: nearest-node find/update per ship */
 	PERF_S_MAX
 };
 
