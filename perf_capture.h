@@ -51,6 +51,13 @@ enum perf_stage {
 	PERF_S_FMPOLY,      /* MainRoutines: FmPolyProcess */
 	PERF_S_CONDITIONS,  /* MainRoutines: ProcessActiveConditions */
 	PERF_S_TRIGGERS,    /* MainRoutines: ProcessTriggerAreas */
+	PERF_S_REGEN,       /* MainRoutines: RegeneratePickups */
+	PERF_S_RESTART,     /* MainRoutines: ProcessRestartPoints */
+	PERF_S_TIME,        /* MainRoutines: CheckTimeLimit + countdown digits */
+	PERF_S_MULTIPLES,   /* MainRoutines: ShowScreenMultiples */
+	PERF_S_GOALS,       /* MainRoutines: ProcessGoals */
+	PERF_S_SHIPMODE,    /* ProcessShips: ModeControl dispatch per ship */
+	PERF_S_SHIPCOLLIDE, /* ProcessShips: ship/enemy/background collide block */
 	PERF_S_MAX
 };
 

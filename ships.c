@@ -37,6 +37,7 @@
 #include "local.h"
 #include "util.h"
 #include "timer.h"
+#include "perf_capture.h"
 
 //#undef MULTI_RAY_COLLISION
 //#define MULTI_RAY_SLIDE
@@ -930,7 +931,9 @@ bool ProcessShips()
 					ShipObjPnt->Mode = WATCH_MODE; 
 		
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+				perf_stage_begin(PERF_S_SHIPMODE);
 				( * ModeControl[ ShipObjPnt->Mode ] )( ShipPnt , i );		//go off and do his thing...
+				perf_stage_end(PERF_S_SHIPMODE, -1);
 
 				if( (i==MAX_PLAYERS) || (ShipObjPnt->Mode != DEATH_MODE && ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != GAMEOVER_MODE) )
 				{
@@ -1038,6 +1041,7 @@ bool ProcessShips()
 					Move_Off.y += ShipObjPnt->ExternalForce.y * framelag;
 					Move_Off.z += ShipObjPnt->ExternalForce.z * framelag;
 
+					perf_stage_begin(PERF_S_SHIPCOLLIDE);
 					Object2Object = false;
 					if( (i != MAX_PLAYERS) && (ShipObjPnt->Mode != LIMBO_MODE) )
 					{
@@ -1152,6 +1156,7 @@ bool ProcessShips()
 						ShipObjPnt->Pos.y += Move_Off.y;
 						ShipObjPnt->Pos.z += Move_Off.z;
 					}
+					perf_stage_end(PERF_S_SHIPCOLLIDE, -1);
 
 					ExtForce.x = 0.0F;
 					ExtForce.y = 0.0F;

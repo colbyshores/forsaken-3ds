@@ -4581,14 +4581,18 @@ void MainRoutines( void )
   ProcessPrimaryBullets();
   ProcessSecondaryBullets();
   perf_stage_end(PERF_S_BULLETS, -1);
+  perf_stage_begin(PERF_S_REGEN);
   if( !PlayDemo ) RegeneratePickups();
+  perf_stage_end(PERF_S_REGEN, -1);
   perf_stage_begin(PERF_S_PICKUPS);
   ProcessPickups();
   perf_stage_end(PERF_S_PICKUPS, -1);
   perf_stage_begin(PERF_S_BGOBJ);
   ProcessBGObjects( true );
   perf_stage_end(PERF_S_BGOBJ, -1);
+  perf_stage_begin(PERF_S_RESTART);
   ProcessRestartPoints();
+  perf_stage_end(PERF_S_RESTART, -1);
   perf_stage_begin(PERF_S_MODELS);
   ProcessModels();
   perf_stage_end(PERF_S_MODELS, -1);
@@ -4604,17 +4608,23 @@ void MainRoutines( void )
   perf_stage_begin(PERF_S_FMPOLY);
   FmPolyProcess();
   perf_stage_end(PERF_S_FMPOLY, -1);
+  perf_stage_begin(PERF_S_TIME);
   CheckTimeLimit();
   if( CountDownOn ) UpdateCountdownDigits();
+  perf_stage_end(PERF_S_TIME, -1);
+  perf_stage_begin(PERF_S_MULTIPLES);
 	if(!CurrentMenu)
 	  ShowScreenMultiples();
+  perf_stage_end(PERF_S_MULTIPLES, -1);
   perf_stage_begin(PERF_S_CONDITIONS);
   ProcessActiveConditions();
   perf_stage_end(PERF_S_CONDITIONS, -1);
   perf_stage_begin(PERF_S_TRIGGERS);
   ProcessTriggerAreas();
   perf_stage_end(PERF_S_TRIGGERS, -1);
+  perf_stage_begin(PERF_S_GOALS);
   ProcessGoals();
+  perf_stage_end(PERF_S_GOALS, -1);
 #ifdef DOESNT_WORK_AND_A_BAD_IDEA_ANYWAY
   if ( outside_map && !DebugInfo && ( Ships[WhoIAm].Object.Mode != DEATH_MODE ) && ( Ships[WhoIAm].Object.Mode != LIMBO_MODE ) )
   {
