@@ -72,6 +72,9 @@ enum perf_stage {
 	PERF_S_OPQLINES,    /* opaque loop: ExecuteLines */
 	PERF_S_OPQMODEL,    /* opaque loop: ModelDisp */
 	PERF_S_OPQPOLYS,    /* opaque loop: DisplaySolidGroupClippedPolys */
+	PERF_S_MDLINTERP,   /* ModelDisp: InterpFrames (per-vertex morph) */
+	PERF_S_MDLLIGHT,    /* ModelDisp: per-model lighting (XLight/Ambient/Update) */
+	PERF_S_MDLEXEC,     /* ModelDisp: ExecuteMxaloadHeader (submission; count=models drawn) */
 	PERF_S_MAX
 };
 

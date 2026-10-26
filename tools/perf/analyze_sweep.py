@@ -15,7 +15,8 @@ STAGES = ["frame","maingame","render","fsbegin","mROUT","cam","fsend","vis","bg"
           "bullets","ships","fires","pickups","xlights","afterbrn","fmpoly","conditions","triggers",
           "regen","restart","time","multiples","goals","shipmode","shipcollide",
           "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode","losnode",
-          "bullprim","bullsec","opqtex","opqclip","opqlines","opqmodel","opqpolys"]
+          "bullprim","bullsec","opqtex","opqclip","opqlines","opqmodel","opqpolys",
+          "mdlinterp","mdllight","mdlexec"]
 TICK = 268111840.0
 
 def load(path):
@@ -52,6 +53,10 @@ def main():
         ts = sum(t for _, t, _ in d["frame"])
         mx = max(mx for _, _, mx in d["frame"])
         return (ts - mx) / (fcs - 1) / TICK * 1000 if fcs > 1 else 0
+    def mdl_per_frame(d):
+        fcs = sum(c for c, _, _ in d["frame"])
+        cand = sum(c for c, _, _ in d.get("mdlexec", [(0, 0, 0)]))
+        return cand / fcs if fcs else 0
     out = []
     for lvl, d in agg.items():
         if not all(s in d for s in STAGES): continue
@@ -61,7 +66,8 @@ def main():
     hdr = (f"{'level':<13}{'fps':>5}{'mROUT':>6}{'ships':>6}{'shpre':>6}{'shdmg':>6}"
            f"{'shnode':>7}{'shpost':>7}{'shmodl':>7}{'shcam':>6}{'shpcoll':>8}"
            f"{'enem':>6}{'bull':>6}{'spotfx':>7}{'bobj':>6}{'model':>6}{'cam':>6}{'bg':>6}{'trans':>6}"
-           f"{'bprim':>6}{'bsec':>6}{'oqtex':>6}{'oqclip':>7}{'oqlin':>6}{'oqmdl':>6}{'oqpol':>6}")
+           f"{'bprim':>6}{'bsec':>6}{'oqtex':>6}{'oqclip':>7}{'oqlin':>6}{'oqmdl':>6}{'oqpol':>6}"
+           f"{'mdlint':>7}{'mdllight':>9}{'mdlexec':>8}{'mdl/frame':>10}")
     lines = [hdr]
     for mr, lvl, fps, r in sorted(out, reverse=True):
         lines.append(f"{lvl:<13}{fps:>5.1f}{r['mROUT']:>6.1f}{r['ships']:>6.1f}{r['shippre']:>6.1f}"
@@ -71,7 +77,8 @@ def main():
                      f"{r['spotfx']:>7.1f}{r['bgobj']:>6.1f}{r['models']:>6.1f}"
                      f"{r['cam']:>6.1f}{r['bg']:>6.1f}{r['trans']:>6.1f}"
                      f"{r['bullprim']:>6.1f}{r['bullsec']:>6.1f}{r['opqtex']:>6.1f}{r['opqclip']:>7.1f}"
-                     f"{r['opqlines']:>6.1f}{r['opqmodel']:>6.1f}{r['opqpolys']:>6.1f}")
+                     f"{r['opqlines']:>6.1f}{r['opqmodel']:>6.1f}{r['opqpolys']:>6.1f}"
+                     f"{r['mdlinterp']:>7.1f}{r['mdllight']:>9.1f}{r['mdlexec']:>8.1f}{mdl_per_frame(d):>10.1f}")
     txt = "\n".join(lines)
     if len(sys.argv) > 2: open(sys.argv[2], "w").write(txt + "\n")
     print(txt)

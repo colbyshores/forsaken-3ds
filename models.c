@@ -32,6 +32,7 @@
 #include "local.h"
 #include "util.h"
 #include "oct2.h"
+#include "perf_capture.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -1472,19 +1473,23 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 						{
 							if( ( Models[i].Flags & MODFLAG_StealthOffset ) && ( Models[i].Flags & MODFLAG_Stealth ) )
 							{
+								perf_stage_begin(PERF_S_MDLINTERP);
 								if( !InterpFrames( &MxaModelHeaders[ ModelNum + Models[i].StealthOffset ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-								{
+								{ perf_stage_end(PERF_S_MDLINTERP, -1);
 									Msg( "ModelDisp() InterpFrames() Failed\n" );
 									return false;
 								}
+								perf_stage_end(PERF_S_MDLINTERP, -1);
 							}
 							else
 							{
+								perf_stage_begin(PERF_S_MDLINTERP);
 								if( !InterpFrames( &MxaModelHeaders[ ModelNum ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-								{
+								{ perf_stage_end(PERF_S_MDLINTERP, -1);
 									Msg( "ModelDisp() InterpFrames() Failed\n" );
 									return false;
 								}
+								perf_stage_end(PERF_S_MDLINTERP, -1);
 							}
 
 							x1.x = 0.0F;
@@ -1500,6 +1505,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
 
 
+							perf_stage_begin(PERF_S_MDLLIGHT);
 							if( Models[i].Flags & MODFLAG_AmbientLight )
 							{
 								GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
@@ -1535,6 +1541,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							{
 								UpdateMxaModel( &MxaModelHeaders[ ModelNum ] );
 							}
+							perf_stage_end(PERF_S_MDLLIGHT, -1);
 
 							//DebugPrintf("display = '%d', mip number = '%d', name = '%s'\n",
 							//	DoDisplay, ModelNum, (char*)&ModelNames[ Models[i].ModelNum ].Name[ 0 ]);
@@ -1552,17 +1559,20 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 									    Models[i].OwnerType != OWNER_BGOBJECT);
 								}
 #endif
-								if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
-								{
+							perf_stage_begin(PERF_S_MDLEXEC);
+							if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
+							{
 #ifdef RENDERER_C3D
-									{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
+								{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
 #endif
-									Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
+								perf_stage_end(PERF_S_MDLEXEC, -1);
+								Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
 #ifdef NEW_LIGHTING
-									render_reset_lighting_variables();
+								render_reset_lighting_variables();
 #endif
-									return false;
-								}
+								return false;
+							}
+							perf_stage_end(PERF_S_MDLEXEC, -1);
 #ifdef RENDERER_C3D
 								{ extern void c3d_set_object_shine_eligible(bool); c3d_set_object_shine_eligible(true); }
 #endif
