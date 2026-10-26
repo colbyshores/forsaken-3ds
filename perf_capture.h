@@ -64,6 +64,14 @@ enum perf_stage {
 	PERF_S_SHIPCAM,     /* ProcessShips: Process_Remote_Camera + listener */
 	PERF_S_SHIPDMG,     /* ProcessShips: DoDamagedEffects per ship */
 	PERF_S_SHIPNODE,    /* ProcessShips: nearest-node find/update per ship */
+	PERF_S_LOSNODE,     /* UpdateNearestNodeSpecial: AI_ClearLOS rays (count=rays) */
+	PERF_S_BULLPRIM,    /* MainRoutines: ProcessPrimaryBullets */
+	PERF_S_BULLSEC,     /* MainRoutines: ProcessSecondaryBullets */
+	PERF_S_OPQTEX,      /* opaque loop: BackGroundTextureAnimation */
+	PERF_S_OPQCLIP,     /* opaque loop: ClipGroup calls */
+	PERF_S_OPQLINES,    /* opaque loop: ExecuteLines */
+	PERF_S_OPQMODEL,    /* opaque loop: ModelDisp */
+	PERF_S_OPQPOLYS,    /* opaque loop: DisplaySolidGroupClippedPolys */
 	PERF_S_MAX
 };
 
@@ -103,7 +111,15 @@ static inline int perf_guarded_i(int stage, int r)
 bool MainGame(void);
 bool MainGameRender(void);
 
-static inline bool perf_guarded(int stage, bool r) { (void)stage; return r; }
+/* Macros (not functions) so the PERF_S_* enum arguments are never named
+ * in builds where the enum does not exist. */
+#define perf_guarded(s, r)      (r)
+#define perf_guarded_i(s, r)    (r)
+
+/* no-op stage gates: call sites in oct2.c/ships.c/node.c use these
+ * unconditionally, so the !PERF_CAPTURE build must accept them too. */
+#define perf_stage_begin(s)     ((void)0)
+#define perf_stage_end(s, e)    ((void)0)
 
 #define PERF_MAINGAME()         MainGame()
 #define PERF_MAINGAME_RENDER()  MainGameRender()

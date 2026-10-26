@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# .githooks/pre-merge-commit
+# Blocks a merge into master on a hard FAIL from the reverse-engineered-code /
+# port review gate. Thin shim — real logic lives in the tracked script below.
+# Skip with: git merge --no-verify  (or  GATE_SKIP=1 git merge ...)
+
+set -euo pipefail
+REPO_ROOT="$(git rev-parse --show-toplevel)"

@@ -28,6 +28,8 @@ RENDERER ?= citro3d
 EDITION ?= original
 # PERF_CAPTURE=1 adds in-memory frame/stage counters + teardown trace dump (hardware capture only)
 PERF_CFLAGS := $(if $(PERF_CAPTURE),-DPERF_CAPTURE,)
+# FIDELITY_DUMP=1 adds per-tick gameplay-state checksums to sdmc:/forsaken_fidelity.txt (A/B fidelity proof, harness builds only)
+FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -98,6 +100,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-ffunction-sections -fdata-sections -fcommon \
 	-fno-math-errno \
 	$(PERF_CFLAGS) \
+	$(FIDELITY_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
 	-DBSP \

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# .githooks/post-commit
+# Zero-cost advisory nudge for the vault "documentation flywheel" — never
+# blocks, never calls an agent, never touches the network. Pure bash keyword
+# heuristic over the commit message: if this commit looks like it contains a
+# durable RE/port finding, print a one-line reminder to check it into the vault.
+#
+# A false positive here costs nothing; a false negative just means no reminder.
+
+set -euo pipefail
+
+MSG="$(git log -1 --pretty=%B 2>/dev/null || true)"
+[[ -z "$MSG" ]] && exit 0
+
+# Case-insensitive match for finding-shaped language.
+if echo "$MSG" | grep -qiE \
+  'root[- ]cause|gotcha|misrecover|mis-recover|bit-pattern|off-by-one|silently (swallow|fail|drop)|race condition|invariant|workaround|mismatch|wrong (offset|type|address)|endian|byteswap|infinite loop|use-after-free|found (a )?(bug|crash)|reverse-engineer|non[- ]matching|decompiled|desync|ghidra|alignment|unaligned|data abort|vldr|ldrd|citro3d|pica200?|ubsan|kex'
+then
+  cat >&2 <<'EOF'
+[vault reminder] This commit message reads like it may contain a durable
+reverse-engineering / port finding. If it generalizes beyond this one fix,
+consider writing it to the Obsidian vault (10-projects/forsaken/findings/, or
+30-architecture/patterns/ if it applies beyond this project) — see the
+(This is a reminder only, not a gate — nothing is blocked.)
+EOF
+fi
+
+exit 0

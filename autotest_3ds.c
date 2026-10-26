@@ -27,6 +27,7 @@
 #include "main.h"
 #include "title.h"
 #include "perf_capture.h"
+#include "fidelity.h"
 
 extern void trace(const char *msg);
 extern int  NumLevels;
@@ -193,7 +194,17 @@ void autotest_tick(void)
 	 * off to STATUS_ViewingStats, so don't double-arm. */
 	if (s_advancing) return;
 
+#ifdef FIDELITY_DUMP
+	/* Fidelity builds pin framelag; dwell is measured in simulation
+	 * ticks so every run executes the identical tick sequence per level. */
+	#ifndef FIDELITY_TICKS_PER_LEVEL
+	#define FIDELITY_TICKS_PER_LEVEL 4000
+	#endif
+	extern unsigned long fidelity_level_ticks(void);
+	if (fidelity_level_ticks() < (unsigned long)FIDELITY_TICKS_PER_LEVEL) return;
+#else
 	if ((osGetTime() - s_level_enter_time_ms) < AUTOTEST_MS_PER_LEVEL) return;
+#endif
 
 	/* Time's up — advance. */
 #if AUTOTEST_USE_BAD_LIST
@@ -245,6 +256,7 @@ void autotest_tick(void)
 	/* profiling branch: flush this level's perf row, then reset so the
 	 * next level starts from zero. No-op unless PERF_CAPTURE is set. */
 	PERF_LEVEL_MARKER(&ShortLevelNames[LevelNum][0]);
+	fidelity_level(&ShortLevelNames[LevelNum][0]);
 
 #if AUTOTEST_MODE == AUTOTEST_MODE_NATURAL
 	/* NATURAL MODE

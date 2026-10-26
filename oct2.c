@@ -71,6 +71,7 @@
 #include "shadows.h"
 #endif
 #include "perf_capture.h"
+#include "fidelity.h"
 
 void SetCam(int ship, int Cam);
 
@@ -4578,8 +4579,12 @@ void MainRoutines( void )
   ProcessSpotFX();
   perf_stage_end(PERF_S_SPOTFX, -1);
   perf_stage_begin(PERF_S_BULLETS);
+  perf_stage_begin(PERF_S_BULLPRIM);
   ProcessPrimaryBullets();
+  perf_stage_end(PERF_S_BULLPRIM, -1);
+  perf_stage_begin(PERF_S_BULLSEC);
   ProcessSecondaryBullets();
+  perf_stage_end(PERF_S_BULLSEC, -1);
   perf_stage_end(PERF_S_BULLETS, -1);
   perf_stage_begin(PERF_S_REGEN);
   if( !PlayDemo ) RegeneratePickups();
@@ -5382,6 +5387,7 @@ bool MainGame( void ) // bjd
   perf_stage_begin(PERF_S_MROUT);
   MainRoutines();
   perf_stage_end(PERF_S_MROUT, -1);
+  fidelity_tick();
 #ifdef __3DS__
   _3ds_mr_ctx = "post-MainRoutines";
 #endif
@@ -6111,7 +6117,9 @@ bool RenderCurrentCamera( void )
 #endif
 
     // Do the Background animation for that group.....
+    perf_stage_begin(PERF_S_OPQTEX);
     BackGroundTextureAnimation( &Mloadheader , group );
+    perf_stage_end(PERF_S_OPQTEX, -1);
 
 #ifdef __3DS__
     /* Per-group sub-stage trace. Fires only on the FIRST few iterations
@@ -6126,21 +6134,31 @@ bool RenderCurrentCamera( void )
     _RC_SUBSTAGE("post-BackGroundTextureAnimation");
 
 #ifdef CLIP_LINES
+    perf_stage_begin(PERF_S_OPQCLIP);
     ClipGroup( &CurrentCamera, group );
 #else
+    perf_stage_begin(PERF_S_OPQCLIP);
     ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
 #endif
+    perf_stage_end(PERF_S_OPQCLIP, -1);
     _RC_SUBSTAGE("post-ClipGroup-1");
 
+    perf_stage_begin(PERF_S_OPQLINES);
 	ExecuteLines( group, &RenderBufs[ 0 ] );
+    perf_stage_end(PERF_S_OPQLINES, -1);
     _RC_SUBSTAGE("post-ExecuteLines");
-
+    perf_stage_begin(PERF_S_OPQCLIP);
     ClipGroup( &CurrentCamera, group );
+    perf_stage_end(PERF_S_OPQCLIP, -1);
     _RC_SUBSTAGE("post-ClipGroup-2");
 
     _RC_SUBSTAGE("calling ModelDisp");
+      perf_stage_begin(PERF_S_OPQMODEL);
       if( !ModelDisp( group, /*lpDev,*/ &ModelNames[0] ) ) // bjd
+      { perf_stage_end(PERF_S_OPQMODEL, -1);
         return false;
+      }
+      perf_stage_end(PERF_S_OPQMODEL, -1);
     _RC_SUBSTAGE("post-ModelDisp");
 
 /*===================================================================
@@ -6148,8 +6166,12 @@ bool RenderCurrentCamera( void )
 ===================================================================*/
 
     _RC_SUBSTAGE("calling DisplaySolidGroupClippedPolys");
+  perf_stage_begin(PERF_S_OPQPOLYS);
   if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
+  { perf_stage_end(PERF_S_OPQPOLYS, -1);
     return false;
+  }
+  perf_stage_end(PERF_S_OPQPOLYS, -1);
     _RC_SUBSTAGE("post-DisplaySolidGroupClippedPolys");
 #ifdef SHADOWTEST
   if( !DisplaySolidGroupClippedTriangles( RenderBufs[ 1 ], group, lpDev, lpView ) )
@@ -6606,6 +6628,15 @@ void CalculateFramelag( void )
 	}
 
   framelag = real_framelag * 71.0F;
+
+#ifdef FIDELITY_DUMP
+  /* Determinism pin: the fidelity harness requires the simulation to
+   * advance by an identical step every tick so per-tick state hashes are
+   * reproducible across runs (wall-clock framelag makes the trajectory
+   * timing-dependent). 1.0F = one 71 Hz step per frame. */
+  real_framelag = 1.0F / 71.0F;
+  framelag = 1.0F;
+#endif
 
   // debugging
   //if (TimeWorst == 0.0 || seconds > TimeWorst) TimeWorst = seconds;

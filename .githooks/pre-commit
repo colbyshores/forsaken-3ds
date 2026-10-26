@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# .githooks/pre-commit
+# Fallback trigger for the reverse-engineered-code review gate, covering a
+# gap pre-merge-commit has by design: git only invokes pre-merge-commit when
+# a merge completes WITHOUT needing manual conflict resolution ("invoked
+# after the merge has been carried out successfully" -- git's own wording).
+# When a merge into master/main conflicts (routine for an append-only log
+# like docs/FINDINGS.md, where two branches add a new section at the same
+# spot), resolving it by hand and finishing with a plain `git commit` never
+# re-invokes pre-merge-commit -- but it DOES invoke pre-commit, and
+# MERGE_HEAD is already written to disk by that point (that is how git
+# itself knows to create a two-parent commit). This hook catches exactly
+# that gap by delegating to the identical review script.
+#
+# Confirmed empirically in a disposable sandbox repo (2026-07-15, same
+# technique as the review-gate's other hook bugs): without this hook, a
+# conflicting merge into master finishes via plain `git commit` and no gate
+# log ever appears -- the review silently never runs. With this hook
+# installed, the same conflict scenario produces a new gate log and a real
+# verdict, and two regression checks confirmed no unwanted side effects:
+# a trivial non-merge commit on master takes ~9ms (hook exits immediately,
+# no subprocess), and a clean (non-conflicting) merge still runs the gate
+# exactly once via pre-merge-commit -- pre-commit does not double-run it,
+# because git does not invoke pre-commit for a merge commit git-merge makes
+# on its own; pre-commit only fires when a human/script finishes the commit
+# by hand after a conflict.
+#
+# Regular, non-merge commits (no MERGE_HEAD on disk) skip straight through
+# below -- zero cost, no gate, no subprocess.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+MERGE_HEAD_FILE="$(git -C "$REPO_ROOT" rev-parse --git-path MERGE_HEAD)"
+
+# Not finishing a merge -> not our concern.
+[[ -f "$MERGE_HEAD_FILE" ]] || exit 0
+
+echo "[pre-commit] finishing a manually-resolved merge -- pre-merge-commit" >&2
+echo "[pre-commit] does not fire for this case (git only runs it on clean," >&2
+echo "[pre-commit] non-conflicting merges), so running the reverse-pr review" >&2
+echo "[pre-commit] gate here instead, as a fallback trigger." >&2
+
