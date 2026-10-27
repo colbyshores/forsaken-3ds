@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# focused_pipeline.sh OUT STAGE — wait for a focused (single-level) perf run
-# to finish, fetch forsaken_perf.txt, and verify freshness by requiring the
-# given stage id to appear (a stale file from an earlier build lacks it).
+# focused_pipeline.sh OUT STAGE [BASE_MD5] — wait for a focused perf run to
+# finish and fetch forsaken_perf.txt. Optional BASE_MD5 rejects a prior-run
+# artifact that remained on the SD because the new build failed before dump.
 set -u
 IP=192.168.4.52
 OUT=$1
 STAGE=$2
+BASE_MD5=${3:-}
 T0=$(date +%s)
 TIMEOUT=900
 
@@ -31,6 +32,10 @@ for i in $(seq 1 20); do
 	md=$(md5sum "$OUT" | cut -d' ' -f1)
 	tail_ok=$(tail -1 "$OUT" | grep -c '^PERF: dump end$')
 	fresh=$(grep -c "stage=$STAGE " "$OUT")
+	if [ -n "$BASE_MD5" ] && [ "$md" = "$BASE_MD5" ]; then
+		say "FRESHNESS FAILURE: artifact md5 matches the preceding capture ($md)"
+		exit 2
+	fi
 	if [ -n "$prev" ] && [ "$md" = "$prev" ] && [ "$tail_ok" = 1 ] && [ "$fresh" -gt 0 ]; then
 		say "FOCUSED RUN OK md5=$md fresh_stage=$STAGE"
 		exit 0
