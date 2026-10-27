@@ -5179,6 +5179,21 @@ bool MainGameRender(void)
 				}
 				_MGR_STAGE("post-RenderCurrentCameraWithMainGameMenu");
 	  	}
+
+#ifdef FRAME_INTERP_PROBE
+      /* Temporal-interpolation feasibility probe (docs/validation/
+       * perf-2026-10-27-temporal-interp-feasibility.md): a second render
+       * traversal with *unchanged* state measures the floor cost of any
+       * CPU-side in-between pass. Draws the identical frame (last
+       * submission wins); flag-gated, never shipped. */
+      if( !render_info.stereo_enabled )
+      {
+				perf_stage_begin(PERF_S_INTERPPROBE);
+				if( perf_guarded(PERF_S_INTERPPROBE, RenderCurrentCameraWithMainGameMenu() != true) )
+					return false;
+				perf_stage_end(PERF_S_INTERPPROBE, -1);
+      }
+#endif
   
 #ifdef __3DS__
       /* [3DS] Rear camera disabled on 3DS.

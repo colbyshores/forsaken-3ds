@@ -34,6 +34,9 @@ FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
 NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
 # FIDELITY_CHECKPOINTS=1 adds per-tick-interval hash checkpoints to the fidelity file (divergence localization)
 FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
+# FRAME_INTERP_PROBE=1 renders each frame twice (identical state) to measure the
+# floor cost of a CPU in-between pass — temporal-interpolation feasibility only.
+INTERP_CFLAGS := $(if $(FRAME_INTERP_PROBE),-DFRAME_INTERP_PROBE,)
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -108,6 +111,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(PERF_CFLAGS) \
 	$(FIDELITY_CFLAGS) \
 	$(FIDCK_CFLAGS) \
+	$(INTERP_CFLAGS) \
 	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
