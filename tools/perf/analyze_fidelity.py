@@ -27,10 +27,17 @@ FIDC_RE = re.compile(r"^FIDC: tick=(\d+) hash=([0-9a-f]{8})"
 
 
 def load(path):
+    """Parse a fidelity artifact.
+
+    File layout: a level's FIDC checkpoints are written DURING the level and
+    its 'FID:' line at the level's END, so checkpoints precede the FID line
+    they belong to. Parse with a pending bucket: FIDC lines accumulate, and
+    the next FID line claims the bucket.
+    """
     levels = {}
     order = []
     checks = []
-    cur = None
+    pending = []
     with open(path, "r", encoding="utf-8", errors="replace") as fh:
         for line in fh:
             m = FID_RE.match(line)
@@ -38,8 +45,8 @@ def load(path):
                 name, ticks, h = m.group(1), int(m.group(2)), m.group(3)
                 levels[name] = (ticks, h)
                 order.append(name)
-                cur = name
-                checks.append((name, None))
+                checks.append((name, list(pending)))
+                pending = []
                 continue
             m = FIDC_RE.match(line)
             if m:
@@ -49,7 +56,7 @@ def load(path):
                                  ("prim", 5), ("sec", 6)):
                     if m.group(idx):
                         comps[key] = m.group(idx)
-                checks.append((cur, tick, comps))
+                pending.append((tick, comps))
     return levels, order, checks
 
 
@@ -79,12 +86,12 @@ def main():
         print("\n  %s: hash differs (A=%s B=%s, ticks %d/%d)"
               % (name, ha, hb, ta, tb))
         # first divergent checkpoint + components
-        seq_a = [x for x in ca if x[0] == name and x[1] is not None]
-        seq_b = [x for x in cb if x[0] == name and x[1] is not None]
+        seq_a = dict(p for x in ca if x[0] == name for p in x[1])
+        seq_b = dict(p for x in cb if x[0] == name for p in x[1])
         first = None
-        for xa, xb in zip(seq_a, seq_b):
-            if xa[1] != xb[1]:
-                first = (xa, xb)
+        for tick in sorted(set(seq_a) | set(seq_b)):
+            if seq_a.get(tick) != seq_b.get(tick):
+                first = tick
                 break
         if first is None:
             if not seq_a or not seq_b:
@@ -94,20 +101,22 @@ def main():
                 print("    checkpoints agree up to the shorter run's end"
                       " (divergence is at level end or mid-tick)")
             continue
-        (ta_ck, ca_h), (tb_ck, cb_h) = first
-        print("    first divergent checkpoint: tick %d (B tick %d)" % (ta_ck, tb_ck))
+        ca_h, cb_h = seq_a.get(first, {}), seq_b.get(first, {})
+        print("    first divergent checkpoint: tick %d" % first)
         print("      A hash=%s  B hash=%s" % (ca_h.get("hash"), cb_h.get("hash")))
+        # components only when BOTH sides record them (old-format runs have
+        # hash only; a missing component on one side is not a divergence)
         comps = [k for k in ("ship", "enem", "prim", "sec")
-                 if k in ca_h and ca_h.get(k) != cb_h.get(k)]
+                 if k in ca_h and k in cb_h and ca_h[k] != cb_h[k]]
         if comps:
             print("      diverging components at that tick: %s" % ", ".join(comps))
             for k in comps:
-                print("        %s: A=%s B=%s" % (k, ca_h.get(k), cb_h.get(k)))
-        elif "ship" in ca_h:
-            print("      component digests agree at that tick -- divergence is"
+                print("        %s: A=%s B=%s" % (k, ca_h[k], cb_h[k]))
+        elif "ship" in ca_h and "ship" in cb_h:
+            print("      component digests agree at that tick-- divergence is"
                   " inside the global hash's fold order (tick counter?)")
         else:
-            print("      (old-format checkpoints: no component digests recorded)")
+            print("      (component digests not recorded on both sides)")
 
     if identical:
         print("\n  VERDICT: IDENTICAL -- byte-for-byte per-level state.")
