@@ -30,7 +30,7 @@ for i in $(seq 1 40); do
 	curl -s --max-time 30 "http://$IP:8080/forsaken_perf.txt" -o "$OUT" || { sleep 5; continue; }
 	md=$(md5sum "$OUT" | cut -d' ' -f1)
 	tail_ok=$(tail -1 "$OUT" | grep -c '^PERF: dump end$')
-	fresh=$(grep -c 'stage=50 ' "$OUT")
+	fresh=$(grep -c 'stage=52 ' "$OUT")
 	if [ -n "$prev" ] && [ "$md" = "$prev" ] && [ "$tail_ok" = 1 ] && [ "$fresh" -gt 0 ]; then
 		say "ARTIFACT VERIFIED md5=$md lines=$(wc -l < "$OUT") wave4_rows=$fresh"
 		break

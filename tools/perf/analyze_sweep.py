@@ -16,7 +16,7 @@ STAGES = ["frame","maingame","render","fsbegin","mROUT","cam","fsend","vis","bg"
           "regen","restart","time","multiples","goals","shipmode","shipcollide",
           "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode","losnode",
           "bullprim","bullsec","opqtex","opqclip","opqlines","opqmodel","opqpolys",
-          "mdlinterp","mdllight","mdlexec"]
+          "mdlinterp","mdllight","mdlexec","mdlentry","mdlwrap"]
 TICK = 268111840.0
 
 def load(path):
@@ -67,7 +67,7 @@ def main():
            f"{'shnode':>7}{'shpost':>7}{'shmodl':>7}{'shcam':>6}{'shpcoll':>8}"
            f"{'enem':>6}{'bull':>6}{'spotfx':>7}{'bobj':>6}{'model':>6}{'cam':>6}{'bg':>6}{'trans':>6}"
            f"{'bprim':>6}{'bsec':>6}{'oqtex':>6}{'oqclip':>7}{'oqlin':>6}{'oqmdl':>6}{'oqpol':>6}"
-           f"{'mdlint':>7}{'mdllight':>9}{'mdlexec':>8}{'mdl/frame':>10}")
+           f"{'mdlint':>7}{'mdllight':>9}{'mdlexec':>8}{'mdl/frame':>10}{'entry':>7}{'mdlwrap':>8}")
     lines = [hdr]
     for mr, lvl, fps, r in sorted(out, reverse=True):
         lines.append(f"{lvl:<13}{fps:>5.1f}{r['mROUT']:>6.1f}{r['ships']:>6.1f}{r['shippre']:>6.1f}"
@@ -78,7 +78,8 @@ def main():
                      f"{r['cam']:>6.1f}{r['bg']:>6.1f}{r['trans']:>6.1f}"
                      f"{r['bullprim']:>6.1f}{r['bullsec']:>6.1f}{r['opqtex']:>6.1f}{r['opqclip']:>7.1f}"
                      f"{r['opqlines']:>6.1f}{r['opqmodel']:>6.1f}{r['opqpolys']:>6.1f}"
-                     f"{r['mdlinterp']:>7.1f}{r['mdllight']:>9.1f}{r['mdlexec']:>8.1f}{mdl_per_frame(d):>10.1f}")
+                      f"{r['mdlinterp']:>7.1f}{r['mdllight']:>9.1f}{r['mdlexec']:>8.1f}{mdl_per_frame(d):>10.1f}"
+                      f"{r['mdlentry']:>7.1f}{r['mdlwrap']:>8.1f}")
     txt = "\n".join(lines)
     if len(sys.argv) > 2: open(sys.argv[2], "w").write(txt + "\n")
     print(txt)

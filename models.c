@@ -1248,6 +1248,8 @@ void KillAttachedSpotFX( u_int16_t i )
 
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
+	perf_stage_begin(PERF_S_MDLWRAP);
+	perf_stage_begin(PERF_S_OPQMODEL);
 	RENDERMATRIX TempWorld;
 	u_int16_t	i;
 	u_int16_t	nextmodel;
@@ -1268,6 +1270,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 	i =  FirstModelUsed;
 	while( i != (u_int16_t) -1 )
 	{
+		perf_stage_begin(PERF_S_MDLENTRY);
 		nextmodel = Models[i].Prev;
 
 		if( Models[ i ].Visible )
@@ -1404,6 +1407,8 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 					if (!FSSetWorld(&TempWorld))
 					{
+						perf_stage_end(PERF_S_MDLWRAP, -1);
+						perf_stage_end(PERF_S_OPQMODEL, -1);
 						Msg( "ModelDisp() SetMatrix1 Failed\n" );
 						return false;
 					}
@@ -1669,6 +1674,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 		}
 
 		/*	go on to the next	*/
+		perf_stage_end(PERF_S_MDLENTRY, -1);
 		i = nextmodel;
 	}
 
@@ -1676,9 +1682,13 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if (!FSSetWorld(&identity))
 	{
+		perf_stage_end(PERF_S_OPQMODEL, -1);
+		perf_stage_end(PERF_S_MDLWRAP, -1);
 		Msg( "ModelDisp() SetMatrix2 Failed\n" );
 		return false;
 	}
+	perf_stage_end(PERF_S_OPQMODEL, -1);
+	perf_stage_end(PERF_S_MDLWRAP, -1);
 	return true;
 }
 
