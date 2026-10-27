@@ -75,3 +75,22 @@ powerdown ModelDisp 6.1 ms/frame, fishy shipnode 4.4 ms) are engine-design
 or ported-math territory under AGENTS.md §5/§9 — out of scope for
 autonomous optimization without fidelity review that the current harness
 cannot yet provide.
+
+## 5. Operational findings (device + harness)
+
+- **Direct-boot crash on mid-list slots.** Focused runs that boot directly
+  into slot 8 (powerdown) or slot 10 (starship) die within ~40 s of boot —
+  before any level marker — while direct boot into slot 28 (fishy) and full
+  sweeps from slot 0 run fine, including those same levels mid-sweep. The
+  wave-7 powerdown split therefore moved to a full sweep. This is a real
+  engine bug in the direct-boot path (autotest booting straight into a
+  mid-list level), independent of the perf program; unfixed, documented.
+- **`sdmc:/forsaken_perf.txt` is append-only** (`O_APPEND`, perf_capture_3ds.c:
+  110) — artifacts accumulate across runs, so any analysis must take the last
+  complete sweep's sections, and "stage-id present" is NOT proof of
+  freshness. The focused pipeline's baseline-md5 guard (077a54b) covers the
+  common failure; a length/section check would be stronger.
+- **Stale `/tmp`-staged binaries failed to chainload three times** while
+  fresh rebuilds of the identical flag set booted. Lesson: always rebuild
+  from the current tree immediately before pushing; do not trust binaries
+  staged hours earlier.
