@@ -69,6 +69,8 @@ PORTLIBS   := $(DEVKITPRO)/portlibs/3ds
 #---------------------------------------------------------------------------------
 
 EXCLUDE_SRC := \
+	breakpad.cpp \
+	render_d3d.cpp \
 	main_sdl.c \
 	input_sdl.c \
 	input_dinput.c \
@@ -130,6 +132,25 @@ endif
 ALL_SRC := $(notdir $(wildcard $(SRCDIR)/*.c))
 CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
 OFILES  := $(CFILES:.c=.o)
+
+# C-with-classes phase 2 (AGENTS.md 9): root-level .cpp files compile as C++
+# with the contract's language flags (-fno-exceptions -fno-rtti: the banned
+# constructs must not merely be discouraged, they must not compile). There are
+# none today; the machinery exists so the first converted module builds with
+# the same flags the audit gate expects, and so the gates' "3DS build scope"
+# claim stays true (a root-level .cpp is in scope for the gates, therefore it
+# must be in the build).
+CXXFILES := $(filter-out $(EXCLUDE_SRC),$(notdir $(wildcard $(SRCDIR)/*.cpp)))
+CXXOFILES := $(CXXFILES:.cpp=.o)
+OFILES += $(CXXOFILES)
+# Link with the C++ driver when any C++ object exists: it pulls libstdc++ and
+# the C++ startup bits the objects reference.
+ifeq ($(strip $(CXXOFILES)),)
+LINK_CC := $(CC)
+else
+LINK_CC := $(CXX)
+endif
+CXXFLAGS_ADD := -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics
 
 #
 # __3DS_DEBUG__ is the unified diagnostic gate. When defined:
@@ -479,12 +500,22 @@ endif
 
 $(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
 	@echo "Linking $(notdir $@)..."
-	$(CC) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LINK_CC) $(LDFLAGS) $^ $(LIBS) -o $@
 
 $(BUILD)/%.o: $(SRCDIR)/%.c $(STAMP)
 	@echo $(notdir $<)
 	@mkdir -p $(BUILD)
 	$(CC) -MMD -MP -MF $(BUILD)/$*.d $(CFLAGS) -c $< -o $@
+
+# C++ translation units (phase 2). Same numeric flags as C -- the contract
+# applies to both -- plus the language flags AGENTS.md 9 requires. -std=gnu99
+# and -fcommon are C-only spellings: gnu99 would override the C++ standard
+# if it came last, and -fcommon is the C default GCC already rejects in C++.
+CXX_BASE_FLAGS := $(filter-out -std=gnu99 -fcommon,$(CFLAGS))
+$(BUILD)/%.o: $(SRCDIR)/%.cpp $(STAMP)
+	@echo $(notdir $<)
+	@mkdir -p $(BUILD)
+	$(CXX) -MMD -MP -MF $(BUILD)/$*.d $(CXX_BASE_FLAGS) $(CXXFLAGS_ADD) -c $< -o $@
 
 clean:
 	@echo "Cleaning 3DS build..."

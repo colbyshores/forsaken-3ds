@@ -333,16 +333,58 @@ build).
 
 ---
 
-## 9. C with classes — PHASE 2 (deferred)
+## 9. C with classes — PHASE 2 (scaffolding live; conversion deferred)
 
-Forsaken is pure C today (`Makefile.3ds` compiles only `.c`; Lua is a
-portlib). The C++ "C with classes" language model — no virtuals, no RTTI,
-no exceptions, no project-defined templates, no `std::function`/`std::bind`,
-preallocate-in-hot-path, worker stack budgets — is **phase 2**, adopted
-after the tree is audited against this numeric contract. When C++ is
-introduced: port T2K's `audit_c_with_classes.py` into `tools/perf/` and
-enable it in `check.sh` in the same change that first compiles a `.cpp`
-into the 3DS build. Until then this section is a commitment, not a gate.
+Forsaken is C today (`Makefile.3ds` compiles `.c`; root-level `.cpp` files
+are picked up automatically and compile with the language flags below —
+`breakpad.cpp`/`render_d3d.cpp` are excluded via `EXCLUDE_SRC` per §8). The
+C++ "C with classes" language model — no virtuals, no RTTI, no exceptions,
+no project-defined templates, no `std::function`/`std::bind`,
+preallocate-in-hot-path, worker stack budgets — is **phase 2**.
+
+**Gates (live now, not on first `.cpp`):**
+
+- `python3 tools/perf/audit_c_with_classes.py` — zero-tolerance language
+  screen ported from T2K (`tools/runner/audit_c_with_classes.py`): bans
+  `virtual`, `override`, `dynamic_cast`, `typeid`, `throw`/`try`/`catch`,
+  `template`, `std::function`/`std::bind`, and the
+  `<typeinfo>`/`<exception>`/`<stdexcept>`/`<functional>` includes. Wired
+  into `check.sh` as `audit_cxx_class`. Strips comments/strings before
+  matching; hits are new code, the fix is to not write the construct —
+  there is no baseline file and never should be.
+- The numeric gates cover C++ too: `gates_vfp.py` scope is root-level
+  `.c/.h/.cpp/.hpp/.cc/.cxx/.hh` minus `EXCLUDE_SRC`. A converted module
+  cannot slip past R1–R11 by being a `.cpp`.
+- The Makefile compiles `.cpp` with the same numeric flags as `.c` plus
+  `-std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics`, and
+  links with the C++ driver when any C++ object exists. Banned constructs
+  do not merely violate the contract — they do not compile.
+
+**Conversion rules (when a module moves from C to C++):**
+
+- A conversion is a translation, not a rewrite. No reordering of float
+  comparisons, no literal retyping (never widen
+  `-fsingle-precision-constant`), no replacing pinned macros
+  (`FMOD`/`FDIV`/`fast_sinf`/`fast_floorf`), no fixed array → container in
+  a per-frame path, no allocation or exception in a hot path.
+- Every converted module ships with a fidelity A/B: build the module as C
+  and as C++, sweep both on hardware with `FIDELITY_DUMP=1`
+  (`sdmc:/forsaken_fidelity.txt`, per-tick state checksums;
+  `FIDELITY_CHECKPOINTS=1` for tick-level localization), and the checksums
+  must be byte-identical. A module that cannot pass its fidelity A/B is
+  not converted — that is the merge gate, not a review opinion.
+- No user-defined operators on float-bearing types in phase 1: arithmetic
+  and comparisons stay explicit and greppable, so the text-based numeric
+  gates keep working and the source keeps saying what it does.
+- Watch the C++-specific seams the C rules cannot see: implicit narrowing
+  in brace-init, overload resolution silently picking a different
+  overload, static-init order for globals with constructors.
+- `extern "C"` for every header that crosses the C/C++ line.
+
+What the gates still cannot see: per-frame heap growth (violated by
+correct shipped design — level/execbuf arrays grow on load) and worker
+stack discipline stay review checks. A screen that cries wolf on correct
+code is worse than none.
 
 Worker stack budget today: music thread 16 KiB (`music_3ds.c:370`), main
 stack 256 KiB (`main_3ds.c:64`). No recursion in the music thread; size
@@ -472,6 +514,15 @@ Rules:
 
 ### Changes
 
+- 2026-10-26: §9 C-with-classes moved from "commitment" to "scaffolding
+  live": T2K's `audit_c_with_classes.py` ported to `tools/perf/` and wired
+  into `check.sh` (`audit_cxx_class`); `gates_vfp.py` scope widened to the
+  C++ extensions so R1–R11 cover converted modules; `Makefile.3ds` compiles
+  root-level `.cpp` with `-std=gnu++17 -fno-exceptions -fno-rtti` and links
+  with the C++ driver when C++ objects exist; conversion rules added
+  (translation-not-rewrite, per-module fidelity A/B merge gate). Build-flag
+  stamp added to `Makefile.3ds` so `-D` changes force a full rebuild
+  (three stale-object incidents this session).
 - 2026-10-25: contract adopted from T2K's shape and re-derived for Forsaken.
   Hot corpus is a provisional static seed (no capture yet). R6 extended to
   `floorf`/`ceilf`/`fmod` (this tree's libm debt). R1 recorded as an open

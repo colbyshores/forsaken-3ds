@@ -82,10 +82,13 @@ DEFAULT_CORPUS = CONTRACTS_DIR / "hotpath_corpus.json"
 DEFAULT_LOG = RUNNER_DIR / "logs" / "vfp_audit.json"
 MAKEFILE = REPO_ROOT / "Makefile.3ds"
 
-# Forsaken is pure C and the scope is root-level only: no .cpp/.hpp/.cc/.hh and
-# no .inc fragments (T2K's renderer is split across pasted .inc files; here the
-# renderer is a single render_c3d.c).
-CXX_EXTS = {".c", ".h"}
+# Forsaken is C today, but the numeric contract (R1-R11) must cover the tree
+# when the C-with-classes phase starts: the C++ extensions are in scope from
+# now so a converted file cannot slip past R2/R3/R4/R6/R11 by being a .cpp.
+# Scope stays ROOT-LEVEL (no .inc fragments -- T2K's renderer is split across
+# pasted .inc files; here the renderer is a single render_c3d.c) and follows
+# the 3DS build via EXCLUDE_SRC.
+CXX_EXTS = {".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".hh"}
 
 INIT_NAME_RE = re.compile(
     r"(init|load|create|destroy|reset|parse|shutdown|seed)", re.IGNORECASE
