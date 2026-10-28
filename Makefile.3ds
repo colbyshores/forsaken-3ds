@@ -34,6 +34,8 @@ FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
 NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
 # FIDELITY_CHECKPOINTS=1 adds per-tick-interval hash checkpoints to the fidelity file (divergence localization)
 FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
+# MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
+VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
 # FRAME_INTERP_PROBE=1 renders each frame twice (identical state) to measure the
 # floor cost of a CPU in-between pass — temporal-interpolation feasibility only.
 INTERP_CFLAGS := $(if $(FRAME_INTERP_PROBE),-DFRAME_INTERP_PROBE,)
@@ -112,6 +114,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(FIDELITY_CFLAGS) \
 	$(FIDCK_CFLAGS) \
 	$(INTERP_CFLAGS) \
+	$(VIS_CFLAGS) \
 	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \

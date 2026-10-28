@@ -6119,6 +6119,10 @@ bool RenderCurrentCamera( void )
   perf_stage_end(PERF_S_BG, -1);
   perf_stage_begin(PERF_S_OPAQUE);
   _RC_STAGE("entering opaque-draw loop");
+  /* Fresh memo generation for this camera's visible-group walk: ModelDisp
+   * is called once per group and the per-model visibility predicate is
+   * camera-constant, so recomputing it per group is pure waste. */
+  ModelVisCache_NewFrame();
   // display clipped opaque objects
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {

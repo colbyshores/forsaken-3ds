@@ -1243,8 +1243,63 @@ void KillAttachedSpotFX( u_int16_t i )
 }
 
 /*===================================================================
-*		display all active Models...
+*		Per-camera model visibility memo (MODEL_VIS_CACHE)
+*
+*	ModelDisp is called once per visible group (measured ~11.8x/frame on
+*	powerdown, wave-7d) and each call walks the WHOLE Models[] list
+*	(~500 entries), re-testing visibility for every model: 5848 loop
+*	iterations/frame, 8.4 ms/frame. That test depends only on
+*	(Models[i].Visible, Models[i].Group, IsGroupVisible[], the camera view
+*	group, InTitle) plus the per-model ClipGroup selection, none of which
+*	changes during one camera traversal, so it is memoised per camera.
+*	The predicate result and the list walk order are unchanged, so the
+*	submission sequence - and every drawn polygon - is identical.
 ===================================================================*/
+#ifdef MODEL_VIS_CACHE
+static u_int8_t  VisCacheVis[MAXNUMOFMODELS];
+static u_int16_t VisCacheClip[MAXNUMOFMODELS];
+static u_int32_t VisCacheStamp[MAXNUMOFMODELS];
+static u_int32_t VisCacheFrame;
+static u_int8_t  VisCacheTitle;
+
+void ModelVisCache_NewFrame( void )
+{
+	VisCacheFrame++;
+}
+#endif
+
+/* True if model i may be drawn for the current camera; *clipout receives
+ * its clip group. Identical semantics with and without the memo - the flag
+ * only removes the redundant recomputation of the same answer. */
+static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * clipout )
+{
+#ifdef MODEL_VIS_CACHE
+	int vis;
+	if( VisCacheStamp[i] == VisCacheFrame && VisCacheTitle == (u_int8_t)(InTitle ? 1 : 0) )
+	{
+		*clipout = VisCacheClip[i];
+		return VisCacheVis[i];
+	}
+	vis = Models[ i ].Visible &&
+		( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
+			CAMERA_VIEW_IS_VALID &&
+			VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[ i ].Group, NULL )
+		) );
+	*clipout = ( Models[ i ].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
+	VisCacheStamp[i] = VisCacheFrame;
+	VisCacheVis[i] = (u_int8_t)( vis ? 1 : 0 );
+	VisCacheClip[i] = *clipout;
+	return vis;
+#else
+	int vis = Models[ i ].Visible &&
+		( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
+			CAMERA_VIEW_IS_VALID &&
+			VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[ i ].Group, NULL )
+		) );
+	*clipout = ( Models[ i ].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
+	return vis;
+#endif
+}
 
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
@@ -1265,6 +1320,15 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if( NamePnt == &ModelNames[0] ) InTitle = false;
 	else InTitle = true;
+#ifdef MODEL_VIS_CACHE
+	if( VisCacheTitle != (u_int8_t)(InTitle ? 1 : 0) )
+	{
+		/* Title and gameplay passes use different predicate inputs; keep
+		 * them in separate cache generations. */
+		VisCacheTitle = (u_int8_t)(InTitle ? 1 : 0);
+		VisCacheFrame++;
+	}
+#endif
 
 	i =  FirstModelUsed;
 	while( i != (u_int16_t) -1 )
@@ -1272,22 +1336,9 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 		perf_stage_begin(PERF_S_MDLENTRY);
 		nextmodel = Models[i].Prev;
 
-		if( Models[ i ].Visible )
+		if( ModelVisibleWithClip( i, InTitle, &ClipGroup ) )
 		{
-			if( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
-				CAMERA_VIEW_IS_VALID &&
-				VisibleOverlap(
-					Ships[ Current_Camera_View ].Object.Group,
-					Models[ i ].Group,
-					NULL
-				)
-			))
 			{
-				if( Models[ i ].Flags & MODFLAG_UseClipGroup ) 
-					ClipGroup = Models[i].ClipGroup;
-				else 
-					ClipGroup = Models[i].Group;
-				
 				if( ClipGroup == group )
 				{
 					perf_stage_begin(PERF_S_MDLTRANSFORM);

@@ -624,4 +624,10 @@ bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner );
 
 #endif // MODELS_INCLUDED
 
-
+#ifdef MODEL_VIS_CACHE
+/* Per-camera memo of the per-model visibility/clip-group predicate.
+ * Call once before a camera's visible-group walk. */
+void ModelVisCache_NewFrame( void );
+#else
+#define ModelVisCache_NewFrame() ((void)0)
+#endif
