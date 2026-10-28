@@ -16,7 +16,7 @@ STAGES = ["frame","maingame","render","fsbegin","mROUT","cam","fsend","vis","bg"
           "regen","restart","time","multiples","goals","shipmode","shipcollide",
           "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode","losnode",
           "bullprim","bullsec","opqtex","opqclip","opqlines","opqmodel","opqpolys",
-          "mdlinterp","mdllight","mdlexec","mdlentry","mdltransform","mdllod","mdlbounds","mdlwrap","interpprobe"]
+          "mdlinterp","mdllight","mdlexec","mdlentry","mdltransform","mdllod","mdlbounds","mdlstatic","mdlwrap","interpprobe"]
 TICK = 268111840.0
 
 def load(path):
@@ -71,7 +71,7 @@ def main():
            f"{'shnode':>7}{'shpost':>7}{'shmodl':>7}{'shcam':>6}{'shpcoll':>8}"
            f"{'enem':>6}{'bull':>6}{'spotfx':>7}{'bobj':>6}{'model':>6}{'cam':>6}{'bg':>6}{'trans':>6}"
            f"{'bprim':>6}{'bsec':>6}{'oqtex':>6}{'oqclip':>7}{'oqlin':>6}{'oqmdl':>6}{'oqpol':>6}"
-           f"{'mdlint':>7}{'mdllight':>9}{'mdlexec':>8}{'mdl/frame':>10}{'entry':>7}{'xform':>7}{'lod':>7}{'bounds':>8}{'mdlwrap':>8}{'itp2nd':>7}")
+           f"{'mdlint':>7}{'mdllight':>9}{'mdlexec':>8}{'mdl/frame':>10}{'entry':>7}{'xform':>7}{'lod':>7}{'bounds':>8}{'static':>8}{'mdlwrap':>8}{'itp2nd':>7}")
     lines = [hdr]
     for mr, lvl, fps, r in sorted(out, reverse=True):
         lines.append(f"{lvl:<13}{fps:>5.1f}{r['mROUT']:>6.1f}{r['ships']:>6.1f}{r['shippre']:>6.1f}"

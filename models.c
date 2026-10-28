@@ -1606,6 +1606,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							perf_stage_end(PERF_S_MDLBOUNDS, -1);
 #endif
 
+							perf_stage_begin(PERF_S_MDLSTATIC);
 							if( Models[i].Flags & MODFLAG_AmbientLight )
 							{
 								GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
@@ -1635,6 +1636,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 								if( !LightMxModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
 
 							}
+							perf_stage_end(PERF_S_MDLSTATIC, -1);
 
 							//DebugPrintf("display = '%d', mip number = '%d', name = '%s'\n",
 							//	DoDisplay, ModelNum, (char*)&ModelNames[ Models[i].ModelNum ].Name[ 0 ]);
