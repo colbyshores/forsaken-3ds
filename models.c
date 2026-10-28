@@ -1249,7 +1249,6 @@ void KillAttachedSpotFX( u_int16_t i )
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
 	perf_stage_begin(PERF_S_MDLWRAP);
-	perf_stage_begin(PERF_S_OPQMODEL);
 	RENDERMATRIX TempWorld;
 	u_int16_t	i;
 	u_int16_t	nextmodel;
@@ -1291,6 +1290,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 				
 				if( ClipGroup == group )
 				{
+					perf_stage_begin(PERF_S_MDLTRANSFORM);
 					switch( Models[i].Func )
 					{
 						case MODFUNC_Fade:
@@ -1407,11 +1407,12 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 					if (!FSSetWorld(&TempWorld))
 					{
+						perf_stage_end(PERF_S_MDLTRANSFORM, -1);
 						perf_stage_end(PERF_S_MDLWRAP, -1);
-						perf_stage_end(PERF_S_OPQMODEL, -1);
 						Msg( "ModelDisp() SetMatrix1 Failed\n" );
 						return false;
 					}
+					perf_stage_end(PERF_S_MDLTRANSFORM, -1);
 					
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					// TODO - BEEF UP LOD LEVEL HANDLING (read notes bellow)
@@ -1421,6 +1422,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					
 					// should probably add a switch to completely disable this...
 
+					perf_stage_begin(PERF_S_MDLLOD);
 					/*	Execute it	*/
 					temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos ); 
 		
@@ -1468,6 +1470,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					// END OF TODO
 
 					ModelNum += Models[i].ModelNum;
+					perf_stage_end(PERF_S_MDLLOD, -1);
 		
 //					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || !( Models[i].Flags & MODFLAG_Clip ) )
 					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
@@ -1502,9 +1505,11 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							x1.z = 0.0F;
 							x2 = x1;
 
+							perf_stage_begin(PERF_S_MDLBOUNDS);
 #ifndef FINAL_RELEASE
 							CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 												  &Models[i].TempLines[ 0 ], Models[i].Group );
+							perf_stage_end(PERF_S_MDLBOUNDS, -1);
 #endif
 
 							ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
@@ -1594,9 +1599,11 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							x1.z = 0.0F;
 							x2 = x1;
 
+							perf_stage_begin(PERF_S_MDLBOUNDS);
 #ifndef FINAL_RELEASE
 							CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 												 &Models[i].TempLines[ 0 ], Models[i].Group );
+							perf_stage_end(PERF_S_MDLBOUNDS, -1);
 #endif
 
 							if( Models[i].Flags & MODFLAG_AmbientLight )
@@ -1682,12 +1689,10 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if (!FSSetWorld(&identity))
 	{
-		perf_stage_end(PERF_S_OPQMODEL, -1);
 		perf_stage_end(PERF_S_MDLWRAP, -1);
 		Msg( "ModelDisp() SetMatrix2 Failed\n" );
 		return false;
 	}
-	perf_stage_end(PERF_S_OPQMODEL, -1);
 	perf_stage_end(PERF_S_MDLWRAP, -1);
 	return true;
 }

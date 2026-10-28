@@ -76,6 +76,9 @@ enum perf_stage {
 	PERF_S_MDLLIGHT,    /* ModelDisp: per-model lighting (XLight/Ambient/Update) */
 	PERF_S_MDLEXEC,     /* ModelDisp: ExecuteMxaloadHeader submission; count=morph models drawn */
 	PERF_S_MDLENTRY,    /* ModelDisp: full per-model iteration */
+	PERF_S_MDLTRANSFORM,/* ModelDisp: per-model matrix build + world upload */
+	PERF_S_MDLLOD,      /* ModelDisp: camera distance + LOD selection */
+	PERF_S_MDLBOUNDS,   /* ModelDisp: debug bounding-box generation */
 	PERF_S_MDLWRAP,     /* ModelDisp: inclusive function timer */
 	PERF_S_INTERPPROBE, /* FRAME_INTERP_PROBE: second render traversal cost */
 	PERF_S_MAX
