@@ -1262,18 +1262,9 @@ static u_int32_t VisCacheStamp[MAXNUMOFMODELS];
 static u_int32_t VisCacheFrame;
 static u_int8_t  VisCacheTitle;
 
+#endif
+
 #ifdef MODEL_BUCKET
-/* Per-group model buckets (MODEL_BUCKET).
- *
- * ModelDisp is called once per visible group and each call walks the whole
- * Models[] list just to find the models whose clip group matches: measured
- * 12 walks/frame x ~500 models = ~5900 scattered reads on powerdown,
- * 8.4 ms/frame. Build that index once per camera instead - a single
- * list-ordered pass chaining each visible model onto its clip group's
- * bucket - then ModelDisp(group) follows only its own chain. Tail-append
- * preserves list order within a group, so the submission sequence (and the
- * drawn polygons) are identical.
- */
 static u_int16_t VisBucketHead[MAXGROUPS];
 static u_int16_t VisBucketTail[MAXGROUPS];
 static u_int16_t VisBucketNext[MAXNUMOFMODELS];
@@ -1315,13 +1306,13 @@ static void ModelVisBucket_Build( int InTitle )
 	VisBucketTitle = (u_int8_t)( InTitle ? 1 : 0 );
 	VisBucketDirty = 0;
 }
-
-#define MODEL_BUCKET_REFRESH(InTitle) 	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) ) 		ModelVisBucket_Build( InTitle ); } while(0)
 #endif
 
 void ModelVisCache_NewFrame( void )
 {
+#ifdef MODEL_VIS_CACHE
 	VisCacheFrame++;
+#endif
 #ifdef MODEL_BUCKET
 	VisBucketDirty = 1;
 #endif
@@ -1329,13 +1320,19 @@ void ModelVisCache_NewFrame( void )
 
 
 
+
+
 /* Draw guard: with bucketing the model is already known to be visible and
  * already known to belong to this group; without it the predicate decides. */
 #ifdef MODEL_BUCKET
+#define MODEL_BUCKET_REFRESH(InTitle) \
+	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) ) \
+		ModelVisBucket_Build( InTitle ); } while(0)
 #define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup)  ( 1 )
 #else
-#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup) 	( ModelVisibleWithClip( (i), (InTitle), &(ClipGroup) ) && (ClipGroup) == (group) )
-#endif
+#define MODEL_BUCKET_REFRESH(InTitle) ((void)0)
+#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup) \
+	( ModelVisibleWithClip( (i), (InTitle), &(ClipGroup) ) && (ClipGroup) == (group) )
 #endif
 
 /* True if model i may be drawn for the current camera; *clipout receives

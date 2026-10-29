@@ -622,12 +622,9 @@ void KillAttachedSpotFX( u_int16_t i );
 void KillAllBikeEngines( void );
 bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner );
 
-#endif // MODELS_INCLUDED
-
-#ifdef MODEL_VIS_CACHE
-/* Per-camera memo of the per-model visibility/clip-group predicate.
- * Call once before a camera's visible-group walk. */
+/* Per-camera model-visibility memo invalidation. Defined in models.c for
+ * both build modes (no-op work when neither optimization flag is on); call
+ * once before a camera's visible-group walk. */
 void ModelVisCache_NewFrame( void );
-#else
-#define ModelVisCache_NewFrame() ((void)0)
-#endif
+
+#endif // MODELS_INCLUDED
