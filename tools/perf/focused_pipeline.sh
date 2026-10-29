@@ -8,7 +8,7 @@ OUT=$1
 STAGE=$2
 BASE_MD5=${3:-}
 T0=$(date +%s)
-TIMEOUT=2700
+TIMEOUT=5400
 
 say() { echo "[$(date -u +%H:%M:%S)] $*"; }
 
