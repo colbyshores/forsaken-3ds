@@ -1401,13 +1401,21 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 #endif
 
 #ifdef MODEL_BUCKET
-	/* Clipped to this group: walk only this group's models, already
-	 * in list order. ClipGroup is implied by the bucket. */
-	ClipGroup = group;
-	for( i = VisBucketHead[ group ]; i != (u_int16_t)-1; i = VisBucketNext[i] )
+	/* Walk only this group's models, in list order (the bucket chains are
+	 * tail-appended in Models[] list order). ClipGroup is implied. */
+	i = VisBucketHead[ group ];
+#else
+	i = FirstModelUsed;
+#endif
+	while( i != (u_int16_t)-1 )
 	{
 		perf_stage_begin(PERF_S_MDLENTRY);
+#ifdef MODEL_BUCKET
 		nextmodel = VisBucketNext[i];
+		ClipGroup = VisBucketClip[i];
+#else
+		nextmodel = Models[i].Prev;
+#endif
 
 		if( MODEL_DRAW_GUARD( i, InTitle, group, ClipGroup ) )
 		{
@@ -1808,11 +1816,8 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 		/*	go on to the next	*/
 		perf_stage_end(PERF_S_MDLENTRY, -1);
-#ifndef MODEL_BUCKET
 		i = nextmodel;
-#endif
 	}
-#endif
 
 	//DebugPrintf("drew %d objects\n", count);
 
