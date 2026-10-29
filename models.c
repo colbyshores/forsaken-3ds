@@ -1262,10 +1262,80 @@ static u_int32_t VisCacheStamp[MAXNUMOFMODELS];
 static u_int32_t VisCacheFrame;
 static u_int8_t  VisCacheTitle;
 
+#ifdef MODEL_BUCKET
+/* Per-group model buckets (MODEL_BUCKET).
+ *
+ * ModelDisp is called once per visible group and each call walks the whole
+ * Models[] list just to find the models whose clip group matches: measured
+ * 12 walks/frame x ~500 models = ~5900 scattered reads on powerdown,
+ * 8.4 ms/frame. Build that index once per camera instead - a single
+ * list-ordered pass chaining each visible model onto its clip group's
+ * bucket - then ModelDisp(group) follows only its own chain. Tail-append
+ * preserves list order within a group, so the submission sequence (and the
+ * drawn polygons) are identical.
+ */
+static u_int16_t VisBucketHead[MAXGROUPS];
+static u_int16_t VisBucketTail[MAXGROUPS];
+static u_int16_t VisBucketNext[MAXNUMOFMODELS];
+static u_int16_t VisBucketClip[MAXNUMOFMODELS];
+static u_int8_t  VisBucketTitle;
+static u_int8_t  VisBucketDirty = 1;
+
+static void ModelVisBucket_Build( int InTitle )
+{
+	int i;
+	int g;
+	for( g = 0; g < MAXGROUPS; g++ )
+	{
+		VisBucketHead[g] = (u_int16_t)-1;
+		VisBucketTail[g] = (u_int16_t)-1;
+	}
+	i = FirstModelUsed;
+	while( i != (u_int16_t)-1 )
+	{
+		u_int16_t clip;
+		int vis = Models[i].Visible &&
+			( InTitle || IsGroupVisible[ Models[i].Group ] || (
+				CAMERA_VIEW_IS_VALID &&
+				VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[i].Group, NULL )
+			) );
+		if( vis )
+		{
+			clip = ( Models[i].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
+			VisBucketClip[i] = clip;
+			VisBucketNext[i] = (u_int16_t)-1;
+			if( VisBucketHead[clip] == (u_int16_t)-1 )
+				VisBucketHead[clip] = i;
+			else
+				VisBucketNext[ VisBucketTail[clip] ] = i;
+			VisBucketTail[clip] = i;
+		}
+		i = Models[i].Prev;
+	}
+	VisBucketTitle = (u_int8_t)( InTitle ? 1 : 0 );
+	VisBucketDirty = 0;
+}
+
+#define MODEL_BUCKET_REFRESH(InTitle) 	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) ) 		ModelVisBucket_Build( InTitle ); } while(0)
+#endif
+
 void ModelVisCache_NewFrame( void )
 {
 	VisCacheFrame++;
+#ifdef MODEL_BUCKET
+	VisBucketDirty = 1;
+#endif
 }
+
+
+
+/* Draw guard: with bucketing the model is already known to be visible and
+ * already known to belong to this group; without it the predicate decides. */
+#ifdef MODEL_BUCKET
+#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup)  ( 1 )
+#else
+#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup) 	( ModelVisibleWithClip( (i), (InTitle), &(ClipGroup) ) && (ClipGroup) == (group) )
+#endif
 #endif
 
 /* True if model i may be drawn for the current camera; *clipout receives
@@ -1320,6 +1390,9 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if( NamePnt == &ModelNames[0] ) InTitle = false;
 	else InTitle = true;
+#ifdef MODEL_BUCKET
+	MODEL_BUCKET_REFRESH( InTitle );
+#endif
 #ifdef MODEL_VIS_CACHE
 	if( VisCacheTitle != (u_int8_t)(InTitle ? 1 : 0) )
 	{
@@ -1330,13 +1403,16 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 	}
 #endif
 
-	i =  FirstModelUsed;
-	while( i != (u_int16_t) -1 )
+#ifdef MODEL_BUCKET
+	/* Clipped to this group: walk only this group's models, already
+	 * in list order. ClipGroup is implied by the bucket. */
+	ClipGroup = group;
+	for( i = VisBucketHead[ group ]; i != (u_int16_t)-1; i = VisBucketNext[i] )
 	{
 		perf_stage_begin(PERF_S_MDLENTRY);
-		nextmodel = Models[i].Prev;
+		nextmodel = VisBucketNext[i];
 
-		if( ModelVisibleWithClip( i, InTitle, &ClipGroup ) )
+		if( MODEL_DRAW_GUARD( i, InTitle, group, ClipGroup ) )
 		{
 			{
 				if( ClipGroup == group )
@@ -1735,8 +1811,11 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 		/*	go on to the next	*/
 		perf_stage_end(PERF_S_MDLENTRY, -1);
+#ifndef MODEL_BUCKET
 		i = nextmodel;
+#endif
 	}
+#endif
 
 	//DebugPrintf("drew %d objects\n", count);
 
