@@ -641,9 +641,14 @@ static bool AppInit( char * lpCmdLine )
 //
 
 extern bool RenderScene( void );
-
+#ifdef FRAME_INTERP_EXTRA_PRESENT
+#include "interp.h"
+#endif
 static bool RenderLoop()
 {
+#ifdef FRAME_INTERP_EXTRA_PRESENT
+    interp_present_window_tick();
+#endif
     if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
 		return true;
 
@@ -661,6 +666,9 @@ static bool RenderLoop()
 	}
 
     // Blt or flip the back buffer to the front buffer
+#ifdef FRAME_INTERP_EXTRA_PRESENT
+	if( !interp_pending() )
+#endif
 	if( !QuitRequested )
 	{
 #ifdef DEMO_SUPPORT
@@ -668,10 +676,20 @@ static bool RenderLoop()
 #endif
 		{
 			// this is the actual call to render a frame...
-			if (!render_flip(&render_info))
+#ifdef FRAME_INTERP_EXTRA_PRESENT
+			if (interp_consume_outer_present_skip())
 			{
-				Msg("RenderLoop: render_flip() failed\n");
-				return false;
+				interp_present_current();
+				interp_present();
+			}
+			else
+#endif
+			{
+				if (!render_flip(&render_info))
+				{
+					Msg("RenderLoop: render_flip() failed\n");
+					return false;
+				}
 			}
 		}
 	}
