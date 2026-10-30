@@ -1302,6 +1302,11 @@ static void ModelVisBucket_Build( int InTitle )
 		if( vis )
 		{
 			clip = ( Models[i].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
+			if( clip >= MAXGROUPS )
+			{
+				i = Models[i].Prev;
+				continue;
+			}
 			VisBucketClip[i] = clip;
 			VisBucketNext[i] = (u_int16_t)-1;
 			if( VisBucketHead[clip] == (u_int16_t)-1 )
