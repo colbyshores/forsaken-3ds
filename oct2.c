@@ -5023,6 +5023,11 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		extern int  Print4x5Text(char *Text, int x, int y, int color);
 		char fps_buf[24];
 		snprintf(fps_buf, sizeof(fps_buf), "FPS:%d", forsaken_get_fps());
+#ifdef FRAME_INTERP_EXTRA_PRESENT
+		extern int interp_present_fps(void);
+		char present_buf[24];
+		snprintf(present_buf, sizeof(present_buf), "P:%d", interp_present_fps());
+#endif
 		ScrPolySetRouteBottom(true);
 		/* Bottom screen is 320×240. Clock sits at y = 240 - 30 = 210
 		 * (DrawSimplePanel) but the actual character glyphs render
@@ -5030,6 +5035,9 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		 * so y=200 had the FPS overlap with the clock. y=190 leaves
 		 * a clean ~10px gap between FPS row and clock row. */
 		Print4x5Text(fps_buf, 6, 190, 1 /* white */);
+#ifdef FRAME_INTERP_EXTRA_PRESENT
+		Print4x5Text(present_buf, 6, 180, 1 /* white */);
+#endif
 		ScrPolySetRouteBottom(false);
 	}
 
@@ -5211,11 +5219,15 @@ bool MainGameRender(void)
 				perf_stage_begin(PERF_S_INTERPONLY);
 				_interp_ok = ( RenderCurrentCameraWithMainGameMenu() == true );
 				perf_stage_end(PERF_S_INTERPONLY, -1);
+#ifdef FRAME_INTERP_EXTRA_PRESENT
+				if (_interp_ok) interp_begin_extra_present();
+#endif
 				interp_restore();
 				if( !_interp_ok )
 					return false;
       }
       interp_frame_end();
+      interp_present();
       perf_stage_end(PERF_S_INTERPTOTAL, -1);
 #endif
   

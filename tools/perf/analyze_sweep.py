@@ -62,7 +62,7 @@ def main():
         # core stages must exist; diagnostic stages (probe, mdlwrap, ...) are
         # optional so older captures still analyze
         core = [s for s in STAGES if s not in
-                ("interpprobe", "mdlwrap", "mdlentry", "mdlinterp", "mdllight", "mdlexec")]
+                ("interpprobe", "interptotal", "interponly", "mdlwrap", "mdlentry", "mdlinterp", "mdllight", "mdlexec")]
         if not all(s in d for s in core): continue
         fm = frame_ms(d)
         r = {s: perframe(d, s) for s in STAGES}

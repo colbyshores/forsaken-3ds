@@ -23,8 +23,19 @@
 
 /* Call before the real camera render: snapshots the current camera. */
 void interp_frame_begin(void);
-/* Snapshot models after the true render updates their current transforms. */
+/* True when this simulation frame captured a camera eligible for an extra present. */
+int  interp_pending(void);
+/* Snapshot models after MainRoutines updates their current transforms. */
 void interp_capture_models(void);
+/* Present the pending interpolated frame and restore game transforms. */
+void interp_present_current(void);
+void interp_present(void);
+void interp_present_window_tick(void);
+int  interp_present_fps(void);
+void interp_begin_extra_present(void);
+void interp_end_extra_present(void);
+int  interp_replay_active(void);
+int  interp_consume_outer_present_skip(void);
 /* Call after the in-between render: publishes this frame as "previous". */
 void interp_frame_end(void);
 /* 1 once a previous frame exists (i.e. from the second frame onwards). */
@@ -41,6 +52,16 @@ float interp_alpha(void);
 #else
 
 #define interp_frame_begin()  ((void)0)
+#define interp_pending()      (0)
+#define interp_capture_models() ((void)0)
+#define interp_present_current() ((void)0)
+#define interp_present()       ((void)0)
+#define interp_present_window_tick() ((void)0)
+#define interp_present_fps() (0)
+#define interp_begin_extra_present() ((void)0)
+#define interp_end_extra_present() ((void)0)
+#define interp_replay_active() (0)
+#define interp_consume_outer_present_skip() (0)
 #define interp_frame_end()    ((void)0)
 #define interp_ready()        (0)
 #define interp_apply(a)       ((void)0)
