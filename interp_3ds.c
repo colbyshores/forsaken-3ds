@@ -15,9 +15,10 @@
  * the state, InvMat is Mat transposed, and Build_View() derives the view
  * matrix the render path consumes (visi.c FSSetView(&cam->View)).
  *
- * Rotation interpolation is element-wise on the 3x3 basis rather than a
- * quaternion slerp. At one-frame deltas the difference is sub-pixel; if the
- * prototype survives its measurement the slerp is the correctness follow-up.
+ * Rotation uses quaternion slerp and is re-normalized by the existing
+ * quaternion routines; element-wise basis lerp would shrink/expand the view
+ * matrix. The camera-only prototype is deliberate: it isolates the visual
+ * cadence effect and CPU cost before adding entity transforms.
  */
 #ifdef FRAME_INTERP
 
@@ -31,8 +32,11 @@
 #include "networking.h"
 #include "mload.h"
 #include "camera.h"
+#include "models.h"
 
 extern CAMERA CurrentCamera;
+extern u_int16_t FirstModelUsed;
+extern MODEL Models[MAXNUMOFMODELS];
 extern void Build_View(void);
 
 #ifndef INTERP_ALPHA
@@ -45,8 +49,17 @@ typedef struct
 	MATRIX	Mat;
 } CAMSNAP;
 
+typedef struct
+{
+	VECTOR Pos;
+	MATRIX Mat;
+	int valid;
+} MODELSNAP;
+
 static CAMSNAP	s_prev;
 static CAMSNAP	s_cur;
+static MODELSNAP s_prevModel[MAXNUMOFMODELS];
+static MODELSNAP s_curModel[MAXNUMOFMODELS];
 static int	s_have_prev;
 static int	s_applied;
 
@@ -60,6 +73,21 @@ void interp_frame_begin(void)
 	s_cur.Pos = CurrentCamera.Pos;
 	s_cur.Mat = CurrentCamera.Mat;
 	s_applied = 0;
+}
+
+void interp_capture_models(void)
+{
+	int i;
+	for (i = 0; i < MAXNUMOFMODELS; i++) s_curModel[i].valid = 0;
+	i = FirstModelUsed;
+	while (i != (u_int16_t)-1) {
+		if (Models[i].Visible) {
+			s_curModel[i].Pos = Models[i].Pos;
+			s_curModel[i].Mat = Models[i].Mat;
+			s_curModel[i].valid = 1;
+		}
+		i = Models[i].Prev;
+	}
 }
 
 int interp_ready(void)
@@ -80,6 +108,17 @@ static float lerpf(float a, float b, float t)
 	return a + (b - a) * t;
 }
 
+static void interp_rotation(MATRIX *out, const MATRIX *a, const MATRIX *b, float alpha)
+{
+	QUAT qa, qb, q;
+	MatrixToQuat(&qa, (MATRIX *)a);
+	MatrixToQuat(&qb, (MATRIX *)b);
+	QuatNormalise(&qa);
+	QuatNormalise(&qb);
+	Quaternion_Slerp(alpha, &qa, &qb, &q, 0);
+	QuatNormalise(&q);
+	QuatToMatrix(&q, out);
+}
 void interp_apply(float alpha)
 {
 	CAMSNAP m;
@@ -88,28 +127,51 @@ void interp_apply(float alpha)
 	m.Pos.y = lerpf(s_prev.Pos.y, s_cur.Pos.y, alpha);
 	m.Pos.z = lerpf(s_prev.Pos.z, s_cur.Pos.z, alpha);
 
-#define LERP_M(f) m.Mat.f = lerpf(s_prev.Mat.f, s_cur.Mat.f, alpha)
-	LERP_M(_11); LERP_M(_12); LERP_M(_13); LERP_M(_14);
-	LERP_M(_21); LERP_M(_22); LERP_M(_23); LERP_M(_24);
-	LERP_M(_31); LERP_M(_32); LERP_M(_33); LERP_M(_34);
-	LERP_M(_41); LERP_M(_42); LERP_M(_43); LERP_M(_44);
-#undef LERP_M
-
+	interp_rotation(&m.Mat, &s_prev.Mat, &s_cur.Mat, alpha);
+	m.Mat._41 = lerpf(s_prev.Mat._41, s_cur.Mat._41, alpha);
+	m.Mat._42 = lerpf(s_prev.Mat._42, s_cur.Mat._42, alpha);
+	m.Mat._43 = lerpf(s_prev.Mat._43, s_cur.Mat._43, alpha);
 	interp_set_camera(&m);
+
+	{
+		int i;
+		for (i = 0; i < MAXNUMOFMODELS; i++) {
+			if (s_prevModel[i].valid && s_curModel[i].valid) {
+				Models[i].Pos.x = lerpf(s_prevModel[i].Pos.x, s_curModel[i].Pos.x, alpha);
+				Models[i].Pos.y = lerpf(s_prevModel[i].Pos.y, s_curModel[i].Pos.y, alpha);
+				Models[i].Pos.z = lerpf(s_prevModel[i].Pos.z, s_curModel[i].Pos.z, alpha);
+				interp_rotation(&Models[i].Mat, &s_prevModel[i].Mat, &s_curModel[i].Mat, alpha);
+				Models[i].Mat._11 *= lerpf(s_prevModel[i].Mat._11, s_curModel[i].Mat._11, alpha);
+				Models[i].Mat._22 *= lerpf(s_prevModel[i].Mat._22, s_curModel[i].Mat._22, alpha);
+				Models[i].Mat._33 *= lerpf(s_prevModel[i].Mat._33, s_curModel[i].Mat._33, alpha);
+				MatrixTranspose(&Models[i].Mat, &Models[i].InvMat);
+			}
+		}
+	}
 	s_applied = 1;
 }
 
 void interp_restore(void)
 {
+	int i;
 	if (!s_applied)
 		return;
 	interp_set_camera(&s_cur);
+	for (i = 0; i < MAXNUMOFMODELS; i++) {
+		if (s_curModel[i].valid) {
+			Models[i].Pos = s_curModel[i].Pos;
+			Models[i].Mat = s_curModel[i].Mat;
+			MatrixTranspose(&Models[i].Mat, &Models[i].InvMat);
+		}
+	}
 	s_applied = 0;
 }
 
 void interp_frame_end(void)
 {
+	int i;
 	s_prev = s_cur;
+	for (i = 0; i < MAXNUMOFMODELS; i++) s_prevModel[i] = s_curModel[i];
 	s_have_prev = 1;
 }
 

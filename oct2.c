@@ -5201,9 +5201,9 @@ bool MainGameRender(void)
 #endif
 
 #ifdef FRAME_INTERP
-      /* Temporal interpolation prototype: render one extra frame at an
-       * interpolated camera between the previous and current frames. The
-       * true camera is restored afterwards; gameplay is never re-run. */
+      /* Temporal interpolation prototype: capture the post-simulation
+       * transforms, then render an in-between camera/model view. Gameplay
+       * is never re-run; true transforms are restored after the pass. */
       if( !render_info.stereo_enabled && interp_ready() )
       {
 				int _interp_ok = 1;
@@ -5431,6 +5431,9 @@ bool MainGame( void ) // bjd
   _3ds_mr_ctx = "post-MainRoutines";
 #endif
   _MG_STAGE("post-MainRoutines");
+#ifdef FRAME_INTERP
+  interp_capture_models();
+#endif
 
   if( MyGameStatus == STATUS_QuitCurrentGame )
     return true;

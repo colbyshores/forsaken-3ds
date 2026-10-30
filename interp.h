@@ -23,7 +23,9 @@
 
 /* Call before the real camera render: snapshots the current camera. */
 void interp_frame_begin(void);
-/* Call after the real render: publishes this frame's camera as "previous". */
+/* Snapshot models after the true render updates their current transforms. */
+void interp_capture_models(void);
+/* Call after the in-between render: publishes this frame as "previous". */
 void interp_frame_end(void);
 /* 1 once a previous frame exists (i.e. from the second frame onwards). */
 int  interp_ready(void);
