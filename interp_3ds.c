@@ -120,7 +120,8 @@ void interp_present_window_tick(void)
 	s_present_window_frames++;
 	if (s_present_window_ms == 0) s_present_window_ms = now;
 	if (now - s_present_window_ms >= 1000) {
-		s_present_fps = (int)s_present_window_frames;
+		s_present_fps = (int)s_present_frames;
+		s_present_frames = 0;
 		s_present_window_frames = 0;
 		s_present_window_ms = now;
 	}
@@ -245,6 +246,8 @@ void interp_present(void)
 	interp_restore();
 	if (!s_pending_present)
 		return;
+	if (!s_skip_normal_present)
+		s_present_frames++;
 	s_pending_present = 0;
 	s_skip_normal_present = 0;
 	s_replay_active = 0;

@@ -646,11 +646,11 @@ extern bool RenderScene( void );
 #endif
 static bool RenderLoop()
 {
-    if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
-		return true;
 #ifdef FRAME_INTERP_EXTRA_PRESENT
     interp_present_window_tick();
 #endif
+    if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
+		return true;
 
     // Call the sample's RenderScene to render this frame
     if (!RenderScene())
@@ -684,10 +684,12 @@ static bool RenderLoop()
 			}
 			else
 #endif
-			if (!render_flip(&render_info))
 			{
-				Msg("RenderLoop: render_flip() failed\n");
-				return false;
+				if (!render_flip(&render_info))
+				{
+					Msg("RenderLoop: render_flip() failed\n");
+					return false;
+				}
 			}
 		}
 	}
