@@ -49,3 +49,16 @@ Known assumptions to validate on a debug display path:
 `MODEL_BUCKET` remains default-off pending an in-game visual sanity run on the
 render-heavy levels. It is not a simulation-state optimization, so the current
 per-tick gameplay checksum does not prove render equivalence.
+
+## Repeat A/B validity note
+
+The first repeat pair (`ab2_runA_base.txt`/`ab2_runB_bucket.txt`) is **not a
+valid paired A/B**: the supposed baseline binary had a broken loop
+instrumentation (MDLENTRY was never called and MDLWRAP averaged 6 calls/frame
+instead of ~12), while the bucket variant ran a split loop. It produced an
+apparent improvement but cannot be used as evidence. A later corrected pair
+was rebuilt from the same unified loop:
+`perf-2026-10-30-model-bucket-baseline.log` and
+`perf-2026-10-30-model-bucket-candidate.log`. These establish the displayed
+powerdown/ramqan numbers above. Both binaries differed only by the
+`MODEL_BUCKET` flag, and the ModelDisp wrapper/loop counters reconcile.
