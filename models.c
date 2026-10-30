@@ -126,6 +126,8 @@ u_int16_t	TrackerTarget = (u_int16_t) -1;
 MODEL	Models[MAXNUMOFMODELS];
 u_int16_t	FirstModelUsed;
 u_int16_t	FirstModelFree;
+static u_int32_t ModelVisGeneration;
+
 int16_t	NextNewModel = -1;
 bool	ShowBoundingBoxes = false;
 
@@ -1065,6 +1067,7 @@ u_int16_t	FindFreeModel()
 
 	FirstModelUsed = i;
 	FirstModelFree = Models[i].Next;
+	ModelVisGeneration++;
 
 #ifdef DEBUG_ON
 	CheckModelLinkList();
@@ -1117,6 +1120,7 @@ void	KillUsedModel( u_int16_t i )
 	Models[i].LifeCount = -1.0F;
 	Models[i].Scale = 1.0F;
 	FirstModelFree	= i;
+	ModelVisGeneration++;
 
 #ifdef DEBUG_ON
 	CheckModelLinkList();
@@ -1260,6 +1264,9 @@ static u_int8_t  VisCacheVis[MAXNUMOFMODELS];
 static u_int16_t VisCacheClip[MAXNUMOFMODELS];
 static u_int32_t VisCacheStamp[MAXNUMOFMODELS];
 static u_int32_t VisCacheFrame;
+#ifdef MODEL_VIS_CACHE
+static u_int8_t VisCacheValid[MAXNUMOFMODELS];
+#endif
 static u_int8_t  VisCacheTitle;
 
 #endif
@@ -1270,7 +1277,9 @@ static u_int16_t VisBucketTail[MAXGROUPS];
 static u_int16_t VisBucketNext[MAXNUMOFMODELS];
 static u_int16_t VisBucketClip[MAXNUMOFMODELS];
 static u_int8_t  VisBucketTitle;
-static u_int8_t  VisBucketDirty = 1;
+static u_int8_t VisBucketDirty = 1;
+static u_int32_t VisBucketGeneration;
+
 
 static void ModelVisBucket_Build( int InTitle )
 {
@@ -1304,6 +1313,7 @@ static void ModelVisBucket_Build( int InTitle )
 		i = Models[i].Prev;
 	}
 	VisBucketTitle = (u_int8_t)( InTitle ? 1 : 0 );
+	VisBucketGeneration = ModelVisGeneration;
 	VisBucketDirty = 0;
 }
 #endif
@@ -1326,7 +1336,7 @@ void ModelVisCache_NewFrame( void )
  * already known to belong to this group; without it the predicate decides. */
 #ifdef MODEL_BUCKET
 #define MODEL_BUCKET_REFRESH(InTitle) \
-	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) ) \
+	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) || VisBucketGeneration != ModelVisGeneration ) \
 		ModelVisBucket_Build( InTitle ); } while(0)
 #define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup)  ( 1 )
 #else
@@ -1342,7 +1352,7 @@ static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * cl
 {
 #ifdef MODEL_VIS_CACHE
 	int vis;
-	if( VisCacheStamp[i] == VisCacheFrame && VisCacheTitle == (u_int8_t)(InTitle ? 1 : 0) )
+	if( VisCacheValid[i] && VisCacheStamp[i] == VisCacheFrame && VisCacheTitle == (u_int8_t)(InTitle ? 1 : 0) )
 	{
 		*clipout = VisCacheClip[i];
 		return VisCacheVis[i];
@@ -1356,6 +1366,7 @@ static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * cl
 	VisCacheStamp[i] = VisCacheFrame;
 	VisCacheVis[i] = (u_int8_t)( vis ? 1 : 0 );
 	VisCacheClip[i] = *clipout;
+	VisCacheValid[i] = 1;
 	return vis;
 #else
 	int vis = Models[ i ].Visible &&
