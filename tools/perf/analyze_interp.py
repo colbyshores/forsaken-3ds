@@ -40,6 +40,7 @@ def load(path):
             'inb_per_frame': probe[0] / f,
             'all_ms': st.get(58, (0, 0, 0))[1] / f / TICK * 1000.0,
             'interp_ms': st.get(59, (0, 0, 0))[1] / f / TICK * 1000.0,
+            'reported_fps': min(60.0, (1000.0 / mean_ms) * 2.0) if st.get(59, (0, 0, 0))[0] else (1000.0 / mean_ms),
         }
     return out
 
@@ -52,12 +53,12 @@ def main():
     if not cur:
         print('no complete sweep found in', sys.argv[1])
         return 1
-    hdr = f"{'level':<12}{'fps':>6}{'base':>6}{'cam_ms':>8}{'inb_ms':>8}{'inb/frame':>10}{'total_ms':>9}{'interp_ms':>10}{'allpass_ms':>12}"
+    hdr = f"{'level':<12}{'fps':>6}{'present':>8}{'base':>6}{'cam_ms':>8}{'inb_ms':>8}{'inb/frame':>10}{'total_ms':>9}{'interp_ms':>10}{'allpass_ms':>12}"
     print(hdr)
     for lvl, d in sorted(cur.items(), key=lambda kv: -kv[1]['inb_ms']):
         b = base.get(lvl, {}).get('fps')
         total = d['cam_ms'] + d['inb_ms']
-        print(f"{lvl:<12}{d['fps']:>6.1f}{(f'{b:.1f}' if b else '-'):>6}"
+        print(f"{lvl:<12}{d['fps']:>6.1f}{(f'{d['reported_fps']:.1f}' if d['reported_fps'] else '-'):>8}{(f'{b:.1f}' if b else '-'):>6}"
               f"{d['cam_ms']:>8.2f}{d['inb_ms']:>8.2f}{d['inb_per_frame']:>10.2f}{total:>9.2f}{d['interp_ms']:>10.2f}{d['all_ms']:>12.2f}")
     return 0
 
