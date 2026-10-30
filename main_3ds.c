@@ -42,7 +42,8 @@ extern bool render_init(render_info_t *info);
  *
  * In either case we don't know at compile time how much memory the OS
  * will hand us, so the heap sizes have to be picked at runtime in the
- * __system_allocateHeaps weak override below. Detection signal:
+ * __system_allocateHeaps weak override below (except an explicit
+ * OG_PROFILE/FORSAKEN_HEAP_FIXED test build). Detection signal:
  * osGetMemRegionSize(MEMREGION_APPLICATION) — the actual region the OS
  * gave us:
  *   - >= 96 MB (N3DS SystemModeExt = 124 MB, or OG HIMEM = 96 MB):
@@ -50,9 +51,8 @@ extern bool render_init(render_info_t *info);
  *   - <  96 MB (OG without HIMEM grant = 64 MB):
  *     32+22 MB heap, 256² texture pack via render_c3d.c.
  *
- * The link-time defaults below are only honored if the override is
- * disabled via -DFORSAKEN_HEAP_FIXED — used for synthetic OG-tight-budget
- * tests on N3DS hardware. */
+ * The link-time defaults below are used by FORSAKEN_HEAP_FIXED and OG_PROFILE.
+ * OG_PROFILE intentionally fixes the OG 32+22 MB split on a New3DS device. */
 #ifndef MALLOC_HEAP_MB
 #define MALLOC_HEAP_MB 32
 #endif
@@ -68,7 +68,7 @@ u32 __stacksize__           = 256 * 1024; /* override libctru's 32 KB default */
  * osGetMemRegionSize is safe to call here. Mirrors the steps in
  * libctru-2.7.0's default (svcControlMemory ×2 + mappableInit + sbrk
  * fakes); diverges only in choosing heap sizes based on region. */
-#ifndef FORSAKEN_HEAP_FIXED
+#if !defined(FORSAKEN_HEAP_FIXED) && !defined(FORSAKEN_OG_PROFILE)
 #include <3ds/os.h>
 #include <3ds/svc.h>
 #include <3ds/allocator/mappable.h>
@@ -346,11 +346,19 @@ bool platform_init(void)
 		mappableFree(probe);
 	}
 
-	/* Enable New3DS 804 MHz mode when available */
+	/* OG_PROFILE is a test instrument for N3DS hardware: leave CPU at the
+	 * Old-3DS 268 MHz / L2-off mode. Ordinary New3DS builds enable 804 MHz
+	 * + 2 MB L2 via osSetSpeedupEnable; that boost is otherwise enabled by
+	 * default for N3DS. */
 	bool is_n3ds = false;
 	APT_CheckNew3DS(&is_n3ds);
-	if (is_n3ds)
+	if (is_n3ds) {
+#ifdef FORSAKEN_OG_PROFILE
+		osSetSpeedupEnable(false);
+#else
 		osSetSpeedupEnable(true);
+#endif
+	}
 
 	/* Always-on boot_log of the platform-detection result. This lands
 	 * in sdmc:/forsaken_boot.log on every boot — lets us verify from
@@ -359,10 +367,18 @@ bool platform_init(void)
 	{
 		u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
 		const char *tier = region_size >= 96ull * 1024 * 1024 ? "HIMEM (512²)" : "LOMEM (256²)";
+#ifdef FORSAKEN_OG_PROFILE
+		tier = "OG_PROFILE (256²)";
+#endif
 		char _b[200];
 		snprintf(_b, sizeof(_b),
-		         "[platform] is_n3ds=%d region=%uMB tier=%s malloc=%uMB linear=%uMB",
+		         "[platform] is_n3ds=%d og_profile=%d clock=%s cache=%s region=%uMB tier=%s malloc=%uMB linear=%uMB",
 		         (int)is_n3ds,
+#ifdef FORSAKEN_OG_PROFILE
+		         1, "268MHz", "L2-off",
+#else
+		         0, is_n3ds ? "804MHz" : "268MHz", is_n3ds ? "L2-on" : "L2-off",
+#endif
 		         (unsigned)(region_size >> 20),
 		         tier,
 		         (unsigned)(__ctru_heap_size >> 20),

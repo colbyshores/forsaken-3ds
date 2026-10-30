@@ -2235,6 +2235,15 @@ static void resolve_hd_textures_dirs(void)
 {
 	if (s_hd_textures_dir) return;
 	u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
+#ifdef FORSAKEN_OG_PROFILE
+	if (region_size >= 64ull * 1024 * 1024) {
+		s_hd_textures_dir      = "hd_textures_lomem";
+		s_hd_textures_fallback = "hd_textures";
+	} else {
+		s_hd_textures_dir      = "hd_textures_lomem";
+		s_hd_textures_fallback = "hd_textures";
+	}
+#else
 	if (region_size >= 96ull * 1024 * 1024) {
 		s_hd_textures_dir      = "hd_textures";
 		s_hd_textures_fallback = "hd_textures_lomem";
@@ -2242,6 +2251,7 @@ static void resolve_hd_textures_dirs(void)
 		s_hd_textures_dir      = "hd_textures_lomem";
 		s_hd_textures_fallback = "hd_textures";
 	}
+#endif
 	/* Lands in sdmc:/forsaken_boot.log on every boot. Pair this with
 	 * the [platform] tier line emitted from platform_init to verify
 	 * from the host which texture pack a given install is using. */

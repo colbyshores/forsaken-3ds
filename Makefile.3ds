@@ -44,6 +44,9 @@ INTERPFRAME_CFLAGS := $(if $(FRAME_INTERP),-DFRAME_INTERP,)
 FORCEMONO_CFLAGS := $(if $(FRAME_INTERP_FORCE_MONO),-DFRAME_INTERP_FORCE_MONO,)
 # FRAME_INTERP_EXTRA_PRESENT=1 enables a true extra display transfer between simulation frames (experimental pacing)
 INTERPPRESENT_CFLAGS := $(if $(FRAME_INTERP_EXTRA_PRESENT),-DFRAME_INTERP_EXTRA_PRESENT,)
+# OG_PROFILE=1 uses exact N3DS 268MHz/L2-off CPU mode plus OG-shaped heap and texture tiers.
+# RAM is approximated; platform/scheduler/GPU behavior remain New 3DS.
+OGPROFILE_CFLAGS := $(if $(OG_PROFILE),-DFORSAKEN_OG_PROFILE -DFORSAKEN_HEAP_FIXED,)
 # FRAME_INTERP_PROBE=1 renders each frame twice (identical state) to measure the
 # floor cost of a CPU in-between pass — temporal-interpolation feasibility only.
 INTERP_CFLAGS := $(if $(FRAME_INTERP_PROBE),-DFRAME_INTERP_PROBE,)
@@ -125,6 +128,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(INTERPFRAME_CFLAGS) \
 	$(FORCEMONO_CFLAGS) \
 	$(INTERPPRESENT_CFLAGS) \
+	$(OGPROFILE_CFLAGS) \
 	$(VIS_CFLAGS) \
 	$(BUCKET_CFLAGS) \
 	$(NODESQ_CFLAGS) \
@@ -223,11 +227,19 @@ ifeq ($(AUTOTEST_REMASTER),1)
 CFLAGS += -DAUTOTEST_REMASTER -D__3DS_DEBUG__
 endif
 
-# OG_SIM=1 tightens the heap budget to 30+30 MB (60 MB total), simulating
-# real OG-CIA HIMEM more pessimistically than the default 32+32 = 64 MB
-# (which already matches OG-CIA HIMEM with 1 MB margin). If a build runs
-# cleanly with OG_SIM=1 on N3DS hardware, OG-CIA install is bulletproof.
-# Custom overrides: MALLOC_HEAP_MB=N LINEAR_HEAP_MB=N
+# OG_PROFILE=1 is a development proxy for an Old-3DS profile on N3DS.
+# Skips 804MHz/L2; caps malloc/linear heaps to the observed OG-app defaults
+# (32+22 MB); selects the 256x texture pack even on a 96MB+ New region. CPU
+# clock/cache is exact; RAM capacity is approximate; GPU, scheduler, memory
+# bandwidth/latency and platform characteristics remain New 3DS. Do NOT report
+# it as a real Old-3DS result. Override heap sizes with MALLOC_HEAP_MB=N
+# LINEAR_HEAP_MB=N. OG_SIM is retained as the historical 30+30 heap-only mode.
+ifeq ($(OG_PROFILE),1)
+MALLOC_HEAP_MB ?= 32
+LINEAR_HEAP_MB ?= 22
+CFLAGS += -DFORSAKEN_OG_PROFILE -DFORSAKEN_HEAP_FIXED
+endif
+# OG_SIM=1 remains a heap-only compatibility alias (historical build usage).
 ifeq ($(OG_SIM),1)
 MALLOC_HEAP_MB ?= 30
 LINEAR_HEAP_MB ?= 30
@@ -356,7 +368,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ED=$(EDITION)|SLIM=$(SLIM)
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ED=$(EDITION)|SLIM=$(SLIM)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
