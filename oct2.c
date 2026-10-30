@@ -72,6 +72,7 @@
 #endif
 #include "perf_capture.h"
 #include "fidelity.h"
+#include "interp.h"
 
 void SetCam(int ship, int Cam);
 
@@ -5160,6 +5161,9 @@ bool MainGameRender(void)
 #endif
 #endif
 
+#ifdef FRAME_INTERP
+      interp_frame_begin();
+#endif
       _MGR_STAGE("pre-render-camera");
       if( render_info.stereo_enabled )
       {
@@ -5193,6 +5197,24 @@ bool MainGameRender(void)
 					return false;
 				perf_stage_end(PERF_S_INTERPPROBE, -1);
       }
+#endif
+
+#ifdef FRAME_INTERP
+      /* Temporal interpolation prototype: render one extra frame at an
+       * interpolated camera between the previous and current frames. The
+       * true camera is restored afterwards; gameplay is never re-run. */
+      if( !render_info.stereo_enabled && interp_ready() )
+      {
+				int _interp_ok = 1;
+				interp_apply( interp_alpha() );
+				perf_stage_begin(PERF_S_INTERPPROBE);
+				_interp_ok = ( RenderCurrentCameraWithMainGameMenu() == true );
+				perf_stage_end(PERF_S_INTERPPROBE, -1);
+				interp_restore();
+				if( !_interp_ok )
+					return false;
+      }
+      interp_frame_end();
 #endif
   
 #ifdef __3DS__

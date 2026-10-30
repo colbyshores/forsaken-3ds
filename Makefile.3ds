@@ -38,6 +38,8 @@ FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
 VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
 # MODEL_BUCKET=1 indexes models by clip group once per camera instead of re-walking the model list per group (render-path optimisation)
 BUCKET_CFLAGS := $(if $(MODEL_BUCKET),-DMODEL_BUCKET,)
+# FRAME_INTERP=1 renders an extra frame at an interpolated camera between the previous and current frames (temporal interpolation prototype)
+INTERPFRAME_CFLAGS := $(if $(FRAME_INTERP),-DFRAME_INTERP,)
 # FRAME_INTERP_PROBE=1 renders each frame twice (identical state) to measure the
 # floor cost of a CPU in-between pass — temporal-interpolation feasibility only.
 INTERP_CFLAGS := $(if $(FRAME_INTERP_PROBE),-DFRAME_INTERP_PROBE,)
@@ -116,6 +118,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(FIDELITY_CFLAGS) \
 	$(FIDCK_CFLAGS) \
 	$(INTERP_CFLAGS) \
+	$(INTERPFRAME_CFLAGS) \
 	$(VIS_CFLAGS) \
 	$(BUCKET_CFLAGS) \
 	$(NODESQ_CFLAGS) \
@@ -347,7 +350,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|ITP=$(FRAME_INTERP_PROBE)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ED=$(EDITION)|SLIM=$(SLIM)
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ED=$(EDITION)|SLIM=$(SLIM)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
