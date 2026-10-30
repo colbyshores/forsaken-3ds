@@ -113,4 +113,10 @@ void interp_frame_end(void)
 	s_have_prev = 1;
 }
 
+void interp_reset(void)
+{
+	s_have_prev = 0;
+	s_applied = 0;
+}
+
 #endif

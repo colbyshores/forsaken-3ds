@@ -580,6 +580,13 @@ float platform_get_3d_slider(void)
 	 * which may return 0 from osGet3DSliderState).
 	 * Set   stereo_test_slider = 0.5   in Configs/debug.txt.
 	 * A negative value means "use the real hardware slider". */
+#ifdef FRAME_INTERP_FORCE_MONO
+	/* Measurement-only override for the temporal-interpolation prototype:
+	 * the in-between pass is defined for a single eye, and stereo would
+	 * multiply both the traversal and the extra pass by two. Never set in
+	 * a shipping build. */
+	return 0.0f;
+#else
 	float override = config_get_float("stereo_test_slider", -1.0f);
 	if (override >= 0.0f)
 		return override > 1.0f ? 1.0f : override;
@@ -587,6 +594,7 @@ float platform_get_3d_slider(void)
 	if (v < 0.0f) v = 0.0f;
 	if (v > 1.0f) v = 1.0f;
 	return v;
+#endif
 #endif
 }
 

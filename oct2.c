@@ -5163,6 +5163,7 @@ bool MainGameRender(void)
 
 #ifdef FRAME_INTERP
       interp_frame_begin();
+      perf_stage_begin(PERF_S_INTERPTOTAL);
 #endif
       _MGR_STAGE("pre-render-camera");
       if( render_info.stereo_enabled )
@@ -5207,14 +5208,15 @@ bool MainGameRender(void)
       {
 				int _interp_ok = 1;
 				interp_apply( interp_alpha() );
-				perf_stage_begin(PERF_S_INTERPPROBE);
+				perf_stage_begin(PERF_S_INTERPONLY);
 				_interp_ok = ( RenderCurrentCameraWithMainGameMenu() == true );
-				perf_stage_end(PERF_S_INTERPPROBE, -1);
+				perf_stage_end(PERF_S_INTERPONLY, -1);
 				interp_restore();
 				if( !_interp_ok )
 					return false;
       }
       interp_frame_end();
+      perf_stage_end(PERF_S_INTERPTOTAL, -1);
 #endif
   
 #ifdef __3DS__

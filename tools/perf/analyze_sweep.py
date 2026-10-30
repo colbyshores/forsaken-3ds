@@ -16,7 +16,7 @@ STAGES = ["frame","maingame","render","fsbegin","mROUT","cam","fsend","vis","bg"
           "regen","restart","time","multiples","goals","shipmode","shipcollide",
           "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode","losnode",
           "bullprim","bullsec","opqtex","opqclip","opqlines","opqmodel","opqpolys",
-          "mdlinterp","mdllight","mdlexec","mdlentry","mdltransform","mdllod","mdlbounds","mdlstatic","mdlwrap","interpprobe"]
+          "mdlinterp","mdllight","mdlexec","mdlentry","mdltransform","mdllod","mdlbounds","mdlstatic","mdlwrap","interpprobe","interptotal","interponly"]
 TICK = 268111840.0
 
 def load(path):

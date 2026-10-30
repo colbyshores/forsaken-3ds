@@ -82,6 +82,8 @@ enum perf_stage {
 	PERF_S_MDLSTATIC,   /* ModelDisp: static-model lighting + ExecuteMxloadHeader */
 	PERF_S_MDLWRAP,     /* ModelDisp: inclusive function timer */
 	PERF_S_INTERPPROBE, /* FRAME_INTERP_PROBE: second render traversal cost */
+	PERF_S_INTERPTOTAL, /* FRAME_INTERP: total camera render including extra pass */
+	PERF_S_INTERPONLY,  /* FRAME_INTERP: isolated extra-pass render cost */
 	PERF_S_MAX
 };
 

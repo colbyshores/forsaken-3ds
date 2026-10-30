@@ -31,6 +31,8 @@ int  interp_ready(void);
 void interp_apply(float alpha);
 /* Restore the true (current) camera and rebuild the view. */
 void interp_restore(void);
+/* Drop temporal history on level/camera discontinuities. */
+void interp_reset(void);
 /* Configured alpha for the in-between frame (INTERP_ALPHA, default 0.5). */
 float interp_alpha(void);
 
@@ -41,6 +43,7 @@ float interp_alpha(void);
 #define interp_ready()        (0)
 #define interp_apply(a)       ((void)0)
 #define interp_restore()      ((void)0)
+#define interp_reset()        ((void)0)
 #define interp_alpha()        (0.0F)
 
 #endif
