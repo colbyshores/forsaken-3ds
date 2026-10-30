@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# focused_pipeline.sh OUT STAGE [BASE_MD5] — wait for a focused perf run to
-# finish and fetch forsaken_perf.txt. Optional BASE_MD5 rejects a prior-run
-# artifact that remained on the SD because the new build failed before dump.
+# focused_pipeline.sh OUT STAGE [BASE_MD5] — wait for an autotest perf sweep
+# to finish and fetch forsaken_perf.txt. TIMEOUT accommodates full remaster
+# sweeps (roughly 45 minutes); optional BASE_MD5 rejects stale artifacts.
 set -u
 IP=192.168.4.52
 OUT=$1
 STAGE=$2
 BASE_MD5=${3:-}
 T0=$(date +%s)
-TIMEOUT=900
+TIMEOUT=5400
 
 say() { echo "[$(date -u +%H:%M:%S)] $*"; }
 

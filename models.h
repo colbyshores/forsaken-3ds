@@ -622,6 +622,9 @@ void KillAttachedSpotFX( u_int16_t i );
 void KillAllBikeEngines( void );
 bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner );
 
+/* Per-camera model-visibility memo invalidation. Defined in models.c for
+ * both build modes (no-op work when neither optimization flag is on); call
+ * once before a camera's visible-group walk. */
+void ModelVisCache_NewFrame( void );
+
 #endif // MODELS_INCLUDED
-
-

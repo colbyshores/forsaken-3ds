@@ -126,6 +126,8 @@ u_int16_t	TrackerTarget = (u_int16_t) -1;
 MODEL	Models[MAXNUMOFMODELS];
 u_int16_t	FirstModelUsed;
 u_int16_t	FirstModelFree;
+static u_int32_t ModelVisGeneration;
+
 int16_t	NextNewModel = -1;
 bool	ShowBoundingBoxes = false;
 
@@ -1065,6 +1067,7 @@ u_int16_t	FindFreeModel()
 
 	FirstModelUsed = i;
 	FirstModelFree = Models[i].Next;
+	ModelVisGeneration++;
 
 #ifdef DEBUG_ON
 	CheckModelLinkList();
@@ -1117,6 +1120,7 @@ void	KillUsedModel( u_int16_t i )
 	Models[i].LifeCount = -1.0F;
 	Models[i].Scale = 1.0F;
 	FirstModelFree	= i;
+	ModelVisGeneration++;
 
 #ifdef DEBUG_ON
 	CheckModelLinkList();
@@ -1243,11 +1247,141 @@ void KillAttachedSpotFX( u_int16_t i )
 }
 
 /*===================================================================
-*		display all active Models...
+*		Per-camera model visibility memo (MODEL_VIS_CACHE)
+*
+*	ModelDisp is called once per visible group (measured ~11.8x/frame on
+*	powerdown, wave-7d) and each call walks the WHOLE Models[] list
+*	(~500 entries), re-testing visibility for every model: 5848 loop
+*	iterations/frame, 8.4 ms/frame. That test depends only on
+*	(Models[i].Visible, Models[i].Group, IsGroupVisible[], the camera view
+*	group, InTitle) plus the per-model ClipGroup selection, none of which
+*	changes during one camera traversal, so it is memoised per camera.
+*	The predicate result and the list walk order are unchanged, so the
+*	submission sequence - and every drawn polygon - is identical.
 ===================================================================*/
+#ifdef MODEL_VIS_CACHE
+static u_int8_t  VisCacheVis[MAXNUMOFMODELS];
+static u_int16_t VisCacheClip[MAXNUMOFMODELS];
+static u_int32_t VisCacheStamp[MAXNUMOFMODELS];
+static u_int32_t VisCacheFrame;
+#ifdef MODEL_VIS_CACHE
+static u_int8_t VisCacheValid[MAXNUMOFMODELS];
+#endif
+static u_int8_t  VisCacheTitle;
+
+#endif
+
+#ifdef MODEL_BUCKET
+static u_int16_t VisBucketHead[MAXGROUPS];
+static u_int16_t VisBucketTail[MAXGROUPS];
+static u_int16_t VisBucketNext[MAXNUMOFMODELS];
+static u_int16_t VisBucketClip[MAXNUMOFMODELS];
+static u_int8_t  VisBucketTitle;
+static u_int8_t VisBucketDirty = 1;
+static u_int32_t VisBucketGeneration;
+
+
+static void ModelVisBucket_Build( int InTitle )
+{
+	int i;
+	int g;
+	for( g = 0; g < MAXGROUPS; g++ )
+	{
+		VisBucketHead[g] = (u_int16_t)-1;
+		VisBucketTail[g] = (u_int16_t)-1;
+	}
+	i = FirstModelUsed;
+	while( i != (u_int16_t)-1 )
+	{
+		u_int16_t clip;
+		int vis = Models[i].Visible &&
+			( InTitle || IsGroupVisible[ Models[i].Group ] || (
+				CAMERA_VIEW_IS_VALID &&
+				VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[i].Group, NULL )
+			) );
+		if( vis )
+		{
+			clip = ( Models[i].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
+			VisBucketClip[i] = clip;
+			VisBucketNext[i] = (u_int16_t)-1;
+			if( VisBucketHead[clip] == (u_int16_t)-1 )
+				VisBucketHead[clip] = i;
+			else
+				VisBucketNext[ VisBucketTail[clip] ] = i;
+			VisBucketTail[clip] = i;
+		}
+		i = Models[i].Prev;
+	}
+	VisBucketTitle = (u_int8_t)( InTitle ? 1 : 0 );
+	VisBucketGeneration = ModelVisGeneration;
+	VisBucketDirty = 0;
+}
+#endif
+
+void ModelVisCache_NewFrame( void )
+{
+#ifdef MODEL_VIS_CACHE
+	VisCacheFrame++;
+#endif
+#ifdef MODEL_BUCKET
+	VisBucketDirty = 1;
+#endif
+}
+
+
+
+
+
+/* Draw guard: with bucketing the model is already known to be visible and
+ * already known to belong to this group; without it the predicate decides. */
+#ifdef MODEL_BUCKET
+#define MODEL_BUCKET_REFRESH(InTitle) \
+	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) || VisBucketGeneration != ModelVisGeneration ) \
+		ModelVisBucket_Build( InTitle ); } while(0)
+#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup)  ( 1 )
+#else
+#define MODEL_BUCKET_REFRESH(InTitle) ((void)0)
+#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup) \
+	( ModelVisibleWithClip( (i), (InTitle), &(ClipGroup) ) && (ClipGroup) == (group) )
+#endif
+
+/* True if model i may be drawn for the current camera; *clipout receives
+ * its clip group. Identical semantics with and without the memo - the flag
+ * only removes the redundant recomputation of the same answer. */
+static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * clipout )
+{
+#ifdef MODEL_VIS_CACHE
+	int vis;
+	if( VisCacheValid[i] && VisCacheStamp[i] == VisCacheFrame && VisCacheTitle == (u_int8_t)(InTitle ? 1 : 0) )
+	{
+		*clipout = VisCacheClip[i];
+		return VisCacheVis[i];
+	}
+	vis = Models[ i ].Visible &&
+		( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
+			CAMERA_VIEW_IS_VALID &&
+			VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[ i ].Group, NULL )
+		) );
+	*clipout = ( Models[ i ].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
+	VisCacheStamp[i] = VisCacheFrame;
+	VisCacheVis[i] = (u_int8_t)( vis ? 1 : 0 );
+	VisCacheClip[i] = *clipout;
+	VisCacheValid[i] = 1;
+	return vis;
+#else
+	int vis = Models[ i ].Visible &&
+		( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
+			CAMERA_VIEW_IS_VALID &&
+			VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[ i ].Group, NULL )
+		) );
+	*clipout = ( Models[ i ].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
+	return vis;
+#endif
+}
 
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
+	perf_stage_begin(PERF_S_MDLWRAP);
 	RENDERMATRIX TempWorld;
 	u_int16_t	i;
 	u_int16_t	nextmodel;
@@ -1264,30 +1398,42 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if( NamePnt == &ModelNames[0] ) InTitle = false;
 	else InTitle = true;
-
-	i =  FirstModelUsed;
-	while( i != (u_int16_t) -1 )
+#ifdef MODEL_BUCKET
+	MODEL_BUCKET_REFRESH( InTitle );
+#endif
+#ifdef MODEL_VIS_CACHE
+	if( VisCacheTitle != (u_int8_t)(InTitle ? 1 : 0) )
 	{
-		nextmodel = Models[i].Prev;
+		/* Title and gameplay passes use different predicate inputs; keep
+		 * them in separate cache generations. */
+		VisCacheTitle = (u_int8_t)(InTitle ? 1 : 0);
+		VisCacheFrame++;
+	}
+#endif
 
-		if( Models[ i ].Visible )
+#ifdef MODEL_BUCKET
+	/* Walk only this group's models, in list order (the bucket chains are
+	 * tail-appended in Models[] list order). ClipGroup is implied. */
+	i = VisBucketHead[ group ];
+#else
+	i = FirstModelUsed;
+#endif
+	while( i != (u_int16_t)-1 )
+	{
+		perf_stage_begin(PERF_S_MDLENTRY);
+#ifdef MODEL_BUCKET
+		nextmodel = VisBucketNext[i];
+		ClipGroup = VisBucketClip[i];
+#else
+		nextmodel = Models[i].Prev;
+#endif
+
+		if( MODEL_DRAW_GUARD( i, InTitle, group, ClipGroup ) )
 		{
-			if( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
-				CAMERA_VIEW_IS_VALID &&
-				VisibleOverlap(
-					Ships[ Current_Camera_View ].Object.Group,
-					Models[ i ].Group,
-					NULL
-				)
-			))
 			{
-				if( Models[ i ].Flags & MODFLAG_UseClipGroup ) 
-					ClipGroup = Models[i].ClipGroup;
-				else 
-					ClipGroup = Models[i].Group;
-				
 				if( ClipGroup == group )
 				{
+					perf_stage_begin(PERF_S_MDLTRANSFORM);
 					switch( Models[i].Func )
 					{
 						case MODFUNC_Fade:
@@ -1404,9 +1550,12 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 					if (!FSSetWorld(&TempWorld))
 					{
+						perf_stage_end(PERF_S_MDLTRANSFORM, -1);
+						perf_stage_end(PERF_S_MDLWRAP, -1);
 						Msg( "ModelDisp() SetMatrix1 Failed\n" );
 						return false;
 					}
+					perf_stage_end(PERF_S_MDLTRANSFORM, -1);
 					
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					// TODO - BEEF UP LOD LEVEL HANDLING (read notes bellow)
@@ -1416,6 +1565,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					
 					// should probably add a switch to completely disable this...
 
+					perf_stage_begin(PERF_S_MDLLOD);
 					/*	Execute it	*/
 					temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos ); 
 		
@@ -1463,6 +1613,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					// END OF TODO
 
 					ModelNum += Models[i].ModelNum;
+					perf_stage_end(PERF_S_MDLLOD, -1);
 		
 //					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || !( Models[i].Flags & MODFLAG_Clip ) )
 					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
@@ -1497,9 +1648,11 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							x1.z = 0.0F;
 							x2 = x1;
 
+							perf_stage_begin(PERF_S_MDLBOUNDS);
 #ifndef FINAL_RELEASE
 							CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 												  &Models[i].TempLines[ 0 ], Models[i].Group );
+							perf_stage_end(PERF_S_MDLBOUNDS, -1);
 #endif
 
 							ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
@@ -1589,11 +1742,14 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							x1.z = 0.0F;
 							x2 = x1;
 
+							perf_stage_begin(PERF_S_MDLBOUNDS);
 #ifndef FINAL_RELEASE
 							CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 												 &Models[i].TempLines[ 0 ], Models[i].Group );
+							perf_stage_end(PERF_S_MDLBOUNDS, -1);
 #endif
 
+							perf_stage_begin(PERF_S_MDLSTATIC);
 							if( Models[i].Flags & MODFLAG_AmbientLight )
 							{
 								GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
@@ -1623,6 +1779,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 								if( !LightMxModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
 
 							}
+							perf_stage_end(PERF_S_MDLSTATIC, -1);
 
 							//DebugPrintf("display = '%d', mip number = '%d', name = '%s'\n",
 							//	DoDisplay, ModelNum, (char*)&ModelNames[ Models[i].ModelNum ].Name[ 0 ]);
@@ -1669,6 +1826,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 		}
 
 		/*	go on to the next	*/
+		perf_stage_end(PERF_S_MDLENTRY, -1);
 		i = nextmodel;
 	}
 
@@ -1676,9 +1834,11 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if (!FSSetWorld(&identity))
 	{
+		perf_stage_end(PERF_S_MDLWRAP, -1);
 		Msg( "ModelDisp() SetMatrix2 Failed\n" );
 		return false;
 	}
+	perf_stage_end(PERF_S_MDLWRAP, -1);
 	return true;
 }
 
