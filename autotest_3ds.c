@@ -217,6 +217,10 @@ void autotest_tick(void)
 	{
 		trace("AUTOTEST: DONE bad-list — chain-loading back to netload_stub");
 		s_done = true;
+		/* Flush the final level's perf row — without this a focused
+		 * single-level sweep (AUTOTEST_MAX_LEVELS_TO_SWEEP=1) ends
+		 * without ever emitting a level marker. */
+		PERF_LEVEL_MARKER(&ShortLevelNames[LevelNum][0]);
 		autotest_chainload_to_stub();
 		extern bool QuitRequested;
 		QuitRequested = true;
@@ -237,6 +241,10 @@ void autotest_tick(void)
 	{
 		trace("AUTOTEST: DONE — chain-loading back to netload_stub");
 		s_done = true;
+		/* Flush the final level's perf row (see bad-list branch above):
+		 * the last swept level never reaches an advance, so without this
+		 * its counters are dumped unlabeled at teardown instead. */
+		PERF_LEVEL_MARKER(&ShortLevelNames[LevelNum][0]);
 		autotest_chainload_to_stub();
 		extern bool QuitRequested;
 		QuitRequested = true;

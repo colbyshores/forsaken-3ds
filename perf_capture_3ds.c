@@ -129,6 +129,10 @@ static void perf_dump_body(void)
 		         "PERF: stage=%d count=%lu total=%llu max=%lu",
 		         i, g_stage[i].count, g_stage[i].total, g_stage[i].max);
 		perf_out(line);
+		if (i == PERF_S_PRESENT) {
+			snprintf(line2, sizeof(line2), "PERF: presents=%lu", g_stage[i].count);
+			perf_out(line2);
+		}
 	}
 	for (i = 0; i <= PERF_BUCKETS; i++) {
 		if (g_frame_ticks[i]) {

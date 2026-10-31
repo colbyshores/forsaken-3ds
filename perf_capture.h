@@ -84,8 +84,9 @@ enum perf_stage {
 	PERF_S_INTERPPROBE, /* FRAME_INTERP_PROBE: second render traversal cost */
 	PERF_S_INTERPTOTAL, /* FRAME_INTERP: total camera render including extra pass */
 	PERF_S_INTERPONLY,  /* FRAME_INTERP: isolated extra-pass render cost */
-	PERF_S_INTERPSIM,   /* FRAME_INTERP: simulation pass + render, excl extra pass */
+	PERF_S_INTERPSIM,   /* FRAME_INTERP: true-frame render window, excl. extra pass */
 	PERF_S_PRESENTLOOP, /* FRAME_INTERP: normal presentation-loop frame window */
+	PERF_S_PRESENT,     /* renderer: C3D frame submission/present count */
 	PERF_S_MAX
 };
 

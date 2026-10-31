@@ -16,7 +16,7 @@ STAGES = ["frame","maingame","render","fsbegin","mROUT","cam","fsend","vis","bg"
           "regen","restart","time","multiples","goals","shipmode","shipcollide",
           "shippre","shippost","shipmodel","shipcam","shipdmg","shipnode","losnode",
           "bullprim","bullsec","opqtex","opqclip","opqlines","opqmodel","opqpolys",
-          "mdlinterp","mdllight","mdlexec","mdlentry","mdltransform","mdllod","mdlbounds","mdlstatic","mdlwrap","interpprobe","interptotal","interponly"]
+           "mdlinterp","mdllight","mdlexec","mdlentry","mdltransform","mdllod","mdlbounds","mdlstatic","mdlwrap","interpprobe","interptotal","interponly","interpsim","presentloop","present"]
 TICK = 268111840.0
 
 def load(path):
@@ -62,18 +62,19 @@ def main():
         # core stages must exist; diagnostic stages (probe, mdlwrap, ...) are
         # optional so older captures still analyze
         core = [s for s in STAGES if s not in
-                ("interpprobe", "interptotal", "interponly", "mdlwrap", "mdlentry", "mdlinterp", "mdllight", "mdlexec")]
+                ("interpprobe", "interptotal", "interponly", "interpsim", "presentloop",
+                 "present", "mdlwrap", "mdlentry", "mdlinterp", "mdllight", "mdlexec")]
         if not all(s in d for s in core): continue
         fm = frame_ms(d)
         r = {s: perframe(d, s) for s in STAGES}
-        out.append((r["mROUT"], lvl, 1000 / fm if fm else 0, r))
+        out.append((r["mROUT"], lvl, 1000 / fm if fm else 0, r, d))
     hdr = (f"{'level':<13}{'fps':>5}{'mROUT':>6}{'ships':>6}{'shpre':>6}{'shdmg':>6}"
            f"{'shnode':>7}{'shpost':>7}{'shmodl':>7}{'shcam':>6}{'shpcoll':>8}"
            f"{'enem':>6}{'bull':>6}{'spotfx':>7}{'bobj':>6}{'model':>6}{'cam':>6}{'bg':>6}{'trans':>6}"
            f"{'bprim':>6}{'bsec':>6}{'oqtex':>6}{'oqclip':>7}{'oqlin':>6}{'oqmdl':>6}{'oqpol':>6}"
            f"{'mdlint':>7}{'mdllight':>9}{'mdlexec':>8}{'mdl/frame':>10}{'entry':>7}{'xform':>7}{'lod':>7}{'bounds':>8}{'static':>8}{'mdlwrap':>8}{'itp2nd':>7}")
     lines = [hdr]
-    for mr, lvl, fps, r in sorted(out, reverse=True):
+    for mr, lvl, fps, r, d in sorted(out, reverse=True):
         lines.append(f"{lvl:<13}{fps:>5.1f}{r['mROUT']:>6.1f}{r['ships']:>6.1f}{r['shippre']:>6.1f}"
                      f"{r['shipdmg']:>6.1f}{r['shipnode']:>7.1f}"
                      f"{r['shippost']:>7.1f}{r['shipmodel']:>7.1f}{r['shipcam']:>6.1f}{r['shipcollide']:>8.1f}"
