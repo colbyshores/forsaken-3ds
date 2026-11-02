@@ -22,21 +22,32 @@ does not exist yet. It stays baselined.
 
 ## 1. Pre-session state (verify before travel)
 
-- Branch `experimental/performance_contract`, `tools/perf/check.sh` → ALL GATES PASS.
-- Instrumented build: `make -f Makefile.3ds PERF_CAPTURE=1 SLIM=1`
-  (verified to link and run 2026-10-25). Do NOT add `EDITION=remaster` or
-  `DEBUG=1` to a capture build: both force `-DVERBOSE_TRACE`, whose
-  per-line fsync (5–10 ms each, P5) would poison the timing being measured,
-  and `__3DS_DEBUG__` additionally enables autoboot + god mode. Default
-  builds are unaffected: with the flag off, `perf_capture_3ds.o` is empty
-  and no perf symbols exist.
+- Record the checked-out branch and `git rev-parse HEAD`. The current
+  native-renderer loop is on `experimental/native-renderer`; an older
+  performance-contract session used `experimental/performance_contract`.
+  `tools/perf/check.sh` must show ALL GATES PASS before building either
+  capture variant.
+- Instrumented build: `make -f Makefile.3ds EDITION=remaster PERF_CAPTURE=1
+  OG_PROFILE=1 RENDERER=citro3d`. This is the clean **manual-navigation**
+  capture build: it records performance counters without enabling the
+  autotest or trace machinery.
+- Do not add `DEBUG=1` or `DEATH_SIM=1` to a timing build: both currently
+  force `-DVERBOSE_TRACE`, whose per-line fsync (5–10 ms each, P5) would
+  poison the timing being measured. `EDITION=remaster` does **not** force
+  `VERBOSE_TRACE`; it only defines `EDITION_REMASTER`. `AUTOTEST_REMASTER=1`
+  deliberately omits `VERBOSE_TRACE`, but it does define `__3DS_DEBUG__` and
+  therefore enables trace-file writes at level transitions, so omit it from
+  a clean manually driven capture as well. Default builds are unaffected:
+  with `PERF_CAPTURE` off, `perf_capture_3ds.o` is empty and no perf symbols
+  exist.
 - The dump goes to `sdmc:/forsaken_perf.txt` through perf_capture_3ds.c's
   own fd — no trace/serial sink needed.
-- Make does not track CFLAGS changes: when toggling `PERF_CAPTURE`,
-  `touch perf_capture_3ds.c main.c oct2.c` (or clean-build) or the stale
-  object is relinked silently.
+- The Makefile's build-flag stamp now tracks `PERF_CAPTURE` and the other
+  compile-time switches. A flag change forces a full rebuild; do not rely on
+  the older `touch perf_capture_3ds.c main.c oct2.c` workaround.
 - Bring: SD card with the `.3dsx` plus the SD romfs, and both build
-  binaries (A/B below).
+  binaries (A/B below). The native-renderer hardware handoff and its exact
+  checksums are in `docs/validation/ralph-pi-hardware-handoff.md`.
 
 ## 2. P6 environment record — fill in, do not skip
 

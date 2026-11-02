@@ -36,8 +36,21 @@ NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
 FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
 # MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
 VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
-# MODEL_BUCKET=1 indexes models by clip group once per camera instead of re-walking the model list per group (render-path optimisation)
-BUCKET_CFLAGS := $(if $(MODEL_BUCKET),-DMODEL_BUCKET,)
+# MODEL_BUCKET=1 indexes models by clip group once per camera instead of re-walking the model list per group.
+# Opt-in only: the corrected hardware A/B showed gains, but an in-game visual sanity run is still required.
+MODEL_BUCKET ?= 0
+BUCKET_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET)),-DMODEL_BUCKET,)
+# MODEL_BUCKET_VERIFY=1 adds an opt-in, correctness-only check that every
+# MODEL_BUCKET group contains exactly the baseline-visible model sequence.
+# It deliberately re-walks Models[] and is not a performance build.
+MODEL_BUCKET_VERIFY ?= 0
+BUCKET_VERIFY_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET_VERIFY)),-DMODEL_BUCKET_VERIFY,)
+ifneq ($(filter 1,$(MODEL_BUCKET_VERIFY)),)
+ifeq ($(filter 1,$(MODEL_BUCKET)),1)
+else
+$(error MODEL_BUCKET_VERIFY=1 requires MODEL_BUCKET=1)
+endif
+endif
 # FRAME_INTERP=1 renders an extra frame at an interpolated camera between the previous and current frames (temporal interpolation prototype)
 INTERPFRAME_CFLAGS := $(if $(FRAME_INTERP),-DFRAME_INTERP,)
 # FRAME_INTERP_FORCE_MONO=1 disables stereo in the interpolation prototype build (measurement only)
@@ -131,6 +144,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(OGPROFILE_CFLAGS) \
 	$(VIS_CFLAGS) \
 	$(BUCKET_CFLAGS) \
+	$(BUCKET_VERIFY_CFLAGS) \
 	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
@@ -368,7 +382,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ED=$(EDITION)|SLIM=$(SLIM)
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp

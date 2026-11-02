@@ -54,6 +54,27 @@ static unsigned long g_frame_ticks[PERF_BUCKETS + 1];
 static unsigned long long g_t0[PERF_S_MAX];
 static unsigned long g_frames;
 
+#if defined(MODEL_BUCKET_VERIFY)
+static unsigned long g_model_bucket_groups;
+static unsigned long g_model_bucket_entries;
+static unsigned long g_model_bucket_mismatches;
+static int g_model_bucket_first_group = -1;
+static unsigned int g_model_bucket_first_expected;
+static unsigned int g_model_bucket_first_actual;
+
+void perf_model_bucket_verify_result(unsigned long groups,
+	unsigned long entries, unsigned long mismatches,
+	int first_group, unsigned int first_expected, unsigned int first_actual)
+{
+	g_model_bucket_groups = groups;
+	g_model_bucket_entries = entries;
+	g_model_bucket_mismatches = mismatches;
+	g_model_bucket_first_group = first_group;
+	g_model_bucket_first_expected = first_expected;
+	g_model_bucket_first_actual = first_actual;
+}
+#endif
+
 static void perf_reset(void)
 {
 	int i;
@@ -65,6 +86,18 @@ static void perf_reset(void)
 	for (i = 0; i <= PERF_BUCKETS; i++)
 		g_frame_ticks[i] = 0;
 	g_frames = 0;
+#if defined(MODEL_BUCKET_VERIFY)
+	{
+		extern void ModelVisBucket_Verify_Reset(void);
+		g_model_bucket_groups = 0;
+		g_model_bucket_entries = 0;
+		g_model_bucket_mismatches = 0;
+		g_model_bucket_first_group = -1;
+		g_model_bucket_first_expected = 0;
+		g_model_bucket_first_actual = 0;
+		ModelVisBucket_Verify_Reset();
+	}
+#endif
 }
 
 void perf_stage_begin(int stage)
@@ -143,6 +176,17 @@ static void perf_dump_body(void)
 	}
 	snprintf(line, sizeof(line), "PERF: frames=%lu", g_frames);
 	perf_out(line);
+#if defined(MODEL_BUCKET_VERIFY)
+	if (g_model_bucket_groups) {
+		static char verify_line[192];
+		snprintf(verify_line, sizeof(verify_line),
+		         "PERF: model_bucket_verify groups=%lu entries=%lu mismatches=%lu first_group=%d first_expected=%u first_actual=%u",
+		         g_model_bucket_groups, g_model_bucket_entries,
+		         g_model_bucket_mismatches, g_model_bucket_first_group,
+		         g_model_bucket_first_expected, g_model_bucket_first_actual);
+		perf_out(verify_line);
+	}
+#endif
 }
 
 void perf_level_marker(const char *level_name)
