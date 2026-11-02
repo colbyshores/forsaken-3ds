@@ -1,6 +1,6 @@
 # Ralph-pi hardware-capture handoff — native renderer
 
-Prepared: 2026-11-02. Refreshed: 2026-11-02 (iteration 12). Loop: `ralph-pi`,
+Prepared: 2026-11-02. Refreshed: 2026-11-02 (iteration 14). Loop: `ralph-pi`,
 branch `experimental/native-renderer`.
 
 Purpose: make the remaining human hardware pass reproducible. This handoff
@@ -16,8 +16,8 @@ result: the console was not touched while preparing it.
 | Field | Value |
 |---|---|
 | Branch | `experimental/native-renderer` |
-| HEAD | `43aa7e72609482a1772f78947fb70ff75ad9edc7` |
-| Engine-tree diff fingerprint | `git diff --binary -- .gitignore Makefile.3ds models.c perf_capture.h perf_capture_3ds.c render_c3d.c \| sha256sum` = `c0c2ae52d19d7cf9832664c4b01ad2b3afae1246a667f09d9c793e70d134cf3e` |
+| Build-source HEAD | `9710973cfe405dd4d2e306a9b9d4d5e2fe5597a5` (`git rev-parse HEAD` at the iteration-14 build) |
+| Engine-tree diff fingerprint | `git diff --binary HEAD -- .gitignore Makefile.3ds models.c perf_capture.h perf_capture_3ds.c render_c3d.c \| sha256sum` = `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` (clean engine tree at build time) |
 | Renderer | Citro3D (`RENDERER=citro3d`); picaGL is not linked |
 | Edition | `EDITION=remaster` (level order/music only; it does not enable verbose trace) |
 | Capture instrumentation | `PERF_CAPTURE=1`; output `sdmc:/forsaken_perf.txt` at clean teardown |
@@ -32,10 +32,10 @@ export DEVKITARM=/opt/devkitpro/devkitARM DEVKITPRO=/opt/devkitpro
 make -f Makefile.3ds EDITION=remaster AUTOTEST_REMASTER=1 \
      AUTOTEST_MAX_LEVELS_TO_SWEEP=1 AUTOTEST_MS_PER_LEVEL=8000 \
      PERF_CAPTURE=1 OG_PROFILE=1 RENDERER=citro3d SLIM=1 -j"$(nproc)"
-# exit=0; log: build_3ds/ralph-pi/iter12/primary-build.log
+# exit=0; log: build_3ds/ralph-pi/iter14/primary-build.log
 
 tools/perf/check.sh
-# exit=0; log: build_3ds/ralph-pi/iter12/gates.log
+# exit=0; log: build_3ds/ralph-pi/iter14/gates.log
 ```
 
 The three handoff binaries were then built without `AUTOTEST_REMASTER`, so a
@@ -44,20 +44,20 @@ writes:
 
 ```sh
 export DEVKITARM=/opt/devkitpro/devkitARM DEVKITPRO=/opt/devkitpro
-make -f Makefile.3ds BUILD=build_3ds/ralph-pi/iter12/hardware/default-off \
+make -f Makefile.3ds BUILD=build_3ds/ralph-pi/iter14/hardware/default-off \
      EDITION=remaster PERF_CAPTURE=1 OG_PROFILE=1 RENDERER=citro3d \
      MODEL_BUCKET=0 SLIM=1 -j"$(nproc)"
-# exit=0; log: build_3ds/ralph-pi/iter12/default-off-build.log
+# exit=0; log: build_3ds/ralph-pi/iter14/default-off-build.log
 
-make -f Makefile.3ds BUILD=build_3ds/ralph-pi/iter12/hardware/bucket-on \
+make -f Makefile.3ds BUILD=build_3ds/ralph-pi/iter14/hardware/bucket-on \
      EDITION=remaster PERF_CAPTURE=1 OG_PROFILE=1 RENDERER=citro3d \
      MODEL_BUCKET=1 SLIM=1 -j"$(nproc)"
-# exit=0; log: build_3ds/ralph-pi/iter12/bucket-on-build.log
+# exit=0; log: build_3ds/ralph-pi/iter14/bucket-on-build.log
 
-make -f Makefile.3ds BUILD=build_3ds/ralph-pi/iter12/hardware/bucket-verify \
+make -f Makefile.3ds BUILD=build_3ds/ralph-pi/iter14/hardware/bucket-verify \
      EDITION=remaster PERF_CAPTURE=1 OG_PROFILE=1 RENDERER=citro3d \
      MODEL_BUCKET=1 MODEL_BUCKET_VERIFY=1 SLIM=1 -j"$(nproc)"
-# exit=0; log: build_3ds/ralph-pi/iter12/bucket-verify-build.log
+# exit=0; log: build_3ds/ralph-pi/iter14/bucket-verify-build.log
 ```
 
 `MODEL_BUCKET_VERIFY=1` requires `MODEL_BUCKET=1`; the Makefile rejects an
@@ -71,9 +71,9 @@ romfs.
 
 | Host artifact | SD destination | SHA-256 | MD5 | Bytes |
 |---|---|---|---|---:|
-| `build_3ds/ralph-pi/iter12/hardware/default-off/forsaken3ds.3dsx` | `sdmc:/3ds/forsaken/forsaken3ds-default-off.3dsx` | `7fd7c153aaafa09fb4dd63dd7680568fcb89ced5b2c77b8e51238262c2e2a9fc` | `1ceef734747cc9d9ed15c5988d51196b` | 3,530,096 |
-| `build_3ds/ralph-pi/iter12/hardware/bucket-on/forsaken3ds.3dsx` | `sdmc:/3ds/forsaken/forsaken3ds-model-bucket.3dsx` | `458bed2cc593eb7ca4b0eda198403731e6163280e8d5f9630acbb9356f7c1864` | `a4626e953858a74d133d24c559dbe2ae` | 3,530,540 |
-| `build_3ds/ralph-pi/iter12/hardware/bucket-verify/forsaken3ds.3dsx` | `sdmc:/3ds/forsaken/forsaken3ds-model-bucket-verify.3dsx` | `582aef37f7392d60e5cfc44ecc2970fd3ac6c73bb8aa3789c429f586fc5acbf7` | `fe38f39205dfe29a94d54a1c6a2250c1` | 3,531,624 |
+| `build_3ds/ralph-pi/iter14/hardware/default-off/forsaken3ds.3dsx` | `sdmc:/3ds/forsaken/forsaken3ds-default-off.3dsx` | `7fd7c153aaafa09fb4dd63dd7680568fcb89ced5b2c77b8e51238262c2e2a9fc` | `1ceef734747cc9d9ed15c5988d51196b` | 3,530,096 |
+| `build_3ds/ralph-pi/iter14/hardware/bucket-on/forsaken3ds.3dsx` | `sdmc:/3ds/forsaken/forsaken3ds-model-bucket.3dsx` | `458bed2cc593eb7ca4b0eda198403731e6163280e8d5f9630acbb9356f7c1864` | `a4626e953858a74d133d24c559dbe2ae` | 3,530,540 |
+| `build_3ds/ralph-pi/iter14/hardware/bucket-verify/forsaken3ds.3dsx` | `sdmc:/3ds/forsaken/forsaken3ds-model-bucket-verify.3dsx` | `582aef37f7392d60e5cfc44ecc2970fd3ac6c73bb8aa3789c429f586fc5acbf7` | `fe38f39205dfe29a94d54a1c6a2250c1` | 3,531,624 |
 | `build_3ds/ralph-pi/iter9-hardware/forsaken.romfs` | `sdmc:/3ds/forsaken/forsaken.romfs` | `e8426b7b5fa7d68d96782492cc2b4d1cd8871d38e34a50c4a6b0880a9b8d6786` | `93b701405eb53b95ed04dfa1cc5b2d2b` | 311,608,372 |
 
 The exact external-romfs path is required by the slim build
@@ -83,7 +83,7 @@ launch them one at a time. Do not overwrite the shared romfs between runs.
 ## 3. Triple validation performed without hardware
 
 The machine-checked verification is in
-`build_3ds/ralph-pi/iter12/hardware/verification.log` (exit 0):
+`build_3ds/ralph-pi/iter14/hardware/verification.log` (exit 0):
 
 1. The three saved build stamps differ only in `BUCKET`/`BVERIFY`:
    `PERF=1`, `OGPROFILE=1`, `ED=remaster`, `SLIM=1`; autotest and verbose-trace
@@ -96,9 +96,10 @@ The machine-checked verification is in
    `sdmc:/forsaken_perf.txt` path. None contains the
    `sdmc:/forsaken_trace.txt` path or an `AUTOTEST:` string. Only the verifier
    artifact contains the `model_bucket_verify` result string.
-4. The default-off and bucket-on binaries are byte-identical to iter 009's
-   already-staged handoff pair, proving that adding the opt-in verifier did
-   not change either shipping/candidate configuration.
+4. All three iteration-14 binaries are byte-identical to the corresponding
+   iteration-12 binaries (and the default-off/bucket-on pair remains
+   byte-identical to iteration 09), proving that the current HEAD refresh did
+   not change either shipping/candidate configuration or the verifier.
 5. The bucket path uses naturally aligned `u_int16_t` arrays
    (`models.c:1274-1323,1387-1432`); this iteration changed no source or data
    layout and introduced no new alignment case.
