@@ -132,6 +132,35 @@ have no autotest level markers. For each build and level:
    `docs/validation/perf-YYYY-MM-DD-*.log` and note the exact source SD
    filename in a sidecar/header.
 
+### Validate each copied artifact before quoting it
+
+Use the matching boot log with `tools/perf/analyze_hardware_capture.py`.
+`--require-og-profile` checks the 268 MHz/L2-off `OG_PROFILE=1` policy;
+`--require-console` separately identifies the console family. Use `og` on
+original/non-New 3DS hardware and `n3ds` on New 3DS hardware:
+
+```sh
+# Original/non-New 3DS hardware
+python3 tools/perf/analyze_hardware_capture.py \
+  --perf forsaken_perf-default-powerdown.txt \
+  --boot forsaken_boot-default-powerdown.log \
+  --require-og-profile --require-console og \
+  --out capture-default-powerdown.analysis.txt
+
+# New 3DS hardware running the OG-profile clock/cache policy
+python3 tools/perf/analyze_hardware_capture.py \
+  --perf forsaken_perf-default-ramqan.txt \
+  --boot forsaken_boot-default-ramqan.log \
+  --require-og-profile --require-console n3ds \
+  --out capture-default-ramqan.analysis.txt
+```
+
+For a bucket-verifier artifact, add `--require-verify`; the command must exit
+0 and report zero mismatches. A parser exit 0 validates the artifact's shape
+and recorded environment only: it does **not** replace the P6 environment
+record, the visual checklist, or the human attribution of the actual console,
+clock/cache, and stereo mode.
+
 Run these four required timing/visual cases, using the same camera route and
 comparable gameplay state for each pair:
 

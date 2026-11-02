@@ -25,8 +25,10 @@ Typical use after a human copies a run off the SD card:
         --boot forsaken_boot-default-powerdown.log \
         --require-og-profile --out capture-default-powerdown.analysis.txt
 
-For the opt-in bucket verifier build, add ``--require-verify``.  The script
-exits 0 only when its mechanical checks pass; any validation failure exits 2.
+For the opt-in bucket verifier build, add ``--require-verify``.  Add
+``--require-console og`` for original/non-New 3DS hardware or
+``--require-console n3ds`` for a New 3DS run.  The script exits 0 only when
+its mechanical checks pass; any validation failure exits 2.
 
 Selection rules:
   * ``--block auto`` (default): use the last level block with gameplay frames
@@ -259,10 +261,10 @@ def choose_block(levels, dumps, mode, allow_teardown_dump):
     return candidates[0]
 
 
-def parse_boot(path, require_og_profile):
+def parse_boot(path, require_boot):
     if path is None:
-        if require_og_profile:
-            raise Invalid("--require-og-profile needs --boot")
+        if require_boot:
+            raise Invalid("console/profile checks need --boot")
         return None, {}
 
     try:
@@ -285,8 +287,22 @@ def parse_boot(path, require_og_profile):
     return platform_lines, fields
 
 
-def validate_block(block, require_verify, require_og_profile, boot_fields):
+def console_class(boot_fields):
+    """Return the console family recorded by main_3ds.c, if known."""
+    value = boot_fields.get("is_n3ds")
+    if value == "0":
+        return "og"
+    if value == "1":
+        return "n3ds"
+    return None
+
+
+def validate_block(block, require_verify, require_og_profile, require_console,
+                   boot_fields):
     errors = []
+    verify_errors = []
+    og_errors = []
+    console_errors = []
 
     if block.kind == "dump" and not block.complete:
         errors.append("selected dump block is not bounded by dump end")
@@ -312,29 +328,31 @@ def validate_block(block, require_verify, require_og_profile, boot_fields):
     verify_status = "not-required"
     if require_verify:
         if block.verify is None:
-            errors.append("model_bucket_verify result line is missing")
-            verify_status = "FAIL"
+            verify_errors.append("model_bucket_verify result line is missing")
         else:
             groups, entries, mismatches, first_group, first_expected, \
                 first_actual = block.verify
             if groups <= 0 or entries <= 0:
-                errors.append(
+                verify_errors.append(
                     "model_bucket_verify has groups<=0 or entries<=0")
             if mismatches != 0:
-                errors.append(f"model_bucket_verify mismatches={mismatches}")
+                verify_errors.append(
+                    f"model_bucket_verify mismatches={mismatches}")
             if first_group != -1:
-                errors.append(
+                verify_errors.append(
                     f"model_bucket_verify first_group={first_group}")
             if first_expected != 0 or first_actual != 0:
-                errors.append(
+                verify_errors.append(
                     "model_bucket_verify first_expected/first_actual are "
                     "nonzero")
-            verify_status = "PASS" if not errors else "FAIL"
+        verify_status = "PASS" if not verify_errors else "FAIL"
 
     og_status = "not-required"
     if require_og_profile:
+        # OG_PROFILE is a clock/cache/heap policy, not a console class.
+        # Both an original 3DS and a New 3DS can run this policy, so
+        # is_n3ds is checked separately by --require-console.
         wanted = {
-            "is_n3ds": "1",
             "og_profile": "1",
             "clock": "268MHz",
             "cache": "L2-off",
@@ -346,12 +364,31 @@ def validate_block(block, require_verify, require_og_profile, boot_fields):
             if boot_fields.get(key) != value
         ]
         if bad:
-            errors.append("OG-profile boot fields failed: " + ", ".join(bad))
+            og_errors.append(
+                "OG-profile boot fields failed: " + ", ".join(bad))
         og_status = "PASS" if not bad else "FAIL"
 
+    detected_console = console_class(boot_fields)
+    console_status = "not-required"
+    if require_console:
+        if detected_console is None:
+            console_errors.append(
+                "console class is missing or invalid (is_n3ds must be 0/1)")
+        elif detected_console != require_console:
+            expected = "OG/non-New-3DS" if require_console == "og" \
+                else "New 3DS"
+            actual = "OG/non-New-3DS" if detected_console == "og" \
+                else "New 3DS"
+            console_errors.append(
+                f"console class is {actual}, expected {expected}")
+        console_status = "PASS" if not console_errors else "FAIL"
+
+    errors.extend(verify_errors)
+    errors.extend(og_errors)
+    errors.extend(console_errors)
     if errors:
         raise Invalid("; ".join(errors))
-    return verify_status, og_status
+    return verify_status, og_status, console_status, detected_console
 
 
 def frame_ms(block):
@@ -362,7 +399,7 @@ def frame_ms(block):
 
 
 def make_report(path, block, boot_path, boot_lines, boot_fields,
-                verify_status, og_status):
+                verify_status, og_status, console_status, detected_console):
     fm, frame_max_ticks = frame_ms(block)
     fps = 1000.0 / fm if fm > 0 else 0.0
 
@@ -385,7 +422,14 @@ def make_report(path, block, boot_path, boot_lines, boot_fields,
         lines.append(f"boot: {boot_path}")
         if boot_lines:
             lines.append(f"boot platform: {boot_lines[-1]}")
-    lines.append(f"og-profile check: {og_status}")
+    console_name = {
+        "og": "OG/non-New-3DS",
+        "n3ds": "New 3DS",
+    }.get(detected_console, "unknown")
+    lines.append(f"console class: {console_name} "
+                 f"(is_n3ds={boot_fields.get('is_n3ds', '<missing>')})")
+    lines.append(f"console-class check: {console_status}")
+    lines.append(f"og-profile policy check: {og_status}")
     lines.append(f"bucket-verify check: {verify_status}")
     if block.verify is not None:
         lines.append("bucket-verify: groups=%d entries=%d mismatches=%d "
@@ -431,7 +475,11 @@ def main(argv=None):
     ap.add_argument("--require-verify", action="store_true",
                     help="require a zero-mismatch MODEL_BUCKET_VERIFY line")
     ap.add_argument("--require-og-profile", action="store_true",
-                    help="require OG-profile fields in --boot")
+                    help="require the 268MHz/L2-off OG_PROFILE policy "
+                         "in --boot")
+    ap.add_argument("--require-console", choices=("og", "n3ds"),
+                    help="require console class in --boot "
+                         "(og=non-New-3DS, n3ds=New 3DS)")
     ap.add_argument("--json", type=Path,
                     help="also write a machine-readable JSON summary")
     args = ap.parse_args(argv)
@@ -440,12 +488,16 @@ def main(argv=None):
         levels, dumps = parse_blocks(args.perf)
         block = choose_block(levels, dumps, args.block,
                              args.allow_teardown_dump)
-        boot_lines, boot_fields = parse_boot(args.boot,
-                                             args.require_og_profile)
-        verify_status, og_status = validate_block(
-            block, args.require_verify, args.require_og_profile, boot_fields)
+        need_boot = (args.require_og_profile or
+                     args.require_console is not None)
+        boot_lines, boot_fields = parse_boot(args.boot, need_boot)
+        verify_status, og_status, console_status, detected_console = \
+            validate_block(block, args.require_verify,
+                           args.require_og_profile, args.require_console,
+                           boot_fields)
         report = make_report(args.perf, block, args.boot, boot_lines,
-                             boot_fields, verify_status, og_status)
+                             boot_fields, verify_status, og_status,
+                             console_status, detected_console)
     except Invalid as exc:
         print(f"analyze_hardware_capture: FAIL: {exc}", file=sys.stderr)
         return 2
@@ -469,6 +521,8 @@ def main(argv=None):
             "hunk": list(block.hunk) if block.hunk else None,
             "boot_fields": boot_fields,
             "og_profile_check": og_status,
+            "console_class": detected_console,
+            "console_class_check": console_status,
             "bucket_verify_check": verify_status,
             "bucket_verify": list(block.verify) if block.verify else None,
             "bucket_verify_source": block.verify_source,
