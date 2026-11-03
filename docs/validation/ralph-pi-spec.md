@@ -1,214 +1,275 @@
-# Ralph-pi loop spec — Forsaken 3DS native-renderer performance work
+    # TASK: On-device profiling and optimization loop on a physical Old 3DS
 
-This is the **iteration contract** for the unattended Ralph Wiggum loop driven by
-the pi harness (`tools/ralph-pi.sh`). Each iteration is a fresh pi context; this
-file plus the repo's own `AGENTS.md` are its entire memory. Anything not written
-here or into the archive does not exist for the next iteration.
+    ## HARNESS CONTRACT — read this first
 
-Branch: `experimental/native-renderer` (the loop works on the checked-out
-branch; never switch branches).
+    You are ONE iteration of an autonomous loop (ralph.sh re-launches
+    a fresh agent with this same prompt repeatedly). You have no
+    memory of previous iterations except what is on disk. Rules:
+    - On every invocation: read ./perf/OPTIMIZATION-LOG.md (if it
+      exists), `git status`, `atm status`, and `atm journal` BEFORE
+      doing anything. Disk state decides which phase you are in —
+      never assume, never restart completed phases.
+    - Do exactly ONE phase or ONE loop iteration (as defined below),
+      write your results to the log/state files, then END YOUR TURN.
+      The harness will relaunch you. Never run the whole campaign in
+      one turn.
+    - If ./perf/LOOP-DONE.md exists: do nothing except confirm and end.
+    - If the console or log state contradicts what you expected
+      (unresponsive console, leftover crash artifacts, a change
+      present in the tree with no log entry), STOP: write what you
+      found into ./perf/BLOCKED.md with exact commands/output, and end.
+      Do not improvise recovery and do not push on blind.
 
----
+    ## Mission
 
-## 1. Mission
+    You have access to a physical Original Nintendo 3DS (Old 3DS ONLY —
+    New 3DS numbers are never acceptable evidence) running a custom
+    Luma3DS+ATM firmware that makes it an autonomous hardware-testing
+    target. We profile on the OG 3DS because it is the lowest common
+    denominator: if it runs well here, it runs well everywhere this
+    project targets — and performance claims from any faster platform
+    prove nothing about this one. Your job across iterations: profile
+    THIS project running on that real hardware, find every
+    optimization you can justify with on-device measurements, apply
+    them one at a time, and prove each one helped.
 
-Raise the frame rate of the Citro3D (native) renderer on the OG-profile proxy
-toward 60 FPS by implementing the three remaining optimization items from the
-native-renderer brief:
+    ## Step 0 — Learn the hardware interface before touching anything
 
-| Item | What it means | Notes |
-|---|---|---|
-| **3 — native render path** | Replay the PICA200 command stream directly instead of translating it through the GL-style path. | **SCOPE ALREADY PARTLY DONE**: `render_c3d.c` is a direct-citro3d renderer (`C3D_DrawArrays`, own vertex conversion, own shaders) and picaGL is **not linked** for it. The stale comment at `render_c3d.c:2773` ("GL-based via picaGL") and the TODO at `render_c3d.c:2774` ("replace with raw citro3d C3D_DrawArrays once visual output confirmed") are both wrong. Item 3 therefore means: **decide what is actually left of the "native render path" lever** (e.g. indexed draws via `C3D_DrawElements` instead of re-expanded triangle lists, no per-draw scratch rebuild, no per-draw state churn), fix the stale comments/TODO, and implement the chosen remainder with measured evidence. A banked statement that item 3 is already satisfied is a valid outcome **only if it cites the code that proves it** and states what was left undone. |
-| **6 — pre-convert static vertices** | Convert level/static geometry to the GPU vertex format once (at load), instead of re-converting it every frame in `draw_render_object`. | `FSCreateVertexBuffer`/`FSLockVertexBuffer` (`render_c3d.c:1852`, `:1891`) hand out `LVERTEX`/`TLVERTEX`; the conversion to `gpu_vertex_t` happens per draw. Expected impact is low-to-moderate; measure, do not assume. |
-| **7 — reduce entity work** | Cut per-frame per-entity CPU cost (entity iteration, visibility, model dispatch). | Candidate areas: `ModelDisp` (`models.c:1387`), `ProcessShips` (`ships.c:700`), the visibility bucket builder. Prior failed experiments (enemy/model/bullet culling, half-resolution, FRAMESKIP) are recorded in the archive — read them before re-proposing. |
+    The complete operational manual is in the Obsidian vault (use the
+    Obsidian MCP tools): start with "ATM Autonomous Agent Runbook —
+    Original Old 3DS" and follow its links to `network-api-reference`,
+    `deployment-and-launch`, `debugger-guide`,
+    `profiling-and-telemetry`, `developer-mode`, `artifact-management`,
+    and `troubleshooting`. Do not invent endpoints or commands — if the
+    runbook doesn't document it, it doesn't exist. The firmware/tooling
+    source of truth is the Luma3DS repo at /mnt/nas/Development/Luma3DS
+    (controller: `tools/atmctl.py`, instrumentation core:
+    `sysmodules/rosalina/source/atm/atm_core.c`, example workload:
+    `tests/workloads/atm_workload_ok.c`).
 
-**Order of work**: pick the bounded change with the best expected value per
-iteration; do not attempt all three at once. Item 6 and item 7 are each one
-bounded change. Item 3 needs a scoping decision first (see the table).
+    Console facts (verify, never assume): 3DS at 192.168.4.167,
+    workstation 192.168.4.220, enrolled device id `old3ds-lan167`,
+    firmware build `da4b1b95a66c`. Ports: HTTP 8080, deploy TCP 17491,
+    telemetry UDP 8081, commands UDP 8082, GDB 4000–4003.
 
-**Target**: 60 FPS on the OG-profile proxy. The proxy is `OG_PROFILE=1` (N3DS at
-268 MHz, L2 off, OG heap/texture tiers) — it is **not** real Old 3DS hardware.
+    Define once per shell:
+      alias atm="python3 /mnt/nas/Development/Luma3DS/tools/atmctl.py --ip 192.168.4.167 --device-id old3ds-lan167"
 
----
+    ## Phase machine (do the FIRST phase whose output is missing)
 
-## 2. Repo memory (read these, in this order)
+    Phase A — VALIDATE the hardware loop.
+    Output: ./perf/OPTIMIZATION-LOG.md created with console identity
+    section + smoke-test result.
+    This ATM build is source/host-verified but has little physical
+    runtime so far. Before trusting any number:
+      atm status        # device must match, operational=yes
+      atm devmode       # devmode_armed=yes; ideally devmode_active=yes
+                        # svc_gdb=active:* required before any debugging
+      atm artifacts     # what's pending from previous work
+      atm journal       # previous run state
+    Then smoke-test with a trivial existing workload if available
+    (atm-deploy/workloads/atm_workload_ok.3dsx in the Luma3DS repo):
+      atm run <workload.3dsx> ./perf/smoke --build-id smoke
+    Only mark Phase A complete when deploy→launch→run→retrieve
+    completes with outcome COMPLETED and artifacts verified. If any
+    stage fails, diagnose via the runbook troubleshooting page, write
+    ./perf/BLOCKED.md with the exact failure, and end — do not build
+    profiling conclusions on a partially working loop. Hard
+    hangs/lockups are OUTSIDE the recovery contract: if the console
+    stops answering entirely, record manual-intervention-required in
+    BLOCKED.md; never claim recovery.
 
-1. `AGENTS.md` — the performance and platform contract (R1–R11, T1/T2, P1–P6).
-   It is binding: gates, exemptions grammar, and the do-not-reopen list.
-2. `docs/validation/ralph-pi-log.md` — **the archive**. Read the LAST TWO
-   `## iter NNN` entries (grep for the heading; never read the whole file).
-3. `docs/validation/capture-protocol.md` — the capture/evidence protocol.
-   are changing; do not read them whole.
+    Phase B — INSTRUMENT this project.
+    Output: profiling build exists; log records how to build it and
+    its build-id.
+    ATM measures nothing generically — no CPU%, no GPU, no memory
+    headroom. Frame timing comes from the app itself:
+    - Link `atm_core.c` (+ its header) from the Luma3DS repo into a
+      dedicated profiling build of this project.
+    - Call `atm_frame_add()` once per frame in the main loop (O(1),
+      no allocation, no I/O in the hot path). Add any app-specific
+      counters you need the same way (bounded, aggregated).
+    - After a FIXED, deterministic workload (same scene/input/frame
+      count every run — if the project has no benchmark mode, add one
+      behind a build flag; never profile interactive play), write the
+      `atm_frame_format_summary()` line plus your counters to
+      `/3ds/atm_result.txt`, then exit cleanly.
+    - Keep the `.elf` next to every `.3dsx` build. Wrong-build symbols
+      are the #1 debugging hazard; the GDB wrapper verifies sections,
+      and you must treat a mismatch as fatal to that session.
+    Measurement honesty: `osGetTime` granularity is 1 ms and
+    percentiles are bucket estimates. Say so in every report. Never
+    extrapolate to CPU/GPU utilization.
 
----
+    Phase C — BASELINE before optimizing.
+    Output: log contains a baseline table of 3 runs.
+      atm run build/<app>.3dsx ./perf/baseline-<gitrev> \
+          --build-id <gitrev-or-content-id> --scenario <workload-name>
+    Run the baseline 3 times. Record per run: build_id, firmware_id
+    (from `atm status`), scenario, frame summary (count, avg, p50,
+    p95, p99, max, over-budget count), and outcome. The spread across
+    the 3 baselines is your noise floor: no "improvement" smaller than
+    run-to-run noise counts as an improvement. Commit nothing yet.
 
-## 3. Exact commands (the only sanctioned ones)
+    Phase D — ONE OPTIMIZATION ITERATION (repeatable, see protocol).
 
-**Primary (unattended, safe): Emulator sweep.** Iterate on the emulator first for
-fast feedback. Use this path for most changes.
+    ## First profiling target — stereo traversal cost (start Phase D here)
 
-```sh
-make -f Makefile.3ds EDITION=remaster AUTOTEST_REMASTER=1 \
-     AUTOTEST_MAX_LEVELS_TO_SWEEP=1 AUTOTEST_MS_PER_LEVEL=8000 \
-     PERF_CAPTURE=1 OG_PROFILE=1 RENDERER=citro3d SLIM=1 -j"$(nproc)"
-tools/perf/check.sh
-EV="build_3ds/ralph-pi/evidence/perf-$(date -u +%Y%m%d-%H%M%S).log"
-tools/perf/emu_sweep.sh --out "$EV"
-python3 tools/perf/analyze_sweep.py "$EV" "$EV.analysis.txt"
-```
+    Prior finding to VERIFY in this project's source, not assume:
+    "Single-pass stereo replay is DISABLED. The replay mechanism
+    recorded left-eye draws into s_dl[] and re-submitted them with
+    the right eye's matrix/state, but the engine's gameplay/
+    visibility traversal in oct2's eye callbacks run fully (CPU cost
+    ~2x 3D traversal in stereo mode), so the CPU savings were not
+    realized and the replay path was disabled. The eye callbacks
+    still run fully in stereo."
 
-**When ready → Byte alignment check.** Before testing on real hardware, verify
-byte alignment issues don't exist. ARM11 is sensitive to alignment. Check:
-- Struct layouts (especially vertex structs like LVERTEX/gpu_vertex_t)
-- Unaligned accesses in hot paths
-- The historical InterpFrames alignment fix pattern
-- Ensure no new unaligned casts/memcpy patterns that could fault
+    Investigate in this order (each numbered item may take its own
+    Phase D iteration — log partial findings before ending your turn):
+    1. Confirm or refute the claim in code: locate s_dl[], the
+       replay submit path, the eye callbacks, and what work
+       (gameplay? visibility/PVS? draw collection?) actually runs
+       per eye vs per frame. Report where the quote is stale.
+    2. Baseline BOTH configurations as separate scenarios with
+       identical scene/inputs: mono (3D off) and stereo (3D on).
+       Add bounded app-side counters beyond frame time: per-eye
+       traversal invocation count and accumulated ms, draw-call
+       count per eye, s_dl recorded size. Frame time alone cannot
+       attribute this cost — do not guess the split.
+    3. Candidate fixes, as separate loop iterations, smallest first:
+       (a) hoist eye-invariant work (gameplay, visibility) out of
+           the per-eye callbacks so it runs once per frame and only
+           draw submission is per-eye;
+       (b) only if (a) is insufficient or inapplicable, evaluate
+           re-enabling replay — note the original failure mode:
+           replay saves draw-submission CPU but is worthless if
+           traversal still runs twice, so quantify replay overhead
+           vs second-traversal cost before reviving it.
+    4. Correctness for stereo changes MUST use a 3D screenshot set
+       (manifest is3d=yes, includes the right-eye image): both eyes
+       correct, correct disparity, no left-eye state leaking into
+       the right eye. A mono-only screenshot does not verify this.
+    Success criterion: stereo frame cost approaching mono + draw
+    submission only, proven by the per-eye counters, not just FPS.
 
-Use tools to inspect, grep for suspicious patterns, and reason about alignment.
-Document findings in the archive entry.
+    ## Phase D iteration protocol (self-directed loop)
 
-**Then test on real hardware.** Only after emulator iteration is stable AND
-byte alignment checked, test on real hardware via the netload_stub pipeline.
+    State lives on disk, not in your context:
+    - At the START of every iteration, re-read
+      ./perf/OPTIMIZATION-LOG.md and run `atm status` + `atm journal`.
+      Never re-attempt a hypothesis already marked reverted/dead.
+      If the console state doesn't match what the log expects (wrong
+      run, pending crash artifacts, not operational), reconcile or
+      STOP (write ./perf/BLOCKED.md) — never push on blind.
+    - Each iteration completes fully before the next begins:
+      hypothesis → one change → 3 measured runs → correctness →
+      keep/revert → log entry written BEFORE you end your turn.
+    - Stop conditions (any one ends the campaign: write the final
+      summary into the log, create ./perf/LOOP-DONE.md, and end):
+      (a) 3 consecutive iterations with no gain beyond baseline noise;
+      (b) 15 total Phase D iterations (count them from the log);
+      (c) console unresponsive or any INCOMPLETE_RECOVERY (also write
+          BLOCKED.md instead of LOOP-DONE.md in this case);
+      (d) the only remaining ideas require a visual/gameplay trade-off
+          or a mass rewrite — write those as proposals in the log for
+          my approval instead of implementing them.
+    - You own task selection between iterations: always attack the
+      largest measured cost next (stereo traversal first, per the
+      target section). If your context is compacted or restarted,
+      the log + `atm journal` are how you recover — trust disk over
+      memory.
 
-```sh
-# Build for hardware (may need different flags; check current working config)
-make -f Makefile.3ds EDITION=remaster AUTOTEST_REMASTER=1 PERF_CAPTURE=1 OG_PROFILE=1 RENDERER=citro3d -j"$(nproc)"
-```
+    One Phase D iteration is:
+    1. HYPOTHESIZE from evidence, not vibes. Use the frame stats and
+       counters to name the suspected bottleneck. To localize it, use
+       the debugger (diagnosis ONLY — see rules below):
+         atm deploy build/<app>.3dsx --build-id <id> --no-launch
+         atm launch <name>   # then confirm `running` via atm journal
+         python3 /mnt/nas/Development/Luma3DS/netload_stub/host/n3dlgdb.py \
+           192.168.4.167 --elf build/<app>.elf --port 4000 --cmds cmds.txt
+       or raw arm-none-eabi-gdb extended-remote :4000 (break-on-start
+       via :4003 before launch). Breakpoints, watchpoints, register/
+       memory inspection, and backtraces are for understanding WHERE
+       time goes. Detach cleanly when done.
+    2. CHANGE exactly one thing. Smallest diff that tests the
+       hypothesis. Respect Old 3DS limits: no unbounded allocation,
+       no new threads casually, no SD writes or network in hot paths.
+    3. MEASURE: same scenario, same frame count, 3 runs via `atm run`
+       into a fresh ./perf/<change-id>/ dir. Compare median-of-3 and
+       p95/p99 against baseline median — averages alone hide hitches.
+    4. VERIFY CORRECTNESS, not just speed:
+         atm screenshot --label <change-id> --retrieve-to ./perf/<change-id>/shots
+       Compare screenshots against baseline visually (rendering must
+       not change unless the change intends it). Screenshots stall the
+       workload (whole-cache flush) — capture in a SEPARATE run from
+       timed runs, never during measurement.
+    5. KEEP or REVERT based on the numbers. A change with no
+       measurable gain beyond noise, or any correctness regression,
+       gets reverted. Log it either way (hypothesis, diff summary,
+       before/after table, keep/revert) in ./perf/OPTIMIZATION-LOG.md.
+    6. Use your resources. You have Internet access plus Obsidian MCP
+       and Cognee MCP. Use them aggressively to GENERATE hypotheses —
+       known Old 3DS/ARM11 bottlenecks, PICA200 costs, libctru/citro3d
+       pitfalls, prior findings from memory. But external claims are
+       never evidence: every researched idea still enters at step 1
+       of this iteration, one variable at a time, and lives or dies
+       by this console's measurements. Record the source of each
+       hypothesis in the log. Work autonomously and make good
+       engineering decisions within these rules; never trade visual
+       quality or gameplay behavior for frame time without flagging
+       it as a proposal for my approval instead of implementing it.
+       If you write findings to Cognee/memory, write only measured
+       results, labeled with build_id + firmware_id — never store
+       hypotheses as facts.
 
-Then use the hardware pipeline: check ports, push via 3dslink, monitor via
-`tools/perf/ralph_loop.sh` or `tools/perf/wave*_pipeline.sh`. Follow the
-`3ds-autonomous-hardware-profiling-loop` runbook. If pushes fail or hardware
-becomes unstable, fall back to emulator immediately.
+    ## Crashes during the loop
 
-**Fallback rule:** If hardware is unstable (transferrer failures, black screen,
-stuck) or if alignment issues are suspected, drop back to emulator and
-investigate there. The loop must utilize the emulator whenever it sees fit.
+    They will happen; use them, don't fear them. `atm run` already
+    handles supported crashes: unattended capture (fatal ARM11 and
+    ErrDisp paths), auto-reboot, reconnect, artifact retrieval, and
+    correlation to the run/build. Outcomes CRASH_FATAL/CRASH_ERRDISP
+    mean recovery worked; INCOMPLETE_RECOVERY/RECOVERY_FAILURE mean
+    stop and report (BLOCKED.md). Resolve crash PCs against THAT run's
+    exact ELF:
+      arm-none-eabi-addr2line -e build/<app>.elf <pc>
+    A missing dump is never proof no crash occurred. Never ack/delete
+    artifacts except through atmctl's verify-then-ack flow.
 
----
+    ## Hard rules
 
-## 4. Evidence rules (do not skip these)
+    - NEVER report debugger-attached or screenshot-interrupted runs
+      as performance evidence.
+    - NEVER substitute emulator, New 3DS, or host timings for Old 3DS
+      measurements. Label every number with build_id + firmware_id +
+      scenario, or don't report it.
+    - One variable at a time. No speculative mass rewrites.
+    - Preserve behavior outside the profiling build flag; the release
+      build must keep working exactly as before, minus the measured
+      optimizations.
+    - Do not modify the Luma3DS firmware, atmctl, or the console's
+      SD gate files. If the hardware interface itself seems broken,
+      stop and report it (BLOCKED.md) — that's a different project's bug.
+    - Do not commit or push anything without my explicit approval.
+      (The loop harness does NOT change this: no per-iteration
+      commits. Your checkpoint is the log + measured artifacts.)
+    - If the console becomes unresponsive (no HTTP, no telemetry,
+      past `atm wait-ready` budget), stop and report exactly what
+      was running (BLOCKED.md). Do not loop retries forever.
 
-- **An emulator number is never a hardware number.** Mandarine runs the guest
-  CPU at host speed, has ~5 MB linear heap (hardware: 22–24 MB), lenient
-  clamping and different f24 precision. Emulator timings are **directional**
-  evidence for ranking and for spotting regressions inside this loop. They do
-  **not** clear any `AGENTS.md` P6 hardware claim
-  (`docs/validation/capture-protocol.md` §6). Say so in every entry that quotes
-  a number.
-- **A/B, not one-shot.** A claim about a change needs a baseline artifact and a
-  candidate artifact from **matched** runs (same flags, same level, same
-  emulator, same display). Compare `stage=` totals per frame via
-  `analyze_sweep.py`. A single run is a smoke test, not a measurement.
-- **Freshness**: `emu_sweep.sh` refuses to report a stale artifact (md5
-  unchanged) and removes the previous artifact before each run. If it exits 3,
-  the run produced nothing — that is a FAILURE to diagnose, not a null result.
-- **Scope of a claim**: if the artifact does not cover the level/feature you
-  changed, the entry must say the claim is UNVERIFIED.
-- **Never invent a measurement.** If you did not run it, it is not a result.
+    ## Deliverable (assembled incrementally; finalized in LOOP-DONE.md)
 
----
+    1. ./perf/OPTIMIZATION-LOG.md: baseline table (3 runs), then one
+       entry per attempted change — hypothesis, evidence that
+       motivated it, diff summary, before/after medians (avg, p50,
+       p95, p99, max), correctness check, keep/revert decision.
+    2. A final summary (in LOOP-DONE.md): total measured improvement
+       vs baseline (per metric), which changes survived, what you
+       tried that didn't help, what remains unmeasured or blocked,
+       and anything about the hardware loop itself that surprised you.
+    3. All kept optimizations as an uncommitted working-tree diff for
+       my review, listed file by file in the final summary.
 
-## 5. Archive format
+    Begin: determine your phase from disk, do that ONE phase or ONE
+    iteration, log it, and end your turn. Find every optimization the
+    hardware can prove exists — and claim none it can't.
 
-Append to `docs/validation/ralph-pi-log.md`. One entry per iteration, heading
-`## iter NNN — <short slug>` (NNN = next number, zero-padded to 3). Entry
-template:
-
-```markdown
-## iter 007 — <slug>
-
-- Item: 3 | 6 | 7 | <other>
-- Change: <one line: what changed, file:line>
-- Risk: low | medium | high          <-- REQUIRED, drives the review lane
-- Build: <exact command> -> exit=<n>
-- Gates: tools/perf/check.sh -> exit=<n>
-- Evidence: <artifact paths> (baseline <path>, candidate <path>)
-- Result: <the measured delta and what it means; emulator-scoped>
-- Unverified: <anything you could not check>
-- Next: <the single next bounded action>
-```
-
-Rules:
-
-- Candidates, not verdicts: the independent reviewer (`router/verify`) appends
-  `VERDICT(verify): ...` lines. Do not write verdicts yourself.
-- The `Risk:` line is what the loop uses to decide whether to invoke the
-  reviewer. Classify honestly:
-  - **low** — small/local, no interface/architecture/state change, no
-    concurrency/memory/resource-lifetime change, gates pass.
-  - **medium** — bounded but touches behavior, data layout, or a hot path in a
-    way that could regress gameplay.
-  - **high** — architecture/interfaces/state transitions, memory safety,
-    concurrency, resource lifetime, performance-critical code, or a fix whose
-    root cause is still uncertain.
-- Never rewrite a previous entry. Corrections are appended as a new entry.
-
----
-
-## 6. Review policy (binding)
-
-The builder implements, the verification harness proves, an independent reviewer
-challenges. The reviewer is a **different model family** (`router/verify`, pinned
-machine-wide to local qwen then muse) and is **read-only** — it appends one
-verdict line and changes nothing else.
-
-- **low** risk → no independent review of that entry.
-- **medium** risk → reviewed in batches (the loop reviews at least every 5
-  completed iterations, and always before the mission is declared complete).
-- **high** risk → reviewed immediately; the entry must say so in its first
-  line: `RISK-ALERT: high` so the loop reviews it without waiting for the
-  batch.
-
-Review findings are advisory. The builder assesses them and implements focused
-fixes; a rejected finding is recorded with a one-line technical reason. Never
-weaken or delete a gate to make something pass.
-
----
-
-## 7. Safety
-
-- **Do not commit, push, publish or deploy.** Leave the change in the working
-  tree; the operator commits. (The loop's own files under `build_3ds/` are
-  gitignored.)
-- **Do not modify**: `AGENTS.md`, `tools/perf/contracts/*` (exemptions,
-  baselines, corpus) unless the mission is explicitly about them, and never
-  `tools/perf/check.sh` to make it pass.
-- **Do not weaken acceptance criteria** to converge the loop.
-- **Do not run two emulator sweeps at once** — `emu_sweep.sh` holds a
-  per-display lock; respect it.
-- **Do not touch the hardware console** (`192.168.4.52`, netload_stub, 3dslink).
-  Hardware validation is a human step and the console is currently unreliable.
-- **Search scope**: this repo only. `/opt/devkitpro/` only for devkitPro
-  header/tool questions. Never `/`, `$HOME`, `/mnt/nas`, or sibling repos.
-- **Leave the tree buildable**: if an iteration cannot finish its change, revert
-  it before ending the iteration. The next iteration starts from a clean build.
-- Do not overwrite unrelated user changes in the working tree (`git status`
-  before you start; leave anything you did not create alone).
-
----
-
-## 8. Completion criterion (derived; the loop exits on `<promise>DONE</promise>`)
-
-The mission is complete when ALL of the following are true and banked in the
-archive:
-
-1. **Item 3** has a banked verdict: either the remaining native-path work is
-   implemented with matched emulator A/B evidence, or the entry states (with
-   code citations) that the item was already satisfied and what, if anything,
-   was left undone — and the stale comments/TODO in `render_c3d.c` are fixed.
-2. **Item 6** and **item 7** each have a banked verdict: implemented with
-   matched emulator A/B evidence, OR a banked explanation of why the item was
-   measured and rejected (a null result is a valid result — record it, do not
-   re-run until a win appears).
-3. `tools/perf/check.sh` exits 0 at the final tree state.
-4. A banked frame-budget assessment: the emulator-measured per-frame CPU work
-   against the 16.67 ms (60 FPS) budget, explicitly labelled **not** a hardware
-   pass, with hardware validation listed as the remaining human step.
-5. No unresolved high-severity reviewer finding, and no unexplained regression.
-
-The loop emits `<promise>DONE</promise>` **only** when all five hold. A DONE is
-a claim, not a fact: the operator re-scores it.
-
-**WATCH-THE-CLOCK**: the loop kills an iteration at its wall limit. If the
-elapsed time in your footer passes `wall − 30 min`, STOP investigating and BANK
-NOW under the next `## iter NNN` heading. A banked partial beats a killed full.
