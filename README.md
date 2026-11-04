@@ -142,6 +142,45 @@ either platform.
 
 ## Quick start
 
+
+# netload_stub target — operating contract
+
+Target: physical Original Old 3DS ONLY (device `old3ds-lan167` at
+`192.168.4.167`, workstation `192.168.4.220`). New 3DS, emulator, and
+host timings are never hardware evidence. Firmware/tooling source of
+truth: this repo. Controller: `tools/atmctl.py`. Immutable: never
+modify `netload_stub/`.
+
+Alias once per shell:
+`atm="python3 tools/atmctl.py --ip 192.168.4.167 --device-id old3ds-lan167"`
+Ports: HTTP 8080, deploy TCP 17491, telemetry UDP 8081, commands
+UDP 8082, GDB 4000–4003.
+
+Rules (non-negotiable):
+- NEVER ask for a physical action: no SD-card handling, no button
+  presses, no power cycling, no lid operation, no reading screens.
+  Operate the console over the network only (`atmctl`, GDB stub,
+  telemetry, HTTP). A silent console is reported as
+  manual-intervention-required, never fixed by asking the user.
+- Firmware installs go over the network (`atm fwupdate`), reboots
+  are remote (`atm reboot`) or crash-triggered (auto-reboot).
+- Validate before acting: `atm status` (device match,
+  `operational=yes`), `atm devmode` (require `devmode_active=yes`
+  before debugging), `atm journal`, `atm artifacts`.
+- One full cycle: `atm run <app>.3dsx ./perf/<dir> --build-id <id>
+  --scenario <name>` (deploy → launch → execute → retrieve).
+  Deployment, launch, and execution are separate claims — check the
+  journal, not just the exit code.
+- Debug with the exact matching `.elf` (`target extended-remote
+  :4000`); wrong-build symbols invalidate the session. Never report
+  debugger-attached or screenshot-interrupted runs as performance.
+- Acknowledge artifacts only after SHA-256 verification; a missing
+  dump never proves no crash occurred.
+- Label every claim: SOURCE (read code), HOST (workstation test),
+  REAL-PROTOCOL, SIMULATED (fake device), HARDWARE (this Old 3DS).
+- Do not commit or push without explicit approval.
+
+
 ### Build the 3DSX (homebrew launcher)
 
 ```bash

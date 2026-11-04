@@ -817,3 +817,9 @@ release: release-check
 	@echo "  forsaken3ds_himem_alt.cia — HIMEM alt"
 	@echo "  forsaken3ds.3dsx         — HBL (dev iteration, not for general install)"
 	@echo "============================================================"
+
+# ATM profiling
+ifdef ATM_PROF
+CFLAGS += -I. -DATM_PROF
+SRCS += atm_core.c
+endif

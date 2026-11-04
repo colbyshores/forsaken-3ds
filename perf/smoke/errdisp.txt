@@ -1,0 +1,14 @@
+Reported on:      2025-09-22 09:16:09
+System booted on: 2025-09-22 08:35:16
+
+Error type:       generic
+
+Process ID:       20
+Process name:     gsp
+Process title ID: 0004013000001c02
+
+Address:          0x00105268
+Error code:       0xf9602a00
+
+-------------------------------------
+

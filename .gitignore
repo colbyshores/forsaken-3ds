@@ -166,3 +166,6 @@ Configs/debug.txt
 !assets/banner.png
 !assets/banner.wav
 forsaken_stereo.txt
+
+# ATM profiling artifacts
+perf/

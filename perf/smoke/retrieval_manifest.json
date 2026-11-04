@@ -1,0 +1,167 @@
+{
+ "device": "192.168.4.167",
+ "artifacts": [
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000000.dmp",
+   "local": "./perf/smoke/crash_dump_00000000.dmp",
+   "bytes": 4340,
+   "sha256": "6f2012771e1ee0ab64dc4ee9495d81d68bccf8ead95f9ef297b14de4047aac9b",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000030.dmp",
+   "local": "./perf/smoke/crash_dump_00000030.dmp",
+   "bytes": 980,
+   "sha256": "17a2fa9e7d0adbc11f7cad9c25e69316dc51778db87000d0e6861d80b589ff1f",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000031.dmp",
+   "local": "./perf/smoke/crash_dump_00000031.dmp",
+   "bytes": 980,
+   "sha256": "0f69c41cafb2ac07a217570daf7e2362877392e4556e7c632efa6a8d9a3d4460",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000032.dmp",
+   "local": "./perf/smoke/crash_dump_00000032.dmp",
+   "bytes": 980,
+   "sha256": "f2c9d74d627c6aa7c87d61e77818c8329954323b1df617d444cc71b523696db8",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000033.dmp",
+   "local": "./perf/smoke/crash_dump_00000033.dmp",
+   "bytes": 980,
+   "sha256": "4a41a7ea758f194b7b9f1f4c8f7ea94ee019e974a732f150cf11111894e498d6",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000034.dmp",
+   "local": "./perf/smoke/crash_dump_00000034.dmp",
+   "bytes": 604,
+   "sha256": "323026638e1279200f0da1d8ff20bcaf04315c4124ceb202ac2c788dddebc04b",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000035.dmp",
+   "local": "./perf/smoke/crash_dump_00000035.dmp",
+   "bytes": 752,
+   "sha256": "c8d53cfe5d56504c3167f79a1c05aa12dc122ca057cd897698042fdd6e41b162",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000036.dmp",
+   "local": "./perf/smoke/crash_dump_00000036.dmp",
+   "bytes": 752,
+   "sha256": "bda2986a079767ef18184b1947951508d180f6d7f0738c98d33f386bf9d79c81",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm11/crash_dump_00000037.dmp",
+   "local": "./perf/smoke/crash_dump_00000037.dmp",
+   "bytes": 612,
+   "sha256": "5b1cf9f84b80f02b745a5eaf56b9ad47ca024cf36cf60b9d1a3991388882671e",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/arm9/crash_dump_00000000.dmp",
+   "local": "./perf/smoke/crash_dump_00000000.dmp",
+   "bytes": 3844,
+   "sha256": "398e8d3da644d3cac01d49c7988664d7737137340b6dc7b64b8c0ac8fec3208c",
+   "kind": "dump",
+   "status": "retrieved_verified",
+   "acked": true
+  },
+  {
+   "file": "/luma/dumps/auto_dump_status.txt",
+   "local": "./perf/smoke/auto_dump_status.txt",
+   "bytes": 16,
+   "sha256": "94475dc979722ed603df7374348f42287ce0eaf49100d666262c1d9a524c358f",
+   "kind": "status",
+   "status": "retrieved_verified",
+   "acked": false
+  },
+  {
+   "file": "/luma/errdisp.txt",
+   "local": "./perf/smoke/errdisp.txt",
+   "bytes": 281,
+   "sha256": "903d9b06eb7c76a1b56f4748ef295260f12706df56aacddb119fc13cd26d96ea",
+   "kind": "errdisp",
+   "status": "retrieved_verified",
+   "acked": false
+  },
+  {
+   "file": "/luma/atm/run_record_a.txt",
+   "local": "./perf/smoke/run_record_a.txt",
+   "bytes": 429,
+   "sha256": "9018998df8297d6aff64c861dc48ce4a958b6db255b8fd4bba530810bbe36680",
+   "kind": "record",
+   "status": "retrieved_verified",
+   "acked": false
+  },
+  {
+   "file": "/luma/atm/run_record_b.txt",
+   "local": "./perf/smoke/run_record_b.txt",
+   "bytes": 430,
+   "sha256": "c90e22ca84f3978c0c662de6b4fa8819db6b913ef7b3818df1fff1f3bca34292",
+   "kind": "record",
+   "status": "retrieved_verified",
+   "acked": false
+  },
+  {
+   "file": "/luma/atm/atm.log",
+   "local": "./perf/smoke/atm.log",
+   "bytes": 65051,
+   "sha256": "8c51a718c7533d3df5057035ca8aff890a33ead19d25261e9a8775e0dea50772",
+   "kind": "log",
+   "status": "retrieved_verified",
+   "acked": false
+  },
+  {
+   "file": "/luma/atm/fwupdate.txt",
+   "local": "./perf/smoke/fwupdate.txt",
+   "bytes": 124,
+   "sha256": "cddb612596e5b097ea16758ffe10ad5e96d5d2c2db4c2ae6c133f8e6666f718e",
+   "kind": "fwupdate",
+   "status": "retrieved_verified",
+   "acked": false
+  },
+  {
+   "file": "/3ds/atm_result.txt",
+   "local": "./perf/smoke/atm_result.txt",
+   "bytes": 198,
+   "sha256": "48f5bd9b0530ed9264c0ddd69cfb0092ae00e906ba15c958bc4d5775142ad4e6",
+   "kind": "result",
+   "status": "retrieved_verified",
+   "acked": false
+  },
+  {
+   "file": "/3ds/atm_workload_last.txt",
+   "local": "./perf/smoke/atm_workload_last.txt",
+   "bytes": 39,
+   "sha256": "76389837893e2971bf9167c773819e6c89dbc3ac5b2771e24048e09024c5c138",
+   "kind": "marker",
+   "status": "retrieved_verified",
+   "acked": false
+  }
+ ]
+}

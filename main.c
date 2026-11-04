@@ -748,6 +748,11 @@ int main( int argc, char* argv[] )
 
 #ifdef __3DS__
 	boot_log("[boot] entering main render loop");
+#ifdef ATM_PROF
+	atm_frame_init(&_atm_stats);
+	_atm_prev = svcGetSystemTick();
+	_atm_frames = 0;
+#endif
 	/* aptMainLoop() must gate the main loop on 3DS. It handles HOME menu
 	 * display, suspend on sleep-mode, and resume-from-sleep restoration.
 	 * Without this, the app never yields to the OS for these events —
@@ -828,10 +833,40 @@ int main( int argc, char* argv[] )
 #if defined(DEBUG_ON) && defined(DEBUG_ALL_MATH_ERRORS)
 		DebugMathErrors();
 #endif
+#ifdef ATM_PROF
+		{
+			u64 now = svcGetSystemTick();
+			/* ticks are 268.11184 MHz, convert to microseconds */
+			u32 frame_us = (u32)((now - _atm_prev) * 1000000ULL / 268111840ULL);
+			atm_frame_add(&_atm_stats, frame_us, 16667);
+			_atm_prev = now;
+			_atm_frames++;
+			if (_atm_frames >= _atm_max_frames) {
+				QuitRequested = true;
+			}
+		}
+#endif
 		PERF_FRAME_END();
 	}
 
 	PERF_DUMP();
+#ifdef ATM_PROF
+	{
+		char summary[192];
+		atm_frame_format_summary(&_atm_stats, summary, sizeof(summary));
+		FILE *f = fopen("sdmc:/3ds/atm_result.txt", "w");
+		if (f) {
+			fprintf(f, "workload=forsaken
+status=complete
+");
+			fprintf(f, "frames=%d
+", _atm_frames);
+			fprintf(f, "%s", summary);
+			fflush(f);
+			fclose(f);
+		}
+	}
+#endif
 
 	/* Normal-exit teardown. On 3DS, QuitRequested is set by the
 	 * Start+Select input handler or aptMainLoop returning false
@@ -862,3 +897,13 @@ FAILURE:
 
 	return 1;
 }
+
+#ifdef ATM_PROF
+#include "atm/atm_core.h"
+#include <3ds.h>
+#include <stdio.h>
+static AtmFrameStats _atm_stats;
+static u64 _atm_prev = 0;
+static int _atm_frames = 0;
+static int _atm_max_frames = 600; /* 10 seconds at ~60fps */
+#endif
