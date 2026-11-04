@@ -1,0 +1,5 @@
+workload=atm_workload_ok
+status=complete
+frames=240 duration_ms=3790
+checksum=94ee3dc5
+@n3dl frames=240 avg_us=15791 p50_us=18000 p95_us=19000 p99_us=22000 max_us=22000 over_budget=125 min_us=12000

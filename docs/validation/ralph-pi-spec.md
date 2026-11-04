@@ -53,7 +53,7 @@
     telemetry UDP 8081, commands UDP 8082, GDB 4000–4003.
 
     Define once per shell:
-      alias atm="python3 /mnt/nas/Development/Luma3DS/tools/atmctl.py --ip 192.168.4.167 --device-id old3ds-lan167"
+      alias atm="python3 /mnt/nas/Development/netload_stub/tools/atmctl.py --ip 192.168.4.167 --device-id old3ds-lan167"
 
     ## Phase machine (do the FIRST phase whose output is missing)
 
