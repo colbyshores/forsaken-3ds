@@ -412,7 +412,6 @@ void EnableEnemy( u_int16_t EnemyIndex );
 void DisableEnemy( ENEMY * Enemy );
 ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTOR * Dir, VECTOR * UpDir, float DirLength, VECTOR * Int_Point,
 						VECTOR * Int_Point2, float * Dist, float WeaponRadius, u_int16_t ColType );
-void CheckHitEnemy_NewFrame( void );
 void SetCurAnimSeq( int16_t Seq, OBJECT * Object );
 bool GetLastCompDispMatrix( OBJECT * Object, MATRIX * Matrix, MATRIX * TMatrix, VECTOR * FirePos, int16_t BaseIndex );
 void SetTurretVector( OBJECT * Object, VECTOR * Vector, int16_t BaseIndex );

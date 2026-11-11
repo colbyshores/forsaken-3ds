@@ -6248,19 +6248,6 @@ void DisableEnemy( ENEMY * Enemy )
 				:	u_int16_t		Colision Type
 	Output		:	ENEMY	*	Enemy Address ( NULL If none hit )
 ===================================================================*/
-/* Compact hittable-enemy list backing (opt3): file-static so the build
- * survives across the ~105 CheckHitEnemy calls per frame. Pointers stay
- * valid (Enemies[] is a static array, never freed); Enable is rechecked
- * per entry so mid-loop kills stay exact. */
-static ENEMY * HitList[ MAXENEMIES ];
-static int HitListCount = 0;
-static int HitListBuilt = 0;
-
-void CheckHitEnemy_NewFrame( void )
-{
-	HitListBuilt = 0;
-}
-
 ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTOR * Dir, VECTOR * UpDir, float DirLength, VECTOR * Int_Point,
 						VECTOR * Int_Point2, float * Dist, float WeaponRadius, u_int16_t ColType )
 {
@@ -6273,41 +6260,18 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTO
 	float		Cos;
 	float		ColRadius = 0.0f;
 	ENEMY	*	Enemy;
-	int			HitListIndex;
+	ENEMY	*	NextEnemy;
 
 //	return( NULL );
 
 	ClosestEnemy = NULL;
 	ClosestLength = *Dist;
 
-	/* Per-frame compact hittable-enemy list (opt3): the per-bullet walk
-	 * visited every used enemy (~92 in ramqan, 9708 visits/frame) while
-	 * only ~37 pass the Enable/sphere predicates. Build once per
-	 * bullet-loop invocation; each bullet walks the short list in chain
-	 * order (same hit priority). Enable is rechecked per entry so
-	 * mid-loop kills stay exact; nothing else mutates enemies during
-	 * bullet processing. Non-bullet callers are unaffected: the list is
-	 * rebuilt on first use after every NewFrame reset. */
-	if( !HitListBuilt )
-	{
-		ENEMY * e;
-		HitListCount = 0;
-		e = FirstEnemyUsed;
-		while( e != NULL )
-		{
-			if( ( e->Status & ENEMY_STATUS_Enable ) && ( e->CompCollision == SPHERECOLLISION ) &&
-			    ( e->Type != ENEMY_Boss_Avatar || IsAvatarActive() ) )
-			{
-				HitList[ HitListCount++ ] = e;
-			}
-			e = e->NextUsed;
-		}
-		HitListBuilt = 1;
-	}
+	Enemy = FirstEnemyUsed;
 
-	for( HitListIndex = 0; HitListIndex < HitListCount; HitListIndex++ )
+	while( Enemy != NULL )
 	{
-		Enemy = HitList[ HitListIndex ];
+		NextEnemy = Enemy->NextUsed;
 		atm_prof_add( ATM_C_ENEMY_VISITS, 1 );
 
 		if( !( ( OwnerType == OWNER_ENEMY ) && ( Owner == Enemy->Index ) ) )
@@ -6422,7 +6386,8 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTO
 				}
 			}
 		}
-SkipIt: ;
+SkipIt:
+		Enemy = NextEnemy;
 	}
 
 	if( ClosestEnemy != NULL ) *Dist = ClosestLength;
