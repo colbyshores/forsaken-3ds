@@ -21,6 +21,7 @@
 #include <3ds.h>
 
 #include "framedump.h"
+extern void boot_log(const char *msg); /* DIAG-LISTENER: reverted after */
 #include "framedump_core.h"
 
 /* SOC context: 64 KiB, page-aligned (socInit requires 0x1000 alignment),
@@ -277,7 +278,20 @@ void framedump_poll(void)
 #endif
 	if (s_listenFd < 0) return;
 	cfd = accept(s_listenFd, NULL, NULL);
-	if (cfd < 0) return; /* nobody waiting: the normal idle case */
+	if (cfd < 0) {
+		/* DIAG-LISTENER: log first REAL accept failure only; EAGAIN /
+		 * EWOULDBLOCK on a nonblocking socket is the normal idle case. */
+		if (errno != EAGAIN && errno != EWOULDBLOCK) {
+			static int accept_logged = 0;
+			if (!accept_logged) {
+				char b[64];
+				accept_logged = 1;
+				snprintf(b, sizeof(b), "[fdnet] accept failed errno=%d", errno);
+				boot_log(b);
+			}
+		}
+		return;
+	}
 	got = recv(cfd, buf, sizeof(buf) - 1, 0);
 	if (got <= 0) {
 		close(cfd);
