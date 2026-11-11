@@ -4393,13 +4393,11 @@ bool RenderScene( void )
 #ifdef __3DS__
     _3ds_mr_ctx = "post-MainGame";
 #endif
-    perf_stage_begin( 58 ); /* DIAG-TAIL: post-MainGame sound tail, reverted after attribution */
     if ( bSoundEnabled && !CurrentMenu )
     {
       ProcessLoopingSfx();
       ProcessEnemyBikerTaunt();
     }
-    perf_stage_end( 58, -1 );
 #ifdef __3DS__
     _3ds_mr_ctx = "post-SoundProcessing";
 #endif

@@ -793,13 +793,8 @@ int main( int argc, char* argv[] )
 		}
 #endif
 		// process system events
-		perf_stage_begin( 57 ); /* DIAG-TAIL: handle_events span, reverted after attribution */
 		if(!handle_events())
-		{
-			perf_stage_end( 57, -1 );
 			goto FAILURE;
-		}
-		perf_stage_end( 57, -1 );
 
         // Attempt to render a frame, if it fails, take a note.  If
         // rendering fails more than twice, abort execution.
@@ -836,9 +831,7 @@ int main( int argc, char* argv[] )
 
 #ifdef __3DS__
 		// refill music stream buffers
-		perf_stage_begin( 59 ); /* DIAG-TAIL: music_update span, reverted after attribution */
 		music_update();
-		perf_stage_end( 59, -1 );
 #endif
 
 		// command line asks us to sleep and free up sys resources a bit...
