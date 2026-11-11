@@ -1671,6 +1671,7 @@ void ProcessPrimaryBullets( void )
 
 	PyroCount += framelag;
 
+	{ extern void CheckHitEnemy_NewFrame( void ); CheckHitEnemy_NewFrame(); }
 	i = FirstPrimBullUsed;
 	while( i != (u_int16_t) -1 )
 	{

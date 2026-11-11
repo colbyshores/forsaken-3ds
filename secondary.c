@@ -2049,6 +2049,7 @@ void ProcessSecondaryBullets( void )
 	int16_t		Count;
 	float		NewFramelag;
 
+	{ extern void CheckHitEnemy_NewFrame( void ); CheckHitEnemy_NewFrame(); }
 	i = FirstSecBullUsed;
 
 	if( ImTargeted )
