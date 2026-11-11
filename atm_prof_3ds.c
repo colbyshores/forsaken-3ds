@@ -66,6 +66,9 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"sfx_used",
 	"sfx_create",
 	"sfx_release",
+	"trig_pcheck",
+	"trig_echeck",
+	"trig_proc",
 };
 
 enum {

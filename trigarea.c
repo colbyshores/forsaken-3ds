@@ -34,6 +34,7 @@ num_zones : u_int16_t
 
 #include <stdio.h>
 #include "main.h"
+#include "atm_prof.h"
 #include "new3d.h"
 #include "quat.h"
 #include "main.h"
@@ -415,6 +416,7 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 	TRIGGER_AREA * Area;
 	bool	CanActivate;
 
+	atm_prof_add( ATM_C_TRIG_PCHECK, 1 );
 	Area = GroupTriggerArea_player_shoots[Group];
 	while( Area )
 	{
@@ -515,6 +517,7 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 	TRIGGER_AREA * Area;
 	bool	CanActivate;
 
+	atm_prof_add( ATM_C_TRIG_ECHECK, 1 );
 	Area = GroupTriggerArea_enemy_shoots[Group];
 	while( Area )
 	{
@@ -670,6 +673,8 @@ void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area
 {
 	bool	OldIn;
 	bool	NewIn;
+
+	atm_prof_add( ATM_C_TRIG_PROC, 1 );
 
 	Entry = false;
 	Exit = false;
