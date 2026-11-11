@@ -4587,6 +4587,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 	VECTOR		TempVector;
 	VECTOR		Recoil;
 	u_int16_t		i, Next;
+	u_int16_t		nSecWalk;
 //	char		methodstr[256];
 //	char		tempstr[256];
 	ENEMY	*	Enemy;
@@ -4753,9 +4754,12 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 	Shockwave hitting any mines?
 ===================================================================*/
 	i = FirstSecBullUsed;
+	nSecWalk = 0;
 
-	while( i != (u_int16_t) -1 )
+	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
+	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
+		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
 
 		if( SecBulls[ i ].SecType == SEC_MINE )
@@ -5155,6 +5159,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 	VECTOR		TempVector;
 	VECTOR		Recoil;
 	u_int16_t		i, Next;
+	u_int16_t		nSecWalk;
 	char		methodstr[256];
 	char		tempstr[256];
 	ENEMY	*	Enemy;
@@ -5283,9 +5288,12 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 ===================================================================*/
 
 	i = FirstSecBullUsed;
+	nSecWalk = 0;
 
-	while( i != (u_int16_t) -1 )
+	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
+	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
+		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
 
  		if( SecBulls[ i ].SecType == SEC_MINE )

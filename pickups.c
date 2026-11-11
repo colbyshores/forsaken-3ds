@@ -7858,13 +7858,17 @@ void CountMinesInLevel( void )
 {
 	u_int16_t	i;
 	u_int16_t	Next;
+	u_int16_t	nSecWalk;
 
 	for( i = 0; i < MAXSECONDARYWEAPONS; i++ ) MinesInLevel[ i ] = 0;
 
 	i = FirstSecBullUsed;
+	nSecWalk = 0;
 
-	while( i != (u_int16_t) -1 )
+	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
+	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
+		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
 
 		if( SecBulls[i].SecType == SEC_MINE )

@@ -65,11 +65,15 @@ AIMDATA			AimData;
 void AI_GetNearestMINETarget( void )
 {
 	u_int16_t	i;
+	u_int16_t	nSecWalk;
 	float	dist;
 
 	i = FirstSecBullUsed;
-	while( i != (u_int16_t) -1 )
+	nSecWalk = 0;
+	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
+	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
+		nSecWalk++;
 		if( SecBulls[ i ].SecType == SEC_MINE )
 		{
 			/* @vfp-exempt R3 — AI target-selection distance compare; integerizing changes target choice. measured n/a. Verified 2026-10-25. */
