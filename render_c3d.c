@@ -54,7 +54,6 @@
 #include <stddef.h>
 #include "main.h"
 #include "atm_prof.h"
-#include "perf_capture.h"
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -2999,7 +2998,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			if (orthographic)
 			{
 				TLVERTEX *verts = (TLVERTEX*)renderObject->lpVertexBuffer;
-				perf_stage_begin( 48 ); /* DIAG10: vert conversion, reverted after */
 				for (i = 0; i < numIndices; i++)
 				{
 					TLVERTEX *v = &verts[startVert + indices[i]];
@@ -3017,7 +3015,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			else
 			{
 				LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
-				perf_stage_begin( 48 ); /* DIAG10: vert conversion, reverted after */
 				for (i = 0; i < numIndices; i++)
 				{
 					int vi = startVert + indices[i];
@@ -3033,7 +3030,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].texcoord[1] = v->tv;
 				}
 			}
-			perf_stage_end( 48, -1 ); /* DIAG10 */
 			totalVerts = numIndices;
 		}
 		else
@@ -3041,7 +3037,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
 			int numVerts = tg->numVerts;
 			if (s_scratchUsed + numVerts > s_scratchMax) continue;
-			perf_stage_begin( 48 ); /* DIAG10 */
 			for (i = 0; i < numVerts; i++)
 			{
 				int vi = startVert + i;
@@ -3056,7 +3051,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				dst[i].texcoord[0] = v->tu;
 				dst[i].texcoord[1] = v->tv;
 			}
-			perf_stage_end( 48, -1 ); /* DIAG10 */
 			totalVerts = numVerts;
 		}
 
