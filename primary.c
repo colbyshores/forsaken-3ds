@@ -7250,6 +7250,7 @@ bool ValidGroupCollision( VECTOR * StartPos, u_int16_t StartGroup, VECTOR * IntP
 {
 	u_int16_t	Group;
 	VECTOR	MoveOff;
+	atm_prof_add( ATM_C_VGCALLS, 1 );
 
 	MoveOff.x = ( IntPoint->x - StartPos->x );
 	MoveOff.y = ( IntPoint->y - StartPos->y );

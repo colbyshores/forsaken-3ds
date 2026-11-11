@@ -62,6 +62,7 @@ enum {
 	ATM_C_OWN_OTHER,          /* live prim bullets with other owners */
 	ATM_C_ENEMY_VISITS,       /* CheckHitEnemy loop iterations (enemies walked) */
 	ATM_C_ENEMY_FULLTEST,     /* visits reaching RaytoSphere2 (passed early-outs) */
+	ATM_C_VGCALLS,            /* ValidGroupCollision calls (geometric hits needing group validation) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];
