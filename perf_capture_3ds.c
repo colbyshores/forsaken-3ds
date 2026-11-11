@@ -140,8 +140,16 @@ static void perf_out(const char *msg)
 	if (g_perf_fd < 0) {
 		/* Append: one autotest sweep chain-loads per process, and the
 		 * profiling loop wants every level's row in one file. */
+	/* ATM harness builds write under /3ds/: the ATM HTTP allowlist
+		 * serves /3ds/*.txt but refuses bare-SD *.txt, so the canonical
+		 * path is unretrievable on hardware. Other builds keep it. */
+#ifdef ATM_PROFILING
+		g_perf_fd = open("sdmc:/3ds/forsaken_perf.txt",
+		                 O_WRONLY | O_CREAT | O_APPEND, 0666);
+#else
 		g_perf_fd = open("sdmc:/forsaken_perf.txt",
 		                 O_WRONLY | O_CREAT | O_APPEND, 0666);
+#endif
 		if (g_perf_fd < 0)
 			return;
 	}
