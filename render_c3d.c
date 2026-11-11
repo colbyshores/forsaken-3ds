@@ -198,6 +198,7 @@ static dl_entry_t s_dl[MAX_DL_ENTRIES];
 static int  s_dlCount     = 0;
 static bool s_dlRecording = false;
 static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
+static bool s_dlReplayDone = false; /* right-eye replay already performed */
 
 /* Scratch buffer for vertex conversion.
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
@@ -749,10 +750,17 @@ void pglTransferEye(unsigned int eye)
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
-		/* Replay disabled (see FSBeginScene comment). The right eye pass
-		 * runs the callback fully, so we just need the target switch
-		 * above — no replay flag. */
+		/* With STEREO_REPLAY, arm the draw-level replay trigger: the
+		 * right eye's first 3D draw replays the recorded list instead
+		 * of re-converting + re-submitting. Ortho/2D draws are excluded
+		 * from the recording and always run live, so HUD stays correct.
+		 * Default (flag off): replay stays disarmed, both eyes callback
+		 * fully, exactly as before. */
+#ifdef STEREO_REPLAY
+		s_dlReplay = (s_dlCount > 0);
+#else
 		s_dlReplay = false;
+#endif
 	}
 	if (eye == GFX_RIGHT)
 	{
@@ -1508,7 +1516,14 @@ bool FSBeginScene(void)
 	 * for ortho (2D) draws only, or to split the callback into "3D once + 2D
 	 * twice" explicitly. Leaving that for later. */
 	s_dlCount = 0;
+#ifdef STEREO_REPLAY
+	/* Record left-eye 3D draws for second-eye replay. Gated on 3DS
+	 * stereo: mono frames must not pay the record cost. */
+	s_dlRecording = (render_info.stereo_mode == STEREO_MODE_3DS);
+#else
 	s_dlRecording = false;
+#endif
+	s_dlReplayDone = false;
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
@@ -2816,18 +2831,24 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		c3d_update_phong_tint_for_object_pos(&pos);
 	}
 
-	/* Single-pass stereo: on the first draw call of the second eye,
-	 * replay the entire display list with the updated view matrix
-	 * (the engine has now set up the right eye camera).  Then skip
-	 * all subsequent draw calls for this pass. */
-	if (s_dlReplay)
+	/* Single-pass stereo: on the first 3D draw call of the second eye,
+	 * replay the recorded list with the updated view matrix (the engine
+	 * has now set up the right eye camera).  Then skip all subsequent
+	 * 3D draw calls for this pass.  Ortho/2D draws always run live on
+	 * both eyes — replaying them caused the historical one-eye-HUD bug.
+	 * If nothing was recorded (all-ortho left eye), fall through and
+	 * draw normally. */
+	if (s_dlReplay && !orthographic)
 	{
 		if (s_dlCount > 0)
 		{
 			replay_display_list();
 			s_dlCount = 0;  /* prevent re-replay */
+			s_dlReplayDone = true;
 		}
-		return true;
+		if (s_dlReplayDone)
+			return true;
+		/* else fall through: nothing to replay, draw normally */
 	}
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
@@ -2919,7 +2940,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
 		atm_prof_add(ATM_C_DRAWS, 1); \
 		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
-		if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES) { \
+		if (s_dlRecording && !orthographic && s_dlCount < MAX_DL_ENTRIES) { \
 			dl_entry_t *_e = &s_dl[s_dlCount++]; \
 			_e->scratchOffset = batch_startOffset; \
 			_e->vertexCount   = batch_vertCount; \

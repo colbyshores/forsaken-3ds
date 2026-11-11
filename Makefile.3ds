@@ -95,6 +95,13 @@ ATM_BENCH_STEREO ?= 0
 # app as a proper NS foreground title, so normal init applies (proven by
 # the framedump render-proof builds).
 ATM_HEADLESS ?= 0
+# STEREO_REPLAY=1 replays the left eye's recorded display list on the
+# second eye instead of re-converting + re-submitting every draw
+# (draw-level replay; traversal still runs per eye, so visibility,
+# billboards and HUD are unaffected). Ortho/2D draws are excluded
+# from the recording and run live on both eyes (the historical
+# one-eye-HUD bug). Default 0 (proven path); enable for A/B only.
+STEREO_REPLAY ?= 0
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -334,6 +341,7 @@ CFLAGS += -DATM_BENCH_FRAMES=$(ATM_BENCH_FRAMES)
 CFLAGS += -DATM_BENCH_WARMUP=$(ATM_BENCH_WARMUP)
 CFLAGS += -DATM_BENCH_STEREO=$(ATM_BENCH_STEREO)
 CFLAGS += $(if $(filter 1,$(ATM_HEADLESS)),-DATM_HEADLESS,)
+CFLAGS += $(if $(filter 1,$(STEREO_REPLAY)),-DSTEREO_REPLAY,)
 # Compiled from outside $(SRCDIR), so it needs an explicit rule (below) and
 # cannot ride the $(SRCDIR)/%.c pattern. It is also deliberately outside the
 # AGENTS.md gate scope: vendored shared ATM firmware, not Forsaken game code.
@@ -433,7 +441,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FDMP=$(FRAMEDUMP)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMH=$(ATM_HEADLESS)
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FDMP=$(FRAMEDUMP)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMH=$(ATM_HEADLESS)|STREP=$(STEREO_REPLAY)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
