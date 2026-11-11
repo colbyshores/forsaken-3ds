@@ -53,6 +53,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "main.h"
+#include "atm_prof.h"
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -2898,6 +2899,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		BufInfo_Init(_bi); \
 		BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
 		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
+		atm_prof_add(ATM_C_DRAWS, 1); \
+		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
 		if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES) { \
 			dl_entry_t *_e = &s_dl[s_dlCount++]; \
 			_e->scratchOffset = batch_startOffset; \

@@ -54,6 +54,8 @@ enum {
 	ATM_C_SFX_USED,           /* looping-sfx slots visited per frame */
 	ATM_C_SFX_CREATE,         /* sound_source_create attempts (failing loads retry forever) */
 	ATM_C_SFX_RELEASE,        /* sound_release_source calls */
+	ATM_C_DRAWS,              /* draw_render_object calls per frame */
+	ATM_C_VERTS,              /* vertices converted per frame */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];
