@@ -33,48 +33,134 @@ static u32 s_socMem[0x4000] __attribute__((aligned(0x1000)));
 static int s_listenFd = -1;
 static int s_seq;
 
-/* Convert one screen to BMP + log line. Returns 0 on success. */
-static int dump_screen(const char *setname, const char *screen,
-                       gfxScreen_t gs, gfx3dSide_t eye)
+/* Snapshot one screen into a caller-managed buffer set. No file I/O,
+ * so several screens can be frozen back-to-back within one frame before
+ * any slow SD write happens (stereo left+right must be same-frame). */
+typedef struct {
+	unsigned char *px;
+	unsigned long cap;
+	unsigned long nbytes;
+	u16 w, h;
+	unsigned bpp;
+	uint32_t hash;
+	int valid;
+} SnapShot;
+
+static int snap_screen(SnapShot *s, gfxScreen_t gs, gfx3dSide_t eye)
 {
-	u16 w = 0, h = 0;
 	u8 *fb;
 	GSPGPU_FramebufferFormat fmt;
-	char path[96];
-	char line[192];
-	int len, rc;
-	unsigned bpp;
-	unsigned long nbytes;
-	uint32_t hash;
-	static unsigned char *snap;
-	static unsigned long snapCap;
+	u16 w = 0, h = 0;
 
+	s->valid = 0;
 	fb = gfxGetFramebuffer(gs, eye, &w, &h);
 	if (!fb || w == 0 || h == 0) return -1;
 	fmt = gfxGetScreenFormat(gs);
-	if (fmt == GSP_RGBA8_OES) bpp = 4;
-	else if (fmt == GSP_BGR8_OES) bpp = 3;
-	else if (fmt == GSP_RGB565_OES) bpp = 2;
+	if (fmt == GSP_RGBA8_OES) s->bpp = 4;
+	else if (fmt == GSP_BGR8_OES) s->bpp = 3;
+	else if (fmt == GSP_RGB565_OES) s->bpp = 2;
 	else return -1;
-	if (bpp != 2) {
-		nbytes = (unsigned long)w * h * bpp;
-	} else {
-		/* RGB565 is expanded below; hash the raw bytes as stored. */
-		nbytes = (unsigned long)w * h * 2u;
-	}
-	/* Freeze the live framebuffer first: the two BMP writes below take
-	 * seconds on SD while the game keeps rendering into this buffer,
-	 * so hashing/writing the live pointer tears on any moving scene
-	 * (proven on hardware: bottom/static verified, top/live did not).
-	 * Hash and both files read the frozen copy. */
-	if (nbytes > snapCap) {
-		unsigned char *nb = realloc(snap, nbytes);
+	if (s->bpp != 2)
+		s->nbytes = (unsigned long)w * h * s->bpp;
+	else
+		s->nbytes = (unsigned long)w * h * 2u;
+	s->w = w;
+	s->h = h;
+	if (s->nbytes > s->cap) {
+		unsigned char *nb = realloc(s->px, s->nbytes);
 		if (!nb) return -1;
-		snap = nb;
-		snapCap = nbytes;
+		s->px = nb;
+		s->cap = s->nbytes;
 	}
-	memcpy(snap, fb, nbytes);
-	hash = framedump_fnv1a(snap, nbytes);
+	memcpy(s->px, fb, s->nbytes);
+	s->hash = framedump_fnv1a(s->px, s->nbytes);
+	s->valid = 1;
+	return 0;
+}
+
+/* Write a frozen snapshot to BMP + retrievable twin + log line. */
+static int write_snapped(const char *setname, const char *screen, SnapShot *s, int seq)
+{
+	char path[96];
+	char line[192];
+	int len, rc;
+	const unsigned char *rgb;
+	unsigned rgbBpp;
+	/* RGB565 is expanded to this temp RGB8 buffer for the writer. */
+	static unsigned char *tmp;
+	static unsigned long tmpCap;
+	unsigned long nbytes = s->nbytes;
+	u16 w = s->w, h = s->h;
+	unsigned bpp = s->bpp;
+	uint32_t hash = s->hash;
+
+	snprintf(path, sizeof(path), "sdmc:/%s_%s.bmp", setname, screen);
+	{
+		if (bpp == 2) {
+			unsigned long np = (unsigned long)w * h;
+			unsigned long k;
+			if (np * 3ul > tmpCap) {
+				unsigned char *nb = realloc(tmp, np * 3ul);
+				if (!nb) return -1;
+				tmp = nb;
+				tmpCap = np * 3ul;
+			}
+			for (k = 0; k < np; k++) {
+				unsigned v = (unsigned)s->px[k * 2] |
+				             ((unsigned)s->px[k * 2 + 1] << 8);
+				tmp[k * 3 + 0] = (unsigned char)((v & 0x1f) << 3);
+				tmp[k * 3 + 1] = (unsigned char)(((v >> 5) & 0x3f) << 2);
+				tmp[k * 3 + 2] = (unsigned char)(((v >> 11) & 0x1f) << 3);
+			}
+			rgb = tmp;
+			rgbBpp = 3;
+		} else {
+			rgb = s->px;
+			rgbBpp = bpp;
+		}
+		rc = framedump_write_bmp(path, rgb, w, h, (int)rgbBpp);
+		if (rc != 0) return -1;
+		/* Retrievable twin for the ATM HTTP allowlist, which serves
+		 * dot-log and dot-txt under /3ds/ but never dot-bmp. The twin
+		 * is byte-identical to the canonical file; curl it as
+		 * http://<3ds-ip>/3ds/<alias> and verify the BM magic locally.
+		 * Remove the twin when the firmware serves the dump dir. */
+		{
+			char alias[96];
+			snprintf(alias, sizeof(alias), "sdmc:/3ds/%s_%s.bmp.log",
+			         setname, screen);
+			if (framedump_write_bmp(alias, rgb, w, h, (int)rgbBpp) != 0)
+				return -1;
+		}
+	}
+	len = snprintf(line, sizeof(line),
+	               "FDUMP seq=%d tag=%s screen=%s w=%u h=%u bpp=%u hash=%08lx file=%s\n",
+	               seq, setname, screen, w, h, bpp,
+	               (unsigned long)hash, path);
+	if (len > 0) {
+		FILE *f = fopen("sdmc:/framedump.log", "a");
+		if (f) {
+			fwrite(line, 1, (size_t)len, f);
+			fclose(f);
+		}
+	}
+	return 0;
+}
+
+/* Convert one screen to BMP + log line. Returns 0 on success.
+ * Preserved single-screen path (mono + bottom); stereo uses the
+ * snap-all-then-write-all sequence in framedump_request. */
+static int dump_screen(const char *setname, const char *screen,
+                       gfxScreen_t gs, gfx3dSide_t eye)
+{
+	/* Reused single-screen snapshot slot (mono path stays exactly as
+	 * before: one buffer, snapshot then immediate write). */
+	static SnapShot mono = { 0 };
+	if (snap_screen(&mono, gs, eye) != 0)
+		return -1;
+	/* s_seq was incremented by the caller before dump_screen. */
+	return write_snapped(setname, screen, &mono, s_seq);
+}
 
 	snprintf(path, sizeof(path), "sdmc:/%s_%s.bmp", setname, screen);
 	{
@@ -155,13 +241,31 @@ int framedump_request(const char *tag)
 	}
 	s_seq++;
 	snprintf(setname, sizeof(setname), "framedump_%04d_%s", s_seq, clean);
-	dump_screen(setname, "top", GFX_TOP, GFX_LEFT);
-	dump_screen(setname, "bottom", GFX_BOTTOM, GFX_LEFT);
-	/* Right eye for stereo render proofs (replay A/B). Mono builds
-	 * never produce a right-eye framebuffer; dump_screen fails closed
-	 * there (no file), so mono runs are unaffected. */
-	if (render_info.stereo_mode == STEREO_MODE_3DS)
-		dump_screen(setname, "top_right", GFX_TOP, GFX_RIGHT);
+	if (render_info.stereo_mode == STEREO_MODE_3DS) {
+		/* Stereo proof path: snapshot BOTH eyes back-to-back before any
+		 * slow SD write, so left+right are the same frame (sequential
+		 * snap-write drifts whole seconds = hundreds of frames apart).
+		 * Bottom is HUD (no stereo); capture it after, order irrelevant.
+		 * Buffers are per-call (freed below); a malloc failure falls
+		 * back to sequential capture rather than failing the dump. */
+		SnapShot left = { 0 }, right = { 0 };
+		int have_both = (snap_screen(&left, GFX_TOP, GFX_LEFT) == 0 &&
+		                 snap_screen(&right, GFX_TOP, GFX_RIGHT) == 0);
+		if (have_both) {
+			write_snapped(setname, "top", &left, s_seq);
+			write_snapped(setname, "top_right", &right, s_seq);
+		} else {
+			/* Fall back to sequential (old behavior); note it. */
+			dump_screen(setname, "top", GFX_TOP, GFX_LEFT);
+			dump_screen(setname, "top_right", GFX_TOP, GFX_RIGHT);
+		}
+		free(left.px);
+		free(right.px);
+		dump_screen(setname, "bottom", GFX_BOTTOM, GFX_LEFT);
+	} else {
+		dump_screen(setname, "top", GFX_TOP, GFX_LEFT);
+		dump_screen(setname, "bottom", GFX_BOTTOM, GFX_LEFT);
+	}
 	return s_seq;
 }
 
