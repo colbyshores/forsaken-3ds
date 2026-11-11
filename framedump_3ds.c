@@ -21,7 +21,8 @@
 #include <3ds.h>
 
 #include "framedump.h"
-extern void boot_log(const char *msg); /* DIAG-LISTENER: reverted after */
+#include "render.h"
+extern render_info_t render_info;
 #include "framedump_core.h"
 
 /* SOC context: 64 KiB, page-aligned (socInit requires 0x1000 alignment),
@@ -34,7 +35,7 @@ static int s_seq;
 
 /* Convert one screen to BMP + log line. Returns 0 on success. */
 static int dump_screen(const char *setname, const char *screen,
-                       gfxScreen_t gs)
+                       gfxScreen_t gs, gfx3dSide_t eye)
 {
 	u16 w = 0, h = 0;
 	u8 *fb;
@@ -48,7 +49,7 @@ static int dump_screen(const char *setname, const char *screen,
 	static unsigned char *snap;
 	static unsigned long snapCap;
 
-	fb = gfxGetFramebuffer(gs, GFX_LEFT, &w, &h);
+	fb = gfxGetFramebuffer(gs, eye, &w, &h);
 	if (!fb || w == 0 || h == 0) return -1;
 	fmt = gfxGetScreenFormat(gs);
 	if (fmt == GSP_RGBA8_OES) bpp = 4;
@@ -154,8 +155,13 @@ int framedump_request(const char *tag)
 	}
 	s_seq++;
 	snprintf(setname, sizeof(setname), "framedump_%04d_%s", s_seq, clean);
-	dump_screen(setname, "top", GFX_TOP);
-	dump_screen(setname, "bottom", GFX_BOTTOM);
+	dump_screen(setname, "top", GFX_TOP, GFX_LEFT);
+	dump_screen(setname, "bottom", GFX_BOTTOM, GFX_LEFT);
+	/* Right eye for stereo render proofs (replay A/B). Mono builds
+	 * never produce a right-eye framebuffer; dump_screen fails closed
+	 * there (no file), so mono runs are unaffected. */
+	if (render_info.stereo_mode == STEREO_MODE_3DS)
+		dump_screen(setname, "top_right", GFX_TOP, GFX_RIGHT);
 	return s_seq;
 }
 
@@ -278,20 +284,7 @@ void framedump_poll(void)
 #endif
 	if (s_listenFd < 0) return;
 	cfd = accept(s_listenFd, NULL, NULL);
-	if (cfd < 0) {
-		/* DIAG-LISTENER: log first REAL accept failure only; EAGAIN /
-		 * EWOULDBLOCK on a nonblocking socket is the normal idle case. */
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
-			static int accept_logged = 0;
-			if (!accept_logged) {
-				char b[64];
-				accept_logged = 1;
-				snprintf(b, sizeof(b), "[fdnet] accept failed errno=%d", errno);
-				boot_log(b);
-			}
-		}
-		return;
-	}
+	if (cfd < 0) return; /* nobody waiting: the normal idle case */
 	got = recv(cfd, buf, sizeof(buf) - 1, 0);
 	if (got <= 0) {
 		close(cfd);
