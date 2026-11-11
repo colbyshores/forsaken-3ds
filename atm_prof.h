@@ -57,6 +57,9 @@ enum {
 	ATM_C_TRIG_PCHECK,        /* TriggerAreaPlayerShootsCheck calls */
 	ATM_C_TRIG_ECHECK,        /* TriggerAreaEnemyShootsCheck calls */
 	ATM_C_TRIG_PROC,          /* TriggerAreaProcess calls (areas actually tested) */
+	ATM_C_OWN_SHIP,           /* live prim bullets owned by ships */
+	ATM_C_OWN_ENEMY,          /* live prim bullets owned by enemies */
+	ATM_C_OWN_OTHER,          /* live prim bullets with other owners */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

@@ -1687,6 +1687,9 @@ void ProcessPrimaryBullets( void )
 		if (PrimBulls[i].LifeCount > 0.0F)
 		{
 			atm_prof_add( ATM_C_PRIM_BULLETS, 1 );
+			if( PrimBulls[i].OwnerType == OWNER_SHIP ) atm_prof_add( ATM_C_OWN_SHIP, 1 );
+			else if( PrimBulls[i].OwnerType == OWNER_ENEMY ) atm_prof_add( ATM_C_OWN_ENEMY, 1 );
+			else atm_prof_add( ATM_C_OWN_OTHER, 1 );
 			perf_stage_begin( 57 ); /* DIAG3: bullet update, reverted after */
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			PrimBulls[i].LifeCount -= NewFramelag; //framelag;

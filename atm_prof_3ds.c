@@ -69,6 +69,9 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"trig_pcheck",
 	"trig_echeck",
 	"trig_proc",
+	"own_ship",
+	"own_enemy",
+	"own_other",
 };
 
 enum {
