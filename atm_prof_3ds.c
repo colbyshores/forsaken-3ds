@@ -72,6 +72,7 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"own_ship",
 	"own_enemy",
 	"own_other",
+	"enemy_visits",
 };
 
 enum {
