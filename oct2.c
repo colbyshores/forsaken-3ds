@@ -4393,15 +4393,10 @@ bool RenderScene( void )
 #ifdef __3DS__
     _3ds_mr_ctx = "post-MainGame";
 #endif
-    /* DIAG2: split LoopingSfx (57) vs Taunt (58), reverted after. */
     if ( bSoundEnabled && !CurrentMenu )
     {
-      perf_stage_begin( 57 );
       ProcessLoopingSfx();
-      perf_stage_end( 57, -1 );
-      perf_stage_begin( 58 );
       ProcessEnemyBikerTaunt();
-      perf_stage_end( 58, -1 );
     }
 #ifdef __3DS__
     _3ds_mr_ctx = "post-SoundProcessing";

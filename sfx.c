@@ -2665,6 +2665,7 @@ void ProcessLoopingSfx( void )
 	VECTOR Temp = {0.0f,0.0f,0.0f};
 	VECTOR Pos = {0.0f,0.0f,0.0f};
 	static unsigned long maint_frame = 0;
+	static unsigned long sfx_try_frame[ MAX_LOOPING_SFX ];
 
 	if(!bSoundEnabled)
 		return;
@@ -2758,16 +2759,31 @@ void ProcessLoopingSfx( void )
 				atm_prof_add( ATM_C_SFX_RELEASE, 1 );
 				sound_release_source( SpotSfxList[ i ].source );
 				SpotSfxList[ i ].source = NULL;
+				/* Conditions changed (slot left range with a live source):
+				 * allow an immediate re-attempt on re-entry. */
+				sfx_try_frame[ i ] = 0;
 			}
 			continue;
 		}
 
-		// if in range & not loaded then find a free slot for the sound
-		// (every frame: first audibility must not wait for a maint tick).
+		// if in range & not loaded then find a free slot for the sound.
+		// First audibility must not wait for a maint tick, but a FAILED
+		// load (missing file, exhausted linear heap or DSP channels)
+		// costs milliseconds of FS/alloc work and must not be retried
+		// 71x/s: measured 10.4 failing creates/frame = 51.7 ms/frame on
+		// Old 3DS hardware (2026-11-11, ramqan mono). Back off to one
+		// attempt per 32 frames; a sound that can never load stays
+		// silent either way, and a transient success starts within
+		// half a sim-second.
 		started = false;
 		if ( !SpotSfxList[ i ].source )
 		{
 			char * file = SfxFullPath[ SpotSfxList[i].sfxindex ][ SpotSfxList[i].variant ];
+
+			if ( sfx_try_frame[ i ] != 0 &&
+			     ( maint_frame - sfx_try_frame[ i ] ) < 32UL )
+				continue;
+			sfx_try_frame[ i ] = maint_frame;
 
 			// TODO - this should probably be done right away in InitLoopingSfx()
 			int index = SpotSfxList[ i ].sfxindex +	SpotSfxList[ i ].variant;
