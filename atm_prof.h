@@ -54,15 +54,6 @@ enum {
 	ATM_C_SFX_USED,           /* looping-sfx slots visited per frame */
 	ATM_C_SFX_CREATE,         /* sound_source_create attempts (failing loads retry forever) */
 	ATM_C_SFX_RELEASE,        /* sound_release_source calls */
-	ATM_C_TRIG_PCHECK,        /* TriggerAreaPlayerShootsCheck calls */
-	ATM_C_TRIG_ECHECK,        /* TriggerAreaEnemyShootsCheck calls */
-	ATM_C_TRIG_PROC,          /* TriggerAreaProcess calls (areas actually tested) */
-	ATM_C_OWN_SHIP,           /* live prim bullets owned by ships */
-	ATM_C_OWN_ENEMY,          /* live prim bullets owned by enemies */
-	ATM_C_OWN_OTHER,          /* live prim bullets with other owners */
-	ATM_C_ENEMY_VISITS,       /* CheckHitEnemy loop iterations (enemies walked) */
-	ATM_C_ENEMY_FULLTEST,     /* visits reaching RaytoSphere2 (passed early-outs) */
-	ATM_C_VGCALLS,            /* ValidGroupCollision calls (geometric hits needing group validation) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

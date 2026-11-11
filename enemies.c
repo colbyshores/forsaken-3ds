@@ -5,7 +5,6 @@
 #include <math.h>
 
 #include "main.h"
-#include "atm_prof.h"
 #include "new3d.h"
 #include "quat.h"
 #include "mload.h"
@@ -6272,13 +6271,11 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTO
 	while( Enemy != NULL )
 	{
 		NextEnemy = Enemy->NextUsed;
-		atm_prof_add( ATM_C_ENEMY_VISITS, 1 );
 
 		if( !( ( OwnerType == OWNER_ENEMY ) && ( Owner == Enemy->Index ) ) )
 		{
 			if( ( Enemy->Status & ENEMY_STATUS_Enable ) && ( Enemy->CompCollision == SPHERECOLLISION ) )
 			{
-				atm_prof_add( ATM_C_ENEMY_FULLTEST, 1 );
 				if( Enemy->Type == ENEMY_Boss_Avatar )
 				{
 					if( !IsAvatarActive() )

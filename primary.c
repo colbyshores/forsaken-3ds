@@ -1686,9 +1686,6 @@ void ProcessPrimaryBullets( void )
 		if (PrimBulls[i].LifeCount > 0.0F)
 		{
 			atm_prof_add( ATM_C_PRIM_BULLETS, 1 );
-			if( PrimBulls[i].OwnerType == OWNER_SHIP ) atm_prof_add( ATM_C_OWN_SHIP, 1 );
-			else if( PrimBulls[i].OwnerType == OWNER_ENEMY ) atm_prof_add( ATM_C_OWN_ENEMY, 1 );
-			else atm_prof_add( ATM_C_OWN_OTHER, 1 );
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			PrimBulls[i].LifeCount -= NewFramelag; //framelag;
 			if( PrimBulls[i].LifeCount < 0.0F ) PrimBulls[i].LifeCount = 0.0F;
@@ -7239,7 +7236,6 @@ bool ValidGroupCollision( VECTOR * StartPos, u_int16_t StartGroup, VECTOR * IntP
 {
 	u_int16_t	Group;
 	VECTOR	MoveOff;
-	atm_prof_add( ATM_C_VGCALLS, 1 );
 
 	MoveOff.x = ( IntPoint->x - StartPos->x );
 	MoveOff.y = ( IntPoint->y - StartPos->y );
