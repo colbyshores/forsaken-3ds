@@ -1,7 +1,7 @@
 /* fidelity_3ds.c — backing for fidelity.h. Compiles to nothing unless
  * FIDELITY_DUMP is defined, so default builds are unaffected.
  *
- * Writes one line per level to sdmc:/forsaken_fidelity.txt at the level
+ * Writes one line per level to sdmc:/3ds/forsaken_fidelity.txt at the level
  * marker (SD write once per level, not per frame — same discipline as
  * perf_capture). See fidelity.h for the semantics of the hash.
  */
@@ -44,7 +44,7 @@ static u_int32_t g_h_sec = 2166136261u;
 static void fid_out(const char *line, int len)
 {
 	if (g_fd < 0)
-		g_fd = open("sdmc:/forsaken_fidelity.txt",
+		g_fd = open("sdmc:/3ds/forsaken_fidelity.txt",
 		            O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (g_fd < 0) return;
 	if (write(g_fd, line, (size_t)len) < 0) { /* SD full/removed: ignore */ }

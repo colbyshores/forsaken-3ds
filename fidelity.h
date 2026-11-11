@@ -4,7 +4,7 @@
  * running FNV-1a hash over the gameplay-relevant state (ship/enemy
  * positions, angles, groups, shields, damage, bullet population, and the
  * player's nearest-node position). One line per level is written to
- * sdmc:/forsaken_fidelity.txt at the level marker. Two builds (baseline vs
+ * sdmc:/3ds/forsaken_fidelity.txt at the level marker. Two builds (baseline vs
  * candidate) that produce byte-identical fidelity files across a full
  * autotest sweep have provably identical gameplay behavior for the sweep's
  * scripted inputs — the gate required before shipping optimizations that

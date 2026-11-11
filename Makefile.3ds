@@ -28,7 +28,7 @@ RENDERER ?= citro3d
 EDITION ?= original
 # PERF_CAPTURE=1 adds in-memory frame/stage counters + teardown trace dump (hardware capture only)
 PERF_CFLAGS := $(if $(PERF_CAPTURE),-DPERF_CAPTURE,)
-# FIDELITY_DUMP=1 adds per-tick gameplay-state checksums to sdmc:/forsaken_fidelity.txt (A/B fidelity proof, harness builds only)
+# FIDELITY_DUMP=1 adds per-tick gameplay-state checksums to sdmc:/3ds/forsaken_fidelity.txt (A/B fidelity proof, harness builds only; under /3ds/ so the ATM HTTP allowlist serves it)
 FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
 # FRAMEDUMP=1 compiles in the triggerable framebuffer dump library
 # (framedump.h): TCP trigger port + sdmc:/framedump_*.bmp + hash log.
@@ -42,6 +42,10 @@ SELFTEST_CFLAGS := $(if $(FRAMEDUMP_SELFTEST_AT),-DFRAMEDUMP_SELFTEST_AT=$(FRAME
 NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
 # FIDELITY_CHECKPOINTS=1 adds per-tick-interval hash checkpoints to the fidelity file (divergence localization)
 FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
+# FIDELITY_CHECKPOINT_TICKS=N sets the checkpoint interval (default 250).
+# Finer intervals (e.g. 60) give per-minute trajectory shape for A/B work.
+FIDELITY_CHECKPOINT_TICKS ?= 250
+FIDCKT_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINT_TICKS=$(FIDELITY_CHECKPOINT_TICKS),)
 # MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
 VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
 # MODEL_BUCKET=1 indexes models by clip group once per camera instead of re-walking the model list per group.
@@ -52,6 +56,14 @@ BUCKET_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET)),-DMODEL_BUCKET,)
 # MODEL_BUCKET group contains exactly the baseline-visible model sequence.
 # It deliberately re-walks Models[] and is not a performance build.
 MODEL_BUCKET_VERIFY ?= 0
+# CHE_PREFILTER=1 enables the SoundInfo group pre-filter in CheckHitEnemy
+# (checkenemy.c): skip enemies in groups with no direct visibility from the
+# bullet's group before any per-enemy vector math. Default 1 (on): validated
+# 2026-11-11 — fidelity A/B byte-identical on ramqan + bio-sphere, ramqan mono
+# wall -7.7ms (-13%), host test tests/test_checkhitenemy.c green. Combat
+# trajectories (firing input) remain uncovered by the bench — see the log.
+CHE_PREFILTER ?= 1
+CHE_PREFILTER_CFLAGS := $(if $(filter 1,$(CHE_PREFILTER)),-DCHE_PREFILTER,)
 BUCKET_VERIFY_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET_VERIFY)),-DMODEL_BUCKET_VERIFY,)
 ifneq ($(filter 1,$(MODEL_BUCKET_VERIFY)),)
 ifeq ($(filter 1,$(MODEL_BUCKET)),1)
@@ -176,6 +188,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(PERF_CFLAGS) \
 	$(FIDELITY_CFLAGS) \
 	$(FIDCK_CFLAGS) \
+	$(FIDCKT_CFLAGS) \
 	$(FRAMEDUMP_CFLAGS) \
 	$(SELFTEST_CFLAGS) \
 	$(INTERP_CFLAGS) \
@@ -186,6 +199,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(VIS_CFLAGS) \
 	$(BUCKET_CFLAGS) \
 	$(BUCKET_VERIFY_CFLAGS) \
+	$(CHE_PREFILTER_CFLAGS) \
 	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
@@ -441,7 +455,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FDMP=$(FRAMEDUMP)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMH=$(ATM_HEADLESS)|STREP=$(STEREO_REPLAY)|FDMPST=$(FRAMEDUMP_SELFTEST_AT)
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FIDCKT=$(FIDELITY_CHECKPOINT_TICKS)|FDMP=$(FRAMEDUMP)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMH=$(ATM_HEADLESS)|STREP=$(STEREO_REPLAY)|FDMPST=$(FRAMEDUMP_SELFTEST_AT)|CHE=$(CHE_PREFILTER)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
