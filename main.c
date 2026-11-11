@@ -687,11 +687,14 @@ static bool RenderLoop()
 			else
 #endif
 			{
+				perf_stage_begin( PERF_S_PRESENTLOOP );
 				if (!render_flip(&render_info))
 				{
+					perf_stage_end( PERF_S_PRESENTLOOP, -1 );
 					Msg("RenderLoop: render_flip() failed\n");
 					return false;
 				}
+				perf_stage_end( PERF_S_PRESENTLOOP, -1 );
 			}
 		}
 	}
