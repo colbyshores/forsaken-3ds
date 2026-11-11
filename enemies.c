@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "atm_prof.h"
+#include "perf_capture.h"
 #include "new3d.h"
 #include "quat.h"
 #include "mload.h"
@@ -6285,6 +6286,7 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTO
 						goto SkipIt;
 				}
 			
+				perf_stage_begin( 48 ); /* DIAG9: enemy full-test body, reverted after */
 				switch( ColType )
 				{
 					case COLTYPE_Trojax:
@@ -6384,6 +6386,7 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTO
    						}
    					}
 				}
+			perf_stage_end( 48, -1 ); /* DIAG9 */
 			}
 		}
 SkipIt:
