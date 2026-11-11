@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "main.h"
 #include "atm_prof.h"
+#include "perf_capture.h"
 
 #include "new3d.h"
 #include "quat.h"
@@ -1686,6 +1687,7 @@ void ProcessPrimaryBullets( void )
 		if (PrimBulls[i].LifeCount > 0.0F)
 		{
 			atm_prof_add( ATM_C_PRIM_BULLETS, 1 );
+			perf_stage_begin( 57 ); /* DIAG3: bullet update, reverted after */
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			PrimBulls[i].LifeCount -= NewFramelag; //framelag;
 			if( PrimBulls[i].LifeCount < 0.0F ) PrimBulls[i].LifeCount = 0.0F;
@@ -1872,10 +1874,12 @@ void ProcessPrimaryBullets( void )
 			Length = VectorLength( &DirVector );
 
 			NormaliseVector( &DirVector );
+			perf_stage_end( 57, -1 ); /* DIAG3 */
 
 /*===================================================================
 	Do Collision with background when initialised
 ===================================================================*/
+			perf_stage_begin( 58 ); /* DIAG3: wall+bgobject battery, reverted after */
 			if( !PrimBulls[i].ColFlag )
 			{
 				temp.x = ( PrimBulls[i].Dir.x * MaxColDistance);
@@ -1950,13 +1954,17 @@ void ProcessPrimaryBullets( void )
 
 /*�����������������������������������������������������������������*/
 			Damage = (int16_t) PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
+			perf_stage_end( 58, -1 ); /* DIAG3 */
 
+			perf_stage_begin( 59 ); /* DIAG3: water, reverted after */
 			if ( WaterObjectCollide( PrimBulls[i].GroupImIn,&PrimBulls[i].Pos, &MoveOffsetVector, &Int_Point , Damage) )
 			{
 				CreateSplash( (VECTOR *) &Int_Point, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn );
 			}
 			
+			perf_stage_end( 59, -1 ); /* DIAG3 */
 /*�����������������������������������������������������������������*/
+			perf_stage_begin( 60 ); /* DIAG3: ship+secondary, reverted after */
 			HitTarget = CheckHitShip( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &Int_Point, &Int_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitTarget != (u_int16_t) -1 ) HitWall = (u_int16_t) -1;
 
@@ -1969,6 +1977,8 @@ void ProcessPrimaryBullets( void )
 			}
 
 /*�����������������������������������������������������������������*/
+			perf_stage_end( 60, -1 ); /* DIAG3 */
+			perf_stage_begin( 62 ); /* DIAG3: enemy+triggers, reverted after */
 			HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitEnemy != NULL )
 			{
@@ -2012,6 +2022,7 @@ void ProcessPrimaryBullets( void )
 					break;
 			}
 
+			perf_stage_end( 62, -1 ); /* DIAG3 */
 /*===================================================================
 			Hit Secondary Weapon
 ===================================================================*/
