@@ -162,66 +162,6 @@ static int dump_screen(const char *setname, const char *screen,
 	return write_snapped(setname, screen, &mono, s_seq);
 }
 
-	snprintf(path, sizeof(path), "sdmc:/%s_%s.bmp", setname, screen);
-	{
-		/* RGB565 is expanded to this temp RGB8 buffer for the writer;
-		 * kept at function scope so the retrievable twin below can
-		 * reuse the same bytes. */
-		static unsigned char *tmp;
-		static unsigned long tmpCap;
-		const unsigned char *rgb;
-		unsigned rgbBpp;
-		if (bpp == 2) {
-			unsigned long np = (unsigned long)w * h;
-			unsigned long k;
-			if (np * 3ul > tmpCap) {
-				unsigned char *nb = realloc(tmp, np * 3ul);
-				if (!nb) return -1;
-				tmp = nb;
-				tmpCap = np * 3ul;
-			}
-			for (k = 0; k < np; k++) {
-				unsigned v = (unsigned)snap[k * 2] |
-				             ((unsigned)snap[k * 2 + 1] << 8);
-				tmp[k * 3 + 0] = (unsigned char)((v & 0x1f) << 3);
-				tmp[k * 3 + 1] = (unsigned char)(((v >> 5) & 0x3f) << 2);
-				tmp[k * 3 + 2] = (unsigned char)(((v >> 11) & 0x1f) << 3);
-			}
-			rgb = tmp;
-			rgbBpp = 3;
-		} else {
-			rgb = snap;
-			rgbBpp = bpp;
-		}
-		rc = framedump_write_bmp(path, rgb, w, h, (int)rgbBpp);
-		if (rc != 0) return -1;
-		/* Retrievable twin for the ATM HTTP allowlist, which serves
-		 * dot-log and dot-txt under /3ds/ but never dot-bmp. The twin
-		 * is byte-identical to the canonical file; curl it as
-		 * http://<3ds-ip>/3ds/<alias> and verify the BM magic locally.
-		 * Remove the twin when the firmware serves the dump dir. */
-		{
-			char alias[96];
-			snprintf(alias, sizeof(alias), "sdmc:/3ds/%s_%s.bmp.log",
-			         setname, screen);
-			if (framedump_write_bmp(alias, rgb, w, h, (int)rgbBpp) != 0)
-				return -1;
-		}
-	}
-	len = snprintf(line, sizeof(line),
-	               "FDUMP seq=%d tag=%s screen=%s w=%u h=%u bpp=%u hash=%08lx file=%s\n",
-	               s_seq, setname, screen, w, h, bpp,
-	               (unsigned long)hash, path);
-	if (len > 0) {
-		FILE *f = fopen("sdmc:/framedump.log", "a");
-		if (f) {
-			fwrite(line, 1, (size_t)len, f);
-			fclose(f);
-		}
-	}
-	return 0;
-}
-
 int framedump_request(const char *tag)
 {
 	char setname[64];
