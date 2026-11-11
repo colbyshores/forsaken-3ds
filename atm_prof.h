@@ -51,6 +51,9 @@ enum {
 	ATM_C_MONO_FRAMES,       /* measured frames rendered with stereo off */
 	ATM_C_PRIM_BULLETS,      /* sum of per-frame live primary bullets (÷frames = mean live) */
 	ATM_C_SEC_BULLETS,        /* sum of per-frame live secondary bullets */
+	ATM_C_SFX_USED,           /* looping-sfx slots visited per frame */
+	ATM_C_SFX_CREATE,         /* sound_source_create attempts (failing loads retry forever) */
+	ATM_C_SFX_RELEASE,        /* sound_release_source calls */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

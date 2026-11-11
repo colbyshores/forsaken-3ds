@@ -63,6 +63,9 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"mono_frames",
 	"prim_bullets",
 	"sec_bullets",
+	"sfx_used",
+	"sfx_create",
+	"sfx_release",
 };
 
 enum {
