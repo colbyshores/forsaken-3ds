@@ -6330,9 +6330,11 @@ bool RenderCurrentCamera( void )
   Display Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
 
+  perf_stage_begin(PERF_S_TRANCLIP);
   if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
     return false;
     _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedPolys");
+  perf_stage_end(PERF_S_TRANCLIP, -1);
 
 #ifdef SHADOWTEST
   if( !DisplayGroupClippedTriangles( RenderBufs[ 1 ], group, lpDev, lpView ) )
@@ -6343,11 +6345,15 @@ bool RenderCurrentCamera( void )
 Display Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
+  perf_stage_begin(PERF_S_TRANFM);
   if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], group ) ) // bjd
       return false;
     _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedFmPolys");
+  perf_stage_end(PERF_S_TRANFM, -1);
 
+  perf_stage_begin(PERF_S_TRANEXE);
   ExecuteTransExe( group );
+  perf_stage_end(PERF_S_TRANEXE, -1);
     _RC_TRANS_SUBSTAGE("post-ExecuteTransExe");
     perf_stage_end(PERF_S_TRANPOLYS, -1);
     #undef _RC_TRANS_SUBSTAGE
@@ -6364,6 +6370,7 @@ Display Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
     perf_stage_begin(PERF_S_TRANPOLYS);
+    perf_stage_begin(PERF_S_TRANUNCLIP);
     if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedFmPolys");
@@ -6374,6 +6381,7 @@ Display Group Clipped Faceme Transluecent Polys
     if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedPolys");
+    perf_stage_end(PERF_S_TRANUNCLIP, -1);
     perf_stage_end(PERF_S_TRANPOLYS, -1);
     perf_stage_begin(PERF_S_TRANMISC);
 #ifdef SHADOWTEST
@@ -6382,11 +6390,13 @@ Display Group Clipped Faceme Transluecent Polys
 #endif
   
   // display unclipped translucencies
+  perf_stage_begin(PERF_S_TRANEXE);
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
     group = g->group;
     ExecuteTransExeUnclipped( group );
   }
+  perf_stage_end(PERF_S_TRANEXE, -1);
 
 
 /*===================================================================
