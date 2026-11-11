@@ -30,6 +30,14 @@ EDITION ?= original
 PERF_CFLAGS := $(if $(PERF_CAPTURE),-DPERF_CAPTURE,)
 # FIDELITY_DUMP=1 adds per-tick gameplay-state checksums to sdmc:/forsaken_fidelity.txt (A/B fidelity proof, harness builds only)
 FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
+# FRAMEDUMP=1 compiles in the triggerable framebuffer dump library
+# (framedump.h): TCP trigger port + sdmc:/framedump_*.bmp + hash log.
+# Harness builds only; default builds are unaffected.
+FRAMEDUMP_CFLAGS := $(if $(FRAMEDUMP),-DFRAMEDUMP,)
+# FRAMEDUMP_SELFTEST_AT=N auto-dumps once at frame N (emulator e2e:
+# emulators do not bridge the trigger socket, so the self-test fires
+# the capture path without network). Requires FRAMEDUMP=1.
+SELFTEST_CFLAGS := $(if $(FRAMEDUMP_SELFTEST_AT),-DFRAMEDUMP_SELFTEST_AT=$(FRAMEDUMP_SELFTEST_AT),)
 # NODE_SQDIST=1 selects the squared-distance candidate in UpdateNearestNodeSpecial (fidelity-gated experiment)
 NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
 # FIDELITY_CHECKPOINTS=1 adds per-tick-interval hash checkpoints to the fidelity file (divergence localization)
@@ -63,6 +71,30 @@ OGPROFILE_CFLAGS := $(if $(OG_PROFILE),-DFORSAKEN_OG_PROFILE -DFORSAKEN_HEAP_FIX
 # FRAME_INTERP_PROBE=1 renders each frame twice (identical state) to measure the
 # floor cost of a CPU in-between pass — temporal-interpolation feasibility only.
 INTERP_CFLAGS := $(if $(FRAME_INTERP_PROBE),-DFRAME_INTERP_PROBE,)
+
+# ATM_PROFILING=1 links the shared ATM telemetry core and enables the fixed
+# deterministic benchmark that publishes /3ds/atm_result.txt for the ATM
+# harness (atm_prof.h / atm_prof_3ds.c). Harness builds only — never merged
+# to a release branch. See perf/OPTIMIZATION-LOG.md Phase B.
+ATM_PROFILING ?= 0
+# Canonical shared ATM source (compiled in place, never copied, so the game,
+# Rosalina and the host conformance test cannot diverge on bucket edges).
+ATM_CORE_DIR ?= /mnt/nas/Development/netload_stub/sysmodules/rosalina
+# Benchmark scenario: one level by NAME (slot indices differ between
+# EDITION=original and EDITION=remaster), fixed warmup, fixed frame count.
+ATM_BENCH_LEVEL  ?= ramqan
+ATM_BENCH_FRAMES ?= 240
+ATM_BENCH_WARMUP ?= 30
+# 0 = force mono, 1 = force stereo. The physical 3D slider is a live analog
+# input, so an unpinned slider cannot produce comparable runs.
+ATM_BENCH_STEREO ?= 0
+# ATM_HEADLESS=1 restores the ATM-launch configuration (custom __appInit
+# without aptInit + aptMainLoop-free main loop) for one-shot payloads that
+# ATM launches while HOME stays foreground. Game benchmarks pushed via
+# 3dslink to the live stub MUST leave this at 0: the stub chainloads the
+# app as a proper NS foreground title, so normal init applies (proven by
+# the framedump render-proof builds).
+ATM_HEADLESS ?= 0
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -137,6 +169,8 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(PERF_CFLAGS) \
 	$(FIDELITY_CFLAGS) \
 	$(FIDCK_CFLAGS) \
+	$(FRAMEDUMP_CFLAGS) \
+	$(SELFTEST_CFLAGS) \
 	$(INTERP_CFLAGS) \
 	$(INTERPFRAME_CFLAGS) \
 	$(FORCEMONO_CFLAGS) \
@@ -289,6 +323,23 @@ ifneq ($(AUTOTEST_MS_PER_LEVEL),)
 CFLAGS += -DAUTOTEST_MS_PER_LEVEL=$(AUTOTEST_MS_PER_LEVEL)
 endif
 
+# ATM_PROFILING=1 — see the knob block near the top of this file.
+ifeq ($(ATM_PROFILING),1)
+ifeq ($(wildcard $(ATM_CORE_DIR)/source/atm/atm_core.c),)
+$(error ATM_PROFILING=1 needs $(ATM_CORE_DIR)/source/atm/atm_core.c — set ATM_CORE_DIR=<path to netload_stub/sysmodules/rosalina>)
+endif
+CFLAGS += -DATM_PROFILING -I$(ATM_CORE_DIR)/include
+CFLAGS += -DATM_BENCH_LEVEL='"$(ATM_BENCH_LEVEL)"'
+CFLAGS += -DATM_BENCH_FRAMES=$(ATM_BENCH_FRAMES)
+CFLAGS += -DATM_BENCH_WARMUP=$(ATM_BENCH_WARMUP)
+CFLAGS += -DATM_BENCH_STEREO=$(ATM_BENCH_STEREO)
+CFLAGS += $(if $(filter 1,$(ATM_HEADLESS)),-DATM_HEADLESS,)
+# Compiled from outside $(SRCDIR), so it needs an explicit rule (below) and
+# cannot ride the $(SRCDIR)/%.c pattern. It is also deliberately outside the
+# AGENTS.md gate scope: vendored shared ATM firmware, not Forsaken game code.
+OFILES += atm_core.o
+endif
+
 # VERBOSE_TRACE=1 enables the TR() / TRMSG() macros in main.h. Lots of
 # trace points get sprinkled through the loaders so a crash leaves the
 # last reached point visible at the tail of sdmc:/forsaken_trace.txt.
@@ -382,7 +433,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FDMP=$(FRAMEDUMP)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMH=$(ATM_HEADLESS)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
@@ -561,6 +612,14 @@ $(BUILD)/%.o: $(SRCDIR)/%.cpp $(STAMP)
 	@echo $(notdir $<)
 	@mkdir -p $(BUILD)
 	$(CXX) -MMD -MP -MF $(BUILD)/$*.d $(CXX_BASE_FLAGS) $(CXXFLAGS_ADD) -c $< -o $@
+
+# Shared ATM telemetry core, compiled from the canonical netload_stub tree in
+# place (explicit rule: it is outside $(SRCDIR), so the pattern rule above
+# cannot reach it). Same numeric flags as the game; -MMD keeps it honest.
+$(BUILD)/atm_core.o: $(ATM_CORE_DIR)/source/atm/atm_core.c $(STAMP)
+	@echo "$(notdir $<) [shared ATM core]"
+	@mkdir -p $(BUILD)
+	$(CC) -MMD -MP -MF $(BUILD)/atm_core.d $(CFLAGS) -c $< -o $@
 
 clean:
 	@echo "Cleaning 3DS build..."

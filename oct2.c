@@ -2753,7 +2753,7 @@ bool RenderScene( void )
   case STATUS_Title:
 	DebugState("STATUS_Title\n");
 
-#if defined(__3DS_DEBUG__) || defined(DEBUG_ON) || defined(AUTOTEST_REMASTER)
+#if defined(__3DS_DEBUG__) || defined(DEBUG_ON) || defined(AUTOTEST_REMASTER) || defined(ATM_PROFILING)
   {
     /* Auto-boot directly into a level. Default target = Volcano
      * (NewLevelNum=0). With AUTOTEST_REMASTER set, target becomes the
@@ -2782,7 +2782,15 @@ bool RenderScene( void )
     /* StartASinglePlayerGame -> InitLevels(SINGLEPLAYER_LEVELS) resets
      * NewLevelNum to 0 as a side effect (singleplayer.c:99). Apply our
      * desired starting level AFTER the call so it survives. */
-#ifdef AUTOTEST_REMASTER
+#ifdef ATM_PROFILING
+    /* Deterministic benchmark entry. atm_prof_bench_level() resolves the
+     * pinned level NAME against the loaded mission list (slot indices are
+     * edition-dependent) and opens the measurement state machine. */
+    {
+      extern int atm_prof_bench_level(void);
+      NewLevelNum = (int16_t)atm_prof_bench_level();
+    }
+#elif defined(AUTOTEST_REMASTER)
     {
       extern int autotest_first_level(void);
       NewLevelNum = autotest_first_level();
@@ -4374,6 +4382,12 @@ bool RenderScene( void )
      * = -1 once the dwell expires (the existing "if NewLevelNum != LevelNum"
      * branch below picks that up and triggers ReleaseView/InitView). */
     { extern void autotest_tick(void); autotest_tick(); }
+#endif
+
+#ifdef ATM_PROFILING
+    /* The benchmark's only per-frame input: it marks "gameplay was live this
+     * frame" and detects level entry. It never synthesizes player input. */
+    { extern void atm_prof_bench_tick(void); atm_prof_bench_tick(); }
 #endif
 
 #ifdef __3DS__
@@ -6687,11 +6701,17 @@ void CalculateFramelag( void )
 
   framelag = real_framelag * 71.0F;
 
-#ifdef FIDELITY_DUMP
+#if defined(FIDELITY_DUMP) || defined(ATM_PROFILING)
   /* Determinism pin: the fidelity harness requires the simulation to
    * advance by an identical step every tick so per-tick state hashes are
    * reproducible across runs (wall-clock framelag makes the trajectory
-   * timing-dependent). 1.0F = one 71 Hz step per frame. */
+   * timing-dependent). 1.0F = one 71 Hz step per frame.
+   *
+   * The ATM benchmark needs the same property for a different reason: with
+   * a wall-clock framelag, two runs of the same level execute different
+   * amounts of simulation work per frame, so per-frame timing would compare
+   * unequal work. One 71 Hz step per frame makes work-per-frame identical
+   * across runs, builds, and mono/stereo. */
   real_framelag = 0.014084507042253521126760563380282F; /* 1/71, exact-folded */
   framelag = 1.0F;
 #endif

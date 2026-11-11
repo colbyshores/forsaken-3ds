@@ -82,6 +82,22 @@ static void test_bmp(void)
 		CHECK(row[0] == 0 && row[1] == 2 && row[2] == 2,
 		      "bmp bottom-up row order");
 	}
+	{
+		/* File bytes -> top-first pixels -> FNV must equal FNV(input):
+		   the exact host-side verification the harness performs on
+		   every retrieved twin (rows re-stacked, padding skipped). */
+		unsigned char file[48], px2[5 * 3 * 3];
+		uint32_t h1, h2;
+		int r;
+		fseek(f, 54, SEEK_SET);
+		CHECK(fread(file, 1, sizeof(file), f) == sizeof(file),
+		      "bmp payload readable");
+		for (r = 0; r < 3; r++)
+			memcpy(px2 + (unsigned)r * 15, file + (unsigned)(2 - r) * 16, 15);
+		h1 = framedump_fnv1a(px, sizeof(px));
+		h2 = framedump_fnv1a(px2, sizeof(px2));
+		CHECK(h1 == h2, "bmp file round-trips to input hash");
+	}
 	fclose(f);
 }
 

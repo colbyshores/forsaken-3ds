@@ -44,6 +44,8 @@ static int dump_screen(const char *setname, const char *screen,
 	unsigned bpp;
 	unsigned long nbytes;
 	uint32_t hash;
+	static unsigned char *snap;
+	static unsigned long snapCap;
 
 	fb = gfxGetFramebuffer(gs, GFX_LEFT, &w, &h);
 	if (!fb || w == 0 || h == 0) return -1;
@@ -58,7 +60,19 @@ static int dump_screen(const char *setname, const char *screen,
 		/* RGB565 is expanded below; hash the raw bytes as stored. */
 		nbytes = (unsigned long)w * h * 2u;
 	}
-	hash = framedump_fnv1a(fb, nbytes);
+	/* Freeze the live framebuffer first: the two BMP writes below take
+	 * seconds on SD while the game keeps rendering into this buffer,
+	 * so hashing/writing the live pointer tears on any moving scene
+	 * (proven on hardware: bottom/static verified, top/live did not).
+	 * Hash and both files read the frozen copy. */
+	if (nbytes > snapCap) {
+		unsigned char *nb = realloc(snap, nbytes);
+		if (!nb) return -1;
+		snap = nb;
+		snapCap = nbytes;
+	}
+	memcpy(snap, fb, nbytes);
+	hash = framedump_fnv1a(snap, nbytes);
 
 	snprintf(path, sizeof(path), "sdmc:/%s_%s.bmp", setname, screen);
 	{
@@ -79,8 +93,8 @@ static int dump_screen(const char *setname, const char *screen,
 				tmpCap = np * 3ul;
 			}
 			for (k = 0; k < np; k++) {
-				unsigned v = (unsigned)fb[k * 2] |
-				             ((unsigned)fb[k * 2 + 1] << 8);
+				unsigned v = (unsigned)snap[k * 2] |
+				             ((unsigned)snap[k * 2 + 1] << 8);
 				tmp[k * 3 + 0] = (unsigned char)((v & 0x1f) << 3);
 				tmp[k * 3 + 1] = (unsigned char)(((v >> 5) & 0x3f) << 2);
 				tmp[k * 3 + 2] = (unsigned char)(((v >> 11) & 0x1f) << 3);
@@ -88,7 +102,7 @@ static int dump_screen(const char *setname, const char *screen,
 			rgb = tmp;
 			rgbBpp = 3;
 		} else {
-			rgb = fb;
+			rgb = snap;
 			rgbBpp = bpp;
 		}
 		rc = framedump_write_bmp(path, rgb, w, h, (int)rgbBpp);
