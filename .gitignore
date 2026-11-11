@@ -169,3 +169,6 @@ forsaken_stereo.txt
 
 # ATM profiling artifacts
 perf/
+# Pi harness progress checkpoints (pi's 5-turn crash-recovery files, repo-local)
+/PROGRESS.md
+/.progress-log/

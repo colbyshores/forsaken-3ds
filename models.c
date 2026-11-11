@@ -1384,6 +1384,94 @@ static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * cl
 #endif
 }
 
+#if defined(MODEL_BUCKET) && defined(MODEL_BUCKET_VERIFY)
+/* Correctness-only audit for MODEL_BUCKET. The normal bucket path replaces
+ * a full Models[] walk per visible group with one per-camera bucket walk.
+ * This diagnostic reconstructs the baseline-visible sequence for the current
+ * group and compares it, element for element, with the bucket chain. It also
+ * catches a stale bucket if model visibility/group state changes between the
+ * bucket build and a later group call in the same camera.
+ *
+ * This deliberately performs the old O(models) work and must never be used
+ * as a performance configuration. */
+static unsigned long g_model_bucket_verify_groups;
+static unsigned long g_model_bucket_verify_entries;
+static unsigned long g_model_bucket_verify_mismatches;
+static int g_model_bucket_verify_first_group = -1;
+static unsigned int g_model_bucket_verify_first_expected;
+static unsigned int g_model_bucket_verify_first_actual;
+
+void ModelVisBucket_Verify_Reset(void)
+{
+	g_model_bucket_verify_groups = 0;
+	g_model_bucket_verify_entries = 0;
+	g_model_bucket_verify_mismatches = 0;
+	g_model_bucket_verify_first_group = -1;
+	g_model_bucket_verify_first_expected = 0;
+	g_model_bucket_verify_first_actual = 0;
+}
+
+static void ModelVisBucket_Verify( u_int16_t group, int InTitle )
+{
+	u_int16_t expected = FirstModelUsed;
+	u_int16_t actual = VisBucketHead[ group ];
+
+	g_model_bucket_verify_groups++;
+	for (;;)
+	{
+		u_int16_t clip = 0;
+		int visible;
+
+		/* Find the next model the baseline guard would accept for this
+		 * group. This is exactly ModelVisibleWithClip() && clip==group. */
+		while (expected != (u_int16_t)-1)
+		{
+			visible = ModelVisibleWithClip( expected, InTitle, &clip );
+			if (visible && clip == group)
+				break;
+			expected = Models[ expected ].Prev;
+		}
+
+		if (expected == (u_int16_t)-1 && actual == (u_int16_t)-1)
+			break;
+		if (expected == (u_int16_t)-1 || actual == (u_int16_t)-1)
+		{
+			g_model_bucket_verify_mismatches++;
+			if (g_model_bucket_verify_first_group < 0)
+			{
+				g_model_bucket_verify_first_group = (int)group;
+				g_model_bucket_verify_first_expected =
+					(expected == (u_int16_t)-1) ? 0xffffu : (unsigned int)expected;
+				g_model_bucket_verify_first_actual =
+					(actual == (u_int16_t)-1) ? 0xffffu : (unsigned int)actual;
+			}
+			break;
+		}
+		if (expected != actual)
+		{
+			g_model_bucket_verify_mismatches++;
+			if (g_model_bucket_verify_first_group < 0)
+			{
+				g_model_bucket_verify_first_group = (int)group;
+				g_model_bucket_verify_first_expected = (unsigned int)expected;
+				g_model_bucket_verify_first_actual = (unsigned int)actual;
+			}
+		}
+		g_model_bucket_verify_entries++;
+		expected = Models[ expected ].Prev;
+		actual = VisBucketNext[ actual ];
+	}
+
+	PERF_MODEL_BUCKET_VERIFY_RESULT(
+		g_model_bucket_verify_groups,
+		g_model_bucket_verify_entries,
+		g_model_bucket_verify_mismatches,
+		g_model_bucket_verify_first_group,
+		g_model_bucket_verify_first_expected,
+		g_model_bucket_verify_first_actual );
+}
+#endif
+
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
 	perf_stage_begin(PERF_S_MDLWRAP);
@@ -1405,6 +1493,9 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 	else InTitle = true;
 #ifdef MODEL_BUCKET
 	MODEL_BUCKET_REFRESH( InTitle );
+#if defined(MODEL_BUCKET_VERIFY)
+	ModelVisBucket_Verify( group, InTitle );
+#endif
 #endif
 #ifdef MODEL_VIS_CACHE
 	if( VisCacheTitle != (u_int8_t)(InTitle ? 1 : 0) )
@@ -4496,6 +4587,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 	VECTOR		TempVector;
 	VECTOR		Recoil;
 	u_int16_t		i, Next;
+	u_int16_t		nSecWalk;
 //	char		methodstr[256];
 //	char		tempstr[256];
 	ENEMY	*	Enemy;
@@ -4662,9 +4754,12 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 	Shockwave hitting any mines?
 ===================================================================*/
 	i = FirstSecBullUsed;
+	nSecWalk = 0;
 
-	while( i != (u_int16_t) -1 )
+	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
+	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
+		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
 
 		if( SecBulls[ i ].SecType == SEC_MINE )
@@ -5064,6 +5159,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 	VECTOR		TempVector;
 	VECTOR		Recoil;
 	u_int16_t		i, Next;
+	u_int16_t		nSecWalk;
 	char		methodstr[256];
 	char		tempstr[256];
 	ENEMY	*	Enemy;
@@ -5192,9 +5288,12 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 ===================================================================*/
 
 	i = FirstSecBullUsed;
+	nSecWalk = 0;
 
-	while( i != (u_int16_t) -1 )
+	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
+	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
+		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
 
  		if( SecBulls[ i ].SecType == SEC_MINE )

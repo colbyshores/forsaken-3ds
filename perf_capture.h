@@ -21,6 +21,18 @@
 extern "C" {
 #endif
 
+#if defined(PERF_CAPTURE) && defined(MODEL_BUCKET_VERIFY)
+/* Correctness-only MODEL_BUCKET audit. The caller supplies cumulative
+ * counters; the capture file records them once at the level marker. */
+void perf_model_bucket_verify_result(unsigned long groups,
+	unsigned long entries, unsigned long mismatches,
+	int first_group, unsigned int first_expected, unsigned int first_actual);
+#define PERF_MODEL_BUCKET_VERIFY_RESULT(g, e, m, fg, fe, fa) \
+	perf_model_bucket_verify_result((g), (e), (m), (fg), (fe), (fa))
+#else
+#define PERF_MODEL_BUCKET_VERIFY_RESULT(g, e, m, fg, fe, fa) ((void)0)
+#endif
+
 #ifdef PERF_CAPTURE
 
 enum perf_stage {

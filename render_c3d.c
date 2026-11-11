@@ -9,7 +9,7 @@
  *
  * Build:
  *   make -f Makefile.3ds RENDERER=citro3d   # this renderer
- *   make -f Makefile.3ds                    # picaGL fallback (GL=1)
+ *   make -f Makefile.3ds RENDERER=picagl    # picaGL fallback (GL=1)
  *
  * Architecture:
  *   - picaGL is NOT linked. We provide our own pglInit/pglSwapBuffers/pglExit
@@ -2769,8 +2769,8 @@ void light_vert(LVERTEX *vert, u_int8_t *color)
 }
 
 /*===================================================================
-	Draw functions — GL-based via picaGL (proves pipeline correctness)
-	TODO: replace with raw citro3d C3D_DrawArrays once visual output confirmed
+	Draw functions — native citro3d path
+	Submits triangles directly with C3D_DrawArrays; picaGL is not linked.
 ===================================================================*/
 
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)

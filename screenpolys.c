@@ -986,11 +986,15 @@ bool ClipBox( LPTLVERTEX topleft, LPTLVERTEX bottomright )
 void DoAllSecBullLensflare( void )
 {
 	u_int16_t	i;
+	u_int16_t	nSecWalk;
 
 	i = FirstSecBullUsed;
+	nSecWalk = 0;
 
-	while( i != (u_int16_t) -1 )
+	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
+	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
+		nSecWalk++;
 		if( !SoundInfo[ SecBulls[i].GroupImIn ][ CurrentCamera.GroupImIn ] )
 		{
 			if( SecBulls[ i ].Lensflare ) SecBullLensflare( i );
