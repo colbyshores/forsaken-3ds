@@ -49,6 +49,8 @@ enum {
 	ATM_C_STATUS_EXITS,      /* gameplay left before the frame target was met */
 	ATM_C_STEREO_FRAMES,     /* measured frames rendered with stereo on */
 	ATM_C_MONO_FRAMES,       /* measured frames rendered with stereo off */
+	ATM_C_PRIM_BULLETS,      /* sum of per-frame live primary bullets (÷frames = mean live) */
+	ATM_C_SEC_BULLETS,        /* sum of per-frame live secondary bullets */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

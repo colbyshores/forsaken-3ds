@@ -61,6 +61,8 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"status_exits",
 	"stereo_frames",
 	"mono_frames",
+	"prim_bullets",
+	"sec_bullets",
 };
 
 enum {
