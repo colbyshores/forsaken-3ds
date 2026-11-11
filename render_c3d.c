@@ -152,6 +152,21 @@ static int  s_hudSavedWinCx     = 0;
 static int  s_hudSavedWinCy     = 0;
 static bool              s_stereoFrame   = false;
 
+/* TRANS-phase flag for the tdraws/tverts counters. Set by oct2.c around
+ * the translucent phase; read in FLUSH_BATCH. Harness-only (ATM_PROFILING)
+ * so release builds carry no branch. */
+#ifdef ATM_PROFILING
+bool render_inTranslucent = false;
+#define TRANS_COUNT_BATCH() do { \
+		if (render_inTranslucent) { \
+			atm_prof_add(ATM_C_TDRAWS, 1); \
+			atm_prof_add(ATM_C_TVERTS, batch_vertCount); \
+		} \
+	} while (0)
+#else
+#define TRANS_COUNT_BATCH() ((void)0)
+#endif
+
 /* GPU lighting uniform locations, resolved at init from the shader DVLE
  * (don't depend on picasso's declaration-order register assignment). */
 static s8 s_loc_ambient     = -1;
@@ -2940,6 +2955,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
 		atm_prof_add(ATM_C_DRAWS, 1); \
 		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
+		TRANS_COUNT_BATCH(); \
 		if (s_dlRecording && !orthographic && s_dlCount < MAX_DL_ENTRIES) { \
 			dl_entry_t *_e = &s_dl[s_dlCount++]; \
 			_e->scratchOffset = batch_startOffset; \

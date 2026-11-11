@@ -6261,6 +6261,9 @@ bool RenderCurrentCamera( void )
   	set_alpha_states();
   _RC_STAGE("post-set_alpha_states-1");
   perf_stage_begin(PERF_S_TRANS);
+#ifdef ATM_PROFILING
+  { extern bool render_inTranslucent; render_inTranslucent = true; }
+#endif
 
 
 /*===================================================================
@@ -6313,10 +6316,13 @@ bool RenderCurrentCamera( void )
     #define _RC_TRANS_SUBSTAGE(s) ((void)0)
 #endif
 
+    perf_stage_begin(PERF_S_TRANWATER);
     ClipGroup( &CurrentCamera, group );
     _RC_TRANS_SUBSTAGE("post-ClipGroup");
     GroupWaterProcessDisplay( group );
     _RC_TRANS_SUBSTAGE("post-GroupWaterProcessDisplay");
+    perf_stage_end(PERF_S_TRANWATER, -1);
+    perf_stage_begin(PERF_S_TRANPOLYS);
 
 
 
@@ -6343,6 +6349,7 @@ Display Group Clipped Faceme Transluecent Polys
 
   ExecuteTransExe( group );
     _RC_TRANS_SUBSTAGE("post-ExecuteTransExe");
+    perf_stage_end(PERF_S_TRANPOLYS, -1);
     #undef _RC_TRANS_SUBSTAGE
   }
   _RC_STAGE("translucent-loop EXIT");
@@ -6356,6 +6363,7 @@ Display Group Clipped Faceme Transluecent Polys
   Display Non Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
+    perf_stage_begin(PERF_S_TRANPOLYS);
     if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedFmPolys");
@@ -6366,6 +6374,8 @@ Display Group Clipped Faceme Transluecent Polys
     if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedPolys");
+    perf_stage_end(PERF_S_TRANPOLYS, -1);
+    perf_stage_begin(PERF_S_TRANMISC);
 #ifdef SHADOWTEST
     if( !DisplayGroupUnclippedTriangles( RenderBufs[ 0 ], lpDev, lpView ) )
       return false;
@@ -6397,6 +6407,7 @@ Display Group Clipped Faceme Transluecent Polys
   }
 
   set_normal_states();
+    perf_stage_end(PERF_S_TRANMISC, -1);
 
     if (!FSSetViewPort(&viewport)) {
 #ifdef DEBUG_VIEWPORT
@@ -6407,6 +6418,9 @@ Display Group Clipped Faceme Transluecent Polys
         return false;
     }
 
+#ifdef ATM_PROFILING
+  { extern bool render_inTranslucent; render_inTranslucent = false; }
+#endif
   perf_stage_end(PERF_S_TRANS, -1);
   return true;
 }

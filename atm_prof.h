@@ -56,6 +56,8 @@ enum {
 	ATM_C_SFX_RELEASE,        /* sound_release_source calls */
 	ATM_C_DRAWS,              /* draw_render_object calls per frame */
 	ATM_C_VERTS,              /* vertices converted per frame */
+	ATM_C_TDRAWS,             /* draw_render_object calls inside the TRANS phase */
+	ATM_C_TVERTS,             /* vertices converted inside the TRANS phase */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

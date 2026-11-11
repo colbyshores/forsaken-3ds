@@ -68,6 +68,8 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"sfx_release",
 	"draws",
 	"verts",
+	"tdraws",
+	"tverts",
 };
 
 enum {
@@ -80,6 +82,13 @@ enum {
 };
 
 static AtmFrameStats g_stats;
+/* GPU load (citro3d timestamp queries, ms as float). Sampled once per
+ * measured frame at frame_end: the values report the last COMPLETED
+ * frame (one frame of lag), which washes out of 240-frame means.
+ * Decides the CPU-vs-GPU strategy question: if draw_mean approaches
+ * the CPU wall, cutting CPU work backfills into GPU wait instead. */
+static float g_gpuDrawSum, g_gpuDrawMax, g_gpuProcSum, g_gpuProcMax;
+static unsigned g_gpuN;
 static uint32_t g_counters[ATM_C_MAX];
 
 static int      g_state = ATM_ST_IDLE;
@@ -258,6 +267,15 @@ void atm_prof_frame_end(void)
 	}
 
 	atm_frame_add(&g_stats, us, (uint32_t)ATM_BENCH_BUDGET_US);
+	{
+		float gd = C3D_GetDrawingTime();
+		float gp = C3D_GetProcessingTime();
+		g_gpuDrawSum += gd;
+		g_gpuProcSum += gp;
+		if (gd > g_gpuDrawMax) g_gpuDrawMax = gd;
+		if (gp > g_gpuProcMax) g_gpuProcMax = gp;
+		g_gpuN++;
+	}
 	if (gfxIs3D())
 		atm_prof_add(ATM_C_STEREO_FRAMES, 1);
 	else
@@ -349,6 +367,17 @@ void atm_prof_write_result(void)
 	if (n > 0) {
 		summary[sizeof(summary) - 1] = '\0';
 		atm_res_write(summary);
+	}
+
+	if (g_gpuN > 0) {
+		snprintf(line, sizeof(line),
+		         "GPU: draw_mean_us=%u proc_mean_us=%u draw_max_us=%u proc_max_us=%u n=%u\n",
+		         (unsigned)(g_gpuDrawSum * 1000.0f / (float)g_gpuN),
+		         (unsigned)(g_gpuProcSum * 1000.0f / (float)g_gpuN),
+		         (unsigned)(g_gpuDrawMax * 1000.0f),
+		         (unsigned)(g_gpuProcMax * 1000.0f),
+		         g_gpuN);
+		atm_res_write(line);
 	}
 
 	/* Trailing integrity marker over the emitted summary, so a truncated or
