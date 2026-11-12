@@ -258,11 +258,12 @@ static bool s_scissorOn = false;
 					atm_prof_add(ATM_C_TFILLPIX, _area); \
 			} \
 		} else { \
-			atm_prof_add(ATM_C_FILLPIX, 240u * 400u); \
-			atm_prof_add(ATM_C_FILLQ3, 1u); \
-			atm_prof_q3_capture(batch_texture, renderObject, batch_vertCount, 240u * 400u); \
+			unsigned _varea = (unsigned)(s_viewport.Width * s_viewport.Height); \
+			atm_prof_add(ATM_C_FILLPIX, _varea); \
+			atm_prof_add((_varea < 24000u) ? ATM_C_FILLQ0 : (_varea < 48000u) ? ATM_C_FILLQ1 : (_varea < 72000u) ? ATM_C_FILLQ2 : ATM_C_FILLQ3, 1u); \
+			if (_varea >= 72000u) { atm_prof_q3_capture(batch_texture, renderObject, batch_vertCount, _varea); } \
 			if (render_inTranslucent) \
-				atm_prof_add(ATM_C_TFILLPIX, 240u * 400u); \
+				atm_prof_add(ATM_C_TFILLPIX, _varea); \
 		} \
 	} while (0)
 #else
