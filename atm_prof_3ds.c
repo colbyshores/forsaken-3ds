@@ -77,6 +77,7 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"lightsw",
 	"fillpix",
 	"tfillpix",
+	"colorskip",
 };
 
 enum {

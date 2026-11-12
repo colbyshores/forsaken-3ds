@@ -65,6 +65,7 @@ enum {
 	ATM_C_LIGHTSW,            /* program switches (proves the 2-cap path executes) */
 	ATM_C_FILLPIX,            /* submitted pixel bounds (scissor rect or full target) */
 	ATM_C_TFILLPIX,           /* same, inside the TRANS phase */
+	ATM_C_COLORSKIP,          /* R06: level color-restores skipped (clean baseline) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];
