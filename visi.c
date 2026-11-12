@@ -894,6 +894,118 @@ Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 }
 
 
+/* Near-plane-clipped portal extent (fill-cut, step 3). When a portal
+ * straddles the near plane the old code forced the window to fullscreen
+ * (correct but maximally loose — the dominant source of the measured
+ * 27x non-TRANS overdraw). Clip the portal polygon against the near
+ * plane in homogeneous clip space instead, project the survivors, and
+ * bound those. Writes tight x/y into *e, leaves z to the caller (kept
+ * from the in-front accumulation so depth order is unchanged).
+ * Returns 1 on success, 0 to keep the old fullscreen fallback
+ * (degenerate input, empty clip, over-capacity polygon). */
+typedef struct { float x, y, z, w; } FILLCLIPVERT;
+#define FILLCLIP_MAX 40
+
+static int
+NearClipPortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
+{
+	FILLCLIPVERT poly[ FILLCLIP_MAX ], tmp[ FILLCLIP_MAX ];
+	RENDERMATRIX *mp = &v->viewproj;
+	render_viewport_t *vp = v->viewport;
+	int n = 0, m, i, j;
+	float minx, miny, maxx, maxy;
+	(void)cam;
+	if ( p->num_vertices_in_portal > FILLCLIP_MAX - 4 )
+		return 0;
+	/* 1. world -> clip space, w preserved. Row-vector convention,
+	 * matching VisPolyApplyMatrix (x' = _11*x + _21*y + _31*z + _41). */
+	for ( i = 0; i < (int)p->num_vertices_in_portal; i++ )
+	{
+		float x = p->Verts[ i ].x, y = p->Verts[ i ].y, z = p->Verts[ i ].z;
+		poly[ n ].x = mp->m[0][0]*x + mp->m[1][0]*y + mp->m[2][0]*z + mp->m[3][0];
+		poly[ n ].y = mp->m[0][1]*x + mp->m[1][1]*y + mp->m[2][1]*z + mp->m[3][1];
+		poly[ n ].z = mp->m[0][2]*x + mp->m[1][2]*y + mp->m[2][2]*z + mp->m[3][2];
+		poly[ n ].w = mp->m[0][3]*x + mp->m[1][3]*y + mp->m[2][3]*z + mp->m[3][3];
+		n++;
+	}
+	/* 2. Sutherland-Hodgman against w >= WEPS, then clip z >= 0 (near).
+	 * w-plane first so the z interpolants stay finite. */
+	for ( m = 0; m < 2 && n > 0; m++ )
+	{
+		int k = 0;
+		for ( i = 0, j = n - 1; i < n; j = i++ )
+		{
+			float di = ( m == 0 ) ? ( poly[i].w - 1e-4f ) : poly[i].z;
+			float dj = ( m == 0 ) ? ( poly[j].w - 1e-4f ) : poly[j].z;
+			int ini = ( di >= 0.0f ), inj = ( dj >= 0.0f );
+			if ( ini )
+			{
+				if ( !inj )
+				{
+					float t = dj / ( dj - di );
+					if ( k >= FILLCLIP_MAX )
+						return 0;
+					tmp[k].x = poly[j].x + t * ( poly[i].x - poly[j].x );
+					tmp[k].y = poly[j].y + t * ( poly[i].y - poly[j].y );
+					tmp[k].z = poly[j].z + t * ( poly[i].z - poly[j].z );
+					tmp[k].w = poly[j].w + t * ( poly[i].w - poly[j].w );
+					k++;
+				}
+				if ( k >= FILLCLIP_MAX )
+					return 0;
+				tmp[k++] = poly[i];
+			}
+			else if ( inj )
+			{
+				float t = di / ( di - dj );
+				if ( k >= FILLCLIP_MAX )
+					return 0;
+				tmp[k].x = poly[i].x + t * ( poly[j].x - poly[i].x );
+				tmp[k].y = poly[i].y + t * ( poly[j].y - poly[i].y );
+				tmp[k].z = poly[i].z + t * ( poly[j].z - poly[i].z );
+				tmp[k].w = poly[i].w + t * ( poly[j].w - poly[i].w );
+				k++;
+			}
+		}
+		n = k;
+		for ( i = 0; i < n; i++ )
+			poly[i] = tmp[i];
+	}
+	if ( n <= 0 )
+		return 0;
+	/* 3. divide + viewport map, replicating Transform2Viewport's
+	 * edge clamping so conventions match the in-front path. */
+	minx = miny = 1e30f;
+	maxx = maxy = -1e30f;
+	for ( i = 0; i < n; i++ )
+	{
+		float nx = poly[i].x / poly[i].w;
+		float ny = poly[i].y / poly[i].w;
+		float px, py;
+		if ( nx < -1.0F )
+			px = (float)vp->X;
+		else if ( nx > 1.0F )
+			px = (float)( vp->X + vp->Width );
+		else
+			px = (float)( vp->X + ( vp->Width * 0.5F ) + ( vp->ScaleX * nx ) );
+		if ( ny < -1.0F )
+			py = (float)( vp->Y + vp->Height );
+		else if ( ny > 1.0F )
+			py = (float)vp->Y;
+		else
+			py = (float)( vp->Y + ( vp->Height * 0.5F ) - ( vp->ScaleY * ny ) );
+		if ( px < minx ) minx = px;
+		if ( py < miny ) miny = py;
+		if ( px > maxx ) maxx = px;
+		if ( py > maxy ) maxy = py;
+	}
+	e->min.x = minx;
+	e->min.y = miny;
+	e->max.x = maxx;
+	e->max.y = maxy;
+	return 1;
+}
+
 static int
 VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 {
@@ -949,7 +1061,11 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 	}
 	if ( clip_any & CLIP_FRONT )
 	{
-		*e = v->first_visible->extent; // portal clipped by front plane -> force extents fullscreen
+		/* Fill-cut: bound the near-straddling fragment instead of forcing
+		 * fullscreen. Falls back to the old fullscreen window when the
+		 * clipped polygon is degenerate. */
+		if ( !NearClipPortalExtent( cam, v, p, e ) )
+			*e = v->first_visible->extent; // portal clipped by front plane -> force extents fullscreen
 	}
 	return 1;
 }
