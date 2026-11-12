@@ -58,6 +58,7 @@ enum {
 	ATM_C_VERTS,              /* vertices converted per frame */
 	ATM_C_TDRAWS,             /* draw_render_object calls inside the TRANS phase */
 	ATM_C_TVERTS,             /* vertices converted inside the TRANS phase */
+	ATM_C_LIGHTS,             /* active XLight count packed per upload (÷frames = mean) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

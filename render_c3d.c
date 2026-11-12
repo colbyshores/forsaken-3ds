@@ -1271,6 +1271,7 @@ void c3d_upload_xlights(void)
 	}
 
 	int n_packed = 0;
+	atm_prof_add(ATM_C_LIGHTS, (unsigned)n_top);
 	for (; n_packed < n_top; n_packed++)
 	{
 		struct XLIGHT *L = top[n_packed];
