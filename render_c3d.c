@@ -245,18 +245,25 @@ static bool s_scissorOn = false;
 /* Submitted-pixel bounds per batch (overdraw screen). Harness-only. */
 #ifdef ATM_PROFILING
 #define FILLPIX_COUNT_BATCH() do { \
+		if (s_isOrthoDraw) { atm_prof_add(ATM_C_ORTHO, 1u); } \
 		if (s_scissorOn) { \
 			int _sw = s_scissorX1 - s_scissorX0; \
 			int _sh = s_scissorY1 - s_scissorY0; \
 			if (_sw > 0 && _sh > 0) { \
-				atm_prof_add(ATM_C_FILLPIX, (unsigned)(_sw * _sh)); \
+				unsigned _area = (unsigned)(_sw * _sh); \
+				atm_prof_add(ATM_C_FILLPIX, _area); \
+				atm_prof_add((_area < 24000u) ? ATM_C_FILLQ0 : (_area < 48000u) ? ATM_C_FILLQ1 : (_area < 72000u) ? ATM_C_FILLQ2 : ATM_C_FILLQ3, 1u); \
+				if (_area >= 72000u) { atm_prof_q3_capture(batch_texture, renderObject, batch_vertCount, _area); } \
 				if (render_inTranslucent) \
-					atm_prof_add(ATM_C_TFILLPIX, (unsigned)(_sw * _sh)); \
+					atm_prof_add(ATM_C_TFILLPIX, _area); \
 			} \
 		} else { \
-			atm_prof_add(ATM_C_FILLPIX, 240u * 400u); \
+			unsigned _varea = (unsigned)(s_viewport.Width * s_viewport.Height); \
+			atm_prof_add(ATM_C_FILLPIX, _varea); \
+			atm_prof_add((_varea < 24000u) ? ATM_C_FILLQ0 : (_varea < 48000u) ? ATM_C_FILLQ1 : (_varea < 72000u) ? ATM_C_FILLQ2 : ATM_C_FILLQ3, 1u); \
+			if (_varea >= 72000u) { atm_prof_q3_capture(batch_texture, renderObject, batch_vertCount, _varea); } \
 			if (render_inTranslucent) \
-				atm_prof_add(ATM_C_TFILLPIX, 240u * 400u); \
+				atm_prof_add(ATM_C_TFILLPIX, _varea); \
 		} \
 	} while (0)
 #else
@@ -2868,6 +2875,36 @@ void light_vert(LVERTEX *vert, u_int8_t *color)
 	Submits triangles directly with C3D_DrawArrays; picaGL is not linked.
 ===================================================================*/
 
+/* q3 attribution ring: which textures dominate fullscreen-ish draws.
+ * Ring keeps the LAST 256 (steady-state frames), dumped at result time.
+ * Harness-only. */
+#define FILLQ3_RING 256
+static struct { void *tex; void *ro; int verts; int area; unsigned char flags; } s_q3ring[ FILLQ3_RING ];
+static int s_q3n = 0;
+/* flags bit0: translucent batch, bit1: orthographic draw */
+static void atm_prof_q3_capture(void *tex, void *ro, int verts, unsigned area)
+{
+	int slot = s_q3n++ & (FILLQ3_RING - 1);
+	s_q3ring[slot].tex = tex;
+	s_q3ring[slot].ro = ro;
+	s_q3ring[slot].verts = verts;
+	s_q3ring[slot].area = (int)area;
+	s_q3ring[slot].flags = (unsigned char)((render_inTranslucent ? 1 : 0) | (s_isOrthoDraw ? 2 : 0));
+}
+void atm_prof_dump_q3(void)
+{
+	char line[128];
+	int i, n;
+	atm_prof_res_write("Q3BEGIN\n");
+	n = s_q3n < FILLQ3_RING ? s_q3n : FILLQ3_RING;
+	for (i = 0; i < n; i++)
+	{
+		snprintf(line, sizeof(line), "Q3: tex=%p ro=%p verts=%d area=%d flags=%d\n",
+		         s_q3ring[i].tex, s_q3ring[i].ro, s_q3ring[i].verts, s_q3ring[i].area, s_q3ring[i].flags);
+		atm_prof_res_write(line);
+	}
+	atm_prof_res_write("Q3END\n");
+}
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
 {
 	int group;

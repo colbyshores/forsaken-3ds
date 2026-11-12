@@ -80,6 +80,13 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"tfillpix",
 	"colorskip",
 	"projskip",
+	"fillq0",
+	"fillq1",
+	"fillq2",
+	"fillq3",
+	"ortho",
+	"ncmix",
+	"nctight",
 };
 
 enum {
@@ -128,7 +135,7 @@ static uint32_t atm_ticks_to_us(uint64_t ticks)
  * and the final summary at teardown. Never anything per frame. */
 static int g_fd = -1;
 
-static void atm_res_write(const char *s)
+void atm_prof_res_write(const char *s)
 {
 	size_t len = strlen(s);
 	if (g_fd < 0)
@@ -171,16 +178,16 @@ static void atm_write_started(void)
 	atm_res_open(1);
 	if (g_fd < 0)
 		return;
-	atm_res_write("workload=forsaken\nstatus=started\n");
+	atm_prof_res_write("workload=forsaken\nstatus=started\n");
 	snprintf(line, sizeof(line), "scenario=%s\n", ATM_BENCH_SCENARIO);
-	atm_res_write(line);
+	atm_prof_res_write(line);
 	snprintf(line, sizeof(line), "level=%s slot=%d resolve=%s\n",
 	         g_level, g_level_slot, g_level_resolve);
-	atm_res_write(line);
+	atm_prof_res_write(line);
 	snprintf(line, sizeof(line), "stereo=%s target_frames=%d warmup=%d budget_us=%u\n",
 	         atm_stereo_mode(), (int)ATM_BENCH_FRAMES, (int)ATM_BENCH_WARMUP,
 	         (unsigned)ATM_BENCH_BUDGET_US);
-	atm_res_write(line);
+	atm_prof_res_write(line);
 	atm_res_close();
 	g_started_written = 1;
 }
@@ -328,10 +335,10 @@ void atm_prof_write_result(void)
 	if (g_fd < 0)
 		return;
 
-	atm_res_write("workload=forsaken\n");
+	atm_prof_res_write("workload=forsaken\n");
 	snprintf(line, sizeof(line), "status=%s\n",
 	         g_state == ATM_ST_DONE ? "complete" : "incomplete");
-	atm_res_write(line);
+	atm_prof_res_write(line);
 
 	/* Hardware identity proof: is_n3ds=0 plus the application region size is
 	 * what distinguishes an Old-3DS pass from a New-3DS or proxy run. */
@@ -341,32 +348,32 @@ void atm_prof_write_result(void)
 		snprintf(line, sizeof(line), "console=is_n3ds=%u region_mb=%u\n",
 		         (unsigned)is_n3ds,
 		         (unsigned)(osGetMemRegionSize(MEMREGION_APPLICATION) >> 20));
-		atm_res_write(line);
+		atm_prof_res_write(line);
 	}
 
 	snprintf(line, sizeof(line), "scenario=%s reason=%s\n",
 	         ATM_BENCH_SCENARIO, g_reason);
-	atm_res_write(line);
+	atm_prof_res_write(line);
 	snprintf(line, sizeof(line), "level=%s slot=%d resolve=%s stereo=%s\n",
 	         g_level, g_level_slot, g_level_resolve, atm_stereo_mode());
-	atm_res_write(line);
+	atm_prof_res_write(line);
 	snprintf(line, sizeof(line),
 	         "target_frames=%d warmup=%d budget_us=%u window_ms=%llu\n",
 	         (int)ATM_BENCH_FRAMES, (int)ATM_BENCH_WARMUP,
 	         (unsigned)ATM_BENCH_BUDGET_US,
 	         (unsigned long long)(g_window_ms ? osGetTime() - g_window_ms : 0));
-	atm_res_write(line);
+	atm_prof_res_write(line);
 
 	for (i = 0; i < ATM_C_MAX; i++) {
 		snprintf(line, sizeof(line), "CNT: %s=%u\n",
 		         atm_prof_counter_name[i], (unsigned)g_counters[i]);
-		atm_res_write(line);
+		atm_prof_res_write(line);
 	}
 
 	n = atm_frame_format_summary(&g_stats, summary, sizeof(summary));
 	if (n > 0) {
 		summary[sizeof(summary) - 1] = '\0';
-		atm_res_write(summary);
+		atm_prof_res_write(summary);
 	}
 
 
@@ -382,7 +389,11 @@ void atm_prof_write_result(void)
 		fnv *= 16777619u;
 	}
 	snprintf(line, sizeof(line), "checksum=%08x\n", (unsigned)fnv);
-	atm_res_write(line);
+	atm_prof_res_write(line);
+
+	/* q3 attribution ring (diagnostic section, outside the integrity
+	 * checksum above). */
+	atm_prof_dump_q3();
 
 	atm_res_close();
 }

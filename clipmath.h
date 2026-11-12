@@ -1,0 +1,123 @@
+/* Fill-cut polygon clipper: tight screen bounds for a near-straddling
+ * portal. Pure math, no engine types — host-testable (tests/test_clipmath.c).
+ * visi.c transforms world verts to clip space, calls fillclip_tight_bounds,
+ * and maps the result with the same viewport math as Transform2Viewport.
+ *
+ * Contract: given clip-space points (x,y,z,w), compute a screen-pixel
+ * bounding box covering exactly the w>0,z>=0-visible fragment. Returns 1
+ * with bounds, 0 when the fragment is empty or degenerate (caller keeps
+ * its conservative fallback). Bounds are a superset of the true visible
+ * pixels (safe direction: never culls wrongly) and tight for ordinary
+ * straddles (no slab explosion: z>=0 clipping happens before projection).
+ */
+#pragma once
+
+/* Scratch capacity: portals are quads; 40 verts covers two
+ * Sutherland-Hodgman passes with wide margin. */
+#define FILLCLIP_CAP 40
+
+/* One Sutherland-Hodgman pass against w>=eps (pass 0) or z>=0 (pass 1).
+ * in:  [n*4] xyzw, out: [cap*4]. Returns out count, or -1 on overflow. */
+static int fillclip_pass(const float *in_pts, int n, float *out_pts, int cap,
+                         int pass)
+{
+    int i, j, k = 0;
+    for (i = 0, j = n - 1; i < n; j = i++) {
+        float di = (pass == 0) ? (in_pts[i * 4 + 3] - 1e-4f) : in_pts[i * 4 + 2];
+        float dj = (pass == 0) ? (in_pts[j * 4 + 3] - 1e-4f) : in_pts[j * 4 + 2];
+        int ini = di >= 0.0f, inj = dj >= 0.0f;
+        if (ini) {
+            if (!inj) {
+                float t = dj / (dj - di);
+                int o = k * 4, a = j * 4, b = i * 4;
+                if (k >= cap)
+                    return -1;
+                out_pts[o + 0] = in_pts[a + 0] + t * (in_pts[b + 0] - in_pts[a + 0]);
+                out_pts[o + 1] = in_pts[a + 1] + t * (in_pts[b + 1] - in_pts[a + 1]);
+                out_pts[o + 2] = in_pts[a + 2] + t * (in_pts[b + 2] - in_pts[a + 2]);
+                out_pts[o + 3] = in_pts[a + 3] + t * (in_pts[b + 3] - in_pts[a + 3]);
+                k++;
+            }
+            if (k >= cap)
+                return -1;
+            out_pts[k * 4 + 0] = in_pts[i * 4 + 0];
+            out_pts[k * 4 + 1] = in_pts[i * 4 + 1];
+            out_pts[k * 4 + 2] = in_pts[i * 4 + 2];
+            out_pts[k * 4 + 3] = in_pts[i * 4 + 3];
+            k++;
+        } else if (inj) {
+            float t = di / (di - dj);
+            int o = k * 4, a = i * 4, b = j * 4;
+            if (k >= cap)
+                return -1;
+            out_pts[o + 0] = in_pts[a + 0] + t * (in_pts[b + 0] - in_pts[a + 0]);
+            out_pts[o + 1] = in_pts[a + 1] + t * (in_pts[b + 1] - in_pts[a + 1]);
+            out_pts[o + 2] = in_pts[a + 2] + t * (in_pts[b + 2] - in_pts[a + 2]);
+            out_pts[o + 3] = in_pts[a + 3] + t * (in_pts[b + 3] - in_pts[a + 3]);
+            k++;
+        }
+    }
+    return k;
+}
+
+/* Tight pixel bounds for a clip-space polygon. vpx/vpy/vpw/vph/vpsx/vpsy
+ * are the viewport origin/size/scale (same convention as
+ * Transform2Viewport). Writes *out_minx..maxy. Returns 1 on success,
+ * 0 when the visible fragment is empty or inputs are degenerate
+ * (caller keeps its conservative fallback). */
+static int fillclip_tight_bounds(const float *clip, int n,
+                                 float vpx, float vpy, float vpw, float vph,
+                                 float vpsx, float vpsy,
+                                 float *out_minx, float *out_miny,
+                                 float *out_maxx, float *out_maxy)
+{
+    /* 40 in / 40 out covers portal quads (4 verts) through both planes
+     * with wide margin; over-capacity falls back conservatively. */
+    float buf_a[FILLCLIP_CAP * 4], buf_b[FILLCLIP_CAP * 4];
+    int m, i;
+    float minx, miny, maxx, maxy;
+
+    if (n < 3 || n > 36)
+        return 0;
+    m = fillclip_pass(clip, n, buf_a, FILLCLIP_CAP, 0);
+    if (m <= 0)
+        return 0;
+    m = fillclip_pass(buf_a, m, buf_b, FILLCLIP_CAP, 1);
+    if (m <= 0)
+        return 0;
+    minx = miny = 1e30f;
+    maxx = maxy = -1e30f;
+    for (i = 0; i < m; i++) {
+        float w = buf_b[i * 4 + 3];
+        float nx, ny, px, py;
+        if (!(w > 0.0f))
+            return 0;
+        nx = buf_b[i * 4 + 0] / w;
+        ny = buf_b[i * 4 + 1] / w;
+        if (nx < -1.0F)
+            px = vpx;
+        else if (nx > 1.0F)
+            px = vpx + vpw;
+        else
+            px = vpx + vpw * 0.5F + vpsx * nx;
+        if (ny < -1.0F)
+            py = vpy + vph;
+        else if (ny > 1.0F)
+            py = vpy;
+        else
+            py = vpy + vph * 0.5F - vpsy * ny;
+        if (px < minx)
+            minx = px;
+        if (py < miny)
+            miny = py;
+        if (px > maxx)
+            maxx = px;
+        if (py > maxy)
+            maxy = py;
+    }
+    *out_minx = minx;
+    *out_miny = miny;
+    *out_maxx = maxx;
+    *out_maxy = maxy;
+    return 1;
+}

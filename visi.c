@@ -894,6 +894,47 @@ Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 }
 
 
+/* Near-plane-clipped portal extent (fill-cut, step 3). When a portal
+ * straddles the near plane the old code forced the window to fullscreen
+ * (correct but maximally loose). Transform to clip space here, then use
+ * the proven clipmath.h clipper (host-tested in tests/test_clipmath.c:
+ * sound on 300 fuzz + edge cases, tight within 2x). Writes tight x/y
+ * into *e, leaves z to the caller (kept from the in-front accumulation
+ * so depth order is unchanged). Returns 1 on success, 0 to keep the old
+ * fullscreen fallback. */
+#include "clipmath.h"
+
+static int
+NearClipPortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
+{
+	float clip[ FILLCLIP_CAP * 4 ];
+	RENDERMATRIX *mp = &v->viewproj;
+	render_viewport_t *vp = v->viewport;
+	float minx, miny, maxx, maxy;
+	int n, i;
+	(void)cam;
+	if ( (int)p->num_vertices_in_portal > FILLCLIP_CAP - 4 )
+		return 0;
+	n = (int)p->num_vertices_in_portal;
+	for ( i = 0; i < n; i++ )
+	{
+		float x = p->Verts[ i ].x, y = p->Verts[ i ].y, z = p->Verts[ i ].z;
+		clip[i*4+0] = mp->m[0][0]*x + mp->m[1][0]*y + mp->m[2][0]*z + mp->m[3][0];
+		clip[i*4+1] = mp->m[0][1]*x + mp->m[1][1]*y + mp->m[2][1]*z + mp->m[3][1];
+		clip[i*4+2] = mp->m[0][2]*x + mp->m[1][2]*y + mp->m[2][2]*z + mp->m[3][2];
+		clip[i*4+3] = mp->m[0][3]*x + mp->m[1][3]*y + mp->m[2][3]*z + mp->m[3][3];
+	}
+	if ( !fillclip_tight_bounds( clip, n,
+		(float)vp->X, (float)vp->Y, (float)vp->Width, (float)vp->Height,
+		vp->ScaleX, vp->ScaleY, &minx, &miny, &maxx, &maxy ) )
+		return 0;
+	e->min.x = minx;
+	e->min.y = miny;
+	e->max.x = maxx;
+	e->max.y = maxy;
+	return 1;
+}
+
 static int
 VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 {
@@ -949,7 +990,14 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 	}
 	if ( clip_any & CLIP_FRONT )
 	{
-		*e = v->first_visible->extent; // portal clipped by front plane -> force extents fullscreen
+		/* Fill-cut: bound the near-straddling fragment instead of forcing
+		 * fullscreen. Falls back to the old fullscreen window when the
+		 * clipped polygon is degenerate. */
+		atm_prof_add(ATM_C_NCMIX, 1u);
+		if ( !NearClipPortalExtent( cam, v, p, e ) )
+			*e = v->first_visible->extent; // portal clipped by front plane -> force extents fullscreen
+		else
+			atm_prof_add(ATM_C_NCTIGHT, 1u);
 	}
 	return 1;
 }
