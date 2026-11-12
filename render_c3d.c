@@ -245,6 +245,7 @@ static bool s_scissorOn = false;
 /* Submitted-pixel bounds per batch (overdraw screen). Harness-only. */
 #ifdef ATM_PROFILING
 #define FILLPIX_COUNT_BATCH() do { \
+		if (s_isOrthoDraw) { atm_prof_add(ATM_C_ORTHO, 1u); } \
 		if (s_scissorOn) { \
 			int _sw = s_scissorX1 - s_scissorX0; \
 			int _sh = s_scissorY1 - s_scissorY0; \
