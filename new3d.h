@@ -83,6 +83,28 @@ static inline float fast_cosf(float rad)
 	return fast_sinf(rad + 1.5707963267948966f); /* rad + PI/2 */
 }
 
+/* Paired sin+cos with ONE shared range reduction (R15). sin is
+ * bit-identical to fast_sinf(rad); cos uses the quarter-table offset
+ * with the same fraction instead of fast_sinf(rad + PI/2)'s separate
+ * reduction, so it can differ by ~1 ULP of the table index where the
+ * two scalings round differently — bounded, measured, and invisible
+ * downstream of a rotation matrix. Use only where both values feed
+ * the same angle (rotation builders, billboard basis). Sine-only or
+ * cosine-only callers keep the single accessors. */
+static inline void fast_sincosf(float rad, float *s, float *c)
+{
+	const float idx = rad * TRIG_SCALE;
+	int   i = (int)idx;               /* truncates toward zero */
+	float f = idx - (float)i;
+	if (f < 0.0f) { --i; f += 1.0f; } /* -> floor(idx), fraction back into [0,1) */
+	i &= TRIG_TABLE_MASK;             /* two's complement modulo wrap */
+	*s = fast_sin_table[i] + (fast_sin_table[i + 1] - fast_sin_table[i]) * f;
+	{
+		int j = (i + TRIG_TABLE_SIZE / 4) & TRIG_TABLE_MASK;
+		*c = fast_sin_table[j] + (fast_sin_table[j + 1] - fast_sin_table[j]) * f;
+	}
+}
+
 /* Inverse square root.  On the 3DS ARM1176 (VFPv2) the classic Quake III
  * bit-hack is a PESSIMISATION: it forces two int<->VFP register transfers
  * (vmov r,s then vmov s,r) per call, each a serialising crossing of the

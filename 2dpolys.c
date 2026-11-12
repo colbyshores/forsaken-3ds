@@ -335,8 +335,8 @@ void FmPolyProcess( void )
 		   		FmPolys[ i ].Rot += ( FmPolys[i].RotSpeed * framelag );
 		   		if( FmPolys[ i ].Rot > 360.0F ) FmPolys[ i ].Rot -= 360.0F;
 		   		else if( FmPolys[ i ].Rot < 0.0F ) FmPolys[ i ].Rot += 360.0F;
-				Rotation.x = (float) fast_sinf( D2R( FmPolys[ i ].Rot ) );
-				Rotation.y = (float) fast_cosf( D2R( FmPolys[ i ].Rot ) );
+				{ float _rr = D2R( FmPolys[ i ].Rot ); /* R15: shared reduction */
+				  fast_sincosf( _rr, &Rotation.x, &Rotation.y ); }
 				Rotation.z = 0.0F;
 				ApplyMatrix( &FmPolys[ i ].Mat, &Rotation, &FmPolys[ i ].UpVector );
 		   		break;
@@ -1855,8 +1855,8 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 						}
 						else
 						{
-							YVector.x = (float) fast_sinf( D2R( FmPolys[ i ].Rot ) ); /* Calc Up Vector */
-							YVector.y = (float) fast_cosf( D2R( FmPolys[ i ].Rot ) );
+							{ float _rr = D2R( FmPolys[ i ].Rot ); /* R15: shared reduction */
+							  fast_sincosf( _rr, &YVector.x, &YVector.y ); } /* Calc Up Vector */
 							YVector.z = 0.0F;
 							ZVector = Forward;
 
@@ -2235,8 +2235,8 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 						}
 						else
 						{
-							YVector.x = (float) fast_sinf( D2R( FmPolys[ i ].Rot ) ); /* Calc Up Vector */
-							YVector.y = (float) fast_cosf( D2R( FmPolys[ i ].Rot ) );
+							{ float _rr = D2R( FmPolys[ i ].Rot ); /* R15: shared reduction */
+							  fast_sincosf( _rr, &YVector.x, &YVector.y ); } /* Calc Up Vector */
 							YVector.z = 0.0F;
 							ZVector = Forward;
 
