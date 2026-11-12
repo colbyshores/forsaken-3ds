@@ -72,6 +72,8 @@ enum {
 	ATM_C_FILLQ2,            /* fill probe: draws covering 50-75% */
 	ATM_C_FILLQ3,            /* fill probe: draws covering >=75% (incl. fullscreen) */
 	ATM_C_ORTHO,              /* fill probe: orthographic (HUD/2D) draws, any size */
+	ATM_C_NCMIX,              /* fill probe: near-straddling portals hit (mixed front/clean verts) */
+	ATM_C_NCTIGHT,            /* fill probe: ...of those, SH clip produced tight bounds */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

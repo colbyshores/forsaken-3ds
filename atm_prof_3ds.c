@@ -85,6 +85,8 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"fillq2",
 	"fillq3",
 	"ortho",
+	"ncmix",
+	"nctight",
 };
 
 enum {

@@ -1064,8 +1064,11 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 		/* Fill-cut: bound the near-straddling fragment instead of forcing
 		 * fullscreen. Falls back to the old fullscreen window when the
 		 * clipped polygon is degenerate. */
+		atm_prof_add(ATM_C_NCMIX, 1u);
 		if ( !NearClipPortalExtent( cam, v, p, e ) )
 			*e = v->first_visible->extent; // portal clipped by front plane -> force extents fullscreen
+		else
+			atm_prof_add(ATM_C_NCTIGHT, 1u);
 	}
 	return 1;
 }
