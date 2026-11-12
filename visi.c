@@ -15,6 +15,7 @@
 #include "mload.h"
 #include "camera.h"
 #include "visi.h"
+#include "atm_prof.h"
 #include <float.h>
 #include "file.h"
 #include "triggers.h"
@@ -1210,6 +1211,25 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		 * baked vertex colors are zero on Remaster levels, result
 		 * is black walls through doorways. Fix is in the flood-fill
 		 * expansion above the projection-compute block, not here. */
+		/* R11: fullscreen (main-camera) groups use cam->Proj unchanged. Branch
+		 * BEFORE the magnified math: its results were overwritten below, so the
+		 * divisions and lr/stereo setup were pure waste. Predicate replicates
+		 * the overwrite condition exactly; missile/rear insets still take the
+		 * magnified path. Clip rects untouched. */
+		bool use_unmagnified = false;
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		/* @vfp-exempt R3 — fullscreen predicate preserved from the overwrite it replaces; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+		use_unmagnified = (v->viewport->X == 0 && v->viewport->Y == 0
+		    && v->viewport->Width  == render_info.ThisMode.w
+		    && v->viewport->Height == render_info.ThisMode.h);
+#endif
+		if (use_unmagnified)
+		{
+			g->projection = cam->Proj;
+			atm_prof_add(ATM_C_PROJSKIP, 1);
+		}
+		else
+		{
 		g->projection = cam->Proj;
 		g->projection._11 = cam->Proj._11 * v->viewport->Width / vp->Width;
 		g->projection._22 = cam->Proj._22 * v->viewport->Height / vp->Height;
@@ -1232,26 +1252,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 									- ( vp->Y + vp->Height * 0.5F ) )
 							/ vp->Height;
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
-		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-		/* citro3d uses scissor + unmagnified cam->Proj only when the
-		 * parent viewport (v->viewport) spans the full screen — the
-		 * main camera's case. Sub-cameras (missile chase, rear view)
-		 * render into an offset sub-rect of the screen, and need the
-		 * engine's per-group _31/_32 offset math to translate their
-		 * geometry into that sub-rect's pixels; the unmagnified
-		 * cam->Proj path centers geometry at NDC origin which lands
-		 * at screen center after the full-screen viewport mapping —
-		 * the scissor then masks everything outside the chase-camera
-		 * inset, leaving the camera looking like it's pointed wrong. */
-		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-		if (v->viewport->X == 0 && v->viewport->Y == 0
-		    && v->viewport->Width  == (long)render_info.ThisMode.w
-		    && v->viewport->Height == (long)render_info.ThisMode.h)
-		{
-			g->projection = cam->Proj;
-		}
-#endif
+		} /* R11: end magnified-path else */
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
 		/* Portal black-void detector: a visible group whose final
