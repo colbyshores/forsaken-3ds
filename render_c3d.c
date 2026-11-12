@@ -229,6 +229,41 @@ static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
 
+/* Fill-coverage estimate for overdraw screening (TF..): tracks the live
+ * scissor rect so each submitted batch can accumulate its pixel bounds.
+ * Upper bound on fill, not measured pixels — a total near the framebuffer
+ * size rules fill out; a large multiple only suggests pressure. */
+#ifdef ATM_PROFILING
+static int  s_scissorX0, s_scissorY0, s_scissorX1, s_scissorY1;
+static bool s_scissorOn = false;
+#define TRACK_SCISSOR(x0, y0, x1, y1, on) \
+	do { s_scissorX0 = (x0); s_scissorY0 = (y0); s_scissorX1 = (x1); s_scissorY1 = (y1); s_scissorOn = (on); } while (0)
+#else
+#define TRACK_SCISSOR(x0, y0, x1, y1, on) ((void)0)
+#endif
+
+/* Submitted-pixel bounds per batch (overdraw screen). Harness-only. */
+#ifdef ATM_PROFILING
+#define FILLPIX_COUNT_BATCH() do { \
+		if (s_scissorOn) { \
+			int _sw = s_scissorX1 - s_scissorX0; \
+			int _sh = s_scissorY1 - s_scissorY0; \
+			if (_sw > 0 && _sh > 0) { \
+				atm_prof_add(ATM_C_FILLPIX, (unsigned)(_sw * _sh)); \
+				if (render_inTranslucent) \
+					atm_prof_add(ATM_C_TFILLPIX, (unsigned)(_sw * _sh)); \
+			} \
+		} else { \
+			atm_prof_add(ATM_C_FILLPIX, 240u * 400u); \
+			if (render_inTranslucent) \
+				atm_prof_add(ATM_C_TFILLPIX, 240u * 400u); \
+		} \
+	} while (0)
+#else
+#define FILLPIX_COUNT_BATCH() ((void)0)
+#endif
+
+
 /* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
  * (measured 7.4 ms/frame on Old 3DS, 12.3K verts/frame) with 4 L1D
  * reads. Bit-identical output: each entry IS ((float)b)/255.0f, the same
@@ -672,9 +707,11 @@ static void replay_display_list(void)
 				C3D_SetScissor(GPU_SCISSOR_NORMAL,
 				               (u32)pica_x, (u32)pica_y,
 				               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
+				TRACK_SCISSOR(pica_x, pica_y, pica_x + pica_w, pica_y + pica_h, true);
 			}
 			else
 			{
+				TRACK_SCISSOR(0, 0, 0, 0, false);
 				C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 				C3D_SetViewport((u32)pica_x, (u32)pica_y,
 				                (u32)pica_w, (u32)pica_h);
@@ -1811,7 +1848,6 @@ static bool s_next_view_use_scissor = false;
  * every recorded draw and undoes the scissor-mode fix on the second
  * eye. */
 static bool s_current_view_used_scissor = false;
-
 void FSSetNextViewPortScissorMode(bool scissor_mode)
 {
 	s_next_view_use_scissor = scissor_mode;
@@ -1850,12 +1886,14 @@ bool FSSetViewPort(render_viewport_t *view)
 		C3D_SetScissor(GPU_SCISSOR_NORMAL,
 		               (u32)pica_x, (u32)pica_y,
 		               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
+		TRACK_SCISSOR(pica_x, pica_y, pica_x + pica_w, pica_y + pica_h, true);
 	}
 	else
 	{
 		/* HUD / 2D / orthographic dispatch — sub-rect viewport, no
 		 * scissor. Used for non-3D-mesh draws which don't go through
 		 * visi.c's per-group projection setup. */
+		TRACK_SCISSOR(0, 0, 0, 0, false);
 		C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 		C3D_SetViewport((u32)pica_x, (u32)pica_y,
 		                (u32)pica_w, (u32)pica_h);
@@ -2964,6 +3002,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
 		atm_prof_add(ATM_C_DRAWS, 1); \
 		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
+		FILLPIX_COUNT_BATCH(); \
 		TRANS_COUNT_BATCH(); \
 		if (s_dlRecording && !orthographic && s_dlCount < MAX_DL_ENTRIES) { \
 			dl_entry_t *_e = &s_dl[s_dlCount++]; \
