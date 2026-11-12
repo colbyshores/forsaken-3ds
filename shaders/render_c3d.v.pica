@@ -110,7 +110,7 @@
 	; inclr is packed bytes (B/G/R/A); swizzle to RGBA and scale to
 	; 0..1 in one op. Uniform must be src1 in add (PICA encoding
 	; restricts src2 to temp/attribute), so ambient comes first.
-	mul r3, inclr.zyxw, inv255
+	mul r3, inv255, inclr.zyxw
 	add r3.xyz, ambient[0], r3
 
 	; Worldspace vertex pos in r2.xyz (lighting reads r2)

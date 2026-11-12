@@ -1738,10 +1738,7 @@ static void clear_sub_viewport_via_quad(void)
 		dst[i].pos[0] = verts[i][0];
 		dst[i].pos[1] = verts[i][1];
 		dst[i].pos[2] = verts[i][2];
-		dst[i].color[0] = 0.0f;
-		dst[i].color[1] = 0.0f;
-		dst[i].color[2] = 0.0f;
-		dst[i].color[3] = 1.0f;
+		dst[i].color.w = 0xFF000000u; /* AARRGGBB black, alpha 1 */
 		dst[i].texcoord[0] = 0.0f;
 		dst[i].texcoord[1] = 0.0f;
 	}
