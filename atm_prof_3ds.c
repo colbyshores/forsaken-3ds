@@ -71,6 +71,10 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"tdraws",
 	"tverts",
 	"lights",
+	"lightuplds",
+	"lightle2",
+	"lightle4",
+	"lightsw",
 };
 
 enum {

@@ -59,6 +59,10 @@ enum {
 	ATM_C_TDRAWS,             /* draw_render_object calls inside the TRANS phase */
 	ATM_C_TVERTS,             /* vertices converted inside the TRANS phase */
 	ATM_C_LIGHTS,             /* active XLight count packed per upload (÷frames = mean) */
+	ATM_C_LIGHTUPLDS,         /* c3d_upload_xlights calls (lights/uplds = mean per pack) */
+	ATM_C_LIGHTLE2,           /* uploads packing <=2 lights (0/1/2-capacity eligibility) */
+	ATM_C_LIGHTLE4,           /* uploads packing <=4 lights (4-capacity eligibility) */
+	ATM_C_LIGHTSW,            /* program switches (proves the 2-cap path executes) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];
