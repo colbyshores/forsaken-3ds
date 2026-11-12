@@ -49,8 +49,9 @@ FIDCKT_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINT_TICKS=$(FIDE
 # MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
 VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
 # MODEL_BUCKET=1 indexes models by clip group once per camera instead of re-walking the model list per group.
-# Opt-in only: the corrected hardware A/B showed gains, but an in-game visual sanity run is still required.
-MODEL_BUCKET ?= 0
+# Default on: verified 0 mismatches + framedump-identical on ramqan mono/stereo (verify build + stills A/B),
+# FSBEGIN growth explained as GPU-wait relocation (FSBEGIN+OPAQUE constant). Override 0 to revert.
+MODEL_BUCKET ?= 1
 BUCKET_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET)),-DMODEL_BUCKET,)
 # MODEL_BUCKET_VERIFY=1 adds an opt-in, correctness-only check that every
 # MODEL_BUCKET group contains exactly the baseline-visible model sequence.
