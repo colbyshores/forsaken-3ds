@@ -93,6 +93,11 @@ void atm_prof_write_result(void);
 
 /* Add a delta to a bounded app counter. Out-of-range indices are dropped. */
 void atm_prof_add(int idx, uint32_t delta);
+/* Raw result-file writer (owned by atm_prof_3ds.c). Lets harness-owned
+ * diagnostics (e.g. the q3 ring in render_c3d.c) append sections. */
+void atm_prof_res_write(const char *s);
+/* q3 ring dump, implemented in render_c3d.c (owns the batch context). */
+void atm_prof_dump_q3(void);
 
 #else /* !ATM_PROFILING */
 
@@ -101,6 +106,7 @@ void atm_prof_add(int idx, uint32_t delta);
 #define atm_prof_bench_tick()    ((void)0)
 #define atm_prof_write_result()  ((void)0)
 #define atm_prof_add(i, d)       ((void)0)
+#define atm_prof_dump_q3()       ((void)0)
 
 #endif /* ATM_PROFILING */
 
