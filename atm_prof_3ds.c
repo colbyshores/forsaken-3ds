@@ -80,6 +80,10 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"tfillpix",
 	"colorskip",
 	"projskip",
+	"fillq0",
+	"fillq1",
+	"fillq2",
+	"fillq3",
 };
 
 enum {

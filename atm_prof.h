@@ -67,6 +67,10 @@ enum {
 	ATM_C_TFILLPIX,           /* same, inside the TRANS phase */
 	ATM_C_COLORSKIP,          /* R06: level color-restores skipped (clean baseline) */
 	ATM_C_PROJSKIP,           /* R11: groups taking fullscreen cam->Proj (magnified math skipped) */
+	ATM_C_FILLQ0,            /* fill probe: draws covering <25% of screen */
+	ATM_C_FILLQ1,            /* fill probe: draws covering 25-50% */
+	ATM_C_FILLQ2,            /* fill probe: draws covering 50-75% */
+	ATM_C_FILLQ3,            /* fill probe: draws covering >=75% (incl. fullscreen) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

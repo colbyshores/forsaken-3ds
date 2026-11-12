@@ -249,12 +249,15 @@ static bool s_scissorOn = false;
 			int _sw = s_scissorX1 - s_scissorX0; \
 			int _sh = s_scissorY1 - s_scissorY0; \
 			if (_sw > 0 && _sh > 0) { \
-				atm_prof_add(ATM_C_FILLPIX, (unsigned)(_sw * _sh)); \
+				unsigned _area = (unsigned)(_sw * _sh); \
+				atm_prof_add(ATM_C_FILLPIX, _area); \
+				atm_prof_add((_area < 24000u) ? ATM_C_FILLQ0 : (_area < 48000u) ? ATM_C_FILLQ1 : (_area < 72000u) ? ATM_C_FILLQ2 : ATM_C_FILLQ3, 1u); \
 				if (render_inTranslucent) \
-					atm_prof_add(ATM_C_TFILLPIX, (unsigned)(_sw * _sh)); \
+					atm_prof_add(ATM_C_TFILLPIX, _area); \
 			} \
 		} else { \
 			atm_prof_add(ATM_C_FILLPIX, 240u * 400u); \
+			atm_prof_add(ATM_C_FILLQ3, 1u); \
 			if (render_inTranslucent) \
 				atm_prof_add(ATM_C_TFILLPIX, 240u * 400u); \
 		} \
