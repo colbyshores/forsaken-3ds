@@ -177,12 +177,18 @@ static s8 s_loc_lights      = -1;
  * removed; hardware stereo uses separate render targets instead). */
 #define s_colorMask GPU_WRITE_ALL
 
-/* ---- GPU vertex format (all floats, matches shader inputs) ---- */
+/* ---- GPU vertex format: 24 bytes (was 36). Color rides as the packed
+ * engine word (AARRGGBB, little-endian B/G/R/A bytes); the shader
+ * swizzles to RGBA and scales by 1/255. Positions/UVs stay float —
+ * coordinate quantization is a separate experiment. */
 typedef struct {
 	float pos[3];
-	float color[4];
+	union { unsigned char c[4]; COLOR w; } color;
 	float texcoord[2];
-} gpu_vertex_t;  /* 36 bytes */
+} gpu_vertex_t;  /* 24 bytes */
+typedef char gpu_vertex_size_check[sizeof(gpu_vertex_t) == 24 ? 1 : -1];
+typedef char gpu_vertex_color_off_check[offsetof(gpu_vertex_t, color) == 12 ? 1 : -1];
+typedef char gpu_vertex_uv_off_check[offsetof(gpu_vertex_t, texcoord) == 16 ? 1 : -1];
 
 /* ---- Single-pass stereo display list ---- */
 
@@ -270,23 +276,6 @@ static bool s_scissorOn = false;
 #define FILLPIX_COUNT_BATCH() ((void)0)
 #endif
 
-
-/* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
- * (measured 7.4 ms/frame on Old 3DS, 12.3K verts/frame) with 4 L1D
- * reads. Bit-identical output: each entry IS ((float)b)/255.0f, the same
- * correctly-rounded quotient the loop computed, so pixels are unchanged
- * (framedump-verified per change). 1 KiB, stays hot in L1D. */
-static float s_c255[256];
-static int s_c255_ok = 0;
-static void c255_init(void)
-{
-	int b;
-	if (s_c255_ok)
-		return;
-	for (b = 0; b < 256; b++)
-		s_c255[b] = (float)b / 255.0f;
-	s_c255_ok = 1;
-}
 
 /* ---- globals expected by the engine ---- */
 
@@ -588,7 +577,7 @@ bool pglHudBeginBottom(void)
 		C3D_AttrInfo *ai = C3D_GetAttrInfo();
 		AttrInfo_Init(ai);
 		AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-		AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+		AttrInfo_AddLoader(ai, 1, GPU_UNSIGNED_BYTE, 4);
 		AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 	}
 	C3D_DepthTest(true, GPU_LESS, s_colorMask);
@@ -652,7 +641,7 @@ void pglHudEndBottom(void)
 		C3D_AttrInfo *ai = C3D_GetAttrInfo();
 		AttrInfo_Init(ai);
 		AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-		AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+		AttrInfo_AddLoader(ai, 1, GPU_UNSIGNED_BYTE, 4);
 		AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 	}
 	C3D_DepthTest(true, GPU_LESS, s_colorMask);
@@ -802,7 +791,7 @@ void pglTransferEye(unsigned int eye)
 			C3D_AttrInfo *ai = C3D_GetAttrInfo();
 			AttrInfo_Init(ai);
 			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+			AttrInfo_AddLoader(ai, 1, GPU_UNSIGNED_BYTE, 4);
 			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 		}
 		C3D_DepthTest(true, GPU_LESS, s_colorMask);
@@ -1599,7 +1588,7 @@ bool FSBeginScene(void)
 			C3D_AttrInfo *ai = C3D_GetAttrInfo();
 			AttrInfo_Init(ai);
 			AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);  /* v0: pos */
-			AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);  /* v1: color */
+			AttrInfo_AddLoader(ai, 1, GPU_UNSIGNED_BYTE, 4);  /* v1: color */
 			AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);  /* v2: texcoord */
 		}
 		{
@@ -1749,10 +1738,7 @@ static void clear_sub_viewport_via_quad(void)
 		dst[i].pos[0] = verts[i][0];
 		dst[i].pos[1] = verts[i][1];
 		dst[i].pos[2] = verts[i][2];
-		dst[i].color[0] = 0.0f;
-		dst[i].color[1] = 0.0f;
-		dst[i].color[2] = 0.0f;
-		dst[i].color[3] = 1.0f;
+		dst[i].color.w = 0xFF000000u; /* AARRGGBB black, alpha 1 */
 		dst[i].texcoord[0] = 0.0f;
 		dst[i].texcoord[1] = 0.0f;
 	}
@@ -2915,7 +2901,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * land in their own ProcTex phase bucket. */
 	s_atlasSeed   = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
 	s_isOrthoDraw = orthographic;
-	c255_init();
 
 	/* For object-mode draws (s_objProcTexOn set by mxload/mxaload),
 	 * sample the lit ambient at the object's world position and blend
@@ -3088,7 +3073,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					C3D_AttrInfo *ai = C3D_GetAttrInfo();
 					AttrInfo_Init(ai);
 					AttrInfo_AddLoader(ai, 0, GPU_FLOAT, 3);
-					AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
+					AttrInfo_AddLoader(ai, 1, GPU_UNSIGNED_BYTE, 4);
 					AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 				}
 				s_lastBoundTexture = NULL;
@@ -3126,10 +3111,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].pos[0] = v->x;
 					dst[i].pos[1] = v->y;
 					dst[i].pos[2] = v->z;
-					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-					dst[i].color[2] = s_c255[(v->color) & 0xFF];
-					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
+					dst[i].color.w = v->color;
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
@@ -3144,10 +3126,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].pos[0] = v->x;
 					dst[i].pos[1] = v->y;
 					dst[i].pos[2] = v->z;
-					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-					dst[i].color[2] = s_c255[(v->color) & 0xFF];
-					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
+					dst[i].color.w = v->color;
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
@@ -3166,10 +3145,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				dst[i].pos[0] = v->x;
 				dst[i].pos[1] = v->y;
 				dst[i].pos[2] = v->z;
-				dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-				dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-				dst[i].color[2] = s_c255[(v->color) & 0xFF];
-				dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
+				dst[i].color.w = v->color;
 				dst[i].texcoord[0] = v->tu;
 				dst[i].texcoord[1] = v->tv;
 			}
