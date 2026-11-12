@@ -671,6 +671,7 @@ void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area
 	bool	OldIn;
 	bool	NewIn;
 
+
 	Entry = false;
 	Exit = false;
 	In = false;

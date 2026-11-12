@@ -25,6 +25,8 @@
 #include "music.h"
 #endif
 #include "perf_capture.h"
+#include "atm_prof.h"
+#include "framedump.h"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -685,11 +687,14 @@ static bool RenderLoop()
 			else
 #endif
 			{
+				perf_stage_begin( PERF_S_PRESENTLOOP );
 				if (!render_flip(&render_info))
 				{
+					perf_stage_end( PERF_S_PRESENTLOOP, -1 );
 					Msg("RenderLoop: render_flip() failed\n");
 					return false;
 				}
+				perf_stage_end( PERF_S_PRESENTLOOP, -1 );
 			}
 		}
 	}
@@ -758,13 +763,25 @@ int main( int argc, char* argv[] )
 	 * Without this, the app never yields to the OS for these events —
 	 * HOME button is ignored and closing the lid freezes the game.
 	 * Returns false when the OS signals the app should exit (user picked
-	 * "Close" from HOME, or the console is being powered off). */
+	 * "Close" from HOME, or the console is being powered off).
+	 * ATM_HEADLESS one-shot payloads skip it: an ATM-launched app is never
+	 * foregrounded, so the first aptMainLoop() call would return false
+	 * immediately (no wakeup ever arrives) and the benchmark loop would
+	 * never run. Headless termination comes from the bench itself
+	 * (frame_target / deadline / left_gameplay / level_never_loaded all
+	 * set QuitRequested). Stub-chainload builds keep the normal gate:
+	 * NS launches the app as a proper foreground title there. */
+#if defined(__3DS__) && defined(ATM_PROFILING) && defined(ATM_HEADLESS)
+	while( !QuitRequested )
+#else
 	while( aptMainLoop() && !QuitRequested )
+#endif
 #else
 	while( !QuitRequested )
 #endif
 	{
 		PERF_FRAME_BEGIN();
+		atm_prof_frame_begin();
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
 		{ extern void trace(const char*); extern unsigned char MyGameStatus;
 		  static unsigned long _ml_n = 0;
@@ -833,40 +850,16 @@ int main( int argc, char* argv[] )
 #if defined(DEBUG_ON) && defined(DEBUG_ALL_MATH_ERRORS)
 		DebugMathErrors();
 #endif
-#ifdef ATM_PROF
-		{
-			u64 now = svcGetSystemTick();
-			/* ticks are 268.11184 MHz, convert to microseconds */
-			u32 frame_us = (u32)((now - _atm_prev) * 1000000ULL / 268111840ULL);
-			atm_frame_add(&_atm_stats, frame_us, 16667);
-			_atm_prev = now;
-			_atm_frames++;
-			if (_atm_frames >= _atm_max_frames) {
-				QuitRequested = true;
-			}
-		}
-#endif
+		atm_prof_frame_end();
 		PERF_FRAME_END();
+		framedump_poll(); /* no-op unless -DFRAMEDUMP; trigger port 17493 */
 	}
 
 	PERF_DUMP();
-#ifdef ATM_PROF
-	{
-		char summary[192];
-		atm_frame_format_summary(&_atm_stats, summary, sizeof(summary));
-		FILE *f = fopen("sdmc:/3ds/atm_result.txt", "w");
-		if (f) {
-			fprintf(f, "workload=forsaken
-status=complete
-");
-			fprintf(f, "frames=%d
-", _atm_frames);
-			fprintf(f, "%s", summary);
-			fflush(f);
-			fclose(f);
-		}
-	}
-#endif
+	/* ATM harness result file. Written after the loop so the measured window
+	 * is closed and teardown order is untouched; also reached by the
+	 * SeriousError break above. */
+	atm_prof_write_result();
 
 	/* Normal-exit teardown. On 3DS, QuitRequested is set by the
 	 * Start+Select input handler or aptMainLoop returning false
@@ -882,6 +875,7 @@ status=complete
 FAILURE:
 
 	//
+	atm_prof_write_result();
 	CleanUpAndPostQuit();
 
 #ifdef DEBUG_ON

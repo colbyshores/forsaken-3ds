@@ -2753,7 +2753,7 @@ bool RenderScene( void )
   case STATUS_Title:
 	DebugState("STATUS_Title\n");
 
-#if defined(__3DS_DEBUG__) || defined(DEBUG_ON) || defined(AUTOTEST_REMASTER)
+#if defined(__3DS_DEBUG__) || defined(DEBUG_ON) || defined(AUTOTEST_REMASTER) || defined(ATM_PROFILING)
   {
     /* Auto-boot directly into a level. Default target = Volcano
      * (NewLevelNum=0). With AUTOTEST_REMASTER set, target becomes the
@@ -2782,7 +2782,15 @@ bool RenderScene( void )
     /* StartASinglePlayerGame -> InitLevels(SINGLEPLAYER_LEVELS) resets
      * NewLevelNum to 0 as a side effect (singleplayer.c:99). Apply our
      * desired starting level AFTER the call so it survives. */
-#ifdef AUTOTEST_REMASTER
+#ifdef ATM_PROFILING
+    /* Deterministic benchmark entry. atm_prof_bench_level() resolves the
+     * pinned level NAME against the loaded mission list (slot indices are
+     * edition-dependent) and opens the measurement state machine. */
+    {
+      extern int atm_prof_bench_level(void);
+      NewLevelNum = (int16_t)atm_prof_bench_level();
+    }
+#elif defined(AUTOTEST_REMASTER)
     {
       extern int autotest_first_level(void);
       NewLevelNum = autotest_first_level();
@@ -4374,6 +4382,12 @@ bool RenderScene( void )
      * = -1 once the dwell expires (the existing "if NewLevelNum != LevelNum"
      * branch below picks that up and triggers ReleaseView/InitView). */
     { extern void autotest_tick(void); autotest_tick(); }
+#endif
+
+#ifdef ATM_PROFILING
+    /* The benchmark's only per-frame input: it marks "gameplay was live this
+     * frame" and detects level entry. It never synthesizes player input. */
+    { extern void atm_prof_bench_tick(void); atm_prof_bench_tick(); }
 #endif
 
 #ifdef __3DS__
@@ -6247,6 +6261,9 @@ bool RenderCurrentCamera( void )
   	set_alpha_states();
   _RC_STAGE("post-set_alpha_states-1");
   perf_stage_begin(PERF_S_TRANS);
+#ifdef ATM_PROFILING
+  { extern bool render_inTranslucent; render_inTranslucent = true; }
+#endif
 
 
 /*===================================================================
@@ -6299,10 +6316,13 @@ bool RenderCurrentCamera( void )
     #define _RC_TRANS_SUBSTAGE(s) ((void)0)
 #endif
 
+    perf_stage_begin(PERF_S_TRANWATER);
     ClipGroup( &CurrentCamera, group );
     _RC_TRANS_SUBSTAGE("post-ClipGroup");
     GroupWaterProcessDisplay( group );
     _RC_TRANS_SUBSTAGE("post-GroupWaterProcessDisplay");
+    perf_stage_end(PERF_S_TRANWATER, -1);
+    perf_stage_begin(PERF_S_TRANPOLYS);
 
 
 
@@ -6310,9 +6330,11 @@ bool RenderCurrentCamera( void )
   Display Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
 
+  perf_stage_begin(PERF_S_TRANCLIP);
   if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
     return false;
     _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedPolys");
+  perf_stage_end(PERF_S_TRANCLIP, -1);
 
 #ifdef SHADOWTEST
   if( !DisplayGroupClippedTriangles( RenderBufs[ 1 ], group, lpDev, lpView ) )
@@ -6323,12 +6345,17 @@ bool RenderCurrentCamera( void )
 Display Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
+  perf_stage_begin(PERF_S_TRANFM);
   if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], group ) ) // bjd
       return false;
     _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedFmPolys");
+  perf_stage_end(PERF_S_TRANFM, -1);
 
+  perf_stage_begin(PERF_S_TRANEXE);
   ExecuteTransExe( group );
+  perf_stage_end(PERF_S_TRANEXE, -1);
     _RC_TRANS_SUBSTAGE("post-ExecuteTransExe");
+    perf_stage_end(PERF_S_TRANPOLYS, -1);
     #undef _RC_TRANS_SUBSTAGE
   }
   _RC_STAGE("translucent-loop EXIT");
@@ -6342,6 +6369,8 @@ Display Group Clipped Faceme Transluecent Polys
   Display Non Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
+    perf_stage_begin(PERF_S_TRANPOLYS);
+    perf_stage_begin(PERF_S_TRANUNCLIP);
     if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedFmPolys");
@@ -6352,17 +6381,22 @@ Display Group Clipped Faceme Transluecent Polys
     if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedPolys");
+    perf_stage_end(PERF_S_TRANUNCLIP, -1);
+    perf_stage_end(PERF_S_TRANPOLYS, -1);
+    perf_stage_begin(PERF_S_TRANMISC);
 #ifdef SHADOWTEST
     if( !DisplayGroupUnclippedTriangles( RenderBufs[ 0 ], lpDev, lpView ) )
       return false;
 #endif
   
   // display unclipped translucencies
+  perf_stage_begin(PERF_S_TRANEXE);
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
     group = g->group;
     ExecuteTransExeUnclipped( group );
   }
+  perf_stage_end(PERF_S_TRANEXE, -1);
 
 
 /*===================================================================
@@ -6383,6 +6417,7 @@ Display Group Clipped Faceme Transluecent Polys
   }
 
   set_normal_states();
+    perf_stage_end(PERF_S_TRANMISC, -1);
 
     if (!FSSetViewPort(&viewport)) {
 #ifdef DEBUG_VIEWPORT
@@ -6393,6 +6428,9 @@ Display Group Clipped Faceme Transluecent Polys
         return false;
     }
 
+#ifdef ATM_PROFILING
+  { extern bool render_inTranslucent; render_inTranslucent = false; }
+#endif
   perf_stage_end(PERF_S_TRANS, -1);
   return true;
 }
@@ -6687,11 +6725,17 @@ void CalculateFramelag( void )
 
   framelag = real_framelag * 71.0F;
 
-#ifdef FIDELITY_DUMP
+#if defined(FIDELITY_DUMP) || defined(ATM_PROFILING)
   /* Determinism pin: the fidelity harness requires the simulation to
    * advance by an identical step every tick so per-tick state hashes are
    * reproducible across runs (wall-clock framelag makes the trajectory
-   * timing-dependent). 1.0F = one 71 Hz step per frame. */
+   * timing-dependent). 1.0F = one 71 Hz step per frame.
+   *
+   * The ATM benchmark needs the same property for a different reason: with
+   * a wall-clock framelag, two runs of the same level execute different
+   * amounts of simulation work per frame, so per-frame timing would compare
+   * unequal work. One 71 Hz step per frame makes work-per-frame identical
+   * across runs, builds, and mono/stereo. */
   real_framelag = 0.014084507042253521126760563380282F; /* 1/71, exact-folded */
   framelag = 1.0F;
 #endif

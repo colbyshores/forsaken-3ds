@@ -410,7 +410,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 void ProcessEnemies( void );
 void EnableEnemy( u_int16_t EnemyIndex );
 void DisableEnemy( ENEMY * Enemy );
-ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, VECTOR * Dir, VECTOR * UpDir, float DirLength, VECTOR * Int_Point,
+ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR * UpDir, float DirLength, VECTOR * Int_Point,
 						VECTOR * Int_Point2, float * Dist, float WeaponRadius, u_int16_t ColType );
 void SetCurAnimSeq( int16_t Seq, OBJECT * Object );
 bool GetLastCompDispMatrix( OBJECT * Object, MATRIX * Matrix, MATRIX * TMatrix, VECTOR * FirePos, int16_t BaseIndex );

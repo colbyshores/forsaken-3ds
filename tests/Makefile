@@ -14,7 +14,7 @@ CFLAGS  := -g -fcommon -Wall -Wextra $(INCLUDE)
 
 AILIB_OBJ := secwalk_ailib.o
 
-all: test_secwalk test_framedump
+all: test_secwalk test_framedump test_checkhitenemy
 
 $(AILIB_OBJ): ../ailib.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -27,7 +27,11 @@ test_framedump: test_framedump.c ../framedump_core.c
 	$(CC) $(CFLAGS) -DFRAMEDUMP_HOSTTEST -o $@ test_framedump.c ../framedump_core.c
 	./test_framedump
 
-clean:
-	rm -f test_secwalk test_framedump $(AILIB_OBJ) out-*.bmp framedump_test.log
+test_checkhitenemy: test_checkhitenemy.c ../checkenemy.c ../sphere.c
+	$(CC) $(CFLAGS) -DCHE_PREFILTER -o $@ test_checkhitenemy.c ../checkenemy.c ../sphere.c -lm
+	./test_checkhitenemy
 
-.PHONY: all clean test_secwalk test_framedump
+clean:
+	rm -f test_secwalk test_framedump test_checkhitenemy $(AILIB_OBJ) out-*.bmp framedump_test.log
+
+.PHONY: all clean test_secwalk test_framedump test_checkhitenemy

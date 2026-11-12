@@ -6,6 +6,7 @@
 ===================================================================*/
 #include <stdio.h>
 #include "main.h"
+#include "atm_prof.h"
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -2073,6 +2074,7 @@ void ProcessSecondaryBullets( void )
 	while( i != (u_int16_t) -1 )
 	{
 		NextMissile = SecBulls[ i ].Prev;											/* Next Missile */
+		atm_prof_add( ATM_C_SEC_BULLETS, 1 );
 
 		NewFramelag = ( framelag + SecBulls[i].FramelagAddition );
 
@@ -3182,8 +3184,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		HitTarget = (u_int16_t) -1;
 	}
 	
-	if( SecBulls[i].ColRadius )	HitEnemy = CheckHitEnemy( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, &SecBulls[i].DirVector, &SecBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, SecBulls[i].ColRadius, COLTYPE_Sphere );
-	else HitEnemy = CheckHitEnemy( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, &SecBulls[i].DirVector, &SecBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, SecBulls[i].ColRadius, COLTYPE_Point );
+	if( SecBulls[i].ColRadius )	HitEnemy = CheckHitEnemy( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, SecBulls[i].GroupImIn, &SecBulls[i].DirVector, &SecBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, SecBulls[i].ColRadius, COLTYPE_Sphere );
+	else HitEnemy = CheckHitEnemy( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, SecBulls[i].GroupImIn, &SecBulls[i].DirVector, &SecBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, SecBulls[i].ColRadius, COLTYPE_Point );
 
 	if( HitEnemy != NULL )
 	{

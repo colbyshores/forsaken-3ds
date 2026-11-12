@@ -6,6 +6,7 @@
 ===================================================================*/
 #include <stdio.h>
 #include "main.h"
+#include "atm_prof.h"
 
 #include "new3d.h"
 #include "quat.h"
@@ -1684,6 +1685,7 @@ void ProcessPrimaryBullets( void )
 
 		if (PrimBulls[i].LifeCount > 0.0F)
 		{
+			atm_prof_add( ATM_C_PRIM_BULLETS, 1 );
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			PrimBulls[i].LifeCount -= NewFramelag; //framelag;
 			if( PrimBulls[i].LifeCount < 0.0F ) PrimBulls[i].LifeCount = 0.0F;
@@ -1967,7 +1969,7 @@ void ProcessPrimaryBullets( void )
 			}
 
 /*�����������������������������������������������������������������*/
-			HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
+			HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitEnemy != NULL )
 			{
 				HitWall = (u_int16_t) -1;

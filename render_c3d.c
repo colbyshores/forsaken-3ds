@@ -53,6 +53,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "main.h"
+#include "atm_prof.h"
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -151,6 +152,21 @@ static int  s_hudSavedWinCx     = 0;
 static int  s_hudSavedWinCy     = 0;
 static bool              s_stereoFrame   = false;
 
+/* TRANS-phase flag for the tdraws/tverts counters. Set by oct2.c around
+ * the translucent phase; read in FLUSH_BATCH. Harness-only (ATM_PROFILING)
+ * so release builds carry no branch. */
+#ifdef ATM_PROFILING
+bool render_inTranslucent = false;
+#define TRANS_COUNT_BATCH() do { \
+		if (render_inTranslucent) { \
+			atm_prof_add(ATM_C_TDRAWS, 1); \
+			atm_prof_add(ATM_C_TVERTS, batch_vertCount); \
+		} \
+	} while (0)
+#else
+#define TRANS_COUNT_BATCH() ((void)0)
+#endif
+
 /* GPU lighting uniform locations, resolved at init from the shader DVLE
  * (don't depend on picasso's declaration-order register assignment). */
 static s8 s_loc_ambient     = -1;
@@ -197,6 +213,7 @@ static dl_entry_t s_dl[MAX_DL_ENTRIES];
 static int  s_dlCount     = 0;
 static bool s_dlRecording = false;
 static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
+static bool s_dlReplayDone = false; /* right-eye replay already performed */
 
 /* Scratch buffer for vertex conversion.
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
@@ -211,6 +228,58 @@ static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
+
+/* Fill-coverage estimate for overdraw screening (TF..): tracks the live
+ * scissor rect so each submitted batch can accumulate its pixel bounds.
+ * Upper bound on fill, not measured pixels — a total near the framebuffer
+ * size rules fill out; a large multiple only suggests pressure. */
+#ifdef ATM_PROFILING
+static int  s_scissorX0, s_scissorY0, s_scissorX1, s_scissorY1;
+static bool s_scissorOn = false;
+#define TRACK_SCISSOR(x0, y0, x1, y1, on) \
+	do { s_scissorX0 = (x0); s_scissorY0 = (y0); s_scissorX1 = (x1); s_scissorY1 = (y1); s_scissorOn = (on); } while (0)
+#else
+#define TRACK_SCISSOR(x0, y0, x1, y1, on) ((void)0)
+#endif
+
+/* Submitted-pixel bounds per batch (overdraw screen). Harness-only. */
+#ifdef ATM_PROFILING
+#define FILLPIX_COUNT_BATCH() do { \
+		if (s_scissorOn) { \
+			int _sw = s_scissorX1 - s_scissorX0; \
+			int _sh = s_scissorY1 - s_scissorY0; \
+			if (_sw > 0 && _sh > 0) { \
+				atm_prof_add(ATM_C_FILLPIX, (unsigned)(_sw * _sh)); \
+				if (render_inTranslucent) \
+					atm_prof_add(ATM_C_TFILLPIX, (unsigned)(_sw * _sh)); \
+			} \
+		} else { \
+			atm_prof_add(ATM_C_FILLPIX, 240u * 400u); \
+			if (render_inTranslucent) \
+				atm_prof_add(ATM_C_TFILLPIX, 240u * 400u); \
+		} \
+	} while (0)
+#else
+#define FILLPIX_COUNT_BATCH() ((void)0)
+#endif
+
+
+/* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
+ * (measured 7.4 ms/frame on Old 3DS, 12.3K verts/frame) with 4 L1D
+ * reads. Bit-identical output: each entry IS ((float)b)/255.0f, the same
+ * correctly-rounded quotient the loop computed, so pixels are unchanged
+ * (framedump-verified per change). 1 KiB, stays hot in L1D. */
+static float s_c255[256];
+static int s_c255_ok = 0;
+static void c255_init(void)
+{
+	int b;
+	if (s_c255_ok)
+		return;
+	for (b = 0; b < 256; b++)
+		s_c255[b] = (float)b / 255.0f;
+	s_c255_ok = 1;
+}
 
 /* ---- globals expected by the engine ---- */
 
@@ -638,9 +707,11 @@ static void replay_display_list(void)
 				C3D_SetScissor(GPU_SCISSOR_NORMAL,
 				               (u32)pica_x, (u32)pica_y,
 				               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
+				TRACK_SCISSOR(pica_x, pica_y, pica_x + pica_w, pica_y + pica_h, true);
 			}
 			else
 			{
+				TRACK_SCISSOR(0, 0, 0, 0, false);
 				C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 				C3D_SetViewport((u32)pica_x, (u32)pica_y,
 				                (u32)pica_w, (u32)pica_h);
@@ -731,10 +802,17 @@ void pglTransferEye(unsigned int eye)
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
-		/* Replay disabled (see FSBeginScene comment). The right eye pass
-		 * runs the callback fully, so we just need the target switch
-		 * above — no replay flag. */
+		/* With STEREO_REPLAY, arm the draw-level replay trigger: the
+		 * right eye's first 3D draw replays the recorded list instead
+		 * of re-converting + re-submitting. Ortho/2D draws are excluded
+		 * from the recording and always run live, so HUD stays correct.
+		 * Default (flag off): replay stays disarmed, both eyes callback
+		 * fully, exactly as before. */
+#ifdef STEREO_REPLAY
+		s_dlReplay = (s_dlCount > 0);
+#else
 		s_dlReplay = false;
+#endif
 	}
 	if (eye == GFX_RIGHT)
 	{
@@ -1230,6 +1308,7 @@ void c3d_upload_xlights(void)
 	}
 
 	int n_packed = 0;
+	atm_prof_add(ATM_C_LIGHTS, (unsigned)n_top);
 	for (; n_packed < n_top; n_packed++)
 	{
 		struct XLIGHT *L = top[n_packed];
@@ -1490,7 +1569,14 @@ bool FSBeginScene(void)
 	 * for ortho (2D) draws only, or to split the callback into "3D once + 2D
 	 * twice" explicitly. Leaving that for later. */
 	s_dlCount = 0;
+#ifdef STEREO_REPLAY
+	/* Record left-eye 3D draws for second-eye replay. Gated on 3DS
+	 * stereo: mono frames must not pay the record cost. */
+	s_dlRecording = (render_info.stereo_mode == STEREO_MODE_3DS);
+#else
 	s_dlRecording = false;
+#endif
+	s_dlReplayDone = false;
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
@@ -1762,7 +1848,6 @@ static bool s_next_view_use_scissor = false;
  * every recorded draw and undoes the scissor-mode fix on the second
  * eye. */
 static bool s_current_view_used_scissor = false;
-
 void FSSetNextViewPortScissorMode(bool scissor_mode)
 {
 	s_next_view_use_scissor = scissor_mode;
@@ -1801,12 +1886,14 @@ bool FSSetViewPort(render_viewport_t *view)
 		C3D_SetScissor(GPU_SCISSOR_NORMAL,
 		               (u32)pica_x, (u32)pica_y,
 		               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
+		TRACK_SCISSOR(pica_x, pica_y, pica_x + pica_w, pica_y + pica_h, true);
 	}
 	else
 	{
 		/* HUD / 2D / orthographic dispatch — sub-rect viewport, no
 		 * scissor. Used for non-3D-mesh draws which don't go through
 		 * visi.c's per-group projection setup. */
+		TRACK_SCISSOR(0, 0, 0, 0, false);
 		C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 		C3D_SetViewport((u32)pica_x, (u32)pica_y,
 		                (u32)pica_w, (u32)pica_h);
@@ -1872,7 +1959,15 @@ bool FSCreateDynamicNormalBuffer(RENDEROBJECT *renderObject, int numNormals)
 
 bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
 {
-	renderObject->lpIndexBuffer = linearAlloc(numIndices * 3 * sizeof(WORD));
+	/* numIndices is an index-element count at every call site (model and
+	 * water loaders pass triangleCount*3, dynamic buffers pass 32767*3),
+	 * so allocate exactly that many WORDs. The old *3 triple-counted and
+	 * reserved 589,806 bytes per 98,301-index dynamic buffer instead of
+	 * 196,602 (768 KiB recovered across the two). Write-bounds audit in
+	 * perf/OPTIMIZATION-LOG.md: per-frame fills are MAXPOLYVERTS-capped
+	 * (800 verts/call), text overlays write tens of quads, load-time
+	 * loops write exactly triangleCount*3 — all far below requested. */
+	renderObject->lpIndexBuffer = linearAlloc(numIndices * sizeof(WORD));
 	return renderObject->lpIndexBuffer != NULL;
 }
 
@@ -2783,6 +2878,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * land in their own ProcTex phase bucket. */
 	s_atlasSeed   = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
 	s_isOrthoDraw = orthographic;
+	c255_init();
 
 	/* For object-mode draws (s_objProcTexOn set by mxload/mxaload),
 	 * sample the lit ambient at the object's world position and blend
@@ -2797,18 +2893,24 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		c3d_update_phong_tint_for_object_pos(&pos);
 	}
 
-	/* Single-pass stereo: on the first draw call of the second eye,
-	 * replay the entire display list with the updated view matrix
-	 * (the engine has now set up the right eye camera).  Then skip
-	 * all subsequent draw calls for this pass. */
-	if (s_dlReplay)
+	/* Single-pass stereo: on the first 3D draw call of the second eye,
+	 * replay the recorded list with the updated view matrix (the engine
+	 * has now set up the right eye camera).  Then skip all subsequent
+	 * 3D draw calls for this pass.  Ortho/2D draws always run live on
+	 * both eyes — replaying them caused the historical one-eye-HUD bug.
+	 * If nothing was recorded (all-ortho left eye), fall through and
+	 * draw normally. */
+	if (s_dlReplay && !orthographic)
 	{
 		if (s_dlCount > 0)
 		{
 			replay_display_list();
 			s_dlCount = 0;  /* prevent re-replay */
+			s_dlReplayDone = true;
 		}
-		return true;
+		if (s_dlReplayDone)
+			return true;
+		/* else fall through: nothing to replay, draw normally */
 	}
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
@@ -2898,7 +3000,11 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		BufInfo_Init(_bi); \
 		BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
 		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
-		if (s_dlRecording && s_dlCount < MAX_DL_ENTRIES) { \
+		atm_prof_add(ATM_C_DRAWS, 1); \
+		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
+		FILLPIX_COUNT_BATCH(); \
+		TRANS_COUNT_BATCH(); \
+		if (s_dlRecording && !orthographic && s_dlCount < MAX_DL_ENTRIES) { \
 			dl_entry_t *_e = &s_dl[s_dlCount++]; \
 			_e->scratchOffset = batch_startOffset; \
 			_e->vertexCount   = batch_vertCount; \
@@ -2983,10 +3089,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].pos[0] = v->x;
 					dst[i].pos[1] = v->y;
 					dst[i].pos[2] = v->z;
-					dst[i].color[0] = ((v->color >> 16) & 0xFF) / 255.0f;
-					dst[i].color[1] = ((v->color >> 8)  & 0xFF) / 255.0f;
-					dst[i].color[2] = ((v->color)       & 0xFF) / 255.0f;
-					dst[i].color[3] = ((v->color >> 24) & 0xFF) / 255.0f;
+					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
+					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
+					dst[i].color[2] = s_c255[(v->color) & 0xFF];
+					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
@@ -3001,10 +3107,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].pos[0] = v->x;
 					dst[i].pos[1] = v->y;
 					dst[i].pos[2] = v->z;
-					dst[i].color[0] = ((v->color >> 16) & 0xFF) / 255.0f;
-					dst[i].color[1] = ((v->color >> 8)  & 0xFF) / 255.0f;
-					dst[i].color[2] = ((v->color)       & 0xFF) / 255.0f;
-					dst[i].color[3] = ((v->color >> 24) & 0xFF) / 255.0f;
+					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
+					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
+					dst[i].color[2] = s_c255[(v->color) & 0xFF];
+					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
@@ -3023,10 +3129,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				dst[i].pos[0] = v->x;
 				dst[i].pos[1] = v->y;
 				dst[i].pos[2] = v->z;
-				dst[i].color[0] = ((v->color >> 16) & 0xFF) / 255.0f;
-				dst[i].color[1] = ((v->color >> 8)  & 0xFF) / 255.0f;
-				dst[i].color[2] = ((v->color)       & 0xFF) / 255.0f;
-				dst[i].color[3] = ((v->color >> 24) & 0xFF) / 255.0f;
+				dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
+				dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
+				dst[i].color[2] = s_c255[(v->color) & 0xFF];
+				dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
 				dst[i].texcoord[0] = v->tu;
 				dst[i].texcoord[1] = v->tv;
 			}

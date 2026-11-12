@@ -99,6 +99,14 @@ enum perf_stage {
 	PERF_S_INTERPSIM,   /* FRAME_INTERP: true-frame render window, excl. extra pass */
 	PERF_S_PRESENTLOOP, /* FRAME_INTERP: normal presentation-loop frame window */
 	PERF_S_PRESENT,     /* renderer: C3D frame submission/present count */
+	PERF_S_TRANWATER,   /* DIAG TRANS split: water (GroupWaterProcessDisplay) */
+	PERF_S_TRANPOLYS,   /* DIAG TRANS split: translucent clipped/unclipped polys */
+	PERF_S_TRANTRIS,    /* DIAG TRANS split: translucent triangles */
+	PERF_S_TRANMISC,    /* DIAG TRANS split: portals + skin/BSP info in TRANS */
+	PERF_S_TRANCLIP,    /* DIAG TRANS split: clipped trans polys per group */
+	PERF_S_TRANFM,      /* DIAG TRANS split: clipped faceme trans polys per group */
+	PERF_S_TRANEXE,     /* DIAG TRANS split: ExecuteTransExe(+Unclipped) */
+	PERF_S_TRANUNCLIP,  /* DIAG TRANS split: unclipped trans polys + fm */
 	PERF_S_MAX
 };
 

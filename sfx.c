@@ -60,6 +60,7 @@ FILE *LoadAllSfx( FILE *fp ){return fp;}
 #include "object.h"
 #include "networking.h"
 #include "object.h"
+#include "atm_prof.h"
 #include "mload.h"
 #include "title.h"
 #include "text.h"
@@ -2659,11 +2660,23 @@ void ProcessLoopingSfx( void )
 	int i=0, flags=0;
 	long Volume = 0;
 	bool InRange = false;
+	bool maint_tick = false;
+	bool started = false;
 	VECTOR Temp = {0.0f,0.0f,0.0f};
 	VECTOR Pos = {0.0f,0.0f,0.0f};
+	static unsigned long maint_frame = 0;
+	static unsigned long sfx_try_frame[ MAX_LOOPING_SFX ];
 
 	if(!bSoundEnabled)
 		return;
+
+	/* Steady-state ndsp maintenance (param pushes + play-state check)
+	 * runs every 4th frame. Measured 51.9 ms/frame on Old 3DS hardware
+	 * (2026-11-11, ramqan mono, stage 58) for work whose audible effect
+	 * is engine-drone params: stepping them at ~18 Hz is inaudible.
+	 * Range checks, create/release, distance writes, and first-start stay
+	 * every-frame, so audibility timing is unchanged. */
+	maint_tick = ((maint_frame++ & 3UL) == 0UL);
 
 	// print debug info
 	// only looping sound i know of is the bike engines
@@ -2674,6 +2687,7 @@ void ProcessLoopingSfx( void )
 	{
 		if ( !SpotSfxList[ i ].used )
 			continue;
+		atm_prof_add( ATM_C_SFX_USED, 1 );
 
 		flags = Sfx_Filenames[ SpotSfxList[ i ].sfxindex ].Flags;
 /*
@@ -2742,28 +2756,49 @@ void ProcessLoopingSfx( void )
 		 	if ( SpotSfxList[ i ].source )
 			{
 				DebugPrintf("ProcessLoopingSfx: Releasing dynamic looping sfx %d\n", SpotSfxList[ i ].sfxindex);
+				atm_prof_add( ATM_C_SFX_RELEASE, 1 );
 				sound_release_source( SpotSfxList[ i ].source );
 				SpotSfxList[ i ].source = NULL;
+				/* Conditions changed (slot left range with a live source):
+				 * allow an immediate re-attempt on re-entry. */
+				sfx_try_frame[ i ] = 0;
 			}
 			continue;
 		}
 
-		// if in range & not loaded then find a free slot for the sound
+		// if in range & not loaded then find a free slot for the sound.
+		// First audibility must not wait for a maint tick, but a FAILED
+		// load (missing file, exhausted linear heap or DSP channels)
+		// costs milliseconds of FS/alloc work and must not be retried
+		// 71x/s: measured 10.4 failing creates/frame = 51.7 ms/frame on
+		// Old 3DS hardware (2026-11-11, ramqan mono). Back off to one
+		// attempt per 32 frames; a sound that can never load stays
+		// silent either way, and a transient success starts within
+		// half a sim-second.
+		started = false;
 		if ( !SpotSfxList[ i ].source )
 		{
 			char * file = SfxFullPath[ SpotSfxList[i].sfxindex ][ SpotSfxList[i].variant ];
 
+			if ( sfx_try_frame[ i ] != 0 &&
+			     ( maint_frame - sfx_try_frame[ i ] ) < 32UL )
+				continue;
+			sfx_try_frame[ i ] = maint_frame;
+
 			// TODO - this should probably be done right away in InitLoopingSfx()
 			int index = SpotSfxList[ i ].sfxindex +	SpotSfxList[ i ].variant;
 
+			atm_prof_add( ATM_C_SFX_CREATE, 1 );
 			if( ! (SpotSfxList[ i ].source = sound_source_create( file, index )) )
 				continue;
 
 			sound_set_pitch( SpotSfxList[ i ].source, SpotSfxList[ i ].freq );
+			started = true;
 		}
 
-		// if in range, and source already loaded
-		if ( SpotSfxList[ i ].source)
+		// if in range, and source already loaded: steady-state params +
+		// play-state check only on maint ticks (or first start above).
+		if ( SpotSfxList[ i ].source && ( maint_tick || started ) )
 		{
 			Volume = (long)(( GlobalSoundAttenuation * Distance / MaxDistance ) * sound_minimum_volume);
 			Volume = sound_minimum_volume - (long)( (float)( sound_minimum_volume - Volume ) * SpotSfxList[ i ].vol * GlobalSoundAttenuation );
