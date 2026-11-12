@@ -331,6 +331,10 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 
 	
 	CellSize = Mloadheader->CellSize;
+	/* R06: snapshot clean state at function entry. A same-call set must
+	 * not let later execbufs skip: their buffers were never restored. */
+	color_already_clean = Mloadheader->Group[group].color_clean;
+	Mloadheader->Group[group].color_clean = 0;
 	execbuf = Mloadheader->Group[group].num_execbufs;
 	while( execbuf--)
 	{
@@ -392,12 +396,10 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			
 			
 			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-			/* R06: dry + no-whiteout restore rewrites the baked baseline that is
-			 * already in place when nothing dirtied it (also collapses the
-			 * second eye's duplicate pass). All other paths clear color_clean.
-			 * Conditions replicate the plain-copy predicate exactly. */
-			color_already_clean = Mloadheader->Group[group].color_clean;
-		Mloadheader->Group[group].color_clean = 0;
+			/* R06: skip when a previous call restored the baseline (entry snapshot
+			 * above); conditions replicate the plain-copy predicate exactly.
+			 * Collapses the second eye's duplicate pass. All other paths
+			 * clear color_clean. */
 		if( color_already_clean && !ShowPlaneRGB && WhiteOut == 0.0F &&
 		    GroupWaterInfo[group] == WATERSTATE_NOWATER )
 		{
