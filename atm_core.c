@@ -538,7 +538,9 @@ size_t atm_frame_format_summary(const AtmFrameStats *f, char *out, size_t cap) {
     int w = snprintf(out, cap,
         "@n3dl frames=%llu avg_us=%llu p50_us=%lu p95_us=%lu p99_us=%lu max_us=%lu over_budget=%lu min_us=%lu\n",
         (unsigned long long)f->count,
-        (unsigned long long)(f->sum_us / f->count),
+        /* R11: cold once-per-run summary; f64 divide is exact here
+         * (sum_us/count magnitudes << 2^53) and lowers to vdiv.f64. */
+        (unsigned long long)((double)f->sum_us / (double)f->count),
         (unsigned long)atm_frame_percentile_us(f, 50),
         (unsigned long)atm_frame_percentile_us(f, 95),
         (unsigned long)atm_frame_percentile_us(f, 99), (unsigned long)f->max_us,
@@ -583,7 +585,8 @@ bool atm_capacity_free_bytes(uint32_t free_clusters, uint32_t cluster_size,
 static uint64_t atm_round_up_clusters(uint64_t bytes, uint32_t cluster_size) {
     if (cluster_size <= 1) return bytes;
     uint64_t c = cluster_size;
-    return (bytes + c - 1) / c * c;
+    /* R11: cold dump-time capacity math; exact for magnitudes << 2^53. */
+    return (uint64_t)((double)(bytes + c - 1) / (double)c) * c;
 }
 uint64_t atm_capacity_required(uint64_t pending_bytes, uint32_t cluster_size) {
     uint64_t reserve = ATM_DUMP_MAX_BYTES + ATM_CRASH_RESERVE_MARGIN_BYTES;
