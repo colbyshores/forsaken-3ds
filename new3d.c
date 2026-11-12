@@ -56,15 +56,12 @@ MATRIX	MATRIX_Identity = {
 ===================================================================*/
 void BuildRotMatrix( float xa, float ya, float za, MATRIX * m )
 {
-	float	c0, c1, c2, s0, s1, s2, c0s1, s0s1;
+	float	c0, c1, c2, s0, s1, s2, c0s1, s0s1, ra;
 
-	c0 = (float) COSD( xa );
-	c1 = (float) COSD( ya );
-	c2 = (float) COSD( za );
-
-	s0 = (float) SIND( xa );
-	s1 = (float) SIND( ya );
-	s2 = (float) SIND( za );
+	/* R15: one shared range reduction per angle (was two). */
+	ra = D2R( xa ); fast_sincosf( ra, &s0, &c0 );
+	ra = D2R( ya ); fast_sincosf( ra, &s1, &c1 );
+	ra = D2R( za ); fast_sincosf( ra, &s2, &c2 );
 
 	c0s1 = c0 * s1;
 	s0s1 = s0 * s1;

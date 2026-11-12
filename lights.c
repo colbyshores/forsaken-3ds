@@ -15,6 +15,7 @@
 #include "lights.h"
 #include "water.h"
 #include "visi.h"
+#include "atm_prof.h"
 #include "text.h"
 #include "main.h"
 #include "util.h"
@@ -295,6 +296,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	u_int32_t r,g,b,intWhiteOut;
 	POLYANIM * PolyAnim;
 	int i,e;
+	int color_already_clean; /* R06: skip-state for this execbuf */
 	u_int32_t * u_int32Pnt;
 	TANIMUV * TanimUV;
 	float	intensity;
@@ -329,6 +331,10 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 
 	
 	CellSize = Mloadheader->CellSize;
+	/* R06: snapshot clean state at function entry. A same-call set must
+	 * not let later execbufs skip: their buffers were never restored. */
+	color_already_clean = Mloadheader->Group[group].color_clean;
+	Mloadheader->Group[group].color_clean = 0;
 	execbuf = Mloadheader->Group[group].num_execbufs;
 	while( execbuf--)
 	{
@@ -390,6 +396,17 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			
 			
 			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+			/* R06: skip when a previous call restored the baseline (entry snapshot
+			 * above); conditions replicate the plain-copy predicate exactly.
+			 * Collapses the second eye's duplicate pass. All other paths
+			 * clear color_clean. */
+		if( color_already_clean && !ShowPlaneRGB && WhiteOut == 0.0F &&
+		    GroupWaterInfo[group] == WATERSTATE_NOWATER )
+		{
+			atm_prof_add(ATM_C_COLORSKIP, Mloadheader->Group[group].num_verts_per_execbuf[execbuf]);
+		}
+		else
+		{
 			if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
 			{
 				if( WhiteOut == 0.0F )
@@ -435,6 +452,7 @@ clear:					mov		eax, [esi]
 							lpLVERTEX++;		
 							lpLVERTEX2++;		
 						}
+						Mloadheader->Group[group].color_clean = 1; /* R06: baseline restored */
 					}
 #endif	//USEASM
 					
@@ -552,6 +570,7 @@ clear:					mov		eax, [esi]
 				}
 				// ****************** End of Water Effect ******************************
 			}
+		} /* R06: end skip-else */
 		}
 #ifdef GPU_LIGHTING
 		/* Skip the per-vertex CPU dynamic-light loop — the vertex shader

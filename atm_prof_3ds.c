@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include "atm_prof.h"
+#include "framedump.h" /* bench-scoped stills hook below; no-op unless -DFRAMEDUMP */
 
 extern bool QuitRequested;
 extern char ShortLevelNames[][32];
@@ -77,6 +78,8 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"lightsw",
 	"fillpix",
 	"tfillpix",
+	"colorskip",
+	"projskip",
 };
 
 enum {
@@ -267,6 +270,12 @@ void atm_prof_frame_end(void)
 	}
 
 	atm_frame_add(&g_stats, us, (uint32_t)ATM_BENCH_BUDGET_US);
+#ifdef FRAMEDUMP_BENCH_STILLS
+	/* Step-1 reference stills: exact measured-frame indices, deterministic
+	 * across runs (fixed scene, no input). Never fires in normal builds. */
+	if (g_stats.count == 60 || g_stats.count == 120 || g_stats.count == 180)
+		framedump_request("bench");
+#endif
 	if (gfxIs3D())
 		atm_prof_add(ATM_C_STEREO_FRAMES, 1);
 	else

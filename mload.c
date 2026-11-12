@@ -409,6 +409,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	for( group = 0; group < Mloadheader->num_groups; group++)
 	{
 		GroupTris[ group ] = 0;
+		Mloadheader->Group[group].color_clean = 0;	/* R06: force first restore */
 		/*	get the number of execbufs in this group	*/
 		Uint16Pnt = (u_int16_t *) Buffer;
 		Mloadheader->Group[group].num_execbufs = *Uint16Pnt++;
