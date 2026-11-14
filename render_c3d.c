@@ -65,6 +65,9 @@
 #ifdef STEREO_REPLAY
 #include "stereomemo.h"
 #endif
+#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
+#include "quadidx.h"
+#endif
 #include "texture.h"
 #include "file.h"
 #include "main_3ds.h"
@@ -332,6 +335,18 @@ static void persist_free_all(void)
 	s_persistBytes = 0;
 }
 #endif /* STEREO_REPLAY && PERSIST_VERTS */
+
+#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
+/* Mono gate shared by the slider-down paths: refreshed per
+ * FSBeginScene from the same stereo_mode signal as s_persistActive. */
+static int s_monoActive = 0;
+static unsigned short *s_quadTable = NULL;
+#elif defined(STEREO_REPLAY)
+/* Flush macro references these unconditionally; inert without the
+ * quad path (batch_isQuad is then never set). */
+static int s_monoActive = 0;
+static unsigned short *s_quadTable = NULL;
+#endif
 
 /* Scratch buffer for vertex conversion.
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
@@ -918,6 +933,15 @@ bool c3d_renderer_init(void)
 #endif
 	s_scratchUsed = 0;
 	s_scratchPeak = 0;
+#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
+	/* Shared quad index table (mono-gated billboard path). Written
+	 * once here; the first FrameEnd linear flush publishes it. Alloc
+	 * failure simply leaves the quad path disabled. */
+	s_quadTable = (unsigned short *)linearAlloc(
+		QUADIDX_MAX_QUADS * 6 * sizeof(unsigned short));
+	if (s_quadTable)
+		quadidx_build(s_quadTable, QUADIDX_MAX_QUADS);
+#endif
 
 	/* Create render targets and link to display output.
 	 * Both left and right eye targets are created unconditionally —
@@ -1591,6 +1615,9 @@ bool FSBeginScene(void)
 	}
 	/* Slider gate: mono only (see s_persistActive comment). */
 	s_persistActive = (render_info.stereo_mode != STEREO_MODE_3DS);
+#endif
+#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
+	s_monoActive = (render_info.stereo_mode != STEREO_MODE_3DS);
 #endif
 	s_scratchUsed = 0;
 	if (!s_inFrame)
@@ -3013,6 +3040,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * being flushed (batch_tg0 .. group-1). A skipped texgroup records
 	 * count 0 and is not submitted. */
 	int   batch_tg0 = 0;
+	/* TF04-A quad batch: unique-vert count + quad flag. A quad batch
+	 * submits via DrawElements and never mixes with DrawArrays. */
+	int   batch_quadCount = 0;
+	int   batch_isQuad = 0;
 	/* Must stay zero-initialized: ortho groups never set these, and the
 	 * lookup flush below must read count 0 (skip), never stack garbage.
 	 * Garbage counts were submitted to DrawArrays and wedged the GPU
@@ -3040,7 +3071,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		TRANS_COUNT_BATCH(); \
 		int _has_persist = 0; \
 		{ int _pi; for (_pi = batch_tg0; _pi < group; _pi++) if (tg_persist_buf[_pi]) { _has_persist = 1; break; } } \
-		if ((_has_persist || (s_memoMode == SMEMO_LOOKUP && MEMO_COALESCE_SUBMIT)) && !orthographic) { \
+		if (batch_isQuad) { \
+			BufInfo_Init(_bi); \
+			BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
+			C3D_DrawElements(GPU_TRIANGLES, batch_quadCount * 6, C3D_UNSIGNED_SHORT, s_quadTable); \
+			atm_prof_add(ATM_C_DRAWS, 1); \
+		} else if ((_has_persist || (s_memoMode == SMEMO_LOOKUP && MEMO_COALESCE_SUBMIT)) && !orthographic) { \
 			int _si; \
 			int _consumed = 0; \
 			long _run_off = 0; \
@@ -3099,6 +3135,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, \
 				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO); \
 		batch_vertCount = 0; \
+		batch_quadCount = 0; \
+		batch_isQuad = 0; \
 	} \
 } while(0)
 #else
@@ -3206,6 +3244,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		int memo_cnt = 0;
 		bool memo_hit = false;
 		bool persist_hit = false;
+		int quad_group = 0;
 #if defined(PERSIST_VERTS) && !defined(MEMO_VERIFY)
 		/* R05: level walls consult the retained buffers first (both
 		 * eyes, any mode). A hit submits the retained buffer at flush
@@ -3251,6 +3290,21 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		{
 			WORD *indices = (WORD*)renderObject->lpIndexBuffer + tg->startIndex;
 
+#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS) && !defined(MEMO_VERIFY)
+			/* TF04-A (mono-gated): a 4-vert/2-tri canonical quad
+			 * converts its 4 unique verts and submits via the
+			 * shared index table instead of expanding to 6. */
+			if (s_monoActive && s_quadTable && !orthographic &&
+			    tg->numVerts == 4 && tg->numTriangles == 2 &&
+			    quadidx_is_quad4(indices))
+				quad_group = 1;
+			if (quad_group && batch_vertCount > 0 &&
+			    (!batch_isQuad || batch_quadCount >= QUADIDX_MAX_QUADS))
+				FLUSH_BATCH();
+			if (!quad_group && batch_isQuad && batch_vertCount > 0)
+				FLUSH_BATCH();
+#endif
+
 			if (orthographic)
 			{
 				TLVERTEX *verts = (TLVERTEX*)renderObject->lpVertexBuffer;
@@ -3267,6 +3321,24 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
+			}
+			else if (quad_group)
+			{
+				LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
+				for (i = 0; i < 4; i++)
+				{
+					LVERTEX *v = &verts[startVert + i];
+					dst[i].pos[0] = v->x;
+					dst[i].pos[1] = v->y;
+					dst[i].pos[2] = v->z;
+					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
+					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
+					dst[i].color[2] = s_c255[(v->color) & 0xFF];
+					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
+					dst[i].texcoord[0] = v->tu;
+					dst[i].texcoord[1] = v->tv;
+				}
+				totalVerts = 4;
 			}
 			else
 			{
@@ -3285,8 +3357,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
+				totalVerts = numIndices;
 			}
-			totalVerts = numIndices;
+			if (!quad_group)
+				totalVerts = numIndices;
 		}
 		else
 		{
@@ -3470,6 +3544,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 
 		/* Accumulate into current batch */
+		if (quad_group) {
+			batch_isQuad = 1;
+			batch_quadCount++;
+		}
 		batch_vertCount += totalVerts;
 		s_scratchUsed += totalVerts;
 	}
