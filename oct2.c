@@ -6013,8 +6013,10 @@ void InitRenderBufs(/* LPDIRECT3DDEVICE lpDev */) // bjd
 	// indexed pre-transformed (2d)
 	FSCreateDynamic2dVertexBuffer(&RenderBufs[3], 32767);
 	FSCreateDynamicIndexBuffer(&RenderBufs[3], 32767*3);
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++) {
 		RenderBufs[i].textureGroups = s_renderbuf_groups[i];
+		RenderBufs[i].vertOwner = VERT_OWNER_SHARED;
+	}
 }
 
 void ReleaseRenderBufs( void )

@@ -263,6 +263,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				TR("Mxaload: FAIL FSCreateVertexBuffer g=%d e=%d nv=%d", group, execbuf, num_vertices);
 				return false;
 			}
+			Mxaloadheader->Group[group].renderObject[execbuf].vertOwner = VERT_OWNER_MXA;
 			TR("Mxaload: g=%d e=%d FSCreateVertexBuffer OK", group, execbuf);
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);

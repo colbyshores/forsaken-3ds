@@ -278,6 +278,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				TR("Mxload: FAIL FSCreateVertexBuffer g=%d e=%d nv=%d", group, execbuf, num_vertices);
 				return false;
 			}
+			Mxloadheader->Group[group].renderObject[execbuf].vertOwner = VERT_OWNER_MODEL;
 			TR("Mxload: g=%d e=%d FSCreateVertexBuffer OK", group, execbuf);
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);

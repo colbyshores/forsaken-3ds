@@ -3151,6 +3151,21 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			totalVerts = numVerts;
 		}
 
+#ifdef ATM_PROFILING
+		/* R05 sizing: attribute this live conversion to its owner
+		 * class. Runs only on the convert path (memo hits skip it),
+		 * so vown_* sums measure actual conversion work per class. */
+		{
+			static const int vown_counter[6] = {
+				ATM_C_VOWN_OTHER, ATM_C_VOWN_LEVEL, ATM_C_VOWN_MODEL,
+				ATM_C_VOWN_MXA, ATM_C_VOWN_SHARED, ATM_C_VOWN_WATER
+			};
+			unsigned int vown = renderObject->vertOwner;
+			if (vown > VERT_OWNER_WATER) vown = VERT_OWNER_OTHER;
+			atm_prof_add(vown_counter[vown], totalVerts);
+		}
+#endif
+
 #ifdef STEREO_REPLAY
 		/* Record the converted range (eye 1). Runs ONLY on the live
 		 * path: on a memo hit the tg arrays already hold the looked-up

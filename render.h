@@ -228,6 +228,19 @@ typedef enum {
 /* Fill epoch for a whole-scene (unclipped) fill: no single group. */
 #define SMEMO_WHOLE_GROUP 0xFFFFFFFFu
 
+/* Vertex-owner class (R05 sizing + future persistent-geometry tagging).
+ * Set once at buffer-creation time by the owning loader; never changed
+ * per frame. Backends may ignore it; the Citro3D bench counters use it
+ * to attribute converted verts by owner class. */
+typedef enum {
+	VERT_OWNER_OTHER = 0,   /* unclassified (billboard temps, execs, HUD) */
+	VERT_OWNER_LEVEL = 1,   /* MLOADHEADER level walls (static candidate) */
+	VERT_OWNER_MODEL = 2,   /* MXLOADHEADER models */
+	VERT_OWNER_MXA = 3,     /* MXALOADHEADER deformable models */
+	VERT_OWNER_SHARED = 4,  /* RenderBufs[*] shared exec slots */
+	VERT_OWNER_WATER = 5    /* water surface objects */
+} VERT_OWNER;
+
 typedef struct RENDEROBJECT
 {
 	LPVERTEXBUFFER	lpVertexBuffer;
@@ -239,6 +252,7 @@ typedef struct RENDEROBJECT
 	unsigned int memoEpochPass;
 	unsigned int memoEpochGroup;
 	unsigned int memoEpochTPage;
+	unsigned int vertOwner;
 } RENDEROBJECT;
 
 typedef struct LEVELRENDEROBJECT
@@ -252,6 +266,7 @@ typedef struct LEVELRENDEROBJECT
 	unsigned int memoEpochPass;
 	unsigned int memoEpochGroup;
 	unsigned int memoEpochTPage;
+	unsigned int vertOwner;
 } LEVELRENDEROBJECT;
 
 typedef struct {

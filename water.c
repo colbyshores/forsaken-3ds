@@ -434,6 +434,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 		DebugPrintf("water FSCreateVertexBuffer failed\n");
 		return false;
 	}
+	WO->renderObject.vertOwner = VERT_OWNER_WATER;
 
 	// pre-count the number of tris so we know how big to make the index buffer
 	// this loop structure was coppied from the way the triangles are assigned further bellow

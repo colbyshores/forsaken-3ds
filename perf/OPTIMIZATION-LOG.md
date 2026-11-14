@@ -2473,3 +2473,18 @@ Required build order (do not shortcut):
 Estimated multi-day; the defend2 uninitialized-array wedge is the
 standing lesson against rushing renderer caches. R05 remains the
 next block; this gate is its entry record.
+
+## 2026-11-14 — R05 sizing MEASURED (HARDWARE): level walls = 56% of conversion
+
+Owner tagging landed (vertOwner at the 5 FSCreate choke points:
+mload/mxload/mxaload/water/InitRenderBufs; additive field, all
+backends ignore it) + vown_* counters (live conversions only).
+Ramqan stereo, memo on, 240 frames:
+  vown_level=2,392,302 (56.5%)  vown_shared=1,201,764 (28.4%)
+  vown_model=640,701 (15.1%)    vown_mxa/other/water=0
+  (submitted 6,373,692; memo hits make up the difference)
+Level-wall persistence is the right target. MEMORY GATE before
+building: persistent copies cost 36B/unique-vert from the linear
+heap (post-texture free ~7.9MB on OG) — unique level vert count
+must be measured at load before allocating anything. Next step is
+that counter, not the cache.

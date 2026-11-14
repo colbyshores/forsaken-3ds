@@ -91,6 +91,12 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"memo_mf_sub2",
 	"memo_mf_epass",
 	"scratch_splits",
+	"vown_other",
+	"vown_level",
+	"vown_model",
+	"vown_mxa",
+	"vown_shared",
+	"vown_water",
 };
 
 enum {

@@ -456,6 +456,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				Msg( "Mload : MakeExecBuffer Failed\n" );
 				return false;
 			}
+			Mloadheader->Group[group].renderObject[execbuf].vertOwner = VERT_OWNER_LEVEL;
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 
