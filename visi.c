@@ -466,28 +466,6 @@ bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 
 	*pbuf = buf;
 
-#if defined(__3DS__) && defined(VERBOSE_TRACE)
-	{ extern void trace(const char *);
-	  extern int16_t LevelNum;
-	  extern char ShortLevelNames[][32];
-	  int total_visible = 0, total_connected = 0, total_indirect = 0, total_portals = 0;
-	  int g_iter;
-	  for ( g_iter = 0; g_iter < m->num_groups; g_iter++ )
-	  {
-	      total_visible   += VisibleGroup.list[ g_iter ].groups;
-	      total_connected += ConnectedGroup.list[ g_iter ].groups;
-	      total_indirect  += IndirectVisibleGroup.list[ g_iter ].groups;
-	      total_portals   += m->Group[ g_iter ].num_portals;
-	  }
-	  char _b[200];
-	  snprintf( _b, sizeof(_b),
-	      "VISI_STATS: level=%s ng=%d portals=%d conn=%d vis=%d indir=%d (avg vis/g=%.1f)",
-	      (LevelNum >= 0 && LevelNum < 64) ? &ShortLevelNames[LevelNum][0] : "?",
-	      (int)m->num_groups, total_portals, total_connected,
-	      total_visible, total_indirect,
-	      m->num_groups ? (double)total_visible / m->num_groups : 0.0 );
-	  trace( _b ); }
-#endif
 
 	return true;
 }
@@ -1003,19 +981,6 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 }
 
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-/* Per-frame portal rejection counters — incremented in ProcessVisiblePortal
- * each time a portal is silently dropped (either entirely clipped by the
- * main viewport, or its post-minimise extent is empty). The black-void
- * symptom on stableizers/powerdown/starship/battlebase fires when a portal
- * connecting current-group to the visible-but-not-yet-current group is in
- * one of these reject paths — the "next room" group never gets marked
- * visible, so the BSP-clipped geometry through that doorway never draws.
- * Reset by FindVisible at start of each frame. */
-int _vt_portal_rej_clipped = 0;
-int _vt_portal_rej_empty   = 0;
-int _vt_portal_accepted    = 0;
-#endif
 
 static void
 ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
@@ -1031,17 +996,11 @@ ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 	p = t->portal;
 	if ( !VisiblePortalExtent( cam, v, p, &extent ) )
 	{
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-		_vt_portal_rej_clipped++;
-#endif
 		return; // portal entirely clipped by main viewport
 	}
 	MinimiseXYExtent( &extent, e, &extent );
 	if ( !EmptyXYExtent( &extent ) )
 	{
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-		_vt_portal_accepted++;
-#endif
 		adj_group = &v->group[ t->group ];
 		if ( adj_group->visible )
 		{
@@ -1060,12 +1019,6 @@ ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 			ProcessVisiblePortal( cam, v, tvis, &extent );
 		}
 	}
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	else
-	{
-		_vt_portal_rej_empty++;
-	}
-#endif
 }
 
 void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
@@ -1139,15 +1092,6 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	g->extent.max.y = (float) ( v->viewport->Y + v->viewport->Height );
 	g->extent.max.z = HUGE_VALUE;
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	/* Per-frame portal counters reset before traversal. Logged once per
-	 * second below so each level's "average" portal rejection rate gets a
-	 * single summary line — easy to compare BAD vs OK levels without
-	 * flooding the trace file. */
-	_vt_portal_rej_clipped = 0;
-	_vt_portal_rej_empty   = 0;
-	_vt_portal_accepted    = 0;
-#endif
 
 	// process visible portals
 	if ( outside_map )
@@ -1315,58 +1259,6 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		} /* end magnified (non-fullscreen) block */
 		} /* R11: end magnified-path else */
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-		/* Portal black-void detector: a visible group whose final
-		 * viewport collapses to zero width or height produces a
-		 * divide-by-zero in the projection-matrix construction above
-		 * (vp->Width / vp->Height denominators on _11, _22, _31, _32).
-		 * Float div-by-zero on ARM gives +inf, the engine then renders
-		 * geometry with NaN clip coords, the GPU drops every triangle,
-		 * and the player sees a black void where the portal opens onto
-		 * that group's geometry. Symptom on Remaster's stableizers /
-		 * powerdown / starship / battlebase levels.
-		 *
-		 * Trace it (rate-limited via the same _vt_flip_remaining counter
-		 * autotest_tick uses) so we can correlate the broken viewport
-		 * with the source group, the camera's GroupImIn, and the
-		 * portal-traversal extents. */
-		{
-			extern int _vt_flip_remaining;
-			static int s_traced_for_level = -1;
-			static int s_total_visible_in_frame = 0;
-			static int s_zero_vp_in_frame = 0;
-			extern int16_t LevelNum;
-
-			if (s_traced_for_level != LevelNum) {
-				s_traced_for_level = LevelNum;
-				s_total_visible_in_frame = 0;
-				s_zero_vp_in_frame = 0;
-			}
-
-			s_total_visible_in_frame++;
-			if (vp->Width <= 0 || vp->Height <= 0) {
-				s_zero_vp_in_frame++;
-				/* Only trace the first ~32 zero-vp groups per process to
-				 * avoid flooding the log when the bug fires every frame. */
-				static int s_traced = 0;
-				if (s_traced < 32) {
-					s_traced++;
-					extern void trace(const char*);
-					char _b[200];
-					snprintf(_b, sizeof(_b),
-					         "VISI: GROUP_INVISIBLE level=%d g=%u groupImIn=%u "
-					         "vp=(%dx%d) clip=(%ld,%ld,%ld,%ld) "
-					         "extent=(%.1f,%.1f,%.1f,%.1f)",
-					         (int)LevelNum, (unsigned)g->group, (unsigned)cam->GroupImIn,
-					         (int)vp->Width, (int)vp->Height,
-					         clip.x1, clip.y1, clip.x2, clip.y2,
-					         g->extent.min.x, g->extent.min.y,
-					         g->extent.max.x, g->extent.max.y);
-					trace(_b);
-				}
-			}
-		}
-#endif
 	}
 
 	// sort visible groups in depth order
@@ -1397,35 +1289,6 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		IsGroupVisible[ g->group ] = 1;
 	}
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	/* Per-second summary log: once every 60 frames per camera. Keeps the
-	 * volume manageable while still catching trends. Useful columns:
-	 *   visGroups   = how many groups end up in the visible list
-	 *   numGroups   = total groups in the level (denominator)
-	 *   accepted    = portals processed where the through-group got added
-	 *   rejClipped  = portals fully outside the main viewport
-	 *   rejEmpty    = portals with non-empty pre-minimise extent but
-	 *                 empty post-minimise extent (the most likely culprit
-	 *                 for the black-void bug — through-portal group
-	 *                 silently dropped before visible-list insertion). */
-	{
-		static int s_frame = 0;
-		s_frame++;
-		if ((s_frame % 60) == 0) {
-			extern void trace(const char*);
-			extern int16_t LevelNum;
-			char _b[200];
-			snprintf(_b, sizeof(_b),
-			         "VISI: frame=%d level=%d visGroups=%u/%u groupImIn=%u "
-			         "accepted=%d rejClipped=%d rejEmpty=%d",
-			         s_frame, (int)LevelNum,
-			         (unsigned)NumGroupsVisible, (unsigned)v->groups,
-			         (unsigned)cam->GroupImIn,
-			         _vt_portal_accepted, _vt_portal_rej_clipped, _vt_portal_rej_empty);
-			trace(_b);
-		}
-	}
-#endif
 }
 
 int ClipGroup( CAMERA *cam, u_int16_t group )
@@ -1532,35 +1395,6 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 			if ( XLight1Group(  Mloadheader, GroupsVisible[i] ) != true  )
 				return false;
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-			/* Per-visible-group draw trace, rate-limited to once-per-second
-			 * via the same s_frame counter as the VISI: summary above.
-			 * Logs the group's triangle budget (GroupTris) and execbuf
-			 * count just before its level-mesh draw fires. If a visible
-			 * group has GroupTris > 0 but no geometry appears on screen
-			 * (the user-reported "black void through portal"), the bug is
-			 * downstream of this point — most likely in a stale/corrupt
-			 * LEVELRENDEROBJECT pointer (lpVertexBuffer, lpIndexBuffer)
-			 * or a bad viewport from the per-group ClipGroup above. */
-			{
-				static int s_dbg_frame = 0;
-				if (g == cam->visible.first_visible) s_dbg_frame++;
-				if ((s_dbg_frame % 60) == 0) {
-					extern void trace(const char*);
-					char _b[200];
-					snprintf(_b, sizeof(_b),
-					         "VISI_DRAW: f=%d level=%d g=%u execbufs=%u tris=%u "
-					         "vp=(%dx%d) ext=(%.0f,%.0f,%.0f,%.0f)",
-					         s_dbg_frame, (int)LevelNum, (unsigned)g->group,
-					         (unsigned)Mloadheader->Group[g->group].num_execbufs,
-					         (unsigned)GroupTris[g->group],
-					         (int)g->viewport.Width, (int)g->viewport.Height,
-					         g->extent.min.x, g->extent.min.y,
-					         g->extent.max.x, g->extent.max.y);
-					trace(_b);
-				}
-			}
-#endif
 
  			if ( ExecuteSingleGroupMloadHeader(  Mloadheader, (u_int16_t) g->group ) != true  )
 				return false;

@@ -643,14 +643,8 @@ static bool AppInit( char * lpCmdLine )
 //
 
 extern bool RenderScene( void );
-#ifdef FRAME_INTERP_EXTRA_PRESENT
-#include "interp.h"
-#endif
 static bool RenderLoop()
 {
-#ifdef FRAME_INTERP_EXTRA_PRESENT
-    interp_present_window_tick();
-#endif
     if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
 		return true;
 
@@ -668,9 +662,6 @@ static bool RenderLoop()
 	}
 
     // Blt or flip the back buffer to the front buffer
-#ifdef FRAME_INTERP_EXTRA_PRESENT
-	if( !interp_pending() )
-#endif
 	if( !QuitRequested )
 	{
 #ifdef DEMO_SUPPORT
@@ -678,14 +669,6 @@ static bool RenderLoop()
 #endif
 		{
 			// this is the actual call to render a frame...
-#ifdef FRAME_INTERP_EXTRA_PRESENT
-			if (interp_consume_outer_present_skip())
-			{
-				interp_present_current();
-				interp_present();
-			}
-			else
-#endif
 			{
 				perf_stage_begin( PERF_S_PRESENTLOOP );
 				if (!render_flip(&render_info))
@@ -782,21 +765,6 @@ int main( int argc, char* argv[] )
 	{
 		PERF_FRAME_BEGIN();
 		atm_prof_frame_begin();
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-		{ extern void trace(const char*); extern unsigned char MyGameStatus;
-		  static unsigned long _ml_n = 0;
-		  static unsigned char _ml_last = 255;
-		  /* Only emit when status changes or every 600 frames so we don't
-		   * spam the log. Cheap canary that proves the loop is iterating. */
-		  if (MyGameStatus != _ml_last || (_ml_n % 600) == 0) {
-		    char _b[64];
-		    snprintf(_b, sizeof(_b), "MAIN: iter=%lu status=%u", _ml_n, (unsigned)MyGameStatus);
-		    trace(_b);
-		    _ml_last = MyGameStatus;
-		  }
-		  _ml_n++;
-		}
-#endif
 		// process system events
 		if(!handle_events())
 			goto FAILURE;

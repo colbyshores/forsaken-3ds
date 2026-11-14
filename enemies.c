@@ -4616,25 +4616,6 @@ bool PreLoadEnemies( void )
 			fread( &Formationlink, sizeof( int16_t ), 1, fp );
 			fread( &GenerationDelay, sizeof( float ), 1, fp );
 
-#if defined(__3DS__) && defined(VERBOSE_TRACE)
-			/* Per-enemy spawn log: ModelNum (.nme record value) plus the
-			 * ModelFilename it resolves to via EnemyTypes[]. Useful when
-			 * a level shows visually-wrong enemies and we need to know
-			 * whether the issue is wrong ModelNum in the .nme, missing
-			 * substitution, or ambiguous file resolution. Gated on
-			 * VERBOSE_TRACE — release builds compile this out. */
-			{
-				extern void trace(const char *);
-				char _b[160];
-				const char *fn =
-					(ModelNum < MAX_ENEMY_TYPES && EnemyTypes[ModelNum].ModelFilename)
-						? EnemyTypes[ModelNum].ModelFilename : "(NULL)";
-				snprintf(_b, sizeof(_b),
-					"NME[%d]: ModelNum=%u file=%s",
-					Count, (unsigned)ModelNum, fn);
-				trace(_b);
-			}
-#endif
 
 			/* Forsaken Remastered's .nme files reference enemy IDs from
 			 * the Remaster's expanded roster (n64Enemies, etc.) that go

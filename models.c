@@ -296,191 +296,6 @@ MODELNAME	ModelNames[MAXMODELHEADERS] ={
 	{ "tc-27.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 
 
-#ifdef SHADOWTEST
-)
-	{ "borg400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "borg300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "borg200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "borg100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "borg050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sborg400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sborg300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sborg200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sborg100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sborg050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "brd400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "brd300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "brd200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "brd100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "brd050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sbrd400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sbrd300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sbrd200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sbrd100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sbrd050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "laj400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "laj300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "laj200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "laj100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "laj050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "slaj400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "slaj300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "slaj200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "slaj100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "slaj050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-
-	{ "xcop400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "xcop300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "xcop200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "xcop100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "xcop050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sxcop400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sxcop300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sxcop200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sxcop100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sxcop050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "truk400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "truk300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "truk200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "truk100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "truk050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "struk400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "struk300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "struk200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "struk100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "struk050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-
-	{ "foet400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "foet300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "foet200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "foet100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "foet050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sfoet400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sfoet300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sfoet200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sfoet100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sfoet050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "jap400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "jap300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "jap200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "jap100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "jap050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjap400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sjap300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjap200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjap100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjap050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "nut400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "nut300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "nut200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "nut100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "nut050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snut400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "snut300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snut200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snut100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snut050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "rhes400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "rhes300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "rhes200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "rhes100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "rhes050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "srhes400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "srhes300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "srhes200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "srhes100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "srhes050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "jo400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Unstealthed
-	{ "jo300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "jo200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "jo100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "jo050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjo400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sjo300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjo200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjo100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sjo050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "shrk400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "shrk300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "shrk200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "shrk100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "shrk050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sshrk400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sshrk300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sshrk200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sshrk100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sshrk050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "hk400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Unstealthed
-	{ "hk300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "hk200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "hk100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "hk050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "shk400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "shk300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "shk200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "shk100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "shk050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-	{ "nbia400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "nbia300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "nbia200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "nbia100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "nbia050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snbia400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "snbia300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snbia200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snbia100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "snbia050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-
-	{ "mofi400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "mofi300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "mofi200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "mofi100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "mofi050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "smofi400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "smofi300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "smofi200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "smofi100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "smofi050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-
-	{ "cerb400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "cerb300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "cerb200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "cerb100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "cerb050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "scerb400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "scerb300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "scerb200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "scerb100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "scerb050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-
-	{ "slick400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
-	{ "slick300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "slick200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "slick100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "slick050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sslick400.mxa", 4, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Stealthed
-	{ "sslick300.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sslick200.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sslick100.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-	{ "sslick050.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-
-#else
 
 
 	{ "borg400.mxa", 4, false, MODELTYPE_Morphing, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
@@ -662,7 +477,6 @@ MODELNAME	ModelNames[MAXMODELHEADERS] ={
 	{ "sslick100.mxa", 0, false, MODELTYPE_Morphing, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 	{ "sslick050.mxa", 0, false, MODELTYPE_Morphing, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 
-#endif
 
 	{ "" , 0 , false, MODELTYPE_Static, 0, false, DONTLOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD }
 };
@@ -1271,7 +1085,6 @@ static u_int8_t  VisCacheTitle;
 
 #endif
 
-#ifdef MODEL_BUCKET
 static u_int16_t VisBucketHead[MAXGROUPS];
 static u_int16_t VisBucketTail[MAXGROUPS];
 static u_int16_t VisBucketNext[MAXNUMOFMODELS];
@@ -1321,16 +1134,13 @@ static void ModelVisBucket_Build( int InTitle )
 	VisBucketGeneration = ModelVisGeneration;
 	VisBucketDirty = 0;
 }
-#endif
 
 void ModelVisCache_NewFrame( void )
 {
 #ifdef MODEL_VIS_CACHE
 	VisCacheFrame++;
 #endif
-#ifdef MODEL_BUCKET
 	VisBucketDirty = 1;
-#endif
 }
 
 
@@ -1339,16 +1149,10 @@ void ModelVisCache_NewFrame( void )
 
 /* Draw guard: with bucketing the model is already known to be visible and
  * already known to belong to this group; without it the predicate decides. */
-#ifdef MODEL_BUCKET
 #define MODEL_BUCKET_REFRESH(InTitle) \
 	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) || VisBucketGeneration != ModelVisGeneration ) \
 		ModelVisBucket_Build( InTitle ); } while(0)
 #define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup)  ( 1 )
-#else
-#define MODEL_BUCKET_REFRESH(InTitle) ((void)0)
-#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup) \
-	( ModelVisibleWithClip( (i), (InTitle), &(ClipGroup) ) && (ClipGroup) == (group) )
-#endif
 
 /* True if model i may be drawn for the current camera; *clipout receives
  * its clip group. Identical semantics with and without the memo - the flag
@@ -1384,93 +1188,6 @@ static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * cl
 #endif
 }
 
-#if defined(MODEL_BUCKET) && defined(MODEL_BUCKET_VERIFY)
-/* Correctness-only audit for MODEL_BUCKET. The normal bucket path replaces
- * a full Models[] walk per visible group with one per-camera bucket walk.
- * This diagnostic reconstructs the baseline-visible sequence for the current
- * group and compares it, element for element, with the bucket chain. It also
- * catches a stale bucket if model visibility/group state changes between the
- * bucket build and a later group call in the same camera.
- *
- * This deliberately performs the old O(models) work and must never be used
- * as a performance configuration. */
-static unsigned long g_model_bucket_verify_groups;
-static unsigned long g_model_bucket_verify_entries;
-static unsigned long g_model_bucket_verify_mismatches;
-static int g_model_bucket_verify_first_group = -1;
-static unsigned int g_model_bucket_verify_first_expected;
-static unsigned int g_model_bucket_verify_first_actual;
-
-void ModelVisBucket_Verify_Reset(void)
-{
-	g_model_bucket_verify_groups = 0;
-	g_model_bucket_verify_entries = 0;
-	g_model_bucket_verify_mismatches = 0;
-	g_model_bucket_verify_first_group = -1;
-	g_model_bucket_verify_first_expected = 0;
-	g_model_bucket_verify_first_actual = 0;
-}
-
-static void ModelVisBucket_Verify( u_int16_t group, int InTitle )
-{
-	u_int16_t expected = FirstModelUsed;
-	u_int16_t actual = VisBucketHead[ group ];
-
-	g_model_bucket_verify_groups++;
-	for (;;)
-	{
-		u_int16_t clip = 0;
-		int visible;
-
-		/* Find the next model the baseline guard would accept for this
-		 * group. This is exactly ModelVisibleWithClip() && clip==group. */
-		while (expected != (u_int16_t)-1)
-		{
-			visible = ModelVisibleWithClip( expected, InTitle, &clip );
-			if (visible && clip == group)
-				break;
-			expected = Models[ expected ].Prev;
-		}
-
-		if (expected == (u_int16_t)-1 && actual == (u_int16_t)-1)
-			break;
-		if (expected == (u_int16_t)-1 || actual == (u_int16_t)-1)
-		{
-			g_model_bucket_verify_mismatches++;
-			if (g_model_bucket_verify_first_group < 0)
-			{
-				g_model_bucket_verify_first_group = (int)group;
-				g_model_bucket_verify_first_expected =
-					(expected == (u_int16_t)-1) ? 0xffffu : (unsigned int)expected;
-				g_model_bucket_verify_first_actual =
-					(actual == (u_int16_t)-1) ? 0xffffu : (unsigned int)actual;
-			}
-			break;
-		}
-		if (expected != actual)
-		{
-			g_model_bucket_verify_mismatches++;
-			if (g_model_bucket_verify_first_group < 0)
-			{
-				g_model_bucket_verify_first_group = (int)group;
-				g_model_bucket_verify_first_expected = (unsigned int)expected;
-				g_model_bucket_verify_first_actual = (unsigned int)actual;
-			}
-		}
-		g_model_bucket_verify_entries++;
-		expected = Models[ expected ].Prev;
-		actual = VisBucketNext[ actual ];
-	}
-
-	PERF_MODEL_BUCKET_VERIFY_RESULT(
-		g_model_bucket_verify_groups,
-		g_model_bucket_verify_entries,
-		g_model_bucket_verify_mismatches,
-		g_model_bucket_verify_first_group,
-		g_model_bucket_verify_first_expected,
-		g_model_bucket_verify_first_actual );
-}
-#endif
 
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
@@ -1491,12 +1208,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if( NamePnt == &ModelNames[0] ) InTitle = false;
 	else InTitle = true;
-#ifdef MODEL_BUCKET
 	MODEL_BUCKET_REFRESH( InTitle );
-#if defined(MODEL_BUCKET_VERIFY)
-	ModelVisBucket_Verify( group, InTitle );
-#endif
-#endif
 #ifdef MODEL_VIS_CACHE
 	if( VisCacheTitle != (u_int8_t)(InTitle ? 1 : 0) )
 	{
@@ -1507,22 +1219,14 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 	}
 #endif
 
-#ifdef MODEL_BUCKET
 	/* Walk only this group's models, in list order (the bucket chains are
 	 * tail-appended in Models[] list order). ClipGroup is implied. */
 	i = VisBucketHead[ group ];
-#else
-	i = FirstModelUsed;
-#endif
 	while( i != (u_int16_t)-1 )
 	{
 		perf_stage_begin(PERF_S_MDLENTRY);
-#ifdef MODEL_BUCKET
 		nextmodel = VisBucketNext[i];
 		ClipGroup = VisBucketClip[i];
-#else
-		nextmodel = Models[i].Prev;
-#endif
 
 		if( MODEL_DRAW_GUARD( i, InTitle, group, ClipGroup ) )
 		{

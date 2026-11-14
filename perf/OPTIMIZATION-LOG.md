@@ -2607,3 +2607,34 @@ SHDLIT2 lesson, third occurrence). Release ELF now contains
 smemo_lookup (nm-verified). R22 re-judgment needed on a build that
 actually has the memo: slider50 build (also halves max eye-sep
 30->15 per owner request) pushed for that look.
+
+## 2026-11-14 — Shared cleanup (both repos): dead code out
+
+Removed: FRAME_INTERP prototype (files + hooks + knobs; dropped by
+owner), NODE_SQDIST (rejected candidate), SHADOWTEST (7 dead blocks),
+QUADIDX path (opt-in, wall-neutral; module + host test), bisect knobs
+MEMO_FORCE_MISS/MEMO_NO_COALESCE, MEMO_MF_* forensic counters and
+MEMO_VERIFY_FORENSICS. Each removal gates+release-build proven.
+Production features (STEREO_REPLAY/PERSIST/MODEL_BUCKET/CHE) are
+being baked in unconditionally next — flags exist only where a
+human flips them in normal use (runtime slider gate stays).
+
+## 2026-11-14 — Consolidation: production baked in, toggles out
+
+Per owner direction (features we agreed are production should not
+be build flags): STEREO_REPLAY, PERSIST_VERTS, MODEL_BUCKET and
+CHE_PREFILTER are compiled in unconditionally (runtime slider gate
+for persist/mono paths remains — that is a user control, not a
+flag). MEMO_VERIFY oracle removed. OG_PROFILE/OG_SIM/heap knobs
+removed (runtime OS detection was already the real mechanism).
+Ungated c3d_trace (per-call SD fopen/fclose, 17 sites) deleted;
+VERBOSE_TRACE diagnostic blocks dropped (DEATH_SIM conditions
+kept). Bench + release builds clean; gates ALL PASS.
+Remaining conditionals by design: platform (__3DS__/renderer/
+edition), harness knobs (ATM/framedump/fidelity/autotest — they
+move to forsaken-harness at the repo split), and upstream engine
+heritage. Harness snapshot: /mnt/nas/Development/forsaken-harness.
+Consolidation part 2 (same day): VERBOSE_TRACE blocks dropped,
+c3d_trace deleted, trace() routed to the single boot_log channel,
+SHADOWTEST residue (primary/models tables) out. Boot proof:
+final-consolidated.3dsx renders title (FPS: 59 in boot log).

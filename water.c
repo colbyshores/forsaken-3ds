@@ -689,9 +689,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	{
 		return;
 	}
-#ifdef STEREO_REPLAY
 	smemo_invalidate(); /* shared verts just integrated */
-#endif
 }
 
 /*===================================================================

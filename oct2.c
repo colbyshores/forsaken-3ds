@@ -66,13 +66,8 @@
 #include "music.h"
 #endif
 
-#ifdef SHADOWTEST
-#include "triangles.h"
-#include "shadows.h"
-#endif
 #include "perf_capture.h"
 #include "fidelity.h"
-#include "interp.h"
 #ifdef ATM_PROFILING
 #include "atm_prof.h"
 #endif
@@ -1884,7 +1879,7 @@ void DrawSimplePanel()
 
 void ReleaseLevel(void)
 {
-#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#if defined(__3DS__) && defined(DEATH_SIM)
 #define _RL_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/RL: " s); } while(0)
 #else
 #define _RL_TRACE(s) ((void)0)
@@ -2084,7 +2079,7 @@ InitScene(void)
 {
   int i;
 
-#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#if defined(__3DS__) && defined(DEATH_SIM)
 #define _IS_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/IS: " s); } while(0)
 #else
 #define _IS_TRACE(s) ((void)0)
@@ -2101,9 +2096,6 @@ InitScene(void)
   _IS_TRACE("InitFmPoly");
   InitFmPoly();
 
-#ifdef SHADOWTEST
-  InitTriangles();
-#endif
 
   _IS_TRACE("InitPolys");
   InitPolys();
@@ -2163,7 +2155,7 @@ bool InitView( void )
 {
 	DebugPrintf("InitView Starting...\n");
 
-#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#if defined(__3DS__) && defined(DEATH_SIM)
 #define _IV_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/IV: " s); } while(0)
 #else
 #define _IV_TRACE(s) ((void)0)
@@ -2544,15 +2536,6 @@ bool RenderScene( void )
 
   //DebugPrintf("RenderScene Started\n");
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-  { extern void trace(const char*); extern int _vt_flip_remaining;
-    if (_vt_flip_remaining > 0) {
-      char _b[64];
-      snprintf(_b, sizeof(_b), "RS: entry status=%u SeriousError=%d", (unsigned)MyGameStatus, (int)SeriousError);
-      trace(_b);
-    }
-  }
-#endif
 
   if ( SeriousError )
     return false;
@@ -3428,7 +3411,7 @@ bool RenderScene( void )
   case STATUS_QuitCurrentGame:
 	DebugState("STATUS_QuitCurrentGame\n");
 
-#if defined(__3DS__) && (defined(DEATH_SIM) || defined(VERBOSE_TRACE))
+#if defined(__3DS__) && defined(DEATH_SIM)
 #define _DS_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/QCG: " s); } while(0)
 #else
 #define _DS_TRACE(s) ((void)0)
@@ -4581,10 +4564,6 @@ void MainRoutines( void )
   ProcessShips();
   perf_stage_end(PERF_S_SHIPS, -1);
 
-#ifdef SHADOWTEST
-//  CreateSpotLight( (u_int16_t) WhoIAm, SHIP_RADIUS, &Mloadheader );
-//  CreateShadowsForShips();
-#endif
 
   perf_stage_begin(PERF_S_FIRES);
   FirePrimary();
@@ -5040,11 +5019,6 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		extern int  Print4x5Text(char *Text, int x, int y, int color);
 		char fps_buf[24];
 		snprintf(fps_buf, sizeof(fps_buf), "FPS:%d", forsaken_get_fps());
-#ifdef FRAME_INTERP_EXTRA_PRESENT
-		extern int interp_present_fps(void);
-		char present_buf[24];
-		snprintf(present_buf, sizeof(present_buf), "P:%d", interp_present_fps());
-#endif
 		ScrPolySetRouteBottom(true);
 		/* Bottom screen is 320×240. Clock sits at y = 240 - 30 = 210
 		 * (DrawSimplePanel) but the actual character glyphs render
@@ -5052,9 +5026,6 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		 * so y=200 had the FPS overlap with the clock. y=190 leaves
 		 * a clean ~10px gap between FPS row and clock row. */
 		Print4x5Text(fps_buf, 6, 190, 1 /* white */);
-#ifdef FRAME_INTERP_EXTRA_PRESENT
-		Print4x5Text(present_buf, 6, 180, 1 /* white */);
-#endif
 		ScrPolySetRouteBottom(false);
 	}
 
@@ -5189,10 +5160,6 @@ bool MainGameRender(void)
 #endif
 #endif
 
-#ifdef FRAME_INTERP
-      interp_frame_begin();
-      perf_stage_begin(PERF_S_INTERPTOTAL);
-#endif
       _MGR_STAGE("pre-render-camera");
       if( render_info.stereo_enabled )
       {
@@ -5213,59 +5180,6 @@ bool MainGameRender(void)
 				_MGR_STAGE("post-RenderCurrentCameraWithMainGameMenu");
 	  	}
 
-#ifdef FRAME_INTERP_PROBE
-      /* Temporal-interpolation feasibility probe (docs/validation/
-       * perf-2026-10-27-temporal-interp-feasibility.md): a second render
-       * traversal with *unchanged* state measures the floor cost of any
-       * CPU-side in-between pass. Draws the identical frame (last
-       * submission wins); flag-gated, never shipped.
-       * M1 render-purity check: fidelity_tick() runs once per tick
-       * (post-MainRoutines), so any hash motion across the repeated
-       * render is a draw path writing authoritative gameplay state. */
-      if( !render_info.stereo_enabled )
-      {
-#ifdef FIDELITY_DUMP
-				unsigned long _probe_h0 = fidelity_hash();
-#endif
-				perf_stage_begin(PERF_S_INTERPPROBE);
-				if( perf_guarded(PERF_S_INTERPPROBE, RenderCurrentCameraWithMainGameMenu() != true) )
-					return false;
-				perf_stage_end(PERF_S_INTERPPROBE, -1);
-#ifdef FIDELITY_DUMP
-				if( fidelity_hash() != _probe_h0 )
-				{
-					DebugPrintf("INTERPPROBE: repeated render moved gameplay hash %08lx -> %08lx\n", _probe_h0, fidelity_hash());
-#ifdef ATM_PROFILING
-					atm_prof_add(ATM_C_INTERP_DIRTY, 1);
-#endif
-				}
-#endif
-      }
-#endif
-
-#ifdef FRAME_INTERP
-      /* Temporal interpolation prototype: capture the post-simulation
-       * transforms, then render an in-between camera/model view. Gameplay
-       * is never re-run; true transforms are restored after the pass. */
-      if( !render_info.stereo_enabled && interp_ready() )
-      {
-				int _interp_ok = 1;
-				interp_apply( interp_alpha() );
-				perf_stage_begin(PERF_S_INTERPONLY);
-				_interp_ok = ( RenderCurrentCameraWithMainGameMenu() == true );
-				perf_stage_end(PERF_S_INTERPONLY, -1);
-#ifdef FRAME_INTERP_EXTRA_PRESENT
-				if (_interp_ok) interp_begin_extra_present();
-#endif
-				interp_restore();
-				if( !_interp_ok )
-					return false;
-      }
-      interp_frame_end();
-      interp_present();
-      perf_stage_end(PERF_S_INTERPTOTAL, -1);
-#endif
-  
 #ifdef __3DS__
       /* [3DS] Rear camera disabled on 3DS.
        * The rear camera requires a second full render pass (BSP traversal,
@@ -5478,9 +5392,6 @@ bool MainGame( void ) // bjd
   _3ds_mr_ctx = "post-MainRoutines";
 #endif
   _MG_STAGE("post-MainRoutines");
-#ifdef FRAME_INTERP
-  interp_capture_models();
-#endif
 
   if( MyGameStatus == STATUS_QuitCurrentGame )
     return true;
@@ -6182,10 +6093,6 @@ bool RenderCurrentCamera( void )
         return false;
     _RC_STAGE("post-DisplaySolidGroupUnclippedPolys");
 
-#ifdef SHADOWTEST
-    if( !DisplaySolidGroupUnclippedTriangles( RenderBufs[ 0 ], lpDev, lpView ) )
-        return false;
-#endif
 
   /* Per-group draw loop. Trace iteration count so an infinite loop or
    * hang on a specific group is visible. Counter resets per-call. */
@@ -6268,10 +6175,6 @@ bool RenderCurrentCamera( void )
   }
   perf_stage_end(PERF_S_OPQPOLYS, -1);
     _RC_SUBSTAGE("post-DisplaySolidGroupClippedPolys");
-#ifdef SHADOWTEST
-  if( !DisplaySolidGroupClippedTriangles( RenderBufs[ 1 ], group, lpDev, lpView ) )
-    return false;
-#endif
     #undef _RC_SUBSTAGE
   }
   _RC_STAGE("opaque-loop EXIT");
@@ -6359,10 +6262,6 @@ bool RenderCurrentCamera( void )
     _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedPolys");
   perf_stage_end(PERF_S_TRANCLIP, -1);
 
-#ifdef SHADOWTEST
-  if( !DisplayGroupClippedTriangles( RenderBufs[ 1 ], group, lpDev, lpView ) )
-    return false;
-#endif
 
 /*===================================================================
 Display Group Clipped Faceme Transluecent Polys
@@ -6407,10 +6306,6 @@ Display Group Clipped Faceme Transluecent Polys
     perf_stage_end(PERF_S_TRANUNCLIP, -1);
     perf_stage_end(PERF_S_TRANPOLYS, -1);
     perf_stage_begin(PERF_S_TRANMISC);
-#ifdef SHADOWTEST
-    if( !DisplayGroupUnclippedTriangles( RenderBufs[ 0 ], lpDev, lpView ) )
-      return false;
-#endif
   
   // display unclipped translucencies
   perf_stage_begin(PERF_S_TRANEXE);
@@ -6986,15 +6881,6 @@ void PrintInitViewStatus( BYTE Status )
 	{
 		bool _vok = FSCreateDynamic2dVertexBuffer(&ro, 32767);
 		bool _iok = FSCreateIndexBuffer(&ro, 32767*3);
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-		{ extern void trace(const char*); extern int _vt_flip_remaining;
-		  if (_vt_flip_remaining > 0) {
-		    char _b[64];
-		    snprintf(_b, sizeof(_b), "PIVS: alloc v=%d i=%d", (int)_vok, (int)_iok);
-		    trace(_b);
-		  }
-		}
-#endif
 #ifdef __3DS__
 		if (_pivs_trace_now) {
 			extern void trace(const char*); char _b[64];

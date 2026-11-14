@@ -41,18 +41,14 @@ extern bool render_init(render_info_t *info);
  * SystemMode for OG users who want full quality and have a working menu.
  *
  * In either case we don't know at compile time how much memory the OS
- * will hand us, so the heap sizes have to be picked at runtime in the
- * __system_allocateHeaps weak override below (except an explicit
- * OG_PROFILE/FORSAKEN_HEAP_FIXED test build). Detection signal:
+ * will hand us, so the heap sizes are picked at runtime in the
+ * __system_allocateHeaps weak override below. Detection signal:
  * osGetMemRegionSize(MEMREGION_APPLICATION) — the actual region the OS
  * gave us:
  *   - >= 96 MB (N3DS SystemModeExt = 124 MB, or OG HIMEM = 96 MB):
  *     32+32 MB heap, 512² texture pack via render_c3d.c.
  *   - <  96 MB (OG without HIMEM grant = 64 MB):
- *     32+22 MB heap, 256² texture pack via render_c3d.c.
- *
- * The link-time defaults below are used by FORSAKEN_HEAP_FIXED and OG_PROFILE.
- * OG_PROFILE intentionally fixes the OG 32+22 MB split on a New3DS device. */
+ *     32+22 MB heap, 256² texture pack via render_c3d.c. */
 #ifndef MALLOC_HEAP_MB
 #define MALLOC_HEAP_MB 32
 #endif
@@ -68,7 +64,6 @@ u32 __stacksize__           = 256 * 1024; /* override libctru's 32 KB default */
  * osGetMemRegionSize is safe to call here. Mirrors the steps in
  * libctru-2.7.0's default (svcControlMemory ×2 + mappableInit + sbrk
  * fakes); diverges only in choosing heap sizes based on region. */
-#if !defined(FORSAKEN_HEAP_FIXED) && !defined(FORSAKEN_OG_PROFILE)
 #include <3ds/os.h>
 #include <3ds/svc.h>
 #include <3ds/allocator/mappable.h>
@@ -112,7 +107,6 @@ void __system_allocateHeaps(void)
 	fake_heap_start = (char *)__ctru_heap;
 	fake_heap_end   = (char *)__ctru_heap + __ctru_heap_size;
 }
-#endif
 
 /* ---- init state tracking ---- */
 
@@ -184,93 +178,13 @@ void vfp_thread_fz_dn(void)
  *
  * Truncation policy (debug builds only): the file is truncated
  * EXACTLY ONCE per process lifetime, on the very first call to
- * either trace_enable() or trace(). Subsequent re-opens (e.g., after
+ * either trace_enable() or boot_log(). Subsequent re-opens (e.g., after
  * a trace_dump() close) use O_APPEND so we don't lose what was
  * written before the close. Without this, the autotest's "DONE ->
  * trace_dump() -> chain-load" path was wiping the whole trace
- * because platform_shutdown's later trace() call would re-open with
+ * because platform_shutdown's later boot_log() call would re-open with
  * O_TRUNC. */
 #include <fcntl.h>
-
-#ifdef __3DS_DEBUG__
-static int  _trace_fd = -1;
-static int  _trace_enabled = 0;
-static int  _trace_truncated_once = 0;
-
-static void _trace_open(void) {
-	int flags = O_WRONLY | O_CREAT |
-	            (_trace_truncated_once ? O_APPEND : O_TRUNC);
-	_trace_fd = open("sdmc:/forsaken_trace.txt", flags, 0666);
-	_trace_truncated_once = 1;
-}
-
-void trace_enable(void) {
-	_trace_enabled = 1;
-	if (_trace_fd < 0) _trace_open();
-}
-
-void trace(const char *msg)
-{
-	/* Auto-open the trace file on first call even if trace_enable()
-	 * hasn't been called yet, so unsolicited trace points (e.g. a
-	 * checkpoint deep inside the loader) still survive a crash. */
-	if (_trace_fd < 0) {
-		_trace_open();
-		_trace_enabled = 1;
-	}
-	svcOutputDebugString(msg, strlen(msg));
-	if (_trace_enabled && _trace_fd >= 0) {
-		int len = strlen(msg);
-		write(_trace_fd, msg, len);
-		write(_trace_fd, "\n", 1);
-		fsync(_trace_fd);
-	}
-}
-#else
-/* Release: no trace infrastructure at all. Call sites still resolve
- * (the function exists), but the body is empty so the optimizer
- * deletes the snprintf chain that built the trace string. */
-void trace_enable(void) {}
-void trace(const char *msg) { (void)msg; }
-#endif /* __3DS_DEBUG__ */
-
-/* boot_log — always-on diagnostic write for boot-time failure tracking.
- * Writes to sdmc:/forsaken_boot.log.  Unlike trace() this is NOT gated
- * on __3DS_DEBUG__; useful for diagnosing CIA installs that fail to
- * boot in the field (e.g. LOMEM bring-up).  The last line in the file
- * is the last checkpoint the boot path reached before failure.
- *
- * Truncates the file on the very first call this process, then appends.
- * Each call also flushes via fsync so a sudden process termination
- * doesn't lose recent writes. */
-static int  _boot_log_fd        = -1;
-static int  _boot_log_truncated = 0;
-
-void boot_log(const char *msg)
-{
-	if (_boot_log_fd < 0) {
-		int flags = O_WRONLY | O_CREAT |
-		            (_boot_log_truncated ? O_APPEND : O_TRUNC);
-		_boot_log_fd = open("sdmc:/forsaken_boot.log", flags, 0666);
-		_boot_log_truncated = 1;
-	}
-	if (_boot_log_fd >= 0) {
-		int len = (int)strlen(msg);
-		write(_boot_log_fd, msg, len);
-		write(_boot_log_fd, "\n", 1);
-		fsync(_boot_log_fd);
-	}
-}
-
-void trace_dump(void) {
-#ifdef __3DS_DEBUG__
-	/* Flush only — don't close. Re-opens with O_APPEND would still
-	 * preserve content per the truncated-once policy, but keeping the
-	 * fd open avoids the open()/close() cost on chain-load paths that
-	 * call trace() again immediately afterward. */
-	if (_trace_fd >= 0) fsync(_trace_fd);
-#endif
-}
 
 /* Runtime flag — when true, DrawSimplePanel prints raw 3D-slider value,
  * stereo_eye_sep, and the on/off state so we can diagnose binary-seeming
@@ -295,6 +209,36 @@ void memcpy_unaligned(void *dst, const void *src, size_t n)
 	while (n--) *d++ = *s++;
 }
 
+/* boot_log — the single always-on diagnostic channel. Writes to
+ * sdmc:/forsaken_boot.log, truncating on first call this process,
+ * then appending; fsync per call so a sudden termination does not
+ * lose the last checkpoint. Boot/init-path use only. */
+static int  _boot_log_fd        = -1;
+static int  _boot_log_truncated = 0;
+
+void boot_log(const char *msg)
+{
+	if (_boot_log_fd < 0) {
+		int flags = O_WRONLY | O_CREAT |
+		            (_boot_log_truncated ? O_APPEND : O_TRUNC);
+		_boot_log_fd = open("sdmc:/forsaken_boot.log", flags, 0666);
+		_boot_log_truncated = 1;
+	}
+	if (_boot_log_fd >= 0) {
+		int len = (int)strlen(msg);
+		write(_boot_log_fd, msg, len);
+		write(_boot_log_fd, "\n", 1);
+		fsync(_boot_log_fd);
+	}
+}
+
+/* Legacy trace() call sites across the engine route to the single
+ * boot_log channel. boot_log fsyncs per call, so the old trace_dump
+ * flush is a no-op. */
+void trace(const char *msg) { boot_log(msg); }
+void trace_dump(void) {}
+void trace_enable(void) {}
+
 /* ---- platform init ---- */
 
 bool platform_init(void)
@@ -302,7 +246,6 @@ bool platform_init(void)
 	_ticks_base = svcGetSystemTick();
 
 	/* Ensure trace ring is dumped on any exit */
-	atexit(trace_dump);
 
 	/* Disable upstream's Debug flag. WinMain on PC sets Debug=false during
 	 * startup (main.c:161), but on 3DS we don't run WinMain so the flag
@@ -317,7 +260,7 @@ bool platform_init(void)
 		Debug = false;
 	}
 
-	trace("platform_init: start");
+	boot_log("platform_init: start");
 	boot_log("[boot] platform_init: start");
 
 	/* Verify __system_allocateHeaps set up mappableInit correctly.  Our
@@ -353,11 +296,7 @@ bool platform_init(void)
 	bool is_n3ds = false;
 	APT_CheckNew3DS(&is_n3ds);
 	if (is_n3ds) {
-#ifdef FORSAKEN_OG_PROFILE
-		osSetSpeedupEnable(false);
-#else
 		osSetSpeedupEnable(true);
-#endif
 	}
 
 	/* Always-on boot_log of the platform-detection result. This lands
@@ -367,18 +306,11 @@ bool platform_init(void)
 	{
 		u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
 		const char *tier = region_size >= 96ull * 1024 * 1024 ? "HIMEM (512²)" : "LOMEM (256²)";
-#ifdef FORSAKEN_OG_PROFILE
-		tier = "OG_PROFILE (256²)";
-#endif
 		char _b[200];
 		snprintf(_b, sizeof(_b),
 		         "[platform] is_n3ds=%d og_profile=%d clock=%s cache=%s region=%uMB tier=%s malloc=%uMB linear=%uMB",
 		         (int)is_n3ds,
-#ifdef FORSAKEN_OG_PROFILE
-		         1, "268MHz", "L2-off",
-#else
 		         0, is_n3ds ? "804MHz" : "268MHz", is_n3ds ? "L2-on" : "L2-off",
-#endif
 		         (unsigned)(region_size >> 20),
 		         tier,
 		         (unsigned)(__ctru_heap_size >> 20),
@@ -400,11 +332,11 @@ bool platform_init(void)
 		bool ok = Hunk_Init(8 * 1024 * 1024);
 		char _b[96];
 		snprintf(_b, sizeof(_b), "Hunk_Init: %s (8MB)", ok ? "OK" : "FAILED");
-		trace(_b);
+		boot_log(_b);
 		if (!ok) return false;
 	}
 
-	trace("platform_init: romfsInit");
+	boot_log("platform_init: romfsInit");
 
 	/* romfs precedence: try the .3dsx's embedded romfs FIRST. If that
 	 * fails (slim build with no embedded section), fall back to
@@ -423,9 +355,9 @@ bool platform_init(void)
 	{
 		Result rc = romfsInit();
 		if (R_SUCCEEDED(rc)) {
-			trace("platform_init: using embedded romfs");
+			boot_log("platform_init: using embedded romfs");
 		} else {
-			trace("platform_init: no embedded romfs, trying sdmc fallback");
+			boot_log("platform_init: no embedded romfs, trying sdmc fallback");
 			static const u16 ext_path[] = u"/3ds/forsaken/forsaken.romfs";
 			FS_Path apath = { PATH_EMPTY, 1, (u8*)"" };
 			FS_Path fpath = { PATH_UTF16, sizeof(ext_path), (u8*)ext_path };
@@ -434,13 +366,13 @@ bool platform_init(void)
 			if (R_SUCCEEDED(rc)) {
 				rc = romfsMountFromFile(fh, 0, "romfs");
 				if (R_SUCCEEDED(rc)) {
-					trace("platform_init: mounted external sdmc romfs");
+					boot_log("platform_init: mounted external sdmc romfs");
 				} else {
 					FSFILE_Close(fh);
-					trace("platform_init: ERROR — sdmc romfs mount failed");
+					boot_log("platform_init: ERROR — sdmc romfs mount failed");
 				}
 			} else {
-				trace("platform_init: ERROR — no romfs available");
+				boot_log("platform_init: ERROR — no romfs available");
 			}
 		}
 	}
@@ -453,7 +385,7 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds/forsaken", 0777);
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
 
-	trace("platform_init: done");
+	boot_log("platform_init: done");
 	boot_log("[boot] platform_init: done OK");
 
 	return true;
@@ -471,8 +403,8 @@ bool platform_init(void)
 bool platform_init_video(void)
 {
 	boot_log("[boot] platform_init_video: entry");
-	trace("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
-	trace("platform_init_video: gfxInitDefault");
+	boot_log("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
+	boot_log("platform_init_video: gfxInitDefault");
 
 	/* Initialize 3DS graphics service (GSP) - required before picaGL.
 	 *
@@ -542,13 +474,13 @@ bool platform_init_video(void)
 	}
 
 	boot_log("[boot] platform_init_video: pre-pglInit");
-	trace("platform_init_video: pglInit");
+	boot_log("platform_init_video: pglInit");
 
 	/* Initialize citro3d-backed picaGL */
 	pglInit();
 
 	_video_initialized = true;
-	trace("platform_init_video: pglInit done");
+	boot_log("platform_init_video: pglInit done");
 	boot_log("[boot] platform_init_video: pglInit done");
 
 	render_info.ThisMode.w = SCREEN_WIDTH;
@@ -608,14 +540,8 @@ float platform_get_3d_slider(void)
 	 * unpinned slider makes "the same run" depend on where the slider
 	 * happened to be, so mono and stereo baselines would not be comparable.
 	 * The ATM benchmark forces one state for the whole run; measurement-only,
-	 * never set in a shipping build (same role as FRAME_INTERP_FORCE_MONO). */
+	 * never set in a shipping build. */
 	return ATM_BENCH_STEREO ? 1.0f : 0.0f;
-#elif defined(FRAME_INTERP_FORCE_MONO)
-	/* Measurement-only override for the temporal-interpolation prototype:
-	 * the in-between pass is defined for a single eye, and stereo would
-	 * multiply both the traversal and the extra pass by two. Never set in
-	 * a shipping build. */
-	return 0.0f;
 #else
 	float override = config_get_float("stereo_test_slider", -1.0f);
 	if (override >= 0.0f)
@@ -630,40 +556,18 @@ float platform_get_3d_slider(void)
 
 /* ---- frame present ---- */
 
-#ifdef VERBOSE_TRACE
-/* Counter armed by autotest_tick before a hot-jump. Decremented on each
- * frame present so we get enter/exit traces around the first ~8 swaps
- * after the transition — enough to see if the GPU hangs in pglSwapBuffers
- * or if we stop entering present at all. */
-int _vt_flip_remaining = 0;
-#endif
 
 void platform_render_present(render_info_t *info)
 {
 	(void)info;
-#ifdef VERBOSE_TRACE
-	if (_vt_flip_remaining > 0) {
-		char _b[48];
-		snprintf(_b, sizeof(_b), "FLIP: enter (%d left)", _vt_flip_remaining);
-		trace(_b);
-	}
 	pglSwapBuffers();
-	if (_vt_flip_remaining > 0) {
-		char _b[48];
-		snprintf(_b, sizeof(_b), "FLIP: exit (%d left)", _vt_flip_remaining);
-		trace(_b);
-		_vt_flip_remaining--;
-	}
-#else
-	pglSwapBuffers();
-#endif
 }
 
 /* ---- shutdown ---- */
 
 void platform_shutdown(void)
 {
-	trace("platform_shutdown: dumping trace ring");
+	boot_log("platform_shutdown: dumping trace ring");
 	trace_dump();
 	if (_video_initialized)
 	{

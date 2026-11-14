@@ -38,8 +38,6 @@ FRAMEDUMP_CFLAGS := $(if $(FRAMEDUMP),-DFRAMEDUMP,)
 # emulators do not bridge the trigger socket, so the self-test fires
 # the capture path without network). Requires FRAMEDUMP=1.
 SELFTEST_CFLAGS := $(if $(FRAMEDUMP_SELFTEST_AT),-DFRAMEDUMP_SELFTEST_AT=$(FRAMEDUMP_SELFTEST_AT),)
-# NODE_SQDIST=1 selects the squared-distance candidate in UpdateNearestNodeSpecial (fidelity-gated experiment)
-NODESQ_CFLAGS := $(if $(NODE_SQDIST),-DNODE_SQDIST,)
 # FIDELITY_CHECKPOINTS=1 adds per-tick-interval hash checkpoints to the fidelity file (divergence localization)
 FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
 # FIDELITY_CHECKPOINT_TICKS=N sets the checkpoint interval (default 250).
@@ -48,65 +46,15 @@ FIDELITY_CHECKPOINT_TICKS ?= 250
 FIDCKT_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINT_TICKS=$(FIDELITY_CHECKPOINT_TICKS),)
 # MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
 VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
-# MODEL_BUCKET=1 (default) indexes models by clip group once per camera instead of re-walking the model list per group.
-# 2026-11-14 stereo A/B on this branch: 88,443 -> 77,705/77,635us
-# (-12%, two runs within 70us), fidelity byte-identical, draws/verts
-# counts identical. (Mono was wall-neutral in the 2026-11-12 A/B/A;
-# stereo doubles the traversal the bucket eliminates.) Converges
-# with master's default. Set MODEL_BUCKET=0 to opt out.
-MODEL_BUCKET ?= 1
-BUCKET_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET)),-DMODEL_BUCKET,)
-# MODEL_BUCKET_VERIFY=1 adds an opt-in, correctness-only check that every
-# MODEL_BUCKET group contains exactly the baseline-visible model sequence.
-# It deliberately re-walks Models[] and is not a performance build.
-MODEL_BUCKET_VERIFY ?= 0
-# CHE_PREFILTER=1 enables the SoundInfo group pre-filter in CheckHitEnemy
-# (checkenemy.c): skip enemies in groups with no direct visibility from the
-# bullet's group before any per-enemy vector math. Default 1 (on): validated
-# 2026-11-11 — fidelity A/B byte-identical on ramqan + bio-sphere, ramqan mono
-# wall -7.7ms (-13%), host test tests/test_checkhitenemy.c green. Combat
-# trajectories (firing input) remain uncovered by the bench — see the log.
-CHE_PREFILTER ?= 1
 # STRESS_SCRATCH_VERTS=N caps the scratch vertex arena at N verts (R02
 # overflow-path stress; forces mid-frame splits every frame). Debug only,
 # never ship: it destroys batching and the memo. 0 (default) = full arena.
 STRESS_SCRATCH_VERTS ?= 0
-# PERSIST_VERTS=1 (default) retains converted level-wall verts across
-# frames (R05). Runtime-gated to mono (3D slider down) where it pays
-# -8.6%; stereo keeps the memo-only path (persist is wall-flat there
-# and only LSB-equivalent across eyes). Set 0 to disable entirely.
-PERSIST_VERTS ?= 1
-# QUADIDX_VERTS=1 enables the TF04-A shared quad index table for
-# canonical 4-vert billboard texgroups, runtime-gated to mono (slider
-# down) like PERSIST_VERTS. Default 0 (opt-in): mechanism proven
-# (tverts -33.3% exactly) but wall-neutral on the current stack —
-# MODEL_BUCKET already removed the CPU headroom it would exploit
-# (mono A/B 51,274 on vs 51,484 off). Revisit if bucket turns off.
-QUADIDX_VERTS ?= 0
-STRESS_SCRATCH_CFLAGS := $(if $(filter-out 0,$(STRESS_SCRATCH_VERTS)),-DSTRESS_SCRATCH_VERTS=$(STRESS_SCRATCH_VERTS),)
-CHE_PREFILTER_CFLAGS := $(if $(filter 1,$(CHE_PREFILTER)),-DCHE_PREFILTER,)
 # FRAMEDUMP_BENCH_STILLS=1 auto-dumps exact bench frames 60/120/180 (step-1
 # reference stills; deterministic). Requires FRAMEDUMP=1. Default 0 (off).
 FRAMEDUMP_BENCH_STILLS ?= 0
-BUCKET_VERIFY_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET_VERIFY)),-DMODEL_BUCKET_VERIFY,)
-ifneq ($(filter 1,$(MODEL_BUCKET_VERIFY)),)
-ifeq ($(filter 1,$(MODEL_BUCKET)),1)
-else
-$(error MODEL_BUCKET_VERIFY=1 requires MODEL_BUCKET=1)
-endif
-endif
-# FRAME_INTERP=1 renders an extra frame at an interpolated camera between the previous and current frames (temporal interpolation prototype)
-INTERPFRAME_CFLAGS := $(if $(FRAME_INTERP),-DFRAME_INTERP,)
-# FRAME_INTERP_FORCE_MONO=1 disables stereo in the interpolation prototype build (measurement only)
-FORCEMONO_CFLAGS := $(if $(FRAME_INTERP_FORCE_MONO),-DFRAME_INTERP_FORCE_MONO,)
-# FRAME_INTERP_EXTRA_PRESENT=1 enables a true extra display transfer between simulation frames (experimental pacing)
-INTERPPRESENT_CFLAGS := $(if $(FRAME_INTERP_EXTRA_PRESENT),-DFRAME_INTERP_EXTRA_PRESENT,)
-# OG_PROFILE=1 uses exact N3DS 268MHz/L2-off CPU mode plus OG-shaped heap and texture tiers.
+STRESS_SCRATCH_CFLAGS := $(if $(filter-out 0,$(STRESS_SCRATCH_VERTS)),-DSTRESS_SCRATCH_VERTS=$(STRESS_SCRATCH_VERTS),)
 # RAM is approximated; platform/scheduler/GPU behavior remain New 3DS.
-OGPROFILE_CFLAGS := $(if $(OG_PROFILE),-DFORSAKEN_OG_PROFILE -DFORSAKEN_HEAP_FIXED,)
-# FRAME_INTERP_PROBE=1 renders each frame twice (identical state) to measure the
-# floor cost of a CPU in-between pass — temporal-interpolation feasibility only.
-INTERP_CFLAGS := $(if $(FRAME_INTERP_PROBE),-DFRAME_INTERP_PROBE,)
 
 # ATM_PROFILING=1 links the shared ATM telemetry core and enables the fixed
 # deterministic benchmark that publishes /3ds/atm_result.txt for the ATM
@@ -131,15 +79,6 @@ ATM_BENCH_STEREO ?= 0
 # trigger. Same discipline as the AUTOTEST_REMASTER hold in input_3ds.c,
 # but without the level-sweep apparatus (dwell, chainload, DEBUG traces).
 ATM_BENCH_FIRE ?= 0
-# MEMO_VERIFY=1 converts live alongside every memo hit and memcmps against
-# the recorded range (single-player stereo bench only). Proves the memoised
-# vertices are what a live convert would produce; any mismatch increments
-# the memo_mismatch counter. Validation-only: the ship build skips the
-# redundant conversion.
-MEMO_VERIFY ?= 0
-# MEMO_VERIFY_FORENSICS=1 adds a one-shot first-mismatch boot_log line
-# (key, offsets, first-differing word + both values). Debug only.
-MEMO_VERIFY_FORENSICS ?= 0
 # ATM_HEADLESS=1 restores the ATM-launch configuration (custom __appInit
 # without aptInit + aptMainLoop-free main loop) for one-shot payloads that
 # ATM launches while HOME stays foreground. Game benchmarks pushed via
@@ -147,28 +86,10 @@ MEMO_VERIFY_FORENSICS ?= 0
 # app as a proper NS foreground title, so normal init applies (proven by
 # the framedump render-proof builds).
 ATM_HEADLESS ?= 0
-# STEREO_REPLAY=1 (default) enables the single-pass stereo vertex memo:
-# the left eye records converted vertex ranges keyed by fill epoch; the
-# right eye reuses them (never skips a draw — traversal, visibility,
-# uniforms and HUD all run per eye). Measured -5 to -7% stereo wall on
-# ramqan/Old 3DS, fidelity byte-identical. Known accepted limitation:
-# animated texture surfaces can lag one UV step in the right eye
-# (~9% of frame-15 pixels on lava/water-type surfaces; static content
-# byte-identical) — R22 human A/B reviewed on hardware 2026-11-13 and
-# accepted ("fine"). Set STEREO_REPLAY=0 to opt out. The old whole-list
-# display replay this flag once gated was proven to draw wrong-eye
-# geometry and is gone; see perf/OPTIMIZATION-LOG.md opt5/opt5b.
-STEREO_REPLAY ?= 1
-# Shipped-feature flag wiring. These MUST be defined here (above the
-# CFLAGS := expansion at the Compiler flags section) and consumed via
-# the *_CFLAGS list there — the previous wiring lived inside the
-# ATM_PROFILING block, so release builds silently never defined
-# STEREO_REPLAY/PERSIST_VERTS at all (caught 2026-11-14 when the
-# QUADIDX code referenced memo-guarded decls unconditionally and the
-# release build stopped). Same incident class as the SHDLIT2 lesson.
-STEREO_CFLAGS := $(if $(filter 1,$(STEREO_REPLAY)),-DSTEREO_REPLAY,)
-PERSIST_CFLAGS := $(if $(filter 1,$(PERSIST_VERTS)),-DPERSIST_VERTS,)
-QUADIDX_CFLAGS := $(if $(filter 1,$(QUADIDX_VERTS)),-DQUADIDX_VERTS,)
+# Shipped features (stereo memo, persist, buckets, CHE pre-filter)
+# are compiled in unconditionally — no feature flags. Only platform
+# (renderer/edition) and measurement-harness knobs remain, and the
+# harness knobs live in the forsaken-harness tree, not here.
 
 #---------------------------------------------------------------------------------
 # Flag matrix — what each knob is for, and when it goes away.
@@ -181,23 +102,14 @@ QUADIDX_CFLAGS := $(if $(filter 1,$(QUADIDX_VERTS)),-DQUADIDX_VERTS,)
 #   (ATMBF=1 adds held primary fire: the combat bench. Same loop.)
 #   FRAMEDUMP + FRAMEDUMP_SELFTEST_AT  pixel proof (stills + FNV log)
 #   FIDELITY_DUMP (+FIDELITY_CHECKPOINTS)  gameplay-trajectory proof
-#   FRAME_INTERP_PROBE  cost-of-second-render floor (M1 vehicle)
 #   PERF_CAPTURE  per-stage breakdowns (shares only)
 # SHIPPED FEATURES (default builds; gates cover):
-#   CHE_PREFILTER=1, STEREO_REPLAY=1 (stereo memo, R22-accepted),
-#   MODEL_BUCKET (flag-only), R1 helpers, GPU lighting path
 # EXPERIMENTS (A/B only, default 0/off):
-#   MODEL_VIS_CACHE, MODEL_BUCKET_VERIFY, NODE_SQDIST,
-#   FRAME_INTERP* (prototype; EXTRA_PRESENT dies in M2 when the spec
-#   scheduler replaces the prototype present path)
 # COMPAT / ENV (not perf work):
-#   OG_SIM (heap-only alias), OG_PROFILE, MALLOC/LINEAR_HEAP_MB,
 #   AUTOTEST_REMASTER* (level-sweep fidelity vehicle), ATM_HEADLESS
 #   (ATM-launched payloads only — NEVER for 3dslink/stub pushes),
 #   DEBUG, RENDERER, EDITION, SLIM
 # SCHEDULED REMOVALS (only at these points, not before):
-#   FRAME_INTERP_EXTRA_PRESENT → M2 scheduler lands
-#   STEREO_REPLAY → landed (R22-accepted default); flag stays as opt-out
 #---------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------
@@ -276,20 +188,8 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(FIDCKT_CFLAGS) \
 	$(FRAMEDUMP_CFLAGS) \
 	$(SELFTEST_CFLAGS) \
-	$(INTERP_CFLAGS) \
-	$(INTERPFRAME_CFLAGS) \
-	$(FORCEMONO_CFLAGS) \
-	$(INTERPPRESENT_CFLAGS) \
-	$(OGPROFILE_CFLAGS) \
 	$(VIS_CFLAGS) \
-	$(BUCKET_CFLAGS) \
-	$(BUCKET_VERIFY_CFLAGS) \
-	$(CHE_PREFILTER_CFLAGS) \
 	$(STRESS_SCRATCH_CFLAGS) \
-	$(STEREO_CFLAGS) \
-	$(PERSIST_CFLAGS) \
-	$(QUADIDX_CFLAGS) \
-	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
 	-DBSP \
@@ -385,29 +285,6 @@ ifeq ($(AUTOTEST_REMASTER),1)
 CFLAGS += -DAUTOTEST_REMASTER -D__3DS_DEBUG__
 endif
 
-# OG_PROFILE=1 is a development proxy for an Old-3DS profile on N3DS.
-# Skips 804MHz/L2; caps malloc/linear heaps to the observed OG-app defaults
-# (32+22 MB); selects the 256x texture pack even on a 96MB+ New region. CPU
-# clock/cache is exact; RAM capacity is approximate; GPU, scheduler, memory
-# bandwidth/latency and platform characteristics remain New 3DS. Do NOT report
-# it as a real Old-3DS result. Override heap sizes with MALLOC_HEAP_MB=N
-# LINEAR_HEAP_MB=N. OG_SIM is retained as the historical 30+30 heap-only mode.
-ifeq ($(OG_PROFILE),1)
-MALLOC_HEAP_MB ?= 32
-LINEAR_HEAP_MB ?= 22
-CFLAGS += -DFORSAKEN_OG_PROFILE -DFORSAKEN_HEAP_FIXED
-endif
-# OG_SIM=1 remains a heap-only compatibility alias (historical build usage).
-ifeq ($(OG_SIM),1)
-MALLOC_HEAP_MB ?= 30
-LINEAR_HEAP_MB ?= 30
-endif
-ifdef MALLOC_HEAP_MB
-CFLAGS += -DMALLOC_HEAP_MB=$(MALLOC_HEAP_MB)
-endif
-ifdef LINEAR_HEAP_MB
-CFLAGS += -DLINEAR_HEAP_MB=$(LINEAR_HEAP_MB)
-endif
 
 # AUTOTEST_FIRST_LEVEL=N overrides the sweep's starting slot so we can
 # resume a sweep from where the previous run failed without re-cycling
@@ -435,16 +312,6 @@ endif
 
 # ATM_BENCH_FIRE=1 without the bench is an always-firing dev build that
 # helps nobody — refuse it (MODEL_BUCKET_VERIFY precedent).
-# MEMO_VERIFY=1 converts live alongside every memo hit (see render_c3d.c)
-# so it also requires the bench result channel for its mismatch counter.
-ifeq ($(filter 1,$(MEMO_VERIFY)),1)
-ifneq ($(ATM_PROFILING),1)
-$(error MEMO_VERIFY=1 requires ATM_PROFILING=1)
-endif
-ifneq ($(filter 1,$(STEREO_REPLAY)),1)
-$(error MEMO_VERIFY=1 requires STEREO_REPLAY=1)
-endif
-endif
 ifeq ($(filter 1,$(ATM_BENCH_FIRE)),1)
 ifneq ($(ATM_PROFILING),1)
 $(error ATM_BENCH_FIRE=1 requires ATM_PROFILING=1)
@@ -462,18 +329,8 @@ CFLAGS += -DATM_BENCH_FRAMES=$(ATM_BENCH_FRAMES)
 CFLAGS += -DATM_BENCH_WARMUP=$(ATM_BENCH_WARMUP)
 CFLAGS += -DATM_BENCH_STEREO=$(ATM_BENCH_STEREO)
 CFLAGS += $(if $(filter 1,$(ATM_BENCH_FIRE)),-DATM_BENCH_FIRE,)
-CFLAGS += $(if $(filter 1,$(MEMO_VERIFY)),-DMEMO_VERIFY,)
-CFLAGS += $(if $(filter 1,$(MEMO_VERIFY_FORENSICS)),-DMEMO_VERIFY_FORENSICS,)
-CFLAGS += $(if $(filter 1,$(MEMO_FORCE_MISS)),-DMEMO_FORCE_MISS,)
-CFLAGS += $(if $(filter 1,$(MEMO_NO_COALESCE)),-DMEMO_COALESCE_SUBMIT=0,)
-ifeq ($(filter 1,$(QUADIDX_VERTS)),1)
-ifneq ($(filter 1,$(STEREO_REPLAY)),1)
-$(error QUADIDX_VERTS=1 requires STEREO_REPLAY=1)
-endif
-endif
-CFLAGS += $(if $(filter 1,$(QUADIDX_VERTS)),-DQUADIDX_VERTS,)
-CFLAGS += $(if $(filter 1,$(ATM_HEADLESS)),-DATM_HEADLESS,)
 CFLAGS += $(if $(filter 1,$(FRAMEDUMP_BENCH_STILLS)),-DFRAMEDUMP_BENCH_STILLS,)
+CFLAGS += $(if $(filter 1,$(ATM_HEADLESS)),-DATM_HEADLESS,)
 # Compiled from outside $(SRCDIR), so it needs an explicit rule (below) and
 # cannot ride the $(SRCDIR)/%.c pattern. It is also deliberately outside the
 # AGENTS.md gate scope: vendored shared ATM firmware, not Forsaken game code.
@@ -564,7 +421,6 @@ all: $(OUTPUT_3DSX)
 
 # --- Build-flag stamp -------------------------------------------------------
 # The -D flag set (PERF_CAPTURE, FIDELITY_DUMP, FIDELITY_CHECKPOINTS,
-# NODE_SQDIST, AUTOTEST_*_REMASTER/FIRST_LEVEL/MAX_LEVELS...) changes object
 # code but is invisible to the -MMD dependency files, so switching flags
 # left stale objects that silently relinked wrong behavior (three incidents
 # this program: 2026-10-26, ships.o + perf_capture_3ds.o link failures and
@@ -573,7 +429,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FIDCKT=$(FIDELITY_CHECKPOINT_TICKS)|FDMP=$(FRAMEDUMP)|SQDIST=$(NODE_SQDIST)|OGPROFILE=$(OG_PROFILE)|VIS=$(MODEL_VIS_CACHE)|BUCKET=$(MODEL_BUCKET)|BVERIFY=$(MODEL_BUCKET_VERIFY)|ITP=$(FRAME_INTERP_PROBE)|ITPF=$(FRAME_INTERP)|ITPM=$(FRAME_INTERP_FORCE_MONO)|ITPP=$(FRAME_INTERP_EXTRA_PRESENT)|OGSIM=$(OG_SIM)|MALLOC=$(MALLOC_HEAP_MB)|LINEAR=$(LINEAR_HEAP_MB)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMBF=$(ATM_BENCH_FIRE)|ATMMV=$(MEMO_VERIFY)|ATMMVF=$(MEMO_VERIFY_FORENSICS)|ATMMFM=$(MEMO_FORCE_MISS)|ATMNC=$(MEMO_NO_COALESCE)|PV=$(PERSIST_VERTS)|QI=$(QUADIDX_VERTS)|ATMH=$(ATM_HEADLESS)|STREP=$(STEREO_REPLAY)|FDMPST=$(FRAMEDUMP_SELFTEST_AT)|CHE=$(CHE_PREFILTER)|STS=$(STRESS_SCRATCH_VERTS)|FSTILL=$(FRAMEDUMP_BENCH_STILLS)
+STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FIDCKT=$(FIDELITY_CHECKPOINT_TICKS)|FDMP=$(FRAMEDUMP)|VIS=$(MODEL_VIS_CACHE)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMBF=$(ATM_BENCH_FIRE)|ATMH=$(ATM_HEADLESS)|FDMPST=$(FRAMEDUMP_SELFTEST_AT)|STS=$(STRESS_SCRATCH_VERTS)|FSTILL=$(FRAMEDUMP_BENCH_STILLS)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
@@ -1030,9 +886,3 @@ release: release-check
 	@echo "  forsaken3ds_himem_alt.cia — HIMEM alt"
 	@echo "  forsaken3ds.3dsx         — HBL (dev iteration, not for general install)"
 	@echo "============================================================"
-
-# ATM profiling
-ifdef ATM_PROF
-CFLAGS += -I. -DATM_PROF
-SRCS += atm_core.c
-endif

@@ -26,7 +26,6 @@
 #include "sfx.h"
 #include "ships.h"
 #include "util.h"
-#include "interp.h"
 
 /*===================================================================
 		Defines
@@ -396,9 +395,6 @@ void StartTeleport( u_int16_t * Data )
 		return;
 	TPpnt += *Data;
 	TPpnt->Status = TELEPORTACTIVE;
-	/* M1 interp history: teleporting crosses a discontinuity; never
-	 * interpolate across it. No-op unless FRAME_INTERP. */
-	interp_reset();
 }
 /*===================================================================
 	Procedure	:	Stop a Teleport..
