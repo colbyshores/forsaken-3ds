@@ -2551,3 +2551,19 @@ paying in mono alone — it is now mono-gated rather than global-off.
   Prototype remains flag-off in-tree as a record only.
 - Stereo state (#4): ACCEPTED as the milestone. No further OG
   stereo optimization after merge work.
+
+## 2026-11-14 — MODEL_BUCKET default-on + TF04-A mono-gated revisit (HARDWARE)
+
+Bucket stereo verdict (ramqan, this branch): bucket-off 88,443 vs
+bucket-on 77,705 / 77,635 (two runs within 70us) — -12%, fidelity
+byte-identical, draws/verts counts identical. Default flipped on
+(converges with master). Mono was neutral in 2026-11-12 A/B/A;
+stereo doubles the traversal the bucket eliminates.
+Mono-reject audit (owner request): nearly all rejects (TF04-A, R04,
+R07, opt3, single-pass x2, NODE_SQDIST, R20) were measured in MONO
+and flat even there — not "rejected for being mono-only". TF04-A is
+the one revisit: its convert slice is now relatively larger (persist
+removed the level share; mono proved CPU-conversion-bound), and its
+LSB pixel class matches the accepted persist precedent. Rebuilt as
+shared quad table (quadidx.c, host-tested), mono-gated via
+s_monoActive, QUADIDX_VERTS default 1. A/B follows.
