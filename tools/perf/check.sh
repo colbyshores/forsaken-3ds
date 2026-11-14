@@ -46,6 +46,7 @@ run_gate "gates_vfp"        tools/perf/gates_vfp.py
 run_gate "audit_arm11_math" tools/perf/audit_arm11_math.py
 run_gate "audit_r11_idiv"   tools/perf/audit_r11_idiv.py
 run_gate "audit_cxx_class"  tools/perf/audit_c_with_classes.py
+run_gate "audit_memo_stamps" tools/perf/audit_memo_stamps.py
 
 if [ "$overall" -eq 0 ]; then
 	echo "ALL GATES PASS"

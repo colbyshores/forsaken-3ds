@@ -102,6 +102,11 @@ bool smemo_lookup(const void *renderObject, int sub,
 	unsigned n;
 	for (n = 0; n < SMEMO_PROBE_MAX; n++) {
 		const smemo_entry_t *e = &s_tab[(i + n) & SMEMO_MASK];
+		/* INVARIANT (load-bearing): record() always claims the first
+		 * stale slot in the probe chain, so no current-generation entry
+		 * for this hash can sit beyond a stale slot. The early return
+		 * below is sound only while that holds — any change to the
+		 * insertion policy (e.g. random replacement) must revisit it. */
 		if (e->gen != s_gen)
 			return false;
 		if (e->ro == (uintptr_t)renderObject && e->sub == sub) {

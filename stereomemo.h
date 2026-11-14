@@ -21,7 +21,13 @@
  * live-convert miss instead of a false hit. Converted vertices are
  * eye-independent (world-space pos, baked color, raw UV — lighting is
  * shader-side), so an epoch-confirmed reuse with eye 2's live uniforms
- * and draw order is pixel-identical by construction. Stable renderObjects
+ * and draw order reuses the same bytes eye 1 submitted. It is NOT
+ * unconditionally pixel-identical to a live eye-2 convert: batches
+ * whose source UVs advance once per frame (texture animation) can
+ * epoch-match while content stepped, leaving a one-step UV lag in
+ * eye 2 (measured ~9% of frame-15 pixels on animated surfaces;
+ * static content is byte-identical). That is why the feature ships
+ * default-off pending human review. Stable renderObjects
  * (models, water, per-slot execs) never stamp: their fields stay put
  * within a frame, which compares equal.
  */
