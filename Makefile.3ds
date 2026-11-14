@@ -128,13 +128,18 @@ MEMO_VERIFY_FORENSICS ?= 0
 # app as a proper NS foreground title, so normal init applies (proven by
 # the framedump render-proof builds).
 ATM_HEADLESS ?= 0
-# STEREO_REPLAY=1 replays the left eye's recorded display list on the
-# second eye instead of re-converting + re-submitting every draw
-# (draw-level replay; traversal still runs per eye, so visibility,
-# billboards and HUD are unaffected). Ortho/2D draws are excluded
-# from the recording and run live on both eyes (the historical
-# one-eye-HUD bug). Default 0 (proven path); enable for A/B only.
-STEREO_REPLAY ?= 0
+# STEREO_REPLAY=1 (default) enables the single-pass stereo vertex memo:
+# the left eye records converted vertex ranges keyed by fill epoch; the
+# right eye reuses them (never skips a draw — traversal, visibility,
+# uniforms and HUD all run per eye). Measured -5 to -7% stereo wall on
+# ramqan/Old 3DS, fidelity byte-identical. Known accepted limitation:
+# animated texture surfaces can lag one UV step in the right eye
+# (~9% of frame-15 pixels on lava/water-type surfaces; static content
+# byte-identical) — R22 human A/B reviewed on hardware 2026-11-13 and
+# accepted ("fine"). Set STEREO_REPLAY=0 to opt out. The old whole-list
+# display replay this flag once gated was proven to draw wrong-eye
+# geometry and is gone; see perf/OPTIMIZATION-LOG.md opt5/opt5b.
+STEREO_REPLAY ?= 1
 
 #---------------------------------------------------------------------------------
 # Flag matrix — what each knob is for, and when it goes away.
@@ -150,9 +155,10 @@ STEREO_REPLAY ?= 0
 #   FRAME_INTERP_PROBE  cost-of-second-render floor (M1 vehicle)
 #   PERF_CAPTURE  per-stage breakdowns (shares only)
 # SHIPPED FEATURES (default builds; gates cover):
-#   CHE_PREFILTER=1, MODEL_BUCKET (flag-only), R1 helpers, GPU lighting path
+#   CHE_PREFILTER=1, STEREO_REPLAY=1 (stereo memo, R22-accepted),
+#   MODEL_BUCKET (flag-only), R1 helpers, GPU lighting path
 # EXPERIMENTS (A/B only, default 0/off):
-#   MODEL_VIS_CACHE, MODEL_BUCKET_VERIFY, NODE_SQDIST, STEREO_REPLAY,
+#   MODEL_VIS_CACHE, MODEL_BUCKET_VERIFY, NODE_SQDIST,
 #   FRAME_INTERP* (prototype; EXTRA_PRESENT dies in M2 when the spec
 #   scheduler replaces the prototype present path)
 # COMPAT / ENV (not perf work):
@@ -162,7 +168,7 @@ STEREO_REPLAY ?= 0
 #   DEBUG, RENDERER, EDITION, SLIM
 # SCHEDULED REMOVALS (only at these points, not before):
 #   FRAME_INTERP_EXTRA_PRESENT → M2 scheduler lands
-#   STEREO_REPLAY machinery → opt5b verdict (lands or dies with it)
+#   STEREO_REPLAY → landed (R22-accepted default); flag stays as opt-out
 #---------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------

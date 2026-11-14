@@ -26,8 +26,9 @@
  * whose source UVs advance once per frame (texture animation) can
  * epoch-match while content stepped, leaving a one-step UV lag in
  * eye 2 (measured ~9% of frame-15 pixels on animated surfaces;
- * static content is byte-identical). That is why the feature ships
- * default-off pending human review. Stable renderObjects
+ * static content is byte-identical). R22 human A/B reviewed this on
+ * hardware 2026-11-13 and accepted it; the memo is default-on
+ * (STEREO_REPLAY ?= 1, opt-out available). Stable renderObjects
  * (models, water, per-slot execs) never stamp: their fields stay put
  * within a frame, which compares equal.
  */

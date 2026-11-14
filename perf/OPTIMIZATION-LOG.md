@@ -2387,3 +2387,18 @@ applies from here, not retroactively):
   closes the failure mode mechanically at lower risk); FLUSH_BATCH
   macro dedup and R05 build (queued behind R22/human review and the
   validation protocol); interp M2 (unchanged verdict).
+
+## 2026-11-13 — R22 verdict: ACCEPTED — stereo memo default-on (HUMAN + HARDWARE)
+
+Owner played the memo-ON playable build (r22-memo-on.3dsx, pushed via
+3dslink, chainload-proven) and judged the one-step UV lag on animated
+surfaces "fine". Per the pre-agreed mapping, STEREO_REPLAY ?= 1 is now
+the Makefile default (opt-out preserved), flag-matrix and stereomemo.h
+updated to match. Default-path hardware verification run follows in
+this entry's commit (bench built WITHOUT an explicit STEREO_REPLAY
+flag must show memo hits >0 and scratch_splits=0).
+Default-path verification (bench built with NO explicit STEREO_REPLAY
+flag; stamp STREP=1, -DSTEREO_REPLAY in compile line): memo_hit=34368,
+memo_miss=71654, scratch_splits=0, avg 85587us, fidelity checkpoints
+byte-identical to the no-memo reference (594bab3c @240). Default-on is
+live and proven; opt-out STEREO_REPLAY=0 unchanged.
