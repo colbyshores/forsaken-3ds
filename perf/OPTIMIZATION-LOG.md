@@ -2508,3 +2508,22 @@ real but the stills are LSB-equivalent rather than byte-identical —
 the same class R04/TF04-A were reverted for. Flipping the default
 is a visual-equivalence judgment for the human session, with this
 evidence attached. If accepted, flip is one line (PERSIST_VERTS ?= 1).
+
+## 2026-11-14 — Autonomous queue exhausted; human-session list
+
+Done autonomously since R22: validation protocol (caught + fixed the
+defend2 GPU wedge), audit F2/F3/F5/F6/F9/F12, R05 sizing + persist
+cache (default off). Capship stills fetched + hash-verified
+(32f5538f/6a4b257b/6c48ae2b MATCH) under perf/fb-capship/.
+Remaining items all need either a human judgment or their own
+design review — none are safe to rush:
+  HUMAN: persist default flip (LSB-equivalence judgment, mono -8.6%
+    evidence attached); R14 spec text; interp go/no-go/N3DS;
+    master-merge approval.
+  DESIGN-REVIEW-FIRST (me, next sessions): BatchId-by-construction
+    (gate currently covers the failure mode); FLUSH_BATCH macro
+    dedup (touches the submit path that wedged once); R02 overflow
+    fence (touches frame pacing); snprintf-builds FrameBegin wedge
+    bisect (unknown mechanism, workaround in place); New 3DS capture
+    session; residual color-word mismatch forensics.
+Console left listening; tree clean; branch pushed.
