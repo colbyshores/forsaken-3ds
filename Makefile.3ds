@@ -67,9 +67,11 @@ CHE_PREFILTER ?= 1
 # overflow-path stress; forces mid-frame splits every frame). Debug only,
 # never ship: it destroys batching and the memo. 0 (default) = full arena.
 STRESS_SCRATCH_VERTS ?= 0
-# PERSIST_VERTS=1 retains converted level-wall verts across frames (R05).
-# Default 0 until the 3-scene validation protocol passes; then flip to 1.
-PERSIST_VERTS ?= 0
+# PERSIST_VERTS=1 (default) retains converted level-wall verts across
+# frames (R05). Runtime-gated to mono (3D slider down) where it pays
+# -8.6%; stereo keeps the memo-only path (persist is wall-flat there
+# and only LSB-equivalent across eyes). Set 0 to disable entirely.
+PERSIST_VERTS ?= 1
 STRESS_SCRATCH_CFLAGS := $(if $(filter-out 0,$(STRESS_SCRATCH_VERTS)),-DSTRESS_SCRATCH_VERTS=$(STRESS_SCRATCH_VERTS),)
 CHE_PREFILTER_CFLAGS := $(if $(filter 1,$(CHE_PREFILTER)),-DCHE_PREFILTER,)
 BUCKET_VERIFY_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET_VERIFY)),-DMODEL_BUCKET_VERIFY,)

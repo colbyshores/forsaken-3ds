@@ -243,6 +243,14 @@ typedef struct {
 static persist_entry_t s_persist[PERSIST_SIZE];
 static unsigned s_persistResetsSeen = 0;
 static unsigned s_persistBytes = 0;
+/* Runtime gate (owner policy 2026-11-14): persist pays in mono
+ * (-8.6% measured) and is wall-flat in stereo, where its stills are
+ * only LSB-equivalent across eyes. So it is active only while the
+ * 3D slider is down (stereo_mode != STEREO_MODE_3DS), refreshed at
+ * every FSBeginScene; stereo keeps the proven memo-only path.
+ * Buffers stay allocated across slider moves and simply go unused
+ * in stereo (generation unchanged, still valid if mono resumes). */
+static int s_persistActive = 0;
 
 static unsigned persist_hash(uintptr_t ro, int sub)
 {
@@ -1581,6 +1589,8 @@ bool FSBeginScene(void)
 		s_persistResetsSeen = smemo_persist_resets();
 		persist_free_all();
 	}
+	/* Slider gate: mono only (see s_persistActive comment). */
+	s_persistActive = (render_info.stereo_mode != STEREO_MODE_3DS);
 #endif
 	s_scratchUsed = 0;
 	if (!s_inFrame)
@@ -3200,7 +3210,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		/* R05: level walls consult the retained buffers first (both
 		 * eyes, any mode). A hit submits the retained buffer at flush
 		 * time and converts nothing. */
-		if (!orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
+		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
 			int pcnt = 0;
 			gpu_vertex_t *pbuf = persist_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type), &pcnt);
@@ -3341,7 +3351,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 #if defined(PERSIST_VERTS) && !defined(MEMO_VERIFY)
 		/* R05: retain this conversion for level walls. On success the
 		 * flush submits the retained buffer instead of scratch. */
-		if (!orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
+		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
 			gpu_vertex_t *pbuf = persist_store(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
 				dst, totalVerts);

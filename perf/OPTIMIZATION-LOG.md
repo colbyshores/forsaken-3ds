@@ -2527,3 +2527,27 @@ design review — none are safe to rush:
     bisect (unknown mechanism, workaround in place); New 3DS capture
     session; residual color-word mismatch forensics.
 Console left listening; tree clean; branch pushed.
+
+## 2026-11-14 — Slider-gated persist default-on (HARDWARE, owner policy)
+
+PERSIST_VERTS ?= 1 with a runtime gate: active only when
+stereo_mode != STEREO_MODE_3DS (3D slider down), refreshed per
+FSBeginScene. Stereo keeps the proven memo-only path; buffers stay
+allocated across slider moves and go unused in stereo.
+Validation (ramqan, default flags, PV=1 in stamp):
+  stereo: vown_level=2,392,302 (persist inactive), splits 0, 88,443us
+  mono:   vown_level=508,836 (active), splits 0, 57,899us vs
+          63,821 no-persist (-9.3%), fidelity 594bab3c identical.
+Same gate principle audited across landed optimizations: CHE/sim
+wins help both modes; buckets/squared-distance were mono-neutral;
+memo is stereo-only by construction. Persist was the only item
+paying in mono alone — it is now mono-gated rather than global-off.
+
+## 2026-11-14 — Owner decisions recorded
+
+- Merge hygiene (#2): APPROVED — R04/MODEL_BUCKET verdicts + land
+  this branch (next entries).
+- Interp (#3): DROPPED entirely. No OG build, no New 3DS build.
+  Prototype remains flag-off in-tree as a record only.
+- Stereo state (#4): ACCEPTED as the milestone. No further OG
+  stereo optimization after merge work.
