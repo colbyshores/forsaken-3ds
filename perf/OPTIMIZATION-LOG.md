@@ -2594,3 +2594,16 @@ than either parent (branch tip 77,426; master stack unmeasured as
 one) — fill-cuts/bullprim from master compose with memo+buckets.
 Fidelity byte-identical, memo_hit=34368, scratch_splits=0.
 Gates ALL PASS on merged tree; host tests all green.
+## 2026-11-14 — WIRING BUG: release builds never had the memo (found by slider build)
+
+-DSTEREO_REPLAY/-DPERSIST_VERTS were wired inside the ATM_PROFILING
+block, so every non-bench build silently compiled the memo/persist
+out. All bench evidence stands (benches are ATM builds), but the
+R22 playable build the owner judged had NO memo — its "fine" did not
+cover the animated-surface UV lag. Caught when QUADIDX code broke
+the release build. Fix: STEREO/PERSIST/QUADIDX *_CFLAGS defined
+above the CFLAGS := expansion and consumed in the main list (the
+SHDLIT2 lesson, third occurrence). Release ELF now contains
+smemo_lookup (nm-verified). R22 re-judgment needed on a build that
+actually has the memo: slider50 build (also halves max eye-sep
+30->15 per owner request) pushed for that look.
