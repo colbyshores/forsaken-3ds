@@ -84,6 +84,7 @@ enum {
 	ATM_C_VOWN_MXA,           /* R05 sizing: deformable-model converted verts */
 	ATM_C_VOWN_SHARED,        /* R05 sizing: shared-slot converted verts */
 	ATM_C_VOWN_WATER,         /* R05 sizing: water converted verts */
+	ATM_C_LEVEL_UNIQUE_VERTS, /* R05 memory gate: unique level source verts at load (x36B = persistent bytes) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

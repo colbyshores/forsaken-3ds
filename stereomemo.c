@@ -29,6 +29,7 @@ typedef struct {
 
 static smemo_entry_t s_tab[SMEMO_SIZE];
 static unsigned s_gen = 1; /* 0 = invalid (never a valid generation) */
+static unsigned s_persist_gen = 1; /* R05: slower generation, see header */
 
 static unsigned smemo_hash(uintptr_t ro, int sub)
 {
@@ -68,6 +69,27 @@ void smemo_begin_frame(void)
 void smemo_invalidate(void)
 {
 	smemo_bump_gen();
+	++s_persist_gen;
+}
+
+unsigned smemo_persist_gen(void)
+{
+	return s_persist_gen;
+}
+
+static unsigned s_persist_resets = 0;
+
+void smemo_persist_reset(void)
+{
+	++s_persist_gen;
+	if (s_persist_gen == 0)
+		s_persist_gen = 1;
+	++s_persist_resets;
+}
+
+unsigned smemo_persist_resets(void)
+{
+	return s_persist_resets;
 }
 
 void smemo_record(const void *renderObject, int sub,

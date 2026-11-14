@@ -92,6 +92,7 @@ num_start_points : u_int16_t
 ===================================================================*/
 
 #include "main.h"
+#include "atm_prof.h"
 #include <stdio.h>
 
 #include "new3d.h"
@@ -1312,6 +1313,23 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	DebugPrintf( "Mload: %d colourkey triangles found\n", colourkey );
 	// Mloadheader is valid and can be executed...
 	Mloadheader->state = true;
+#ifdef STEREO_REPLAY
+	/* New level geometry: retained conversions from any previous
+	 * level must never be reused (backend frees them lazily). */
+	smemo_persist_reset();
+#endif
+#ifdef ATM_PROFILING
+	/* R05 memory gate: unique level source verts (persistent copies
+	 * would cost verts x sizeof(gpu_vertex_t) of linear heap). */
+	{
+		int ug, ue;
+		unsigned int unique_verts = 0;
+		for (ug = 0; ug < Mloadheader->num_groups; ug++)
+			for (ue = 0; ue < Mloadheader->Group[ug].num_execbufs; ue++)
+				unique_verts += Mloadheader->Group[ug].num_verts_per_execbuf[ue];
+		atm_prof_add(ATM_C_LEVEL_UNIQUE_VERTS, unique_verts);
+	}
+#endif
 
 #if MXV_VERSION_NUMBER < 3
 	if ( !FindGroupConnections( Mloadheader ) )

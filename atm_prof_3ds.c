@@ -97,6 +97,7 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"vown_mxa",
 	"vown_shared",
 	"vown_water",
+	"level_unique_verts",
 };
 
 enum {

@@ -2488,3 +2488,23 @@ building: persistent copies cost 36B/unique-vert from the linear
 heap (post-texture free ~7.9MB on OG) — unique level vert count
 must be measured at load before allocating anything. Next step is
 that counter, not the cache.
+
+## 2026-11-14 — R05 persist: CORRECT, mono -8.6%, stereo flat (HARDWARE)
+
+PERSIST_VERTS=1 retains level-wall conversions in linear buffers
+keyed by smemo_persist_gen (invalidate on tex-anim steps/water;
+free on level-load reset). Validation:
+  ramqan stereo: vown_level 2,392,302 -> 508,836 (-79% conversions),
+    wall 85,724 (memo band 85.6-86.8k — flat, GPU-wait bound),
+    fidelity byte-identical, splits 0, stills statistically
+    equivalent (97.6% bytes within +-4 LSB; vertex-cache rounding
+    class, not byte-identical)
+  ramqan mono: 63,821 -> 58,316 (-8.6%) — CPU-bound there, pays
+  defend2 stereo: 34,094 (clean, no wedge), capship: 28,245 (clean)
+Memory: ramqan unique level verts 25,304 (~0.87MB source; retained
+expanded buffers tracked in s_persistBytes, freed on level change).
+Verdict: ship default-OFF. Stereo gain is nil today; mono gain is
+real but the stills are LSB-equivalent rather than byte-identical —
+the same class R04/TF04-A were reverted for. Flipping the default
+is a visual-equivalence judgment for the human session, with this
+evidence attached. If accepted, flip is one line (PERSIST_VERTS ?= 1).

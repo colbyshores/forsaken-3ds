@@ -219,6 +219,112 @@ static smemo_mode_t s_memoMode = SMEMO_OFF;
 #endif
 #endif
 
+/* ---- R05 persistent level geometry (PERSIST_VERTS, default off) ----
+ * Level-wall (VERT_OWNER_LEVEL) texgroups are converted once into
+ * retained linear buffers and resubmitted every frame/eye without
+ * reconversion or scratch traffic. Validity is keyed by
+ * smemo_persist_gen(): texture-animation steps and water integration
+ * bump it (reconvert into the same allocations); level load bumps the
+ * reset count (buffers freed lazily at the next FSBeginScene).
+ * Allocation failure or table pressure falls back to the scratch
+ * path — never stale data, never a skipped draw. */
+#if defined(STEREO_REPLAY) && defined(PERSIST_VERTS)
+#define PERSIST_BITS 11
+#define PERSIST_SIZE (1u << PERSIST_BITS)
+#define PERSIST_MASK (PERSIST_SIZE - 1u)
+typedef struct {
+	uintptr_t ro;
+	int sub;
+	gpu_vertex_t *buf;
+	int cap;
+	int count;
+	unsigned gen;
+} persist_entry_t;
+static persist_entry_t s_persist[PERSIST_SIZE];
+static unsigned s_persistResetsSeen = 0;
+static unsigned s_persistBytes = 0;
+
+static unsigned persist_hash(uintptr_t ro, int sub)
+{
+	uint64_t z = (uint64_t)ro * 0x9E3779B97F4A7C15ULL + (uint64_t)sub;
+	z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
+	z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
+	{
+		unsigned h = (z ^ (z >> 31)) & PERSIST_MASK;
+		return h;
+	}
+}
+
+static persist_entry_t *persist_find(const void *ro, int sub, int create)
+{
+	unsigned i = persist_hash((uintptr_t)ro, sub);
+	unsigned n;
+	for (n = 0; n < 32; n++) {
+		persist_entry_t *e = &s_persist[(i + n) & PERSIST_MASK];
+		if (e->ro == (uintptr_t)ro && e->sub == sub)
+			return e;
+		if (create && e->buf == NULL) {
+			e->ro = (uintptr_t)ro;
+			e->sub = sub;
+			return e;
+		}
+	}
+	return NULL;
+}
+
+static gpu_vertex_t *persist_lookup(const void *ro, int sub, int *count)
+{
+	persist_entry_t *e = persist_find(ro, sub, 0);
+	if (e && e->buf && e->gen == smemo_persist_gen()) {
+		*count = e->count;
+		return e->buf;
+	}
+	return NULL;
+}
+
+/* Retain a freshly converted range. Returns the retained buffer or
+ * NULL (pressure/alloc failure — caller submits from scratch). */
+static gpu_vertex_t *persist_store(const void *ro, int sub,
+                                   const gpu_vertex_t *src, int count)
+{
+	persist_entry_t *e = persist_find(ro, sub, 1);
+	if (!e)
+		return NULL;
+	if (e->cap < count) {
+		if (e->buf) {
+			s_persistBytes -= e->cap * sizeof(gpu_vertex_t);
+			linearFree(e->buf);
+			e->buf = NULL;
+			e->cap = 0;
+		}
+		e->buf = (gpu_vertex_t *)linearAlloc(count * sizeof(gpu_vertex_t));
+		if (!e->buf)
+			return NULL;
+		e->cap = count;
+		s_persistBytes += count * sizeof(gpu_vertex_t);
+	}
+	memcpy(e->buf, src, count * sizeof(gpu_vertex_t));
+	e->count = count;
+	e->gen = smemo_persist_gen();
+	return e->buf;
+}
+
+static void persist_free_all(void)
+{
+	unsigned i;
+	for (i = 0; i < PERSIST_SIZE; i++) {
+		if (s_persist[i].buf) {
+			linearFree(s_persist[i].buf);
+			s_persist[i].buf = NULL;
+			s_persist[i].cap = 0;
+			s_persist[i].count = 0;
+			s_persist[i].gen = 0;
+		}
+	}
+	s_persistBytes = 0;
+}
+#endif /* STEREO_REPLAY && PERSIST_VERTS */
+
 /* Scratch buffer for vertex conversion.
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
  * firefight frames (many ships + projectiles + explosion particles +
@@ -1467,6 +1573,14 @@ bool FSBeginScene(void)
 	/* Gated on 3DS stereo: mono frames must not pay the record cost. */
 	s_memoMode = (render_info.stereo_mode == STEREO_MODE_3DS) ?
 		SMEMO_RECORD : SMEMO_OFF;
+#endif
+#if defined(STEREO_REPLAY) && defined(PERSIST_VERTS)
+	/* Level load/unload bumped the persist reset count: free retained
+	 * buffers once, lazily, before any new conversion can reuse them. */
+	if (s_persistResetsSeen != smemo_persist_resets()) {
+		s_persistResetsSeen = smemo_persist_resets();
+		persist_free_all();
+	}
 #endif
 	s_scratchUsed = 0;
 	if (!s_inFrame)
@@ -2895,6 +3009,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * queue on defend2 (FrameBegin wait, deterministic). */
 	int   tg_memo_off[MAX_TEXTURE_GROUPS] = {0};
 	int   tg_memo_cnt[MAX_TEXTURE_GROUPS] = {0};
+	/* R05: retained-buffer submit per texgroup (NULL = scratch path).
+	 * Zero-initialized for the same reason as above. */
+	gpu_vertex_t *tg_persist_buf[MAX_TEXTURE_GROUPS] = {0};
+	int   tg_persist_cnt[MAX_TEXTURE_GROUPS] = {0};
 #endif
 
 /* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
@@ -2910,13 +3028,30 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
 		FILLPIX_COUNT_BATCH(); \
 		TRANS_COUNT_BATCH(); \
-		if (s_memoMode == SMEMO_LOOKUP && MEMO_COALESCE_SUBMIT && !orthographic) { \
+		int _has_persist = 0; \
+		{ int _pi; for (_pi = batch_tg0; _pi < group; _pi++) if (tg_persist_buf[_pi]) { _has_persist = 1; break; } } \
+		if ((_has_persist || (s_memoMode == SMEMO_LOOKUP && MEMO_COALESCE_SUBMIT)) && !orthographic) { \
 			int _si; \
 			int _consumed = 0; \
 			long _run_off = 0; \
 			int _run_cnt = 0; \
 			int _run_open = 0; \
 			for (_si = batch_tg0; _si < group && _consumed < batch_vertCount; _si++) { \
+				if (tg_persist_buf[_si]) { \
+					if (_run_open) { \
+						BufInfo_Init(_bi); \
+						BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
+						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
+						atm_prof_add(ATM_C_DRAWS, 1); \
+						_run_open = 0; \
+					} \
+					BufInfo_Init(_bi); \
+					BufInfo_Add(_bi, tg_persist_buf[_si], sizeof(gpu_vertex_t), 3, 0x210); \
+					C3D_DrawArrays(GPU_TRIANGLES, 0, tg_persist_cnt[_si]); \
+					atm_prof_add(ATM_C_DRAWS, 1); \
+					_consumed += tg_persist_cnt[_si]; \
+					continue; \
+				} \
 				if (tg_memo_cnt[_si] <= 0 || (_run_open && tg_memo_off[_si] != _run_off + _run_cnt)) { \
 					if (_run_open) { \
 						BufInfo_Init(_bi); \
@@ -3060,7 +3195,24 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		long memo_off = 0;
 		int memo_cnt = 0;
 		bool memo_hit = false;
-		if (s_memoMode == SMEMO_LOOKUP && !orthographic) {
+		bool persist_hit = false;
+#if defined(PERSIST_VERTS) && !defined(MEMO_VERIFY)
+		/* R05: level walls consult the retained buffers first (both
+		 * eyes, any mode). A hit submits the retained buffer at flush
+		 * time and converts nothing. */
+		if (!orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
+			int pcnt = 0;
+			gpu_vertex_t *pbuf = persist_lookup(renderObject,
+				smemo_sub(sorted_order[group], 0, primitive_type), &pcnt);
+			if (pbuf) {
+				persist_hit = true;
+				tg_persist_buf[group] = pbuf;
+				tg_persist_cnt[group] = pcnt;
+				totalVerts = pcnt;
+			}
+		}
+#endif
+		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic) {
 			memo_hit = smemo_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
 				&memo_off, &memo_cnt,
@@ -3072,10 +3224,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 #endif
 		}
 #endif
-		/* Convert live unless the memo hit (VERIFY converts anyway
-		 * for the oracle compare below). */
+		/* Convert live unless the memo/persist hit (VERIFY converts
+		 * anyway for the oracle compare below). */
 #if defined(STEREO_REPLAY) && !defined(MEMO_VERIFY)
-		if (memo_hit) {
+		if (persist_hit) {
+			/* totalVerts + tg_persist_* already set above */
+		} else if (memo_hit) {
 			totalVerts = memo_cnt;
 			tg_memo_off[group] = memo_off;
 			tg_memo_cnt[group] = memo_cnt;
@@ -3169,8 +3323,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 #ifdef STEREO_REPLAY
 		/* Record the converted range (eye 1). Runs ONLY on the live
 		 * path: on a memo hit the tg arrays already hold the looked-up
-		 * range and must not be overwritten with the cursor. */
-		if (s_memoMode != SMEMO_OFF && !orthographic) {
+		 * range and must not be overwritten with the cursor. The tg
+		 * fill itself is unconditional on the live path so the
+		 * per-group flush (persist/mono mixes) can always read it. */
+		if (!orthographic) {
 			tg_memo_off[group] = dst - s_scratch;
 			tg_memo_cnt[group] = totalVerts;
 			if (s_memoMode == SMEMO_RECORD) {
@@ -3182,6 +3338,20 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					renderObject->memoEpochTPage);
 			}
 		}
+#if defined(PERSIST_VERTS) && !defined(MEMO_VERIFY)
+		/* R05: retain this conversion for level walls. On success the
+		 * flush submits the retained buffer instead of scratch. */
+		if (!orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
+			gpu_vertex_t *pbuf = persist_store(renderObject,
+				smemo_sub(sorted_order[group], 0, primitive_type),
+				dst, totalVerts);
+			if (pbuf) {
+				tg_persist_buf[group] = pbuf;
+				tg_persist_cnt[group] = totalVerts;
+				tg_memo_cnt[group] = 0;
+			}
+		}
+#endif
 #endif
 #if defined(STEREO_REPLAY) && defined(MEMO_VERIFY)
 		if (memo_hit) {
