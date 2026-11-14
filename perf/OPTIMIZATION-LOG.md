@@ -2567,3 +2567,14 @@ removed the level share; mono proved CPU-conversion-bound), and its
 LSB pixel class matches the accepted persist precedent. Rebuilt as
 shared quad table (quadidx.c, host-tested), mono-gated via
 s_monoActive, QUADIDX_VERTS default 1. A/B follows.
+
+## 2026-11-14 — TF04-A revisit verdict: mechanism exact, wall-neutral (HARDWARE)
+
+Mono ramqan (bucket+persist gated stack): quad ON 51,274 vs OFF
+51,484 (-0.4%, noise). tverts 561,192 -> 374,128 = the historical
+-33.3% exactly; fidelity byte-identical; splits 0. MODEL_BUCKET
+(-12% stereo, now default) removed the traversal/conversion
+headroom quad would have exploited. QUADIDX_VERTS default back to
+0 (opt-in); quadidx.c + host test + mono runtime gate retained.
+Not a keeper today — same conservative rule as 2026-11-12, now
+with the bucket interaction measured rather than assumed.

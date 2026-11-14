@@ -76,10 +76,13 @@ STRESS_SCRATCH_VERTS ?= 0
 # -8.6%; stereo keeps the memo-only path (persist is wall-flat there
 # and only LSB-equivalent across eyes). Set 0 to disable entirely.
 PERSIST_VERTS ?= 1
-# QUADIDX_VERTS=1 (default) enables the TF04-A shared quad index table
-# for canonical 4-vert billboard texgroups, runtime-gated to mono
-# (slider down) like PERSIST_VERTS. Set 0 to disable entirely.
-QUADIDX_VERTS ?= 1
+# QUADIDX_VERTS=1 enables the TF04-A shared quad index table for
+# canonical 4-vert billboard texgroups, runtime-gated to mono (slider
+# down) like PERSIST_VERTS. Default 0 (opt-in): mechanism proven
+# (tverts -33.3% exactly) but wall-neutral on the current stack —
+# MODEL_BUCKET already removed the CPU headroom it would exploit
+# (mono A/B 51,274 on vs 51,484 off). Revisit if bucket turns off.
+QUADIDX_VERTS ?= 0
 STRESS_SCRATCH_CFLAGS := $(if $(filter-out 0,$(STRESS_SCRATCH_VERTS)),-DSTRESS_SCRATCH_VERTS=$(STRESS_SCRATCH_VERTS),)
 CHE_PREFILTER_CFLAGS := $(if $(filter 1,$(CHE_PREFILTER)),-DCHE_PREFILTER,)
 BUCKET_VERIFY_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET_VERIFY)),-DMODEL_BUCKET_VERIFY,)
