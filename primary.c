@@ -41,9 +41,6 @@
 #include "water.h"
 #include "util.h"
 
-#ifdef SHADOWTEST
-#include "shadows.h"
-#endif
 
 #include "local.h"
 #include "localtitle.h"
@@ -3771,9 +3768,6 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 	VECTOR		LeftVector;
 	QUAT		TempQuat;
 
-#ifdef SHADOWTEST
-	CreateSpotLight( (u_int16_t) WhoIAm, SHIP_RADIUS, &Mloadheader );
-#endif
 
 /*
 	if( MyGameStatus != STATUS_SinglePlayer )

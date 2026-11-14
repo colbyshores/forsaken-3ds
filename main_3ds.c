@@ -178,93 +178,13 @@ void vfp_thread_fz_dn(void)
  *
  * Truncation policy (debug builds only): the file is truncated
  * EXACTLY ONCE per process lifetime, on the very first call to
- * either trace_enable() or trace(). Subsequent re-opens (e.g., after
+ * either trace_enable() or boot_log(). Subsequent re-opens (e.g., after
  * a trace_dump() close) use O_APPEND so we don't lose what was
  * written before the close. Without this, the autotest's "DONE ->
  * trace_dump() -> chain-load" path was wiping the whole trace
- * because platform_shutdown's later trace() call would re-open with
+ * because platform_shutdown's later boot_log() call would re-open with
  * O_TRUNC. */
 #include <fcntl.h>
-
-#ifdef __3DS_DEBUG__
-static int  _trace_fd = -1;
-static int  _trace_enabled = 0;
-static int  _trace_truncated_once = 0;
-
-static void _trace_open(void) {
-	int flags = O_WRONLY | O_CREAT |
-	            (_trace_truncated_once ? O_APPEND : O_TRUNC);
-	_trace_fd = open("sdmc:/forsaken_trace.txt", flags, 0666);
-	_trace_truncated_once = 1;
-}
-
-void trace_enable(void) {
-	_trace_enabled = 1;
-	if (_trace_fd < 0) _trace_open();
-}
-
-void trace(const char *msg)
-{
-	/* Auto-open the trace file on first call even if trace_enable()
-	 * hasn't been called yet, so unsolicited trace points (e.g. a
-	 * checkpoint deep inside the loader) still survive a crash. */
-	if (_trace_fd < 0) {
-		_trace_open();
-		_trace_enabled = 1;
-	}
-	svcOutputDebugString(msg, strlen(msg));
-	if (_trace_enabled && _trace_fd >= 0) {
-		int len = strlen(msg);
-		write(_trace_fd, msg, len);
-		write(_trace_fd, "\n", 1);
-		fsync(_trace_fd);
-	}
-}
-#else
-/* Release: no trace infrastructure at all. Call sites still resolve
- * (the function exists), but the body is empty so the optimizer
- * deletes the snprintf chain that built the trace string. */
-void trace_enable(void) {}
-void trace(const char *msg) { (void)msg; }
-#endif /* __3DS_DEBUG__ */
-
-/* boot_log — always-on diagnostic write for boot-time failure tracking.
- * Writes to sdmc:/forsaken_boot.log.  Unlike trace() this is NOT gated
- * on __3DS_DEBUG__; useful for diagnosing CIA installs that fail to
- * boot in the field (e.g. LOMEM bring-up).  The last line in the file
- * is the last checkpoint the boot path reached before failure.
- *
- * Truncates the file on the very first call this process, then appends.
- * Each call also flushes via fsync so a sudden process termination
- * doesn't lose recent writes. */
-static int  _boot_log_fd        = -1;
-static int  _boot_log_truncated = 0;
-
-void boot_log(const char *msg)
-{
-	if (_boot_log_fd < 0) {
-		int flags = O_WRONLY | O_CREAT |
-		            (_boot_log_truncated ? O_APPEND : O_TRUNC);
-		_boot_log_fd = open("sdmc:/forsaken_boot.log", flags, 0666);
-		_boot_log_truncated = 1;
-	}
-	if (_boot_log_fd >= 0) {
-		int len = (int)strlen(msg);
-		write(_boot_log_fd, msg, len);
-		write(_boot_log_fd, "\n", 1);
-		fsync(_boot_log_fd);
-	}
-}
-
-void trace_dump(void) {
-#ifdef __3DS_DEBUG__
-	/* Flush only — don't close. Re-opens with O_APPEND would still
-	 * preserve content per the truncated-once policy, but keeping the
-	 * fd open avoids the open()/close() cost on chain-load paths that
-	 * call trace() again immediately afterward. */
-	if (_trace_fd >= 0) fsync(_trace_fd);
-#endif
-}
 
 /* Runtime flag — when true, DrawSimplePanel prints raw 3D-slider value,
  * stereo_eye_sep, and the on/off state so we can diagnose binary-seeming
@@ -289,6 +209,36 @@ void memcpy_unaligned(void *dst, const void *src, size_t n)
 	while (n--) *d++ = *s++;
 }
 
+/* boot_log — the single always-on diagnostic channel. Writes to
+ * sdmc:/forsaken_boot.log, truncating on first call this process,
+ * then appending; fsync per call so a sudden termination does not
+ * lose the last checkpoint. Boot/init-path use only. */
+static int  _boot_log_fd        = -1;
+static int  _boot_log_truncated = 0;
+
+void boot_log(const char *msg)
+{
+	if (_boot_log_fd < 0) {
+		int flags = O_WRONLY | O_CREAT |
+		            (_boot_log_truncated ? O_APPEND : O_TRUNC);
+		_boot_log_fd = open("sdmc:/forsaken_boot.log", flags, 0666);
+		_boot_log_truncated = 1;
+	}
+	if (_boot_log_fd >= 0) {
+		int len = (int)strlen(msg);
+		write(_boot_log_fd, msg, len);
+		write(_boot_log_fd, "\n", 1);
+		fsync(_boot_log_fd);
+	}
+}
+
+/* Legacy trace() call sites across the engine route to the single
+ * boot_log channel. boot_log fsyncs per call, so the old trace_dump
+ * flush is a no-op. */
+void trace(const char *msg) { boot_log(msg); }
+void trace_dump(void) {}
+void trace_enable(void) {}
+
 /* ---- platform init ---- */
 
 bool platform_init(void)
@@ -296,7 +246,6 @@ bool platform_init(void)
 	_ticks_base = svcGetSystemTick();
 
 	/* Ensure trace ring is dumped on any exit */
-	atexit(trace_dump);
 
 	/* Disable upstream's Debug flag. WinMain on PC sets Debug=false during
 	 * startup (main.c:161), but on 3DS we don't run WinMain so the flag
@@ -311,7 +260,7 @@ bool platform_init(void)
 		Debug = false;
 	}
 
-	trace("platform_init: start");
+	boot_log("platform_init: start");
 	boot_log("[boot] platform_init: start");
 
 	/* Verify __system_allocateHeaps set up mappableInit correctly.  Our
@@ -383,11 +332,11 @@ bool platform_init(void)
 		bool ok = Hunk_Init(8 * 1024 * 1024);
 		char _b[96];
 		snprintf(_b, sizeof(_b), "Hunk_Init: %s (8MB)", ok ? "OK" : "FAILED");
-		trace(_b);
+		boot_log(_b);
 		if (!ok) return false;
 	}
 
-	trace("platform_init: romfsInit");
+	boot_log("platform_init: romfsInit");
 
 	/* romfs precedence: try the .3dsx's embedded romfs FIRST. If that
 	 * fails (slim build with no embedded section), fall back to
@@ -406,9 +355,9 @@ bool platform_init(void)
 	{
 		Result rc = romfsInit();
 		if (R_SUCCEEDED(rc)) {
-			trace("platform_init: using embedded romfs");
+			boot_log("platform_init: using embedded romfs");
 		} else {
-			trace("platform_init: no embedded romfs, trying sdmc fallback");
+			boot_log("platform_init: no embedded romfs, trying sdmc fallback");
 			static const u16 ext_path[] = u"/3ds/forsaken/forsaken.romfs";
 			FS_Path apath = { PATH_EMPTY, 1, (u8*)"" };
 			FS_Path fpath = { PATH_UTF16, sizeof(ext_path), (u8*)ext_path };
@@ -417,13 +366,13 @@ bool platform_init(void)
 			if (R_SUCCEEDED(rc)) {
 				rc = romfsMountFromFile(fh, 0, "romfs");
 				if (R_SUCCEEDED(rc)) {
-					trace("platform_init: mounted external sdmc romfs");
+					boot_log("platform_init: mounted external sdmc romfs");
 				} else {
 					FSFILE_Close(fh);
-					trace("platform_init: ERROR — sdmc romfs mount failed");
+					boot_log("platform_init: ERROR — sdmc romfs mount failed");
 				}
 			} else {
-				trace("platform_init: ERROR — no romfs available");
+				boot_log("platform_init: ERROR — no romfs available");
 			}
 		}
 	}
@@ -436,7 +385,7 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds/forsaken", 0777);
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
 
-	trace("platform_init: done");
+	boot_log("platform_init: done");
 	boot_log("[boot] platform_init: done OK");
 
 	return true;
@@ -454,8 +403,8 @@ bool platform_init(void)
 bool platform_init_video(void)
 {
 	boot_log("[boot] platform_init_video: entry");
-	trace("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
-	trace("platform_init_video: gfxInitDefault");
+	boot_log("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
+	boot_log("platform_init_video: gfxInitDefault");
 
 	/* Initialize 3DS graphics service (GSP) - required before picaGL.
 	 *
@@ -525,13 +474,13 @@ bool platform_init_video(void)
 	}
 
 	boot_log("[boot] platform_init_video: pre-pglInit");
-	trace("platform_init_video: pglInit");
+	boot_log("platform_init_video: pglInit");
 
 	/* Initialize citro3d-backed picaGL */
 	pglInit();
 
 	_video_initialized = true;
-	trace("platform_init_video: pglInit done");
+	boot_log("platform_init_video: pglInit done");
 	boot_log("[boot] platform_init_video: pglInit done");
 
 	render_info.ThisMode.w = SCREEN_WIDTH;
@@ -618,7 +567,7 @@ void platform_render_present(render_info_t *info)
 
 void platform_shutdown(void)
 {
-	trace("platform_shutdown: dumping trace ring");
+	boot_log("platform_shutdown: dumping trace ring");
 	trace_dump();
 	if (_video_initialized)
 	{

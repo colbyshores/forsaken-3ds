@@ -2619,3 +2619,7 @@ Remaining conditionals by design: platform (__3DS__/renderer/
 edition), harness knobs (ATM/framedump/fidelity/autotest — they
 move to forsaken-harness at the repo split), and upstream engine
 heritage. Harness snapshot: /mnt/nas/Development/forsaken-harness.
+Consolidation part 2 (same day): VERBOSE_TRACE blocks dropped,
+c3d_trace deleted, trace() routed to the single boot_log channel,
+SHADOWTEST residue (primary/models tables) out. Boot proof:
+final-consolidated.3dsx renders title (FPS: 59 in boot log).
