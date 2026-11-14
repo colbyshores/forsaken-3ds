@@ -1714,6 +1714,10 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 ===================================================================*/
 bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
+	/* opt5b memo epoch: stamp this fill's content identity. */
+	renderObject->memoEpochPass = SMEMO_PASS_FM_CLIPPED;
+	renderObject->memoEpochGroup = Group;
+	renderObject->memoEpochTPage = *TPage;
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			BitCount;
@@ -2094,6 +2098,10 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 ===================================================================*/
 bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
+	/* opt5b memo epoch: whole-scene fill (no single group). */
+	renderObject->memoEpochPass = SMEMO_PASS_FM_UNCLIPPED;
+	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
+	renderObject->memoEpochTPage = *TPage;
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			BitCount;

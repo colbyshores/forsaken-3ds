@@ -42,6 +42,7 @@ mxtype : u_int16_t // always 0 for mx format
 #include "compobjects.h"
 #include "bgobjects.h"
 #include "object.h"
+#include "stereomemo.h"
 #include "networking.h"
 #include "mxload.h"
 #include "models.h"
@@ -277,6 +278,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				TR("Mxload: FAIL FSCreateVertexBuffer g=%d e=%d nv=%d", group, execbuf, num_vertices);
 				return false;
 			}
+			Mxloadheader->Group[group].renderObject[execbuf].vertOwner = VERT_OWNER_MODEL;
 			TR("Mxload: g=%d e=%d FSCreateVertexBuffer OK", group, execbuf);
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
@@ -1405,6 +1407,9 @@ void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  )
 						AnimData = ( Mxloadheader->AnimData.AnimSeq[PolyAnim->animation] + PolyAnim->CurrentOffset );
 						Uint16Pnt = HandleAnimCommands( PolyAnim , AnimData , Mxloadheader->AnimData.AnimSeq[PolyAnim->animation] );
 						PolyAnim->CurrentOffset = Uint16Pnt - Mxloadheader->AnimData.AnimSeq[PolyAnim->animation];
+#ifdef STEREO_REPLAY
+						smemo_invalidate(); /* shared UVs just stepped */
+#endif
 					}
 
 				}

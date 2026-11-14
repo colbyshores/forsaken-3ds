@@ -33,9 +33,6 @@
 .constf myconst(0.0, 1.0, -1.0, 0.0)
 .alias  zeros myconst.xxxx
 .alias  ones  myconst.yyyy
-; 1/255 for packed-byte baked color (R04 24-byte verts: inclr arrives
-; as B/G/R/A bytes in v1.xyzw; .zyxw restores RGBA order).
-.constf inv255(0.0039215686, 0.0039215686, 0.0039215686, 0.0039215686)
 
 ; Outputs
 .out outpos position
@@ -107,11 +104,10 @@
 	; live in worldspace; distance math is now correct on both paths.
 	;
 	; Accumulator r3 = baked vertex color + ambient.xyz, alpha untouched.
-	; inclr is packed bytes (B/G/R/A); swizzle to RGBA and scale to
-	; 0..1 in one op. Uniform must be src1 in add (PICA encoding
-	; restricts src2 to temp/attribute), so ambient comes first.
-	mul r3, inv255, inclr.zyxw
-	add r3.xyz, ambient[0], r3
+	; Uniform must be src1 in add (PICA encoding restricts src2 to
+	; temp/attribute), so ambient comes first.
+	add r3.xyz, ambient[0], inclr
+	mov r3.w,   inclr
 
 	; Worldspace vertex pos in r2.xyz (lighting reads r2)
 	mov r2.xyz, r1

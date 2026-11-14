@@ -73,6 +73,9 @@
 #include "perf_capture.h"
 #include "fidelity.h"
 #include "interp.h"
+#ifdef ATM_PROFILING
+#include "atm_prof.h"
+#endif
 
 void SetCam(int ship, int Cam);
 
@@ -5212,13 +5215,28 @@ bool MainGameRender(void)
        * perf-2026-10-27-temporal-interp-feasibility.md): a second render
        * traversal with *unchanged* state measures the floor cost of any
        * CPU-side in-between pass. Draws the identical frame (last
-       * submission wins); flag-gated, never shipped. */
+       * submission wins); flag-gated, never shipped.
+       * M1 render-purity check: fidelity_tick() runs once per tick
+       * (post-MainRoutines), so any hash motion across the repeated
+       * render is a draw path writing authoritative gameplay state. */
       if( !render_info.stereo_enabled )
       {
+#ifdef FIDELITY_DUMP
+				unsigned long _probe_h0 = fidelity_hash();
+#endif
 				perf_stage_begin(PERF_S_INTERPPROBE);
 				if( perf_guarded(PERF_S_INTERPPROBE, RenderCurrentCameraWithMainGameMenu() != true) )
 					return false;
 				perf_stage_end(PERF_S_INTERPPROBE, -1);
+#ifdef FIDELITY_DUMP
+				if( fidelity_hash() != _probe_h0 )
+				{
+					DebugPrintf("INTERPPROBE: repeated render moved gameplay hash %08lx -> %08lx\n", _probe_h0, fidelity_hash());
+#ifdef ATM_PROFILING
+					atm_prof_add(ATM_C_INTERP_DIRTY, 1);
+#endif
+				}
+#endif
       }
 #endif
 
@@ -5995,8 +6013,10 @@ void InitRenderBufs(/* LPDIRECT3DDEVICE lpDev */) // bjd
 	// indexed pre-transformed (2d)
 	FSCreateDynamic2dVertexBuffer(&RenderBufs[3], 32767);
 	FSCreateDynamicIndexBuffer(&RenderBufs[3], 32767*3);
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++) {
 		RenderBufs[i].textureGroups = s_renderbuf_groups[i];
+		RenderBufs[i].vertOwner = VERT_OWNER_SHARED;
+	}
 }
 
 void ReleaseRenderBufs( void )

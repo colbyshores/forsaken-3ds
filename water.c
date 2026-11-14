@@ -9,6 +9,7 @@
 #include "compobjects.h"
 #include "bgobjects.h"
 #include "object.h"
+#include "stereomemo.h"
 #include "networking.h"
 #include "triggers.h"
 #include "file.h"
@@ -433,6 +434,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 		DebugPrintf("water FSCreateVertexBuffer failed\n");
 		return false;
 	}
+	WO->renderObject.vertOwner = VERT_OWNER_WATER;
 
 	// pre-count the number of tris so we know how big to make the index buffer
 	// this loop structure was coppied from the way the triangles are assigned further bellow
@@ -687,6 +689,9 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	{
 		return;
 	}
+#ifdef STEREO_REPLAY
+	smemo_invalidate(); /* shared verts just integrated */
+#endif
 }
 
 /*===================================================================

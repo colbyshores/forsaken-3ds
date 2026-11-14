@@ -17,6 +17,7 @@
 
 #include "atm_prof.h"
 #include "framedump.h" /* bench-scoped stills hook below; no-op unless -DFRAMEDUMP */
+#include "render.h"
 
 extern bool QuitRequested;
 extern char ShortLevelNames[][32];
@@ -89,6 +90,26 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"hittest",
 	"ncmix",
 	"nctight",
+	"interp_dirty",
+	"memo_hit",
+	"memo_miss",
+	"memo_mismatch",
+	"memo_mf_sub",
+	"memo_mf_cnt",
+	"memo_mf_fi",
+	"memo_mf_exp",
+	"memo_mf_got",
+	"memo_mf_word",
+	"memo_mf_sub2",
+	"memo_mf_epass",
+	"scratch_splits",
+	"vown_other",
+	"vown_level",
+	"vown_model",
+	"vown_mxa",
+	"vown_shared",
+	"vown_water",
+	"level_unique_verts",
 };
 
 enum {
@@ -136,6 +157,12 @@ static uint32_t atm_ticks_to_us(uint64_t ticks)
  * Two writes per run at most: a status=started marker when the window opens
  * and the final summary at teardown. Never anything per frame. */
 static int g_fd = -1;
+
+/* Merge note: master's q3 attribution-ring dump lived in its
+ * render_c3d.c, which resolved wholesale to the experimental
+ * backend (R04 no-port verdict). The ring is gone; the FILLQ
+ * counters remain but stay 0. Stub keeps the header contract. */
+void atm_prof_dump_q3(void) {}
 
 void atm_prof_res_write(const char *s)
 {
@@ -371,6 +398,12 @@ void atm_prof_write_result(void)
 		         atm_prof_counter_name[i], (unsigned)g_counters[i]);
 		atm_prof_res_write(line);
 	}
+
+	/* M1 scratch high-water: full-run peak vertex footprint (verts).
+	 * Extra presents stay safe only while this is under scratch max. */
+	snprintf(line, sizeof(line), "scratch_peak_verts=%u\n",
+	         (unsigned)c3d_scratch_peak_verts());
+	atm_prof_res_write(line);
 
 	n = atm_frame_format_summary(&g_stats, summary, sizeof(summary));
 	if (n > 0) {

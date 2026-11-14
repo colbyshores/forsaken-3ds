@@ -76,6 +76,26 @@ enum {
 	ATM_C_HITTEST,            /* bullets: enemies taking the full hit battery */
 	ATM_C_NCMIX,              /* fill probe: near-straddling portals hit (mixed front/clean verts) */
 	ATM_C_NCTIGHT,            /* fill probe: ...of those, SH clip produced tight bounds */
+	ATM_C_INTERP_DIRTY,       /* M1: repeated-render purity violations (must stay 0) */
+	ATM_C_MEMO_HIT,           /* opt5b: eye-2 texgroup memo hits (conversion skipped) */
+	ATM_C_MEMO_MISS,          /* opt5b: eye-2 texgroup memo misses (converted live) */
+	ATM_C_MEMO_MISMATCH,      /* opt5b verify: recorded vs live bytes differ (must stay 0) */
+	ATM_C_MEMO_MF_SUB,        /* opt5b forensics: first-mismatch texgroup sub-key (one-shot) */
+	ATM_C_MEMO_MF_CNT,        /* opt5b forensics: first-mismatch recorded word count (one-shot) */
+	ATM_C_MEMO_MF_FI,         /* opt5b forensics: first-mismatch first-diff word index (one-shot) */
+	ATM_C_MEMO_MF_EXP,        /* opt5b forensics: first-mismatch recorded word low 32b (one-shot) */
+	ATM_C_MEMO_MF_GOT,        /* opt5b forensics: first-mismatch live word low 32b (one-shot) */
+	ATM_C_MEMO_MF_WORD,       /* opt5b forensics: first-mismatch word index mod 9 (field id, one-shot) */
+	ATM_C_MEMO_MF_SUB2,       /* opt5b forensics: second-mismatch texgroup sub-key (one-shot) */
+	ATM_C_MEMO_MF_EPASS,      /* opt5b forensics: first-mismatch lookup epoch pass (system id, one-shot) */
+	ATM_C_SCRATCH_SPLITS,     /* R02: mid-frame scratch overflows (FrameSplit+reset). Must stay 0 in benches; >0 = overflow path exercised, stills invalid until fenced */
+	ATM_C_VOWN_OTHER,         /* R05 sizing: live-converted verts by owner class (unclassified) */
+	ATM_C_VOWN_LEVEL,         /* R05 sizing: level-wall converted verts (static candidate) */
+	ATM_C_VOWN_MODEL,         /* R05 sizing: model converted verts */
+	ATM_C_VOWN_MXA,           /* R05 sizing: deformable-model converted verts */
+	ATM_C_VOWN_SHARED,        /* R05 sizing: shared-slot converted verts */
+	ATM_C_VOWN_WATER,         /* R05 sizing: water converted verts */
+	ATM_C_LEVEL_UNIQUE_VERTS, /* R05 memory gate: unique level source verts at load (x36B = persistent bytes) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

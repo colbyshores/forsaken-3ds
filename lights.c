@@ -1039,12 +1039,26 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 			vert = MXloadheader->Group[group].num_verts_per_execbuf[execbuf];
 			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[execbuf];
 
+#ifdef GPU_LIGHTING
+			/* R06: restore skipped — idempotent copy. Audit: under
+			 * GPU_LIGHTING no per-frame path writes computed colors
+			 * into static-MX live verts. AmbientLightMxModel and
+			 * LightMxModel set render_color_blend globals and return;
+			 * InterpFrames color morphs and ENVMxa UV writes are
+			 * MXA-only; mxload writes both copies at load. The else-if
+			 * dispatch excludes a second writer in the same frame, so
+			 * live == original every frame. Lock/unlock retained. */
+			(void)vert;
+			(void)lpLVERTEX;
+			(void)lpLVERTEX2;
+#else
 			while( vert --)
 			{
 				lpLVERTEX->color = lpLVERTEX2->color;
 				lpLVERTEX++;
 				lpLVERTEX2++;
 			}
+#endif
 
 #ifndef GPU_LIGHTING
 			/* Vertex shader adds dynamic-light contribution on top of

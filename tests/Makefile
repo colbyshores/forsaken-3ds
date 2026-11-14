@@ -14,7 +14,7 @@ CFLAGS  := -g -fcommon -Wall -Wextra $(INCLUDE)
 
 AILIB_OBJ := secwalk_ailib.o
 
-all: test_secwalk test_framedump test_checkhitenemy test_atm_core_div test_sincos test_clipmath
+all: test_secwalk test_framedump test_checkhitenemy test_atm_core_div test_sincos test_clipmath test_stereomemo test_quadidx
 
 $(AILIB_OBJ): ../ailib.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -38,9 +38,6 @@ test_atm_core_div: test_atm_core_div.c ../atm_core.c atm/atm_core.h ../atm_core.
 	$(CC) $(CFLAGS) -I. -o $@ test_atm_core_div.c -lm
 	./test_atm_core_div
 
-clean:
-	rm -f test_secwalk test_framedump test_checkhitenemy test_atm_core_div test_sincos $(AILIB_OBJ) out-*.bmp framedump_test.log
-
 test_sincos: test_sincos.c ../new3d.h trigshim/main.h
 	$(CC) $(CFLAGS) -Itrigshim -o $@ test_sincos.c -lm
 	./test_sincos
@@ -48,4 +45,14 @@ test_clipmath: test_clipmath.c ../clipmath.h
 	$(CC) $(CFLAGS) -o $@ test_clipmath.c -lm
 	./test_clipmath
 
-.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_atm_core_div test_sincos test_clipmath
+test_stereomemo: test_stereomemo.c ../stereomemo.c
+	$(CC) $(CFLAGS) -DSTEREO_REPLAY -o $@ test_stereomemo.c ../stereomemo.c
+	./test_stereomemo
+test_quadidx: test_quadidx.c ../quadidx.c
+	$(CC) $(CFLAGS) -o $@ test_quadidx.c ../quadidx.c
+	./test_quadidx
+
+clean:
+	rm -f test_secwalk test_framedump test_checkhitenemy test_atm_core_div test_sincos test_clipmath test_stereomemo test_quadidx $(AILIB_OBJ) out-*.bmp framedump_test.log
+
+.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_atm_core_div test_sincos test_clipmath test_stereomemo test_quadidx

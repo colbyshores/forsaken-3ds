@@ -1279,6 +1279,18 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		else
 		{
 		g->projection = cam->Proj;
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		/* @vfp-exempt R2, R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-11-13. */
+		/* R11: skip the magnified math below when the parent viewport is
+		 * fullscreen (every mono main-camera group) — the override at
+		 * the end of this block would discard it. The condition is
+		 * duplicated, not moved, so the pinned decision below and its
+		 * rationale comments stay exactly where they were reviewed. */
+		if (!(v->viewport->X == 0 && v->viewport->Y == 0
+		    && v->viewport->Width  == (long)render_info.ThisMode.w
+		    && v->viewport->Height == (long)render_info.ThisMode.h))
+#endif
+		{
 		g->projection._11 = cam->Proj._11 * v->viewport->Width / vp->Width;
 		g->projection._22 = cam->Proj._22 * v->viewport->Height / vp->Height;
 		lr = 2.0F * ( ( v->viewport->X + v->viewport->Width * 0.5F ) - ( vp->X + vp->Width * 0.5F ) );
@@ -1300,6 +1312,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 									- ( vp->Y + vp->Height * 0.5F ) )
 							/ vp->Height;
 
+		} /* end magnified (non-fullscreen) block */
 		} /* R11: end magnified-path else */
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
