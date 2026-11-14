@@ -2623,3 +2623,12 @@ Consolidation part 2 (same day): VERBOSE_TRACE blocks dropped,
 c3d_trace deleted, trace() routed to the single boot_log channel,
 SHADOWTEST residue (primary/models tables) out. Boot proof:
 final-consolidated.3dsx renders title (FPS: 59 in boot log).
+
+## 2026-11-14 — ARM conditionals unwrapped (owner: 3DS-only tree)
+
+46 #ifdef ARM sites across 16 files unwrapped to the ARM path
+(alignment-safe memcpy/aligned-buffer code — the port's alignment
+solution, now unconditional); x86 #else branches and -DARM deleted.
+Release build clean. Legacy platform symbols (WIN32/WINE/MACOSX/
+DINPUTJOY/DXMOUSE/BSP_ONLY/A_BAD_IDEA) follow the same rule: only
+the 3DS and Linux build paths stay.

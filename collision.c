@@ -149,15 +149,11 @@ bool MCload( char * Filename , MCLOADHEADER * MCloadheader )
 	if( !File_Size )
 		return ( false );
 
-#ifdef ARM
 	/* +8 headroom: per-group u16 num_faces toggles alignment, so any MCFACE*
 	   cast on an odd-indexed group lands 2-mod-4. MCFACE has float fields
 	   and ARM's vldr needs 4-byte alignment, so we memmove-shift remaining
 	   data forward per group as needed (see the group loop below). */
 	Buffer = malloc( File_Size + 8 );
-#else
-	Buffer = malloc( File_Size );
-#endif
 
 	if( Buffer == NULL )
 		return( false );
@@ -192,7 +188,6 @@ bool MCload( char * Filename , MCLOADHEADER * MCloadheader )
 		MCloadheader->num_of_faces_in_group[i] = *Uint16Pnt++ ;
 		Buffer = (char *) Uint16Pnt;
 
-#ifdef ARM
 		/* MCFACE has float fields; vldr needs Buffer 4-byte aligned.
 		   The u16 num_faces read above may leave Buffer 2-mod-4.
 		   Shift remaining bytes forward into the headroom allocated
@@ -205,7 +200,6 @@ bool MCload( char * Filename , MCLOADHEADER * MCloadheader )
 			memmove( Buffer + pad, Buffer, remaining );
 			Buffer += pad;
 		}
-#endif
 
 		/* make a note of the address of the Faces	*/
 		MCloadheader->GroupFacePnt[i] = (MCFACE *) Buffer;

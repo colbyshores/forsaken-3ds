@@ -116,7 +116,6 @@ static bool BSP_Loadtree( BSP_TREE *t, char **Buffer )
 	// pack on node heirachy
 	for( e = 0 ; e < t->NumNodes ; e++ )
 	{
-#ifdef ARM
 		/* Raw points into a byte-parsed buffer after a u16 NumNodes read
 		   so it's 2-mod-4; `New->Normal = Raw->Normal` compiles to
 		   `ldm` which faults on misaligned sources. Normal/Offset are
@@ -126,11 +125,6 @@ static bool BSP_Loadtree( BSP_TREE *t, char **Buffer )
 		  memcpy_unaligned(&New->Normal, &Raw->Normal, sizeof(VECTOR));
 		  memcpy_unaligned(&New->Offset, &Raw->Offset, sizeof(float));
 		  memcpy_unaligned(&New->Colour, &Raw->Colour, sizeof(int)); }
-#else
-		New->Normal = Raw->Normal;
-		New->Offset = Raw->Offset;
-		New->Colour = Raw->Colour;
-#endif
 		if( !Raw->Front ) New->Front = NULL;
 		else{
 			New->Front = t->Root + Raw->Front;
@@ -160,7 +154,6 @@ static bool BSP_LoadPortal( BSP_PORTAL *p, char **Buffer )
 	int16_tpnt = (int16_t *) *Buffer;
 	p->group = *int16_tpnt++;
 	floatpnt = (float *) int16_tpnt;
-#ifdef ARM
 	/* GCC inlines memcpy(dst, src, 12) to ldm which requires 4-byte
 	   source alignment; floatpnt is only 2-byte aligned here. */
 	{ extern void memcpy_unaligned(void*, const void*, size_t);
@@ -168,12 +161,6 @@ static bool BSP_LoadPortal( BSP_PORTAL *p, char **Buffer )
 	  floatpnt+=3;
 	  memcpy_unaligned(&p->offset, floatpnt, 4);
 	  floatpnt++; }
-#else
-	p->normal.x = *floatpnt++;
-	p->normal.y = *floatpnt++;
-	p->normal.z = *floatpnt++;
-	p->offset = *floatpnt++;
-#endif
 	*Buffer = (char *) floatpnt;
 
 	return BSP_Loadtree( &p->bsp, Buffer );

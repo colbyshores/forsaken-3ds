@@ -472,7 +472,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			/*	copy the vertex data into the execute buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
-#ifdef ARM
 				/* lpLVERTEX2 points into the raw buffer at an offset
 				   that depends on the variable-length filename section
 				   above; it can be 2-mod-4. Reading old->x via vldr
@@ -481,9 +480,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				__typeof__(*lpLVERTEX2) _ovx_local;
 				memcpy_unaligned(&_ovx_local, lpLVERTEX2, sizeof(*lpLVERTEX2));
 				LPOLDLVERTEX old = &_ovx_local;
-#else
-				LPOLDLVERTEX old = lpLVERTEX2;
-#endif
 
 				lpLVERTEX[i].x = old->x;
 				lpLVERTEX[i].y = old->y;
@@ -637,15 +633,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					FacePnt->v3 = MFacePnt->v3;
 */
 
-#ifdef ARM
 					memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
 					memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
 					memcpy(&lpNormals->nz, &MFacePnt->nz, 4);
-#else
-					lpNormals->nx = MFacePnt->nx;
-					lpNormals->ny = MFacePnt->ny;
-					lpNormals->nz = MFacePnt->nz;
-#endif
 
 					if ( MFacePnt->pad & 1 )
 					{
@@ -742,7 +732,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			Mloadheader->Group[group].StartPosInThisGroup = (u_int16_t) -1;
 
 			VertPnt = ( VERT* )	Buffer;
-#ifdef ARM
 			/* Group name above is null-terminated, so VertPnt may land on
 			   any byte alignment. Plain memcpy(VERT) inlines to `ldm`
 			   which faults on misaligned sources; use the noinline helper. */
@@ -750,12 +739,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			  memcpy_unaligned(&Mloadheader->Group[group].center,    VertPnt,     sizeof(VERT));
 			  memcpy_unaligned(&Mloadheader->Group[group].half_size, VertPnt + 1, sizeof(VERT)); }
 			VertPnt += 2;
-#else
-			/*	get the center position of the group	*/
-			Mloadheader->Group[group].center = *VertPnt++;
-			/*	get the size of the group	*/
-			Mloadheader->Group[group].half_size = *VertPnt++;
-#endif
 			Buffer = ( char * ) VertPnt;
 
 			Uint16Pnt = (u_int16_t *) Buffer;
@@ -829,16 +812,12 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				for ( pnum = 0; pnum < Mloadheader->Group[group].Portal[portal].num_polys_in_portal; pnum++ )
 				{
 #if 1
-#ifdef ARM
 					/* Uint16Pnt is 2-byte aligned; GCC compiles the struct
 					   assignment below into `ldm` which requires 4-byte
 					   alignment and faults on ARM11. */
 					{ extern void memcpy_unaligned(void*, const void*, size_t);
 					  memcpy_unaligned(&Mloadheader->Group[group].Portal[portal].Poly[pnum],
 					                   Uint16Pnt, sizeof(MCFACE)); }
-#else
-					Mloadheader->Group[group].Portal[portal].Poly[pnum] = * (MCFACE *) Uint16Pnt;
-#endif
 					Uint16Pnt = (u_int16_t *) ( (char *) Uint16Pnt + sizeof(MCFACE) );
 #else
 					Mloadheader->Group[group].Portal[portal].Poly[pnum].num_vertices_in_poly = *Uint16Pnt++;
@@ -1015,7 +994,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		StartPosPnt = (STARTPOS * ) Buffer;
 		for( i = 0 ; i < num_start_positions ; i++ )
 		{
-#ifdef ARM
 			/* STARTPOS* cast from Buffer after a u16 read — may be
 			   2-mod-4. GCC inlines a plain memcpy(VECTOR) to `ldm`
 			   which requires 4-byte alignment; use the noinline helper. */
@@ -1024,18 +1002,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			  memcpy_unaligned(&StartPositions[i].Dir, &StartPosPnt->Dir, sizeof(VECTOR));
 			  memcpy_unaligned(&StartPositions[i].Up,  &StartPosPnt->Up,  sizeof(VECTOR)); }
 			StartPositions[i].Group = StartPosPnt->Group;  /* u16 — safe */
-#else
-			StartPositions[i].Pos.x = StartPosPnt->Pos.x;
-			StartPositions[i].Pos.y = StartPosPnt->Pos.y;
-			StartPositions[i].Pos.z = StartPosPnt->Pos.z;
-			StartPositions[i].Dir.x = StartPosPnt->Dir.x;
-			StartPositions[i].Dir.y = StartPosPnt->Dir.y;
-			StartPositions[i].Dir.z = StartPosPnt->Dir.z;
-			StartPositions[i].Up.x = StartPosPnt->Up.x;
-			StartPositions[i].Up.y = StartPosPnt->Up.y;
-			StartPositions[i].Up.z = StartPosPnt->Up.z;
-			StartPositions[i].Group = StartPosPnt->Group;
-#endif
 			//Make a note in each group of which Start point is in there...
 			Mloadheader->Group[StartPositions[i].Group].StartPosInThisGroup = i;
 			if( FirstStartPositionInGroup[StartPositions[i].Group] == (u_int16_t) -1 )
@@ -1196,15 +1162,10 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						FloatPnt = (float*) Buffer;
 						for( o = 0 ; o < vertices*frames ; o++ )
 						{
-#ifdef ARM
 							/* ARM unaligned access fix: buffer pointer may not
 							 * be 4-byte aligned after reading u_int16_t data. */
 							memcpy(&TanimUV->u, FloatPnt++, 4);
 							memcpy(&TanimUV->v, FloatPnt++, 4);
-#else
-							TanimUV->u = *FloatPnt++;
-							TanimUV->v = *FloatPnt++;
-#endif
 							TanimUV++;
 						}
 						Buffer = ( char * ) FloatPnt;

@@ -188,7 +188,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(VIS_CFLAGS) \
 	$(STRESS_SCRATCH_CFLAGS) \
 	-std=gnu99 \
-	-D__3DS__ -DARM \
+	-D__3DS__ \
 	-DBSP \
 	-DTEXTURE_PNG \
 	-DSOUND_SUPPORT \
