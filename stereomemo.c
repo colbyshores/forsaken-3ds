@@ -98,6 +98,13 @@ bool smemo_lookup(const void *renderObject, int sub,
                    long *offset, int *count,
                    uint32_t epass, uint32_t epgroup, uint32_t etpage)
 {
+#ifdef MEMO_FORCE_MISS
+	/* Bisect knob (debug only): record + coalesced submit stay live,
+	 * recorded-range reuse is disabled. Never ship enabled. */
+	(void)renderObject; (void)sub; (void)offset; (void)count;
+	(void)epass; (void)epgroup; (void)etpage;
+	return false;
+#endif
 	unsigned i = smemo_hash((uintptr_t)renderObject, sub);
 	unsigned n;
 	for (n = 0; n < SMEMO_PROBE_MAX; n++) {

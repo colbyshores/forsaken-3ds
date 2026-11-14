@@ -212,6 +212,11 @@ typedef enum {
 } smemo_mode_t;
 #ifdef STEREO_REPLAY
 static smemo_mode_t s_memoMode = SMEMO_OFF;
+/* Bisect knob (debug only): 0 = lookup flush uses the single-draw path
+ * instead of coalesced per-range submits. Never ship 0. */
+#ifndef MEMO_COALESCE_SUBMIT
+#define MEMO_COALESCE_SUBMIT 1
+#endif
 #endif
 
 /* Scratch buffer for vertex conversion.
@@ -2884,8 +2889,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * being flushed (batch_tg0 .. group-1). A skipped texgroup records
 	 * count 0 and is not submitted. */
 	int   batch_tg0 = 0;
-	int   tg_memo_off[MAX_TEXTURE_GROUPS];
-	int   tg_memo_cnt[MAX_TEXTURE_GROUPS];
+	/* Must stay zero-initialized: ortho groups never set these, and the
+	 * lookup flush below must read count 0 (skip), never stack garbage.
+	 * Garbage counts were submitted to DrawArrays and wedged the GPU
+	 * queue on defend2 (FrameBegin wait, deterministic). */
+	int   tg_memo_off[MAX_TEXTURE_GROUPS] = {0};
+	int   tg_memo_cnt[MAX_TEXTURE_GROUPS] = {0};
 #endif
 
 /* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
@@ -2901,7 +2910,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
 		FILLPIX_COUNT_BATCH(); \
 		TRANS_COUNT_BATCH(); \
-		if (s_memoMode == SMEMO_LOOKUP) { \
+		if (s_memoMode == SMEMO_LOOKUP && MEMO_COALESCE_SUBMIT && !orthographic) { \
 			int _si; \
 			int _consumed = 0; \
 			long _run_off = 0; \

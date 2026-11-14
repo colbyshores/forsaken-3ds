@@ -2402,3 +2402,42 @@ flag; stamp STREP=1, -DSTEREO_REPLAY in compile line): memo_hit=34368,
 memo_miss=71654, scratch_splits=0, avg 85587us, fidelity checkpoints
 byte-identical to the no-memo reference (594bab3c @240). Default-on is
 live and proven; opt-out STEREO_REPLAY=0 unchanged.
+
+## 2026-11-14 — ALERT: defend2 memo build wedges in FrameBegin (HARDWARE, deterministic)
+
+Validation protocol caught what ramqan-only testing missed: defend2 +
+STEREO_REPLAY=1 hangs twice at the same point (status=started forever;
+GDB exact-ELF: render thread in C3D_FrameBegin -> gxCmdQueueWait ->
+gspWaitForAnyEvent from MainGameRender; music/ndsp threads normal; no
+crash dump). Defend2 no-memo completes (34166us). Ramqan memo has 10+
+clean runs. Scene x flag interaction, mechanism unknown: recorded-range
+submit bounds, per-eye batch-split divergence, and the layout-wedge
+family are all live candidates. DEFAULT-ON (46d7e33) IS SUSPECT until
+this is bisected — ramqan-only validation was insufficient, exactly
+the audit F4 failure mode. Bisect order: MEMO_VERIFY defend2, then
+lookup-submit bounds instrumentation.
+
+## 2026-11-14 — CRITICAL FIX: uninitialized tg_memo arrays wedged GPU on defend2 (HARDWARE)
+
+Validation protocol (interleaved, checkpointed, 3 scenes) caught a
+ship-blocking defect ramqan-only testing missed: defend2 + memo hung
+deterministically in C3D_FrameBegin (GPU queue wait; ship, verify, and
+force-miss builds all hung; mono and no-memo completed). Bisect:
+MEMO_NO_COALESCE completed -> coalesced submit implicated. Root cause:
+tg_memo_off/cnt were UNINITIALIZED stack arrays; ortho groups never
+set them, yet the LOOKUP flush read them — garbage counts submitted
+to DrawArrays wedged the GPU queue. Ramqan's stack happened benign.
+Fix: zero-initialize both arrays + !orthographic guard on the lookup
+flush. Debug knobs MEMO_FORCE_MISS / MEMO_NO_COALESCE retained
+(default off) with stamp tracking.
+Post-fix validation (Old 3DS, 240+30, stereo):
+  ramqan  no-memo median ~89.0ms (n=4, one 1.44s outlier run kept)
+          memo 86006/86841 (n=5 band 85587-86841) => -3.4%, max ~equal
+  defend2 34166 vs 34096 (-0.2%, hits 99.6% — scene is sim-bound)
+  capship 29220 vs 28316 (-3.1%, hits 99.9%)
+  scratch_splits=0 everywhere; fidelity byte-identical (ramqan).
+Honest headline: memo = -3.4% on the heavy scene, ~flat where the
+scene is not conversion-bound. The earlier -5..-7% band was
+cross-config noise. Default-on stands (R22) WITH this fix; without
+it, default-on would have shipped a defend2 hang — the protocol
+earned its cost. Results banked under perf/val/.
