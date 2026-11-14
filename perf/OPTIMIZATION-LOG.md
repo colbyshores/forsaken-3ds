@@ -2441,3 +2441,35 @@ scene is not conversion-bound. The earlier -5..-7% band was
 cross-config noise. Default-on stands (R22) WITH this fix; without
 it, default-on would have shipped a defend2 hang — the protocol
 earned its cost. Results banked under perf/val/.
+
+## 2026-11-14 — R05 design gate: do not build the cache yet (analysis)
+
+Static audit of the level-mesh conversion inputs (MLOADHEADER walls):
+- XLight1Group (visi.c:1483, per visible group per frame) under
+  GPU_LIGHTING restores baked baseline colors (idempotent byte-wise)
+  and SKIPS the dynamic per-vertex loop (lights.c:556) — so wall
+  colors are frame-stable EXCEPT: TanimUV writes (animated textures,
+  per execbuf PolyAnim) and the water-effect tint section.
+- Therefore persistent conversion is byte-valid for execbufs with no
+  animating PolyAnim and no water tint, PROVIDED invalidation fires
+  on texture steps (hooks exist: smemo_invalidate sites) and on
+  water-state changes.
+- Identification is the hard part: draw_render_object receives an
+  opaque RENDEROBJECT*; there is no owner tag distinguishing level
+  walls from model/billboard buffers, and no per-execbuf "animates"
+  flag plumbed to the backend today. A cache keyed without that tag
+  repeats the RenderBufs aliasing class of bug.
+Required build order (do not shortcut):
+  1. Owner/static tagging at load (mload/mxload set a flag on the
+     RENDEROBJECT: STATIC_PERSIST_OK cleared by PolyAnim presence,
+     ENV envmap, MXA deform, water tint).
+  2. Static-fraction bench (counters: verts converted by owner class)
+     to size the prize before allocating linear memory.
+  3. Persistent linear buffers per execbuf texgroup, converted on
+     first draw, submitted via BufInfo; freed on level unload (hunk
+     epoch); invalidation via the existing smemo generation.
+  4. Audit validation protocol (A/B/A, 3 scenes, fidelity+stills+
+     splits=0) before default-on.
+Estimated multi-day; the defend2 uninitialized-array wedge is the
+standing lesson against rushing renderer caches. R05 remains the
+next block; this gate is its entry record.
