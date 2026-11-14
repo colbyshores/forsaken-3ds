@@ -174,6 +174,11 @@ void fidelity_tick(void)
 #endif
 }
 
+unsigned long fidelity_hash(void)
+{
+	return (unsigned long)g_hash;
+}
+
 void fidelity_level(const char *level_name)
 {
 	char line[128];

@@ -61,6 +61,10 @@
 #include "object.h"
 #include "networking.h"
 #include "render.h"
+#include "perf_capture.h"
+#ifdef STEREO_REPLAY
+#include "stereomemo.h"
+#endif
 #include "texture.h"
 #include "file.h"
 #include "main_3ds.h"
@@ -184,36 +188,31 @@ typedef struct {
 	float texcoord[2];
 } gpu_vertex_t;  /* 36 bytes */
 
-/* ---- Single-pass stereo display list ---- */
-
-/* Records one texture group draw for replay on the second eye.
- * Vertex data stays in the scratch buffer; only the MVP changes. */
-typedef struct {
-	int      scratchOffset;   /* index into s_scratch */
-	int      vertexCount;
-	MATRIX   worldMatrix;
-	MATRIX   projMatrix;
-	render_viewport_t viewport;
-	void    *texture;         /* texture_t* or NULL */
-	bool     colourkey;
-	bool     orthographic;
-	bool     additive_blend;
-	bool     has_texture;
-	/* True if this draw used the scissor-mode viewport (full-screen
-	 * GPU viewport + GPU scissor to the sub-rect). False for normal
-	 * sub-rect viewport draws. The replay path uses this to re-apply
-	 * the same dispatch on the second eye — without it, the second
-	 * eye re-renders the same group with sub-rect viewport, undoing
-	 * the visi.c portal-void fix on that eye. */
-	bool     scissor_mode;
-} dl_entry_t;
-
-#define MAX_DL_ENTRIES 4096
-static dl_entry_t s_dl[MAX_DL_ENTRIES];
-static int  s_dlCount     = 0;
-static bool s_dlRecording = false;
-static bool s_dlReplay    = false;  /* true = skip draw, replay handles it */
-static bool s_dlReplayDone = false; /* right-eye replay already performed */
+/* ---- Single-pass stereo vertex memo (STEREO_REPLAY) ----
+ *
+ * Converted vertices are eye-independent (world-space pos, baked color,
+ * raw UVs; lighting is shader-side), so the left eye's converted ranges
+ * can be re-submitted for the right eye with the right eye's live
+ * uniforms and draw order. The memo is keyed by stable batch identity
+ * (renderObject + texgroup + ortho + prim), NOT by draw order, so
+ * differing per-eye culling cannot drop geometry the way the old
+ * whole-list replay did (missed inset/HUD draws on one eye). A miss
+ * converts live — always safe, never stale. Table lives one frame
+ * (generation counter in stereomemo.c); overflow of the scratch arena
+ * disarms the memo for the rest of the frame (recorded offsets would
+ * be recycled).
+ *
+ * What runs per eye is UNCHANGED: full traversal, culling, state
+ * setup, uniforms, draw order, HUD. Only the vertex-conversion memcpy
+ * is skipped on memo hits. Pixel-identical by construction. */
+typedef enum {
+	SMEMO_OFF = 0,    /* mono / default: memo untouched */
+	SMEMO_RECORD,     /* left eye: convert live + record ranges */
+	SMEMO_LOOKUP      /* right eye: reuse recorded ranges, convert misses */
+} smemo_mode_t;
+#ifdef STEREO_REPLAY
+static smemo_mode_t s_memoMode = SMEMO_OFF;
+#endif
 
 /* Scratch buffer for vertex conversion.
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
@@ -228,6 +227,9 @@ static bool s_dlReplayDone = false; /* right-eye replay already performed */
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
+/* M1 scratch high-water (verts): full-run peak for the interp ownership
+ * proof. Extra presents are only safe while peak stays under s_scratchMax. */
+static int s_scratchPeak = 0;
 
 /* Fill-coverage estimate for overdraw screening (TF..): tracks the live
  * scissor rect so each submitted batch can accumulate its pixel bounds.
@@ -498,10 +500,15 @@ void pglSwapBuffers(void)
 		C3D_FrameEnd(0);
 		s_inFrame = false;
 	}
+	/* M1 scratch high-water: frame-end footprint (no mid-frame split
+	 * fired) or the split-time footprint below, whichever peaked. */
+	if (s_scratchUsed > s_scratchPeak)
+		s_scratchPeak = s_scratchUsed;
 	/* Reset stereo state for next frame */
 	s_stereoFrame = false;
-	s_dlReplay = false;
-	s_dlRecording = false;
+#ifdef STEREO_REPLAY
+	s_memoMode = SMEMO_OFF;
+#endif
 	s_hudDrawnThisFrame = false;
 
 	/* FPS measurement. Roll the count over a 1-second window so the
@@ -536,6 +543,12 @@ void pglSwapBuffers(void)
 		trace(_b);
 		s_fps_last_log_ms = now;
 	}
+}
+
+/* M1 scratch high-water (verts) for the bench result. */
+int c3d_scratch_peak_verts(void)
+{
+	return s_scratchPeak;
 }
 
 /*===================================================================
@@ -653,136 +666,17 @@ void pglHudEndBottom(void)
 	C3D_DepthMap(true, 1.0f, 1.0f);
 }
 
-/* Replay the display list recorded during the first eye.
- * Reuses vertex data already in the scratch buffer — only
- * recomputes the MVP with the updated view matrix. */
-static void replay_display_list(void)
-{
-	int i;
-	void *dl_lastTex = NULL;
-	bool dl_lastTextured = false;
-
-	for (i = 0; i < s_dlCount; i++)
-	{
-		dl_entry_t *e = &s_dl[i];
-		gpu_vertex_t *dst = s_scratch + e->scratchOffset;
-
-		/* Restore per-entry state */
-		if (e->additive_blend)
-		{
-			C3D_DepthTest(true, GPU_LESS, s_colorMask & ~GPU_WRITE_DEPTH);
-			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
-				GPU_SRC_ALPHA, GPU_ONE, GPU_SRC_ALPHA, GPU_ONE);
-		}
-		else
-		{
-			C3D_DepthTest(true, GPU_LESS, s_colorMask);
-			if (e->has_texture)
-				C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
-					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA,
-					GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA);
-			else
-				C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
-					GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
-		}
-
-		if (e->colourkey)
-			C3D_AlphaTest(true, GPU_GREATER, 0x64);
-
-		/* Viewport / scissor — match the dispatch the original draw
-		 * used. e->scissor_mode is recorded by FLUSH_BATCH from the
-		 * FSSetViewPort dispatch on the first eye. Without this, the
-		 * second eye renders every recorded draw with sub-rect
-		 * viewport, undoing visi.c's portal-void fix on that eye. */
-		{
-			int bottom = (int)render_info.ThisMode.h - (int)(e->viewport.Y + e->viewport.Height);
-			int pica_x = bottom < 0 ? 0 : bottom;
-			int pica_y = (400 - (int)e->viewport.Width) - (int)e->viewport.X;
-			if (pica_y < 0) pica_y = 0;
-			int pica_w = (int)e->viewport.Height;
-			int pica_h = (int)e->viewport.Width;
-			if (e->scissor_mode)
-			{
-				C3D_SetViewport(0, 0, 240, 400);
-				C3D_SetScissor(GPU_SCISSOR_NORMAL,
-				               (u32)pica_x, (u32)pica_y,
-				               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
-				TRACK_SCISSOR(pica_x, pica_y, pica_x + pica_w, pica_y + pica_h, true);
-			}
-			else
-			{
-				TRACK_SCISSOR(0, 0, 0, 0, false);
-				C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
-				C3D_SetViewport((u32)pica_x, (u32)pica_y,
-				                (u32)pica_w, (u32)pica_h);
-			}
-		}
-
-		/* Recompute MVP with new view matrix (eye offset already applied
-		 * by the engine before pglTransferEye was called) */
-		if (!e->orthographic)
-		{
-			memmove(&world_matrix, &e->worldMatrix, sizeof(MATRIX));
-			memmove(&proj_matrix, &e->projMatrix, sizeof(MATRIX));
-			upload_matrices();
-		}
-		else
-		{
-			C3D_Mtx ortho, identity;
-			Mtx_OrthoTilt(&ortho, 0.0f, render_info.ThisMode.w,
-				render_info.ThisMode.h, 0.0f, -1.0f, 1.0f, true);
-			Mtx_Identity(&identity);
-			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_PROJECTION, &ortho);
-			C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
-		}
-
-		/* Texture binding — apply_texenv_* uses the global TexEnv mode
-		 * cache (s_lastTexEnvMode), so the dl_lastTex local cache is
-		 * redundant once the helpers are in. Caller invalidates
-		 * s_lastTexEnvMode at replay start so the first draw re-binds. */
-		if (e->has_texture && e->texture)
-		{
-			texture_t *texdata = (texture_t*)e->texture;
-			if (texdata->initialized)
-			{
-				apply_texenv_for_texture(texdata);
-				dl_lastTex = (void*)texdata;
-				dl_lastTextured = true;
-			}
-			else if (dl_lastTextured)
-			{
-				apply_texenv_untextured();
-				dl_lastTex = NULL;
-				dl_lastTextured = false;
-			}
-		}
-		else if (dl_lastTextured)
-		{
-			apply_texenv_untextured();
-			dl_lastTex = NULL;
-			dl_lastTextured = false;
-		}
-
-		/* Buffer pointer only — AttrInfo set once in pglTransferEye */
-		{
-			C3D_BufInfo *bi = C3D_GetBufInfo();
-			BufInfo_Init(bi);
-			BufInfo_Add(bi, dst, sizeof(gpu_vertex_t), 3, 0x210);
-		}
-		C3D_DrawArrays(GPU_TRIANGLES, 0, e->vertexCount);
-
-		/* Restore */
-		if (e->colourkey)
-			C3D_AlphaTest(false, GPU_ALWAYS, 0);
-	}
-}
-
 void pglTransferEye(unsigned int eye)
 {
 	if (eye == GFX_LEFT)
 	{
-		/* Left eye finished. Stop recording, prepare for replay. */
-		s_dlRecording = false;
+		/* Left eye finished. Switch the memo from record to lookup:
+		 * the right eye reuses recorded ranges with its own live
+		 * uniforms and draw order. */
+#ifdef STEREO_REPLAY
+		if (s_memoMode == SMEMO_RECORD)
+			s_memoMode = SMEMO_LOOKUP;
+#endif
 
 		/* Switch to right eye target */
 		C3D_RenderTargetClear(s_targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
@@ -802,23 +696,20 @@ void pglTransferEye(unsigned int eye)
 		C3D_CullFace(GPU_CULL_FRONT_CCW);
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
-		/* With STEREO_REPLAY, arm the draw-level replay trigger: the
-		 * right eye's first 3D draw replays the recorded list instead
-		 * of re-converting + re-submitting. Ortho/2D draws are excluded
-		 * from the recording and always run live, so HUD stays correct.
-		 * Default (flag off): replay stays disarmed, both eyes callback
+		/* No trigger needed: the memo is keyed per batch, so every
+		 * right-eye draw looks its own range up (hit = resubmit,
+		 * miss = convert live). No draw is ever skipped, so inset,
+		 * HUD and post-stereo draws are unaffected by construction.
+		 * Default (flag off): s_memoMode stays OFF, both eyes run
 		 * fully, exactly as before. */
-#ifdef STEREO_REPLAY
-		s_dlReplay = (s_dlCount > 0);
-#else
-		s_dlReplay = false;
-#endif
 	}
 	if (eye == GFX_RIGHT)
 	{
-		/* Right eye done. Clear replay flag so post-stereo rendering
+		/* Right eye done. Disarm the memo; post-stereo rendering
 		 * (missile camera, rear view, HUD overlays) draws normally. */
-		s_dlReplay = false;
+#ifdef STEREO_REPLAY
+		s_memoMode = SMEMO_OFF;
+#endif
 	}
 	s_stereoFrame = true;
 }
@@ -900,7 +791,14 @@ bool c3d_renderer_init(void)
 	    "[boot] c3d_renderer_init: scratch OK linearFree=%u KB",
 	    linearSpaceFree() >> 10); boot_log(_b); }
 	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
+#ifdef STRESS_SCRATCH_VERTS
+	/* R02 stress: force mid-frame scratch overflow every frame to prove
+	 * the split/reset path (no GPU-completion wait) neither corrupts
+	 * geometry nor hangs. Debug builds only; never ship (kills batching). */
+	s_scratchMax = STRESS_SCRATCH_VERTS;
+#endif
 	s_scratchUsed = 0;
+	s_scratchPeak = 0;
 
 	/* Create render targets and link to display output.
 	 * Both left and right eye targets are created unconditionally —
@@ -1552,35 +1450,34 @@ bool FSBeginScene(void)
 		boot_log("[frame] first FSBeginScene");
 		s_first_begin_scene = 0;
 	}
-	/* Single-pass stereo: if replay already drew the second eye, skip. */
-	if (s_dlReplay)
-		return true;
-	/* Single-pass stereo replay is DISABLED.
-	 *
-	 * The replay mechanism recorded left-eye draws into s_dl[] and re-submitted
-	 * them with the right-eye view matrix, saving one BSP traversal per frame.
-	 * But it silently dropped any 2D/HUD draw issued AFTER the replay was
-	 * triggered on the second eye — menu text, reticles, missile viewport
-	 * all ended up on only one eye as a result. Disabling replay makes both
-	 * eye callbacks run fully (CPU cost ~2x 3D traversal in stereo mode), so
-	 * every draw lands on both targets naturally.
-	 *
-	 * If FPS on Old 3DS drops too far, the smarter fix is to skip replay
-	 * for ortho (2D) draws only, or to split the callback into "3D once + 2D
-	 * twice" explicitly. Leaving that for later. */
-	s_dlCount = 0;
+	/* Single-pass stereo vertex memo (STEREO_REPLAY): the left eye
+	 * records converted ranges keyed by stable batch identity; the
+	 * right eye reuses them with its own live uniforms and draw
+	 * order. The old whole-list replay (replay_display_list +
+	 * draw-skipping) is gone: it dropped inset/HUD draws on one eye
+	 * and broke on per-eye culling differences. Here no draw is ever
+	 * skipped — only the vertex-conversion memcpy, on memo hits. */
 #ifdef STEREO_REPLAY
-	/* Record left-eye 3D draws for second-eye replay. Gated on 3DS
-	 * stereo: mono frames must not pay the record cost. */
-	s_dlRecording = (render_info.stereo_mode == STEREO_MODE_3DS);
-#else
-	s_dlRecording = false;
+	smemo_begin_frame();
+	/* Gated on 3DS stereo: mono frames must not pay the record cost. */
+	s_memoMode = (render_info.stereo_mode == STEREO_MODE_3DS) ?
+		SMEMO_RECORD : SMEMO_OFF;
 #endif
-	s_dlReplayDone = false;
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
+#ifdef PERF_CAPTURE
+		/* FSBEGIN split: isolate the FrameBegin GPU/queue wait from the
+		 * CPU state setup that follows. If the wait dominates and setup
+		 * is ~0, the frame-begin cost is GPU overhang, not CPU work —
+		 * the reading that closes the TF03 question. */
+		perf_stage_begin(PERF_S_FSBWAIT);
+#endif
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+#ifdef PERF_CAPTURE
+		perf_stage_end(PERF_S_FSBWAIT, -1);
+		perf_stage_begin(PERF_S_FSBSETUP);
+#endif
 		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 		C3D_FrameDrawOn(s_targetLeft);
 		s_targetCurrent = s_targetLeft;
@@ -1630,6 +1527,9 @@ bool FSBeginScene(void)
 #endif
 
 		s_inFrame = true;
+#ifdef PERF_CAPTURE
+		perf_stage_end(PERF_S_FSBSETUP, -1);
+#endif
 	}
 	return true;
 }
@@ -1790,7 +1690,7 @@ static void clear_sub_viewport_via_quad(void)
 bool FSClear(XYRECT *rect)
 {
 	(void)rect;
-	if (!s_targetCurrent || s_dlReplay) return true;
+	if (!s_targetCurrent) return true;
 
 	/* Sub-viewports (missile cam, PIP, rear view) render AFTER the main
 	 * camera. Rasterized quad clear scissored to viewport via the
@@ -1841,12 +1741,10 @@ bool FSGetViewPort(render_viewport_t *view)
  * viewport" decisions without changing FSSetViewPort's signature
  * (which would touch every caller). */
 static bool s_next_view_use_scissor = false;
-/* Persistent record of the most recent FSSetViewPort dispatch — read
- * by FLUSH_BATCH when recording the display list so the second eye's
- * replay can re-apply the same dispatch (full-vp+scissor vs sub-rect
- * vp). Without this, the replay path uses sub-rect viewport for
- * every recorded draw and undoes the scissor-mode fix on the second
- * eye. */
+/* Persistent record of the most recent FSSetViewPort dispatch
+ * (full-vp+scissor vs sub-rect vp). Kept for viewport-dispatch
+ * diagnostics; the stereo vertex memo does not need it (both eyes
+ * run the live dispatch path). */
 static bool s_current_view_used_scissor = false;
 void FSSetNextViewPortScissorMode(bool scissor_mode)
 {
@@ -2170,8 +2068,6 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	else
 		mode = TEXENV_MODE_DIFFUSE;
 
-	C3D_TexBind(0, &texdata->tex);
-
 	/* Compute desired ProcTex state up front so the cache key includes
 	 * the per-execbuf atlas bucket. Two adjacent execbufs sharing the
 	 * same texture but different atlas seeds will land in different
@@ -2202,6 +2098,11 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	if (!mode_changed && !aux_state_changed &&
 	    s_lastBoundTexture == (void*)texdata)
 		return;
+
+	/* R08: bind only on a cache miss. The early-return path provably
+	 * already has this texture bound, so binding there was a redundant
+	 * GPU register write per cached call. */
+	C3D_TexBind(0, &texdata->tex);
 
 	if (mode == TEXENV_MODE_AUX && (mode_changed || aux_state_changed))
 	{
@@ -2893,25 +2794,11 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		c3d_update_phong_tint_for_object_pos(&pos);
 	}
 
-	/* Single-pass stereo: on the first 3D draw call of the second eye,
-	 * replay the recorded list with the updated view matrix (the engine
-	 * has now set up the right eye camera).  Then skip all subsequent
-	 * 3D draw calls for this pass.  Ortho/2D draws always run live on
-	 * both eyes — replaying them caused the historical one-eye-HUD bug.
-	 * If nothing was recorded (all-ortho left eye), fall through and
-	 * draw normally. */
-	if (s_dlReplay && !orthographic)
-	{
-		if (s_dlCount > 0)
-		{
-			replay_display_list();
-			s_dlCount = 0;  /* prevent re-replay */
-			s_dlReplayDone = true;
-		}
-		if (s_dlReplayDone)
-			return true;
-		/* else fall through: nothing to replay, draw normally */
-	}
+	/* Single-pass stereo memo: lookup happens per texture group in
+	 * the convert loop below (hit = reuse recorded verts, miss =
+	 * convert live). Nothing is skipped here — traversal, culling,
+	 * state, uniforms and draw order all run live per eye, so inset
+	 * and HUD draws are unaffected by construction. */
 
 #if defined(VERBOSE_TRACE) && defined(__3DS__)
 	/* Draw-side detector for the portal black-void bug: log when a draw
@@ -2992,8 +2879,75 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	void *batch_texture     = NULL;
 	bool  batch_colourkey   = false;
 	bool  batch_hasTexture  = false;
+#ifdef STEREO_REPLAY
+	/* Eye-2 submit spans: per-texgroup converted ranges for the batch
+	 * being flushed (batch_tg0 .. group-1). A skipped texgroup records
+	 * count 0 and is not submitted. */
+	int   batch_tg0 = 0;
+	int   tg_memo_off[MAX_TEXTURE_GROUPS];
+	int   tg_memo_cnt[MAX_TEXTURE_GROUPS];
+#endif
 
-/* Macro: flush the current batch (draw + display list + state restore) */
+/* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
+ * exactly as before. Eye 2 in lookup mode: one draw per texgroup range
+ * in the batch, in walk order, with the same per-batch state. Splitting
+ * only the submit (never state, order or uniforms) keeps pixels
+ * identical while tolerating per-eye culling differences: a texgroup
+ * the left eye never converted is simply converted live instead. */
+#ifdef STEREO_REPLAY
+#define FLUSH_BATCH() do { \
+	if (batch_vertCount > 0) { \
+		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
+		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
+		FILLPIX_COUNT_BATCH(); \
+		TRANS_COUNT_BATCH(); \
+		if (s_memoMode == SMEMO_LOOKUP) { \
+			int _si; \
+			int _consumed = 0; \
+			long _run_off = 0; \
+			int _run_cnt = 0; \
+			int _run_open = 0; \
+			for (_si = batch_tg0; _si < group && _consumed < batch_vertCount; _si++) { \
+				if (tg_memo_cnt[_si] <= 0 || (_run_open && tg_memo_off[_si] != _run_off + _run_cnt)) { \
+					if (_run_open) { \
+						BufInfo_Init(_bi); \
+						BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
+						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
+						atm_prof_add(ATM_C_DRAWS, 1); \
+						_run_open = 0; \
+					} \
+					if (tg_memo_cnt[_si] <= 0) \
+						continue; \
+				} \
+				if (!_run_open) { \
+					_run_off = tg_memo_off[_si]; \
+					_run_cnt = 0; \
+					_run_open = 1; \
+				} \
+				_run_cnt += tg_memo_cnt[_si]; \
+				_consumed += tg_memo_cnt[_si]; \
+			} \
+			if (_run_open) { \
+				BufInfo_Init(_bi); \
+				BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
+				C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
+				atm_prof_add(ATM_C_DRAWS, 1); \
+			} \
+		} else { \
+			BufInfo_Init(_bi); \
+			BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
+			C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
+			atm_prof_add(ATM_C_DRAWS, 1); \
+		} \
+		if (batch_colourkey) \
+			C3D_AlphaTest(false, GPU_ALWAYS, 0); \
+		if (batch_hasTexture && !_additive_blend_active) \
+			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, \
+				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO); \
+		batch_vertCount = 0; \
+	} \
+} while(0)
+#else
 #define FLUSH_BATCH() do { \
 	if (batch_vertCount > 0) { \
 		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
@@ -3004,20 +2958,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
 		FILLPIX_COUNT_BATCH(); \
 		TRANS_COUNT_BATCH(); \
-		if (s_dlRecording && !orthographic && s_dlCount < MAX_DL_ENTRIES) { \
-			dl_entry_t *_e = &s_dl[s_dlCount++]; \
-			_e->scratchOffset = batch_startOffset; \
-			_e->vertexCount   = batch_vertCount; \
-			memmove(&_e->worldMatrix, &world_matrix, sizeof(MATRIX)); \
-			memmove(&_e->projMatrix,  &proj_matrix,  sizeof(MATRIX)); \
-			_e->viewport       = s_viewport; \
-			_e->texture        = batch_texture; \
-			_e->colourkey      = batch_colourkey; \
-			_e->orthographic   = orthographic; \
-			_e->additive_blend = _additive_blend_active; \
-			_e->has_texture    = batch_hasTexture; \
-			_e->scissor_mode   = s_current_view_used_scissor; \
-		} \
 		if (batch_colourkey) \
 			C3D_AlphaTest(false, GPU_ALWAYS, 0); \
 		if (batch_hasTexture && !_additive_blend_active) \
@@ -3026,6 +2966,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		batch_vertCount = 0; \
 	} \
 } while(0)
+#endif
 
 	for (group = 0; group < numGroups; group++)
 	{
@@ -3035,7 +2976,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		int totalVerts, i;
 		gpu_vertex_t *dst;
 
-		if (numIndices <= 0) continue;
+		if (numIndices <= 0) {
+#ifdef STEREO_REPLAY
+			tg_memo_cnt[group] = 0;
+#endif
+			continue;
+		}
 
 		/* Mid-frame flush: if scratch is nearly full, flush pending batch
 		 * and split the frame to reset the scratch pointer. */
@@ -3045,7 +2991,20 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			{
 				FLUSH_BATCH();
 				C3D_FrameSplit(0);
+				/* M1: record the pre-split footprint. Resetting the cursor
+				 * here is NOT a GPU-completion proof (FrameSplit only
+				 * queues); the peak at least makes any overlap visible. */
+				if (s_scratchUsed > s_scratchPeak)
+					s_scratchPeak = s_scratchUsed;
 				s_scratchUsed = 0;
+#ifdef STEREO_REPLAY
+				/* Scratch reset recycles eye-1 recorded offsets: stop
+				 * reusing them. The pending batch was already flushed
+				 * above (valid ranges); the rest of the frame runs
+				 * fully live. */
+				if (s_memoMode != SMEMO_OFF)
+					s_memoMode = SMEMO_OFF;
+#endif
 				C3D_BindProgram(&s_shaderProgram);
 				{
 					C3D_AttrInfo *ai = C3D_GetAttrInfo();
@@ -3069,13 +3028,45 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					C3D_FVUnifMtx4x4(GPU_VERTEX_SHADER, UNIFORM_MODELVIEW, &identity);
 				}
 			}
-			if (s_scratchUsed + numIndices > s_scratchMax)
+			if (s_scratchUsed + numIndices > s_scratchMax) {
+#ifdef STEREO_REPLAY
+				tg_memo_cnt[group] = 0;
+#endif
 				continue;
+			}
 		}
 
 		dst = s_scratch + s_scratchUsed;
 
+#ifdef STEREO_REPLAY
+		/* Memo lookup (right eye only, never ortho): reuse the recorded
+		 * range and skip conversion. Misses convert live below. */
+		long memo_off = 0;
+		int memo_cnt = 0;
+		bool memo_hit = false;
+		if (s_memoMode == SMEMO_LOOKUP && !orthographic) {
+			memo_hit = smemo_lookup(renderObject,
+				smemo_sub(sorted_order[group], 0, primitive_type),
+				&memo_off, &memo_cnt,
+				renderObject->memoEpochPass,
+				renderObject->memoEpochGroup,
+				renderObject->memoEpochTPage);
+#ifdef ATM_PROFILING
+			atm_prof_add(memo_hit ? ATM_C_MEMO_HIT : ATM_C_MEMO_MISS, 1);
+#endif
+		}
+#endif
+		/* Convert live unless the memo hit (VERIFY converts anyway
+		 * for the oracle compare below). */
+#if defined(STEREO_REPLAY) && !defined(MEMO_VERIFY)
+		if (memo_hit) {
+			totalVerts = memo_cnt;
+			tg_memo_off[group] = memo_off;
+			tg_memo_cnt[group] = memo_cnt;
+		} else
+#endif
 		/* Convert LVERTEX/TLVERTEX → gpu_vertex_t, expanding indices */
+		{
 		if (renderObject->lpIndexBuffer)
 		{
 			WORD *indices = (WORD*)renderObject->lpIndexBuffer + tg->startIndex;
@@ -3121,7 +3112,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		{
 			LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
 			int numVerts = tg->numVerts;
-			if (s_scratchUsed + numVerts > s_scratchMax) continue;
+			if (s_scratchUsed + numVerts > s_scratchMax) {
+#ifdef STEREO_REPLAY
+				tg_memo_cnt[group] = 0;
+#endif
+				continue;
+			}
 			for (i = 0; i < numVerts; i++)
 			{
 				int vi = startVert + i;
@@ -3137,6 +3133,84 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				dst[i].texcoord[1] = v->tv;
 			}
 			totalVerts = numVerts;
+		}
+
+#ifdef STEREO_REPLAY
+		/* Record the converted range (eye 1). Runs ONLY on the live
+		 * path: on a memo hit the tg arrays already hold the looked-up
+		 * range and must not be overwritten with the cursor. */
+		if (s_memoMode != SMEMO_OFF && !orthographic) {
+			tg_memo_off[group] = dst - s_scratch;
+			tg_memo_cnt[group] = totalVerts;
+			if (s_memoMode == SMEMO_RECORD) {
+				smemo_record(renderObject,
+					smemo_sub(sorted_order[group], 0, primitive_type),
+					dst - s_scratch, totalVerts,
+					renderObject->memoEpochPass,
+					renderObject->memoEpochGroup,
+					renderObject->memoEpochTPage);
+			}
+		}
+#endif
+#if defined(STEREO_REPLAY) && defined(MEMO_VERIFY)
+		if (memo_hit) {
+			/* Oracle check: the live convert above must reproduce the
+			 * recorded bytes exactly (the content hash already matched,
+			 * so a failure here means same-frame mutation, not aliasing).
+			 * On mismatch submit the LIVE range: the recorded bytes
+			 * belong to a different batch, and submitting them draws
+			 * another batch's geometry. */
+			if (memcmp(dst, s_scratch + memo_off, memo_cnt * sizeof(gpu_vertex_t)) != 0) {
+				atm_prof_add(ATM_C_MEMO_MISMATCH, 1);
+				tg_memo_off[group] = dst - s_scratch;
+				tg_memo_cnt[group] = totalVerts;
+#ifdef MEMO_VERIFY_FORENSICS
+				/* One-shot first-mismatch forensics via result counters.
+				 * 2026-11-13: snprintf/fb/boot_log removed — the no-FS
+				 * variant still wedged, so the 256B stack buffer and the
+				 * stdio call are suspects alongside the counter adds.
+				 * This adds-only shape isolates them. */
+				{
+					static int mf_done = 0;
+					static int mf_n = 0;
+					mf_n++;
+					if (!mf_done) {
+						mf_done = 1;
+						const unsigned *pa = (const unsigned *)dst;
+						const unsigned *pb = (const unsigned *)(s_scratch + memo_off);
+						int nw = memo_cnt * (int)(sizeof(gpu_vertex_t) / sizeof(unsigned));
+						int fi = 0;
+						while (fi < nw && pa[fi] == pb[fi]) fi++;
+						/* Field id without % (runtime modulo is an
+						 * __aeabi_idiv call): repeated subtract. */
+						int mf_word = fi;
+						while (mf_word >= 9) mf_word -= 9;
+						/* @vfp-exempt R2 — one-shot memo-verify debug plumbing: plain int/unsigned words, no float source involved. measured n/a. Verified 2026-11-13. */
+						int mf_sub = smemo_sub(sorted_order[group], 0, primitive_type);
+						/* Numeric-only first-mismatch detail via the proven
+						 * atm_result.txt channel. Single-shot via mf_done.
+						 * No explicit casts: atm_prof_add takes uint32_t and
+						 * the sources are already int/unsigned. */
+						atm_prof_add(ATM_C_MEMO_MF_SUB, mf_sub);
+						atm_prof_add(ATM_C_MEMO_MF_CNT, nw);
+						atm_prof_add(ATM_C_MEMO_MF_FI, fi);
+						atm_prof_add(ATM_C_MEMO_MF_EXP, fi < nw ? pb[fi] : 0);
+						atm_prof_add(ATM_C_MEMO_MF_GOT, fi < nw ? pa[fi] : 0);
+						atm_prof_add(ATM_C_MEMO_MF_WORD, mf_word);
+						atm_prof_add(ATM_C_MEMO_MF_EPASS, renderObject->memoEpochPass);
+					}
+					if (mf_n == 2) {
+						int mf_sub2 = smemo_sub(sorted_order[group], 0, primitive_type);
+						atm_prof_add(ATM_C_MEMO_MF_SUB2, mf_sub2);
+					}
+				}
+#endif
+			} else {
+				tg_memo_off[group] = memo_off;
+				tg_memo_cnt[group] = memo_cnt;
+			}
+		}
+#endif
 		}
 
 		/* Determine effective texture state for this group */
@@ -3161,6 +3235,9 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		if (batch_vertCount == 0)
 		{
 			batch_startOffset = s_scratchUsed;
+#ifdef STEREO_REPLAY
+			batch_tg0 = group;
+#endif
 			batch_texture     = (void*)tg->texture;
 			batch_colourkey   = tg->colourkey;
 			batch_hasTexture  = eff_hasTexture;

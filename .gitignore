@@ -127,6 +127,7 @@ tools/*
 # tools/* rule swallow them. Run logs stay out.
 !tools/perf/
 !tools/perf/**
+!tools/ralph-pi.sh
 tools/perf/logs/
 
 # Nintendo DSP firmware blob. NOT bundled in the CIA — CFW users on real

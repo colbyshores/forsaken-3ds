@@ -260,6 +260,14 @@ bool handle_events(void)
 	joy_button_state[0][0] = true;
 #endif
 
+#if defined(ATM_BENCH_FIRE) && defined(ATM_PROFILING)
+	/* Combat bench: same held trigger as above, but scoped to the ATM
+	 * bench (Makefile refuses FIRE without PROFILING) so the
+	 * level-sweep apparatus — dwell advance, chainload-to-stub, DEBUG
+	 * traces — stays out of the measured run. */
+	joy_button_state[0][0] = true;
+#endif
+
 	/* ---- D-pad as POV hat ---- */
 	if (kHeld & KEY_DUP)    joy_hat_state[0][0][JOY_HAT_UP]    = 1;
 	if (kHeld & KEY_DRIGHT) joy_hat_state[0][0][JOY_HAT_RIGHT] = 1;

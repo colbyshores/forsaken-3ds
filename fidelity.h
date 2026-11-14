@@ -22,6 +22,9 @@
 void fidelity_tick(void);
 void fidelity_level(const char *level_name);
 unsigned long fidelity_level_ticks(void);
+/* M1 render-purity probe: current gameplay-state hash (FNV-1a over ships,
+ * enemies, bullets). A repeated render of the same tick must not move it. */
+unsigned long fidelity_hash(void);
 
 #ifdef FIDELITY_CHECKPOINTS
 /* Emits a hash checkpoint every FIDELITY_CHECKPOINT_TICKS simulation ticks
@@ -38,6 +41,7 @@ unsigned long fidelity_level_ticks(void);
 
 #define fidelity_tick() ((void)0)
 #define fidelity_level(s) ((void)0)
+#define fidelity_hash() (0UL)
 
 #endif
 

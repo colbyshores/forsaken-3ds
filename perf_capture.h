@@ -107,6 +107,8 @@ enum perf_stage {
 	PERF_S_TRANFM,      /* DIAG TRANS split: clipped faceme trans polys per group */
 	PERF_S_TRANEXE,     /* DIAG TRANS split: ExecuteTransExe(+Unclipped) */
 	PERF_S_TRANUNCLIP,  /* DIAG TRANS split: unclipped trans polys + fm */
+	PERF_S_FSBWAIT,     /* FSBEGIN split: C3D_FrameBegin (GPU/queue wait) only */
+	PERF_S_FSBSETUP,    /* FSBEGIN split: target clear + GPU state setup after begin */
 	PERF_S_MAX
 };
 

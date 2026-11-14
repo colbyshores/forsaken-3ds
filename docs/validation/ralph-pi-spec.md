@@ -1,275 +1,74 @@
-    # TASK: On-device profiling and optimization loop on a physical Old 3DS
+# Ralph-pi task: profile and optimize Forsaken on physical Old 3DS using ATM
 
-    ## HARNESS CONTRACT — read this first
+## Mandatory first actions, every fresh iteration
 
-    You are ONE iteration of an autonomous loop (ralph.sh re-launches
-    a fresh agent with this same prompt repeatedly). You have no
-    memory of previous iterations except what is on disk. Rules:
-    - On every invocation: read ./perf/OPTIMIZATION-LOG.md (if it
-      exists), `git status`, `atm status`, and `atm journal` BEFORE
-      doing anything. Disk state decides which phase you are in —
-      never assume, never restart completed phases.
-    - Do exactly ONE phase or ONE loop iteration (as defined below),
-      write your results to the log/state files, then END YOUR TURN.
-      The harness will relaunch you. Never run the whole campaign in
-      one turn.
-    - If ./perf/LOOP-DONE.md exists: do nothing except confirm and end.
-    - If the console or log state contradicts what you expected
-      (unresponsive console, leftover crash artifacts, a change
-      present in the tree with no log entry), STOP: write what you
-      found into ./perf/BLOCKED.md with exact commands/output, and end.
-      Do not improvise recovery and do not push on blind.
+Before any code change, build, deploy, or test:
+1. Read `perf/OPTIMIZATION-LOG.md` if present, `perf/BLOCKED.md`, `perf/LOOP-DONE.md`, and `git status --short --branch`.
+2. Run `atm status`, `atm devmode`, `atm artifacts`, and `atm journal` using the controller below. Save the exact outputs in the iteration log. **Transient unreachability is retried, not filed**: if a command returns `unreachable` / `Connection refused`, wait 60 seconds and retry up to 3 times before treating it as a blocker. A refused or timed-out preflight is polled a few times over ~5 minutes before it becomes a blocker; never file `perf/BLOCKED.md` on the first transient failure.
+3. Disk state selects the first incomplete phase. Do exactly ONE phase or ONE Phase-D iteration, write results, then end your turn. The outer `tools/ralph-pi.sh` relaunches a fresh agent.
+4. If `perf/LOOP-DONE.md` exists, confirm and stop. If `perf/BLOCKED.md` exists, stop without retrying. Only if all retries are exhausted and the console remains unreachable, unresponsive, or reports `recovery_failure`/`incomplete_recovery`, write exact command/output to `perf/BLOCKED.md` and stop. Do not improvise a reboot, cleanup, ack, or retry.
+5. Never commit or push. Keep successful code changes uncommitted for operator review.
 
-    ## Mission
+## Objective
 
-    You have access to a physical Original Nintendo 3DS (Old 3DS ONLY —
-    New 3DS numbers are never acceptable evidence) running a custom
-    Luma3DS+ATM firmware that makes it an autonomous hardware-testing
-    target. We profile on the OG 3DS because it is the lowest common
-    denominator: if it runs well here, it runs well everywhere this
-    project targets — and performance claims from any faster platform
-    prove nothing about this one. Your job across iterations: profile
-    THIS project running on that real hardware, find every
-    optimization you can justify with on-device measurements, apply
-    them one at a time, and prove each one helped.
+Use the actual physical Original 3DS at `192.168.4.167`, enrolled as `old3ds-lan167`, to profile and improve Forsaken. The ATM project is now named `netload_stub`; use that canonical path. Emulator, host, New 3DS, and OG-profile proxy results are not Old 3DS evidence. The first optimization target is duplicated stereo traversal. Do not fall back to the obsolete `192.168.4.52`/raw-3dslink netload_stub workflow.
 
-    ## Step 0 — Learn the hardware interface before touching anything
+## ATM docs and controller
 
-    The complete operational manual is in the Obsidian vault (use the
-    Obsidian MCP tools): start with "ATM Autonomous Agent Runbook —
-    Original Old 3DS" and follow its links to `network-api-reference`,
-    `deployment-and-launch`, `debugger-guide`,
-    `profiling-and-telemetry`, `developer-mode`, `artifact-management`,
-    and `troubleshooting`. Do not invent endpoints or commands — if the
-    runbook doesn't document it, it doesn't exist. The firmware/tooling
-    source of truth is the Luma3DS repo at /mnt/nas/Development/Luma3DS
-    (controller: `tools/atmctl.py`, instrumentation core:
-    `sysmodules/rosalina/source/atm/atm_core.c`, example workload:
-    `tests/workloads/atm_workload_ok.c`).
+Read the Obsidian runbook `10-projects/netload_stub/atm-autonomous-agent-runbook.md`, then its linked ATM notes: network API, deployment/launch, debugger, profiling/telemetry, developer mode, artifact management, troubleshooting. These docs and the controller are authoritative; do not invent commands/endpoints.
 
-    Console facts (verify, never assume): 3DS at 192.168.4.167,
-    workstation 192.168.4.220, enrolled device id `old3ds-lan167`,
-    firmware build `da4b1b95a66c`. Ports: HTTP 8080, deploy TCP 17491,
-    telemetry UDP 8081, commands UDP 8082, GDB 4000–4003.
+```sh
+ATM=(python3 /mnt/nas/Development/netload_stub/tools/atmctl.py --ip 192.168.4.167 --device-id old3ds-lan167)
+"${ATM[@]}" status
+"${ATM[@]}" devmode
+"${ATM[@]}" artifacts
+"${ATM[@]}" journal
+```
 
-    Define once per shell:
-      alias atm="python3 /mnt/nas/Development/netload_stub/tools/atmctl.py --ip 192.168.4.167 --device-id old3ds-lan167"
+Verify all identity and state live. ATM's `recovery_stopped` means the documented three-consecutive-crash circuit breaker has tripped; it is not by itself network unavailability. A host-requested `atm run` is permitted only when the device is reachable, `operational=yes`, `recovery_ready=yes`, and no `recovery_failure`/`incomplete_recovery` exists. Preserve prior crash evidence. A run must be judged from its JSON stage evidence, journal, manifest, hashes, and retrieved results—not mere deploy/launch acknowledgement. `CRASH_FATAL`/`CRASH_ERRDISP` mean dump recovery occurred, not that the workload passed. Stop on `INCOMPLETE_RECOVERY`, `RECOVERY_FAILURE`, timeout, or unexplained state change.
 
-    ## Phase machine (do the FIRST phase whose output is missing)
+ATM measures no generic CPU/GPU utilization or memory headroom. Frame timing must be produced by this application. `osGetTime` is 1 ms granularity and percentiles are bucket estimates; state this in all reports.
 
-    Phase A — VALIDATE the hardware loop.
-    Output: ./perf/OPTIMIZATION-LOG.md created with console identity
-    section + smoke-test result.
-    This ATM build is source/host-verified but has little physical
-    runtime so far. Before trusting any number:
-      atm status        # device must match, operational=yes
-      atm devmode       # devmode_armed=yes; ideally devmode_active=yes
-                        # svc_gdb=active:* required before any debugging
-      atm artifacts     # what's pending from previous work
-      atm journal       # previous run state
-    Then smoke-test with a trivial existing workload if available
-    (atm-deploy/workloads/atm_workload_ok.3dsx in the Luma3DS repo):
-      atm run <workload.3dsx> ./perf/smoke --build-id smoke
-    Only mark Phase A complete when deploy→launch→run→retrieve
-    completes with outcome COMPLETED and artifacts verified. If any
-    stage fails, diagnose via the runbook troubleshooting page, write
-    ./perf/BLOCKED.md with the exact failure, and end — do not build
-    profiling conclusions on a partially working loop. Hard
-    hangs/lockups are OUTSIDE the recovery contract: if the console
-    stops answering entirely, record manual-intervention-required in
-    BLOCKED.md; never claim recovery.
+## Phase A — validate the hardware loop (first if missing)
 
-    Phase B — INSTRUMENT this project.
-    Output: profiling build exists; log records how to build it and
-    its build-id.
-    ATM measures nothing generically — no CPU%, no GPU, no memory
-    headroom. Frame timing comes from the app itself:
-    - Link `atm_core.c` (+ its header) from the Luma3DS repo into a
-      dedicated profiling build of this project.
-    - Call `atm_frame_add()` once per frame in the main loop (O(1),
-      no allocation, no I/O in the hot path). Add any app-specific
-      counters you need the same way (bounded, aggregated).
-    - After a FIXED, deterministic workload (same scene/input/frame
-      count every run — if the project has no benchmark mode, add one
-      behind a build flag; never profile interactive play), write the
-      `atm_frame_format_summary()` line plus your counters to
-      `/3ds/atm_result.txt`, then exit cleanly.
-    - Keep the `.elf` next to every `.3dsx` build. Wrong-build symbols
-      are the #1 debugging hazard; the GDB wrapper verifies sections,
-      and you must treat a mismatch as fatal to that session.
-    Measurement honesty: `osGetTime` granularity is 1 ms and
-    percentiles are bucket estimates. Say so in every report. Never
-    extrapolate to CPU/GPU utilization.
+Create `perf/OPTIMIZATION-LOG.md` with live device/firmware identity and smoke result. Run the existing workload:
 
-    Phase C — BASELINE before optimizing.
-    Output: log contains a baseline table of 3 runs.
-      atm run build/<app>.3dsx ./perf/baseline-<gitrev> \
-          --build-id <gitrev-or-content-id> --scenario <workload-name>
-    Run the baseline 3 times. Record per run: build_id, firmware_id
-    (from `atm status`), scenario, frame summary (count, avg, p50,
-    p95, p99, max, over-budget count), and outcome. The spread across
-    the 3 baselines is your noise floor: no "improvement" smaller than
-    run-to-run noise counts as an improvement. Commit nothing yet.
+```sh
+"${ATM[@]}" run /mnt/nas/Development/netload_stub/atm-deploy/workloads/atm_workload_ok.3dsx ./perf/smoke --build-id smoke-<unique-id> --scenario atm-workload-ok
+```
 
-    Phase D — ONE OPTIMIZATION ITERATION (repeatable, see protocol).
+Require outcome `COMPLETED`, matching device/build/firmware, successful deploy/launch/run evidence, and verified retrieval manifest including `/3ds/atm_result.txt`. If a command fails, consult runbook troubleshooting and stop with exact evidence in `perf/BLOCKED.md`; do not retry blindly. Existing successful smoke output may count only if its manifest, run record, journal, build, and device identity satisfy these requirements and there is no later contradictory state.
 
-    ## First profiling target — stereo traversal cost (start Phase D here)
+## Phase B — instrument Forsaken (one-time)
 
-    Prior finding to VERIFY in this project's source, not assume:
-    "Single-pass stereo replay is DISABLED. The replay mechanism
-    recorded left-eye draws into s_dl[] and re-submitted them with
-    the right eye's matrix/state, but the engine's gameplay/
-    visibility traversal in oct2's eye callbacks run fully (CPU cost
-    ~2x 3D traversal in stereo mode), so the CPU savings were not
-    realized and the replay path was disabled. The eye callbacks
-    still run fully in stereo."
+Link shared `atm_core.c` and header from `/mnt/nas/Development/netload_stub/sysmodules/rosalina/` into a profiling-only Forsaken build. Call `atm_frame_add()` once per frame, bounded O(1), no allocation/I/O on the hot path. Add a fixed deterministic benchmark (same level, inputs, settings, frame count; never interactive play) behind profiling flags; write `atm_frame_format_summary()` and bounded app counters to `/3ds/atm_result.txt` and exit cleanly. Keep each matching `.elf` beside its `.3dsx`; wrong-build symbols invalidate debugging. Preserve release behavior outside profiling flags.
 
-    Investigate in this order (each numbered item may take its own
-    Phase D iteration — log partial findings before ending your turn):
-    1. Confirm or refute the claim in code: locate s_dl[], the
-       replay submit path, the eye callbacks, and what work
-       (gameplay? visibility/PVS? draw collection?) actually runs
-       per eye vs per frame. Report where the quote is stale.
-    2. Baseline BOTH configurations as separate scenarios with
-       identical scene/inputs: mono (3D off) and stereo (3D on).
-       Add bounded app-side counters beyond frame time: per-eye
-       traversal invocation count and accumulated ms, draw-call
-       count per eye, s_dl recorded size. Frame time alone cannot
-       attribute this cost — do not guess the split.
-    3. Candidate fixes, as separate loop iterations, smallest first:
-       (a) hoist eye-invariant work (gameplay, visibility) out of
-           the per-eye callbacks so it runs once per frame and only
-           draw submission is per-eye;
-       (b) only if (a) is insufficient or inapplicable, evaluate
-           re-enabling replay — note the original failure mode:
-           replay saves draw-submission CPU but is worthless if
-           traversal still runs twice, so quantify replay overhead
-           vs second-traversal cost before reviving it.
-    4. Correctness for stereo changes MUST use a 3D screenshot set
-       (manifest is3d=yes, includes the right-eye image): both eyes
-       correct, correct disparity, no left-eye state leaking into
-       the right eye. A mono-only screenshot does not verify this.
-    Success criterion: stereo frame cost approaching mono + draw
-    submission only, proven by the per-eye counters, not just FPS.
+## Phase C — baseline
 
-    ## Phase D iteration protocol (self-directed loop)
+Run the same deterministic Old 3DS scenario three times into fresh `perf/baseline-<build-id>-<run>/` directories using `atm run`. Record per run: device ID, firmware ID, build ID and payload SHA-256, scenario, frame count, avg/p50/p95/p99/max, over-budget count, ATM outcome, and verified artifact paths/hashes. Three-run spread is the noise floor. Commit nothing.
 
-    State lives on disk, not in your context:
-    - At the START of every iteration, re-read
-      ./perf/OPTIMIZATION-LOG.md and run `atm status` + `atm journal`.
-      Never re-attempt a hypothesis already marked reverted/dead.
-      If the console state doesn't match what the log expects (wrong
-      run, pending crash artifacts, not operational), reconcile or
-      STOP (write ./perf/BLOCKED.md) — never push on blind.
-    - Each iteration completes fully before the next begins:
-      hypothesis → one change → 3 measured runs → correctness →
-      keep/revert → log entry written BEFORE you end your turn.
-    - Stop conditions (any one ends the campaign: write the final
-      summary into the log, create ./perf/LOOP-DONE.md, and end):
-      (a) 3 consecutive iterations with no gain beyond baseline noise;
-      (b) 15 total Phase D iterations (count them from the log);
-      (c) console unresponsive or any INCOMPLETE_RECOVERY (also write
-          BLOCKED.md instead of LOOP-DONE.md in this case);
-      (d) the only remaining ideas require a visual/gameplay trade-off
-          or a mass rewrite — write those as proposals in the log for
-          my approval instead of implementing them.
-    - You own task selection between iterations: always attack the
-      largest measured cost next (stereo traversal first, per the
-      target section). If your context is compacted or restarted,
-      the log + `atm journal` are how you recover — trust disk over
-      memory.
+## Phase D — one measured optimization per iteration
 
-    One Phase D iteration is:
-    1. HYPOTHESIZE from evidence, not vibes. Use the frame stats and
-       counters to name the suspected bottleneck. To localize it, use
-       the debugger (diagnosis ONLY — see rules below):
-         atm deploy build/<app>.3dsx --build-id <id> --no-launch
-         atm launch <name>   # then confirm `running` via atm journal
-         python3 /mnt/nas/Development/Luma3DS/netload_stub/host/n3dlgdb.py \
-           192.168.4.167 --elf build/<app>.elf --port 4000 --cmds cmds.txt
-       or raw arm-none-eabi-gdb extended-remote :4000 (break-on-start
-       via :4003 before launch). Breakpoints, watchpoints, register/
-       memory inspection, and backtraces are for understanding WHERE
-       time goes. Detach cleanly when done.
-    2. CHANGE exactly one thing. Smallest diff that tests the
-       hypothesis. Respect Old 3DS limits: no unbounded allocation,
-       no new threads casually, no SD writes or network in hot paths.
-    3. MEASURE: same scenario, same frame count, 3 runs via `atm run`
-       into a fresh ./perf/<change-id>/ dir. Compare median-of-3 and
-       p95/p99 against baseline median — averages alone hide hitches.
-    4. VERIFY CORRECTNESS, not just speed:
-         atm screenshot --label <change-id> --retrieve-to ./perf/<change-id>/shots
-       Compare screenshots against baseline visually (rendering must
-       not change unless the change intends it). Screenshots stall the
-       workload (whole-cache flush) — capture in a SEPARATE run from
-       timed runs, never during measurement.
-    5. KEEP or REVERT based on the numbers. A change with no
-       measurable gain beyond noise, or any correctness regression,
-       gets reverted. Log it either way (hypothesis, diff summary,
-       before/after table, keep/revert) in ./perf/OPTIMIZATION-LOG.md.
-    6. Use your resources. You have Internet access plus Obsidian MCP
-       and Cognee MCP. Use them aggressively to GENERATE hypotheses —
-       known Old 3DS/ARM11 bottlenecks, PICA200 costs, libctru/citro3d
-       pitfalls, prior findings from memory. But external claims are
-       never evidence: every researched idea still enters at step 1
-       of this iteration, one variable at a time, and lives or dies
-       by this console's measurements. Record the source of each
-       hypothesis in the log. Work autonomously and make good
-       engineering decisions within these rules; never trade visual
-       quality or gameplay behavior for frame time without flagging
-       it as a proposal for my approval instead of implementing it.
-       If you write findings to Cognee/memory, write only measured
-       results, labeled with build_id + firmware_id — never store
-       hypotheses as facts.
+Start with stereo traversal. Verify the code before assuming the earlier claim: locate left/right callbacks, display-list recording/replay, and identify which gameplay, visibility/PVS, traversal, and draw-collection work runs per eye versus once per frame. Bank this source audit before implementing changes.
 
-    ## Crashes during the loop
+Then instrument bounded counters: per-eye traversal invocation/count and accumulated time, draw submissions per eye, and recorded/replayed list size. Establish identical deterministic mono and stereo baselines on the device. Candidate changes are separate iterations: first hoist measured eye-invariant gameplay/visibility work so it runs once per frame; only consider replay if measured savings exceed its overhead. Do not trade image quality or game behavior without explicitly recording a proposal rather than implementing it.
 
-    They will happen; use them, don't fear them. `atm run` already
-    handles supported crashes: unattended capture (fatal ARM11 and
-    ErrDisp paths), auto-reboot, reconnect, artifact retrieval, and
-    correlation to the run/build. Outcomes CRASH_FATAL/CRASH_ERRDISP
-    mean recovery worked; INCOMPLETE_RECOVERY/RECOVERY_FAILURE mean
-    stop and report (BLOCKED.md). Resolve crash PCs against THAT run's
-    exact ELF:
-      arm-none-eabi-addr2line -e build/<app>.elf <pc>
-    A missing dump is never proof no crash occurred. Never ack/delete
-    artifacts except through atmctl's verify-then-ack flow.
+Every Phase-D iteration: read live ATM state; state a measured hypothesis and source; make exactly one minimal change; build; run the same scenario three times into fresh ATM run directories; compare median-of-three and p95/p99 against baseline/noise; take correctness screenshots in a separate non-timed run. Stereo changes require an `is3d=yes` manifest with both left and right eye images, correct disparity, and no eye-state leakage. Keep only gains beyond noise with correctness passed; otherwise revert. Append exact commands, outcomes, build/firmware IDs, artifact paths/hashes, before/after numbers, and keep/revert decision to `perf/OPTIMIZATION-LOG.md` before ending.
 
-    ## Hard rules
+Use GDB only to localize a bottleneck, never for timed measurements. Require `svc_gdb=active:*` and use the exact `.elf` matching the deployed `.3dsx`; detach cleanly. Obsidian/Cognee/internet are for hypotheses, not evidence. Store only measured facts with build and firmware IDs.
 
-    - NEVER report debugger-attached or screenshot-interrupted runs
-      as performance evidence.
-    - NEVER substitute emulator, New 3DS, or host timings for Old 3DS
-      measurements. Label every number with build_id + firmware_id +
-      scenario, or don't report it.
-    - One variable at a time. No speculative mass rewrites.
-    - Preserve behavior outside the profiling build flag; the release
-      build must keep working exactly as before, minus the measured
-      optimizations.
-    - Do not modify the Luma3DS firmware, atmctl, or the console's
-      SD gate files. If the hardware interface itself seems broken,
-      stop and report it (BLOCKED.md) — that's a different project's bug.
-    - Do not commit or push anything without my explicit approval.
-      (The loop harness does NOT change this: no per-iteration
-      commits. Your checkpoint is the log + measured artifacts.)
-    - If the console becomes unresponsive (no HTTP, no telemetry,
-      past `atm wait-ready` budget), stop and report exactly what
-      was running (BLOCKED.md). Do not loop retries forever.
+## Stop conditions and final deliverables
 
-    ## Deliverable (assembled incrementally; finalized in LOOP-DONE.md)
+Stop after 3 consecutive no-gain iterations, 15 Phase-D iterations, incomplete recovery/hard hang, or only trade-off/mass-rewrite ideas remain. For normal completion write `perf/LOOP-DONE.md`; for hardware/recovery blockers write `perf/BLOCKED.md` instead. Final summary lists measured improvement, survivors, dead ends, remaining unmeasured/blocked work, and all kept uncommitted source changes.
 
-    1. ./perf/OPTIMIZATION-LOG.md: baseline table (3 runs), then one
-       entry per attempted change — hypothesis, evidence that
-       motivated it, diff summary, before/after medians (avg, p50,
-       p95, p99, max), correctness check, keep/revert decision.
-    2. A final summary (in LOOP-DONE.md): total measured improvement
-       vs baseline (per metric), which changes survived, what you
-       tried that didn't help, what remains unmeasured or blocked,
-       and anything about the hardware loop itself that surprised you.
-    3. All kept optimizations as an uncommitted working-tree diff for
-       my review, listed file by file in the final summary.
+## Hard constraints
 
-    Begin: determine your phase from disk, do that ONE phase or ONE
-    iteration, log it, and end your turn. Find every optimization the
-    hardware can prove exists — and claim none it can't.
+- Physical Old 3DS ATM runs are the primary and required profiling evidence.
+- Never substitute emulator/New 3DS/host timings or interactive play for deterministic Old 3DS measurements.
+- No SD/network I/O or unbounded allocation in hot paths; no casual threads.
+- Never modify ATM/Luma firmware/controller or SD gate files.
+- Never acknowledge/delete artifacts except via atmctl's documented verified flow.
+- Never claim a result without exact build ID, firmware ID, scenario, and retrieved evidence.
+- No commits/pushes without explicit operator approval.
 
+Begin by determining the first incomplete phase from disk and live ATM state. Do exactly that phase/iteration, bank evidence, then end your turn.

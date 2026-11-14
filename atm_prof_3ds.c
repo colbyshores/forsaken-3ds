@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include "atm_prof.h"
+#include "render.h"
 
 extern bool QuitRequested;
 extern char ShortLevelNames[][32];
@@ -75,6 +76,20 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"lightle2",
 	"lightle4",
 	"lightsw",
+	"fillpix",
+	"tfillpix",
+	"interp_dirty",
+	"memo_hit",
+	"memo_miss",
+	"memo_mismatch",
+	"memo_mf_sub",
+	"memo_mf_cnt",
+	"memo_mf_fi",
+	"memo_mf_exp",
+	"memo_mf_got",
+	"memo_mf_word",
+	"memo_mf_sub2",
+	"memo_mf_epass",
 };
 
 enum {
@@ -351,6 +366,12 @@ void atm_prof_write_result(void)
 		         atm_prof_counter_name[i], (unsigned)g_counters[i]);
 		atm_res_write(line);
 	}
+
+	/* M1 scratch high-water: full-run peak vertex footprint (verts).
+	 * Extra presents stay safe only while this is under scratch max. */
+	snprintf(line, sizeof(line), "scratch_peak_verts=%u\n",
+	         (unsigned)c3d_scratch_peak_verts());
+	atm_res_write(line);
 
 	n = atm_frame_format_summary(&g_stats, summary, sizeof(summary));
 	if (n > 0) {

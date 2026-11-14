@@ -206,6 +206,28 @@ typedef struct {
  * The two struct types are now structurally identical; LEVELRENDEROBJECT
  * is kept distinct for now so call-site signatures don't churn, but it's
  * a candidate for a follow-up unification. */
+/* Stereo-memo fill epoch (opt5b). Shared exec-buffer slots
+ * (RenderBufs[*] across visible groups) are refilled per batch with
+ * texgroups restarting at 0, so (renderObject, texgroup) alone aliases
+ * across fills. Every shared fill stamps the identity of the content it
+ * just wrote; the memo records and re-checks it, so a lookup only hits
+ * when the current fill is the same batch. Stable renderObjects (models,
+ * water, per-slot execs) never stamp: their identity is already unique
+ * and the field simply stays put within a frame, which compares equal.
+ * Additive fields only — all backends ignore them. */
+typedef enum {
+	SMEMO_PASS_UNSET = 0,      /* never stamped (stable identity) */
+	SMEMO_PASS_POLYS_CLIPPED = 1,
+	SMEMO_PASS_POLYS_UNCLIPPED = 2,
+	SMEMO_PASS_SOLID_CLIPPED = 3,
+	SMEMO_PASS_SOLID_UNCLIPPED = 4,
+	SMEMO_PASS_FM_CLIPPED = 5,
+	SMEMO_PASS_FM_UNCLIPPED = 6,
+	SMEMO_PASS_LINES = 7
+} SMEMO_PASS;
+/* Fill epoch for a whole-scene (unclipped) fill: no single group. */
+#define SMEMO_WHOLE_GROUP 0xFFFFFFFFu
+
 typedef struct RENDEROBJECT
 {
 	LPVERTEXBUFFER	lpVertexBuffer;
@@ -214,6 +236,9 @@ typedef struct RENDEROBJECT
 	bool			vbLocked;
 	int numTextureGroups;
 	TEXTUREGROUP *textureGroups;
+	unsigned int memoEpochPass;
+	unsigned int memoEpochGroup;
+	unsigned int memoEpochTPage;
 } RENDEROBJECT;
 
 typedef struct LEVELRENDEROBJECT
@@ -224,6 +249,9 @@ typedef struct LEVELRENDEROBJECT
 	bool			vbLocked;
 	int numTextureGroups;
 	TEXTUREGROUP *textureGroups;
+	unsigned int memoEpochPass;
+	unsigned int memoEpochGroup;
+	unsigned int memoEpochTPage;
 } LEVELRENDEROBJECT;
 
 typedef struct {
@@ -306,6 +334,9 @@ bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName, u_int1
 void release_texture( LPTEXTURE texture );
 
 bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool orthographic );
+/* M1 scratch high-water (verts) for the bench result. Defined by the 3DS
+ * backend; 0 if the backend never converts vertices. */
+int c3d_scratch_peak_verts(void);
 bool draw_line_object(RENDEROBJECT *renderObject);
 bool draw_object(RENDEROBJECT *renderObject);
 bool draw_billboard_object(RENDEROBJECT *renderObject);

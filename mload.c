@@ -100,6 +100,7 @@ num_start_points : u_int16_t
 #include "compobjects.h"
 #include "bgobjects.h"
 #include "object.h"
+#include "stereomemo.h"
 #include "networking.h"
 #include "mload.h"
 #include "lights.h"
@@ -1746,6 +1747,9 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 						if ( PolyAnim->WhenStoppedTriggerMod != -1 )
 							ApplyTriggerMod( &TrigMods[ PolyAnim->WhenStoppedTriggerMod ] );
 					}
+#ifdef STEREO_REPLAY
+					smemo_invalidate(); /* shared UVs just stepped */
+#endif
 				}
 				
 			}

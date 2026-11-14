@@ -63,6 +63,20 @@ enum {
 	ATM_C_LIGHTLE2,           /* uploads packing <=2 lights (0/1/2-capacity eligibility) */
 	ATM_C_LIGHTLE4,           /* uploads packing <=4 lights (4-capacity eligibility) */
 	ATM_C_LIGHTSW,            /* program switches (proves the 2-cap path executes) */
+	ATM_C_FILLPIX,            /* submitted pixel bounds (scissor rect or full target) */
+	ATM_C_TFILLPIX,           /* same, inside the TRANS phase */
+	ATM_C_INTERP_DIRTY,       /* M1: repeated-render purity violations (must stay 0) */
+	ATM_C_MEMO_HIT,           /* opt5b: eye-2 texgroup memo hits (conversion skipped) */
+	ATM_C_MEMO_MISS,          /* opt5b: eye-2 texgroup memo misses (converted live) */
+	ATM_C_MEMO_MISMATCH,      /* opt5b verify: recorded vs live bytes differ (must stay 0) */
+	ATM_C_MEMO_MF_SUB,        /* opt5b forensics: first-mismatch texgroup sub-key (one-shot) */
+	ATM_C_MEMO_MF_CNT,        /* opt5b forensics: first-mismatch recorded word count (one-shot) */
+	ATM_C_MEMO_MF_FI,         /* opt5b forensics: first-mismatch first-diff word index (one-shot) */
+	ATM_C_MEMO_MF_EXP,        /* opt5b forensics: first-mismatch recorded word low 32b (one-shot) */
+	ATM_C_MEMO_MF_GOT,        /* opt5b forensics: first-mismatch live word low 32b (one-shot) */
+	ATM_C_MEMO_MF_WORD,       /* opt5b forensics: first-mismatch word index mod 9 (field id, one-shot) */
+	ATM_C_MEMO_MF_SUB2,       /* opt5b forensics: second-mismatch texgroup sub-key (one-shot) */
+	ATM_C_MEMO_MF_EPASS,      /* opt5b forensics: first-mismatch lookup epoch pass (system id, one-shot) */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];

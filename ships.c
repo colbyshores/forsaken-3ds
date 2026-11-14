@@ -37,6 +37,7 @@
 #include "local.h"
 #include "util.h"
 #include "timer.h"
+#include "interp.h"
 #include "perf_capture.h"
 
 //#undef MULTI_RAY_COLLISION
@@ -2575,6 +2576,9 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 
 			WhiteOut = 0.0F;
 			InitShipRandomPos( i );
+			/* M1 interp history: respawn is a new lifetime for the camera
+			 * and ship identities. No-op unless FRAME_INTERP. */
+			interp_reset();
 			JustGenerated = true;
 			ShipPnt->Object.Mode = NORMAL_MODE;
 			ShipPnt->InvulTimer = RGENINVULTIME;		// approx 1 second of invulnerability...			

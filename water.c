@@ -9,6 +9,7 @@
 #include "compobjects.h"
 #include "bgobjects.h"
 #include "object.h"
+#include "stereomemo.h"
 #include "networking.h"
 #include "triggers.h"
 #include "file.h"
@@ -687,6 +688,9 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	{
 		return;
 	}
+#ifdef STEREO_REPLAY
+	smemo_invalidate(); /* shared verts just integrated */
+#endif
 }
 
 /*===================================================================

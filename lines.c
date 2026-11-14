@@ -113,6 +113,10 @@ void KillUsedLine( u_int16_t i )
 ===================================================================*/
 bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, u_int16_t * StartLine )
 {
+	/* opt5b memo epoch: stamp this fill's content identity. */
+	renderObject->memoEpochPass = SMEMO_PASS_LINES;
+	renderObject->memoEpochGroup = Group;
+	renderObject->memoEpochTPage = *StartLine;
 	LPLVERTEX	Vert_Ptr;
 	COLOR		color;
 	int16_t			Num_Lines;

@@ -25,6 +25,7 @@
 #include "controls.h"
 #include "util.h"
 #include "oct2.h"
+#include "interp.h"
 
 
 extern bool IsHost;   // is the user hosting/joining a game
@@ -89,6 +90,10 @@ bool LoadASinglePlayerGame( MENUITEM * Item )
 bool StartASinglePlayerGame( MENUITEM * Item )
 {
 	int i;
+
+	/* M1 interp history: a (re)started game is a new lifetime for every
+	 * render identity. No-op unless FRAME_INTERP. */
+	interp_reset();
 
 	/* Ensure single-player level list is active — but ONLY reload if it
 	 * isn't already. InitLevels resets NewLevelNum to 0 as a side effect;

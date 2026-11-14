@@ -14,7 +14,7 @@ CFLAGS  := -g -fcommon -Wall -Wextra $(INCLUDE)
 
 AILIB_OBJ := secwalk_ailib.o
 
-all: test_secwalk test_framedump test_checkhitenemy
+all: test_secwalk test_framedump test_checkhitenemy test_stereomemo
 
 $(AILIB_OBJ): ../ailib.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -31,7 +31,11 @@ test_checkhitenemy: test_checkhitenemy.c ../checkenemy.c ../sphere.c
 	$(CC) $(CFLAGS) -DCHE_PREFILTER -o $@ test_checkhitenemy.c ../checkenemy.c ../sphere.c -lm
 	./test_checkhitenemy
 
-clean:
-	rm -f test_secwalk test_framedump test_checkhitenemy $(AILIB_OBJ) out-*.bmp framedump_test.log
+test_stereomemo: test_stereomemo.c ../stereomemo.c
+	$(CC) $(CFLAGS) -DSTEREO_REPLAY -o $@ test_stereomemo.c ../stereomemo.c
+	./test_stereomemo
 
-.PHONY: all clean test_secwalk test_framedump test_checkhitenemy
+clean:
+	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo $(AILIB_OBJ) out-*.bmp framedump_test.log
+
+.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_stereomemo

@@ -676,6 +676,10 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 
 bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
+	/* opt5b memo epoch: stamp this fill's content identity. */
+	renderObject->memoEpochPass = SMEMO_PASS_POLYS_CLIPPED;
+	renderObject->memoEpochGroup = Group;
+	renderObject->memoEpochTPage = *TPage;
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
@@ -924,6 +928,10 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 ===================================================================*/
 bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
+	/* opt5b memo epoch: whole-scene fill (no single group). */
+	renderObject->memoEpochPass = SMEMO_PASS_POLYS_UNCLIPPED;
+	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
+	renderObject->memoEpochTPage = *TPage;
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
@@ -1222,6 +1230,10 @@ bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject )
 ===================================================================*/
 bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
+	/* opt5b memo epoch: stamp this fill's content identity. */
+	renderObject->memoEpochPass = SMEMO_PASS_SOLID_CLIPPED;
+	renderObject->memoEpochGroup = Group;
+	renderObject->memoEpochTPage = *TPage;
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
@@ -1471,6 +1483,10 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 ===================================================================*/
 bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
+	/* opt5b memo epoch: whole-scene fill (no single group). */
+	renderObject->memoEpochPass = SMEMO_PASS_SOLID_UNCLIPPED;
+	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
+	renderObject->memoEpochTPage = *TPage;
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
