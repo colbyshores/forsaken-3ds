@@ -2351,3 +2351,39 @@ M3-M6 queued behind (a) M2, (b) R05-level R reductions, (c) New-3DS
 capture. R22 human A/B covers LANDED work (memo on/off stereo feel,
 overall) + interp prototype as flag-only curiosity (no target to hit).
 R14: still no spec text in tree/gates/log — remains blocked; not attempted.
+
+## 2026-11-13 — Audit remediation (post adversarial review)
+
+Independent audit findings F1-F12 addressed as follows (forward commits
+only — a97fa18 is already pushed; rewriting it would trade a review
+problem for a history-integrity problem, so the split discipline
+applies from here, not retroactively):
+- F2/F3/F5 CLOSED (3bf7682): audit_memo_stamps gate in check.sh fails
+  on any unstamped shared fill or new fill-shaped function (pass on
+  tree, fail on stamp-deleted copy, both verified); probe-chain
+  invariant stated in stereomemo.c; stereomemo.h no longer claims
+  unconditional pixel-identity (animated UV lag documented).
+- F6 LOUD (9ba7dd5): scratch_splits counter. Stress run: 3196 splits
+  (black-frame path exercised, now visible in every result file).
+  Control memo run: scratch_splits=0, hits 34368, wall 85724us,
+  fidelity byte-identical to no-memo — overflow path untouched in
+  real scenes, and any future bench that touches it is self-flagging.
+- F9 SUPERSESSION (this entry): on this branch, the keyed memo
+  supersedes master's display-list replay (replay draws the left-eye
+  visible set in the right eye — proven wrong, log 2026-11-11 opt5).
+  Master's replay arming must be retired, not merged, wherever the
+  branches join. R04 24B vertices (master) are NOT merged here: solo
+  wall was noise; evaluate only composed with R05 persistent buffers
+  under the audit validation protocol (n>=5, A/B/A, tail-capable
+  histogram, 3 scenes). MODEL_BUCKET: default-on on master, flag-only
+  (benched 0) here — wall-neutral on GPU-bound frames; do not flip
+  defaults without the same protocol. Neither branch merges into the
+  other without that protocol run first.
+- F12: key text evidence (atm_result + fidelity for the A/B pairs and
+  stress/defend2 runs) committed under perf/fb-*; BMP twins remain
+  local (gitignored) and are reproducible from the banked build
+  commands + row-flipped FNV hashes in framedump.log.
+- NOT done, deliberately: BatchId-by-construction refactor (gate
+  closes the failure mode mechanically at lower risk); FLUSH_BATCH
+  macro dedup and R05 build (queued behind R22/human review and the
+  validation protocol); interp M2 (unchanged verdict).
