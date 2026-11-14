@@ -80,11 +80,6 @@ PERSIST_VERTS ?= 1
 # for canonical 4-vert billboard texgroups, runtime-gated to mono
 # (slider down) like PERSIST_VERTS. Set 0 to disable entirely.
 QUADIDX_VERTS ?= 1
-ifeq ($(filter 1,$(QUADIDX_VERTS)),1)
-ifneq ($(filter 1,$(STEREO_REPLAY)),1)
-$(error QUADIDX_VERTS=1 requires STEREO_REPLAY=1)
-endif
-endif
 STRESS_SCRATCH_CFLAGS := $(if $(filter-out 0,$(STRESS_SCRATCH_VERTS)),-DSTRESS_SCRATCH_VERTS=$(STRESS_SCRATCH_VERTS),)
 CHE_PREFILTER_CFLAGS := $(if $(filter 1,$(CHE_PREFILTER)),-DCHE_PREFILTER,)
 BUCKET_VERIFY_CFLAGS := $(if $(filter 1,$(MODEL_BUCKET_VERIFY)),-DMODEL_BUCKET_VERIFY,)
@@ -452,6 +447,11 @@ CFLAGS += $(if $(filter 1,$(MEMO_VERIFY)),-DMEMO_VERIFY,)
 CFLAGS += $(if $(filter 1,$(MEMO_VERIFY_FORENSICS)),-DMEMO_VERIFY_FORENSICS,)
 CFLAGS += $(if $(filter 1,$(MEMO_FORCE_MISS)),-DMEMO_FORCE_MISS,)
 CFLAGS += $(if $(filter 1,$(MEMO_NO_COALESCE)),-DMEMO_COALESCE_SUBMIT=0,)
+ifeq ($(filter 1,$(QUADIDX_VERTS)),1)
+ifneq ($(filter 1,$(STEREO_REPLAY)),1)
+$(error QUADIDX_VERTS=1 requires STEREO_REPLAY=1)
+endif
+endif
 CFLAGS += $(if $(filter 1,$(QUADIDX_VERTS)),-DQUADIDX_VERTS,)
 CFLAGS += $(if $(filter 1,$(PERSIST_VERTS)),-DPERSIST_VERTS,)
 CFLAGS += $(if $(filter 1,$(ATM_HEADLESS)),-DATM_HEADLESS,)
