@@ -90,6 +90,7 @@ const char *const atm_prof_counter_name[ATM_C_MAX] = {
 	"memo_mf_word",
 	"memo_mf_sub2",
 	"memo_mf_epass",
+	"scratch_splits",
 };
 
 enum {

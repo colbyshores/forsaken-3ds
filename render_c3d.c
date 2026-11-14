@@ -2991,6 +2991,13 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			{
 				FLUSH_BATCH();
 				C3D_FrameSplit(0);
+#ifdef ATM_PROFILING
+				/* R02 loudness: any bench with splits>0 exercised the
+				 * unfenced overflow path; its stills/wall are invalid
+				 * until that path is fenced. Must stay 0 in real scenes
+				 * (peaks 5-26k vs 116k cap today). */
+				atm_prof_add(ATM_C_SCRATCH_SPLITS, 1);
+#endif
 				/* M1: record the pre-split footprint. Resetting the cursor
 				 * here is NOT a GPU-completion proof (FrameSplit only
 				 * queues); the peak at least makes any overlap visible. */

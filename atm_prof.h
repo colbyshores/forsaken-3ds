@@ -77,6 +77,7 @@ enum {
 	ATM_C_MEMO_MF_WORD,       /* opt5b forensics: first-mismatch word index mod 9 (field id, one-shot) */
 	ATM_C_MEMO_MF_SUB2,       /* opt5b forensics: second-mismatch texgroup sub-key (one-shot) */
 	ATM_C_MEMO_MF_EPASS,      /* opt5b forensics: first-mismatch lookup epoch pass (system id, one-shot) */
+	ATM_C_SCRATCH_SPLITS,     /* R02: mid-frame scratch overflows (FrameSplit+reset). Must stay 0 in benches; >0 = overflow path exercised, stills invalid until fenced */
 	ATM_C_MAX
 };
 extern const char *const atm_prof_counter_name[ATM_C_MAX];
