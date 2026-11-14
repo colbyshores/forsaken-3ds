@@ -5214,7 +5214,8 @@ bool DisplayTitle(void)
 			render_info.stereo_enabled = true;
 			gfxSet3D(true);
 			render_info.stereo_mode = STEREO_MODE_3DS;
-			render_info.stereo_eye_sep = _slider * 30.0f;
+			/* Max 3D effect halved 2026-11-14 (see oct2.c slider drive). */
+			render_info.stereo_eye_sep = _slider * 15.0f;
 		}
 		else
 		{

@@ -156,6 +156,16 @@ ATM_HEADLESS ?= 0
 # display replay this flag once gated was proven to draw wrong-eye
 # geometry and is gone; see perf/OPTIMIZATION-LOG.md opt5/opt5b.
 STEREO_REPLAY ?= 1
+# Shipped-feature flag wiring. These MUST be defined here (above the
+# CFLAGS := expansion at the Compiler flags section) and consumed via
+# the *_CFLAGS list there — the previous wiring lived inside the
+# ATM_PROFILING block, so release builds silently never defined
+# STEREO_REPLAY/PERSIST_VERTS at all (caught 2026-11-14 when the
+# QUADIDX code referenced memo-guarded decls unconditionally and the
+# release build stopped). Same incident class as the SHDLIT2 lesson.
+STEREO_CFLAGS := $(if $(filter 1,$(STEREO_REPLAY)),-DSTEREO_REPLAY,)
+PERSIST_CFLAGS := $(if $(filter 1,$(PERSIST_VERTS)),-DPERSIST_VERTS,)
+QUADIDX_CFLAGS := $(if $(filter 1,$(QUADIDX_VERTS)),-DQUADIDX_VERTS,)
 
 #---------------------------------------------------------------------------------
 # Flag matrix — what each knob is for, and when it goes away.
@@ -273,6 +283,9 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	$(BUCKET_VERIFY_CFLAGS) \
 	$(CHE_PREFILTER_CFLAGS) \
 	$(STRESS_SCRATCH_CFLAGS) \
+	$(STEREO_CFLAGS) \
+	$(PERSIST_CFLAGS) \
+	$(QUADIDX_CFLAGS) \
 	$(NODESQ_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ -DARM \
@@ -456,9 +469,7 @@ $(error QUADIDX_VERTS=1 requires STEREO_REPLAY=1)
 endif
 endif
 CFLAGS += $(if $(filter 1,$(QUADIDX_VERTS)),-DQUADIDX_VERTS,)
-CFLAGS += $(if $(filter 1,$(PERSIST_VERTS)),-DPERSIST_VERTS,)
 CFLAGS += $(if $(filter 1,$(ATM_HEADLESS)),-DATM_HEADLESS,)
-CFLAGS += $(if $(filter 1,$(STEREO_REPLAY)),-DSTEREO_REPLAY,)
 # Compiled from outside $(SRCDIR), so it needs an explicit rule (below) and
 # cannot ride the $(SRCDIR)/%.c pattern. It is also deliberately outside the
 # AGENTS.md gate scope: vendored shared ATM firmware, not Forsaken game code.

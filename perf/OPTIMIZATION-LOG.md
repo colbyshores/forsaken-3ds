@@ -2578,3 +2578,17 @@ headroom quad would have exploited. QUADIDX_VERTS default back to
 0 (opt-in); quadidx.c + host test + mono runtime gate retained.
 Not a keeper today — same conservative rule as 2026-11-12, now
 with the bucket interaction measured rather than assumed.
+
+## 2026-11-14 — WIRING BUG: release builds never had the memo (found by slider build)
+
+-DSTEREO_REPLAY/-DPERSIST_VERTS were wired inside the ATM_PROFILING
+block, so every non-bench build silently compiled the memo/persist
+out. All bench evidence stands (benches are ATM builds), but the
+R22 playable build the owner judged had NO memo — its "fine" did not
+cover the animated-surface UV lag. Caught when QUADIDX code broke
+the release build. Fix: STEREO/PERSIST/QUADIDX *_CFLAGS defined
+above the CFLAGS := expansion and consumed in the main list (the
+SHDLIT2 lesson, third occurrence). Release ELF now contains
+smemo_lookup (nm-verified). R22 re-judgment needed on a build that
+actually has the memo: slider50 build (also halves max eye-sep
+30->15 per owner request) pushed for that look.
