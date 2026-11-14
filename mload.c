@@ -685,24 +685,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				}
 			}
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-			/* Log final textureGroup count per execbuf so we can see if any
-			 * Remaster/N64 level still pins at MAX_LEVEL_TEXTURE_GROUPS=64 —
-			 * if so, the cap needs to go higher. Logged only when
-			 * count > 8 (the old cap) to keep the noise level down for
-			 * 1998 levels that fit comfortably. */
-			{
-				int nt = Mloadheader->Group[group].renderObject[execbuf].numTextureGroups;
-				if (nt > 8) {
-					extern void trace(const char*);
-					char _b[128];
-					snprintf(_b, sizeof(_b),
-					         "Mload: g=%d e=%d numTextureGroups=%d (cap=%d)",
-					         group, execbuf, nt, MAX_LEVEL_TEXTURE_GROUPS);
-					trace(_b);
-				}
-			}
-#endif
 
 			Mloadheader->Group[group].polyanim[execbuf] = NULL;
 			Mloadheader->Group[group].num_animating_polys[execbuf] = 0;
@@ -1313,11 +1295,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	DebugPrintf( "Mload: %d colourkey triangles found\n", colourkey );
 	// Mloadheader is valid and can be executed...
 	Mloadheader->state = true;
-#ifdef STEREO_REPLAY
 	/* New level geometry: retained conversions from any previous
 	 * level must never be reused (backend frees them lazily). */
 	smemo_persist_reset();
-#endif
 #ifdef ATM_PROFILING
 	/* R05 memory gate: unique level source verts (persistent copies
 	 * would cost verts x sizeof(gpu_vertex_t) of linear heap). */
@@ -1766,9 +1746,7 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 						if ( PolyAnim->WhenStoppedTriggerMod != -1 )
 							ApplyTriggerMod( &TrigMods[ PolyAnim->WhenStoppedTriggerMod ] );
 					}
-#ifdef STEREO_REPLAY
 					smemo_invalidate(); /* shared UVs just stepped */
-#endif
 				}
 				
 			}

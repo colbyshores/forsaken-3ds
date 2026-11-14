@@ -62,12 +62,7 @@
 #include "networking.h"
 #include "render.h"
 #include "perf_capture.h"
-#ifdef STEREO_REPLAY
 #include "stereomemo.h"
-#endif
-#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
-#include "quadidx.h"
-#endif
 #include "texture.h"
 #include "file.h"
 #include "main_3ds.h"
@@ -213,14 +208,7 @@ typedef enum {
 	SMEMO_RECORD,     /* left eye: convert live + record ranges */
 	SMEMO_LOOKUP      /* right eye: reuse recorded ranges, convert misses */
 } smemo_mode_t;
-#ifdef STEREO_REPLAY
 static smemo_mode_t s_memoMode = SMEMO_OFF;
-/* Bisect knob (debug only): 0 = lookup flush uses the single-draw path
- * instead of coalesced per-range submits. Never ship 0. */
-#ifndef MEMO_COALESCE_SUBMIT
-#define MEMO_COALESCE_SUBMIT 1
-#endif
-#endif
 
 /* ---- R05 persistent level geometry (PERSIST_VERTS, default off) ----
  * Level-wall (VERT_OWNER_LEVEL) texgroups are converted once into
@@ -231,7 +219,6 @@ static smemo_mode_t s_memoMode = SMEMO_OFF;
  * reset count (buffers freed lazily at the next FSBeginScene).
  * Allocation failure or table pressure falls back to the scratch
  * path — never stale data, never a skipped draw. */
-#if defined(STEREO_REPLAY) && defined(PERSIST_VERTS)
 #define PERSIST_BITS 11
 #define PERSIST_SIZE (1u << PERSIST_BITS)
 #define PERSIST_MASK (PERSIST_SIZE - 1u)
@@ -334,19 +321,10 @@ static void persist_free_all(void)
 	}
 	s_persistBytes = 0;
 }
-#endif /* STEREO_REPLAY && PERSIST_VERTS */
 
-#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
-/* Mono gate shared by the slider-down paths: refreshed per
- * FSBeginScene from the same stereo_mode signal as s_persistActive. */
+/* Mono gate for the slider-down paths: refreshed per FSBeginScene
+ * from the same stereo_mode signal as s_persistActive. */
 static int s_monoActive = 0;
-static unsigned short *s_quadTable = NULL;
-#elif defined(STEREO_REPLAY)
-/* Flush macro references these unconditionally; inert without the
- * quad path (batch_isQuad is then never set). */
-static int s_monoActive = 0;
-static unsigned short *s_quadTable = NULL;
-#endif
 
 /* Scratch buffer for vertex conversion.
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
@@ -486,19 +464,6 @@ typedef struct texture_s {
 	float   proctex_phase;
 } texture_t;
 
-/* Debug trace to SD card. Truncate once on first call per process so
- * each run starts a fresh log; subsequent calls append. Without this
- * the log accumulates across every run since the project began,
- * making "13 cleanups, 21 inits" look like in-run churn when really
- * it is multi-month history. forsaken_trace.txt does the same trick
- * via O_TRUNC vs O_APPEND in main_3ds.c. */
-static void c3d_trace(const char *msg)
-{
-	static bool _truncated_once = false;
-	const char *mode = _truncated_once ? "a" : "w";
-	FILE *f = fopen("sdmc:/forsaken_c3d.log", mode);
-	if (f) { fputs(msg, f); fputc('\n', f); fclose(f); _truncated_once = true; }
-}
 
 /* bSquareOnly — shared global, always true on 3DS */
 bool bSquareOnly = true;
@@ -640,9 +605,7 @@ void pglSwapBuffers(void)
 		s_scratchPeak = s_scratchUsed;
 	/* Reset stereo state for next frame */
 	s_stereoFrame = false;
-#ifdef STEREO_REPLAY
 	s_memoMode = SMEMO_OFF;
-#endif
 	s_hudDrawnThisFrame = false;
 
 	/* FPS measurement. Roll the count over a 1-second window so the
@@ -807,10 +770,8 @@ void pglTransferEye(unsigned int eye)
 		/* Left eye finished. Switch the memo from record to lookup:
 		 * the right eye reuses recorded ranges with its own live
 		 * uniforms and draw order. */
-#ifdef STEREO_REPLAY
 		if (s_memoMode == SMEMO_RECORD)
 			s_memoMode = SMEMO_LOOKUP;
-#endif
 
 		/* Switch to right eye target */
 		C3D_RenderTargetClear(s_targetRight, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
@@ -841,9 +802,7 @@ void pglTransferEye(unsigned int eye)
 	{
 		/* Right eye done. Disarm the memo; post-stereo rendering
 		 * (missile camera, rear view, HUD overlays) draws normally. */
-#ifdef STEREO_REPLAY
 		s_memoMode = SMEMO_OFF;
-#endif
 	}
 	s_stereoFrame = true;
 }
@@ -889,25 +848,19 @@ bool c3d_renderer_init(void)
 	 * EOF, immediately preceding GPUCMD_AddInternal's full-buffer svcBreak. */
 	{
 		char _b[64];
-		snprintf(_b, sizeof(_b), "c3d_renderer_init: enter shaderReady=%d", (int)s_shaderReady);
-		c3d_trace(_b);
 	}
 	if (s_shaderReady) {
-		c3d_trace("c3d_renderer_init: already initialized, skipping");
 		return true;
 	}
-	c3d_trace("c3d_renderer_init: start");
 	{ char _b[96]; snprintf(_b, sizeof(_b),
 	    "[boot] c3d_renderer_init: start linearFree=%u KB",
 	    linearSpaceFree() >> 10); boot_log(_b); }
 	s_shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
 	if (!s_shaderDVLB)
 	{
-		c3d_trace("c3d_renderer_init: DVLB_ParseFile FAILED");
 		boot_log("[boot] c3d_renderer_init: FAIL DVLB_ParseFile");
 		return false;
 	}
-	c3d_trace("c3d_renderer_init: shader parsed");
 
 	shaderProgramInit(&s_shaderProgram);
 	if (shaderProgramSetVsh(&s_shaderProgram, &s_shaderDVLB->DVLE[0]) < 0) {
@@ -933,15 +886,6 @@ bool c3d_renderer_init(void)
 #endif
 	s_scratchUsed = 0;
 	s_scratchPeak = 0;
-#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
-	/* Shared quad index table (mono-gated billboard path). Written
-	 * once here; the first FrameEnd linear flush publishes it. Alloc
-	 * failure simply leaves the quad path disabled. */
-	s_quadTable = (unsigned short *)linearAlloc(
-		QUADIDX_MAX_QUADS * 6 * sizeof(unsigned short));
-	if (s_quadTable)
-		quadidx_build(s_quadTable, QUADIDX_MAX_QUADS);
-#endif
 
 	/* Create render targets and link to display output.
 	 * Both left and right eye targets are created unconditionally —
@@ -956,7 +900,6 @@ bool c3d_renderer_init(void)
 
 		s_targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetLeft) {
-			c3d_trace("FAILED to create left render target");
 			boot_log("[boot] c3d_renderer_init: FAIL left render target");
 			return false;
 		}
@@ -965,7 +908,6 @@ bool c3d_renderer_init(void)
 
 		s_targetRight = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetRight) {
-			c3d_trace("FAILED to create right render target");
 			boot_log("[boot] c3d_renderer_init: FAIL right render target");
 			return false;
 		}
@@ -976,13 +918,11 @@ bool c3d_renderer_init(void)
 		 * above isn't cluttered. */
 		s_targetBottom = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetBottom) {
-			c3d_trace("FAILED to create bottom render target");
 			boot_log("[boot] c3d_renderer_init: FAIL bottom render target");
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
 	}
-	c3d_trace("render targets created and linked to display");
 	{ char _b[96]; snprintf(_b, sizeof(_b),
 	    "[boot] c3d_renderer_init: targets OK linearFree=%u KB",
 	    linearSpaceFree() >> 10); boot_log(_b); }
@@ -1128,7 +1068,6 @@ bool c3d_renderer_init(void)
 		}
 
 		s_procTexReady = true;
-		c3d_trace("c3d_renderer_init: wall ProcTex (3 classes) initialised");
 	}
 
 	if (!s_objLightReady)
@@ -1167,18 +1106,15 @@ bool c3d_renderer_init(void)
 		}
 
 		s_objLightReady = true;
-		c3d_trace("c3d_renderer_init: object Phong LightEnv initialised");
 	}
 
 	s_shaderReady = true;
-	c3d_trace("c3d_renderer_init: OK — shader ready, render targets created");
 	boot_log("[boot] c3d_renderer_init: OK");
 	return true;
 }
 
 void c3d_renderer_cleanup(void)
 {
-	c3d_trace("c3d_renderer_cleanup: called");
 	if (s_shaderReady)
 	{
 		shaderProgramFree(&s_shaderProgram);
@@ -1600,13 +1536,10 @@ bool FSBeginScene(void)
 	 * draw-skipping) is gone: it dropped inset/HUD draws on one eye
 	 * and broke on per-eye culling differences. Here no draw is ever
 	 * skipped — only the vertex-conversion memcpy, on memo hits. */
-#ifdef STEREO_REPLAY
 	smemo_begin_frame();
 	/* Gated on 3DS stereo: mono frames must not pay the record cost. */
 	s_memoMode = (render_info.stereo_mode == STEREO_MODE_3DS) ?
 		SMEMO_RECORD : SMEMO_OFF;
-#endif
-#if defined(STEREO_REPLAY) && defined(PERSIST_VERTS)
 	/* Level load/unload bumped the persist reset count: free retained
 	 * buffers once, lazily, before any new conversion can reuse them. */
 	if (s_persistResetsSeen != smemo_persist_resets()) {
@@ -1615,10 +1548,7 @@ bool FSBeginScene(void)
 	}
 	/* Slider gate: mono only (see s_persistActive comment). */
 	s_persistActive = (render_info.stereo_mode != STEREO_MODE_3DS);
-#endif
-#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS)
 	s_monoActive = (render_info.stereo_mode != STEREO_MODE_3DS);
-#endif
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
@@ -2387,15 +2317,6 @@ static void resolve_hd_textures_dirs(void)
 {
 	if (s_hd_textures_dir) return;
 	u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
-#ifdef FORSAKEN_OG_PROFILE
-	if (region_size >= 64ull * 1024 * 1024) {
-		s_hd_textures_dir      = "hd_textures_lomem";
-		s_hd_textures_fallback = "hd_textures";
-	} else {
-		s_hd_textures_dir      = "hd_textures_lomem";
-		s_hd_textures_fallback = "hd_textures";
-	}
-#else
 	if (region_size >= 96ull * 1024 * 1024) {
 		s_hd_textures_dir      = "hd_textures";
 		s_hd_textures_fallback = "hd_textures_lomem";
@@ -2403,7 +2324,6 @@ static void resolve_hd_textures_dirs(void)
 		s_hd_textures_dir      = "hd_textures_lomem";
 		s_hd_textures_fallback = "hd_textures";
 	}
-#endif
 	/* Lands in sdmc:/forsaken_boot.log on every boot. Pair this with
 	 * the [platform] tier line emitted from platform_init to verify
 	 * from the host which texture pack a given install is using. */
@@ -2633,11 +2553,9 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		{
 			char buf[128];
 			snprintf(buf, sizeof(buf), "create_texture: C3D_TexInit %dx%d", image.w, image.h);
-			c3d_trace(buf);
 		}
 		if (!C3D_TexInit(&texdata->tex, image.w, image.h, GPU_RGBA4))
 		{
-			c3d_trace("create_texture: C3D_TexInit FAILED (VRAM full?)");
 			texdata->initialized = false;
 			*t = (LPTEXTURE)texdata;
 			destroy_image(&image);
@@ -2655,7 +2573,6 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		}
 		else
 		{
-			c3d_trace("create_texture: linearAlloc for tiled data FAILED");
 		}
 
 		C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
@@ -2956,34 +2873,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * state, uniforms and draw order all run live per eye, so inset
 	 * and HUD draws are unaffected by construction. */
 
-#if defined(VERBOSE_TRACE) && defined(__3DS__)
-	/* Draw-side detector for the portal black-void bug: log when a draw
-	 * is rejected here — most commonly because lpVertexBuffer is NULL,
-	 * which would explain the "next room geometry doesn't render" symptom
-	 * when an earlier load step (or memory overflow into this struct)
-	 * clobbered the buffer pointer. Once-per-second per failure path. */
-	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
-	{
-		static int s_rej_count = 0;
-		s_rej_count++;
-		if ((s_rej_count % 60) == 1) {
-			extern void trace(const char*);
-			char _b[160];
-			snprintf(_b, sizeof(_b),
-			         "DRAW_REJ: shaderReady=%d renderObject=%p lpVertex=%p s_scratch=%p numTG=%d (rej#%d)",
-			         (int)s_shaderReady, (void*)renderObject,
-			         renderObject ? renderObject->lpVertexBuffer : NULL,
-			         (void*)s_scratch,
-			         renderObject ? renderObject->numTextureGroups : -1,
-			         s_rej_count);
-			trace(_b);
-		}
-		return false;
-	}
-#else
 	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
 		return false;
-#endif
 
 	if (!orthographic)
 	{
@@ -3035,15 +2926,10 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	void *batch_texture     = NULL;
 	bool  batch_colourkey   = false;
 	bool  batch_hasTexture  = false;
-#ifdef STEREO_REPLAY
 	/* Eye-2 submit spans: per-texgroup converted ranges for the batch
 	 * being flushed (batch_tg0 .. group-1). A skipped texgroup records
 	 * count 0 and is not submitted. */
 	int   batch_tg0 = 0;
-	/* TF04-A quad batch: unique-vert count + quad flag. A quad batch
-	 * submits via DrawElements and never mixes with DrawArrays. */
-	int   batch_quadCount = 0;
-	int   batch_isQuad = 0;
 	/* Must stay zero-initialized: ortho groups never set these, and the
 	 * lookup flush below must read count 0 (skip), never stack garbage.
 	 * Garbage counts were submitted to DrawArrays and wedged the GPU
@@ -3054,7 +2940,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * Zero-initialized for the same reason as above. */
 	gpu_vertex_t *tg_persist_buf[MAX_TEXTURE_GROUPS] = {0};
 	int   tg_persist_cnt[MAX_TEXTURE_GROUPS] = {0};
-#endif
 
 /* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
  * exactly as before. Eye 2 in lookup mode: one draw per texgroup range
@@ -3062,7 +2947,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
  * only the submit (never state, order or uniforms) keeps pixels
  * identical while tolerating per-eye culling differences: a texgroup
  * the left eye never converted is simply converted live instead. */
-#ifdef STEREO_REPLAY
 #define FLUSH_BATCH() do { \
 	if (batch_vertCount > 0) { \
 		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
@@ -3071,12 +2955,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		TRANS_COUNT_BATCH(); \
 		int _has_persist = 0; \
 		{ int _pi; for (_pi = batch_tg0; _pi < group; _pi++) if (tg_persist_buf[_pi]) { _has_persist = 1; break; } } \
-		if (batch_isQuad) { \
-			BufInfo_Init(_bi); \
-			BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
-			C3D_DrawElements(GPU_TRIANGLES, batch_quadCount * 6, C3D_UNSIGNED_SHORT, s_quadTable); \
-			atm_prof_add(ATM_C_DRAWS, 1); \
-		} else if ((_has_persist || (s_memoMode == SMEMO_LOOKUP && MEMO_COALESCE_SUBMIT)) && !orthographic) { \
+		if ((_has_persist || (s_memoMode == SMEMO_LOOKUP)) && !orthographic) { \
 			int _si; \
 			int _consumed = 0; \
 			long _run_off = 0; \
@@ -3135,30 +3014,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, \
 				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO); \
 		batch_vertCount = 0; \
-		batch_quadCount = 0; \
-		batch_isQuad = 0; \
 	} \
 } while(0)
-#else
-#define FLUSH_BATCH() do { \
-	if (batch_vertCount > 0) { \
-		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
-		BufInfo_Init(_bi); \
-		BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
-		C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
-		atm_prof_add(ATM_C_DRAWS, 1); \
-		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
-		FILLPIX_COUNT_BATCH(); \
-		TRANS_COUNT_BATCH(); \
-		if (batch_colourkey) \
-			C3D_AlphaTest(false, GPU_ALWAYS, 0); \
-		if (batch_hasTexture && !_additive_blend_active) \
-			C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, \
-				GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO); \
-		batch_vertCount = 0; \
-	} \
-} while(0)
-#endif
 
 	for (group = 0; group < numGroups; group++)
 	{
@@ -3169,9 +3026,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		gpu_vertex_t *dst;
 
 		if (numIndices <= 0) {
-#ifdef STEREO_REPLAY
 			tg_memo_cnt[group] = 0;
-#endif
 			continue;
 		}
 
@@ -3196,14 +3051,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				if (s_scratchUsed > s_scratchPeak)
 					s_scratchPeak = s_scratchUsed;
 				s_scratchUsed = 0;
-#ifdef STEREO_REPLAY
 				/* Scratch reset recycles eye-1 recorded offsets: stop
 				 * reusing them. The pending batch was already flushed
 				 * above (valid ranges); the rest of the frame runs
 				 * fully live. */
 				if (s_memoMode != SMEMO_OFF)
 					s_memoMode = SMEMO_OFF;
-#endif
 				C3D_BindProgram(&s_shaderProgram);
 				{
 					C3D_AttrInfo *ai = C3D_GetAttrInfo();
@@ -3228,24 +3081,19 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				}
 			}
 			if (s_scratchUsed + numIndices > s_scratchMax) {
-#ifdef STEREO_REPLAY
 				tg_memo_cnt[group] = 0;
-#endif
 				continue;
 			}
 		}
 
 		dst = s_scratch + s_scratchUsed;
 
-#ifdef STEREO_REPLAY
 		/* Memo lookup (right eye only, never ortho): reuse the recorded
 		 * range and skip conversion. Misses convert live below. */
 		long memo_off = 0;
 		int memo_cnt = 0;
 		bool memo_hit = false;
 		bool persist_hit = false;
-		int quad_group = 0;
-#if defined(PERSIST_VERTS) && !defined(MEMO_VERIFY)
 		/* R05: level walls consult the retained buffers first (both
 		 * eyes, any mode). A hit submits the retained buffer at flush
 		 * time and converts nothing. */
@@ -3260,7 +3108,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				totalVerts = pcnt;
 			}
 		}
-#endif
 		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic) {
 			memo_hit = smemo_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
@@ -3272,10 +3119,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			atm_prof_add(memo_hit ? ATM_C_MEMO_HIT : ATM_C_MEMO_MISS, 1);
 #endif
 		}
-#endif
 		/* Convert live unless the memo/persist hit (VERIFY converts
 		 * anyway for the oracle compare below). */
-#if defined(STEREO_REPLAY) && !defined(MEMO_VERIFY)
 		if (persist_hit) {
 			/* totalVerts + tg_persist_* already set above */
 		} else if (memo_hit) {
@@ -3283,27 +3128,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			tg_memo_off[group] = memo_off;
 			tg_memo_cnt[group] = memo_cnt;
 		} else
-#endif
 		/* Convert LVERTEX/TLVERTEX → gpu_vertex_t, expanding indices */
 		{
 		if (renderObject->lpIndexBuffer)
 		{
 			WORD *indices = (WORD*)renderObject->lpIndexBuffer + tg->startIndex;
 
-#if defined(STEREO_REPLAY) && defined(QUADIDX_VERTS) && !defined(MEMO_VERIFY)
-			/* TF04-A (mono-gated): a 4-vert/2-tri canonical quad
-			 * converts its 4 unique verts and submits via the
-			 * shared index table instead of expanding to 6. */
-			if (s_monoActive && s_quadTable && !orthographic &&
-			    tg->numVerts == 4 && tg->numTriangles == 2 &&
-			    quadidx_is_quad4(indices))
-				quad_group = 1;
-			if (quad_group && batch_vertCount > 0 &&
-			    (!batch_isQuad || batch_quadCount >= QUADIDX_MAX_QUADS))
-				FLUSH_BATCH();
-			if (!quad_group && batch_isQuad && batch_vertCount > 0)
-				FLUSH_BATCH();
-#endif
 
 			if (orthographic)
 			{
@@ -3321,24 +3151,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
-			}
-			else if (quad_group)
-			{
-				LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
-				for (i = 0; i < 4; i++)
-				{
-					LVERTEX *v = &verts[startVert + i];
-					dst[i].pos[0] = v->x;
-					dst[i].pos[1] = v->y;
-					dst[i].pos[2] = v->z;
-					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-					dst[i].color[2] = s_c255[(v->color) & 0xFF];
-					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
-					dst[i].texcoord[0] = v->tu;
-					dst[i].texcoord[1] = v->tv;
-				}
-				totalVerts = 4;
 			}
 			else
 			{
@@ -3359,17 +3171,14 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				}
 				totalVerts = numIndices;
 			}
-			if (!quad_group)
-				totalVerts = numIndices;
+			totalVerts = numIndices;
 		}
 		else
 		{
 			LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
 			int numVerts = tg->numVerts;
 			if (s_scratchUsed + numVerts > s_scratchMax) {
-#ifdef STEREO_REPLAY
 				tg_memo_cnt[group] = 0;
-#endif
 				continue;
 			}
 			for (i = 0; i < numVerts; i++)
@@ -3404,7 +3213,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 #endif
 
-#ifdef STEREO_REPLAY
 		/* Record the converted range (eye 1). Runs ONLY on the live
 		 * path: on a memo hit the tg arrays already hold the looked-up
 		 * range and must not be overwritten with the cursor. The tg
@@ -3422,7 +3230,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					renderObject->memoEpochTPage);
 			}
 		}
-#if defined(PERSIST_VERTS) && !defined(MEMO_VERIFY)
 		/* R05: retain this conversion for level walls. On success the
 		 * flush submits the retained buffer instead of scratch. */
 		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
@@ -3435,67 +3242,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				tg_memo_cnt[group] = 0;
 			}
 		}
-#endif
-#endif
-#if defined(STEREO_REPLAY) && defined(MEMO_VERIFY)
-		if (memo_hit) {
-			/* Oracle check: the live convert above must reproduce the
-			 * recorded bytes exactly (the content hash already matched,
-			 * so a failure here means same-frame mutation, not aliasing).
-			 * On mismatch submit the LIVE range: the recorded bytes
-			 * belong to a different batch, and submitting them draws
-			 * another batch's geometry. */
-			if (memcmp(dst, s_scratch + memo_off, memo_cnt * sizeof(gpu_vertex_t)) != 0) {
-				atm_prof_add(ATM_C_MEMO_MISMATCH, 1);
-				tg_memo_off[group] = dst - s_scratch;
-				tg_memo_cnt[group] = totalVerts;
-#ifdef MEMO_VERIFY_FORENSICS
-				/* One-shot first-mismatch forensics via result counters.
-				 * 2026-11-13: snprintf/fb/boot_log removed — the no-FS
-				 * variant still wedged, so the 256B stack buffer and the
-				 * stdio call are suspects alongside the counter adds.
-				 * This adds-only shape isolates them. */
-				{
-					static int mf_done = 0;
-					static int mf_n = 0;
-					mf_n++;
-					if (!mf_done) {
-						mf_done = 1;
-						const unsigned *pa = (const unsigned *)dst;
-						const unsigned *pb = (const unsigned *)(s_scratch + memo_off);
-						int nw = memo_cnt * (int)(sizeof(gpu_vertex_t) / sizeof(unsigned));
-						int fi = 0;
-						while (fi < nw && pa[fi] == pb[fi]) fi++;
-						/* Field id without % (runtime modulo is an
-						 * __aeabi_idiv call): repeated subtract. */
-						int mf_word = fi;
-						while (mf_word >= 9) mf_word -= 9;
-						/* @vfp-exempt R2 — one-shot memo-verify debug plumbing: plain int/unsigned words, no float source involved. measured n/a. Verified 2026-11-13. */
-						int mf_sub = smemo_sub(sorted_order[group], 0, primitive_type);
-						/* Numeric-only first-mismatch detail via the proven
-						 * atm_result.txt channel. Single-shot via mf_done.
-						 * No explicit casts: atm_prof_add takes uint32_t and
-						 * the sources are already int/unsigned. */
-						atm_prof_add(ATM_C_MEMO_MF_SUB, mf_sub);
-						atm_prof_add(ATM_C_MEMO_MF_CNT, nw);
-						atm_prof_add(ATM_C_MEMO_MF_FI, fi);
-						atm_prof_add(ATM_C_MEMO_MF_EXP, fi < nw ? pb[fi] : 0);
-						atm_prof_add(ATM_C_MEMO_MF_GOT, fi < nw ? pa[fi] : 0);
-						atm_prof_add(ATM_C_MEMO_MF_WORD, mf_word);
-						atm_prof_add(ATM_C_MEMO_MF_EPASS, renderObject->memoEpochPass);
-					}
-					if (mf_n == 2) {
-						int mf_sub2 = smemo_sub(sorted_order[group], 0, primitive_type);
-						atm_prof_add(ATM_C_MEMO_MF_SUB2, mf_sub2);
-					}
-				}
-#endif
-			} else {
-				tg_memo_off[group] = memo_off;
-				tg_memo_cnt[group] = memo_cnt;
-			}
-		}
-#endif
 		}
 
 		/* Determine effective texture state for this group */
@@ -3520,9 +3266,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		if (batch_vertCount == 0)
 		{
 			batch_startOffset = s_scratchUsed;
-#ifdef STEREO_REPLAY
 			batch_tg0 = group;
-#endif
 			batch_texture     = (void*)tg->texture;
 			batch_colourkey   = tg->colourkey;
 			batch_hasTexture  = eff_hasTexture;
@@ -3544,10 +3288,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 
 		/* Accumulate into current batch */
-		if (quad_group) {
-			batch_isQuad = 1;
-			batch_quadCount++;
-		}
 		batch_vertCount += totalVerts;
 		s_scratchUsed += totalVerts;
 	}

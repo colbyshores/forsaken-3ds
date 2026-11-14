@@ -1271,7 +1271,6 @@ static u_int8_t  VisCacheTitle;
 
 #endif
 
-#ifdef MODEL_BUCKET
 static u_int16_t VisBucketHead[MAXGROUPS];
 static u_int16_t VisBucketTail[MAXGROUPS];
 static u_int16_t VisBucketNext[MAXNUMOFMODELS];
@@ -1321,16 +1320,13 @@ static void ModelVisBucket_Build( int InTitle )
 	VisBucketGeneration = ModelVisGeneration;
 	VisBucketDirty = 0;
 }
-#endif
 
 void ModelVisCache_NewFrame( void )
 {
 #ifdef MODEL_VIS_CACHE
 	VisCacheFrame++;
 #endif
-#ifdef MODEL_BUCKET
 	VisBucketDirty = 1;
-#endif
 }
 
 
@@ -1339,16 +1335,10 @@ void ModelVisCache_NewFrame( void )
 
 /* Draw guard: with bucketing the model is already known to be visible and
  * already known to belong to this group; without it the predicate decides. */
-#ifdef MODEL_BUCKET
 #define MODEL_BUCKET_REFRESH(InTitle) \
 	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) || VisBucketGeneration != ModelVisGeneration ) \
 		ModelVisBucket_Build( InTitle ); } while(0)
 #define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup)  ( 1 )
-#else
-#define MODEL_BUCKET_REFRESH(InTitle) ((void)0)
-#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup) \
-	( ModelVisibleWithClip( (i), (InTitle), &(ClipGroup) ) && (ClipGroup) == (group) )
-#endif
 
 /* True if model i may be drawn for the current camera; *clipout receives
  * its clip group. Identical semantics with and without the memo - the flag
@@ -1384,93 +1374,6 @@ static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * cl
 #endif
 }
 
-#if defined(MODEL_BUCKET) && defined(MODEL_BUCKET_VERIFY)
-/* Correctness-only audit for MODEL_BUCKET. The normal bucket path replaces
- * a full Models[] walk per visible group with one per-camera bucket walk.
- * This diagnostic reconstructs the baseline-visible sequence for the current
- * group and compares it, element for element, with the bucket chain. It also
- * catches a stale bucket if model visibility/group state changes between the
- * bucket build and a later group call in the same camera.
- *
- * This deliberately performs the old O(models) work and must never be used
- * as a performance configuration. */
-static unsigned long g_model_bucket_verify_groups;
-static unsigned long g_model_bucket_verify_entries;
-static unsigned long g_model_bucket_verify_mismatches;
-static int g_model_bucket_verify_first_group = -1;
-static unsigned int g_model_bucket_verify_first_expected;
-static unsigned int g_model_bucket_verify_first_actual;
-
-void ModelVisBucket_Verify_Reset(void)
-{
-	g_model_bucket_verify_groups = 0;
-	g_model_bucket_verify_entries = 0;
-	g_model_bucket_verify_mismatches = 0;
-	g_model_bucket_verify_first_group = -1;
-	g_model_bucket_verify_first_expected = 0;
-	g_model_bucket_verify_first_actual = 0;
-}
-
-static void ModelVisBucket_Verify( u_int16_t group, int InTitle )
-{
-	u_int16_t expected = FirstModelUsed;
-	u_int16_t actual = VisBucketHead[ group ];
-
-	g_model_bucket_verify_groups++;
-	for (;;)
-	{
-		u_int16_t clip = 0;
-		int visible;
-
-		/* Find the next model the baseline guard would accept for this
-		 * group. This is exactly ModelVisibleWithClip() && clip==group. */
-		while (expected != (u_int16_t)-1)
-		{
-			visible = ModelVisibleWithClip( expected, InTitle, &clip );
-			if (visible && clip == group)
-				break;
-			expected = Models[ expected ].Prev;
-		}
-
-		if (expected == (u_int16_t)-1 && actual == (u_int16_t)-1)
-			break;
-		if (expected == (u_int16_t)-1 || actual == (u_int16_t)-1)
-		{
-			g_model_bucket_verify_mismatches++;
-			if (g_model_bucket_verify_first_group < 0)
-			{
-				g_model_bucket_verify_first_group = (int)group;
-				g_model_bucket_verify_first_expected =
-					(expected == (u_int16_t)-1) ? 0xffffu : (unsigned int)expected;
-				g_model_bucket_verify_first_actual =
-					(actual == (u_int16_t)-1) ? 0xffffu : (unsigned int)actual;
-			}
-			break;
-		}
-		if (expected != actual)
-		{
-			g_model_bucket_verify_mismatches++;
-			if (g_model_bucket_verify_first_group < 0)
-			{
-				g_model_bucket_verify_first_group = (int)group;
-				g_model_bucket_verify_first_expected = (unsigned int)expected;
-				g_model_bucket_verify_first_actual = (unsigned int)actual;
-			}
-		}
-		g_model_bucket_verify_entries++;
-		expected = Models[ expected ].Prev;
-		actual = VisBucketNext[ actual ];
-	}
-
-	PERF_MODEL_BUCKET_VERIFY_RESULT(
-		g_model_bucket_verify_groups,
-		g_model_bucket_verify_entries,
-		g_model_bucket_verify_mismatches,
-		g_model_bucket_verify_first_group,
-		g_model_bucket_verify_first_expected,
-		g_model_bucket_verify_first_actual );
-}
-#endif
 
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
@@ -1491,12 +1394,7 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 	if( NamePnt == &ModelNames[0] ) InTitle = false;
 	else InTitle = true;
-#ifdef MODEL_BUCKET
 	MODEL_BUCKET_REFRESH( InTitle );
-#if defined(MODEL_BUCKET_VERIFY)
-	ModelVisBucket_Verify( group, InTitle );
-#endif
-#endif
 #ifdef MODEL_VIS_CACHE
 	if( VisCacheTitle != (u_int8_t)(InTitle ? 1 : 0) )
 	{
@@ -1507,22 +1405,14 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 	}
 #endif
 
-#ifdef MODEL_BUCKET
 	/* Walk only this group's models, in list order (the bucket chains are
 	 * tail-appended in Models[] list order). ClipGroup is implied. */
 	i = VisBucketHead[ group ];
-#else
-	i = FirstModelUsed;
-#endif
 	while( i != (u_int16_t)-1 )
 	{
 		perf_stage_begin(PERF_S_MDLENTRY);
-#ifdef MODEL_BUCKET
 		nextmodel = VisBucketNext[i];
 		ClipGroup = VisBucketClip[i];
-#else
-		nextmodel = Models[i].Prev;
-#endif
 
 		if( MODEL_DRAW_GUARD( i, InTitle, group, ClipGroup ) )
 		{

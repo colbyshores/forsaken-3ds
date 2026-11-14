@@ -1407,9 +1407,7 @@ void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  )
 						AnimData = ( Mxloadheader->AnimData.AnimSeq[PolyAnim->animation] + PolyAnim->CurrentOffset );
 						Uint16Pnt = HandleAnimCommands( PolyAnim , AnimData , Mxloadheader->AnimData.AnimSeq[PolyAnim->animation] );
 						PolyAnim->CurrentOffset = Uint16Pnt - Mxloadheader->AnimData.AnimSeq[PolyAnim->animation];
-#ifdef STEREO_REPLAY
 						smemo_invalidate(); /* shared UVs just stepped */
-#endif
 					}
 
 				}

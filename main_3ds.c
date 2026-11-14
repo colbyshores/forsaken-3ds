@@ -41,18 +41,14 @@ extern bool render_init(render_info_t *info);
  * SystemMode for OG users who want full quality and have a working menu.
  *
  * In either case we don't know at compile time how much memory the OS
- * will hand us, so the heap sizes have to be picked at runtime in the
- * __system_allocateHeaps weak override below (except an explicit
- * OG_PROFILE/FORSAKEN_HEAP_FIXED test build). Detection signal:
+ * will hand us, so the heap sizes are picked at runtime in the
+ * __system_allocateHeaps weak override below. Detection signal:
  * osGetMemRegionSize(MEMREGION_APPLICATION) — the actual region the OS
  * gave us:
  *   - >= 96 MB (N3DS SystemModeExt = 124 MB, or OG HIMEM = 96 MB):
  *     32+32 MB heap, 512² texture pack via render_c3d.c.
  *   - <  96 MB (OG without HIMEM grant = 64 MB):
- *     32+22 MB heap, 256² texture pack via render_c3d.c.
- *
- * The link-time defaults below are used by FORSAKEN_HEAP_FIXED and OG_PROFILE.
- * OG_PROFILE intentionally fixes the OG 32+22 MB split on a New3DS device. */
+ *     32+22 MB heap, 256² texture pack via render_c3d.c. */
 #ifndef MALLOC_HEAP_MB
 #define MALLOC_HEAP_MB 32
 #endif
@@ -68,7 +64,6 @@ u32 __stacksize__           = 256 * 1024; /* override libctru's 32 KB default */
  * osGetMemRegionSize is safe to call here. Mirrors the steps in
  * libctru-2.7.0's default (svcControlMemory ×2 + mappableInit + sbrk
  * fakes); diverges only in choosing heap sizes based on region. */
-#if !defined(FORSAKEN_HEAP_FIXED) && !defined(FORSAKEN_OG_PROFILE)
 #include <3ds/os.h>
 #include <3ds/svc.h>
 #include <3ds/allocator/mappable.h>
@@ -112,7 +107,6 @@ void __system_allocateHeaps(void)
 	fake_heap_start = (char *)__ctru_heap;
 	fake_heap_end   = (char *)__ctru_heap + __ctru_heap_size;
 }
-#endif
 
 /* ---- init state tracking ---- */
 
@@ -353,11 +347,7 @@ bool platform_init(void)
 	bool is_n3ds = false;
 	APT_CheckNew3DS(&is_n3ds);
 	if (is_n3ds) {
-#ifdef FORSAKEN_OG_PROFILE
-		osSetSpeedupEnable(false);
-#else
 		osSetSpeedupEnable(true);
-#endif
 	}
 
 	/* Always-on boot_log of the platform-detection result. This lands
@@ -367,18 +357,11 @@ bool platform_init(void)
 	{
 		u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
 		const char *tier = region_size >= 96ull * 1024 * 1024 ? "HIMEM (512²)" : "LOMEM (256²)";
-#ifdef FORSAKEN_OG_PROFILE
-		tier = "OG_PROFILE (256²)";
-#endif
 		char _b[200];
 		snprintf(_b, sizeof(_b),
 		         "[platform] is_n3ds=%d og_profile=%d clock=%s cache=%s region=%uMB tier=%s malloc=%uMB linear=%uMB",
 		         (int)is_n3ds,
-#ifdef FORSAKEN_OG_PROFILE
-		         1, "268MHz", "L2-off",
-#else
 		         0, is_n3ds ? "804MHz" : "268MHz", is_n3ds ? "L2-on" : "L2-off",
-#endif
 		         (unsigned)(region_size >> 20),
 		         tier,
 		         (unsigned)(__ctru_heap_size >> 20),
@@ -608,14 +591,8 @@ float platform_get_3d_slider(void)
 	 * unpinned slider makes "the same run" depend on where the slider
 	 * happened to be, so mono and stereo baselines would not be comparable.
 	 * The ATM benchmark forces one state for the whole run; measurement-only,
-	 * never set in a shipping build (same role as FRAME_INTERP_FORCE_MONO). */
+	 * never set in a shipping build. */
 	return ATM_BENCH_STEREO ? 1.0f : 0.0f;
-#elif defined(FRAME_INTERP_FORCE_MONO)
-	/* Measurement-only override for the temporal-interpolation prototype:
-	 * the in-between pass is defined for a single eye, and stereo would
-	 * multiply both the traversal and the extra pass by two. Never set in
-	 * a shipping build. */
-	return 0.0f;
 #else
 	float override = config_get_float("stereo_test_slider", -1.0f);
 	if (override >= 0.0f)
@@ -630,33 +607,11 @@ float platform_get_3d_slider(void)
 
 /* ---- frame present ---- */
 
-#ifdef VERBOSE_TRACE
-/* Counter armed by autotest_tick before a hot-jump. Decremented on each
- * frame present so we get enter/exit traces around the first ~8 swaps
- * after the transition — enough to see if the GPU hangs in pglSwapBuffers
- * or if we stop entering present at all. */
-int _vt_flip_remaining = 0;
-#endif
 
 void platform_render_present(render_info_t *info)
 {
 	(void)info;
-#ifdef VERBOSE_TRACE
-	if (_vt_flip_remaining > 0) {
-		char _b[48];
-		snprintf(_b, sizeof(_b), "FLIP: enter (%d left)", _vt_flip_remaining);
-		trace(_b);
-	}
 	pglSwapBuffers();
-	if (_vt_flip_remaining > 0) {
-		char _b[48];
-		snprintf(_b, sizeof(_b), "FLIP: exit (%d left)", _vt_flip_remaining);
-		trace(_b);
-		_vt_flip_remaining--;
-	}
-#else
-	pglSwapBuffers();
-#endif
 }
 
 /* ---- shutdown ---- */
