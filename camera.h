@@ -4,6 +4,10 @@
 #define CAMERA_INCLUDED
 
 #include "main.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*
  * Defines
  */
@@ -89,6 +93,10 @@ void EnableRemoteCamera( u_int16_t * Data );
 void DisableRemoteCamera( u_int16_t * Data );
 FILE * SaveRemoteCameras( FILE * fp );
 FILE * LoadRemoteCameras( FILE * fp );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

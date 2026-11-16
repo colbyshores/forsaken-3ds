@@ -69,7 +69,7 @@ bool Cameraload( char * Filename )
 		// Doesnt Matter.....
 		return true;
 	}
-	Buffer = calloc( 1, File_Size );
+	Buffer = (char *)calloc( 1, File_Size );
 	OrgBuffer = Buffer;
 	if( !Buffer )
 	{
