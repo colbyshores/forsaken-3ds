@@ -3,6 +3,14 @@
 #include <math.h>
 
 #include "input.h"
+/* Definitions for input.h externs (were tentative definitions in the header;
+   illegal as C++ TUs now include input.h). controls.c is the owner. */
+int old_input;
+int new_input;
+int input_buffer[MAX_INPUT_BUFFER];
+int input_buffer_count;
+bool input_grabbed = false;
+
 #include "config.h"
 #include "title.h"
 #include "controls.h"

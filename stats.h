@@ -14,13 +14,22 @@ extern "C" {
 \*******************************************************************/
 
 /* prototypes */
+#ifdef __cplusplus
+extern "C"
+#endif
 void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon);		// update the kill statistics
+#ifdef __cplusplus
+extern "C"
+#endif
 void UpdateBonusStats(int Player, int Points);										// update the bonus statistics (e.g. CTF or bounty points)
 void UpdateKillCount(int Killer);															// updates player's kill counter for this life
 void ResetAllStats();																			// Resets all statistics
 void ResetIndividualStats(int Player);													// Resets one player's statistics
 void ScoreSort();																				// Sorts player's score from highest to lowest
 void InitScoreSortTab(int Player);														// Initiate Score Sort Tab player IDs
+#ifdef __cplusplus
+extern "C"
+#endif
 int GetTotalKills(int Killer);																	// Get total number of kills (not including suicides)
 int GetTotalDeaths(int Victim);															// Get total number of deaths
 int GetKillStats(int Killer, int Victim);													// Get an individual kill statistic

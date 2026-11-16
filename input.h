@@ -171,14 +171,17 @@ static inline const char* SDL_GetKeyName(int key)
 
 #define INPUT_BUFFERS (2)
 
-int old_input;
-int new_input;
+extern int old_input;
+extern int new_input;
 
 ////////////
 // Events //
 ////////////
 
-bool input_grabbed;
+extern bool input_grabbed;
+#ifdef __cplusplus
+extern "C"
+#endif
 void input_grab( bool grab );
 
 bool handle_events( void );
@@ -194,8 +197,8 @@ bool handle_events( void );
 // TODO - probably ok to rewrite this to simply have codes
 
 #define MAX_INPUT_BUFFER 100
-int input_buffer[MAX_INPUT_BUFFER];
-int input_buffer_count;
+extern int input_buffer[MAX_INPUT_BUFFER];
+extern int input_buffer_count;
 int input_buffer_find( int code );
 void input_buffer_reset( void );
 
