@@ -1,6 +1,10 @@
 #ifndef TEXTURE_INCLUDED
 #define TEXTURE_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
 	int id;			// internal id
 	int w;			// width
@@ -13,5 +17,9 @@ typedef struct {
 
 int load_image( texture_image_t * image, int mipmap ); //, float gamma );
 void destroy_image( texture_image_t * image );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -3,6 +3,10 @@
 
 #ifdef DEBUG_ON
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 #undef malloc
@@ -23,6 +27,10 @@ void X_free( void * Pnt, char *in_file, int in_line );
 void * X_realloc( void * Pnt , size_t size, char *in_file, int in_line );
 void * X_strdup( void * Pnt , char *in_file, int in_line );
 int UnMallocedBlocks( void );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
