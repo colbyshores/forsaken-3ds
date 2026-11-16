@@ -31,6 +31,8 @@
 #include "util.h"
 #include "music.h"
 #include "main_3ds.h"
+#include "dsp_adpcm.h"
+#include "music_table.h"
 
 /* ---- configuration ---- */
 
@@ -65,125 +67,20 @@ static Thread        s_thread = NULL;
 static LightLock     s_lock;
 static volatile bool s_thread_exit = false;
 
-/* ---- level→track mapping ---- */
 
-#ifdef EDITION_REMASTER
-/* Remaster build: indices line up with Data/Levels/mission_remaster.dat
- * (Remaster's authoritative 24-entry SP order + 8 N64 secret levels).
- * Track values come from defs/mapInfo.txt in the Remaster's KPF, where
- * Night Dive curated a "musictrack N" assignment per level (N is 1-indexed
- * against their 18-track OGG library). On disk the DSP-ADPCM files are
- * named track02.dsp..track19.dsp (CD-style 1-offset numbering preserved
- * so the existing 1998 audio files at track02-10 stay valid for the
- * tracks they share by composition with the Remaster's OGG 01-09).
- * extract_remaster_levels.py converts OGG 10-18 → track11.dsp..track19.dsp. */
-static const int s_level_track[] = {
-	/* SP campaign — Remaster authoritative order */
-	 5,  /*  1. vol2        Remaster track  4 -> 1998 CD #5    */
-	 9,  /*  2. asubchb     Remaster track  8 -> 1998 CD #9    */
-	 6,  /*  3. nps-sp01    Remaster track  5 -> 1998 CD #6    */
-	 3,  /*  4. thermal     Remaster track  2 -> 1998 CD #3    */
-	 2,  /*  5. fedbankv    Remaster track  1 -> 1998 CD #2    */
-	13,  /*  6. defend2     Remaster track 12 -> NEW track13   */
-	 8,  /*  7. pship       Remaster track  7 -> 1998 CD #8    */
-	10,  /*  8. stableizers Remaster track  9 -> 1998 CD #10   */
-	 7,  /*  9. powerdown   Remaster track  6 -> 1998 CD #7    */
-	 4,  /* 10. spc-sp01    Remaster track  3 -> 1998 CD #4    */
-	12,  /* 11. starship    Remaster track 11 -> NEW track12   */
-	 9,  /* 12. bio-sphere  Remaster track  8 -> 1998 CD #9    */
-	 3,  /* 13. nukerf      Remaster track  2 -> 1998 CD #3    */
-	15,  /* 14. battlebase  Remaster track 14 -> NEW track15   */
-	 7,  /* 15. capship     Remaster track  6 -> 1998 CD #7    */
-	 8,  /* 16. space       Remaster track  7 -> 1998 CD #8    */
-	10,  /* 17. high        Remaster track  9 -> 1998 CD #10   */
-	 5,  /* 18. military    Remaster track  4 -> 1998 CD #5    */
-	14,  /* 19. munitions   Remaster track 13 -> NEW track14   */
-	 4,  /* 20. biolab      Remaster track  3 -> 1998 CD #4    */
-	11,  /* 21. ramqan      Remaster track 10 -> NEW track11   */
-	 2,  /* 22. temple      Remaster track  1 -> 1998 CD #2    */
-	 3,  /* 23. azt-sp01    Remaster track  2 -> 1998 CD #3    */
-	 6,  /* 24. azchb       Remaster track  5 -> 1998 CD #6    */
-	/* N64 secret levels — unlocked by crystal counts in original Remaster */
-	16,  /* 25. nuken64     Remaster track 15 -> NEW track16   */
-	12,  /* 26. shipn64     Remaster track 11 -> NEW track12   */
-	13,  /* 27. aztec64     Remaster track 12 -> NEW track13   */
-	11,  /* 28. blackhole   Remaster track 10 -> NEW track11   */
-	18,  /* 29. genstation  Remaster track 17 -> NEW track18   */
-	15,  /* 30. tuben64     Remaster track 14 -> NEW track15   */
-	 7,  /* 31. fishy       Remaster track  6 -> 1998 CD #7    */
-	 8,  /* 32. final       Remaster track  7 -> 1998 CD #8    */
-};
-#define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
-#else
-/* Original 1998 build: indices line up with Data/Levels/mission.dat
- * (the authoritative 1998 SP campaign order). Track values were
- * extracted from ForsakenHW.exe strings on the original 1998 CD —
- * the exe embeds an internal array of "<levelname> <trackN>" entries
- * where N is the CDDA track number (2-10 on the music CD). This is
- * the AUTHORITATIVE 1998 mapping straight from the shipped binary.
- * 9 distinct tracks, themes repeat across 15 levels as in the original. */
-static const int s_level_track[] = {
-	5,   /*  1. vol2       (Volcano)               */
-	9,   /*  2. asubchb    (Abandoned Subway)      */
-	6,   /*  3. nps-sp01   (Nuclear Power Station) */
-	3,   /*  4. thermal    (Thermal Power Station) */
-	2,   /*  5. fedbankv   (Federal Bank Vault)    */
-	8,   /*  6. pship      (Prison Ship)           */
-	4,   /*  7. spc-sp01   (Asteroid Base)         */
-	9,   /*  8. bio-sphere (Bio-Sphere)            */
-	3,   /*  9. nukerf     (Subterranean Complex)  */
-	7,   /* 10. capship    (Capsized Ship)         */
-	8,   /* 11. space      (Orbital Space Station) */
-	10,  /* 12. high       (Shuttle Bay)           */
-	5,   /* 13. military   (Military Base)         */
-	3,   /* 14. azt-sp01   (Tloloc Temple)         */
-	6,   /* 15. azchb      (Ancient Temple)        */
-};
-#define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
-#endif
 
-/* ---- byte-swap helpers (DSP headers are big-endian) ---- */
-
-static inline u_int16_t bs16(u_int16_t v) { return (v >> 8) | (v << 8); }
-static inline u_int32_t bs32(u_int32_t v) {
-	return ((v >> 24) & 0xFF) | ((v >> 8) & 0xFF00) |
-	       ((v << 8) & 0xFF0000) | ((v << 24) & 0xFF000000);
-}
-
-/* ---- DSP-ADPCM CPU decoder for tracking end-of-buffer context ---- */
-
+/* ---- DSP-ADPCM CPU decode (shared dsp_adpcm module) ----
+ * Used in state-only mode to track the end-of-buffer predictor
+ * context the hardware decoder will have reached. */
 static void adpcm_advance(const u_int8_t *frames, u_int32_t num_frames,
                           const u_int16_t *coefs, ndspAdpcmData *ctx)
 {
-	int32_t hist1 = (int16_t)ctx->history0;
-	int32_t hist2 = (int16_t)ctx->history1;
-	u_int32_t f;
-	for (f = 0; f < num_frames; f++)
-	{
-		const u_int8_t *frame = frames + f * 8;
-		u_int8_t header = frame[0];
-		u_int8_t predictor = (header >> 4) & 0x07;
-		u_int8_t scale = header & 0x0F;
-		int16_t c1 = (int16_t)coefs[predictor * 2 + 0];
-		int16_t c2 = (int16_t)coefs[predictor * 2 + 1];
-		int n;
-		for (n = 0; n < 14; n++)
-		{
-			int byte_idx = 1 + (n >> 1);
-			int32_t nibble = (n & 1) ? (frame[byte_idx] & 0x0F)
-			                         : ((frame[byte_idx] >> 4) & 0x0F);
-			if (nibble & 0x08) nibble |= 0xFFFFFFF0;
-			int32_t sample = nibble << scale;
-			int32_t prediction = (hist1 * c1 + hist2 * c2) >> 11;
-			int32_t decoded = prediction + sample;
-			if (decoded > 32767) decoded = 32767;
-			else if (decoded < -32768) decoded = -32768;
-			hist2 = hist1;
-			hist1 = decoded;
-		}
-	}
-	ctx->history0 = (int16_t)hist1;
-	ctx->history1 = (int16_t)hist2;
+	dsp_state_t st;
+	st.hist1 = (int16_t)ctx->history0;
+	st.hist2 = (int16_t)ctx->history1;
+	dsp_decode(frames, num_frames, coefs, &st, NULL);
+	ctx->history0 = (int16_t)st.hist1;
+	ctx->history1 = (int16_t)st.hist2;
 }
 
 /* ---- buffer fill (streamed from SD via fread) ---- */
@@ -258,12 +155,15 @@ static bool open_track(int track)
 	 * on whether it counts data nibbles only or includes per-frame header
 	 * nibbles. We trust the file size (below) instead — much simpler. */
 
-	for (i = 0; i < 16; i++)
-		s_adpcm_coefs[i] = bs16(*(u_int16_t*)&hdr[28 + i*2]);
-
-	s_adpcm_initial.index    = bs16(*(u_int16_t*)&hdr[62]);
-	s_adpcm_initial.history0 = (s16)bs16(*(u_int16_t*)&hdr[64]);
-	s_adpcm_initial.history1 = (s16)bs16(*(u_int16_t*)&hdr[66]);
+	{
+		dsp_header_t dh;
+		dsp_parse_header(hdr, &dh);
+		for (i = 0; i < 16; i++)
+			s_adpcm_coefs[i] = dh.coefs[i];
+		s_adpcm_initial.index    = dh.initial_index;
+		s_adpcm_initial.history0 = dh.initial_hist1;
+		s_adpcm_initial.history1 = dh.initial_hist2;
+	}
 	s_adpcm_running = s_adpcm_initial;
 
 	/* Trust the file size, not the header's nibble count. Different DSP
@@ -473,13 +373,8 @@ void music_set_volume(float vol)
 
 void music_play_for_level(int level_num)
 {
-	int track;
 	if (level_num < 0) return;
-	if (level_num < NUM_LEVEL_TRACKS)
-		track = s_level_track[level_num];
-	else
-		track = MUSIC_FIRST_TRACK + (level_num % MUSIC_NUM_TRACKS);
-	music_play(track);
+	music_play(music_track_for_level(level_num));
 }
 
 void music_play_title(void) { music_play(MUSIC_TITLE_TRACK); }

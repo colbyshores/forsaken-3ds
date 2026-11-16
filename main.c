@@ -585,8 +585,8 @@ static bool AppInit( char * lpCmdLine )
 	  boot_log(_b); }
 #endif
 
-#ifdef __3DS__
 	music_init();
+#ifdef __3DS__
 	boot_log("[boot] AppInit: post music_init");
 #endif
 

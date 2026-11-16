@@ -5018,9 +5018,7 @@ bool DisplayTitle(void)
 
 	if (!TitleInitDone && (( MyGameStatus == STATUS_Title ) || ( MyGameStatus == STATUS_BetweenLevels )))
 	{
-#ifdef __3DS__
 		music_play_title();
-#endif
 
 		DarkenRoomForStart( NULL );
 		TitleInitDone = true;

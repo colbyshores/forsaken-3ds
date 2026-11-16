@@ -33,11 +33,7 @@ void input_grab( bool grab )
 	if( render_info.fullscreen )
 	{
 		input_grabbed = true;
-#if SDL_VERSION_ATLEAST(2,0,0)
 		SDL_SetWindowGrab( render_info.window, SDL_TRUE );
-#else
-		SDL_WM_GrabInput( SDL_GRAB_ON );
-#endif
 		SDL_ShowCursor( SDL_DISABLE );
 		return;
 	}
@@ -45,14 +41,10 @@ void input_grab( bool grab )
 	input_grabbed = grab;
 
 #ifdef LUA_BOT
-	SDL_WM_GrabInput( SDL_GRAB_OFF );
+	SDL_SetWindowGrab( render_info.window, SDL_FALSE );
 	SDL_ShowCursor( SDL_ENABLE );
 #else
-	#if SDL_VERSION_ATLEAST(2,0,0)
 	SDL_SetWindowGrab( render_info.window, grab ? SDL_TRUE : SDL_FALSE );
-	#else
-	SDL_WM_GrabInput( grab ? SDL_GRAB_ON : SDL_GRAB_OFF );
-	#endif
 	SDL_ShowCursor( grab ? SDL_DISABLE : SDL_ENABLE );
 #endif
 
@@ -92,11 +84,7 @@ int input_buffer_find( int code )
 //	when this is ready then pass SDL_RESIZABLE to SDL_SetVideoMode
 //  need to resize video with SDL_SetVideoMode
 bool bIgnoreWM_SIZE = false; // ignores resize events
-#if SDL_VERSION_ATLEAST(2,0,0)
 void app_resize( SDL_WindowEvent * window )
-#else
-void app_resize( SDL_ResizeEvent * resize )
-#endif
 {
 	DebugPrintf("Window size changed.\n");
 
@@ -128,24 +116,15 @@ void app_resize( SDL_ResizeEvent * resize )
 	SetGamePrefs();
 }
 
-#if SDL_VERSION_ATLEAST(2,0,0)
 void app_active( SDL_WindowEvent * window )
-#else
-void app_active( SDL_ActiveEvent * active )
-#endif
 {
 //	DebugPrintf("window active state set to: %s\n",(active->gain?"true":"false"));
 
-// since sdl 2 can support more than one type of event we want to explicitly check both gained/lost state
-#if SDL_VERSION_ATLEAST(2,0,0)
+// SDL2 window events carry the specific gained/lost state
 	bool gained  = window -> event == SDL_WINDOWEVENT_FOCUS_GAINED;
 	bool lost    = window -> event == SDL_WINDOWEVENT_FOCUS_LOST;
 	bool resized = window -> event == SDL_WINDOWEVENT_RESIZED;
 	bool exposed = window -> event == SDL_WINDOWEVENT_EXPOSED;
-#else
-	bool gained = active -> gain;
-	bool lost   = ! gained;
-#endif
 
 	if( lost )
 		input_grab( false );
@@ -171,30 +150,11 @@ void app_active( SDL_ActiveEvent * active )
 		RenderModeReset();
 	}
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-
 	if( resized )
 		app_resize( window );
 
 	if( exposed )
 		render_flip(&render_info);
-
-#endif
-
-#if !SDL_VERSION_ATLEAST(2,0,0)
-	switch( active->state )
-	{
-	case SDL_APPMOUSEFOCUS: // mouse
-		//DebugPrintf("Mouse event\n");
-		break;
-	case SDL_APPINPUTFOCUS: // keyboard
-		//DebugPrintf("keyboard event\n");
-		break;
-	case SDL_APPACTIVE: // minimize/iconified
-		//DebugPrintf("Iconify event\n");
-		break;
-	}
-#endif
 }
 
 void app_quit( void )
@@ -235,23 +195,20 @@ void app_keyboard( SDL_KeyboardEvent * key )
 		}
 		else if( key->keysym.sym == SDLK_RSHIFT || key->keysym.sym == SDLK_LSHIFT )
 		{
-#if SDL_VERSION_ATLEAST(2,0,0)
 				u_int8_t *keystate = SDL_GetKeyboardState(NULL);
 				if ( keystate[SDL_SCANCODE_F12] )
-#else
-				u_int8_t *keystate = SDL_GetKeyState(NULL);
-				if ( keystate[SDLK_F12] )
-#endif
 					MenuGoFullScreen( NULL );
 		}
 	}
 	if( key->type == SDL_KEYDOWN )
 	{
-		input_buffer_send(
-			key->keysym.unicode ? 
-				key->keysym.unicode :
-				key->keysym.sym
-		);
+		/* SDL2 has no keysym.unicode (SDL1 field). SDLK_* values for
+		 * printable keys match lowercase ASCII; restore shifted letters
+		 * so text entry (pilot names, console) keeps capitals. */
+		int code = (int) key->keysym.sym;
+		if( ( key->keysym.mod & KMOD_SHIFT ) && code >= 'a' && code <= 'z' )
+			code += 'A' - 'a';
+		input_buffer_send( code );
 	}
 }
 
@@ -282,14 +239,12 @@ void reset_mouse_wheel( void )
 	mouse_state.wheel = 0;
 }
 
-#if SDL_VERSION_ATLEAST(2,0,0)
 void app_mouse_wheel( SDL_MouseWheelEvent * _event )
 {
 	//printf("mouse wheel = { x = %d, y = %d }\n", _event->x, _event->y);
 	if(_event->y > 0) { mouse_wheel_up();   input_buffer_send( UP_MOUSE   ); }
 	if(_event->y < 0) { mouse_wheel_down(); input_buffer_send( DOWN_MOUSE ); }
 }
-#endif
 
 void app_mouse_button( SDL_MouseButtonEvent * _event )
 {
@@ -303,20 +258,6 @@ void app_mouse_button( SDL_MouseButtonEvent * _event )
 
 	switch( _event->button )
 	{
-#if !SDL_VERSION_ATLEAST(2,0,0)
-	// mouse wheel button down/up are sent at same time
-	// so if we react to the up event then we undo the down event !
-	// so we must ignore up events and reset it further bellow manually
-	// since a wheel event can never be held down this is ok...
-	case SDL_BUTTON_WHEELUP:
-		if( _event->type == SDL_MOUSEBUTTONDOWN )
-			mouse_wheel_up();
-		break;
-	case SDL_BUTTON_WHEELDOWN:
-		if( _event->type == SDL_MOUSEBUTTONDOWN )
-			mouse_wheel_down();
-		break;
-#endif
 
 	//
 	// Every other mouse button works like normal
@@ -649,14 +590,9 @@ bool joysticks_cleanup( void )
 // seems to not be included anymore
 // but since sdl_joy is not null then
 // seems like we would always have a joystick opened here
-#if !SDL_VERSION_ATLEAST(2,0,0)
-			if(SDL_JoystickOpened(i))
-#endif
-			{
-				SDL_JoystickClose(
-					JoystickInfo[i].sdl_joy
-				);
-			}
+			SDL_JoystickClose(
+				JoystickInfo[i].sdl_joy
+			);
 		}
 
 		for (j = 0; j < JoystickInfo[i].NumButtons; i++)
@@ -730,42 +666,18 @@ bool handle_events( void )
 		{
 
 
-// previously mouse wheel was a button code
-// now it's an x/y axis since it supports mouse wheel balls
-#if SDL_VERSION_ATLEAST(2,0,0)
+// mouse wheel is an x/y axis event in SDL2 (was a button code in SDL1)
 		case SDL_MOUSEWHEEL:
 			app_mouse_wheel( &_event );
 			break;
-#endif
 
 
-// this event name has changed
-#if SDL_VERSION_ATLEAST(2,0,0)
-// TODO - we should call something like app_window
-//        which then delegates to app_active in correct case
 		case SDL_WINDOWEVENT:
 			app_active( &_event );
 			break;
-#else
-		case SDL_ACTIVEEVENT:
-			app_active( &_event.active );
-			break;
-#endif
 
 
-// these have been moved into the window event above
-#if !SDL_VERSION_ATLEAST(2,0,0)
-		case SDL_VIDEORESIZE:
-			app_resize( &_event.resize );
-			break;
 
-		case SDL_VIDEOEXPOSE: // need redraw
-			render_flip(&render_info);
-			break;
-#endif
-
-// the newer sdl now uses a union instead of sub structures
-#if SDL_VERSION_ATLEAST(2,0,0)
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
 			app_keyboard( &_event );
@@ -797,39 +709,6 @@ bool handle_events( void )
 			app_joy_hat( &_event );
 			break;
 
-#else
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
-			app_keyboard( &_event.key );
-			break;
-
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			app_mouse_button( &_event.button );
-			break;
-
-		case SDL_MOUSEMOTION:
-			app_mouse_motion( &_event.motion );
-			break;
-
-		case SDL_JOYAXISMOTION:
-			app_joy_axis( &_event.jaxis );
-			break;
-
-		case SDL_JOYBALLMOTION:
-			app_joy_ball( &_event.jball );
-			break;
-
-		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYBUTTONUP:
-			app_joy_button( &_event.jbutton );
-			break;
-
-		case SDL_JOYHATMOTION:
-			app_joy_hat( &_event.jhat );
-			break;
-
-#endif
 
 		case SDL_QUIT:
 			app_quit();

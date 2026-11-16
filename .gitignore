@@ -127,6 +127,8 @@ tools/*
 # tools/* rule swallow them. Run logs stay out.
 !tools/perf/
 !tools/perf/**
+!tools/texture/
+!tools/texture/etc2enc.c
 !tools/ralph-pi.sh
 tools/perf/logs/
 
@@ -173,3 +175,9 @@ perf/
 # Pi harness progress checkpoints (pi's 5-turn crash-recovery files, repo-local)
 /PROGRESS.md
 /.progress-log/
+
+# build-time ETC2 pack (from PNG masters)
+Data/**/*.ktx2
+tools/texture/etc2enc
+shaders/*.spv
+vulkan_shaders.h

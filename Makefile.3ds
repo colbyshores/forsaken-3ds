@@ -11,16 +11,12 @@
 #                                           # ISO assets + tracks 02-10) and
 #                                           # extract_remaster_levels.py (for
 #                                           # the KPF levels + tracks 11-19).
-#   make -f Makefile.3ds RENDERER=picagl    # picaGL fallback (no stereo 3D)
 #   make -f Makefile.3ds DEBUG=1   # debug build (__3DS_DEBUG__ defined)
 #                                   # enables: autoboot to Volcano level
 #
 
 # Debug flag — set to 1 to enable __3DS_DEBUG__ features
 DEBUG ?= 0
-
-# Renderer: citro3d (default — shipping CIA) or picagl (fallback, no stereo 3D)
-RENDERER ?= citro3d
 
 # Edition: original (default — 1998 game) or remaster (Forsaken Remastered
 # levels + music). The remaster build still uses the 1998 ISO for UI assets
@@ -54,7 +50,7 @@ VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
 # COMPAT / ENV (not perf work):
 #   AUTOTEST_REMASTER* (level-sweep fidelity vehicle), ATM_HEADLESS
 #   (ATM-launched payloads only — NEVER for 3dslink/stub pushes),
-#   DEBUG, RENDERER, EDITION, SLIM
+#   DEBUG, EDITION, SLIM
 # SCHEDULED REMOVALS (only at these points, not before):
 #---------------------------------------------------------------------------------
 
@@ -80,10 +76,6 @@ SRCDIR     := $(CURDIR)
 TARGET     := forsaken3ds
 BUILD      := build_3ds
 
-# picaGL paths
-PICAGL_DIR := $(SRCDIR)/picaGL
-PICAGL_INC := $(PICAGL_DIR)/include
-
 # portlibs
 PORTLIBS   := $(DEVKITPRO)/portlibs/3ds
 
@@ -98,11 +90,10 @@ EXCLUDE_SRC := \
 	input_sdl.c \
 	input_dinput.c \
 	sound_openal.c \
+	music_openal.c \
 	sound_dsound.c \
 	texture_sdl.c \
 	texture_devil.c \
-	render_gl2.c \
-	render_gl3.c \
 	render_disabled.c \
 	net_enet.c \
 	net_enet_2.c \
@@ -136,18 +127,13 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-DSOUND_SUPPORT \
 	-DLUA_USE_APICHECK
 
-ifeq ($(RENDERER),citro3d)
+# Citro3D is the only 3DS renderer (PicaGL backend removed).
 CFLAGS += -DRENDERER_C3D
 # Hybrid GPU vertex lighting: shader does ambient + per-vertex point-light
 # falloff + accumulation, replacing the per-vertex CPU dynamic-light loop
-# in lights.c::XLight1Group. Validated on hardware; default-on for citro3d.
-# picaGL builds keep CPU lighting since picaGL has no programmable shader.
+# in lights.c::XLight1Group. Validated on hardware; default-on.
 CFLAGS += -DGPU_LIGHTING
-EXCLUDE_SRC += render_gl1.c render_gl_shared.c
-else
-CFLAGS += -DGL=1
-EXCLUDE_SRC += render_c3d.c
-endif
+EXCLUDE_SRC += render_vulkan.c
 
 ALL_SRC := $(notdir $(wildcard $(SRCDIR)/*.c))
 CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
@@ -251,23 +237,16 @@ endif
 # Include paths - note isystem for the source dir so #include <header.h> works
 CFLAGS += -isystem $(SRCDIR) \
 	-I$(SRCDIR) \
-	-I$(PICAGL_INC) \
 	-I$(PORTLIBS)/include \
 	-I$(PORTLIBS)/include/lua5.1 \
 	-I$(DEVKITPRO)/libctru/include
 
 LDFLAGS := $(ARCH) -specs=3dsx.specs \
 	-Wl,-Map,$(TARGET).map \
-	-L$(PICAGL_DIR)/lib \
 	-L$(PORTLIBS)/lib \
 	-L$(DEVKITPRO)/libctru/lib
 
-# Link order: picaGL before citro3d
-ifeq ($(RENDERER),citro3d)
 LIBS := -lcitro3d
-else
-LIBS := -lpicaGL -lcitro3d
-endif
 LIBS += -lctru -lpng -lz -llua5.1 -lm
 
 #---------------------------------------------------------------------------------
@@ -738,10 +717,10 @@ release: release-check
 	@echo "[release] Running 'make clean' to guarantee fresh .o files..."
 	@$(MAKE) -f Makefile.3ds clean
 	@echo "[release] Building unified primary + alt CIA + dspfirm-less 3dsx..."
-	@$(MAKE) -f Makefile.3ds RENDERER=citro3d EDITION=remaster \
+	@$(MAKE) -f Makefile.3ds EDITION=remaster \
 		$(OUTPUT_CIA) $(OUTPUT_CIA_ALT) release-3dsx
 	@echo "[release] Building HIMEM opt-in CIAs (primary + alt)..."
-	@$(MAKE) -f Makefile.3ds RENDERER=citro3d EDITION=remaster \
+	@$(MAKE) -f Makefile.3ds EDITION=remaster \
 		$(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
 	@echo "[release] Final sanity-grep on production ELF..."
 	@$(MAKE) -f Makefile.3ds release-strings-check
