@@ -14,7 +14,7 @@ CFLAGS  := -g -fcommon -Wall -Wextra $(INCLUDE)
 
 AILIB_OBJ := secwalk_ailib.o
 
-all: test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules
+all: test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat
 
 $(AILIB_OBJ): ../ailib.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -39,7 +39,11 @@ test_modules: test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
 	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
 	./test_modules
 
-clean:
-	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules $(AILIB_OBJ) out-*.bmp framedump_test.log
+test_quat: test_quat.cpp ../quat.cpp ../new3d.c
+	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_quat.cpp ../quat.cpp ../new3d.c -lm
+	./test_quat
 
-.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules
+clean:
+	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat $(AILIB_OBJ) out-*.bmp framedump_test.log
+
+.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat

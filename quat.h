@@ -4,8 +4,20 @@
 #include "main.h"
 #include "new3d.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*===================================================================
 	Quaternion Structures
+
+	QUAT stores (w, x, y, z) - scalar first, Forsaken's layout since
+	the original engine (RT64-style (x,y,z,w) code must convert, not
+	cast). Quaternions are expected to be unit length on input to
+	the multiply/matrix paths; QuatNormalise restores that.
+	QuatInterpolate performs normalised linear interpolation and
+	relies on QUATLERP.dir for the shortest-arc sign choice - the
+	caller sets it, the function does not compute the dot product.
 ===================================================================*/
 typedef struct QUAT {
 	float	w;
@@ -50,5 +62,9 @@ void QuatMake( QUAT * destQuat, float x, float y, float z, float angle);
 void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 );
 void MatrixToQuat(QUAT * destQuat, MATRIX * srcMatrix);
 void QuatFromDirAndUp( VECTOR * Dir, VECTOR * Up, QUAT * Quat );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

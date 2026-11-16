@@ -16,7 +16,6 @@ extern	VECTOR			Forward;
 extern	VECTOR			SlideUp;
 
 
-#if 1
 void MakeQuat( float XRot, float YRot, float ZRot , QUAT * qxyz )
 {
     float  cosZRot, sinZRot, cosYRot, sinYRot, cosXRot, sinXRot;
@@ -46,41 +45,6 @@ void MakeQuat( float XRot, float YRot, float ZRot , QUAT * qxyz )
 	qxyz->w = cosXRot * cosYRot * cosZRot + sinXRot * sinYRot * sinZRot;
 
 }	/* q_from_euler */
-#else
-/*===================================================================
-	Procedure	:	Build XYZ Quaternion
-	Input		:	float		X Rotation ( Degrees )
-				:	float		Y Rotation ( Degrees )
-				:	float		Z Rotation ( Degrees )
-				:	QUAT	*	Destination Quaternion
-	Output		:	Nothing
-===================================================================*/
-void MakeQuat( float XRot, float YRot, float ZRot, QUAT * qxyz )
-{
-	QUAT	qx;
-	QUAT	qy;
-	QUAT	qz;
-	QUAT	qxy;
-
-	qx.w = (float) COSD( XRot * 0.5F );
-	qx.x = (float) SIND( XRot * 0.5F );
-	qx.y = 0.0F;
-	qx.z = 0.0F;
-
-	qy.w = (float) COSD( YRot * 0.5F );
-	qy.x = 0.0F;
-	qy.y = (float) SIND( YRot * 0.5F );
-	qy.z = 0.0F;
-
-	qz.w = (float) COSD( ZRot * 0.5F );
-	qz.x = 0.0F;
-	qz.y = 0.0F;
-	qz.z = (float) SIND( ZRot * 0.5F );
-
-	QuatMultiplyX_Y( &qx, &qy, &qxy );
-	QuatMultiplyXY_Z( &qxy, &qz, qxyz );
-}
-#endif
 /*===================================================================
 	Procedure	:	Multiply 2 Quaternions together creating 3rd
 	Input		:	QUAT	*	Quaternion1
@@ -179,57 +143,6 @@ void QuatNormalise( QUAT * q )
 	}			   
 }
 
-#if 0
-/*===================================================================
-	Procedure	:	Create Matrix from Quaternion
-	Input		:	QUAT	*	Quaternion
-				:	MATRIX	*	Matrix
-	Output		:	Nothing
-===================================================================*/
-void QuatToMatrix( QUAT * q, MATRIX * m )
-{
-	float	xs, ys, zs;
-	float	wx, wy, wz;
-	float	xx, xy, xz;
-	float	yy, yz, zz;
-
-	xs = q->x;
-	ys = q->y;
-	zs = q->z;
-
-	wx = ( ( q->w * xs ) * 2 );
-	wy = ( ( q->w * ys ) * 2 );
-	wz = ( ( q->w * zs ) * 2 );
-
-	xx = ( ( q->x * xs ) * 2 );
-	xy = ( ( q->x * ys ) * 2 );
-	xz = ( ( q->x * zs ) * 2 );
-
-	yy = ( ( q->y * ys ) * 2 );
-	yz = ( ( q->y * zs ) * 2 );
-	zz = ( ( q->z * zs ) * 2 );
-
-	m->_11 = ( 1.0F - ( yy + zz ) );
-	m->_12 = ( xy - wz );
-	m->_13 = ( xz + wy );
-	m->_14 = 0.0F;
-
-	m->_21 = ( xy + wz );
-	m->_22 = ( 1.0F - ( xx + zz ) );
-	m->_23 = ( yz - wx );
-	m->_24 = 0.0F;
-
-	m->_31 = ( xz - wy );
-	m->_32 = ( yz + wx );
-	m->_33 = ( 1.0F - ( xx + yy ) );
-	m->_34 = 0.0F;
-
-	m->_41 = 0.0F;
-	m->_42 = 0.0F;
-	m->_43 = 0.0F;
-	m->_44 = 1.0F;
-}
-#else
 /*===================================================================
 	Procedure	:	NEW Create Matrix from Quaternion
 	Input		:	QUAT	*	Quaternion
@@ -279,7 +192,6 @@ void QuatToMatrix( QUAT * q, MATRIX * m )
 	m->_43 = 0.0F;
 	m->_44 = 1.0F;
 }
-#endif
 
 /*===================================================================
 	Procedure	:	Quaternion Dot Product
