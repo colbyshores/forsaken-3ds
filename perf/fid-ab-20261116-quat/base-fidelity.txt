@@ -1,0 +1,4 @@
+FIDC: tick=60 hash=70726734 ship=8f4a8024 enem=65ffd8ef prim=868def59 sec=f1fc1875
+FIDC: tick=120 hash=64ec3815 ship=835f9653 enem=f1bcf883 prim=dad44851 sec=d9ab7825
+FIDC: tick=180 hash=203e383d ship=07213f4e enem=53887f66 prim=5752ff69 sec=67e36cd5
+FIDC: tick=240 hash=594bab3c ship=702d0a15 enem=a95d140c prim=e9f233a1 sec=8261a685
