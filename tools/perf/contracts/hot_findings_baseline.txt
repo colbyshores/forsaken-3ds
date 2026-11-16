@@ -180,10 +180,10 @@ R7|2dpolys.c|FmPolyProcess|float division in hot loop
 R7|2dpolys.c|FmPolyProcess|float division in hot loop
 R7|ailib.c|AI_LookAhead|float division inner_loop=false
 R7|aimain.c|AI_AVOIDCHECK|float division inner_loop=false
-R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division in hot loop
-R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division in hot loop
-R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
-R7|aispline.c|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
+R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
+R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
+R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
+R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
 R7|collision.c|BackgroundCollideOneGroup|float division inner_loop=false
 R7|collision.c|BackgroundCollideOneGroup|float division inner_loop=false
 R7|collision.c|BackgroundCollideOneGroup|float division inner_loop=false
