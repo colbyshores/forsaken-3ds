@@ -48,8 +48,8 @@ R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
 R2|2dpolys.cpp|SaveFmPolys|float-to-int cast in loop body
 R2|2dpolys.cpp|SaveFmPolys|float-to-int cast in loop body
 R2|2dpolys.cpp|SaveFmPolys|float-to-int cast in loop body
-R2|enemies.c|ProcessEnemies|float-to-int cast in loop body
-R2|enemies.c|ProcessEnemies|float-to-int cast in loop body
+R2|enemies.cpp|ProcessEnemies|float-to-int cast in loop body
+R2|enemies.cpp|ProcessEnemies|float-to-int cast in loop body
 R2|lights.c|XLight1Group|float-to-int cast in loop body
 R2|lights.c|XLight1Group|float-to-int cast in loop body
 R2|lights.c|XLight1Group|float-to-int cast in loop body
@@ -106,15 +106,15 @@ R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispSolid|float-to-int cast in loop body
-R2|ships.c|ProcessShips|untyped-heuristic: float-to-int cast in loop body
-R2|ships.c|ProcessShips|untyped-heuristic: float-to-int cast in loop body
+R2|ships.cpp|ProcessShips|untyped-heuristic: float-to-int cast in loop body
+R2|ships.cpp|ProcessShips|untyped-heuristic: float-to-int cast in loop body
 R2|spotfx.c|SaveAllSpotFX|float-to-int cast in loop body
 R2|spotfx.c|SaveAllSpotFX|float-to-int cast in loop body
-R2|visi.c|FindVisible|float-to-int cast in loop body
-R2|visi.c|FindVisible|float-to-int cast in loop body
-R2|visi.c|FindVisible|float-to-int cast in loop body
-R2|visi.c|FindVisible|float-to-int cast in loop body
-R2|visi.c|FindVisible|float-to-int cast in loop body
+R2|visi.cpp|FindVisible|float-to-int cast in loop body
+R2|visi.cpp|FindVisible|float-to-int cast in loop body
+R2|visi.cpp|FindVisible|float-to-int cast in loop body
+R2|visi.cpp|FindVisible|float-to-int cast in loop body
+R2|visi.cpp|FindVisible|float-to-int cast in loop body
 R4-D|new3d.cpp|spline|double in hot function spline
 R4-D|new3d.cpp|spline|double in hot function spline
 R4-D|new3d.cpp|spline|double in hot function spline
@@ -212,7 +212,7 @@ R7|lights.c|XLight1Group|float division in hot loop
 R7|lights.c|XLight1Group|float division in hot loop
 R7|lights.c|XLight1Group|float division in hot loop
 R7|lights.c|XLight1Group|sqrtf in hot loop
-R7|models.c|ModelDisp|float division in hot loop
+R7|models.cpp|ModelDisp|float division in hot loop
 R7|new3d.cpp|NormaliseVector|float division inner_loop=false
 R7|new3d.cpp|NormaliseVector|sqrtf inner_loop=false
 R7|oct2.c|MainGameRender|float division inner_loop=false
@@ -346,16 +346,16 @@ R7|screenpolys.cpp|UpdateCountdownDigits|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
 R7|screenpolys.cpp|UpdateDigit|float division inner_loop=false
 R7|secondary.c|ProcessSecondaryBullets|float division inner_loop=false
-R7|ships.c|ProcessShips|float division in hot loop
-R7|ships.c|ProcessShips|float division in hot loop
-R7|ships.c|ProcessShips|float division in hot loop
-R7|ships.c|ProcessShips|float division in hot loop
-R7|ships.c|ProcessShips|float division in hot loop
-R7|ships.c|ProcessShips|float division in hot loop
-R7|visi.c|FindVisible|float division in hot loop
-R7|visi.c|FindVisible|float division in hot loop
-R7|visi.c|FindVisible|float division in hot loop
-R7|visi.c|FindVisible|float division in hot loop
-R7|visi.c|FindVisible|float division in hot loop
-R7|visi.c|FindVisible|float division inner_loop=false
+R7|ships.cpp|ProcessShips|float division in hot loop
+R7|ships.cpp|ProcessShips|float division in hot loop
+R7|ships.cpp|ProcessShips|float division in hot loop
+R7|ships.cpp|ProcessShips|float division in hot loop
+R7|ships.cpp|ProcessShips|float division in hot loop
+R7|ships.cpp|ProcessShips|float division in hot loop
+R7|visi.cpp|FindVisible|float division in hot loop
+R7|visi.cpp|FindVisible|float division in hot loop
+R7|visi.cpp|FindVisible|float division in hot loop
+R7|visi.cpp|FindVisible|float division in hot loop
+R7|visi.cpp|FindVisible|float division in hot loop
+R7|visi.cpp|FindVisible|float division inner_loop=false
 R9|build_3ds/2dpolys.o|2dpolys|live VFP s-regs N > N

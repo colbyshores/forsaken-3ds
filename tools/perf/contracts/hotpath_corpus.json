@@ -52,7 +52,7 @@
       "why": "per-group poly transform/clip/display batches"
     },
     {
-      "file": "models.c",
+      "file": "models.cpp",
       "symbols": [
         "ModelDisp"
       ],
@@ -83,14 +83,14 @@
       "why": "per moving object per frame (ObjectCollide/QCollide/MoveGroup)"
     },
     {
-      "file": "ships.c",
+      "file": "ships.cpp",
       "symbols": [
         "ProcessShips"
       ],
       "why": "per player per frame"
     },
     {
-      "file": "enemies.c",
+      "file": "enemies.cpp",
       "symbols": [
         "ProcessEnemies"
       ],
