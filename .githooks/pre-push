@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# pre-push: every shipped build configuration must compile+link before a push.
+# This exists because EDITION=original sat broken for six months and
+# tests/Makefile sat broken since Cleanup 5 — both invisible because nothing
+# ran them. See tools/build_matrix.sh.
+#
+# Skip once:  git push --no-verify   (or: GATE_SKIP=1 git push)
+set -u
+cd "$(git rev-parse --show-toplevel)"
+if [ "${GATE_SKIP:-0}" = "1" ]; then
+	echo "pre-push: GATE_SKIP=1 — build matrix skipped (log this in the PR)"
+	exit 0
+fi
+exec tools/build_matrix.sh

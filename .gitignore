@@ -121,6 +121,7 @@ net_test/
 # fetched binaries — makerom, bannertool, the enet-build clone, etc.
 # — stay out of version control).
 tools/*
+!tools/build_matrix.sh
 !tools/*.py
 # Perf-contract tooling (AGENTS.md gates) is tracked source, not fetched
 # binaries. Baselines inside it are tracked adoption debt — never let the
@@ -179,3 +180,4 @@ Data/**/*.ktx2
 tools/texture/etc2enc
 shaders/*.spv
 vulkan_shaders.h
+.build-matrix/
