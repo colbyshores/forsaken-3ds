@@ -46,7 +46,7 @@ ALLOWLIST = {
 }
 
 SCAN_FILES = ["polys.cpp", "2dpolys.cpp", "lines.cpp", "screenpolys.cpp",
-              "transexe.c", "water.c", "mxaload.cpp", "mxload.cpp", "mload.cpp"]
+              "transexe.cpp", "water.cpp", "mxaload.cpp", "mxload.cpp", "mload.cpp"]
 
 FUNC_RE = re.compile(r"^bool\s+([A-Za-z_]\w*)\s*\(", re.MULTILINE)
 FILL_HINT_RE = re.compile(r"FSLockVertexBuffer|textureGroups\[|numTextureGroups\s*=\s*0")
