@@ -115,26 +115,26 @@ R2|visi.c|FindVisible|float-to-int cast in loop body
 R2|visi.c|FindVisible|float-to-int cast in loop body
 R2|visi.c|FindVisible|float-to-int cast in loop body
 R2|visi.c|FindVisible|float-to-int cast in loop body
-R4-D|new3d.c|spline|double in hot function spline
-R4-D|new3d.c|spline|double in hot function spline
-R4-D|new3d.c|spline|double in hot function spline
-R4-D|new3d.c|spline|double in hot function spline
-R4-D|new3d.c|spline|double in hot function spline
-R4-D|new3d.c|spline|double in hot function spline
-R4-D|new3d.c|spline|double in hot function spline
-R4|new3d.c|spline|double/long double in hot path
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
-R4|new3d.c|spline|unsuffixed float literal promotes to double
+R4-D|new3d.cpp|spline|double in hot function spline
+R4-D|new3d.cpp|spline|double in hot function spline
+R4-D|new3d.cpp|spline|double in hot function spline
+R4-D|new3d.cpp|spline|double in hot function spline
+R4-D|new3d.cpp|spline|double in hot function spline
+R4-D|new3d.cpp|spline|double in hot function spline
+R4-D|new3d.cpp|spline|double in hot function spline
+R4|new3d.cpp|spline|double/long double in hot path
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R4|new3d.cpp|spline|unsuffixed float literal promotes to double
 R7|2dpolys.c|FmPolyProcess|float division in hot loop
 R7|2dpolys.c|FmPolyProcess|float division in hot loop
 R7|2dpolys.c|FmPolyProcess|float division in hot loop
