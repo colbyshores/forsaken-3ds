@@ -46,7 +46,6 @@ test_quat: test_quat.cpp ../quat.cpp ../new3d.c
 test_sphere: test_sphere.cpp ../sphere.cpp ../new3d.c
 	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_sphere.cpp ../sphere.cpp ../new3d.c -lm
 	./test_sphere
-	./test_quat
 
 clean:
 	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat test_sphere $(AILIB_OBJ) out-*.bmp framedump_test.log
