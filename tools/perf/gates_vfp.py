@@ -163,7 +163,7 @@ R1_THREAD_SITES = ("main.c", "music_3ds.c")
 STANDING_EXEMPTIONS: tuple[dict[str, object], ...] = (
     {"id": "E-LUT-1", "file": "new3d.h", "symbols": ("fast_sinf",), "rules": ("R2", "R3", "R5")},
     {"id": "E-LUT-2", "file": "new3d.h", "symbols": ("fast_cosf",), "rules": ("R2", "R3")},
-    {"id": "E-LUT-3", "file": "new3d.c", "symbols": ("trig_table_init",), "rules": ("R4", "R6")},
+    {"id": "E-LUT-3", "file": "new3d.cpp", "symbols": ("trig_table_init",), "rules": ("R4", "R6")},
     {"id": "E-LUT-4", "file": "new3d.h", "symbols": ("fast_invsqrtf",), "rules": ("R7",)},
     {"id": "E-TITLE-1", "file": "title.c", "symbols": ("*",), "rules": ("R6",)},
 )

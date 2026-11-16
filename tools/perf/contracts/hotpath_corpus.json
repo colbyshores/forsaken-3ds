@@ -26,7 +26,7 @@
       "why": "inlined into per-frame/per-entity trig sites"
     },
     {
-      "file": "new3d.c",
+      "file": "new3d.cpp",
       "symbols": [
         "MatrixMultiply",
         "ApplyMatrix",
@@ -133,7 +133,7 @@
       "why": "CPU lighting path (partly compiled out under GPU_LIGHTING)"
     },
     {
-      "file": "quat.c",
+      "file": "quat.cpp",
       "symbols": [
         "*"
       ],

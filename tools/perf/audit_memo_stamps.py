@@ -34,7 +34,7 @@ REQUIRED = {
         "FmPolyDispGroupClipped": "SMEMO_PASS_FM_CLIPPED",
         "FmPolyDispGroupUnclipped": "SMEMO_PASS_FM_UNCLIPPED",
     },
-    "lines.c": {
+    "lines.cpp": {
         "LinesDispGroup": "SMEMO_PASS_LINES",
     },
 }
@@ -45,7 +45,7 @@ ALLOWLIST = {
     "ScrPolyDispNonSolid": "ortho screen polys: draw_2d_object only, memo is non-ortho only",
 }
 
-SCAN_FILES = ["polys.c", "2dpolys.c", "lines.c", "screenpolys.c",
+SCAN_FILES = ["polys.c", "2dpolys.c", "lines.cpp", "screenpolys.c",
               "transexe.c", "water.c", "mxaload.c", "mxload.c", "mload.c"]
 
 FUNC_RE = re.compile(r"^bool\s+([A-Za-z_]\w*)\s*\(", re.MULTILINE)
