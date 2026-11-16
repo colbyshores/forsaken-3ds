@@ -357,10 +357,22 @@ romfs-freshness-check:
 # consider the phony's "always out of date" timestamp when deciding
 # whether the stamp itself is up-to-date. Net result: restage only when
 # the check deleted the stamp.
-$(ROMFS_STAMP): | romfs-freshness-check
+# Edition marker: a REAL prerequisite of the staging stamp (not an order-only
+# check — order-only prereqs are skipped when the stamp is up to date, which
+# is how a remaster mission.dat silently shipped inside an original build and
+# vice versa). When EDITION changes, .edition is rewritten newer than the
+# stamp, the stamp rebuilds, rsync --delete restores the 1998 data, and the
+# remaster substitution re-applies on top. Same FORCE+cmp pattern as the
+# build-flags stamp above.
+$(ROMFS_STAGING)/.edition: FORCE
+	@mkdir -p $(ROMFS_STAGING)
+	@printf '%s' '$(EDITION)' > $@.tmp
+	@if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; echo "romfs edition changed -> restaging"; fi
+
+$(ROMFS_STAMP): $(ROMFS_STAGING)/.edition | romfs-freshness-check
 	@echo "Staging romfs data (this may take a while)..."
 	@mkdir -p $(ROMFS_STAGING)
-	@rsync -aL --delete --exclude='.stamp' $(SRCDIR)/romfs/ $(ROMFS_STAGING)/
+	@rsync -aL --delete --exclude='.stamp' --exclude='.edition' $(SRCDIR)/romfs/ $(ROMFS_STAGING)/
 	@echo "Converting BMP textures to PNG (level-specific + global)..."
 	@# The 3DS texture loader (render_c3d.c::FSCreateTexture) substitutes
 	@# a .png extension at lookup time, so the engine looks for <name>.png
