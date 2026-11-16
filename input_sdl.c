@@ -247,11 +247,13 @@ void app_keyboard( SDL_KeyboardEvent * key )
 	}
 	if( key->type == SDL_KEYDOWN )
 	{
-		input_buffer_send(
-			key->keysym.unicode ? 
-				key->keysym.unicode :
-				key->keysym.sym
-		);
+		/* SDL2 has no keysym.unicode (SDL1 field). SDLK_* values for
+		 * printable keys match lowercase ASCII; restore shifted letters
+		 * so text entry (pilot names, console) keeps capitals. */
+		int code = (int) key->keysym.sym;
+		if( ( key->keysym.mod & KMOD_SHIFT ) && code >= 'a' && code <= 'z' )
+			code += 'A' - 'a';
+		input_buffer_send( code );
 	}
 }
 

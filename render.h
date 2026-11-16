@@ -63,11 +63,10 @@ typedef struct {
 	bool					wireframe;
 
 #ifdef __3DS__
-	/* no window/renderer handles on 3DS - picaGL manages the framebuffer */
+	/* no window/context handles on 3DS - Citro3D manages the framebuffer */
 	int _3ds_reserved;
 #elif SDL_VERSION_ATLEAST(2,0,0)
 	SDL_Window*             window;
-	SDL_Renderer*           renderer;
 #else
 	SDL_Surface*	        screen;
 #endif

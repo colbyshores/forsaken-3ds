@@ -2,9 +2,7 @@
 #include "util.h"
 #include "version.h"
 #include "main_sdl.h"
-#ifdef GL
 #include "SDL_opengl.h"
-#endif
 
 extern render_info_t render_info;
 extern bool render_init( render_info_t * info );
@@ -22,6 +20,19 @@ bool sdl_init( void )
 	ver = *SDL_Linked_Version();
 #endif
 	DebugPrintf("SDL runtime version: %u.%u.%u\n", ver.major, ver.minor, ver.patch);
+
+	/* Shared two-tag hunk allocator (model textureGroups etc).
+	 * The 3DS platform layer initialises this in platform_init;
+	 * Linux needs the same call or every Hunk_Alloc returns NULL
+	 * and model loading fails. Same 8 MB size as 3DS. */
+	{
+		extern bool Hunk_Init(size_t);
+		if (!Hunk_Init(8 * 1024 * 1024))
+		{
+			Msg("Failed to initialise hunk allocator\n");
+			return false;
+		}
+	}
 
 	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_JOYSTICK ) < 0
 #if !SDL_VERSION_ATLEAST(2,0,0)
@@ -130,39 +141,6 @@ static void set_window_icon( void )
 #endif
 }
 
-static void set_opengl_settings( void )
-{
-#ifdef GL
-	// BPP should be left alone to match whatever the desktop is at.
-
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,	  1);
-
-#if SDL_VERSION_ATLEAST(2,0,0)
-#if GL == 3
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-	// TODO - this isn't only mac osx specific is it ?
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-#endif
-#endif
-
-	// this causes issues on at least one card I've seen.
-	// best to leave this as an option.  if someone says they have
-	// low frame rate then suggest them to pass -forceaccel on cli
-	if(render_info.force_accel)
-	{
-		DebugPrintf("main_sdl: enabling accelerated visual\n");
-		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL,	1  );
-	}
-
-// this is now done during creation of the renderer
-#if !SDL_VERSION_ATLEAST(2,0,0)
-	DebugPrintf("vsync set to %d\n",render_info.vsync);
-	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL,	render_info.vsync );
-#endif
-
-#endif
-}
 
 static void print_info( void )
 {
@@ -180,9 +158,6 @@ static void print_info( void )
 	);
 #endif
 
-	// actual depth size set by sdl
-	SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &bpp);
-	DebugPrintf("main_sdl: depth buffer is %d bpp\n", bpp);
 
 // TODO
 #if !SDL_VERSION_ATLEAST(2,0,0)
@@ -211,18 +186,6 @@ static u_int32_t create_video_flags( void )
 #endif
 
 #if SDL_VERSION_ATLEAST(2,0,0)
-static u_int32_t create_renderer_flags( void )
-{
-	// doubt we want to support   SDL_RENDERER_SOFTWARE
-	// we might need to add       SDL_RENDERER_TARGETTEXTURE
-	u_int32_t renderer_flags = SDL_RENDERER_ACCELERATED;
-
-	DebugPrintf("vsync set to %d\n",render_info.vsync);
-	if(render_info.vsync)
-		renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
-
-	return renderer_flags;
-}
 static u_int32_t create_window_flags( void )
 {
 	u_int32_t window_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE; // TODO - we really want resizable ?
@@ -230,9 +193,7 @@ static u_int32_t create_window_flags( void )
 	if(render_info.fullscreen)
 		window_flags |= SDL_WINDOW_FULLSCREEN;
 
-#ifdef GL
-	window_flags |= SDL_WINDOW_OPENGL;
-#endif
+	window_flags |= SDL_WINDOW_VULKAN;
 
 	return window_flags;
 }
@@ -257,16 +218,8 @@ static bool create_video_surface( u_int32_t window_flags, u_int32_t renderer_fla
 		Msg("main_sdl: failed to create window: %s\n",SDL_GetError());
 		return false;
 	}
-	render_info.renderer = SDL_CreateRenderer(
-		render_info.window,
-		-1,
-		renderer_flags
-		);
-	if(!render_info.renderer)
-	{
-		Msg("main_sdl: failed to create renderer: %s\n",SDL_GetError());
-		return false;
-	}
+	/* Vulkan surface/device creation lives in render_vulkan.c
+	 * (render_init), called by sdl_init_video below. */
 
   #else
 	render_info.screen = SDL_SetVideoMode(
@@ -308,7 +261,6 @@ static void set_aspect_ratio( void )
 bool sdl_init_video( void )
 {
 #if SDL_VERSION_ATLEAST(2,0,0)
-	u_int32_t renderer_flags = create_renderer_flags();
 	u_int32_t window_flags   = create_window_flags();
 #else
 	// old sdl had one set of flags
@@ -318,13 +270,12 @@ bool sdl_init_video( void )
 
 	set_window_icon();
 
-	set_opengl_settings();
 
 	init_video_modes( window_flags );
 
 	set_aspect_ratio();
 
-	if(!create_video_surface( window_flags, renderer_flags ))
+	if(!create_video_surface( window_flags, 0 ))
 		return false;
 
 
@@ -339,11 +290,3 @@ bool sdl_init_video( void )
 	return true;
 }
 
-void sdl_render_present( render_info_t * info )
-{
-#if SDL_VERSION_ATLEAST(2,0,0)
-	SDL_RenderPresent(info->renderer);
-#else
-	SDL_GL_SwapBuffers();
-#endif
-}
