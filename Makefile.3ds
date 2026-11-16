@@ -556,6 +556,12 @@ $(OUTPUT_CIA): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE) $(CIA_ROMF
 
 cia: $(OUTPUT_CIA)
 
+# Prune dep files whose recorded source no longer exists: a .c->.cpp rename
+# leaves e.g. xmem.d demanding xmem.c and make dies at graph time before any
+# recipe can clean it. Runs at parse time, before the include. atm_core.d is
+# exempt (its source lives in the ATM harness tree, not SRCDIR).
+STALE_DFILES := $(shell for d in $(BUILD)/*.d; do [ -f "$$d" ] || continue; b=$$(basename "$$d"); [ "$$b" = atm_core.d ] && continue; s=$$(head -1 "$$d" | sed 's/^[^:]*: //' | cut -d' ' -f1); [ -f "$$s" ] || echo "$$d"; done)
+$(if $(STALE_DFILES),$(shell rm -f $(STALE_DFILES)))
 -include $(wildcard $(BUILD)/*.d)
 
 # ─── Release pipeline ────────────────────────────────────────────────
