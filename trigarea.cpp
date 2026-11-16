@@ -121,7 +121,7 @@ bool TriggerAreaload( char * Filename )
 
 	if( !File_Size ) return true;
 
-	Buffer = malloc( File_Size );
+	Buffer = (char*)malloc( File_Size );
 	OrgBuffer = Buffer;
 
 	if( Buffer == NULL ) return false;
