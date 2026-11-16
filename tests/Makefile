@@ -14,7 +14,7 @@ CFLAGS  := -g -fcommon -Wall -Wextra $(INCLUDE)
 
 AILIB_OBJ := secwalk_ailib.o
 
-all: test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat test_sphere
+all: test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d
 
 $(AILIB_OBJ): ../ailib.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -39,15 +39,19 @@ test_modules: test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
 	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
 	./test_modules
 
-test_quat: test_quat.cpp ../quat.cpp ../new3d.c
-	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_quat.cpp ../quat.cpp ../new3d.c -lm
+test_quat: test_quat.cpp ../quat.cpp ../new3d.cpp
+	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_quat.cpp ../quat.cpp ../new3d.cpp -lm
 	./test_quat
 
-test_sphere: test_sphere.cpp ../sphere.cpp ../new3d.c
-	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_sphere.cpp ../sphere.cpp ../new3d.c -lm
+test_sphere: test_sphere.cpp ../sphere.cpp ../new3d.cpp
+	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_sphere.cpp ../sphere.cpp ../new3d.cpp -lm
 	./test_sphere
 
-clean:
-	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat test_sphere $(AILIB_OBJ) out-*.bmp framedump_test.log
+test_new3d: test_new3d.cpp ../new3d.cpp
+	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_new3d.cpp ../new3d.cpp -lm
+	./test_new3d
 
-.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat test_sphere
+clean:
+	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d $(AILIB_OBJ) out-*.bmp framedump_test.log
+
+.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d
