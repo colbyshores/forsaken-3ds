@@ -250,23 +250,7 @@ bool handle_events(void)
 		joy_button_state[0][act] = (mask && (kHeld & mask)) ? true : false;
 	}
 
-#ifdef AUTOTEST_REMASTER
-	/* Hold the primary-fire button so the autotest sweep produces visible
-	 * dynamic blaster light on every level — without the user manually
-	 * holding A, the GPU lighting path has no transient lights to validate.
-	 * The engine's primary cooldown enforces natural fire rate; this just
-	 * keeps the trigger pulled. Safe outside gameplay too — the engine's
-	 * status state machine won't act on it from menus/title. */
-	joy_button_state[0][0] = true;
-#endif
 
-#if defined(ATM_BENCH_FIRE) && defined(ATM_PROFILING)
-	/* Combat bench: same held trigger as above, but scoped to the ATM
-	 * bench (Makefile refuses FIRE without PROFILING) so the
-	 * level-sweep apparatus — dwell advance, chainload-to-stub, DEBUG
-	 * traces — stays out of the measured run. */
-	joy_button_state[0][0] = true;
-#endif
 
 	/* ---- D-pad as POV hat ---- */
 	if (kHeld & KEY_DUP)    joy_hat_state[0][0][JOY_HAT_UP]    = 1;

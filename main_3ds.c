@@ -463,13 +463,7 @@ bool platform_init_video(void)
 		extern bool sound_check_dsp_firmware_available(void);
 		extern void sound_show_missing_firmware_warning(void);
 		if (!sound_check_dsp_firmware_available()) {
-#ifdef ATM_PROFILING
-			/* Harness builds run headless with no one to press A: log and
-			 * continue without audio instead of blocking forever. */
-			boot_log("[boot] DSP firmware missing, continuing without audio (ATM headless)");
-#else
 			sound_show_missing_firmware_warning();
-#endif
 		}
 	}
 
@@ -535,14 +529,6 @@ float platform_get_3d_slider(void)
 	 * which may return 0 from osGet3DSliderState).
 	 * Set   stereo_test_slider = 0.5   in Configs/debug.txt.
 	 * A negative value means "use the real hardware slider". */
-#if defined(ATM_BENCH_STEREO)
-	/* Deterministic benchmark pin. The 3D slider is a live analog input: an
-	 * unpinned slider makes "the same run" depend on where the slider
-	 * happened to be, so mono and stereo baselines would not be comparable.
-	 * The ATM benchmark forces one state for the whole run; measurement-only,
-	 * never set in a shipping build. */
-	return ATM_BENCH_STEREO ? 1.0f : 0.0f;
-#else
 	float override = config_get_float("stereo_test_slider", -1.0f);
 	if (override >= 0.0f)
 		return override > 1.0f ? 1.0f : override;
@@ -550,7 +536,6 @@ float platform_get_3d_slider(void)
 	if (v < 0.0f) v = 0.0f;
 	if (v > 1.0f) v = 1.0f;
 	return v;
-#endif
 #endif
 }
 
