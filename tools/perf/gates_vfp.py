@@ -118,7 +118,8 @@ EXEMPT_RE = re.compile(
 )
 HOTPATH_ANN_RE = re.compile(r"/\*\s*@hotpath\s*\*/")
 FUNC_RE = re.compile(
-    r"(?P<head>^[\w:<>,\s\*&]+?\b(?P<name>[A-Za-z_]\w*)\s*\([^;{]*\))\s*\{",
+    r"(?P<head>^[\w:<>,\s\*&]+?\b(?P<name>[A-Za-z_]\w*)\s*\([^;{]*\))"
+    r"\s*(?:const\s+|volatile\s+|&{1,2}\s*)*\{",
     re.MULTILINE,
 )
 FOR_FLOAT_RE = re.compile(r"\bfor\s*\(\s*(?:float|double)\b")

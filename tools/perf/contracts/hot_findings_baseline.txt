@@ -252,16 +252,16 @@ R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|quat.cpp|MatrixToQuat|float division inner_loop=false
-R7|quat.cpp|MatrixToQuat|float division inner_loop=false
-R7|quat.cpp|MatrixToQuat|sqrtf inner_loop=false
-R7|quat.cpp|MatrixToQuat|sqrtf inner_loop=false
-R7|quat.cpp|QuatFrom2Vectors|sqrtf inner_loop=false
-R7|quat.cpp|QuatFromVector2|float division inner_loop=false
-R7|quat.cpp|QuatFromVector|float division inner_loop=false
-R7|quat.cpp|QuatInverse|float division inner_loop=false
-R7|quat.cpp|Quaternion_Slerp|float division inner_loop=false
-R7|quat.cpp|Quaternion_Slerp|float division inner_loop=false
+R7|quat.cpp|FromMatrix|float division inner_loop=false
+R7|quat.cpp|FromMatrix|float division inner_loop=false
+R7|quat.cpp|FromMatrix|sqrtf inner_loop=false
+R7|quat.cpp|FromMatrix|sqrtf inner_loop=false
+R7|quat.cpp|From2Vectors|sqrtf inner_loop=false
+R7|quat.cpp|FromVector2|float division inner_loop=false
+R7|quat.cpp|FromVector|float division inner_loop=false
+R7|quat.cpp|Inverse|float division inner_loop=false
+R7|quat.cpp|Slerp|float division inner_loop=false
+R7|quat.cpp|Slerp|float division inner_loop=false
 R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
