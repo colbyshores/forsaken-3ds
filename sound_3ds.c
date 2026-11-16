@@ -136,7 +136,7 @@ static void ensure_dspfirm_on_sd(void)
 /* Returns true if we expect ndspInit() to succeed later — either the
  * firmware blob is on the virtual SD already, or we have a copy in romfs
  * that ensure_dspfirm_on_sd() will install on first launch. Called at
- * startup (before pglInit) so we can show a user-friendly warning if
+ * startup (before c3d_context_init) so we can show a user-friendly warning if
  * the firmware is missing on a CIA install. */
 bool sound_check_dsp_firmware_available(void)
 {
@@ -160,7 +160,7 @@ bool sound_check_dsp_firmware_available(void)
 }
 
 /* Top-screen console warning shown on CIA installs where the user has
- * not run dsp1 yet. Runs before pglInit so we can cleanly hand over
+ * not run dsp1 yet. Runs before c3d_context_init so we can cleanly hand over
  * the top screen to citro3d once the user dismisses it.
  *
  * Requires gfxInitDefault() to have run already. */

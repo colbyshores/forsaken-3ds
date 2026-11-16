@@ -40,4 +40,14 @@ void memcpy_unaligned(void *dst, const void *src, size_t n);
  * stereo_test_slider = <value> in Configs/debug.txt (3DS-only config key). */
 float platform_get_3d_slider(void);
 
+/* Citro3D context/present glue (render_c3d.c). These replace the old
+ * picaGL-named shim; picaGL itself is gone. */
+void c3d_context_init(void);
+void c3d_context_exit(void);
+void c3d_present(void);
+void c3d_transfer_eye(unsigned int eye);
+bool c3d_hud_begin_bottom(void);
+void c3d_hud_end_bottom(void);
+void c3d_clear_bottom_screen(void);
+
 #endif

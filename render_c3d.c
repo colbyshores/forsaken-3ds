@@ -12,22 +12,22 @@
  *   make -f Makefile.3ds RENDERER=picagl    # picaGL fallback (GL=1)
  *
  * Architecture:
- *   - picaGL is NOT linked. We provide our own pglInit/pglSwapBuffers/pglExit
+ *   - picaGL is NOT linked. We provide our own c3d_context_init/c3d_present/c3d_context_exit
  *     stubs that use citro3d directly for GPU init and frame presentation.
- *   - pglInit() calls C3D_Init(). c3d_renderer_init() creates the render
+ *   - c3d_context_init() calls C3D_Init(). c3d_renderer_init() creates the render
  *     target, shader, and scratch buffer.
  *   - FSBeginScene() calls C3D_FrameBegin + C3D_FrameDrawOn + binds shader
  *     + initializes GPU state (AttrInfo, TexEnv, depth, cull, uniforms).
  *   - draw_render_object() converts LVERTEX/TLVERTEX to gpu_vertex_t (36 bytes,
  *     all floats) in a linearAlloc scratch buffer, then C3D_DrawArrays.
- *   - pglSwapBuffers() calls C3D_FrameEnd which triggers the auto display
+ *   - c3d_present() calls C3D_FrameEnd which triggers the auto display
  *     transfer via C3D_RenderTargetSetOutput. DO NOT call picaGL's real
- *     pglSwapBuffers — its GX_DisplayTransfer conflicts with citro3d's
+ *     c3d_present — its GX_DisplayTransfer conflicts with citro3d's
  *     auto-transfer and produces a black screen.
  *
  * Key lessons learned during development:
  *   1. Mandarine emulator DOES support citro3d render targets + auto-transfer.
- *      The earlier black screen was caused by pglSwapBuffers conflicting with
+ *      The earlier black screen was caused by c3d_present conflicting with
  *      C3D_FrameEnd's display transfer, NOT emulator limitations.
  *   2. GPU state (AttrInfo, BufInfo, TexEnv, DepthTest, CullFace) must be
  *      explicitly initialized in FSBeginScene. Uninitialized GPU registers
@@ -502,8 +502,8 @@ void c3d_set_object_shine_eligible(bool enable)
 
 
 /* picaGL is NOT linked for the citro3d renderer. We provide our own
- * pglInit/pglExit/pglSwapBuffers/pglTransferEye implementations. */
-void pglInit(void)
+ * c3d_context_init/c3d_context_exit/c3d_present/c3d_transfer_eye implementations. */
+void c3d_context_init(void)
 {
 	/* Idempotent: paired with c3d_renderer_init's own idempotency. If
 	 * we let C3D_Init re-fire on a render_mode_select retrigger, it
@@ -514,9 +514,9 @@ void pglInit(void)
 	 * "black void" regression on the autotest sweep traced to this:
 	 * primary geometry rendered fine but through-portal groups landed
 	 * on a target citro3d no longer treated as live. */
-	static bool _pglInited = false;
-	if (_pglInited) return;
-	_pglInited = true;
+	static bool _c3d_context_inited = false;
+	if (_c3d_context_inited) return;
+	_c3d_context_inited = true;
 
 	/* 16× the default GPU command buffer (256 KB → 4 MB).
 	 *
@@ -539,7 +539,7 @@ void pglInit(void)
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 16);
 }
 
-void pglExit(void)
+void c3d_context_exit(void)
 {
 	c3d_renderer_cleanup();
 	C3D_Fini();
@@ -557,7 +557,7 @@ static u64    s_fps_last_log_ms   = 0;
 
 int forsaken_get_fps(void) { return s_fps_current; }
 
-void pglSwapBuffers(void)
+void c3d_present(void)
 {
 	if (s_inFrame)
 	{
@@ -614,13 +614,13 @@ int c3d_scratch_peak_verts(void)
 	-------------------------------------------------------------------
 	The gameplay HUD (ammo / weapons / shield / messages) is rendered
 	on the mono bottom screen instead of overlaying the stereo top
-	screen. pglHudBeginBottom() stashes the current top-screen target,
+	screen. c3d_hud_begin_bottom() stashes the current top-screen target,
 	clears the bottom target, switches C3D's draw target to it, and
 	returns true if the caller should actually issue draws. It returns
 	false on the second eye's pass so we only draw the HUD once per
 	frame (bottom is mono — one copy is all we need).
 ===================================================================*/
-bool pglHudBeginBottom(void)
+bool c3d_hud_begin_bottom(void)
 {
 	if (!s_targetBottom || !s_inFrame)
 		return false;
@@ -646,7 +646,7 @@ bool pglHudBeginBottom(void)
 	/* PICA portrait viewport for the 240×320 bottom target. */
 	C3D_SetViewport(0, 0, 240, 320);
 
-	/* Re-bind shader state for the new target (matches pglTransferEye). */
+	/* Re-bind shader state for the new target (matches c3d_transfer_eye). */
 	C3D_BindProgram(&s_shaderProgram);
 	{
 		C3D_AttrInfo *ai = C3D_GetAttrInfo();
@@ -669,7 +669,7 @@ bool pglHudBeginBottom(void)
  *
  * Safe to call between frames; if the engine is in an open frame,
  * close it first so the C3D_FrameBegin below doesn't conflict. */
-void pglClearBottomScreen(void)
+void c3d_clear_bottom_screen(void)
 {
 	if (!s_targetBottom)
 		return;
@@ -693,7 +693,7 @@ void pglClearBottomScreen(void)
 	s_hudDrawnThisFrame = false;
 }
 
-void pglHudEndBottom(void)
+void c3d_hud_end_bottom(void)
 {
 	if (!s_targetSaved)
 		return;
@@ -724,7 +724,7 @@ void pglHudEndBottom(void)
 	C3D_DepthMap(true, 1.0f, 1.0f);
 }
 
-void pglTransferEye(unsigned int eye)
+void c3d_transfer_eye(unsigned int eye)
 {
 	if (eye == GFX_LEFT)
 	{
@@ -1375,7 +1375,7 @@ bool render_init(render_info_t *info)
 {
 	detect_caps();
 	build_gamma_table(1.0);
-	/* C3D_Init already called by pglInit() stub */
+	/* C3D_Init already called by c3d_context_init() stub */
 	if (!c3d_renderer_init())
 		return false;
 
@@ -1424,7 +1424,7 @@ bool render_init(render_info_t *info)
 
 void render_cleanup(render_info_t *info)
 {
-	/* Cleanup handled by pglExit() stub */
+	/* Cleanup handled by c3d_context_exit() stub */
 	info->ok_to_render = false;
 }
 
@@ -1452,7 +1452,7 @@ void render_set_filter(bool red, bool green, bool blue)
 
 bool render_flip(render_info_t *info)
 {
-	/* platform_render_present calls our pglSwapBuffers which calls
+	/* platform_render_present calls our c3d_present which calls
 	 * C3D_FrameEnd if a frame is active */
 	platform_render_present(info);
 	return true;

@@ -2,16 +2,13 @@
  * main_3ds.c - Nintendo 3DS platform layer replacing main_sdl.c
  *
  * Initializes the 3DS hardware (gfx, HID, romfs),
- * sets up picaGL on the top screen, and provides
+ * sets up the Citro3D context on the top screen, and provides
  * the platform_*() functions consumed by main.c.
  */
 
 #ifdef __3DS__
 
 #include <3ds.h>
-#include <GL/picaGL.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -391,7 +388,7 @@ bool platform_init(void)
 	return true;
 }
 
-/* ---- video / picaGL init ---- */
+/* ---- video / Citro3D init ---- */
 
 /* 3DS top screen: 400x240 (5:3 landscape).
  * Same aspect ratio as the Open Pandora (800x480) which runs Forsaken
@@ -406,7 +403,7 @@ bool platform_init_video(void)
 	boot_log("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
 	boot_log("platform_init_video: gfxInitDefault");
 
-	/* Initialize 3DS graphics service (GSP) - required before picaGL.
+	/* Initialize 3DS graphics service (GSP) - required before Citro3D.
 	 *
 	 * Use VRAM for framebuffers (third arg `true`).  gfxInitDefault()
 	 * places framebuffers at the START of the linear heap (top buffer at
@@ -467,15 +464,15 @@ bool platform_init_video(void)
 		}
 	}
 
-	boot_log("[boot] platform_init_video: pre-pglInit");
-	boot_log("platform_init_video: pglInit");
+	boot_log("[boot] platform_init_video: pre-c3d_context_init");
+	boot_log("platform_init_video: c3d_context_init");
 
-	/* Initialize citro3d-backed picaGL */
-	pglInit();
+	/* Initialize the Citro3D context */
+	c3d_context_init();
 
 	_video_initialized = true;
-	boot_log("platform_init_video: pglInit done");
-	boot_log("[boot] platform_init_video: pglInit done");
+	boot_log("platform_init_video: c3d_context_init done");
+	boot_log("[boot] platform_init_video: c3d_context_init done");
 
 	render_info.ThisMode.w = SCREEN_WIDTH;
 	render_info.ThisMode.h = SCREEN_HEIGHT;
@@ -492,15 +489,15 @@ bool platform_init_video(void)
 	render_info.Mode = &render_info.ThisMode;
 	render_info.fullscreen = true;
 
-	/* Standard landscape aspect ratio. picaGL's matrix4x4_fix_projection
-	 * applies a proper -90° rotation ([[0,1],[-1,0]], det=+1) to the
-	 * projection, which rotates axes without swapping the _11/_22 scales.
-	 * An earlier hack inverted this to H/W assuming picaGL was doing a
-	 * reflection that swapped the scales; with the proper rotation in
-	 * place that hack over-compensates and distorts vfov. */
+	/* Standard landscape aspect ratio. The backend's projection fix
+	 * applies a proper -90° rotation ([[0,1],[-1,0]], det=+1), which
+	 * rotates axes without swapping the _11/_22 scales. An earlier hack
+	 * inverted this to H/W assuming a reflection that swapped the scales;
+	 * with the proper rotation in place that hack over-compensates and
+	 * distorts vfov. */
 	render_info.aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
-	DebugPrintf("platform_init_video: picaGL context created %dx%d\n",
+	DebugPrintf("platform_init_video: citro3d context created %dx%d\n",
 		SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	boot_log("[boot] platform_init_video: pre-render_init");
@@ -519,11 +516,6 @@ bool platform_init_video(void)
 
 float platform_get_3d_slider(void)
 {
-#ifndef RENDERER_C3D
-	/* picaGL: stereo not supported (no display list replay = half framerate).
-	 * Always return 0 to keep stereo disabled. */
-	return 0.0f;
-#else
 	extern float config_get_float(const char *opt, float _default);
 	/* Check for a test override first (useful when testing in Mandarine/Citra
 	 * which may return 0 from osGet3DSliderState).
@@ -536,7 +528,6 @@ float platform_get_3d_slider(void)
 	if (v < 0.0f) v = 0.0f;
 	if (v > 1.0f) v = 1.0f;
 	return v;
-#endif
 }
 
 /* ---- frame present ---- */
@@ -545,7 +536,7 @@ float platform_get_3d_slider(void)
 void platform_render_present(render_info_t *info)
 {
 	(void)info;
-	pglSwapBuffers();
+	c3d_present();
 }
 
 /* ---- shutdown ---- */
@@ -556,7 +547,7 @@ void platform_shutdown(void)
 	trace_dump();
 	if (_video_initialized)
 	{
-		pglExit();
+		c3d_context_exit();
 		gfxExit();
 		_video_initialized = false;
 	}

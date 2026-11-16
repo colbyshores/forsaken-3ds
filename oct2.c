@@ -2,9 +2,6 @@
 
 #include "main.h"
 #include "platform.h"
-#ifdef __3DS__
-#include <GL/gl.h>
-#endif
 #include "new3d.h"
 #include "quat.h"
 #include "compobjects.h"
@@ -3316,8 +3313,8 @@ bool RenderScene( void )
     /* Wipe the gameplay HUD off the bottom screen — the title screen
      * never draws there, so without this the last HUD frame stays
      * frozen until the next gameplay session takes over. */
-    _DS_TRACE("pglClearBottomScreen");
-    pglClearBottomScreen();
+    _DS_TRACE("c3d_clear_bottom_screen");
+    c3d_clear_bottom_screen();
 #endif
     _DS_TRACE("InitScene");
     InitScene();
@@ -4024,17 +4021,17 @@ bool RenderScene( void )
      *
      * ChangeLevel() contains its own internal render loop (STATUS_InitView_0,
      * STATUS_ChangeLevelPostInitView, etc.) that renders loading-screen frames
-     * into the picaGL color buffer and pumps pglSwapBuffers(), updating GX
+     * into the picaGL color buffer and pumps c3d_present(), updating GX
      * display buffer A.  When ChangeLevel returns, one of the two GX display
      * buffers (A) still contains the last loading-screen frame.
      *
-     * On the STATUS_StartingSinglePlayer break, pglSwapBuffers() is called once
+     * On the STATUS_StartingSinglePlayer break, c3d_present() is called once
      * more by platform_render_present(); this frame uses whatever is currently
      * in the picaGL color buffer (the last loading frame).  That result is
      * DMA'd into GX display buffer B, contaminating the second buffer too.
      *
      * Fix: clear the picaGL color buffer to black here so that the
-     * pglSwapBuffers() call at the end of this frame sends black to display B
+     * c3d_present() call at the end of this frame sends black to display B
      * instead of the stale loading frame.  STATUS_PostStartingSinglePlayer
      * (next frame) clears it again, which sends black to display A.
      * Both GX display buffers are now black before the first gameplay frame
@@ -4055,8 +4052,8 @@ bool RenderScene( void )
      *
      * The GX double-buffer scheme means there are always two display buffers
      * (A and B) alternating each swap.  STATUS_StartingSinglePlayer's
-     * FSClearBlack() + pglSwapBuffers() cleared buffer B.  This frame's
-     * FSClearBlack() + pglSwapBuffers() clears buffer A.  After both frames
+     * FSClearBlack() + c3d_present() cleared buffer B.  This frame's
+     * FSClearBlack() + c3d_present() clears buffer A.  After both frames
      * complete, both display buffers contain black and neither holds stale
      * loading-screen or title-screen content.  The first STATUS_SinglePlayer
      * frame renders real gameplay into clean buffers. */
@@ -4567,13 +4564,13 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	 * platform_get_3d_slider() to 0, so stereo_mode is never set to
 	 * STEREO_MODE_3DS and this branch is dead there — but we also
 	 * gate the symbol reference at compile time so picaGL doesn't
-	 * have to export pglTransferEye at all. */
+	 * have to export c3d_transfer_eye at all. */
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
-		extern void pglTransferEye(unsigned int eye);
-		_RCS_STAGE("pglTransferEye(LEFT)");
-		pglTransferEye(GFX_LEFT);
-		_RCS_STAGE("post pglTransferEye(LEFT)");
+		extern void c3d_transfer_eye(unsigned int eye);
+		_RCS_STAGE("c3d_transfer_eye(LEFT)");
+		c3d_transfer_eye(GFX_LEFT);
+		_RCS_STAGE("post c3d_transfer_eye(LEFT)");
 	}
 #endif
 	//
@@ -4615,10 +4612,10 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
-		extern void pglTransferEye(unsigned int eye);
-		_RCS_STAGE("pglTransferEye(RIGHT)");
-		pglTransferEye(GFX_RIGHT);
-		_RCS_STAGE("post pglTransferEye(RIGHT)");
+		extern void c3d_transfer_eye(unsigned int eye);
+		_RCS_STAGE("c3d_transfer_eye(RIGHT)");
+		c3d_transfer_eye(GFX_RIGHT);
+		_RCS_STAGE("post c3d_transfer_eye(RIGHT)");
 	}
 #endif
 	//
@@ -4653,9 +4650,9 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 }
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-extern bool pglHudBeginBottom(void);
-extern void pglHudEndBottom(void);
-extern void pglClearBottomScreen(void);
+extern bool c3d_hud_begin_bottom(void);
+extern void c3d_hud_end_bottom(void);
+extern void c3d_clear_bottom_screen(void);
 extern void ScrPolySetRouteBottom(bool b);
 extern void ScrPolySetDisplayMode(int mode);
 #endif
@@ -4783,7 +4780,7 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	 *           SCRFLAG_BottomHUD (gameplay text HUD tagged inside
 	 *           DrawSimplePanel).
 	 * Mode=0 restored so Display* runs outside this path (title, crate
-	 * menu) behave as before. pglHudBeginBottom is a no-op on the second
+	 * menu) behave as before. c3d_hud_begin_bottom is a no-op on the second
 	 * eye pass; the bottom screen is mono and doesn't need a second copy. */
 	/* FPS overlay — queue an FPS-counter text poly with the bottom-HUD
 	 * route flag so RenderMainCamera2dPolys's pass-2 (mode=2) picks
@@ -4810,11 +4807,11 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 
 	ScrPolySetDisplayMode(1);
 	RenderMainCamera2dPolys();
-	if (pglHudBeginBottom())
+	if (c3d_hud_begin_bottom())
 	{
 		ScrPolySetDisplayMode(2);
 		RenderMainCamera2dPolys();
-		pglHudEndBottom();
+		c3d_hud_end_bottom();
 	}
 	ScrPolySetDisplayMode(0);
 #else

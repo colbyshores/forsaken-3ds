@@ -25,9 +25,6 @@
 #include "timer.h"
 #include "oct2.h"
 #include "render.h"
-#ifdef __3DS__
-#include <GL/gl.h>
-#endif
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
