@@ -2,7 +2,7 @@
 #include "util.h"
 #include "version.h"
 #include "main_sdl.h"
-#include "SDL_opengl.h"
+#include <SDL.h>
 
 extern render_info_t render_info;
 extern bool render_init( render_info_t * info );
@@ -14,11 +14,7 @@ bool sdl_init( void )
 	SDL_VERSION(&ver);
 	DebugPrintf("SDL compile-time version: %u.%u.%u\n", ver.major, ver.minor, ver.patch);
 
-#if SDL_VERSION_ATLEAST(2,0,0)
 	SDL_GetVersion(&ver);
-#else
-	ver = *SDL_Linked_Version();
-#endif
 	DebugPrintf("SDL runtime version: %u.%u.%u\n", ver.major, ver.minor, ver.patch);
 
 	/* Shared two-tag hunk allocator (model textureGroups etc).
@@ -34,11 +30,7 @@ bool sdl_init( void )
 		}
 	}
 
-	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_JOYSTICK ) < 0
-#if !SDL_VERSION_ATLEAST(2,0,0)
-		|| !SDL_GetVideoInfo()
-#endif
-	)
+	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_JOYSTICK ) < 0 )
 	{
 		Msg("Failed to initialize sdl: %s\n",SDL_GetError());
 		return false;
@@ -81,7 +73,7 @@ render_display_mode_t video_modes[NUMBER_MODES] = {
 {1600,1200},
 {1680,1050},
 {1920,1080},
-{1920,1200} 
+{1920,1200}
 };
 
 static void init_video_modes( u_int32_t window_flags )
@@ -91,15 +83,9 @@ static void init_video_modes( u_int32_t window_flags )
 	render_info.NumModes           = NUMBER_MODES;
 
 	// in full screen then default to desktop resolution
-	if( window_flags &
-#if SDL_VERSION_ATLEAST(2,0,0)
-		SDL_WINDOW_FULLSCREEN
-#else
-		SDL_FULLSCREEN
-#endif
-	) render_info.CurrMode = 0;
+	if( window_flags & SDL_WINDOW_FULLSCREEN ) render_info.CurrMode = 0;
 
-	// in window mode default to 800x600 
+	// in window mode default to 800x600
 	else render_info.CurrMode = 2;
 
 	// try to find the users preferred mode
@@ -126,69 +112,22 @@ static void init_video_modes( u_int32_t window_flags )
 
 static void set_window_icon( void )
 {
-// TODO
-#if !SDL_VERSION_ATLEAST(2,0,0)
-	SDL_Surface* icon = NULL;
-	icon = SDL_LoadBMP("Data/ProjectX-32x32.bmp");
+	SDL_Surface* icon = SDL_LoadBMP("Data/ProjectX-32x32.bmp");
 	if(icon)
 	{
-		// remove black pixels
-		u_int32_t colorkey = SDL_MapRGB(icon->format, 0, 0, 0);
-		SDL_SetColorKey(icon, SDL_SRCCOLORKEY, colorkey);        
-		SDL_WM_SetIcon(icon, NULL);
+		SDL_SetWindowIcon(render_info.window, icon);
 		SDL_FreeSurface(icon);
 	}
-#endif
 }
-
 
 static void print_info( void )
 {
-	int bpp;
-	char driver[64];
-
-// TODO
-#if !SDL_VERSION_ATLEAST(2,0,0)
-	// surface created by sdl
-	DebugPrintf("main_sdl: surface { w=%d, h=%d, bpp=%d, Bpp=%d }\n",
-		render_info.screen->w,
-		render_info.screen->h,
-		render_info.screen->format->BitsPerPixel,
-		render_info.screen->format->BytesPerPixel
-	);
-#endif
-
-
-// TODO
-#if !SDL_VERSION_ATLEAST(2,0,0)
-	// video driver
-	if(SDL_VideoDriverName(driver, 64)!=NULL)
-		DebugPrintf("main_sd: sdl video driver name: %s\n",driver);
-	else
-		DebugPrintf("main_sdl: failed to obtain the video driver name.\n");
-#endif
+	DebugPrintf("main_sdl: video driver name: %s\n", SDL_GetCurrentVideoDriver());
 }
 
-#if !SDL_VERSION_ATLEAST(2,0,0)
-static u_int32_t create_video_flags( void )
-{
-	u_int32_t flags = SDL_ANYFORMAT;
-
-#ifdef GL
-	flags |= SDL_OPENGL;
-#endif
-
-	if(render_info.fullscreen)
-		flags |= SDL_FULLSCREEN;
-
-	return flags;
-}
-#endif
-
-#if SDL_VERSION_ATLEAST(2,0,0)
 static u_int32_t create_window_flags( void )
 {
-	u_int32_t window_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE; // TODO - we really want resizable ?
+	u_int32_t window_flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 
 	if(render_info.fullscreen)
 		window_flags |= SDL_WINDOW_FULLSCREEN;
@@ -197,14 +136,10 @@ static u_int32_t create_window_flags( void )
 
 	return window_flags;
 }
-#endif
 
-
-
-static bool create_video_surface( u_int32_t window_flags, u_int32_t renderer_flags )
+static bool create_video_surface( u_int32_t window_flags )
 {
 #ifndef RENDER_DISABLED
-  #if SDL_VERSION_ATLEAST(2,0,0)
 	render_info.window = SDL_CreateWindow(
 		"ProjectX",
 		SDL_WINDOWPOS_CENTERED,
@@ -221,21 +156,6 @@ static bool create_video_surface( u_int32_t window_flags, u_int32_t renderer_fla
 	/* Vulkan surface/device creation lives in render_vulkan.c
 	 * (render_init), called by sdl_init_video below. */
 
-  #else
-	render_info.screen = SDL_SetVideoMode(
-		render_info.ThisMode.w,
-		render_info.ThisMode.h,
-		0, // BPP should be left alone to match whatever the desktop is at.
-		window_flags // on older sdl only 1 set of flags was used
-	);
-
-	if(!render_info.screen)
-	{
-		Msg("main_sdl: failed to create video surface: %s\n",SDL_GetError());
-		return false;
-	}
-  #endif
-	
 	print_info();
 #endif
 
@@ -244,11 +164,8 @@ static bool create_video_surface( u_int32_t window_flags, u_int32_t renderer_fla
 
 static void set_window_title( void )
 {
-// this is now done in CreateWindow
-#if !SDL_VERSION_ATLEAST(2,0,0)
-	// window title, icon title (taskbar and other places)
-	SDL_WM_SetCaption(PXVersion,"ProjectX");
-#endif
+	if (render_info.window)
+		SDL_SetWindowTitle(render_info.window, PXVersion);
 }
 
 // TODO - we need a ui control for this
@@ -260,25 +177,16 @@ static void set_aspect_ratio( void )
 
 bool sdl_init_video( void )
 {
-#if SDL_VERSION_ATLEAST(2,0,0)
 	u_int32_t window_flags   = create_window_flags();
-#else
-	// old sdl had one set of flags
-	u_int32_t window_flags   = create_video_flags();
-	u_int32_t renderer_flags = window_flags;
-#endif
-
-	set_window_icon();
-
 
 	init_video_modes( window_flags );
 
 	set_aspect_ratio();
 
-	if(!create_video_surface( window_flags, 0 ))
+	if(!create_video_surface( window_flags ))
 		return false;
 
-
+	set_window_icon();
 	set_window_title();
 
 	if (!render_init( &render_info ))
@@ -289,4 +197,3 @@ bool sdl_init_video( void )
 
 	return true;
 }
-

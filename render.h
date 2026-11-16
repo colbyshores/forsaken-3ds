@@ -65,10 +65,8 @@ typedef struct {
 #ifdef __3DS__
 	/* no window/context handles on 3DS - Citro3D manages the framebuffer */
 	int _3ds_reserved;
-#elif SDL_VERSION_ATLEAST(2,0,0)
-	SDL_Window*             window;
 #else
-	SDL_Surface*	        screen;
+	SDL_Window*             window;
 #endif
 
 	// stereo related options
