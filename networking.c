@@ -12,6 +12,16 @@
 #include "bgobjects.h"
 #include "object.h"
 #include "networking.h"
+
+/* definitions for the globals networking.h declares */
+int local_port;
+int host_port;
+char host_address[256];
+bool PlayerReady[MAX_PLAYERS];
+char tracker_server[256];
+int tracker_port;
+bool tracker_enabled;
+
 #include "2dtextures.h"
 #include "mload.h"
 #include "triggers.h"

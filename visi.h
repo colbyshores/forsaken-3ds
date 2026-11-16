@@ -18,8 +18,8 @@ typedef struct _GROUPLIST
 } GROUPLIST;
 
 // indirectly visible groups seen by any active camera
-u_int16_t Num_IndirectVisible;
-u_int16_t IndirectVisible[ MAXGROUPS ];
+extern u_int16_t Num_IndirectVisible;
+extern u_int16_t IndirectVisible[ MAXGROUPS ];
 
 /*
  * fn prototypes

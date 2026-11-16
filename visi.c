@@ -97,6 +97,7 @@ static bool InitConnections = false;
 
 u_int16_t Num_IndirectVisible = 0;
 u_int16_t IndirectVisible[ MAXGROUPS ];
+u_int16_t IndirectVisible[ MAXGROUPS ];
 
 static VECTOR clip_top, clip_bottom, clip_left, clip_right; // clipping planes
 

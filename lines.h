@@ -8,6 +8,10 @@
 	Includes
 ===================================================================*/
 #include "main.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <math.h>
 
 #include "new3d.h"
@@ -56,6 +60,10 @@ void InitLines( void );
 bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject );
 void KillUsedLine( u_int16_t i );
 u_int16_t FindFreeLine( void );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

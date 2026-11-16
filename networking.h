@@ -14,9 +14,9 @@ typedef int net_bool_t; // backwards compatibility need bool's in pkt structures
 #include "object.h"
 
 // game tracker
-char tracker_server[256];
-int tracker_port;
-bool tracker_enabled;
+extern char tracker_server[256];
+extern int tracker_port;
+extern bool tracker_enabled;
 
 // my ship number
 #define	UNASSIGNED_SHIP 0xff // WhoIAm before host gives me number
@@ -29,9 +29,9 @@ extern network_player_t * host_network_player; // the host .. NULL if I am host
 //   host_port_str.text = "2300"
 //   TCPAddress.text = "192.168.0.30"
 // the values are parsed before calling network_join and network_setup
-int local_port;
-int host_port;
-char host_address[256];
+extern int local_port;
+extern int host_port;
+extern char host_address[256];
 
  /*
  * defines
@@ -67,7 +67,7 @@ char host_address[256];
 #define MAX_TEAMS								4
 #define NUMTITANBITS							10 
 
-bool PlayerReady[MAX_PLAYERS];
+extern bool PlayerReady[MAX_PLAYERS];
 extern BYTE GameStatus[];
 
 /*
