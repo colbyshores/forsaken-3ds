@@ -42,7 +42,7 @@ static bool s_n3ds_checked = false;
 
 JOYSTICKINFO JoystickInfo[MAX_JOYSTICKS];
 
-bool input_grabbed = false;
+/* input_grabbed is defined in controls.c (owner for input.h externs). */
 
 /* old_input, new_input, mouse_state, mouse_states, input_buffer*,
    joy_axis_state, joy_button_state, joy_hat_state are all declared
