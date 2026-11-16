@@ -95,10 +95,10 @@ EXCLUDE_SRC := \
 	texture_sdl.c \
 	texture_devil.c \
 	render_disabled.c \
-	net_enet.c \
-	net_enet_2.c \
-	net_tracker.c \
-	private_address.c \
+	net_enet.cpp \
+	net_enet_2.cpp \
+	net_tracker.cpp \
+	private_address.cpp \
 	lua_miniupnp.cpp \
 	botai_actions.cpp \
 	botai_path.cpp \
