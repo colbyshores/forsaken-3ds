@@ -45,7 +45,7 @@
       "why": "portal PVS traversal per camera pass, per visible group"
     },
     {
-      "file": "polys.c",
+      "file": "polys.cpp",
       "symbols": [
         "*"
       ],
@@ -140,14 +140,14 @@
       "why": "per-frame orientation math incl. fast trig"
     },
     {
-      "file": "2dpolys.c",
+      "file": "2dpolys.cpp",
       "symbols": [
         "*"
       ],
       "why": "per-frame 2D poly/HUD batches"
     },
     {
-      "file": "screenpolys.c",
+      "file": "screenpolys.cpp",
       "symbols": [
         "*"
       ],

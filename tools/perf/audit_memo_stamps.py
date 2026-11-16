@@ -24,13 +24,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 # file -> {function: expected SMEMO_PASS_* constant}
 REQUIRED = {
-    "polys.c": {
+    "polys.cpp": {
         "PolyDispGroupClipped": "SMEMO_PASS_POLYS_CLIPPED",
         "PolyDispGroupUnclipped": "SMEMO_PASS_POLYS_UNCLIPPED",
         "SolidPolyDispGroupClipped": "SMEMO_PASS_SOLID_CLIPPED",
         "SolidPolyDispGroupUnclipped": "SMEMO_PASS_SOLID_UNCLIPPED",
     },
-    "2dpolys.c": {
+    "2dpolys.cpp": {
         "FmPolyDispGroupClipped": "SMEMO_PASS_FM_CLIPPED",
         "FmPolyDispGroupUnclipped": "SMEMO_PASS_FM_UNCLIPPED",
     },
@@ -45,7 +45,7 @@ ALLOWLIST = {
     "ScrPolyDispNonSolid": "ortho screen polys: draw_2d_object only, memo is non-ortho only",
 }
 
-SCAN_FILES = ["polys.c", "2dpolys.c", "lines.cpp", "screenpolys.c",
+SCAN_FILES = ["polys.cpp", "2dpolys.cpp", "lines.cpp", "screenpolys.cpp",
               "transexe.c", "water.c", "mxaload.cpp", "mxload.cpp", "mload.cpp"]
 
 FUNC_RE = re.compile(r"^bool\s+([A-Za-z_]\w*)\s*\(", re.MULTILINE)
