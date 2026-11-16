@@ -74,9 +74,20 @@ static VkDeviceMemory   s_depth_mem;
 static VkImageView      s_depth_view;
 static VkRenderPass     s_pass;
 static VkCommandPool    s_pool;
-static VkCommandBuffer  s_cmd;
-static VkSemaphore      s_img_avail, s_done;
-static VkFence          s_fence;
+/* Two frames in flight: per-slot command buffer, fence and
+ * semaphores. FSBeginScene waits only the slot it is about to
+ * reuse, so frame N+1 CPU work overlaps frame N GPU work. */
+#define FRAMES_IN_FLIGHT 2
+static VkCommandBuffer  s_cmd[FRAMES_IN_FLIGHT];
+static VkSemaphore      s_img_avail[FRAMES_IN_FLIGHT], s_done[FRAMES_IN_FLIGHT];
+static VkFence          s_fence[FRAMES_IN_FLIGHT];
+static int              s_slot;
+static uint64_t         s_frame_seq;      /* submitted frame counter */
+/* Buffers retired during a frame are freed once two later frames
+ * have been submitted (their fences waited at slot reuse). */
+typedef struct retire { struct retire *next; vkbuf_t *buf; uint64_t seq; } retire_t;
+static retire_t        *s_retire;
+static VkCommandBuffer  s_cur;
 static VkPipelineLayout s_layout;
 static VkDescriptorSetLayout s_dsl;
 static VkDescriptorPool s_dpool;
@@ -250,7 +261,7 @@ typedef struct {
     int ortho, topo, blend, dtest, dwrite, cull;
     VkPipeline pipe;
 } pipe_entry_t;
-static pipe_entry_t s_pipes[64];
+static pipe_entry_t s_pipes[256];
 static int s_npipes;
 
 static VkPipeline get_pipeline(int ortho, int topo)
@@ -261,7 +272,7 @@ static VkPipeline get_pipeline(int ortho, int topo)
             e->dtest == (int)s_depth_test && e->dwrite == (int)s_depth_write && e->cull == s_cull)
             return e->pipe;
     }
-    if (s_npipes >= 64) return s_pipes[0].pipe;
+    if (s_npipes >= 256) return s_pipes[0].pipe;
 
     VkPipelineShaderStageCreateInfo stages[2] = {
         { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO },
@@ -414,6 +425,13 @@ bool render_init(render_info_t *info)
     dci.pEnabledFeatures = &enabled;
     if (vkCreateDevice(s_phys, &dci, NULL, &s_dev) != VK_SUCCESS) { DebugPrintf("vulkan: device failed\n"); return false; }
     vkGetDeviceQueue(s_dev, s_qfam, 0, &s_queue);
+    {
+        VkPhysicalDeviceProperties dp;
+        vkGetPhysicalDeviceProperties(s_phys, &dp);
+        DebugPrintf("vulkan: device '%s' api %u.%u.%u\n", dp.deviceName,
+                    VK_VERSION_MAJOR(dp.apiVersion), VK_VERSION_MINOR(dp.apiVersion),
+                    VK_VERSION_PATCH(dp.apiVersion));
+    }
 
     VkAttachmentDescription atts[2] = {
         { 0, VK_FORMAT_UNDEFINED, VK_SAMPLE_COUNT_1_BIT, VK_ATTACHMENT_LOAD_OP_CLEAR, VK_ATTACHMENT_STORE_OP_STORE,
@@ -450,15 +468,18 @@ bool render_init(render_info_t *info)
     pci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     vkCreateCommandPool(s_dev, &pci, NULL, &s_pool);
     VkCommandBufferAllocateInfo cai = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO };
-    cai.commandPool = s_pool; cai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY; cai.commandBufferCount = 1;
-    vkAllocateCommandBuffers(s_dev, &cai, &s_cmd);
+    cai.commandPool = s_pool; cai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    cai.commandBufferCount = FRAMES_IN_FLIGHT;
+    vkAllocateCommandBuffers(s_dev, &cai, s_cmd);
 
     VkSemaphoreCreateInfo sci = { VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
-    vkCreateSemaphore(s_dev, &sci, NULL, &s_img_avail);
-    vkCreateSemaphore(s_dev, &sci, NULL, &s_done);
     VkFenceCreateInfo fci = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
     fci.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-    vkCreateFence(s_dev, &fci, NULL, &s_fence);
+    for (int i = 0; i < FRAMES_IN_FLIGHT; i++) {
+        vkCreateSemaphore(s_dev, &sci, NULL, &s_img_avail[i]);
+        vkCreateSemaphore(s_dev, &sci, NULL, &s_done[i]);
+        vkCreateFence(s_dev, &fci, NULL, &s_fence[i]);
+    }
 
     VkDescriptorSetLayoutBinding db = { 0 };
     db.binding = 0; db.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -523,9 +544,12 @@ void render_cleanup(render_info_t *info)
     vkDestroyDescriptorPool(s_dev, s_dpool, NULL);
     vkDestroyPipelineLayout(s_dev, s_layout, NULL);
     vkDestroyDescriptorSetLayout(s_dev, s_dsl, NULL);
-    vkDestroySemaphore(s_dev, s_img_avail, NULL);
-    vkDestroySemaphore(s_dev, s_done, NULL);
-    vkDestroyFence(s_dev, s_fence, NULL);
+    for (int i = 0; i < FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(s_dev, s_img_avail[i], NULL);
+        vkDestroySemaphore(s_dev, s_done[i], NULL);
+        vkDestroyFence(s_dev, s_fence[i], NULL);
+    }
+    while (s_retire) { retire_t *r = s_retire; s_retire = r->next; vkbuf_destroy(r->buf); free(r); }
     vkDestroyCommandPool(s_dev, s_pool, NULL);
     vkDestroyRenderPass(s_dev, s_pass, NULL);
     vkDestroyDevice(s_dev, NULL);
@@ -596,8 +620,8 @@ bool FSSetViewPort(render_viewport_t *view)
     if (s_frame_active) {
         VkViewport vp = { (float)view->X, (float)view->Y, (float)view->Width, (float)view->Height, view->MinZ, view->MaxZ };
         VkRect2D sc = { { view->X, view->Y }, { (uint32_t)view->Width, (uint32_t)view->Height } };
-        vkCmdSetViewport(s_cmd, 0, 1, &vp);
-        vkCmdSetScissor(s_cmd, 0, 1, &sc);
+        vkCmdSetViewport(s_cur, 0, 1, &vp);
+        vkCmdSetScissor(s_cur, 0, 1, &sc);
     }
     return true;
 }
@@ -607,8 +631,18 @@ void FSSetNextViewPortScissorMode(bool b) { (void)b; }
 bool FSBeginScene(void)
 {
     if (!s_init_done || s_frame_active) return true;
-    vkWaitForFences(s_dev, 1, &s_fence, VK_TRUE, UINT64_MAX);
-    VkResult r = vkAcquireNextImageKHR(s_dev, s_swap, UINT64_MAX, s_img_avail, VK_NULL_HANDLE, &s_img_idx);
+    s_slot = (int)(s_frame_seq % FRAMES_IN_FLIGHT);
+    vkWaitForFences(s_dev, 1, &s_fence[s_slot], VK_TRUE, UINT64_MAX);
+    {
+        retire_t **pp = &s_retire;
+        while (*pp) {
+            retire_t *r2 = *pp;
+            if (r2->seq + FRAMES_IN_FLIGHT <= s_frame_seq) {
+                *pp = r2->next; vkbuf_destroy(r2->buf); free(r2);
+            } else pp = &r2->next;
+        }
+    }
+    VkResult r = vkAcquireNextImageKHR(s_dev, s_swap, UINT64_MAX, s_img_avail[s_slot], VK_NULL_HANDLE, &s_img_idx);
     if (r == VK_ERROR_OUT_OF_DATE_KHR) {
         vkDeviceWaitIdle(s_dev);
         destroy_swapchain();
@@ -616,10 +650,11 @@ bool FSBeginScene(void)
         return true;
     }
     if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) return false;
-    vkResetFences(s_dev, 1, &s_fence);
-    vkResetCommandBuffer(s_cmd, 0);
+    vkResetFences(s_dev, 1, &s_fence[s_slot]);
+    s_cur = s_cmd[s_slot];
+    vkResetCommandBuffer(s_cur, 0);
     VkCommandBufferBeginInfo bi = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO };
-    vkBeginCommandBuffer(s_cmd, &bi);
+    vkBeginCommandBuffer(s_cur, &bi);
     VkClearValue clears[2];
     memset(clears, 0, sizeof clears);
     clears[1].depthStencil.depth = 1.0f;
@@ -627,11 +662,11 @@ bool FSBeginScene(void)
     rp.renderPass = s_pass; rp.framebuffer = s_fbs[s_img_idx];
     rp.renderArea.extent = s_extent;
     rp.clearValueCount = 2; rp.pClearValues = clears;
-    vkCmdBeginRenderPass(s_cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(s_cur, &rp, VK_SUBPASS_CONTENTS_INLINE);
     VkViewport vp = { 0, 0, (float)s_extent.width, (float)s_extent.height, 0.0f, 1.0f };
     VkRect2D sc = { { 0, 0 }, s_extent };
-    vkCmdSetViewport(s_cmd, 0, 1, &vp);
-    vkCmdSetScissor(s_cmd, 0, 1, &sc);
+    vkCmdSetViewport(s_cur, 0, 1, &vp);
+    vkCmdSetScissor(s_cur, 0, 1, &sc);
     s_frame_active = true;
     return true;
 }
@@ -641,16 +676,17 @@ bool render_flip(render_info_t *info)
 {
     (void)info;
     if (!s_frame_active) return true;
-    vkCmdEndRenderPass(s_cmd);
-    vkEndCommandBuffer(s_cmd);
+    vkCmdEndRenderPass(s_cur);
+    vkEndCommandBuffer(s_cur);
     VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     VkSubmitInfo si = { VK_STRUCTURE_TYPE_SUBMIT_INFO };
-    si.waitSemaphoreCount = 1; si.pWaitSemaphores = &s_img_avail; si.pWaitDstStageMask = &wait_stage;
-    si.commandBufferCount = 1; si.pCommandBuffers = &s_cmd;
-    si.signalSemaphoreCount = 1; si.pSignalSemaphores = &s_done;
-    vkQueueSubmit(s_queue, 1, &si, s_fence);
+    si.waitSemaphoreCount = 1; si.pWaitSemaphores = &s_img_avail[s_slot]; si.pWaitDstStageMask = &wait_stage;
+    si.commandBufferCount = 1; si.pCommandBuffers = &s_cur;
+    si.signalSemaphoreCount = 1; si.pSignalSemaphores = &s_done[s_slot];
+    vkQueueSubmit(s_queue, 1, &si, s_fence[s_slot]);
+    s_frame_seq++;
     VkPresentInfoKHR pi = { VK_STRUCTURE_TYPE_PRESENT_INFO_KHR };
-    pi.waitSemaphoreCount = 1; pi.pWaitSemaphores = &s_done;
+    pi.waitSemaphoreCount = 1; pi.pWaitSemaphores = &s_done[s_slot];
     pi.swapchainCount = 1; pi.pSwapchains = &s_swap; pi.pImageIndices = &s_img_idx;
     VkResult r = vkQueuePresentKHR(s_queue, &pi);
     if (r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_SUBOPTIMAL_KHR) {
@@ -672,7 +708,7 @@ bool FSClear(XYRECT *rect)
     atts[1].clearValue.depthStencil.depth = 1.0f;
     int y = render_info.ThisMode.h - rect->y1 - (rect->y2 - rect->y1);
     VkClearRect cr = { { { rect->x1, y }, { (uint32_t)(rect->x2 - rect->x1), (uint32_t)(rect->y2 - rect->y1) } }, 0, 1 };
-    vkCmdClearAttachments(s_cmd, 2, atts, 1, &cr);
+    vkCmdClearAttachments(s_cur, 2, atts, 1, &cr);
     return true;
 }
 bool FSClearBlack(void)
@@ -680,7 +716,7 @@ bool FSClearBlack(void)
     if (!s_frame_active) return true;
     VkClearAttachment att = { VK_IMAGE_ASPECT_COLOR_BIT, 0, { { 0, 0, 0, 1 } } };
     VkClearRect cr = { { { 0, 0 }, s_extent }, 0, 1 };
-    vkCmdClearAttachments(s_cmd, 1, &att, 1, &cr);
+    vkCmdClearAttachments(s_cur, 1, &att, 1, &cr);
     return true;
 }
 bool FSClearDepth(XYRECT *rect)
@@ -690,7 +726,7 @@ bool FSClearDepth(XYRECT *rect)
     att.clearValue.depthStencil.depth = 1.0f;
     int y = render_info.ThisMode.h - rect->y1 - (rect->y2 - rect->y1);
     VkClearRect cr = { { { rect->x1, y }, { (uint32_t)(rect->x2 - rect->x1), (uint32_t)(rect->y2 - rect->y1) } }, 0, 1 };
-    vkCmdClearAttachments(s_cmd, 1, &att, 1, &cr);
+    vkCmdClearAttachments(s_cur, 1, &att, 1, &cr);
     return true;
 }
 
@@ -711,13 +747,21 @@ bool FSLockIndexBuffer(RENDEROBJECT *ro, WORD **indices) { *indices = (WORD *)((
 bool FSUnlockIndexBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
 bool FSLockPretransformedVertexBuffer(RENDEROBJECT *ro, TLVERTEX **verts) { return FSLockVertexBuffer(ro, (LVERTEX **)verts); }
 
+static void retire_buf(vkbuf_t *b)
+{
+    if (!b) return;
+    if (!s_init_done) { vkbuf_destroy(b); return; }
+    retire_t *r = malloc(sizeof(retire_t));
+    r->buf = b; r->seq = s_frame_seq; r->next = s_retire; s_retire = r;
+}
+
 void FSReleaseRenderObject(RENDEROBJECT *ro)
 {
-    /* Buffers may be referenced by the in-flight frame. */
-    if (s_init_done) vkDeviceWaitIdle(s_dev);
-    if (ro->lpVertexBuffer) { vkbuf_destroy((vkbuf_t *)ro->lpVertexBuffer); ro->lpVertexBuffer = NULL; }
-    if (ro->lpNormalBuffer) { vkbuf_destroy((vkbuf_t *)ro->lpNormalBuffer); ro->lpNormalBuffer = NULL; }
-    if (ro->lpIndexBuffer) { vkbuf_destroy((vkbuf_t *)ro->lpIndexBuffer); ro->lpIndexBuffer = NULL; }
+    /* Buffers may be referenced by in-flight frames: retire them;
+     * FSBeginScene frees them once their frame slot has cycled. */
+    if (ro->lpVertexBuffer) { retire_buf((vkbuf_t *)ro->lpVertexBuffer); ro->lpVertexBuffer = NULL; }
+    if (ro->lpNormalBuffer) { retire_buf((vkbuf_t *)ro->lpNormalBuffer); ro->lpNormalBuffer = NULL; }
+    if (ro->lpIndexBuffer) { retire_buf((vkbuf_t *)ro->lpIndexBuffer); ro->lpIndexBuffer = NULL; }
     for (int i = 0; i < ro->numTextureGroups; i++) {
         ro->textureGroups[i].numVerts = 0;
         ro->textureGroups[i].startVert = 0;
@@ -1056,7 +1100,7 @@ static void push_mvp(int ortho)
         MatrixMultiply(&mvp, &proj_matrix, &mvp);
         memcpy(m, &mvp, sizeof m);
     }
-    vkCmdPushConstants(s_cmd, s_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, m);
+    vkCmdPushConstants(s_cur, s_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, m);
 }
 
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
@@ -1064,24 +1108,24 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
     if (!s_frame_active || !renderObject->lpVertexBuffer) return true;
     VkPipeline pipe = get_pipeline(orthographic ? 1 : 0, primitive_type == 1 ? 1 : 0);
     if (!pipe) return false;
-    vkCmdBindPipeline(s_cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe);
+    vkCmdBindPipeline(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe);
     VkBuffer vbuf = ((vkbuf_t *)renderObject->lpVertexBuffer)->buf;
     VkDeviceSize off = 0;
-    vkCmdBindVertexBuffers(s_cmd, 0, 1, &vbuf, &off);
+    vkCmdBindVertexBuffers(s_cur, 0, 1, &vbuf, &off);
     if (renderObject->lpIndexBuffer)
-        vkCmdBindIndexBuffer(s_cmd, ((vkbuf_t *)renderObject->lpIndexBuffer)->buf, 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(s_cur, ((vkbuf_t *)renderObject->lpIndexBuffer)->buf, 0, VK_INDEX_TYPE_UINT16);
     push_mvp(orthographic ? 1 : 0);
 
     for (int i = 0; i < renderObject->numTextureGroups; i++) {
         TEXTUREGROUP *group = &renderObject->textureGroups[i];
         int frag[2] = { group->colourkey ? 1 : 0, group->texture ? 1 : 0 };
-        vkCmdPushConstants(s_cmd, s_layout, VK_SHADER_STAGE_FRAGMENT_BIT, 64, 8, frag);
+        vkCmdPushConstants(s_cur, s_layout, VK_SHADER_STAGE_FRAGMENT_BIT, 64, 8, frag);
         vktex_t *tex = group->texture ? (vktex_t *)group->texture : default_tex();
-        vkCmdBindDescriptorSets(s_cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, s_layout, 0, 1, &tex->set, 0, NULL);
+        vkCmdBindDescriptorSets(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, s_layout, 0, 1, &tex->set, 0, NULL);
         if (renderObject->lpIndexBuffer)
-            vkCmdDrawIndexed(s_cmd, (uint32_t)group->numTriangles * 3, 1, (uint32_t)group->startIndex, (int32_t)group->startVert, 0);
+            vkCmdDrawIndexed(s_cur, (uint32_t)group->numTriangles * 3, 1, (uint32_t)group->startIndex, (int32_t)group->startVert, 0);
         else
-            vkCmdDraw(s_cmd, (uint32_t)group->numVerts, 1, (uint32_t)group->startVert, 0);
+            vkCmdDraw(s_cur, (uint32_t)group->numVerts, 1, (uint32_t)group->startVert, 0);
     }
     return true;
 }
