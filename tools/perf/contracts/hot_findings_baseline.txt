@@ -213,8 +213,8 @@ R7|lights.c|XLight1Group|float division in hot loop
 R7|lights.c|XLight1Group|float division in hot loop
 R7|lights.c|XLight1Group|sqrtf in hot loop
 R7|models.c|ModelDisp|float division in hot loop
-R7|new3d.c|NormaliseVector|float division inner_loop=false
-R7|new3d.c|NormaliseVector|sqrtf inner_loop=false
+R7|new3d.cpp|NormaliseVector|float division inner_loop=false
+R7|new3d.cpp|NormaliseVector|sqrtf inner_loop=false
 R7|oct2.c|MainGameRender|float division inner_loop=false
 R7|oct2.c|MainGameRender|float division inner_loop=false
 R7|oct2.c|MainGameRender|float division inner_loop=false
@@ -252,16 +252,16 @@ R7|primary.c|ProcessPrimaryBullets|float division in hot loop
 R7|primary.c|ProcessPrimaryBullets|float division in hot loop
 R7|primary.c|ProcessPrimaryBullets|float division in hot loop
 R7|primary.c|ProcessPrimaryBullets|float division in hot loop
-R7|quat.c|MatrixToQuat|float division inner_loop=false
-R7|quat.c|MatrixToQuat|float division inner_loop=false
-R7|quat.c|MatrixToQuat|sqrtf inner_loop=false
-R7|quat.c|MatrixToQuat|sqrtf inner_loop=false
-R7|quat.c|QuatFrom2Vectors|sqrtf inner_loop=false
-R7|quat.c|QuatFromVector2|float division inner_loop=false
-R7|quat.c|QuatFromVector|float division inner_loop=false
-R7|quat.c|QuatInverse|float division inner_loop=false
-R7|quat.c|Quaternion_Slerp|float division inner_loop=false
-R7|quat.c|Quaternion_Slerp|float division inner_loop=false
+R7|quat.cpp|MatrixToQuat|float division inner_loop=false
+R7|quat.cpp|MatrixToQuat|float division inner_loop=false
+R7|quat.cpp|MatrixToQuat|sqrtf inner_loop=false
+R7|quat.cpp|MatrixToQuat|sqrtf inner_loop=false
+R7|quat.cpp|QuatFrom2Vectors|sqrtf inner_loop=false
+R7|quat.cpp|QuatFromVector2|float division inner_loop=false
+R7|quat.cpp|QuatFromVector|float division inner_loop=false
+R7|quat.cpp|QuatInverse|float division inner_loop=false
+R7|quat.cpp|Quaternion_Slerp|float division inner_loop=false
+R7|quat.cpp|Quaternion_Slerp|float division inner_loop=false
 R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop

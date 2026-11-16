@@ -97,7 +97,7 @@ a correctness pin, not an optimization.
 ### R4 — No double precision in hot paths (MUST)
 
 Use `float` and `f`-suffixed literals. Known residue at adoption:
-`new3d.c:872-881` `spline()` computes Catmull-Rom coefficients in `double`
+`new3d.cpp:872-881` `spline()` computes Catmull-Rom coefficients in `double`
 and runs per-entity via `aispline.c`; `oct2.c:5461` and `models.c:6187`
 promote to double inside throttled effects. `new3d.h:17,23` `EPS`/`M_PI_2`
 are double literals. Each is a burn-down item, not a licence to add more.
@@ -110,7 +110,7 @@ bar as T2K's mechanics-gated rule.
 ### R6 — No libm calls in hot paths (MUST)
 
 Presentation / camera / mesh / AI trig goes through `fast_sinf` / `fast_cosf`
-(`new3d.h:71-84`, table `new3d.c:22`, init `trig_table_init` called from
+(`new3d.h:71-84`, table `new3d.cpp:22`, init `trig_table_init` called from
 `main.c:490`). The table is one path on every target. `fast_sinf`'s leaf
 `(int)` truncation and sign fixup are load-bearing — VFPv2 has no
 float-result floor, and `floorf` is a real `bl` into newlib with VFP↔ARM
@@ -146,7 +146,7 @@ variables. Review-only until a capture exists.
 
 ### R11 — Integer division/modulo by a runtime value (SHOULD)
 
-No integer divide on this core. `new3d.c:593` `Random_Range` does
+No integer divide on this core. `new3d.cpp:593` `Random_Range` does
 `(Seed1 & 32767) % Max` and is called pervasively from per-frame game logic —
 the first burn-down item. A compile-time-constant divisor is NOT a finding.
 `((x % n) + n) % n` is two helper calls; where the value is provably within
@@ -215,7 +215,7 @@ Standing exemptions (corpus, not source comments):
 |---|---|---|---|---|
 | E-LUT-1 | new3d.h:fast_sinf | R2,R3,R5 | yes | Range reduction; leaf vcvt+flag; documented cheaper than floorf |
 | E-LUT-2 | new3d.h:fast_cosf | R2,R3 | yes | Wraps fast_sinf; same range reduction |
-| E-LUT-3 | new3d.c:trig_table_init | R4,R6 | yes | COLD table build; libm sinf is the reference |
+| E-LUT-3 | new3d.cpp:trig_table_init | R4,R6 | yes | COLD table build; libm sinf is the reference |
 | E-LUT-4 | new3d.h:fast_invsqrtf | R7 | yes | 1/sqrtf is the shipped policy (VFPv2 vsqrt) |
 | E-TITLE-1 | title.c | R6 | yes | Title/menu is COLD; ATAND/atan2f at title.c:4697 is one cold site |
 
