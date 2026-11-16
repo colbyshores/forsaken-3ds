@@ -28,6 +28,7 @@
 #include "music.h"
 #include "file.h"
 #include "dsp_adpcm.h"
+#include "music_table.h"
 
 #define MUSIC_SAMPLE_RATE 32000
 
@@ -38,21 +39,6 @@ static float s_volume = 1.0f;
 static ALuint s_source = 0;
 static ALuint s_buffer = 0;
 
-/* Level->track mapping: keep in sync with music_3ds.c. The tables
- * live in both backends today because the 3DS file is ndsp-typed;
- * the mapping itself is data, duplicated deliberately rather than
- * coupling the 3DS TU to this one. */
-#ifdef EDITION_REMASTER
-static const int s_level_track[] = {
-     5, 9, 6, 3, 2, 13, 8, 10, 7, 4, 12, 9, 3, 15, 7, 8,
-     10, 5, 14, 4, 11, 2, 3, 6, 16, 12, 13, 11, 18, 15, 7, 8
-};
-#else
-static const int s_level_track[] = {
-    5, 9, 6, 3, 2, 8, 4, 9, 3, 7, 8, 10, 5, 3, 6
-};
-#endif
-#define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
 
 static bool load_track_pcm(int track, int16_t **out_pcm, long *out_samples)
 {
@@ -164,13 +150,8 @@ void music_set_volume(float vol)
 
 void music_play_for_level(int level_num)
 {
-    int track;
     if (level_num < 0) return;
-    if (level_num < NUM_LEVEL_TRACKS)
-        track = s_level_track[level_num];
-    else
-        track = MUSIC_FIRST_TRACK + (level_num % MUSIC_NUM_TRACKS);
-    music_play(track);
+    music_play(music_track_for_level(level_num));
 }
 
 void music_play_title(void) { music_play(MUSIC_TITLE_TRACK); }
