@@ -787,7 +787,9 @@ static void transition(VkCommandBuffer cb, VkImage img, int base_level, int leve
     b.subresourceRange.levelCount = (uint32_t)levels;
     b.subresourceRange.layerCount = 1;
     b.srcAccessMask = src; b.dstAccessMask = dst;
-    vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &b);
+    VkPipelineStageFlags dst_stage = (new_l == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+        ? VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT : VK_PIPELINE_STAGE_TRANSFER_BIT;
+    vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0, NULL, 0, NULL, 1, &b);
 }
 
 static bool load_ktx2(vktex_t *t, const char *path, u_int16_t *width, u_int16_t *height, bool *colorkey)
@@ -943,7 +945,7 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
             bd.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             bd.subresourceRange.baseMipLevel = (uint32_t)i; bd.subresourceRange.levelCount = 1; bd.subresourceRange.layerCount = 1;
             bd.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-            vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &bd);
+            vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &bd);
             VkImageBlit blit = { 0 };
             blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             blit.srcSubresource.mipLevel = (uint32_t)(i - 1); blit.srcSubresource.layerCount = 1;
