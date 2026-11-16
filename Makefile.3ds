@@ -99,11 +99,11 @@ EXCLUDE_SRC := \
 	net_enet_2.c \
 	net_tracker.c \
 	private_address.c \
-	lua_miniupnp.c \
-	botai_actions.c \
-	botai_path.c \
-	botai_sensors.c \
-	lua_bot.c
+	lua_miniupnp.cpp \
+	botai_actions.cpp \
+	botai_path.cpp \
+	botai_sensors.cpp \
+	lua_bot.cpp
 
 
 #---------------------------------------------------------------------------------
