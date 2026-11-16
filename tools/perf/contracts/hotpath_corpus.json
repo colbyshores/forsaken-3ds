@@ -76,7 +76,7 @@
       ]
     },
     {
-      "file": "collision.c",
+      "file": "collision.cpp",
       "symbols": [
         "*"
       ],
@@ -111,21 +111,21 @@
       "why": "AI helpers (LookAhead/AimAtTarget/ClearLOS) per enemy per frame"
     },
     {
-      "file": "primary.c",
+      "file": "primary.cpp",
       "symbols": [
         "ProcessPrimaryBullets"
       ],
       "why": "per projectile per frame"
     },
     {
-      "file": "secondary.c",
+      "file": "secondary.cpp",
       "symbols": [
         "ProcessSecondaryBullets"
       ],
       "why": "per projectile per frame"
     },
     {
-      "file": "lights.c",
+      "file": "lights.cpp",
       "symbols": [
         "ProcessXLights",
         "XLight1Group"
@@ -154,7 +154,7 @@
       "why": "screen effect polys per frame"
     },
     {
-      "file": "spotfx.c",
+      "file": "spotfx.cpp",
       "symbols": [
         "*"
       ],

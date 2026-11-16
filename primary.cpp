@@ -44,6 +44,8 @@
 
 #include "local.h"
 #include "localtitle.h"
+/* aim_assist.c is a C TU; hoisted from a block-scope extern (C++ forbids extern "C" at block scope). */
+extern "C" bool aim_assist_steer( VECTOR *pos, VECTOR *dir, u_int16_t group, int8_t weapon );
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -216,23 +218,23 @@ bool	PyroLightFlag = true;
 
 int8_t	*	DebugPrimStrings[] = {
 
-			"Pulsar",
-			"Trojax",
-			"Pyrolite",
-			"Transpulse",
-			"SussGun",
-			"Laser",
-			"Orbit Pulsar",
-			"Nme Bullet",
-			"Nme Pulsar",
-			"Nme Trojax",
-			"Nme Pyrolite",
-			"Nme Transpulse",
-			"Nme SussGun",
-			"Nme Laser",
-			"Nme Lightning",
-			"Flames",
-			"Nme PowerLaser",
+			(int8_t*)"Pulsar",
+			(int8_t*)"Trojax",
+			(int8_t*)"Pyrolite",
+			(int8_t*)"Transpulse",
+			(int8_t*)"SussGun",
+			(int8_t*)"Laser",
+			(int8_t*)"Orbit Pulsar",
+			(int8_t*)"Nme Bullet",
+			(int8_t*)"Nme Pulsar",
+			(int8_t*)"Nme Trojax",
+			(int8_t*)"Nme Pyrolite",
+			(int8_t*)"Nme Transpulse",
+			(int8_t*)"Nme SussGun",
+			(int8_t*)"Nme Laser",
+			(int8_t*)"Nme Lightning",
+			(int8_t*)"Flames",
+			(int8_t*)"Nme PowerLaser",
 
 };
 
@@ -1720,7 +1722,7 @@ void ProcessPrimaryBullets( void )
 							}
 							else
 							{
-								GunPtr = PrimBulls[i].EnemyGun;
+								GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
 								if( GunPtr )
 								{
 									FirePosPnt = EnemyTypes[ Enemies[ PrimBulls[i].Owner ].Type ].GunFirePoints[ GunPtr->GunNum>>1 ];
@@ -1849,7 +1851,7 @@ void ProcessPrimaryBullets( void )
 			 * adjusted Dir is what propels the bullet this frame. */
 			if( PrimBulls[i].OwnerType == OWNER_SHIP )
 			{
-				extern bool aim_assist_steer( VECTOR *pos, VECTOR *dir,
+				bool aim_assist_steer( VECTOR *pos, VECTOR *dir,
 				                              u_int16_t group, int8_t weapon );
 				aim_assist_steer( &PrimBulls[i].Pos, &PrimBulls[i].Dir,
 				                  PrimBulls[i].GroupImIn, PrimBulls[i].Weapon );
@@ -5891,7 +5893,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Grou
 			}
 			else
 			{
-				GunPtr = PrimBulls[i].EnemyGun;
+				GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
 				ApplyMatrix( &GunPtr->Mat, &SlideLeft, &LeftVector );
 				ApplyMatrix( &GunPtr->Mat, &SlideUp, &UpVector );
 			}
@@ -6073,7 +6075,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t G
 			}
 			else
 			{
-				GunPtr = PrimBulls[i].EnemyGun;
+				GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
 				ApplyMatrix( &GunPtr->Mat, &SlideLeft, &LeftVector );
 				ApplyMatrix( &GunPtr->Mat, &SlideUp, &UpVector );
 			}
@@ -6252,7 +6254,7 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 			}
 			else
 			{
-				GunPtr = PrimBulls[i].EnemyGun;
+				GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
 				ApplyMatrix( &GunPtr->Mat, &SlideLeft, &LeftVector );
 				ApplyMatrix( &GunPtr->Mat, &SlideUp, &UpVector );
 			}
@@ -6403,7 +6405,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 			}
 			else
 			{
-				GunPtr = PrimBulls[i].EnemyGun;
+				GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
 				ApplyMatrix( &GunPtr->Mat, &SlideLeft, &NormLeftVector );
 				ApplyMatrix( &GunPtr->Mat, &SlideUp, &NormUpVector );
 			}
@@ -6769,7 +6771,7 @@ void DispPowerLevel( void )
 				PowerString[ Count ] = 'O';
 			}
 			PowerString[ Steps ] = 0;
-			Print4x5Text( &PowerString[ 0 ], x, y, 2 );
+			Print4x5Text( (char*)&PowerString[ 0 ], x, y, 2 );
 		}
 		else
 		{
@@ -6788,7 +6790,7 @@ void DispPowerLevel( void )
 			}
 			LaserString[ Steps ] = 0;
 	
-			Print4x5Text( &LaserString[ 0 ], x, y-6, 5 );
+			Print4x5Text( (char*)&LaserString[ 0 ], x, y-6, 5 );
 		}
 	
 		if( Ships[ WhoIAm ].Primary == TROJAX && GeneralAmmo != 0.0F && control.fire_primary )
@@ -6803,7 +6805,7 @@ void DispPowerLevel( void )
 			}
 			PowerString[ Steps ] = 0;
 	
-			Print4x5Text( &PowerString[ 0 ], x, y-6, 1 );
+			Print4x5Text( (char*)&PowerString[ 0 ], x, y-6, 1 );
 		}
 	}
 	else
@@ -8922,7 +8924,7 @@ void GetLaserLocalVector( u_int16_t i, VECTOR * LocalVector )
 					}
 					else
 					{
-						GunPtr = PrimBulls[i].EnemyGun;
+						GunPtr = (GUNOBJECT*)PrimBulls[i].EnemyGun;
 						if( GunPtr )
 						{
 							ApplyMatrix( &GunPtr->InvMat, &PrimBulls[i].Dir, LocalVector );
