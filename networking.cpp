@@ -46,6 +46,8 @@ bool tracker_enabled;
 #include "net_tracker.h"
 #include "timer.h"
 #include "oct2.h"
+/* util.c is a C TU; networking.c relied on implicit declaration here. */
+extern "C" void DebugPrintf_( const char * format, ... );
 
 
 BYTE WhoIAm = UNASSIGNED_SHIP;
@@ -111,7 +113,7 @@ extern bool OwnFlagTeleportsHome;
 extern bool CanCarryOwnFlag;
 extern SLIDER CTFSlider;
 
-void SetTeamGoals( u_int16_t *TeamGoals );
+extern "C" void SetTeamGoals( u_int16_t *TeamGoals );
 
 u_int32_t BuildShipFlags( BYTE Player );
 void UnPackShipFlags( BYTE Player , u_int32_t Flags );
@@ -198,7 +200,7 @@ extern float framelag;
 extern	float	Start_Shield;
 extern	float	Start_Hull;
 
-void SpecialDestroyGame( void );
+extern "C" void SpecialDestroyGame( void );
 void GetLevelName( char *buf, int bufsize, int level );
 
 bool	CanDoDamage[MAX_PLAYERS+1];
@@ -281,7 +283,7 @@ int16_t					StatsCount = -1;
 
 network_player_t * host_network_player = NULL;
 
-void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID );
+extern "C" void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID );
 
 void CreateReGen( u_int16_t ship );
 bool InitLevels( char *levels_list );
@@ -361,8 +363,8 @@ extern	BYTE	TeamNumber[MAX_PLAYERS];
 extern	u_int16_t	RandomStartPosModify;
 
 bool	ChAngleevel( void );
-void	DebugPrintf( const char * format, ... );
-void AddTitleMessage(LPTEXTMSG LpTextMsg);
+extern "C" void	DebugPrintf( const char * format, ... );
+extern "C" void AddTitleMessage(LPTEXTMSG LpTextMsg);
 
 MATRIX	TempMatrix = {
 				1.0F, 0.0F, 0.0F, 0.0F,
@@ -435,7 +437,7 @@ float FlagVolume;
 extern SLIDER WatchPlayerSelect;
 
 // calculates distance between you and a bike (Sfx.c)
-float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
+extern "C" float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
 
 // stats used to send to other players if you are the host (stats.c)
 extern u_int8_t	KillStats[MAX_PLAYERS][MAX_PLAYERS];	
@@ -917,7 +919,7 @@ void	KillPickupSend( u_int16_t Owner, u_int16_t IDCount, int16_t Style )
 	SendGameMessage( MSG_KILLPICKUP, 0, 0, 0, 0 );
 }
 
-void	TeamGoalsSend( u_int16_t * TeamGoals )
+extern "C" void	TeamGoalsSend( u_int16_t * TeamGoals )
 {
 	int i;
 	for( i = 0; i < MAX_TEAMS; i++ ) TempTeamGoals.TeamGoals[ i ] = TeamGoals[ i ];
@@ -1483,7 +1485,7 @@ void network_event( network_event_type_t type, void* data )
         case NETWORK_DATA:
                 {
                         network_packet_t * packet = (network_packet_t*) data;
-						network_event_new_message( packet->from, packet->data, packet->size );
+						network_event_new_message( packet->from, (BYTE*)packet->data, packet->size );
                 }
                 break;
         default:
@@ -4255,9 +4257,9 @@ send:
 	//DebugPrintf("Sending message type, %s  bytes %lu\n", msg_to_str(msg), nBytes);
 
 	if(!to)
-		network_broadcast( (void*) &CommBuff[0], nBytes, flags, channel );
+		network_broadcast( (void*) &CommBuff[0], nBytes, (network_flags_t)flags, channel );
 	else
-		network_send( to, (void*) &CommBuff[0], nBytes, flags, channel );
+		network_send( to, (void*) &CommBuff[0], nBytes, (network_flags_t)flags, channel );
 
 }
 
