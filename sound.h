@@ -2,6 +2,9 @@
 #define SOUND_INCLUDED
 
 #include "main.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifndef __3DS__
 #include <SDL.h>
 #endif
@@ -11,10 +14,10 @@
 //
 
 // this will eventually be removed but is required right now
-bool Sound3D;
+extern bool Sound3D;
 
 // the game appears to need this probably wont in openAL
-int sound_minimum_volume;
+extern int sound_minimum_volume;
 
 //
 // Generic Functions
@@ -59,5 +62,9 @@ void sound_set_pitch( sound_source_t * s, float freq );
 void sound_volume( sound_source_t * s, long decibels );
 void sound_pan( sound_source_t * s, long pan );
 void sound_position( sound_source_t * s, float x, float y, float z, float min_distance, float max_distance );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -27,8 +27,9 @@
 #define MAX_PATH_LEN 500
 
 bool Sound3D = false;
+/* sound_minimum_volume is defined in sfx.cpp (always-compiled owner). */
 
-int sound_minimum_volume = -10000 / 3;
+
 
 /* ---- internal structs ---- */
 
