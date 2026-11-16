@@ -3,55 +3,75 @@
 #include "main.h"
 #include "util.h"
 
+/* C-with-classes (AGENTS.md S9): the block tracker below is
+ * state owned by this module; definitions keep C linkage
+ * because the X_* API is called from C translation units
+ * (and MemUsed is externed by oct2.c). */
+extern "C" {
+
 size_t	MemUsed = 0;
 
-#define	MAXBLOCKS 16384
+namespace {
 
-bool	BlockUsed[MAXBLOCKS];
-void *	BlockPnts[MAXBLOCKS];
-size_t	BlockSize[MAXBLOCKS];
-char *	BlockInFile[MAXBLOCKS];
-int		BlockInLine[MAXBLOCKS];
-int BlocksUsed = 0;
+constexpr int MAXBLOCKS = 16384;
+
+/* Debug block tracker: one slot per live X_ allocation, recording
+ * size and allocation site for leak reports. */
+struct XMemTracker {
+    bool   used[MAXBLOCKS];
+    void  *pnts[MAXBLOCKS];
+    size_t sizes[MAXBLOCKS];
+    char  *files[MAXBLOCKS];
+    int    lines[MAXBLOCKS];
+    int    blocks_used = 0;
+
+    void init()
+    {
+        for (int i = 0; i < MAXBLOCKS; i++) {
+            used[i] = false;
+            pnts[i] = nullptr;
+            sizes[i] = 0;
+        }
+    }
+    int find_free()
+    {
+        for (int i = 0; i < MAXBLOCKS; i++)
+            if (!used[i]) { blocks_used++; return i; }
+        return -1;
+    }
+    int find_same(void *p) const
+    {
+        for (int i = 0; i < MAXBLOCKS; i++)
+            if (used[i] && pnts[i] == p) return i;
+        return -1;
+    }
+};
+
+XMemTracker g_mem;
+
+} // namespace
+
+#define BlockUsed   g_mem.used
+#define BlockPnts   g_mem.pnts
+#define BlockSize   g_mem.sizes
+#define BlockInFile g_mem.files
+#define BlockInLine g_mem.lines
+#define BlocksUsed  g_mem.blocks_used
 
 void XMem_Init( void )
 {
-	int i;
-
-	MemUsed =0;
-	for( i = 0 ; i < MAXBLOCKS ; i++ )
-	{
-		BlockUsed[i] = false;
-		BlockPnts[i] = NULL;
-		BlockSize[i] = 0;
-	}
+	MemUsed = 0;
+	g_mem.init();
 }
 
 int XMem_FindFree( void )
 {
-	int i;
-
-	for( i = 0 ; i < MAXBLOCKS ; i++ )
-	{
-		if( !BlockUsed[i] )
-		{
-			BlocksUsed++;
-			return i;
-		}
-	}
-
-	return -1;
+	return g_mem.find_free();
 }
 
 int XMem_FindSame( void * Pnt )
 {
-	int i;
-	for( i = 0 ; i < MAXBLOCKS ; i++ )
-	{
-		if( BlockUsed[i] && ( BlockPnts[i] == Pnt ) )
-			return i;
-	}
-	return -1;
+	return g_mem.find_same(Pnt);
 }
 
 void * X_strdup( char *str, char *in_file, int in_line )
@@ -71,7 +91,7 @@ void * X_strdup( char *str, char *in_file, int in_line )
 	if( !Pnt )
 		return Pnt;
 
-	int size = strlen(str)+1;
+	size_t size = strlen(str)+1;
 
 	BlockUsed[i] = true;
 	BlockPnts[i] = Pnt;
@@ -200,7 +220,7 @@ void * X_realloc( void * Pnt , size_t size, char *in_file, int in_line )
 	BlockInLine[i] = in_line;
 
 	if(size > BlockSize[i]) // this protects whole program against dirty memory
-		memset(Pnt+BlockSize[i],0,size-BlockSize[i]);
+		memset((char *)Pnt+BlockSize[i],0,size-BlockSize[i]);
 
 	MemUsed -= BlockSize[i];
 	BlockSize[i] = size;
@@ -229,3 +249,5 @@ int UnMallocedBlocks( void )
 		MemUsed, BlocksUsed ); // break point
 	return BlocksUsed;
 }
+
+} /* extern "C" */

@@ -8,12 +8,19 @@
 #ifndef PLATFORM_INCLUDED
 #define PLATFORM_INCLUDED
 
+
 #ifdef __3DS__
 
 #include <3ds.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern u_int32_t platform_get_ticks(void);
 extern void platform_delay(u_int32_t ms);
+#ifdef __cplusplus
+}
+#endif
 
 #define SDL_GetTicks()     platform_get_ticks()
 #define SDL_Delay(ms)      platform_delay(ms)
