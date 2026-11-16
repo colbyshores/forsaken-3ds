@@ -336,7 +336,6 @@ void app_mouse_motion( SDL_MouseMotionEvent * motion )
 	mouse_state.yrel += motion->yrel;
 }
 
-#ifndef DXMOUSE
 extern float real_framelag;
 mouse_state_t* read_mouse(void)
 {
@@ -362,7 +361,6 @@ mouse_state_t* read_mouse(void)
 	mouse_state.yrel = 0;
 	return &state;
 }
-#endif
 
 //////////////////////////////////////////////
 // Joystick Events
@@ -513,7 +511,6 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 	}
 }
 
-#ifndef DINPUTJOY
 bool joysticks_init(void)
 {
 	int i, j, k;
@@ -708,7 +705,6 @@ bool joysticks_cleanup( void )
 	return true;
 }
 
-#endif // ! DINPUTJOY
 
 //////////////////////////////////////////////
 // Main Events

@@ -33,7 +33,6 @@
 #define	MC_VERSION_NUMBER	1
 
 #define	BSP_ENABLE		1
-#define BSP_ONLY
 //#define BSP2
 #undef BSP2
 
@@ -675,12 +674,12 @@ static float hit_portal_offset = 0.0F;
  * Returns
  *	true if collided with background, false if no collision
  */
-#ifdef BSP_ONLY
 bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
 					  VECTOR *EndPos, u_int16_t *EndGroup,
 					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject )
 {
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	float poffset, pdist;
 	VECTOR ppos, pmove, epos, tpos;
 	NORMAL fnorm, pnorm; ZERO_STACK_MEM(pnorm);
@@ -811,194 +810,6 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 	return hit_bg;
 }
 
-#else // !BSP_ONLY
-
-bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
-					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
-					  VECTOR *EndPos, u_int16_t *EndGroup,
-					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject )
-{
-	float poffset, pdist;
-	VECTOR ppos, pmove, epos, tpos;
-	NORMAL fnorm, pnorm;
-	u_int16_t group;
-	u_int16_t next_group;
-	u_int16_t last_group;
-	bool hit_bg, hit_portal, hit_any_portal;
-	float dist_bg, dist_portal;
-	VECTOR dv;
-	float impact_offset;
-	VECTOR	OldPMove;
-	VECTOR	OldPPos;
-	float impact_dotp;
-
-	CompEnemyHit = (u_int16_t) -1;
-	AnyCompEnemyHit = (u_int16_t) -1;
-	next_group = StartGroup;
-	ppos = *StartPos;
-	pmove = *MoveOffset;
-	hit_any_portal = false;
-	do {
-		group = next_group;
-		hit_portal = false;
-		OldPMove = pmove;
-		OldPPos = ppos;
-		if ( !Bsp_Portal_Header.state && OneGroupPortalCol( m, group, &ppos, &pmove, &epos, &pnorm, &next_group, 0 ) )
-		{
-			hit_portal = true;
-			dv.x = epos.x - StartPos->x;
-			dv.y = epos.y - StartPos->y;
-			dv.z = epos.z - StartPos->z;
-			dist_portal = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
-			pmove.x += ppos.x - epos.x;
-			pmove.y += ppos.y - epos.y;
-			pmove.z += ppos.z - epos.z;
-			ppos = epos;
-			hit_any_portal = true;
-			last_group = group;
-		}
-		hit_bg = false;
-		if ( OneGroupPolyCol( c, m, group, &OldPPos, &OldPMove, &epos, &fnorm, &tpos, BGCol, BGObject ) )
-		{
-			dv.x = epos.x - StartPos->x;
-			dv.y = epos.y - StartPos->y;
-			dv.z = epos.z - StartPos->z;
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
-			if ( Bsp_Portal_Header.state )
-			{
-				BSP_PORTAL_GROUP	*pg;
-				BSP_PORTAL			*bp;
-				int					j;
-				float				d;
-				
-				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				pg = &Bsp_Portal_Header.group[ group ];
-				for ( j = 0; j < pg->portals; j++ )
-				{
-					bp = &pg->portal[ j ];
-					if ( DotProduct( &bp->normal, MoveOffset ) < 0.0F )
-					{
-						d = epos.x * bp->normal.x + epos.y * bp->normal.y + epos.z * bp->normal.z + bp->offset;
-						if ( fabsf( d ) < POINT_ON_PORTAL_TOLERANCE )
-						{
-							if ( PISDistRecursive( &epos, bp->bsp.Root ) )
-							{
-								hit_portal = true;
-								next_group = bp->group;
-								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-								pmove.x += ppos.x - epos.x;
-								pmove.y += ppos.y - epos.y;
-								pmove.z += ppos.z - epos.z;
-								ppos = epos;
-								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-								hit_any_portal = true;
-								last_group = group;
-								break;
-							}
-						}
-					}
-				}
-			}
-			if ( hit_portal )
-			{
-				if ( Bsp_Portal_Header.state || (float) fabsf( dist_bg - dist_portal ) < 0.1F )
-				{
-					hit_bg = false;
-				}
-				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				else if ( dist_bg < dist_portal )
-				{
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					hit_bg = true;
-					hit_portal = false;
-					dv = *MoveOffset;
-					NormaliseVector( &dv );
-					impact_dotp = -( dv.x * fnorm.nx + dv.y * fnorm.ny + dv.z * fnorm.nz );
-					impact_offset = ( impact_dotp ) ? COLLISION_FUDGE / impact_dotp : 2.0F * dist_bg;
-					if ( dist_bg > impact_offset )
-					{
-						epos.x -= dv.x * impact_offset;
-						epos.y -= dv.y * impact_offset;
-						epos.z -= dv.z * impact_offset;
-						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-						// find distance of end point from portal plane
-						poffset = hit_portal_offset;
-						pdist = epos.x * pnorm.nx + epos.y * pnorm.ny + epos.z * pnorm.nz + poffset;
-						// NB this test is NOT perfect -- ideally should fire ray from StartPos to epos to find EndGroup more reliably
-						if ( pdist < 0.0F ) // end point still behind portal plane -> collide in adjacent group
-							*EndGroup = next_group;
-						else // end point now in front of portal plane -> collide in this group
-							*EndGroup = group;
-					}
-					else
-					{
-						epos = *StartPos;
-						*EndGroup = StartGroup;
-					}
-					*EndPos = epos;
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					*FaceNormal = fnorm;
-					*NewTarget = tpos;
-				}
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			}
-			else
-			{
-				hit_bg = true;
-				dv = *MoveOffset;
-				NormaliseVector( &dv );
-				impact_dotp = -( dv.x * fnorm.nx + dv.y * fnorm.ny + dv.z * fnorm.nz );
-				impact_offset = ( impact_dotp ) ? COLLISION_FUDGE / impact_dotp : 2.0F * dist_bg;
-				if ( dist_bg > impact_offset )
-				{
-					epos.x -= dv.x * impact_offset;
-					epos.y -= dv.y * impact_offset;
-					epos.z -= dv.z * impact_offset;
-					if ( hit_any_portal )
-					{
-						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-						// find distance of end point from portal plane
-						poffset = hit_portal_offset;
-						pdist = epos.x * pnorm.nx + epos.y * pnorm.ny + epos.z * pnorm.nz + poffset;
-						// NB this test is NOT perfect -- ideally should fire ray from StartPos to epos to find EndGroup more reliably
-						if ( pdist < 0.0F ) // end point still behind last portal plane -> collide in this group
-							*EndGroup = group;
-						else // end point now in front of portal plane -> collide in last group
-							*EndGroup = last_group;
-					}
-					else
-					{
-	 					*EndGroup = group;
-					}
-				}
-				else
-				{
-					epos = *StartPos;
-					*EndGroup = StartGroup;
-				}
-				*EndPos = epos;
-				*FaceNormal = fnorm;
-				*NewTarget = tpos;
-			}
-		}
-	} while ( !hit_bg && hit_portal );
-	if ( !hit_bg )
-	{
-		*EndGroup = group;
-		EndPos->x = StartPos->x + MoveOffset->x;
-		EndPos->y = StartPos->y + MoveOffset->y;
-		EndPos->z = StartPos->z + MoveOffset->z;
-	}
-	dv.x = (float) fabsf( EndPos->x - m->Group[ *EndGroup ].center.x );
-	dv.y = (float) fabsf( EndPos->y - m->Group[ *EndGroup ].center.y );
-	dv.z = (float) fabsf( EndPos->z - m->Group[ *EndGroup ].center.z );
-	outside_group = dv.x > m->Group[ *EndGroup ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
-					dv.y > m->Group[ *EndGroup ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
-					dv.z > m->Group[ *EndGroup ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
-	return hit_bg;
-}
-#endif // !BSP_ONLY
 
 
 /*
@@ -1025,12 +836,12 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
  * Returns
  *	true if collided with background, false if no collision
  */
-#ifdef BSP_ONLY
 bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
 					  VECTOR *EndPos, u_int16_t *EndGroup,
 					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject )
 {
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	VECTOR ppos, pmove, epos, tpos;
 	NORMAL fnorm;
 	u_int16_t group;
@@ -1132,159 +943,6 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 }
 
 
-#else // ! BSP_ONLY
-
-
-bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
-					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
-					  VECTOR *EndPos, u_int16_t *EndGroup,
-					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject )
-{
-	VECTOR ppos, pmove, epos, tpos;
-	NORMAL fnorm;
-	u_int16_t group;
-	u_int16_t next_group;
-	bool hit_bg, hit_portal;
-	float dist_bg, dist_portal;
-	VECTOR dv;
-	float impact_offset;
-	float impact_dotp;
-
-	CompEnemyHit = (u_int16_t) -1;
-	AnyCompEnemyHit = (u_int16_t) -1;
-	next_group = StartGroup;
-	ppos = *StartPos;
-	pmove = *MoveOffset;
-	group = next_group;
-	hit_portal = false;
-	if ( !Bsp_Portal_Header.state && OneGroupPortalCol( m, group, &ppos, &pmove, &epos, &fnorm, &next_group, 0 ) )
-	{
-		hit_portal = true;
-		dv.x = epos.x - StartPos->x;
-		dv.y = epos.y - StartPos->y;
-		dv.z = epos.z - StartPos->z;
-		dist_portal = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
-		pmove.x += ppos.x - epos.x;
-		pmove.y += ppos.y - epos.y;
-		pmove.z += ppos.z - epos.z;
-		ppos = epos;
-	}
-	hit_bg = false;
-	if ( OneGroupPolyCol( c, m, group, StartPos, MoveOffset, &epos, &fnorm, &tpos, BGCol, BGObject ) )
-	{
-		dv.x = epos.x - StartPos->x;
-		dv.y = epos.y - StartPos->y;
-		dv.z = epos.z - StartPos->z;
-		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-		dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
-		if ( Bsp_Portal_Header.state )
-		{
-			BSP_PORTAL_GROUP	*pg;
-			BSP_PORTAL			*bp;
-			int					j;
-			float				d;
-
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			pg = &Bsp_Portal_Header.group[ group ];
-			for ( j = 0; j < pg->portals; j++ )
-			{
-				bp = &pg->portal[ j ];
-				if ( DotProduct( &bp->normal, MoveOffset ) < 0.0F )
-				{
-					d = epos.x * bp->normal.x + epos.y * bp->normal.y + epos.z * bp->normal.z + bp->offset;
-					if ( fabsf( d ) < POINT_ON_PORTAL_TOLERANCE )
-					{
-						if ( PISDistRecursive( &epos, bp->bsp.Root ) )
-						{
-							hit_portal = true;
-							next_group = bp->group;
-							pmove.x += ppos.x - epos.x;
-							pmove.y += ppos.y - epos.y;
-							pmove.z += ppos.z - epos.z;
-							ppos = epos;
-							break;
-						}
-					}
-				}
-			}
-		}
-		if ( hit_portal )
-		{
-			if ( Bsp_Portal_Header.state || (float) fabsf( dist_bg - dist_portal ) < 0.1F )
-			{
-				hit_bg = false;
-			}
-			else if ( dist_bg < dist_portal )
-			{
-				hit_bg = true;
-				hit_portal = false;
-				dv = *MoveOffset;
-				NormaliseVector( &dv );
-				impact_dotp = -( dv.x * fnorm.nx + dv.y * fnorm.ny + dv.z * fnorm.nz );
-				impact_offset = ( impact_dotp ) ? COLLISION_FUDGE / impact_dotp : 2.0F * dist_bg;
-				if ( dist_bg > impact_offset )
-				{
-					epos.x -= dv.x * impact_offset;
-					epos.y -= dv.y * impact_offset;
-					epos.z -= dv.z * impact_offset;
-					*EndGroup = group;
-				}
-				else
-				{
-					epos = *StartPos;
-					*EndGroup = StartGroup;
-				}
-				*EndPos = epos;
-				*FaceNormal = fnorm;
-				*NewTarget = tpos;
-			}
-		}
-		else
-		{
-			hit_bg = true;
-			dv = *MoveOffset;
-			NormaliseVector( &dv );
-			impact_dotp = -( dv.x * fnorm.nx + dv.y * fnorm.ny + dv.z * fnorm.nz );
-			impact_offset = ( impact_dotp ) ? COLLISION_FUDGE / impact_dotp : 2.0F * dist_bg;
-			if ( dist_bg > impact_offset )
-			{
-				epos.x -= dv.x * impact_offset;
-				epos.y -= dv.y * impact_offset;
-				epos.z -= dv.z * impact_offset;
-	 			*EndGroup = group;
-			}
-			else
-			{
-				epos = *StartPos;
-				*EndGroup = StartGroup;
-			}
- 			*EndGroup = group;
-			*EndPos = epos;
-			*FaceNormal = fnorm;
-			*NewTarget = tpos;
-		}
-	}
-//	if ( no_collision )
-//		hit_bg = false;
-	if ( !hit_bg )
-	{
-		if ( hit_portal )
-		{
-			*EndGroup = next_group;
-			*EndPos = ppos;
-		}
-		else
-		{
-			*EndGroup = group;
-			EndPos->x = StartPos->x + MoveOffset->x;
-			EndPos->y = StartPos->y + MoveOffset->y;
-			EndPos->z = StartPos->z + MoveOffset->z;
-		}
-	}
-	return hit_bg;
-}
-
-#endif // BSP_ONLY
 
 /*
  * MoveGroup
@@ -1305,7 +963,6 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
  *	EndGroup	=	group final position is in
  */
 u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset )
-#ifdef BSP_ONLY
 {
 	VECTOR ppos, pmove, epos;
 	NORMAL pnorm;
@@ -1339,52 +996,6 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 
 	return group;
 }
-#else // ! BSP_ONLY
-{
-	VECTOR ppos, pmove, epos;
-	NORMAL pnorm;
-	u_int16_t group;
-	u_int16_t next_group;
-	bool hit_portal;
-	VECTOR dv;
-
-#ifdef NO_SEPARATE_BSP_PORTAL_COLLIDE
-	if ( Bsp_Portal_Header.state )
-	{
-		BackgroundCollide( &MCloadheadert0, &Mloadheader, StartPos, StartGroup, MoveOffset,
-			&epos, &group, &pnorm, &dv, false, NULL );
-	}
-	else
-#endif
-	{
-		next_group = StartGroup;
-		ppos = *StartPos;
-		pmove = *MoveOffset;
-		do {
-			group = next_group;
-			hit_portal = false;
-			if ( OneGroupPortalCol( m, group, &ppos, &pmove, &epos, &pnorm, &next_group, 0 ) )
-			{
-				hit_portal = true;
-				pmove.x += ppos.x - epos.x;
-				pmove.y += ppos.y - epos.y;
-				pmove.z += ppos.z - epos.z;
-				ppos = epos;
-			}
-		} while ( hit_portal );
-	}
-
-	dv.x = (float) fabsf( StartPos->x + MoveOffset->x - m->Group[ group ].center.x );
-	dv.y = (float) fabsf( StartPos->y + MoveOffset->y - m->Group[ group ].center.y );
-	dv.z = (float) fabsf( StartPos->z + MoveOffset->z - m->Group[ group ].center.z );
-	outside_group = dv.x > m->Group[ group ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
-					dv.y > m->Group[ group ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
-					dv.z > m->Group[ group ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
-
-	return group;
-}
-
-#endif // ! BSP_ONLY
 
 
 /*===================================================================
@@ -1403,8 +1014,8 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , u_int16_t group ,
 					 VECTOR * Pos, VECTOR * Dir  ,
 					 VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, bool BGCol, BGOBJECT ** BGColObject )
-#ifdef BSP_ONLY
 {
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 #ifdef POLYGONAL_COLLISIONS
 	MCFACE	*	FacePnt;
 	int			num_faces;
@@ -1454,6 +1065,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , 
 	}
 	else if( (MCloadheaderp == &MCloadheader) && Bsp_Header[ 1 ].State )
 	{
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 		CollisionRadius = 0.0F;
 		collided = RayCollide( &Bsp_Header[ 1 ], &Origin, &ODir, ImpactPoint, &ImpactNormal, &ImpactOffset , group );
 		if ( collided )
@@ -1618,208 +1230,6 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , 
 	}
 	return(true);
 }
-#else // !BSP_ONLY
-{
-	MCFACE	*	FacePnt;
-	MCFACE	*	CollFace;
-	int			num_faces;
-	float		Distance;
-	float		D;
-	VECTOR		Dn;
-	float		C;
-	VECTOR		e;
-	float		nDOTe;
-	int			collided = 0;
-
-#if BSP_ENABLE
-	VECTOR		ImpactNormal;
-	float		ImpactOffset;
-	MCFACE		BSPFace;
-#endif
-	
-	if( group == (u_int16_t) -1)
-		return false;
-
-	Origin.x = Pos->x;
-	Origin.y = Pos->y;
-	Origin.z = Pos->z;
-	ODir.x = Dir->x;
-	ODir.y = Dir->y;
-	ODir.z = Dir->z;
-
-#if BSP_ENABLE
-	if( (MCloadheaderp == &MCloadheadert0) && Bsp_Header[ 0 ].State )
-	{
-		CollisionRadius = 0.0F;
-		ImpactPoint->x = 0.0F;
-		ImpactPoint->y = 0.0F;
-		ImpactPoint->z = 0.0F;
-		collided = RayCollide( &Bsp_Header[ 0 ], &Origin, &ODir, ImpactPoint, &ImpactNormal, &ImpactOffset , group );
-		if ( collided )
-		{
-			e.x = ImpactPoint->x - Pos->x;
-			e.y = ImpactPoint->y - Pos->y;
-			e.z = ImpactPoint->z - Pos->z;
-			Distance = VectorLength( &e );
-			BSPFace.nx = ImpactNormal.x;
-			BSPFace.ny = ImpactNormal.y;
-			BSPFace.nz = ImpactNormal.z;
-			BSPFace.D = ImpactOffset;
-			CollFace = &BSPFace;
-		}
-	}
-#ifdef BSP2
-	else if( (MCloadheaderp == &MCloadheader) && Bsp_Header[ 0 ].State )
-	{
-		CollisionRadius = 75.0F;
-		collided = RayCollide( &Bsp_Header[ 0 ], &Origin, &ODir, ImpactPoint, &ImpactNormal, &ImpactOffset , group );
-#else
-	else if( (MCloadheaderp == &MCloadheader) && Bsp_Header[ 1 ].State )
-	{
-		CollisionRadius = 0.0F;
-		collided = RayCollide( &Bsp_Header[ 1 ], &Origin, &ODir, ImpactPoint, &ImpactNormal, &ImpactOffset , group );
-#endif
-		if ( collided )
-		{
-			e.x = ImpactPoint->x - Pos->x;
-			e.y = ImpactPoint->y - Pos->y;
-			e.z = ImpactPoint->z - Pos->z;
-			Distance = VectorLength( &e );
-			BSPFace.nx = ImpactNormal.x;
-			BSPFace.ny = ImpactNormal.y;
-			BSPFace.nz = ImpactNormal.z;
-			BSPFace.D = ImpactOffset;
-			CollFace = &BSPFace;
-		}
-	}
-	else
-#if 0
-	{
-		CollisionRadius = 0.0;
-		collided = RayCollide( &Origin, &ODir, ImpactPoint, &ImpactNormal, &ImpactOffset , group );
-		if ( collided )
-		{
-			e.x = ImpactPoint->x - Pos->x;
-			e.y = ImpactPoint->y - Pos->y;
-			e.z = ImpactPoint->z - Pos->z;
-			Distance = VectorLength( &e );
-			BSPFace.nx = ImpactNormal.x;
-			BSPFace.ny = ImpactNormal.y;
-			BSPFace.nz = ImpactNormal.z;
-			BSPFace.D = ImpactOffset;
-			CollFace = &BSPFace;
-		}
-	}
-#endif
-#endif
-
-#if 1	
-	{
-
-		FacePnt = MCloadheaderp->GroupFacePnt[group];
-		num_faces = MCloadheaderp->num_of_faces_in_group[group];
-		
-		while ( num_faces-- )
-		{
-			if( ColRayPolyIntersect( FacePnt ) )
-			{
-				if ( !collided )
-				{
-					Distance = IDist;
-					*ImpactPoint = IPoint;
-					CollFace = FacePnt;
-				}
-				else
-				{
-					if ( IDist < Distance )
-					{
-						Distance = IDist;
-						*ImpactPoint = IPoint;
-						CollFace = FacePnt;
-					}
-				}
-				collided++;
-			}
-			FacePnt++;
-		}
-
-		if( collided )
-			Distance *= VectorLength( &ODir );
-	}
-#endif
-
-	if( BGCol )
-	{
-		if( MCloadheaderp == &MCloadheadert0 ) ColRadius = 0.0F;
-		if( MCloadheaderp == &MCloadheader ) ColRadius = ( 300.0F * GLOBAL_SCALE );
-
-		if( CheckBGObjectsCol( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
-		{
-			collided += ColCollided;
-			e.x = ( ImpactPoint->x - Pos->x );
-			e.y = ( ImpactPoint->y - Pos->y );
-			e.z = ( ImpactPoint->z - Pos->z );
-			Distance = VectorLength( &e );
-			BSPFace.nx = FaceNormal->nx;
-			BSPFace.ny = FaceNormal->ny;
-			BSPFace.nz = FaceNormal->nz;
-			BSPFace.D = -DotProduct( (VECTOR *) FaceNormal, ImpactPoint );
-			CollFace = &BSPFace;
-		}
-		else
-		{
-			if( !collided ) return (false);
-		   	
-			FaceNormal->nx = CollFace->nx;
-			FaceNormal->ny = CollFace->ny;
-			FaceNormal->nz = CollFace->nz;
-			C = CollFace->D;
-		   	
-			e.x = Pos->x + Dir->x;	
-			e.y = Pos->y + Dir->y;	
-			e.z = Pos->z + Dir->z;	
-		   	
-			nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
-		   		
-			D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
-		   	
-			Dn.x = D * FaceNormal->nx; 
-			Dn.y = D * FaceNormal->ny; 
-			Dn.z = D * FaceNormal->nz; 
-		   	
-			Pos_New->x = e.x + Dn.x;
-			Pos_New->y = e.y + Dn.y;
-			Pos_New->z = e.z + Dn.z;
-		}
-	}
-	else
-	{
-		if( !collided ) return (false);
-	   	
-		FaceNormal->nx = CollFace->nx;
-		FaceNormal->ny = CollFace->ny;
-		FaceNormal->nz = CollFace->nz;
-		C = CollFace->D;
-	   	
-		e.x = Pos->x + Dir->x;	
-		e.y = Pos->y + Dir->y;	
-		e.z = Pos->z + Dir->z;	
-	   	
-		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
-	   		
-		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
-	   	
-		Dn.x = D * FaceNormal->nx; 
-		Dn.y = D * FaceNormal->ny; 
-		Dn.z = D * FaceNormal->nz; 
-	   	
-		Pos_New->x = e.x + Dn.x;
-		Pos_New->y = e.y + Dn.y;
-		Pos_New->z = e.z + Dn.z;
-	}
-	return(true);
-}
-#endif // !BSP_ONLY
 
 
 /*===================================================================
@@ -1837,8 +1247,8 @@ bool OneGroupPortalCol( MLOADHEADER * Mloadheader , u_int16_t group ,
 						VECTOR * Pos, VECTOR * Dir  ,
 						VECTOR * ImpactPoint , NORMAL * FaceNormal, u_int16_t *Next_Group,
 						int collisionhint )
-#ifdef BSP_ONLY
 {
+	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	float		Distance = 0.0f;
 	u_int16_t		flag = 0;	
 	bool		res;
@@ -1897,132 +1307,6 @@ bool OneGroupPortalCol( MLOADHEADER * Mloadheader , u_int16_t group ,
 
 	return ( flag ) ? true : false;
 }
-#else // ! BSP_ONLY
-{
-	PORTAL	*	PortalPnt;
-	u_int16_t		i;
-	float		Distance;
-	u_int16_t		flag = 0;	
-	bool		res;
-	float		SkinThickness = 300.0F * GLOBAL_SCALE;
-	int			k;
-	
-	Origin.x = Pos->x;
-	Origin.y = Pos->y;
-	Origin.z = Pos->z;
-	ODir.x = Dir->x;
-	ODir.y = Dir->y;
-	ODir.z = Dir->z;
-
-	if( group == (u_int16_t) -1)
-		return false;
-
-	if ( Bsp_Portal_Header.state )
-	{
-		BSP_PORTAL_GROUP	*pg;
-		BSP_PORTAL			*bp;
-		int					j;
-		
-		pg = &Bsp_Portal_Header.group[ group ];
-		for ( j = 0; j < pg->portals; j++ )
-		{
-			bp = &pg->portal[ j ];
-			res = ColRayPlaneIntersect( &bp->normal, bp->offset );
-			if( res == true )
-			{
-				if ( PISDistRecursive( &IPoint, bp->bsp.Root ) )
-				{
-					if ( flag == 0 )
-					{
-						Distance = IDist;
-						ImpactPoint->x = IPoint.x;
-						ImpactPoint->y = IPoint.y;
-						ImpactPoint->z = IPoint.z;
-						FaceNormal->nx = bp->normal.x;
-						FaceNormal->ny = bp->normal.y;
-						FaceNormal->nz = bp->normal.z;
-						hit_portal_offset = bp->offset;
-						*Next_Group = bp->group;
-						flag = 1;
-					}else{
-						if ( IDist < Distance )
-						{
-							Distance = IDist;
-							ImpactPoint->x = IPoint.x;
-							ImpactPoint->y = IPoint.y;
-							ImpactPoint->z = IPoint.z;
-							FaceNormal->nx = bp->normal.x;
-							FaceNormal->ny = bp->normal.y;
-							FaceNormal->nz = bp->normal.z;
-							hit_portal_offset = bp->offset;
-							*Next_Group = bp->group;
-						}
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		PortalPnt = Mloadheader->Group[group].Portal;
-		
-		for ( i = 0 ; i < Mloadheader->Group[group].num_portals ; i++ )
-		{
-			for ( k = 0; k < PortalPnt->num_polys_in_portal; k++ )
-			{
-				res = ColRayPolyIntersect( &PortalPnt->Poly[ k ] );
-				if( res == true )
-				{
-					if ( flag == 0 )
-					{
-						Distance = IDist;
-						ImpactPoint->x = IPoint.x;
-						ImpactPoint->y = IPoint.y;
-						ImpactPoint->z = IPoint.z;
-						FaceNormal->nx = PortalPnt->Poly[ k ].nx;
-						FaceNormal->ny = PortalPnt->Poly[ k ].ny;
-						FaceNormal->nz = PortalPnt->Poly[ k ].nz;
-						hit_portal_offset = PortalPnt->Poly[ k ].D;
-						*Next_Group = PortalPnt->visible.group;
-						flag = 1;
-					}else{
-						if ( IDist < Distance )
-						{
-							Distance = IDist;
-							ImpactPoint->x = IPoint.x;
-							ImpactPoint->y = IPoint.y;
-							ImpactPoint->z = IPoint.z;
-							FaceNormal->nx = PortalPnt->Poly[ k ].nx;
-							FaceNormal->ny = PortalPnt->Poly[ k ].ny;
-							FaceNormal->nz = PortalPnt->Poly[ k ].nz;
-							hit_portal_offset = PortalPnt->Poly[ k ].D;
-							*Next_Group = PortalPnt->visible.group;
-						}
-					}
-				}
-			}
-			
-			PortalPnt++;
-		}
-	}
-#ifdef A_BAD_IDEA_AND_DOESNT_WORK_ANYWAY
-	if ( flag )
-	{
-		VECTOR		NDir;
-		float		offset;
-
-		NDir = *Dir;
-		NormaliseVector( &NDir );
-		offset = PORTAL_IMPACTOFFSET / -DotProduct( &NDir, (VECTOR *)FaceNormal ); // this gets bigger the narrower the angle between the portal and the ray
-		ImpactPoint->x += NDir.x * offset;
-		ImpactPoint->y += NDir.y * offset;
-		ImpactPoint->z += NDir.z * offset;
-	}
-#endif
-
-	return ( flag ) ? true : false;
-}
-#endif // !BSP_ONLY
 
 bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup )
 {

@@ -17,7 +17,6 @@
 #define BSP_VERSION_NUMBER	(1)
 #define BSP_PORTAL_VERSION_NUMBER	(1)
 
-#define BSP_ONLY
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -342,12 +341,8 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 #ifdef __3DS__
 	{ extern void trace(const char*); trace("Bspload: -> BSP_LoadPortals"); }
 #endif
-#ifdef BSP_ONLY
 	if ( !BSP_LoadPortals( Filename ) )
 		return false;
-#else
-	BSP_LoadPortals( Filename );
-#endif
 #ifdef __3DS__
 	{ extern void trace(const char*); trace("Bspload: success"); }
 #endif

@@ -83,17 +83,6 @@ extern  int FontHeight;
 #define KEY_PRESSED( K )    ( !( key_state[ old_input ][ K ] ) && ( key_state[ new_input ][ K ] ) )
 #define KEY_RELEASED( K )   ( ( key_state[ old_input ][ K ] ) && !( key_state[ new_input ][ K ] ) )
 
-#ifdef DINPUTJOY
-
-#define JOYSTICK_BUTTON_HELD( J, B )    ( js[ new_input ][ J ].rgbButtons[ B ] & 0x80 )
-#define JOYSTICK_BUTTON_PRESSED( J, B )   ( !( js[ old_input ][ J ].rgbButtons[ B ] & 0x80) && ( js[ new_input ][ J ].rgbButtons[ B ] & 0x80 ) )
-#define JOYSTICK_BUTTON_RELEASED( J, B )  ( ( js[ old_input ][ J ].rgbButtons[ B ] & 0x80) && !( js[ new_input ][ J ].rgbButtons[ B ] & 0x80 ) )
-
-#define JOYSTICK_POV_HELD( J, P, D )    ( js_pov[ new_input ][ J ][ P ][ D ] & 0x80 )
-#define JOYSTICK_POV_PRESSED( J, P, D )   ( !( js_pov[ old_input ][ J ][ P ][ D ] & 0x80 ) && ( js_pov[ new_input ][ J ][ P ][ D ] & 0x80 ) )
-#define JOYSTICK_POV_RELEASED( J, P, D )  ( ( js_pov[ old_input ][ J ][ P ][ D ] & 0x80 ) && !( js_pov[ new_input ][ J ][ P ][ D ] & 0x80 ) )
-
-#else // ! DINPUTJOY
 
 #define JOYSTICK_BUTTON_HELD( J, B )    ( js_buttons[ new_input ][ J ][ B ] )
 #define JOYSTICK_BUTTON_PRESSED( J, B )   ( !( js_buttons[ old_input ][ J ][ B ]) && ( js_buttons[ new_input ][ J ][ B ] ) )
@@ -103,7 +92,6 @@ extern  int FontHeight;
 #define JOYSTICK_POV_PRESSED( J, P, D )   ( !( js_pov[ old_input ][ J ][ P ][ D ] ) && ( js_pov[ new_input ][ J ][ P ][ D ] ) )
 #define JOYSTICK_POV_RELEASED( J, P, D )  ( ( js_pov[ old_input ][ J ][ P ][ D ] ) && !( js_pov[ new_input ][ J ][ P ][ D ] ) )
 
-#endif
 
 int GetPOVMask( DWORD pov );
 
@@ -112,15 +100,8 @@ bool CheatsEnabled = false;
 #define TOTAL_JOYSTICK_ACTIONS  140 // 5 axis positions, 3 axis rotations, 4 POV hats and 128 buttons!
 #define TOTAL_JOYSTICK_AXIS   8 // 5 axis positions, 3 axis rotations
 
-#ifdef DINPUTJOY
-DIJOYSTATE2 js[ INPUT_BUFFERS ][ MAX_JOYSTICKS ];
-#else
 int js_buttons[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
-#endif
 
-#ifdef DINPUTJOY
-extern LPDIRECTINPUTDEVICE2 lpdiJoystick[MAX_JOYSTICKS];
-#endif
 
 extern MENU MENU_QuickTextSend;
 extern MENU MENU_QuickTextSendWhisper;
@@ -131,11 +112,7 @@ int new_input = 1;
 
 bool joystick_poll( int joysticknum );
 
-#ifdef DINPUTJOY
-BYTE 
-#else
 u_int8_t
-#endif
 js_pov[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ];
 
 // (Sfx.c)
@@ -350,10 +327,6 @@ int ShipAxisLookup[NUM_SHIP_AXIS_ACTIONS] = { SHIPACTION_Nothing, SHIPACTION_Rot
 
 char *JoystickPOVDirections[MAX_POV_DIRECTIONS] = { "Up", "Down", "Left", "Right" };
 
-#ifdef DINPUTJOY
-HRESULT SetDIDwordProperty(LPDIRECTINPUTDEVICE2 pdev, REFGUID guidProperty,
-                   DWORD dwObject, DWORD dwHow, DWORD dwValue);
-#endif
 
 // this function receives higher level encoded bits
 
@@ -674,13 +647,8 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 // TODO
 // win32 appear to return greator values even in some resolution
 // we should also configure a fine control setting for the mouse to turn on/off the fabsf() trick
-#ifdef WIN32
-	mouse_dx = mouse_dx * (float) fabsf( mouse_dx ) * MouseXFactor; // factor = 0.000625
-	mouse_dy = mouse_dy * (float) fabsf( mouse_dy ) * MouseYFactor; // factor = -0.000625
-#else
 	mouse_dx = mouse_dx * (float) fabsf( mouse_dx ) * 0.01f; // tweaked for linux
 	mouse_dy = mouse_dy * (float) fabsf( mouse_dy ) * -0.01f;
-#endif
 
 #if 0
   if ( mouse_dx < -framelag )
@@ -1101,419 +1069,6 @@ void DoShipAction( SHIPCONTROL *ctrl, int Action, float amount )
 }
 
 // this function doesn't really do anything important needed to port
-#ifdef DINPUTJOY
-HRESULT SetDIDwordProperty(LPDIRECTINPUTDEVICE2 pdev, REFGUID guidProperty,
-                   DWORD dwObject, DWORD dwHow, DWORD dwValue)
-{
-   DIPROPDWORD dipdw;
-
-   dipdw.diph.dwSize       = sizeof(dipdw);
-   dipdw.diph.dwHeaderSize = sizeof(dipdw.diph);
-   dipdw.diph.dwObj        = dwObject;
-   dipdw.diph.dwHow        = dwHow;
-   dipdw.dwData            = dwValue;
-
-   return pdev->lpVtbl->SetProperty(pdev, guidProperty, &dipdw.diph);
-
-}
-
-// this function sets the input range to -100 <-> +100 (we already do that in sdl)
-// it also sets the dead zone which we do not support in sdl yet.. probably easy to do though...
-void SetUpJoystickAxis(int joystick)
-{
-  DIPROPRANGE diprg;
-  bool DeadzoneNotSet = false;
-  int i;
-  
-  // set axis range to (-100 ... +100)
-  // This lets us test against 0 to see which way the stick is pointed.
-  diprg.diph.dwSize       = sizeof(diprg);
-  diprg.diph.dwHeaderSize = sizeof(diprg.diph);
-  diprg.diph.dwHow        = DIPH_BYOFFSET;
-  diprg.lMin              = -100;
-  diprg.lMax              = +100;
-      
-  DebugPrintf( "SetUpJoystickAxis: setting up %d axes for joystick #%d='%s'\n",
-    JoystickInfo[ joystick ].NumAxis,
-    joystick,
-    JoystickInfo[ joystick ].Name );
-  if (JoystickInfo[joystick].Axis[AXIS_XAxis].exists)
-  {
-    DebugPrintf( "SetUpJoystickAxis: setting up X axis range=(%d,%d) for joystick #%d='%s'\n",
-      diprg.lMin, diprg.lMax,
-      joystick,
-      JoystickInfo[ joystick ].Name );
-    diprg.diph.dwObj        = DIJOFS_X;
-    if( !lpdiJoystick[joystick] )
-	{
-      JoystickInfo[joystick].Axis[AXIS_XAxis].exists = false; // cannot set range, therefore do not allow axis
-      DebugPrintf( "SetUpJoystickAxis: failed to set range for X axis because lpdiJoystick[joystick] is NULL\n" );
-	}
-	else if ( lpdiJoystick[joystick]->lpVtbl->SetProperty(lpdiJoystick[joystick], DIPROP_RANGE, &diprg.diph) != DI_OK)
-    {
-      JoystickInfo[joystick].Axis[AXIS_XAxis].exists = false; // cannot set range, therefore do not allow axis
-      DebugPrintf( "SetUpJoystickAxis: failed to set range for X axis\n" );
-    }
-	else
-    {
-      // set  dead zone
-      // Units are ten thousandths, so multiply %age by 100.
-      DebugPrintf( "SetUpJoystickAxis: setting up X axis deadzone=%d for joystick #%d='%s'\n",
-        JoystickInfo[ joystick ].Axis[AXIS_XAxis].deadzone,
-        joystick,
-        JoystickInfo[ joystick ].Name );
-      if (SetDIDwordProperty(lpdiJoystick[joystick], DIPROP_DEADZONE, DIJOFS_X, DIPH_BYOFFSET, (DWORD)(JoystickInfo[joystick].Axis[AXIS_XAxis].deadzone * 100)) != DI_OK)
-      {
-        // cannot set deadzone - but just ignore for now...
-        DeadzoneNotSet = true;
-        DebugPrintf( "SetUpJoystickAxis: failed to set deadzone for X axis\n" );
-      }
-    }
-  }
-  if (JoystickInfo[joystick].Axis[AXIS_YAxis].exists)
-  {
-    DebugPrintf( "SetUpJoystickAxis: setting up Y axis range=(%d,%d) for joystick #%d='%s'\n",
-      diprg.lMin, diprg.lMax,
-      joystick,
-      JoystickInfo[ joystick ].Name );
-    diprg.diph.dwObj        = DIJOFS_Y;
-    if(lpdiJoystick[joystick]->lpVtbl->SetProperty(lpdiJoystick[joystick], DIPROP_RANGE, &diprg.diph) != DI_OK)
-    {
-      JoystickInfo[joystick].Axis[AXIS_YAxis].exists = false; // cannot set range, therefore do not allow axis
-      DebugPrintf( "SetUpJoystickAxis: failed to set range for Y axis\n" );
-    }else
-    {
-      DebugPrintf( "SetUpJoystickAxis: setting up Y axis deadzone=%d for joystick #%d='%s'\n",
-        JoystickInfo[ joystick ].Axis[AXIS_YAxis].deadzone,
-        joystick,
-        JoystickInfo[ joystick ].Name );
-      if (SetDIDwordProperty(lpdiJoystick[joystick], DIPROP_DEADZONE, DIJOFS_Y, DIPH_BYOFFSET, (DWORD)(JoystickInfo[joystick].Axis[AXIS_YAxis].deadzone * 100)) != DI_OK)
-      {
-        // cannot set deadzone - but just ignore for now...
-        DeadzoneNotSet = true;
-        DebugPrintf( "SetUpJoystickAxis: failed to set deadzone for Y axis\n" );
-      }
-    }
-  }
-  if (JoystickInfo[joystick].Axis[AXIS_ZAxis].exists)
-  {
-    DebugPrintf( "SetUpJoystickAxis: setting up Z axis range=(%d,%d) for joystick #%d='%s'\n",
-      diprg.lMin, diprg.lMax,
-      joystick,
-      JoystickInfo[ joystick ].Name );
-    diprg.diph.dwObj        = DIJOFS_Z;
-    if(lpdiJoystick[joystick]->lpVtbl->SetProperty(lpdiJoystick[joystick], DIPROP_RANGE, &diprg.diph) != DI_OK)
-    {
-      JoystickInfo[joystick].Axis[AXIS_ZAxis].exists = false; // cannot set range, therefore do not allow axis
-      DebugPrintf( "SetUpJoystickAxis: failed to set range for Z axis\n" );
-    }else
-    {
-      DebugPrintf( "SetUpJoystickAxis: setting up Z axis deadzone=%d for joystick #%d='%s'\n",
-        JoystickInfo[ joystick ].Axis[AXIS_ZAxis].deadzone,
-        joystick,
-        JoystickInfo[ joystick ].Name );
-      if (SetDIDwordProperty(lpdiJoystick[joystick], DIPROP_DEADZONE, DIJOFS_Z, DIPH_BYOFFSET, (DWORD)(JoystickInfo[joystick].Axis[AXIS_ZAxis].deadzone * 100)) != DI_OK)
-      {
-        // cannot set deadzone - but just ignore for now...
-        DeadzoneNotSet = true;
-        DebugPrintf( "SetUpJoystickAxis: failed to set deadzone for Z axis\n" );
-      }
-    }
-  }
-  if (JoystickInfo[joystick].Axis[AXIS_RxAxis].exists)
-  {
-    DebugPrintf( "SetUpJoystickAxis: setting up Rx axis range=(%d,%d) for joystick #%d='%s'\n",
-      diprg.lMin, diprg.lMax,
-      joystick,
-      JoystickInfo[ joystick ].Name );
-    diprg.diph.dwObj        = DIJOFS_RX;
-    if(lpdiJoystick[joystick]->lpVtbl->SetProperty(lpdiJoystick[joystick], DIPROP_RANGE, &diprg.diph) != DI_OK)
-    {
-      JoystickInfo[joystick].Axis[AXIS_RxAxis].exists = false;  // cannot set range, therefore do not allow axis
-      DebugPrintf( "SetUpJoystickAxis: failed to set range for Rx axis\n" );
-    }else
-    {
-      DebugPrintf( "SetUpJoystickAxis: setting up Rx axis deadzone=%d for joystick #%d='%s'\n",
-        JoystickInfo[ joystick ].Axis[AXIS_RxAxis].deadzone,
-        joystick,
-        JoystickInfo[ joystick ].Name );
-      if (SetDIDwordProperty(lpdiJoystick[joystick], DIPROP_DEADZONE, DIJOFS_RX, DIPH_BYOFFSET, (DWORD)(JoystickInfo[joystick].Axis[AXIS_RxAxis].deadzone * 100)) != DI_OK)
-      {
-        // cannot set deadzone - but just ignore for now...
-        DeadzoneNotSet = true;
-        DebugPrintf( "SetUpJoystickAxis: failed to set deadzone for Rx axis\n" );
-      }
-    }
-  }
-  if (JoystickInfo[joystick].Axis[AXIS_RyAxis].exists)
-  {
-    DebugPrintf( "SetUpJoystickAxis: setting up Ry axis range=(%d,%d) for joystick #%d='%s'\n",
-      diprg.lMin, diprg.lMax,
-      joystick,
-      JoystickInfo[ joystick ].Name );
-    diprg.diph.dwObj        = DIJOFS_RY;
-    if(lpdiJoystick[joystick]->lpVtbl->SetProperty(lpdiJoystick[joystick], DIPROP_RANGE, &diprg.diph) != DI_OK)
-    {
-      JoystickInfo[joystick].Axis[AXIS_RyAxis].exists = false;  // cannot set range, therefore do not allow axis
-      DebugPrintf( "SetUpJoystickAxis: failed to set range for Ry axis\n" );
-    }else
-    {
-      DebugPrintf( "SetUpJoystickAxis: setting up Ry axis deadzone=%d for joystick #%d='%s'\n",
-        JoystickInfo[ joystick ].Axis[AXIS_RyAxis].deadzone,
-        joystick,
-        JoystickInfo[ joystick ].Name );
-      if (SetDIDwordProperty(lpdiJoystick[joystick], DIPROP_DEADZONE, DIJOFS_RY, DIPH_BYOFFSET, (DWORD)(JoystickInfo[joystick].Axis[AXIS_RyAxis].deadzone * 100)) != DI_OK)
-      {
-        // cannot set deadzone - but just ignore for now...
-        DeadzoneNotSet = true;
-        DebugPrintf( "SetUpJoystickAxis: failed to set deadzone for Ry axis\n" );
-      }
-    }
-  }
-  if (JoystickInfo[joystick].Axis[AXIS_RzAxis].exists)
-  {
-    DebugPrintf( "SetUpJoystickAxis: setting up Rz axis range=(%d,%d) for joystick #%d='%s'\n",
-      diprg.lMin, diprg.lMax,
-      joystick,
-      JoystickInfo[ joystick ].Name );
-    diprg.diph.dwObj        = DIJOFS_RZ;
-    if(lpdiJoystick[joystick]->lpVtbl->SetProperty(lpdiJoystick[joystick], DIPROP_RANGE, &diprg.diph) != DI_OK)
-    {
-      JoystickInfo[joystick].Axis[AXIS_RzAxis].exists = false;  // cannot set range, therefore do not allow axis
-      DebugPrintf( "SetUpJoystickAxis: failed to set range for Rz axis\n" );
-    }else
-    {
-      DebugPrintf( "SetUpJoystickAxis: setting up Rz axis deadzone=%d for joystick #%d='%s'\n",
-        JoystickInfo[ joystick ].Axis[AXIS_RzAxis].deadzone,
-        joystick,
-        JoystickInfo[ joystick ].Name );
-      if (SetDIDwordProperty(lpdiJoystick[joystick], DIPROP_DEADZONE, DIJOFS_RZ, DIPH_BYOFFSET, (DWORD)(JoystickInfo[joystick].Axis[AXIS_RzAxis].deadzone * 100)) != DI_OK)
-      {
-        // cannot set deadzone - but just ignore for now...
-        DeadzoneNotSet = true;
-        DebugPrintf( "SetUpJoystickAxis: failed to set deadzone for Rz axis\n" );
-      }
-    }
-  }
-  for (i = 0; i < 2; i++)
-  {
-    if (JoystickInfo[joystick].Axis[AXIS_SliderAxis0 + i].exists)
-    {
-      DebugPrintf( "SetUpJoystickAxis: setting up Slider%d range=(%d,%d) for joystick #%d='%s'\n",
-        i,
-        diprg.lMin, diprg.lMax,
-        joystick,
-        JoystickInfo[ joystick ].Name );
-      diprg.diph.dwObj        = DIJOFS_SLIDER(i);
-      if(lpdiJoystick[joystick]->lpVtbl->SetProperty(lpdiJoystick[joystick], DIPROP_RANGE, &diprg.diph) != DI_OK)
-      {
-        JoystickInfo[joystick].Axis[AXIS_SliderAxis0 + i].exists = false; // cannot set range, therefore do not allow axis
-        DebugPrintf( "SetUpJoystickAxis: failed to set range for Slider%d axis\n", i );
-      }else
-      {
-        DebugPrintf( "SetUpJoystickAxis: setting up Slider%d deadzone=%d for joystick #%d='%s'\n",
-          i,
-          JoystickInfo[ joystick ].Axis[AXIS_SliderAxis0 + i].deadzone,
-          joystick,
-          JoystickInfo[ joystick ].Name );
-        if (SetDIDwordProperty(lpdiJoystick[joystick], DIPROP_DEADZONE, DIJOFS_SLIDER(i), DIPH_BYOFFSET, (DWORD)(JoystickInfo[joystick].Axis[AXIS_SliderAxis0 + i].deadzone * 100)) != DI_OK)
-        {
-          // cannot set deadzone - but just ignore for now...
-          DeadzoneNotSet = true;
-          DebugPrintf( "SetUpJoystickAxis: failed to set deadzone for Slider%d axis\n", i );
-        }
-      }
-    }
-  }
-
-  // could do something about unset deadzones here...
-  if (DeadzoneNotSet)
-    DeadzoneNotSet = false;
-
-}
-
-// this just gets the pov direction which is internal to the dinput version
-// nothing here to port...
-int GetPOVDirection( DIJOYSTATE2 *data, int POVNum )
-{
-  int dir;
-  
-  if (!((data->rgdwPOV[POVNum] == 65535) || (data->rgdwPOV[POVNum] == -1)))
-  {
-    dir = POV_Centre;
-    if( data->rgdwPOV[POVNum] > 27000 || data->rgdwPOV[POVNum] < 9000 ) // up
-    {
-      dir |= POV_Up;
-    }
-    if( data->rgdwPOV[POVNum] > 9000 && data->rgdwPOV[POVNum] < 27000 ) // down
-    {
-      dir |= POV_Down;
-    }
-    if( data->rgdwPOV[POVNum] < 18000 && data->rgdwPOV[POVNum] > 0 ) // right
-    {
-      dir |= POV_Right;
-    }
-    if( data->rgdwPOV[POVNum] > 18000 ) // left
-    {
-      dir |= POV_Left;
-    }
-    return dir;
-  }else
-    return POV_Centre;
-}
-// nothing here to port again we have this all done already in sdl version
-
-#define POV_UP      0
-#define POV_RIGHT   9000
-#define POV_DOWN    18000
-#define POV_LEFT    27000
-
-#define POV_RANGE   36000
-#define POV_HALFRANGE 18000
-#define POV_TOLERANCE 6750  // this gives 45 deg for each of 8 compass directions
-
-int GetPOVMask( DWORD pov )
-{
-  static DWORD POVDir[ MAX_POV_DIRECTIONS ] =
-  {
-    POV_UP,
-    POV_DOWN,
-    POV_LEFT,
-    POV_RIGHT
-  };
-  int mask;
-  int dir;
-  int dpov;
-
-  mask = 0;
-  if ( pov != 0xFFFF && pov != 0xFFFFFFFF )
-  {
-    for ( dir = 0; dir < MAX_POV_DIRECTIONS; dir++ )
-    {
-      dpov = abs( pov - POVDir[ dir ] );
-      if ( dpov > POV_HALFRANGE )
-        dpov = POV_RANGE - dpov;
-      if ( dpov <= POV_TOLERANCE )
-        mask |= ( 1 << dir );
-    }
-  }
-  return mask;
-}
-
-bool joystick_poll( int joysticknum )
-{
-   HRESULT hRes;
-   int i, j, povdir;
-
-   /* joystick doesn't exist */
-   if( !lpdiJoystick[joysticknum] )
-     return false;
-
-poll:
-
-   /* poll the device */
-   hRes = IDirectInputDevice2_Poll(lpdiJoystick[joysticknum]);
-
-   /* not needed or succeeded */
-   if ( hRes == DI_NOEFFECT && hRes == DI_OK )
-     goto state;
-
-   /* lets look for some errors */
-   switch ( hRes )
-   {
-
-   // Access to the input device has been lost. It must be reacquired. 
-   case DIERR_INPUTLOST:
-
-   // The operation cannot be performed unless the device is acquired. 
-   case DIERR_NOTACQUIRED:
-
-     // acquire the device
-     hRes = IDirectInputDevice2_Acquire(lpdiJoystick[joysticknum]);
-
-     // must be a deeper issue
-     if ( hRes != DI_OK )
-       return false;
-
-     // try again
-     goto poll;
-
-     break;
-
-   // The object has not been initialized. 
-   case DIERR_NOTINITIALIZED:
-
-     // must be a deeper issue
-     return false;
-     break;
-
-   }
-
-state:
-
-   // get data from the joystick
-   hRes = IDirectInputDevice_GetDeviceState( lpdiJoystick[joysticknum],
-                                             sizeof(DIJOYSTATE2),
-                                             &js[ new_input ][joysticknum]);
-   // if we got an error
-   if ( hRes == DI_OK )
-     goto povs;
-   
-   // lets check out some errors
-   switch (hRes)
-   {
-
-   // Access to the input device has been lost. It must be reacquired. 
-   case DIERR_INPUTLOST:
-
-   // The operation cannot be performed unless the device is acquired. 
-   case DIERR_NOTACQUIRED:
-
-     // acquire the device
-     hRes = IDirectInputDevice2_Acquire(lpdiJoystick[joysticknum]);
-
-     // must be a deeper issue
-     if ( hRes != DI_OK )
-       return false;
-
-     // try again
-     goto state;
-
-     break;
-
-   case DIERR_INVALIDPARAM:
-   case DIERR_NOTINITIALIZED:
-      
-     // must be a deeper issue
-     return false;
-     break;
-
-   // Data is not yet available. 
-   case E_PENDING:
-     // no data just say ok and get out of here
-     return true;
-     break;
-
-   }
-
-povs:
-
-   /* who knows what the rest of this does */
-
-   // for each hat switch
-   for (i = 0; i < JoystickInfo[joysticknum].NumPOVs; i++)
-   {
-     povdir = GetPOVMask( js[ new_input ][ joysticknum ].rgdwPOV[ i ] );
-     for (j = 0; j < MAX_POV_DIRECTIONS; j++)
-		js_pov[ new_input ][ joysticknum ][ i ][ j ] =
-        ( povdir & ( 1 << j ) ) ? 0x80 : 0;
-   }
-
-   /* everything fine */
-   return true;
-}
-
-#else // ! DINPUTJOY
 
 void SetUpJoystickAxis(int joystick)
 {
@@ -1547,7 +1102,6 @@ bool joystick_poll( int joysticknum )
 	return true;
 }
 
-#endif // !  DINPUTJOY
 
 void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum)
 {
@@ -1556,40 +1110,16 @@ void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum)
 
    JOYSTICKAXIS *joyaxis;
 
-#ifdef DINPUTJOY
-
-	// this is a good thing cause sdl also considers a slider an axis
-	long *axisptr[MAX_JOYSTICK_AXIS] =
-	{
-		&js[ new_input ][joysticknum].lX,  // 0
-		&js[ new_input ][joysticknum].lY,  // 1
-		&js[ new_input ][joysticknum].lZ,  // 2
-		&js[ new_input ][joysticknum].lRx, // 3
-		&js[ new_input ][joysticknum].lRy, // 4
-		&js[ new_input ][joysticknum].lRz, // 5
-		&js[ new_input ][joysticknum].rglSlider[0], // 6
-		&js[ new_input ][joysticknum].rglSlider[1]  // 7
-	};
-
-	if( !lpdiJoystick[joysticknum] )
-		return;
-
-#else // ! DINPUTJOY
 
 	if( joysticknum >= Num_Joysticks )
 		return;
 
-#endif
 
 
 	for (axis = 0; axis < MAX_JOYSTICK_AXIS; axis++)
 	{
 
-#ifdef DINPUTJOY
-			amount = (float) *axisptr[ axis ];
-#else
 			amount = (float) joy_axis_state[ joysticknum ][ axis ];
-#endif
 
 		if ((JoystickInfo[joysticknum].Axis[axis].exists) && amount)
 		{
@@ -1630,13 +1160,8 @@ bool IsJoystickButtonPressed( int joysticknum )
 {
   int i;
 
-#ifdef DINPUTJOY
-  if( !lpdiJoystick[joysticknum] )
-    return( false );
-#else
   if( joysticknum >= Num_Joysticks )
 	  return false;
-#endif
 
   for( i = 0; i < JoystickInfo[joysticknum].NumButtons; i++)
   {
@@ -1659,13 +1184,8 @@ bool IsJoystickButtonReleased( int joysticknum )
 {
   int i;
 
-#ifdef DINPUTJOY
-  if( !lpdiJoystick[joysticknum] )
-    return( false );
-#else
   if( joysticknum >= Num_Joysticks )
 	  return false;
-#endif
 
   for( i = 0; i < JoystickInfo[joysticknum].NumButtons; i++)
   {

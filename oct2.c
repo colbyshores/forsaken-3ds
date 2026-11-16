@@ -1,5 +1,4 @@
 #define INSIDE_BSP // disable to use bounding box inside check instead
-#define BSP_ONLY
 
 #include "main.h"
 #include "platform.h"
@@ -314,14 +313,6 @@ DWORD CurrentSrcBlend;
 DWORD CurrentDestBlend;
 DWORD CurrentTextureBlend;
  
-#ifdef DEMO_SUPPORT
-LONGLONG  GameStartedTime;    // when the game started
-LONGLONG  GameElapsedTime;    // Real how long the game has been going in game time not real..
-LONGLONG  TempGameElapsedTime;  // Real how long the game has been going in game time not real..
-LONGLONG  GameCurrentTime;    // How long the game has been going...
-LONGLONG  TimeDiff;
-LONGLONG  Freq;
-#endif
 
 bool  JustExitedMenu =false;
 
@@ -370,14 +361,6 @@ extern  MENU  *       GetPlayerNumMenu;
 #define FOV_GROW(A)     ((A) + 10.0F)
 #define FOV_SHRINK(A)   ((A) - 10.0F)
 
-#ifdef DEMO_SUPPORT
-LONGLONG  DemoStartedTime;    // when the game started
-LONGLONG  DemoEndedTime;      // when the game started
-float   DemoTotalTime = 0.0F; // total game time (in seconds)
-int32_t   DemoGameLoops = 0;
-float DemoAvgFps = 0.0F;
-extern  LONGLONG  DemoTimeSoFar;
-#endif
 
 #define MIN_VIEWPORT_WIDTH  (64)
 #define MIN_VIEWPORT_HEIGHT (64)
@@ -3202,9 +3185,6 @@ bool RenderScene( void )
       MyGameStatus = OverallGameStatus;
 			input_grab( true );
 	  
-#ifdef DEMO_SUPPORT
-      QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
 
       GameStatus[WhoIAm] = OverallGameStatus;
       SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
@@ -3377,9 +3357,6 @@ bool RenderScene( void )
           break;  // not yet..
       }
       // tell them all they can now restart a new level...
-#ifdef DEMO_SUPPORT
-      QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
       DebugPrintf("STATUS_StartingMultiplayerSynch setting MyGameStatus to STATUS_Normal\n");
       MyGameStatus = STATUS_Normal;
       GameStatus[WhoIAm] = STATUS_Normal;
@@ -3395,9 +3372,6 @@ bool RenderScene( void )
 	{
       if( OverallGameStatus == STATUS_Normal )
       {
-#ifdef DEMO_SUPPORT
-        QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
         MyGameStatus = OverallGameStatus;
         GameStatus[WhoIAm] = MyGameStatus;
         SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
@@ -3518,34 +3492,6 @@ bool RenderScene( void )
 
     break;
 
-#ifdef DEMO_SUPPORT
-  case STATUS_PlayingDemo:
-	DebugState("STATUS_PlayingDemo\n");
-
-    DemoGameLoops++;
-
-    if( DemoSpeed.value > 8 )
-    {
-      // slower or normal playback speed...
-      Demoframelag = 1.0F / (float) ( DemoSpeed.value - 7 );
-    }else{
-      Demoframelag = 1.0F * (float) ( 9 - DemoSpeed.value );
-    }
-    
-    Oldframelag = framelag;
-
-    if( PauseDemo )
-    {
-      framelag = 0.0F;
-    }else{
-      framelag *= Demoframelag;
-    }
-
-    if( PERF_MAINGAME() != true ) // bjd
-      return false;
-
-    break;
-#endif
 
   case STATUS_InitView_0:
 	DebugState("STATUS_InitView_0\n");
@@ -3853,16 +3799,12 @@ bool RenderScene( void )
     Bspload( (char*) &BspZNames[LevelNum][0], &Bsp_Header[ 0 ] );
     Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 1 ] );
 #else
-#ifdef BSP_ONLY
     if ( !Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 0 ] ) )
     {
       SeriousError = true;
       Msg( "Bspload failed\n" );
       return false;   // the collision data
     }
-#else
-    Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 0 ] ); // load .BSP file into 0 skin
-#endif
     Bsp_Header[ 1 ].State = false; // no non-zero .BSP any more
 #endif
 #ifdef __3DS__
@@ -4147,39 +4089,6 @@ bool RenderScene( void )
     break;
 
 
-#ifdef DEMO_SUPPORT
-  case STATUS_ChangeLevelPostPlayingDemo:
-	DebugState("STATUS_ChangeLevelPostPlayingDemo\n");
-
-    WhoIAm = MAX_PLAYERS;
-    Ships[WhoIAm].Object.Mode = DEMO_MODE;
-    Ships[WhoIAm].enable = 1;
-    IsHost = true;
-    Current_Camera_View = MAX_PLAYERS;    // which object is currently using the camera view....
-  
-    for( i = 0 ; i < MAX_PLAYERS ; i++ )
-    {
-      GameStatus[i] = STATUS_Null;
-    }
-  
-    DemoTimeSoFar = 0;
-    if( DemoSpeed.value > 8 )
-    {
-      // slower or normal playback speed...
-      Demoframelag = 1.0F / (float) ( DemoSpeed.value - 7 );
-    }else{
-      Demoframelag = 1.0F * (float) ( 9 - DemoSpeed.value );
-    }
-  
-    GameElapsedTime = 0;
-
-    QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-    QueryPerformanceCounter((LARGE_INTEGER *) &DemoStartedTime);
-    DemoGameLoops = 0;
-    TempGameElapsedTime = GameStartedTime;
-    MyGameStatus = STATUS_PlayingDemo;
-    break;
-#endif
 
 	//  *********************** Single Player Game Stuff **********************************
 
@@ -4289,9 +4198,6 @@ bool RenderScene( void )
 	//      StartCountDown( (int16_t) TimeLimit.value, 0 );
 	//    }
 
-#ifdef DEMO_SUPPORT
-    QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
 
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
@@ -4472,9 +4378,6 @@ bool RenderScene( void )
     smallinitShip( WhoIAm );
     InGameLoad( NULL );
     
-#ifdef DEMO_SUPPORT
-    QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
 
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
@@ -4494,23 +4397,6 @@ bool RenderScene( void )
 }
 
 void MainGameDemoRoutines(){
-#ifdef DEMO_SUPPORT
-  QueryPerformanceCounter((LARGE_INTEGER *) &GameCurrentTime);
-  if( PlayDemo )
-  {
-    if( PauseDemo )
-    {
-      TempGameElapsedTime = GameCurrentTime;
-    }else{
-      GameElapsedTime += (LONGLONG) ( ( GameCurrentTime - TempGameElapsedTime ) * Demoframelag );
-      TempGameElapsedTime = GameCurrentTime;
-      GameCurrentTime = GameCurrentTime - GameStartedTime;
-      GameCurrentTime = (LONGLONG) ( GameCurrentTime * Demoframelag );
-    }
-  }else{
-    NetworkGameUpdate();
-  }
-#endif
 }
 
 
@@ -6459,17 +6345,6 @@ bool Our_CalculateFrameRate(void)
 
 	}
 
-#ifdef DEMO_SUPPORT
-    // some stupid place for a demo calculation
-	if( MyGameStatus == STATUS_PlayingDemo )
-	{
-		QueryPerformanceFrequency((LARGE_INTEGER *) &Freq);
-		QueryPerformanceCounter((LARGE_INTEGER *) &DemoEndedTime);
-		TimeDiff = DemoEndedTime - DemoStartedTime;
-		DemoTotalTime = ( (float) TimeDiff / (float) Freq );
-		DemoAvgFps = DemoGameLoops / DemoTotalTime;
-	}
-#endif
 
 	return true;
 }

@@ -28,13 +28,8 @@
 #include "atm_prof.h"
 #include "framedump.h"
 
-#ifndef WIN32
 #include <unistd.h>
-#endif
 
-#ifdef __WINE__
-#define LR_VGACOLOR LR_VGA_COLOR
-#endif
 
 //
 // GLOBAL VARIABLES
@@ -418,9 +413,7 @@ void CleanUpAndPostQuit(void)
 
 #ifdef BREAKPAD
 // breakpad running through wine, built for windows doens't work well..
-#ifndef __WINE__
 extern bool breakpad_init( void );
-#endif
 #endif
 
 extern bool InitView( void );
@@ -451,17 +444,9 @@ static bool AppInit( char * lpCmdLine )
 
 	render_info.vsync = false;
 
-#ifdef DXMOUSE
-	if(!dx_init_mouse())
-	{
-		DebugPrintf("Could not init dx mouse\n");
-		return false;
-	}
-#endif
 
 #ifdef BREAKPAD
 // breakpad running through wine, built for windows doens't work well..
-#ifndef __WINE__
 
 	// initialize google breakpad crash reporting
 	if(!breakpad_init())
@@ -470,7 +455,6 @@ static bool AppInit( char * lpCmdLine )
 	// test breakpad by uncommenting this
 	//{ *(int*)0=0; }
 
-#endif
 #endif
 
 #ifdef DEBUG_ON
@@ -664,9 +648,6 @@ static bool RenderLoop()
     // Blt or flip the back buffer to the front buffer
 	if( !QuitRequested )
 	{
-#ifdef DEMO_SUPPORT
-		if ((!PlayDemo || ( MyGameStatus != STATUS_PlayingDemo ) ||	DemoShipInit[ Current_Camera_View ]	))
-#endif
 		{
 			// this is the actual call to render a frame...
 			{

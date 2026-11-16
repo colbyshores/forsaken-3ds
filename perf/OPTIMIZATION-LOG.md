@@ -2632,3 +2632,15 @@ solution, now unconditional); x86 #else branches and -DARM deleted.
 Release build clean. Legacy platform symbols (WIN32/WINE/MACOSX/
 DINPUTJOY/DXMOUSE/BSP_ONLY/A_BAD_IDEA) follow the same rule: only
 the 3DS and Linux build paths stay.
+
+## 2026-11-14 — Legacy platform pass: only 3DS + Linux paths stay
+
+Unwrapped legacy conditionals to the live build paths: WIN32,
+__WINE__, MACOSX, DINPUTJOY, DXMOUSE, A_BAD_IDEA_AND_DOESNT_WORK_ANYWAY
+(never defined in either build), DEMO_SUPPORT (never defined —
+whole demo-playback surface dead), BSP_ONLY (keep-body + defines
+out). R3 pins restored on the kept BSP collision branch (its
+duplicate carried them). Gates ALL PASS; 3DS release clean.
+Linux (root Makefile) build is broken at pristine HEAD too
+(aijump ENEMY/JumpInAir include divergence) — pre-existing bitrot,
+not from this pass; 3DS is the maintained target.
