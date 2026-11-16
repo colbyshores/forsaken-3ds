@@ -5,6 +5,7 @@
 #include "main.h"
 #include "file.h"
 #include "util.h"
+#include <ctype.h>
 #include "string.h"
 #include "title.h"
 
@@ -27,7 +28,7 @@ char * convert_char( char from, char to, char* in )
 	return in;
 }
 
-char* convert_path( char* _str )
+char* convert_path( const char* _str )
 {
 	static char temp[500];
 	char * str = temp;
@@ -56,19 +57,19 @@ void GetFilename( u_int8_t * Src, u_int8_t * Dest )
 {
 	u_int8_t	*	Char_Ptr;
 
-	Char_Ptr = ( Src + strlen( Src ) ) -1;
+	Char_Ptr = ( Src + strlen( (const char *)Src ) ) -1;
 
 	while( Char_Ptr != Src && *Char_Ptr != '\\' && *Char_Ptr != ':' ) Char_Ptr--;
 
 	if( Char_Ptr == Src )
 	{
-		strcpy( Dest, Src );
+		strcpy( (char *)Dest, (const char *)Src );
 		return;
 	}
 
-	if( Char_Ptr != ( Src + strlen( Src ) - 1 ) )
+	if( Char_Ptr != ( Src + strlen( (const char *)Src ) - 1 ) )
 	{
-		strcpy( Dest, ( Char_Ptr + 1 ) );
+		strcpy( (char *)Dest, (const char *)( Char_Ptr + 1 ) );
 	}
 	else
 	{
@@ -80,7 +81,7 @@ void Get_Ext( u_int8_t * Src, u_int8_t * Dest )
 {
 	u_int8_t	*	Char_Ptr;
 
-	Char_Ptr = ( Src + strlen( Src ) ) -1;
+	Char_Ptr = ( Src + strlen( (const char *)Src ) ) -1;
 
 	while( Char_Ptr != Src && *Char_Ptr != '\\' && *Char_Ptr != ':' && *Char_Ptr != '.' ) Char_Ptr--;
 
@@ -121,7 +122,7 @@ void Change_Ext( const char * Src, char * Dest, const char * Ext )
 	}
 	else
 	{
-		strcpy( Dest, Src );
+		strcpy( (char *)Dest, (const char *)Src );
 		Dest += strlen( Src );
 		strcpy( Dest, Ext );
 	}

@@ -2,6 +2,10 @@
 #define FILE_H
 
 #include "main.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stdio.h>
 
 struct filetime
@@ -31,5 +35,9 @@ char* find_next_file( void );
 void find_close( void );
 
 FILE * file_open(char * filename, char * mode);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // FILE_H
