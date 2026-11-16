@@ -3472,6 +3472,7 @@ bool LoadPickupsPositions( void )
    * happened. The visual is approximate (StablizerCrystal uses 1998's
    * Crystal model, BlackHoleGun parts use PowerPod, etc.); proper
    * fidelity needs the .mx files extracted from the Remaster KPF —
+#ifdef EDITION_REMASTER
   {
     static bool _n64_pickup_init_done = false;
     if (!_n64_pickup_init_done)
@@ -3510,6 +3511,7 @@ bool LoadPickupsPositions( void )
         PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
     }
   }
+#endif /* EDITION_REMASTER — N64 pickup template block */
 
   /* convert the level_name into level_name.pic */
   Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );

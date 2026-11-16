@@ -4402,6 +4402,7 @@ bool PreLoadEnemies( void )
 	 * inherited — visible symptom: Tube64's Enforcer (flying-eye
 	 * shape) renders as a Mekton tank after the first level
 	 * transition. */
+#ifdef EDITION_REMASTER
 	{
 
 			/* Each N64-only enemy uses its real Remaster mesh. Asset
@@ -4578,6 +4579,7 @@ bool PreLoadEnemies( void )
 				}
 			}
 	}
+#endif /* EDITION_REMASTER — N64 enemy template block */
 
 	NextEnemyModel = NextNewModel;
 
@@ -6345,9 +6347,16 @@ void EnemyCrawlUnderAiControl( ENEMY * Enemy )
 ===================================================================*/
 void EnemyJumpUnderAiControl( ENEMY * Enemy )
 {
+#ifdef EDITION_REMASTER
 	Enemy->AIMoveFlags = 0;
 	AI_JUMP( Enemy );
 	AutoDisplay( &Enemy->Object );
+#else
+	/* ENEMY_CONTROLTYPE_JUMP_AI is Remaster-only (Boss_Ramqan); the
+	 * control type is never assigned in the 1998 build, so this slot
+	 * is unreachable there. Stub keeps the dispatch table uniform. */
+	(void)Enemy;
+#endif
 }
 
 /*===================================================================

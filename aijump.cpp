@@ -40,6 +40,12 @@
 extern ENEMY_TYPES	EnemyTypes[];
 extern float		framelag;
 
+/* Boss_Ramqan's jump AI is Remaster-only content: the ENEMY state
+ * fields it drives exist only under EDITION_REMASTER (enemies.h), and
+ * the dispatch slot is never selected in the 1998 build. The whole
+ * body is compiled out of the original edition. */
+#ifdef EDITION_REMASTER
+
 #define JUMP_DURATION_TICKS	75.0F
 #define JUMP_ARC_SCALE		4.0F
 
@@ -340,3 +346,4 @@ void AI_JUMP( register ENEMY * Enemy )
 	if( AI_JUMP_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_JUMP_Mode[ Enemy->Object.AI_Mode ] )( Enemy );
 }
+#endif /* EDITION_REMASTER */
