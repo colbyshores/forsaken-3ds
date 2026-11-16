@@ -250,7 +250,7 @@ char *CurrentLevelsList;
 
 px_timer_t level_time;
 
-extern "C" extern "C" void InitModeCase(void);
+extern "C" void InitModeCase(void);
 void DebugState( const char * str );
 
 
@@ -622,7 +622,7 @@ void PrintInitViewStatus( BYTE Status );
 
 extern "C" void UpdateBGObjectsClipGroup( CAMERA * Camera );
 extern "C" void UpdateEnemiesClipGroup( CAMERA * Camera  );
-extern "C" extern "C" void SpecialDestroyGame( void );
+extern "C" void SpecialDestroyGame( void );
 
 extern  int16_t PrimaryInLevel[ MAXPRIMARYWEAPONS ];
 extern  int16_t SecondaryInLevel[ MAXSECONDARYWEAPONS ];
@@ -715,7 +715,7 @@ extern  SHORTNAMETYPE     Names;  // all the players short Names....
 
 bool MainGame(); // bjd
 
-extern "C" extern "C" void Build_View();
+extern "C" void Build_View();
 bool DispTracker( void ); // bjd
 
 

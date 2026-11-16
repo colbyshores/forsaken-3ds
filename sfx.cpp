@@ -45,9 +45,9 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume ){}
 void CheckSBufferList( void ){}
 
 bool SetPosVelDir_Listner( VECTOR * Pos , VECTOR * Velocity , MATRIX * Mat ){return 0;}
-extern "C" extern "C" void SetSoundLevels( int *dummy ){}
+extern "C" void SetSoundLevels( int *dummy ){}
 
-extern "C" extern "C" float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector ){return 0;}
+extern "C" float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector ){return 0;}
 
 FILE *SaveAllSfx( FILE *fp ){return fp;}
 FILE *LoadAllSfx( FILE *fp ){return fp;}
