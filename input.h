@@ -199,7 +199,13 @@ bool handle_events( void );
 #define MAX_INPUT_BUFFER 100
 extern int input_buffer[MAX_INPUT_BUFFER];
 extern int input_buffer_count;
+#ifdef __cplusplus
+extern "C"
+#endif
 int input_buffer_find( int code );
+#ifdef __cplusplus
+extern "C"
+#endif
 void input_buffer_reset( void );
 
 ///////////

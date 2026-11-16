@@ -64,6 +64,46 @@
 
 #include "perf_capture.h"
 #include "fidelity.h"
+/* C TUs (or C++ TUs with C-linkage definitions); oct2.c relied on
+   block-scope externs, which C++ mangles. Hoisted to file scope. */
+#ifdef __3DS__
+/* main_3ds.c / render_c3d.c / controls_3ds.c are C TUs; oct2.c relied
+   on implicit or block-scope declarations, which C++ mangles. */
+extern "C" {
+void boot_log(const char *msg);
+void c3d_clear_bottom_screen(void);
+void c3d_transfer_eye(unsigned int eye);
+void c3d_upload_xlights(void);
+float platform_get_3d_slider(void);
+bool controls_3ds_menu_is_open(void);
+void controls_3ds_render_overlay(void);
+}
+#endif
+
+extern "C" {
+void trace(const char*);
+void trace_enable(void);
+void ScrPolySetRouteBottom(bool b);
+void InitScrPolys(void);
+bool ScrPolyGetRouteBottom(void);
+void ScrPolySetDisplayMode(int mode);
+void Hunk_FreeAll(int);
+void ScoreSort();
+void input_grab( bool clip );
+void ReleaseView(void);
+void Printint16_t( int16_t num , int x , int y , int col );
+void InitIndirectVisible( u_int16_t g );
+void AddIndirectVisible( u_int16_t g );
+char* GetName(int Player);
+int GetPlayerByRank( int rank );
+int forsaken_get_fps(void);
+bool PreLoadPickups(void);
+bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 );
+bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup );
+int  Print4x5Text(char *Text, int x, int y, int color);
+}
+/* stats.cpp defines these with C linkage; oct2.c relied on implicit declarations. */
+extern "C" int GetFriendlyKills( int Player );
 
 void SetCam(int ship, int Cam);
 
@@ -80,8 +120,8 @@ extern bool ShowKPMOnHUD;
 extern bool ShowSpeedOnHUD;
 
 extern render_info_t render_info;
-extern bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup );
-extern bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 );
+
+
 BSP_HEADER Bsp_Original;
 
 extern	render_viewport_t viewport;
@@ -92,7 +132,7 @@ extern int    FlagsInLevel;
 extern int    TeamFlagsInLevel[ MAX_TEAMS ];
 extern int    TeamFlagsInShips[ MAX_TEAMS ];
 
-extern void input_grab( bool clip );
+
 extern bool NeedFlagAtHome;
 extern bool OwnFlagTeleportsHome;
 extern bool CanCarryOwnFlag;
@@ -125,11 +165,11 @@ extern u_int8_t QuickStart;
 extern char *TeamName[ MAX_TEAMS ];
 extern int16_t DummyTextureIndex;
 
-extern void Printint16_t( int16_t num , int x , int y , int col );
 
-extern void InitIndirectVisible( u_int16_t g );
 
-extern void AddIndirectVisible( u_int16_t g );
+
+
+
 extern  bool  RearCameraDisable;
 extern  MODELNAME   SplashModelNames[MAXMODELHEADERS];
 extern USERCONFIG *player_config;
@@ -168,8 +208,8 @@ extern u_int32_t CurrentBikeCompSpeech;
 
 bool Cheated = false;
 
-void InitSoundInfo( MLOADHEADER * Mloadheader );
-void InitShipSpeeds( void );
+extern "C" void InitSoundInfo( MLOADHEADER * Mloadheader );
+extern "C" void InitShipSpeeds( void );
 
 #define SAVESCREEN_3DFX
 
@@ -210,7 +250,7 @@ char *CurrentLevelsList;
 
 px_timer_t level_time;
 
-void InitModeCase(void);
+extern "C" extern "C" void InitModeCase(void);
 void DebugState( const char * str );
 
 
@@ -236,7 +276,7 @@ char * AiModes[] = {
 };
 
 extern  int EnemiesActive;
-void CheckTimeLimit( void );
+extern "C" void CheckTimeLimit( void );
 extern  int16_t InGameLoadGameLevelNum;
 
 bool  ScoreDisplaySfx = true;
@@ -299,7 +339,7 @@ extern  float WhiteOut;
 extern float mouse_dx;
 extern float mouse_dy;
 
-void	MessageQuePrintAll( void );
+extern "C" void	MessageQuePrintAll( void );
 
 bool  InsideResizeViewport = false;
 
@@ -315,9 +355,9 @@ int   Depth;
 
 void CalculateFramelag( void );
 
-MENU  MENU_EditMacro1;
-MENU  MENU_EditMacro2;
-MENU  MENU_EditMacro3;
+extern MENU  MENU_EditMacro1;  /* defined in title.c */
+extern MENU  MENU_EditMacro2;  /* defined in title.c */
+extern MENU  MENU_EditMacro3;  /* defined in title.c */
 
 extern  FILE  * DemoFp;
 extern  FILE  * DemoFpClean;
@@ -469,7 +509,7 @@ extern  REMOTECAMERA * ActiveRemoteCamera;
 
 bool
 Our_CalculateFrameRate(void);
-bool VduFinished( MENU *Menu );
+extern "C" bool VduFinished( MENU *Menu );
 bool WriteMessage(const char *format, ...); // printf-a-like for bottom line of window
 
 bool ScoreDisplay();
@@ -499,7 +539,7 @@ extern  int16_t   NumKilledEnemies;
 
 bool  ResizeViewport( void );
 bool  FullScreenViewport();
-bool  ClearBuffers( void );
+extern "C" bool  ClearBuffers( void );
 bool  ClearZBuffer( void );
 
 bool clear_black(void)
@@ -528,7 +568,7 @@ bool  OldDrawPanel = true;
 bool  Panel = true;
 
 bool ChangeLevel( void );
-void SelectQuitCurrentGame( MENUITEM *Item );
+extern "C" void SelectQuitCurrentGame( MENUITEM *Item );
 
 float pixel_aspect_ratio;
 float Oldframelag;  
@@ -580,9 +620,9 @@ void ReleaseRenderBufs( void );
 bool SetMatrixViewPort( void );
 void PrintInitViewStatus( BYTE Status );
 
-void UpdateBGObjectsClipGroup( CAMERA * Camera );
-void UpdateEnemiesClipGroup( CAMERA * Camera  );
-void SpecialDestroyGame( void );
+extern "C" void UpdateBGObjectsClipGroup( CAMERA * Camera );
+extern "C" void UpdateEnemiesClipGroup( CAMERA * Camera  );
+extern "C" extern "C" void SpecialDestroyGame( void );
 
 extern  int16_t PrimaryInLevel[ MAXPRIMARYWEAPONS ];
 extern  int16_t SecondaryInLevel[ MAXSECONDARYWEAPONS ];
@@ -612,10 +652,10 @@ extern u_int8_t Colourtrans[MAXFONTCOLOURS][3];
 extern SLIDER WatchPlayerSelect;
 
 // (Ships.c)
-extern char* GetName(int Player);
+
 
 // (stats.c)
-extern void ScoreSort();
+
 
 /*===================================================================
     Weapon Names...
@@ -675,7 +715,7 @@ extern  SHORTNAMETYPE     Names;  // all the players short Names....
 
 bool MainGame(); // bjd
 
-void Build_View();
+extern "C" extern "C" void Build_View();
 bool DispTracker( void ); // bjd
 
 
@@ -774,7 +814,7 @@ void stereo_adjust( RENDERMATRIX *m )
 	m->_31 = (right+left)/(right-left);
 }
 
-bool SetFOV( float fov )
+extern "C" bool SetFOV( float fov )
 {
 	float screen_width, screen_height;
 	float Scale, NewNear;
@@ -842,7 +882,7 @@ bool SetFOV( float fov )
 }
 
 
-void SetViewportError( char *where, render_viewport_t *vp )
+extern "C" void SetViewportError( char *where, render_viewport_t *vp )
 {
   static char msg[1024];
   sprintf( msg,
@@ -1366,7 +1406,7 @@ bool FullScreenViewport()
 	return true;
 }
 
-bool InitLevels( char * levels_list )
+extern "C" bool InitLevels( char * levels_list )
 {
 
   FILE *f;
@@ -1678,8 +1718,8 @@ void DrawSimplePanel()
 				   camera viewport — it belongs on the stereo top screen, not
 				   the mono bottom. Temporarily clear the bottom-HUD routing
 				   so this AddScreenPolyText creates a top-screen poly. */
-				extern bool ScrPolyGetRouteBottom(void);
-				extern void ScrPolySetRouteBottom(bool b);
+				
+				
 				bool _was_routing = ScrPolyGetRouteBottom();
 				ScrPolySetRouteBottom(false);
 #endif
@@ -1840,7 +1880,7 @@ void DrawSimplePanel()
 		extern bool g_show_stereo_debug;
 		if (g_show_stereo_debug)
 		{
-			extern float platform_get_3d_slider(void);
+			
 			char _dbg[64];
 			float _slider = platform_get_3d_slider();
 			sprintf(_dbg, "slider: %.3f",  _slider);
@@ -1914,7 +1954,7 @@ void ReleaseLevel(void)
 
 
 
-void
+extern "C" void
 ReleaseScene(void)
 {
   int16_t Count;
@@ -1950,10 +1990,10 @@ ReleaseScene(void)
 
 }
 
-void ReleaseView(void)
+extern "C" void ReleaseView(void)
 {
 #ifdef __3DS__
-  { extern void trace(const char*); char _b[64]; snprintf(_b,sizeof(_b),"ReleaseView: status=%d",(int)MyGameStatus); trace(_b); }
+  {  char _b[64]; snprintf(_b,sizeof(_b),"ReleaseView: status=%d",(int)MyGameStatus); trace(_b); }
 #endif
   switch( MyGameStatus )
   {
@@ -1984,7 +2024,7 @@ void ReleaseView(void)
      * After ReleaseTitleModels above, NumSpotFX is 0 so the read
      * is a no-op. */
     {
-      extern void Hunk_FreeAll(int);
+      
       Hunk_FreeAll(/*TAG_LEVEL=*/1);
     }
     break;
@@ -1995,7 +2035,7 @@ void ReleaseView(void)
 
   default:
 #ifdef __3DS__
-#define _RV_TRACE(s) do { extern void trace(const char*); trace("ReleaseView/default: " s); } while(0)
+#define _RV_TRACE(s) do {  trace("ReleaseView/default: " s); } while(0)
 #else
 #define _RV_TRACE(s) ((void)0)
 #endif
@@ -2039,7 +2079,7 @@ void ReleaseView(void)
      * ModelHeaders / MxaModelHeaders are intentionally kept live until
      * the next PreInitModel — see the title-branch comment for why. */
     {
-      extern void Hunk_FreeAll(int);
+      
       Hunk_FreeAll(/*TAG_LEVEL=*/1);
     }
     _RV_TRACE("default DONE");
@@ -2047,7 +2087,7 @@ void ReleaseView(void)
   }
 }
 
-bool
+extern "C" bool
 InitScene(void)
 {
   int i;
@@ -2120,7 +2160,7 @@ InitScene(void)
   Output    :   bool true/FLASE
 ===================================================================*/
 
-bool InitView( void )
+extern "C" bool InitView( void )
 {
 	DebugPrintf("InitView Starting...\n");
 
@@ -2457,7 +2497,7 @@ void GetLevelName( char *buf, int bufsize, int level )
   }
   if ( !buf[ 0 ] )
   {
-    strncpy( buf, LevelList.item[ level ], bufsize );
+    strncpy( buf, (char*)LevelList.item[ level ], bufsize );
   }
 
   pCh = strchr( buf, '\n' );
@@ -2483,8 +2523,8 @@ char NodeName[256];
   Input   :   nothing...
   Output    :   nothing
 ===================================================================*/
-extern void ReleaseView(void);
-bool RenderScene( void )
+
+extern "C" bool RenderScene( void )
 {
 #ifdef __3DS__
   {
@@ -2537,7 +2577,7 @@ bool RenderScene( void )
   case STATUS_WaitingToStartSinglePlayer:
 	DebugState("STATUS_WaitingToStartSinglePlayer\n");
 #ifdef __3DS__
-	{ extern void trace_enable(void); extern void trace(const char*);
+	{  
 	  static int _wtss_count = 0;
 	  if (_wtss_count == 0) { trace_enable(); trace("WTSS: first frame"); }
 	  _wtss_count++;
@@ -2554,7 +2594,7 @@ bool RenderScene( void )
 
     done = VduFinished( &MENU_NEW_BetweenLevels );
 #ifdef __3DS__
-	{ extern void trace(const char*); static int _vf_logged = 0;
+	{  static int _vf_logged = 0;
 	  if (done && !_vf_logged) { _vf_logged=1; trace("WTSS: VduFinished=true"); }
 	}
 #endif
@@ -2565,7 +2605,7 @@ bool RenderScene( void )
     {
       WaitFrames = 2;
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("WTSS: calling StartASinglePlayerGame"); }
+	{  trace("WTSS: calling StartASinglePlayerGame"); }
 #endif
       StartASinglePlayerGame( NULL );
     }
@@ -3399,7 +3439,7 @@ bool RenderScene( void )
   case STATUS_InitView_0:
 	DebugState("STATUS_InitView_0\n");
 #ifdef __3DS__
-	{ extern void trace_enable(void); extern void trace(const char*); trace_enable(); trace("IV0: entry"); }
+	{   trace_enable(); trace("IV0: entry"); }
 #endif
 
     if( IsHost )
@@ -3458,7 +3498,7 @@ bool RenderScene( void )
     InitRenderBufs();
 
 #ifdef __3DS__
-	{ extern void trace(const char*); char _b[96];
+	{  char _b[96];
 	  snprintf(_b, sizeof(_b), "IV0: InitTload start (LevelNum=%d name=%s)",
 	           LevelNum, LevelNames[LevelNum]); trace(_b); }
 #endif
@@ -3470,7 +3510,7 @@ bool RenderScene( void )
       return false;
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: InitTload OK -> PreMload"); }
+	{  trace("IV0: InitTload OK -> PreMload"); }
 #endif
 
     //  Prep the Texture Handler.....
@@ -3480,20 +3520,20 @@ bool RenderScene( void )
       return false; // the model and visipoly data
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: PreMload OK -> PreWaterLoad"); }
+	{  trace("IV0: PreMload OK -> PreWaterLoad"); }
 #endif
 
     // Can Cope with no .Wat file!!!
     PreWaterLoad( (char*) &WaterNames[LevelNum][0] );
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: PreWaterLoad OK"); }
+	{  trace("IV0: PreWaterLoad OK"); }
 #endif
 
     if( OnceOnlyChangeLevel )
     {
       OnceOnlyChangeLevel = false;
 #ifdef __3DS__
-	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadShips"); }
+	  {  trace("IV0: OnceOnly: PreLoadShips"); }
 #endif
       if( !PreLoadShips() )
       {
@@ -3501,7 +3541,7 @@ bool RenderScene( void )
         return false;
       }
 #ifdef __3DS__
-	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadBGOFiles"); }
+	  {  trace("IV0: OnceOnly: PreLoadBGOFiles"); }
 #endif
       if( !PreLoadBGOFiles() )
       {
@@ -3509,7 +3549,7 @@ bool RenderScene( void )
         return false;
       }
 #ifdef __3DS__
-	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadRestartPoints"); }
+	  {  trace("IV0: OnceOnly: PreLoadRestartPoints"); }
 #endif
       if( !PreLoadRestartPoints() )
       {
@@ -3517,7 +3557,7 @@ bool RenderScene( void )
         return false;
       }
 #ifdef __3DS__
-	  { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadEnemies"); }
+	  {  trace("IV0: OnceOnly: PreLoadEnemies"); }
 #endif
       if( !PreLoadEnemies() )
       {
@@ -3531,9 +3571,9 @@ bool RenderScene( void )
        * up past the enemy slots. PreInitModel below loads everything
        * registered up to NextNewModel. */
 #ifdef __3DS__
-      { extern void trace(const char*); trace("IV0: OnceOnly: PreLoadPickups"); }
+      {  trace("IV0: OnceOnly: PreLoadPickups"); }
 #endif
-      { extern bool PreLoadPickups(void);
+      { 
         if( !PreLoadPickups() )
         {
           SeriousError = true;
@@ -3542,16 +3582,16 @@ bool RenderScene( void )
       }
 #endif /* EDITION_REMASTER */
 #ifdef __3DS__
-	  { extern void trace(const char*); trace("IV0: OnceOnly done"); }
+	  {  trace("IV0: OnceOnly done"); }
 #endif
     }
 
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: EnableRelavantModels"); }
+	{  trace("IV0: EnableRelavantModels"); }
 #endif
     EnableRelavantModels( &ModelNames[0] );
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: EnableRelavantModels OK -> PreInitModel"); }
+	{  trace("IV0: EnableRelavantModels OK -> PreInitModel"); }
 #endif
 		if( !PreInitModel( /*lpDev,*/ &ModelNames[0] ) ) // bjd
 		{
@@ -3559,7 +3599,7 @@ bool RenderScene( void )
 			return false;
 		}
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: PreInitModel OK -> Load_All_Off_Files"); }
+	{  trace("IV0: PreInitModel OK -> Load_All_Off_Files"); }
 #endif
 		if( !Load_All_Off_Files( &OffsetFiles[ 0 ] ) )
 		{
@@ -3567,7 +3607,7 @@ bool RenderScene( void )
 			return false;
 		}
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Load_All_Off_Files OK -> Tload"); }
+	{  trace("IV0: Load_All_Off_Files OK -> Tload"); }
 #endif
     //  Load in And if nescessary ReScale Textures...
     if( !Tload( &Tloadheader ) )
@@ -3576,7 +3616,7 @@ bool RenderScene( void )
       return false;
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Tload OK"); }
+	{  trace("IV0: Tload OK"); }
 #endif
 
 /*
@@ -3624,7 +3664,7 @@ bool RenderScene( void )
 */
 
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: InitModel"); }
+	{  trace("IV0: InitModel"); }
 #endif
     if( !InitModel( &ModelNames[0] ) )
     {
@@ -3632,7 +3672,7 @@ bool RenderScene( void )
        return false;               // all 3d models....
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: InitModel OK"); }
+	{  trace("IV0: InitModel OK"); }
 #endif
 
 /*
@@ -3658,7 +3698,7 @@ bool RenderScene( void )
     ReceiveGameMessages();
 */
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Mload"); }
+	{  trace("IV0: Mload"); }
 #endif
     if( !Mload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
     {
@@ -3666,13 +3706,13 @@ bool RenderScene( void )
       return false; // the model and visipoly data
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Mload OK -> InitVisiStats"); }
+	{  trace("IV0: Mload OK -> InitVisiStats"); }
 #endif
 
     InitVisiStats( &Mloadheader );
 
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: InitVisiStats OK -> Bspload"); }
+	{  trace("IV0: InitVisiStats OK -> Bspload"); }
 #endif
 
 /*
@@ -3711,7 +3751,7 @@ bool RenderScene( void )
     Bsp_Header[ 1 ].State = false; // no non-zero .BSP any more
 #endif
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: Bspload OK -> WaterLoad"); }
+	{  trace("IV0: Bspload OK -> WaterLoad"); }
 #endif
 	//    if ( !Bsp_Duplicate( &Bsp_Header[ 0 ], &Bsp_Original ) )
 	//    {
@@ -3723,7 +3763,7 @@ bool RenderScene( void )
     // might not be any water...
     WaterLoad();
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: WaterLoad OK -> ReadTxt/MsgFile"); }
+	{  trace("IV0: WaterLoad OK -> ReadTxt/MsgFile"); }
 #endif
 
     ReadTxtFile( (char*) &TextNames[LevelNum][0] );
@@ -3731,7 +3771,7 @@ bool RenderScene( void )
     ReadMsgFile( (char*) &MsgNames[LevelNum][0] );
 
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: TxtMsg OK -> MCload"); }
+	{  trace("IV0: TxtMsg OK -> MCload"); }
 #endif
     if( !MCload( (char*) &CollisionNames[LevelNum][0] , &MCloadheader ) )
     {
@@ -3740,7 +3780,7 @@ bool RenderScene( void )
       return false;   // the collision data
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: MCload nz OK -> MCload zero"); }
+	{  trace("IV0: MCload nz OK -> MCload zero"); }
 #endif
     if( !MCload( (char*) &CollisionZNames[LevelNum][0] , &MCloadheadert0 ) )
     {
@@ -3749,12 +3789,12 @@ bool RenderScene( void )
       return false; // the collision data skin thickness 0
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: MCload zero OK -> SetUpShips"); }
+	{  trace("IV0: MCload zero OK -> SetUpShips"); }
 #endif
 
     SetUpShips();
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("IV0: SetUpShips OK"); }
+	{  trace("IV0: SetUpShips OK"); }
 #endif
 
 /*
@@ -3846,7 +3886,7 @@ bool RenderScene( void )
 	/* [3DS] Debug traces for the level-load sequence.  Each checkpoint writes
 	 * to sdmc:/forsaken_trace.txt so a crash can be pinpointed without a
 	 * debugger.  Safe to remove once the port is stable. */
-	{ extern void trace(const char*); trace("CLPIV: entry"); }
+	{  trace("CLPIV: entry"); }
 #endif
 
     Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], ".NOD" );
@@ -3856,7 +3896,7 @@ bool RenderScene( void )
       return( false );
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: Nodeload OK"); }
+	{  trace("CLPIV: Nodeload OK"); }
 #endif
 
     if( !LoadBGOFiles() )
@@ -3865,7 +3905,7 @@ bool RenderScene( void )
       return( false );
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: LoadBGOFiles OK"); }
+	{  trace("CLPIV: LoadBGOFiles OK"); }
 #endif
 
     if( !LoadEnemies() )
@@ -3875,7 +3915,7 @@ bool RenderScene( void )
       return( false );
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: LoadEnemies OK"); }
+	{  trace("CLPIV: LoadEnemies OK"); }
 #endif
 
     if( !LoadSpotFX() )
@@ -3899,7 +3939,7 @@ bool RenderScene( void )
       return( false );
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: LoadRestartPoints OK"); }
+	{  trace("CLPIV: LoadRestartPoints OK"); }
 #endif
 
       if ( !InitializeSound( DESTROYSOUND_All ))
@@ -3908,7 +3948,7 @@ bool RenderScene( void )
         return false;
       }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: InitializeSound OK"); }
+	{  trace("CLPIV: InitializeSound OK"); }
 #endif
 
     Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], ".CAM" );
@@ -3919,7 +3959,7 @@ bool RenderScene( void )
       return( false );
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: Cameraload OK"); }
+	{  trace("CLPIV: Cameraload OK"); }
 #endif
 
     // might not be any real-time lights
@@ -3944,7 +3984,7 @@ bool RenderScene( void )
       return( false );
     }
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: LoadPickupsPositions OK"); }
+	{  trace("CLPIV: LoadPickupsPositions OK"); }
 #endif
 
     // might not be any External Forces...
@@ -3958,7 +3998,7 @@ bool RenderScene( void )
 
     InitShipsChangeLevel(&Mloadheader);
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: InitShipsChangeLevel OK"); }
+	{  trace("CLPIV: InitShipsChangeLevel OK"); }
 #endif
 
     if( ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
@@ -3980,12 +4020,12 @@ bool RenderScene( void )
 
     MyGameStatus = ChangeLevel_MyGameStatus;
 #ifdef __3DS__
-	{ extern void trace(const char*); char _b[64]; snprintf(_b,sizeof(_b),"CLPIV: done, MyGameStatus=%d",(int)MyGameStatus); trace(_b); }
+	{  char _b[64]; snprintf(_b,sizeof(_b),"CLPIV: done, MyGameStatus=%d",(int)MyGameStatus); trace(_b); }
 #endif
 
     PrintInitViewStatus( MyGameStatus );
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("CLPIV: post-PrintInitViewStatus"); }
+	{  trace("CLPIV: post-PrintInitViewStatus"); }
 #endif
 
 
@@ -3999,7 +4039,7 @@ bool RenderScene( void )
   case  STATUS_StartingSinglePlayer:
 	DebugState("STATUS_StartingSinglePlayer\n");
 #ifdef __3DS__
-	{ extern void trace_enable(void); extern void trace(const char*); trace_enable(); trace("SSP: entry"); }
+	{   trace_enable(); trace("SSP: entry"); }
 #endif
 
     MenuAbort();
@@ -4044,7 +4084,7 @@ bool RenderScene( void )
   case  STATUS_PostStartingSinglePlayer:
 	DebugState("STATUS_PostStartingSinglePlayer\n");
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("PSP: entry"); }
+	{  trace("PSP: entry"); }
 #endif
 
 #ifdef __3DS__
@@ -4089,11 +4129,11 @@ bool RenderScene( void )
 #endif
 
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("PSP: -> smallinitShip"); }
+	{  trace("PSP: -> smallinitShip"); }
 #endif
     smallinitShip( WhoIAm );
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("PSP: smallinitShip OK"); }
+	{  trace("PSP: smallinitShip OK"); }
 #endif
 	//    if( CountDownOn )
 	//    {
@@ -4105,7 +4145,7 @@ bool RenderScene( void )
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
 #ifdef __3DS__
-	{ extern void trace(const char*); trace("PSP: -> STATUS_SinglePlayer"); }
+	{  trace("PSP: -> STATUS_SinglePlayer"); }
 #endif
     LevelTimeTaken = 0.0F;
     timer_run( &level_time );
@@ -4119,7 +4159,7 @@ bool RenderScene( void )
 	DebugState("STATUS_SinglePlayer\n");
 
 #ifdef __3DS__
-	{ static int _sp_first = 1; extern void trace(const char*);
+	{ static int _sp_first = 1; 
 	  if (_sp_first) { _sp_first = 0; trace("SP: first frame entry"); } }
 #endif
 
@@ -4141,7 +4181,7 @@ bool RenderScene( void )
          * description text) left over from the title screen.  VduClear() only
          * clears VDU-specific entries; InitScrPolys() resets the entire
          * ScrPolys[] linked list so nothing stale renders this frame. */
-        extern void InitScrPolys(void);
+        
         InitScrPolys();
     }
 #endif
@@ -4152,7 +4192,7 @@ bool RenderScene( void )
 	 * for each level. The original `_mg_first` static fired only on
 	 * the very first STATUS_SinglePlayer frame in the whole process,
 	 * which is useless for diagnosing late-sweep crashes. */
-	{ static int _mg_last_level = -2; extern void trace(const char*);
+	{ static int _mg_last_level = -2; 
 	  extern int16_t LevelNum;
 	  if (LevelNum != _mg_last_level) {
 	    _mg_last_level = LevelNum;
@@ -4162,7 +4202,7 @@ bool RenderScene( void )
     if( PERF_MAINGAME() != true ) // bjd
       return false;
 #ifdef __3DS__
-	{ static int _mg_done_last_level = -2; extern void trace(const char*);
+	{ static int _mg_done_last_level = -2; 
 	  extern int16_t LevelNum;
 	  if (LevelNum != _mg_done_last_level) {
 	    _mg_done_last_level = LevelNum;
@@ -4512,7 +4552,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 			_rcs_stage_trace = true;
 		}
 	}
-	#define _RCS_STAGE(s) do { if (_rcs_stage_trace) { extern void trace(const char*); trace("RCS/" s); } } while(0)
+	#define _RCS_STAGE(s) do { if (_rcs_stage_trace) {  trace("RCS/" s); } } while(0)
 #else
 	#define _RCS_STAGE(s) ((void)0)
 #endif
@@ -4567,7 +4607,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	 * have to export c3d_transfer_eye at all. */
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
-		extern void c3d_transfer_eye(unsigned int eye);
+		
 		_RCS_STAGE("c3d_transfer_eye(LEFT)");
 		c3d_transfer_eye(GFX_LEFT);
 		_RCS_STAGE("post c3d_transfer_eye(LEFT)");
@@ -4612,7 +4652,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 #if defined(__3DS__) && defined(RENDERER_C3D)
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
-		extern void c3d_transfer_eye(unsigned int eye);
+		
 		_RCS_STAGE("c3d_transfer_eye(RIGHT)");
 		c3d_transfer_eye(GFX_RIGHT);
 		_RCS_STAGE("post c3d_transfer_eye(RIGHT)");
@@ -4650,11 +4690,13 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 }
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-extern bool c3d_hud_begin_bottom(void);
-extern void c3d_hud_end_bottom(void);
-extern void c3d_clear_bottom_screen(void);
-extern void ScrPolySetRouteBottom(bool b);
-extern void ScrPolySetDisplayMode(int mode);
+extern "C" {
+bool c3d_hud_begin_bottom(void);
+void c3d_hud_end_bottom(void);
+void c3d_clear_bottom_screen(void);
+}
+
+
 #endif
 
 void DrawMainGameMenu(void)
@@ -4677,8 +4719,7 @@ void DrawMainGameMenu(void)
     render_info.ThisMode.w = 320;
     render_info.ThisMode.h = 240;
     {
-      extern bool controls_3ds_menu_is_open(void);
-      extern void controls_3ds_render_overlay(void);
+
       if (controls_3ds_menu_is_open()) {
         /* Menu open: skip HUD, draw menu text only. The next
          * frame after menu closes restores HUD automatically. */
@@ -4790,9 +4831,9 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	 * cycles through "Quantum" / "Solaris" / etc and obscured the
 	 * counter completely. */
 	{
-		extern void ScrPolySetRouteBottom(bool b);
-		extern int  forsaken_get_fps(void);
-		extern int  Print4x5Text(char *Text, int x, int y, int color);
+		
+		
+
 		char fps_buf[24];
 		snprintf(fps_buf, sizeof(fps_buf), "FPS:%d", forsaken_get_fps());
 		ScrPolySetRouteBottom(true);
@@ -4860,7 +4901,7 @@ bool MainGameRender(void)
 			_mgr_stage_trace = true;
 		}
 	}
-	#define _MGR_STAGE(s) do { if (_mgr_stage_trace) { extern void trace(const char*); trace("MGR/" s); } } while(0)
+	#define _MGR_STAGE(s) do { if (_mgr_stage_trace) {  trace("MGR/" s); } } while(0)
 #else
 	#define _MGR_STAGE(s) ((void)0)
 #endif
@@ -4913,7 +4954,7 @@ bool MainGameRender(void)
        * would need two full render passes which halves the framerate. */
 #ifdef RENDERER_C3D
       {
-          extern float platform_get_3d_slider(void);
+          
           float slider = platform_get_3d_slider();
           if (slider > 0.0f)
           {
@@ -5130,7 +5171,7 @@ bool MainGame( void ) // bjd
       _mg_stage_trace = true;
     }
   }
-  #define _MG_STAGE(s) do { if (_mg_stage_trace) { extern void trace(const char*); trace("MG/" s); } } while(0)
+  #define _MG_STAGE(s) do { if (_mg_stage_trace) {  trace("MG/" s); } } while(0)
 #else
   #define _MG_STAGE(s) ((void)0)
 #endif
@@ -5299,7 +5340,7 @@ bool StatsNamePulse( void )
 	return false;
 }
 
-extern int GetPlayerByRank( int rank );
+
 
 void DisplayNetworkInfo()
 {
@@ -5643,7 +5684,7 @@ bool  InitScoreDisplay()
 }
 
 // Clears the target(back) and zbuffer for the current camera
-bool ClearBuffers( void )
+extern "C" bool ClearBuffers( void )
 {
 	XYRECT dummy;
 
@@ -5763,7 +5804,7 @@ bool RenderCurrentCamera( void )
 			_rc_stage_trace = true;
 		}
 	}
-	#define _RC_STAGE(s) do { if (_rc_stage_trace) { extern void trace(const char*); trace("RC/" s); } } while(0)
+	#define _RC_STAGE(s) do { if (_rc_stage_trace) {  trace("RC/" s); } } while(0)
 #else
 	#define _RC_STAGE(s) ((void)0)
 #endif
@@ -5807,7 +5848,7 @@ bool RenderCurrentCamera( void )
   /* Pack the camera's visible XLight list into the shader uniform
    * once per pass. No per-group filter — see c3d_upload_xlights for
    * why occlusion-aware filtering isn't tractable on PICA200. */
-  { extern void c3d_upload_xlights(void); c3d_upload_xlights(); }
+  { c3d_upload_xlights(); }
   _RC_STAGE("post-c3d_upload_xlights");
 #endif
 
@@ -5889,7 +5930,7 @@ bool RenderCurrentCamera( void )
 #ifdef __3DS__
     if (_rc_stage_trace && _rc_group_iter < 8) {
       char _b[64]; snprintf(_b,sizeof(_b),"RC/opaque-loop iter=%d group=%d", _rc_group_iter, (int)group);
-      extern void trace(const char*); trace(_b);
+       trace(_b);
     }
     _rc_group_iter++;
 #endif
@@ -5904,7 +5945,7 @@ bool RenderCurrentCamera( void )
      * of the FIRST per-level call so we can pinpoint the exact sub-call
      * that hangs without spamming the trace at 60 fps. */
     bool _rc_substage_trace = (_rc_stage_trace && _rc_group_iter <= 3);
-    #define _RC_SUBSTAGE(s) do { if (_rc_substage_trace) { extern void trace(const char*); \
+    #define _RC_SUBSTAGE(s) do { if (_rc_substage_trace) {  \
         char _b[80]; snprintf(_b,sizeof(_b),"RC/group=%d %s",(int)group,s); trace(_b); } } while(0)
 #else
     #define _RC_SUBSTAGE(s) ((void)0)
@@ -6006,10 +6047,10 @@ bool RenderCurrentCamera( void )
     bool _rc_trans_substage_trace = (_rc_stage_trace && _rc_trans_iter <= 3);
     if (_rc_trans_substage_trace) {
       char _b[80]; snprintf(_b,sizeof(_b),"RC/trans-loop iter=%d group=%d",_rc_trans_iter,(int)group);
-      extern void trace(const char*); trace(_b);
+       trace(_b);
     }
     _rc_trans_iter++;
-    #define _RC_TRANS_SUBSTAGE(s) do { if (_rc_trans_substage_trace) { extern void trace(const char*); \
+    #define _RC_TRANS_SUBSTAGE(s) do { if (_rc_trans_substage_trace) {  \
         char _b[80]; snprintf(_b,sizeof(_b),"RC/trans-group=%d %s",(int)group,s); trace(_b); } } while(0)
 #else
     #define _RC_TRANS_SUBSTAGE(s) ((void)0)
@@ -6610,13 +6651,13 @@ void PrintInitViewStatus( BYTE Status )
 	{ static int _pivs_last_status = -1;
 	  if ((int)Status != _pivs_last_status) {
 	    _pivs_last_status = (int)Status;
-	    extern void trace(const char*); char _b[64];
+	     char _b[64];
 	    snprintf(_b, sizeof(_b), "PIVS/enter status=%u", (unsigned)Status);
 	    trace(_b);
 	  }
 	}
 	bool _pivs_trace_now = (Status == 33);
-	#define _PIVS_STAGE(s) do { if (_pivs_trace_now) { extern void trace(const char*); trace("PIVS/" s); } } while(0)
+	#define _PIVS_STAGE(s) do { if (_pivs_trace_now) {  trace("PIVS/" s); } } while(0)
 #else
 	#define _PIVS_STAGE(s) ((void)0)
 #endif
@@ -6628,7 +6669,7 @@ void PrintInitViewStatus( BYTE Status )
 		bool _iok = FSCreateIndexBuffer(&ro, 32767*3);
 #ifdef __3DS__
 		if (_pivs_trace_now) {
-			extern void trace(const char*); char _b[64];
+			 char _b[64];
 			snprintf(_b, sizeof(_b), "PIVS/post-FSCreate v=%d i=%d", (int)_vok, (int)_iok);
 			trace(_b);
 		}
@@ -6686,7 +6727,7 @@ void PrintInitViewStatus( BYTE Status )
 	 * but it's a subset of this broader cleanup. Calling InitScrPolys
 	 * always at status=33 covers both. */
 	if (Status == 33) {
-		extern void InitScrPolys(void);
+		
 		InitScrPolys();
 	}
 #endif
@@ -6878,11 +6919,11 @@ bool SavePPM( u_int8_t * Filename, u_int8_t * ScreenPtr, u_int32_t Width, u_int3
   Xsize = ( x2 - x1 );
   Ysize = ( y2 - y1 );
 
-  fp = file_open( Filename, "wb" );
+  fp = file_open( (char*)Filename, "wb" );
 
   if( fp != NULL )
   {
-    sprintf( &Header[ 0 ], "P6%c#Forsaken (c)1998%c%d %d%c255%c", 10, 10, (int)Xsize, (int)Ysize, 10, 10 );
+    sprintf( (char*)&Header[ 0 ], "P6%c#Forsaken (c)1998%c%d %d%c255%c", 10, 10, (int)Xsize, (int)Ysize, 10, 10 );
 
     i = 0;
     while( Header[ i ] )
@@ -6954,7 +6995,7 @@ bool SavePPM( u_int8_t * Filename, u_int8_t * ScreenPtr, u_int32_t Width, u_int3
   Input   :   int8_t  * Filename
   Output    :   bool    True/False
 ===================================================================*/
-bool SaveSnapShot( int8_t * Filename )
+extern "C" bool SaveSnapShot( int8_t * Filename )
 {
 	return true;
 }
