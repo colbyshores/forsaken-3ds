@@ -8,15 +8,12 @@
 #include	"new3d.h"
 #include	"quat.h"
 #include <stdio.h>
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
 
 extern	VECTOR			Forward;
 extern	VECTOR			SlideUp;
 
 
-void MakeQuat( float XRot, float YRot, float ZRot , QUAT * qxyz )
+void QUAT::MakeEuler( float XRot, float YRot, float ZRot )
 {
     float  cosZRot, sinZRot, cosYRot, sinYRot, cosXRot, sinXRot;
     float  half_XRot, half_YRot, half_ZRot;
@@ -38,26 +35,25 @@ void MakeQuat( float XRot, float YRot, float ZRot , QUAT * qxyz )
 	sinXRot = (float) SIND(half_XRot);
 	
 	
-	qxyz->x = sinXRot * cosYRot * cosZRot - cosXRot * sinYRot * sinZRot;
-	qxyz->y = cosXRot * sinYRot * cosZRot + sinXRot * cosYRot * sinZRot;
-	qxyz->z = cosXRot * cosYRot * sinZRot - sinXRot * sinYRot * cosZRot;
+	x = sinXRot * cosYRot * cosZRot - cosXRot * sinYRot * sinZRot;
+	y = cosXRot * sinYRot * cosZRot + sinXRot * cosYRot * sinZRot;
+	z = cosXRot * cosYRot * sinZRot - sinXRot * sinYRot * cosZRot;
 	
-	qxyz->w = cosXRot * cosYRot * cosZRot + sinXRot * sinYRot * sinZRot;
+	w = cosXRot * cosYRot * cosZRot + sinXRot * sinYRot * sinZRot;
 
 }	/* q_from_euler */
 /*===================================================================
 	Procedure	:	Multiply 2 Quaternions together creating 3rd
-	Input		:	QUAT	*	Quaternion1
-				:	QUAT	*	Quaternion2
+	Input		:	QUAT	*	Quaternion2
 				:	QUAT	*	New Quaternion
 	Output		:	Nothing
 ===================================================================*/
-void QuatMultiply( QUAT * q1, QUAT * q2, QUAT * q1q2 )
+void QUAT::Multiply( const QUAT * q2, QUAT * q1q2 ) const
 {
 	float	q1_w, q1_x, q1_y, q1_z;
 	float	q2_w, q2_x, q2_y, q2_z;
 
-	q1_w = q1->w;	q1_x = q1->x;	q1_y = q1->y;	q1_z = q1->z;
+	q1_w = w;	q1_x = x;	q1_y = y;	q1_z = z;
 	q2_w = q2->w;	q2_x = q2->x;	q2_y = q2->y;	q2_z = q2->z;
 
 	q1q2->w = ( (q1_w * q2_w) - (q1_x * q2_x) - (q1_y * q2_y) - (q1_z * q2_z) );
@@ -69,20 +65,16 @@ void QuatMultiply( QUAT * q1, QUAT * q2, QUAT * q1q2 )
 /*===================================================================
 	Procedure	:	Multiply X Quaternion by Y Quaternion creating
 				:	new XY quaternion
-	Input		:	QUAT	*	X Quaternion
-				:	QUAT	*	Y Quaternion
+	Input		:	QUAT	*	Y Quaternion
 				:	QUAT	*	New Quaternion
 	Output		:	Nothing
 ===================================================================*/
-#ifdef USEINLINE
-__inline
-#endif
-void QuatMultiplyX_Y( QUAT * qx, QUAT * qy, QUAT * qxy )
+void QUAT::MultiplyX_Y( const QUAT * qy, QUAT * qxy ) const
 {
 	float	x_w, x_x, x_y, x_z;
 	float	y_w, y_x, y_y, y_z;
 
-	x_w = qx->w;	x_x = qx->x;	x_y = qx->y;	x_z = qx->z;
+	x_w = w;	x_x = x;	x_y = y;	x_z = z;
 	y_w = qy->w;	y_x = qy->x;	y_y = qy->y;	y_z = qy->z;
 
 	qxy->w = ( ( x_w * y_w ) );
@@ -94,20 +86,16 @@ void QuatMultiplyX_Y( QUAT * qx, QUAT * qy, QUAT * qxy )
 /*===================================================================
 	Procedure	:	Multiply XY Quaternion by Z Quaternion creating
 				:	new XYZ Quaternion
-	Input		:	QUAT	*	XY Quaternion
-				:	QUAT	*	Z Quaternion
+	Input		:	QUAT	*	Z Quaternion
 				:	QUAT	*	New Quaternion
 	Output		:	Nothing
 ===================================================================*/
-#ifdef USEINLINE
-__inline
-#endif
-void QuatMultiplyXY_Z( QUAT * qxy, QUAT * qz, QUAT * qxyz )
+void QUAT::MultiplyXY_Z( const QUAT * qz, QUAT * qxyz ) const
 {
 	float	xy_w, xy_x, xy_y, xy_z;
 	float	z_w, z_x, z_y, z_z;
 
-	xy_w = qxy->w;	xy_x = qxy->x;	xy_y = qxy->y;	xy_z = qxy->z;
+	xy_w = w;	xy_x = x;	xy_y = y;	xy_z = z;
 	z_w = qz->w;	z_x = qz->x;	z_y = qz->y;	z_z = qz->z;
 
 	qxyz->w = ( ( xy_w * z_w ) - ( xy_z * z_z ) );
@@ -118,59 +106,58 @@ void QuatMultiplyXY_Z( QUAT * qxy, QUAT * qz, QUAT * qxyz )
 
 /*===================================================================
 	Procedure	:	Normalise a Quaternion
-	Input		:	QUAT	*	Quaternion
+	Input		:	Nothing (operates on this)
 	Output		:	Nothing
 ===================================================================*/
-void QuatNormalise( QUAT * q )
+void QUAT::Normalise()
 {
 	float 	len;
 	VECTOR	sq;
 
-	sq.x = ( q->x * q->x );
-	sq.y = ( q->y * q->y );
-	sq.z = ( q->z * q->z );
+	sq.x = ( x * x );
+	sq.y = ( y * y );
+	sq.z = ( z * z );
 
 	{
-		float dot = ( sq.x + sq.y + sq.z ) + ( q->w * q->w );
+		float dot = ( sq.x + sq.y + sq.z ) + ( w * w );
 		if ( dot > 1e-14f )
 		{
 			len = fast_invsqrtf( dot );
-			q->x *= len;
-			q->y *= len;
-			q->z *= len;
-			q->w *= len;
+			x *= len;
+			y *= len;
+			z *= len;
+			w *= len;
 		}
 	}			   
 }
 
 /*===================================================================
 	Procedure	:	NEW Create Matrix from Quaternion
-	Input		:	QUAT	*	Quaternion
-				:	MATRIX	*	Matrix
+	Input		:	MATRIX	*	Matrix
 	Output		:	Nothing
 ===================================================================*/
-void QuatToMatrix( QUAT * q, MATRIX * m )
+void QUAT::ToMatrix( MATRIX * m ) const
 {
 	float	xs, ys, zs;
 	float	wx, wy, wz;
 	float	xx, xy, xz;
 	float	yy, yz, zz;
 
-	xs = q->x + q->x;
-	ys = q->y + q->y;
-	zs = q->z + q->z;
+	xs = x + x;
+	ys = y + y;
+	zs = z + z;
 
-	wx = q->w * xs;
-	wy = q->w * ys;
-	wz = q->w * zs;
+	wx = w * xs;
+	wy = w * ys;
+	wz = w * zs;
 
-	xx = q->x * xs;
-	xy = q->x * ys;
-	xz = q->x * zs;
+	xx = x * xs;
+	xy = x * ys;
+	xz = x * zs;
 
-	yy = q->y * ys;
-	yz = q->y * zs;
-	zz = q->z * zs;
+	yy = y * ys;
+	yz = y * zs;
+	zz = z * zs;
 
 	m->_11 = ( 1.0F - ( yy + zz ) );
 	m->_12 = ( xy - wz );
@@ -195,22 +182,21 @@ void QuatToMatrix( QUAT * q, MATRIX * m )
 
 /*===================================================================
 	Procedure	:	Quaternion Dot Product
-	Input		:	QUAT	*	Quaternion1
-				:	QUAT	*	Quaternion2
+	Input		:	QUAT	*	Quaternion2
 	Output		:	float		Result
 ===================================================================*/
-float QuatDotProduct( QUAT * q1, QUAT * q2 )
+float QUAT::Dot( const QUAT * q2 ) const
 {
-	return ( ( q1->x * q2->x ) + ( q1->y * q2->y ) +
-			 ( q1->z * q2->z ) + ( q1->w * q2->w ) );
+	return ( ( x * q2->x ) + ( y * q2->y ) +
+			 ( z * q2->z ) + ( w * q2->w ) );
 }
 
 /*===================================================================
 	Procedure	:	Quaternion Interpolation
-	Input		:	QUATLERP	*	Quaternion Interpolation Data
+	Input		:	Nothing (operates on this QUATLERP)
 	Output		:	Nothing
 ===================================================================*/
-void QuatInterpolate( register QUATLERP * ql )
+void QUATLERP::Step()
 {
 	float	 	alpha;
 	float	 	beta;
@@ -218,17 +204,17 @@ void QuatInterpolate( register QUATLERP * ql )
 	QUAT	*	end;
 	QUAT	*	result;
 	
-	alpha  =	ql->time;
-	start  =	&ql->start;
-	end	   =	&ql->end;
-	result =	ql->crnt;
+	alpha  =	time;
+	start  =	&this->start;
+	end	   =	&this->end;
+	result =	crnt;
 
   	beta   =	( 1.0F - alpha );
 
 /*===================================================================
 	Check which direction we are going around hypersphere ...
 ===================================================================*/
-	if ( ql->dir < 0.0F ) alpha = -alpha;
+	if ( dir < 0.0F ) alpha = -alpha;
 
 /*===================================================================
 	Interpolate ...
@@ -239,16 +225,15 @@ void QuatInterpolate( register QUATLERP * ql )
 	result->z = ( ( beta * start->z ) ) + ( ( alpha * end->z ) );
 	result->w = ( ( beta * start->w ) ) + ( ( alpha * end->w ) );
 					 
-	QuatNormalise( result );
+	result->Normalise();
 }
 
 /*===================================================================
 	Procedure	:	Create Quaternion from Vector
 	Input		:	VECTOR	*	Vector
-				:	QUAT	*	New Quaternion
 	Output		:	Nothing
 ===================================================================*/
-void QuatFromVector( VECTOR * Tv, QUAT * q )
+void QUAT::FromVector( VECTOR * Tv )
 {
 	float	angle;
 	VECTOR	Av;
@@ -275,21 +260,20 @@ void QuatFromVector( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Finally build TARGET QUATERNION
 ===================================================================*/
-	q->x = (float) ( fast_sinf( angle ) * Av.x );
-	q->y = (float) ( fast_sinf( angle ) * Av.y );
-	q->z = 0.0F;
-	q->w = (float) fast_cosf( angle );
+	x = (float) ( fast_sinf( angle ) * Av.x );
+	y = (float) ( fast_sinf( angle ) * Av.y );
+	z = 0.0F;
+	w = (float) fast_cosf( angle );
 
-	QuatNormalise( q );
+	Normalise();
 }
 
 /*===================================================================
 	Procedure	:	Create Quaternion from Vector ( Uuuummmmm )
 	Input		:	VECTOR	*	Vector
-				:	QUAT	*	New Quaternion
 	Output		:	Nothing
 ===================================================================*/
-void QuatFromVector2( VECTOR * Tv, QUAT * q )
+void QUAT::FromVector2( VECTOR * Tv )
 {
 	float	angle;
 	VECTOR	Av;
@@ -316,24 +300,23 @@ void QuatFromVector2( VECTOR * Tv, QUAT * q )
 /*===================================================================
 	Finally build TARGET QUATERNION
 ===================================================================*/
-	q->x = (float) ( fast_sinf( angle ) * Av.x );
-	q->y = (float) ( fast_sinf( angle ) * Av.y );
-	q->z = 0.0F;
-	q->w = (float) fast_cosf( angle );
+	x = (float) ( fast_sinf( angle ) * Av.x );
+	y = (float) ( fast_sinf( angle ) * Av.y );
+	z = 0.0F;
+	w = (float) fast_cosf( angle );
 
-	QuatNormalise( q );
+	Normalise();
 }
 
 /*===================================================================
 	Procedure	:		Quaternion Spherical Interpolation (Slerp)
-	Input		:		double		alpha ( interpolation parameter (0 to 1) )
-				:		QUAT	*	a ( start unit quaternions )
+	Input		:		float		alpha ( interpolation parameter (0 to 1) )
 				:		QUAT	*	b ( end unit quaternions )
 				:		QUAT	*	q ( output interpolated quaternion )
-				:		int16_t		spin ( number of extra spin rotations )
-	Output		:		Nothing
+				:		int		spin ( number of extra spin rotations )
+	Output		:	Nothing
 ===================================================================*/
-void Quaternion_Slerp( float alpha, QUAT * a, QUAT * b, QUAT * q, int spin )
+void QUAT::Slerp( float alpha, const QUAT * b, QUAT * q, int spin ) const
 {
 	float	beta;			/* complementary interp parameter */
 	float	theta;			/* angle between A and B */
@@ -341,7 +324,7 @@ void Quaternion_Slerp( float alpha, QUAT * a, QUAT * b, QUAT * q, int spin )
 	float	phi;			/* theta plus spins */
 	int		bflip;			/* use negation of B? */
 
-	cos_t = QuatDotProduct( a, b );
+	cos_t = Dot( b );
 
 	/* if B is on opposite hemisphere from A, use -B instead */
  	if( cos_t < 0.0F )
@@ -377,44 +360,42 @@ void Quaternion_Slerp( float alpha, QUAT * a, QUAT * b, QUAT * q, int spin )
 	if( bflip ) alpha = -alpha;
 
 	/* interpolate */
- 	q->x = ( ( beta * a->x ) + ( alpha * b->x ) );
- 	q->y = ( ( beta * a->y ) + ( alpha * b->y ) );
- 	q->z = ( ( beta * a->z ) + ( alpha * b->z ) );
- 	q->w = ( ( beta * a->w ) + ( alpha * b->w ) );
+ 	q->x = ( ( beta * x ) + ( alpha * b->x ) );
+ 	q->y = ( ( beta * y ) + ( alpha * b->y ) );
+ 	q->z = ( ( beta * z ) + ( alpha * b->z ) );
+ 	q->w = ( ( beta * w ) + ( alpha * b->w ) );
 }
 
 /*===================================================================
 	Procedure	:		Invert Quaternion
 				:		Create it's multiplicative inverse.
-	Input		:		QUAT	*	Source Quaternion
-				:		QUAT	*	Destin Quaternion
-	Output		:		Nothing
+	Input		:		QUAT	*	Destin Quaternion
+	Output		:	Nothing
 ===================================================================*/
-void QuatInverse( QUAT * s, QUAT * d )
+void QUAT::Inverse( QUAT * d ) const
 {
     float	sNorm;
 
-	sNorm = ( 1.0F / ( ( s->x * s->x ) +
-					   ( s->y * s->y ) +
-					   ( s->z * s->z ) +
-					   ( s->w * s->w ) ) );
+	sNorm = ( 1.0F / ( ( x * x ) +
+					   ( y * y ) +
+					   ( z * z ) +
+					   ( w * w ) ) );
 
-	d->x = -s->x * sNorm;
-	d->y = -s->y * sNorm;
-	d->z = -s->z * sNorm;
-	d->w =  s->w * sNorm;
+	d->x = -x * sNorm;
+	d->y = -y * sNorm;
+	d->z = -z * sNorm;
+	d->w =  w * sNorm;
 
 }
 
 /*===================================================================
 	Procedure	:		create a quaternion from two vectors that rotates
     	    	     	v1 to v2 about an axis perpendicular to both
-	Input		:		QUAT	*	Destin Quaternion
-				:		VECTOR * v1
+	Input		:		VECTOR * v1
 				:		VECTOR * v2
-	Output		:		Nothing
+	Output		:	Nothing (operates on this)
 ===================================================================*/
-void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
+void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 {
 	VECTOR	u1, u2;
 	VECTOR	axis;					 /* axis of rotation */
@@ -467,10 +448,10 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 /* if angle is 0, just return identity quaternion   */
 	if( theta < EPS )
 	{
-		destQuat->x = 0.0F;
-		destQuat->y = 0.0F;
-		destQuat->z = 0.0F;
-		destQuat->w = 1.0F;
+		x = 0.0F;
+		y = 0.0F;
+		z = 0.0F;
+		w = 1.0F;
 	}else{
 		if( theta_complement < EPS )
 		{
@@ -492,8 +473,8 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 			}
 		}
 		NormaliseVector( &axis );
-		QuatMake( destQuat, axis.x, axis.y, axis.z, theta ) ;
-		QuatNormalise( destQuat );
+		MakeAxis( axis.x, axis.y, axis.z, theta ) ;
+		Normalise();
    }
 }
 
@@ -504,12 +485,10 @@ void QuatFrom2Vectors( QUAT * destQuat, VECTOR * v1, VECTOR * v2 )
 					    - rotation is counter-clockwise when rotation axis vector is 
 					    	pointing at you
 				    	    - if angle or vector are 0, the identity quaternion is returned.
-	Input		:		QUAT	*	Destin Quaternion
-				:		float x , y , z , angle
-	Output		:		Nothing
+	Input		:		float x , y , z , angle
+	Output		:	Nothing (operates on this)
 ===================================================================*/
-void
-QuatMake( QUAT * destQuat, float x, float y, float z, float angle)
+void QUAT::MakeAxis( float x, float y, float z, float angle)
 {
     float length, cosA, sinA;
 	/* normalize vector */
@@ -520,10 +499,10 @@ QuatMake( QUAT * destQuat, float x, float y, float z, float angle)
 		/* if zero vector passed in, just return identity quaternion	*/
 		if ( dot < EPS * EPS )
 		{
-			destQuat->x = 0.0F;
-			destQuat->y = 0.0F;
-			destQuat->z = 0.0F;
-			destQuat->w = 1.0F;
+			this->x = 0.0F;
+			this->y = 0.0F;
+			this->z = 0.0F;
+			this->w = 1.0F;
 			return;
 		}
 		inv = fast_invsqrtf( dot );
@@ -535,22 +514,20 @@ QuatMake( QUAT * destQuat, float x, float y, float z, float angle)
 	cosA = (float) fast_cosf(angle * 0.5F);
 	sinA = (float) fast_sinf(angle * 0.5F);
 
-	destQuat->w = cosA;
-	destQuat->x = sinA * x;
-	destQuat->y = sinA * y;
-	destQuat->z = sinA * z;
+	this->w = cosA;
+	this->x = sinA * x;
+	this->y = sinA * y;
+	this->z = sinA * z;
 
 }
 
 /*===================================================================
 	Procedure	:		Convert GL 4x4 row-major 
     	    	    	rotation matrix to unit quaternion.
-	Input		:		QUAT	*	DestQuat
-				:		MATRIX	*	SrcMatrix
-	Output		:		Nothing
+	Input		:		MATRIX	*	SrcMatrix
+	Output		:	Nothing (operates on this)
 ===================================================================*/
-void 
-MatrixToQuat(QUAT * destQuat, MATRIX * srcMatrix)
+void QUAT::FromMatrix( const MATRIX * srcMatrix)
 {
     float	trace, s;
     int     i, j, k;
@@ -561,12 +538,12 @@ MatrixToQuat(QUAT * destQuat, MATRIX * srcMatrix)
 if (trace > 0.0F)
     {
     s = sqrtf(trace + 1.0F);
-    destQuat->w = s * 0.5F;
+    w = s * 0.5F;
     s = 0.5F / s;
     
-    destQuat->x = (srcMatrix->_23 - srcMatrix->_32) * s;
-    destQuat->y = (srcMatrix->_31 - srcMatrix->_13) * s;
-    destQuat->z = (srcMatrix->_12 - srcMatrix->_21) * s;
+    x = (srcMatrix->_23 - srcMatrix->_32) * s;
+    y = (srcMatrix->_31 - srcMatrix->_13) * s;
+    z = (srcMatrix->_12 - srcMatrix->_21) * s;
     } 
 else 
     {
@@ -587,28 +564,28 @@ else
     
     s = (float) sqrtf( (Temp[i][i] - (Temp[j][j]+Temp[k][k])) + 1.0F );
 	if( i == 0)
-		destQuat->x = s*0.5F;
+		x = s*0.5F;
 	if( i == 1)
-		destQuat->y = s*0.5F;
+		y = s*0.5F;
 	if( i == 2)
-		destQuat->z = s*0.5F;
+		z = s*0.5F;
     
     s = 0.5F / s;
     
-    destQuat->w = (Temp[j][k] - Temp[k][j]) * s;
+    w = (Temp[j][k] - Temp[k][j]) * s;
 	if( j == 0)
-		destQuat->x = (Temp[i][j] + Temp[j][i]) * s;
+		x = (Temp[i][j] + Temp[j][i]) * s;
 	if( j == 1)
-		destQuat->y = (Temp[i][j] + Temp[j][i]) * s;
+		y = (Temp[i][j] + Temp[j][i]) * s;
 	if( j == 2)
-		destQuat->z = (Temp[i][j] + Temp[j][i]) * s;
+		z = (Temp[i][j] + Temp[j][i]) * s;
 
 	if( k == 0)
-		destQuat->x = (Temp[i][k] + Temp[k][i]) * s;
+		x = (Temp[i][k] + Temp[k][i]) * s;
 	if( k == 1)
-		destQuat->y = (Temp[i][k] + Temp[k][i]) * s;
+		y = (Temp[i][k] + Temp[k][i]) * s;
 	if( k == 2)
-		destQuat->z = (Temp[i][k] + Temp[k][i]) * s;
+		z = (Temp[i][k] + Temp[k][i]) * s;
     }
 }
 
@@ -616,22 +593,17 @@ else
 	Procedure	:		Create Quat from dir vector and up vector
 	Input		:		VECTOR	*	Direction Vector
 				:		VECTOR	*	Up Vector
-				:		QUAT	*	Destin Quaternion
-	Output		:		Nothing
+	Output		:	Nothing (operates on this)
 ===================================================================*/
-void QuatFromDirAndUp( VECTOR * Dir, VECTOR * Up, QUAT * Quat )
+void QUAT::FromDirAndUp( const VECTOR * Dir, const VECTOR * Up )
 {
 	MATRIX		TempMat;
 	VECTOR		TempUp;
 	QUAT		RotQuat;
 
-	QuatFrom2Vectors( Quat, &Forward, Dir );
-	QuatToMatrix( Quat, &TempMat );
+	From2Vectors( &Forward, Dir );
+	ToMatrix( &TempMat );
 	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
-	QuatFrom2Vectors( &RotQuat, &TempUp, Up );
-	QuatMultiply( &RotQuat, Quat, Quat );
+	RotQuat.From2Vectors( &TempUp, Up );
+	RotQuat.Multiply( this, this );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

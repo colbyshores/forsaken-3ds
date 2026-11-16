@@ -3170,8 +3170,8 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 			}
 			else
 			{
-				QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-				QuatToMatrix( &TempQuat, &TempMat );
+				TempQuat.From2Vectors(&Forward, Dir);
+				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 		
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3301,8 +3301,8 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 			}
 			else
 			{
-				QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-				QuatToMatrix( &TempQuat, &TempMat );
+				TempQuat.From2Vectors(&Forward, Dir);
+				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 		
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -4038,8 +4038,8 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Frame = 0.0F;
 				  	FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
 					FmPolys[ fmpoly ].DirVector = *Dir;
-					QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-					QuatToMatrix( &TempQuat, &FmPolys[ fmpoly ].Mat );
+					TempQuat.From2Vectors(&Forward, Dir);
+					TempQuat.ToMatrix(&FmPolys[ fmpoly ].Mat);
 					FmPolys[ fmpoly ].xsize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
 					FmPolys[ fmpoly ].ysize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
 				   	FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
@@ -4766,8 +4766,8 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Frame = 0.0F;
 				  	FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
 					FmPolys[ fmpoly ].DirVector = *Dir;
-					QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-					QuatToMatrix( &TempQuat, &FmPolys[ fmpoly ].Mat );
+					TempQuat.From2Vectors(&Forward, Dir);
+					TempQuat.ToMatrix(&FmPolys[ fmpoly ].Mat);
 					FmPolys[ fmpoly ].xsize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
 					FmPolys[ fmpoly ].ysize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
 				   	FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
@@ -5520,8 +5520,8 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 		if( fmpoly != (u_int16_t ) -1 )
 		{
-			QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-		   	QuatToMatrix( &TempQuat, &TempMat );
+			TempQuat.From2Vectors(&Forward, Dir);
+		   	TempQuat.ToMatrix(&TempMat);
 		   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 		
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
@@ -5646,8 +5646,8 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 		if( fmpoly != (u_int16_t ) -1 )
 		{
-			QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-		   	QuatToMatrix( &TempQuat, &TempMat );
+			TempQuat.From2Vectors(&Forward, Dir);
+		   	TempQuat.ToMatrix(&TempMat);
 		   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 		
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
@@ -5918,16 +5918,16 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Grou
 			}
 			else
 			{
-				QuatFromVector2( Dir, &TempQuat );
-				QuatToMatrix( &TempQuat, &TempMat );
+				TempQuat.FromVector2(Dir);
+				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 				ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			}
 			break;
 
 		default:
-			QuatFromVector2( Dir, &TempQuat );
-			QuatToMatrix( &TempQuat, &TempMat );
+			TempQuat.FromVector2(Dir);
+			TempQuat.ToMatrix(&TempMat);
 			ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 			ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			break;
@@ -6100,16 +6100,16 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t G
 			}
 			else
 			{
-				QuatFromVector2( Dir, &TempQuat );
-				QuatToMatrix( &TempQuat, &TempMat );
+				TempQuat.FromVector2(Dir);
+				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 				ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			}
 			break;
 
 		default:
-			QuatFromVector2( Dir, &TempQuat );
-			QuatToMatrix( &TempQuat, &TempMat );
+			TempQuat.FromVector2(Dir);
+			TempQuat.ToMatrix(&TempMat);
 			ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 			ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			break;
@@ -6279,16 +6279,16 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 			}
 			else
 			{
-				QuatFromVector2( Dir, &TempQuat );
-				QuatToMatrix( &TempQuat, &TempMat );
+				TempQuat.FromVector2(Dir);
+				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 				ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			}
 			break;
 
 		default:
-			QuatFromVector2( Dir, &TempQuat );
-			QuatToMatrix( &TempQuat, &TempMat );
+			TempQuat.FromVector2(Dir);
+			TempQuat.ToMatrix(&TempMat);
 			ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 			ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			break;
@@ -6435,16 +6435,16 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 			}
 			else
 			{
-				QuatFromVector2( Dir, &TempQuat );
-				QuatToMatrix( &TempQuat, &TempMat );
+				TempQuat.FromVector2(Dir);
+				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 				ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			}
 			break;
 
 		default:
-			QuatFromVector2( Dir, &TempQuat );
-			QuatToMatrix( &TempQuat, &TempMat );
+			TempQuat.FromVector2(Dir);
+			TempQuat.ToMatrix(&TempMat);
 			ApplyMatrix( &TempMat, &SlideLeft, &LeftVector );
 			ApplyMatrix( &TempMat, &SlideUp, &UpVector );
 			break;
@@ -6860,8 +6860,8 @@ void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * IntPos2, u_int1
 			else Time = 1.0F;
 			if( Time > 1.0F ) Time = 1.0F;
 		
-			QuatFrom2Vectors( &StartQuat, &Forward, &TempVector );
-			QuatFrom2Vectors( &EndQuat, &Forward, &TempVector2 );
+			StartQuat.From2Vectors(&Forward, &TempVector);
+			EndQuat.From2Vectors(&Forward, &TempVector2);
 		
 			Step = 0.0F;
 		
@@ -6902,16 +6902,16 @@ void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * IntPos2, u_int1
 						Polys[ Poly ].Qlerp.start = StartQuat;			/* Starting Quaternion */
 						Polys[ Poly ].Qlerp.end = EndQuat;				/* Ending Quaternion */
 						Polys[ Poly ].Qlerp.crnt = &Polys[ Poly ].Quat;	/* Address to store new Quaternion */
-						Polys[ Poly ].Qlerp.dir = QuatDotProduct( &Polys[ Poly ].Qlerp.start, &Polys[ Poly ].Qlerp.end );
+						Polys[ Poly ].Qlerp.dir = Polys[ Poly ].Qlerp.start.Dot(&Polys[ Poly ].Qlerp.end);
 						Polys[ Poly ].Qlerp.time = Step;
 						Polys[ Poly ].SeqNum = POLY_SHIELD;
 						Polys[ Poly ].Ship = ShipHit;
 						Polys[ Poly ].TimeStep = Time;
 						Polys[ Poly ].Group = Ships[ ShipHit ].Object.Group;
 			
-						QuatInterpolate( &Polys[ Poly ].Qlerp );
+						Polys[ Poly ].Qlerp.Step();
 		
-						QuatToMatrix( &Polys[ Poly ].Quat, &TempMat );
+						Polys[ Poly ].Quat.ToMatrix(&TempMat);
 						MatrixTranspose( &TempMat, &TempInvMat );
 						TempInvMat._41 = Ships[ Polys[ Poly ].Ship ].Object.Pos.x;
 						TempInvMat._42 = Ships[ Polys[ Poly ].Ship ].Object.Pos.y;
@@ -7354,9 +7354,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 	else Toggle = 0;
 	ID = Ships[Ship].PrimID;
 
-	MakeQuat( 0.0F , 0.0F , Ships[Ship].Object.Bank, &StepQuat );
-	QuatMultiply(  &Ships[Ship].Object.Quat , &StepQuat , &Ships[Ship].Object.FinalQuat );
-	QuatToMatrix( &Ships[Ship].Object.FinalQuat, &Ships[Ship].Object.FinalMat );
+	StepQuat.MakeEuler(0.0F, 0.0F, Ships[Ship].Object.Bank);
+	Ships[Ship].Object.Quat.Multiply(&StepQuat, &Ships[Ship].Object.FinalQuat);
+	Ships[Ship].Object.FinalQuat.ToMatrix(&Ships[Ship].Object.FinalMat);
 
 	ApplyMatrix( &Ships[Ship].Object.FinalMat, &Forward, &Dir );
 	ApplyMatrix( &Ships[Ship].Object.FinalMat, &SlideDown, &DownVector );	/* Calc Down Vector */
@@ -8341,8 +8341,8 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 
 	if( fmpoly != (u_int16_t ) -1 )
 	{
-		QuatFrom2Vectors( &TempQuat, &FmPolys[ fmpoly ].UpVector, &NewDir );
-		QuatToMatrix( &TempQuat, &TempMatrix );
+		TempQuat.From2Vectors(&FmPolys[ fmpoly ].UpVector, &NewDir);
+		TempQuat.ToMatrix(&TempMatrix);
 		ApplyMatrix( &TempMatrix, &FmPolys[ fmpoly ].DirVector, &FmPolys[ fmpoly ].DirVector );
 		FmPolys[ fmpoly ].UpVector = NewDir;
 		FmPolys[ fmpoly ].xsize *= 0.5F;
@@ -8367,8 +8367,8 @@ void ChangePulsarDir( u_int16_t i, VECTOR * Dir )
 	VECTOR	DownVector;
 	VECTOR	LeftVector;
 
-	QuatFromVector( Dir, &TempQuat );
-	QuatToMatrix( &TempQuat, &TempMatrix );
+	TempQuat.FromVector(Dir);
+	TempQuat.ToMatrix(&TempMatrix);
 
 	ApplyMatrix( &TempMatrix, &Forward, &DirVector );
 	ApplyMatrix( &TempMatrix, &SlideDown, &DownVector );
@@ -8434,8 +8434,8 @@ void ChangeTrojaxDir( u_int16_t i, VECTOR * Dir )
 
 	if( fmpoly != (u_int16_t ) -1 )
 	{
-		QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-		QuatToMatrix( &TempQuat, &TempMatrix );
+		TempQuat.From2Vectors(&Forward, Dir);
+		TempQuat.ToMatrix(&TempMatrix);
 		FmPolys[ fmpoly ].DirVector = *Dir;
 		FmPolys[ fmpoly ].Mat = TempMatrix;
 	}
@@ -8670,8 +8670,8 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 				else Time = 1.0F;
 				if( Time > 1.0F ) Time = 1.0F;
 			
-				QuatFrom2Vectors( &StartQuat, &Forward, &TempVector );
-				QuatFrom2Vectors( &EndQuat, &Forward, &TempVector2 );
+				StartQuat.From2Vectors(&Forward, &TempVector);
+				EndQuat.From2Vectors(&Forward, &TempVector2);
 			
 				Step = 0.0F;
 			
@@ -8703,16 +8703,16 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 					Polys[ Poly ].Qlerp.start = StartQuat;			/* Starting Quaternion */
 					Polys[ Poly ].Qlerp.end = EndQuat;				/* Ending Quaternion */
 					Polys[ Poly ].Qlerp.crnt = &Polys[ Poly ].Quat;	/* Address to store new Quaternion */
-					Polys[ Poly ].Qlerp.dir = QuatDotProduct( &Polys[ Poly ].Qlerp.start, &Polys[ Poly ].Qlerp.end );
+					Polys[ Poly ].Qlerp.dir = Polys[ Poly ].Qlerp.start.Dot(&Polys[ Poly ].Qlerp.end);
 					Polys[ Poly ].Qlerp.time = Step;
 					Polys[ Poly ].SeqNum = POLY_INVBITS;
 					Polys[ Poly ].Ship = ShipHit;
 					Polys[ Poly ].TimeStep = Time;
 					Polys[ Poly ].Group = Ships[ ShipHit ].Object.Group;
 				
-					QuatInterpolate( &Polys[ Poly ].Qlerp );
+					Polys[ Poly ].Qlerp.Step();
 			
-					QuatToMatrix( &Polys[ Poly ].Quat, &TempMat );
+					Polys[ Poly ].Quat.ToMatrix(&TempMat);
 					MatrixTranspose( &TempMat, &TempInvMat );
 					TempInvMat._41 = Ships[ Polys[ Poly ].Ship ].Object.Pos.x;
 					TempInvMat._42 = Ships[ Polys[ Poly ].Ship ].Object.Pos.y;

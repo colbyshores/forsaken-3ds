@@ -373,8 +373,8 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 		Comp->OldOldDisplayMatrix = MATRIX_Identity;
 		Comp->OldOldInvDisplayMatrix = MATRIX_Identity;
 
-		QuatFromDirAndUp( &Comp->Dir, &Comp->Up, &TempQuat );
-		QuatToMatrix( &TempQuat, &Comp->InitMatrix );
+		TempQuat.FromDirAndUp(&Comp->Dir, &Comp->Up);
+		TempQuat.ToMatrix(&Comp->InitMatrix);
 	
 		if( ID != -1 )
 		{

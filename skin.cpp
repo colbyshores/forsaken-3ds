@@ -706,8 +706,8 @@ void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		Models[ Model ].Flags = MODFLAG_Nothing;
 		Models[ Model ].Visible = true;
 		Models[ Model ].Pos = *Pos;
-		QuatFromVector2( &TempDir, &TempQuat );
-		QuatToMatrix( &TempQuat, &Models[ Model ].Mat );
+		TempQuat.FromVector2(&TempDir);
+		TempQuat.ToMatrix(&Models[ Model ].Mat);
 		MatrixTranspose( &Models[ Model ].Mat, &Models[ Model ].InvMat );
 		Models[ Model ].Func = MODFUNC_Nothing;
 		Models[ Model ].MaxScale = 1.0F;
@@ -749,8 +749,8 @@ extern "C" void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16
 		Models[ Model ].Flags = MODFLAG_Nothing;
 		Models[ Model ].Visible = true;
 		Models[ Model ].Pos = *Pos;
-		QuatFromDirAndUp( Dir, Up, &TempQuat );
-		QuatToMatrix( &TempQuat, &Models[ Model ].Mat );
+		TempQuat.FromDirAndUp(Dir, Up);
+		TempQuat.ToMatrix(&Models[ Model ].Mat);
 		MatrixTranspose( &Models[ Model ].Mat, &Models[ Model ].InvMat );
 		Models[ Model ].Func = MODFUNC_Nothing;
 		Models[ Model ].MaxScale = 1.0F;

@@ -1285,8 +1285,8 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 						case MODFUNC_Scale2:
 						case MODFUNC_SphereZone:
 							ApplyMatrix( &CurrentCamera.Mat, &Forward, &TempVector );
-							QuatFromVector2( &TempVector, &TempQuat );
-							QuatToMatrix( &TempQuat, &Models[ i ].Mat );
+							TempQuat.FromVector2(&TempVector);
+							TempQuat.ToMatrix(&Models[ i ].Mat);
 							TempMatrix = MATRIX_Identity;
 							TempMatrix._11 = Models[i].Scale;
 							TempMatrix._22 = Models[i].Scale;
@@ -1846,14 +1846,14 @@ void ProcessModels( void )
 				case MODFUNC_BodyPart:
 					if( Models[i].Group != (u_int16_t) -1 )
 					{
-						QuatFrom2Vectors( &TempQuat, &Mloadheader.Group[ Models[i].Group ].up, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 					else
 					{
-						QuatFrom2Vectors( &TempQuat, &SlideUp, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&SlideUp, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 
@@ -1950,9 +1950,9 @@ void ProcessModels( void )
 	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
 	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
 	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-	     	   			MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-	     	   			QuatMultiply( &TempQuat, &Models[i].Quat, &Models[i].Quat );
-	     	   			QuatToMatrix( &Models[i].Quat, &Models[i].Mat );							// Create Dir Matrix
+	     	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+	     	   			TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
 	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
 		
 //						BloodPtr = &BloodOffsets[ ( ( Models[i].ModelNum - MODEL_BorgHead ) * 2 ) ];
@@ -1989,14 +1989,14 @@ void ProcessModels( void )
 				case MODFUNC_TomCruise:
 					if( Models[i].Group != (u_int16_t) -1 )
 					{
-						QuatFrom2Vectors( &TempQuat, &Mloadheader.Group[ Models[i].Group ].up, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 					else
 					{
-						QuatFrom2Vectors( &TempQuat, &SlideUp, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&SlideUp, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 
@@ -2088,8 +2088,8 @@ void ProcessModels( void )
 						Rotation.z = 0.0F;
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
-						QuatFromDirAndUp( &DirVector, &UpVector, &Models[i].Quat );					// Create Quat
-	     	   			QuatToMatrix( &Models[i].Quat, &Models[i].Mat );							// Create Matrix
+						Models[i].Quat.FromDirAndUp(&DirVector, &UpVector);					// Create Quat
+	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Matrix
 	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Inv Matrix
 						Models[ i ].Pos.x = ( Ships[ Models[ i ].Ship ].Object.Pos.x + ( UpVector.x * ORBIT_RADIUS ) ); //+ ( DirVector.x * ( ORBIT_RADIUS * 0.85F ) ) );
 						Models[ i ].Pos.y = ( Ships[ Models[ i ].Ship ].Object.Pos.y + ( UpVector.y * ORBIT_RADIUS ) ); //+ ( DirVector.y * ( ORBIT_RADIUS * 0.85F ) ) );
@@ -2117,14 +2117,14 @@ void ProcessModels( void )
 				case MODFUNC_LargeShrapnel:
 					if( Models[i].Group != (u_int16_t) -1 )
 					{
-						QuatFrom2Vectors( &TempQuat, &Mloadheader.Group[ Models[i].Group ].up, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 					else
 					{
-						QuatFrom2Vectors( &TempQuat, &SlideUp, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&SlideUp, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 
@@ -2228,9 +2228,9 @@ void ProcessModels( void )
 	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
 	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
 	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-	     	   			MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-	     	   			QuatMultiply( &TempQuat, &Models[i].Quat, &Models[i].Quat );
-	     	   			QuatToMatrix( &Models[i].Quat, &Models[i].Mat );							// Create Dir Matrix
+	     	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+	     	   			TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
 	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
 
 						Models[i].TimeInterval = (float) 1;
@@ -2263,14 +2263,14 @@ void ProcessModels( void )
 				case MODFUNC_SmallShrapnel:
 					if( Models[i].Group != (u_int16_t) -1 )
 					{
-						QuatFrom2Vectors( &TempQuat, &Mloadheader.Group[ Models[i].Group ].up, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 					else
 					{
-						QuatFrom2Vectors( &TempQuat, &SlideUp, &SlideUp );
-						QuatToMatrix( &TempQuat, &UpMatrix );
+						TempQuat.From2Vectors(&SlideUp, &SlideUp);
+						TempQuat.ToMatrix(&UpMatrix);
 						MatrixTranspose( &UpMatrix, &InvUpMatrix );
 					}
 
@@ -2359,9 +2359,9 @@ void ProcessModels( void )
 	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
 	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
 	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-	     	   			MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-	     	   			QuatMultiply( &TempQuat, &Models[i].Quat, &Models[i].Quat );
-	     	   			QuatToMatrix( &Models[i].Quat, &Models[i].Mat );							// Create Dir Matrix
+	     	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+	     	   			TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
 	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
 
 						if( IsGroupVisible[ Models[i].Group ] )
@@ -4832,8 +4832,8 @@ void CreateTomCruise( VECTOR * Pos, u_int16_t Group )
 		TempDir.y = 0.0F;
 		TempDir.z = ( CurrentCamera.Pos.z - Pos->z );
 		NormaliseVector( &TempDir );
-		QuatFrom2Vectors( &Models[ Model ].Quat, &Forward, &TempDir );
-		QuatToMatrix( &Models[ Model ].Quat, &Models[ Model ].Mat );
+		Models[ Model ].Quat.From2Vectors(&Forward, &TempDir);
+		Models[ Model ].Quat.ToMatrix(&Models[ Model ].Mat);
 		MatrixTranspose( &Models[ Model ].Mat, &Models[ Model ].InvMat );
 
 		Models[ Model ].Rot.x = 0.0F;
@@ -5260,8 +5260,8 @@ void CreateExplosionDonut( VECTOR * Pos, VECTOR * Up, u_int16_t Group )
 		Models[ Model ].Rot.x = 0.0F;
 		Models[ Model ].Rot.y = 0.0F;
 		Models[ Model ].Rot.z = 0.0F;
-		QuatFromVector( Up, &Models[ Model ].Quat );
-		QuatToMatrix( &Models[ Model ].Quat, &Models[ Model ].Mat );
+		Models[ Model ].Quat.FromVector(Up);
+		Models[ Model ].Quat.ToMatrix(&Models[ Model ].Mat);
 		MatrixTranspose( &Models[ Model ].Mat, &Models[ Model ].InvMat );
 		Models[ Model ].Func = MODFUNC_ScaleDonut;
 		Models[ Model ].Scale = 0.1F;

@@ -991,18 +991,18 @@ bool ProcessShips()
 						AccellDecell( &ShipObjPnt->Speed.z , MoveDecell );
 					}
 				
-					MakeQuat( ShipObjPnt->Angle.x * framelag, ShipObjPnt->Angle.y * framelag, ShipObjPnt->Angle.z * framelag + ShipObjPnt->Autolevel, &StepQuat );
-					QuatMultiply(  &ShipObjPnt->Quat , &StepQuat , &ShipObjPnt->Quat );
-					QuatMultiply(  &ShipObjPnt->RotationForce , &ShipObjPnt->Quat , &ShipObjPnt->Quat );
+					StepQuat.MakeEuler(ShipObjPnt->Angle.x * framelag, ShipObjPnt->Angle.y * framelag, ShipObjPnt->Angle.z * framelag + ShipObjPnt->Autolevel);
+					ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
+					ShipObjPnt->RotationForce.Multiply(&ShipObjPnt->Quat, &ShipObjPnt->Quat);
 					/* Without this, each QuatMultiply bleeds tiny float
 					 * error into the quaternion's length. Unnormalized,
 					 * QuatToMatrix produces a non-orthonormal matrix —
 					 * visible as direction-dependent view stretching +
 					 * ship-velocity scaling after many rotations on
 					 * twist-heavy levels (e.g. asubchb subway). */
-					QuatNormalise( &ShipObjPnt->Quat );
-					QuatToMatrix( &ShipObjPnt->Quat, &ShipObjPnt->Mat );
-					MakeQuat( 0.0F, 0.0F, 0.0F, &ShipObjPnt->RotationForce );
+					ShipObjPnt->Quat.Normalise();
+					ShipObjPnt->Quat.ToMatrix(&ShipObjPnt->Mat);
+					ShipObjPnt->RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				
 					// carry out movements
@@ -1416,7 +1416,7 @@ bool ProcessShips()
 								ShipObjPnt->Pos.y = ShipPnt->OldPos.y + ( ( ShipPnt->OldPos.y - ShipPnt->NextPos.y ) * Interp);
 								ShipObjPnt->Pos.z = ShipPnt->OldPos.z + ( ( ShipPnt->OldPos.z - ShipPnt->NextPos.z ) * Interp);
 								
-								Quaternion_Slerp( -Interp, &ShipPnt->OldQuat, &ShipPnt->NextQuat, &ShipObjPnt->Quat, 0 );
+								ShipPnt->OldQuat.Slerp(-Interp, &ShipPnt->NextQuat, &ShipObjPnt->Quat, 0);
 								
 								ShipObjPnt->Bank = ShipPnt->OldBank + ( ( ShipPnt->OldBank - ShipPnt->NextBank ) * Interp);
 							}
@@ -1439,8 +1439,8 @@ bool ProcessShips()
 								ShipObjPnt->Pos.y += Move_Off.y;		
 								ShipObjPnt->Pos.z += Move_Off.z;
 								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-								MakeQuat( ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel, &StepQuat );
-								QuatMultiply(  &ShipObjPnt->Quat , &StepQuat , &ShipObjPnt->Quat );
+								StepQuat.MakeEuler(ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel);
+								ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
 
 								ShipPnt->PacketDelay -= framelag;
 								if( ShipPnt->PacketDelay <= 0.0F )
@@ -1483,9 +1483,9 @@ bool ProcessShips()
 /*===================================================================����
 			Set the Banking Matrix
 /*===================================================================����*/
-			MakeQuat( 0.0F , 0.0F , ShipObjPnt->Bank, &StepQuat );
-			QuatMultiply(  &ShipObjPnt->Quat , &StepQuat , &ShipObjPnt->FinalQuat );
-			QuatToMatrix( &ShipObjPnt->FinalQuat, &ShipObjPnt->FinalMat );
+			StepQuat.MakeEuler(0.0F, 0.0F, ShipObjPnt->Bank);
+			ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->FinalQuat);
+			ShipObjPnt->FinalQuat.ToMatrix(&ShipObjPnt->FinalMat);
 			MatrixTranspose( &ShipObjPnt->FinalMat, &ShipObjPnt->FinalInvMat );
 #if 0
 			if( ShipObjPnt->light == (u_int16_t) -1 )
@@ -1638,8 +1638,8 @@ void RotateExternal( u_int16_t ship, VECTOR *point, VECTOR *dir, float force )
 	near_ship.y = point->y + t * dir->y - Ships[ship].Object.Pos.y;
 	near_ship.z = point->z + t * dir->z - Ships[ship].Object.Pos.z;
 	angle = force * VectorLength( &near_ship ) / SHIP_RADIUS;
-	QuatMake( &rot, axis.x, axis.y, axis.z, angle );
-	QuatMultiply( &rot, &Ships[ship].Object.RotationForce, &Ships[ship].Object.RotationForce );
+	rot.MakeAxis(axis.x, axis.y, axis.z, angle);
+	rot.Multiply(&Ships[ship].Object.RotationForce, &Ships[ship].Object.RotationForce);
 }
 
 
@@ -1647,8 +1647,8 @@ void RotateInternal( u_int16_t ship, float xrot, float yrot, float zrot )
 {
 	QUAT rot;
 
-	MakeQuat( xrot, yrot, zrot, &rot );
-	QuatMultiply( &Ships[ship].Object.RotationForce , &rot , &Ships[ship].Object.RotationForce );
+	rot.MakeEuler(xrot, yrot, zrot);
+	Ships[ship].Object.RotationForce.Multiply(&rot, &Ships[ship].Object.RotationForce);
 }
 
 
@@ -1787,7 +1787,7 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 		for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
 		Ships[i].NumMultiples = 0;
 		
-		MakeQuat( 0.0F, 0.0F, 0.0F, &Ships[i].Object.Quat );
+		Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
 		
 		if ( Mloadheader->state == true)
 		{
@@ -2147,8 +2147,8 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	RestoreWeapons();
 	RestoreAmmo();
 #endif
-	MakeQuat( 0.0F, 0.0F, 0.0F, &Ships[i].Object.Quat );
-	MakeQuat( 0.0F, 0.0F, 0.0F, &Ships[i].Object.RotationForce );
+	Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
+	Ships[i].Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 	Start_Dir.x = 0.0F;
 	Start_Dir.y = 0.0F;
 	Start_Dir.z = -1.0F;
@@ -2169,9 +2169,9 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		Start_Dir.x = -Start_Dir.x;
 		Start_Dir.y = -Start_Dir.y;
 		Start_Dir.z = -Start_Dir.z;
-		QuatFromVector2( &Start_Dir, &Ships[i].Quat );
+		Ships[i].Quat.FromVector2(&Start_Dir);
 #else
-		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
+		Ships[i].Object.Quat.From2Vectors(&Forward, &Start_Dir);
 #endif
 		Ships[i].Object.Group = StartPositions[startpos].Group;
 
@@ -2190,7 +2190,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		Start_Dir.x = 0.0F;
 		Start_Dir.y = 0.0F;
 		Start_Dir.z = 1.0F;
-		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
+		Ships[i].Object.Quat.From2Vectors(&Forward, &Start_Dir);
 # endif
 #endif
 	}else{
@@ -2199,7 +2199,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		Ships[i].Object.Pos.z = -1.0F;
 		Ships[i].Object.Group = 0;
 	}
-	QuatToMatrix( &Ships[i].Object.Quat, &Ships[i].Object.Mat );
+	Ships[i].Object.Quat.ToMatrix(&Ships[i].Object.Mat);
 	ApplyMatrix( &Ships[i].Object.Mat, &SlideUp, &Ship_Up );
 #ifdef USE_ORIGINAL_STARTPOS_UP
 	CrossProduct( &Start_Dir, &StartPositions[ startpos ].Up, &Start_Right );
@@ -2207,10 +2207,10 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	CrossProduct( &Start_Dir, &Mloadheader.Group[ Ships[i].Object.Group ].up, &Start_Right );
 #endif
 	CrossProduct( &Start_Right, &Start_Dir, &Start_Up );
-	QuatFrom2Vectors( &ZQuat, &Ship_Up, &Start_Up );
-	QuatMultiply( &ZQuat, &Ships[i].Object.Quat, &Ships[i].Object.Quat );
+	ZQuat.From2Vectors(&Ship_Up, &Start_Up);
+	ZQuat.Multiply(&Ships[i].Object.Quat, &Ships[i].Object.Quat);
 #ifdef FUDGE_AUTOLEVEL
-	QuatToMatrix( &Ships[i].Quat, &Ships[i].Mat ); // needed for AutoLevelRot() below
+	Ships[i].Quat.ToMatrix(&Ships[i].Mat); // needed for AutoLevelRot() below
 	
 	// autolevel initial ship position
 	for ( j = 0; j < 30; j++ )
@@ -2218,9 +2218,9 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		autolevel = AutoLevelRot( i, 1.0F );
 		if ( fabsf( autolevel ) < 0.01 )
 			break;
-		MakeQuat( 0.0F, 0.0F, autolevel, &StepQuat );
-		QuatMultiply(  &Ships[i].Quat , &StepQuat , &Ships[i].Quat );
-		QuatToMatrix( &Ships[i].Quat, &Ships[i].Mat );
+		StepQuat.MakeEuler(0.0F, 0.0F, autolevel);
+		Ships[i].Quat.Multiply(&StepQuat, &Ships[i].Quat);
+		Ships[i].Quat.ToMatrix(&Ships[i].Mat);
 	}
 	DebugPrintf( "autolevel = %f after %d iterations\n", autolevel, j );
 #endif
@@ -2294,15 +2294,15 @@ bool GotoRoom( int16_t i, char *roomname )
 			Start_Dir.y = 0.0F;
 			Start_Dir.z = -1.0F;
 		}
-		MakeQuat( 0.0F, 0.0F, 0.0F, &Ships[i].Object.Quat );
-		MakeQuat( 0.0F, 0.0F, 0.0F, &Ships[i].Object.RotationForce );
+		Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
+		Ships[i].Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 #if 0
 		Start_Dir.x = -Start_Dir.x;
 		Start_Dir.y = -Start_Dir.y;
 		Start_Dir.z = -Start_Dir.z;
-		QuatFromVector2( &Start_Dir, &Ships[i].Quat );
+		Ships[i].Quat.FromVector2(&Start_Dir);
 #else
-		QuatFrom2Vectors( &Ships[i].Object.Quat, &Forward, &Start_Dir );
+		Ships[i].Object.Quat.From2Vectors(&Forward, &Start_Dir);
 #endif
 		Ships[i].Object.Group = group;
 	}else{
@@ -2314,12 +2314,12 @@ bool GotoRoom( int16_t i, char *roomname )
 	Ships[i].Object.Pos.x = Start_Pos.x;
 	Ships[i].Object.Pos.y = Start_Pos.y;			
 	Ships[i].Object.Pos.z = Start_Pos.z;
-	QuatToMatrix( &Ships[i].Object.Quat, &Ships[i].Object.Mat );
+	Ships[i].Object.Quat.ToMatrix(&Ships[i].Object.Mat);
 	ApplyMatrix( &Ships[i].Object.Mat, &SlideUp, &Ship_Up );
 	CrossProduct( &Start_Dir, &Start_Up, &Start_Right );
 	CrossProduct( &Start_Right, &Start_Dir, &Start_Up );
-	QuatFrom2Vectors( &ZQuat, &Ship_Up, &Start_Up );
-	QuatMultiply( &ZQuat, &Ships[i].Object.Quat, &Ships[i].Object.Quat );
+	ZQuat.From2Vectors(&Ship_Up, &Start_Up);
+	ZQuat.Multiply(&Ships[i].Object.Quat, &Ships[i].Object.Quat);
 	
 	// reset external and internal force vectors to ship movement
 	
@@ -3166,11 +3166,11 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 	AccellDecell( &ShipPnt->Object.Angle.x , TurnDecell );
 	AccellDecell( &ShipPnt->Object.Angle.z , RollDecell );
 
-	MakeQuat( ShipPnt->Object.Angle.x * framelag, ShipPnt->Object.Angle.y * framelag, ShipPnt->Object.Angle.z * framelag + ShipPnt->Object.Autolevel, &StepQuat );
-	QuatMultiply(  &ShipPnt->Object.Quat , &StepQuat , &ShipPnt->Object.Quat );
-	QuatMultiply(  &ShipPnt->Object.RotationForce , &ShipPnt->Object.Quat , &ShipPnt->Object.Quat );
-	QuatToMatrix( &ShipPnt->Object.Quat, &ShipPnt->Object.Mat );
-	MakeQuat( 0.0F, 0.0F, 0.0F, &ShipPnt->Object.RotationForce );
+	StepQuat.MakeEuler(ShipPnt->Object.Angle.x * framelag, ShipPnt->Object.Angle.y * framelag, ShipPnt->Object.Angle.z * framelag + ShipPnt->Object.Autolevel);
+	ShipPnt->Object.Quat.Multiply(&StepQuat, &ShipPnt->Object.Quat);
+	ShipPnt->Object.RotationForce.Multiply(&ShipPnt->Object.Quat, &ShipPnt->Object.Quat);
+	ShipPnt->Object.Quat.ToMatrix(&ShipPnt->Object.Mat);
+	ShipPnt->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 
 	// apply external and internal force vectors to ship movement
 	Move_Off.x = ShipPnt->Object.ExternalForce.x * framelag;

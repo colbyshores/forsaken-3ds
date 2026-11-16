@@ -1733,8 +1733,8 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 		Object->UpdateCount = 3;
 		Object->SoundFX_ID = 0;
 	
-	   	QuatFromDirAndUp( DirVector, UpVector, &TempQuat );
-	   	QuatToMatrix( &TempQuat, &Object->ColMatrix );
+	   	TempQuat.FromDirAndUp(DirVector, UpVector);
+	   	TempQuat.ToMatrix(&Object->ColMatrix);
 		MatrixTranspose( &Object->ColMatrix, &Object->InvColMatrix );
 	   	TempMatrix = MATRIX_Identity;
 	   	TempMatrix._11 = 1.0F;

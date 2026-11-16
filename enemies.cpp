@@ -5753,11 +5753,11 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 			Enemy->Object.ControlType != ENEMY_CONTROLTYPE_TURRET_AI )
 			FindNearestNode( &Enemy->Object );
 		
-		QuatFromDirAndUp( Dir, Up, &Enemy->Object.Quat );
+		Enemy->Object.Quat.FromDirAndUp(Dir, Up);
 
-		MakeQuat( 0.0F, 0.0F, 0.0F, &Enemy->Object.RotationForce );
+		Enemy->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 		
-		QuatToMatrix( &Enemy->Object.Quat, &Enemy->Object.Mat );
+		Enemy->Object.Quat.ToMatrix(&Enemy->Object.Mat);
 		MatrixTranspose( &Enemy->Object.Mat, &Enemy->Object.InvMat );
 		
 
@@ -6532,15 +6532,15 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 
 	if( AngleDecellBefore )
 	{
-		MakeQuat( Object->Angle.x * framelag, Object->Angle.y * framelag, Object->Angle.z * framelag + Object->Autolevel, &StepQuat );
+		StepQuat.MakeEuler(Object->Angle.x * framelag, Object->Angle.y * framelag, Object->Angle.z * framelag + Object->Autolevel);
 	}else{
-		MakeQuat( Object->Angle.x , Object->Angle.y , Object->Angle.z * framelag + Object->Autolevel, &StepQuat );
+		StepQuat.MakeEuler(Object->Angle.x, Object->Angle.y, Object->Angle.z * framelag + Object->Autolevel);
 	}
-	QuatMultiply(  &Object->Quat , &StepQuat , &Object->Quat );
+	Object->Quat.Multiply(&StepQuat, &Object->Quat);
 
 #if 1
-	QuatMultiply(  &Object->RotationForce , &Object->Quat , &Object->Quat );
-	MakeQuat( 0.0F, 0.0F, 0.0F, &Enemy->Object.RotationForce );
+	Object->RotationForce.Multiply(&Object->Quat, &Object->Quat);
+	Enemy->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 #else
 	if( Object->RotationForce.w >= 1.0F )
 		Object->RotationForce.w = 1.0F;
@@ -6552,10 +6552,10 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	AccellDecell( &Object->RotationForce.x , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
 	AccellDecell( &Object->RotationForce.y , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
 	AccellDecell( &Object->RotationForce.z , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
-	QuatMultiply(  &Object->RotationForce , &Object->Quat , &Object->Quat );
+	Object->RotationForce.Multiply(&Object->Quat, &Object->Quat);
 #endif
 
-	QuatToMatrix( &Object->Quat, &Object->Mat );
+	Object->Quat.ToMatrix(&Object->Mat);
 
 	MatrixTranspose( &Object->Mat, &Object->InvMat );
 	
@@ -6671,9 +6671,9 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 /*===================================================================����
 			Set the Banking Matrix
 /*===================================================================����*/
-	MakeQuat( 0.0F , 0.0F , Object->Bank, &StepQuat );
-	QuatMultiply(  &Object->Quat , &StepQuat , &Object->FinalQuat );
-	QuatToMatrix( &Object->FinalQuat, &Object->FinalMat );
+	StepQuat.MakeEuler(0.0F, 0.0F, Object->Bank);
+	Object->Quat.Multiply(&StepQuat, &Object->FinalQuat);
+	Object->FinalQuat.ToMatrix(&Object->FinalMat);
 	MatrixTranspose( &Object->FinalMat, &Object->FinalInvMat );
 
 	if( !AngleDecellBefore )
@@ -7175,7 +7175,7 @@ void SetWheelPos( VECTOR * DestPos , VECTOR * SourcePos , float xoff , float zof
 ===================================================================*/
 __inline void AutoDisplay( OBJECT * Object )
 {
-	QuatToMatrix( &Object->Quat, &Object->Mat );
+	Object->Quat.ToMatrix(&Object->Mat);
 	MatrixTranspose( &Object->Mat, &Object->InvMat );
 	Object->FinalQuat = Object->Quat;
 	Object->FinalMat = Object->Mat;
@@ -8790,11 +8790,11 @@ void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
 	AccellDecell( &Object->Angle.x , EnemyTypes[Enemy->Type].TurnRateDecell );
 	AccellDecell( &Object->Angle.y , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
 	AccellDecell( &Object->Angle.z , RollDecell );
-	MakeQuat( Object->Angle.x * framelag, Object->Angle.y * framelag, Object->Angle.z * framelag, &StepQuat );
-	QuatMultiply(  &Object->Quat , &StepQuat , &Object->Quat );
+	StepQuat.MakeEuler(Object->Angle.x * framelag, Object->Angle.y * framelag, Object->Angle.z * framelag);
+	Object->Quat.Multiply(&StepQuat, &Object->Quat);
 #endif
 
-	QuatToMatrix( &Object->Quat, &Object->Mat );
+	Object->Quat.ToMatrix(&Object->Mat);
 	MatrixTranspose( &Object->Mat, &Object->InvMat );
 	Object->FinalMat = Object->Mat;
 	Object->FinalInvMat = Object->InvMat;
@@ -8907,16 +8907,16 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 #endif
 	
 
-	MakeQuat( Enemy->AI_Angle.x , Enemy->AI_Angle.y , Object->Autolevel, &StepQuat );
-	QuatMultiply(  &Object->Quat , &StepQuat , &Object->Quat );
-	QuatMultiply(  &Object->RotationForce , &Object->Quat , &Object->Quat );
-	QuatToMatrix( &Object->Quat, &Object->Mat );
+	StepQuat.MakeEuler(Enemy->AI_Angle.x, Enemy->AI_Angle.y, Object->Autolevel);
+	Object->Quat.Multiply(&StepQuat, &Object->Quat);
+	Object->RotationForce.Multiply(&Object->Quat, &Object->Quat);
+	Object->Quat.ToMatrix(&Object->Mat);
 	MatrixTranspose( &Object->Mat, &Object->InvMat );
 	Object->FinalQuat = Object->Quat;
 	Object->FinalMat = Object->Mat;
 	Object->FinalInvMat = Object->InvMat;
 	
-	MakeQuat( 0.0F, 0.0F, 0.0F, &Enemy->Object.RotationForce );
+	Enemy->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 	
 	StartPos = Object->Pos;
 	OldGroup = Object->Group;
@@ -9169,8 +9169,8 @@ void ObjectRotateExternal( OBJECT * Object, VECTOR * Pos , VECTOR *point, VECTOR
 	near_ship.y = point->y + t * dir->y - Pos->y;
 	near_ship.z = point->z + t * dir->z - Pos->z;
 	angle = force * VectorLength( &near_ship ) / Radius;
-	QuatMake( &rot, axis.x, axis.y, axis.z, angle );
-	QuatMultiply( &rot, &Object->RotationForce, &Object->RotationForce );
+	rot.MakeAxis(axis.x, axis.y, axis.z, angle);
+	rot.Multiply(&Object->RotationForce, &Object->RotationForce);
 }
 
 

@@ -591,8 +591,8 @@ void ShowGoal( GOAL * Goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_
 	QUAT	TempQuat;
 	MATRIX	GoalMatrix;
 
-	QuatFromDirAndUp( &Goal->dir, &Goal->up, &TempQuat );
-	QuatToMatrix( &TempQuat, &GoalMatrix );
+	TempQuat.FromDirAndUp(&Goal->dir, &Goal->up);
+	TempQuat.ToMatrix(&GoalMatrix);
 
 	for( Count = 0; Count < 10; Count++ )
 	{

@@ -260,9 +260,9 @@ void ProcessPolys( void )
 					if( B < 0.0F ) Polys[ i ].Col4.B = 0;
 					else Polys[ i ].Col4.B = (u_int8_t) B;
 
-					QuatInterpolate( &Polys[ i ].Qlerp );
+					Polys[ i ].Qlerp.Step();
 
-					QuatToMatrix( &Polys[ i ].Quat, &TempMat );
+					Polys[ i ].Quat.ToMatrix(&TempMat);
 					MatrixTranspose( &TempMat, &TempInvMat );
 					TempInvMat._41 = Ships[ Polys[ i ].Ship ].Object.Pos.x;
 					TempInvMat._42 = Ships[ Polys[ i ].Ship ].Object.Pos.y;
@@ -351,9 +351,9 @@ void ProcessPolys( void )
 					if( B < 0.0F ) Polys[ i ].Col4.B = 0;
 					else Polys[ i ].Col4.B = (u_int8_t) B;
 
-					QuatInterpolate( &Polys[ i ].Qlerp );
+					Polys[ i ].Qlerp.Step();
 
-					QuatToMatrix( &Polys[ i ].Quat, &TempMat );
+					Polys[ i ].Quat.ToMatrix(&TempMat);
 					MatrixTranspose( &TempMat, &TempInvMat );
 					TempInvMat._41 = Ships[ Polys[ i ].Ship ].Object.Pos.x;
 					TempInvMat._42 = Ships[ Polys[ i ].Ship ].Object.Pos.y;

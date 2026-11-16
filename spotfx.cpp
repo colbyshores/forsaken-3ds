@@ -1331,8 +1331,8 @@ void CreateSpotFXGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].Dir = *Dir;
 		FmPolys[ fmpoly ].Speed = ( 15.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].Group = Group;
-		QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-	   	QuatToMatrix( &TempQuat, &TempMat );
+		TempQuat.From2Vectors(&Forward, Dir);
+	   	TempQuat.ToMatrix(&TempMat);
 	   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 	  	FmPolys[ fmpoly ].DirVector = *Dir;
 	  	FmPolys[ fmpoly ].UpVector = TempUp;

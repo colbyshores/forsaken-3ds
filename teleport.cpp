@@ -271,8 +271,8 @@ bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJ
 				obj->Group = newTPpnt->Group;
 				obj->Pos = newTPpnt->Pos;
 #if TELEPORTS_VERSION_NUMBER >= 2
-				QuatFromDirAndUp( &newTPpnt->Dir, &newTPpnt->Up, &obj->Quat);
-				QuatToMatrix( &obj->Quat, &obj->Mat );
+				obj->Quat.FromDirAndUp(&newTPpnt->Dir, &newTPpnt->Up);
+				obj->Quat.ToMatrix(&obj->Mat);
 #endif
 				return true;
 			}

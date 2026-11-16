@@ -227,10 +227,10 @@ bool BOTAI_WillHomingMissileHit(VECTOR * MyPos)
 	Cos = DotProduct( &DirVector, &MissCopy.DirVector );
 
 	// set the parameters to perform a linear interpolation on two quaternions
-	QuatFrom2Vectors( &qlerp.end, &Forward, &DirVector );
+	qlerp.end.From2Vectors(&Forward, &DirVector);
 	qlerp.start	= MissCopy.DirQuat;				
 	qlerp.crnt	= &MissCopy.DirQuat;	
-	qlerp.dir	= QuatDotProduct( &qlerp.start, &qlerp.end );
+	qlerp.dir	= qlerp.start.Dot(&qlerp.end);
 
 	// bound angle difference
 	if( Cos < -1.0F ) Cos = -1.0F;
@@ -245,8 +245,8 @@ bool BOTAI_WillHomingMissileHit(VECTOR * MyPos)
 	if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
 
 	// perform quat interpolation
-	QuatInterpolate( &qlerp );
-	QuatToMatrix( &MissCopy.DirQuat, &MissCopy.Mat );
+	qlerp.Step();
+	MissCopy.DirQuat.ToMatrix(&MissCopy.Mat);
 	ApplyMatrix( &MissCopy.Mat, &Forward, &MissCopy.DirVector );
 	ApplyMatrix( &MissCopy.Mat, &SlideUp, &MissCopy.UpVector );
 

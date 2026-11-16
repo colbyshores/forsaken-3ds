@@ -608,8 +608,8 @@ RESTART * InitOneRestartPoint( u_int16_t Group, VECTOR * Pos, VECTOR * DirVector
 		Object->Sequence = RESTARTSEQ_Inactive;
 		Object->Time = 0.0F;
 		Object->OverallTime = OverallTime;
-	   	QuatFromDirAndUp( DirVector, UpVector, &TempQuat );
-	   	QuatToMatrix( &TempQuat, &Object->Matrix );
+	   	TempQuat.FromDirAndUp(DirVector, UpVector);
+	   	TempQuat.ToMatrix(&Object->Matrix);
 	}
 	return( Object );
 }

@@ -1089,7 +1089,7 @@ void SetupNetworkGame()
 		Ships[i].Object.light = (u_int16_t) -1;
 		for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
 		Ships[i].NumMultiples = 0;
-		MakeQuat( 0.0F, 0.0F, 0.0F, &Ships[i].Object.Quat );
+		Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
 		Ships[i].Object.Pos.x = 0.0F;;
 		Ships[i].Object.Pos.y = 0.0F;;
 		Ships[i].Object.Pos.z = 0.0F;;
@@ -1142,7 +1142,7 @@ void InitShipStructure( int i , bool ResetScore )
 	Ships[i].Object.light = (u_int16_t) -1;
 	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
 	Ships[i].NumMultiples = 0;
-	MakeQuat( 0.0F, 0.0F, 0.0F, &Ships[i].Object.Quat );
+	Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
 	
 	Ships[i].Object.Pos.x = 0.0F;;
 	Ships[i].Object.Pos.y = 0.0F;;
@@ -4684,9 +4684,9 @@ void UnPackShipFlags( BYTE Player , u_int32_t Flags )
 void SetShipBankAndMat( OBJECT * ShipObjPnt )
 {
 	QUAT	StepQuat;
-	MakeQuat( 0.0F , 0.0F , ShipObjPnt->Bank, &StepQuat );
-	QuatMultiply(  &ShipObjPnt->Quat , &StepQuat , &ShipObjPnt->FinalQuat );
-	QuatToMatrix( &ShipObjPnt->FinalQuat, &ShipObjPnt->FinalMat );
+	StepQuat.MakeEuler(0.0F, 0.0F, ShipObjPnt->Bank);
+	ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->FinalQuat);
+	ShipObjPnt->FinalQuat.ToMatrix(&ShipObjPnt->FinalMat);
 	MatrixTranspose( &ShipObjPnt->FinalMat, &ShipObjPnt->FinalInvMat );
 }
 

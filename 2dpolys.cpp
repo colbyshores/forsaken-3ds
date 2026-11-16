@@ -1023,8 +1023,8 @@ void FmPolyProcess( void )
 				}
 				else
 				{
-					QuatFrom2Vectors( &TempQuat, &Mloadheader.Group[ FmPolys[i].Group ].up, &SlideUp );
-					QuatToMatrix( &TempQuat, &UpMatrix );
+					TempQuat.From2Vectors(&Mloadheader.Group[ FmPolys[i].Group ].up, &SlideUp);
+					TempQuat.ToMatrix(&UpMatrix);
 					MatrixTranspose( &UpMatrix, &InvUpMatrix );
 
 	     			TempDir.x = ( FmPolys[i].Dir.x * framelag );
@@ -1394,8 +1394,8 @@ void FmPolyProcess( void )
 				}
 				else
 				{
-					QuatFrom2Vectors( &TempQuat, &Mloadheader.Group[ FmPolys[i].Group ].up, &SlideUp );
-					QuatToMatrix( &TempQuat, &UpMatrix );
+					TempQuat.From2Vectors(&Mloadheader.Group[ FmPolys[i].Group ].up, &SlideUp);
+					TempQuat.ToMatrix(&UpMatrix);
 					MatrixTranspose( &UpMatrix, &InvUpMatrix );
 
 	     			TempDir.x = ( FmPolys[i].Dir.x * framelag );
@@ -1866,8 +1866,8 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 
 							if( FmPolys[ i ].Flags & FM_FLAG_RELATIVE )
 							{
-								QuatFromDirAndUp( &FmPolys[i].DirVector, &FmPolys[i].UpVector, &TempQuat );
-								QuatToMatrix( &TempQuat, &TempMatrix );
+								TempQuat.FromDirAndUp(&FmPolys[i].DirVector, &FmPolys[i].UpVector);
+								TempQuat.ToMatrix(&TempMatrix);
 								ApplyMatrix( &TempMatrix, &YVector, &YVector );
 								ApplyMatrix( &TempMatrix, &ZVector, &ZVector );
 							}
@@ -2250,8 +2250,8 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 
 							if( FmPolys[ i ].Flags & FM_FLAG_RELATIVE )
 							{
-								QuatFromDirAndUp( &FmPolys[i].DirVector, &FmPolys[i].UpVector, &TempQuat );
-								QuatToMatrix( &TempQuat, &TempMatrix );
+								TempQuat.FromDirAndUp(&FmPolys[i].DirVector, &FmPolys[i].UpVector);
+								TempQuat.ToMatrix(&TempMatrix);
 								ApplyMatrix( &TempMatrix, &YVector, &YVector );
 								ApplyMatrix( &TempMatrix, &ZVector, &ZVector );
 							}

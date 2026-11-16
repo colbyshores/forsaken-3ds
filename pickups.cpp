@@ -868,8 +868,8 @@ void InitPickups( void )
 		Pickups[ i ].RegenSlot = -1;
 		Pickups[ i ].TriggerModPtr = NULL;
 		Pickups[ i ].TriggerMod = (u_int16_t) -1;
-		QuatFrom2Vectors( &Pickups[ i ].DirQuat, &Forward, &Pickups[ i ].DirVector );
-		QuatToMatrix( &Pickups[ i ].DirQuat, &Pickups[ i ].Mat );
+		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
+		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);
 	}
 	Pickups[ MAXPICKUPS-1 ].Next = (u_int16_t) -1;
 }
@@ -2621,8 +2621,8 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		Pickups[ i ].TriggerMod = TriggerMod;
 		if( TriggerMod == (u_int16_t) -1 ) Pickups[ i ].TriggerModPtr = NULL;
 		else Pickups[ i ].TriggerModPtr = &TrigMods[ TriggerMod ];
-		QuatFrom2Vectors( &Pickups[ i ].DirQuat, &Forward, &Pickups[ i ].DirVector );
-		QuatToMatrix( &Pickups[ i ].DirQuat, &Pickups[ i ].Mat );			// Create Dir Matrix
+		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
+		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);			// Create Dir Matrix
 
 		NumPickupType[ Pickups[ i ].Type ]++;
 
@@ -2836,8 +2836,8 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 		Pickups[ i ].TriggerMod = TriggerMod;
 		if( TriggerMod == (u_int16_t) -1 ) Pickups[ i ].TriggerModPtr = NULL;
 		else Pickups[ i ].TriggerModPtr = &TrigMods[ TriggerMod ];
-		QuatFrom2Vectors( &Pickups[ i ].DirQuat, &Forward, &Pickups[ i ].DirVector );
-		QuatToMatrix( &Pickups[ i ].DirQuat, &Pickups[ i ].Mat );			// Create Dir Matrix
+		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
+		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);			// Create Dir Matrix
 
 		NumPickupType[ Pickups[ i ].Type ]++;
 #if 1 //-----------------------------------------------------------*/
@@ -3213,9 +3213,9 @@ void ProcessPickups( void )
 	   			FrameLag_Rot.x = ( Pickups[i].Rot.x * framelag );
 	   			FrameLag_Rot.y = ( Pickups[i].Rot.y * framelag );
 	   			FrameLag_Rot.z = ( Pickups[i].Rot.z * framelag );
-	   			MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-	   			QuatMultiply( &TempQuat, &Pickups[ i ].DirQuat, &Pickups[ i ].DirQuat );
-	   			QuatToMatrix( &Pickups[ i ].DirQuat, &Pickups[ i ].Mat );				// Create Dir Matrix
+	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+	   			TempQuat.Multiply(&Pickups[ i ].DirQuat, &Pickups[ i ].DirQuat);
+	   			Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);				// Create Dir Matrix
 	
 				if( Pickups[ i ].ModelNum != (u_int16_t) -1 )								/* 3D Model Attached? */
 		   		{																		
@@ -5214,8 +5214,8 @@ FILE * LoadAllPickups( FILE * fp )
 			Pickups[ i ].RegenSlot = -1;
 			Pickups[ i ].TriggerModPtr = NULL;
 			Pickups[ i ].TriggerMod = (u_int16_t) -1;
-			QuatFrom2Vectors( &Pickups[ i ].DirQuat, &Forward, &Pickups[ i ].DirVector );
-			QuatToMatrix( &Pickups[ i ].DirQuat, &Pickups[ i ].Mat );
+			Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
+			Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);
 
 			fread( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Pickups[ i ].Next;

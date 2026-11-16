@@ -2171,8 +2171,8 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 	StartPos = Obj->Pos;
 	Move_Dir = *Move_Off;
 	NormaliseVector( &Move_Dir );
-	QuatFromVector2( &Move_Dir, &MoveQuat );
-	QuatToMatrix( &MoveQuat, &MoveMat );
+	MoveQuat.FromVector2(&Move_Dir);
+	MoveQuat.ToMatrix(&MoveMat);
 	ApplyMatrix( &MoveMat, &SlideUp, &Up );
 	ApplyMatrix( &MoveMat, &SlideRight, &Right );
 	MoveDist = VectorLength( Move_Off );
@@ -2478,8 +2478,8 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 	StartPos = Obj->Pos;
 	Move_Dir = *Move_Off;
 	NormaliseVector( &Move_Dir );
-	QuatFromVector2( &Move_Dir, &MoveQuat );
-	QuatToMatrix( &MoveQuat, &MoveMat );
+	MoveQuat.FromVector2(&Move_Dir);
+	MoveQuat.ToMatrix(&MoveMat);
 	ApplyMatrix( &MoveMat, &SlideUp, &Up );
 	ApplyMatrix( &MoveMat, &SlideRight, &Right );
 	MoveDist = VectorLength( Move_Off );
@@ -2712,8 +2712,8 @@ bool ObjectCollideOnly( OBJECT *Obj, VECTOR *Move_Off, float radius, VECTOR *Tar
 	StartPos = Obj->Pos;
 	Move_Dir = *Move_Off;
 	NormaliseVector( &Move_Dir );
-	QuatFromVector2( &Move_Dir, &MoveQuat );
-	QuatToMatrix( &MoveQuat, &MoveMat );
+	MoveQuat.FromVector2(&Move_Dir);
+	MoveQuat.ToMatrix(&MoveMat);
 	ApplyMatrix( &MoveMat, &SlideUp, &Up );
 	ApplyMatrix( &MoveMat, &SlideRight, &Right );
 	MoveDist = VectorLength( Move_Off );
@@ -2855,8 +2855,8 @@ bool QCollide( VECTOR *Start_Pos, u_int16_t Start_Group, VECTOR *Move_Off, float
 	StartPos = *Start_Pos;
 	Move_Dir = *Move_Off;
 	NormaliseVector( &Move_Dir );
-	QuatFromVector2( &Move_Dir, &MoveQuat );
-	QuatToMatrix( &MoveQuat, &MoveMat );
+	MoveQuat.FromVector2(&Move_Dir);
+	MoveQuat.ToMatrix(&MoveMat);
 	ApplyMatrix( &MoveMat, &SlideUp, &Up );
 	ApplyMatrix( &MoveMat, &SlideRight, &Right );
 	MoveDist = VectorLength( Move_Off );

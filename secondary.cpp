@@ -898,8 +898,8 @@ void	InitSecBulls(void)
 		SecBulls[ i ].UpVector = SlideUp;
 		SecBulls[ i ].DropVector = SlideDown;
 		SecBulls[ i ].NumOldPos = 0;
-		QuatFrom2Vectors( &SecBulls[ i ].DirQuat, &Forward, &SecBulls[ i ].DirVector );
-		QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );
+		SecBulls[ i ].DirQuat.From2Vectors(&Forward, &SecBulls[ i ].DirVector);
+		SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
 	}
 	SecBulls[MAXSECONDARYWEAPONBULLETS-1].Next = (u_int16_t) -1;
 }
@@ -1572,8 +1572,8 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 		SecBulls[i].DirVector = *Dir;
 		SecBulls[i].UpVector = *UpVector;
 
-		QuatFromDirAndUp( &SecBulls[ i ].DirVector, &SecBulls[ i ].UpVector, &SecBulls[ i ].DirQuat );
-		QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );							// Create Dir Matrix
+		SecBulls[ i ].DirQuat.FromDirAndUp(&SecBulls[ i ].DirVector, &SecBulls[ i ].UpVector);
+		SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);							// Create Dir Matrix
 
 		SecBulls[i].Type = Weapon;
 		SecBulls[i].Flags = SecondaryWeaponAttribs[ Weapon ].Flags;
@@ -1705,8 +1705,8 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 				break;
 
 			case ENEMYDEPTHCHARGE:
-				QuatFromDirAndUp( &Forward, &SlideUp, &SecBulls[ i ].DirQuat );
-				QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );			// Create Dir Matrix
+				SecBulls[ i ].DirQuat.FromDirAndUp(&Forward, &SlideUp);
+				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);			// Create Dir Matrix
 
 				SecBulls[i].LifeSpan = ( ( ( (float) Random_Range( 10000 ) ) / 5000.0F ) + 2.0F ) * 60.0F;
 				SecBulls[i].DirVector.x *= SecBulls[i].Speed;
@@ -2207,9 +2207,9 @@ bool ProcessMines( u_int16_t i )
 			FrameLag_Rot.x = 0.0F;
 			FrameLag_Rot.y = ( 2.0F * framelag );
 			FrameLag_Rot.z = 0.0F;
-			MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-			QuatMultiply( &SecBulls[ i ].DirQuat, &TempQuat, &SecBulls[ i ].DirQuat );
-			QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );				// Create Dir Matrix
+			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+			SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
+			SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
 
 			Val = (int16_t) ( SecBulls[i].LifeCount * 3.0F );
 			Val %= 360;
@@ -2373,11 +2373,11 @@ bool ProcessMines( u_int16_t i )
 
 				Cos = DotProduct( &DirVector, &SecBulls[ i ].DirVector );
 
-				QuatFrom2Vectors( &qlerp.end, &Forward, &DirVector );
+				qlerp.end.From2Vectors(&Forward, &DirVector);
    				
 				qlerp.start	= SecBulls[ i ].DirQuat;				/* Current Quaternion */
    				qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
-				qlerp.dir	= QuatDotProduct( &qlerp.start, &qlerp.end );
+				qlerp.dir	= qlerp.start.Dot(&qlerp.end);
    	
 				if( Cos < -1.0F ) Cos = -1.0F;
 				else if ( Cos > 1.0F ) Cos = 1.0F;
@@ -2387,8 +2387,8 @@ bool ProcessMines( u_int16_t i )
 				else qlerp.time = 1.0F;
 				if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
    				
-				QuatInterpolate( &qlerp );
-				QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );
+				qlerp.Step();
+				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
 				ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &SecBulls[ i ].DirVector );
 				ApplyMatrix( &SecBulls[ i ].Mat, &SlideUp, &SecBulls[ i ].UpVector );
 
@@ -2424,9 +2424,9 @@ bool ProcessMines( u_int16_t i )
 			FrameLag_Rot.x = 0.0F;
 			FrameLag_Rot.y = ( 2.0F * framelag );
 			FrameLag_Rot.z = 0.0F;
-			MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-			QuatMultiply( &SecBulls[ i ].DirQuat, &TempQuat, &SecBulls[ i ].DirQuat );
-			QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );				// Create Dir Matrix
+			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+			SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
+			SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
 
 			Val = (int16_t) ( SecBulls[i].LifeCount * 2.5F );
 			Val %= 360;
@@ -2474,9 +2474,9 @@ bool ProcessMines( u_int16_t i )
 			FrameLag_Rot.x = 0.0F;
 			FrameLag_Rot.y = ( 2.0F * framelag );
 			FrameLag_Rot.z = 0.0F;
-			MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-			QuatMultiply( &SecBulls[ i ].DirQuat, &TempQuat, &SecBulls[ i ].DirQuat );
-			QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );				// Create Dir Matrix
+			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+			SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
+			SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
 
 			if( SecBulls[i].LifeCount >= 150.0F ) Owner = (u_int16_t) -1;
 			else Owner = SecBulls[i].Owner;
@@ -2654,8 +2654,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 			{
 				NormVector = SecBulls[i].DirVector;
 				NormaliseVector( &NormVector );
-				QuatFrom2Vectors( &SecBulls[ i ].DirQuat, &Forward, &NormVector );
-				QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );
+				SecBulls[ i ].DirQuat.From2Vectors(&Forward, &NormVector);
+				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
 			}
 			break;
 
@@ -2670,9 +2670,9 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				FrameLag_Rot.x = 0.0F;
 				FrameLag_Rot.y = ( 5.0F * NewFramelag ); //framelag );
 				FrameLag_Rot.z = 0.0F;
-				MakeQuat( FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z, &TempQuat );
-				QuatMultiply( &SecBulls[ i ].DirQuat, &TempQuat, &SecBulls[ i ].DirQuat );
-				QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );				// Create Dir Matrix
+				TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+				SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
+				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
 			}
 			break;
 
@@ -2925,11 +2925,11 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 				Cos = DotProduct( &NormVector, &SecBulls[ i ].DirVector );
 
-				QuatFrom2Vectors( &qlerp.end, &Forward, &NormVector );
+				qlerp.end.From2Vectors(&Forward, &NormVector);
    		
    				qlerp.start	= SecBulls[ i ].DirQuat;				/* Current Quaternion */
    				qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
-   				qlerp.dir	= QuatDotProduct( &qlerp.start, &qlerp.end );
+   				qlerp.dir	= qlerp.start.Dot(&qlerp.end);
 
 				if( Cos < -1.0F ) Cos = -1.0F;
 				else if ( Cos > 1.0F ) Cos = 1.0F;
@@ -2939,8 +2939,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
    				else qlerp.time = 1.0F;
    				if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
    		
-   				QuatInterpolate( &qlerp );
-   				QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );
+   				qlerp.Step();
+   				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
 				ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &SecBulls[ i ].DirVector );
 				ApplyMatrix( &SecBulls[ i ].Mat, &SlideUp, &SecBulls[ i ].UpVector );
 			}
@@ -2956,8 +2956,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		Missile gravity
 ===================================================================*/
 		case MIS_GRAVITY:
-			QuatFrom2Vectors( &TempQuat, &Mloadheader.Group[ Models[i].Group ].up, &SlideUp );
-			QuatToMatrix( &TempQuat, &UpMatrix );
+			TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+			TempQuat.ToMatrix(&UpMatrix);
 			MatrixTranspose( &UpMatrix, &InvUpMatrix );
 
 			ApplyMatrix( &UpMatrix, &SecBulls[i].DirVector, &DirVector );
@@ -3005,8 +3005,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 			TempVector.z = ( TempPoint1.z - TempPoint2.z );
 			NormaliseVector( &TempVector );
 
-			QuatFromVector2( &TempVector, &TempQuat );
-			QuatToMatrix( &TempQuat, &SecBulls[i].Mat );
+			TempQuat.FromVector2(&TempVector);
+			TempQuat.ToMatrix(&SecBulls[i].Mat);
 			ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &SecBulls[ i ].DirVector );
 			ApplyMatrix( &SecBulls[ i ].Mat, &SlideUp, &SecBulls[ i ].UpVector );
 			break;
@@ -3032,8 +3032,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 				SecBulls[i].Pos = SecBulls[i].OldPos[ (int16_t) SecBulls[i].RetractPos ].Pos;
 				SecBulls[i].DirVector = SecBulls[i].OldPos[ (int16_t) SecBulls[i].RetractPos ].Dir;
-				QuatFromDirAndUp( &SecBulls[ i ].DirVector, &SecBulls[ i ].UpVector, &SecBulls[ i ].DirQuat );
-				QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );							// Create Dir Matrix
+				SecBulls[ i ].DirQuat.FromDirAndUp(&SecBulls[ i ].DirVector, &SecBulls[ i ].UpVector);
+				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);							// Create Dir Matrix
 	
 				if( (int16_t) SecBulls[i].RetractPos != ( MAXTENTOLDPOS - 1 ) )
 				{
@@ -4301,8 +4301,8 @@ void CreateBloodSplat( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 		if( fmpoly != (u_int16_t ) -1 )
 		{
-			QuatFrom2Vectors( &TempQuat, &Forward, Dir );
-		   	QuatToMatrix( &TempQuat, &TempMat );
+			TempQuat.From2Vectors(&Forward, Dir);
+		   	TempQuat.ToMatrix(&TempMat);
 		   	ApplyMatrix( &TempMat, &Mloadheader.Group[ Group ].up, &TempUp );
 		
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
@@ -6952,8 +6952,8 @@ void CreateScatterTrail( u_int16_t i )
 	SrcPtr = &PointPos[ 0 ];
 	DstPtr = &PointPos[ NUMSCATTERPOINTS ];
 
-	QuatFrom2Vectors( &TempQuat, &Forward, &SecBulls[i].DirVector );
-	QuatToMatrix( &TempQuat, &TempMat );
+	TempQuat.From2Vectors(&Forward, &SecBulls[i].DirVector);
+	TempQuat.ToMatrix(&TempMat);
 
 	for( Count = 0; Count < NUMSCATTERPOINTS; Count++ )
 	{
@@ -6983,8 +6983,8 @@ void CreateScatterTrail( u_int16_t i )
 		DstPtr = SrcPtr;
 		SrcPtr = TempPtr;
 
-		QuatFrom2Vectors( &TempQuat, &Forward, &SecBulls[i].OldPos[ Count ].Dir );
-		QuatToMatrix( &TempQuat, &TempMat );
+		TempQuat.From2Vectors(&Forward, &SecBulls[i].OldPos[ Count ].Dir);
+		TempQuat.ToMatrix(&TempMat);
 
 		for( Count2 = 0; Count2 < NUMSCATTERPOINTS; Count2++ )
 		{
@@ -7093,8 +7093,8 @@ void CreateTentacle( u_int16_t i )
 	SrcPtr = &PointPos[ 0 ];
 	DstPtr = &PointPos[ NUMSCATTERPOINTS ];
 
-	QuatFrom2Vectors( &TempQuat, &Forward, &SecBulls[i].DirVector );
-	QuatToMatrix( &TempQuat, &TempMat );
+	TempQuat.From2Vectors(&Forward, &SecBulls[i].DirVector);
+	TempQuat.ToMatrix(&TempMat);
 
 	for( Count = 0; Count < NUMSCATTERPOINTS; Count++ )
 	{
@@ -7122,8 +7122,8 @@ void CreateTentacle( u_int16_t i )
 		DstPtr = SrcPtr;
 		SrcPtr = TempPtr;
 
-		QuatFrom2Vectors( &TempQuat, &Forward, &SecBulls[i].OldPos[ Count ].Dir );
-		QuatToMatrix( &TempQuat, &TempMat );
+		TempQuat.From2Vectors(&Forward, &SecBulls[i].OldPos[ Count ].Dir);
+		TempQuat.ToMatrix(&TempMat);
 
 		for( Count2 = 0; Count2 < NUMSCATTERPOINTS; Count2++ )
 		{
@@ -8271,8 +8271,8 @@ void CreateSmokeRing( VECTOR * Pos, VECTOR * DirVector, VECTOR * UpVector, u_int
 	MATRIX	TempMat;
 	u_int16_t	fmpoly;
 
-	QuatFromDirAndUp( DirVector, UpVector, &TempQuat );
-	QuatToMatrix( &TempQuat, &TempMat );
+	TempQuat.FromDirAndUp(DirVector, UpVector);
+	TempQuat.ToMatrix(&TempMat);
 
 	for( Count = 0; Count < 20; Count++ )
 	{
@@ -9202,8 +9202,8 @@ FILE * LoadSecBulls( FILE * fp )
 			SecBulls[ i ].UpVector = SlideUp;
 			SecBulls[ i ].DropVector = SlideDown;
 			SecBulls[ i ].NumOldPos = 0;
-			QuatFrom2Vectors( &SecBulls[ i ].DirQuat, &Forward, &SecBulls[ i ].DirVector );
-			QuatToMatrix( &SecBulls[ i ].DirQuat, &SecBulls[ i ].Mat );
+			SecBulls[ i ].DirQuat.From2Vectors(&Forward, &SecBulls[ i ].DirVector);
+			SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
 
 			fread( &SecBulls[ i ].Next, sizeof( SecBulls[ i ].Next ), 1, fp );
 			i = SecBulls[ i ].Next;
