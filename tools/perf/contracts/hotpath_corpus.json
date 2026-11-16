@@ -59,7 +59,7 @@
       "why": "per-group model display, per-model matrix apply"
     },
     {
-      "file": "mxaload.c",
+      "file": "mxaload.cpp",
       "symbols": [
         "InterpFrames"
       ],
