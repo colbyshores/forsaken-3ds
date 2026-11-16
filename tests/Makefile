@@ -31,8 +31,8 @@ test_checkhitenemy: test_checkhitenemy.c ../checkenemy.c ../sphere.c
 	$(CC) $(CFLAGS) -DCHE_PREFILTER -o $@ test_checkhitenemy.c ../checkenemy.c ../sphere.c -lm
 	./test_checkhitenemy
 
-test_stereomemo: test_stereomemo.c ../stereomemo.c
-	$(CC) $(CFLAGS) -DSTEREO_REPLAY -o $@ test_stereomemo.c ../stereomemo.c
+test_stereomemo: test_stereomemo.c ../stereomemo.cpp
+	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_stereomemo.c ../stereomemo.cpp
 	./test_stereomemo
 
 test_modules: test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
