@@ -37,7 +37,7 @@
       "why": "per-entity matrix/vector math every frame; spline drives AI movement"
     },
     {
-      "file": "visi.c",
+      "file": "visi.cpp",
       "symbols": [
         "FindVisible",
         "ProcessVisiblePortal"
@@ -161,7 +161,7 @@
       "why": "impact/spot effects per frame"
     },
     {
-      "file": "water.c",
+      "file": "water.cpp",
       "symbols": [
         "WaterProcess"
       ],
