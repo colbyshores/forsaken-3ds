@@ -75,7 +75,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 /*===================================================================
 	Global Variables
 ===================================================================*/
-int8_t * CompObjPath = "data\\bgobjects\\";
+int8_t * CompObjPath = (int8_t*)"data\\bgobjects\\";
 MODELNAME	*	ModNames = &ModelNames[ 0 ];
 
 /*===================================================================
@@ -94,7 +94,7 @@ bool PreLoadCompObj( int8_t * path, u_int16_t * BaseModel, bool LevelSpecific )
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
 
-	fp = file_open( path, "rb" );
+	fp = file_open( (char*)path, "rb" );
 
 	if( fp != NULL )
 	{
@@ -209,7 +209,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 	*OverallTime = 0.0F;
 	*MidTime = 0.0F;
 
-	fp = file_open( path, "rb" );
+	fp = file_open( (char*)path, "rb" );
 
 	if( fp != NULL )
 	{
@@ -223,7 +223,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 			return( NULL );
 		}
 
-  		CompsPtr = malloc( sizeof( COMP_OBJ ) );
+  		CompsPtr = (COMP_OBJ*)malloc( sizeof( COMP_OBJ ) );
 
 		if( CompsPtr )
 		{
@@ -448,7 +448,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 		if( NumTrans )
 		{
-			TransPtr = malloc( sizeof( ANI_TRANS ) * NumTrans );
+			TransPtr = (ANI_TRANS*)malloc( sizeof( ANI_TRANS ) * NumTrans );
 	
 			if( TransPtr != NULL )
 			{
@@ -564,7 +564,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 										}
 										while( SFXFilename[ ( i - 1 ) ] != 0 );
 
-										AniPropPtr->Value = ReturnSFXIndex( &SFXFilename[ 0 ] );
+										AniPropPtr->Value = ReturnSFXIndex( (char*)&SFXFilename[ 0 ] );
 										break;
 
 									case PROPTYPE_Unknown:
@@ -641,7 +641,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 		if( NumColZones )
 		{
-			ZonesPtr = malloc( sizeof( ANI_ZONES ) * NumColZones );
+			ZonesPtr = (ANI_ZONES*)malloc( sizeof( ANI_ZONES ) * NumColZones );
 	
 			if( ZonesPtr )
 			{
@@ -694,7 +694,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								fread( &NumSides, sizeof( int16_t ), 1, fp );
 	
 								AniZoneBoxPtr->NumSides = NumSides;
-								AniZoneBoxPtr->Sides = malloc( sizeof( ZONESIDE ) * NumSides );
+								AniZoneBoxPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
 	
 								if( AniZoneBoxPtr->Sides )
 								{
@@ -737,7 +737,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								fread( &NumSides, sizeof( int16_t ), 1, fp );
 	
 								AniZonePolyPtr->NumSides = NumSides;
-								AniZonePolyPtr->Sides = malloc( sizeof( ZONESIDE ) * NumSides );
+								AniZonePolyPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
 	
 								if( AniZonePolyPtr->Sides )
 								{
@@ -789,7 +789,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 	
 		if( Comp->NumChildren )
 		{
-			CompsPtr = malloc( ( sizeof( COMP_OBJ ) * Comp->NumChildren ) );
+			CompsPtr = (COMP_OBJ*)malloc( ( sizeof( COMP_OBJ ) * Comp->NumChildren ) );
 
 			if( CompsPtr )
 			{
