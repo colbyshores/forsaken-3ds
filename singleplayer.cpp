@@ -25,6 +25,7 @@
 #include "controls.h"
 #include "util.h"
 #include "oct2.h"
+#include "singleplayer.h"
 
 
 extern bool IsHost;   // is the user hosting/joining a game
@@ -40,7 +41,7 @@ extern	bool	TeamGame;
 extern  BYTE          MyGameStatus;
 extern SLIDER WatchPlayerSelect;
 
-extern bool InitLevels( char *levels_list );
+extern "C" bool InitLevels( char *levels_list );
 extern char *CurrentLevelsList;
 
 bool LoadASinglePlayerGame( MENUITEM * Item )

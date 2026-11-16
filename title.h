@@ -477,7 +477,7 @@ extern MENU	MENU_STATS_Start;
 
 extern bool quitting;
 
-MENU *LastMenu;
+extern MENU *LastMenu;
 
 //	Function Prototypes
 

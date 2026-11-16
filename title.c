@@ -217,6 +217,8 @@ char	biker_name[256] = DEFAULT_PLAYER_NAME;
 char	bike_name[16];
 char	biker_text[512];
 bool	quitting = false;
+
+MENU *LastMenu;
 int16_t	SelectedBike = 0; //MODEL_Borg;
 int16_t	NumTitleModelsToLoad;
 float TriggerInitialAnimation = 0.0F;
