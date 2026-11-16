@@ -83,6 +83,13 @@ INC=$(wildcard *.h)
 SRC=$(wildcard *.c)
 OBJ=$(patsubst %.c,%.o,$(SRC))
 
+# C-with-classes modules (AGENTS.md S9): same flags as C plus the
+# phase-2 language restrictions - banned constructs must not compile.
+CXXSRC=$(filter-out render_d3d.cpp breakpad.cpp,$(wildcard *.cpp))
+CXXOBJ=$(patsubst %.cpp,%.o,$(CXXSRC))
+OBJ+=$(CXXOBJ)
+CXXFLAGS=$(CFLAGS) -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics
+
 # allows user to override settings
 ADD_FLAGS=
 ADD_CFLAGS=
@@ -99,6 +106,7 @@ ifeq ($(EDITION),remaster)
 endif
 
 BIN=projectx
+CXX?=g++
 .DEFAULT_GOAL := all
 
 # ETC2 texture pack for the PC (Vulkan) build: every opaque PNG master
@@ -136,7 +144,10 @@ textures-etc2: $(KTX2_TEXTURES)
 all: textures-etc2 $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) -o $(BIN) $(OBJ) $(LDFLAGS) $(LIB)
+	$(if $(CXXOBJ),$(CXX),$(CC)) -o $(BIN) $(OBJ) $(LDFLAGS) $(LIB) $(if $(CXXOBJ),-lstdc++)
+
+%.o: %.cpp $(INC)
+	$(CXX) $(FLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(OBJ): $(INC)
 

@@ -14,7 +14,7 @@ CFLAGS  := -g -fcommon -Wall -Wextra $(INCLUDE)
 
 AILIB_OBJ := secwalk_ailib.o
 
-all: test_secwalk test_framedump test_checkhitenemy test_stereomemo
+all: test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules
 
 $(AILIB_OBJ): ../ailib.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -35,7 +35,11 @@ test_stereomemo: test_stereomemo.c ../stereomemo.c
 	$(CC) $(CFLAGS) -DSTEREO_REPLAY -o $@ test_stereomemo.c ../stereomemo.c
 	./test_stereomemo
 
-clean:
-	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo $(AILIB_OBJ) out-*.bmp framedump_test.log
+test_modules: test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
+	g++ -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti -o $@ test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
+	./test_modules
 
-.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_stereomemo
+clean:
+	rm -f test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules $(AILIB_OBJ) out-*.bmp framedump_test.log
+
+.PHONY: all clean test_secwalk test_framedump test_checkhitenemy test_stereomemo test_modules
