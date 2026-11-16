@@ -31,6 +31,7 @@
 #include "util.h"
 #include "music.h"
 #include "main_3ds.h"
+#include "dsp_adpcm.h"
 
 /* ---- configuration ---- */
 
@@ -142,48 +143,19 @@ static const int s_level_track[] = {
 #define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
 #endif
 
-/* ---- byte-swap helpers (DSP headers are big-endian) ---- */
 
-static inline u_int16_t bs16(u_int16_t v) { return (v >> 8) | (v << 8); }
-static inline u_int32_t bs32(u_int32_t v) {
-	return ((v >> 24) & 0xFF) | ((v >> 8) & 0xFF00) |
-	       ((v << 8) & 0xFF0000) | ((v << 24) & 0xFF000000);
-}
-
-/* ---- DSP-ADPCM CPU decoder for tracking end-of-buffer context ---- */
-
+/* ---- DSP-ADPCM CPU decode (shared dsp_adpcm module) ----
+ * Used in state-only mode to track the end-of-buffer predictor
+ * context the hardware decoder will have reached. */
 static void adpcm_advance(const u_int8_t *frames, u_int32_t num_frames,
                           const u_int16_t *coefs, ndspAdpcmData *ctx)
 {
-	int32_t hist1 = (int16_t)ctx->history0;
-	int32_t hist2 = (int16_t)ctx->history1;
-	u_int32_t f;
-	for (f = 0; f < num_frames; f++)
-	{
-		const u_int8_t *frame = frames + f * 8;
-		u_int8_t header = frame[0];
-		u_int8_t predictor = (header >> 4) & 0x07;
-		u_int8_t scale = header & 0x0F;
-		int16_t c1 = (int16_t)coefs[predictor * 2 + 0];
-		int16_t c2 = (int16_t)coefs[predictor * 2 + 1];
-		int n;
-		for (n = 0; n < 14; n++)
-		{
-			int byte_idx = 1 + (n >> 1);
-			int32_t nibble = (n & 1) ? (frame[byte_idx] & 0x0F)
-			                         : ((frame[byte_idx] >> 4) & 0x0F);
-			if (nibble & 0x08) nibble |= 0xFFFFFFF0;
-			int32_t sample = nibble << scale;
-			int32_t prediction = (hist1 * c1 + hist2 * c2) >> 11;
-			int32_t decoded = prediction + sample;
-			if (decoded > 32767) decoded = 32767;
-			else if (decoded < -32768) decoded = -32768;
-			hist2 = hist1;
-			hist1 = decoded;
-		}
-	}
-	ctx->history0 = (int16_t)hist1;
-	ctx->history1 = (int16_t)hist2;
+	dsp_state_t st;
+	st.hist1 = (int16_t)ctx->history0;
+	st.hist2 = (int16_t)ctx->history1;
+	dsp_decode(frames, num_frames, coefs, &st, NULL);
+	ctx->history0 = (int16_t)st.hist1;
+	ctx->history1 = (int16_t)st.hist2;
 }
 
 /* ---- buffer fill (streamed from SD via fread) ---- */
@@ -258,12 +230,15 @@ static bool open_track(int track)
 	 * on whether it counts data nibbles only or includes per-frame header
 	 * nibbles. We trust the file size (below) instead — much simpler. */
 
-	for (i = 0; i < 16; i++)
-		s_adpcm_coefs[i] = bs16(*(u_int16_t*)&hdr[28 + i*2]);
-
-	s_adpcm_initial.index    = bs16(*(u_int16_t*)&hdr[62]);
-	s_adpcm_initial.history0 = (s16)bs16(*(u_int16_t*)&hdr[64]);
-	s_adpcm_initial.history1 = (s16)bs16(*(u_int16_t*)&hdr[66]);
+	{
+		dsp_header_t dh;
+		dsp_parse_header(hdr, &dh);
+		for (i = 0; i < 16; i++)
+			s_adpcm_coefs[i] = dh.coefs[i];
+		s_adpcm_initial.index    = dh.initial_index;
+		s_adpcm_initial.history0 = dh.initial_hist1;
+		s_adpcm_initial.history1 = dh.initial_hist2;
+	}
 	s_adpcm_running = s_adpcm_initial;
 
 	/* Trust the file size, not the header's nibble count. Different DSP
