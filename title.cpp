@@ -2196,7 +2196,7 @@ MENU	MENU_NEW_InGameSound = {
 	(u_int8_t*)LT_MENU_NEW_InGameSound0 /*"sound"*/ , NULL, NULL, SetSoundLevels, 0,
 	{
 		{ 200, 128				 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound1 /*"sfx volume    "		*/, 0, 0, &SfxSlider,						NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
-		{ 200, 128 + (2*16)	 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound3 /*"bike engines  "		*, 0, 0, &BikeEnginesOn,				(void*)ToggleBikeEngines,	SelectToggle,	DrawToggle,	NULL, NULL },
+		{ 200, 128 + (2*16)	 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound3 /*"bike engines  "		*/, 0, 0, &BikeEnginesOn,				(void*)ToggleBikeEngines,	SelectToggle,	DrawToggle,	NULL, 0 },
 		{ 200, 128 + (3*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound4 /*"biker volume  "		*/, 0, 0, &BikerSpeechSlider,			NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
 		{ 200, 128 + (4*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound5 /*"bike computer "	*/, 0, 0, &BikeCompSpeechSlider,	NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
 		{ 200, 128 + (5*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound6 /*"flag sfx "				*/, 0, 0, &FlagSfxSlider,					NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
@@ -2996,7 +2996,7 @@ MENU	MENU_Host_Options = { (u_int8_t*)"HOST OPTIONS FOR THIS GAME" , InitHostMen
 			{
 					OLDMENUITEM( 200, 112, (u_int8_t*)LT_MENU_InGame27		/*"collision perspective"		*/,	&ColPerspective,				NULL,								SelectToggle,	DrawColToggle),
 					OLDMENUITEM( 200, 128, (u_int8_t*)LT_MENU_InGame36		/*"short packets"				*/,	&UseShortPackets,			NULL,								SelectToggle,	DrawToggle),
-					OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_Options5		/*"Packets Per Second"		*,	(void*)&PacketsSlider,		NULL,								SelectSlider,	DrawSlider),
+					OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_Options5		/*"Packets Per Second"		*/,	(void*)&PacketsSlider,		NULL,								SelectSlider,	DrawSlider),
 					OLDMENUITEM( 200, 176, (u_int8_t*)LT_MENU_InGame6		/*"Level Select"				*/,	NULL,								&MENU_LevelSelect,			MenuChange,	MenuItemDrawName),
 					OLDMENUITEM( 200, 192, (u_int8_t*)LT_MENU_RemovePlayer	/*"remove player"				*/,	&HostPlayersList,				(void*)HostListPlayerSelected,		SelectList,		DrawList ),  
 
