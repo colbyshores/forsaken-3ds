@@ -57,6 +57,12 @@
 #ifdef __3DS__
 #include "music.h"
 #endif
+extern "C" {
+#if !SDL_VERSION_ATLEAST(2,0,0)
+int SDL_EnableUNICODE(int enable);
+#endif
+void music_play_title(void);
+}
 
 
 #define MAX_SAVEGAME_SLOTS		16
@@ -66,12 +72,12 @@
 
 extern render_info_t render_info;
 extern float MaxMessageTime;
-extern void SetViewportError( char *where, render_viewport_t *vp );
+extern "C" void SetViewportError( char *where, render_viewport_t *vp );
 extern bool ShowNamesAnyway;
 
 bool SpaceOrbSetup = false;
-void DefaultJoystickSettings( USERCONFIG *u );
-void ReInitJoysticks( void );
+extern "C" void DefaultJoystickSettings( USERCONFIG *u );
+extern "C" void ReInitJoysticks( void );
 
 #define MAX_KEYDEF_PAGES	(4)
 int CurrentPage = 0;
@@ -98,7 +104,7 @@ static void KeySelect( DEFKEY *kdef, int key );
 bool DeletePilot( LIST *l, int item );
 void MoveConfigFile( MENU *Menu );
 
-extern void ShowNodeNetwork( u_int32_t NetMask );
+extern "C" void ShowNodeNetwork( u_int32_t NetMask );
 void ProcessTextItems (void);
 
 bool	Last_SWMonoChrome = false;
@@ -182,7 +188,7 @@ extern bool ShowColZones;
 
 extern	int16_t actual_volume;
 extern	bool RearCameraActive;
-char *ShipAxisSeperateText[NUM_SHIP_AXIS_ACTIONS * 2];
+extern char *ShipAxisSeperateText[NUM_SHIP_AXIS_ACTIONS * 2];
 extern char *JoystickPOVDirections[];
 extern char *ShipAxisText[];
 extern int ShipAxisLookup[];
@@ -203,7 +209,7 @@ extern	FRAME_INFO	*	Title_Chars1_Header;
 extern	FRAME_INFO	*	Title_Chars2_Header;
 extern	OFF_FILES Title_OffsetFiles[];
 extern	CAMERA	CurrentCamera;
-void Build_View();
+extern "C" void Build_View();
 extern	RENDEROBJECT RenderBufs[4];
 extern	int16_t		NumLevels;
 
@@ -244,7 +250,7 @@ extern int16_t		LevelNum;
 extern int16_t		NumLevels;
 extern	bool                    IsHost;
 extern	RENDERMATRIX view;
-extern	bool ClearBuffers( void );
+extern "C"	bool ClearBuffers( void );
 extern	MATRIX	MATRIX_Identity;
 extern	render_viewport_t viewport;
 extern	MODEL	Models[];
@@ -339,7 +345,7 @@ bool IgnoreMenuFuncs = false;
 ===================================================================*/
 void InitBattleMenu( MENU *Menu );
 void InitInGameLevelSelect( MENU *menu );
-void CheckCheats( int key );
+extern "C" void CheckCheats( int key );
 char *CTF_Type( SLIDER *s );
 void InGameSaveASinglePlayerGame( MENUITEM *item );
 char TypeFileName( TEXT *t, char c );
@@ -379,7 +385,7 @@ void ExitTitleLoad( MENU *Menu );
 void InitBikerName( char *name );
 void InitMultiplayerHost( MENU *Menu );
 void SetAutolevel( MENUITEM *item );
-void SelectQuitCurrentGame( MENUITEM *Item );
+extern "C" void SelectQuitCurrentGame( MENUITEM *Item );
 void ExitBikeSelection( MENUITEM * menu );
 void ExitBikeComputerSelection( MENUITEM * item );
 void InitDebugMenu( MENU *Menu );
@@ -392,21 +398,21 @@ void SavePickups( MENUITEM *item );
 void ShowNodeToggle( MENUITEM *item );
 void ShowStartPointsToggle( MENUITEM *item );
 void InitDemoList( MENU * Menu );
-void GetGamePrefs( void );
-void SetGamePrefs( void );
+extern "C" void GetGamePrefs( void );
+extern "C" void SetGamePrefs( void );
 void InitLoadSavedGameList( MENU * Menu );
 void WatchPlayerSelected( MENUITEM *Item);
 
 char *SearchKey( char c );
 void PauseDemoToggle( MENUITEM *Item );
 
-bool InitLevels( char *levels_list );
+extern "C" bool InitLevels( char *levels_list );
 void InitLevelSelect( MENU *Menu );
 void ExitLevelSelect( MENU * Menu );
 void GoToStats( MENUITEM *Item );
 void GetSavedGameData( void );
 
-bool SetFOV( float fov );
+extern "C" bool SetFOV( float fov );
 bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclude );
 bool MakeTranslucent( u_int16_t Model );
 void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *maxoffset );
@@ -425,7 +431,7 @@ void WiggleDiscs(void);
 void SetTextures (MENU *menu);
 void InitDifficultyLevel ( MENU *Menu );
 void DifficultySet (MENUITEM *item);
-void ProcessVduItems( MENU * Menu );
+extern "C" void ProcessVduItems( MENU * Menu );
 void KillTextInfo ( TEXTINFO *TextInfo );
 
 void SetInitialTitleParams();
@@ -583,7 +589,7 @@ void InitEventFadeOffHoloLight(TITLE_EVENT *TitleEvent);
 void ExitEventFadeOffHoloLight(TITLE_EVENT *TitleEvent);
 void EventFadeOffHoloLight(TITLE_EVENT *TitleEvent);
 
-void FadeHoloLight(float Brightness);
+extern "C" void FadeHoloLight(float Brightness);
 
 void InitEventRaiseHoloPad(TITLE_EVENT *TitleEvent);
 void EventRaiseHoloPad(TITLE_EVENT *TitleEvent);
@@ -602,7 +608,7 @@ void EventJudderStack(TITLE_EVENT *TitleEvent);
 void InitEventExpandBike(TITLE_EVENT *TitleEvent);
 void InitEventExpandCrystal(TITLE_EVENT *TitleEvent);
 void ExitEventExpandBike(TITLE_EVENT *TitleEvent);
-void DarkenRoom2(float darkness);
+extern "C" void DarkenRoom2(float darkness);
 void DarkenRoomForStart( MENU *Menu );
 void RotateDiscStack(float theta);
 
@@ -652,8 +658,8 @@ void SetAxisFineControl( MENUITEM *Item );
 void SetAxisDeadzone( MENUITEM *Item );
 void SetAxisSensitivity( MENUITEM *Item );
 void UpdateAxisPtr( float pos );
-void InitModeCase(void);
-void SetSoundLevels( int *dummy );
+extern "C" void InitModeCase(void);
+extern "C" void SetSoundLevels( int *dummy );
 void ExitMouseSetup( MENU *Menu );
 void InitAvgFrameRateGlobals( MENU *Menu );
 void GoToNextLevel( MENUITEM *Item );
@@ -677,7 +683,7 @@ bool ProcessWeaponOrder ( int Key );
 /***********************************
 text messaging
 ***********************************/
-void AddTitleMessage(LPTEXTMSG LpTextMsg);
+extern "C" void AddTitleMessage(LPTEXTMSG LpTextMsg);
 void GetTitleMessage(void);
 
 /*===================================================================
@@ -1000,7 +1006,8 @@ DEFKEY KDsend_speech = { &Config.send_speech, 0 };
  * so the menu select callback can fire it directly. The remap UI
  * is modal: takes over the bottom screen, returns when the player
  * saves or cancels. */
-extern void controls_3ds_remap_menu(void);
+extern "C" void controls_3ds_remap_menu(void);
+extern "C" float platform_get_3d_slider(void);
 static void SelectControlsRemap(MENUITEM *Item) {
 	(void)Item;
 	/* Just open the controls menu — leave the pause menu open
@@ -1012,21 +1019,21 @@ static void SelectControlsRemap(MENUITEM *Item) {
 #endif
 
 MENU	MENU_NotYet = {
-	"Not Implemented Yet", NULL, NULL, NULL, 0,
+	(u_int8_t*)"Not Implemented Yet", NULL, NULL, NULL, 0,
 	{
-		{ 200, 144, 0, 0, 0, "Go Back", 0, 0, NULL, NULL, MenuItemBack, MenuItemDrawName, NULL, 0 },
-		{ -1, -1, 0, 0, 0, "", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ 200, 144, 0, 0, 0, (u_int8_t*)"Go Back", 0, 0, NULL, NULL, MenuItemBack, MenuItemDrawName, NULL, 0 },
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU MENU_NEW_BetweenLevels = {
-	"", PrepareNextLevelStart, NULL, NULL, 0,
+	(u_int8_t*)"", PrepareNextLevelStart, NULL, NULL, 0,
 	{
-		{  0,  0, 200,  20, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_ForceFit, (void *)SelectedLevel, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 36, 20, 164,  72, 0, "", 0, 0, NULL, NULL, NULL, LoadLevelPic, NULL, 0 },
-		{ 10, 80, 190, 155, 0, "", FONT_Small, TEXTFLAG_ForceFit , (void *)SelectedLevelText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{  0,  0, 200,  20, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_ForceFit, (void *)SelectedLevel, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 36, 20, 164,  72, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, LoadLevelPic, NULL, 0 },
+		{ 10, 80, 190, 155, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit , (void *)SelectedLevelText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
 
-		{ -1, -1,   0,   0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1,   0,   0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
@@ -1045,68 +1052,68 @@ char *GameCompleteWithCheating				= LT_GameCompleteWithCheating				/* "well, you
 char *GameCompleteAdditionalLevels			= LT_GameCompleteAdditionalLevels			/* "congratulations. You have completed all the currently installed additional levels. Look out for further mission packs!!"*/;
 
 MENU MENU_NEW_SpecialMessage = {
-	"", NULL, NULL, NULL, TITLE_TIMER_LowerHolopad,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_LowerHolopad,
 	{
-		{ 30,   0, 170, 150, 0, "", FONT_Medium, TEXTFLAG_CentreYBunched,  (void *)&GameCompleteText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{  0, 150, 200, 170, 0, LT_MENU_NEW_SpecialMessage0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, AfterSpecialMessage, DrawFlatMenuItem, NULL, 0  },
+		{ 30,   0, 170, 150, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreYBunched,  (void *)&GameCompleteText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{  0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_SpecialMessage0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, AfterSpecialMessage, DrawFlatMenuItem, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU MENU_NEW_NumberOfSecretsEnemys = {
-	"", NULL, NULL, NULL, TITLE_TIMER_LowerHolopad,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_LowerHolopad,
 	{
-		{ 30,   0, 170,  50, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&SecretsFoundText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 30,  50, 170, 100, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&EnemiesKilledText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 30, 100, 170, 150, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&TimeTakenText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{  0, 150, 200, 170, 0, LT_MENU_NEW_NumberOfSecretsEnemys0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NextLevelOrGameComplete, DrawFlatMenuItem, NULL, 0  },
+		{ 30,   0, 170,  50, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&SecretsFoundText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 30,  50, 170, 100, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&EnemiesKilledText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 30, 100, 170, 150, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&TimeTakenText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{  0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_NumberOfSecretsEnemys0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NextLevelOrGameComplete, DrawFlatMenuItem, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU MENU_NEW_NumberOfGoldBars = {
-	"", SelectGoldBarModel, NULL, NULL, TITLE_TIMER_InterLevelPan,
+	(u_int8_t*)"", SelectGoldBarModel, NULL, NULL, TITLE_TIMER_InterLevelPan,
 	{
-		{ 30,   0, 170, 150, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&GoldBarsFoundText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{  0, 150, 200, 170, 0, LT_MENU_NEW_NumberOfGoldBars0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_NumberOfSecretsEnemys, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 30,   0, 170, 150, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&GoldBarsFoundText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{  0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_NumberOfGoldBars0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_NumberOfSecretsEnemys, MenuChange, DrawFlatMenuItem, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU MENU_NEW_NumberOfCrystals = {
-	"", InitCrystalsFoundText, NULL, NULL, TITLE_TIMER_InterLevelPan,
+	(u_int8_t*)"", InitCrystalsFoundText, NULL, NULL, TITLE_TIMER_InterLevelPan,
 	{
-		{ 30,   0, 170, 150, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&CrystalsFoundText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{  0, 150, 200, 170, 0, LT_MENU_NEW_NumberOfCrystals0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_NumberOfGoldBars, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 30,   0, 170, 150, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreYBunched,  (void *)&CrystalsFoundText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{  0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_NumberOfCrystals0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_NumberOfGoldBars, MenuChange, DrawFlatMenuItem, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 /* select single player level */
 
 MENU	MENU_NEW_StartSinglePlayer = {
-	"", InitSinglePlayerGame, NULL, NULL, TITLE_TIMER_NormalPanToRightVDU,
+	(u_int8_t*)"", InitSinglePlayerGame, NULL, NULL, TITLE_TIMER_NormalPanToRightVDU,
 	{
 
 		{  0,  0, 200, 20, 0,
-			LT_MENU_NEW_StartSinglePlayer0/*"single player Game"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,
+			(u_int8_t*)LT_MENU_NEW_StartSinglePlayer0/*"single player Game"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,
 			NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
 		{ 0, 50, 200, 50, 0,
-			LT_MENU_NEW_StartSinglePlayer2/*"select level"*/, FONT_Medium, TEXTFLAG_CentreY | TEXTFLAG_CentreX,
+			(u_int8_t*)LT_MENU_NEW_StartSinglePlayer2/*"select level"*/, FONT_Medium, TEXTFLAG_CentreY | TEXTFLAG_CentreX,
 			NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 } ,
 
 		{ 0, 90, 200, 50, 0,
-			"", /* level name */ FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY |
+			(u_int8_t*)"", /* level name */ FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY |
 											TEXTFLAG_AutoSelect | TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit,
 			(void *)SelectedLevel, NULL, InitLevelSelectVDU, DrawFlatMenuName, NULL, 0 } ,
 
 		{ 0, 200, 200, 50, 0,
-			LT_MENU_NEW_StartSinglePlayer1/*"start"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,
+			(u_int8_t*)LT_MENU_NEW_StartSinglePlayer1/*"start"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,
 #ifdef __3DS__
 			/* [3DS] Skip the between-levels briefing screen.
 			 * On PC, pressing Start navigates to MENU_NEW_BetweenLevels via
@@ -1120,121 +1127,121 @@ MENU	MENU_NEW_StartSinglePlayer = {
 			NULL, &MENU_NEW_BetweenLevels, MenuChange, DrawFlatMenuItem, NULL, 0 } ,
 #endif
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_Error = {
-	"", NULL, NULL, NULL, 0,
+	(u_int8_t*)"", NULL, NULL, NULL, 0,
 	{
-		{ 0,   0, 200, 150, 0, "", FONT_Small, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, (void *)ErrorMessage, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 0, 150, 200, 170, 0, LT_MENU_NEW_Error0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, MenuItemBackFromError, DrawFlatMenuItem, NULL, 0  },
+		{ 0,   0, 200, 150, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, (void *)ErrorMessage, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_Error0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, MenuItemBackFromError, DrawFlatMenuItem, NULL, 0  },
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_Notify = {
-	"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
-		{ 0,   0, 200, 150, 0, "", FONT_Small, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, (void *)NotifyMessage, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 0, 150, 200, 170, 0, LT_MENU_NEW_Error0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, TitleReset, DrawFlatMenuItem, NULL, 0  },
+		{ 0,   0, 200, 150, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, (void *)NotifyMessage, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_Error0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, TitleReset, DrawFlatMenuItem, NULL, 0  },
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 
 MENU	MENU_NEW_GeneralLoading = {
-	"", NULL, NULL, NULL, 0,
+	(u_int8_t*)"", NULL, NULL, NULL, 0,
 	{
-		{ 0, 0, 200, 150, 0, LT_MENU_NEW_GeneralLoading0/*loading..."*/, FONT_Medium, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 150, 0, (u_int8_t*)LT_MENU_NEW_GeneralLoading0/*loading..."*/, FONT_Medium, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_HostWaitingToStart = {
-	"", InitHostWaitingToStart, BailMultiplayerFrontEnd, UpdateSessions, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", InitHostWaitingToStart, BailMultiplayerFrontEnd, UpdateSessions, TITLE_TIMER_PanToLeftVDU,
 	{
-		{   0,   0, 200,  10, 0, LT_MENU_NEW_HostWaitingToStart0/*"waiting to start..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{   5,  15,  90,  25, 0, LT_MENU_NEW_HostWaitingToStart1/*"start"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, &MENU_NEW_GeneralLoading, HostAboutToStart/*GoToSynchup*/, DrawFlatMenuItem, NULL, 0  },
-		{   5,  27, 100,  37, SLIDER_Value, LT_MENU_NEW_HostWaitingToStart3/*"Num of Players"*/, FONT_Small, TEXTFLAG_CentreY, &NumOfPlayersSlider, NULL, NULL, DrawFlatMenuSlider, NULL, 0 },
-		{   5,  40, 100, 125, 0, "", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, &PlayersList, NULL , NULL , DrawFlatMenuList, NULL, 0 } ,
-		{   5, 112, 200, 119, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[5], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{   5, 119, 200, 126, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[4], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{   5, 126, 200, 133, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{   5, 133, 200, 140, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{   5, 140, 200, 147, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{   5, 147, 200, 154, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{   0,   0, 200,  10, 0, (u_int8_t*)LT_MENU_NEW_HostWaitingToStart0/*"waiting to start..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{   5,  15,  90,  25, 0, (u_int8_t*)LT_MENU_NEW_HostWaitingToStart1/*"start"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, &MENU_NEW_GeneralLoading, HostAboutToStart/*GoToSynchup*/, DrawFlatMenuItem, NULL, 0  },
+		{   5,  27, 100,  37, SLIDER_Value, (u_int8_t*)LT_MENU_NEW_HostWaitingToStart3/*"Num of Players"*/, FONT_Small, TEXTFLAG_CentreY, &NumOfPlayersSlider, NULL, NULL, DrawFlatMenuSlider, NULL, 0 },
+		{   5,  40, 100, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, &PlayersList, NULL , NULL , DrawFlatMenuList, NULL, 0 } ,
+		{   5, 112, 200, 119, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[5], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{   5, 119, 200, 126, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[4], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{   5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{   5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{   5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{   5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 
-		{   5, 160,  25, 160, 0, LT_MENU_NEW_HostWaitingToStart4/*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
+		{   5, 160,  25, 160, 0, (u_int8_t*)LT_MENU_NEW_HostWaitingToStart4/*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_SelectLevel = {
-	"", LoadLevelText, KillLevelPic, NULL, 0,
+	(u_int8_t*)"", LoadLevelText, KillLevelPic, NULL, 0,
 	{
-		{  0,  0, 200,  20, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_ForceFit, (void *)SelectedLevel, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 30, 20, 168,  76, 0, "", 0, 0, NULL, NULL, NULL, LoadLevelPic, NULL, 0 },
-		{ 10, 84, 190, 155, 0, "", FONT_Small, TEXTFLAG_ForceFit , (void *)SelectedLevelText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{  0,  0, 200,  20, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_ForceFit, (void *)SelectedLevel, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 30, 20, 168,  76, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, LoadLevelPic, NULL, 0 },
+		{ 10, 84, 190, 155, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit , (void *)SelectedLevelText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
 	 
-		{ -1, -1, 0, 0, 0,"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0,(u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
-MENUITEM SlowLevelSelectItem = { 0, 0, 0, 0, 0, "", 0, 0, NULL, &MENU_NEW_SelectLevel, NULL, NULL, NULL, 0 };
+MENUITEM SlowLevelSelectItem = { 0, 0, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, &MENU_NEW_SelectLevel, NULL, NULL, NULL, 0 };
 
 MENU	MENU_NEW_ValidPickups_Second_Page = {
-	"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
-		{  0,   0, 200,  20, 0, LT_MENU_NEW_ValidPickups0	/*"allowed pickups"*/,	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 },
+		{  0,   0, 200,  20, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups0	/*"allowed pickups"*/,	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 },
 		
-		{ 10,  28, 200,  36, 0, LT_MENU_NEW_ValidPickups24	/*"missiles"*/,			FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 } ,
+		{ 10,  28, 200,  36, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups24	/*"missiles"*/,			FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 } ,
 
-		{ 10,  44, 120,  52, 0, LT_MENU_NEW_ValidPickups6	/*mug*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Mugs ],				NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  52, 120,  60, 0, LT_MENU_NEW_ValidPickups7	/*"solaris"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_HeatseakerPickup ],	NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  60, 120,  68, 0, LT_MENU_NEW_ValidPickups8	/*"scatter"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Scatter ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  68, 120,  76, 0, LT_MENU_NEW_ValidPickups9	/*"gravgon"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Gravgon ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  76, 120,  84, 0, LT_MENU_NEW_ValidPickups10	/*"mfrl"*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Launcher ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  84, 120,  92, 0, LT_MENU_NEW_ValidPickups11	/*"titan"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_TitanStar ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  92, 120, 100, 0, LT_MENU_NEW_ValidPickups20	/*"thief missle"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Thief ],				NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  44, 120,  52, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups6	/*mug*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Mugs ],				NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  52, 120,  60, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups7	/*"solaris"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_HeatseakerPickup ],	NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  60, 120,  68, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups8	/*"scatter"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Scatter ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  68, 120,  76, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups9	/*"gravgon"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Gravgon ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  76, 120,  84, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups10	/*"mfrl"*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Launcher ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  84, 120,  92, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups11	/*"titan"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_TitanStar ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  92, 120, 100, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups20	/*"thief missle"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Thief ],				NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		
-		{ 10, 108, 200, 116, 0, LT_MENU_NEW_ValidPickups25	/*"mines"*/,			FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 } ,
+		{ 10, 108, 200, 116, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups25	/*"mines"*/,			FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 } ,
 
-		{ 10, 124, 120, 132, 0, LT_MENU_NEW_ValidPickups12	/*"purge mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_PurgePickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10, 132, 120, 140, 0, LT_MENU_NEW_ValidPickups13	/*"pine mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_PinePickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10, 140, 120, 148, 0, LT_MENU_NEW_ValidPickups14	/*"quantum mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_QuantumPickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10, 148, 120, 156, 0, LT_MENU_NEW_ValidPickups21	/*"spider mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_SpiderPod ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 124, 120, 132, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups12	/*"purge mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_PurgePickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 132, 120, 140, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups13	/*"pine mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_PinePickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 140, 120, 148, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups14	/*"quantum mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_QuantumPickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 148, 120, 156, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups21	/*"spider mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_SpiderPod ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_ValidPickups = {
-	"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
-		{  0,   0, 200,  20, 0, LT_MENU_NEW_ValidPickups0				/*"allowed pickups"*/,	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
+		{  0,   0, 200,  20, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups0				/*"allowed pickups"*/,	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
 		
-		{ 10,  28, 200,  36, 0, LT_MENU_NEW_ValidPickups22				/*"primary weapons"*/,	FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
-		{ 10,  44, 120,  52, 0, LT_MENU_NEW_ValidPickups1				/*"trojax"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Trojax ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  52, 120,  60, 0, LT_MENU_NEW_ValidPickups2				/*"pyrolite"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Pyrolite ],			NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  60, 120,  68, 0, LT_MENU_NEW_ValidPickups3				/*"transpulse"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Transpulse ],			NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  68, 120,  76, 0, LT_MENU_NEW_ValidPickups4				/*"suss gun"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_SussGun ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10,  76, 120,  84, 0, LT_MENU_NEW_ValidPickups5				/*laser*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Laser ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  28, 200,  36, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups22				/*"primary weapons"*/,	FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
+		{ 10,  44, 120,  52, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups1				/*"trojax"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Trojax ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  52, 120,  60, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups2				/*"pyrolite"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Pyrolite ],			NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  60, 120,  68, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups3				/*"transpulse"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Transpulse ],			NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  68, 120,  76, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups4				/*"suss gun"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_SussGun ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  76, 120,  84, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups5				/*laser*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Laser ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		
-		{ 10,  92, 200, 100, 0, LT_MENU_NEW_ValidPickups23				/*"power-ups"*/,		FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
-		{ 10, 108, 120, 116, 0, LT_MENU_NEW_ValidPickups15				/*"invulnerability"*/,	FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Inv ],					NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10, 116, 120, 124, 0, LT_MENU_NEW_ValidPickups16				/*"nitro"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Nitro ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10, 124, 120, 132, 0, LT_MENU_NEW_ValidPickups17				/*"stealth mantle"*/,	FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Mantle ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10, 132, 120, 140, 0, LT_MENU_NEW_ValidPickups18				/*"orbit pulsar"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Orb ],					NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		{ 10, 140, 120, 148, 0, LT_MENU_NEW_ValidPickups19				/*"golden power pod"*/, FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_GoldenPowerPod ],		NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10,  92, 200, 100, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups23				/*"power-ups"*/,		FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
+		{ 10, 108, 120, 116, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups15				/*"invulnerability"*/,	FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Inv ],					NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 116, 120, 124, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups16				/*"nitro"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Nitro ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 124, 120, 132, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups17				/*"stealth mantle"*/,	FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Mantle ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 132, 120, 140, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups18				/*"orbit pulsar"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Orb ],					NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
+		{ 10, 140, 120, 148, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups19				/*"golden power pod"*/, FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_GoldenPowerPod ],		NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		
-		{ 10, 156, 120, 164, 0, LT_MENU_NEW_MoreMultiplayerOptions22	/*"next page"*/,		FONT_Small,		TEXTFLAG_CentreY,						NULL,										&MENU_NEW_ValidPickups_Second_Page, MenuChange,			DrawFlatMenuItem,	NULL, 0 } ,
+		{ 10, 156, 120, 164, 0, (u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions22	/*"next page"*/,		FONT_Small,		TEXTFLAG_CentreY,						NULL,										&MENU_NEW_ValidPickups_Second_Page, MenuChange,			DrawFlatMenuItem,	NULL, 0 } ,
 		
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
@@ -1244,12 +1251,12 @@ MENU	MENU_NEW_MoreMultiplayerOptions = {
 	{
 		{  0,   0, 200,  20, 0,				"Other options",													FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,						NULL,					NULL,						DrawFlatMenuItem,		NULL, 0 } ,
 
-		{ 10,  86, 100,  93, 0,				LT_MENU_NEW_MoreMultiplayerOptions7  /* "bike exhausts"          , FONT_Small,  TEXTFLAG_CentreY,							&BikeExhausts,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
-		{ 10,  93, 100, 100, 0,				LT_MENU_NEW_MoreMultiplayerOptions8  /* "bright bikes"           , FONT_Small,  TEXTFLAG_CentreY,							&MyBrightShips,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
+		{ 10,  86, 100,  93, 0,				(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions7  /* "bike exhausts"          , FONT_Small,  TEXTFLAG_CentreY,							&BikeExhausts,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
+		{ 10,  93, 100, 100, 0,				(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions8  /* "bright bikes"           , FONT_Small,  TEXTFLAG_CentreY,							&MyBrightShips,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
 		
-		{  10, 116,  85, 116, 0,			LT_MENU_NEW_MoreMultiplayerOptions14/*"demo"        , FONT_Small,		TEXTFLAG_CentreY,													&RecordDemo,						NULL,								SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
+		{  10, 116,  85, 116, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions14/*"demo"        , FONT_Small,		TEXTFLAG_CentreY,													&RecordDemo,						NULL,								SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 */
@@ -1260,105 +1267,105 @@ void GameTypeRefresh( int * i )
 }
 
 MENU MENU_NEW_GameType = {
-	"",NULL,NULL,GameTypeRefresh,TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"",NULL,NULL,GameTypeRefresh,TITLE_TIMER_PanToLeftVDU,
 	{		
 
-		{   0,   0, 200,   0, 0,	LT_MENU_NEW_CreateGame8  /*"game type"*/,				FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 } ,
+		{   0,   0, 200,   0, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame8  /*"game type"*/,				FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 } ,
 
-		{  10,   8, 200,  16, 0,	LT_MENU_NEW_CreateGame9	 /*"free for all"*/,			FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_Normal,		SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
-		{  10,  16, 200,  24, 0,	LT_MENU_NEW_CreateGame10 /*"team game"*/,				FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_Team,			SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
-		{  10,  24, 200,  32, 0,	LT_MENU_NEW_CreateGame11 /*"capture the flag"*/,		FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_CTF,			SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
-		{  10,  32, 200,  40, 0,	LT_MENU_NEW_CreateGame12 /*"flag chase"*/,				FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_FlagChase,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
-		{  10,  40, 200,  48, 0,	LT_MENU_NEW_CreateGame13 /*"bounty hunt"*/,				FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_BountyHunt,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
-		{  10,  48, 200,  56, 0,	LT_MENU_NEW_CreateGame14 /*"Team bounty hunt"*/,		FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_TeamBountyHunt,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{  10,   8, 200,  16, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame9	 /*"free for all"*/,			FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_Normal,		SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{  10,  16, 200,  24, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame10 /*"team game"*/,				FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_Team,			SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{  10,  24, 200,  32, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame11 /*"capture the flag"*/,		FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_CTF,			SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{  10,  32, 200,  40, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame12 /*"flag chase"*/,				FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_FlagChase,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{  10,  40, 200,  48, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame13 /*"bounty hunt"*/,				FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_BountyHunt,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{  10,  48, 200,  56, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame14 /*"Team bounty hunt"*/,		FONT_Small,		TEXTFLAG_CentreY,	&GameType,	(void *)GAME_TeamBountyHunt,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
 
-		{  10,  68, 200,  68, 0,			"Game Type Options",												FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,						NULL,					NULL,						DrawFlatMenuItem,		NULL, 0 } ,
+		{  10,  68, 200,  68, 0,			(u_int8_t*)"Game Type Options",												FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,						NULL,					NULL,						DrawFlatMenuItem,		NULL, 0 } ,
 
-		{  10,  92, 120,  92, 0,			LT_MENU_NEW_MoreMultiplayerOptions10 /* "Bounty bonus"           */, FONT_Small, TEXTFLAG_CentreY,							&BountyBonus,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
-		{  10, 100, 120, 100, SLIDER_Value,	LT_MENU_NEW_MoreMultiplayerOptions12 /* "bounty bonus interval"  */, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BountyBonusSlider,			NULL,					SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
-		{  10, 108, 120, 108, SLIDER_Value,	LT_MENU_NEW_MoreMultiplayerOptions11 /* "flag capture score"     */, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&GoalScoreSlider,			NULL,					SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
-		{  10, 116, 120, 116, SLIDER_User,	LT_MENU_NEW_MoreMultiplayerOptions13 /* "own flag rule"          */, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&CTFSlider,					NULL,					SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{  10,  92, 120,  92, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions10 /* "Bounty bonus"           */, FONT_Small, TEXTFLAG_CentreY,							&BountyBonus,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
+		{  10, 100, 120, 100, SLIDER_Value,	(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions12 /* "bounty bonus interval"  */, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BountyBonusSlider,			NULL,					SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
+		{  10, 108, 120, 108, SLIDER_Value,	(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions11 /* "flag capture score"     */, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&GoalScoreSlider,			NULL,					SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
+		{  10, 116, 120, 116, SLIDER_User,	(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions13 /* "own flag rule"          */, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&CTFSlider,					NULL,					SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU MENU_NEW_NetworkOptions = {
-	"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
-		{  0, 16, 200, 16, 0,			"Network Options",															FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 } ,
+		{  0, 16, 200, 16, 0,			(u_int8_t*)"Network Options",															FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 } ,
 
-		{ 10, 32,  85, 32, 0,			LT_MENU_NEW_MoreMultiplayerOptions2/*"short packets"*/,						FONT_Small,	TEXTFLAG_CentreY,							&MyUseShortPackets,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
-		{ 10, 40,  85, 40, SLIDER_Value,LT_MENU_NEW_MoreMultiplayerOptions4/*"packet rate"*/,						FONT_Small,	TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,		&MyPacketsSlider,				NULL,						SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
+		{ 10, 32,  85, 32, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions2/*"short packets"*/,						FONT_Small,	TEXTFLAG_CentreY,							&MyUseShortPackets,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
+		{ 10, 40,  85, 40, SLIDER_Value,(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions4/*"packet rate"*/,						FONT_Small,	TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,		&MyPacketsSlider,				NULL,						SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
 
-		{ 10, 56,  85, 56, 0,			LT_MENU_NEW_MoreMultiplayerOptions1a /*target collision perspective"*/,		FONT_Small, TEXTFLAG_CentreY,							&MyColPerspective,			(void *)COLPERS_Descent,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
-		{ 10, 64,  85, 64, 0,			LT_MENU_NEW_MoreMultiplayerOptions2a /*"shooter collision perspective"*/,	FONT_Small, TEXTFLAG_CentreY,							&MyColPerspective,			(void *)COLPERS_Forsaken,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{ 10, 56,  85, 56, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions1a /*target collision perspective"*/,		FONT_Small, TEXTFLAG_CentreY,							&MyColPerspective,			(void *)COLPERS_Descent,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
+		{ 10, 64,  85, 64, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions2a /*"shooter collision perspective"*/,	FONT_Small, TEXTFLAG_CentreY,							&MyColPerspective,			(void *)COLPERS_Forsaken,	SelectFlatRadioButton,	DrawFlatRadioButton,	NULL, 0 } ,
 
-		{ 10, 78,  85, 78, 0,			"enable tracker",															FONT_Small, TEXTFLAG_CentreY,							&tracker_enabled,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
+		{ 10, 78,  85, 78, 0,			(u_int8_t*)"enable tracker",															FONT_Small, TEXTFLAG_CentreY,							&tracker_enabled,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
 
-		{ 10, 88,  85, 88, 0,			"local port",																FONT_Small,	TEXTFLAG_ForceFit | TEXTFLAG_CentreY,		&local_port_str,			NULL,						SelectFlatMenutext,		DrawFlatMenuText,		NULL, 0 } ,
+		{ 10, 88,  85, 88, 0,			(u_int8_t*)"local port",																FONT_Small,	TEXTFLAG_ForceFit | TEXTFLAG_CentreY,		&local_port_str,			NULL,						SelectFlatMenutext,		DrawFlatMenuText,		NULL, 0 } ,
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 /* create */
 MENU	MENU_NEW_CreateGame = {
 
-	"",
+	(u_int8_t*)"",
 	InitMultiplayerHostVDUPeerPeer,
 	ExitMultiplayerHostVDUPeerPeer,
 	RedrawMultiplayerHostVDUPeerPeer,
 	TITLE_TIMER_PanToLeftVDU,
 
 	{
-		{   0,  15, 200,  15, 0,			LT_MENU_NEW_CreateGame0  /*"Create Multiplayer Game"*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,								NULL,								NULL,								NULL,					DrawFlatMenuItem,		NULL, 0 } ,
-		{  10,  36,  90,  36, 0,			LT_MENU_NEW_CreateGame1  /*"Start game"*/,				FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_HostWaitingToStart,		StartAHostSession,		DrawFlatMenuItem,		NULL, 0 } ,
+		{   0,  15, 200,  15, 0,			(u_int8_t*)LT_MENU_NEW_CreateGame0  /*"Create Multiplayer Game"*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,								NULL,								NULL,								NULL,					DrawFlatMenuItem,		NULL, 0 } ,
+		{  10,  36,  90,  36, 0,			(u_int8_t*)LT_MENU_NEW_CreateGame1  /*"Start game"*/,				FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_HostWaitingToStart,		StartAHostSession,		DrawFlatMenuItem,		NULL, 0 } ,
 
-		{  10,  51,  85,  51, 0,			LT_MENU_NEW_CreateGame8  /*"game type"*/,				FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_GameType,					MenuChange,				DrawFlatMenuItem,		NULL, 0 } ,
-		{  90,  51, 200,  51, 0,			"",														FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit,	(void *)GameTypeName,				NULL,								NULL,					DrawFlatMenuName,		NULL, 0 } ,
+		{  10,  51,  85,  51, 0,			(u_int8_t*)LT_MENU_NEW_CreateGame8  /*"game type"*/,				FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_GameType,					MenuChange,				DrawFlatMenuItem,		NULL, 0 } ,
+		{  90,  51, 200,  51, 0,			(u_int8_t*)"",														FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit,	(void *)GameTypeName,				NULL,								NULL,					DrawFlatMenuName,		NULL, 0 } ,
 
-		{  10,  59,  50,  59, 0,			LT_MENU_NEW_CreateGame4  /*"level"*/,					FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								NULL,								NULL,								InitLevelSelectVDU,		DrawFlatMenuItem,		NULL, 0 } ,
-		{  90,  59, 200,  59, 0,			"",														FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit,	(void *)SelectedLevel,				NULL,								NULL,					DrawFlatMenuName,		NULL, 0 } ,
+		{  10,  59,  50,  59, 0,			(u_int8_t*)LT_MENU_NEW_CreateGame4  /*"level"*/,					FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								NULL,								NULL,								InitLevelSelectVDU,		DrawFlatMenuItem,		NULL, 0 } ,
+		{  90,  59, 200,  59, 0,			(u_int8_t*)"",														FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit,	(void *)SelectedLevel,				NULL,								NULL,					DrawFlatMenuName,		NULL, 0 } ,
 
-		{  10,  75,  85,  75, SLIDER_Value, LT_MENU_NEW_CreateGame5  /*"player limit"*/,			FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								&MaxPlayersSlider,					NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
-		{  10,  83,  85,  83, SLIDER_Value, LT_MENU_NEW_CreateGame6  /*"score limit"*/,				FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								&MaxKillsSlider,					NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
-		{  10,  91,  85,  91, SLIDER_Time,	LT_MENU_NEW_CreateGame7  /*"time limit"*/,				FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								&MyTimeLimit,						NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
+		{  10,  75,  85,  75, SLIDER_Value, (u_int8_t*)LT_MENU_NEW_CreateGame5  /*"player limit"*/,			FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								&MaxPlayersSlider,					NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
+		{  10,  83,  85,  83, SLIDER_Value, (u_int8_t*)LT_MENU_NEW_CreateGame6  /*"score limit"*/,				FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								&MaxKillsSlider,					NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
+		{  10,  91,  85,  91, SLIDER_Time,	(u_int8_t*)LT_MENU_NEW_CreateGame7  /*"time limit"*/,				FONT_Small,		TEXTFLAG_CentreY | TEXTFLAG_AutoSelect,								&MyTimeLimit,						NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
 
-		{  10, 107,  85, 107, 0,			"Reset Kills"            /*"Reset Kills"*/,				FONT_Small,		TEXTFLAG_CentreY,													&MyResetKillsPerLevel,				NULL,								SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
-		{  10, 115,  85, 115, SLIDER_Value,	LT_MENU_NEW_MoreMultiplayerOptions21/*"num weapons"	*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,								&NumPrimaryPickupsSlider,			NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
-		{  10, 124,  85, 124, 0,			LT_MENU_NEW_MoreMultiplayerOptions20/*"randomize"   */, FONT_Small,		TEXTFLAG_CentreY,													&MyRandomPickups,					NULL,								SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
+		{  10, 107,  85, 107, 0,			(u_int8_t*)"Reset Kills"            /*"Reset Kills"*/,				FONT_Small,		TEXTFLAG_CentreY,													&MyResetKillsPerLevel,				NULL,								SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
+		{  10, 115,  85, 115, SLIDER_Value,	(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions21/*"num weapons"	*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,								&NumPrimaryPickupsSlider,			NULL,								SelectSlider,			DrawFlatMenuSlider,		NULL, 0 } ,
+		{  10, 124,  85, 124, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions20/*"randomize"   */, FONT_Small,		TEXTFLAG_CentreY,													&MyRandomPickups,					NULL,								SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
 
-		{  10, 139, 180, 139, 0,			LT_MENU_NEW_MoreMultiplayerOptions19/*"pickups" */,		FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_ValidPickups,				MenuChange,				DrawFlatMenuItem,		NULL, 0 } ,
-		{  10, 147, 100, 147, 0,			"Network Options",										FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_NetworkOptions,			MenuChange,				DrawFlatMenuItem,		NULL, 0 } ,
+		{  10, 139, 180, 139, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions19/*"pickups" */,		FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_ValidPickups,				MenuChange,				DrawFlatMenuItem,		NULL, 0 } ,
+		{  10, 147, 100, 147, 0,			(u_int8_t*)"Network Options",										FONT_Small,		TEXTFLAG_CentreY,													NULL,								&MENU_NEW_NetworkOptions,			MenuChange,				DrawFlatMenuItem,		NULL, 0 } ,
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENUITEM MENU_ITEM_IdiotText = 
-		{ 0, 150, 200, 170, 0, "", FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, NULL, NULL, NULL, 0  };
+		{ 0, 150, 200, 170, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, NULL, NULL, NULL, 0  };
 
 MENU	MENU_NEW_PrimaryOrder = {
-	"", NULL, StoreWeaponOrder, NULL, 0,
+	(u_int8_t*)"", NULL, StoreWeaponOrder, NULL, 0,
 	{
-		{ 10, 0, 190, 35, 0, LT_MENU_NEW_PrimaryOrder0 /*"primary weapon selection preferences"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 5, 50, 95, 180, 0, "", FONT_Small, TEXTFLAG_CentreY  | TEXTFLAG_ForceFit,  &Config.primary_order, NULL, NULL, DrawPrimaryWeapons, NULL, 0  },
-		{ 5, 35, 95, 50, 0, LT_MENU_NEW_PrimaryOrder1 /*"auto"*/, FONT_Medium, TEXTFLAG_CentreY ,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 105, 35, 195, 50, 0, LT_MENU_NEW_PrimaryOrder2 /*"manual"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 0, 190, 35, 0, (u_int8_t*)LT_MENU_NEW_PrimaryOrder0 /*"primary weapon selection preferences"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 5, 50, 95, 180, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CentreY  | TEXTFLAG_ForceFit,  &Config.primary_order, NULL, NULL, DrawPrimaryWeapons, NULL, 0  },
+		{ 5, 35, 95, 50, 0, (u_int8_t*)LT_MENU_NEW_PrimaryOrder1 /*"auto"*/, FONT_Medium, TEXTFLAG_CentreY ,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 105, 35, 195, 50, 0, (u_int8_t*)LT_MENU_NEW_PrimaryOrder2 /*"manual"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_SecondaryOrder = {
-	"", NULL, StoreWeaponOrder, NULL, 0,
+	(u_int8_t*)"", NULL, StoreWeaponOrder, NULL, 0,
 	{
-		{ 10, 0, 190, 35, 0, LT_MENU_NEW_SecondaryOrder0 /*"secondary weapon selection preferences"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 5, 50, 95, 180, 0, "", FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_ForceFit,  &Config.primary_order, NULL, NULL, DrawSecondaryWeapons, NULL, 0  },
-		{ 5, 35, 95, 50, 0, LT_MENU_NEW_SecondaryOrder1 /*"auto"*/, FONT_Medium, TEXTFLAG_CentreY ,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 105, 35, 195, 50, 0, LT_MENU_NEW_SecondaryOrder2 /*"manual"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 0, 190, 35, 0, (u_int8_t*)LT_MENU_NEW_SecondaryOrder0 /*"secondary weapon selection preferences"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 5, 50, 95, 180, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_ForceFit,  &Config.primary_order, NULL, NULL, DrawSecondaryWeapons, NULL, 0  },
+		{ 5, 35, 95, 50, 0, (u_int8_t*)LT_MENU_NEW_SecondaryOrder1 /*"auto"*/, FONT_Medium, TEXTFLAG_CentreY ,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 105, 35, 195, 50, 0, (u_int8_t*)LT_MENU_NEW_SecondaryOrder2 /*"manual"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
@@ -1366,296 +1373,296 @@ MENU	MENU_NEW_SecondaryOrder = {
 
 MENU	MENU_NEW_SecondaryWeaponKeys = {
 #ifdef VDUKDEF
-	"", InitKeyDef, NULL, NULL, 0,
+	(u_int8_t*)"", InitKeyDef, NULL, NULL, 0,
 #else
-	"", InitControls, ExitControls, NULL, 0,
+	(u_int8_t*)"", InitControls, ExitControls, NULL, 0,
 #endif
 	{
-		{ 0, 0, 200, 15, 0, LT_MENU_NEW_SecondaryWeaponKeys0 /*"secondary weapon"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys0 /*"secondary weapon"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
 #ifdef VDUKDEF
-		VDUKDEF( 3, 20, 89, 28, LT_MENU_NEW_SecondaryWeaponKeys1 /*"fire secondary"*/, KDfire_secondary ),
-		VDUKDEF( 3, 28, 89, 36, LT_MENU_NEW_SecondaryWeaponKeys2 /*"drop mine"*/, KDfire_mine ),
+		VDUKDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys1 /*"fire secondary"*/, KDfire_secondary ),
+		VDUKDEF( 3, 28, 89, 36, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys2 /*"drop mine"*/, KDfire_mine ),
 
-		VDUKDEF( 3, 42, 89, 50, LT_MENU_NEW_SecondaryWeaponKeys3 /*"mug missile"*/, KDselect_secondary[ MUGMISSILE ] ),
-		VDUKDEF( 3, 50, 89, 58, LT_MENU_NEW_SecondaryWeaponKeys4 /*"solaris missile"*/, KDselect_secondary[ SOLARISMISSILE ] ),
-		VDUKDEF( 3, 58, 89, 66, LT_MENU_NEW_SecondaryWeaponKeys5 /*"scatter missile"*/, KDselect_secondary[ SCATTERMISSILE ] ),
-		VDUKDEF( 3, 66, 89, 74, LT_MENU_NEW_SecondaryWeaponKeys6 /*"gravgon missile"*/, KDselect_secondary[ GRAVGONMISSILE ] ),
-		VDUKDEF( 3, 74, 89, 82, LT_MENU_NEW_SecondaryWeaponKeys7 /*"mfrl"*/, KDselect_secondary[ MULTIPLEMISSILE ] ),
-		VDUKDEF( 3, 82, 89, 90, LT_MENU_NEW_SecondaryWeaponKeys8 /*"Titan Missile"*/, KDselect_secondary[ TITANSTARMISSILE ] ),
-		VDUKDEF( 3, 90, 89, 98, LT_MENU_NEW_SecondaryWeaponKeys29 /*"Thief Missile"*/, KDselect_secondary[ THIEFMISSILE ] ),
+		VDUKDEF( 3, 42, 89, 50, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys3 /*"mug missile"*/, KDselect_secondary[ MUGMISSILE ] ),
+		VDUKDEF( 3, 50, 89, 58, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys4 /*"solaris missile"*/, KDselect_secondary[ SOLARISMISSILE ] ),
+		VDUKDEF( 3, 58, 89, 66, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys5 /*"scatter missile"*/, KDselect_secondary[ SCATTERMISSILE ] ),
+		VDUKDEF( 3, 66, 89, 74, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys6 /*"gravgon missile"*/, KDselect_secondary[ GRAVGONMISSILE ] ),
+		VDUKDEF( 3, 74, 89, 82, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys7 /*"mfrl"*/, KDselect_secondary[ MULTIPLEMISSILE ] ),
+		VDUKDEF( 3, 82, 89, 90, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys8 /*"Titan Missile"*/, KDselect_secondary[ TITANSTARMISSILE ] ),
+		VDUKDEF( 3, 90, 89, 98, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys29 /*"Thief Missile"*/, KDselect_secondary[ THIEFMISSILE ] ),
 		
-		VDUKDEF( 3,  98, 89, 106, LT_MENU_NEW_SecondaryWeaponKeys9 /*"purge mine"*/, KDselect_secondary[ PURGEMINE ] ),
-		VDUKDEF( 3, 106, 89, 114, LT_MENU_NEW_SecondaryWeaponKeys10 /*"pine mine"*/, KDselect_secondary[ PINEMINE ] ),
-		VDUKDEF( 3, 114, 89, 122, LT_MENU_NEW_SecondaryWeaponKeys11 /*"quantum mine"*/, KDselect_secondary[ QUANTUMMINE ] ),
-		VDUKDEF( 3, 122, 89, 130, LT_MENU_NEW_SecondaryWeaponKeys30 /*"spider mine"*/, KDselect_secondary[ SPIDERMINE ] ),
+		VDUKDEF( 3,  98, 89, 106, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys9 /*"purge mine"*/, KDselect_secondary[ PURGEMINE ] ),
+		VDUKDEF( 3, 106, 89, 114, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys10 /*"pine mine"*/, KDselect_secondary[ PINEMINE ] ),
+		VDUKDEF( 3, 114, 89, 122, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys11 /*"quantum mine"*/, KDselect_secondary[ QUANTUMMINE ] ),
+		VDUKDEF( 3, 122, 89, 130, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys30 /*"spider mine"*/, KDselect_secondary[ SPIDERMINE ] ),
 
-		VDUKDEF( 3, 136, 89, 144, LT_MENU_NEW_SecondaryWeaponKeys12 /*"Next weapon"*/, KDselect_next_secondary ),
-		VDUKDEF( 3, 144, 89, 152, LT_MENU_NEW_SecondaryWeaponKeys13 /*"Prev weapon"*/, KDselect_prev_secondary ),
+		VDUKDEF( 3, 136, 89, 144, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys12 /*"Next weapon"*/, KDselect_next_secondary ),
+		VDUKDEF( 3, 144, 89, 152, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys13 /*"Prev weapon"*/, KDselect_prev_secondary ),
 
-		VDUKDEF( 3, 158, 89, 166, LT_MENU_NEW_SecondaryWeaponKeys14 /*"drop weapon"*/, KDdrop_secondary ),
+		VDUKDEF( 3, 158, 89, 166, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys14 /*"drop weapon"*/, KDdrop_secondary ),
 #else
-		VDUKEYDEF( 3, 20, 89, 28, LT_MENU_NEW_SecondaryWeaponKeys15 /*"fire secondary:"*/, (void *)&Config.fire_secondary ),
-		VDUKEYDEF( 3, 28, 89, 36, LT_MENU_NEW_SecondaryWeaponKeys16 /*"drop mine:"*/, (void *)&Config.fire_mine ),
+		VDUKEYDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys15 /*"fire secondary:"*/, (void *)&Config.fire_secondary ),
+		VDUKEYDEF( 3, 28, 89, 36, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys16 /*"drop mine:"*/, (void *)&Config.fire_mine ),
 
-		VDUKEYDEF( 3, 42, 89, 50, LT_MENU_NEW_SecondaryWeaponKeys17 /*"mug missile:"*/, (void *)&Config.select_secondary[ MUGMISSILE ] ),
-		VDUKEYDEF( 3, 50, 89, 58, LT_MENU_NEW_SecondaryWeaponKeys18 /*"solaris missile:"*/, (void *)&Config.select_secondary[ SOLARISMISSILE ] ),
-		VDUKEYDEF( 3, 58, 89, 66, LT_MENU_NEW_SecondaryWeaponKeys19 /*"scatter missile:"*/, (void *)&Config.select_secondary[ SCATTERMISSILE ] ),
-		VDUKEYDEF( 3, 66, 89, 74, LT_MENU_NEW_SecondaryWeaponKeys20 /*"gravgon missile:"*/, (void *)&Config.select_secondary[ GRAVGONMISSILE ] ),
-		VDUKEYDEF( 3, 74, 89, 82, LT_MENU_NEW_SecondaryWeaponKeys21 /*"mfrl:"*/, (void *)&Config.select_secondary[ MULTIPLEMISSILE ] ),
-		VDUKEYDEF( 3, 82, 89, 90, LT_MENU_NEW_SecondaryWeaponKeys22 /*"Titan Missile:"*/, (void *)&Config.select_secondary[ TITANSTARMISSILE ] ),
-		VDUKEYDEF( 3, 90, 89, 98, LT_MENU_NEW_SecondaryWeaponKeys29 /*"Thief Missile"*/, (void *)&Config.select_secondary[ THIEFMISSILE ] ),
+		VDUKEYDEF( 3, 42, 89, 50, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys17 /*"mug missile:"*/, (void *)&Config.select_secondary[ MUGMISSILE ] ),
+		VDUKEYDEF( 3, 50, 89, 58, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys18 /*"solaris missile:"*/, (void *)&Config.select_secondary[ SOLARISMISSILE ] ),
+		VDUKEYDEF( 3, 58, 89, 66, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys19 /*"scatter missile:"*/, (void *)&Config.select_secondary[ SCATTERMISSILE ] ),
+		VDUKEYDEF( 3, 66, 89, 74, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys20 /*"gravgon missile:"*/, (void *)&Config.select_secondary[ GRAVGONMISSILE ] ),
+		VDUKEYDEF( 3, 74, 89, 82, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys21 /*"mfrl:"*/, (void *)&Config.select_secondary[ MULTIPLEMISSILE ] ),
+		VDUKEYDEF( 3, 82, 89, 90, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys22 /*"Titan Missile:"*/, (void *)&Config.select_secondary[ TITANSTARMISSILE ] ),
+		VDUKEYDEF( 3, 90, 89, 98, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys29 /*"Thief Missile"*/, (void *)&Config.select_secondary[ THIEFMISSILE ] ),
 		
-		VDUKEYDEF( 3, 98, 89, 106, LT_MENU_NEW_SecondaryWeaponKeys23 /*"purge mine:"*/, (void *)&Config.select_secondary[ PURGEMINE ] ),
-		VDUKEYDEF( 3, 106, 89, 114, LT_MENU_NEW_SecondaryWeaponKeys24 /*"pine mine:"*/, (void *)&Config.select_secondary[ PINEMINE ] ),
-		VDUKEYDEF( 3, 114, 89, 122, LT_MENU_NEW_SecondaryWeaponKeys25 /*"quantum mine:"*/, (void *)&Config.select_secondary[ QUANTUMMINE ] ),
-		VDUKEYDEF( 3, 122, 89, 130, LT_MENU_NEW_SecondaryWeaponKeys30 /*"spider mine"*/, (void *)&Config.select_secondary[ SPIDERMINE ] ),
+		VDUKEYDEF( 3, 98, 89, 106, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys23 /*"purge mine:"*/, (void *)&Config.select_secondary[ PURGEMINE ] ),
+		VDUKEYDEF( 3, 106, 89, 114, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys24 /*"pine mine:"*/, (void *)&Config.select_secondary[ PINEMINE ] ),
+		VDUKEYDEF( 3, 114, 89, 122, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys25 /*"quantum mine:"*/, (void *)&Config.select_secondary[ QUANTUMMINE ] ),
+		VDUKEYDEF( 3, 122, 89, 130, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys30 /*"spider mine"*/, (void *)&Config.select_secondary[ SPIDERMINE ] ),
 
-		VDUKEYDEF( 3, 136, 89, 144, LT_MENU_NEW_SecondaryWeaponKeys26 /*"Next weapon:"*/, (void *)&Config.select_next_secondary ),
-		VDUKEYDEF( 3, 144, 89, 152, LT_MENU_NEW_SecondaryWeaponKeys27 /*"Prev weapon:"*/, (void *)&Config.select_prev_secondary ),
+		VDUKEYDEF( 3, 136, 89, 144, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys26 /*"Next weapon:"*/, (void *)&Config.select_next_secondary ),
+		VDUKEYDEF( 3, 144, 89, 152, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys27 /*"Prev weapon:"*/, (void *)&Config.select_prev_secondary ),
 
-		VDUKEYDEF( 3, 158, 89, 166, LT_MENU_NEW_SecondaryWeaponKeys28 /*"drop weapon:"*/, (void *)&Config.drop_secondary ),
+		VDUKEYDEF( 3, 158, 89, 166, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys28 /*"drop weapon:"*/, (void *)&Config.drop_secondary ),
 #endif		
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_PrimaryWeaponKeys = {
 #ifdef VDUKDEF
-	"", InitKeyDef, NULL, NULL, 0,
+	(u_int8_t*)"", InitKeyDef, NULL, NULL, 0,
 #else
-	"", InitControls, ExitControls, NULL, 0,
+	(u_int8_t*)"", InitControls, ExitControls, NULL, 0,
 #endif
 	{
-		{ 0, 0, 200, 15, 0, LT_MENU_NEW_PrimaryWeaponKeys0 /*"primary weapon"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys0 /*"primary weapon"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 #ifdef VDUKDEF
-		VDUKDEF( 3, 20, 89, 28, LT_MENU_NEW_PrimaryWeaponKeys1 /*"fire primary"*/, KDfire_primary ),
+		VDUKDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys1 /*"fire primary"*/, KDfire_primary ),
 
-		VDUKDEF( 3, 34, 89, 42, LT_MENU_NEW_PrimaryWeaponKeys2 /*"pulsar"*/, KDselect_primary[ PULSAR ] ),
-		VDUKDEF( 3, 42, 89, 50, LT_MENU_NEW_PrimaryWeaponKeys3 /*"trojax"*/, KDselect_primary[ TROJAX ] ),
-		VDUKDEF( 3, 50, 89, 58, LT_MENU_NEW_PrimaryWeaponKeys4 /*"pyrolite"*/, KDselect_primary[ PYROLITE_RIFLE ] ),
-		VDUKDEF( 3, 58, 89, 66, LT_MENU_NEW_PrimaryWeaponKeys5 /*"transpulse"*/, KDselect_primary[ TRANSPULSE_CANNON ] ),
-		VDUKDEF( 3, 66, 89, 74, LT_MENU_NEW_PrimaryWeaponKeys6 /*"suss gun"*/, KDselect_primary[ SUSS_GUN ] ),
-		VDUKDEF( 3, 74, 89, 82, LT_MENU_NEW_PrimaryWeaponKeys7 /*"laser"*/, KDselect_primary[ LASER ] ),
+		VDUKDEF( 3, 34, 89, 42, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys2 /*"pulsar"*/, KDselect_primary[ PULSAR ] ),
+		VDUKDEF( 3, 42, 89, 50, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys3 /*"trojax"*/, KDselect_primary[ TROJAX ] ),
+		VDUKDEF( 3, 50, 89, 58, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys4 /*"pyrolite"*/, KDselect_primary[ PYROLITE_RIFLE ] ),
+		VDUKDEF( 3, 58, 89, 66, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys5 /*"transpulse"*/, KDselect_primary[ TRANSPULSE_CANNON ] ),
+		VDUKDEF( 3, 66, 89, 74, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys6 /*"suss gun"*/, KDselect_primary[ SUSS_GUN ] ),
+		VDUKDEF( 3, 74, 89, 82, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys7 /*"laser"*/, KDselect_primary[ LASER ] ),
 
-		VDUKDEF( 3, 88, 89, 96, LT_MENU_NEW_PrimaryWeaponKeys8 /*"Next weapon"*/, KDselect_next_primary ),
-		VDUKDEF( 3, 96, 89, 104, LT_MENU_NEW_PrimaryWeaponKeys9 /*"Prev weapon"*/, KDselect_prev_primary ),
+		VDUKDEF( 3, 88, 89, 96, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys8 /*"Next weapon"*/, KDselect_next_primary ),
+		VDUKDEF( 3, 96, 89, 104, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys9 /*"Prev weapon"*/, KDselect_prev_primary ),
 
-		VDUKDEF( 3, 110, 89, 118, LT_MENU_NEW_PrimaryWeaponKeys10 /*"drop weapon"*/, KDdrop_primary ),
+		VDUKDEF( 3, 110, 89, 118, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys10 /*"drop weapon"*/, KDdrop_primary ),
 
-		VDUKDEF( 3, 124, 89, 132, LT_MENU_NEW_PrimaryWeaponKeys11 /*"send msg"*/, KDsend_msg ),
+		VDUKDEF( 3, 124, 89, 132, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys11 /*"send msg"*/, KDsend_msg ),
 #else
-		VDUKEYDEF( 3, 20, 89, 28, LT_MENU_NEW_PrimaryWeaponKeys12 /*"fire primary:"*/, (void *)&Config.fire_primary ),
+		VDUKEYDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys12 /*"fire primary:"*/, (void *)&Config.fire_primary ),
 
-		VDUKEYDEF( 3, 34, 89, 42, LT_MENU_NEW_PrimaryWeaponKeys13 /*"pulsar:"*/, (void *)&Config.select_primary[ PULSAR ] ),
-		VDUKEYDEF( 3, 42, 89, 50, LT_MENU_NEW_PrimaryWeaponKeys14 /*"trojax:"*/, (void *)&Config.select_primary[ TROJAX ] ),
-		VDUKEYDEF( 3, 50, 89, 58, LT_MENU_NEW_PrimaryWeaponKeys15 /*"suss gun:"*/, (void *)&Config.select_primary[ SUSS_GUN ] ),
-		VDUKEYDEF( 3, 58, 89, 66, LT_MENU_NEW_PrimaryWeaponKeys16 /*"pyrolite:"*/, (void *)&Config.select_primary[ TRANSPULSE_CANNON ] ),
-		VDUKEYDEF( 3, 66, 89, 74, LT_MENU_NEW_PrimaryWeaponKeys17 /*"transpulse:"*/, (void *)&Config.select_primary[ PYROLITE_RIFLE ] ),
-		VDUKEYDEF( 3, 74, 89, 82, LT_MENU_NEW_PrimaryWeaponKeys18 /*"laser:"*/, (void *)&Config.select_primary[ LASER ] ),
+		VDUKEYDEF( 3, 34, 89, 42, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys13 /*"pulsar:"*/, (void *)&Config.select_primary[ PULSAR ] ),
+		VDUKEYDEF( 3, 42, 89, 50, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys14 /*"trojax:"*/, (void *)&Config.select_primary[ TROJAX ] ),
+		VDUKEYDEF( 3, 50, 89, 58, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys15 /*"suss gun:"*/, (void *)&Config.select_primary[ SUSS_GUN ] ),
+		VDUKEYDEF( 3, 58, 89, 66, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys16 /*"pyrolite:"*/, (void *)&Config.select_primary[ TRANSPULSE_CANNON ] ),
+		VDUKEYDEF( 3, 66, 89, 74, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys17 /*"transpulse:"*/, (void *)&Config.select_primary[ PYROLITE_RIFLE ] ),
+		VDUKEYDEF( 3, 74, 89, 82, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys18 /*"laser:"*/, (void *)&Config.select_primary[ LASER ] ),
 
-		VDUKEYDEF( 3, 88, 89, 96, LT_MENU_NEW_PrimaryWeaponKeys19 /*"Next weapon:"*/, (void *)&Config.select_next_primary ),
-		VDUKEYDEF( 3, 96, 89, 104, LT_MENU_NEW_PrimaryWeaponKeys20 /*"Prev weapon:"*/, (void *)&Config.select_prev_primary ),
+		VDUKEYDEF( 3, 88, 89, 96, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys19 /*"Next weapon:"*/, (void *)&Config.select_next_primary ),
+		VDUKEYDEF( 3, 96, 89, 104, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys20 /*"Prev weapon:"*/, (void *)&Config.select_prev_primary ),
 
-		VDUKEYDEF( 3, 110, 89, 118, LT_MENU_NEW_PrimaryWeaponKeys21 /*"drop weapon:"*/, (void *)&Config.drop_primary ),
+		VDUKEYDEF( 3, 110, 89, 118, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys21 /*"drop weapon:"*/, (void *)&Config.drop_primary ),
 #endif		
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_Weapons = {
-	"", InitControls, ExitControls, NULL, TITLE_TIMER_NormalPanToRightVDU,
+	(u_int8_t*)"", InitControls, ExitControls, NULL, TITLE_TIMER_NormalPanToRightVDU,
 	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_Weapons0 /*"weapons"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 10, 45, 200, 65, 0, LT_MENU_NEW_Weapons1 /*"primary weapon keys"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_PrimaryWeaponKeys, MenuChange, DrawFlatMenuItem, NULL, 0  },
-		{ 10, 70, 200, 90, 0, LT_MENU_NEW_Weapons2 /*"secondary weapon keys"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_SecondaryWeaponKeys, MenuChange, DrawFlatMenuItem, NULL, 0  },
-		{ 10, 100, 200, 120, 0, LT_MENU_NEW_Weapons3 /*"primary weapon preferences"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_PrimaryOrder, MenuChange, DrawFlatMenuItem, NULL, 0  },
-		{ 10, 125, 200, 145, 0, LT_MENU_NEW_Weapons4 /*"secondary weapon preferences"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_SecondaryOrder, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_Weapons0 /*"weapons"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 45, 200, 65, 0, (u_int8_t*)LT_MENU_NEW_Weapons1 /*"primary weapon keys"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_PrimaryWeaponKeys, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 70, 200, 90, 0, (u_int8_t*)LT_MENU_NEW_Weapons2 /*"secondary weapon keys"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_SecondaryWeaponKeys, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 100, 200, 120, 0, (u_int8_t*)LT_MENU_NEW_Weapons3 /*"primary weapon preferences"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_PrimaryOrder, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 125, 200, 145, 0, (u_int8_t*)LT_MENU_NEW_Weapons4 /*"secondary weapon preferences"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_SecondaryOrder, MenuChange, DrawFlatMenuItem, NULL, 0  },
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_ConfigureKeyboard = {
 #ifdef VDUKDEF
-	"", InitKeyDef, NULL, NULL, 0,
+	(u_int8_t*)"", InitKeyDef, NULL, NULL, 0,
 #else
-	"", InitControls, ExitControls, NULL, 0,
+	(u_int8_t*)"", InitControls, ExitControls, NULL, 0,
 #endif
 	{
-		{ 0, 0, 200, 15, 0, LT_MENU_NEW_ConfigureKeyboard0 /*"movement controls"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard0 /*"movement controls"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
 #ifdef VDUKDEF
-		VDUKDEF( 3, 15, 80, 23, LT_MENU_NEW_ConfigureKeyboard1 /*"rotate left"*/, KDleft ),
-		VDUKDEF( 3, 23, 80, 31, LT_MENU_NEW_ConfigureKeyboard2 /*"rotate right"*/, KDright ),
-		VDUKDEF( 3, 31, 80, 39, LT_MENU_NEW_ConfigureKeyboard3  /*"rotate up"*/, KDup ),
-		VDUKDEF( 3, 39, 80, 47, LT_MENU_NEW_ConfigureKeyboard4 /*"rotate down"*/, KDdown ),
+		VDUKDEF( 3, 15, 80, 23, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard1 /*"rotate left"*/, KDleft ),
+		VDUKDEF( 3, 23, 80, 31, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard2 /*"rotate right"*/, KDright ),
+		VDUKDEF( 3, 31, 80, 39, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard3  /*"rotate up"*/, KDup ),
+		VDUKDEF( 3, 39, 80, 47, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard4 /*"rotate down"*/, KDdown ),
 
-		VDUKDEF( 3, 50, 80, 58, LT_MENU_NEW_ConfigureKeyboard5 /*"slide left"*/, KDmove_left ),
-		VDUKDEF( 3, 58, 80, 66, LT_MENU_NEW_ConfigureKeyboard6 /*"slide right"*/, KDmove_right ),
-		VDUKDEF( 3, 66, 80, 74, LT_MENU_NEW_ConfigureKeyboard7 /*"slide up"*/, KDmove_up ),
-		VDUKDEF( 3, 74, 80, 82, LT_MENU_NEW_ConfigureKeyboard8 /*"slide down"*/, KDmove_down ),
+		VDUKDEF( 3, 50, 80, 58, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard5 /*"slide left"*/, KDmove_left ),
+		VDUKDEF( 3, 58, 80, 66, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard6 /*"slide right"*/, KDmove_right ),
+		VDUKDEF( 3, 66, 80, 74, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard7 /*"slide up"*/, KDmove_up ),
+		VDUKDEF( 3, 74, 80, 82, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard8 /*"slide down"*/, KDmove_down ),
 
-		VDUKDEF( 3, 85, 80, 93, LT_MENU_NEW_ConfigureKeyboard9 /*"roll left"*/, KDroll_left ),
-		VDUKDEF( 3, 93, 80, 101, LT_MENU_NEW_ConfigureKeyboard10 /*"roll right"*/, KDroll_right ),
+		VDUKDEF( 3, 85, 80, 93, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard9 /*"roll left"*/, KDroll_left ),
+		VDUKDEF( 3, 93, 80, 101, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard10 /*"roll right"*/, KDroll_right ),
 
-		VDUKDEF( 3, 104, 80, 112, LT_MENU_NEW_ConfigureKeyboard11 /*"slide mode"*/, KDmove ),
-		VDUKDEF( 3, 112, 80, 120, LT_MENU_NEW_ConfigureKeyboard12 /*"roll mode"*/, KDroll ),
+		VDUKDEF( 3, 104, 80, 112, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard11 /*"slide mode"*/, KDmove ),
+		VDUKDEF( 3, 112, 80, 120, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard12 /*"roll mode"*/, KDroll ),
 
-		VDUKDEF( 3, 123, 80, 131, LT_MENU_NEW_ConfigureKeyboard13 /*"forward"*/, KDmove_forward ),
-		VDUKDEF( 3, 131, 80, 139, LT_MENU_NEW_ConfigureKeyboard14 /*"reverse"*/, KDmove_backward ),
-		VDUKDEF( 3, 139, 80, 147, LT_MENU_NEW_ConfigureKeyboard15 /*"nitro"*/, KDturbo ),
+		VDUKDEF( 3, 123, 80, 131, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard13 /*"forward"*/, KDmove_forward ),
+		VDUKDEF( 3, 131, 80, 139, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard14 /*"reverse"*/, KDmove_backward ),
+		VDUKDEF( 3, 139, 80, 147, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard15 /*"nitro"*/, KDturbo ),
 
-		VDUKDEF( 3, 150, 80, 158, LT_MENU_NEW_ConfigureKeyboard16 /*"cruise faster"*/, KDcruise_faster ),
-		VDUKDEF( 3, 158, 80, 166, LT_MENU_NEW_ConfigureKeyboard17 /*"cruise slower"*/, KDcruise_slower ),
+		VDUKDEF( 3, 150, 80, 158, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard16 /*"cruise faster"*/, KDcruise_faster ),
+		VDUKDEF( 3, 158, 80, 166, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard17 /*"cruise slower"*/, KDcruise_slower ),
 #else
-		VDUKEYDEF( 3, 15, 80, 23, LT_MENU_NEW_ConfigureKeyboard18 /*"rotate left:"*/, (void *)&Config.left ),
-		VDUKEYDEF( 3, 23, 80, 31, LT_MENU_NEW_ConfigureKeyboard19 /*"rotate right:"*/, (void *)&Config.right ),
-		VDUKEYDEF( 3, 31, 80, 39, LT_MENU_NEW_ConfigureKeyboard20 /*"rotate up:"*/, (void *)&Config.up ),
-		VDUKEYDEF( 3, 39, 80, 47, LT_MENU_NEW_ConfigureKeyboard21 /*"rotate down:"*/, (void *)&Config.down ),
+		VDUKEYDEF( 3, 15, 80, 23, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard18 /*"rotate left:"*/, (void *)&Config.left ),
+		VDUKEYDEF( 3, 23, 80, 31, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard19 /*"rotate right:"*/, (void *)&Config.right ),
+		VDUKEYDEF( 3, 31, 80, 39, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard20 /*"rotate up:"*/, (void *)&Config.up ),
+		VDUKEYDEF( 3, 39, 80, 47, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard21 /*"rotate down:"*/, (void *)&Config.down ),
 
-		VDUKEYDEF( 3, 50, 80, 58, LT_MENU_NEW_ConfigureKeyboard22 /*"slide left:"*/, (void *)&Config.move_left ),
-		VDUKEYDEF( 3, 58, 80, 66, LT_MENU_NEW_ConfigureKeyboard23 /*"slide right:"*/, (void *)&Config.move_right ),
-		VDUKEYDEF( 3, 66, 80, 74, LT_MENU_NEW_ConfigureKeyboard24 /*"slide up"*/, (void *)&Config.move_up ),
-		VDUKEYDEF( 3, 74, 80, 82, LT_MENU_NEW_ConfigureKeyboard25 /*"slide down:"*/, (void *)&Config.move_down ),
+		VDUKEYDEF( 3, 50, 80, 58, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard22 /*"slide left:"*/, (void *)&Config.move_left ),
+		VDUKEYDEF( 3, 58, 80, 66, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard23 /*"slide right:"*/, (void *)&Config.move_right ),
+		VDUKEYDEF( 3, 66, 80, 74, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard24 /*"slide up"*/, (void *)&Config.move_up ),
+		VDUKEYDEF( 3, 74, 80, 82, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard25 /*"slide down:"*/, (void *)&Config.move_down ),
 
-		VDUKEYDEF( 3, 85, 80, 93, LT_MENU_NEW_ConfigureKeyboard26 /*"roll left:"*/, (void *)&Config.roll_left ),
-		VDUKEYDEF( 3, 93, 80, 101, LT_MENU_NEW_ConfigureKeyboard27 /*"roll right:"*/, (void *)&Config.roll_right ),
+		VDUKEYDEF( 3, 85, 80, 93, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard26 /*"roll left:"*/, (void *)&Config.roll_left ),
+		VDUKEYDEF( 3, 93, 80, 101, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard27 /*"roll right:"*/, (void *)&Config.roll_right ),
 
-		VDUKEYDEF( 3, 104, 80, 112, LT_MENU_NEW_ConfigureKeyboard28 /*"slide mode:"*/, (void *)&Config.move ),
-		VDUKEYDEF( 3, 112, 80, 120, LT_MENU_NEW_ConfigureKeyboard29 /*"roll mode:"*/, (void *)&Config.roll ),
+		VDUKEYDEF( 3, 104, 80, 112, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard28 /*"slide mode:"*/, (void *)&Config.move ),
+		VDUKEYDEF( 3, 112, 80, 120, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard29 /*"roll mode:"*/, (void *)&Config.roll ),
 
-		VDUKEYDEF( 3, 123, 80, 131, LT_MENU_NEW_ConfigureKeyboard30 /*"forward:"*/, (void *)&Config.move_forward ),
-		VDUKEYDEF( 3, 131, 80, 139, LT_MENU_NEW_ConfigureKeyboard31 /*"reverse:"*/, (void *)&Config.move_backward ),
-		VDUKEYDEF( 3, 139, 80, 147, LT_MENU_NEW_ConfigureKeyboard32 /*"nitro:"*/, (void *)&Config.turbo ),
+		VDUKEYDEF( 3, 123, 80, 131, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard30 /*"forward:"*/, (void *)&Config.move_forward ),
+		VDUKEYDEF( 3, 131, 80, 139, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard31 /*"reverse:"*/, (void *)&Config.move_backward ),
+		VDUKEYDEF( 3, 139, 80, 147, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard32 /*"nitro:"*/, (void *)&Config.turbo ),
 
-		VDUKEYDEF( 3, 150, 80, 158, LT_MENU_NEW_ConfigureKeyboard33 /*"cruise faster:"*/, (void *)&Config.cruise_faster ),
-		VDUKEYDEF( 3, 158, 80, 166, LT_MENU_NEW_ConfigureKeyboard34 /*"cruise slower:"*/, (void *)&Config.cruise_slower ),
+		VDUKEYDEF( 3, 150, 80, 158, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard33 /*"cruise faster:"*/, (void *)&Config.cruise_faster ),
+		VDUKEYDEF( 3, 158, 80, 166, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard34 /*"cruise slower:"*/, (void *)&Config.cruise_slower ),
 
-		VDUKEYDEF( 3, 170, 80, 178, LT_MENU_NEW_ConfigureKeyboard35 /*"send msg:"*/, (void *)&Config.send_msg ),
+		VDUKEYDEF( 3, 170, 80, 178, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard35 /*"send msg:"*/, (void *)&Config.send_msg ),
 #endif
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU MENU_NEW_ConfigJoyAxis = {
-	"", InitJoystickAxisConfig, SetAxis, CheckJoyAxis, 0,
+	(u_int8_t*)"", InitJoystickAxisConfig, SetAxis, CheckJoyAxis, 0,
 	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_ConfigJoyAxis0 /*"setup axis"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis0 /*"setup axis"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-		{ 0, 0, 20 , 20, 0, "", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &JoystickAxisList, NULL, NULL, DrawLeftArrow, NULL, 0 } ,
-		{ 180, 0, 200 , 20, 0, "", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &JoystickAxisList, NULL, NULL, DrawRightArrow, NULL, 0 } ,
+		{ 0, 0, 20 , 20, 0, (u_int8_t*)"", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &JoystickAxisList, NULL, NULL, DrawLeftArrow, NULL, 0 } ,
+		{ 180, 0, 200 , 20, 0, (u_int8_t*)"", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &JoystickAxisList, NULL, NULL, DrawRightArrow, NULL, 0 } ,
 
-		{ 5, 25, 85, 45, SLIDER_User, LT_MENU_NEW_ConfigJoyAxis1 /*"select axis:"*/, FONT_Medium, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,
+		{ 5, 25, 85, 45, SLIDER_User, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis1 /*"select axis:"*/, FONT_Medium, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,
 						&AxisSlider, NULL, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
 
-		{ 5, 50, 85, 65, SLIDER_User, LT_MENU_NEW_ConfigJoyAxis2 /*"select action:"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY | TEXTFLAG_ForceFit,
+		{ 5, 50, 85, 65, SLIDER_User, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis2 /*"select action:"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY | TEXTFLAG_ForceFit,
 						&AxisActionSlider, NULL, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
 
-		{ 5, 70, 85, 80, 0, LT_MENU_NEW_ConfigJoyAxis3 /*"invert axis"*/, FONT_Small, TEXTFLAG_CentreY, &AxisInvert, SetAxisInv, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
+		{ 5, 70, 85, 80, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis3 /*"invert axis"*/, FONT_Small, TEXTFLAG_CentreY, &AxisInvert, (void*)SetAxisInv, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
 
-		{ 5, 85, 85, 95, 0, LT_MENU_NEW_ConfigJoyAxis4 /*"sensitivity"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &SensitivitySlider, SetAxisSensitivity, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
+		{ 5, 85, 85, 95, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis4 /*"sensitivity"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &SensitivitySlider, (void*)SetAxisSensitivity, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
 
-		{ 5, 100, 85, 110, 0, LT_MENU_NEW_ConfigJoyAxis5 /*"deadzone"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &DeadzoneSlider, SetAxisDeadzone, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
+		{ 5, 100, 85, 110, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis5 /*"deadzone"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &DeadzoneSlider, (void*)SetAxisDeadzone, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
 		
-		{ 5, 115, 85, 125, 0, LT_MENU_NEW_ConfigJoyAxis6 /*"fine control"*/, FONT_Small, TEXTFLAG_CentreY, &FineControl, SetAxisFineControl, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
+		{ 5, 115, 85, 125, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis6 /*"fine control"*/, FONT_Small, TEXTFLAG_CentreY, &FineControl, (void*)SetAxisFineControl, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
 
-		{ 0, 130, 200, 140, 0, LT_MENU_NEW_ConfigJoyAxis7 /*"test:"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 130, 200, 140, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis7 /*"test:"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-		{ 5, 140, 100, 150, 0, "", FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh,  (void *)AxisExtremeLeftText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 100, 140, 195, 150, 0, "", FONT_Small, TEXTFLAG_RightX | TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh,  (void *)AxisExtremeRightText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 5, 140, 100, 150, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh,  (void *)AxisExtremeLeftText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
+		{ 100, 140, 195, 150, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_RightX | TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh,  (void *)AxisExtremeRightText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 
 /* joystick */
 MENU	MENU_NEW_SetupJoystick = {
-	"", InitJoystickList, ExitJoySetup, NULL, 0,
+	(u_int8_t*)"", InitJoystickList, ExitJoySetup, NULL, 0,
 	{
 
 		/* title */
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_SetupJoystick0 /*"choose joystick"*/,
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_SetupJoystick0 /*"choose joystick"*/,
 		FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL,
 		DrawFlatMenuItem, NULL, 0  },
 
 		{ 10, 30, 200, 100, 0,
-		LT_MENU_NEW_SetupJoystick1 /*"joystick list"*/, FONT_Small,
+		(u_int8_t*)LT_MENU_NEW_SetupJoystick1 /*"joystick list"*/, FONT_Small,
 		TEXTFLAG_SuppressHighlight | TEXTFLAG_CentreY | TEXTFLAG_ForceFit | 
 		TEXTFLAG_AutoSelect,
-        &JoystickList, SelectConfigureAxisMenu, SelectList, DrawFlatMenuList, NULL, 0  },
+        &JoystickList, (void*)SelectConfigureAxisMenu, SelectList, DrawFlatMenuList, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 
 };
 
-MENUITEM AxisScreenItem = { 100, 110, 180, 130, 0, LT_AxisScreenItem/*"configure Axis"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_ConfigJoyAxis, MenuChange, DrawFlatMenuItem, NULL, 0  };
+MENUITEM AxisScreenItem = { 100, 110, 180, 130, 0, (u_int8_t*)LT_AxisScreenItem/*"configure Axis"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_ConfigJoyAxis, MenuChange, DrawFlatMenuItem, NULL, 0  };
 
 MENU	MENU_NEW_SetupMouse = {
-	"", NULL, ExitMouseSetup, NULL, 0,
+	(u_int8_t*)"", NULL, ExitMouseSetup, NULL, 0,
 	{
-		{ 10, 85, 100, 95, SLIDER_Sensitivity, LT_MENU_NEW_SetupMouse0 /*"X sensitivity"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,  &SensitivityXSlider, NULL, SelectSlider,	DrawFlatMenuSlider, NULL, 0  },
-		{ 10, 95, 100, 105, SLIDER_Sensitivity, LT_MENU_NEW_SetupMouse1 /*"Y sensitivity"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,  &SensitivityYSlider, NULL, SelectSlider,	DrawFlatMenuSlider, NULL, 0  },
-		{ 10, 115, 100, 125, 0, LT_MENU_NEW_SetupMouse2 /*"invert x"*/, FONT_Small, TEXTFLAG_CentreY,  &Config.invert_turn, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
-		{ 10, 125, 100, 135, 0, LT_MENU_NEW_SetupMouse3 /*"invert y"*/, FONT_Small, TEXTFLAG_CentreY,  &Config.invert_pitch, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
+		{ 10, 85, 100, 95, SLIDER_Sensitivity, (u_int8_t*)LT_MENU_NEW_SetupMouse0 /*"X sensitivity"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,  &SensitivityXSlider, NULL, SelectSlider,	DrawFlatMenuSlider, NULL, 0  },
+		{ 10, 95, 100, 105, SLIDER_Sensitivity, (u_int8_t*)LT_MENU_NEW_SetupMouse1 /*"Y sensitivity"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,  &SensitivityYSlider, NULL, SelectSlider,	DrawFlatMenuSlider, NULL, 0  },
+		{ 10, 115, 100, 125, 0, (u_int8_t*)LT_MENU_NEW_SetupMouse2 /*"invert x"*/, FONT_Small, TEXTFLAG_CentreY,  &Config.invert_turn, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
+		{ 10, 125, 100, 135, 0, (u_int8_t*)LT_MENU_NEW_SetupMouse3 /*"invert y"*/, FONT_Small, TEXTFLAG_CentreY,  &Config.invert_pitch, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 
 };
 
 /* controls */
 MENU	MENU_NEW_Controls = {
-	"", InitControls, ExitControls, NULL, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", InitControls, ExitControls, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
 		
 
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_Controls0 /*"controls"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_Controls0 /*"controls"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-		{ 10, 30, 200, 40, 0, LT_MENU_NEW_Controls1 /*"configure mouse"*/, FONT_Small, TEXTFLAG_CentreY, NULL, &MENU_NEW_SetupMouse, MenuChange,	DrawFlatMenuItem, NULL, 0  },
+		{ 10, 30, 200, 40, 0, (u_int8_t*)LT_MENU_NEW_Controls1 /*"configure mouse"*/, FONT_Small, TEXTFLAG_CentreY, NULL, &MENU_NEW_SetupMouse, MenuChange,	DrawFlatMenuItem, NULL, 0  },
 
-		{ 10, 45, 200, 55, 0, LT_MENU_NEW_Controls2 /*"configure joystick"*/, FONT_Small, TEXTFLAG_CentreY, NULL,
+		{ 10, 45, 200, 55, 0, (u_int8_t*)LT_MENU_NEW_Controls2 /*"configure joystick"*/, FONT_Small, TEXTFLAG_CentreY, NULL,
 		  &MENU_NEW_SetupJoystick, MenuChange, DrawFlatMenuItem, NULL, 0  },
 
 
 
-		{ 10, 60, 200, 70, 0, LT_MENU_NEW_Controls3 /*"configure keys and buttons"*/, FONT_Small, TEXTFLAG_CentreY, NULL, &MENU_NEW_ConfigureKeyboard, MenuChange, DrawFlatMenuItem, NULL, 0  },
-		{ 10, 75, 100, 85, 0, LT_MENU_NEW_Controls4 /*"autoleveling"*/, FONT_Small, TEXTFLAG_CentreY,  &Autoleveling, SetAutolevel, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
-		{ 10, 90, 200, 100, 0, LT_MENU_NEW_Controls5 /*"restore defaults"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, RestoreDefaultControlSettings, DrawFlatMenuItem, NULL, 0  },
-		{ 10, 105, 200, 115, 0, LT_MENU_NEW_Controls6 /*"back"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 60, 200, 70, 0, (u_int8_t*)LT_MENU_NEW_Controls3 /*"configure keys and buttons"*/, FONT_Small, TEXTFLAG_CentreY, NULL, &MENU_NEW_ConfigureKeyboard, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 75, 100, 85, 0, (u_int8_t*)LT_MENU_NEW_Controls4 /*"autoleveling"*/, FONT_Small, TEXTFLAG_CentreY,  &Autoleveling, (void*)SetAutolevel, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
+		{ 10, 90, 200, 100, 0, (u_int8_t*)LT_MENU_NEW_Controls5 /*"restore defaults"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, RestoreDefaultControlSettings, DrawFlatMenuItem, NULL, 0  },
+		{ 10, 105, 200, 115, 0, (u_int8_t*)LT_MENU_NEW_Controls6 /*"back"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0  },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 // Out-of-game menu
 extern bool ShowInfo;
 MENU	MENU_NEW_DetailLevels = {
-	"", NULL, ExitDetailLevels, NULL, 0,
+	(u_int8_t*)"", NULL, ExitDetailLevels, NULL, 0,
 	{
-		{ 0, 10, 200, 10, 0, LT_MENU_NEW_DetailLevels0/*"DETAIL LEVELS"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 10, 200, 10, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels0/*"DETAIL LEVELS"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-		{ 10, 40, 150, 40, 0, "MATURE CONTENT", FONT_Small, TEXTFLAG_CentreY,  &MatureContent,	NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 },
-		{ 10, 56, 150, 56, 0, LT_MENU_NEW_DetailLevels4/*"Team Info"*/, FONT_Small, TEXTFLAG_CentreY,		&ShowTeamInfo,			NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle, NULL, 0 },
-		{ 10, 72, 95, 72, 0, LT_MENU_NEW_DetailLevels8/*"Water Detail"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,		&WaterDetailSlider,		NULL,	SelectSlider,	DrawFlatMenuSlider, NULL, 0 },
-		{ 10, 86, 150, 86, 0, LT_MENU_NEW_DetailLevels14/*"Show Extra Info "*/, FONT_Small, TEXTFLAG_CentreY, &ShowInfo, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 10, 102, 150, 102, 0, LT_MENU_NEW_DetailLevels15/*"Show Weapon Kills"*/, FONT_Small, TEXTFLAG_CentreY, &ShowWeaponKills, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 10, 150, 150, 150, 0, LT_MENU_NEW_DetailLevels16/*"Back"*/, FONT_Small, TEXTFLAG_CentreY,		NULL,		NULL,	MenuItemBack, DrawFlatMenuItem, NULL, 0 },
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ 10, 40, 150, 40, 0, (u_int8_t*)"MATURE CONTENT", FONT_Small, TEXTFLAG_CentreY,  &MatureContent,	NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 },
+		{ 10, 56, 150, 56, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels4/*"Team Info"*/, FONT_Small, TEXTFLAG_CentreY,		&ShowTeamInfo,			NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle, NULL, 0 },
+		{ 10, 72, 95, 72, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels8/*"Water Detail"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,		&WaterDetailSlider,		NULL,	SelectSlider,	DrawFlatMenuSlider, NULL, 0 },
+		{ 10, 86, 150, 86, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels14/*"Show Extra Info "*/, FONT_Small, TEXTFLAG_CentreY, &ShowInfo, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 10, 102, 150, 102, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels15/*"Show Weapon Kills"*/, FONT_Small, TEXTFLAG_CentreY, &ShowWeaponKills, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 10, 150, 150, 150, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels16/*"Back"*/, FONT_Small, TEXTFLAG_CentreY,		NULL,		NULL,	MenuItemBack, DrawFlatMenuItem, NULL, 0 },
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	 
 	}
 };
 
 
 MENU	MENU_NEW_ScreenRes = {
-	"Select Screen Mode" , MakeModeList , NULL , NULL, 0,
+	(u_int8_t*)"Select Screen Mode" , MakeModeList , NULL , NULL, 0,
 	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_ScreenRes0 /*"Choose From..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 15, 30, 200, 150, 0, "", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &ModeList, NewMenuSelectMode , SelectList , DrawFlatMenuList, NULL, 0 } ,
-		{ 0, 155, 200, 165, 0, LT_MENU_NEW_ScreenRes1 /*"press escape to go back"*/, FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_CentreX, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_ScreenRes0 /*"Choose From..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 15, 30, 200, 150, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &ModeList, (void*)NewMenuSelectMode , SelectList , DrawFlatMenuList, NULL, 0 } ,
+		{ 0, 155, 200, 165, 0, (u_int8_t*)LT_MENU_NEW_ScreenRes1 /*"press escape to go back"*/, FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_CentreX, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
@@ -1715,7 +1722,7 @@ bool SetStereoMode( SLIDER *slider )
 	case STEREO_MODE_COLOR:
 	case STEREO_MODE_HALF_HEIGHT:
 	case STEREO_MODE_HALF_WIDTH:
-		render_info.stereo_mode = (stereo_right_color_t) slider->value;
+		render_info.stereo_mode = (stereo_mode_t) slider->value;
 		return true;
 	default:
 		DebugPrintf( "Unknown stereo slider value: %d\n", slider->value );
@@ -1727,14 +1734,14 @@ SLIDER StereoColorSlider = {0, 2, 1, 2, 2, 0.0F, 0.0F, 0, true, StereoColorSlide
 SLIDER StereoModeSlider = {0, 2, 1, 2, 2, 0.0F, 0.0F, 0, true, StereoModeSliderFunc, SetStereoMode, NULL };
 
 MENU	MENU_NEW_VisualsStereo = {
-	"Stereo", NULL, NULL, NULL, 0,
+	(u_int8_t*)"Stereo", NULL, NULL, NULL, 0,
 	{
-		{  0,   0, 200,  20, 0,					"stereo",											FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,			NULL,						NULL,					DrawFlatMenuItem,	NULL, 0 },
-		{ 20,  40, 150,  50, 0,					"enable stereo",								FONT_Small, TEXTFLAG_CentreY,				&render_info.stereo_enabled,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },		 
-		{ 20,  50, 150,  70, SLIDER_User,		"stereo mode",								FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,				&StereoModeSlider,			NULL,						SelectSlider,	DrawFlatMenuSlider,	NULL, 0 },		 
-		{ 20,  70, 150,  70, SLIDER_User,		"right eye color",									FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&StereoColorSlider,	NULL,					SelectSlider,			DrawFlatMenuSlider,			NULL, 0 },		 
-		{ 20, 140, 100, 150, 0,					"back",												FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },		 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{  0,   0, 200,  20, 0,					(u_int8_t*)"stereo",											FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,			NULL,						NULL,					DrawFlatMenuItem,	NULL, 0 },
+		{ 20,  40, 150,  50, 0,					(u_int8_t*)"enable stereo",								FONT_Small, TEXTFLAG_CentreY,				&render_info.stereo_enabled,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },		 
+		{ 20,  50, 150,  70, SLIDER_User,		(u_int8_t*)"stereo mode",								FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,				&StereoModeSlider,			NULL,						SelectSlider,	DrawFlatMenuSlider,	NULL, 0 },		 
+		{ 20,  70, 150,  70, SLIDER_User,		(u_int8_t*)"right eye color",									FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&StereoColorSlider,	NULL,					SelectSlider,			DrawFlatMenuSlider,			NULL, 0 },		 
+		{ 20, 140, 100, 150, 0,					(u_int8_t*)"back",												FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },		 
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
@@ -1760,70 +1767,70 @@ extern bool g_stereo_invert;
 #endif
 
 MENU	MENU_NEW_Visuals = {
-	"", NULL, NULL, NULL, TITLE_TIMER_Visuals,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_Visuals,
 	{
-		{  0,   0, 200,  20, 0,					LT_MENU_NEW_Visuals0 /*"Visuals"*/,					FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,			NULL,						NULL,					DrawFlatMenuItem,	NULL, 0 },
-		{ 20,  40, 200,  50, 0,					LT_MENU_NEW_Visuals1 /*"Change Detail Levels"*/,	FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_DetailLevels,		MenuChange,				DrawFlatMenuItem,	NULL, 0 },
-		{ 20,  60, 200,  70, 0,					LT_MENU_NEW_Visuals2 /*"Change Screen Res"*/,		FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_ScreenRes,		MenuChange,				DrawFlatMenuItem,	NULL, 0 },
-		{ 20, 80,  50, 90, SLIDER_Percent,	LT_MENU_NEW_Visuals4 /*"gamma"*/,					FONT_Small,	TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &GammaSlider,	NULL,						SelectSlider,			DrawFlatMenuSlider, NULL, 0 },
+		{  0,   0, 200,  20, 0,					(u_int8_t*)LT_MENU_NEW_Visuals0 /*"Visuals"*/,					FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,			NULL,						NULL,					DrawFlatMenuItem,	NULL, 0 },
+		{ 20,  40, 200,  50, 0,					(u_int8_t*)LT_MENU_NEW_Visuals1 /*"Change Detail Levels"*/,	FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_DetailLevels,		MenuChange,				DrawFlatMenuItem,	NULL, 0 },
+		{ 20,  60, 200,  70, 0,					(u_int8_t*)LT_MENU_NEW_Visuals2 /*"Change Screen Res"*/,		FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_ScreenRes,		MenuChange,				DrawFlatMenuItem,	NULL, 0 },
+		{ 20, 80,  50, 90, SLIDER_Percent,	(u_int8_t*)LT_MENU_NEW_Visuals4 /*"gamma"*/,					FONT_Small,	TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &GammaSlider,	NULL,						SelectSlider,			DrawFlatMenuSlider, NULL, 0 },
 
-		{ 20, 100, 200, 100, 0,					LT_MENU_InGame2  /*"Toggle Full Screen" */,			FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuGoFullScreen,		DrawFlatMenuItem,	NULL, 0 },
-		{ 20, 112, 150, 112, 0,					"Vertical Sync (requires restart)",			FONT_Small, TEXTFLAG_CentreY,	&render_info.vsync,	NewMenuSelectMode,	SelectFlatMenuToggle, DrawFlatMenuToggle,		NULL, 0 },
-		{ 20, 124, 200, 124, 0,					"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	NULL, 0 },
-		{ 20, 136, 150, 136, 0,					"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
-		{ 20, 160, 100, 160, 0,					LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ 20, 100, 200, 100, 0,					(u_int8_t*)LT_MENU_InGame2  /*"Toggle Full Screen" */,			FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuGoFullScreen,		DrawFlatMenuItem,	NULL, 0 },
+		{ 20, 112, 150, 112, 0,					(u_int8_t*)"Vertical Sync (requires restart)",			FONT_Small, TEXTFLAG_CentreY,	&render_info.vsync,	(void*)NewMenuSelectMode,	SelectFlatMenuToggle, DrawFlatMenuToggle,		NULL, 0 },
+		{ 20, 124, 200, 124, 0,					(u_int8_t*)"anaglyph stereo 3d options",						FONT_Small, TEXTFLAG_CentreY,						NULL,			&MENU_NEW_VisualsStereo,	MenuChange,				DrawFlatMenuItem,	NULL, 0 },
+		{ 20, 136, 150, 136, 0,					(u_int8_t*)"Tint Bike to Team Color",						FONT_Small, TEXTFLAG_CentreY,		&TintBikeTeamColor,		NULL,	SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20, 160, 100, 160, 0,					(u_int8_t*)LT_MENU_NEW_Visuals5 /*"back"*/,					FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
 MENU	MENU_NEW_3DS_Visuals = {
-	"", NULL, NULL, NULL, TITLE_TIMER_Visuals,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_Visuals,
 	{
-		{  0,   0, 200,  20, 0, "3DS Visual Settings",	FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 },
-		{ 20,  40, 150,  40, 0, "Object shine",			FONT_Small, TEXTFLAG_CentreY, &g_object_shine,      NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20,  56, 150,  56, 0, "Wall detail",			FONT_Small, TEXTFLAG_CentreY, &g_wall_detail,       NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20,  72, 150,  72, 0, "Show stereo debug",	FONT_Small, TEXTFLAG_CentreY, &g_show_stereo_debug, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20,  88, 150,  88, 0, "Invert 3D depth",		FONT_Small, TEXTFLAG_CentreY, &g_stereo_invert,     NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20, 104, 100, 104, 0, "back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{  0,   0, 200,  20, 0, (u_int8_t*)"3DS Visual Settings",	FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 },
+		{ 20,  40, 150,  40, 0, (u_int8_t*)"Object shine",			FONT_Small, TEXTFLAG_CentreY, &g_object_shine,      NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20,  56, 150,  56, 0, (u_int8_t*)"Wall detail",			FONT_Small, TEXTFLAG_CentreY, &g_wall_detail,       NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20,  72, 150,  72, 0, (u_int8_t*)"Show stereo debug",	FONT_Small, TEXTFLAG_CentreY, &g_show_stereo_debug, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20,  88, 150,  88, 0, (u_int8_t*)"Invert 3D depth",		FONT_Small, TEXTFLAG_CentreY, &g_stereo_invert,     NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20, 104, 100, 104, 0, (u_int8_t*)"back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 #endif
 
 MENU	MENU_NEW_JoinWaitingToStart = {
-	"" , InitHostWaitingToStart, BailMultiplayerFrontEnd , UpdateSessions, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"" , InitHostWaitingToStart, BailMultiplayerFrontEnd , UpdateSessions, TITLE_TIMER_PanToLeftVDU,
 	{
 
-		{ 0, 0, 200, 10, 0, LT_MENU_NEW_JoinWaitingToStart0 /*"waiting for host..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 5, 27, 100, 37, SLIDER_Value, LT_MENU_NEW_JoinWaitingToStart1 /*"Num of Players"*/, FONT_Small, TEXTFLAG_CentreY, &NumOfPlayersSlider, NULL, NULL, DrawFlatMenuSlider, NULL, 0 },
-		{ 5, 40, 100, 125, 0, "", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PlayersList, NULL , NULL , DrawFlatMenuList, NULL, 0 } ,
+		{ 0, 0, 200, 10, 0, (u_int8_t*)LT_MENU_NEW_JoinWaitingToStart0 /*"waiting for host..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 5, 27, 100, 37, SLIDER_Value, (u_int8_t*)LT_MENU_NEW_JoinWaitingToStart1 /*"Num of Players"*/, FONT_Small, TEXTFLAG_CentreY, &NumOfPlayersSlider, NULL, NULL, DrawFlatMenuSlider, NULL, 0 },
+		{ 5, 40, 100, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PlayersList, NULL , NULL , DrawFlatMenuList, NULL, 0 } ,
 
-		{ 5, 126, 200, 133, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 133, 200, 140, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 140, 200, 147, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 147, 200, 154, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 155, 25, 162, 0, LT_MENU_NEW_JoinWaitingToStart2 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
+		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 155, 25, 162, 0, (u_int8_t*)LT_MENU_NEW_JoinWaitingToStart2 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_GetTeamPlayers = {
-	"" , GetInitialPlayers, BailMultiplayer , CheckForMenuChange, 0,
+	(u_int8_t*)"" , GetInitialPlayers, BailMultiplayer , CheckForMenuChange, 0,
 	{
 
-		{ 0, 0, 200, 10, 0, LT_MENU_NEW_GetTeamPlayers0 /*"waiting for host..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 5, 27, 100, 37, SLIDER_Value, LT_MENU_NEW_GetTeamPlayers1 /*"Num of Players"*/, FONT_Small, TEXTFLAG_CentreY, &NumOfPlayersSlider, NULL, NULL, DrawFlatMenuSlider, NULL, 0 },
-		{ 5, 40, 100, 165, 0, "", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PlayersList, NULL , NULL , DrawFlatMenuList, NULL, 0 } ,
+		{ 0, 0, 200, 10, 0, (u_int8_t*)LT_MENU_NEW_GetTeamPlayers0 /*"waiting for host..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 5, 27, 100, 37, SLIDER_Value, (u_int8_t*)LT_MENU_NEW_GetTeamPlayers1 /*"Num of Players"*/, FONT_Small, TEXTFLAG_CentreY, &NumOfPlayersSlider, NULL, NULL, DrawFlatMenuSlider, NULL, 0 },
+		{ 5, 40, 100, 165, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PlayersList, NULL , NULL , DrawFlatMenuList, NULL, 0 } ,
 
-		{ 5, 126, 200, 133, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 133, 200, 140, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 140, 200, 147, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 147, 200, 154, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 155, 25, 162, 0, LT_MENU_NEW_GetTeamPlayers2 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
+		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 155, 25, 162, 0, (u_int8_t*)LT_MENU_NEW_GetTeamPlayers2 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
 	}
 };
 
@@ -1951,21 +1958,21 @@ void CheckJoinStatus( int * i )
 
 MENU	MENU_NEW_Joining = {
 
-		"" , JoiningEnter, JoiningExit, CheckJoinStatus, TITLE_TIMER_PanToLeftVDU,
+		(u_int8_t*)"" , JoiningEnter, JoiningExit, CheckJoinStatus, TITLE_TIMER_PanToLeftVDU,
 	{
-		{ 0, 0, 200, 20, 0, "", FONT_Medium, TEXTFLAG_CheckForRefresh | TEXTFLAG_CentreX | TEXTFLAG_CentreY, join_status_msg, NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 0, 0, 200, 20, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CheckForRefresh | TEXTFLAG_CentreX | TEXTFLAG_CentreY, join_status_msg, NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 
 		// join in watch mode (add 'if host allows' later)
 //		{ 10, 30, 200, 93, 0, NULL, FONT_Small, TEXTFLAG_CentreY, "YOOYYO TEST", NULL , SelectList , DrawFlatMenuName, NULL, 0 } ,
 
-		{ 0, 15, 200, 30, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_CentreX | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, &show_f1, NULL, NULL, DrawFlatMenuName, NULL, 0 } ,
+		{ 0, 15, 200, 30, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_CentreX | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, &show_f1, NULL, NULL, DrawFlatMenuName, NULL, 0 } ,
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENUITEM MENU_ITEM_JoinMultiplayer = 
-		{ 0, 0, 0, 0, 0, "", 0, 0,  NULL, &MENU_NEW_Joining, MenuChange, NULL, NULL, 0  };
+		{ 0, 0, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, &MENU_NEW_Joining, MenuChange, NULL, NULL, 0  };
 
 #define MAX_GAME_LIST 7
 #define MAX_GAME_LENGTH 100
@@ -2024,119 +2031,119 @@ void Update_ChooseConnectionToJoin( int * z )
 }
 
 MENU	MENU_NEW_ChooseConnectionToJoin = {
-	"", Enter_ChooseConnectionToJoin, NULL, Update_ChooseConnectionToJoin, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", Enter_ChooseConnectionToJoin, NULL, Update_ChooseConnectionToJoin, TITLE_TIMER_PanToLeftVDU,
 	{
-		{ 0, 10, 200, 10, 0, "Join Multiplayer Game",	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,				NULL,	NULL,						DrawFlatMenuItem,	NULL, 0  },
+		{ 0, 10, 200, 10, 0, (u_int8_t*)"Join Multiplayer Game",	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,				NULL,	NULL,						DrawFlatMenuItem,	NULL, 0  },
 
-		{ 5, 25, 60, 25, 0, "connect",					FONT_Medium,	TEXTFLAG_CentreY,						NULL,				NULL,	SelectConnectionToJoin,		DrawFlatMenuItem,	NULL, 0  },
+		{ 5, 25, 60, 25, 0, (u_int8_t*)"connect",					FONT_Medium,	TEXTFLAG_CentreY,						NULL,				NULL,	SelectConnectionToJoin,		DrawFlatMenuItem,	NULL, 0  },
 
-		{ 5, 40, 60, 40, 0, "host address:",			FONT_Small,		TEXTFLAG_ForceFit | TEXTFLAG_CentreY,	&TCPAddress,		NULL,	SelectFlatMenutext,			DrawFlatMenuText,	NULL, 0 } ,
-		{ 5, 48, 60, 48, 0,	"host port:",				FONT_Small,		TEXTFLAG_ForceFit | TEXTFLAG_CentreY,	&host_port_str,		NULL,	SelectFlatMenutext,			DrawFlatMenuText,	NULL, 0 } ,
+		{ 5, 40, 60, 40, 0, (u_int8_t*)"host address:",			FONT_Small,		TEXTFLAG_ForceFit | TEXTFLAG_CentreY,	&TCPAddress,		NULL,	SelectFlatMenutext,			DrawFlatMenuText,	NULL, 0 } ,
+		{ 5, 48, 60, 48, 0,	(u_int8_t*)"host port:",				FONT_Small,		TEXTFLAG_ForceFit | TEXTFLAG_CentreY,	&host_port_str,		NULL,	SelectFlatMenutext,			DrawFlatMenuText,	NULL, 0 } ,
 
-		{ 5, 60, 60, 60, 0,	"local port:",				FONT_Small,		TEXTFLAG_ForceFit | TEXTFLAG_CentreY,	&local_port_str,	NULL,	SelectFlatMenutext,			DrawFlatMenuText,	NULL, 0 } ,
+		{ 5, 60, 60, 60, 0,	(u_int8_t*)"local port:",				FONT_Small,		TEXTFLAG_ForceFit | TEXTFLAG_CentreY,	&local_port_str,	NULL,	SelectFlatMenutext,			DrawFlatMenuText,	NULL, 0 } ,
 
 		//
 
-		{ 0, 75, 200, 75, 0, "Public Game List",		FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,				NULL,	NULL,						DrawFlatMenuItem,	NULL, 0 },
-		{ 0, 83, 200, 83, 0, "Select a game bellow to join", FONT_Small,TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,				NULL,	NULL,						DrawFlatMenuItem,	NULL, 0 } ,
+		{ 0, 75, 200, 75, 0, (u_int8_t*)"Public Game List",		FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,				NULL,	NULL,						DrawFlatMenuItem,	NULL, 0 },
+		{ 0, 83, 200, 83, 0, (u_int8_t*)"Select a game bellow to join", FONT_Small,TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,				NULL,	NULL,						DrawFlatMenuItem,	NULL, 0 } ,
 
 		// number of games
-		{ 5, 97, 60, 97, 0, "Games Found:",			FONT_Small,		TEXTFLAG_CheckForRefresh | TEXTFLAG_CentreY,	&GamesLength,	NULL,	NULL,						DrawFlatMenuText,	NULL, 0 } ,
+		{ 5, 97, 60, 97, 0, (u_int8_t*)"Games Found:",			FONT_Small,		TEXTFLAG_CheckForRefresh | TEXTFLAG_CentreY,	&GamesLength,	NULL,	NULL,						DrawFlatMenuText,	NULL, 0 } ,
 
 		// list of games
-		{ 5, 111, 200, 111, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[0], (void *)GameName[0], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 119, 200, 119, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[1], (void *)GameName[1], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 127, 200, 127, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[2], (void *)GameName[2], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 135, 200, 135, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[3], (void *)GameName[3], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 143, 200, 143, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[4], (void *)GameName[4], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 151, 200, 151, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[5], (void *)GameName[5], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 159, 200, 159, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[6], (void *)GameName[6], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 111, 200, 111, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[0], (void *)GameName[0], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 119, 200, 119, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[1], (void *)GameName[1], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 127, 200, 127, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[2], (void *)GameName[2], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 135, 200, 135, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[3], (void *)GameName[3], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 143, 200, 143, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[4], (void *)GameName[4], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 151, 200, 151, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[5], (void *)GameName[5], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 159, 200, 159, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)GameList[6], (void *)GameName[6], SelectConnectionToJoin, DrawFlatMenuName, NULL, 0 } ,
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 
 MENU	MENU_NEW_ChangeBike = {
-	"", InitBikeListVDU, KillBikeChar, NULL, 0,
+	(u_int8_t*)"", InitBikeListVDU, KillBikeChar, NULL, 0,
 	{
-		{ 0, 0, 200 , 20, 0, "", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &bike_name, NULL, NULL, DrawFlatMenuName, NULL, 0 } ,
-		{ 15, 20, 135 , 128, 0, "", FONT_Small, TEXTFLAG_ForceFit , &biker_text, NULL, NULL, DrawFlatMenuName, NULL, 0 } ,
+		{ 0, 0, 200 , 20, 0, (u_int8_t*)"", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &bike_name, NULL, NULL, DrawFlatMenuName, NULL, 0 } ,
+		{ 15, 20, 135 , 128, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit , &biker_text, NULL, NULL, DrawFlatMenuName, NULL, 0 } ,
 
-		{ 27, 130, 72 , 137, SLIDER_Bike, LT_MENU_NEW_ChangeBike0 /*"speed"*/, FONT_Small, TEXTFLAG_CentreY , &SpeedFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
-		{ 27, 137, 72 , 144, SLIDER_Bike, LT_MENU_NEW_ChangeBike1 /*"accel"*/, FONT_Small, TEXTFLAG_CentreY , &AccelFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
-		{ 65, 144, 110 , 151, SLIDER_Bike, LT_MENU_NEW_ChangeBike2 /*"handling"*/, FONT_Small, TEXTFLAG_CentreY , &HandleFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
+		{ 27, 130, 72 , 137, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike0 /*"speed"*/, FONT_Small, TEXTFLAG_CentreY , &SpeedFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
+		{ 27, 137, 72 , 144, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike1 /*"accel"*/, FONT_Small, TEXTFLAG_CentreY , &AccelFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
+		{ 65, 144, 110 , 151, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike2 /*"handling"*/, FONT_Small, TEXTFLAG_CentreY , &HandleFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
 		
-		{ 114, 130, 157 , 137, SLIDER_Bike, LT_MENU_NEW_ChangeBike3 /*"shield"*/, FONT_Small, TEXTFLAG_CentreY , &ShieldFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
-		{ 114, 137, 157 , 144, SLIDER_Bike, LT_MENU_NEW_ChangeBike4 /*"hull"*/, FONT_Small, TEXTFLAG_CentreY , &HullFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
+		{ 114, 130, 157 , 137, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike3 /*"shield"*/, FONT_Small, TEXTFLAG_CentreY , &ShieldFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
+		{ 114, 137, 157 , 144, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike4 /*"hull"*/, FONT_Small, TEXTFLAG_CentreY , &HullFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
 
-		{ 125 , 20, 200, 130, 0, "" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0},
+		{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0},
 
-		{ -1, -1, 0, 0, 0,"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0,(u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 
 	}
 };
 
 MENU	MENU_NEW_ChoosePlayer = {
-	"", InitVDUPilotMenu, KillBikeChar, NULL, 0,
+	(u_int8_t*)"", InitVDUPilotMenu, KillBikeChar, NULL, 0,
 	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_ChoosePlayer0 /*"Choose Player"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 125 , 130, 200, 150, 0, "" , FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh, &bike_name, NULL , NULL , DrawFlatMenuName, NULL, 0},
-		{ 15 , 30, 100, 150, 0, LT_MENU_NEW_ChoosePlayer1 /*"list..."*/ , FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotList, NULL , NULL , DrawFlatMenuList, NULL, 0},
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_ChoosePlayer0 /*"Choose Player"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 125 , 130, 200, 150, 0, (u_int8_t*)"" , FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh, &bike_name, NULL , NULL , DrawFlatMenuName, NULL, 0},
+		{ 15 , 30, 100, 150, 0, (u_int8_t*)LT_MENU_NEW_ChoosePlayer1 /*"list..."*/ , FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotList, NULL , NULL , DrawFlatMenuList, NULL, 0},
 
-		{ 125 , 20, 200, 130, 0, "" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0},
+		{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0},
 			
-		{ -1, -1, 0, 0, 0,"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0,(u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 
 	}
 };
 
 MENU	MENU_NEW_NewPlayer = {
-	"", InitPilotName, ExitBikerMenu, NULL, TITLE_TIMER_PanToRightVDU,
+	(u_int8_t*)"", InitPilotName, ExitBikerMenu, NULL, TITLE_TIMER_PanToRightVDU,
 	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_NewPlayer0 /*"Enter Player Name"*/, FONT_Medium, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_NewPlayer0 /*"Enter Player Name"*/, FONT_Medium, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-		{ 15 , 50, 15, 70, 0, "" , FONT_Medium, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotName, NULL, SelectFlatMenutext, DrawFlatMenuText, NULL, 0},
+		{ 15 , 50, 15, 70, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotName, NULL, SelectFlatMenutext, DrawFlatMenuText, NULL, 0},
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };										 
 
 MENU MENU_NEW_ChangePlayerName = {
-	"", InitPilotReName, MoveConfigFile, NULL, TITLE_TIMER_PanToRightVDU,
+	(u_int8_t*)"", InitPilotReName, MoveConfigFile, NULL, TITLE_TIMER_PanToRightVDU,
 	{
 		
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_ChangePlayerName0 /*"Enter new Name"*/, FONT_Medium, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_ChangePlayerName0 /*"Enter new Name"*/, FONT_Medium, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-		{ 15 , 50, 15, 70, 0, "" , FONT_Medium, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotReName, NULL, SelectFlatMenutext, DrawFlatMenuText, NULL, 0},
+		{ 15 , 50, 15, 70, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotReName, NULL, SelectFlatMenutext, DrawFlatMenuText, NULL, 0},
 		
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
-MENU	MENU_NEW_ChangeBikeComputer;
+extern MENU	MENU_NEW_ChangeBikeComputer;
 
 MENU	MENU_NEW_SelectBiker = {
-	"", NewInitBikeMenu, ExitBikerMenu, NULL, TITLE_TIMER_PanToRightVDU,
+	(u_int8_t*)"", NewInitBikeMenu, ExitBikerMenu, NULL, TITLE_TIMER_PanToRightVDU,
 	{
-		{ 5 , 0, 195, 20, 0, "" , FONT_Large, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY , (void *)biker_name, NULL , NULL , DrawFlatMenuName, NULL, 0},
-		{ 15 , 25, 85, 45, 0, LT_MENU_NEW_SelectBiker0 /*"Choose Player"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChoosePlayer , MenuChange , DrawFlatMenuItem, NULL, 0},
-		{ 15 , 45, 85, 65, 0, LT_MENU_NEW_SelectBiker1 /*"New Player"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_NewPlayer, MenuChange, DrawFlatMenuItem, NULL, 0},
-		{ 15 , 65, 85, 85, 0, LT_MENU_NEW_SelectBiker2 /*"rename player"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChangePlayerName , MenuChange , DrawFlatMenuItem, NULL, 0},
-		{ 15 , 85, 85, 105, 0, LT_MENU_NEW_SelectBiker3 /*"Change Bike"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChangeBike , MenuChange , DrawFlatMenuItem, NULL, 0},
-		{ 15 , 105, 85, 125, 0, LT_MENU_NEW_SelectBiker4 /*"Change Bike computer"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChangeBikeComputer , MenuChange , DrawFlatMenuItem, NULL, 0},
-		{ 15 , 125, 85, 145, 0, LT_MENU_NEW_SelectBiker5 /*"Exit"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, NULL , MenuItemBack , DrawFlatMenuItem, NULL, 0},
-		{ 125 , 130, 200, 150, 0, "" , FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &bike_name, NULL , NULL , DrawFlatMenuName, NULL, 0},
+		{ 5 , 0, 195, 20, 0, (u_int8_t*)"" , FONT_Large, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY , (void *)biker_name, NULL , NULL , DrawFlatMenuName, NULL, 0},
+		{ 15 , 25, 85, 45, 0, (u_int8_t*)LT_MENU_NEW_SelectBiker0 /*"Choose Player"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChoosePlayer , MenuChange , DrawFlatMenuItem, NULL, 0},
+		{ 15 , 45, 85, 65, 0, (u_int8_t*)LT_MENU_NEW_SelectBiker1 /*"New Player"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_NewPlayer, MenuChange, DrawFlatMenuItem, NULL, 0},
+		{ 15 , 65, 85, 85, 0, (u_int8_t*)LT_MENU_NEW_SelectBiker2 /*"rename player"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChangePlayerName , MenuChange , DrawFlatMenuItem, NULL, 0},
+		{ 15 , 85, 85, 105, 0, (u_int8_t*)LT_MENU_NEW_SelectBiker3 /*"Change Bike"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChangeBike , MenuChange , DrawFlatMenuItem, NULL, 0},
+		{ 15 , 105, 85, 125, 0, (u_int8_t*)LT_MENU_NEW_SelectBiker4 /*"Change Bike computer"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, &MENU_NEW_ChangeBikeComputer , MenuChange , DrawFlatMenuItem, NULL, 0},
+		{ 15 , 125, 85, 145, 0, (u_int8_t*)LT_MENU_NEW_SelectBiker5 /*"Exit"*/ , FONT_Small, TEXTFLAG_CentreY , NULL, NULL , MenuItemBack , DrawFlatMenuItem, NULL, 0},
+		{ 125 , 130, 200, 150, 0, (u_int8_t*)"" , FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &bike_name, NULL , NULL , DrawFlatMenuName, NULL, 0},
 
-		{ 125 , 20, 200, 130, 0, "" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0},
+		{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0},
 
-		{ -1, -1, 0, 0, 0,  "",0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0,  (u_int8_t*)"",0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };										 
 
 MENUITEM BikeCharItem = 
-		{ 125 , 20, 200, 130, 0, "" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0};
+		{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0};
 
 
 int16_t InGameLoadGameLevelNum;
@@ -2163,38 +2170,38 @@ bool InGameLoadASinglePlayerGame( MENUITEM * Item )
 }
 
 MENU	MENU_LoadSavedGame = {
-	LT_MENU_LoadSavedGame0/*"Load Saved Game"*/, InitLoadSavedGameList, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_LoadSavedGame0/*"Load Saved Game"*/, InitLoadSavedGameList, NULL, NULL, 0,
 	{
-		{ 100 , 128, 0, 0, 0, LT_MENU_LoadSavedGame1/*"Choose From..."*/, 0, 0, &LoadSavedGameList, InGameLoadASinglePlayerGame, SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 100 , 128, 0, 0, 0, (u_int8_t*)LT_MENU_LoadSavedGame1/*"Choose From..."*/, 0, 0, &LoadSavedGameList, (void*)InGameLoadASinglePlayerGame, SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_Sound = {
-	LT_MENU_NEW_Sound0 /*"sound"*/ , NULL, ExitSoundMenu, SetSoundLevels, TITLE_TIMER_NormalPanToRightVDU,
+	(u_int8_t*)LT_MENU_NEW_Sound0 /*"sound"*/ , NULL, ExitSoundMenu, SetSoundLevels, TITLE_TIMER_NormalPanToRightVDU,
 	{
-		{ 0,	0,		200,	20,	0, LT_MENU_NEW_Sound1 /*"sound options"		*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,								NULL, NULL,							DrawFlatMenuItem,		NULL, 0 } ,
-		{ 10,	40,	100,	50,	0, LT_MENU_NEW_Sound2 /*"sfx volume"			*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&SfxSlider,						NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
-		{ 10,	60,	100,	70,	0, LT_MENU_NEW_Sound4 /*"bike engines"		*/, FONT_Small,		TEXTFLAG_CentreY,										&BikeEnginesOn,				NULL, SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 } ,
-		{ 0,	80,	200,	100,	0, LT_MENU_NEW_Sound5 /*"speech options"	*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,								NULL, NULL,							DrawFlatMenuItem,		NULL, 0 } ,
-		{ 10, 100,	100,	110,	0, LT_MENU_NEW_Sound6 /*"biker speech"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikerSpeechSlider,			NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
-		{ 10, 110,	100,	120,	0, LT_MENU_NEW_Sound7 /*"bike computer"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikeCompSpeechSlider,	NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
-		{ 10,	120,	100,	130,	0, LT_MENU_NEW_Sound8 /*"flag sfx"				*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&FlagSfxSlider,					NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
+		{ 0,	0,		200,	20,	0, (u_int8_t*)LT_MENU_NEW_Sound1 /*"sound options"		*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,								NULL, NULL,							DrawFlatMenuItem,		NULL, 0 } ,
+		{ 10,	40,	100,	50,	0, (u_int8_t*)LT_MENU_NEW_Sound2 /*"sfx volume"			*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&SfxSlider,						NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
+		{ 10,	60,	100,	70,	0, (u_int8_t*)LT_MENU_NEW_Sound4 /*"bike engines"		*/, FONT_Small,		TEXTFLAG_CentreY,										&BikeEnginesOn,				NULL, SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 } ,
+		{ 0,	80,	200,	100,	0, (u_int8_t*)LT_MENU_NEW_Sound5 /*"speech options"	*/, FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,								NULL, NULL,							DrawFlatMenuItem,		NULL, 0 } ,
+		{ 10, 100,	100,	110,	0, (u_int8_t*)LT_MENU_NEW_Sound6 /*"biker speech"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikerSpeechSlider,			NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
+		{ 10, 110,	100,	120,	0, (u_int8_t*)LT_MENU_NEW_Sound7 /*"bike computer"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikeCompSpeechSlider,	NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
+		{ 10,	120,	100,	130,	0, (u_int8_t*)LT_MENU_NEW_Sound8 /*"flag sfx"				*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&FlagSfxSlider,					NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
 		
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_InGameSound = {
-	LT_MENU_NEW_InGameSound0 /*"sound"*/ , NULL, NULL, SetSoundLevels, 0,
+	(u_int8_t*)LT_MENU_NEW_InGameSound0 /*"sound"*/ , NULL, NULL, SetSoundLevels, 0,
 	{
-		{ 200, 128				 , 0, 0, 0, LT_MENU_NEW_InGameSound1 /*"sfx volume    "		*/, 0, 0, &SfxSlider,						NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
-		{ 200, 128 + (2*16)	 , 0, 0, 0, LT_MENU_NEW_InGameSound3 /*"bike engines  "		*/, 0, 0, &BikeEnginesOn,				ToggleBikeEngines,	SelectToggle,	DrawToggle,	NULL, 0 },
-		{ 200, 128 + (3*16)  , 0, 0, 0, LT_MENU_NEW_InGameSound4 /*"biker volume  "		*/, 0, 0, &BikerSpeechSlider,			NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
-		{ 200, 128 + (4*16)  , 0, 0, 0, LT_MENU_NEW_InGameSound5 /*"bike computer "	*/, 0, 0, &BikeCompSpeechSlider,	NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
-		{ 200, 128 + (5*16)  , 0, 0, 0, LT_MENU_NEW_InGameSound6 /*"flag sfx "				*/, 0, 0, &FlagSfxSlider,					NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
+		{ 200, 128				 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound1 /*"sfx volume    "		*/, 0, 0, &SfxSlider,						NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
+		{ 200, 128 + (2*16)	 , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound3 /*"bike engines  "		*, 0, 0, &BikeEnginesOn,				(void*)ToggleBikeEngines,	SelectToggle,	DrawToggle,	NULL, NULL },
+		{ 200, 128 + (3*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound4 /*"biker volume  "		*/, 0, 0, &BikerSpeechSlider,			NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
+		{ 200, 128 + (4*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound5 /*"bike computer "	*/, 0, 0, &BikeCompSpeechSlider,	NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
+		{ 200, 128 + (5*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound6 /*"flag sfx "				*/, 0, 0, &FlagSfxSlider,					NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
 		
-		{	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
@@ -2207,116 +2214,116 @@ char CurrentSavedGameTimeLevelPlayed[ MAX_SAVEDGAME_INFO_LENGTH ];
 char CurrentSavedGameEnemiesKilled[ MAX_SAVEDGAME_INFO_LENGTH ];
 
 MENU	MENU_NEW_LoadGame = {
-	"" , InitTitleLoad , ExitTitleLoad, NULL, 0,
+	(u_int8_t*)"" , InitTitleLoad , ExitTitleLoad, NULL, 0,
 	{
-		{ 0,  0, 200,  30, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameLevel,           NULL, NULL, DrawFlatMenuName, NULL, 0 },
-		{ 0, 30, 200,  60, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameDate,            NULL, NULL, DrawFlatMenuName, NULL, 0 },
-		{ 0, 60, 200,  90, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameEnemiesKilled,   NULL, NULL, DrawFlatMenuName, NULL, 0 },
-		{ 0, 90, 200, 120, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameTimeLevelPlayed, NULL, NULL, DrawFlatMenuName, NULL, 0 },
+		{ 0,  0, 200,  30, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameLevel,           NULL, NULL, DrawFlatMenuName, NULL, 0 },
+		{ 0, 30, 200,  60, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameDate,            NULL, NULL, DrawFlatMenuName, NULL, 0 },
+		{ 0, 60, 200,  90, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameEnemiesKilled,   NULL, NULL, DrawFlatMenuName, NULL, 0 },
+		{ 0, 90, 200, 120, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, &CurrentSavedGameTimeLevelPlayed, NULL, NULL, DrawFlatMenuName, NULL, 0 },
 
-		{ 0,   120,  20, 170, 0, "", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawLeftArrow,  NULL, 0 },
-		{ 180, 120, 200, 170, 0, "", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawRightArrow, NULL, 0 },
+		{ 0,   120,  20, 170, 0, (u_int8_t*)"", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawLeftArrow,  NULL, 0 },
+		{ 180, 120, 200, 170, 0, (u_int8_t*)"", FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawRightArrow, NULL, 0 },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 
 MENU	MENU_NEW_RestoreGame = {
-	"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_RestoreGame0 /*"Restore Game"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 5, 70, 100, 80, 0, LT_MENU_NEW_RestoreGame3 /*"load game"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_LoadGame, MenuChange, DrawFlatMenuItem, NULL, 0  },
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_RestoreGame0 /*"Restore Game"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
+		{ 5, 70, 100, 80, 0, (u_int8_t*)LT_MENU_NEW_RestoreGame3 /*"load game"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_LoadGame, MenuChange, DrawFlatMenuItem, NULL, 0  },
 						 
-		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_Options = {
-	"", SetDiscStatus, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
+	(u_int8_t*)"", SetDiscStatus, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
 	{
-		{ 0, TITLE_MODEL_Disc1, 0, 0, 5,LT_MENU_NEW_Options0 /*"Options"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc2, 0, 0, 8, LT_MENU_NEW_Options1 /*"Sound"*/, 0, 0, NULL, &MENU_NEW_Sound, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc1, 0, 0, 5,(u_int8_t*)LT_MENU_NEW_Options0 /*"Options"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc2, 0, 0, 8, (u_int8_t*)LT_MENU_NEW_Options1 /*"Sound"*/, 0, 0, NULL, &MENU_NEW_Sound, MenuChange, NULL, NULL, 0 },
 #if defined(__3DS__) && defined(RENDERER_C3D)
-		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, "3DS Visual Settings", 0, 0, NULL, &MENU_NEW_3DS_Visuals, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, (u_int8_t*)"3DS Visual Settings", 0, 0, NULL, &MENU_NEW_3DS_Visuals, MenuChange, NULL, NULL, 0 },
 #else
-		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, LT_MENU_NEW_Options2 /*"Visuals"*/, 0, 0, NULL, &MENU_NEW_Visuals, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, (u_int8_t*)LT_MENU_NEW_Options2 /*"Visuals"*/, 0, 0, NULL, &MENU_NEW_Visuals, MenuChange, NULL, NULL, 0 },
 #endif
-		{ 0, TITLE_MODEL_Disc4, 0, 0, 2, LT_MENU_NEW_Options3 /*"back"*/, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc5, 0, 0, 2, "blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, "Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc4, 0, 0, 2, (u_int8_t*)LT_MENU_NEW_Options3 /*"back"*/, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc5, 0, 0, 2, (u_int8_t*)"blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, (u_int8_t*)"Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 /* setup */
 MENU	MENU_NEW_Setup = {
-	"", NULL, NULL, NULL, TITLE_TIMER_ChooseDiscPan,
+	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_ChooseDiscPan,
 	{
-		{ 0, TITLE_MODEL_Disc1, 0, 0, 4,LT_MENU_NEW_Setup0 /*"Setup Biker"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc2, 0, 0, 6, LT_MENU_NEW_Setup1 /*"Select Bike"*/, 0, 0, NULL, &MENU_NEW_SelectBiker, MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc3, 0, 0, 12, LT_MENU_NEW_Setup2 /*"Controls"*/, 0, 0, NULL, &MENU_NEW_Controls, MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc4, 0, 0, 4, LT_MENU_NEW_Setup3 /*"Weapons"*/, 0, 0, NULL, &MENU_NEW_Weapons, MenuChange , NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc5, 0, 0, 3, "back"/*"back"*/, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, "Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc1, 0, 0, 4,(u_int8_t*)LT_MENU_NEW_Setup0 /*"Setup Biker"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc2, 0, 0, 6, (u_int8_t*)LT_MENU_NEW_Setup1 /*"Select Bike"*/, 0, 0, NULL, &MENU_NEW_SelectBiker, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc3, 0, 0, 12, (u_int8_t*)LT_MENU_NEW_Setup2 /*"Controls"*/, 0, 0, NULL, &MENU_NEW_Controls, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc4, 0, 0, 4, (u_int8_t*)LT_MENU_NEW_Setup3 /*"Weapons"*/, 0, 0, NULL, &MENU_NEW_Weapons, MenuChange , NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc5, 0, 0, 3, (u_int8_t*)"back"/*"back"*/, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, (u_int8_t*)"Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };  
 
 /* battle */
 MENU	MENU_NEW_Battle = {
-	"", InitBattleMenu, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
+	(u_int8_t*)"", InitBattleMenu, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
 	{
-		{ 0, TITLE_MODEL_Disc1, 0, 0, 3, LT_MENU_NEW_Battle0 /*"death match"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc2, 0, 0, 2, LT_MENU_NEW_Battle1 /*"Create Game"*/, 0, 0, NULL, &MENU_NEW_CreateGame, MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc3, 0, 0, 2, LT_MENU_NEW_Battle2 /*"Join Game"  */, 0, 0, NULL, &MENU_NEW_ChooseConnectionToJoin, MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc4, 0, 0, 3, LT_MENU_NEW_Battle3 /*"back"       */, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc5, 0, 0, 2, "Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, "Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc1, 0, 0, 3, (u_int8_t*)LT_MENU_NEW_Battle0 /*"death match"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc2, 0, 0, 2, (u_int8_t*)LT_MENU_NEW_Battle1 /*"Create Game"*/, 0, 0, NULL, &MENU_NEW_CreateGame, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc3, 0, 0, 2, (u_int8_t*)LT_MENU_NEW_Battle2 /*"Join Game"  */, 0, 0, NULL, &MENU_NEW_ChooseConnectionToJoin, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc4, 0, 0, 3, (u_int8_t*)LT_MENU_NEW_Battle3 /*"back"       */, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc5, 0, 0, 2, (u_int8_t*)"Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, (u_int8_t*)"Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 /* single */
 MENU	MENU_NEW_MissionMenu = {
-	"", InitDifficultyLevel, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
+	(u_int8_t*)"", InitDifficultyLevel, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
 	{
-		{ 0, TITLE_MODEL_Disc1, 0, 0, 0,LT_MENU_NEW_MissionMenu0 /*"single player"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc2, 0, 0, 4, LT_MENU_NEW_MissionMenu1 /*"Start Game"*/, 0, 0, NULL, &MENU_NEW_StartSinglePlayer, MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc3, 0, 0, 6, "", 0, TEXTFLAG_AutoSelect, NULL, NULL, DifficultySet, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc4, 0, 0, 2, LT_MENU_NEW_MissionMenu2 /*"back"*/, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc5, 0, 0, 2, "Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, "Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc1, 0, 0, 0,(u_int8_t*)LT_MENU_NEW_MissionMenu0 /*"single player"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc2, 0, 0, 4, (u_int8_t*)LT_MENU_NEW_MissionMenu1 /*"Start Game"*/, 0, 0, NULL, &MENU_NEW_StartSinglePlayer, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc3, 0, 0, 6, (u_int8_t*)"", 0, TEXTFLAG_AutoSelect, NULL, NULL, DifficultySet, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc4, 0, 0, 2, (u_int8_t*)LT_MENU_NEW_MissionMenu2 /*"back"*/, 0, 0, NULL, NULL, MenuItemBack, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc5, 0, 0, 2, (u_int8_t*)"Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc6, 0, 0, 2, (u_int8_t*)"Blank", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 
-		{ -1, -1, 0, 0, 0, "", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 /* main */
 MENU	MENU_NEW_Start = {
-	"", InitStartMenu, NULL, NULL, TITLE_TIMER_ChooseDiscPan,
+	(u_int8_t*)"", InitStartMenu, NULL, NULL, TITLE_TIMER_ChooseDiscPan,
 	{
-		{ 0, TITLE_MODEL_Disc1, 0, 0, 1, LT_MENU_NEW_Start1 /*"single player" */, 0, 0, NULL, &MENU_NEW_MissionMenu, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc1, 0, 0, 1, (u_int8_t*)LT_MENU_NEW_Start1 /*"single player" */, 0, 0, NULL, &MENU_NEW_MissionMenu, MenuChange, NULL, NULL, 0 },
 		//{ 0, TITLE_MODEL_Disc1, 0, 0, 0, "CoOp",                                  0, 0, NULL, &MENU_NEW_CoOp,        MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc2, 0, 0, 0, LT_MENU_NEW_Start2 /*"death match"   */, 0, 0, NULL, &MENU_NEW_Battle,      MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc3, 0, 0, 0, LT_MENU_NEW_Start3 /*"Setup Biker"   */, 0, 0, NULL, &MENU_NEW_Setup,       MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc4, 0, 0, 0, LT_MENU_NEW_Start5 /*"load Game"     */, 0, 0, NULL, &MENU_NEW_RestoreGame, MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc5, 0, 0, 0, LT_MENU_NEW_Start6 /*"Options"       */, 0, 0, NULL, &MENU_NEW_Options,     MenuChange, NULL, NULL, 0 },
-		{ 0, TITLE_MODEL_Disc6, 0, 0, 0, LT_MENU_NEW_Start7 /*"Exit"          */, 0, 0, NULL, NULL,                  SelectQuit, NULL, NULL, 0 } ,
+		{ 0, TITLE_MODEL_Disc2, 0, 0, 0, (u_int8_t*)LT_MENU_NEW_Start2 /*"death match"   */, 0, 0, NULL, &MENU_NEW_Battle,      MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc3, 0, 0, 0, (u_int8_t*)LT_MENU_NEW_Start3 /*"Setup Biker"   */, 0, 0, NULL, &MENU_NEW_Setup,       MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc4, 0, 0, 0, (u_int8_t*)LT_MENU_NEW_Start5 /*"load Game"     */, 0, 0, NULL, &MENU_NEW_RestoreGame, MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc5, 0, 0, 0, (u_int8_t*)LT_MENU_NEW_Start6 /*"Options"       */, 0, 0, NULL, &MENU_NEW_Options,     MenuChange, NULL, NULL, 0 },
+		{ 0, TITLE_MODEL_Disc6, 0, 0, 0, (u_int8_t*)LT_MENU_NEW_Start7 /*"Exit"          */, 0, 0, NULL, NULL,                  SelectQuit, NULL, NULL, 0 } ,
 
-		{ -1, -1, 0, 0, 0, "", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_STATS_Start = {
-	"a", InitStartMenu, NULL, NULL, TITLE_TIMER_NormalPanToRightVDU,
+	(u_int8_t*)"a", InitStartMenu, NULL, NULL, TITLE_TIMER_NormalPanToRightVDU,
 	{
-		{ 0, 0, 200, 20, 0, "press enter", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , GoToNextLevel , DrawFlatMenuItem, NULL, 0 } ,
+		{ 0, 0, 200, 20, 0, (u_int8_t*)"press enter", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , GoToNextLevel , DrawFlatMenuItem, NULL, 0 } ,
 		
-		{ -1, -1, 0, 0, 0, "", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
+		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
@@ -2343,223 +2350,223 @@ void QuitQuickText( MENU *Menu )
 }
 
 MENU	MENU_QuickTextSend = {
-	"" , InitQuickText, QuitQuickText, NULL, 0,
+	(u_int8_t*)"" , InitQuickText, QuitQuickText, NULL, 0,
 	{
-		{ 48, 144, 0, 0, 0, "Message: "/*"Message: "*/, 0, TEXTFLAG_AutoSelect, &QuickText, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 48, 144, 0, 0, 0, (u_int8_t*)"Message: "/*"Message: "*/, 0, TEXTFLAG_AutoSelect, &QuickText, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 MENU	MENU_QuickTextSendWhisper = {
-	"" , InitQuickText, NULL, NULL, 0,
+	(u_int8_t*)"" , InitQuickText, NULL, NULL, 0,
 	{
-		{ 48, 144, 0, 0, 0, LT_MENU_QuickTextSendWhisper0 /*"Whisper Message: "*/, 0, TEXTFLAG_AutoSelect, &QuickTextWhisper, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 48, 144, 0, 0, 0, (u_int8_t*)LT_MENU_QuickTextSendWhisper0 /*"Whisper Message: "*/, 0, TEXTFLAG_AutoSelect, &QuickTextWhisper, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 
 MENU	MENU_EditMacro1 = {
-	LT_MENU_EditMacro10 /*"Edit Message 1"*/ , NULL, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_EditMacro10 /*"Edit Message 1"*/ , NULL, NULL, NULL, 0,
 	{
-		{ 48, 144, 0, 0, 0, LT_MENU_EditMacro11 /*"Enter Message 1 "*/, 0, 0, &MacroText1, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 48, 144, 0, 0, 0, (u_int8_t*)LT_MENU_EditMacro11 /*"Enter Message 1 "*/, 0, 0, &MacroText1, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 MENU	MENU_EditMacro2 = {
-	LT_MENU_EditMacro20 /*"Edit Message 2"*/ , NULL, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_EditMacro20 /*"Edit Message 2"*/ , NULL, NULL, NULL, 0,
 	{
-		{ 48, 144, 0, 0, 0, LT_MENU_EditMacro21 /*"Enter Message 2 "*/, 0, 0, &MacroText2, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 48, 144, 0, 0, 0, (u_int8_t*)LT_MENU_EditMacro21 /*"Enter Message 2 "*/, 0, 0, &MacroText2, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_EditMacro3 = {
-	LT_MENU_EditMacro30/*"Edit Message 1"*/ , NULL, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_EditMacro30/*"Edit Message 1"*/ , NULL, NULL, NULL, 0,
 	{
-		{ 100, 144, 0, 0, 0, LT_MENU_EditMacro31/*"Enter Message 3 "*/, 0, 0, &MacroText3, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 100, 144, 0, 0, 0, (u_int8_t*)LT_MENU_EditMacro31/*"Enter Message 3 "*/, 0, 0, &MacroText3, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 
-MENU	MENU_SinglePlayer = { "Select Difficulty Level" , NULL, NULL , NULL , 0,
-					{ {	200 , 144, 0, 0, 0, "Easy" , 0, 0, NULL , (void*) DIFF_Easy , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	200 , 160, 0, 0, 0, "Normal" , 0, 0, NULL , (void*) DIFF_Norm , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	200 , 176, 0, 0, 0, "Hard" , 0, 0, NULL , (void*) DIFF_Hard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	200 , 192, 0, 0, 0, "Bronson Mode" , 0, 0, NULL , (void*) DIFF_Vhard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	-1 , -1, 0, 0, 0, "" , 0, 0, NULL , NULL , NULL , NULL, NULL, 0 } } };
+MENU	MENU_SinglePlayer = { (u_int8_t*)"Select Difficulty Level" , NULL, NULL , NULL , 0,
+					{ {	200 , 144, 0, 0, 0, (u_int8_t*)"Easy" , 0, 0, NULL , (void*) DIFF_Easy , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
+					  {	200 , 160, 0, 0, 0, (u_int8_t*)"Normal" , 0, 0, NULL , (void*) DIFF_Norm , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
+					  {	200 , 176, 0, 0, 0, (u_int8_t*)"Hard" , 0, 0, NULL , (void*) DIFF_Hard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
+					  {	200 , 192, 0, 0, 0, (u_int8_t*)"Bronson Mode" , 0, 0, NULL , (void*) DIFF_Vhard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL , NULL , NULL , NULL, NULL, 0 } } };
 
 
 
 MENU	MENU_Team = {
-	"Select Teams" , InitTeamSelection , NULL , NULL, 0,
+	(u_int8_t*)"Select Teams" , InitTeamSelection , NULL , NULL, 0,
 	{
-		{ 200, 112, 0, 0, 0, "Start", 0, 0, NULL, &MENU_NotYet, TeamGoToSynchup , MenuItemDrawName, NULL, 0 } ,
-		{ 200, 128, 0, 0, 0, "Red Team", 0, 0, &TeamList[0], NULL , SelectList , DrawList, NULL, 0 } ,
-		{ 400, 128, 0, 0, 0, "Green Team", 0, 0, &TeamList[1], NULL , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 112, 0, 0, 0, (u_int8_t*)"Start", 0, 0, NULL, &MENU_NotYet, TeamGoToSynchup , MenuItemDrawName, NULL, 0 } ,
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"Red Team", 0, 0, &TeamList[0], NULL , SelectList , DrawList, NULL, 0 } ,
+		{ 400, 128, 0, 0, 0, (u_int8_t*)"Green Team", 0, 0, &TeamList[1], NULL , SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_Team = {
 	
-	"" , InitTeamSelection , BailMultiplayerFrontEnd , DistributeTeamsToLists, TITLE_TIMER_PanToLeftVDU,
+	(u_int8_t*)"" , InitTeamSelection , BailMultiplayerFrontEnd , DistributeTeamsToLists, TITLE_TIMER_PanToLeftVDU,
 	{
-		{ 0, 0, 200, 15, 0, LT_MENU_NEW_Team0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 0, 15, 200, 30, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, PlayerConfirm , DrawReadyButton, NULL, 0 } ,
-		{ 5, 30, 50, 40, 0, LT_MENU_NEW_Team1 /*"Red"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[0], &Team1 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 53, 30, 98, 40, 0, LT_MENU_NEW_Team2 /*"Green"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[1], &Team2 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 101, 30, 146, 40, 0, LT_MENU_NEW_Team3 /*"Blue"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[2], &Team3 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 149, 30, 194, 40, 0, LT_MENU_NEW_Team4 /*"Yellow"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[3], &Team4 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 5, 45, 50, 126, 0, LT_MENU_NEW_Team5 /*"Red"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[0], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 53, 45, 98, 126, 0, LT_MENU_NEW_Team6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 101, 45, 146, 126, 0, LT_MENU_NEW_Team7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 149, 45, 194, 126, 0, LT_MENU_NEW_Team8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_Team0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 0, 15, 200, 30, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, PlayerConfirm , DrawReadyButton, NULL, 0 } ,
+		{ 5, 30, 50, 40, 0, (u_int8_t*)LT_MENU_NEW_Team1 /*"Red"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[0], &Team1 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 53, 30, 98, 40, 0, (u_int8_t*)LT_MENU_NEW_Team2 /*"Green"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[1], &Team2 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 101, 30, 146, 40, 0, (u_int8_t*)LT_MENU_NEW_Team3 /*"Blue"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[2], &Team3 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 149, 30, 194, 40, 0, (u_int8_t*)LT_MENU_NEW_Team4 /*"Yellow"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[3], &Team4 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 5, 45, 50, 126, 0, (u_int8_t*)LT_MENU_NEW_Team5 /*"Red"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[0], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 53, 45, 98, 126, 0, (u_int8_t*)LT_MENU_NEW_Team6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 101, 45, 146, 126, 0, (u_int8_t*)LT_MENU_NEW_Team7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 149, 45, 194, 126, 0, (u_int8_t*)LT_MENU_NEW_Team8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 		
-		{ 0, 116, 200, 126, 0, LT_MENU_NEW_Team9 /*"waiting for team selection"*/, FONT_Small, TEXTFLAG_Instant | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_Pulse, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 0, 116, 200, 126, 0, (u_int8_t*)LT_MENU_NEW_Team9 /*"waiting for team selection"*/, FONT_Small, TEXTFLAG_Instant | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_Pulse, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
 		
-		{ 5, 126, 200, 133, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 133, 200, 140, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 140, 200, 147, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 147, 200, 154, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 155, 25, 162, 0, LT_MENU_NEW_Team10 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
+		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 155, 25, 162, 0, (u_int8_t*)LT_MENU_NEW_Team10 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
 
-		{ -1 , -1, 0, 0, 0, "" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
-MENUITEM	NewTeamItem = { 0, 0, 0, 0, 0, "GoingToDoTeamGame", 0, 0,	NULL,	&MENU_NEW_Team,	MenuChange,	NULL, NULL, 0 };
+MENUITEM	NewTeamItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToDoTeamGame", 0, 0,	NULL,	&MENU_NEW_Team,	MenuChange,	NULL, NULL, 0 };
 
 MENU	MENU_NEW_WatchTeamSelect = {
-	"" , InitTeamSelection , BailMultiplayerFrontEnd , DistributeTeamsToLists, 0,
+	(u_int8_t*)"" , InitTeamSelection , BailMultiplayerFrontEnd , DistributeTeamsToLists, 0,
 	{
-		{ 0, 0, 200, 15, 0, LT_MENU_NEW_WatchTeamSelect0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 0, 15, 200, 30, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, PlayerConfirm , DrawReadyButton, NULL, 0 } ,
-		{ 5, 30, 50, 40, 0, LT_MENU_NEW_WatchTeamSelect1 /*"Red"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[0], &Team1 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 53, 30, 98, 40, 0, LT_MENU_NEW_WatchTeamSelect2 /*"Green"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[1], &Team2 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 101, 30, 146, 40, 0, LT_MENU_NEW_WatchTeamSelect3 /*"Blue"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[2], &Team3 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 149, 30, 194, 40, 0, LT_MENU_NEW_WatchTeamSelect4 /*"Yellow"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[3], &Team4 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 5, 45, 50, 126, 0, LT_MENU_NEW_WatchTeamSelect5 /*"Red"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[0], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 53, 45, 98, 126, 0, LT_MENU_NEW_WatchTeamSelect6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 101, 45, 146, 126, 0, LT_MENU_NEW_WatchTeamSelect7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 149, 45, 194, 126, 0, LT_MENU_NEW_WatchTeamSelect8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 0, 15, 200, 30, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, PlayerConfirm , DrawReadyButton, NULL, 0 } ,
+		{ 5, 30, 50, 40, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect1 /*"Red"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[0], &Team1 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 53, 30, 98, 40, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect2 /*"Green"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[1], &Team2 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 101, 30, 146, 40, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect3 /*"Blue"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[2], &Team3 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 149, 30, 194, 40, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect4 /*"Yellow"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[3], &Team4 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 5, 45, 50, 126, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect5 /*"Red"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[0], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 53, 45, 98, 126, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 101, 45, 146, 126, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 149, 45, 194, 126, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 
-		{ 0, 116, 200, 126, 0, LT_MENU_NEW_WatchTeamSelect9 /*"waiting for team selection"*/, FONT_Small, TEXTFLAG_Instant | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_Pulse, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 0, 116, 200, 126, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect9 /*"waiting for team selection"*/, FONT_Small, TEXTFLAG_Instant | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_Pulse, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
 		
-		{ 5, 126, 200, 133, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 133, 200, 140, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 140, 200, 147, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 147, 200, 154, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 155, 25, 162, 0, LT_MENU_NEW_WatchTeamSelect10 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
+		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 155, 25, 162, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect10 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
 
-		{ -1 , -1, 0, 0, 0, "" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU  MENU_NEW_ChooseTeamForExistingGame = {
-	"" , InitExistingGameJoin , BailMultiplayerFrontEnd , DistributeTeamsToLists, 0,
+	(u_int8_t*)"" , InitExistingGameJoin , BailMultiplayerFrontEnd , DistributeTeamsToLists, 0,
 	{
-		{ 0, 0, 200, 15, 0, LT_MENU_NEW_ChooseTeamForExistingGame0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 0, 15, 200, 30, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, PlayerConfirm , DrawReadyButton, NULL, 0 } ,
-		{ 5, 30, 50, 40, 0, LT_MENU_NEW_ChooseTeamForExistingGame1 /*"Red"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[0], &Team1 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 53, 30, 98, 40, 0, LT_MENU_NEW_ChooseTeamForExistingGame2 /*"Green"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[1], &Team2 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 101, 30, 146, 40, 0, LT_MENU_NEW_ChooseTeamForExistingGame3 /*"Blue"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[2], &Team3 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 149, 30, 194, 40, 0, LT_MENU_NEW_ChooseTeamForExistingGame4 /*"Yellow"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[3], &Team4 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 5, 45, 50, 126, 0, LT_MENU_NEW_ChooseTeamForExistingGame5 /*"Red"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[0], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 53, 45, 98, 126, 0, LT_MENU_NEW_ChooseTeamForExistingGame6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 101, 45, 146, 126, 0, LT_MENU_NEW_ChooseTeamForExistingGame7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 149, 45, 194, 126, 0, LT_MENU_NEW_ChooseTeamForExistingGame8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 0, 15, 200, 30, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, PlayerConfirm , DrawReadyButton, NULL, 0 } ,
+		{ 5, 30, 50, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame1 /*"Red"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[0], &Team1 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 53, 30, 98, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame2 /*"Green"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[1], &Team2 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 101, 30, 146, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame3 /*"Blue"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[2], &Team3 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 149, 30, 194, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame4 /*"Yellow"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[3], &Team4 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
+		{ 5, 45, 50, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame5 /*"Red"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[0], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 53, 45, 98, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 101, 45, 146, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
+		{ 149, 45, 194, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 #if 0
-		{ 5, 118, 50, 125, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 53, 118, 98, 125, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 101, 118, 146, 125, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 149, 118, 194, 125, 0, "", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 118, 50, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 53, 118, 98, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 101, 118, 146, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 149, 118, 194, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 #endif
 
-		{ 5, 126, 200, 133, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 133, 200, 140, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 140, 200, 147, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 147, 200, 154, 0, "", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
+		{ 5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 
-		{ 5, 155, 25, 162, 0, LT_MENU_NEW_ChooseTeamForExistingGame9 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
+		{ 5, 155, 25, 162, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame9 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
 
-		{ -1 , -1, 0, 0, 0, "" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 
-MENUITEM	TeamItem = { 0, 0, 0, 0, 0, "GoingToDoTeamGame", 0, 0,	NULL,	&MENU_Team,	MenuChange,		MenuItemDrawName, NULL, 0 };
+MENUITEM	TeamItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToDoTeamGame", 0, 0,	NULL,	&MENU_Team,	MenuChange,		MenuItemDrawName, NULL, 0 };
 
 MENU	MENU_HostWaitingToStart = {
-	"Hosting a session" , NULL , BailMultiplayer , NULL, 0,
+	(u_int8_t*)"Hosting a session" , NULL , BailMultiplayer , NULL, 0,
 	{
-		{ 200, 112, 0, 0, 0, "Start", 0, 0, NULL, &MENU_NotYet, GoToSynchup , MenuItemDrawName, NULL, 0 } ,
-		{ 200, 128, 0, 0, 0, "Num of Players ", 0, 0, &NumOfPlayersSlider, NULL, NULL, DrawSlider, NULL, 0 },
-		{ 200, 128, 0, 0, 0, "", 0, 0, &PlayersList, NULL , NULL , GetPlayersInCurrentSession, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 112, 0, 0, 0, (u_int8_t*)"Start", 0, 0, NULL, &MENU_NotYet, GoToSynchup , MenuItemDrawName, NULL, 0 } ,
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"Num of Players ", 0, 0, &NumOfPlayersSlider, NULL, NULL, DrawSlider, NULL, 0 },
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"", 0, 0, &PlayersList, NULL , NULL , GetPlayersInCurrentSession, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_JoinWaitingToStart = {
-	"Waiting for Host" , NULL , BailMultiplayer , NULL, 0,
+	(u_int8_t*)"Waiting for Host" , NULL , BailMultiplayer , NULL, 0,
 	{
-		{ 200, 128, 0, 0, 0, "Num of Players ", 0, 0, &NumOfPlayersSlider, NULL, NULL, DrawSlider, NULL, 0 },
-		{ 200, 128, 0, 0, 0, "", 0, 0, &PlayersList, NULL , NULL , GetPlayersInCurrentSession, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"Num of Players ", 0, 0, &NumOfPlayersSlider, NULL, NULL, DrawSlider, NULL, 0 },
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"", 0, 0, &PlayersList, NULL , NULL , GetPlayersInCurrentSession, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_Host = {
-	"Hosting a MultiPlayer Game" , InitMultiplayerHost , NULL , NULL, 0,
+	(u_int8_t*)"Hosting a MultiPlayer Game" , InitMultiplayerHost , NULL , NULL, 0,
 	{
-		{ 200, 112, 0, 0, 0, "Start", 0, 0, NULL, &MENU_HostWaitingToStart, StartAHostSession , MenuItemDrawName, NULL, 0 } ,
-		{ 200, 128, 0, 0, 0, "Team Game", 0, 0, &TeamGame, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 144, 0, 0, 0, "Record Demo", 0, 0, &RecordDemo, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 160, 0, 0, 0, "Demo Name  ", 0, 0, &DemoGameName, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ 200, 176, 0, 0, 0, "Time Limit ", 0, 0, &MyTimeLimit, NULL, SelectSlider, DrawSlider, NULL, 0 },
-		{ 200, 192, 0, 0, 0, "Max Players ", 0, 0, &MaxPlayersSlider, NULL, SelectSlider, DrawSlider, NULL, 0 },
-		{ 200, 224, 0, 0, 0, "Level...", 0, 0, &LevelList, NULL , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 112, 0, 0, 0, (u_int8_t*)"Start", 0, 0, NULL, &MENU_HostWaitingToStart, StartAHostSession , MenuItemDrawName, NULL, 0 } ,
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"Team Game", 0, 0, &TeamGame, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 144, 0, 0, 0, (u_int8_t*)"Record Demo", 0, 0, &RecordDemo, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 160, 0, 0, 0, (u_int8_t*)"Demo Name  ", 0, 0, &DemoGameName, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ 200, 176, 0, 0, 0, (u_int8_t*)"Time Limit ", 0, 0, &MyTimeLimit, NULL, SelectSlider, DrawSlider, NULL, 0 },
+		{ 200, 192, 0, 0, 0, (u_int8_t*)"Max Players ", 0, 0, &MaxPlayersSlider, NULL, SelectSlider, DrawSlider, NULL, 0 },
+		{ 200, 224, 0, 0, 0, (u_int8_t*)"Level...", 0, 0, &LevelList, NULL , SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_LevelSelect = {
-	LT_MENU_LevelSelect0 /*"Level Selection"*/ , InitInGameLevelSelect , ExitLevelSelect , NULL, 0,
+	(u_int8_t*)LT_MENU_LevelSelect0 /*"Level Selection"*/ , InitInGameLevelSelect , ExitLevelSelect , NULL, 0,
 	{
-		{ 200, 112, 0, 0, 0, LT_MENU_LevelSelect1 /*"Ability To Change "*/, 0, 0, &IsHost, NULL, NULL, DrawToggle, NULL, 0 },
-		{ 200, 128, 0, 0, 0, LT_MENU_LevelSelect2 /*"Level..."*/, 0, 0, &LevelList, NULL , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 112, 0, 0, 0, (u_int8_t*)LT_MENU_LevelSelect1 /*"Ability To Change "*/, 0, 0, &IsHost, NULL, NULL, DrawToggle, NULL, 0 },
+		{ 200, 128, 0, 0, 0, (u_int8_t*)LT_MENU_LevelSelect2 /*"Level..."*/, 0, 0, &LevelList, NULL , SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 
-MENUITEM	JoinItem = { 0, 0, 0, 0, 0, "GoingToJoinASession", 0, 0,	NULL,	&MENU_JoinWaitingToStart,	MenuChange,		MenuItemDrawName, NULL, 0 };
-MENUITEM	NewJoinItem = { 0, 0, 0, 0, 0, "GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_JoinWaitingToStart,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
-MENUITEM	WatchTeamSelectionItem = { 0, 0, 0, 0, 0, "GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_Team,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
+MENUITEM	JoinItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_JoinWaitingToStart,	MenuChange,		MenuItemDrawName, NULL, 0 };
+MENUITEM	NewJoinItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_JoinWaitingToStart,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
+MENUITEM	WatchTeamSelectionItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_Team,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
 
 						
 MENU	MENU_ChooseSessionToJoin = {
-	"" , NULL , NULL, NULL, 0,
+	(u_int8_t*)"" , NULL , NULL, NULL, 0,
 	{
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_HostOrJoin = {
-	"MultiPlayer" , NULL , NULL, NULL, 0,
+	(u_int8_t*)"MultiPlayer" , NULL , NULL, NULL, 0,
 	{
-		{ 200, 112, 0, 0, 0, "Start a Game", 0, 0,	NULL,	&MENU_Host,	MenuChange,		MenuItemDrawName, NULL, 0 },
-		{ 200, 128, 0, 0, 0, "Join a Network Game", 0, 0,	NULL,	&MENU_ChooseSessionToJoin,	MenuChange,		MenuItemDrawName, NULL, 0 },
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 112, 0, 0, 0, (u_int8_t*)"Start a Game", 0, 0,	NULL,	&MENU_Host,	MenuChange,		MenuItemDrawName, NULL, 0 },
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"Join a Network Game", 0, 0,	NULL,	&MENU_ChooseSessionToJoin,	MenuChange,		MenuItemDrawName, NULL, 0 },
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_LoadGame;
 MENU	MENU_SaveGame = {
-	LT_MENU_SaveGame0 /*"Save Game"*/, InitLoadSavedGameList, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_SaveGame0 /*"Save Game"*/, InitLoadSavedGameList, NULL, NULL, 0,
 	{
-		{ 100 , 128, 0, 0, 0, LT_MENU_SaveGame1 /*"Choose From..."*/, 0, 0, &LoadSavedGameList, InGameSaveASinglePlayerGame, SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 100 , 128, 0, 0, 0, (u_int8_t*)LT_MENU_SaveGame1 /*"Choose From..."*/, 0, 0, &LoadSavedGameList, (void*)InGameSaveASinglePlayerGame, SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
@@ -2567,132 +2574,132 @@ MENU	MENU_Joystick;
 
 MENU	MENU_WeaponPriority =
 {
-	"Weapon Priority", NULL, NULL, NULL, 0,
+	(u_int8_t*)"Weapon Priority", NULL, NULL, NULL, 0,
 	{
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_WeaponKeys =
 {
-	"Weapon Selection", NULL, NULL, NULL, 0,
+	(u_int8_t*)"Weapon Selection", NULL, NULL, NULL, 0,
 	{
-		KEYDEF( 32, 112,"Pulsar", (void *)&Config.select_primary[ PULSAR ] ),
-		KEYDEF( 32, 128,"Trojax", (void *)&Config.select_primary[ TROJAX ] ),
-		KEYDEF( 32, 144,"Suss Gun", (void *)&Config.select_primary[ SUSS_GUN ] ),
-		KEYDEF( 32, 160,"Transpulse", (void *)&Config.select_primary[ TRANSPULSE_CANNON ] ),
-		KEYDEF( 32, 176,"Pyrolite", (void *)&Config.select_primary[ PYROLITE_RIFLE ] ),
-		KEYDEF( 32, 192,"Beam Laser", (void *)&Config.select_primary[ LASER ] ),
+		KEYDEF( 32, 112,(u_int8_t*)"Pulsar", (void *)&Config.select_primary[ PULSAR ] ),
+		KEYDEF( 32, 128,(u_int8_t*)"Trojax", (void *)&Config.select_primary[ TROJAX ] ),
+		KEYDEF( 32, 144,(u_int8_t*)"Suss Gun", (void *)&Config.select_primary[ SUSS_GUN ] ),
+		KEYDEF( 32, 160,(u_int8_t*)"Transpulse", (void *)&Config.select_primary[ TRANSPULSE_CANNON ] ),
+		KEYDEF( 32, 176,(u_int8_t*)"Pyrolite", (void *)&Config.select_primary[ PYROLITE_RIFLE ] ),
+		KEYDEF( 32, 192,(u_int8_t*)"Beam Laser", (void *)&Config.select_primary[ LASER ] ),
 		
-		KEYDEF( 32, 224,"Next Prim", (void *)&Config.select_next_primary ),
-		KEYDEF( 32, 240,"Prev Prim", (void *)&Config.select_prev_primary ),
+		KEYDEF( 32, 224,(u_int8_t*)"Next Prim", (void *)&Config.select_next_primary ),
+		KEYDEF( 32, 240,(u_int8_t*)"Prev Prim", (void *)&Config.select_prev_primary ),
 		
-		KEYDEF( 32, 272,"Next Sec", (void *)&Config.select_next_secondary ),
-		KEYDEF( 32, 288,"Prev Sec", (void *)&Config.select_prev_secondary ),
+		KEYDEF( 32, 272,(u_int8_t*)"Next Sec", (void *)&Config.select_next_secondary ),
+		KEYDEF( 32, 288,(u_int8_t*)"Prev Sec", (void *)&Config.select_prev_secondary ),
 		
-		KEYDEF( 352, 112, "Mug Missile", (void *)&Config.select_secondary[ MUGMISSILE ] ),
-		KEYDEF( 352, 128,"Solaris", (void *)&Config.select_secondary[ SOLARISMISSILE ] ),
-		KEYDEF( 352, 160, "Scatter", (void *)&Config.select_secondary[ SCATTERMISSILE ] ),
-		KEYDEF( 352, 176, "Gravgon", (void *)&Config.select_secondary[ GRAVGONMISSILE ] ),
-		KEYDEF( 352, 192, "MFRL", (void *)&Config.select_secondary[ MULTIPLEMISSILE ] ),
-		KEYDEF( 352, 208, "Titan Star", (void *)&Config.select_secondary[ TITANSTARMISSILE ] ),
-		KEYDEF( 352, 224, "Thief Missile", (void *)&Config.select_secondary[ THIEFMISSILE ] ),
+		KEYDEF( 352, 112, (u_int8_t*)"Mug Missile", (void *)&Config.select_secondary[ MUGMISSILE ] ),
+		KEYDEF( 352, 128,(u_int8_t*)"Solaris", (void *)&Config.select_secondary[ SOLARISMISSILE ] ),
+		KEYDEF( 352, 160, (u_int8_t*)"Scatter", (void *)&Config.select_secondary[ SCATTERMISSILE ] ),
+		KEYDEF( 352, 176, (u_int8_t*)"Gravgon", (void *)&Config.select_secondary[ GRAVGONMISSILE ] ),
+		KEYDEF( 352, 192, (u_int8_t*)"MFRL", (void *)&Config.select_secondary[ MULTIPLEMISSILE ] ),
+		KEYDEF( 352, 208, (u_int8_t*)"Titan Star", (void *)&Config.select_secondary[ TITANSTARMISSILE ] ),
+		KEYDEF( 352, 224, (u_int8_t*)"Thief Missile", (void *)&Config.select_secondary[ THIEFMISSILE ] ),
 
-		KEYDEF( 352, 256, "Purge Mine", (void *)&Config.select_secondary[ PURGEMINE ] ),
-		KEYDEF( 352, 272, "Pine Mine", (void *)&Config.select_secondary[ PINEMINE ] ),
-		KEYDEF( 352, 288, "Quantum Mine", (void *)&Config.select_secondary[ QUANTUMMINE ] ),
-		KEYDEF( 352, 304, "Spider Mine", (void *)&Config.select_secondary[ SPIDERMINE ] ),
+		KEYDEF( 352, 256, (u_int8_t*)"Purge Mine", (void *)&Config.select_secondary[ PURGEMINE ] ),
+		KEYDEF( 352, 272, (u_int8_t*)"Pine Mine", (void *)&Config.select_secondary[ PINEMINE ] ),
+		KEYDEF( 352, 288, (u_int8_t*)"Quantum Mine", (void *)&Config.select_secondary[ QUANTUMMINE ] ),
+		KEYDEF( 352, 304, (u_int8_t*)"Spider Mine", (void *)&Config.select_secondary[ SPIDERMINE ] ),
 
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 #if 1
 MENU	MENU_Keyboard =
 {
-	LT_MENU_Keyboard0 /*"Configure controls"*/, InitKeyDefPage, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_Keyboard0 /*"Configure controls"*/, InitKeyDefPage, NULL, NULL, 0,
 	{
-		KDEF( 0, 200, 112, LT_MENU_Keyboard1 /*"Rotate Left"*/, KDleft ),
-		KDEF( 0, 200, 128, LT_MENU_Keyboard2 /*"Rotate Right"*/, KDright ),
-		KDEF( 0, 200, 144, LT_MENU_Keyboard3 /*"Rotate Up"*/, KDup ),	      
-		KDEF( 0, 200, 160, LT_MENU_Keyboard4 /*"Rotate Down"*/, KDdown ),
+		KDEF( 0, 200, 112, (u_int8_t*)LT_MENU_Keyboard1 /*"Rotate Left"*/, KDleft ),
+		KDEF( 0, 200, 128, (u_int8_t*)LT_MENU_Keyboard2 /*"Rotate Right"*/, KDright ),
+		KDEF( 0, 200, 144, (u_int8_t*)LT_MENU_Keyboard3 /*"Rotate Up"*/, KDup ),	      
+		KDEF( 0, 200, 160, (u_int8_t*)LT_MENU_Keyboard4 /*"Rotate Down"*/, KDdown ),
 			      
-		KDEF( 0, 200, 184, LT_MENU_Keyboard5 /*"Slide Left"*/, KDmove_left ),	         
-		KDEF( 0, 200, 200, LT_MENU_Keyboard6 /*"Slide Right"*/, KDmove_right ),
+		KDEF( 0, 200, 184, (u_int8_t*)LT_MENU_Keyboard5 /*"Slide Left"*/, KDmove_left ),	         
+		KDEF( 0, 200, 200, (u_int8_t*)LT_MENU_Keyboard6 /*"Slide Right"*/, KDmove_right ),
 			   
-		KDEF( 0, 200, 216, LT_MENU_Keyboard7 /*"Slide Up"*/, KDmove_up ),         
-		KDEF( 0, 200, 232, LT_MENU_Keyboard8 /*"Slide Down"*/, KDmove_down ),
+		KDEF( 0, 200, 216, (u_int8_t*)LT_MENU_Keyboard7 /*"Slide Up"*/, KDmove_up ),         
+		KDEF( 0, 200, 232, (u_int8_t*)LT_MENU_Keyboard8 /*"Slide Down"*/, KDmove_down ),
 			   
-		KDEF( 0, 200, 256, LT_MENU_Keyboard9 /*"Roll Left"*/, KDroll_left ),  
-		KDEF( 0, 200, 272, LT_MENU_Keyboard10 /*"Roll Right"*/, KDroll_right ),
+		KDEF( 0, 200, 256, (u_int8_t*)LT_MENU_Keyboard9 /*"Roll Left"*/, KDroll_left ),  
+		KDEF( 0, 200, 272, (u_int8_t*)LT_MENU_Keyboard10 /*"Roll Right"*/, KDroll_right ),
 
-		KDEF( 0, 200, 296, LT_MENU_Keyboard11 /*"Slide Mode"*/, KDmove ),
-		KDEF( 0, 200, 312, LT_MENU_Keyboard12 /*"Roll Mode"*/, KDroll ),
+		KDEF( 0, 200, 296, (u_int8_t*)LT_MENU_Keyboard11 /*"Slide Mode"*/, KDmove ),
+		KDEF( 0, 200, 312, (u_int8_t*)LT_MENU_Keyboard12 /*"Roll Mode"*/, KDroll ),
 
 #ifdef PLAYER_SPEECH_TAUNTS
-		KDEF( 0, 200, 328,LT_MENU_Keyboard36 /*"speech taunt"*/, KDsend_speech),
+		KDEF( 0, 200, 328,(u_int8_t*)LT_MENU_Keyboard36 /*"speech taunt"*/, KDsend_speech),
 #endif
 
 		// 2nd page
 
-		KDEF( 1, 200, 112, LT_MENU_Keyboard13 /*"Forward"*/, KDmove_forward ),
-		KDEF( 1, 200, 128, LT_MENU_Keyboard14 /*"Reverse"*/, KDmove_backward ),
-		KDEF( 1, 200, 144, LT_MENU_Keyboard15 /*"Nitro"*/, KDturbo ),
+		KDEF( 1, 200, 112, (u_int8_t*)LT_MENU_Keyboard13 /*"Forward"*/, KDmove_forward ),
+		KDEF( 1, 200, 128, (u_int8_t*)LT_MENU_Keyboard14 /*"Reverse"*/, KDmove_backward ),
+		KDEF( 1, 200, 144, (u_int8_t*)LT_MENU_Keyboard15 /*"Nitro"*/, KDturbo ),
 
-		KDEF( 1, 200, 168, LT_MENU_Keyboard16 /*"Speed Up"*/, KDcruise_faster ),
-		KDEF( 1, 200, 184, LT_MENU_Keyboard17 /*"Slow Down"*/, KDcruise_slower ),
+		KDEF( 1, 200, 168, (u_int8_t*)LT_MENU_Keyboard16 /*"Speed Up"*/, KDcruise_faster ),
+		KDEF( 1, 200, 184, (u_int8_t*)LT_MENU_Keyboard17 /*"Slow Down"*/, KDcruise_slower ),
 
-		KDEF( 1, 200, 208, LT_MENU_Keyboard18 /*"Fire Prim"*/, KDfire_primary ),
-		KDEF( 1, 200, 224, LT_MENU_Keyboard19 /*"Fire Sec"*/, KDfire_secondary ),
-		KDEF( 1, 200, 240, LT_MENU_Keyboard20 /*"Drop Mine"*/, KDfire_mine ),
-		KDEF( 1, 200, 264, LT_MENU_Keyboard21 /*"Drop Prim"*/, KDdrop_primary ),
-		KDEF( 1, 200, 280, LT_MENU_Keyboard22 /*"Drop Sec"*/, KDdrop_secondary ),
-		KDEF( 1, 200, 296, LT_MENU_Keyboard23 /*"Drop Shield"*/, KDdrop_shield ),
-		KDEF( 1, 200, 312, LT_MENU_Keyboard24 /*"Drop Ammo"*/, KDdrop_ammo ),
+		KDEF( 1, 200, 208, (u_int8_t*)LT_MENU_Keyboard18 /*"Fire Prim"*/, KDfire_primary ),
+		KDEF( 1, 200, 224, (u_int8_t*)LT_MENU_Keyboard19 /*"Fire Sec"*/, KDfire_secondary ),
+		KDEF( 1, 200, 240, (u_int8_t*)LT_MENU_Keyboard20 /*"Drop Mine"*/, KDfire_mine ),
+		KDEF( 1, 200, 264, (u_int8_t*)LT_MENU_Keyboard21 /*"Drop Prim"*/, KDdrop_primary ),
+		KDEF( 1, 200, 280, (u_int8_t*)LT_MENU_Keyboard22 /*"Drop Sec"*/, KDdrop_secondary ),
+		KDEF( 1, 200, 296, (u_int8_t*)LT_MENU_Keyboard23 /*"Drop Shield"*/, KDdrop_shield ),
+		KDEF( 1, 200, 312, (u_int8_t*)LT_MENU_Keyboard24 /*"Drop Ammo"*/, KDdrop_ammo ),
 
 		// 3rd page
 
-		KDEF( 2, 200, 112,LT_MENU_Keyboard25 /*"Pulsar"*/, KDselect_primary[ PULSAR ] ),
-		KDEF( 2, 200, 128,LT_MENU_Keyboard26 /*"Trojax"*/, KDselect_primary[ TROJAX ] ),
-		KDEF( 2, 200, 144,LT_MENU_Keyboard27 /*"Pyrolite"*/, KDselect_primary[ PYROLITE_RIFLE ] ),
-		KDEF( 2, 200, 160,LT_MENU_Keyboard28 /*"Transpulse"*/, KDselect_primary[ TRANSPULSE_CANNON ] ),
-		KDEF( 2, 200, 176,LT_MENU_Keyboard29 /*"Suss Gun"*/, KDselect_primary[ SUSS_GUN ] ),
-		KDEF( 2, 200, 192,LT_MENU_Keyboard30 /*"Beam Laser"*/, KDselect_primary[ LASER ] ),
-		KDEF( 2, 200, 216,LT_MENU_Keyboard31 /*"Next Prim"*/, KDselect_next_primary ),
-		KDEF( 2, 200, 232,LT_MENU_Keyboard32 /*"Prev Prim"*/, KDselect_prev_primary ),
-		KDEF( 2, 200, 256,LT_MENU_Keyboard33 /*"Next Sec"*/, KDselect_next_secondary ),
-		KDEF( 2, 200, 272,LT_MENU_Keyboard34 /*"Prev Sec"*/, KDselect_prev_secondary ),
+		KDEF( 2, 200, 112,(u_int8_t*)LT_MENU_Keyboard25 /*"Pulsar"*/, KDselect_primary[ PULSAR ] ),
+		KDEF( 2, 200, 128,(u_int8_t*)LT_MENU_Keyboard26 /*"Trojax"*/, KDselect_primary[ TROJAX ] ),
+		KDEF( 2, 200, 144,(u_int8_t*)LT_MENU_Keyboard27 /*"Pyrolite"*/, KDselect_primary[ PYROLITE_RIFLE ] ),
+		KDEF( 2, 200, 160,(u_int8_t*)LT_MENU_Keyboard28 /*"Transpulse"*/, KDselect_primary[ TRANSPULSE_CANNON ] ),
+		KDEF( 2, 200, 176,(u_int8_t*)LT_MENU_Keyboard29 /*"Suss Gun"*/, KDselect_primary[ SUSS_GUN ] ),
+		KDEF( 2, 200, 192,(u_int8_t*)LT_MENU_Keyboard30 /*"Beam Laser"*/, KDselect_primary[ LASER ] ),
+		KDEF( 2, 200, 216,(u_int8_t*)LT_MENU_Keyboard31 /*"Next Prim"*/, KDselect_next_primary ),
+		KDEF( 2, 200, 232,(u_int8_t*)LT_MENU_Keyboard32 /*"Prev Prim"*/, KDselect_prev_primary ),
+		KDEF( 2, 200, 256,(u_int8_t*)LT_MENU_Keyboard33 /*"Next Sec"*/, KDselect_next_secondary ),
+		KDEF( 2, 200, 272,(u_int8_t*)LT_MENU_Keyboard34 /*"Prev Sec"*/, KDselect_prev_secondary ),
 		
-		KDEF( 2, 200, 296,LT_MENU_Keyboard35 /*"Send Msg"*/, KDsend_msg),
-		KDEF( 2, 200, 312,LT_MENU_Keyboard1a /*"headlights"*/, KDheadlights),
-		KDEF( 2, 200, 328,LT_MENU_Keyboard1b /*"full rear view"*/, KDfull_rearview),
+		KDEF( 2, 200, 296,(u_int8_t*)LT_MENU_Keyboard35 /*"Send Msg"*/, KDsend_msg),
+		KDEF( 2, 200, 312,(u_int8_t*)LT_MENU_Keyboard1a /*"headlights"*/, KDheadlights),
+		KDEF( 2, 200, 328,(u_int8_t*)LT_MENU_Keyboard1b /*"full rear view"*/, KDfull_rearview),
 		// 4th page
 		
-		KDEF( 3, 200, 112, LT_MENU_Keyboard37 /*"Mug Missile"*/, KDselect_secondary[ MUGMISSILE ] ),
-		KDEF( 3, 200, 128, LT_MENU_Keyboard38 /*"Solaris"*/, KDselect_secondary[ SOLARISMISSILE ] ),
-		KDEF( 3, 200, 144, LT_MENU_Keyboard39 /*"Scatter"*/, KDselect_secondary[ SCATTERMISSILE ] ),
-		KDEF( 3, 200, 160, LT_MENU_Keyboard40 /*"Gravgon"*/, KDselect_secondary[ GRAVGONMISSILE ] ),
-		KDEF( 3, 200, 176, LT_MENU_Keyboard41 /*"MFRL"*/, KDselect_secondary[ MULTIPLEMISSILE ] ),
-		KDEF( 3, 200, 192, LT_MENU_Keyboard42 /*"Titan Star"*/, KDselect_secondary[ TITANSTARMISSILE ] ),
-		KDEF( 3, 200, 208, LT_MENU_Keyboard46 /*"Thief Missile"*/, KDselect_secondary[ THIEFMISSILE ] ),
+		KDEF( 3, 200, 112, (u_int8_t*)LT_MENU_Keyboard37 /*"Mug Missile"*/, KDselect_secondary[ MUGMISSILE ] ),
+		KDEF( 3, 200, 128, (u_int8_t*)LT_MENU_Keyboard38 /*"Solaris"*/, KDselect_secondary[ SOLARISMISSILE ] ),
+		KDEF( 3, 200, 144, (u_int8_t*)LT_MENU_Keyboard39 /*"Scatter"*/, KDselect_secondary[ SCATTERMISSILE ] ),
+		KDEF( 3, 200, 160, (u_int8_t*)LT_MENU_Keyboard40 /*"Gravgon"*/, KDselect_secondary[ GRAVGONMISSILE ] ),
+		KDEF( 3, 200, 176, (u_int8_t*)LT_MENU_Keyboard41 /*"MFRL"*/, KDselect_secondary[ MULTIPLEMISSILE ] ),
+		KDEF( 3, 200, 192, (u_int8_t*)LT_MENU_Keyboard42 /*"Titan Star"*/, KDselect_secondary[ TITANSTARMISSILE ] ),
+		KDEF( 3, 200, 208, (u_int8_t*)LT_MENU_Keyboard46 /*"Thief Missile"*/, KDselect_secondary[ THIEFMISSILE ] ),
 
-		KDEF( 3, 200, 232, LT_MENU_Keyboard43 /*"Purge Mine"*/, KDselect_secondary[ PURGEMINE ] ),
-		KDEF( 3, 200, 248, LT_MENU_Keyboard44 /*"Pine Mine"*/, KDselect_secondary[ PINEMINE ] ),
-		KDEF( 3, 200, 264, LT_MENU_Keyboard45 /*"Quantum Mine"*/, KDselect_secondary[ QUANTUMMINE ] ),
-		KDEF( 3, 200, 280, LT_MENU_Keyboard47 /*"Spider Mine"*/, KDselect_secondary[ SPIDERMINE ] ),
+		KDEF( 3, 200, 232, (u_int8_t*)LT_MENU_Keyboard43 /*"Purge Mine"*/, KDselect_secondary[ PURGEMINE ] ),
+		KDEF( 3, 200, 248, (u_int8_t*)LT_MENU_Keyboard44 /*"Pine Mine"*/, KDselect_secondary[ PINEMINE ] ),
+		KDEF( 3, 200, 264, (u_int8_t*)LT_MENU_Keyboard45 /*"Quantum Mine"*/, KDselect_secondary[ QUANTUMMINE ] ),
+		KDEF( 3, 200, 280, (u_int8_t*)LT_MENU_Keyboard47 /*"Spider Mine"*/, KDselect_secondary[ SPIDERMINE ] ),
 
-		KDEF( 3, 200, 310, LT_MENU_Keyboard48 /*"Show Messages"*/, KDshow_messages ),
-		KDEF( 3, 200, 326, LT_MENU_Keyboard49 /*"Show Statistics"*/, KDshow_stats ),
-		KDEF( 3, 200, 342, LT_MENU_Keyboard50 /*"Show Network Info"*/, KDshow_networkinfo ),
+		KDEF( 3, 200, 310, (u_int8_t*)LT_MENU_Keyboard48 /*"Show Messages"*/, KDshow_messages ),
+		KDEF( 3, 200, 326, (u_int8_t*)LT_MENU_Keyboard49 /*"Show Statistics"*/, KDshow_stats ),
+		KDEF( 3, 200, 342, (u_int8_t*)LT_MENU_Keyboard50 /*"Show Network Info"*/, KDshow_networkinfo ),
 
-		{ 200, 32, 0, 0, 0, "help3", 0, 0, NULL, NULL, NULL, DrawKeyDefHelp3, NULL, 0 },
-		{ 200, 336, 0, 0, 0, "help1", 0, 0, NULL, NULL, NULL, DrawKeyDefHelp1, NULL, 0 },
-		{ 200, 352, 0, 0, 0, "help2", 0, 0, NULL, NULL, NULL, DrawKeyDefHelp2, NULL, 0 },
-		{ 200, 368, 0, 0, 0, "Page", 0, 0, NULL, NULL, NULL, DrawKeyDefPage, NULL, 0 },
+		{ 200, 32, 0, 0, 0, (u_int8_t*)"help3", 0, 0, NULL, NULL, NULL, DrawKeyDefHelp3, NULL, 0 },
+		{ 200, 336, 0, 0, 0, (u_int8_t*)"help1", 0, 0, NULL, NULL, NULL, DrawKeyDefHelp1, NULL, 0 },
+		{ 200, 352, 0, 0, 0, (u_int8_t*)"help2", 0, 0, NULL, NULL, NULL, DrawKeyDefHelp2, NULL, 0 },
+		{ 200, 368, 0, 0, 0, (u_int8_t*)"Page", 0, 0, NULL, NULL, NULL, DrawKeyDefPage, NULL, 0 },
 //		{ 200, 368, 0, 0, 0,  "Weapon selection keys", 0, 0, NULL, &MENU_WeaponKeys, MenuChange, MenuItemDrawName, NULL, 0 },
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 #else
@@ -2766,7 +2773,7 @@ MENU	MENU_Keyboard =
 MENU	MENU_Primary;
 MENU	MENU_Secondary;
 MENU	MENU_Controls = {
-	LT_MENU_Controls0 /*"Bike Controls"*/, InitControls, ExitControls, NULL, 0,
+	(u_int8_t*)LT_MENU_Controls0 /*"Bike Controls"*/, InitControls, ExitControls, NULL, 0,
 	{
 #if 0
 		{ 200, 144 - 32, 0, 0, 0, "Mouse", 0, 0,				(void *)&ControlMethod,	(void *)CONTROL_Mouse,		SelectRadioButton,	DrawRadioButton, NULL, 0 },
@@ -2779,84 +2786,84 @@ MENU	MENU_Controls = {
 				
 		{ 200, 224, 0, 0, 0, "X Sensitivity  ", 0, 0,		&SensitivityXSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
 		{ 200, 240, 0, 0, 0, "Y Sensitivity  ", 0, 0,		&SensitivityYSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
-		{ 200, 272, 0, 0, 0, "Autoleveling",  0, 0,			&Autoleveling,			SetAutolevel,				SelectToggle,		DrawToggle, NULL, 0 },
+		{ 200, 272, 0, 0, 0, "Autoleveling",  0, 0,			&Autoleveling,			(void*)SetAutolevel,				SelectToggle,		DrawToggle, NULL, 0 },
 		{ 200, 288, 0, 0, 0, "Calibrate Joystick", 0, 0,	NULL,					&MENU_NotYet,				MenuChange,			MenuItemDrawName, NULL, 0 },
 		{ 200, 320, 0, 0, 0, "Configure Keyboard", 0, 0,	NULL,					&MENU_Keyboard,				MenuChange,			MenuItemDrawName, NULL, 0 },
 		{ 200, 336, 0, 0, 0, "Weapon Priority", 0, 0,		NULL,					&MENU_NotYet,				MenuChange,			MenuItemDrawName, NULL, 0 },
 		{ 200, 352, 0, 0, 0, "Reorder Secondary", 0, 0,	NULL,					&MENU_NotYet,				MenuChange,			MenuItemDrawName, NULL, 0 },
 #else
-		{ 200, 112, 0, 0, 0, LT_MENU_Controls1 /*"Configure controls"*/, 0, 0,	NULL,					&MENU_Keyboard,				MenuChange,			MenuItemDrawName, NULL, 0 },
-		{ 200, 160, 0, 0, 0, LT_MENU_Controls3 /*"Joystick          "*/, 0, 0,	&JoystickInput,			NULL,						SelectToggle,		DrawToggle, NULL, 0 },
-		{ 200, 192, 0, 0, 0, LT_MENU_Controls4 /*"Autoleveling      "*/,  0, 0,			&Autoleveling,			SetAutolevel,				SelectToggle,		DrawToggle, NULL, 0 },
-		{ 200, 224, 0, 0, 0, LT_MENU_Controls5 /*"Invert X          "*/,  0, 0,			&Config.invert_turn,			NULL,				SelectToggle,		DrawToggle, NULL, 0 },
-		{ 200, 240, 0, 0, 0, LT_MENU_Controls6 /*"Invert Y          "*/,  0, 0,			&Config.invert_pitch,			NULL,				SelectToggle,		DrawToggle, NULL, 0 },
-		{ 200, 272, 0, 0, 0, LT_MENU_Controls7 /*"X Sensitivity     "*/, 0, 0,		&SensitivityXSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
-		{ 200, 288, 0, 0, 0, LT_MENU_Controls8 /*"Y Sensitivity     "*/, 0, 0,		&SensitivityYSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
+		{ 200, 112, 0, 0, 0, (u_int8_t*)LT_MENU_Controls1 /*"Configure controls"*/, 0, 0,	NULL,					&MENU_Keyboard,				MenuChange,			MenuItemDrawName, NULL, 0 },
+		{ 200, 160, 0, 0, 0, (u_int8_t*)LT_MENU_Controls3 /*"Joystick          "*/, 0, 0,	&JoystickInput,			NULL,						SelectToggle,		DrawToggle, NULL, 0 },
+		{ 200, 192, 0, 0, 0, (u_int8_t*)LT_MENU_Controls4 /*"Autoleveling      "*/,  0, 0,			&Autoleveling,			(void*)SetAutolevel,				SelectToggle,		DrawToggle, NULL, 0 },
+		{ 200, 224, 0, 0, 0, (u_int8_t*)LT_MENU_Controls5 /*"Invert X          "*/,  0, 0,			&Config.invert_turn,			NULL,				SelectToggle,		DrawToggle, NULL, 0 },
+		{ 200, 240, 0, 0, 0, (u_int8_t*)LT_MENU_Controls6 /*"Invert Y          "*/,  0, 0,			&Config.invert_pitch,			NULL,				SelectToggle,		DrawToggle, NULL, 0 },
+		{ 200, 272, 0, 0, 0, (u_int8_t*)LT_MENU_Controls7 /*"X Sensitivity     "*/, 0, 0,		&SensitivityXSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
+		{ 200, 288, 0, 0, 0, (u_int8_t*)LT_MENU_Controls8 /*"Y Sensitivity     "*/, 0, 0,		&SensitivityYSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
 #endif
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}																					
 };
 
 // in-game-menu
 MENU	MENU_Detail = {
-	LT_MENU_Detail0 /*"Detail Levels"*/, NULL, ExitDetailLevels, NULL, 0,
+	(u_int8_t*)LT_MENU_Detail0 /*"Detail Levels"*/, NULL, ExitDetailLevels, NULL, 0,
 	{
-		{ 200, 180, 0, 0, 0, LT_MENU_Detail4/*"Team Info"*/,     0, 0,  &ShowTeamInfo,     NULL,SelectToggle,DrawToggle,NULL, 0 },
-		{ 200, 196, 0, 0, 0, "MATURE CONTENT      ", 0, 0, &MatureContent, NULL, SelectMatureContentToggle, DrawMatureContentToggle,	NULL, 0 },
-		{ 200, 212, 0, 0, 0, LT_MENU_Detail12/*"Water Detail"*/, 0, 0,	&WaterDetailSlider,NULL,SelectSlider,DrawSlider,NULL, 0 },
-		{ 200, 228, 0, 0, 0, LT_MENU_Detail13/*"gamma"*/,        0, 0,	&GammaSlider,      NULL,SelectSlider,DrawSlider,NULL, 0 },
-		{-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 180, 0, 0, 0, (u_int8_t*)LT_MENU_Detail4/*"Team Info"*/,     0, 0,  &ShowTeamInfo,     NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 196, 0, 0, 0, (u_int8_t*)"MATURE CONTENT      ", 0, 0, &MatureContent, NULL, SelectMatureContentToggle, DrawMatureContentToggle,	NULL, 0 },
+		{ 200, 212, 0, 0, 0, (u_int8_t*)LT_MENU_Detail12/*"Water Detail"*/, 0, 0,	&WaterDetailSlider,NULL,SelectSlider,DrawSlider,NULL, 0 },
+		{ 200, 228, 0, 0, 0, (u_int8_t*)LT_MENU_Detail13/*"gamma"*/,        0, 0,	&GammaSlider,      NULL,SelectSlider,DrawSlider,NULL, 0 },
+		{-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_DebugMode = {
-	"Select Debug Mode" , InitDebugMode , NULL , NULL, 0,
+	(u_int8_t*)"Select Debug Mode" , InitDebugMode , NULL , NULL, 0,
 	{
 		
-		{ 200, 96, 0, 0, 0, "Show Plane RGB", 0, 0, &ShowPlaneRGB, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 96, 0, 0, 0, (u_int8_t*)"Show Plane RGB", 0, 0, &ShowPlaneRGB, NULL, SelectToggle, DrawToggle, NULL, 0 },
 		
-		{ 200, 144, 0, 0, 0, "external forces", 0, 0, &ShowEFZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 160, 0, 0, 0, "show teleports", 0, 0, &ShowTeleports, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 176, 0, 0, 0, "trigger zones", 0, 0, &ShowTrigZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 192, 0, 0, 0, "bounding boxes", 0, 0, &ShowBoundingBoxes, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 208, 0, 0, 0, "collision zones", 0, 0, &ShowColZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 224, 0, 0, 0, "Untriggered Enemies", 0, 0, &ShowUntriggeredNMEs, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 144, 0, 0, 0, (u_int8_t*)"external forces", 0, 0, &ShowEFZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 160, 0, 0, 0, (u_int8_t*)"show teleports", 0, 0, &ShowTeleports, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 176, 0, 0, 0, (u_int8_t*)"trigger zones", 0, 0, &ShowTrigZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 192, 0, 0, 0, (u_int8_t*)"bounding boxes", 0, 0, &ShowBoundingBoxes, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 208, 0, 0, 0, (u_int8_t*)"collision zones", 0, 0, &ShowColZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 224, 0, 0, 0, (u_int8_t*)"Untriggered Enemies", 0, 0, &ShowUntriggeredNMEs, NULL, SelectToggle, DrawToggle, NULL, 0 },
 
-		{ 200, 256, 0, 0, 0, "Screen Capture Mode ...on F8 key", 0, 0,		&ScreenSaving,		NULL,	SelectToggle,	DrawToggle, NULL, 0 },
-		{ 200, 272, 0, 0, 0, "Old BSP Cube", 0, 0, &OldNodeCube, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 288, 0, 0, 0, "BSP Node Cube", 0, 0, &NodeCube, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 304, 0, 0, 0, "BSP Nodes tested", 0, 0, &NodeCubeType, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 256, 0, 0, 0, (u_int8_t*)"Screen Capture Mode ...on F8 key", 0, 0,		&ScreenSaving,		NULL,	SelectToggle,	DrawToggle, NULL, 0 },
+		{ 200, 272, 0, 0, 0, (u_int8_t*)"Old BSP Cube", 0, 0, &OldNodeCube, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 288, 0, 0, 0, (u_int8_t*)"BSP Node Cube", 0, 0, &NodeCube, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 304, 0, 0, 0, (u_int8_t*)"BSP Nodes tested", 0, 0, &NodeCubeType, NULL, SelectToggle, DrawToggle, NULL, 0 },
 		
-		{ 200, 336, 0, 0, 0, "Show Nodes", 0, 0, &ShowNode, ShowNodeToggle, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 352, 0, 0, 0, "Show Startpoints", 0, 0, &ShowStartPoints, ShowStartPointsToggle, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Nodes", 0, 0, &ShowNode, (void*)ShowNodeToggle, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 352, 0, 0, 0, (u_int8_t*)"Show Startpoints", 0, 0, &ShowStartPoints, (void*)ShowStartPointsToggle, SelectToggle, DrawToggle, NULL, 0 },
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_SelectBike = {
-	LT_MENU_SelectBike0 /*"Select Bike"*/ , InitBikeList , NULL , NULL,	0,
+	(u_int8_t*)LT_MENU_SelectBike0 /*"Select Bike"*/ , InitBikeList , NULL , NULL,	0,
 	{
-		{ 200, 128, 0, 0, 0, LT_MENU_SelectBike1 /*"Choose From..."*/, 0, 0, &BikeList, ExitBikeSelection , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 128, 0, 0, 0, (u_int8_t*)LT_MENU_SelectBike1 /*"Choose From..."*/, 0, 0, &BikeList, (void*)ExitBikeSelection , SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_SelectBikeComputer = {
-	LT_MENU_SelectBikeComputer0 /*"Select Bike Computer"*/ , InitBikeComputerMenu , NULL , NULL,	0,
+	(u_int8_t*)LT_MENU_SelectBikeComputer0 /*"Select Bike Computer"*/ , InitBikeComputerMenu , NULL , NULL,	0,
 	{
-		{ 200, 128, 0, 0, 0, LT_MENU_SelectBikeComputer1 /*"Choose From..."*/, 0, 0, &BikeComputerList, ExitBikeComputerSelection , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 128, 0, 0, 0, (u_int8_t*)LT_MENU_SelectBikeComputer1 /*"Choose From..."*/, 0, 0, &BikeComputerList, (void*)ExitBikeComputerSelection , SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_ChangeBikeComputer = {
-	LT_MENU_NEW_ChangeBikeComputer0 /*"Select Bike Computer"*/ , InitBikeComputerMenu , NULL , NULL,	0,
+	(u_int8_t*)LT_MENU_NEW_ChangeBikeComputer0 /*"Select Bike Computer"*/ , InitBikeComputerMenu , NULL , NULL,	0,
 	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_ChangeBikeComputer1 /*"Choose bike computer..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 15 , 30, 100, 150, 0, LT_MENU_NEW_ChangeBikeComputer2 /*"list..."*/ , FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &BikeComputerList, ExitBikeComputerSelection , SelectList , DrawFlatMenuList, NULL, 0},
+		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_ChangeBikeComputer1 /*"Choose bike computer..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
+		{ 15 , 30, 100, 150, 0, (u_int8_t*)LT_MENU_NEW_ChangeBikeComputer2 /*"list..."*/ , FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &BikeComputerList, (void*)ExitBikeComputerSelection , SelectList , DrawFlatMenuList, NULL, 0},
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, (u_int8_t*)NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
@@ -2866,44 +2873,44 @@ MENU	MENU_Computer;
 MENU	MENU_Restore;
 
 MENU	MENU_SelectScreenMode = {
-	LT_MENU_SelectScreenMode0 /*"Select Screen Mode"*/ , MakeModeList , MenuSelectMode , NULL, 0,
+	(u_int8_t*)LT_MENU_SelectScreenMode0 /*"Select Screen Mode"*/ , MakeModeList , MenuSelectMode , NULL, 0,
 	{
-		{ 200, 128, 0, 0, 0, LT_MENU_SelectScreenMode1 /*"Choose From..."*/, 0, 0, &ModeList, NULL , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 128, 0, 0, 0, (u_int8_t*)LT_MENU_SelectScreenMode1 /*"Choose From..."*/, 0, 0, &ModeList, NULL , SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 /*XXX*/
 MENU	MENU_Visuals = {
-	LT_MENU_Visuals0 /*"Visuals"*/, NULL, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_Visuals0 /*"Visuals"*/, NULL, NULL, NULL, 0,
 	{
-		{ 200, 128 + ( 0*16 ), 0, 0, 0, LT_MENU_Visuals1		/*"Select Screen Mode"		*/, 0, 0, NULL,									&MENU_SelectScreenMode,		MenuChange,			MenuItemDrawName,		NULL, 0 },
+		{ 200, 128 + ( 0*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_Visuals1		/*"Select Screen Mode"		*/, 0, 0, NULL,									&MENU_SelectScreenMode,		MenuChange,			MenuItemDrawName,		NULL, 0 },
 		
-		{ 200, 128 + ( 2*16 ), 0, 0, 0, "TEXT SCALE", 0, 0,	&TextScaleSlider,	NULL,	SelectSlider,	DrawSlider, NULL, 0 },
+		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"TEXT SCALE", 0, 0,	&TextScaleSlider,	NULL,	SelectSlider,	DrawSlider, NULL, 0 },
 
-		{ 200, 128 + ( 3*16 ), 0, 0, 0, "HUD COLOUR ", 0, 0, &HUDColour,	NULL,		SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 4*16 ), 0, 0, 0, "MENU COLOUR ", 0, 0, &InGameMenuColour,	NULL,		SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 5*16 ), 0, 0, 0, LT_MENU_InGame28	/*"normal kill messages"		*/, 0, 0, &KillMessageColour,				NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 6*16 ), 0, 0, 0, LT_MENU_InGame29	/*"milestone kill messages"	*/, 0, 0,	&MilestoneMessagesColour,	NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 7*16 ), 0, 0, 0, LT_MENU_InGame30	/*"system messages"		*/, 0, 0,	&SystemMessageColour,		NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 8*16 ), 0, 0, 0, LT_MENU_InGame31	/*"flag/bounty messages"	*/, 0, 0,	&FlagMessageColour,				NULL,										SelectColourToggle, DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 9*16 ), 0, 0, 0, LT_MENU_InGame32	/*"player messages"			*/, 0, 0,	&PlayerMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 10*16 ), 0, 0, 0, LT_MENU_InGame33	/*"pickup messages"			*/, 0, 0,	&PickupMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 11*16 ), 0, 0, 0, LT_MENU_InGame34	/*"taunt messages"			*/, 0, 0,	&TauntMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ 200, 128 + ( 12*16 ), 0, 0, 0, LT_MENU_InGame35	/*"your messages"			*/, 0, 0,	&MyMessageColour,				NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 128 + ( 3*16 ), 0, 0, 0, (u_int8_t*)"HUD COLOUR ", 0, 0, &HUDColour,	NULL,		SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 4*16 ), 0, 0, 0, (u_int8_t*)"MENU COLOUR ", 0, 0, &InGameMenuColour,	NULL,		SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 5*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame28	/*"normal kill messages"		*/, 0, 0, &KillMessageColour,				NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 6*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame29	/*"milestone kill messages"	*/, 0, 0,	&MilestoneMessagesColour,	NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 7*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame30	/*"system messages"		*/, 0, 0,	&SystemMessageColour,		NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 8*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame31	/*"flag/bounty messages"	*/, 0, 0,	&FlagMessageColour,				NULL,										SelectColourToggle, DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 9*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame32	/*"player messages"			*/, 0, 0,	&PlayerMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 10*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame33	/*"pickup messages"			*/, 0, 0,	&PickupMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 11*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame34	/*"taunt messages"			*/, 0, 0,	&TauntMessageColour,			NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ 200, 128 + ( 12*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_InGame35	/*"your messages"			*/, 0, 0,	&MyMessageColour,				NULL,										SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
 MENU	MENU_3DS_Visuals = {
-	"3DS Visual Settings", NULL, NULL, NULL, 0,
+	(u_int8_t*)"3DS Visual Settings", NULL, NULL, NULL, 0,
 	{
-		{ 200, 128 + ( 0*16 ), 0, 0, 0, "Object shine",      0, 0, &g_object_shine,      NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 128 + ( 1*16 ), 0, 0, 0, "Wall detail",       0, 0, &g_wall_detail,       NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 128 + ( 2*16 ), 0, 0, 0, "Show stereo debug", 0, 0, &g_show_stereo_debug, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 128 + ( 3*16 ), 0, 0, 0, "Invert 3D depth",   0, 0, &g_stereo_invert,     NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 128 + ( 0*16 ), 0, 0, 0, (u_int8_t*)"Object shine",      0, 0, &g_object_shine,      NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 1*16 ), 0, 0, 0, (u_int8_t*)"Wall detail",       0, 0, &g_wall_detail,       NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"Show stereo debug", 0, 0, &g_show_stereo_debug, NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 3*16 ), 0, 0, 0, (u_int8_t*)"Invert 3D depth",   0, 0, &g_stereo_invert,     NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 #endif
@@ -2912,223 +2919,223 @@ extern bool ShowFrameRate;
 extern bool ShowInfo;
 
 MENU	MENU_Options = {
-	LT_MENU_Options0/*"Options"*/, NULL, (MenuFunc) SetGamePrefs, NULL, 0,
+	(u_int8_t*)LT_MENU_Options0/*"Options"*/, NULL, (MenuFunc) SetGamePrefs, NULL, 0,
 	{
 #if defined(__3DS__) && defined(RENDERER_C3D)
-		{ 200, 128, 0, 0, 0, "3DS Visual Settings",			0, 0, NULL,						&MENU_3DS_Visuals,		MenuChange,		MenuItemDrawName,	NULL, 0 },
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"3DS Visual Settings",			0, 0, NULL,						&MENU_3DS_Visuals,		MenuChange,		MenuItemDrawName,	NULL, 0 },
 #else
-		{ 200, 128, 0, 0, 0, LT_MENU_Options1	/*"Visuals"*/,				0, 0, NULL,						&MENU_Visuals,			MenuChange,		MenuItemDrawName,	NULL, 0 },
+		{ 200, 128, 0, 0, 0, (u_int8_t*)LT_MENU_Options1	/*"Visuals"*/,				0, 0, NULL,						&MENU_Visuals,			MenuChange,		MenuItemDrawName,	NULL, 0 },
 #endif
-		{ 200, 144, 0, 0, 0, LT_MENU_Options2	/*"Sound FX and Music"*/,	0, 0, NULL,						&MENU_NEW_InGameSound,	MenuChange,		MenuItemDrawName,	NULL, 0 },
-		{ 200, 160, 0, 0, 0, LT_MENU_Options3	/*"Detail Levels"*/,		0, 0, NULL,						&MENU_Detail,			MenuChange,		MenuItemDrawName,	NULL, 0 },
-		{ 200, 176, 0, 0, 0, LT_MENU_Options4	/*"Show Frame Rate "*/,		0, 0, &ShowFrameRate,	NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
-		{ 200, 192, 0, 0, 0, LT_MENU_Options8	/*"Show Extra Info "*/,		0, 0, &ShowInfo,		NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
-		{ 200, 208, 0, 0, 0, LT_MENU_Options9	/*"Show Weapon Kills"*/,	0, 0, &ShowWeaponKills,			NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
-		{ 200, 224, 0, 0, 0, LT_MENU_Options13	/*"Show Players on HUD"*/,	0, 0, &ShowPlayersOnHUD,		NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
-		{ 200, 240, 0, 0, 0, "HUD Show Kills Only",	0, 0, &ShowPlayersOnHUDbyKills,NULL,SelectToggle,DrawToggle,NULL, 0 },
-		{ 200, 256, 0, 0, 0, "HUD Show Inventory",	0, 0, &ShowWeaponsPossessedOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
-		{ 200, 272, 0, 0, 0, "HUD Show Clock",	0, 0, &ShowClockOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
-		{ 200, 288, 0, 0, 0, "HUD Show KPM",	0, 0, &ShowKPMOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
-		{ 200, 304, 0, 0, 0, "HUD Show Speed",	0, 0, &ShowSpeedOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
-        { 200, 320, 0, 0, 0, "Show Health Above Bikes", 0, 0, &ShowPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
-        { 200, 336, 0, 0, 0, "Show Health By Scores", 0, 0, &ShowPlayerHealthByScores,NULL,SelectToggle,DrawToggle,NULL, 0 },
-        { 200, 352, 0, 0, 0, "Scale Font Above Bikes", 0, 0, &ScaleFontPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
-		{	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 144, 0, 0, 0, (u_int8_t*)LT_MENU_Options2	/*"Sound FX and Music"*/,	0, 0, NULL,						&MENU_NEW_InGameSound,	MenuChange,		MenuItemDrawName,	NULL, 0 },
+		{ 200, 160, 0, 0, 0, (u_int8_t*)LT_MENU_Options3	/*"Detail Levels"*/,		0, 0, NULL,						&MENU_Detail,			MenuChange,		MenuItemDrawName,	NULL, 0 },
+		{ 200, 176, 0, 0, 0, (u_int8_t*)LT_MENU_Options4	/*"Show Frame Rate "*/,		0, 0, &ShowFrameRate,	NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
+		{ 200, 192, 0, 0, 0, (u_int8_t*)LT_MENU_Options8	/*"Show Extra Info "*/,		0, 0, &ShowInfo,		NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
+		{ 200, 208, 0, 0, 0, (u_int8_t*)LT_MENU_Options9	/*"Show Weapon Kills"*/,	0, 0, &ShowWeaponKills,			NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
+		{ 200, 224, 0, 0, 0, (u_int8_t*)LT_MENU_Options13	/*"Show Players on HUD"*/,	0, 0, &ShowPlayersOnHUD,		NULL,					SelectToggle,	DrawToggle,			NULL, 0 },
+		{ 200, 240, 0, 0, 0, (u_int8_t*)"HUD Show Kills Only",	0, 0, &ShowPlayersOnHUDbyKills,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 256, 0, 0, 0, (u_int8_t*)"HUD Show Inventory",	0, 0, &ShowWeaponsPossessedOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 272, 0, 0, 0, (u_int8_t*)"HUD Show Clock",	0, 0, &ShowClockOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 288, 0, 0, 0, (u_int8_t*)"HUD Show KPM",	0, 0, &ShowKPMOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 304, 0, 0, 0, (u_int8_t*)"HUD Show Speed",	0, 0, &ShowSpeedOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
+        { 200, 320, 0, 0, 0, (u_int8_t*)"Show Health Above Bikes", 0, 0, &ShowPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
+        { 200, 336, 0, 0, 0, (u_int8_t*)"Show Health By Scores", 0, 0, &ShowPlayerHealthByScores,NULL,SelectToggle,DrawToggle,NULL, 0 },
+        { 200, 352, 0, 0, 0, (u_int8_t*)"Scale Font Above Bikes", 0, 0, &ScaleFontPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_DemoPlaying = {
-	LT_MENU_DemoPlaying0 /*"Demo Playing"*/ , NULL, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_DemoPlaying0 /*"Demo Playing"*/ , NULL, NULL, NULL, 0,
 	{
-		{ 200 , 128           , 0, 0, 0, LT_MENU_DemoPlaying1 /*"Pause Demo "*/, 0, 0,	&PauseDemo,	NULL, PauseDemoToggle,	DrawToggle, NULL, 0 },
-		{ 200 , 128 + ( 2*16 ), 0, 0, 0, LT_MENU_DemoPlaying7 /*"Playback Speed"*/, 0, 0,	&DemoSpeed,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
-		{ 200 , 128 + ( 4*16 ), 0, 0, 0, LT_MENU_DemoPlaying8 /*"Watch Player"*/, 0, 0,		&DemoEyesSelect,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
-		{ 200 , 128 + ( 5*16 ), 0, 0, 0, LT_MENU_DemoPlaying9 /*"Options"*/ , 0, 0, NULL, &MENU_Options , MenuChange , MenuItemDrawName, NULL, 0 } ,
+		{ 200 , 128           , 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying1 /*"Pause Demo "*/, 0, 0,	&PauseDemo,	NULL, PauseDemoToggle,	DrawToggle, NULL, 0 },
+		{ 200 , 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying7 /*"Playback Speed"*/, 0, 0,	&DemoSpeed,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
+		{ 200 , 128 + ( 4*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying8 /*"Watch Player"*/, 0, 0,		&DemoEyesSelect,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
+		{ 200 , 128 + ( 5*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying9 /*"Options"*/ , 0, 0, NULL, &MENU_Options , MenuChange , MenuItemDrawName, NULL, 0 } ,
 #ifdef DEBUG_ON
-		{ 200 , 128 + ( 6*16 ), 0, 0, 0, LT_MENU_DemoPlaying10 /*"Debugging"*/, 0, 0,	&DebugInfo,	DebugModeChanged, SelectToggle,	DrawToggle, NULL, 0 },
+		{ 200 , 128 + ( 6*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying10 /*"Debugging"*/, 0, 0,	&DebugInfo,	(void*)DebugModeChanged, SelectToggle,	DrawToggle, NULL, 0 },
 #endif
-		{ 200 , 128 + ( 7*16 ), 0, 0, 0, LT_MENU_DemoPlaying11 /*"Quit to Title Screen"*/ , 0, 0, NULL, NULL, SelectQuitCurrentGame , MenuItemDrawName, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200 , 128 + ( 7*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying11 /*"Quit to Title Screen"*/ , 0, 0, NULL, NULL, SelectQuitCurrentGame , MenuItemDrawName, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 
 
 MENU	MENU_SetUpBiker = {
-	LT_MENU_SetUpBiker0 /*"Set Up Biker"*/ , InitBikerMenu, ExitBikerMenu, NULL, 0,
+	(u_int8_t*)LT_MENU_SetUpBiker0 /*"Set Up Biker"*/ , InitBikerMenu, ExitBikerMenu, NULL, 0,
 	{
-		{ 200, 128, 0, 0, 0, LT_MENU_SetUpBiker1 /*"Create New Biker  "*/, 0, 0, &PilotNameInGame, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ 200, 144, 0, 0, 0, LT_MENU_SetUpBiker2 /*"Bike Controls"*/, 0, 0, NULL, &MENU_Controls, MenuChange, MenuItemDrawName, NULL, 0 },
-		{ 200, 160, 0, 0, 0, LT_MENU_SetUpBiker3 /*"Select Bike"*/, 0, 0, NULL, &MENU_SelectBike, MenuChange, MenuItemDrawName, NULL, 0 },
-		{ 200, 176, 0, 0, 0, LT_MENU_SetUpBiker4 /*"Select Bike Computer"*/, 0, 0, NULL, &MENU_SelectBikeComputer, MenuChange, MenuItemDrawName, NULL, 0 },
-		{ 200, 192, 0, 0, 0, LT_MENU_SetUpBiker5 /*"Choose From..."*/, 0, 0, &PilotList, SelectPilot , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ 200, 128, 0, 0, 0, (u_int8_t*)LT_MENU_SetUpBiker1 /*"Create New Biker  "*/, 0, 0, &PilotNameInGame, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ 200, 144, 0, 0, 0, (u_int8_t*)LT_MENU_SetUpBiker2 /*"Bike Controls"*/, 0, 0, NULL, &MENU_Controls, MenuChange, MenuItemDrawName, NULL, 0 },
+		{ 200, 160, 0, 0, 0, (u_int8_t*)LT_MENU_SetUpBiker3 /*"Select Bike"*/, 0, 0, NULL, &MENU_SelectBike, MenuChange, MenuItemDrawName, NULL, 0 },
+		{ 200, 176, 0, 0, 0, (u_int8_t*)LT_MENU_SetUpBiker4 /*"Select Bike Computer"*/, 0, 0, NULL, &MENU_SelectBikeComputer, MenuChange, MenuItemDrawName, NULL, 0 },
+		{ 200, 192, 0, 0, 0, (u_int8_t*)LT_MENU_SetUpBiker5 /*"Choose From..."*/, 0, 0, &PilotList, (void*)SelectPilot , SelectList , DrawList, NULL, 0 } ,
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 
-MENU	MENU_Save = { LT_MENU_Save0 /*"Save Menu"*/ , NULL , NULL , NULL, 0,
-					{ {	200 , 176, 0, 0, 0, LT_MENU_Save1 /*"Save Pickups"*/ , 0, 0, NULL, NULL , SavePickups , MenuItemDrawName, NULL, 0 } ,
-					  {	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
+MENU	MENU_Save = { (u_int8_t*)LT_MENU_Save0 /*"Save Menu"*/ , NULL , NULL , NULL, 0,
+					{ {	200 , 176, 0, 0, 0, (u_int8_t*)LT_MENU_Save1 /*"Save Pickups"*/ , 0, 0, NULL, NULL , SavePickups , MenuItemDrawName, NULL, 0 } ,
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
 
-MENU	MENU_Start = { "Forsaken" , InitStartMenu , NULL , NULL, 0,
+MENU	MENU_Start = { (u_int8_t*)"Forsaken" , InitStartMenu , NULL , NULL, 0,
 
-					{ OLDMENUITEM( 200 , 112,  "Set Up Biker  ", (void *)biker_name, &MENU_SetUpBiker, MenuChange, DrawNameVar ),
-					  OLDMENUITEM( 200 , 128, LT_MENU_InGame2,/*Toggle fullscreen*/ NULL, NULL , MenuGoFullScreen , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 144, "Single Player", NULL, &MENU_SinglePlayer , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 160, "Multi Player", NULL, &MENU_HostOrJoin , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 176, "Load Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 192, "Save Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 240, "Options", NULL, &MENU_Options , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 256, "Quit", NULL, NULL, SelectQuit , MenuItemDrawName ),
-					{ 200 , 272, 0, 0, 0, "New Menu System" , 0, 0, NULL, &MENU_NEW_Start, MenuChange , MenuItemDrawName, NULL, 0, 0 } ,
+					{ OLDMENUITEM( 200 , 112,  (u_int8_t*)"Set Up Biker  ", (void *)biker_name, &MENU_SetUpBiker, MenuChange, DrawNameVar ),
+					  OLDMENUITEM( 200 , 128, (u_int8_t*)LT_MENU_InGame2,/*Toggle fullscreen*/ NULL, NULL , MenuGoFullScreen , MenuItemDrawName ),
+					  OLDMENUITEM( 200 , 144, (u_int8_t*)"Single Player", NULL, &MENU_SinglePlayer , MenuChange , MenuItemDrawName ),
+					  OLDMENUITEM( 200 , 160, (u_int8_t*)"Multi Player", NULL, &MENU_HostOrJoin , MenuChange , MenuItemDrawName ),
+					  OLDMENUITEM( 200 , 176, (u_int8_t*)"Load Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
+					  OLDMENUITEM( 200 , 192, (u_int8_t*)"Save Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
+					  OLDMENUITEM( 200 , 240, (u_int8_t*)"Options", NULL, &MENU_Options , MenuChange , MenuItemDrawName ),
+					  OLDMENUITEM( 200 , 256, (u_int8_t*)"Quit", NULL, NULL, SelectQuit , MenuItemDrawName ),
+					{ 200 , 272, 0, 0, 0, (u_int8_t*)"New Menu System" , 0, 0, NULL, &MENU_NEW_Start, MenuChange , MenuItemDrawName, NULL, 0, 0 } ,
 
-					  {	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
 
-MENU	MENU_Host_Options = { "HOST OPTIONS FOR THIS GAME" , InitHostMenu , NULL , NULL,	0,
+MENU	MENU_Host_Options = { (u_int8_t*)"HOST OPTIONS FOR THIS GAME" , InitHostMenu , NULL , NULL,	0,
 			{
-					OLDMENUITEM( 200, 112, LT_MENU_InGame27		/*"collision perspective"		*/,	&ColPerspective,				NULL,								SelectToggle,	DrawColToggle),
-					OLDMENUITEM( 200, 128, LT_MENU_InGame36		/*"short packets"				*/,	&UseShortPackets,			NULL,								SelectToggle,	DrawToggle),
-					OLDMENUITEM( 200, 160, LT_MENU_Options5		/*"Packets Per Second"		*/,	(void*)&PacketsSlider,		NULL,								SelectSlider,	DrawSlider),
-					OLDMENUITEM( 200, 176, LT_MENU_InGame6		/*"Level Select"				*/,	NULL,								&MENU_LevelSelect,			MenuChange,	MenuItemDrawName),
-					OLDMENUITEM( 200, 192, LT_MENU_RemovePlayer	/*"remove player"				*/,	&HostPlayersList,				HostListPlayerSelected,		SelectList,		DrawList ),  
+					OLDMENUITEM( 200, 112, (u_int8_t*)LT_MENU_InGame27		/*"collision perspective"		*/,	&ColPerspective,				NULL,								SelectToggle,	DrawColToggle),
+					OLDMENUITEM( 200, 128, (u_int8_t*)LT_MENU_InGame36		/*"short packets"				*/,	&UseShortPackets,			NULL,								SelectToggle,	DrawToggle),
+					OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_Options5		/*"Packets Per Second"		*,	(void*)&PacketsSlider,		NULL,								SelectSlider,	DrawSlider),
+					OLDMENUITEM( 200, 176, (u_int8_t*)LT_MENU_InGame6		/*"Level Select"				*/,	NULL,								&MENU_LevelSelect,			MenuChange,	MenuItemDrawName),
+					OLDMENUITEM( 200, 192, (u_int8_t*)LT_MENU_RemovePlayer	/*"remove player"				*/,	&HostPlayersList,				(void*)HostListPlayerSelected,		SelectList,		DrawList ),  
 
-			{	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+			{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
 };
 
-MENU	MENU_Watch_Options = { LT_MENU_InGame24 /*"Watch Options"*/ , InitWatchList , NULL , NULL,	0,
+MENU	MENU_Watch_Options = { (u_int8_t*)LT_MENU_InGame24 /*"Watch Options"*/ , InitWatchList , NULL , NULL,	0,
 			{
-				OLDMENUITEM( 200, 112, LT_MENU_InGame24	/*"Watch Player"*/,	&HostPlayersList, WatchPlayerSelected, SelectList, DrawList ),  
-			{	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+				OLDMENUITEM( 200, 112, (u_int8_t*)LT_MENU_InGame24	/*"Watch Player"*/,	&HostPlayersList, (void*)WatchPlayerSelected, SelectList, DrawList ),  
+			{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
 };
 
-MENU	MENU_InGame = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGameMenu , NULL,	0,
+MENU	MENU_InGame = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGameMenu , NULL,	0,
 			{
-					  OLDMENUITEM( 200, 112, LT_MENU_InGame1  /*"Set Up Biker"				*/,	(void *)biker_name,			&MENU_SetUpBiker,		MenuChange,				DrawNameVar),
-					  OLDMENUITEM( 200, 128, LT_MENU_InGame2  /*"Toggle Full Screen"		*/,	NULL,						NULL,					MenuGoFullScreen,		MenuItemDrawName),
-					  OLDMENUITEM( 200, 144, LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
-					  OLDMENUITEM( 200, 160, LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 112, (u_int8_t*)LT_MENU_InGame1  /*"Set Up Biker"				*/,	(void *)biker_name,			&MENU_SetUpBiker,		MenuChange,				DrawNameVar),
+					  OLDMENUITEM( 200, 128, (u_int8_t*)LT_MENU_InGame2  /*"Toggle Full Screen"		*/,	NULL,						NULL,					MenuGoFullScreen,		MenuItemDrawName),
+					  OLDMENUITEM( 200, 144, (u_int8_t*)LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
 #if defined(__3DS__) && defined(RENDERER_C3D)
-					  OLDMENUITEM( 200, 176, "3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 176, (u_int8_t*)"3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
 #else
-					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 176, (u_int8_t*)LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
 #endif
 #if defined(__3DS__)
-					  OLDMENUITEM( 200, 208, "3DS Controls",                                NULL,                       NULL,                    SelectControlsRemap,    MenuItemDrawName),
+					  OLDMENUITEM( 200, 208, (u_int8_t*)"3DS Controls",                                NULL,                       NULL,                    SelectControlsRemap,    MenuItemDrawName),
 #endif
-					  OLDMENUITEM( 200, 192, LT_MENU_InGame26 /*"Host Options"				*/,	NULL,						&MENU_Host_Options,		MenuChange,				MenuItemDrawName),
-					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
-					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 192, (u_int8_t*)LT_MENU_InGame26 /*"Host Options"				*/,	NULL,						&MENU_Host_Options,		MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 224, (u_int8_t*)LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
+					  OLDMENUITEM( 200, 240, (u_int8_t*)LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
 				
- 					  OLDMENUITEM( 200, 256, LT_MENU_InGame24 /*"Watch Player"*/, NULL, &MENU_Watch_Options, MenuChange, MenuItemDrawName),
+ 					  OLDMENUITEM( 200, 256, (u_int8_t*)LT_MENU_InGame24 /*"Watch Player"*/, NULL, &MENU_Watch_Options, MenuChange, MenuItemDrawName),
 #ifndef EXTERNAL_DEMO
 #ifdef DEBUG_ON
-					  OLDMENUITEM( 200, 272, LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					DebugModeChanged,		SelectToggle,			DrawToggle),
+					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
 #endif
 #endif
-					  OLDMENUITEM( 200, 304, LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
-					  OLDMENUITEM( 200, 320, LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
 					
 					  
-					  {	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
 };
 
 
-MENU	MENU_InGameSingle = { LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGameMenu , NULL,	0,
+MENU	MENU_InGameSingle = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGameMenu , NULL,	0,
 			{
-					  OLDMENUITEM( 200, 112, LT_MENU_InGame1  /*"Set Up Biker"				*/,	(void *)biker_name,			&MENU_SetUpBiker,		MenuChange,				DrawNameVar),
+					  OLDMENUITEM( 200, 112, (u_int8_t*)LT_MENU_InGame1  /*"Set Up Biker"				*/,	(void *)biker_name,			&MENU_SetUpBiker,		MenuChange,				DrawNameVar),
 #ifndef __3DS__
-					  OLDMENUITEM( 200, 128, LT_MENU_InGame2  /*"Toggle Full Screen"		*/,	NULL,						NULL,					MenuGoFullScreen,		MenuItemDrawName),
+					  OLDMENUITEM( 200, 128, (u_int8_t*)LT_MENU_InGame2  /*"Toggle Full Screen"		*/,	NULL,						NULL,					MenuGoFullScreen,		MenuItemDrawName),
 #endif
-					  OLDMENUITEM( 200, 144, LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
-					  OLDMENUITEM( 200, 160, LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 144, (u_int8_t*)LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
 #if defined(__3DS__) && defined(RENDERER_C3D)
-					  OLDMENUITEM( 200, 176, "3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 176, (u_int8_t*)"3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
 #else
-					  OLDMENUITEM( 200, 176, LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 176, (u_int8_t*)LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
 #endif
 #if defined(__3DS__)
-					  OLDMENUITEM( 200, 208, "3DS Controls",                                NULL,                       NULL,                    SelectControlsRemap,    MenuItemDrawName),
+					  OLDMENUITEM( 200, 208, (u_int8_t*)"3DS Controls",                                NULL,                       NULL,                    SelectControlsRemap,    MenuItemDrawName),
 #endif
-					  OLDMENUITEM( 200, 224, LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
+					  OLDMENUITEM( 200, 224, (u_int8_t*)LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 #ifndef __3DS__
-					  OLDMENUITEM( 200, 240, LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 240, (u_int8_t*)LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
 #endif
 #ifndef EXTERNAL_DEMO
 #ifdef DEBUG_ON
-					  OLDMENUITEM( 200, 272, LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					DebugModeChanged,		SelectToggle,			DrawToggle),
+					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
 #endif
 #endif
-					  OLDMENUITEM( 200, 304, LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
-					  OLDMENUITEM( 200, 320, LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
+					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
 					  					  
-					  {	-1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
 };
 
 MENU	MENU_ForceAbort = {
-	"Sorry Directplay has forced you to quit due to 1 of its bugs" , NULL , NULL , NULL, 0,
+	(u_int8_t*)"Sorry Directplay has forced you to quit due to 1 of its bugs" , NULL , NULL , NULL, 0,
 	{
-		 OLDMENUITEM(200, 112, "Restart",	NULL,	&MENU_Start,	MenuChange,		MenuItemDrawName),
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		 OLDMENUITEM(200, 112, (u_int8_t*)"Restart",	NULL,	&MENU_Start,	MenuChange,		MenuItemDrawName),
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 
 
 MENU	MENU_GotoRoom = {
-	"Go to Specific Room" , InitDebugMenu, NULL, NULL, 0,
+	(u_int8_t*)"Go to Specific Room" , InitDebugMenu, NULL, NULL, 0,
 	{
-		{ 200, 128, 0, 0, 0, "Enter Room Name  ", 0, 0, &RoomName, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ 200, 144, 0, 0, 0, "Choose Room From...", 0, 0, &RoomList, ChooseRoom , SelectList , DrawList, NULL, 0 } ,
+		{ 200, 128, 0, 0, 0, (u_int8_t*)"Enter Room Name  ", 0, 0, &RoomName, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
+		{ 200, 144, 0, 0, 0, (u_int8_t*)"Choose Room From...", 0, 0, &RoomList, (void*)ChooseRoom , SelectList , DrawList, NULL, 0 } ,
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_DebugHelp =
 {
-	"Debug Help", NULL, NULL, NULL, 0,
+	(u_int8_t*)"Debug Help", NULL, NULL, NULL, 0,
 	{
-		HELPKEY( 200, 112, "S+F1",	"Toggle debug help screen" ),
-		HELPKEY( 200, 128, "S+F2",	"Increase FOV" ),
-		HELPKEY( 200, 144, "S+F3",	"Decrease FOV" ),
-		HELPKEY( 200, 160, "C+S+F2","Reset FOV" ),
-		HELPKEY( 200, 176, "S+F4",	"Go to specific room" ),
-		HELPKEY( 200, 192, "S+F5",	"Go to next start position" ),
-		HELPKEY( 200, 208, "S+F6",	"toggle object clipping" ),
-		HELPKEY( 200, 224, "S+F7",	"show bounding boxes" ),
-		HELPKEY( 200, 240, "S+F8",	"show external forces" ),
-		HELPKEY( 200, 256, "S+F9",	"Cycle portal display" ),
-		HELPKEY( 200, 272, "S+F10",	"show trigger zones" ),
-		HELPKEY( 200, 288, "S+F11",	"Cycle collision skin" ),
-		HELPKEY( 200, 304, "S+F12",	"Toggle collision detection" ),
+		HELPKEY( 200, 112, (u_int8_t*)"S+F1",	(u_int8_t*)"Toggle debug help screen" ),
+		HELPKEY( 200, 128, (u_int8_t*)"S+F2",	(u_int8_t*)"Increase FOV" ),
+		HELPKEY( 200, 144, (u_int8_t*)"S+F3",	(u_int8_t*)"Decrease FOV" ),
+		HELPKEY( 200, 160, (u_int8_t*)"C+S+F2",(u_int8_t*)"Reset FOV" ),
+		HELPKEY( 200, 176, (u_int8_t*)"S+F4",	(u_int8_t*)"Go to specific room" ),
+		HELPKEY( 200, 192, (u_int8_t*)"S+F5",	(u_int8_t*)"Go to next start position" ),
+		HELPKEY( 200, 208, (u_int8_t*)"S+F6",	(u_int8_t*)"toggle object clipping" ),
+		HELPKEY( 200, 224, (u_int8_t*)"S+F7",	(u_int8_t*)"show bounding boxes" ),
+		HELPKEY( 200, 240, (u_int8_t*)"S+F8",	(u_int8_t*)"show external forces" ),
+		HELPKEY( 200, 256, (u_int8_t*)"S+F9",	(u_int8_t*)"Cycle portal display" ),
+		HELPKEY( 200, 272, (u_int8_t*)"S+F10",	(u_int8_t*)"show trigger zones" ),
+		HELPKEY( 200, 288, (u_int8_t*)"S+F11",	(u_int8_t*)"Cycle collision skin" ),
+		HELPKEY( 200, 304, (u_int8_t*)"S+F12",	(u_int8_t*)"Toggle collision detection" ),
 
-		HELPKEY( 200, 320, "C+F1",	"show teleports" ),
-		HELPKEY( 200, 336, "S+F2",	"show trigger zones" ),
+		HELPKEY( 200, 320, (u_int8_t*)"C+F1",	(u_int8_t*)"show teleports" ),
+		HELPKEY( 200, 336, (u_int8_t*)"S+F2",	(u_int8_t*)"show trigger zones" ),
 
-		{ 200, 352, 0, 0, 0, "Return to game", 0, 0, NULL, NULL, MenuItemBack, MenuItemDrawName, NULL, 0 },
+		{ 200, 352, 0, 0, 0, (u_int8_t*)"Return to game", 0, 0, NULL, NULL, MenuItemBack, MenuItemDrawName, NULL, 0 },
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_Help =
 {
-	LT_MENU_Help0/*"In-Game Help"*/, NULL, NULL, NULL, 0,
+	(u_int8_t*)LT_MENU_Help0/*"In-Game Help"*/, NULL, NULL, NULL, 0,
 	{							 
-		HELPKEY( 200, 112, "ESC",LT_MENU_Help1	/*"Toggle menu"*/ ),
-		HELPKEY( 200, 128, "F1", LT_MENU_Help2	/*"Toggle help screen" */),
-		HELPKEY( 200, 144, "F2", LT_MENU_Help3	/*"Increase window size" */),
-		HELPKEY( 200, 160, "F3", LT_MENU_Help4	/*"Decrease window size" */),
-		HELPKEY( 200, 176, "F4", LT_MENU_Help5	/*"Toggle panel text" */),
-		HELPKEY( 200, 192, "F5", LT_MENU_Help6	/*"Toggle remote camera"*/ ),
-		HELPKEY( 200, 208, "F6", LT_MENU_Help7	/*"Toggle rear camera" */),
-		HELPKEY( 200, 224, "F7", LT_MENU_Help8	/*"Toggle missile camera"*/ ),
-		HELPKEY( 200, 240, "F8", LT_MENU_Help9	/*"Toggle player names" */),
+		HELPKEY( 200, 112, (void*)"ESC",(u_int8_t*)LT_MENU_Help1	/*"Toggle menu"*/ ),
+		HELPKEY( 200, 128, (void*)"F1", (u_int8_t*)LT_MENU_Help2	/*"Toggle help screen" */),
+		HELPKEY( 200, 144, (void*)"F2", (u_int8_t*)LT_MENU_Help3	/*"Increase window size" */),
+		HELPKEY( 200, 160, (void*)"F3", (u_int8_t*)LT_MENU_Help4	/*"Decrease window size" */),
+		HELPKEY( 200, 176, (void*)"F4", (u_int8_t*)LT_MENU_Help5	/*"Toggle panel text" */),
+		HELPKEY( 200, 192, (void*)"F5", (u_int8_t*)LT_MENU_Help6	/*"Toggle remote camera"*/ ),
+		HELPKEY( 200, 208, (void*)"F6", (u_int8_t*)LT_MENU_Help7	/*"Toggle rear camera" */),
+		HELPKEY( 200, 224, (void*)"F7", (u_int8_t*)LT_MENU_Help8	/*"Toggle missile camera"*/ ),
+		HELPKEY( 200, 240, (void*)"F8", (u_int8_t*)LT_MENU_Help9	/*"Toggle player names" */),
 
-		{ 200, 272, 0, 0, 0, LT_MENU_Help10/*"Return to game"*/, 0, 0, NULL, NULL, MenuItemBack, MenuItemDrawName, NULL, 0 },
+		{ 200, 272, 0, 0, 0, (u_int8_t*)LT_MENU_Help10/*"Return to game"*/, 0, 0, NULL, NULL, MenuItemBack, MenuItemDrawName, NULL, 0 },
 
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
+		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
@@ -3201,7 +3208,7 @@ MENUITEM * CurrentMenuItem = NULL;
 
 /* Called from input_3ds.c to check if a menu is open without
  * pulling in the full title.h dependency chain. */
-int _3ds_is_menu_open(void) { return CurrentMenu != NULL; }
+extern "C" int _3ds_is_menu_open(void) { return CurrentMenu != NULL; }
 TEXTINFO * HighlightItem[MAXHIGHLIGHTITEMS];
 int HighlightStatus[MAXHIGHLIGHTITEMS];
 int CurrentHighlightItem;
@@ -3370,7 +3377,7 @@ float	TEXTINFO_TextSpace;
 float	TEXTINFO_LineSpace;				
 int		TEXTINFO_currentstartpoint;			
 int		TEXTINFO_currentendpoint;
-int CurrentTextItem;
+extern int CurrentTextItem;
 u_int16_t testboxpoly;	
 u_int16_t TextLookup[NUMSCREENFONTS][256];		
 int character = 0;
@@ -3651,7 +3658,7 @@ TITLE_EVENT_TIMER Title_Timers[MAXTITLETIMERS] = {
 	{-1.0F, -1.0F, TITLE_EVENT_TIMER_IDLE, NULL}
 };
 
-extern bool InitView( void );
+extern "C" bool InitView( void );
 extern bool render_mode_select( render_info_t * info );
 bool RenderModeSelect( int mode, bool fullscreen, bool vsync )
 {
@@ -3693,7 +3700,7 @@ DebugPrintf("2 vsync = %d\n",render_info.vsync);
 }
 
 extern bool render_reset( render_info_t * info );
-bool RenderModeReset( void )
+extern "C" bool RenderModeReset( void )
 {
 	if(!render_reset( &render_info ))
 		return true;
@@ -4969,7 +4976,7 @@ Display Solid Lines
 	Input		:		nothing...
 	Output		:		bool true/false
 ===================================================================*/
-bool IpOnCLI;
+extern bool IpOnCLI;
 bool DisplayTitle(void)
 {
 #if 1 // bjd - CHECK IMPORTANT
@@ -5354,7 +5361,7 @@ void	MenuItemDrawName( MENUITEM * Item )
 		x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 		y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-		Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+		Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 	}
 }
 
@@ -5370,13 +5377,13 @@ void	MenuItemDrawPageName( MENUITEM * Item )
 	int	y;;
 	int page;
 
-	page = (int) Item->Value;
+	page = (int)(intptr_t) Item->Value;
 	if ( Item->StrPnt && page == CurrentPage )
 	{
 		x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 		y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-		Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+		Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 	}
 }
 
@@ -5603,7 +5610,7 @@ void DrawNameVar( MENUITEM * Item )
 	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-	Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 	var = (char *)(Item->Variable);
 	Print4x5Text( var, -1 , y , 1 );
 
@@ -5642,7 +5649,7 @@ void	DrawHelpKey( MENUITEM * Item )
 	if ( key )
 		Print4x5Text( key, x , y , 1 );
 	x = (int) ( ( ( Item->x + 64 ) >> 1 ) * ModeScaleX );
-	Print4x5Text( Item->StrPnt , x, y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt , x, y , InGameMenuColour );
 }
 
 
@@ -5664,7 +5671,7 @@ void MenuDraw( MENU * Menu )
 
 	//if ( (CameraStatus != CAMERA_AtDiscs) && (CameraStatus != CAMERA_AtVDU))
 	if (CameraStatus == CAMERA_AtStart)
-		CenterPrint4x5Text( Menu->Name , y , InGameMenuColour );
+		CenterPrint4x5Text( (char*)Menu->Name , y , InGameMenuColour );
 
 	// only use menu item draw functions if not at VDU
 	if ((CameraStatus != CAMERA_AtLeftVDU) && (CameraStatus != CAMERA_AtRightVDU))
@@ -6211,13 +6218,13 @@ void CursorSearch( char *keyword )
 		{
 			if ( ( ( item->x > x ) || ( item->y > y ) )
 				&& ( !next || ( ( abs( item->x - x ) + abs( item->y - y ) ) <= ( abs( next->x - x ) + abs( next->y - y ) ) ) )
-				&& item->StrPnt && !strncasecmp( item->StrPnt, keyword, keyword_len ) )
+				&& item->StrPnt && !strncasecmp( (char*)item->StrPnt, keyword, keyword_len ) )
 			{
 				next = item;
 			}
 			if ( ( ( item->x < x ) || ( item->y < y ) )
 				&& ( !wrap || ( ( abs( item->x - x ) + abs( item->y - y ) ) >= ( abs( wrap->x - x ) + abs( wrap->y - y ) ) ) )
-				&& item->StrPnt && !strncasecmp( item->StrPnt, keyword, keyword_len ) )
+				&& item->StrPnt && !strncasecmp( (char*)item->StrPnt, keyword, keyword_len ) )
 			{
 				wrap = item;
 			}
@@ -6430,7 +6437,7 @@ void SetKeyDefPage( int page )
 	{
 		if ( item->FuncDraw == DrawKeyDef )
 		{
-			item->FuncSelect = ( (int) item->Value == CurrentPage ) ? SelectKeyDef : NULL;
+			item->FuncSelect = ( (int)(intptr_t) item->Value == CurrentPage ) ? SelectKeyDef : NULL;
 		}
 	}
 	CurrentMenuItem = CurrentMenu->Item;
@@ -6675,7 +6682,7 @@ void DrawSlider( MENUITEM *Item )
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
 	// text label for the slider
-	Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 
 	// print a space and get the start position
 	sx = Print4x5Text( " ", -1, y, InGameMenuColour );
@@ -6709,7 +6716,7 @@ void SelectRadioButton( MENUITEM *Item )
 {
 	if ( Item->Variable )
 	{
-		*((int *)(Item->Variable)) = (int) Item->Value;
+		*((int *)(Item->Variable)) = (int)(intptr_t) Item->Value;
 	}
 }
 
@@ -6730,15 +6737,15 @@ void DrawRadioButton( MENUITEM *Item )
 
 	if ( Item->Variable )
 	{
-		if ( *((int *)(Item->Variable)) == (int) Item->Value )
+		if ( *((int *)(Item->Variable)) == (int)(intptr_t) Item->Value )
 		{
 			// draw selected item
-			Print4x5Text( Item->StrPnt , x , y , 1 );
+			Print4x5Text( (char*)Item->StrPnt , x , y , 1 );
 		}
 		else
 		{
 			// draw unselected item
-			Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+			Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 		}
 	}
 }
@@ -6780,7 +6787,7 @@ void DrawToggle( MENUITEM *Item )
 	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-	Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 	if ( Item->Variable )
 	{
 		if ( *(bool *)(Item->Variable ) )
@@ -6807,7 +6814,7 @@ void DrawColToggle( MENUITEM *Item )
 	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-	Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 
 	if ( ColPerspective == COLPERS_Forsaken )
 		Print4x5Text( LT_ToggleShooter/*" SHOOTER"*/, -1 , y , 1 );
@@ -6841,7 +6848,7 @@ void DrawMatureContentToggle( MENUITEM *Item )
 	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-	Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 	if ( Item->Variable )
 	{
 		switch(*(int*)(Item->Variable ))
@@ -6885,7 +6892,7 @@ void DrawMessagesToggle( MENUITEM *Item )
 	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-	Print4x5Text( Item->StrPnt , x , y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt , x , y , InGameMenuColour );
 	if ( Item->Variable )
 	{
 		switch(*(int*)(Item->Variable ))
@@ -7021,7 +7028,7 @@ void DrawKeyDef( MENUITEM *Item )
 	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 
-	page = (int) Item->Value;
+	page = (int)(intptr_t) Item->Value;
 	if ( Item->Variable && page == CurrentPage )
 	{
 		keydef = (DEFKEY *)(Item->Variable);
@@ -7064,8 +7071,8 @@ void DrawKeyDef( MENUITEM *Item )
 	Output		:		Nothing
 ===================================================================*/
 
-extern bool InitView(void);
-extern void ReleaseView(void);
+extern "C" bool InitView(void);
+extern "C" void ReleaseView(void);
 void ExitDetailLevels( MENU *Menu )
 {
 	SetGamePrefs();
@@ -7156,7 +7163,7 @@ void MoveConfigFile( MENU *Menu )
 void InitBikeList( MENU *Menu )
 {
 	BikeList.selected_item = ValidBikeSelected( SelectedBike );
-	strcpy(bike_name,BikeList.item[BikeList.selected_item]);
+	strcpy(bike_name,(char*)BikeList.item[BikeList.selected_item]);
 }
 
 
@@ -7264,7 +7271,7 @@ void InitPilotList( void )
 	do{
 
         // the next empty pilot slot to fill in
-		bname = PilotList.item[PilotList.items];
+		bname = (char*)PilotList.item[PilotList.items];
 
 		// size of the pilot name
 		j = strlen( fname ) - strlen( ".txt" );
@@ -7292,7 +7299,7 @@ void InitPilotList( void )
 	for ( j = 0; j < PilotList.items; j++ )
 	{
 		// 
-		if ( !strcasecmp( PilotList.item[ j ], biker_name ) )
+		if ( !strcasecmp( (char*)PilotList.item[ j ], biker_name ) )
 			PilotList.selected_item = j;
 	}
 
@@ -7565,7 +7572,7 @@ void GetBikeDetails(int Bike, MENUITEM *item)
 	SelectedBikeFrame = BikeChars[ Bike ];
 	SelectedBikeModel = BikeModelLookup[ Bike ];
 	SelectedBikeScale = BikeModelScale[ Bike ];
-	strcpy(bike_name,BikeList.item[ Bike ]);
+	strcpy(bike_name,(char*)BikeList.item[ Bike ]);
 	if ( WhoIAm != (u_int8_t) -1 )
 		Ships[ WhoIAm ].BikeNum = Bike;
 }
@@ -7579,7 +7586,7 @@ void SelectPilot( MENUITEM *item )
 {
 	if ( PilotList.selected_item >= 0 && PilotList.selected_item < PilotList.items )
 	{
-		InitBikerName( PilotList.item[ PilotList.selected_item ] );
+		InitBikerName( (char*)PilotList.item[ PilotList.selected_item ] );
 		read_config( player_config, biker_config );
 
 		if ( player_config->bike > ( BikeList.items - 1 ) )
@@ -7677,7 +7684,7 @@ void DrawList( MENUITEM *Item )
 	if ( !l )
 		return;
 
-	Print4x5Text( Item->StrPnt, x , y , InGameMenuColour );
+	Print4x5Text( (char*)Item->StrPnt, x , y , InGameMenuColour );
 	x += (int) ( ( 16 >> 1 ) * ModeScaleX );
 	for ( j = 0; j < l->display_items; j++ )
 	{
@@ -7689,7 +7696,7 @@ void DrawList( MENUITEM *Item )
 		else
 			colour = InGameMenuColour;
 		y += (int) ( (16 >> 1) * ModeScaleY );
-		Print4x5Text( l->item[ it ], x , y , colour );
+		Print4x5Text( (char*)l->item[ it ], x , y , colour );
 	}
 }
 
@@ -7787,11 +7794,11 @@ void SelectListSearch( LIST *l, char *keyword )
 	wrap = -1;
 	for ( item = 0; item < l->items; item++ )
 	{
-		if ( ( item >= l->selected_item ) && ( next == -1 ) && !strncasecmp( l->item[ item ], keyword, keyword_len ) )
+		if ( ( item >= l->selected_item ) && ( next == -1 ) && !strncasecmp( (char*)l->item[ item ], keyword, keyword_len ) )
 		{
 			next = item;
 		}
-		if ( ( item < l->selected_item ) && ( wrap == -1 ) && !strncasecmp( l->item[ item ], keyword, keyword_len ) )
+		if ( ( item < l->selected_item ) && ( wrap == -1 ) && !strncasecmp( (char*)l->item[ item ], keyword, keyword_len ) )
 		{
 			wrap = item;
 		}
@@ -7858,7 +7865,7 @@ void CancelListSelection( LIST *l )
 
 void MenuEnterTextInputState(int state)
 {
-	MenuState = state;
+	MenuState = (MENUSTATE)state;
 // TODO is this right ?
 #if SDL_VERSION_ATLEAST(2,0,0)
 	SDL_StartTextInput();
@@ -7911,7 +7918,7 @@ void DrawTextItem( MENUITEM *Item )
 
 	// print the initial message (e.g., "whisper message: ") and get
 	// the start x position for the user text
-	tx = Print4x5Text( Item->StrPnt, x , y , InGameMenuColour );
+	tx = Print4x5Text( (char*)Item->StrPnt, x , y , InGameMenuColour );
 
 	// get the text message
 	t = (TEXT *)(Item->Variable);
@@ -7952,13 +7959,13 @@ void GetVduTextFormattingInfo (TEXT *t)
 {
 	t->VDU_insert_pos = 0;
 	
-	TextItem->TextInfo[1]->text = t->text;
+	TextItem->TextInfo[1]->text = (u_int8_t*)t->text;
 	PrintTextItem( TextItem->TextInfo[1] );
 
 	while ((TextItem->TextInfo[1]->endpoint[0] - TextItem->TextInfo[1]->startpoint[0]) < t->insert_pos - t->VDU_insert_pos - 1)
 	{
 		t->VDU_insert_pos++;
-		TextItem->TextInfo[1]->text = &t->text[t->VDU_insert_pos];
+		TextItem->TextInfo[1]->text = (u_int8_t*)&t->text[t->VDU_insert_pos];
 		PrintTextItem( TextItem->TextInfo[1] );
 	}
 
@@ -8044,7 +8051,7 @@ void TextCancel( TEXT *t )
 
 	if (MenuState == MENUSTATE_Text2)
 	{
-		TextItem->TextInfo[1]->text = t->text;
+		TextItem->TextInfo[1]->text = (u_int8_t*)t->text;
 		PrintTextItem( TextItem->TextInfo[1] );
 	}
 }
@@ -8082,7 +8089,7 @@ void InitBikerName( char *name )
 \********************************************/
 
 
-void GetDefaultPilot(void)
+extern "C" void GetDefaultPilot(void)
 {
 
 	// pointer to a char
@@ -8209,7 +8216,7 @@ void InitInGameMenu( MENU *Menu )
 		}
 
 		if ( item->FuncSelect == SelectQuitCurrentGame )
-				item->StrPnt = LT_QuitToMainMenu/*"Quit to Main Menu"*/;
+				item->StrPnt = (u_int8_t*)LT_QuitToMainMenu/*"Quit to Main Menu"*/;
 
 		if ( item->Value == &MENU_LevelSelect )
 		{
@@ -8342,7 +8349,7 @@ void InitMultiplayerHostVDUPeerPeer( MENU *Menu )
 		for ( i = 0; i < LevelList.items; i++ )
 		{
 			//DebugPrintf("level select: testing level %d: %s\n",i,LevelList.item[i]);
-			if ( !strncasecmp( LevelList.item[ i ], level_name, 7 ) )
+			if ( !strncasecmp( (char*)LevelList.item[ i ], level_name, 7 ) )
 			{
 				DebugPrintf("level select: found last level at index %d\n",i);
 				selected_level = (u_int16_t) i;
@@ -8396,7 +8403,7 @@ void ExitMultiplayerHostVDUPeerPeer ( MENU *Menu )
 void RedrawMultiplayerHostVDUPeerPeer( int * i )
 {
 	strncpy( GameTypeName, GameTypeNameTable[ GameType ], sizeof(GameTypeName) );
-	config_set_str( "LevelName", LevelList.item[ LevelList.selected_item ] );
+	config_set_str( "LevelName", (char*)LevelList.item[ LevelList.selected_item ] );
 }
 
 void LoadLevelText( MENU *Menu )
@@ -8409,7 +8416,7 @@ void LoadLevelText( MENU *Menu )
 	if ( !f )
 	{
 	 	SelectedLevelText[ 0 ] = 0;
-		strncpy( SelectedLevel, LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
+		strncpy( SelectedLevel, (char*)LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
 		return;
 	}
 
@@ -8420,7 +8427,7 @@ void LoadLevelText( MENU *Menu )
 		if ( ferror( f ) != 0 )
 		{
 		 	SelectedLevel[ 0 ] = 0;
-			strncpy( SelectedLevel, LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
+			strncpy( SelectedLevel, (char*)LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
 			fclose( f );
 			return;
 		}
@@ -8472,12 +8479,12 @@ void GetSavedGameData( void )
 	CurrentSavedGameEnemiesKilled[0] = 0;
 
 #ifdef SAVEGAME_SLOTS
-	strcpy( filename, SaveGameFileName( LoadSavedGameList.selected_item ) );
+	strcpy( (char*)filename, SaveGameFileName( LoadSavedGameList.selected_item ) );
 #else
 	sprintf(filename, "savegame\\%s", LoadSavedGameList.item[ LoadSavedGameList.selected_item ] ); 
 #endif
 
-	if ( file_time( filename, &ftime ) )
+	if ( file_time( (char*)filename, &ftime ) )
 		sprintf( CurrentSavedGameDate, "saved %d-%d-%d at %2d:%02d", ftime.month, ftime.day, ftime.year, ftime.hour, ftime.minute );
 	else
 	{
@@ -8489,7 +8496,7 @@ void GetSavedGameData( void )
 #endif
 	}
 
-	fp = file_open( filename, "r" );
+	fp = file_open( (char*)filename, "r" );
 
 	if( fp )
 	{
@@ -8534,8 +8541,8 @@ void GetSavedGameData( void )
 
 		fclose( fp );
 
-		sprintf( CurrentSavedGameLevel, LT_LevelName/*"level name: %s"*/, GetMissionName( buf ) );
-		if ( strcasecmp( biker, DEFAULT_PLAYER_NAME ) )
+		sprintf( CurrentSavedGameLevel, LT_LevelName/*"level name: %s"*/, GetMissionName( (char*)buf ) );
+		if ( strcasecmp( (char*)biker, (char*)DEFAULT_PLAYER_NAME ) )
 			sprintf( CurrentSavedGameTimeLevelPlayed, LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
 		else
 			sprintf( CurrentSavedGameTimeLevelPlayed, LT_LevelPlayedFor2/*"played for %hd mins %hd secs"*/, Hours * 60 + Minutes, Seconds );
@@ -8548,12 +8555,12 @@ void GetSavedGameData( void )
 #endif
 	}
 
-	ext = strstr( filename, SAVEGAME_EXTENSION );
+	ext = strstr( (char*)filename, SAVEGAME_EXTENSION );
 	strcpy( ext, SAVEGAMEPIC_EXTENSION );
 
-	if ( File_Exists( filename ) )
+	if ( File_Exists( (char*)filename ) )
 	{
-		LoadSavedGamePic( filename );
+		LoadSavedGamePic( (char*)filename );
 	}else
 	{
 		// ensure normal tv is displayed
@@ -8717,7 +8724,7 @@ void ExitBikeSelection( MENUITEM * item )
 	player_config->bike = Config.bike;
 	ForceConfigSave = false;
 	write_config( player_config, biker_config );
-	strcpy(bike_name,BikeList.item[BikeList.selected_item]);
+	strcpy(bike_name,(char*)BikeList.item[BikeList.selected_item]);
 	AddBikeArrow( bike_name, SelectedBike );
 	strcpy(biker_text,BikerText[BikeList.selected_item]);
 	if ( WhoIAm != (u_int8_t) -1 )
@@ -8800,9 +8807,9 @@ void MakeModeList( MENU *Menu )
 		{
 			WhichMode[ModeList.items] = i;
 			if(i==0)
-				sprintf( &ModeList.item[ModeList.items][0], "default");
+				sprintf( (char*)&ModeList.item[ModeList.items][0], "default");
 			else
-				sprintf( &ModeList.item[ModeList.items][0], "%d x %d" ,
+				sprintf( (char*)&ModeList.item[ModeList.items][0], "%d x %d" ,
 					render_info.Mode[i].w , render_info.Mode[i].h );
 
 			if( (render_info.Mode[i].w == render_info.ThisMode.w) &&				
@@ -8861,7 +8868,7 @@ void InitDebugMenu( MENU *Menu )
 {
 	InitRoomList();
 	if ( RoomList.selected_item >= 0 && RoomList.selected_item < RoomList.items )
-		strncpy( RoomName.text, RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) );
+		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) );
 }
 
 
@@ -8875,7 +8882,7 @@ void InitRoomList( void )
 		RoomList.selected_item = -1;
 		for ( j = 0; j < RoomList.items; j++ )
 		{
-			strncpy( RoomList.item[ j ], Mloadheader.Group[ j ].name, sizeof( RoomList.item[ j ] ) );
+			strncpy( (char*)RoomList.item[ j ], Mloadheader.Group[ j ].name, sizeof( RoomList.item[ j ] ) );
 			if ( WhoIAm != (u_int8_t) -1 && Ships[WhoIAm].Object.Group == j )
 				RoomList.selected_item = j;
 		}
@@ -8910,14 +8917,14 @@ void ChooseRoom( MENUITEM *item )
 {
 	if ( RoomList.selected_item < 0 || RoomList.selected_item >= Mloadheader.num_groups )
 		return; // abort if invalid room
-	if ( GotoRoom( WhoIAm, RoomList.item[ RoomList.selected_item ] ) )
+	if ( GotoRoom( WhoIAm, (char*)(char*)RoomList.item[ RoomList.selected_item ] ) )
 	{
-		strncpy( RoomName.text, RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) );
-		AddColourMessageToQue( SystemMessageColour, "You are now in %s", RoomList.item[ RoomList.selected_item ] );
+		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) );
+		AddColourMessageToQue( SystemMessageColour, "You are now in %s", (char*)RoomList.item[ RoomList.selected_item ] );
 	}
 	else
 	{
-		AddColourMessageToQue( SystemMessageColour, "Could not find %s", RoomList.item[ RoomList.selected_item ] );
+		AddColourMessageToQue( SystemMessageColour, "Could not find %s", (char*)RoomList.item[ RoomList.selected_item ] );
 		AddColourMessageToQue( SystemMessageColour, "You are still in %s", Mloadheader.Group[ Ships[WhoIAm].Object.Group ].name );
 	}
 	MenuExit();
@@ -8930,13 +8937,13 @@ void DebugModeChanged( MENUITEM *item )
 {
 	if( DebugInfo )
 	{
-		strcpy( &MacroText4.text[0], &DebuggingString[0] );
+		strcpy( (char*)&MacroText4.text[0], (char*)&DebuggingString[0] );
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
 		if( !GodMode ) ToggleGodMode( NULL );
 	}
 	else
 	{
-		strcpy( &MacroText4.text[0], &NotDebuggingString[0] );
+		strcpy( (char*)&MacroText4.text[0], (char*)&NotDebuggingString[0] );
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
 		if( GodMode ) ToggleGodMode( NULL );
 	}
@@ -8989,7 +8996,7 @@ void InitLoadSavedGameList( MENU * Menu )
 		char *gameinfo;
 
 		gameinfo = SavedGameInfo( LoadSavedGameList.items );
-		strncpy( LoadSavedGameList.item[ LoadSavedGameList.items ], gameinfo, sizeof( LoadSavedGameList.item[ 0 ] ) - 1 );
+		strncpy( (char*)LoadSavedGameList.item[ LoadSavedGameList.items ], gameinfo, sizeof( LoadSavedGameList.item[ 0 ] ) - 1 );
 		LoadSavedGameList.item[ LoadSavedGameList.items ][ sizeof( LoadSavedGameList.item[ 0 ] ) - 1 ] = 0;
 		LoadSavedGameList.items++;
 	}
@@ -9113,7 +9120,7 @@ void ExitLevelSelect( MENU * Menu )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-extern void InitValidPickups();
+extern "C" void InitValidPickups();
 void GetGamePrefs( void )
 {
 	// default allow all pickups
@@ -9274,10 +9281,10 @@ void GetGamePrefs( void )
 
 	// Stereo options
 	render_info.stereo_enabled = config_get_bool( "StereoEnabled", false );
-	render_info.stereo_mode = config_get_float( "StereoMode", STEREO_MODE_COLOR );
+	render_info.stereo_mode = (stereo_mode_t)config_get_float( "StereoMode", STEREO_MODE_COLOR );
 	render_info.stereo_eye_sep = config_get_float( "StereoEyeSep", 20 );
 	render_info.stereo_focal_dist = config_get_float( "StereoFocalDist", 750 );
-	render_info.stereo_right_color = config_get_float( "StereoRightColor", ST_CYAN );
+	render_info.stereo_right_color = (stereo_right_color_t)config_get_float( "StereoRightColor", ST_CYAN );
 
 	// initialize sliders to above values
 	StereoColorSlider.value = render_info.stereo_right_color;
@@ -9986,7 +9993,7 @@ void DrawFlatMenuListText ( MENUITEM *Item )
 
 		current = l->top_item + i;
 		if (current >= l->items)
-		{	TextInfo->text = EmptyString;
+		{	TextInfo->text = (u_int8_t*)EmptyString;
 			PrintTextItem(TextInfo);
 			continue;
 		}
@@ -10025,7 +10032,7 @@ void AddToFlatMenuList( MENUITEM *Item )
 		{
 			if (TextInfo->text != (u_int8_t*)EmptyString)
 			{	
-				TextInfo->text = EmptyString;
+				TextInfo->text = (u_int8_t*)EmptyString;
 				PrintTextItem(TextInfo);
 			}
 		}
@@ -10033,14 +10040,14 @@ void AddToFlatMenuList( MENUITEM *Item )
 		{
 			if (!TextInfo->text)
 			{
-				strncpy( l->old_item[current] , l->item[current] , sizeof(l->item[0])  );
+				strncpy( (char*)l->old_item[current] , (char*)l->item[current] , sizeof(l->item[0])  );
 				TextInfo->text = l->old_item[current];
 				PrintTextItem(TextInfo);
 			}else
 			{
-				if (strcmp( TextInfo->text, l->item[current] ) != 0)		// if text has changed
+				if (strcmp( (char*)TextInfo->text, (char*)l->item[current] ) != 0)		// if text has changed
 				{
-					strncpy( l->old_item[current] , l->item[current] , sizeof(l->item[0])  );
+					strncpy( (char*)l->old_item[current] , (char*)l->item[current] , sizeof(l->item[0])  );
 
 					TextInfo->text = l->old_item[current];
 					PrintTextItem(TextInfo);
@@ -10098,7 +10105,7 @@ void DrawFlatMenuList( MENUITEM *Item )
 	for (i=0; i < l->display_items; i++)
 	{
 
-		strncpy( l->old_item[i] , EmptyString , sizeof(l->item[0])  );
+		strncpy( (char*)l->old_item[i] , EmptyString , sizeof(l->item[0])  );
 		
 		Item->TextInfo[i] = InitTextInfo();
 
@@ -10144,7 +10151,7 @@ void DrawSplitMenuList( MENUITEM *Item )
 		for (i=0; i < l->display_items / 2; i++)
 		{
 
-			strncpy( l->old_item[i + column * (l->display_items / 2)] , EmptyString , sizeof(l->item[0])  );
+			strncpy( (char*)l->old_item[i + column * (l->display_items / 2)] , EmptyString , sizeof(l->item[0])  );
 		
 			Item->TextInfo[i + column * (l->display_items / 2)] = InitTextInfo();
 
@@ -10187,7 +10194,7 @@ void DrawFlatTextStatus( MENUITEM *Item )
 	TextInfo->font = Item->font;
 	TextInfo->flags = Item->highlightflags;
 
-	TextInfo->text = t->text;
+	TextInfo->text = (u_int8_t*)t->text;
 	
 	//format text item...
 	PrintTextItem(TextInfo);
@@ -10208,8 +10215,8 @@ void DrawFlatMenuText( MENUITEM *Item )
 	DrawFlatTextStatus( Item );
 }
 /*
-		{ 0,160, 10 , 170, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawLeftArrow, NULL, 0 } ,
-		{ 190,160, 200 , 170, 0, "", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawRightArrow, NULL, 0 } ,
+		{ 0,160, 10 , 170, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawLeftArrow, NULL, 0 } ,
+		{ 190,160, 200 , 170, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawRightArrow, NULL, 0 } ,
 */
 
 void DrawLeftArrow( MENUITEM *Item )
@@ -10229,7 +10236,7 @@ void DrawLeftArrow( MENUITEM *Item )
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
-		TextInfo->text = (char *)malloc( sizeof( char ) * 2 );
+		TextInfo->text = (u_int8_t*)malloc( sizeof( char ) * 2 );
 		TextInfo->text[ 0 ] = 17;
 		TextInfo->text[ 1 ] = 0;
 
@@ -10266,7 +10273,7 @@ void DrawRightArrow( MENUITEM *Item )
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
-		TextInfo->text = (char *)malloc( sizeof( char ) * 2);
+		TextInfo->text = (u_int8_t*)malloc( sizeof( char ) * 2);
 		TextInfo->text[ 0 ] = 16;
 		TextInfo->text[ 1 ] = 0;
 
@@ -10332,7 +10339,7 @@ void DrawConditionalName( MENUITEM *Item )
 
 void DrawReadyStatus(MENUITEM *Item)
 {
-	Item->TextInfo[0]->text = (PlayerReady[WhoIAm]) ? WaitingForReset : WaitingForConfirm;
+	Item->TextInfo[0]->text = (PlayerReady[WhoIAm]) ? (u_int8_t*)WaitingForReset  : (u_int8_t*)WaitingForConfirm;
 	PrintTextItem(Item->TextInfo[0]);
 }
 
@@ -10369,12 +10376,12 @@ TEXTINFO * DrawFlatRadioBtnStatus( MENUITEM *Item )
 		TextInfo->font = Item->font;
 		TextInfo->flags = Item->highlightflags;
 
-		if ( *((int *)(Item->Variable)) == (int) Item->Value )
+		if ( *((int *)(Item->Variable)) == (int)(intptr_t) Item->Value )
 		{
-			TextInfo->text = RadioBtnSelected;
+			TextInfo->text = (u_int8_t*)RadioBtnSelected;
 		}else
 		{
-			TextInfo->text = RadioBtnNotSelected;
+			TextInfo->text = (u_int8_t*)RadioBtnNotSelected;
 		}
 	
 		//format text item...
@@ -10402,7 +10409,7 @@ TEXTINFO * DrawFlatToggleStatus( MENUITEM *Item )
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[1];
 
-	TextInfo->text = status;
+	TextInfo->text = (u_int8_t*)status;
 	TextInfo->xmin = Item->xmax + 5;
 	TextInfo->ymin = Item->y;
 	TextInfo->xmax = Item->xmax + 45;
@@ -10433,7 +10440,7 @@ TEXTINFO * DrawColFlatToggleStatus( MENUITEM *Item )
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[1];
 
-	TextInfo->text = status;
+	TextInfo->text = (u_int8_t*)status;
 	TextInfo->xmin = Item->xmax + 5;
 	TextInfo->ymin = Item->y;
 	TextInfo->xmax = Item->xmax + 45;
@@ -10547,7 +10554,7 @@ void CheckKeysForChanges( void )
 			else
 				keyword = UndefinedKey;
 			
-			Item->TextInfo[0]->text = keyword; 
+			Item->TextInfo[0]->text = (u_int8_t*)keyword; 
 		}
 		else if ( Item->FuncDraw == DrawFlatMenuKeyLeftArrow )
 		{
@@ -10562,7 +10569,7 @@ void CheckKeysForChanges( void )
 					arrow = "\021"; // = 17
 				}
 			}
-			Item->TextInfo[ 0 ]->text = arrow;
+			Item->TextInfo[ 0 ]->text = (u_int8_t*)arrow;
 		}
 		else if ( Item->FuncDraw == DrawFlatMenuKeyRightArrow )
 		{
@@ -10577,7 +10584,7 @@ void CheckKeysForChanges( void )
 					arrow = "\020"; // = 16
 				}
 			}
-			Item->TextInfo[ 0 ]->text = arrow;
+			Item->TextInfo[ 0 ]->text = (u_int8_t*)arrow;
 		}
 		else if ( Item->FuncDraw == DrawFlatMenuKeyNum )
 		{
@@ -10587,7 +10594,7 @@ void CheckKeysForChanges( void )
 				kdef = (DEFKEY *)(Item->Variable);
 				if ( kdef->def->keys > 1 )
 				{
-					sprintf( Item->TextInfo[ 0 ]->text, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
+					sprintf( (char*)Item->TextInfo[ 0 ]->text, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
 				}
 			}
 		}
@@ -10622,7 +10629,7 @@ void DrawFlatMenuKeyText( MENUITEM *Item )
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[0];
 
-	TextInfo->text = keyword;
+	TextInfo->text = (u_int8_t*)keyword;
 	TextInfo->xmin = Item->x;
 	TextInfo->ymin = Item->y;
 	TextInfo->xmax = Item->xmax;
@@ -10666,10 +10673,10 @@ void DrawFlatMenuKeyNum( MENUITEM *Item )
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
-		TextInfo->text = (char *)malloc( 16 );
+		TextInfo->text = (u_int8_t*)malloc( 16 );
 		if ( kdef->def->keys > 1 )
 		{
-			sprintf( TextInfo->text, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
+			sprintf( (char*)TextInfo->text, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
 		}
 		else
 			TextInfo->text[ 0 ] = 0;
@@ -10709,7 +10716,7 @@ void DrawFlatMenuKeyLeftArrowText( MENUITEM *Item )
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[0];
 
-	TextInfo->text = arrow;
+	TextInfo->text = (u_int8_t*)arrow;
 	TextInfo->xmin = Item->x;
 	TextInfo->ymin = Item->y;
 	TextInfo->xmax = Item->xmax;
@@ -10756,7 +10763,7 @@ void DrawFlatMenuKeyRightArrowText( MENUITEM *Item )
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[0];
 
-	TextInfo->text = arrow;
+	TextInfo->text = (u_int8_t*)arrow;
 	TextInfo->xmin = Item->x;
 	TextInfo->ymin = Item->y;
 	TextInfo->xmax = Item->xmax;
@@ -10825,32 +10832,32 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 		switch (slider->value)
 		{
 		case 0:
-			num = sprintf( TextInfo->text, LT_NoLimit/*"no limit"*/ );
+			num = sprintf( (char*)TextInfo->text, LT_NoLimit/*"no limit"*/ );
 			break;
 		case 1:
-			num = sprintf( TextInfo->text, LT_OneMinute/*"1 min"*/ );
+			num = sprintf( (char*)TextInfo->text, LT_OneMinute/*"1 min"*/ );
 			break;
 		default:
-			num = sprintf( TextInfo->text, LT_ManyMinutes/*"%d mins"*/, slider->value );
+			num = sprintf( (char*)TextInfo->text, LT_ManyMinutes/*"%d mins"*/, slider->value );
 			break;
 		}
 		offset = 5;
 		break;
 	case SLIDER_Value:
-		num = sprintf( TextInfo->text, "%d", slider->value );
+		num = sprintf( (char*)TextInfo->text, "%d", slider->value );
 		offset = 5;
 		break;
 	case SLIDER_Percent:
-		num = sprintf( TextInfo->text, "%d %%", slider->value );
+		num = sprintf( (char*)TextInfo->text, "%d %%", slider->value );
 		offset = 58;
 		break;
 	case SLIDER_Sensitivity:
-		num = sprintf( TextInfo->text, "%d", slider->value );
+		num = sprintf( (char*)TextInfo->text, "%d", slider->value );
 		offset = 58;
 		break;
 	case SLIDER_Bike:
 		num = 0;
-		TextInfo->text = EmptyString;
+		TextInfo->text = (u_int8_t*)EmptyString;
 		offset = 0;
 		break;
 	case SLIDER_Demo:
@@ -10861,7 +10868,7 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 		}else{
 			percentage = (1.0F * (float) ( 9 - DemoSpeed.value )) * 100.0F;
 		}
-		num = sprintf( TextInfo->text, "%3.1f%%", percentage );  
+		num = sprintf( (char*)TextInfo->text, "%3.1f%%", percentage );  
 		offset = 58;
 		break;
 	case SLIDER_User:
@@ -10870,23 +10877,23 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 			uservalue = slider->FuncUser( slider );
 			if ( uservalue )
 			{
-				strncpy( TextInfo->text, uservalue, MAXSLIDERINFOLENGTH - 1 );
+				strncpy( (char*)TextInfo->text, uservalue, MAXSLIDERINFOLENGTH - 1 );
 				TextInfo->text[ MAXSLIDERINFOLENGTH - 1 ] = 0;
-				num = strlen( TextInfo->text );
+				num = strlen( (char*)TextInfo->text );
 			}
 			else
 			{
-				num = sprintf( TextInfo->text, LT_NoValue/*"no value" */);
+				num = sprintf( (char*)TextInfo->text, LT_NoValue/*"no value" */);
 			}
 		}
 		else
 		{
-			num = sprintf( TextInfo->text, "no func" );
+			num = sprintf( (char*)TextInfo->text, "no func" );
 		}
 		offset = 5;
 		break;
 	default:
-		num = sprintf( TextInfo->text, "%.0f%%", ((float)slider->value / (float)slider->max) * 100.0F );
+		num = sprintf( (char*)TextInfo->text, "%.0f%%", ((float)slider->value / (float)slider->max) * 100.0F );
 		offset = 58;
 		break;
 	}
@@ -11068,7 +11075,7 @@ void DrawFlatMenuSlider( MENUITEM *Item )
 	Item->TextInfo[1] = InitTextInfo();
 
 	//allocate space for slider info string
-	Item->TextInfo[1]->text = (char*)malloc ( sizeof (char) * MAXSLIDERINFOLENGTH );
+	Item->TextInfo[1]->text = (u_int8_t*)malloc ( sizeof (char) * MAXSLIDERINFOLENGTH );
 
 	if (!Item->TextInfo[1]->text)
 	{	Msg("Title.c   DrawFlatMenuSlider:  unable to allocate memory\n");
@@ -11158,7 +11165,7 @@ void DrawFlatMenuName( MENUITEM *Item )
 	TEXTINFO *TextInfo;
 
 	//var = (char *)(Item->Variable);
-	var = Item->Variable;
+	var = (char*)Item->Variable;
 	  
 	//allocate space for textinfo
 	Item->TextInfo[0] = InitTextInfo();
@@ -11167,7 +11174,7 @@ void DrawFlatMenuName( MENUITEM *Item )
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[0];
 
-	TextInfo->text = var;
+	TextInfo->text = (u_int8_t*)var;
 	TextInfo->xmin = Item->x;
 	TextInfo->ymin = Item->y;
 	TextInfo->xmax = Item->xmax;
@@ -11180,7 +11187,7 @@ void DrawFlatMenuName( MENUITEM *Item )
 		//TextInfo->oldtext = (char*)malloc ( sizeof (char) * strlen(var) );
 		//DebugPrintf("DrawFlatMenuName() allocated %d\n", strlen(var));
 		//TextInfo->pointer[TextInfo->num_pointers_to_free++] = TextInfo->oldtext;
-		strncpy(TextInfo->oldtext, TextInfo->text, MAX_TEXT_LENGTH);
+		strncpy((char*)TextInfo->oldtext, (char*)TextInfo->text, MAX_TEXT_LENGTH);
 	}
 
 	//add to text stack...
@@ -11222,7 +11229,7 @@ void DrawGeneralWeaponText( MENUITEM *Item )
 		TextInfo->xmin = Item->x + offset;
 		TextInfo->ymin = (((Item->ymax - Item->y)/Total_Slots) * line) + Item->y;
 
-		TextInfo->text = DescriptionList[WeaponList[i]];
+		TextInfo->text = (u_int8_t*)DescriptionList[WeaponList[i]];
 		
 		TextInfo->xmax = Item->xmax + offset;
 		TextInfo->ymax = (((Item->ymax - Item->y)/Total_Slots) * (line + 1)) + Item->y;
@@ -11969,7 +11976,7 @@ void Print3Dots(TEXTINFO *TextInfo, float totalheight)
 	}
 }
 
-bool VduFinished( MENU *Menu )
+extern "C" bool VduFinished( MENU *Menu )
 {
 	int i, j;
 	bool eventsactive = false;
@@ -12153,9 +12160,9 @@ void PrintTextItem (TEXTINFO *TextInfo)
 		str = TextInfo->text;
 
 	if (!str)
-		str = EmptyString;
+		str = (u_int8_t*)EmptyString;
 
-	length = strlen(str);
+	length = strlen((char*)str);
 
 	TEXTINFO_currentx = 0.0F;
 	TEXTINFO_currenty = 0.0F;	
@@ -12265,10 +12272,10 @@ void ProcessTextItems (void)
 
 		if (
 			(TextStack[i]->flags & TEXTFLAG_CheckForRefresh) &&
-			(strncmp(TextStack[i]->oldtext, TextStack[i]->text, MAX_TEXT_LENGTH) != 0)
+			(strncmp((char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, MAX_TEXT_LENGTH) != 0)
 		)
 		{
-			strncpy(TextStack[i]->oldtext, TextStack[i]->text, MAX_TEXT_LENGTH);
+			strncpy((char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, MAX_TEXT_LENGTH);
 			PrintTextItem(TextStack[i]);
 		}
 
@@ -13768,7 +13775,7 @@ void SelectConnectionToJoin (MENUITEM *Item)
 	{
 		int index = 0;
 		// find the selected game
-		char * game_name = Item->Value;
+		char * game_name = (char*)Item->Value;
 		index = games_index_at( game_name );
 		if( index )
 		{
@@ -13858,7 +13865,7 @@ void GetTitleMessage(void)
 			dummytext.boxdone = false;					
 			dummytext.num_pointers_to_free = 0;		
 			dummytext.force_fit = false;
-			dummytext.text = &TitleMsgQue[TitleMsgQueEnd].text[0];
+			dummytext.text = (u_int8_t*)&TitleMsgQue[TitleMsgQueEnd].text[0];
 			PrintTextItem( &dummytext );
 
 			for (i = 0; i < dummytext.num_lines; i++)
@@ -13870,7 +13877,7 @@ void GetTitleMessage(void)
 					strcpy( TitleMessage[j], TitleMessage[j - 1] );
 				}
 				
-				strncpy( &TitleMessage[0][0], &dummytext.text[dummytext.startpoint[i]], dummytext.endpoint[i] - dummytext.startpoint[i] + 1);
+				strncpy( &TitleMessage[0][0], (char*)&dummytext.text[dummytext.startpoint[i]], dummytext.endpoint[i] - dummytext.startpoint[i] + 1);
 				TitleMessage[0][dummytext.endpoint[i] - dummytext.startpoint[i] + 1] = '\0';
 			}
 			TitleMsgQueEnd++;
@@ -13960,7 +13967,7 @@ void MenuItemBackFromError ( MENUITEM *Item )
 
 void SelectConfigureAxisMenu ( MENUITEM *Item )
 {
-	if ( !strcasecmp( JoystickList.item[ JoystickList.selected_item ], "Spacetec SpaceOrb 360" ) 
+	if ( !strcasecmp( (char*)JoystickList.item[ JoystickList.selected_item ], "Spacetec SpaceOrb 360" ) 
 		&& !SpaceOrbSetup )
 	{
 		// do not allow axis setup
@@ -14001,7 +14008,7 @@ void InitJoystickList ( MENU *Menu )
 	{
 		if ( JoystickInfo[i].connected )
 		{
-			strncpy( JoystickList.item[j], JoystickInfo[i].Name, sizeof(JoystickList.item[0]));
+			strncpy( (char*)JoystickList.item[j], JoystickInfo[i].Name, sizeof(JoystickList.item[0]));
 			JoystickList.items++;
 			JoystickMap[j] = i;
 			j++;
@@ -14047,7 +14054,7 @@ void InitJoystickAxisConfig ( MENU *Menu)
 			if(JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[i].name)
 			{
 				strncpy(
-					JoystickAxisList.item[j],
+					(char*)JoystickAxisList.item[j],
 					JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[i].name,
 					sizeof(JoystickList.item[0])
 				);
@@ -14055,7 +14062,7 @@ void InitJoystickAxisConfig ( MENU *Menu)
 			else
 			{
 				snprintf(
-					JoystickAxisList.item[j],
+					(char*)JoystickAxisList.item[j],
 					sizeof(JoystickList.item[0]),
 					"Axis %d",
 					j
@@ -14293,7 +14300,7 @@ void InitShipActionList( void )
 	ShipActionList.selected_item = 0;
 	for (i = 0; i < NUM_SHIP_ACTIONS; i++)
 	{
-		strncpy( ShipActionList.item[i], ShipActionText[i], sizeof( ShipActionList.item[0] ) );
+		strncpy( (char*)ShipActionList.item[i], ShipActionText[i], sizeof( ShipActionList.item[0] ) );
 		ShipActionList.items++;
 	}
 
@@ -14303,7 +14310,7 @@ void InitShipActionList( void )
 	AxisActionList.selected_item = 0;
 	for (i = 0; i < NUM_SHIP_AXIS_ACTIONS; i++)
 	{
-		strncpy( AxisActionList.item[i], ShipAxisText[i], sizeof( AxisActionList.item[0] ) );
+		strncpy( (char*)AxisActionList.item[i], ShipAxisText[i], sizeof( AxisActionList.item[0] ) );
 		AxisActionList.items++;
 	}
 }
@@ -14657,7 +14664,7 @@ void SelectGoldBarModel( MENU *Menu )
 	ShowHoloModel( TITLE_MODEL_GoldBar );
 }
 
-bool InitScene(void);
+extern "C" bool InitScene(void);
 void AfterSpecialMessage( MENUITEM *Item )
 {
 	switch( GameCompleted )
@@ -14760,7 +14767,7 @@ bool ListDelete( LIST *l, int item )
 	{
 		while ( ++item < l->items )
 		{
-			strncpy( l->item[ item - 1 ], l->item[ item ], sizeof( l->item[ 0 ] ) );
+			strncpy( (char*)l->item[ item - 1 ], (char*)l->item[ item ], sizeof( l->item[ 0 ] ) );
 		}
 		l->items--;
 		if ( l->selected_item >= l->items )
@@ -14776,7 +14783,7 @@ bool ListDelete( LIST *l, int item )
 
 bool DeleteDemo( LIST *l, int item )
 {
-	return delete_file( DemoFileName( l->item[ item ] ) ) ? ListDelete( l, item ) : false;
+	return delete_file( DemoFileName( (char*)l->item[ item ] ) ) ? ListDelete( l, item ) : false;
 }
 
 
@@ -14784,7 +14791,7 @@ void InGameSaveASinglePlayerGame( MENUITEM *item )
 {
 	if ( InGameSave( item ) )
 	{
-		strncpy( LoadSavedGameList.item[ LoadSavedGameList.selected_item ], SavedGameInfo( LoadSavedGameList.selected_item ), sizeof( LoadSavedGameList.item[ 0 ] ) - 1 );
+		strncpy( (char*)LoadSavedGameList.item[ LoadSavedGameList.selected_item ], SavedGameInfo( LoadSavedGameList.selected_item ), sizeof( LoadSavedGameList.item[ 0 ] ) - 1 );
 		LoadSavedGameList.item[ LoadSavedGameList.selected_item ][ sizeof( LoadSavedGameList.item[ 0 ] ) - 1 ] = 0;
 	}
 }
@@ -14800,7 +14807,7 @@ bool DeleteSavedGame( LIST *l, int item )
 	if ( delete_file( SaveGameFileName( item ) )
 		&& delete_file( SaveGamePicFileName( item ) ) )
 	{
-		strncpy( l->item[ item ], SavedGameInfo( item ), sizeof( l->item[ 0 ] ) - 1 );
+		strncpy( (char*)l->item[ item ], SavedGameInfo( item ), sizeof( l->item[ 0 ] ) - 1 );
 		l->item[ item ][ sizeof( l->item[ 0 ] ) - 1 ] = 0;
 		return true;
 	}
@@ -14882,13 +14889,13 @@ bool SetNumPrimaryPickups( SLIDER *slider )
 
 char *AxisName( SLIDER *s )
 {
-	return ( s->value >= 0 && s->value < JoystickAxisList.items ) ? JoystickAxisList.item[ s->value ] : NULL;
+	return ( s->value >= 0 && s->value < JoystickAxisList.items ) ? (char*)JoystickAxisList.item[ s->value ] : NULL;
 }
 
 
 char *AxisActionName( SLIDER *s )
 {
-	return ( s->value >= 0 && s->value < AxisActionList.items ) ? AxisActionList.item[ s->value ] : NULL;
+	return ( s->value >= 0 && s->value < AxisActionList.items ) ? (char*)AxisActionList.item[ s->value ] : NULL;
 }
 
 
@@ -15327,17 +15334,17 @@ void InitWatchList( MENU *Menu )
 	{
 		if ( GameStatus[ i ] == STATUS_Normal || i == WhoIAm )
 		{
-			strncpy( HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ 0 ] ) );
+			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ 0 ] ) );
 			
 			if(i == WhoIAm)
-				strcat( HostPlayersList.item[ HostPlayersList.items ], " (YOU)");
+				strcat( (char*)HostPlayersList.item[ HostPlayersList.items ], " (YOU)");
 
 			HostGamePlayersWhoIAm[ HostPlayersList.items ] = i;
 			HostPlayersList.items++;
 		}
 	}
 
-	strncpy( HostPlayersList.item[ HostPlayersList.items ], "--OBSERVATORY--", sizeof( HostPlayersList.item[ 0 ] ) );
+	strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], "--OBSERVATORY--", sizeof( HostPlayersList.item[ 0 ] ) );
 	HostGamePlayersWhoIAm[ HostPlayersList.items ] = MAX_PLAYERS+1;
 	HostPlayersList.items++;
 
@@ -15355,7 +15362,7 @@ void RefreshHostPlayersList( LIST *List )
 	{
 		if ( GameStatus[ i ] == STATUS_Normal && i != WhoIAm)
 		{
-			strncpy( HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ 0 ] ) );
+			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ 0 ] ) );
 			HostGamePlayersWhoIAm[ HostPlayersList.items ] = i;
 			HostPlayersList.items++;
 		}
@@ -15435,13 +15442,13 @@ void InitBattleMenu( MENU *menu )
 		switch ( item->y  )
 		{
 		case TITLE_MODEL_Disc4:
-			item->StrPnt = LT_MENU_NEW_Battle3;
+			item->StrPnt = (u_int8_t*)LT_MENU_NEW_Battle3;
 			item->FrameNo = 2;
 			item->Value = NULL;
 			item->FuncSelect = MenuItemBack;
 			break;
 		case TITLE_MODEL_Disc5:
-			item->StrPnt = "Blank";
+			item->StrPnt = (u_int8_t*)"Blank";
 			item->FrameNo = 2;
 			item->Value = NULL;
 			item->FuncSelect = NULL;
@@ -16044,7 +16051,7 @@ bool ProcessText( int Key )
 	default:
 		if ( Key )
 		{
-			char * c = key_char( Key );
+			char * c = (char*)key_char( Key );
 			if ( c && strlen(c) == 1)
 				TextType( (TEXT *)(TextItem->Variable), *c );
 		}

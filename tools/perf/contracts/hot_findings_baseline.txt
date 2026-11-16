@@ -81,11 +81,11 @@ R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
-R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.c|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.c|RenderScene|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
+R2|oct2.cpp|RenderScene|untyped-heuristic: float-to-int cast in loop body
 R2|polys.cpp|PolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|PolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|PolyDispGroupUnclipped|float-to-int cast in loop body
@@ -178,8 +178,8 @@ R7|2dpolys.cpp|FmPolyProcess|float division in hot loop
 R7|2dpolys.cpp|FmPolyProcess|float division in hot loop
 R7|2dpolys.cpp|FmPolyProcess|float division in hot loop
 R7|2dpolys.cpp|FmPolyProcess|float division in hot loop
-R7|ailib.c|AI_LookAhead|float division inner_loop=false
-R7|aimain.c|AI_AVOIDCHECK|float division inner_loop=false
+R7|ailib.cpp|AI_LookAhead|float division inner_loop=false
+R7|aimain.cpp|AI_AVOIDCHECK|float division inner_loop=false
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
@@ -215,20 +215,20 @@ R7|lights.cpp|XLight1Group|sqrtf in hot loop
 R7|models.cpp|ModelDisp|float division in hot loop
 R7|new3d.cpp|NormaliseVector|float division inner_loop=false
 R7|new3d.cpp|NormaliseVector|sqrtf inner_loop=false
-R7|oct2.c|MainGameRender|float division inner_loop=false
-R7|oct2.c|MainGameRender|float division inner_loop=false
-R7|oct2.c|MainGameRender|float division inner_loop=false
-R7|oct2.c|MainGameRender|float division inner_loop=false
-R7|oct2.c|MainGameRender|float division inner_loop=false
-R7|oct2.c|MainGameRender|float division inner_loop=false
-R7|oct2.c|RenderCurrentCameraInStereo|float division inner_loop=false
-R7|oct2.c|RenderCurrentCameraInStereo|float division inner_loop=false
-R7|oct2.c|RenderCurrentCameraInStereo|float division inner_loop=false
-R7|oct2.c|RenderScene|float division inner_loop=false
-R7|oct2.c|RenderScene|float division inner_loop=false
-R7|oct2.c|RenderScene|float division inner_loop=false
-R7|oct2.c|RenderScene|float division inner_loop=false
-R7|oct2.c|RenderScene|float division inner_loop=false
+R7|oct2.cpp|MainGameRender|float division inner_loop=false
+R7|oct2.cpp|MainGameRender|float division inner_loop=false
+R7|oct2.cpp|MainGameRender|float division inner_loop=false
+R7|oct2.cpp|MainGameRender|float division inner_loop=false
+R7|oct2.cpp|MainGameRender|float division inner_loop=false
+R7|oct2.cpp|MainGameRender|float division inner_loop=false
+R7|oct2.cpp|RenderCurrentCameraInStereo|float division inner_loop=false
+R7|oct2.cpp|RenderCurrentCameraInStereo|float division inner_loop=false
+R7|oct2.cpp|RenderCurrentCameraInStereo|float division inner_loop=false
+R7|oct2.cpp|RenderScene|float division inner_loop=false
+R7|oct2.cpp|RenderScene|float division inner_loop=false
+R7|oct2.cpp|RenderScene|float division inner_loop=false
+R7|oct2.cpp|RenderScene|float division inner_loop=false
+R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|polys.cpp|ProcessPolys|float division in hot loop
 R7|polys.cpp|ProcessPolys|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop

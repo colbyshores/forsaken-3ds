@@ -5,7 +5,7 @@
   "capture_note": "STATIC SEED, NOT A PROFILE. Every entry below was classified by reading the frame loop (main.c:726 -> RenderScene oct2.c:2522 -> MainGame oct2.c:5285 -> MainRoutines oct2.c:4551 / MainGameRender oct2.c:5026 -> RenderCurrentCamera oct2.c:5910) and applying AGENTS.md 2's per-frame and >=256x/frame criteria to the call graph. No hardware capture exists yet, so 'top 15 of a captured profile' is not in force and the corpus age clock is dormant while provisional is true. gates_vfp prints a loud note while this flag is set. To promote: take a real capture, write it to docs/validation/perf-YYYY-MM-DD-*.log, set provisional=false and captured to the capture date, and re-derive this seed from the profile -- the seed is a starting scope, never a substitute for the measurement.",
   "seed": [
     {
-      "file": "oct2.c",
+      "file": "oct2.cpp",
       "symbols": [
         "RenderScene",
         "MainGame",
@@ -97,14 +97,14 @@
       "why": "per enemy per frame"
     },
     {
-      "file": "aimain.c",
+      "file": "aimain.cpp",
       "symbols": [
         "*"
       ],
       "why": "AI_THINK/AI_AIR/AI_TURRET per enemy per frame"
     },
     {
-      "file": "ailib.c",
+      "file": "ailib.cpp",
       "symbols": [
         "*"
       ],
@@ -178,7 +178,7 @@
   "cold_always": [
     "main_3ds.c",
     "main.c",
-    "title.c",
+    "title.cpp",
     "loadsave.c",
     "bsp.c",
     "tload.c",
