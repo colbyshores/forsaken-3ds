@@ -1,9 +1,6 @@
 #ifndef MAIN_INCLUDED
 #define MAIN_INCLUDED
 
-#ifdef WIN32
-#define WIN32_EXTRA_LEAN
-#endif
 
 /*===================================================================
 	Game Status Defines...
@@ -102,17 +99,6 @@ typedef struct
 #undef ZERO_STACK_MEM
 #define ZERO_STACK_MEM(x) memset(&x, 0, sizeof(x))
 
-#ifdef WIN32
-#include <string.h>
-#define strcasecmp	_stricmp
-#define strncasecmp _strnicmp
-#define strdup _strdup
-#include <stdio.h>
-#define snprintf	_snprintf
-#include <direct.h>
-#define chdir		_chdir
-// _strupr use strtoupper see util.h
-#endif
 
 #include "math_error.h"
 
@@ -129,23 +115,12 @@ typedef struct
 // should be included after malloc/stdlib
 #include "xmem.h"
 
-// really crappy support right now for mingw32
-// since apparently it doesn't work with u_ types
-// support for this coming soon in a newer release
-#if defined(WIN32) || defined(__3DS__)
 #include <stdint.h>
 typedef uint8_t  u_int8_t;
 typedef uint16_t u_int16_t;
 typedef uint32_t u_int32_t;
-#ifdef WIN32
-#include <windef.h>
-#endif
-#else
-// winapi compatibility
 typedef u_int32_t DWORD;
-#endif
 #ifdef __3DS__
-typedef u_int32_t DWORD;
 
 /* Byte-wise memcpy GCC cannot inline to ldm/stm. Use when copying
  * structs (especially 12+ byte multi-float VECTORs) out of a file

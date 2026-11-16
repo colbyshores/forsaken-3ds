@@ -26,66 +26,12 @@ RENDERER ?= citro3d
 # levels + music). The remaster build still uses the 1998 ISO for UI assets
 # (fonts, splash, decals) since the KPF lacks them — see README.
 EDITION ?= original
-# PERF_CAPTURE=1 adds in-memory frame/stage counters + teardown trace dump (hardware capture only)
-PERF_CFLAGS := $(if $(PERF_CAPTURE),-DPERF_CAPTURE,)
-# FIDELITY_DUMP=1 adds per-tick gameplay-state checksums to sdmc:/3ds/forsaken_fidelity.txt (A/B fidelity proof, harness builds only; under /3ds/ so the ATM HTTP allowlist serves it)
-FIDELITY_CFLAGS := $(if $(FIDELITY_DUMP),-DFIDELITY_DUMP,)
-# FRAMEDUMP=1 compiles in the triggerable framebuffer dump library
 # (framedump.h): TCP trigger port + sdmc:/framedump_*.bmp + hash log.
 # Harness builds only; default builds are unaffected.
-FRAMEDUMP_CFLAGS := $(if $(FRAMEDUMP),-DFRAMEDUMP,)
-# FRAMEDUMP_SELFTEST_AT=N auto-dumps once at frame N (emulator e2e:
-# emulators do not bridge the trigger socket, so the self-test fires
-# the capture path without network). Requires FRAMEDUMP=1.
-SELFTEST_CFLAGS := $(if $(FRAMEDUMP_SELFTEST_AT),-DFRAMEDUMP_SELFTEST_AT=$(FRAMEDUMP_SELFTEST_AT),)
-# FIDELITY_CHECKPOINTS=1 adds per-tick-interval hash checkpoints to the fidelity file (divergence localization)
-FIDCK_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINTS,)
-# FIDELITY_CHECKPOINT_TICKS=N sets the checkpoint interval (default 250).
-# Finer intervals (e.g. 60) give per-minute trajectory shape for A/B work.
-FIDELITY_CHECKPOINT_TICKS ?= 250
-FIDCKT_CFLAGS := $(if $(FIDELITY_CHECKPOINTS),-DFIDELITY_CHECKPOINT_TICKS=$(FIDELITY_CHECKPOINT_TICKS),)
 # MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
 VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
-# STRESS_SCRATCH_VERTS=N caps the scratch vertex arena at N verts (R02
-# overflow-path stress; forces mid-frame splits every frame). Debug only,
-# never ship: it destroys batching and the memo. 0 (default) = full arena.
-STRESS_SCRATCH_VERTS ?= 0
-# FRAMEDUMP_BENCH_STILLS=1 auto-dumps exact bench frames 60/120/180 (step-1
-# reference stills; deterministic). Requires FRAMEDUMP=1. Default 0 (off).
-FRAMEDUMP_BENCH_STILLS ?= 0
-STRESS_SCRATCH_CFLAGS := $(if $(filter-out 0,$(STRESS_SCRATCH_VERTS)),-DSTRESS_SCRATCH_VERTS=$(STRESS_SCRATCH_VERTS),)
 # RAM is approximated; platform/scheduler/GPU behavior remain New 3DS.
 
-# ATM_PROFILING=1 links the shared ATM telemetry core and enables the fixed
-# deterministic benchmark that publishes /3ds/atm_result.txt for the ATM
-# harness (atm_prof.h / atm_prof_3ds.c). Harness builds only — never merged
-# to a release branch. See perf/OPTIMIZATION-LOG.md Phase B.
-ATM_PROFILING ?= 0
-# Canonical shared ATM source (compiled in place, never copied, so the game,
-# Rosalina and the host conformance test cannot diverge on bucket edges).
-ATM_CORE_DIR ?= /mnt/nas/Development/netload_stub/sysmodules/rosalina
-# Benchmark scenario: one level by NAME (slot indices differ between
-# EDITION=original and EDITION=remaster), fixed warmup, fixed frame count.
-ATM_BENCH_LEVEL  ?= ramqan
-ATM_BENCH_FRAMES ?= 240
-ATM_BENCH_WARMUP ?= 30
-# 0 = force mono, 1 = force stereo. The physical 3D slider is a live analog
-# input, so an unpinned slider cannot produce comparable runs.
-ATM_BENCH_STEREO ?= 0
-# ATM_BENCH_FIRE=1 holds primary fire for the whole bench (combat bench:
-# live primaries, muzzle flashes, impacts, enemy reactions). Requires
-# ATM_PROFILING=1 (refused otherwise: an always-firing dev build helps
-# nobody). Cooldown/fire-rate stay engine-driven; this only pulls the
-# trigger. Same discipline as the AUTOTEST_REMASTER hold in input_3ds.c,
-# but without the level-sweep apparatus (dwell, chainload, DEBUG traces).
-ATM_BENCH_FIRE ?= 0
-# ATM_HEADLESS=1 restores the ATM-launch configuration (custom __appInit
-# without aptInit + aptMainLoop-free main loop) for one-shot payloads that
-# ATM launches while HOME stays foreground. Game benchmarks pushed via
-# 3dslink to the live stub MUST leave this at 0: the stub chainloads the
-# app as a proper NS foreground title, so normal init applies (proven by
-# the framedump render-proof builds).
-ATM_HEADLESS ?= 0
 # Shipped features (stereo memo, persist, buckets, CHE pre-filter)
 # are compiled in unconditionally — no feature flags. Only platform
 # (renderer/edition) and measurement-harness knobs remain, and the
@@ -182,16 +128,9 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-Wno-implicit-int -Wno-int-conversion \
 	-ffunction-sections -fdata-sections -fcommon \
 	-fno-math-errno \
-	$(PERF_CFLAGS) \
-	$(FIDELITY_CFLAGS) \
-	$(FIDCK_CFLAGS) \
-	$(FIDCKT_CFLAGS) \
-	$(FRAMEDUMP_CFLAGS) \
-	$(SELFTEST_CFLAGS) \
 	$(VIS_CFLAGS) \
-	$(STRESS_SCRATCH_CFLAGS) \
 	-std=gnu99 \
-	-D__3DS__ -DARM \
+	-D__3DS__ \
 	-DBSP \
 	-DTEXTURE_PNG \
 	-DSOUND_SUPPORT \
@@ -239,14 +178,10 @@ CXXFLAGS_ADD := -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics
 #   - trace() writes to sdmc:/forsaken_trace.txt and dispatches via
 #     svcOutputDebugString (main_3ds.c — release builds get an empty
 #     body so call sites compile to nothing, no SD I/O on shipping CIAs)
-#   - VERBOSE_TRACE-gated #ifdef blocks are activated (see below)
 #
-# Set it via `make DEBUG=1`. AUTOTEST_REMASTER=1 implies it (the sweep
-# harness needs traces to record each level transition) and so does
-# DEATH_SIM=1.
 #
 ifeq ($(DEBUG),1)
-CFLAGS += -D__3DS_DEBUG__ -DVERBOSE_TRACE
+CFLAGS += -D__3DS_DEBUG__
 endif
 
 # DEBUG_AUTOBOOT_SLOT=N overrides the DEBUG-build autoboot target (which
@@ -310,56 +245,8 @@ ifneq ($(AUTOTEST_MS_PER_LEVEL),)
 CFLAGS += -DAUTOTEST_MS_PER_LEVEL=$(AUTOTEST_MS_PER_LEVEL)
 endif
 
-# ATM_BENCH_FIRE=1 without the bench is an always-firing dev build that
-# helps nobody — refuse it (MODEL_BUCKET_VERIFY precedent).
-ifeq ($(filter 1,$(ATM_BENCH_FIRE)),1)
-ifneq ($(ATM_PROFILING),1)
-$(error ATM_BENCH_FIRE=1 requires ATM_PROFILING=1)
-endif
-endif
 
-# ATM_PROFILING=1 — see the knob block near the top of this file.
-ifeq ($(ATM_PROFILING),1)
-ifeq ($(wildcard $(ATM_CORE_DIR)/source/atm/atm_core.c),)
-$(error ATM_PROFILING=1 needs $(ATM_CORE_DIR)/source/atm/atm_core.c — set ATM_CORE_DIR=<path to netload_stub/sysmodules/rosalina>)
-endif
-CFLAGS += -DATM_PROFILING -I$(ATM_CORE_DIR)/include
-CFLAGS += -DATM_BENCH_LEVEL='"$(ATM_BENCH_LEVEL)"'
-CFLAGS += -DATM_BENCH_FRAMES=$(ATM_BENCH_FRAMES)
-CFLAGS += -DATM_BENCH_WARMUP=$(ATM_BENCH_WARMUP)
-CFLAGS += -DATM_BENCH_STEREO=$(ATM_BENCH_STEREO)
-CFLAGS += $(if $(filter 1,$(ATM_BENCH_FIRE)),-DATM_BENCH_FIRE,)
-CFLAGS += $(if $(filter 1,$(FRAMEDUMP_BENCH_STILLS)),-DFRAMEDUMP_BENCH_STILLS,)
-CFLAGS += $(if $(filter 1,$(ATM_HEADLESS)),-DATM_HEADLESS,)
-# Compiled from outside $(SRCDIR), so it needs an explicit rule (below) and
-# cannot ride the $(SRCDIR)/%.c pattern. It is also deliberately outside the
-# AGENTS.md gate scope: vendored shared ATM firmware, not Forsaken game code.
-OFILES += atm_core.o
-endif
 
-# VERBOSE_TRACE=1 enables the TR() / TRMSG() macros in main.h. Lots of
-# trace points get sprinkled through the loaders so a crash leaves the
-# last reached point visible at the tail of sdmc:/forsaken_trace.txt.
-# Tanks framerate + bloats the log — fine for crash bisection on
-# hardware, off for production. Macros expand to do-nothing when this
-# flag is absent so the trace points stay sprinkled in source without
-# perf cost on shipping builds.
-ifeq ($(VERBOSE_TRACE),1)
-CFLAGS += -DVERBOSE_TRACE
-endif
-
-# DEATH_SIM=1 simulates the game-over (lose-all-lives) code path on
-# boot. Autoboots into a level (vol2 by default) and after ~3 s of
-# gameplay forces MyGameStatus = STATUS_QuitCurrentGame, exercising
-# the same teardown→title chain as a real death sequence. Granular
-# trace points fire across STATUS_QuitCurrentGame / ReleaseLevel /
-# InitScene / InitView / InitTitle so a crash leaves the last reached
-# point at the tail of sdmc:/forsaken_trace.txt. After the title
-# screen is reachable for ~3 s, chain-loads back to netload_stub so
-# the host can pull the trace via 3dslink. Diagnostic build only.
-ifeq ($(DEATH_SIM),1)
-CFLAGS += -DDEATH_SIM -D__3DS_DEBUG__ -DVERBOSE_TRACE
-endif
 
 # Include paths - note isystem for the source dir so #include <header.h> works
 CFLAGS += -isystem $(SRCDIR) \
@@ -429,7 +316,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := PERF=$(PERF_CAPTURE)|FID=$(FIDELITY_DUMP)|FIDCK=$(FIDELITY_CHECKPOINTS)|FIDCKT=$(FIDELITY_CHECKPOINT_TICKS)|FDMP=$(FRAMEDUMP)|VIS=$(MODEL_VIS_CACHE)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|ATMP=$(ATM_PROFILING)|ATML=$(ATM_BENCH_LEVEL)|ATMF=$(ATM_BENCH_FRAMES)|ATMW=$(ATM_BENCH_WARMUP)|ATMS3D=$(ATM_BENCH_STEREO)|ATMBF=$(ATM_BENCH_FIRE)|ATMH=$(ATM_HEADLESS)|FDMPST=$(FRAMEDUMP_SELFTEST_AT)|STS=$(STRESS_SCRATCH_VERTS)|FSTILL=$(FRAMEDUMP_BENCH_STILLS)
+STAMP_CONTENT := VIS=$(MODEL_VIS_CACHE)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|STS=$(STRESS_SCRATCH_VERTS)|FSTILL=$(FRAMEDUMP_BENCH_STILLS)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
@@ -612,10 +499,6 @@ $(BUILD)/%.o: $(SRCDIR)/%.cpp $(STAMP)
 # Shared ATM telemetry core, compiled from the canonical netload_stub tree in
 # place (explicit rule: it is outside $(SRCDIR), so the pattern rule above
 # cannot reach it). Same numeric flags as the game; -MMD keeps it honest.
-$(BUILD)/atm_core.o: $(ATM_CORE_DIR)/source/atm/atm_core.c $(STAMP)
-	@echo "$(notdir $<) [shared ATM core]"
-	@mkdir -p $(BUILD)
-	$(CC) -MMD -MP -MF $(BUILD)/atm_core.d $(CFLAGS) -c $< -o $@
 
 clean:
 	@echo "Cleaning 3DS build..."

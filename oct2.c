@@ -1,5 +1,4 @@
 #define INSIDE_BSP // disable to use bounding box inside check instead
-#define BSP_ONLY
 
 #include "main.h"
 #include "platform.h"
@@ -68,9 +67,6 @@
 
 #include "perf_capture.h"
 #include "fidelity.h"
-#ifdef ATM_PROFILING
-#include "atm_prof.h"
-#endif
 
 void SetCam(int ship, int Cam);
 
@@ -314,14 +310,6 @@ DWORD CurrentSrcBlend;
 DWORD CurrentDestBlend;
 DWORD CurrentTextureBlend;
  
-#ifdef DEMO_SUPPORT
-LONGLONG  GameStartedTime;    // when the game started
-LONGLONG  GameElapsedTime;    // Real how long the game has been going in game time not real..
-LONGLONG  TempGameElapsedTime;  // Real how long the game has been going in game time not real..
-LONGLONG  GameCurrentTime;    // How long the game has been going...
-LONGLONG  TimeDiff;
-LONGLONG  Freq;
-#endif
 
 bool  JustExitedMenu =false;
 
@@ -370,14 +358,6 @@ extern  MENU  *       GetPlayerNumMenu;
 #define FOV_GROW(A)     ((A) + 10.0F)
 #define FOV_SHRINK(A)   ((A) - 10.0F)
 
-#ifdef DEMO_SUPPORT
-LONGLONG  DemoStartedTime;    // when the game started
-LONGLONG  DemoEndedTime;      // when the game started
-float   DemoTotalTime = 0.0F; // total game time (in seconds)
-int32_t   DemoGameLoops = 0;
-float DemoAvgFps = 0.0F;
-extern  LONGLONG  DemoTimeSoFar;
-#endif
 
 #define MIN_VIEWPORT_WIDTH  (64)
 #define MIN_VIEWPORT_HEIGHT (64)
@@ -1879,11 +1859,7 @@ void DrawSimplePanel()
 
 void ReleaseLevel(void)
 {
-#if defined(__3DS__) && defined(DEATH_SIM)
-#define _RL_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/RL: " s); } while(0)
-#else
 #define _RL_TRACE(s) ((void)0)
-#endif
   _RL_TRACE("enter");
   switch( MyGameStatus )
   {
@@ -2079,11 +2055,7 @@ InitScene(void)
 {
   int i;
 
-#if defined(__3DS__) && defined(DEATH_SIM)
-#define _IS_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/IS: " s); } while(0)
-#else
 #define _IS_TRACE(s) ((void)0)
-#endif
   _IS_TRACE("enter");
   _IS_TRACE("OnceOnlyInitModel");
   OnceOnlyInitModel();
@@ -2155,11 +2127,7 @@ bool InitView( void )
 {
 	DebugPrintf("InitView Starting...\n");
 
-#if defined(__3DS__) && defined(DEATH_SIM)
-#define _IV_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/IV: " s); } while(0)
-#else
 #define _IV_TRACE(s) ((void)0)
-#endif
 	_IV_TRACE("enter");
 
 	CheatsDisabled = false;
@@ -2540,9 +2508,6 @@ bool RenderScene( void )
   if ( SeriousError )
     return false;
 
-#ifdef DEATH_SIM
-  { extern void death_sim_tick(void); death_sim_tick(); }
-#endif
 
 #ifdef __3DS__
   _3ds_mr_ctx = "pre-ReadInput";
@@ -2739,70 +2704,6 @@ bool RenderScene( void )
   case STATUS_Title:
 	DebugState("STATUS_Title\n");
 
-#if defined(__3DS_DEBUG__) || defined(DEBUG_ON) || defined(AUTOTEST_REMASTER) || defined(ATM_PROFILING)
-  {
-    /* Auto-boot directly into a level. Default target = Volcano
-     * (NewLevelNum=0). With AUTOTEST_REMASTER set, target becomes the
-     * first new Remaster slot (defend2). Either way: run DisplayTitle()
-     * for N frames first so it can complete its one-time initialization
-     * (title models, HoloModel, etc.), then call StartASinglePlayerGame()
-     * to skip manual menu navigation. */
-    static int _autoboot_frames = 0;
-    extern bool StartASinglePlayerGame(MENUITEM*);
-#ifdef __3DS__
-    int _autoboot_max = 3;
-#else
-    int _autoboot_max = 30;
-#endif
-
-    if (_autoboot_frames < _autoboot_max) {
-        _autoboot_frames++;
-        DebugPrintf("autoboot: title frame %d/%d\n", _autoboot_frames, _autoboot_max);
-        if (!DisplayTitle()) { SeriousError = true; return false; }
-        break;
-    }
-    DebugPrintf("autoboot: calling StartASinglePlayerGame\n");
-    VduClear();
-    input_buffer_reset();
-    StartASinglePlayerGame(NULL);
-    /* StartASinglePlayerGame -> InitLevels(SINGLEPLAYER_LEVELS) resets
-     * NewLevelNum to 0 as a side effect (singleplayer.c:99). Apply our
-     * desired starting level AFTER the call so it survives. */
-#ifdef ATM_PROFILING
-    /* Deterministic benchmark entry. atm_prof_bench_level() resolves the
-     * pinned level NAME against the loaded mission list (slot indices are
-     * edition-dependent) and opens the measurement state machine. */
-    {
-      extern int atm_prof_bench_level(void);
-      NewLevelNum = (int16_t)atm_prof_bench_level();
-    }
-#elif defined(AUTOTEST_REMASTER)
-    {
-      extern int autotest_first_level(void);
-      NewLevelNum = autotest_first_level();
-      extern void trace(const char*);
-      char _b[96]; snprintf(_b, sizeof(_b),
-        "AUTOTEST: autoboot override -> NewLevelNum=%d", (int)NewLevelNum); trace(_b);
-    }
-#else
-    /* DEBUG-build autoboot target. Defaults to slot 0 (vol2 / volcano) but
-     * can be overridden via -DDEBUG_AUTOBOOT_SLOT=N for boss-rendering /
-     * level-specific tests. */
-#ifndef DEBUG_AUTOBOOT_SLOT
-#define DEBUG_AUTOBOOT_SLOT 0
-#endif
-    NewLevelNum = DEBUG_AUTOBOOT_SLOT;
-#if DEBUG_AUTOBOOT_SLOT == 0
-    /* Start at checkpoint 1 (lava tube area) for easier debugging */
-    {
-        extern u_int16_t last_start_position;
-        last_start_position = 1;
-    }
-#endif
-#endif
-    break;
-  }
-#endif
 
   // ??
   case STATUS_BetweenLevels:
@@ -2814,14 +2715,6 @@ bool RenderScene( void )
       SeriousError = true;
       return false;
     }
-#ifdef AUTOTEST_REMASTER
-    /* Natural-mode autotest hook: counts BetweenLevels frames while a
-     * transition is in flight and auto-confirms the inter-level menu
-     * via StartASinglePlayerGame(NULL) once a short dwell elapses.
-     * No-op when no transition is armed (s_advancing == false). */
-    { extern void autotest_between_levels_tick(void);
-      autotest_between_levels_tick(); }
-#endif
     break;
 
 
@@ -3202,9 +3095,6 @@ bool RenderScene( void )
       MyGameStatus = OverallGameStatus;
 			input_grab( true );
 	  
-#ifdef DEMO_SUPPORT
-      QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
 
       GameStatus[WhoIAm] = OverallGameStatus;
       SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
@@ -3377,9 +3267,6 @@ bool RenderScene( void )
           break;  // not yet..
       }
       // tell them all they can now restart a new level...
-#ifdef DEMO_SUPPORT
-      QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
       DebugPrintf("STATUS_StartingMultiplayerSynch setting MyGameStatus to STATUS_Normal\n");
       MyGameStatus = STATUS_Normal;
       GameStatus[WhoIAm] = STATUS_Normal;
@@ -3395,9 +3282,6 @@ bool RenderScene( void )
 	{
       if( OverallGameStatus == STATUS_Normal )
       {
-#ifdef DEMO_SUPPORT
-        QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
         MyGameStatus = OverallGameStatus;
         GameStatus[WhoIAm] = MyGameStatus;
         SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
@@ -3411,11 +3295,7 @@ bool RenderScene( void )
   case STATUS_QuitCurrentGame:
 	DebugState("STATUS_QuitCurrentGame\n");
 
-#if defined(__3DS__) && defined(DEATH_SIM)
-#define _DS_TRACE(s) do { extern void trace(const char*); trace("DEATH_SIM/QCG: " s); } while(0)
-#else
 #define _DS_TRACE(s) ((void)0)
-#endif
     _DS_TRACE("enter case");
     _DS_TRACE("OutputVisiStats");
     OutputVisiStats( &Mloadheader, LevelNames[ LevelNum ] );
@@ -3518,34 +3398,6 @@ bool RenderScene( void )
 
     break;
 
-#ifdef DEMO_SUPPORT
-  case STATUS_PlayingDemo:
-	DebugState("STATUS_PlayingDemo\n");
-
-    DemoGameLoops++;
-
-    if( DemoSpeed.value > 8 )
-    {
-      // slower or normal playback speed...
-      Demoframelag = 1.0F / (float) ( DemoSpeed.value - 7 );
-    }else{
-      Demoframelag = 1.0F * (float) ( 9 - DemoSpeed.value );
-    }
-    
-    Oldframelag = framelag;
-
-    if( PauseDemo )
-    {
-      framelag = 0.0F;
-    }else{
-      framelag *= Demoframelag;
-    }
-
-    if( PERF_MAINGAME() != true ) // bjd
-      return false;
-
-    break;
-#endif
 
   case STATUS_InitView_0:
 	DebugState("STATUS_InitView_0\n");
@@ -3853,16 +3705,12 @@ bool RenderScene( void )
     Bspload( (char*) &BspZNames[LevelNum][0], &Bsp_Header[ 0 ] );
     Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 1 ] );
 #else
-#ifdef BSP_ONLY
     if ( !Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 0 ] ) )
     {
       SeriousError = true;
       Msg( "Bspload failed\n" );
       return false;   // the collision data
     }
-#else
-    Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 0 ] ); // load .BSP file into 0 skin
-#endif
     Bsp_Header[ 1 ].State = false; // no non-zero .BSP any more
 #endif
 #ifdef __3DS__
@@ -4147,39 +3995,6 @@ bool RenderScene( void )
     break;
 
 
-#ifdef DEMO_SUPPORT
-  case STATUS_ChangeLevelPostPlayingDemo:
-	DebugState("STATUS_ChangeLevelPostPlayingDemo\n");
-
-    WhoIAm = MAX_PLAYERS;
-    Ships[WhoIAm].Object.Mode = DEMO_MODE;
-    Ships[WhoIAm].enable = 1;
-    IsHost = true;
-    Current_Camera_View = MAX_PLAYERS;    // which object is currently using the camera view....
-  
-    for( i = 0 ; i < MAX_PLAYERS ; i++ )
-    {
-      GameStatus[i] = STATUS_Null;
-    }
-  
-    DemoTimeSoFar = 0;
-    if( DemoSpeed.value > 8 )
-    {
-      // slower or normal playback speed...
-      Demoframelag = 1.0F / (float) ( DemoSpeed.value - 7 );
-    }else{
-      Demoframelag = 1.0F * (float) ( 9 - DemoSpeed.value );
-    }
-  
-    GameElapsedTime = 0;
-
-    QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-    QueryPerformanceCounter((LARGE_INTEGER *) &DemoStartedTime);
-    DemoGameLoops = 0;
-    TempGameElapsedTime = GameStartedTime;
-    MyGameStatus = STATUS_PlayingDemo;
-    break;
-#endif
 
 	//  *********************** Single Player Game Stuff **********************************
 
@@ -4289,9 +4104,6 @@ bool RenderScene( void )
 	//      StartCountDown( (int16_t) TimeLimit.value, 0 );
 	//    }
 
-#ifdef DEMO_SUPPORT
-    QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
 
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
@@ -4361,20 +4173,7 @@ bool RenderScene( void )
 	  } }
 #endif
 
-#ifdef AUTOTEST_REMASTER
-    /* Per-gameplay-frame tick of the autonomous level cycler. Runs after
-     * MainGame() so the level is fully initialised before its frame is
-     * counted. autotest_tick() advances NewLevelNum and forces LevelNum
-     * = -1 once the dwell expires (the existing "if NewLevelNum != LevelNum"
-     * branch below picks that up and triggers ReleaseView/InitView). */
-    { extern void autotest_tick(void); autotest_tick(); }
-#endif
 
-#ifdef ATM_PROFILING
-    /* The benchmark's only per-frame input: it marks "gameplay was live this
-     * frame" and detects level entry. It never synthesizes player input. */
-    { extern void atm_prof_bench_tick(void); atm_prof_bench_tick(); }
-#endif
 
 #ifdef __3DS__
     _3ds_mr_ctx = "post-MainGame";
@@ -4472,9 +4271,6 @@ bool RenderScene( void )
     smallinitShip( WhoIAm );
     InGameLoad( NULL );
     
-#ifdef DEMO_SUPPORT
-    QueryPerformanceCounter((LARGE_INTEGER *) &GameStartedTime);
-#endif
 
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
@@ -4494,23 +4290,6 @@ bool RenderScene( void )
 }
 
 void MainGameDemoRoutines(){
-#ifdef DEMO_SUPPORT
-  QueryPerformanceCounter((LARGE_INTEGER *) &GameCurrentTime);
-  if( PlayDemo )
-  {
-    if( PauseDemo )
-    {
-      TempGameElapsedTime = GameCurrentTime;
-    }else{
-      GameElapsedTime += (LONGLONG) ( ( GameCurrentTime - TempGameElapsedTime ) * Demoframelag );
-      TempGameElapsedTime = GameCurrentTime;
-      GameCurrentTime = GameCurrentTime - GameStartedTime;
-      GameCurrentTime = (LONGLONG) ( GameCurrentTime * Demoframelag );
-    }
-  }else{
-    NetworkGameUpdate();
-  }
-#endif
 }
 
 
@@ -6187,9 +5966,6 @@ bool RenderCurrentCamera( void )
   	set_alpha_states();
   _RC_STAGE("post-set_alpha_states-1");
   perf_stage_begin(PERF_S_TRANS);
-#ifdef ATM_PROFILING
-  { extern bool render_inTranslucent; render_inTranslucent = true; }
-#endif
 
 
 /*===================================================================
@@ -6346,9 +6122,6 @@ Display Group Clipped Faceme Transluecent Polys
         return false;
     }
 
-#ifdef ATM_PROFILING
-  { extern bool render_inTranslucent; render_inTranslucent = false; }
-#endif
   perf_stage_end(PERF_S_TRANS, -1);
   return true;
 }
@@ -6459,17 +6232,6 @@ bool Our_CalculateFrameRate(void)
 
 	}
 
-#ifdef DEMO_SUPPORT
-    // some stupid place for a demo calculation
-	if( MyGameStatus == STATUS_PlayingDemo )
-	{
-		QueryPerformanceFrequency((LARGE_INTEGER *) &Freq);
-		QueryPerformanceCounter((LARGE_INTEGER *) &DemoEndedTime);
-		TimeDiff = DemoEndedTime - DemoStartedTime;
-		DemoTotalTime = ( (float) TimeDiff / (float) Freq );
-		DemoAvgFps = DemoGameLoops / DemoTotalTime;
-	}
-#endif
 
 	return true;
 }
@@ -6643,20 +6405,6 @@ void CalculateFramelag( void )
 
   framelag = real_framelag * 71.0F;
 
-#if defined(FIDELITY_DUMP) || defined(ATM_PROFILING)
-  /* Determinism pin: the fidelity harness requires the simulation to
-   * advance by an identical step every tick so per-tick state hashes are
-   * reproducible across runs (wall-clock framelag makes the trajectory
-   * timing-dependent). 1.0F = one 71 Hz step per frame.
-   *
-   * The ATM benchmark needs the same property for a different reason: with
-   * a wall-clock framelag, two runs of the same level execute different
-   * amounts of simulation work per frame, so per-frame timing would compare
-   * unequal work. One 71 Hz step per frame makes work-per-frame identical
-   * across runs, builds, and mono/stereo. */
-  real_framelag = 0.014084507042253521126760563380282F; /* 1/71, exact-folded */
-  framelag = 1.0F;
-#endif
 
   // debugging
   //if (TimeWorst == 0.0 || seconds > TimeWorst) TimeWorst = seconds;

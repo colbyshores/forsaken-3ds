@@ -157,17 +157,7 @@ static bool              s_stereoFrame   = false;
 /* TRANS-phase flag for the tdraws/tverts counters. Set by oct2.c around
  * the translucent phase; read in FLUSH_BATCH. Harness-only (ATM_PROFILING)
  * so release builds carry no branch. */
-#ifdef ATM_PROFILING
-bool render_inTranslucent = false;
-#define TRANS_COUNT_BATCH() do { \
-		if (render_inTranslucent) { \
-			atm_prof_add(ATM_C_TDRAWS, 1); \
-			atm_prof_add(ATM_C_TVERTS, batch_vertCount); \
-		} \
-	} while (0)
-#else
 #define TRANS_COUNT_BATCH() ((void)0)
-#endif
 
 /* GPU lighting uniform locations, resolved at init from the shader DVLE
  * (don't depend on picasso's declaration-order register assignment). */
@@ -347,35 +337,10 @@ static int s_scratchPeak = 0;
  * scissor rect so each submitted batch can accumulate its pixel bounds.
  * Upper bound on fill, not measured pixels — a total near the framebuffer
  * size rules fill out; a large multiple only suggests pressure. */
-#ifdef ATM_PROFILING
-static int  s_scissorX0, s_scissorY0, s_scissorX1, s_scissorY1;
-static bool s_scissorOn = false;
-#define TRACK_SCISSOR(x0, y0, x1, y1, on) \
-	do { s_scissorX0 = (x0); s_scissorY0 = (y0); s_scissorX1 = (x1); s_scissorY1 = (y1); s_scissorOn = (on); } while (0)
-#else
 #define TRACK_SCISSOR(x0, y0, x1, y1, on) ((void)0)
-#endif
 
 /* Submitted-pixel bounds per batch (overdraw screen). Harness-only. */
-#ifdef ATM_PROFILING
-#define FILLPIX_COUNT_BATCH() do { \
-		if (s_scissorOn) { \
-			int _sw = s_scissorX1 - s_scissorX0; \
-			int _sh = s_scissorY1 - s_scissorY0; \
-			if (_sw > 0 && _sh > 0) { \
-				atm_prof_add(ATM_C_FILLPIX, (unsigned)(_sw * _sh)); \
-				if (render_inTranslucent) \
-					atm_prof_add(ATM_C_TFILLPIX, (unsigned)(_sw * _sh)); \
-			} \
-		} else { \
-			atm_prof_add(ATM_C_FILLPIX, 240u * 400u); \
-			if (render_inTranslucent) \
-				atm_prof_add(ATM_C_TFILLPIX, 240u * 400u); \
-		} \
-	} while (0)
-#else
 #define FILLPIX_COUNT_BATCH() ((void)0)
-#endif
 
 
 /* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
@@ -628,11 +593,7 @@ void pglSwapBuffers(void)
 	}
 	/* Trace cadence: 1s under AUTOTEST so a hard lock pinpoints to within
 	 * a second; 10s otherwise so SD I/O doesn't drown normal play. */
-#ifdef AUTOTEST_REMASTER
-	if ((now - s_fps_last_log_ms) >= 1000)
-#else
 	if ((now - s_fps_last_log_ms) >= 10000)
-#endif
 	{
 		extern void trace(const char*);
 		char _b[64];
@@ -878,12 +839,6 @@ bool c3d_renderer_init(void)
 	    "[boot] c3d_renderer_init: scratch OK linearFree=%u KB",
 	    linearSpaceFree() >> 10); boot_log(_b); }
 	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
-#ifdef STRESS_SCRATCH_VERTS
-	/* R02 stress: force mid-frame scratch overflow every frame to prove
-	 * the split/reset path (no GPU-completion wait) neither corrupts
-	 * geometry nor hangs. Debug builds only; never ship (kills batching). */
-	s_scratchMax = STRESS_SCRATCH_VERTS;
-#endif
 	s_scratchUsed = 0;
 	s_scratchPeak = 0;
 
@@ -1552,18 +1507,7 @@ bool FSBeginScene(void)
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
-#ifdef PERF_CAPTURE
-		/* FSBEGIN split: isolate the FrameBegin GPU/queue wait from the
-		 * CPU state setup that follows. If the wait dominates and setup
-		 * is ~0, the frame-begin cost is GPU overhang, not CPU work —
-		 * the reading that closes the TF03 question. */
-		perf_stage_begin(PERF_S_FSBWAIT);
-#endif
 		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-#ifdef PERF_CAPTURE
-		perf_stage_end(PERF_S_FSBWAIT, -1);
-		perf_stage_begin(PERF_S_FSBSETUP);
-#endif
 		C3D_RenderTargetClear(s_targetLeft, C3D_CLEAR_ALL, 0x000000FF, 0xFFFFFF);
 		C3D_FrameDrawOn(s_targetLeft);
 		s_targetCurrent = s_targetLeft;
@@ -1613,9 +1557,6 @@ bool FSBeginScene(void)
 #endif
 
 		s_inFrame = true;
-#ifdef PERF_CAPTURE
-		perf_stage_end(PERF_S_FSBSETUP, -1);
-#endif
 	}
 	return true;
 }
@@ -3038,13 +2979,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			{
 				FLUSH_BATCH();
 				C3D_FrameSplit(0);
-#ifdef ATM_PROFILING
-				/* R02 loudness: any bench with splits>0 exercised the
-				 * unfenced overflow path; its stills/wall are invalid
-				 * until that path is fenced. Must stay 0 in real scenes
-				 * (peaks 5-26k vs 116k cap today). */
-				atm_prof_add(ATM_C_SCRATCH_SPLITS, 1);
-#endif
 				/* M1: record the pre-split footprint. Resetting the cursor
 				 * here is NOT a GPU-completion proof (FrameSplit only
 				 * queues); the peak at least makes any overlap visible. */
@@ -3115,9 +3049,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				renderObject->memoEpochPass,
 				renderObject->memoEpochGroup,
 				renderObject->memoEpochTPage);
-#ifdef ATM_PROFILING
-			atm_prof_add(memo_hit ? ATM_C_MEMO_HIT : ATM_C_MEMO_MISS, 1);
-#endif
 		}
 		/* Convert live unless the memo/persist hit (VERIFY converts
 		 * anyway for the oracle compare below). */
@@ -3198,20 +3129,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			totalVerts = numVerts;
 		}
 
-#ifdef ATM_PROFILING
-		/* R05 sizing: attribute this live conversion to its owner
-		 * class. Runs only on the convert path (memo hits skip it),
-		 * so vown_* sums measure actual conversion work per class. */
-		{
-			static const int vown_counter[6] = {
-				ATM_C_VOWN_OTHER, ATM_C_VOWN_LEVEL, ATM_C_VOWN_MODEL,
-				ATM_C_VOWN_MXA, ATM_C_VOWN_SHARED, ATM_C_VOWN_WATER
-			};
-			unsigned int vown = renderObject->vertOwner;
-			if (vown > VERT_OWNER_WATER) vown = VERT_OWNER_OTHER;
-			atm_prof_add(vown_counter[vown], totalVerts);
-		}
-#endif
 
 		/* Record the converted range (eye 1). Runs ONLY on the live
 		 * path: on a memo hit the tg arrays already hold the looked-up

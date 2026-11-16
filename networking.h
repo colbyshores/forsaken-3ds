@@ -393,10 +393,6 @@ typedef struct _GLOBALSHIP
 	float		OldBank;							//
 	float		NextBank;							// what my next bank angle will be..
 
-#ifdef DEMO_SUPPORT
-	LONGLONG	OldTime;							// how long before I am at those positions
-	LONGLONG	NextTime;							// how long before I am at those positions
-#endif
 
 	float		SuperNashramTimer;					// HowLong have i left with the super nashram?
 	u_int16_t		TempLines[ 12 ];
@@ -943,27 +939,6 @@ typedef struct _TEXTMSG
 	BYTE		TextMsgType;
 } TEXTMSG, *LPTEXTMSG;
 
-#ifdef DEMO_SUPPORT
-typedef struct _INTERPOLATEMSG
-{
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-	VECTOR		NextPos;			// what my next position will be
-	QUAT		NextQuat;			// what my next view angle will be
-	float		NextBank;			// what my next bank angle will be..
-	LONGLONG	NextTime;			// how long before I am at thos positions
-} INTERPOLATEMSG, *LPINTERPOLATEMSG;
-
-typedef struct _VERYSHORTINTERPOLATEMSG
-{
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-	SHORTVECTOR	NextPos;			// what my next position will be
-	SHORTQUAT	NextQuat;			// what my next view angle will be
-	int16_t		NextBank;			// what my next bank angle will be..
-	LONGLONG	NextTime;			// how long before I am at thos positions
-} VERYSHORTINTERPOLATEMSG, *LPVERYSHORTINTERPOLATEMSG;
-#endif
 
 typedef struct _SETTIMEMSG
 {

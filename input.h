@@ -1,10 +1,6 @@
 #ifndef INPUT_INCLUDED
 #define INPUT_INCLUDED
 
-#ifdef DINPUTJOY
-#define DIRECTINPUT_VERSION 0x0700
-#include <dinput.h>
-#endif
 
 #include "main.h"
 

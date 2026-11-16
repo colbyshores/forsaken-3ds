@@ -139,7 +139,6 @@ bool GoalLoad( void )
 		GoalPnt->state = GOALSTATE_Off;
 
 		floatpnt = (float * ) u_int16_tpnt;
-#ifdef ARM
 		memcpy_unaligned(&GoalPnt->pos, floatpnt, 4*3);
 		floatpnt+=3;
 		memcpy_unaligned(&GoalPnt->half_size, floatpnt, 4*3);
@@ -151,23 +150,6 @@ bool GoalLoad( void )
 		memcpy(&GoalPnt->width, floatpnt++, 4);
 		memcpy(&GoalPnt->height, floatpnt++, 4);
 		memcpy(&GoalPnt->depth, floatpnt++, 4);
-#else
-		GoalPnt->pos.x = *floatpnt++;
-		GoalPnt->pos.y = *floatpnt++;
-		GoalPnt->pos.z = *floatpnt++;
-		GoalPnt->half_size.x = *floatpnt++;
-		GoalPnt->half_size.y = *floatpnt++;
-		GoalPnt->half_size.z = *floatpnt++;
-		GoalPnt->dir.x = *floatpnt++;
-		GoalPnt->dir.y = *floatpnt++;
-		GoalPnt->dir.z = *floatpnt++;
-		GoalPnt->up.x = *floatpnt++;
-		GoalPnt->up.y = *floatpnt++;
-		GoalPnt->up.z = *floatpnt++;
-		GoalPnt->width = *floatpnt++;
-		GoalPnt->height = *floatpnt++;
-		GoalPnt->depth = *floatpnt++;
-#endif
 		Buffer = (char*) floatpnt;
 		if( GoalPnt->type != ZONE_Sphere )
 		{
@@ -192,16 +174,9 @@ bool GoalLoad( void )
 			
 			for( j = 0 ; j < GoalPnt->num_sides ; j++ )
 			{
-#ifdef ARM
 				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
 				floatpnt+=3;
 				memcpy(&ZonePnt->offset, floatpnt++, 4);
-#else
-				ZonePnt->normal.x = *floatpnt++;
-				ZonePnt->normal.y = *floatpnt++;
-				ZonePnt->normal.z = *floatpnt++;
-				ZonePnt->offset   = *floatpnt++;
-#endif
 				ZonePnt++;
 			}
 			Buffer = (char*) floatpnt;

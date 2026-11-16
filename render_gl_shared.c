@@ -3,29 +3,6 @@
 
 // windows needs explicit retrieval of newer GL functions...
 /*
-#ifdef WIN32
-
-static PFNGLBLENDCOLOREXTPROC glBlendColor = NULL;
-
-void no_glBlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha){}
-
-static void bind_glBlendColor(void)
-{
-        if( !glBlendColor ) glBlendColor = SDL_GL_GetProcAddress( "glBlendColor" );
-        if( !glBlendColor ) glBlendColor = SDL_GL_GetProcAddress( "glBlendColorEXT" );
-        if( !glBlendColor )
-        {
-                glBlendColor = (PFNGLBLENDCOLOREXTPROC) no_glBlendColor;
-                DebugPrintf("bind_glBlendColor: failed to get proc address\n");
-        }
-}
-
-static void bind_gl_funcs(void)
-{
-        bind_glBlendColor();
-}
-
-#endif // WIN32
 */
 
 // CHECK_GL_ERRORS will set this when called
@@ -1081,6 +1058,7 @@ LPVERTEXBUFFER _create_buffer( int size, GLenum type, GLenum gettype, GLenum usa
 #endif
 
 bool draw_object(RENDEROBJECT *renderObject){return draw_render_object(renderObject,GL_TRIANGLES,false);}
+bool draw_billboard_object(RENDEROBJECT *renderObject){return draw_render_object(renderObject,GL_TRIANGLES,false);}
 bool draw_2d_object(RENDEROBJECT *renderObject){return draw_render_object(renderObject,GL_TRIANGLES,true);}
 bool draw_line_object(RENDEROBJECT *renderObject){return draw_render_object(renderObject,GL_LINES,false);}
 

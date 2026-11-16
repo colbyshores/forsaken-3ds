@@ -281,16 +281,12 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			for ( i=0 ; i<num_vertices; i++)
 			{
 
-#ifdef ARM
 				/* lpLVERTEX2 points into a buffer at variable alignment
 				   (filename strings precede it); copy 32-byte OLDLVERTEX
 				   to a stack-aligned local before float reads. */
 				__typeof__(*lpLVERTEX2) _ovx_local;
 				memcpy_unaligned(&_ovx_local, lpLVERTEX2, sizeof(*lpLVERTEX2));
 				LPOLDLVERTEX old = &_ovx_local;
-#else
-				LPOLDLVERTEX old = lpLVERTEX2;
-#endif
 
 				lpLVERTEX[i].x = old->x;
 				lpLVERTEX[i].y = old->y;
@@ -436,15 +432,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 					lpIndices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
-#ifdef ARM
 					memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
 					memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
 					memcpy(&lpNormals->nz, &MFacePnt->nz, 4);
-#else
-					lpNormals->nx = MFacePnt->nx;
-					lpNormals->ny = MFacePnt->ny;
-					lpNormals->nz = MFacePnt->nz;
-#endif
 
 					if ( MFacePnt->pad & 1 )
 					{
@@ -562,18 +552,14 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Msg( "Mxaload() calloc(num_frames=%d) failed in %s\n", Mxaloadheader->num_frames, Filename );
 				return false;
 			}
-#ifdef ARM
 			Mxaloadheader->aligned_verts = NULL;
-#endif
 
 			{
-#ifdef ARM
 				/* First pass: record frame_pnts into raw buffer and count total
 				 * MXAVERT bytes.  We'll allocate an aligned copy afterwards so
 				 * InterpFrames can use direct pointer access instead of per-vertex
 				 * memcpy on every frame. */
 				char *BufferStart = Buffer;
-#endif
 				for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
 				{
 					for( group=0 ; group<Mxaloadheader->num_groups; group++)
@@ -612,7 +598,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 					}
 				}
 
-#ifdef ARM
 				/* Allocate a single aligned buffer and pack MXAVERT arrays
 				 * consecutively (without the u16 count-fields that appear
 				 * between them in the raw file).  malloc returns 8-byte
@@ -666,7 +651,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 						}
 					}
 				}
-#endif
 			}
 		}
 		else
@@ -754,24 +738,12 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				FirePointPtr->ID = *Uint16Pnt++;				// ID ( u_int16_t )
 				FloatPnt = (float *) Uint16Pnt;
 
-#ifdef ARM
 				memcpy_unaligned(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
 				FloatPnt+=3;
 				memcpy_unaligned(&FirePointPtr->Dir, FloatPnt, 3*4);				// Dir ( 3 floats )
 				FloatPnt+=3;
 				memcpy_unaligned(&FirePointPtr->Up, FloatPnt, 3*4);				// Up ( 3 floats )
 				FloatPnt+=3;
-#else
-				FirePointPtr->Pos.x = *FloatPnt++;				// Pos ( 3 floats )
-				FirePointPtr->Pos.y = *FloatPnt++;
-				FirePointPtr->Pos.z = *FloatPnt++;
-				FirePointPtr->Dir.x = *FloatPnt++;				// Dir ( 3 floats )
-				FirePointPtr->Dir.y = *FloatPnt++;
-				FirePointPtr->Dir.z = *FloatPnt++;
-				FirePointPtr->Up.x = *FloatPnt++;				// Up ( 3 floats )
-				FirePointPtr->Up.y = *FloatPnt++;
-				FirePointPtr->Up.z = *FloatPnt++;
-#endif
 				Uint16Pnt = (u_int16_t *) FloatPnt;
 				FirePointPtr++;
 			}
@@ -802,7 +774,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				SpotFXPtr->Type = *Uint16Pnt++;				// Type ( u_int16_t )
 				FloatPnt = (float *) Uint16Pnt;
 
-#ifdef ARM
 				memcpy_unaligned(&SpotFXPtr->Pos, FloatPnt, 4*3);
 				FloatPnt+=3;
 				memcpy_unaligned(&SpotFXPtr->DirVector.x, FloatPnt, 4*3);
@@ -812,20 +783,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				memcpy(&SpotFXPtr->StartDelay, FloatPnt++, 4); SpotFXPtr->StartDelay*= ANIM_SECOND;	// Start Delay
 				memcpy(&SpotFXPtr->ActiveDelay, FloatPnt++,4); SpotFXPtr->ActiveDelay*= ANIM_SECOND;	// Active Delay
 				memcpy(&SpotFXPtr->InactiveDelay, FloatPnt++, 4); SpotFXPtr->InactiveDelay*= ANIM_SECOND;	// Inactive Delay
-#else
-				SpotFXPtr->Pos.x = *FloatPnt++;				// Pos ( 3 floats )
-				SpotFXPtr->Pos.y = *FloatPnt++;
-				SpotFXPtr->Pos.z = *FloatPnt++;
-				SpotFXPtr->DirVector.x = *FloatPnt++;		// Dir ( 3 floats )
-				SpotFXPtr->DirVector.y = *FloatPnt++;
-				SpotFXPtr->DirVector.z = *FloatPnt++;
-				SpotFXPtr->UpVector.x = *FloatPnt++;		// Up ( 3 floats )
-				SpotFXPtr->UpVector.y = *FloatPnt++;
-				SpotFXPtr->UpVector.z = *FloatPnt++;
-				SpotFXPtr->StartDelay = ( *FloatPnt++ * ANIM_SECOND );	// Start Delay
-				SpotFXPtr->ActiveDelay = ( *FloatPnt++ * ANIM_SECOND );	// Active Delay
-				SpotFXPtr->InactiveDelay = ( *FloatPnt++ * ANIM_SECOND );	// Inactive Delay
-#endif
 				Int16Pnt = (int16_t *) FloatPnt;
 				SpotFXPtr->Primary = (int8_t) *Int16Pnt++;	// Primary ( int16_t )
 				SpotFXPtr->Secondary = (int8_t) *Int16Pnt++;	// Secondary ( int16_t )
@@ -865,13 +822,8 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				}
 
 				FloatPnt = (float *) Int8Pnt;
-#ifdef ARM
 				memcpy(&SpotFXPtr->SoundFXVolume, FloatPnt++, 4);
 				memcpy(&SpotFXPtr->SoundFXSpeed, FloatPnt++, 4);
-#else
-				SpotFXPtr->SoundFXVolume = *FloatPnt++;
-				SpotFXPtr->SoundFXSpeed = *FloatPnt++;
-#endif
 				Uint16Pnt = (u_int16_t *) FloatPnt;
 #else
 				Uint16Pnt = (u_int16_t *) Uint32Pnt;
@@ -1019,11 +971,9 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 			free ( Mxaloadheader->frame_pnts );
 		Mxaloadheader->frame_pnts = NULL;
 
-#ifdef ARM
 		if ( Mxaloadheader->aligned_verts )
 			free( Mxaloadheader->aligned_verts );
 		Mxaloadheader->aligned_verts = NULL;
-#endif
 	}
 
 	Mxaloadheader->state = false;

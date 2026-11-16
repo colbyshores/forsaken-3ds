@@ -4,9 +4,6 @@
 ===================================================================*/
 
 #define SAVEGAME_SLOTS
-#ifdef WIN32
-#include <windows.h>
-#endif
 #include "main.h"
 #include "platform.h"
 
@@ -182,11 +179,6 @@ extern bool ShowTeleports;
 extern bool ShowBoundingBoxes;
 extern bool ShowColZones;
 
-#ifdef DEMO_SUPPORT
-extern float DemoAvgFps;
-extern float DemoTotalTime;
-extern int32_t DemoGameLoops;
-#endif
 
 extern	int16_t actual_volume;
 extern	bool RearCameraActive;
@@ -195,9 +187,6 @@ extern char *JoystickPOVDirections[];
 extern char *ShipAxisText[];
 extern int ShipAxisLookup[];
 
-#ifdef DINPUTJOY
-extern DIJOYSTATE2		js[ INPUT_BUFFERS ][ MAX_JOYSTICKS ];
-#endif
 
 extern char *ShipActionText[];
 extern TLOADHEADER	Tloadheader;
@@ -2147,27 +2136,6 @@ MENU	MENU_NEW_SelectBiker = {
 MENUITEM BikeCharItem = 
 		{ 125 , 20, 200, 130, 0, "" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0};
 
-#ifdef DEMO_SUPPORT
-
-MENU	MENU_NEW_DemoPlayBack = {
-	"Demo Playback" , InitDemoList, NULL, NULL, 0,
-	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_DemoPlayBack0 /*"play back demo"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 0, 20, 200, 30, 0, LT_MENU_NEW_DemoPlayBack1 /*"Start"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, StartDemoPlayback , DrawFlatMenuItem, NULL, 0 } ,
-		{ 10, 40, 100, 50, SLIDER_Demo, LT_MENU_NEW_DemoPlayBack2 /*"playback speed"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &DemoSpeed, NULL, SelectSlider, DrawFlatMenuSlider, NULL, 0 } ,
-		{ 10, 60, 90, 60, SLIDER_Value, LT_MENU_NEW_DemoPlayBack3 /*"watch player"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &DemoEyesSelect, NULL, SelectSlider, DrawFlatMenuSlider, NULL, 0 } ,
-
-		{ 10, 75, 200, 75, 0, LT_MENU_NEW_DemoPlayBack4 /*"choose demo"*/, FONT_Small, TEXTFLAG_CentreY, &DemoList, NULL, SelectVDUList, DrawFlatMenuItem, NULL, 0 } ,
- 		{ 20, 90, 200, 150, 0, "",  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, &DemoList, NULL, SelectList, DrawFlatMenuList, NULL, 0 } ,
-		
-		{ 5, 160, 200, 160, 0, "", FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh,  (void *)DemoAvgFpsText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		{ 5, 170, 200, 170, 0, "", FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_CheckForRefresh,  (void *)DemoTotalFramesText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-		
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-#endif
 
 int16_t InGameLoadGameLevelNum;
 extern	bool	CountDownOn;
@@ -2228,22 +2196,6 @@ MENU	MENU_NEW_InGameSound = {
 	}
 };
 
-#ifdef DEMO_SUPPORT
-
-MENU	MENU_NEW_DemoCleaning = {
-	"" , InitDemoList, NULL, NULL, 0,
-	{
-		{ 0, 0, 200, 20, 0, LT_MENU_NEW_DemoCleaning0 /*"clean a demo"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 0 , 20, 200, 30, 0, LT_MENU_NEW_DemoCleaning1 /*"Start"*/ , FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, &MENU_NotYet , StartDemoCleaning , DrawFlatMenuItem, NULL, 0 } ,
-		
-		{ 10, 45, 200, 55, 0, LT_MENU_NEW_DemoCleaning2 /*"choose demo"*/, FONT_Small, TEXTFLAG_CentreY, &DemoList, NULL, SelectVDUList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 20 , 60, 200, 170, 0, "", FONT_Small,TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &DemoList, NULL , SelectList , DrawFlatMenuList, NULL, 0 } ,
-
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-#endif
 
 #define MAX_SAVEDGAME_INFO_LENGTH 128
 
@@ -2272,10 +2224,6 @@ MENU	MENU_NEW_RestoreGame = {
 	"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
 		{ 0, 0, 200, 20, 0, LT_MENU_NEW_RestoreGame0 /*"Restore Game"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-#ifdef DEMO_SUPPORT
-		{ 5, 30, 100, 40, 0, LT_MENU_NEW_RestoreGame1 /*"Play Demo"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_DemoPlayBack, MenuChange, DrawFlatMenuItem, NULL, 0  },
-		{ 5, 50, 100, 60, 0, LT_MENU_NEW_RestoreGame2 /*"Clean Demo"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_DemoCleaning, MenuChange, DrawFlatMenuItem, NULL, 0  },
-#endif
 		{ 5, 70, 100, 80, 0, LT_MENU_NEW_RestoreGame3 /*"load game"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_LoadGame, MenuChange, DrawFlatMenuItem, NULL, 0  },
 						 
 		{ -1, -1, 0, 0, 0, "", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
@@ -3003,30 +2951,6 @@ MENU	MENU_DemoPlaying = {
 };
 
 
-#ifdef DEMO_SUPPORT
-
-MENU	MENU_DemoPlayBack = {
-	"Demo Playback"/*"Demo Playback"*/ , InitDemoList, NULL, NULL, 0,
-	{
-		{ 200 , 128, 0, 0, 0, "Start"/*"Start"*/ , 0, 0, NULL, &MENU_NotYet , StartDemoPlayback , MenuItemDrawName, NULL, 0 } ,
-		{ 200 , 144, 0, 0, 0, "Playback Speed"/*"Playback Speed"*/, 0, 0,	&DemoSpeed,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
-		{ 200 , 176, 0, 0, 0, "Watch Player"/*"Watch Player"*/, 0, 0,		&DemoEyesSelect,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
-		{ 200 , 192, 0, 0, 0, "Choose From..."/*"Choose From..."*/, 0, 0, &DemoList, NULL , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-MENU	MENU_DemoCleaning = {
-	LT_MENU_DemoCleaning0 /*"Clean A Demo"*/ , InitDemoList, NULL, NULL, 0,
-	{
-		{ 200 , 128, 0, 0, 0, LT_MENU_DemoCleaning1 /*"Start"*/ , 0, 0, NULL, &MENU_NotYet , StartDemoCleaning , MenuItemDrawName, NULL, 0 } ,
-		{ 200 , 144, 0, 0, 0, LT_MENU_DemoCleaning2 /*"Output Name  "*/, 0, 0, &DemoGameName, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ 200 , 160, 0, 0, 0, LT_MENU_DemoCleaning3 /*"Choose From..."*/, 0, 0, &DemoList, NULL , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-#endif
 
 MENU	MENU_SetUpBiker = {
 	LT_MENU_SetUpBiker0 /*"Set Up Biker"*/ , InitBikerMenu, ExitBikerMenu, NULL, 0,
@@ -3053,10 +2977,6 @@ MENU	MENU_Start = { "Forsaken" , InitStartMenu , NULL , NULL, 0,
 					  OLDMENUITEM( 200 , 160, "Multi Player", NULL, &MENU_HostOrJoin , MenuChange , MenuItemDrawName ),
 					  OLDMENUITEM( 200 , 176, "Load Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
 					  OLDMENUITEM( 200 , 192, "Save Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
-#ifdef DEMO_SUPPORT
-					  OLDMENUITEM( 200 , 208, "Play Demo", NULL, &MENU_DemoPlayBack , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 224, "Clean Demo", NULL, &MENU_DemoCleaning , MenuChange , MenuItemDrawName ),
-#endif
 					  OLDMENUITEM( 200 , 240, "Options", NULL, &MENU_Options , MenuChange , MenuItemDrawName ),
 					  OLDMENUITEM( 200 , 256, "Quit", NULL, NULL, SelectQuit , MenuItemDrawName ),
 					{ 200 , 272, 0, 0, 0, "New Menu System" , 0, 0, NULL, &MENU_NEW_Start, MenuChange , MenuItemDrawName, NULL, 0, 0 } ,
@@ -7317,70 +7237,6 @@ static int compare( const void *arg1, const void *arg2 )
    return strcasecmp( ( char* ) arg1, ( char* ) arg2 );
 }
 
-#ifdef DEMO_SUPPORT
-
-static int
-_cdecl CompareDemoDate( const void *arg1, const void *arg2 )
-{
-	FILETIME date;
-	HANDLE hfile;
-	char *demo;	 
-	LONGLONG longdate1, longdate2;
-
-	// get creation date of file 1
-	demo = DemoFileName( (char *)arg1 );
-	hfile = CreateFile( demo,	// pointer to name of the file 
-						GENERIC_READ,	// read mode 
-						FILE_SHARE_READ,	// share mode 
-						NULL,	// pointer to security descriptor 
-						OPEN_EXISTING,	// how to create 
-						FILE_ATTRIBUTE_NORMAL,	// file attributes 
-						NULL 	// handle to file with attributes to copy  
-						);
-	if ( hfile != INVALID_HANDLE_VALUE )
-	{
-		GetFileTime( hfile,	NULL,  NULL, &date );
-		longdate1 = ( LONGLONG )date.dwHighDateTime;
-		longdate1 <<= 32;
-		longdate1 |= ( LONGLONG )date.dwLowDateTime;
-	}else
-	{
-		return 0;
-	}
-	CloseHandle(hfile);
-
-	// get creation date of file 1
-	demo = DemoFileName( (char *)arg2 );
-	hfile = CreateFile( demo,	// pointer to name of the file 
-						GENERIC_READ,	// read mode 
-						FILE_SHARE_READ,	// share mode 
-						NULL,	// pointer to security descriptor 
-						OPEN_EXISTING,	// how to create 
-						FILE_ATTRIBUTE_NORMAL,	// file attributes 
-						NULL 	// handle to file with attributes to copy  
-						);
-	if ( hfile != INVALID_HANDLE_VALUE )
-	{
-		GetFileTime( hfile,	NULL,  NULL, &date );
-		longdate2 = ( LONGLONG )date.dwHighDateTime;
-		longdate2 <<= 32;
-		longdate2 |= ( LONGLONG )date.dwLowDateTime;
-	}else
-	{
-		return 0;
-	}
-	CloseHandle(hfile);
-
-	if ( longdate1 < longdate2 )
-		return 1;
-
-	if ( longdate1 > longdate2 )
-		return -1;
-
-	return 0;
-}
-
-#endif // DEMO_SUPPORT
 
 /*===================================================================
 	Procedure	:		Initialise the pilot list
@@ -9109,138 +8965,6 @@ void ShowStartPointsToggle( MENUITEM *item )
 	}
 }
 
-#ifdef DEMO_SUPPORT
-
-void InitAvgFrameRateGlobals( MENU *Menu )
-{
-    sprintf( DemoAvgFpsText, "Avg %.2f FPS", DemoAvgFps );
-	sprintf( DemoTotalFramesText, "%d frames %d.%02d",
-		(int)DemoGameLoops,
-		(int) DemoTotalTime / 60, (int) DemoTotalTime % 60 );
-}
-
-void RestoreDemoSettings( void )
-{
-	PauseDemo = false;
-	DemoSpeed.value = 8;
-	DemoEyesSelect.value = 0;
-	ShowNamesAnyway = false;
-}
-
-/*===================================================================
-	Procedure	:		Initialise Demo Name list
-	Input		:		Nothing
-	Output		:		Nothing
-===================================================================*/
-void InitDemoList( MENU * Menu )
-{
-	HANDLE h;
-	WIN32_FIND_DATA DemoFiles;
-	int j;
-//	char *fname, *bname;
-	FILE *DemoFp;
-
-	RestoreDemoSettings();
-
-	if ( !InitLevels( DEMO_LEVELS ) && !InitLevels( DEFAULT_LEVELS ) )
-	{
-		//Msg( "No demo levels" );
-		PrintErrorMessage (LT_NoSinglePlayerLevelsInstalled, 1, NULL, ERROR_USE_MENUFUNCS );
-		return;
-	}
-	DemoList.items = 0;
-	DemoList.top_item = 0;
-	if (CameraStatus != CAMERA_AtStart)
-		DemoList.display_items = 10;
-	else
-		DemoList.display_items = 8;
-
-	DemoList.selected_item = 0;
-	DemoList.item[0][0] = 0;
-	h = FindFirstFile( DEMOFILE_SEARCHPATH,	// pointer to name of file to search for  
-						(LPWIN32_FIND_DATA) &DemoFiles );	// pointer to returned information 
-
-	if ( h == INVALID_HANDLE_VALUE )
-	{
-		return;
-	}
-
-	do{
-		strncpy( DemoList.item[ DemoList.items ], DemoName( DemoFiles.cFileName ), sizeof( DemoList.item[ 0 ] ) - 1 );
-		DemoList.item[ DemoList.items ][ sizeof( DemoList.item[ 0 ] ) - 1 ] = 0;
-
-		DemoFp = file_open( DemoFileName( DemoList.item[ DemoList.items ] ), "rb" );
-
-		if ( DemoFp )
-		{
-			u_int32_t mp_version;
-
-			mp_version = ~MULTIPLAYER_VERSION;
-			fread( &mp_version, sizeof( mp_version ), 1, DemoFp );
-			if ( (mp_version <= MULTIPLAYER_VERSION) && (mp_version >= DEMO_MULTIPLAYER_VERSION) )
-			{
-				u_int16_t CopyOfSeed1;
-				u_int16_t CopyOfSeed2;
-				bool RandomPickups;
-				u_int32_t flags;
-				u_int32_t PackedInfo[ MAX_PICKUPFLAGS ];
-				u_int16_t RandomStartPosModify;
-				static char buf[ 256 ];
-				int i;
-
-				fread( &CopyOfSeed1, sizeof( CopyOfSeed1 ), 1, DemoFp );
-				fread( &CopyOfSeed2, sizeof( CopyOfSeed2 ), 1, DemoFp );
-				fread( &RandomPickups, sizeof( RandomPickups ), 1, DemoFp );
-				fread( &PackedInfo[ 0 ], sizeof( PackedInfo ), 1, DemoFp );
-				
-				fread( &flags, sizeof( flags ), 1, DemoFp );
-				
-				fread( &RandomStartPosModify, sizeof( RandomStartPosModify ), 1, DemoFp );
-				
-				for( i = 0 ; i < 256 ; i++ )
-				{
-					fread( &buf[i], sizeof(char), 1, DemoFp );
-					if( buf[i] == 0 )
-					{
-						break;
-					}
-				}
-				
-				for (i = 0; i < NumLevels; i++)
-				{
-					
-					if( strcasecmp( (char*) &ShortLevelNames[i][0] , (char*) &buf[0] ) == 0 ) 
-					{
-						break;
-					}
-				}
-				
-				if( i < NumLevels )
-				{
-					DemoList.items++;
-				}
-			}
-			fclose( DemoFp );
-		}
-	}while(	FindNextFile( h , (LPWIN32_FIND_DATA) &DemoFiles ) && DemoList.items < MAXLISTITEMS );
-
-	qsort( (void *)DemoList.item, (size_t) DemoList.items, sizeof( DemoList.item[ 0 ] ), CompareDemoDate );
-
-	for ( j = 0; j < DemoList.items; j++ )
-	{
-		if ( !strcmp( DemoList.item[ j ], biker_name ) )
-			DemoList.selected_item = j;
-	}
-	if ( DemoList.selected_item >= DemoList.top_item + DemoList.display_items )
-		DemoList.top_item = DemoList.selected_item - DemoList.display_items + 1;
-
-	FindClose(h);
-
-	InitAvgFrameRateGlobals( NULL );
-	DemoList.FuncDelete = ( DemoList.items > 0 ) ? DeleteDemo : NULL;
-}
-
-#endif // DEMO_SUPPORT
 
 /*===================================================================
 	Procedure	:		Initialise Load Game Name list
@@ -14645,33 +14369,13 @@ void CheckJoyAxis( int *dummy )
 	int axis;
 	float pos;
 
-#ifdef DINPUTJOY
-
-	// this is a good thing cause sdl also considers a slider an axis
-	long *axisptr[MAX_JOYSTICK_AXIS] =
-	{
-		&js[ new_input ][joystick].lX,  // 0
-		&js[ new_input ][joystick].lY,  // 1
-		&js[ new_input ][joystick].lZ,  // 2
-		&js[ new_input ][joystick].lRx, // 3
-		&js[ new_input ][joystick].lRy, // 4
-		&js[ new_input ][joystick].lRz, // 5
-		&js[ new_input ][joystick].rglSlider[0], // 6
-		&js[ new_input ][joystick].rglSlider[1]  // 7
-	};
-
-#endif
 
 	char *left;
 	char *right;
 
 	axis = AxisMap[JoystickAxisList.selected_item];
 
-#ifdef DINPUTJOY
-	pos = (float) *axisptr[axis];
-#else
 	pos = (float) joy_axis_state[ joystick ][ axis ];
-#endif
 
 	//DebugPrintf("%f\n",pos);
 
@@ -15088,25 +14792,6 @@ void InGameSaveASinglePlayerGame( MENUITEM *item )
 
 void DebugLastError( void )
 {
-#ifdef WIN32
-	DWORD err;
-	LPVOID lpMsgBuf;
-
-	err = GetLastError();
-
-	FormatMessage( 
-		  FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		  NULL,
-		  err,
-		  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-		  (LPTSTR) &lpMsgBuf,
-		  0,
-		  NULL 
-		  );
-	DebugPrintf( "DeleteSavedGame failed: err=0x%08X msg=%s\n",
-		err, lpMsgBuf );
-	LocalFree( lpMsgBuf );
-#endif
 }
 
 
@@ -16330,11 +16015,7 @@ bool ProcessText( int Key )
 		TextBackspace( (TEXT *)(TextItem->Variable) );
 		break;
 	case SDLK_DELETE:
-#ifdef MACOSX
-		TextBackspace( (TEXT *)(TextItem->Variable) );
-#else
 		TextDelete( (TEXT *)(TextItem->Variable) );
-#endif
 		break;
 	case SDLK_TAB:
 		TextClear( (TEXT *)(TextItem->Variable) );

@@ -28,13 +28,8 @@
 #include "atm_prof.h"
 #include "framedump.h"
 
-#ifndef WIN32
 #include <unistd.h>
-#endif
 
-#ifdef __WINE__
-#define LR_VGACOLOR LR_VGA_COLOR
-#endif
 
 //
 // GLOBAL VARIABLES
@@ -418,9 +413,7 @@ void CleanUpAndPostQuit(void)
 
 #ifdef BREAKPAD
 // breakpad running through wine, built for windows doens't work well..
-#ifndef __WINE__
 extern bool breakpad_init( void );
-#endif
 #endif
 
 extern bool InitView( void );
@@ -451,17 +444,9 @@ static bool AppInit( char * lpCmdLine )
 
 	render_info.vsync = false;
 
-#ifdef DXMOUSE
-	if(!dx_init_mouse())
-	{
-		DebugPrintf("Could not init dx mouse\n");
-		return false;
-	}
-#endif
 
 #ifdef BREAKPAD
 // breakpad running through wine, built for windows doens't work well..
-#ifndef __WINE__
 
 	// initialize google breakpad crash reporting
 	if(!breakpad_init())
@@ -470,7 +455,6 @@ static bool AppInit( char * lpCmdLine )
 	// test breakpad by uncommenting this
 	//{ *(int*)0=0; }
 
-#endif
 #endif
 
 #ifdef DEBUG_ON
@@ -664,9 +648,6 @@ static bool RenderLoop()
     // Blt or flip the back buffer to the front buffer
 	if( !QuitRequested )
 	{
-#ifdef DEMO_SUPPORT
-		if ((!PlayDemo || ( MyGameStatus != STATUS_PlayingDemo ) ||	DemoShipInit[ Current_Camera_View ]	))
-#endif
 		{
 			// this is the actual call to render a frame...
 			{
@@ -754,11 +735,7 @@ int main( int argc, char* argv[] )
 	 * (frame_target / deadline / left_gameplay / level_never_loaded all
 	 * set QuitRequested). Stub-chainload builds keep the normal gate:
 	 * NS launches the app as a proper foreground title there. */
-#if defined(__3DS__) && defined(ATM_PROFILING) && defined(ATM_HEADLESS)
-	while( !QuitRequested )
-#else
 	while( aptMainLoop() && !QuitRequested )
-#endif
 #else
 	while( !QuitRequested )
 #endif
@@ -777,25 +754,12 @@ int main( int argc, char* argv[] )
 
 			if( SeriousError )
 			{
-#ifdef AUTOTEST_REMASTER
-				/* Level failed to load (most likely InitView returned
-				 * false). Hop back to the netload_stub so the next
-				 * 3dslink push can iterate, instead of leaving the
-				 * device stuck. autotest_on_serious_error logs which
-				 * level died and triggers hb:ldr chain-load. */
-				extern void autotest_on_serious_error(void);
-				autotest_on_serious_error();
-#endif
 				CleanUpAndPostQuit();
 				break;
 			}
 
 			if (failcount == 3) {
 				DebugPrintf("Rendering has failed too many times.  Aborting execution.\n");
-#ifdef AUTOTEST_REMASTER
-				extern void autotest_on_serious_error(void);
-				autotest_on_serious_error();
-#endif
 				CleanUpAndPostQuit();
 				break;
 			}
@@ -820,7 +784,6 @@ int main( int argc, char* argv[] )
 #endif
 		atm_prof_frame_end();
 		PERF_FRAME_END();
-		framedump_poll(); /* no-op unless -DFRAMEDUMP; trigger port 17493 */
 	}
 
 	PERF_DUMP();

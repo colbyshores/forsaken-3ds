@@ -132,10 +132,8 @@ int luaopen_miniupnp(lua_State *L);
 
 static void assign_loaders( void )
 {
-#ifndef __3DS__
-	assign_loader( "socket.core", luaopen_socket_core );
-	assign_loader( "mime.core", luaopen_mime_core );
-#endif
+	/* socket/mime load via the system Lua package paths (luasocket
+	 * 3.x); the old static luaopen_* preload registration is gone. */
 #ifdef MINIUPNP
 	assign_loader( "miniupnp", luaopen_miniupnp );
 #endif

@@ -327,13 +327,6 @@ bool sdl_init_video( void )
 	if(!create_video_surface( window_flags, renderer_flags ))
 		return false;
 
-#ifdef WIN32
-	// on windows the 2nd time you try to set video mode
-	// you need to call the opengl states again after wards
-	// as stated on http://sdl.beuc.net/sdl.wiki/SDL_SetVideoMode
-	// this fixes a bug where the screen goes black on mode change
-	set_opengl_settings();
-#endif
 
 	set_window_title();
 

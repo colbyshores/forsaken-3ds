@@ -2638,3 +2638,36 @@ Consolidation part 2 (same day): VERBOSE_TRACE blocks dropped,
 c3d_trace deleted, trace() routed to the single boot_log channel,
 SHADOWTEST residue (primary/models tables) out. Boot proof:
 final-consolidated.3dsx renders title (FPS: 59 in boot log).
+
+## 2026-11-14 — ARM conditionals unwrapped (owner: 3DS-only tree)
+
+46 #ifdef ARM sites across 16 files unwrapped to the ARM path
+(alignment-safe memcpy/aligned-buffer code — the port's alignment
+solution, now unconditional); x86 #else branches and -DARM deleted.
+Release build clean. Legacy platform symbols (WIN32/WINE/MACOSX/
+DINPUTJOY/DXMOUSE/BSP_ONLY/A_BAD_IDEA) follow the same rule: only
+the 3DS and Linux build paths stay.
+
+## 2026-11-14 — Legacy platform pass: only 3DS + Linux paths stay
+
+Unwrapped legacy conditionals to the live build paths: WIN32,
+__WINE__, MACOSX, DINPUTJOY, DXMOUSE, A_BAD_IDEA_AND_DOESNT_WORK_ANYWAY
+(never defined in either build), DEMO_SUPPORT (never defined —
+whole demo-playback surface dead), BSP_ONLY (keep-body + defines
+out). R3 pins restored on the kept BSP collision branch (its
+duplicate carried them). Gates ALL PASS; 3DS release clean.
+Linux (root Makefile) build is broken at pristine HEAD too
+(aijump ENEMY/JumpInAir include divergence) — pre-existing bitrot,
+not from this pass; 3DS is the maintained target.
+
+## 2026-11-14 — Minimal-ifdefs sweep + Linux parity
+
+Removed the harness experiment machinery from this tree (ATM bench,
+framedump, fidelity, perf stages, autotest, death_sim, stress knob;
+headers remain as no-op seams, implementations live in the harness
+snapshot + git history). Linux (root Makefile) brought to parity:
+EDITION wiring (remaster default), lua5.1 pin fix, enet 1.3 API,
+draw_billboard_object in GL shared backend, memcpy_unaligned/trace
+helpers in util.c, luasocket 3.x loader removal, non-Linux host
+branches (MACOSX/MINGW/DXMOUSE/STATIC/MUDFLAP) deleted. Linux now
+links (projectx); 3DS release + gates green.

@@ -111,24 +111,12 @@ bool Cameraload( char * Filename )
 		int16Pnt = (int16_t*) Buffer;
 		CamPnt->Group = *int16Pnt++;
 		FloatPnt = (float*) int16Pnt;
-#ifdef ARM
 		memcpy_unaligned(&CamPnt->Pos, FloatPnt, 4*3);
 		FloatPnt+=3;
 		memcpy_unaligned(&CamPnt->Dir, FloatPnt, 4*3);
 		FloatPnt+=3;
 		memcpy_unaligned(&CamPnt->Up, FloatPnt, 4*3);
 		FloatPnt+=3;
-#else
-		CamPnt->Pos.x = *FloatPnt++;
-		CamPnt->Pos.y = *FloatPnt++;
-		CamPnt->Pos.z = *FloatPnt++;
-		CamPnt->Dir.x = *FloatPnt++;
-		CamPnt->Dir.y = *FloatPnt++;
-		CamPnt->Dir.z = *FloatPnt++;
-		CamPnt->Up.x = *FloatPnt++;
-		CamPnt->Up.y = *FloatPnt++;
-		CamPnt->Up.z = *FloatPnt++;
-#endif
 		Buffer = (char*) FloatPnt;
 		Tempv.x = CamPnt->Pos.x + CamPnt->Dir.x;
 		Tempv.y = CamPnt->Pos.y + CamPnt->Dir.y;

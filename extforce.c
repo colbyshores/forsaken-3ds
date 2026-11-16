@@ -147,7 +147,6 @@ bool ExternalForcesLoad( char * Filename )
 		}
 
 		floatpnt = (float *) Buffer;
-#ifdef ARM
 		memcpy_unaligned(&EFpnt->Origin, floatpnt, 4*3);
 		floatpnt+=3;
 		memcpy_unaligned(&EFpnt->Dir, floatpnt, 4*3);
@@ -160,22 +159,6 @@ bool ExternalForcesLoad( char * Filename )
 		memcpy(&EFpnt->Height, floatpnt++, 4);
 		memcpy(&EFpnt->Range , floatpnt++, 4);
 		EFpnt->Range=1.0f/EFpnt->Range;
-#else
-		EFpnt->Origin.x = *floatpnt++;
-		EFpnt->Origin.y = *floatpnt++;
-		EFpnt->Origin.z = *floatpnt++;
-		EFpnt->Dir.x = *floatpnt++;
-		EFpnt->Dir.y = *floatpnt++;
-		EFpnt->Dir.z = *floatpnt++;
-		EFpnt->Up.x = *floatpnt++;
-		EFpnt->Up.y = *floatpnt++;
-		EFpnt->Up.z = *floatpnt++;
-		EFpnt->MinForce = *floatpnt++;
-		EFpnt->MaxForce = *floatpnt++;
-		EFpnt->Width = *floatpnt++;
-		EFpnt->Height = *floatpnt++;
-		EFpnt->Range = 1.0F / *floatpnt++;
-#endif
 		Buffer = (char *) floatpnt;
 
 		Uint16Pnt = (u_int16_t *) Buffer;
@@ -183,19 +166,10 @@ bool ExternalForcesLoad( char * Filename )
 		Buffer = (char *) Uint16Pnt;
 		floatpnt = (float *) Buffer;
 
-#ifdef ARM
 		memcpy_unaligned(&EFpnt->Pos, floatpnt, 4*3);
 		floatpnt+=3;
 		memcpy_unaligned(&EFpnt->half_size, floatpnt, 4*3);
 		floatpnt+=3;
-#else
-		EFpnt->Pos.x = *floatpnt++;
-		EFpnt->Pos.y = *floatpnt++;
-		EFpnt->Pos.z = *floatpnt++;
-		EFpnt->half_size.x = *floatpnt++;
-		EFpnt->half_size.y = *floatpnt++;
-		EFpnt->half_size.z = *floatpnt++;
-#endif
 		Buffer = (char *) floatpnt;
 		
 		if( EFpnt->Type != ZONE_Sphere )
@@ -220,16 +194,9 @@ bool ExternalForcesLoad( char * Filename )
 // appears that the file data stops !
 // but we were told that there was more data...
 // we would need to properly track the location in the stream and not go over the stream size
-#ifdef ARM
 				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
 				floatpnt+=3;
 				memcpy(&ZonePnt->offset, floatpnt++, 4);
-#else
-				ZonePnt->normal.x = *floatpnt++;
-				ZonePnt->normal.y = *floatpnt++;
-				ZonePnt->normal.z = *floatpnt++;
-				ZonePnt->offset   = *floatpnt++;
-#endif
 				ZonePnt++;
 			}
 			Buffer = (char*) floatpnt;

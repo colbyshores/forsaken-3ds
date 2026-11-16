@@ -11,10 +11,6 @@
 extern bool Debug;
 bool DebugLog = false;
 
-#ifdef WIN32
-#include <windows.h>	// for various things
-#include <ctype.h>		// for toupper
-#endif
 
 
 char * convert_char( char from, char to, char* in )
@@ -33,9 +29,6 @@ char * convert_char( char from, char to, char* in )
 
 char* convert_path( char* _str )
 {
-#ifdef WIN32
-	return _str;
-#else
 	static char temp[500];
 	char * str = temp;
 	strncpy( temp, _str, sizeof(temp) );
@@ -48,7 +41,6 @@ char* convert_path( char* _str )
 		str++;
 	}
 	return temp;
-#endif
 }
 
 void strtoupper(char *str)
@@ -186,11 +178,7 @@ void DebugPuts( char * buf )
 	if(!Debug)
 		return;
 
-#ifdef WIN32
-	OutputDebugString( buf );
-#else
 	fputs( buf, stderr );
-#endif
 
 	if( !DebugLog )
 		return;
@@ -293,3 +281,18 @@ int Msg( const char * msg, ... )
 	return res;
 }
 
+
+#ifndef __3DS__
+/* Shared helpers the 3DS build gets from main_3ds.c. memcpy_unaligned
+ * is a plain byte copy (alignment-safe on every target); trace is a
+ * no-op in production (diagnostics live in the harness tree). */
+void memcpy_unaligned(void *dst, const void *src, size_t n)
+{
+	unsigned char *d = (unsigned char *)dst;
+	const unsigned char *s = (const unsigned char *)src;
+	while (n--) *d++ = *s++;
+}
+void trace(const char *msg) { (void)msg; }
+void trace_dump(void) {}
+void trace_enable(void) {}
+#endif
