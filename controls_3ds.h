@@ -15,6 +15,9 @@
 
 #include <stdbool.h>
 #include <3ds.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* The actions the engine cares about. The index doubles as BOTH the
  * joy-button slot input_3ds.c writes into joy_button_state[0][N] AND
@@ -89,4 +92,7 @@ void controls_3ds_remap_menu(void);
 
 #endif /* __3DS__ */
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* CONTROLS_3DS_INCLUDED */

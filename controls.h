@@ -6,6 +6,9 @@
 #endif
 #include "main.h"
 #include "config.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 		Some Keyboard and Mouse Globals
@@ -185,4 +188,7 @@ void FlashMenuText( char *text, float activetime, u_int16_t sfx );
 void ProcessMenuFlashText( void );
 void DisableCheats( void );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // CONTROLS_H

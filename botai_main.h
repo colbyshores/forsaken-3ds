@@ -37,6 +37,9 @@
 #include "util.h"
 #include "timer.h"
 #include "ai.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern bool TeamGame;
 extern BYTE	TeamNumber[MAX_PLAYERS];
@@ -103,4 +106,7 @@ SHIPCONTROL bot;
 #define MIN_WALLDIST 100.0F
 #define NUM_SENSORS 26
 #define BALL_RADIUS	( 256 * GLOBAL_SCALE )
+#ifdef __cplusplus
+}
+#endif
 #endif // LUA_BOT

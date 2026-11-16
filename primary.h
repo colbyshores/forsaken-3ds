@@ -11,6 +11,9 @@
 
 #ifndef PRIMARY_INCLUDED
 #define PRIMARY_INCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -308,6 +311,9 @@ void HostRestoreWeapons( int16_t Player );
 void HostRestoreAmmo( int16_t Player );
 float GetPrimaryAmmoUsage( int16_t Ship, int8_t Weapon );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // PRIMARY_INCLUDED
 
 

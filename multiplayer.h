@@ -1,5 +1,8 @@
 #ifndef MULTIPLAYER_INCLUDED
 #define MULTIPLAYER_INCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //
 // Networking functions mainly used by title.c
@@ -18,4 +21,7 @@ void BailMultiplayerFrontEnd( MENU * Menu );
 void DistributeTeamsToLists(int *dummy);
 void SetUpGameType( int type );
 
+#ifdef __cplusplus
+}
+#endif
 #endif	// MULTIPLAYER_INCLUDED

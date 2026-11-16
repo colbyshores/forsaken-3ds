@@ -16,6 +16,9 @@
 #include "new3d.h"
 #include "tload.h"
 #include "transexe.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * defines
@@ -265,6 +268,9 @@ void TriggerBackgroundAnimationStop( u_int16_t * Data );
 extern FILE *LoadTextureAnimations( FILE *f );
 extern FILE *SaveTextureAnimations( FILE *f );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

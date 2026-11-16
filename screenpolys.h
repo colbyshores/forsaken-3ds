@@ -23,6 +23,9 @@
 #include "lights.h"
 #include "2dtextures.h"
 #include "tload.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -173,5 +176,8 @@ void ShowBounty( u_int16_t Ship );
 void ShowCTFFlagsOnShip( u_int16_t Ship );
 void ShowCTFFlags( u_int16_t Ship );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

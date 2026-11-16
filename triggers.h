@@ -2,6 +2,9 @@
 #define TRIGGERS_INCLUDED
 
 #include "networking.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Defines
@@ -165,6 +168,9 @@ FILE * SaveAllTriggers( FILE * fp );
 FILE * LoadAllTriggers( FILE * fp );
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif	// TRIGGERS_INCLUDED
 
 

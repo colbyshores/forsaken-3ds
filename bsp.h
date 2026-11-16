@@ -3,6 +3,9 @@
 #define BSP_INCLUDED
 
 #include "main.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Defines
@@ -91,6 +94,9 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 bool PointInSpaceRecursive( VECTOR *Pos );
 
 bool PointInsideSkin( VECTOR *Pos, u_int16_t Group );
+#ifdef __cplusplus
+}
+#endif
 #endif	// BSP_INCLUDED
 
 

@@ -10,6 +10,9 @@
 #include "lights.h"
 #include "skin.h"
 #include "camera.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct _GROUPLIST
 {
@@ -52,4 +55,7 @@ u_int16_t FindClipGroup( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max )
 u_int16_t FindOverlappingVisibleGroups( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max, u_int16_t * group );
 bool PointInGroupBoundingBox( MLOADHEADER * Mloadheader, VECTOR * Pos, u_int16_t group );
 
+#ifdef __cplusplus
+}
+#endif
 #endif	// VISI_INCLUDED

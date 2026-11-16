@@ -19,6 +19,9 @@
 #include "2dtextures.h"
 #include "2dpolys.h"
 #include "tload.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -110,6 +113,9 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 FILE * SavePolys( FILE * fp );
 FILE * LoadPolys( FILE * fp );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

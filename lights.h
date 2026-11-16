@@ -21,6 +21,9 @@
 #include "mxload.h"
 #include "mxaload.h"
 #include "collision.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * defines
@@ -76,6 +79,9 @@ void BuildVisibleLightList( u_int16_t Group );
 FILE * SaveXLights( FILE * fp );
 FILE * LoadXLights( FILE * fp );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // LIGHTS_INCLUDED
 
 

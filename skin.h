@@ -16,6 +16,9 @@
 #include "tload.h"
 #include "bsp.h"
 #include "trigarea.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -52,6 +55,9 @@ void DisplaySphereZone( VECTOR * Pos, float Radius, u_int16_t Group,
 					   u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
 void KillAllSphereZones( void );
 void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

@@ -8,6 +8,9 @@
 #include "main.h"
 #include "node.h"
 #include "triggers.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -438,6 +441,9 @@ bool Object_Load( FILE * fp , OBJECT * Obj );
 bool Gun_Save( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp );
 bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

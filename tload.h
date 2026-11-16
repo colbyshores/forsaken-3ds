@@ -14,6 +14,9 @@
 #include "file.h"
 #include "render.h"
 #include "new3d.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * defines
@@ -67,6 +70,9 @@ bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n );
 
 extern bool use_original_textures;
 
+#ifdef __cplusplus
+}
+#endif
 #endif	//TLOAD_INCLUDED
 
 #endif

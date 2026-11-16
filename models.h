@@ -13,6 +13,9 @@
 #include "mxaload.h"
 #include "lights.h"
 #include "camera.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * defines
@@ -627,4 +630,7 @@ bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner );
  * once before a camera's visible-group walk. */
 void ModelVisCache_NewFrame( void );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // MODELS_INCLUDED

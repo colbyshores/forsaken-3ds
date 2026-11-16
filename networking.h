@@ -12,6 +12,9 @@ typedef int net_bool_t; // backwards compatibility need bool's in pkt structures
 #include "net.h"
 #include "new3d.h"
 #include "object.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // game tracker
 extern char tracker_server[256];
@@ -1013,6 +1016,9 @@ void AllocatePseudoHost( void );
 
 void set_my_player_name( void );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

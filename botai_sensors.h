@@ -1,5 +1,8 @@
 #ifdef LUA_BOT
 #include "botai_main.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
  
 bool BOTAI_CanICollectPickup( u_int16_t i );
 bool BOTAI_CheckForGravgons( VECTOR * Pos );
@@ -21,4 +24,7 @@ void BOTAI_LookAhead( float Accuracy, VECTOR * SPos, BYTE TargetID, VECTOR * New
 void BOTAI_LookAheadPos( float Time, VECTOR * NewPos, VECTOR SlideDirection );
 void BOTAI_UpdateSensors();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

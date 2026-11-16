@@ -2,8 +2,14 @@
 #define MATH_ERROR
 #ifdef DEBUG_ON
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern void InitMathErrors( void );
 extern int DebugMathErrors( void );
+#ifdef __cplusplus
+}
+#endif
 
 // mingw still appears to support matherr so we'll leave it for now
 // not sure if msvc still does but it appears matherr is going away

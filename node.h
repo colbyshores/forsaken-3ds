@@ -3,6 +3,9 @@
 
 #include "main.h"
 #include "object.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Bumped 16 -> 32 to fit Remaster nodes that exceed the 1998 cap.
  * starship has nodes with 17-18 links per the runtime trace; 32
@@ -56,4 +59,7 @@ NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 
 NODE * FindSuitableSplineNodeRandom( u_int32_t Network, NODE * NodeFrom , NODE *Node1 , NODE *Node2 , NODE *Node3 , NODE *Node4 );
 float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Group, VECTOR * TopLeft, VECTOR * BottomRight );
 
+#ifdef __cplusplus
+}
+#endif
 #endif	// NODE_INCLUDED

@@ -1,6 +1,9 @@
 
 #ifndef TEXT_INCLUDED
 #define TEXT_INCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Defines
@@ -101,6 +104,9 @@ typedef enum {
 
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif	// TEXT_INCLUDED
 
 

@@ -28,6 +28,9 @@
 
 #include "main.h"
 #include "title.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef short VirtualKeycode;
 
@@ -127,4 +130,7 @@ key_char( int keycode );
 extern const char *
 key_fullname( int keycode );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // CONFIG_H

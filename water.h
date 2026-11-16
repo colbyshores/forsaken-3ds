@@ -1,6 +1,9 @@
 
 #ifndef WATER_H
 #define WATER_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define	ROOTTWO  (1.0F / (float)sqrt(2.0F))
 #define	SPECIALROOTTWO (1.0F / (4.0F+(1.0F / (float)sqrt(2.0F))*4.0F))
@@ -86,4 +89,7 @@ bool InWater( u_int16_t group , VECTOR *OrgPos , float * Damage);
 bool WaterObjectCollide( u_int16_t group , VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage );
 void GetWaterColour( u_int16_t Group, u_int8_t * Red, u_int8_t * Green, u_int8_t * Blue );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // WATER_H

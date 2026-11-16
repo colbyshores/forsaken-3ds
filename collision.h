@@ -20,6 +20,9 @@
 #include "object.h"
 #include "compobjects.h"
 #include "bgobjects.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * defines
@@ -98,6 +101,9 @@ bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVect
 u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance );
 u_int16_t CheckAnyEnemyHit( void );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // COLLISION_INCLUDED
 
 

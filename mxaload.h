@@ -21,6 +21,9 @@
 #include "tload.h"
 #include "mload.h"
 #include "transexe.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 //#include "pickups.h"
 
 /*===================================================================
@@ -130,6 +133,9 @@ bool InitMxaModels( char * NamePnt);
 bool ReleaseMxaModels();
 bool InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

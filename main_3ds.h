@@ -3,6 +3,9 @@
 
 #include <3ds.h>
 #include "render.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* No letterboxing — render at the native 400x240 (5:3) resolution.
  * The Open Pandora port (800x480, also 5:3) proves this aspect ratio
@@ -50,4 +53,7 @@ bool c3d_hud_begin_bottom(void);
 void c3d_hud_end_bottom(void);
 void c3d_clear_bottom_screen(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

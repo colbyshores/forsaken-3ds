@@ -2,6 +2,9 @@
 #define GOAL_H
 
 #include "main.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 #define GOALSTATE_Off	(0)
 #define GOALSTATE_On	(1)
 
@@ -36,4 +39,7 @@ int GoalCheckTeam( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int team 
 int DisplayGoal( u_int16_t group );
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif // GOAL_H

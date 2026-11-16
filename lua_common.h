@@ -43,6 +43,9 @@
 #include "lua_config.h"
 #include "util.h"
 #include "file.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // return rv if function does not return 0
 #define ASSERT(x) \
@@ -59,4 +62,7 @@ int lua_dofile(lua_State *L, const char *name);
 int lua_init(void);
 void lua_shutdown(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* LUA_COMMON_H */

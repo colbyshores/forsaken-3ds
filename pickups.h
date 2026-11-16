@@ -6,6 +6,9 @@
 #define PICKUPS_INCLUDED
 
 #include "main.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*===================================================================
 	Defines
 ===================================================================*/
@@ -332,6 +335,9 @@ void ReleaseFailedKillSlot( int16_t i );
 void ProcessFailedKills( void );
 u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

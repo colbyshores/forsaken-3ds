@@ -6,6 +6,9 @@
 #include "new3d.h"
 #include "triggers.h"
 #include "trigarea.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Defines
@@ -49,5 +52,8 @@ void DisplayTeleportsInGroup( u_int16_t Group );
 FILE * SaveTeleports( FILE * fp );
 FILE * LoadTeleports( FILE * fp );
 
+#ifdef __cplusplus
+}
+#endif
 #endif	// TELEPORT_INCLUDED
 

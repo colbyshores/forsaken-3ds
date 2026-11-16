@@ -10,6 +10,9 @@
 
 #ifndef SECONDARY_INCLUDED
 #define SECONDARY_INCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -299,6 +302,9 @@ void ToggleSecondaryWeapons( int8_t Secondary );
 void ScatterWeaponsForShip( u_int16_t Ship, VECTOR * Dir, int16_t MaxPickupsAllowed );
 int16_t HostGenerateSecondaryPickups( u_int16_t Ship, int16_t NumAllowed );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // SECONDARY_INCLUDED
 
 

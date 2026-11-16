@@ -1,6 +1,9 @@
 #ifndef TEXT2D_INCLUDED
 #define TEXT2D_INCLUDED
 #include "main.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -83,4 +86,7 @@ void EnableOffFile( OFF_FILES * FileInfo, int8_t * Filename );
 void DisableOffFile( OFF_FILES * FileInfo, int8_t * Filename );
 void EnableRelevantOffFiles( OFF_FILES * FileInfo );
 
+#ifdef __cplusplus
+}
+#endif
 #endif

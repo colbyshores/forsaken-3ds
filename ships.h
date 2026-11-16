@@ -22,6 +22,9 @@
 #include "sfx.h"
 #include "models.h"
 #include "mxload.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern bool SwitchedToWatchMode;
 
@@ -118,6 +121,9 @@ void ReleaseComponentedShips( void );
 FILE * SaveShips( FILE * fp );
 FILE * LoadShips( FILE * fp );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

@@ -32,6 +32,9 @@
 
 #ifndef LUA_CONFIG_H
 #define LUA_CONFIG_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int config_save( void );
 
@@ -48,4 +51,7 @@ void config_set_strn(const char *opt, char* str, size_t size);
 int config_get_bool(const char *opt, int _default);
 void config_set_bool(const char *opt, int i);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* LUA_CONFIG_H */

@@ -1,6 +1,9 @@
 
 #ifndef STATS
 #define STATS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*******************************************************************\
 *																	
@@ -41,5 +44,8 @@ int GetEffeciency( int Player );
 int player_left( int player );
 int scoreable_status( int player );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

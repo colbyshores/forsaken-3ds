@@ -1,6 +1,9 @@
 
 #ifndef TRIGGERAREA_INCLUDED
 #define TRIGGERAREA_INCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Defines
@@ -73,6 +76,9 @@ void DisableTriggerArea( u_int16_t * Data );
 void ProcessTriggerAreas( void );
 FILE * SaveTriggerAreas( FILE * fp );
 FILE * LoadTriggerAreas( FILE * fp );
+#ifdef __cplusplus
+}
+#endif
 #endif	// TRIGGERAREA_INCLUDED
 
 

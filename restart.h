@@ -4,6 +4,9 @@
 ===================================================================*/
 #ifndef RESTART_INCLUDED
 #define RESTART_INCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -68,6 +71,9 @@ FILE * SaveStartRestartPoints( FILE * fp );
 FILE * LoadStartRestartPoints( FILE * fp );
 void DisplayStartPoints( void );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

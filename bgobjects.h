@@ -5,6 +5,9 @@
 #ifndef BGOBJECTS_INCLUDED
 #define BGOBJECTS_INCLUDED
 #include "main.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -253,6 +256,9 @@ bool AllocateCompFlyGirl( void );
 void UpdateFlyGirl( VECTOR * Pos, MATRIX * Matrix, bool Visible );
 void ReleaseFlyGirl( void );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 

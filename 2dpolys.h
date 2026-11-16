@@ -24,6 +24,9 @@
 #include "lights.h"
 #include "2dtextures.h"
 #include "tload.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*===================================================================
 	Defines
@@ -173,6 +176,9 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 FILE * SaveFmPolys( FILE * fp );
 FILE * LoadFmPolys( FILE * fp );
 
+#ifdef __cplusplus
+}
+#endif
 #endif // TWODPOLYS_INCLUDED
 
 

@@ -4,6 +4,9 @@
 
 #include "main.h"
 #include "util.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //--------------------------------------------------------------------------
 // Define AI modes
@@ -337,6 +340,9 @@ void AI_FLESHMORPH_STOPBACKWARD( register ENEMY * Enemy );
 
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif // AI_H
 //--------------------------------------------------------------------------
  

@@ -3,6 +3,9 @@
 
 #include "main.h"
 #include "enemies.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SFX_Biker			4	// biker speech
 #define SFX_Title	64	// use when biker speech must play ( will cut off any existing speech )
@@ -308,4 +311,7 @@ void PlayEnemyBikerTaunt( ENEMY *Enemy );
 void ProcessEnemyBikerTaunt( void );
 u_int32_t PlayPannedSfxWithVolModify(int16_t Sfx, u_int16_t Group, VECTOR * SfxPos, float Freq, float Vol );
 
+#ifdef __cplusplus
+}
+#endif
 #endif

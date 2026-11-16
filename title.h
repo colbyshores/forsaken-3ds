@@ -5,6 +5,9 @@
 
 #include "new3d.h"
 #include "2dtextures.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define QUICKSTART_None		0
 #define QUICKSTART_Start	1
@@ -561,4 +564,7 @@ bool GeneralTimeout( float *timer );
 void TitleReset( MENUITEM *item );
 void SetTitleNotify( char *str );
 
+#ifdef __cplusplus
+}
+#endif
 #endif
