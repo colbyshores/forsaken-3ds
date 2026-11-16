@@ -223,7 +223,7 @@ typedef struct {
 } mouse_state_t;
 
 // this holds the current state each loop
-mouse_state_t mouse_state;
+extern mouse_state_t mouse_state;
 
 // special keydefs for mouse actions
 // this is only used by MenuProcess
@@ -238,7 +238,7 @@ enum {
 
 #define MOUSE_RANGE_END LEFT_MOUSE + MAX_MOUSE_BUTTONS
 
-mouse_state_t mouse_states[ INPUT_BUFFERS ];
+extern mouse_state_t mouse_states[ INPUT_BUFFERS ];
 
 #define MOUSE_BUTTON_HELD( B )    ( mouse_states[ new_input ].buttons[ B ] )
 #define MOUSE_BUTTON_PRESSED( B ) ( !( mouse_states[ old_input ].buttons[ B ] ) && ( mouse_states[ new_input ].buttons[ B ] ) )
@@ -249,6 +249,9 @@ mouse_state_t mouse_states[ INPUT_BUFFERS ];
 #define MOUSE_WHEEL_UP_PRESSED()		( !( mouse_states[ old_input ].wheel > 0 ) && ( mouse_states[ new_input ].wheel > 0 ) )
 #define MOUSE_WHEEL_DOWN_PRESSED()      ( !( mouse_states[ old_input ].wheel < 0 ) && ( mouse_states[ new_input ].wheel < 0 ) )
 
+#ifdef __cplusplus
+extern "C"
+#endif
 mouse_state_t* read_mouse(void);
 
 ///////////////
@@ -285,10 +288,10 @@ bool joysticks_init(void);
 bool joysticks_cleanup( void );
 
 // this holds the current state joysticks
-long joy_axis_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_AXIS ];
-bool joy_button_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
+extern long joy_axis_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_AXIS ];
+extern bool joy_button_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
 // hat has 4 directions, diagnols turn on both adjecent angles
-u_int8_t joy_hat_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ];
+extern u_int8_t joy_hat_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ];
 
 enum {
 	JOY_HAT_UP,
