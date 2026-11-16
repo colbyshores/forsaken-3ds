@@ -7,6 +7,10 @@
 #include <math.h>
 #include <new3d.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*===================================================================
 	Defines
 ===================================================================*/
@@ -18,6 +22,11 @@
 
 /*===================================================================
 	Prototypes
+
+	Ray/sphere intersection tests. intersect/RaytoSphere return a
+	distance along the ray (0 = miss); RaytoSphere3 classifies the
+	result with the R2S_* codes below. All functions are pure:
+	inputs are not modified except the explicit out-parameters.
 ===================================================================*/
 float isNotZero(float x);
 float solveQuadric(float * c, float * s);
@@ -31,4 +40,8 @@ int16_t RaytoSphere3( VECTOR * SphereCenter, float Radius, VECTOR * RayStart,
 bool RaytoSphereShort( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rdir, float rlength );
 
 //	vec3 normalAt(vec3& p);
+#ifdef __cplusplus
+}
+#endif
+
 #endif	//SPHERE_INCLUDED
