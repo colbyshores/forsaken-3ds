@@ -36,9 +36,17 @@
 #include <stdio.h>
 #include <string.h>
 
+/* devkitPro's lua5.1 headers carry no __cplusplus guards; the lua API is C,
+ * so the include must be wrapped (same idiom as lua.hpp upstream). */
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#ifdef __cplusplus
+}
+#endif
 
 #include "lua_config.h"
 #include "util.h"
