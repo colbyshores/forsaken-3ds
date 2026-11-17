@@ -37,7 +37,6 @@
 #include "ui/local.h"
 #include "util/util.h"
 #include "util/timer.h"
-#include "diag/perf_capture.h"
 #include "audio/sfx.h"
 #include "data/mload.h"
 #include "game/camera.h"
@@ -640,7 +639,6 @@ bool ProcessShips()
 
 		if( ShipPnt->enable )
 		{
-		perf_stage_begin(PERF_S_SHIPPRE);
 			if( ShipPnt->Invul )
 			{
 				if( !PlayDemo )
@@ -670,9 +668,7 @@ bool ProcessShips()
 				}
 			}
 
-			perf_stage_begin(PERF_S_SHIPDMG);
 			DoDamagedEffects( i );							// Do Effects when damaged
-			perf_stage_end(PERF_S_SHIPDMG, -1);
 
 			// Special Noise Distance Modifier...
 			if( ShipObjPnt->Noise > 0.0F )
@@ -726,14 +722,12 @@ bool ProcessShips()
 
 				ShipObjPnt->NodeNetwork = 1;
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				perf_stage_begin(PERF_S_SHIPNODE);
 				if( !ShipObjPnt->NearestNode )
 				{
 					FindNearestNode( &ShipPnt->Object );
 				}else{
 					UpdateNearestNodeSpecial( &ShipPnt->Object );
 				}
-				perf_stage_end(PERF_S_SHIPNODE, -1);
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				NodePnt = (NODE*)ShipObjPnt->NearestNode;
 				if( NodePnt && ShowNode)
@@ -816,11 +810,7 @@ bool ProcessShips()
 					ShipObjPnt->Mode = WATCH_MODE; 
 		
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				perf_stage_end(PERF_S_SHIPPRE, -1);
-				perf_stage_begin(PERF_S_SHIPMODE);
 				( * ModeControl[ ShipObjPnt->Mode ] )( ShipPnt , i );		//go off and do his thing...
-				perf_stage_end(PERF_S_SHIPMODE, -1);
-				perf_stage_begin(PERF_S_SHIPPOST);
 
 				if( (i==MAX_PLAYERS) || (ShipObjPnt->Mode != DEATH_MODE && ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != GAMEOVER_MODE) )
 				{
@@ -928,7 +918,6 @@ bool ProcessShips()
 					Move_Off.y += ShipObjPnt->ExternalForce.y * framelag;
 					Move_Off.z += ShipObjPnt->ExternalForce.z * framelag;
 
-					perf_stage_begin(PERF_S_SHIPCOLLIDE);
 					Object2Object = false;
 					if( (i != MAX_PLAYERS) && (ShipObjPnt->Mode != LIMBO_MODE) )
 					{
@@ -1027,7 +1016,6 @@ bool ProcessShips()
 						ShipObjPnt->Pos.y += Move_Off.y;
 						ShipObjPnt->Pos.z += Move_Off.z;
 					}
-					perf_stage_end(PERF_S_SHIPCOLLIDE, -1);
 
 					ExtForce.x = 0.0F;
 					ExtForce.y = 0.0F;
@@ -1356,7 +1344,6 @@ bool ProcessShips()
 			ShipPnt->LastMove.x = ShipObjPnt->Pos.x - StartPos.x;
 			ShipPnt->LastMove.y = ShipObjPnt->Pos.y - StartPos.y;
 			ShipPnt->LastMove.z = ShipObjPnt->Pos.z - StartPos.z;
-			perf_stage_end(PERF_S_SHIPPOST, -1);
 		}
 
 		if( PlayDemo && ( i == MAX_PLAYERS ) )
@@ -1368,13 +1355,10 @@ bool ProcessShips()
 				framelag = Oldframelag * Demoframelag;
 			}
 		}
-		perf_stage_begin(PERF_S_SHIPMODEL);
 		UpdateShipModel( i );
-		perf_stage_end(PERF_S_SHIPMODEL, -1);
 
 	}
 
-	perf_stage_begin(PERF_S_SHIPCAM);
 	if( !PlayDemo )
 	{
 		if( Ships[MAX_PLAYERS].enable != 0 )
@@ -1390,7 +1374,6 @@ bool ProcessShips()
 	}
 
 	SetPosVelDir_Listner( &Ships[WhoIAm].Object.Pos , &Ships[WhoIAm].Move_Off , &Ships[WhoIAm].Object.Mat );
-	perf_stage_end(PERF_S_SHIPCAM, -1);
 	
 	return true;
 }

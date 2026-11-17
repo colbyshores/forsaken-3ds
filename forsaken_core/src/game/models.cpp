@@ -33,7 +33,6 @@
 #include "ui/local.h"
 #include "util/util.h"
 #include "game/oct2.h"
-#include "diag/perf_capture.h"
 #include "data/mload.h"
 #include "data/mxaload.h"
 #include "game/camera.h"
@@ -1110,7 +1109,6 @@ static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * cl
 
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
 {
-	perf_stage_begin(PERF_S_MDLWRAP);
 	RENDERMATRIX TempWorld;
 	u_int16_t	i;
 	u_int16_t	nextmodel;
@@ -1143,7 +1141,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 	i = VisBucketHead[ group ];
 	while( i != (u_int16_t)-1 )
 	{
-		perf_stage_begin(PERF_S_MDLENTRY);
 		nextmodel = VisBucketNext[i];
 		ClipGroup = VisBucketClip[i];
 
@@ -1152,7 +1149,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 			{
 				if( ClipGroup == group )
 				{
-					perf_stage_begin(PERF_S_MDLTRANSFORM);
 					switch( Models[i].Func )
 					{
 						case MODFUNC_Fade:
@@ -1239,12 +1235,9 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 					if (!FSSetWorld(&TempWorld))
 					{
-						perf_stage_end(PERF_S_MDLTRANSFORM, -1);
-						perf_stage_end(PERF_S_MDLWRAP, -1);
 						Msg( "ModelDisp() SetMatrix1 Failed\n" );
 						return false;
 					}
-					perf_stage_end(PERF_S_MDLTRANSFORM, -1);
 					
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					// TODO - BEEF UP LOD LEVEL HANDLING (read notes bellow)
@@ -1254,7 +1247,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					
 					// should probably add a switch to completely disable this...
 
-					perf_stage_begin(PERF_S_MDLLOD);
 					/*	Execute it	*/
 					temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos ); 
 		
@@ -1302,7 +1294,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					// END OF TODO
 
 					ModelNum += Models[i].ModelNum;
-					perf_stage_end(PERF_S_MDLLOD, -1);
 		
 					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
 					{
@@ -1312,23 +1303,19 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 						{
 							if( ( Models[i].Flags & MODFLAG_StealthOffset ) && ( Models[i].Flags & MODFLAG_Stealth ) )
 							{
-								perf_stage_begin(PERF_S_MDLINTERP);
 								if( !InterpFrames( &MxaModelHeaders[ ModelNum + Models[i].StealthOffset ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-								{ perf_stage_end(PERF_S_MDLINTERP, -1);
+								{
 									Msg( "ModelDisp() InterpFrames() Failed\n" );
 									return false;
 								}
-								perf_stage_end(PERF_S_MDLINTERP, -1);
 							}
 							else
 							{
-								perf_stage_begin(PERF_S_MDLINTERP);
 								if( !InterpFrames( &MxaModelHeaders[ ModelNum ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-								{ perf_stage_end(PERF_S_MDLINTERP, -1);
+								{
 									Msg( "ModelDisp() InterpFrames() Failed\n" );
 									return false;
 								}
-								perf_stage_end(PERF_S_MDLINTERP, -1);
 							}
 
 							x1.x = 0.0F;
@@ -1336,17 +1323,14 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							x1.z = 0.0F;
 							x2 = x1;
 
-							perf_stage_begin(PERF_S_MDLBOUNDS);
 #ifndef FINAL_RELEASE
 							CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 												  &Models[i].TempLines[ 0 ], Models[i].Group );
-							perf_stage_end(PERF_S_MDLBOUNDS, -1);
 #endif
 
 							ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
 
 
-							perf_stage_begin(PERF_S_MDLLIGHT);
 							if( Models[i].Flags & MODFLAG_AmbientLight )
 							{
 								GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
@@ -1382,7 +1366,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							{
 								UpdateMxaModel( &MxaModelHeaders[ ModelNum ] );
 							}
-							perf_stage_end(PERF_S_MDLLIGHT, -1);
 
 
 							if( DoDisplay )
@@ -1396,20 +1379,17 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 									    Models[i].OwnerType != OWNER_BGOBJECT);
 								}
 #endif
-							perf_stage_begin(PERF_S_MDLEXEC);
 							if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
 							{
 #ifdef RENDERER_C3D
 								{ c3d_set_object_shine_eligible(true); }
 #endif
-								perf_stage_end(PERF_S_MDLEXEC, -1);
 								Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
 #ifdef NEW_LIGHTING
 								render_reset_lighting_variables();
 #endif
 								return false;
 							}
-							perf_stage_end(PERF_S_MDLEXEC, -1);
 #ifdef RENDERER_C3D
 								{ c3d_set_object_shine_eligible(true); }
 #endif
@@ -1426,14 +1406,11 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 							x1.z = 0.0F;
 							x2 = x1;
 
-							perf_stage_begin(PERF_S_MDLBOUNDS);
 #ifndef FINAL_RELEASE
 							CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 												 &Models[i].TempLines[ 0 ], Models[i].Group );
-							perf_stage_end(PERF_S_MDLBOUNDS, -1);
 #endif
 
-							perf_stage_begin(PERF_S_MDLSTATIC);
 							if( Models[i].Flags & MODFLAG_AmbientLight )
 							{
 								GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
@@ -1463,7 +1440,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 								if( !LightMxModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
 
 							}
-							perf_stage_end(PERF_S_MDLSTATIC, -1);
 
 
 							if( DoDisplay )
@@ -1506,17 +1482,14 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 		}
 
 		/*	go on to the next	*/
-		perf_stage_end(PERF_S_MDLENTRY, -1);
 		i = nextmodel;
 	}
 
 	if (!FSSetWorld(&identity))
 	{
-		perf_stage_end(PERF_S_MDLWRAP, -1);
 		Msg( "ModelDisp() SetMatrix2 Failed\n" );
 		return false;
 	}
-	perf_stage_end(PERF_S_MDLWRAP, -1);
 	return true;
 }
 

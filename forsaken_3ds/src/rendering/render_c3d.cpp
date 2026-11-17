@@ -53,7 +53,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "game/main.h"
-#include "diag/atm_prof.h"
 #include "math/new3d.h"
 #include "math/quat.h"
 #include "game/compobjects.h"
@@ -61,7 +60,6 @@
 #include "game/object.h"
 #include "net/networking.h"
 #include "rendering/render.h"
-#include "diag/perf_capture.h"
 #include "rendering/stereomemo.h"
 #include "rendering/texture.h"
 #include "data/file.h"
@@ -160,11 +158,6 @@ static int  s_hudSavedThisModeH = 0;
 static int  s_hudSavedWinCx     = 0;
 static int  s_hudSavedWinCy     = 0;
 static bool              s_stereoFrame   = false;
-
-/* TRANS-phase flag for the tdraws/tverts counters. Set by oct2.c around
- * the translucent phase; read in FLUSH_BATCH. Harness-only (ATM_PROFILING)
- * so release builds carry no branch. */
-#define TRANS_COUNT_BATCH() ((void)0)
 
 /* GPU lighting uniform locations, resolved at init from the shader DVLE
  * (don't depend on picasso's declaration-order register assignment). */
@@ -340,21 +333,12 @@ static int s_scratchMax = 0;
  * proof. Extra presents are only safe while peak stays under s_scratchMax. */
 static int s_scratchPeak = 0;
 
-/* Fill-coverage estimate for overdraw screening (TF..): tracks the live
- * scissor rect so each submitted batch can accumulate its pixel bounds.
- * Upper bound on fill, not measured pixels — a total near the framebuffer
- * size rules fill out; a large multiple only suggests pressure. */
-#define TRACK_SCISSOR(x0, y0, x1, y1, on) ((void)0)
-
-/* Submitted-pixel bounds per batch (overdraw screen). Harness-only. */
-#define FILLPIX_COUNT_BATCH() ((void)0)
-
 
 /* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
  * (measured 7.4 ms/frame on Old 3DS, 12.3K verts/frame) with 4 L1D
  * reads. Bit-identical output: each entry IS ((float)b)/255.0f, the same
  * correctly-rounded quotient the loop computed, so pixels are unchanged
- * (framedump-verified per change). 1 KiB, stays hot in L1D. */
+ * (pixel-verified). 1 KiB, stays hot in L1D. */
 static float s_c255[256];
 static int s_c255_ok = 0;
 static void c255_init(void)
@@ -1241,7 +1225,6 @@ void c3d_upload_xlights(void)
 	}
 
 	int n_packed = 0;
-	atm_prof_add(ATM_C_LIGHTS, (unsigned)n_top);
 	for (; n_packed < n_top; n_packed++)
 	{
 		struct XLIGHT *L = top[n_packed];
@@ -1811,14 +1794,12 @@ bool FSSetViewPort(render_viewport_t *view)
 		C3D_SetScissor(GPU_SCISSOR_NORMAL,
 		               (u32)pica_x, (u32)pica_y,
 		               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
-		TRACK_SCISSOR(pica_x, pica_y, pica_x + pica_w, pica_y + pica_h, true);
 	}
 	else
 	{
 		/* HUD / 2D / orthographic dispatch — sub-rect viewport, no
 		 * scissor. Used for non-3D-mesh draws which don't go through
 		 * visi.c's per-group projection setup. */
-		TRACK_SCISSOR(0, 0, 0, 0, false);
 		C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 		C3D_SetViewport((u32)pica_x, (u32)pica_y,
 		                (u32)pica_w, (u32)pica_h);
@@ -2888,9 +2869,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 #define FLUSH_BATCH() do { \
 	if (batch_vertCount > 0) { \
 		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
-		atm_prof_add(ATM_C_VERTS, batch_vertCount); \
-		FILLPIX_COUNT_BATCH(); \
-		TRANS_COUNT_BATCH(); \
 		int _has_persist = 0; \
 		{ int _pi; for (_pi = batch_tg0; _pi < group; _pi++) if (tg_persist_buf[_pi]) { _has_persist = 1; break; } } \
 		if ((_has_persist || (s_memoMode == SMEMO_LOOKUP)) && !orthographic) { \
@@ -2905,13 +2883,11 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 						BufInfo_Init(_bi); \
 						BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
 						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
-						atm_prof_add(ATM_C_DRAWS, 1); \
 						_run_open = 0; \
 					} \
 					BufInfo_Init(_bi); \
 					BufInfo_Add(_bi, tg_persist_buf[_si], sizeof(gpu_vertex_t), 3, 0x210); \
 					C3D_DrawArrays(GPU_TRIANGLES, 0, tg_persist_cnt[_si]); \
-					atm_prof_add(ATM_C_DRAWS, 1); \
 					_consumed += tg_persist_cnt[_si]; \
 					continue; \
 				} \
@@ -2920,7 +2896,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 						BufInfo_Init(_bi); \
 						BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
 						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
-						atm_prof_add(ATM_C_DRAWS, 1); \
 						_run_open = 0; \
 					} \
 					if (tg_memo_cnt[_si] <= 0) \
@@ -2938,13 +2913,11 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				BufInfo_Init(_bi); \
 				BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
 				C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
-				atm_prof_add(ATM_C_DRAWS, 1); \
 			} \
 		} else { \
 			BufInfo_Init(_bi); \
 			BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
 			C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
-			atm_prof_add(ATM_C_DRAWS, 1); \
 		} \
 		if (batch_colourkey) \
 			C3D_AlphaTest(false, GPU_ALWAYS, 0); \

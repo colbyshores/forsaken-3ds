@@ -22,9 +22,6 @@
 #include "input/input.h"
 #include "audio/sound.h"
 #include "audio/music.h"
-#include "diag/perf_capture.h"
-#include "diag/atm_prof.h"
-#include "diag/framedump.h"
 
 #include <unistd.h>
 #include "game/oct2.h"
@@ -624,14 +621,11 @@ static bool RenderLoop()
 		{
 			// this is the actual call to render a frame...
 			{
-				perf_stage_begin( PERF_S_PRESENTLOOP );
 				if (!render_flip(&render_info))
 				{
-					perf_stage_end( PERF_S_PRESENTLOOP, -1 );
 					Msg("RenderLoop: render_flip() failed\n");
 					return false;
 				}
-				perf_stage_end( PERF_S_PRESENTLOOP, -1 );
 			}
 		}
 	}
@@ -692,21 +686,12 @@ int main( int argc, char* argv[] )
 	 * Without this, the app never yields to the OS for these events —
 	 * HOME button is ignored and closing the lid freezes the game.
 	 * Returns false when the OS signals the app should exit (user picked
-	 * "Close" from HOME, or the console is being powered off).
-	 * ATM_HEADLESS one-shot payloads skip it: an ATM-launched app is never
-	 * foregrounded, so the first aptMainLoop() call would return false
-	 * immediately (no wakeup ever arrives) and the benchmark loop would
-	 * never run. Headless termination comes from the bench itself
-	 * (frame_target / deadline / left_gameplay / level_never_loaded all
-	 * set QuitRequested). Stub-chainload builds keep the normal gate:
-	 * NS launches the app as a proper foreground title there. */
+	 * "Close" from HOME, or the console is being powered off). */
 	while( aptMainLoop() && !QuitRequested )
 #else
 	while( !QuitRequested )
 #endif
 	{
-		PERF_FRAME_BEGIN();
-		atm_prof_frame_begin();
 		// process system events
 		if(!handle_events())
 			goto FAILURE;
@@ -747,15 +732,7 @@ int main( int argc, char* argv[] )
 #if defined(DEBUG_ON) && defined(DEBUG_ALL_MATH_ERRORS)
 		DebugMathErrors();
 #endif
-		atm_prof_frame_end();
-		PERF_FRAME_END();
 	}
-
-	PERF_DUMP();
-	/* ATM harness result file. Written after the loop so the measured window
-	 * is closed and teardown order is untouched; also reached by the
-	 * SeriousError break above. */
-	atm_prof_write_result();
 
 	/* Normal-exit teardown. On 3DS, QuitRequested is set by the
 	 * Start+Select input handler or aptMainLoop returning false
@@ -770,8 +747,6 @@ int main( int argc, char* argv[] )
 
 FAILURE:
 
-	//
-	atm_prof_write_result();
 	CleanUpAndPostQuit();
 
 #ifdef DEBUG_ON

@@ -89,7 +89,6 @@ num_start_points : u_int16_t
 ===================================================================*/
 
 #include "game/main.h"
-#include "diag/atm_prof.h"
 #include <stdio.h>
 
 #include "math/new3d.h"

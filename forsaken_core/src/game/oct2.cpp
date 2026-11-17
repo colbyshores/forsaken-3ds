@@ -62,8 +62,6 @@
 #include "audio/music.h"
 #endif
 
-#include "diag/perf_capture.h"
-#include "diag/fidelity.h"
 #include "data/config.h"
 #include "game/skin.h"
 #include "util/xmem.h"
@@ -2386,7 +2384,7 @@ bool RenderScene( void )
     if( IMustQuit )
       SpecialDestroyGame();
 
-    if( PERF_MAINGAME() != true ) // bjd
+    if( MainGame() != true ) // bjd
       return false;
 
     if ( bSoundEnabled )
@@ -3609,7 +3607,7 @@ bool RenderScene( void )
 	    char _b[64]; snprintf(_b,sizeof(_b),"SP: -> MainGame first frame for level %d", (int)LevelNum); trace(_b);
 	  } }
 #endif
-    if( PERF_MAINGAME() != true ) // bjd
+    if( MainGame() != true ) // bjd
       return false;
 #ifdef __3DS__
 	{ static int _mg_done_last_level = -2; 
@@ -3776,79 +3774,33 @@ void MainRoutines( void )
     DemoPlayingNetworkGameUpdate();
   }
 
-  perf_stage_begin(PERF_S_SHIPS);
   ProcessShips();
-  perf_stage_end(PERF_S_SHIPS, -1);
 
 
-  perf_stage_begin(PERF_S_FIRES);
   FirePrimary();
   FireSecondary();
-  perf_stage_end(PERF_S_FIRES, -1);
-  perf_stage_begin(PERF_S_ENEMIES);
   ProcessEnemies();
-  perf_stage_end(PERF_S_ENEMIES, -1);
-  perf_stage_begin(PERF_S_SPOTFX);
   ProcessSpotFX();
-  perf_stage_end(PERF_S_SPOTFX, -1);
-  perf_stage_begin(PERF_S_BULLETS);
-  perf_stage_begin(PERF_S_BULLPRIM);
   ProcessPrimaryBullets();
-  perf_stage_end(PERF_S_BULLPRIM, -1);
-  perf_stage_begin(PERF_S_BULLSEC);
   ProcessSecondaryBullets();
-  perf_stage_end(PERF_S_BULLSEC, -1);
-  perf_stage_end(PERF_S_BULLETS, -1);
-  perf_stage_begin(PERF_S_REGEN);
   if( !PlayDemo ) RegeneratePickups();
-  perf_stage_end(PERF_S_REGEN, -1);
-  perf_stage_begin(PERF_S_PICKUPS);
   ProcessPickups();
-  perf_stage_end(PERF_S_PICKUPS, -1);
-  perf_stage_begin(PERF_S_BGOBJ);
   ProcessBGObjects( true );
-  perf_stage_end(PERF_S_BGOBJ, -1);
-  perf_stage_begin(PERF_S_RESTART);
   ProcessRestartPoints();
-  perf_stage_end(PERF_S_RESTART, -1);
-  perf_stage_begin(PERF_S_MODELS);
   ProcessModels();
-  perf_stage_end(PERF_S_MODELS, -1);
-  perf_stage_begin(PERF_S_POLYS);
   ProcessPolys();
-  perf_stage_end(PERF_S_POLYS, -1);
-  perf_stage_begin(PERF_S_XLIGHTS);
   ProcessXLights( &Mloadheader );
-  perf_stage_end(PERF_S_XLIGHTS, -1);
-  perf_stage_begin(PERF_S_AFTERBRN);
   DoAfterBurnerEffects();
-  perf_stage_end(PERF_S_AFTERBRN, -1);
-  perf_stage_begin(PERF_S_FMPOLY);
   FmPolyProcess();
-  perf_stage_end(PERF_S_FMPOLY, -1);
-  perf_stage_begin(PERF_S_TIME);
   CheckTimeLimit();
   if( CountDownOn ) UpdateCountdownDigits();
-  perf_stage_end(PERF_S_TIME, -1);
-  perf_stage_begin(PERF_S_MULTIPLES);
 	if(!CurrentMenu)
 	  ShowScreenMultiples();
-  perf_stage_end(PERF_S_MULTIPLES, -1);
-  perf_stage_begin(PERF_S_CONDITIONS);
   ProcessActiveConditions();
-  perf_stage_end(PERF_S_CONDITIONS, -1);
-  perf_stage_begin(PERF_S_TRIGGERS);
   ProcessTriggerAreas();
-  perf_stage_end(PERF_S_TRIGGERS, -1);
-  perf_stage_begin(PERF_S_GOALS);
   ProcessGoals();
-  perf_stage_end(PERF_S_GOALS, -1);
-  perf_stage_begin(PERF_S_WATER);
   WaterProcess();
-  perf_stage_end(PERF_S_WATER, -1);
-  perf_stage_begin(PERF_S_RTLIGHTS);
   ProcessRTLights();
-  perf_stage_end(PERF_S_RTLIGHTS, -1);
   
 }
 
@@ -4283,8 +4235,7 @@ bool MainGameRender(void)
 #endif
 
 	_MGR_STAGE("entry");
-	perf_stage_begin(PERF_S_FSBEGIN);
-	if (!perf_guarded(PERF_S_FSBEGIN, FSBeginScene()))
+	if (!FSBeginScene())
 	{
 		_MGR_STAGE("FSBeginScene FAILED");
 		return false;
@@ -4357,16 +4308,14 @@ bool MainGameRender(void)
       if( render_info.stereo_enabled )
       {
 				_MGR_STAGE("calling RenderCurrentCameraInStereo");
-				perf_stage_begin(PERF_S_CAM);
-				if(!perf_guarded(PERF_S_CAM, RenderCurrentCameraInStereo(RenderCurrentCameraWithMainGameMenu)))
+				if(!RenderCurrentCameraInStereo(RenderCurrentCameraWithMainGameMenu))
 					return false;
 				_MGR_STAGE("post-RenderCurrentCameraInStereo");
       }
       else // non stereo - normal rendering
 	  	{
 				_MGR_STAGE("calling RenderCurrentCameraWithMainGameMenu");
-				perf_stage_begin(PERF_S_CAM);
-				if( perf_guarded(PERF_S_CAM, RenderCurrentCameraWithMainGameMenu() != true) ) // bjd
+				if( RenderCurrentCameraWithMainGameMenu() != true ) // bjd
 				{
 					return false;
 				}
@@ -4514,8 +4463,7 @@ bool MainGameRender(void)
 		set_normal_states();
   }
 
-  perf_stage_begin(PERF_S_FSEND);
-  if (!perf_guarded(PERF_S_FSEND, FSEndScene()))
+  if (!FSEndScene())
   {
         return false;
   }
@@ -4577,10 +4525,7 @@ bool MainGame( void ) // bjd
 #ifdef __3DS__
   _3ds_mr_ctx = "pre-MainRoutines";
 #endif
-  perf_stage_begin(PERF_S_MROUT);
   MainRoutines();
-  perf_stage_end(PERF_S_MROUT, -1);
-  fidelity_tick();
 #ifdef __3DS__
   _3ds_mr_ctx = "post-MainRoutines";
 #endif
@@ -4596,7 +4541,7 @@ bool MainGame( void ) // bjd
     LastDistance[i] = 100000.0F;
 
   _MG_STAGE("pre-MainGameRender");
-  if(!PERF_MAINGAME_RENDER())
+  if(!MainGameRender())
     return false;
   _MG_STAGE("post-MainGameRender");
 
@@ -5182,7 +5127,6 @@ bool RenderCurrentCamera( void )
 	#define _RC_STAGE(s) ((void)0)
 #endif
 	_RC_STAGE("entry");
-	perf_stage_begin(PERF_S_VIS);
 	int16_t Count;
 	VISGROUP  *g;
 	u_int16_t  group;
@@ -5228,8 +5172,6 @@ bool RenderCurrentCamera( void )
   UpdateBGObjectsClipGroup( &CurrentCamera );
   UpdateEnemiesClipGroup( &CurrentCamera );
   _RC_STAGE("post-UpdateClipGroups");
-  perf_stage_end(PERF_S_VIS, -1);
-  perf_stage_begin(PERF_S_BG);
 
   if (ClearBuffers() != true )
   {
@@ -5269,8 +5211,6 @@ bool RenderCurrentCamera( void )
 #ifdef __3DS__
   int _rc_group_iter = 0;
 #endif
-  perf_stage_end(PERF_S_BG, -1);
-  perf_stage_begin(PERF_S_OPAQUE);
   _RC_STAGE("entering opaque-draw loop");
   /* Fresh memo generation for this camera's visible-group walk: ModelDisp
    * is called once per group and the per-model visibility predicate is
@@ -5289,9 +5229,7 @@ bool RenderCurrentCamera( void )
 #endif
 
     // Do the Background animation for that group.....
-    perf_stage_begin(PERF_S_OPQTEX);
     BackGroundTextureAnimation( &Mloadheader , group );
-    perf_stage_end(PERF_S_OPQTEX, -1);
 
 #ifdef __3DS__
     /* Per-group sub-stage trace. Fires only on the FIRST few iterations
@@ -5305,27 +5243,19 @@ bool RenderCurrentCamera( void )
 #endif
     _RC_SUBSTAGE("post-BackGroundTextureAnimation");
 
-    perf_stage_begin(PERF_S_OPQCLIP);
     ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
-    perf_stage_end(PERF_S_OPQCLIP, -1);
     _RC_SUBSTAGE("post-ClipGroup-1");
 
-    perf_stage_begin(PERF_S_OPQLINES);
 	ExecuteLines( group, &RenderBufs[ 0 ] );
-    perf_stage_end(PERF_S_OPQLINES, -1);
     _RC_SUBSTAGE("post-ExecuteLines");
-    perf_stage_begin(PERF_S_OPQCLIP);
     ClipGroup( &CurrentCamera, group );
-    perf_stage_end(PERF_S_OPQCLIP, -1);
     _RC_SUBSTAGE("post-ClipGroup-2");
 
     _RC_SUBSTAGE("calling ModelDisp");
-      perf_stage_begin(PERF_S_OPQMODEL);
       if( !ModelDisp( group, /*lpDev,*/ &ModelNames[0] ) ) // bjd
-      { perf_stage_end(PERF_S_OPQMODEL, -1);
+      {
         return false;
       }
-      perf_stage_end(PERF_S_OPQMODEL, -1);
     _RC_SUBSTAGE("post-ModelDisp");
 
 /*===================================================================
@@ -5333,17 +5263,14 @@ bool RenderCurrentCamera( void )
 ===================================================================*/
 
     _RC_SUBSTAGE("calling DisplaySolidGroupClippedPolys");
-  perf_stage_begin(PERF_S_OPQPOLYS);
   if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
-  { perf_stage_end(PERF_S_OPQPOLYS, -1);
+  {
     return false;
   }
-  perf_stage_end(PERF_S_OPQPOLYS, -1);
     _RC_SUBSTAGE("post-DisplaySolidGroupClippedPolys");
     #undef _RC_SUBSTAGE
   }
   _RC_STAGE("opaque-loop EXIT");
-  perf_stage_end(PERF_S_OPAQUE, -1);
 
   ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
   _RC_STAGE("post-ClipGroup-cam");
@@ -5351,7 +5278,6 @@ bool RenderCurrentCamera( void )
 	// set all the Translucent execute status flags...
   	set_alpha_states();
   _RC_STAGE("post-set_alpha_states-1");
-  perf_stage_begin(PERF_S_TRANS);
 
 
 /*===================================================================
@@ -5403,40 +5329,30 @@ bool RenderCurrentCamera( void )
     #define _RC_TRANS_SUBSTAGE(s) ((void)0)
 #endif
 
-    perf_stage_begin(PERF_S_TRANWATER);
     ClipGroup( &CurrentCamera, group );
     _RC_TRANS_SUBSTAGE("post-ClipGroup");
     GroupWaterProcessDisplay( group );
     _RC_TRANS_SUBSTAGE("post-GroupWaterProcessDisplay");
-    perf_stage_end(PERF_S_TRANWATER, -1);
-    perf_stage_begin(PERF_S_TRANPOLYS);
 
 /*===================================================================
   Display Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
 
-  perf_stage_begin(PERF_S_TRANCLIP);
   if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
     return false;
     _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedPolys");
-  perf_stage_end(PERF_S_TRANCLIP, -1);
 
 
 /*===================================================================
 Display Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
-  perf_stage_begin(PERF_S_TRANFM);
   if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], group ) ) // bjd
       return false;
     _RC_TRANS_SUBSTAGE("post-DisplayGroupClippedFmPolys");
-  perf_stage_end(PERF_S_TRANFM, -1);
 
-  perf_stage_begin(PERF_S_TRANEXE);
   ExecuteTransExe( group );
-  perf_stage_end(PERF_S_TRANEXE, -1);
     _RC_TRANS_SUBSTAGE("post-ExecuteTransExe");
-    perf_stage_end(PERF_S_TRANPOLYS, -1);
     #undef _RC_TRANS_SUBSTAGE
   }
   _RC_STAGE("translucent-loop EXIT");
@@ -5450,8 +5366,6 @@ Display Group Clipped Faceme Transluecent Polys
   Display Non Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
-    perf_stage_begin(PERF_S_TRANPOLYS);
-    perf_stage_begin(PERF_S_TRANUNCLIP);
     if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedFmPolys");
@@ -5462,18 +5376,13 @@ Display Group Clipped Faceme Transluecent Polys
     if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
         return false;
   _RC_STAGE("post-DisplayGroupUnclippedPolys");
-    perf_stage_end(PERF_S_TRANUNCLIP, -1);
-    perf_stage_end(PERF_S_TRANPOLYS, -1);
-    perf_stage_begin(PERF_S_TRANMISC);
   
   // display unclipped translucencies
-  perf_stage_begin(PERF_S_TRANEXE);
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
     group = g->group;
     ExecuteTransExeUnclipped( group );
   }
-  perf_stage_end(PERF_S_TRANEXE, -1);
 
 
 /*===================================================================
@@ -5493,7 +5402,6 @@ Display Group Clipped Faceme Transluecent Polys
   }
 
   set_normal_states();
-    perf_stage_end(PERF_S_TRANMISC, -1);
 
     if (!FSSetViewPort(&viewport)) {
 #ifdef DEBUG_VIEWPORT
@@ -5504,7 +5412,6 @@ Display Group Clipped Faceme Transluecent Polys
         return false;
     }
 
-  perf_stage_end(PERF_S_TRANS, -1);
   return true;
 }
   

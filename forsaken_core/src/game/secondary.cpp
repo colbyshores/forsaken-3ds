@@ -6,7 +6,6 @@
 ===================================================================*/
 #include <stdio.h>
 #include "game/main.h"
-#include "diag/atm_prof.h"
 #include "math/new3d.h"
 #include "math/quat.h"
 #include "game/compobjects.h"
@@ -1905,7 +1904,6 @@ void ProcessSecondaryBullets( void )
 	while( i != (u_int16_t) -1 )
 	{
 		NextMissile = SecBulls[ i ].Prev;											/* Next Missile */
-		atm_prof_add( ATM_C_SEC_BULLETS, 1 );
 
 		NewFramelag = ( framelag + SecBulls[i].FramelagAddition );
 

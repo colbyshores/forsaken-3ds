@@ -9,8 +9,7 @@
 # hangs (observe with `timeout 5`); post-fix all three cases exit 0.
 #
 # Engine sources are C++ (C-with-classes), so every test builds with g++
-# against the .cpp sources. test_framedump was dropped when framedump_core.c
-# moved to the harness tree (ad420e3); the framedump proof chain lives there.
+# against the .cpp sources.
 
 CC      := gcc
 CXX     := g++
@@ -49,6 +48,6 @@ test_new3d: test_new3d.cpp $(CORE)/math/new3d.cpp
 	./test_new3d
 
 clean:
-	rm -f test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d out-*.bmp framedump_test.log
+	rm -f test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d
 
 .PHONY: all clean test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d

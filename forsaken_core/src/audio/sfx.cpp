@@ -62,7 +62,6 @@ FILE *LoadAllSfx( FILE *fp ){return fp;}
 #include "game/object.h"
 #include "net/networking.h"
 #include "game/object.h"
-#include "diag/atm_prof.h"
 #include "data/mload.h"
 #include "ui/title.h"
 #include "rendering/text.h"
@@ -2562,7 +2561,6 @@ void ProcessLoopingSfx( void )
 	{
 		if ( !SpotSfxList[ i ].used )
 			continue;
-		atm_prof_add( ATM_C_SFX_USED, 1 );
 
 		flags = Sfx_Filenames[ SpotSfxList[ i ].sfxindex ].Flags;
 		
@@ -2627,7 +2625,6 @@ void ProcessLoopingSfx( void )
 		 	if ( SpotSfxList[ i ].source )
 			{
 				DebugPrintf("ProcessLoopingSfx: Releasing dynamic looping sfx %d\n", SpotSfxList[ i ].sfxindex);
-				atm_prof_add( ATM_C_SFX_RELEASE, 1 );
 				sound_release_source( (sound_source_t*)SpotSfxList[ i ].source );
 				SpotSfxList[ i ].source = NULL;
 				/* Conditions changed (slot left range with a live source):
@@ -2659,7 +2656,6 @@ void ProcessLoopingSfx( void )
 			// TODO - this should probably be done right away in InitLoopingSfx()
 			int index = SpotSfxList[ i ].sfxindex +	SpotSfxList[ i ].variant;
 
-			atm_prof_add( ATM_C_SFX_CREATE, 1 );
 			if( ! (SpotSfxList[ i ].source = sound_source_create( file, index )) )
 				continue;
 

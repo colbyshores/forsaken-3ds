@@ -28,7 +28,6 @@
 #include "net/networking.h"
 #include "data/file.h"
 #include "game/triggers.h"
-#include "diag/perf_capture.h"
 #include "game/models.h"
 #include "game/enemies.h"
 #include "data/mload.h"
@@ -929,9 +928,7 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 			if( Temp < Distance )
 			{
 				bool _los;
-				perf_stage_begin(PERF_S_LOSNODE);
 				_los = AI_ClearLOS( &Object->Pos ,Object->Group, &NodeLink->Pos );
-				perf_stage_end(PERF_S_LOSNODE, -1);
 				if( _los )
 				{
 					Distance = Temp;
@@ -949,9 +946,7 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 			if( Temp < Distance )
 			{
 				bool _los;
-				perf_stage_begin(PERF_S_LOSNODE);
 				_los = AI_ClearLOS( &Object->Pos ,Object->Group, &Node->Pos );
-				perf_stage_end(PERF_S_LOSNODE, -1);
 				if( _los )
 				{
 					Distance = Temp;

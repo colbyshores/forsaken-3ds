@@ -6,7 +6,6 @@
 ===================================================================*/
 #include <stdio.h>
 #include "game/main.h"
-#include "diag/atm_prof.h"
 
 #include "math/new3d.h"
 #include "math/quat.h"
@@ -1567,7 +1566,6 @@ void ProcessPrimaryBullets( void )
 
 		if (PrimBulls[i].LifeCount > 0.0F)
 		{
-			atm_prof_add( ATM_C_PRIM_BULLETS, 1 );
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			PrimBulls[i].LifeCount -= NewFramelag; //framelag;
 			if( PrimBulls[i].LifeCount < 0.0F ) PrimBulls[i].LifeCount = 0.0F;

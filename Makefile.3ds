@@ -22,37 +22,10 @@ DEBUG ?= 0
 # levels + music). The remaster build still uses the 1998 ISO for UI assets
 # (fonts, splash, decals) since the KPF lacks them — see README.
 EDITION ?= original
-# (framedump.h): TCP trigger port + sdmc:/framedump_*.bmp + hash log.
-# Harness builds only; default builds are unaffected.
 # MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
 VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
 # RAM is approximated; platform/scheduler/GPU behavior remain New 3DS.
 
-# Shipped features (stereo memo, persist, buckets, CHE pre-filter)
-# are compiled in unconditionally — no feature flags. Only platform
-# (renderer/edition) and measurement-harness knobs remain, and the
-# harness knobs live in the forsaken-harness tree, not here.
-
-#---------------------------------------------------------------------------------
-# Flag matrix — what each knob is for, and when it goes away.
-# Nothing here is dead: every knob is live measurement infra, a shipped
-# feature flag, or a placeholder with a named removal point. Do not
-# purge flags for tidiness; each removal below is scheduled, not overdue.
-#
-# MEASUREMENT LOOP (every remaining A/B needs these; never ship, never drop):
-#   ATM_PROFILING + ATM_BENCH_*  fixed bench + /3ds/atm_result.txt
-#   (ATMBF=1 adds held primary fire: the combat bench. Same loop.)
-#   FRAMEDUMP + FRAMEDUMP_SELFTEST_AT  pixel proof (stills + FNV log)
-#   FIDELITY_DUMP (+FIDELITY_CHECKPOINTS)  gameplay-trajectory proof
-#   PERF_CAPTURE  per-stage breakdowns (shares only)
-# SHIPPED FEATURES (default builds; gates cover):
-# EXPERIMENTS (A/B only, default 0/off):
-# COMPAT / ENV (not perf work):
-#   AUTOTEST_REMASTER* (level-sweep fidelity vehicle), ATM_HEADLESS
-#   (ATM-launched payloads only — NEVER for 3dslink/stub pushes),
-#   DEBUG, EDITION, SLIM
-# SCHEDULED REMOVALS (only at these points, not before):
-#---------------------------------------------------------------------------------
 
 #---------------------------------------------------------------------------------
 # Environment
@@ -194,42 +167,6 @@ CFLAGS += -DDEFEND2_TRACE
 endif
 endif
 
-# AUTOTEST_REMASTER=1 is a hardware-iteration helper. With it set, the
-# build autoboots into mission.dat[5] (defend2 — first new SP slot)
-# and cycles through the rest of the SP campaign one minute per level,
-# tracing each transition to sdmc:/forsaken_trace.txt and chain-loading
-# back to sdmc:/3ds/netload_stub.3dsx after the last level. Used to
-# validate Remaster levels without manual menu navigation.
-ifeq ($(AUTOTEST_REMASTER),1)
-# profiling branch: VERBOSE_TRACE dropped — per-line fsync (5-10 ms, P5)
-# poisons the PERF_CAPTURE timings this build is meant to measure.
-CFLAGS += -DAUTOTEST_REMASTER -D__3DS_DEBUG__
-endif
-
-
-# AUTOTEST_FIRST_LEVEL=N overrides the sweep's starting slot so we can
-# resume a sweep from where the previous run failed without re-cycling
-# already-validated levels. Pass on the make command line:
-#   make ... AUTOTEST_REMASTER=1 AUTOTEST_FIRST_LEVEL=10
-ifneq ($(AUTOTEST_FIRST_LEVEL),)
-CFLAGS += -DAUTOTEST_FIRST_LEVEL=$(AUTOTEST_FIRST_LEVEL)
-# (Force-rebuild rule for autotest_3ds.o is appended after `all:` below
-# so it doesn't accidentally become the default target — putting an
-# explicit rule with no commands before `all:` made make's first target
-# `$(BUILD)/autotest_3ds.o`, breaking plain `make` for everyone.)
-endif
-
-# AUTOTEST_MAX_LEVELS_TO_SWEEP=N caps how many levels the sweep covers
-# before chain-loading back. Default 32; reduce for focused diagnosis.
-ifneq ($(AUTOTEST_MAX_LEVELS_TO_SWEEP),)
-CFLAGS += -DAUTOTEST_MAX_LEVELS_TO_SWEEP=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)
-endif
-
-# AUTOTEST_MS_PER_LEVEL=N overrides the per-level dwell (default 60000
-# ms = 60s). Useful for fast smoke tests.
-ifneq ($(AUTOTEST_MS_PER_LEVEL),)
-CFLAGS += -DAUTOTEST_MS_PER_LEVEL=$(AUTOTEST_MS_PER_LEVEL)
-endif
 
 
 
@@ -291,28 +228,20 @@ CIA_ROMFS_STAMP := $(CIA_ROMFS)/.stamp
 all: $(OUTPUT_3DSX)
 
 # --- Build-flag stamp -------------------------------------------------------
-# The -D flag set (PERF_CAPTURE, FIDELITY_DUMP, FIDELITY_CHECKPOINTS,
-# code but is invisible to the -MMD dependency files, so switching flags
-# left stale objects that silently relinked wrong behavior (three incidents
-# this program: 2026-10-26, ships.o + perf_capture_3ds.o link failures and
-# a stale-binary push). This stamp records the flag set; when it changes,
-# the stamp file is rewritten with a fresh mtime, and because every object
-# depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
-# the old stamp mtime, so normal incremental builds are untouched.
+# Compiler flags change the code but are invisible to the -MMD dependency
+# files, so switching flags (DEBUG=1 <-> release, EDITION, ...) in the same
+# build directory would relink stale objects built with the old flags. The
+# stamp records the complete flag set; when it changes, the stamp file gets
+# a fresh mtime and, because every object depends on it, the whole tree
+# rebuilds. Unchanged flags keep the old mtime, so incremental builds are
+# untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := VIS=$(MODEL_VIS_CACHE)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|STS=$(STRESS_SCRATCH_VERTS)|VFY=$(VERIFY_CFLAGS)
+STAMP_CONTENT := $(CFLAGS) $(CXXFLAGS_ADD)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
 	@if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; echo "build flags changed -> full rebuild"; fi
 
-# Force autotest_3ds.o to always recompile when AUTOTEST_FIRST_LEVEL is set,
-# so a slot change picks up without manual `rm`. CFLAGS aren't tracked as
-# deps by default. Defined AFTER `all:` so `make` with no target still
-# resolves to `all` and not to this internal .o rule.
-ifneq ($(AUTOTEST_FIRST_LEVEL),)
-$(BUILD)/autotest_3ds.o: FORCE
-endif
 .PHONY: FORCE
 FORCE: ;
 
@@ -493,14 +422,6 @@ $(BUILD)/%.o: %.cpp $(STAMP)
 	@mkdir -p $(BUILD)
 	$(CXX) -MMD -MP -MF $(BUILD)/$*.d $(CXX_BASE_FLAGS) $(CXXFLAGS_ADD) -c $< -o $@
 
-# Shared ATM telemetry core, compiled from the canonical netload_stub tree in
-# place (explicit rule: it is outside $(SRCDIR), so the pattern rule above
-# cannot reach it). Same numeric flags as the game; -MMD keeps it honest.
-$(BUILD)/atm_core.o: $(ATM_CORE_DIR)/source/atm/atm_core.c $(STAMP)
-	@echo "$(notdir $<) [shared ATM core]"
-	@mkdir -p $(BUILD)
-	$(CC) -MMD -MP -MF $(BUILD)/atm_core.d $(CFLAGS) -c $< -o $@
-
 clean:
 	@echo "Cleaning 3DS build..."
 	@rm -rf $(BUILD) $(OUTPUT_ELF) $(OUTPUT_3DSX) $(OUTPUT_SMDH) $(TARGET).map $(OUTPUT_BNR) $(OUTPUT_CIA) $(OUTPUT_CIA_ALT) $(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
@@ -576,14 +497,13 @@ cia: $(OUTPUT_CIA)
 
 # Prune dep files whose recorded source no longer exists: a .c->.cpp rename
 # leaves e.g. xmem.d demanding xmem.c and make dies at graph time before any
-# recipe can clean it. Runs at parse time, before the include. atm_core.d is
-# exempt (its source lives in the ATM harness tree, not SRCDIR).
+# recipe can clean it. Runs at parse time, before the include.
 # The source is the FIRST PREREQUISITE, not "the rest of line 1": GCC wraps
 # long rules as 'obj.o: \' with the source on the next line, and reading
 # line 1 alone took '\' for the source and deleted every valid .d file --
 # after which header-only edits never rebuilt anything. Join continuation
 # lines first, then take the first word after the colon.
-STALE_DFILES := $(shell for d in $(BUILD)/*.d; do [ -f "$$d" ] || continue; b=$$(basename "$$d"); [ "$$b" = atm_core.d ] && continue; s=$$(tr -d '\\\n' < "$$d" | sed 's/^[^:]*:[[:space:]]*//' | cut -d' ' -f1); [ -f "$$s" ] || echo "$$d"; done)
+STALE_DFILES := $(shell for d in $(BUILD)/*.d; do [ -f "$$d" ] || continue; s=$$(tr -d '\\\n' < "$$d" | sed 's/^[^:]*:[[:space:]]*//' | cut -d' ' -f1); [ -f "$$s" ] || echo "$$d"; done)
 $(if $(STALE_DFILES),$(shell rm -f $(STALE_DFILES)))
 -include $(wildcard $(BUILD)/*.d)
 

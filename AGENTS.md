@@ -14,100 +14,6 @@ tools/perf/check.sh                    # all three
 ```
 
 
-**Hardware console maintenance (physical Old 3DS only)
-
-  The console supports remote cleanup and large pushes. The old
-  blanket "do not improvise a reboot, cleanup" rule is replaced by
-  the three rules below — all other stop conditions (no blind
-  retries on recovery_failure / incomplete_recovery, no commits
-  without approval) still hold.
-
-  • Push large builds with a raised timeout: `atm deploy <file>
-    --no-launch --timeout 120(or the equivalentatm run` budget)
-    for anything multi-MB. The default 10 s host budget reports a
-    false transport failed: timed out while the console is still
-    validating — a timeout is never proof the transfer failed; check
-    the journal before concluding anything. Hard per-file cap is
-    512 MB: beyond it the device refuses with transfer_rejected and
-    self-cleans, so size the build accordingly.
-  • Delete what every try stages: each successful deploy commits an SD
-    final (.3dsx → /3ds/<name>, anything else →
-    /3ds/atm-assets/<name>); same-name re-push rotates, distinct
-    names accumulate. At the end of every iteration, atm del each
-    payload that iteration staged and confirm absence via `atm
-    artifacts` (never the UDP ack alone). The device refuses the
-    currently staged launchable build and the running app's file —
-    stage a replacement first, then delete. Never delete crash dumps
-    or run records; unacked evidence is never deleted.
-  • Reboot autonomously, but only remotely and only with proof: `atm
-    reboot --wait 180` is permitted when the console is reachable yet
-    wedged (e.g. an interactive build with no clean-exit path still
-    running past its timeout after atm cmd terminate), or to reset
-    to a known-clean state between profiling groups. Never reboot
-    mid-transfer (busy=no first; the device refuses otherwise).
-    Every reboot must be proven by a boot_count increase plus
-    recovery_ready=yes before the next run; record before/after
-    device, session, and boot counts in the iteration log. A console
-    that stops answering is still manual-intervention-required —
-    report it, never work around it.
-
-**Loop hygiene (learned from stalled iterations)
-
-  • Firmware identity gates all comparisons: record firmware_id
-    from atm status every iteration. If it differs from the last
-    recorded value, the harness is unvalidated until proven otherwise
-    — re-run the Phase A smoke (COMPLETED, matching device/build/
-    firmware, verified retrieval manifest) and re-establish the
-    three-run noise floor before any Phase D measurement counts.
-    Timing numbers across firmware versions are never compared.
-  • Transient unreachability is retried, not filed: a refused or
-    timed-out preflight is polled a few times over ~5 minutes before
-    it becomes a blocker. Only persistent unreachability writes the
-    canonical perf/BLOCKED.md. Every attempt (command, output, UTC)
-    is banked in the iteration log either way, so a later reader can
-    tell a reboot window from a dead console.
-  • Blocker files have fixed roles: dated perf/BLOCKED-*.md files
-    are immutable evidence and are never edited or deleted;
-    perf/BLOCKED.md is the live parked signal. Only the operator
-    clears it, and the clearing (who, when, what changed on the
-    console or network since) is recorded before the next iteration
-    preflights.
-  • Leave the console listening: every iteration ends with the app
-    terminated (atm cmd terminate) or the console rebooted to a
-    proven clean state — never abandoned running an interactive
-    build with no exit path. If an iteration intentionally leaves it
-    running, the log states why. Name staged builds uniquely per
-    iteration, keep current plus previous for bisection, and `atm
-    del` everything older at iteration end.
-
-
-**Wedged-console watchdog (no human presses OK)
-  
-  An "An error has occurred" screen with no auto-recovery is a
-  wedged console, not a stop state. No human will ever press the
-  button; the loop owns recovery. Device-side auto-recovery
-  (auto_dump armed) is the first line — this rule is the backstop
-  for whatever the device doesn't clear itself.
-  
-  • A run is wedged when ALL hold: journal state=running past the
-    run's own timeout, no journal/session/state change across three
-    consecutive polls (~1 min apart), busy=no, and no recovery in
-    progress (recovery=none, no dump capture active). Log silence
-    alone is never the trigger — quiet runs are healthy.
-  • On a wedged run, in order: (1) atm journal + atm artifacts +
-    atm retrieve to preserve whatever evidence exists (dumps
-    first — a console mid-capture must never be rebooted);
-    (2) atm cmd terminate; if still wedged, (3) `atm reboot
-    --wait 180, proven by boot_count` increase plus
-    recovery_ready=yes before the next run.
-  • Circuit breaker: three watchdog reboots in one loop lifetime
-    without a single COMPLETED/exited run means the console is
-    not recovering — write perf/BLOCKED.md with all three reboot
-    evidences and stop. Rebooting a fourth time is the loop the rule
-    exists to prevent.
-  
-
-
 **Project policy and hardware facts are different.** R2/R4/R6 and the other
 conservative rules are deliberate constraints for this engine. They are not
 proof that every prohibited construct is always slow on every 3DS workload.
@@ -469,12 +375,16 @@ preallocate-in-hot-path, worker stack budgets — is **phase 2**.
   `-fsingle-precision-constant`), no replacing pinned macros
   (`FMOD`/`FDIV`/`fast_sinf`/`fast_floorf`), no fixed array → container in
   a per-frame path, no allocation or exception in a hot path.
-- Every converted module ships with a fidelity A/B: build the module as C
-  and as C++, sweep both on hardware with `FIDELITY_DUMP=1`
-  (`sdmc:/forsaken_fidelity.txt`, per-tick state checksums;
-  `FIDELITY_CHECKPOINTS=1` for tick-level localization), and the checksums
-  must be byte-identical. A module that cannot pass its fidelity A/B is
-  not converted — that is the merge gate, not a review opinion.
+- Every conversion or cleanup is proven before it merges:
+  `tools/verify_identical.sh BASE` builds the base and the change in all six
+  configurations (3DS remaster/original x release/`DEBUG=1`, PC release/
+  `DEBUG=1`) from clean and compares every object and the linked binary.
+  Where `-O2` output differs only by scheduling, `tools/verify_o0.sh`
+  recompiles those objects at `-O0`; equal `-O0` objects mean the compiler
+  saw the same program. A change whose output legitimately differs is a
+  behaviour change: its own labelled commit, its disassembly reviewed, and an
+  on-device play test of the affected scenario by the owner (hardware is
+  owner-gated). That is the merge gate, not a review opinion.
 - No user-defined operators on float-bearing types in phase 1: arithmetic
   and comparisons stay explicit and greppable, so the text-based numeric
   gates keep working and the source keeps saying what it does.
@@ -486,9 +396,8 @@ preallocate-in-hot-path, worker stack budgets — is **phase 2**.
   `__system_allocateHeaps` override (a mangled name compiles, links, and
   silently loses to the library default); (2) a C library's headers —
   Lua, wrapped once in `scripting/lua_api.h`, never `#include <lua.h>`
-  directly; (3) `forsaken_core/src/diag/*`, shared with C TUs outside the
-  tree (the ATM core, the harness overlay). `tools/verify_identical.sh`
-  fails if a library's weak default replaces one of our symbols.
+  directly. `tools/verify_identical.sh` fails if a library's weak default
+  replaces one of our symbols.
 
 **Preferred C++ constructs (use where they apply).** These are the
 "classes" half of C with classes that cost nothing at run time; prefer
@@ -589,7 +498,7 @@ P1–P6. Correctness requirements apply in cold paths too.
 
 | Area changed | Required evidence |
 |---|---|
-| Build or math | Clean build commands, tool/library versions, relevant disassembly, fidelity checks, comparable hardware capture |
+| Build or math | Clean build commands, tool/library versions, `tools/verify_identical.sh` result, relevant disassembly for any object that differs |
 | Rendering or sync | Busy-scene pacing, both-eye/slider behavior, buffer reuse under load, clean teardown |
 | Lifecycle or workers | HOME return, lid sleep/wake, repeated pause/resume, clean exit, no stuck waits or duplicate workers |
 | Filesystem or streaming | Packaged assets in each shipped format, missing/read-error handling, streaming under load |
@@ -598,102 +507,6 @@ Record hardware, scene/workload, clock/cache settings, build revision, and
 stereoscopic mode. If original hardware is unavailable, state the gap; do
 not claim it passed. A documentation-only revision is not a performance
 pass.
-
----
-
-## 10b. Autonomous hardware loop — netload_stub (no FTP, no hands)
-
-Source of truth for operating the console is the stub repo, not this file:
-- /mnt/nas/Development/netload_stub/docs/atm-autonomous-agent-runbook.md
-  (full machine interface — read before touching the console)
-- /mnt/nas/Development/netload_stub/docs/atm/agent-prompt.md
-  (paste-ready brief, Evidence rules + Standard loop)
-- /mnt/nas/Development/netload_stub/docs/atm/profiling-and-telemetry.md
-- /mnt/nas/Development/netload_stub/docs/atm/artifact-management.md
-- /mnt/nas/Development/netload_stub/docs/framedump-game-render-proof.md
-  (lid-closed render proof chain)
-If this section and the runbook disagree, the runbook wins: stop and report.
-
-Target (fixed): Original Old 3DS `old3ds-lan167` at `192.168.4.167`,
-workstation `192.168.4.220`. GDB ports 4000–4003 untouched.
-
-Define once per shell:
-  ATM="python3 /mnt/nas/Development/netload_stub/tools/atmctl.py \
-    --ip 192.168.4.167 --device-id old3ds-lan167"
-
-Ports (do not move without updating the framedump doc): 3dslink TCP+UDP 17491
-(userland stub owns it — ATM never binds it), ATM deploy TCP 17492 (`--tcp-port`
-must match the RUNNING build), framedump TCP 17493 (in-game), HTTP 8080,
-telemetry UDP 8081, commands UDP 8082, GDB 4000–4003.
-
-Mechanism (current, hardware-proven):
-
-1. **Build out of tree** (`BUILD=/tmp/...`, link + `3dsxtool` by hand) —
-   never overwrite in-tree artifacts. Game builds keep their normal gfx init:
-   they run via stub chainload, NOT the ATM launch path (the no-gfx rule
-   applies only to ATM-launched payloads).
-2. **Deliver ONLY by 3dslink push to the live stub** (`3dslink -a 192.168.4.167
-   game.3dsx`, port 17491). The stub saves under `/3ds/` and chainloads via
-   SetTarget + full hbmenu-style argv + clean exit; NS relaunches the target.
-   Recipe closed 2026-11-09 (three push→exit→relaunch→run cycles, boot 287).
-   Do NOT reintroduce APT_DoApplicationJump; it deadlocks APT.
-3. **NEVER `atm run` / `atm launch` a .3dsx onto a live-stub box** (settled
-   2026-11-08, five wedges: app stuck in `aptInit`, ATM stuck in
-   `DoApplicationJump`, all ATM networking dead, physical reboot required).
-   `deploy --no-launch` (staging) is safe; the launch half is not.
-4. **Run the deterministic benchmark**: `ATM_PROFILING=1` compiles in
-   `atm_prof.h` / `atm_prof_3ds.c` (`atm_prof_frame_begin/end` around the
-   render loop, `atm_prof_bench_tick` drives fixed level + warmup + fixed
-   measured frames + clean QuitRequested exit). Without the flag every macro
-   is a no-op and release behavior is unchanged. Results land in
-   `/3ds/atm_result.txt` (count/avg_us/p50/p95/p99/max_us/over_budget).
-   Samples are `svcGetSystemTick()`-derived (avg_us/max_us exact; p50/p95/p99
-   are 1 ms bucket-edge estimates — a documented limit). Retrieve via
-   `atm retrieve` / HTTP 8080; the firmware syncs ONLY workload outputs +
-   dumps/shots.
-5. **Prove render with framedump, not LCD**: game compiled with `FRAMEDUMP=1`
-   listens on TCP 17493; `DUMP <tag>` captures both framebuffers to SD BMPs +
-   FNV-1a log, `PING` is liveness. Retrieve twins over HTTP
-   (`/framedump.log` + `/3ds/framedump_*_<screen>.bmp.log` — the HTTP
-   allowlist serves `/luma/atm/*`, `/luma/dumps/*`, `/3ds/*.log|*.txt` and
-   single-segment `*.log`; bare `*.bmp` is 403 by design), recompute FNV-1a
-   from retrieved bytes, require hash MATCH. LCD screenshots cannot see a
-   non-foreground app; GDB `m` reads refuse VRAM (`E0e`). Full chain:
-   `game-libs/framedump/` (vendored mirror, read-only) + stub doc above.
-6. **Cycle**: after every chainload the stub exits, so 17491 closes; the next
-   push needs `atm reboot --wait 180` first (restores the stub — normal
-   cycle, not an error). Remote reboot re-proves the ATM netload loop
-   (Luma-native autoboot still needs a physical cold boot for proof).
-   Gate file `/luma/atm/autoboot` is the restore primitive; hold X on boot
-   to skip a bad default.
-
-Rules:
-- NEVER ask for a physical action (no SD pulls, button presses, power work,
-  screen reads). A silent console is manual-intervention-required, never
-  fixed by asking. Reboots are `atm reboot` (HTTP; `atm cmd reboot` over UDP
-  8082 when HTTP is wedged) proven by `boot_count+1`, never stacked launches.
-- 3dslink progress % lies (compressed vs raw, e.g. 43% = done). Trust only
-  the device's `transfers.log` (`status=ok` + `bytes_out` == file size) at
-  `http://192.168.4.167:8080/3ds/netload_stub/transfers.log`.
-- Never stack concurrent HTTP clients against the console (wedges its ATM
-  server). GDB needs the exact-build `.elf`, resume + detach always.
-- Stub `loop alive n=N` stops after n=10 BY DESIGN (then blocking accept —
-  a frozen trace is NOT a wedge). `/dev/tcp` open on 17491 proves only a
-  listen backlog; liveness needs push bytes or trace growth.
-- Screenshots stall the workload (whole-cache flush): timed runs use
-  framedump; screenshots only in separate untimed runs, retrieved to `perf/`
-  unacked, acked (`ack_shot <set>`) only after BMP-integrity check. Menu-open
-  refuses are normal.
-- Label every claim SOURCE / HOST / REAL-PROTOCOL / SIMULATED / HARDWARE.
-  Emulator/New 3DS numbers are never Old 3DS evidence. Bank journals + run
-  records + retrieved artifacts under `perf/`, tagged by build-id.
-- The harness never ships: autotest/PERF/PROFILING builds are branch-local
-  and must not be merged to a release branch. The flag set is tracked by
-  `BUILD/.dflags.stamp` (covers `PERF_CAPTURE`, `FRAMEDUMP`, `ATM_PROFILING`,
-  `ATM_BENCH_*`, `EDITION`, `SLIM`, etc.) which forces a full rebuild on
-  change; `make clean` remains the backstop if you switch `BUILD` dirs or
-  suspect staleness.
-- Read the stub repo, never modify it from here without asking.
 
 ---
 
@@ -714,6 +527,12 @@ Rules:
 
 ### Changes
 
+- 2026-11-17: Removed everything that served the external measurement
+  harness (`forsaken-harness`): the ATM console-maintenance runbook, §10b
+  (autonomous netload/ATM profiling loop), the `FIDELITY_DUMP` A/B merge gate
+  and the `diag/` C boundary. The tree is the game players play; profiling
+  happens off-tree. Proof of a change is `tools/verify_identical.sh` (+
+  `verify_o0.sh`) and, for a real behaviour change, an owner play test.
 - 2026-11-17: §9 describes the converted engine and the three source
   trees; gate keys are basenames. Added the preferred C++ constructs
   (`constexpr`, `enum class`, `std::array`) with the C-boundary rule and
