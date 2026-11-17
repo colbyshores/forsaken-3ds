@@ -39,15 +39,24 @@ playbook; AGENTS.md is the law where they differ.
 ### Phase 2 progress (2026-11-17, branch `experimental/cpp-phase2`)
 
 Done, each commit proven with `tools/verify_identical.sh` (clean builds, all
-five configurations; `tools/verify_o0.sh` where `-O2` scheduling differs):
+configurations; `tools/verify_o0.sh` where `-O2` scheduling differs):
 - Every shared global/function declared once, in its owner's header, from
   the definition (~2,000 private `extern` copies gone); `game/constants.h`.
 - Every translation unit is C++; `extern "C"` only at real C boundaries
   (AGENTS.md §9). Lua only via `scripting/lua_api.h`.
 - Dead code: `#if 0` blocks, commented-out code (`//` runs and `/* */`
   blocks, incl. every D3D execute-buffer remnant), conditionals on 28
-  obsolete macros, 61 prototypes for functions that do not exist
-  (~4,300 lines).
+  obsolete macros, 61 prototypes for functions that do not exist, and
+  300 functions/globals nothing uses (~11,000 lines in all).
+- The tree is the game players play (owner, 2026-11-17): the
+  forsaken-harness instrumentation (`diag/`, 160 hook sites, ATM/fidelity/
+  framedump/perf/autotest knobs and tools), all tracing (`trace`,
+  `boot_log` -- which was NOT gated and fsync'd to SD on every call in the
+  shipping build), and the test scaffolding (3DS `DEBUG=1` god mode, warps,
+  stereo debug overlay + menu toggle, `stereo_test_slider`, `SLIM`, the
+  `MODEL_VIS_CACHE` experiment) are gone. AGENTS.md no longer requires a
+  harness A/B; proof is `verify_identical.sh` + an owner play test for real
+  behaviour changes.
 - `tools/verify_identical.sh` proves 3DS remaster/original and PC `host`
   (default `DEBUG=1`, the only build compiling `DEBUG_ON` code) and
   `host-release` (`DEBUG=0`).
@@ -57,9 +66,11 @@ Bugs found (separate, labelled commits): `primary.cpp` indexed
 `ModelHeaders` as an array (1c75966); PC joystick names (5d6474b); the C++
 conversion briefly lost the libctru heap override (088b1f0, now guarded).
 
-**Hardware fidelity A/B needed** (when the console is free): 1c75966
+**On-device play test needed** (when the console is free): 1c75966
 (behaviour fix; reactor-core / spot-FX scenario), 46d152e (3DS platform
-TUs and render_c3d compiled as C++).
+TUs and render_c3d compiled as C++), da7b53a (tracing removed: level loads
+no longer write the SD log), 8260103 (stereo debug toggle removed from the
+3DS visuals menus).
 
 **Owner decisions pending:**
 1. Optional features under never-defined macros — keep or delete:
@@ -79,11 +90,21 @@ TUs and render_c3d compiled as C++).
    `int[17][17]` arrays by raw copy (FIXME in networking.cpp).
 4. Gates: `title.c` exemptions (E-TITLE-1, ALLOWED-COLD-TITLE) have been
    dead since Cleanup 5 — re-point (loosens the gate) or delete; ~50
-   baseline entries match nothing — prune?
+   baseline entries match nothing (more now that dead code is gone) — prune?
+5. Lua binding modules (`lua_bullets/collision/controls/enemies/object/
+   ships/vecmat/weapons`) are never registered: `assign_loaders` registers
+   nothing, so no script can load them. Delete them, or wire them up?
+6. PC `Makefile` hard-codes `DEBUG=1` (`-O0 -g`, `DEBUG_ON`) and
+   `PROFILE=1` (gprof `-pg`, writes `gmon.out`). Keep, or default to an
+   optimised build without profiling?
+7. Off-binary dev tooling that stays unless you say otherwise: host unit
+   tests (`tests/`), the static perf/contract gates (`tools/perf/`, run by
+   `build_matrix.sh`), `verify_identical.sh`/`verify_o0.sh`.
+8. Support channel: `sdmc:/forsaken_boot.log` (tier/texture-pack lines
 
-Next (no decision needed): unreferenced functions and data (e.g.
-`QuedPickups[]`, `BspZNames[]` written but never read), `#pragma once` + header comments, the 2,566 warnings `-isystem`
-was hiding, `constexpr`/`enum class`/`std::array` sweep, then classes for
+Next (no decision needed): data written but never read (e.g.
+`BspZNames[]`), empty `{ }` blocks and bare blocks left by earlier passes,
+`#pragma once` + header comments, the 2,566 warnings `-isystem` was hiding, `constexpr`/`enum class`/`std::array` sweep, then classes for
 state-owning modules (A/B batch).
 
 **Last, after the conversion is complete (owner request 2026-11-17):** fully
@@ -91,7 +112,8 @@ refactor the Forsaken Obsidian docs (`port-docs` vault,
 `10-projects/forsaken/` and the patterns promoted from it) to match the new
 source layout, file names (`.cpp`, `forsaken_core/forsaken_3ds/forsaken_pc`
 trees), seam headers and class structure. Most notes still cite
-`foo.c:NNN` paths from the old flat layout. The cross-project lesson so far is in
+(it still documents tracing, autotest, `DEBUG=1`, `SLIM`, the test-harness
+branch). The cross-project lesson so far is in
 `30-architecture/patterns/c-to-cpp-private-externs-hide-type-drift.md`.
 
 ---
