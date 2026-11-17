@@ -63,12 +63,38 @@ build() {
 	esac
 }
 
+# disasm OBJDUMP FILE -> instructions + relocations, one line each.
+# NORMALIZE_LINKAGE=1 demangles and drops C++ parameter lists, so moving a
+# declaration into an extern "C" block (symbol _Z3foov -> foo) compares equal
+# while any instruction or operand change still differs. Off by default; a
+# change that needs it must say so in its commit message.
+disasm() {
+	if [ "${NORMALIZE_LINKAGE:-0}" = 1 ]; then
+		# Section names embed mangled names under -ffunction-sections; drop
+		# the headers (functions still compare in emission order).
+		"$1" -d -r -C "$2" | tail -n +4 | grep -v '^Disassembly of section' |
+			sed -E ':a; s/\b([A-Za-z_][A-Za-z0-9_:~]*)\([^()]*\)( const)?/\1/g; ta'
+	else
+		"$1" -d -r "$2" | tail -n +4
+	fi
+}
+
+# data OBJDUMP FILE -> hex dump of every loadable non-code section, in order.
+# Code (.text*) is covered by disasm, which prints its bytes too.
+data() {
+	local secs
+	secs=$("$1" -h "$2" | awk '$2 ~ /^\./ && $2 !~ /^\.text|debug|comment|ARM.attributes|note|gnu_debug/ {print "-j " $2}')
+	[ -z "$secs" ] && return 0
+	if [ "${NORMALIZE_LINKAGE:-0}" = 1 ]; then
+		"$1" -s $secs "$2" 2>/dev/null | tail -n +4 | grep -v '^Contents of section'
+	else
+		"$1" -s $secs "$2" 2>/dev/null | tail -n +4
+	fi
+}
+
 # cmp_obj OBJDUMP A B -> 0 if code+relocs+non-debug data match
 cmp_obj() {
-	local od=$1 a=$2 b=$3 secs
-	secs=$($od -h "$a" | awk '$2 ~ /^\./ && $2 !~ /debug|comment|ARM.attributes|note|gnu_debug/ {print "-j " $2}')
-	cmp -s <($od -d -r "$a" | tail -n +4) <($od -d -r "$b" | tail -n +4) &&
-		cmp -s <($od -s $secs "$a" 2>/dev/null | tail -n +4) <($od -s $secs "$b" 2>/dev/null | tail -n +4)
+	cmp -s <(disasm "$1" "$2") <(disasm "$1" "$3") && cmp -s <(data "$1" "$2") <(data "$1" "$3")
 }
 
 fail=0
