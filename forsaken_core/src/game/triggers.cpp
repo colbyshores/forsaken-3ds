@@ -208,17 +208,6 @@ void ModifyTriggerVar( TRIGGERVAR * TrigVar , int Op , int Val )
 		TrigVar->Name, old_state, Op, Val, TrigVar->State );
 #endif
 
-#ifdef DEFEND2_TRACE
-	{
-		extern void boot_log(const char *);
-		char _b[160];
-		snprintf(_b, sizeof(_b),
-		         "[trig] %.32s : %d -> %d (op=%d val=%d)",
-		         TrigVar->Name, old_state, TrigVar->State, Op, Val);
-		boot_log(_b);
-	}
-#endif
-
 	for( i = 0 ; i < TrigVar->NumOfTriggers ; i++ )
 	{
 		Trig = TrigVar->Triggers[i];
@@ -723,16 +712,6 @@ void EVENT_EnemySetTargetNode( u_int8_t * Data )
 	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
 	node = NodeNetworkHeader.FirstNode + node_idx;
 	node->Flags &= ~0x20;
-#ifdef DEFEND2_TRACE
-	{
-		extern void boot_log(const char *);
-		char _b[140];
-		snprintf(_b, sizeof(_b),
-		         "[node] Enable  idx=%u flags now=0x%02x",
-		         (unsigned)node_idx, (unsigned)node->Flags);
-		boot_log(_b);
-	}
-#endif
 }
 
 /*===================================================================
@@ -752,16 +731,6 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	if( (int32_t)node_idx >= NodeNetworkHeader.NumOfNodes ) return;
 	node = NodeNetworkHeader.FirstNode + node_idx;
 	node->Flags |= 0x20;
-#ifdef DEFEND2_TRACE
-	{
-		extern void boot_log(const char *);
-		char _b[140];
-		snprintf(_b, sizeof(_b),
-		         "[node] Disable idx=%u flags now=0x%02x",
-		         (unsigned)node_idx, (unsigned)node->Flags);
-		boot_log(_b);
-	}
-#endif
 }
 #endif /* EDITION_REMASTER */
 

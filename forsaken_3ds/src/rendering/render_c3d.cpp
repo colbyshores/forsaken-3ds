@@ -329,9 +329,6 @@ static int s_monoActive = 0;
 static gpu_vertex_t *s_scratch = NULL;
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
-/* M1 scratch high-water (verts): full-run peak for the interp ownership
- * proof. Extra presents are only safe while peak stays under s_scratchMax. */
-static int s_scratchPeak = 0;
 
 
 /* Byte-to-float color table: replaces 4 vdiv.f32 per converted vertex
@@ -535,14 +532,10 @@ void c3d_context_exit(void)
 }
 
 /* Frame-rate counter. Updated once per swap, exposed via the
- * `forsaken_get_fps()` accessor so the HUD overlay can draw it. The
- * 10-second sample logs to forsaken_trace.txt for off-device
- * monitoring. */
-static u64    s_fps_last_swap_ms  = 0;
+ * `forsaken_get_fps()` accessor so the HUD overlay can draw it. */
 static u32    s_fps_frames_in_win = 0;
 static u64    s_fps_window_start_ms = 0;
 static int    s_fps_current       = 0;
-static u64    s_fps_last_log_ms   = 0;
 
 int forsaken_get_fps(void) { return s_fps_current; }
 
@@ -553,24 +546,16 @@ void c3d_present(void)
 		C3D_FrameEnd(0);
 		s_inFrame = false;
 	}
-	/* M1 scratch high-water: frame-end footprint (no mid-frame split
-	 * fired) or the split-time footprint below, whichever peaked. */
-	if (s_scratchUsed > s_scratchPeak)
-		s_scratchPeak = s_scratchUsed;
 	/* Reset stereo state for next frame */
 	s_stereoFrame = false;
 	s_memoMode = SMEMO_OFF;
 	s_hudDrawnThisFrame = false;
 
 	/* FPS measurement. Roll the count over a 1-second window so the
-	 * displayed value is stable. Log every 10 seconds. */
+	 * displayed value is stable. */
 	u64 now = osGetTime();
 	if (s_fps_window_start_ms == 0)
-	{
 		s_fps_window_start_ms = now;
-		s_fps_last_log_ms = now;
-	}
-	s_fps_last_swap_ms = now;
 	s_fps_frames_in_win++;
 	u64 elapsed = now - s_fps_window_start_ms;
 	if (elapsed >= 1000)
@@ -580,21 +565,6 @@ void c3d_present(void)
 		s_fps_window_start_ms = now;
 		s_fps_frames_in_win = 0;
 	}
-	/* Trace cadence: 1s under AUTOTEST so a hard lock pinpoints to within
-	 * a second; 10s otherwise so SD I/O doesn't drown normal play. */
-	if ((now - s_fps_last_log_ms) >= 10000)
-	{
-		char _b[64];
-		snprintf(_b, sizeof(_b), "FPS: %d", s_fps_current);
-		trace(_b);
-		s_fps_last_log_ms = now;
-	}
-}
-
-/* M1 scratch high-water (verts) for the bench result. */
-int c3d_scratch_peak_verts(void)
-{
-	return s_scratchPeak;
 }
 
 /*===================================================================
@@ -795,40 +765,27 @@ bool c3d_renderer_init(void)
 	 * Diagnosed via 246 "render targets created" lines in forsaken_c3d.log
 	 * paired with 10+ "FSCreateIndexBuffer: linearAlloc FAILED" entries near
 	 * EOF, immediately preceding GPUCMD_AddInternal's full-buffer svcBreak. */
-	{
-		char _b[64];
-	}
 	if (s_shaderReady) {
 		return true;
 	}
-	{ char _b[96]; snprintf(_b, sizeof(_b),
-	    "[boot] c3d_renderer_init: start linearFree=%u KB",
-	    linearSpaceFree() >> 10); boot_log(_b); }
 	s_shaderDVLB = DVLB_ParseFile((u32*)render_c3d_shbin, render_c3d_shbin_len);
 	if (!s_shaderDVLB)
 	{
-		boot_log("[boot] c3d_renderer_init: FAIL DVLB_ParseFile");
 		return false;
 	}
 
 	shaderProgramInit(&s_shaderProgram);
 	if (shaderProgramSetVsh(&s_shaderProgram, &s_shaderDVLB->DVLE[0]) < 0) {
-		boot_log("[boot] c3d_renderer_init: FAIL shaderProgramSetVsh");
 		return false;
 	}
 
 	/* Allocate scratch buffer for vertex conversion */
 	s_scratch = (gpu_vertex_t*)linearAlloc(GPU_SCRATCH_SIZE);
 	if (!s_scratch) {
-		boot_log("[boot] c3d_renderer_init: FAIL linearAlloc(GPU_SCRATCH_SIZE)");
 		return false;
 	}
-	{ char _b[96]; snprintf(_b, sizeof(_b),
-	    "[boot] c3d_renderer_init: scratch OK linearFree=%u KB",
-	    linearSpaceFree() >> 10); boot_log(_b); }
 	s_scratchMax = GPU_SCRATCH_SIZE / sizeof(gpu_vertex_t);
 	s_scratchUsed = 0;
-	s_scratchPeak = 0;
 
 	/* Create render targets and link to display output.
 	 * Both left and right eye targets are created unconditionally —
@@ -843,15 +800,12 @@ bool c3d_renderer_init(void)
 
 		s_targetLeft = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetLeft) {
-			boot_log("[boot] c3d_renderer_init: FAIL left render target");
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetLeft, GFX_TOP, GFX_LEFT, transferFlags);
-		boot_log("[boot] c3d_renderer_init: left RT OK");
 
 		s_targetRight = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetRight) {
-			boot_log("[boot] c3d_renderer_init: FAIL right render target");
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetRight, GFX_TOP, GFX_RIGHT, transferFlags);
@@ -861,14 +815,10 @@ bool c3d_renderer_init(void)
 		 * above isn't cluttered. */
 		s_targetBottom = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 		if (!s_targetBottom) {
-			boot_log("[boot] c3d_renderer_init: FAIL bottom render target");
 			return false;
 		}
 		C3D_RenderTargetSetOutput(s_targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
 	}
-	{ char _b[96]; snprintf(_b, sizeof(_b),
-	    "[boot] c3d_renderer_init: targets OK linearFree=%u KB",
-	    linearSpaceFree() >> 10); boot_log(_b); }
 
 	/* Match picaGL depth map: scale=1.0, offset=1.0 */
 	C3D_DepthMap(true, 1.0f, 1.0f);
@@ -1052,7 +1002,6 @@ bool c3d_renderer_init(void)
 	}
 
 	s_shaderReady = true;
-	boot_log("[boot] c3d_renderer_init: OK");
 	return true;
 }
 
@@ -1465,7 +1414,6 @@ bool FSBeginScene(void)
 {
 	static int s_first_begin_scene = 1;
 	if (s_first_begin_scene) {
-		boot_log("[frame] first FSBeginScene");
 		s_first_begin_scene = 0;
 	}
 	/* Single-pass stereo vertex memo (STEREO_REPLAY): the left eye
@@ -2246,17 +2194,6 @@ static void resolve_hd_textures_dirs(void)
 		s_hd_textures_dir      = "hd_textures_lomem";
 		s_hd_textures_fallback = "hd_textures";
 	}
-	/* Lands in sdmc:/forsaken_boot.log on every boot. Pair this with
-	 * the [platform] tier line emitted from platform_init to verify
-	 * from the host which texture pack a given install is using. */
-	{
-		char _b[160];
-		snprintf(_b, sizeof(_b),
-		         "[hd_textures] region=%uMB primary=%s fallback=%s",
-		         (unsigned)(region_size >> 20),
-		         s_hd_textures_dir, s_hd_textures_fallback);
-		boot_log(_b);
-	}
 }
 
 static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
@@ -2949,11 +2886,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			{
 				FLUSH_BATCH();
 				C3D_FrameSplit(0);
-				/* M1: record the pre-split footprint. Resetting the cursor
-				 * here is NOT a GPU-completion proof (FrameSplit only
-				 * queues); the peak at least makes any overlap visible. */
-				if (s_scratchUsed > s_scratchPeak)
-					s_scratchPeak = s_scratchUsed;
 				s_scratchUsed = 0;
 				/* Scratch reset recycles eye-1 recorded offsets: stop
 				 * reusing them. The pending batch was already flushed

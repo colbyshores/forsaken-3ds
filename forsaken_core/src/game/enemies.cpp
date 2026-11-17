@@ -4582,12 +4582,6 @@ bool PreLoadEnemies( void )
 					    EnemyTypes[ j ].ModelFilename[ 0 ] )
 					{ fallback = j; break; }
 				}
-#ifdef __3DS__
-				{ extern void trace(const char*); char _b[160];
-				  snprintf(_b, sizeof(_b),
-				    "PreLoadEnemies: enemy[%d/%d] ModelNum=%d -> fallback=%d",
-				    Count, NumInitEnemies, ModelNum, fallback); trace(_b); }
-#endif
 				if( fallback < 0 ) continue;  /* nothing populated at all */
 				ModelNum = fallback;
 			}
@@ -6617,37 +6611,6 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 	NODE	* LastTNode;
 	float	length = 75.0F;
 
-#if defined(DEFEND2_TRACE) && defined(EDITION_REMASTER)
-	/* Periodic drone state dump: every ~2 seconds (120 frames) print
-	 * CargoDrone position + TNode + speed + orientation.  The Mat
-	 * column vectors give yaw/pitch/roll: Mat[2]=forward, Mat[1]=up.
-	 * Logging the forward vector lets us see when the drone is
-	 * facing weird directions (yaw issues on multi-segment lifts). */
-	if( Enemy->Type == ENEMY_CargoDrone )
-	{
-		static int _dump_tick = 0;
-		_dump_tick++;
-		if( _dump_tick >= 120 )
-		{
-			extern void boot_log(const char *);
-			extern NODENETWORKHEADER NodeNetworkHeader;
-			NODE * tn = (NODE*)Enemy->TNode;
-			char _b[260];
-			int  _ti = tn ? (int)(tn - NodeNetworkHeader.FirstNode) : -1;
-			snprintf(_b, sizeof(_b),
-			         "[drone] pos=(%.0f,%.0f,%.0f) grp=%u TNode=%d(f=0x%02x) Spd=%.2f Ang=(%.1f,%.1f,%.1f) Fwd=(%.2f,%.2f,%.2f) Up=(%.2f,%.2f,%.2f)",
-			         Object->Pos.x, Object->Pos.y, Object->Pos.z,
-			         (unsigned)Object->Group,
-			         _ti, tn ? (unsigned)tn->Flags : 0,
-			         Object->Speed.z,
-			         Object->Angle.x, Object->Angle.y, Object->Angle.z,
-			         Object->Mat._31, Object->Mat._32, Object->Mat._33,
-			         Object->Mat._21, Object->Mat._22, Object->Mat._23);
-			boot_log(_b);
-			_dump_tick = 0;
-		}
-	}
-#endif
 	VECTOR	AimPos;
 	VECTOR	TempPos;
 	VECTOR	AnglePos;

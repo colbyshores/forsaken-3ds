@@ -159,12 +159,6 @@ endif
 
 ifeq ($(EDITION),remaster)
 CFLAGS += -DEDITION_REMASTER
-
-# DEFEND2_TRACE=1 — focused CargoDrone trace lines to sdmc:/forsaken_boot.log:
-# switch flips, drone-wait events, lift BGO start/end, drone state per lift.
-ifeq ($(DEFEND2_TRACE),1)
-CFLAGS += -DDEFEND2_TRACE
-endif
 endif
 
 

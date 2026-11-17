@@ -345,11 +345,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	DebugPrintf("Mload - %s\n",Filename);
 
-#ifdef __3DS__
-	{ extern void trace(const char*); char _b[160];
-	  snprintf(_b, sizeof(_b), "Mload: enter file=%s", Filename); trace(_b); }
-#endif
-
 	// Mloadheader is not valid until everything has been done..
 	Mloadheader->state = false;
 
@@ -368,19 +363,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	if ( Mloadheader->num_groups > MAXGROUPS )
 	{
 		Msg( "Mload : NumGroups > MAXGROUPS\n" );
-#ifdef __3DS__
-		{ extern void trace(const char*); char _b[96];
-		  snprintf(_b, sizeof(_b), "Mload: FAIL num_groups=%d > MAXGROUPS",
-		           Mloadheader->num_groups); trace(_b); }
-#endif
 		return false;
 	}
-
-#ifdef __3DS__
-	{ extern void trace(const char*); char _b[96];
-	  snprintf(_b, sizeof(_b), "Mload: num_groups=%d", Mloadheader->num_groups);
-	  trace(_b); }
-#endif
 
 	for( group = 0; group < Mloadheader->num_groups; group++)
 	{
@@ -393,11 +377,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		if ( Mloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
 		{
 			Msg( "Mload : NumExecBufs > MAXEXECBUFSPERGROUP\n" );
-#ifdef __3DS__
-			{ extern void trace(const char*); char _b[128];
-			  snprintf(_b, sizeof(_b), "Mload: FAIL group=%d num_execbufs=%d > MAXEXECBUFSPERGROUP",
-			           group, Mloadheader->Group[group].num_execbufs); trace(_b); }
-#endif
 			return false;
 		}
 		
@@ -1386,11 +1365,6 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	DebugPrintf("Loading Level: %s\n",Filename);
 
-#ifdef __3DS__
-	{ extern void trace(const char*); char _b[160];
-	  snprintf(_b, sizeof(_b), "PreMload: enter file=%s", Filename); trace(_b); }
-#endif
-
 	// Mloadheader is not valid until everything has been done..
 	Mloadheader->state = false;
 	Mloadheader->Buffer = NULL;
@@ -1400,27 +1374,14 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 	if ( !File_Size )
 	{
 	 	Msg( "PreMLoad : File_Size is zero\n" );
-#ifdef __3DS__
-		{ extern void trace(const char*); char _b[160];
-		  snprintf(_b, sizeof(_b), "PreMload: FAIL Get_File_Size returned 0 for %s", Filename); trace(_b); }
-#endif
 		return false;
 	}
-
-#ifdef __3DS__
-	{ extern void trace(const char*); char _b[96];
-	  snprintf(_b, sizeof(_b), "PreMload: file_size=%ld", File_Size); trace(_b); }
-#endif
 
 	Buffer = (char*)calloc( 1, File_Size + sizeof( int ) );
 
 	if( Buffer == NULL )
 	{
 	 	Msg( "PreMLoad : Unable to allocate buffer\n" );
-#ifdef __3DS__
-		{ extern void trace(const char*); char _b[96];
-		  snprintf(_b, sizeof(_b), "PreMload: FAIL calloc(%ld) returned NULL", File_Size); trace(_b); }
-#endif
 		return( false );
 	}
 
@@ -1429,10 +1390,6 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 	if( Read_Size != File_Size )
 	{
 	 	Msg( "PreMLoad : Didn't read all of file\n" );
-#ifdef __3DS__
-		{ extern void trace(const char*); char _b[160];
-		  snprintf(_b, sizeof(_b), "PreMload: FAIL short read %ld/%ld", Read_Size, File_Size); trace(_b); }
-#endif
 		return( false );
 	}
 
@@ -1446,11 +1403,6 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != MXV_VERSION_NUMBER  ) )
 	{
 		Msg( "PreMload() Incompatible level( .MXV ) file %s", Filename );
-#ifdef __3DS__
-		{ extern void trace(const char*); char _b[160];
-		  snprintf(_b, sizeof(_b), "PreMload: FAIL bad magic/version magic=0x%08X ver=0x%08X file=%s",
-		           (unsigned)MagicNumber, (unsigned)VersionNumber, Filename); trace(_b); }
-#endif
 		return( false );
 	}
 
@@ -1459,18 +1411,9 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 	Mloadheader->num_texture_files = *Uint16Pnt++;
 	Buffer = (char *) Uint16Pnt;
 
-#ifdef __3DS__
-	{ extern void trace(const char*); char _b[96];
-	  snprintf(_b, sizeof(_b), "PreMload: num_texture_files=%d (cap=%d)",
-	           Mloadheader->num_texture_files, MAXTPAGESPERMLOAD); trace(_b); }
-#endif
-
 	if ( Mloadheader->num_texture_files > MAXTPAGESPERMLOAD )
 	{
 	 	Msg( "PreMLoad : Too many texture pages\n" );
-#ifdef __3DS__
-		{ extern void trace(const char*); trace("PreMload: FAIL num_texture_files > MAXTPAGESPERMLOAD"); }
-#endif
 		return false;
 	}
 
@@ -1485,32 +1428,17 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 			GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 
-#ifdef __3DS__
-			{ extern void trace(const char*); char _b[256];
-			  snprintf(_b, sizeof(_b), "PreMload: tex[%d/%d] name=%.50s path=%.150s",
-			           i, Mloadheader->num_texture_files,
-			           &Mloadheader->ImageFile[i][0],
-			           (char*)TempFilename); trace(_b); }
-#endif
 			Mloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[ 0 ], true , false , true, 0, 0 );
 
 			if( Mloadheader->TloadIndex[i] == -1 )
 			{
 			 	Msg( "PreMLoad : Too many TPages\n" );
-#ifdef __3DS__
-				{ extern void trace(const char*); char _b[160];
-				  snprintf(_b, sizeof(_b), "PreMload: FAIL AddTexture returned -1 for tex[%d] name=%.80s",
-				           i, &Mloadheader->ImageFile[i][0]); trace(_b); }
-#endif
 				return( false );
 			}
 		}
 
 	}
 
-#ifdef __3DS__
-	{ extern void trace(const char*); trace("PreMload: success"); }
-#endif
 	Mloadheader->Buffer = Buffer;
 	return( true );
 }

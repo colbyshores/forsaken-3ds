@@ -28,7 +28,6 @@ void platform_render_present(render_info_t *info);
 void platform_shutdown(void);
 u_int32_t platform_get_ticks(void);
 void platform_delay(u_int32_t ms);
-void trace(const char *msg);
 
 /* Byte-wise memcpy that GCC cannot inline to `ldm/stm` (which require
  * 4-byte alignment on ARM and fault on misaligned file-buffer sources).

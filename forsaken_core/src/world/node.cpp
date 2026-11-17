@@ -181,14 +181,6 @@ bool Nodeload( char * Filename )
 			 * for the autotest sweep we keep the first 16 links and skip
 			 * the rest so AI pathing is degraded rather than the level
 			 * failing to load entirely. */
-			{
-				extern void trace(const char*);
-				char _b[160];
-				snprintf(_b, sizeof(_b),
-				         "NODES: clamping node[%d] NumOfLinks=%d -> %d (file=%s)",
-				         (int)e, (int)NodePnt->NumOfLinks, (int)MAXLINKSPERNODE, Filename);
-				trace(_b);
-			}
 			int over = NodePnt->NumOfLinks - MAXLINKSPERNODE;
 			NodePnt->NumOfLinks = MAXLINKSPERNODE;
 			int32Pnt = (int32_t*) int16Pnt;

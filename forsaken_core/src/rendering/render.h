@@ -341,9 +341,6 @@ bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName, u_int1
 void release_texture( LPTEXTURE texture );
 
 bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool orthographic );
-/* M1 scratch high-water (verts) for the bench result. Defined by the 3DS
- * backend; 0 if the backend never converts vertices. */
-int c3d_scratch_peak_verts(void);
 bool draw_line_object(RENDEROBJECT *renderObject);
 bool draw_object(RENDEROBJECT *renderObject);
 bool draw_billboard_object(RENDEROBJECT *renderObject);

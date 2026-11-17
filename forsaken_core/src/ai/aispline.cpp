@@ -62,12 +62,6 @@ void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
 		 * along a spline this frame. */
 		if (!TNode)
 		{
-			extern void trace(const char*);
-			char _b[128];
-			snprintf(_b, sizeof(_b),
-			    "AI_SPLINE_FOLLOWPATH: SKIP enemy Type=%d Pos=%.1f,%.1f,%.1f (NearestNode=NULL)",
-			    Enemy->Type, Enemy->Object.Pos.x, Enemy->Object.Pos.y, Enemy->Object.Pos.z);
-			trace(_b);
 			return;
 		}
 

@@ -249,16 +249,12 @@ int Msg( const char * msg, ... )
 
 
 #ifndef __3DS__
-/* Shared helpers the 3DS build gets from main_3ds.c. memcpy_unaligned
- * is a plain byte copy (alignment-safe on every target); trace is a
- * no-op in production (diagnostics live in the harness tree). */
+/* memcpy_unaligned: the 3DS build gets it from main_3ds.c; elsewhere a
+ * plain byte copy is alignment-safe on every target. */
 void memcpy_unaligned(void *dst, const void *src, size_t n)
 {
 	unsigned char *d = (unsigned char *)dst;
 	const unsigned char *s = (const unsigned char *)src;
 	while (n--) *d++ = *s++;
 }
-void trace(const char *msg) { (void)msg; }
-void trace_dump(void) {}
-void trace_enable(void) {}
 #endif

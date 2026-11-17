@@ -402,9 +402,6 @@ extern bool breakpad_init( void );
 
 static bool AppInit( char * lpCmdLine )
 {
-#ifdef __3DS__
-	boot_log("[boot] AppInit: entry");
-#endif
 #ifdef DEBUG_ON
 	InitMathErrors();
 #endif
@@ -438,7 +435,6 @@ static bool AppInit( char * lpCmdLine )
 
 #ifdef __3DS__
 	if(!platform_init()) {
-		boot_log("[boot] AppInit: FAIL platform_init returned false");
 		return false;
 	}
 #else
@@ -447,15 +443,9 @@ static bool AppInit( char * lpCmdLine )
 #endif
 
 	trig_table_init();
-#ifdef __3DS__
-	boot_log("[boot] AppInit: post platform_init");
-#endif
 
 	// parse chdir from command line first
 	if(!parse_chdir(lpCmdLine)) {
-#ifdef __3DS__
-		boot_log("[boot] AppInit: FAIL parse_chdir");
-#endif
 		return false;
 	}
 
@@ -463,22 +453,13 @@ static bool AppInit( char * lpCmdLine )
 	// now we need to see if we are in right place
 	// check for missing folders
 	if(missing_folders()) {
-#ifdef __3DS__
-		boot_log("[boot] AppInit: FAIL missing_folders");
-#endif
 		return false;
 	}
 
 	// startup lua
 	if( lua_init() != 0 ) {
-#ifdef __3DS__
-		boot_log("[boot] AppInit: FAIL lua_init");
-#endif
 		return false;
 	}
-#ifdef __3DS__
-	boot_log("[boot] AppInit: post lua_init");
-#endif
 
 	// copy game settings from config
 	GetGamePrefs();
@@ -488,9 +469,6 @@ static bool AppInit( char * lpCmdLine )
 
 	// parse the command line
 	if(!ParseCommandLine(lpCmdLine)) {
-#ifdef __3DS__
-		boot_log("[boot] AppInit: FAIL ParseCommandLine");
-#endif
 		return false;
 	}
 
@@ -501,14 +479,8 @@ static bool AppInit( char * lpCmdLine )
 	if(!platform_init_video())
 	{
 		Msg("platform_init_video() returned false");
-		boot_log("[boot] AppInit: FAIL platform_init_video");
 		return false;
 	}
-	{ extern u32 linearSpaceFree(void); char _b[96];
-	  snprintf(_b, sizeof(_b),
-	    "[boot] AppInit: post platform_init_video linearFree=%u KB",
-	    linearSpaceFree() >> 10);
-	  boot_log(_b); }
 #else
 	if(!sdl_init_video())
 	{
@@ -525,9 +497,6 @@ static bool AppInit( char * lpCmdLine )
 	if (!joysticks_init())
 	{
 		Msg("Failed to initialized joysticks!");
-#ifdef __3DS__
-		boot_log("[boot] AppInit: FAIL joysticks_init");
-#endif
 		return false;
 	}
 
@@ -539,44 +508,19 @@ static bool AppInit( char * lpCmdLine )
 
 	// start the title scene
 	MyGameStatus = STATUS_Title;
-#ifdef __3DS__
-	boot_log("[boot] AppInit: pre-InitScene");
-#endif
 
 	if (!InitScene()) {
-#ifdef __3DS__
-		boot_log("[boot] AppInit: FAIL InitScene");
-#endif
 		return false;
 	}
-#ifdef __3DS__
-	{ extern u32 linearSpaceFree(void); char _b[96];
-	  snprintf(_b, sizeof(_b),
-	    "[boot] AppInit: post InitScene linearFree=%u KB",
-	    linearSpaceFree() >> 10);
-	  boot_log(_b); }
-#endif
 
 	music_init();
-#ifdef __3DS__
-	boot_log("[boot] AppInit: post music_init");
-#endif
 
 	// load the view
-#ifdef __3DS__
-	boot_log("[boot] AppInit: pre-InitView");
-#endif
 	if (!InitView() )
 	{
 	    Msg("InitView failed.\n");
-#ifdef __3DS__
-		boot_log("[boot] AppInit: FAIL InitView");
-#endif
         return false;
 	}
-#ifdef __3DS__
-	boot_log("[boot] AppInit: post InitView");
-#endif
 
 	// exclusively grab input in fullscreen mode
 	input_grab( render_info.fullscreen );
@@ -586,9 +530,6 @@ static bool AppInit( char * lpCmdLine )
 
 	// done
 	DebugPrintf("AppInit finished...\n");
-#ifdef __3DS__
-	boot_log("[boot] AppInit: SUCCESS — entering main loop");
-#endif
     return true;
 
 }
@@ -642,7 +583,6 @@ static bool RenderLoop()
 int main( int argc, char* argv[] )
 {
 #ifdef __3DS__
-	boot_log("[boot] main: entry");
 
 	/* R1 (AGENTS.md §3): establish FPSCR Flush-to-Zero (FZ) + Default-NaN
 	 * (DN) on this thread before any float math runs. Denormal results
@@ -680,7 +620,6 @@ int main( int argc, char* argv[] )
 		goto FAILURE;
 
 #ifdef __3DS__
-	boot_log("[boot] entering main render loop");
 	/* aptMainLoop() must gate the main loop on 3DS. It handles HOME menu
 	 * display, suspend on sleep-mode, and resume-from-sleep restoration.
 	 * Without this, the app never yields to the OS for these events —

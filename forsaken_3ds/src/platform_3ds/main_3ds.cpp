@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "game/main.h"
 #include "platform_3ds/main_3ds.h"
@@ -166,27 +167,6 @@ void vfp_thread_fz_dn(void)
 	(void)vfp_set_fz_dn();
 }
 
-/* ---- debug trace (writes to sdmc so Mandarine can show it) ---- */
-
-/* Tracing: use low-level write() to bypass stdio buffering.
- *
- * Gated on __3DS_DEBUG__ — release builds (the shipping CIA) get a
- * stub that compiles to nothing, so end-user installs don't write
- * to their SD card every level load. Diagnostic builds (`make
- * DEBUG=1`, which defines __3DS_DEBUG__) get the full path, with
- * every level-load checkpoint and per-frame counter-gated trace
- * persisted to sdmc:/forsaken_trace.txt for post-crash analysis.
- *
- * Truncation policy (debug builds only): the file is truncated
- * EXACTLY ONCE per process lifetime, on the very first call to
- * either trace_enable() or boot_log(). Subsequent re-opens (e.g., after
- * a trace_dump() close) use O_APPEND so we don't lose what was
- * written before the close. Without this, the autotest's "DONE ->
- * trace_dump() -> chain-load" path was wiping the whole trace
- * because platform_shutdown's later boot_log() call would re-open with
- * O_TRUNC. */
-#include <fcntl.h>
-
 /* Runtime flag — when true, DrawSimplePanel prints raw 3D-slider value,
  * stereo_eye_sep, and the on/off state so we can diagnose binary-seeming
  * slider behavior. Config key: ShowStereoDebug. Default off. */
@@ -210,43 +190,11 @@ void memcpy_unaligned(void *dst, const void *src, size_t n)
 	while (n--) *d++ = *s++;
 }
 
-/* boot_log — the single always-on diagnostic channel. Writes to
- * sdmc:/forsaken_boot.log, truncating on first call this process,
- * then appending; fsync per call so a sudden termination does not
- * lose the last checkpoint. Boot/init-path use only. */
-static int  _boot_log_fd        = -1;
-static int  _boot_log_truncated = 0;
-
-void boot_log(const char *msg)
-{
-	if (_boot_log_fd < 0) {
-		int flags = O_WRONLY | O_CREAT |
-		            (_boot_log_truncated ? O_APPEND : O_TRUNC);
-		_boot_log_fd = open("sdmc:/forsaken_boot.log", flags, 0666);
-		_boot_log_truncated = 1;
-	}
-	if (_boot_log_fd >= 0) {
-		int len = (int)strlen(msg);
-		write(_boot_log_fd, msg, len);
-		write(_boot_log_fd, "\n", 1);
-		fsync(_boot_log_fd);
-	}
-}
-
-/* Legacy trace() call sites across the engine route to the single
- * boot_log channel. boot_log fsyncs per call, so the old trace_dump
- * flush is a no-op. */
-void trace(const char *msg) { boot_log(msg); }
-void trace_dump(void) {}
-void trace_enable(void) {}
-
 /* ---- platform init ---- */
 
 bool platform_init(void)
 {
 	_ticks_base = svcGetSystemTick();
-
-	/* Ensure trace ring is dumped on any exit */
 
 	/* Disable upstream's Debug flag. WinMain on PC sets Debug=false during
 	 * startup (main.c:161), but on 3DS we don't run WinMain so the flag
@@ -257,9 +205,6 @@ bool platform_init(void)
 	 * inside _dtoa_r mid-load on hardware. Force the flag off here, before
 	 * any loader can fire, so DebugPrintf returns immediately. */
 	Debug = false;
-
-	boot_log("platform_init: start");
-	boot_log("[boot] platform_init: start");
 
 	/* Verify __system_allocateHeaps set up mappableInit correctly.  Our
 	 * override mirrors libctru's default init sequence (svcControlMemory
@@ -273,44 +218,16 @@ bool platform_init(void)
 		void *probe = mappableAlloc(4096);
 		uintptr_t addr = (uintptr_t)probe;
 		if (probe == NULL || addr < 0x10000000 || addr >= 0x14000000) {
-			char _b[160];
-			snprintf(_b, sizeof(_b),
-			         "[boot] FATAL: mappableAlloc returned %p (expected in [0x10000000,0x14000000)). "
-			         "libctru ABI changed — re-audit __system_allocateHeaps override.",
-			         probe);
-			boot_log(_b);
 			svcBreak(USERBREAK_PANIC);
 		}
 		mappableFree(probe);
 	}
 
-	/* OG_PROFILE is a test instrument for N3DS hardware: leave CPU at the
-	 * Old-3DS 268 MHz / L2-off mode. Ordinary New3DS builds enable 804 MHz
-	 * + 2 MB L2 via osSetSpeedupEnable; that boost is otherwise enabled by
-	 * default for N3DS. */
+	/* New 3DS: enable the 804 MHz clock + 2 MB L2 cache. */
 	bool is_n3ds = false;
 	APT_CheckNew3DS(&is_n3ds);
 	if (is_n3ds) {
 		osSetSpeedupEnable(true);
-	}
-
-	/* Always-on boot_log of the platform-detection result. This lands
-	 * in sdmc:/forsaken_boot.log on every boot — lets us verify from
-	 * the host which heap tier + texture pack ended up selected,
-	 * without needing to do per-texture memory-consumption math. */
-	{
-		u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
-		const char *tier = region_size >= 96ull * 1024 * 1024 ? "HIMEM (512²)" : "LOMEM (256²)";
-		char _b[200];
-		snprintf(_b, sizeof(_b),
-		         "[platform] is_n3ds=%d og_profile=%d clock=%s cache=%s region=%uMB tier=%s malloc=%uMB linear=%uMB",
-		         (int)is_n3ds,
-		         0, is_n3ds ? "804MHz" : "268MHz", is_n3ds ? "L2-on" : "L2-off",
-		         (unsigned)(region_size >> 20),
-		         tier,
-		         (unsigned)(__ctru_heap_size >> 20),
-		         (unsigned)(__ctru_linear_heap_size >> 20));
-		boot_log(_b);
 	}
 
 	/* Q3-style hunk arena for per-execbuf textureGroups[] arrays. The
@@ -324,52 +241,12 @@ bool platform_init(void)
 	 * the densest level. */
 	{
 		bool ok = Hunk_Init(8 * 1024 * 1024);
-		char _b[96];
-		snprintf(_b, sizeof(_b), "Hunk_Init: %s (8MB)", ok ? "OK" : "FAILED");
-		boot_log(_b);
 		if (!ok) return false;
 	}
 
-	boot_log("platform_init: romfsInit");
-
-	/* romfs precedence: try the .3dsx's embedded romfs FIRST. If that
-	 * fails (slim build with no embedded section), fall back to
-	 * sdmc:/3ds/forsaken/forsaken.romfs.
-	 *
-	 * Why this order: the embedded romfs ships in lock-step with the
-	 * code, so a FULL build always boots a self-consistent dataset.
-	 * The SD file is a long-lived blob from a previous SLIM iteration
-	 * and can drift behind the code (e.g., a level-list update only
-	 * landed in the last build's romfs). Letting it win silently led
-	 * to autotest cycling 1998 SP slots even with an EDITION=remaster
-	 * code build.
-	 *
-	 * Production CIA installs never set up the SD file, so they hit
-	 * the embedded path on the first try — behaviour unchanged. */
-	{
-		Result rc = romfsInit();
-		if (R_SUCCEEDED(rc)) {
-			boot_log("platform_init: using embedded romfs");
-		} else {
-			boot_log("platform_init: no embedded romfs, trying sdmc fallback");
-			static const char16_t ext_path[] = u"/3ds/forsaken/forsaken.romfs";
-			FS_Path apath = { PATH_EMPTY, 1, (u8*)"" };
-			FS_Path fpath = { PATH_UTF16, sizeof(ext_path), (u8*)ext_path };
-			Handle fh = 0;
-			rc = FSUSER_OpenFileDirectly(&fh, ARCHIVE_SDMC, apath, fpath, FS_OPEN_READ, 0);
-			if (R_SUCCEEDED(rc)) {
-				rc = romfsMountFromFile(fh, 0, "romfs");
-				if (R_SUCCEEDED(rc)) {
-					boot_log("platform_init: mounted external sdmc romfs");
-				} else {
-					FSFILE_Close(fh);
-					boot_log("platform_init: ERROR — sdmc romfs mount failed");
-				}
-			} else {
-				boot_log("platform_init: ERROR — no romfs available");
-			}
-		}
-	}
+	/* Game data is the romfs embedded in the .3dsx / CIA. A missing romfs
+	 * is reported later by missing_folders() in AppInit. */
+	romfsInit();
 
 	/* Set working directory so relative paths (Data/, Configs/) resolve */
 	chdir("romfs:/");
@@ -378,9 +255,6 @@ bool platform_init(void)
 	mkdir("sdmc:/3ds", 0777);
 	mkdir("sdmc:/3ds/forsaken", 0777);
 	mkdir("sdmc:/3ds/forsaken/savegame", 0777);
-
-	boot_log("platform_init: done");
-	boot_log("[boot] platform_init: done OK");
 
 	return true;
 }
@@ -396,10 +270,6 @@ bool platform_init(void)
 
 bool platform_init_video(void)
 {
-	boot_log("[boot] platform_init_video: entry");
-	boot_log("platform_init_video: BOOT_TAG_v3_idempotent_renderer");
-	boot_log("platform_init_video: gfxInitDefault");
-
 	/* Initialize 3DS graphics service (GSP) - required before Citro3D.
 	 *
 	 * Use VRAM for framebuffers (third arg `true`).  gfxInitDefault()
@@ -459,15 +329,10 @@ bool platform_init_video(void)
 		}
 	}
 
-	boot_log("[boot] platform_init_video: pre-c3d_context_init");
-	boot_log("platform_init_video: c3d_context_init");
-
 	/* Initialize the Citro3D context */
 	c3d_context_init();
 
 	_video_initialized = true;
-	boot_log("platform_init_video: c3d_context_init done");
-	boot_log("[boot] platform_init_video: c3d_context_init done");
 
 	render_info.ThisMode.w = SCREEN_WIDTH;
 	render_info.ThisMode.h = SCREEN_HEIGHT;
@@ -495,15 +360,12 @@ bool platform_init_video(void)
 	DebugPrintf("platform_init_video: citro3d context created %dx%d\n",
 		SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	boot_log("[boot] platform_init_video: pre-render_init");
 	if (!render_init(&render_info))
 	{
 		DebugPrintf("platform_init_video: render_init failed\n");
-		boot_log("[boot] platform_init_video: FAIL render_init returned false");
 		return false;
 	}
 
-	boot_log("[boot] platform_init_video: done OK");
 	return true;
 }
 
@@ -537,8 +399,6 @@ void platform_render_present(render_info_t *info)
 
 void platform_shutdown(void)
 {
-	boot_log("platform_shutdown: dumping trace ring");
-	trace_dump();
 	if (_video_initialized)
 	{
 		c3d_context_exit();

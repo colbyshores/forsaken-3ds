@@ -128,12 +128,6 @@ typedef u_int32_t DWORD;
 typedef u_int8_t  BYTE;
 typedef u_int16_t WORD;
 
-/* Trace macros are unconditional no-ops in production. The verbose
- * trace implementation lives in the harness tree only. */
-#define TR(fmt, ...)   do {} while(0)
-#define TRMSG(msg)     do {} while(0)
-
-
 /* Defined in main.c; shared with the modules that use it. */
 extern bool Debug;
 extern bool ShowFrameRate;

@@ -4795,7 +4795,6 @@ bool DisplayTitle(void)
 	MakeViewMatrix(&View, &Look, &Up, &CurrentCamera.Mat);
 	MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
 	CurrentCamera.Pos = View;
-	/* camera traces disabled — waste sdmc write budget */
 	CurrentCamera.GroupImIn = -1;
 	CurrentCamera.Viewport = viewport;	
 	CurrentCamera.Viewport.X = 0;

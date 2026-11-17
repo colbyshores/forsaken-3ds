@@ -574,27 +574,10 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 		MxaModelHeaders = (MXALOADHEADER *) calloc(count, sizeof(MXALOADHEADER));
 		if (!ModelHeaders || !MxaModelHeaders)
 		{
-#ifdef __3DS__
-			extern void trace(const char *);
-			char _b[160];
-			snprintf(_b, sizeof(_b),
-			    "PreInitModel: malloc FAILED for ModelHeaders/MxaModelHeaders (count=%d, %u KB requested)",
-			    count,
-			    (unsigned)((count * (sizeof(MXLOADHEADER) + sizeof(MXALOADHEADER))) >> 10));
-			trace(_b);
-#endif
 			free(ModelHeaders);    ModelHeaders    = NULL;
 			free(MxaModelHeaders); MxaModelHeaders = NULL;
 			return false;
 		}
-#ifdef __3DS__
-		{ extern void trace(const char *); char _b[160];
-		  snprintf(_b, sizeof(_b),
-		      "PreInitModel: malloc ModelHeaders=%d entries (%u KB total)",
-		      count,
-		      (unsigned)((count * (sizeof(MXLOADHEADER) + sizeof(MXALOADHEADER))) >> 10));
-		  trace(_b); }
-#endif
 	}
 
 	for( i = 0 ; i < MAXMODELHEADERS ; i++ )
@@ -655,24 +638,11 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 ===================================================================*/
 bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 {
-#ifdef __3DS__
-	{ char _b[96]; extern u32 linearSpaceFree(void);
-	  snprintf(_b, sizeof(_b),
-	    "[initmodel] entry linearFree=%u KB",
-	    linearSpaceFree() >> 10);
-	  boot_log(_b); }
-#endif
 	int i;
 	int8_t		TempFilename[ 256 ];
 	VECTOR		TempVector = { 0.0F, 0.0F, 0.0F };
 	VECTOR		TopLeft;
 	VECTOR		BottomRight;
-
-#ifdef __3DS__
-	{ extern void trace(const char*); char _b[96];
-	  snprintf(_b, sizeof(_b), "InitModel: enter (MAXMODELHEADERS=%d)", MAXMODELHEADERS);
-	  trace(_b); }
-#endif
 
 	for( i = 0 ; i < MAXMODELHEADERS ; i++ )
 	{
@@ -683,34 +653,15 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 				strcpy( (char*)&TempFilename[0], (char*)NamePnt->Name );
 
 #ifdef __3DS__
-				{ extern void trace(const char*); char _b[256];
-				  snprintf(_b, sizeof(_b), "InitModel: i=%d morph=%d name=%.180s",
-				           i, (int)NamePnt->DoIMorph, NamePnt->Name); trace(_b); }
 				/* Periodic linear-heap snapshot during model load — every
 				 * 50th model.  Gives us a curve so we can see where the
 				 * heap drains. */
-				if ((i % 50) == 0) {
-					extern u32 linearSpaceFree(void);
-					char _b[128];
-					snprintf(_b, sizeof(_b),
-					    "[initmodel] i=%d name=%.80s linearFree=%u KB",
-					    i, NamePnt->Name, linearSpaceFree() >> 10);
-					boot_log(_b);
-				}
 #endif
 
 				if( NamePnt->DoIMorph )
 				{
 
 					if( !Mxaload( (char*)&TempFilename[0] , &MxaModelHeaders[i], NamePnt->StoreTriangles ) ) {
-#ifdef __3DS__
-						{ extern void trace(const char*); char _b[256];
-						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxaload i=%d name=%.180s",
-						           i, NamePnt->Name); trace(_b);
-						  extern u32 linearSpaceFree(void);
-						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxaload i=%d name=%.140s linearFree=%u KB",
-						           i, NamePnt->Name, linearSpaceFree() >> 10); boot_log(_b); }
-#endif
 						return false;	// the model and visipoly data
 					}
 					ModelHeaders[i].LOD = NamePnt->LOD;
@@ -729,14 +680,6 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 				{
 
 					if( !Mxload( (char*)&TempFilename[0] , &ModelHeaders[i] , NamePnt->Panel, NamePnt->StoreTriangles) ) {
-#ifdef __3DS__
-						{ extern void trace(const char*); char _b[256];
-						  snprintf(_b, sizeof(_b), "InitModel: FAIL Mxload i=%d name=%.180s",
-						           i, NamePnt->Name); trace(_b);
-						  extern u32 linearSpaceFree(void);
-						  snprintf(_b, sizeof(_b), "[initmodel] FAIL Mxload i=%d name=%.140s linearFree=%u KB",
-						           i, NamePnt->Name, linearSpaceFree() >> 10); boot_log(_b); }
-#endif
 						return false;	// the model and visipoly data
 					}
 					ModelHeaders[i].LOD = NamePnt->LOD;
@@ -757,10 +700,6 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 		}
 		else break;
 	}
-#ifdef __3DS__
-	{ extern void trace(const char*); char _b[64];
-	  snprintf(_b, sizeof(_b), "InitModel: done after i=%d", i); trace(_b); }
-#endif
 	return	true;
 }
 
@@ -1226,12 +1165,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					TempWorld._43 = Models[i].Pos.z;
 					TempWorld._44 = Models[i].InvMat._44;
-
-#ifdef __3DS__
-					if (InTitle) {
-						/* model traces disabled — waste sdmc write budget */
-					}
-#endif
 
 					if (!FSSetWorld(&TempWorld))
 					{

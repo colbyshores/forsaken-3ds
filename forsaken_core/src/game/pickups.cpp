@@ -3159,15 +3159,6 @@ bool LoadPickupsPositions( void )
            * Use Type=PICKUP_GeneralAmmo as a benign substitute so the slot
            * still spawns SOMETHING rather than leaving a hole in the pickup
            * count math downstream. */
-          {
-            extern void trace(const char*);
-            char _b[160];
-            snprintf(_b, sizeof(_b),
-                     "PICKUPS: substitute regen[%d] Type=%u (>=%d) TriggerMod=%u -> PICKUP_GeneralAmmo",
-                     (int)Count, (unsigned)RegenPoints[Count].Type,
-                     (int)MAXPICKUPTYPES, (unsigned)RegenPoints[Count].TriggerMod);
-            trace(_b);
-          }
           RegenPoints[ Count ].Type = PICKUP_GeneralAmmo;
           if (RegenPoints[ Count ].TriggerMod != (u_int16_t)-1 &&
               RegenPoints[ Count ].TriggerMod >= NumOfTrigMods) {

@@ -505,56 +505,16 @@ void ProcessBGObjects( bool Collide )
 							if( Object->IsCargoDroneLift )
 							{
 								ENEMY * drone;
-#ifdef DEFEND2_TRACE
-								extern NODENETWORKHEADER NodeNetworkHeader;
-								/* Log on the first frame of this specific BGO's
-								 * animation (Object->Time small, just after the
-								 * += framelag).  Using a per-BGO Time check
-								 * instead of a shared static counter so EVERY
-								 * lift's first-frame is captured. */
-								bool _log_this_frame = (Object->Time < 2.0F * framelag);
-								if( _log_this_frame )
-								{
-									extern void boot_log(const char *);
-									char _b[160];
-									snprintf(_b, sizeof(_b),
-									         "[ylerp] BGO #%d START animating (IsLift=1, pos=%.0f,%.0f,%.0f, OvT=%.1f)",
-									         (int)Object->Index, Object->Pos.x, Object->Pos.y, Object->Pos.z,
-									         Object->OverallTime);
-									boot_log(_b);
-								}
-#endif
 								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
 								{
 									float dx, dz;
 									NODE * wait_node;
 									NODE * upper_node;
-#ifdef DEFEND2_TRACE
-									bool _passed = false;
-									int _tnode_idx = -1;
-									unsigned _tnode_flags = 0;
-#endif
 									if( drone->Type != ENEMY_CargoDrone ) continue;
 									if( !drone->TNode ) continue;
 									wait_node = (NODE*)drone->TNode;
-#ifdef DEFEND2_TRACE
-									_tnode_idx   = (int)( wait_node - NodeNetworkHeader.FirstNode );
-									_tnode_flags = wait_node->Flags;
-#endif
 									if( !( wait_node->Flags & 0x40 ) )
 									{
-#ifdef DEFEND2_TRACE
-										if( _log_this_frame )
-										{
-											extern void boot_log(const char *);
-											char _b[160];
-											snprintf(_b, sizeof(_b),
-											         "[ylerp] SKIP TNode=%d f=0x%02x !0x40 (drone_pos=%.0f,%.0f,%.0f)",
-											         _tnode_idx, _tnode_flags,
-											         drone->Object.Pos.x, drone->Object.Pos.y, drone->Object.Pos.z);
-											boot_log(_b);
-										}
-#endif
 										continue;
 									}
 									/* Gate on drone-to-wait-node XZ distance — the drone is
@@ -569,19 +529,6 @@ void ProcessBGObjects( bool Collide )
 									dz = drone->Object.Pos.z - wait_node->Pos.z;
 									if( dx*dx + dz*dz > 200.0F*200.0F )
 									{
-#ifdef DEFEND2_TRACE
-										if( _log_this_frame )
-										{
-											extern void boot_log(const char *);
-											char _b[180];
-											snprintf(_b, sizeof(_b),
-											         "[ylerp] SKIP drone-to-WAIT XZ=%.0f > 200 (TNode=%d, drone=%.0f,%.0f,%.0f, wait=%.0f,%.0f,%.0f)",
-											         sqrtf(dx*dx + dz*dz), _tnode_idx,
-											         drone->Object.Pos.x, drone->Object.Pos.y, drone->Object.Pos.z,
-											         wait_node->Pos.x, wait_node->Pos.y, wait_node->Pos.z);
-											boot_log(_b);
-										}
-#endif
 										continue;
 									}
 									/* Lerp drone Y from wait node to its IMMEDIATE upper
@@ -604,28 +551,8 @@ void ProcessBGObjects( bool Collide )
 										float progress = Object->Time / Object->OverallTime;
 										if( progress > 1.0F ) progress = 1.0F;
 										drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
-#ifdef DEFEND2_TRACE
-										_passed = true;
-										if( _log_this_frame )
-										{
-											extern void boot_log(const char *);
-											char _b[200];
-											int _up_idx = (int)( upper_node - NodeNetworkHeader.FirstNode );
-											snprintf(_b, sizeof(_b),
-											         "[ylerp] PASS TNode=%d upper=%d progress=%.2f Y: %.0f -> %.0f",
-											         _tnode_idx, _up_idx, progress,
-											         wait_node->Pos.y, upper_node->Pos.y);
-											boot_log(_b);
-										}
-#endif
 									}
-#ifdef DEFEND2_TRACE
-									(void)_passed;
-#endif
 								}
-#ifdef DEFEND2_TRACE
-								/* no shared counter needed */
-#endif
 							}
 #endif
 						}
@@ -700,21 +627,6 @@ void ProcessBGObjects( bool Collide )
 										drone->Object.Group = (u_int16_t)upper_node->Group;
 										TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
 									}
-
-#ifdef DEFEND2_TRACE
-									{
-										extern void boot_log(const char *);
-										extern NODENETWORKHEADER NodeNetworkHeader;
-										char _b[200];
-										int _w = (int)( wait_node - NodeNetworkHeader.FirstNode );
-										int _u = (int)( upper_node - NodeNetworkHeader.FirstNode );
-										snprintf(_b, sizeof(_b),
-										         "[lift-end] BGO #%d: drone TNode %d->%d (f=0x%02x) %s",
-										         (int)Object->Index, _w, _u, (unsigned)upper_node->Flags,
-										         upper_is_intermediate_wait ? "TELEPORT" : "walk");
-										boot_log(_b);
-									}
-#endif
 								}
 							}
 #endif
@@ -1636,16 +1548,6 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 			}
 			if( strncasecmp( base, "lift", 4 ) == 0 )
 				Object->IsCargoDroneLift = true;
-#ifdef DEFEND2_TRACE
-			{
-				extern void boot_log(const char *);
-				char _b[200];
-				snprintf(_b, sizeof(_b),
-				         "[bgo]  Load fn='%s' base='%s' IsLift=%d",
-				         (const char*)Filename, base, (int)Object->IsCargoDroneLift);
-				boot_log(_b);
-			}
-#endif
 		}
 #endif
 		Object->StartPos = *Pos;
@@ -1814,19 +1716,6 @@ void StartBGOAnim( u_int16_t Index )
 	BGOBJECT * Object;
 
 	Object = &BGObjects[ Index ];
-
-#ifdef DEFEND2_TRACE
-	{
-		extern void boot_log(const char *);
-		char _b[160];
-		snprintf(_b, sizeof(_b),
-		         "[bgo]  StartBGOAnim idx=%u type=%d state=%d pos=(%.0f,%.0f,%.0f) grp=%u",
-		         (unsigned)Index, (int)Object->Type, (int)Object->State,
-		         Object->Pos.x, Object->Pos.y, Object->Pos.z,
-		         (unsigned)Object->Group);
-		boot_log(_b);
-	}
-#endif
 
 	switch( Object->Type )
 	{
