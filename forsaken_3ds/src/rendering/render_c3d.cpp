@@ -67,6 +67,13 @@
 #include "data/file.h"
 #include "platform_3ds/main_3ds.h"
 #include "rendering/lights.h"
+#include "util/util.h"
+#include "util/platform.h"
+#include "game/oct2.h"
+
+/* Defined further down; used above their definitions. */
+void c3d_renderer_cleanup(void);
+void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, float *A);
 #include "util/platform.h"
 #include "game/camera.h"
 
@@ -362,7 +369,6 @@ static void c255_init(void)
 
 /* ---- globals expected by the engine ---- */
 
-render_info_t render_info;
 
 typedef struct { float anisotropic; } gl_caps_t;
 gl_caps_t caps;
@@ -594,7 +600,6 @@ void c3d_present(void)
 	 * a second; 10s otherwise so SD I/O doesn't drown normal play. */
 	if ((now - s_fps_last_log_ms) >= 10000)
 	{
-		extern void trace(const char*);
 		char _b[64];
 		snprintf(_b, sizeof(_b), "FPS: %d", s_fps_current);
 		trace(_b);
@@ -1578,13 +1583,13 @@ void reset_zbuff(void)
 void disable_zbuff_write(void)
 {
 	/* Write color only (no depth), respecting anaglyph channel mask */
-	GPU_WRITEMASK mask = s_colorMask & ~GPU_WRITE_DEPTH;
+	GPU_WRITEMASK mask = (GPU_WRITEMASK)(s_colorMask & ~GPU_WRITE_DEPTH);
 	C3D_DepthTest(true, GPU_LESS, mask);
 }
 
 void disable_zbuff(void)
 {
-	GPU_WRITEMASK mask = s_colorMask & ~GPU_WRITE_DEPTH;
+	GPU_WRITEMASK mask = (GPU_WRITEMASK)(s_colorMask & ~GPU_WRITE_DEPTH);
 	C3D_DepthTest(false, GPU_ALWAYS, mask);
 }
 
@@ -1719,7 +1724,6 @@ bool FSClear(XYRECT *rect)
 	 * camera. Rasterized quad clear scissored to viewport via the
 	 * rasterizer — wipes color + depth inside just the inset rect.
 	 * See clear_sub_viewport_via_quad comment for why. */
-	extern int16_t CameraRendering;
 	if (CameraRendering != CAMRENDERING_None &&
 	    CameraRendering != CAMRENDERING_Main)
 	{
@@ -1899,13 +1903,13 @@ bool FSCreateDynamicIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
 
 bool FSLockIndexBuffer(RENDEROBJECT *renderObject, WORD **indices)
 {
-	*indices = renderObject->lpIndexBuffer;
+	*indices = (WORD *)renderObject->lpIndexBuffer;
 	return true;
 }
 
 bool FSLockVertexBuffer(RENDEROBJECT *renderObject, LVERTEX **verts)
 {
-	*verts = renderObject->lpVertexBuffer;
+	*verts = (LVERTEX *)renderObject->lpVertexBuffer;
 	return true;
 }
 
@@ -1914,7 +1918,7 @@ bool FSUnlockVertexBuffer(RENDEROBJECT *renderObject) { (void)renderObject; retu
 
 bool FSLockNormalBuffer(RENDEROBJECT *renderObject, NORMAL **normals)
 {
-	*normals = renderObject->lpNormalBuffer;
+	*normals = (NORMAL *)renderObject->lpNormalBuffer;
 	return true;
 }
 
@@ -2058,7 +2062,7 @@ static void configure_texenv_object(void)
 		C3D_TexEnv *env = C3D_GetTexEnv(1);
 		C3D_TexEnvInit(env);
 		C3D_TexEnvSrc(env, C3D_RGB, GPU_PREVIOUS,
-		              GPU_FRAGMENT_SECONDARY_COLOR, 0);
+		              GPU_FRAGMENT_SECONDARY_COLOR, (GPU_TEVSRC)0);
 		C3D_TexEnvFunc(env, C3D_RGB, GPU_ADD);
 	}
 
@@ -2265,7 +2269,6 @@ static void resolve_hd_textures_dirs(void)
 	 * the [platform] tier line emitted from platform_init to verify
 	 * from the host which texture pack a given install is using. */
 	{
-		extern void boot_log(const char *);
 		char _b[160];
 		snprintf(_b, sizeof(_b),
 		         "[hd_textures] region=%uMB primary=%s fallback=%s",
@@ -2336,7 +2339,7 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	/* Allocate texture_t wrapper */
 	if (*t == NULL)
 	{
-		texdata = malloc(sizeof(texture_t));
+		texdata = (texture_t *)malloc(sizeof(texture_t));
 		if (!texdata) { fclose(f); return false; }
 		memset(texdata, 0, sizeof(texture_t));
 	}
@@ -2420,7 +2423,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 	{
 		int nw = image.w / 2, nh = image.h / 2;
 		int x, y, c;
-		char *nd = malloc(nw * nh * 4);
+		char *nd = (char *)malloc(nw * nh * 4);
 		if (!nd) break;
 		for (y = 0; y < nh; y++)
 			for (x = 0; x < nw; x++)
@@ -2473,7 +2476,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 
 		if (is_new)
 		{
-			texdata = malloc(sizeof(texture_t));
+			texdata = (texture_t *)malloc(sizeof(texture_t));
 			if (!texdata) { destroy_image(&image); return false; }
 			memset(texdata, 0, sizeof(texture_t));
 		}
@@ -2500,7 +2503,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		}
 
 		/* Morton-tile RGBA8 → RGBA4444 into the texture's linear buffer */
-		tiled = linearAlloc(image.w * image.h * 2); /* 2 bytes per pixel for RGBA4 */
+		tiled = (u_int8_t *)linearAlloc(image.w * image.h * 2); /* 2 bytes per pixel for RGBA4 */
 		if (tiled)
 		{
 			tile_rgba4((u_int8_t*)image.data, (u_int16_t*)tiled, image.w, image.h);
@@ -2740,9 +2743,9 @@ void light_vert(LVERTEX *vert, u_int8_t *color)
 	VECTOR world, v = { vert->x, vert->y, vert->z };
 	MxV(&world_matrix, &v, &world);
 	if (render_lighting_env_whiteout)
-		do_whiteout_effect(&world, color);
+		do_whiteout_effect(&world, (COLOR *)color);
 	else if (render_lighting_env_water)
-		do_water_effect(&world, color);
+		do_water_effect(&world, (COLOR *)color);
 #ifndef LIGHT_EVERYTHING
 	if (render_lighting_enabled)
 #endif

@@ -289,7 +289,7 @@ sound_buffer_t * sound_load(char *path)
 	char * file_path = convert_path(path);
 
 	// create the buffer
-	buffer = malloc(sizeof(sound_buffer_t));
+	buffer = (sound_buffer_t *)malloc(sizeof(sound_buffer_t));
 	if(!buffer)
 	{
 		DebugPrintf("sound_load: failed to malloc buffer\n");
@@ -384,7 +384,7 @@ sound_source_t * sound_source( sound_buffer_t * buffer )
 		return 0;
 	}
 
-	source = malloc(sizeof(sound_source_t));
+	source = (sound_source_t *)malloc(sizeof(sound_source_t));
 	if(!source)
 	{
 		DebugPrintf("sound_source: failed to malloc source\n");

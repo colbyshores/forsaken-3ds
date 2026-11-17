@@ -92,6 +92,9 @@ int  controls_3ds_cstick_invert_y(void);
 
 #endif /* __3DS__ */
 
+/* Feed one frame of HID state to the remap overlay; true = it consumed input. */
+bool controls_3ds_handle_input(u32 kDown, u32 kHeld);
+
 #ifdef __cplusplus
 }
 #endif

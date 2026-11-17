@@ -6,6 +6,7 @@
 #define SAVEGAME_SLOTS
 #include "game/main.h"
 #include "util/platform.h"
+#include "audio/music.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -59,15 +60,6 @@
 #include "game/skin.h"
 #include "game/water.h"
 #include "world/node.h"
-#ifdef __3DS__
-#include "audio/music.h"
-#endif
-extern "C" {
-#if !SDL_VERSION_ATLEAST(2,0,0)
-int SDL_EnableUNICODE(int enable);
-#endif
-void music_play_title(void);
-}
 
 
 #define MAX_SAVEGAME_SLOTS		16
@@ -2967,7 +2959,7 @@ MENUITEM * CurrentMenuItem = NULL;
 
 /* Called from input_3ds.c to check if a menu is open without
  * pulling in the full title.h dependency chain. */
-extern "C" int _3ds_is_menu_open(void) { return CurrentMenu != NULL; }
+int _3ds_is_menu_open(void) { return CurrentMenu != NULL; }
 TEXTINFO * HighlightItem[MAXHIGHLIGHTITEMS];
 int HighlightStatus[MAXHIGHLIGHTITEMS];
 int CurrentHighlightItem;

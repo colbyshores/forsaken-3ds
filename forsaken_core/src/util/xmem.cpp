@@ -21,7 +21,7 @@ struct XMemTracker {
     bool   used[MAXBLOCKS];
     void  *pnts[MAXBLOCKS];
     size_t sizes[MAXBLOCKS];
-    char  *files[MAXBLOCKS];
+    const char *files[MAXBLOCKS];	/* __FILE__ of each live block */
     int    lines[MAXBLOCKS];
     int    blocks_used = 0;
 
@@ -74,7 +74,7 @@ int XMem_FindSame( void * Pnt )
 	return g_mem.find_same(Pnt);
 }
 
-void * X_strdup( char *str, char *in_file, int in_line )
+void * X_strdup( const char *str, const char *in_file, int in_line )
 {
 	void * Pnt;
 	int i;
@@ -103,7 +103,7 @@ void * X_strdup( char *str, char *in_file, int in_line )
 	return Pnt;
 
 }
-void * X_malloc( size_t size, char *in_file, int in_line )
+void * X_malloc( size_t size, const char *in_file, int in_line )
 {
 	void * Pnt;
 	int i;
@@ -133,7 +133,7 @@ void * X_malloc( size_t size, char *in_file, int in_line )
 
 }
 
-void * X_calloc( size_t num,size_t size, char *in_file, int in_line )
+void * X_calloc( size_t num,size_t size, const char *in_file, int in_line )
 {
 	void * Pnt;
 	int i;
@@ -163,10 +163,10 @@ void * X_calloc( size_t num,size_t size, char *in_file, int in_line )
 
 }
 
-void X_free( void * Pnt, char *in_file, int in_line )
+void X_free( void * Pnt, const char *in_file, int in_line )
 {
 	int i;
-	static char *last_file = NULL;
+	static const char *last_file = NULL;
 	static int last_line = -1;
 	
 	if ( !Pnt )
@@ -198,7 +198,7 @@ void X_free( void * Pnt, char *in_file, int in_line )
 	BlocksUsed--;
 }
 
-void * X_realloc( void * Pnt , size_t size, char *in_file, int in_line )
+void * X_realloc( void * Pnt , size_t size, const char *in_file, int in_line )
 {
 	int i;
 	

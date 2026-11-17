@@ -1,4 +1,5 @@
 #include "ui/title.h"
+#include "rendering/text.h"
 /*===================================================================
 	controls_3ds.c — bindings + persistence + rebind UI.
 	See controls_3ds.h for API contract.
@@ -284,7 +285,6 @@ bool controls_3ds_menu_is_open(void) { return s_menu_open; }
 
 void controls_3ds_render_overlay(void)
 {
-	extern int Print4x5Text(char *text, int x, int y, int color);
 	if (!s_menu_open) return;
 
 	const int FG = 7;        /* white */

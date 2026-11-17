@@ -78,8 +78,7 @@ typedef struct {
 	float                 stereo_focal_dist;
 } render_info_t;
 
-/* The one render state. Defined in main.c (the 3DS renderer also carries a
-   tentative definition; -fcommon merges them on the C side). */
+/* The one render state (defined in main.cpp). */
 extern render_info_t render_info;
 
 typedef bool (*RenderCurrentCameraPt) (void);
@@ -366,6 +365,12 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject);
    (saved as ObjectShine / WallDetail in Configs/main.txt). */
 void c3d_set_object_proctex(bool on);
 void c3d_set_object_shine_eligible(bool eligible);
+void c3d_transfer_eye(unsigned int eye);	/* stereo: switch to the other eye's target */
+void c3d_upload_xlights(void);				/* push the visible XLights to the vshader */
+void c3d_clear_bottom_screen(void);
+bool c3d_hud_begin_bottom(void);			/* route HUD draws to the bottom screen */
+void c3d_hud_end_bottom(void);
+int forsaken_get_fps(void);
 extern bool g_object_shine;
 extern bool g_wall_detail;
 #endif

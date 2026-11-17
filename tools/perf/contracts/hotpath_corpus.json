@@ -66,7 +66,7 @@
       "why": "per-vertex animation interpolation per animated model"
     },
     {
-      "file": "render_c3d.c",
+      "file": "render_c3d.cpp",
       "symbols": [
         "*"
       ],
@@ -176,8 +176,8 @@
     }
   ],
   "cold_always": [
-    "main_3ds.c",
-    "main.c",
+    "main_3ds.cpp",
+    "main.cpp",
     "title.cpp",
     "loadsave.c",
     "bsp.c",
@@ -187,7 +187,7 @@
     "config.c",
     "stats.c",
     "controls.c",
-    "input_3ds.c",
-    "controls_3ds.c"
+    "input_3ds.cpp",
+    "controls_3ds.cpp"
   ]
 }

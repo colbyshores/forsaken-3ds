@@ -21,9 +21,7 @@
 #include "audio/sfx.h"
 #include "input/input.h"
 #include "audio/sound.h"
-#ifdef __3DS__
 #include "audio/music.h"
-#endif
 #include "diag/perf_capture.h"
 #include "diag/atm_prof.h"
 #include "diag/framedump.h"

@@ -173,7 +173,7 @@ ARCH_REQUIRED = ("-march=armv6k", "-mtune=mpcore", "-mfloat-abi=hard", "-mtp=sof
 BANNED_FLAGS = ("-ffast-math", "-Ofast", "-fsingle-precision-constant")
 # The two float threads in this tree (contract §2 R1 table). main runs on the
 # main thread; music_thread_fn is the only created worker.
-R1_THREAD_SITES = ("main.c", "music_3ds.c")
+R1_THREAD_SITES = ("main.cpp", "music_3ds.cpp")
 STANDING_EXEMPTIONS: tuple[dict[str, object], ...] = (
     {"id": "E-LUT-1", "file": "new3d.h", "symbols": ("fast_sinf",), "rules": ("R2", "R3", "R5")},
     {"id": "E-LUT-2", "file": "new3d.h", "symbols": ("fast_cosf",), "rules": ("R2", "R3")},
@@ -1042,7 +1042,7 @@ def gate_r1(root: Path | None = None) -> list[Finding]:
                     Finding("R1", "MUST", rel, 0, "fpscr-comment", True, "seed", None,
                             "FPSCR code without rationale comment (denormal/FZ|DN, per-thread)")
                 )
-        if rel == "main.c" and not (fpscr_established(code) or fpscr_established(tu_code)):
+        if rel == "main.cpp" and not (fpscr_established(code) or fpscr_established(tu_code)):
             findings.append(
                 Finding("R1", "MUST", rel, 0, "main", True, "seed", None,
                         "no FPSCR FZ|DN helper on main (file or include closure)")
@@ -1068,9 +1068,9 @@ def gate_r1(root: Path | None = None) -> list[Finding]:
                     Finding("R1", severity, rel, line_of(text, index), kind, True, "seed", None,
                             r1_site_detail(kind))
                 )
-    if not any_fpscr and not any(f.file == "main.c" and f.symbol == "main" for f in findings):
+    if not any_fpscr and not any(f.file == "main.cpp" and f.symbol == "main" for f in findings):
         findings.append(
-            Finding("R1", "MUST", "main.c", 0, "main", True, "seed", None,
+            Finding("R1", "MUST", "main.cpp", 0, "main", True, "seed", None,
                     "no FPSCR FZ|DN write on main or workers")
         )
     return _dedupe(findings)

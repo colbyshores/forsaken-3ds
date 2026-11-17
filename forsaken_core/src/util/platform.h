@@ -23,6 +23,9 @@ extern void platform_delay(u_int32_t ms);
 void boot_log(const char *line);		/* append a line to sdmc:/forsaken_boot.log */
 float platform_get_3d_slider(void);		/* 0..1, 0 = mono */
 void controls_3ds_remap_menu(void);		/* open the button-remap overlay */
+bool controls_3ds_menu_is_open(void);
+void controls_3ds_render_overlay(void);	/* draw the remap overlay (bottom screen) */
+int SDL_EnableUNICODE(int enable);		/* SDL 1.x call, stubbed on 3DS */
 extern bool g_show_stereo_debug;		/* stereo debug overlay toggle */
 #ifdef __cplusplus
 }

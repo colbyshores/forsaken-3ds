@@ -142,7 +142,7 @@ static void end_one_time(VkCommandBuffer cb)
 
 static vkbuf_t *vkbuf_create(VkDeviceSize size, VkBufferUsageFlags usage)
 {
-    vkbuf_t *b = calloc(1, sizeof(vkbuf_t));
+    vkbuf_t *b = (vkbuf_t *)calloc(1, sizeof(vkbuf_t));
     b->size = size;
     VkBufferCreateInfo ci = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
     ci.size = size; ci.usage = usage; ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -213,9 +213,9 @@ static bool create_swapchain(void)
     if (vkCreateSwapchainKHR(s_dev, &ci, NULL, &s_swap) != VK_SUCCESS) return false;
 
     vkGetSwapchainImagesKHR(s_dev, s_swap, &s_swap_count, NULL);
-    s_swap_imgs = malloc(sizeof(VkImage) * s_swap_count);
+    s_swap_imgs = (VkImage *)malloc(sizeof(VkImage) * s_swap_count);
     vkGetSwapchainImagesKHR(s_dev, s_swap, &s_swap_count, s_swap_imgs);
-    s_swap_views = malloc(sizeof(VkImageView) * s_swap_count);
+    s_swap_views = (VkImageView *)malloc(sizeof(VkImageView) * s_swap_count);
     for (uint32_t i = 0; i < s_swap_count; i++) {
         VkImageViewCreateInfo vi = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
         vi.image = s_swap_imgs[i]; vi.viewType = VK_IMAGE_VIEW_TYPE_2D; vi.format = s_swap_fmt;
@@ -243,7 +243,7 @@ static bool create_swapchain(void)
     dvi.subresourceRange.levelCount = 1; dvi.subresourceRange.layerCount = 1;
     vkCreateImageView(s_dev, &dvi, NULL, &s_depth_view);
 
-    s_fbs = malloc(sizeof(VkFramebuffer) * s_swap_count);
+    s_fbs = (VkFramebuffer *)malloc(sizeof(VkFramebuffer) * s_swap_count);
     for (uint32_t i = 0; i < s_swap_count; i++) {
         VkImageView atts[2] = { s_swap_views[i], s_depth_view };
         VkFramebufferCreateInfo fi = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
@@ -371,7 +371,7 @@ bool render_init(render_info_t *info)
     if (s_init_done) return true;
     unsigned int n_ext = 0;
     SDL_Vulkan_GetInstanceExtensions(info->window, &n_ext, NULL);
-    const char **exts = malloc(sizeof(char *) * (n_ext + 1));
+    const char **exts = (const char **)malloc(sizeof(char *) * (n_ext + 1));
     SDL_Vulkan_GetInstanceExtensions(info->window, &n_ext, exts);
 
     VkApplicationInfo app = { VK_STRUCTURE_TYPE_APPLICATION_INFO };
@@ -515,9 +515,9 @@ bool render_init(render_info_t *info)
     }
     vkCreateSampler(s_dev, &samp, NULL, &s_sampler);
 
-    s_vs3d = make_module(vulkan3d_vert_spv, vulkan3d_vert_spv_len);
-    s_vs2d = make_module(vulkan2d_vert_spv, vulkan2d_vert_spv_len);
-    s_fs = make_module(vulkan_frag_spv, vulkan_frag_spv_len);
+    s_vs3d = make_module((const uint32_t *)vulkan3d_vert_spv, vulkan3d_vert_spv_len);
+    s_vs2d = make_module((const uint32_t *)vulkan2d_vert_spv, vulkan2d_vert_spv_len);
+    s_fs = make_module((const uint32_t *)vulkan_frag_spv, vulkan_frag_spv_len);
 
     if (!create_swapchain()) { DebugPrintf("vulkan: swapchain failed\n"); return false; }
     info->ok_to_render = true;
@@ -750,7 +750,7 @@ static void retire_buf(vkbuf_t *b)
 {
     if (!b) return;
     if (!s_init_done) { vkbuf_destroy(b); return; }
-    retire_t *r = malloc(sizeof(retire_t));
+    retire_t *r = (retire_t *)malloc(sizeof(retire_t));
     r->buf = b; r->seq = s_frame_seq; r->next = s_retire; s_retire = r;
 }
 
@@ -772,7 +772,7 @@ void FSReleaseRenderObject(RENDEROBJECT *ro)
 /* ---- textures ---- */
 static vktex_t *vktex_alloc(void)
 {
-    vktex_t *t = calloc(1, sizeof(vktex_t));
+    vktex_t *t = (vktex_t *)calloc(1, sizeof(vktex_t));
     VkDescriptorSetAllocateInfo ai = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
     ai.descriptorPool = s_dpool; ai.descriptorSetCount = 1; ai.pSetLayouts = &s_dsl;
     vkAllocateDescriptorSets(s_dev, &ai, &t->set);
@@ -842,7 +842,7 @@ static bool load_ktx2(vktex_t *t, const char *path, u_int16_t *width, u_int16_t 
     fseek(f, 0, SEEK_END);
     long sz = ftell(f);
     fseek(f, 0, SEEK_SET);
-    u_int8_t *data = malloc((size_t)sz);
+    u_int8_t *data = (u_int8_t *)malloc((size_t)sz);
     if (fread(data, 1, (size_t)sz, f) != (size_t)sz) { fclose(f); free(data); return false; }
     fclose(f);
     static const u_int8_t ktx2id[12] = {0xAB,0x4B,0x54,0x58,0x20,0x32,0x30,0xBB,0x0D,0x0A,0x1A,0x0A};
@@ -852,7 +852,7 @@ static bool load_ktx2(vktex_t *t, const char *path, u_int16_t *width, u_int16_t 
     int w = (int)hdr[2], h = (int)hdr[3], levels = (int)hdr[7];
     if (w <= 0 || h <= 0 || levels <= 0 || levels > 16) { free(data); return false; }
     /* Level index follows the 88-byte header. */
-    struct { u_int64_t off, len, ulen; } *lv = (void *)(data + 88);
+    struct ktx2_level { u_int64_t off, len, ulen; } *lv = (ktx2_level *)(data + 88);
 
     t->image = vktex_image(w, h, levels, VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK);
     t->w = w; t->h = h;

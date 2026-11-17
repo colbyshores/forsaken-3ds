@@ -185,7 +185,7 @@ void app_keyboard( SDL_KeyboardEvent * key )
 		}
 		else if( key->keysym.sym == SDLK_RSHIFT || key->keysym.sym == SDLK_LSHIFT )
 		{
-				u_int8_t *keystate = SDL_GetKeyboardState(NULL);
+				const u_int8_t *keystate = SDL_GetKeyboardState(NULL);
 				if ( keystate[SDL_SCANCODE_F12] )
 					MenuGoFullScreen( NULL );
 		}
@@ -466,7 +466,7 @@ bool joysticks_init(void)
 		{
 			DebugPrintf(
 				"joysticks_init: joystick (%d), '%s' failed to open\n",
-				i, SDL_JoystickName(i)
+				i, SDL_JoystickName((SDL_Joystick *)(intptr_t)i)
 			);
 			continue;
 		}
@@ -482,7 +482,7 @@ bool joysticks_init(void)
 		// TODO
 		// JoystickInfo[i].NumBalls = SDL_JoystickNumBalls(joy);
 
-		JoystickInfo[i].Name = strdup( SDL_JoystickName(i) );
+		JoystickInfo[i].Name = (char *)strdup( SDL_JoystickName((SDL_Joystick *)(intptr_t)i) );
 
 		DebugPrintf( 
 			"joysticks_init: joystick (%d), name='%s', axises=%d, buttons=%d, hats=%d\n", 
@@ -657,43 +657,43 @@ bool handle_events( void )
 
 // mouse wheel is an x/y axis event in SDL2 (was a button code in SDL1)
 		case SDL_MOUSEWHEEL:
-			app_mouse_wheel( &_event );
+			app_mouse_wheel( &_event.wheel );
 			break;
 
 
 		case SDL_WINDOWEVENT:
-			app_active( &_event );
+			app_active( &_event.window );
 			break;
 
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
-			app_keyboard( &_event );
+			app_keyboard( &_event.key );
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
-			app_mouse_button( &_event );
+			app_mouse_button( &_event.button );
 			break;
 
 		case SDL_MOUSEMOTION:
-			app_mouse_motion( &_event );
+			app_mouse_motion( &_event.motion );
 			break;
 
 		case SDL_JOYAXISMOTION:
-			app_joy_axis( &_event );
+			app_joy_axis( &_event.jaxis );
 			break;
 
 		case SDL_JOYBALLMOTION:
-			app_joy_ball( &_event );
+			app_joy_ball( &_event.jball );
 			break;
 
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			app_joy_button( &_event );
+			app_joy_button( &_event.jbutton );
 			break;
 
 		case SDL_JOYHATMOTION:
-			app_joy_hat( &_event );
+			app_joy_hat( &_event.jhat );
 			break;
 
 
@@ -711,7 +711,7 @@ bool handle_events( void )
 		// so that we can call the callbacks from the same thread
 		case SDL_USEREVENT:
 			{
-				void (*p) (void*) = _event.user.data1; // callback
+				void (*p) (void*) = (void (*)(void*))_event.user.data1; // callback
 				p(_event.user.data2); // callback( data )
 			}
 			break;

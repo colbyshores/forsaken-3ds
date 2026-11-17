@@ -233,7 +233,7 @@ int Print4x5TextSmall( char * Text , int x , int y , int color )
 	Input		:		char * Text, u_int16_t x , u_int16_t y
 	Output		:		last x position
 ===================================================================*/
-int Print4x5Text( char * Text , int x , int y , int color )
+int Print4x5Text( const char * Text , int x , int y , int color )
 {
 	u_int8_t num;
 	u_int8_t r , g , b;

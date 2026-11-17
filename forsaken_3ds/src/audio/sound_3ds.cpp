@@ -17,6 +17,7 @@
 #include <sys/stat.h>     /* mkdir() for dspfirm.cdc bootstrap */
 
 #include "game/main.h"
+#include "audio/sound_3ds.h"
 #include "util/util.h"
 #include "audio/sound.h"
 #include "data/file.h"
@@ -319,7 +320,7 @@ sound_buffer_t *sound_load(char *path)
 		return NULL;
 	}
 
-	buffer = malloc(sizeof(sound_buffer_t));
+	buffer = (sound_buffer_t *)malloc(sizeof(sound_buffer_t));
 	if (!buffer) { fclose(f); return NULL; }
 	memset(buffer, 0, sizeof(sound_buffer_t));
 	strncpy(buffer->path, file_path, MAX_PATH_LEN - 1);
@@ -430,7 +431,7 @@ sound_source_t *sound_source(sound_buffer_t *buffer)
 		return NULL;
 	}
 
-	src = malloc(sizeof(sound_source_t));
+	src = (sound_source_t *)malloc(sizeof(sound_source_t));
 	if (!src) { free_channel(ch); return NULL; }
 	memset(src, 0, sizeof(sound_source_t));
 

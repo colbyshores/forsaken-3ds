@@ -17,6 +17,9 @@
 #include "platform_3ds/main_3ds.h"
 #include "util/util.h"
 #include "rendering/render.h"
+#include "util/hunk_alloc.h"
+#include "scripting/lua_config.h"
+#include "audio/sound_3ds.h"
 
 
 /* ---- 3DS heap configuration ---- */
@@ -85,10 +88,10 @@ void __system_allocateHeaps(void)
 
 	__ctru_heap = 0x08000000;
 	svcControlMemory(&tmp, __ctru_heap, 0, __ctru_heap_size,
-	                 MEMOP_ALLOC, MEMPERM_READ | MEMPERM_WRITE);
+	                 MEMOP_ALLOC, (MemPerm)(MEMPERM_READ | MEMPERM_WRITE));
 
 	svcControlMemory(&__ctru_linear_heap, 0, 0, __ctru_linear_heap_size,
-	                 MEMOP_ALLOC_LINEAR, MEMPERM_READ | MEMPERM_WRITE);
+	                 MEMOP_ALLOC_LINEAR, (MemPerm)(MEMPERM_READ | MEMPERM_WRITE));
 
 	/* CRITICAL: initialize the "mappable" allocator that backs
 	 * mappableAlloc() — gspInit uses this to reserve the virtual
@@ -250,10 +253,7 @@ bool platform_init(void)
 	 * On larger levels the cost compounds and has been observed to crash
 	 * inside _dtoa_r mid-load on hardware. Force the flag off here, before
 	 * any loader can fire, so DebugPrintf returns immediately. */
-	{
-		extern bool Debug;
-		Debug = false;
-	}
+	Debug = false;
 
 	boot_log("platform_init: start");
 	boot_log("[boot] platform_init: start");
@@ -267,9 +267,6 @@ bool platform_init(void)
 	 * mappableAlloc and verify it returns an address inside the
 	 * range our override passed to mappableInit. */
 	{
-		extern void mappableInit(u32, u32);
-		extern void *mappableAlloc(size_t);
-		extern void  mappableFree(void *);
 		void *probe = mappableAlloc(4096);
 		uintptr_t addr = (uintptr_t)probe;
 		if (probe == NULL || addr < 0x10000000 || addr >= 0x14000000) {
@@ -323,7 +320,6 @@ bool platform_init(void)
 	 * Hunk_FreeAll(TAG_LEVEL) on level transition. 8 MB easily covers
 	 * the densest level. */
 	{
-		extern bool Hunk_Init(size_t);
 		bool ok = Hunk_Init(8 * 1024 * 1024);
 		char _b[96];
 		snprintf(_b, sizeof(_b), "Hunk_Init: %s (8MB)", ok ? "OK" : "FAILED");
@@ -353,7 +349,7 @@ bool platform_init(void)
 			boot_log("platform_init: using embedded romfs");
 		} else {
 			boot_log("platform_init: no embedded romfs, trying sdmc fallback");
-			static const u16 ext_path[] = u"/3ds/forsaken/forsaken.romfs";
+			static const char16_t ext_path[] = u"/3ds/forsaken/forsaken.romfs";
 			FS_Path apath = { PATH_EMPTY, 1, (u8*)"" };
 			FS_Path fpath = { PATH_UTF16, sizeof(ext_path), (u8*)ext_path };
 			Handle fh = 0;
@@ -455,8 +451,6 @@ bool platform_init_video(void)
 	 * dsp1 instructions if the blob is missing. Dismissing the screen hands
 	 * the top screen back to citro3d as usual. */
 	{
-		extern bool sound_check_dsp_firmware_available(void);
-		extern void sound_show_missing_firmware_warning(void);
 		if (!sound_check_dsp_firmware_available()) {
 			sound_show_missing_firmware_warning();
 		}
@@ -514,7 +508,6 @@ bool platform_init_video(void)
 
 float platform_get_3d_slider(void)
 {
-	extern float config_get_float(const char *opt, float _default);
 	/* Check for a test override first (useful when testing in Mandarine/Citra
 	 * which may return 0 from osGet3DSliderState).
 	 * Set   stereo_test_slider = 0.5   in Configs/debug.txt.

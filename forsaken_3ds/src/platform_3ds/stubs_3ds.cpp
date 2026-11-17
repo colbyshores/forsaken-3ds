@@ -11,17 +11,21 @@
 #include <string.h>
 #include <sys/time.h>
 #include "game/main.h"
+#include "net/net_tracker.h"
+#include "util/platform.h"
 
 /* ---- net_tracker stubs ---- */
 
-void send_tracker_update(void *data, int size, int flags)
+/* No master-server tracker on 3DS (single player only): net_tracker.h's
+ * interface, doing nothing. */
+void send_tracker_update(char *host, int port)
 {
-	(void)data; (void)size; (void)flags;
+	(void)host; (void)port;
 }
 
-void send_tracker_finished(void *host)
+void send_tracker_finished(char *host, int port)
 {
-	(void)host;
+	(void)host; (void)port;
 }
 
 /* ---- SDL stubs ---- */
@@ -105,7 +109,7 @@ int glob(const char *pattern, int flags,
 
 	if (count == 0) { closedir(dir); return GLOB_NOMATCH; }
 
-	pglob->gl_pathv = malloc((count + 1) * sizeof(char *));
+	pglob->gl_pathv = (char **)malloc((count + 1) * sizeof(char *));
 	if (!pglob->gl_pathv) { closedir(dir); return GLOB_NOSPACE; }
 
 	/* Second pass: collect matches */
@@ -128,7 +132,7 @@ int glob(const char *pattern, int flags,
 		}
 		if (matched) {
 			int pathlen = strlen(dirpath) + strlen(name) + 1;
-			pglob->gl_pathv[idx] = malloc(pathlen);
+			pglob->gl_pathv[idx] = (char *)malloc(pathlen);
 			snprintf(pglob->gl_pathv[idx], pathlen, "%s%s", dirpath, name);
 			idx++;
 		}
@@ -150,16 +154,12 @@ void globfree(glob_t *pglob)
 	pglob->gl_pathc = 0;
 }
 
-/* ---- ftime replacement ---- */
+/* ---- ftime replacement ----
+ * newlib's <sys/timeb.h> declares ftime() and struct timeb but ships no
+ * implementation; util.cpp's DebugPrintf timestamps need one. */
 
 #include <sys/types.h>
-
-struct timeb {
-	time_t time;
-	unsigned short millitm;
-	short timezone;
-	short dstflag;
-};
+#include <sys/timeb.h>
 
 int ftime(struct timeb *tp)
 {

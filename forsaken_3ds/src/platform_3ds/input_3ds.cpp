@@ -27,6 +27,7 @@
 #include <3ds.h>
 #include <string.h>
 #include "game/main.h"
+#include "ui/title.h"
 #include "input/input.h"
 #include "util/util.h"
 #include "platform_3ds/controls_3ds.h"
@@ -165,7 +166,6 @@ bool handle_events(void)
 	 * fall through to update axis/button state but the menu will
 	 * have already absorbed the relevant kDown bits. */
 	{
-		extern bool controls_3ds_handle_input(u32 kDown, u32 kHeld);
 		if (controls_3ds_handle_input(kDown, kHeld)) {
 			/* Menu open — fully suppress input propagation:
 			 *   joy_*: gameplay axes/buttons
@@ -196,7 +196,6 @@ bool handle_events(void)
 		 * the game loop continue to use render/sound/lua resources that
 		 * the teardown just freed. Main loop sees QuitRequested on its
 		 * next iteration and cleanup runs cleanly post-loop. */
-		extern bool QuitRequested;
 		QuitRequested = true;
 		return true;
 	}
@@ -261,7 +260,7 @@ bool handle_events(void)
 	/* ---- inject key presses into input buffer for menu nav ---- */
 	/* B only injects ESCAPE when a menu is open (go back / close).
 	 * During gameplay B is fire secondary (joy button 1). */
-	{extern int _3ds_is_menu_open(void);
+	{
 	int menu_open = _3ds_is_menu_open();
 	if (kDown & KEY_A)
 		input_buffer[input_buffer_count++] = SDLK_RETURN;

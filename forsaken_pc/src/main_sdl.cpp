@@ -4,6 +4,7 @@
 #include "main_sdl.h"
 #include <SDL.h>
 #include "rendering/render.h"
+#include "util/hunk_alloc.h"
 
 
 bool sdl_init( void )
@@ -21,7 +22,6 @@ bool sdl_init( void )
 	 * Linux needs the same call or every Hunk_Alloc returns NULL
 	 * and model loading fails. Same 8 MB size as 3DS. */
 	{
-		extern bool Hunk_Init(size_t);
 		if (!Hunk_Init(8 * 1024 * 1024))
 		{
 			Msg("Failed to initialise hunk allocator\n");

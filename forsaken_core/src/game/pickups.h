@@ -336,6 +336,7 @@ void ProcessFailedKills( void );
 u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID );
 
 /* Defined in pickups.cpp; shared with the modules that use it. */
+bool PreLoadPickups( void );
 extern PICKUP * PickupGroups[ MAXGROUPS ];
 extern int16_t PickupsGot[ MAXPICKUPTYPES ];
 extern u_int16_t CopyOfSeed1;

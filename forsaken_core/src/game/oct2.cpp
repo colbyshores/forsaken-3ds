@@ -68,44 +68,7 @@
 #include "game/skin.h"
 #include "util/xmem.h"
 #include "util/util.h"
-/* C TUs (or C++ TUs with C-linkage definitions); oct2.c relied on
-   block-scope externs, which C++ mangles. Hoisted to file scope. */
-#ifdef __3DS__
-/* main_3ds.c / render_c3d.c / controls_3ds.c are C TUs; oct2.c relied
-   on implicit or block-scope declarations, which C++ mangles. */
-extern "C" {
-void boot_log(const char *msg);
-void c3d_clear_bottom_screen(void);
-void c3d_transfer_eye(unsigned int eye);
-void c3d_upload_xlights(void);
-float platform_get_3d_slider(void);
-bool controls_3ds_menu_is_open(void);
-void controls_3ds_render_overlay(void);
-}
-#endif
-
-extern "C" {
-void trace(const char*);
-void trace_enable(void);
-void ScrPolySetRouteBottom(bool b);
-void InitScrPolys(void);
-bool ScrPolyGetRouteBottom(void);
-void ScrPolySetDisplayMode(int mode);
-void Hunk_FreeAll(int);
-void ScoreSort();
-void input_grab( bool clip );
-void ReleaseView(void);
-void Printint16_t( int16_t num , int x , int y , int col );
-void InitIndirectVisible( u_int16_t g );
-void AddIndirectVisible( u_int16_t g );
-char* GetName(int Player);
-int GetPlayerByRank( int rank );
-int forsaken_get_fps(void);
-bool PreLoadPickups(void);
-bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 );
-bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup );
-int  Print4x5Text(char *Text, int x, int y, int color);
-}
+#include "util/hunk_alloc.h"
 
 void SetCam(int ship, int Cam);
 
@@ -1707,7 +1670,7 @@ extern "C" void ReleaseView(void)
      * is a no-op. */
     {
       
-      Hunk_FreeAll(/*TAG_LEVEL=*/1);
+      Hunk_FreeAll(TAG_LEVEL);
     }
     break;
 
@@ -1762,7 +1725,7 @@ extern "C" void ReleaseView(void)
      * the next PreInitModel — see the title-branch comment for why. */
     {
       
-      Hunk_FreeAll(/*TAG_LEVEL=*/1);
+      Hunk_FreeAll(TAG_LEVEL);
     }
     _RV_TRACE("default DONE");
 #undef _RV_TRACE
@@ -4367,15 +4330,6 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	return true;
 }
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
-extern "C" {
-bool c3d_hud_begin_bottom(void);
-void c3d_hud_end_bottom(void);
-void c3d_clear_bottom_screen(void);
-}
-
-
-#endif
 
 void DrawMainGameMenu(void)
 {

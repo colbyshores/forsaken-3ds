@@ -98,10 +98,10 @@ R2|polys.cpp|SolidPolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|primary.cpp|ProcessPrimaryBullets|float-to-int cast in loop body
-R2|render_c3d.c|GetRealLightAmbientWorldSpace|float-to-int cast in loop body
-R2|render_c3d.c|replay_display_list|float-to-int cast in loop body
-R2|render_c3d.c|replay_display_list|untyped-heuristic: float-to-int cast in loop body
-R2|render_c3d.c|replay_display_list|untyped-heuristic: float-to-int cast in loop body
+R2|render_c3d.cpp|GetRealLightAmbientWorldSpace|float-to-int cast in loop body
+R2|render_c3d.cpp|replay_display_list|float-to-int cast in loop body
+R2|render_c3d.cpp|replay_display_list|untyped-heuristic: float-to-int cast in loop body
+R2|render_c3d.cpp|replay_display_list|untyped-heuristic: float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispSolid|float-to-int cast in loop body
@@ -262,36 +262,36 @@ R7|quat.cpp|FromVector|float division inner_loop=false
 R7|quat.cpp|Inverse|float division inner_loop=false
 R7|quat.cpp|Slerp|float division inner_loop=false
 R7|quat.cpp|Slerp|float division inner_loop=false
-R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
-R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
-R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
-R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
-R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
-R7|render_c3d.c|GetRealLightAmbientWorldSpace|float division in hot loop
-R7|render_c3d.c|GetRealLightAmbientWorldSpace|sqrtf in hot loop
-R7|render_c3d.c|apply_texenv_for_texture|float division inner_loop=false
-R7|render_c3d.c|apply_texenv_for_texture|float division inner_loop=false
-R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.c|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.c|do_water_effect|float division inner_loop=false
-R7|render_c3d.c|do_whiteout_effect|float division inner_loop=false
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|draw_render_object|float division in hot loop
-R7|render_c3d.c|proctex_phase_from_path|float division inner_loop=false
+R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
+R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|sqrtf in hot loop
+R7|render_c3d.cpp|apply_texenv_for_texture|float division inner_loop=false
+R7|render_c3d.cpp|apply_texenv_for_texture|float division inner_loop=false
+R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
+R7|render_c3d.cpp|do_water_effect|float division inner_loop=false
+R7|render_c3d.cpp|do_whiteout_effect|float division inner_loop=false
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|draw_render_object|float division in hot loop
+R7|render_c3d.cpp|proctex_phase_from_path|float division inner_loop=false
 R7|screenpolys.cpp|AddScreenPolyTextScale|float division inner_loop=false
 R7|screenpolys.cpp|AddScreenPolyTextScale|float division inner_loop=false
 R7|screenpolys.cpp|AddScreenPolyText|float division inner_loop=false
