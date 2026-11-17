@@ -74,7 +74,6 @@ float VduScaleX, VduScaleY;
 	FRAME_INFO	*	Multiple_Header = NULL;
 	FRAME_INFO	*	Solid_Header = NULL;
 	FRAME_INFO	*	Thermo_Header = NULL;
-	FRAME_INFO	*	Logos_Header = NULL;
 	FRAME_INFO	*	NMEBullet_Header = NULL;
 	FRAME_INFO	*	BigExp1_Header = NULL;
 	FRAME_INFO	*	Mushroom_Header = NULL;

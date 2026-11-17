@@ -412,61 +412,6 @@ float Random_Range_Float( float Max )
 
 
 
-/*===================================================================
-	Function	:	Quick Distancecalc... 8 % error...
-	Input		:	VECTOR * 
-	Output		:	float
-===================================================================*/
-float	QuickDistance( VECTOR * V )
-{
-	float	Max,Med,Min;
-
-	Max = V->x;
-
-	if( V->y > Max )
-	{
-		Med = Max;
-		Max = V->y;
-	}else{
-		Med = V->y;
-	}
-	if( V->z > Max)
-	{
-		Min = Med;
-		Med = Max;
-		Max = V->z;
-	}else{
-		if(	V->z > Med )
-		{
-			Min = Med;
-			Med = V->z;
-		}else{
-			Min = V->z;
-		}
-	}
-	return( Max + ( Med * 0.34375F ) + ( Min * 0.25F ) ) ;
-}
-/*===================================================================
-	Function	:	Quick Distancecalc... 8 % error...
-	Input		:	float , float
-	Output		:	float
-===================================================================*/
-float	QuickDistance2d( float x , float y )
-{
-	float Min;
-
-	x = (float) fabsf( x );
-	y = (float) fabsf( y );
-
-	if( x > y )
-	{
-		Min = y;
-	}else{
-		Min = x;
-	}
-	return( x + y - ( 0.5f * Min ) );
-}
-
 void MakeViewMatrix(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, MATRIX *view)
 {
 	VECTOR vx, vy, vz;

@@ -373,34 +373,6 @@ int GetBonusStats(int Player)
   Input   :   killer id
   Output    :   total kills achieved by all players on the same team (minuses suicides and 'friendly kills')
 ===================================================================*/
-/* Get A Player's Team's Total Kills */
-int GetTeamKills(int Killer)
-{
-	int x, z;
-	int TeamKills = 0; // total kills team made
-
-	// search all players
-	for(x = 0; x < MAX_PLAYERS; x++)
-	{
-		// found a team mate or myself
-		if(TeamNumber[Killer] == TeamNumber[x])
-		{
-			// search all the players that my team mate or i killed
-			for(z = 0; z < MAX_PLAYERS; z++)
-			{
-				// add kills
-				if(x!=z && TeamNumber[x] != TeamNumber[z])
-					TeamKills += GetKillStats(x,z);
-				// minus suicides and friendly kills
-				else
-					TeamKills -= GetKillStats(x,z);
-			}
-		}
-	}
-
-	return TeamKills;
-}
-
 /*===================================================================
   Procedure :   Get Team Score (includes kills)...
   Input   :   killer id
@@ -593,21 +565,6 @@ int GetFriendlyKills( int Player )
 int GetSuicides( int Player )
 {
 	return GetKillStats( Player, Player );
-}
-
-// positives points / negatives points
-int GetEffeciency( int Player )
-{
-	// positive points == + kills - suacides - friendly
-	float positives = (float)GetKills(Player);
-	// negative points == + deaths + suicides + friendly
-	float negatives = (float)(GetTotalDeaths(Player)+GetFriendlyKills(Player));
-	// worst possible case
-	if(!positives) return 0;
-	// perfection
-	if(!negatives) return 100;
-	// calculate percentage
-	return (int)(positives / (positives + negatives) * 100.0F);
 }
 
 int player_left( int player )

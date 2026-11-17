@@ -25,51 +25,9 @@
 bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_point_ptr );
 
 BSP_HEADER Bsp_Header[ 2 ];
-float ColRad;
 																   
 BSP_NODE *	BSP_Nodes[256];
 BSP_PORTAL_HEADER Bsp_Portal_Header = { false, 0, {} };
-
-bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup )
-{
-	int j;
-	BSP_TREE *srctree, *duptree;
-
-	dup->State = src->State;
-	dup->NumGroups = src->NumGroups;
-	for ( j = 0; j < src->NumGroups; j++ )
-	{
-		srctree = &src->Bsp_Tree[ j ];
-		duptree = &dup->Bsp_Tree[ j ];
-		duptree->NumNodes = srctree->NumNodes;
-		duptree->Root = (BSP_NODE *) calloc( srctree->NumNodes, sizeof( BSP_NODE ) );
-		if ( !duptree->Root )
-			return false;
-		memmove( duptree->Root, srctree->Root, srctree->NumNodes * sizeof( BSP_NODE ) );//memcpy
-	}
-	return true;
-}
-
-bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 )
-{
-	int j;
-	BSP_TREE *b1tree, *b2tree;
-
-	if ( b1->State != b2->State )
-		return false;
-	if ( b1->NumGroups != b2->NumGroups )
-		return false;
-	for ( j = 0; j < b1->NumGroups; j++ )
-	{
-		b1tree = &b1->Bsp_Tree[ j ];
-		b2tree = &b2->Bsp_Tree[ j ];
-		if ( b1tree->NumNodes != b2tree->NumNodes )
-			return false;
-		if ( memcmp( b1tree->Root, b2tree->Root, b1tree->NumNodes * sizeof( BSP_NODE ) ) )
-			return false;
-	}
-	return true;
-}
 
 
 static bool BSP_Loadtree( BSP_TREE *t, char **Buffer )
@@ -363,9 +321,7 @@ void Bspfree( void )
 static VECTOR RayPos;
 static VECTOR RayDir;
 static float RayLength;
-float	Trick;
 bool Collided;
-float CollideDist;
 VECTOR CollidePoint;
 BSP_NODE *CollideNode;
 BSP_NODE *OldCollideNode;

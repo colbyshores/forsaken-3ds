@@ -453,7 +453,6 @@ static bool s_isOrthoDraw      = false;
  * 3D-space sprites that *aren't* orthographic but still shouldn't get
  * wall grain. */
 static bool s_skipAuxProcTex   = false;
-void c3d_set_skip_aux_proctex(bool enable) { s_skipAuxProcTex = enable; }
 
 /* Phase 4 of wall-normal-detail-mapping: track the last TexEnv mode
  * so we can re-init when transitioning between single-stage (legacy
@@ -1398,14 +1397,6 @@ const char *render_error_description(int e)
 }
 
 /*===================================================================
-	Render mode
-===================================================================*/
-
-void render_mode_wireframe(void) { /* no wireframe on PICA200 */ }
-void render_mode_points(void) { /* no point mode on PICA200 */ }
-void render_mode_fill(void) { /* always fill on PICA200 */ }
-
-/*===================================================================
 	Scene begin / end
 ===================================================================*/
 
@@ -1527,14 +1518,6 @@ void disable_zbuff(void)
 void cull_none(void)
 {
 	C3D_CullFace(GPU_CULL_NONE);
-}
-
-void cull_cw(void)
-{
-	/* Game uses CW front faces (D3D convention).
-	 * PICA200 has CCW-front only. CW = "our front" = PICA200's back.
-	 * Culling CW (game's request) means cull PICA200's back faces. */
-	C3D_CullFace(GPU_CULL_BACK_CCW);
 }
 
 void reset_cull(void)
@@ -1804,11 +1787,6 @@ bool FSCreateNormalBuffer(RENDEROBJECT *renderObject, int numNormals)
 {
 	renderObject->lpNormalBuffer = linearAlloc(numNormals * sizeof(NORMAL));
 	return renderObject->lpNormalBuffer != NULL;
-}
-
-bool FSCreateDynamicNormalBuffer(RENDEROBJECT *renderObject, int numNormals)
-{
-	return FSCreateNormalBuffer(renderObject, numNormals);
 }
 
 bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
@@ -2653,45 +2631,6 @@ NEXT_LIGHT:
 
 #define MIX_COLOR_BLEND_LIGHT(COLOR, BLEND, LIGHT) \
 	ADD(COLOR, LIGHT); MINUS(COLOR, BLEND)
-
-void light_vert(LVERTEX *vert, u_int8_t *color)
-{
-	int tmp;
-	float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
-	VECTOR world, v = { vert->x, vert->y, vert->z };
-	MxV(&world_matrix, &v, &world);
-	if (render_lighting_env_whiteout)
-		do_whiteout_effect(&world, (COLOR *)color);
-	else if (render_lighting_env_water)
-		do_water_effect(&world, (COLOR *)color);
-#ifndef LIGHT_EVERYTHING
-	if (render_lighting_enabled)
-#endif
-		GetRealLightAmbientWorldSpace(&world, &r, &g, &b, &a);
-	if (render_lighting_use_only_light_color)
-	{
-		color[0] = b;
-		color[1] = g;
-		color[2] = r;
-		color[3] = a;
-	}
-	else if (render_lighting_use_only_light_color_and_blend)
-	{
-		color[0] = b;
-		color[1] = g;
-		color[2] = r;
-		color[3] = a;
-		ADD(color[0], render_color_blend_blue);
-		ADD(color[1], render_color_blend_green);
-		ADD(color[2], render_color_blend_red);
-	}
-	else
-	{
-		MIX_COLOR_BLEND_LIGHT(color[0], render_color_blend_blue,  b);
-		MIX_COLOR_BLEND_LIGHT(color[1], render_color_blend_green, g);
-		MIX_COLOR_BLEND_LIGHT(color[2], render_color_blend_red,   r);
-	}
-}
 
 /*===================================================================
 	Draw functions — native citro3d path

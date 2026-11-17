@@ -102,5 +102,3 @@ void Hunk_Shutdown(void) { g_hunk.shutdown(); }
 void *Hunk_Alloc(HunkTag tag, size_t size) { return g_hunk.alloc(tag, size); }
 void Hunk_FreeAll(HunkTag tag) { g_hunk.free_all(tag); }
 size_t Hunk_Used(HunkTag tag) { return g_hunk.used(tag); }
-size_t Hunk_Available(void) { return g_hunk.available(); }
-size_t Hunk_Total(void) { return g_hunk.total; }

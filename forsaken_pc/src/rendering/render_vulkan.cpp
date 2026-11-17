@@ -581,9 +581,6 @@ bool render_mode_select(render_info_t *info)
 }
 void render_set_filter(bool r, bool g, bool b) { (void)r; (void)g; (void)b; }
 const char *render_error_description(int e) { (void)e; return NULL; }
-void render_mode_wireframe(void) {}
-void render_mode_points(void) {}
-void render_mode_fill(void) {}
 
 static u_int8_t gamma_table[256];
 void build_gamma_table(double gamma)
@@ -604,7 +601,6 @@ void reset_zbuff(void) { s_depth_test = true; s_depth_write = true; }
 void disable_zbuff_write(void) { s_depth_write = false; }
 void disable_zbuff(void) { s_depth_test = false; }
 void cull_none(void) { s_cull = CULL_OFF; }
-void cull_cw(void) { s_cull = CULL_FRONT; }
 void reset_cull(void) { s_cull = CULL_BACK; }
 
 /* ---- matrices ---- */
@@ -734,7 +730,6 @@ bool FSCreateVertexBuffer(RENDEROBJECT *ro, int n) { ro->lpVertexBuffer = (LPVER
 bool FSCreateDynamicVertexBuffer(RENDEROBJECT *ro, int n) { return FSCreateVertexBuffer(ro, n); }
 bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *ro, int n) { ro->lpVertexBuffer = (LPVERTEXBUFFER)vkbuf_create((VkDeviceSize)n * sizeof(TLVERTEX), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
 bool FSCreateNormalBuffer(RENDEROBJECT *ro, int n) { ro->lpNormalBuffer = (LPVERTEXBUFFER)vkbuf_create((VkDeviceSize)n * sizeof(NORMAL), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
-bool FSCreateDynamicNormalBuffer(RENDEROBJECT *ro, int n) { return FSCreateNormalBuffer(ro, n); }
 bool FSCreateIndexBuffer(RENDEROBJECT *ro, int n) { ro->lpIndexBuffer = (LPVERTEXBUFFER)vkbuf_create((VkDeviceSize)n * 3 * sizeof(WORD), VK_BUFFER_USAGE_INDEX_BUFFER_BIT); return true; }
 bool FSCreateDynamicIndexBuffer(RENDEROBJECT *ro, int n) { return FSCreateIndexBuffer(ro, n); }
 

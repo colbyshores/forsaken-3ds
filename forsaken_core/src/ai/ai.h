@@ -248,14 +248,12 @@ void AI_SetMOVETOTARGET( ENEMY * Enemy );
 void AI_SetFIREATTARGET( ENEMY * Enemy );
 void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos );
 void AI_GetNearestNODETarget( OBJECT * Object );
-void AI_SetMOVEFOLLOWPATH( ENEMY * Enemy );
 void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * NewPos , float SpeedOfBullet );
 void AI_SetFOLLOWPATH( register ENEMY * Enemy );
 void AI_SetDOGFIGHT( register ENEMY * Enemy );
 void AI_SetKILLMINE( register ENEMY * Enemy );
 void AI_GetNearestMINETarget( void );
 void AI_SetRETREAT( register ENEMY * Enemy );
-void AI_SetFORMATION( ENEMY * Enemy );
 
 // AIMAIN.C
 void AI_AIR( ENEMY * Enemy );

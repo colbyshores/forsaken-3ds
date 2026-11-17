@@ -62,7 +62,6 @@ void ProcessRestartPoints( void );
 void SetupRestartPointGroups( void );
 void AddRestartPointToGroup( RESTART * Object, u_int16_t Group );
 void RemoveRestartPointFromGroup( RESTART * Object, u_int16_t Group );
-void MoveRestartPointToGroup( RESTART * Object, u_int16_t OldGroup, u_int16_t NewGroup );
 void ActivateRestartPoint( u_int16_t NewStartPos, u_int16_t OldStartPos );
 FILE * SaveStartRestartPoints( FILE * fp );
 FILE * LoadStartRestartPoints( FILE * fp );

@@ -459,30 +459,10 @@ void AI_SetMOVETOTARGET( ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_SetMOVEFOLLOWPATH( ENEMY * Enemy )
-{
-	Enemy->Object.AI_Mode = AIMODE_FOLLOWPATH;
-	Enemy->Timer  = RESET_VALIDATE_TIME + (float) Random_Range( (u_int16_t) RESET_VALIDATE_TIME );
-}
-/*===================================================================
-	Procedure	:	Set Enemy AI Mode to...
-	Input		:	ENEMY * Enemy
-	Output		:	Nothing
-===================================================================*/
 void AI_SetDOGFIGHT( ENEMY * Enemy )
 {
 	Enemy->TNode = NULL;
 	Enemy->Object.AI_Mode = AIMODE_DOGFIGHT;
-	Enemy->Timer  = RESET_VALIDATE_TIME + (float) Random_Range( (u_int16_t) RESET_VALIDATE_TIME );
-}
-/*===================================================================
-	Procedure	:	Set Enemy AI Mode to...
-	Input		:	ENEMY * Enemy
-	Output		:	Nothing
-===================================================================*/
-void AI_SetFORMATION( ENEMY * Enemy )
-{
-	Enemy->Object.AI_Mode = AIMODE_FORMATION;
 	Enemy->Timer  = RESET_VALIDATE_TIME + (float) Random_Range( (u_int16_t) RESET_VALIDATE_TIME );
 }
 /*===================================================================

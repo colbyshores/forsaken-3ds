@@ -58,9 +58,6 @@ bool IpOnCLI = false;
 int						TeamMembers[MAX_TEAMS];
 
 MENU  *				GetPlayerNumMenu;
-float	Bodge	= 1.0F;
-
-bool	Modem2Modem = false;
 
 u_int16_t	RandomStartPosModify = 0;							
 

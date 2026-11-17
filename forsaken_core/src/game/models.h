@@ -591,7 +591,6 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF );
 bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range );
 void CreateExplosionDonut( VECTOR * Pos, VECTOR * Up, u_int16_t Group );
 bool ReleaseTitleModels( );
-bool TintMxaModel( MXALOADHEADER * DstMloadheader, float RF, float GF, float BF, float TF );
 bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, int A , float r , float g , float b);
 bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, int A , float rp , float gp , float bp);
 void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t WeaponType, u_int8_t Weapon );
@@ -619,7 +618,6 @@ bool ReinitSpotFXSFX( u_int16_t i );
 void SetShipsVisibleFlag( void );
 void EnableRelavantModels( MODELNAME * ModelNamesPtr );
 void KillAttachedSpotFX( u_int16_t i );
-void KillAllBikeEngines( void );
 bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner );
 
 /* Per-camera model-visibility memo invalidation. Defined in models.c for

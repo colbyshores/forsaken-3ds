@@ -71,26 +71,10 @@ int		NumOfVertsConsidered= 0;
 int		NumOfVertsTouched= 0;
 
 u_int16_t	GroupImIn;
-/* bjd - CHECK
-D3DTRANSFORMDATA Data;
-*/
-DWORD VertexCount = 0;
-DWORD Offscreen = 0;
-VERT TestVerts[MAXPORTVERTS];
-VISPOLVERTEX	VisVerts[MAXPORTVERTS];
 u_int16_t	CurrentGroupVisible;						// the real group thats visible
 u_int16_t	GroupInVisibleList;							// where it is in the visibility list
 u_int16_t	NumGroupsVisible;
 u_int16_t	GroupsVisible[MAXGROUPS];
-XYRECT	GroupVisibleExtents[MAXGROUPS];
-u_int16_t	NumPortalsVisible;
-u_int16_t	PortalsVisible[MAXPORTALSPERGROUP];
-XYRECT	PortalExtents[MAXGROUPS];
-MATRIX	VisPolyMatrix = {
-				1.0F, 0.0F, 0.0F, 0.0F,
-				0.0F, 1.0F, 0.0F, 0.0F,
-				0.0F, 0.0F, 1.0F, 0.0F,
-				0.0F, 0.0F, 0.0F, 1.0F };
 u_int16_t	IsGroupVisible[MAXGROUPS];
 
 struct
@@ -286,21 +270,6 @@ bool GroupsAreConnected( u_int16_t g1, u_int16_t g2 )
 bool GroupsAreVisible( u_int16_t g1, u_int16_t g2 )
 {
 	return AreGroupsRelated( &VisibleGroup, g1, g2 );
-}
-
-
-bool GroupsAreIndirectVisible( u_int16_t g1, u_int16_t g2 )
-{
-	if ( IndirectVisibleGroup.table )
-		return AreGroupsRelated( &IndirectVisibleGroup, g1, g2 );
-	else
-	{
-		static int failed = 0;
-
-		if ( !failed++ )
-			Msg( "No IndirectVisible table loaded\n" );
-		return false;
-	}
 }
 
 bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
@@ -583,11 +552,6 @@ void FreeGroupConnections( void )
 	}
 }
 
-GROUPLIST *ConnectedGroups( u_int16_t g )
-{
-	return &ConnectedGroup.list[ g ];
-}
-
 GROUPLIST *VisibleGroups( u_int16_t g )
 {
 	if( g >= Mloadheader.num_groups )
@@ -600,12 +564,6 @@ GROUPLIST *VisibleGroups( u_int16_t g )
 		Msg( "VisibleGroups.list[%d].group Invalid", g );
 
 	return &VisibleGroup.list[ g ];
-}
-
-
-GROUPLIST *IndirectVisibleGroups( u_int16_t g )
-{
-	return &IndirectVisibleGroup.list[ g ];
 }
 
 int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group )
@@ -1383,36 +1341,6 @@ FindClipGroup( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max )
 	return group;
 }
 
-
-u_int16_t FindOverlappingVisibleGroups( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max, u_int16_t * group )
-{
-	VISGROUP *vg;
-	LVLGROUP *mg;
-	u_int16_t in_groups;
-
-	if ( outside_map )
-		return 0;
-
-	// find extent of visible groups overlapped by object's bounds
-	in_groups = 0;
-	for ( vg = cam->visible.first_visible; vg; vg = vg->next_visible )
-	{
-		mg = &m->Group[ vg->group ];
-		if ( min->x <= mg->center.x + mg->half_size.x &&
-			 min->y <= mg->center.y + mg->half_size.y &&
-			 min->z <= mg->center.z + mg->half_size.z &&
-			 max->x >= mg->center.x - mg->half_size.x &&
-			 max->y >= mg->center.y - mg->half_size.y &&
-			 max->z >= mg->center.z - mg->half_size.z )
-		{
-			if ( group )
-				group[ in_groups ] = vg->group;
-			in_groups++;
-		}
-	}
-
-	return in_groups;
-}
 
 /*===================================================================
 	Procedure	:	Is point inside bounding box of group

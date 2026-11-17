@@ -49,28 +49,3 @@ char *DemoFileName( char *demoname )
 
 	return filename;
 }
-
-char *DemoName( char *demofilename )
-{
-	static char demoname[ MAX_DEMONAME_LENGTH + 4 ];
-	char *dmo;
-	int offset;
-
-	offset = strstr( demofilename, DEMOFOLDER ) ? strlen( DEMOFOLDER ) + 1 : 0;
-	strncpy( demoname, demofilename + offset, sizeof( demoname ) - 1 );
-	demoname[ sizeof( demoname ) - 1 ] = 0;
-	strtoupper( demoname );
-	dmo = strstr( demoname, DEMOFILE_EXTENSION );
-	if ( dmo )
-		*dmo = 0;
-
-	return demoname;
-}
-
-void StartDemoCleaning( MENUITEM * Item )
-{
-}
-
-void StartDemoPlayback( MENUITEM * Item )
-{
-}

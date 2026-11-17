@@ -302,10 +302,6 @@ FILE * LoadAllPickups( FILE * fp );
 void KillAllPickupsOfType( u_int16_t Type, int16_t Style );
 
 void PickupModelValid( void );
-void CheckPickupAllPlayers( void );
-bool ActuallyCollectPickup( u_int16_t i );
-bool PretendCollectPickup( u_int16_t i );
-void CorrectForExtraOrMissingPickups( void );
 void CountMinesInLevel( void );
 void KillAllPickupsOfTypeAndSend( u_int16_t Type, int16_t Style );
 

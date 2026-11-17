@@ -84,12 +84,10 @@ void InitMultiSfxHandle( void );
 
 // force ship to move
 void ForceExternal( u_int16_t ship, VECTOR *force );
-void ForceInternal( u_int16_t ship, VECTOR *force );
 void ForceExternalOneOff( u_int16_t ship, VECTOR *force );
 void ForceInternalOneOff( u_int16_t ship, VECTOR *force );
 
 void StartShipScreenShake( float Force );
-void StopShipScreenShake( void );
 
 // force ship to rotate
 void RotateExternal( u_int16_t ship, VECTOR *point, VECTOR *dir, float force );

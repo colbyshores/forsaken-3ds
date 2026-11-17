@@ -10,10 +10,6 @@
 #define DEMOFILE_SEARCHPATH		DEMOFOLDER"\\*"DEMOFILE_EXTENSION
 
 char *DemoFileName( char *demoname );
-char *DemoName( char *demofilename );
-
-void StartDemoCleaning( MENUITEM * Item );
-void StartDemoPlayback( MENUITEM * Item );
 
 /* Defined in demo.cpp; shared with the modules that use it. */
 extern FILE * DemoFp;

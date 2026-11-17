@@ -226,17 +226,12 @@ bool	PointToSphere(	VERT * TargPos, float TargRadius, VERT * BulPos );
 void	CreateExplosion( VECTOR * Pos, u_int16_t Group );
 void	CreateSmallExplosion( VECTOR * Pos, u_int16_t Group );
 void	CreateSingleExplosion( VECTOR * Pos, u_int16_t Group );
-void	CreateShipExplosion( VECTOR * Pos, u_int16_t Group );
 void	CreateTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateBloodTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateBloodSplat( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateSolarisTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateNewTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
-void	InitLinkList( void );
-ENTRY *	FindFreeLink( void );
-void	FreeLink( ENTRY * Entry );
-void	DispSecAmmoLevels( void );
 void	CreateGravgonField( u_int16_t i );
 void	CreateShockwave( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int16_t Group, float ShockwaveSize, BYTE Weapon );
 void	ExplodeSecondary( VECTOR * Pos, u_int16_t Group, u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize );
@@ -276,7 +271,6 @@ void	CreateSmokeRing( VECTOR * Pos, VECTOR * DirVector, VECTOR * UpVector, u_int
 u_int16_t	TargetClosestEnemy( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t MeType, u_int16_t Me, float ViewConeCos, float * ClosestCos );
 u_int16_t	TargetClosestSecondary( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t MeType, u_int16_t Me, float ViewConeCos, float * ClosestCos );
 bool	CheckProximityToShips( VECTOR * Pos, u_int16_t Group, float Radius, u_int16_t OwnerType, u_int16_t Owner );
-bool	CheckProximityToEnemies( VECTOR * Pos, u_int16_t Group, float Radius, u_int16_t OwnerType, u_int16_t Owner );
 u_int16_t	GetClosestEnemy( VECTOR * Pos, u_int16_t Group, float * Radius, u_int16_t OwnerType, u_int16_t Owner );
 void	CreateBigExplosion( VECTOR * Pos, u_int16_t Group );
 void	CreateSplash( VECTOR * Pos, VECTOR * DirVector, u_int16_t Group );
@@ -296,7 +290,6 @@ u_int8_t GetPrevValidSecondaryWeapon( void );
 int8_t ConvSecToNormWeapon( int8_t Secondary );
 void ToggleSecondaryWeapons( int8_t Secondary );
 
-void ScatterWeaponsForShip( u_int16_t Ship, VECTOR * Dir, int16_t MaxPickupsAllowed );
 int16_t HostGenerateSecondaryPickups( u_int16_t Ship, int16_t NumAllowed );
 
 /* Defined in secondary.cpp; shared with the modules that use it. */

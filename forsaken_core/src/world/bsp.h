@@ -90,8 +90,6 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 
 bool PointInsideSkin( VECTOR *Pos, u_int16_t Group );
 /* Defined in bsp.cpp; shared with the modules that use it. */
-bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 );
-bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup );
 extern BSP_NODE * BSP_Nodes[ 256 ];
 extern float CollisionRadius;
 bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node);

@@ -132,22 +132,6 @@ void music_play(int track)
     s_playing = true;
 }
 
-bool music_is_playing(void)
-{
-    if (!s_playing || !s_source) return false;
-    ALint state = 0;
-    alGetSourcei(s_source, AL_SOURCE_STATE, &state);
-    return state == AL_PLAYING;
-}
-
-void music_set_volume(float vol)
-{
-    if (vol < 0.0f) vol = 0.0f;
-    if (vol > 1.0f) vol = 1.0f;
-    s_volume = vol;
-    if (s_source) alSourcef(s_source, AL_GAIN, vol);
-}
-
 void music_play_for_level(int level_num)
 {
     if (level_num < 0) return;
@@ -163,8 +147,6 @@ bool music_init(void) { return false; }
 void music_shutdown(void) {}
 void music_play(int track) { (void)track; }
 void music_stop(void) {}
-bool music_is_playing(void) { return false; }
-void music_set_volume(float vol) { (void)vol; }
 void music_play_for_level(int level_num) { (void)level_num; }
 void music_play_title(void) {}
 void music_update(void) {}

@@ -29,17 +29,6 @@
 /*===================================================================
 		Globals...	
 ===================================================================*/
-COLOR GroupColours[ 8 ] = {
-
-	RGBA_MAKE( 0,128,0,255 ),
-	RGBA_MAKE( 0,0,128,255 ),
-	RGBA_MAKE( 0,128,128,255 ),
-	RGBA_MAKE( 128,128,0,255 ),
-	RGBA_MAKE( 128,0,128,255 ),
-	RGBA_MAKE( 128,128,128,255 ),
-	RGBA_MAKE( 64,128,64,255 ),
-	RGBA_MAKE( 128,64,64,255 )
-};
 
 XLIGHT * FirstLightVisible = NULL;
 XLIGHT	XLights[MAXXLIGHTS];
@@ -47,7 +36,6 @@ u_int16_t	FirstXLightUsed;
 u_int16_t	FirstXLightFree;
 
 WORD	status;		
-DWORD	chop_status;		
 
 /*===================================================================
 	Floating Point Cull Mode

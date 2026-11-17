@@ -862,82 +862,6 @@ int AnyKeyReleased( void )
   return 0;
 }
 
-int WhichMousePressed( void )
-{
-  int k;
-  int key;
-
-  key = 0;
-  for ( k = 0; k < MAX_MOUSE_BUTTONS; k++ )
-  {
-    if ( MOUSE_BUTTON_PRESSED( k ) )
-    {
-      if ( !key )
-        key = LEFT_MOUSE + k;
-      else
-        return 0;
-    }
-  }
-  if ( MOUSE_WHEEL_UP_PRESSED() )
-  {
-    if ( !key )
-      key = UP_MOUSE;
-    else
-      return 0;
-  }
-  if ( MOUSE_WHEEL_DOWN_PRESSED() )
-  {
-    if ( !key )
-      key = DOWN_MOUSE;
-    else
-      return 0;
-  }
-
-  return key;
-}
-
-int WhichJoystickPressed( void )
-{
-  int key = 0;
-
-  int k;
-
-  for ( k = 0; k < Num_Joysticks; k++ )
-  {
-    if ( JoystickInfo[ k ].connected )
-    {
-      int b, p, d;
-
-      for ( b = 0; b < JoystickInfo[ k ].NumButtons; b++ )
-      {
-        if ( JOYSTICK_BUTTON_PRESSED( k, b ) )
-        {
-          if ( !key )
-            key = JOYSTICK_BUTTON_KEYCODE( k, b );
-          else
-            return 0;
-        }
-      }
-
-      for ( p = 0; p < JoystickInfo[ k ].NumPOVs; p++ )
-      {
-        for ( d = 0; d < MAX_POV_DIRECTIONS; d++ )
-        {
-          if ( JOYSTICK_POV_PRESSED( k, p, d ) )
-          {
-            if ( !key )
-              key = JOYSTICK_POVDIR_KEYCODE( k, p, d );
-            else
-              return 0;
-          }
-        }
-      }
-    }
-  }
-
-  return key;
-}
-
 void DoShipAction( SHIPCONTROL *ctrl, int Action, float amount )
 {
   switch (Action)
@@ -1107,26 +1031,6 @@ bool IsJoystickButtonReleased( int joysticknum )
     }
   }
 
-  return( false );
-}
-
-/*===================================================================
-  Procedure : Check if any buttons of a any connected joystick
-        : are pressed
-  Input   : Nothing
-  Output    : bool    true/false
-===================================================================*/
-bool IsAnyJoystickButtonPressed( void )
-{
-  int joystick;
-
-  for (joystick = 0; joystick < Num_Joysticks; joystick++)
-  {
-    if( IsJoystickButtonPressed( joystick ) )
-    {
-      return( true );
-    }
-  }
   return( false );
 }
 

@@ -755,58 +755,6 @@ SPOTFX * FindFreeSpotFX( void )
 }
 
 /*===================================================================
-	Procedure	:	Kill an SpotFX
-	Input		:	SPOTFX	*	Object
-	Output		:	nothing
-===================================================================*/
-void KillUsedSpotFX( SPOTFX * Object )
-{
-	SPOTFX	*	PrevObject;
-	SPOTFX	*	NextObject;
-
-	if( Object != NULL )
-	{
-		RemoveSpotFXFromGroup( Object, Object->Group );
-
-		if( Object == FirstSpotFXUsed )
-		{
-			NextObject = FirstSpotFXUsed->NextUsed;
-
-			FirstSpotFXUsed = NextObject;
-
-			if( FirstSpotFXUsed != NULL )
-			{
-				FirstSpotFXUsed->PrevUsed = NULL;
-			}
-		}
-		else
-		{
-			PrevObject = Object->PrevUsed;
-			NextObject = Object->NextUsed;
-
-			if( PrevObject != NULL )
-			{
-				PrevObject->NextUsed = NextObject;
-			}
-
-			if( NextObject != NULL )
-			{
-				NextObject->PrevUsed = PrevObject;
-			}
-		}
-
-		if( FirstSpotFXFree != NULL )
-		{
-			FirstSpotFXFree->PrevFree = Object;
-		}
-
-		Object->NextFree = FirstSpotFXFree;
-		Object->PrevFree = NULL;
-		FirstSpotFXFree = Object;
-	}
-}
-
-/*===================================================================
 	Procedure	:	Create SpotFX Steam
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
@@ -1532,37 +1480,6 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 				return;
 			}
 		}
-	}
-}
-
-/*===================================================================
-	Procedure	:	Create SpotFX Rock Shrapnel Explosion
-	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
-				:	float		Speed
-				:	u_int16_t		Group
-	Output		:	Nothing
-===================================================================*/
-void CreateSpotFXRockShrapnel( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
-{
-	int16_t	NumBits;
-	int16_t	Count;
-	float	Speed;
-	VECTOR	DirVector;
-
-	CreateSpotFXExplosion( Pos, Dir, Group );
-
-	NumBits = ( Random_Range( 4 ) + 3 );
-		
-	for( Count = 0; Count < NumBits; Count++ )
-	{
-		Speed = ( ( (float) Random_Range( 10000 ) ) / 1500.0F ) + 2.0F;
-		DirVector.x = Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		DirVector.y = Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		DirVector.z = Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		NormaliseVector( &DirVector );
-
-		CreateSmallShrapnelBit( Pos, &DirVector, Speed, Group, (u_int16_t) ( MODEL_Rock + Random_Range( 2 ) ) );
 	}
 }
 
@@ -2376,19 +2293,6 @@ void RemoveSpotFXFromGroup( SPOTFX * SpotFX, u_int16_t Group )
 	SpotFX->PrevInGroup = NULL;
 	SpotFX->NextInGroup = NULL;
 	NumSpotFXPerGroup[ Group ]--;
-}
-
-/*===================================================================
-	Procedure	:	Move SpotFX from 1 group to another
-	Input		:	SpotFX	*	SpotFX
-				:	u_int16_t		OldGroup
-				:	u_int16_t		NewGroup
-	Output		:	Nothing
-===================================================================*/
-void MoveSpotFXToGroup( SPOTFX * SpotFX, u_int16_t OldGroup, u_int16_t NewGroup )
-{
-	RemoveSpotFXFromGroup( SpotFX, OldGroup );
-	AddSpotFXToGroup( SpotFX, NewGroup );
 }
 
 /*===================================================================

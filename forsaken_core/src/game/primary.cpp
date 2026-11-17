@@ -3346,56 +3346,6 @@ void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Create Mushroom Explosion
-	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
-				:	u_int16_t		Group
-	Output		:	Nothing
-===================================================================*/
-void CreateMushroomExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
-{
-	u_int16_t	fmpoly;
-	VECTOR	TempUpVector;
-
-	if( IsGroupVisible[ Group ] )
-	{
-	   	fmpoly = FindFreeFmPoly();
-	
-	   	if( fmpoly != (u_int16_t ) -1 )
-	   	{
-			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].SeqNum = FM_MUSHROOM;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Mushroom_Header;
-	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
-			FmPolys[ fmpoly ].Trans = 255;
-#endif
-	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
-			FmPolys[ fmpoly ].R = 255;
-			FmPolys[ fmpoly ].G = 255;
-			FmPolys[ fmpoly ].B = 255;
-	   		FmPolys[ fmpoly ].Speed = 0.0F;
-			FmPolys[ fmpoly ].Rot = 0.0F;
-			FmPolys[ fmpoly ].xsize = 8.0F;
-			FmPolys[ fmpoly ].ysize = 8.0F;
-			FmPolys[ fmpoly ].Group = Group;
-			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
-	}
-
-	TempUpVector.x = 0.0F;
-	TempUpVector.y = 1.0F;
-	TempUpVector.z = 0.0F;
-	CreateSmokeRing( Pos, Dir, &TempUpVector, Group );
-}
-
-/*===================================================================
 	Procedure	:	Create New Explosion
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
@@ -5323,50 +5273,6 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 /*===================================================================
 	Procedure	:	Create Explosion
 	Input		:	VECTOR	*	Position
-				:	u_int16_t		Group
-	Output		:	Nothing
-===================================================================*/
-void CreateFireExplosion( VECTOR * Pos, u_int16_t Group )
-{
-	u_int16_t	fmpoly;
-
-	if( IsGroupVisible[ Group ] )
-	{
-	   	fmpoly = FindFreeFmPoly();
-	
-	   	if( fmpoly != (u_int16_t ) -1 )
-	   	{
-			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].SeqNum = FM_ANIM2;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Exp2_Header;
-	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
-			FmPolys[ fmpoly ].Trans = 255;
-#endif
-	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
-			FmPolys[ fmpoly ].R = 255;
-			FmPolys[ fmpoly ].G = 255;
-			FmPolys[ fmpoly ].B = 255;
-			FmPolys[ fmpoly ].Speed = 0.0F;
-			FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
-			FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
-			FmPolys[ fmpoly ].xsize = NORM_EXPLO_SIZE;
-			FmPolys[ fmpoly ].ysize = NORM_EXPLO_SIZE;
-			FmPolys[ fmpoly ].Group = Group;
-			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
-	}
-}
-
-/*===================================================================
-	Procedure	:	Create Explosion
-	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 	Output		:	Nothing
@@ -6590,99 +6496,6 @@ void CreateTransTrail( u_int16_t i )
 }
 
 /*===================================================================
-	Procedure	:	Display Power Level
-	Input		:	Nothing
-	Output		:	Nothing
-===================================================================*/
-void DispPowerLevel( void )
-{
-	int16_t	Steps=0, Count;
-	int16_t	x, y;
-
-	x = ((int16_t)render_info.window_size.cx / 2 ) - ( 16 * 4 );
-	y = (int16_t)render_info.window_size.cy - ( (int16_t)render_info.window_size.cy / 5 ) + 6;
-
-	switch( Ships[ WhoIAm ].Primary )
-	{
-		case PULSAR:
-		case TROJAX:
-		case TRANSPULSE_CANNON:
-		case LASER:
-			Steps = (int16_t) ( ( GeneralAmmo + ( MAXGENERALAMMO / 10.0F ) - 1.0F ) / ( MAXGENERALAMMO / 10.0F ) );
-			break;
-
-		case SUSS_GUN:
-			Steps = (int16_t) ( ( SussGunAmmo + ( MAXSUSSGUNAMMO / 10.0F ) - 1.0F ) / ( MAXSUSSGUNAMMO / 10.0F ) );
-			break;
-
-		case PYROLITE_RIFLE:
-			Steps = (int16_t) ( ( PyroliteAmmo + ( MAXPYROLITEAMMO / 10.0F ) - 1.0F ) / ( MAXPYROLITEAMMO / 10.0F ) );
-			break;
-	}
-
-	/* Defensive bounds check on the array index.  Ships[WhoIAm].Primary
-	 * is a BYTE (0..255) and the engine clamps it to 0..MAXPRIMARYWEAPONS-1
-	 * via GetNext/PrevValidPrimaryWeapon() at every assignment, but GCC's
-	 * value-range analyzer can't prove that across functions and emits an
-	 * array-bounds warning here.  Explicit bound makes the invariant
-	 * visible to both compiler and reader; the compare costs nothing
-	 * compared to the HUD render that follows. */
-	u_int8_t prim = Ships[ WhoIAm ].Primary;
-	if( prim < MAXPRIMARYWEAPONS && PrimaryWeaponsGot[ prim ] )
-	{
-		if( Steps != 0 )
-		{
-			if( Steps > 10 ) Steps = 10;
-
-			for( Count = 0; Count < Steps; Count++ )
-			{
-				PowerString[ Count ] = 'O';
-			}
-			PowerString[ Steps ] = 0;
-			Print4x5Text( (char*)&PowerString[ 0 ], x, y, 2 );
-		}
-		else
-		{
-			Print4x5Text( "NO AMMO", x, y, 2 );
-		}
-	
-		if( Ships[ WhoIAm ].Primary == LASER )
-		{
-			Steps = (int16_t) ( LaserTemperature / 10.0F );
-
-			if( Steps > 10 ) Steps = 10;
-
-			for( Count = 0; Count < Steps; Count++ )
-			{
-				LaserString[ Count ] = 'O';
-			}
-			LaserString[ Steps ] = 0;
-	
-			Print4x5Text( (char*)&LaserString[ 0 ], x, y-6, 5 );
-		}
-	
-		if( Ships[ WhoIAm ].Primary == TROJAX && GeneralAmmo != 0.0F && control.fire_primary )
-		{
-			Steps = (int16_t) ( PowerLevel / 10.0F );
-
-			if( Steps > 10 ) Steps = 10;
-
-			for( Count = 0; Count < Steps; Count++ )
-			{
-				PowerString[ Count ] = 'O';
-			}
-			PowerString[ Steps ] = 0;
-	
-			Print4x5Text( (char*)&PowerString[ 0 ], x, y-6, 1 );
-		}
-	}
-	else
-	{
-		Print4x5Text( "NO WEAPON", x, y, 2 );
-	}
-}
-
-/*===================================================================
 	Procedure	:	Create Shield Effect when hit
 	Input		:	VECTOR	*	Center of Shield
 				:	VECTOR	*	Intersection Point ( Front of shield )
@@ -7649,11 +7462,6 @@ void CheckCharging( u_int16_t Ship, u_int32_t OldFlags, u_int32_t NewFlags )
 	}
 }
 
-int16_t	CopyOfSecondaryAmmo[ MAXSECONDARYWEAPONS ];
-int16_t	CopyOfSecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
-int16_t	CopyOfWeaponsGot[ MAXPRIMARYWEAPONS ];
-BYTE	CopyOfPrimary = PULSAR;
-BYTE	CopyOfSecondary = MUGMISSILE;
 int16_t	CopyOfPowerLevel = 0;
 float	CopyOfGeneralAmmo = 0.0F;
 float	CopyOfSussGunAmmo = 0.0F;
@@ -7672,8 +7480,6 @@ float	GodModeCopyOfGeneralAmmo = 0.0F;
 float	GodModeCopyOfSussGunAmmo = 0.0F;
 float	GodModeCopyOfPyroliteAmmo = 0.0F;
 float	GodModeCopyOfNitroFuel = 0.0F;
-BYTE	GodModeCopyOfOrbitals = 0;
-float	GodModeCopyOfOrbAmmo[ MAXMULTIPLES ];
 
 /*===================================================================
 	Procedure	:	Give me all weapons
@@ -8323,16 +8129,6 @@ void ChangeOrbitPulsarDir( u_int16_t i, VECTOR * Dir )
 {
 	PrimBulls[i].ColFlag = 0;
 	PrimBulls[i].Dir = *Dir;
-}
-
-/*===================================================================
-	Procedure	:	Change Direction of Laser
-	Input		:	u_int16_t		Primary Bullet Index
-				:	VECTOR	*	New Direction
-	Output		:	bool		True/False
-===================================================================*/
-void ReflectLaser( u_int16_t i, VECTOR * Dir )
-{
 }
 
 /*===================================================================

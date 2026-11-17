@@ -338,8 +338,6 @@ u_int16_t	Random_Range( u_int16_t Max );
 float Random_Range_Float( float Max );
 
 
-float	QuickDistance( VECTOR * V );
-float	QuickDistance2d( float x , float y );
 void	MakeViewMatrix(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, MATRIX *view);
 void CalcViewAxes(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, VECTOR *vx, VECTOR *vy, VECTOR *vz);
 void ScaleMatrix( MATRIX * m, VECTOR * v );

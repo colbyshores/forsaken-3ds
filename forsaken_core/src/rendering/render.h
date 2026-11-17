@@ -86,7 +86,6 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt );
 #define RELEASE(x) {if (x != NULL) {x->Release(); x = NULL;}}
 
 void cull_none( void );
-void cull_cw( void );
 void reset_cull( void );
 void disable_zbuff( void );
 void set_alpha_states( void );
@@ -290,9 +289,6 @@ extern float render_lighting_env_water_green;
 extern float render_lighting_env_water_blue;
 extern int render_lighting_env_whiteout;
 bool render_mode_select( render_info_t * info );
-void render_mode_wireframe(void);
-void render_mode_points(void);
-void render_mode_fill(void);
 void build_gamma_table( double gamma );
 bool render_init( render_info_t * info );
 void render_cleanup( render_info_t * info );
@@ -321,7 +317,6 @@ bool FSSetWorld( RENDERMATRIX *matrix );
 bool FSSetProjection( RENDERMATRIX *matrix );
 bool FSSetView( RENDERMATRIX *matrix );
 
-bool FSCreateDynamicNormalBuffer(RENDEROBJECT *renderObject, int numNormals);
 bool FSCreateNormalBuffer(RENDEROBJECT *renderObject, int numNormals);
 bool FSLockNormalBuffer(RENDEROBJECT *renderObject, NORMAL **normals);
 bool FSUnlockNormalBuffer(RENDEROBJECT *renderObject);

@@ -44,8 +44,6 @@
 
 #define NO_GRAVGON_TIMER 0
 
-void RefreshModel( u_int16_t model );
-
 #define BALL_RADIUS	( 256 * GLOBAL_SCALE )
 #define	NUMBIKEDETAILS	4
 
@@ -53,7 +51,6 @@ void RefreshModel( u_int16_t model );
 	Globals
 ===================================================================*/
 void CheckModelLinkList( void );
-void UpdateTracker( void );
 void CreateTracker( void );
 u_int16_t	Tracker = (u_int16_t) -1;
 u_int16_t	TrackerTarget = (u_int16_t) -1;
@@ -2879,58 +2876,6 @@ bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void UpdateTracker( void )
-{
-	VECTOR	Pos;
-	VECTOR	Offset;
-	u_int16_t	i;
-
-	if( Tracker == (u_int16_t ) -1 ) CreateTracker();
-
-	if( Tracker != (u_int16_t ) -1 )
-	{
-		Offset.x = ( -400.0F * GLOBAL_SCALE );
-		Offset.y = ( +300.0F * GLOBAL_SCALE );
-		Offset.z = ( +640.0F * GLOBAL_SCALE );
-		ApplyMatrix( &Ships[ WhoIAm ].Object.FinalMat, &Offset, &Pos );
-		Pos.x += Ships[ WhoIAm ].Object.Pos.x;
-		Pos.y += Ships[ WhoIAm ].Object.Pos.y;
-		Pos.z += Ships[ WhoIAm ].Object.Pos.z;
-		Models[ Tracker ].Pos = Pos;
-		Models[ Tracker ].Group = Ships[ WhoIAm ].Object.Group;
-	}
-
-	if( TrackerTarget != (u_int16_t ) -1 )
-	{
-		i = FindClosestPickup();
-
-		Offset.x = ( -400.0F * GLOBAL_SCALE );
-		Offset.y = ( +300.0F * GLOBAL_SCALE );
-		Offset.z = ( +640.0F * GLOBAL_SCALE );
-		ApplyMatrix( &Ships[ WhoIAm ].Object.FinalMat, &Offset, &Offset );
-		Offset.x += Ships[ WhoIAm ].Object.Pos.x;
-		Offset.y += Ships[ WhoIAm ].Object.Pos.y;
-		Offset.z += Ships[ WhoIAm ].Object.Pos.z;
-
-		Pos.x = ( ( Pickups[ i ].Pos.x - Ships[ WhoIAm ].Object.Pos.x ) / 50.0F );
-		Pos.y = ( ( Pickups[ i ].Pos.y - Ships[ WhoIAm ].Object.Pos.y ) / 50.0F );
-		Pos.z = ( ( Pickups[ i ].Pos.z - Ships[ WhoIAm ].Object.Pos.z ) / 50.0F );
-
-		Models[ TrackerTarget ].Mat = Ships[ WhoIAm ].Object.FinalMat;
-		MatrixTranspose( &Models[ TrackerTarget ].Mat, &Models[ TrackerTarget ].InvMat );
-
-		Models[ TrackerTarget ].Pos.x = Pos.x + Offset.x;
-		Models[ TrackerTarget ].Pos.y = Pos.y + Offset.y;
-		Models[ TrackerTarget ].Pos.z = Pos.z + Offset.z;
-		Models[ TrackerTarget ].Group = Ships[ WhoIAm ].Object.Group;
-	}
-}
-
-/*===================================================================
-	Procedure	:	Create Tracker
-	Input		:	Nothing
-	Output		:	Nothing
-===================================================================*/
 void CreateTracker( void )
 {
 	u_int16_t	Model;
@@ -3029,50 +2974,6 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 			{
 				return false;
 			}
-
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
-
-			while( Vert-- )
-			{
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
-			}
-
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-/*===================================================================
-	Procedure	:	Light model
-	Input		:	u_int16_t		Model Number
-				:	float		R,G,B,Trans
-	Output		:	bool		True/False
-===================================================================*/
-bool TintMxaModel( MXALOADHEADER * DstMloadheader, float RF, float GF, float BF, float TF )
-{
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
-	u_int16_t					Group;
-	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
-	COLOR				Colour;
-
-	Colour = RGBA_MAKE( (u_int8_t) RF, (u_int8_t) GF, (u_int8_t) BF, (u_int8_t) TF );
-	if( !Colour ) return false;
-
-	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
-	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
-		{
-
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
-			{
-				return false;
-			}	
 
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
@@ -5364,46 +5265,6 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 
 #define POINT_TO_PLANE( P, N ) ( (P)->x * (N)->Normal.x + (P)->y * (N)->Normal.y + (P)->z * (N)->Normal.z + ( (N)->Offset) )
 
-void RefreshModel( u_int16_t model )
-{
-	u_int16_t					Group;
-	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
-	MXALOADHEADER			*DstMloadheader;
-	float distance, refresh_value;
-	VECTOR point;
-	MATRIX Mat_R;
-
-	DstMloadheader = &MxaModelHeaders[ Models[ model ].ModelNum ];
-
-	BuildRotMatrix( Models[ model ].Rot.x, Models[ model ].Rot.y, Models[ model ].Rot.z, &Mat_R);
-	
-	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
-	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
-		{
-			for ( Vert = 0; Vert < DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ]; Vert++ )
-			{
-				point.x = DstMloadheader->Group[ Group ].originalVerts[ ExecBuf ][ Vert ].x;
-				point.y = DstMloadheader->Group[ Group ].originalVerts[ ExecBuf ][ Vert ].y;
-				point.z = DstMloadheader->Group[ Group ].originalVerts[ ExecBuf ][ Vert ].z;
-
-				ApplyMatrix( &Mat_R, &point, &point );
-				distance = POINT_TO_PLANE( &point, &Models[ model ].IntersectionPlane );
-				distance = 0.0F - distance;
-				
-				if ( ( distance > 0.0F ) &&  ( distance < SCAN_WINDOW_WIDTH ) )
-				{
-
-					refresh_value = 1.0F - ( distance / SCAN_WINDOW_WIDTH );
-										
-				}
-			}
-		}
-	}
-
-}
-
 #define SHIP_MIN_FREQ 0.5F
 #define SHIP_MAX_FREQ 1.0F
 #define ENGINEUPDATEPAUSEFRAMES 5
@@ -5916,81 +5777,6 @@ void CheckModelLinkList( void )
 		// oh shit
         DebugPrintf( "Model Used link list Gone up its ass\n" );
 		i = 0;
-	}
-}
-
-/*===================================================================
-	Procedure	:	Kill all bike engine sound
-	Input		:	Nothing
-	Output		:	Nothing
-===================================================================*/
-void KillAllBikeEngines( void )
-{
-	u_int16_t		NumSpotFX  = 0;
-	PVSPOTFX *	SpotFXPtr = NULL;
-	int16_t		Count;
-	u_int16_t		i;
-
-	i = FirstModelUsed;
-
-	while( i != (u_int16_t) -1 )
-	{
-		switch( Models[i].Func )
-		{
-			case MODFUNC_ProcessSpotFX:
-				if( ModelNames[ Models[i].ModelNum ].DoIMorph )
-				{
-					if( MxaModelHeaders[ Models[i].ModelNum ].NumSpotFX &&
-						MxaModelHeaders[ Models[i].ModelNum ].SpotFX )
-					{
-						SpotFXPtr = MxaModelHeaders[ Models[i].ModelNum ].SpotFX;
-						NumSpotFX = MxaModelHeaders[ Models[i].ModelNum ].NumSpotFX;
-					}
-				}
-				else
-				{
-					if( ModelHeaders[ Models[i].ModelNum ].NumSpotFX &&
-						ModelHeaders[ Models[i].ModelNum ].SpotFX )
-					{
-						SpotFXPtr = ModelHeaders[ Models[i].ModelNum ].SpotFX;
-						NumSpotFX = ModelHeaders[ Models[i].ModelNum ].NumSpotFX;
-					}
-				}
-
-				if( SpotFXPtr && NumSpotFX )
-				{
-					for( Count = 0; Count < NumSpotFX; Count++ )
-					{
-						switch( SpotFXPtr->Type )
-						{
-							case SPOTFX_SoundFX:
-								if( SpotFXPtr->SoundFX != -1 )
-								{
-									if( ( Models[i].OwnerType == OWNER_SHIP ) &&
-										( Models[i].Owner < MAX_PLAYERS ) )
-									{
-										if( Models[i].SpotFXSFX_ID[ Count ] )
-										{
-											StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
-											Models[i].SpotFXSFX_ID[ Count ] = 0;
-											Models[i].SpotFXFlags[ Count ] &= ~SPOTFX_FLAGS_DoneOnce;
-										}
-									}
-								}
-								break;
-							default:
-								break;
-						}
-						SpotFXPtr++;
-					}
-				}
-				break;
-
-			default:
-				break;
-		}
-
-		i = Models[ i ].Prev;
 	}
 }
 

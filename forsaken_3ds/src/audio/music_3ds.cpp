@@ -354,23 +354,6 @@ void music_stop(void)
 	LightLock_Unlock(&s_lock);
 }
 
-bool music_is_playing(void)
-{
-	if (!s_initialized) return false;
-	return s_playing && ndspChnIsPlaying(MUSIC_CHANNEL);
-}
-
-void music_set_volume(float vol)
-{
-	float mix[12] = {0};
-	if (vol < 0.0f) vol = 0.0f;
-	if (vol > 1.0f) vol = 1.0f;
-	s_volume = vol;
-	if (!s_initialized) return;
-	mix[0] = vol; mix[1] = vol;
-	ndspChnSetMix(MUSIC_CHANNEL, mix);
-}
-
 void music_play_for_level(int level_num)
 {
 	if (level_num < 0) return;
@@ -387,8 +370,6 @@ bool music_init(void) { return false; }
 void music_shutdown(void) {}
 void music_play(int track) { (void)track; }
 void music_stop(void) {}
-bool music_is_playing(void) { return false; }
-void music_set_volume(float vol) { (void)vol; }
 void music_play_for_level(int level_num) { (void)level_num; }
 void music_play_title(void) {}
 void music_update(void) {}

@@ -494,13 +494,6 @@ void sound_play_looping(sound_source_t *src)
 	ndspChnWaveBufAdd(src->channel, &src->wavebuf);
 }
 
-void sound_stop(sound_source_t *src)
-{
-	if (!src || src->channel < 0) return;
-	ndspChnWaveBufClear(src->channel);
-	src->playing = false;
-}
-
 bool sound_is_playing(sound_source_t *src)
 {
 	if (!src || src->channel < 0) return false;

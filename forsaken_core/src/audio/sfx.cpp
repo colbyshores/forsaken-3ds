@@ -423,8 +423,6 @@ u_int32_t CurrentBikeCompSpeech = 0;
 
 float	LastDistance[MAX_SFX];
 
-int CurrentLevel = 16;
-
 /////
 // sound buffer storage
 // reusable buffers for sources
@@ -506,8 +504,6 @@ typedef struct _SPOT_SFX_LIST
 #define MAX_LOOPING_SFX 64
 SPOT_SFX_LIST SpotSfxList[ MAX_LOOPING_SFX ];
 
-int sfxref = 0;
-int dupbufref = 0;
 char TauntPath[ 128 ];
 
 bool BikerSpeechPlaying = false;
@@ -1152,35 +1148,6 @@ int16_t ReturnSFXIndex( char *file )
 }
 
 #define NUM_ESSENTIAL_SFX 26
-
-int16_t EssentialSfx[ NUM_ESSENTIAL_SFX ] = {
-	SFX_BIKECOMP_AP,				//	-	picking up a weapon which is already present
-	SFX_Select_BeamLaser,			//	-	beam laser
-	SFX_Select_Invul,				//	-	chaos shield
-	SFX_Select_Ammo,				//	-	extra ammo
-	SFX_Select_GravgonMissile,		//	-	gravgon missile
-	SFX_Select_GoldenPowerPod,		//	-	golden power pod
-	SFX_Incoming,					//	-	incoming
-	SFX_Select_MFRL,				//	-	MRFL
-	SFX_Select_MugMissile,			//	-	mug
-	SFX_DontHaveThat,				//	-	selecting a weapon which is not present
-	SFX_Select_Nitro,				//	-	nitro
-	SFX_Orbital,					//	-	orbit pulsar
-	SFX_Select_PineMine,			//	-	pine mine
-	SFX_Select_PowerPod,			//	-	power pod
-	SFX_Select_PurgeMine,			//	-	purge mine
-	SFX_Select_Pulsar,				//	-	pulsar
-	SFX_Select_QuantumMine,			//	-	quantum mine
-	SFX_Select_ScatterMissile,		//	-	scatter missile
-	SFX_Select_SussGun,				//	-	suss-gun
-	SFX_Select_Shield,				//	-	shield
-	SFX_Scattered,					//	-	scatter missile impact
-	SFX_Select_SolarisMissile,		//	-	solaris heatseaker
-	SFX_BIKECOMP_ST,				//	-	stealth mantle
-	SFX_Select_TitanStarMissile,	//	-	titan star missile
-	SFX_Select_Transpulse,			//	-	transpulse
-	SFX_Select_Trojax,				//	-	trojax
-};
 
 void PauseAllSfx( void )
 {
@@ -2450,83 +2417,6 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume )
 #define X_OFFSET 5
 #define LINE_HEIGHT 8
 #define DATA_OFFSET 100
-
-void PrintLoopingSfxDebug( void )
-{
-	int line, i;
-	char buf[128];
-
-	line = START_LINE;
-
-	// print field names...
-	Print4x5Text( "sfxindex",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "variant",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "flags",			X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "pos x",			X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "pos y",			X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "pos z",			X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "fixedpos x",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "fixedpos y",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "fixedpos z",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "type",			X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "var group",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "fixed group",	X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "freq",			X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "vol",			X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "source ptr",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "distance",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "holder index",	X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "thread index",	X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "effects",		X_OFFSET, LINE_HEIGHT * line++, 2 );
-	Print4x5Text( "uid",			X_OFFSET, LINE_HEIGHT * line++, 2 ); 
-
-	for ( i = 0; i < MAX_LOOPING_SFX; i++ )
-	{
-		if ( !SpotSfxList[ i ].used )
-			continue;
-	
-		line = START_LINE;
-
-		sprintf( buf, "%d", SpotSfxList[ i ].sfxindex );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", SpotSfxList[ i ].variant );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", SpotSfxList[ i ].flags );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%4.0f", SpotSfxList[ i ].pos->x );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%4.0f", SpotSfxList[ i ].pos->y );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%4.0f", SpotSfxList[ i ].pos->z );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%4.0f", SpotSfxList[ i ].fixedpos.x );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%4.0f", SpotSfxList[ i ].fixedpos.y );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%4.0f", SpotSfxList[ i ].fixedpos.z );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", SpotSfxList[ i ].type );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", *SpotSfxList[ i ].group );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", SpotSfxList[ i ].fixedgroup );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%1.1f", SpotSfxList[ i ].freq );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%1.1f", SpotSfxList[ i ].vol );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%s", SpotSfxList[ i ].source ? "Y" : "N" );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%4.0f", SpotSfxList[ i ].distance );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", SpotSfxList[ i ].SfxHolderIndex );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", SpotSfxList[ i ].Effects );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-		sprintf( buf, "%d", (int)SpotSfxList[ i ].uid );
-		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
-	}
-}
 
 void ProcessLoopingSfx( void )
 {

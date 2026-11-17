@@ -50,16 +50,9 @@ typedef struct MCLOADHEADER{
  * fn prototypes
  */
 
-float ColDotProduct( VECTOR * a , NORMAL * b );
 bool MCload( char * Filename , MCLOADHEADER * MCloadheader );
 bool ColRayPolyIntersect( MCFACE *face );
-bool RayPolyIntersect( float * P0 , float * P1 , float * P2 , float * P3 ,
-	 				 VERT *  Point, NORMAL * FaceNormal , float D , float * TempDistance);
 bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
-					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
-					  VECTOR *EndPos, u_int16_t *EndGroup,
-					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject );
-bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
 					  VECTOR *EndPos, u_int16_t *EndGroup,
 					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject );
@@ -93,8 +86,6 @@ u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * Int
 u_int16_t CheckAnyEnemyHit( void );
 
 /* Defined in collision.cpp; shared with the modules that use it. */
-bool ObjectCollideOnly( OBJECT *Obj, VECTOR *Move_Off, float radius, VECTOR *Target_Off, BGOBJECT **BGObject );
-bool ObjectCollideNoBGObject( OBJECT *Obj, VECTOR *Move_Off, float radius );
 extern int outside_group;
 extern int no_collision;
 extern COMP_OBJ * ColChild;

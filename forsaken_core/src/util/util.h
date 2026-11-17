@@ -15,7 +15,6 @@ void DebugPuts( char * str );                  //
 
 void Change_Ext( const char * Src, char * Dest, const char * Ext );
 void Get_Ext( u_int8_t * Src, u_int8_t * Dest );
-void GetFilename( u_int8_t * Src, u_int8_t * Dest );
 
 char* convert_path( const char* _str );
 

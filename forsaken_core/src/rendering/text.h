@@ -51,7 +51,6 @@ void CenterPrint4x5Text( char * Text , int y , int color );
 void CenterPrint4x5Text2( char * Text , int x, int y, int color );
 int	 Print4x5Text( const char * Text , int x , int y , int color );
 int	 Print4x5TextSmall( char * Text , int x , int y , int color );
-void PrintClipped4x5Text( char * Text , int x , int y , int color );
 void Printu_int16_t( u_int16_t tempnum , int x , int y , int color );
 void MessageQuePrint( void );
 void PlayerMessageQuePrint( void );
@@ -65,7 +64,6 @@ void InitFont( void );
 bool ReadTxtFile( char *Filename );
 void FreeTxtFile( void );
 void TriggerTextMessage( u_int16_t * Data );
-void InitStatsMessages( void );
 bool ReadMsgFile( char *Filename );
 void FreeMsgFile( void );
 
@@ -76,7 +74,6 @@ FILE * LoadAllText( FILE * fp );
 FILE * SaveAllText( FILE * fp );
 
 
-void FillStatusTab( void );
 void DisplayConnectionStatus( int num , int x , int y);
 
 
@@ -112,8 +109,6 @@ extern float MessageTime[ MAX_MESSAGES ];
 extern char MessageBank[ MAX_MESSAGES ][ MAXPERLINE ];
 extern int FontWidth;
 extern int FontHeight;
-extern int FontSourceWidth;
-extern int FontSourceHeight;
 extern int16_t NumOfActivePlayers;
 extern float MaxMessageTime;
 

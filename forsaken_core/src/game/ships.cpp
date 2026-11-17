@@ -532,7 +532,6 @@ RENDERMATRIX  TempWorld;
 
 float	WhiteOut = 0.0F;
 float	RandomBubbleTimer = 0.0F;
-DWORD max_time;
 u_int16_t	NumCollides;
 
 SHIPCONTROL control;
@@ -542,7 +541,6 @@ float AutoLevelRot( u_int16_t ship, float autolevel_rate );
 void BobShip( u_int16_t ship, VECTOR *bob );
 void	UpdateStartPos( void );
 float	SteamTime = 0.0F;
-bool	IsStartPosVacantMutualyVisibleGroup( int16_t i , u_int16_t startpos );
 bool	IsStartPosVacantVisibleGroup( int16_t i , u_int16_t startpos );
 bool SwitchedToWatchMode =false;
 
@@ -1383,19 +1381,6 @@ void ForceExternal( u_int16_t ship, VECTOR *force )
 	Ships[ ship ].Object.ExternalForce.x += ( force->x * framelag );
 	Ships[ ship ].Object.ExternalForce.y += ( force->y * framelag );
 	Ships[ ship ].Object.ExternalForce.z += ( force->z * framelag );
-}
-
-
-void ForceInternal( u_int16_t ship, VECTOR *force )
-{
-	VECTOR	NewForce;
-
-	ApplyMatrix( &Ships[ ship ].Object.Mat, force, &NewForce );
-
-	Ships[ ship ].Object.ExternalForce.x += ( NewForce.x * framelag );
-	Ships[ ship ].Object.ExternalForce.y += ( NewForce.y * framelag );
-	Ships[ ship ].Object.ExternalForce.z += ( NewForce.z * framelag );
-
 }
 
 void ForceExternalOneOff( u_int16_t ship, VECTOR *force )
@@ -2535,29 +2520,6 @@ bool	IsStartPosVacant( int16_t i , u_int16_t startpos )
 	return false;
 }
 /*===================================================================
-	Procedure	:	Is there a Bike in a Mutually visible Group from this restart point...
-	Input		:	nothing
-	Output		:	false/true
-===================================================================*/
-bool	IsStartPosVacantMutualyVisibleGroup( int16_t i , u_int16_t startpos )
-{
-	int	e;
-	for( e = 0 ; e < MAX_PLAYERS ; e++ )
-	{
-		if( i != e )
-		{
-			if( GameStatus[e] == MyGameStatus )
-			{
-				if( VisibleOverlap( Ships[ e ].Object.Group, StartPositions[startpos].Group , NULL ) )
-				{
-					return true;
-				}
-			}
-		}
-	}
-	return false;
-}
-/*===================================================================
 	Procedure	:	Is there a Bike in a visible group from this restart point...
 	Input		:	nothing
 	Output		:	false/true
@@ -2683,15 +2645,6 @@ void StartShipScreenShake( float Force )
 {
 	Ships[WhoIAm].ShakeTimer = 2.0F * 60.0F;
 	Ships[WhoIAm].ShakeForce = Force;
-}
-/*===================================================================
-	Procedure	:	Stop Screen Shake...
-	Input		:	float Time;
-	Output		:	nothing
-===================================================================*/
-void StopShipScreenShake( void )
-{
-	Ships[WhoIAm].ShakeTimer = 0.0F;
 }
 
 
@@ -3268,14 +3221,3 @@ FILE * LoadShips( FILE * fp )
 
 float	MyShield;
 float	MyHull;
-
-void StoreMyShieldHull( void )
-{
-	MyShield = Ships[WhoIAm].Object.Shield * 1234.0F;
-	MyHull = Ships[WhoIAm].Object.Hull * 4321.0F;
-}
-void ReStoreMyShieldHull( void )
-{
-	Ships[WhoIAm].Object.Shield = MyShield / 1234.0F;
-	Ships[WhoIAm].Object.Hull = MyHull / 4321.0F;
-}

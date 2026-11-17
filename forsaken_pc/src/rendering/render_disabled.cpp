@@ -10,9 +10,6 @@
 #include "math/new3d.h"
 #include "rendering/lights.h"
 
-void render_mode_wireframe(void){}
-void render_mode_points(void){}
-void render_mode_fill(void){}
 void build_gamma_table( double gamma ){}
 void release_texture( LPTEXTURE texture ){}
 void render_cleanup( render_info_t * info ){}
@@ -22,7 +19,6 @@ void reset_zbuff( void ){}
 void disable_zbuff_write( void ){}
 void disable_zbuff( void ){}
 void cull_none( void ){}
-void cull_cw( void ){}
 void reset_cull( void ){}
 void set_alpha_ignore( void ){}
 void unset_alpha_ignore( void ){}
@@ -109,12 +105,6 @@ bool FSCreateNormalBuffer(RENDEROBJECT *renderObject, int numNormals)
 {
 	renderObject->lpNormalBuffer = malloc( numNormals * sizeof(NORMAL) );
 	return true; 
-}
-
-bool FSCreateDynamicNormalBuffer(RENDEROBJECT *renderObject, int numNormals)
-{
-	FSCreateNormalBuffer(renderObject, numNormals); 
-	return true;
 }
 
 bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)

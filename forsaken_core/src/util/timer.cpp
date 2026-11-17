@@ -14,13 +14,6 @@ float timer_peek( px_timer_t* stats )
 	return seconds;
 }
 
-// send debug info to console
-void timer_debug( char* name, px_timer_t* stats )
-{
-  DebugPrintf("%s: seconds = %5f, millis = %d, best = %5f, worst = %5f\n",
-	name,stats->seconds,stats->millis,stats->best,stats->worst);
-}
-
 // clear the timer
 void timer_clear( px_timer_t* stats )
 {

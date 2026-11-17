@@ -410,7 +410,6 @@ bool LoadEnemies( void );
 ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up, u_int16_t Group, u_int16_t ModelNum, u_int16_t TriggerMod , u_int16_t EnemyType , u_int32_t Network , int32_t PickupHeld , u_int16_t FormationLink , float GenerationDelay);
 void ProcessEnemies( void );
 void EnableEnemy( u_int16_t EnemyIndex );
-void DisableEnemy( ENEMY * Enemy );
 ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR * UpDir, float DirLength, VECTOR * Int_Point,
 						VECTOR * Int_Point2, float * Dist, float WeaponRadius, u_int16_t ColType );
 void SetCurAnimSeq( int16_t Seq, OBJECT * Object );
@@ -428,7 +427,6 @@ u_int16_t FindDuplicateModel( int8_t * Filename, int16_t NumModels );
 bool DamageEnemy( ENEMY * Enemy , float Damage , VECTOR * ImpactPoint , VECTOR * Dir, float Speed ,u_int16_t Owner , u_int16_t OwnerType);
 void ObjectRotateExternal( OBJECT * Object, VECTOR *Pos, VECTOR *point, VECTOR *dir, float force , float Radius );
 void ReleaseAllEnemies( void );
-void DoNmeDamagedEffects( ENEMY * Enemy );
 void DispUntriggeredNMEs( void );
 void AccellDecell(  float *  value ,  float  Decell );
 

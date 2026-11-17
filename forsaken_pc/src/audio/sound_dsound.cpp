@@ -99,11 +99,6 @@ void sound_play_looping( sound_t * buffer )
 	IDirectSoundBuffer_Play( buffer, 0, 0, DSBPLAY_LOOPING );
 }
 
-void sound_stop( sound_t * buffer )
-{
-	IDirectSoundBuffer_Stop( buffer );
-}
-
 void sound_release( sound_t * buffer )
 {
 	if (buffer != NULL)

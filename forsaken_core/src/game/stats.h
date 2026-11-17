@@ -36,7 +36,6 @@ char* GetWeaponName(int WeaponType, int Weapon);							// Get weapon name
 
 int GetSuicides( int Player );
 int GetKills( int Player );
-int GetEffeciency( int Player );
 int player_left( int player );
 int scoreable_status( int player );
 

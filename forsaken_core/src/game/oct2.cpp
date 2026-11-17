@@ -74,9 +74,6 @@ VECTOR OldPos;
 float SpeedInterval = 0.0F;
 float BikeSpeed = 0.0F;
 
-BSP_HEADER Bsp_Original;
-
-
 bool OriginalLevels = false;
 bool CheatsDisabled = false;
 bool WaitingToQuit;
@@ -119,7 +116,6 @@ bool  ScoreDisplaySfx = true;
 bool  IMustQuit = false;
 // Capture The Flag Stuff
 bool  CaptureTheFlag	= false;
-bool  IHaveAFlag			= false;
 // End of Capture The Flag
 
 // Bounty Hunt
@@ -140,11 +136,6 @@ char *  InitViewMessages[] = {
 };
 
 bool  InsideResizeViewport = false;
-
-DWORD CurrentSrcBlend;
-DWORD CurrentDestBlend;
-DWORD CurrentTextureBlend;
- 
 
 bool  JustExitedMenu =false;
 
@@ -170,10 +161,6 @@ float FPS = 0.0F;         // Frames Per Second...
 
 #define VIEWPORT_GROW   (1.1F)
 #define VIEWPORT_SHRINK   (1.0F/1.1F)
-
-bool LockOutWindows = true;
-
-BYTE PreWaitingToSendMessagesStatus;
 
 bool InitViewport( void );
 
@@ -210,7 +197,6 @@ Our_CalculateFrameRate(void);
 
 bool ScoreDisplay();
 bool InitScoreDisplay();
-bool StatsDisplay();
 bool InitStatsDisplay();
 
 typedef enum {
@@ -228,8 +214,6 @@ int Secrets = 0;
 int TotalSecrets = 0;
 int CrystalsFound = 0;
 
-bool  ResizeViewport( void );
-bool  FullScreenViewport();
 bool  ClearZBuffer( void );
 
 bool clear_black(void)
@@ -242,7 +226,6 @@ bool clear_black(void)
 bool RenderCurrentCamera( void );
 
 render_viewport_t viewport;
-render_viewport_t oldviewport;
 int initfov = 0;
 float viewplane_distance;
 float hfov = START_FOV;
@@ -283,7 +266,6 @@ char  TeleportNames[MAXLEVELS][128];
 
 char MissionTextNames[MAXLEVELS][128];
 char MissionTextPics[MAXLEVELS][128];
-char level_names[MAXLEVELS][128];
 
 int16_t CameraRendering = CAMRENDERING_None;
 
@@ -362,18 +344,6 @@ RENDERMATRIX proj = {
     RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(Far/(Far-Near)), RENDERVAL(1.0),
     RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(-Far*Near/(Far-Near)), RENDERVAL(0.0) };
 
-RENDERMATRIX panelproj = {
-    RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(Far/(Far-Near)), RENDERVAL(1.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(-Far*Near/(Far-Near)), RENDERVAL(0.0) };
-
-RENDERMATRIX trackerproj = {
-    RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(Far/(Far-Near)), RENDERVAL(1.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(-Far*Near/(Far-Near)), RENDERVAL(0.0) };
-
 MATRIX  ProjMatrix = {
     RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),
     RENDERVAL(0.0), RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0),
@@ -388,8 +358,6 @@ MATRIX  ProjMatrix = {
   VECTOR  Forward   = { 0.0F, 0.0F, 1.0F };
   VECTOR  Backward  = { 0.0F, 0.0F,-1.0F };
   VECTOR  NullVector  = { 0.0F, 0.0F, 0.0F };
-
-  VECTOR  Camera_Dir = { 0.0F, 0.0F,0.0F };
 
 /*===================================================================
 ===================================================================*/
@@ -906,132 +874,6 @@ void ProcessGameKeys( void )
   } // end normal keys
 } // ProcessGameKeys
 
-bool
-ResizeViewport( void )
-{
-	int left, top;
-	int width, height;
-	int maxwidth, maxheight;
-	bool  NewDrawPanel;
-	bool  NewDrawSimplePanel;
-	float scale = 1.0F;
-  
-	InsideResizeViewport = true;
-
-	/*
-     * Setup the viewport for specified viewing area
-     */
-
-	if (!FSGetViewPort(&viewport))
-	{
-        Msg( "GetViewport failed.\n%s", render_error_description(0) );
-        return false;
-    }
-	maxwidth = render_info.window_size.cx;
-
-	NewDrawSimplePanel = false;
-  
-	maxheight = render_info.window_size.cy;
-
-	if ( scale < 1.01F )
-	{
-		width = (int) floorf( maxwidth * scale );
-		if ( width < MIN_VIEWPORT_WIDTH )
-		{
-			width = MIN_VIEWPORT_WIDTH;
-			scale = (float) width / maxwidth;
-		}
-		height = (int) floorf( maxheight * scale );
-
-		NewDrawPanel = false;
-
-		left = ( ( maxwidth - width ) >> 1 ) & ~1;
-		top = ( ( maxheight - height ) >> 1 ) & ~1;
-	}
-	else
-	{
-		width = maxwidth;
-		height = maxheight;
-		if ( scale > 1.11F )
-		{
-			NewDrawPanel = true;
-			scale = 1.2F;
-		}
-		else
-		{
-			NewDrawPanel = false;
-		}
-		left = 0;
-		top = 0;
-	}
-
-	// This disables the 3d panel...
-	NewDrawPanel = DrawPanel;
-
-	viewport.X = left;
-	viewport.Y = top;
-	viewport.Width = width;
-	viewport.Height = height;
-	viewport.ScaleX = viewport.Width / (float)2.0;
-	viewport.ScaleY = viewport.Height / (float)2.0;
-
-	if (!FSSetViewPort(&viewport))
-	{
-#ifdef DEBUG_VIEWPORT
-    SetViewportError( "ResizeViewport", &viewport );
-#else
-        Msg("SetViewport failed.\n%s", render_error_description(0));
-#endif
-        return false;
-    }
-  
-	SetFOV( hfov );
-
-	clear_black();
-
-	return true;
-}
-
-bool FullScreenViewport()
-{
-	int left, top;
-	int width, height;
-	int maxwidth, maxheight;
-
-	if (!FSGetViewPort(&viewport))
-	{
-        Msg( "GetViewport failed.\n%s", render_error_description(0) );
-        return false;
-    }
-
-	maxwidth = render_info.window_size.cx;
-	maxheight = render_info.window_size.cy;
-	width = maxwidth;
-	height = maxheight;
-	left = 0;
-	top = 0;
-
-	viewport.X = left;
-	viewport.Y = top;
-    viewport.Width = width;
-    viewport.Height = height;
-    viewport.ScaleX = viewport.Width / (float)2.0;
-    viewport.ScaleY = viewport.Height / (float)2.0;
-
-	if (!FSSetViewPort(&viewport))
-	{
-#ifdef DEBUG_VIEWPORT
-    SetViewportError( "FullScreenViewport", &viewport );
-#else
-        Msg("SetViewport failed.\n%s", render_error_description(0));
-#endif
-        return false;
-    }
-	SetFOV( hfov );
-	clear_black();
-	return true;
-}
-
 bool InitLevels( char * levels_list )
 {
 
@@ -1169,8 +1011,6 @@ int GetCurPrimAmmo( void )
 	else                                          return GeneralAmmo;
 }
 
-float HealthCount = 0.0F;
-int PowerSizes[6] = { 0 , 4 , 16 , 24 , 40 , 56 };
 void DrawSimplePanel()
 {
 	int current = 0;
@@ -1937,41 +1777,6 @@ bool ChangeLevel( void )
 	InitView();
 
 	return( true );
-}
-
-void GetLevelName( char *buf, int bufsize, int level )
-{
-  FILE *f;
-  char *pCh;
-  
-  buf[ 0 ] = 0;
-
-  if ( level < 0 )
-    return;
-  
-  f = file_open( MissionTextNames[ level ], "r" );
-  if ( f )
-  {
-    // read level name
-    if ( !fgets( buf, bufsize, f ) )
-    {
-        // if error ( as oposed to end of file )
-      if ( ferror( f ) != 0 )
-      {
-        buf[ 0 ] = 0;
-      }
-    }
-  }
-  if ( !buf[ 0 ] )
-  {
-    strncpy( buf, (char*)LevelList.item[ level ], bufsize );
-  }
-
-  pCh = strchr( buf, '\n' );
-  if ( pCh )
-    *pCh = 0;
-  
-  buf[ bufsize - 1 ] = 0; // ensure null terminated 
 }
 
 float Browl = 0.0F;
@@ -3356,41 +3161,6 @@ bool RenderScene( void )
 
 void MainGameDemoRoutines(){
 }
-
-
-float Hdiv[MAX_PLAYERS] = { 1.0F ,
-                1.0F ,
-                1.0F ,
-                0.5F ,
-                0.5F ,
-                0.5F ,
-                1.0F ,
-                0.5F };
-float Vdiv[MAX_PLAYERS] = { 1.0F ,
-                0.5F ,
-                0.33333333F ,
-                0.5F ,
-                0.2F ,
-                0.33333333F ,
-                0.142857142F ,
-                0.25F  };
-float Hpos[MAX_PLAYERS][MAX_PLAYERS] = { { 0.0F } ,
-                       { 0.0F , 0.0F } ,
-                       { 0.0F , 0.0F , 0.0F } ,
-                       { 0.0F , 1.0F , 0.0F , 1.0F } ,
-                       { 0.0F , 0.0F , 0.0F , 0.0F , 0.0F } ,
-                       { 0.0F , 1.0F , 0.0F , 1.0F , 0.0F , 1.0F} ,
-                       { 0.0F , 0.0F , 0.0F , 0.0F , 0.0F , 0.0F , 0.0F} ,
-                       { 0.0F , 1.0F , 0.0F , 1.0F , 0.0F , 1.0F , 0.0F , 1.0F } };
-float Vpos[MAX_PLAYERS][MAX_PLAYERS] = { { 0.0F } ,
-                       { 0.0F , 1.0F } ,
-                       { 0.0F , 1.0F , 2.0F } ,
-                       { 0.0F , 0.0F , 1.0F , 1.0F } ,
-                       { 0.0F , 1.0F , 2.0F , 3.0F , 4.0F } ,
-                       { 0.0F , 0.0F , 1.0F , 1.0F , 2.0F , 2.0F} ,
-                       { 0.0F , 1.0F , 2.0F , 3.0F , 4.0F , 5.0F , 6.0F} ,
-                       { 0.0F , 0.0F , 1.0F , 1.0F , 2.0F , 2.0F , 3.0F , 3.0F } };
-                       
 
 /*===================================================================
   Procedure :   Main Routines...
@@ -5341,75 +5111,6 @@ bool  InitStatsDisplay()
   return true;
 }
 
-/*===================================================================
-  Procedure :   Stats Display...
-  Input   :   nothing...
-  Output    :   bool true/false
-===================================================================*/
-bool StatsDisplay()
-{
-  rect_t    src;
-  rect_t    dest;
-  point_t	destp;
-  int x,y;
-
-  char buf[256];
-
-  //  Blt Background
-  src.top = 0;
-  src.left = 0;
-  src.right = render_info.window_size.cx;
-  src.bottom = render_info.window_size.cy;
-  x = 0;
-  y = 0;
-
-  dest.top = 0;
-  dest.bottom = render_info.window_size.cy;
-  dest.left = 0;
-  dest.right = render_info.window_size.cx;
-      
-  destp.x = dest.left;
-  destp.y = dest.top;
-
-  if( !GameCompleted )
-  {
-    if( Secrets == 1 )
-    {
-      sprintf( (char*) &buf ,"%d Secret found out of %d", Secrets , TotalSecrets );
-    }else{
-      sprintf( (char*) &buf ,"%d Secrets found out of %d", Secrets , TotalSecrets );
-    }
-    CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy >> 1 ) - (FontHeight*2) , 2 );
-    if( NumKilledEnemies == 1 )
-    {
-      sprintf( (char*) &buf ,"%d Enemy killed out of %d", NumKilledEnemies , NumInitEnemies );
-    }else{
-      sprintf( (char*) &buf ,"%d Enemies killed out of %d", NumKilledEnemies , NumInitEnemies );
-    }
-    CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy >> 1 ) + (FontHeight*0) , 2 );
-    if( CrystalsFound == 1 )
-    {
-      sprintf( (char*) &buf ,"%d Crystal found so far", CrystalsFound );
-    }else{
-      sprintf( (char*) &buf ,"%d Crystals found so far", CrystalsFound );
-    }
-    CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy >> 1 ) + (FontHeight*2) , 2 );
-  }else{
-    CenterPrint4x5Text( "Congratulations" , (render_info.window_size.cy >> 1 ) - (FontHeight*2) , 2 );
-    CenterPrint4x5Text( "Demo Complete" , (render_info.window_size.cy >> 1 ) + (FontHeight*0) , 2 );
-    if( DifficultyLevel != 3 )
-    {
-      CenterPrint4x5Text( "Now Try a Harder Difficulty Setting" , (render_info.window_size.cy >> 1 ) + (FontHeight*2) , 2 );
-    }else{
-      CenterPrint4x5Text( "Try the real Game for a harder challenge" , (render_info.window_size.cy >> 1 ) + (FontHeight*2) , 2 );
-    }
-  }
-  
-  CenterPrint4x5Text( "Press Space to continue" , render_info.window_size.cy - (FontHeight*2) , 2 );
-
-  return true;
-}
-
 // ModeScaleX use to have hard coded spacing value and such for fonts etc...
 // now we just use index 0 and set it dynamically to whatever screen size we are at
 
@@ -5443,16 +5144,6 @@ int16_t GetBitShift( int32_t Mask )
   }
 
   return( 0 );
-}
-
-
-/*===================================================================
-  Procedure :   Render Snapshot
-  Input   :   Nothing
-  Output    :   Nothing
-===================================================================*/
-void RenderSnapshot( void )
-{
 }
 
 /*===================================================================

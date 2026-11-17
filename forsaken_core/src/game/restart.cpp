@@ -767,19 +767,6 @@ void RemoveRestartPointFromGroup( RESTART * Object, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Move RestartPoint from 1 group to another
-	Input		:	RESTART	*	Retart Point
-				:	u_int16_t		OldGroup
-				:	u_int16_t		NewGroup
-	Output		:	Nothing
-===================================================================*/
-void MoveRestartPointToGroup( RESTART * Object, u_int16_t OldGroup, u_int16_t NewGroup )
-{
-	RemoveRestartPointFromGroup( Object, OldGroup );
-    AddRestartPointToGroup( Object, NewGroup );
-}
-
-/*===================================================================
 	Procedure	:	Save RestartPoint arrays & Connected Global Variables
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer

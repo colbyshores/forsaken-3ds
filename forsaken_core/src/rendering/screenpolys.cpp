@@ -98,7 +98,6 @@ u_int16_t	FirstScrPolyFree;
 float	Countdown_Float = 3000.0F;	// 30 Seconds
 float	ZValue;
 float	RHWValue;
-bool	BilinearSolidScrPolys = false;
 float	ThermalTemp = 0.0F;
 float	WantedThermalTemp = 0.0F;
 float	ThermalMinimum = 0.0F;
@@ -789,63 +788,6 @@ void Conv3DTo2D( VECTOR * SrcVert, VECTOR * DstVert, MATRIX * FinalMat )
 	DstVert->x = CurrentCamera.Viewport.X + ( ( CurrentCamera.Viewport.Width / 2 ) + ( CurrentCamera.Viewport.ScaleX * TempVert.x ) );
 	DstVert->y = CurrentCamera.Viewport.Y + ( ( CurrentCamera.Viewport.Height / 2 ) - ( CurrentCamera.Viewport.ScaleY * TempVert.y ) );
 	DstVert->z = TempVert.z;
-}
-
-/*===================================================================
-	Procedure	:	3D World to 2D Screen and clip
-	Input		:	VECTOR	*	Vertex
-				:	VECTOR	*	2D Vertex
-				:	MATRIX	*	Final View Matrix
-	Output		:	bool		True/False
-===================================================================*/
-bool ClipConv3DTo2D( VECTOR * SrcVert, VECTOR * DstVert, MATRIX * FinalMat )
-{
-	DWORD	Flags;
-	VECTOR	TempVert;
-
-	VisPolyApplyMatrix( FinalMat, SrcVert, &TempVert );
-
-	Flags = 0;
-
-	if( TempVert.z > 1.0F )
-	{
-		TempVert.x = -TempVert.x; 
-		TempVert.y = -TempVert.y;
-		Flags |= CLIP_FRONT;
-	}
-
-	if( TempVert.x < -1.0F )
-	{
-		Flags |= CLIP_LEFT;
-		TempVert.x = -1.0F;
-	}
-	else
-	{
-		if( TempVert.x > 1.0F )
-		{
-			Flags |= CLIP_RIGHT;
-			TempVert.x = 1.0F;
-		}
-	}
-
-   	if( TempVert.y < -1.0F )
-	{
-		Flags |= CLIP_TOP;
-		TempVert.y = -1.0F;
-	}
-	else
-	{
-		if( TempVert.y > 1.0F )
-		{
-			Flags |= CLIP_BOTTOM;
-			TempVert.y = 1.0F;
-		}
-	}
-	DstVert->x = CurrentCamera.Viewport.X + ( ( CurrentCamera.Viewport.Width / 2 ) + ( CurrentCamera.Viewport.ScaleX * TempVert.x ) );
-	DstVert->y = CurrentCamera.Viewport.Y + ( ( CurrentCamera.Viewport.Height / 2 ) - ( CurrentCamera.Viewport.ScaleY * TempVert.y ) );
-	DstVert->z = TempVert.z;
-	if( Flags ) return( true );
-	return( false );
 }
 
 /*===================================================================
@@ -1593,15 +1535,6 @@ void StartCountDown( int16_t Minutes, int16_t Seconds )
 				:	u_int8_t	Trans
 	Output		:	void
 ===================================================================*/
-
-void AddScreenPolyTextColor( u_int16_t Frame, float XPos, float YPos, int Color, u_int8_t Trans )
-{
-	u_int8_t r,g,b;
-	r = Colourtrans[Color][0];
-	g = Colourtrans[Color][1];
-	b = Colourtrans[Color][2];
-	AddScreenPolyText( Frame, XPos, YPos, r, g, b, Trans );
-}
 
 void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
 {

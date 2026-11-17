@@ -6127,21 +6127,6 @@ void EnableEnemy( u_int16_t EnemyIndex )
 }
 
 /*===================================================================
-	Procedure	:	Disable Enemy
-	Input		:	ENEMY	*	Enemy
-	Output		:	Nothing
-===================================================================*/
-void DisableEnemy( ENEMY * Enemy )
-{
-	Enemy->Status &= ~ENEMY_STATUS_Enable;
-
-	if( Enemy->TriggerModPtr != NULL )
-	{
-		ApplyTriggerMod( Enemy->TriggerModPtr );
-	}
-}
-
-/*===================================================================
 	Procedure	:	Flying Enemy Under Player Control...
 	Output		:	ENEMY	*	Enemy 
 	Output		:	Nothing
@@ -9049,82 +9034,6 @@ bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_
 	
 	return true;
 }
-
-/*===================================================================
-	Procedure	:		Do Enemy Damage Effects
-	Input		:		ENEMY	*	Enemy
-	Output		:		Nothing
-===================================================================*/
-void DoNmeDamagedEffects( ENEMY * Enemy )
-{
-	u_int16_t	fmpoly;
-	VECTOR	TempUp;
-	float	EnemySmokeInterval;
-	u_int8_t	Colour;
-
-	EnemySmokeInterval = (float) 1;
-
-	if( ( Enemy->Status & ENEMY_STATUS_Enable ) )
-	{
-		if( Enemy->Object.Shield <= (EnemyTypes[Enemy->Type].Shield * 0.25F ) )
-		{
-			if( IsGroupVisible[ Enemy->Object.Group ] )
-			{
-				Enemy->SmokeTime += framelag;
-	
-				if( Enemy->SmokeTime >= EnemySmokeInterval )
-				{
-					Enemy->SmokeTime = FMOD( Enemy->SmokeTime, EnemySmokeInterval );
-	
-					fmpoly = FindFreeFmPoly();
-					
-					Colour = (u_int8_t) 128.0F; //( ( ( EnemyTypes[Enemy->Type].Shield * 0.25F ) / 192.0F ) * Enemy->Object.Shield );
-
-					if( fmpoly != (u_int16_t ) -1 )
-					{
-						FmPolys[ fmpoly ].LifeCount = 1000.0F;
-						ApplyMatrix( &Enemy->Object.FinalMat, &Backward, &FmPolys[ fmpoly ].Dir );
-						ApplyMatrix( &Enemy->Object.FinalMat, &SlideUp, &TempUp );
-						FmPolys[ fmpoly ].UpVector = SlideUp;
-						FmPolys[ fmpoly ].Pos = Enemy->Object.Pos;
-						FmPolys[ fmpoly ].SeqNum = FM_BLACK_SMOKE;															   
-						FmPolys[ fmpoly ].Frame = 0.0F;
-						FmPolys[ fmpoly ].R = Colour;
-						FmPolys[ fmpoly ].G = Colour;
-						FmPolys[ fmpoly ].B = Colour;
-#if ACTUAL_TRANS
-						FmPolys[ fmpoly ].Trans = 128;
-#else
-						FmPolys[ fmpoly ].Trans = 255;
-#endif
-						FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
-						FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-						FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
-						FmPolys[ fmpoly ].xsize = SMOKE_TRAIL_SIZE * 2.0F;
-						FmPolys[ fmpoly ].ysize = SMOKE_TRAIL_SIZE * 2.0F;
-						FmPolys[ fmpoly ].Speed = ( ( ( ( (float) Random_Range( 4000 ) ) / 1000.0F ) + 2.0F ) * GLOBAL_SCALE ); //( 16.0F * GLOBAL_SCALE );
-						FmPolys[ fmpoly ].UpSpeed = 0.0F;
-						FmPolys[ fmpoly ].Group = Enemy->Object.Group;
-						AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-					}
-				}
-			}
-			else
-			{
-				Enemy->SmokeTime = 0.0F;
-			}
-		}
-		else
-		{
-			Enemy->SmokeTime = 0.0F;
-		}
-	}
-	else
-	{
-		Enemy->SmokeTime = 0.0F;
-	}
-}
-
 
 /*===================================================================
 	Procedure	:		Enemy Save...

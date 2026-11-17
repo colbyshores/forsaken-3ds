@@ -118,7 +118,6 @@ SPOTFX * InitOneSpotFX( u_int16_t GenType, float GenDelay, u_int16_t Type, u_int
 					    VECTOR * Pos, VECTOR * Dir, VECTOR * Up, float ActiveDelay, float InactiveDelay,
 						int32_t Colour, int16_t Primary, int16_t Secondary, int16_t SoundFX, float Volume, float Speed, int16_t SFXType );
 SPOTFX * FindFreeSpotFX( void );
-void KillUsedSpotFX( SPOTFX * Object );
 void ProcessSpotFX( void );
 void EnableSpotFX( u_int16_t SpotFXIndex );
 void DisableSpotFX( u_int16_t SpotFXIndex );
@@ -152,11 +151,9 @@ void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, f
 void SetupSpotFXGroups( void );
 void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group );
 void RemoveSpotFXFromGroup( SPOTFX * SpotFX, u_int16_t Group );
-void MoveSpotFXToGroup( SPOTFX * SpotFX, u_int16_t OldGroup, u_int16_t NewGroup );
 void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group );
 void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed );
 void CreateSpotFXHk5Afterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
-void CreateSpotFXRockShrapnel( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 FILE * SaveAllSpotFX( FILE * fp );
 FILE * LoadAllSpotFX( FILE * fp );
 

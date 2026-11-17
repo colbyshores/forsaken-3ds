@@ -247,15 +247,6 @@ void sound_play_looping( sound_source_t * source )
 	sound_play( source );
 }
 
-void sound_stop( sound_source_t * source )
-{
-	if(source->playing)
-		stats.playing--;
-	source->playing = false;
-	//
-	alSourceStop( source->id );
-}
-
 bool sound_is_playing( sound_source_t * source )
 {
 	ALint state;

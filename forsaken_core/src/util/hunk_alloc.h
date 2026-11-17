@@ -42,8 +42,6 @@ void * Hunk_Alloc(HunkTag tag, size_t size);
 void   Hunk_FreeAll(HunkTag tag);
 
 size_t Hunk_Used(HunkTag tag);
-size_t Hunk_Available(void);
-size_t Hunk_Total(void);
 
 
 #endif

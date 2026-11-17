@@ -51,9 +51,6 @@ u_int8_t Colourtrans[MAXFONTCOLOURS][3] = {
 		Globals ...
 ===================================================================*/
 
-int TextSrcX[MAXFONTCOLOURS][256];
-int	TextSrcY[MAXFONTCOLOURS][256];
-
 float MaxMessageTime = 5.0f;
 
 int16_t	TextActivatedOrder = 0;
@@ -69,8 +66,6 @@ char *TeamName[ MAX_TEAMS ] = // team colour names should match TeamCol[] colour
 
 int FontWidth = 8;
 int FontHeight = 8;
-int FontSourceWidth = 8;
-int FontSourceHeight = 8;
 
 int16_t	NumOfActivePlayers = 0;
 
@@ -96,8 +91,6 @@ u_int16_t NumOfTextMessages = 0;
 char * TextMessagesPnt[MAXTEXTMESSAGES];
 char * TextMessages = NULL;
 TEXTMSGINFO * TextMsgInfo = NULL;
-
-char StatsMessageFile[] = "data\\txt\\statsmessages.txt";
 
 STATSMESSAGE StatsMessages[MAX_STATS_MESSAGES];
 
@@ -261,39 +254,6 @@ int Print4x5Text( const char * Text , int x , int y , int color )
 }
 
 
-/*===================================================================
-	Procedure	:		Print some text at a specified or the last pos
-	Input		:		char * Text, u_int16_t x , u_int16_t y
-	Output		:		last x position
-===================================================================*/
-void PrintClipped4x5Text( char * Text , int x , int y , int col )
-{
-	u_int8_t num;
-	u_int8_t r , g , b;
-	int dummy;
-
-
-	if (x < 0)
-		dummy = 0;
-
-	r = Colourtrans[col][0];
-	g = Colourtrans[col][1];
-	b = Colourtrans[col][2];
-
-	PermX = x;
-
-	while( ( num = *Text++ ) != 0 )
-	{
-		num = CharTrans[num];
-
-		if ( num )
-			AddScreenPolyText( (u_int16_t) num, (float) PermX , (float) y, r , g , b, 255 );
-	
-		PermX += FontWidth;
-	}
-
-}
-				
 /*===================================================================
 	Procedure	:		Print All Message in the player message Que (last 4 messages)...
 	Input		:		nothing
@@ -1733,60 +1693,6 @@ FILE *	LoadAllText( FILE * fp )
 	Output		:		void
 ===================================================================*/
 char * StatusTab[256];
-void FillStatusTab( void )
-{
-	int i;
-	for( i = 0 ; i < 256 ; i++ )
-	{
-		StatusTab[i] = "No Status Defined";
-	}
-
-    StatusTab[STATUS_Title                                ] = "Title        ";
-    StatusTab[STATUS_StartingMultiplayer                  ] = "Preping      ";
-    StatusTab[STATUS_PreStartingMultiplayerSynch          ] = "Preping      ";
-    StatusTab[STATUS_StartingMultiplayerSynch             ] = "Ready        ";
-    StatusTab[STATUS_QuitCurrentGame                      ] = "Quiting      ";
-    StatusTab[STATUS_GetPlayerNum                         ] = "Preping      ";
-    StatusTab[STATUS_PlayingDemo                          ] = "PlayingDemo  "; 
-    StatusTab[STATUS_Normal                               ] = "Ready        ";
-    StatusTab[STATUS_LevelEnd                             ] = "Preping      ";
-    StatusTab[STATUS_BetweenLevels                        ] = "Preping      ";
-    StatusTab[STATUS_ViewingScore                         ] = "Viewing Score";
-    StatusTab[STATUS_WaitingAfterScore                    ] = "Ready        ";
-    StatusTab[STATUS_Joining                              ] = "Joining      ";
-    StatusTab[STATUS_Left                                 ] = "Left         ";
-    StatusTab[STATUS_ChangeLevelPostInitView              ] = "Preping      ";
-    StatusTab[STATUS_ChangeLevelPostPlayingDemo           ] = "Preping      ";
-    StatusTab[STATUS_StartingSinglePlayer                 ] = "StartingSingl";
-    StatusTab[STATUS_PostStartingSinglePlayer             ] = "PostStartingS";
-    StatusTab[STATUS_SinglePlayer                         ] = "SinglePlayer ";
-    StatusTab[STATUS_ViewingStats                         ] = "ViewingStats ";
-    StatusTab[STATUS_TitleLoadGameStartingSinglePlayer    ] = "TitleLoadGame";
-    StatusTab[STATUS_TitleLoadGamePostStartingSinglePlayer] = "TitleLoadGame";
-    StatusTab[STATUS_ChangeLevelPostLoadGame              ] = "ChangeLevelPo";
-    StatusTab[STATUS_InGameLoadGameStartingSinglePlayer   ] = "InGameLoadGam";
-    StatusTab[STATUS_WaitingToStartSinglePlayer           ] = "WaitingToStar";
-    StatusTab[STATUS_WaitingToStartMultiPlayerHost        ] = "Preping      ";
-    StatusTab[STATUS_WaitingToStartMultiPlayerClient      ] = "Preping      ";
-    StatusTab[STATUS_WaitingToStartTeamGame               ] = "Perping      ";
-    StatusTab[STATUS_QuittingFromTitles                   ] = "QuittingFromT";
-    StatusTab[STATUS_WaitingToStartDemo                   ] = "WaitingToStar";
-    StatusTab[STATUS_WaitingToStartEndGameSequence        ] = "WaitingToStar";
-    StatusTab[STATUS_InitView_0                           ] = "Loading 1/10 ";
-    StatusTab[STATUS_InitView_1                           ] = "Loading 2/10 ";
-    StatusTab[STATUS_InitView_2                           ] = "Loading 3/10 ";
-    StatusTab[STATUS_InitView_3                           ] = "Loading 4/10 ";
-    StatusTab[STATUS_InitView_4                           ] = "Loading 5/10 ";
-    StatusTab[STATUS_InitView_5                           ] = "Loading 6/10 ";
-    StatusTab[STATUS_InitView_6                           ] = "Loading 7/10 ";
-    StatusTab[STATUS_InitView_7                           ] = "Loading 8/10 ";
-    StatusTab[STATUS_InitView_8                           ] = "Loading 9/10 ";
-    StatusTab[STATUS_InitView_9                           ] = "Loading 10/10";
-    StatusTab[STATUS_InitView_10                          ] = "Loading 10/10";
-    StatusTab[STATUS_LeftCrashed                          ] = "LeftCrashed  ";
-    StatusTab[STATUS_Null                                 ] = "Null         ";
-
-}
 
 /*===================================================================
 	Procedure	:		Display a connection setting...

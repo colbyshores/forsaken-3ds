@@ -247,7 +247,6 @@ void	CreatePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateShrapnelExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
-void	CreateFireExplosion( VECTOR * Pos, u_int16_t Group );
 void	CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup );
@@ -255,7 +254,6 @@ void	CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 void	CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup );
 void	CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup );
 void	CreateTransTrail( u_int16_t i );
-void	DispPowerLevel( void );
 void	RestoreAmmo( void );
 void	RestoreWeapons( void );
 void	InitAmmoUsed( void );
@@ -280,12 +278,10 @@ void	ChangePulsarDir( u_int16_t i, VECTOR * Dir );
 void	ChangeTrojaxDir( u_int16_t i, VECTOR * Dir );
 void	ChangeSussgunDir( u_int16_t i, VECTOR * Dir );
 void	ChangeOrbitPulsarDir( u_int16_t i, VECTOR * Dir );
-void	ReflectLaser( u_int16_t i, VECTOR * Dir );
 void	GivemeSuperNashram( void );
 void	LoseSuperNashram( void );
 void	CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 void	CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
-void	CreateMushroomExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateNewExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 u_int16_t	EnemyFirePrimary( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t BulletID, int8_t Weapon,

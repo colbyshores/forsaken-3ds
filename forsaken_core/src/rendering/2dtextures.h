@@ -131,7 +131,6 @@ extern FRAME_INFO * Text512_Header;
 extern FRAME_INFO * Orb_Header;
 extern FRAME_INFO * Solid_Header;
 extern FRAME_INFO * Thermo_Header;
-extern FRAME_INFO * Logos_Header;
 extern FRAME_INFO * Flag_Header;
 extern FRAME_INFO * Flags_Header;
 extern FRAME_INFO * Title_LevelPics_Header;

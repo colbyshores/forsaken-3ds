@@ -51,30 +51,6 @@ void strtoupper(char *str)
 	}
 }
 
-void GetFilename( u_int8_t * Src, u_int8_t * Dest )
-{
-	u_int8_t	*	Char_Ptr;
-
-	Char_Ptr = ( Src + strlen( (const char *)Src ) ) -1;
-
-	while( Char_Ptr != Src && *Char_Ptr != '\\' && *Char_Ptr != ':' ) Char_Ptr--;
-
-	if( Char_Ptr == Src )
-	{
-		strcpy( (char *)Dest, (const char *)Src );
-		return;
-	}
-
-	if( Char_Ptr != ( Src + strlen( (const char *)Src ) - 1 ) )
-	{
-		strcpy( (char *)Dest, (const char *)( Char_Ptr + 1 ) );
-	}
-	else
-	{
-		*Dest = 0;
-	}
-}
-
 void Get_Ext( u_int8_t * Src, u_int8_t * Dest )
 {
 	u_int8_t	*	Char_Ptr;

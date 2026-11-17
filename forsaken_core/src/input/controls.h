@@ -168,16 +168,9 @@ AnyKeyReleased( void );
 extern void
 ReadInput( void );
 
-extern int
-WhichMousePressed( void );
-
-extern int
-WhichJoystickPressed( void );
-
 void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum);
 void SetUpJoystickAxis(int joystick);
 bool IsJoystickButtonPressed( int joysticknum );
-bool IsAnyJoystickButtonPressed( void );
 bool IsJoystickButtonReleased( int joysticknum );
 bool IsAnyJoystickButtonReleased( void );
 int ToggleGodMode( char *cheat );

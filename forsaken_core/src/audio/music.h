@@ -43,8 +43,6 @@ bool music_init(void);
 void music_shutdown(void);
 void music_play(int track);     /* play track N (2-10), looping */
 void music_stop(void);
-bool music_is_playing(void);
-void music_set_volume(float vol); /* 0.0 - 1.0 */
 
 /* Called from ChangeLevel() / title screen to play the right track */
 void music_play_for_level(int level_num);

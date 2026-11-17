@@ -234,57 +234,6 @@ bool RaytoSphere2( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rd
 }
 
 /*===================================================================
-	Procedure	:	Ray To Sphere Collision
-	Input		:	VECTOR *	SphereCenter
-				:	float		Radius
-				:	VECTOR *	RayStart
-				:	VECTOR *	RayEnd
-				:	VECTOR *	IntPoint
-	Output		:	int16_t		Type Collision
-===================================================================*/
-int16_t RaytoSphere3( VECTOR * SphereCenter, float Radius, VECTOR * RayStart,
-				    VECTOR * RayEnd, VECTOR * IntPoint )
-{
-	VECTOR		EO;
-	float		v, disc, d, d0, d1;
-	VECTOR		RayDir;
-	float		RayLength;
-
-	EO.x = ( RayStart->x - SphereCenter->x );
-	EO.y = ( RayStart->y - SphereCenter->y );
-	EO.z = ( RayStart->z - SphereCenter->z );
-
-	if( VectorLength( &EO ) < Radius ) return( R2S_INSIDE ); // Vector Started inside Sphere!
-
-	RayDir.x = ( RayEnd->x - RayStart->x );
-	RayDir.y = ( RayEnd->y - RayStart->y );
-	RayDir.z = ( RayEnd->z - RayStart->z );
-	RayLength = VectorLength( &RayDir );
-	NormaliseVector( &RayDir );
-
-	v = DotProduct( &EO, &RayDir );
-
-	disc = ( ( Radius * Radius ) - DotProduct( &EO, &EO ) - ( v * v ) );
-
-	if ( disc < 0.0F ) return( R2S_MISSED );				// Ray does not IntPointsect sphere!
-
-	d  = (float) sqrtf( disc );
-	d0 = d - v;
-	d1 = ( -d ) - v;
-
-	d = (d0 < d1) ? d0 : d1;
-
-	if( d < 0.0F ) return( R2S_BEHIND );					// Start IntPointsection behind ray start!
-	if( d > RayLength ) return( R2S_SHORT );				// Ray was Short!
-
-	IntPoint->x = RayStart->x + ( RayDir.x * d );
-	IntPoint->y = RayStart->y + ( RayDir.y * d );
-	IntPoint->z = RayStart->z + ( RayDir.z * d );
-
-	return( R2S_COLLISION );								// Collided!
-}
-
-/*===================================================================
 	Procedure	:	Ray To Sphere Short
 	Input		:	VECTOR *	SphereCenter
 				:	float		Radius

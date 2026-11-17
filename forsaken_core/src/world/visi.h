@@ -32,16 +32,12 @@ bool OutputVisiStats( MLOADHEADER *m, char *lname );
 
 bool FindGroupConnections( MLOADHEADER *m );
 void FreeGroupConnections( void );
-GROUPLIST *ConnectedGroups( u_int16_t g );
 GROUPLIST *VisibleGroups( u_int16_t g );
-GROUPLIST *IndirectVisibleGroups( u_int16_t g );
 int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group );
 bool GroupsAreVisible( u_int16_t g1, u_int16_t g2 );
 bool GroupsAreConnected( u_int16_t g1, u_int16_t g2 );
-bool GroupsAreIndirectVisible( u_int16_t g1, u_int16_t g2 );
 
 u_int16_t FindClipGroup( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max );
-u_int16_t FindOverlappingVisibleGroups( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max, u_int16_t * group );
 bool PointInGroupBoundingBox( MLOADHEADER * Mloadheader, VECTOR * Pos, u_int16_t group );
 
 /* Defined in visi.cpp; shared with the modules that use it. */
