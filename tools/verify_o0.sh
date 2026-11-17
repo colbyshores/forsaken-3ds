@@ -19,7 +19,7 @@ export PATH=${DEVKITARM:-/opt/devkitpro/devkitARM}/bin:$PATH
 tmp=$(mktemp -d)
 norm() { "$OD" -d -r -C "$1" | tail -n +4 | grep -v '^Disassembly of section' |
 	sed -E ':a; s/\b([A-Za-z_][A-Za-z0-9_:~]*)\([^()]*\)( const)?/\1/g; ta' |
-	perl -pe 's{_ZZ(\d+)(\w+)}{my($n,$r)=($1,$2); my $f=substr($r,0,$n); ($r=~/E(\d+)([A-Za-z_]\w*)$/ && length($2)==$1) ? "_ZZ${n}${f}E$1$2" : "_ZZ$n$r"}ge; s{\.(rodata|bss|data|text)\._Z(\d+)(\w+?)\.}{".$1.".substr($3,0,$2)."."}ge'; }
+	perl -pe 's{_ZZ(\d+)(\w+)}{my($n,$r)=($1,$2); my $f=substr($r,0,$n); ($r=~/E(\d+)([A-Za-z_]\w*)$/ && length($2)==$1) ? "_ZZ${n}${f}E$1$2" : "_ZZ$n$r"}ge; s{\.(rodata|bss|data|text)\._ZL?(\d+)(\w+)}{".$1.".substr($3,0,$2)}ge'; }
 fail=0
 for o in "$@"; do
 	for side in base work; do
