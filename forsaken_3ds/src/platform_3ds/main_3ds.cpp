@@ -70,7 +70,10 @@ extern u32 __ctru_heap;
 extern u32 __ctru_linear_heap;
 extern char *fake_heap_start, *fake_heap_end;
 
-void __system_allocateHeaps(void)
+/* extern "C" is load-bearing: libctru calls this by its C name and links
+ * its own weak default otherwise. A mangled C++ name compiles and links
+ * cleanly and silently loses the override (tier detection gone). */
+extern "C" void __system_allocateHeaps(void)
 {
 	u32 tmp = 0;
 	u64 region_size = osGetMemRegionSize(MEMREGION_APPLICATION);
