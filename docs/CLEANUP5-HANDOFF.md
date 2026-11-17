@@ -66,11 +66,13 @@ Bugs found (separate, labelled commits): `primary.cpp` indexed
 `ModelHeaders` as an array (1c75966); PC joystick names (5d6474b); the C++
 conversion briefly lost the libctru heap override (088b1f0, now guarded).
 
-**On-device play test needed** (when the console is free): 1c75966
-(behaviour fix; reactor-core / spot-FX scenario), 46d152e (3DS platform
-TUs and render_c3d compiled as C++), da7b53a (tracing removed: level loads
-no longer write the SD log), 8260103 (stereo debug toggle removed from the
-3DS visuals menus).
+**On-device play test:** 2026-11-17, owner, build 7b095b6 (remaster .3dsx
+via ftpd): title + the subway level play well, no regressions seen -- covers
+46d152e (platform TUs / render_c3d as C++), da7b53a (no tracing) and
+8260103 in general play. Emulator (Mandarine r1.2.1) and PC Vulkan
+(lavapipe) title screens match a 09eeb31 baseline. Still worth a targeted
+check: 1c75966 (spot-FX bullets from models, e.g. the reactor core) and
+the 3DS Visuals menu (stereo debug row removed).
 
 **Owner decisions pending:**
 1. Optional features under never-defined macros — keep or delete:
