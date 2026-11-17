@@ -1177,36 +1177,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					switch( Models[i].Func )
 					{
 						case MODFUNC_Fade:
-#if 0
-							// is this mxa?
-							/*
-							if ( NamePnt[ i ].DoIMorph )
-							{
-								if( !FadeMxaModel( &MxaModelHeaders[ i ] ))
-									DebugPrintf("FadeMxaModel failed\n");
-							}
-							*/
-							if (!FadeMxaModel( &MxaModelHeaders[ Models[ i ].ModelNum ] ))
-								Msg("MakeTranslucent() returned false");
-
-							TempMatrix = MATRIX_Identity;
-							TempMatrix._11 *= Models[i].Xscale;
-							TempMatrix._22 *= Models[i].Yscale;
-							TempMatrix._33 *= Models[i].Zscale;
-
-							BuildRotMatrix(Models[i].Rot.x, Models[i].Rot.y, Models[i].Rot.z, &TempRotMatrix);
-							
-
-							MatrixMultiply( &TempMatrix, &TempRotMatrix, &Models[i].Mat );
-							MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-
-							
-							//RefreshVertex( &MxaModelHeaders[ Models[ i ].ModelNum ],
-							//	CurrentGroup, CurrentExecBuf, CurrentVert, 1.0F );
-
-							if ( BikeExpanded )
-								RefreshModel( i ); 
-#endif							
 							break;
 						case MODFUNC_ReScale:
 							break;
@@ -2992,15 +2962,6 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 
 			while( Vert-- )
 			{
-#if 0
-				OrigRGBA = (COLOR_RGBA *) OrigColours;
-				DestRGBA = (COLOR_RGBA *) &DstlpD3DLVERTEX->color;
-				DestRGBA->r = (u_int8_t) ( ( (u_int16_t) OrigRGBA->r * Red ) >> 8 );
-				DestRGBA->g = (u_int8_t) ( ( (u_int16_t) OrigRGBA->g * Green ) >> 8 );
-				DestRGBA->b = (u_int8_t) ( ( (u_int16_t) OrigRGBA->b * Blue ) >> 8 );
-				OrigColours++;
-				DstlpD3DLVERTEX++;
-#endif
 				DestRGBA = (COLOR_RGBA *) &DstlpD3DLVERTEX->color;
 
 				DestRGBA->r = (u_int8_t) ( ( (u_int16_t) (RGBA_GETRED(VertPtr->color) * Red) ) >> 8 );
@@ -4234,93 +4195,6 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 
 	switch( ColPerspective )
 	{
-#if 0
-		case COLPERS_Forsaken:
-			if( ( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) ||
-				( ( OwnerType != OWNER_SHIP ) && IsHost ) )
-			{
-				for( Count = 0; Count < MAX_PLAYERS; Count++ )
-				{
-					if( ( Ships[ Count ].enable ) && ( Ships[ Count ].Object.Mode != LIMBO_MODE ) )
-					{
-						if( !SoundInfo[ Ships[ Count ].Object.Group ][ Group ] )
-						{
-							DistVector.x = ( Ships[ Count ].Object.Pos.x - Pos->x );
-							DistVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
-							DistVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
-							DistFromCenter = VectorLength( &DistVector );
-					
-							if( DistFromCenter < ( Radius + SHIP_RADIUS ) )
-							{
-								if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
-											  Group, &DistVector, (VECTOR *) &Int_Point,
-											  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
-								{
-									Damage = ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) );
-				
-									Recoil.x = ( ( DistVector.x / DistFromCenter ) * ( Damage / 4.0F ) );
-									Recoil.y = ( ( DistVector.y / DistFromCenter ) * ( Damage / 4.0F ) );
-									Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 4.0F ) );
-			
-									Damage = ( Damage * framelag );
-			
-									if( Count != WhoIAm )
-									{
-										if( Weapon != (BYTE) -1 )
-										{
-											IHitYou( (BYTE) Count, Damage, &Recoil, &TempVector, &TempVector, 0.0F, WEPTYPE_Secondary, Weapon, FRAMELAGED_RECOIL );
-										}
-										else
-										{
-											IHitYou( (BYTE) Count, Damage, &Recoil, &TempVector, &TempVector, 0.0F, WEPTYPE_Various, Weapon, FRAMELAGED_RECOIL );
-										}
-									}
-									else
-									{
-										if( !Ships[ WhoIAm ].Invul )
-										{
-											if( OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
-
-											Ships[ WhoIAm ].Damage = Damage;
-								
-											Ships[WhoIAm].ShipThatLastHitMe = WhoIAm;
-											if( DoDamage( DONT_OVERRIDE_INVUL ) == 1 )		// Did I Die?
-											{
-												GetDeathString( WEPTYPE_Secondary, Weapon, &methodstr[0] );
-			
-												Ships[ WhoIAm ].ShipThatLastKilledMe = WhoIAm;
-												Ships[ WhoIAm ].Object.Mode = DEATH_MODE;
-												Ships[ WhoIAm ].Timer = 0.0F;
-												if( OwnerType != OWNER_SHIP ) sprintf( &tempstr[0], AN_ENEMY_KILLED_YOU, &methodstr[0] );
-												else{
-													PlaySfx( SFX_BIKECOMP_DY, 1.0F );
-													sprintf( &tempstr[0], YOU_KILLED_YOURSELF_HOW, &methodstr[0] );
-												}
-												AddColourMessageToQue( KillMessageColour, "%s", &tempstr[0] );
-												ShipDiedSend( WEPTYPE_Secondary, Weapon );
-											}
-										}
-										ForceExternal( WhoIAm, &Recoil );
-										if ( !( Models[ model ].Flags & MODFLAG_ShockwaveHitMe ) )
-										{
-											Models[ model ].Flags |= MODFLAG_ShockwaveHitMe;
-											Damage = ( Center_Damage - ( DistFromCenter / ( ( ( Models[ model ].MaxScale * BALL_RADIUS ) + SHIP_RADIUS ) / Center_Damage ) ) );
-											Damage = ( Damage * framelag );
-											Recoil.x = ( ( DistVector.x / DistFromCenter ) * ( Damage / 4.0F ) );
-											Recoil.y = ( ( DistVector.y / DistFromCenter ) * ( Damage / 4.0F ) );
-											Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 4.0F ) );
-											FB_JoltForce( &Recoil );
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			break;
-
-#endif
 		case COLPERS_Forsaken:
 		case COLPERS_Descent:
 			if( ( Ships[ WhoIAm ].enable ) && ( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE ) )
@@ -4347,29 +4221,6 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 							Damage = ( Damage * framelag );
 							if( OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
 			
-#if 0
-							if( !Ships[ WhoIAm ].Invul )
-							{
-								Ships[ WhoIAm ].Damage = Damage;
-						
-								Ships[WhoIAm].ShipThatLastHitMe = WhoIAm;
-								if( DoDamage( DONT_OVERRIDE_INVUL ) == 1 )		// Did I Die?
-								{
-									GetDeathString( WEPTYPE_Secondary, Weapon, &methodstr[0] );
-			
-									Ships[ WhoIAm ].ShipThatLastKilledMe = WhoIAm;
-									Ships[ WhoIAm ].Object.Mode = DEATH_MODE;
-									Ships[ WhoIAm ].Timer = 0.0F;
-									if( OwnerType != OWNER_SHIP ) sprintf( &tempstr[0], AN_ENEMY_KILLED_YOU, &methodstr[0] );
-									else{
-										PlaySfx( SFX_BIKECOMP_DY, 1.0F );
-										sprintf( &tempstr[0], YOU_KILLED_YOURSELF_HOW, &methodstr[0] );
-									}
-									AddColourMessageToQue( KillMessageColour, "%s", &tempstr[0] );
-									ShipDiedSend( WEPTYPE_Secondary, Weapon );
-								}
-							}
-#endif
 
 							HitMe( OwnerType, Owner, Damage, WEPTYPE_Secondary, Weapon );
 							ForceExternal( WhoIAm, &Recoil );
@@ -4894,25 +4745,6 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 							Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 10.0F ) );
 					
 							Damage = ( Damage * framelag );
-#if 0					
-							if( !Ships[ WhoIAm ].Invul )
-							{
-								Ships[ WhoIAm ].Damage = Damage;
-								Ships[WhoIAm].ShipThatLastHitMe = WhoIAm;
-						
-								if( DoDamage( DONT_OVERRIDE_INVUL ) == 1 )						// Did I Die?
-								{
-									GetDeathString( WEPTYPE_Secondary, Weapon, &methodstr[0] );
-					
-									Ships[ WhoIAm ].ShipThatLastKilledMe = WhoIAm;
-									Ships[ WhoIAm ].Object.Mode = DEATH_MODE;
-									Ships[ WhoIAm ].Timer = 0.0F;
-									PlaySfx( SFX_BIKECOMP_DY, 1.0F );
-									AddColourMessageToQue( KillMessageColour, YOU_KILLED_YOURSELF_HOW, &methodstr[0] );
-									ShipDiedSend( WEPTYPE_Secondary, Weapon );
-								}
-							}
-#endif
 							HitMe( OWNER_SHIP, Owner, Damage, WEPTYPE_Secondary, Weapon );
 							ForceExternalOneOff( WhoIAm, &Recoil );
 						}

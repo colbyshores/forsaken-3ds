@@ -117,7 +117,6 @@ typedef struct
 
 static void InitDebugRays( void )
 {
-#if 1
 	char fname[ 256 ];
 	FILE *rf;
 	DebugRay ray;
@@ -154,7 +153,6 @@ static void InitDebugRays( void )
 		}
 	}
 	fclose( rf );
-#endif
 }
 
 
@@ -765,16 +763,6 @@ Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 	{
 		clip |= CLIP_FRONT;
 	    VisPolyApplyMatrix( (MATRIX *) &cam->View, (VECTOR *) wpos, vpos );
-#if 0
-		if ( vpos->x < 0.0F )
-			vpos->x = -1.0F;
-		else
-			vpos->x = 1.0F;
-		if ( vpos->y < 0.0F )
-			vpos->y = -1.0F;
-		else
-			vpos->y = 1.0F;
-#else
 		if ( DotProduct( vpos, &clip_left ) < 0.0F )
 		{
 			clip |= CLIP_LEFT;
@@ -792,7 +780,6 @@ Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 			clip |= CLIP_BOTTOM;
 		}
 		return clip;
-#endif
 	}
 
 	if ( vpos->x < -1.0F )

@@ -6485,22 +6485,8 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	}
 	Object->Quat.Multiply(&StepQuat, &Object->Quat);
 
-#if 1
 	Object->RotationForce.Multiply(&Object->Quat, &Object->Quat);
 	Enemy->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
-#else
-	if( Object->RotationForce.w >= 1.0F )
-		Object->RotationForce.w = 1.0F;
-	else{
-		Object->RotationForce.w *= 1.0F + ( EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F * framelag );
-		if( Object->RotationForce.w > 1.0F )
-			Object->RotationForce.w = 1.0F;
-	}
-	AccellDecell( &Object->RotationForce.x , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
-	AccellDecell( &Object->RotationForce.y , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
-	AccellDecell( &Object->RotationForce.z , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
-	Object->RotationForce.Multiply(&Object->Quat, &Object->Quat);
-#endif
 
 	Object->Quat.ToMatrix(&Object->Mat);
 
@@ -7903,7 +7889,6 @@ extern "C" void UpdateEnemiesClipGroup( CAMERA * Camera  )
 	}
 }
 
-#if 1
 /*===================================================================
 	Stuff to do with reading in the Enemies.txt!!!!
 ===================================================================*/
@@ -8721,13 +8706,6 @@ void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
 	AccellDecell( &Object->Speed.y , EnemyTypes[Enemy->Type].MoveRateDecell );
 	AccellDecell( &Object->Speed.z , EnemyTypes[Enemy->Type].MoveRateDecell );
 
-#if 0
-	AccellDecell( &Object->Angle.x , EnemyTypes[Enemy->Type].TurnRateDecell );
-	AccellDecell( &Object->Angle.y , EnemyTypes[Enemy->Type].TurnRateDecell * 2.0F);
-	AccellDecell( &Object->Angle.z , RollDecell );
-	StepQuat.MakeEuler(Object->Angle.x * framelag, Object->Angle.y * framelag, Object->Angle.z * framelag);
-	Object->Quat.Multiply(&StepQuat, &Object->Quat);
-#endif
 
 	Object->Quat.ToMatrix(&Object->Mat);
 	MatrixTranspose( &Object->Mat, &Object->InvMat );
@@ -8803,43 +8781,8 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 
 	Object->Autolevel = ObjectAutoLevelRot( Object , 0.05F * framelag );
 
-#if 1
 	Enemy->AI_Angle.x *= EnemyTypes[Enemy->Type].TurnRateDecell * framelag;
 	Enemy->AI_Angle.y *= EnemyTypes[Enemy->Type].TurnRateDecell * framelag;
-#else
-	if( Enemy->AI_Angle.x < 0.0F )
-	{
-		if( Enemy->AI_Angle.x < -(EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F) )
-		{
-			Enemy->AI_Angle.x = -(EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F);
-		}
-	}else{
-		if( Enemy->AI_Angle.x > 0.0F )
-		{
-
-			if( Enemy->AI_Angle.x > (EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F) )
-			{
-				Enemy->AI_Angle.x = EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F;
-			}
-		}
-	}
-	if( Enemy->AI_Angle.y < 0.0F )
-	{
-		if( Enemy->AI_Angle.y < -(EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F) )
-		{
-			Enemy->AI_Angle.y = -(EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F);
-		}
-	}else{
-		if( Enemy->AI_Angle.y > 0.0F )
-		{
-
-			if( Enemy->AI_Angle.y > (EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F) )
-			{
-				Enemy->AI_Angle.y = EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F;
-			}
-		}
-	}
-#endif
 	
 
 	StepQuat.MakeEuler(Enemy->AI_Angle.x, Enemy->AI_Angle.y, Object->Autolevel);
@@ -8910,7 +8853,6 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 		return false;
 }
 
-#endif
 
 /*===================================================================
 	Procedure	:	Crappy Bodge to fix mappers fuckup
@@ -9239,68 +9181,6 @@ void DoNmeDamagedEffects( ENEMY * Enemy )
 	}
 }
 
-#if 0
-typedef long fix;				//16 bits int, 16 bits frac
-
-typedef struct vms_vector {
-	fix x,y,z;
-} vms_vector;
-
-//A 3x3 rotation matrix.  Sorry about the numbering starting with one.
-//Ordering is across then down, so <m1,m2,m3> is the first row
-typedef struct vms_matrix {
-	vms_vector rvec,uvec,fvec;
-} vms_matrix;
-
-
-typedef struct frame_info {
-1	ubyte				type;						// What type of packet
-3	ubyte				pad[3];					// Pad out length of frame_info packet
-4	int				numpackets;			
-12	vms_vector		obj_pos;
-36	vms_matrix		obj_orient;
-12	vms_vector		phys_velocity;
-12	vms_vector		phys_rotvel;
-2	short				obj_segnum;
-2	ushort			data_size;		// Size of data appended to the net packet
-1	ubyte				playernum;
-1	ubyte				obj_render_type;
-1	ubyte				level_num;
-1	ubyte				data[NET_XDATA_SIZE];		// extra data to be tacked on the end
-} frame_info;
-// Descent Packet size = 88
-
-
-typedef struct _VERYSHORTGLOBALSHIP
-{
-	u_int32_t				Flags;			// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
-	BYTE				Status;			// tells us constantly what this ship is doing...
-	BYTE				GroupImIn;		// Group Im In
-	SHORTVECTOR			Pos;			// x , y , z position
-	SHORTVECTOR			Move_Off;		// Last MoveMent...x , y , z
-	SHORTVECTOR			Angle;			// Last Rotation..
-	int16_t				Bank;		// How much Am I banked....
-	u_int16_t				Move_Off_Scalar;
-	SHORTQUAT			Quat;		// Final Quat...
-	// 36 bytes norm 58
-} VERYSHORTGLOBALSHIP, *LPVERYSHORTGLOBALSHIP;
-
-typedef struct _FSHORTGLOBALSHIP
-{
-	u_int32_t				Flags;			// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
-	BYTE				Primary;		// Primary weapon
-	BYTE				Secondary;		// Secondary weapon
-	BYTE				GroupImIn;		// Group Im In
-	BYTE				PrimPowerLevel;	// Trojax Powerlevel
-	SHORTVECTOR			Pos;			// x , y , z position
-	SHORTVECTOR			Move_Off;		// Last MoveMent...x , y , z
-	SHORTVECTOR			Angle;			// Last Rotation..
-	int16_t				Bank;		// How much Am I banked....
-	u_int16_t				Move_Off_Scalar;
-	SHORTQUAT			Quat;		// Final Quat...
-} FSHORTGLOBALSHIP, *LPFSHORTGLOBALSHIP;
-//38 bytes norm 65
-#endif
 
 /*===================================================================
 	Procedure	:		Enemy Save...

@@ -794,7 +794,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 				for ( pnum = 0; pnum < Mloadheader->Group[group].Portal[portal].num_polys_in_portal; pnum++ )
 				{
-#if 1
 					/* Uint16Pnt is 2-byte aligned; GCC compiles the struct
 					   assignment below into `ldm` which requires 4-byte
 					   alignment and faults on ARM11. */
@@ -802,24 +801,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					  memcpy_unaligned(&Mloadheader->Group[group].Portal[portal].Poly[pnum],
 					                   Uint16Pnt, sizeof(MCFACE)); }
 					Uint16Pnt = (u_int16_t *) ( (char *) Uint16Pnt + sizeof(MCFACE) );
-#else
-					Mloadheader->Group[group].Portal[portal].Poly[pnum].num_vertices_in_poly = *Uint16Pnt++;
-					if ( Mloadheader->Group[group].Portal[portal].Poly[pnum].num_vertices_in_poly > MAXVERTSPERPORTALPOLY )
-					{
-						Msg( "Mload : More than MAXVERTSPERPORTALPOLY\n" );
-						return false;
-					}
-					for ( verts = 0; verts < Mloadheader->Group[group].Portal[portal].Poly[pnum].num_vertices_in_poly; verts++ )
-					{
-						vnum = *Uint16Pnt++;
-						if ( vnum >= Mloadheader->Group[group].Portal[portal].num_vertices_in_portal )
-						{
-							Msg( "Mload : Different num of verts in portal\n" );
-							return false;
-						}
-						Mloadheader->Group[group].Portal[portal].Poly[pnum].Verts[verts] = Mloadheader->Group[group].Portal[portal].Verts[vnum];
-					}
-#endif
 				}
 	
 				Buffer = (char *) Uint16Pnt;		

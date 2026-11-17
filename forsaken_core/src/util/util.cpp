@@ -240,38 +240,9 @@ int Msg( const char * msg, ... )
 
 	txt[sizeof(txt)-1] = 0;
 
-#if 0 //def WIN32
-
-    if (render_info.fullscreen)
-	{
-		// switch to window mode
-		// other wise pop up will get stuck behind main window
-		MenuGoFullScreen(NULL);
-		// push main window to background so popup shows
-        SetWindowPos(GetActiveWindow(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-	}
-
-	
-	// release mouse so they can interact with message box
-	input_grab( false );
-
-    res = MessageBox( GetActiveWindow(), txt, "Forsaken", MB_OKCANCEL | MB_ICONEXCLAMATION );
-
-    if (was_fullscreen)
-	{
-		// switch back to fullscreen
-		MenuGoFullScreen(NULL);
-        SetWindowPos(GetActiveWindow(), HWND_TOPMOST, 0, 0, 0, 0,  SWP_NOSIZE | SWP_NOMOVE);
-		input_grab( true ); // don't do this in window mode just let them click back on the window
-	}
-
-	DebugPrintf( txt );
-
-#else // ! WIN32
 
 	DebugPrintf("Msg: %s\n",txt);
 
-#endif
 	// IDCANCEL	Cancel button was selected.
 	// IDOK	OK button was selected.
 	return res;

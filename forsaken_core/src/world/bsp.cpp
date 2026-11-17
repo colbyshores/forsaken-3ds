@@ -434,16 +434,6 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
    		*ImpactNormal = CollideNode->Normal;
    		*ImpactOffset = CollideNode->Offset - CollisionRadius;
 
-#if 0	// Shouldnt need this if all opposite co-planear faces are not used as splitting planes...
-		Trick = ( ImpactNormal->x * Dir->x + ImpactNormal->y * Dir->y + ImpactNormal->z * Dir->z ) / RayLength;
-		if ( Trick > 0.001F )
-   		{
-   			ImpactNormal->x = -ImpactNormal->x;
-   			ImpactNormal->y = -ImpactNormal->y;
-   			ImpactNormal->z = -ImpactNormal->z;
-   			*ImpactOffset = -*ImpactOffset;
-   		}
-#endif
    		return true;
 	}
 	else

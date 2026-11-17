@@ -1270,59 +1270,6 @@ bool RestoreSfxData( u_int32_t id, VECTOR *pos, u_int16_t *group )
 
 void ReTriggerSfx( void )
 {
-#if 0
-	u_int16_t i, j;
-	u_int32_t tempuid[ MAX_LOOPING_SFX ];
-
-	SfxUniqueID = 1;
-
-	// find highest unique id
-	for ( i = 0; i < MAX_LOOPING_SFX; i++ )
-	{
-		if ( TempSpotSfxList[ i ].uid > SfxUniqueID )
-		{
-			SfxUniqueID = TempSpotSfxList[ i ].uid;
-		}
-	}
-
-	memset( tempuid, 0, sizeof( u_int32_t ) * MAX_LOOPING_SFX );
-
-	// re-trigger all existing looping sfx...
-	for ( i = 0; i < MAX_LOOPING_SFX; i++ )
-	{
-		if ( TempSpotSfxList[ i ].used )
-		{
-			if ( TempSpotSfxList[ i ].type == LOOPING_SFX_FixedGroup )
-			{
-				tempuid[ i ] = PlayFixedSpotSfx( temp.sfxindex, temp.fixedgroup, &temp.fixedpos, temp.freq, temp.vol, temp.Effects );
-			}
-
-			if ( TempSpotSfxList[ i ].type == LOOPING_SFX_VariableGroup )
-			{
-
-				tempuid[ i ] = PlaySpotSfx( temp.sfxindex, temp.group, temp.pos,	temp.freq, temp.vol, temp.Effects );
-			}
-
-		}
-	}
-
-	for ( i = 0; i < MAX_LOOPING_SFX; i++ )
-	{
-		if ( tempuid[ i ] )
-		{
-			// change uid of given sfx holder to match old one...
-			for ( j = 0; j < MAX_ANY_SFX; j++ )
-			{
-				if ( SfxHolder[ j ].Used && ( SfxHolder[ j ].UniqueID == tempuid[ i ] ) )
-				{
-					SfxHolder[ j ].UniqueID = TempSpotSfxList[ j ].uid;
-					SpotSfxList[ SfxHolder[ j ].SfxBufferIndex ].uid = TempSpotSfxList[ j ].uid;
-					break;
-				}
-			}
-		}
-	}
-#else
 	SPOT_SFX_LIST temp;
 	u_int32_t tempuid;
 	u_int16_t i, j;
@@ -1366,7 +1313,6 @@ void ReTriggerSfx( void )
 			}
 		}
 	}
-#endif
 }
 
 void GetFullBikeSfxPath( char *fullpath, int sfxnum, int variant, int total_variants, int bike )
@@ -2555,7 +2501,6 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume )
 	}
 }
 
-#if 1
 #define START_LINE 5
 #define GAP_SIZE 50
 #define X_OFFSET 5
@@ -2638,7 +2583,6 @@ void PrintLoopingSfxDebug( void )
 		Print4x5Text( buf , DATA_OFFSET + X_OFFSET + i * GAP_SIZE , LINE_HEIGHT * line++, 2 );
 	}
 }
-#endif
 
 void ProcessLoopingSfx( void )
 {

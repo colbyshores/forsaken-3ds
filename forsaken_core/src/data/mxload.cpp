@@ -954,7 +954,6 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 						{
 							if( !LightModel2( Models[ Model ].ModelNum, &Models[ Model ].Pos ) ) Display = false;
 						}
-#if 1
 						switch( Models[ Model ].Func )
 						{
 							case MODFUNC_ScaleDonut:
@@ -963,7 +962,6 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 							default:
 								break;
 						}
-#endif
 					}
 
 					if (!FSGetWorld(&Matrix))

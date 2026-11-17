@@ -2334,12 +2334,6 @@ MENU  MENU_NEW_ChooseTeamForExistingGame = {
 		{ 53, 45, 98, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 		{ 101, 45, 146, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 		{ 149, 45, 194, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-#if 0
-		{ 5, 118, 50, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 53, 118, 98, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 101, 118, 146, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 149, 118, 194, 125, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)TeamCurrentScore[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-#endif
 
 		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
@@ -2473,7 +2467,6 @@ MENU	MENU_WeaponKeys =
 	}
 };
 
-#if 1
 MENU	MENU_Keyboard =
 {
 	(u_int8_t*)LT_MENU_Keyboard0 /*"Configure controls"*/, InitKeyDefPage, NULL, NULL, 0,
@@ -2560,96 +2553,12 @@ MENU	MENU_Keyboard =
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
-#else
-MENU	MENU_Keyboard =
-{
-	"Keyboard", NULL, NULL, NULL, 0,
-	{
-		KEYDEF( 32, 112, "Rotate Left", (void *)&Config.left ),
-
-		KEYDEF( 32, 128, "Rotate Right", (void *)&Config.right ),
-
-		KEYDEF( 32, 144, "Rotate Up", (void *)&Config.up ),
-			      
-		KEYDEF( 32, 160, "Rotate Down", (void *)&Config.down ),
-
-			      
-		KEYDEF( 32, 192, "Slide Left", (void *)&Config.move_left ),
-			         
-		KEYDEF( 32, 208, "Slide Right", (void *)&Config.move_right ),
-			   
-		KEYDEF( 32, 224, "Slide Up", (void *)&Config.move_up ),
-			         
-		KEYDEF( 32, 240, "Slide Down", (void *)&Config.move_down ),
-
-			   
-		KEYDEF( 32, 272, "Roll Left", (void *)&Config.roll_left ),
-			      
-		KEYDEF( 32, 288, "Roll Right", (void *)&Config.roll_right ),
-
-
-		KEYDEF( 32, 320, "Slide Mode", (void *)&Config.move ),
-
-		KEYDEF( 32, 336, "Roll Mode", (void *)&Config.roll ),
-
-		// right column
-
-		KEYDEF( 352, 112, "Forward", (void *)&Config.move_forward ),
-
-		KEYDEF( 352, 128, "Reverse", (void *)&Config.move_backward ),
-		
-		KEYDEF( 352, 144, "Nitro", (void *)&Config.turbo ),
-
-
-		KEYDEF( 352, 176, "Speed Up", (void *)&Config.cruise_faster ),
-
-		KEYDEF( 352, 192, "Slow Down", (void *)&Config.cruise_slower ),
-
-
-		KEYDEF( 352, 224, "Fire Prim", (void *)&Config.fire_primary ),
-
-		KEYDEF( 352, 240, "Fire Sec", (void *)&Config.fire_secondary ),
-		
-		KEYDEF( 352, 256, "Drop Mine", (void *)&Config.fire_mine ),
-
-		KEYDEF( 352, 288, "Drop Prim", (void *)&Config.drop_primary ),
-
-		KEYDEF( 352, 304, "Drop Sec", (void *)&Config.drop_secondary ),
-
-		KEYDEF( 352, 320, "Drop Shield", (void *)&Config.drop_shield ),
-
-		KEYDEF( 352, 336, "Drop Ammo", (void *)&Config.drop_ammo ),
-
-
-		{ 200, 368, 0, 0, 0,  "Weapon selection keys", 0, 0, NULL, &MENU_WeaponKeys, MenuChange, MenuItemDrawName, NULL, 0 },
-
-		{ -1 , -1, 0, 0, 0, "" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-#endif
 
 MENU	MENU_Primary;
 MENU	MENU_Secondary;
 MENU	MENU_Controls = {
 	(u_int8_t*)LT_MENU_Controls0 /*"Bike Controls"*/, InitControls, ExitControls, NULL, 0,
 	{
-#if 0
-		{ 200, 144 - 32, 0, 0, 0, "Mouse", 0, 0,				(void *)&ControlMethod,	(void *)CONTROL_Mouse,		SelectRadioButton,	DrawRadioButton, NULL, 0 },
-		{ 200, 160 - 32, 0, 0, 0, "Keyboard", 0, 0,				(void *)&ControlMethod,	(void *)CONTROL_Keyboard,	SelectRadioButton,	DrawRadioButton, NULL, 0 },
-		{ 200, 176 - 32, 0, 0, 0, "Joystick", 0, 0,				(void *)&ControlMethod,	(void *)CONTROL_Joystick,	SelectRadioButton,	DrawRadioButton, NULL, 0 },
-		{ 200, 192 - 32, 0, 0, 0, "Gamepad", 0, 0,				(void *)&ControlMethod,	(void *)CONTROL_Gamepad,	SelectRadioButton,	DrawRadioButton, NULL, 0 },
-		
-		{ 200, 176 + 16, 0, 0, 0, "Invert X",  0, 0,			&Config.invert_turn,			NULL,				SelectToggle,		DrawToggle, NULL, 0 },
-		{ 200, 192 + 16, 0, 0, 0, "Invert Y",  0, 0,			&Config.invert_pitch,			NULL,				SelectToggle,		DrawToggle, NULL, 0 },
-				
-		{ 200, 224, 0, 0, 0, "X Sensitivity  ", 0, 0,		&SensitivityXSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
-		{ 200, 240, 0, 0, 0, "Y Sensitivity  ", 0, 0,		&SensitivityYSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
-		{ 200, 272, 0, 0, 0, "Autoleveling",  0, 0,			&Autoleveling,			(void*)SetAutolevel,				SelectToggle,		DrawToggle, NULL, 0 },
-		{ 200, 288, 0, 0, 0, "Calibrate Joystick", 0, 0,	NULL,					&MENU_NotYet,				MenuChange,			MenuItemDrawName, NULL, 0 },
-		{ 200, 320, 0, 0, 0, "Configure Keyboard", 0, 0,	NULL,					&MENU_Keyboard,				MenuChange,			MenuItemDrawName, NULL, 0 },
-		{ 200, 336, 0, 0, 0, "Weapon Priority", 0, 0,		NULL,					&MENU_NotYet,				MenuChange,			MenuItemDrawName, NULL, 0 },
-		{ 200, 352, 0, 0, 0, "Reorder Secondary", 0, 0,	NULL,					&MENU_NotYet,				MenuChange,			MenuItemDrawName, NULL, 0 },
-#else
 		{ 200, 112, 0, 0, 0, (u_int8_t*)LT_MENU_Controls1 /*"Configure controls"*/, 0, 0,	NULL,					&MENU_Keyboard,				MenuChange,			MenuItemDrawName, NULL, 0 },
 		{ 200, 160, 0, 0, 0, (u_int8_t*)LT_MENU_Controls3 /*"Joystick          "*/, 0, 0,	&JoystickInput,			NULL,						SelectToggle,		DrawToggle, NULL, 0 },
 		{ 200, 192, 0, 0, 0, (u_int8_t*)LT_MENU_Controls4 /*"Autoleveling      "*/,  0, 0,			&Autoleveling,			(void*)SetAutolevel,				SelectToggle,		DrawToggle, NULL, 0 },
@@ -2657,7 +2566,6 @@ MENU	MENU_Controls = {
 		{ 200, 240, 0, 0, 0, (u_int8_t*)LT_MENU_Controls6 /*"Invert Y          "*/,  0, 0,			&Config.invert_pitch,			NULL,				SelectToggle,		DrawToggle, NULL, 0 },
 		{ 200, 272, 0, 0, 0, (u_int8_t*)LT_MENU_Controls7 /*"X Sensitivity     "*/, 0, 0,		&SensitivityXSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
 		{ 200, 288, 0, 0, 0, (u_int8_t*)LT_MENU_Controls8 /*"Y Sensitivity     "*/, 0, 0,		&SensitivityYSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
-#endif
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}																					
 };
@@ -4735,13 +4643,6 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 
 		if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], 0 ) ) // bjd
 				return false;
-#if 0
-/*
-Display 0 solid Clipped Faceme Transluecent Polys
-*/
-		if( !DisplaySolidGroupClippedFmPolys( &RenderBufs[ 1 ], 0, lpDev, lpView ) )
-				return false;
-#endif
 
 	// set all the Translucent execute status flags...
 	set_alpha_states();
@@ -4822,7 +4723,6 @@ Display Solid Lines
 ===================================================================*/
 bool DisplayTitle(void)
 {
-#if 1 // bjd - CHECK IMPORTANT
 	u_int16_t i;
 	u_int16_t	group;
 	MENUITEM *Item;
@@ -4932,16 +4832,6 @@ bool DisplayTitle(void)
 		}
 	}
 
-#if 0
-	VduHeader = &ModelHeaders[BackgroundModel[TITLE_MODEL_VDU]];
-	//VduAnim = VduHeader->Group[0].polyanim[0];
-	//VertPtr = VduAnim->vert;
-
-	for (i=0; i<4; i++)
-	{
-		TvVerts[i] = *VertPtr++;
-	}
-#endif
 
 	// initialise sfx
 	for( i = 0 ; i < MAX_SFX ; i++ )
@@ -5081,7 +4971,6 @@ Event handling
 	}
 
 	return true;
-#endif
 }
 
 static int SelectionColour( void )
@@ -8476,47 +8365,6 @@ void AddBikeArrow( char *name, int num )
 void ExitBikeSelection( MENUITEM * item )
 {
 	
-#if 0
-	if( ( BikeList.selected_item >= 0 ) && ( BikeList.selected_item < MAXBIKETYPES ) )
-	{
-		BikeList.selected_item = ValidBikeSelected( BikeList.selected_item );
-		if ((CameraStatus != CAMERA_AtStart) && (OldSelectedBike != BikeList.selected_item))
-		{
-			if ((Title_Timers[TITLE_TIMER_SwapBikes].Status != TITLE_EVENT_TIMER_ACTIVE) && (Title_Timers[TITLE_TIMER_SwapBikes].Status != TITLE_EVENT_TIMER_FINISHED))
-			{
-				Title_Timers[TITLE_TIMER_SwapBikes].Status = TITLE_EVENT_TIMER_ACTIVE;
- 				Title_Timers[TITLE_TIMER_SwapBikes].CurrentTime = 0.0F;
-				OldSelectedBikeScale = SelectedBikeScale;
-			}else
-			{	if (Title_Timers[TITLE_TIMER_SwapBikes].CurrentTime > 0.5F)
-				{	for (Event = Title_Events; Event->TriggeredBy >= 0; Event++)
-					{
-						if (Event->TriggeredBy == TITLE_TIMER_SwapBikes)
-						{
-				
-							if ((Event->Status == TITLE_EVENT_STATUS_ACTIVE) || (Event->Status == TITLE_EVENT_STATUS_FINISHED))
-							{
-								Event->Status = TITLE_EVENT_STATUS_IDLE;
-
-								if (Event->Status == TITLE_EVENT_STATUS_ACTIVE)
-								{
-									if (Event->ExitFunc)
-										Event->ExitFunc(Event);
-								}
-
-								Title_Timers[TITLE_TIMER_SwapBikes].Status = TITLE_EVENT_TIMER_ACTIVE;
-			 					Title_Timers[TITLE_TIMER_SwapBikes].CurrentTime = 0.0F;
-								OldSelectedBikeScale = BikeSwapScale;
-							}
-
-						}
-					}
-		
-				}
-			}
-		}
-	}
-#endif
 
 	if( CameraStatus != CAMERA_AtStart )
 		ShowHoloModel( HoloModelLookup[ BikeList.selected_item ] );
@@ -9643,22 +9491,12 @@ void ResetDisc(int disc)
 
 void DifficultySet (MENUITEM *item)
 {
-#if 0
-	StackMode = DISC_MODE_ONE;
-	StackStatus = DISC_EXPAND;
-	DifficultyLevel++;
-	if( DifficultyLevel > DIFF_Vhard )
-		DifficultyLevel = DIFF_Easy;
-
-	PlaySfx( SFX_Stakmove, 1.0F );
-#endif
 
 	MenuState = MENUSTATE_DifficultySet;
 }
 
 void InitDifficultyLevel ( MENU *Menu )
 {
-#if 1
 	MENUITEM *Item;
 	static int DifficultyLookup[ 4 ] = { 4, 6, 8, 10 };
 
@@ -9670,7 +9508,6 @@ void InitDifficultyLevel ( MENU *Menu )
 			break;
 		}
 	}
-#endif
 }
 
 TEXTINFO *InitTextInfo( void )
@@ -9704,7 +9541,6 @@ TEXTINFO *InitTextInfo( void )
 
 void RedrawFlatMenuList( MENUITEM *Item )
 {
-#if 1
 	LIST *l;
 	int i, current;
 	TEXTINFO *TextInfo;
@@ -9766,7 +9602,6 @@ void RedrawFlatMenuList( MENUITEM *Item )
 			}
 		}
 	}
-#endif
 }
 
 void DrawFlatMenuListText ( MENUITEM *Item )
@@ -11118,19 +10953,6 @@ void DrawGeneralWeapons( MENUITEM *Item )
 	SelectedWeapon = 0;
 	WeaponItem = Item;
 	WeaponOrderStatus = WEAPON_ChoosingFirst;
-#if 0
-	IdiotText = InitTextInfo();
-	Item->numtextitems++;
-	AddToTextStack( IdiotText );
-	IdiotText->xmin = MENU_ITEM_IdiotText.x;
-	IdiotText->ymin = MENU_ITEM_IdiotText.y;
-	IdiotText->xmax = MENU_ITEM_IdiotText.xmax;
-	IdiotText->ymax = MENU_ITEM_IdiotText.ymax;
-	IdiotText->font = MENU_ITEM_IdiotText.font;
-	IdiotText->text = WeaponSelectFirst;
-
-	PrintTextItem(IdiotText);
-#endif
 	for (i = 0; i < MaxWeapons; i++)
 	{
 		Item->TextInfo[i] = InitTextInfo();
@@ -14724,7 +14546,6 @@ bool SetAxisActionSlider( SLIDER *s )
 	else
 		return false;
 }
-#if 1
 
 #define HOLOMODEL_Done		0
 #define HOLOMODEL_Expand	1
@@ -15109,7 +14930,6 @@ void InitTitleMessaging( void )
 	TitlePlayerMessage.text[ 0 ] = 0;
 }
 
-#endif
 
 
 void WatchPlayerSelected( MENUITEM *Item)
@@ -16295,42 +16115,6 @@ bool ProcessPlayerList ( int Key )
 
 			ShowHoloModel( HoloModelLookup[ SelectedBike ] );
 
-#if 0
-			PrintTextItem(BikeNameTextPtr); 
-
-			if ((Title_Timers[TITLE_TIMER_SwapBikes].Status != TITLE_EVENT_TIMER_ACTIVE) && (Title_Timers[TITLE_TIMER_SwapBikes].Status != TITLE_EVENT_TIMER_FINISHED))
-			{
-				Title_Timers[TITLE_TIMER_SwapBikes].Status = TITLE_EVENT_TIMER_ACTIVE;
- 				Title_Timers[TITLE_TIMER_SwapBikes].CurrentTime = 0.0F;
-				OldSelectedBikeScale = SelectedBikeScale;
-			}else
-			{	if (Title_Timers[TITLE_TIMER_SwapBikes].CurrentTime > 0.5F)
-				{	for (Event = Title_Events; Event->TriggeredBy >= 0; Event++)
-					{
-						if (Event->TriggeredBy == TITLE_TIMER_SwapBikes)
-						{
-				
-							if ((Event->Status == TITLE_EVENT_STATUS_ACTIVE) || (Event->Status == TITLE_EVENT_STATUS_FINISHED))
-							{
-								Event->Status = TITLE_EVENT_STATUS_IDLE;
-
-								if (Event->Status == TITLE_EVENT_STATUS_ACTIVE)
-								{
-									if (Event->ExitFunc)
-										Event->ExitFunc(Event);
-								}
-
-								Title_Timers[TITLE_TIMER_SwapBikes].Status = TITLE_EVENT_TIMER_ACTIVE;
-			 					Title_Timers[TITLE_TIMER_SwapBikes].CurrentTime = 0.0F;
-								OldSelectedBikeScale = BikeSwapScale;
-							}
-
-						}
-					}
-		
-				}
-			}
-#endif
 		}
 
 		KillBikeChar( NULL );

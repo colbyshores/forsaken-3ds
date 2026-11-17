@@ -1980,35 +1980,6 @@ void KillThermo( void )
 	}
 }
 	
-#if 0
-/*===================================================================
-	Procedure	:	Check if MMX present
-	Input		:	Nothing
-	Output		:	bool	true/false
-===================================================================*/
-bool IsMMX( void )
-{
-	int MMX = 0;
-    SYSTEM_INFO si;
-
-    GetSystemInfo(&si);
-
-    if (si.dwProcessorType==PROCESSOR_INTEL_PENTIUM) 
-	{
-		_asm 
-		{
-			 mov EAX, 1         ; request for feature flags
-			_emit 0x0f			; CPUID (00001111 10100010) - This is a Pentium
-								; specific instruction which gets information on the
-			_emit 0xa2			; processor. A Pentium family processor should set
-								; bits 11-8 of eax to 5.
- 
-			mov MMX, EDX		; is MMX technology Bit(bit 23)in feature      
-		}
-	}
- 	return( !!(MMX & 0x00800000) );
-}
-#endif
 
 TPAGEINFO	ScrPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
 
@@ -3347,45 +3318,10 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 ===================================================================*/
 void LoadTimeForLevel( void )
 {
-#if 0
-
-	char		NewFilename[ 256 ];
-	char	*	NewExt = ".TIM";
-	int			Minutes;
-	FILE	*	f;
-
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
-
-	f = file_open( &NewFilename[ 0 ], "r" );
-
-	if( f )
-	{
-		if ( fscanf( f, " %d", &Minutes ) == 1 )
-		{
-			CountDownOn = true;
-			SinglePlayerTimeLimit = Minutes;
-			KilledPlayer = false;
-		}
-		else
-		{
-			CountDownOn = false;
-			SinglePlayerTimeLimit = 0;
-		}
-
-		fclose( f );
-	}
-	else
-	{
-		CountDownOn = false;
-		SinglePlayerTimeLimit = 0;
-	}
-
-#else
 
 	CountDownOn = false;
 	SinglePlayerTimeLimit = 0;
 
-#endif
 }
 
 /*===================================================================

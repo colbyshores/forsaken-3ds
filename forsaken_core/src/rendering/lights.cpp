@@ -691,7 +691,6 @@ clear:					mov		eax, [esi]
 #ifdef	USEASM
 __asm
 {
-#if 1		
 														fld		rlf				;float load rlf
 														fmul	distance		;float mul distance 2
 														fld		blf				;float load blf
@@ -720,32 +719,6 @@ __asm
 												or  ebx , tempiB		;or in the Blue
 			
 			
-#else		
-			
-			
-														fld rlf					;float load rlf        
-														fmul distance			;float mul distance    
- 												mov	esi , [lpLVERTEX];set up the pointer
-														fistp tempiR			;float int store tempiR
-												mov	ecx , [esi+16]		;int ecx = col   get the color
-														fld glf					;float load glf
-														fmul distance			;float mul distance
-
-												mov edi , ecx			; edi = col..
-												and ecx , 0x00ffffff	; and out the alpha
-												and edi , 0xff000000	; keep the alpha for later
-
-												mov ebx , tempiR		;move the red into inc
-														fistp	tempiG			;float int store tempiG
-												shl ebx , 8				;shift it up 8 bits
-														fld blf					;float load blf
-														fmul distance			;float mul distance
-												or  ebx , tempiG		;or in the green
-												mov edx , ecx			;edx = col
-														fistp	tempiB			;float int store tempiG
-												shl ebx , 8				;shift it up 8 bits
-												or  ebx , tempiB		;or in the Blue
-#endif
 												add ecx , ebx			;ecx = col + inc
 												xor edx , ebx			;edx = col ^ inc
 												xor edx , ecx			;edx = ( col + inc ) ^ ( col ^ inc )

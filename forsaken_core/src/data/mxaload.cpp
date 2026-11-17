@@ -653,57 +653,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	Point Direction Data
 ===================================================================*/
 	Uint16Pnt = (u_int16_t *) Buffer;
-#if 0
-	if( *Uint16Pnt++ )
-	{
-		NumPVs = *Uint16Pnt++;
-
-		if( NumPVs )
-		{
-			Mxaloadheader->NumPVs = NumPVs;
-			Mxaloadheader->PVs = (PV *) malloc( NumPVs * sizeof( PV ) );
-
-			if( !Mxaloadheader->PVs )
-			{
-				Mxaloadheader->NumPVs = 0;
-				return( false );
-			}
-
-			PVPtr = Mxaloadheader->PVs;
-
-			for( i = 0; i < NumPVs; i++ )
-			{
-				PVPtr->Type = *Uint16Pnt++;				// Type ( u_int16_t )
-				PVPtr->ID = *Uint16Pnt++;				// ID ( u_int16_t )
-				FloatPnt = (float *) Uint16Pnt;
-				PVPtr->Pos.x = *FloatPnt++;				// Pos ( 3 floats )
-				PVPtr->Pos.y = *FloatPnt++;
-				PVPtr->Pos.z = *FloatPnt++;
-				PVPtr->Dir.x = *FloatPnt++;				// Dir ( 3 floats )
-				PVPtr->Dir.y = *FloatPnt++;
-				PVPtr->Dir.z = *FloatPnt++;
-				PVPtr->Up.x = *FloatPnt++;				// Up ( 3 floats )
-				PVPtr->Up.y = *FloatPnt++;
-				PVPtr->Up.z = *FloatPnt++;
-				PVPtr->OldPos = PVPtr->Pos;
-				Uint16Pnt = (u_int16_t *) FloatPnt;
-				PVPtr++;
-			}
-		}
-		else
-		{
-			Mxaloadheader->PVs = NULL;
-			Mxaloadheader->NumPVs = 0;
-		}
-		Buffer = (char *) Uint16Pnt;
-	}
-	else
-	{
-		Mxaloadheader->NumPVs = 0;
-		Mxaloadheader->PVs = NULL;
-		Buffer = (char *) ( Uint16Pnt + 1 );
-	}
-#else
 	if( *Uint16Pnt++ )
 	{
 		NumFirePoints = *Uint16Pnt++;
@@ -839,7 +788,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 		Mxaloadheader->SpotFX = NULL;
 		Buffer = (char *) ( Uint16Pnt + 1 );
 	}
-#endif
 
 	if ( colourkey )
 		DebugPrintf( "Mxaload: %d colourkey triangles found\n", colourkey );
@@ -1146,11 +1094,6 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 					ToVert++;
 				}
 			}
-#if 0
-			/*	unlock the execute buffer	*/
-			if ( Mxaloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( Mxaloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
-				return false ;
-#endif
 			if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
 			{
 				return false;

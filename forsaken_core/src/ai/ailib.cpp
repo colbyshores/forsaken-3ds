@@ -143,7 +143,6 @@ void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * Ne
 		NewPos->z = TObject->Pos.z;
 		return;
 	}
-#if 1
 	Speed = TObject->Speed.x;
 	ApplyMatrix( &TObject->Mat, &SlideRight, &Move_Dir );			/* Calc Direction Vector */
 	Move_Off.x = ( Move_Dir.x * Speed );
@@ -159,11 +158,6 @@ void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * Ne
 	Move_Off.x += ( Move_Dir.x * Speed );
 	Move_Off.y += ( Move_Dir.y * Speed );
 	Move_Off.z += ( Move_Dir.z * Speed );
-#else
-	Move_Off.x = ( TObject->Move_Off.x );
-	Move_Off.y = ( TObject->Move_Off.y );
-	Move_Off.z = ( TObject->Move_Off.z );
-#endif
 	
 	Distance = DistanceVector2Vector( &TObject->Pos , SPos  );
 	Time = ( Distance / SpeedOfBullet );

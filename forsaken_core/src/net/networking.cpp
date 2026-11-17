@@ -4154,17 +4154,6 @@ void DemoClean( void )
 		fread( &from_network_id , sizeof(DPID), 1, DemoFp );
 		fread( &CommBuff[0] , nBytes , 1, DemoFp );
 
-#if 0
-		// Special model num correction stuff...And Power Level Stuff
-		switch( CommBuff[0] )
-		{
-		case MSG_UPDATE:
-			lpUpdate = (LPUPDATEMSG) &CommBuff[0];
-			break;
-		case MSG_FUPDATE:
-			break;
-		}
-#endif
 		
 		// write out the message..
 		fwrite( &DemoTimeSoFar, sizeof(LONGLONG), 1, DemoFpClean );

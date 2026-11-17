@@ -1801,54 +1801,6 @@ void FillStatusTab( void )
     StatusTab[STATUS_LeftCrashed                          ] = "LeftCrashed  ";
     StatusTab[STATUS_Null                                 ] = "Null         ";
 
-#if 0
-    StatusTab[STATUS_PlayingAVI                           ] = "PlayingAVI                 ";
-    StatusTab[STATUS_Title                                ] = "Title                      ";
-    StatusTab[STATUS_StartingMultiplayer                  ] = "StartingMultiplayer        ";
-    StatusTab[STATUS_PreStartingMultiplayerSynch          ] = "PreStartingMultiplayerSy...";
-    StatusTab[STATUS_StartingMultiplayerSynch             ] = "StartingMultiplayerSynch   ";
-    StatusTab[STATUS_QuitCurrentGame                      ] = "QuitCurrentGame            ";
-    StatusTab[STATUS_GetPlayerNum                         ] = "GetPlayerNum               ";
-    StatusTab[STATUS_PlayingDemo                          ] = "PlayingDemo                "; 
-    StatusTab[STATUS_Normal                               ] = "Normal                     ";
-    StatusTab[STATUS_LevelEnd                             ] = "LevelEnd                   ";
-    StatusTab[STATUS_BetweenLevels                        ] = "BetweenLevels              ";
-    StatusTab[STATUS_ViewingScore                         ] = "ViewingScore               ";
-    StatusTab[STATUS_WaitingAfterScore                    ] = "WaitingAfterScore          ";
-    StatusTab[STATUS_Joining                              ] = "Joining                    ";
-    StatusTab[STATUS_Left                                 ] = "Left                       ";
-    StatusTab[STATUS_ChangeLevelPostInitView              ] = "ChangeLevelPostInitView    ";
-    StatusTab[STATUS_ChangeLevelPostPlayingDemo           ] = "ChangeLevelPostPlayingDe...";
-    StatusTab[STATUS_StartingSinglePlayer                 ] = "StartingSinglePlayer       ";
-    StatusTab[STATUS_PostStartingSinglePlayer             ] = "PostStartingSinglePlayer   ";
-    StatusTab[STATUS_SinglePlayer                         ] = "SinglePlayer               ";
-    StatusTab[STATUS_ViewingStats                         ] = "ViewingStats               ";
-    StatusTab[STATUS_TitleLoadGameStartingSinglePlayer    ] = "TitleLoadGameStartingSin...";
-    StatusTab[STATUS_TitleLoadGamePostStartingSinglePlayer] = "TitleLoadGamePost...       ";
-    StatusTab[STATUS_ChangeLevelPostLoadGame              ] = "ChangeLevelPostLoadGame    ";
-    StatusTab[STATUS_InGameLoadGameStartingSinglePlayer   ] = "InGameLoadGameStartingSi...";
-    StatusTab[STATUS_WaitingToStartSinglePlayer           ] = "WaitingToStartSinglePlay...";
-    StatusTab[STATUS_WaitingToStartMultiPlayerHost        ] = "WaitingToStartMultiPlaye...";
-    StatusTab[STATUS_WaitingToStartMultiPlayerClient      ] = "WaitingToStartMultiPlaye...";
-    StatusTab[STATUS_WaitingToStartTeamGame               ] = "WaitingToStartTeamGame     ";
-    StatusTab[STATUS_QuittingFromTitles                   ] = "QuittingFromTitles         ";
-    StatusTab[STATUS_WaitingToStartDemo                   ] = "WaitingToStartDemo         ";
-    StatusTab[STATUS_WaitingToStartEndGameSequence        ] = "WaitingToStartEndGameSeq...";
-    StatusTab[STATUS_QuittingFromInGame                   ] = "QuittingFromInGame         ";
-    StatusTab[STATUS_InitView_0                           ] = "InitView_0                 ";
-    StatusTab[STATUS_InitView_1                           ] = "InitView_1                 ";
-    StatusTab[STATUS_InitView_2                           ] = "InitView_2                 ";
-    StatusTab[STATUS_InitView_3                           ] = "InitView_3                 ";
-    StatusTab[STATUS_InitView_4                           ] = "InitView_4                 ";
-    StatusTab[STATUS_InitView_5                           ] = "InitView_5                 ";
-    StatusTab[STATUS_InitView_6                           ] = "InitView_6                 ";
-    StatusTab[STATUS_InitView_7                           ] = "InitView_7                 ";
-    StatusTab[STATUS_InitView_8                           ] = "InitView_8                 ";
-    StatusTab[STATUS_InitView_9                           ] = "InitView_9                 ";
-    StatusTab[STATUS_InitView_10                          ] = "InitView_10                ";
-    StatusTab[STATUS_LeftCrashed                          ] = "LeftCrashed                ";
-    StatusTab[STATUS_Null                                 ] = "Null                       ";
-#endif
 }
 
 /*===================================================================

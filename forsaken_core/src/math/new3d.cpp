@@ -165,7 +165,6 @@ void MxV( MATRIX * m, VECTOR * v0, VECTOR * v1 )
 // it's meant to only be used in certain places
 
 //#ifndef USEASM
-#if 1
 void ApplyMatrix( MATRIX * m, VECTOR * v0, VECTOR * v1 )
 {
 	float x = m->_41;
@@ -180,63 +179,6 @@ void ApplyMatrix( MATRIX * m, VECTOR * v0, VECTOR * v1 )
 	v1->y = y;
 	v1->z = z;
 }
-#else
-// assumes v[W] == 1.0f
-//__declspec(naked) void MatMultVec3x4(Vector res, Matrix m, Vector v)
-__declspec(naked) void ApplyMatrix( MATRIX * m, VECTOR * v0, VECTOR * v1 )
-{
-//	res[0] = m[0][0]*v[0] + m[0][1]*v[1] + m[0][2]*v[2] + m[0][3];
-//	res[1] = m[1][0]*v[0] + m[1][1]*v[1] + m[1][2]*v[2] + m[1][3];
-//	res[2] = m[2][0]*v[0] + m[2][1]*v[1] + m[2][2]*v[2] + m[2][3];
-	__asm
-	{
-		mov			eax, [esp + 12]
-		mov			ecx, [esp + 4]
-		mov			edx, [esp + 8]
-		fld			dword ptr [ecx]
-		fmul		dword ptr [edx]
-		fld			dword ptr [ecx + 4]
-		fmul		dword ptr [edx + 4]
-		fld			dword ptr [ecx + 8]
-		fmul		dword ptr [edx + 8]
-		fld			dword ptr [ecx + 16]
-		fmul		dword ptr [edx]
-		fld			dword ptr [ecx + 16 + 4]
-		fmul		dword ptr [edx + 4]
-		fld			dword ptr [ecx + 16 + 8]
-		fmul		dword ptr [edx + 8]
-		fxch		st(5)
-		fadd		dword ptr [ecx + 12]
-		fxch		st(4)
-		faddp		st(3), st
-		fxch		st(1)
-		fadd		dword ptr [ecx + 16 + 12]
-		fxch		st(4)
-		fld			dword ptr [ecx + 32]
-		fmul		dword ptr [edx]
-		fld			dword ptr [ecx + 32 + 4]
-		fmul		dword ptr [edx + 4]
-		fld			dword ptr [ecx + 32 + 8]
-		fmul		dword ptr [edx + 8]
-		fxch		st(4)
-		faddp		st(3), st
-		fxch		st(1)
-		fadd		dword ptr [ecx + 32 + 12]
-		fxch		st(5)
-		faddp		st(4), st
-		faddp		st(2), st
-		faddp		st(4), st
-		fxch		st(1)
-		fstp		dword ptr [eax]
-		faddp		st(1), st
-		fxch		st(1)
-		fstp		dword ptr [eax + 4]
-		fstp		dword ptr [eax + 8]
-		ret
-	}
-}
-
-#endif
 
 /*===================================================================
 	Function	:	Apply Matrix to a Vector
@@ -552,15 +494,8 @@ void MatrixTranspose( MATRIX * m1, MATRIX * m2 )
 {
 	MATRIX	T;
 
-#if 1
 	T = *m1;
 
-#else
-	T._11 = m1->_11;	T._12 = m1->_12;	T._13 = m1->_13;	T._14 = m1->_14;
-	T._21 = m1->_21;	T._22 = m1->_22;	T._23 = m1->_23;	T._24 = m1->_24;
-	T._31 = m1->_31;	T._32 = m1->_32;	T._33 = m1->_33;	T._34 = m1->_34;
-	T._41 = m1->_41;	T._42 = m1->_42;	T._43 = m1->_43;	T._44 = m1->_44;
-#endif
 
 	m2->_11 = T._11;	m2->_12 = T._21;	m2->_13 = T._31;	m2->_14 = T._41;
 	m2->_21 = T._12;	m2->_22 = T._22;	m2->_23 = T._32;	m2->_24 = T._42;
@@ -861,7 +796,6 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 void 
 spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4)
 {
-#if 1
     float t2, t3, m1, m2, m3, m4;
 
     t2 = t * t;
@@ -880,27 +814,6 @@ spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4)
     p->x = p1->x * m1 + p2->x * m2 + p3->x * m3 + p4->x * m4;
     p->y = p1->y * m1 + p2->y * m2 + p3->y * m3 + p4->y * m4;
     p->z = p1->z * m1 + p2->z * m2 + p3->z * m3 + p4->z * m4;
-#else
-    double t2, t3;
-    float m1, m2, m3, m4;
-
-    t2 = (double)(t * t);
-    t3 = t2 * (double)t;
-
-    m1 = (float)((-1.0 * t3) + (2.0 * t2) + (-1.0 * (double)t));
-    m2 = (float)((3.0 * t3) + (-5.0 * t2) + (0.0 * (double)t) + 2.0);
-    m3 = (float)((-3.0 * t3) + (4.0 * t2) + (1.0 * (double)t));
-    m4 = (float)((1.0 * t3) + (-1.0 * t2) + (0.0 * (double)t));
-
-    m1 /= (float)2.0;
-    m2 /= (float)2.0;
-    m3 /= (float)2.0;
-    m4 /= (float)2.0;
-
-    p->x = p1->x * m1 + p2->x * m2 + p3->x * m3 + p4->x * m4;
-    p->y = p1->y * m1 + p2->y * m2 + p3->y * m3 + p4->y * m4;
-    p->z = p1->z * m1 + p2->z * m2 + p3->z * m3 + p4->z * m4;
-#endif
 
 }
 

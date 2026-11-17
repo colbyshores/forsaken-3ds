@@ -2621,7 +2621,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 												    SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 													&ClosestCos );
 						if( Enemy != (u_int16_t) -1 ) Ship = (u_int16_t) -1;
-#if 1
 						Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												  &ClosestCos );
@@ -2630,9 +2629,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 							Ship = (u_int16_t) -1;
 							Enemy = (u_int16_t) -1;
 						}
-#else
-						Secondary = (u_int16_t) -1;
-#endif
 						if( Ship != (u_int16_t) -1 )
 						{
 							if( !( SecBulls[ i ].Flags & SECFLAGS_NoIncoming ) )
@@ -2671,7 +2667,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												  &ClosestCos );
-#if 1
 						Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												  &ClosestCos );
@@ -2679,9 +2674,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						{
 							Ship = (u_int16_t) -1;
 						}
-#else
-						Secondary = (u_int16_t) -1;
-#endif
 					 
 						if( Ship != (u_int16_t) -1 )
 						{
@@ -2709,7 +2701,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												  &ClosestCos );
-#if 1
 						Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												  &ClosestCos );
@@ -2717,9 +2708,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						{
 							Ship = (u_int16_t) -1;
 						}
-#else
-						Secondary = (u_int16_t) -1;
-#endif
 					 
 						if( Ship != (u_int16_t) -1 )
 						{

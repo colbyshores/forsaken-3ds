@@ -1280,7 +1280,6 @@ static int16_t	OnceOnlyFlag = 0;
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 
-#if 1
 									Speed = (float) PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].FireDelay[ Ships[ WhoIAm ].Object.PowerLevel ] * framelag;
 									Speed *= ( ( PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].Speed[ Ships[ WhoIAm ].Object.PowerLevel ] ) * 0.333333F );
 									Pos.x += ( Dir.x * Speed );
@@ -1297,7 +1296,6 @@ static int16_t	OnceOnlyFlag = 0;
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 
-#endif
 								}
 								break;
 			
@@ -7364,7 +7362,6 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
-#if 1
 				Speed = (float) PrimaryWeaponAttribs[ Weapon ].FireDelay[ Ships[ Ship ].Object.PowerLevel ] * framelag;
 				Speed *= ( ( PrimaryWeaponAttribs[ Weapon ].Speed[ Ships[ Ship ].Object.PowerLevel ] ) * 0.33333F );
 				Pos.x += ( Dir.x * Speed );
@@ -7388,7 +7385,6 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
-#endif
 				break;
 		
 			case TRANSPULSE_CANNON:

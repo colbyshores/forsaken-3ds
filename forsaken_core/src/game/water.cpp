@@ -823,7 +823,6 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 
 	Verts = Wo->Verts;
 	
-#if 1
 	Verts += (IWaterX * Wo->YVerts ) + IWaterY;
 	Vels += (IWaterX * Wo->YVerts ) + IWaterY;
 	if( *Verts < ( 1024.0F * GLOBAL_SCALE ) && 
@@ -862,37 +861,6 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 			}
 		}
 	}
-#else	
-	if( *(Verts +((IWaterX) * Wo->YVerts ) + (IWaterY) ) < ( 1024.0F * GLOBAL_SCALE ) && 
-		*(Verts +((IWaterX) * Wo->YVerts ) + (IWaterY) ) > -( 1024.0F * GLOBAL_SCALE ) )
-	{
-		*(Vels+((IWaterX) * Wo->YVerts ) + (IWaterY) ) = Impact * ( dx + dy );
-	}
-	if ( IWaterX + 1 < Wo->XVerts )
-	{
-		if( *(Verts +((IWaterX+1) * Wo->YVerts ) + (IWaterY) ) < ( 1024.0F * GLOBAL_SCALE ) && 
-			*(Verts +((IWaterX+1) * Wo->YVerts ) + (IWaterY) ) > -( 1024.0F * GLOBAL_SCALE ) )
-		{
-			*(Vels+((IWaterX+1) * Wo->YVerts ) + (IWaterY) ) = Impact * ( ( 1 - dx ) + dy );
-		}
-		if ( IWaterY + 1 < Wo->YVerts )
-		{
-			if( *(Verts +((IWaterX+1) * Wo->YVerts ) + (IWaterY+1) ) < ( 1024.0F * GLOBAL_SCALE ) && 
-				*(Verts +((IWaterX+1) * Wo->YVerts ) + (IWaterY+1) ) > -( 1024.0F * GLOBAL_SCALE ) )
-			{
-				*(Vels+((IWaterX+1) * Wo->YVerts ) + (IWaterY+1) ) = Impact * ( ( 1 - dx ) + ( 1 - dy ) );
-			}
-		}
-	}
-	if ( IWaterY + 1 < Wo->YVerts)
-	{
-		if( *(Verts +((IWaterX) * Wo->YVerts ) + (IWaterY+1) ) < ( 1024.0F * GLOBAL_SCALE ) && 
-			*(Verts +((IWaterX) * Wo->YVerts ) + (IWaterY+1) ) > -( 1024.0F * GLOBAL_SCALE ) )
-		{
-			*(Vels+((IWaterX) * Wo->YVerts ) + (IWaterY+1) ) = Impact * ( dx + ( 1 - dy ) );
-		}
-	}
-#endif
 	
 	return true;
 }

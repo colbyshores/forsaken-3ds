@@ -211,16 +211,6 @@ int JimBeam( char *cheat )
 
 int Lumberjack( char *cheat )
 {
-#if 0
-  static int line = 0;
-  static char *msg[] = {
-    "he's a lumberjack",
-    "and he's okay,",
-    "he works all night",
-    "and he sleeps all day."
-  };
-  FlashMenuText( msg[ line++ % ( sizeof( msg ) / sizeof( msg[ 0 ] ) ) ], 120.0F, SFX_Secret );
-#else
   if( SecondaryWeaponCheat )
   {
     FlashMenuText( "...and he sleeps all day", 120.0F, SFX_Secret );
@@ -250,7 +240,6 @@ int Lumberjack( char *cheat )
     SecondaryWeaponCheat = true;
     FlashMenuText( "He works all night...", 120.0F, SFX_Secret );
   }
-#endif
   return 1;
 }
 
@@ -597,16 +586,6 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
   mouse_dx = mouse_states[ new_input ].xrel * conf->mouse_x_sensitivity * 4.0F;
   mouse_dy = mouse_states[ new_input ].yrel * conf->mouse_y_sensitivity * 4.0F;
 
-#if 0
-  if ( mouse_dx < -MAX_MOUSE_DELTA_X )
-    mouse_dx = -MAX_MOUSE_DELTA_X;
-  else if ( mouse_dx > MAX_MOUSE_DELTA_X )
-    mouse_dx = MAX_MOUSE_DELTA_X;
-  if ( mouse_dy < -MAX_MOUSE_DELTA_Y )
-    mouse_dy = -MAX_MOUSE_DELTA_Y;
-  else if ( mouse_dy > MAX_MOUSE_DELTA_Y )
-    mouse_dy = MAX_MOUSE_DELTA_Y;
-#endif
 
 // TODO
 // win32 appear to return greator values even in some resolution
@@ -614,16 +593,6 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 	mouse_dx = mouse_dx * (float) fabsf( mouse_dx ) * 0.01f; // tweaked for linux
 	mouse_dy = mouse_dy * (float) fabsf( mouse_dy ) * -0.01f;
 
-#if 0
-  if ( mouse_dx < -framelag )
-    mouse_dx = -framelag;
-  if ( mouse_dx > framelag )
-    mouse_dx = framelag;
-  if ( mouse_dy < -framelag )
-    mouse_dy = -framelag;
-  if ( mouse_dy > framelag )
-    mouse_dy = framelag;
-#endif
 
   pitch_sign = ( conf->invert_pitch ) ? -1.0F : 1.0F;
   turn_sign = ( conf->invert_turn ) ? -1.0F : 1.0F;

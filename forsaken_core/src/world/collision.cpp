@@ -559,7 +559,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 				:	NORMAL	*	b
 	Output		:	float		Dot Product
 ===================================================================*/
-#if 1
 #ifdef USEINLINE
 __inline
 #endif
@@ -569,29 +568,6 @@ float ColDotProduct( VECTOR * a , NORMAL * b )
 		    ( a->y * b->ny ) +
 		    ( a->z * b->nz ) );
 }
-#else
-#ifdef USEINLINE
-__inline
-#endif
-float ColDotProduct( VECTOR * vec0 , NORMAL * vec1 ) 
-{
-	float	dot;
-	__asm
-	{
-		fld		[vec0+0]
-		fmul	[vec1+0]
-		fld		[vec0+4]
-		fmul	[vec1+4]
-		fld		[vec0+8]
-		fmul	[vec1+8]
-		fxch	st(1)
-		faddp	st(0),st(2)
-		faddp	st(0),st(1)
-		fstp	[dot]
-	}
-	return dot;
-}
-#endif
 
 #define NIL ((u_int16_t) -1)
 
@@ -2041,322 +2017,6 @@ static bool bounce_object = true;
 static bool NoBGObject = true;
 
 
-#if 0
-
-bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
-{
-	VECTOR Up, Right;
-	QUAT MoveQuat;
-	MATRIX MoveMat;
-	int f;
-	float dx0, dy0;
-	float dx1, dy1;
-	VECTOR Feeler;
-	static struct
-	{
-		struct {
-			float dx, dy;
-		} start, end;
-		u_int16_t line;
-	} FeelerOffset[ MAX_FEELER_RAYS ] =
-	{
-		{ 0.0F, 0.0F,  0.0F, 0.0F, -1 },
-		{ 0.0F, 0.0F,  1.0F, 1.0F, -1 },
-		{ 0.0F, 0.0F,  1.0F,-1.0F, -1 },
-		{ 0.0F, 0.0F, -1.0F,-1.0F, -1 },
-		{ 0.0F, 0.0F, -1.0F, 1.0F, -1 },
-#if 1
-		{ 0.0F, 1.0F,  0.0F,-1.0F, -1 },
-		{ 0.0F,-1.0F,  0.0F, 1.0F, -1 },
-		{ 1.0F, 0.0F, -1.0F, 0.0F, -1 },
-		{-1.0F, 0.0F,  1.0F, 0.0F, -1 },
-#else
-		{ .70F, .70F, -1.0F,-1.0F, -1 },
-		{ .70F,-.70F, -1.0F, 1.0F, -1 },
-		{-.70F,-.70F,  1.0F, 1.0F, -1 },
-		{-.70F, .70F,  1.0F,-1.0F, -1 }
-#endif
-	};
-	VECTOR FeelerImpactPoint;
-	u_int16_t FeelerImpactGroup;
-	NORMAL FeelerFaceNormal;
-	VECTOR FeelerPos_New;
-	BGOBJECT *FeelerBGObject;
-#if 0
-	float FeelerImpactOffset;
-#endif
-	float FeelerImpactDist;
-	float ImpactDist;
-	VECTOR Move;
-	float MoveDist;
-	VECTOR Move_Dir;
-	VECTOR New_Off;
-	float FeelerPlane;
-	float FeelerDist;
-	VECTOR FeelerEndPoint;
-	float Num, Div;
-#ifdef DEBUG_MULTI_RAYS
-	u_int16_t line;
-#endif
-	static u_int16_t target_line = -1;
-	VECTOR FeelerStart;
-	u_int16_t FeelerGroup;
-	int truncated;
-	NORMAL ImpactNormal;
-	float ImpactPlane;
-	float FeelerLength = 1.25F * radius;
-	VECTOR StartPos;
-	VECTOR Pos_New;
-	bool hit;
-	VECTOR ImpactPoint;
-	
-	hit = false;
-	StartPos = Obj->Pos;
-	Move_Dir = *Move_Off;
-	NormaliseVector( &Move_Dir );
-	MoveQuat.FromVector2(&Move_Dir);
-	MoveQuat.ToMatrix(&MoveMat);
-	ApplyMatrix( &MoveMat, &SlideUp, &Up );
-	ApplyMatrix( &MoveMat, &SlideRight, &Right );
-	MoveDist = VectorLength( Move_Off );
-	ImpactDist = MoveDist;
-	ImpactPoint.x = StartPos.x + Move_Off->x;
-	ImpactPoint.y = StartPos.y + Move_Off->y;
-	ImpactPoint.z = StartPos.z + Move_Off->z;
-	for ( f = 0; f < MAX_FEELER_RAYS; f++ )
-	{
-		dx0 = FeelerOffset[ f ].start.dx;
-		dy0 = FeelerOffset[ f ].start.dy;
-		dx1 = FeelerOffset[ f ].end.dx;
-		dy1 = FeelerOffset[ f ].end.dy;
-		FeelerStart.x = radius * ( dx0 * Right.x + dy0 * Up.x );
-		FeelerStart.y = radius * ( dx0 * Right.y + dy0 * Up.y );
-		FeelerStart.z = radius * ( dx0 * Right.z + dy0 * Up.z );
-		FeelerGroup = MoveGroup( &Mloadheader, &StartPos, Obj->Group, &FeelerStart );
-		FeelerGroup = Obj->Group;
-		FeelerStart.x += StartPos.x;
-		FeelerStart.y += StartPos.y;
-		FeelerStart.z += StartPos.z;
-		Feeler = Move_Dir;
-		Feeler.x *= ( MoveDist + FeelerLength );
-		Feeler.y *= ( MoveDist + FeelerLength );
-		Feeler.z *= ( MoveDist + FeelerLength );
-		Feeler.x += radius * ( dx1 * Right.x + dy1 * Up.x );
-		Feeler.y += radius * ( dx1 * Right.y + dy1 * Up.y );
-		Feeler.z += radius * ( dx1 * Right.z + dy1 * Up.z );
-#ifdef DEBUG_MULTI_RAYS
-		if ( FeelerOffset[ f ].line == (u_int16_t) -1 )
-		{
-			FeelerOffset[ f ].line = FindFreeLine();
-		}
-		line = FeelerOffset[ f ].line;
-		if ( line != (u_int16_t) -1 )
-		{
-			Lines[ line ].StartPos = FeelerStart;
-			Lines[ line ].EndPos.x = FeelerStart.x + Feeler.x;
-			Lines[ line ].EndPos.y = FeelerStart.y + Feeler.y;
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			Lines[ line ].EndPos.z = FeelerStart.z + Feeler.z;
-			Lines[ line ].StartCol.R = 255;
-			Lines[ line ].StartCol.G = 255;
-			Lines[ line ].StartCol.B = 255;
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			Lines[ line ].EndCol.R = 128 + (int) (96 * (dx0 + dx1));
-			Lines[ line ].EndCol.G = 128 + (int) (96 * (dy0 + dy1));
-			Lines[ line ].EndCol.B = (!f) * 255;
-			Lines[ line ].StartTrans = 255;
-			Lines[ line ].EndTrans = 255;
-			Lines[ line ].Group = Obj->Group;
-		}
-#endif
-		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
-			&FeelerStart, FeelerGroup, &Feeler,
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			&FeelerImpactPoint , &FeelerImpactGroup, &FeelerFaceNormal, &FeelerPos_New, true, ( BGObject ) ? &FeelerBGObject : NULL ) )
-		{
-			FeelerPlane = -DotProduct( (VECTOR *)&FeelerFaceNormal, &FeelerImpactPoint ) - radius;
-			Div = DotProduct( &Move_Dir , (VECTOR *)&FeelerFaceNormal );
-			if( Div >= -0.001F )
-			{
-				//										DebugPrintf( "Errk! (Div = %f)\n", Div );		/* Reject, Parallel */
-				continue;
-			}
-			Num = ( FeelerPlane + DotProduct( &StartPos, (VECTOR *)&FeelerFaceNormal) );
-			FeelerImpactDist = -( Num / Div );
-			if ( FeelerImpactDist > 0.1F )
-			{
-				FeelerImpactDist -= 0.1F;
-				truncated = 0;
-			}
-#if 1
-			else
-			{
-				FeelerImpactDist = 0.0F;
-				truncated = 1;
-			}
-#else
-			else if ( FeelerImpactDist > 0.0F || !f )
-			{
-				FeelerImpactDist = 0.0F;
-				truncated = 1;
-			}
-			else
-				continue;
-#endif
-			FeelerImpactPoint.x = StartPos.x + Move_Dir.x * FeelerImpactDist;
-			FeelerImpactPoint.y = StartPos.y + Move_Dir.y * FeelerImpactDist;
-			FeelerImpactPoint.z = StartPos.z + Move_Dir.z * FeelerImpactDist;
-			if ( ImpactDist > FeelerImpactDist )
-			{
-				FeelerEndPoint.x = StartPos.x + Move_Off->x;
-				FeelerEndPoint.y = StartPos.y + Move_Off->y;
-				FeelerEndPoint.z = StartPos.z + Move_Off->z;
-				FeelerDist = ( DotProduct( &FeelerEndPoint, (VECTOR *)&FeelerFaceNormal ) + FeelerPlane );// + 0.025F;// * MoveDist;
-				if ( FeelerDist > 0.0F )
-				{
-					//											DebugPrintf( "FeelerDist = %f\n", FeelerDist );
-				}
-#if 0
-				if ( truncated )
-				{
-					FeelerImpactOffset = ( DotProduct( &FeelerImpactPoint, (VECTOR *)&FeelerFaceNormal ) + FeelerPlane );
-					DebugPrintf( "FeelerDist = %f   FeelerImpactOffset = %f\n",
-						FeelerDist, FeelerImpactOffset );
-					if ( FeelerImpactOffset < 0.0F )
-						FeelerDist = FeelerImpactOffset - FeelerDist;
-				}
-#endif
-				FeelerDist = -FeelerDist;// + 1.0F;
-				//										DebugPrintf( "fd = %f\n", FeelerDist );
-				FeelerPos_New.x = FeelerEndPoint.x + FeelerFaceNormal.nx * FeelerDist;
-				FeelerPos_New.y = FeelerEndPoint.y + FeelerFaceNormal.ny * FeelerDist;
-				FeelerPos_New.z = FeelerEndPoint.z + FeelerFaceNormal.nz * FeelerDist;
-				NumCollides++;
-				ImpactDist = FeelerImpactDist;
-				ImpactPoint = FeelerImpactPoint;
-				ImpactNormal = FeelerFaceNormal;
-				ImpactPlane = FeelerPlane;
-				Pos_New = FeelerPos_New;
-				if( BGObject ) *BGObject = FeelerBGObject;
-			}
-		}
-	}
-	if ( ImpactDist < MoveDist )
-	{
-		static MATRIX InvMat;
-		float MaxPerpendicularAccel;
-		VECTOR BumpForce;
-
-#if 1
-		Move.x = Move_Off->x - Obj->ExternalForce.x * framelag;
-		Move.y = Move_Off->y - Obj->ExternalForce.y * framelag;
-		Move.z = Move_Off->z - Obj->ExternalForce.z * framelag;
-		MoveDist = VectorLength( &Move );
-#endif
-#ifdef THIS_SHOULD_WORK_BUT_DOESNT		
-		MaxPerpendicularAccel = (float) fabsf( DotProduct( &Move_Dir, (VECTOR *)&ImpactNormal ) ) * TurboAccell * MaxTurboSpeed * framelag * framelag;
-		//								DebugPrintf( "MaxPerpAccel = %f\n", MaxPerpendicularAccel );
-#else
-#if 1
-		MaxPerpendicularAccel = TurboAccell * MoveDist;
-#else
-		MaxPerpendicularAccel = TurboAccell * MaxTurboSpeed * framelag;// * framelag;
-#endif
-#endif
-#ifdef THIS_OR_SOMETHING_SIMILAR_MIGHT_BE_NEEDED
-		if( framelag != 0.0F )
-		{
-			if ( MaxPerpendicularAccel > MoveDist / framelag )
-				MaxPerpendicularAccel = MoveDist / framelag;
-		}
-		else
-		{
-			MaxPerpendicularAccel = 0.0F;
-		}
-#endif
-		BumpForce.x = ImpactNormal.nx * MaxPerpendicularAccel;
-		BumpForce.y = ImpactNormal.ny * MaxPerpendicularAccel;
-		BumpForce.z = ImpactNormal.nz * MaxPerpendicularAccel;
-#ifdef DEBUG_MULTI_RAYS
-		if ( target_line == (u_int16_t) -1 )
-			target_line = FindFreeLine();
-		if ( target_line != (u_int16_t) -1 )
-		{
-			Lines[ target_line ].StartPos = ImpactPoint;
-			Lines[ target_line ].EndPos = Pos_New;
-			Lines[ target_line ].StartCol.R = 55;
-			Lines[ target_line ].StartCol.G = 55;
-			Lines[ target_line ].StartCol.B = 55;
-			Lines[ target_line ].EndCol.R = 255;
-			Lines[ target_line ].EndCol.G = 255;
-			Lines[ target_line ].EndCol.B = 255;
-			Lines[ target_line ].StartTrans = 255;
-			Lines[ target_line ].EndTrans = 255;
-			Lines[ target_line ].Group = Obj->Group;
-		}
-#endif
-		New_Off.x = Pos_New.x - ImpactPoint.x;
-		New_Off.y = Pos_New.y - ImpactPoint.y;
-		New_Off.z = Pos_New.z - ImpactPoint.z;
-		NormaliseVector( &New_Off );
-		if ( framelag )
-		{
-			New_Off.x *= MoveDist / framelag;
-			New_Off.y *= MoveDist / framelag;
-			New_Off.z *= MoveDist / framelag;
-		}
-		else
-		{
-			New_Off.x = 0.0F;
-			New_Off.y = 0.0F;
-			New_Off.z = 0.0F;
-		}
-
-		MatrixTranspose( &Obj->Mat, &InvMat );
-		ApplyMatrix( &InvMat, &New_Off, &Move ); // modify ship's speed
-		//								DebugPrintf( "New move=%f  old=%f\n", VectorLength( &Move_Off ), MoveDist );
-		if ( move_object )
-		{
-			if ( VectorLength( &Move ) < 10.0F * MoveDist )
-			{
-				Obj->Speed = Move;
-				if ( DotProduct( &Obj->ExternalForce, (VECTOR *) &ImpactNormal ) < 0.0F )
-					ReflectVector( &Obj->ExternalForce, &ImpactNormal, &Obj->ExternalForce );
-#if FIX0
-				Obj->ExternalForce.x = 0.0F;
-				Obj->ExternalForce.y = 0.0F;
-				Obj->ExternalForce.z = 0.0F;
-#endif
-			}
-			else
-			{
-				DebugPrintf( "New move too big (%f > 10 * %f)...!\n", VectorLength( &Move ), MoveDist );
-			}
-			ObjForceExternalOneOff( Obj, &BumpForce );
-			if ( ImpactDist < 0.0F )
-			{
-				ImpactPoint = StartPos;
-				DebugPrintf( "impactdist = %f, no movement\n", ImpactDist );
-			}
-		}
-		//								DebugPrintf( "Move (%f, %f, %f)\n",
-		//									Move.x, Move., Move.z );
-		hit = true;
-	}
-	Move_Off->x = ImpactPoint.x - StartPos.x;
-	Move_Off->y = ImpactPoint.y - StartPos.y;
-	Move_Off->z = ImpactPoint.z - StartPos.z;
-	if ( move_object )
-	{
-		Obj->Pos = ImpactPoint;
-		Obj->Group = MoveGroup( &Mloadheader, &StartPos, Obj->Group, Move_Off );
-	}
-
-	return hit;
-}
-
-
-#else
 
 #define BACKFACING_PLANE_TOLERANCE		(-0.001F)
 #define IMPACT_OFFSET					(0.1F)
@@ -2439,11 +2099,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 		FeelerStart.x = radius * ( dx0 * Right.x + dy0 * Up.x );
 		FeelerStart.y = radius * ( dx0 * Right.y + dy0 * Up.y );
 		FeelerStart.z = radius * ( dx0 * Right.z + dy0 * Up.z );
-#if 0
-		FeelerGroup = MoveGroup( &Mloadheader, &StartPos, Obj->Group, &FeelerStart );
-#else
 		FeelerGroup = Obj->Group;
-#endif
 		FeelerStart.x += StartPos.x;
 		FeelerStart.y += StartPos.y;
 		FeelerStart.z += StartPos.z;
@@ -2562,7 +2218,6 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 	return hit;
 }
 
-#endif
 
 
 bool WouldObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
@@ -2671,11 +2326,7 @@ bool ObjectCollideOnly( OBJECT *Obj, VECTOR *Move_Off, float radius, VECTOR *Tar
 		FeelerStart.x = radius * ( dx0 * Right.x + dy0 * Up.x );
 		FeelerStart.y = radius * ( dx0 * Right.y + dy0 * Up.y );
 		FeelerStart.z = radius * ( dx0 * Right.z + dy0 * Up.z );
-#if 0
-		FeelerGroup = MoveGroup( &Mloadheader, &StartPos, Obj->Group, &FeelerStart );
-#else
 		FeelerGroup = Obj->Group;
-#endif
 		FeelerStart.x += StartPos.x;
 		FeelerStart.y += StartPos.y;
 		FeelerStart.z += StartPos.z;
@@ -2815,11 +2466,7 @@ bool QCollide( VECTOR *Start_Pos, u_int16_t Start_Group, VECTOR *Move_Off, float
 		FeelerStart.x = radius * ( dx0 * Right.x + dy0 * Up.x );
 		FeelerStart.y = radius * ( dx0 * Right.y + dy0 * Up.y );
 		FeelerStart.z = radius * ( dx0 * Right.z + dy0 * Up.z );
-#if 0
-		FeelerGroup = MoveGroup( &Mloadheader, &StartPos, Start_Group, &FeelerStart );
-#else
 		FeelerGroup = Start_Group;
-#endif
 		FeelerStart.x += StartPos.x;
 		FeelerStart.y += StartPos.y;
 		FeelerStart.z += StartPos.z;

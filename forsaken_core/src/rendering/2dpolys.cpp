@@ -174,17 +174,6 @@ void KillUsedFmPoly( u_int16_t i )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-#if 0
-
-#define	NMEGEN_START		( 5.0F * ANIM_SECOND )
-#define	NMEGEN_STAGE1		( 2.0F * ANIM_SECOND )
-#define	NMEGEN_STAGE2		( 1.0F * ANIM_SECOND )
-#define	NMEGEN_END			( 0.0F * ANIM_SECOND )
-#define	NMEGEN_STAGE0_LEN	( NMEGEN_START - NMEGEN_STAGE1 )
-#define	NMEGEN_STAGE1_LEN	( NMEGEN_STAGE1 - NMEGEN_STAGE2 )
-#define	NMEGEN_STAGE2_LEN	( NMEGEN_STAGE2 - NMEGEN_END )
-
-#else
 
 #define	NMEGEN_START		( 2.0F * ANIM_SECOND )
 #define	NMEGEN_STAGE1		( 0.8F * ANIM_SECOND )
@@ -194,7 +183,6 @@ void KillUsedFmPoly( u_int16_t i )
 #define	NMEGEN_STAGE1_LEN	( NMEGEN_STAGE1 - NMEGEN_STAGE2 )
 #define	NMEGEN_STAGE2_LEN	( NMEGEN_STAGE2 - NMEGEN_END )
 
-#endif
 
 static	int16_t	GlobCount;
 static	u_int8_t	ShadeTable[ 16 ] = { 255, 200, 128, 104, 96, 92, 80, 77, 74, 72, 69, 66, 64, 64, 64, 64 };

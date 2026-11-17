@@ -766,345 +766,6 @@ void InitPickups( void )
 	Pickups[ MAXPICKUPS-1 ].Next = (u_int16_t) -1;
 }
 
-#if 0
-/*===================================================================
-	Table info for new pickup code
-===================================================================*/
-REGENPICKUPINFO	RegenPickupInfo[ MAXPICKUPTYPES ] = {
-
-	{ 1,	0 },				// 0  PICKUP_Trojax
-	{ 1,	0 },				// 1  PICKUP_Pyrolite
-	{ 1,	0 },				// 2  PICKUP_Transpulse
-	{ 1,	0 },				// 3  PICKUP_SussGun
-	{ 1,	0 },				// 4  PICKUP_Laser
-	{ 1,	0 },				// 5  PICKUP_Mug
-	{ 3,	0 },				// 6  PICKUP_Mugs
-	{ 1,	0 },				// 7  PICKUP_Heatseaker
-	{ 3,	0 },				// 8  PICKUP_HeatseakerPickup
-	{ 1,	0 },				// 9  PICKUP_Thief
-	{ 1,	0 },				// 10 PICKUP_Scatter
-	{ 1,	0 },				// 11 PICKUP_Gravgon
-	{ 50,	0 },				// 12 PICKUP_Launcher
-	{ 1,	0 },				// 13 PICKUP_TitanStar
-	{ 3,	0 },				// 14 PICKUP_PurgePickup
-	{ 3,	0 },				// 15 PICKUP_PinePickup
-	{ 1,	0 },				// 16 PICKUP_QuantumPickup
-	{ 1,	0 },				// 17 PICKUP_SpiderPod
-	{ 1,	0 },				// 18 PICKUP_Parasite
-	{ 1,	0 },				// 19 PICKUP_Flare
-	{ 1,	0 },				// 20 PICKUP_GeneralAmmo
-	{ 1,	0 },				// 21 PICKUP_PyroliteAmmo
-	{ 1,	0 },				// 22 PICKUP_SussGunAmmo
-	{ 1,	0 },				// 23 PICKUP_PowerPod
-	{ 1,	0 },				// 24 PICKUP_Shield
-	{ 1,	0 },				// 25 PICKUP_Inv
-	{ 1,	0 },				// 26 PICKUP_ExtraLife
-	{ 1,	0 },				// 27 PICKUP_Computer
-	{ 1,	0 },				// 28 PICKUP_Smoke
-	{ 1,	0 },				// 29 PICKUP_Nitro
-	{ 1,	0 },				// 30 PICKUP_Goggles
-	{ 1,	0 },				// 31 PICKUP_Gold
-	{ 1,	0 },				// 32 PICKUP_Mantle
-	{ 1,	0 },				// 33 PICKUP_Crystal
-	{ 1,	0 },				// 34 PICKUP_Orb
-	{ 1,	0 },				// 35 PICKUP_GoldenPowerPod
-	{ 1,	0 },				// 36 PICKUP_DNA
-	{ 1,	0 },				// 37 PICKUP_SkeletonKey
-	{ 1,	0 },				// 38 PICKUP_Bomb
-	{ 1,	0 },				// 39 PICKUP_GoldFigure
-	{ 1,	0 },				// 40 PICKUP_Flag
-	{ 1,	0 },				// 41 PICKUP_Bounty
-	{ 1,	0 },				// 42 PICKUP_Flag1
-	{ 1,	0 },				// 43 PICKUP_Flag2
-	{ 1,	0 },				// 44 PICKUP_Flag3
-	{ 1,	0 },				// 45 PICKUP_Flag4
-};
-
-int16_t PrimWeaponPickups[ MAXPRIMARYWEAPONS ] = {
-
-	-1,							// Pulsar
-	PICKUP_Trojax,				// Trojax
-	PICKUP_Pyrolite,			// Pyrolite
-	PICKUP_Transpulse,			// Transpulse
-	PICKUP_SussGun,				// SussGun
-	PICKUP_Laser,				// Laser
-};
-
-int16_t SecWeaponPickups[ MAXSECONDARYWEAPONS ] = {
-
-	PICKUP_Mugs,				// Mug
-	PICKUP_HeatseakerPickup,	// Solaris
-	PICKUP_Thief,				// Thief
-	PICKUP_Scatter,				// Scatter
-	PICKUP_Gravgon,				// Gravgon
-	PICKUP_Launcher,			// MFRL
-	PICKUP_TitanStar,			// Titan
-	PICKUP_PurgePickup,			// Purge Mine
-	PICKUP_PinePickup,			// Pine Mine
-	PICKUP_QuantumPickup,		// Quantum Mine
-	PICKUP_SpiderPod,			// Spider Mine
-};
-
-/*===================================================================
-	Procedure	:	Initialise Pickup Regeneration Que
-	Input		:	nothing
-	Output		:	nothing
-===================================================================*/
-void InitQuedPickups( void )
-{
-	u_int16_t	i;
-
-	FirstQuedPickupUsed = NULL;
-	FirstQuedPickupFree = &QuedPickups[ 0 ];
-
-	for( i = 0; i < MAXPICKUPS; i++ )
-	{
-		memset( &QuedPickups[ i ], 0, sizeof( QUEDPICKUP ) );
-		QuedPickups[ i ].Type -1;
-		QuedPickups[ i ].NextUsed = NULL;
-		QuedPickups[ i ].PrevUsed = NULL;
-		QuedPickups[ i ].NextFree = &QuedPickups[ i + 1 ];
-		QuedPickups[ i ].PrevFree = &QuedPickups[ i - 1 ];
-	}
-
-	QuedPickups[ 0 ].PrevFree = NULL;
-	QuedPickups[ MAXPICKUPS - 1 ].NextFree = NULL;
-
-	for( i = 0; i < MAXPICKUPTYPES; i++ )
-	{
-		RegenPickupInfo[ i ].Num = 0;
-	}
-}
-
-/*===================================================================
-	Procedure	:	Get free Slots
-	Input		:	int16_t			Pickup Type
-				:	int16_t			*	Num Random Slots ( TBFI )
-				:	FREESLOTINFO	*	Random Slots Ptr ( TBFI )
-				:	int16_t			*	Num Constant Slots ( TBFI )
-				:	FREESLOTINFO	*	Constant Slots Ptr ( TBFI )
-	Output		:	Nothing
-===================================================================*/
-void GetFreeSlots( int16_t Type, int16_t * NumRandomSlots, FREESLOTINFO * RandomSlots,
-				   int16_t * NumConstantSlots, FREESLOTINFO * ConstantSlots )
-{
-	int16_t	Slot;
-	float	Distance;
-	VECTOR	DistVector;
-
-	*NumRandomSlots = 0;
-	*NumConstantSlots = 0;
-
-	for( Slot = 0; Slot < NumRegenPoints; Slot++ )
-	{
-		if( ( RegenPoints[ Slot ].Status == PU_REGENSTAT_Free ) &&
-			( RegenPoints[ Slot ].Wait == 0.0F ) )
-		{
-			DistVector.x = ( RegenPoints[ Slot ].Pos.x - Ships[ WhoIAm ].Object.Pos.x );
-			DistVector.y = ( RegenPoints[ Slot ].Pos.y - Ships[ WhoIAm ].Object.Pos.y );
-			DistVector.z = ( RegenPoints[ Slot ].Pos.z - Ships[ WhoIAm ].Object.Pos.z );
-			Distance = VectorLength( &DistVector );
-
-			if( RegenPoints[ Slot ].RegenType == PU_REGENTYPE_Const )
-			{
-				if( RegenPoints[ Slot ].Type == Type )
-				{
-					ConstantSlots[ *NumConstantSlots ].Slot = Slot;
-					ConstantSlots[ *NumConstantSlots ].Distance = Distance;
-					*NumConstantSlots++;
-				}
-			}
-			else
-			{
-				RandomSlots[ *NumRandomSlots ].Slot = Slot;
-				RandomSlots[ *NumRandomSlots ].Distance = Distance;
-				*NumRandomSlots++;
-			}
-		}
-	}
-}
-
-/*===================================================================
-	Procedure	:	Add Primary Weapon To Regeneration Que
-	Input		:	int16_t	Primary Weapon
-	Output		:	bool	True/False
-===================================================================*/
-bool AddPrimaryToRegenQue( int8_t Weapon )
-{
-	return( AddPickupToRegenQue( PrimWeaponPickups[ Weapon ] ) );
-}
-
-/*===================================================================
-	Procedure	:	Add Secondary Weapon To Regeneration Que
-	Input		:	int16_t	Primary Weapon
-	Output		:	bool	True/False
-===================================================================*/
-bool AddSecondaryToRegenQue( int8_t Weapon )
-{
-	return( AddPickupToRegenQue( SecWeaponPickups[ Weapon ] ) );
-}
-
-/*===================================================================
-	Procedure	:	Add Pickup to end of regeneration que
-	Input		:	int16_t	Type
-	Output		:	bool	True/False
-===================================================================*/
-bool AddPickupToRegenQue( int16_t Type )
-{
-	QUEDPICKUP	*	QuedPickup;
-
-	if( Type == -1 ) return ( false );
-
-	RegenPickupInfo[ Type ].Num++;
-
-	if( RegenPickupInfo[ Type ].Num < RegenPickupInfo[ Type ].Required )
-	{
-		return( true );
-	}
-
-	QuedPickup = FirstQuedPickupFree;
-
-	if( QuedPickup != NULL )
-	{
-		RegenPickupInfo[ Type ].Num -= RegenPickupInfo[ Type ].Required;
-
-		FirstQuedPickupFree = QuedPickup->NextFree;
-		if( FirstQuedPickupFree != NULL )
-		{
-			FirstQuedPickupFree->PrevFree = NULL;
-		}
-
-		if( FirstQuedPickupUsed != NULL )
-		{
-			FirstQuedPickupUsed->PrevUsed = QuedPickup;
-			QuedPickup->NextUsed = FirstQuedPickupUsed;
-		}
-		else
-		{
-			FirstQuedPickupToProcess = QuedPickup;
-			QuedPickup->NextUsed = NULL;
-		}
-
-		QuedPickup->PrevUsed = NULL;
-		FirstQuedPickupUsed = QuedPickup;
-	}
-	else
-	{
-		return( false );
-	}
-
-	QuedPickup->Type = Type;
-
-	return( true );
-}
-
-/*===================================================================
-	Procedure	:	Remove Pickup from Regeneration Que
-	Input		:	QUEDPICKUP	*	QuedPickup Ptr
-	Output		:	Nothing
-===================================================================*/
-void FreeQuedPickup( QUEDPICKUP * QuedPickup )
-{
-	QUEDPICKUP	*	PrevQuedPickup;
-	QUEDPICKUP	*	NextQuedPickup;
-
-	if( QuedPickup != NULL )
-	{
-		if( FirstQuedPickupToProcess == QuedPickup )
-		{
-			FirstQuedPickupToProcess = FirstQuedPickupToProcess->PrevUsed;
-		}
-
-		if( QuedPickup == FirstQuedPickupUsed )
-		{
-			NextQuedPickup = FirstQuedPickupUsed->NextUsed;
-
-			FirstQuedPickupUsed = NextQuedPickup;
-
-			if( FirstQuedPickupUsed != NULL )
-			{
-				FirstQuedPickupUsed->PrevUsed = NULL;
-			}
-		}
-		else
-		{
-			PrevQuedPickup = QuedPickup->PrevUsed;
-			NextQuedPickup = QuedPickup->NextUsed;
-
-			if( PrevQuedPickup != NULL )
-			{
-				PrevQuedPickup->NextUsed = NextQuedPickup;
-			}
-
-			if( NextQuedPickup != NULL )
-			{
-				NextQuedPickup->PrevUsed = PrevQuedPickup;
-			}
-		}
-
-		if( FirstQuedPickupFree != NULL )
-		{
-			FirstQuedPickupFree->PrevFree = QuedPickup;
-		}
-
-		QuedPickup->NextFree = FirstQuedPickupFree;
-		QuedPickup->PrevFree = NULL;
-		FirstQuedPickupFree = QuedPickup;
-	}
-}
-
-/*===================================================================
-	Procedure	:	Find free Background Object
-	Input		:	nothing
-	Output		:	Nothing
-===================================================================*/
-void ProcessQuedPickups( void )
-{
-	int16_t			Slot;
-	int16_t			Type;
-	u_int16_t			i;
-	int16_t			NumRandomSlots;
-	FREESLOTINFO	RandomSlots[ MAXPICKUPS ];
-	int16_t			NumConstantSlots;
-	FREESLOTINFO	ConstantSlots[ MAXPICKUPS ];
-
-	if( FirstQuedPickupToProcess )
-	{
-		Type = FirstQuedPickupToProcess->Type;
-
-		GetFreeSlots( Type, &NumRandomSlots, &RandomSlots[ 0 ], &NumConstantSlots, &ConstantSlots[ 0 ] );
-
-		if( NumConstantSlots )
-		{
-			Slot = ConstantSlots[ Random_Range( NumConstantSlots ) ].Slot;
-
-			i = InitOnePickup( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Forward, 0.0F, Type, WhoIAm, ++Ships[WhoIAm].PickupIdCount, Slot, true, -1.0F, (u_int16_t) -1 );
-
-			if( ( i != (u_int16_t) -1 ) && ( i != (u_int16_t) -2 ) )
-			{
-				DropPickupSend( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Forward, 0.0F, Type, Ships[WhoIAm].PickupIdCount, Slot, true, -1.0F, (u_int16_t) -1 );
-				FreeQuedPickup( FirstQuedPickupToProcess );
-			}
-		}
-		else
-		{
-			if( NumRandomSlots >= 5 )
-			{
-				Slot = RandomSlots[ Random_Range( NumRandomSlots ) ].Slot;
-		
-				i = InitOnePickup( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Forward, 0.0F, Type, WhoIAm, ++Ships[WhoIAm].PickupIdCount, Slot, true, -1.0F, (u_int16_t) -1 );
-
-				if( ( i != (u_int16_t) -1 ) && ( i != (u_int16_t) -2 ) )
-				{
-					DropPickupSend( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Forward, 0.0F, Type, Ships[WhoIAm].PickupIdCount, Slot, true, -1.0F, (u_int16_t) -1 );
-					FreeQuedPickup( FirstQuedPickupToProcess );
-				}
-			}
-		}
-	}
-}
-
-#endif
 
 /*===================================================================
 	Procedure	:	Clear Pickups Got
@@ -2696,10 +2357,6 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 
 	if( i != (u_int16_t) -1 )
 	{
-#if 0 //-----------------------------------------------------------*/
-		if( RegenSlot != -1 )
-				if( RegenPoints[ RegenSlot ].Status == PU_REGENSTAT_Used ) RegenSlot = -1;	// if trying to use used slot then use no slot.
-#endif //----------------------------------------------------------*/
 
 		AddPickupToGroup( i, Group );
 
@@ -2731,7 +2388,6 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);			// Create Dir Matrix
 
 		NumPickupType[ Pickups[ i ].Type ]++;
-#if 1 //-----------------------------------------------------------*/
 		if( RegenSlot != -1 )
 		{
 			RegenPoints[ RegenSlot ].Status = PU_REGENSTAT_Used;
@@ -2739,7 +2395,6 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 			RegenPoints[ RegenSlot ].PickupIndex = i;
 			RegenPoints[ RegenSlot ].PickupID = ID;
 		}
-#endif //----------------------------------------------------------*/
 
 		light = (u_int16_t) -1;
 		model = (u_int16_t) -1;
@@ -3353,9 +3008,6 @@ bool LoadPickupsPositions( void )
   /* wipes out all pickups, so we can load new ones */
   KillAllPickups();
 
-#if 0
-  DebugPrintf( "pickups: RandomSeeds %d, %d : NumPrimaryPickups %d\n", CopyOfSeed1, CopyOfSeed2, NumPrimaryPickups );
-#endif
 
   /* Populate Remaster N64 pickup slots (100-105) by template-copying
    * from a similar 1998 pickup. One-shot — guarded by a static flag
@@ -5334,7 +4986,6 @@ void PickupModelValid( void )
 	}																				
 }
 
-#if 1
 
 /*===================================================================
 	Procedure	:	Collect Pickup from scene
@@ -5681,14 +5332,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_Shield:
-#if 0
-				if( Ships[ Player ].Object.Shield != MAX_SHIELD )
-				{
-					Ships[ Player ].Object.Shield += 32.0F;
-					if( Ships[ Player ].Object.Shield > MAX_SHIELD ) Ships[ Player ].Object.Shield = MAX_SHIELD;
-					PickupEnable = true;
-				}
-#endif
 				PickupEnable = true;
 				break;
 
@@ -7239,9 +6882,6 @@ void CorrectForExtraOrMissingPickups( void )
 	int16_t	NumWeapons;
 	int16_t	Diff;
 	int16_t	Pickup;
-#if 0
-	int16_t	OldNumWeapons;
-#endif
 
 	CountMinesInLevel();
 
@@ -7714,29 +7354,6 @@ void CorrectForExtraOrMissingPickups( void )
 		}
 	}
 
-#if 0
-	for( Count = 1; Count < MAXPRIMARYWEAPONS; Count++ )
-	{
-		OldNumWeapons = ( CopyPrimaryInLevel[ Count ] + CopyPrimaryInPlayers[ Count ] + CopyPrimaryToGenerate[ Count ] );
-		NumWeapons = ( PrimaryInLevel[ Count ] + PrimaryInPlayers[ Count ] + PrimaryToGenerate[ Count ] );
-
-		if( NumWeapons < MaxPickupType[ PICKUP_Trojax + ( Count - 1 ) ] )
-		{
-			DebugPrintf( "pickups: OLD L %hd - P %hd - G %hd %s\n", CopyPrimaryInLevel[ Count ], CopyPrimaryInPlayers[ Count ], CopyPrimaryToGenerate[ Count ], PrimaryNames[ Count ] );
-			DebugPrintf( "pickups: NEW L %hd - P %hd - G %hd %s\n", PrimaryInLevel[ Count ], PrimaryInPlayers[ Count ], PrimaryToGenerate[ Count ], PrimaryNames[ Count ] );
-			Msg( "A %s has disappeared from the level", PrimaryNames[ Count ] );
-		}
-		else
-		{
-			if( NumWeapons > MaxPickupType[ PICKUP_Trojax + ( Count - 1 ) ] )
-			{
-				DebugPrintf( "pickups: OLD L %hd - P %hd - G %hd %s\n", CopyPrimaryInLevel[ Count ], CopyPrimaryInPlayers[ Count ], CopyPrimaryToGenerate[ Count ], PrimaryNames[ Count ] );
-				DebugPrintf( "pickups: NEW L %hd - P %hd - G %hd %s\n", PrimaryInLevel[ Count ], PrimaryInPlayers[ Count ], PrimaryToGenerate[ Count ], PrimaryNames[ Count ] );
-				Msg( "An extra %s has appeared in the level", PrimaryNames[ Weapon ] );
-			}
-		}
-	}
-#endif
 }
 
 /*===================================================================
@@ -7770,7 +7387,6 @@ void CountMinesInLevel( void )
 	}																				
 }
 
-#endif
 
 int16_t		FirstFailedKillUsed = -1;
 int16_t		FirstFailedKillFree = -1;

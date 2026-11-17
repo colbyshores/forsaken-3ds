@@ -1,7 +1,6 @@
 #include "ui/title.h"
 #include "util/platform.h"
 #include "rendering/text.h"
-#if 1 // bjd		    
 /*==========================================================================
  *
  *  File: Tload.c
@@ -444,4 +443,3 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 #pragma optimize( "", off )
 #endif
 
-#endif

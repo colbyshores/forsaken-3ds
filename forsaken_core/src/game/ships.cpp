@@ -602,11 +602,6 @@ static	float	Interp;
 bool ProcessShips()
 {
 	BYTE	i;
-#if 0
-	float	Impact_Off_Length;
-	VECTOR	Impact_Off;
-	float	M;
-#endif
 	VECTOR	ImpactPoint;
 	float	Speed;
 	VECTOR	Move_Off;	
@@ -639,12 +634,6 @@ bool ProcessShips()
 
 /* @vfp-exempt R6 — dead diagnostic block disabled by #if 0, never compiled
    into any build. measured n/a. Verified 2026-10-25. */
-#if 0
-	for( i = 0 ; i < 10 ; i ++ )
-	{
-		DebugPrintf( "powf( 0.9 ,framelag %f ) = %f \n", 1.0F - (i / 10.0F) , (float) powf( 0.9 , 1.0F - (i / 10.0F) ) );
-	}
-#endif
 
 	if( PlayDemo )
 		NumToDo = MAX_PLAYERS+1;
@@ -1387,41 +1376,7 @@ bool ProcessShips()
 			ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->FinalQuat);
 			ShipObjPnt->FinalQuat.ToMatrix(&ShipObjPnt->FinalMat);
 			MatrixTranspose( &ShipObjPnt->FinalMat, &ShipObjPnt->FinalInvMat );
-#if 0
-			if( ShipObjPnt->light == (u_int16_t) -1 )
-			{
-				ShipObjPnt->light = FindFreeXLight();
-			}
-			if( ShipObjPnt->light != (u_int16_t) -1 )
-			{
-				XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
-				XLights[ShipObjPnt->light].CosArc = (float)fast_cosf(D2R(35));
-				
-				ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
-				XLights[ShipObjPnt->light].r = 255.0F;
-				XLights[ShipObjPnt->light].g = 255.0F;
-				XLights[ShipObjPnt->light].b = 255.0F;
-				XLights[ShipObjPnt->light].Type = SPOT_LIGHT;
-				XLights[ShipObjPnt->light].Pos = ShipObjPnt->Pos;
-				XLights[ShipObjPnt->light].Group = ShipObjPnt->Group;
-			}
-#endif
 
-#if 0
-			if( ShipObjPnt->light == (u_int16_t) -1 )
-			{
-				ShipObjPnt->light = FindFreeXLight();
-			}
-			if( ShipObjPnt->light != (u_int16_t) -1 )
-			{
-				XLights[ShipObjPnt->light].Size = SHIP_RADIUS * 2;
-				XLights[ShipObjPnt->light].r = 0.0F;
-				XLights[ShipObjPnt->light].g = 0.0F;
-				XLights[ShipObjPnt->light].b = 16.0F;
-				XLights[ShipObjPnt->light].Pos = ShipObjPnt->Pos;
-				XLights[ShipObjPnt->light].Group = ShipObjPnt->Group;
-			}
-#endif
 
 			ShipPnt->LastMove.x = ShipObjPnt->Pos.x - StartPos.x;
 			ShipPnt->LastMove.y = ShipObjPnt->Pos.y - StartPos.y;
@@ -1926,27 +1881,6 @@ void InitShipRandomPos( int16_t i )
 			// pick a random startpos to try first then try all others..
 
 			
-#if 0
-			for( e = 0 ; e < num_start_positions ; e++ )
-			{
-				/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
-				trys = ( orgtry + e ) % num_start_positions;
-				
-				MineVec.x = StartPositions[trys].Pos.x;
-				MineVec.y = StartPositions[trys].Pos.y;
-				MineVec.z = StartPositions[trys].Pos.z;
-				
-				if(	!IsStartPosVacantMutualyVisibleGroup( i , trys ) &&
-					!CheckForMines( &MineVec) &&
-					!CheckForGravgons( &MineVec ) )
-				{
-					// Found a vacant one
-					InitShipStartPos( i, trys );
-					return;
-				}
-
-			}
-#endif
 			for( e = 0 ; e < num_start_positions ; e++ )
 			{
 				/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
@@ -2020,22 +1954,6 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	}
 
 
-#if 0
-	Ships[i].Shield = Start_Shield;
-	Ships[i].Hull	= Start_Hull;
-	Ships[i].Angle.x = 0.0F;
-	Ships[i].Angle.y = 0.0F;
-	Ships[i].Angle.z = 0.0F;
-	Ships[i].PowerLevel = 0;
-	Ships[i].Flags = 0;
-	Ships[i].NumMultiples = 0;
-	Ships[i].StealthTime = 0.0F;
-	Ships[i].Primary = PULSAR;
-	Ships[i].Secondary = MUGMISSILE;
-	Ships[i].light = (u_int16_t) -1;
-	RestoreWeapons();
-	RestoreAmmo();
-#endif
 	Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
 	Ships[i].Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 	Start_Dir.x = 0.0F;
@@ -2054,14 +1972,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 		Ships[i].Object.Pos.y = StartPositions[startpos].Pos.y;			
 		Ships[i].Object.Pos.z = StartPositions[startpos].Pos.z;
 		Start_Dir = StartPositions[ startpos ].Dir;
-#if 0
-		Start_Dir.x = -Start_Dir.x;
-		Start_Dir.y = -Start_Dir.y;
-		Start_Dir.z = -Start_Dir.z;
-		Ships[i].Quat.FromVector2(&Start_Dir);
-#else
 		Ships[i].Object.Quat.From2Vectors(&Forward, &Start_Dir);
-#endif
 		Ships[i].Object.Group = StartPositions[startpos].Group;
 
 #ifdef DEBUG_WARP_TO_BOSS
@@ -2183,14 +2094,7 @@ bool GotoRoom( int16_t i, char *roomname )
 		}
 		Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
 		Ships[i].Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
-#if 0
-		Start_Dir.x = -Start_Dir.x;
-		Start_Dir.y = -Start_Dir.y;
-		Start_Dir.z = -Start_Dir.z;
-		Ships[i].Quat.FromVector2(&Start_Dir);
-#else
 		Ships[i].Object.Quat.From2Vectors(&Forward, &Start_Dir);
-#endif
 		Ships[i].Object.Group = group;
 	}else{
 		return false;
@@ -3014,7 +2918,6 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 
 					return true;
 				}else{
-	#if 1
 					if( RaytoSphere2( &Ships[Count].Object.Pos, (SHIP_RADIUS*2.0F)-2.0F, &Ships[i].Object.Pos, &Norm_Move_Off, &inter, &inter2 ) )
 					{
 						Temp_Move_Off.x = inter.x - Ships[i].Object.Pos.x;
@@ -3028,14 +2931,12 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 							HasBeen = true;
 						}
 					}
-	#endif
 				}
 			}
 		}
 	}
 	return HasBeen;
 }
-#if 1
 bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 {
 	VECTOR	Move_Off;	
@@ -3109,7 +3010,6 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 
 	return Impact;
 }
-#endif
 
 /*===================================================================
 	Procedure	:	Multiplayer Sfx handler...
