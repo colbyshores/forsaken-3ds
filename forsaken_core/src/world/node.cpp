@@ -285,19 +285,13 @@ _skipped_extra_links: ;
 		NodePnt++;
 		Buffer = (char*) int32Pnt;
 	}
-#ifdef LOAD_PRECALC_NODE_DISTANCE_TABLE
-	// copy pre-calculated node distances over
-	memmove( NodeArray, Buffer, NodeNetworkHeader.NumOfNodes * NodeNetworkHeader.NumOfNodes * sizeof( float ) );
-#endif
 
 	// All Node Networks have been loaded...
 	free(OrgBuffer);
 	
 	NodeNetworkHeader.State = true;
 
-#ifndef LOAD_PRECALC_NODE_DISTANCE_TABLE
 	SetNetworkDistance();
-#endif
 	
 	return true;
 }

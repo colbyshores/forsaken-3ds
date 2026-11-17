@@ -5149,11 +5149,7 @@ void DrawKeyDefHelp2( MENUITEM * Item )
 		}
 		else
 		{
-#ifdef KEY_ENTER_AT_EMPTY_ADDS_KEYDEF
-			sprintf( help, LT_Edit/*"[enter]=edit, [del]=remove key for %s"*/, keyname );
-#else
 			sprintf( help, LT_Add/*"[enter]=add, [del]=remove key for %s"*/, keyname );
-#endif
 		}
 	}
 	else

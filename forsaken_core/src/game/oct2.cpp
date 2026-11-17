@@ -3238,11 +3238,6 @@ bool RenderScene( void )
 	{  trace("IV0: InitVisiStats OK -> Bspload"); }
 #endif
 
-    // Can Cope with no Bsp file!!!
-#ifdef LOAD_ZBSP
-    Bspload( (char*) &BspZNames[LevelNum][0], &Bsp_Header[ 0 ] );
-    Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 1 ] );
-#else
     if ( !Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 0 ] ) )
     {
       SeriousError = true;
@@ -3250,7 +3245,6 @@ bool RenderScene( void )
       return false;   // the collision data
     }
     Bsp_Header[ 1 ].State = false; // no non-zero .BSP any more
-#endif
 #ifdef __3DS__
 	{  trace("IV0: Bspload OK -> WaterLoad"); }
 #endif
@@ -5311,13 +5305,8 @@ bool RenderCurrentCamera( void )
 #endif
     _RC_SUBSTAGE("post-BackGroundTextureAnimation");
 
-#ifdef CLIP_LINES
-    perf_stage_begin(PERF_S_OPQCLIP);
-    ClipGroup( &CurrentCamera, group );
-#else
     perf_stage_begin(PERF_S_OPQCLIP);
     ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );
-#endif
     perf_stage_end(PERF_S_OPQCLIP, -1);
     _RC_SUBSTAGE("post-ClipGroup-1");
 

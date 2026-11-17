@@ -664,7 +664,6 @@
 #define LT_ViewAlternateKeys2 "[left]=view alternate keys for %s"	// %s = action
 #define LT_SelectControl "[up/down]=select control" 
 #define LT_Cancel "[esc]=cancel" 
-#define LT_Edit "[enter]=edit, [del]=remove key for %s"	// %s = action
 #define LT_Add "[enter]=add, [del]=remove key for %s"	// %s = action
 
 #define LT_Unconnected1 " is not connected"

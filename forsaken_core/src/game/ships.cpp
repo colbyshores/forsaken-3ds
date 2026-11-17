@@ -46,8 +46,6 @@
 #include "net/multiplayer.h"
 #include "world/collision.h"
 
-#undef MULTI_RAY_SLIDE
-
 #define	RGENINVULTIME 60.0F
 
 #define FRAMES_PER_SEC	(60.0F)
@@ -947,20 +945,6 @@ bool ProcessShips()
 						if ( ShipObjPnt->Group != (u_int16_t) -1 )
 #ifdef MULTI_RAY_COLLISION
 						{
-#ifdef MULTI_RAY_SLIDE
-							VECTOR Target_Off;
-
-							BGObject = NULL;
-							while ( ObjectCollideOnly( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &Target_Off, &BGObject ) )
-							{
-								if ( BGObject )
-									ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
-								BGObject = NULL;
-								Move_Off = Target_Off;
-								if ( ++NumCollides > MAXCOLLISIONS )
-									break;
-							}
-#else
 							BGObject = NULL;
 
 							if( !Object2Object )
@@ -973,7 +957,6 @@ bool ProcessShips()
 								ObjectCollideNoBounce( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &BGObject );
 								if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
 							}
-#endif
 							outside_map = !PointInsideSkin( &ShipObjPnt->Pos, ShipObjPnt->Group );
 							if ( outside_map )
 							{
@@ -1975,11 +1958,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	}
 	Ships[i].Object.Quat.ToMatrix(&Ships[i].Object.Mat);
 	ApplyMatrix( &Ships[i].Object.Mat, &SlideUp, &Ship_Up );
-#ifdef USE_ORIGINAL_STARTPOS_UP
-	CrossProduct( &Start_Dir, &StartPositions[ startpos ].Up, &Start_Right );
-#else
 	CrossProduct( &Start_Dir, &Mloadheader.Group[ Ships[i].Object.Group ].up, &Start_Right );
-#endif
 	CrossProduct( &Start_Right, &Start_Dir, &Start_Up );
 	ZQuat.From2Vectors(&Ship_Up, &Start_Up);
 	ZQuat.Multiply(&Ships[i].Object.Quat, &Ships[i].Object.Quat);
