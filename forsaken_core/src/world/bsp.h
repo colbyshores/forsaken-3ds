@@ -86,10 +86,7 @@ extern	BSP_PORTAL_HEADER Bsp_Portal_Header;
  */
 void Bspfree( void );
 bool Bspload( char * Filename,  BSP_HEADER *Bsp_Header );
-bool InBSPGroup( u_int16_t group, VECTOR *pos );
 bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *ImpactPoint, VECTOR *ImpactNormal, float *ImpactOffset ,u_int16_t group );
-
-bool PointInSpaceRecursive( VECTOR *Pos );
 
 bool PointInsideSkin( VECTOR *Pos, u_int16_t Group );
 /* Defined in bsp.cpp; shared with the modules that use it. */

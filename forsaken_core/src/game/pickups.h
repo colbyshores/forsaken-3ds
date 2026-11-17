@@ -244,13 +244,6 @@ typedef struct REGENPICKUPINFO {
 
 } REGENPICKUPINFO;
 
-typedef struct FREESLOTINFO {
-
-	int16_t	Slot;
-	float	Distance;
-
-} FREESLOTINFO;
-
 typedef struct FAILEDKILL {
 
 	int16_t	Next;				// link list.....	
@@ -275,7 +268,6 @@ u_int16_t	InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 					   u_int16_t Owner, u_int16_t ID, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod );
 u_int16_t	InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Speed, int16_t Type,
 					   u_int16_t Owner, u_int16_t ID, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod );
-void	DropPickup( int16_t Type );
 void	KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style );
 bool	CollectPickup( u_int16_t i );
 void	CheckPickup( void );
@@ -309,14 +301,6 @@ FILE * SaveAllPickups( FILE * fp );
 FILE * LoadAllPickups( FILE * fp );
 void KillAllPickupsOfType( u_int16_t Type, int16_t Style );
 
-void InitQuedPickups( void );
-bool AddPickupToRegenQue( int16_t Type );
-void FreeQuedPickup( QUEDPICKUP * QuedPickup );
-void ProcessQuedPickups( void );
-void GetFreeSlots( int16_t Type, int16_t * NumRandomSlots, FREESLOTINFO * RandomSlots,
-				   int16_t * NumConstantSlots, FREESLOTINFO * ConstantSlots );
-bool AddPrimaryToRegenQue( int8_t Weapon );
-bool AddSecondaryToRegenQue( int8_t Weapon );
 void PickupModelValid( void );
 void CheckPickupAllPlayers( void );
 bool ActuallyCollectPickup( u_int16_t i );

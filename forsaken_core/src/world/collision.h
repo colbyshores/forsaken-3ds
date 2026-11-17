@@ -76,10 +76,6 @@ bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup );
 bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint, int collided,
 						VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
 
-bool BGObjectCollideOneGroup( VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
-					  VECTOR *EndPos, u_int16_t *EndGroup, NORMAL *FaceNormal, VECTOR *NewTarget,
-					  BGOBJECT ** BGObject );
-
 bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VECTOR * Pos, VECTOR * Dir  ,
 					 VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, BGOBJECT ** BGObject, float Radius );
 

@@ -216,13 +216,11 @@ BYTE  TempMissileCam;
 
 bool
 Our_CalculateFrameRate(void);
-bool WriteMessage(const char *format, ...); // printf-a-like for bottom line of window
 
 bool ScoreDisplay();
 bool InitScoreDisplay();
 bool StatsDisplay();
 bool InitStatsDisplay();
-bool ScoreDisplayOrig(void);
 
 typedef enum {
 	NO_BG,
@@ -230,8 +228,6 @@ typedef enum {
 	BOX_BG
 } stats_mode_t;
 
-void ShowDetailedStats(int NumActivePlayers, bool TeamsGame, bool KillsBased, bool DetailedStats);
-void ShowBasicStats(int NumActivePlayers);
 void ShowInGameStats();
 void ShowDeathModeStats();
 void ShowGameStats(stats_mode_t mode);
@@ -253,8 +249,6 @@ bool clear_black(void)
 }
 
 bool RenderCurrentCamera( void );
-
-void  PlotSimplePanel( void );
 
 render_viewport_t viewport;
 render_viewport_t oldviewport;
@@ -3450,10 +3444,6 @@ bool RenderScene( void )
     clear_black();
     ReceiveGameMessages();
 */
-
-#ifdef NO_PRECALCULATED_CELL_COLOURS
-    CreateCellColours( &Mloadheader );
-#endif
 
 /*
     MyGameStatus = STATUS_InitView_8;

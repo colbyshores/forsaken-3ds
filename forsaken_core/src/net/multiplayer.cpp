@@ -64,9 +64,6 @@ bool	Modem2Modem = false;
 
 u_int16_t	RandomStartPosModify = 0;							
 
-void InitDemoList( MENU * Menu );
-void RestoreDemoSettings( void );
-
 void SetUpGameSubType( int type )
 {
 	switch ( CTFSlider.value )

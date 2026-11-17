@@ -118,10 +118,6 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangles  );
 bool ExecuteMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t group );
 void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader );
-bool ExecuteSingleGroupMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t group  );
-bool PreInitMxaModels( char * NamePnt);
-bool InitMxaModels( char * NamePnt);
-bool ReleaseMxaModels();
 bool InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp );
 
 /* Defined in mxaload.cpp; shared with the modules that use it. */

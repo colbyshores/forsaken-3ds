@@ -6,6 +6,5 @@
 
 bool sdl_init_video( void );
 bool sdl_init( void );
-void sdl_render_present( render_info_t * info );
 
 #endif

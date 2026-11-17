@@ -217,8 +217,6 @@ BYTE	CommBuff[MAX_BUFFER_SIZE];
 
 int		RealPacketSize[256];
 
-bool	ChAngleevel( void );
-
 MATRIX	TempMatrix = {
 				1.0F, 0.0F, 0.0F, 0.0F,
 				0.0F, 1.0F, 0.0F, 0.0F,

@@ -70,7 +70,6 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 bool	XLightMxaloadHeader( MXALOADHEADER * MXAloadheader , VECTOR * Pos , float Radius , MATRIX * Matrix );
 
 
-void	CreateCellColours( MLOADHEADER * Mloadheader );
 COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t group );
 void BuildVisibleLightList( u_int16_t Group );
 FILE * SaveXLights( FILE * fp );

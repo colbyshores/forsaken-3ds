@@ -35,7 +35,6 @@ void DisplayNewBSPNode( BSP_NODE * Node );
 int PlaneToCubeIntersectionShape( VECTOR * min_ptr, VECTOR * max_ptr, VECTOR * vec_ptr, float offset, VECTOR * result_ptr );
 void CreateLineBox( void );
 int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VECTOR * out_ptr );
-void DisplayNodeVolume( BSP_NODE * Node );
 void KillNodeCubeLines( void );
 void KillBoxLines( void );
 void InitSkinExecs( void );

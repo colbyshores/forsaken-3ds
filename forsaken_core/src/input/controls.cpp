@@ -65,8 +65,6 @@ bool input_grabbed = false;
 #define JOYSTICK_POV_RELEASED( J, P, D )  ( ( js_pov[ old_input ][ J ][ P ][ D ] ) && !( js_pov[ new_input ][ J ][ P ][ D ] ) )
 
 
-int GetPOVMask( DWORD pov );
-
 bool CheatsEnabled = false;
 
 #define TOTAL_JOYSTICK_ACTIONS  140 // 5 axis positions, 3 axis rotations, 4 POV hats and 128 buttons!

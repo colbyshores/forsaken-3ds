@@ -1007,8 +1007,6 @@ void	SetTime( float Time );
 void Demo_fwrite( const void *buffer, size_t size, size_t count , FILE *stream );
 void StopDemoRecording( void );
 bool UpdateAmmoAndValidateMessage( void * Message );
-bool AutoJoinSession( void );
-void AllocatePseudoHost( void );
 
 void set_my_player_name( void );
 

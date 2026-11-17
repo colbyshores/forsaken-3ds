@@ -73,11 +73,6 @@ POLYANIM * Panel3DPolyAnims_MineNum[NUMOFPOLYSPER3DPANELITEM];
 void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
 
 /*===================================================================
-		Function from title.c not #included due to dependences...
-===================================================================*/
-void TintDisc(u_int16_t Model);
-
-/*===================================================================
 	Procedure	:		Load .Mx File
 	Input		:		char	*	Filename , MXLOADHEADER *
 	Output		:		Nothing

@@ -216,8 +216,6 @@ void InitBGObjects( void );
 BGOBJECT * FindFreeBGObject( void );
 void KillUsedBGObject( BGOBJECT * Object );
 void ProcessBGObjects( bool Collide );
-BGOBJECT * CreateBGObject( VECTOR * Pos, VECTOR * DirVector, VECTOR * UpVector,
-						  u_int16_t Group, u_int16_t Model, float Frame, u_int16_t Func, u_int16_t Type );
 void KillAllBGObjects( void );
 void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int16_t How, float Damage );
 bool PreLoadBGOFiles( void );
@@ -246,7 +244,6 @@ FILE * SaveBGObjects( FILE * fp );
 FILE * LoadBGObjects( FILE * fp );
 bool PreLoadShips( void );
 bool AllocateCompShip( u_int16_t Ship );
-void ReloadNakedGirlsTextures( void );
 void RequestDoorTypeSFX( int16_t Type );
 void StartOrChangeDoorSoundFX( BGOBJECT * Object );
 

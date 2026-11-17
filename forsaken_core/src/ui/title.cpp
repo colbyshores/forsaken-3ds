@@ -233,8 +233,6 @@ char TypeFileName( TEXT *t, char c );
 void LoadLevelText( MENU *Menu );
 void ToggleBikeEngines( MENUITEM *Item );
 void DrawHelpKey( MENUITEM * Item );
-int GetFontInfo( MENUITEM * Item );
-void DrawBikeLabel ( MENUITEM * Item );
 void DrawNameVar( MENUITEM * Item );
 void DrawCenteredNameVar( MENUITEM * Item );
 void ExitDetailLevels( MENU *Menu );
@@ -277,7 +275,6 @@ void DebugModeChanged( MENUITEM *item );
 void SavePickups( MENUITEM *item );
 void ShowNodeToggle( MENUITEM *item );
 void ShowStartPointsToggle( MENUITEM *item );
-void InitDemoList( MENU * Menu );
 void InitLoadSavedGameList( MENU * Menu );
 void WatchPlayerSelected( MENUITEM *Item);
 
@@ -299,7 +296,6 @@ void SetDiscStatus(MENU *menu);
 void PlaceObjects (void);
 void HighlightDisc(int disc);
 void ResetDisc(int disc);
-void TintDisc(u_int16_t Model);
 void ExpandDiscs(void);
 void SetUpRotate(int disc);
 void RotateDiscs(int disc, int DifficultyLevel);
@@ -311,7 +307,6 @@ void KillTextInfo ( TEXTINFO *TextInfo );
 
 void SetInitialTitleParams();
 void RotateHoloLight(void);
-void PlotBikeScanLine(void);
 void PulsateVDU(void);
 void MorphHoloLight(void);
 
@@ -409,10 +404,6 @@ void AfterSpecialMessage( MENUITEM *Item );
 void NextLevelOrGameComplete( MENUITEM *Item );
 bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot);
 void KillLines(void);
-void KillDerivedPlane(void);
-void KillPlane(void);
-void SwapBikes(void);
-bool LoadBike(void);
 void GetVduTextFormattingInfo (TEXT *t);
 void RestoreDefaultControlSettings( MENUITEM *Item );
 void PlayCursorSfx( void );
@@ -531,7 +522,6 @@ void SetAxisDeadzone( MENUITEM *Item );
 void SetAxisSensitivity( MENUITEM *Item );
 void UpdateAxisPtr( float pos );
 void ExitMouseSetup( MENU *Menu );
-void InitAvgFrameRateGlobals( MENU *Menu );
 void GoToNextLevel( MENUITEM *Item );
 void TitleLoadGame( MENUITEM *Item );
 void StartTimer( int timer );
@@ -540,13 +530,11 @@ bool SetWaterDetail( SLIDER *slider );
 bool SetTextScale( SLIDER *slider );
 bool SetNumPrimaryPickups( SLIDER *slider );
 void InitHostWaitingToStart( MENU *Menu );
-void BackToJoinSession( MENUITEM *Item );
 
 /***********************************
 Highlight box functions
 ***********************************/
 u_int16_t PlotHighlightPoly (float xmin, float ymin, float xmax, float ymax, u_int8_t r, u_int8_t g, u_int8_t b);
-void ProcessHighlightBox(void);
 void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b);
 bool ProcessWeaponOrder ( int Key );
 

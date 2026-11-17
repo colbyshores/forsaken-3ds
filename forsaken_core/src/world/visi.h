@@ -24,14 +24,6 @@ extern u_int16_t IndirectVisible[ MAXGROUPS ];
 /*
  * fn prototypes
  */
-bool LightGroupDispGroup( MLOADHEADER	* Mloadheader);
-
-bool DispVisipolyModel( MLOADHEADER	* Mloadheader) ;
-void FindGroupImIn( MLOADHEADER	* Mloadheader);
-u_int16_t WhichGroupImIn( MLOADHEADER	* Mloadheader , VECTOR * Pos );
-bool PortalTestTransformClip( MLOADHEADER * Mloadheader , u_int16_t group );
-void FindVisiblePortals( MLOADHEADER * Mloadheader , u_int16_t group );
-void BuildGroupList ( MLOADHEADER * Mloadheader , u_int16_t group );
 void FindVisible( CAMERA *cam, MLOADHEADER	* Mloadheader );
 int ClipGroup( CAMERA *cam, u_int16_t group );
 bool DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam );

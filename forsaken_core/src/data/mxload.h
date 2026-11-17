@@ -114,8 +114,6 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model );
 
 void ReleaseMxloadheader( MXLOADHEADER * Mxloadheader );
 
-bool ExecuteSingleGroupMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t group  );
-bool ReleaseMxModels();
 bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model );
 
 void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  );

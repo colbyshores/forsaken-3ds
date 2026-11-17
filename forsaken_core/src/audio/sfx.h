@@ -285,7 +285,6 @@ u_int32_t PlaySpotSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Fre
 bool StopSfx( u_int32_t uid );
 u_int32_t PlaySfxWithTrigger( int16_t Sfx, int16_t TriggeredSfx );
 u_int32_t PlayFixedSpotSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects );
-void KillCompoundSfxBuffer( int buffer );
 FILE *SaveAllSfx( FILE *fp );
 FILE *LoadAllSfx( FILE *fp );
 void PauseAllSfx( void );

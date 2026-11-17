@@ -50,7 +50,6 @@ typedef struct TLOADHEADER{
  */
 bool InitTload( TLOADHEADER * Tloadheader  );
 bool Tload( TLOADHEADER * Tloadheader );
-bool TloadGetTextureHandle(TLOADHEADER * Tloadheader , int n);
 void TloadReleaseTexture(TLOADHEADER * Tloadheader, int n);
 void ReleaseTloadheader( TLOADHEADER * Tloadheader );
 
