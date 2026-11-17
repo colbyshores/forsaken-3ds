@@ -44,8 +44,12 @@ five configurations; `tools/verify_o0.sh` where `-O2` scheduling differs):
   the definition (~2,000 private `extern` copies gone); `game/constants.h`.
 - Every translation unit is C++; `extern "C"` only at real C boundaries
   (AGENTS.md §9). Lua only via `scripting/lua_api.h`.
-- Dead code: `#if 0` blocks, commented-out code runs, conditionals on 22
-  obsolete macros (~3,400 lines).
+- Dead code: `#if 0` blocks, commented-out code (`//` runs and `/* */`
+  blocks, incl. every D3D execute-buffer remnant), conditionals on 28
+  obsolete macros, 61 prototypes for functions that do not exist
+  (~4,300 lines).
+- `tools/verify_identical.sh` also proves the PC `DEBUG=1` build
+  (`host-debug`), the only one compiling `DEBUG_ON`/`DEBUG_COMP` code.
 - Build: header dependencies are tracked on 3DS again (they never were).
 
 Bugs found (separate, labelled commits): `primary.cpp` indexed
@@ -62,7 +66,12 @@ TUs and render_c3d compiled as C++).
    `PLAYER_SPEECH_TAUNTS`, `COOPERATIVE`, `SCROLLING_MESSAGES`,
    `SINT_PEACEFROG_CHEAT`, `POLYGONAL_COLLISIONS`, `ACTUAL_TRANS`,
    `NEW_LIGHTING`, `MINIUPNP`, `BREAKPAD`, `NET_ENET`, `TEXTURE_SDL`/`DEVIL`,
-   `SOUND_DSOUND`, `RENDER_DISABLED`, `INPUT_DISABLED`.
+   `SOUND_DSOUND`, `RENDER_DISABLED`, `INPUT_DISABLED`, `EXTERNAL_DEMO`,
+   `HOST_CHOOSES_DEMO_NAME`, `REMOTE_CAMERA_ENABLED`, `TEAM_NUMBERS`.
+   Behaviour, not just code: `FINAL_RELEASE` (undefined, so non-original
+   levels follow the original-campaign completion path -- was that the
+   1998 release's behaviour?). Debug switches kept as-is:
+   `DEBUG_TEXT_MESSAGES`, `LIGHT_EVERYTHING`.
 2. Windows-only files never built: `render_d3d.cpp`, `breakpad.cpp`,
    `sound_dsound.cpp`, `input_dinput.cpp`, `texture_devil.cpp`.
 3. Multiplayer: the init packet carries `BYTE[16][16]` kill stats into
@@ -71,8 +80,8 @@ TUs and render_c3d compiled as C++).
    dead since Cleanup 5 — re-point (loosens the gate) or delete; ~50
    baseline entries match nothing — prune?
 
-Next (no decision needed): undefined prototypes (27), unreferenced
-functions, `#pragma once` + header comments, the 2,566 warnings `-isystem`
+Next (no decision needed): unreferenced functions and data (e.g.
+`QuedPickups[]`, `BspZNames[]` written but never read), `#pragma once` + header comments, the 2,566 warnings `-isystem`
 was hiding, `constexpr`/`enum class`/`std::array` sweep, then classes for
 state-owning modules (A/B batch).
 
