@@ -23,10 +23,6 @@
 #include "game/secondary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Procedure	:	TURRET Fire At Target..
 	Input		:	ENEMY * Enemy
@@ -302,8 +298,3 @@ void AI_UPDATEGUNS( register ENEMY * Enemy )
 		GObject = GObject->Next;
 	}
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

@@ -482,9 +482,6 @@ bool InitWaterObject(WATEROBJECT * WO)
 	return true;
 }
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
 /*===================================================================
 	Procedure	:	Process Water Based on Group..
 	Input		:	u_int16_t group
@@ -949,7 +946,3 @@ void GetWaterColour( u_int16_t Group, u_int8_t * Red, u_int8_t * Green, u_int8_t
 	*Green	= (u_int8_t) ( GroupWaterIntensity_Green[ Group ] * 255.0F );
 	*Blue	= (u_int8_t) ( GroupWaterIntensity_Blue[ Group ] * 255.0F );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

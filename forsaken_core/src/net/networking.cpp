@@ -90,10 +90,6 @@ float HostDutyTimer = 0.0F;
 float NetUpdateIntervalHostDuties = 30.0F;
 void SetShipBankAndMat( OBJECT * ShipObjPnt );
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 int16_t	MaxKills = 0;
 
 #ifdef DEMO_SUPPORT

@@ -20,10 +20,6 @@
 #include "ai/ai.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Procedure	:	AIR Idle
 	Input		:	ENEMY * Enemy
@@ -104,9 +100,3 @@ void AI_CRAWL_IDLE( register ENEMY * Enemy )
 	Enemy->Object.AI_Mode = AIMODE_SCAN;
 	Enemy->Timer  =	RESET_SCAN_TIME + (float) Random_Range( (u_int16_t) RESET_SCAN_TIME );
 }
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

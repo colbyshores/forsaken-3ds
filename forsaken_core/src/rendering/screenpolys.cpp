@@ -30,10 +30,6 @@
 #include "game/ships.h"
 #include "rendering/2dtextures.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 #define THERMAL_STEP		(1.6F)
 #define THERMAL_INC			(0.0092593F)
 #define THERMAL_DEC			(0.25F)
@@ -3801,7 +3797,3 @@ void ShowCTFFlags( u_int16_t Ship )
 		}
 	}
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

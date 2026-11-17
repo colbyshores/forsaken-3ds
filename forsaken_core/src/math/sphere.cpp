@@ -6,10 +6,6 @@
 #include "game/main.h"
 #include "math/sphere.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /************************************************************************
 *									*
 * This method computes the intersection between a ray and the sphere.	*
@@ -330,7 +326,3 @@ bool RaytoSphereShort( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR 
 
 	return true;
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

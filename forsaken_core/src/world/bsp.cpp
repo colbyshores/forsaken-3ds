@@ -19,11 +19,6 @@
 #define BSP_VERSION_NUMBER	(1)
 #define BSP_PORTAL_VERSION_NUMBER	(1)
 
-
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 		Globals ...
 ===================================================================*/
@@ -672,7 +667,3 @@ bool PointInsideSkin( VECTOR *Pos, u_int16_t Group )
 	}
 	return !AmIOutsideGroup( &Mloadheader, Pos, Group );
  }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

@@ -23,12 +23,6 @@
 #include "game/oct2.h"
 #include "game/spotfx.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-// Externals
-
 /*===================================================================
 	Procedure	:	AIR Crash and burn...
 	Input		:	ENEMY * Enemy
@@ -69,6 +63,3 @@ void AI_AIR_DEATH_CRASHANDBURN( register ENEMY * Enemy )
 	CreateSpotFXBurning( &NewPos, &Mloadheader.Group[ Enemy->Object.Group ].up, Enemy->Object.Group );
 
 }
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

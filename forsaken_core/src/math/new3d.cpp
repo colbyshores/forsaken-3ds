@@ -3,10 +3,6 @@
 #include <stdio.h>
 #include "math/new3d.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Sin/Cos lookup table — 1024 entries covering [0, 2*PI)
 	Linear interpolation gives < 4.7e-6 max error vs sinf().
@@ -222,159 +218,24 @@ void AddMatrixTrans( float xt, float yt, float zt, MATRIX * m )
 				:	VECTOR	*	New Vector
 	Output		:	Nothing
 ===================================================================*/
-#ifndef USEASM
 void CrossProduct( VECTOR * a, VECTOR * b, VECTOR * ab )
 {
 	ab->x = ( a->y * b->z ) - ( a->z * b->y );
 	ab->y = ( a->z * b->x ) - ( a->x * b->z );
 	ab->z = ( a->x * b->y ) - ( a->y * b->x );
 }
-#else
-__declspec(naked) void CrossProduct(VECTOR * v, VECTOR * v1, VECTOR * v2)
-{
-	// v[X] = v1[Y]*v2[Z] - v1[Z]*v2[Y] = A - B
-	// v[Y] = v1[Z]*v2[X] - v1[X]*v2[Z] = C - D
-	// v[Z] = v1[X]*v2[Y] - v1[Y]*v2[X] = E - F
-	__asm
-	{
-		mov			eax, [esp + 12]
-		mov			ecx, [esp + 4]
-		mov			edx, [esp + 8]
-
-		fld			dword ptr [ecx + 4]
-		// v1[Y]
-		fmul		dword ptr [edx + 8]
-		// v1[Y]*v2[Z] (2)
-		fld			dword ptr [ecx + 8]
-		// v1[Z]
-		// v1[Y]*v2[Z] (1)
-		fmul		dword ptr [edx + 4]
-		// v1[Z]*v2[Y] (2)
-		// v1[Y]*v2[Z] (0)
-		fld			dword ptr [ecx + 8]
-		// v1[Z]
-		// v1[Z]*v2[Y] (1)
-		// v1[Y]*v2[Z] (0)
-		fmul		dword ptr [edx]
-		// v1[Z]*v2[X] (2)
-		// v1[Z]*v2[Y] (0)
-		// v1[Y]*v2[Z] (0)
-		fld			dword ptr [ecx]
-		// v1[X]
-		// v1[Z]*v2[X] (1)
-		// v1[Z]*v2[Y] (0)
-		// v1[Y]*v2[Z] (0)
-		fmul		dword ptr [edx + 8]
-		// v1[X]*v2[Z] (2)
-		// v1[Z]*v2[X] (0)
-		// v1[Z]*v2[Y] (0)
-		// v1[Y]*v2[Z] (0)
-		fld			dword ptr [ecx]
-		// v1[X]
-		// v1[X]*v2[Z] (1)
-		// v1[Z]*v2[X] (0)
-		// v1[Z]*v2[Y] (0)
-		// v1[Y]*v2[Z] (0)
-		fmul		dword ptr [edx + 4]
-		// v1[X]*v2[Y] (2)
-		// v1[X]*v2[Z] (0)
-		// v1[Z]*v2[X] (0)
-		// v1[Z]*v2[Y] (0)
-		// v1[Y]*v2[Z] (0)
-		fld			dword ptr [ecx + 4]
-		// v1[Y]
-		// v1[X]*v2[Y] (1)
-		// v1[X]*v2[Z] (0)
-		// v1[Z]*v2[X] (0)
-		// v1[Z]*v2[Y] (0)
-		// v1[Y]*v2[Z] (0)
-		fmul		dword ptr [edx]
-		// v1[Y]*v2[X] = F (2)
-		// v1[X]*v2[Y] = E (0)
-		// v1[X]*v2[Z] = D (0)
-		// v1[Z]*v2[X] = C (0)
-		// v1[Z]*v2[Y] = B (0)
-		// v1[Y]*v2[Z] = A (0)
-		fxch		st(5)
-		// v1[Y]*v2[Z] = A (0)
-		// v1[X]*v2[Y] = E (0)
-		// v1[X]*v2[Z] = D (0)
-		// v1[Z]*v2[X] = C (0)
-		// v1[Z]*v2[Y] = B (0)
-		// v1[Y]*v2[X] = F (2)
-		fsubrp	st(4), st
-		// v1[X]*v2[Y] = E (0)
-		// v1[X]*v2[Z] = D (0)
-		// v1[Z]*v2[X] = C (0)
-		// A - B (2)
-		// v1[Y]*v2[X] = F (1)
-		fxch		st(2)
-		// v1[Z]*v2[X] = C (0)
-		// v1[X]*v2[Z] = D (0)
-		// v1[X]*v2[Y] = E (0)
-		// A - B (2)
-		// v1[Y]*v2[X] = F (1)
-		fsubrp	st(1), st
-		// C - D (2)
-		// v1[X]*v2[Y] = E (0)
-		// A - B (1)
-		// v1[Y]*v2[X] = F (0)
-		fxch		st(1)
-		// v1[X]*v2[Y] = E (0)
-		// C - D (2)
-		// A - B (1)
-		// v1[Y]*v2[X] = F (0)
-		fsubrp	st(3), st
-		// C - D (1)
-		// A - B (0)
-		// E - F (2)
-		fxch		st(1)
-		// A - B (0)
-		// C - D (1)
-		// E - F (2)
-		// ******** 1 clock stall (needs result 1 cycle in advance) ********
-		fstp		dword ptr [eax]
-		fstp		dword ptr [eax + 4]
-		fstp		dword ptr [eax + 8]
-
-		ret
-	}
-}
-#endif
 /*===================================================================
 	Procedure	:	Calculate the Dod product of 2 VECTORS
 	Input		:	VECTOR * a
 				:	VECTOR * b
 	Output		:	float		Dot Product
 ===================================================================*/
-#ifndef USEASM
 float DotProduct( VECTOR * a , VECTOR * b ) 
 {
 	return( ( a->x * b->x ) +
 		    ( a->y * b->y ) +
 		    ( a->z * b->z ) );
 }
-#else
-__declspec(naked) float DotProduct( VECTOR * a, VECTOR * b)
-{
-	// a[X]*b[X] + a[Y]*b[Y] + a[Z]*b[Z]
-	__asm
-	{
-		mov			ecx, [esp + 4]
-		mov			edx, [esp + 8]
-		fld			dword ptr [ecx]
-		fmul		dword ptr [edx]
-		fld			dword ptr [ecx + 4]
-		fmul		dword ptr [edx + 4]
-		fld			dword ptr [ecx + 8]
-		fmul		dword ptr [edx + 8]
-		fxch		st(2)
-		faddp		st(1), st
-		faddp		st(1), st
-		ret
-	}
-}
-#endif
 
 /*===================================================================
 	Procedure	:	Reflect Vector off a surface normal
@@ -813,10 +674,3 @@ spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4)
     p->z = p1->z * m1 + p2->z * m2 + p3->z * m3 + p4->z * m4;
 
 }
-
-
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

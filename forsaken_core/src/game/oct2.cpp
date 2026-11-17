@@ -4037,20 +4037,6 @@ void MainRoutines( void )
   perf_stage_begin(PERF_S_GOALS);
   ProcessGoals();
   perf_stage_end(PERF_S_GOALS, -1);
-#ifdef DOESNT_WORK_AND_A_BAD_IDEA_ANYWAY
-  if ( outside_map && !DebugInfo && ( Ships[WhoIAm].Object.Mode != DEATH_MODE ) && ( Ships[WhoIAm].Object.Mode != LIMBO_MODE ) )
-  {
-    // bugger -- the player has managed to get outside the map, so kill him off...
-    Ships[WhoIAm].ShipThatLastHitMe = MAX_PLAYERS;
-    Ships[WhoIAm].Damage = 255 + 255; //make sure I Die....
-    DoDamage( OVERRIDE_INVUL );
-  
-  
-    Ships[WhoIAm].Object.Mode = DEATH_MODE;
-    Ships[WhoIAm].Timer = 0.0F;
-    ShipDiedSend( WEPTYPE_Primary, 0);
-  }
-#endif
   perf_stage_begin(PERF_S_WATER);
   WaterProcess();
   perf_stage_end(PERF_S_WATER, -1);

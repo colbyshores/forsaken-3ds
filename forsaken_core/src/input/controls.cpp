@@ -275,9 +275,6 @@ char *JoystickPOVDirections[MAX_POV_DIRECTIONS] = { "Up", "Down", "Left", "Right
 
 // this function receives higher level encoded bits
 
-#ifdef USEINLINE
-__inline
-#endif
 short key_pressed( USERKEY *k )
 {
   int j;
@@ -340,9 +337,6 @@ short key_pressed( USERKEY *k )
 
 // this function receives higher level encoded bits
 
-#ifdef USEINLINE
-__inline
-#endif
 short key_held( USERKEY *k )
 {
   int j;

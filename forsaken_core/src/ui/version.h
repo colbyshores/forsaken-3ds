@@ -23,13 +23,7 @@
     #ifdef __3DS__
         #define PXBV  "3DS"
     #elif defined(WIN32)
-        #ifdef D3D
-            #define PXBV  "D3D9"
-        #else
             #define PXBV  "OPEN"
-        #endif
-    #elif defined(MACOSX)
-        #define PXBV  "MACOSX"
     #else
         #define PXBV  "LINUX"
     #endif

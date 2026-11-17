@@ -28,10 +28,6 @@
 #include "game/oct2.h"
 #include "world/collision.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
 
@@ -542,7 +538,3 @@ void AI_SetFIREATTARGET( register ENEMY * Enemy )
 	Enemy->Object.AI_Mode = AIMODE_FIRE;
 	Enemy->Timer  = RESET_FIRE_TIME + (float) Random_Range( (u_int16_t) RESET_FIRE_TIME );
 }
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

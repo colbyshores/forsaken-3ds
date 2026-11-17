@@ -20,10 +20,6 @@
 #include "game/oct2.h"
 #include "rendering/2dtextures.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 #define	FMPOLYSCALE	32.0F
 
 /*===================================================================
@@ -2611,8 +2607,3 @@ FILE * LoadFmPolys( FILE * fp )
 
 	return( fp );
 }
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

@@ -22,11 +22,6 @@
 #include "game/primary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-// Externals
 /*===================================================================
 	Procedure	:	AIR Follow Path
 	Input		:	ENEMY * Enemy
@@ -324,7 +319,3 @@ void AI_CRAWL_FOLLOWPATH( register ENEMY * Enemy )
 
 
 }
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

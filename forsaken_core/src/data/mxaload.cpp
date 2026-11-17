@@ -73,7 +73,6 @@ num_frames : u_int16_t // number of animation frames
 ===================================================================*/
 #define	MXA_VERSION_NUMBER	2
 
-#undef FIX_MXA_UV
 
 /*===================================================================
 		Globals...	
@@ -423,9 +422,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 						colourkey++;
 						MFacePnt->pad &= ~1;
 					}
-#ifdef FIX_MXA_UV
-					FixUV( &FacePnt, lpBufStart, tpage, Mxaloadheader->Group[group].originalVerts[execbuf] );
-#endif
 					MFacePnt++;
 					lpNormals++;
 					tempInt+=3;
@@ -556,11 +552,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 								Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] = (MXAVERT*) Buffer;
 								lpLVERTEX = 	( LPLVERTEX ) ( lpLVERTEX +( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
 								lpLVERTEX += 8;
-#ifdef FIX_MXA_UV
-								FixUV_MXA( Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup],
-									Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup],
-									lpLVERTEX, lpLVERTEX2 );
-#endif
 								Buffer += ( num_anim_vertices * sizeof( MXAVERT ) );
 							}
 
@@ -779,9 +770,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	Mxaloadheader->state = true;
 	return( true );
 }
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
 
 /*===================================================================
 	Procedure	:		Execute all group buffers for a Mxaloadheader
@@ -1062,9 +1050,6 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 						color->r = from_color->r + (int8_t) fast_floorf( ( to_color->r - from_color->r ) * Interp );
 						color->g = from_color->g + (int8_t) fast_floorf( ( to_color->g - from_color->g ) * Interp );
 						color->b = from_color->b + (int8_t) fast_floorf( ( to_color->b - from_color->b ) * Interp );
-#ifdef DOES_NOT_WORK_FOR_BLASTER
-						color->a = from_color->a + (int8_t) fast_floorf( ( to_color->a - from_color->a ) * Interp );
-#endif
 					}
 					if ( FromVert->flags & MXA_ANIM_UV )
 					{
@@ -1087,8 +1072,3 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 	
 	return true;
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

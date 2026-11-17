@@ -22,11 +22,6 @@
 #include "game/primary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-// Externals
 /*===================================================================
 	Procedure	:	AIR KillMine
 	Input		:	ENEMY * Enemy
@@ -105,8 +100,3 @@ void AI_AIR_KILLMINE( register ENEMY * Enemy )
 	}
 	Enemy->AI_Angle = AimData.Angle;
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

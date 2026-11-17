@@ -267,7 +267,7 @@ extern int Num_Joysticks;
 typedef struct {
 	bool assigned;
 	bool connected;
-#if !defined(DINPUTJOY) && !defined(__3DS__)
+#if !defined(__3DS__)
 	SDL_Joystick * sdl_joy;
 #endif
 	char *Name;

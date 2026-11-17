@@ -15,11 +15,6 @@
 #include "rendering/lights.h"
 #include "game/oct2.h"
 
-
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /******************************************************************************************
 	Defines
 *******************************************************************************************/
@@ -754,8 +749,3 @@ FILE * LoadRealTimeLights( FILE * fp )
 
 	return( fp );
 }
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

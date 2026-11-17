@@ -23,10 +23,6 @@
 #include "game/secondary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 // Globals
 void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy );
 
@@ -329,8 +325,3 @@ void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy )
 	}
 	
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

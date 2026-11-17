@@ -50,10 +50,6 @@
 #include "game/models.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 #define MAX_TROJAX_POWER_LEVEL	(100.0F)
 
 /*===================================================================
@@ -6859,17 +6855,11 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 							TempVector.x = ( Ships[ Count ].Object.Pos.x - Pos->x );			// Bul - Ship
 							TempVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
 							TempVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
-#ifdef OLD_METHOD
-							NormaliseVector( &TempVector );
-							Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
-							ShipRadius = ( SHIP_RADIUS + ( WeaponRadius * Cos ) );
-#else
 							Cos = DotProduct( &TempVector, Dir );
 							if ( Cos >= 0 && Cos <= DirLength )
 								ShipRadius = SHIP_RADIUS + WeaponRadius;
 							else
 								ShipRadius = SHIP_RADIUS;
-#endif
 							break;
 					
 						case COLTYPE_Transpulse:
@@ -9348,7 +9338,3 @@ float GetPrimaryAmmoUsage( int16_t Ship, int8_t Weapon )
 
 	return( Ammo );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

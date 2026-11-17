@@ -22,11 +22,6 @@
 #include "game/primary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-// Externals
 /*===================================================================
 	Procedure	:	AIR Formation Flying
 	Input		:	ENEMY * Enemy
@@ -258,9 +253,3 @@ void AI_LITTLEGEEK_FORMATION( register ENEMY * Enemy )
 	EnemyTypes[ENEMY_Boss_LittleGeek].Radius = 0.0F;
 
 }
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

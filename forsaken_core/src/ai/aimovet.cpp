@@ -23,10 +23,6 @@
 #include "game/oct2.h"
 #include "ui/title.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Procedure	:	AIR Move to a Target
 	Input		:	ENEMY * Enemy
@@ -163,8 +159,3 @@ void AI_AIR_MOVETOTARGET( register ENEMY * Enemy )
 
 
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

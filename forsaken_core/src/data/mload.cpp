@@ -1392,52 +1392,6 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 	Mloadheader->state = false;
 }
 
-
-#ifdef UNSCRAMBLE
-
-#define CODE_LENGTH		(977)
-#define CODEKEY			"+>*\\?<~:$^`�=&|,�"
-
-static void Unscramble( char *buf, long size, char *fname )
-{
-	char *fname_end;
-	static char codeword[ CODE_LENGTH ], *codekey = CODEKEY;
-	int codenum;
-	char *ck, *cn;
-
-	fname_end = strrchr( fname, '\\' );
-	if ( fname_end && *++fname_end )
-		fname = fname_end;
-	fname_end = strrchr( fname, '.' );
-	if ( !fname_end )
-		fname_end = fname + strlen( fname );
-
-	// set up code table
-	memset( codeword, 0, sizeof( codeword ) );
-	for ( ck = codekey, cn = fname, codenum = 0; codenum < sizeof( codeword ); codenum++ )
-	{
-		codeword[ codenum ] = *ck++ ^ *cn++ ^ ( ( codenum + 113 ) % 29 );
-		if ( !codeword[ codenum ] )
-			codeword[ codenum ] = ( codenum + 61 ) % 253;
-		if ( !*ck )
-			ck = codekey;
-		if ( cn == fname_end )
-			cn = fname;
-	}
-	codeword[ sizeof( codeword ) - 1 ] = 0;
-
-	// decode data
-	for ( codenum = 0; size--; )
-	{
-		*buf++ ^= codeword[ codenum++ ];
-		if ( !codeword[ codenum ] )
-			codenum = 0;
-	}
-}
-
-#endif // UNSCRAMBLE
-
-
 /*===================================================================
 	Procedure	:		Pre - Load .Mx File
 	Input		:		char	*	Filename , MLOADHEADER *
@@ -1509,12 +1463,6 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 	}
 
 	Mloadheader->OrgAddr = Buffer;
-
-#ifdef UNSCRAMBLE
-	if ( strcasecmp( Filename, "data\\levels\\accworld\\accworld.mxv" ) &&
-		 strcasecmp( Filename, "data\\levels\\probeworld\\probeworld.mxv" ) )
-		Unscramble( Buffer, Read_Size, Filename );
-#endif
 
 	Uint32Pnt = (u_int32_t *) Buffer;
 	MagicNumber = *Uint32Pnt++;

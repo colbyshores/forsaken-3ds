@@ -23,11 +23,6 @@
 #include "rendering/lines.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-// Externals
 /*===================================================================
 	Procedure	:	AI Spline Movement....
 	Input		:	ENEMY * Enemy
@@ -177,7 +172,3 @@ void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
 
 
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

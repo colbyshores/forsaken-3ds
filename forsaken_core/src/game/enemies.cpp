@@ -41,10 +41,6 @@
 #include "world/visi.h"
 #include "world/collision.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_int16_t * NewGroup );
 void AutoMovementExogenon( OBJECT * Object , ENEMY * Enemy );
 
@@ -9923,7 +9919,3 @@ bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp )
 	}
 	return true;
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

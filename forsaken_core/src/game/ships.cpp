@@ -48,11 +48,6 @@
 
 #undef MULTI_RAY_SLIDE
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-
 #define	RGENINVULTIME 60.0F
 
 #define FRAMES_PER_SEC	(60.0F)
@@ -1928,11 +1923,6 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	VECTOR	Start_Right;
 	VECTOR	Ship_Up;
 	QUAT	ZQuat;
-#ifdef FUDGE_AUTOLEVEL
-	QUAT	StepQuat;
-	int		j;
-	float	autolevel;
-#endif
 	JustGenerated = true;
 
 	if( (MyGameStatus==STATUS_SinglePlayer) || (MyGameStatus==STATUS_StartingSinglePlayer) )
@@ -1997,21 +1987,6 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	CrossProduct( &Start_Right, &Start_Dir, &Start_Up );
 	ZQuat.From2Vectors(&Ship_Up, &Start_Up);
 	ZQuat.Multiply(&Ships[i].Object.Quat, &Ships[i].Object.Quat);
-#ifdef FUDGE_AUTOLEVEL
-	Ships[i].Quat.ToMatrix(&Ships[i].Mat); // needed for AutoLevelRot() below
-	
-	// autolevel initial ship position
-	for ( j = 0; j < 30; j++ )
-	{
-		autolevel = AutoLevelRot( i, 1.0F );
-		if ( fabsf( autolevel ) < 0.01 )
-			break;
-		StepQuat.MakeEuler(0.0F, 0.0F, autolevel);
-		Ships[i].Quat.Multiply(&StepQuat, &Ships[i].Quat);
-		Ships[i].Quat.ToMatrix(&Ships[i].Mat);
-	}
-	DebugPrintf( "autolevel = %f after %d iterations\n", autolevel, j );
-#endif
 	// reset external and internal force vectors to ship movement
 	
 	Ships[i].Object.ExternalForce.x = 0.0F;
@@ -2601,11 +2576,6 @@ void RemoteCameraMode1( GLOBALSHIP * ShipPnt , BYTE i )
 	Input		:	nothing
 	Output		:	false/true
 ===================================================================*/
-#ifdef USEINLINE
-#ifdef FINAL_RELEASE
-__inline
-#endif
-#endif
 bool	IsStartPosVacant( int16_t i , u_int16_t startpos )
 {
 	int	e;
@@ -2629,11 +2599,6 @@ bool	IsStartPosVacant( int16_t i , u_int16_t startpos )
 	Input		:	nothing
 	Output		:	false/true
 ===================================================================*/
-#ifdef USEINLINE
-#ifdef FINAL_RELEASE
-__inline
-#endif
-#endif
 bool	IsStartPosVacantMutualyVisibleGroup( int16_t i , u_int16_t startpos )
 {
 	int	e;
@@ -2657,11 +2622,6 @@ bool	IsStartPosVacantMutualyVisibleGroup( int16_t i , u_int16_t startpos )
 	Input		:	nothing
 	Output		:	false/true
 ===================================================================*/
-#ifdef USEINLINE
-#ifdef FINAL_RELEASE
-__inline
-#endif
-#endif
 bool	IsStartPosVacantVisibleGroup( int16_t i , u_int16_t startpos )
 {
 	int	e;
@@ -3379,8 +3339,3 @@ void ReStoreMyShieldHull( void )
 	Ships[WhoIAm].Object.Shield = MyShield / 1234.0F;
 	Ships[WhoIAm].Object.Hull = MyHull / 4321.0F;
 }
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

@@ -25,11 +25,6 @@
 #include "game/skin.h"
 #include "ui/title.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-#undef TESTING_SUBTRACTIVE
 
 /*===================================================================
 		Globals...	
@@ -57,29 +52,6 @@ DWORD	chop_status;
 /*===================================================================
 	Floating Point Cull Mode
 ===================================================================*/
-#ifdef USEASM
-__inline
-void	start_chop(void)
-{
-__asm
-	{
-		fstcw word ptr status
-		mov eax,dword ptr status
-		or eax,3072
-		mov dword ptr chop_status,eax
-		fldcw word ptr chop_status
-	}
-}
-
-__inline
-void	end_chop(void)
-{
-__asm
-	{
-		fldcw word ptr status
-	}
-}
-#endif
 
 /*===================================================================
 	Procedure	:	Set up And Init all XLights
@@ -365,30 +337,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			{
 				if( WhiteOut == 0.0F )
 				{
-#ifdef	USEASM
-					__asm
-					{
-						mov		eax, DWORD PTR ShowPlaneRGB
-						or		eax, eax
-						jnz		useplanergb
-						mov		esi, [lpLVERTEX2]
-						add		esi,16
-						jmp		go
-useplanergb:
-						mov		esi, [lpLVERTEX2]
-						add		esi,12
-go:
-						mov		edi, [lpLVERTEX]
-						add		edi,16
-						mov		ecx, vert
-clear:					mov		eax, [esi]
-						add		esi, 32
-						mov		[edi],eax
-						add		edi, 32
-						dec		ecx
-						jnz		clear
-					}
-#else	//USEASM
 					if ( ShowPlaneRGB )
 					{
 						while( vert --)
@@ -406,7 +354,6 @@ clear:					mov		eax, [esi]
 							lpLVERTEX2++;		
 						}
 					}
-#endif	//USEASM
 					
 				}
 				else
@@ -645,9 +592,6 @@ clear:					mov		eax, [esi]
 						{
 						case POINT_LIGHT:
 							Cellz = CellIndex_z;
-#ifdef	USEASM
-							start_chop();
-#endif	//USEASM
 			
 							while( Cellz <= CellRange_z )
 							{			   
@@ -680,76 +624,8 @@ clear:					mov		eax, [esi]
 											if ( distance <  SizeX2  )					// float
 											{
 												distance = 1.0F - ( distance * Size );	// float
-#ifdef	USEASM
-__asm
-{
-														fld		rlf				;float load rlf
-														fmul	distance		;float mul distance 2
-														fld		blf				;float load blf
-														fmul	distance		;float mul distance	1
-														fld		glf				;float load glf
-														fmul	distance		;float mul distance	0
-														fxch	st(2)
-														fistp	tempiR			;float int store tempiR
-														fxch	st(1)
-														fistp	tempiG			;float int store tempiG
-														fxch	st(0)
-														fistp	tempiB			;float int store tempiG
-			
- 												mov	esi , [lpLVERTEX];set up the pointer
-												mov	ecx , [esi+16]		;int ecx = col   get the color
-
-												mov edi , ecx			; edi = col..
-												and ecx , 0x00ffffff	; and out the alpha
-												and edi , 0xff000000	; keep the alpha for later
-												
-												mov ebx , tempiR		;move the red into inc
-												mov edx , ecx			;edx = col
-												shl ebx , 8				;shift it up 8 bits
-												or  ebx , tempiG		;or in the green
-												shl ebx , 8				;shift it up 8 bits
-												or  ebx , tempiB		;or in the Blue
-			
-			
-												add ecx , ebx			;ecx = col + inc
-												xor edx , ebx			;edx = col ^ inc
-												xor edx , ecx			;edx = ( col + inc ) ^ ( col ^ inc )
-												and edx	, 0x01010100	;edx = carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100
-												mov eax , edx			;eax = carry
-												shr	edx , 8				;edx = ( carry >> 8 )
-												sub eax , edx			;eax = clamp = carry - ( carry >> 8 )
-												sub ecx , edx			;ecx = (col + inc) - carry
-												or  ecx , eax			;col = ecx | clamp
-			
-												or  ecx , edi			; or back in the alpha..
-
-												mov [esi+16] , ecx		;int put the color back
-											}
-
-#else	//USEASM
-
 
 												col = lpLVERTEX->color;
-#ifdef TESTING_SUBTRACTIVE
-												tempiA = col & 0xff000000;
-												// for subtraction, simply add the negative
-												tempiR = ( (int) -( rlf * distance ) ) & 0xFF;
-												tempiG = ( (int) -( glf * distance ) ) & 0xFF;
-												tempiB = ( (int) -( blf * distance ) ) & 0xFF;
-												// so far so much nearly the same...
-												inc = ( tempiR << 16 ) + ( tempiG << 8 ) + tempiB;
-												carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100;
-												col = col + inc - carry;
-												// set the carry also for those channels where we are subtracting 0 (this seems wrong!)
-												// where 0 components are detected by inverting the inc
-												// adding 1, and checking the carry out
-												inc = inc ^ 0x00FFFFFF;
-												carry |= ( ( inc + 0x00010101) ^ ( inc ^ 0x00010101 ) ) & 0x01010100;
-												// ...and now it's nearly the same as for additive saturation
-												clamp = carry - ( carry >> 8 );
-												col = ( col & clamp ) & 0x00ffffff;
-												col |= tempiA;
-#else
 												tempiA = col & 0xff000000;
 												tempiR = (int) ( rlf * distance );
 												tempiG = (int) ( glf * distance );
@@ -759,10 +635,8 @@ __asm
 												clamp = carry - ( carry >> 8 );
 												col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 												col |= tempiA;
-#endif
 			
 												lpLVERTEX->color = col;
-#endif	//USEASM
 											}
 										}
 			
@@ -772,9 +646,6 @@ __asm
 								}
 								Cellz++;
 							}
-#ifdef USEASM
-							end_chop();
-#endif		
 							break;
 						case SPOT_LIGHT:
 							Cellz = CellIndex_z;
@@ -1554,8 +1425,3 @@ FILE * LoadXLights( FILE * fp )
 
 	return( fp );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

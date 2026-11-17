@@ -20,10 +20,6 @@
 #include "ai/ai.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Procedure	:	AIR Scan for a Target
 	Input		:	ENEMY * Enemy
@@ -191,8 +187,3 @@ void AI_DO_SCAN( register ENEMY * Enemy )
 		}
 	}
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

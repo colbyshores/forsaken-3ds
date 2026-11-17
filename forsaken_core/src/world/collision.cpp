@@ -163,10 +163,6 @@ bool MCload( char * Filename , MCLOADHEADER * MCloadheader )
 	return( true );
 }
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Procedure	:	Check Ray to Polygon intersection
 	Input		:	VECTOR	*	Point 0
@@ -177,9 +173,6 @@ bool MCload( char * Filename , MCLOADHEADER * MCloadheader )
 				:	VECTOR	*	Intersect Point
 	Output		:	int			true/ false
 ===================================================================*/
-#ifdef USEINLINE
-__inline
-#endif
 bool RayPolyIntersect( float * P0 , float * P1 , float * P2 , float * P3 ,
 	 				 VERT *  Point, NORMAL * FaceNormal , float D , float * TempDistance)
 {
@@ -355,9 +348,6 @@ typedef enum
 	Z_Axis = 2
 } AxisIndex;
 
-#ifdef USEINLINE
-__inline
-#endif
 bool ColRayPolyIntersect( MCFACE *face )
 {
 	float		t;
@@ -537,9 +527,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 				:	NORMAL	*	b
 	Output		:	float		Dot Product
 ===================================================================*/
-#ifdef USEINLINE
-__inline
-#endif
 float ColDotProduct( VECTOR * a , NORMAL * b ) 
 {
 	return( ( a->x * b->nx ) +
@@ -2139,16 +2126,8 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 			float MaxPerpendicularAccel;
 			VECTOR BumpForce;
 
-#if BAD_BUMP
-			Move.x = Move_Off->x - Obj->ExternalForce.x * framelag;
-			Move.y = Move_Off->y - Obj->ExternalForce.y * framelag;
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-			Move.z = Move_Off->z - Obj->ExternalForce.z * framelag;
-			MoveDist = VectorLength( &Move );
-#else // better, but not perfect...
 			Move = Obj->Speed;
 			MoveDist = VectorLength( &Move ) * framelag;
-#endif
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			MaxPerpendicularAccel = TurboAccell * MoveDist;
 			BumpForce.x = ImpactNormal.nx * MaxPerpendicularAccel;
@@ -2541,7 +2520,3 @@ u_int16_t CheckAnyEnemyHit( void )
 {
 	return( AnyCompEnemyHit );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

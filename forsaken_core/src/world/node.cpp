@@ -286,40 +286,8 @@ _skipped_extra_links: ;
 		Buffer = (char*) int32Pnt;
 	}
 #ifdef LOAD_PRECALC_NODE_DISTANCE_TABLE
-#ifndef CHECK_NODE_DISTANCES
 	// copy pre-calculated node distances over
 	memmove( NodeArray, Buffer, NodeNetworkHeader.NumOfNodes * NodeNetworkHeader.NumOfNodes * sizeof( float ) );
-#else
-	{
-		float * NodeArray2 = NULL;
-		int j, errs = 0;
-
-		NodeArray2 = (float*) malloc( NodeNetworkHeader.NumOfNodes * NodeNetworkHeader.NumOfNodes * sizeof(float) );
-		if(!NodeArray2)
-		{
-			Msg( "Nodeload failed NodeArray2 malloc in %s \n", Filename );
-			return false;
-		}
-		// copy pre-calculated node distances over
-		memmove( NodeArray2, Buffer, NodeNetworkHeader.NumOfNodes * NodeNetworkHeader.NumOfNodes * sizeof( float ) );
-
-		NodeNetworkHeader.State = true;
-		SetNetworkDistance();
-		for ( j = 0; j < NodeNetworkHeader.NumOfNodes * NodeNetworkHeader.NumOfNodes; j++ )
-		{
-			if ( fabsf( NodeArray[ j ] - NodeArray2[ j ] ) > 0.1F )
-			{
-				errs++;
-			}
-		}
-		if ( errs )
-		{
-			Msg( "%d node array errors found in %d nodes\n",
-				errs, NodeNetworkHeader.NumOfNodes );
-		}
-		free( NodeArray2 );
-	}
-#endif
 #endif
 
 	// All Node Networks have been loaded...

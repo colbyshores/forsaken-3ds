@@ -23,10 +23,6 @@
 #include "game/ships.h"
 #include "rendering/2dtextures.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Externs
 ===================================================================*/
@@ -1813,7 +1809,3 @@ FILE * LoadPolys( FILE * fp )
 
 	return( fp );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

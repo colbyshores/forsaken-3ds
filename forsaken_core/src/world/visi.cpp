@@ -33,10 +33,6 @@
 #include "game/ships.h"
 #include "world/bsp.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 		Globals...	
 ===================================================================*/
@@ -719,9 +715,6 @@ void AddIndirectVisible( u_int16_t g )
 
 #define HUGE_VALUE	(FLT_MAX * 0.5F)
 
-#ifdef USEINLINE
-__inline
-#endif
  int EmptyXYExtent( EXTENT *e )
 {
 	return ( e->min.x >= e->max.x ) || ( e->min.y >= e->max.y );
@@ -1446,7 +1439,3 @@ bool PointInGroupBoundingBox( MLOADHEADER * Mloadheader, VECTOR * Pos, u_int16_t
 	}
 	return false;
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

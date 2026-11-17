@@ -76,10 +76,6 @@ FILE *LoadAllSfx( FILE *fp ){return fp;}
    sound_dsound.c), as before. */
 int sound_minimum_volume = -10000 / 3;
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*************************************
 Biker speech lookup table identifiers
 **************************************/
@@ -950,10 +946,6 @@ void GetSfxFileNamePrefix( int sfxnum, char *file )
 	strcpy( file, Sfx_Filenames[ sfxnum ].Name);
 }
 
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-
 /****************************************
 	Procedure	: ClearLevelSpecSfx		
 	description	: removes current level specific sfx from LevelSpecificEffects table
@@ -1765,10 +1757,6 @@ bool InitializeSound( int flags )
 
 	return true;
 }
-
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
 
 /*===================================================================
 	Procedure	:	Destroy all sound fx...
@@ -2725,10 +2713,6 @@ void ProcessLoopingSfx( void )
 		}
 	}
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
 
 FILE *SaveAllSfx( FILE *fp )
 {

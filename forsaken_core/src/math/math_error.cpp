@@ -1,6 +1,6 @@
 // see math_error.h for an explain of some details
 #ifdef DEBUG_ON
-#if defined(WIN32) && !defined(MINGW)
+#if defined(WIN32)
 #include "game/main.h"
 #include "math/new3d.h"
 #include "util/util.h"
@@ -106,9 +106,6 @@ int DebugMathErrors( void )
 
 void InitMathErrors(void)
 {
-#if defined(DEBUG_ON) && defined(_SVID_)
-  _LIB_VERSION = _SVID_;
-#endif
 }
 
 #else // NOT WIN32
@@ -124,26 +121,9 @@ void InitMathErrors(void)
 {
 }
 
-#ifdef TEST_MATH_ERRORS
-#include <float.h>
-void TestMathErrors(void)
-{
-  // https://en.cppreference.com/w/c/numeric/fenv/fetestexcept
-  DebugPrintf("1.0/0.0 = %f\n", 1.0/0.0); // FE_DIVBYZERO
-  DebugPrintf("1.0/10.0 = %f\n", 1.0/10.0); // FE_INEXACT
-  DebugPrintf("sqrt(-1) = %f\n", sqrt(-1)); // FE_INVALID
-  DebugPrintf("DBL_MAX*2.0 = %f\n", DBL_MAX*2.0); // FE_INEXACT FE_OVERFLOW
-  DebugPrintf("nextafter(DBL_MIN/pow(2.0,52),0.0) = %.1f\n",
-    nextafter(DBL_MIN/pow(2.0,52),0.0)); // FE_INEXACT FE_UNDERFLOW
-}
-#endif
-
 // https://en.cppreference.com/w/c/numeric/fenv/fetestexcept
 int DebugMathErrors( void )
 {
-#ifdef TEST_MATH_ERRORS
-	TestMathErrors();
-#endif
 
 	if(!fetestexcept(FE_ALL_EXCEPT))
 		return 0;

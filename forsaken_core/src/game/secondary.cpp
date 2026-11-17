@@ -51,10 +51,6 @@
 #include "game/oct2.h"
 #include "rendering/2dtextures.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Externs
 ===================================================================*/
@@ -9177,8 +9173,3 @@ void ToggleSecondaryWeapons( int8_t Secondary )
 			break;
 	}
 }
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

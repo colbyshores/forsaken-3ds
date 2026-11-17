@@ -33,10 +33,6 @@
 #include "game/oct2.h"
 #include "data/tload.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Global Variables
 ===================================================================*/
@@ -1168,10 +1164,6 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 	}
 }
 
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-
 /*===================================================================
 	Procedure	:	PreLoad All Background Animating Objects
 	Input		:	int8_t	*	Filename
@@ -1383,10 +1375,6 @@ bool PreLoadBGOFiles( void )
 
 	return( true );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
 
 /*===================================================================
 	Procedure	:	Load All Background Animating Objects
@@ -3087,7 +3075,3 @@ void UpdateFlyGirl( VECTOR * Pos, MATRIX * Matrix, bool Visible )
 	SetCompObjModelsState( FlyGirlComps, 1, Visible );
 	UpdateCompObjChildren( FlyGirlComps, 1, Matrix, Pos, FlyGirlAnim, 0, Pos );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

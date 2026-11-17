@@ -23,12 +23,6 @@
 #include "game/secondary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-
-// Externals
 void ExogenonAim( ENEMY * Enemy );
 
 
@@ -297,8 +291,3 @@ void	ExogenonFireLeftRight( ENEMY * Enemy )
 		&Enemy->Object.Pos, &TempOffset, &FireDir, &TempUpVector,
 		&TempOffset, ENEMYBLUEHOMINGMISSILE, false );
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

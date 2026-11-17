@@ -17,11 +17,6 @@
 #include "util/util.h"
 #include "stdio.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-
 #define BLANK_RED		(255)
 #define BLANK_GREEN		(255)
 #define BLANK_BLUE		(255)
@@ -431,8 +426,3 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 	strncpy(file,"data\\textures\\defaults.png",sizeof(destination));
 	DebugPrintf("ERROR: GetTexturePath() could not find %s\n",new_file);
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

@@ -22,11 +22,6 @@
 #include "game/primary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-// Externals
 /*===================================================================
 	Procedure	:	AIR Ping Off...
 	Input		:	ENEMY * Enemy
@@ -65,8 +60,3 @@ void AI_AIR_DEATH_PINGOFF( register ENEMY * Enemy )
 						  &Enemy->LastDamageDir, D2R( -Enemy->LastDamage * framelag ) , EnemyTypes[Enemy->Type].Radius );
 
 }
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-

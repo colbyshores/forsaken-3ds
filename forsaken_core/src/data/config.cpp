@@ -1177,14 +1177,6 @@ void ConfigureSpaceorbAxis( int joystick )
 	JoystickInfo[ joystick ].Axis[ AXIS_RzAxis ].action = SHIPACTION_RotateUp;
 	JoystickInfo[ joystick ].Axis[ AXIS_SliderAxis0 ].action = SHIPACTION_RotateLeft;
 	JoystickInfo[ joystick ].Axis[ AXIS_SliderAxis1 ].action = SHIPACTION_RollLeft;
-#if NOT_DONE_THIS_WAY
-	JoystickInfo[ joystick ].Button[ 0 ].action = SHIPACTION_FirePrimary;
-	JoystickInfo[ joystick ].Button[ 1 ].action = SHIPACTION_FireSecondary;
-	JoystickInfo[ joystick ].Button[ 2 ].action = SHIPACTION_Turbo;
-	JoystickInfo[ joystick ].Button[ 3 ].action = SHIPACTION_MoveForward;
-	JoystickInfo[ joystick ].Button[ 4 ].action = SHIPACTION_SelectNextPrimary;
-	JoystickInfo[ joystick ].Button[ 5 ].action = SHIPACTION_SelectNextSecondary;
-#endif
 	DebugPrintf( "ConfigureSpaceorbAxis: axes=%d\n", JoystickInfo[ joystick ].NumAxis );
 }
 
@@ -1632,9 +1624,6 @@ const char *key_name( int keycode )
 			}
 			else if ( KEY_ON_JOYSTICK_POV( keycode ) )
 			{
-#ifdef BUGGED_STATIC_POV_NAME
-				static char name[ 256 ];
-#endif
 				int pov, dir;
 
 				pov = KEY_JOYSTICK_POV( keycode );
@@ -1642,12 +1631,7 @@ const char *key_name( int keycode )
 				if ( pov >= 0 && pov < joy->NumPOVs
 					&& dir >= 0 && dir < MAX_POV_DIRECTIONS )
 				{
-#ifdef BUGGED_STATIC_POV_NAME
-					sprintf( name, "%s %s", joy->POV[ pov ].name, JoystickPOVDirections[ dir ] );
-					return name;
-#else
 					return ( joy->connected ) ? joy->POV[ pov ].dirname[ dir ] : "unconnected";
-#endif
 				}
 			}
 		}
@@ -1817,27 +1801,6 @@ write_config( USERCONFIG *u, char *cfg_name )
 		{
 			fprintf( f, "JOYSTICK\n" );
 			fprintf( f, "%s\n", JoystickInfo[joystick].Name );
-#ifdef OLD_JOYSTICK_FORMAT
-			if ( JoystickInfo[joystick].NumButtons > 0 )
-				fprintf( f, "BTN " );
-			for (button = 0; button < JoystickInfo[joystick].NumButtons; button++)
-			{	fprintf( f, "%d ", JoystickInfo[joystick].Button[button].action );
-				if ( button == JoystickInfo[joystick].NumButtons - 1 )
-					fprintf( f, "\n" );
-			}
-			if ( JoystickInfo[joystick].NumPOVs > 0 )
-				fprintf( f, "POV " );
-			for (pov = 0; pov < JoystickInfo[joystick].NumPOVs; pov++)
-			{	
-				for (povdir = 0; povdir < MAX_POV_DIRECTIONS; povdir++)
-				{
-					fprintf( f, "%d ", JoystickInfo[joystick].POV[pov].action[povdir] );
-				}
-
-				if ( pov == JoystickInfo[joystick].NumPOVs - 1 )
-					fprintf( f, "\n" );
-			}
-#else
 			for ( action = SHIPACTION_RotateUp; action < SHIPACTION_MAX; action++ )
 			{
 				USERKEY *k;
@@ -1887,7 +1850,6 @@ write_config( USERCONFIG *u, char *cfg_name )
 					}
 				}
 			}
-#endif
 			for (axis = 0; axis < MAX_JOYSTICK_AXIS; axis++)
 			{
 				if ( JoystickInfo[joystick].Axis[axis].exists )

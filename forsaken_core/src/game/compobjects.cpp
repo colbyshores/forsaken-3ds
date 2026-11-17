@@ -789,10 +789,6 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 	return( fp );
 }
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Procedure	:	Free components of object
 	Input		:	COMP_OBJ	*	Children
@@ -2479,8 +2475,3 @@ void SetCompObjNonStealth( COMP_OBJ * Children, int16_t NumChildren )
 		}
 	}
 }
-
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

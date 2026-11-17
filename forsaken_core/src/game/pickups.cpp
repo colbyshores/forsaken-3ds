@@ -44,10 +44,6 @@
 #include "game/oct2.h"
 #include "ui/title.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
 /*===================================================================
 	Defines
 ===================================================================*/
@@ -2770,10 +2766,6 @@ void ProcessPickups( void )
 	}																				
 }
 
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-
 /*===================================================================
 	Procedure	:	Save Pickup Positions
 	Input		:	Nothing
@@ -3353,10 +3345,6 @@ bool LoadPickupsPositions( void )
   return( true );
 
 }
-
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
 
 /*===================================================================
 	Procedure	:		Initialise a pickup given only regen slot
@@ -7526,6 +7514,3 @@ u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID )
 	return( (u_int16_t) -1 );
 }	
 	
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif

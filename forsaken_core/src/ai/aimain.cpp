@@ -22,11 +22,6 @@
 #include "game/primary.h"
 #include "game/oct2.h"
 
-#ifdef OPT_ON
-#pragma optimize( "gty", on )
-#endif
-
-
 void (* AI_AIR_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,
 	AI_AIR_FOLLOWPATH,								// Follow Path..
@@ -668,10 +663,3 @@ void AI_AVOIDCHECK( register ENEMY * Enemy )
 	}
 
 }
-
- 
-
-#ifdef OPT_ON
-#pragma optimize( "", off )
-#endif
-
