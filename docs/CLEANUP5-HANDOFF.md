@@ -36,6 +36,46 @@ playbook; AGENTS.md is the law where they differ.
   the owning header (39 files still carry them; `oct2.cpp` 26,
   `title.cpp` 30). Each phase-2 module still needs its fidelity A/B.
 
+### Phase 2 progress (2026-11-17, branch `experimental/cpp-phase2`)
+
+Done, each commit proven with `tools/verify_identical.sh` (clean builds, all
+five configurations; `tools/verify_o0.sh` where `-O2` scheduling differs):
+- Every shared global/function declared once, in its owner's header, from
+  the definition (~2,000 private `extern` copies gone); `game/constants.h`.
+- Every translation unit is C++; `extern "C"` only at real C boundaries
+  (AGENTS.md §9). Lua only via `scripting/lua_api.h`.
+- Dead code: `#if 0` blocks, commented-out code runs, conditionals on 22
+  obsolete macros (~3,400 lines).
+- Build: header dependencies are tracked on 3DS again (they never were).
+
+Bugs found (separate, labelled commits): `primary.cpp` indexed
+`ModelHeaders` as an array (1c75966); PC joystick names (5d6474b); the C++
+conversion briefly lost the libctru heap override (088b1f0, now guarded).
+
+**Hardware fidelity A/B needed** (when the console is free): 1c75966
+(behaviour fix; reactor-core / spot-FX scenario), 46d152e (3DS platform
+TUs and render_c3d compiled as C++).
+
+**Owner decisions pending:**
+1. Optional features under never-defined macros — keep or delete:
+   `DEMO_SUPPORT`, `LUA_BOT` (botai_*, lua_bot: compiled empty everywhere),
+   `PLAYER_SPEECH_TAUNTS`, `COOPERATIVE`, `SCROLLING_MESSAGES`,
+   `SINT_PEACEFROG_CHEAT`, `POLYGONAL_COLLISIONS`, `ACTUAL_TRANS`,
+   `NEW_LIGHTING`, `MINIUPNP`, `BREAKPAD`, `NET_ENET`, `TEXTURE_SDL`/`DEVIL`,
+   `SOUND_DSOUND`, `RENDER_DISABLED`, `INPUT_DISABLED`.
+2. Windows-only files never built: `render_d3d.cpp`, `breakpad.cpp`,
+   `sound_dsound.cpp`, `input_dinput.cpp`, `texture_devil.cpp`.
+3. Multiplayer: the init packet carries `BYTE[16][16]` kill stats into
+   `int[17][17]` arrays by raw copy (FIXME in networking.cpp).
+4. Gates: `title.c` exemptions (E-TITLE-1, ALLOWED-COLD-TITLE) have been
+   dead since Cleanup 5 — re-point (loosens the gate) or delete; ~50
+   baseline entries match nothing — prune?
+
+Next (no decision needed): undefined prototypes (27), unreferenced
+functions, `#pragma once` + header comments, the 2,566 warnings `-isystem`
+was hiding, `constexpr`/`enum class`/`std::array` sweep, then classes for
+state-owning modules (A/B batch).
+
 ---
 
 ## 1. Where things stand
