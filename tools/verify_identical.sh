@@ -22,7 +22,7 @@
 # Configurations: 3DS {remaster,original} x {release,DEBUG=1}, and the PC host
 # build (EDITION=remaster). Env: JOBS (default nproc), VERIFY_DIR (default
 # /tmp/forsaken-verify; base builds are cached per commit there), CONFIGS
-# (subset, e.g. CONFIGS="3ds-remaster host").
+# (subset, e.g. CONFIGS="3ds-remaster host"), INCREMENTAL=1 (reuse work objects).
 set -u
 cd "$(dirname "$0")/.."
 ROOT=$PWD
@@ -52,6 +52,12 @@ build() {
 	log=$out/$cfg.log
 	mkdir -p "$out/$cfg"
 	local vf="-D__LINE__=0 -fmacro-prefix-map=$tree/="
+	# Work builds start clean unless INCREMENTAL=1: a stale object compares
+	# equal to the base and hides exactly the change being checked. (Base
+	# builds are always fresh: one directory per commit and flag revision.)
+	if [ "$out" = "$WORK_OUT" ] && [ "${INCREMENTAL:-0}" != 1 ]; then
+		rm -rf "${out:?}/${cfg:?}"; mkdir -p "$out/$cfg"
+	fi
 	case $cfg in
 	3ds-*)
 		local ed=${cfg#3ds-}; ed=${ed%-debug}
