@@ -43,7 +43,7 @@ main	forsaken_core/src/game/main.c	c	kept-C	n/a	-	n/a	engine main loop; platform
 models	forsaken_core/src/game/models.cpp	cpp	222509b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 oct2	forsaken_core/src/game/oct2.cpp	cpp	4f65e74	todo	-	PASS fid-ab-20261116 (tier3)	
 pickups	forsaken_core/src/game/pickups.cpp	cpp	5ab8bbd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-primary	forsaken_core/src/game/primary.cpp	cpp	60819fb	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+primary	forsaken_core/src/game/primary.cpp	cpp	60819fb	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	BEHAVIOUR FIX pending A/B: ModelHeaders/MxaModelHeaders extern were arrays over heap pointers since the Q3 refactor (OWNER_MODELSPOTFX bullets read SpotFX from the wrong base)
 restart	forsaken_core/src/game/restart.cpp	cpp	9d21b80	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 secondary	forsaken_core/src/game/secondary.cpp	cpp	4eda836	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 ships	forsaken_core/src/game/ships.cpp	cpp	6e3a4c6	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	

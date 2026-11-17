@@ -128,8 +128,8 @@ extern	ENEMY_TYPES		EnemyTypes[ MAX_ENEMY_TYPES ];
 extern	int16_t			NumSecBullsPerGroup[ MAXGROUPS ];
 extern	SECONDARYWEAPONBULLET *	SecBullGroups[ MAXGROUPS ];
 extern	bool            IsHost;
-extern	MXLOADHEADER	ModelHeaders[MAXMODELHEADERS];
-extern	MXALOADHEADER	MxaModelHeaders[ MAXMXAMODELHEADERS ];
+extern	MXLOADHEADER *	ModelHeaders;	/* heap arrays since the Q3 memory refactor */
+extern	MXALOADHEADER *	MxaModelHeaders;
 extern	int				outside_map;
 extern	bool			PlayDemo;
 
