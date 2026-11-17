@@ -2,9 +2,6 @@
 #define TRIGGERS_INCLUDED
 
 #include "net/networking.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * Defines
@@ -177,9 +174,6 @@ extern int NumOfTriggers;
 extern TRIGGERVAR * DecreaseTemperature;
 extern TRIGGERVAR * TimeLimitTrigger;
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// TRIGGERS_INCLUDED
 
 

@@ -3,9 +3,6 @@
 
 #include "game/main.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * CD audio music playback system.
@@ -56,8 +53,5 @@ void music_play_title(void);
 /* Call once per frame to refill stream buffers */
 void music_update(void);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

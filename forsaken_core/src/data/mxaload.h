@@ -22,9 +22,6 @@
 #include "data/mload.h"
 #include "rendering/transexe.h"
 #include "game/constants.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 //#include "pickups.h"
 
 /*===================================================================
@@ -131,9 +128,6 @@ bool InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 /* Defined in mxaload.cpp; shared with the modules that use it. */
 extern MXALOADHEADER * MxaModelHeaders;
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

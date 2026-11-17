@@ -1,8 +1,5 @@
 #ifndef RTLIGHT_H
 #define RTLIGHT_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef enum
 {
@@ -113,7 +110,4 @@ extern void DisableRTLight( u_int16_t *data );
 FILE * SaveRealTimeLights( FILE * fp );
 FILE * LoadRealTimeLights( FILE * fp );
 
-#ifdef __cplusplus
-}
-#endif
 #endif // RTLIGHT_H

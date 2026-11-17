@@ -36,24 +36,11 @@
 #include <stdio.h>
 #include <string.h>
 
-/* devkitPro's lua5.1 headers carry no __cplusplus guards; the lua API is C,
- * so the include must be wrapped (same idiom as lua.hpp upstream). */
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-#ifdef __cplusplus
-}
-#endif
+#include "scripting/lua_api.h"
 
 #include "scripting/lua_config.h"
 #include "util/util.h"
 #include "data/file.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // return rv if function does not return 0
 #define ASSERT(x) \
@@ -70,7 +57,4 @@ int lua_dofile(lua_State *L, const char *name);
 int lua_init(void);
 void lua_shutdown(void);
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* LUA_COMMON_H */

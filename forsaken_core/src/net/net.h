@@ -20,9 +20,6 @@
 
 #ifndef NET_INCLUDED
 #define NET_INCLUDED
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define NETWORK_DEFAULT_PORT 2300
 
@@ -150,7 +147,4 @@ typedef struct {
 // this function will be most likely converted to an argument to network_setup
 void network_event( network_event_type_t, void* data );
 
-#ifdef __cplusplus
-}
-#endif
 #endif // NET_INCLUDED

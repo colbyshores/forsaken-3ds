@@ -2938,7 +2938,7 @@ static int16_t s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
 				:	(which is the last consumer of NextNewModel before
 				:	PreInitModel runs the actual model load).
 ===================================================================*/
-extern "C" bool PreLoadPickups( void )
+bool PreLoadPickups( void )
 {
 	extern int16_t NextNewModel;
 	extern bool File_Exists( char * );
@@ -4230,7 +4230,7 @@ u_int16_t FindClosestShip( void )
 	Input		:	u_int16_t	pickup to get
 	Output		:	bool	True/False
 ===================================================================*/
-extern "C" void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID )
+void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID )
 {
 	u_int16_t	i;
 	u_int16_t	NextPickup;
@@ -4419,7 +4419,7 @@ void MovePickupToGroup( u_int16_t i, u_int16_t OldGroup, u_int16_t NewGroup )
 	AddPickupToGroup( i, NewGroup );
 }
 
-extern "C" void InitValidPickups()
+void InitValidPickups()
 {
 	int i;
 	

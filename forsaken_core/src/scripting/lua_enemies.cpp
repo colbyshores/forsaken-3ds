@@ -1,6 +1,5 @@
 #include <string.h>
-#include <lua.h>
-#include <lauxlib.h>
+#include "scripting/lua_api.h"
 #include "game/enemies.h"
 
 static void pushenemy(lua_State *L, int index)

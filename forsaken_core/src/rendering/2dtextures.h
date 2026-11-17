@@ -1,9 +1,6 @@
 #ifndef TEXT2D_INCLUDED
 #define TEXT2D_INCLUDED
 #include "game/main.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -145,7 +142,4 @@ extern FRAME_INFO * Title_Fonts_Header;
 extern FRAME_INFO * Title_Chars1_Header;
 extern FRAME_INFO * Title_Chars2_Header;
 
-#ifdef __cplusplus
-}
-#endif
 #endif

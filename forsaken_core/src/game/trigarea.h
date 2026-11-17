@@ -1,9 +1,6 @@
 
 #ifndef TRIGGERAREA_INCLUDED
 #define TRIGGERAREA_INCLUDED
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * Defines
@@ -83,9 +80,6 @@ extern bool Entry;
 extern bool Exit;
 extern bool In;
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// TRIGGERAREA_INCLUDED
 
 

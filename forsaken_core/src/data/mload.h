@@ -17,9 +17,6 @@
 #include "data/tload.h"
 #include "rendering/transexe.h"
 #include "game/constants.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * defines
@@ -280,9 +277,6 @@ extern u_int16_t last_start_position;
 extern u_int16_t FirstStartPositionInGroup[ MAXGROUPS ];
 extern u_int16_t GroupTris[ MAXGROUPS ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

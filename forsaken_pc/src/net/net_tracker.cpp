@@ -40,7 +40,7 @@ static void send_tracker_message( char* host, int port, char* message );
 #define MAX_PORT 5
 #define MAX_HOSTING_MSG (MAX_PORT + (MAXSHORTNAME+1) * MAX_PLAYERS + MAX_PXVersion + MAX_SHORT_LEVEL_NAME + 13)
 
-extern "C" void send_tracker_update( char* host, int port )
+void send_tracker_update( char* host, int port )
 {
 	int i;
 	char message[ MAX_HOSTING_MSG ];
@@ -61,7 +61,7 @@ extern "C" void send_tracker_update( char* host, int port )
 	send_tracker_message( host, port, message );
 }
 
-extern "C" void send_tracker_finished( char* host, int port )
+void send_tracker_finished( char* host, int port )
 {
 	char message[256] = "";
 	sprintf(message,"finished %d\n",my_local_port);

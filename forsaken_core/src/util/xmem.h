@@ -14,15 +14,9 @@
 
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 extern size_t MemUsed;
 
-#ifdef __cplusplus
-}
-#endif
 
 #ifdef DEBUG_ON
 
@@ -39,9 +33,6 @@ extern size_t MemUsed;
 #define free( P )		X_free( (P), __FILE__, __LINE__ )
 #define strdup( P )		X_strdup( (P), __FILE__, __LINE__ )
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void XMem_Init( void );
 void * X_calloc( size_t num,size_t size, const char *in_file, int in_line );
@@ -51,9 +42,6 @@ void * X_realloc( void * Pnt , size_t size, const char *in_file, int in_line );
 void * X_strdup( const char * str , const char *in_file, int in_line );
 int UnMallocedBlocks( void );
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif	/* DEBUG_ON */
 

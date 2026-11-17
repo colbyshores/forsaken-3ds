@@ -6,8 +6,7 @@
  *
  * see also object.h
  */
-#include <lua.h>
-#include <lauxlib.h>
+#include "scripting/lua_api.h"
 #include "game/object.h"
 #include "scripting/lua_vecmat.h"
 

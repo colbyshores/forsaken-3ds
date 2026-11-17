@@ -54,7 +54,7 @@ static bool breakpad_callback(	const wchar_t* dump_path, const wchar_t* minidump
 	// then stop any other handlers from running
 	return succeeded;
 }
-extern "C" BOOL breakpad_init( void )
+BOOL breakpad_init( void )
 {
 	using namespace google_breakpad;
 	static ExceptionHandler * e;

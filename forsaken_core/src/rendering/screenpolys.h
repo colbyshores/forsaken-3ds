@@ -24,9 +24,6 @@
 #include "rendering/2dtextures.h"
 #include "data/tload.h"
 #include "util/timer.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -190,8 +187,5 @@ extern u_int16_t FlashScreenPoly;
 extern bool KilledPlayer;
 extern float Countdown_Float;
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 

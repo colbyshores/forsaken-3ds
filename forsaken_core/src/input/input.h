@@ -182,9 +182,6 @@ extern bool input_grabbed;
 /* Set while the platform layer resizes its own window, so the resize
    event it generates is not taken as a user request (stubbed on 3DS). */
 extern bool bIgnoreWM_SIZE;
-#ifdef __cplusplus
-extern "C"
-#endif
 void input_grab( bool grab );
 
 bool handle_events( void );
@@ -202,13 +199,7 @@ bool handle_events( void );
 #define MAX_INPUT_BUFFER 100
 extern int input_buffer[MAX_INPUT_BUFFER];
 extern int input_buffer_count;
-#ifdef __cplusplus
-extern "C"
-#endif
 int input_buffer_find( int code );
-#ifdef __cplusplus
-extern "C"
-#endif
 void input_buffer_reset( void );
 
 ///////////
@@ -258,9 +249,6 @@ extern mouse_state_t mouse_states[ INPUT_BUFFERS ];
 #define MOUSE_WHEEL_UP_PRESSED()		( !( mouse_states[ old_input ].wheel > 0 ) && ( mouse_states[ new_input ].wheel > 0 ) )
 #define MOUSE_WHEEL_DOWN_PRESSED()      ( !( mouse_states[ old_input ].wheel < 0 ) && ( mouse_states[ new_input ].wheel < 0 ) )
 
-#ifdef __cplusplus
-extern "C"
-#endif
 mouse_state_t* read_mouse(void);
 
 ///////////////

@@ -3,9 +3,6 @@
 
 #include "game/main.h"
 #include "game/enemies.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define SFX_Biker			4	// biker speech
 #define SFX_Title	64	// use when biker speech must play ( will cut off any existing speech )
@@ -322,7 +319,4 @@ extern char CurrentTauntVariant;
 float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
 extern float GlobalSoundAttenuation;
 
-#ifdef __cplusplus
-}
-#endif
 #endif

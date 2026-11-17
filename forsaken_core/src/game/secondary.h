@@ -13,9 +13,6 @@
 #include "game/constants.h"
 #include "game/main.h"
 #include "util/timer.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -324,9 +321,6 @@ extern int8_t * DebugSecStrings[];
 extern bool ShowNamesAnyway;
 extern bool SecondaryValid[ MAXSECONDARYWEAPONS ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif // SECONDARY_INCLUDED
 
 

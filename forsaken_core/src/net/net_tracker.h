@@ -20,14 +20,8 @@
 
 #ifndef NET_TRACKER
 #define NET_TRACKER
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void send_tracker_update( char* host, int port );
 void send_tracker_finished( char* host, int port );
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* NET_TRACKER */

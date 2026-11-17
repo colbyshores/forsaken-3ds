@@ -7,9 +7,6 @@
 #include "rendering/render.h"
 #include "util/timer.h"
 #include "world/collision.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define MAX_SHORT_LEVEL_NAME 32
 extern char ShortLevelNames[MAXLEVELS][MAX_SHORT_LEVEL_NAME];
@@ -103,7 +100,4 @@ extern float hfov;
 extern bool DoClipping;
 extern RENDERMATRIX proj;
 
-#ifdef __cplusplus
-}
-#endif
 #endif // OCT2_INCLUDED

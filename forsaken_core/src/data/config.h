@@ -28,9 +28,6 @@
 
 #include "game/main.h"
 #include "ui/title.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef short VirtualKeycode;
 
@@ -136,7 +133,4 @@ extern USERCONFIG * player_config;
 void DefaultJoystickSettings( USERCONFIG *u );
 void ReInitJoysticks( void );
 
-#ifdef __cplusplus
-}
-#endif
 #endif // CONFIG_H

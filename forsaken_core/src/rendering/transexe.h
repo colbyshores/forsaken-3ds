@@ -3,9 +3,6 @@
 
 #include "rendering/render.h"
 #include "math/new3d.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define MAXTRANSEXE 128
 
@@ -37,7 +34,4 @@ void AddTransExe( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject, int UseIden
 void ExecuteTransExe( u_int16_t group );
 void ExecuteTransExeUnclipped( u_int16_t group );
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// TRANSEXE_INCLUDED

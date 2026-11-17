@@ -308,8 +308,7 @@ bool GroupsAreIndirectVisible( u_int16_t g1, u_int16_t g2 )
 	}
 }
 
-
-extern "C" bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
+bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 {
 	u_int32_t tabsize;
 	u_int16_t g;
@@ -660,8 +659,7 @@ int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group )
 	return gnum;
 }
 
-
-extern "C" void InitIndirectVisible( u_int16_t g )
+void InitIndirectVisible( u_int16_t g )
 {
 	GROUPLIST *list;
 	int j;
@@ -674,8 +672,7 @@ extern "C" void InitIndirectVisible( u_int16_t g )
 	Num_IndirectVisible = list->groups;
 }
 
-
-extern "C" void AddIndirectVisible( u_int16_t g )
+void AddIndirectVisible( u_int16_t g )
 {
 	static u_int16_t AddedVisible[ MAXGROUPS ];
 	int current, next;

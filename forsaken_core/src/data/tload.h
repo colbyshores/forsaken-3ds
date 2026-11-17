@@ -13,9 +13,6 @@
 #include "data/file.h"
 #include "rendering/render.h"
 #include "math/new3d.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * defines
@@ -73,8 +70,5 @@ extern bool use_original_textures;
 extern TLOADHEADER Tloadheader;
 extern double Gamma;
 
-#ifdef __cplusplus
-}
-#endif
 #endif	//TLOAD_INCLUDED
 

@@ -35,8 +35,7 @@ float ColRad;
 BSP_NODE *	BSP_Nodes[256];
 BSP_PORTAL_HEADER Bsp_Portal_Header = { false, 0, {} };
 
-
-extern "C" bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup )
+bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup )
 {
 	int j;
 	BSP_TREE *srctree, *duptree;
@@ -56,8 +55,7 @@ extern "C" bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup )
 	return true;
 }
 
-
-extern "C" bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 )
+bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 )
 {
 	int j;
 	BSP_TREE *b1tree, *b2tree;
@@ -631,7 +629,7 @@ start:
 	Output		:		bool
 ===================================================================*/
 
-extern "C" bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node)
+bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node)
 {
 	float d;
 

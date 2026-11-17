@@ -704,7 +704,7 @@ void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:		u_int16_t			Group
 	Output		:		Nothing
 ===================================================================*/
-extern "C" void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
+void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
 {
 	u_int16_t	Model;
 	QUAT	TempQuat;

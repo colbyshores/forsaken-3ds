@@ -4,9 +4,6 @@
 ===================================================================*/
 #ifndef SPOTFX_INCLUDED
 #define SPOTFX_INCLUDED
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -163,9 +160,6 @@ void CreateSpotFXRockShrapnel( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 FILE * SaveAllSpotFX( FILE * fp );
 FILE * LoadAllSpotFX( FILE * fp );
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

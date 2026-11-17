@@ -13,9 +13,6 @@
 
 #include <3ds.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 extern u_int32_t platform_get_ticks(void);
 extern void platform_delay(u_int32_t ms);
 
@@ -27,9 +24,6 @@ bool controls_3ds_menu_is_open(void);
 void controls_3ds_render_overlay(void);	/* draw the remap overlay (bottom screen) */
 int SDL_EnableUNICODE(int enable);		/* SDL 1.x call, stubbed on 3DS */
 extern bool g_show_stereo_debug;		/* stereo debug overlay toggle */
-#ifdef __cplusplus
-}
-#endif
 
 #define SDL_GetTicks()     platform_get_ticks()
 #define SDL_Delay(ms)      platform_delay(ms)

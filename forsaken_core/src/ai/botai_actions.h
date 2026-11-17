@@ -1,7 +1,4 @@
 #ifdef LUA_BOT
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 bool BOTAI_AimAtTarget( MATRIX * InvMat, VECTOR * SPos, VECTOR * TPos );
 bool BOTAI_CollectNearestPickup(bool SlideOnly);
@@ -19,7 +16,4 @@ void BOTAI_FireMissiles();
 void BOTAI_SelectWeapon( bool MineTarget );
 void BOTAI_ShootAtTargetShip(); 
 
-#ifdef __cplusplus
-}
-#endif
 #endif

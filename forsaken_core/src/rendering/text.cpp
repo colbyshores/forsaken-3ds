@@ -107,7 +107,7 @@ STATSMESSAGE StatsMessages[MAX_STATS_MESSAGES];
 	Output		:		nothing
 ===================================================================*/
 
-extern "C" int Printint16_t( int16_t num , int x , int y , int color )
+int Printint16_t( int16_t num , int x , int y , int color )
 {
 	static char buf[ 128 ];
 
@@ -398,7 +398,7 @@ void	MessageQuePrint( void )
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-extern "C" void	MessageQuePrintAll( void )
+void	MessageQuePrintAll( void )
 {
 	int i,y,z,MAX;
 	char MessageBuff[150];

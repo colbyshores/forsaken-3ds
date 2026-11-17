@@ -38,9 +38,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* New frame: invalidates all entries (generation bump, no clearing). */
 void smemo_begin_frame(void);
@@ -86,8 +83,5 @@ static inline int smemo_sub(int texgroup, int ortho, int prim)
 	return (texgroup << 2) | (ortho << 1) | prim;
 }
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

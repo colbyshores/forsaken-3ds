@@ -14,9 +14,6 @@ typedef int net_bool_t; // backwards compatibility need bool's in pkt structures
 #include "game/object.h"
 #include "game/constants.h"
 #include "util/timer.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // game tracker
 extern char tracker_server[256];
@@ -1066,9 +1063,6 @@ extern bool CanDoDamage[ MAX_PLAYERS+1 ];
 extern px_timer_t LastPacketTime[ MAX_PLAYERS+1 ];
 extern bool HostDuties;
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

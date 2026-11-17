@@ -1,9 +1,6 @@
 #ifndef DEMO_INCLUDED
 #define DEMO_INCLUDED
 #include "game/main.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define MAX_DEMONAME_LENGTH		(60)
 #define MAX_DEMOFILENAME_LENGTH	(80) // must be at least MAX_DEMONAME_LENGTH + strlen( DEMOFOLDER ) + strlen( DEMOFILE_EXTENSION ) + 1
@@ -22,7 +19,4 @@ void StartDemoPlayback( MENUITEM * Item );
 extern FILE * DemoFp;
 extern FILE * DemoFpClean;
 
-#ifdef __cplusplus
-}
-#endif
 #endif

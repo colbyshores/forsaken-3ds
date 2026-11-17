@@ -3,9 +3,6 @@
 #include <math.h>
 #include "game/main.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // taken from d3d9.h
 
@@ -356,8 +353,5 @@ extern MATRIX MATRIX_Identity;
 extern u_int16_t Seed1;
 extern u_int16_t Seed2;
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

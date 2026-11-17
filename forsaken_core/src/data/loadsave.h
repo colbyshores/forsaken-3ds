@@ -6,9 +6,6 @@
  */
 #define SAVEGAME_SLOTS
 #include "game/main.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef __3DS__
 /* 3DS: saves go to SD card (romfs is read-only) */
@@ -35,8 +32,5 @@ char *SaveGamePicFileName( int slot );
 char *SavedGameInfo( int slot );
 char *GetMissionName( char *levelname );
 bool SaveGameSlotUsed( int slot );
-#ifdef __cplusplus
-}
-#endif
 #endif	// LOADSAVE_INCLUDED
 

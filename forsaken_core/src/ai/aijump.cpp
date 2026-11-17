@@ -142,7 +142,7 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 	SetCurAnimSeq( 2, &Enemy->Object );
 }
 
-extern "C" u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
+u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
                             u_int16_t StartGroup, VECTOR * MoveOffset );
 
 /* Body rotation deliberately removed.

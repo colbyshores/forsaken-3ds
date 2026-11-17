@@ -1549,7 +1549,7 @@ bool CheckDecreaseTemperature( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-extern "C" void CheckTimeLimit( void )
+void CheckTimeLimit( void )
 {
 	TRIGGERVAR	* TVpnt;
 

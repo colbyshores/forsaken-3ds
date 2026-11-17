@@ -7,9 +7,6 @@
 #include "game/constants.h"
 #include "rendering/render.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*
  * Defines
  */
@@ -101,9 +98,6 @@ extern CAMERA CurrentCamera;
 extern CAMERA MainCamera;
 extern REMOTECAMERA * ActiveRemoteCamera;
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

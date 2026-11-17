@@ -47,9 +47,9 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume ){}
 void CheckSBufferList( void ){}
 
 bool SetPosVelDir_Listner( VECTOR * Pos , VECTOR * Velocity , MATRIX * Mat ){return 0;}
-extern "C" void SetSoundLevels( int *dummy ){}
+void SetSoundLevels( int *dummy ){}
 
-extern "C" float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector ){return 0;}
+float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector ){return 0;}
 
 FILE *SaveAllSfx( FILE *fp ){return fp;}
 FILE *LoadAllSfx( FILE *fp ){return fp;}
@@ -2330,7 +2330,7 @@ void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECT
 	}
 }
 
-extern "C" void SetSoundLevels( int *dummy )
+void SetSoundLevels( int *dummy )
 {
 	GlobalSoundAttenuation = SfxSlider.value / ( SfxSlider.max / GLOBAL_MAX_SFX );
 }
@@ -2865,7 +2865,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 }
 
 #define MAX_DISTANCE  ( 24 * 1024 * GLOBAL_SCALE )
-extern "C" float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector )
+float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector )
 {
 	VECTOR	Temp;
 	float Modify;

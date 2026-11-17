@@ -16,9 +16,6 @@
 #include "data/tload.h"
 #include "world/bsp.h"
 #include "game/trigarea.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -65,9 +62,6 @@ extern int16_t ShowPortal;
 extern int16_t ShowSkin;
 void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group );
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

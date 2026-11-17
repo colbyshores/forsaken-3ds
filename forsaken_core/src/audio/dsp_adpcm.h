@@ -17,9 +17,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef struct {
     uint16_t coefs[16];       /* predictor coefficients (host order) */
@@ -45,8 +42,5 @@ void dsp_state_init(dsp_state_t *st, const dsp_header_t *hdr);
 void dsp_decode(const uint8_t *frames, uint32_t num_frames,
                 const uint16_t *coefs, dsp_state_t *st, int16_t *out);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

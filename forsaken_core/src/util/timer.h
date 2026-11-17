@@ -33,9 +33,6 @@
 #include <SDL.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef struct timer {
   u_int32_t  last;
@@ -50,8 +47,5 @@ float timer_peek  ( px_timer_t* );
 void  timer_clear ( px_timer_t* );
 void  timer_debug ( char*, px_timer_t* );
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -88,7 +88,9 @@ disasm() {
 		# Section names embed mangled names under -ffunction-sections; drop
 		# the headers (functions still compare in emission order).
 		"$1" -d -r -C "$2" | tail -n +4 | grep -v '^Disassembly of section' |
-			sed -E ':a; s/\b([A-Za-z_][A-Za-z0-9_:~]*)\([^()]*\)( const)?/\1/g; ta' |
+			perl -pe 's/\b([A-Za-z_][\w:~]*)(\((?:[^()]++|(?2))*\))( const)?/$1/g' |
+			sed -E 's/ \[clone (\.[a-z_]+\.[0-9]+)\]/\1/g; s/_GLOBAL__sub_I_[A-Za-z0-9_]+/_GLOBAL__sub_I_/g' |
+			sed -E 's/\(anonymous namespace\):://g; s/\.(bss|data|rodata)\._ZN12_GLOBAL__N_1L?[0-9]+([A-Za-z_][A-Za-z0-9_]*)E/\2/g' |
 			perl -pe 's{_ZZ(\d+)(\w+)}{my($n,$r)=($1,$2); my $f=substr($r,0,$n); ($r=~/E(\d+)([A-Za-z_]\w*)$/ && length($2)==$1) ? "_ZZ${n}${f}E$1$2" : "_ZZ$n$r"}ge; s{\.(rodata|bss|data|text)\._ZL?(\d+)(\w+)}{".$1.".substr($3,0,$2)}ge'
 	else
 		"$1" -d -r "$2" | tail -n +4

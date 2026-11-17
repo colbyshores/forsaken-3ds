@@ -3,9 +3,6 @@
 #define TEXT_INCLUDED
 #include "game/main.h"
 #include "game/constants.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * Defines
@@ -122,9 +119,6 @@ extern int FontSourceHeight;
 extern int16_t NumOfActivePlayers;
 extern float MaxMessageTime;
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// TEXT_INCLUDED
 
 

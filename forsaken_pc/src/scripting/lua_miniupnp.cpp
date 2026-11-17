@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <lua.h>
-#include <lauxlib.h>
+#include "scripting/lua_api.h"
 #include <miniupnpc.h>
 #include <upnpcommands.h>
 #include <upnperrors.h>

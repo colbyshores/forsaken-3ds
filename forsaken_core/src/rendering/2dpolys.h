@@ -24,9 +24,6 @@
 #include "rendering/lights.h"
 #include "rendering/2dtextures.h"
 #include "data/tload.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -181,9 +178,6 @@ extern FMPOLY FmPolys[ MAXNUMOF2DPOLYS ];
 extern u_int32_t TotalFmPolysInUse;
 extern u_int16_t FirstFmPolyUsed;
 
-#ifdef __cplusplus
-}
-#endif
 #endif // TWODPOLYS_INCLUDED
 
 

@@ -365,7 +365,7 @@ void NodeRelease( void)
 	Input		:		NOTHING
 	Output		:		Nothing
 ===================================================================*/
-extern "C" ENEMY * PutEnemiesAtNodes(void)
+ENEMY * PutEnemiesAtNodes(void)
 {
 	int o,i,e;
 	NODE * NodePnt;
@@ -462,7 +462,7 @@ extern "C" ENEMY * PutEnemiesAtNodes(void)
 	Input		:		NOTHING
 	Output		:		Nothing
 ===================================================================*/
-extern "C" void ShowNodeNetwork( u_int32_t NetMask )
+void ShowNodeNetwork( u_int32_t NetMask )
 {
 	int o,i,e;
 	NODE * NodePnt;

@@ -54,9 +54,6 @@ mxtype : u_int16_t // always 0 for mx format
 #include "data/mload.h"
 #include "data/tload.h"
 #include "util/hunk_alloc.h"
-#ifdef RENDERER_C3D
-/* render_c3d.c is a C TU; hoisted from block-scope extern (C++ mangles those). */
-#endif
 
 /*===================================================================
 		Defines

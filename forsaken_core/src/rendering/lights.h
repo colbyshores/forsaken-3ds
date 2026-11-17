@@ -21,9 +21,6 @@
 #include "data/mxload.h"
 #include "data/mxaload.h"
 #include "world/collision.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * defines
@@ -86,9 +83,6 @@ extern u_int16_t FirstXLightUsed;
 extern u_int16_t FirstXLightFree;
 extern float cral;
 
-#ifdef __cplusplus
-}
-#endif
 #endif // LIGHTS_INCLUDED
 
 

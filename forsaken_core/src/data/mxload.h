@@ -17,9 +17,6 @@
 #include "data/tload.h"
 #include "data/mload.h"
 #include "rendering/transexe.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * defines
@@ -125,9 +122,6 @@ bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model );
 
 void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  );
 bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 );
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

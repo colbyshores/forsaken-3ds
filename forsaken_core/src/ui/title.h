@@ -7,9 +7,6 @@
 #include "rendering/2dtextures.h"
 #include "game/constants.h"
 #include "net/networking.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define QUICKSTART_None		0
 #define QUICKSTART_Start	1
@@ -727,7 +724,4 @@ extern bool InitialTexturesSet;
 /* Nonzero while a front-end menu is up (the 3DS input layer routes keys). */
 int _3ds_is_menu_open(void);
 
-#ifdef __cplusplus
-}
-#endif
 #endif

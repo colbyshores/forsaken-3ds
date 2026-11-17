@@ -15,12 +15,10 @@
 	relies on QUATLERP.dir for the shortest-arc sign choice - the
 	caller sets it, the function does not compute the dot product.
 
-	Phase 2 (C with classes): in C++ QUAT is a class carrying its
-	operations as members; in C it stays the plain data struct so
-	platform TUs and C tests that include this header transitively
-	keep compiling. The two forms have identical layout (four
-	floats, no padding, no virtuals) - data crosses the C/C++
-	boundary, member calls are C++-only.
+	QUAT carries its operations as member functions. Its layout is
+	the original C struct's -- four floats, no padding, no virtuals --
+	so data that stores quaternions (saves, level and network
+	structures) is unchanged.
 ===================================================================*/
 typedef struct SHORTQUAT {
 	int16_t	w;
@@ -28,8 +26,6 @@ typedef struct SHORTQUAT {
 	int16_t	y;
 	int16_t	z;
 } SHORTQUAT;
-
-#ifdef __cplusplus
 
 class QUAT {
 public:
@@ -66,23 +62,5 @@ public:
 	void	Step();
 };
 
-#else
-
-typedef struct QUAT {
-	float	w;
-	float	x;
-	float	y;
-	float	z;
-} QUAT;
-
-typedef struct QUATLERP {
-	QUAT	start;		// Starting QUATERNION
-	QUAT	end;		// Ending QUATERNION
-	QUAT *	crnt;		// Current QUATERNION to change
-	float	time;		// Time
-	float	dir;		// Direction
-} QUATLERP;
-
-#endif
 
 #endif

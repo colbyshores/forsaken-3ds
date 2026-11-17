@@ -428,7 +428,7 @@ void DisableCheats( void )
     ToggleGodMode( NULL );
 }
 
-extern "C" void CheckCheats( int key )
+void CheckCheats( int key )
 {
   int j, i;
   int cheats;
@@ -495,7 +495,7 @@ static void ReadKeyboard( void )
 		key_state[ new_input ][ i ] = keys[ i ];
 }
 
-extern "C" void clear_last_mouse_state(void)
+void clear_last_mouse_state(void)
 {
 	int i;
 	for ( i = 0; i < MAX_MOUSE_BUTTONS; i++ )

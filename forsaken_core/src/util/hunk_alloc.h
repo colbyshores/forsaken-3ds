@@ -28,9 +28,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef enum {
     TAG_STARTUP = 0,
@@ -48,8 +45,5 @@ size_t Hunk_Used(HunkTag tag);
 size_t Hunk_Available(void);
 size_t Hunk_Total(void);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

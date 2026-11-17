@@ -7833,7 +7833,7 @@ void MoveEnemyToGroup( ENEMY * Enemy, u_int16_t OldGroup, u_int16_t NewGroup )
 	Input		:	CAMERA	*	Camera
 	Output		:	nothing
 ===================================================================*/
-extern "C" void UpdateEnemiesClipGroup( CAMERA * Camera  )
+void UpdateEnemiesClipGroup( CAMERA * Camera  )
 {
 	ENEMY		*	Enemy;
 	ENEMY		*	NextEnemy;

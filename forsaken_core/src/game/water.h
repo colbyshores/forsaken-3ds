@@ -3,9 +3,6 @@
 #define WATER_H
 #include "game/main.h"
 #include "game/constants.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define	ROOTTWO  (1.0F / (float)sqrt(2.0F))
 #define	SPECIALROOTTWO (1.0F / (4.0F+(1.0F / (float)sqrt(2.0F))*4.0F))
@@ -99,7 +96,4 @@ extern float GroupWaterIntensity_Green[ MAXGROUPS ];
 extern float GroupWaterIntensity_Blue[ MAXGROUPS ];
 extern float WATER_CELLSIZE;
 
-#ifdef __cplusplus
-}
-#endif
 #endif // WATER_H

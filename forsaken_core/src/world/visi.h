@@ -10,9 +10,6 @@
 #include "rendering/lights.h"
 #include "game/skin.h"
 #include "game/camera.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef struct _GROUPLIST
 {
@@ -66,7 +63,4 @@ extern u_int16_t NumGroupsVisible;
 extern u_int16_t GroupImIn;
 extern u_int16_t GroupsVisible[ MAXGROUPS ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// VISI_INCLUDED

@@ -8,13 +8,7 @@
 	silent with no explanation, so main_3ds shows a warning screen.
 ===================================================================*/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 bool sound_check_dsp_firmware_available(void);	/* SD or romfs copy present */
 void sound_show_missing_firmware_warning(void);	/* modal; returns on A/START/SELECT */
 
-#ifdef __cplusplus
-}
-#endif

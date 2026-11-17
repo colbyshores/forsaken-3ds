@@ -3,9 +3,6 @@
 #define EXTFORCE_INCLUDED
 
 #include "game/main.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*
  * Defines
  */
@@ -52,8 +49,5 @@ void DisplayExternalForcesInGroup( u_int16_t Group );
 FILE * LoadExternalForces( FILE * fp );
 FILE * SaveExternalForces( FILE * fp );
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// EXTFORCE_INCLUDED
 

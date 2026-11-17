@@ -1447,8 +1447,7 @@ void ForceExternalOneOff( u_int16_t ship, VECTOR *force )
 	Ships[ ship ].Object.ExternalForce.z += force->z;
 }
 
-
-extern "C" void ObjForceExternalOneOff( OBJECT *Obj, VECTOR *force )
+void ObjForceExternalOneOff( OBJECT *Obj, VECTOR *force )
 {
 	Obj->ExternalForce.x += force->x;
 	Obj->ExternalForce.y += force->y;

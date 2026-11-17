@@ -3,9 +3,6 @@
 #include "game/main.h"
 #include "game/constants.h"
 #include "ui/title.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 //
 // Networking functions mainly used by title.c
@@ -33,7 +30,4 @@ extern MENU * GetPlayerNumMenu;
 extern bool MyResetKillsPerLevel;
 extern int TeamMembers[ MAX_TEAMS ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// MULTIPLAYER_INCLUDED

@@ -7,9 +7,6 @@
 
 #include "game/main.h"
 #include <stdio.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -229,9 +226,6 @@ void SetStealthOffset( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Offse
 void SetCompObjStealth( COMP_OBJ * Children, int16_t NumChildren );
 void SetCompObjNonStealth( COMP_OBJ * Children, int16_t NumChildren );
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

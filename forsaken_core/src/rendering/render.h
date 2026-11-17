@@ -1,9 +1,6 @@
 #ifndef RENDER_INCLUDED
 #define RENDER_INCLUDED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <assert.h>
 
@@ -86,11 +83,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt );
 
 
 #undef RELEASE
-#ifndef __cplusplus
-#define RELEASE(x) {if (x != NULL) {x->lpVtbl->Release(x); x = NULL;}}
-#else
 #define RELEASE(x) {if (x != NULL) {x->Release(); x = NULL;}}
-#endif
 
 void cull_none( void );
 void cull_cw( void );
@@ -375,9 +368,6 @@ extern bool g_object_shine;
 extern bool g_wall_detail;
 #endif
 
-#ifdef __cplusplus
-};
-#endif
 
 // this is used to read the file because the file
 typedef struct {

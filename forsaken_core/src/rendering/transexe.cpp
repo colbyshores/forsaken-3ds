@@ -21,9 +21,6 @@
 #include "rendering/transexe.h"
 #include "game/models.h"
 #include "game/oct2.h"
-#ifdef RENDERER_C3D
-/* render_c3d.c is a C TU; hoisted from block-scope externs (C++ mangles those). */
-#endif
 
 /*===================================================================
 		Globals...

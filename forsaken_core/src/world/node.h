@@ -3,9 +3,6 @@
 
 #include "game/main.h"
 #include "game/object.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* Bumped 16 -> 32 to fit Remaster nodes that exceed the 1998 cap.
  * starship has nodes with 17-18 links per the runtime trace; 32
@@ -64,7 +61,4 @@ struct ENEMY * PutEnemiesAtNodes(void);	/* struct tag: enemies.h includes this h
 extern NODENETWORKHEADER NodeNetworkHeader;
 void ShowNodeNetwork( u_int32_t NetMask );
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// NODE_INCLUDED

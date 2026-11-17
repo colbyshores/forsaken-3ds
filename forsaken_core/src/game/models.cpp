@@ -42,23 +42,12 @@
 #include "rendering/2dtextures.h"
 #include "rendering/lights.h"
 #include "world/visi.h"
-#ifdef RENDERER_C3D
-/* render_c3d.c is a C TU; hoisted from block-scope externs (C++ mangles those). */
-#endif
-#ifdef __3DS__
-/* main_3ds.c is a C TU; models.c relied on implicit declaration here. */
-#endif
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 #define NO_GRAVGON_TIMER 0
-
-/*===================================================================
-		Externals ...
-===================================================================*/
-
 
 void RefreshModel( u_int16_t model );
 
@@ -5154,7 +5143,7 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 	Input		:	 player id
 	Output		:	player's short name
 ===================================================================*/
-extern "C" char *GetName(int Player)
+char *GetName(int Player)
 {
 	return &Names[Player][0];
 }
@@ -5863,8 +5852,7 @@ float FrameLagStore[ MAX_PLAYERS ];
 int CurrentStoredSpeed[ MAX_PLAYERS ];
 float SpeedStore[ MAX_PLAYERS ][ ENGINEUPDATEPAUSEFRAMES ];
 
-
-extern "C" void InitShipSpeeds( void )
+void InitShipSpeeds( void )
 {
 	memset( FrameLagStore, 0, sizeof( FrameLagStore ) );
 	memset( CurrentStoredSpeed, 0, sizeof( CurrentStoredSpeed ) );

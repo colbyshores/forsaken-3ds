@@ -17,11 +17,6 @@
 #include "util/util.h"
 #include "stdio.h"
 
-#ifdef __3DS__
-/* main_3ds.c's boot log; C TU, so the decl needs C linkage (C++ rejects the
- * implicit declaration the C build tolerated). */
-#endif
-
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif

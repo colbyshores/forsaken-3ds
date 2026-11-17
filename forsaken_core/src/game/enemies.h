@@ -9,9 +9,6 @@
 #include "world/node.h"
 #include "game/triggers.h"
 #include "game/camera.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -461,9 +458,6 @@ extern ENEMY * TestEnemy;
 void UpdateEnemiesClipGroup( CAMERA * Camera );
 extern bool ShowUntriggeredNMEs;
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

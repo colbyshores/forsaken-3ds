@@ -16,9 +16,6 @@
 
 #include <stdbool.h>
 #include <3ds.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* The actions the engine cares about. The index doubles as BOTH the
  * joy-button slot input_3ds.c writes into joy_button_state[0][N] AND
@@ -95,7 +92,4 @@ int  controls_3ds_cstick_invert_y(void);
 /* Feed one frame of HID state to the remap overlay; true = it consumed input. */
 bool controls_3ds_handle_input(u32 kDown, u32 kHeld);
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* CONTROLS_3DS_INCLUDED */

@@ -576,7 +576,7 @@ int GetKills(int Player)
 	return score;
 }
 
-extern "C" int GetFriendlyKills( int Player )
+int GetFriendlyKills( int Player )
 {
 	int kills = 0;
 	int x;

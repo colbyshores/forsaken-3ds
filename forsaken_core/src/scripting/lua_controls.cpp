@@ -7,12 +7,7 @@
  *
  * see also controls.h
  */
-/* devkitPro's lua5.1 headers carry no __cplusplus guards; the lua API is C,
- * so the include must be wrapped (same idiom as lua.hpp upstream). */
-extern "C" {
-#include <lua.h>
-#include <lauxlib.h>
-}
+#include "scripting/lua_api.h"
 #include "input/controls.h"
 
 #define FIELD(f, type) do {       \

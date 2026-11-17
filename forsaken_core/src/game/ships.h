@@ -23,9 +23,6 @@
 #include "game/models.h"
 #include "data/mxload.h"
 #include "input/controls.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 extern bool SwitchedToWatchMode;
 
@@ -155,9 +152,6 @@ extern float Start_Shield;
 extern float Start_Hull;
 void ObjForceExternalOneOff( OBJECT *Obj, VECTOR *force );
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

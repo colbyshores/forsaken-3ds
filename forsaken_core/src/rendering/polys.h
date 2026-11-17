@@ -19,9 +19,6 @@
 #include "rendering/2dtextures.h"
 #include "rendering/2dpolys.h"
 #include "data/tload.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -119,9 +116,6 @@ extern u_int32_t TotalPolysInUse;
 extern u_int16_t FirstPolyUsed;
 extern VECTOR ShieldVerts[ 4 ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

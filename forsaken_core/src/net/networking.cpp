@@ -709,7 +709,7 @@ void	KillPickupSend( u_int16_t Owner, u_int16_t IDCount, int16_t Style )
 	SendGameMessage( MSG_KILLPICKUP, 0, 0, 0, 0 );
 }
 
-extern "C" void	TeamGoalsSend( u_int16_t * TeamGoals )
+void	TeamGoalsSend( u_int16_t * TeamGoals )
 {
 	int i;
 	for( i = 0; i < MAX_TEAMS; i++ ) TempTeamGoals.TeamGoals[ i ] = TeamGoals[ i ];

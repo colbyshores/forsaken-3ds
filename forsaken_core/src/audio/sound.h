@@ -2,9 +2,6 @@
 #define SOUND_INCLUDED
 
 #include "game/main.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 #ifndef __3DS__
 #include <SDL.h>
 #endif
@@ -63,8 +60,5 @@ void sound_volume( sound_source_t * s, long decibels );
 void sound_pan( sound_source_t * s, long pan );
 void sound_position( sound_source_t * s, float x, float y, float z, float min_distance, float max_distance );
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif

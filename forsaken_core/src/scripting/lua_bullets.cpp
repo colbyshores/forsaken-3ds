@@ -15,8 +15,7 @@
  * see also primary.h and secondary.h
  */
 #include <string.h>
-#include <lua.h>
-#include <lauxlib.h>
+#include "scripting/lua_api.h"
 #include "game/main.h" /* FIXME -- needed for primary.h and secondary.h */
 #include "rendering/2dtextures.h" /* FIXME -- needed for primary.h and secondary.h */
 #include "math/new3d.h" /* FIXME -- needed for primary.h and secondary.h */

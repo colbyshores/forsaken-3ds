@@ -3,11 +3,8 @@
 #include "game/main.h"
 #include "util/util.h"
 
-/* C-with-classes (AGENTS.md S9): the block tracker below is
- * state owned by this module; definitions keep C linkage
- * because the X_* API is called from C translation units
- * (and MemUsed is externed by oct2.c). */
-extern "C" {
+/* The block tracker below is state owned by this module (one instance,
+ * reached through the X_* API that xmem.h's DEBUG_ON macros redirect to). */
 
 size_t	MemUsed = 0;
 
@@ -249,5 +246,3 @@ int UnMallocedBlocks( void )
 		MemUsed, BlocksUsed ); // break point
 	return BlocksUsed;
 }
-
-} /* extern "C" */

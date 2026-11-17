@@ -67,9 +67,6 @@ num_frames : u_int16_t // number of animation frames
 #include "data/tload.h"
 #include "game/ships.h"
 #include "util/hunk_alloc.h"
-#ifdef RENDERER_C3D
-/* render_c3d.c is a C TU; hoisted from block-scope extern (C++ mangles those). */
-#endif
 
 /*===================================================================
 		Defines

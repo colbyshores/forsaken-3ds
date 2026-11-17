@@ -13,9 +13,6 @@
 #include "data/mxaload.h"
 #include "rendering/lights.h"
 #include "game/camera.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * defines
@@ -644,7 +641,4 @@ char *GetName(int Player);
 extern MODELNAME InterLevelModelNames[ NUM_INTERLEVEL_MODELS+1 ];
 
 extern MODELNAME * ModNames;	/* defined in compobjects.cpp; declared with its type */
-#ifdef __cplusplus
-}
-#endif
 #endif // MODELS_INCLUDED

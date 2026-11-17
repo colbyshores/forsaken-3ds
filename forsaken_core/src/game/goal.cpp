@@ -331,8 +331,7 @@ int PickTeamGoal( int team )
 	return goal;
 }
 
-
-extern "C" void SetTeamGoals( u_int16_t *TeamGoals )
+void SetTeamGoals( u_int16_t *TeamGoals )
 {
 	int j;
 

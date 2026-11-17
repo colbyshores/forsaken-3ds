@@ -13,9 +13,6 @@
 #define PRIMARY_INCLUDED
 #include "game/constants.h"
 #include "game/main.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -343,9 +340,6 @@ extern char * PrimaryDescription[ MAXPRIMARYWEAPONS ];
 extern int8_t * DebugPrimStrings[];
 extern bool PrimaryValid[ MAXPRIMARYWEAPONS ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif // PRIMARY_INCLUDED
 
 

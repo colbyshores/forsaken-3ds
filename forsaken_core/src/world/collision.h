@@ -20,9 +20,6 @@
 #include "game/object.h"
 #include "game/compobjects.h"
 #include "game/bgobjects.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * defines
@@ -108,9 +105,6 @@ extern int outside_group;
 extern int no_collision;
 extern COMP_OBJ * ColChild;
 
-#ifdef __cplusplus
-}
-#endif
 #endif // COLLISION_INCLUDED
 
 

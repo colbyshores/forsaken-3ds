@@ -4,9 +4,6 @@
 
 #include "game/main.h"
 #include "math/new3d.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*
  * Defines
@@ -103,9 +100,6 @@ extern float CollisionRadius;
 bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node);
 extern BSP_NODE * OldCollideNode;
 
-#ifdef __cplusplus
-}
-#endif
 #endif	// BSP_INCLUDED
 
 

@@ -11,8 +11,7 @@
  *
  * see also collision.h
  */
-#include <lua.h>
-#include <lauxlib.h>
+#include "scripting/lua_api.h"
 #include "game/object.h" /* FIXME: needed by collision.h */
 #include "world/collision.h"
 #include "game/ships.h" /* for SHIP_RADIUS */

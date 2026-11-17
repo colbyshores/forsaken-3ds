@@ -7,9 +7,6 @@
 
 #include "game/main.h"
 #include "game/constants.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*===================================================================
 	Defines
 ===================================================================*/
@@ -411,9 +408,6 @@ extern char * Messages[];
 extern int16_t SecondaryFromPickupTab[ MAXSECONDARYWEAPONS*2 ];
 void InitValidPickups();
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

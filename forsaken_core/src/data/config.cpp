@@ -1211,8 +1211,7 @@ int AddButton( int joystick, int button, USERKEY *k )
 		return 0;
 }
 
-
-extern "C" void DefaultJoystickSettings( USERCONFIG *u )
+void DefaultJoystickSettings( USERCONFIG *u )
 {
 	int j, k;
 
@@ -1311,8 +1310,7 @@ extern "C" void DefaultJoystickSettings( USERCONFIG *u )
 	}
 }
 
-
-extern "C" void ReInitJoysticks( void )
+void ReInitJoysticks( void )
 {
 	JOYSTICKINFO tempJoystickInfo[MAX_JOYSTICKS];	
 	int i, j, k;

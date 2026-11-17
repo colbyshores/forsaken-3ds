@@ -9,9 +9,6 @@
 ===================================================================*/
 #include "game/main.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include <math.h>
 
 #include "math/new3d.h"
@@ -65,9 +62,6 @@ u_int16_t FindFreeLine( void );
 extern LINE Lines[ MAXLINES ];
 extern u_int16_t FirstLineUsed;
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

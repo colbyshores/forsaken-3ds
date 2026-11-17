@@ -26,9 +26,6 @@
 
 #include "math/new3d.h"  /* VECTOR */
 #include "game/main.h"   /* u_int16_t */
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* Steer the bullet's direction toward a valid target if one is in
  * the forward cone with LOS. No-op if Config.aim_assist_strength is
@@ -42,7 +39,4 @@ extern "C" {
  * Returns true if dir was modified, false otherwise. */
 bool aim_assist_steer( VECTOR *pos, VECTOR *dir, u_int16_t group, int8_t weapon );
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* AIM_ASSIST_H */

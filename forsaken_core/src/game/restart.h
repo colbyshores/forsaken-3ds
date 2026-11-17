@@ -4,9 +4,6 @@
 ===================================================================*/
 #ifndef RESTART_INCLUDED
 #define RESTART_INCLUDED
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -75,9 +72,6 @@ void DisplayStartPoints( void );
 extern bool ShowStartPoints;
 extern RESTART * FirstRestartUsed;
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

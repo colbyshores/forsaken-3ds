@@ -2134,7 +2134,7 @@ void CreateBoundingBox( VECTOR * x1, VECTOR * x2, u_int16_t Group )
 	Input		:	CAMERA	*	Camera
 	Output		:	nothing
 ===================================================================*/
-extern "C" void UpdateBGObjectsClipGroup( CAMERA * Camera )
+void UpdateBGObjectsClipGroup( CAMERA * Camera )
 {
 	BGOBJECT	*	Object;
 	BGOBJECT	*	NextObject;

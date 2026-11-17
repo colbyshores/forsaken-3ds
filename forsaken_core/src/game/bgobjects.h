@@ -7,9 +7,6 @@
 #include "game/main.h"
 #include "game/camera.h"
 #include "game/constants.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -265,9 +262,6 @@ void UpdateBGObjectsClipGroup( CAMERA * Camera );
 extern BGOBJECT * FirstBGObjectUsed;
 extern BGOBJECT BGObjects[ MAXBGOBJECTS ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 
 

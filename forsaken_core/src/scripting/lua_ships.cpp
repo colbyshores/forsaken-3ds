@@ -8,8 +8,7 @@
  *
  * see also networking.h
  */
-#include <lua.h>
-#include <lauxlib.h>
+#include "scripting/lua_api.h"
 #include "game/main.h"
 #include "math/new3d.h"
 #include "game/object.h"

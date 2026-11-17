@@ -7,9 +7,6 @@
 #include <math.h>
 #include "math/new3d.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 	Defines
@@ -40,8 +37,5 @@ int16_t RaytoSphere3( VECTOR * SphereCenter, float Radius, VECTOR * RayStart,
 bool RaytoSphereShort( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rdir, float rlength );
 
 //	vec3 normalAt(vec3& p);
-#ifdef __cplusplus
-}
-#endif
 
 #endif	//SPHERE_INCLUDED

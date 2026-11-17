@@ -462,7 +462,7 @@ void stereo_adjust( RENDERMATRIX *m )
 	m->_31 = (right+left)/(right-left);
 }
 
-extern "C" bool SetFOV( float fov )
+bool SetFOV( float fov )
 {
 	float screen_width, screen_height;
 	float Scale, NewNear;
@@ -529,8 +529,7 @@ extern "C" bool SetFOV( float fov )
 	return true;
 }
 
-
-extern "C" void SetViewportError( char *where, render_viewport_t *vp )
+void SetViewportError( char *where, render_viewport_t *vp )
 {
   static char msg[1024];
   sprintf( msg,
@@ -1054,7 +1053,7 @@ bool FullScreenViewport()
 	return true;
 }
 
-extern "C" bool InitLevels( char * levels_list )
+bool InitLevels( char * levels_list )
 {
 
   FILE *f;
@@ -1599,7 +1598,7 @@ void ReleaseLevel(void)
 #undef _RL_TRACE
 }
 
-extern "C" void
+void
 ReleaseScene(void)
 {
   int16_t Count;
@@ -1635,7 +1634,7 @@ ReleaseScene(void)
 
 }
 
-extern "C" void ReleaseView(void)
+void ReleaseView(void)
 {
 #ifdef __3DS__
   {  char _b[64]; snprintf(_b,sizeof(_b),"ReleaseView: status=%d",(int)MyGameStatus); trace(_b); }
@@ -1732,7 +1731,7 @@ extern "C" void ReleaseView(void)
   }
 }
 
-extern "C" bool
+bool
 InitScene(void)
 {
   int i;
@@ -1805,7 +1804,7 @@ InitScene(void)
   Output    :   bool true/FLASE
 ===================================================================*/
 
-extern "C" bool InitView( void )
+bool InitView( void )
 {
 	DebugPrintf("InitView Starting...\n");
 
@@ -2169,7 +2168,7 @@ char NodeName[256];
   Output    :   nothing
 ===================================================================*/
 
-extern "C" bool RenderScene( void )
+bool RenderScene( void )
 {
 #ifdef __3DS__
   {
@@ -5314,7 +5313,7 @@ bool  InitScoreDisplay()
 }
 
 // Clears the target(back) and zbuffer for the current camera
-extern "C" bool ClearBuffers( void )
+bool ClearBuffers( void )
 {
 	XYRECT dummy;
 
@@ -6615,7 +6614,7 @@ bool SavePPM( u_int8_t * Filename, u_int8_t * ScreenPtr, u_int32_t Width, u_int3
   Input   :   int8_t  * Filename
   Output    :   bool    True/False
 ===================================================================*/
-extern "C" bool SaveSnapShot( int8_t * Filename )
+bool SaveSnapShot( int8_t * Filename )
 {
 	return true;
 }

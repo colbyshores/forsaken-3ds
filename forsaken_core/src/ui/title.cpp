@@ -3445,7 +3445,7 @@ DebugPrintf("2 vsync = %d\n",render_info.vsync);
 	return true;
 }
 
-extern "C" bool RenderModeReset( void )
+bool RenderModeReset( void )
 {
 	if(!render_reset( &render_info ))
 		return true;
@@ -7778,8 +7778,7 @@ void InitBikerName( char *name )
 |
 \********************************************/
 
-
-extern "C" void GetDefaultPilot(void)
+void GetDefaultPilot(void)
 {
 
 	// pointer to a char
@@ -11590,7 +11589,7 @@ void Print3Dots(TEXTINFO *TextInfo, float totalheight)
 	}
 }
 
-extern "C" bool VduFinished( MENU *Menu )
+bool VduFinished( MENU *Menu )
 {
 	int i, j;
 	bool eventsactive = false;

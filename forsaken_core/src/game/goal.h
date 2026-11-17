@@ -3,9 +3,6 @@
 
 #include "game/main.h"
 #include "game/constants.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define GOALSTATE_Off	(0)
 #define GOALSTATE_On	(1)
 
@@ -45,7 +42,4 @@ extern int GoalTeamMembers[ MAX_TEAMS ];
 void SetTeamGoals( u_int16_t *TeamGoals );
 extern int TeamFlag[ MAX_TEAMS ];
 
-#ifdef __cplusplus
-}
-#endif
 #endif // GOAL_H

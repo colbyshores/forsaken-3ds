@@ -6,9 +6,6 @@
 #endif
 #include "game/main.h"
 #include "data/config.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*===================================================================
 		Some Keyboard and Mouse Globals
@@ -204,7 +201,4 @@ extern int ShipAxisLookup[ NUM_SHIP_AXIS_ACTIONS ];
 extern char * ShipActionText[ NUM_SHIP_ACTIONS ];
 void CheckCheats( int key );
 
-#ifdef __cplusplus
-}
-#endif
 #endif // CONTROLS_H
