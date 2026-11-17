@@ -709,17 +709,6 @@ void PrintScoreSort( void )
 							Print4x5TextSmall( &buf[0], left_offset+60.0F, top_offset+((FontHeight-8.0F)/2.0F), ShipHealthColour[ShipID] );
                         }
 
-				/*		sprintf( (char*) &buf[0] ,"IP: %s PING: %d LOSS: %d LOST: %d BW IN: %d BW OUT: %d PORT: %d", 
-													Ships[ShipID].network_player->ip,
-													Ships[ShipID].network_player->ping,
-													Ships[ShipID].network_player->packet_loss,
-													Ships[ShipID].network_player->packets_lost,
-													Ships[ShipID].network_player->bw_in,
-													Ships[ShipID].network_player->bw_out,
-													Ships[ShipID].network_player->port);
-
-						Print4x5TextSmall( &buf[0] , left_offset, top_offset+((FontHeight-8.0F)/2.0F), GREEN );*/
-
 					}
 				}
 

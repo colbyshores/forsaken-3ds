@@ -80,30 +80,8 @@ static void send_tracker_message( char* host, int port, char* message )
 	ENetAddress address;
 	ENetBuffer send_buffer;
 
-	/*
-	if(enet_initialize())
-	{
-		DebugPrintf("Enet failed to initialize\n");
-		return;
-	}
-	*/
-
 	enet_address_set_host( &address, host ); 
 	address.port = port;
-
-	/*
-	socket = enet_socket_create( ENET_SOCKET_TYPE_DATAGRAM );
-
-	if( socket == ENET_SOCKET_NULL )
-	{
-		DebugPrintf("Failed to create socket\n");
-		return;
-	}
-
-	enet_socket_set_option (socket, ENET_SOCKOPT_NONBLOCK, 1);
-	enet_socket_set_option (socket, ENET_SOCKOPT_RCVBUF, 0 ); // ENET_HOST_RECEIVE_BUFFER_SIZE); // we receive no data
-	enet_socket_set_option (socket, ENET_SOCKOPT_SNDBUF, size );// ENET_HOST_SEND_BUFFER_SIZE); // we send very little data
-	*/
 
 	send_buffer.data = message;
 	send_buffer.dataLength = size;

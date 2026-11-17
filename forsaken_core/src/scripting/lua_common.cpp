@@ -141,7 +141,6 @@ static void assign_loaders( void )
 
 static int lua_create(void)
 {
-	/* luaL_Reg x[] = { { NULL, NULL } }; */
 	L1 = luaL_newstate();
 	if (!L1)
 	{

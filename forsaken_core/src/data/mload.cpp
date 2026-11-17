@@ -235,13 +235,6 @@ void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert
 			zv++;
 		}
 	}
-/*
-	if ( zu != 1 || zv != 1 )
-	{
-		DebugPrintf("-- here -- not a square texture\n");
-	//	return; // not a square texture
-	}
-*/
 	TriVert[ 0 ] = &Vert[ Tri->v1 ];
 	TriVert[ 1 ] = &Vert[ Tri->v2 ];
 	TriVert[ 2 ] = &Vert[ Tri->v3 ];
@@ -603,11 +596,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					ibIndex++;
 					lpIndices[ibIndex] = FacePnt.v3;
 					ibIndex++;
-/*
-					FacePnt->v1 = MFacePnt->v1;
-					FacePnt->v2 = MFacePnt->v2;
-					FacePnt->v3 = MFacePnt->v3;
-*/
 
 					memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
 					memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
@@ -1041,19 +1029,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						Msg( "Mload : No PolyAnim\n" );
 						return false;
 					}
-/*
-					memset(&debDesc, 0, sizeof(D3DEXECUTEBUFFERDESC));
-					debDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //					if( Mloadheader->Group[ group ].lpExBuf[ execbuf ]->lpVtbl->Lock(
 //						Mloadheader->Group[ group ].lpExBuf[ execbuf ], &debDesc ) != D3D_OK ) // bjd
-/*
-					if (FSLockExecuteBuffer(Mloadheader->Group[ group ].lpExBuf[ execbuf ], &debDesc ) != D3D_OK )
-					{
-						Msg( "Mload : Lock ExecBuffer failed\n" );
-						return false;
-					}
-*/
 					if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[ group ].renderObject[execbuf], &lpLVERTEX)))
 					{
 						Msg( "Mload : Lock VertexBuffer failed\n" );

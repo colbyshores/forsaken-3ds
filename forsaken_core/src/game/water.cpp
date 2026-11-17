@@ -584,11 +584,6 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 		VertPnt += 2;
 	}
 
-/*
-	memset(&debDesc, 0, sizeof(D3DEXECUTEBUFFERDESC));
-	debDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
-
 	/*	lock the execute buffer	*/
 //	if ( WO->lpExBuf->lpVtbl->Lock( WO->lpExBuf, &debDesc ) != D3D_OK)
 //		return; // bjd
@@ -600,10 +595,6 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 		return;
 	}
 
-/*
-	lpBufStart = debDesc.lpData;
-	lpLVERTEX = ( LPLVERTEX )lpBufStart;
-*/
 	VertPnt = WO->Verts;
 	
 	for( x = 0 ; x < WO->XVerts ; x++ )

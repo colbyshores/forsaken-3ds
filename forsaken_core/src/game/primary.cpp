@@ -3652,14 +3652,6 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 	QUAT		TempQuat;
 
 
-/*
-	if( MyGameStatus != STATUS_SinglePlayer )
-	{
-		if( !IsGroupVisible[ Group ] && !VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Group, NULL ) && !outside_map )
-			return( (u_int16_t) -1 );
-	}
-*/
-
 	CrossProduct( Dir, Up, &LeftVector );
 
 	i = FindFreePrimBull();

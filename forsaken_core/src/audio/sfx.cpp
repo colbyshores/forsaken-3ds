@@ -934,14 +934,6 @@ void GetSfxFileNamePrefix( int sfxnum, char *file )
 		strcat( file, BikerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
 		return;
 	}
-/*
-	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_LevelSpec )
-	{
-		if ( LevelSpecificEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ].file )
-			strcpy( file, LevelSpecificEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ].file );
-		return;
-	}
-*/
 
 	strcpy( file, Sfx_Filenames[ sfxnum ].Name);
 }
@@ -958,10 +950,6 @@ void ClearLevelSpecSfx( void )
 
 	for ( i = SFX_LEVELSPEC_Start; i <= SFX_LEVELSPEC_End; i++ )
 	{
-		/*
-		LevelSpecificEffects[ i - SFX_LEVELSPEC_Start ].file[0] = 0;
-		LevelSpecificEffects[ i - SFX_LEVELSPEC_Start ].flags = 0;
-		*/
 
 		if( Sfx_Filenames[ i ].Name )
 		{
@@ -1832,10 +1820,6 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 }
 
 	flags = Sfx_Filenames[ Sfx ].Flags;
-/*
-	if ( flags & SFX_LevelSpec )
-		flags = LevelSpecificEffects[ Sfx_Filenames[ Sfx ].SfxLookup ].flags;
-*/
 
 	if( flags & SFX_Biker )
     	VolModify *= ( (float)BikerSpeechSlider.value / (float)BikerSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
@@ -2427,10 +2411,6 @@ void StopLoopingSfx( int index )
 	int flags;
 
 	flags = Sfx_Filenames[ SpotSfxList[ index ].sfxindex ].Flags;
-/*
-	if ( flags & SFX_LevelSpec )
-		flags = LevelSpecificEffects[ Sfx_Filenames[ SpotSfxList[ index ].sfxindex ].SfxLookup ].flags;
-*/
 
 	if ( SpotSfxList[ index ].source )
 	{
@@ -2585,10 +2565,6 @@ void ProcessLoopingSfx( void )
 		atm_prof_add( ATM_C_SFX_USED, 1 );
 
 		flags = Sfx_Filenames[ SpotSfxList[ i ].sfxindex ].Flags;
-/*
-		if ( flags & SFX_LevelSpec )
-			flags = LevelSpecificEffects[ Sfx_Filenames[ SpotSfxList[ i ].sfxindex ].SfxLookup ].flags;
-*/
 		
 
 //
@@ -2992,12 +2968,6 @@ void PlayUpdatableBikerTaunt( VECTOR *pos, u_int16_t Group, u_int16_t bike, char
 	dist = ReturnDistanceVolumeVector( pos, Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, NULL, NULL );
 	if( dist < 0.0F )
 		return;
-/*
-	if ( TauntID && ( dist < ( TauntDist / TAUNT_OVERIDE_DISTANCE_FACTOR ) ) )
-	{
-		StopSfx( TauntID );
-	}
-*/
 	
 	if ( dist > MAX_TAUNT_DISTANCE )
 	{

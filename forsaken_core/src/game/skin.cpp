@@ -996,14 +996,6 @@ bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t	NumVerts, int16_
 	{
 		return false;
 	}
-/*		
-   	memset( &Skin_d3dexdata, 0, sizeof(D3DEXECUTEDATA) );
-   	Skin_d3dexdata.dwSize = sizeof(D3DEXECUTEDATA);
-   	Skin_d3dexdata.dwVertexCount = NumVerts;
-   	Skin_d3dexdata.dwInstructionOffset = (ULONG) ( (char *) lpInsStart - (char *) lpBufStart );
-   	Skin_d3dexdata.dwInstructionLength = (ULONG) ( (char *) lpPointer - (char *) lpInsStart );
-   	if( ( Skin_Execs[ Num_Skin_Execs ]->lpVtbl->SetExecuteData( Skin_Execs[ Num_Skin_Execs ], &Skin_d3dexdata ) ) != D3D_OK) return false;
-*/
 	Num_Skin_Execs++;
 
 	return true;
@@ -1199,14 +1191,6 @@ bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t NumVerts, int1
 	{
 		return false;
 	}
-/*   		
-   	memset( &Portal_d3dexdata, 0, sizeof(D3DEXECUTEDATA) );
-   	Portal_d3dexdata.dwSize = sizeof(D3DEXECUTEDATA);
-   	Portal_d3dexdata.dwVertexCount = NumVerts;
-   	Portal_d3dexdata.dwInstructionOffset = (ULONG) ( (char *) lpInsStart - (char *) lpBufStart );
-   	Portal_d3dexdata.dwInstructionLength = (ULONG) ( (char *) lpPointer - (char *) lpInsStart );
-   	if( ( Portal_Execs[ Num_Portal_Execs ]->lpVtbl->SetExecuteData( Portal_Execs[ Num_Portal_Execs ], &Portal_d3dexdata ) ) != D3D_OK) return false;
-*/
 	Num_Portal_Execs++;
 
 	return true;

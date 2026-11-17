@@ -3079,11 +3079,6 @@ float rtintamount, gtintamount, btintamount, atintamount1, atintamount2, atintam
 
 int HoloMorphVerts[24] = {9, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52};
 int HoloTintVerts[24] = {10, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55};
-/*float FlatXOffset = 176.0F;
-float FlatYOffset = 44.0F;
-float FlatXScale = 0.75F;
-float FlatYScale = 0.62F;
-float FlatTextScale = 0.79F;*/
 
 float FlatXOffset = 0.0F;
 float FlatYOffset = 0.0F;
@@ -3796,17 +3791,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
 					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
 					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
-					/*
-					tempv1.x *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv1.y *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv1.z *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv2.x *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv2.y *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv2.z *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv3.x *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv3.y *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv3.z *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					*/
 					tempv1.x *= HoloModelScale * scaleout; //* BikeSwapScale;
 					tempv1.y *= HoloModelScale * scaleout; //* BikeSwapScale;
 					tempv1.z *= HoloModelScale * scaleout; //* BikeSwapScale;
@@ -3972,18 +3956,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
 					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
 					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
-
-					/*
-					tempv1.x *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv1.y *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv1.z *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv2.x *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv2.y *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv2.z *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv3.x *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv3.y *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					tempv3.z *= SelectedBikeScale * scaleout; //* BikeSwapScale;
-					*/
 
 					tempv1.x *= HoloModelScale * scaleout; //* BikeSwapScale;
 					tempv1.y *= HoloModelScale * scaleout; //* BikeSwapScale;
@@ -8169,20 +8141,6 @@ void GetSavedGameData( void )
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n\n");
-		/*
-		{
-			fclose( fp );
-#ifdef SAVEGAME_SLOTS
-			sprintf( CurrentSavedGameDate, SavedGameInfo( LoadSavedGameList.selected_item ) );
-			Models[ BackgroundModel[ TITLE_MODEL_MenuTVDummy ] ].Visible = 0;
-			Models[ BackgroundModel[ TITLE_MODEL_MenuTV ] ].Visible = 1;
-			return;
-#else
-			Msg( "invalid saved game file\n" );
-			return;
-#endif
-		}
-		*/
 
 		i = 0;
 		do
@@ -9255,10 +9213,6 @@ bool MakeTranslucent( u_int16_t Model )
 		{
 			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{   
-/*
-				memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-				DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //				if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //								DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //				if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -9311,10 +9265,6 @@ bool MakeTranslucent( u_int16_t Model )
 		{
 			for( ExecBuf = 0; ExecBuf < DstMxloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{   
-/*			
-				memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-				DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //				if( DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //								DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //				if (FSLockExecuteBuffer(DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -9392,13 +9342,6 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int Ver
   	green = (u_int8_t)((float)vgreen * tg);
   	blue = (u_int8_t)((float)vblue * tb);
   	alpha = (u_int8_t)((float)valpha * ta);
-
-/*
-	red = 255;
-	green = 255;
-	blue = 255;
-	alpha = 255;
-*/
 
 	Colour = RGBA_MAKE( red, green, blue, alpha );
 	if( !Colour ) 
@@ -9802,10 +9745,6 @@ void DrawFlatMenuText( MENUITEM *Item )
 	AddToTextStack( Item->TextInfo[1] );
 	DrawFlatTextStatus( Item );
 }
-/*
-		{ 0,160, 10 , 170, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawLeftArrow, NULL, 0 } ,
-		{ 190,160, 200 , 170, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , &LoadSavedGameList, NULL, NULL, DrawRightArrow, NULL, 0 } ,
-*/
 
 void DrawLeftArrow( MENUITEM *Item )
 {
@@ -13028,13 +12967,6 @@ void ExitEventExpandBike(TITLE_EVENT *TitleEvent)
 
 void InitEventShrinkBike(TITLE_EVENT *TitleEvent)
 {
-	/*
-	BikeExpanded = false;
-	
-	KillLines();
-
-	PlaySfx( SFX_HoloChange, 0.5F );
-	*/
 
 	ShowHoloModel( (u_int16_t)-1 );
 }
@@ -14174,13 +14106,6 @@ void InitCrystalsFoundText( MENU *Menu )
 		sprintf( EnemiesKilledText, LT_EnemysKilled, (int)NumKilledEnemies, (int)NumInitEnemies );
 	}
 
-	/*
-	sprintf( TimeTakenText, "time taken %d min%s %d sec%s", 
-		IntLevelTimeTaken / 60,
-		( ( IntLevelTimeTaken / 60 ) == 1 ) ? "" : "s",
-		IntLevelTimeTaken % 60,
-		( ( IntLevelTimeTaken % 60 ) == 1 ) ? "" : "s"); 
-	*/
 	if ( ( ( LevelTimeTaken / 60 ) == 1 ) && ( ( (int)LevelTimeTaken % 60 ) == 1 ) )
 	{
 		sprintf( TimeTakenText, LT_TimeTaken1/*"time taken %d min %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) ); 
@@ -15154,20 +15079,6 @@ bool ProcessSelectKeydef( int Key )
 			break;
 		
 		// TODO - need to pass unicode char to this function
-		/*
-		default:
-			if ( Key )
-			{
-				char *c;
-				
-				c = (char *) key_name( Key );
-				if ( c && strlen( c ) == 1 )
-				{
-					CursorSearch( SearchKey( *c ) );
-				}
-			}
-			break;
-		*/
 		}
 	}
 	

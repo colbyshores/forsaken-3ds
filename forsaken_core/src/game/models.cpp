@@ -3231,10 +3231,6 @@ bool TintMxaModel( MXALOADHEADER * DstMloadheader, float RF, float GF, float BF,
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-/*
-			memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-			DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //			if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //							DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //			if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -3288,10 +3284,6 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 		execbuf = MXAloadheader->Group[group].num_execbufs;
 		while( execbuf--)
 		{
-/*
-			memset(&debDesc, 0, sizeof(D3DEXECUTEBUFFERDESC));
-			debDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 			/*	lock the execute buffer	*/
 //			if ( MXAloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Lock( MXAloadheader->Group[group].lpExBuf[execbuf], &debDesc ) != D3D_OK) // bjd
 //				return false ;
@@ -3489,10 +3481,6 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-/*
-			memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-			DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //			if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //							DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false;
 //			if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -3577,10 +3565,6 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-/*
-			memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-			DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //			if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //							DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //			if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -3698,10 +3682,6 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-/*
-			memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-			DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //			if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //							DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //			if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -3798,10 +3778,6 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-/*
-			memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-			DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //			if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //							DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false;
 //			if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -3901,10 +3877,6 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 		{
 			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{
-/*
-				memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-				DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //				if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //								DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //				if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -4006,10 +3978,6 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 		{
 			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{
-/*
-				memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-				DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //				if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //								DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //				if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -4958,10 +4926,6 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 
 	Group = 0;
 	ExecBuf = 0;
-/*
-	memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-	DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //	if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //					DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //	if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -5045,10 +5009,6 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 
 	Group = 0;
 	ExecBuf = 0;
-/*	
-	memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-	DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //	if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //					DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //	if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -5131,10 +5091,6 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 
 	Group = 0;
 	ExecBuf = 0;
-/*
-	memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-	DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //	if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //					DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false;
 //	if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
@@ -5211,10 +5167,6 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 
 	Group = 0;
 	ExecBuf = 0;
-/*	
-	memset( &DstDebDesc, 0, sizeof(D3DEXECUTEBUFFERDESC) );
-	DstDebDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-*/
 //	if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
 //					DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
 //	if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )

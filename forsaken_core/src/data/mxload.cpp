@@ -544,18 +544,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			/* update the renderObject */
 
-/*
-			if( Mxloadheader->num_texture_files == 0 )
-			{
-				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = NULL;
-				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = false;
-			}
-			else
-			{
-				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mxloadheader->TloadIndex[tpage]];
-				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxloadheader->TloadIndex[tpage]];
-			}
-*/
 		}
 	}
 

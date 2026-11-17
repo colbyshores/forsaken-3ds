@@ -1390,43 +1390,6 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 		return( (u_int16_t) -1 );
 	}
 
-/*
-	switch( Weapon )
-	{
-		case MUGMISSILE:
-		case ENEMYSPIRALMISSILE:
-		case ENEMYHOMINGMISSILE:
-		case ENEMYBLUEHOMINGMISSILE:
-		case ENEMYFIREBALL:
-		case ENEMYDEPTHCHARGE:
-		case TITANSTARSHRAPNEL:
-		case THIEFMISSILE:
-		case MULTIPLEMISSILE:
-		case ENEMYTENTACLE:
-			if( MyGameStatus != STATUS_SinglePlayer )
-			{
-				if( !IsGroupVisible[ Group ] && !VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Group, NULL ) && !outside_map )
-					return( (u_int16_t) -1 );
-			}
-			break;
-
-		case SOLARISMISSILE:
-		case SCATTERMISSILE:
-		case TITANSTARMISSILE:
-		case GRAVGONMISSILE:
-		case PURGEMINE:
-		case PINEMINE:
-		case QUANTUMMINE:
-		case SPIDERMINE:
-		case PINEMISSILE:
-			break;
-
-		default:
-			Weapon = -1;
-			break;
-	}
-*/
-
 	i = FindFreeSecBull();
 
 	if( i != (u_int16_t) -1 )

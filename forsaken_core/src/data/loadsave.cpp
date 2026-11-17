@@ -131,17 +131,6 @@ bool PreInGameLoad( MENUITEM * MenuItem )
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-/*
-		{
-			fclose( fp );
-#ifdef SAVEGAME_SLOTS
-			Msg( "PreInGameLoad() Incompatible save game file %s", SaveGameFileName( LoadSavedGameList.selected_item ) );
-#else
-			Msg( "PreInGameLoad() Incompatible save game file %s", &LoadGameFilename[ 0 ] );
-#endif
-			return( false );
-		}
-*/
 
 		i = 0;
 		do
@@ -200,17 +189,6 @@ void InGameLoad( MENUITEM * MenuItem )
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-/*
-		{
-			fclose( fp );
-#ifdef SAVEGAME_SLOTS
-			Msg( "PreInGameLoad() Incompatible save game file %s", SaveGameFileName( LoadSavedGameList.selected_item ) );
-#else
-			Msg( "PreInGameLoad() Incompatible save game file %s", &LoadGameFilename[ 0 ] );
-#endif
-			return;
-		}
-*/
 
 		i = 0;
 		do
@@ -560,13 +538,6 @@ char *SavedGameInfo( int slot )
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-		/*
-		{
-			fclose( fp );
-			sprintf( info, "unused slot %d", slot + 1 );
-			return info;
-		}
-		*/
 
 		i = 0;
 		do
@@ -625,12 +596,6 @@ bool SaveGameSlotUsed( int slot )
 
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-		/*
-		{
-			fclose( fp );
-			return false;
-		}
-		*/
 
 		fclose( fp );
 		return true;

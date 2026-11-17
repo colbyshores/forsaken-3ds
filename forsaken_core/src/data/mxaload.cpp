@@ -441,19 +441,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mxaloadheader->TloadIndex[tpage]];
 				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxaloadheader->TloadIndex[tpage]];
-/*
-				if (StoreTriangles)
-				{	Mxaloadheader->Group[group].num_polys_per_execbuf[execbuf] = num_triangles;			
-					Mxaloadheader->Group[group].poly_ptr[execbuf] = (LPTRIANGLE)malloc( sizeof (TRIANGLE) * num_triangles);			
-				
-					memmove(Mxaloadheader->Group[group].poly_ptr[execbuf], TempFacePnt, sizeof (TRIANGLE) * num_triangles);//memcpy
-				}
-				else
-				{
-					Mxaloadheader->Group[group].num_polys_per_execbuf[execbuf] = 0;
-					Mxaloadheader->Group[group].poly_ptr[execbuf] = NULL;			
-				}
-*/
 			}
 
 			if (StoreTriangles)
@@ -486,13 +473,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Msg( "Mxload() normal unlock failed in %s\n", Filename );
 				return false ;
 			}
-/*
-			Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;
-			Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numTriangles = num_triangles;
-			Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].startVert = 0;
-			Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mxaloadheader->TloadIndex[tpage]];
-			Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxaloadheader->TloadIndex[tpage]];
-*/
 
 			Mxaloadheader->Group[group].renderObject[execbuf].numTextureGroups = num_texture_groups;
 

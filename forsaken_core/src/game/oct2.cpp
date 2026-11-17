@@ -3081,28 +3081,6 @@ bool RenderScene( void )
     }
     InitFont();
 
-/*
-    MyGameStatus = STATUS_InitView_1;
-
-    break;
-  
-  case STATUS_InitView_1:
-	DebugState("STATUS_InitView_1\n");
-
-    if( IsHost )
-    {
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-    }
-		else
-		{
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-    }
-
-    clear_black();
-
-    ReceiveGameMessages();
-*/
-
     ReMakeSimplePanel = true;
 
     InitSkinExecs();
@@ -3231,50 +3209,6 @@ bool RenderScene( void )
 	{  trace("IV0: Tload OK"); }
 #endif
 
-/*
-    MyGameStatus = STATUS_InitView_2;
-    PrintInitViewStatus( MyGameStatus );
-    break;
-  
-
-  case STATUS_InitView_2:
-	DebugState("STATUS_InitView_2\n");
-
-    if( IsHost )
-    {
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-    }
-		else
-		{
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-    }
-
-    clear_black();
-
-    ReceiveGameMessages();
-
-    MyGameStatus = STATUS_InitView_3;
-    PrintInitViewStatus( MyGameStatus );
-    break;
-  
-
-  case STATUS_InitView_3:
-	DebugState("STATUS_InitView_3\n");
-
-    if( IsHost )
-    {
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-    }
-		else
-		{
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-    }
-
-    clear_black();
-
-    ReceiveGameMessages();
-*/
-
 #ifdef __3DS__
 	{  trace("IV0: InitModel"); }
 #endif
@@ -3287,28 +3221,6 @@ bool RenderScene( void )
 	{  trace("IV0: InitModel OK"); }
 #endif
 
-/*
-    MyGameStatus = STATUS_InitView_4;
-    PrintInitViewStatus( MyGameStatus );
-    break;
-
-
-  case STATUS_InitView_4:
-	DebugState("STATUS_InitView_4\n");
-
-    if( IsHost )
-    {
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-    }
-		else
-		{
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-    }
-
-    clear_black();
-
-    ReceiveGameMessages();
-*/
 #ifdef __3DS__
 	{  trace("IV0: Mload"); }
 #endif
@@ -3326,28 +3238,6 @@ bool RenderScene( void )
 #ifdef __3DS__
 	{  trace("IV0: InitVisiStats OK -> Bspload"); }
 #endif
-
-/*
-    MyGameStatus = STATUS_InitView_5;
-    PrintInitViewStatus( MyGameStatus );
-    break;
-  
-
-  case STATUS_InitView_5:
-	DebugState("STATUS_InitView_5\n");
-
-    if( IsHost )
-    {
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-    }
-		else
-		{
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-    }
-
-    clear_black();
-    ReceiveGameMessages();
-*/
 
     // Can Cope with no Bsp file!!!
 #ifdef LOAD_ZBSP
@@ -3403,69 +3293,7 @@ bool RenderScene( void )
 	{  trace("IV0: SetUpShips OK"); }
 #endif
 
-/*
-    MyGameStatus = STATUS_InitView_6;
-    PrintInitViewStatus( MyGameStatus );
-
-    break;
-
-  case STATUS_InitView_6:
-	DebugState("STATUS_InitView_6\n");
-
-    if( IsHost )
-    {
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-    }
-		else
-		{
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-    }
-
-    clear_black();
-    ReceiveGameMessages();
-*/
-
     InitSoundInfo( &Mloadheader );
-
-/*
-    MyGameStatus = STATUS_InitView_7;
-    PrintInitViewStatus( MyGameStatus );
-    break;
-
-
-  case STATUS_InitView_7:
-	DebugState("STATUS_InitView_7\n");
-
-    if( IsHost )
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-		else
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-
-    clear_black();
-    ReceiveGameMessages();
-*/
-
-/*
-    MyGameStatus = STATUS_InitView_8;
-    PrintInitViewStatus( MyGameStatus );
-    break;
-
-
-  case STATUS_InitView_8:
-	DebugState("STATUS_InitView_8\n");
-
-    if( IsHost )
-      SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-		else
-      SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-
-    clear_black();
-    ReceiveGameMessages();
-
-		DebugState("STATUS_InitView_9\n");
-    MyGameStatus = STATUS_InitView_9;
-    PrintInitViewStatus( MyGameStatus );
-*/
 
     InitShipSpeeds();
 
@@ -3473,11 +3301,6 @@ bool RenderScene( void )
 		// so don't remove this !!!!!!!!!
     if( InitView_MyGameStatus != STATUS_InitView_0 )
 			MyGameStatus = InitView_MyGameStatus;
-
-/*
-		//
-		input_grab( true );
-*/
 
     break;
 
@@ -5415,26 +5238,6 @@ bool RenderCurrentCamera( void )
   perf_stage_end(PERF_S_VIS, -1);
   perf_stage_begin(PERF_S_BG);
 
-  /*
-  if( CurrentCamera.GroupImIn != (u_int16_t) -1 )
-  {
-    for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
-    {
-      if( Mloadheader.Group[ g->group ].BGClear_Flag )
-      {
-        if ( Mloadheader.Group[ g->group ].BGClear_Flag & 0x80 )
-        {
-          R = Mloadheader.Group[ g->group ].BGClear_Red;
-          G = Mloadheader.Group[ g->group ].BGClear_Green;
-          B = Mloadheader.Group[ g->group ].BGClear_Blue;
-          ChangeBackgroundColour( R, G, B );
-        }
-        break;
-      }
-    }
-  }
-  */
-
   if (ClearBuffers() != true )
   {
     return false;
@@ -6017,46 +5820,6 @@ bool DispTracker( void ) // bjd
 	VECTOR      ShipDir, TargetDir;
 	float       Cos;
 
-/*
-	if ( render_info.fullscreen )
-	{
-		screen_width = (float) render_info.ThisMode.w;
-		screen_height = (float) render_info.ThisMode.h;
-	}
-	else
-	{
-		screen_width = (float) render_info.WindowsDisplay.w;
-		screen_height = (float) render_info.WindowsDisplay.h;
-	}
-
-    newviewport.X = 0;	
-	newviewport.Y = 0;
-    newviewport.Width = ( render_info.window_size.cx / 3 ) & -2;
-    newviewport.Height = (u_int32_t) ( (float) newviewport.Width * pixel_aspect_ratio );
-    newviewport.ScaleX = newviewport.Width / (float)2.0;
-    newviewport.ScaleY = newviewport.Height / (float)2.0;
-
-	if (!FSSetViewPort(&newviewport))
-		return false;
-
-	viewplane_distance = (float) ( newviewport.Width / ( 2 * tanf( DEG2RAD( normal_fov ) * 0.5 ) ) );
-	panelproj._11 = 2 * viewplane_distance / newviewport.Width;
-	panelproj._22 = 2 * viewplane_distance / ( newviewport.Height / pixel_aspect_ratio );
-
-	if (!FSSetProjection(&panelproj))
-	{
-		return false;
-	}
-
-	dummy.x1 = newviewport.X;
-	dummy.x2 = newviewport.X + newviewport.Width;
-	dummy.y1 = newviewport.Y;
-	dummy.y2 = newviewport.Y + newviewport.Height;
-
-	if (FSClearDepth(&dummy))
-		return false;
-*/
-
 	MatrixTranspose( &Ships[ WhoIAm ].Object.FinalMat, &TempMatrix );
 	ShadeModel( MODEL_Tracker, &TempMatrix, ( 40.0F * GLOBAL_SCALE ), ( 220.0F * GLOBAL_SCALE ) );
 
@@ -6149,16 +5912,6 @@ bool DispTracker( void ) // bjd
       return false;
   }
 
-/*
-	if (!FSSetViewPort(&viewport))
-		return false;
-
-	if (!FSSetProjection(&proj))
-	{
-		return false;
-	}
-*/
-
   return true;
 }
 
@@ -6171,12 +5924,6 @@ bool DispTracker( void ) // bjd
   Output    : bool  true/false
 ===================================================================*/
 // TODO - might want this
-/*
-bool ChangeBackgroundColour( float R, float G, float B )
-{
-	return true;
-}
-*/
 
 /*===================================================================
   Procedure : Print up how far the init view has to go...

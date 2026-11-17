@@ -148,12 +148,6 @@ bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/REND
 						color = RGBA_MAKE( Lines[ i ].StartCol.R, Lines[ i ].StartCol.G,
 										   Lines[ i ].StartCol.B, Lines[ i ].StartTrans );
 				}
-				/*
-				else
-				{
-					color = RGBA_MAKE( 128, 128, 128, 255 );
-				}
-				*/
 	
 				Vert_Ptr->x = Lines[ i ].StartPos.x;
 				Vert_Ptr->y = Lines[ i ].StartPos.y;
@@ -168,12 +162,6 @@ bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/REND
 						color = RGBA_MAKE( Lines[ i ].EndCol.R, Lines[ i ].EndCol.G,
 										   Lines[ i ].EndCol.B, Lines[ i ].EndTrans );
 				}
-				/*
-				else
-				{
-					color = RGBA_MAKE( 128, 128, 128, 255 );
-				}
-				*/
 	
 				Vert_Ptr->x = Lines[ i ].EndPos.x;
 				Vert_Ptr->y = Lines[ i ].EndPos.y;
