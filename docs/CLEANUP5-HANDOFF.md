@@ -76,6 +76,14 @@ functions, `#pragma once` + header comments, the 2,566 warnings `-isystem`
 was hiding, `constexpr`/`enum class`/`std::array` sweep, then classes for
 state-owning modules (A/B batch).
 
+**Last, after the conversion is complete (owner request 2026-11-17):** fully
+refactor the Forsaken Obsidian docs (`port-docs` vault,
+`10-projects/forsaken/` and the patterns promoted from it) to match the new
+source layout, file names (`.cpp`, `forsaken_core/forsaken_3ds/forsaken_pc`
+trees), seam headers and class structure. Most notes still cite
+`foo.c:NNN` paths from the old flat layout. The cross-project lesson so far is in
+`30-architecture/patterns/c-to-cpp-private-externs-hide-type-drift.md`.
+
 ---
 
 ## 1. Where things stand
