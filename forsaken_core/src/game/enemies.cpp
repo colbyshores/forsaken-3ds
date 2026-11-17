@@ -5632,7 +5632,6 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		Enemy->Object.Group = Group;
 		Enemy->ModelNum = ModelNum;
 		Enemy->Object.DirVector = *Dir;
-//		Enemy->Object.UpVector = *Up;
 		Enemy->TriggerMod = TriggerMod;
 		Enemy->Object.Shield = Difficulty * EnemyTypes[EnemyType].Shield;
 		Enemy->Object.NodeNetwork = Network;
@@ -5902,9 +5901,6 @@ void ProcessEnemies( void )
 				MoveEnemyToGroup( Enemy, OldGroup, Enemy->Object.Group );
 			}
 
-
-			
-//			if( ( Ships[WhoIAm].Object.Group == (u_int16_t) -1 ) || VisibleOverlap( Ships[WhoIAm].Object.Group, Enemy->Object.Group , NULL ) )
 			{
 				UpdateObjectAmbientColour( &Enemy->Object );
   
@@ -5980,7 +5976,6 @@ void ProcessEnemies( void )
 				}
 			}
 
-//			DoNmeDamagedEffects( Enemy );
 		}
 		else
 		{
@@ -6223,12 +6218,7 @@ void EnemyCrawlUnderPlayerControl( ENEMY * Enemy )
 	ctrl.forward	= 0.0F;
 
 	Enemy->Object.Angle.y += ctrl.yaw;
-//	Enemy->Object.Speed.z += ctrl.forward * Enemy->Object.WheelsOnGround;
 
-//	if( Enemy->Object.WheelsOnGround > 0.25F )
-//	{
-//		Enemy->Object.ExternalForce.y = -1.0F;
-//	}
 	Enemy->Object.ExternalForce.y -= 0.30F * framelag;
 
 	AutoMovementCrawl( &Enemy->Object , Enemy );
@@ -8695,7 +8685,6 @@ void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
 	float	Speed;
 	VECTOR	Move_Off;	
 	VECTOR	Move_Dir;
-//	QUAT	StepQuat;	
 	VECTOR	StartPos;
 	u_int16_t	OldGroup;
 
@@ -8919,10 +8908,6 @@ bool DamageEnemy( ENEMY * Enemy , float Damage , VECTOR * ImpactPoint , VECTOR *
 			PlayPannedSfx( SFX_FleshmorphPainCry, Enemy->Object.Group , &Enemy->Object.Pos, 0.0F );
 		}
 	}
-
-//	Enemy->Object.Red = 0.0F;
-//	Enemy->Object.Green = 255.0F;
-//	Enemy->Object.Blue = 255.0F;
 
 	if( Enemy->Object.Shield < 0.0F )
 	{
@@ -9697,9 +9682,6 @@ bool Object_Save( FILE * fp , OBJECT * Obj )
 	fwrite( &Obj->FinalMat, sizeof( Obj->FinalMat ), 1, fp );
 	fwrite( &Obj->FinalQuat, sizeof( Obj->FinalQuat ), 1, fp );
 
-//	fwrite( &Obj->DirVector, sizeof( Obj->DirVector ), 1, fp );
-//	fwrite( &Obj->UpVector, sizeof( Obj->UpVector ), 1, fp );
-//	fwrite( &Obj->LeftVector, sizeof( Obj->LeftVector ), 1, fp );
 	fwrite( &Obj->Group, sizeof( Obj->Group ), 1, fp );
 	fwrite( &Obj->Speed, sizeof( Obj->Speed ), 1, fp );
 	fwrite( &Obj->Angle, sizeof( Obj->Angle ), 1, fp );
@@ -9835,9 +9817,6 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 	MatrixTranspose( &Obj->Mat, &Obj->InvMat );
 	MatrixTranspose( &Obj->FinalMat, &Obj->FinalInvMat );
 
-//	fread( &Obj->DirVector, sizeof( Obj->DirVector ), 1, fp );
-//	fread( &Obj->UpVector, sizeof( Obj->UpVector ), 1, fp );
-//	fread( &Obj->LeftVector, sizeof( Obj->LeftVector ), 1, fp );
 	fread( &Obj->Group, sizeof( Obj->Group ), 1, fp );
 	fread( &Obj->Speed, sizeof( Obj->Speed ), 1, fp );
 	fread( &Obj->Angle, sizeof( Obj->Angle ), 1, fp );

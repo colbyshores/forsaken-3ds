@@ -624,8 +624,6 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 				{
 					NamePnt->DoIMorph = false;
 
-//					DebugPrintf( "PreLoading MX File %s\n", &TempFilename[ 0 ] );
-
 					if( !PreMxload( (char*)&TempFilename[0], &ModelHeaders[i] , NamePnt->Panel, NamePnt->LevelSpecific ) ) return false;	// the model and visipoly data
 				}
 				else
@@ -633,8 +631,6 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 					if( !strcasecmp( (char*)&Ext[ 0 ], "MXA" ) )
 					{
 						NamePnt->DoIMorph = true;
-
-//						DebugPrintf( "PreLoading MXA File %s\n", &TempFilename[ 0 ] );
 
 						MxaModelHeaders[i].AllocateTPage = NamePnt->AllocateTpage;
 
@@ -710,7 +706,6 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 
 				if( NamePnt->DoIMorph )
 				{
-//					DebugPrintf( "Loading MXA File %s\n", &TempFilename[ 0 ] );
 
 					if( !Mxaload( (char*)&TempFilename[0] , &MxaModelHeaders[i], NamePnt->StoreTriangles ) ) {
 #ifdef __3DS__
@@ -737,7 +732,6 @@ bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
 				}
 				else
 				{
-//					DebugPrintf( "Loading MX File %s\n", &TempFilename[ 0 ] );
 
 					if( !Mxload( (char*)&TempFilename[0] , &ModelHeaders[i] , NamePnt->Panel, NamePnt->StoreTriangles) ) {
 #ifdef __3DS__
@@ -1314,7 +1308,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 					ModelNum += Models[i].ModelNum;
 					perf_stage_end(PERF_S_MDLLOD, -1);
 		
-//					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || !( Models[i].Flags & MODFLAG_Clip ) )
 					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
 					{
 						DoDisplay = true;
@@ -1400,7 +1393,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 							if( DoDisplay )
 							{
-								//count++;
 #ifdef RENDERER_C3D
 								/* Same eligibility check as the
 								 * static-mxload path: BGOBJECT models
@@ -1484,7 +1476,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 
 							if( DoDisplay )
 							{
-								//count++;
 #ifdef RENDERER_C3D
 								/* Phong specular reads as tacky on
 								 * BGOBJECT models (doors, vents, large
@@ -1526,8 +1517,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 		perf_stage_end(PERF_S_MDLENTRY, -1);
 		i = nextmodel;
 	}
-
-	//DebugPrintf("drew %d objects\n", count);
 
 	if (!FSSetWorld(&identity))
 	{
@@ -1846,7 +1835,6 @@ void ProcessModels( void )
 	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
 	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
 		
-//						BloodPtr = &BloodOffsets[ ( ( Models[i].ModelNum - MODEL_BorgHead ) * 2 ) ];
 						BloodPtr = &BloodOffsets[ 0 ];
 						
 						ApplyMatrix( &Models[i].Mat, BloodPtr, &TempVector );
@@ -1862,7 +1850,6 @@ void ProcessModels( void )
 		
 								if( Models[i].TimeCount >= Models[i].TimeInterval )
 								{
-//									Models[i].TimeCount -= Models[i].TimeInterval;
 									Models[i].TimeCount = 0.0F;
 									Pos.x = ( Models[i].Pos.x + ( OffVector.x * GLOBAL_SCALE ) );
 									Pos.y = ( Models[i].Pos.y + ( OffVector.y * GLOBAL_SCALE ) );
@@ -1967,7 +1954,6 @@ void ProcessModels( void )
 					}
 	 				break;
 				case MODFUNC_OrbitPulsar:
-//					if( Ships[ Models[ i ].Ship ].enable && ( Ships[ Models[ i ].Ship ].NumMultiples ) )
 					if( ( ( GameStatus[ Models[ i ].Ship ] == STATUS_SinglePlayer ) || ( GameStatus[ Models[ i ].Ship ] == STATUS_Normal ) ) &&
 						( Ships[ Models[ i ].Ship ].NumMultiples ) )
 					{
@@ -2908,7 +2894,6 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 ===================================================================*/
 bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
@@ -2919,10 +2904,8 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 	u_int16_t					Green;
 	u_int16_t					Blue;
 	
-	//COLOR	*			OrigColours;
 	LPLVERTEX			VertPtr;
 
-	//COLOR_RGBA *			OrigRGBA;
 	COLOR_RGBA *			DestRGBA;
 
 	Col2 = ( ( Scale / MaxScale ) * 255.0F );
@@ -2946,7 +2929,6 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 			}
 
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
-//			OrigColours = DstMloadheader->Group[ Group ].org_colors[ ExecBuf ];
 			VertPtr = DstMloadheader->Group[ Group ].originalVerts[ ExecBuf ];
 
 			while( Vert-- )
@@ -3294,7 +3276,6 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
     LPLVERTEX	lpPointer = NULL;
 	LPLVERTEX	lpLVERTEX;
     LPLVERTEX	lpLVERTEX2;
-//	D3DEXECUTEBUFFERDESC	debDesc;
 	int		group;
 	int		execbuf;
 	int		vert;
@@ -3326,8 +3307,6 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 				return false;
 			}
 
-//			lpPointer = (LPLVERTEX) debDesc.lpData;
-
 			lpLVERTEX2 = MXAloadheader->Group[group].originalVerts[execbuf];
 			
 			lpLVERTEX = lpPointer;
@@ -3340,8 +3319,6 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 				lpLVERTEX2++;		
 			}
 			/*	unlock the execute buffer	*/
-//			if ( MXAloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( MXAloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
-//				return false;
 			if (!(FSUnlockVertexBuffer(&MXAloadheader->Group[group].renderObject[execbuf])))
 			{
 				return false;
@@ -3469,15 +3446,12 @@ __asm
 				r -= R;
 				g -= G;
 				b -= B;
-//				a -= A;
 				if( r < 0 )
 					r = 0;
 				if( g < 0 )
 					g = 0;
 				if( b < 0 )
 					b = 0;
-//				if( a < 0 )
-//					a = 0;
 				Colour = RGBA_MAKE( r, g, b, a);
 #endif
 				DstlpD3DLVERTEX->color = Colour;
@@ -3503,7 +3477,6 @@ __asm
 ===================================================================*/
 bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, int A , float rp , float gp , float bp)
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	LPLVERTEX			SrclpD3DLVERTEX = NULL;
 	u_int16_t					Group;
@@ -3567,7 +3540,6 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 				return false;
 			}
 
-//			DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
 			SrclpD3DLVERTEX = DstMloadheader->Group[ Group ].originalVerts[ExecBuf];
 
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
@@ -3624,15 +3596,12 @@ __asm
 				r -= R;
 				g -= G;
 				b -= B;
-//				a -= A;
 				if( r < 0 )
 					r = 0;
 				if( g < 0 )
 					g = 0;
 				if( b < 0 )
 					b = 0;
-//				if( a < 0 )
-//					a = 0;
 				Colour = RGBA_MAKE( r, g, b, a);
 #endif
 				DstlpD3DLVERTEX->color = Colour;
@@ -3661,7 +3630,6 @@ __asm
 ===================================================================*/
 bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
@@ -3689,8 +3657,6 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 			{
 				return false;
 			}
-
-//			DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
 
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
@@ -3743,7 +3709,6 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 bool LightModel( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
@@ -3815,8 +3780,6 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 				return false;
 			}
 
-//			DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
-
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
 			while( Vert-- )
@@ -3846,7 +3809,6 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 bool LightModel2( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
@@ -3918,8 +3880,6 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 				return false;
 			}
 
-//			DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
-
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
 			while( Vert-- )
@@ -3953,7 +3913,6 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
@@ -4024,8 +3983,6 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 					return false;
 				}
 	
-//				DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
-	
 				Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 	
 				while( Vert-- )
@@ -4060,7 +4017,6 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
@@ -4131,8 +4087,6 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 					return false;
 				}
 	
-//				DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
-	
 				Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 	
 				while( Vert-- )
@@ -4166,7 +4120,6 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 ===================================================================*/
 void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner, float Center_Damage, u_int16_t Group, BYTE Weapon, u_int16_t model )
 {
-//	int16_t		Count;
 	float		Damage;
 	u_int16_t		EndGroup;
 	VECTOR		DistVector;
@@ -4177,8 +4130,6 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 	VECTOR		Recoil;
 	u_int16_t		i, Next;
 	u_int16_t		nSecWalk;
-//	char		methodstr[256];
-//	char		tempstr[256];
 	ENEMY	*	Enemy;
 	ENEMY	*	NextEnemy;
 
@@ -4285,7 +4236,6 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 
 		if( ( Enemy->Status & ENEMY_STATUS_Enable ) && !( Enemy->Object.Flags & SHIP_Invul ) )
 		{
-//			if( ( OwnerType == OWNER_ENEMY ) && ( Enemy->Index != Owner ) || ( OwnerType != OWNER_ENEMY ) )
 			if( OwnerType != OWNER_ENEMY )
 			{
 				if( !SoundInfo[ Enemy->Object.Group ][ Group ] )
@@ -4531,9 +4481,6 @@ void CreateBodyPart( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t Mode
 		Models[ Model ].Dir.y += 5.0F;
 		Models[ Model ].Dir.z *= 5.0F;
 
-//		Models[ Model ].Dir.x = ( ( (float) Random_Range( 10000 ) ) - 5000.0F ) / 1000.0F;
-//		Models[ Model ].Dir.y = ( ( (float) Random_Range( 8000 ) ) + 2000.0F ) / 1000.0F;
-//		Models[ Model ].Dir.z = ( ( (float) Random_Range( 10000 ) ) - 5000.0F ) / 1000.0F;
 		Models[ Model ].Rot.x = ( ( (float) Random_Range( 10000 ) ) - 5000.0F ) / 1000.0F;
 		Models[ Model ].Rot.y = ( ( (float) Random_Range( 10000 ) ) - 5000.0F ) / 1000.0F;
 		Models[ Model ].Rot.z = ( ( (float) Random_Range( 10000 ) ) - 5000.0F ) / 1000.0F;
@@ -5071,7 +5018,6 @@ u_int16_t CreateLine( float x1, float y1, float z1, float x2, float y2, float z2
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight )
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
@@ -5093,8 +5039,6 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 	{
 		return false;
 	}
-
-//	DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
 
 	for( Count = 0; Count < 8; Count++ )
 	{
@@ -5161,7 +5105,6 @@ char *GetName(int Player)
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					    VECTOR * BottomRight )
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
@@ -5182,8 +5125,6 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 	{
 		return false;
 	}
-
-//	DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
 
 	for( Count = 0; Count < 8; Count++ )
 	{
@@ -5239,7 +5180,6 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 ===================================================================*/
 bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
@@ -5271,8 +5211,6 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 	{
 		return false;
 	}
-
-//	DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
 
 	for( Count = 0; Count < 8; Count++ )
 	{
@@ -5322,7 +5260,6 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 ===================================================================*/
 bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
@@ -5354,8 +5291,6 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 	{
 		return false;
 	}
-
-//	DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
 
 	for( Count = 0; Count < 8; Count++ )
 	{
@@ -5452,7 +5387,6 @@ void SetupModelSpotFX( u_int16_t i )
 	Input		:	u_int16_t		Ship
 	Output		:	Nothing
 ===================================================================*/
-//#define	PHIL_TESTSFX
 
 void UpdateShipModel( u_int16_t Ship )
 {
@@ -5470,7 +5404,6 @@ void UpdateShipModel( u_int16_t Ship )
 		{
 			if( Ships[ Ship ].ModelNum != (u_int16_t) -1 )
 			{
-//				DebugPrintf( "Deallocated Model %d for ship %d\n", Ships[ Ship ].ModelNum, Ship );
 
 				KillUsedModel( Ships[ Ship ].ModelNum );
 				Ships[ Ship ].ModelNum = (u_int16_t) -1;
@@ -5478,7 +5411,6 @@ void UpdateShipModel( u_int16_t Ship )
 
 			if( !Ships[ Ship ].Object.Components )
 			{
-//				DebugPrintf( "Allocated Componented Model for ship %d\n", Ship );
 				AllocateCompShip( Ship );
 			}
 
@@ -5538,7 +5470,6 @@ void UpdateShipModel( u_int16_t Ship )
 		{
 			if( Ships[ Ship ].Object.Components )
 			{
-//				DebugPrintf( "Deallocated Componented Model for ship %d\n", Ship );
 
 				FreeCompObjChildren( Ships[ Ship ].Object.Components, 1 );
 				free( Ships[ Ship ].Object.Components );
@@ -5573,8 +5504,6 @@ void UpdateShipModel( u_int16_t Ship )
 					Models[ Model ].Group = Ships[ Ship ].Object.Group;
 					Models[ Model ].LifeCount = (float) 10000.0F;
 					Ships[ Ship ].ModelNum = Model;
-
-//					DebugPrintf( "Allocated Model %d for ship %d\n", Model, Ship );
 
 #ifdef PHIL_TESTSFX
 					if( !Ship )
@@ -5655,7 +5584,6 @@ void UpdateShipModel( u_int16_t Ship )
 
 		if( Ships[ Ship ].ModelNum != (u_int16_t) -1 )
 		{
-//			DebugPrintf( "Deallocated Model %d for ship %d\n", Ships[ Ship ].ModelNum, Ship );
 
 			KillUsedModel( Ships[ Ship ].ModelNum );
 			Ships[ Ship ].ModelNum = (u_int16_t) -1;
@@ -5663,7 +5591,6 @@ void UpdateShipModel( u_int16_t Ship )
 
 		if( Ships[ Ship ].Object.Components )
 		{
-//			DebugPrintf( "Deallocated Componented Model for ship %d\n", Ship );
 
 			FreeCompObjChildren( Ships[ Ship ].Object.Components, 1 );
 			free( Ships[ Ship ].Object.Components );
@@ -5830,10 +5757,8 @@ void RefreshModel( u_int16_t model )
 				distance = POINT_TO_PLANE( &point, &Models[ model ].IntersectionPlane );
 				distance = 0.0F - distance;
 				
-				//distance = (float)fabsf((double)distance);
 				if ( ( distance > 0.0F ) &&  ( distance < SCAN_WINDOW_WIDTH ) )
 				{
-					//refresh_value = 1.0F;
 
 					refresh_value = 1.0F - ( distance / SCAN_WINDOW_WIDTH );
 										
@@ -5909,14 +5834,11 @@ u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_
 	if ( Speed > MAXMOVESPEED )
 		Speed = MAXMOVESPEED;
 	
-	//DebugPrintf("speed for owner type %d id %d = %d\n", OwnerType, OwnerID, Speed);
-
 	switch( OwnerType )
 	{
 		case OWNER_SHIP:
 			fracspeed = (float)fabsf( (double) ( Speed / MAXMOVESPEED ) );
 			newfreq = fracspeed * ( SHIP_MAX_FREQ - SHIP_MIN_FREQ ) + SHIP_MIN_FREQ;
-			//DebugPrintf("using frequency of %f\n", newfreq );
 			ModifyLoopingSfx( SoundFX_ID, newfreq, 0.0F );
 			break;
 		case OWNER_ENEMY:
@@ -6455,7 +6377,6 @@ bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner )
 bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 {
 	VECTOR Temp;
-//	D3DEXECUTEBUFFERDESC	debDesc;
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t execbuf;
@@ -6469,8 +6390,6 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 			if( (Mxloadheader->Group[group].exec_type[execbuf]&HASENVIROMENTMAP) != 0 )
 			{
 				/*	lock the execute buffer	*/
-//				memset(&debDesc, 0, sizeof(D3DEXECUTEBUFFERDESC));
-//				debDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
 
 //				if ( Mxloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Lock( Mxloadheader->Group[group].lpExBuf[execbuf], &debDesc ) != D3D_OK)
 //					return false ; // bjd
@@ -6480,8 +6399,6 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 				{
 					return false;
 				}
-
-//				lpLVERTEX = ( LPLVERTEX ) debDesc.lpData;
 
 				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] ; vert ++ )
 				{
@@ -6497,8 +6414,6 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 					lpLVERTEX++;
 				}
 				/*	unlock the execute buffer	*/
-//				if ( Mxloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( Mxloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
-//					return false ;
 				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
 				{
 					return false;

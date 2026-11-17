@@ -175,7 +175,6 @@ void InitVisiStats( MLOADHEADER *m )
 		max.x = g->center.x + g->half_size.x;
 		max.y = g->center.y + g->half_size.y;
 		max.z = g->center.z + g->half_size.z;
-//		CreateBoundingBox( &min, &max, j );
 	}
 #ifndef FINAL_RELEASE
 	InitDebugRays();
@@ -1291,7 +1290,6 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 			DispGroupTriggerAreas( (u_int16_t) g->group );
 			if ( CaptureTheFlag || CTF )
 				DisplayGoal( (u_int16_t) g->group );
-//			ShowAllColZones( (u_int16_t) g->group );
 
 			t += GroupTris[ g->group ];
 		}

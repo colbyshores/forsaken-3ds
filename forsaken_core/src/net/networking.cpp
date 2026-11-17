@@ -910,9 +910,6 @@ void InitShipStructure( int i , bool ResetScore )
 {
 	int16_t Count;
 
-
-//	memset(&Ships[i], 0, sizeof(GLOBALSHIP) );
-
 	CanDoDamage[i] = true;
 
 	Ships[i].BikeNum = ( i % MAXBIKETYPES );
@@ -1140,7 +1137,6 @@ void network_event_player_left( network_player_t * player )
 
 				InitShipStructure(i , false );
 
-				//memset(Names[i],0,sizeof(Names[i]));
 			}
 		}
 		reset_tracker();
@@ -1226,7 +1222,6 @@ void network_event_player_joined( network_player_t * player )
 
 void network_event_new_message( network_player_t * from, BYTE * data, int size )
 {
-	//DebugPrintf("network_event_new_message: type = %s\n",msg_to_str(*data));
 #ifdef DEMO_SUPPORT
 	QueryPerformanceCounter((LARGE_INTEGER *) &TempTime);
 	if( RecordDemo && ( MyGameStatus == STATUS_Normal ) )
@@ -1515,9 +1510,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	default:
 		break;
 	}
-
-	//DebugPrintf("EvaluateMessage: message %s got past initial checks\n",msg_to_str(*MsgPnt));
-				
 
 	// set flag sfx volume
 	FlagVolume = FlagSfxSlider.value / ( FlagSfxSlider.max / GLOBAL_MAX_SFX );
@@ -2753,7 +2745,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		if( ( GameStatus[lpStatus->WhoIAm] != STATUS_Normal) && (lpStatus->Status == STATUS_Normal ) ) 
 			CreateReGen( lpStatus->WhoIAm );
 
-		//DebugPrintf("setting status for player %d to %x\n", lpStatus->WhoIAm, lpStatus->Status );
 		GameStatus[lpStatus->WhoIAm] = lpStatus->Status;
 
 		if( GameStatus[lpStatus->WhoIAm] == STATUS_Left )
@@ -2768,7 +2759,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		}
 		else
 		{
-	//		DebugPrintf("%s status = %d\n", Names[lpStatus->WhoIAm], GameStatus[lpStatus->WhoIAm] );
 			Ships[lpStatus->WhoIAm].Pickups		= lpStatus->Pickups;
 			Ships[lpStatus->WhoIAm].RegenSlots	= lpStatus->RegenSlots;
 			Ships[lpStatus->WhoIAm].Mines			= lpStatus->Mines;
@@ -3145,7 +3135,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		Ships[lpInterpolate->WhoIAm].NextQuat = lpInterpolate->NextQuat;
 		Ships[lpInterpolate->WhoIAm].OldBank = Ships[lpInterpolate->WhoIAm].Object.Bank;
 		Ships[lpInterpolate->WhoIAm].NextBank = lpInterpolate->NextBank;
-//		Ships[lpInterpolate->WhoIAm].OldTime = GameElapsedTime;
 		Ships[lpInterpolate->WhoIAm].OldTime = DemoTimeSoFar;
 		Ships[lpInterpolate->WhoIAm].NextTime = lpInterpolate->NextTime;
 		Ships[lpInterpolate->WhoIAm].DemoInterpolate = true;
@@ -3496,7 +3485,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 
     case MSG_VERYSHORTUPDATE: // short packets on
-    	//DebugPrintf("net_msg: MSG_VERYSHORTUPDATE\n");
 
         lpVeryShortUpdate = (LPVERYSHORTUPDATEMSG)&CommBuff[0];
         lpVeryShortUpdate->MsgCode = msg;
@@ -3509,7 +3497,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 
     case MSG_UPDATE: // short packets off
-    	//DebugPrintf("net_msg: MSG_UPDATE\n");
 
         lpUpdate = (LPUPDATEMSG)&CommBuff[0];
         lpUpdate->MsgCode = msg;
@@ -3531,8 +3518,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_FUPDATE: // short packets off + fire weapon data
     	DebugPrintf("net_msg: MSG_FUPDATE\n");
 
-		//DebugPrintf("F UPDATE\n");
-
         lpFUpdate = (LPFUPDATEMSG)&CommBuff[0];
         lpFUpdate->MsgCode = msg;
         lpFUpdate->WhoIAm = WhoIAm;
@@ -3550,8 +3535,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_VERYSHORTFUPDATE: // short packets on + fire weapon data
     	DebugPrintf("net_msg: MSG_VERYSHORTFUPDATE\n");
 
-		//DebugPrintf("F UPDATE\n");
-
         lpVeryShortFUpdate = (LPVERYSHORTFUPDATEMSG)&CommBuff[0];
         lpVeryShortFUpdate->MsgCode = msg;
         lpVeryShortFUpdate->WhoIAm = WhoIAm;
@@ -3568,8 +3551,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
     case MSG_GROUPONLY_VERYSHORTFUPDATE:
     	DebugPrintf("net_msg: MSG_GROUPONLY_VERYSHORTFUPDATE\n");
-
-		//DebugPrintf("F UPDATE GROUP ONLY\n");
 
         lpGroupOnly_VeryShortFUpdate = (LPGROUPONLY_VERYSHORTFUPDATEMSG)&CommBuff[0];
         lpGroupOnly_VeryShortFUpdate->MsgCode = msg;
@@ -3915,17 +3896,14 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 				MessageColour = SystemMessageColour;
 				break;
 			case TEXTMSGTYPE_JoiningTeamGame:
-	//			strncpy( &lpTextMsg->Text[0]	, "%s is joining the game" , MAXTEXTMSG );
 				lpTextMsg->TextMsgType = Type;
 				MessageColour = SystemMessageColour;
 				break;
 			case TEXTMSGTYPE_EnteredWatchMode:
-	//			strncpy( &lpTextMsg->Text[0]	, "%s entered watch mode" , MAXTEXTMSG );
 				lpTextMsg->TextMsgType = Type;
 				MessageColour = SystemMessageColour;
 				break;
 			case TEXTMSGTYPE_ExitedWatchMode:
-	//			strncpy( &lpTextMsg->Text[0]	, "%s exited watch mode" , MAXTEXTMSG );
 				lpTextMsg->TextMsgType = Type;
 				MessageColour = SystemMessageColour;
 				break;
@@ -4035,8 +4013,6 @@ send:
 #endif
 
 	BytesPerSecSent += nBytes;
-
-	//DebugPrintf("Sending message type, %s  bytes %lu\n", msg_to_str(msg), nBytes);
 
 	if(!to)
 		network_broadcast( (void*) &CommBuff[0], nBytes, (network_flags_t)flags, channel );
@@ -4662,7 +4638,6 @@ bool UpdateAmmoAndValidateMessage( void * Message )
 			{
 				for( Count = 0; Count < Host_NumOfOrbitals[ Player ]; Count++ )
 				{
-//					if( !( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 					if( Ships[ Player ].SuperNashramTimer == 0.0F )
 					{
 						Host_OrbAmmo[ Player ][ Count ] -= (float) PrimaryWeaponAttribs[ ORBITPULSAR ].AmmoUsage[ PowerLevel ];
@@ -4853,7 +4828,6 @@ bool UpdateAmmoAndValidateMessage( void * Message )
 			{
 				for( Count = 0; Count < Host_NumOfOrbitals[ Player ]; Count++ )
 				{
-//					if( !( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 					if( Ships[ Player ].SuperNashramTimer == 0.0F )
 					{
 						Host_OrbAmmo[ Player ][ Count ] -= (float) PrimaryWeaponAttribs[ ORBITPULSAR ].AmmoUsage[ PowerLevel ];
@@ -5044,7 +5018,6 @@ bool UpdateAmmoAndValidateMessage( void * Message )
 			{
 				for( Count = 0; Count < Host_NumOfOrbitals[ Player ]; Count++ )
 				{
-//					if( !( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 					if( ( Ships[ Player ].SuperNashramTimer == 0.0F ) )
 					{
 						Host_OrbAmmo[ Player ][ Count ] -= (float) PrimaryWeaponAttribs[ ORBITPULSAR ].AmmoUsage[ PowerLevel ];

@@ -38,7 +38,6 @@ void input_grab( bool grab )
 	SDL_ShowCursor( grab ? SDL_DISABLE : SDL_ENABLE );
 #endif
 
-	//DebugPrintf("input state: %s\n",(grab?"grabbed":"free"));
 }
 
 //////////////////////////////////////////////
@@ -108,7 +107,6 @@ void app_resize( SDL_WindowEvent * window )
 
 void app_active( SDL_WindowEvent * window )
 {
-//	DebugPrintf("window active state set to: %s\n",(active->gain?"true":"false"));
 
 // SDL2 window events carry the specific gained/lost state
 	bool gained  = window -> event == SDL_WINDOWEVENT_FOCUS_GAINED;
@@ -213,25 +211,21 @@ void app_keyboard( SDL_KeyboardEvent * key )
 
 void mouse_wheel_up( void )
 {
-	//DebugPrintf("mouse wheel up pressed\n");
 	mouse_state.wheel = 1;
 }
 
 void mouse_wheel_down( void )
 {
-	//DebugPrintf("mouse wheel down pressed\n");
 	mouse_state.wheel = -1;
 }
 
 void reset_mouse_wheel( void )
 {
-	//DebugPrintf("mouse wheel state reset\n");
 	mouse_state.wheel = 0;
 }
 
 void app_mouse_wheel( SDL_MouseWheelEvent * _event )
 {
-	//printf("mouse wheel = { x = %d, y = %d }\n", _event->x, _event->y);
 	if(_event->y > 0) { mouse_wheel_up();   input_buffer_send( UP_MOUSE   ); }
 	if(_event->y < 0) { mouse_wheel_down(); input_buffer_send( DOWN_MOUSE ); }
 }
@@ -647,8 +641,6 @@ bool handle_events( void )
 
 	reset_events();
 
-	//DebugPrintf("processing events\n");
-
 	while( SDL_PollEvent( &_event ) )
 	{
 		switch( _event.type )
@@ -722,8 +714,6 @@ bool handle_events( void )
 			break;
 		}
 	}
-
-	//DebugPrintf("DONE processing events\n");
 
 	if ( quitting )
 	{

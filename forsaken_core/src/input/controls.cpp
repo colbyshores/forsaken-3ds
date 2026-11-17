@@ -225,14 +225,6 @@ int Lumberjack( char *cheat )
     SecondaryToFireLookup[ PINEMINE ] = PINEMINE;
     SecondaryToFireLookup[ QUANTUMMINE ] = QUANTUMMINE;
     SecondaryToFireLookup[ SPIDERMINE ] = SPIDERMINE;
-//    SecondaryToFireLookup[ PINEMISSILE ] = PINEMISSILE;
-//    SecondaryToFireLookup[ TITANSTARSHRAPNEL ] = TITANSTARSHRAPNEL;
-//    SecondaryToFireLookup[ ENEMYSPIRALMISSILE ] = ENEMYSPIRALMISSILE;
-//    SecondaryToFireLookup[ ENEMYHOMINGMISSILE ] = ENEMYHOMINGMISSILE;
-//    SecondaryToFireLookup[ ENEMYBLUEHOMINGMISSILE ] = ENEMYBLUEHOMINGMISSILE;
-//    SecondaryToFireLookup[ ENEMYFIREBALL ] = ENEMYFIREBALL;
-//    SecondaryToFireLookup[ ENEMYTENTACLE ] = ENEMYTENTACLE;
-//    SecondaryToFireLookup[ ENEMYDEPTHCHARGE ] = ENEMYDEPTHCHARGE;
     SecondaryWeaponCheat = false;
   }
   else
@@ -486,8 +478,6 @@ static void ReadKeyboard( void )
 #else
 	keys = SDL_GetKeyState( &nkeys );
 #endif
-
-	//printf("number of keys = %d\n",nkeys);
 
 	memset( &key_state[ new_input ], 0, SDLK_LAST );
 
@@ -808,7 +798,6 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
     if( MyGameStatus == STATUS_Normal )
     {
 		SendBikerTaunt(); // (Sfx.c)
-      //SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_SpeechTaunt, 0);
     }
   }
 #endif

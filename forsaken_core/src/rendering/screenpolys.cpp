@@ -2413,14 +2413,12 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      		   		ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 1;
 		      		   		ScrPolyFacePnt->v3 = 2;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
 
 		      		   		ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 2;
 		      		   		ScrPolyFacePnt->v3 = 3;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
       		
@@ -2591,14 +2589,12 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 1;
 		      		   		ScrPolyFacePnt->v3 = 2;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
 
 		      		   		ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 2;
 		      		   		ScrPolyFacePnt->v3 = 3;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
 
@@ -2792,10 +2788,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 
 	ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
 
-//	lpBufStart = ExecBuffer_debdesc.lpData;
 	ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
-	//lpPointer = (LPVOID) ( ScrPolyVertPnt + TotalVerts );
-//	lpInsStart = lpPointer;
 
 /*===================================================================
 		Fill in Exec Buffer ( Verts and Faces Simultaneously )
@@ -2836,8 +2829,6 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 */
 			}
 
-	   		//ScrPolyFacePnt = (LPTRIANGLE) lpPointer;
-			
 			if( Count == *TPage ) i = *NextScrPoly;
 			else i = ScrPolyTPages[ Count ].FirstPoly;
 	
@@ -3016,14 +3007,12 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 1;
 		      		   		ScrPolyFacePnt->v3 = 2;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
 
 		      		   		ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 2;
 		      		   		ScrPolyFacePnt->v3 = 3;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
 							
@@ -3213,14 +3202,12 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 1;
 		      		   		ScrPolyFacePnt->v3 = 2;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
 
 		      		   		ScrPolyFacePnt->v1 = 0;
 		      		   		ScrPolyFacePnt->v2 = 2;
 		      		   		ScrPolyFacePnt->v3 = 3;
-//		      		   		ScrPolyFacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
       						
@@ -3282,13 +3269,10 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 				i = ScrPolys[ i ].NextInTPage;
 			}
 
-	   		//lpPointer = ( LPVOID ) ScrPolyFacePnt;
 		}
 
 		if( StartVert >= MAXSCREENPOLYVERTS ) break;
 	}
-
-//	OP_EXIT( lpPointer );
 
 /*===================================================================
 		UnLock Exec Buffer and set data description

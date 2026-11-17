@@ -97,7 +97,6 @@ void BOTAI_UpdateSensors()
 		// i died, reset flags 
 		if( CurrentDeaths > PrevDeaths )
 		{
-			//DebugPrintf("i died\n");
 			CurrentNode = -1;
 			GettingPickup = -1;
 			IFiredTitan = -1.0F;
@@ -190,12 +189,6 @@ void BOTAI_UpdateSensors()
 	BOTAI_GetNearestPickup();
 	FriendlyFire = BOTAI_FriendlyFireCheck();
 	BOTAI_GetSHIPTarget();
-
-	//DebugPrintf("r: %.1f l: %.1f u: %.1f d: %.1f f: %.1f b: %.1f\n", DistWall[0], DistWall[1], DistWall[2], DistWall[3], DistWall[8], DistWall[9]);
-	//DebugPrintf("ur: %.1f ul: %.1f dr: %.1f dl: %.1f\n", DistWall[22], DistWall[23], DistWall[24], DistWall[25]);
-	//DebugPrintf("%f %f %f\n", Ships[WhoIAm].Object.Pos.x, Ships[WhoIAm].Object.Pos.y, Ships[WhoIAm].Object.Pos.z); 
-	//DebugPrintf("Level: %s\n", ShortLevelNames[LevelNum]);
-	//DebugPrintf("nearest node = %d\n", BOTAI_GetNearestNode(&Ships[WhoIAm].Object));
 
 	// if there is a target
 	if(TargetShipID > - 1)

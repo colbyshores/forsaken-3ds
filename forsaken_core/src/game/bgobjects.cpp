@@ -352,14 +352,10 @@ void ProcessBGObjects( bool Collide )
 								{
 									ChangeBGState( Object, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
 
-//									if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, NULL ) )
 									{
 										HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
 									}
-//									else
-//									{
 										ForceExternalOneOff( WhoIAm, &PushVector );
-//									}
 									UndoAnim = true;
 								}
 							}
@@ -441,7 +437,6 @@ void ProcessBGObjects( bool Collide )
 							{
 								if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
 								{
-//									if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, NULL ) )
 									{
 										HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
 									}
@@ -760,7 +755,6 @@ void ProcessBGObjects( bool Collide )
 								{
 									if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
 									{
-//										if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, NULL ) )
 										{
 											HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
 										}
@@ -1444,9 +1438,6 @@ bool LoadBGOFiles( void )
 			Object->ColRadius = CalcObjectRadius( &Object->ColCenter, &Object->ColTopLeft, &Object->ColBottomRight );
 
 			SetCompObjRealLighting( Object->Children, Object->NumChildren, Object->Radius );
-
-//			CreateBoundingBox( &Object->TopLeft, &Object->BottomRight, Object->Group );
-//			CreateBoundingBox( &Object->ColTopLeft, &Object->ColBottomRight, Object->Group );
 
 			FilePtr++;
 		}
@@ -2274,7 +2265,6 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 					{
 					HitFlag = true;
 
-//					if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, EnemyTypes[ Enemy->Type ].Radius, NULL ) )
 					{
 						if( Damage != 0.0F )
 						{
@@ -2374,7 +2364,6 @@ bool CheckBGObjectToPickups( BGOBJECT * Object )
 					}
 					else
 					{
-//						KillPickup( Pickup->Owner, Pickup->ID, PICKUPKILL_Disappear );
 					}
 				}
 			}

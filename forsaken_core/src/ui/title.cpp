@@ -3089,8 +3089,6 @@ EXCLUDEDVERTICES VduScreenExcluded = {0, 1, EXCLUDE_ALL, {0}};
 EXCLUDEDVERTICES VduFrameExcluded = {0, 0, EXCLUDE_ALL, {0}};
 float rtintamount, gtintamount, btintamount, atintamount1, atintamount2, atintamount3, atintamount4, tinttheta;
 
-//int HoloMorphVerts[24] = {8, 9, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54};
-//int HoloMorphVerts[24] = {40, 9, 18, 14, 48, 16, 34, 8, 20, 44, 24, 42, 26, 50, 12, 28, 30, 54, 32, 38, 46, 36, 52, 22 };
 int HoloMorphVerts[24] = {9, 14, 18, 22, 26, 30, 34, 38, 42, 46, 50, 54, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52};
 int HoloTintVerts[24] = {10, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55};
 /*float FlatXOffset = 176.0F;
@@ -4211,8 +4209,6 @@ void PlaceObjects(void)
 	BuildRotMatrix(HoloRotx, HoloRoty, HoloRotz, &Mat_R);
 	Models[BackgroundModel[TITLE_MODEL_Holopad]].Mat = Mat_R;
 	MatrixTranspose(&Mat_R, &Models[BackgroundModel[TITLE_MODEL_Holopad]].InvMat);
-	//Models[BackgroundModel[TITLE_MODEL_HoloLight]].Mat = Mat_R;
-	//MatrixTranspose(&Mat_R, &Models[BackgroundModel[TITLE_MODEL_HoloLight]].InvMat);
 
 	HoloLightBrightness = 0.0F;
 
@@ -4949,7 +4945,6 @@ Event handling
 	{
   		for( Item = CurrentMenu->Item ; Item->x >= 0 ; Item++ )
 		{	
-			//if( Item->highlightflags & TEXTFLAG_RefreshList)
 			if ( (Item->FuncDraw == DrawFlatMenuList) || (Item->FuncDraw == DrawSplitMenuList) )
 			{	
 				l = (LIST *)(Item->Variable);
@@ -5383,7 +5378,6 @@ void MenuDraw( MENU * Menu )
 	if ( Menu->MenuFuncDraw )
 		Menu->MenuFuncDraw ( &DiscStatus);
 
-	//if ( (CameraStatus != CAMERA_AtDiscs) && (CameraStatus != CAMERA_AtVDU))
 	if (CameraStatus == CAMERA_AtStart)
 		CenterPrint4x5Text( (char*)Menu->Name , y , InGameMenuColour );
 
@@ -5465,7 +5459,6 @@ void MenuChange( MENUITEM * Item )
 		{
 			VduClear();
 			ProcessVduItems(CurrentMenu);
-			//VDU_Ready = false;
 			LastMenuItem = NULL;
 		}
 	}
@@ -5536,7 +5529,6 @@ void MenuBack()
 		{
 			VduClear();
 			ProcessVduItems(CurrentMenu);
-			//VDU_Ready = false;
 			LastMenuItem = NULL;
 		}
 
@@ -6817,7 +6809,6 @@ void NewInitBikeMenu ( MENU *Menu)
 ===================================================================*/
 void ExitBikerMenu( MENU *Menu )
 {
-//	if ( ( memcmp( &Config, player_config, sizeof( Config ) ) ) || ForceConfigSave )
 	{
 		ForceConfigSave = false;
 		*player_config = Config;
@@ -7522,7 +7513,6 @@ void SelectListSearch( LIST *l, char *keyword )
 
 void CancelListSelection( LIST *l )
 {
-//	MENUITEM *NewItem;
 
 	l->selected_item = OriginalSelection;
 	if ( l->selected_item > 0 && l->selected_item < l->items )
@@ -8035,7 +8025,6 @@ void InitMultiplayerHostVDUPeerPeer( MENU *Menu )
 		DebugPrintf("level select: finding level by name in %d items\n",LevelList.items);
 		for ( i = 0; i < LevelList.items; i++ )
 		{
-			//DebugPrintf("level select: testing level %d: %s\n",i,LevelList.item[i]);
 			if ( !strncasecmp( (char*)LevelList.item[ i ], level_name, 7 ) )
 			{
 				DebugPrintf("level select: found last level at index %d\n",i);
@@ -8287,7 +8276,6 @@ void InitSinglePlayerGame( MENU *Menu )
 {
 	if ( !InitLevels( SINGLEPLAYER_LEVELS ) && !InitLevels( DEFAULT_LEVELS ) )
 	{
-		//Msg( "No single player levels" );
 		PrintErrorMessage (LT_NoSinglePlayerLevelsInstalled, 1, NULL, ERROR_USE_MENUFUNCS );
 		return;
 	}
@@ -8360,7 +8348,6 @@ void ExitBikeSelection( MENUITEM * item )
 	if( CameraStatus != CAMERA_AtStart )
 		ShowHoloModel( HoloModelLookup[ BikeList.selected_item ] );
 
-//		SelectedBike = BikeModels[ BikeList.selected_item ];
 	SelectedBike = BikeList.selected_item;
 	SelectedBikeFrame = BikeChars[ BikeList.selected_item ];
 	SelectedBikeModel = BikeModelLookup[ BikeList.selected_item ];
@@ -8703,7 +8690,6 @@ void InitLoadSavedGameList( MENU * Menu )
 
 	find_close();
 #endif
-//	LoadSavedGameList.FuncDelete = ( LoadSavedGameList.items > 0 ) ? DeleteSavedGame : NULL;
 }
 
 /*===================================================================
@@ -8757,7 +8743,6 @@ void ExitLevelSelect( MENU * Menu )
 	CurrentMenuItem = NULL;
 	MenuStackLevel = 0;
 	NewLevelNum = LevelList.selected_item;
-//	LevelNum = -1;			// Force Level change even if same level;
 
 }
 
@@ -9218,7 +9203,6 @@ void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *
 				tempvert.y = VertPtr[i].y * Models[Model].Yscale;
 				tempvert.z = VertPtr[i].z * Models[Model].Zscale;
 
-				//dist = -(POINT_TO_PLANE( &tempvert, plane ));
 				dist = tempvert.z;	// assumes z plane!!!
 
 				if (dist > *maxoffset)
@@ -9249,7 +9233,6 @@ void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *
 				tempvert.y = VertPtr[i].y * Models[Model].Yscale;
 				tempvert.z = VertPtr[i].z * Models[Model].Zscale;
 
-				//dist = -(POINT_TO_PLANE( &tempvert, plane ));
 				dist = tempvert.z;
 
 				if (dist > *maxoffset)
@@ -9265,7 +9248,6 @@ void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *
 
 bool MakeTranslucent( u_int16_t Model )
 {
-//	D3DEXECUTEBUFFERDESC	DstDebDesc;
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
@@ -9298,8 +9280,6 @@ bool MakeTranslucent( u_int16_t Model )
 					return false;
 				}
 
-//				DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
-
 				Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
 				ColourPtr = DstMloadheader->Group[Group].originalVerts[ExecBuf];
@@ -9312,10 +9292,6 @@ bool MakeTranslucent( u_int16_t Model )
 					blue = (u_int8_t)RGBA_GETBLUE(ColourPtr->color);
 					alpha = (u_int8_t)RGBA_GETALPHA(ColourPtr->color);
 					
-					//red = (u_int8_t)((float)red * BikeCol);
-					//green = (u_int8_t)((float)green * BikeCol);
-					//blue = (u_int8_t)((float)blue * BikeCol);
-					//alpha = (u_int8_t)((float)alpha * BikeAlpha);
 					red = 255;
 					green = 255;
 					blue = 255;
@@ -9360,8 +9336,6 @@ bool MakeTranslucent( u_int16_t Model )
 				{
 					return false;
 				}
-
-				//DstlpD3DLVERTEX = (LPLVERTEX) DstDebDesc.lpData;
 
 				Vert = DstMxloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
@@ -10733,7 +10707,6 @@ void ProcessFlatSliders(void)
 		 
 			if (slider->redraw_req)
 			{
-				//DebugPrintf("slider redrawn\n");
 				RedrawFlatMenuSlider(ActiveSliderItem[i].Item);
 			}
 
@@ -10790,7 +10763,6 @@ void DrawFlatMenuName( MENUITEM *Item )
 	char *var;
 	TEXTINFO *TextInfo;
 
-	//var = (char *)(Item->Variable);
 	var = (char*)Item->Variable;
 	  
 	//allocate space for textinfo
@@ -10926,7 +10898,6 @@ void StoreWeaponOrder( MENU *Menu )
 		PriorityList[WeaponList[i]] = -1;
 	}
 	
-//	if ( memcmp( &Config, player_config, sizeof( Config ) ) )
 	{
 		*player_config = Config;
 		write_config( player_config, biker_config );
@@ -11115,7 +11086,6 @@ bool Plot2dBox (TEXTINFO *TextInfo)
 		ScrPolys[screenpoly[CurrentScreenPoly]].x4 = ((float)TextInfo->xmin + VDUoffsetX) * ModeScaleX;
 		ScrPolys[screenpoly[CurrentScreenPoly]].y4 = ((float)TextInfo->ymax + VDUoffsetY) * ModeScaleY;
 		AddScrPolyToTPage(screenpoly[CurrentScreenPoly], GetTPage( NULL, 0 ) );
-    	//AddScrPolyToTPage( screenpoly[CurrentScreenPoly], GetTPage( *ScrPolys[ screenpoly[CurrentScreenPoly] ].Frm_Info, 0 ) );
 		
 		r = 255; g = 255; b = 255;
 		
@@ -11290,7 +11260,6 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 				
 				TEXTINFO_currenty += PreviousHeight + TEXTINFO_LineSpace;
 				TEXTINFO_currentx = 0.0F;
-				//TEXTINFO_currentheight = 0.0F;
 
 				ForceNewLine = false;
 			}
@@ -11445,8 +11414,6 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 	if ((pos != -1) && (pos != -2))
 	{	if (TextLookup[font][TextInfo->text[pos]])
 			OKtoProcess = true;		
-//		else
-			//TextInfo->currentchar[line]++;
 	}
 	
 	if ((OKtoProcess) || (pos == -1) || (pos == -2))
@@ -11806,7 +11773,6 @@ void PrintTextItem (TEXTINFO *TextInfo)
 			{
 			 	if (!(TextInfo->flags & TEXTFLAG_ForceFit))
 				{
-					//Msg( "FormatTextItem() : returned false\nbounding box for text ( %s ) too small??\n", TextInfo->text );
 					DebugPrintf( "FormatTextItem() : returned false\tbounding box for text ( %s ) too small??\n", TextInfo->text );
 				}
 				else
@@ -11838,8 +11804,6 @@ void PrintTextItem (TEXTINFO *TextInfo)
 	}
 
 	TextInfo->currenty = 0.0F;
-
-	//TeleTypeTimer = 0.0F;
 
 	for (i = 0; i < TextInfo->num_lines; i++)
 	{
@@ -11968,7 +11932,6 @@ Highlight box
 			switch (HighlightStatus[i])
 			{
 			case HIGHLIGHT_Static:
-//					if (CurrentMenu == &MENU_NEW_JoinWaitingToStart)
 				DrawHighlightBox(HighlightItem[i], 64, 255, 64);
 				break;
 			default:
@@ -12633,9 +12596,6 @@ void InitEventGeneralPan(TITLE_EVENT *TitleEvent)
 
 void InitEventDiscPan(TITLE_EVENT *TitleEvent)
 {
-	//InitEventGeneralPan(TitleEvent);
-	//VduClear();
-	//VDU_Ready = false;
 }
 
 void EventDiscPan(TITLE_EVENT *TitleEvent)
@@ -12656,8 +12616,6 @@ void InitEventRightVDUPan(TITLE_EVENT *TitleEvent)
 {
 	MATRIX Mat_R;
 
-	//InitEventGeneralPan(TitleEvent);
-	
 	if (!CompareVectors(Models[BackgroundModel[TITLE_MODEL_VDU]].Pos, RightVDU.Pos))
 	{
 		Models[BackgroundModel[TITLE_MODEL_VDU]].Pos = RightVDU.Pos;
@@ -12698,8 +12656,6 @@ void ExitEventVDUPan(TITLE_EVENT *TitleEvent)
 void InitEventLeftVDUPan(TITLE_EVENT *TitleEvent)
 {
 	MATRIX Mat_R;
-
-	//InitEventGeneralPan(TitleEvent);
 
 	if (!CompareVectors(Models[BackgroundModel[TITLE_MODEL_VDU]].Pos, LeftVDU.Pos))
 	{
@@ -12987,7 +12943,6 @@ void ExitEventJudderHoloPad(TITLE_EVENT *TitleEvent)
 
 void InitEventDiscPanFromRightInit(TITLE_EVENT *TitleEvent)
 {
-	//InitEventGeneralPan(TitleEvent);
 }
 
 void EventDiscPanInit(TITLE_EVENT *TitleEvent)
@@ -13014,7 +12969,6 @@ void EventLowerStack(TITLE_EVENT *TitleEvent)
 
 	currenttime = (float)SIND(currenttime * 90.0F);
 
-	//RotateDiscStack((currenttime * (MaxStackTheta - MinStackTheta)) + MinStackTheta);
 	RotateDiscStack (currenttime * MaxStackTheta);
 
 }
@@ -13319,7 +13273,6 @@ void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 	if (length > actuallength)
 		length = actuallength;
 	
-	//xmin = (float)(TextInfo->xmin + VDUoffsetX) * ModeScaleX;
 	xmin = TextInfo->char1x - widthX;
 	xmax = xmin + length + widthX * 2.0F;
 	ymin = TextInfo->text_y_min - widthY;
@@ -13628,7 +13581,6 @@ void InitJoystickList ( MENU *Menu )
 void InitJoystickAxisConfig ( MENU *Menu)
 {
 	int i, j;
-//	float mid;
 	SCRPOLY_RGB light, dark, polycol[NUM_SHIP_AXIS_ACTIONS][2];
 	float sensitivity;
 
@@ -13737,10 +13689,7 @@ void InitJoystickAxisConfig ( MENU *Menu)
 
 	AxisPtr_mid = (AXISTEST_XPos + AXISTEST_Width / 2.0F) + VDUoffsetX;
 	AxisPtr_mid *= ModeScaleX;
-//	mid = (AXISTEST_XPos + AXISTEST_Width / 2.0F); 
 	
-//	AxisPtr_xmin = mid - AXISTEST_PtrWidth / 2.0F + VDUoffsetX;
-//	AxisPtr_xmax = mid + AXISTEST_PtrWidth / 2.0F + VDUoffsetX;
 	AxisPtr_ymin = AXISTEST_YPos + VDUoffsetY;
 	AxisPtr_ymax = AXISTEST_YPos + AXISTEST_Height + VDUoffsetY;
 
@@ -13991,8 +13940,6 @@ void CheckJoyAxis( int *dummy )
 
 	pos = (float) joy_axis_state[ joystick ][ axis ];
 
-	//DebugPrintf("%f\n",pos);
-
 	pos = pos * JoystickInfo[ joystick ].Axis[ axis ].sensitivity;
 
 	if ( JoystickInfo[ joystick ].Axis[ axis ].fine )
@@ -14066,7 +14013,6 @@ void ExitJoySetup( MENU *Menu )
 
 void ExitMouseSetup( MENU *Menu )
 {
-//	if ( memcmp( &Config, player_config, sizeof( Config ) ) )
 	{
 		*player_config = Config;
 		write_config( player_config, biker_config );
@@ -14153,7 +14099,6 @@ void RestoreDefaultControlSettings( MENUITEM *Item )
 
 void InitSelectedLevelText( MENU *Menu )
 {
-//	strcpy( SelectedLevelText, MissionBriefing[ CurrentLevel ] );
 }
 
 void PrepareNextLevelStart( MENU *Menu )
@@ -16111,7 +16056,6 @@ bool ProcessPlayerList ( int Key )
 		KillBikeChar( NULL );
 		LoadBikeChar( &BikeCharItem );
 
-//		RedrawFlatMenuList(CurrentMenuItem);
 	}
 
 	
@@ -16564,7 +16508,6 @@ void MenuProcess()
 				{	
 					MenuState = MENUSTATE_Select;
 #endif
-	//				RedrawFlatMenuKey( KeyItem);
 					CheckKeysForChanges();
 					CurrentMenuItem->TextInfo[0]->highlighttype = HIGHLIGHT_Pulsing;
 				}

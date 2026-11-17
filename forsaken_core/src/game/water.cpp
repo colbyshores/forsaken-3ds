@@ -433,7 +433,6 @@ bool InitWaterObject(WATEROBJECT * WO)
 			lpLVERTEX->tu = 0.0F;
 			lpLVERTEX->tv = 0.0F;
 			lpLVERTEX->color = RGBA_MAKE(128,128,128,128);
-//			lpLVERTEX->dwReserved = 0;
 			
 			lpLVERTEX++;
 
@@ -451,12 +450,10 @@ bool InitWaterObject(WATEROBJECT * WO)
 			FacePnt->v1 = i+WO->YVerts+1;
 			FacePnt->v2 = i+WO->YVerts;
 			FacePnt->v3 = i;
-//			FacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			FacePnt++;
 			FacePnt->v1 = i+1;
 			FacePnt->v2 = i+WO->YVerts+1;
 			FacePnt->v3 = i;
-//			FacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			FacePnt++;
 		}
 	}
@@ -536,9 +533,7 @@ void GroupWaterProcessDisplay( u_int16_t group )
 void UpdateWaterMesh( WATEROBJECT * WO )
 {
 	int x,y;
-// 	D3DEXECUTEBUFFERDESC	debDesc;
 	LPLVERTEX	lpLVERTEX;
-//  LPVOID lpBufStart;
 	int col;
 	float dx, dy;
 	float u, v;
@@ -644,8 +639,6 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 		}
 	}
 	/*	unlock the execute buffer	*/
-//	if ( WO->lpExBuf->lpVtbl->Unlock( WO->lpExBuf ) != D3D_OK)
-//		return;
 	if (!(FSUnlockVertexBuffer(/*WO->lpVertexBuffer*/&WO->renderObject)))
 	{
 		return;

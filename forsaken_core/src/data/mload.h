@@ -21,7 +21,6 @@
 /*
  * defines
  */
-//#define	CELLSIZE ( 2048.0F * GLOBAL_SCALE )
 #define	CELLSIZE ( 256.0F )
 #define	BLOCKSIZE		( 1024.0F * GLOBAL_SCALE )
 

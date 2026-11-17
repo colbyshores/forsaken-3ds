@@ -73,7 +73,6 @@ num_frames : u_int16_t // number of animation frames
 ===================================================================*/
 #define	MXA_VERSION_NUMBER	2
 
-//#define FIX_MXA_UV
 #undef FIX_MXA_UV
 
 /*===================================================================
@@ -241,8 +240,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			lpLVERTEX2 = (LPOLDLVERTEX ) Buffer;
 
-			//vertexArray = (LVERTEX*)malloc(sizeof(LVERTEX) * num_vertices);
-
 			/*	create a vertex buffer	*/
 			if (!FSCreateVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], num_vertices))
 			{
@@ -282,7 +279,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				lpLVERTEX[i].color = old->color;
 
 #if !ACTUAL_TRANS
-				//lpLVERTEX->color |= 0xFF000000;
 				lpLVERTEX[i].color |= 0xFF000000;
 #endif
 				// nothing used specular so we removed it from LVERTEX
@@ -427,13 +423,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 						colourkey++;
 						MFacePnt->pad &= ~1;
 					}
-//					FacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
-//					FacePnt->wFlags = MFacePnt->pad;
 #ifdef FIX_MXA_UV
 					FixUV( &FacePnt, lpBufStart, tpage, Mxaloadheader->Group[group].originalVerts[execbuf] );
 #endif
-					//lpLVERTEX+=3;
-					//FacePnt++;
 					MFacePnt++;
 					lpNormals++;
 					tempInt+=3;
@@ -508,8 +500,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			Mxaloadheader->Group[group].renderObject[execbuf].numTextureGroups = num_texture_groups;
 
-			//free(vertexArray);
-			//vertexArray = NULL;
 		}
 	}
 				
@@ -724,9 +714,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Colour = *Uint32Pnt++;
 
 #if	MXA_VERSION_NUMBER == 2
-//				Int16Pnt = (int16_t *) Uint32Pnt;
-//				SpotFXPtr->SoundFX = *Int16Pnt++;
-//				Uint16Pnt = (u_int16_t *) Int16Pnt;
 
 				Int8Pnt = (int8_t *) Uint32Pnt;
 

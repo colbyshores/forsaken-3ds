@@ -529,7 +529,6 @@ int DisplayGoal( u_int16_t group )
 			{
 				c[ k ] = Colourtrans[ TeamCol[ Goal[ j ].team ] ][ k ];
 			}
-//			DisplayTriggerZone( Goal[ j ].Zone, Goal[ j ].num_sides, group, c[ 0 ], c[ 1 ], c[ 2 ], 128 );
 			ShowGoal( &Goal[ j ], c[ 0 ], c[ 1 ], c[ 2 ], 128 );
 			shown++;
 		}

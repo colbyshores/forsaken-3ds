@@ -17,7 +17,6 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-//#define	SINT_PEACEFROG_CHEAT	1
 
 #define	MIS_ACCELERATE		0		// Missile Sequences
 #define	MIS_DROP			1		

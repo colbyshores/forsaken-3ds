@@ -982,7 +982,6 @@ bool CollectPickup( u_int16_t i )
 				{
 					SecondaryAmmo[ THIEFMISSILE ] += 1;
 					NewSecondaryWeapon( THIEFMISSILE );
-//					MessageSFX = SFX_Select_ThiefMissile;
 				}
 				else
 				{
@@ -1441,7 +1440,6 @@ bool CollectPickup( u_int16_t i )
 				NumGoldBars ++;
 				if( !( NumGoldBars % 10 ) )
 				{
-//					NumGoldBars = 0;
 					Lives += 1;
 					sprintf( (char*)&Message[0], YOUVE_EARNED_EXTRA_LIFE );
 					PlaySfx( SFX_ExtraLife, 1.0F );
@@ -1642,7 +1640,6 @@ bool CollectPickup( u_int16_t i )
 				{
 					if( Ships[ WhoIAm ].NumMultiples < MAXMULTIPLES )
 					{
-//						Ships[ WhoIAm ].Object.Flags |= SHIP_Multiple;
 						Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples ] = MAXMULTIPLEAMMO;
 						Ships[ WhoIAm ].NumMultiples++;
 						CreateOrbitPulsar( WhoIAm );
@@ -2551,7 +2548,6 @@ void ProcessPickups( void )
 						Pickups[ i ].LifeCount -= framelag;
 						if( Pickups[ i ].LifeCount <= 0.0F )
 						{
-//							if( ( Pickups[ i ].Type >= PICKUP_Trojax ) && ( Pickups[ i ].Type <= PICKUP_Laser ) )
 							{
 #if DEBUG_PICKUPS
 								DebugPrintf( "pickups: Tell %s to dissapear\n", Messages[ Pickups[ i ].Type ] );
@@ -2576,7 +2572,6 @@ void ProcessPickups( void )
 						( ( ( Pickups[ i ].Owner != (u_int16_t) -1 ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) ||
 						( PlayDemo ) )
 					{
-//						if( ( Pickups[ i ].Type >= PICKUP_Trojax ) && ( Pickups[ i ].Type <= PICKUP_Laser ) )
 						{
 #if DEBUG_PICKUPS
 							DebugPrintf( "pickups: Kill %s immediatly\n", Messages[ Pickups[ i ].Type ] );
@@ -2731,7 +2726,6 @@ void ProcessPickups( void )
 									if ( MoveDist > 0.0F )
 										AddColourMessageToQue(FlagMessageColour, FLAG_DRIFTED_BACK, TeamName[ team ] );
 									TeamFlagAtHome[ team ] = true;
-									//								SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_FlagDriftedIn, 0);
 								}
 								break;
 							default:
@@ -2744,7 +2738,6 @@ void ProcessPickups( void )
 									if ( MoveDist > 0.0F )
 										AddColourMessageToQue(FlagMessageColour, FLAG_ESCAPED, TeamName[ team ] );
 									TeamFlagAtHome[ team ] = false;
-									//								SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_FlagEscaped, 0);
 								}
 							}
 						}
@@ -4273,7 +4266,6 @@ void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID )
 				PlaySfx( SFX_Select_SolarisMissile, Sfx_Volume );
 				return;
 			case PICKUP_Thief:
-//				PlaySfx( SFX_Select_ThiefMissile, Sfx_Volume );
 				return;
 			case PICKUP_Scatter:
 				PlaySfx( SFX_Select_ScatterMissile, Sfx_Volume );
@@ -5017,7 +5009,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				{
 					Host_PrimaryWeaponsGot[ Player ][ PYROLITE_RIFLE ] = 1;
 
-//					if( ( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 					if( Ships[ Player ].SuperNashramTimer != 0.0F )
 					{
 						Host_CopyOfPyroliteAmmo[ Player ] = MAXPYROLITEAMMO;
@@ -5045,7 +5036,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				{
 					Host_PrimaryWeaponsGot[ Player ][ SUSS_GUN ] = 1;
 
-//					if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 					if( Ships[ Player ].SuperNashramTimer != 0.0F )
 					{
 						Host_CopyOfSussGunAmmo[ Player ] = MAXSUSSGUNAMMO;
@@ -5237,7 +5227,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_GeneralAmmo:
-//				if( ( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
 					if( Host_CopyOfGeneralAmmo[ Player ] < MAXGENERALAMMO )
@@ -5258,7 +5247,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_PyroliteAmmo:
-//				if( ( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
 					if( Host_CopyOfPyroliteAmmo[ Player ] < MAXPYROLITEAMMO )
@@ -5279,7 +5267,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_SussGunAmmo:
-//				if( ( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
 					if( Host_CopyOfSussGunAmmo[ Player ] < MAXSUSSGUNAMMO )
@@ -5300,7 +5287,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_PowerPod:
-//				if( ( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
 					if( Host_CopyOfPowerLevel[ Player ] != ( MAXPOWERLEVELS - 1 ) )
@@ -5321,10 +5307,8 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_GoldenPowerPod:
-//				if( !( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 				if( Ships[ Player ].SuperNashramTimer == 0.0F )
 				{
-//					GivemeSuperNashram();
 					HostGivemeSuperNashram( Player );
 					PickupEnable = true;
 				}
@@ -5337,7 +5321,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_Inv:
-//				if( !Ships[ Player ].Invul )
 				if( Ships[ Player ].InvulTimer == 0.0F )
 				{
 					Ships[ Player ].InvulTimer = INVULNERABILITY_TIME;
@@ -5360,7 +5343,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_Nitro:
-//				if( ( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
 					if( Host_CopyOfNitroFuel[ Player ] < MAX_NITRO_FUEL )
@@ -5405,7 +5387,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_Mantle:
-//				Ships[ Player ].Object.Flags |= SHIP_Stealth;
 				if( Ships[ Player ].StealthTime == 0.0F )
 				{
 					Ships[ Player ].StealthTime = ( 60.0F * ANIM_SECOND );
@@ -5523,7 +5504,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 /*�����������������������������������������������������������������*/
 			case PICKUP_Orb:
-//				if( ( Ships[ Player ].Object.Flags & SHIP_SuperNashram ) )
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
 					if( Host_CopyOfNumOfOrbitals[ Player ] < MAXMULTIPLES )
@@ -5549,7 +5529,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 		if( PickupEnable )
 		{
-//			if( ( Pickups[ i ].Type >= PICKUP_Trojax ) && ( Pickups[ i ].Type <= PICKUP_Laser ) )
 			{
 #if DEBUG_PICKUPS
 				DebugPrintf( "pickups: Tell %s to collect %s\n", &Names[ Player ][ 0 ], Messages[ Pickups[ i ].Type ] );
@@ -5557,7 +5536,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 			}
 
 			Host_PickupsGot[ Player ][ Pickups[ i ].Type ]++;
-			//			KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
 			CleanUpPickup( i );
 			return true;
 		}
@@ -5694,7 +5672,6 @@ bool ActuallyCollectPickup( u_int16_t i )
 			case PICKUP_Thief:
 				SecondaryAmmo[ THIEFMISSILE ] += 1;
 				NewSecondaryWeapon( THIEFMISSILE );
-//				MessageSFX = SFX_Select_ThiefMissile;
 				break;
 
 /*�����������������������������������������������������������������*/
@@ -5955,7 +5932,6 @@ bool ActuallyCollectPickup( u_int16_t i )
 				NumGoldBars ++;
 				if( !( NumGoldBars % 10 ) )
 				{
-//					NumGoldBars = 0;
 					Lives += 1;
 					sprintf( (char*)&Message[0], YOUVE_EARNED_EXTRA_LIFE );
 					PlaySfx( SFX_ExtraLife, 1.0F );
@@ -6099,7 +6075,6 @@ bool ActuallyCollectPickup( u_int16_t i )
 				{
 					if( Ships[ WhoIAm ].NumMultiples < MAXMULTIPLES )
 					{
-//						Ships[ WhoIAm ].Object.Flags |= SHIP_Multiple;
 						Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples ] = MAXMULTIPLEAMMO;
 						Ships[ WhoIAm ].NumMultiples++;
 						CreateOrbitPulsar( WhoIAm );
@@ -6139,7 +6114,6 @@ bool ActuallyCollectPickup( u_int16_t i )
 
 			PickupsGot[ Pickups[ i ].Type ]++;
 			CleanUpPickup( i );
-//			KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
 			return true;
 		}
 		else
@@ -6753,7 +6727,6 @@ void CheckPickupAllPlayers( void )
 				{
 					NextPickup = Pickup->NextInGroup;
 
-//					if( ( Pickup->Speed == 0.0F ) && ( Pickup->Mode == PICKUPMODE_Normal ) && ( Pickup->PickupTime > 0.0F ) )
 					if( Pickup->Mode == PICKUPMODE_Normal )
 					{
 						if( Pickup->Speed == 0.0F )
@@ -6955,7 +6928,6 @@ void CorrectForExtraOrMissingPickups( void )
 				}
 
 				SecondaryInLevel[ Weapon ] = NumPickupType[ Count ];
-//				SecondaryToGenerate[ Weapon ] = ( ( Host_SecAmmoUsed[ Weapon ] + SecondaryFromPickupTab[ ( Weapon * 2 ) + 1 ] - 1 ) / SecondaryFromPickupTab[ ( Weapon * 2 ) + 1 ] );
 				SecondaryToGenerate[ Weapon ] = Host_SecAmmoUsed[ Weapon ];
 				SecondaryInPlayers[ Weapon ] = 0;
 
@@ -6963,7 +6935,6 @@ void CorrectForExtraOrMissingPickups( void )
 				{
 					if( GameStatus[ Player ] == STATUS_Normal )
 					{
-//						SecondaryInPlayers[ Weapon ] += ( ( Host_SecondaryAmmo[ Player ][ Weapon ] + SecondaryFromPickupTab[ ( Weapon * 2 ) + 1 ] - 1 ) / SecondaryFromPickupTab[ ( Weapon * 2 ) + 1 ] );
 						SecondaryInPlayers[ Weapon ] += Host_SecondaryAmmo[ Player ][ Weapon ];
 					}
 				}

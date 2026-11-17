@@ -49,7 +49,6 @@
                 if (_err) return _err; \
         }
 
-// luaL_dofile(L1, file);
 
 extern lua_State *L1;
 

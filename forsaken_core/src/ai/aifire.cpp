@@ -27,9 +27,6 @@
 #pragma optimize( "gty", on )
 #endif
 
-
-// Externals
-
 /*===================================================================
 	Procedure	:	TURRET Fire At Target..
 	Input		:	ENEMY * Enemy
@@ -118,7 +115,6 @@ void AI_UPDATEGUNS( register ENEMY * Enemy )
 	while( GObject )
 	{
 		
-//		if( TObject && ( (Enemy->AIFlags & AI_ICANSEEPLAYER) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_TURRET_AI) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_SPLINE) ) )
 		if( TObject && ( (Enemy->AIFlags & AI_ICANSEEPLAYER) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_SPLINE) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_JUMP_AI) ) )
 		{
 			FirePosPnt = EnemyTypes[Enemy->Type].GunFirePoints[GObject->GunNum>>1];

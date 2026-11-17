@@ -144,7 +144,6 @@ bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/REND
 			if( Lines[ i ].Group == Group )
 			{
 				/* bjd curr driver = 0 use to be software mode */
-				//if(render_info.CurrDriver != 0)
 				{
 						color = RGBA_MAKE( Lines[ i ].StartCol.R, Lines[ i ].StartCol.G,
 										   Lines[ i ].StartCol.B, Lines[ i ].StartTrans );
@@ -162,11 +161,9 @@ bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/REND
 				Vert_Ptr->tu = 0.0F;
 				Vert_Ptr->tv = 0.0F;
 				Vert_Ptr->color = color;
-//				Vert_Ptr->dwReserved = 0;
 				Vert_Ptr++;
 	
 				/* bjd curr driver = 0 use to be software mode */
-				//if(render_info.CurrDriver != 0)
 				{
 						color = RGBA_MAKE( Lines[ i ].EndCol.R, Lines[ i ].EndCol.G,
 										   Lines[ i ].EndCol.B, Lines[ i ].EndTrans );
@@ -184,7 +181,6 @@ bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/REND
 				Vert_Ptr->tu = 0.0F;
 				Vert_Ptr->tv = 0.0F;
 				Vert_Ptr->color = color;
-//				Vert_Ptr->dwReserved = 0;
 				Vert_Ptr++;
 
 				Num_Lines++;
@@ -235,9 +231,6 @@ bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/REND
 bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject ) 
 {
 	u_int16_t  i = 0;
-
-	//  if( !render_info.bIsPrimary )
-	//		return true;
 
 	i = FirstLineUsed;
 	while( i != (u_int16_t) -1 )

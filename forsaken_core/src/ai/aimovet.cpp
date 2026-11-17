@@ -158,7 +158,6 @@ void AI_AIR_MOVETOTARGET( register ENEMY * Enemy )
 
 
 	TNode = (NODE*)Enemy->Object.NearestNode;
-//	TNode = Enemy->TNode;
 	if( ShowNode && TNode )
 		CreateSparks( &TNode->Pos, &SlideUp, TNode->Group );
 

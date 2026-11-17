@@ -33,9 +33,6 @@
 	static	TRIANGLE		PortalTris[ 310 ];
 	static	int16_t			PortalVertCount;
 	static	int16_t			PortalTriCount;
-//	D3DEXECUTEBUFFERDESC	Portal_debdesc;
-//	D3DEXECUTEDATA			Portal_d3dexdata;
-//	LPDIRECT3DEXECUTEBUFFER Portal_Execs[ MAXPORTALEXECS ];
 	RENDEROBJECT			Portal_Execs[ MAXPORTALEXECS ];
 	int16_t					Num_Portal_Execs = 0;
 	int16_t					ShowPortal = 0;
@@ -44,9 +41,6 @@
 	static	TRIANGLE		SkinTris[ 310 ];
 	static	int16_t			SkinVertCount;
 	static	int16_t			SkinTriCount;
-//	D3DEXECUTEBUFFERDESC	Skin_debdesc;
-//	D3DEXECUTEDATA			Skin_d3dexdata;
-//	LPDIRECT3DEXECUTEBUFFER Skin_Execs[ MAXSKINEXECS ];
 	RENDEROBJECT			Skin_Execs[ MAXSKINEXECS ];
 	int16_t					Num_Skin_Execs = 0;
 	int16_t					ShowSkin = 0;
@@ -73,7 +67,6 @@ void InitSkinExecs( void )
 
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
-//		Skin_Execs[ Count ] = NULL;
 		FSReleaseRenderObject(&Skin_Execs[ Count ]);
 	}
 
@@ -224,7 +217,6 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 			SkinVerts[ SkinVertCount ].tu = 0.0F;
 			SkinVerts[ SkinVertCount ].tv = 0.0F;
 			SkinVerts[ SkinVertCount ].color = color;
-//			SkinVerts[ SkinVertCount ].dwReserved = 0;
 			SkinVertCount++;
 
 			SkinVerts[ SkinVertCount ].x = Verts[ 1 ].x;
@@ -233,7 +225,6 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 			SkinVerts[ SkinVertCount ].tu = 0.0F;
 			SkinVerts[ SkinVertCount ].tv = 0.0F;
 			SkinVerts[ SkinVertCount ].color = color;
-//			SkinVerts[ SkinVertCount ].dwReserved = 0;
 			SkinVertCount++;
 
 			SkinVerts[ SkinVertCount ].x = Verts[ 2 ].x;
@@ -242,18 +233,15 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 			SkinVerts[ SkinVertCount ].tu = 0.0F;
 			SkinVerts[ SkinVertCount ].tv = 0.0F;
 			SkinVerts[ SkinVertCount ].color = color;
-//			SkinVerts[ SkinVertCount ].dwReserved = 0;
 			SkinVertCount++;
 
 			SkinTris[ SkinTriCount ].v1 = SkinVertCount - 3;
 			SkinTris[ SkinTriCount ].v2 = SkinVertCount - 2;
 			SkinTris[ SkinTriCount ].v3 = SkinVertCount - 1;
-//			SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			SkinTriCount++;
 
 			if( FacePtr->type & 1 )
 			{
-//				SkinTris[ SkinTriCount-1 ].wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 
 				SkinVerts[ SkinVertCount ].x = Verts[ 2 ].x;
 				SkinVerts[ SkinVertCount ].y = Verts[ 2 ].y;
@@ -261,7 +249,6 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				SkinVerts[ SkinVertCount ].tu = 0.0F;
 				SkinVerts[ SkinVertCount ].tv = 0.0F;
 				SkinVerts[ SkinVertCount ].color = color;
-//				SkinVerts[ SkinVertCount ].dwReserved = 0;
 				SkinVertCount++;
 	
 				SkinVerts[ SkinVertCount ].x = Verts[ 3 ].x;
@@ -270,7 +257,6 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				SkinVerts[ SkinVertCount ].tu = 0.0F;
 				SkinVerts[ SkinVertCount ].tv = 0.0F;
 				SkinVerts[ SkinVertCount ].color = color;
-//				SkinVerts[ SkinVertCount ].dwReserved = 0;
 				SkinVertCount++;
 	
 				SkinVerts[ SkinVertCount ].x = Verts[ 0 ].x;
@@ -279,13 +265,11 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				SkinVerts[ SkinVertCount ].tu = 0.0F;
 				SkinVerts[ SkinVertCount ].tv = 0.0F;
 				SkinVerts[ SkinVertCount ].color = color;
-//				SkinVerts[ SkinVertCount ].dwReserved = 0;
 				SkinVertCount++;
 	
 				SkinTris[ SkinTriCount ].v1 = SkinVertCount - 3;
 				SkinTris[ SkinTriCount ].v2 = SkinVertCount - 2;
 				SkinTris[ SkinTriCount ].v3 = SkinVertCount - 1;
-//				SkinTris[ SkinTriCount ].wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 				SkinTriCount++;
 			}
 
@@ -386,7 +370,6 @@ void DisplayBSPNode( BSP_NODE * Node )
 					SkinVerts[ SkinVertCount ].tu = 0.0F;
 					SkinVerts[ SkinVertCount ].tv = 0.0F;
 					SkinVerts[ SkinVertCount ].color = color;
-//					SkinVerts[ SkinVertCount ].dwReserved = 0;
 					SkinVertCount++;
 				}
 			
@@ -395,13 +378,11 @@ void DisplayBSPNode( BSP_NODE * Node )
 					SkinTris[ SkinTriCount ].v1 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v3 = Count+2;
-//					SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 					SkinTriCount++;
 		
 					SkinTris[ SkinTriCount ].v3 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v1 = Count+2;
-//					SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 					SkinTriCount++;
 				}
 			
@@ -456,7 +437,6 @@ void DisplayBSPNode( BSP_NODE * Node )
 					SkinVerts[ SkinVertCount ].tu = 0.0F;
 					SkinVerts[ SkinVertCount ].tv = 0.0F;
 					SkinVerts[ SkinVertCount ].color = color;
-//					SkinVerts[ SkinVertCount ].dwReserved = 0;
 					SkinVertCount++;
 				}
 			
@@ -465,13 +445,11 @@ void DisplayBSPNode( BSP_NODE * Node )
 					SkinTris[ SkinTriCount ].v1 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v3 = Count+2;
-//					SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 					SkinTriCount++;
 		
 					SkinTris[ SkinTriCount ].v3 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v1 = Count+2;
-//					SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 					SkinTriCount++;
 				}
 			
@@ -555,7 +533,6 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 			SkinVerts[ SkinVertCount ].tu = 0.0F;
 			SkinVerts[ SkinVertCount ].tv = 0.0F;
 			SkinVerts[ SkinVertCount ].color = color;
-//			SkinVerts[ SkinVertCount ].dwReserved = 0;
 			SkinVertCount++;
 		}
 	
@@ -564,13 +541,11 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 			SkinTris[ SkinTriCount ].v1 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v3 = Count+2;
-//			SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			SkinTriCount++;
 	
 			SkinTris[ SkinTriCount ].v3 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v1 = Count+2;
-//			SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			SkinTriCount++;
 		}
 	
@@ -805,7 +780,6 @@ void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group
 			SkinVerts[ SkinVertCount ].tu = 0.0F;
 			SkinVerts[ SkinVertCount ].tv = 0.0F;
 			SkinVerts[ SkinVertCount ].color = color;
-//			SkinVerts[ SkinVertCount ].dwReserved = 0;
 			SkinVertCount++;
 		}
 	
@@ -814,13 +788,11 @@ void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group
 			SkinTris[ SkinTriCount ].v1 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v3 = Count+2;
-//			SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			SkinTriCount++;
 	
 			SkinTris[ SkinTriCount ].v3 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v1 = Count+2;
-//			SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			SkinTriCount++;
 		}
 	
@@ -911,7 +883,6 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 			SkinVerts[ SkinVertCount ].tu = 0.0F;
 			SkinVerts[ SkinVertCount ].tv = 0.0F;
 			SkinVerts[ SkinVertCount ].color = color;
-//			SkinVerts[ SkinVertCount ].dwReserved = 0;
 			SkinVertCount++;
 		}
 	
@@ -920,13 +891,11 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 			SkinTris[ SkinTriCount ].v1 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v3 = Count+2;
-//			SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			SkinTriCount++;
 	
 			SkinTris[ SkinTriCount ].v3 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v1 = Count+2;
-//			SkinTris[ SkinTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 			SkinTriCount++;
 		}
 	
@@ -987,12 +956,7 @@ bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t	NumVerts, int16_
 		return false;
 	}
    		
-//   	lpBufStart = Skin_debdesc.lpData;
-//   	lpPointer = lpBufStart;
-   		
 	memmove(lpBufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
-   
-//    lpInsStart = lpPointer;
    
    	if( ( ShowSkin == 3  ) || ( ShowSkin == 4 ) )
    	{
@@ -1027,8 +991,6 @@ bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t	NumVerts, int16_
         TRIANGLE_LIST_DATA( Tris, NumTris, lpPointer );		// Copy Triangles to Execute Buffer
 */
 
-//   	OP_EXIT( lpPointer );
-   
 //   	Skin_Execs[ Num_Skin_Execs ]->lpVtbl->Unlock( Skin_Execs[ Num_Skin_Execs ] );
 	if (!(FSUnlockVertexBuffer(&Skin_Execs[ Num_Skin_Execs ])))
 	{
@@ -1058,10 +1020,8 @@ void ReleaseSkinExecs( void )
 
 	for( Count = 0; Count < Num_Skin_Execs; Count++ )
 	{
-//		if( Skin_Execs[ Count ] != NULL )
 		{
 			FSReleaseRenderObject(&Skin_Execs[ Count ]);
-//			Skin_Execs[ Count ] = NULL;
 	 	}
 	}
 
@@ -1168,7 +1128,6 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 					PortalTris[ PortalTriCount ].v1 = PortalVertCount;
 					PortalTris[ PortalTriCount ].v2 = PortalVertCount + Count2 + 1;
 					PortalTris[ PortalTriCount ].v3 = PortalVertCount + Count2 + 2;
-//					PortalTris[ PortalTriCount ].wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 					PortalTriCount++;
 				}
 
@@ -1223,13 +1182,8 @@ bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t NumVerts, int1
 		return false;
 	}
    		
-//   	lpBufStart = Portal_debdesc.lpData;
-//   	lpPointer = lpBufStart;
-   		
 	memmove(lpBufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
    
-//    lpInsStart = lpPointer;
-
 /* bjd - CHECK   
     OP_PROCESS_VERTICES( 1, lpPointer );
         PROCESSVERTICES_DATA( D3DPROCESSVERTICES_TRANSFORM, 0, NumVerts, lpPointer );
@@ -1238,8 +1192,6 @@ bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t NumVerts, int1
     OP_TRIANGLE_LIST( NumTris, lpPointer );
         TRIANGLE_LIST_DATA( Tris, NumTris, lpPointer );		// Copy Triangles to Execute Buffer
 */		
-   
-//   	OP_EXIT( lpPointer );
    
 //   	Portal_Execs[ Num_Portal_Execs ]->lpVtbl->Unlock( Portal_Execs[ Num_Portal_Execs ] );
 
@@ -1272,7 +1224,6 @@ void InitPortalExecs( void )
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
 		FSReleaseRenderObject(&Portal_Execs[ Count ]);
-//		Portal_Execs[ Count ] = NULL;
 	}
 
 	Num_Portal_Execs = 0;
@@ -1289,10 +1240,8 @@ void ReleasePortalExecs( void )
 
 	for( Count = 0; Count < Num_Portal_Execs; Count++ )
 	{
-//		if( Portal_Execs[ Count ] != NULL )
 		{
 			FSReleaseRenderObject(&Portal_Execs[ Count ]);
-//			Portal_Execs[ Count ] = NULL;
 	 	}
 	}
 
@@ -1708,8 +1657,6 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 	first_free_pin_ptr = NULL;
 	first_pin_ptr = NULL;
 
-	// Prepare PinBuf;
-
 	for( i = 0; i < MAX_PINS; i++ )
 	{
 		PinBuf[ i ].next_ptr = first_free_pin_ptr;
@@ -2016,8 +1963,6 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 	first_free_pin_ptr = NULL;
 	first_pin_ptr = NULL;
 
-	// Prepare PinBuf;
-
 	for( i = 0; i < MAX_PINS; i++ )
 	{
 		PinBuf[ i ].next_ptr = first_free_pin_ptr;
@@ -2311,8 +2256,6 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 
 	first_free_pin_ptr = NULL;
 	first_pin_ptr = NULL;
-
-	// Prepare PinBuf;
 
 	for( i = 0; i < MAX_PINS; i++ )
 	{

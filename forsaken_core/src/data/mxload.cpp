@@ -77,10 +77,6 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
 ===================================================================*/
 void TintDisc(u_int16_t Model);
 
-//u_int8_t Red = 128;
-//u_int8_t Green = 192;
-//u_int8_t Blue = 192+64;
-
 /*===================================================================
 	Procedure	:		Load .Mx File
 	Input		:		char	*	Filename , MXLOADHEADER *
@@ -98,7 +94,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int16_t		*	Uint16Pnt2;
 	float		*	FloatPnt;
 	MFACE		*	MFacePnt;
-//	LPTRIANGLE	FacePnt;
 	TRIANGLE		FacePnt; // was a pointer
 	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
 	u_int16_t			exec_type = 0;			// the type of execute buffer
@@ -481,10 +476,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						colourkey++;
 						MFacePnt->pad &= ~1;
 					}
-//					FacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
 					FixUV( &FacePnt, lpBufStart, tpage, Mxloadheader->Group[group].originalVerts[execbuf]);
-//					FacePnt++;
-					//lpLVERTEX+=3;
 					MFacePnt++;
 					lpNormals++;
 					tempInt+=3;
@@ -532,13 +524,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				Mxloadheader->Group[group].poly_ptr[execbuf] = NULL;
 			}
 
-//			OP_STATE_RENDER( 1, lpPointer);
-//				STATE_DATA(D3DRENDERSTATE_FOGENABLE, false, lpPointer );
-//			OP_EXIT(lpPointer);
-
-			//free(vertexArray);
-			//vertexArray = NULL;
-
 			/*	unlock the vertex buffer	*/
 			if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
 			{
@@ -563,13 +548,10 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 
 			/* update the renderObject */
-//			Mxloadheader->Group[ group ].renderObject[execbuf].numVerts = num_vertices;
-//			Mxloadheader->Group[ group ].renderObject[execbuf].numTriangles = triangleCount; //num_triangles;
 
 /*
 			if( Mxloadheader->num_texture_files == 0 )
 			{
-				//Mxloadheader->Group[ group ].renderObject[execbuf].texture = NULL;
 				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = NULL;
 				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = false;
 			}
@@ -577,7 +559,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			{
 				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mxloadheader->TloadIndex[tpage]];
 				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxloadheader->TloadIndex[tpage]];
-				//STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, Tloadheader.hTex[Mxloadheader->TloadIndex[tpage]], lpPointer);
 			}
 */
 		}
@@ -798,9 +779,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				Colour = *Uint32Pnt++;
 
 #if	MX_VERSION_NUMBER == 2
-//				Int16Pnt = (int16_t *) Uint32Pnt;
-//				SpotFXPtr->SoundFX = *Int16Pnt++;
-//				Uint16Pnt = (u_int16_t *) Int16Pnt;
 
 				Int8Pnt = (int8_t *) Uint32Pnt;
 
@@ -1009,7 +987,6 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 								break;
 
 							case MODFUNC_ScaleDonut:
-//								ProcessModel( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 1, 1 );
 								break;
 
 							case MODFUNC_RestoreColours:
@@ -1067,8 +1044,6 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 	{
 	    for (i = 0; i < Mxloadheader->Group[group].num_execbufs; i++)
 		{
-//		   	free(Mxloadheader->Group[group].org_colors[i]);
-//		   	Mxloadheader->Group[group].org_colors[i]= NULL;
 
 			FSReleaseRenderObject(&Mxloadheader->Group[group].renderObject[i]);
 
@@ -1349,9 +1324,7 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 {
 	int		i,e;
 	int		group;
-//	D3DEXECUTEBUFFERDESC	debDesc1;
 	LPLVERTEX	lpD3DLVERTEX1 = NULL;
-//	COLOR * ColourPnt;
 	LPLVERTEX			VertPtr;
 
 	if( !Mxloadheader1->state )
@@ -1371,21 +1344,15 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 				return false;
 			}
 
-//			lpD3DLVERTEX1 = (LPLVERTEX) debDesc1.lpData;
-
-			//ColourPnt = Mxloadheader1->Group[group].org_colors[i];
 			VertPtr = Mxloadheader1->Group[group].originalVerts[i];
 
 			for( e = 0 ; e < Mxloadheader1->Group[group].num_verts_per_execbuf[i] ; e++ )
 			{
-				//lpD3DLVERTEX1->color = *ColourPnt++;
 				lpD3DLVERTEX1->color = VertPtr->color;
 				VertPtr++;
 				lpD3DLVERTEX1++;
 			}
 
-//			if ( Mxloadheader1->Group[group].lpExBuf[i]->lpVtbl->Unlock( Mxloadheader1->Group[group].lpExBuf[i] ) != D3D_OK)
-//				return false;
 			if (!(FSUnlockVertexBuffer(&Mxloadheader1->Group[group].renderObject[i])))
 			{
 				return false;

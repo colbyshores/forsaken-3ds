@@ -75,8 +75,6 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 	ENEMY	*	Enemy;
 	ENEMY	*	NextEnemy;
 
-//	return( NULL );
-
 	ClosestEnemy = NULL;
 	ClosestLength = *Dist;
 

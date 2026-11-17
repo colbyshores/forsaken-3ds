@@ -232,7 +232,6 @@ typedef struct {
         WORD v3;
         WORD wV3;
     };
-//    WORD     wFlags;
 } TRIANGLE, *LPTRIANGLE;
 
 

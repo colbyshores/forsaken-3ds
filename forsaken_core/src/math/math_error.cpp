@@ -124,7 +124,6 @@ void InitMathErrors(void)
 {
 }
 
-//#define TEST_MATH_ERRORS
 #ifdef TEST_MATH_ERRORS
 #include <float.h>
 void TestMathErrors(void)

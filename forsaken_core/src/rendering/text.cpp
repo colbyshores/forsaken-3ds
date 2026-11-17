@@ -245,8 +245,6 @@ int Print4x5Text( const char * Text , int x , int y , int color )
 	g = Colourtrans[color][1];
 	b = Colourtrans[color][2];
 
-	//printf("rgb = %d-%d-%d , text = %s\n",r,g,b,Text);
-
 	if( x != -1 )
 		PermX = x;
 	while( ( num = *Text++ ) != 0 )
@@ -415,7 +413,6 @@ void	MessageQuePrintAll( void )
 				if(strcmp(&MessageBankLong[i][MAX*z],(const char*) "\0") != 0)
 				{
 					strncpy(&MessageBuff[0],&MessageBankLong[i][MAX*z],MAX); 
-					//CenterPrint4x5Text( &MessageBuff[0],((y*(FontHeight+1))+16) , MessageColourLong[i] );
 					Print4x5Text( &MessageBuff[0], FontWidth*23 , ((y*(FontHeight+1))+16) , MessageColourLong[i] );
 					y++;
 				}
@@ -875,7 +872,6 @@ bool ReadTxtFile( char *Filename )
 
 	while( TextMessagesPnt[NumOfTextMessages] )
 	{
-//		DebugPrintf( "message %d = %s\n", NumOfTextMessages , TextMessagesPnt[NumOfTextMessages]);
 
 		TextMessagesPnt[++NumOfTextMessages] = strtok( NULL , "\n" );
 	}

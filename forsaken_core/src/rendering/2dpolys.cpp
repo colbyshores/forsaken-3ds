@@ -1777,10 +1777,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 
 	FmPolyFacePnt = (LPTRIANGLE) lpIndices;
 
-//	lpBufStart = ExecBuffer_debdesc.lpData;
 	FmPolyVertPnt = (LPLVERTEX) lpBufStart;
-	//lpPointer = (LPVOID) ( FmPolyVertPnt + TotalVerts );
-	//lpInsStart = lpPointer;
 
 /*===================================================================
 		Fill in Exec Buffer ( Verts and Faces Simultaneously )
@@ -1800,7 +1797,6 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 		   	    STATE_DATA( D3DRENDERSTATE_TEXTUREHANDLE, Tloadheader.hTex[ Count ], lpPointer );
 		   	OP_TRIANGLE_LIST( NumTris, lpPointer );
 */
-	   		//FmPolyFacePnt = (LPTRIANGLE) lpPointer;
 
 			if( Count == *TPage ) i = *NextFmPoly;
 			else i = FmPolyTPages[ Count ].FirstPoly;
@@ -1953,7 +1949,6 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 							FmPolyVertPnt->tu = Box_Ptr->u1;
 							FmPolyVertPnt->tv = Box_Ptr->v1;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 							FmPolyVertPnt->x = ( NewPos.x + Xsize.x );			// v2
@@ -1962,7 +1957,6 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 							FmPolyVertPnt->tu = Box_Ptr->u2;
 							FmPolyVertPnt->tv = Box_Ptr->v1;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 							FmPolyVertPnt->x = ( NewPos.x + Xsize.x - Ysize.x ); // v3
@@ -1971,7 +1965,6 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 							FmPolyVertPnt->tu = Box_Ptr->u2;
 							FmPolyVertPnt->tv = Box_Ptr->v2;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 							FmPolyVertPnt->x = ( NewPos.x - Ysize.x );			// v4
@@ -1980,20 +1973,17 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 							FmPolyVertPnt->tu = Box_Ptr->u1;
 							FmPolyVertPnt->tv = Box_Ptr->v2;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 				   			FmPolyFacePnt->v1 = 0;
 				   			FmPolyFacePnt->v2 = 1;
 				   			FmPolyFacePnt->v3 = 2;
-//				   			FmPolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 				   			FmPolyFacePnt++;
 							ntris++;
 
 				   			FmPolyFacePnt->v1 = 0;
 				   			FmPolyFacePnt->v2 = 2;
 				   			FmPolyFacePnt->v3 = 3;
-//				   			FmPolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE2 | D3DTRIFLAG_EDGEENABLE3 );
 				   			FmPolyFacePnt++;
 							ntris++;
 
@@ -2033,13 +2023,10 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 				i = FmPolys[ i ].NextInTPage;
 			}
 
-	   		//lpPointer = ( LPVOID ) FmPolyFacePnt;
 		}
 
 		if( StartVert >= MAXFMPOLYVERTS ) break;
 	}
-
-//	OP_EXIT( lpPointer );
 
 /*===================================================================
 		UnLock Exec Buffer and set data description
@@ -2161,10 +2148,7 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 
 	FmPolyFacePnt = (LPTRIANGLE) lpIndices;
 
-//	lpBufStart = ExecBuffer_debdesc.lpData;
 	FmPolyVertPnt = (LPLVERTEX) lpBufStart;
-	//lpPointer = (LPVOID) ( FmPolyVertPnt + TotalVerts );
-	//lpInsStart = lpPointer;
 
 /*===================================================================
 		Fill in Exec Buffer ( Verts and Faces Simultaneously )
@@ -2184,7 +2168,6 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 		   	    STATE_DATA( D3DRENDERSTATE_TEXTUREHANDLE, Tloadheader.hTex[ Count ], lpPointer );
 		   	OP_TRIANGLE_LIST( NumTris, lpPointer );
 */
-	   		//FmPolyFacePnt = (LPTRIANGLE) lpPointer;
 
 			if( Count == *TPage ) i = *NextFmPoly;
 			else i = FmPolyTPages[ Count ].FirstPoly;
@@ -2337,7 +2320,6 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 							FmPolyVertPnt->tu = Box_Ptr->u1;
 							FmPolyVertPnt->tv = Box_Ptr->v1;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 							FmPolyVertPnt->x = ( NewPos.x + Xsize.x );			// v2
@@ -2346,7 +2328,6 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 							FmPolyVertPnt->tu = Box_Ptr->u2;
 							FmPolyVertPnt->tv = Box_Ptr->v1;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 							FmPolyVertPnt->x = ( NewPos.x + Xsize.x - Ysize.x ); // v3
@@ -2355,7 +2336,6 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 							FmPolyVertPnt->tu = Box_Ptr->u2;
 							FmPolyVertPnt->tv = Box_Ptr->v2;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 							FmPolyVertPnt->x = ( NewPos.x - Ysize.x );			// v4
@@ -2364,20 +2344,17 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 							FmPolyVertPnt->tu = Box_Ptr->u1;
 							FmPolyVertPnt->tv = Box_Ptr->v2;
 							FmPolyVertPnt->color = Colour;
-//							FmPolyVertPnt->dwReserved = 0;
 							FmPolyVertPnt++;
 
 					   		FmPolyFacePnt->v1 = 0;
 					   		FmPolyFacePnt->v2 = 1;
 					   		FmPolyFacePnt->v3 = 2;
-//					   		FmPolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 					   		FmPolyFacePnt++;
 							ntris++;
 
 					   		FmPolyFacePnt->v1 = 0;
 					   		FmPolyFacePnt->v2 = 2;
 					   		FmPolyFacePnt->v3 = 3;
-//					   		FmPolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE2 | D3DTRIFLAG_EDGEENABLE3 );
 					   		FmPolyFacePnt++;
 							ntris++;
 
@@ -2417,13 +2394,10 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 				i = FmPolys[ i ].NextInTPage;
 			}
 
-	   		//lpPointer = ( LPVOID ) FmPolyFacePnt;
 		}
 
 		if( StartVert >= MAXFMPOLYVERTS ) break;
 	}
-
-//	OP_EXIT( lpPointer );
 
 /*===================================================================
 		UnLock Exec Buffer and set data description

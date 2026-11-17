@@ -228,7 +228,6 @@ void DebugState( const char * str )
 //#include "render.h"
 int Msg( const char * msg, ... )
 {
-//	bool was_fullscreen = render_info.fullscreen;
 
 	char txt[ 1024 ];
 	va_list args;

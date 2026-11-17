@@ -82,7 +82,6 @@ bool BOTAI_FireTitan()
 	dist = DistanceVector2Vector(&Ships[WhoIAm].Object.Pos, &Ships[TargetShipID].Object.Pos);
 	if(dist < 500.0F || dist > 2000.0F)
 	{
-		//DebugPrintf("too close or too far to target to fire titan\n");
 		return false;
 	}
 
@@ -133,13 +132,11 @@ bool BOTAI_FireTitan()
 				// and i have line of sight to the target
 				|| ( !BOTAI_ClearLOS(&Ships[WhoIAm].Object.Pos, Ships[WhoIAm].Object.Group, &Ships[TargetShipID].Object.Pos) ) )
 		{
-			//DebugPrintf("aiming at target\n");
 			BOTAI_AimAtTarget( &Ships[WhoIAm].Object.FinalInvMat, &Ships[WhoIAm].Object.Pos, &Ships[TargetShipID].Object.Pos);
 		}
 		// can see target so aim front sensor towards wall
 		else if(DistWall[8] > 500.0F)
 		{	
-			//DebugPrintf("aiming toward wall\n");
 			switch(wall)
 			{
 				case 0:
@@ -162,7 +159,6 @@ bool BOTAI_FireTitan()
 		// can see target but i'm too close to wall
 		else if(DistWall[8] < 400.0F)
 		{	
-			//DebugPrintf("aiming away from wall\n");
 			switch(wall)
 			{
 				case 0:
@@ -184,7 +180,6 @@ bool BOTAI_FireTitan()
 		// just right
 		else
 		{
-			//DebugPrintf("chocs away old boy!\n");
 			Ships[WhoIAm].Secondary = TITANSTARMISSILE;
 			BOTAI_SetAction( &bot.fire_secondary, 1.0F, "FireTitan() fire secondary" );
 			BOTAI_SetAction( &bot.forward, -1.0F, "FireTitan() reverse" );
@@ -250,7 +245,6 @@ bool BOTAI_MoveToTargetNew(VECTOR * TPos)
 	// apply that vector to my matrix to make direction relative to my direction and rotation 
 	//ApplyMatrix( &Ships[WhoIAm].Object.FinalInvMat, &NormVector, &DirVector );
 	NormaliseVector( &DirVector );
-	//DebugPrintf("straight x = %f y = %f z = %f\n", DirVector.x, DirVector.y, DirVector.z);
 
 	// calculate the desired vector
 	// forward right
@@ -262,8 +256,6 @@ bool BOTAI_MoveToTargetNew(VECTOR * TPos)
 	// calculate the triple chord direction vector 
 	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Slide, &TriChordVector );
 	NormaliseVector( &TriChordVector );
-	//DebugPrintf("trivec x = %f y = %f z = %f\n", TriChordVector.x, TriChordVector.y, TriChordVector.z);
-
 
 	// difference between wanted vector and slide vector
 	WantedVector.x = DirVector.x - TriChordVector.x;
@@ -321,9 +313,6 @@ bool BOTAI_MoveToTarget(VECTOR * TPos)
 	VECTOR DirVector;
 	float xAngle;
 	float yAngle;
-
-	//DebugPrintf("moving to %f %f %f\n", TPos->x, TPos->y, TPos->z);
-
 
 	// set slide movements and check if at target pos
 	if(BOTAI_SlideToTarget(TPos))
@@ -411,8 +400,6 @@ bool BOTAI_SlideToTarget(VECTOR * TPos)
 	VECTOR DirVector;
 	float xAngle;
 	float yAngle;
-
-	//DebugPrintf("sliding to target\n");
 
 	// -- Calculate angles
 	NormVector.x = TPos->x - Ships[WhoIAm].Object.Pos.x;
@@ -558,9 +545,6 @@ bool BOTAI_ShootEnemyMines()
 				break;
 		}
 
-		//DebugPrintf("i have a mine target at %f distance\n", nearest);
-		//DebugPrintf("min dist = %f\n", (BALL_RADIUS * QUANTUM_SHOCKWAVE) + SHIP_RADIUS);
-
 		// back up to safest distance or until i hit a wall
 		if( nearest < dist && DistWall[9] > 100.0F )
 			BOTAI_SetAction( &bot.forward, -1.0F, "ShootEnemyMines() reverse" );
@@ -691,7 +675,6 @@ void BOTAI_AvoidHomingMissiles()
 		// new missile
 		//if(!MissileAvoidanceSet)
 		{
-			//DebugPrintf("set details for missile %d\n", HomingMissile);
 			MissileAvoidanceSet = true;
 			NormVector.x = SecBulls[HomingMissile].Pos.x - Ships[WhoIAm].Object.Pos.x;
 			NormVector.y = SecBulls[HomingMissile].Pos.y - Ships[WhoIAm].Object.Pos.y;
@@ -709,7 +692,6 @@ void BOTAI_AvoidHomingMissiles()
 			xAngle = 180.0F - xAngle;
 		if( xAngle > 180.0F )
 			xAngle -= 360.0F;
-		//DebugPrintf("x = %f\n", xAngle);
 
 		// up/down angle
 		yAngle = (float) acosf( MissileOrigDirVector.y );
@@ -717,7 +699,6 @@ void BOTAI_AvoidHomingMissiles()
 		yAngle *= -1.0F;
 		if( yAngle > 180.0F )
 			yAngle -= 360.0F;
-		//DebugPrintf("y = %f\n", yAngle);
 
 		// -- execute slide movements
 
@@ -796,7 +777,6 @@ void BOTAI_AvoidBullets()
 					// move to the one with most room
 					if(DistWall[i] > dist)
 					{	
-						//DebugPrintf("using %d instead of %d because %f > %f\n", i, AvoidMove, DistWall[i], dist);
 						AvoidMove = i;// BOTAI_CenterCheck(i);
 						DebugPrintf("using %d\n", AvoidMove);
 						dist = DistWall[i];
@@ -816,7 +796,6 @@ void BOTAI_AvoidBullets()
 						longest = WhenWillHitSlide[i];
 					}
 				}
-				//if(DEBUG_AVOIDANCE)
 				DebugPrintf("couldn't find perfect spot: using %d\n", AvoidMove);
 			}
 			//else if(DEBUG_AVOIDANCE)

@@ -575,7 +575,6 @@ static bool AppInit( char * lpCmdLine )
 #ifdef __3DS__
 		boot_log("[boot] AppInit: FAIL InitView");
 #endif
-		//CleanUpAndPostQuit();
         return false;
 	}
 #ifdef __3DS__

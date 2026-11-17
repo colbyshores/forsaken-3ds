@@ -22,7 +22,6 @@
 #include "data/mload.h"
 #include "rendering/transexe.h"
 #include "game/constants.h"
-//#include "pickups.h"
 
 /*===================================================================
 	Defines

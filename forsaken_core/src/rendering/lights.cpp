@@ -316,8 +316,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			return false;
 		}	
 
-//		lpPointer = (LPLVERTEX) debDesc.lpData;
-
 		VertexCellPnt = Mloadheader->Group[group].vertex_cell_pnt[execbuf];
 		OrgVertexIndexPnt = Mloadheader->Group[group].vertex_index_pnt[execbuf];
 
@@ -395,7 +393,6 @@ clear:					mov		eax, [esi]
 					{
 						while( vert --)
 						{
-//							lpLVERTEX->color = (COLOR) lpLVERTEX2->dwReserved;
 							lpLVERTEX++;		
 							lpLVERTEX2++;		
 						}
@@ -420,10 +417,8 @@ clear:					mov		eax, [esi]
 						x = (float)((int) (lpLVERTEX2->x * 0.35F) % 360);
 						y = (float)((int) (lpLVERTEX2->y * 0.35F) % 360);
 						z = (float)((int) (lpLVERTEX2->z * 0.35F) % 360);
-						//					distance = (float) sqrtf( (x*x) + (y*y) + (z*z) );
 						col = lpLVERTEX2->color;
 						col &= 0xffff;
-						//					tal = 128.0F + 127.0F * (float) fast_sinf( (distance+cral) * (PI / 180.0F ) );
 						b = (int)  ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 						b+= intWhiteOut;
 						if( b > 255 )
@@ -671,7 +666,6 @@ clear:					mov		eax, [esi]
 			
 										while( vert-- )
 										{
-//											NumOfVertsConsidered++;
 											lpLVERTEX = lpPointer + *VertexIndexPnt++;
 											/* find the distance from vert to light */
 											x = lpLVERTEX->x;
@@ -683,10 +677,8 @@ clear:					mov		eax, [esi]
 			
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											distance = (x*x) + (y*y) + (z*z);
-//											distance = 0.0F;			
 											if ( distance <  SizeX2  )					// float
 											{
-												//											NumOfVertsTouched++;
 												distance = 1.0F - ( distance * Size );	// float
 #ifdef	USEASM
 __asm
@@ -732,9 +724,6 @@ __asm
 												or  ecx , edi			; or back in the alpha..
 
 												mov [esi+16] , ecx		;int put the color back
-												// carry = ( ( col + inc ) ^ ( col ^ inc ) ) & 0x01010100;
-												// clamp = carry - ( carry >> 8 );
-												// col = ( col + inc - carry ) | clamp;
 											}
 
 #else	//USEASM
@@ -805,21 +794,17 @@ __asm
 										vert = VertexCellPnt[Cell].num_verts_in_cell;
 										while( vert-- )
 										{
-//											NumOfVertsConsidered++;
-//											lpLVERTEX = ((LPLVERTEX ) lpPointer) + *VertexIndexPnt++;
 											lpLVERTEX = lpPointer + *VertexIndexPnt++;
 											/* find the distance from vert to light */
 											x = lpLVERTEX->x - Posx;
 											y = lpLVERTEX->y - Posy;
 											z = lpLVERTEX->z - Posz;
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-											//distance = (float) sqrtf( (x*x) + (y*y) + (z*z)); 
 											distance = (x*x) + (y*y) + (z*z); 
 					
 											if ( distance <  SizeX2  )
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											{
-//												NumOfVertsTouched++;
 							
 												if( distance > 0.0F )
 												{
@@ -955,8 +940,6 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 				return false;
 			}
 
-//			lpPointer = (LPLVERTEX) debDesc.lpData;
-		
 			lpLVERTEX = lpPointer;
 			vert = MXloadheader->Group[group].num_verts_per_execbuf[execbuf];
 			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[execbuf];
@@ -1141,8 +1124,6 @@ PLOP:
 			}
 #endif /* !GPU_LIGHTING */
 			/*	unlock the execute buffer	*/
-//			if ( MXloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( MXloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
-//				return false;
 			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf])))
 			{
 				return false;
@@ -1311,7 +1292,6 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
 								z = Temp.z - Posz;
-								//distance = (float) sqrtf( (x*x) + (y*y) + (z*z)); 
 								distance = (x*x) + (y*y) + (z*z); 
 		
 								if ( distance <  SizeX2  )
@@ -1376,8 +1356,6 @@ PLOP2:
 			}
 #endif /* !GPU_LIGHTING */
 			/*	unlock the execute buffer	*/
-//			if ( MXloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( MXloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
-//				return false;
 			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf])))
 			{
 				return false;

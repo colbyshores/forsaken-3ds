@@ -45,7 +45,6 @@ void AddTransExe( /*LPD3DMATRIX Matrix*/RENDERMATRIX *Matrix , /*LPDIRECT3DEXECU
 		{
 			TransExe[NumOfTransExe].Matrix = *Matrix;
 		}
-//		TransExe[NumOfTransExe].lpExBuf = lpExBuf;
 		/* Plain shallow struct copy. The textureGroups field is now a
 		 * pointer to a TAG_LEVEL hunk allocation rather than an inline
 		 * MAX_TEXTURE_GROUPS array, so copying the struct just copies
@@ -142,7 +141,6 @@ void ExecuteTransExe( u_int16_t group )
 						break;
 
 					case MODFUNC_ScaleDonut:
-//						ProcessModelExec( TransExe[i].lpExBuf, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 1, 1 );
 						break;
 					
 					case MODFUNC_Nothing:
@@ -262,7 +260,6 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 						break;
 
 					case MODFUNC_ScaleDonut:
-//						ProcessModelExec( TransExe[i].lpExBuf, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 1, 1 );
 						break;
 					
 					case MODFUNC_Nothing:

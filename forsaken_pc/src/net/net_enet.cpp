@@ -834,7 +834,6 @@ static void new_packet( ENetEvent * event )
 	if ( event->channelID == system_channel )
 	{
 		p2p_packet_t * packet = ((p2p_packet_t *) event->packet->data);
-		//DebugPrintf("new_packet: system message\n");
 		switch( packet->type )
 		{
 		case CONNECT_PORT:
@@ -1046,7 +1045,6 @@ static void new_packet( ENetEvent * event )
 		if( peer_data->state == PLAYING )
 		{
 			network_packet_t packet;
-			//DebugPrintf("new_packet: application message\n");
 			packet.size = (int) event->packet->dataLength;
 			packet.data = (void*) event->packet->data;
 			packet.from = peer_data->player;

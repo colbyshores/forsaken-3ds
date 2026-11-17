@@ -605,10 +605,6 @@ bool DisplayGroupClippedPolys(RENDEROBJECT *renderObject, u_int16_t Group )
  		if( !PolyDispGroupClipped( Group, /*ExecBuff*/renderObject, &TPage, &i ) )
 			return( true );
 
-//		if( D3D_Device->lpVtbl->Execute( D3D_Device, ExecBuff, D3D_ViewPort, D3DEXECUTE_CLIPPED ) != D3D_OK )
-//		if (FSExecuteBuffer(ExecBuff, D3D_ViewPort, D3DEXECUTE_CLIPPED ) != D3D_OK )
-//			return false;
-
 		cull_none();
 
 		if (!draw_billboard_object(renderObject))
@@ -631,10 +627,6 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 	{
  		if( !PolyDispGroupUnclipped( /*ExecBuff*/renderObject, &TPage, &i ) )
 			return( true );
-
-			//if( D3D_Device->lpVtbl->Execute( D3D_Device, ExecBuff, D3D_ViewPort, D3DEXECUTE_CLIPPED ) != D3D_OK )
-//			if (FSExecuteBuffer(ExecBuff, D3D_ViewPort, D3DEXECUTE_CLIPPED ) != D3D_OK )
-//				return false;
 
 		cull_none();
 
@@ -780,7 +772,6 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
 
 #if ACTUAL_TRANS
@@ -795,7 +786,6 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
  
 #if ACTUAL_TRANS
@@ -810,7 +800,6 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    	
 #if ACTUAL_TRANS
@@ -825,20 +814,17 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    		
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 				   			PolyFacePnt++;
 							ntris++;
 
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 2;
 				   			PolyFacePnt->v3 = 3;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE2 | D3DTRIFLAG_EDGEENABLE3 );
 				   			PolyFacePnt++;
 							ntris++;
 
@@ -1030,7 +1016,6 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
 
 #if ACTUAL_TRANS
@@ -1045,7 +1030,6 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    							
 	
@@ -1061,7 +1045,6 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    					
 	
@@ -1077,20 +1060,17 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    		
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 				   			PolyFacePnt++;
 							ntris++;
 
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 2;
 				   			PolyFacePnt->v3 = 3;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE2 | D3DTRIFLAG_EDGEENABLE3 );
 				   			PolyFacePnt++;
 							ntris++;
 				
@@ -1161,10 +1141,6 @@ bool DisplaySolidGroupClippedPolys( RENDEROBJECT *renderObject, u_int16_t Group 
 	{
  		if( !SolidPolyDispGroupClipped( Group, /*ExecBuff*/renderObject, &TPage, &i ) )
 			return( true );
-
-//			if( D3D_Device->lpVtbl->Execute( D3D_Device, ExecBuff, D3D_ViewPort, D3DEXECUTE_CLIPPED ) != D3D_OK )
-//			if (FSExecuteBuffer(ExecBuff, D3D_ViewPort, D3DEXECUTE_CLIPPED ) != D3D_OK )
-//				return false;
 
 		cull_none();
 
@@ -1335,7 +1311,6 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
 
 #if ACTUAL_TRANS
@@ -1350,7 +1325,6 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    							
 #if ACTUAL_TRANS
@@ -1365,7 +1339,6 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
 
 #if ACTUAL_TRANS
@@ -1380,20 +1353,17 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    		
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 				   			PolyFacePnt++;
 							ntris++;
 
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 2;
 				   			PolyFacePnt->v3 = 3;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE2 | D3DTRIFLAG_EDGEENABLE3 );
 				   			PolyFacePnt++;
 							ntris++;
 				
@@ -1587,7 +1557,6 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
 
 #if ACTUAL_TRANS
@@ -1602,7 +1571,6 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    							
 #if ACTUAL_TRANS
@@ -1617,7 +1585,6 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->tu = Box_Ptr->u2;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    					
 #if ACTUAL_TRANS
@@ -1632,20 +1599,17 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->tu = Box_Ptr->u1;
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
-//		   					PolyVertPnt->dwReserved = 0;
 		   					PolyVertPnt++;
    		
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE1 | D3DTRIFLAG_EDGEENABLE2 );
 				   			PolyFacePnt++;
 							ntris++;
 
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 2;
 				   			PolyFacePnt->v3 = 3;
-//				   			PolyFacePnt->wFlags = ( D3DTRIFLAG_EDGEENABLE2 | D3DTRIFLAG_EDGEENABLE3 );
 				   			PolyFacePnt++;
 							ntris++;
 

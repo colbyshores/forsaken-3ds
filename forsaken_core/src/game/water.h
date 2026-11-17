@@ -49,8 +49,6 @@ typedef struct WATEROBJECT{
 	float	Green;
 	float	Blue;
 
-//	LPDIRECT3DEXECUTEBUFFER	lpExBuf;
-//	LPVERTEXBUFFER lpVertexBuffer;
 	RENDEROBJECT renderObject;
 
 	struct WATEROBJECT * GroupLink;

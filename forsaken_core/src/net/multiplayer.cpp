@@ -252,7 +252,6 @@ void StartAHostSession ( MENUITEM * Item )
 	MyGameStatus = STATUS_StartingMultiplayer;
 	
 	Current_Camera_View = 0;				// set camera to that view
-//	Ships[WhoIAm].enable = 1;
 	Ships[WhoIAm].Pickups = 0;
 	Ships[WhoIAm].RegenSlots = 0;
 	Ships[WhoIAm].Mines = 0;
@@ -515,9 +514,6 @@ void InitTeamSelection( MENU *Menu )
 	for( i = 0 ; i < MAX_PLAYERS ; i++ )
 		if( IsHost )
 			TeamNumber[i] = 255;
-
-//	for (i = 0; i < TeamList[0].items; i++)
-//		TeamNumber[i] = 0;
 
 	TeamNumber[WhoIAm] = 0;		// start myself off in team 0
 

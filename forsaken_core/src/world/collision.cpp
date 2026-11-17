@@ -32,13 +32,9 @@
 #include "ui/title.h"
 #include "world/visi.h"
 
-//#undef COLLISION_FUDGE
-//#define COLLISION_FUDGE	(0.065F)
-
 #define	MC_VERSION_NUMBER	1
 
 #define	BSP_ENABLE		1
-//#define BSP2
 #undef BSP2
 
 #define MAX_FEELER_RAYS		(9)
@@ -59,7 +55,6 @@ int outside_group = 0;
 static VECTOR		ColPoint;
 static ZONESIDE	*	ColSide;
 static float		ColDist;
-//static COMP_OBJ *	ColChild;
 	COMP_OBJ	*	ColChild;
 static int			ColCollided;
 static float		ColRadius;
@@ -214,16 +209,12 @@ bool RayPolyIntersect( float * P0 , float * P1 , float * P2 , float * P3 ,
 //		  ( P0->y * FaceNormal->ny ) +
 //		  ( P0->z * FaceNormal->nz ) ); 
 
-//	D = -ColDotProduct( P0 , FaceNormal  );
-
 /*===================================================================
 	Calculate T
 ===================================================================*/
 	Div = ( ODir.x * FaceNormal->nx) + 
 		  ( ODir.y * FaceNormal->ny) + 
 		  ( ODir.z * FaceNormal->nz);
-	
-//	Div = ColDotProduct( &ODir , FaceNormal );
 	
 	if( Div >= 0.0F ) return false;		/* Reject, Parallel */
 
@@ -232,9 +223,6 @@ bool RayPolyIntersect( float * P0 , float * P1 , float * P2 , float * P3 ,
 		    ( Origin.y * FaceNormal->ny ) +
 		    ( Origin.z * FaceNormal->nz ) ) + D ; 
 		
-//	Num = ( D + ColDotProduct( &Origin , FaceNormal) );
-	
-	
 	t = -( Num / Div );
 
 	if( t < 0.0F ) return false;		/* Intersection behind origin */
@@ -395,8 +383,6 @@ bool ColRayPolyIntersect( MCFACE *face )
 		  ( ODir.y * face->ny) + 
 		  ( ODir.z * face->nz);
 	
-//	Div = ColDotProduct( &ODir , (NORMAL *) &face->nx );
-	
 	if( Div >= 0.0F ) return false;		/* Reject, Parallel */
 
 
@@ -404,9 +390,6 @@ bool ColRayPolyIntersect( MCFACE *face )
 		    ( Origin.y * face->ny ) +
 		    ( Origin.z * face->nz ) ) + face->D ; 
 		
-//	Num = ( D + ColDotProduct( &Origin , (NORMAL *) face->nx) );
-	
-	
 	t = -( Num / Div );
 
 /*===================================================================
@@ -524,8 +507,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 		  ( ODir.y * normal->y) + 
 		  ( ODir.z * normal->z);
 	
-//	Div = ColDotProduct( &ODir , (NORMAL *) &normal->nx );
-	
 	if( Div >= 0.0F ) return false;		/* Reject, Parallel */
 
 
@@ -533,9 +514,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 		    ( Origin.y * normal->y ) +
 		    ( Origin.z * normal->z ) ) + offset; 
 		
-//	Num = ( D + ColDotProduct( &Origin , (NORMAL *) face->nx) );
-	
-	
 	t = -( Num / Div );
 
 /*===================================================================

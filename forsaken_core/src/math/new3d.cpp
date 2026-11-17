@@ -627,9 +627,6 @@ void MakeViewMatrix(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, MATRIX *view)
 	view->_42 = 0.0F;
 	view->_43 = 0.0F;
 	view->_44 = 1.0F;
-//	view->_41 = vx.x * -viewpos->x + vx.y * -viewpos->y + vx.z * -viewpos->z;
-//	view->_42 = vy.x * -viewpos->x + vy.y * -viewpos->y + vy.z * -viewpos->z;
-//	view->_43 = vz.x * -viewpos->x + vz.y * -viewpos->y + vz.z * -viewpos->z;
 }
 
 

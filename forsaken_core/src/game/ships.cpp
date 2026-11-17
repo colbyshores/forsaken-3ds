@@ -46,8 +46,6 @@
 #include "net/multiplayer.h"
 #include "world/collision.h"
 
-//#undef MULTI_RAY_COLLISION
-//#define MULTI_RAY_SLIDE
 #undef MULTI_RAY_SLIDE
 
 #ifdef OPT_ON
@@ -1037,7 +1035,6 @@ bool ProcessShips()
 							outside_map = outside_group;
 						}
 						
-//						if( InBSPGroup( 0, &ImpactPoint )	)
 						{
 							// the end point is actually outside...
 							ShipObjPnt->Pos = ImpactPoint;
@@ -1504,7 +1501,6 @@ void RotateInternal( u_int16_t ship, float xrot, float yrot, float zrot )
 #define MIN_AUTOLEVEL_PITCH	D2R(5.0F) 
 #define MAX_AUTOLEVEL_PITCH	D2R(175.0F)
 
-//#define MIN_AUTOLEVEL_ROLL_TOLERANCE	(0.01F)
 #define MIN_AUTOLEVEL_ROLL_TOLERANCE	(0.2F)
 #define AUTOLEVEL_RATE					(0.1F)
 
@@ -1671,7 +1667,6 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 {
 	VECTOR Temp;
-//	D3DEXECUTEBUFFERDESC	debDesc;
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t execbuf;
@@ -1685,8 +1680,6 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 			if( (Mxloadheader->Group[group].exec_type[execbuf]&HASENVIROMENTMAP) != 0 )
 			{
 				/*	lock the execute buffer	*/
-//				memset(&debDesc, 0, sizeof(D3DEXECUTEBUFFERDESC));
-//				debDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
 
 //				if ( Mxloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Lock( Mxloadheader->Group[group].lpExBuf[execbuf], &debDesc ) != D3D_OK)
 //					return false ; // bjd
@@ -1697,7 +1690,6 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 					return false;
 				}
 
-//				lpLVERTEX = ( LPLVERTEX ) debDesc.lpData;
 				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] ; vert ++ )
 				{
 					ApplyMatrix( Mat , (VECTOR *) lpLVERTEX,  &Temp);
@@ -1706,15 +1698,12 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 					u = (0.125f + (-0.125f * Temp.x) );
 					v = (0.125f + (-0.125f * Temp.y) );
 
-//					lpLVERTEX->color = RGBA_MAKE( (long) (u * 255), (long) (v * 255), 0, 255 );
 					lpLVERTEX->tu = u;//+(Pos->x*0.001F)+(Pos->z*0.001F);
 					lpLVERTEX->tv = v;//+(Pos->y*0.001F);
 					lpLVERTEX++;
 				}
 
 				/*	unlock the execute buffer	*/
-//				if ( Mxloadheader->Group[group].lpExBuf[execbuf]->lpVtbl->Unlock( Mxloadheader->Group[group].lpExBuf[execbuf] ) != D3D_OK)
-//					return false ;
 				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
 				{
 					return false;
@@ -2903,17 +2892,11 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 
 					Move_Length = ( (SHIP_RADIUS*2.0F)+1.0F ) - Move_Length;
 
-	//				if( Move_Length >= (SHIP_RADIUS * 0.1F) )
-	//					Move_Length = (SHIP_RADIUS * 0.1F);
 					if( Move_Dir.x == 0.0F && Move_Dir.y == 0.0F && Move_Dir.z == 0.0F )
 						return false;
 					Move_Off->x = Move_Dir.x * Move_Length;
 					Move_Off->y = Move_Dir.y * Move_Length;
 					Move_Off->z = Move_Dir.z * Move_Length;
-	//				Ships[i].Object.Speed.x = 0.0F;
-	//				Ships[i].Object.Speed.y = 0.0F;
-	//				Ships[i].Object.Speed.z = 0.0F;
-
 
 					return true;
 				}else{

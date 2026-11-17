@@ -7,8 +7,6 @@
 #include <SDL.h>
 #include <AL/al.h>
 #include <AL/alc.h>
-//#include <efx.h>
-//#include <efx-creative.h>
 #include <math.h>
 
 bool Sound3D = false; // enable 3d sound
@@ -202,7 +200,6 @@ void sound_set_pitch( sound_source_t * source, float pitch )
 {
 	ALfloat f = pitch ? pitch : 1.0f ; // 1.0f is default
 	alSourcef( source->id, AL_PITCH, f );
-	//DebugPrintf("sound_pitch: %f\n",f);
 }
 
 void sound_volume( sound_source_t * source, long millibels )
@@ -214,7 +211,6 @@ void sound_volume( sound_source_t * source, long millibels )
 	// defined in Dsound.h as (no change) 0 and (silence) -10,000
 	f = (ALfloat) powf(10.0, millibels/2000.0);
 	alSourcef(source->id, AL_GAIN, f);
-	//DebugPrintf("sound_volume: %ld\n",millibels);
 }
 
 void sound_pan( sound_source_t * source, long _pan )
@@ -225,7 +221,6 @@ void sound_pan( sound_source_t * source, long _pan )
 	// so:
 	float pan = (float) _pan / 10000.0f;
 	float pan2 = (float) sqrtf(1 - pan*pan);
-	//DebugPrintf("sound_pan: %f - %f\n",pan,pan2);
 	alSource3f(source->id, AL_POSITION, pan, pan2, 0.0f);
 }
 
@@ -253,8 +248,6 @@ void sound_play_looping( sound_source_t * source )
 	//
 	alSourcei( source->id, AL_LOOPING, AL_TRUE );
 	sound_play( source );
-	//
-	//DebugPrintf("sound_play_looping: playing %d\n",stats.playing);
 }
 
 void sound_stop( sound_source_t * source )
@@ -264,8 +257,6 @@ void sound_stop( sound_source_t * source )
 	source->playing = false;
 	//
 	alSourceStop( source->id );
-	//
-	//DebugPrintf("sound_stop: playing %d\n",stats.playing);
 }
 
 bool sound_is_playing( sound_source_t * source )

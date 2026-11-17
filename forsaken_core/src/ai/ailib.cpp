@@ -244,7 +244,6 @@ void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 	}
 	AimData.Angle.y =  Angle;
 
-//	if( Angle > 3.0F || ( TempDir.z < 0.0F ) )
 	if( Angle > 3.0F )
 	{
 		AimData.Flags |= AI_CONTROL_TURNRIGHT;

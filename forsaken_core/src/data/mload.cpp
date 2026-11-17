@@ -204,12 +204,10 @@ void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert
 			if( Xsize > Ysize )
 			{
 				Xsize = Ysize;
-//				DebugPrintf("-- here -- shrinking x to y = %d\n",Xsize);
 			}
 			if( Ysize > Xsize )
 			{
 				Ysize = Xsize;
-//				DebugPrintf("-- here -- shrinking y to x = %d\n",Xsize);
 			}
 		}
 	}
@@ -485,9 +483,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				else
 				*/
 				{
-						//r = Tab[r];
-						//g = Tab[g];
-						//b = Tab[b];
 #if ACTUAL_TRANS
 						a = 128;
 #else
@@ -499,8 +494,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				color = RGBA_MAKE( r , g , b , a  );
 				lpLVERTEX[i].color = color;
 				lpLVERTEX2->color = color;
-
-// bjd - CHECK				lpLVERTEX2->dwReserved |= 0xff000000;
 
 				// nothing used specular so we removed it from LVERTEX
 				//lpLVERTEX->specular = lpLVERTEX2->specular;
@@ -626,19 +619,12 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						colourkey++;
 						MFacePnt->pad &= ~1;
 					}
-					//if ( AllWires )
-						//FacePnt->wFlags = D3DTRIFLAG_EDGEENABLETRIANGLE;
-					//else
-						//FacePnt->wFlags = MFacePnt->pad;
 
 					FixUV( &FacePnt, lpBufStart, tpage, Mloadheader->Group[group].originalVerts[execbuf] );
-					//FacePnt++;
-					//MFacePnt++;
 					MFacePnt++;
 					lpNormals++;
 					tempInt+=3;
 				}
-				//lpPointer = (LPVOID) FacePnt;
 				Buffer = (char *) MFacePnt;
 
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;
@@ -766,7 +752,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						sum.x += vert.x;
 						sum.y += vert.y;
 						sum.z += vert.z;
-						//DebugPrintf("portal %d vert %d = { %f, %f, %f }\n", portal, verts, vert->x, vert->y, vert->z);
 						Mloadheader->Group[group].Portal[portal].Verts[verts] = vert;
 					}
 
@@ -1074,7 +1059,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						Msg( "Mload : Lock VertexBuffer failed\n" );
 						return false;
 					}
-//					lpLVERTEX = (LPLVERTEX ) debDesc.lpData;
 
 					for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
 					{

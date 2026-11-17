@@ -328,8 +328,6 @@ int16_t	FindTexture( TLOADHEADER * Tloadheader , char * Name )
 		if( strcasecmp( pnt1, pnt2 ) == 0 )
 			return i;
 
-//		if( strcasecmp( (char*) Name, (char*) &Tloadheader->ImageFile[i] ) == 0 )
-//			return i;
 	}
 	return -1;
 }

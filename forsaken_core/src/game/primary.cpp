@@ -1362,9 +1362,6 @@ static int16_t	OnceOnlyFlag = 0;
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 
-//								}
-//								if( GeneralAmmo && !LaserOverheated )
-//								{
 									Pos.x = -( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
 									Pos.y = -(    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
 									Pos.z = -(    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
@@ -2398,7 +2395,6 @@ void ProcessPrimaryBullets( void )
 						break;
 				}
 
-//				if( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) )
 				if( ( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) ) )
 				{
 					if( Ships[ HitTarget ].Object.Shield || Ships[ HitTarget ].Invul  )
@@ -3672,8 +3668,6 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 	i = FindFreePrimBull();
 
-//	DebugPrintf( "ID = %d, Pos = %f,%f,%f, Offset = %f,%f%,%f, Group = %d\n", BulletID, Pos->x, Pos->y, Pos->z, Offset->x, Offset->y, Offset->z, Group );
-
 	if( i != (u_int16_t) -1 )
 	{
 		PrimBulls[i].Offset = *Offset;
@@ -4342,7 +4336,6 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 			ORBIT PULSAR
 ===================================================================*/
 		   	case ORBITPULSAR:
-				//PlayPannedSfxWithVolModify(SFX_Orbit, PrimBulls[i].GroupImIn, Pos, 0.0F, 0.75F );
 				PlayPannedSfx(SFX_Orbit, PrimBulls[i].GroupImIn, Pos, 0.0F );
 				light = FindFreeXLight();
 				if( light != (u_int16_t ) -1 )					// Light attached
@@ -8456,18 +8449,12 @@ void HostGivemeSuperNashram( u_int16_t Player )
 		Host_CopyOfOrbAmmo[ Player ][ Count ] = Host_OrbAmmo[ Player ][ Count ];
 	}
 
-//	Ships[ Player ].Object.PowerLevel = ( MAXPOWERLEVELS - 1 );
-
 	for( Count = 0; Count < 4; Count++ )
 	{
 		Host_OrbAmmo[ Player ][ Count ] = MAXMULTIPLEAMMO;
 	}
 
-//	Ships[ Player ].NumMultiples = 4;
-//	Ships[ Player ].Object.Flags |= SHIP_SuperNashram;
 	Ships[ Player ].SuperNashramTimer = ( 30.0F * 60.0F );
-
-//	CreateOrbitPulsar( WhoIAm );
 
 	Host_PyroliteAmmo[ Player ] = MAXPYROLITEAMMO;		//MAXPYROLITEAMMO;
 	Host_SussGunAmmo[ Player ] = MAXSUSSGUNAMMO;		//MAXSUSSGUNAMMO;

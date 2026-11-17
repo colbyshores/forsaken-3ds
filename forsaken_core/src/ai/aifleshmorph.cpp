@@ -27,8 +27,6 @@
 #pragma optimize( "gty", on )
 #endif
 
-// Externals
-
 // Globals
 void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy );
 
@@ -119,7 +117,6 @@ void AI_FLESHMORPH_MOVEFORWARDS( register ENEMY * Enemy )
 ===================================================================*/
 void AI_FLESHMORPH_STOPFORWARD( register ENEMY * Enemy )
 {
-//	OBJECT * TObject;
 	OBJECT * SObject;
 	VECTOR		TempVector;
 	VECTOR		TempUpVector;
@@ -153,9 +150,7 @@ void AI_FLESHMORPH_STOPFORWARD( register ENEMY * Enemy )
 	if( Enemy->SecondaryFireTimer < 0.0F )
 		Enemy->SecondaryFireTimer = 0.0F;
 
-//	if( Enemy->AIFlags & ( AI_ICANSEEPLAYER + AI_ICANHEARPLAYER ) )
 	{
-//		if( !(Enemy->Object.Flags & SHIP_Scattered ) && (Enemy->AIFlags & AI_ICANSEEPLAYER) && !(Enemy->AIFlags & AI_FRIENDLYFIRE) )
 		{
 			ApplyMatrix( &SObject->Mat, &Forward, &TempVector );
 			ApplyMatrix( &SObject->Mat, &SlideUp, &TempUpVector );

@@ -30,7 +30,6 @@ extern bool SwitchedToWatchMode;
 
 #define RESPAWN_TIMER -3.5F // = -250.0F / 71.0f - framelag hack reversal
 
-//#define	SHIP_RADIUS	( 256.0F * GLOBAL_SCALE )
 #define	SHIP_RADIUS	( 300.0F * GLOBAL_SCALE )
 #define MOVE_TOLERANCE ( 2.0F * GLOBAL_SCALE )
 #define	MAX_NITRO_FUEL	( 100.0F )

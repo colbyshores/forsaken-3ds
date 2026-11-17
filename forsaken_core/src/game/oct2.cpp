@@ -198,8 +198,6 @@ static bool _gameplay_start_guard = false;
 const char *_3ds_mr_ctx = "startup";
 #endif
 
-//LPDIRECTDRAWPALETTE ddpal;
-
 void ProcessGameKeys( void );
 
 
@@ -371,7 +369,6 @@ bool DispTracker( void ); // bjd
   Global Variables
 ===================================================================*/   
 #define Near  ( 100.0F * GLOBAL_SCALE )
-//#define Far   ( 65535.0F * GLOBAL_SCALE )
 #define Far   ( 49152.0F * GLOBAL_SCALE )
 #define MinNear ( 50.0F * GLOBAL_SCALE )
 
@@ -412,8 +409,6 @@ MATRIX  ProjMatrix = {
 
 /*===================================================================
 ===================================================================*/
-//static D3DEXECUTEDATA d3dExData;
-//static D3DEXECUTEBUFFERDESC debDesc;
 
 /*
  * Global projection, view, world and identity matricies
@@ -2075,16 +2070,12 @@ char TriggerName[256];
 ===================================================================*/
 bool ChangeLevel( void )
 {
-	//if( NewLevelNum != LevelNum )
-	//  return true;
 
 	LevelNum = NewLevelNum;
 
 #ifdef __3DS__
 	music_play_for_level(LevelNum);
 #endif
-
-	//NumGoldBars = 0;
 
 	ReleaseLevel();
 	KillNodeCubeLines();
@@ -2183,9 +2174,6 @@ bool RenderScene( void )
   static int WaitFrames = 2;
   bool done;
 
-  //DebugPrintf("RenderScene Started\n");
-
-
   if ( SeriousError )
     return false;
 
@@ -2198,9 +2186,6 @@ bool RenderScene( void )
 #ifdef __3DS__
   _3ds_mr_ctx = "post-ReadInput";
 #endif
-
-  //if ( !Bsp_Identical( &Bsp_Header[ 0 ], &Bsp_Original ) )
-  //  hr = 0;
 
   CalculateFramelag();
   AnimOncePerFrame++;
@@ -2635,12 +2620,6 @@ bool RenderScene( void )
         if( (GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && (GameStatus[i] != STATUS_Null ) )
         {
 
-		//        if( GameStatus[i] == STATUS_ViewingScore )
-		//        {
-		//          sprintf( buf, "%-8s status %8s\n", &Names[i][0] , "viewing score" );
-		//          CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_StartingMultiplayerSynch ? 2 : 1 );
-		//        }
-		//        else
           {
             sprintf( buf, "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
             CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_WaitingAfterScore ? 2 : 1 );
@@ -2684,7 +2663,6 @@ bool RenderScene( void )
         StartCountDown( (int16_t) TimeLimit.value, 0 );
       }
 
-      //DebugPrintf("STATUS_WaitingAfterScore setting MyGameStatus to STATUS_Normal\n");
       MyGameStatus = STATUS_Normal;
       GameStatus[WhoIAm] = MyGameStatus;
       SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
@@ -2802,7 +2780,6 @@ bool RenderScene( void )
       Browl = 30.0F;
       if( TeamGame &&  (OverallGameStatus == STATUS_Normal) )
 	  {
-		  //SendGameMessage(MSG_SENDKILLSDEATHSBIKENUM, 0, 0, 0, 0);
 	  }
       SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
     }
@@ -2847,8 +2824,6 @@ bool RenderScene( void )
 
           if ((CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
           { 
-            //LastMenu = CurrentMenu;
-            //VduClear();
             MenuChangeEx( &MENU_NEW_GeneralLoading );
             MenuDraw( CurrentMenu );  // because menu processing will not be done when MyGameStatus changes
           }
@@ -3136,7 +3111,6 @@ bool RenderScene( void )
 
     ReMakeSimplePanel = true;
 
-		// InitVisiExecList( lpDev );
     InitSkinExecs();
     InitPortalExecs();
     InitRenderBufs();
@@ -3397,12 +3371,6 @@ bool RenderScene( void )
 #ifdef __3DS__
 	{  trace("IV0: Bspload OK -> WaterLoad"); }
 #endif
-	//    if ( !Bsp_Duplicate( &Bsp_Header[ 0 ], &Bsp_Original ) )
-	//    {
-	//		    SeriousError = true;
-	//		    Msg( "Bsp_Duplicate failed\n" );
-	//		    return false;
-	//    }
     
     // might not be any water...
     WaterLoad();
@@ -3777,12 +3745,6 @@ bool RenderScene( void )
 #ifdef __3DS__
 	{  trace("PSP: smallinitShip OK"); }
 #endif
-	//    if( CountDownOn )
-	//    {
-	//      CreateCountdownDigits();
-	//      StartCountDown( (int16_t) TimeLimit.value, 0 );
-	//    }
-
 
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
@@ -3866,9 +3828,6 @@ bool RenderScene( void )
 
     LevelTimeTaken += timer_run( &level_timer );
 
-    //sprintf( buf, "time so far %d", ((u_int32_t)LevelTimeTaken) / 100 );
-    //Print4x5Text( buf, 10, 30, 2 );
-
     // if player is quiting nothing should stop him.....
     if( MyGameStatus != STATUS_QuitCurrentGame )
     {
@@ -3909,7 +3868,6 @@ bool RenderScene( void )
   case  STATUS_TitleLoadGameStartingSinglePlayer:
 	DebugState("STATUS_TitleLoadGameStartingSinglePlayer\n");
 
-    //clear_black();
     MenuAbort();
     ReleaseView();
     // tell them all to load up a level
@@ -3925,8 +3883,6 @@ bool RenderScene( void )
 
   case  STATUS_InGameLoadGameStartingSinglePlayer:
 	DebugState("STATUS_InGameLoadGameStartingSinglePlayer\n");
-
-    //clear_black();
 
     NewLevelNum = InGameLoadGameLevelNum;
     MenuAbort();
@@ -3960,8 +3916,6 @@ bool RenderScene( void )
 	//  ******************** End of Single Player Game Stuff *******************************
 
   }
-
- // DebugPrintf("RenderScene Ended\n");
 
   return true;
 }
@@ -4104,7 +4058,6 @@ void MainRoutines( void )
   ProcessRTLights();
   perf_stage_end(PERF_S_RTLIGHTS, -1);
   
-	//DebugPrintf("MainRoutines Finished...\n");
 }
 
 void CheckLevelEnd ( void )
@@ -5296,7 +5249,6 @@ bool  InitScoreDisplay()
    //Create the offscreen surface, by loading our bitmap.
 
   InitFont();
-  //ChangeBackgroundColour( 0, 0, 0 );
 
 #ifdef SCROLLING_MESSAGES
   // get random phrases...
@@ -5645,7 +5597,6 @@ bool RenderCurrentCamera( void )
 
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
-//		if( Skin_Execs[ Count ] != NULL )
 		{
 			if (!draw_object(&Skin_Execs[ Count ]))
 			{
@@ -5765,7 +5716,6 @@ Display Group Clipped Faceme Transluecent Polys
   {
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
-//		if( Portal_Execs[ Count ] != NULL )
 		{
 			if (!draw_object(&Portal_Execs[ Count ]))
 			{
@@ -6056,7 +6006,6 @@ void CalculateFramelag( void )
 
   while( !(real_framelag = timer_run( &framelag_timer )) )
 	{
-	  //DebugPrintf("WARNING: real_framelag=%d\n",real_framelag);
 		SDL_Delay(10);
 	}
 
@@ -6372,7 +6321,6 @@ bool  InitStatsDisplay()
   // Create the offscreen surface, by loading our bitmap.
 
   InitFont();
-  //ChangeBackgroundColour( 0, 0, 0 );
 
   HowManySecrets( &TotalSecrets , &Secrets );
 
@@ -6444,8 +6392,6 @@ bool StatsDisplay()
   }
   
   CenterPrint4x5Text( "Press Space to continue" , render_info.window_size.cy - (FontHeight*2) , 2 );
-//  Our_CalculateFrameRate();
-
 
   return true;
 }

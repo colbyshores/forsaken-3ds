@@ -167,11 +167,6 @@ bool Nodeload( char * Filename )
 		u_int32Pnt = (u_int32_t*) FloatPnt;
 		NodePnt->NetMask = *u_int32Pnt++;				// which networks this node is in...
 
-//		if( !(NodePnt->NetMask&1) )
-//		{
-//			Msg( "Nodeload failed Node %d is not in Network 1\n", e );
-//		}
-		
 		int16Pnt = (int16_t*) u_int32Pnt;
 		NodePnt->Flags = (u_int16_t) *int16Pnt++;
 		NodePnt->NumOfLinks = *int16Pnt++;
@@ -268,7 +263,6 @@ _skipped_extra_links: ;
 				NodePnt->SolidPos.y += 75.0F;
 			}else{
 				DebugPrintf( "NodeLoad failed Couldnt find a Solid collide , Node %d in %s\n", e, Mloadheader.Group[ NodePnt->Group ].name );
-				//return false;
 			}
 		}else{
 			DebugPrintf( "Node %d Is not in any Legal Group..This is Very Bad...FIX IT!\n", e );
@@ -394,14 +388,12 @@ ENEMY * PutEnemiesAtNodes(void)
 	for( o = 0 ; o < NodeNetworkHeader.NumOfNodes ; o++ )
 	{
 
-//		InitOneEnemy( ENEMY_GENTYPE_Initialised, &NodePnt->Pos, &Dir, &Up, NodePnt->Group, MODEL_Swarm, -1 ,0 ,0);
 		if( NumOfEnemies )
 		{
 			NumOfEnemies--;
 			InitOneEnemy( ENEMY_GENTYPE_Initialised, &NodePnt->SolidPos, &Dir, &Up, NodePnt->Group, Enemy->ModelNum, -1 ,ENEMY_Swarm ,0,-1,(u_int16_t) -1 , 0.0F);
 		}
 
-//		if( (NodePnt->NetMask&NetMask) && !NodePnt->LegalGroup)
 		if( (NodePnt->NetMask&NetMask) )
 		{
 			for( i = 0 ; i < NodePnt->NumOfLinks ; i++ )

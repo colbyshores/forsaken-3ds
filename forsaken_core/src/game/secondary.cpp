@@ -1547,7 +1547,6 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 				break;
 
 			case MULTIPLEMISSILE:
-				//PlayPannedSfx( SFX_MFRLLaunch, SecBulls[i].GroupImIn , &SecBulls[i].Pos, 0.0F );
 				PlayPannedSfxWithVolModify(SFX_MFRLLaunch, SecBulls[i].GroupImIn, &SecBulls[i].Pos, 0.0F, 0.85F );
 				break;
 
@@ -3254,7 +3253,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				break;
 		}
 
-//		if( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) )
 		if( ( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) ) )
 		{
 			if( Ships[ HitTarget ].Object.Shield )
@@ -4992,7 +4990,6 @@ void ScatterWeaponsForShip( u_int16_t Ship, VECTOR * Dir, int16_t MaxPickupsAllo
 
 	if( MyGameStatus == STATUS_SinglePlayer ) MaxPickupsAllowed = MAXPICKUPS;
 
-//	if( ( Ships[ Ship ].Object.Flags & SHIP_SuperNashram ) ) HostLoseSuperNashram( Ship );
 	if( Ships[ Ship ].SuperNashramTimer != 0.0F ) HostLoseSuperNashram( Ship );
 
 	if ( BountyHunt && ( Host_Flags[ Ship ] & SHIP_CarryingBounty ) )
@@ -5201,10 +5198,8 @@ void ScatterWeaponsForShip( u_int16_t Ship, VECTOR * Dir, int16_t MaxPickupsAllo
 		}
 	}
 
-//	if(	( Ships[ Ship ].Object.Flags & SHIP_Stealth ) )
 	if(	Ships[ Ship ].StealthTime != 0.0F )
 	{
-//		Ships[ Ship ].Object.Flags &= ~SHIP_Stealth;
 		Ships[ Ship ].StealthTime = 0.0F;
 
 		if( TotalPickups < MaxPickupsAllowed )
@@ -5230,7 +5225,6 @@ void ScatterWeaponsForShip( u_int16_t Ship, VECTOR * Dir, int16_t MaxPickupsAllo
 		}
 	}
 
-//	if(	Ships[ Ship ].Invul && PickupInvulnerability )
 	if(	Ships[ Ship ].InvulTimer != 0.0F )
 	{
 		Ships[ Ship ].Invul = false;

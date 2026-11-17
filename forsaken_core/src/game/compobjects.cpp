@@ -36,7 +36,6 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-//#define	DEBUG_COMP			1
 #define	COB_VERSION_NUMBER	2
 
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,

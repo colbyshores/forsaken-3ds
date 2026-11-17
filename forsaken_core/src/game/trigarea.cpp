@@ -423,7 +423,6 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 			{
 				TriggerAreaProcess( OldPos , NewPos , Area );
 				
-//				if( Entry || In || Exit )
 				if( Entry )			/* Entry only, trigger will not activate if bullet starts in zone */
 				{
 					if( Area->when_player_shoots != 0xffff )
@@ -523,7 +522,6 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 			{
 				TriggerAreaProcess( OldPos , NewPos , Area );
 				
-//				if( Entry || In || Exit )
 				if( Entry )			/* Entry only, trigger will not activate if bullet starts in zone */
 				{
 					if( Area->when_enemy_shoots != 0xffff )
@@ -580,13 +578,11 @@ bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos ,
 				if( ( d1 < 0.0F ) && ( d2 > 0.0F ) )
 				{
 					Exit = true;
-//					return( true );
 				}
 
 				if( ( d1 > 0.0F ) && ( d2 < 0.0F ) )
 				{
 					Entry = true;
-//					return( true );
 				}
 			}
 		}
@@ -601,7 +597,6 @@ bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos ,
 	if( InsideCount == StartNumSides )
 	{
 		In = true;
-//		return( true );
 	}
 
 	if( Entry || Exit || In ) return( true );

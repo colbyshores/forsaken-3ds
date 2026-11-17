@@ -123,7 +123,6 @@ bool TeleportsLoad( char * Filename )
 		Uint16Pnt = (u_int16_t *) Buffer;
 		TPpnt->Group = *Uint16Pnt++;
 		TPpnt->Status = *Uint16Pnt++;
-//		TPpnt->Type = *Uint16Pnt++;
 		if( TeleportsGroupLink[TPpnt->Group] )
 		{
 			TPpnt->NextInGroup = TeleportsGroupLink[TPpnt->Group];
@@ -248,9 +247,6 @@ bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJ
 
 				PlaySfx( SFX_Teleport, 1.0F );
 
-//				StartShipScreenShake( 10.0F );
-				
-				
 				// Were in the Zone....
 				newTPpnt = Teleports;
 				newTPpnt += TPpnt->Links[Random_Range(TPpnt->num_links)];
