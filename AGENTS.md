@@ -428,10 +428,11 @@ build).
 
 ---
 
-## 9. C with classes — PHASE 2 (scaffolding live; conversion deferred)
+## 9. C with classes — PHASE 2 (every translation unit is C++)
 
-The engine is C++ compiled as "C with classes" since Cleanup 5; platform TUs
-and render backends stay C (`docs/CPP_LEDGER.tsv` is the per-module record).
+Every translation unit is C++ compiled as "C with classes" — the engine since
+Cleanup 5, the platform layers and render backends since 2026-11-17
+(`docs/CPP_LEDGER.tsv` is the per-module record).
 Sources live in `forsaken_core/src` + `forsaken_3ds/src` (+ `forsaken_pc/src`
 and `.cpp` in the core and 3DS trees and compiles `.cpp` with the language
 flags below; PC-only sources (`breakpad.cpp`, `render_d3d.cpp`, …) are not in
@@ -480,7 +481,14 @@ preallocate-in-hot-path, worker stack budgets — is **phase 2**.
 - Watch the C++-specific seams the C rules cannot see: implicit narrowing
   in brace-init, overload resolution silently picking a different
   overload, static-init order for globals with constructors.
-- `extern "C"` for every header that crosses the C/C++ line.
+- **No `extern "C"`** except at a real C boundary, each with a comment
+  saying why: (1) a symbol a C library calls by name — libctru's weak
+  `__system_allocateHeaps` override (a mangled name compiles, links, and
+  silently loses to the library default); (2) a C library's headers —
+  Lua, wrapped once in `scripting/lua_api.h`, never `#include <lua.h>`
+  directly; (3) `forsaken_core/src/diag/*`, shared with C TUs outside the
+  tree (the ATM core, the harness overlay). `tools/verify_identical.sh`
+  fails if a library's weak default replaces one of our symbols.
 
 **Preferred C++ constructs (use where they apply).** These are the
 "classes" half of C with classes that cost nothing at run time; prefer
@@ -489,8 +497,8 @@ them over the C idiom they replace, in new and converted code:
 - **`constexpr`** for named constants instead of `#define` — typed,
   scoped, visible to the debugger. Keep the literal's exact type and
   suffix (`constexpr float NITROLOSS = 0.08333F;`, never widen to
-  `double`); a constant that sizes a C-visible array or is read by a C
-  TU stays a `#define` (see the C boundary below).
+  `double`); a constant a `diag/` header or a preprocessor `#if` needs
+  stays a `#define`.
 - **`enum class`** for closed sets of states/kinds instead of integer
   `#define` families — no implicit int conversion, no namespace
   pollution. Give it the underlying type the data already uses
@@ -498,14 +506,13 @@ them over the C idiom they replace, in new and converted code:
   do not move; values that are serialized keep their numeric values.
 - **`std::array<T, N>`** instead of a raw fixed array where the size
   travels with the array (bounds, `.size()`, value semantics). Same
-  layout and no allocation, so it is allowed in hot paths; it does not
-  replace arrays in structs that cross the C boundary or are loaded
-  from level/save files byte-for-byte.
+  layout and no allocation, so it is allowed in hot paths; arrays in
+  structs read or written byte-for-byte (level/save files, network
+  packets) keep their exact layout — `std::array` preserves it, but
+  check `sizeof` and alignment are unchanged.
 
-The C boundary governs all three: anything a C translation unit
-(`main.c`, `render_c3d.c`, the platform TUs) can see must stay C — guard
-C++-only declarations with `#ifdef __cplusplus`, or keep them in `.cpp`
-files. Every such replacement is a cleanup and carries the cleanup proof:
+Only the `diag/` headers are still read by C code; keep them C. Every such
+replacement is a cleanup and carries the cleanup proof:
 `tools/verify_identical.sh` shows identical objects (a `constexpr`
 standing in for a `#define`, or an `enum class` with the same underlying
 type and values, compiles to the same code).
