@@ -1,33 +1,23 @@
+#include "net/networking.h"
 #ifdef LUA_BOT
 #include "ai/botai_sensors.h"
 #include "ai/botai_actions.h"
 
 // sensors.c
-extern VECTOR FollowTargetPos;
 extern VECTOR MissileOrigDirVector;
-extern bool AllSensorsClear;
 extern bool DEBUG_AVOIDANCE;
 extern bool FriendlyFire;
 extern bool MissileAvoidanceSet;
-extern bool ReverseNetwork;
-extern bool initialised;
 extern float DistWall[NUM_SENSORS];
 extern float IFiredTitan;
-extern float PrevHull;
-extern float PrevShield;
 extern float TargetShipDistance;
 extern float WhenWillHitSlide[NUM_SENSORS];
 extern float accuracy;
 extern int AvoidMove;
 extern int CurrentNode;
-extern int FollowTargetGroup;
 extern int GettingPickup;
 extern int HomingMissile;
-extern int PrevDeaths;
-extern int PrevHomingMissile;
-extern int PrevKills;
 extern int TargetMine;
-extern int TargetNode;
 extern int TargetShipHealth;
 extern int TargetShipID;
 extern char	* WepMessages[];

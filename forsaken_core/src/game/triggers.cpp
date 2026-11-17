@@ -28,6 +28,8 @@
 #include "game/teleport.h"
 #include "rendering/screenpolys.h"
 #include "util/util.h"
+#include "game/oct2.h"
+#include "world/node.h"
 
 #undef DEBUG_TRIGGERS
 
@@ -38,14 +40,6 @@
 
 #define FLAG_MASK( N )	( 1 << ( (N) - 1 ) )
 
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern	BYTE			WhoIAm;
-extern	float framelag;
-extern	BYTE	ChangeLevel_MyGameStatus;
-extern	bool	CountDownOn;
-extern	bool	KilledPlayer;
 /*===================================================================
 		Globals ...
 ===================================================================*/
@@ -700,8 +694,6 @@ void EVENT_TeleportDisable( u_int8_t * Data )
 
 
 #ifdef EDITION_REMASTER
-extern	NODENETWORKHEADER	NodeNetworkHeader;
-extern	ENEMY *	FirstEnemyUsed;
 
 /*===================================================================
 	KEX event 25 = NodeEnable.  Verified via Ghidra decompile of
@@ -1245,8 +1237,6 @@ bool Triggerload( char * Filename )
 	return true;
 }
 
-
-
 /*===================================================================
 	Procedure	:		release triggers
 	Input		:		none
@@ -1471,9 +1461,6 @@ void CopyTrigVars( u_int16_t Player )
 		ShortTrigVarCopy[ Player ][ Count ].State = TrigVars[ Count ].State;
 	}
 }
-
-
-
 
 /*===================================================================
 	Procedure	:	Count how may secrest there are and how many have been found..

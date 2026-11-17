@@ -78,6 +78,10 @@ typedef struct {
 	float                 stereo_focal_dist;
 } render_info_t;
 
+/* The one render state. Defined in main.c (the 3DS renderer also carries a
+   tentative definition; -fcommon merges them on the C side). */
+extern render_info_t render_info;
+
 typedef bool (*RenderCurrentCameraPt) (void);
 bool RenderCurrentCameraInStereo( RenderCurrentCameraPt );
 

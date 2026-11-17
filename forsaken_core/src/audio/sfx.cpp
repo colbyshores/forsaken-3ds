@@ -2,6 +2,8 @@
 #include "rendering/render.h"
 #include "audio/sound.h"
 #include "audio/sfx.h"
+#include "game/enemies.h"
+#include "game/oct2.h"
 
 #ifndef SOUND_SUPPORT
 
@@ -77,8 +79,6 @@ int sound_minimum_volume = -10000 / 3;
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
-
-extern render_info_t render_info;
 
 /*************************************
 Biker speech lookup table identifiers
@@ -522,24 +522,6 @@ u_int32_t SfxUniqueID = 1;
 
 #define MAX_SFX_VARIANTS 16
 char *SfxFullPath[ MAX_SFX ][ MAX_SFX_VARIANTS ];
-
-/****************************************
-Externals
-*****************************************/
-extern 	ENEMY Enemies[];
-extern SLIDER BikeCompSpeechSlider;
-extern SLIDER BikerSpeechSlider;
-extern USERCONFIG	*player_config;
-extern VECTOR	SlideUp;
-extern VECTOR	Forward;
-extern float	SoundInfo[MAXGROUPS][MAXGROUPS];
-extern SLIDER  SfxSlider; 
-extern USERCONFIG *player_config;
-
-extern float framelag;	
-extern LEVEL_LOOKUP LevelLookup[];
-extern LIST	BikeList;
-extern LIST BikeComputerList;
 
 /****************************************
 Fn Prototypes
@@ -1497,7 +1479,6 @@ void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants
 
 }
 
-extern BYTE MyGameStatus;
 void PreInitSfx( void )
 {
 	int i;
@@ -3082,8 +3063,6 @@ void ProcessEnemyBikerTaunt( void )
 
 #define TAUNT_OVERIDE_DISTANCE_FACTOR 2.0F
 #define MAX_TAUNT_DISTANCE 2240.0F 
-
-extern BYTE GameStatus[MAX_PLAYERS + 1];
 
 void SendBikerTaunt()
 {

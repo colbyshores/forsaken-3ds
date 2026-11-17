@@ -630,6 +630,20 @@ bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner );
  * once before a camera's visible-group walk. */
 void ModelVisCache_NewFrame( void );
 
+/* Defined in models.cpp; shared with the modules that use it. */
+extern MODEL Models[ MAXNUMOFMODELS ];
+extern MODELNAME ModelNames[ MAXMODELHEADERS ];
+extern MODELNAME TitleModelNames[ MAXMODELHEADERS ];
+extern MODELNAME SplashModelNames[ MAXMODELHEADERS ];
+extern int16_t NextNewModel;
+extern MXLOADHEADER * ModelHeaders;
+extern MODELNAME * TitleModelSet;
+void InitShipSpeeds( void );
+extern bool ShowBoundingBoxes;
+char *GetName(int Player);
+extern MODELNAME InterLevelModelNames[ NUM_INTERLEVEL_MODELS+1 ];
+
+extern MODELNAME * ModNames;	/* defined in compobjects.cpp; declared with its type */
 #ifdef __cplusplus
 }
 #endif

@@ -20,23 +20,13 @@
 #include "ai/ai.h"
 #include "game/secondary.h"
 #include "game/primary.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[];
-extern	SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[];
-
 extern	AIMDATA			AimData;
-extern	ENEMY	*	FirstEnemyUsed;
-extern	VECTOR Forward;
-extern	float	Difficulty;
-extern	float	DifficlutyTab[3];
-extern	float	FleshMorphTimer;
-
 
 void (* AI_AIR_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,
@@ -129,8 +119,6 @@ void (* AI_LITTLEGEEK_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,
 	NULL,
 };
-
-
 
 PRIMARYWEAPONKNOWLEDGE PrimaryKnowledge[] = {
 	{// Pulsar

@@ -168,6 +168,15 @@ FILE * SaveAllTriggers( FILE * fp );
 FILE * LoadAllTriggers( FILE * fp );
 
 
+/* Defined in triggers.cpp; shared with the modules that use it. */
+extern TRIGGERMOD * TrigMods;
+extern int NumOfTrigMods;
+void CheckTimeLimit( void );
+extern int NumOfTrigVars;
+extern int NumOfTriggers;
+extern TRIGGERVAR * DecreaseTemperature;
+extern TRIGGERVAR * TimeLimitTrigger;
+
 #ifdef __cplusplus
 }
 #endif

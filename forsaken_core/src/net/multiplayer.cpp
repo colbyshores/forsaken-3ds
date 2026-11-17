@@ -34,118 +34,25 @@
 #include "util/util.h"
 #include "net/net_tracker.h"
 #include "game/oct2.h"
+#include "rendering/screenpolys.h"
 
 /*
  * Externals
  */
-
-extern int OldPPSValue;
-extern int OldColPerspective;
-extern int OldUseShortPackets;
 
 bool ResetKillsPerLevel;
 bool TintBikeTeamColor;
 bool MyResetKillsPerLevel;
 bool IpOnCLI = false;
 
-extern u_int8_t QuickStart;
-extern bool BrightShips;
-extern bool BikeExhausts;
-extern int32_t ColPerspective;
-
-extern bool NoMenuBack;
-extern bool Debug;
-
-extern bool NeedFlagAtHome;
-extern bool OwnFlagTeleportsHome;
-extern bool CanCarryOwnFlag;
-extern SLIDER CTFSlider;
-
-extern	bool	UseShortPackets;
-extern bool	Panel;
-
-extern MENUITEM TeamGameHostMenuItem;
-extern BYTE	PreSynchupStatus;
-extern bool DemoShipInit[];
-extern	float NetUpdateInterval;
-extern	bool	BrightShips;
-extern	bool	MyBrightShips;
-
-extern float Pulse;
-extern char *EmptyString;
-
-extern	bool					IsHost;   // is the user hosting/joining a game
-extern	int16_t					Lives;
-
-extern	bool	BountyHunt;
-extern	bool	CaptureTheFlag;
-extern	bool	CTF;
-extern	TEXT	DemoGameName;
-extern	bool	RecordDemo;
-extern	LIST	PlayersList;
-extern	LIST	LevelList;
-extern	LIST	TeamList[MAX_TEAMS];
-extern	MENUITEM	TeamItem;
-extern	MENUITEM	NewTeamItem;
-extern	bool	TeamGame;
-extern	BYTE	TeamNumber[MAX_PLAYERS];
-extern	SLIDER	TimeLimit;
-extern	SLIDER	MyTimeLimit;
-extern	SLIDER	DemoSpeed;
-extern	SLIDER	MaxPlayersSlider;
-extern	SLIDER	MaxKillsSlider;
-extern	int16_t	MaxKills;
-extern	char	biker_name[256];
-extern	float	framelag;
-extern char MyName[];
-extern char NickName[];
-extern	BYTE                    WhoIAm;
-extern	int16_t					Stats[MAX_PLAYERS+1][MAX_PLAYERS+1];
-extern	int16_t					StatsCount;
-extern	int16_t	SelectedBike;
-extern	SLIDER	NumOfPlayersSlider;
-extern	int MenuStackLevel;
-extern	BYTE	GameStatus[];	// Game Status for every Ship...
-extern	SLIDER  PacketsSlider;
-extern	TEXT TCPAddress;
-extern	bool	CountDownOn;
-extern	float	GetPlayerNumCount1;
-extern	float	GetPlayerNumCount2;
-extern	int		GetPlayerNumCount;
-extern	FILE	*	DemoFp;
-extern	FILE	*	DemoFpClean;
 bool ChangeLevel( void );
 bool InitLevels( char *levels_list );
-extern	int16_t		LevelNum;
 
 #ifdef DEMO_SUPPORT
-extern	bool	PlayDemo;
-extern	LONGLONG	GameElapsedTime;		// when the game started
-extern	LIST	DemoList;
-extern	float Demoframelag;
-extern	LONGLONG	DemoTimeSoFar;
 #endif
 
-extern	MENUITEM	JoinItem;
-extern	MENUITEM	NewJoinItem;
-extern  MENUITEM	WatchTeamSelectionItem;
-extern int CameraStatus;
-extern	BYTE					OverallGameStatus;
-extern char *CurrentLevelsList;
-extern	bool AutoSelectConnection;
-extern  MENUSTATE MenuState;
-extern  char TeamCurrentScore[MAX_TEAMS][64];
 #ifdef DEMO_SUPPORT
-extern	LONGLONG	DemoStartedTime;		// when the game started
-extern	LONGLONG	DemoEndedTime;		// when the game started
-extern	int32_t		DemoGameLoops;
 #endif
-extern	int		GameType;
-extern	u_int16_t		Seed1;
-extern	u_int16_t		Seed2;
-extern	u_int16_t		CopyOfSeed1;
-extern	u_int16_t		CopyOfSeed2;
-extern	bool		RandomPickups;
 
 /*
  * Globals to this module
@@ -241,14 +148,6 @@ void SetUpGameType( int type )
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
-extern "C" void SetGamePrefs( void );
-extern TEXT local_port_str;
-extern bool	PickupValid[ MAXPICKUPTYPES ];
-extern bool	MyPickupValid[ MAXPICKUPTYPES ];
-extern SLIDER MyPacketsSlider;
-extern int32_t MyColPerspective;
-extern bool MyRandomPickups;
-extern bool MyUseShortPackets;
 
 // these settings get over ridden when you join a game
 // so we need a separate copy of them to backup our settings
@@ -266,8 +165,6 @@ void copy_in_my_settings( void )
 	UseShortPackets		= MyUseShortPackets;
 }
 
-extern MENU MENU_NEW_CreateGame;
-extern  BYTE          MyGameStatus;
 void StartAHostSession ( MENUITEM * Item )
 {
 	int i;

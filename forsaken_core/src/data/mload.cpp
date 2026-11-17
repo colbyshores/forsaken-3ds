@@ -84,9 +84,6 @@ num_start_points : u_int16_t
 
 */
 
-
-
-
 /*===================================================================
 		Include File...	
 ===================================================================*/
@@ -109,22 +106,11 @@ num_start_points : u_int16_t
 #include "util/util.h"
 #include "game/oct2.h"
 #include "rendering/render.h"
-extern "C" void *Hunk_Alloc(int, size_t);
+#include "data/tload.h"
+#include "util/hunk_alloc.h"
+#include "world/visi.h"
 
-/*===================================================================
-		Externals...	
-===================================================================*/
-extern	TRIGGERMOD	*	TrigMods;
-extern	MATRIX ProjMatrix;
-extern	TLOADHEADER Tloadheader;
-extern	MLOADHEADER Mloadheader;
-extern	DWORD	CurrentSrcBlend;
-extern	DWORD	CurrentDestBlend;
-extern	DWORD	CurrentTextureBlend;
-extern	float framelag;
-extern	u_int32_t	AnimOncePerFrame;	// used for stuff that is displayed more than once in a single frame..
 bool FindGroupConnections( MLOADHEADER *m );
-extern "C" bool ReadGroupConnections( MLOADHEADER *m, char **pbuf );
 void FreeGroupConnections( void );
 void ReadSoundInfo( MLOADHEADER *m, char **pbuf );
 
@@ -586,7 +572,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			if ( num_triangle_groups > 0 )
 			{
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups =
-				    (TEXTUREGROUP *) Hunk_Alloc(/*TAG_LEVEL=*/1,
+				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
 				                                num_triangle_groups * sizeof(TEXTUREGROUP));
 				if ( !Mloadheader->Group[group].renderObject[execbuf].textureGroups )
 				{
@@ -1495,7 +1481,6 @@ static void Unscramble( char *buf, long size, char *fname )
 	Input		:		char	*	Filename , MLOADHEADER *
 	Output		:		Nothing
 ===================================================================*/
-extern	int16_t		LevelNum;
 bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 {
 	long			File_Size;
@@ -1747,10 +1732,6 @@ u_int16_t * HandleAnimCommands( POLYANIM * PolyAnim , u_int16_t * AnimData , u_i
 	PolyAnim->newframe = Frame;
  	return AnimData;
 }
-
-
-
-
 
 /*===================================================================
 	Procedure	:		Is GroupVisible recursive...
@@ -2011,8 +1992,6 @@ void TriggerBackgroundAnimationStop( u_int16_t * Data )
 	PolyAnim->State = TEXTUREANIM_Stop;
 }
 
-
-
 FILE *LoadTextureAnimations( FILE *f )
 {
 	u_int16_t group;
@@ -2040,8 +2019,6 @@ FILE *LoadTextureAnimations( FILE *f )
 	}
 	return f;
 }
-
-
 
 FILE *SaveTextureAnimations( FILE *f )
 {

@@ -4,6 +4,8 @@
 #define CAMERA_INCLUDED
 
 #include "game/main.h"
+#include "game/constants.h"
+#include "rendering/render.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,6 +95,11 @@ void EnableRemoteCamera( u_int16_t * Data );
 void DisableRemoteCamera( u_int16_t * Data );
 FILE * SaveRemoteCameras( FILE * fp );
 FILE * LoadRemoteCameras( FILE * fp );
+
+/* Defined in camera.cpp; shared with the modules that use it. */
+extern CAMERA CurrentCamera;
+extern CAMERA MainCamera;
+extern REMOTECAMERA * ActiveRemoteCamera;
 
 #ifdef __cplusplus
 }

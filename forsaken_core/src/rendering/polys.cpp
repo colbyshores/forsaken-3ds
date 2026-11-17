@@ -18,6 +18,10 @@
 #include "game/secondary.h"
 #include "game/main.h"
 #include "util/util.h"
+#include "data/tload.h"
+#include "game/oct2.h"
+#include "game/ships.h"
+#include "rendering/2dtextures.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -26,28 +30,6 @@
 /*===================================================================
 	Externs
 ===================================================================*/
-extern	CAMERA			CurrentCamera;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	TLOADHEADER		Tloadheader;
-extern	float			framelag;
-extern	FRAME_INFO	*	Laser_Header;
-extern	FRAME_INFO	*	AfterBurner_Header;
-extern	FRAME_INFO	*	LensFlare_Header;
-extern	SHIPCONTROL		control;
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	MATRIX			ProjMatrix;
-extern	DWORD			CurrentSrcBlend;
-extern	DWORD			CurrentDestBlend;
-extern	DWORD			CurrentTextureBlend;
-extern	BYTE			GameStatus[MAX_PLAYERS];
-
 
 /*===================================================================
 	Globals

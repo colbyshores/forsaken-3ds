@@ -61,6 +61,10 @@ bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject );
 void KillUsedLine( u_int16_t i );
 u_int16_t FindFreeLine( void );
 
+/* Defined in lines.cpp; shared with the modules that use it. */
+extern LINE Lines[ MAXLINES ];
+extern u_int16_t FirstLineUsed;
+
 #ifdef __cplusplus
 }
 #endif

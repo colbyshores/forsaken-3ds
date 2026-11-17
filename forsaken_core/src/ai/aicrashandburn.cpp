@@ -20,20 +20,15 @@
 #include "ai/ai.h"
 #include "game/secondary.h"
 #include "game/primary.h"
+#include "game/oct2.h"
+#include "game/spotfx.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[];
-extern	SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[];
-extern	MLOADHEADER Mloadheader;
-extern "C" void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 
 /*===================================================================
 	Procedure	:	AIR Crash and burn...
@@ -78,9 +73,3 @@ void AI_AIR_DEATH_CRASHANDBURN( register ENEMY * Enemy )
 #ifdef OPT_ON
 #pragma optimize( "", off )
 #endif
-
-
-
-
-
-

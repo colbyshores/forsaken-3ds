@@ -63,11 +63,14 @@ num_frames : u_int16_t // number of animation frames
 #include "game/spotfx.h"
 #include "util/util.h"
 #include "game/oct2.h"
+#include "data/mload.h"
+#include "data/tload.h"
+#include "game/ships.h"
+#include "util/hunk_alloc.h"
 #ifdef RENDERER_C3D
 /* render_c3d.c is a C TU; hoisted from block-scope extern (C++ mangles those). */
 extern "C" void c3d_set_object_proctex(bool);
 #endif
-extern "C" void *Hunk_Alloc(int, size_t);
 
 /*===================================================================
 		Defines
@@ -76,24 +79,6 @@ extern "C" void *Hunk_Alloc(int, size_t);
 
 //#define FIX_MXA_UV
 #undef FIX_MXA_UV
-
-/*===================================================================
-		Externals...	
-===================================================================*/
-
-extern void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPOLDLVERTEX Orig_Vert );
-
-extern	MATRIX ProjMatrix;
-extern	TLOADHEADER Tloadheader;
-extern	float	framelag;
-extern	DWORD	CurrentSrcBlend;
-extern	DWORD	CurrentDestBlend;
-extern	DWORD	CurrentTextureBlend;
-extern	int16_t	BikeModels[ MAXBIKETYPES ];
-extern	RENDERMATRIX view;
-extern	RENDERMATRIX identity;
-extern	MATRIX	MATRIX_Identity;
-extern	RENDERMATRIX  TempWorld;
 
 /*===================================================================
 		Globals...	
@@ -392,7 +377,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			if ( num_texture_groups > 0 )
 			{
 				Mxaloadheader->Group[group].renderObject[execbuf].textureGroups =
-				    (TEXTUREGROUP *) Hunk_Alloc(/*TAG_LEVEL=*/1,
+				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
 				                                num_texture_groups * sizeof(TEXTUREGROUP));
 				if ( !Mxaloadheader->Group[group].renderObject[execbuf].textureGroups )
 				{
@@ -983,15 +968,11 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 	Mxaloadheader->state = false;
 }
 
-
-
-
 /*===================================================================
 	Procedure	:		Pre - Load .Mxa File
 	Input		:		char	*	Filename , MXALOADHEADER *
 	Output		:		Nothing
 ===================================================================*/
-extern	int16_t		LevelNum;
 bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num, bool LevelSpecific )
 {
 	long			File_Size;

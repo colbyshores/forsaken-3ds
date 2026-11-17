@@ -86,6 +86,65 @@ void EnableOffFile( OFF_FILES * FileInfo, int8_t * Filename );
 void DisableOffFile( OFF_FILES * FileInfo, int8_t * Filename );
 void EnableRelevantOffFiles( OFF_FILES * FileInfo );
 
+/* Defined in 2dtextures.cpp; shared with the modules that use it. */
+extern FRAME_INFO * Exp_Header;
+extern FRAME_INFO * GreyFlare_Header;
+extern FRAME_INFO * Flare_Header;
+extern OFF_FILES OffsetFiles[];
+extern OFF_FILES Title_OffsetFiles[];
+extern OFF_FILES Splash_OffsetFiles[];
+extern FRAME_INFO * Circle_Header;
+extern FRAME_INFO * PickupRegen_Header;
+extern FRAME_INFO * Pulsar_Header;
+extern FRAME_INFO * Pulsar_Trail_Header;
+extern FRAME_INFO * Pulsar_Exp_Header;
+extern FRAME_INFO * Trojax1_Header;
+extern FRAME_INFO * Trojax2_Header;
+extern FRAME_INFO * Trojax_Exp_Header;
+extern FRAME_INFO * Exp2_Header;
+extern FRAME_INFO * Shrapnel_Header;
+extern FRAME_INFO * Arc_Header;
+extern FRAME_INFO * Laser_Header;
+extern FRAME_INFO * Bits_Header;
+extern FRAME_INFO * Multiple_Header;
+extern FRAME_INFO * NMEBullet_Header;
+extern FRAME_INFO * Mushroom_Header;
+extern FRAME_INFO * BigExp1_Header;
+extern FRAME_INFO * Restart_Header;
+extern FRAME_INFO * GravgonTrail_Header;
+extern FRAME_INFO * SolarisTrail_Header;
+extern FRAME_INFO * NewTrail_Header;
+extern FRAME_INFO * Blood_Header;
+extern FRAME_INFO * BloodSplat_Header;
+extern FRAME_INFO * BloodDribble_Header;
+extern FRAME_INFO * ScatterTrail_Header;
+extern FRAME_INFO * BigFlash_Header;
+extern FRAME_INFO * Target_Header;
+extern FRAME_INFO * LensFlare_Header;
+extern FRAME_INFO * BlueSpark_Header;
+extern FRAME_INFO * Tentacle_Header;
+extern FRAME_INFO * Bubble_Header;
+extern FRAME_INFO * EnemyGen_Header;
+extern FRAME_INFO * Drip_Header;
+extern FRAME_INFO * AfterBurner_Header;
+extern FRAME_INFO * Numbers_Header;
+extern FRAME_INFO * Numbers2_Header;
+extern FRAME_INFO * Text512b_Header;
+extern FRAME_INFO * Text512_Header;
+extern FRAME_INFO * Orb_Header;
+extern FRAME_INFO * Solid_Header;
+extern FRAME_INFO * Thermo_Header;
+extern FRAME_INFO * Logos_Header;
+extern FRAME_INFO * Flag_Header;
+extern FRAME_INFO * Flags_Header;
+extern FRAME_INFO * Title_LevelPics_Header;
+extern FRAME_INFO * Title_TVFrame_Header;
+extern float VduScaleX;
+extern float VduScaleY;
+extern FRAME_INFO * Title_Fonts_Header;
+extern FRAME_INFO * Title_Chars1_Header;
+extern FRAME_INFO * Title_Chars2_Header;
+
 #ifdef __cplusplus
 }
 #endif

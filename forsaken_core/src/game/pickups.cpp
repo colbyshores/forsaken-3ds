@@ -40,6 +40,9 @@
 #include "game/goal.h"
 #include "ui/local.h"
 #include "util/util.h"
+#include "data/config.h"
+#include "game/oct2.h"
+#include "ui/title.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -57,115 +60,6 @@
 /*===================================================================
 	Externs
 ===================================================================*/
-extern SLIDER BikeCompSpeechSlider;
-extern bool CTF;
-extern bool CanCarryOwnFlag;
-extern bool OwnFlagTeleportsHome;
-extern u_int32_t TeamFlagMask[ MAX_TEAMS ];
-extern bool TeamFlagAtHome[ MAX_TEAMS ];
-
-extern float BountyTime;
-
-extern bool BountyHunt;
-extern bool CaptureTheFlag;
-extern bool ShieldCritical;
-
-extern	BYTE	TeamNumber[MAX_PLAYERS];
-extern char *TeamName[ MAX_TEAMS ];
-
-extern	VECTOR			Forward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	XLIGHT			XLights[ MAXXLIGHTS ];
-extern	FMPOLY			FmPolys[ MAXNUMOF2DPOLYS ];
-extern	MODEL			Models[ MAXNUMOFMODELS ];
-extern	float			framelag;
-extern	BYTE			WhoIAm;
-extern	LINE			Lines[ MAXLINES ];
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	FRAME_INFO	*	Flare_Header;
-extern	FRAME_INFO	*	Circle_Header;
-extern	FRAME_INFO	*	PickupRegen_Header;
-
-extern	bool			JustPickedUpShield;
-
-extern	int16_t			LevelNum;
-extern	char			LevelNames[MAXLEVELS][128];
-
-extern	int16_t			PrimaryWeaponsGot[ MAXPRIMARYWEAPONS ];
-extern	int16_t			SecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
-extern	float			GeneralAmmo;
-extern	float			PyroliteAmmo;
-extern	float			SussGunAmmo;
-extern	float			GeneralAmmo;
-
-extern	float			GeneralAmmoUsed;
-extern	float			PyroliteAmmoUsed;
-extern	float			SussGunAmmoUsed;
-extern	int16_t			SecondaryAmmo[ MAXSECONDARYWEAPONS ];
-extern	int16_t			SecAmmoUsed[ MAXSECONDARYWEAPONS ];
-extern	USERCONFIG *	player_config;
-extern	PRIMARYWEAPONATTRIB PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ];
-extern	SECONDARYWEAPONATTRIB SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ];
-extern	int				no_collision;		// disables player ship-to-background collisions
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-extern	bool			IsHost;
-
-extern	MISSEDPICKUPMSG	MissedPickups[ MAXMISSEDPICKUPS ];
-extern	SHORTPICKUP		MissedInitPickups[ MAXMISSEDPICKUPS ];
-extern	SHORTKILLPICKUP	MissedKillPickups[ MAXMISSEDPICKUPS ];
-extern	int16_t			NumMissedPickups;
-extern	int16_t			NumMissedInitPickups;
-extern	int16_t			NumMissedKillPickups;
-
-extern	float			NitroFuel;
-extern	float			NitroFuelUsed;
-
-extern	bool            bSoundEnabled;
-
-extern	int16_t			NumOfActivePlayers;
-
-extern	BYTE			GameStatus[MAX_PLAYERS];	// Game Status for every Ship...
-extern	bool			DebugInfo;
-
-extern	TRIGGERMOD	*	TrigMods;
-extern	int				NumOfTrigMods;
-extern	bool			TargetComputerOn;
-
-extern	BYTE			CopyOfOrbitals;
-extern	float			CopyOfOrbAmmo[ MAXMULTIPLES ];
-extern	int16_t			CopyOfPowerLevel;
-extern	float			CopyOfNitroFuel;
-extern	float			CopyOfGeneralAmmo;
-extern	float			CopyOfSussGunAmmo;
-extern	float			CopyOfPyroliteAmmo;
-extern	int				outside_group;
-extern	bool			PlayDemo;
-extern	int16_t			Lives;
-extern	int				CrystalsFound;
-extern	BYTE			ChangeLevel_MyGameStatus;
-extern	float			LevelTimeTaken;
-
-extern	u_int16_t			Seed1;
-extern	u_int16_t			Seed2;
-extern	u_int16_t			FirstSecBullUsed;
-extern	SECONDARYWEAPONBULLET SecBulls[MAXSECONDARYWEAPONBULLETS];
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-
-extern bool	NeedFlagAtHome;
-extern int GoalScore;
-
-extern	char PrimaryNames[7][16];
-
-// message colours (Title.c)
-extern int KillMessageColour; 
-extern int SystemMessageColour;
-extern int FlagMessageColour;
-extern int PickupMessageColour;
 
 /*===================================================================
 	Globals
@@ -233,7 +127,6 @@ float   Host_BountyTimer;
 float   Host_FlagTimer;
 float   Host_TeamFlagTimer[ MAX_TEAMS ];
 extern int FlagsToGenerate;
-extern int GoalTeamMembers[ MAX_TEAMS ];
 
 int16_t	NumPrimaryPickups = 1;
 
@@ -2532,7 +2425,6 @@ void CleanUpPickup( u_int16_t i )
 	Output		:	u_int16_t		-1 if none free
 				:				-2 if too many of same type
 ===================================================================*/
-extern  BYTE          MyGameStatus;
 u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Speed, int16_t Type, u_int16_t Owner, u_int16_t ID, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod )
 {
 	u_int16_t	i;
@@ -7546,7 +7438,6 @@ void CorrectForExtraOrMissingPickups( void )
 		}
 	}
 
-
 /*===================================================================����
 	Correct for fucked up secondary weapons
 /*===================================================================���*/
@@ -7607,7 +7498,6 @@ void CorrectForExtraOrMissingPickups( void )
 			NumOrbs += Diff;
 		}
 	}
-
 
 /*===================================================================����
 	Correct for fucked up stealths

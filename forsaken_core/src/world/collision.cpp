@@ -26,6 +26,11 @@
 #include "game/secondary.h"
 #include "game/restart.h"
 #include "util/util.h"
+#include "data/mload.h"
+#include "game/oct2.h"
+#include "game/ships.h"
+#include "ui/title.h"
+#include "world/visi.h"
 
 //#undef COLLISION_FUDGE
 //#define COLLISION_FUDGE	(0.065F)
@@ -46,45 +51,6 @@
 #define POINT_ON_PORTAL_TOLERANCE	(0.1)
 #define OUTSIDE_GROUP_TOLERANCE		(25.0F)
 
-
-extern "C" bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node);
-extern "C" void ObjForceExternalOneOff( OBJECT *Obj, VECTOR *force );
-
-extern	float	MaxMoveSpeed;
-extern	float	MoveAccell;
-extern	float	MoveDecell;
-extern	float	MaxTurboSpeed;
-extern	float	TurboAccell;
-extern	float	TurboDecell;
-extern	float	MaxTurnSpeed;
-extern	float	TurnAccell;
-extern	float	TurnDecell;
-extern	float	MaxRollSpeed;
-extern	float	RollAccell;
-extern	float	RollDecell;
-extern	float	MaxBankAngle;
-extern	float	BankAccell;
-extern	float	BankDecell;
-
-
-extern	VECTOR	SlideRight;
-extern	VECTOR	SlideUp;
-extern	VECTOR	Forward;
-extern	float	framelag;  
-
-extern MLOADHEADER Mloadheader;
-
-extern	BGOBJECT	*	FirstBGObjectUsed;
-extern	BGOBJECT		BGObjects[ MAXBGOBJECTS ];
-
-extern	LINE			Lines[ MAXLINES ];
-extern	ENEMY			Enemies[ MAXENEMIES ];
-
-extern	MCLOADHEADER	MCloadheadert0;					//  0 thickness collision map...
-extern	MCLOADHEADER	MCloadheader;					//  ship collision map...
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-
-extern bool	DebugInfo;
 int no_collision = 0;
 int outside_group = 0;
 
@@ -112,13 +78,6 @@ static	VECTOR	ODir;
 static	VECTOR	IPoint;
 static	float	IDist;
 static	float	*IPointp = (float *) &IPoint;
-
-extern	float	CollisionRadius;
-extern	float	SoundInfo[MAXGROUPS][MAXGROUPS];
-
-extern	RESTART	*	FirstRestartUsed;
-extern	float			SoundInfo[MAXGROUPS][MAXGROUPS];
-extern	ENEMY	*		FirstEnemyUsed;
 
 bool CheckRestartPointCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
@@ -247,8 +206,6 @@ bool RayPolyIntersect( float * P0 , float * P1 , float * P2 , float * P3 ,
 	float		Npcx;
 	float		Npcy;
 	float		*NP4;
-
-
 
 /*===================================================================
 	Calculate D
@@ -555,8 +512,6 @@ bool ColRayPolyIntersect( MCFACE *face )
 	return true;
 }
 
-
-
 bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 {
 	float		t;
@@ -598,9 +553,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 	return true;
 }
 
-
-
-
 /*===================================================================
 	Procedure	:	Calculate the Dot product of a Vert and Normal
 	Input		:	VERT	*	a
@@ -640,11 +592,6 @@ float ColDotProduct( VECTOR * vec0 , NORMAL * vec1 )
 	return dot;
 }
 #endif
-
-
-
-
-
 
 #define NIL ((u_int16_t) -1)
 
@@ -810,8 +757,6 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 	return hit_bg;
 }
 
-
-
 /*
  * BackgroundCollideOneGroup
  *
@@ -941,8 +886,6 @@ bool BackgroundCollideOneGroup( MCLOADHEADER *c, MLOADHEADER *m,
 	}
 	return hit_bg;
 }
-
-
 
 /*
  * MoveGroup
@@ -2656,8 +2599,6 @@ bool ObjectCollideNoBGObject( OBJECT *Obj, VECTOR *Move_Off, float radius )
 
 	return collide;
 }
-
-
 
 bool ObjectCollideOnly( OBJECT *Obj, VECTOR *Move_Off, float radius, VECTOR *Target_Off, BGOBJECT **BGObject )
 {

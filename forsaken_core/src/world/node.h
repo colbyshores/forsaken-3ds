@@ -59,6 +59,10 @@ NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 
 NODE * FindSuitableSplineNodeRandom( u_int32_t Network, NODE * NodeFrom , NODE *Node1 , NODE *Node2 , NODE *Node3 , NODE *Node4 );
 float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Group, VECTOR * TopLeft, VECTOR * BottomRight );
 
+/* Defined in node.cpp; shared with the modules that use it. */
+extern NODENETWORKHEADER NodeNetworkHeader;
+void ShowNodeNetwork( u_int32_t NetMask );
+
 #ifdef __cplusplus
 }
 #endif

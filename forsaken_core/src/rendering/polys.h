@@ -113,6 +113,12 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 FILE * SavePolys( FILE * fp );
 FILE * LoadPolys( FILE * fp );
 
+/* Defined in polys.cpp; shared with the modules that use it. */
+extern POLY Polys[ MAXPOLYS ];
+extern u_int32_t TotalPolysInUse;
+extern u_int16_t FirstPolyUsed;
+extern VECTOR ShieldVerts[ 4 ];
+
 #ifdef __cplusplus
 }
 #endif

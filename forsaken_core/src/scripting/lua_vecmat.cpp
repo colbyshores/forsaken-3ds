@@ -326,7 +326,6 @@ static int luamat_new(lua_State *L)
 	return 1;
 }
 
-extern MATRIX MATRIX_Identity;
 static int luamat_newidentity(lua_State *L)
 {
 	MATRIX *m;

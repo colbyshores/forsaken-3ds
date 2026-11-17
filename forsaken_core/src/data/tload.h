@@ -70,6 +70,10 @@ bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n );
 
 extern bool use_original_textures;
 
+/* Defined in tload.cpp; shared with the modules that use it. */
+extern TLOADHEADER Tloadheader;
+extern double Gamma;
+
 #ifdef __cplusplus
 }
 #endif

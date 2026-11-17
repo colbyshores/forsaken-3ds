@@ -27,9 +27,6 @@
 #include "scripting/lua_vecmat.h"
 #include "scripting/lua_weapons.h"
 
-extern PRIMARYWEAPONBULLET PrimBulls[MAXPRIMARYWEAPONBULLETS];
-extern SECONDARYWEAPONBULLET SecBulls[MAXSECONDARYWEAPONBULLETS];
-
 static void pushprimbull(lua_State *L, u_int16_t index)
 {
 	int *id = (int*)lua_newuserdata(L, sizeof(int));

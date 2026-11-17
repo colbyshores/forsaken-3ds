@@ -73,31 +73,10 @@
 		TextureAnims			24				Olly
  */
 
-
-
-
 /*===================================================================
 		Defines
 ===================================================================*/
 #define MAX_SAVEGAME_FILENAME		128
-
-
-extern "C" bool SaveSnapShot( int8_t * Filename );
-																   
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern bool Cheated;
-extern	char biker_name[];
-extern	float framelag;
-extern	int CrystalsFound;
-extern	int16_t Lives;
-extern	int16_t		LevelNum;
-extern	char		MissionTextNames[MAXLEVELS][128];
-extern	float		LevelTimeTaken;
-extern	int16_t		NumInitEnemies;
-extern	int16_t		NumKilledEnemies;
-extern	LIST		LoadSavedGameList;
 
 /*===================================================================
 		Globals ...
@@ -129,7 +108,6 @@ char *SaveGamePicFileName( int slot )
 	Output		:	nothing
 ===================================================================*/
 int8_t	LoadGameFilename[ 256 ];
-extern	int16_t			NumLevels;
 
 bool PreInGameLoad( MENUITEM * MenuItem )
 {
@@ -198,7 +176,6 @@ bool PreInGameLoad( MENUITEM * MenuItem )
 	Input		:	MENUITEM * MenuItem
 	Output		:	nothing
 ===================================================================*/
-extern px_timer_t countdown_timer;
 void InGameLoad( MENUITEM * MenuItem )
 {
 	FILE	*	fp;

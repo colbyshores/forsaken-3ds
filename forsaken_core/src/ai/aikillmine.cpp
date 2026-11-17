@@ -20,19 +20,14 @@
 #include "ai/ai.h"
 #include "game/secondary.h"
 #include "game/primary.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[];
-extern	SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[];
-extern	SECONDARYWEAPONBULLET	SecBulls[MAXSECONDARYWEAPONBULLETS];
 /*===================================================================
 	Procedure	:	AIR KillMine
 	Input		:	ENEMY * Enemy

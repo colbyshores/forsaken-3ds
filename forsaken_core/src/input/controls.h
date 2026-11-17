@@ -188,6 +188,22 @@ void FlashMenuText( char *text, float activetime, u_int16_t sfx );
 void ProcessMenuFlashText( void );
 void DisableCheats( void );
 
+/* Defined in controls.cpp; shared with the modules that use it. */
+extern char * JoystickPOVDirections[ MAX_POV_DIRECTIONS ];
+extern bool FullRearView;
+extern bool ShowStats;
+extern bool ShowMessages;
+extern bool ShowStatistics;
+extern bool ShowNetworkInfo;
+extern bool flush_input;
+void clear_last_mouse_state(void);
+extern float FlashTextActive;
+extern char * ShipAxisSeperateText[ NUM_SHIP_AXIS_ACTIONS*2 ];
+extern char * ShipAxisText[ NUM_SHIP_AXIS_ACTIONS ];
+extern int ShipAxisLookup[ NUM_SHIP_AXIS_ACTIONS ];
+extern char * ShipActionText[ NUM_SHIP_ACTIONS ];
+void CheckCheats( int key );
+
 #ifdef __cplusplus
 }
 #endif

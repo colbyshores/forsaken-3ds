@@ -3,8 +3,6 @@
 #include <lauxlib.h>
 #include "game/enemies.h"
 
-extern ENEMY Enemies[MAXENEMIES];
-
 static void pushenemy(lua_State *L, int index)
 {
 	int *id = (int*)lua_newuserdata(L, sizeof(int));

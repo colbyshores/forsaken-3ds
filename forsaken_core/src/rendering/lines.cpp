@@ -12,9 +12,7 @@
 #include "net/networking.h"
 #include "rendering/lines.h"
 #include "game/camera.h"
-
-extern	CAMERA	CurrentCamera;
-extern	bool	DebugInfo;
+#include "ui/title.h"
 
 /*===================================================================
 	Globals

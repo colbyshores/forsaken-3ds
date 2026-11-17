@@ -26,23 +26,7 @@
 #include "util/util.h"
 #include "game/oct2.h"
 #include "game/singleplayer.h"
-
-
-extern bool IsHost;   // is the user hosting/joining a game
-extern	BYTE	GameStatus[];	// Game Status for every Ship...
-extern u_int16_t RandomStartPosModify;
-extern bool PlayDemo;
-extern	bool	CaptureTheFlag;
-extern	bool	CTF;
-extern	int16_t	SelectedBike;
-extern	char	biker_name[256];
-extern	bool	CountDownOn;
-extern	bool	TeamGame;
-extern  BYTE          MyGameStatus;
-extern SLIDER WatchPlayerSelect;
-
-extern "C" bool InitLevels( char *levels_list );
-extern char *CurrentLevelsList;
+#include "rendering/screenpolys.h"
 
 bool LoadASinglePlayerGame( MENUITEM * Item )
 {

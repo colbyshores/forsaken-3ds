@@ -5,6 +5,8 @@
 #ifndef BGOBJECTS_INCLUDED
 #define BGOBJECTS_INCLUDED
 #include "game/main.h"
+#include "game/camera.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -255,6 +257,13 @@ bool PreLoadFlyGirl( void );
 bool AllocateCompFlyGirl( void );
 void UpdateFlyGirl( VECTOR * Pos, MATRIX * Matrix, bool Visible );
 void ReleaseFlyGirl( void );
+
+/* Defined in bgobjects.cpp; shared with the modules that use it. */
+extern BIKEINFO BikeCompFiles[ MAXBIKETYPES ];
+extern bool ShowColZones;
+void UpdateBGObjectsClipGroup( CAMERA * Camera );
+extern BGOBJECT * FirstBGObjectUsed;
+extern BGOBJECT BGObjects[ MAXBGOBJECTS ];
 
 #ifdef __cplusplus
 }

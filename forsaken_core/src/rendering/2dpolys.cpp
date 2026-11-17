@@ -16,6 +16,9 @@
 #include "game/spotfx.h"
 #include "game/water.h"
 #include "util/util.h"
+#include "data/tload.h"
+#include "game/oct2.h"
+#include "rendering/2dtextures.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -26,25 +29,6 @@
 /*===================================================================
 	Externs
 ===================================================================*/
-extern	CAMERA	CurrentCamera;
-extern	RENDERMATRIX			view;
-extern	MATRIX				ProjMatrix;
-extern	VECTOR				Camera_Dir;
-extern	VECTOR				Forward;
-extern	VECTOR				SlideUp;
-extern	VECTOR				SlideLeft;
-extern	BYTE				WhoIAm;
-extern	TLOADHEADER			Tloadheader;
-extern	FRAME_INFO	*		Troj_Exp_Header;
-extern	FRAME_INFO	*		Shrapnel_Header;
-extern	float				framelag;
-extern	MATRIX				MATRIX_Identity;
-extern	DWORD				CurrentSrcBlend;
-extern	DWORD				CurrentDestBlend;
-extern	DWORD				CurrentTextureBlend;
-extern	MLOADHEADER			Mloadheader;
-extern	MCLOADHEADER		MCloadheader;
-extern	MCLOADHEADER		MCloadheadert0;
 
 /*===================================================================
 	Globals

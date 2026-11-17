@@ -18,6 +18,10 @@ char *DemoName( char *demofilename );
 void StartDemoCleaning( MENUITEM * Item );
 void StartDemoPlayback( MENUITEM * Item );
 
+/* Defined in demo.cpp; shared with the modules that use it. */
+extern FILE * DemoFp;
+extern FILE * DemoFpClean;
+
 #ifdef __cplusplus
 }
 #endif

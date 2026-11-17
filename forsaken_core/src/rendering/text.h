@@ -1,6 +1,8 @@
 
 #ifndef TEXT_INCLUDED
 #define TEXT_INCLUDED
+#include "game/main.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,6 +105,21 @@ typedef enum {
 } colors_t;
 
 
+
+/* Defined in text.cpp; shared with the modules that use it. */
+extern char * TeamName[ MAX_TEAMS ];
+extern u_int8_t Colourtrans[ MAXFONTCOLOURS ][ 3 ];
+extern int TeamCol[ MAX_TEAMS ];
+extern char * StatusTab[ 256 ];
+void MessageQuePrintAll( void );
+extern float MessageTime[ MAX_MESSAGES ];
+extern char MessageBank[ MAX_MESSAGES ][ MAXPERLINE ];
+extern int FontWidth;
+extern int FontHeight;
+extern int FontSourceWidth;
+extern int FontSourceHeight;
+extern int16_t NumOfActivePlayers;
+extern float MaxMessageTime;
 
 #ifdef __cplusplus
 }

@@ -33,6 +33,14 @@
 #include "util/util.h"
 #include "game/oct2.h"
 #include "diag/perf_capture.h"
+#include "data/mload.h"
+#include "data/mxaload.h"
+#include "game/camera.h"
+#include "game/stats.h"
+#include "net/multiplayer.h"
+#include "rendering/2dtextures.h"
+#include "rendering/lights.h"
+#include "world/visi.h"
 #ifdef RENDERER_C3D
 /* render_c3d.c is a C TU; hoisted from block-scope externs (C++ mangles those). */
 extern "C" void c3d_set_object_shine_eligible(bool);
@@ -51,77 +59,13 @@ extern "C" void boot_log(const char *);
 /*===================================================================
 		Externals ...
 ===================================================================*/
-extern VECTOR HoloRot;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	CAMERA			CurrentCamera;
-extern	MXALOADHEADER	*MxaModelHeaders;
 
-extern	BYTE			WhoIAm;
-extern	float			framelag;
-extern	XLIGHT * FirstLightVisible;
-
-extern	RENDERMATRIX		identity;
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-
-extern	u_int16_t			FirstSecBullUsed;
-extern	SECONDARYWEAPONBULLET SecBulls[MAXSECONDARYWEAPONBULLETS];
-extern	int16_t			SecondaryAmmo[ MAXSECONDARYWEAPONS ];
-extern	int16_t			SecAmmoUsed[ MAXSECONDARYWEAPONS ];
-
-extern	MATRIX			MATRIX_Identity;
-
-extern	XLIGHT			XLights[ MAXXLIGHTS ];
-extern	u_int16_t			FirstXLightUsed;
-extern	u_int16_t			FirstXLightFree;
-extern	PICKUP			Pickups[ MAXPICKUPS ];
-
-extern	int16_t			NumPickupsPerGroup[ MAXGROUPS ];
 extern	MODELNAME		TitleModelNames[MAXMODELHEADERS];
-extern	float			SoundInfo[MAXGROUPS][MAXGROUPS];
-extern	ENEMY	*		FirstEnemyUsed;
-extern	LINE			Lines[ MAXLINES ];
-extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
-extern	POLY			Polys[MAXPOLYS];
-extern	FRAME_INFO	*	Flare_Header;
-extern	PRIMARYWEAPONBULLET	PrimBulls[MAXPRIMARYWEAPONBULLETS];
-extern	u_int16_t			GlobalPrimBullsID;
-extern	u_int16_t			GlobalSecBullsID;
-extern	int16_t			BikeModels[ MAXBIKETYPES ];
-extern	BYTE			GameStatus[MAX_PLAYERS];	// Game Status for every Ship...
-extern	bool			IsHost;
-extern	float			NmeDamageModifier;
-extern	int32_t			ColPerspective;
-extern	bool			TeamGame;
-extern	BYTE			TeamNumber[MAX_PLAYERS];
-extern bool BikeExpanded;
-extern	ENEMY			Enemies[ MAXENEMIES ];
-extern	BIKEINFO		BikeCompFiles[ MAXBIKETYPES ];
-extern	bool			BikeExhausts;
-extern	int16_t			CameraRendering;
-extern	bool			PlayDemo;
-extern	BYTE			ChangeLevel_MyGameStatus;
-extern	bool			CaptureTheFlag;
-extern	bool			CTF;
-extern	bool			BikeEnginesOn;
-
-extern int KillMessageColour;
-extern int MatureContent;
 
 void RefreshModel( u_int16_t model );
 
 #define BALL_RADIUS	( 256 * GLOBAL_SCALE )
 #define	NUMBIKEDETAILS	4
-
-// statistics (stats.c)
-extern "C" void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon);	// update the statistics
 
 /*===================================================================
 	Globals
@@ -302,9 +246,6 @@ MODELNAME	ModelNames[MAXMODELHEADERS] ={
 	{ "tc-25.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 	{ "tc-26.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 	{ "tc-27.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
-
-
-
 
 	{ "borg400.mxa", 4, false, MODELTYPE_Morphing, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// Unstealthed
 	{ "borg300.mxa", 0, false, MODELTYPE_Morphing, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
@@ -555,8 +496,6 @@ MODELNAME	SplashModelNames[ MAXMODELHEADERS ] ={
 	{ "" , 0 , false, MODELTYPE_Static, 0, false, DONTLOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 };
 
-
-
 /*===================================================================
 *		Set up 2d exec buff etc...
 ===================================================================*/
@@ -609,7 +548,6 @@ void OnceOnlyInitModel( void )
 				:	MODELNAME	*		Current Model Name
 	Output		:	bool				true/false
 ===================================================================*/
-extern	int16_t		LevelNum;
 bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 {
 	int			i;
@@ -1150,10 +1088,6 @@ void ModelVisCache_NewFrame( void )
 #endif
 	VisBucketDirty = 1;
 }
-
-
-
-
 
 /* Draw guard: with bucketing the model is already known to be visible and
  * already known to belong to this group; without it the predicate decides. */
@@ -3769,9 +3703,6 @@ __asm
 	return true;
 }
 
-
-
-
 /*===================================================================
 	Procedure	:	Light model
 	Input		:	u_int16_t		Model Number
@@ -5704,12 +5635,6 @@ void SetupModelSpotFX( u_int16_t i )
 ===================================================================*/
 //#define	PHIL_TESTSFX
 
-extern bool TeamGame;
-extern int TeamCol[ MAX_TEAMS ];
-extern u_int8_t Colourtrans[MAXFONTCOLOURS][3];
-extern BYTE	TeamNumber[MAX_PLAYERS];
-extern bool TintBikeTeamColor;
-
 void UpdateShipModel( u_int16_t Ship )
 {
 	u_int16_t	Model;
@@ -6576,9 +6501,6 @@ void EnableRelavantModels( MODELNAME * ModelNamesPtr )
 		}
 	}
 }
-
-
-
 
 void CheckModelLinkList( void )
 {

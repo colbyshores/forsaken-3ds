@@ -3,21 +3,11 @@
 #include "util/util.h"
 #include "rendering/render.h"
 #include <SDL.h>
+#include "game/oct2.h"
+#include "net/networking.h"
+#include "ui/title.h"
 
 JOYSTICKINFO JoystickInfo[MAX_JOYSTICKS];
-
-extern bool RenderModeReset( void );
-extern void SetGamePrefs( void );
-extern void FadeHoloLight(float Brightness);
-extern float HoloLightBrightness;
-extern float RoomDarkness;
-extern void DarkenRoom2(float darkness);
-extern void ProcessVduItems( MENU * Menu );
-extern bool InitialTexturesSet;
-extern bool cursor_clipped;
-extern BYTE MyGameStatus;
-extern render_info_t render_info;
-extern void CleanUpAndPostQuit(void);
 
 int Num_Joysticks = 0;
 
@@ -277,7 +267,6 @@ void app_mouse_motion( SDL_MouseMotionEvent * motion )
 	mouse_state.yrel += motion->yrel;
 }
 
-extern float real_framelag;
 mouse_state_t* read_mouse(void)
 {
 	static mouse_state_t state;
@@ -675,8 +664,6 @@ bool handle_events( void )
 		case SDL_WINDOWEVENT:
 			app_active( &_event );
 			break;
-
-
 
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:

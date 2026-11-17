@@ -26,37 +26,10 @@
 #include "util/util.h"
 #include "rendering/render.h"
 #include "util/timer.h"
+#include "game/goal.h"
+#include "game/oct2.h"
 
 #define MSG_VERSION_NUMBER 1
-
-
-/*===================================================================
-		Externals ...
-===================================================================*/
-
-extern bool Debug;
-extern bool	CanDoDamage[MAX_PLAYERS+1];
-extern bool	PlayDemo;
-extern px_timer_t LastPacketTime[MAX_PLAYERS+1];
-extern bool	CTF;
-extern bool CaptureTheFlag;
-extern bool BountyHunt;
-extern float	framelag;
-extern float	real_framelag;
-extern	BYTE	GameStatus[MAX_PLAYERS];	// Game Status for every Ship...
-
-extern	bool	TeamGame;
-extern	BYTE	TeamNumber[MAX_PLAYERS];
-extern	bool	ShowTeamInfo;
-extern	MLOADHEADER Mloadheader;
-extern	int16_t			Stats[MAX_PLAYERS+1][MAX_PLAYERS+1];
-extern	int16_t					Lives;
-extern	int16_t					MaxKills;
-extern	bool                    IsHost;
-extern	int16_t			NumLevels;
-extern	int				TeamFlag[ MAX_TEAMS ];
-
-extern render_info_t render_info;
 
 // color names are defined in text.h colors_t
 u_int8_t Colourtrans[MAXFONTCOLOURS][3] = {
@@ -73,19 +46,6 @@ u_int8_t Colourtrans[MAXFONTCOLOURS][3] = {
 	{ 0,0,0 },		// black
 	{ 255,255,255 }		// white
 };
-
-// (Title.c)
-extern int SystemMessageColour;
-extern int PlayerMessageColour;
-extern int MyMessageColour;
-extern SLIDER TextScaleSlider;
-extern bool ShowPlayerHealthByScores;
-// (stats.c)
-extern int GetPlayerByRank(int Player);
-
-// (networking.c)
-extern SHIPHEALTHMSG PlayerHealths[ MAX_PLAYERS+1 ];
-extern u_int8_t ShipHealthColour[ MAX_PLAYERS+1 ];
 
 /*===================================================================
 		Globals ...
@@ -641,13 +601,6 @@ void AddColourMessageToQue( int Colour, char * Text, ... )
 float	FlashSpeed = 0.0F;
 bool	FlashToggle = false;
 
-// (stats.c)
-extern int GetScoreStats(int Player);
-
-
-extern bool ShowPlayersOnHUD;
-extern bool ShowPlayersOnHUDbyKills;
-extern BYTE MyGameStatus;
 void PrintScoreSort( void )
 {
 	bool teamOK[MAX_TEAMS];
@@ -1034,8 +987,6 @@ void InitStatsMessages( void )
 		{ "NoPointsName",		Stats_NoPointsName		},
 		{ NULL,					0					   	}
 	};
-
-
 
 /*
 typedef struct
@@ -1791,8 +1742,6 @@ FILE *	LoadAllText( FILE * fp )
 	return fp;
 }
 
-
-
 /*===================================================================
 	Procedure	:		Fill Status messages..
 	Input		:		void
@@ -1851,9 +1800,6 @@ void FillStatusTab( void )
     StatusTab[STATUS_InitView_10                          ] = "Loading 10/10";
     StatusTab[STATUS_LeftCrashed                          ] = "LeftCrashed  ";
     StatusTab[STATUS_Null                                 ] = "Null         ";
-
-
-
 
 #if 0
     StatusTab[STATUS_PlayingAVI                           ] = "PlayingAVI                 ";

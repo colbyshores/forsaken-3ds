@@ -12,6 +12,11 @@
 #include "game/bgobjects.h"
 #include "game/object.h"
 #include "net/networking.h"
+#include "audio/sfx.h"
+#include "data/config.h"
+#include "game/demo.h"
+#include "game/ships.h"
+#include "util/util.h"
 
 /* definitions for the globals networking.h declares */
 int local_port;
@@ -46,13 +51,8 @@ bool tracker_enabled;
 #include "net/net_tracker.h"
 #include "util/timer.h"
 #include "game/oct2.h"
-/* util.c is a C TU; networking.c relied on implicit declaration here. */
-extern "C" void DebugPrintf_( const char * format, ... );
-
 
 BYTE WhoIAm = UNASSIGNED_SHIP;
-
-extern bool Debug;
 
 int	PacketGot[256];
 int	PacketSize[256];
@@ -67,35 +67,6 @@ u_int32_t MaxCurrentBytesPerSecRec		= 0;
 u_int32_t MaxCurrentBytesPerSecSent	= 0;
 float BytesPerSecTimer				= 0.0F;
 
-extern MENU  * GetPlayerNumMenu;
-
-extern int FontHeight;
-
-extern	int16_t	PickupsGot[ MAXPICKUPTYPES ];
-extern	u_int32_t	TeamFlagMask[ MAX_TEAMS ];
-extern	int8_t	TeamFlagPickup[ MAX_TEAMS ];
-
-extern int16_t	NumPrimaryPickups;
-
-extern	bool	CountDownOn;
-extern char LevelNames[MAXLEVELS][128];
-
-extern	SLIDER	MaxPlayersSlider;
-
-extern SLIDER	GoalScoreSlider;
-
-extern LIST	LevelList;
-extern	SLIDER	TimeLimit;
-extern	int		GameType;
-extern	bool	MyBrightShips;
-extern bool BountyBonus;
-
-extern float GetPlayerNumCount1;
-extern float GetPlayerNumCount2;
-extern int   GetPlayerNumCount;
-
-extern bool	PickupValid[ MAXPICKUPTYPES ];
-
 #define YourVersion "YOUR VERSION: " PXVersion
 
 #define	ONEOVER32767 (1.0F / 32767.0F)
@@ -105,44 +76,8 @@ extern bool	PickupValid[ MAXPICKUPTYPES ];
 #define	SHORTANGLEMODIFIERPACK (32767.0F / 45.0F)
 #define	SHORTANGLEMODIFIERUNPACK (45.0F / 32767.0F)
 
-extern char CTFMessage[];
-extern	bool IMustQuit;
-
-extern bool NeedFlagAtHome;
-extern bool OwnFlagTeleportsHome;
-extern bool CanCarryOwnFlag;
-extern SLIDER CTFSlider;
-
-extern "C" void SetTeamGoals( u_int16_t *TeamGoals );
-
 u_int32_t BuildShipFlags( BYTE Player );
 void UnPackShipFlags( BYTE Player , u_int32_t Flags );
-
-extern int FlagsToGenerate;
-extern  u_int32_t  Host_Flags[ MAX_PLAYERS ];
-
-extern bool BountyHunt;
-extern int BountyBonusInterval;
-
-extern bool	CTF;
-extern bool CaptureTheFlag;
-extern int GoalScore;
-extern int GameCompleted;
-extern USERCONFIG	*player_config;
-
-extern char *TeamName[ MAX_TEAMS ];
-
-extern int	AllowedBike[ ALLOWED_BIKETYPES ];
-extern int32_t ColPerspective;
-extern bool Panel;
-
-extern bool	BrightShips;
-extern bool	BikeExhausts;
-extern	bool IllegalTime;
-extern	float	Countdown_Float;
-extern	SLIDER  PacketsSlider;
-
-extern char CurrentTauntVariant;
 
 float NetUpdateInterval = 4.0F;
 float HealthUpdateInterval = 4.0F;
@@ -159,8 +94,6 @@ void SetShipBankAndMat( OBJECT * ShipObjPnt );
 #pragma optimize( "gty", on )
 #endif
 
-
-extern	SLIDER	MaxKillsSlider;
 int16_t	MaxKills = 0;
 
 #ifdef DEMO_SUPPORT
@@ -172,51 +105,13 @@ extern	LONGLONG	Freq;
 #endif
 
 extern	float	DemoAvgFps;
-extern	MENUITEM	NewJoinItem;
-extern	bool	Buffer1InUse;
-extern	int		Buffer1Count;
-extern	DWORD	Buffer1Offset;
-extern	BYTE *	Buffer1Pnt;
-
-extern	bool	Buffer2InUse;
-extern	int		Buffer2Count;
-extern	DWORD	Buffer2Offset;
-extern	BYTE *	Buffer2Pnt;
-
-extern	bool	RecordDemo;
-extern	bool	PlayDemo;
-extern	FILE	*	DemoFp;
-extern	FILE	*	DemoFpClean;
-extern	LIST	DemoList;
 
 #ifdef DEMO_SUPPORT
-extern	LONGLONG	GameCurrentTime;		// How long the game has been going...
 #endif
 
-extern bool	bSoundEnabled;
-
-extern float framelag;
-
-extern	float	Start_Shield;
-extern	float	Start_Hull;
-
-extern "C" void SpecialDestroyGame( void );
 void GetLevelName( char *buf, int bufsize, int level );
 
 bool	CanDoDamage[MAX_PLAYERS+1];
-
-extern	MATRIX			MATRIX_Identity;
-
-extern	TEXT	MacroText1;
-extern	TEXT	MacroText2;
-extern	TEXT	MacroText3;
-extern	TEXT	MacroText4;
-extern  TEXT	QuickText;
-extern  TEXT	QuickTextWhisper;
-extern	int8_t	PrimaryToFireLookup[ MAXPRIMARYWEAPONS ];
-extern	int8_t	SecondaryToFireLookup[ MAXSECONDARYWEAPONS ];
-extern	float	GlobalFramelagAddition;
-extern	bool ResetKillsPerLevel;
 
 bool		JustGenerated = false;
 bool		JustPickedUpShield = false;
@@ -237,13 +132,6 @@ extern	LONGLONG	GameElapsedTime;
 LONGLONG	TempTime;
 LONGLONG	DemoTimeSoFar = 0;
 #endif
-
-extern	u_int16_t		Seed1;
-extern	u_int16_t		Seed2;
-extern	u_int16_t		CopyOfSeed1;
-extern	u_int16_t		CopyOfSeed2;
-extern	bool		RandomPickups;
-
 
 int16_t	BikeModels[ MAXBIKETYPES ] = {
 
@@ -283,11 +171,8 @@ int16_t					StatsCount = -1;
 
 network_player_t * host_network_player = NULL;
 
-extern "C" void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID );
-
 void CreateReGen( u_int16_t ship );
 bool InitLevels( char *levels_list );
-extern	MODEL	Models[MAXNUMOFMODELS];
 
 bool	HostDuties = false;
 bool					IsHost = true;
@@ -331,8 +216,6 @@ int16_t								NumMissedMines = 0;
 int16_t								NumMissedInitMines = 0;
 int16_t								NumMissedKillMines = 0;
 
-extern u_int16_t	num_start_positions;
-
 GLOBALSHIP              Ships[MAX_PLAYERS+1];
 bool	DemoShipInit[MAX_PLAYERS+1];
 
@@ -341,30 +224,7 @@ BYTE	CommBuff[MAX_BUFFER_SIZE];
 
 int		RealPacketSize[256];
 
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	VECTOR			NullVector;
-extern	MLOADHEADER Mloadheader;
-extern	int16_t LevelNum;
-extern	float PowerLevel;
-extern	SECONDARYWEAPONATTRIB SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ];
-extern	SECONDARYWEAPONBULLET SecBulls[MAXSECONDARYWEAPONBULLETS];
-extern	SHIPCONTROL control;
-extern	char * Messages[];
-extern	int16_t	SelectedBike;
-extern	bool	GodMode;
-
-extern	bool	TeamGame;
-extern	BYTE	TeamNumber[MAX_PLAYERS];
-extern	u_int16_t	RandomStartPosModify;
-
 bool	ChAngleevel( void );
-extern "C" void	DebugPrintf( const char * format, ... );
-extern "C" void AddTitleMessage(LPTEXTMSG LpTextMsg);
 
 MATRIX	TempMatrix = {
 				1.0F, 0.0F, 0.0F, 0.0F,
@@ -372,77 +232,10 @@ MATRIX	TempMatrix = {
 				0.0F, 0.0F, 1.0F, 0.0F,
 				0.0F, 0.0F, 0.0F, 1.0F };
 
-extern	char biker_name[256];
-
-extern	int16_t			NumRegenPoints;
-extern	int				NumOfTrigVars;
-extern	int				NumOfTriggers;
-
 bool	UseShortPackets;
 bool	MyUseShortPackets;
 
-extern	int16_t	NumOrbs;
-extern	PRIMARYWEAPONATTRIB PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ];
-extern	char *SecondaryDescription[MAXSECONDARYWEAPONS];
-extern	char *PrimaryDescription[];
-extern	int16_t	Host_PrimaryWeaponsGot[ MAX_PLAYERS ][ MAXPRIMARYWEAPONS ];
-extern	int16_t	Host_SecondaryWeaponsGot[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-extern	float	Host_GeneralAmmo[ MAX_PLAYERS ];
-extern	float	Host_PyroliteAmmo[ MAX_PLAYERS ];
-extern	float	Host_SussGunAmmo[ MAX_PLAYERS ];
-//extern	float	Host_GeneralAmmoUsed[ MAX_PLAYERS ];
-extern	float	Host_GeneralAmmoUsed; //[ MAX_PLAYERS ];
-//extern	float	Host_PyroliteAmmoUsed[ MAX_PLAYERS ];
-extern	float	Host_PyroliteAmmoUsed;
-//extern	float	Host_SussGunAmmoUsed[ MAX_PLAYERS ];
-extern	float	Host_SussGunAmmoUsed;
-extern	int16_t	Host_SecondaryAmmo[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-//extern	int16_t	Host_SecAmmoUsed[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-extern	int16_t	Host_SecAmmoUsed[ MAXSECONDARYWEAPONS ];
-extern	int8_t	Host_SecWeaponsGot[ MAX_PLAYERS ][ MAXPICKUPS ];
-extern	float	Host_NitroFuel[ MAX_PLAYERS ];
-//extern	float	Host_NitroFuelUsed[ MAX_PLAYERS ];
-extern	float	Host_NitroFuelUsed;
-extern	int16_t	Host_PowerLevel[ MAX_PLAYERS ];
-extern	float	Host_OrbAmmo[ MAX_PLAYERS ][ MAXMULTIPLES ];
-extern	BYTE	Host_NumOfOrbitals[ MAX_PLAYERS ];
-extern	BYTE	Host_CopyOfNumOfOrbitals[ MAX_PLAYERS ];
-extern	float	Host_CopyOfOrbAmmo[ MAX_PLAYERS ][ MAXMULTIPLES ];
-extern	int16_t	Host_CopyOfPowerLevel[ MAX_PLAYERS ];
-extern	float	Host_CopyOfNitroFuel[ MAX_PLAYERS ];
-extern	float	Host_CopyOfGeneralAmmo[ MAX_PLAYERS ];
-extern	float	Host_CopyOfSussGunAmmo[ MAX_PLAYERS ];
-extern	float	Host_CopyOfPyroliteAmmo[ MAX_PLAYERS ];
-extern	int16_t	Host_PickupsGot[ MAX_PLAYERS ][ MAXPICKUPTYPES ];
-extern	PICKUP	Pickups[ MAXPICKUPS ];
-extern	int16_t	SecondaryFromPickupTab[ MAXSECONDARYWEAPONS * 2 ];
-
-// statistics (stats.c)
-extern void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon);	// update the statistics
-
-// message colours (Title.c)
-extern int KillMessageColour; 
-extern int SystemMessageColour;
-extern int FlagMessageColour;
-extern int PlayerMessageColour;
-extern int PickupMessageColour;
-extern int TauntMessageColour;
-extern int MyMessageColour;
-
-// sfx volume (Title.c)
-extern SLIDER FlagSfxSlider;
 float FlagVolume;
-
-// watch player mode select player (Title.c)
-extern SLIDER WatchPlayerSelect;
-
-// calculates distance between you and a bike (Sfx.c)
-extern "C" float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
-
-// stats used to send to other players if you are the host (stats.c)
-extern u_int8_t	KillStats[MAX_PLAYERS][MAX_PLAYERS];	
-extern u_int8_t	BonusStats[MAX_PLAYERS];
-extern u_int8_t	KillCounter[MAX_PLAYERS];	
 
 bool msg_is_valid( int msg_type )
 {
@@ -981,7 +774,6 @@ void	SetTime( float Time )
 	SendGameMessage( MSG_SETTIME, 0, 0, 0, 0 );
 }
 
-extern float real_framelag;
 static float tracker_timer = 0;
 void reset_tracker()
 {
@@ -998,9 +790,6 @@ void update_tracker()
 	}
 	tracker_timer -= real_framelag; // minus elapsed time
 }
-
-// (stats.c)
-extern void InitScoreSortTab(int Player); 
 
 void SetupNetworkGame()
 {
@@ -1110,7 +899,6 @@ void SetupNetworkGame()
 
 		for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = (u_int16_t) -1;
 	
-		// (stats.c)
 		InitScoreSortTab((int) i);
 
         PlayerHealths[i].WhoIAm = i;
@@ -1176,9 +964,6 @@ void InitShipStructure( int i , bool ResetScore )
 	Ships[i].network_player = NULL;
 }
 
-
-
-
 void DestroyGame( void )
 {
 	int	i;
@@ -1216,8 +1001,6 @@ void DestroyGame( void )
 				DebugPrintf("num %3d quantity %12d size %12d\n", i, PacketGot[i] , PacketSize[i] );
 
 }
-
-
 
 void initShip( u_int16_t i )
 {
@@ -1549,8 +1332,6 @@ void ReceiveGameMessages( void )
 		}
 	}
 }
-
-extern px_timer_t last_mine_timer;
 
 void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 {
@@ -2471,9 +2252,13 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		memmove( PlayerReady,	lpInit->PlayerReady,	sizeof(PlayerReady));//memcpy
 		memmove( GameStatus,		lpInit->GameStatus,		sizeof(GameStatus));//memcpy
 		memmove( TeamNumber,		lpInit->TeamNumber,		sizeof(TeamNumber));//memcpy
-		memmove( KillStats,		lpInit->KillStats,		sizeof(KillStats));//memcpy
-		memmove( KillCounter,	lpInit->KillCounter,	sizeof(KillCounter));//memcpy
-		memmove( BonusStats,		lpInit->BonusStats,		sizeof(BonusStats));//memcpy
+		/* FIXME(multiplayer): the packet carries BYTE[16][16] / BYTE[16]
+		 * but the stats are int[17][17] / int[17] (stats.cpp), so these
+		 * raw copies do not round-trip. Sizes are the packet's, exactly as
+		 * the old private u_int8_t declarations made them. Owner decision. */
+		memmove( KillStats,		lpInit->KillStats,		sizeof(lpInit->KillStats));
+		memmove( KillCounter,	lpInit->KillCounter,	sizeof(lpInit->KillCounter));
+		memmove( BonusStats,		lpInit->BonusStats,		sizeof(lpInit->BonusStats));
 
 		memset( PickupValid, 0, sizeof(PickupValid) );  // turn off all weapons
 		UnpackPickupInfo( lpInit->PickupFlags );	// which weapons are enabled
@@ -4580,7 +4365,6 @@ void CreateReGen( u_int16_t ship )
 	Input		:		char * Name
 	Output		:		int -1 no level....
 ===================================================================*/
-extern	int16_t			NumLevels;
 int FindSameLevel( char * Name )
 {
 	int i;
@@ -4650,8 +4434,6 @@ u_int32_t BuildShipFlags( BYTE Player )
 	if( Ships[Player].headlights ) Flags |= SHIP_Light;
 	return Flags;
 }
-
-
 
 /*===================================================================
 	Procedure	:		Build Ship Flags...

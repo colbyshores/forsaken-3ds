@@ -26,24 +26,8 @@
 #include "util/util.h"
 #include "game/demo.h"
 #include "data/file.h"
-
-
-extern BYTE TeamNumber[MAX_PLAYERS];
-extern LIST DemoList;
-extern bool TeamGame;
-extern bool CTF;
-extern bool CaptureTheFlag;
-extern bool BountyHunt;
-extern u_int16_t RandomStartPosModify;
-extern int CameraStatus;  
-extern bool CountDownOn;
-extern bool DemoShipInit[];
-extern u_int16_t CopyOfSeed1;
-extern u_int16_t CopyOfSeed2;
-extern bool RandomPickups;
-extern bool PlayDemo;
-extern void DebugLastError( void );
-extern bool ChangeLevel( void );
+#include "game/oct2.h"
+#include "rendering/screenpolys.h"
 
 FILE	*	DemoFp = NULL;
 FILE	*	DemoFpClean = NULL;

@@ -30,38 +30,14 @@
 
 #include "game/spotfx.h"
 #include "util/util.h"
+#include "game/oct2.h"
+#include "world/visi.h"
 
 /*===================================================================
 	Defines
 ===================================================================*/
 //#define	DEBUG_COMP			1
 #define	COB_VERSION_NUMBER	2
-
-/*===================================================================
-	External Variables
-===================================================================*/
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	MODEL			Models[ MAXNUMOFMODELS ];
-extern	float			framelag;
-extern	MATRIX			MATRIX_Identity;
-extern	int16_t			LevelNum;
-extern	char			LevelNames[MAXLEVELS][128];
-extern	BYTE			GameStatus[MAX_PLAYERS];
-extern	BYTE			WhoIAm;
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-extern	TRIGGERMOD	*	TrigMods;
-extern	int				NumOfTrigMods;
-extern	MXLOADHEADER	*ModelHeaders;
-extern	MXALOADHEADER	*MxaModelHeaders;
-extern	LINE			Lines[ MAXLINES ];
-extern	MLOADHEADER		Mloadheader;
 
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight );

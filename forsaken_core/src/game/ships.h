@@ -22,6 +22,7 @@
 #include "audio/sfx.h"
 #include "game/models.h"
 #include "data/mxload.h"
+#include "input/controls.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -120,6 +121,39 @@ void ReleaseComponentedShips( void );
 
 FILE * SaveShips( FILE * fp );
 FILE * LoadShips( FILE * fp );
+
+/* Defined in ships.cpp; shared with the modules that use it. */
+extern RENDERMATRIX TempWorld;
+extern SHIPCONTROL control;
+extern float MaxMoveSpeed;
+extern float MoveAccell;
+extern float MoveDecell;
+extern float MaxTurboSpeed;
+extern float TurboAccell;
+extern float TurboDecell;
+extern float MaxTurnSpeed;
+extern float TurnAccell;
+extern float TurnDecell;
+extern float MaxRollSpeed;
+extern float RollAccell;
+extern float RollDecell;
+extern float MaxBankAngle;
+extern float BankAccell;
+extern float BankDecell;
+extern int outside_map;
+extern u_int32_t TeamFlagMask[ MAX_TEAMS ];
+extern bool TeamFlagAtHome[ MAX_TEAMS ];
+extern bool RearCameraDisable;
+extern float WhiteOut;
+extern float NitroFuel;
+extern int HullHit;
+extern int ShieldHit;
+extern float BountyTime;
+extern bool ShieldCritical;
+extern float NitroFuelUsed;
+extern float Start_Shield;
+extern float Start_Hull;
+void ObjForceExternalOneOff( OBJECT *Obj, VECTOR *force );
 
 #ifdef __cplusplus
 }

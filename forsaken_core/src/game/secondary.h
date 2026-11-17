@@ -11,6 +11,8 @@
 #ifndef SECONDARY_INCLUDED
 #define SECONDARY_INCLUDED
 #include "game/constants.h"
+#include "game/main.h"
+#include "util/timer.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -300,6 +302,27 @@ void ToggleSecondaryWeapons( int8_t Secondary );
 
 void ScatterWeaponsForShip( u_int16_t Ship, VECTOR * Dir, int16_t MaxPickupsAllowed );
 int16_t HostGenerateSecondaryPickups( u_int16_t Ship, int16_t NumAllowed );
+
+/* Defined in secondary.cpp; shared with the modules that use it. */
+extern SECONDARYWEAPONATTRIB SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ];
+extern SECONDARYWEAPONBULLET SecBulls[ MAXSECONDARYWEAPONBULLETS ];
+extern u_int16_t FirstSecBullUsed;
+extern SECONDARYWEAPONBULLET * SecBullGroups[ MAXGROUPS ];
+extern int16_t SecondaryAmmo[ MAXSECONDARYWEAPONS ];
+extern int16_t SecAmmoUsed[ MAXSECONDARYWEAPONS ];
+extern u_int16_t GlobalSecBullsID;
+extern bool TargetComputerOn;
+extern int16_t SecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
+extern int16_t NumSecBullsPerGroup[ MAXGROUPS ];
+extern int8_t SecondaryToFireLookup[ MAXSECONDARYWEAPONS ];
+extern bool SecondaryWeaponCheat;
+extern char * SecondaryDescription[ MAXSECONDARYWEAPONS ];
+extern px_timer_t last_mine_timer;
+extern u_int16_t HitBox;
+extern u_int16_t TargScrPolys[ 4 ];
+extern int8_t * DebugSecStrings[];
+extern bool ShowNamesAnyway;
+extern bool SecondaryValid[ MAXSECONDARYWEAPONS ];
 
 #ifdef __cplusplus
 }

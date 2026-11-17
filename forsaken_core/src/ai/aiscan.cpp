@@ -18,13 +18,12 @@
 #include "game/pickups.h"
 #include "game/enemies.h"
 #include "ai/ai.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
-// Externals
-extern	float framelag;
 /*===================================================================
 	Procedure	:	AIR Scan for a Target
 	Input		:	ENEMY * Enemy

@@ -351,6 +351,11 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot );
 void spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4);
 void MxV( MATRIX * m, VECTOR * v0, VECTOR * v1 );
 
+/* Defined in new3d.cpp; shared with the modules that use it. */
+extern MATRIX MATRIX_Identity;
+extern u_int16_t Seed1;
+extern u_int16_t Seed2;
+
 #ifdef __cplusplus
 }
 #endif

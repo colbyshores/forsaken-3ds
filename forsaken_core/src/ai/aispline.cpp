@@ -21,19 +21,14 @@
 #include "game/secondary.h"
 #include "game/primary.h"
 #include "rendering/lines.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	LINE			Lines[ MAXLINES ];
-extern	NODENETWORKHEADER	NodeNetworkHeader;
-extern	MLOADHEADER	Mloadheader;
 /*===================================================================
 	Procedure	:	AI Spline Movement....
 	Input		:	ENEMY * Enemy
@@ -187,12 +182,3 @@ void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
 #ifdef OPT_ON
 #pragma optimize( "", off )
 #endif
-
-
-
-
-
-
-
-
-

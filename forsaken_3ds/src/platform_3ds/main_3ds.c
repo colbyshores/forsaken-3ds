@@ -18,7 +18,6 @@
 #include "util/util.h"
 #include "rendering/render.h"
 
-extern render_info_t render_info;
 extern bool render_init(render_info_t *info);
 
 /* ---- 3DS heap configuration ---- */

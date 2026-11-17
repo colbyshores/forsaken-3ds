@@ -29,6 +29,10 @@
 #include "diag/framedump.h"
 
 #include <unistd.h>
+#include "game/oct2.h"
+#include "game/skin.h"
+#include "net/multiplayer.h"
+#include "net/networking.h"
 
 
 //
@@ -125,20 +129,7 @@ static bool missing_folders( void )
 // Parse the Command Line
 //
 
-extern bool NoSFX;
-extern float normal_fov;
-extern float UV_Fix;
-extern int NetUpdateIntervalCmdLine;
-extern char *config_name;
 extern int cliSleep;
-extern TEXT local_port_str;
-extern bool SpaceOrbSetup;
-extern TEXT TCPAddress;
-extern TEXT local_port_str;
-extern TEXT host_port_str;
-extern bool DebugLog;
-extern u_int8_t QuickStart;
-extern bool IpOnCLI;
 
 static bool ParseCommandLine(char* lpCmdLine)
 {
@@ -344,10 +335,7 @@ static bool ParseCommandLine(char* lpCmdLine)
 // Cleans up the application before quiting
 //
 
-extern void ReleaseView(void);
-extern void DestroySound( int flags );
 extern void render_cleanup( render_info_t * info );
-extern void ReleaseScene(void);
 
 bool QuitRequested = false;
 void CleanUpAndPostQuit(void)
@@ -416,17 +404,7 @@ void CleanUpAndPostQuit(void)
 extern bool breakpad_init( void );
 #endif
 
-extern bool InitView( void );
-extern void GetGamePrefs( void );
-extern void SetSoundLevels( int *dummy );
-extern void GetDefaultPilot(void);
-extern bool InitScene(void);
-extern BYTE MyGameStatus;
-
 #include "data/mload.h"
-extern RENDEROBJECT Portal_Execs[ MAXGROUPS ];
-extern RENDEROBJECT Skin_Execs[ MAXGROUPS ];
-extern RENDEROBJECT RenderBufs[4];
 
 static bool AppInit( char * lpCmdLine )
 {
@@ -626,7 +604,6 @@ static bool AppInit( char * lpCmdLine )
 // Render the next frame and update the window
 //
 
-extern bool RenderScene( void );
 static bool RenderLoop()
 {
     if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
@@ -672,7 +649,6 @@ static bool RenderLoop()
 //
 
 extern void network_cleanup( void );
-extern bool SeriousError;
 extern void CleanUpAndPostQuit(void);
 
 int main( int argc, char* argv[] )

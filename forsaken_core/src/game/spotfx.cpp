@@ -30,39 +30,9 @@
 
 #include "audio/sfx.h"
 #include "util/util.h"
-
-/*===================================================================
-	External Variables
-===================================================================*/
-extern	int16_t			LevelNum;
-extern	char			LevelNames[MAXLEVELS][128];
-extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
-extern	FRAME_INFO	*	NewTrail_Header;
-extern	FRAME_INFO	*	Bits_Header;
-extern	FRAME_INFO	*	Exp_Header;
-extern	FRAME_INFO	*	Flare_Header;
-extern	FRAME_INFO	*	Circle_Header;
-extern	FRAME_INFO	*	BigFlash_Header;
-extern	FRAME_INFO	*	GravgonTrail_Header;
-extern	FRAME_INFO	*	Bubble_Header;
-extern	FRAME_INFO	*	EnemyGen_Header;
-extern	FRAME_INFO	*	Drip_Header;
-extern	XLIGHT			XLights[MAXXLIGHTS];
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	MODEL			Models[MAXNUMOFMODELS];
-extern	MATRIX			MATRIX_Identity;
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-extern	u_int16_t			GlobalPrimBullsID;
-extern	u_int16_t			GlobalSecBullsID;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	ENEMY			Enemies[ MAXENEMIES ];
+#include "game/oct2.h"
+#include "rendering/2dtextures.h"
+#include "world/visi.h"
 
 /*===================================================================
 	Defines

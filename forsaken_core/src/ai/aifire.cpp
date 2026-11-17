@@ -21,6 +21,7 @@
 #include "ai/ai.h"
 #include "game/primary.h"
 #include "game/secondary.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -28,13 +29,7 @@
 
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[];
-extern	SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[];
-extern	PRIMARYWEAPONBULLET	PrimBulls[MAXPRIMARYWEAPONBULLETS];
 
 /*===================================================================
 	Procedure	:	TURRET Fire At Target..
@@ -93,8 +88,6 @@ void AI_TURRET_FIREATTARGET( register ENEMY * Enemy )
 	Enemy->AIFlags |= AI_ICANSEEPLAYER;
 	AI_UPDATEGUNS( Enemy );
 }
-
-
 
 /*===================================================================
 	Procedure	:	Update an Enemies Guns...

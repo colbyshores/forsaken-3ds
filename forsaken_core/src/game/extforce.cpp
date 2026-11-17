@@ -26,23 +26,14 @@
 #include "game/ships.h"
 #include "game/skin.h"
 #include "util/util.h"
+#include "game/oct2.h"
+#include "ui/title.h"
 
 /*===================================================================
 		Defines
 ===================================================================*/
 #define	EXTERNALFORCES_VERSION_NUMBER	2
 
-																   
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern	float framelag;
-extern	bool	Entry;
-extern	bool	Exit;
-extern	bool	In;
-extern	bool	ShowEFZones;
-extern	bool	DebugInfo;
-extern	bool	GodMode;
 bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides );
 
 /*===================================================================
@@ -113,8 +104,6 @@ bool ExternalForcesLoad( char * Filename )
 		Msg( "ExternalForcesLoad() Incompatible ( .efc ) file %s", Filename );
 		return( false );
 	}
-
-
 
 	int32Pnt = (int32_t *) Buffer;
 	NumOfExternalForces = *int32Pnt++;

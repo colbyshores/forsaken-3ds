@@ -21,21 +21,14 @@
 #include "ai/ai.h"
 #include "game/primary.h"
 #include "game/secondary.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	VECTOR	SlideLeft;
-extern	VECTOR	SlideRight;
-extern	PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[];
-extern	SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[];
-extern	PRIMARYWEAPONBULLET	PrimBulls[MAXPRIMARYWEAPONBULLETS];
 
 // Globals
 void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy );
@@ -275,10 +268,6 @@ void AI_FLESHMORPH_STOPBACKWARD( register ENEMY * Enemy )
 	Enemy->Timer  =	ONE_SECOND * 16.0F;
 }
 
-
-
-
-
 /*===================================================================
 	Procedure	:	Fleshmorph Random Fireball move...
 	Input		:	ENEMY * Enemy
@@ -294,8 +283,6 @@ VECTOR	FireOffs[4] = { { (-800.0F * GLOBAL_SCALE), (1400.0F * GLOBAL_SCALE), (60
 						{ (-800.0F * GLOBAL_SCALE), (1400.0F * GLOBAL_SCALE), (600.0F * GLOBAL_SCALE) },
 						{ (-800.0F * GLOBAL_SCALE), (1400.0F * GLOBAL_SCALE), (600.0F * GLOBAL_SCALE) }
 };
-
-
 
 void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy )
 {

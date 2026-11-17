@@ -20,20 +20,14 @@
 #include "ai/ai.h"
 #include "game/secondary.h"
 #include "game/primary.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[];
-extern	SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[];
-extern	FIREPOS	BigGeekFirePos2;
-extern	FIREPOS	BigGeekFirePos3;
 /*===================================================================
 	Procedure	:	AIR Dogfighting...
 	Input		:	ENEMY * Enemy

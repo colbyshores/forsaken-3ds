@@ -8,6 +8,7 @@
 #include "game/main.h"
 #include "world/node.h"
 #include "game/triggers.h"
+#include "game/camera.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -440,6 +441,25 @@ bool Object_Save( FILE * fp , OBJECT * Obj );
 bool Object_Load( FILE * fp , OBJECT * Obj );
 bool Gun_Save( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp );
 bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp );
+
+/* Defined in enemies.cpp; shared with the modules that use it. */
+extern FIREPOS BigGeekFirePos2;
+extern FIREPOS BigGeekFirePos3;
+extern int Exogenon_Num_StartPos;
+extern VECTOR Exogenon_StartPos[ 6 ];
+extern ENEMY_TYPES EnemyTypes[ MAX_ENEMY_TYPES ];
+extern ENEMY * FirstEnemyUsed;
+extern float Difficulty;
+extern float DifficlutyTab[ 4 ];
+extern float FleshMorphTimer;
+extern ENEMY Enemies[ MAXENEMIES ];
+extern int16_t NumInitEnemies;
+extern int16_t NumKilledEnemies;
+extern ENEMY * EnemyGroups[ MAXGROUPS ];
+extern int EnemiesActive;
+extern ENEMY * TestEnemy;
+void UpdateEnemiesClipGroup( CAMERA * Camera );
+extern bool ShowUntriggeredNMEs;
 
 #ifdef __cplusplus
 }

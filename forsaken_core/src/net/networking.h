@@ -13,6 +13,7 @@ typedef int net_bool_t; // backwards compatibility need bool's in pkt structures
 #include "math/new3d.h"
 #include "game/object.h"
 #include "game/constants.h"
+#include "util/timer.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1013,6 +1014,57 @@ bool AutoJoinSession( void );
 void AllocatePseudoHost( void );
 
 void set_my_player_name( void );
+
+/* Defined in networking.cpp; shared with the modules that use it. */
+extern float PrevHull;
+extern float PrevShield;
+extern BYTE MyGameStatus;
+extern int16_t Lives;
+extern int16_t BikeModels[ MAXBIKETYPES ];
+extern bool DemoShipInit[ MAX_PLAYERS+1 ];
+extern bool IsHost;
+void TeamGoalsSend( u_int16_t * TeamGoals );
+extern SHIPHEALTHMSG PlayerHealths[ MAX_PLAYERS+1 ];
+extern u_int8_t ShipHealthColour[ MAX_PLAYERS+1 ];
+extern u_int32_t RecPacketSize;
+extern u_int32_t MaxRecPacketSize;
+extern u_int32_t CurrentBytesPerSecRec;
+extern u_int32_t CurrentBytesPerSecSent;
+extern u_int32_t MaxCurrentBytesPerSecRec;
+extern u_int32_t MaxCurrentBytesPerSecSent;
+extern BYTE PreDemoEndMyGameStatus;
+extern int16_t NextworkOldBikeNum;
+extern int16_t MaxKills;
+extern char MyName[ 32 ];
+extern BYTE OverallGameStatus;
+extern bool RemoteCameraActive;
+extern int16_t NamesAreLegal;
+extern bool JustPickedUpShield;
+extern MISSEDPICKUPMSG MissedPickups[ MAXMISSEDPICKUPS ];
+extern SHORTPICKUP MissedInitPickups[ MAXMISSEDPICKUPS ];
+extern SHORTKILLPICKUP MissedKillPickups[ MAXMISSEDPICKUPS ];
+extern int16_t NumMissedPickups;
+extern int16_t NumMissedInitPickups;
+extern int16_t NumMissedKillPickups;
+extern MISSEDMINEMSG MissedMines[ MAXMISSEDMINES ];
+extern SHORTMINE MissedInitMines[ MAXMISSEDMINES ];
+extern SHORTKILLMINE MissedKillMines[ MAXMISSEDMINES ];
+extern int16_t NumMissedMines;
+extern int16_t NumMissedInitMines;
+extern int16_t NumMissedKillMines;
+extern MATRIX TempMatrix;
+extern char NickName[ 32 ];
+extern bool JustGenerated;
+extern int OldPPSValue;
+extern int OldColPerspective;
+extern int OldUseShortPackets;
+extern bool UseShortPackets;
+extern float NetUpdateInterval;
+extern int16_t StatsCount;
+extern bool MyUseShortPackets;
+extern bool CanDoDamage[ MAX_PLAYERS+1 ];
+extern px_timer_t LastPacketTime[ MAX_PLAYERS+1 ];
+extern bool HostDuties;
 
 #ifdef __cplusplus
 }

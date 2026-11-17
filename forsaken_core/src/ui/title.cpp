@@ -54,6 +54,11 @@
 #include "data/file.h"
 #include "game/oct2.h"
 #include "data/tload.h"
+#include "data/mxaload.h"
+#include "game/enemies.h"
+#include "game/skin.h"
+#include "game/water.h"
+#include "world/node.h"
 #ifdef __3DS__
 #include "audio/music.h"
 #endif
@@ -70,14 +75,7 @@ void music_play_title(void);
 
 //#pragma optimize( "gty", on )
 
-extern render_info_t render_info;
-extern float MaxMessageTime;
-extern "C" void SetViewportError( char *where, render_viewport_t *vp );
-extern bool ShowNamesAnyway;
-
 bool SpaceOrbSetup = false;
-extern "C" void DefaultJoystickSettings( USERCONFIG *u );
-extern "C" void ReInitJoysticks( void );
 
 #define MAX_KEYDEF_PAGES	(4)
 int CurrentPage = 0;
@@ -104,33 +102,9 @@ static void KeySelect( DEFKEY *kdef, int key );
 bool DeletePilot( LIST *l, int item );
 void MoveConfigFile( MENU *Menu );
 
-extern "C" void ShowNodeNetwork( u_int32_t NetMask );
 void ProcessTextItems (void);
 
 bool	Last_SWMonoChrome = false;
-
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern bool WaitingToQuit;
-extern int16_t	NumPrimaryPickups;
-extern float FlashTextActive;
-extern float GlobalSoundAttenuation;
-extern float WATER_CELLSIZE;
-extern bool flush_input;
-extern double	Gamma;
-extern bool MyUseShortPackets;
-extern bool UseShortPackets;
-extern bool MyResetKillsPerLevel;
-extern bool TintBikeTeamColor;
-extern int CrystalsFound;
-extern	int16_t	NumGoldBars;
-extern int Secrets;
-extern int TotalSecrets;
-extern	int16_t		NumInitEnemies;
-extern	int16_t		NumKilledEnemies;
-
-extern MODELNAME *TitleModelSet;
 
 int GameCompleted = GAMECOMPLETE_NotComplete;
 
@@ -165,53 +139,7 @@ float LevelTimeTaken;
 bool NoMenuBack = false;
 
 int16_t DummyTextureIndex;
-extern FRAME_INFO	*	Title_LevelPics_Header;
-extern FRAME_INFO	*	Title_TVFrame_Header;
-extern char MissionTextNames[MAXLEVELS][128];
-extern char MissionTextPics[MAXLEVELS][128];
-extern int32_t ColPerspective;
-extern int32_t MyColPerspective;
-extern bool	JustExitedMenu;
-extern bool	PickupValid[ MAXPICKUPTYPES ];
-extern bool	MyPickupValid[ MAXPICKUPTYPES ];
-extern bool LockOutWindows;
 extern SLIDER BikerSpeechSlider;
-extern int16_t Lives;
-extern BYTE	GameStatus[];	// Game Status for every Ship...
-extern bool bSoundEnabled;
-extern bool ShowTrigZones;
-extern bool ShowEFZones;
-extern bool ShowTeleports;
-extern bool ShowBoundingBoxes;
-extern bool ShowColZones;
-
-
-extern	int16_t actual_volume;
-extern	bool RearCameraActive;
-extern char *ShipAxisSeperateText[NUM_SHIP_AXIS_ACTIONS * 2];
-extern char *JoystickPOVDirections[];
-extern char *ShipAxisText[];
-extern int ShipAxisLookup[];
-
-
-extern char *ShipActionText[];
-extern TLOADHEADER	Tloadheader;
-extern int	TeamMembers[MAX_TEAMS];
-extern	int16_t	ShowPortal;
-extern float VduScaleX, VduScaleY;
-extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
-extern	POLY   			Polys[MAXPOLYS];
-extern  SCRPOLY			ScrPolys[ MAXNUMOFSCRPOLYS ];
-extern	LINE			Lines[ MAXLINES ];
-extern	MXALOADHEADER	*MxaModelHeaders;
-extern	FRAME_INFO	*	Title_Fonts_Header;
-extern	FRAME_INFO	*	Title_Chars1_Header;
-extern	FRAME_INFO	*	Title_Chars2_Header;
-extern	OFF_FILES Title_OffsetFiles[];
-extern	CAMERA	CurrentCamera;
-extern "C" void Build_View();
-extern	RENDEROBJECT RenderBufs[4];
-extern	int16_t		NumLevels;
 
 #define REGISTRY_EXPIRE_TIME	"ServiceID"
 #define DEFAULT_CONFIG_FILE		DEFAULT_PLAYER_NAME".txt"
@@ -229,42 +157,8 @@ int16_t	SelectedBike = 0; //MODEL_Borg;
 int16_t	NumTitleModelsToLoad;
 float TriggerInitialAnimation = 0.0F;
 bool	Our_CalculateFrameRate(void);
-extern	u_int16_t			FirstFmPolyUsed;
-extern	u_int16_t			FirstPolyUsed;
-extern	u_int16_t			FirstLineUsed;
-extern	u_int16_t			FirstScrPolyUsed;
-extern USERCONFIG *player_config;
-extern	float framelag;
-extern	BYTE	MyGameStatus;
-extern	int		FontWidth;
-extern	int		FontHeight;
-extern	int		FontSourceWidth;
-extern	int		FontSourceHeight;
 bool	ShowWeaponKills = false;
-extern	float	ModeScaleX;
-extern	float	ModeScaleY;
-extern	bool					HostDuties;
-extern	int16_t	BikeModels[ MAXBIKETYPES ];
-extern	MLOADHEADER Mloadheader;
-extern int16_t		LevelNum;
-extern int16_t		NumLevels;
-extern	bool                    IsHost;
-extern	RENDERMATRIX view;
-extern "C"	bool ClearBuffers( void );
-extern	MATRIX	MATRIX_Identity;
-extern	render_viewport_t viewport;
-extern	MODEL	Models[];
 u_int16_t	BackgroundModel[NUMOFTITLEMODELS];
-extern	TLOADHEADER Tloadheader;
-extern	float	LastDistance[];
-extern	MXLOADHEADER *ModelHeaders;
-extern	MODELNAME	TitleModelNames[]; 
-extern	MODELNAME	InterLevelModelNames[];
-extern	char *PrimaryDescription[];
-extern	char *SecondaryDescription[];
-extern	bool	ShowUntriggeredNMEs;
-extern	bool	BilinearSolidScrPolys;
-extern	bool	MyRandomPickups;
 extern  bool bIgnoreWM_SIZE;
 
 /*===================================================================
@@ -345,7 +239,6 @@ bool IgnoreMenuFuncs = false;
 ===================================================================*/
 void InitBattleMenu( MENU *Menu );
 void InitInGameLevelSelect( MENU *menu );
-extern "C" void CheckCheats( int key );
 char *CTF_Type( SLIDER *s );
 void InGameSaveASinglePlayerGame( MENUITEM *item );
 char TypeFileName( TEXT *t, char c );
@@ -406,13 +299,11 @@ void WatchPlayerSelected( MENUITEM *Item);
 char *SearchKey( char c );
 void PauseDemoToggle( MENUITEM *Item );
 
-extern "C" bool InitLevels( char *levels_list );
 void InitLevelSelect( MENU *Menu );
 void ExitLevelSelect( MENU * Menu );
 void GoToStats( MENUITEM *Item );
 void GetSavedGameData( void );
 
-extern "C" bool SetFOV( float fov );
 bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclude );
 bool MakeTranslucent( u_int16_t Model );
 void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *maxoffset );
@@ -658,8 +549,6 @@ void SetAxisFineControl( MENUITEM *Item );
 void SetAxisDeadzone( MENUITEM *Item );
 void SetAxisSensitivity( MENUITEM *Item );
 void UpdateAxisPtr( float pos );
-extern "C" void InitModeCase(void);
-extern "C" void SetSoundLevels( int *dummy );
 void ExitMouseSetup( MENU *Menu );
 void InitAvgFrameRateGlobals( MENU *Menu );
 void GoToNextLevel( MENUITEM *Item );
@@ -691,7 +580,6 @@ void GetTitleMessage(void);
 ===================================================================*/
 
 extern BYTE	TeamNumber[MAX_PLAYERS];
-extern bool	ShowStartPoints;
 
 enum
 {
@@ -1369,8 +1257,6 @@ MENU	MENU_NEW_SecondaryOrder = {
 	}
 };
 
-
-
 MENU	MENU_NEW_SecondaryWeaponKeys = {
 #ifdef VDUKDEF
 	(u_int8_t*)"", InitKeyDef, NULL, NULL, 0,
@@ -1626,8 +1512,6 @@ MENU	MENU_NEW_Controls = {
 		{ 10, 45, 200, 55, 0, (u_int8_t*)LT_MENU_NEW_Controls2 /*"configure joystick"*/, FONT_Small, TEXTFLAG_CentreY, NULL,
 		  &MENU_NEW_SetupJoystick, MenuChange, DrawFlatMenuItem, NULL, 0  },
 
-
-
 		{ 10, 60, 200, 70, 0, (u_int8_t*)LT_MENU_NEW_Controls3 /*"configure keys and buttons"*/, FONT_Small, TEXTFLAG_CentreY, NULL, &MENU_NEW_ConfigureKeyboard, MenuChange, DrawFlatMenuItem, NULL, 0  },
 		{ 10, 75, 100, 85, 0, (u_int8_t*)LT_MENU_NEW_Controls4 /*"autoleveling"*/, FONT_Small, TEXTFLAG_CentreY,  &Autoleveling, (void*)SetAutolevel, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
 		{ 10, 90, 200, 100, 0, (u_int8_t*)LT_MENU_NEW_Controls5 /*"restore defaults"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, RestoreDefaultControlSettings, DrawFlatMenuItem, NULL, 0  },
@@ -1638,7 +1522,6 @@ MENU	MENU_NEW_Controls = {
 };
 
 // Out-of-game menu
-extern bool ShowInfo;
 MENU	MENU_NEW_DetailLevels = {
 	(u_int8_t*)"", NULL, ExitDetailLevels, NULL, 0,
 	{
@@ -1760,10 +1643,6 @@ extern bool g_show_stereo_debug;
  * Saved as ObjectShine / WallDetail in Configs/main.txt. */
 extern bool g_object_shine;
 extern bool g_wall_detail;
-/* Declared in oct2.c. Flips the stereoscopic per-eye parallax sign so the
- * 3D reads as receding depth vs. popping out of the screen. Saved as
- * Invert3D in Configs/main.txt. */
-extern bool g_stereo_invert;
 #endif
 
 MENU	MENU_NEW_Visuals = {
@@ -2147,7 +2026,6 @@ MENUITEM BikeCharItem =
 
 
 int16_t InGameLoadGameLevelNum;
-extern	bool	CountDownOn;
 bool InGameLoadASinglePlayerGame( MENUITEM * Item )
 {
 	int16_t OldNewLevelNum;
@@ -2395,8 +2273,6 @@ MENU	MENU_SinglePlayer = { (u_int8_t*)"Select Difficulty Level" , NULL, NULL , N
 					  {	200 , 176, 0, 0, 0, (u_int8_t*)"Hard" , 0, 0, NULL , (void*) DIFF_Hard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
 					  {	200 , 192, 0, 0, 0, (u_int8_t*)"Bronson Mode" , 0, 0, NULL , (void*) DIFF_Vhard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
 					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL , NULL , NULL , NULL, NULL, 0 } } };
-
-
 
 MENU	MENU_Team = {
 	(u_int8_t*)"Select Teams" , InitTeamSelection , NULL , NULL, 0,
@@ -2915,9 +2791,6 @@ MENU	MENU_3DS_Visuals = {
 };
 #endif
 
-extern bool ShowFrameRate;
-extern bool ShowInfo;
-
 MENU	MENU_Options = {
 	(u_int8_t*)LT_MENU_Options0/*"Options"*/, NULL, (MenuFunc) SetGamePrefs, NULL, 0,
 	{
@@ -2958,8 +2831,6 @@ MENU	MENU_DemoPlaying = {
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
-
-
 
 MENU	MENU_SetUpBiker = {
 	(u_int8_t*)LT_MENU_SetUpBiker0 /*"Set Up Biker"*/ , InitBikerMenu, ExitBikerMenu, NULL, 0,
@@ -3079,8 +2950,6 @@ MENU	MENU_ForceAbort = {
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
-
-
 
 MENU	MENU_GotoRoom = {
 	(u_int8_t*)"Go to Specific Room" , InitDebugMenu, NULL, NULL, 0,
@@ -3243,7 +3112,6 @@ float JudderAngle[Judders] = {180.0F, 182.0F, 178.0F, 181.0F, 179.0F, 180.0F, 18
 
 bool Turned[6], LastTurned[6], RotateSetup, DoHighlight, 
 	 OnRotateVDU, OnVDUflip, RotVDU, PanDone, VDU_Active;
-
 
 /* (extern declaration of ModelHeaders is at the top of this file —
  * the duplicate static definition that used to live here merged
@@ -3511,8 +3379,6 @@ bool WasteAFrame = false;
 /********************
 weapon priority
 *********************/
-extern bool PrimaryValid[];
-extern bool SecondaryValid[];
 int WeaponList[ MAX( MAX_PRIMARY_WEAPONS, MAX_SECONDARY_WEAPONS ) ];
 int16_t SelectedWeapon;
 u_int16_t Num_Unused_Weapons;
@@ -3658,7 +3524,6 @@ TITLE_EVENT_TIMER Title_Timers[MAXTITLETIMERS] = {
 	{-1.0F, -1.0F, TITLE_EVENT_TIMER_IDLE, NULL}
 };
 
-extern "C" bool InitView( void );
 extern bool render_mode_select( render_info_t * info );
 bool RenderModeSelect( int mode, bool fullscreen, bool vsync )
 {
@@ -4976,7 +4841,6 @@ Display Solid Lines
 	Input		:		nothing...
 	Output		:		bool true/false
 ===================================================================*/
-extern bool IpOnCLI;
 bool DisplayTitle(void)
 {
 #if 1 // bjd - CHECK IMPORTANT
@@ -5387,8 +5251,6 @@ void	MenuItemDrawPageName( MENUITEM * Item )
 	}
 }
 
-
-
 void DrawKeyDefPage( MENUITEM * Item )
 {
 	static char page[ 80 ];
@@ -5410,8 +5272,6 @@ void DrawKeyDefPage( MENUITEM * Item )
 	}
 	Print4x5Text( page, x, y, col );
 }
-
-
 
 void DrawKeyDefHelp1( MENUITEM * Item )
 {
@@ -5456,8 +5316,6 @@ void DrawKeyDefHelp1( MENUITEM * Item )
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 	CenterPrint4x5Text( help, y, col );
 }
-
-
 
 void DrawKeyDefHelp2( MENUITEM * Item )
 {
@@ -5629,8 +5487,6 @@ void DrawCenteredNameVar( MENUITEM * Item )
 	CenterPrint4x5Text( var, y, 5 );
 }
 
-
-
 /*===================================================================
 	Procedure	:		Draw the help key and description in a menu item...
 	Input		:		MENUITEM * Item...
@@ -5651,8 +5507,6 @@ void	DrawHelpKey( MENUITEM * Item )
 	x = (int) ( ( ( Item->x + 64 ) >> 1 ) * ModeScaleX );
 	Print4x5Text( (char*)Item->StrPnt , x, y , InGameMenuColour );
 }
-
-
 
 /*===================================================================
 	Procedure	:		Menu Draw..draws the title and all other text..
@@ -5884,8 +5738,6 @@ void MenuItemBack( MENUITEM *item )
 void	SetDifficulty( MENUITEM * Item )
 {
 }
-
-
 
 /*===================================================================
 	Procedure	:		Draw the Name in a menu item...
@@ -6385,8 +6237,6 @@ KeyDefine( MENUITEM *item, VirtualKeycode key )
 	}
 }
 
-
-
 bool ProcessDefKey( int Key )
 {
 	bool done;
@@ -6458,8 +6308,6 @@ void InitKeyDef( MENU *Menu )
 {
 	MenuState = MENUSTATE_SelectKeydef;
 }
-
-
 
 int ValidBikeSelected( int bike)
 {
@@ -6602,8 +6450,6 @@ void IncrementSlider( MENUITEM *Item )
 		s->value = s->max;
 }
 
-
-
 /*===================================================================
 	Procedure	:		Minimise a slider value
 	Input		:		MENUITEM * Item...
@@ -6662,8 +6508,6 @@ void SliderCancel( MENUITEM *Item )
 	s->value = OriginalSliderValue;
 }
 
-
-
 /*===================================================================
 	Procedure	:		Draw a slider menuitem
 	Input		:		MENUITEM * Item...
@@ -6719,8 +6563,6 @@ void SelectRadioButton( MENUITEM *Item )
 		*((int *)(Item->Variable)) = (int)(intptr_t) Item->Value;
 	}
 }
-
-
 
 /*===================================================================
 	Procedure	:		Draws a radio button item
@@ -6945,8 +6787,6 @@ void SelectKey( MENUITEM *Item )
 
 }
 
-
-
 /*===================================================================
 	Procedure	:		Draw a key menuitem
 	Input		:		MENUITEM * Item...
@@ -6993,8 +6833,6 @@ void DrawKey( MENUITEM *Item )
  
 }
 
-
-
 /*===================================================================
 	Procedure	:		Select a keydef menuitem
 	Input		:		MENUITEM * Item...
@@ -7006,8 +6844,6 @@ void SelectKeyDef( MENUITEM *Item )
 	KeyItem = Item;
 	PlaySfx( SFX_InGameMenuSelect, 1.0F );
 }
-
-
 
 /*===================================================================
 	Procedure	:		Draw a keydef menuitem
@@ -7071,8 +6907,6 @@ void DrawKeyDef( MENUITEM *Item )
 	Output		:		Nothing
 ===================================================================*/
 
-extern "C" bool InitView(void);
-extern "C" void ReleaseView(void);
 void ExitDetailLevels( MENU *Menu )
 {
 	SetGamePrefs();
@@ -7700,8 +7534,6 @@ void DrawList( MENUITEM *Item )
 	}
 }
 
-
-
 /*===================================================================
 	Procedure	:		List navigation/selection routines
 	Input		:		MENUITEM * Item...
@@ -7854,8 +7686,6 @@ void CancelListSelection( LIST *l )
 	}
 */
 }
-
-
 
 /*===================================================================
 	Procedure	:		Selects a text menuitem
@@ -8273,8 +8103,6 @@ void InitDebugMode( MENU *Menu )
 		}
 	}
 }
-
-
 
 char *SearchKey( char c )
 {
@@ -9120,7 +8948,6 @@ void ExitLevelSelect( MENU * Menu )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-extern "C" void InitValidPickups();
 void GetGamePrefs( void )
 {
 	// default allow all pickups
@@ -9618,8 +9445,6 @@ void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *
 	}
 }
 
-
-
 bool MakeTranslucent( u_int16_t Model )
 {
 //	D3DEXECUTEBUFFERDESC	DstDebDesc;
@@ -9809,8 +9634,6 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int Ver
 	return true;
 }
 
-
-
 /*===================================================================
 	Procedure	:		increases the texture frame no. of a disc by one
 	Input		:		disc number
@@ -9966,8 +9789,6 @@ void RedrawFlatMenuList( MENUITEM *Item )
 	}
 #endif
 }
-
-
 
 void DrawFlatMenuListText ( MENUITEM *Item )
 {
@@ -11997,8 +11818,6 @@ extern "C" bool VduFinished( MENU *Menu )
 		}
 	}
 
-
-
 	for (Event = Title_Events; Event->TriggeredBy >= 0; Event++)
 	{
 		switch( Event->Status )
@@ -12558,8 +12377,6 @@ void InitScreenFonts (void)
 end of VDU text routines
 *********************************************************************************************************/
 
-
-
 void SinPan2(VECTOR ViewFrom, VECTOR ViewTo, VECTOR *CurrentView,
 			 VECTOR LookFrom, VECTOR LookTo, VECTOR *CurrentLook, float Time)
 {
@@ -13028,8 +12845,6 @@ void InitEventDiscPan(TITLE_EVENT *TitleEvent)
 	//VduClear();
 	//VDU_Ready = false;
 }
-
-
 
 void EventDiscPan(TITLE_EVENT *TitleEvent)
 {
@@ -14664,7 +14479,6 @@ void SelectGoldBarModel( MENU *Menu )
 	ShowHoloModel( TITLE_MODEL_GoldBar );
 }
 
-extern "C" bool InitScene(void);
 void AfterSpecialMessage( MENUITEM *Item )
 {
 	switch( GameCompleted )
@@ -15457,12 +15271,6 @@ void InitBattleMenu( MENU *menu )
 	}
 }
 
-
-
-
-
-
-
 //
 //
 //
@@ -15470,12 +15278,6 @@ void InitBattleMenu( MENU *menu )
 //
 //
 //
-
-
-
-
-
-
 
 bool ProcessSelectKeydef( int Key )
 {
@@ -16123,8 +15925,6 @@ void ProcessSelect( int Key )
 	|
 	\************************/
 
-
-
 	/* cursor up */
 	if ( Key == SDLK_UP || Key == UP_MOUSE )
 		CursorUp();
@@ -16227,8 +16027,6 @@ void ProcessSelect( int Key )
 		}
 	}
 }
-
-
 
 bool ProcessDifficultySet ( int Key )
 {
@@ -16798,8 +16596,6 @@ bool ProcessWeaponOrder ( int Key )
 	return !done;
 }
 
-
-
 bool ProcessLevelList ( int Key )
 {
 	bool done, redraw;
@@ -17133,10 +16929,5 @@ end:
 	if( InTitleRoom )
 		SetVolumeLevels();
 }
-
-
-
-
-
 
 //#pragma optimize( "", off )

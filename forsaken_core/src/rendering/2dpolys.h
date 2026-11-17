@@ -176,6 +176,11 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 FILE * SaveFmPolys( FILE * fp );
 FILE * LoadFmPolys( FILE * fp );
 
+/* Defined in 2dpolys.cpp; shared with the modules that use it. */
+extern FMPOLY FmPolys[ MAXNUMOF2DPOLYS ];
+extern u_int32_t TotalFmPolysInUse;
+extern u_int16_t FirstFmPolyUsed;
+
 #ifdef __cplusplus
 }
 #endif

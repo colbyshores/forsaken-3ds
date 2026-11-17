@@ -26,25 +26,15 @@
 #include "audio/sfx.h"
 #include "game/ships.h"
 #include "util/util.h"
+#include "game/oct2.h"
+#include "game/skin.h"
 
 /*===================================================================
 		Defines
 ===================================================================*/
 #define	TELEPORTS_VERSION_NUMBER	2
 
-																   
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern	VECTOR Forward;
-extern	VECTOR SlideUp;
-extern	float framelag;
-extern	bool	Entry;
-extern	bool	Exit;
-extern	bool	In;
-extern	bool	ShowTeleports;
 bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides );
-extern "C" void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group );
 
 /*===================================================================
 		Globals ...
@@ -237,8 +227,6 @@ void ReleaseTeleports( void )
 	}
 	NumOfTeleports = 0;
 }
-
-
 
 /*===================================================================
 	Procedure	:	Check if im in an Active Teleport....

@@ -36,9 +36,7 @@
 #include "world/node.h"
 #include "game/enemies.h"
 #include "ai/ai.h"
-
-extern ENEMY_TYPES	EnemyTypes[];
-extern float		framelag;
+#include "game/oct2.h"
 
 /* Boss_Ramqan's jump AI is Remaster-only content: the ENEMY state
  * fields it drives exist only under EDITION_REMASTER (enemies.h), and
@@ -146,8 +144,6 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 
 extern "C" u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
                             u_int16_t StartGroup, VECTOR * MoveOffset );
-extern MLOADHEADER Mloadheader;
-extern VECTOR Forward;
 
 /* Body rotation deliberately removed.
  *

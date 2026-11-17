@@ -1,3 +1,4 @@
+#include "ui/title.h"
 /*===================================================================
 	controls_3ds.c — bindings + persistence + rebind UI.
 	See controls_3ds.h for API contract.
@@ -254,9 +255,6 @@ int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
  * value the engine uses at runtime. write_config persists it to the
  * main config file (Configs/main.txt). */
 #include "data/config.h"
-extern USERCONFIG *player_config;
-extern char biker_config[];
-extern int write_config( USERCONFIG *u, char *cfg_name );
 
 #define AIM_ASSIST_STEP        0.05F
 #define AIM_ASSIST_MIN         0.00F

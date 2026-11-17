@@ -2,6 +2,7 @@
 #define GOAL_H
 
 #include "game/main.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,6 +39,11 @@ bool GenerateFlagAtHome( int team );
 int GoalCheckTeam( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int team );
 int DisplayGoal( u_int16_t group );
 
+
+/* Defined in goal.cpp; shared with the modules that use it. */
+extern int GoalTeamMembers[ MAX_TEAMS ];
+void SetTeamGoals( u_int16_t *TeamGoals );
+extern int TeamFlag[ MAX_TEAMS ];
 
 #ifdef __cplusplus
 }

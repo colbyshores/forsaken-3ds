@@ -71,6 +71,10 @@ FILE * SaveStartRestartPoints( FILE * fp );
 FILE * LoadStartRestartPoints( FILE * fp );
 void DisplayStartPoints( void );
 
+/* Defined in restart.cpp; shared with the modules that use it. */
+extern bool ShowStartPoints;
+extern RESTART * FirstRestartUsed;
+
 #ifdef __cplusplus
 }
 #endif

@@ -18,6 +18,12 @@
 #include "rendering/text.h"
 #include "game/main.h"
 #include "util/util.h"
+#include "data/mload.h"
+#include "game/camera.h"
+#include "game/oct2.h"
+#include "game/ships.h"
+#include "game/skin.h"
+#include "ui/title.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -25,28 +31,6 @@
 
 #undef TESTING_SUBTRACTIVE
 
-/*===================================================================
-		Externals...	
-===================================================================*/
-extern	bool	ShowPlaneRGB;
-extern	float	WhiteOut;
-extern	u_int16_t	NumGroupsVisible;
-extern	u_int16_t	GroupsVisible[MAXGROUPS];
-extern	int16_t	ShowPortal;
-
-extern	int		NumOfVertsConsidered;
-extern	int		NumOfVertsTouched;
-
-extern	float	framelag;
-extern	float	SoundInfo[MAXGROUPS][MAXGROUPS];
-extern	u_int16_t	GroupWaterInfo[MAXGROUPS];
-extern	float	GroupWaterLevel[MAXGROUPS];
-extern	float	GroupWaterIntensity_Red[MAXGROUPS];
-extern	float	GroupWaterIntensity_Green[MAXGROUPS];
-extern	float	GroupWaterIntensity_Blue[MAXGROUPS];
-extern bool	BrightShips;
-
-extern	CAMERA	CurrentCamera;
 void PrintInitViewStatus( BYTE Status );
 
 /*===================================================================
@@ -216,9 +200,6 @@ bool	ProcessXLights( MLOADHEADER * Mloadheader )
 	return true;
 }
 
-
-
-
 /*===================================================================
 *		cause a light to go red and get smaller then die...
 ===================================================================*/
@@ -382,7 +363,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			lpLVERTEX2 = Mloadheader->Group[group].originalVerts[execbuf];
 			
 			vert = Mloadheader->Group[group].num_verts_per_execbuf[execbuf];
-			
 			
 			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 			if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
@@ -565,8 +545,6 @@ clear:					mov		eax, [esi]
 			half_sizey	=	Mloadheader->Group[group].half_size.y;
 			half_sizez	=	Mloadheader->Group[group].half_size.z;
 
-
-
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
 			{
@@ -704,7 +682,6 @@ clear:					mov		eax, [esi]
 											x -= Posx;
 											y -= Posy;
 											z -= Posz;
-			
 			
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											distance = (x*x) + (y*y) + (z*z);
@@ -951,8 +928,6 @@ __asm
 
 	return true;
 }
-
-
 
 /*===================================================================
 	Procedure	:	Xlight Mxloadheader...
@@ -1447,7 +1422,6 @@ PLOP2:
 	Input		:	MLOADHEADER * Mloadheader
 	Output		:	COLOR
 ===================================================================*/
-extern  BYTE          MyGameStatus;
 COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t group )
 {
 	COLOR Col;
@@ -1523,8 +1497,6 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 	}
 	return RGBA_MAKE( r, g, b, 0 );
 }
-
-
 
 /*===================================================================
 	Procedure	:	Build a list of the lights that are currently potentially visible...

@@ -37,6 +37,7 @@
 #include "rendering/lines.h"
 
 #include "world/collision.h"
+#include "game/oct2.h"
 
 /*===================================================================
 		Defines
@@ -45,20 +46,11 @@
 #define	NOD_VERSION_NUMBER	1
 
 /*===================================================================
-		Externals...	
-===================================================================*/
-extern	LINE			Lines[ MAXLINES ];
-extern	ENEMY	*	FirstEnemyUsed;
-
-/*===================================================================
 		Globals...	
 ===================================================================*/
 
 NODENETWORKHEADER	NodeNetworkHeader;
 void SetNetworkDistance( void );
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
 
 float	* NodeArray = NULL;
 
@@ -348,8 +340,6 @@ _skipped_extra_links: ;
 	return true;
 }
 
-
-
 /*===================================================================
 	Procedure	:		Release NodeHeader..
 	Input		:		NOTHING
@@ -455,8 +445,6 @@ extern "C" ENEMY * PutEnemiesAtNodes(void)
 						Lines[ line ].Group = NodePnt->Group;
 					}
 
-
-
 				}
 			}
 		}
@@ -468,9 +456,6 @@ extern "C" ENEMY * PutEnemiesAtNodes(void)
 
 	return NULL;
 }
-
-
-
 
 /*===================================================================
 	Procedure	:		draw lines for a Network
@@ -549,8 +534,6 @@ extern "C" void ShowNodeNetwork( u_int32_t NetMask )
 						Lines[ line ].Group = NodePnt->Group;
 					}
 
-
-
 				}
 			}
 		}
@@ -558,10 +541,6 @@ extern "C" void ShowNodeNetwork( u_int32_t NetMask )
 
 	}
 }
-
-
-
-
 
 /*===================================================================
 	Procedure	:		Recursive Node Dsistance Find.....
@@ -754,8 +733,6 @@ NODE * WhichNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 	NODE * NodeReturn;
 	float * na;
 
-
-
 	if( !NodeNetworkHeader.State )
 		return NULL;
 
@@ -841,8 +818,6 @@ NODE * WhichRetreatNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 	return NodeReturn;
 }
 
-
-
 /*===================================================================
 	Procedure	:		An Alternate root is needed so find a different node if possible..
 	Input		:		int16_t Network..Which Network...
@@ -869,12 +844,6 @@ NODE * ChooseAlternateNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo 
 	}
 	return NULL;
 }
-
-
-
-
-
-
 
 NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 , NODE *Node2 , NODE *Node3 , NODE *Node4 )
 {
@@ -1097,7 +1066,3 @@ float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Grou
 	}
 	return( Distance );
 }
-
-
-
-

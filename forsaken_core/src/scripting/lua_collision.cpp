@@ -17,9 +17,7 @@
 #include "world/collision.h"
 #include "game/ships.h" /* for SHIP_RADIUS */
 #include "scripting/lua_vecmat.h"
-
-extern MCLOADHEADER MCloadheadert0;
-extern MLOADHEADER Mloadheader;
+#include "game/oct2.h"
 
 /* [-0, +1, m] */
 #define NEWOBJ(L, objtype, var) do {           \

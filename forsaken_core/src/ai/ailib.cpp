@@ -25,26 +25,15 @@
 #include "input/controls.h"
 #include "ai/ai.h"
 #include "rendering/lines.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 //--------------------------------------------------------------------------
-// Externals
 //--------------------------------------------------------------------------
 
-extern	float framelag;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideRight;
-extern	VECTOR	SlideUp;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	LINE			Lines[ MAXLINES ];
-extern	NODENETWORKHEADER	NodeNetworkHeader;
-extern	SECONDARYWEAPONBULLET	SecBulls[MAXSECONDARYWEAPONBULLETS];
-extern	u_int16_t		FirstSecBullUsed;
 bool WouldObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
 
 //--------------------------------------------------------------------------
@@ -185,8 +174,6 @@ void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * Ne
 	NewPos->y = TObject->Pos.y + ( Move_Off.y * Time );
 	NewPos->z = TObject->Pos.z + ( Move_Off.z * Time );
 }
-
-
 
 /*===================================================================
 	Procedure	:	AI Find the best least hassle free Next Node...

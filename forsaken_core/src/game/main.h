@@ -133,4 +133,18 @@ typedef u_int16_t WORD;
 #define TR(fmt, ...)   do {} while(0)
 #define TRMSG(msg)     do {} while(0)
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* Defined in main.c; shared with the modules that use it. */
+extern bool Debug;
+extern bool ShowFrameRate;
+extern bool ShowInfo;
+void CleanUpAndPostQuit(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif	// MAIN_INCLUDED

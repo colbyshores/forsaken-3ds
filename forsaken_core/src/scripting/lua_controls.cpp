@@ -1,3 +1,4 @@
+#include "game/ships.h"
 /* Functions for accessing ship controls from Lua.
  *
  * print(controls.pitch)
@@ -13,8 +14,6 @@ extern "C" {
 #include <lauxlib.h>
 }
 #include "input/controls.h"
-
-extern SHIPCONTROL control;
 
 #define FIELD(f, type) do {       \
 	lua_push ## type(L, ctrl->f); \

@@ -12,6 +12,7 @@
 #ifndef PRIMARY_INCLUDED
 #define PRIMARY_INCLUDED
 #include "game/constants.h"
+#include "game/main.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -310,6 +311,37 @@ void HostLoseSuperNashram( u_int16_t Player );
 void HostRestoreWeapons( int16_t Player );
 void HostRestoreAmmo( int16_t Player );
 float GetPrimaryAmmoUsage( int16_t Ship, int8_t Weapon );
+
+/* Defined in primary.cpp; shared with the modules that use it. */
+extern PRIMARYWEAPONATTRIB PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ];
+extern PRIMARYWEAPONBULLET PrimBulls[ MAXPRIMARYWEAPONBULLETS ];
+extern float NmeDamageModifier;
+extern u_int16_t GlobalPrimBullsID;
+extern int32_t ColPerspective;
+extern float PyroliteAmmo;
+extern float SussGunAmmo;
+extern float GeneralAmmo;
+extern float PowerLevel;
+extern float LaserTemperature;
+extern bool GodModeOnceOnly;
+extern int16_t PrimaryWeaponsGot[ MAXPRIMARYWEAPONS ];
+extern float GeneralAmmoUsed;
+extern float PyroliteAmmoUsed;
+extern float SussGunAmmoUsed;
+extern BYTE CopyOfOrbitals;
+extern float CopyOfOrbAmmo[ MAXMULTIPLES ];
+extern int16_t CopyOfPowerLevel;
+extern float CopyOfNitroFuel;
+extern float CopyOfGeneralAmmo;
+extern float CopyOfSussGunAmmo;
+extern float CopyOfPyroliteAmmo;
+extern float GlobalFramelagAddition;
+extern int8_t PrimaryToFireLookup[ MAXPRIMARYWEAPONS ];
+extern bool PrimaryWeaponCheat;
+extern int32_t MyColPerspective;
+extern char * PrimaryDescription[ MAXPRIMARYWEAPONS ];
+extern int8_t * DebugPrimStrings[];
+extern bool PrimaryValid[ MAXPRIMARYWEAPONS ];
 
 #ifdef __cplusplus
 }

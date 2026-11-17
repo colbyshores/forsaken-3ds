@@ -34,6 +34,7 @@
 #include "world/collision.h"   /* BackgroundCollide */
 #include "data/config.h"
 #include "net/networking.h"  /* WhoIAm + Ships + GameStatus + STATUS_*  */
+#include "game/oct2.h"
 
 /* Weapon enum constants we exclude — duplicated here to avoid pulling
  * primary.h (which uses FILE* without #include <stdio.h>). */
@@ -41,12 +42,6 @@
 #define AA_NME_LASER      13
 #define AA_NME_LIGHTNING  14
 #define AA_NME_POWERLASER 16
-
-/* externs not declared in headers */
-extern ENEMY        *FirstEnemyUsed;
-extern MLOADHEADER   Mloadheader;
-extern MCLOADHEADER  MCloadheadert0;
-extern USERCONFIG   *player_config;
 
 /* ─── Tunables ──────────────────────────────────────────────────── */
 

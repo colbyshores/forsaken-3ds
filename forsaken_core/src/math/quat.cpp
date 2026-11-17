@@ -8,9 +8,7 @@
 #include	"math/new3d.h"
 #include	"math/quat.h"
 #include <stdio.h>
-
-extern	VECTOR			Forward;
-extern	VECTOR			SlideUp;
+#include "game/oct2.h"
 
 
 void QUAT::MakeEuler( float XRot, float YRot, float ZRot )

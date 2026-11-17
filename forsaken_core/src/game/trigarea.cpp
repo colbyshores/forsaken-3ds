@@ -53,18 +53,11 @@ num_zones : u_int16_t
 #include "game/primary.h"
 #include "game/secondary.h"
 #include "util/util.h"
+#include "game/oct2.h"
 
-
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern	bool			ShowTrigZones;
-extern	BYTE			WhoIAm;
 bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, int16_t Side );
 bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides );
-extern TRIGGERMOD	*	TrigMods;
 void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area );
-extern	float framelag;
 /*===================================================================
 		Globals ...
 ===================================================================*/
@@ -808,8 +801,6 @@ void DispGroupTriggerAreas( u_int16_t Group )
 		Area = Area->NextSameGroup_player;
 	}
 }
-
-
 
 /*===================================================================
  	Procedure	:		Enable trigger area

@@ -13,36 +13,14 @@
 #include "game/primary.h"
 #include "game/skin.h"
 #include "util/util.h"
+#include "game/camera.h"
+#include "game/models.h"
+#include "game/oct2.h"
+#include "ui/title.h"
+#include "world/bsp.h"
+#include "world/visi.h"
 
 #define USE_BSP_COLOURS
-
-/*===================================================================
-	Externals
-===================================================================*/
-extern	bool		DebugInfo;
-extern	MLOADHEADER Mloadheader;
-extern	u_int16_t		NumGroupsVisible;
-extern	u_int16_t		GroupsVisible[MAXGROUPS];
-extern	BYTE		WhoIAm;
-
-extern	DWORD		CurrentSrcBlend;
-extern	DWORD		CurrentDestBlend;
-extern	DWORD		CurrentTextureBlend;
-
-extern	LINE		Lines[ MAXLINES ];
-extern	CAMERA		CurrentCamera;
-extern	bool		NodeCube;
-extern	bool		OldNodeCube;
-extern	bool		NodeCubeType;
-
-extern	int			Depth;
-extern	BSP_NODE *	BSP_Nodes[ 256 ];
-extern	bool		Inside;
-extern	float		CollisionRadius;
-extern	bool		ShowColZones;
-
-extern	MODEL		Models[MAXNUMOFMODELS];
-extern	MATRIX		MATRIX_Identity;
 
 #define	BOXSIZE		96.0F
 #define	NODECUBE_Branch	false
@@ -164,8 +142,6 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 		patchcolor = RGBA_MAKE( 0, 192, 0, 128 );
 		backpatchcolor = RGBA_MAKE( 192, 0, 0, 128 );
 	}
-
-
 
 	SkinVertCount = 0;
 	SkinTriCount = 0;

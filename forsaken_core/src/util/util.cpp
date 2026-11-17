@@ -9,10 +9,7 @@
 #include "string.h"
 #include "ui/title.h"
 
-extern bool Debug;
 bool DebugLog = false;
-
-
 
 char * convert_char( char from, char to, char* in )
 {
@@ -228,8 +225,6 @@ void DebugState( const char * str )
 
 // temporarily jumps to desktop mode
 //#include "render.h"
-//extern render_info_t render_info;
-extern void MenuGoFullScreen( MENUITEM *Item );
 extern void input_grab( bool clip );
 int Msg( const char * msg, ... )
 {

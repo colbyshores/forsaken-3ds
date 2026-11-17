@@ -46,6 +46,10 @@
 #define TITANBITS_SEND  1
 
 #include "ui/localtitle.h"
+#include "data/config.h"
+#include "game/camera.h"
+#include "game/oct2.h"
+#include "rendering/2dtextures.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -54,138 +58,7 @@
 /*===================================================================
 	Externs
 ===================================================================*/
-extern SLIDER BikeCompSpeechSlider;
-extern bool CaptureTheFlag;
-extern bool CTF;
-extern bool BountyHunt;
-extern int8_t TeamFlagPickup[ MAX_TEAMS ];
-extern u_int32_t TeamFlagMask[ MAX_TEAMS ];
-extern char *TeamName[ MAX_TEAMS ];
-extern int16_t			PickupsGot[ MAXPICKUPTYPES ];
-extern	FRAME_INFO	*	Flare_Header;
-extern	FRAME_INFO	*	Trojax_Exp_Header;
-extern	FRAME_INFO	*	Pulsar_Exp_Header;
-extern	FRAME_INFO	*	Bits_Header;
-extern	SHIPCONTROL		control;
-extern	RENDERMATRIX		view;
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-//extern	D3DTEXTUREHANDLE bTex;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	XLIGHT			XLights[MAXXLIGHTS];
-extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
-extern	POLY			Polys[MAXPOLYS];
-extern	MODEL			Models[MAXNUMOFMODELS];
-extern	float			framelag;
-extern	BYTE			WhoIAm;
-extern	bool            bSoundEnabled;
-extern	FRAME_INFO	*	Exp_Header;
-extern	FRAME_INFO	*	Exp2_Header;
-extern	FRAME_INFO	*	GravgonTrail_Header;
-extern	FRAME_INFO	*	SolarisTrail_Header;
-extern	FRAME_INFO	*	NewTrail_Header;
-extern	FRAME_INFO	*	Blood_Header;
-extern	FRAME_INFO	*	BloodSplat_Header;
-extern	FRAME_INFO	*	BloodDribble_Header;
-extern	FRAME_INFO	*	Laser_Header;
-extern	FRAME_INFO	*	ScatterTrail_Header;
-extern	FRAME_INFO	*	GreyFlare_Header;
-extern	FRAME_INFO	*	BigFlash_Header;
-extern	FRAME_INFO	*	Target_Header;
-extern	FRAME_INFO	*	LensFlare_Header;
-extern	FRAME_INFO	*	BlueSpark_Header;
-extern	FRAME_INFO	*	Circle_Header;
-extern	FRAME_INFO	*	Tentacle_Header;
-extern	MATRIX			MATRIX_Identity;
-extern	int16_t			PrimaryWeaponsGot[ MAXPRIMARYWEAPONS ];
-extern	USERCONFIG	*	player_config;
-extern	bool            IsHost;
-extern	float			NitroFuel;
-extern	float			NitroFuelUsed;
-extern	int16_t			NumStealths;
-extern	int16_t			NumOrbs;
-extern	u_int16_t			CameraMissile;
-extern	int				MissileCameraActive;
-extern	MATRIX			ProjMatrix;
-extern	CAMERA			CurrentCamera;
-extern	MISSEDMINEMSG	MissedMines[ MAXMISSEDMINES ];
-extern	SHORTMINE		MissedInitMines[ MAXMISSEDMINES ];
-extern	SHORTKILLMINE	MissedKillMines[ MAXMISSEDMINES ];
-extern	int16_t			NumMissedMines;
-extern	int16_t			NumMissedInitMines;
-extern	int16_t			NumMissedKillMines;
-extern	int16_t			NumPowerPods;
-extern	BYTE			GameStatus[MAX_PLAYERS];	// Game Status for every Ship...
 																	// this tells the drones what status the host thinks hes in..
-
-extern	SCRPOLY			ScrPolys[ MAXNUMOFSCRPOLYS ];
-extern	PRIMARYWEAPONATTRIB PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ];
-extern	bool			TeamGame;
-extern	BYTE			TeamNumber[MAX_PLAYERS];
-extern	bool			DebugInfo;
-extern	bool			GodMode;
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-extern	bool			PickupInvulnerability;
-extern	int16_t			NumInvuls;
-extern	float			SoundInfo[MAXGROUPS][MAXGROUPS];
-extern	ENEMY	*		FirstEnemyUsed;
-extern	ENEMY			Enemies[ MAXENEMIES ];
-extern	ENEMY_TYPES		EnemyTypes[ MAX_ENEMY_TYPES ];
-extern	int				no_collision;		// disables player ship-to-background collisions
-extern	int				outside_map;
-extern	float			NmeDamageModifier;
-extern	int32_t			ColPerspective;
-extern	bool			CaptureTheFlag;
-extern	bool			BountyHunt;
-extern	float			GlobalFramelagAddition;
-extern	bool			PlayDemo;
-extern	int16_t	Host_PrimaryWeaponsGot[ MAX_PLAYERS ][ MAXPRIMARYWEAPONS ];
-extern	int16_t	Host_SecondaryWeaponsGot[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-extern	float	Host_GeneralAmmo[ MAX_PLAYERS ];
-extern	float	Host_PyroliteAmmo[ MAX_PLAYERS ];
-extern	float	Host_SussGunAmmo[ MAX_PLAYERS ];
-extern	float	Host_GeneralAmmoUsed;
-extern	float	Host_PyroliteAmmoUsed;
-extern	float	Host_SussGunAmmoUsed;
-extern	int16_t	Host_SecondaryAmmo[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-extern	int16_t	Host_SecAmmoUsed[ MAXSECONDARYWEAPONS ];
-extern	int8_t	Host_SecWeaponsGot[ MAX_PLAYERS ][ MAXPICKUPS ];
-extern	float	Host_NitroFuel[ MAX_PLAYERS ];
-extern	float	Host_NitroFuelUsed;
-extern	int16_t	Host_PowerLevel[ MAX_PLAYERS ];
-extern	BYTE	Host_NumOfOrbitals[ MAX_PLAYERS ];
-extern	BYTE	Host_CopyOfNumOfOrbitals[ MAX_PLAYERS ];
-extern	float	Host_CopyOfOrbAmmo[ MAX_PLAYERS ][ MAXMULTIPLES ];
-extern	int16_t	Host_CopyOfPowerLevel[ MAX_PLAYERS ];
-extern	float	Host_CopyOfNitroFuel[ MAX_PLAYERS ];
-extern	float	Host_CopyOfGeneralAmmo[ MAX_PLAYERS ];
-extern	float	Host_CopyOfSussGunAmmo[ MAX_PLAYERS ];
-extern	float	Host_CopyOfPyroliteAmmo[ MAX_PLAYERS ];
-extern	int16_t	Host_PickupsGot[ MAX_PLAYERS ][ MAXPICKUPTYPES ];
-extern  u_int32_t  Host_Flags[ MAX_PLAYERS ];
-extern	int16_t	NumSuperNashrams;
-extern	PICKUP	Pickups[ MAXPICKUPS ];
-extern	float	RegenDelay;
-
-extern render_info_t render_info;
-
-// custom colour messages (Title.c)
-extern int PickupMessageColour;
-// player selected for watch mode - used to display their missile camera (Title.c)
-extern SLIDER WatchPlayerSelect;
-// player selected in demo mode - used to display their missile camera (Title.c)
-extern SLIDER DemoEyesSelect;
-extern bool ShowPlayerHealthAboveBikes;
-extern bool ScaleFontPlayerHealthAboveBikes;
-// (networking.c)
-extern SHIPHEALTHMSG PlayerHealths[ MAX_PLAYERS+1 ];
-extern u_int8_t ShipHealthColour[ MAX_PLAYERS+1 ];
 
 /*===================================================================
 	Globals
@@ -2518,7 +2391,6 @@ bool ProcessMines( u_int16_t i )
 	Input		:	u_int16_t		Secondary Weapon Bullet Index
 	Output		:	bool		NotDestroyed/Destroyed?  ( true/false )
 ===================================================================*/
-extern  BYTE          MyGameStatus;
 bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 {
 	QUATLERP		qlerp;

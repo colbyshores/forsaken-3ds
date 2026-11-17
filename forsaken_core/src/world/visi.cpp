@@ -28,43 +28,14 @@
 #include "util/util.h"
 #include "game/water.h"
 #include "rendering/render.h"
-
-extern render_info_t render_info;
+#include "data/tload.h"
+#include "game/oct2.h"
+#include "game/ships.h"
+#include "world/bsp.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
-
-extern "C" void SetViewportError( char *where, render_viewport_t *vp );
-
-extern float hfov;
-extern int outside_map;
-extern	bool	DoClipping;
-extern	CAMERA	CurrentCamera;
-
-/*===================================================================
-		Externals...	
-===================================================================*/
-
-extern	bool			CTF;
-extern	bool			CaptureTheFlag;
-
-extern	MATRIX			ProjMatrix;
-extern	TLOADHEADER		Tloadheader;
-extern	RENDERMATRIX		proj;
-extern	RENDERMATRIX		view;
-extern	MCLOADHEADER	MCloadheader;
-
-extern	DWORD			CurrentSrcBlend;
-extern	DWORD			CurrentDestBlend;
-extern	DWORD			CurrentTextureBlend;
-
-extern	BSP_NODE *	OldCollideNode;
-
-extern	u_int16_t			GroupTris[ MAXGROUPS ];
-extern	LINE			Lines[ MAXLINES ];
-extern	char			LevelNames[MAXLEVELS][128];                        
-extern	MLOADHEADER		Mloadheader;
 
 /*===================================================================
 		Globals...	
@@ -144,7 +115,6 @@ typedef struct
 	} from, to;
 } DebugRay;
 
-extern int16_t LevelNum;
 static void InitDebugRays( void )
 {
 #if 1
@@ -621,16 +591,10 @@ void FreeGroupConnections( void )
 	}
 }
 
-
-
-
 GROUPLIST *ConnectedGroups( u_int16_t g )
 {
 	return &ConnectedGroup.list[ g ];
 }
-
-
-
 
 GROUPLIST *VisibleGroups( u_int16_t g )
 {
@@ -651,8 +615,6 @@ GROUPLIST *IndirectVisibleGroups( u_int16_t g )
 {
 	return &IndirectVisibleGroup.list[ g ];
 }
-
-
 
 int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group )
 {
@@ -763,8 +725,6 @@ extern "C" void AddIndirectVisible( u_int16_t g )
 
 #define HUGE_VALUE	(FLT_MAX * 0.5F)
 
-
-
 #ifdef USEINLINE
 __inline
 #endif
@@ -772,8 +732,6 @@ __inline
 {
 	return ( e->min.x >= e->max.x ) || ( e->min.y >= e->max.y );
 }
-
-
 
 static void
 MinimiseXYExtent( EXTENT *e1, EXTENT *e2, EXTENT *e )
@@ -930,8 +888,6 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 	}
 	return 1;
 }
-
-
 
 static void
 ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
@@ -1298,12 +1254,6 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 /*===================================================================
 		Disp Visipoly Model
 ===================================================================*/
-extern	float	WhiteOut;
-extern	u_int16_t	GroupWaterInfo[MAXGROUPS];
-extern	float	GroupWaterLevel[MAXGROUPS];
-extern	float	GroupWaterIntensity_Red[MAXGROUPS];
-extern	float	GroupWaterIntensity_Green[MAXGROUPS];
-extern	float	GroupWaterIntensity_Blue[MAXGROUPS];
 bool
 DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam ) 
 {

@@ -20,15 +20,10 @@
 #include "ai/ai.h"
 #include "game/secondary.h"
 #include "game/primary.h"
+#include "game/oct2.h"
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
-extern	PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[];
-extern	SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[];
-extern	MLOADHEADER Mloadheader;
 /*===================================================================
 	Procedure	:	AIR Crash and burn...
 	Input		:	ENEMY * Enemy
@@ -80,8 +75,3 @@ void AI_AIR_DEATH_PSYCHO( register ENEMY * Enemy )
 	}
 	
 }
-
-
-
-
-

@@ -429,7 +429,6 @@ typedef struct texture_s {
 	float   proctex_phase;
 } texture_t;
 
-
 /* bSquareOnly — shared global, always true on 3DS */
 bool bSquareOnly = true;
 
@@ -1172,9 +1171,6 @@ static void upload_matrices(void)
 static float s_ambient_r = 0.0f;
 static float s_ambient_g = 0.0f;
 static float s_ambient_b = 0.0f;
-
-extern struct XLIGHT * FirstLightVisible;
-extern CAMERA          CurrentCamera;
 
 /* Zero all lighting uniforms. Called from FSBeginScene so each frame
  * starts clean — without this, UI / crate-menu / title-screen frames
@@ -2641,8 +2637,6 @@ void do_whiteout_effect(VECTOR *pos, COLOR *color)
 	*color &= 0xffff;
 	*color |= (intensity << 24) + (intensity << 16);
 }
-
-extern XLIGHT *FirstLightVisible;
 
 void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, float *A)
 {

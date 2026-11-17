@@ -55,6 +55,15 @@ u_int16_t FindClipGroup( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max )
 u_int16_t FindOverlappingVisibleGroups( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max, u_int16_t * group );
 bool PointInGroupBoundingBox( MLOADHEADER * Mloadheader, VECTOR * Pos, u_int16_t group );
 
+/* Defined in visi.cpp; shared with the modules that use it. */
+bool ReadGroupConnections( MLOADHEADER *m, char **pbuf );
+extern u_int16_t IsGroupVisible[ MAXGROUPS ];
+extern int NumOfVertsConsidered;
+extern int NumOfVertsTouched;
+extern u_int16_t NumGroupsVisible;
+extern u_int16_t GroupImIn;
+extern u_int16_t GroupsVisible[ MAXGROUPS ];
+
 #ifdef __cplusplus
 }
 #endif

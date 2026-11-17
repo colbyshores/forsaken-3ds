@@ -37,7 +37,6 @@
 
 #include "rendering/vulkan_shaders.h" /* generated: vulkan3d_vert_spv, vulkan2d_vert_spv, vulkan_frag_spv */
 
-extern render_info_t render_info;
 bool bSquareOnly = true;
 
 typedef struct vkbuf {

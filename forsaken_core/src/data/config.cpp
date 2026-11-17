@@ -16,13 +16,8 @@
 #include "data/mxaload.h"
 #include "data/config.h"
 #include "util/util.h"
+#include "ui/title.h"
 
-extern LIST BikeList;
-extern LIST BikeComputer;
-extern TEXT	MacroText1;
-extern TEXT	MacroText2;
-extern TEXT	MacroText3;
-extern LIST BikeComputerList;
 extern void ConfigureSpaceorbAxis( int joystick );
 
 typedef int (*ReadConfig)( FILE *, USERCONFIG *, char * );
@@ -31,8 +26,6 @@ typedef struct {
 	char *keyword;
 	ReadConfig handle;
 } READCONFIGTABLE;
-
-extern char *JoystickPOVDirections[];
 
 USERCONFIG default_config = {
 	"Player",						// player name

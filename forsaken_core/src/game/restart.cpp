@@ -19,39 +19,13 @@
 #include "game/primary.h"
 #include "game/restart.h"
 #include "game/spotfx.h"
+#include "game/oct2.h"
+#include "rendering/2dtextures.h"
 
 /*===================================================================
 	Defines
 ===================================================================*/
 #define	RESTART_VERSION_NUMBER	1
-
-/*===================================================================
-	External Variables
-===================================================================*/
-extern	int16_t			NextNewModel;
-extern	int16_t			LevelNum;
-extern	char			LevelNames[ MAXLEVELS ][ 128 ];
-extern	float			framelag;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	BYTE			ChangeLevel_MyGameStatus;
-extern	BYTE			MyGameStatus;
-extern	MATRIX			MATRIX_Identity;
-extern	u_int16_t			num_start_positions;
-extern	GAMESTARTPOS	StartPositions[ MAXSTARTPOSITIONS ];
-extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
-extern	FRAME_INFO	*	Restart_Header;
-extern	u_int16_t			last_start_position;
-extern	MODELNAME	*	ModNames;
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-extern	u_int16_t	FirstStartPositionInGroup[MAXGROUPS];
 
 /*===================================================================
 	Global Variables

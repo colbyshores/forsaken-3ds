@@ -21,24 +21,12 @@
 #include "game/water.h"
 #include "util/util.h"
 #include "game/oct2.h"
-extern "C" void *Hunk_Alloc(int, size_t);
+#include "game/ships.h"
+#include "util/hunk_alloc.h"
 
 /*===================================================================
 		Externs...	
 ===================================================================*/
-extern	MATRIX ProjMatrix;
-extern	TLOADHEADER Tloadheader;
-extern	float	framelag;
-extern	DWORD	CurrentSrcBlend;
-extern	DWORD	CurrentDestBlend;
-extern	DWORD	CurrentTextureBlend;
-extern	RENDERMATRIX view;
-extern	RENDERMATRIX identity;
-extern	MATRIX	MATRIX_Identity;
-extern	RENDERMATRIX  TempWorld;	
-extern	RENDERMATRIX identity;
-extern	u_int32_t	AnimOncePerFrame;// used for stuff that is displayed more than once in a single frame..
-extern TRIGGERMOD	*	TrigMods;
 
 /*===================================================================
 		Defines
@@ -64,7 +52,6 @@ float	GroupWaterIntensity_Red[MAXGROUPS];
 float	GroupWaterIntensity_Green[MAXGROUPS];
 float	GroupWaterIntensity_Blue[MAXGROUPS];
 
-extern	float framelag;
 float	Fc[MAXMESHX*MAXMESHY];
 
 void UpdateWaterMesh( WATEROBJECT * WO );
@@ -81,7 +68,6 @@ float WaterFade = 1.0F;
 	Input		:	char * filename....
 	Output		:	bool
 ===================================================================*/
-extern int16_t LevelNum;
 bool PreWaterLoad( char * Filename )
 {
 	long			File_Size;
@@ -238,7 +224,7 @@ bool WaterLoad( void )
 		 * transition. */
 		{
 			WO->renderObject.textureGroups =
-			    (TEXTUREGROUP *) Hunk_Alloc(/*TAG_LEVEL=*/1, sizeof(TEXTUREGROUP));
+			    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL, sizeof(TEXTUREGROUP));
 			if ( !WO->renderObject.textureGroups )
 			{
 				Msg( "WaterLoad: hunk-alloc failed for WO[%d].textureGroups", i );
@@ -693,8 +679,6 @@ void DisplayWaterObject(WATEROBJECT * Wo)
 		return;
 }
 
-
-
 /*===================================================================
 	Procedure	:		Loop around and see if there are any object in this group...
 	Input		:		Nothing
@@ -747,9 +731,6 @@ bool InWater( u_int16_t group , VECTOR *OrgPos , float * Damage)
 	}
 	return false;
 }
-
-
-
 
 /*===================================================================
 	Procedure	:		Collide the Water Object Stuff...
@@ -1011,14 +992,3 @@ void GetWaterColour( u_int16_t Group, u_int8_t * Red, u_int8_t * Green, u_int8_t
 #ifdef OPT_ON
 #pragma optimize( "", off )
 #endif
-
-
-
-
-
-
-
-
-
-
-

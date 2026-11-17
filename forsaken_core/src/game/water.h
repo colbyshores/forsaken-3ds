@@ -1,6 +1,8 @@
 
 #ifndef WATER_H
 #define WATER_H
+#include "game/main.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -88,6 +90,14 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 bool InWater( u_int16_t group , VECTOR *OrgPos , float * Damage);
 bool WaterObjectCollide( u_int16_t group , VECTOR *Origin, VECTOR *Offset, VECTOR *CollidePos , float Damage );
 void GetWaterColour( u_int16_t Group, u_int8_t * Red, u_int8_t * Green, u_int8_t * Blue );
+
+/* Defined in water.cpp; shared with the modules that use it. */
+extern u_int16_t GroupWaterInfo[ MAXGROUPS ];
+extern float GroupWaterLevel[ MAXGROUPS ];
+extern float GroupWaterIntensity_Red[ MAXGROUPS ];
+extern float GroupWaterIntensity_Green[ MAXGROUPS ];
+extern float GroupWaterIntensity_Blue[ MAXGROUPS ];
+extern float WATER_CELLSIZE;
 
 #ifdef __cplusplus
 }

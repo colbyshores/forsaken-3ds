@@ -20,18 +20,16 @@
 #include "ai/ai.h"
 #include "game/secondary.h"
 #include "game/primary.h"
+#include "game/oct2.h"
+#include "ui/title.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
 // Externals
-extern	float framelag;
 extern	AIMDATA AimData;
-extern	VECTOR	Forward;
-extern	VECTOR	SlideUp;
 void CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
-extern	bool ShowNode;
 /*===================================================================
 	Procedure	:	AIR Move to a Target
 	Input		:	ENEMY * Enemy

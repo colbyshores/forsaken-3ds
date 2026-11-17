@@ -133,6 +133,9 @@ bool InitMxaModels( char * NamePnt);
 bool ReleaseMxaModels();
 bool InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp );
 
+/* Defined in mxaload.cpp; shared with the modules that use it. */
+extern MXALOADHEADER * MxaModelHeaders;
+
 #ifdef __cplusplus
 }
 #endif

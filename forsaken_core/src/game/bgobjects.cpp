@@ -31,44 +31,7 @@
 #include "input/controls.h"
 #include "util/util.h"
 #include "game/oct2.h"
-
-/*===================================================================
-	External Variables
-===================================================================*/
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	MODEL			Models[ MAXNUMOFMODELS ];
-extern	float			framelag;
-extern	MATRIX			MATRIX_Identity;
-extern	int16_t			LevelNum;
-extern	char			LevelNames[MAXLEVELS][128];
-extern	BYTE			GameStatus[MAX_PLAYERS];
-extern	BYTE			WhoIAm;
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-extern	MODELNAME		TitleModelNames[MAXMODELHEADERS];
-extern	MODELNAME		SplashModelNames[MAXMODELHEADERS];
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-extern	TRIGGERMOD	*	TrigMods;
-extern	int				NumOfTrigMods;
-extern	int16_t			NextNewModel;
-extern	LINE			Lines[ MAXLINES ];
-extern	MLOADHEADER		Mloadheader;
-extern	ENEMY			Enemies[ MAXENEMIES ];
-extern	ENEMY		*	EnemyGroups[ MAXGROUPS ];
-extern	ENEMY_TYPES		EnemyTypes[ MAX_ENEMY_TYPES ];
-extern	PICKUP	*		PickupGroups[ MAXGROUPS ];
-extern	MXLOADHEADER	*ModelHeaders;
-extern	ENEMY	*		FirstEnemyUsed;
-extern	int16_t			PickupsGot[ MAXPICKUPTYPES ];
-extern	int16_t			BikeModels[ MAXBIKETYPES ];
-extern	MODELNAME	*	ModNames;
-extern	TLOADHEADER		Tloadheader;
-extern	SECONDARYWEAPONBULLET *	SecBullGroups[ MAXGROUPS ];
+#include "data/tload.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -1220,7 +1183,6 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 	Input		:	int8_t	*	Filename
 	Output		:	bool		true/false
 ===================================================================*/
-extern	int16_t		LevelNum;
 bool PreLoadBGOFiles( void )
 {
 	BGO_FILE	*	FilePtr = NULL;
@@ -2349,7 +2311,6 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 	Input		:	BGOBJECT	*	Object
 	Output		:	bool			True/False
 ===================================================================*/
-extern  BYTE          MyGameStatus;
 bool CheckBGObjectToPickups( BGOBJECT * Object )
 {
 	int16_t		Count;

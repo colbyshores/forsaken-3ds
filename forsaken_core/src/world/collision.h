@@ -101,6 +101,11 @@ bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVect
 u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance );
 u_int16_t CheckAnyEnemyHit( void );
 
+/* Defined in collision.cpp; shared with the modules that use it. */
+extern int outside_group;
+extern int no_collision;
+extern COMP_OBJ * ColChild;
+
 #ifdef __cplusplus
 }
 #endif

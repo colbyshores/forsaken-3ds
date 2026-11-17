@@ -18,11 +18,6 @@
 #include "game/secondary.h"
 #include "scripting/lua_weapons.h"
 
-extern PRIMARYWEAPONATTRIB PrimaryWeaponAttribs[];
-extern SECONDARYWEAPONATTRIB SecondaryWeaponAttribs[];
-extern int8_t * DebugPrimStrings[];
-extern int8_t * DebugSecStrings[];
-
 #define FIELD(field, table, index, type) do { \
 	lua_push ## type(L, table[index].field);  \
 	lua_setfield(L, -2, #field);              \

@@ -19,19 +19,9 @@
 #include	"game/triggers.h"
 #include	"game/pickups.h"
 #include	"game/restart.h"
+#include "game/oct2.h"
+#include "ui/title.h"
 
-/*===================================================================
-	External variables
-===================================================================*/
-	extern	TLOADHEADER	Tloadheader;
-	extern	TRIGGERVAR	*	DecreaseTemperature;
-	extern	bool	CaptureTheFlag;
-	extern	bool	CTF;
-	extern	bool	BountyHunt;
-	extern	BYTE	ChangeLevel_MyGameStatus;
-	extern	float	UV_Fix;
-
-extern render_info_t render_info;
 /*===================================================================
 	Globals
 ===================================================================*/

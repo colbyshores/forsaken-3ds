@@ -76,6 +76,11 @@ void DisableTriggerArea( u_int16_t * Data );
 void ProcessTriggerAreas( void );
 FILE * SaveTriggerAreas( FILE * fp );
 FILE * LoadTriggerAreas( FILE * fp );
+/* Defined in trigarea.cpp; shared with the modules that use it. */
+extern bool Entry;
+extern bool Exit;
+extern bool In;
+
 #ifdef __cplusplus
 }
 #endif

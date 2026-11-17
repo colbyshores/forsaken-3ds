@@ -1,6 +1,8 @@
 
 #ifndef STATS
 #define STATS
+#include "game/main.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -52,6 +54,12 @@ int GetTeamScore2( int Player );
 int GetEffeciency( int Player );
 int player_left( int player );
 int scoreable_status( int player );
+
+/* Defined in stats.cpp; shared with the modules that use it. */
+int GetFriendlyKills( int Player );
+extern int KillStats[ MAX_PLAYERS+1 ][ MAX_PLAYERS+1 ];
+extern int BonusStats[ MAX_PLAYERS+1 ];
+extern int KillCounter[ MAX_PLAYERS+1 ];
 
 #ifdef __cplusplus
 }

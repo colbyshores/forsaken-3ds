@@ -51,31 +51,18 @@ mxtype : u_int16_t // always 0 for mx format
 #include "game/spotfx.h"
 #include "util/util.h"
 #include "game/oct2.h"
+#include "data/mload.h"
+#include "data/tload.h"
+#include "util/hunk_alloc.h"
 #ifdef RENDERER_C3D
 /* render_c3d.c is a C TU; hoisted from block-scope extern (C++ mangles those). */
 extern "C" void c3d_set_object_proctex(bool);
 #endif
-extern "C" void *Hunk_Alloc(int, size_t);
 
 /*===================================================================
 		Defines
 ===================================================================*/
 #define	MX_VERSION_NUMBER	2
-
-/*===================================================================
-		Externals...
-===================================================================*/
-
-extern	u_int32_t				AnimOncePerFrame;					// used for stuff that is displayed more than once in a single frame..
-extern	DWORD				CurrentSrcBlend;
-extern	DWORD				CurrentDestBlend;
-extern	DWORD				CurrentTextureBlend;
-
-extern	TLOADHEADER Tloadheader;
-extern	MODEL	Models[MAXNUMOFMODELS];
-
-extern	bool	DrawPanel;
-extern	float	framelag;
 
 /*===================================================================
 		Globals...
@@ -88,9 +75,6 @@ POLYANIM * Panel3DPolyAnims_Mine[NUMOFPOLYSPER3DPANELITEM];
 POLYANIM * Panel3DPolyAnims_MineNum[NUMOFPOLYSPER3DPANELITEM];
 
 void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
-
-extern void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert );
-extern void FixUV_Anim( POLYANIM *PolyAnim, LPLVERTEX Vert, LPLVERTEX Orig_Vert );
 
 /*===================================================================
 		Function from title.c not #included due to dependences...
@@ -433,7 +417,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			if ( num_texture_groups > 0 )
 			{
 				Mxloadheader->Group[group].renderObject[execbuf].textureGroups =
-				    (TEXTUREGROUP *) Hunk_Alloc(/*TAG_LEVEL=*/1,
+				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
 				                                num_texture_groups * sizeof(TEXTUREGROUP));
 				if ( !Mxloadheader->Group[group].renderObject[execbuf].textureGroups )
 				{
@@ -1165,15 +1149,11 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 	Mxloadheader->state = false;
 }
 
-
-
-
 /*===================================================================
 	Procedure	:		Pre - Load .Mx File
 	Input		:		char	*	Filename , MXLOADHEADER *
 	Output		:		Nothing
 ===================================================================*/
-extern	int16_t		LevelNum;
 bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool LevelSpecific )
 {
 	long			File_Size;
@@ -1276,8 +1256,6 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 	return( true );
 }
 
-
-
 /*===================================================================
 	Procedure	:		Execute all group buffers for a Mxloadheader
 	Input		;		MXLOADHEADER *
@@ -1311,8 +1289,6 @@ bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model )
 	}
 	return true;
 }
-
-
 
 /*===================================================================
 	Procedure	:		Handle All Animation For an Mloadheader

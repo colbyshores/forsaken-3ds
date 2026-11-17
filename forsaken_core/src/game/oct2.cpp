@@ -64,6 +64,9 @@
 
 #include "diag/perf_capture.h"
 #include "diag/fidelity.h"
+#include "data/config.h"
+#include "game/skin.h"
+#include "util/xmem.h"
 /* C TUs (or C++ TUs with C-linkage definitions); oct2.c relied on
    block-scope externs, which C++ mangles. Hoisted to file scope. */
 #ifdef __3DS__
@@ -102,8 +105,6 @@ bool Bsp_Identical( BSP_HEADER *b1, BSP_HEADER *b2 );
 bool Bsp_Duplicate( BSP_HEADER *src, BSP_HEADER *dup );
 int  Print4x5Text(char *Text, int x, int y, int color);
 }
-/* stats.cpp defines these with C linkage; oct2.c relied on implicit declarations. */
-extern "C" int GetFriendlyKills( int Player );
 
 void SetCam(int ship, int Cam);
 
@@ -111,31 +112,10 @@ VECTOR OldPos;
 float SpeedInterval = 0.0F;
 float BikeSpeed = 0.0F;
 
-extern SHIPHEALTHMSG PlayerHealths[ MAX_PLAYERS+1 ];
-extern u_int8_t ShipHealthColour[ MAX_PLAYERS+1 ];
-extern int HUDColour;
-extern bool ShowWeaponsPossessedOnHUD;
-extern bool ShowClockOnHUD;
-extern bool ShowKPMOnHUD;
-extern bool ShowSpeedOnHUD;
-
-extern render_info_t render_info;
-
-
 BSP_HEADER Bsp_Original;
 
 extern	render_viewport_t viewport;
-extern VECTOR View, Look, Up, PanFrom, PanTo, PanFrom2, PanTo2, VDULookPos, DiscLookPos, DiscViewPos, VDUViewPos, StartLookPos, StartViewPos;
 extern	RENDERMATRIX view;
-extern int    BountyInLevel;
-extern int    FlagsInLevel;
-extern int    TeamFlagsInLevel[ MAX_TEAMS ];
-extern int    TeamFlagsInShips[ MAX_TEAMS ];
-
-
-extern bool NeedFlagAtHome;
-extern bool OwnFlagTeleportsHome;
-extern bool CanCarryOwnFlag;
 
 bool OriginalLevels = false;
 bool CheatsDisabled = false;
@@ -144,106 +124,16 @@ bool WaitingToQuit;
 void ConfigureSpaceorbAxis( int joystick );
 void DefaultJoystickSettings( USERCONFIG *u );
 
-extern const char last_compiled[];
-
-extern  u_int32_t RecPacketSize;
-extern  u_int32_t MaxRecPacketSize;
-
-extern  u_int32_t CurrentBytesPerSecRec;
-extern  u_int32_t CurrentBytesPerSecSent;
-extern  u_int32_t MaxCurrentBytesPerSecRec;
-extern  u_int32_t MaxCurrentBytesPerSecSent;
-
-
-extern char *JoystickPOVDirections[];
-extern VECTOR BikePos;
-
-extern bool CTF;
-
-extern u_int8_t QuickStart;
-
-extern char *TeamName[ MAX_TEAMS ];
-extern int16_t DummyTextureIndex;
-
-
-
-
-
-
-extern  bool  RearCameraDisable;
-extern  MODELNAME   SplashModelNames[MAXMODELHEADERS];
-extern USERCONFIG *player_config;
-extern char biker_config[];
-
-extern MODELNAME *TitleModelSet;
-extern float LevelTimeTaken;
-
-extern BYTE PreDemoEndMyGameStatus;
-extern  TEXT  DemoGameName;
-
-extern  bool FullRearView;
-extern  bool ShowStats;
-
-extern  int AckMsgsActiveMax;
-extern  int AckMsgsActive;
-
-extern MENU MENU_Controls;
-extern MENU MENU_Options;
-extern MENU MENU_LoadSavedGame;
-extern MENU MENU_SaveGame;
-extern MENU MENU_NEW_BetweenLevels;
-extern MENU MENU_NEW_BetweenLevels;
-extern MENU MENU_NEW_NumberOfCrystals;
-extern MENU MENU_NEW_WatchTeamSelect;
-
-extern float VDUoffsetX;
-extern float VDUoffsetY;
-extern  int16_t NextworkOldBikeNum;
-
-extern  size_t  MemUsed;
-
 #ifdef DEBUG_ON
-extern u_int32_t CurrentBikeCompSpeech;
 #endif
 
 bool Cheated = false;
-
-extern "C" void InitSoundInfo( MLOADHEADER * Mloadheader );
-extern "C" void InitShipSpeeds( void );
 
 #define SAVESCREEN_3DFX
 
 u_int32_t        AnimOncePerFrame = 0;         // used for stuff that is displayed more than once in a single frame..
 
-extern bool bSoundEnabled;
-
-extern int	TeamCol[ MAX_TEAMS ];
 extern int Num_StatsMessage_Parts;
-extern LIST BikeList;
-extern LIST LevelList;
-
-extern  bool ResetKillsPerLevel;
-
-extern int  outside_map;
-
-extern  int16_t NextNewModel;
-extern MENUSTATE MenuState;
-extern  bool  ShowEFZones;
-extern  bool  ShowTeleports;
-extern bool MenuFrozen;
-extern  int16_t MaxKills;
-extern  int16_t NumGoldBars;
-extern bool ReloadSfx;
-extern float ReloadSfxPause;
-extern  bool  IllegalTime;
-extern  int   SinglePlayerTimeLimit;
-extern  bool  BilinearSolidScrPolys;
-extern  u_int16_t  RandomStartPosModify;
-extern  char * StatusTab[256];
-
-extern bool ShowMessages; // show long list of chat messages
-extern bool ShowStatistics; // show in-game statistics
-extern bool ShowNetworkInfo; // show in-game enet info
 
 BYTE  PreSynchupStatus;
 char *CurrentLevelsList;
@@ -275,10 +165,6 @@ char * AiModes[] = {
   "",
 };
 
-extern  int EnemiesActive;
-extern "C" void CheckTimeLimit( void );
-extern  int16_t InGameLoadGameLevelNum;
-
 bool  ScoreDisplaySfx = true;
 bool  IMustQuit = false;
 // Capture The Flag Stuff
@@ -288,8 +174,6 @@ bool  IHaveAFlag			= false;
 
 // Bounty Hunt
 bool  BountyHunt = false;
-
-extern int CameraStatus;  
 
 char *  InitViewMessages[] = {
      "Loading OffScreen Surfaces" ,
@@ -305,42 +189,6 @@ char *  InitViewMessages[] = {
      "" 
 };
 
-extern  float MaxMoveSpeed;
-extern  float MoveAccell;
-extern  float MoveDecell;
-extern  float MaxTurboSpeed;
-extern  float TurboAccell;
-extern  float TurboDecell;
-extern  float MaxTurnSpeed;
-extern  float TurnAccell;
-extern  float TurnDecell;
-extern  float MaxRollSpeed;
-extern  float RollAccell;
-extern  float RollDecell;
-extern  float MaxBankAngle;
-extern  float BankAccell;
-extern  float BankDecell;
-
-extern bool BrightShips;
-
-extern  float LastDistance[MAX_SFX];
-
-extern int GameCompleted;
-extern  OFF_FILES OffsetFiles[];
-extern  OFF_FILES Title_OffsetFiles[];
-extern  OFF_FILES Splash_OffsetFiles[];
-
-extern  int   DifficultyLevel;
-
-extern int outside_group;
-
-extern  bool  ScreenSaving;
-extern  float WhiteOut;
-extern float mouse_dx;
-extern float mouse_dy;
-
-extern "C" void	MessageQuePrintAll( void );
-
 bool  InsideResizeViewport = false;
 
 DWORD CurrentSrcBlend;
@@ -355,32 +203,6 @@ int   Depth;
 
 void CalculateFramelag( void );
 
-extern MENU  MENU_EditMacro1;  /* defined in title.c */
-extern MENU  MENU_EditMacro2;  /* defined in title.c */
-extern MENU  MENU_EditMacro3;  /* defined in title.c */
-
-extern  FILE  * DemoFp;
-extern  FILE  * DemoFpClean;
-extern  bool  PlayDemo;
-extern  bool  PauseDemo;
-extern  bool  RecordDemo;
-extern  SLIDER  DemoSpeed;
-extern  SLIDER  DemoEyesSelect;
-extern  bool  ShowWeaponKills;
-extern  bool ShowStats; 
-
-extern  u_int16_t  IsGroupVisible[MAXGROUPS];
-
-extern  MXLOADHEADER *ModelHeaders;
-extern  MODELNAME TitleModelNames[MAXMODELHEADERS]; 
-
-extern  char  TitleNames[8][64];  
-
-extern  ENEMY * FirstEnemyUsed;
-
-extern  CAMERA  CurrentCamera;
-extern  CAMERA  MainCamera;     // the main viewing screen...
-
 float FPS = 0.0F;         // Frames Per Second...
 //double  TPS = 0.0;          // Textures Per Second...     
 
@@ -388,9 +210,6 @@ float FPS = 0.0F;         // Frames Per Second...
 #undef MYTIMER
 
 #define LEVELSFILE      "levels.dat"
-
-extern  MENU  *       GetPlayerNumMenu;
-
 
 #define FOV_GROW(A)     ((A) + 10.0F)
 #define FOV_SHRINK(A)   ((A) - 10.0F)
@@ -402,71 +221,9 @@ extern  MENU  *       GetPlayerNumMenu;
 #define VIEWPORT_GROW   (1.1F)
 #define VIEWPORT_SHRINK   (1.0F/1.1F)
 
-extern  TLOADHEADER Tloadheader;
-extern  int16_t   SecondaryAmmo[ MAXSECONDARYWEAPONS ];
 bool LockOutWindows = true;
 
-extern u_int16_t OnceOnly;
-extern char         MyName[ 32 ];
-extern  bool                    IsHost;
-extern float  MessageTime[MAX_MESSAGES];
-extern  char MessageBank[MAX_MESSAGES][200];
-extern  int CurrentMessage;
-extern  BYTE          MyGameStatus;
 BYTE PreWaitingToSendMessagesStatus;
-extern  BYTE          GameStatus[]; // Game Status for every Ship...
-extern  BYTE          OverallGameStatus;      // what the host says he is doing...
-//extern  LPDIRECT3DEXECUTEBUFFER Skin_Execs[ MAXGROUPS ];
-//extern  LPDIRECT3DEXECUTEBUFFER Portal_Execs[ MAXGROUPS ];
-extern RENDEROBJECT Skin_Execs[ MAXGROUPS ];
-extern RENDEROBJECT	Portal_Execs[ MAXGROUPS ];
-extern  float PyroliteAmmo;
-extern  float SussGunAmmo;
-extern  float GeneralAmmo;
-extern  SHIPCONTROL control;
-extern  REGENPOINT  * RegenPoints;
-extern  int16_t     NumRegenPoints;
-extern  float PowerLevel;
-extern  float LaserTemperature;
-extern  float NitroFuel;
-extern  SECONDARYWEAPONBULLET SecBulls[MAXSECONDARYWEAPONBULLETS];
-extern  ENEMY * TestEnemy;
-
-extern  char  biker_name[256];
-extern  int16_t SelectedBike;
-
-extern  float cral;
-extern  int   HullHit;
-extern  int   ShieldHit;
-extern  bool  TargetComputerOn;
-
-extern  int16_t NumPickupsPerGroup[ MAXGROUPS ];
-extern  PICKUP  Pickups[ MAXPICKUPS ];
-
-extern  bool  DebugInfo;
-extern  bool  GodMode;
-extern  bool  GodModeOnceOnly;
-
-extern  bool  TeamGame;
-extern  BYTE  TeamNumber[MAX_PLAYERS];
-
-extern  int   no_collision;   // disables player ship-to-background collisions
-extern  SLIDER  TimeLimit;
-extern  bool  CountDownOn;
-extern  REGENPOINT  * RegenSlotsCopy[ MAX_PLAYERS ];
-
-extern  bool  ShowTrigZones;
-extern  bool  ShowColZones;
-extern  bool  NodeCube;
-extern  bool  OldNodeCube;
-extern  MATRIX  MATRIX_Identity;
-
-extern  u_int32_t  TotalFmPolysInUse;
-extern  u_int32_t  TotalPolysInUse;
-extern  u_int32_t  TotalScrPolysInUse;
-extern  MODELNAME ModelNames[MAXMODELHEADERS];
-extern  bool  quitting; 
-extern  bool  ShowBoundingBoxes;
 
 bool InitViewport( void );
 
@@ -502,14 +259,10 @@ int i, j; // index counters
 bool RearCameraActive;
 int MissileCameraActive = 0;
 u_int16_t  CameraMissile = (u_int16_t) -1;
-extern bool MissileCameraEnable;
 BYTE  TempMissileCam;
-
-extern  REMOTECAMERA * ActiveRemoteCamera;
 
 bool
 Our_CalculateFrameRate(void);
-extern "C" bool VduFinished( MENU *Menu );
 bool WriteMessage(const char *format, ...); // printf-a-like for bottom line of window
 
 bool ScoreDisplay();
@@ -534,8 +287,6 @@ void DisplayNetworkInfo();
 int Secrets = 0;
 int TotalSecrets = 0;
 int CrystalsFound = 0;
-extern  int16_t   NumInitEnemies;
-extern  int16_t   NumKilledEnemies;
 
 bool  ResizeViewport( void );
 bool  FullScreenViewport();
@@ -568,7 +319,6 @@ bool  OldDrawPanel = true;
 bool  Panel = true;
 
 bool ChangeLevel( void );
-extern "C" void SelectQuitCurrentGame( MENUITEM *Item );
 
 float pixel_aspect_ratio;
 float Oldframelag;  
@@ -577,14 +327,6 @@ float real_framelag = 0.0F;
 float Demoframelag = 0.5F;
 
 px_timer_t level_timer;
-
-extern int FontWidth;
-extern int FontHeight;
-extern int FontSourceWidth;
-extern int FontSourceHeight;
-
-extern  int PlayerSort[MAX_PLAYERS];
-extern int16_t NumOfActivePlayers;
 
 int16_t   LevelNum = 0 ;
 int16_t   NewLevelNum = 0 ;
@@ -620,42 +362,10 @@ void ReleaseRenderBufs( void );
 bool SetMatrixViewPort( void );
 void PrintInitViewStatus( BYTE Status );
 
-extern "C" void UpdateBGObjectsClipGroup( CAMERA * Camera );
-extern "C" void UpdateEnemiesClipGroup( CAMERA * Camera  );
 extern "C" void SpecialDestroyGame( void );
-
-extern  int16_t PrimaryInLevel[ MAXPRIMARYWEAPONS ];
-extern  int16_t SecondaryInLevel[ MAXSECONDARYWEAPONS ];
-extern  int16_t PrimaryInPlayers[ MAXPRIMARYWEAPONS ];
-extern  int16_t SecondaryInPlayers[ MAXSECONDARYWEAPONS ];
-extern  int16_t PrimaryToGenerate[ MAXPRIMARYWEAPONS ];
-extern  int16_t SecondaryToGenerate[ MAXSECONDARYWEAPONS ];
-extern  int16_t MinesInLevel[ MAXSECONDARYWEAPONS ];
-extern  int16_t OrbsInLevel;
-extern  int16_t OrbsToGenerate;
-extern  int16_t OrbsInPlayers;
-
-extern int16_t PrimaryWeaponsGot[ MAXPRIMARYWEAPONS ];
 
 // if met max kill limit, sets flag to change level
 void CheckMetKillLimit();
-
-// message colours (Title.c)
-extern int KillMessageColour; 
-extern int SystemMessageColour;
-extern int FlagMessageColour;
-
-// for HUD colour (text.c)
-extern u_int8_t Colourtrans[MAXFONTCOLOURS][3];
-
-// watch mode select player (Title.c)
-extern SLIDER WatchPlayerSelect;
-
-// (Ships.c)
-
-
-// (stats.c)
-
 
 /*===================================================================
     Weapon Names...
@@ -698,20 +408,6 @@ float ModeScaleY;
 MLOADHEADER  Mloadheader;
 MCLOADHEADER MCloadheader;          //  inner skin collision map...
 MCLOADHEADER MCloadheadert0;        //  0 thickness collision map...
-
-//extern  LPDIRECT3DEXECUTEBUFFER Portal_lpD3DExBuf;
-
-extern  u_int16_t      FirstFmPolyUsed;
-extern  u_int16_t      FirstPolyUsed;
-extern  u_int16_t      FirstLineUsed;
-extern  u_int16_t      FirstScrPolyUsed;
-extern  BYTE      WhoIAm;
-extern  bool      RemoteCameraActive;
-
-extern  int16_t     ShowPortal;
-extern  int16_t     ShowSkin;
-extern  int16_t         NamesAreLegal;
-extern  SHORTNAMETYPE     Names;  // all the players short Names....
 
 bool MainGame(); // bjd
 
@@ -1951,8 +1647,6 @@ void ReleaseLevel(void)
   }
 #undef _RL_TRACE
 }
-
-
 
 extern "C" void
 ReleaseScene(void)
@@ -4031,8 +3725,6 @@ extern "C" bool RenderScene( void )
 
     break;
 
-
-
 	//  *********************** Single Player Game Stuff **********************************
 
 
@@ -4209,8 +3901,6 @@ extern "C" bool RenderScene( void )
 	    char _b[64]; snprintf(_b,sizeof(_b),"SP: MainGame OK first frame for level %d", (int)LevelNum); trace(_b);
 	  } }
 #endif
-
-
 
 #ifdef __3DS__
     _3ds_mr_ctx = "post-MainGame";
@@ -5340,8 +5030,6 @@ bool StatsNamePulse( void )
 	return false;
 }
 
-
-
 void DisplayNetworkInfo()
 {
 	char buf[256];
@@ -6064,8 +5752,6 @@ bool RenderCurrentCamera( void )
     perf_stage_end(PERF_S_TRANWATER, -1);
     perf_stage_begin(PERF_S_TRANPOLYS);
 
-
-
 /*===================================================================
   Display Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
@@ -6164,10 +5850,6 @@ Display Group Clipped Faceme Transluecent Polys
   return true;
 }
   
-
-extern  int   NumOfVertsConsidered;
-extern  int   NumOfVertsTouched;
-
 /*===================================================================
   Procedure :  Our Calculate frame rate...
   Input   :
@@ -6176,10 +5858,6 @@ extern  int   NumOfVertsTouched;
 
 px_timer_t our_timer;
 float our_count = 0;
-extern bool ShowFrameRate;
-extern bool ShowInfo;
-extern	u_int16_t		NumGroupsVisible;
-extern u_int16_t	GroupImIn;
 
 bool Our_CalculateFrameRate(void)
 {

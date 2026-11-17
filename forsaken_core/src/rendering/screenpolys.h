@@ -23,6 +23,7 @@
 #include "rendering/lights.h"
 #include "rendering/2dtextures.h"
 #include "data/tload.h"
+#include "util/timer.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -175,6 +176,19 @@ void ShowBountyOnShip( u_int16_t Ship );
 void ShowBounty( u_int16_t Ship );
 void ShowCTFFlagsOnShip( u_int16_t Ship );
 void ShowCTFFlags( u_int16_t Ship );
+
+/* Defined in screenpolys.cpp; shared with the modules that use it. */
+extern px_timer_t countdown_timer;
+extern bool CountDownOn;
+extern bool IllegalTime;
+extern int SinglePlayerTimeLimit;
+extern bool BilinearSolidScrPolys;
+extern u_int32_t TotalScrPolysInUse;
+extern u_int16_t FirstScrPolyUsed;
+extern SCRPOLY ScrPolys[ MAXNUMOFSCRPOLYS ];
+extern u_int16_t FlashScreenPoly;
+extern bool KilledPlayer;
+extern float Countdown_Float;
 
 #ifdef __cplusplus
 }

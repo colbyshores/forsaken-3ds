@@ -130,6 +130,11 @@ key_char( int keycode );
 extern const char *
 key_fullname( int keycode );
 
+/* Defined in config.cpp; shared with the modules that use it. */
+extern USERCONFIG * player_config;
+void DefaultJoystickSettings( USERCONFIG *u );
+void ReInitJoysticks( void );
+
 #ifdef __cplusplus
 }
 #endif

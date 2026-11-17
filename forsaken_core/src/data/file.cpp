@@ -21,8 +21,6 @@
 #define S_IWRITE 0200
 #endif
 
-extern bool Debug;
-
 FILE * file_open(char * filename, char * mode)
 {
 	return fopen(convert_path(filename), mode);

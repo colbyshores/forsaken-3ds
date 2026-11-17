@@ -12,6 +12,8 @@
 #include "data/file.h"
 
 #include "util/util.h"
+#include "game/oct2.h"
+#include "world/collision.h"
 
 
 #define BSP_VERSION_NUMBER	(1)
@@ -21,16 +23,6 @@
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
-
-
-
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern	int	Depth;
-extern MLOADHEADER Mloadheader;
-
-extern "C" bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup );
 
 /*===================================================================
 		Globals ...
@@ -643,10 +635,6 @@ start:
 	return FindCollision( far_node_ptr, &intersection_point, end_point_ptr );
 }
 
-
-
-
-
 /*===================================================================
 	Procedure	:		Define if a point is inside or outside
 	Input		:		VECTOR * Pos , Node *node
@@ -688,8 +676,6 @@ start:
 	return false;
 }
 
-
-
 bool PointInsideSkin( VECTOR *Pos, u_int16_t Group )
 {
 	if( Bsp_Header[ 0 ].State )
@@ -698,9 +684,6 @@ bool PointInsideSkin( VECTOR *Pos, u_int16_t Group )
 	}
 	return !AmIOutsideGroup( &Mloadheader, Pos, Group );
  }
-
-
-
 
 #ifdef OPT_ON
 #pragma optimize( "", off )

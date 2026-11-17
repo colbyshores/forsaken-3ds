@@ -45,8 +45,6 @@
 #include "util/util.h"
 #include "game/oct2.h"
 
-extern	ENEMY	*		FirstEnemyUsed;
-
 /*===================================================================
 	Procedure	:	Check if hit Enemy
 	Input		:	u_int16_t		OwnerType

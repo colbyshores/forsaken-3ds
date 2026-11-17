@@ -38,6 +38,13 @@
 #include "util/util.h"
 #include "util/timer.h"
 #include "diag/perf_capture.h"
+#include "audio/sfx.h"
+#include "data/mload.h"
+#include "game/camera.h"
+#include "game/oct2.h"
+#include "game/stats.h"
+#include "net/multiplayer.h"
+#include "world/collision.h"
 
 //#undef MULTI_RAY_COLLISION
 //#define MULTI_RAY_SLIDE
@@ -66,22 +73,7 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off );
 bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i);
 
 bool	IsStartPosVacant( int16_t i , u_int16_t startpos );
-extern "C" void SpecialDestroyGame( void );
 void MultiSfxHandle( void );
-
-/*===================================================================
-		Externals ...
-===================================================================*/
-extern SLIDER BikeCompSpeechSlider;
-extern bool SeriousError;
-
-extern float LevelTimeTaken;
-extern	bool			CaptureTheFlag;
-extern	bool			CTF;
-extern	bool			BountyHunt;
-extern bool	NeedFlagAtHome;
-extern int8_t TeamFlagPickup[ MAX_TEAMS ];
-extern u_int16_t	FlashScreenPoly;
 
 bool TeamFlagAtHome[ MAX_TEAMS ];
 u_int32_t TeamFlagMask[ MAX_TEAMS ] = {
@@ -91,91 +83,11 @@ u_int32_t TeamFlagMask[ MAX_TEAMS ] = {
 	SHIP_CarryingFlag4,
 };
 
-extern int GoalScore;
-extern int16_t PickupsGot[ MAXPICKUPTYPES ];
-extern int FlagsToGenerate;
-extern char *TeamName[ MAX_TEAMS ];
-extern bool	bSoundEnabled;
-extern	bool ShowNode;
-extern	int16_t	SelectedBike;
-extern u_int16_t	num_start_positions;
-extern u_int16_t	last_start_position;
-extern GAMESTARTPOS		StartPositions[MAXSTARTPOSITIONS];			// pos and group info...
-extern	int16_t					Stats[MAX_PLAYERS+1][MAX_PLAYERS+1];
-extern	int16_t					Lives;
-extern int  no_collision;
-extern	XLIGHT	XLights[MAXXLIGHTS];
-extern	bool	flush_input;
-extern	MATRIX TempMatrix;
-extern USERCONFIG *player_config;
-extern char MyName[];
-extern char NickName[];
-extern	MXLOADHEADER  *ModelHeaders;
-extern	MXALOADHEADER *MxaModelHeaders;
-extern	bool	DebugInfo;
-extern	bool	GodMode;
-extern MLOADHEADER Mloadheader;
-extern MCLOADHEADER MCloadheader;
-extern MCLOADHEADER MCloadheadert0;
-extern	BYTE                    WhoIAm;
-extern	RENDERMATRIX view;
-extern	RENDERMATRIX identity;
-extern	MATRIX	MATRIX_Identity;
-extern	VECTOR	SlideRight;
-extern	VECTOR	SlideUp;
-extern	VECTOR	Forward;
-extern	float	real_framelag;
-extern	float	framelag;
-extern	float	Oldframelag;  
-extern	float	Demoframelag;  
-extern	SLIDER	DemoEyesSelect;
-
 #ifdef DEMO_SUPPORT
 extern	LONGLONG	GameElapsedTime;
 #endif
 
-extern	PICKUP	Pickups[ MAXPICKUPS ];
-extern	u_int16_t	FirstPickupUsed;
-extern	float	PickupMessageCount;
-extern	int16_t	PickupMessageIndex;
-extern	bool	RemoteCameraActive;
-extern	u_int16_t	RandomStartPosModify;
-extern	bool	DrawPanel;
-extern	bool	OldDrawPanel;
-extern	u_int16_t IsGroupVisible[MAXGROUPS];
-extern	int16_t	NumStealths;
-extern	int16_t	NumInvuls;
-extern	float	GeneralAmmo;
-extern	float	PowerLevel;
-
-extern	BYTE	GameStatus[MAX_PLAYERS];	// Game Status for every Ship...
 											// this tells the drones what status the host thinks hes in..
-
-extern	int		outside_group;
-extern	bool	PickupInvulnerability;
-
-extern	int16_t	BikeModels[ MAXBIKETYPES ];
-
-extern	bool	TeamGame;
-extern	BYTE	TeamNumber[MAX_PLAYERS];
-extern	int		CrystalsFound;
-extern	int16_t	NumGoldBars;
-extern	u_int16_t	FirstStartPositionInGroup[MAXGROUPS];
-extern	bool		JustGenerated;
-extern	bool		JustPickedUpShield;
-
-// watch mode select player (Title.c)
-extern SLIDER WatchPlayerSelect;
-
-// statistics updates (stats.c)
-extern "C" int UpdateBonusStats(int Player, int Points);
-extern "C" int GetTotalKills(int Player);
-
-// message colours (Title.c)
-extern int KillMessageColour; 
-extern int SystemMessageColour;
-extern int FlagMessageColour;
-extern int PlayerMessageColour;
 
 /*===================================================================
 		Bike Modifiers.....
@@ -625,7 +537,6 @@ int		ShieldHit = 0;
 ===================================================================*/
 u_int32_t UnderwaterSfxID;
 float BountyTime = 0.0F;
-extern int BountyBonusInterval;
 
 bool ShieldCritical = false;
 bool HullCritical = false;
@@ -640,9 +551,6 @@ u_int16_t	NumCollides;
 SHIPCONTROL control;
 float	NitroFuel = 0.0F;
 float	NitroFuelUsed = 0.0F;
-extern	CAMERA			CurrentCamera;
-extern	bool	PlayDemo;
-extern	bool	PauseDemo;
 float AutoLevelRot( u_int16_t ship, float autolevel_rate );
 void BobShip( u_int16_t ship, VECTOR *bob );
 void	UpdateStartPos( void );
@@ -695,7 +603,6 @@ static	LONGLONG	TempTime2;
 #endif
 
 static	float	Interp;	
-extern  BYTE          MyGameStatus;
 
 bool ProcessShips()
 {
@@ -791,8 +698,6 @@ bool ProcessShips()
 			perf_stage_begin(PERF_S_SHIPDMG);
 			DoDamagedEffects( i );							// Do Effects when damaged
 			perf_stage_end(PERF_S_SHIPDMG, -1);
-
-
 
 			// Special Noise Distance Modifier...
 			if( ShipObjPnt->Noise > 0.0F )
@@ -1523,10 +1428,6 @@ bool ProcessShips()
 			}
 #endif
 
-
-
-
-
 			ShipPnt->LastMove.x = ShipObjPnt->Pos.x - StartPos.x;
 			ShipPnt->LastMove.y = ShipObjPnt->Pos.y - StartPos.y;
 			ShipPnt->LastMove.z = ShipObjPnt->Pos.z - StartPos.z;
@@ -1603,8 +1504,6 @@ extern "C" void ObjForceExternalOneOff( OBJECT *Obj, VECTOR *force )
 	Obj->ExternalForce.y += force->y;
 	Obj->ExternalForce.z += force->z;
 }
-
-
 
 void ForceInternalOneOff( u_int16_t ship, VECTOR *force )
 {
@@ -1817,8 +1716,6 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 	}
 }
 
-
-
 /*===================================================================
 		True EnviroMent Mapping for an Mloadheader...
 ===================================================================*/
@@ -1878,8 +1775,6 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
 	}
 	return true;
 }
-
-
 
 /*===================================================================����
 			Work Out How Much Damage Ive Taken
@@ -2101,7 +1996,6 @@ void InitShipRandomPos( int16_t i )
 	}
 }
 
-
 /*===================================================================����
 	Procedure	:	InitShipStartPos
 	Input		:	int16_t which Ship
@@ -2239,8 +2133,6 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	FindNearestNode( &Ships[i].Object );
 }
 
-
-
 /*===================================================================����
 	Procedure	:	GotoRoom
 	Input		:	int16_t	which ship
@@ -2335,8 +2227,6 @@ bool GotoRoom( int16_t i, char *roomname )
 
 	return true;
 }
-
-
 
 /*===================================================================����
 	Procedure	:	Ship Mode 0	Normal Ship...
@@ -2509,7 +2399,6 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 	Input		:	int16_t which Ship
 	Output		:	Nothing
 /*===================================================================���*/
-extern "C" void clear_last_mouse_state(void);
 void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 {
 	input_grab(false);
@@ -2905,7 +2794,6 @@ bool	IsStartPosVacantVisibleGroup( int16_t i , u_int16_t startpos )
 	return false;
 }
 
-
 /*===================================================================����
 	Procedure	:	Remote Camera Mode 3	Demo Playback...
 	Input		:	int16_t which Ship
@@ -3227,9 +3115,6 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 	return Impact;
 }
 #endif
-
-
-
 
 /*===================================================================
 	Procedure	:	Multiplayer Sfx handler...

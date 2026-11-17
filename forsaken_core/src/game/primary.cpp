@@ -44,8 +44,11 @@
 
 #include "ui/local.h"
 #include "ui/localtitle.h"
-/* aim_assist.c is a C TU; hoisted from a block-scope extern (C++ forbids extern "C" at block scope). */
-extern "C" bool aim_assist_steer( VECTOR *pos, VECTOR *dir, u_int16_t group, int8_t weapon );
+#include "ai/aim_assist.h"
+#include "data/config.h"
+#include "data/mxaload.h"
+#include "game/models.h"
+#include "game/oct2.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -53,122 +56,11 @@ extern "C" bool aim_assist_steer( VECTOR *pos, VECTOR *dir, u_int16_t group, int
 
 #define MAX_TROJAX_POWER_LEVEL	(100.0F)
 
-extern render_info_t render_info;
 /*===================================================================
 	Externs
 ===================================================================*/
-extern SLIDER BikeCompSpeechSlider;
 
-extern	SHIPCONTROL		control;
-extern	RENDERMATRIX		view;
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-//extern	D3DTEXTUREHANDLE bTex;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	XLIGHT			XLights[MAXXLIGHTS];
-extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
-extern	POLY			Polys[MAXPOLYS];
-extern	LINE			Lines[ MAXLINES ];
-extern	float			framelag;
-extern	BYTE			WhoIAm;
-extern	MODEL			Models[ MAXNUMOFMODELS ];
-extern	RENDERMATRIX		identity;
-extern	u_int16_t			FirstSecBullUsed;
-extern	SECONDARYWEAPONBULLET SecBulls[MAXSECONDARYWEAPONBULLETS];
-extern	int16_t			SecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
-extern	VECTOR			ShieldVerts[ 4 ];
-extern	int16_t			SecondaryAmmo[ MAXSECONDARYWEAPONS ];
-extern	int16_t			SecAmmoUsed[ MAXSECONDARYWEAPONS ];
-extern	USERCONFIG	*	player_config;
-extern	float			NitroFuel;
-extern	float			NitroFuelUsed;
-extern	bool            bSoundEnabled;
-
-extern	FRAME_INFO	*	Pulsar_Header;
-extern	FRAME_INFO	*	Pulsar_Trail_Header;
-extern	FRAME_INFO	*	Pulsar_Exp_Header;
-extern	FRAME_INFO	*	Trojax1_Header;
-extern	FRAME_INFO	*	Trojax2_Header;
-extern	FRAME_INFO	*	Trojax_Exp_Header;
-extern	FRAME_INFO	*	Exp_Header;
-extern	FRAME_INFO	*	Exp2_Header;
-extern	FRAME_INFO	*	Shrapnel_Header;
-extern	FRAME_INFO	*	Arc_Header;
-extern	FRAME_INFO	*	Flare_Header;
-extern	FRAME_INFO	*	Laser_Header;
-extern	FRAME_INFO	*	Bits_Header;
-extern	FRAME_INFO	*	Circle_Header;
-extern	FRAME_INFO	*	Multiple_Header;
-extern	FRAME_INFO	*	NMEBullet_Header;
-extern	FRAME_INFO	*	Mushroom_Header;
-extern	FRAME_INFO	*	BigExp1_Header;
-
-extern BYTE				GameStatus[MAX_PLAYERS];	// Game Status for every Ship...
 													// this tells the drones what status the host thinks hes in..
-extern	bool			DebugInfo;
-extern	bool			GodMode;
-extern	int				no_collision;		// disables player ship-to-background collisions
-extern	int16_t			NumOrbs;
-extern	u_int16_t			IsGroupVisible[MAXGROUPS];
-extern	int16_t			NumSuperNashrams;
-extern	bool			PickupInvulnerability;
-extern	int16_t			NumInvuls;
-
-extern	COMP_OBJ	*	ColChild;
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-extern	float			SoundInfo[MAXGROUPS][MAXGROUPS];
-extern	ENEMY			Enemies[ MAXENEMIES ];
-extern	ENEMY_TYPES		EnemyTypes[ MAX_ENEMY_TYPES ];
-extern	int16_t			NumSecBullsPerGroup[ MAXGROUPS ];
-extern	SECONDARYWEAPONBULLET *	SecBullGroups[ MAXGROUPS ];
-extern	bool            IsHost;
-extern	MXLOADHEADER *	ModelHeaders;	/* heap arrays since the Q3 memory refactor */
-extern	MXALOADHEADER *	MxaModelHeaders;
-extern	int				outside_map;
-extern	bool			PlayDemo;
-
-extern	int16_t	Host_PrimaryWeaponsGot[ MAX_PLAYERS ][ MAXPRIMARYWEAPONS ];
-extern	int16_t	Host_SecondaryWeaponsGot[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-extern	float	Host_GeneralAmmo[ MAX_PLAYERS ];
-extern	float	Host_PyroliteAmmo[ MAX_PLAYERS ];
-extern	float	Host_SussGunAmmo[ MAX_PLAYERS ];
-//extern	float	Host_GeneralAmmoUsed[ MAX_PLAYERS ];
-extern	float	Host_GeneralAmmoUsed;
-//extern	float	Host_PyroliteAmmoUsed[ MAX_PLAYERS ];
-extern	float	Host_PyroliteAmmoUsed;
-//extern	float	Host_SussGunAmmoUsed[ MAX_PLAYERS ];
-extern	float	Host_SussGunAmmoUsed;
-extern	int16_t	Host_SecondaryAmmo[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-//extern	int16_t	Host_SecAmmoUsed[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
-extern	int16_t	Host_SecAmmoUsed[ MAXSECONDARYWEAPONS ];
-extern	int8_t	Host_SecWeaponsGot[ MAX_PLAYERS ][ MAXPICKUPS ];
-extern	float	Host_NitroFuel[ MAX_PLAYERS ];
-//extern	float	Host_NitroFuelUsed[ MAX_PLAYERS ];
-extern	float	Host_NitroFuelUsed;
-extern	int16_t	Host_PowerLevel[ MAX_PLAYERS ];
-extern	float	Host_OrbAmmo[ MAX_PLAYERS ][ MAXMULTIPLES ];
-extern	BYTE	Host_NumOfOrbitals[ MAX_PLAYERS ];
-extern	BYTE	Host_CopyOfNumOfOrbitals[ MAX_PLAYERS ];
-extern	float	Host_CopyOfOrbAmmo[ MAX_PLAYERS ][ MAXMULTIPLES ];
-extern	int16_t	Host_CopyOfPowerLevel[ MAX_PLAYERS ];
-extern	float	Host_CopyOfNitroFuel[ MAX_PLAYERS ];
-extern	float	Host_CopyOfGeneralAmmo[ MAX_PLAYERS ];
-extern	float	Host_CopyOfSussGunAmmo[ MAX_PLAYERS ];
-extern	float	Host_CopyOfPyroliteAmmo[ MAX_PLAYERS ];
-extern	int16_t	Host_PickupsGot[ MAX_PLAYERS ][ MAXPICKUPTYPES ];
-extern  u_int32_t  Host_Flags[ MAX_PLAYERS ];
-extern  float   Host_BountyTimer;
-extern  float   Host_FlagTimer;
-extern  float   Host_TeamFlagTimer[ MAX_TEAMS ];
-
-// custom colour messages (Title.c)
-extern int PickupMessageColour;
 
 #ifdef SINT_PEACEFROG_CHEAT
 extern	int16_t	TargetingWeaponCheat;
@@ -3756,7 +3648,6 @@ void CleanUpPrimBull( u_int16_t i, bool LightFlag  )
 				:	bool		NetFlag ( Send to everyone )
 	Output		:	nothing
 ===================================================================*/
-extern  BYTE          MyGameStatus;
 u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t BulletID, int8_t Weapon,
 						u_int16_t Group, VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * Up,
 						int16_t PowerLevel, float PLevel, bool NetFlag )

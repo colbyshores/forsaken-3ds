@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include "input/input.h"
+#include "game/oct2.h"
 /* Definitions for input.h externs (were tentative definitions in the header;
    illegal as C++ TUs now include input.h). controls.c is the owner. */
 int input_buffer[MAX_INPUT_BUFFER];
@@ -37,46 +38,6 @@ bool input_grabbed = false;
 #include "game/object.h"
 #include "net/networking.h"
 #include "game/ships.h"
-
-
-extern MENU MENU_NEW_Battle;
-extern MENU *CurrentMenu;
-
-extern render_info_t render_info;
-extern  bool  Cheated;
-extern bool WaitingToQuit;
-extern bool CheatsDisabled;
-extern  bool  JoystickInput;
-
-extern  BYTE  MyGameStatus;
-extern  float framelag;
-extern  float NitroFuel;
-extern USERCONFIG *player_config;
-
-extern  float MaxMoveSpeed;
-extern  float MoveAccell;
-extern  float MoveDecell;
-extern  float MaxTurboSpeed;
-extern  float TurboAccell;
-extern  float TurboDecell;
-extern  float MaxTurnSpeed;
-extern  float TurnAccell;
-extern  float TurnDecell;
-extern  float MaxRollSpeed;
-extern  float RollAccell;
-extern  float RollDecell;
-extern  float MaxBankAngle;
-extern  float BankAccell;
-extern  float BankDecell;
-extern bool DebugInfo;
-
-extern  int8_t  PrimaryToFireLookup[ MAXPRIMARYWEAPONS ];
-extern  bool  PrimaryWeaponCheat;
-extern  int8_t  SecondaryToFireLookup[ MAXSECONDARYWEAPONS ];
-extern  bool  SecondaryWeaponCheat;
-extern  bool  GodMode;
-
-extern  int FontHeight;
 
 /*===================================================================
     Some Keyboard and Mouse Globals
@@ -113,11 +74,6 @@ bool CheatsEnabled = false;
 
 int js_buttons[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
 
-
-extern MENU MENU_QuickTextSend;
-extern MENU MENU_QuickTextSendWhisper;
-extern MENU MENU_NEW_StartSinglePlayer;
-
 int old_input = 0;
 int new_input = 1;
 
@@ -125,9 +81,6 @@ bool joystick_poll( int joysticknum );
 
 u_int8_t
 js_pov[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ];
-
-// (Sfx.c)
-extern void SendBikerTaunt();
 
 bool flush_input = true;
 
@@ -1124,8 +1077,6 @@ void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum)
 
 	if( joysticknum >= Num_Joysticks )
 		return;
-
-
 
 	for (axis = 0; axis < MAX_JOYSTICK_AXIS; axis++)
 	{

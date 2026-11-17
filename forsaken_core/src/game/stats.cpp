@@ -44,22 +44,9 @@
 #include "rendering/text.h"
 #include "ui/title.h"
 #include "util/timer.h"
-/* util.c is a C TU; stats.c relied on implicit declaration here. */
-extern "C" void DebugPrintf( const char * format, ... );
-
-/* external variables */
-extern  BYTE  TeamNumber[MAX_PLAYERS];	// which team each player is on
-// (Ships.c)
-extern "C" char* GetName(int Player);				// returns player's short name
-// (Title.c)
-extern bool TeamGame;										// team game?  
-extern int MilestoneMessagesColour;			// colour to display messages 
-extern SLIDER WatchPlayerSelect;				// which player is being watched 
-extern float LevelTimeTaken; // time elapsed in this game
-// (oct2.c)
-extern px_timer_t level_timer;
-// (timer.c)
-extern void timer_clear( px_timer_t* stats );
+#include "game/models.h"
+#include "game/oct2.h"
+#include "util/util.h"
 
 /* internal variables */
 int	PrimaryStats[MAX_PLAYERS+1][MAXPRIMARYWEAPONS+1];				// PrimaryStats[Killer][PrimaryWeaponType];
@@ -480,7 +467,6 @@ int GetTotalDeaths(int Victim)
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-extern BYTE	GameStatus[MAX_PLAYERS + 1];
 void ScoreSort()
 {
 	int i;

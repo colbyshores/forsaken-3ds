@@ -13,14 +13,12 @@
 #include "util/util.h"
 #include "rendering/rtlight.h"
 #include "rendering/lights.h"
+#include "game/oct2.h"
 
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
-
-
-
 
 /******************************************************************************************
 	Defines
@@ -44,30 +42,15 @@
 
 #define RANDOM() ( (float) rand() / RAND_MAX )
 
-
-/******************************************************************************************
-	Externals
-*******************************************************************************************/
-extern	float			framelag;
-extern	char			LevelNames[MAXLEVELS][128];
-extern	XLIGHT			XLights[ MAXXLIGHTS ];
-
-
-
-
 /******************************************************************************************
 	Globals
 *******************************************************************************************/
 u_int16_t rt_lights = 0;
 RT_LIGHT *rt_light = NULL;
 
-
-
-
 /******************************************************************************************
 	Load real-time game lights for level
 *******************************************************************************************/
-extern int16_t		LevelNum;
 bool LoadRTLights( void )
 {
 	FILE	*	fp;
@@ -267,8 +250,6 @@ bool ReleaseRTLights( void )
 
 	return true;
 }
-
-
 
 static void InterpLightOn( RT_LIGHT *light, float t, PULSETYPE type )
 {
@@ -619,8 +600,6 @@ void ProcessRTLights( void )
 	}
 }
 
-
-
 /******************************************************************************************
 	Enable real-time game light
 *******************************************************************************************/
@@ -667,8 +646,6 @@ void EnableRTLight( u_int16_t *data )
 		break;
 	}
 }
-
-
 
 /******************************************************************************************
 	Disable real-time game light

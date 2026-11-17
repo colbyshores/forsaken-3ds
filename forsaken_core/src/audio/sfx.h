@@ -311,6 +311,17 @@ void PlayEnemyBikerTaunt( ENEMY *Enemy );
 void ProcessEnemyBikerTaunt( void );
 u_int32_t PlayPannedSfxWithVolModify(int16_t Sfx, u_int16_t Group, VECTOR * SfxPos, float Freq, float Vol );
 
+/* Defined in sfx.cpp; shared with the modules that use it. */
+extern bool NoSFX;
+void SetSoundLevels( int *dummy );
+extern u_int32_t CurrentBikeCompSpeech;
+extern bool bSoundEnabled;
+extern float LastDistance[ MAX_SFX ];
+void SendBikerTaunt();
+extern char CurrentTauntVariant;
+float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
+extern float GlobalSoundAttenuation;
+
 #ifdef __cplusplus
 }
 #endif

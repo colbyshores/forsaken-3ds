@@ -20,12 +20,6 @@
 #include "scripting/lua_vecmat.h"
 #include "scripting/lua_weapons.h"
 
-extern BYTE WhoIAm;
-extern BYTE GameStatus[MAX_PLAYERS+1];
-
-extern int8_t PrimaryToFireLookup[ MAXPRIMARYWEAPONS ];
-extern int8_t SecondaryToFireLookup[ MAXSECONDARYWEAPONS ];
-
 static void lua_pushobjptr(lua_State *L, void *v, const char *type)
 {
 	void **vp = (void**)lua_newuserdata(L, sizeof(void *));

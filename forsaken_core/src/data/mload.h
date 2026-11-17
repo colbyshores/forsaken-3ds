@@ -268,6 +268,18 @@ void TriggerBackgroundAnimationStop( u_int16_t * Data );
 extern FILE *LoadTextureAnimations( FILE *f );
 extern FILE *SaveTextureAnimations( FILE *f );
 
+/* Defined in mload.cpp; shared with the modules that use it. */
+extern float SoundInfo[ MAXGROUPS ][ MAXGROUPS ];
+void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert );
+void FixUV_Anim( POLYANIM *PolyAnim, LPLVERTEX Vert, LPLVERTEX Orig_Vert );
+extern float UV_Fix;
+void InitSoundInfo( MLOADHEADER * Mloadheader );
+extern u_int16_t num_start_positions;
+extern GAMESTARTPOS StartPositions[ MAXSTARTPOSITIONS ];
+extern u_int16_t last_start_position;
+extern u_int16_t FirstStartPositionInGroup[ MAXGROUPS ];
+extern u_int16_t GroupTris[ MAXGROUPS ];
+
 #ifdef __cplusplus
 }
 #endif

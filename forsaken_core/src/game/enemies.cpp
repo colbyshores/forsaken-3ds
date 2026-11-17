@@ -35,6 +35,10 @@
 #include "ui/title.h"
 #include "util/util.h"
 #include "game/oct2.h"
+#include "data/config.h"
+#include "data/mxaload.h"
+#include "rendering/2dtextures.h"
+#include "world/visi.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -43,58 +47,9 @@
 /*===================================================================
 	External Variables
 ===================================================================*/
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	XLIGHT			XLights[ MAXXLIGHTS ];
-extern	FMPOLY			FmPolys[ MAXNUMOF2DPOLYS ];
-extern	MODEL			Models[ MAXNUMOFMODELS ];
-extern	float			framelag;
-extern	MATRIX			MATRIX_Identity;
-extern	int16_t			LevelNum;
-extern	char			LevelNames[MAXLEVELS][128];
-extern	BYTE			GameStatus[MAX_PLAYERS];
-extern	int16_t			Stats[MAX_PLAYERS+1][MAX_PLAYERS+1];
-extern	TRIGGERMOD	*	TrigMods;
-extern	u_int16_t	IsGroupVisible[MAXGROUPS];
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern USERCONFIG *player_config;
-extern	SHIPCONTROL control;
-extern	int16_t	NextNewModel;
-extern	MODELNAME		ModelNames[MAXMODELHEADERS];
-extern	bool			IsHost;
-extern	MXALOADHEADER	*MxaModelHeaders;
-extern	MXLOADHEADER	*ModelHeaders;
 extern	AIMDATA AimData;
-extern	BYTE	ChangeLevel_MyGameStatus;
-extern	FRAME_INFO	*	Exp_Header;
-extern	NODENETWORKHEADER	NodeNetworkHeader;
 
-extern	float	MaxMoveSpeed;
-extern	float	MoveAccell;
-extern	float	MoveDecell;
-extern	float	MaxTurboSpeed;
-extern	float	TurboAccell;
-extern	float	TurboDecell;
-extern	float	MaxTurnSpeed;
-extern	float	TurnAccell;
-extern	float	TurnDecell;
-extern	float	MaxRollSpeed;
-extern	float	RollAccell;
-extern	float	RollDecell;
-extern	float	MaxBankAngle;
-extern	float	BankAccell;
-extern	float	BankDecell;
-extern	int		DifficultyLevel;
-extern	int		outside_map;
-extern	float	NmeDamageModifier;
 extern	VECTOR	FleshmorphPos;
-extern	MODELNAME	*	ModNames;
 
 bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
 bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_int16_t * NewGroup );
@@ -511,8 +466,6 @@ GUNTYPE	GunTypes[] = {
 		false,	//PreciseRotation — KEX bPreciseRotation FALSE
 	},
 #endif
-
-
 
 };
 
@@ -976,8 +929,6 @@ FIREPOS	BigGeekFirePos3 = {
 		}
 
 };
-
-
 
 FIREPOS	FleshMorphFirePos = {
 		4,
@@ -4120,7 +4071,6 @@ ENEMY * FindFreeEnemy( void )
 	Input		:	ENEMY	*	Object
 	Output		:	nothing
 ===================================================================*/
-extern  BYTE          MyGameStatus;
 #ifdef DEBUG_ON
 void KillUsedEnemyDebugOn( ENEMY * Object, char *in_file, int in_line )
 #else
@@ -4354,7 +4304,6 @@ void ReleaseAllEnemies( void )
 	Input		:	Nothing
 	Output		:	bool	True/False
 ===================================================================*/
-extern	int16_t		LevelNum;
 bool PreLoadEnemies( void )
 {
 	FILE	*	fp;
@@ -6215,9 +6164,6 @@ void DisableEnemy( ENEMY * Enemy )
 	}
 }
 
-
-
-
 /*===================================================================
 	Procedure	:	Flying Enemy Under Player Control...
 	Output		:	ENEMY	*	Enemy 
@@ -7129,8 +7075,6 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 #endif
 }
 
-
-
 /*===================================================================
 	Procedure	:	Carry out all movement / collision/ turning for a Exogenon Enemy...
 	Output		:	OBJECt * Object
@@ -7147,9 +7091,6 @@ void AutoMovementExogenon( OBJECT * Object , ENEMY * Enemy )
 	Object->FinalMat = Object->Mat;
 	Object->FinalInvMat = Object->InvMat;
 }
-
-
-
 
 /*===================================================================
 	Procedure	:	Set a wheel position..checks if group changes...
@@ -7203,9 +7144,6 @@ void AutoDisplayMatrix( OBJECT * Object )
 	Object->FinalMat = Object->Mat;
 	Object->FinalInvMat = Object->InvMat;
 }
-
-
-
 
 /*===================================================================
 	Procedure	:	Carry out the movement required by AI....
@@ -7583,8 +7521,6 @@ void SetTurretVector( OBJECT * Object, VECTOR * Vector, int16_t BaseIndex )
 		Object->UserContComps[ BaseIndex + 1 ]->UserAngle = D2R( Vector->x );
 	}
 }
-
-
 
 /*===================================================================
 	Procedure	:	Init a gun..
@@ -7974,8 +7910,6 @@ extern "C" void UpdateEnemiesClipGroup( CAMERA * Camera  )
 		Enemy = NextEnemy;
 	}
 }
-
-
 
 #if 1
 /*===================================================================
@@ -8984,8 +8918,6 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 		return false;
 }
 
-
-
 #endif
 
 /*===================================================================
@@ -9315,8 +9247,6 @@ void DoNmeDamagedEffects( ENEMY * Enemy )
 	}
 }
 
-
-
 #if 0
 typedef long fix;				//16 bits int, 16 bits frac
 
@@ -9380,8 +9310,6 @@ typedef struct _FSHORTGLOBALSHIP
 //38 bytes norm 65
 #endif
 
-
-
 /*===================================================================
 	Procedure	:		Enemy Save...
 	Input		:		FILE * fp
@@ -9413,9 +9341,6 @@ bool Enemy_Save( FILE * fp )
 		e = Enemy->Index;
 	}
 	fwrite( &e, sizeof( e ), 1, fp );
-
-
-
 
 	fwrite( &FleshMorphTimer, sizeof( FleshMorphTimer ), 1, fp );
 	
@@ -9743,8 +9668,6 @@ bool Enemy_Load( FILE * fp )
 			Enemies[i].NextUsed = &Enemies[e];
 		}
 
-
-
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
@@ -9850,8 +9773,6 @@ bool Enemy_Load( FILE * fp )
 	}
 	return true;
 }
-
-
 
 /*===================================================================
 	Procedure	:		Object Save...
@@ -10155,16 +10076,3 @@ bool Gun_Load( BYTE HowManyGuns , GUNOBJECT * GO , FILE * fp )
 #ifdef OPT_ON
 #pragma optimize( "", off )
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-

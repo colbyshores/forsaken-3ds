@@ -3,6 +3,7 @@
 #define BSP_INCLUDED
 
 #include "game/main.h"
+#include "math/new3d.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -94,6 +95,12 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 bool PointInSpaceRecursive( VECTOR *Pos );
 
 bool PointInsideSkin( VECTOR *Pos, u_int16_t Group );
+/* Defined in bsp.cpp; shared with the modules that use it. */
+extern BSP_NODE * BSP_Nodes[ 256 ];
+extern float CollisionRadius;
+bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node);
+extern BSP_NODE * OldCollideNode;
+
 #ifdef __cplusplus
 }
 #endif

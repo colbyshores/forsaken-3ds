@@ -25,6 +25,10 @@
 #include "util/timer.h"
 #include "game/oct2.h"
 #include "rendering/render.h"
+#include "data/mload.h"
+#include "data/tload.h"
+#include "game/ships.h"
+#include "rendering/2dtextures.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -37,62 +41,7 @@
 /*===================================================================
 	Externs
 ===================================================================*/
-extern	CAMERA			CurrentCamera;
-extern	CAMERA			MainCamera;
-extern	MLOADHEADER		Mloadheader;
-extern	MCLOADHEADER	MCloadheader;
-extern	MCLOADHEADER	MCloadheadert0;
-extern	TLOADHEADER		Tloadheader;
-extern	float			framelag;
-extern	FRAME_INFO	*	Laser_Header;
-extern	FRAME_INFO	*	AfterBurner_Header;
-extern	FRAME_INFO	*	LensFlare_Header;
-extern	FRAME_INFO	*	Numbers_Header;
-extern	FRAME_INFO	*	Numbers2_Header;
-extern  FRAME_INFO  * Text512b_Header;
-extern	FRAME_INFO	*	Text512_Header;
-extern	FRAME_INFO	*	Orb_Header;
-extern	FRAME_INFO	*	Solid_Header;
-extern	FRAME_INFO	*	Thermo_Header;
-extern	FRAME_INFO	*	Logos_Header;
-extern	SHIPCONTROL		control;
-extern	VECTOR			Forward;
-extern	VECTOR			Backward;
-extern	VECTOR			SlideUp;
-extern	VECTOR			SlideDown;
-extern	VECTOR			SlideLeft;
-extern	VECTOR			SlideRight;
-extern	MATRIX			ProjMatrix;
-extern	float			pixel_aspect_ratio;
-extern	DWORD			CurrentSrcBlend;
-extern	DWORD			CurrentDestBlend;
-extern	DWORD			CurrentTextureBlend;
-extern	SECONDARYWEAPONBULLET	SecBulls[MAXSECONDARYWEAPONBULLETS];
-extern	u_int16_t		FirstSecBullUsed;
-extern	int16_t			NumLevels;
-extern	MODEL		Models[ MAXNUMOFMODELS ];
-extern	int				FontWidth;
-extern	int				FontHeight;
-extern	float			SoundInfo[MAXGROUPS][MAXGROUPS];
 extern	bool			CountDownOn;
-extern	int16_t			LevelNum;
-extern	char			LevelNames[MAXLEVELS][128];
-extern	int16_t			Lives;
-extern	bool			DebugInfo;
-extern	TRIGGERVAR	*	DecreaseTemperature;
-extern	FRAME_INFO	*	Flag_Header;
-extern	FRAME_INFO	*	Flags_Header;
-extern	int				outside_map;
-extern	u_int16_t			HitBox;
-extern	u_int16_t			TargScrPolys[ 4 ];
-extern	u_int32_t			TeamFlagMask[ MAX_TEAMS ];
-extern	TRIGGERVAR	*	TimeLimitTrigger;
-
-// message colours (Title.c)
-extern int KillMessageColour; 
-extern int SystemMessageColour;
-extern int FlagMessageColour;
-extern int PlayerMessageColour;
 
 #define RGBA_MAKE2(r, g, b, a)   ((COLOR) (( (DWORD) ((a) & 0xff) << 24) | ( (DWORD) ((r) & 0xff) << 16) | ( (DWORD) ((g) & 0xff) << 8) | (DWORD) ((b) & 0xff)))
 #define	CUTOFF				( 5.0F * 1024.0F * GLOBAL_SCALE )
@@ -1223,7 +1172,6 @@ void SecBullLensflare( u_int16_t i )
 				:	LONGLONG	Number
 	Output		:	Nothing
 ===================================================================*/
-extern  BYTE          MyGameStatus;
 px_timer_t countdown_timer;
 void UpdateCountdownDigits( void )
 {
@@ -1651,7 +1599,6 @@ void StartCountDown( int16_t Minutes, int16_t Seconds )
 	Output		:	void
 ===================================================================*/
 
-extern u_int8_t Colourtrans[MAXFONTCOLOURS][3];
 void AddScreenPolyTextColor( u_int16_t Frame, float XPos, float YPos, int Color, u_int8_t Trans )
 {
 	u_int8_t r,g,b;

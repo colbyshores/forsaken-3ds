@@ -1,5 +1,8 @@
 #ifndef MULTIPLAYER_INCLUDED
 #define MULTIPLAYER_INCLUDED
+#include "game/main.h"
+#include "game/constants.h"
+#include "ui/title.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,6 +23,15 @@ void CheckForMenuChange(int *dummy);
 void BailMultiplayerFrontEnd( MENU * Menu );
 void DistributeTeamsToLists(int *dummy);
 void SetUpGameType( int type );
+
+/* Defined in multiplayer.cpp; shared with the modules that use it. */
+extern u_int16_t RandomStartPosModify;
+extern bool IpOnCLI;
+extern bool TintBikeTeamColor;
+extern bool ResetKillsPerLevel;
+extern MENU * GetPlayerNumMenu;
+extern bool MyResetKillsPerLevel;
+extern int TeamMembers[ MAX_TEAMS ];
 
 #ifdef __cplusplus
 }

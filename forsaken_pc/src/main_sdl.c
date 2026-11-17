@@ -4,7 +4,6 @@
 #include "main_sdl.h"
 #include <SDL.h>
 
-extern render_info_t render_info;
 extern bool render_init( render_info_t * info );
 
 bool sdl_init( void )

@@ -25,42 +25,19 @@
 #include "world/visi.h"
 #include "rendering/text.h"
 #include "util/util.h"
+#include "game/oct2.h"
+#include "game/ships.h"
+#include "net/multiplayer.h"
+#include "rendering/2dtextures.h"
 
 #define GOAL_VERSION_NUMBER		(1)
 
 
 // externs
-extern	bool			PlayDemo;
-extern	bool			DebugInfo;
-extern	bool			IsHost;
-extern	bool			CaptureTheFlag;
-extern	bool			CTF;
-extern	char			LevelNames[MAXLEVELS][128];
-extern	bool			Entry;
-extern	bool			Exit;
-extern	bool			In;
-extern	char		*	TeamName[ MAX_TEAMS ];
-extern	u_int32_t			TeamFlagMask[ MAX_TEAMS ];
-extern	int8_t			TeamFlagPickup[ MAX_TEAMS ];
-extern	bool			TeamFlagAtHome[ MAX_TEAMS ];
-extern	int16_t			NumPickupType[ MAXPICKUPTYPES ];
-extern	FMPOLY			FmPolys[MAXNUMOF2DPOLYS];
-extern	FRAME_INFO	*	GreyFlare_Header;
-extern	float			framelag;
-extern	u_int8_t			Colourtrans[MAXFONTCOLOURS][3];
-extern	int				TeamCol[ MAX_TEAMS ];
-extern	BYTE			TeamNumber[MAX_PLAYERS];
-extern	BYTE			GameStatus[MAX_PLAYERS];	// Game Status for every Ship...
-extern	u_int16_t			RandomStartPosModify;
-extern	int16_t			PickupsGot[ MAXPICKUPTYPES ];
-extern	float			SoundInfo[MAXGROUPS][MAXGROUPS];
-extern	u_int32_t			Host_Flags[ MAX_PLAYERS ];
 
 bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, int16_t Side );
 bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides );
 void ShowGoal( GOAL * Goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
-extern "C" void TeamGoalsSend( u_int16_t * TeamGoals );
-
 
 // globals
 int NumGoals = 0;
@@ -71,8 +48,6 @@ int LastTeamMembers[ MAX_TEAMS ];
 int16_t Teamgoal[ MAX_TEAMS ];
 int LastEnable[ MAX_PLAYERS ];
 
-
-extern int16_t   LevelNum;
 bool GoalLoad( void )
 {
 	int8_t		Filename[ 256 ];
@@ -249,8 +224,6 @@ static void GoalCheck( VECTOR * OldPos , VECTOR * NewPos , GOAL * goal )
    	}
 }
 
-
-
 GOAL *TeamGoal( int team )
 {
 	int j;
@@ -402,8 +375,6 @@ extern "C" void SetTeamGoals( u_int16_t *TeamGoals )
 	}
 }
 
-
-extern  BYTE          MyGameStatus;
 void ProcessGoals( void )
 {
 	int j, k;
