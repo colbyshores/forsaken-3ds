@@ -27,8 +27,6 @@
 #pragma optimize( "gty", on )
 #endif
 
-// Externals
-void CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 /*===================================================================
 	Procedure	:	AIR Move to a Target
 	Input		:	ENEMY * Enemy

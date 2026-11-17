@@ -17,6 +17,9 @@ extern char ShortLevelNames[MAXLEVELS][MAX_SHORT_LEVEL_NAME];
 extern int16_t NewLevelNum;
 
 /* Defined in oct2.cpp; shared with the modules that use it. */
+void GetLevelName( char *buf, int bufsize, int level );
+void PrintInitViewStatus( BYTE Status );
+bool Our_CalculateFrameRate(void);
 extern float framelag;
 extern VECTOR Forward;
 extern VECTOR SlideUp;

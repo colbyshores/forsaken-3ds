@@ -1,5 +1,6 @@
 #include "ui/title.h"
 #include "util/platform.h"
+#include "rendering/text.h"
 #if 1 // bjd		    
 /*==========================================================================
  *
@@ -37,7 +38,6 @@
 #define	MAXSCALE 3
 
 TLOADHEADER	Tloadheader;
-int Print4x5Text( char * Text , int x , int y , int col );
 double	Gamma = 1.0;
 
 /*===================================================================

@@ -131,6 +131,7 @@ extern const char *
 key_fullname( int keycode );
 
 /* Defined in config.cpp; shared with the modules that use it. */
+void ConfigureSpaceorbAxis( int joystick );
 extern USERCONFIG * player_config;
 void DefaultJoystickSettings( USERCONFIG *u );
 void ReInitJoysticks( void );

@@ -82,7 +82,6 @@ int CurrentPage = 0;
 int MaxPage = 0;
 bool MissileCameraEnable;
 void MenuItemSelect( MENUITEM * item );
-void GetLevelName( char *buf, int bufsize, int level );
 void MenuItemDrawPageName( MENUITEM *Item );
 void InitKeyDef( MENU *Menu );
 void InitKeyDefPage( MENU *Menu );
@@ -155,7 +154,6 @@ MENU *LastMenu;
 int16_t	SelectedBike = 0; //MODEL_Borg;
 int16_t	NumTitleModelsToLoad;
 float TriggerInitialAnimation = 0.0F;
-bool	Our_CalculateFrameRate(void);
 bool	ShowWeaponKills = false;
 u_int16_t	BackgroundModel[NUMOFTITLEMODELS];
 
@@ -426,7 +424,6 @@ bool LoadBike(void);
 void GetVduTextFormattingInfo (TEXT *t);
 void RestoreDefaultControlSettings( MENUITEM *Item );
 void PlayCursorSfx( void );
-bool ChangeLevel( void );
 void AddBikeArrow( char *name, int num );
 void CheckMenuTimer( void );
 

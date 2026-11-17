@@ -67,6 +67,7 @@
 #include "data/config.h"
 #include "game/skin.h"
 #include "util/xmem.h"
+#include "util/util.h"
 /* C TUs (or C++ TUs with C-linkage definitions); oct2.c relied on
    block-scope externs, which C++ mangles. Hoisted to file scope. */
 #ifdef __3DS__
@@ -119,9 +120,6 @@ bool OriginalLevels = false;
 bool CheatsDisabled = false;
 bool WaitingToQuit;
 
-void ConfigureSpaceorbAxis( int joystick );
-void DefaultJoystickSettings( USERCONFIG *u );
-
 #ifdef DEBUG_ON
 #endif
 
@@ -137,9 +135,6 @@ BYTE  PreSynchupStatus;
 char *CurrentLevelsList;
 
 px_timer_t level_time;
-
-void DebugState( const char * str );
-
 
 // Ai Modes
 char * AiModes[] = {

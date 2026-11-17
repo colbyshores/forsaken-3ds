@@ -18,7 +18,6 @@
 #include "util/util.h"
 #include "ui/title.h"
 
-extern void ConfigureSpaceorbAxis( int joystick );
 
 typedef int (*ReadConfig)( FILE *, USERCONFIG *, char * );
 

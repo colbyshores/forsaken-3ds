@@ -66,9 +66,6 @@
 #define BOB_XFREQ		(2.0F * PI / BOB_XPERIOD)
 #define BOB_YFREQ		(2.0F * PI / BOB_YPERIOD)
 
-
-bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
-bool ObjectCollideOnly( OBJECT *Obj, VECTOR *Move_Off, float radius, VECTOR *Target_Off, BGOBJECT **BGObject );
 bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off );
 bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i);
 
@@ -554,11 +551,9 @@ float	NitroFuelUsed = 0.0F;
 float AutoLevelRot( u_int16_t ship, float autolevel_rate );
 void BobShip( u_int16_t ship, VECTOR *bob );
 void	UpdateStartPos( void );
-void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 float	SteamTime = 0.0F;
 bool	IsStartPosVacantMutualyVisibleGroup( int16_t i , u_int16_t startpos );
 bool	IsStartPosVacantVisibleGroup( int16_t i , u_int16_t startpos );
-bool ObjectCollideNoBGObject( OBJECT *Obj, VECTOR *Move_Off, float radius );
 bool SwitchedToWatchMode =false;
 
 bool	RearCameraDisable = false;

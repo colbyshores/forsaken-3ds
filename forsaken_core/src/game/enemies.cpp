@@ -39,17 +39,12 @@
 #include "data/mxaload.h"
 #include "rendering/2dtextures.h"
 #include "world/visi.h"
+#include "world/collision.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
 #endif
 
-/*===================================================================
-	External Variables
-===================================================================*/
-
-
-bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
 bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_int16_t * NewGroup );
 void AutoMovementExogenon( OBJECT * Object , ENEMY * Enemy );
 
@@ -3841,7 +3836,6 @@ ENEMY * TestEnemy = NULL;
 /*===================================================================
 	Enemy Control Routines...
 ===================================================================*/
-ENEMY * PutEnemiesAtNodes(void);
 void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore );
 void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy );
 void AutoDisplay( OBJECT * Object );

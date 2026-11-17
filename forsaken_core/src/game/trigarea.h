@@ -77,6 +77,8 @@ void ProcessTriggerAreas( void );
 FILE * SaveTriggerAreas( FILE * fp );
 FILE * LoadTriggerAreas( FILE * fp );
 /* Defined in trigarea.cpp; shared with the modules that use it. */
+bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides );
+bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, int16_t Side );
 extern bool Entry;
 extern bool Exit;
 extern bool In;

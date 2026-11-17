@@ -110,8 +110,6 @@ num_start_points : u_int16_t
 #include "util/hunk_alloc.h"
 #include "world/visi.h"
 
-bool FindGroupConnections( MLOADHEADER *m );
-void FreeGroupConnections( void );
 void ReadSoundInfo( MLOADHEADER *m, char **pbuf );
 
 /*===================================================================

@@ -26,6 +26,7 @@
 #include "ai/ai.h"
 #include "rendering/lines.h"
 #include "game/oct2.h"
+#include "world/collision.h"
 
 #ifdef OPT_ON
 #pragma optimize( "gty", on )
@@ -33,8 +34,6 @@
 
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
-
-bool WouldObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
 
 //--------------------------------------------------------------------------
 // Global Data

@@ -567,6 +567,7 @@ void TitleReset( MENUITEM *item );
 void SetTitleNotify( char *str );
 
 /* Defined in title.cpp; shared with the modules that use it. */
+void DrawFlatMenuItem( MENUITEM *Item );
 extern char biker_config[ 256 ];
 extern bool ShowNode;
 extern SLIDER BikeCompSpeechSlider;

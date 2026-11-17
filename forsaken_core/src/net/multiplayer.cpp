@@ -45,9 +45,6 @@ bool TintBikeTeamColor;
 bool MyResetKillsPerLevel;
 bool IpOnCLI = false;
 
-bool ChangeLevel( void );
-bool InitLevels( char *levels_list );
-
 #ifdef DEMO_SUPPORT
 #endif
 
@@ -67,8 +64,6 @@ bool	Modem2Modem = false;
 
 u_int16_t	RandomStartPosModify = 0;							
 
-void DrawFlatMenuItem( MENUITEM *Item );
-void GetLevelName( char *buf, int bufsize, int level );
 void InitDemoList( MENU * Menu );
 void RestoreDemoSettings( void );
 

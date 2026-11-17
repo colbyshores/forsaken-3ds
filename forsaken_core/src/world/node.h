@@ -60,6 +60,7 @@ NODE * FindSuitableSplineNodeRandom( u_int32_t Network, NODE * NodeFrom , NODE *
 float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Group, VECTOR * TopLeft, VECTOR * BottomRight );
 
 /* Defined in node.cpp; shared with the modules that use it. */
+struct ENEMY * PutEnemiesAtNodes(void);	/* struct tag: enemies.h includes this header */
 extern NODENETWORKHEADER NodeNetworkHeader;
 void ShowNodeNetwork( u_int32_t NetMask );
 

@@ -109,8 +109,6 @@ extern	float	DemoAvgFps;
 #ifdef DEMO_SUPPORT
 #endif
 
-void GetLevelName( char *buf, int bufsize, int level );
-
 bool	CanDoDamage[MAX_PLAYERS+1];
 
 bool		JustGenerated = false;
@@ -172,7 +170,6 @@ int16_t					StatsCount = -1;
 network_player_t * host_network_player = NULL;
 
 void CreateReGen( u_int16_t ship );
-bool InitLevels( char *levels_list );
 
 bool	HostDuties = false;
 bool					IsHost = true;

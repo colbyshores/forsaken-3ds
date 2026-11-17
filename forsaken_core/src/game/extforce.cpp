@@ -34,8 +34,6 @@
 ===================================================================*/
 #define	EXTERNALFORCES_VERSION_NUMBER	2
 
-bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides );
-
 /*===================================================================
 		Globals ...
 ===================================================================*/

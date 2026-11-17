@@ -102,6 +102,8 @@ u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * Int
 u_int16_t CheckAnyEnemyHit( void );
 
 /* Defined in collision.cpp; shared with the modules that use it. */
+bool ObjectCollideOnly( OBJECT *Obj, VECTOR *Move_Off, float radius, VECTOR *Target_Off, BGOBJECT **BGObject );
+bool ObjectCollideNoBGObject( OBJECT *Obj, VECTOR *Move_Off, float radius );
 extern int outside_group;
 extern int no_collision;
 extern COMP_OBJ * ColChild;
