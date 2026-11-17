@@ -74,6 +74,14 @@ via ftpd): title + the subway level play well, no regressions seen -- covers
 check: 1c75966 (spot-FX bullets from models, e.g. the reactor core) and
 the 3DS Visuals menu (stereo debug row removed).
 
+**Data fix, not in git (romfs/ is gitignored):** the volcano lava floor drew
+another image on New 3DS because `romfs/hd_textures/levels/vol2/textures/
+thermd.t3x` (rewritten 2026-10-25 00:41) declared 1,024 of its 262,144 data
+bytes (size field `00 04 00` instead of `00 00 04` at offset 0x12). Patched
+in place 2026-11-17 (payload untouched); `tools/texture/t3x_check.py
+romfs/hd_textures romfs/hd_textures_lomem` now passes all 816 files. If
+romfs/ is ever regenerated, rerun the checker. Owner confirmed on hardware.
+
 **Owner decisions pending:**
 1. Optional features under never-defined macros — keep or delete:
    `DEMO_SUPPORT`, `LUA_BOT` (botai_*, lua_bot: compiled empty everywhere),
