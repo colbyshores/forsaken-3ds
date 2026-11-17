@@ -235,12 +235,13 @@ endif
 
 
 # Include paths. Project includes are root-relative to a source tree
-# ("game/ships.h", "platform_3ds/main_3ds.h"). Both trees are also -isystem,
-# as the flat root was before the reorg: GCC lets -isystem win over -I for the
-# same directory, so project headers keep being treated as system headers
-# exactly as they were (object code proven identical across the move).
-CFLAGS += -isystem $(CORE_SRCDIR) -isystem $(PLAT_SRCDIR) \
-	-I$(CORE_SRCDIR) -I$(PLAT_SRCDIR) \
+# ("game/ships.h", "platform_3ds/main_3ds.h"). The trees are -I, NOT
+# -isystem: -MMD leaves system headers out of the .d files, so with the trees
+# on -isystem (as the flat root used to be) no object ever depended on a
+# project header and header-only edits relinked stale objects. -isystem also
+# hid every warning in project headers. It has no effect on linkage or code
+# for this target (no implicit extern "C" for system headers).
+CFLAGS += -I$(CORE_SRCDIR) -I$(PLAT_SRCDIR) \
 	-I$(PORTLIBS)/include \
 	-I$(PORTLIBS)/include/lua5.1 \
 	-I$(DEVKITPRO)/libctru/include
@@ -577,7 +578,12 @@ cia: $(OUTPUT_CIA)
 # leaves e.g. xmem.d demanding xmem.c and make dies at graph time before any
 # recipe can clean it. Runs at parse time, before the include. atm_core.d is
 # exempt (its source lives in the ATM harness tree, not SRCDIR).
-STALE_DFILES := $(shell for d in $(BUILD)/*.d; do [ -f "$$d" ] || continue; b=$$(basename "$$d"); [ "$$b" = atm_core.d ] && continue; s=$$(head -1 "$$d" | sed 's/^[^:]*: //' | cut -d' ' -f1); [ -f "$$s" ] || echo "$$d"; done)
+# The source is the FIRST PREREQUISITE, not "the rest of line 1": GCC wraps
+# long rules as 'obj.o: \' with the source on the next line, and reading
+# line 1 alone took '\' for the source and deleted every valid .d file --
+# after which header-only edits never rebuilt anything. Join continuation
+# lines first, then take the first word after the colon.
+STALE_DFILES := $(shell for d in $(BUILD)/*.d; do [ -f "$$d" ] || continue; b=$$(basename "$$d"); [ "$$b" = atm_core.d ] && continue; s=$$(tr -d '\\\n' < "$$d" | sed 's/^[^:]*:[[:space:]]*//' | cut -d' ' -f1); [ -f "$$s" ] || echo "$$d"; done)
 $(if $(STALE_DFILES),$(shell rm -f $(STALE_DFILES)))
 -include $(wildcard $(BUILD)/*.d)
 
