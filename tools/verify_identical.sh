@@ -20,7 +20,8 @@
 # (VERIFY_CFLAGS is in Makefile.3ds FORBIDDEN_FLAGS: it can never ship).
 #
 # Configurations: 3DS {remaster,original} x {release,DEBUG=1}, and the PC host
-# build (EDITION=remaster). Env: JOBS (default nproc), VERIFY_DIR (default
+# build (EDITION=remaster) x {release,DEBUG=1} -- the PC DEBUG=1 build is the
+# only one that compiles DEBUG_ON/DEBUG_COMP/DEBUG_VIEWPORT/DEBUG_SPOTFX_SOUND. Env: JOBS (default nproc), VERIFY_DIR (default
 # /tmp/forsaken-verify; base builds are cached per commit there), CONFIGS
 # (subset, e.g. CONFIGS="3ds-remaster host"), INCREMENTAL=1 (reuse work objects).
 set -u
@@ -29,7 +30,7 @@ ROOT=$PWD
 BASE_REF=${1:-HEAD}
 JOBS=${JOBS:-$(nproc)}
 VERIFY_DIR=${VERIFY_DIR:-/tmp/forsaken-verify}
-CONFIGS=${CONFIGS:-"3ds-remaster 3ds-original 3ds-remaster-debug 3ds-original-debug host"}
+CONFIGS=${CONFIGS:-"3ds-remaster 3ds-original 3ds-remaster-debug 3ds-original-debug host host-debug"}
 OD3DS=${DEVKITARM:-/opt/devkitpro/devkitARM}/bin/arm-none-eabi-objdump
 export DEVKITPRO=${DEVKITPRO:-/opt/devkitpro} DEVKITARM=${DEVKITARM:-/opt/devkitpro/devkitARM}
 
@@ -66,12 +67,13 @@ build() {
 			VERIFY_CFLAGS="$vf" "$tree/forsaken3ds.elf" -j"$JOBS") > "$log" 2>&1 \
 			&& cp "$tree/forsaken3ds.elf" "$out/$cfg/linked.elf"
 		;;
-	host)
+	host|host-debug)
+		local dbg=; [ "$cfg" = host-debug ] && dbg="DEBUG=1"
 		# The PC Makefile has no flag stamp: never reuse host objects.
 		rm -rf "${out:?}/$cfg"; mkdir -p "$out/$cfg"
 		# -DNDEBUG: in C++ glibc's assert() passes __builtin_LINE(), which
 		# -D__LINE__=0 cannot pin; assert compiles away identically instead.
-		(cd "$tree" && make EDITION=remaster BUILD_PC="$out/$cfg" BIN="$out/$cfg/linked.elf" \
+		(cd "$tree" && make EDITION=remaster $dbg BUILD_PC="$out/$cfg" BIN="$out/$cfg/linked.elf" \
 			ADD_CFLAGS="$vf -DNDEBUG" "$out/$cfg/linked.elf" -j"$JOBS") > "$log" 2>&1
 		;;
 	esac
@@ -145,7 +147,7 @@ cmp_obj() {
 
 fail=0
 for cfg in $CONFIGS; do
-	od=$OD3DS; [ "$cfg" = host ] && od=objdump
+	od=$OD3DS; [ "${cfg#host}" != "$cfg" ] && od=objdump
 	if [ ! -f "$BASE_OUT/$cfg/linked.elf" ]; then
 		build "$BASE_TREE" "$BASE_OUT" "$cfg" || { echo "BASE BUILD FAILED $cfg ($BASE_OUT/$cfg.log)"; fail=1; continue; }
 	fi
@@ -159,7 +161,7 @@ for cfg in $CONFIGS; do
 	done
 	linked=same
 	cmp_obj "$od" "$a/linked.elf" "$b/linked.elf" || linked=DIFF
-	nm=${OD3DS%objdump}nm; [ "$cfg" = host ] && nm=nm
+	nm=${OD3DS%objdump}nm; [ "${cfg#host}" != "$cfg" ] && nm=nm
 	ov=$(lost_overrides "$nm" "$a/linked.elf" "$b/linked.elf")
 	if [ -n "${ov%%|*}" ]; then
 		echo "LOST OVERRIDE $cfg: ${ov%%|*}  (a library weak default replaced ours)"
