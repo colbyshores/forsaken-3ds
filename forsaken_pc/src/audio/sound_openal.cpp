@@ -13,11 +13,11 @@
 
 bool Sound3D = false; // enable 3d sound
 
-struct {
+static struct {
 	int buffers;
 	int sources;
 	int playing;
-} stats;
+} stats;	/* live OpenAL object counts, for print_info */
 
 #define MAX_PATH 500
 

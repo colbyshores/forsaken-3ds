@@ -78,7 +78,8 @@ build() {
 }
 
 # disasm OBJDUMP FILE -> instructions + relocations, one line each.
-# NORMALIZE_LINKAGE=1 demangles and drops C++ parameter lists, so moving a
+# NORMALIZE_LINKAGE=1 demangles and drops C++ parameter lists (and maps
+# mangled names inside section names, incl. file-static _ZL), so moving a
 # declaration into an extern "C" block (symbol _Z3foov -> foo) compares equal
 # while any instruction or operand change still differs. Off by default; a
 # change that needs it must say so in its commit message.
@@ -88,7 +89,7 @@ disasm() {
 		# the headers (functions still compare in emission order).
 		"$1" -d -r -C "$2" | tail -n +4 | grep -v '^Disassembly of section' |
 			sed -E ':a; s/\b([A-Za-z_][A-Za-z0-9_:~]*)\([^()]*\)( const)?/\1/g; ta' |
-			perl -pe 's{_ZZ(\d+)(\w+)}{my($n,$r)=($1,$2); my $f=substr($r,0,$n); ($r=~/E(\d+)([A-Za-z_]\w*)$/ && length($2)==$1) ? "_ZZ${n}${f}E$1$2" : "_ZZ$n$r"}ge; s{\.(rodata|bss|data|text)\._Z(\d+)(\w+?)\.}{".$1.".substr($3,0,$2)."."}ge'
+			perl -pe 's{_ZZ(\d+)(\w+)}{my($n,$r)=($1,$2); my $f=substr($r,0,$n); ($r=~/E(\d+)([A-Za-z_]\w*)$/ && length($2)==$1) ? "_ZZ${n}${f}E$1$2" : "_ZZ$n$r"}ge; s{\.(rodata|bss|data|text)\._ZL?(\d+)(\w+)}{".$1.".substr($3,0,$2)}ge'
 	else
 		"$1" -d -r "$2" | tail -n +4
 	fi
@@ -105,6 +106,34 @@ data() {
 	else
 		"$1" -s $secs "$2" 2>/dev/null | tail -n +4
 	fi
+}
+
+# lost_overrides NM BASE_ELF WORK_ELF -> names strongly defined in the base
+# binary that are only weak (or gone) in the work binary: a library's weak
+# default won. This is how a C-named override (e.g. libctru's
+# __system_allocateHeaps) dies when its definition gets a mangled C++ name --
+# it compiles, links, and every per-function comparison under demangled
+# names still matches. Always checked, whatever else differs.
+lost_overrides() {
+	python3 - "$1" "$2" "$3" <<'PYEOF'
+import re, subprocess, sys
+def syms(nm, elf):
+    out = {}
+    for l in subprocess.run([nm, "-C", elf], capture_output=True, text=True).stdout.splitlines():
+        m = re.match(r"^(?:[0-9a-f]+)?\s+([A-Za-z])\s+(.+)$", l)
+        if not m: continue
+        name = re.sub(r"\(.*$", "", m.group(2)).strip()  # demangled base name
+        t = m.group(1)
+        if out.get(name) in ("T", "D", "B", "R"): continue  # keep the strongest
+        out[name] = t
+    return out
+a, b = syms(sys.argv[1], sys.argv[2]), syms(sys.argv[1], sys.argv[3])
+STRONG, WEAK = ("T", "D", "B", "R"), ("W", "w", "V", "v")
+weak = [f"{n}({t}->{b[n]})" for n, t in sorted(a.items()) if t in STRONG and b.get(n) in WEAK]
+gone = [f"{n}({t}->{b.get(n, 'MISSING')})" for n, t in sorted(a.items())
+        if t in STRONG and b.get(n, "MISSING") not in STRONG + WEAK]
+print(" ".join(weak) + "|" + " ".join(gone))
+PYEOF
 }
 
 # cmp_obj OBJDUMP A B -> 0 if code+relocs+non-debug data match
@@ -128,6 +157,15 @@ for cfg in $CONFIGS; do
 	done
 	linked=same
 	cmp_obj "$od" "$a/linked.elf" "$b/linked.elf" || linked=DIFF
+	nm=${OD3DS%objdump}nm; [ "$cfg" = host ] && nm=nm
+	ov=$(lost_overrides "$nm" "$a/linked.elf" "$b/linked.elf")
+	if [ -n "${ov%%|*}" ]; then
+		echo "LOST OVERRIDE $cfg: ${ov%%|*}  (a library weak default replaced ours)"
+		fail=1
+	fi
+	if [ -n "${ov#*|}" ]; then
+		echo "NOTE      $cfg: no longer a global symbol: ${ov#*|}"
+	fi
 	if [ -z "$only_a$only_b$diffs" ] && [ $linked = same ]; then
 		echo "IDENTICAL  $cfg ($(ls "$b"/*.o | wc -l) objects + linked binary)"
 	else

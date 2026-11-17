@@ -243,7 +243,7 @@ enum {
 	RIGHT_MOUSE,
 	UP_MOUSE,
 	DOWN_MOUSE
-} mouse_input_enum;
+};
 
 #define MOUSE_RANGE_END LEFT_MOUSE + MAX_MOUSE_BUTTONS
 
@@ -307,7 +307,7 @@ enum {
 	JOY_HAT_RIGHT,
 	JOY_HAT_DOWN,
 	JOY_HAT_LEFT
-} joy_hat_enum;
+};
 
 // TODO - we need settings/implementation for joystick dead zones
 
