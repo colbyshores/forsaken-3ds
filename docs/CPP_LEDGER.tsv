@@ -1,0 +1,121 @@
+module	path	lang	phase1_cpp	phase2_classes	host_test	fidelity_ab	notes
+aicrashandburn	forsaken_core/src/ai/aicrashandburn.cpp	cpp	8e0ac54	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aidogfight	forsaken_core/src/ai/aidogfight.cpp	cpp	11f0484	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aiexogenon	forsaken_core/src/ai/aiexogenon.cpp	cpp	45e6f3f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aifire	forsaken_core/src/ai/aifire.cpp	cpp	4ee16a7	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aifleshmorph	forsaken_core/src/ai/aifleshmorph.cpp	cpp	ae2ba09	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aifollow	forsaken_core/src/ai/aifollow.cpp	cpp	01575c0	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aiformation	forsaken_core/src/ai/aiformation.cpp	cpp	9f91967	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aiidle	forsaken_core/src/ai/aiidle.cpp	cpp	d975319	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aijump	forsaken_core/src/ai/aijump.cpp	cpp	1a21aa8	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aikillmine	forsaken_core/src/ai/aikillmine.cpp	cpp	3098f2c	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+ailib	forsaken_core/src/ai/ailib.cpp	cpp	97072a0	todo	test_secwalk	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aim_assist	forsaken_core/src/ai/aim_assist.cpp	cpp	abf4ba2	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aimain	forsaken_core/src/ai/aimain.cpp	cpp	2fde943	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aimovet	forsaken_core/src/ai/aimovet.cpp	cpp	fc26d66	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aipingoff	forsaken_core/src/ai/aipingoff.cpp	cpp	49c8a23	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aipsycho	forsaken_core/src/ai/aipsycho.cpp	cpp	ef5d956	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+airetreat	forsaken_core/src/ai/airetreat.cpp	cpp	23e26da	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aiscan	forsaken_core/src/ai/aiscan.cpp	cpp	8ce1580	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+aispline	forsaken_core/src/ai/aispline.cpp	cpp	ced5653	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+botai_actions	forsaken_core/src/ai/botai_actions.cpp	cpp	1c87cda	todo	-	n/a (not in 3DS build)	
+botai_path	forsaken_core/src/ai/botai_path.cpp	cpp	cbafb12	todo	-	n/a (not in 3DS build)	
+botai_sensors	forsaken_core/src/ai/botai_sensors.cpp	cpp	845b4ee	todo	-	n/a (not in 3DS build)	
+dsp_adpcm	forsaken_core/src/audio/dsp_adpcm.cpp	cpp	4f19b6a	todo	test_modules	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+music_table	forsaken_core/src/audio/music_table.cpp	cpp	87549bd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+sfx	forsaken_core/src/audio/sfx.cpp	cpp	eb79483	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+config	forsaken_core/src/data/config.cpp	cpp	ba54803	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+file	forsaken_core/src/data/file.cpp	cpp	6836f6b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+loadsave	forsaken_core/src/data/loadsave.cpp	cpp	6578ec8	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+mload	forsaken_core/src/data/mload.cpp	cpp	6c9501b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+mxaload	forsaken_core/src/data/mxaload.cpp	cpp	121cc1f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+mxload	forsaken_core/src/data/mxload.cpp	cpp	5c56881	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+tload	forsaken_core/src/data/tload.cpp	cpp	044f81b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+bgobjects	forsaken_core/src/game/bgobjects.cpp	cpp	6dd07fc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+camera	forsaken_core/src/game/camera.cpp	cpp	c7aa8fe	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+checkenemy	forsaken_core/src/game/checkenemy.cpp	cpp	e438230	todo	test_checkhitenemy	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+compobjects	forsaken_core/src/game/compobjects.cpp	cpp	f151bc2	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+demo	forsaken_core/src/game/demo.cpp	cpp	5d340cc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+enemies	forsaken_core/src/game/enemies.cpp	cpp	e5af6fc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+extforce	forsaken_core/src/game/extforce.cpp	cpp	c321b0d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+goal	forsaken_core/src/game/goal.cpp	cpp	61d7466	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+main	forsaken_core/src/game/main.c	c	kept-C	n/a	-	n/a	engine main loop; platform-adjacent (handoff §7: owner's call)
+models	forsaken_core/src/game/models.cpp	cpp	222509b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+oct2	forsaken_core/src/game/oct2.cpp	cpp	4f65e74	todo	-	PASS fid-ab-20261116 (tier3)	
+pickups	forsaken_core/src/game/pickups.cpp	cpp	5ab8bbd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+primary	forsaken_core/src/game/primary.cpp	cpp	60819fb	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+restart	forsaken_core/src/game/restart.cpp	cpp	9d21b80	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+secondary	forsaken_core/src/game/secondary.cpp	cpp	4eda836	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+ships	forsaken_core/src/game/ships.cpp	cpp	6e3a4c6	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+singleplayer	forsaken_core/src/game/singleplayer.cpp	cpp	b1a6bc2	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+skin	forsaken_core/src/game/skin.cpp	cpp	b1c7b01	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+spotfx	forsaken_core/src/game/spotfx.cpp	cpp	57e292f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+stats	forsaken_core/src/game/stats.cpp	cpp	e373585	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+teleport	forsaken_core/src/game/teleport.cpp	cpp	791e88a	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+trigarea	forsaken_core/src/game/trigarea.cpp	cpp	45b3d6f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+triggers	forsaken_core/src/game/triggers.cpp	cpp	d2a89e8	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+water	forsaken_core/src/game/water.cpp	cpp	571e88b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+controls	forsaken_core/src/input/controls.cpp	cpp	b2f9f4c	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+math_error	forsaken_core/src/math/math_error.cpp	cpp	d39c0f3	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+new3d	forsaken_core/src/math/new3d.cpp	cpp	a584770	todo	test_new3d,test_quat,test_sphere	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+quat	forsaken_core/src/math/quat.cpp	cpp	bf5252c	done 872d887	test_quat	P1 transitive; P2 PASS fid-ab-20261116-quat	
+sphere	forsaken_core/src/math/sphere.cpp	cpp	26191fa	todo	test_sphere,test_checkhitenemy	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+multiplayer	forsaken_core/src/net/multiplayer.cpp	cpp	7a9548f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+networking	forsaken_core/src/net/networking.cpp	cpp	df67b8d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+2dpolys	forsaken_core/src/rendering/2dpolys.cpp	cpp	279d155	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+2dtextures	forsaken_core/src/rendering/2dtextures.cpp	cpp	5905126	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lights	forsaken_core/src/rendering/lights.cpp	cpp	a65ed11	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lines	forsaken_core/src/rendering/lines.cpp	cpp	a55c06e	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+polys	forsaken_core/src/rendering/polys.cpp	cpp	9634a58	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+rtlight	forsaken_core/src/rendering/rtlight.cpp	cpp	ce745ae	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+screenpolys	forsaken_core/src/rendering/screenpolys.cpp	cpp	75cc934	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+stereomemo	forsaken_core/src/rendering/stereomemo.cpp	cpp	3bd8416	todo	test_stereomemo	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+text	forsaken_core/src/rendering/text.cpp	cpp	ff84d3d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+texture_png	forsaken_core/src/rendering/texture_png.cpp	cpp	4bf7fc9	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+transexe	forsaken_core/src/rendering/transexe.cpp	cpp	ffe2bec	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_bot	forsaken_core/src/scripting/lua_bot.cpp	cpp	6b367bf	todo	-	n/a (not in 3DS build)	
+lua_bullets	forsaken_core/src/scripting/lua_bullets.cpp	cpp	bd4eacd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_collision	forsaken_core/src/scripting/lua_collision.cpp	cpp	9c15219	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_common	forsaken_core/src/scripting/lua_common.cpp	cpp	3466132	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_config	forsaken_core/src/scripting/lua_config.cpp	cpp	6742088	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_controls	forsaken_core/src/scripting/lua_controls.cpp	cpp	e168f91	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_enemies	forsaken_core/src/scripting/lua_enemies.cpp	cpp	af70a9c	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_games	forsaken_core/src/scripting/lua_games.cpp	cpp	b1f9b78	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_object	forsaken_core/src/scripting/lua_object.cpp	cpp	3cecf7f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_ships	forsaken_core/src/scripting/lua_ships.cpp	cpp	ece2d75	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_vecmat	forsaken_core/src/scripting/lua_vecmat.cpp	cpp	9420a67	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+lua_weapons	forsaken_core/src/scripting/lua_weapons.cpp	cpp	1c5753d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+title	forsaken_core/src/ui/title.cpp	cpp	591d0e4	todo	-	PASS fid-ab-20261116 (tier3)	
+hunk_alloc	forsaken_core/src/util/hunk_alloc.cpp	cpp	4f19b6a	todo	test_modules	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+timer	forsaken_core/src/util/timer.cpp	cpp	12e46c1	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+util	forsaken_core/src/util/util.cpp	cpp	6836f6b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+xmem	forsaken_core/src/util/xmem.cpp	cpp	12e46c1	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+bsp	forsaken_core/src/world/bsp.cpp	cpp	697102f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+collision	forsaken_core/src/world/collision.cpp	cpp	372c223	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+node	forsaken_core/src/world/node.cpp	cpp	63f93d5	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+visi	forsaken_core/src/world/visi.cpp	cpp	386542d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+music_3ds	forsaken_3ds/src/audio/music_3ds.c	c	kept-C	n/a	-	n/a	platform TU (ndsp; no C++ need)
+sound_3ds	forsaken_3ds/src/audio/sound_3ds.c	c	kept-C	n/a	-	n/a	platform TU
+net_3ds	forsaken_3ds/src/net/net_3ds.cpp	cpp	e60c503	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
+controls_3ds	forsaken_3ds/src/platform_3ds/controls_3ds.c	c	kept-C	n/a	-	n/a	platform TU
+input_3ds	forsaken_3ds/src/platform_3ds/input_3ds.c	c	kept-C	n/a	-	n/a	platform TU
+main_3ds	forsaken_3ds/src/platform_3ds/main_3ds.c	c	kept-C	n/a	-	n/a	platform TU (handoff §7: do not convert)
+stubs_3ds	forsaken_3ds/src/platform_3ds/stubs_3ds.c	c	kept-C	n/a	-	n/a	platform TU
+render_c3d	forsaken_3ds/src/rendering/render_c3d.c	c	kept-C	n/a	-	n/a	backend (handoff §7)
+breakpad	forsaken_pc/src/breakpad.cpp	cpp	pre-existing C++	todo	-	n/a (not in 3DS build)	
+main_sdl	forsaken_pc/src/main_sdl.c	c	kept-C	n/a	-	n/a	PC platform TU
+music_openal	forsaken_pc/src/audio/music_openal.c	c	kept-C	n/a	-	n/a	PC platform TU
+sound_dsound	forsaken_pc/src/audio/sound_dsound.c	c	kept-C	n/a	-	n/a	PC platform TU (Windows, dead)
+sound_openal	forsaken_pc/src/audio/sound_openal.c	c	kept-C	n/a	-	n/a	PC platform TU
+input_dinput	forsaken_pc/src/input/input_dinput.c	c	kept-C	n/a	-	n/a	PC platform TU (Windows, dead)
+input_sdl	forsaken_pc/src/input/input_sdl.c	c	kept-C	n/a	-	n/a	PC platform TU
+net_enet	forsaken_pc/src/net/net_enet.cpp	cpp	cafe450	todo	-	n/a (not in 3DS build)	
+net_enet_2	forsaken_pc/src/net/net_enet_2.cpp	cpp	f3dbde2	todo	-	n/a (not in 3DS build)	
+net_tracker	forsaken_pc/src/net/net_tracker.cpp	cpp	961da60	todo	-	n/a (not in 3DS build)	
+private_address	forsaken_pc/src/net/private_address.cpp	cpp	6317617	todo	-	n/a (not in 3DS build)	
+render_d3d	forsaken_pc/src/rendering/render_d3d.cpp	cpp	pre-existing C++	todo	-	n/a (not in 3DS build)	
+render_disabled	forsaken_pc/src/rendering/render_disabled.c	c	kept-C	n/a	-	n/a	PC null backend
+render_vulkan	forsaken_pc/src/rendering/render_vulkan.c	c	kept-C	n/a	-	n/a	backend (handoff §7; may convert late)
+texture_devil	forsaken_pc/src/rendering/texture_devil.c	c	kept-C	n/a	-	n/a	PC platform TU
+texture_sdl	forsaken_pc/src/rendering/texture_sdl.c	c	kept-C	n/a	-	n/a	PC platform TU
+lua_miniupnp	forsaken_pc/src/scripting/lua_miniupnp.cpp	cpp	4ad0e84	todo	-	n/a (not in 3DS build)	

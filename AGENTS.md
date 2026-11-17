@@ -430,9 +430,12 @@ build).
 
 ## 9. C with classes — PHASE 2 (scaffolding live; conversion deferred)
 
-Forsaken is C today (`Makefile.3ds` compiles `.c`; root-level `.cpp` files
-are picked up automatically and compile with the language flags below —
-`breakpad.cpp`/`render_d3d.cpp` are excluded via `EXCLUDE_SRC` per §8). The
+The engine is C++ compiled as "C with classes" since Cleanup 5; platform TUs
+and render backends stay C (`docs/CPP_LEDGER.tsv` is the per-module record).
+Sources live in `forsaken_core/src` + `forsaken_3ds/src` (+ `forsaken_pc/src`
+and `.cpp` in the core and 3DS trees and compiles `.cpp` with the language
+flags below; PC-only sources (`breakpad.cpp`, `render_d3d.cpp`, …) are not in
+those trees at all. The
 C++ "C with classes" language model — no virtuals, no RTTI, no exceptions,
 no project-defined templates, no `std::function`/`std::bind`,
 preallocate-in-hot-path, worker stack budgets — is **phase 2**.
@@ -447,9 +450,12 @@ preallocate-in-hot-path, worker stack budgets — is **phase 2**.
   into `check.sh` as `audit_cxx_class`. Strips comments/strings before
   matching; hits are new code, the fix is to not write the construct —
   there is no baseline file and never should be.
-- The numeric gates cover C++ too: `gates_vfp.py` scope is root-level
-  `.c/.h/.cpp/.hpp/.cc/.cxx/.hh` minus `EXCLUDE_SRC`. A converted module
-  cannot slip past R1–R11 by being a `.cpp`.
+- The numeric gates cover C++ too: `gates_vfp.py` scope is every
+  `.c/.h/.cpp/.hpp/.cc/.cxx/.hh` under `forsaken_core/src` and
+  `forsaken_3ds/src` minus `EXCLUDE_SRC`. A converted module cannot slip past
+  R1–R11 by being a `.cpp`. Findings, baselines, the corpus and exemptions are
+  keyed by basename (unique across trees, enforced), so moving a file between
+  subdirectories never re-keys a gate.
 - The Makefile compiles `.cpp` with the same numeric flags as `.c` plus
   `-std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics`, and
   links with the C++ driver when any C++ object exists. Banned constructs

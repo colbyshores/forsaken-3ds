@@ -8,6 +8,34 @@ especially §9 (language model), §3/§4 (perf rules — the gates scan
 `.cpp` too), and §5 (exemptions). This spec is the operational
 playbook; AGENTS.md is the law where they differ.
 
+## 0. Status update 2026-11-17 — read this first
+
+- **Cleanup 5 (phase 1, C → `.cpp` translation) is complete.** Every
+  in-scope module is a `.cpp`; what stays C is recorded with its reason.
+  §1/§7 below are the historical plan, not the current state.
+- **The ledger is `docs/CPP_LEDGER.tsv`** — one row per translation unit:
+  path, language, phase-1 commit, phase-2 status, host test, fidelity A/B
+  status, and why a file stays C. Update the row in the same commit that
+  changes it; the git log is the evidence, the ledger is the index.
+- **Source layout changed** (move-only, object code proven identical): the
+  flat root is now `forsaken_core/src/{game,ai,world,data,rendering,audio,
+  net,scripting,input,ui,math,util,diag}`, `forsaken_3ds/`, `forsaken_pc/`
+  (`"game/ships.h"`). The §4 commands still work from the repo root; the
+  §5 gate re-key table no longer applies to moves (gates key by basename).
+- **Phase 2 (real classes) conventions**, recommended 2026-11-17 and open to
+  owner override: t2k layout and header conventions (`#pragma once` on new
+  or rewritten headers; header comments state *why*, units, ownership;
+  root-relative includes), **Forsaken's own identifiers kept** (no renaming
+  to snake_case, no other project's names or prefixes), plain structs +
+  free functions remain the default (they already are: `Ships[]`,
+  `Enemies[]`), and member functions only where they earn it — value types
+  (QUAT, done in `872d887`) and modules owning private state (the
+  `Hunk`/`StereoMemo` pattern). No namespace around anything a C TU
+  calls; if a namespace is introduced for C++-only internals it is
+  `forsaken`. Replace local `extern "C"` declarations in `.cpp` files with
+  the owning header (39 files still carry them; `oct2.cpp` 26,
+  `title.cpp` 30). Each phase-2 module still needs its fidelity A/B.
+
 ---
 
 ## 1. Where things stand
