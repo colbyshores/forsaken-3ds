@@ -179,6 +179,9 @@ extern int new_input;
 ////////////
 
 extern bool input_grabbed;
+/* Set while the platform layer resizes its own window, so the resize
+   event it generates is not taken as a user request (stubbed on 3DS). */
+extern bool bIgnoreWM_SIZE;
 #ifdef __cplusplus
 extern "C"
 #endif

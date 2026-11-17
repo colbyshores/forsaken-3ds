@@ -335,7 +335,6 @@ static bool ParseCommandLine(char* lpCmdLine)
 // Cleans up the application before quiting
 //
 
-extern void render_cleanup( render_info_t * info );
 
 bool QuitRequested = false;
 void CleanUpAndPostQuit(void)
@@ -648,8 +647,6 @@ static bool RenderLoop()
 // The main routine
 //
 
-extern void network_cleanup( void );
-extern void CleanUpAndPostQuit(void);
 
 int main( int argc, char* argv[] )
 {

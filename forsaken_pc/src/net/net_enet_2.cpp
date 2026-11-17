@@ -21,6 +21,7 @@
 #ifdef NET_ENET_2
 #include "game/main.h"
 #include "net/net.h"
+#include "net/net_enet_2.h"
 #include "enet/enet.h"
 #include <stdio.h>
 #include <string.h>
@@ -42,7 +43,7 @@ typedef unsigned char peer_id_t;
 
 // state flags
 static int initialized;
-ENetHost* enet_host = NULL; // used in net_tracker.c
+ENetHost* enet_host = NULL;
 
 // the host player
 static ENetPeer* host;
@@ -54,8 +55,8 @@ network_state_t network_state;
 // my settings
 static int i_am_host = 0;
 peer_id_t my_id = NO_ID; // used by nettest
-char my_player_name[NETWORK_MAX_NAME_LENGTH] = {0}; // used in net_tracker.c
-int my_local_port = 0; // used in net_tracker.c
+char my_player_name[NETWORK_MAX_NAME_LENGTH] = {0};
+int my_local_port = 0;
 
 // settings
 static int max_peers = 40;

@@ -139,7 +139,6 @@ float LevelTimeTaken;
 bool NoMenuBack = false;
 
 int16_t DummyTextureIndex;
-extern SLIDER BikerSpeechSlider;
 
 #define REGISTRY_EXPIRE_TIME	"ServiceID"
 #define DEFAULT_CONFIG_FILE		DEFAULT_PLAYER_NAME".txt"
@@ -159,7 +158,6 @@ float TriggerInitialAnimation = 0.0F;
 bool	Our_CalculateFrameRate(void);
 bool	ShowWeaponKills = false;
 u_int16_t	BackgroundModel[NUMOFTITLEMODELS];
-extern  bool bIgnoreWM_SIZE;
 
 /*===================================================================
 		Mode changing stuff..
@@ -278,7 +276,6 @@ void ExitTitleLoad( MENU *Menu );
 void InitBikerName( char *name );
 void InitMultiplayerHost( MENU *Menu );
 void SetAutolevel( MENUITEM *item );
-extern "C" void SelectQuitCurrentGame( MENUITEM *Item );
 void ExitBikeSelection( MENUITEM * menu );
 void ExitBikeComputerSelection( MENUITEM * item );
 void InitDebugMenu( MENU *Menu );
@@ -291,8 +288,6 @@ void SavePickups( MENUITEM *item );
 void ShowNodeToggle( MENUITEM *item );
 void ShowStartPointsToggle( MENUITEM *item );
 void InitDemoList( MENU * Menu );
-extern "C" void GetGamePrefs( void );
-extern "C" void SetGamePrefs( void );
 void InitLoadSavedGameList( MENU * Menu );
 void WatchPlayerSelected( MENUITEM *Item);
 
@@ -322,7 +317,6 @@ void WiggleDiscs(void);
 void SetTextures (MENU *menu);
 void InitDifficultyLevel ( MENU *Menu );
 void DifficultySet (MENUITEM *item);
-extern "C" void ProcessVduItems( MENU * Menu );
 void KillTextInfo ( TEXTINFO *TextInfo );
 
 void SetInitialTitleParams();
@@ -480,7 +474,6 @@ void InitEventFadeOffHoloLight(TITLE_EVENT *TitleEvent);
 void ExitEventFadeOffHoloLight(TITLE_EVENT *TitleEvent);
 void EventFadeOffHoloLight(TITLE_EVENT *TitleEvent);
 
-extern "C" void FadeHoloLight(float Brightness);
 
 void InitEventRaiseHoloPad(TITLE_EVENT *TitleEvent);
 void EventRaiseHoloPad(TITLE_EVENT *TitleEvent);
@@ -499,7 +492,6 @@ void EventJudderStack(TITLE_EVENT *TitleEvent);
 void InitEventExpandBike(TITLE_EVENT *TitleEvent);
 void InitEventExpandCrystal(TITLE_EVENT *TitleEvent);
 void ExitEventExpandBike(TITLE_EVENT *TitleEvent);
-extern "C" void DarkenRoom2(float darkness);
 void DarkenRoomForStart( MENU *Menu );
 void RotateDiscStack(float theta);
 
@@ -572,14 +564,12 @@ bool ProcessWeaponOrder ( int Key );
 /***********************************
 text messaging
 ***********************************/
-extern "C" void AddTitleMessage(LPTEXTMSG LpTextMsg);
 void GetTitleMessage(void);
 
 /*===================================================================
 	MultiPlayer Stuff...
 ===================================================================*/
 
-extern BYTE	TeamNumber[MAX_PLAYERS];
 
 enum
 {
@@ -894,8 +884,6 @@ DEFKEY KDsend_speech = { &Config.send_speech, 0 };
  * so the menu select callback can fire it directly. The remap UI
  * is modal: takes over the bottom screen, returns when the player
  * saves or cancels. */
-extern "C" void controls_3ds_remap_menu(void);
-extern "C" float platform_get_3d_slider(void);
 static void SelectControlsRemap(MENUITEM *Item) {
 	(void)Item;
 	/* Just open the controls menu — leave the pause menu open
@@ -1632,7 +1620,6 @@ MENU	MENU_NEW_VisualsStereo = {
 /* Declared in main_3ds.c — when true, DrawSimplePanel prints raw slider /
  * eye-sep / stereo-state to the HUD for diagnosing slider behavior. Saved
  * to config as ShowStereoDebug. */
-extern bool g_show_stereo_debug;
 
 /* Declared in render_c3d.c. Toggle the new graphics features:
  *   g_object_shine — Phong specular highlight on enemy / pickup / crate
@@ -1641,8 +1628,6 @@ extern bool g_show_stereo_debug;
  *   g_wall_detail  — ADD_SIGNED detail-map modulation on wall textures
  *                    that ship with a sibling <name>_d.t3x file.
  * Saved as ObjectShine / WallDetail in Configs/main.txt. */
-extern bool g_object_shine;
-extern bool g_wall_detail;
 #endif
 
 MENU	MENU_NEW_Visuals = {
@@ -3524,7 +3509,6 @@ TITLE_EVENT_TIMER Title_Timers[MAXTITLETIMERS] = {
 	{-1.0F, -1.0F, TITLE_EVENT_TIMER_IDLE, NULL}
 };
 
-extern bool render_mode_select( render_info_t * info );
 bool RenderModeSelect( int mode, bool fullscreen, bool vsync )
 {
 	render_info_t old_info = render_info;
@@ -3564,7 +3548,6 @@ DebugPrintf("2 vsync = %d\n",render_info.vsync);
 	return true;
 }
 
-extern bool render_reset( render_info_t * info );
 extern "C" bool RenderModeReset( void )
 {
 	if(!render_reset( &render_info ))
@@ -3582,7 +3565,6 @@ extern "C" bool RenderModeReset( void )
 	Procedure	:		Init Title load in all graphics etc for Titles..
 	Output		:		bool true/false
 ===================================================================*/
-extern void input_grab( bool clip );
 bool InitTitle()
 {
 	framelag = 0;

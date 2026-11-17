@@ -1,3 +1,4 @@
+#include "util/platform.h"
 #ifndef MAIN_3DS_INCLUDED
 #define MAIN_3DS_INCLUDED
 
@@ -41,7 +42,6 @@ void memcpy_unaligned(void *dst, const void *src, size_t n);
  * On real hardware this is osGet3DSliderState().
  * In emulators that always return 0 you can override it by setting
  * stereo_test_slider = <value> in Configs/debug.txt (3DS-only config key). */
-float platform_get_3d_slider(void);
 
 /* Citro3D context/present glue (render_c3d.c). These replace the old
  * picaGL-named shim; picaGL itself is gone. */

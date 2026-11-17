@@ -135,7 +135,6 @@ u_int16_t	FirstStartPositionInGroup[MAXGROUPS];
 
 float	SoundInfo[MAXGROUPS][MAXGROUPS];
 bool	TempGroups[MAXGROUPS];
-extern "C" void InitSoundInfo( MLOADHEADER * Mloadheader );
 u_int16_t	GroupTris[ MAXGROUPS ];
 
 /*===================================================================

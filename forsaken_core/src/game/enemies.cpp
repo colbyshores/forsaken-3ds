@@ -47,9 +47,7 @@
 /*===================================================================
 	External Variables
 ===================================================================*/
-extern	AIMDATA AimData;
 
-extern	VECTOR	FleshmorphPos;
 
 bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject );
 bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_int16_t * NewGroup );

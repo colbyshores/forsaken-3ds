@@ -41,7 +41,6 @@
 /*===================================================================
 	Externs
 ===================================================================*/
-extern	bool			CountDownOn;
 
 #define RGBA_MAKE2(r, g, b, a)   ((COLOR) (( (DWORD) ((a) & 0xff) << 24) | ( (DWORD) ((r) & 0xff) << 16) | ( (DWORD) ((g) & 0xff) << 8) | (DWORD) ((b) & 0xff)))
 #define	CUTOFF				( 5.0F * 1024.0F * GLOBAL_SCALE )

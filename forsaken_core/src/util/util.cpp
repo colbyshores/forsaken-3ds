@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include "string.h"
 #include "ui/title.h"
+#include "input/input.h"
 
 bool DebugLog = false;
 
@@ -225,7 +226,6 @@ void DebugState( const char * str )
 
 // temporarily jumps to desktop mode
 //#include "render.h"
-extern void input_grab( bool clip );
 int Msg( const char * msg, ... )
 {
 //	bool was_fullscreen = render_info.fullscreen;

@@ -26,7 +26,6 @@
 #pragma optimize( "gty", on )
 #endif
 
-extern	AIMDATA			AimData;
 
 void (* AI_AIR_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,

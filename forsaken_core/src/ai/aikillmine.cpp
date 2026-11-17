@@ -27,7 +27,6 @@
 #endif
 
 // Externals
-extern	AIMDATA AimData;
 /*===================================================================
 	Procedure	:	AIR KillMine
 	Input		:	ENEMY * Enemy

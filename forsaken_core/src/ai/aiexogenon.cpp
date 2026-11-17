@@ -29,7 +29,6 @@
 
 
 // Externals
-extern	AIMDATA AimData;
 void ExogenonAim( ENEMY * Enemy );
 
 

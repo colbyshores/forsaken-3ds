@@ -18,6 +18,12 @@ extern "C" {
 #endif
 extern u_int32_t platform_get_ticks(void);
 extern void platform_delay(u_int32_t ms);
+
+/* 3DS platform services used by the game (main_3ds.c, controls_3ds.c). */
+void boot_log(const char *line);		/* append a line to sdmc:/forsaken_boot.log */
+float platform_get_3d_slider(void);		/* 0..1, 0 = mono */
+void controls_3ds_remap_menu(void);		/* open the button-remap overlay */
+extern bool g_show_stereo_debug;		/* stereo debug overlay toggle */
 #ifdef __cplusplus
 }
 #endif

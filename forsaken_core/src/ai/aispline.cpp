@@ -28,7 +28,6 @@
 #endif
 
 // Externals
-extern	AIMDATA AimData;
 /*===================================================================
 	Procedure	:	AI Spline Movement....
 	Input		:	ENEMY * Enemy

@@ -1,3 +1,4 @@
+#include "util/platform.h"
 /*===================================================================
 	controls_3ds.h — user-customizable button + C-stick bindings.
 
@@ -88,7 +89,6 @@ int  controls_3ds_cstick_invert_y(void);
  * A to rebind, B to back out, START to save & exit). Returns when
  * the user exits — caller should then re-establish their own
  * console / GFX state if they had one on the bottom screen. */
-void controls_3ds_remap_menu(void);
 
 #endif /* __3DS__ */
 

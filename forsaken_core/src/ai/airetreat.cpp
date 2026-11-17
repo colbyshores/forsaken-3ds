@@ -27,7 +27,6 @@
 #endif
 
 // Externals
-extern	AIMDATA AimData;
 /*===================================================================
 	Procedure	:	AIR Retreat And run away
 	Input		:	ENEMY * Enemy

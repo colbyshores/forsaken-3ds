@@ -28,7 +28,6 @@
 #endif
 
 // Externals
-extern	AIMDATA AimData;
 
 // Globals
 void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy );

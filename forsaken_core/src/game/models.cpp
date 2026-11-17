@@ -1,3 +1,4 @@
+#include "util/platform.h"
 
 #define FAST_RGB_CLAMP
 
@@ -43,11 +44,9 @@
 #include "world/visi.h"
 #ifdef RENDERER_C3D
 /* render_c3d.c is a C TU; hoisted from block-scope externs (C++ mangles those). */
-extern "C" void c3d_set_object_shine_eligible(bool);
 #endif
 #ifdef __3DS__
 /* main_3ds.c is a C TU; models.c relied on implicit declaration here. */
-extern "C" void boot_log(const char *);
 #endif
 
 #ifdef OPT_ON
@@ -60,7 +59,6 @@ extern "C" void boot_log(const char *);
 		Externals ...
 ===================================================================*/
 
-extern	MODELNAME		TitleModelNames[MAXMODELHEADERS];
 
 void RefreshModel( u_int16_t model );
 

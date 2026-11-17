@@ -25,13 +25,9 @@
 #include "util/util.h"
 #include "ui/version.h"
 #include "net/net.h"
+#include "net/net_enet_2.h"
 #include "net/networking.h"
 #include "game/oct2.h"
-
-// created in net_enet.c
-extern ENetHost* enet_host;
-extern char my_player_name[];
-extern int my_local_port;
 
 static void send_tracker_message( char* host, int port, char* message );
 

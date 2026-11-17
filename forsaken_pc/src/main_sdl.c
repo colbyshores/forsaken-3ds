@@ -3,8 +3,8 @@
 #include "ui/version.h"
 #include "main_sdl.h"
 #include <SDL.h>
+#include "rendering/render.h"
 
-extern bool render_init( render_info_t * info );
 
 bool sdl_init( void )
 {

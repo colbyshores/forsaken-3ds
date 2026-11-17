@@ -114,8 +114,6 @@ float BikeSpeed = 0.0F;
 
 BSP_HEADER Bsp_Original;
 
-extern	render_viewport_t viewport;
-extern	RENDERMATRIX view;
 
 bool OriginalLevels = false;
 bool CheatsDisabled = false;
@@ -140,7 +138,6 @@ char *CurrentLevelsList;
 
 px_timer_t level_time;
 
-extern "C" void InitModeCase(void);
 void DebugState( const char * str );
 
 
@@ -290,7 +287,6 @@ int CrystalsFound = 0;
 
 bool  ResizeViewport( void );
 bool  FullScreenViewport();
-extern "C" bool  ClearBuffers( void );
 bool  ClearZBuffer( void );
 
 bool clear_black(void)
@@ -362,7 +358,6 @@ void ReleaseRenderBufs( void );
 bool SetMatrixViewPort( void );
 void PrintInitViewStatus( BYTE Status );
 
-extern "C" void SpecialDestroyGame( void );
 
 // if met max kill limit, sets flag to change level
 void CheckMetKillLimit();
@@ -411,7 +406,6 @@ MCLOADHEADER MCloadheadert0;        //  0 thickness collision map...
 
 bool MainGame(); // bjd
 
-extern "C" void Build_View();
 bool DispTracker( void ); // bjd
 
 
@@ -1573,7 +1567,6 @@ void DrawSimplePanel()
 	   fclose on sdmc:/ every 20 frames cost enough milliseconds per
 	   write to visibly hitch frame pacing. On-screen text is free. */
 	{
-		extern bool g_show_stereo_debug;
 		if (g_show_stereo_debug)
 		{
 			

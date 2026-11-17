@@ -18,7 +18,6 @@
 #include "util/util.h"
 #include "rendering/render.h"
 
-extern bool render_init(render_info_t *info);
 
 /* ---- 3DS heap configuration ---- */
 /* [3DS] Heap reduced from 80 MB to 64 MB to avoid OOM during level transitions.

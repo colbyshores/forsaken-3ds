@@ -27,7 +27,6 @@
 #endif
 
 // Externals
-extern	AIMDATA AimData;
 /*===================================================================
 	Procedure	:	AIR Ping Off...
 	Input		:	ENEMY * Enemy

@@ -319,8 +319,6 @@ void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
 /* Reuse 1998 IDLE/SCAN handlers — the KEX brain doesn't differentiate
  * between scan and idle; both just tick down before the next hop
  * decision. Wire to AI_CRAWL_IDLE/SCAN to avoid duplicating logic. */
-extern void AI_CRAWL_IDLE( register ENEMY * Enemy );
-extern void AI_CRAWL_SCAN( register ENEMY * Enemy );
 
 void (* AI_JUMP_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,

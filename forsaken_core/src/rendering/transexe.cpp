@@ -23,7 +23,6 @@
 #include "game/oct2.h"
 #ifdef RENDERER_C3D
 /* render_c3d.c is a C TU; hoisted from block-scope externs (C++ mangles those). */
-extern "C" void c3d_set_object_shine_eligible(bool);
 #endif
 
 /*===================================================================

@@ -263,6 +263,11 @@ void AI_SetFORMATION( ENEMY * Enemy );
 // AIMAIN.C
 void AI_AIR( ENEMY * Enemy );
 void AI_TURRET( ENEMY * Enemy );
+/* Aim solution shared by every brain (defined in ailib.cpp). */
+extern AIMDATA AimData;
+/* Last fleshmorph target position (defined in aifleshmorph.cpp). */
+extern VECTOR FleshmorphPos;
+
 void AI_CRAWL( ENEMY * Enemy );
 void AI_THINK( register ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange );
 void AI_AVOIDCHECK( register ENEMY * Enemy );

@@ -29,7 +29,6 @@
 
 
 // Externals
-extern	AIMDATA AimData;
 
 /*===================================================================
 	Procedure	:	TURRET Fire At Target..

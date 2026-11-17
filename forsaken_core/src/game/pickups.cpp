@@ -126,7 +126,6 @@ u_int32_t  Host_Flags[ MAX_PLAYERS ];
 float   Host_BountyTimer;
 float   Host_FlagTimer;
 float   Host_TeamFlagTimer[ MAX_TEAMS ];
-extern int FlagsToGenerate;
 
 int16_t	NumPrimaryPickups = 1;
 

@@ -28,7 +28,6 @@
 #endif
 
 // Externals
-extern	AIMDATA AimData;
 
 /*===================================================================
 	Procedure	:	AIR Crash and burn...

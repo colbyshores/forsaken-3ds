@@ -56,7 +56,6 @@ mxtype : u_int16_t // always 0 for mx format
 #include "util/hunk_alloc.h"
 #ifdef RENDERER_C3D
 /* render_c3d.c is a C TU; hoisted from block-scope extern (C++ mangles those). */
-extern "C" void c3d_set_object_proctex(bool);
 #endif
 
 /*===================================================================

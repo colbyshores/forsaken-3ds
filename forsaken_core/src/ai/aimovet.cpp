@@ -28,7 +28,6 @@
 #endif
 
 // Externals
-extern	AIMDATA AimData;
 void CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 /*===================================================================
 	Procedure	:	AIR Move to a Target

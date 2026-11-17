@@ -360,6 +360,16 @@ bool draw_2d_object(RENDEROBJECT *renderObject);
 
 void FSReleaseRenderObject(RENDEROBJECT *renderObject);
 
+#ifdef RENDERER_C3D
+/* Citro3D backend extensions (render_c3d.c). Material-class switches set
+   per draw by the model paths, and the Visuals menu toggles behind them
+   (saved as ObjectShine / WallDetail in Configs/main.txt). */
+void c3d_set_object_proctex(bool on);
+void c3d_set_object_shine_eligible(bool eligible);
+extern bool g_object_shine;
+extern bool g_wall_detail;
+#endif
+
 #ifdef __cplusplus
 };
 #endif

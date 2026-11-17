@@ -23,7 +23,6 @@
 #include "game/oct2.h"
 
 // Externals
-extern	AIMDATA AimData;
 /*===================================================================
 	Procedure	:	AIR Crash and burn...
 	Input		:	ENEMY * Enemy
