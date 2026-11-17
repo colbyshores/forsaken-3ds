@@ -14,7 +14,7 @@ VERIFY_DIR=${VERIFY_DIR:-/tmp/forsaken-verify}
 base_out=$(ls -td "$VERIFY_DIR"/out-*/ | head -1); base_out=${base_out%/}
 base_tree=$VERIFY_DIR/tree-$(echo "${base_out##*/out-}" | sed "s/-f[0-9]*$//")
 work_tree=$(cd "$(dirname "$0")/.." && pwd)
-OD=${DEVKITARM:-/opt/devkitpro/devkitARM}/bin/arm-none-eabi-objdump; [ "$cfg" = host ] && OD=objdump
+OD=${DEVKITARM:-/opt/devkitpro/devkitARM}/bin/arm-none-eabi-objdump; [ "${cfg#host}" != "$cfg" ] && OD=objdump
 export PATH=${DEVKITARM:-/opt/devkitpro/devkitARM}/bin:$PATH
 tmp=$(mktemp -d)
 norm() { "$OD" -d -r -C "$1" | tail -n +4 | grep -v '^Disassembly of section' |
@@ -34,6 +34,12 @@ for o in "$@"; do
 		cmd=$(echo "$cmd" | sed -E "s/ -O[0-3s]\b/ -O0/g; s# -o [^ ]*/$o# -o $tmp/$side-$o#; s# -MMD -MP -MF [^ ]*##")
 		(cd "$tree" && eval "$cmd") > "$tmp/$side-$o.log" 2>&1 || { echo "O0 compile failed ($side $o)"; fail=1; continue 2; }
 	done
-	if cmp -s <(norm "$tmp/base-$o") <(norm "$tmp/work-$o"); then echo "O0-IDENTICAL  $cfg $o"; else echo "O0-DIFFERS    $cfg $o"; fail=1; fi
+	norm "$tmp/base-$o" > "$tmp/base-$o.dis"; norm "$tmp/work-$o" > "$tmp/work-$o.dis"
+	# An objdump that cannot read the object prints nothing on both sides,
+	# which would compare equal: an empty disassembly is a failure.
+	if [ ! -s "$tmp/base-$o.dis" ] || [ ! -s "$tmp/work-$o.dis" ]; then
+		echo "O0-UNREADABLE $cfg $o (wrong objdump for this config?)"; fail=1
+	elif cmp -s "$tmp/base-$o.dis" "$tmp/work-$o.dis"; then echo "O0-IDENTICAL  $cfg $o"
+	else echo "O0-DIFFERS    $cfg $o  (diff $tmp/base-$o.dis $tmp/work-$o.dis)"; fail=1; keep=1; fi
 done
-rm -rf "$tmp"; exit $fail
+[ "${keep:-0}" = 1 ] || rm -rf "$tmp"; exit $fail
