@@ -359,3 +359,22 @@ R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division inner_loop=false
 R9|build_3ds/2dpolys.o|2dpolys|live VFP s-regs N > N
+# 2026-11-17 (Phase 2 dead-code pass): the 14 entries below are NOT new code.
+# Removing #if 0 blocks (objects proven identical by tools/verify_identical.sh)
+# fixed the gate's function attribution: dead duplicate definitions such as an
+# old ObjectCollide under #if 0 had made it attribute these lines elsewhere.
+# They are shipped hot-path debt the gate could not see before.
+R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
+R2|visi.cpp|FindVisible|float-to-int cast in loop body
+R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|ObjectCollideOnly|float comparison driving control flow in hot loop
+R3|collision.cpp|ObjectCollideOnly|float comparison driving control flow in hot loop
+R3|collision.cpp|ObjectCollideOnly|float comparison driving control flow in hot loop
+R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
+R3|models.cpp|ModelDisp|float comparison driving control flow in hot loop
+R3|screenpolys.cpp|ScrPolyDispNonSolid|float comparison driving control flow in hot loop
+R3|screenpolys.cpp|ScrPolyDispSolid|float comparison driving control flow in hot loop
