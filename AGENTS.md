@@ -482,6 +482,34 @@ preallocate-in-hot-path, worker stack budgets — is **phase 2**.
   overload, static-init order for globals with constructors.
 - `extern "C"` for every header that crosses the C/C++ line.
 
+**Preferred C++ constructs (use where they apply).** These are the
+"classes" half of C with classes that cost nothing at run time; prefer
+them over the C idiom they replace, in new and converted code:
+
+- **`constexpr`** for named constants instead of `#define` — typed,
+  scoped, visible to the debugger. Keep the literal's exact type and
+  suffix (`constexpr float NITROLOSS = 0.08333F;`, never widen to
+  `double`); a constant that sizes a C-visible array or is read by a C
+  TU stays a `#define` (see the C boundary below).
+- **`enum class`** for closed sets of states/kinds instead of integer
+  `#define` families — no implicit int conversion, no namespace
+  pollution. Give it the underlying type the data already uses
+  (`enum class X : u_int8_t`) so struct layout and file/network formats
+  do not move; values that are serialized keep their numeric values.
+- **`std::array<T, N>`** instead of a raw fixed array where the size
+  travels with the array (bounds, `.size()`, value semantics). Same
+  layout and no allocation, so it is allowed in hot paths; it does not
+  replace arrays in structs that cross the C boundary or are loaded
+  from level/save files byte-for-byte.
+
+The C boundary governs all three: anything a C translation unit
+(`main.c`, `render_c3d.c`, the platform TUs) can see must stay C — guard
+C++-only declarations with `#ifdef __cplusplus`, or keep them in `.cpp`
+files. Every such replacement is a cleanup and carries the cleanup proof:
+`tools/verify_identical.sh` shows identical objects (a `constexpr`
+standing in for a `#define`, or an `enum class` with the same underlying
+type and values, compiles to the same code).
+
 What the gates still cannot see: per-frame heap growth (violated by
 correct shipped design — level/execbuf arrays grow on load) and worker
 stack discipline stay review checks. A screen that cries wolf on correct
@@ -679,6 +707,10 @@ Rules:
 
 ### Changes
 
+- 2026-11-17: §9 describes the converted engine and the three source
+  trees; gate keys are basenames. Added the preferred C++ constructs
+  (`constexpr`, `enum class`, `std::array`) with the C-boundary rule and
+  the cleanup proof (`tools/verify_identical.sh`, `tools/verify_o0.sh`).
 - 2026-10-26: §9 C-with-classes moved from "commitment" to "scaffolding
   live": T2K's `audit_c_with_classes.py` ported to `tools/perf/` and wired
   into `check.sh` (`audit_cxx_class`); `gates_vfp.py` scope widened to the
