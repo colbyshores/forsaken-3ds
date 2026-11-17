@@ -53,8 +53,6 @@ void AI_AIR_DEATH_PINGOFF( register ENEMY * Enemy )
 	Enemy->Object.ExternalForce.y -= Mloadheader.Group[ Enemy->Object.Group ].up.y * 0.25F * framelag;
 	Enemy->Object.ExternalForce.z -= Mloadheader.Group[ Enemy->Object.Group ].up.z * 0.25F * framelag;
 
-//	ObjectRotateExternal( &Enemy->Object, &Enemy->LastDamagePos , &Enemy->LastDamageImpactPos,
-//						  &Enemy->LastDamageDir, D2R( (15.0F ) * framelag ) , EnemyTypes[Enemy->Type].Radius );
 
 	ObjectRotateExternal( &Enemy->Object, &Enemy->LastDamagePos , &Enemy->LastDamageImpactPos,
 						  &Enemy->LastDamageDir, D2R( -Enemy->LastDamage * framelag ) , EnemyTypes[Enemy->Type].Radius );

@@ -1029,8 +1029,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						Msg( "Mload : No PolyAnim\n" );
 						return false;
 					}
-//					if( Mloadheader->Group[ group ].lpExBuf[ execbuf ]->lpVtbl->Lock(
-//						Mloadheader->Group[ group ].lpExBuf[ execbuf ], &debDesc ) != D3D_OK ) // bjd
 					if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[ group ].renderObject[execbuf], &lpLVERTEX)))
 					{
 						Msg( "Mload : Lock VertexBuffer failed\n" );

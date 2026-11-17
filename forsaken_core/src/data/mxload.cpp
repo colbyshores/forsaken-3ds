@@ -1316,12 +1316,6 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 	{
 		for ( i=0 ; i<Mxloadheader1->Group[group].num_execbufs; i++)
 		{
-//			memset(&debDesc1, 0, sizeof(D3DEXECUTEBUFFERDESC));
-//			debDesc1.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
-			// lock the execute buffer
-//			if ( Mxloadheader1->Group[group].lpExBuf[i]->lpVtbl->Lock( Mxloadheader1->Group[group].lpExBuf[i], &debDesc1 ) != D3D_OK) // bjd
-//			if (FSLockExecuteBuffer(Mxloadheader1->Group[group].lpExBuf[i], &debDesc1 ) != D3D_OK)
-//				return false;
 			if (!(FSLockVertexBuffer(&Mxloadheader1->Group[group].renderObject[i], &lpD3DLVERTEX1)))
 			{
 				return false;

@@ -585,10 +585,6 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	}
 
 	/*	lock the execute buffer	*/
-//	if ( WO->lpExBuf->lpVtbl->Lock( WO->lpExBuf, &debDesc ) != D3D_OK)
-//		return; // bjd
-//	if (FSLockExecuteBuffer(WO->lpExBuf, &debDesc ) != D3D_OK)
-//		return false;
 
 	if (!(FSLockVertexBuffer(/*WO->lpVertexBuffer*/&WO->renderObject, &lpLVERTEX)))
 	{

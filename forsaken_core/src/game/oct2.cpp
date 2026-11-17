@@ -304,7 +304,6 @@ RENDEROBJECT RenderBufs[4];
 
 void InitRenderBufs(/*LPDIRECT3DDEVICE lpDev*/ ); // bjd
 void ReleaseRenderBufs( void );
-//bool ChangeBackgroundColour( float R, float G, float B );
 bool SetMatrixViewPort( void );
 void PrintInitViewStatus( BYTE Status );
 

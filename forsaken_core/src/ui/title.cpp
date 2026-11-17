@@ -5936,11 +5936,6 @@ DefineKey( MENUITEM *item, VirtualKeycode key )
 	VirtualKeycode *kdef;//, *other_kdef;
 
 	kdef = (VirtualKeycode *)(item->Variable);
-	//other_kdef = KeyDefined( &Config, key );
-	//if ( other_kdef )
-	//{
-	//	*other_kdef = *kdef;
-	//}
 	*kdef = key;
 }
 
@@ -9213,10 +9208,6 @@ bool MakeTranslucent( u_int16_t Model )
 		{
 			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{   
-//				if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
-//								DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
-//				if (FSLockExecuteBuffer(DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
-//					return false;
 				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
 				{
 					return false;
@@ -9248,8 +9239,6 @@ bool MakeTranslucent( u_int16_t Model )
 				}
 
 
-//				if( DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Unlock(
-//				DstMloadheader->Group[ Group ].lpExBuf[ ExecBuf] ) != D3D_OK )	return false;
 				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
 				{
 					return false;
@@ -9265,10 +9254,6 @@ bool MakeTranslucent( u_int16_t Model )
 		{
 			for( ExecBuf = 0; ExecBuf < DstMxloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{   
-//				if( DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Lock(
-//								DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK ) return false; // bjd
-//				if (FSLockExecuteBuffer(DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf ], &DstDebDesc ) != D3D_OK )
-//					return false;
 
 				if (!(FSLockVertexBuffer(&DstMxloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
 				{
@@ -9302,8 +9287,6 @@ bool MakeTranslucent( u_int16_t Model )
 				}
 
 
-//				if( DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf ]->lpVtbl->Unlock(
-//				DstMxloadheader->Group[ Group ].lpExBuf[ ExecBuf] ) != D3D_OK )	return false;
 				if (!(FSUnlockVertexBuffer(&DstMxloadheader->Group[ Group ].renderObject[ExecBuf])))
 				{
 					return false;
@@ -10709,9 +10692,6 @@ void DrawFlatMenuName( MENUITEM *Item )
 
 	if (Item->highlightflags & TEXTFLAG_CheckForRefresh)
 	{
-		//TextInfo->oldtext = (char*)malloc ( sizeof (char) * strlen(var) );
-		//DebugPrintf("DrawFlatMenuName() allocated %d\n", strlen(var));
-		//TextInfo->pointer[TextInfo->num_pointers_to_free++] = TextInfo->oldtext;
 		strncpy((char*)TextInfo->oldtext, (char*)TextInfo->text, MAX_TEXT_LENGTH);
 	}
 

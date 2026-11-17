@@ -36,6 +36,5 @@ int16_t RaytoSphere3( VECTOR * SphereCenter, float Radius, VECTOR * RayStart,
 				    VECTOR * RayEnd, VECTOR * IntPoint );
 bool RaytoSphereShort( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rdir, float rlength );
 
-//	vec3 normalAt(vec3& p);
 
 #endif	//SPHERE_INCLUDED

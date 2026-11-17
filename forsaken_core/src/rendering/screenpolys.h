@@ -133,7 +133,6 @@ void ScreenPolyProcess( void );
 void DoLensflareEffect( void );
 void Conv3DTo2D( VECTOR * SrcVert, VECTOR * DstVert, MATRIX * FinalMat );
 bool ClipConv3DTo2D( VECTOR * SrcVert, VECTOR * DstVert, MATRIX * FinalMat );
-//bjd - CHECK bool ClipBox( LPTLVERTEX topleft, LPTLVERTEX bottomright );
 void DoAllSecBullLensflare( void );
 void SecBullLensflare( u_int16_t i );
 void CreateCountdownDigits( void );

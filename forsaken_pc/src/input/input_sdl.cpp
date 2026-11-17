@@ -249,8 +249,6 @@ void app_mouse_button( SDL_MouseButtonEvent * _event )
 	default: 
 		// save the button state
 		mouse_state.buttons[ button ] = ( _event->type == SDL_MOUSEBUTTONDOWN );
-		//DebugPrintf("sdl mouse button %d %s\n",_event->button,
-		//	(mouse_state.buttons[ button ]?"pressed":"released"));
 		break;
 	}
 }
