@@ -122,6 +122,7 @@ net_test/
 # — stay out of version control).
 tools/*
 !tools/build_matrix.sh
+!tools/verify_identical.sh
 !tools/*.py
 # Perf-contract tooling (AGENTS.md gates) is tracked source, not fetched
 # binaries. Baselines inside it are tracked adoption debt — never let the

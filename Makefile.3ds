@@ -131,6 +131,12 @@ CFLAGS += -DRENDERER_C3D
 # in lights.c::XLight1Group. Validated on hardware; default-on.
 CFLAGS += -DGPU_LIGHTING
 
+# VERIFY_CFLAGS: verification builds only (tools/verify_identical.sh). It
+# exists so a cleanup can be proven object-identical across line shifts:
+# VERIFY_CFLAGS=-D__LINE__=0 pins every __LINE__ to 0. In the flag stamp
+# (no stale objects) and in FORBIDDEN_FLAGS (never in a release).
+CFLAGS += $(VERIFY_CFLAGS)
+
 ALL_SRC := $(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.c))))
 CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
 OFILES  := $(CFILES:.c=.o)
@@ -293,7 +299,7 @@ all: $(OUTPUT_3DSX)
 # depends on the stamp, make rebuilds the whole tree. Unchanged flags keep
 # the old stamp mtime, so normal incremental builds are untouched.
 STAMP := $(BUILD)/.dflags.stamp
-STAMP_CONTENT := VIS=$(MODEL_VIS_CACHE)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|STS=$(STRESS_SCRATCH_VERTS)
+STAMP_CONTENT := VIS=$(MODEL_VIS_CACHE)|AT=$(AUTOTEST_REMASTER)|ATF=$(AUTOTEST_FIRST_LEVEL)|ATM=$(AUTOTEST_MAX_LEVELS_TO_SWEEP)|ATMS=$(AUTOTEST_MS_PER_LEVEL)|ED=$(EDITION)|SLIM=$(SLIM)|STS=$(STRESS_SCRATCH_VERTS)|VFY=$(VERIFY_CFLAGS)
 $(STAMP): FORCE
 	@mkdir -p $(BUILD)
 	@printf '%s' '$(STAMP_CONTENT)' > $@.tmp
@@ -611,7 +617,7 @@ $(if $(STALE_DFILES),$(shell rm -f $(STALE_DFILES)))
 # them. Better to over-block than ship another sweep build by accident.
 
 FORBIDDEN_FLAGS := DEBUG AUTOTEST_REMASTER DEBUG_AUTOBOOT_SLOT \
-                   DEATH_SIM AUTOBOOT_SP DEBUG_RAMQAN_FIRE
+                   DEATH_SIM AUTOBOOT_SP DEBUG_RAMQAN_FIRE VERIFY_CFLAGS
 
 OUTPUT_CIA_ALT      := $(SRCDIR)/$(TARGET)_alt.cia
 RSF_FILE_ALT        := $(BUILD)/forsaken_alt.rsf
