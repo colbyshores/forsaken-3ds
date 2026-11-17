@@ -21,6 +21,7 @@
 #include "data/tload.h"
 #include "data/mload.h"
 #include "rendering/transexe.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,7 +43,6 @@ extern "C" {
 #define	MAXMXAMODELHEADERS		1024
 #endif
 
-#define	MAXBIKETYPES		17
 
 #define MXA_ANIM_POS		(1 << 0)
 #define MXA_ANIM_RGB		(1 << 1)

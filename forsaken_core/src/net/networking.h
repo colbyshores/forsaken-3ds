@@ -12,6 +12,7 @@ typedef int net_bool_t; // backwards compatibility need bool's in pkt structures
 #include "net/net.h"
 #include "math/new3d.h"
 #include "game/object.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,7 +52,6 @@ extern char host_address[256];
 #define DEMO_MODE								3			// this is the mode the camera goes into when Playing back a Demo
 #define GAMEOVER_MODE						4			// this is the mode the player goes into when single player has finished...
 #define WATCH_MODE							5
-#define MAX_PLAYERS							16			//24 //16 //12
 #define MAX_SHIELD								255.0F
 #define START_SHIELD							128.0F
 #define MAX_HULL								255.0F
@@ -62,12 +62,10 @@ extern char host_address[256];
 #define MAXGENMINECOUNT					3 //4
 #define MAXGENTRIGGERCOUNT				60
 #define MAXGENTRIGVARCOUNT				60
-#define MAXMULTIPLES							8
 #define MAX_PICKUPFLAGS					2
 #define MAX_BUFFER_SIZE					1024
 #define FRAMELAGED_RECOIL					true
 #define ONEOFF_RECOIL						false
-#define MAX_TEAMS								4
 #define NUMTITANBITS							10 
 
 extern bool PlayerReady[MAX_PLAYERS];

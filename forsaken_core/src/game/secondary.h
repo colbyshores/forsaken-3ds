@@ -10,6 +10,7 @@
 
 #ifndef SECONDARY_INCLUDED
 #define SECONDARY_INCLUDED
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,7 +36,6 @@ extern "C" {
 #define	SEC_XMISSILE		2
 
 #define	MAXSECONDARYWEAPONBULLETS	256
-#define MAXSECONDARYWEAPONS			11
 
 #define MAXENEMYSECONDARYWEAPONS	6
 #define	TOTALSECONDARYWEAPONS	( MAXSECONDARYWEAPONS + 2 + MAXENEMYSECONDARYWEAPONS )
@@ -84,7 +84,6 @@ extern "C" {
 
 #define	SEC_LIGHTSIZE		( 1536.0F * GLOBAL_SCALE )
 
-#define	MAXMISSEDMINES		100
 #define	MM_TYPE_KILL		0
 #define	MM_TYPE_INIT		1
 

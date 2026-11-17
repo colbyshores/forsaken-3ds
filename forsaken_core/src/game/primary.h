@@ -11,6 +11,7 @@
 
 #ifndef PRIMARY_INCLUDED
 #define PRIMARY_INCLUDED
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,7 +20,6 @@ extern "C" {
 	Defines
 ===================================================================*/
 #define	MAXPRIMARYWEAPONBULLETS	256
-#define MAXPRIMARYWEAPONS		6
 
 #define	MAXENEMYPRIMARYWEAPONS	11	/* +1 for NME_PULSAR_BLUE */
 #define	TOTALPRIMARYWEAPONS		( MAXPRIMARYWEAPONS + 1 + MAXENEMYPRIMARYWEAPONS )

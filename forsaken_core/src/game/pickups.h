@@ -6,6 +6,7 @@
 #define PICKUPS_INCLUDED
 
 #include "game/main.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,7 +43,6 @@ extern "C" {
 #define	COLOUR_SCALE			0.5F
 #define	PICKUP_MODEL_RADIUS		( 310.0F * GLOBAL_SCALE )
 								
-#define	MAXMISSEDPICKUPS		256
 #define	MPU_TYPE_KILL			0
 #define	MPU_TYPE_INIT			1
 								

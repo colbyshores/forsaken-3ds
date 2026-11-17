@@ -16,6 +16,7 @@
 #include "math/new3d.h"
 #include "data/tload.h"
 #include "rendering/transexe.h"
+#include "game/constants.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,7 +29,6 @@ extern "C" {
 #define	BLOCKSIZE		( 1024.0F * GLOBAL_SCALE )
 
 #define MAXTPAGESPERMLOAD 8
-#define MAXGROUPS			128
 #define MAXEXECBUFSPERGROUP 16
 #define MAXPORTALSPERGROUP	64
 #define MAXVERTSPERPORTAL	32
