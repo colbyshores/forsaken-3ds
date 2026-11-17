@@ -16,7 +16,7 @@ R11's), and "inside a hot loop" is approximated as "in a file that has a loop an
 is not corpus-cold". A hit is a CANDIDATE for a human to confirm; a clean run
 means "nothing obvious", never "proven absent".
 
-Scope is the root-level in-scope sources (imported from gates_vfp) and the cold
+Scope is the in-scope sources of the 3DS build's trees (imported from gates_vfp) and the cold
 list is the corpus cold_always set, so the three screens agree on "the tree".
 
 SIGNATURES ARE LINE-INDEPENDENT (--sig). The baseline keys on
@@ -37,7 +37,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gates_vfp import in_scope_files, load_corpus, DEFAULT_CORPUS  # noqa: E402
+from gates_vfp import in_scope_files, load_corpus, source_trees, DEFAULT_CORPUS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 BASELINE = Path(__file__).resolve().parent / "contracts" / "r11_candidates_baseline.txt"
@@ -133,7 +133,10 @@ def header_float_members():
     `->member`/`.member` operands, never bare locals, so a header `float x;`
     cannot silence an integer `x % n` in a .c file. Name test, not proof."""
     names = set()
-    for h in sorted(ROOT.glob("*.h")):
+    # Every header in all three source trees: the same set the flat root held
+    # (PC-tree headers included, as they were before the reorg).
+    headers = [h for t in source_trees(include_pc=True) for h in t.rglob("*.h")]
+    for h in sorted(headers, key=lambda h: h.name):
         try:
             txt = h.read_text(encoding="utf-8", errors="replace")
         except OSError:

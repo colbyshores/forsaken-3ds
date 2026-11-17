@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "sphere.h"
+#include "math/sphere.h"
 
 static int failures = 0;
 #define CHECK(cond, ...) do { \

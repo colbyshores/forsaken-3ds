@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "stereomemo.h"
+#include "rendering/stereomemo.h"
 
 /* Epoch shorthand: pass 1 = polys-clipped, group = world group. */
 #define EP(g, t) 1u, (uint32_t)(g), (uint32_t)(t)

@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "new3d.h"
+#include "math/new3d.h"
 
 static int failures = 0;
 #define CHECK(cond, ...) do { \

@@ -21,6 +21,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gates_vfp import find_source  # noqa: E402  (files are keyed by basename)
 
 # file -> {function: expected SMEMO_PASS_* constant}
 REQUIRED = {
@@ -75,8 +77,8 @@ def main():
     failures = []
     bodies = {}  # (file, func) -> body
     for fname in SCAN_FILES:
-        p = ROOT / fname
-        if not p.exists():
+        p = find_source(fname)
+        if p is None:
             continue
         for name, body in function_bodies(p.read_text(errors="replace")):
             bodies[(fname, name)] = body

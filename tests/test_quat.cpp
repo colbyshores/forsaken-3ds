@@ -9,8 +9,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "quat.h"
-#include "new3d.h"
+#include "math/quat.h"
+#include "math/new3d.h"
 
 /* engine globals quat.cpp references (defined by the game TUs) */
 VECTOR Forward;

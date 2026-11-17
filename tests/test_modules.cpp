@@ -13,8 +13,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "dsp_adpcm.h"
-#include "hunk_alloc.h"
+#include "audio/dsp_adpcm.h"
+#include "util/hunk_alloc.h"
 
 static int failures = 0;
 #define CHECK(cond, ...) do { \

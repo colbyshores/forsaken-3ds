@@ -13,7 +13,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "framedump_core.h"
+#include "diag/framedump_core.h"
 
 static int failures;
 

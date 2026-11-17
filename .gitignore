@@ -33,8 +33,8 @@ mingw*
 
 # ---- Game data / assets (large binaries, not code) ----
 # Retail game data directories (textures, models, sounds, levels)
-Data/
-data/
+/Data/
+/data/
 Demos/
 Pilots/
 pilots/
@@ -178,6 +178,7 @@ forsaken_stereo.txt
 # build-time ETC2 pack (from PNG masters)
 Data/**/*.ktx2
 tools/texture/etc2enc
-shaders/*.spv
-vulkan_shaders.h
+forsaken_pc/shaders/*.spv
+forsaken_pc/src/rendering/vulkan_shaders.h
 .build-matrix/
+build_pc/

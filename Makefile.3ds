@@ -80,26 +80,23 @@ BUILD      := build_3ds
 PORTLIBS   := $(DEVKITPRO)/portlibs/3ds
 
 #---------------------------------------------------------------------------------
-# Source files - exclude SDL/desktop/networking-specific files
+# Source trees (same shape as t2k / mdk-sdl):
+#   forsaken_core/src/  the game -- compiled into BOTH targets
+#   forsaken_3ds/src/   this platform's layer only (libctru, Citro3D, ndsp)
+#   forsaken_pc/src/    the desktop layer -- never globbed here
+# Objects are keyed by basename ($(BUILD)/<name>.o), so basenames must stay
+# unique across all three trees.
 #---------------------------------------------------------------------------------
 
+CORE_SRCDIR := $(SRCDIR)/forsaken_core/src
+PLAT_SRCDIR := $(SRCDIR)/forsaken_3ds/src
+SRC_DIRS    := $(sort $(shell find $(CORE_SRCDIR) $(PLAT_SRCDIR) -type d))
+vpath %.c   $(SRC_DIRS)
+vpath %.cpp $(SRC_DIRS)
+
+# Core sources the 3DS build leaves out: the bot AI and its Lua binding are
+# platform-agnostic but are not shipped on 3DS.
 EXCLUDE_SRC := \
-	breakpad.cpp \
-	render_d3d.cpp \
-	main_sdl.c \
-	input_sdl.c \
-	input_dinput.c \
-	sound_openal.c \
-	music_openal.c \
-	sound_dsound.c \
-	texture_sdl.c \
-	texture_devil.c \
-	render_disabled.c \
-	net_enet.cpp \
-	net_enet_2.cpp \
-	net_tracker.cpp \
-	private_address.cpp \
-	lua_miniupnp.cpp \
 	botai_actions.cpp \
 	botai_path.cpp \
 	botai_sensors.cpp \
@@ -133,20 +130,17 @@ CFLAGS += -DRENDERER_C3D
 # falloff + accumulation, replacing the per-vertex CPU dynamic-light loop
 # in lights.c::XLight1Group. Validated on hardware; default-on.
 CFLAGS += -DGPU_LIGHTING
-EXCLUDE_SRC += render_vulkan.c
 
-ALL_SRC := $(notdir $(wildcard $(SRCDIR)/*.c))
+ALL_SRC := $(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.c))))
 CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
 OFILES  := $(CFILES:.c=.o)
 
-# C-with-classes phase 2 (AGENTS.md 9): root-level .cpp files compile as C++
+# C-with-classes (AGENTS.md 9): .cpp files in the source trees compile as C++
 # with the contract's language flags (-fno-exceptions -fno-rtti: the banned
 # constructs must not merely be discouraged, they must not compile). There are
-# none today; the machinery exists so the first converted module builds with
-# the same flags the audit gate expects, and so the gates' "3DS build scope"
-# claim stays true (a root-level .cpp is in scope for the gates, therefore it
-# must be in the build).
-CXXFILES := $(filter-out $(EXCLUDE_SRC),$(notdir $(wildcard $(SRCDIR)/*.cpp)))
+# the gates' "3DS build scope" claim stays true: every .cpp under the core and
+# 3DS trees is in scope for the gates, therefore it must be in the build.
+CXXFILES := $(filter-out $(EXCLUDE_SRC),$(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp)))))
 CXXOFILES := $(CXXFILES:.cpp=.o)
 OFILES += $(CXXOFILES)
 # Link with the C++ driver when any C++ object exists: it pulls libstdc++ and
@@ -234,9 +228,13 @@ endif
 
 
 
-# Include paths - note isystem for the source dir so #include <header.h> works
-CFLAGS += -isystem $(SRCDIR) \
-	-I$(SRCDIR) \
+# Include paths. Project includes are root-relative to a source tree
+# ("game/ships.h", "platform_3ds/main_3ds.h"). Both trees are also -isystem,
+# as the flat root was before the reorg: GCC lets -isystem win over -I for the
+# same directory, so project headers keep being treated as system headers
+# exactly as they were (object code proven identical across the move).
+CFLAGS += -isystem $(CORE_SRCDIR) -isystem $(PLAT_SRCDIR) \
+	-I$(CORE_SRCDIR) -I$(PLAT_SRCDIR) \
 	-I$(PORTLIBS)/include \
 	-I$(PORTLIBS)/include/lua5.1 \
 	-I$(DEVKITPRO)/libctru/include
@@ -315,9 +313,10 @@ FORCE: ;
 # render_c3d.c does `#include "render_c3d_shbin.h"` to get the shader bytecode
 # baked into the binary. Without this rule, a developer who edited the .pica
 # would see no behavioral change because picasso runs but xxd never gets called
-SHADER_PICA   := $(SRCDIR)/shaders/render_c3d.v.pica
-SHADER_SHBIN  := $(SRCDIR)/shaders/render_c3d.shbin
-SHADER_HEADER := $(SRCDIR)/render_c3d_shbin.h
+SHADER_DIR    := $(SRCDIR)/forsaken_3ds/shaders
+SHADER_PICA   := $(SHADER_DIR)/render_c3d.v.pica
+SHADER_SHBIN  := $(SHADER_DIR)/render_c3d.shbin
+SHADER_HEADER := $(PLAT_SRCDIR)/rendering/render_c3d_shbin.h
 
 $(SHADER_SHBIN): $(SHADER_PICA)
 	@echo "Compiling vertex shader $<..."
@@ -325,8 +324,8 @@ $(SHADER_SHBIN): $(SHADER_PICA)
 
 $(SHADER_HEADER): $(SHADER_SHBIN)
 	@echo "Generating $@..."
-	@cd $(SRCDIR) && xxd -i shaders/render_c3d.shbin | \
-	  sed 's/shaders_render_c3d_shbin/render_c3d_shbin/g' > render_c3d_shbin.h
+	@cd $(SHADER_DIR)/.. && xxd -i shaders/render_c3d.shbin | \
+	  sed 's/shaders_render_c3d_shbin/render_c3d_shbin/g' > $@
 
 # Force render_c3d.o to depend on the shader header so editing .pica triggers
 # both the shader rebuild and the renderer source recompile.
@@ -472,7 +471,7 @@ $(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
 	@echo "Linking $(notdir $@)..."
 	$(LINK_CC) $(LDFLAGS) $^ $(LIBS) -o $@
 
-$(BUILD)/%.o: $(SRCDIR)/%.c $(STAMP)
+$(BUILD)/%.o: %.c $(STAMP)
 	@echo $(notdir $<)
 	@mkdir -p $(BUILD)
 	$(CC) -MMD -MP -MF $(BUILD)/$*.d $(CFLAGS) -c $< -o $@
@@ -482,7 +481,7 @@ $(BUILD)/%.o: $(SRCDIR)/%.c $(STAMP)
 # and -fcommon are C-only spellings: gnu99 would override the C++ standard
 # if it came last, and -fcommon is the C default GCC already rejects in C++.
 CXX_BASE_FLAGS := $(filter-out -std=gnu99 -fcommon,$(CFLAGS))
-$(BUILD)/%.o: $(SRCDIR)/%.cpp $(STAMP)
+$(BUILD)/%.o: %.cpp $(STAMP)
 	@echo $(notdir $<)
 	@mkdir -p $(BUILD)
 	$(CXX) -MMD -MP -MF $(BUILD)/$*.d $(CXX_BASE_FLAGS) $(CXXFLAGS_ADD) -c $< -o $@

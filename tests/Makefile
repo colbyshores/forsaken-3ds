@@ -14,37 +14,38 @@
 
 CC      := gcc
 CXX     := g++
-INCLUDE := -I.. $(shell pkg-config --cflags sdl2)
+CORE    := ../forsaken_core/src
+INCLUDE := -I$(CORE) $(shell pkg-config --cflags sdl2)
 CXXFLAGS := -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti
 
 all: test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d
 
-test_secwalk: test_secwalk.cpp ../ailib.cpp
-	$(CXX) $(CXXFLAGS) -o $@ test_secwalk.cpp ../ailib.cpp -lm
+test_secwalk: test_secwalk.cpp $(CORE)/ai/ailib.cpp
+	$(CXX) $(CXXFLAGS) -o $@ test_secwalk.cpp $(CORE)/ai/ailib.cpp -lm
 	./test_secwalk
 
-test_checkhitenemy: test_checkhitenemy.cpp ../checkenemy.cpp ../sphere.cpp
-	$(CXX) $(CXXFLAGS) -DCHE_PREFILTER -o $@ test_checkhitenemy.cpp ../checkenemy.cpp ../sphere.cpp -lm
+test_checkhitenemy: test_checkhitenemy.cpp $(CORE)/game/checkenemy.cpp $(CORE)/math/sphere.cpp
+	$(CXX) $(CXXFLAGS) -DCHE_PREFILTER -o $@ test_checkhitenemy.cpp $(CORE)/game/checkenemy.cpp $(CORE)/math/sphere.cpp -lm
 	./test_checkhitenemy
 
-test_stereomemo: test_stereomemo.c ../stereomemo.cpp
-	$(CXX) $(CXXFLAGS) -o $@ test_stereomemo.c ../stereomemo.cpp
+test_stereomemo: test_stereomemo.c $(CORE)/rendering/stereomemo.cpp
+	$(CXX) $(CXXFLAGS) -o $@ test_stereomemo.c $(CORE)/rendering/stereomemo.cpp
 	./test_stereomemo
 
-test_modules: test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
-	$(CXX) $(CXXFLAGS) -o $@ test_modules.cpp ../dsp_adpcm.cpp ../hunk_alloc.cpp
+test_modules: test_modules.cpp $(CORE)/audio/dsp_adpcm.cpp $(CORE)/util/hunk_alloc.cpp
+	$(CXX) $(CXXFLAGS) -o $@ test_modules.cpp $(CORE)/audio/dsp_adpcm.cpp $(CORE)/util/hunk_alloc.cpp
 	./test_modules
 
-test_quat: test_quat.cpp ../quat.cpp ../new3d.cpp
-	$(CXX) $(CXXFLAGS) -o $@ test_quat.cpp ../quat.cpp ../new3d.cpp -lm
+test_quat: test_quat.cpp $(CORE)/math/quat.cpp $(CORE)/math/new3d.cpp
+	$(CXX) $(CXXFLAGS) -o $@ test_quat.cpp $(CORE)/math/quat.cpp $(CORE)/math/new3d.cpp -lm
 	./test_quat
 
-test_sphere: test_sphere.cpp ../sphere.cpp ../new3d.cpp
-	$(CXX) $(CXXFLAGS) -o $@ test_sphere.cpp ../sphere.cpp ../new3d.cpp -lm
+test_sphere: test_sphere.cpp $(CORE)/math/sphere.cpp $(CORE)/math/new3d.cpp
+	$(CXX) $(CXXFLAGS) -o $@ test_sphere.cpp $(CORE)/math/sphere.cpp $(CORE)/math/new3d.cpp -lm
 	./test_sphere
 
-test_new3d: test_new3d.cpp ../new3d.cpp
-	$(CXX) $(CXXFLAGS) -o $@ test_new3d.cpp ../new3d.cpp -lm
+test_new3d: test_new3d.cpp $(CORE)/math/new3d.cpp
+	$(CXX) $(CXXFLAGS) -o $@ test_new3d.cpp $(CORE)/math/new3d.cpp -lm
 	./test_new3d
 
 clean:

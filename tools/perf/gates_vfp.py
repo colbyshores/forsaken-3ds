@@ -14,9 +14,10 @@ seed_map, the Finding/AuditResult/Function/Exemption/HotEntry dataclasses, the
 exemption grammar regex, and scan_function's R2-R8 rule logic).
 
 Forsaken adaptations (see the task brief / contract):
-  * Scope is ROOT-LEVEL *.c/*.h only, minus EXCLUDE_SRC from Makefile.3ds and
-    the two GL sources the default citro3d renderer excludes. No SRC_ROOTS
-    rglob, no ``.inc`` fragments, no PC tree.
+  * Scope is the 3DS build's source trees (forsaken_core/src + forsaken_3ds/src),
+    minus EXCLUDE_SRC from Makefile.3ds and the two GL sources the default
+    citro3d renderer excludes. No ``.inc`` fragments, no PC tree. Keys are
+    basenames (see CXX_EXTS).
   * R1 covers main.c + music_3ds.c only (no sys::Thread wrapper exists here).
   * R6 LIBM_RE extended with floor/ceil/fmod (this tree's floorf debt).
   * R10 requires the devkitPro ARCH baseline + -fno-math-errno and bans
@@ -82,12 +83,24 @@ DEFAULT_CORPUS = CONTRACTS_DIR / "hotpath_corpus.json"
 DEFAULT_LOG = RUNNER_DIR / "logs" / "vfp_audit.json"
 MAKEFILE = REPO_ROOT / "Makefile.3ds"
 
-# Forsaken is C today, but the numeric contract (R1-R11) must cover the tree
-# when the C-with-classes phase starts: the C++ extensions are in scope from
-# now so a converted file cannot slip past R2/R3/R4/R6/R11 by being a .cpp.
-# Scope stays ROOT-LEVEL (no .inc fragments -- T2K's renderer is split across
-# pasted .inc files; here the renderer is a single render_c3d.c) and follows
-# the 3DS build via EXCLUDE_SRC.
+# Source trees (same shape as t2k / mdk-sdl). The 3DS build compiles CORE +
+# 3DS, so that is gate scope; the PC tree is outside it, as the PC-only files
+# always were (they used to be filtered out via EXCLUDE_SRC).
+CORE_SRC_REL = Path("forsaken_core/src")
+PLAT_3DS_SRC_REL = Path("forsaken_3ds/src")
+PLAT_PC_SRC_REL = Path("forsaken_pc/src")
+BUILD_TREES_REL = (CORE_SRC_REL, PLAT_3DS_SRC_REL)
+ALL_TREES_REL = (CORE_SRC_REL, PLAT_3DS_SRC_REL, PLAT_PC_SRC_REL)
+
+# The numeric contract (R1-R11) covers C and C++ alike: a converted file cannot
+# slip past R2/R3/R4/R6/R11 by being a .cpp. No .inc fragments (T2K's renderer
+# is split across pasted .inc files; here the renderer is a single render_c3d.c).
+#
+# Findings, baselines, the hot corpus and exemptions are keyed by source
+# BASENAME ("ships.cpp"), not by path. Both Makefiles already key objects by
+# basename, so basenames are unique across the trees by construction;
+# in_scope_files() fails loudly if that ever stops being true. Basename keys
+# keep every baseline entry valid when a file moves between subdirectories.
 CXX_EXTS = {".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".hh"}
 
 INIT_NAME_RE = re.compile(
@@ -240,10 +253,30 @@ class HotEntry:
 
 
 def repo_rel(path: Path) -> str:
+    """Report/key name for a path: the BASENAME for a file inside a source tree
+    (the gate key, see CXX_EXTS above), else the repo-relative path."""
     try:
-        return path.resolve().relative_to(REPO_ROOT).as_posix()
+        rel = path.resolve().relative_to(REPO_ROOT)
     except ValueError:
         return path.as_posix()
+    if any(rel.parts[:len(t.parts)] == t.parts for t in ALL_TREES_REL):
+        return path.name
+    return rel.as_posix()
+
+
+def source_trees(root: Path | None = None, *, include_pc: bool = False) -> list[Path]:
+    """Absolute source-tree roots under `root` (default: the repo)."""
+    root = root or REPO_ROOT
+    rels = ALL_TREES_REL if include_pc else BUILD_TREES_REL
+    return [root / t for t in rels]
+
+
+def find_source(name: str, root: Path | None = None) -> Path | None:
+    """The in-scope file whose basename is `name`, or None."""
+    for path in in_scope_files(root):
+        if path.name == name:
+            return path
+    return None
 
 
 def _is_under(path: Path, prefix: Path) -> bool:
@@ -299,14 +332,24 @@ def parse_exclude_src(makefile: Path = MAKEFILE) -> set[str]:
 
 
 def in_scope_files(root: Path | None = None) -> list[Path]:
-    """Root-level *.c/*.h compiled by Makefile.3ds, in a stable order."""
-    root = root or REPO_ROOT
+    """Sources compiled by Makefile.3ds (core + 3DS trees), ordered by basename.
+
+    Basename order is the order the flat root used to give, so reports and
+    first-hit behaviour are unchanged by the tree layout.
+    """
     excl = parse_exclude_src()
-    out: list[Path] = []
-    for path in sorted(root.iterdir()):
-        if path.is_file() and path.suffix in CXX_EXTS and path.name not in excl:
-            out.append(path)
-    return out
+    by_name: dict[str, Path] = {}
+    for tree in source_trees(root):
+        for path in tree.rglob("*"):
+            if path.is_file() and path.suffix in CXX_EXTS and path.name not in excl:
+                if path.name in by_name:
+                    raise SystemExit(
+                        f"duplicate source basename {path.name}: {by_name[path.name]} and "
+                        f"{path} -- basenames are the gate keys and the object names; "
+                        "they must be unique across the source trees"
+                    )
+                by_name[path.name] = path
+    return [by_name[name] for name in sorted(by_name)]
 
 
 def iter_cxx_files(root: Path | None = None) -> Iterator[Path]:
@@ -909,13 +952,20 @@ def include_graph(
     present = {p.resolve(): p for p in files}
     includes: dict[Path, set[Path]] = {p: set() for p in files}
     includers: dict[Path, set[Path]] = {p: set() for p in files}
+    # Quoted includes resolve the way the compiler does: the including file's
+    # directory first, then each source-tree root (-I), in order.
+    roots = source_trees()
     for path in files:
         try:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
         for match in LOCAL_INCLUDE_RE.finditer(text):
-            src = present.get((path.parent / match.group(1)).resolve())
+            src = None
+            for base in (path.parent, *roots):
+                src = present.get((base / match.group(1)).resolve())
+                if src is not None:
+                    break
             if src is not None and src != path:
                 includes[path].add(src)
                 includers[src].add(path)
@@ -974,8 +1024,8 @@ def gate_r1(root: Path | None = None) -> list[Finding]:
     any_fpscr = False
     listed = set(R1_THREAD_SITES)
     for rel in R1_THREAD_SITES:
-        path = base / rel
-        if not path.exists():
+        path = find_source(rel, base)
+        if path is None:
             findings.append(
                 Finding("R1", "MUST", rel, 0, "missing", True, "seed", None,
                         "required thread site missing")
