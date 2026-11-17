@@ -79,6 +79,9 @@ def main():
     for fname in SCAN_FILES:
         p = find_source(fname)
         if p is None:
+            # A scan file that cannot be found must FAIL, not skip: a skip
+            # turns this gate into a silent no-op the moment files move.
+            failures.append(f"{fname}: not found in the source trees (moved/renamed? update gate)")
             continue
         for name, body in function_bodies(p.read_text(errors="replace")):
             bodies[(fname, name)] = body
