@@ -48,8 +48,9 @@ five configurations; `tools/verify_o0.sh` where `-O2` scheduling differs):
   blocks, incl. every D3D execute-buffer remnant), conditionals on 28
   obsolete macros, 61 prototypes for functions that do not exist
   (~4,300 lines).
-- `tools/verify_identical.sh` also proves the PC `DEBUG=1` build
-  (`host-debug`), the only one compiling `DEBUG_ON`/`DEBUG_COMP` code.
+- `tools/verify_identical.sh` proves 3DS remaster/original and PC `host`
+  (default `DEBUG=1`, the only build compiling `DEBUG_ON` code) and
+  `host-release` (`DEBUG=0`).
 - Build: header dependencies are tracked on 3DS again (they never were).
 
 Bugs found (separate, labelled commits): `primary.cpp` indexed
@@ -231,7 +232,7 @@ cd /tmp/cxxN && make 2>&1 | grep -E "error:|undefined" | head
 ls projectx   # must exist
 
 # 3DS build (in main tree is fine; it is out-of-tree via BUILD=)
-make -f Makefile.3ds BUILD=/tmp/cxx-bN EDITION=remaster SLIM=1
+make -f Makefile.3ds BUILD=/tmp/cxx-bN EDITION=remaster
 ls forsaken3ds.3dsx && rm -f forsaken3ds.3dsx forsaken3ds.elf \
   forsaken3ds.smdh forsaken3ds.map && rm -rf .romfs_staging
 
@@ -248,8 +249,7 @@ always also check the artifact exists. Emulator smoke
 load; KB: `~/Documents/port-docs/50-tooling/mandarine-emulator-
 location-and-version-pinning.md`): run the 3DS build on your own
 Xvfb display (tenants run Perfect Dark concurrently — never kill
-a PID you didn't create), confirm the fresh
-`~/.local/share/mandarine-emu/sdmc/forsaken_boot.log` and menu.
+a PID you didn't create), confirm it reaches the title menu.
 
 ## 5. Perf-gate re-keying (renames break filename keys)
 

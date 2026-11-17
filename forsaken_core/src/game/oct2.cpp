@@ -1497,26 +1497,6 @@ void DrawSimplePanel()
 			(render_info.window_size.cy >> 1) - (FontHeight*2) ,
 			2 );
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
-	/* Stereo diagnostic overlay — kept behind the "Show stereo debug"
-	   menu toggle. The SD-card file log was removed: fopen / fprintf /
-	   fclose on sdmc:/ every 20 frames cost enough milliseconds per
-	   write to visibly hitch frame pacing. On-screen text is free. */
-	{
-		if (g_show_stereo_debug)
-		{
-			
-			char _dbg[64];
-			float _slider = platform_get_3d_slider();
-			sprintf(_dbg, "slider: %.3f",  _slider);
-			Print4x5Text(_dbg, FontWidth, FontHeight*2, 1);
-			sprintf(_dbg, "eye_sep: %.2f", render_info.stereo_eye_sep);
-			Print4x5Text(_dbg, FontWidth, FontHeight*3, 1);
-			sprintf(_dbg, "stereo: %s", render_info.stereo_enabled ? "on" : "off");
-			Print4x5Text(_dbg, FontWidth, FontHeight*4, 1);
-		}
-	}
-#endif
 }
 
 void ReleaseLevel(void)

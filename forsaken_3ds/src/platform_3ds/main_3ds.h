@@ -34,11 +34,6 @@ void platform_delay(u_int32_t ms);
  * Use when copying structs out of a raw byte-parsed buffer. */
 void memcpy_unaligned(void *dst, const void *src, size_t n);
 
-/* Returns the 3D slider state (0.0–1.0).
- * On real hardware this is osGet3DSliderState().
- * In emulators that always return 0 you can override it by setting
- * stereo_test_slider = <value> in Configs/debug.txt (3DS-only config key). */
-
 /* Citro3D context/present glue (render_c3d.c). These replace the old
  * picaGL-named shim; picaGL itself is gone. */
 void c3d_context_init(void);

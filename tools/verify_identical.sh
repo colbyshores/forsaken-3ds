@@ -19,9 +19,10 @@
 # Both go in through VERIFY_CFLAGS / ADD_CFLAGS, which only this script sets
 # (VERIFY_CFLAGS is in Makefile.3ds FORBIDDEN_FLAGS: it can never ship).
 #
-# Configurations: 3DS {remaster,original} x {release,DEBUG=1}, and the PC host
-# build (EDITION=remaster) x {release,DEBUG=1} -- the PC DEBUG=1 build is the
-# only one that compiles DEBUG_ON/DEBUG_COMP/DEBUG_VIEWPORT/DEBUG_SPOTFX_SOUND. Env: JOBS (default nproc), VERIFY_DIR (default
+# Configurations: 3DS {remaster,original}, and the PC host build
+# (EDITION=remaster) as `host` (the PC Makefile's default DEBUG=1: -O0, and the
+# only build compiling DEBUG_ON/DEBUG_COMP/DEBUG_VIEWPORT/DEBUG_SPOTFX_SOUND)
+# and `host-release` (DEBUG=0: -O3). Env: JOBS (default nproc), VERIFY_DIR (default
 # /tmp/forsaken-verify; base builds are cached per commit there), CONFIGS
 # (subset, e.g. CONFIGS="3ds-remaster host"), INCREMENTAL=1 (reuse work objects).
 set -u
@@ -30,7 +31,7 @@ ROOT=$PWD
 BASE_REF=${1:-HEAD}
 JOBS=${JOBS:-$(nproc)}
 VERIFY_DIR=${VERIFY_DIR:-/tmp/forsaken-verify}
-CONFIGS=${CONFIGS:-"3ds-remaster 3ds-original 3ds-remaster-debug 3ds-original-debug host host-debug"}
+CONFIGS=${CONFIGS:-"3ds-remaster 3ds-original host host-release"}
 OD3DS=${DEVKITARM:-/opt/devkitpro/devkitARM}/bin/arm-none-eabi-objdump
 export DEVKITPRO=${DEVKITPRO:-/opt/devkitpro} DEVKITARM=${DEVKITARM:-/opt/devkitpro/devkitARM}
 
@@ -61,14 +62,13 @@ build() {
 	fi
 	case $cfg in
 	3ds-*)
-		local ed=${cfg#3ds-}; ed=${ed%-debug}
-		local dbg=; [ "${cfg%-debug}" != "$cfg" ] && dbg="DEBUG=1"
-		(cd "$tree" && make -f Makefile.3ds EDITION="$ed" $dbg BUILD="$out/$cfg" \
+		local ed=${cfg#3ds-}
+		(cd "$tree" && make -f Makefile.3ds EDITION="$ed" BUILD="$out/$cfg" \
 			VERIFY_CFLAGS="$vf" "$tree/forsaken3ds.elf" -j"$JOBS") > "$log" 2>&1 \
 			&& cp "$tree/forsaken3ds.elf" "$out/$cfg/linked.elf"
 		;;
-	host|host-debug)
-		local dbg=; [ "$cfg" = host-debug ] && dbg="DEBUG=1"
+	host|host-release)
+		local dbg=; [ "$cfg" = host-release ] && dbg="DEBUG=0"
 		# The PC Makefile has no flag stamp: never reuse host objects.
 		rm -rf "${out:?}/$cfg"; mkdir -p "$out/$cfg"
 		# -DNDEBUG: in C++ glibc's assert() passes __builtin_LINE(), which

@@ -19,7 +19,6 @@
 #include "util/util.h"
 #include "rendering/render.h"
 #include "util/hunk_alloc.h"
-#include "scripting/lua_config.h"
 #include "audio/sound_3ds.h"
 
 
@@ -166,11 +165,6 @@ void vfp_thread_fz_dn(void)
 	 * honors the write before gameplay started. */
 	(void)vfp_set_fz_dn();
 }
-
-/* Runtime flag — when true, DrawSimplePanel prints raw 3D-slider value,
- * stereo_eye_sep, and the on/off state so we can diagnose binary-seeming
- * slider behavior. Config key: ShowStereoDebug. Default off. */
-bool g_show_stereo_debug = false;
 
 /* ---- unaligned memcpy for ARM -----------------------------------------
  *
@@ -373,13 +367,6 @@ bool platform_init_video(void)
 
 float platform_get_3d_slider(void)
 {
-	/* Check for a test override first (useful when testing in Mandarine/Citra
-	 * which may return 0 from osGet3DSliderState).
-	 * Set   stereo_test_slider = 0.5   in Configs/debug.txt.
-	 * A negative value means "use the real hardware slider". */
-	float override = config_get_float("stereo_test_slider", -1.0f);
-	if (override >= 0.0f)
-		return override > 1.0f ? 1.0f : override;
 	float v = osGet3DSliderState();
 	if (v < 0.0f) v = 0.0f;
 	if (v > 1.0f) v = 1.0f;

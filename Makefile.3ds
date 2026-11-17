@@ -11,20 +11,13 @@
 #                                           # ISO assets + tracks 02-10) and
 #                                           # extract_remaster_levels.py (for
 #                                           # the KPF levels + tracks 11-19).
-#   make -f Makefile.3ds DEBUG=1   # debug build (__3DS_DEBUG__ defined)
-#                                   # enables: autoboot to Volcano level
+#   make -f Makefile.3ds release            # the public release artifacts
 #
-
-# Debug flag — set to 1 to enable __3DS_DEBUG__ features
-DEBUG ?= 0
 
 # Edition: original (default — 1998 game) or remaster (Forsaken Remastered
 # levels + music). The remaster build still uses the 1998 ISO for UI assets
 # (fonts, splash, decals) since the KPF lacks them — see README.
 EDITION ?= original
-# MODEL_VIS_CACHE=1 memoises the per-model visibility/clip-group predicate per camera (render-path optimisation, A/B gated)
-VIS_CFLAGS := $(if $(MODEL_VIS_CACHE),-DMODEL_VIS_CACHE,)
-# RAM is approximated; platform/scheduler/GPU behavior remain New 3DS.
 
 
 #---------------------------------------------------------------------------------
@@ -89,7 +82,6 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-Wno-implicit-int -Wno-int-conversion \
 	-ffunction-sections -fdata-sections -fcommon \
 	-fno-math-errno \
-	$(VIS_CFLAGS) \
 	-std=gnu99 \
 	-D__3DS__ \
 	-DBSP \
@@ -130,32 +122,6 @@ else
 LINK_CC := $(CXX)
 endif
 CXXFLAGS_ADD := -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics
-
-#
-# __3DS_DEBUG__ is the unified diagnostic gate. When defined:
-#   - god mode + all weapons + autoboot enabled (singleplayer.c)
-#   - trace() writes to sdmc:/forsaken_trace.txt and dispatches via
-#     svcOutputDebugString (main_3ds.c — release builds get an empty
-#     body so call sites compile to nothing, no SD I/O on shipping CIAs)
-#
-#
-ifeq ($(DEBUG),1)
-CFLAGS += -D__3DS_DEBUG__
-endif
-
-# DEBUG_AUTOBOOT_SLOT=N overrides the DEBUG-build autoboot target (which
-# defaults to slot 0 / vol2). Useful for testing a specific level's boss
-# rendering: e.g. DEBUG_AUTOBOOT_SLOT=19 boots biolab (Maldroid),
-# DEBUG_AUTOBOOT_SLOT=18 boots munitions (DreadNaught). Independent of
-# AUTOTEST_REMASTER (which has its own AUTOTEST_FIRST_LEVEL knob).
-ifneq ($(DEBUG_AUTOBOOT_SLOT),)
-CFLAGS += -DDEBUG_AUTOBOOT_SLOT=$(DEBUG_AUTOBOOT_SLOT)
-endif
-
-# DEBUG_WARP_TO_BOSS=1 - branch-local one-shot warp.
-ifeq ($(DEBUG_WARP_TO_BOSS),1)
-CFLAGS += -DDEBUG_WARP_TO_BOSS
-endif
 
 ifeq ($(EDITION),remaster)
 CFLAGS += -DEDITION_REMASTER
@@ -223,7 +189,7 @@ all: $(OUTPUT_3DSX)
 
 # --- Build-flag stamp -------------------------------------------------------
 # Compiler flags change the code but are invisible to the -MMD dependency
-# files, so switching flags (DEBUG=1 <-> release, EDITION, ...) in the same
+# files, so switching flags (EDITION, VERIFY_CFLAGS, ...) in the same
 # build directory would relink stale objects built with the old flags. The
 # stamp records the complete flag set; when it changes, the stamp file gets
 # a fresh mtime and, because every object depends on it, the whole tree
@@ -378,24 +344,9 @@ $(OUTPUT_SMDH):
 	@echo "Creating SMDH..."
 	smdhtool --create "Forsaken" "3DS port of ForsakenX" "ForsakenX" $(SMDH_ICON) $@
 
-ifeq ($(SLIM),1)
-# SLIM=1: build a tiny .3dsx (no embedded romfs) plus a separate
-# forsaken.romfs file. Used for the iteration loop — push the small
-# .3dsx via 3dslink (~5 MB / ~12 sec) and keep the romfs uploaded
-# once at sdmc:/3ds/forsaken/forsaken.romfs. The engine's
-# platform_init() prefers the SD romfs over the embedded one.
-$(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP) forsaken.romfs
-	@echo "Creating slim 3DSX (no embedded romfs)..."
-	3dsxtool $< $@ --smdh=$(OUTPUT_SMDH)
-
-forsaken.romfs: $(ROMFS_STAMP)
-	@echo "Building standalone forsaken.romfs..."
-	$(DEVKITPRO)/tools/bin/mkromfs3ds $(ROMFS_STAGING) $@
-else
 $(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP)
 	@echo "Creating 3DSX..."
 	3dsxtool $< $@ --smdh=$(OUTPUT_SMDH) --romfs=$(ROMFS_STAGING)
-endif
 
 $(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
 	@echo "Linking $(notdir $@)..."
@@ -503,41 +454,29 @@ $(if $(STALE_DFILES),$(shell rm -f $(STALE_DFILES)))
 
 # ─── Release pipeline ────────────────────────────────────────────────
 #
-# `make -f Makefile.3ds release` produces three artifacts ready to
+# `make -f Makefile.3ds release` produces five artifacts ready to
 # upload to archive.org, all from a clean tree:
 #
-#   forsaken3ds.cia            — UniqueId 0xff4ba (current shipping)
-#   forsaken3ds_alt.cia        — UniqueId 0xff4bb (alternate ID for
-#                                Title-ID-collision recovery: if a user
-#                                has another homebrew on 0xff4ba already,
-#                                they install this variant instead)
-#   forsaken3ds.3dsx           — fat build with full romfs (dspfirm.cdc
-#                                bundled, auto-stages on first boot).
-#                                For Homebrew Launcher users who do not
-#                                want a CIA install.
+#   forsaken3ds.cia            — UniqueId 0xff4ba, unified primary (runtime
+#                                memory-tier detection picks heap + textures)
+#   forsaken3ds_alt.cia        — UniqueId 0xff4bb, same build; for users with
+#                                another homebrew already on 0xff4ba
+#   forsaken3ds_himem.cia      — UniqueId 0xff4be, requests OG HIMEM (512²
+#                                textures on OGs whose HOME menu grants it)
+#   forsaken3ds_himem_alt.cia  — UniqueId 0xff4bf, title-slot fallback
+#   forsaken3ds.3dsx           — Homebrew Launcher build, romfs without
+#                                dspfirm.cdc (safe to redistribute)
 #
-# **HARD RULE — DO NOT VIOLATE**:
-#   Production builds MUST NOT include any debug flag. The release
-#   target asserts this and refuses to build if any of the following
-#   are set in the environment or on the make command line:
-#
-#       DEBUG, AUTOTEST_REMASTER, DEBUG_AUTOBOOT_SLOT,
-#       DEBUG_WARP_TO_BOSS, DEATH_SIM, AUTOBOOT_SP, DEBUG_RAMQAN_FIRE
-#
-#   Background: 2026-05-07 we shipped a CIA with AUTOTEST_REMASTER baked
-#   in because a previous diagnostic build's .o files were reused
-#   without `make clean`. Players got a level-cycler instead of a game.
-#   The release target guards against that with three layers:
-#     1. Refuse to run if any debug flag env var is set
-#     2. Force `make clean` before invoking the production builds
-#     3. arm-none-eabi-strings | grep "AUTOTEST:|autoboot:|autotest_tick"
-#        must return zero hits before any artifact is allowed to upload
-#
-# Add new debug flags to the FORBIDDEN_FLAGS list when you introduce
-# them. Better to over-block than ship another sweep build by accident.
+# Release builds are clean, full builds with the shipping flag set only:
+#   1. release-check refuses to run if VERIFY_CFLAGS (the verification-only
+#      knob) is set in the environment or on the command line;
+#   2. `make clean` runs before the production builds, so no object from a
+#      previous build can be reused (the build-flag stamp also forces a full
+#      rebuild whenever the flag set changes).
+#   Background: 2026-05-07 a CIA shipped with autotest code baked in because
+#   a previous diagnostic build's objects were reused without a clean.
 
-FORBIDDEN_FLAGS := DEBUG AUTOTEST_REMASTER DEBUG_AUTOBOOT_SLOT \
-                   DEATH_SIM AUTOBOOT_SP DEBUG_RAMQAN_FIRE VERIFY_CFLAGS
+FORBIDDEN_FLAGS := VERIFY_CFLAGS
 
 OUTPUT_CIA_ALT      := $(SRCDIR)/$(TARGET)_alt.cia
 RSF_FILE_ALT        := $(BUILD)/forsaken_alt.rsf
@@ -545,12 +484,12 @@ RSF_FILE_ALT        := $(BUILD)/forsaken_alt.rsf
 .PHONY: release release-check $(OUTPUT_CIA_ALT)
 
 release-check:
-	@echo "[release] Verifying no debug flags are set..."
+	@echo "[release] Verifying the flag environment..."
 	@for f in $(FORBIDDEN_FLAGS); do \
 		v=$$(eval echo \$$$$f); \
 		if [ -n "$$v" ]; then \
 			echo "[release] ABORT: forbidden flag $$f=$$v is set."; \
-			echo "[release] Production builds must have NO debug flags."; \
+			echo "[release] Production builds use the shipping flags only."; \
 			echo "[release] Unset it in your environment and re-run."; \
 			exit 1; \
 		fi; \
@@ -644,20 +583,6 @@ release-3dsx: $(OUTPUT_ELF) $(OUTPUT_SMDH) $(CIA_ROMFS_STAMP)
 	3dsxtool $(OUTPUT_ELF) $(OUTPUT_3DSX) --smdh=$(OUTPUT_SMDH) --romfs=$(CIA_ROMFS)
 	@echo "[release] Production 3dsx written: $(OUTPUT_3DSX)"
 
-# Strings-grep sanity check. Catches any debug-flag string that snuck
-# into the binary (defense in depth — release-check blocks the env,
-# this catches a stale .o that bypassed the clean somehow). Runs
-# AFTER all artifacts build so a fresh ELF is on disk.
-.PHONY: release-strings-check
-release-strings-check: $(OUTPUT_ELF)
-	@echo "[release] Sanity-grepping production ELF for debug strings..."
-	@n=$$(arm-none-eabi-strings $(OUTPUT_ELF) | grep -cE "AUTOTEST:|autoboot:|autotest_tick|DEATH_SIM|DEBUG_RAMQAN" || true); \
-	if [ "$$n" != "0" ]; then \
-		echo "[release] ABORT: $$n debug-flag strings present in $(OUTPUT_ELF)."; \
-		echo "[release] Aborting before any artifact ships. Investigate."; \
-		exit 1; \
-	fi; \
-	echo "[release] $(OUTPUT_ELF) is clean ✓"
 # Top-level release target. Forces a clean build first so no stale .o
 # files survive from previous diagnostic runs.
 release: release-check
@@ -669,8 +594,6 @@ release: release-check
 	@echo "[release] Building HIMEM opt-in CIAs (primary + alt)..."
 	@$(MAKE) -f Makefile.3ds EDITION=remaster \
 		$(OUTPUT_CIA_HIMEM) $(OUTPUT_CIA_HIMEM_ALT)
-	@echo "[release] Final sanity-grep on production ELF..."
-	@$(MAKE) -f Makefile.3ds release-strings-check
 	@echo
 	@echo "============================================================"
 	@echo "[release] DONE — five artifacts ready for archive.org:"

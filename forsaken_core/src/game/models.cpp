@@ -922,29 +922,17 @@ void KillAttachedSpotFX( u_int16_t i )
 }
 
 /*===================================================================
-*		Per-camera model visibility memo (MODEL_VIS_CACHE)
+*		Per-camera model visibility buckets
 *
-*	ModelDisp is called once per visible group (measured ~11.8x/frame on
-*	powerdown, wave-7d) and each call walks the WHOLE Models[] list
-*	(~500 entries), re-testing visibility for every model: 5848 loop
-*	iterations/frame, 8.4 ms/frame. That test depends only on
-*	(Models[i].Visible, Models[i].Group, IsGroupVisible[], the camera view
-*	group, InTitle) plus the per-model ClipGroup selection, none of which
-*	changes during one camera traversal, so it is memoised per camera.
-*	The predicate result and the list walk order are unchanged, so the
-*	submission sequence - and every drawn polygon - is identical.
+*	ModelDisp is called once per visible group and used to walk the WHOLE
+*	Models[] list (~500 entries) each time, re-testing visibility for every
+*	model. That test depends only on (Models[i].Visible, Models[i].Group,
+*	IsGroupVisible[], the camera view group, InTitle) plus the per-model
+*	ClipGroup, none of which changes during one camera traversal, so the
+*	visible models are bucketed by clip group once per camera and each
+*	ModelDisp call walks only its own bucket, in Models[] list order. The
+*	submission sequence - and every drawn polygon - is unchanged.
 ===================================================================*/
-#ifdef MODEL_VIS_CACHE
-static u_int8_t  VisCacheVis[MAXNUMOFMODELS];
-static u_int16_t VisCacheClip[MAXNUMOFMODELS];
-static u_int32_t VisCacheStamp[MAXNUMOFMODELS];
-static u_int32_t VisCacheFrame;
-#ifdef MODEL_VIS_CACHE
-static u_int8_t VisCacheValid[MAXNUMOFMODELS];
-#endif
-static u_int8_t  VisCacheTitle;
-
-#endif
 
 static u_int16_t VisBucketHead[MAXGROUPS];
 static u_int16_t VisBucketTail[MAXGROUPS];
@@ -998,52 +986,14 @@ static void ModelVisBucket_Build( int InTitle )
 
 void ModelVisCache_NewFrame( void )
 {
-#ifdef MODEL_VIS_CACHE
-	VisCacheFrame++;
-#endif
 	VisBucketDirty = 1;
 }
 
-/* Draw guard: with bucketing the model is already known to be visible and
- * already known to belong to this group; without it the predicate decides. */
+/* Rebuild the buckets when the camera, the title/game pass or the model
+ * list changed since the last build. */
 #define MODEL_BUCKET_REFRESH(InTitle) \
 	do { if( VisBucketDirty || VisBucketTitle != (u_int8_t)((InTitle)?1:0) || VisBucketGeneration != ModelVisGeneration ) \
 		ModelVisBucket_Build( InTitle ); } while(0)
-#define MODEL_DRAW_GUARD(i, InTitle, group, ClipGroup)  ( 1 )
-
-/* True if model i may be drawn for the current camera; *clipout receives
- * its clip group. Identical semantics with and without the memo - the flag
- * only removes the redundant recomputation of the same answer. */
-static inline int ModelVisibleWithClip( u_int16_t i, int InTitle, u_int16_t * clipout )
-{
-#ifdef MODEL_VIS_CACHE
-	int vis;
-	if( VisCacheValid[i] && VisCacheStamp[i] == VisCacheFrame && VisCacheTitle == (u_int8_t)(InTitle ? 1 : 0) )
-	{
-		*clipout = VisCacheClip[i];
-		return VisCacheVis[i];
-	}
-	vis = Models[ i ].Visible &&
-		( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
-			CAMERA_VIEW_IS_VALID &&
-			VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[ i ].Group, NULL )
-		) );
-	*clipout = ( Models[ i ].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
-	VisCacheStamp[i] = VisCacheFrame;
-	VisCacheVis[i] = (u_int8_t)( vis ? 1 : 0 );
-	VisCacheClip[i] = *clipout;
-	VisCacheValid[i] = 1;
-	return vis;
-#else
-	int vis = Models[ i ].Visible &&
-		( InTitle || IsGroupVisible[ Models[ i ].Group ] || (
-			CAMERA_VIEW_IS_VALID &&
-			VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[ i ].Group, NULL )
-		) );
-	*clipout = ( Models[ i ].Flags & MODFLAG_UseClipGroup ) ? Models[i].ClipGroup : Models[i].Group;
-	return vis;
-#endif
-}
 
 
 bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
@@ -1065,15 +1015,6 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 	if( NamePnt == &ModelNames[0] ) InTitle = false;
 	else InTitle = true;
 	MODEL_BUCKET_REFRESH( InTitle );
-#ifdef MODEL_VIS_CACHE
-	if( VisCacheTitle != (u_int8_t)(InTitle ? 1 : 0) )
-	{
-		/* Title and gameplay passes use different predicate inputs; keep
-		 * them in separate cache generations. */
-		VisCacheTitle = (u_int8_t)(InTitle ? 1 : 0);
-		VisCacheFrame++;
-	}
-#endif
 
 	/* Walk only this group's models, in list order (the bucket chains are
 	 * tail-appended in Models[] list order). ClipGroup is implied. */
@@ -1083,333 +1024,328 @@ bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt
 		nextmodel = VisBucketNext[i];
 		ClipGroup = VisBucketClip[i];
 
-		if( MODEL_DRAW_GUARD( i, InTitle, group, ClipGroup ) )
+		if( ClipGroup == group )
 		{
+			switch( Models[i].Func )
 			{
-				if( ClipGroup == group )
-				{
-					switch( Models[i].Func )
-					{
-						case MODFUNC_Fade:
-							break;
-						case MODFUNC_ReScale:
-							break;
+				case MODFUNC_Fade:
+					break;
+				case MODFUNC_ReScale:
+					break;
 
-						case MODFUNC_Explode:
-						case MODFUNC_Regen:
-						case MODFUNC_Scale:
-						case MODFUNC_Scale2:
-						case MODFUNC_SphereZone:
-							ApplyMatrix( &CurrentCamera.Mat, &Forward, &TempVector );
-							TempQuat.FromVector2(&TempVector);
-							TempQuat.ToMatrix(&Models[ i ].Mat);
-							TempMatrix = MATRIX_Identity;
-							TempMatrix._11 = Models[i].Scale;
-							TempMatrix._22 = Models[i].Scale;
-							TempMatrix._33 = Models[i].Scale;
-							MatrixMultiply( &TempMatrix, &Models[i].Mat, &Models[i].Mat );
-							MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-							break;
+				case MODFUNC_Explode:
+				case MODFUNC_Regen:
+				case MODFUNC_Scale:
+				case MODFUNC_Scale2:
+				case MODFUNC_SphereZone:
+					ApplyMatrix( &CurrentCamera.Mat, &Forward, &TempVector );
+					TempQuat.FromVector2(&TempVector);
+					TempQuat.ToMatrix(&Models[ i ].Mat);
+					TempMatrix = MATRIX_Identity;
+					TempMatrix._11 = Models[i].Scale;
+					TempMatrix._22 = Models[i].Scale;
+					TempMatrix._33 = Models[i].Scale;
+					MatrixMultiply( &TempMatrix, &Models[i].Mat, &Models[i].Mat );
+					MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+					break;
 			
-						case MODFUNC_RealScale:
-							Models[ i ].Mat = MATRIX_Identity;
-							Models[ i ].Mat._11 = Models[i].Scale;
-							Models[ i ].Mat._22 = 1.0F; //Models[i].Scale;
-							Models[ i ].Mat._33 = Models[i].Scale;
-							MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-							break;
+				case MODFUNC_RealScale:
+					Models[ i ].Mat = MATRIX_Identity;
+					Models[ i ].Mat._11 = Models[i].Scale;
+					Models[ i ].Mat._22 = 1.0F; //Models[i].Scale;
+					Models[ i ].Mat._33 = Models[i].Scale;
+					MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+					break;
 
-						case MODFUNC_ScaleXYZandRotate:
-							TempMatrix = MATRIX_Identity;
-							TempMatrix._11 *= Models[i].Xscale;
-							TempMatrix._22 *= Models[i].Yscale;
-							TempMatrix._33 *= Models[i].Zscale;
+				case MODFUNC_ScaleXYZandRotate:
+					TempMatrix = MATRIX_Identity;
+					TempMatrix._11 *= Models[i].Xscale;
+					TempMatrix._22 *= Models[i].Yscale;
+					TempMatrix._33 *= Models[i].Zscale;
 
-							BuildRotMatrix(HoloRot.x, HoloRot.y, HoloRot.z, &TempRotMatrix);
+					BuildRotMatrix(HoloRot.x, HoloRot.y, HoloRot.z, &TempRotMatrix);
 							
 
-							MatrixMultiply( &TempMatrix, &TempRotMatrix, &Models[i].Mat );
-							MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-							break;
+					MatrixMultiply( &TempMatrix, &TempRotMatrix, &Models[i].Mat );
+					MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+					break;
 						
-						case MODFUNC_ScaleDonut:
-							Models[ i ].Mat = MATRIX_Identity;
-							Models[ i ].Mat._11 = Models[i].Scale;
-							Models[ i ].Mat._22 = Models[i].Scale;
-							Models[ i ].Mat._33 = Models[i].Scale;
-							MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
-							break;
+				case MODFUNC_ScaleDonut:
+					Models[ i ].Mat = MATRIX_Identity;
+					Models[ i ].Mat._11 = Models[i].Scale;
+					Models[ i ].Mat._22 = Models[i].Scale;
+					Models[ i ].Mat._33 = Models[i].Scale;
+					MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
+					break;
 
-						case MODFUNC_Nothing:
-						default:
-							break;
+				case MODFUNC_Nothing:
+				default:
+					break;
 
-					}
+			}
 
-					ENV( &ModelHeaders[Models[i].ModelNum] , &Models[i].Mat , &Models[i].Pos);
+			ENV( &ModelHeaders[Models[i].ModelNum] , &Models[i].Mat , &Models[i].Pos);
 				
-					TempWorld._11 = Models[i].InvMat._11;
-					TempWorld._12 = Models[i].InvMat._12;
-					TempWorld._13 = Models[i].InvMat._13;
-					TempWorld._14 = Models[i].InvMat._14;
-					TempWorld._21 = Models[i].InvMat._21;
-					TempWorld._22 = Models[i].InvMat._22;
-					TempWorld._23 = Models[i].InvMat._23;
-					TempWorld._24 = Models[i].InvMat._24;
-					TempWorld._31 = Models[i].InvMat._31;
-					TempWorld._32 = Models[i].InvMat._32;
-					TempWorld._33 = Models[i].InvMat._33;
-					TempWorld._34 = Models[i].InvMat._34;
-					TempWorld._41 = Models[i].Pos.x;
-					TempWorld._42 = Models[i].Pos.y;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					TempWorld._43 = Models[i].Pos.z;
-					TempWorld._44 = Models[i].InvMat._44;
+			TempWorld._11 = Models[i].InvMat._11;
+			TempWorld._12 = Models[i].InvMat._12;
+			TempWorld._13 = Models[i].InvMat._13;
+			TempWorld._14 = Models[i].InvMat._14;
+			TempWorld._21 = Models[i].InvMat._21;
+			TempWorld._22 = Models[i].InvMat._22;
+			TempWorld._23 = Models[i].InvMat._23;
+			TempWorld._24 = Models[i].InvMat._24;
+			TempWorld._31 = Models[i].InvMat._31;
+			TempWorld._32 = Models[i].InvMat._32;
+			TempWorld._33 = Models[i].InvMat._33;
+			TempWorld._34 = Models[i].InvMat._34;
+			TempWorld._41 = Models[i].Pos.x;
+			TempWorld._42 = Models[i].Pos.y;
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+			TempWorld._43 = Models[i].Pos.z;
+			TempWorld._44 = Models[i].InvMat._44;
 
-					if (!FSSetWorld(&TempWorld))
-					{
-						Msg( "ModelDisp() SetMatrix1 Failed\n" );
-						return false;
-					}
+			if (!FSSetWorld(&TempWorld))
+			{
+				Msg( "ModelDisp() SetMatrix1 Failed\n" );
+				return false;
+			}
 					
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					// TODO - BEEF UP LOD LEVEL HANDLING (read notes bellow)
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+			// TODO - BEEF UP LOD LEVEL HANDLING (read notes bellow)
 
-					// set ModelNum = 0 bellow for best lod level
-					// set ModelNum = ModelHeaders[Models[i].ModelNum].LOD bellow for worst lod level
+			// set ModelNum = 0 bellow for best lod level
+			// set ModelNum = ModelHeaders[Models[i].ModelNum].LOD bellow for worst lod level
 					
-					// should probably add a switch to completely disable this...
+			// should probably add a switch to completely disable this...
 
-					/*	Execute it	*/
-					temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos ); 
+			/*	Execute it	*/
+			temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos ); 
 		
-					// this is for objects that dont' support diff lod values like in title room
-	 				if( ModelHeaders[Models[i].ModelNum].LOD == 0 )
-					{
-						ModelNum = 0;
-					}
+			// this is for objects that dont' support diff lod values like in title room
+ 			if( ModelHeaders[Models[i].ModelNum].LOD == 0 )
+			{
+				ModelNum = 0;
+			}
 
-					// objects that support lod
+			// objects that support lod
+			else
+			{
+				{
+					// appears the larger you make this number 
+					// the farther away we can see the object with better lod's
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+					// we should probably make this a global so people can control it on it's own
+					float distance = CurrentCamera.UseLowestLOD ? 
+									6144.0F	:	// down grade for smaller cams
+									12288.0F;	// larger value for full screen
+
+					// appears to be based on how many many pickups need to be rendered
+					temp2 = ( temp + ( ( (float) NumPickupsPerGroup[ group ] ) * ( 128.0F * GLOBAL_SCALE ) ) );
+								
+					// wtf is this?
+					if( temp2 >= ( ( distance * GLOBAL_SCALE )  * ( (float) ModelHeaders[Models[i].ModelNum].LOD ) )  )
+					{
+						// sets it to the lowest value
+						ModelNum = ModelHeaders[Models[i].ModelNum].LOD;
+					}
 					else
 					{
+						// wtf is this ?
+						ModelNum = (u_int16_t) ( temp2 / (distance*GLOBAL_SCALE )  );
+
+						// make sure we don't select a value larger than acceptable
+						if( ModelNum > ModelHeaders[ Models[i].ModelNum ].LOD )
 						{
-							// appears the larger you make this number 
-							// the farther away we can see the object with better lod's
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							// we should probably make this a global so people can control it on it's own
-							float distance = CurrentCamera.UseLowestLOD ? 
-											6144.0F	:	// down grade for smaller cams
-											12288.0F;	// larger value for full screen
+							ModelNum = ModelHeaders[Models[i].ModelNum].LOD;
+						}
+					}
+				}
+			}
 
-							// appears to be based on how many many pickups need to be rendered
-							temp2 = ( temp + ( ( (float) NumPickupsPerGroup[ group ] ) * ( 128.0F * GLOBAL_SCALE ) ) );
-								
-							// wtf is this?
-							if( temp2 >= ( ( distance * GLOBAL_SCALE )  * ( (float) ModelHeaders[Models[i].ModelNum].LOD ) )  )
-							{
-								// sets it to the lowest value
-								ModelNum = ModelHeaders[Models[i].ModelNum].LOD;
-							}
-							else
-							{
-								// wtf is this ?
-								ModelNum = (u_int16_t) ( temp2 / (distance*GLOBAL_SCALE )  );
+			// END OF TODO
 
-								// make sure we don't select a value larger than acceptable
-								if( ModelNum > ModelHeaders[ Models[i].ModelNum ].LOD )
-								{
-									ModelNum = ModelHeaders[Models[i].ModelNum].LOD;
-								}
-							}
+			ModelNum += Models[i].ModelNum;
+		
+			if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
+			{
+				DoDisplay = true;
+
+				if( NamePnt[ ModelNum ].DoIMorph )
+				{
+					if( ( Models[i].Flags & MODFLAG_StealthOffset ) && ( Models[i].Flags & MODFLAG_Stealth ) )
+					{
+						if( !InterpFrames( &MxaModelHeaders[ ModelNum + Models[i].StealthOffset ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
+						{
+							Msg( "ModelDisp() InterpFrames() Failed\n" );
+							return false;
+						}
+					}
+					else
+					{
+						if( !InterpFrames( &MxaModelHeaders[ ModelNum ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
+						{
+							Msg( "ModelDisp() InterpFrames() Failed\n" );
+							return false;
 						}
 					}
 
-					// END OF TODO
-
-					ModelNum += Models[i].ModelNum;
-		
-					if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
-					{
-						DoDisplay = true;
-
-						if( NamePnt[ ModelNum ].DoIMorph )
-						{
-							if( ( Models[i].Flags & MODFLAG_StealthOffset ) && ( Models[i].Flags & MODFLAG_Stealth ) )
-							{
-								if( !InterpFrames( &MxaModelHeaders[ ModelNum + Models[i].StealthOffset ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-								{
-									Msg( "ModelDisp() InterpFrames() Failed\n" );
-									return false;
-								}
-							}
-							else
-							{
-								if( !InterpFrames( &MxaModelHeaders[ ModelNum ], Models[i].Frame, Models[i].InterpFrame, Models[i].InterpTime ) )
-								{
-									Msg( "ModelDisp() InterpFrames() Failed\n" );
-									return false;
-								}
-							}
-
-							x1.x = 0.0F;
-							x1.y = 0.0F;
-							x1.z = 0.0F;
-							x2 = x1;
+					x1.x = 0.0F;
+					x1.y = 0.0F;
+					x1.z = 0.0F;
+					x2 = x1;
 
 #ifndef FINAL_RELEASE
-							CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
-												  &Models[i].TempLines[ 0 ], Models[i].Group );
+					CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
+										  &Models[i].TempLines[ 0 ], Models[i].Group );
 #endif
 
-							ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
+					ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
 
 
-							if( Models[i].Flags & MODFLAG_AmbientLight )
-							{
-								GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
-								AmbientLightMxaModel( &MxaModelHeaders[ ModelNum ],
-												Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
-							}else if( Models[i].Flags & MODFLAG_RealLight )
-							{
-								TempMatrix = Models[i].Mat;
-								TempMatrix._41 = Models[i].Pos.x;
-								TempMatrix._42 = Models[i].Pos.y;
-								TempMatrix._43 = Models[i].Pos.z;
-								XLightMxaloadHeader( &MxaModelHeaders[ ModelNum ], &Models[i].Pos, Models[i].Radius, &TempMatrix );
-							}
+					if( Models[i].Flags & MODFLAG_AmbientLight )
+					{
+						GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
+						AmbientLightMxaModel( &MxaModelHeaders[ ModelNum ],
+										Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
+					}else if( Models[i].Flags & MODFLAG_RealLight )
+					{
+						TempMatrix = Models[i].Mat;
+						TempMatrix._41 = Models[i].Pos.x;
+						TempMatrix._42 = Models[i].Pos.y;
+						TempMatrix._43 = Models[i].Pos.z;
+						XLightMxaloadHeader( &MxaModelHeaders[ ModelNum ], &Models[i].Pos, Models[i].Radius, &TempMatrix );
+					}
 
-							if( Models[i].Flags & MODFLAG_Stealth )
-							{
-								if( Models[i].Flags & MODFLAG_StealthOffset )
-								{
-									ModelNum += Models[i].StealthOffset;
-								}
-								else
-								{
-									ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
-								}
-
-								if( !LightMxaModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
-							}
-
-							if( !( Models[i].Flags & MODFLAG_RealLight ) &&
-								!( Models[i].Flags & MODFLAG_Stealth ) &&
-								!( Models[i].Flags & MODFLAG_AmbientLight ) &&
-								!( Models[i].Flags & MODFLAG_Original ) )
-							{
-								UpdateMxaModel( &MxaModelHeaders[ ModelNum ] );
-							}
-
-
-							if( DoDisplay )
-							{
-#ifdef RENDERER_C3D
-								/* Same eligibility check as the
-								 * static-mxload path: BGOBJECT models
-								 * (animated doors, vents) get no shine. */
-								{
-									c3d_set_object_shine_eligible(
-									    Models[i].OwnerType != OWNER_BGOBJECT);
-								}
-#endif
-							if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
-							{
-#ifdef RENDERER_C3D
-								{ c3d_set_object_shine_eligible(true); }
-#endif
-								Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
-#ifdef NEW_LIGHTING
-								render_reset_lighting_variables();
-#endif
-								return false;
-							}
-#ifdef RENDERER_C3D
-								{ c3d_set_object_shine_eligible(true); }
-#endif
-							}
-
-#ifdef NEW_LIGHTING
-							render_reset_lighting_variables();
-#endif
+					if( Models[i].Flags & MODFLAG_Stealth )
+					{
+						if( Models[i].Flags & MODFLAG_StealthOffset )
+						{
+							ModelNum += Models[i].StealthOffset;
 						}
 						else
 						{
-							x1.x = 0.0F;
-							x1.y = 0.0F;
-							x1.z = 0.0F;
-							x2 = x1;
+							ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
+						}
+
+						if( !LightMxaModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
+					}
+
+					if( !( Models[i].Flags & MODFLAG_RealLight ) &&
+						!( Models[i].Flags & MODFLAG_Stealth ) &&
+						!( Models[i].Flags & MODFLAG_AmbientLight ) &&
+						!( Models[i].Flags & MODFLAG_Original ) )
+					{
+						UpdateMxaModel( &MxaModelHeaders[ ModelNum ] );
+					}
+
+
+					if( DoDisplay )
+					{
+#ifdef RENDERER_C3D
+						/* Same eligibility check as the
+						 * static-mxload path: BGOBJECT models
+						 * (animated doors, vents) get no shine. */
+						{
+							c3d_set_object_shine_eligible(
+							    Models[i].OwnerType != OWNER_BGOBJECT);
+						}
+#endif
+					if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
+					{
+#ifdef RENDERER_C3D
+						{ c3d_set_object_shine_eligible(true); }
+#endif
+						Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
+#ifdef NEW_LIGHTING
+						render_reset_lighting_variables();
+#endif
+						return false;
+					}
+#ifdef RENDERER_C3D
+						{ c3d_set_object_shine_eligible(true); }
+#endif
+					}
+
+#ifdef NEW_LIGHTING
+					render_reset_lighting_variables();
+#endif
+				}
+				else
+				{
+					x1.x = 0.0F;
+					x1.y = 0.0F;
+					x1.z = 0.0F;
+					x2 = x1;
 
 #ifndef FINAL_RELEASE
-							CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
-												 &Models[i].TempLines[ 0 ], Models[i].Group );
+					CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
+										 &Models[i].TempLines[ 0 ], Models[i].Group );
 #endif
 
-							if( Models[i].Flags & MODFLAG_AmbientLight )
-							{
-								GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
-								AmbientLightMxModel( &ModelHeaders[ ModelNum ],
-												Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
-							}else if( Models[i].Flags & MODFLAG_RealLight )
-							{
-								TempMatrix = Models[i].Mat;
-								TempMatrix._41 = Models[i].Pos.x;
-								TempMatrix._42 = Models[i].Pos.y;
-								TempMatrix._43 = Models[i].Pos.z;
-								XLightMxloadHeader( &ModelHeaders[ ModelNum ], &Models[i].Pos, 
-									Models[i].Radius, &TempMatrix );
-							}
+					if( Models[i].Flags & MODFLAG_AmbientLight )
+					{
+						GetRealLightAmbient( &Models[i].Pos , &r , &g , &b );
+						AmbientLightMxModel( &ModelHeaders[ ModelNum ],
+										Models[i].Red, Models[i].Green, Models[i].Blue, 0 , r , g , b);
+					}else if( Models[i].Flags & MODFLAG_RealLight )
+					{
+						TempMatrix = Models[i].Mat;
+						TempMatrix._41 = Models[i].Pos.x;
+						TempMatrix._42 = Models[i].Pos.y;
+						TempMatrix._43 = Models[i].Pos.z;
+						XLightMxloadHeader( &ModelHeaders[ ModelNum ], &Models[i].Pos, 
+							Models[i].Radius, &TempMatrix );
+					}
 
-							if( Models[i].Flags & MODFLAG_Stealth )
-							{
-								if( Models[i].Flags & MODFLAG_StealthOffset )
-								{
-									ModelNum += Models[i].StealthOffset;
-								}
-								else
-								{
-									ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
-								}
+					if( Models[i].Flags & MODFLAG_Stealth )
+					{
+						if( Models[i].Flags & MODFLAG_StealthOffset )
+						{
+							ModelNum += Models[i].StealthOffset;
+						}
+						else
+						{
+							ModelNum += ( ModelHeaders[Models[i].ModelNum].LOD + 1 );
+						}
 
-								if( !LightMxModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
+						if( !LightMxModel( ModelNum, &Models[i].Pos, (float) Models[i].Red, (float) Models[i].Green, (float) Models[i].Blue, 255.0F ) ) DoDisplay = false;
 
-							}
+					}
 
 
-							if( DoDisplay )
-							{
+					if( DoDisplay )
+					{
 #ifdef RENDERER_C3D
-								/* Phong specular reads as tacky on
-								 * BGOBJECT models (doors, vents, large
-								 * flat decorations). Disable shine for
-								 * those, keep it on enemies / pickups /
-								 * mines / nobody-owned. */
-								{
-									c3d_set_object_shine_eligible(
-									    Models[i].OwnerType != OWNER_BGOBJECT);
-								}
+						/* Phong specular reads as tacky on
+						 * BGOBJECT models (doors, vents, large
+						 * flat decorations). Disable shine for
+						 * those, keep it on enemies / pickups /
+						 * mines / nobody-owned. */
+						{
+							c3d_set_object_shine_eligible(
+							    Models[i].OwnerType != OWNER_BGOBJECT);
+						}
 #endif
-								if( ExecuteMxloadHeader( &ModelHeaders[ ModelNum ], i ) != true)
-								{
+						if( ExecuteMxloadHeader( &ModelHeaders[ ModelNum ], i ) != true)
+						{
 #ifdef RENDERER_C3D
-									{ c3d_set_object_shine_eligible(true); }
+							{ c3d_set_object_shine_eligible(true); }
 #endif
-									Msg( "ModelDisp() ExecuteMxloadHeader for %s Failed\n",
-										&ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
-#ifdef NEW_LIGHTING
-									render_reset_lighting_variables();
-#endif
-									return false;
-								}
-#ifdef RENDERER_C3D
-								{ c3d_set_object_shine_eligible(true); }
-#endif
-							}
-
+							Msg( "ModelDisp() ExecuteMxloadHeader for %s Failed\n",
+								&ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
 #ifdef NEW_LIGHTING
 							render_reset_lighting_variables();
 #endif
+							return false;
 						}
+#ifdef RENDERER_C3D
+						{ c3d_set_object_shine_eligible(true); }
+#endif
 					}
+
+#ifdef NEW_LIGHTING
+					render_reset_lighting_variables();
+#endif
 				}
 			}
 		}

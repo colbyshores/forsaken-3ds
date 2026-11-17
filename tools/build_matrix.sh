@@ -30,9 +30,7 @@ run() {
 }
 
 run 3ds-original        make -f Makefile.3ds EDITION=original BUILD="$BUILDDIR/3ds-original" "$PWD/forsaken3ds.elf" -j"$JOBS"
-run 3ds-original-debug  make -f Makefile.3ds EDITION=original DEBUG=1 BUILD="$BUILDDIR/3ds-original-debug" "$PWD/forsaken3ds.elf" -j"$JOBS"
 run 3ds-remaster        make -f Makefile.3ds EDITION=remaster BUILD="$BUILDDIR/3ds-remaster" "$PWD/forsaken3ds.elf" -j"$JOBS"
-run 3ds-remaster-debug  make -f Makefile.3ds EDITION=remaster DEBUG=1 BUILD="$BUILDDIR/3ds-remaster-debug" "$PWD/forsaken3ds.elf" -j"$JOBS"
 run host-original       make EDITION=original -j"$JOBS"
 run host-remaster       make EDITION=remaster -j"$JOBS"
 run tests               make -C tests

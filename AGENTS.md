@@ -376,9 +376,9 @@ preallocate-in-hot-path, worker stack budgets — is **phase 2**.
   (`FMOD`/`FDIV`/`fast_sinf`/`fast_floorf`), no fixed array → container in
   a per-frame path, no allocation or exception in a hot path.
 - Every conversion or cleanup is proven before it merges:
-  `tools/verify_identical.sh BASE` builds the base and the change in all six
-  configurations (3DS remaster/original x release/`DEBUG=1`, PC release/
-  `DEBUG=1`) from clean and compares every object and the linked binary.
+  `tools/verify_identical.sh BASE` builds the base and the change in all four
+  configurations (3DS remaster/original, PC default `DEBUG=1` and
+  `DEBUG=0`) from clean and compares every object and the linked binary.
   Where `-O2` output differs only by scheduling, `tools/verify_o0.sh`
   recompiles those objects at `-O0`; equal `-O0` objects mean the compiler
   saw the same program. A change whose output legitimately differs is a

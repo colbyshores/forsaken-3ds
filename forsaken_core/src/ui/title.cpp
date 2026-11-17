@@ -1594,10 +1594,6 @@ MENU	MENU_NEW_VisualsStereo = {
 };
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-/* Declared in main_3ds.c — when true, DrawSimplePanel prints raw slider /
- * eye-sep / stereo-state to the HUD for diagnosing slider behavior. Saved
- * to config as ShowStereoDebug. */
-
 /* Declared in render_c3d.c. Toggle the new graphics features:
  *   g_object_shine — Phong specular highlight on enemy / pickup / crate
  *                    surfaces. Free if disabled (skips fragment-lighting
@@ -1631,9 +1627,8 @@ MENU	MENU_NEW_3DS_Visuals = {
 		{  0,   0, 200,  20, 0, (u_int8_t*)"3DS Visual Settings",	FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 },
 		{ 20,  40, 150,  40, 0, (u_int8_t*)"Object shine",			FONT_Small, TEXTFLAG_CentreY, &g_object_shine,      NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
 		{ 20,  56, 150,  56, 0, (u_int8_t*)"Wall detail",			FONT_Small, TEXTFLAG_CentreY, &g_wall_detail,       NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20,  72, 150,  72, 0, (u_int8_t*)"Show stereo debug",	FONT_Small, TEXTFLAG_CentreY, &g_show_stereo_debug, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20,  88, 150,  88, 0, (u_int8_t*)"Invert 3D depth",		FONT_Small, TEXTFLAG_CentreY, &g_stereo_invert,     NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
-		{ 20, 104, 100, 104, 0, (u_int8_t*)"back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
+		{ 20,  72, 150,  72, 0, (u_int8_t*)"Invert 3D depth",		FONT_Small, TEXTFLAG_CentreY, &g_stereo_invert,     NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
+		{ 20,  88, 100,  88, 0, (u_int8_t*)"back",					FONT_Small, TEXTFLAG_CentreY, NULL, NULL, MenuItemBack, DrawFlatMenuItem, NULL, 0 },
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -2654,8 +2649,7 @@ MENU	MENU_3DS_Visuals = {
 	{
 		{ 200, 128 + ( 0*16 ), 0, 0, 0, (u_int8_t*)"Object shine",      0, 0, &g_object_shine,      NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 128 + ( 1*16 ), 0, 0, 0, (u_int8_t*)"Wall detail",       0, 0, &g_wall_detail,       NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"Show stereo debug", 0, 0, &g_show_stereo_debug, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 128 + ( 3*16 ), 0, 0, 0, (u_int8_t*)"Invert 3D depth",   0, 0, &g_stereo_invert,     NULL, SelectToggle, DrawToggle, NULL, 0 },
+		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"Invert 3D depth",   0, 0, &g_stereo_invert,     NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
@@ -8837,9 +8831,6 @@ void GetGamePrefs( void )
 	CLAMP( GameType, MAX_GAMETYPE );
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-	/* ShowStereoDebug prints raw slider / eye-sep / state in the HUD +
-	 * writes sdmc:/forsaken_stereo.txt every ~1 s for remote diagnosis. */
-	g_show_stereo_debug = config_get_bool( "ShowStereoDebug", false );
 	g_object_shine      = config_get_bool( "ObjectShine",     true );
 	g_wall_detail       = config_get_bool( "WallDetail",      true );
 	g_stereo_invert     = config_get_bool( "Invert3D",        false );
@@ -8972,7 +8963,6 @@ void SetGamePrefs( void )
 	config_set_float( "StereoRightColor",		render_info.stereo_right_color );
 
 #if defined(__3DS__) && defined(RENDERER_C3D)
-	config_set_bool( "ShowStereoDebug", g_show_stereo_debug );
 	config_set_bool( "ObjectShine",     g_object_shine );
 	config_set_bool( "WallDetail",      g_wall_detail );
 	config_set_bool( "Invert3D",        g_stereo_invert );
