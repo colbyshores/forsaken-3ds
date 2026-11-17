@@ -15,6 +15,7 @@
 #   -D__LINE__=0               line shifts (removed dead code, moved comments)
 #                              do not change __LINE__ immediates
 #   -fmacro-prefix-map=ROOT/=  __FILE__ does not embed the checkout path
+#   -DNDEBUG (PC host only)    glibc's C++ assert() uses __builtin_LINE()
 # Both go in through VERIFY_CFLAGS / ADD_CFLAGS, which only this script sets
 # (VERIFY_CFLAGS is in Makefile.3ds FORBIDDEN_FLAGS: it can never ship).
 #
@@ -34,7 +35,10 @@ export DEVKITPRO=${DEVKITPRO:-/opt/devkitpro} DEVKITARM=${DEVKITARM:-/opt/devkit
 
 base_hash=$(git rev-parse --short=12 "$BASE_REF") || exit 2
 BASE_TREE=$VERIFY_DIR/tree-$base_hash
-BASE_OUT=$VERIFY_DIR/out-$base_hash
+# Bump FLAGS_REV whenever the verification flags below change: base builds are
+# cached per (commit, flag revision), never compared across flag sets.
+FLAGS_REV=2
+BASE_OUT=$VERIFY_DIR/out-$base_hash-f$FLAGS_REV
 WORK_OUT=$VERIFY_DIR/work
 mkdir -p "$VERIFY_DIR"
 
@@ -57,8 +61,12 @@ build() {
 			&& cp "$tree/forsaken3ds.elf" "$out/$cfg/linked.elf"
 		;;
 	host)
+		# The PC Makefile has no flag stamp: never reuse host objects.
+		rm -rf "${out:?}/$cfg"; mkdir -p "$out/$cfg"
+		# -DNDEBUG: in C++ glibc's assert() passes __builtin_LINE(), which
+		# -D__LINE__=0 cannot pin; assert compiles away identically instead.
 		(cd "$tree" && make EDITION=remaster BUILD_PC="$out/$cfg" BIN="$out/$cfg/linked.elf" \
-			ADD_CFLAGS="$vf" "$out/$cfg/linked.elf" -j"$JOBS") > "$log" 2>&1
+			ADD_CFLAGS="$vf -DNDEBUG" "$out/$cfg/linked.elf" -j"$JOBS") > "$log" 2>&1
 		;;
 	esac
 }
@@ -73,7 +81,8 @@ disasm() {
 		# Section names embed mangled names under -ffunction-sections; drop
 		# the headers (functions still compare in emission order).
 		"$1" -d -r -C "$2" | tail -n +4 | grep -v '^Disassembly of section' |
-			sed -E ':a; s/\b([A-Za-z_][A-Za-z0-9_:~]*)\([^()]*\)( const)?/\1/g; ta'
+			sed -E ':a; s/\b([A-Za-z_][A-Za-z0-9_:~]*)\([^()]*\)( const)?/\1/g; ta' |
+			perl -pe 's{_ZZ(\d+)(\w+)}{my($n,$r)=($1,$2); my $f=substr($r,0,$n); ($r=~/E(\d+)([A-Za-z_]\w*)$/ && length($2)==$1) ? "_ZZ${n}${f}E$1$2" : "_ZZ$n$r"}ge; s{\.(rodata|bss|data|text)\._Z(\d+)(\w+?)\.}{".$1.".substr($3,0,$2)."."}ge'
 	else
 		"$1" -d -r "$2" | tail -n +4
 	fi
