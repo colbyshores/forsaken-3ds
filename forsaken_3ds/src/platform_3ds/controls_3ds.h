@@ -1,14 +1,19 @@
 #pragma once
-#include "util/platform.h"
-/*===================================================================
-	controls_3ds.h — user-customizable button + C-stick bindings.
 
-	Storage struct loaded from sdmc:/3ds/forsaken/controls.cfg at
-	startup, falls back to platform defaults (different defaults
-	for OG vs N3DS — OG lacks ZL/ZR so we move turbo to SELECT).
-	Bottom-screen rebind menu invoked from the in-game pause menu
-	or via the START+L chord. Save persists across sessions.
-===================================================================*/
+/* controls_3ds.h -- 3DS button bindings, their save file and the remap overlay
+ *
+ * controls_3ds.cpp owns one process-lifetime controls_3ds_t: platform
+ * defaults (OG hardware lacks ZL/ZR, so nitro moves to SELECT) overlaid
+ * by sdmc:/3ds/forsaken/controls.cfg, a hand-editable action=BUTTON file.
+ * Each controls_action_t value is also the engine joystick-button slot
+ * that input_3ds.cpp writes and config.cpp's DefaultJoystickSettings
+ * binds; the two must stay in lockstep. The remap menu is not modal: the
+ * pause menu opens it, oct2.cpp draws it each frame on the bottom screen,
+ * and controls_3ds_handle_input swallows HID input while it is open.
+ * C-stick fields are saved but not routed through the engine's mapping.
+ */
+
+#include "util/platform.h"
 
 
 #ifdef __3DS__

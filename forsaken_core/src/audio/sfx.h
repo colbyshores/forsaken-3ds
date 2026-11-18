@@ -1,5 +1,17 @@
 #pragma once
 
+/* sfx.h -- game sound effects: one-shots, positional, looping spot FX, speech
+ *
+ * sfx.cpp owns all of it: the SFX_* enum indexes its Sfx_Filenames[]
+ * table (keep the two in order), loaded buffers, the 64-slot looping /
+ * spot list, and biker and bike-computer speech. Play functions return a
+ * uid (0 = not played) that StopSfx and ModifyLoopingSfx take later.
+ * Positional volume uses straight-line distance plus the
+ * SoundInfo[listener group][source group] path penalty; a negative
+ * penalty means inaudible. Freq is a pitch multiplier, 0 = as recorded.
+ * Without SOUND_SUPPORT every entry point is a stub.
+ */
+
 #include "game/main.h"
 #include "game/enemies.h"
 

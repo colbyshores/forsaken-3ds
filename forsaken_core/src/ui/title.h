@@ -1,5 +1,18 @@
 #pragma once
 
+/* title.h -- menu system for the front end and the in-game pause menus
+ *
+ * title.cpp owns the static MENU / MENUITEM trees (process lifetime), the
+ * current menu (CurrentMenu, MenuChange / MenuBack) and the title-scene event
+ * timers that drive camera pans and disc animations. Item behaviour is held in
+ * function pointers: FuncSelect on activation, FuncDraw each frame; Variable
+ * and Value point at the setting an item edits.
+ *
+ * A menu's Item[] list ends at the first entry with x == -1. Item coordinates
+ * are VDU coordinates, not screen pixels. Timer Interval is in seconds; event
+ * StartTime / EndTime and timer CurrentTime are normalised 0..1.
+ */
+
 #include "ui/localtitle.h"
 
 #include "math/new3d.h"

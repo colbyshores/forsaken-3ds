@@ -1,5 +1,19 @@
-
 #pragma once
+
+/* text.h -- HUD bitmap-font printing and the in-game message queues
+ *
+ * text.cpp owns the font character map (InitFont, process lifetime), the
+ * MAX_MESSAGES-line message queues drawn by MessageQuePrint and
+ * PlayerMessageQuePrint, and the per-level trigger text read from the level
+ * .txt / .msg files (ReadTxtFile / ReadMsgFile, freed by FreeTxtFile /
+ * FreeMsgFile).
+ *
+ * Coordinates are screen pixels. Print4x5Text with x == -1 continues from the
+ * last printed x, returns the next x, and drops a line that would cross the
+ * bottom edge. Glyphs are queued as screen polys and appear when that pass
+ * draws. Colour arguments index Colourtrans[], which must match colors_t.
+ */
+
 #include "game/main.h"
 #include "game/constants.h"
 

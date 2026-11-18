@@ -1,5 +1,16 @@
 #pragma once
 
+/* input.h -- input seam: key, mouse and joystick state shared with the platform layer
+ *
+ * The platform layer (input_3ds.cpp on 3DS, input_sdl.cpp on PC) implements
+ * handle_events and the joystick setup; controls.cpp owns the state buffers.
+ * State is double-buffered by old_input / new_input, swapped once per frame
+ * by ReadInput; platform code must not swap them as well, or every
+ * PRESSED / RELEASED edge test reads two equal states. On 3DS there is no
+ * SDL: the SDLK_* codes and SDL_GetKeyboardState are emulated over
+ * _3ds_key_state. input_buffer collects key codes for the menus (mouse codes
+ * above SDLK_LAST, joystick codes from DIK_JOYSTICK).
+ */
 
 #include "game/main.h"
 

@@ -1,5 +1,19 @@
 #pragma once
 
+/* oct2.h -- game-state machine, per-frame driver and current-level globals
+ *
+ * oct2.cpp owns the level list (LevelNames, LevelNum / NewLevelNum, filled by
+ * InitLevels from a mission list), the current level's mesh and collision
+ * headers (Mloadheader, MCloadheader*), the view/projection state, and
+ * RenderScene, which runs one frame of whatever MyGameStatus selects.
+ * InitView / ReleaseView load and free the title or level assets by status.
+ * framelag is elapsed real seconds x 71; every per-tick rate in the engine is
+ * scaled by it, and it is forced to 0 while a menu is open in single player.
+ * real_framelag is the raw seconds. hfov, normal_fov and SetFOV are
+ * horizontal degrees. RenderBufs[4] are process-lifetime shared batch buffers:
+ * [0]/[1] vertex-only, [2] indexed 3D, [3] indexed pre-transformed 2D.
+ */
+
 #include "game/main.h"
 #include "data/mload.h"
 #include "math/new3d.h"

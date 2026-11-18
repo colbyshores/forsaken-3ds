@@ -1,4 +1,18 @@
 #pragma once
+
+/* main_3ds.h -- 3DS platform layer: boot, heaps, video init, timing
+ *
+ * main_3ds.cpp owns process start. Its __system_allocateHeaps override
+ * runs before main and sizes the malloc and linear heaps from the memory
+ * region the OS granted (>= 96 MB: 32 + 32 MB, otherwise 32 + 22 MB).
+ * platform_get_ticks is milliseconds since platform_init.
+ * Every thread that does float math calls vfp_set_fz_dn or
+ * vfp_thread_fz_dn at entry: FPSCR is per-thread and the engine assumes
+ * flush-to-zero with default NaN. memcpy_unaligned is a deliberately
+ * non-inlined byte copy for float-bearing structs read from byte-parsed
+ * file buffers. The c3d_* functions are defined in render_c3d.cpp.
+ */
+
 #include "util/platform.h"
 
 #include <3ds.h>

@@ -1,4 +1,17 @@
 #pragma once
+
+/* 2dtextures.h -- sprite and HUD frame tables loaded from .off offset files
+ *
+ * 2dtextures.cpp loads each file listed in OffsetFiles (level), Title_OffsetFiles
+ * or Splash_OffsetFiles into a FRAME_INFO and stores it through InfoPtrAddr
+ * in the matching *_Header global; oct2.cpp loads and frees each set with the
+ * title or level. A frame is a BIT_INFO run of OFF_INFOs; each OFF_INFO places
+ * one BOX_INFO (texture page, UV rect, pixel size) at an offset. Box_Info,
+ * Off_Info and Bit_Info point into the loaded file buffer, so the structs must
+ * match the file layout. OFF_INFO.box keeps the BOX_*FLIP flags in its top
+ * bits; mask with 0x0fff for the box index.
+ */
+
 #include "game/main.h"
 
 /*===================================================================

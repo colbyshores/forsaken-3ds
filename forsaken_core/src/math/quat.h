@@ -1,5 +1,13 @@
 #pragma once
 
+/* quat.h -- QUAT orientation type and the QUATLERP interpolation helper
+ *
+ * quat.cpp defines the members. QUAT is stored in OBJECT and in save and
+ * network data; SHORTQUAT is the network form (each component x 32767).
+ * MakeEuler takes degrees; MakeAxis takes radians. Layout and normalisation
+ * rules are in the block below.
+ */
+
 #include "game/main.h"
 #include "math/new3d.h"
 

@@ -1,5 +1,17 @@
 #pragma once
 
+/* config.h -- per-pilot settings: key bindings, sensitivities, weapon order
+ *
+ * config.cpp owns default_config and the active USERCONFIG behind
+ * player_config, plus the text reader and writer for a pilot file
+ * (pilots/<name>.txt), loaded when a pilot is chosen on the title screen.
+ * Each USERKEY holds up to MAX_KEYS_PER_CONTROL VirtualKeycodes: values
+ * below SDLK_LAST are keyboard keys, values up to DIK_JOYSTICK are mouse,
+ * and joystick buttons and POV directions are packed above DIK_JOYSTICK by
+ * the JOYSTICK_*_KEYCODE macros. On 3DS the joystick button numbers are
+ * the controls_3ds action slots. aim_assist_strength is clamped to 0..1.
+ */
+
 #define MAX_PLAYER_NAME_LENGTH	(16)
 
 #define MAX_KEYS_PER_CONTROL	(8)

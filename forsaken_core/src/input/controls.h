@@ -1,5 +1,15 @@
 #pragma once
 
+/* controls.h -- ship controls: per-frame SHIPCONTROL, bindings and flight constants
+ *
+ * controls.cpp owns ReadInput (the once-per-frame input read) and
+ * control_ship, which maps the player's USERCONFIG bindings onto a
+ * SHIPCONTROL each frame; it also holds the HUD display toggles, menu flash
+ * text and cheat codes. The flight constants are per framelag tick: speeds in
+ * world units (scaled by GLOBAL_SCALE), turn and roll rates and MAXBANKANGLE
+ * in degrees.
+ */
+
 #ifndef __3DS__
 #include <SDL.h>
 #endif

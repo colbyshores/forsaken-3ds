@@ -1,5 +1,11 @@
-
 #pragma once
+
+/* localtitle.h -- English strings for the front-end and pause menus
+ *
+ * Compile-time LT_* / LT_MENU_* string macros, used by title.cpp (via title.h)
+ * and by primary.cpp / secondary.cpp for weapon names. There is no runtime
+ * language selection.
+ */
 
 #define LT_MacroText1 "you ugly son of a bitch..." 
 #define LT_MacroText2 "Time to die..." 

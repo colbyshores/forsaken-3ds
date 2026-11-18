@@ -1,5 +1,18 @@
-
 #pragma once
+
+/* water.h -- level water: rippling surfaces that fill and drain per group
+ *
+ * water.cpp owns the per-level WATEROBJECTs (PreWaterLoad reads the level
+ * file, WaterLoad builds the objects later in the load) and the per-group
+ * tables GroupWaterInfo (WATERSTATE_*), GroupWaterLevel (world Y of the
+ * surface) and the tint colours. A surface is an XVerts x YVerts grid
+ * WATER_CELLSIZE world units apart, capped at MAXMESHX * MAXMESHY cells;
+ * Verts and Vels are per-vertex Y offsets and velocities. offset moves
+ * between MinLevel and MaxLevel at FillRate / DrainRate (file rates / 60,
+ * scaled by framelag) and fires Trigger_WhenFilled / _WhenDrained (0xffff =
+ * none) when it stops. InWater adds Damage * framelag to its out-parameter.
+ */
+
 #include "game/main.h"
 #include "game/constants.h"
 

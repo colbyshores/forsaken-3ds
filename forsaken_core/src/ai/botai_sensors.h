@@ -1,4 +1,14 @@
 #pragma once
+
+/* botai_sensors.h -- bot perception: walls, incoming fire, targets, pickups (LUA_BOT only)
+ *
+ * botai_sensors.cpp owns the bot's file-scope state: target ship, route
+ * node, wanted pickup, wall distances in NUM_SENSORS directions and
+ * time-to-impact estimates for incoming fire. BOTAI_UpdateSensors
+ * refreshes it once per frame before the action layer runs, and resets
+ * it when the bot dies.
+ */
+
 #ifdef LUA_BOT
 #include "ai/botai_main.h"
  

@@ -1,5 +1,17 @@
 #pragma once
 
+/* goal.h -- capture-the-flag goal zones
+ *
+ * goal.cpp owns the per-level goal array, loaded from the level's .GOL
+ * file only in flag games (no file = no goals). Each goal is a trigger
+ * zone; the host assigns goals to teams (SetTeamGoals), and a goal is
+ * GOALSTATE_On while its team has players. GoalCheckTeam tests a move
+ * from OldPos to NewPos against goals in or connected to Group: GOAL_SCORED
+ * for the team's own goal, GOAL_WRONG for entering another team's,
+ * GOAL_NONE otherwise. ProcessGoals recounts GoalTeamMembers (players per
+ * team) and TeamFlag (that team's players carrying a flag) every frame.
+ */
+
 #include "game/main.h"
 #include "game/constants.h"
 #define GOALSTATE_Off	(0)

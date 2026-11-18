@@ -1,4 +1,15 @@
 #pragma once
+
+/* botai_main.h -- common include and engine externs for the bot AI (LUA_BOT only)
+ *
+ * Pulls in the engine headers that the botai_*.cpp files and lua_bot.cpp
+ * need and declares the engine globals they read. It also defines
+ * SHIPCONTROL bot and the sensor constants (NUM_SENSORS, MIN_WALLDIST);
+ * since several translation units include it, enabling LUA_BOT would
+ * require moving that definition into one .cpp. No Makefile defines
+ * LUA_BOT, and the 3DS build excludes the bot sources outright.
+ */
+
 #ifdef LUA_BOT
 #include <stdio.h>
 #include "scripting/lua_api.h"

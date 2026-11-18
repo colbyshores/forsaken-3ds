@@ -1,5 +1,16 @@
 #pragma once
 
+/* sound.h -- low-level sound backend seam: buffers, sources, listener
+ *
+ * Implemented by sound_3ds.cpp (ndsp, SFX capped at 8 voices with the
+ * oldest evicted) and sound_openal.cpp; sound_dsound.cpp is a DirectSound
+ * backend neither Makefile selects. sfx.cpp is the only game-side caller.
+ * Units keep the DirectSound conventions: volume in millibels (0 = full,
+ * negative attenuates, sound_minimum_volume is the floor and is owned by
+ * sfx.cpp), pan in -10000..10000, pitch as a multiplier with 0 meaning
+ * as recorded. Each backend defines Sound3D.
+ */
+
 #include "game/main.h"
 #ifndef __3DS__
 #include <SDL.h>

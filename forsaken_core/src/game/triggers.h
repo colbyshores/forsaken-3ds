@@ -1,5 +1,17 @@
 #pragma once
 
+/* triggers.h -- level scripting: trigger variables, conditions and events
+ *
+ * triggers.cpp loads the level's .trg file (Triggerload); all tables are per
+ * level. A TRIGGERMOD applies an Op to a TRIGGERVAR's integer State, at once
+ * or after Time framelag ticks via the mod queue. A changed State re-tests
+ * each TRIGGER on that var against ActiveState; a CONDITION whose triggers
+ * are all Active is queued, and ProcessActiveConditions runs its EVENTs.
+ * EVENT.Data is raw bytes decoded per event type. Flag ops and tests number
+ * bits from 1. ApplyTriggerMod does nothing while framelag is 0 (paused).
+ * Gen/Regen/Copy* serialise trigger state for players joining a game.
+ */
+
 #include "net/networking.h"
 
 /*

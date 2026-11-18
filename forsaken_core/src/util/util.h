@@ -1,5 +1,16 @@
 #pragma once
 
+/* util.h -- logging, file-name helpers and the alignment-safe copy
+ *
+ * Msg() only logs (no dialog) and always reports OK. DebugPrintf writes to
+ * stderr only when Debug is set, and also to a timestamped file under Logs/
+ * when DebugLog is set. convert_path() lower-cases and converts backslashes
+ * into a static buffer that the next call overwrites.
+ *
+ * memcpy_unaligned is a byte-wise copy, defined in main_3ds.cpp on 3DS and in
+ * util.cpp elsewhere; use it for float-bearing structs read out of
+ * byte-parsed file buffers.
+ */
 
 #include "game/main.h"
 

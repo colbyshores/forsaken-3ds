@@ -1,4 +1,13 @@
 #pragma once
+
+/* botai_path.h -- bot routes over hand-placed nodes (LUA_BOT only)
+ *
+ * botai_path.cpp hardcodes world-space node positions for three
+ * multiplayer levels (alpha, fourball, ship; any other level uses the
+ * ship table) and walks them. This is not the engine's .nod AI node
+ * graph. Route direction is re-rolled after each death or kill.
+ */
+
 #ifdef LUA_BOT
 VECTOR BOTAI_NodeNetwork(int node);
 VECTOR BOTAI_NodeNetworkAlpha(int node);

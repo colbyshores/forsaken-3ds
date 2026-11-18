@@ -1,5 +1,18 @@
 #pragma once
 
+/* file.h -- thin file-system helpers over POSIX
+ *
+ * file.cpp passes every path through convert_path (util.cpp), which turns
+ * backslashes into '/' and lowercases the whole path into one static
+ * buffer, so a converted path is valid only until the next call. Engine
+ * data paths are written DOS-style and depend on this; files on disk and
+ * in romfs must have lowercase names. Read_File with Read_Size 0 reads
+ * the whole file; the size and read helpers return 0 on failure.
+ * folder_exists takes a printf-style path and creates the folder if it is
+ * missing. find_file / find_next_file walk one glob at a time and return
+ * bare file names.
+ */
+
 #include "game/main.h"
 
 #include <stdio.h>

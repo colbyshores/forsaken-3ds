@@ -1,5 +1,17 @@
- 
 #pragma once
+
+/* ai.h -- shared enemy AI vocabulary: modes, flags, targeting, brain entry points
+ *
+ * Each brain lives in its own ai*.cpp. The AIMODE_* enums index the
+ * per-brain mode tables in aimain.cpp (AI_AIR_Mode[] and friends), so
+ * their order is load-bearing. AI_* status bits live in ENEMY.AIFlags,
+ * AI_BEHAVIOUR_* bits come from the enemy type, AI_CONTROL_* bits are
+ * per-frame steering requests.
+ * ailib.cpp owns the shared scratch results (TargetInfo behind Tinfo,
+ * AimData); every call overwrites them, so read them straight after.
+ * Timers count framelag ticks (ONE_SECOND = 60). AimData.Angle is in
+ * degrees in the source's local frame: y is yaw, x is pitch.
+ */
 
 #include "game/main.h"
 #include "util/util.h"

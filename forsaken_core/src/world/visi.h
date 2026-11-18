@@ -1,6 +1,17 @@
-
 #pragma once
 
+/* visi.h -- portal visibility: per-camera visible groups and group relations
+ *
+ * visi.cpp reads the Connected / Visible / IndirectVisible group tables (bitmaps
+ * plus per-group lists sorted ascending) from the level .mxv at load; they are
+ * per level. FindVisible walks the portal tree from the camera's group once
+ * per camera pass, filling cam->visible and the GroupsVisible / IsGroupVisible
+ * globals; ClipGroup then sets projection and viewport before a group is drawn
+ * (full-screen citro3d cameras use a scissor instead of a sub-rect viewport).
+ *
+ * GroupsAreVisible and VisibleOverlap answer from the precomputed tables, not
+ * from the current frame. The list merges rely on the ascending sort.
+ */
 
 #include <math.h>
 #include "math/new3d.h"

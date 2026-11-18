@@ -1,15 +1,20 @@
 #pragma once
 
+/* music.h -- CD-track music playback seam
+ *
+ * Implemented by music_3ds.cpp (ndsp hardware DSP-ADPCM decode, streamed
+ * from romfs:/music/trackNN.dsp by a worker thread) and music_openal.cpp
+ * (whole track decoded in software and looped as one OpenAL buffer); both
+ * read the same .dsp files. Track numbers follow the original CD, with
+ * track 02 as the title theme; EDITION_REMASTER extends the range to 19.
+ * music_play_for_level maps a level to a track through music_table.
+ * music_update is a no-op on both backends.
+ */
+
 #include "game/main.h"
 
 
-/*
- * CD audio music playback system.
- *
- * WAV files are loaded from romfs:/music/ and streamed via ndsp.
- * Format expected: 16-bit signed LE PCM, mono, 32000 Hz.
- *
- * Track numbering matches the original 1998 CD:
+/* Track numbering matches the original 1998 CD:
  *   Track 02 - "Forsaken" (main theme)
  *   Track 03 - "Gargantuan"
  *   Track 04 - "Sanctuary of Tloloc"

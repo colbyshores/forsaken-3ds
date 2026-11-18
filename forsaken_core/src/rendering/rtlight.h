@@ -1,5 +1,18 @@
 #pragma once
 
+/* rtlight.h -- level real-time lights (.RTL): fixed, pulsing, flickering, spot
+ *
+ * rtlight.cpp loads rt_light[] per level (LoadRTLights / ReleaseRTLights) and
+ * reserves one XLights[] slot per light at load; ProcessRTLights runs once a
+ * frame and writes that slot's colour and visibility. xlight is -1 when the
+ * pool was full, and that light is skipped. Trigger-generated lights start off
+ * and are switched by EnableRTLight / DisableRTLight from triggers.cpp.
+ *
+ * Units after load: r/g/b are 0..255 (the file stores 0..1); all times and
+ * delays are framelag ticks (file seconds x ANIM_SECOND); pos and range are
+ * world units; spot cone is in degrees, rotation_speed in radians per tick.
+ */
+
 typedef enum
 {
 	LIGHT_FIXED,

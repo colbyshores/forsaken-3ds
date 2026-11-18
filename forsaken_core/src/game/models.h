@@ -1,5 +1,18 @@
-
 #pragma once
+
+/* models.h -- model registry and live model instances
+ *
+ * models.cpp owns two layers. The MODELNAME tables (ModelNames,
+ * TitleModelNames, SplashModelNames) name mesh files: MODEL_* and
+ * TITLE_MODEL_* index them, and component-object children and other
+ * runtime meshes are appended from *_ExtraModels via NextNewModel, within
+ * MAXMODELHEADERS. ModelHeaders / MxaModelHeaders are heap arrays indexed
+ * by the same slot (DoIMorph picks .mxa); PreInitModel reallocates them
+ * per level and they stay allocated through ReleaseView for teardown.
+ * Models[] is a fixed pool of instances on used/free lists linked by
+ * u_int16_t index, 0xFFFF terminating; FindFreeModel returns 0xFFFF when
+ * full. LifeCount and timers are in framelag ticks.
+ */
 
 #include <math.h>
 
@@ -23,8 +36,6 @@
 /* Sized to the peak model index observed across the SP campaign.
  * Military Base sets the high-water mark at ~584 (BGOs + ship/enemy
  * comp objects loaded for that level). 608 gives a ~24-entry margin.
- * Per-header BSS cost scales with MAX_TEXTURE_GROUPS=64 (~9.6 KB per
- * entry), so each +N is ~9.6N KB — keep tight to fit OG 3DS budget.
  * If a future level crashes during PreLoadCompObj("Too many models"),
  * bump this AND MAXMXAMODELHEADERS together (they share index space). */
 #define	MAXMODELHEADERS		608

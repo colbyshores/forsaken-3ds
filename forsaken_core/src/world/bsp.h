@@ -1,5 +1,18 @@
-
 #pragma once
+
+/* bsp.h -- per-group collision BSP trees and portal BSPs
+ *
+ * bsp.cpp loads the level .BSP (one tree per visibility group) into
+ * Bsp_Header[0] and the matching .PBS portal trees into Bsp_Portal_Header;
+ * both are per level and freed by Bspfree. Bsp_Header[1] is never loaded, so
+ * code that tests it is inert.
+ *
+ * RayCollide's Dir is a displacement whose length is the ray length, not a
+ * unit vector; planes are offset by the global CollisionRadius (callers set
+ * it, currently always 0). A NULL front child is open space and a NULL back
+ * child is solid; PointInsideSkin returns true in open space. TOLER is the
+ * on-plane tolerance in world units.
+ */
 
 #include "game/main.h"
 #include "math/new3d.h"

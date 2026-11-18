@@ -1,5 +1,13 @@
 #pragma once
 
+/* texture.h -- seam between the renderers and the image decoder
+ *
+ * load_image() decodes image->path into 8-bit RGBA (data is w*h*4 bytes, freed
+ * by destroy_image). Both shipping builds use texture_png.cpp (TEXTURE_PNG);
+ * the SDL and DevIL loaders under forsaken_pc are unused alternatives.
+ * colorkey is set for images without an alpha channel, telling the renderer to
+ * treat pure black as transparent. The PNG loader ignores the mipmap argument.
+ */
 
 typedef struct {
 	int id;			// internal id

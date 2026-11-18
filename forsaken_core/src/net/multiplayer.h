@@ -1,4 +1,15 @@
 #pragma once
+
+/* multiplayer.h -- title-menu actions for hosting, joining and team setup
+ *
+ * multiplayer.cpp backs the network menus in title.cpp. Hosting seeds the
+ * shared RNG (Seed1/Seed2), sets the game-type flags (SetUpGameType) and
+ * starts the session; the team functions fill the team lists before synchup.
+ * The My* settings keep the local player's host preferences, because joining
+ * a game overwrites the live settings with the host's. RandomStartPosModify
+ * offsets spawn-point and goal selection.
+ */
+
 #include "game/main.h"
 #include "game/constants.h"
 #include "ui/title.h"

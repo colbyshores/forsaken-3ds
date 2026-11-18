@@ -1,5 +1,17 @@
-
 #pragma once
+
+/* object.h -- shared motion and animation state for ships and enemies, plus enemy guns
+ *
+ * OBJECT is embedded by value in each ship (Ships[].Object) and enemy
+ * (ENEMY.Object); ID points back to the owner and Type says which kind.
+ * Angle (a per-tick turn rate, applied as Angle * framelag) and Bank are
+ * degrees. Mat/InvMat/Quat are the unbanked orientation; Final* include Bank.
+ * Time/OverallTime are animation ticks advanced by framelag * AnimSpeed.
+ * Each enemy's GUNOBJECTs are one malloc'd array (enemies.cpp), also chained
+ * by Next. GUNOBJECT.Dir holds pitch/yaw angles in degrees, not a direction
+ * vector, clamped by the GUNTYPE XRot/YRot limits. The GUNTYPE table is
+ * GunTypes[] in enemies.cpp, retuned from enemies.txt by PreLoadEnemies.
+ */
 
 #include "game/main.h"
 #include "math/quat.h"

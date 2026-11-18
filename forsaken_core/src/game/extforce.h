@@ -1,5 +1,16 @@
-
 #pragma once
+
+/* extforce.h -- level force zones: push, shield change, screen shake
+ *
+ * extforce.cpp owns the per-level array loaded from the level's .gf file
+ * (no file = no forces), linked per group through ExternalForcesGroupLink
+ * and NextInGroup for lookup. Each force is a trigger zone (sphere, box
+ * or convex hull). Ships and enemies inside an active zone receive a
+ * force that falls linearly from MaxForce at Origin to MinForce at Range,
+ * scaled by framelag. Range is stored as its reciprocal after load.
+ * Status 0 (EXTERNALFORCEACTIVE) means on; trigger events start and stop
+ * a force by index. Released with the level.
+ */
 
 #include "game/main.h"
 /*

@@ -1,27 +1,22 @@
-
-
 #pragma once
 
+/* sphere.h -- ray versus sphere intersection tests
+ *
+ * Stateless helpers in sphere.cpp, used by bullet, pickup and ship collision.
+ * Ray directions must be unit length (the quadratic assumes |dir| = 1). The
+ * variants differ on a ray that starts inside the sphere: RaytoSphere2 reports
+ * no hit, RaytoSphereShort reports a hit.
+ */
 
 #include <math.h>
 #include "math/new3d.h"
 
 
 /*===================================================================
-	Defines
-===================================================================*/
-#define	R2S_MISSED		0	// Ray does not IntPointsect sphere!
-#define	R2S_INSIDE		1	// Vector Started inside Sphere!
-#define R2S_BEHIND		2	// Start IntPointsection behind ray start!
-#define	R2S_SHORT		3	// Ray was Short!
-#define	R2S_COLLISION	4	// Collided!
-
-/*===================================================================
 	Prototypes
 
 	Ray/sphere intersection tests. intersect/RaytoSphere return a
-	distance along the ray (0 = miss); RaytoSphere3 classifies the
-	result with the R2S_* codes below. All functions are pure:
+	distance along the ray (0 = miss). All functions are pure:
 	inputs are not modified except the explicit out-parameters.
 ===================================================================*/
 float isNotZero(float x);

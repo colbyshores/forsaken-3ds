@@ -1,5 +1,14 @@
 #pragma once
 
+/* lua_weapons.h -- Lua table of primary and secondary weapon attributes
+ *
+ * luaopen_weapons (lua_weapons.cpp) would build the global `weapons` table as a
+ * snapshot of PrimaryWeaponAttribs[] and SecondaryWeaponAttribs[], indexed
+ * 1-based and by name, with secondaries starting at SECOFFSET + 1. Compiled but
+ * never registered: nothing calls luaopen_weapons, so the table does not exist
+ * at runtime.
+ */
+
 #include "scripting/lua_api.h"
 #include "game/main.h" /* FIXME -- needed for primary.h and secondary.h */
 #include "rendering/2dtextures.h" /* FIXME -- needed for primary.h and secondary.h */

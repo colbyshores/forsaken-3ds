@@ -1,5 +1,19 @@
 #pragma once
 
+/* transexe.h -- deferred translucent draws, replayed per visibility group
+ *
+ * Model and level-mesh draw paths call AddTransExe for execbufs with
+ * translucent faces instead of drawing them; ExecuteTransExe(group) draws that
+ * group's entries after its opaque geometry, and ExecuteTransExeUnclipped draws
+ * entries for models without MODFLAG_Clip. TransExe[] lives in transexe.cpp and
+ * is per camera pass: RenderCurrentCamera resets NumOfTransExe, and entries past
+ * MAXTRANSEXE are dropped without warning.
+ *
+ * Entries copy the RENDEROBJECT by value; its textureGroups pointer still
+ * refers to the level hunk, which outlives the pass. Copies are marked so the
+ * stereo memo and level cache never reuse them by slot address.
+ */
+
 #include "rendering/render.h"
 #include "math/new3d.h"
 

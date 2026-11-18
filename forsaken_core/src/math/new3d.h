@@ -1,4 +1,17 @@
 #pragma once
+
+/* new3d.h -- core vector and matrix types, vertex formats, fast trig and the game RNG
+ *
+ * new3d.cpp defines the routines, the sine table (trig_table_init, called once
+ * at startup) and the RNG seeds. MATRIX is D3D row-vector layout: MxV computes
+ * v * M with translation in _41.._43. ApplyMatrix uses the transposed 3x3 with
+ * the same translation and is not a general transform. Angle units differ:
+ * BuildRotMatrix and SIND/COSD take degrees; MatrixFromAxisAndAngle,
+ * SINR/COSR and fast_sinf/fast_cosf take radians. COLOR is a u32 0xAARRGGBB.
+ * Random_Range draws from Seed1/Seed2, which a multiplayer host seeds and
+ * sends to joining players.
+ */
+
 #include <math.h>
 #include "game/main.h"
 

@@ -1,6 +1,16 @@
-
-
 #pragma once
+
+/* camera.h -- render cameras, visible-group lists, level remote cameras
+ *
+ * camera.cpp owns MainCamera and CurrentCamera, the camera being drawn in
+ * the current pass (main, rear, missile or PIP; oct2.cpp's CameraRendering
+ * says which). A camera's VISLIST is rebuilt each frame by visi.cpp's
+ * FindVisible: one VISGROUP per level group carrying its screen extent,
+ * sub-viewport and projection, chained through next_visible.
+ * REMOTECAMERA entries are per-level fixed viewpoints loaded from the
+ * level's .cam file (a missing file is not an error) and switched on and
+ * off by trigger events whose data is the camera index.
+ */
 
 #include "game/main.h"
 #include "game/constants.h"

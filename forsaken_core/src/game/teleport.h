@@ -1,5 +1,16 @@
-
 #pragma once
+
+/* teleport.h -- level teleporters: entry zones and their destinations
+ *
+ * teleport.cpp loads the level's .tel file (TeleportsLoad) into a per-level
+ * malloc'd Teleports[] array, chained per group through TeleportsGroupLink.
+ * Status is inverted: TELEPORTACTIVE is 0. Links[] are indices into
+ * Teleports[]; an object crossing an active zone is moved to a random link's
+ * Pos, Group and Dir/Up orientation. Type is neither loaded nor tested, so
+ * ships and enemies both teleport. StartTeleport / StopTeleport take a
+ * teleport index from trigger event data. TeleportsAreaCheck takes the new
+ * position first.
+ */
 
 #include "game/main.h"
 #include "math/new3d.h"
@@ -41,7 +52,7 @@ struct	TELEPORT * NextInGroup;
 void ReleaseTeleports( void );
 bool TeleportsLoad( char * Filename );
 void TeleportsZoneCheck( VECTOR * OldPos , VECTOR * NewPos , TELEPORT * Tport );
-bool TeleportsAreaCheck( VECTOR * OldPos , VECTOR * NewPos ,u_int16_t Group, OBJECT *obj );
+bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJECT *obj );
 void StartTeleport( u_int16_t * Data );
 void StopTeleport( u_int16_t * Data );
 void DisplayTeleportsInGroup( u_int16_t Group );

@@ -1,5 +1,18 @@
 #pragma once
 
+/* render.h -- renderer seam: buffers, textures, matrices and draw calls
+ *
+ * Core code draws only through these FS*, draw_* and render_* calls. The 3DS
+ * citro3d backend (render_c3d.cpp) and the PC Vulkan backend
+ * (render_vulkan.cpp) implement them; RENDERER_C3D builds add the c3d_* calls.
+ * render_info (main.cpp) is the single process-lifetime render state.
+ * A RENDEROBJECT is a vertex buffer (plus optional index and normal buffers)
+ * split into TEXTUREGROUP draw ranges. Loaders point textureGroups at TAG_LEVEL
+ * hunk memory sized to the file's count; the shared RenderBufs (oct2.cpp) use
+ * MAX_TEXTURE_GROUPS-slot static scratch that the per-frame batchers fill and
+ * flush when full. RENDERMATRIX is D3D row-vector layout. The memoEpoch* and
+ * vertOwner fields are backend hints that other backends ignore.
+ */
 
 #include <assert.h>
 
@@ -132,12 +145,10 @@ bool FSClearDepth(XYRECT * rect);
 /*
  * MAX_TEXTURE_GROUPS — 3DS value (64 vs. 600 on PC).
  *
- * RENDEROBJECT embeds textureGroups[MAX_TEXTURE_GROUPS] inline (not a
- * pointer), so every live RENDEROBJECT consumes this many TEXTUREGROUP
- * slots in BSS/stack.  ModelHeaders[512] + MxaModelHeaders[512] alone
- * account for ~27 MB of BSS at 64 groups each; combined with the 64 MB
- * heap this fits comfortably within New 3DS's ~96 MB application memory.
- * Raising the limit further would push total memory usage over budget.
+ * Load-time RENDEROBJECTs point textureGroups at hunk memory sized to the
+ * file's count, so this cap only sizes the dynamic batch buffers
+ * (RenderBufs' static scratch and stack-local batch objects) and bounds
+ * INCREASE_TEXTURE_GROUPS.
  *
  * PC can afford 600 groups because desktop RAM is not a concern and the
  * in-game scene geometry rarely drives group counts that high.  On 3DS,

@@ -1,5 +1,17 @@
-
 #pragma once
+
+/* stats.h -- per-player kill, death, weapon and bonus scoring
+ *
+ * stats.cpp owns the tables; they last for a game session and are cleared by
+ * ResetAllStats / ResetIndividualStats. Arrays are indexed by player id and
+ * sized MAX_PLAYERS+1, though the loops cover 0..MAX_PLAYERS-1.
+ * KillStats[Killer][Victim]; the diagonal counts suicides. GetKills is kills
+ * minus suicides and team kills, GetScoreStats adds BonusStats (CTF / bounty
+ * points), GetRealScore also subtracts deaths. UpdateKillStats announces
+ * milestones and returns early, recording nothing, for Titan direct hits and
+ * Gravgon kills.
+ */
+
 #include "game/main.h"
 #include "game/constants.h"
 
