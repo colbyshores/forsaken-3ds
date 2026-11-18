@@ -4301,7 +4301,7 @@ void InitValidPickups()
 ===================================================================*/
 bool FilterPickup( u_int16_t PickupType )
 {
-	if ( PickupType < 0 || PickupType > MAXPICKUPTYPES )
+	if ( PickupType >= MAXPICKUPTYPES )
 		return false;
 
 	// if in these modes
