@@ -85,78 +85,6 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 ===================================================================*/
 bool MCload( char * /*Filename*/ , MCLOADHEADER * /*MCloadheader*/ )
 {
-#ifdef POLYGONAL_COLLISIONS
-	long			File_Size;
-	long			Read_Size;
-	char		*	Buffer;
-	u_int16_t		*	Uint16Pnt;
-	u_int32_t		*	Uint32Pnt;
-	int				i;
-	u_int32_t			MagicNumber;
-	u_int32_t			VersionNumber;
-
-	File_Size = Get_File_Size( Filename );	
-
-	if( !File_Size )
-		return ( false );
-
-	/* +8 headroom: per-group u16 num_faces toggles alignment, so any MCFACE*
-	   cast on an odd-indexed group lands 2-mod-4. MCFACE has float fields
-	   and ARM's vldr needs 4-byte alignment, so we memmove-shift remaining
-	   data forward per group as needed (see the group loop below). */
-	Buffer = malloc( File_Size + 8 );
-
-	if( Buffer == NULL )
-		return( false );
-
-	Read_Size = Read_File( Filename, Buffer, File_Size );
-
-	if( Read_Size != File_Size )
-		return( false );
-	
-	MCloadheader->Buffer = Buffer;
-
-	Uint32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *Uint32Pnt++;
-	VersionNumber = *Uint32Pnt++;
-	Buffer = (char *) Uint32Pnt;
-
-	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != MC_VERSION_NUMBER  ) )
-	{
-		Msg( "MCload() Incompatible collision ( .MC ) file %s", Filename );
-		return( false );
-	}
-
-	Uint16Pnt = (u_int16_t *) Buffer;
-	/*	get the number of Groups	*/
-	MCloadheader->num_of_groups = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;		
-
-	for( i=0 ; i<MCloadheader->num_of_groups;i++)
-	{
-		/* get the number of polys in the group	*/
-		Uint16Pnt = (u_int16_t *) Buffer;
-		MCloadheader->num_of_faces_in_group[i] = *Uint16Pnt++ ;
-		Buffer = (char *) Uint16Pnt;
-
-		/* MCFACE has float fields; vldr needs Buffer 4-byte aligned.
-		   The u16 num_faces read above may leave Buffer 2-mod-4.
-		   Shift remaining bytes forward into the headroom allocated
-		   with Buffer (see MCload allocation above). */
-		if( ((uintptr_t)Buffer) & 3 )
-		{
-			size_t pad = (4 - (((uintptr_t)Buffer) & 3)) & 3;
-			size_t used = (size_t)( Buffer - MCloadheader->Buffer );
-			size_t remaining = (size_t)File_Size - used;
-			memmove( Buffer + pad, Buffer, remaining );
-			Buffer += pad;
-		}
-
-		/* make a note of the address of the Faces	*/
-		MCloadheader->GroupFacePnt[i] = (MCFACE *) Buffer;
-		Buffer += ( MCloadheader->num_of_faces_in_group[i] * sizeof(MCFACE) );
-	}
-#endif // POLYGONAL_COLLISIONS
 
 	return( true );
 }
@@ -578,10 +506,6 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 					 VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, bool BGCol, BGOBJECT ** BGColObject )
 {
 	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-#ifdef POLYGONAL_COLLISIONS
-	MCFACE	*	FacePnt;
-	int			num_faces;
-#endif
 	MCFACE	*	CollFace;
 	float		Distance = 0;
 	float		D;
@@ -649,42 +573,8 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 
 		if ( !not_bsp++ )
 		{
-#ifdef POLYGONAL_COLLISIONS
-			Msg( "Polygonal collisions still being used -- THIS WILL FAIL!" );
-#endif
 		}
 
-#ifdef POLYGONAL_COLLISIONS
-		FacePnt = MCloadheaderp->GroupFacePnt[group];
-		num_faces = MCloadheaderp->num_of_faces_in_group[group];
-		
-		while ( num_faces-- )
-		{
-			if( ColRayPolyIntersect( FacePnt ) )
-			{
-				if ( !collided )
-				{
-					Distance = IDist;
-					*ImpactPoint = IPoint;
-					CollFace = FacePnt;
-				}
-				else
-				{
-					if ( IDist < Distance )
-					{
-						Distance = IDist;
-						*ImpactPoint = IPoint;
-						CollFace = FacePnt;
-					}
-				}
-				collided++;
-			}
-			FacePnt++;
-		}
-
-		if( collided )
-			Distance *= VectorLength( &ODir );
-#endif // POLYGONAL_COLLISIONS
 	}
 
 #if ENABLE_RESTART

@@ -645,16 +645,6 @@ void ProcessGameKeys( void )
       if ( input_buffer_find( SDLK_F10 ) )
         ShowColZones = !ShowColZones;
 
-#ifdef POLYGONAL_COLLISIONS
-
-      // Shift + F11
-      if ( input_buffer_find( SDLK_F11 ) )
-        if( ShowSkin == 6 )
-          ShowSkin = 0;
-        else
-          ShowSkin++;
-
-#endif
 
       // Shift + F12
       if( input_buffer_find( SDLK_F12 ) )
@@ -673,7 +663,6 @@ void ProcessGameKeys( void )
 		if ( input_buffer_find( SDLK_F2 ) )
 			ShowTrigZones = !ShowTrigZones;
 
-#ifndef POLYGONAL_COLLISIONS
 #ifdef REMOTE_CAMERA_ENABLED
 		// Ctrl + F3
 		if ( input_buffer_find( SDLK_F3 ) )
@@ -690,7 +679,6 @@ void ProcessGameKeys( void )
 				Ships[MAX_PLAYERS].enable = 0;
 				Current_Camera_View = WhoIAm;   // which object is currently using the camera view....
 			}
-#endif
 #endif
 
     } // end ctrl modifier
