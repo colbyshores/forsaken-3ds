@@ -1,8 +1,31 @@
-/*===================================================================
-	File	:	bgobjects.h
-	Content	:	bgobjects.cpp include file
-===================================================================*/
 #pragma once
+
+/* enemies.h -- enemy types, the enemy pool, spawning and per-frame enemy AI
+ *
+ * EnemyTypes[] is the per-type table (model file, control type, guns, fire
+ * points, AI behaviour). It has a static initializer for the 1998 IDs 0..55;
+ * on each single-player level load PreLoadEnemies re-reads
+ * data/txt/enemies.txt over it (and over GunTypes[]) and, under
+ * EDITION_REMASTER, fills IDs 100..108 by copying a 1998 type and overriding
+ * its model and a few fields. The other slots stay empty. Enemies only exist
+ * in single player: PreLoadEnemies and LoadEnemies do nothing in other modes.
+ *
+ * Enemies[MAXENEMIES] is a pool with used/free lists (FirstEnemyUsed) and a
+ * per-group list (EnemyGroups[]); it is per level. PreLoadEnemies reads the
+ * level .NME to register enemy models in ModelNames[]; after the models load,
+ * LoadEnemies reads the .NME again and spawns each record through
+ * InitOneEnemy. A .NME type that is out of range or has no model is replaced
+ * by the first populated type rather than skipped. ProcessEnemies runs once
+ * per frame: it calls the ControlType handler, turns the guns, advances
+ * component animation and copies the result into Models[]. KillUsedEnemy
+ * drops the held pickup, fires the enemy's trigger mod and frees its guns,
+ * model and components.
+ *
+ * Each GUNOBJECT has GunNum = 2 * gun index; Object.UserContComps[GunNum] is
+ * the gun's yaw component and [GunNum + 1] its pitch component. When neither
+ * is set the gun fires along the body matrix. EnableEnemy (trigger-driven)
+ * indexes Enemies[] directly by the enemy's position in the .NME file.
+ */
 
 #include "game/main.h"
 #include "world/node.h"
@@ -255,13 +278,10 @@ enum
 
 	/* N64 enemy IDs imported from Forsaken Remastered. The Remaster's
 	 * .nme files reference these IDs in the 100-108 range, beyond the
-	 * original 1998 enemy roster. We populate slots 100-108 at runtime
-	 * (PreLoadEnemies one-shot init) by template-copying from a similar
-	 * existing 1998 enemy and overriding ModelFilename + a few stats —
-	 * the visual is approximate (Mekton model shown for Manmech, etc.)
-	 * but the spawn lands in a real slot rather than being substituted.
-	 * Extracting the actual Remaster .mx model meshes from ForsakenEX.kpf
-	 * Slot Approximation" for the workaround scope. */
+	 * original 1998 enemy roster. PreLoadEnemies fills slots 100-108 on
+	 * every level load by copying a similar 1998 enemy type (its brain
+	 * and behaviour) and pointing ModelFilename at the Remaster mesh
+	 * under n64\, plus a few per-type overrides. */
 	ENEMY_Boss_Manmech     = 100,	// 100
 	ENEMY_CargoDrone       = 101,	// 101
 	ENEMY_Boss_Ramqan      = 102,	// 102
@@ -320,7 +340,7 @@ enum {
 	ENEMY_CONTROLTYPE_SPLINE,		// Controlled By Spline Movement...
 	ENEMY_CONTROLTYPE_EXOGENON,		// Boss Specifics for Exogenon...
 	ENEMY_CONTROLTYPE_LITTLEGEEK,	// Boss Specifics for LittleGeek...
-	ENEMY_CONTROLTYPE_FLESHMORPH,	// Boss Specifics for LittleGeek...
+	ENEMY_CONTROLTYPE_FLESHMORPH,	// Boss Specifics for FleshMorph...
 	ENEMY_CONTROLTYPE_JUMP_AI,		// Remaster: parametric-arc hopping (Boss_Ramqan)
 };
 
@@ -367,9 +387,9 @@ constexpr int ENEMY_STATUS_Generating = 2;
 
 constexpr int MAXENEMIES = 256;
 /* Bumped 56 -> 128 to fit Remaster N64 enemy IDs at slots 100-108
- * (Boss_Manmech .. Ghost). Slots 56-99 stay zero-initialised; nothing
- * references them. Memory cost: 72 unused slots × sizeof(ENEMY_TYPES)
- * (~150 bytes) ≈ 11 KB BSS, negligible. */
+ * (Boss_Manmech .. Ghost). Slots 56-99 and 109-127 stay zero-initialised;
+ * a .NME record that names one is substituted at load. Cost: 72 extra
+ * ENEMY_TYPES entries in static data. */
 constexpr int MAX_ENEMY_TYPES = 128;
 
 #define	YES_STEALTH_MODE		true

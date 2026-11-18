@@ -1,6 +1,4 @@
-/*===================================================================
-	Includes
-===================================================================*/
+/* enemies.cpp -- enemy types, spawning, AI dispatch and movement; see enemies.h. */
 #include <stdio.h>
 #include <math.h>
 
@@ -387,14 +385,14 @@ GUNTYPE	GunTypes[] = {
 		30.0F,	//ReloadTime — matches KEX Gun_RamqanLCannon
 		600.0F,	//BurstMasterTime
 		4,		//BurstMasterCount — KEX fires 4-rocket bursts
-		80.0F,	//BurstAngle — KEX uses 80°; we need wide because no per-component aim
+		80.0F,	//BurstAngle — KEX uses 80°
 		-30.0F,	//XRotMin
 		30.0F,	//XRotMax
 		-45.0F,	//YRotMin
 		45.0F,	//YRotMax
 		0.0F,	//Range
 		0,		//PowerLevel
-		true,	// Secondary (ENEMYHOMINGMISSILE lives in secondary.h)
+		true,	// Secondary (SOLARISMISSILE is a secondary weapon)
 		SOLARISMISSILE,	//WeaponType — Solaris tank rockets, per KEX defs/enemyGuns.txt Gun_RamqanLCannon
 		false,	//PreciseRotation
 	},
@@ -966,10 +964,10 @@ VECTOR	MektonTurretAimPos = { ( -60.0F * GLOBAL_SCALE ), ( 180.0F * GLOBAL_SCALE
  *   body : (   0, -64, 148)
  *   L can: ( -61, -64, 153)
  *   R can: (  61, -64, 153)
- * Mapped to Forsaken Y-up: (X, KEX_Z, KEX_Y) with KEX_Y negated so
- * "forward" = +Z. Body sits up high (~150) above pivot; cannons are
- * higher still and offset ±61 to the sides — visibly mounted near
- * the boss's head/shoulders rather than its body center. */
+ * The values below are not a direct axis swap of those: the body
+ * point sits at (0, 150, 80) and the cannons at (±110, 200, 80),
+ * i.e. above the pivot and out to the sides, near the boss's
+ * head/shoulders rather than its body center. */
 FIREPOS RamqanBodyFirePos = {
 	1,
 	{ { (    0.0F * GLOBAL_SCALE ), ( 150.0F * GLOBAL_SCALE ), ( 80.0F * GLOBAL_SCALE ) } },
@@ -4327,14 +4325,10 @@ bool PreLoadEnemies( void )
 	/* Populate Remaster N64 enemy slots (100-108) by template-copying
 	 * from a similar 1998 enemy, then overriding the model filename.
 	 *
-	 * Re-applied on every level load because ReadEnemyTxtFile() above
-	 * resets the entire EnemyTypes[] array from enemies.txt, which
-	 * clobbers any prior substitution. enemies.txt doesn't define
-	 * the N64-only IDs (100-108), so without re-applying here those
-	 * slots silently revert to whatever uninitialized template they
-	 * inherited — visible symptom: Tube64's Enforcer (flying-eye
-	 * shape) renders as a Mekton tank after the first level
-	 * transition. */
+	 * Re-applied on every level load, after ReadEnemyTxtFile() above
+	 * has rewritten the 1998 template entries from enemies.txt (which
+	 * names none of the N64-only IDs), so each copy picks up the
+	 * current template values. */
 #ifdef EDITION_REMASTER
 	{
 
@@ -4378,19 +4372,11 @@ bool PreLoadEnemies( void )
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
 			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 15000; /* KEX defs/n64Enemies.txt */
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
-			/* Three turret guns per KEX defs/n64Enemies.txt:
-			 *   gun 0: body-mounted Pulsar (Gun_RamqanBody)
-			 *   gun 1: left  cannon Solaris rocket (Gun_RamqanLCannon)
-			 *   gun 2: right cannon Scatter (Gun_RamqanRCannon)
-			 * Without per-COMP_OBJ aim wiring all three fire from the
-			 * body matrix, but the per-gun FirePos offsets place the
-			 * projectile origins near the head/shoulders so it visually
-			 * reads as cannon-fire instead of body-fire. */
 			/* Three guns per KEX defs/n64Enemies.txt:
 			 *   gun 0: body-mounted Pulsar (Gun_RamqanBody, comp 11)
 			 *   gun 1: left  cannon Solaris rocket (comp 14)
 			 *   gun 2: right cannon Suss-bullet cluster ≈ KEX Scatter (comp 13)
-			 * Per-COMP_OBJ aim is wired in PreInitEnemies's UserContComps
+			 * Per-COMP_OBJ aim is wired in LoadEnemies's UserContComps
 			 * switch case, so each gun's matrix actually points at the
 			 * player and the per-gun BurstAngle gates work correctly. */
 			EnemyTypes[ ENEMY_Boss_Ramqan ].NumOfGuns = 3;
@@ -4554,11 +4540,11 @@ bool PreLoadEnemies( void )
 
 			/* Forsaken Remastered's .nme files reference enemy IDs from
 			 * the Remaster's expanded roster (n64Enemies, etc.) that go
-			 * up to 108. Our 1998 Enemies.txt only populates indices
-			 * 0..21 inside an array of MAX_ENEMY_TYPES=56 slots, and
-			 * any further IDs would either index past the array (UB)
-			 * or hit a slot whose ModelFilename pointer was never
-			 * initialized (NULL deref on the [0] check below).
+			 * up to 108. EnemyTypes[] only has entries for 0..55 and
+			 * (Remaster builds) 100..108; any other ID would either
+			 * index past the array (>= MAX_ENEMY_TYPES) or hit a slot
+			 * whose ModelFilename is NULL (deref on the [0] check
+			 * below).
 			 *
 			 * Substitute the OOB ModelNum with the first populated
 			 * slot rather than continue-skipping. Skipping leaves a
@@ -5813,15 +5799,13 @@ void ProcessEnemies( void )
 					
 					if( !GetLastCompDispMatrix( &Enemy->Object, &GunObject->Mat, &GunObject->InvMat, &GunObject->FirePos , GunObject->GunNum) )
 				{
-					/* Fallback for bosses whose .cob lacks a UserContComps
-					 * gun-mount component (e.g. Boss_Ramqan: Mekton-template
-					 * gun config + ramqan.cob with 19 different bones).
-					 * Without this, GunObject->Mat is uninitialized (malloc
-					 * heap garbage); the per-gun BurstAngle gate in
-					 * AI_UPDATEGUNS rejects every shot because AI_Angle is
-					 * nonsense. Use body matrix → gun fires straight forward
-					 * from body center. Works because JUMP_AI rotates the
-					 * body to face the player each frame. */
+					/* Fallback for a gun with no mount component (neither
+					 * UserContComps[GunNum] nor [GunNum + 1] is set, e.g. a
+					 * single-mesh enemy or a .cob without turret comps).
+					 * InitGuns mallocs the GUNOBJECTs without setting Mat,
+					 * so without this the per-gun BurstAngle gate in
+					 * AI_UPDATEGUNS would read garbage. Use the body matrix:
+					 * the gun fires straight forward from the body centre. */
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					GunObject->Mat    = Enemy->Object.Mat;
 					GunObject->InvMat = Enemy->Object.InvMat;
@@ -6252,7 +6236,7 @@ void EnemyJumpUnderAiControl( ENEMY * Enemy )
 
 /*===================================================================
 	Procedure	:	Turret Enemy Under Player Control...
-	Output		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
 void EnemyTurretUnderPlayerControl( ENEMY * /*Enemy*/ )
@@ -7612,7 +7596,7 @@ bool Enemy2EnemyCollideSpecial( ENEMY * SEnemy , VECTOR * StartPos)
 }
 
 /*===================================================================
-	Procedure	:	Ship 2 Ship collide...
+	Procedure	:	Ship to Enemy collide...
 	Input		:	BikeNumber..
 	Output		:	Move_Off filled in...
 ===================================================================*/
@@ -7830,8 +7814,8 @@ static int read_NumOfGuns( FILE *f, char *last_token )
 // Read the Gun Type
 static int read_GunType( FILE *f, char *last_token )
 {
-	// NOTE - GunType[CurrentGun] use to be GunType but that's a compiler error in unix somehow it gets away on msvc
-	// none the less this function appears to never be used during reading of the enemies.txt
+	// Writes slot CurrentGun, which only Gun_NewGunType sets. enemies.txt
+	// as shipped has no GunType keyword, so this is not reached.
 	if ( fscanf( f, " %hu", &EnemyTypes[CurrentEnemy].GunType[CurrentGun] ) == 1 )
 	{
 		fscanf( f, " %80s", last_token );
@@ -8605,8 +8589,8 @@ void ObjectForceExternalOneOff( OBJECT * Object, VECTOR *force )
 }
 
 /*===================================================================
-	Procedure	:	Carry out all movement / collision/ turning...
-	Output		:	OBJECt * Object
+	Procedure	:	Carry out all movement / collision/ turning for FleshMorph...
+	Input		:	OBJECT * Object
 	Output		:	Nothing
 ===================================================================*/
 void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
@@ -8767,7 +8751,9 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 
 
 /*===================================================================
-	Procedure	:	Crappy Bodge to fix mappers fuckup
+	Procedure	:	Pick the primary an enemy fires: if it holds a
+				:	primary-weapon pickup (PICKUP_Trojax..PICKUP_Laser)
+				:	it fires that weapon instead of its own
 	Input		:	BYTE	Primary Weapon
 				:	u_int16_t	PickupHeld
 	Output		:	BYTE	Primary Weapon to Fire
