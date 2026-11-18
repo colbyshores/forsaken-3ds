@@ -982,7 +982,7 @@ static void peer_connected_to( ENetPeer * peer, peer_id_t id )
 		DebugPrintf("network security: failed to find joiner by id %d\n", id);
 		return;
 	}
-	if( joiner->state == PLAYING )
+	if( PEER_STATE( joiner ) == PLAYING )
 	{
 		network_peer_data_t * peer_data = (network_peer_data_t*)peer->data;
 		DebugPrintf("network security: player %d @ %s sent us a succesfully-connected-to-new-player message for player %d but player %d is already in the game!\n",
