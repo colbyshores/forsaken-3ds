@@ -15,30 +15,30 @@
 #include "game/main.h"
 #include "game/enemies.h"
 
-#define SFX_Biker			4	// biker speech
-#define SFX_Title	64	// use when biker speech must play ( will cut off any existing speech )
-#define SFX_InGame	256	// sfx must be loaded in game, regardless of whether or not SFX_Title is set
+constexpr int SFX_Biker = 4; // biker speech
+constexpr int SFX_Title = 64; // use when biker speech must play ( will cut off any existing speech )
+constexpr int SFX_InGame = 256; // sfx must be loaded in game, regardless of whether or not SFX_Title is set
 
-#define SPOT_SFX_TYPE_Normal 0
-#define SPOT_SFX_TYPE_NoPan 1
-#define SPOT_SFX_TYPE_Taunt 2
+constexpr int SPOT_SFX_TYPE_Normal = 0;
+constexpr int SPOT_SFX_TYPE_NoPan = 1;
+constexpr int SPOT_SFX_TYPE_Taunt = 2;
 
-#define SFX_TYPE_Normal 1
-#define SFX_TYPE_Panned 2
-#define SFX_TYPE_Looping 3
-#define SFX_TYPE_Taunt 4
+constexpr int SFX_TYPE_Normal = 1;
+constexpr int SFX_TYPE_Panned = 2;
+constexpr int SFX_TYPE_Looping = 3;
+constexpr int SFX_TYPE_Taunt = 4;
 
-#define GLOBAL_MAX_SFX ( 0.9F ) 
+constexpr float GLOBAL_MAX_SFX = ( 0.9F );
 
 // sfx is -1 if free
 // allocate one variable only - sfx loader can wait if not available
 
-#define SFX_TYPE_Nothing 0
-#define SFX_TYPE_Static 1
-#define SFX_TYPE_Dynamic 2
-#define SFX_TYPE_Compound 3
+constexpr int SFX_TYPE_Nothing = 0;
+constexpr int SFX_TYPE_Static = 1;
+constexpr int SFX_TYPE_Dynamic = 2;
+constexpr int SFX_TYPE_Compound = 3;
 
-#define MAX_LEVELSPECIFIC_SFX 64
+constexpr int MAX_LEVELSPECIFIC_SFX = 64;
 
 enum {
 	SFX_KILLINGSPREE, //** voices
@@ -268,16 +268,16 @@ enum {
 	MAX_SFX,
 };
 
-#define SFX_BikeComp		2	// bike computer speech 
-#define SFX_BikeCompNoOveride	512
-#define SFX_BikerSpeechOveride	32	// use when biker speech must play ( will cut off any existing speech )
+constexpr int SFX_BikeComp = 2; // bike computer speech
+constexpr int SFX_BikeCompNoOveride = 512;
+constexpr int SFX_BikerSpeechOveride = 32; // use when biker speech must play ( will cut off any existing speech )
 
-#define SFX_Looping			16	// level specific sfx
-#define SFX_LevelSpec		8	// level specific sfx
+constexpr int SFX_Looping = 16; // level specific sfx
+constexpr int SFX_LevelSpec = 8; // level specific sfx
 
-#define MAXBIKECOMPTYPES 5
+constexpr int MAXBIKECOMPTYPES = 5;
 
-#define DESTROYSOUND_All 0
+constexpr int DESTROYSOUND_All = 0;
 
 // functions
 bool InitializeSound( int flags );

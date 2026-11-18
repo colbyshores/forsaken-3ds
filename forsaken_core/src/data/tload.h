@@ -16,13 +16,13 @@
 /*
  * defines
  */
-#define MAXTPAGESPERTLOAD 50
-#define SCALEMAX 2
+constexpr int MAXTPAGESPERTLOAD = 50;
+constexpr int SCALEMAX = 2;
 
-#define	DONTLOAD_TPAGES				0
-#define	LOAD_TPAGES					1
-#define	LOAD_TPAGES_PLACEHOLDER		4
-#define	LOAD_TPAGES_FINISH			8
+constexpr int DONTLOAD_TPAGES = 0;
+constexpr int LOAD_TPAGES = 1;
+constexpr int LOAD_TPAGES_PLACEHOLDER = 4;
+constexpr int LOAD_TPAGES_FINISH = 8;
 
 /*
  * structures

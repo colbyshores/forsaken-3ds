@@ -21,19 +21,19 @@
  * Defines
  */
 
-#define	MAX_MESSAGES 4
-#define  MAX_MESSAGES_LONG 100
+constexpr int MAX_MESSAGES = 4;
+constexpr int MAX_MESSAGES_LONG = 100;
 #ifdef DEBUG_ON
 #define MAXTEXTMESSAGES (128+256)
 #else
 #define MAXTEXTMESSAGES 128
 #endif
-#define MAXPERLINE 512 // message buffer width - line width set in (Text.c) MessageQuePrint/All
+constexpr int MAXPERLINE = 512; // message buffer width - line width set in (Text.c) MessageQuePrint/All
 
-#define MAX_STATS_MESSAGES 32
-#define MAX_STATS_MESSAGE_VARIATIONS 16
-#define MAX_STATS_MESSAGE_LENGTH 128
-#define MAX_STATS_FORMATING_VARS 8
+constexpr int MAX_STATS_MESSAGES = 32;
+constexpr int MAX_STATS_MESSAGE_VARIATIONS = 16;
+constexpr int MAX_STATS_MESSAGE_LENGTH = 128;
+constexpr int MAX_STATS_FORMATING_VARS = 8;
 
 /*
  * Typedefs
@@ -92,7 +92,7 @@ void DisplayConnectionStatus( int num , int x , int y);
 
 
 // if you add a color then up this count...
-#define	MAXFONTCOLOURS	11
+constexpr int MAXFONTCOLOURS = 11;
 
 // must align this enum with rgb values in Colourtrans (text.c)
 typedef enum {

@@ -18,7 +18,7 @@
 #define SAVEGAME_FILESPEC		"save??"
 #define SAVEGAMEPIC_EXTENSION	".PPM"
 
-#define	LOADSAVE_VERSION_NUMBER	5
+constexpr int LOADSAVE_VERSION_NUMBER = 5;
 
 /*
  * fn prototypes

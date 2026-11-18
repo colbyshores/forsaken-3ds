@@ -28,81 +28,81 @@
 	Defines
 ===================================================================*/
 #define	EXPLO_DISTANCE		( 256.0F * GLOBAL_SCALE )
-#define MAXNUMOF2DPOLYS		2000
-#define	MAXVERTSPER2DPOLY	4
+constexpr int MAXNUMOF2DPOLYS = 2000;
+constexpr int MAXVERTSPER2DPOLY = 4;
 #define MaxColDistance		( 64000.0F * GLOBAL_SCALE )
-#define	MAXFMPOLYVERTS		700
+constexpr int MAXFMPOLYVERTS = 700;
 
 /*===================================================================
 	Faceme Sequences
 ===================================================================*/
-#define	FM_ZERO					0  	   				// Do Nothing
-#define	FM_ANIM					1  	   				// Animate then die (Wall Explo).
-#define	FM_ANIM2				2  	   				// Animate then die (Ship Explo).
-#define	FM_SMOKE_TRAIL			3  	   				// Move and animate X2 then die.
-#define	FM_TROJAX_EXP			4  	   				// Trojax Explosion.
-#define	FM_TROJAX				5  	   				// Trojax 1 Bullet
-#define FM_PULSAR_EXP			6  	   				// Pulsar Explosion
-#define FM_PULSAR				7  	   				// Pulsar
-#define FM_SHRAPNEL_EXP			8  	   				// Shrapnel Explosion
-#define	FM_FLAME				9  	   				// Flame Sequence
-#define	FM_STATIC				10 	   				// Static Sequence
-#define	FM_ARC					11 	   				// Arc Sequence
-#define	FM_ARC2					12 	   				// Arc Glow Sequence
-#define	FM_ARC_SPARK			13 	   				// Arc Spark Sequence
-#define	FM_BITS					14 	   				// Bits Sequence
-#define	FM_ARC_RING				15 	   				// Arc Explosion Ring
-#define	FM_FLARE				16 	   				// Arc Explosion Flare
-#define	FM_GRAVGON_TRAIL		17 	   				// Gravgon Smoke Trail
-#define	FM_SOLARIS_TRAIL		18 	   				// Solaris Smoke Trail
-#define	FM_NEW_TRAIL			19 	   				// New Smoke Trail
-#define	FM_PICKUP_REGEN			20 	   				// Regenerating Pickup?
-#define	FM_BLOOD				21 	   				// Blood?
-#define	FM_BLOODSPLAT			22 	   				// Blood Splat?
-#define	FM_BLOODDRIBBLE			23 	   				// Blood Dribble?
-#define	FM_FLASH				24 	   				// Flash?
-#define	FM_BLACK_SMOKE			25 	   				// Black Smoke?
-#define	FM_NMEBULLET1			26 	   				// NME Bullet1?
-#define	FM_MUZZLEFLASH			27 	   				// Muzzle Flash?
-#define	FM_MUSHROOM				28 	   				// Mushroom Explosion?
-#define	FM_SMOKE_RING			29 	   				// Smoke Ring?
-#define	FM_SPOTFX_SMOKE			30 	   				// Smoke?
-#define	FM_SPOTFX_FLAME			31 	   				// Flame?
-#define	FM_SPOTFX_STEAM			32 	   				// Steam?
-#define	FM_SPOTFX_SPARKS		33 	   				// Sparks?
-#define	FM_SPOTFX_SPARKSFACEME	34					// Sparks FaceMe?
-#define	FM_SPOTFX_GRAVGON_TRAIL	35					// Gravgon Trail?
-#define	FM_SPOTFX_GLOW			36					// Glow?
-#define	FM_NME_TRAIL			37					// NME Trail?
-#define	FM_NME_VAPOUR_TRAIL		38					// NME Vapour Trail?
-#define	FM_SPOTFX_REALSPARKS	39					// Real Sparks?
-#define	FM_SPOTFX_SHRAPNEL_TRAIL 40					// Shrapnel Trail?
-#define	FM_SPOTFX_BUBBLE		41					// Bubble?
-#define	FM_NMEGEN_EFFECT		42					// Enemy Generation Effect?
-#define	FM_NMEGEN_FLARE			43					// Enemy Generation Flare?
-#define	FM_SPOTFX_DRIP			44					// Drip?
-#define	FM_PHOTON				45					// Photon Torpedo?
-#define	FM_SPOTFX_BURNING		46					// Burning?
-#define	FM_ANIMSPEED			47					// Anim using animspeed
-#define	FM_SPOTFX_BEARD_AFTERBURNER	48				// Beard Afterburner
-#define	FM_RESTART_INACTIVE		49					// Restart Point Inactive
-#define	FM_RESTART_ACTIVE		50					// Restart Point Active
-#define	FM_SPOTFX_WATERSPLASH	51					// Water Splash
-#define	FM_HK5_TRAIL			52					// Hk5 Trail
-#define	FM_BLUEPHOTON			53					// Blue Photon Torpedo?
-#define	FM_FIREBALL				54					// Fireball
-#define	FM_SPARKLE				55					// Sparkle?
-#define	FM_GOALSPARKLE			56					// Hacky goal Sparkle?
+constexpr int FM_ZERO = 0; // Do Nothing
+constexpr int FM_ANIM = 1; // Animate then die (Wall Explo).
+constexpr int FM_ANIM2 = 2; // Animate then die (Ship Explo).
+constexpr int FM_SMOKE_TRAIL = 3; // Move and animate X2 then die.
+constexpr int FM_TROJAX_EXP = 4; // Trojax Explosion.
+constexpr int FM_TROJAX = 5; // Trojax 1 Bullet
+constexpr int FM_PULSAR_EXP = 6; // Pulsar Explosion
+constexpr int FM_PULSAR = 7; // Pulsar
+constexpr int FM_SHRAPNEL_EXP = 8; // Shrapnel Explosion
+constexpr int FM_FLAME = 9; // Flame Sequence
+constexpr int FM_STATIC = 10; // Static Sequence
+constexpr int FM_ARC = 11; // Arc Sequence
+constexpr int FM_ARC2 = 12; // Arc Glow Sequence
+constexpr int FM_ARC_SPARK = 13; // Arc Spark Sequence
+constexpr int FM_BITS = 14; // Bits Sequence
+constexpr int FM_ARC_RING = 15; // Arc Explosion Ring
+constexpr int FM_FLARE = 16; // Arc Explosion Flare
+constexpr int FM_GRAVGON_TRAIL = 17; // Gravgon Smoke Trail
+constexpr int FM_SOLARIS_TRAIL = 18; // Solaris Smoke Trail
+constexpr int FM_NEW_TRAIL = 19; // New Smoke Trail
+constexpr int FM_PICKUP_REGEN = 20; // Regenerating Pickup?
+constexpr int FM_BLOOD = 21; // Blood?
+constexpr int FM_BLOODSPLAT = 22; // Blood Splat?
+constexpr int FM_BLOODDRIBBLE = 23; // Blood Dribble?
+constexpr int FM_FLASH = 24; // Flash?
+constexpr int FM_BLACK_SMOKE = 25; // Black Smoke?
+constexpr int FM_NMEBULLET1 = 26; // NME Bullet1?
+constexpr int FM_MUZZLEFLASH = 27; // Muzzle Flash?
+constexpr int FM_MUSHROOM = 28; // Mushroom Explosion?
+constexpr int FM_SMOKE_RING = 29; // Smoke Ring?
+constexpr int FM_SPOTFX_SMOKE = 30; // Smoke?
+constexpr int FM_SPOTFX_FLAME = 31; // Flame?
+constexpr int FM_SPOTFX_STEAM = 32; // Steam?
+constexpr int FM_SPOTFX_SPARKS = 33; // Sparks?
+constexpr int FM_SPOTFX_SPARKSFACEME = 34; // Sparks FaceMe?
+constexpr int FM_SPOTFX_GRAVGON_TRAIL = 35; // Gravgon Trail?
+constexpr int FM_SPOTFX_GLOW = 36; // Glow?
+constexpr int FM_NME_TRAIL = 37; // NME Trail?
+constexpr int FM_NME_VAPOUR_TRAIL = 38; // NME Vapour Trail?
+constexpr int FM_SPOTFX_REALSPARKS = 39; // Real Sparks?
+constexpr int FM_SPOTFX_SHRAPNEL_TRAIL = 40; // Shrapnel Trail?
+constexpr int FM_SPOTFX_BUBBLE = 41; // Bubble?
+constexpr int FM_NMEGEN_EFFECT = 42; // Enemy Generation Effect?
+constexpr int FM_NMEGEN_FLARE = 43; // Enemy Generation Flare?
+constexpr int FM_SPOTFX_DRIP = 44; // Drip?
+constexpr int FM_PHOTON = 45; // Photon Torpedo?
+constexpr int FM_SPOTFX_BURNING = 46; // Burning?
+constexpr int FM_ANIMSPEED = 47; // Anim using animspeed
+constexpr int FM_SPOTFX_BEARD_AFTERBURNER = 48; // Beard Afterburner
+constexpr int FM_RESTART_INACTIVE = 49; // Restart Point Inactive
+constexpr int FM_RESTART_ACTIVE = 50; // Restart Point Active
+constexpr int FM_SPOTFX_WATERSPLASH = 51; // Water Splash
+constexpr int FM_HK5_TRAIL = 52; // Hk5 Trail
+constexpr int FM_BLUEPHOTON = 53; // Blue Photon Torpedo?
+constexpr int FM_FIREBALL = 54; // Fireball
+constexpr int FM_SPARKLE = 55; // Sparkle?
+constexpr int FM_GOALSPARKLE = 56; // Hacky goal Sparkle?
 	
 /*===================================================================
 	Faceme Flags
 ===================================================================*/
-#define	FM_FLAG_ZERO		0							// Do Nothing
-#define	FM_FLAG_MOVEOUT		1							// Move 2D Sprite toward Camera.
-#define	FM_FLAG_DIRCONST	2							// Direction and Up Vector Constant.
-#define	FM_FLAG_TWOSIDED	4							// Double Sided Poly
-#define	FM_FLAG_DONTCLIP	8							// Don't Clip
-#define	FM_FLAG_RELATIVE	16							// Direction and Up Vector Relative to camera.
+constexpr int FM_FLAG_ZERO = 0; // Do Nothing
+constexpr int FM_FLAG_MOVEOUT = 1; // Move 2D Sprite toward Camera.
+constexpr int FM_FLAG_DIRCONST = 2; // Direction and Up Vector Constant.
+constexpr int FM_FLAG_TWOSIDED = 4; // Double Sided Poly
+constexpr int FM_FLAG_DONTCLIP = 8; // Don't Clip
+constexpr int FM_FLAG_RELATIVE = 16; // Direction and Up Vector Relative to camera.
 
 /*===================================================================
 		TPage Info Structure for FmPolys/Polys/ScreenPolys

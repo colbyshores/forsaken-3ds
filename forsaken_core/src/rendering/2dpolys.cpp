@@ -20,7 +20,7 @@
 #include "game/oct2.h"
 #include "rendering/2dtextures.h"
 
-#define	FMPOLYSCALE	32.0F
+constexpr float FMPOLYSCALE = 32.0F;
 
 /*===================================================================
 	Externs

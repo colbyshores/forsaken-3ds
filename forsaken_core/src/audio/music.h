@@ -26,7 +26,7 @@
  *   Track 10 - "The Dead System"
  */
 
-#define MUSIC_FIRST_TRACK   2
+constexpr int MUSIC_FIRST_TRACK = 2;
 #ifdef EDITION_REMASTER
 /* Remaster: 18 OGG tracks from Forsaken Remastered's music/OGG/ library
  * (tracks 1-9 are the original CD compositions, 10-18 are new — Labyrinth,
@@ -41,7 +41,7 @@
 #define MUSIC_NUM_TRACKS   (MUSIC_LAST_TRACK - MUSIC_FIRST_TRACK + 1)
 
 /* Title screen track */
-#define MUSIC_TITLE_TRACK   2
+constexpr int MUSIC_TITLE_TRACK = 2;
 
 bool music_init(void);
 void music_shutdown(void);

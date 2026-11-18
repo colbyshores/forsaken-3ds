@@ -32,20 +32,20 @@
 #include "ui/title.h"
 #include "world/visi.h"
 
-#define	MC_VERSION_NUMBER	1
+constexpr int MC_VERSION_NUMBER = 1;
 
-#define	BSP_ENABLE		1
+constexpr int BSP_ENABLE = 1;
 #undef BSP2
 
-#define MAX_FEELER_RAYS		(9)
-#define MAX_QFEELER_RAYS	(5)
+constexpr int MAX_FEELER_RAYS = (9);
+constexpr int MAX_QFEELER_RAYS = (5);
 
 #define BACKGROUND_PORTAL_TOLERANCE		(12.0F * GLOBAL_SCALE)
 
 #define PORTAL_IMPACTOFFSET		(0.1F * GLOBAL_SCALE)
 
-#define POINT_ON_PORTAL_TOLERANCE	(0.1)
-#define OUTSIDE_GROUP_TOLERANCE		(25.0F)
+constexpr double POINT_ON_PORTAL_TOLERANCE = (0.1);
+constexpr float OUTSIDE_GROUP_TOLERANCE = (25.0F);
 
 int no_collision = 0;
 int outside_group = 0;
@@ -1661,9 +1661,9 @@ static bool NoBGObject = true;
 
 
 
-#define BACKFACING_PLANE_TOLERANCE		(-0.001F)
-#define IMPACT_OFFSET					(0.1F)
-#define FEELER_LENGTH_TO_RADIUS_RATIO	(1.25F)
+constexpr float BACKFACING_PLANE_TOLERANCE = (-0.001F);
+constexpr float IMPACT_OFFSET = (0.1F);
+constexpr float FEELER_LENGTH_TO_RADIUS_RATIO = (1.25F);
 
 
 bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )

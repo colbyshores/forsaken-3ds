@@ -17,15 +17,15 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	MAX_NAMES		8
+constexpr int MAX_NAMES = 8;
 
 #define	DO_LOAD			true
 #define	DONT_LOAD		false
 
-#define	BOX_NOFLIP		0x0000
-#define	BOX_XFLIP		0x2000
-#define	BOX_YFLIP		0x8000
-#define	BOX_BOTHFLIP	0xA000
+constexpr auto BOX_NOFLIP = 0x0000;
+constexpr auto BOX_XFLIP = 0x2000;
+constexpr auto BOX_YFLIP = 0x8000;
+constexpr auto BOX_BOTHFLIP = 0xA000;
 
 /*===================================================================
 	Structures for 2D Texture info

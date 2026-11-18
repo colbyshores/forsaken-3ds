@@ -12,15 +12,15 @@
  * the controls_3ds action slots. aim_assist_strength is clamped to 0..1.
  */
 
-#define MAX_PLAYER_NAME_LENGTH	(16)
+constexpr int MAX_PLAYER_NAME_LENGTH = (16);
 
-#define MAX_KEYS_PER_CONTROL	(8)
+constexpr int MAX_KEYS_PER_CONTROL = (8);
 
-#define MAX_PRIMARY_WEAPONS		(6)
-#define MAX_SECONDARY_WEAPONS	(11)
+constexpr int MAX_PRIMARY_WEAPONS = (6);
+constexpr int MAX_SECONDARY_WEAPONS = (11);
 
-#define DIK_JOYSTICK			(0x300)
-#define DIK_JOYSTICK_POV		(0x080)
+constexpr auto DIK_JOYSTICK = (0x300);
+constexpr auto DIK_JOYSTICK_POV = (0x080);
 
 #define JOYSTICK_BUTTON_KEYCODE( J, B )		( DIK_JOYSTICK | ( ( (J) & 0x0F ) << 12 ) | ( (B) & 0x7F ) )
 #define JOYSTICK_POVDIR_KEYCODE( J, P, D )	( DIK_JOYSTICK | DIK_JOYSTICK_POV | ( ( (J) & 0x0F ) << 12 ) | ( ( (P) & 0x03 ) << 2 ) | ( (D) & 0x03 ) )
@@ -42,7 +42,7 @@
 
 typedef short VirtualKeycode;
 
-#define MAX_KEYNAME_LENGTH 32
+constexpr int MAX_KEYNAME_LENGTH = 32;
 typedef struct {
 	int keys;
 	VirtualKeycode key[MAX_KEYS_PER_CONTROL];

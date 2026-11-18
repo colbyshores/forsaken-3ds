@@ -18,11 +18,11 @@
 /******************************************************************************************
 	Defines
 *******************************************************************************************/
-#define RTL_VERSION_NUMBER	2
+constexpr int RTL_VERSION_NUMBER = 2;
 
 
-#define HALF_PI		(0.5F * PI)
-#define TWO_PI		(2.0F * PI)
+constexpr auto HALF_PI = (0.5F * PI);
+constexpr auto TWO_PI = (2.0F * PI);
 
 
 #define fread_var( F, V ) \

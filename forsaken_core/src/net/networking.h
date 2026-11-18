@@ -20,7 +20,7 @@ extern int tracker_port;
 extern bool tracker_enabled;
 
 // my ship number
-#define	UNASSIGNED_SHIP 0xff // WhoIAm before host gives me number
+constexpr auto UNASSIGNED_SHIP = 0xff; // WhoIAm before host gives me number
 extern BYTE	WhoIAm;  // which ship number i am
 extern network_player_t * host_network_player; // the host .. NULL if I am host
 
@@ -38,32 +38,32 @@ extern char host_address[256];
  * defines
  */
 
-#define MULTIPLAYER_VERSION				(0x010d)
-#define DEMO_MULTIPLAYER_VERSION		(0x0109)
+constexpr auto MULTIPLAYER_VERSION = (0x010d);
+constexpr auto DEMO_MULTIPLAYER_VERSION = (0x0109);
 #define SHORTBANK
 #define VERYSHORTPACKETS
-#define NOISEFALLOFFFACTOR				( 1.0F / 120.0F )	// approx 2 seconds....
-#define NORMAL_MODE							0
-#define DEATH_MODE							1
-#define LIMBO_MODE							2			// this is what the ship is in while viewing its own death....but has blown up...
-#define DEMO_MODE								3			// this is the mode the camera goes into when Playing back a Demo
-#define GAMEOVER_MODE						4			// this is the mode the player goes into when single player has finished...
-#define WATCH_MODE							5
-#define MAX_SHIELD								255.0F
-#define START_SHIELD							128.0F
-#define MAX_HULL								255.0F
-#define START_HULL								128.0F
+constexpr auto NOISEFALLOFFFACTOR = ( 1.0F / 120.0F ); // approx 2 seconds....
+constexpr int NORMAL_MODE = 0;
+constexpr int DEATH_MODE = 1;
+constexpr int LIMBO_MODE = 2; // this is what the ship is in while viewing its own death....but has blown up...
+constexpr int DEMO_MODE = 3; // this is the mode the camera goes into when Playing back a Demo
+constexpr int GAMEOVER_MODE = 4; // this is the mode the player goes into when single player has finished...
+constexpr int WATCH_MODE = 5;
+constexpr float MAX_SHIELD = 255.0F;
+constexpr float START_SHIELD = 128.0F;
+constexpr float MAX_HULL = 255.0F;
+constexpr float START_HULL = 128.0F;
 #define MAXTEXTMSG							512		// the number of chars in a message you can send.....
-#define MAXGENPICKUPCOUNT				5
-#define MAXGENREGENSLOTCOUNT			6
-#define MAXGENMINECOUNT					3 //4
-#define MAXGENTRIGGERCOUNT				60
-#define MAXGENTRIGVARCOUNT				60
-#define MAX_PICKUPFLAGS					2
-#define MAX_BUFFER_SIZE					1024
+constexpr int MAXGENPICKUPCOUNT = 5;
+constexpr int MAXGENREGENSLOTCOUNT = 6;
+constexpr int MAXGENMINECOUNT = 3; //4
+constexpr int MAXGENTRIGGERCOUNT = 60;
+constexpr int MAXGENTRIGVARCOUNT = 60;
+constexpr int MAX_PICKUPFLAGS = 2;
+constexpr int MAX_BUFFER_SIZE = 1024;
 #define FRAMELAGED_RECOIL					true
 #define ONEOFF_RECOIL						false
-#define NUMTITANBITS							10 
+constexpr int NUMTITANBITS = 10;
 
 extern bool PlayerReady[MAX_PLAYERS];
 extern BYTE GameStatus[];
@@ -181,7 +181,7 @@ typedef struct MISSEDPICKUPMSG{
 	void *	Struct;
 }MISSEDPICKUPMSG;
 
-#define MAXSHORTNAME 8
+constexpr int MAXSHORTNAME = 8;
 typedef	char		SHORTNAMETYPE[MAX_PLAYERS][MAXSHORTNAME];
 
 typedef struct _SHIPDIEDINFO
@@ -491,46 +491,46 @@ typedef struct _GROUPONLY_FVERYSHORTGLOBALSHIP
 // Mask Defines for .Flags u_int32_t
 //----------------------------------------------------------
 
-#define	SHIP_Light_Bit			30
-#define	SHIP_CarryingFlag4_Bit	29
-#define	SHIP_CarryingFlag3_Bit	28
-#define	SHIP_CarryingFlag2_Bit	27
-#define	SHIP_CarryingFlag1_Bit	26
-#define	SHIP_CarryingFlag_Bit	26
-#define	SHIP_CarryingBounty_Bit	26
-#define	SHIP_Shield_Bit			25
-#define	SHIP_Scattered_Bit		24
-#define	SHIP_Litup_Bit			23
-#define	SHIP_InWater_Bit		22
-#define	SHIP_SuperNashram_Bit	21
-#define	SHIP_Invul_Bit			20
-#define	SHIP_MulFire_Bit		19
-#define	SHIP_Charging_Bit		18
-#define	SHIP_Turbo_Bit			17
-#define	SHIP_Stealth_Bit		16
-#define	SHIP_PrimFire_Bit		15
-#define	SHIP_PrimToggle_Bit		14
-#define	SHIP_SecFire_Bit		13
-#define	SHIP_SecToggle_Bit		12
-#define	SHIP_IsHost_Bit			11
-#define	SHIP_Enable_Bit			10
-#define	SHIP_Hull_Bit2			9
-#define	SHIP_Hull_Bit1			8
-#define	SHIP_Mode_Bit2			7
-#define	SHIP_Mode_Bit1			6
-#define	SHIP_PowerLevel_Bit2	5
-#define	SHIP_PowerLevel_Bit1	4
-#define	SHIP_NumMultiples_Bit4	3
-#define	SHIP_NumMultiples_Bit3	2
-#define	SHIP_NumMultiples_Bit2	1
-#define	SHIP_NumMultiples_Bit1	0
+constexpr int SHIP_Light_Bit = 30;
+constexpr int SHIP_CarryingFlag4_Bit = 29;
+constexpr int SHIP_CarryingFlag3_Bit = 28;
+constexpr int SHIP_CarryingFlag2_Bit = 27;
+constexpr int SHIP_CarryingFlag1_Bit = 26;
+constexpr int SHIP_CarryingFlag_Bit = 26;
+constexpr int SHIP_CarryingBounty_Bit = 26;
+constexpr int SHIP_Shield_Bit = 25;
+constexpr int SHIP_Scattered_Bit = 24;
+constexpr int SHIP_Litup_Bit = 23;
+constexpr int SHIP_InWater_Bit = 22;
+constexpr int SHIP_SuperNashram_Bit = 21;
+constexpr int SHIP_Invul_Bit = 20;
+constexpr int SHIP_MulFire_Bit = 19;
+constexpr int SHIP_Charging_Bit = 18;
+constexpr int SHIP_Turbo_Bit = 17;
+constexpr int SHIP_Stealth_Bit = 16;
+constexpr int SHIP_PrimFire_Bit = 15;
+constexpr int SHIP_PrimToggle_Bit = 14;
+constexpr int SHIP_SecFire_Bit = 13;
+constexpr int SHIP_SecToggle_Bit = 12;
+constexpr int SHIP_IsHost_Bit = 11;
+constexpr int SHIP_Enable_Bit = 10;
+constexpr int SHIP_Hull_Bit2 = 9;
+constexpr int SHIP_Hull_Bit1 = 8;
+constexpr int SHIP_Mode_Bit2 = 7;
+constexpr int SHIP_Mode_Bit1 = 6;
+constexpr int SHIP_PowerLevel_Bit2 = 5;
+constexpr int SHIP_PowerLevel_Bit1 = 4;
+constexpr int SHIP_NumMultiples_Bit4 = 3;
+constexpr int SHIP_NumMultiples_Bit3 = 2;
+constexpr int SHIP_NumMultiples_Bit2 = 1;
+constexpr int SHIP_NumMultiples_Bit1 = 0;
 
-#define	SHIP_Light			( 1 << SHIP_Light_Bit )
+constexpr auto SHIP_Light = ( 1 << SHIP_Light_Bit );
 #define	SHIP_CarryingFlag4	( 1 << SHIP_CarryingFlag4_Bit )
 #define	SHIP_CarryingFlag3	( 1 << SHIP_CarryingFlag3_Bit )
 #define	SHIP_CarryingFlag2	( 1 << SHIP_CarryingFlag2_Bit )
 #define	SHIP_CarryingFlag1	( 1 << SHIP_CarryingFlag1_Bit )
-#define	SHIP_CarryingFlag	( 1 << SHIP_CarryingFlag_Bit )
+constexpr auto SHIP_CarryingFlag = ( 1 << SHIP_CarryingFlag_Bit );
 #define	SHIP_CarryingFlags	( SHIP_CarryingFlag1 \
 							| SHIP_CarryingFlag2 \
 							| SHIP_CarryingFlag3 \
@@ -539,72 +539,72 @@ typedef struct _GROUPONLY_FVERYSHORTGLOBALSHIP
 #define	SHIP_NumMultiplesBit3	( 1 << SHIP_NumMultiples_Bit3 )
 #define	SHIP_NumMultiplesBit2	( 1 << SHIP_NumMultiples_Bit2 )
 #define	SHIP_NumMultiplesBit1	( 1 << SHIP_NumMultiples_Bit1 )
-#define	SHIP_Shield			( 1 << SHIP_Shield_Bit )
+constexpr auto SHIP_Shield = ( 1 << SHIP_Shield_Bit );
 #define	SHIP_HullBit2		( 1 << SHIP_Hull_Bit2 )
 #define	SHIP_HullBit1		( 1 << SHIP_Hull_Bit1 )
 #define	SHIP_ModeBit2		( 1 << SHIP_Mode_Bit2 )
 #define	SHIP_ModeBit1		( 1 << SHIP_Mode_Bit1 )
 #define	SHIP_PowerLevelBit2	( 1 << SHIP_PowerLevel_Bit2 )
 #define	SHIP_PowerLevelBit1	( 1 << SHIP_PowerLevel_Bit1 )
-#define	SHIP_CarryingBounty	( 1 << SHIP_CarryingBounty_Bit )
-#define	SHIP_Scattered		( 1 << SHIP_Scattered_Bit)
-#define	SHIP_Litup			( 1 << SHIP_Litup_Bit )
-#define	SHIP_InWater		( 1 << SHIP_InWater_Bit )
-#define	SHIP_SuperNashram	( 1 << SHIP_SuperNashram_Bit )
-#define	SHIP_Invul			( 1 << SHIP_Invul_Bit )
-#define	SHIP_MulFire		( 1 << SHIP_MulFire_Bit )
+constexpr auto SHIP_CarryingBounty = ( 1 << SHIP_CarryingBounty_Bit );
+constexpr auto SHIP_Scattered = ( 1 << SHIP_Scattered_Bit);
+constexpr auto SHIP_Litup = ( 1 << SHIP_Litup_Bit );
+constexpr auto SHIP_InWater = ( 1 << SHIP_InWater_Bit );
+constexpr auto SHIP_SuperNashram = ( 1 << SHIP_SuperNashram_Bit );
+constexpr auto SHIP_Invul = ( 1 << SHIP_Invul_Bit );
+constexpr auto SHIP_MulFire = ( 1 << SHIP_MulFire_Bit );
 #define	SHIP_Multiple		( ( 1 << SHIP_NumMultiples_Bit4 ) \
 							| ( 1 << SHIP_NumMultiples_Bit3 ) \
 							| ( 1 << SHIP_NumMultiples_Bit2 ) \
 							| ( 1 << SHIP_NumMultiples_Bit1 ) )
-#define	SHIP_Charging		( 1 << SHIP_Charging_Bit )
-#define	SHIP_Turbo			( 1 << SHIP_Turbo_Bit )
-#define	SHIP_Stealth		( 1 << SHIP_Stealth_Bit )
-#define	SHIP_PrimFire		( 1 << SHIP_PrimFire_Bit )
-#define	SHIP_PrimToggle		( 1 << SHIP_PrimToggle_Bit )
-#define	SHIP_SecFire		( 1 << SHIP_SecFire_Bit )
-#define	SHIP_SecToggle		( 1 << SHIP_SecToggle_Bit )
-#define	SHIP_IsHost			( 1 << SHIP_IsHost_Bit )
-#define	SHIP_Enable			( 1 << SHIP_Enable_Bit )
+constexpr auto SHIP_Charging = ( 1 << SHIP_Charging_Bit );
+constexpr auto SHIP_Turbo = ( 1 << SHIP_Turbo_Bit );
+constexpr auto SHIP_Stealth = ( 1 << SHIP_Stealth_Bit );
+constexpr auto SHIP_PrimFire = ( 1 << SHIP_PrimFire_Bit );
+constexpr auto SHIP_PrimToggle = ( 1 << SHIP_PrimToggle_Bit );
+constexpr auto SHIP_SecFire = ( 1 << SHIP_SecFire_Bit );
+constexpr auto SHIP_SecToggle = ( 1 << SHIP_SecToggle_Bit );
+constexpr auto SHIP_IsHost = ( 1 << SHIP_IsHost_Bit );
+constexpr auto SHIP_Enable = ( 1 << SHIP_Enable_Bit );
 
 //----------------------------------------------------------
 // communication packet structures
 //----------------------------------------------------------
-#define MSG_UPDATE							0x11
-#define MSG_HEREIAM							0x22
-#define MSG_INIT								0x33
-#define MSG_SHIPHIT							0x44
-#define MSG_PRIMBULLPOSDIR				0x55
-#define MSG_SECBULLPOSDIR					0x66
-#define MSG_SHIPDIED							0x77
-#define MSG_DROPPICKUP						0x88
-#define MSG_KILLPICKUP						0x99
-#define MSG_NETSETTINGS					0xaa
-#define MSG_STATUS							0xbb
-#define MSG_SHORTPICKUP					0xee
-#define MSG_SHOCKWAVE						0xff
-#define MSG_FUPDATE							0x1f
-#define MSG_SHORTMINE						0x2f
-#define MSG_TEXTMSG							0x3f
-#define MSG_SHORTREGENSLOT				0x4f
-#define MSG_SHORTTRIGGER					0x5f
-#define MSG_SHORTTRIGVAR					0x6f
-#define MSG_INTERPOLATE					0x8f
-#define MSG_BGOUPDATE						0xaf
-#define MSG_LONGSTATUS					0xdf
-#define MSG_SETTIME							0xef
-#define MSG_REQTIME							0xf1
-#define MSG_BIKENUM							0xf4
-#define MSG_VERYSHORTUPDATE			0xf5
-#define MSG_VERYSHORTFUPDATE			0xf6
-#define MSG_VERYSHORTINTERPOLATE	0xf8
-#define MSG_TEAMGOALS						0xf9
-#define MSG_YOUQUIT							0xfa
-#define MSG_SHORTSHIPHIT					0xfc
-#define MSG_TITANBITS						0xfd
-#define MSG_GROUPONLY_VERYSHORTFUPDATE		0xec
-#define MSG_VERYSHORTDROPPICKUP		0xed
-#define MSG_SHIPHEALTH              0xcc
+constexpr auto MSG_UPDATE = 0x11;
+constexpr auto MSG_HEREIAM = 0x22;
+constexpr auto MSG_INIT = 0x33;
+constexpr auto MSG_SHIPHIT = 0x44;
+constexpr auto MSG_PRIMBULLPOSDIR = 0x55;
+constexpr auto MSG_SECBULLPOSDIR = 0x66;
+constexpr auto MSG_SHIPDIED = 0x77;
+constexpr auto MSG_DROPPICKUP = 0x88;
+constexpr auto MSG_KILLPICKUP = 0x99;
+constexpr auto MSG_NETSETTINGS = 0xaa;
+constexpr auto MSG_STATUS = 0xbb;
+constexpr auto MSG_SHORTPICKUP = 0xee;
+constexpr auto MSG_SHOCKWAVE = 0xff;
+constexpr auto MSG_FUPDATE = 0x1f;
+constexpr auto MSG_SHORTMINE = 0x2f;
+constexpr auto MSG_TEXTMSG = 0x3f;
+constexpr auto MSG_SHORTREGENSLOT = 0x4f;
+constexpr auto MSG_SHORTTRIGGER = 0x5f;
+constexpr auto MSG_SHORTTRIGVAR = 0x6f;
+constexpr auto MSG_INTERPOLATE = 0x8f;
+constexpr auto MSG_BGOUPDATE = 0xaf;
+constexpr auto MSG_LONGSTATUS = 0xdf;
+constexpr auto MSG_SETTIME = 0xef;
+constexpr auto MSG_REQTIME = 0xf1;
+constexpr auto MSG_BIKENUM = 0xf4;
+constexpr auto MSG_VERYSHORTUPDATE = 0xf5;
+constexpr auto MSG_VERYSHORTFUPDATE = 0xf6;
+constexpr auto MSG_VERYSHORTINTERPOLATE = 0xf8;
+constexpr auto MSG_TEAMGOALS = 0xf9;
+constexpr auto MSG_YOUQUIT = 0xfa;
+constexpr auto MSG_SHORTSHIPHIT = 0xfc;
+constexpr auto MSG_TITANBITS = 0xfd;
+constexpr auto MSG_GROUPONLY_VERYSHORTFUPDATE = 0xec;
+constexpr auto MSG_VERYSHORTDROPPICKUP = 0xed;
+constexpr auto MSG_SHIPHEALTH = 0xcc;
 
 typedef struct _SENDBIKENUMMSG
 {
@@ -962,7 +962,7 @@ typedef struct _SHIPHEALTHMSG
     u_int8_t Shield;
 } SHIPHEALTHMSG, *LPSHIPHEALTHMSG;
 
-#define MAXLEVELSPERBATCH 8
+constexpr int MAXLEVELSPERBATCH = 8;
 
 // expose Names to all that care
 extern SHORTNAMETYPE Names;

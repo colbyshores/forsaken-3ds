@@ -20,9 +20,9 @@
 /*
  * defines
  */
-#define	MAXMXGROUPS 1
+constexpr int MAXMXGROUPS = 1;
 #define MAXMXATEXTUREGROUPSPER 8
-#define	MAXTPAGESPERMXLOAD		8
+constexpr int MAXTPAGESPERMXLOAD = 8;
 
 enum {
 

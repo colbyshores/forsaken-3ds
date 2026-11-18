@@ -16,8 +16,8 @@
 #include "world/collision.h"
 
 
-#define BSP_VERSION_NUMBER	(1)
-#define BSP_PORTAL_VERSION_NUMBER	(1)
+constexpr int BSP_VERSION_NUMBER = (1);
+constexpr int BSP_PORTAL_VERSION_NUMBER = (1);
 
 /*===================================================================
 		Globals ...

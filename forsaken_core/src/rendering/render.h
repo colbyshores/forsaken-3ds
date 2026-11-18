@@ -139,7 +139,7 @@ bool FSClearDepth(XYRECT * rect);
  * Mloadheader's per-group renderObject[MAXEXECBUFSPERGROUP] arrays —
  * small fraction of the existing ~27 MB ModelHeaders BSS, fits comfortably
  * inside the OG 3DS application memory budget. */
-#define MAX_LEVEL_TEXTURE_GROUPS 64
+constexpr int MAX_LEVEL_TEXTURE_GROUPS = 64;
 
 #ifdef __3DS__
 /*
@@ -238,7 +238,7 @@ typedef enum {
 	SMEMO_PASS_PER_FRAME = 9
 } SMEMO_PASS;
 /* Fill epoch for a whole-scene (unclipped) fill: no single group. */
-#define SMEMO_WHOLE_GROUP 0xFFFFFFFFu
+constexpr auto SMEMO_WHOLE_GROUP = 0xFFFFFFFFu;
 /* Resume point of a poly/FmPoly fill: the texture page AND the poly it
  * starts from. A fill that runs out of vertex space mid-page resumes on
  * the same page from a later poly, so the page alone does not identify
@@ -253,7 +253,7 @@ static inline unsigned int smemo_resume(int tpage, unsigned int poly)
  * the first adds this step so its texgroup ids do not alias the earlier
  * chunk's. Pages fit in 12 bits (MAXTPAGESPERTLOAD is 50), leaving the
  * top 4 bits for the chunk number. */
-#define SMEMO_CHUNK_STEP (1u << 28)
+constexpr auto SMEMO_CHUNK_STEP = (1u << 28);
 
 /* Vertex-owner class (R05 sizing + future persistent-geometry tagging).
  * Set once at buffer-creation time by the owning loader; never changed
@@ -432,9 +432,9 @@ typedef struct {
 } *LPOLDLVERTEX;
 
 /* bjd - remove when done. taken from SDK */
-#define CLIP_LEFT                0x00000001L
-#define CLIP_RIGHT               0x00000002L
-#define CLIP_TOP					0x00000004L
-#define CLIP_BOTTOM              0x00000008L
-#define CLIP_FRONT               0x00000010L
-#define CLIP_BACK                0x00000020L
+constexpr auto CLIP_LEFT = 0x00000001L;
+constexpr auto CLIP_RIGHT = 0x00000002L;
+constexpr auto CLIP_TOP = 0x00000004L;
+constexpr auto CLIP_BOTTOM = 0x00000008L;
+constexpr auto CLIP_FRONT = 0x00000010L;
+constexpr auto CLIP_BACK = 0x00000020L;

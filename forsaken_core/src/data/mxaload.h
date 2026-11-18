@@ -25,10 +25,10 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define MAX_MXAGROUPS			1
-#define	MAX_ANIM_FRAMES			16 //1
+constexpr int MAX_MXAGROUPS = 1;
+constexpr int MAX_ANIM_FRAMES = 16; //1
 #define MAXMXATEXTUREGROUPSPER 8
-#define	MAXTPAGESPERMXALOAD		8
+constexpr int MAXTPAGESPERMXALOAD = 8;
 #ifdef __3DS__
 /* Must be == MAXMODELHEADERS — model indices are shared between MX and MXA
  * headers, so the smaller of the two limits the system. See models.h for
@@ -39,9 +39,9 @@
 #endif
 
 
-#define MXA_ANIM_POS		(1 << 0)
-#define MXA_ANIM_RGB		(1 << 1)
-#define MXA_ANIM_UV			(1 << 2)
+constexpr auto MXA_ANIM_POS = (1 << 0);
+constexpr auto MXA_ANIM_RGB = (1 << 1);
+constexpr auto MXA_ANIM_UV = (1 << 2);
 
 /*===================================================================
 	Structures

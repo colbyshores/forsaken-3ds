@@ -17,7 +17,7 @@
 #include "rendering/render.h"
 #include "math/new3d.h"
 
-#define MAXTRANSEXE 128
+constexpr int MAXTRANSEXE = 128;
 
 typedef struct _TRANSEXE{
 	int	UseIdentity;

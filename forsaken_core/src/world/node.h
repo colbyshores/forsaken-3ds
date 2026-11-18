@@ -23,13 +23,13 @@
  * Memory cost: per-NODE struct grows by (32-16) × sizeof(struct NODE*)
  * = 64 bytes × number of nodes per level (typically 100-300) =
  * ~6-20 KB extra heap per level. Negligible. */
-#define	MAXLINKSPERNODE 32
+constexpr int MAXLINKSPERNODE = 32;
 
-#define	NODE_DECISION		(1<<0)
-#define	NODE_DROPMINES		(1<<1)
-#define	NODE_SNIPE_POSITION	(1<<2)
-#define	NODE_HIDE_POSITION	(1<<3)
-#define	NODE_TERMINATE		(1<<4)
+constexpr auto NODE_DECISION = (1<<0);
+constexpr auto NODE_DROPMINES = (1<<1);
+constexpr auto NODE_SNIPE_POSITION = (1<<2);
+constexpr auto NODE_HIDE_POSITION = (1<<3);
+constexpr auto NODE_TERMINATE = (1<<4);
 
 typedef struct NODE
 {

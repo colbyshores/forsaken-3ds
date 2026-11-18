@@ -116,8 +116,8 @@ void ReadSoundInfo( MLOADHEADER *m, char **pbuf );
 ===================================================================*/
 #define	MXV_VERSION_NUMBER	3
 
-#define UV_FUDGE	(0.5F)
-#define SAME_UV		(2.0F)
+constexpr float UV_FUDGE = (0.5F);
+constexpr float SAME_UV = (2.0F);
 
 /*===================================================================
 		Globals...	

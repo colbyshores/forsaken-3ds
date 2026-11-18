@@ -29,7 +29,7 @@
 #include "game/goal.h"
 #include "game/oct2.h"
 
-#define MSG_VERSION_NUMBER 1
+constexpr int MSG_VERSION_NUMBER = 1;
 
 // color names are defined in text.h colors_t
 u_int8_t Colourtrans[MAXFONTCOLOURS][3] = {
@@ -556,7 +556,7 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/
-#define	FLASH_RATE	( 15.0F )
+constexpr float FLASH_RATE = ( 15.0F );
 float	FlashSpeed = 0.0F;
 bool	FlashToggle = false;
 

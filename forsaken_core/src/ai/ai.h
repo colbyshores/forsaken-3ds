@@ -70,85 +70,85 @@ enum
 
 
 // Ai Status.... Enemy->AIFlags
-#define AI_ITHINK						(1<<0)
-#define AI_PLAYERINRANGE				(1<<1)
-#define AI_ANYPLAYERINRANGE				(1<<2)
-#define AI_ICANSEEPLAYER				(1<<3)
-#define AI_IHAVESEENPLAYER				(1<<4)
-#define AI_FRIENDLYFIRE					(1<<5)		// If I fire at my target I might cause friendly fire....
-#define AI_PLAYERCANSEEME				(1<<6)
-#define AI_PLAYERISTARGETINGME			(1<<7)
-#define AI_PLAYERHASFIREDATME			(1<<8)
-#define AI_IVEBEENHITBYPLAYER			(1<<9)
-#define AI_ICANHEARPLAYER				(1<<10)
-#define	AI_PLAYERHASFIREDPRIMARY		(1<<11)
-#define	AI_PLAYERHASFIREDSECONDARY		(1<<12)
-#define	AI_TARGETED						(1<<13)
-#define	AI_TARGETED_ONEOFF				(1<<14)
-#define	AI_MINEISCLOSE					(1<<15)
-#define	AI_MINEAVOID					(1<<16)
+constexpr auto AI_ITHINK = (1<<0);
+constexpr auto AI_PLAYERINRANGE = (1<<1);
+constexpr auto AI_ANYPLAYERINRANGE = (1<<2);
+constexpr auto AI_ICANSEEPLAYER = (1<<3);
+constexpr auto AI_IHAVESEENPLAYER = (1<<4);
+constexpr auto AI_FRIENDLYFIRE = (1<<5); // If I fire at my target I might cause friendly fire....
+constexpr auto AI_PLAYERCANSEEME = (1<<6);
+constexpr auto AI_PLAYERISTARGETINGME = (1<<7);
+constexpr auto AI_PLAYERHASFIREDATME = (1<<8);
+constexpr auto AI_IVEBEENHITBYPLAYER = (1<<9);
+constexpr auto AI_ICANHEARPLAYER = (1<<10);
+constexpr auto AI_PLAYERHASFIREDPRIMARY = (1<<11);
+constexpr auto AI_PLAYERHASFIREDSECONDARY = (1<<12);
+constexpr auto AI_TARGETED = (1<<13);
+constexpr auto AI_TARGETED_ONEOFF = (1<<14);
+constexpr auto AI_MINEISCLOSE = (1<<15);
+constexpr auto AI_MINEAVOID = (1<<16);
 
 
 
 // Behaviour
-#define AI_BEHAVIOUR_LEAVENETWORK		(1<<0)		// Can I Leave My Network to persue Target...
-#define AI_BEHAVIOUR_NOFRIENDLYFIRE		(1<<1)		// Do I Care About Friendly Fire...
-#define AI_BEHAVIOUR_AVOID_PRIMARY		(1<<2)
-#define AI_BEHAVIOUR_AVOID_SECONDARY	(1<<3)
-#define AI_BEHAVIOUR_AVOID_MINES		(1<<4)
-#define AI_BEHAVIOUR_ANTICIPATE_MOVE	(1<<5)
-#define AI_BEHAVIOUR_ATTACK_ONSITE		(1<<6)		// If I See the player Should I Attack him...
-#define AI_BEHAVIOUR_ATTACK_PROVOKE		(1<<7)		// If the Player Hits me should I Hit Back...
-#define AI_BEHAVIOUR_ATTACK_FIND		(1<<8)		// Can I Find the player if I have allready attacked him...
-#define AI_BEHAVIOUR_NETWORKRANGE		(1<<9)		// Do I Have a max range that I can Wander from my network???
-#define AI_BEHAVIOUR_WEAPONKNOWLEDGE	(1<<10)		// Can I Take advantage of certain weapon charcteristics..ie suss gun limited range??
-#define AI_BEHAVIOUR_ICANTPITCH			(1<<11)		// I cant turn in the X..So I must try and get level with the player by sliding up and down...
-#define AI_BEHAVIOUR_ICANTYAW			(1<<12)		// I cant turn in the Y..So I must try and get level with the player by sliding left and right...
-#define AI_BEHAVIOUR_ATTACKMINES		(1<<13)		// If I see a Mine Should I Attack It..
-#define AI_BEHAVIOUR_AVOIDMINES			(1<<14)		// If I see a Mine Should I Avoid It..
-#define AI_BEHAVIOUR_DROPMINES			(1<<15)		// If My Nearest Node is a mine dropping node then I can Drop Mines..
-#define AI_BEHAVIOUR_RAMMINES			(1<<16)		// If I find a mine ram the bastard....
-#define AI_BEHAVIOUR_RETREAT			(1<<17)		// If I Get hurt bad I should run away..
-#define AI_BEHAVIOUR_DONTSTOPANDTURN	(1<<18)		// should I stop when I turn...
-#define AI_BEHAVIOUR_PRECISECONTROL		(1<<19)		// No bouncy inertial shit...Robotic and Menacing movements...
-#define AI_BEHAVIOUR_CLOAK				(1<<20)		// I Can Cloak...
-#define AI_BEHAVIOUR_NOBOB				(1<<21)		// I Dont Bob...
-#define AI_BEHAVIOUR_NOTURN				(1<<22)		// I Dont Turn..
-#define AI_BEHAVIOUR_RANDSECONDARYFIREPOS	(1<<23)		// Fire my secondary bullets randomly...
+constexpr auto AI_BEHAVIOUR_LEAVENETWORK = (1<<0); // Can I Leave My Network to persue Target...
+constexpr auto AI_BEHAVIOUR_NOFRIENDLYFIRE = (1<<1); // Do I Care About Friendly Fire...
+constexpr auto AI_BEHAVIOUR_AVOID_PRIMARY = (1<<2);
+constexpr auto AI_BEHAVIOUR_AVOID_SECONDARY = (1<<3);
+constexpr auto AI_BEHAVIOUR_AVOID_MINES = (1<<4);
+constexpr auto AI_BEHAVIOUR_ANTICIPATE_MOVE = (1<<5);
+constexpr auto AI_BEHAVIOUR_ATTACK_ONSITE = (1<<6); // If I See the player Should I Attack him...
+constexpr auto AI_BEHAVIOUR_ATTACK_PROVOKE = (1<<7); // If the Player Hits me should I Hit Back...
+constexpr auto AI_BEHAVIOUR_ATTACK_FIND = (1<<8); // Can I Find the player if I have allready attacked him...
+constexpr auto AI_BEHAVIOUR_NETWORKRANGE = (1<<9); // Do I Have a max range that I can Wander from my network???
+constexpr auto AI_BEHAVIOUR_WEAPONKNOWLEDGE = (1<<10); // Can I Take advantage of certain weapon charcteristics..ie suss gun limited range??
+constexpr auto AI_BEHAVIOUR_ICANTPITCH = (1<<11); // I cant turn in the X..So I must try and get level with the player by sliding up and down...
+constexpr auto AI_BEHAVIOUR_ICANTYAW = (1<<12); // I cant turn in the Y..So I must try and get level with the player by sliding left and right...
+constexpr auto AI_BEHAVIOUR_ATTACKMINES = (1<<13); // If I see a Mine Should I Attack It..
+constexpr auto AI_BEHAVIOUR_AVOIDMINES = (1<<14); // If I see a Mine Should I Avoid It..
+constexpr auto AI_BEHAVIOUR_DROPMINES = (1<<15); // If My Nearest Node is a mine dropping node then I can Drop Mines..
+constexpr auto AI_BEHAVIOUR_RAMMINES = (1<<16); // If I find a mine ram the bastard....
+constexpr auto AI_BEHAVIOUR_RETREAT = (1<<17); // If I Get hurt bad I should run away..
+constexpr auto AI_BEHAVIOUR_DONTSTOPANDTURN = (1<<18); // should I stop when I turn...
+constexpr auto AI_BEHAVIOUR_PRECISECONTROL = (1<<19); // No bouncy inertial shit...Robotic and Menacing movements...
+constexpr auto AI_BEHAVIOUR_CLOAK = (1<<20); // I Can Cloak...
+constexpr auto AI_BEHAVIOUR_NOBOB = (1<<21); // I Dont Bob...
+constexpr auto AI_BEHAVIOUR_NOTURN = (1<<22); // I Dont Turn..
+constexpr auto AI_BEHAVIOUR_RANDSECONDARYFIREPOS = (1<<23); // Fire my secondary bullets randomly...
 
 
-#define	AI_CONTROL_FORWARD	(1<<0)
-#define	AI_CONTROL_BACK		(1<<1)
-#define	AI_CONTROL_LEFT		(1<<2)
-#define	AI_CONTROL_RIGHT	(1<<3)
-#define	AI_CONTROL_UP		(1<<4)
-#define	AI_CONTROL_DOWN		(1<<5)
-#define	AI_CONTROL_TURNLEFT		(1<<6)
-#define	AI_CONTROL_TURNRIGHT	(1<<7)
-#define	AI_CONTROL_TURNUP		(1<<8)
-#define	AI_CONTROL_TURNDOWN		(1<<9)
-#define	AI_CONTROL_FIREPRIMARY	(1<<10)
+constexpr auto AI_CONTROL_FORWARD = (1<<0);
+constexpr auto AI_CONTROL_BACK = (1<<1);
+constexpr auto AI_CONTROL_LEFT = (1<<2);
+constexpr auto AI_CONTROL_RIGHT = (1<<3);
+constexpr auto AI_CONTROL_UP = (1<<4);
+constexpr auto AI_CONTROL_DOWN = (1<<5);
+constexpr auto AI_CONTROL_TURNLEFT = (1<<6);
+constexpr auto AI_CONTROL_TURNRIGHT = (1<<7);
+constexpr auto AI_CONTROL_TURNUP = (1<<8);
+constexpr auto AI_CONTROL_TURNDOWN = (1<<9);
+constexpr auto AI_CONTROL_FIREPRIMARY = (1<<10);
 
 
-#define	AI_CONTROL_NO_FORWARD	(1<<11)
-#define	AI_CONTROL_NO_BACK		(1<<12)
-#define	AI_CONTROL_NO_LEFT		(1<<13)
-#define	AI_CONTROL_NO_RIGHT		(1<<14)
-#define	AI_CONTROL_NO_UP		(1<<15)
-#define	AI_CONTROL_NO_DOWN		(1<<16)
+constexpr auto AI_CONTROL_NO_FORWARD = (1<<11);
+constexpr auto AI_CONTROL_NO_BACK = (1<<12);
+constexpr auto AI_CONTROL_NO_LEFT = (1<<13);
+constexpr auto AI_CONTROL_NO_RIGHT = (1<<14);
+constexpr auto AI_CONTROL_NO_UP = (1<<15);
+constexpr auto AI_CONTROL_NO_DOWN = (1<<16);
 
-#define	AI_CONTROL_COLLISION	(1<<17)
+constexpr auto AI_CONTROL_COLLISION = (1<<17);
 
 
 
 
 // Avoidance Types....
-#define AVOID_LEFT				(AI_CONTROL_LEFT)
-#define AVOID_RIGHT				(AI_CONTROL_RIGHT)
-#define AVOID_UP				(AI_CONTROL_UP)
-#define AVOID_DOWN				(AI_CONTROL_DOWN)
-#define AVOID_FORWARD			(AI_CONTROL_FORWARD)
-#define AVOID_BACK				(AI_CONTROL_BACK)
+constexpr auto AVOID_LEFT = (AI_CONTROL_LEFT);
+constexpr auto AVOID_RIGHT = (AI_CONTROL_RIGHT);
+constexpr auto AVOID_UP = (AI_CONTROL_UP);
+constexpr auto AVOID_DOWN = (AI_CONTROL_DOWN);
+constexpr auto AVOID_FORWARD = (AI_CONTROL_FORWARD);
+constexpr auto AVOID_BACK = (AI_CONTROL_BACK);
 
 
 
@@ -156,14 +156,14 @@ enum
 // Define AI mode timer values
 //--------------------------------------------------------------------------
 
-#define ONE_SECOND				(60.0F)
+constexpr float ONE_SECOND = (60.0F);
 
-#define RESET_IDLE_TIME			(ONE_SECOND * 1.0F)
-#define RESET_SCAN_TIME			(ONE_SECOND * 0.25F)
-#define RESET_VALIDATE_TIME		(ONE_SECOND * 0.25F)
-#define RESET_FIRE_TIME			(ONE_SECOND * 0.25F)
+constexpr auto RESET_IDLE_TIME = (ONE_SECOND * 1.0F);
+constexpr auto RESET_SCAN_TIME = (ONE_SECOND * 0.25F);
+constexpr auto RESET_VALIDATE_TIME = (ONE_SECOND * 0.25F);
+constexpr auto RESET_FIRE_TIME = (ONE_SECOND * 0.25F);
 
-#define PINGOFFTIME				(ONE_SECOND * 3.0F)
+constexpr auto PINGOFFTIME = (ONE_SECOND * 3.0F);
 
 //--------------------------------------------------------------------------
 // Define Primary Weapon Data...
@@ -203,13 +203,13 @@ typedef struct {
 // Define TARGETTING flags / macros
 //--------------------------------------------------------------------------
 
-#define	_TARGET_CURRENT		(1 << 0)				// Target in current GROUP only
-#define	_TARGET_ENEMIES		(1 << 1)				// Target ENEMIES
-#define	_TARGET_PLAYERS		(1 << 2)				// Target PLAYERS
-#define	_TARGET_NODES		(1 << 3)				// Target NODES
-#define	_TARGET_PICKUPS		(1 << 4)				// Target PICKUPS
-#define	_TARGET_TRIGGERS	(1 << 5)				// Target TRIGGERS
-#define	_TARGET_MINES		(1 << 6)				// Target MINES
+constexpr auto _TARGET_CURRENT = (1 << 0); // Target in current GROUP only
+constexpr auto _TARGET_ENEMIES = (1 << 1); // Target ENEMIES
+constexpr auto _TARGET_PLAYERS = (1 << 2); // Target PLAYERS
+constexpr auto _TARGET_NODES = (1 << 3); // Target NODES
+constexpr auto _TARGET_PICKUPS = (1 << 4); // Target PICKUPS
+constexpr auto _TARGET_TRIGGERS = (1 << 5); // Target TRIGGERS
+constexpr auto _TARGET_MINES = (1 << 6); // Target MINES
 
 #define	SET_TARGET_CURRENT	(Tinfo->Flags |= _TARGET_CURRENT)
 #define	SET_TARGET_ENEMIES	(Tinfo->Flags |= _TARGET_ENEMIES)
@@ -227,7 +227,7 @@ typedef struct {
 #define	TARGET_TRIGGERS			(Tinfo->Flags & _TARGET_TRIGGERS)
 #define	TARGET_MINES			(Tinfo->Flags & _TARGET_MINES)
 
-#define 	BIGDISTANCE				(32000.0F)
+constexpr float BIGDISTANCE = (32000.0F);
 
 #define 	END_OF_TYPES			((int8_t) 255)
 

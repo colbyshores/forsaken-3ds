@@ -64,7 +64,7 @@ mxtype : u_int16_t // always 0 for mx format
 		Globals...
 ===================================================================*/
 
-#define	NUMOFPOLYSPER3DPANELITEM 2
+constexpr int NUMOFPOLYSPER3DPANELITEM = 2;
 POLYANIM * Panel3DPolyAnims_Primary[NUMOFPOLYSPER3DPANELITEM];
 POLYANIM * Panel3DPolyAnims_Secondary[NUMOFPOLYSPER3DPANELITEM];
 POLYANIM * Panel3DPolyAnims_Mine[NUMOFPOLYSPER3DPANELITEM];

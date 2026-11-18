@@ -30,9 +30,9 @@
 #include "game/ships.h"
 #include "rendering/2dtextures.h"
 
-#define THERMAL_STEP		(1.6F)
-#define THERMAL_INC			(0.0092593F)
-#define THERMAL_DEC			(0.25F)
+constexpr float THERMAL_STEP = (1.6F);
+constexpr float THERMAL_INC = (0.0092593F);
+constexpr float THERMAL_DEC = (0.25F);
 
 /*===================================================================
 	Externs

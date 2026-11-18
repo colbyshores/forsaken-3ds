@@ -37,9 +37,9 @@
 		Globals...	
 ===================================================================*/
 
-#define MAXPORTVERTS (MAXPORTALSPERGROUP * MAXVERTSPERPORTAL)
+constexpr auto MAXPORTVERTS = (MAXPORTALSPERGROUP * MAXVERTSPERPORTAL);
 
-#define	MAXGROUPSVISIBLE 16
+constexpr int MAXGROUPSVISIBLE = 16;
 
 static int GTabRowSize;
 

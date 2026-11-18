@@ -20,7 +20,7 @@
 
 #pragma once
 
-#define NETWORK_DEFAULT_PORT 2300
+constexpr int NETWORK_DEFAULT_PORT = 2300;
 
 typedef enum {
 	NETWORK_OK,			// success
@@ -58,7 +58,7 @@ void network_cleanup();	// stop and cleanup networking
  *  Players
  */
 
-#define NETWORK_MAX_NAME_LENGTH 15
+constexpr int NETWORK_MAX_NAME_LENGTH = 15;
 #define INET_ADDRSTRLEN 16 // 255.255.255.255\0
 
 typedef struct _network_player_t network_player_t;

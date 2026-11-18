@@ -27,42 +27,42 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define MAXNUMOFSCRPOLYS	1000
-#define	MAXSCREENPOLYVERTS	800
-#define	TIMERSTARTSCREENX	( 320.0F - 64.0F )
-#define	TIMERSTARTSCREENY	( 240.0F - 36.0F )
-#define	TIMERSTARTSCALE		( 0.3F )
-#define	TIMERENDSCREENX		( 160.0F )
-#define	TIMERENDSCREENY		( 120.0F )
-#define	TIMERENDSCALE		( 1.0F )
+constexpr int MAXNUMOFSCRPOLYS = 1000;
+constexpr int MAXSCREENPOLYVERTS = 800;
+constexpr auto TIMERSTARTSCREENX = ( 320.0F - 64.0F );
+constexpr auto TIMERSTARTSCREENY = ( 240.0F - 36.0F );
+constexpr float TIMERSTARTSCALE = ( 0.3F );
+constexpr float TIMERENDSCREENX = ( 160.0F );
+constexpr float TIMERENDSCREENY = ( 120.0F );
+constexpr float TIMERENDSCALE = ( 1.0F );
 
 /*===================================================================
 	Types
 ===================================================================*/
-#define	SCRTYPE_Normal		0
-#define	SCRTYPE_LastAFrame	1
+constexpr int SCRTYPE_Normal = 0;
+constexpr int SCRTYPE_LastAFrame = 1;
 
 /*===================================================================
 	Flags
 ===================================================================*/
-#define	SCRFLAG_Nothing		0
-#define	SCRFLAG_Scale		1
-#define	SCRFLAG_UseCoords	2
-#define	SCRFLAG_Onscreen	4
-#define	SCRFLAG_Solid		8
-#define	SCRFLAG_Rot90		16
+constexpr int SCRFLAG_Nothing = 0;
+constexpr int SCRFLAG_Scale = 1;
+constexpr int SCRFLAG_UseCoords = 2;
+constexpr int SCRFLAG_Onscreen = 4;
+constexpr int SCRFLAG_Solid = 8;
+constexpr int SCRFLAG_Rot90 = 16;
 #define	SCRFLAG_BottomHUD	32  /* [3DS] route this poly to the mono bottom screen
                                       instead of the stereo top screen */
 
 /*===================================================================
 	Process Sequences
 ===================================================================*/
-#define	SCRSEQ_Nothing		0
-#define	SCRSEQ_Anim			1
-#define	SCRSEQ_Fade			2
-#define	SCRSEQ_Thermo		3
-#define	SCRSEQ_Logo			4
-#define	SCRSEQ_FadeUp 		5
+constexpr int SCRSEQ_Nothing = 0;
+constexpr int SCRSEQ_Anim = 1;
+constexpr int SCRSEQ_Fade = 2;
+constexpr int SCRSEQ_Thermo = 3;
+constexpr int SCRSEQ_Logo = 4;
+constexpr int SCRSEQ_FadeUp = 5;
 
 /*===================================================================
 	Structures

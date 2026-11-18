@@ -69,12 +69,12 @@ float BytesPerSecTimer				= 0.0F;
 
 #define YourVersion "YOUR VERSION: " PXVersion
 
-#define	ONEOVER32767 (1.0F / 32767.0F)
-#define	ONEOVER256 (1.0F / 256.0F)
+constexpr auto ONEOVER32767 = (1.0F / 32767.0F);
+constexpr auto ONEOVER256 = (1.0F / 256.0F);
 
-#define	SHORTBANKMODIFIER (32767.0F / MAXBANKANGLE )
-#define	SHORTANGLEMODIFIERPACK (32767.0F / 45.0F)
-#define	SHORTANGLEMODIFIERUNPACK (45.0F / 32767.0F)
+constexpr auto SHORTBANKMODIFIER = (32767.0F / MAXBANKANGLE );
+constexpr auto SHORTANGLEMODIFIERPACK = (32767.0F / 45.0F);
+constexpr auto SHORTANGLEMODIFIERUNPACK = (45.0F / 32767.0F);
 
 u_int32_t BuildShipFlags( BYTE Player );
 void UnPackShipFlags( BYTE Player , u_int32_t Flags );

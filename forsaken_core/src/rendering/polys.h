@@ -22,22 +22,22 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define MAXPOLYS			2000
-#define	MAXPOLYVERTS		800
+constexpr int MAXPOLYS = 2000;
+constexpr int MAXPOLYVERTS = 800;
 
-#define	POLY_FLAG_NOTHING	0
-#define	POLY_FLAG_TWOSIDED	1
-#define	POLY_FLAG_DONTCLIP	2
-#define	POLY_FLAG_SOLID		4
+constexpr int POLY_FLAG_NOTHING = 0;
+constexpr int POLY_FLAG_TWOSIDED = 1;
+constexpr int POLY_FLAG_DONTCLIP = 2;
+constexpr int POLY_FLAG_SOLID = 4;
 
-#define	POLY_NOTHING		0
-#define	POLY_LASER			1
-#define	POLY_PULSAR_TRAIL	2
-#define	POLY_SHIELD			3
-#define	POLY_AFTERBURNER	4
-#define	POLY_SCATTER_TRAIL	5
-#define	POLY_INVBITS		6
-#define	POLY_POWERLASER		7
+constexpr int POLY_NOTHING = 0;
+constexpr int POLY_LASER = 1;
+constexpr int POLY_PULSAR_TRAIL = 2;
+constexpr int POLY_SHIELD = 3;
+constexpr int POLY_AFTERBURNER = 4;
+constexpr int POLY_SCATTER_TRAIL = 5;
+constexpr int POLY_INVBITS = 6;
+constexpr int POLY_POWERLASER = 7;
 
 /*===================================================================
 	Structures

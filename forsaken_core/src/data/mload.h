@@ -20,34 +20,34 @@
 /*
  * defines
  */
-#define	CELLSIZE ( 256.0F )
+constexpr float CELLSIZE = ( 256.0F );
 #define	BLOCKSIZE		( 1024.0F * GLOBAL_SCALE )
 
-#define MAXTPAGESPERMLOAD 8
-#define MAXEXECBUFSPERGROUP 16
-#define MAXPORTALSPERGROUP	64
-#define MAXVERTSPERPORTAL	32
-#define MAXPOLYSPERPORTAL	32
-#define MAXVERTSPERPORTALPOLY	4
-#define MAXGROUPSVISIBLEPERPORTAL 64
+constexpr int MAXTPAGESPERMLOAD = 8;
+constexpr int MAXEXECBUFSPERGROUP = 16;
+constexpr int MAXPORTALSPERGROUP = 64;
+constexpr int MAXVERTSPERPORTAL = 32;
+constexpr int MAXPOLYSPERPORTAL = 32;
+constexpr int MAXVERTSPERPORTALPOLY = 4;
+constexpr int MAXGROUPSVISIBLEPERPORTAL = 64;
 #define MAXSTARTPOSITIONS	MAXGROUPS
-#define HASTRANSPARENCIES	0x001
-#define HASENVIROMENTMAP	0x002
+constexpr auto HASTRANSPARENCIES = 0x001;
+constexpr auto HASENVIROMENTMAP = 0x002;
 
 
-#define MAXPOLYANIMSPEREXECBUF 64
-#define MAXANIMSEQS		128
-#define	MAXANIMLOOPSTACK 8
-#define TEXTUREANIM_Stop	0
-#define TEXTUREANIM_Go		1
+constexpr int MAXPOLYANIMSPEREXECBUF = 64;
+constexpr int MAXANIMSEQS = 128;
+constexpr int MAXANIMLOOPSTACK = 8;
+constexpr int TEXTUREANIM_Stop = 0;
+constexpr int TEXTUREANIM_Go = 1;
 
 
-#define TEXANIM_COMMAND		(0x8000) // (top bit set if command otherwise frame number)
-#define TEXANIM_DURATION	(0x8001) // default frame duration
-#define TEXANIM_DURATION1	(0x8002) // next frame duration only
-#define TEXANIM_LOOPINIT	(0x8003) // loop var, number of repeats
-#define TEXANIM_LOOPEND		(0x8004) // loop var, start of loop
-#define TEXANIM_END			(0xFFFF) // (end of animation)
+constexpr auto TEXANIM_COMMAND = (0x8000); // (top bit set if command otherwise frame number)
+constexpr auto TEXANIM_DURATION = (0x8001); // default frame duration
+constexpr auto TEXANIM_DURATION1 = (0x8002); // next frame duration only
+constexpr auto TEXANIM_LOOPINIT = (0x8003); // loop var, number of repeats
+constexpr auto TEXANIM_LOOPEND = (0x8004); // loop var, start of loop
+constexpr auto TEXANIM_END = (0xFFFF); // (end of animation)
 
 #define	LEVEL_SPECIFIC			true
 #define	NOT_LEVEL_SPECIFIC		false

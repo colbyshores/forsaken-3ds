@@ -20,13 +20,13 @@
 /*
  * Defines
  */
-#define TOLER (0.03125)	//0.0000076F 
-#define INSIDE 1
-#define OUTSIDE -1
-#define ONPLANE 0
+constexpr double TOLER = (0.03125); //0.0000076F
+constexpr int INSIDE = 1;
+constexpr int OUTSIDE = -1;
+constexpr int ONPLANE = 0;
  
 
-#define MAX_BSP_MODELS	(2)
+constexpr int MAX_BSP_MODELS = (2);
 /*
  * Structures
  */

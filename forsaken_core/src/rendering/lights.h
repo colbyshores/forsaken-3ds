@@ -24,9 +24,9 @@
 /*
  * defines
  */
-#define	MAXXLIGHTS	256
-#define	POINT_LIGHT	0
-#define	SPOT_LIGHT	1
+constexpr int MAXXLIGHTS = 256;
+constexpr int POINT_LIGHT = 0;
+constexpr int SPOT_LIGHT = 1;
  
 #define MIN_LIGHT_SIZE	( 1536.0F * GLOBAL_SCALE )
  

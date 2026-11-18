@@ -17,14 +17,14 @@
 #include "util/util.h"
 #include "stdio.h"
 
-#define BLANK_RED		(255)
-#define BLANK_GREEN		(255)
-#define BLANK_BLUE		(255)
+constexpr int BLANK_RED = (255);
+constexpr int BLANK_GREEN = (255);
+constexpr int BLANK_BLUE = (255);
 
 /*===================================================================
 		Globals...	
 ===================================================================*/
-#define	MAXSCALE 3
+constexpr int MAXSCALE = 3;
 
 TLOADHEADER	Tloadheader;
 double	Gamma = 1.0;
