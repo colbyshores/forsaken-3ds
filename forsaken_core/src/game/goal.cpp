@@ -29,6 +29,7 @@
 #include "game/ships.h"
 #include "net/multiplayer.h"
 #include "rendering/2dtextures.h"
+#include "util/file_reader.h"
 
 constexpr int GOAL_VERSION_NUMBER = (1);
 
@@ -52,12 +53,9 @@ bool GoalLoad( void )
 	long			Read_Size;
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	u_int16_t			*	u_int16_tpnt;
-	u_int32_t			*	u_int32_tpnt;
 	int			i, j;
 	GOAL * GoalPnt;
 	TRIGGER_ZONE * ZonePnt;
-	float * floatpnt;
 	u_int32_t	MagicNumber;
 	u_int32_t	VersionNumber;
 
@@ -79,10 +77,9 @@ bool GoalLoad( void )
 
 	if( Read_Size != File_Size ) return false;
 
-	u_int32_tpnt = (u_int32_t *) Buffer;
-	MagicNumber = *u_int32_tpnt++;
-	VersionNumber = *u_int32_tpnt++;
-	Buffer = (char *) u_int32_tpnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != GOAL_VERSION_NUMBER  ) )
 	{
@@ -90,9 +87,7 @@ bool GoalLoad( void )
 		return( false );
 	}
 
-	u_int16_tpnt = (u_int16_t *) Buffer;
-	NumGoals = *u_int16_tpnt++;
-	Buffer = (char*) u_int16_tpnt;
+	NumGoals = in.u16();
 	Goal = (GOAL *) calloc( NumGoals, sizeof( GOAL ) );	
 	if ( !Goal )
 	{
@@ -103,31 +98,22 @@ bool GoalLoad( void )
 
 	for( i = 0 ; i < NumGoals ; i++ )
 	{
-		u_int16_tpnt = (u_int16_t *) Buffer;
-		GoalPnt->group = *u_int16_tpnt++;
-		GoalPnt->type = *u_int16_tpnt++;
+		GoalPnt->group = in.u16();
+		GoalPnt->type = in.u16();
 		GoalPnt->team = -1;
 		GoalPnt->state = GOALSTATE_Off;
 
-		floatpnt = (float * ) u_int16_tpnt;
-		memcpy_unaligned(&GoalPnt->pos, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&GoalPnt->half_size, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&GoalPnt->dir, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&GoalPnt->up, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy(&GoalPnt->width, floatpnt++, 4);
-		memcpy(&GoalPnt->height, floatpnt++, 4);
-		memcpy(&GoalPnt->depth, floatpnt++, 4);
-		Buffer = (char*) floatpnt;
+		GoalPnt->pos = in.vec();
+		GoalPnt->half_size = in.vec();
+		GoalPnt->dir = in.vec();
+		GoalPnt->up = in.vec();
+		GoalPnt->width = in.f32();
+		GoalPnt->height = in.f32();
+		GoalPnt->depth = in.f32();
 		if( GoalPnt->type != ZONE_Sphere )
 		{
 			// convex hull...
-			u_int16_tpnt = (u_int16_t*) Buffer;
-			GoalPnt->num_sides = *u_int16_tpnt++;
-			Buffer = (char*) u_int16_tpnt;
+			GoalPnt->num_sides = in.u16();
 			if ( GoalPnt->num_sides )
 				GoalPnt->Zone = (TRIGGER_ZONE*) malloc( GoalPnt->num_sides * sizeof( TRIGGER_ZONE ) );
 			else
@@ -141,16 +127,12 @@ bool GoalLoad( void )
 				return false;
 			}
 
-			floatpnt = (float * ) Buffer;
-			
 			for( j = 0 ; j < GoalPnt->num_sides ; j++ )
 			{
-				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
-				floatpnt+=3;
-				memcpy(&ZonePnt->offset, floatpnt++, 4);
+				ZonePnt->normal = in.vec();
+				ZonePnt->offset = in.f32();
 				ZonePnt++;
 			}
-			Buffer = (char*) floatpnt;
 		}
 		GoalPnt++;
 	}
