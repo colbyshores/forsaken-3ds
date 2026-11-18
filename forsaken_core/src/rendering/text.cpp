@@ -575,7 +575,7 @@ void PrintScoreSort( void )
 	if( !TeamGame )
 	{
 		if( ShowPlayersOnHUD )
- 		{
+		{
 			int top_offset = FontHeight; // initial gap
 			int line_height = FontHeight+1;
 
@@ -645,12 +645,12 @@ void PrintScoreSort( void )
 						sprintf( (char*) &buf[0] ,"%*dms", 4, (u_int16_t) Ships[ShipID].network_player->ping);
 						Print4x5TextSmall( &buf[0], left_offset, top_offset+((FontHeight-8.0F)/2.0F), ((GameStatus[ShipID] == STATUS_Left) ? DARKGRAY : GREEN) );
 
-                        // Show % Health
-                        if(ShowPlayerHealthByScores && GameStatus[ShipID] != STATUS_Left)
-                        {
+						// Show % Health
+						if(ShowPlayerHealthByScores && GameStatus[ShipID] != STATUS_Left)
+						{
 							sprintf( (char*) &buf[0], "H:%d", (u_int16_t) ceilf(((PlayerHealths[ShipID].Shield + PlayerHealths[ShipID].Hull) /2.56F)));
 							Print4x5TextSmall( &buf[0], left_offset+60.0F, top_offset+((FontHeight-8.0F)/2.0F), ShipHealthColour[ShipID] );
-                        }
+						}
 
 					}
 				}
@@ -1098,22 +1098,22 @@ char * StatusTab[256];
 ===================================================================*/
 void DisplayConnectionStatus( int num , int x , int y)
 {
-    u_int16_t dot;
+	u_int16_t dot;
 
 	// protect against bad input
 	if( num < 0 || num > MAX_PLAYERS-1 || num == WhoIAm || Ships[num].network_player == NULL )
 		return;
 
 	// calculate which colour flag to use
-    if(Ships[num].network_player->packets_lost == 0)
-        dot = 84; // green
-    else if(Ships[num].network_player->packets_lost == 1)
-        dot = 83; // blue
-    else
-        dot = 85; // red
+	if(Ships[num].network_player->packets_lost == 0)
+		dot = 84; // green
+	else if(Ships[num].network_player->packets_lost == 1)
+		dot = 83; // blue
+	else
+		dot = 85; // red
 
 	// display
-    AddScreenPolyText( dot, (float) x , (float) y+2, 255, 255, 255, 255 );
+	AddScreenPolyText( dot, (float) x , (float) y+2, 255, 255, 255, 255 );
 }
 
 

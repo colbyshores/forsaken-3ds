@@ -537,12 +537,12 @@ Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 {
 	int clip;
 
-    VisPolyApplyMatrix( (MATRIX *) &v->viewproj, (VECTOR *) wpos, vpos );
+	VisPolyApplyMatrix( (MATRIX *) &v->viewproj, (VECTOR *) wpos, vpos );
 	clip = 0;
 	if ( vpos->z > 1.0F )
 	{
 		clip |= CLIP_FRONT;
-	    VisPolyApplyMatrix( (MATRIX *) &cam->View, (VECTOR *) wpos, vpos );
+		VisPolyApplyMatrix( (MATRIX *) &cam->View, (VECTOR *) wpos, vpos );
 		if ( DotProduct( vpos, &clip_left ) < 0.0F )
 		{
 			clip |= CLIP_LEFT;
@@ -577,7 +577,7 @@ Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 		vpos->x = v->viewport->X + ( v->viewport->Width * 0.5F ) + (v->viewport->ScaleX * vpos->x);
 	}
 
-   	if ( vpos->y < -1.0F )
+	if ( vpos->y < -1.0F )
 	{
 		clip |= CLIP_BOTTOM;
 		vpos->y = (float) ( v->viewport->Y + v->viewport->Height );
@@ -886,8 +886,8 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		 * duplicated, not moved, so the pinned decision below and its
 		 * rationale comments stay exactly where they were reviewed. */
 		if (!(v->viewport->X == 0 && v->viewport->Y == 0
-		    && v->viewport->Width  == (long)render_info.ThisMode.w
-		    && v->viewport->Height == (long)render_info.ThisMode.h))
+			&& v->viewport->Width  == (long)render_info.ThisMode.w
+			&& v->viewport->Height == (long)render_info.ThisMode.h))
 #endif
 		{
 		g->projection._11 = cam->Proj._11 * v->viewport->Width / vp->Width;
@@ -927,8 +927,8 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		 * inset, leaving the camera looking like it's pointed wrong. */
 		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		if (v->viewport->X == 0 && v->viewport->Y == 0
-		    && v->viewport->Width  == (long)render_info.ThisMode.w
-		    && v->viewport->Height == (long)render_info.ThisMode.h)
+			&& v->viewport->Width  == (long)render_info.ThisMode.w
+			&& v->viewport->Height == (long)render_info.ThisMode.h)
 		{
 			g->projection = cam->Proj;
 		}
@@ -1000,22 +1000,22 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 	{
 		render_viewport_t *_pv = cam->visible.viewport;
 		bool _full_screen = (_pv->X == 0 && _pv->Y == 0
-		                     && _pv->Width  == (long)render_info.ThisMode.w
-		                     && _pv->Height == (long)render_info.ThisMode.h);
+							 && _pv->Width  == (long)render_info.ThisMode.w
+							 && _pv->Height == (long)render_info.ThisMode.h);
 		FSSetNextViewPortScissorMode(_full_screen);
 	}
 #else
 	FSSetNextViewPortScissorMode(false);
 #endif
 
-    if (!FSSetViewPort(&g->viewport)) {
+	if (!FSSetViewPort(&g->viewport)) {
 #ifdef DEBUG_VIEWPORT
 		SetViewportError( "ClipGroup", &g->viewport );
 #else
-        Msg("SetViewport failed.\n%s", render_error_description(0));
+		Msg("SetViewport failed.\n%s", render_error_description(0));
 #endif
-        return false;
-    }
+		return false;
+	}
 
 	return 1;
 }
@@ -1056,13 +1056,13 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 		t = 0;
 		for ( g = cam->visible.first_visible, i = 0; g; g = g->next_visible, i++ )
 		{
-		 	ClipGroup( &CurrentCamera, (u_int16_t) g->group );
+			ClipGroup( &CurrentCamera, (u_int16_t) g->group );
 
 			if ( XLight1Group(  Mloadheader, GroupsVisible[i] ) != true  )
 				return false;
 
 
- 			if ( ExecuteSingleGroupMloadHeader(  Mloadheader, (u_int16_t) g->group ) != true  )
+			if ( ExecuteSingleGroupMloadHeader(  Mloadheader, (u_int16_t) g->group ) != true  )
 				return false;
 
 
@@ -1086,15 +1086,15 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 			return false;
 	}
 
-    if (!FSSetViewPort(&OldViewPort))
+	if (!FSSetViewPort(&OldViewPort))
 	{
 #ifdef DEBUG_VIEWPORT
 		SetViewportError( "ClipGroup", &g->viewport );
 #else
-        Msg("SetViewport failed.\n%s", render_error_description(0));
+		Msg("SetViewport failed.\n%s", render_error_description(0));
 #endif
-        return false;
-    }
+		return false;
+	}
 
 	proj = Tempproj;
 	view = Tempview;

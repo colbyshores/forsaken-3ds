@@ -208,7 +208,7 @@ bool WaterLoad( void )
 		 * transition. */
 		{
 			WO->renderObject.textureGroups =
-			    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL, sizeof(TEXTUREGROUP));
+				(TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL, sizeof(TEXTUREGROUP));
 			if ( !WO->renderObject.textureGroups )
 			{
 				Msg( "WaterLoad: hunk-alloc failed for WO[%d].textureGroups", i );
@@ -720,8 +720,8 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 		  ( Offset->z * WaterNormal.z);
 	if( Div == 0.0F ) return false;		/* Reject, Parallel */
 	Num = ( ( Origin->x * WaterNormal.x ) +
-		    ( Origin->y * WaterNormal.y ) +
-		    ( Origin->z * WaterNormal.z ) ) + WaterOffset ;
+			( Origin->y * WaterNormal.y ) +
+			( Origin->z * WaterNormal.z ) ) + WaterOffset ;
 	t = -( Num / Div );
 
 /*===================================================================

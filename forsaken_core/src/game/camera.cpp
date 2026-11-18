@@ -90,8 +90,8 @@ bool Cameraload( char * Filename )
 	}
 
 	NumOfCams = in.i32();
- 	RemoteCameras = (REMOTECAMERA*) calloc( NumOfCams, sizeof(REMOTECAMERA) );
- 	CamPnt = RemoteCameras;
+	RemoteCameras = (REMOTECAMERA*) calloc( NumOfCams, sizeof(REMOTECAMERA) );
+	CamPnt = RemoteCameras;
 	if( !CamPnt )
 	{
 		Msg( "Camload failed allocate Cam Pointer in %s \n", Filename );
@@ -135,7 +135,7 @@ void CameraRelease( void)
 }
 
 /*===================================================================
- 	Procedure	:		Enable Remote Camera
+	Procedure	:		Enable Remote Camera
 	Input		:		u_int16_t	* Data
 	Output		:		Nothing
 ===================================================================*/
@@ -151,7 +151,7 @@ void EnableRemoteCamera( u_int16_t * Data )
 	ActiveRemoteCamera = CamPnt;
 }
 /*===================================================================
- 	Procedure	:		Disable Remote Camera
+	Procedure	:		Disable Remote Camera
 	Input		:		u_int16_t	* Data
 	Output		:		Nothing
 ===================================================================*/
@@ -198,7 +198,7 @@ FILE * LoadRemoteCameras( FILE * fp )
 	u_int16_t	TempIndex;
 	REMOTECAMERA	*	CamPnt;
 
- 	CamPnt = RemoteCameras;
+	CamPnt = RemoteCameras;
 
 	for( i = 0; i < NumOfCams ; i++ )
 	{

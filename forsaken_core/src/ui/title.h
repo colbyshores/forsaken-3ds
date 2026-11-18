@@ -103,8 +103,8 @@ typedef enum
 enum
 {
 	TEAM_SelectTeam,
-  	TEAM_SelectPlayer,
-  	TEAM_PlacePlayer,
+	TEAM_SelectPlayer,
+	TEAM_PlacePlayer,
 };
 
 // status of disc stack
@@ -182,8 +182,8 @@ enum
 enum
 {
 	WIPE_Done,
- 	WIPE_In,
- 	WIPE_Out,
+	WIPE_In,
+	WIPE_Out,
 	WIPE_WaitingToProcess,
 };
 

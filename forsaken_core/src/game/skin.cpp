@@ -349,7 +349,7 @@ void DisplayBSPNode( BSP_NODE * Node )
 					color = ( ( ( ( tempcolor & 0xFF000000 ) >> 1 ) & 0xFF000000 ) |
 							  ( ( ( tempcolor & 0x00FF0000 ) >> 1 ) & 0x00FF0000 ) |
 							  ( ( ( tempcolor & 0x0000FF00 ) >> 1 ) & 0x0000FF00 ) |
-							    ( ( tempcolor & 0x000000FF ) >> 1 ) );
+								( ( tempcolor & 0x000000FF ) >> 1 ) );
 				}
 				else
 				{
@@ -416,7 +416,7 @@ void DisplayBSPNode( BSP_NODE * Node )
 					color = ( ( ( ( tempcolor & 0xFF000000 ) >> 1 ) & 0xFF000000 ) |
 							  ( ( ( tempcolor & 0x00FF0000 ) >> 1 ) & 0x00FF0000 ) |
 							  ( ( ( tempcolor & 0x0000FF00 ) >> 1 ) & 0x0000FF00 ) |
-							    ( ( tempcolor & 0x000000FF ) >> 1 ) );
+								( ( tempcolor & 0x000000FF ) >> 1 ) );
 				}
 				else
 				{
@@ -935,7 +935,7 @@ void KillNodeCubeLines( void )
 ===================================================================*/
 bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
 {
-    LVERTEX	*BufStart = NULL;
+	LVERTEX	*BufStart = NULL;
 
 	if( Num_Skin_Execs >= MAXSKINEXECS )
 	{
@@ -977,7 +977,7 @@ void ReleaseSkinExecs( void )
 	{
 		{
 			FSReleaseRenderObject(&Skin_Execs[ Count ]);
-	 	}
+		}
 	}
 
 	Num_Skin_Execs = 0;
@@ -1124,7 +1124,7 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 ===================================================================*/
 bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
 {
-    LVERTEX	*BufStart = NULL;
+	LVERTEX	*BufStart = NULL;
 
 	if( Num_Portal_Execs >= MAXPORTALEXECS )
 	{
@@ -1185,7 +1185,7 @@ void ReleasePortalExecs( void )
 	{
 		{
 			FSReleaseRenderObject(&Portal_Execs[ Count ]);
-	 	}
+		}
 	}
 
 	Num_Portal_Execs = 0;
@@ -1207,9 +1207,9 @@ struct
 \*---------------------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------------------*\
 
-	       -------10-------
-	     /                 /
-	    / |               / |
+		   -------10-------
+		 /                 /
+		/ |               / |
 	   5  9              6  |
 	  /   |             /   |
 	 /                 /    |
@@ -1242,64 +1242,64 @@ int GetNextSide( int side )
 
 	switch( side )
 	{
-    	case 11:
-			     if( PointList[  2 ].flag )	new_side =  2;
+		case 11:
+				 if( PointList[  2 ].flag )	new_side =  2;
 			else if( PointList[  6 ].flag )	new_side =  6;
 			else if( PointList[  7 ].flag )	new_side =  7;
 			else if( PointList[  8 ].flag )	new_side =  8;
 			else if( PointList[  9 ].flag )	new_side =  9;
 			else if( PointList[ 10 ].flag )	new_side = 10;
 			break;
-    	case 10:
-			     if( PointList[  9 ].flag )	new_side =  9;
+		case 10:
+				 if( PointList[  9 ].flag )	new_side =  9;
 			else if( PointList[  8 ].flag )	new_side =  8;
 			else if( PointList[ 11 ].flag )	new_side = 11;
 			else if( PointList[  5 ].flag )	new_side =  5;
 			else if( PointList[  6 ].flag )	new_side =  6;
 			else if( PointList[  1 ].flag )	new_side =  1;
 			break;
-    	case 9:
-			     if( PointList[  0 ].flag )	new_side =  0;
+		case 9:
+				 if( PointList[  0 ].flag )	new_side =  0;
 			else if( PointList[  5 ].flag )	new_side =  5;
 			else if( PointList[  4 ].flag )	new_side =  4;
 			else if( PointList[  8 ].flag )	new_side =  8;
 			else if( PointList[ 10 ].flag )	new_side = 10;
 			else if( PointList[ 11 ].flag )	new_side = 11;
 			break;
-    	case 8:
-			     if( PointList[  9 ].flag )	new_side =  9;
+		case 8:
+				 if( PointList[  9 ].flag )	new_side =  9;
 			else if( PointList[ 10 ].flag )	new_side = 10;
 			else if( PointList[ 11 ].flag )	new_side = 11;
 			else if( PointList[  3 ].flag )	new_side =  3;
 			else if( PointList[  4 ].flag )	new_side =  4;
 			else if( PointList[  7 ].flag )	new_side =  7;
 			break;
-    	case 7:
-			     if( PointList[  3 ].flag )	new_side =  3;
+		case 7:
+				 if( PointList[  3 ].flag )	new_side =  3;
 			else if( PointList[  4 ].flag )	new_side =  4;
 			else if( PointList[  8 ].flag )	new_side =  8;
 			else if( PointList[  2 ].flag )	new_side =  2;
 			else if( PointList[  6 ].flag )	new_side =  6;
 			else if( PointList[ 11 ].flag )	new_side = 11;
 			break;
-    	case 6:
-			     if( PointList[  1 ].flag )	new_side =  1;
+		case 6:
+				 if( PointList[  1 ].flag )	new_side =  1;
 			else if( PointList[  5 ].flag )	new_side =  5;
 			else if( PointList[ 10 ].flag )	new_side = 10;
 			else if( PointList[  2 ].flag )	new_side =  2;
 			else if( PointList[  7 ].flag )	new_side =  7;
 			else if( PointList[ 11 ].flag )	new_side = 11;
 			break;
-    	case 5:
-			     if( PointList[  1 ].flag )	new_side =  1;
+		case 5:
+				 if( PointList[  1 ].flag )	new_side =  1;
 			else if( PointList[  6 ].flag )	new_side =  6;
 			else if( PointList[ 10 ].flag )	new_side = 10;
 			else if( PointList[  0 ].flag )	new_side =  0;
 			else if( PointList[  4 ].flag )	new_side =  4;
 			else if( PointList[  9 ].flag )	new_side =  9;
 			break;
-    	case 4:
-			     if( PointList[  0 ].flag )	new_side =  0;
+		case 4:
+				 if( PointList[  0 ].flag )	new_side =  0;
 			else if( PointList[  5 ].flag )	new_side =  5;
 			else if( PointList[  9 ].flag )	new_side =  9;
 			else if( PointList[  3 ].flag )	new_side =  3;
@@ -1307,7 +1307,7 @@ int GetNextSide( int side )
 			else if( PointList[  8 ].flag )	new_side =  8;
 			break;
 		case 3:
-			     if( PointList[  4 ].flag )	new_side =  4;
+				 if( PointList[  4 ].flag )	new_side =  4;
 			else if( PointList[  8 ].flag )	new_side =  8;
 			else if( PointList[  7 ].flag )	new_side =  7;
 			else if( PointList[  0 ].flag )	new_side =  0;
@@ -1315,23 +1315,23 @@ int GetNextSide( int side )
 			else if( PointList[  2 ].flag )	new_side =  2;
 			break;
 		case 0:
-			     if( PointList[  1 ].flag )	new_side =  1;
+				 if( PointList[  1 ].flag )	new_side =  1;
 			else if( PointList[  2 ].flag )	new_side =  2;
 			else if( PointList[  3 ].flag )	new_side =  3;
 			else if( PointList[  4 ].flag )	new_side =  4;
 			else if( PointList[  5 ].flag )	new_side =  5;
 			else if( PointList[  9 ].flag )	new_side =  9;
 			break;
-    	case 1:
-			     if( PointList[  0 ].flag )	new_side =  0;
+		case 1:
+				 if( PointList[  0 ].flag )	new_side =  0;
 			else if( PointList[  3 ].flag )	new_side =  3;
 			else if( PointList[  2 ].flag )	new_side =  2;
 			else if( PointList[  5 ].flag )	new_side =  5;
 			else if( PointList[  6 ].flag )	new_side =  6;
 			else if( PointList[ 10 ].flag )	new_side = 10;
 			break;
-    	case 2:
-			     if( PointList[  1 ].flag )	new_side =  1;
+		case 2:
+				 if( PointList[  1 ].flag )	new_side =  1;
 			else if( PointList[  0 ].flag )	new_side =  0;
 			else if( PointList[  3 ].flag )	new_side =  3;
 			else if( PointList[  6 ].flag )	new_side =  6;
@@ -1461,32 +1461,32 @@ u_int16_t	BoxLines[ 12 ] = { 0xffff, 0xffff, 0xffff, 0xffff,
 						   0xffff, 0xffff, 0xffff, 0xffff };
 
 VECTOR	BoxOffsets[ 24 ] = {
-   	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
-   	{  BOXSIZE, -BOXSIZE, -BOXSIZE },
-   	{  BOXSIZE, -BOXSIZE, -BOXSIZE },
-   	{  BOXSIZE,  BOXSIZE, -BOXSIZE },
-   	{  BOXSIZE,  BOXSIZE, -BOXSIZE },
-   	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
-   	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
-   	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
+	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
+	{  BOXSIZE, -BOXSIZE, -BOXSIZE },
+	{  BOXSIZE, -BOXSIZE, -BOXSIZE },
+	{  BOXSIZE,  BOXSIZE, -BOXSIZE },
+	{  BOXSIZE,  BOXSIZE, -BOXSIZE },
+	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
+	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
+	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
 
-   	{ -BOXSIZE, -BOXSIZE,  BOXSIZE },
-   	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
-   	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
-   	{  BOXSIZE,  BOXSIZE,  BOXSIZE },
-   	{  BOXSIZE,  BOXSIZE,  BOXSIZE },
-   	{ -BOXSIZE,  BOXSIZE,  BOXSIZE },
-   	{ -BOXSIZE,  BOXSIZE,  BOXSIZE },
-   	{ -BOXSIZE, -BOXSIZE,  BOXSIZE },
+	{ -BOXSIZE, -BOXSIZE,  BOXSIZE },
+	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
+	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
+	{  BOXSIZE,  BOXSIZE,  BOXSIZE },
+	{  BOXSIZE,  BOXSIZE,  BOXSIZE },
+	{ -BOXSIZE,  BOXSIZE,  BOXSIZE },
+	{ -BOXSIZE,  BOXSIZE,  BOXSIZE },
+	{ -BOXSIZE, -BOXSIZE,  BOXSIZE },
 
-   	{ -BOXSIZE, -BOXSIZE,  BOXSIZE },
-   	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
-   	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
-   	{  BOXSIZE, -BOXSIZE, -BOXSIZE },
-   	{  BOXSIZE,  BOXSIZE,  BOXSIZE },
-   	{  BOXSIZE,  BOXSIZE, -BOXSIZE },
-   	{ -BOXSIZE,  BOXSIZE,  BOXSIZE },
-   	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
+	{ -BOXSIZE, -BOXSIZE,  BOXSIZE },
+	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
+	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
+	{  BOXSIZE, -BOXSIZE, -BOXSIZE },
+	{  BOXSIZE,  BOXSIZE,  BOXSIZE },
+	{  BOXSIZE,  BOXSIZE, -BOXSIZE },
+	{ -BOXSIZE,  BOXSIZE,  BOXSIZE },
+	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
 };
 
 void CreateLineBox( void )
@@ -1661,7 +1661,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 			x = -FAR_AWAY;
 			z = -FAR_AWAY;
 			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
- 			pin_ptr = first_free_pin_ptr;
+			pin_ptr = first_free_pin_ptr;
 			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
 			pin_ptr->x = x;
 			pin_ptr->y = y;
@@ -1716,7 +1716,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 			pin_ptr->next_ptr = first_pin_ptr;
 			first_pin_ptr = pin_ptr;
 
- 			x =  FAR_AWAY;
+			x =  FAR_AWAY;
 			y = -FAR_AWAY;
 			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
 			pin_ptr = first_free_pin_ptr;
@@ -1967,7 +1967,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 			x = -FAR_AWAY;
 			z = -FAR_AWAY;
 			y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
- 			pin_ptr = first_free_pin_ptr;
+			pin_ptr = first_free_pin_ptr;
 			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
 			pin_ptr->x = x;
 			pin_ptr->y = y;
@@ -2022,7 +2022,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 			pin_ptr->next_ptr = first_pin_ptr;
 			first_pin_ptr = pin_ptr;
 
- 			x =  FAR_AWAY;
+			x =  FAR_AWAY;
 			y = -FAR_AWAY;
 			z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
 			pin_ptr = first_free_pin_ptr;
@@ -2261,7 +2261,7 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 			x = -FAR_AWAY;
 			z = -FAR_AWAY;
 			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
- 			pin_ptr = first_free_pin_ptr;
+			pin_ptr = first_free_pin_ptr;
 			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
 			pin_ptr->x = x;
 			pin_ptr->y = y;
@@ -2316,7 +2316,7 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 			pin_ptr->next_ptr = first_pin_ptr;
 			first_pin_ptr = pin_ptr;
 
- 			x =  FAR_AWAY;
+			x =  FAR_AWAY;
 			y = -FAR_AWAY;
 			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
 			pin_ptr = first_free_pin_ptr;

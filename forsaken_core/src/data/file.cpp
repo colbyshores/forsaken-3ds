@@ -113,7 +113,7 @@ long Get_File_Size( char * Filename )
 	{
 		return (long) st.st_size;
   }
- 	else
+	else
 	{
 		DebugPrintf("file '%s' does not exist\n",path);
 		perror("stat");

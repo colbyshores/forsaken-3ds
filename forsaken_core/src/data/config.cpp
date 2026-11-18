@@ -639,7 +639,7 @@ read_general_macro( FILE *f, char *config_macro, char *last_token, TEXT *macro )
 	sprintf( fmt, " %%%d[^\n]", MAXTEXTMSG );
 
 	fscanf( f, fmt, tempstr );
-   	strncpy( config_macro, tempstr, MAXTEXTMSG );
+	strncpy( config_macro, tempstr, MAXTEXTMSG );
 	strncpy( macro->text, tempstr, MAXTEXTMSG );
 
 	fscanf( f, " %80s", last_token );
@@ -1699,7 +1699,7 @@ write_config( USERCONFIG *u, char *cfg_name )
 	FILE *f;
 	int j, joystick, axis, button, pov, povdir, action;
 	char axistok[MAX_JOYSTICK_AXIS][80] = { "AXISX",  "AXISY",  "AXISZ",  "AXISRX",
-		                                    "AXISRY", "AXISRZ", "AXISS1", "AXISS2"};
+											"AXISRY", "AXISRZ", "AXISS1", "AXISS2"};
 
 	f = file_open( cfg_name, "w" );
 	if ( !f )

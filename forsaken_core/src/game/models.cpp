@@ -1108,7 +1108,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 			temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos );
 
 			// this is for objects that dont' support diff lod values like in title room
- 			if( ModelHeaders[Models[i].ModelNum].LOD == 0 )
+			if( ModelHeaders[Models[i].ModelNum].LOD == 0 )
 			{
 				ModelNum = 0;
 			}
@@ -1231,7 +1231,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 						 * (animated doors, vents) get no shine. */
 						{
 							c3d_set_object_shine_eligible(
-							    Models[i].OwnerType != OWNER_BGOBJECT);
+								Models[i].OwnerType != OWNER_BGOBJECT);
 						}
 #endif
 					if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
@@ -1299,7 +1299,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 						 * mines / nobody-owned. */
 						{
 							c3d_set_object_shine_eligible(
-							    Models[i].OwnerType != OWNER_BGOBJECT);
+								Models[i].OwnerType != OWNER_BGOBJECT);
 						}
 #endif
 						if( ExecuteMxloadHeader( &ModelHeaders[ ModelNum ], i ) != true)
@@ -1553,97 +1553,97 @@ void ProcessModels( void )
 							break;
 						}
 
-	     				TempDir.x = ( Models[i].Dir.x * framelag );
-	     				TempDir.y = ( Models[i].Dir.y * framelag );
-	     				TempDir.z = ( Models[i].Dir.z * framelag );
+						TempDir.x = ( Models[i].Dir.x * framelag );
+						TempDir.y = ( Models[i].Dir.y * framelag );
+						TempDir.z = ( Models[i].Dir.z * framelag );
 
-	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-	     									  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-	     									  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
-	     				{
+						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+						{
 							Models[i].Pos = Int_Point;
-	     					CreateBloodSplat( &Int_Point, (VECTOR *) &Int_Normal, Models[i].Group );
+							CreateBloodSplat( &Int_Point, (VECTOR *) &Int_Normal, Models[i].Group );
 
-	     					TempVector = Models[i].Dir;
-	     					NormaliseVector( &TempVector );
-	     					Speed = VectorLength( &Models[i].Dir );
-	     					ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-	     					Speed *= 0.5F;
+							TempVector = Models[i].Dir;
+							NormaliseVector( &TempVector );
+							Speed = VectorLength( &Models[i].Dir );
+							ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+							Speed *= 0.5F;
 
 							PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
 
-	     					if( Speed < ( 5.0F * GLOBAL_SCALE ) )
-	     					{
-		  						KillUsedModel( i );
-	     						break;
-	     					}
+							if( Speed < ( 5.0F * GLOBAL_SCALE ) )
+							{
+								KillUsedModel( i );
+								break;
+							}
 
-	     					Models[i].Dir.x *= Speed;
-	     					Models[i].Dir.y *= Speed;
-	     					Models[i].Dir.z *= Speed;
-	     					Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     					Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     					Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     					Models[i].Rot.x *= Speed;
-	     					Models[i].Rot.y *= Speed;
-	     					Models[i].Rot.z *= Speed;
-	     				}
+							Models[i].Dir.x *= Speed;
+							Models[i].Dir.y *= Speed;
+							Models[i].Dir.z *= Speed;
+							Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+							Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+							Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+							Models[i].Rot.x *= Speed;
+							Models[i].Rot.y *= Speed;
+							Models[i].Rot.z *= Speed;
+						}
 						else
 						{
-		     				Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-		     				Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-		     				Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+							Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+							Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+							Models[i].Pos.z += ( Models[i].Dir.z * framelag );
 						}
 
 						ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
 
-	     				if( TempDir.x )
-	     				{
-	     					if( TempDir.x > 0.0F )
-	     					{
-	     						TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     				}
-	     				if( TempDir.z )
-	     				{
-	     					if( TempDir.z > 0.0F )
-	     					{
-	     						TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     				}
-	     				TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+						if( TempDir.x )
+						{
+							if( TempDir.x > 0.0F )
+							{
+								TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+							}
+							else
+							{
+								TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+							}
+						}
+						if( TempDir.z )
+						{
+							if( TempDir.z > 0.0F )
+							{
+								TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+							}
+							else
+							{
+								TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+							}
+						}
+						TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 						ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
 
-	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
-	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
-	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-	     	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-	     	   			TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
-	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
-	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
+						FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
+						FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
+						FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
+						TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+						TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+						Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
+						MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
 
 						BloodPtr = &BloodOffsets[ 0 ];
 
 						ApplyMatrix( &Models[i].Mat, BloodPtr, &TempVector );
-	     				NormaliseVector( &TempVector );
+						NormaliseVector( &TempVector );
 						BloodPtr++;
 						ApplyMatrix( &Models[i].Mat, BloodPtr, &OffVector );
-	     				Cos = DotProduct( &TempVector, &SlideUp );
-	     				if( Cos < 0.0F )
-	     				{
+						Cos = DotProduct( &TempVector, &SlideUp );
+						if( Cos < 0.0F )
+						{
 							if( IsGroupVisible[ Models[i].Group ] )
 							{
 								Models[i].TimeCount += framelag;
@@ -1654,16 +1654,16 @@ void ProcessModels( void )
 									Pos.x = ( Models[i].Pos.x + ( OffVector.x * GLOBAL_SCALE ) );
 									Pos.y = ( Models[i].Pos.y + ( OffVector.y * GLOBAL_SCALE ) );
 									Pos.z = ( Models[i].Pos.z + ( OffVector.z * GLOBAL_SCALE ) );
-			     					CreateBloodTrail( &Pos, &TempVector, Models[i].Group );
+									CreateBloodTrail( &Pos, &TempVector, Models[i].Group );
 								}
 							}
-	     				}
+						}
 						else
 						{
 							Models[i].TimeCount = 0.0F;
 						}
 					}
-	 				break;
+					break;
 				case MODFUNC_TomCruise:
 					if( Models[i].Group != INDEX_NONE )
 					{
@@ -1699,60 +1699,60 @@ void ProcessModels( void )
 							break;
 						}
 
-	     				TempDir.x = ( Models[i].Dir.x * framelag );
-	     				TempDir.y = ( Models[i].Dir.y * framelag );
-	     				TempDir.z = ( Models[i].Dir.z * framelag );
+						TempDir.x = ( Models[i].Dir.x * framelag );
+						TempDir.y = ( Models[i].Dir.y * framelag );
+						TempDir.z = ( Models[i].Dir.z * framelag );
 
-	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-	     									  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-	     									  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
-	     				{
+						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+						{
 							PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
 							NormaliseVector( &Models[i].Dir );
 							ExplodeBody( &Models[i].Pos, &Models[i].Dir, Models[i].Group );
-	  						KillUsedModel( i );
-     						break;
-	     				}
+							KillUsedModel( i );
+							break;
+						}
 						else
 						{
-		     				Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-		     				Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-		     				Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+							Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+							Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+							Models[i].Pos.z += ( Models[i].Dir.z * framelag );
 						}
 
 						ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
 
-	     				if( TempDir.x )
-	     				{
-	     					if( TempDir.x > 0.0F )
-	     					{
-	     						TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     				}
-	     				if( TempDir.z )
-	     				{
-	     					if( TempDir.z > 0.0F )
-	     					{
-	     						TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     				}
-	     				TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+						if( TempDir.x )
+						{
+							if( TempDir.x > 0.0F )
+							{
+								TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+							}
+							else
+							{
+								TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+							}
+						}
+						if( TempDir.z )
+						{
+							if( TempDir.z > 0.0F )
+							{
+								TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+							}
+							else
+							{
+								TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+							}
+						}
+						TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 						ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
 					}
-	 				break;
+					break;
 				case MODFUNC_OrbitPulsar:
 					if( ( ( GameStatus[ Models[ i ].Ship ] == STATUS_SinglePlayer ) || ( GameStatus[ Models[ i ].Ship ] == STATUS_Normal ) ) &&
 						( Ships[ Models[ i ].Ship ].NumMultiples ) )
@@ -1766,8 +1766,8 @@ void ProcessModels( void )
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
 						ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
 						Models[i].Quat.FromDirAndUp(&DirVector, &UpVector);					// Create Quat
-	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Matrix
-	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Inv Matrix
+						Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Matrix
+						MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Inv Matrix
 						Models[ i ].Pos.x = ( Ships[ Models[ i ].Ship ].Object.Pos.x + ( UpVector.x * ORBIT_RADIUS ) ); //+ ( DirVector.x * ( ORBIT_RADIUS * 0.85F ) ) );
 						Models[ i ].Pos.y = ( Ships[ Models[ i ].Ship ].Object.Pos.y + ( UpVector.y * ORBIT_RADIUS ) ); //+ ( DirVector.y * ( ORBIT_RADIUS * 0.85F ) ) );
 						Models[ i ].Pos.z = ( Ships[ Models[ i ].Ship ].Object.Pos.z + ( UpVector.z * ORBIT_RADIUS ) ); //+ ( DirVector.z * ( ORBIT_RADIUS * 0.85F ) ) );
@@ -1814,101 +1814,101 @@ void ProcessModels( void )
 					}
 					else
 					{
-	     				TempDir.x = ( Models[i].Dir.x * framelag );
-	     				TempDir.y = ( Models[i].Dir.y * framelag );
-	     				TempDir.z = ( Models[i].Dir.z * framelag );
+						TempDir.x = ( Models[i].Dir.x * framelag );
+						TempDir.y = ( Models[i].Dir.y * framelag );
+						TempDir.z = ( Models[i].Dir.z * framelag );
 
 						WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 255 );
 
-	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-	     									  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-	     									  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
-	     				{
+						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+						{
 							if( Random_Range( 3 ) )
 							{
-	     						TempVector = Models[i].Dir;
-	     						NormaliseVector( &TempVector );
-	     						Speed = VectorLength( &Models[i].Dir );
-	     						ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-	     						Speed *= 0.8F;
+								TempVector = Models[i].Dir;
+								NormaliseVector( &TempVector );
+								Speed = VectorLength( &Models[i].Dir );
+								ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+								Speed *= 0.8F;
 
 								CreateSpotFXSmallShrapnel( &Int_Point, &Models[i].Dir, Speed, Models[i].Group );
-	  							KillUsedModel( i );
+								KillUsedModel( i );
 								break;
 							}
 							else
 							{
 								Models[i].Pos = Int_Point;
 
-	     						TempVector = Models[i].Dir;
-	     						NormaliseVector( &TempVector );
-	     						Speed = VectorLength( &Models[i].Dir );
-	     						ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-	     						Speed *= 0.5F;
+								TempVector = Models[i].Dir;
+								NormaliseVector( &TempVector );
+								Speed = VectorLength( &Models[i].Dir );
+								ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+								Speed *= 0.5F;
 
-	     						if( Speed < ( 5.0F * GLOBAL_SCALE ) )
-	     						{
-		  							KillUsedModel( i );
-	     							break;
-	     						}
+								if( Speed < ( 5.0F * GLOBAL_SCALE ) )
+								{
+									KillUsedModel( i );
+									break;
+								}
 
-	     						Models[i].Dir.x *= Speed;
-	     						Models[i].Dir.y *= Speed;
-	     						Models[i].Dir.z *= Speed;
-	     						Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     						Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     						Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     						Models[i].Rot.x *= Speed;
-	     						Models[i].Rot.y *= Speed;
-	     						Models[i].Rot.z *= Speed;
+								Models[i].Dir.x *= Speed;
+								Models[i].Dir.y *= Speed;
+								Models[i].Dir.z *= Speed;
+								Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+								Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+								Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+								Models[i].Rot.x *= Speed;
+								Models[i].Rot.y *= Speed;
+								Models[i].Rot.z *= Speed;
 							}
-	     				}
+						}
 						else
 						{
-		     				Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-		     				Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-		     				Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+							Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+							Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+							Models[i].Pos.z += ( Models[i].Dir.z * framelag );
 						}
 
 						ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
 
-	     				if( TempDir.x )
-	     				{
-	     					if( TempDir.x > 0.0F )
-	     					{
-	     						TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     				}
-	     				if( TempDir.z )
-	     				{
-	     					if( TempDir.z > 0.0F )
-	     					{
-	     						TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     				}
-	     				TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+						if( TempDir.x )
+						{
+							if( TempDir.x > 0.0F )
+							{
+								TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+							}
+							else
+							{
+								TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+							}
+						}
+						if( TempDir.z )
+						{
+							if( TempDir.z > 0.0F )
+							{
+								TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+							}
+							else
+							{
+								TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+							}
+						}
+						TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 						ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
 
-	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
-	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
-	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-	     	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-	     	   			TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
-	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
-	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
+						FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
+						FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
+						FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
+						TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+						TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+						Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
+						MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
 
 						Models[i].TimeInterval = (float) 1;
 
@@ -1935,7 +1935,7 @@ void ProcessModels( void )
 						}
 
 					}
-	 				break;
+					break;
 
 				case MODFUNC_SmallShrapnel:
 					if( Models[i].Group != INDEX_NONE )
@@ -1960,86 +1960,86 @@ void ProcessModels( void )
 					}
 					else
 					{
-	     				TempDir.x = ( Models[i].Dir.x * framelag );
-	     				TempDir.y = ( Models[i].Dir.y * framelag );
-	     				TempDir.z = ( Models[i].Dir.z * framelag );
+						TempDir.x = ( Models[i].Dir.x * framelag );
+						TempDir.y = ( Models[i].Dir.y * framelag );
+						TempDir.z = ( Models[i].Dir.z * framelag );
 
 						WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 128 );
 
-	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-	     									  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-	     									  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
-	     				{
+						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+						{
 							Models[i].Pos = Int_Point;
 
-	     					TempVector = Models[i].Dir;
-	     					NormaliseVector( &TempVector );
-	     					Speed = VectorLength( &Models[i].Dir );
-	     					ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-	     					Speed *= 0.5F;
+							TempVector = Models[i].Dir;
+							NormaliseVector( &TempVector );
+							Speed = VectorLength( &Models[i].Dir );
+							ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+							Speed *= 0.5F;
 
-	     					if( Speed < ( 5.0F * GLOBAL_SCALE ) )
-	     					{
-		  						KillUsedModel( i );
-	     						break;
-	     					}
+							if( Speed < ( 5.0F * GLOBAL_SCALE ) )
+							{
+								KillUsedModel( i );
+								break;
+							}
 
-	     					Models[i].Dir.x *= Speed;
-	     					Models[i].Dir.y *= Speed;
-	     					Models[i].Dir.z *= Speed;
-	     					Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     					Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     					Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-	     					Models[i].Rot.x *= Speed;
-	     					Models[i].Rot.y *= Speed;
-	     					Models[i].Rot.z *= Speed;
-	     				}
+							Models[i].Dir.x *= Speed;
+							Models[i].Dir.y *= Speed;
+							Models[i].Dir.z *= Speed;
+							Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+							Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+							Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+							Models[i].Rot.x *= Speed;
+							Models[i].Rot.y *= Speed;
+							Models[i].Rot.z *= Speed;
+						}
 						else
 						{
-		     				Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-		     				Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-		     				Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+							Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+							Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+							Models[i].Pos.z += ( Models[i].Dir.z * framelag );
 						}
 
 						ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
 
-	     				if( TempDir.x )
-	     				{
-	     					if( TempDir.x > 0.0F )
-	     					{
-	     						TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-	     					}
-	     				}
-	     				if( TempDir.z )
-	     				{
-	     					if( TempDir.z > 0.0F )
-	     					{
-	     						TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     					else
-	     					{
-	     						TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-	     						if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-	     					}
-	     				}
-	     				TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+						if( TempDir.x )
+						{
+							if( TempDir.x > 0.0F )
+							{
+								TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+							}
+							else
+							{
+								TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+							}
+						}
+						if( TempDir.z )
+						{
+							if( TempDir.z > 0.0F )
+							{
+								TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+							}
+							else
+							{
+								TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+								if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+							}
+						}
+						TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 						ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
 
-	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
-	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
-	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-	     	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-	     	   			TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
-	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
-	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
+						FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
+						FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
+						FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
+						TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+						TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+						Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
+						MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
 
 						if( IsGroupVisible[ Models[i].Group ] )
 						{
@@ -2063,7 +2063,7 @@ void ProcessModels( void )
 							}
 						}
 					}
-	 				break;
+					break;
 
 				case MODFUNC_ProcessSpotFX:
 					if( Models[i].Flags & MODFLAG_SpotFXDisabled ) break;
@@ -2118,7 +2118,7 @@ void ProcessModels( void )
 									{
 										Models[i].SpotFXDelay[ Count ] += SpotFXPtr->ActiveDelay;
 										Models[i].SpotFXState[ Count ] = SPOTFX_STATE_Active;
-					 					Models[i].SpotFXTimeCount[ Count ] = 0.0F;
+										Models[i].SpotFXTimeCount[ Count ] = 0.0F;
 									}
 									break;
 
@@ -2146,7 +2146,7 @@ void ProcessModels( void )
 
 												if( Models[i].SpotFXTimeCount[ Count ] >= Models[i].SpotFXTimeInterval[ Count ] )
 												{
-					 								Models[i].SpotFXTimeCount[ Count ] = (float) FMOD( Models[i].SpotFXTimeCount[ Count ], Models[i].SpotFXTimeInterval[ Count ] );
+													Models[i].SpotFXTimeCount[ Count ] = (float) FMOD( Models[i].SpotFXTimeCount[ Count ], Models[i].SpotFXTimeInterval[ Count ] );
 
 													ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
 													ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
@@ -2598,7 +2598,7 @@ void ProcessModels( void )
 	Output		:	Nothing
 ===================================================================*/
 void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
-							    u_int16_t Group, u_int8_t Weapon, u_int16_t ModelIndex, u_int16_t SpotFXIndex )
+								u_int16_t Group, u_int8_t Weapon, u_int16_t ModelIndex, u_int16_t SpotFXIndex )
 {
 	VECTOR	TempVector = { 0.0F, 0.0F, 0.0F };
 	u_int16_t	i;
@@ -2882,9 +2882,9 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 ===================================================================*/
 bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 {
-    LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = NULL;
 	LVERTEX	*LVert;
-    LVERTEX	*OrigLVert;
+	LVERTEX	*OrigLVert;
 	int		group;
 	int		mesh;
 	int		vert;
@@ -3168,7 +3168,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
-    float					Val;
+	float					Val;
 	float					TF = 0.0F;
 	float					RF = 0.0F;
 	float					GF = 0.0F;
@@ -3251,7 +3251,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
-    float					Val;
+	float					Val;
 	float					TF = 255.0F;
 	float					RF = 128.0F;
 	float					GF = 128.0F;
@@ -3338,7 +3338,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
-    float					Val;
+	float					Val;
 
 
 	DstMloadheader = &ModelHeaders[ Model ];
@@ -3423,7 +3423,7 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 	u_int16_t					Mesh;
 	MXALOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
-    float					Val;
+	float					Val;
 
 
 	DstMloadheader = &MxaModelHeaders[ Model ];
@@ -3575,17 +3575,17 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 		{
 
 			// calculate distance between objects
-   			DistVector.x = ( SecBulls[ i ].Pos.x - Pos->x );
-   			DistVector.y = ( SecBulls[ i ].Pos.y - Pos->y );
-   			DistVector.z = ( SecBulls[ i ].Pos.z - Pos->z );
-   			DistFromCenter = VectorLength( &DistVector );
+			DistVector.x = ( SecBulls[ i ].Pos.x - Pos->x );
+			DistVector.y = ( SecBulls[ i ].Pos.y - Pos->y );
+			DistVector.z = ( SecBulls[ i ].Pos.z - Pos->z );
+			DistFromCenter = VectorLength( &DistVector );
 
-   			if( DistFromCenter < ( Radius + MINE_RADIUS ) )
-   			{
-   				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
-   							  Group, &DistVector, (VECTOR *) &Int_Point,
-   							  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
-   				{
+			if( DistFromCenter < ( Radius + MINE_RADIUS ) )
+			{
+				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
+							  Group, &DistVector, (VECTOR *) &Int_Point,
+							  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+				{
 					Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + MINE_RADIUS ) / Center_Damage ) ) ) * framelag );
 
 					if( OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
@@ -3682,31 +3682,31 @@ void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_
 	ENEMY	*	Enemy;
 	ENEMY	*	NextEnemy;
 
-  	if( ( Ships[ WhoIAm ].enable ) && ( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE ) && ( WhoIAm < MAX_PLAYERS ) )
-   	{
+	if( ( Ships[ WhoIAm ].enable ) && ( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE ) && ( WhoIAm < MAX_PLAYERS ) )
+	{
 		if( !SoundInfo[ Ships[ WhoIAm ].Object.Group ][ Group ] )
 		{
-	   		DistVector.x = ( Ships[ WhoIAm ].Object.Pos.x - Pos->x );
-	   		DistVector.y = ( Ships[ WhoIAm ].Object.Pos.y - Pos->y );
-	   		DistVector.z = ( Ships[ WhoIAm ].Object.Pos.z - Pos->z );
-	   		DistFromCenter = VectorLength( &DistVector );
+			DistVector.x = ( Ships[ WhoIAm ].Object.Pos.x - Pos->x );
+			DistVector.y = ( Ships[ WhoIAm ].Object.Pos.y - Pos->y );
+			DistVector.z = ( Ships[ WhoIAm ].Object.Pos.z - Pos->z );
+			DistFromCenter = VectorLength( &DistVector );
 
-	   		if( ( DistFromCenter < ( Radius + SHIP_RADIUS ) ) && ( DistFromCenter > ( ( Radius / 8.0F ) + SHIP_RADIUS ) ) )
-	   		{
-	   			if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
-	   						  Group, &DistVector, (VECTOR *) &Int_Point,
-	   						  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
-	   			{
-	   				Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
+			if( ( DistFromCenter < ( Radius + SHIP_RADIUS ) ) && ( DistFromCenter > ( ( Radius / 8.0F ) + SHIP_RADIUS ) ) )
+			{
+				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
+							  Group, &DistVector, (VECTOR *) &Int_Point,
+							  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+				{
+					Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
 
-	   				force.x = -( ( ( DistVector.x / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
-	   				force.y = -( ( ( DistVector.y / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
-	   				force.z = -( ( ( DistVector.z / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
-	   				ForceExternal( WhoIAm, &force );
-	   			}
-	   		}
+					force.x = -( ( ( DistVector.x / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
+					force.y = -( ( ( DistVector.y / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
+					force.z = -( ( ( DistVector.z / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
+					ForceExternal( WhoIAm, &force );
+				}
+			}
 		}
-   	}
+	}
 
 /*===================================================================
 	GravityWave effecting any Enemies?
@@ -3726,17 +3726,17 @@ void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_
 				DistVector.z = ( Enemy->Object.Pos.z - Pos->z );
 				DistFromCenter = VectorLength( &DistVector );
 
-		   		if( ( DistFromCenter < ( Radius + SHIP_RADIUS ) ) && ( DistFromCenter > ( ( Radius / 8.0F ) + SHIP_RADIUS ) ) )
+				if( ( DistFromCenter < ( Radius + SHIP_RADIUS ) ) && ( DistFromCenter > ( ( Radius / 8.0F ) + SHIP_RADIUS ) ) )
 				{
 					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 								  Group, &DistVector, (VECTOR *) &Int_Point,
 								  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 					{
-	   					Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
+						Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
 
-	   					force.x = -( ( ( DistVector.x / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
-	   					force.y = -( ( ( DistVector.y / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
-	   					force.z = -( ( ( DistVector.z / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
+						force.x = -( ( ( DistVector.x / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
+						force.y = -( ( ( DistVector.y / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
+						force.z = -( ( ( DistVector.z / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
 
 						Enemy->Object.ExternalForce.x += ( force.x * framelag );
 						Enemy->Object.ExternalForce.y += ( force.y * framelag );
@@ -4081,7 +4081,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
 
- 		if( SecBulls[ i ].SecType == SEC_MINE )
+		if( SecBulls[ i ].SecType == SEC_MINE )
 		{
 			DistVector.x = ( SecBulls[ i ].Pos.x - Pos->x );
 			DistVector.y = ( SecBulls[ i ].Pos.y - Pos->y );
@@ -4470,7 +4470,7 @@ char *GetName(int Player)
 	Output		:	bool	True/False
 ===================================================================*/
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
-					    VECTOR * BottomRight )
+						VECTOR * BottomRight )
 {
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
@@ -4997,7 +4997,7 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 {
 	VECTOR					DistVector;
 	float					Dist;
-    float					Val;
+	float					Val;
 	XLIGHT * LightPnt;
 	float	RF,GF,BF;
 	float Size2;
@@ -5074,7 +5074,7 @@ u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_
 		return SoundFX_ID;
 
 	if ( framelag )
-	  	Speed /= framelag;
+		Speed /= framelag;
 	else
 		Speed = 0.0F;
 
@@ -5529,7 +5529,7 @@ void CheckModelLinkList( void )
 	if( i == MAXNUMOFMODELS*2 )
 	{
 		// oh shit
-        DebugPrintf( "Model Free link list Gone up its ass\n" );
+		DebugPrintf( "Model Free link list Gone up its ass\n" );
 		i = 0;
 	}
 
@@ -5549,7 +5549,7 @@ void CheckModelLinkList( void )
 	if( i == MAXNUMOFMODELS*2 )
 	{
 		// oh shit
-        DebugPrintf( "Model Used link list Gone up its ass\n" );
+		DebugPrintf( "Model Used link list Gone up its ass\n" );
 		i = 0;
 	}
 }

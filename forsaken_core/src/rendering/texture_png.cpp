@@ -30,56 +30,56 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
   /* open image file */
   fp = file_open (image->path, "rb");
   if (!fp)
-    {
-      fprintf (stderr, "error: couldn't open \"%s\"!\n", image->path);
-      return -1;
-    }
+	{
+	  fprintf (stderr, "error: couldn't open \"%s\"!\n", image->path);
+	  return -1;
+	}
 
   /* read magic number */
   fread (magic, 1, sizeof (magic), fp);
 
   /* check for valid magic number */
   if (!png_check_sig (magic, sizeof (magic)))
-    {
-      fprintf (stderr, "error: \"%s\" is not a valid PNG image!\n",
-	       image->path);
-      fclose (fp);
-      return -1;
-    }
+	{
+	  fprintf (stderr, "error: \"%s\" is not a valid PNG image!\n",
+		   image->path);
+	  fclose (fp);
+	  return -1;
+	}
 
   /* create a png read struct */
   png_ptr = png_create_read_struct
-    (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (!png_ptr)
-    {
-      fclose (fp);
-      return -1;
-    }
+	{
+	  fclose (fp);
+	  return -1;
+	}
 
   /* create a png info struct */
   info_ptr = png_create_info_struct (png_ptr);
   if (!info_ptr)
-    {
-      fclose (fp);
-      png_destroy_read_struct (&png_ptr, NULL, NULL);
-      return -1;
-    }
+	{
+	  fclose (fp);
+	  png_destroy_read_struct (&png_ptr, NULL, NULL);
+	  return -1;
+	}
 
   /* initialize the setjmp for returning properly after a libpng
-     error occured */
+	 error occured */
   if (setjmp (png_jmpbuf (png_ptr)))
-    {
-      fclose (fp);
-      png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+	{
+	  fclose (fp);
+	  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
 
-      if (row_pointers)
+	  if (row_pointers)
 		free (row_pointers);
 
-      return -1;
-    }
+	  return -1;
+	}
 
   /* setup libpng for using standard C fread() function
-     with our FILE pointer */
+	 with our FILE pointer */
   png_init_io (png_ptr, fp);
 
   /* tell libpng that we have already read the magic number */
@@ -98,7 +98,7 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 
   /* detect if not rgb */
   if (!(color_type & PNG_COLOR_MASK_COLOR))
-      return -1;
+	  return -1;
 
   /* "colorkey" here is the flag the downstream create_texture()
    * consults to decide whether to replace pure-black RGB pixels with
@@ -116,10 +116,10 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
    * in-scene VDU panel (green on green with black background
    * additively blended = no visible characters). */
   {
-    int has_alpha = (color_type & PNG_COLOR_MASK_ALPHA) != 0;
-    image->colorkey = !has_alpha;
-    if (!has_alpha)
-      png_set_add_alpha(png_ptr, (png_uint_32)255, PNG_FILLER_AFTER);
+	int has_alpha = (color_type & PNG_COLOR_MASK_ALPHA) != 0;
+	image->colorkey = !has_alpha;
+	if (!has_alpha)
+	  png_set_add_alpha(png_ptr, (png_uint_32)255, PNG_FILLER_AFTER);
   }
 
   /* update info structure to apply transformations */
@@ -143,7 +143,7 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 
   /* PNG rows are stored top to bottom. */
   for (i = 0; i < image->h; ++i)
-      row_pointers[i] = (png_bytep)(image->data +
+	  row_pointers[i] = (png_bytep)(image->data +
 	  (i * image->w * 4));
 
   /* read pixel data using row pointers */

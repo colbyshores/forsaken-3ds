@@ -211,8 +211,8 @@ void CrossProduct( VECTOR * a, VECTOR * b, VECTOR * ab )
 float DotProduct( VECTOR * a , VECTOR * b )
 {
 	return( ( a->x * b->x ) +
-		    ( a->y * b->y ) +
-		    ( a->z * b->z ) );
+			( a->y * b->y ) +
+			( a->z * b->z ) );
 }
 
 /*===================================================================
@@ -230,15 +230,15 @@ void ReflectVector( VECTOR * old, NORMAL * normal, VECTOR * new1 )
 
    if( fabsf( lambda ) < EPS )
    {
-        new1->x = old->x;
-        new1->y = old->y;
-        new1->z = old->z;
+		new1->x = old->x;
+		new1->y = old->y;
+		new1->z = old->z;
    }
    else
    {
-        new1->x = ( old->x + ( lambda * normal->nx ) );
-        new1->y = ( old->y + ( lambda * normal->ny ) );
-        new1->z = ( old->z + ( lambda * normal->nz ) );
+		new1->x = ( old->x + ( lambda * normal->nx ) );
+		new1->y = ( old->y + ( lambda * normal->ny ) );
+		new1->z = ( old->z + ( lambda * normal->nz ) );
    }
 }
 
@@ -517,25 +517,25 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 	c = (float) fast_cosf( angle );
 	s = (float) fast_sinf( angle );
 
-   	rotangle._11 = 1.0F;
-   	rotangle._12 = 0.0F;
-   	rotangle._13 = 0.0F;
-   	rotangle._14 = 0.0F;
+	rotangle._11 = 1.0F;
+	rotangle._12 = 0.0F;
+	rotangle._13 = 0.0F;
+	rotangle._14 = 0.0F;
 
-   	rotangle._21 = 0.0F;
-   	rotangle._22 = c;
-   	rotangle._23 = s;
-   	rotangle._24 = 0.0F;
+	rotangle._21 = 0.0F;
+	rotangle._22 = c;
+	rotangle._23 = s;
+	rotangle._24 = 0.0F;
 
-   	rotangle._31 = 0.0F;
-   	rotangle._32 = -s;
-   	rotangle._33 = c;
-   	rotangle._34 = 0.0F;
+	rotangle._31 = 0.0F;
+	rotangle._32 = -s;
+	rotangle._33 = c;
+	rotangle._34 = 0.0F;
 
-   	rotangle._41 = 0.0F;
-   	rotangle._42 = 0.0F;
-   	rotangle._43 = 0.0F;
-   	rotangle._44 = 1.0F;
+	rotangle._41 = 0.0F;
+	rotangle._42 = 0.0F;
+	rotangle._43 = 0.0F;
+	rotangle._44 = 1.0F;
 
 	MatrixMultiply( &rotx, &rotangle, rot );
 	MatrixTranspose( &rotx, &rotx );
@@ -552,23 +552,23 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 void
 spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4)
 {
-    float t2, t3, m1, m2, m3, m4;
+	float t2, t3, m1, m2, m3, m4;
 
-    t2 = t * t;
-    t3 = t2 * t;
+	t2 = t * t;
+	t3 = t2 * t;
 
-    m1 = ( -1.0F * t3) + ( 2.0F  * t2) + ( -1.0F * t);
-    m2 = ( 3.0F  * t3) + ( -5.0F * t2) + 2.0F;
-    m3 = ( -3.0F * t3) + ( 4.0F  * t2) + t;
-    m4 = t3 + ( -1.0F * t2);
+	m1 = ( -1.0F * t3) + ( 2.0F  * t2) + ( -1.0F * t);
+	m2 = ( 3.0F  * t3) + ( -5.0F * t2) + 2.0F;
+	m3 = ( -3.0F * t3) + ( 4.0F  * t2) + t;
+	m4 = t3 + ( -1.0F * t2);
 
-    m1 *= 0.5;
-    m2 *= 0.5;
-    m3 *= 0.5;
-    m4 *= 0.5;
+	m1 *= 0.5;
+	m2 *= 0.5;
+	m3 *= 0.5;
+	m4 *= 0.5;
 
-    p->x = p1->x * m1 + p2->x * m2 + p3->x * m3 + p4->x * m4;
-    p->y = p1->y * m1 + p2->y * m2 + p3->y * m3 + p4->y * m4;
-    p->z = p1->z * m1 + p2->z * m2 + p3->z * m3 + p4->z * m4;
+	p->x = p1->x * m1 + p2->x * m2 + p3->x * m3 + p4->x * m4;
+	p->y = p1->y * m1 + p2->y * m2 + p3->y * m3 + p4->y * m4;
+	p->z = p1->z * m1 + p2->z * m2 + p3->z * m3 + p4->z * m4;
 
 }

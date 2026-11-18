@@ -378,7 +378,7 @@ void AI_GetDistToNearestTarget( ENEMY * Enemy )
 
 	if ( TARGET_PLAYERS )
 	{
-	    AI_GetNearestSHIPTargetInAnyGROUP();
+		AI_GetNearestSHIPTargetInAnyGROUP();
 
 		if ( ( TObject = (OBJECT*) Tinfo->TObject ) )
 		{

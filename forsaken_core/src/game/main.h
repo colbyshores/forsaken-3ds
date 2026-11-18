@@ -91,16 +91,16 @@ constexpr float BLOCKSIZE = ( 1024.0F * GLOBAL_SCALE ); // one level block
 
 typedef struct
 {
-    long    left;
-    long    top;
-    long    right;
-    long    bottom;
+	long    left;
+	long    top;
+	long    right;
+	long    bottom;
 } rect_t;
 
 typedef struct
 {
-    long  x;
-    long  y;
+	long  x;
+	long  y;
 } point_t;
 
 #undef MAX

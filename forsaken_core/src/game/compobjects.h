@@ -210,10 +210,10 @@ typedef struct ANI_ZONE_POLYGONAL {
 ===================================================================*/
 bool PreLoadCompObj( int8_t * Filename, u_int16_t * BaseModel, bool LevelSpecific );
 COMP_OBJ * LoadCompObj( int8_t * Filename, VECTOR * Pos, VECTOR * Dir, u_int16_t Group,
-					    float * OverallTime, float * MidTime, u_int16_t * BaseModel,
+						float * OverallTime, float * MidTime, u_int16_t * BaseModel,
 						u_int16_t OwnerType, u_int16_t OwnerID );
 FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
-						    VECTOR * Pos, VECTOR * Dir, u_int16_t Group,
+							VECTOR * Pos, VECTOR * Dir, u_int16_t Group,
 							float * Time, float * MidTime, u_int16_t * BaseModel, u_int16_t OwnerType, u_int16_t OwnerID );
 void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren );
 void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * ParentMatrix, VECTOR * ParentPos, float Time, u_int16_t Group, VECTOR * Pos );
@@ -228,7 +228,7 @@ void GetCompObjBoundingBox( MATRIX * ParentMatrix, VECTOR * ParentPos,
 						   COMP_OBJ * Children, int16_t NumChildren, float OverallTime, VECTOR * TopLeft,
 						   VECTOR * BottomRight );
 void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * ParentMatrix,
-								    VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight );
+									VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight );
 void UpdateCompObjColours( COMP_OBJ * Children, int16_t NumChildren, int Red, int Green, int Blue );
 void UpdateCompObjClipGroup( COMP_OBJ * Children, int16_t NumChildren, u_int16_t ClipGroup );
 void MaximizeBoundingBox( VECTOR * TopLeft, VECTOR * BottomRight );
@@ -242,7 +242,7 @@ void GetCompObjColBoundingBox( MATRIX * ParentMatrix, VECTOR * ParentPos,
 						   COMP_OBJ * Children, int16_t NumChildren, float OverallTime, VECTOR * TopLeft,
 						   VECTOR * BottomRight );
 void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * ParentMatrix,
-								    VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight );
+									VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight );
 void GetCompObjColZoneBoundingBox( COMP_OBJ * Children, MATRIX * DisplayMatrix, VECTOR * DisplayPos,
 								   VECTOR * TopLeft, VECTOR * BottomRight );
 void GetZoneBoundingBox( VECTOR * Center, VECTOR * HalfSize, MATRIX * Matrix, VECTOR * Pos,

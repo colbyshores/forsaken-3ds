@@ -449,12 +449,12 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			if ( num_triangle_groups > 0 )
 			{
 				Mloadheader->Group[group].renderObject[mesh].textureGroups =
-				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
-				                                num_triangle_groups * sizeof(TEXTUREGROUP));
+					(TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
+												num_triangle_groups * sizeof(TEXTUREGROUP));
 				if ( !Mloadheader->Group[group].renderObject[mesh].textureGroups )
 				{
 					Msg( "Mload() hunk-alloc failed for textureGroups[%u] %s\n",
-					     (unsigned)num_triangle_groups, Filename );
+						 (unsigned)num_triangle_groups, Filename );
 					return false;
 				}
 			}
@@ -1043,8 +1043,8 @@ void ReleaseVisible( VISTREE *v )
 void
 ReleaseMloadheader( MLOADHEADER * Mloadheader )
 {
-    int i,e;
-    int group;
+	int i,e;
+	int group;
 	POLYANIM * PolyAnim;
 
 	if ( !Mloadheader->state )
@@ -1061,7 +1061,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 	c3d_release_level_cache();
 #endif
 
-    	for (group = 0; group < Mloadheader->num_groups; group++)
+		for (group = 0; group < Mloadheader->num_groups; group++)
 	{
 		for ( i = 0; i < Mloadheader->Group[ group ].num_portals; i++ )
 		{
@@ -1097,24 +1097,24 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 
 			for( e = 0 ; e < Mloadheader->Group[group].num_animating_polys[i] ; e++ )
 			{
-			   	if( PolyAnim )
-			   	{
-			   		if( PolyAnim->vert )
-			   		{
-			   			free( PolyAnim->vert );
-			   			PolyAnim->vert = NULL;
-			   		}
-			   		if( PolyAnim->UVs )
-			   		{
-			   			free( PolyAnim->UVs );
-			   			PolyAnim->UVs = NULL;
-			   		}
-			   	}
+				if( PolyAnim )
+				{
+					if( PolyAnim->vert )
+					{
+						free( PolyAnim->vert );
+						PolyAnim->vert = NULL;
+					}
+					if( PolyAnim->UVs )
+					{
+						free( PolyAnim->UVs );
+						PolyAnim->UVs = NULL;
+					}
+				}
 				PolyAnim++;
 			}
 
 			if (Mloadheader->Group[group].polyanim[i])
-		   		free(Mloadheader->Group[group].polyanim[i]);
+				free(Mloadheader->Group[group].polyanim[i]);
 
 			Mloadheader->Group[group].polyanim[i] = NULL;
 		}
@@ -1168,7 +1168,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	if ( !File_Size )
 	{
-	 	Msg( "PreMLoad : File_Size is zero\n" );
+		Msg( "PreMLoad : File_Size is zero\n" );
 		return false;
 	}
 
@@ -1176,7 +1176,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	if( Buffer == NULL )
 	{
-	 	Msg( "PreMLoad : Unable to allocate buffer\n" );
+		Msg( "PreMLoad : Unable to allocate buffer\n" );
 		return( false );
 	}
 
@@ -1184,7 +1184,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	if( Read_Size != File_Size )
 	{
-	 	Msg( "PreMLoad : Didn't read all of file\n" );
+		Msg( "PreMLoad : Didn't read all of file\n" );
 		return( false );
 	}
 
@@ -1204,7 +1204,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	if ( Mloadheader->num_texture_files > MAXTPAGESPERMLOAD )
 	{
-	 	Msg( "PreMLoad : Too many texture pages\n" );
+		Msg( "PreMLoad : Too many texture pages\n" );
 		return false;
 	}
 
@@ -1221,7 +1221,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 			if( Mloadheader->TloadIndex[i] == -1 )
 			{
-			 	Msg( "PreMLoad : Too many TPages\n" );
+				Msg( "PreMLoad : Too many TPages\n" );
 				return( false );
 			}
 		}
@@ -1321,7 +1321,7 @@ u_int16_t * HandleAnimCommands( POLYANIM * PolyAnim , u_int16_t * AnimData , u_i
 			{
 				AnimData = OrgAnimAdr + *AnimData;
 			}else{
- 				AnimData++;
+				AnimData++;
 			}
 			break;
 		case TEXANIM_END:
@@ -1331,7 +1331,7 @@ u_int16_t * HandleAnimCommands( POLYANIM * PolyAnim , u_int16_t * AnimData , u_i
 		}
 	}
 	PolyAnim->newframe = Frame;
- 	return AnimData;
+	return AnimData;
 }
 
 

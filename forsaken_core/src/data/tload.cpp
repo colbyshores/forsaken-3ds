@@ -167,33 +167,33 @@ TloadReleaseTexture(TLOADHEADER * Tloadheader, int n)
 void
 ReleaseTloadheader( TLOADHEADER * Tloadheader )
 {
-    int i;
-    for (i = 0; i < Tloadheader->num_texture_files; i++)
-    {
-        TloadReleaseTexture( Tloadheader , i);
-    }
-    InitTload( Tloadheader );
+	int i;
+	for (i = 0; i < Tloadheader->num_texture_files; i++)
+	{
+		TloadReleaseTexture( Tloadheader , i);
+	}
+	InitTload( Tloadheader );
 }
 
 bool TloadAllTextures(TLOADHEADER * Tloadheader)
 {
-    int i;
+	int i;
 
-    for (i = 0; i < Tloadheader->num_texture_files; i++)
+	for (i = 0; i < Tloadheader->num_texture_files; i++)
 	{
-        if(!TloadTextureSurf( Tloadheader, i ))
+		if(!TloadTextureSurf( Tloadheader, i ))
 		{
 			goto exit_with_error;
 		}
 	}
 
-    return true;
+	return true;
 
 exit_with_error:
-    for ( ; i < Tloadheader->num_texture_files; i++) {
-        TloadReleaseTexture( Tloadheader , i);
-    }
-    return false;
+	for ( ; i < Tloadheader->num_texture_files; i++) {
+		TloadReleaseTexture( Tloadheader , i);
+	}
+	return false;
 }
 
 /*===================================================================
@@ -246,7 +246,7 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t Co
 	// are we just loading placeholder?
 	if ( !Name[ 0 ] )
 	{
-	 	i = Tloadheader->num_texture_files;
+		i = Tloadheader->num_texture_files;
 		Tloadheader->ColourKey[i] = ColourKey;
 		Tloadheader->MipMap[i] = MipMap;
 		Tloadheader->ImageFile[i][0] = 0;

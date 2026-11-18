@@ -77,8 +77,8 @@ unsigned smemo_persist_gen(void);
  * ranges, and the epoch is plain integer compares, so no float or
  * pointer conversion ever appears at a call site. */
 void smemo_record(const void *renderObject, int sub,
-                   long offset, int count,
-                   uint32_t epass, uint32_t epgroup, uint32_t eresume);
+				   long offset, int count,
+				   uint32_t epass, uint32_t epgroup, uint32_t eresume);
 
 /* Eye 2 hit: fills the offset/count outs with the recorded range, but
  * only when the recorded fill epoch matches the current fill's epoch.
@@ -86,8 +86,8 @@ void smemo_record(const void *renderObject, int sub,
  * (different group/pass/resume sharing one slot) — miss: eye 2
  * converts live (the safe fallback — never stale data). */
 bool smemo_lookup(const void *renderObject, int sub,
-                   long *offset, int *count,
-                   uint32_t epass, uint32_t epgroup, uint32_t eresume);
+				   long *offset, int *count,
+				   uint32_t epass, uint32_t epgroup, uint32_t eresume);
 
 /* Pack (texgroup id, orthographic, primitive) into the sub-key.
  * Pure int arithmetic — texgroup ids are small non-negative array

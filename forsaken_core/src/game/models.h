@@ -608,13 +608,13 @@ u_int16_t CreateLine( float x1, float y1, float z1, float x2, float y2, float z2
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight );
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
-					    VECTOR * BottomRight );
+						VECTOR * BottomRight );
 bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group );
 bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group );
 bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u_int8_t R, u_int8_t G, u_int8_t B );
 void SetupModelSpotFX( u_int16_t i );
 void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
-							    u_int16_t Group, u_int8_t Weapon, u_int16_t ModelIndex, u_int16_t SpotFXIndex );
+								u_int16_t Group, u_int8_t Weapon, u_int16_t ModelIndex, u_int16_t SpotFXIndex );
 void UpdateShipModel( u_int16_t Ship );
 void UpdateObjectAmbientColour( OBJECT * Object );
 bool UpdateMxaModel( MXALOADHEADER * MXAloadheader );

@@ -142,43 +142,43 @@ void ProcessPolys( void )
 
 		switch( Polys[i].SeqNum )
 		{
-		   	case POLY_NOTHING:								// Nothing?
+			case POLY_NOTHING:								// Nothing?
 				break;
 
 			case POLY_PULSAR_TRAIL:							// Pulsar Trail?
 				break;
 
-		   	case POLY_AFTERBURNER:							// Afterburner Trail?
+			case POLY_AFTERBURNER:							// Afterburner Trail?
 				break;
 
-		   	case POLY_LASER:								// Laser?
-		   		Polys[i].Frame += ( framelag / 4.0F );
-		   		if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
-		   		{
-		   			Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
+			case POLY_LASER:								// Laser?
+				Polys[i].Frame += ( framelag / 4.0F );
+				if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
+				{
+					Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
 										* (*Polys[i].Frm_Info)->Num_Frames );
-		   		}
+				}
 				break;
 
-		   	case POLY_POWERLASER:							// Laser?
-		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-		   		Polys[i].Frame += ( framelag / Polys[i].AnimSpeed );
-		   		if( Polys[i].Frame >= (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 )  )
-		   		{
-		   			Polys[i].Frame = ( (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 ) ) - 0.01F;
-		   		}
+			case POLY_POWERLASER:							// Laser?
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				Polys[i].Frame += ( framelag / Polys[i].AnimSpeed );
+				if( Polys[i].Frame >= (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 )  )
+				{
+					Polys[i].Frame = ( (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 ) ) - 0.01F;
+				}
 				break;
 
-		   	case POLY_INVBITS:								// Bits?
-		   		Polys[i].Frame += ( framelag / 6.0F );
-		   		if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
-		   		{
-		   			Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
+			case POLY_INVBITS:								// Bits?
+				Polys[i].Frame += ( framelag / 6.0F );
+				if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
+				{
+					Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
 										/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 										* (*Polys[i].Frm_Info)->Num_Frames );
 				}
 
-    			if( Polys[ i ].Qlerp.time != 1.0F )
+				if( Polys[ i ].Qlerp.time != 1.0F )
 				{
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
@@ -267,9 +267,9 @@ void ProcessPolys( void )
 				}
 				break;
 
-		   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-		   	case POLY_SHIELD:								// Ship Shield Effect>
-    			if( Polys[ i ].Qlerp.time != 1.0F )
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+			case POLY_SHIELD:								// Ship Shield Effect>
+				if( Polys[ i ].Qlerp.time != 1.0F )
 				{
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
@@ -595,7 +595,7 @@ bool DisplayGroupClippedPolys(RENDEROBJECT *renderObject, u_int16_t Group )
 
 	while( 1 )
 	{
- 		if( !PolyDispGroupClipped( Group, renderObject, &TPage, &i ) )
+		if( !PolyDispGroupClipped( Group, renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -618,7 +618,7 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 
 	while( 1 )
 	{
- 		if( !PolyDispGroupUnclipped( renderObject, &TPage, &i ) )
+		if( !PolyDispGroupUnclipped( renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -659,7 +659,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	COLOR		Colour;
 	LVERTEX	*PolyVertPnt;
 	TRIANGLE	*PolyFacePnt;
-    LVERTEX	*BufStart;
+	LVERTEX	*BufStart;
 	WORD			*Indices = NULL;
 	int				start_index = 0;
 
@@ -749,60 +749,60 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 						{
 							int ntris = 0;
 
-		   					Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-		   					Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
+							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
+							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos1.x;
+							PolyVertPnt->y = Polys[ i ].Pos1.y;
+							PolyVertPnt->z = Polys[ i ].Pos1.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos2.x;
+							PolyVertPnt->y = Polys[ i ].Pos2.y;
+							PolyVertPnt->z = Polys[ i ].Pos2.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos3.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos3.x;
+							PolyVertPnt->y = Polys[ i ].Pos3.y;
+							PolyVertPnt->z = Polys[ i ].Pos3.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos4.x;
+							PolyVertPnt->y = Polys[ i ].Pos4.y;
+							PolyVertPnt->z = Polys[ i ].Pos4.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 1;
-				   			PolyFacePnt->v3 = 2;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 1;
+							PolyFacePnt->v3 = 2;
+							PolyFacePnt++;
 							ntris++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 2;
-				   			PolyFacePnt->v3 = 3;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 2;
+							PolyFacePnt->v3 = 3;
+							PolyFacePnt++;
 							ntris++;
 
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
@@ -893,7 +893,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	COLOR		Colour;
 	LVERTEX	*PolyVertPnt;
 	TRIANGLE	*PolyFacePnt;
-    LVERTEX	*BufStart;
+	LVERTEX	*BufStart;
 	WORD			*Indices = NULL;
 	int				start_index = 0;
 
@@ -980,63 +980,63 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 						{
 							int ntris = 0;
 
-		   					Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-		   					Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
+							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
+							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos1.x;
+							PolyVertPnt->y = Polys[ i ].Pos1.y;
+							PolyVertPnt->z = Polys[ i ].Pos1.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos2.x;
+							PolyVertPnt->y = Polys[ i ].Pos2.y;
+							PolyVertPnt->z = Polys[ i ].Pos2.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos3.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos3.x;
+							PolyVertPnt->y = Polys[ i ].Pos3.y;
+							PolyVertPnt->z = Polys[ i ].Pos3.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos4.x;
+							PolyVertPnt->y = Polys[ i ].Pos4.y;
+							PolyVertPnt->z = Polys[ i ].Pos4.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 1;
-				   			PolyFacePnt->v3 = 2;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 1;
+							PolyFacePnt->v3 = 2;
+							PolyFacePnt++;
 							ntris++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 2;
-				   			PolyFacePnt->v3 = 3;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 2;
+							PolyFacePnt->v3 = 3;
+							PolyFacePnt++;
 							ntris++;
 
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
@@ -1108,7 +1108,7 @@ bool DisplaySolidGroupClippedPolys( RENDEROBJECT *renderObject, u_int16_t Group 
 
 	while( 1 )
 	{
- 		if( !SolidPolyDispGroupClipped( Group, renderObject, &TPage, &i ) )
+		if( !SolidPolyDispGroupClipped( Group, renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -1132,7 +1132,7 @@ bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject )
 
 	while( 1 )
 	{
- 		if( !SolidPolyDispGroupUnclipped( renderObject, &TPage, &i ) )
+		if( !SolidPolyDispGroupUnclipped( renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -1173,7 +1173,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 	COLOR		Colour;
 	LVERTEX	*PolyVertPnt;
 	TRIANGLE	*PolyFacePnt;
-    LVERTEX	*BufStart;
+	LVERTEX	*BufStart;
 	WORD			*Indices = NULL;
 	int				start_index = 0;
 
@@ -1263,61 +1263,61 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 						{
 							int ntris = 0;
 
-		   					Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-		   					Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
+							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
+							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos1.x;
+							PolyVertPnt->y = Polys[ i ].Pos1.y;
+							PolyVertPnt->z = Polys[ i ].Pos1.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos2.x;
+							PolyVertPnt->y = Polys[ i ].Pos2.y;
+							PolyVertPnt->z = Polys[ i ].Pos2.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos3.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos3.x;
+							PolyVertPnt->y = Polys[ i ].Pos3.y;
+							PolyVertPnt->z = Polys[ i ].Pos3.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos4.x;
+							PolyVertPnt->y = Polys[ i ].Pos4.y;
+							PolyVertPnt->z = Polys[ i ].Pos4.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 1;
-				   			PolyFacePnt->v3 = 2;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 1;
+							PolyFacePnt->v3 = 2;
+							PolyFacePnt++;
 							ntris++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 2;
-				   			PolyFacePnt->v3 = 3;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 2;
+							PolyFacePnt->v3 = 3;
+							PolyFacePnt++;
 							ntris++;
 
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = 0;
@@ -1409,7 +1409,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	COLOR		Colour;
 	LVERTEX	*PolyVertPnt;
 	TRIANGLE	*PolyFacePnt;
-    LVERTEX	*BufStart;
+	LVERTEX	*BufStart;
 	WORD			*Indices = NULL;
 	int				start_index = 0;
 
@@ -1499,60 +1499,60 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 						{
 							int ntris = 0;
 
-		   					Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-		   					Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
+							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
+							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos1.x;
+							PolyVertPnt->y = Polys[ i ].Pos1.y;
+							PolyVertPnt->z = Polys[ i ].Pos1.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v1;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos2.x;
+							PolyVertPnt->y = Polys[ i ].Pos2.y;
+							PolyVertPnt->z = Polys[ i ].Pos2.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v1;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos3.z;
-		   					PolyVertPnt->tu = Box_Ptr->u2;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos3.x;
+							PolyVertPnt->y = Polys[ i ].Pos3.y;
+							PolyVertPnt->z = Polys[ i ].Pos3.z;
+							PolyVertPnt->tu = Box_Ptr->u2;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
-		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
-		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
-		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
-		   					PolyVertPnt->tu = Box_Ptr->u1;
-		   					PolyVertPnt->tv = Box_Ptr->v2;
-		   					PolyVertPnt->color = Colour;
-		   					PolyVertPnt++;
+							PolyVertPnt->x = Polys[ i ].Pos4.x;
+							PolyVertPnt->y = Polys[ i ].Pos4.y;
+							PolyVertPnt->z = Polys[ i ].Pos4.z;
+							PolyVertPnt->tu = Box_Ptr->u1;
+							PolyVertPnt->tv = Box_Ptr->v2;
+							PolyVertPnt->color = Colour;
+							PolyVertPnt++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 1;
-				   			PolyFacePnt->v3 = 2;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 1;
+							PolyFacePnt->v3 = 2;
+							PolyFacePnt++;
 							ntris++;
 
-				   			PolyFacePnt->v1 = 0;
-				   			PolyFacePnt->v2 = 2;
-				   			PolyFacePnt->v3 = 3;
-				   			PolyFacePnt++;
+							PolyFacePnt->v1 = 0;
+							PolyFacePnt->v2 = 2;
+							PolyFacePnt->v3 = 3;
+							PolyFacePnt++;
 							ntris++;
 
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;

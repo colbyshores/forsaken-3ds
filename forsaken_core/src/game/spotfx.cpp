@@ -267,7 +267,7 @@ void ProcessSpotFX( void )
 
 								if( SpotFX->Time >= SpotFX->TimeInterval )
 								{
-					 				SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
+									SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
 
 									switch( SpotFX->Type )
 									{
@@ -450,7 +450,7 @@ void ProcessSpotFX( void )
 
 							if( SpotFX->Time >= SpotFX->TimeInterval )
 							{
-				 				SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
+								SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
 
 								switch( SpotFX->Type )
 								{
@@ -600,7 +600,7 @@ void SetupSpotFX( void )
 	Output		:	SPOTFX	*	SpotFX ( NULL if not available )
 ===================================================================*/
 SPOTFX * InitOneSpotFX( u_int16_t GenType, float GenDelay, u_int16_t Type, u_int16_t Group,
-					    VECTOR * Pos, VECTOR * Dir, VECTOR * Up, float ActiveDelay, float InactiveDelay,
+						VECTOR * Pos, VECTOR * Dir, VECTOR * Up, float ActiveDelay, float InactiveDelay,
 						int32_t Colour, int16_t Primary, int16_t Secondary, int16_t SoundFX, float Volume, float Speed, int16_t SFXType )
 {
 	SPOTFX	*	Object;
@@ -873,9 +873,9 @@ void CreateSpotFXFlameSmoke( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].xsize = ( 8.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 8.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].Dir = *Dir;
-   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
-  		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
-   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
+		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
+		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
+		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
 		NormaliseVector( &FmPolys[ fmpoly ].Dir );
 		FmPolys[ fmpoly ].Speed = ( 10.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -920,9 +920,9 @@ void CreateSpotFXSmoke( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 		FmPolys[ fmpoly ].xsize = ( 20.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 20.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].Dir = *Dir;
-   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-  		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 		NormaliseVector( &FmPolys[ fmpoly ].Dir );
 		FmPolys[ fmpoly ].Speed = ( 10.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -981,10 +981,10 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 			FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-		   	FmPolys[ fmpoly ].Trans = 255;
-		   	FmPolys[ fmpoly ].R = Red;
-		   	FmPolys[ fmpoly ].G = Green;
-		   	FmPolys[ fmpoly ].B = Blue;
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].R = Red;
+			FmPolys[ fmpoly ].G = Green;
+			FmPolys[ fmpoly ].B = Blue;
 			FmPolys[ fmpoly ].Start_R = Red;
 			FmPolys[ fmpoly ].Start_G = Green;
 			FmPolys[ fmpoly ].Start_B = Blue;
@@ -997,22 +997,22 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_SPARKS;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_SPARKS;
 				FmPolys[ fmpoly ].AnimSpeed = 6.0F;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = Red;
 				FmPolys[ fmpoly ].G = Green;
 				FmPolys[ fmpoly ].B = Blue;
@@ -1026,7 +1026,7 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -1070,48 +1070,48 @@ void CreateSpotFXExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	{
 		fmpoly = FindFreeFmPoly();
 
-   		if( fmpoly != INDEX_NONE )
-   		{
-   			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   			FmPolys[ fmpoly ].Pos = *Pos;
-   			FmPolys[ fmpoly ].SeqNum = FM_ANIM;
-   			FmPolys[ fmpoly ].Frame = 0.0F;
-   			FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
-   			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-   			FmPolys[ fmpoly ].R = 192;
-   			FmPolys[ fmpoly ].G = 192;
-   			FmPolys[ fmpoly ].B = 192;
+		if( fmpoly != INDEX_NONE )
+		{
+			FmPolys[ fmpoly ].LifeCount = 1000.0F;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].SeqNum = FM_ANIM;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].R = 192;
+			FmPolys[ fmpoly ].G = 192;
+			FmPolys[ fmpoly ].B = 192;
 			FmPolys[ fmpoly ].Start_R = 192;
 			FmPolys[ fmpoly ].Start_G = 192;
 			FmPolys[ fmpoly ].Start_B = 192;
 			FmPolys[ fmpoly ].Trans = 255;
-   			FmPolys[ fmpoly ].Dir = *Dir;
-   			FmPolys[ fmpoly ].Speed = 0.0F;
-   			FmPolys[ fmpoly ].Group = Group;
+			FmPolys[ fmpoly ].Dir = *Dir;
+			FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Group = Group;
 
-   			if( Count == 0 )
-   			{
-   				FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
-   				FmPolys[ fmpoly ].xsize = NORM_EXPLO_SIZE;
-   				FmPolys[ fmpoly ].ysize = NORM_EXPLO_SIZE;
-   			}
-   			else
-   			{
-   				FmPolys[ fmpoly ].Pos.x += ( ( ( (float) Random_Range( 256 ) ) - 128.0F ) * GLOBAL_SCALE );
-   				FmPolys[ fmpoly ].Pos.y += ( ( ( (float) Random_Range( 256 ) ) - 128.0F ) * GLOBAL_SCALE );
-   				FmPolys[ fmpoly ].Pos.z += ( ( ( (float) Random_Range( 256 ) ) - 128.0F ) * GLOBAL_SCALE );
-   				FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
-   				Scale = (float) ( Random_Range( 10 ) + 6 ) * GLOBAL_SCALE;
-   				FmPolys[ fmpoly ].xsize = Scale;
-   				FmPolys[ fmpoly ].ysize = Scale;
-   			}
-   			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-   		}
-   		else
-   		{
-   			return;
-   		}
-   	}
+			if( Count == 0 )
+			{
+				FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
+				FmPolys[ fmpoly ].xsize = NORM_EXPLO_SIZE;
+				FmPolys[ fmpoly ].ysize = NORM_EXPLO_SIZE;
+			}
+			else
+			{
+				FmPolys[ fmpoly ].Pos.x += ( ( ( (float) Random_Range( 256 ) ) - 128.0F ) * GLOBAL_SCALE );
+				FmPolys[ fmpoly ].Pos.y += ( ( ( (float) Random_Range( 256 ) ) - 128.0F ) * GLOBAL_SCALE );
+				FmPolys[ fmpoly ].Pos.z += ( ( ( (float) Random_Range( 256 ) ) - 128.0F ) * GLOBAL_SCALE );
+				FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
+				Scale = (float) ( Random_Range( 10 ) + 6 ) * GLOBAL_SCALE;
+				FmPolys[ fmpoly ].xsize = Scale;
+				FmPolys[ fmpoly ].ysize = Scale;
+			}
+			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
+		}
+		else
+		{
+			return;
+		}
+	}
 }
 
 /*===================================================================
@@ -1126,7 +1126,7 @@ void CreateSpotFXExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	Output		:	Nothing
 ===================================================================*/
 void CreateSpotFXFireSecondary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
-							    u_int16_t Group, u_int8_t Weapon, u_int16_t OwnerType, u_int16_t OwnerID )
+								u_int16_t Group, u_int8_t Weapon, u_int16_t OwnerType, u_int16_t OwnerID )
 {
 	VECTOR	TempVector = { 0.0F, 0.0F, 0.0F };
 	u_int16_t	BulletID = 0;
@@ -1152,7 +1152,7 @@ void CreateSpotFXFireSecondary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 	Output		:	Nothing
 ===================================================================*/
 void CreateSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
-							    u_int16_t Group, u_int8_t Weapon, u_int16_t /*OwnerType*/, u_int16_t /*OwnerID*/ )
+								u_int16_t Group, u_int8_t Weapon, u_int16_t /*OwnerType*/, u_int16_t /*OwnerID*/ )
 {
 	VECTOR	TempVector = { 0.0F, 0.0F, 0.0F };
 
@@ -1217,7 +1217,7 @@ void CreateSpotFXGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].B = 255;
 		FmPolys[ fmpoly ].Trans = 255;
 		FmPolys[ fmpoly ].Frm_Info = &GravgonTrail_Header;
-   		FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
+		FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
 		FmPolys[ fmpoly ].Rot = 0.0F;
 		FmPolys[ fmpoly ].RotSpeed = 0.0F;
 		FmPolys[ fmpoly ].xsize = ( 10.0F * GLOBAL_SCALE );
@@ -1226,10 +1226,10 @@ void CreateSpotFXGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].Speed = ( 15.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].Group = Group;
 		TempQuat.From2Vectors(&Forward, Dir);
-	   	TempQuat.ToMatrix(&TempMat);
-	   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
-	  	FmPolys[ fmpoly ].DirVector = *Dir;
-	  	FmPolys[ fmpoly ].UpVector = TempUp;
+		TempQuat.ToMatrix(&TempMat);
+		ApplyMatrix( &TempMat, &SlideUp, &TempUp );
+		FmPolys[ fmpoly ].DirVector = *Dir;
+		FmPolys[ fmpoly ].UpVector = TempUp;
 		AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 	}
 }
@@ -1291,8 +1291,8 @@ void CreateSpotFXNmeGlow( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, u_int
 	if( FmPoly != INDEX_NONE )
 	{
 		FmPolys[ FmPoly ].LifeCount = 1000.0F;
-  		FmPolys[ FmPoly ].Pos = *Pos;
-  		FmPolys[ FmPoly ].OnceOnly = 1;
+		FmPolys[ FmPoly ].Pos = *Pos;
+		FmPolys[ FmPoly ].OnceOnly = 1;
 		FmPolys[ FmPoly ].SeqNum = FM_SPOTFX_GLOW;
 		FmPolys[ FmPoly ].Frame = 0.0F;
 		FmPolys[ FmPoly ].Flags = FM_FLAG_ZERO;
@@ -1303,7 +1303,7 @@ void CreateSpotFXNmeGlow( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, u_int
 		FmPolys[ FmPoly ].R = Red;
 		FmPolys[ FmPoly ].G = Green;
 		FmPolys[ FmPoly ].B = Blue;
-	   	FmPolys[ FmPoly ].Trans = 255;
+		FmPolys[ FmPoly ].Trans = 255;
 		AddFmPolyToTPage( FmPoly, GetTPage( *FmPolys[ FmPoly ].Frm_Info, 0 ) );
 	}
 }
@@ -1399,10 +1399,10 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 			FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-		   	FmPolys[ fmpoly ].Trans = 255;
-		   	FmPolys[ fmpoly ].R = Red;
-		   	FmPolys[ fmpoly ].G = Green;
-		   	FmPolys[ fmpoly ].B = Blue;
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].R = Red;
+			FmPolys[ fmpoly ].G = Green;
+			FmPolys[ fmpoly ].B = Blue;
 			FmPolys[ fmpoly ].Start_R = Red;
 			FmPolys[ fmpoly ].Start_G = Green;
 			FmPolys[ fmpoly ].Start_B = Blue;
@@ -1415,21 +1415,21 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = ( (float) Random_Range( 180 ) ) + 60.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_REALSPARKS;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
-		   		FmPolys[ fmpoly ].Frame = (float) Random_Range( (*FmPolys[ fmpoly ].Frm_Info)->Num_Frames );
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_REALSPARKS;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Frame = (float) Random_Range( (*FmPolys[ fmpoly ].Frm_Info)->Num_Frames );
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				FmPolys[ fmpoly ].Dir.x *= ( ( (float) Random_Range( 10000 ) ) / 2000.0F ) + 3.0F;
 				FmPolys[ fmpoly ].Dir.y *= ( ( (float) Random_Range( 10000 ) ) / 2000.0F ) + 3.0F;
@@ -1446,7 +1446,7 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 				FmPolys[ fmpoly ].ysize = ( 8.0F * GLOBAL_SCALE );
 				FmPolys[ fmpoly ].Group = Group;
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -1565,9 +1565,9 @@ void CreateSpotFXBubbles( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t 
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = (float) ( Random_Range( 100 ) / 50.0F ) + 0.25F;
 			FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
-   			FmPolys[ fmpoly ].Dir.x = ( Dir->x * 2.0F ) + Random_Jitter();
-   			FmPolys[ fmpoly ].Dir.y = ( Dir->y * 2.0F ) + Random_Jitter();
-   			FmPolys[ fmpoly ].Dir.z = ( Dir->z * 2.0F ) + Random_Jitter();
+			FmPolys[ fmpoly ].Dir.x = ( Dir->x * 2.0F ) + Random_Jitter();
+			FmPolys[ fmpoly ].Dir.y = ( Dir->y * 2.0F ) + Random_Jitter();
+			FmPolys[ fmpoly ].Dir.z = ( Dir->z * 2.0F ) + Random_Jitter();
 			NormaliseVector( &FmPolys[ fmpoly ].Dir );
 			FmPolys[ fmpoly ].Speed = ( ( Random_Range( 10000 ) / 10000.0F ) * 4.0F ) + 1.0F;
 			FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -1606,15 +1606,15 @@ void CreateBubbleTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 		FmPolys[ fmpoly ].Start_R = Red;
 		FmPolys[ fmpoly ].Start_G = Green;
 		FmPolys[ fmpoly ].Start_B = Blue;
-   		FmPolys[ fmpoly ].Trans = 255;
+		FmPolys[ fmpoly ].Trans = 255;
 		FmPolys[ fmpoly ].Frm_Info = &Bubble_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = 0.0F;
 		FmPolys[ fmpoly ].xsize = (float) ( Random_Range( 100 ) / 75.0F ) + 0.25F;
 		FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
-   		FmPolys[ fmpoly ].Dir.x = ( Dir->x * 3.0F ) + Random_Jitter();
-   		FmPolys[ fmpoly ].Dir.y = ( Dir->y * 3.0F ) + Random_Jitter();
-   		FmPolys[ fmpoly ].Dir.z = ( Dir->z * 3.0F ) + Random_Jitter();
+		FmPolys[ fmpoly ].Dir.x = ( Dir->x * 3.0F ) + Random_Jitter();
+		FmPolys[ fmpoly ].Dir.y = ( Dir->y * 3.0F ) + Random_Jitter();
+		FmPolys[ fmpoly ].Dir.z = ( Dir->z * 3.0F ) + Random_Jitter();
 		NormaliseVector( &FmPolys[ fmpoly ].Dir );
 		FmPolys[ fmpoly ].Speed = ( ( Random_Range( 10000 ) / 10000.0F ) * 4.0F ) + 1.0F;
 		FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -1640,7 +1640,7 @@ void CreateSpotFXDrip( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red
 	fmpoly = FindFreeFmPoly();
 
 	if( fmpoly != INDEX_NONE )
- 	{
+	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
 		FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_DRIP;
@@ -1658,7 +1658,7 @@ void CreateSpotFXDrip( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red
 		FmPolys[ fmpoly ].Rot = 0.0F;
 		FmPolys[ fmpoly ].xsize = ( 2.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 4.0F * GLOBAL_SCALE );
-   		FmPolys[ fmpoly ].Dir = *Dir;
+		FmPolys[ fmpoly ].Dir = *Dir;
 		FmPolys[ fmpoly ].Speed = 0.0F;
 		FmPolys[ fmpoly ].UpSpeed = 0.0F;
 		FmPolys[ fmpoly ].Group = Group;
@@ -1688,22 +1688,22 @@ void CreateSpotFXDripSplash( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 
 	for( Count = 0; Count < NumSparks; Count++ )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   	FmPolys[ fmpoly ].Pos = *Pos;
-		   	FmPolys[ fmpoly ].Dir = *Dir;
-		   	FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_SPARKS;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].Dir = *Dir;
+			FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_SPARKS;
 			FmPolys[ fmpoly ].AnimSpeed = 6.0F;
-		   	FmPolys[ fmpoly ].Frame = 0.0F;
-		   	FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Trans = 255;
-		   	FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   	FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   	FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 			FmPolys[ fmpoly ].R = Red;
 			FmPolys[ fmpoly ].G = Green;
 			FmPolys[ fmpoly ].B = Blue;
@@ -1717,7 +1717,7 @@ void CreateSpotFXDripSplash( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 			FmPolys[ fmpoly ].Group = Group;
 			NormaliseVector( &FmPolys[ fmpoly ].Dir );
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 		else
 		{
 			return;
@@ -1882,7 +1882,7 @@ void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group )
 		FmPolys[ fmpoly ].R = 0;
 		FmPolys[ fmpoly ].G = 0;
 		FmPolys[ fmpoly ].B = 0;
-   		FmPolys[ fmpoly ].Trans = 255;
+		FmPolys[ fmpoly ].Trans = 255;
 		FmPolys[ fmpoly ].Frm_Info = &EnemyGen_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].DirVector.x = +1.0F;
@@ -1893,13 +1893,13 @@ void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group )
 		FmPolys[ fmpoly ].UpVector.z = +1.0F;
 		NormaliseVector( &FmPolys[ fmpoly ].DirVector );
 		NormaliseVector( &FmPolys[ fmpoly ].UpVector );
-   		FmPolys[ fmpoly ].Flags = FM_FLAG_RELATIVE;
+		FmPolys[ fmpoly ].Flags = FM_FLAG_RELATIVE;
 		FmPolys[ fmpoly ].Rot = 0.0F;
 		FmPolys[ fmpoly ].xsize = ( 16.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
-   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+		FmPolys[ fmpoly ].Dir.x = 0.0F;
+		FmPolys[ fmpoly ].Dir.y = 0.0F;
+		FmPolys[ fmpoly ].Dir.z = 0.0F;
 		FmPolys[ fmpoly ].Speed = 0.0F;
 		FmPolys[ fmpoly ].UpSpeed = 0.0F;
 		FmPolys[ fmpoly ].Group = Group;
@@ -1917,15 +1917,15 @@ void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group )
 			FmPolys[ fmpoly ].R = 0;
 			FmPolys[ fmpoly ].G = 0;
 			FmPolys[ fmpoly ].B = 0;
-   			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].Trans = 255;
 			FmPolys[ fmpoly ].Frm_Info = &BigFlash_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = 0.1F;
 			FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
-   			FmPolys[ fmpoly ].Dir.x = 0.0F;
-   			FmPolys[ fmpoly ].Dir.y = 0.0F;
-   			FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
 			FmPolys[ fmpoly ].Speed = 0.0F;
 			FmPolys[ fmpoly ].UpSpeed = 0.0F;
 			FmPolys[ fmpoly ].Group = Group;
@@ -1969,9 +1969,9 @@ void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 			FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
 			FmPolys[ fmpoly ].Dir = *Dir;
-	   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 10000 ) ) / 7500.0F ) - 0.66F );
-	   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 10000 ) ) / 7500.0F ) - 0.66F );
-	   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 10000 ) ) / 7500.0F ) - 0.66F );
+			FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 10000 ) ) / 7500.0F ) - 0.66F );
+			FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 10000 ) ) / 7500.0F ) - 0.66F );
+			FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 10000 ) ) / 7500.0F ) - 0.66F );
 			NormaliseVector( &FmPolys[ fmpoly ].Dir );
 			FmPolys[ fmpoly ].Speed = ( 24.0F * GLOBAL_SCALE );
 			FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -1982,25 +1982,25 @@ void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-   	if( fmpoly != INDEX_NONE )
-   	{
-   		FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   		FmPolys[ fmpoly ].Pos = *Pos;
-   		FmPolys[ fmpoly ].SeqNum = FM_ANIMSPEED;
-   		FmPolys[ fmpoly ].AnimSpeed = 1.0F;
-   		FmPolys[ fmpoly ].Frame = 0.0F;
-   		FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
-   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-   		FmPolys[ fmpoly ].R = 64;
-   		FmPolys[ fmpoly ].G = 64;
-   		FmPolys[ fmpoly ].B = 64;
+	if( fmpoly != INDEX_NONE )
+	{
+		FmPolys[ fmpoly ].LifeCount = 1000.0F;
+		FmPolys[ fmpoly ].Pos = *Pos;
+		FmPolys[ fmpoly ].SeqNum = FM_ANIMSPEED;
+		FmPolys[ fmpoly ].AnimSpeed = 1.0F;
+		FmPolys[ fmpoly ].Frame = 0.0F;
+		FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
+		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+		FmPolys[ fmpoly ].R = 64;
+		FmPolys[ fmpoly ].G = 64;
+		FmPolys[ fmpoly ].B = 64;
 		FmPolys[ fmpoly ].Start_R = 64;
 		FmPolys[ fmpoly ].Start_G = 64;
 		FmPolys[ fmpoly ].Start_B = 64;
 		FmPolys[ fmpoly ].Trans = 255;
-   		FmPolys[ fmpoly ].Dir = *Dir;
-   		FmPolys[ fmpoly ].Speed = 0.0F;
-   		FmPolys[ fmpoly ].Group = Group;
+		FmPolys[ fmpoly ].Dir = *Dir;
+		FmPolys[ fmpoly ].Speed = 0.0F;
+		FmPolys[ fmpoly ].Group = Group;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 		FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
@@ -2077,8 +2077,8 @@ void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Grou
 	if( FmPoly != INDEX_NONE )
 	{
 		FmPolys[ FmPoly ].LifeCount = 1000.0F;
-  		FmPolys[ FmPoly ].Pos = *Pos;
-  		FmPolys[ FmPoly ].OnceOnly = 1;
+		FmPolys[ FmPoly ].Pos = *Pos;
+		FmPolys[ FmPoly ].OnceOnly = 1;
 		FmPolys[ FmPoly ].SeqNum = FM_SPOTFX_GLOW;
 		FmPolys[ FmPoly ].Frame = 0.0F;
 		FmPolys[ FmPoly ].Flags = FM_FLAG_ZERO;
@@ -2089,7 +2089,7 @@ void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Grou
 		FmPolys[ FmPoly ].R = (u_int8_t) ( Size * 100.0F );
 		FmPolys[ FmPoly ].G = (u_int8_t) ( Size * 100.0F );
 		FmPolys[ FmPoly ].B = (u_int8_t) ( Size * 100.0F );
-	   	FmPolys[ FmPoly ].Trans = 255;
+		FmPolys[ FmPoly ].Trans = 255;
 		AddFmPolyToTPage( FmPoly, GetTPage( *FmPolys[ FmPoly ].Frm_Info, 0 ) );
 	}
 }
@@ -2117,8 +2117,8 @@ void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Gro
 	if( FmPoly != INDEX_NONE )
 	{
 		FmPolys[ FmPoly ].LifeCount = 1000.0F;
-  		FmPolys[ FmPoly ].Pos = *Pos;
-  		FmPolys[ FmPoly ].OnceOnly = 1;
+		FmPolys[ FmPoly ].Pos = *Pos;
+		FmPolys[ FmPoly ].OnceOnly = 1;
 		FmPolys[ FmPoly ].SeqNum = FM_SPOTFX_GLOW;
 		FmPolys[ FmPoly ].Frame = 0.0F;
 		FmPolys[ FmPoly ].Flags = FM_FLAG_ZERO;
@@ -2129,7 +2129,7 @@ void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Gro
 		FmPolys[ FmPoly ].R = (u_int8_t) ( Size * 100.0F );
 		FmPolys[ FmPoly ].G = (u_int8_t) ( Size * 100.0F );
 		FmPolys[ FmPoly ].B = (u_int8_t) ( Size * 100.0F );
-	   	FmPolys[ FmPoly ].Trans = 255;
+		FmPolys[ FmPoly ].Trans = 255;
 		AddFmPolyToTPage( FmPoly, GetTPage( *FmPolys[ FmPoly ].Frm_Info, 0 ) );
 	}
 }

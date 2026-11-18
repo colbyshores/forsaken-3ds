@@ -292,7 +292,7 @@ bool TriggerAreaload( char * Filename )
 }
 
 /*===================================================================
- 	Procedure	:		Free any memory taken up with zone loading..
+	Procedure	:		Free any memory taken up with zone loading..
 	Input		:		void
 	Output		:		void
 ===================================================================*/
@@ -323,7 +323,7 @@ bool	Entry;
 bool	Exit;
 bool	In;
 /*===================================================================
- 	Procedure	:		Check a player's move against the group's areas
+	Procedure	:		Check a player's move against the group's areas
 	Input		:		VECTOR	*	Old Position
 				:		VECTOR	*	New Position
 				:		u_int16_t		Group
@@ -363,7 +363,7 @@ bool	TriggerAreaPlayerCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group
 }
 
 /*===================================================================
- 	Procedure	:		Check Player's shot hits trigger area...
+	Procedure	:		Check Player's shot hits trigger area...
 	Input		:		VECTOR	*	Old Position
 				:		VECTOR	*	New Position
 				:		u_int16_t		Group
@@ -425,7 +425,7 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 	return true;
 }
 /*===================================================================
- 	Procedure	:		Check an enemy's move against the group's areas
+	Procedure	:		Check an enemy's move against the group's areas
 	Input		:		VECTOR	*	Old Position
 				:		VECTOR	*	New Position
 				:		u_int16_t		Group
@@ -465,7 +465,7 @@ bool	TriggerAreaEnemyCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group 
 }
 
 /*===================================================================
- 	Procedure	:		Check Enemy's shot hits trigger area...
+	Procedure	:		Check Enemy's shot hits trigger area...
 	Input		:		VECTOR	*	Old Position
 				:		VECTOR	*	New Position
 				:		u_int16_t		Group
@@ -529,7 +529,7 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 
 
 /*===================================================================
- 	Procedure	:		Classify a segment against a convex hull
+	Procedure	:		Classify a segment against a convex hull
 	Input		:		TRIGGER_ZONE *	Sides
 				:		VECTOR	*	StartPos
 				:		VECTOR	*	EndPos
@@ -597,7 +597,7 @@ bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos ,
 }
 
 /*===================================================================
- 	Procedure	:		Is point inside convex shape?
+	Procedure	:		Is point inside convex shape?
 	Input		:		VECTOR	*	Pos
 				:		TRIGGER_ZONE *	Sides
 				:		int16_t		NumSides
@@ -626,7 +626,7 @@ bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, 
 }
 
 /*===================================================================
- 	Procedure	:		Process and clasify 2 positions with an area..
+	Procedure	:		Process and clasify 2 positions with an area..
 	Input		:		VECTOR	*	Old Position
 				:		VECTOR	*	New Position
 				:		TRIGGER_AREA *	Area
@@ -644,20 +644,20 @@ void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area
 	In = false;
 	if( Area->type == ZONE_Sphere )
 	{
-   		OldIn = DistanceVector2Vector( &Area->pos , OldPos ) < Area->half_size.x;
-   		NewIn = DistanceVector2Vector( &Area->pos , NewPos ) < Area->half_size.x;
+		OldIn = DistanceVector2Vector( &Area->pos , OldPos ) < Area->half_size.x;
+		NewIn = DistanceVector2Vector( &Area->pos , NewPos ) < Area->half_size.x;
 
-   		if( !OldIn && NewIn )
-   			Entry = true;
-   		if( OldIn && !NewIn )
-   			Exit = true;
-   		if( OldIn && NewIn )
-   		{
-   			In = true;
-   		}
-   	}else{
-   		RayToHull( Area->Zone , OldPos , NewPos , Area->num_sides );
-   	}
+		if( !OldIn && NewIn )
+			Entry = true;
+		if( OldIn && !NewIn )
+			Exit = true;
+		if( OldIn && NewIn )
+		{
+			In = true;
+		}
+	}else{
+		RayToHull( Area->Zone , OldPos , NewPos , Area->num_sides );
+	}
 }
 
 /*
@@ -673,7 +673,7 @@ void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area
 */
 
 /*===================================================================
- 	Procedure	:		Display all trigger areas in group
+	Procedure	:		Display all trigger areas in group
 	Input		:		u_int16_t	Group
 	Output		:		Nothing
 ===================================================================*/
@@ -797,7 +797,7 @@ void DispGroupTriggerAreas( u_int16_t Group )
 }
 
 /*===================================================================
- 	Procedure	:		Enable trigger area
+	Procedure	:		Enable trigger area
 	Input		:		u_int16_t	* Data
 	Output		:		Nothing
 ===================================================================*/
@@ -813,7 +813,7 @@ void EnableTriggerArea( u_int16_t * Data )
 
 
 /*===================================================================
- 	Procedure	:		Disable trigger area
+	Procedure	:		Disable trigger area
 	Input		:		u_int16_t	* Data
 	Output		:		Nothing
 ===================================================================*/
@@ -827,7 +827,7 @@ void DisableTriggerArea( u_int16_t * Data )
 	AreaPnt->state = TRIGGER_AREA_STATE_Off;
 }
 /*===================================================================
- 	Procedure	:		Count down timed areas and switch them on
+	Procedure	:		Count down timed areas and switch them on
 	Input		:		void
 	Output		:		void
 ===================================================================*/

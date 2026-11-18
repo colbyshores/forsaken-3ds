@@ -140,7 +140,7 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 }
 
 u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
-                            u_int16_t StartGroup, VECTOR * MoveOffset );
+							u_int16_t StartGroup, VECTOR * MoveOffset );
 
 /* Body rotation deliberately removed.
  *
@@ -206,7 +206,7 @@ static void JumpDoMovement( ENEMY * Enemy )
 		 * mid-air pose for the rest of the arc, which keeps the
 		 * backward-lean cycle from playing mid-hop. */
 		if( Enemy->Object.CurAnimSeq == 2 &&
-		    Enemy->Object.Time >= 1.3F * ANIM_SECOND )
+			Enemy->Object.Time >= 1.3F * ANIM_SECOND )
 			SetCurAnimSeq( 3, &Enemy->Object );
 
 		/* arc_height = (apex_y - landing_y) * 4 — mirrors KEX's
@@ -229,7 +229,7 @@ static void JumpDoMovement( ENEMY * Enemy )
 	MoveOff.y = Enemy->Object.Pos.y - StartPos.y;
 	MoveOff.z = Enemy->Object.Pos.z - StartPos.z;
 	Enemy->Object.Group = MoveGroup( &Mloadheader, &StartPos,
-	                                 OldGroup, &MoveOff );
+									 OldGroup, &MoveOff );
 }
 
 /*===================================================================

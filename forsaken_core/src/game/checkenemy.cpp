@@ -172,42 +172,42 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 						*Int_Point = *Pos;
 						*Int_Point2 = *Pos;
 					}
-   					else
-   					{
-   						if( ColRadius > EnemyTypes[Enemy->Type].Radius )
-   						{
+					else
+					{
+						if( ColRadius > EnemyTypes[Enemy->Type].Radius )
+						{
 /*===================================================================
 	Do i graze sphere?
 ===================================================================*/
-   							if( RaytoSphere2( (VECTOR *) &Enemy->Object.Pos, ColRadius, Pos, Dir,
-   											  &Int_Temp, &Int_Temp2 ) )
-   							{
-   								TempVector.x = ( Int_Temp.x - Pos->x );
-   								TempVector.y = ( Int_Temp.y - Pos->y );
-   								TempVector.z = ( Int_Temp.z - Pos->z );
+							if( RaytoSphere2( (VECTOR *) &Enemy->Object.Pos, ColRadius, Pos, Dir,
+											  &Int_Temp, &Int_Temp2 ) )
+							{
+								TempVector.x = ( Int_Temp.x - Pos->x );
+								TempVector.y = ( Int_Temp.y - Pos->y );
+								TempVector.z = ( Int_Temp.z - Pos->z );
 
-   								DistToSphere = VectorLength( &TempVector );
+								DistToSphere = VectorLength( &TempVector );
 
-   								if( ( DistToSphere <= DirLength ) && ( DistToSphere < ClosestLength ) )
-   								{
-   									ClosestLength = DistToSphere;
-   									ClosestEnemy = Enemy;
-   									*Int_Point = Int_Temp;
-   									*Int_Point2 = Int_Temp2;
-   								}
-   							}
-   							else
-   							{
-   								if( PointToSphere( (VERT *) &Enemy->Object.Pos, ColRadius, (VERT *) Pos ) )
-   								{
-   									ClosestLength = 0.0F;
-   									ClosestEnemy = Enemy;
-   									*Int_Point = *Pos;
-   									*Int_Point2 = *Pos;
-   								}
-   							}
-   						}
-   					}
+								if( ( DistToSphere <= DirLength ) && ( DistToSphere < ClosestLength ) )
+								{
+									ClosestLength = DistToSphere;
+									ClosestEnemy = Enemy;
+									*Int_Point = Int_Temp;
+									*Int_Point2 = Int_Temp2;
+								}
+							}
+							else
+							{
+								if( PointToSphere( (VERT *) &Enemy->Object.Pos, ColRadius, (VERT *) Pos ) )
+								{
+									ClosestLength = 0.0F;
+									ClosestEnemy = Enemy;
+									*Int_Point = *Pos;
+									*Int_Point2 = *Pos;
+								}
+							}
+						}
+					}
 				}
 			}
 		}

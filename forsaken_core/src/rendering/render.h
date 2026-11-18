@@ -28,25 +28,25 @@
 extern bool  bSquareOnly;
 
 typedef struct {
-    DWORD       X;
-    DWORD       Y;            /* Viewport Top left */
-    DWORD       Width;
-    DWORD       Height;       /* Viewport Dimensions */
-    float       MinZ;         /* Min/max of clip Volume */
-    float       MaxZ;
-    float	ScaleX;
-    float	ScaleY;
+	DWORD       X;
+	DWORD       Y;            /* Viewport Top left */
+	DWORD       Width;
+	DWORD       Height;       /* Viewport Dimensions */
+	float       MinZ;         /* Min/max of clip Volume */
+	float       MaxZ;
+	float	ScaleX;
+	float	ScaleY;
 } render_viewport_t;
 
 typedef struct {
-    int     w;                /* width */
-    int     h;                /* height */
+	int     w;                /* width */
+	int     h;                /* height */
 } render_display_mode_t;
 
 typedef struct
 {
-    long cx;
-    long cy;
+	long cx;
+	long cy;
 } CLIENTSIZE;
 
 // stereo related enums
@@ -55,18 +55,18 @@ typedef enum { ST_CENTER, ST_LEFT, ST_RIGHT } stereo_position_t;
 typedef enum { ST_GREEN, ST_BLUE, ST_CYAN } stereo_right_color_t;
 
 typedef struct {
-    int                     NumModes;				/* number of available display modes */
-    int                     CurrMode;				/* number of current display mode (only when fullscreen) */
-    render_display_mode_t * Mode;					/* desc avail modes */
-    render_display_mode_t   ThisMode;				/* description of this mode, identical to Mode[CurrMode] */
-    render_display_mode_t   WindowsDisplay;			/* desktop / screen size, set by the platform layer */
-    render_display_mode_t   default_mode;			/* mode from the config or command line (ScreenWidth / ScreenHeight) */
-    bool                    fullscreen;				/* in fullscreen exclusive mode? */
-    CLIENTSIZE              window_size;			/* dimensions of client win */
-    bool                    bPaused;				/* the app is paused */
-    bool                    app_active;				/* the app is active */
-    bool                    minimized;				/* app window is minimized */
-    bool                    ok_to_render;			/* All objects etc. necessary rendering are in ok */
+	int                     NumModes;				/* number of available display modes */
+	int                     CurrMode;				/* number of current display mode (only when fullscreen) */
+	render_display_mode_t * Mode;					/* desc avail modes */
+	render_display_mode_t   ThisMode;				/* description of this mode, identical to Mode[CurrMode] */
+	render_display_mode_t   WindowsDisplay;			/* desktop / screen size, set by the platform layer */
+	render_display_mode_t   default_mode;			/* mode from the config or command line (ScreenWidth / ScreenHeight) */
+	bool                    fullscreen;				/* in fullscreen exclusive mode? */
+	CLIENTSIZE              window_size;			/* dimensions of client win */
+	bool                    bPaused;				/* the app is paused */
+	bool                    app_active;				/* the app is active */
+	bool                    minimized;				/* app window is minimized */
+	bool                    ok_to_render;			/* All objects etc. necessary rendering are in ok */
 	bool					vsync;					/* vertical sync */
 	float					aspect_ratio;			/* screen aspect ratio */
 	bool					force_accel;			/* force 3d acelleration on gl */
@@ -109,10 +109,10 @@ void set_whiteout_state( void );
 const char * render_error_description( int error );
 
 typedef struct {
-    long x1;
-    long y1;
-    long x2;
-    long y2;
+	long x1;
+	long y1;
+	long x2;
+	long y2;
 } XYRECT;
 
 bool FSClearBlack(void);
@@ -189,10 +189,10 @@ typedef void * BUFFER_HANDLE;
 
 
 typedef struct {
-    float r;
-    float g;
-    float b;
-    float a;
+	float r;
+	float g;
+	float b;
+	float a;
 } COLORVALUE;
 
 /* RENDEROBJECT / LEVELRENDEROBJECT: textureGroups is a TAG_LEVEL hunk
@@ -296,15 +296,15 @@ typedef struct LEVELRENDEROBJECT
 } LEVELRENDEROBJECT;
 
 typedef struct {
-    union {
-        struct {
-            float        _11, _12, _13, _14;
-            float        _21, _22, _23, _24;
-            float        _31, _32, _33, _34;
-            float        _41, _42, _43, _44;
-        };
-        float m[4][4];
-    };
+	union {
+		struct {
+			float        _11, _12, _13, _14;
+			float        _21, _22, _23, _24;
+			float        _31, _32, _33, _34;
+			float        _41, _42, _43, _44;
+		};
+		float m[4][4];
+	};
 } RENDERMATRIX;
 
 extern int render_lighting_point_lights_only;

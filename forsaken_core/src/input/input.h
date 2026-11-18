@@ -130,7 +130,7 @@ static inline const char* SDL_GetKeyName(int key)
 #else
 #include <SDL.h>
 #if SDL_VERSION_ATLEAST(2,0,0)
-    #define SDLK_LAST 512
+	#define SDLK_LAST 512
 #endif
 #endif /* __3DS__ */
 

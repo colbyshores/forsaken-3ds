@@ -297,17 +297,17 @@ void TeleportsZoneCheck( VECTOR * OldPos , VECTOR * NewPos , TELEPORT * TPpnt )
 	In = false;
 	if( TPpnt->zone_type == ZONE_Sphere )
 	{
-   		OldIn = DistanceVector2Vector( &TPpnt->Pos , OldPos ) <= TPpnt->half_size.x;
-   		NewIn = DistanceVector2Vector( &TPpnt->Pos , NewPos ) <= TPpnt->half_size.x;
-   		if( !OldIn && NewIn )
-   			Entry = true;
-   		if( OldIn && !NewIn )
-   			Exit = true;
-   		if( OldIn && NewIn )
-   			In = true;
-   	}else{
-   		RayToHull( TPpnt->Zone , OldPos , NewPos , TPpnt->num_sides );
-   	}
+		OldIn = DistanceVector2Vector( &TPpnt->Pos , OldPos ) <= TPpnt->half_size.x;
+		NewIn = DistanceVector2Vector( &TPpnt->Pos , NewPos ) <= TPpnt->half_size.x;
+		if( !OldIn && NewIn )
+			Entry = true;
+		if( OldIn && !NewIn )
+			Exit = true;
+		if( OldIn && NewIn )
+			In = true;
+	}else{
+		RayToHull( TPpnt->Zone , OldPos , NewPos , TPpnt->num_sides );
+	}
 }
 
 

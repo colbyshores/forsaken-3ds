@@ -56,7 +56,7 @@ void AI_FLESHMORPH_IDLE( ENEMY * Enemy )
 		}
 		return;
 	}
- 	// Scan for target
+	// Scan for target
 	AI_THINK( Enemy , true , true );
 	if( Enemy->AIFlags & AI_ANYPLAYERINRANGE )
 	{
@@ -320,8 +320,8 @@ void AI_FLESHMORPH_RANDOMFIREBALL( ENEMY * Enemy )
 				FireOffset = FireOffs[i];
 			}else{
 				TempVector.x = Dir.x + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
-		   		TempVector.y = Dir.y + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
-		   		TempVector.z = Dir.z + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
+				TempVector.y = Dir.y + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
+				TempVector.z = Dir.z + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
 				NormaliseVector( &TempVector );
 			}
 

@@ -1276,7 +1276,7 @@ void CleanUpSecBull( u_int16_t i )
 	Output		:	u_int16_t		SecBull Index ( -1 nothing )
 ===================================================================*/
 u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_int16_t Group,
-					    VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
+						VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
 						VECTOR * DropDir, int8_t Weapon, bool NetFlag )
 {
 	u_int16_t	i;
@@ -1525,20 +1525,20 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 				SecBulls[i].Interval = 8.0F;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != INDEX_NONE )
-   				{
-   					FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   					FmPolys[ fmpoly ].Pos = SecBulls[i].Pos;
-   					FmPolys[ fmpoly ].SeqNum = FM_ZERO;
-   					FmPolys[ fmpoly ].Frame = 0.0F;
+				if( fmpoly != INDEX_NONE )
+				{
+					FmPolys[ fmpoly ].LifeCount = 1000.0F;
+					FmPolys[ fmpoly ].Pos = SecBulls[i].Pos;
+					FmPolys[ fmpoly ].SeqNum = FM_ZERO;
+					FmPolys[ fmpoly ].Frame = 0.0F;
 					FmPolys[ fmpoly ].Trans = 255;
 					FmPolys[ fmpoly ].R = 64;
 					FmPolys[ fmpoly ].G = 64;
 					FmPolys[ fmpoly ].B = 255;
-   					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-   					FmPolys[ fmpoly ].xsize = ( 10.0F * GLOBAL_SCALE );
-   					FmPolys[ fmpoly ].ysize = ( 10.0F * GLOBAL_SCALE );
-   					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].xsize = ( 10.0F * GLOBAL_SCALE );
+					FmPolys[ fmpoly ].ysize = ( 10.0F * GLOBAL_SCALE );
+					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 					FmPolys[ fmpoly ].Group = SecBulls[i].GroupImIn;
 					SecBulls[i].numfmpolys++;
 					SecBulls[i].fmpoly = fmpoly;
@@ -1559,15 +1559,15 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 					FmPolys[ fmpoly ].R = 255;
 					FmPolys[ fmpoly ].G = 128;
 					FmPolys[ fmpoly ].B = 64;
-   					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].Trans = 255;
 					FmPolys[ fmpoly ].Frm_Info = &LensFlare_Header;
 					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 					FmPolys[ fmpoly ].Rot = 0.0F;
 					FmPolys[ fmpoly ].xsize = ( 12.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 12.0F * GLOBAL_SCALE );
-   					FmPolys[ fmpoly ].Dir.x = 0.0F;
-   					FmPolys[ fmpoly ].Dir.y = 0.0F;
-   					FmPolys[ fmpoly ].Dir.z = 0.0F;
+					FmPolys[ fmpoly ].Dir.x = 0.0F;
+					FmPolys[ fmpoly ].Dir.y = 0.0F;
+					FmPolys[ fmpoly ].Dir.z = 0.0F;
 					FmPolys[ fmpoly ].Speed = 0.0F;
 					FmPolys[ fmpoly ].UpSpeed = 0.0F;
 					FmPolys[ fmpoly ].Group = Group;
@@ -1590,7 +1590,7 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 						FmPolys[ fmpoly ].R = 64;
 						FmPolys[ fmpoly ].G = 64;
 						FmPolys[ fmpoly ].B = 64;
-   						FmPolys[ fmpoly ].Trans = 255;
+						FmPolys[ fmpoly ].Trans = 255;
 						FmPolys[ fmpoly ].Frm_Info = &BigFlash_Header;
 						FmPolys[ fmpoly ].DirVector.x = ( ( ( (float) Random_Range( 10000 ) ) / 10000.0F ) - 0.5F );
 						FmPolys[ fmpoly ].DirVector.y = ( ( ( (float) Random_Range( 10000 ) ) / 10000.0F ) - 0.5F );
@@ -1600,14 +1600,14 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 						FmPolys[ fmpoly ].UpVector.z = ( ( ( (float) Random_Range( 10000 ) ) / 10000.0F ) - 0.5F );
 						NormaliseVector( &FmPolys[ fmpoly ].DirVector );
 						NormaliseVector( &FmPolys[ fmpoly ].UpVector );
-   						FmPolys[ fmpoly ].Flags = FM_FLAG_RELATIVE;
+						FmPolys[ fmpoly ].Flags = FM_FLAG_RELATIVE;
 						FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 						FmPolys[ fmpoly ].RotSpeed = ( ( (float) Random_Range( 10000 ) ) / 2500.0F ) + 2.0F;
 						FmPolys[ fmpoly ].xsize = ( 2.0F * GLOBAL_SCALE );
 						FmPolys[ fmpoly ].ysize = ( 12.0F * GLOBAL_SCALE );
-   						FmPolys[ fmpoly ].Dir.x = 0.0F;
-   						FmPolys[ fmpoly ].Dir.y = 0.0F;
-   						FmPolys[ fmpoly ].Dir.z = 0.0F;
+						FmPolys[ fmpoly ].Dir.x = 0.0F;
+						FmPolys[ fmpoly ].Dir.y = 0.0F;
+						FmPolys[ fmpoly ].Dir.z = 0.0F;
 						FmPolys[ fmpoly ].Speed = 0.0F;
 						FmPolys[ fmpoly ].UpSpeed = 0.0F;
 						FmPolys[ fmpoly ].Group = SecBulls[i].GroupImIn;
@@ -1631,15 +1631,15 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 					FmPolys[ fmpoly ].R = 96;
 					FmPolys[ fmpoly ].G = 96;
 					FmPolys[ fmpoly ].B = 255;
-   					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].Trans = 255;
 					FmPolys[ fmpoly ].Frm_Info = &LensFlare_Header;
 					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 					FmPolys[ fmpoly ].Rot = 0.0F;
 					FmPolys[ fmpoly ].xsize = ( 12.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 12.0F * GLOBAL_SCALE );
-   					FmPolys[ fmpoly ].Dir.x = 0.0F;
-   					FmPolys[ fmpoly ].Dir.y = 0.0F;
-   					FmPolys[ fmpoly ].Dir.z = 0.0F;
+					FmPolys[ fmpoly ].Dir.x = 0.0F;
+					FmPolys[ fmpoly ].Dir.y = 0.0F;
+					FmPolys[ fmpoly ].Dir.z = 0.0F;
 					FmPolys[ fmpoly ].Speed = 0.0F;
 					FmPolys[ fmpoly ].UpSpeed = 0.0F;
 					FmPolys[ fmpoly ].Group = Group;
@@ -1662,7 +1662,7 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 						FmPolys[ fmpoly ].R = 128;
 						FmPolys[ fmpoly ].G = 128;
 						FmPolys[ fmpoly ].B = 128;
-   						FmPolys[ fmpoly ].Trans = 255;
+						FmPolys[ fmpoly ].Trans = 255;
 						FmPolys[ fmpoly ].Frm_Info = &BlueSpark_Header;
 						FmPolys[ fmpoly ].DirVector.x = ( ( ( (float) Random_Range( 10000 ) ) / 10000.0F ) - 0.5F );
 						FmPolys[ fmpoly ].DirVector.y = ( ( ( (float) Random_Range( 10000 ) ) / 10000.0F ) - 0.5F );
@@ -1672,14 +1672,14 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 						FmPolys[ fmpoly ].UpVector.z = ( ( ( (float) Random_Range( 10000 ) ) / 10000.0F ) - 0.5F );
 						NormaliseVector( &FmPolys[ fmpoly ].DirVector );
 						NormaliseVector( &FmPolys[ fmpoly ].UpVector );
-   						FmPolys[ fmpoly ].Flags = FM_FLAG_RELATIVE;
+						FmPolys[ fmpoly ].Flags = FM_FLAG_RELATIVE;
 						FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 						FmPolys[ fmpoly ].RotSpeed = ( ( (float) Random_Range( 10000 ) ) / 2500.0F ) + 2.0F;
 						FmPolys[ fmpoly ].xsize = ( 4.0F * GLOBAL_SCALE );
 						FmPolys[ fmpoly ].ysize = ( 12.0F * GLOBAL_SCALE );
-   						FmPolys[ fmpoly ].Dir.x = 0.0F;
-   						FmPolys[ fmpoly ].Dir.y = 0.0F;
-   						FmPolys[ fmpoly ].Dir.z = 0.0F;
+						FmPolys[ fmpoly ].Dir.x = 0.0F;
+						FmPolys[ fmpoly ].Dir.y = 0.0F;
+						FmPolys[ fmpoly ].Dir.z = 0.0F;
 						FmPolys[ fmpoly ].Speed = 0.0F;
 						FmPolys[ fmpoly ].UpSpeed = 0.0F;
 						FmPolys[ fmpoly ].Group = SecBulls[i].GroupImIn;
@@ -1703,15 +1703,15 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 					FmPolys[ fmpoly ].R = 255;
 					FmPolys[ fmpoly ].G = 128;
 					FmPolys[ fmpoly ].B = 128;
-   					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].Trans = 255;
 					FmPolys[ fmpoly ].Frm_Info = &Circle_Header;
 					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 					FmPolys[ fmpoly ].Rot = 0.0F;
 					FmPolys[ fmpoly ].xsize = ( 8.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 8.0F * GLOBAL_SCALE );
-   					FmPolys[ fmpoly ].Dir.x = 0.0F;
-   					FmPolys[ fmpoly ].Dir.y = 0.0F;
-   					FmPolys[ fmpoly ].Dir.z = 0.0F;
+					FmPolys[ fmpoly ].Dir.x = 0.0F;
+					FmPolys[ fmpoly ].Dir.y = 0.0F;
+					FmPolys[ fmpoly ].Dir.z = 0.0F;
 					FmPolys[ fmpoly ].Speed = 0.0F;
 					FmPolys[ fmpoly ].UpSpeed = 0.0F;
 					FmPolys[ fmpoly ].Group = Group;
@@ -2029,7 +2029,7 @@ bool ProcessMines( u_int16_t i )
 											  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 											  &ClosestCos );
 					Enemy = TargetClosestEnemy( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-											    SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+												SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												&ClosestCos );
 					if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
 					Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
@@ -2106,7 +2106,7 @@ bool ProcessMines( u_int16_t i )
 				qlerp.end.From2Vectors(&Forward, &DirVector);
 
 				qlerp.start	= SecBulls[ i ].DirQuat;				/* Current Quaternion */
-   				qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
+				qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
 				qlerp.dir	= qlerp.start.Dot(&qlerp.end);
 
 				if( Cos < -1.0F ) Cos = -1.0F;
@@ -2367,8 +2367,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		case THIEFMISSILE:
 			if( SecBulls[i].LifeCount > SecBulls[i].LifeSpan )
 			{
-	 			CreateExplosion( &SecBulls[i].Pos, SecBulls[i].GroupImIn );
-	 			CleanUpSecBull( i );
+				CreateExplosion( &SecBulls[i].Pos, SecBulls[i].GroupImIn );
+				CleanUpSecBull( i );
 				return( false );
 			}
 			break;
@@ -2407,62 +2407,62 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 	}
 
-   	switch( SecBulls[ i ].State )
-   	{
+	switch( SecBulls[ i ].State )
+	{
 /*===================================================================
 		Missile Dropping ( MFRL )
 ===================================================================*/
-   		case MIS_DROP:														/* Dropping */
-   			if( SecBulls[ i ].DropCount == 0.0F )
-   			{
+		case MIS_DROP:														/* Dropping */
+			if( SecBulls[ i ].DropCount == 0.0F )
+			{
 				SecBulls[ i ].State = MIS_ACCELERATE;						/* Start to accelerate */
 				SecBulls[ i ].ColFlag = 0;
 
-   				Light = FindFreeXLight();									/* Generate Light */
-   				if( Light != INDEX_NONE )
-   				{
-   					XLights[ Light ].Pos = SecBulls[i].Pos;
-   					XLights[ Light ].Size = SecondaryWeaponAttribs[ SecBulls[i].Type ].lightsize;
-   					XLights[ Light ].SizeCount = 0.0F;
-   					XLights[ Light ].r = SecondaryWeaponAttribs[ SecBulls[i].Type ].r;
-   					XLights[ Light ].g = SecondaryWeaponAttribs[ SecBulls[i].Type ].g;
-   					XLights[ Light ].b = SecondaryWeaponAttribs[ SecBulls[i].Type ].b;
- 					XLights[ Light ].Group = SecBulls[i].GroupImIn;
+				Light = FindFreeXLight();									/* Generate Light */
+				if( Light != INDEX_NONE )
+				{
+					XLights[ Light ].Pos = SecBulls[i].Pos;
+					XLights[ Light ].Size = SecondaryWeaponAttribs[ SecBulls[i].Type ].lightsize;
+					XLights[ Light ].SizeCount = 0.0F;
+					XLights[ Light ].r = SecondaryWeaponAttribs[ SecBulls[i].Type ].r;
+					XLights[ Light ].g = SecondaryWeaponAttribs[ SecBulls[i].Type ].g;
+					XLights[ Light ].b = SecondaryWeaponAttribs[ SecBulls[i].Type ].b;
+					XLights[ Light ].Group = SecBulls[i].GroupImIn;
 				}
 				SecBulls[i].light = Light;
-   			}
-   			else
-   			{
-   				SecBulls[ i ].DropCount -= NewFramelag; //framelag;
-   				if( SecBulls[ i ].DropCount < 0.0F )
+			}
+			else
+			{
+				SecBulls[ i ].DropCount -= NewFramelag; //framelag;
+				if( SecBulls[ i ].DropCount < 0.0F )
 				{
 					SecBulls[ i ].FramelagAddition = (float) fabsf( SecBulls[i].DropCount );
 					SecBulls[ i ].DropCount = 0.0F;
 				}
-   			}
-   			break;
+			}
+			break;
 
 /*===================================================================
 		Missile Accelerating ( MFRL )
 ===================================================================*/
-   		case MIS_ACCELERATE:												/* Accelerating */
-   			if( SecBulls[ i ].Speed < SecBulls[ i ].SpeedWanted )
-   			{
-   				SecBulls[ i ].Speed += SecBulls[ i ].SpeedInc;
-   				if( SecBulls[ i ].Speed > SecBulls[ i ].SpeedWanted )
-   				{
-   					SecBulls[ i ].Speed = SecBulls[ i ].SpeedWanted;
+		case MIS_ACCELERATE:												/* Accelerating */
+			if( SecBulls[ i ].Speed < SecBulls[ i ].SpeedWanted )
+			{
+				SecBulls[ i ].Speed += SecBulls[ i ].SpeedInc;
+				if( SecBulls[ i ].Speed > SecBulls[ i ].SpeedWanted )
+				{
+					SecBulls[ i ].Speed = SecBulls[ i ].SpeedWanted;
 					SecBulls[ i ].State = MIS_STRAIGHT;
-   				}
-   			}
+				}
+			}
 			break;
 
 /*===================================================================
 		Missile Flying Staight ( All )
 ===================================================================*/
-   		case MIS_STRAIGHT:													/* Straight ( possibly homing missile looking for target ) */
-   			if( SecBulls[ i ].MoveType == MISMOVE_HOMING )
-   			{
+		case MIS_STRAIGHT:													/* Straight ( possibly homing missile looking for target ) */
+			if( SecBulls[ i ].MoveType == MISMOVE_HOMING )
+			{
 				ClosestCos = -1.0F;
 
 				switch( SecBulls[i].OwnerType )
@@ -2472,7 +2472,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												  &ClosestCos );
 						Enemy = TargetClosestEnemy( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-												    SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+													SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 													&ClosestCos );
 						if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
 						Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
@@ -2589,12 +2589,12 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						break;
 				}
 			}
-   			break;
+			break;
 
 /*===================================================================
 		Missile Homing ( Heatseaker/Scatter/Thief )
 ===================================================================*/
-   		case MIS_HOMING:													/* Homing toward target ( could lose target ) */
+		case MIS_HOMING:													/* Homing toward target ( could lose target ) */
 			if( StillGotTarget( &SecBulls[ i ].Pos, &SecBulls[ i ].DirVector,
 								SecBulls[ i ].GroupImIn, SecBulls[i].TargetType, SecBulls[ i ].Target,
 								SecBulls[ i ].ViewCone ) )
@@ -2602,9 +2602,9 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				switch( SecBulls[i].TargetType )
 				{
 					case OWNER_SHIP:
-		   				NormVector.x = ( Ships[ SecBulls[i].Target ].Object.Pos.x - SecBulls[i].Pos.x );
-		   				NormVector.y = ( Ships[ SecBulls[i].Target ].Object.Pos.y - SecBulls[i].Pos.y );
-		   				NormVector.z = ( Ships[ SecBulls[i].Target ].Object.Pos.z - SecBulls[i].Pos.z );
+						NormVector.x = ( Ships[ SecBulls[i].Target ].Object.Pos.x - SecBulls[i].Pos.x );
+						NormVector.y = ( Ships[ SecBulls[i].Target ].Object.Pos.y - SecBulls[i].Pos.y );
+						NormVector.z = ( Ships[ SecBulls[i].Target ].Object.Pos.z - SecBulls[i].Pos.z );
 						break;
 
 					case OWNER_ENEMY:
@@ -2612,15 +2612,15 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						Enemies[ SecBulls[i].Target ].TargetingPos = SecBulls[ i ].Pos;
 						Enemies[ SecBulls[i].Target ].TargetingDir = SecBulls[ i ].DirVector;
 
-		   				NormVector.x = ( Enemies[ SecBulls[i].Target ].Object.Pos.x - SecBulls[i].Pos.x );
-		   				NormVector.y = ( Enemies[ SecBulls[i].Target ].Object.Pos.y - SecBulls[i].Pos.y );
-		   				NormVector.z = ( Enemies[ SecBulls[i].Target ].Object.Pos.z - SecBulls[i].Pos.z );
+						NormVector.x = ( Enemies[ SecBulls[i].Target ].Object.Pos.x - SecBulls[i].Pos.x );
+						NormVector.y = ( Enemies[ SecBulls[i].Target ].Object.Pos.y - SecBulls[i].Pos.y );
+						NormVector.z = ( Enemies[ SecBulls[i].Target ].Object.Pos.z - SecBulls[i].Pos.z );
 						break;
 
 					case OWNER_MINE:
-		   				NormVector.x = ( SecBulls[ SecBulls[i].Target ].Pos.x - SecBulls[i].Pos.x );
-		   				NormVector.y = ( SecBulls[ SecBulls[i].Target ].Pos.y - SecBulls[i].Pos.y );
-		   				NormVector.z = ( SecBulls[ SecBulls[i].Target ].Pos.z - SecBulls[i].Pos.z );
+						NormVector.x = ( SecBulls[ SecBulls[i].Target ].Pos.x - SecBulls[i].Pos.x );
+						NormVector.y = ( SecBulls[ SecBulls[i].Target ].Pos.y - SecBulls[i].Pos.y );
+						NormVector.z = ( SecBulls[ SecBulls[i].Target ].Pos.z - SecBulls[i].Pos.z );
 						break;
 				}
 
@@ -2641,30 +2641,30 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 				qlerp.end.From2Vectors(&Forward, &NormVector);
 
-   				qlerp.start	= SecBulls[ i ].DirQuat;				/* Current Quaternion */
-   				qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
-   				qlerp.dir	= qlerp.start.Dot(&qlerp.end);
+				qlerp.start	= SecBulls[ i ].DirQuat;				/* Current Quaternion */
+				qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
+				qlerp.dir	= qlerp.start.Dot(&qlerp.end);
 
 				if( Cos < -1.0F ) Cos = -1.0F;
 				else if ( Cos > 1.0F ) Cos = 1.0F;
-   				/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
-   				Angle = (float) acosf( Cos );
-   				if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * NewFramelag ) / Angle ); //framelag ) / Angle );
-   				else qlerp.time = 1.0F;
-   				if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
+				/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
+				Angle = (float) acosf( Cos );
+				if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * NewFramelag ) / Angle ); //framelag ) / Angle );
+				else qlerp.time = 1.0F;
+				if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
 
-   				qlerp.Step();
-   				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
+				qlerp.Step();
+				SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
 				ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &SecBulls[ i ].DirVector );
 				ApplyMatrix( &SecBulls[ i ].Mat, &SlideUp, &SecBulls[ i ].UpVector );
 			}
 			else
 			{
-   				SecBulls[ i ].State = MIS_STRAIGHT;
-   				SecBulls[ i ].Target = INDEX_NONE;
+				SecBulls[ i ].State = MIS_STRAIGHT;
+				SecBulls[ i ].Target = INDEX_NONE;
 				SecBulls[ i ].ColFlag = 0;
 			}
-   			break;
+			break;
 
 /*===================================================================
 		Missile gravity
@@ -2683,7 +2683,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 			NormaliseVector( &NormVector );
 			DirVector.x = ( NormVector.x * Speed );
 			DirVector.z = ( NormVector.z * Speed );
-	     	DirVector.y -= ( ( 0.08F * GLOBAL_SCALE ) * NewFramelag ); //framelag );
+			DirVector.y -= ( ( 0.08F * GLOBAL_SCALE ) * NewFramelag ); //framelag );
 
 			ApplyMatrix( &InvUpMatrix, &DirVector, &SecBulls[i].DirVector );
 			break;
@@ -2691,7 +2691,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 /*===================================================================
 		Should never be in here
 ===================================================================*/
-   		case MIS_SPIRALING:												/* Spiraling missile */
+		case MIS_SPIRALING:												/* Spiraling missile */
 			Angle = (float) D2R( ( ( SecBulls[i].LifeCount * 6.0F ) - ( fast_floorf( ( SecBulls[i].LifeCount * 6.0F ) / 360.0F ) * 360.0F ) ) );
 
 			Rotation.x = (float) fast_sinf( Angle );
@@ -2766,14 +2766,14 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				DestroySecondary( i, &SecBulls[i].Pos );
 				return( false );
 			}
-   			break;
+			break;
 
 /*===================================================================
 		Should never be in here
 ===================================================================*/
-   		default:															/* Unknown/Undefined Missile */
-   			break;
-   	}
+		default:															/* Unknown/Undefined Missile */
+			break;
+	}
 
 /*===================================================================
 			Do Collision Routines
@@ -2844,7 +2844,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 			DistFromStart = (float) fabsf( DistanceVert2Vector( (VERT*) &NewPos, &SecBulls[i].ColStart ) );
 
 			if( SecBulls[i].ColDist < DistFromStart )
-	   		{
+			{
 				HitWall = 0;
 				DistToInt = (float) fabsf( DistanceVert2Vector( (VERT*) &SecBulls[i].ColPoint, &SecBulls[i].Pos ) );
 			}
@@ -3064,18 +3064,18 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 ===================================================================*/
 	if( HitTarget != INDEX_NONE )												/* Hit Target? */
 	{
-	 	PlayPannedSfx( SFX_ShipHit, Ships[ HitTarget ].Object.Group , &Int_Point, 0.0F );
+		PlayPannedSfx( SFX_ShipHit, Ships[ HitTarget ].Object.Group , &Int_Point, 0.0F );
 
 		switch( ColPerspective )
 		{
 			case COLPERS_Forsaken:
 				if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( WhoIAm == SecBulls[i].Owner ) ) || ( SecBulls[i].OwnerType != OWNER_SHIP ) )
-   				{
-   					Damage = SecBulls[i].Damage;
+				{
+					Damage = SecBulls[i].Damage;
 
-   					Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
-   					Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
-   					Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
+					Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
+					Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
+					Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
 
 					if( SecBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
 
@@ -3086,25 +3086,25 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 					}
 					else
 					{
-	   					IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &SecBulls[i].DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Secondary, SecBulls[i].Weapon, ONEOFF_RECOIL );
+						IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &SecBulls[i].DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Secondary, SecBulls[i].Weapon, ONEOFF_RECOIL );
 					}
-   				}
+				}
 				break;
 
 			case COLPERS_Descent:
 				if( HitTarget == WhoIAm )
-   				{
-   					Damage = SecBulls[i].Damage;
+				{
+					Damage = SecBulls[i].Damage;
 
-   					Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
-   					Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
-   					Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
+					Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
+					Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
+					Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
 
 					if( SecBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
 
 					HitMe( SecBulls[i].OwnerType, SecBulls[i].Owner, Damage, WEPTYPE_Secondary, SecBulls[i].Weapon );
 					ForceExternalOneOff( WhoIAm, &Recoil );
-   				}
+				}
 				break;
 		}
 
@@ -3279,8 +3279,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 					NewPos.x = SecBulls[i].ColPoint.x;
 					NewPos.y = SecBulls[i].ColPoint.y;
 					NewPos.z = SecBulls[i].ColPoint.z;
-       				TempVector = SecBulls[i].DirVector;
-       				ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
+					TempVector = SecBulls[i].DirVector;
+					ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
 					SecBulls[i].ColFlag = 0;
 				}
 				else
@@ -3314,8 +3314,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 					NewPos.x = SecBulls[i].ColPoint.x;
 					NewPos.y = SecBulls[i].ColPoint.y;
 					NewPos.z = SecBulls[i].ColPoint.z;
-        			TempVector = SecBulls[i].DirVector;
-        			ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
+					TempVector = SecBulls[i].DirVector;
+					ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
 					SecBulls[i].ColFlag = 0;
 				}
 				else
@@ -3326,8 +3326,8 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				break;
 
 			case TITANSTARMISSILE:
-       			TempVector = SecBulls[i].DirVector;
-       			ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &TempVector );
+				TempVector = SecBulls[i].DirVector;
+				ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &TempVector );
 
 				CreateExplosionDonut( &SecBulls[ i ].Pos, (VECTOR *) &SecBulls[ i ].ColPointNormal, SecBulls[ i ].GroupImIn );
 				if( ( ( SecBulls[i].OwnerType == OWNER_SHIP )
@@ -3358,7 +3358,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		TempVector.z = ( EInt_Point.z - HitEnemy->Object.Pos.z );
 		NormaliseVector( &TempVector );
 
-  		ReflectVector( &SecBulls[i].DirVector, (NORMAL *) &TempVector, &NewDir );
+		ReflectVector( &SecBulls[i].DirVector, (NORMAL *) &TempVector, &NewDir );
 
 		if( !( HitEnemy->Object.Flags & SHIP_Invul ) )
 		{
@@ -3415,9 +3415,9 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				{
 					if( !( HitEnemy->Object.Flags & SHIP_Scattered ) )
 					{
-	   					TempVector.x = Random_Jitter();
-	   					TempVector.y = Random_Jitter();
-	   					TempVector.z = Random_Jitter();
+						TempVector.x = Random_Jitter();
+						TempVector.y = Random_Jitter();
+						TempVector.z = Random_Jitter();
 						NormaliseVector( &TempVector );
 						if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 						else LifeCount = -1.0F;
@@ -3430,9 +3430,9 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				}
 				else
 				{
-	   				TempVector.x = Random_Jitter();
-	   				TempVector.y = Random_Jitter();
-	   				TempVector.z = Random_Jitter();
+					TempVector.x = Random_Jitter();
+					TempVector.y = Random_Jitter();
+					TempVector.z = Random_Jitter();
 					NormaliseVector( &TempVector );
 					if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 					else LifeCount = -1.0F;
@@ -3523,7 +3523,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						SecBulls[i].Time += NewFramelag; //framelag;
 						if( SecBulls[i].Time >= SecBulls[i].Interval )
 						{
-						 	SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
+							SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
 
 							switch( SecBulls[i].Weapon )
 							{
@@ -3597,7 +3597,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 						SecBulls[i].Time += NewFramelag; //framelag;
 						if( SecBulls[i].Time >= SecBulls[i].Interval )
 						{
-						 	SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
+							SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
 
 							TempVector.x = ( SecBulls[i].Pos.x + ( -SecBulls[i].DirVector.x * ( 200.0F * GLOBAL_SCALE ) ) );
 							TempVector.y = ( SecBulls[i].Pos.y + ( -SecBulls[i].DirVector.y * ( 200.0F * GLOBAL_SCALE ) ) );
@@ -3892,23 +3892,23 @@ void CreateBloodTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-   	if( fmpoly != INDEX_NONE )
-   	{
+	if( fmpoly != INDEX_NONE )
+	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   		FmPolys[ fmpoly ].Pos = *Pos;
-   		FmPolys[ fmpoly ].Dir = *Dir;
-   		FmPolys[ fmpoly ].SeqNum = FM_BLOOD;
-   		FmPolys[ fmpoly ].Frame = 0.0F;
-   		FmPolys[ fmpoly ].Frm_Info = &Blood_Header; //&Bits_Header;
+		FmPolys[ fmpoly ].Pos = *Pos;
+		FmPolys[ fmpoly ].Dir = *Dir;
+		FmPolys[ fmpoly ].SeqNum = FM_BLOOD;
+		FmPolys[ fmpoly ].Frame = 0.0F;
+		FmPolys[ fmpoly ].Frm_Info = &Blood_Header; //&Bits_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-  		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
-   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
-   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
+		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
+		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
+		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
 		FmPolys[ fmpoly ].Trans = 255;
 		FmPolys[ fmpoly ].R = 192;
 		FmPolys[ fmpoly ].G = 192;
 		FmPolys[ fmpoly ].B = 192;
-   		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 2.0F ) * GLOBAL_SCALE;
+		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 2.0F ) * GLOBAL_SCALE;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 		FmPolys[ fmpoly ].xsize = BLOODSIZE;
 		FmPolys[ fmpoly ].ysize = BLOODSIZE;
@@ -3938,52 +3938,52 @@ void CreateBloodSplat( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	{
 		Angle = DotProduct( Dir, &SlideUp );
 
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
 		if( fmpoly != INDEX_NONE )
 		{
 			TempQuat.From2Vectors(&Forward, Dir);
-		   	TempQuat.ToMatrix(&TempMat);
-		   	ApplyMatrix( &TempMat, &Mloadheader.Group[ Group ].up, &TempUp );
+			TempQuat.ToMatrix(&TempMat);
+			ApplyMatrix( &TempMat, &Mloadheader.Group[ Group ].up, &TempUp );
 
-		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
-		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 8.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 8.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 8.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].LifeCount = 48.0F;
+			FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 8.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 8.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 8.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Frame = 0.0F;
 
 			if( ( Angle <= 0.9F ) && ( Angle >= -0.9F ) )
 			{
-			  	FmPolys[ fmpoly ].Frm_Info = &BloodDribble_Header;
-			  	FmPolys[ fmpoly ].SeqNum = FM_BLOODDRIBBLE;
+				FmPolys[ fmpoly ].Frm_Info = &BloodDribble_Header;
+				FmPolys[ fmpoly ].SeqNum = FM_BLOODDRIBBLE;
 				CrossProduct( Dir, &Mloadheader.Group[ Group ].up, &TempVector );	/* Calc Temp Left Vector */
 				CrossProduct( &TempVector, Dir, &TempUp );						/* Calc Up Vector */
 			}
 			else
 			{
-			  	FmPolys[ fmpoly ].Frm_Info = &BloodSplat_Header;
-			  	FmPolys[ fmpoly ].SeqNum = FM_BLOODSPLAT;
+				FmPolys[ fmpoly ].Frm_Info = &BloodSplat_Header;
+				FmPolys[ fmpoly ].SeqNum = FM_BLOODSPLAT;
 			}
 
-		  	FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
-		   	FmPolys[ fmpoly ].Trans = 255;
-		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
-		  	FmPolys[ fmpoly ].DirVector = *Dir;
-		  	FmPolys[ fmpoly ].UpVector = TempUp;
-		   	FmPolys[ fmpoly ].R = 192; //255;
-		   	FmPolys[ fmpoly ].G = 50; //255;
-		   	FmPolys[ fmpoly ].B = 50; //255;
+			FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
 			FmPolys[ fmpoly ].Trans = 255;
-		  	FmPolys[ fmpoly ].Speed = 0.0F;
-		   	FmPolys[ fmpoly ].Rot = 0.0F;
-		   	FmPolys[ fmpoly ].RotSpeed = 0.0F;
-		   	FmPolys[ fmpoly ].xsize = BLOODSIZE * 2.0F;
-		   	FmPolys[ fmpoly ].ysize = BLOODSIZE * 2.0F;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].DirVector = *Dir;
+			FmPolys[ fmpoly ].UpVector = TempUp;
+			FmPolys[ fmpoly ].R = 192; //255;
+			FmPolys[ fmpoly ].G = 50; //255;
+			FmPolys[ fmpoly ].B = 50; //255;
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Rot = 0.0F;
+			FmPolys[ fmpoly ].RotSpeed = 0.0F;
+			FmPolys[ fmpoly ].xsize = BLOODSIZE * 2.0F;
+			FmPolys[ fmpoly ].ysize = BLOODSIZE * 2.0F;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 	}
 }
 
@@ -4227,7 +4227,7 @@ void ExplodeSecondary( VECTOR * /*Pos*/, u_int16_t /*Group*/, u_int16_t OwnerTyp
 					SecAmmoUsed[ SecBulls[i].Weapon ]++;
 				}
 
- 			CleanUpSecBull( i );
+			CleanUpSecBull( i );
 			return;
 		}
 
@@ -4379,9 +4379,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 	{
 		if( PrimaryWeaponsGot[ Count ] && ( TotalPickups < MaxPickupsAllowed ) )
 		{
-	   		DirVector.x = ( Dir->x + Random_Jitter() );
-	   		DirVector.y = ( Dir->y + Random_Jitter() );
-	   		DirVector.z = ( Dir->z + Random_Jitter() );
+			DirVector.x = ( Dir->x + Random_Jitter() );
+			DirVector.y = ( Dir->y + Random_Jitter() );
+			DirVector.z = ( Dir->z + Random_Jitter() );
 			NormaliseVector( &DirVector );
 			PickupNum = ( PICKUP_Trojax + ( Count - 1 ) );
 			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4404,9 +4404,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 			if( Ships[ WhoIAm ].Object.PowerLevel >= 3 )
 			{
 				Ships[ WhoIAm ].Object.PowerLevel -= 3;
-		   		DirVector.x = ( Dir->x + Random_Jitter() );
-		   		DirVector.y = ( Dir->y + Random_Jitter() );
-		   		DirVector.z = ( Dir->z + Random_Jitter() );
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
 				NormaliseVector( &DirVector );
 				PickupNum = PICKUP_GoldenPowerPod;
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4422,9 +4422,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 			else
 			{
 				Ships[ WhoIAm ].Object.PowerLevel--;
-		   		DirVector.x = ( Dir->x + Random_Jitter() );
-		   		DirVector.y = ( Dir->y + Random_Jitter() );
-		   		DirVector.z = ( Dir->z + Random_Jitter() );
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
 				NormaliseVector( &DirVector );
 				PickupNum = PICKUP_PowerPod;
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4464,9 +4464,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 	for( Count = 0; Count < NumSecWeapons; Count++ )
 	{
-   		DirVector.x = ( Dir->x + Random_Jitter() );
-   		DirVector.y = ( Dir->y + Random_Jitter() );
-   		DirVector.z = ( Dir->z + Random_Jitter() );
+		DirVector.x = ( Dir->x + Random_Jitter() );
+		DirVector.y = ( Dir->y + Random_Jitter() );
+		DirVector.z = ( Dir->z + Random_Jitter() );
 		NormaliseVector( &DirVector );
 		PickupNum = SecWeaponsGot[ Count ];
 		if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4526,9 +4526,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 		if( TotalPickups < MaxPickupsAllowed )
 		{
-	   		DirVector.x = ( Dir->x + Random_Jitter() );
-	   		DirVector.y = ( Dir->y + Random_Jitter() );
-	   		DirVector.z = ( Dir->z + Random_Jitter() );
+			DirVector.x = ( Dir->x + Random_Jitter() );
+			DirVector.y = ( Dir->y + Random_Jitter() );
+			DirVector.z = ( Dir->z + Random_Jitter() );
 			NormaliseVector( &DirVector );
 			PickupNum = PICKUP_Mantle;
 			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4561,9 +4561,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 		{
 			if( TotalPickups < MaxPickupsAllowed )
 			{
-		   		DirVector.x = ( Dir->x + Random_Jitter() );
-		   		DirVector.y = ( Dir->y + Random_Jitter() );
-		   		DirVector.z = ( Dir->z + Random_Jitter() );
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
 				NormaliseVector( &DirVector );
 				PickupNum = PICKUP_Orb;
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -5166,7 +5166,7 @@ void HeatseakerTarget( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 
 	if( ClosestShip != INDEX_NONE )
 	{
-    	GetFinalMatrix( &FinalMatrix );
+		GetFinalMatrix( &FinalMatrix );
 
 		ApplyMatrix( &CurrentCamera.Mat, &SlideUp, &Trans );
 		ApplyMatrix( &CurrentCamera.Mat, &SlideRight, &Trans2 );
@@ -5259,7 +5259,7 @@ void HeatseakerTarget( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 	{
 		if( ClosestEnemy != INDEX_NONE )
 		{
-    		GetFinalMatrix( &FinalMatrix );
+			GetFinalMatrix( &FinalMatrix );
 
 			ApplyMatrix( &CurrentCamera.Mat, &SlideUp, &Trans );
 			ApplyMatrix( &CurrentCamera.Mat, &SlideRight, &Trans2 );
@@ -5410,7 +5410,7 @@ void HUDNames( void )
 	LookAheadShip = INDEX_NONE;
 	LookAheadCos = -1.0F;
 
-   	GetFinalMatrix( &FinalMatrix );
+	GetFinalMatrix( &FinalMatrix );
 
 	if( !SecondaryWeaponsGot[ Ships[ WhoIAm ].Secondary ] ) ViewConeCos = 1.0F;
 	else ViewConeCos = (float) COSD( SecondaryWeaponAttribs[ Ships[ WhoIAm ].Secondary ].ViewCone / 2 );
@@ -5581,7 +5581,7 @@ void DispInGameText( VECTOR * Pos, int8_t * Text )
 	float	Cos;
 	VECTOR	TextPos;
 
-   	GetFinalMatrix( &FinalMatrix );
+	GetFinalMatrix( &FinalMatrix );
 	ApplyMatrix( &CurrentCamera.Mat, &Forward, &CameraDir );
 
 	DirVector.x = ( Pos->x - CurrentCamera.Pos.x );
@@ -5616,7 +5616,7 @@ void DispHUDNames( void )
 	u_int16_t	Ship;
 	BYTE	MyTeam;
 	BYTE	ShipsTeam;
-    char buf[10];
+	char buf[10];
 
 	if( TeamGame )
 	{
@@ -5641,25 +5641,25 @@ void DispHUDNames( void )
 	}
 	else
 	{
-        if(ShowPlayerHealthAboveBikes)
-        {
+		if(ShowPlayerHealthAboveBikes)
+		{
 			// for all visible ships
-            for( Count = 0; Count < NumVisibleShips; Count++ )
-            {
+			for( Count = 0; Count < NumVisibleShips; Count++ )
+			{
 				// get the ship
-                Ship = VisibleShipsPos[ Count ].Ship;
+				Ship = VisibleShipsPos[ Count ].Ship;
 
 				// format the ship health as a percentage
-                sprintf( (char*) &buf[0] ,"%d", (u_int16_t) fast_ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
+				sprintf( (char*) &buf[0] ,"%d", (u_int16_t) fast_ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
 
 				// display using whatever scaled font player has chosen
-                if(ScaleFontPlayerHealthAboveBikes)
-                     Print4x5Text( &buf[0] , VisibleShipsPos[ Count ].ScreenX - 24, VisibleShipsPos[ Count ].ScreenY, ShipHealthColour[Ship] );
+				if(ScaleFontPlayerHealthAboveBikes)
+					 Print4x5Text( &buf[0] , VisibleShipsPos[ Count ].ScreenX - 24, VisibleShipsPos[ Count ].ScreenY, ShipHealthColour[Ship] );
 				// display using small font
-                else
-                    Print4x5TextSmall( &buf[0] , VisibleShipsPos[ Count ].ScreenX - 12, VisibleShipsPos[ Count ].ScreenY, ShipHealthColour[Ship] );
-            }
-        }
+				else
+					Print4x5TextSmall( &buf[0] , VisibleShipsPos[ Count ].ScreenX - 12, VisibleShipsPos[ Count ].ScreenY, ShipHealthColour[Ship] );
+			}
+		}
 
 		if( TargetComputerOn )
 		{
@@ -6267,22 +6267,22 @@ void FireSecondaryWeapons( u_int8_t Ship )
 				Fire bottom Left and Right together
 ===================================================================*/
 		case SOLARISMISSILE:
-		 	if( Toggle == 0 )
-		 	{
-		 		Toggle = 1;
-		 		DropVector.x = -0.7071F;
-		 		DropVector.y = -0.7071F;
-		 		DropVector.z = 0.0F;
-		 	}
-		 	else
-		 	{
-		 		Toggle = 0;
-		 		DropVector.x = +0.7071F;
-		 		DropVector.y = -0.7071F;
-		 		DropVector.z = 0.0F;
-		 	}
+			if( Toggle == 0 )
+			{
+				Toggle = 1;
+				DropVector.x = -0.7071F;
+				DropVector.y = -0.7071F;
+				DropVector.z = 0.0F;
+			}
+			else
+			{
+				Toggle = 0;
+				DropVector.x = +0.7071F;
+				DropVector.y = -0.7071F;
+				DropVector.z = 0.0F;
+			}
 
-		 	ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
 			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
 			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
 			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
@@ -6472,23 +6472,23 @@ void DestroySecondary( u_int16_t i, VECTOR * Int_Point )
 	switch( SecBulls[ i ].Weapon )
 	{
 		case ENEMYSPIRALMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
 			break;
 
 		case ENEMYHOMINGMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
 			break;
 
 		case ENEMYBLUEHOMINGMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
 			break;
 
 		case ENEMYFIREBALL:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
 			break;
 
 		case ENEMYDEPTHCHARGE:
@@ -6496,58 +6496,58 @@ void DestroySecondary( u_int16_t i, VECTOR * Int_Point )
 			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, DEPTHCHARGE_SHOCKWAVE );
 			break;
 
-   		case MUGMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
-   			break;
+		case MUGMISSILE:
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
 
-   		case SOLARISMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
-   			break;
+		case SOLARISMISSILE:
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
 
-   		case THIEFMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
- 			CleanUpSecBull( i );
-   			break;
+		case THIEFMISSILE:
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
 
 		case ENEMYTENTACLE:
-   			CleanUpSecBull( i );
-   			break;
-
-   		case SCATTERMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
-   			break;
-
-   		case GRAVGONMISSILE:
-   			SecBulls[i].ColPoint.x = Int_Point->x;
-   			SecBulls[i].ColPoint.y = Int_Point->y;
-   			SecBulls[i].ColPoint.z = Int_Point->z;
-   			CreateGravgonField( i );
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
-   			break;
-
-   		case MULTIPLEMISSILE:
- 			CreateSmallExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
-   			break;
-
-   		case TITANSTARMISSILE:
- 			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
 			CleanUpSecBull( i );
-   			break;
+			break;
 
-   		case PINEMISSILE:
- 			CreateSmallExplosion( Int_Point, SecBulls[i].GroupImIn );
-   			CleanUpSecBull( i );
-   			break;
+		case SCATTERMISSILE:
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
+
+		case GRAVGONMISSILE:
+			SecBulls[i].ColPoint.x = Int_Point->x;
+			SecBulls[i].ColPoint.y = Int_Point->y;
+			SecBulls[i].ColPoint.z = Int_Point->z;
+			CreateGravgonField( i );
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
+
+		case MULTIPLEMISSILE:
+			CreateSmallExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
+
+		case TITANSTARMISSILE:
+			CreateExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
+
+		case PINEMISSILE:
+			CreateSmallExplosion( Int_Point, SecBulls[i].GroupImIn );
+			CleanUpSecBull( i );
+			break;
 
 		case TITANSTARSHRAPNEL:
 			PlayPannedSfx( SFX_Exp3, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
 			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, TITANSTAR_SHOCKWAVE );
-   			break;
+			break;
 
 		case PINEMINE:
 			PlayPannedSfx( SFX_Exp5, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
@@ -6572,7 +6572,7 @@ void DestroySecondary( u_int16_t i, VECTOR * Int_Point )
 		default:
 			CleanUpSecBull( i );
 			break;
-   	}
+	}
 }
 
 /*===================================================================
@@ -6781,7 +6781,7 @@ void KillOwnerIDSecBulls( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID )
 		if( ( SecBulls[ i ].OwnerType == OwnerType ) && ( SecBulls[ i ].Owner == Owner ) && ( SecBulls[ i ].ID == ID ) )
 		{
 				if( ( SecBulls[i].SecType == SEC_MINE ) && ( Owner == WhoIAm ) ) SecAmmoUsed[ SecBulls[i].Weapon ]++;
- 			CleanUpSecBull( i );
+			CleanUpSecBull( i );
 		}
 
 		i = Next;
@@ -7094,8 +7094,8 @@ void CreateTitanStarShrapnel( u_int16_t i, VECTOR * Pos, VECTOR * Dir, u_int16_t
 							if( ShipTargCount )
 							{
 								DirVector.x += ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
-					   			DirVector.y += ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
-					   			DirVector.z += ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
+								DirVector.y += ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
+								DirVector.z += ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
 								NormaliseVector( &DirVector );
 							}
 
@@ -7159,8 +7159,8 @@ void CreateTitanStarShrapnel( u_int16_t i, VECTOR * Pos, VECTOR * Dir, u_int16_t
 			for( Count = 0; Count < NUMTITANBITS; Count++ )
 			{
 				DirVector.x = Dir->x + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
-		   		DirVector.y = Dir->y + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
-		   		DirVector.z = Dir->z + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
+				DirVector.y = Dir->y + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
+				DirVector.z = Dir->z + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
 				NormaliseVector( &DirVector );
 
 				InitOneSecBull( SecBulls[i].OwnerType, (BYTE) SecBulls[i].Owner, ++Ships[ SecBulls[i].Owner ].SecBullIdCount,
@@ -7484,29 +7484,29 @@ bool CheckProximityToShips( VECTOR * Pos, u_int16_t Group, float Radius, u_int16
 	for( Count = 0; Count < MAX_PLAYERS; Count++ )
 	{
 		if( !( ( OwnerType == OWNER_SHIP ) && ( Owner == Count ) ) )
-   		{
+		{
 			if( (Ships[Count].enable ) && (Ships[Count].Object.Mode != LIMBO_MODE) && ((GameStatus[Count] == STATUS_Normal )||(GameStatus[Count] == STATUS_SinglePlayer ) ) )
-   			{
+			{
 				if( !SoundInfo[ Ships[ Count ].Object.Group ][ Group ] )
 				{
-   					DirVector.x = ( Ships[ Count ].Object.Pos.x - Pos->x );
-   					DirVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
-   					DirVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
+					DirVector.x = ( Ships[ Count ].Object.Pos.x - Pos->x );
+					DirVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
+					DirVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
 
-   					DistToShip = VectorLength( &DirVector );
+					DistToShip = VectorLength( &DirVector );
 
-   					if( DistToShip < Radius )
-   					{
-   						if( BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group,
-   										&DirVector, (VECTOR *) &IntPoint, &EndGroup, &IntPointNormal,
+					if( DistToShip < Radius )
+					{
+						if( BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group,
+										&DirVector, (VECTOR *) &IntPoint, &EndGroup, &IntPointNormal,
 										&TempVector, true, NULL ) == false )
-   						{
+						{
 							return( true );
-   						}
-   					}
+						}
+					}
 				}
-   			}
-   		}
+			}
+		}
 	}
 	return( false );
 }
@@ -7542,24 +7542,24 @@ u_int16_t GetClosestEnemy( VECTOR * Pos, u_int16_t Group, float * Radius, u_int1
 		if( !( ( OwnerType == OWNER_ENEMY ) && ( Owner == Enemy->Index ) ) )
 		{
 			if( ( Enemy->Status & ENEMY_STATUS_Enable ) )
-   			{
+			{
 				if( !SoundInfo[ Enemy->Object.Group ][ Group ] )
 				{
 					DirVector.x = ( Enemy->Object.Pos.x - Pos->x );
-  					DirVector.y = ( Enemy->Object.Pos.y - Pos->y );
-   					DirVector.z = ( Enemy->Object.Pos.z - Pos->z );
+					DirVector.y = ( Enemy->Object.Pos.y - Pos->y );
+					DirVector.z = ( Enemy->Object.Pos.z - Pos->z );
 
-   					DistToEnemy = VectorLength( &DirVector );
+					DistToEnemy = VectorLength( &DirVector );
 
-   					if( DistToEnemy < *Radius )
-   					{
-   						if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group,
-   										&DirVector, (VECTOR *) &IntPoint, &EndGroup, &IntPointNormal,
+					if( DistToEnemy < *Radius )
+					{
+						if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group,
+										&DirVector, (VECTOR *) &IntPoint, &EndGroup, &IntPointNormal,
 										&TempVector, true, NULL ) )
-   						{
+						{
 							Closest = Enemy->Index;
 							*Radius = DistToEnemy;
-   						}
+						}
 						else
 						{
 							TempEnemyIndex = CheckAnyEnemyHit();
@@ -7570,9 +7570,9 @@ u_int16_t GetClosestEnemy( VECTOR * Pos, u_int16_t Group, float * Radius, u_int1
 								*Radius = DistToEnemy;
 							}
 						}
-   					}
-   				}
-   			}
+					}
+				}
+			}
 		}
 
 		Enemy = NextEnemy;
@@ -7617,7 +7617,7 @@ void CreateFireBall( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			FmPolys[ fmpoly ].Pos.y = ( Pos->y + Offset.y );
 			FmPolys[ fmpoly ].Pos.z = ( Pos->z + Offset.z );
 			FmPolys[ fmpoly ].SeqNum = FM_FIREBALL;
-	   		FmPolys[ fmpoly ].AnimSpeed = ( 2.0F - ( Dist / 22.0F ) );
+			FmPolys[ fmpoly ].AnimSpeed = ( 2.0F - ( Dist / 22.0F ) );
 			FmPolys[ fmpoly ].Frame = 0.0F;
 			FmPolys[ fmpoly ].R = 128;
 			FmPolys[ fmpoly ].G = 64;
@@ -7644,25 +7644,25 @@ void CreateFireBall( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-   	if( fmpoly != INDEX_NONE )
-   	{
-   		FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   		FmPolys[ fmpoly ].Pos = *Pos;
-   		FmPolys[ fmpoly ].SeqNum = FM_ANIMSPEED;
-   		FmPolys[ fmpoly ].AnimSpeed = 1.0F;
-   		FmPolys[ fmpoly ].Frame = 0.0F;
-   		FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
-   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-   		FmPolys[ fmpoly ].R = 64;
-   		FmPolys[ fmpoly ].G = 64;
-   		FmPolys[ fmpoly ].B = 64;
+	if( fmpoly != INDEX_NONE )
+	{
+		FmPolys[ fmpoly ].LifeCount = 1000.0F;
+		FmPolys[ fmpoly ].Pos = *Pos;
+		FmPolys[ fmpoly ].SeqNum = FM_ANIMSPEED;
+		FmPolys[ fmpoly ].AnimSpeed = 1.0F;
+		FmPolys[ fmpoly ].Frame = 0.0F;
+		FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
+		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+		FmPolys[ fmpoly ].R = 64;
+		FmPolys[ fmpoly ].G = 64;
+		FmPolys[ fmpoly ].B = 64;
 		FmPolys[ fmpoly ].Start_R = 64;
 		FmPolys[ fmpoly ].Start_G = 64;
 		FmPolys[ fmpoly ].Start_B = 64;
 		FmPolys[ fmpoly ].Trans = 255;
-   		FmPolys[ fmpoly ].Dir = *Dir;
-   		FmPolys[ fmpoly ].Speed = 0.0F;
-   		FmPolys[ fmpoly ].Group = Group;
+		FmPolys[ fmpoly ].Dir = *Dir;
+		FmPolys[ fmpoly ].Speed = 0.0F;
+		FmPolys[ fmpoly ].Group = Group;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 		FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );

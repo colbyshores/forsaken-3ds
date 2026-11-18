@@ -84,10 +84,10 @@ extern "C" void __system_allocateHeaps(void)
 
 	__ctru_heap = 0x08000000;
 	svcControlMemory(&tmp, __ctru_heap, 0, __ctru_heap_size,
-	                 MEMOP_ALLOC, (MemPerm)(MEMPERM_READ | MEMPERM_WRITE));
+					 MEMOP_ALLOC, (MemPerm)(MEMPERM_READ | MEMPERM_WRITE));
 
 	svcControlMemory(&__ctru_linear_heap, 0, 0, __ctru_linear_heap_size,
-	                 MEMOP_ALLOC_LINEAR, (MemPerm)(MEMPERM_READ | MEMPERM_WRITE));
+					 MEMOP_ALLOC_LINEAR, (MemPerm)(MEMPERM_READ | MEMPERM_WRITE));
 
 	/* CRITICAL: initialize the "mappable" allocator that backs
 	 * mappableAlloc() — gspInit uses this to reserve the virtual

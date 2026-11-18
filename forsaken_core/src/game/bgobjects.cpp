@@ -1245,7 +1245,7 @@ bool PreLoadBGOFiles( void )
 
 					if( !PreLoadCompObj( (int8_t*)&FilePtr->Filename[ 0 ], &BaseModel, LEVEL_SPECIFIC ) )
 					{
-				        Msg( "PreloadBGOFiles() PreloadCompObj() failed on %s\n", &FilePtr->Filename[ 0 ] );
+						Msg( "PreloadBGOFiles() PreloadCompObj() failed on %s\n", &FilePtr->Filename[ 0 ] );
 						return( false );
 				}	}
 
@@ -1255,7 +1255,7 @@ bool PreLoadBGOFiles( void )
 		}
 		else
 		{
-	        Msg( "PreloadBGOFiles() alloc failed on %s\n", &TempFilename[ 0 ] );
+			Msg( "PreloadBGOFiles() alloc failed on %s\n", &TempFilename[ 0 ] );
 			return( false );
 		}
 
@@ -1545,7 +1545,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 		Object->MoveOff.z = 0.0F;
 		Object->CrushCount = 0;
 		Object->Frame = 0.0F;
-    	Object->Offset = 0.0F;
+		Object->Offset = 0.0F;
 		Object->OffsetInc = 0.0F;
 		Object->MaxOffset = 0.0F;
 		Object->Timer = 0.0F;
@@ -1561,14 +1561,14 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 		Object->UpdateCount = 3;
 		Object->SoundFX_ID = 0;
 
-	   	TempQuat.FromDirAndUp(DirVector, UpVector);
-	   	TempQuat.ToMatrix(&Object->ColMatrix);
+		TempQuat.FromDirAndUp(DirVector, UpVector);
+		TempQuat.ToMatrix(&Object->ColMatrix);
 		MatrixTranspose( &Object->ColMatrix, &Object->InvColMatrix );
-	   	TempMatrix = MATRIX_Identity;
-	   	TempMatrix._11 = 1.0F;
-	   	TempMatrix._22 = 1.0F;
-	   	TempMatrix._33 = 1.0F;
-	   	MatrixMultiply( &Object->ColMatrix, &TempMatrix, &Object->Matrix );
+		TempMatrix = MATRIX_Identity;
+		TempMatrix._11 = 1.0F;
+		TempMatrix._22 = 1.0F;
+		TempMatrix._33 = 1.0F;
+		MatrixMultiply( &Object->ColMatrix, &TempMatrix, &Object->Matrix );
 		MatrixTranspose( &Object->Matrix, &Object->InvMatrix );
 
 		TempMatrix = MATRIX_Identity;
@@ -1577,19 +1577,19 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 		TempMatrix._33 = 1.0F;
 		Object->InvScaleMatrix = TempMatrix;
 
-	   	TempMatrix = MATRIX_Identity;
-	   	TempMatrix._11 = 1.0F;
-	   	TempMatrix._22 = 1.0F;
-	   	TempMatrix._33 = 1.0F;
+		TempMatrix = MATRIX_Identity;
+		TempMatrix._11 = 1.0F;
+		TempMatrix._22 = 1.0F;
+		TempMatrix._33 = 1.0F;
 		Object->ScaleMatrix = TempMatrix;
 
 		Object->NumChildren = 1;
 		Object->Children = LoadCompObj( Filename, Pos, DirVector, Group,
-				    &Object->OverallTime, &Object->MidTime, BaseModel, OWNER_BGOBJECT, Object->Index );
+					&Object->OverallTime, &Object->MidTime, BaseModel, OWNER_BGOBJECT, Object->Index );
 
 		if( !Object->Children )
 		{
-	        Msg( "LoadBGObjectData() LoadCompObj() failded in %s\n", Filename );
+			Msg( "LoadBGObjectData() LoadCompObj() failded in %s\n", Filename );
 			return( NULL );
 		}
 
@@ -1612,7 +1612,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 	}
 	else
 	{
-        Msg( "LoadBGObjectData() unable to allocate bgobject in %s\n", Filename );
+		Msg( "LoadBGObjectData() unable to allocate bgobject in %s\n", Filename );
 		return( NULL );
 	}
 
@@ -1620,7 +1620,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 }
 
 /*===================================================================
- 	Procedure	:		Update BGObject State
+	Procedure	:		Update BGObject State
 	Input		:		u_int16_t		BGObjbect
 				:		int16_t		State
 				:		float		Time
@@ -2118,7 +2118,7 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 					 * lerp in the OneOff_Anim update block above; PushVector.y here
 					 * would double-count and fight the lerp. */
 					if( Enemy->Type == ENEMY_CargoDrone &&
-					    Enemy->TNode && ( ((NODE*)Enemy->TNode)->Flags & 0x40 ) )
+						Enemy->TNode && ( ((NODE*)Enemy->TNode)->Flags & 0x40 ) )
 					{
 						/* intentionally empty — no HitFlag, no pos change */
 					}

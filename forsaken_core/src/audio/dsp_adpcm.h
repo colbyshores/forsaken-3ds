@@ -20,15 +20,15 @@
 
 
 typedef struct {
-    uint16_t coefs[16];       /* predictor coefficients (host order) */
-    int16_t  initial_hist1;   /* newest history sample at stream start */
-    int16_t  initial_hist2;   /* previous history sample */
-    uint16_t initial_index;
+	uint16_t coefs[16];       /* predictor coefficients (host order) */
+	int16_t  initial_hist1;   /* newest history sample at stream start */
+	int16_t  initial_hist2;   /* previous history sample */
+	uint16_t initial_index;
 } dsp_header_t;
 
 typedef struct {
-    int32_t hist1;            /* newest decoded sample */
-    int32_t hist2;            /* previous decoded sample */
+	int32_t hist1;            /* newest decoded sample */
+	int32_t hist2;            /* previous decoded sample */
 } dsp_state_t;
 
 /* Parse the 96-byte .dsp header (big-endian on disk). Fails only on NULL
@@ -42,4 +42,4 @@ void dsp_state_init(dsp_state_t *st, const dsp_header_t *hdr);
  * s16 samples; pass NULL to advance the predictor state only (the
  * 3DS uses this to track per-buffer hardware decode context). */
 void dsp_decode(const uint8_t *frames, uint32_t num_frames,
-                const uint16_t *coefs, dsp_state_t *st, int16_t *out);
+				const uint16_t *coefs, dsp_state_t *st, int16_t *out);

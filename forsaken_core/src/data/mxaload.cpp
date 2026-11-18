@@ -253,12 +253,12 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			if ( num_texture_groups > 0 )
 			{
 				Mxaloadheader->Group[group].renderObject[mesh].textureGroups =
-				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
-				                                num_texture_groups * sizeof(TEXTUREGROUP));
+					(TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
+												num_texture_groups * sizeof(TEXTUREGROUP));
 				if ( !Mxaloadheader->Group[group].renderObject[mesh].textureGroups )
 				{
 					Msg( "Mxaload() hunk-alloc failed for textureGroups[%u] %s\n",
-					     (unsigned)num_texture_groups, Filename );
+						 (unsigned)num_texture_groups, Filename );
 					return false;
 				}
 			}
@@ -600,14 +600,14 @@ bool ExecuteMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t in_group  )
 
 void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 {
-    int i;
-    int group;
+	int i;
+	int group;
 
 	if ( !Mxaloadheader->state )
 		return;
-    for (group = 0; group < Mxaloadheader->num_groups; group++)
+	for (group = 0; group < Mxaloadheader->num_groups; group++)
 	{
-	    for (i = 0; i < Mxaloadheader->Group[group].num_meshes; i++)
+		for (i = 0; i < Mxaloadheader->Group[group].num_meshes; i++)
 		{
 			FSReleaseRenderObject(&Mxaloadheader->Group[group].renderObject[i]);
 			if (Mxaloadheader->Group[group].poly_ptr[i])
@@ -765,7 +765,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 ===================================================================*/
 bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp )
 {
-    LVERTEX	*BufStart = NULL;
+	LVERTEX	*BufStart = NULL;
 	LVERTEX	*LVert;
 	LVERTEX	*OrigLVert;
 	MXAVERT *		FromVert;

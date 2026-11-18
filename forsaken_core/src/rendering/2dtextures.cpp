@@ -111,7 +111,7 @@ OFF_FILES OffsetFiles[] = {
 	{ (int8_t*)"Soltrail.off",	&SolarisTrail_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Solaris Trail
 	{ (int8_t*)"Newtrail.off",	&NewTrail_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// New Trail
 	{ (int8_t*)"Pikgen.off",		&PickupRegen_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Pickup Regeneration
-    { (int8_t*)"Scttrail.off",	&ScatterTrail_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Scatter Trail
+	{ (int8_t*)"Scttrail.off",	&ScatterTrail_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Scatter Trail
 	{ (int8_t*)"Greyflar.off",	&GreyFlare_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Grey Flare Trail
 	{ (int8_t*)"BigFlash.off",	&BigFlash_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Grey Flare Trail
 	{ (int8_t*)"Splat.off",		&BloodSplat_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Blood Splat
@@ -282,7 +282,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 				*last_tpage = Name_Index[ Count ];
 				if( Name_Index[ Count ] == -1 )
 				{
-		   			free( Frm_Info );
+					free( Frm_Info );
 					free( Off_Buffer );
 					return( NULL );
 				}
@@ -445,9 +445,9 @@ int16_t GetTPage( FRAME_INFO * FrameInfo, int16_t Frame )
 
 	if( FrameInfo )
 	{
-	   	Bit_Ptr = ( FrameInfo->Bit_Info + Frame );
-	   	Off_Ptr = ( FrameInfo->Off_Info + Bit_Ptr->startbit );
-	   	Box_Ptr = ( FrameInfo->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+		Bit_Ptr = ( FrameInfo->Bit_Info + Frame );
+		Off_Ptr = ( FrameInfo->Off_Info + Bit_Ptr->startbit );
+		Box_Ptr = ( FrameInfo->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 		return ( Box_Ptr->tpage );
 	}
 	return( INDEX_NONE );

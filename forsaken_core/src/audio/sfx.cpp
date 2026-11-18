@@ -134,7 +134,7 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 	{ "godlike", 0, 0, -1 },
 	{ "doublekill", 0, 0, -1 },
 	{ "firstblood", 0, 0, -1 },
- 	{ "combowhore", 0, 0, -1 },
+	{ "combowhore", 0, 0, -1 },
 	{ "hattrick", 0, 0, -1 },
 	{ "holyshit", 0, 0, -1 },
 	{ "humiliation", 0, 0, -1 },
@@ -351,13 +351,13 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 
 typedef struct
 {
-        bool Used;
-        u_int32_t  UniqueID;
-        int SndObjIndex;
-        int SfxFlags;
-        int16_t TriggerSfx;
-        bool OnPause;
-        float PauseValue;
+		bool Used;
+		u_int32_t  UniqueID;
+		int SndObjIndex;
+		int SfxFlags;
+		int16_t TriggerSfx;
+		bool OnPause;
+		float PauseValue;
 	int SfxBufferIndex;
 	sound_source_t * source;
 } SFX_HOLDER;
@@ -389,7 +389,7 @@ sound_buffer_t * sound_buffer_create( char *file, int sfxnum )
 	buffer = sound_load( file );
 
 	if ( ! buffer )
-  	{
+	{
 		SndLookup[ sfxnum ].Num_Variants = 0;
 		DebugPrintf("failed to load sfxnum %d from %s\n",sfxnum,file);
 		return NULL;
@@ -1049,7 +1049,7 @@ int16_t ReturnSFXIndex( char *file )
 		filelen = strlen( file );
 		if ( ( IsDigit( file[ filelen - 1 ] ) ) && ( IsDigit( file[ filelen - 2 ] ) ) )
 		{
-		    strcpy( filetocheck, file );
+			strcpy( filetocheck, file );
 			filetocheck[ filelen - 2 ] = 0;
 			i = 0;
 			while (!( LevelSpecificSfxLookup[ i ].flags & SFX_End ))
@@ -1732,10 +1732,10 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 	flags = Sfx_Filenames[ Sfx ].Flags;
 
 	if( flags & SFX_Biker )
-    	VolModify *= ( (float)BikerSpeechSlider.value / (float)BikerSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
+		VolModify *= ( (float)BikerSpeechSlider.value / (float)BikerSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
 
 	if( flags & SFX_BikeComp )
-    	VolModify *= ( (float)BikeCompSpeechSlider.value / (float)BikeCompSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
+		VolModify *= ( (float)BikeCompSpeechSlider.value / (float)BikeCompSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
 
 	if ( !VolModify )
 		return false;
@@ -1896,10 +1896,10 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 			);
 		}
 
-        if ( flags & SFX_Looping )
-                sound_play_looping( SfxHolder[ HolderIndex ].source );
-        else
-                sound_play( SfxHolder[ HolderIndex ].source );
+		if ( flags & SFX_Looping )
+				sound_play_looping( SfxHolder[ HolderIndex ].source );
+		else
+				sound_play( SfxHolder[ HolderIndex ].source );
 	}
 
 	return true;
@@ -2286,7 +2286,7 @@ int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, 
 
 	if ( index < 0 )
 	{
-	 	DebugPrintf("No free looping sfx list places!\n");
+		DebugPrintf("No free looping sfx list places!\n");
 		return -1;
 	}
 
@@ -2404,12 +2404,12 @@ void ProcessLoopingSfx( void )
 
 			if ( SpotSfxList[ i ].type == LOOPING_SFX_FixedGroup )
 			{
-			 	Pos = SpotSfxList[ i ].fixedpos;
+				Pos = SpotSfxList[ i ].fixedpos;
 				Modify = SoundInfo[Ships[ Current_Camera_View ].Object.Group][SpotSfxList[ i ].fixedgroup];
 			}
 			if ( SpotSfxList[ i ].type == LOOPING_SFX_VariableGroup )
 			{
-			 	Pos = *( SpotSfxList[ i ].pos );
+				Pos = *( SpotSfxList[ i ].pos );
 				Modify = SoundInfo[Ships[ Current_Camera_View ].Object.Group][*(SpotSfxList[ i ].group)];
 			}
 		}
@@ -2443,7 +2443,7 @@ void ProcessLoopingSfx( void )
 		if ( !InRange )
 		{
 			// if sound loaded then free it
-		 	if ( SpotSfxList[ i ].source )
+			if ( SpotSfxList[ i ].source )
 			{
 				DebugPrintf("ProcessLoopingSfx: Releasing dynamic looping sfx %d\n", SpotSfxList[ i ].sfxindex);
 				sound_release_source( (sound_source_t*)SpotSfxList[ i ].source );
@@ -2470,7 +2470,7 @@ void ProcessLoopingSfx( void )
 			char * file = SfxFullPath[ SpotSfxList[i].sfxindex ][ SpotSfxList[i].variant ];
 
 			if ( sfx_try_frame[ i ] != 0 &&
-			     ( maint_frame - sfx_try_frame[ i ] ) < 32UL )
+				 ( maint_frame - sfx_try_frame[ i ] ) < 32UL )
 				continue;
 			sfx_try_frame[ i ] = maint_frame;
 
@@ -2679,7 +2679,7 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 
 	if( Distance < 0.0F )
 	{
-	 	StopSfx( uid );
+		StopSfx( uid );
 		return false;
 	}
 

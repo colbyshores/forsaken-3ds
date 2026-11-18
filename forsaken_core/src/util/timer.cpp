@@ -34,9 +34,9 @@ float timer_run( px_timer_t* stats )
   if(!stats->last)
   {
 
-    stats->last = SDL_GetTicks();
+	stats->last = SDL_GetTicks();
 
-    return 0.0F;
+	return 0.0F;
 
   }
 
@@ -49,10 +49,10 @@ float timer_run( px_timer_t* stats )
   stats->last = time_now;
 
   if (stats->best == 0.0F || stats->seconds < stats->best)
-    stats->best = stats->seconds;
+	stats->best = stats->seconds;
 
   if (stats->worst  == 0.0F || stats->seconds > stats->worst)
-    stats->worst = stats->seconds;
+	stats->worst = stats->seconds;
 
   return stats->seconds;
 

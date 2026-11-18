@@ -119,7 +119,7 @@ typedef struct SHORTKILLMINE{
 ===================================================================*/
 
 typedef struct MISSEDMINEMSG{
- 	int16_t	Type;
+	int16_t	Type;
 	void *	Struct;
 }MISSEDMINEMSG;
 
@@ -127,7 +127,7 @@ typedef struct MISSEDMINEMSG{
 	Bodge Structures
 ===================================================================*/
 typedef struct SHORTPICKUP{
- 	int16_t	Type;
+	int16_t	Type;
 	int16_t	Group;
 	u_int16_t	Owner;				// Owner ID
 	u_int16_t	ID;					// ID
@@ -192,7 +192,7 @@ typedef struct _PLAYERINFO
 ===================================================================*/
 
 typedef struct MISSEDPICKUPMSG{
- 	int16_t	Type;
+	int16_t	Type;
 	void *	Struct;
 }MISSEDPICKUPMSG;
 
@@ -612,110 +612,110 @@ constexpr auto MSG_SHIPHEALTH = 0xcc;
 
 typedef struct _SENDBIKENUMMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 }SENDBIKENUMMSG;
 
 
 typedef struct _YOUQUITMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	BYTE		You;
 }YOUQUITMSG;
 
 typedef struct _BIKENUMMSG
 {
-    BYTE     MsgCode;
-    BYTE     WhoIAm;
+	BYTE     MsgCode;
+	BYTE     WhoIAm;
 	BYTE		BikeNum;		// which model to display for them...
 }BIKENUMMSG;
 
 typedef struct _SHORTPICKUPMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	BYTE		HowManyPickups;
 	BYTE		Pickups;
-    struct SHORTPICKUP  ShortPickup[MAXGENPICKUPCOUNT];
+	struct SHORTPICKUP  ShortPickup[MAXGENPICKUPCOUNT];
 } SHORTPICKUPMSG;
 
 typedef struct _SHORTREGENSLOTMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	BYTE		HowManyRegenSlots;
 	BYTE		RegenSlots;
-    struct SHORTREGENSLOT  ShortRegenSlot[MAXGENREGENSLOTCOUNT];
+	struct SHORTREGENSLOT  ShortRegenSlot[MAXGENREGENSLOTCOUNT];
 } SHORTREGENSLOTMSG;
 
 typedef struct _SHORTTRIGGERMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	BYTE		HowManyTriggers;
 	BYTE		Triggers;
-    struct SHORTTRIGGER  ShortTrigger[MAXGENTRIGGERCOUNT];
+	struct SHORTTRIGGER  ShortTrigger[MAXGENTRIGGERCOUNT];
 } SHORTTRIGGERMSG;
 
 typedef struct _SHORTTRIGVARMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	BYTE		HowManyTrigVars;
 	BYTE		TrigVars;
-    struct SHORTTRIGVAR  ShortTrigVar[MAXGENTRIGVARCOUNT];
+	struct SHORTTRIGVAR  ShortTrigVar[MAXGENTRIGVARCOUNT];
 } SHORTTRIGVARMSG;
 
 typedef struct _SHORTMINEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	BYTE		HowManyMines;
 	BYTE		Mines;
-    struct SHORTMINE  ShortMine[MAXGENMINECOUNT];
+	struct SHORTMINE  ShortMine[MAXGENMINECOUNT];
 } SHORTMINEMSG;
 
 typedef struct _UPDATEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-    SHORTGLOBALSHIP  ShortGlobalShip;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
+	SHORTGLOBALSHIP  ShortGlobalShip;
 } UPDATEMSG;
 
 typedef struct _VERYSHORTUPDATEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-    VERYSHORTGLOBALSHIP  ShortGlobalShip;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
+	VERYSHORTGLOBALSHIP  ShortGlobalShip;
 } VERYSHORTUPDATEMSG;
 
 typedef struct _FUPDATEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-    FSHORTGLOBALSHIP  ShortGlobalShip;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
+	FSHORTGLOBALSHIP  ShortGlobalShip;
 } FUPDATEMSG;
 
 typedef struct _VERYSHORTFUPDATEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-    FVERYSHORTGLOBALSHIP  ShortGlobalShip;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
+	FVERYSHORTGLOBALSHIP  ShortGlobalShip;
 } VERYSHORTFUPDATEMSG;
 
 typedef struct _GROUPONLY_VERYSHORTFUPDATEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-    GROUPONLY_FVERYSHORTGLOBALSHIP  ShortGlobalShip;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
+	GROUPONLY_FVERYSHORTGLOBALSHIP  ShortGlobalShip;
 } GROUPONLY_VERYSHORTFUPDATEMSG;
 
 
 typedef struct _HEREIAMMSG
 {
-    BYTE		MsgCode;
-    BYTE		WhoIAm;
+	BYTE		MsgCode;
+	BYTE		WhoIAm;
 	BYTE		MPVersion;
 } HEREIAMMSG;
 
@@ -725,7 +725,7 @@ typedef struct _HEREIAMMSG
 
 typedef struct _INITMSG
 {
-    BYTE	MsgCode;
+	BYTE	MsgCode;
 
 	// boolEANS
 
@@ -740,8 +740,8 @@ typedef struct _INITMSG
 
 	// others
 
-    BYTE	WhoIAm;
-    BYTE	YouAre;
+	BYTE	WhoIAm;
+	BYTE	YouAre;
 	BYTE	OverallGameStatus;
 	BYTE	NumPrimaryPickups;
 	BYTE	MaxKills;
@@ -772,26 +772,26 @@ typedef struct _INITMSG
 
 typedef struct _SHIPHITMSG
 {
-    BYTE     MsgCode;
+	BYTE     MsgCode;
 	BYTE		WhoHitYou;
-    BYTE     You;
+	BYTE     You;
 	SHIPHIT	ShipHit;
 } SHIPHITMSG;
 
 typedef struct _SHORTSHIPHITMSG
 {
-    BYTE		MsgCode;
+	BYTE		MsgCode;
 	BYTE		WhoHitYou;
-    BYTE		You;
+	BYTE		You;
 	SHORTSHIPHIT	ShipHit;
 } SHORTSHIPHITMSG;
 
 
 typedef struct _SHIPDIEDMSG
 {
-    BYTE     MsgCode;
-    BYTE     WhoIAm;
-    BYTE     WhoKilledMe;
+	BYTE     MsgCode;
+	BYTE     WhoIAm;
+	BYTE     WhoKilledMe;
 	BYTE		Type;
 	BYTE		WeaponType;
 	BYTE		Weapon;
@@ -801,70 +801,70 @@ typedef struct _SHIPDIEDMSG
 
 typedef struct _KILLPICKUPMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	KILLPICKUPINFO	KillPickupInfo;
 
 } KILLPICKUPMSG;
 
 typedef struct _TEAMGOALSMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	TEAMGOALSINFO	TeamGoalsInfo;
 
 } TEAMGOALSMSG;
 
 typedef struct _SHOCKWAVEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	SHOCKWAVEINFO	ShockwaveInfo;
 
 } SHOCKWAVEMSG;
 
 typedef struct _BGOUPDATEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	BGOUPDATEINFO	BGOUpdateInfo;
 
 } BGOUPDATEMSG;
 
 typedef struct _DROPPICKUPMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	PICKUPINFO	PickupInfo;
 
 } DROPPICKUPMSG;
 
 typedef struct _VERYSHORTDROPPICKUPMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	VERYSHORTPICKUPINFO	PickupInfo;
 
 } VERYSHORTDROPPICKUPMSG;
 
 typedef struct _PRIMBULLPOSDIRMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	PRIMBULLPOSDIR	PrimBullPosDir;
 } PRIMBULLPOSDIRMSG;
 
 typedef struct _SECBULLPOSDIRMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	SECBULLPOSDIR	SecBullPosDir;
 } SECBULLPOSDIRMSG;
 
 typedef struct _TITANBITSMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	TITANBITS	TitanBits;
 } TITANBITSMSG;
 
@@ -872,16 +872,16 @@ typedef	int16_t		SHORTSTATSTYPE[MAX_PLAYERS];
 
 typedef struct _SHORTSTATSMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
-    BYTE        WhosStats;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
+	BYTE        WhosStats;
 	SHORTSTATSTYPE		ShortStats;
 } SHORTSTATSMSG;
 
 typedef struct _STATUSMSG
 {
-    BYTE     MsgCode;
-    BYTE     WhoIAm;
+	BYTE     MsgCode;
+	BYTE     WhoIAm;
 	net_bool_t		IsHost;			// from host ???
 	BYTE		Status;
 	BYTE		TeamNumber;
@@ -905,8 +905,8 @@ typedef struct _NETSETTINGSMSG
 
 typedef struct _LONGSTATUSMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	STATUSMSG	Status;
 	char		LevelName[32];
 	u_int16_t		RandomStartPosModify;
@@ -934,8 +934,8 @@ enum{
 
 typedef struct _TEXTMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	char		Text[MAXTEXTMSG];
 	BYTE		TextMsgType;
 } TEXTMSG;
@@ -943,8 +943,8 @@ typedef struct _TEXTMSG
 
 typedef struct _SETTIMEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 	SETTIME		TimeInfo;
 
 } SETTIMEMSG;
@@ -952,17 +952,17 @@ typedef struct _SETTIMEMSG
 
 typedef struct _REQTIMEMSG
 {
-    BYTE        MsgCode;
-    BYTE        WhoIAm;
+	BYTE        MsgCode;
+	BYTE        WhoIAm;
 
 } REQTIMEMSG;
 
 typedef struct _SHIPHEALTHMSG
 {
-    BYTE MsgCode;
-    BYTE WhoIAm;
-    u_int8_t Hull;
-    u_int8_t Shield;
+	BYTE MsgCode;
+	BYTE WhoIAm;
+	u_int8_t Hull;
+	u_int8_t Shield;
 } SHIPHEALTHMSG;
 
 
@@ -988,10 +988,10 @@ void	PrimBullPosDirSend( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bulle
 						u_int16_t Group, VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * Up,
 						int16_t PowerLevel, float PLevel );
 void SecBullPosDirSend( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_int16_t Group,
-					    VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
+						VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
 						VECTOR * DropDir, int8_t Weapon );
 void TitanBitsSend( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_int16_t Group,
-					    VECTOR * Pos, VECTOR * Offset, VECTOR * UpVector,
+						VECTOR * Pos, VECTOR * Offset, VECTOR * UpVector,
 						VECTOR * DropDir, int8_t Weapon, VECTOR * Directions );
 void	DropPickupSend( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Speed, int16_t Type, u_int16_t IDCount, int16_t RegenSlot, bool Sparkle, float LifeCount, u_int16_t TriggerMod);
 void	KillPickupSend( u_int16_t Owner, u_int16_t IDCount, int16_t Style );

@@ -91,7 +91,7 @@ static void init_video_modes( u_int32_t window_flags )
 	for( i = 1; i < render_info.NumModes; i++ ) // skip mode 0
 	{
 		if( render_info.Mode[i].w == render_info.default_mode.w &&
-		    render_info.Mode[i].h == render_info.default_mode.h )
+			render_info.Mode[i].h == render_info.default_mode.h )
 		{
 			render_info.CurrMode = i;
 			DebugPrintf("init_video_modes: found requested resolution of %dx%d\n",

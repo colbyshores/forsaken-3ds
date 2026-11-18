@@ -318,19 +318,19 @@ void ExternalForcesZoneCheck( VECTOR * OldPos , VECTOR * NewPos , EXTERNALFORCE 
 	In = false;
 	if( EFpnt->Type == ZONE_Sphere )
 	{
-   		OldIn = DistanceVector2Vector( &EFpnt->Pos , OldPos ) < EFpnt->half_size.x;
-   		NewIn = DistanceVector2Vector( &EFpnt->Pos , NewPos ) < EFpnt->half_size.x;
-   		if( !OldIn && NewIn )
-   			Entry = true;
-   		if( OldIn && !NewIn )
-   			Exit = true;
-   		if( OldIn && NewIn )
-   		{
-   			In = true;
-   		}
-   	}else{
-   		RayToHull( EFpnt->Zone , OldPos , NewPos , EFpnt->num_sides );
-   	}
+		OldIn = DistanceVector2Vector( &EFpnt->Pos , OldPos ) < EFpnt->half_size.x;
+		NewIn = DistanceVector2Vector( &EFpnt->Pos , NewPos ) < EFpnt->half_size.x;
+		if( !OldIn && NewIn )
+			Entry = true;
+		if( OldIn && !NewIn )
+			Exit = true;
+		if( OldIn && NewIn )
+		{
+			In = true;
+		}
+	}else{
+		RayToHull( EFpnt->Zone , OldPos , NewPos , EFpnt->num_sides );
+	}
 }
 
 

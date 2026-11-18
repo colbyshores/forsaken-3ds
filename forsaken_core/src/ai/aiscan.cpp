@@ -46,7 +46,7 @@ void AI_AIR_SCAN( ENEMY * Enemy )
 
 	if( Tinfo->TFlags == _TARGET_PLAYERS )
 	{
-  		TObject = (OBJECT*)Tinfo->TObject;
+		TObject = (OBJECT*)Tinfo->TObject;
 		dist = DistanceVector2Vector( &Enemy->Object.Pos , &Tinfo->Pos ) + SoundInfo[Enemy->Object.Group][TObject->Group];
 
 		if( AI_InViewCone( &Enemy->Object.Pos , &Enemy->Object.Mat , &TObject->Pos, Enemy->Viewcone ) || ( (dist <= EnemyTypes[Enemy->Type].Behave.HearRange) && TObject->Noise ) )
@@ -87,7 +87,7 @@ void AI_TURRET_SCAN( ENEMY * Enemy )
 	{
 		return;
 	}
- 	// Scan for target
+	// Scan for target
 	if ( Enemy->Timer <= 0.0F )
 	{
 		AI_THINK( Enemy , true , true );
@@ -184,7 +184,7 @@ void AI_DO_SCAN( ENEMY * Enemy )
 
 	if( Tinfo->TFlags & _TARGET_PLAYERS )
 	{
-  		TObject = (OBJECT*)Tinfo->TObject;
+		TObject = (OBJECT*)Tinfo->TObject;
 		if( AI_InViewCone( &Enemy->Object.Pos , &Enemy->Object.Mat , &TObject->Pos, Enemy->Viewcone ) || ( ( Enemy->LastDistance <= EnemyTypes[Enemy->Type].Behave.HearRange) && TObject->Noise ) )
 		{
 			if( AI_ClearLOS( &Enemy->Object.Pos , Enemy->Object.Group , &TObject->Pos ) )

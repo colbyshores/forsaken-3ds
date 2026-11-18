@@ -39,8 +39,8 @@ static_assert( sizeof( BSP_RAWNODE ) == 28, "BSP_RAWNODE is a file record" );
 
 typedef struct BSP_NODE
 {
-    VECTOR	Normal;
-    float	Offset;
+	VECTOR	Normal;
+	float	Offset;
 	int		Colour;
 struct	BSP_NODE * Parent;
 struct	BSP_NODE * Front;
@@ -56,8 +56,8 @@ typedef struct BSP_TREE
 typedef struct BSP_HEADER
 {
 	bool	State;
-    int NumGroups;
-    BSP_TREE Bsp_Tree[MAXGROUPS];
+	int NumGroups;
+	BSP_TREE Bsp_Tree[MAXGROUPS];
 }BSP_HEADER;
 
 

@@ -347,7 +347,7 @@ void TeamGoToSynchup ( MENUITEM * /*Item*/ )
 void BailMultiplayer( MENU * /*Menu*/ )
 {
 	MyGameStatus = STATUS_Left;
-    if ( WhoIAm < MAX_PLAYERS )
+	if ( WhoIAm < MAX_PLAYERS )
 		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
 	if(IsHost)
 		send_tracker_finished( tracker_server, tracker_port );
@@ -401,9 +401,9 @@ void InitTeamSelection( MENU *Menu )
 			item->FuncSelect = PlayerConfirm;
 
 		if 	( ( item->Variable == &TeamList[0] ) ||
-		    ( item->Variable == &TeamList[1] ) ||
-		    ( item->Variable == &TeamList[2] ) ||
-		    ( item->Variable == &TeamList[3] ) )
+			( item->Variable == &TeamList[1] ) ||
+			( item->Variable == &TeamList[2] ) ||
+			( item->Variable == &TeamList[3] ) )
 		{
 			item->FuncSelect = SelectTeamList;
 		}

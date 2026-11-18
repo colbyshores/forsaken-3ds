@@ -157,7 +157,7 @@ void ExecuteTransExe( u_int16_t group )
 					 * which case default to eligible. */
 					u_int16_t mi = TransExe[i].Model;
 					bool eligible = !(mi < MAXNUMOFMODELS &&
-					                  Models[mi].OwnerType == OWNER_BGOBJECT);
+									  Models[mi].OwnerType == OWNER_BGOBJECT);
 					c3d_set_object_shine_eligible(eligible);
 				}
 #endif
@@ -254,7 +254,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 					 * which case default to eligible. */
 					u_int16_t mi = TransExe[i].Model;
 					bool eligible = !(mi < MAXNUMOFMODELS &&
-					                  Models[mi].OwnerType == OWNER_BGOBJECT);
+									  Models[mi].OwnerType == OWNER_BGOBJECT);
 					c3d_set_object_shine_eligible(eligible);
 				}
 #endif

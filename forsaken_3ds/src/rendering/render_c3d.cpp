@@ -77,9 +77,9 @@ constexpr int UNIFORM_MODELVIEW = 4; /* fvec4[4] — world_matrix (model→world
 constexpr int UNIFORM_AMBIENT = 8; /* fvec4    — .xyz=ambient, .w=unused */
 constexpr int UNIFORM_LIGHT_COUNT = 9; /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
 constexpr int UNIFORM_LIGHTS = 10;   /* fvec4[24]— GPU_MAX_LIGHTS × 3 fvec4 each
-                                  *   light[3i+0] = (Pos.xyz, invSizeSq)
-                                  *   light[3i+1] = (r, g, b, type)
-                                  *   light[3i+2] = (Dir.xyz, CosArc)  */
+								  *   light[3i+0] = (Pos.xyz, invSizeSq)
+								  *   light[3i+1] = (r, g, b, type)
+								  *   light[3i+2] = (Dir.xyz, CosArc)  */
 constexpr int GPU_MAX_LIGHTS = 8; /* must match .v.pica `lights[24]` (= 8*3) */
 
 /* ---- citro3d state ---- */
@@ -302,7 +302,7 @@ static gpu_vertex_t *persist_lookup(const void *ro, int sub, int *count)
 /* Retain a freshly converted range. Returns the retained buffer or
  * NULL (pressure/alloc failure — caller submits from scratch). */
 static gpu_vertex_t *persist_store(const void *ro, int sub,
-                                   const gpu_vertex_t *src, int count)
+								   const gpu_vertex_t *src, int count)
 {
 	persist_entry_t *e = persist_find(ro, sub, 1);
 	if (!e)
@@ -420,11 +420,11 @@ static u8 classify_texture(const char *path)
 	for (const char *p = path; *p; p++)
 		if (*p == '/' || *p == '\\') base = p + 1;
 	if (strstr(base, "therm") || strstr(base, "nuke") ||
-	    strstr(base, "lava")  || strstr(base, "fire") ||
-	    strstr(base, "rock")  || strstr(base, "stone"))
+		strstr(base, "lava")  || strstr(base, "fire") ||
+		strstr(base, "rock")  || strstr(base, "stone"))
 		return MAT_ROCK;
 	if (strstr(base, "bio")   || strstr(base, "foe")  ||
-	    strstr(base, "flsh")  || strstr(base, "guts"))
+		strstr(base, "flsh")  || strstr(base, "guts"))
 		return MAT_ORGANIC;
 	return MAT_METAL;
 }
@@ -953,11 +953,11 @@ bool c3d_renderer_init(void)
 		/* MAT_METAL — fine paint-grain + brushed sheen. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_METAL], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_METAL],
-		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+						 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_METAL],
-		                      C3D_ProcTex_UV, 0.25f, 16.0f, 0.0f);
+							  C3D_ProcTex_UV, 0.25f, 16.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_METAL], false,
-		                    GPU_PT_ADD, GPU_PT_ADD);
+							GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_METAL], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_METAL], true);
 		{
@@ -968,17 +968,17 @@ bool c3d_renderer_init(void)
 				0xFF8C8C8Cu,  /*  +5% */
 			};
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_METAL],
-			                      colors, 0, 4);
+								  colors, 0, 4);
 		}
 
 		/* MAT_ROCK — pitted, cool/warm wear pattern. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ROCK], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ROCK],
-		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+						 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ROCK],
-		                      C3D_ProcTex_UV, 0.31f, 13.0f, 0.0f);
+							  C3D_ProcTex_UV, 0.31f, 13.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ROCK], false,
-		                    GPU_PT_ADD, GPU_PT_ADD);
+							GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ROCK], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ROCK], true);
 		{
@@ -989,17 +989,17 @@ bool c3d_renderer_init(void)
 				0xFF8E8783u,  /* warm mid-light */
 			};
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_ROCK],
-			                      colors, 0, 4);
+								  colors, 0, 4);
 		}
 
 		/* MAT_ORGANIC — soft, faint green tint. */
 		C3D_ProcTexInit(&s_wallProcTex[MAT_ORGANIC], 0, 2);
 		C3D_ProcTexClamp(&s_wallProcTex[MAT_ORGANIC],
-		                 GPU_PT_REPEAT, GPU_PT_REPEAT);
+						 GPU_PT_REPEAT, GPU_PT_REPEAT);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[MAT_ORGANIC],
-		                      C3D_ProcTex_UV, 0.27f, 14.0f, 0.0f);
+							  C3D_ProcTex_UV, 0.27f, 14.0f, 0.0f);
 		C3D_ProcTexCombiner(&s_wallProcTex[MAT_ORGANIC], false,
-		                    GPU_PT_ADD, GPU_PT_ADD);
+							GPU_PT_ADD, GPU_PT_ADD);
 		C3D_ProcTexFilter(&s_wallProcTex[MAT_ORGANIC], GPU_PT_LINEAR);
 		C3D_ProcTexNoiseEnable(&s_wallProcTex[MAT_ORGANIC], true);
 		{
@@ -1010,7 +1010,7 @@ bool c3d_renderer_init(void)
 				0xFF8C9088u,
 			};
 			ProcTexColorLut_Write(&s_wallProcColor[MAT_ORGANIC],
-			                      colors, 0, 4);
+								  colors, 0, 4);
 		}
 
 		s_procTexReady = true;
@@ -1024,7 +1024,7 @@ bool c3d_renderer_init(void)
 		 * as a moving spot rather than a broad glow. */
 		LightLut_Phong(&s_objLightLut, 30.0f);
 		C3D_LightEnvLut(&s_objLightEnv, GPU_LUT_D0, GPU_LUTINPUT_LN,
-		                false, &s_objLightLut);
+						false, &s_objLightLut);
 
 		/* Material — strong specular, modest diffuse. We don't sample
 		 * FRAGMENT_PRIMARY_COLOR (diffuse stays in the legacy TEX0 ×
@@ -1692,7 +1692,7 @@ bool FSClear(XYRECT *rect)
 	 * rasterizer — wipes color + depth inside just the inset rect.
 	 * See clear_sub_viewport_via_quad comment for why. */
 	if (CameraRendering != CamRendering::None &&
-	    CameraRendering != CamRendering::Main)
+		CameraRendering != CamRendering::Main)
 	{
 		clear_sub_viewport_via_quad();
 		return true;
@@ -1776,8 +1776,8 @@ bool FSSetViewPort(render_viewport_t *view)
 		 * that PICA200 produced under the sub-rect-viewport path. */
 		C3D_SetViewport(0, 0, 240, 400);
 		C3D_SetScissor(GPU_SCISSOR_NORMAL,
-		               (u32)pica_x, (u32)pica_y,
-		               (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
+					   (u32)pica_x, (u32)pica_y,
+					   (u32)(pica_x + pica_w), (u32)(pica_y + pica_h));
 	}
 	else
 	{
@@ -1786,7 +1786,7 @@ bool FSSetViewPort(render_viewport_t *view)
 		 * visi.cpp's per-group projection setup. */
 		C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 		C3D_SetViewport((u32)pica_x, (u32)pica_y,
-		                (u32)pica_w, (u32)pica_h);
+						(u32)pica_w, (u32)pica_h);
 	}
 
 	return true;
@@ -1926,15 +1926,15 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject)
 
 	  TEXENV_MODE_NONE     — untextured (HUD vertex-color paths).
 	  TEXENV_MODE_DIFFUSE  — single-stage modulate: TEX0 × PRIMARY_COLOR.
-	                         Used for textured draws that get neither
-	                         of the modes below.
+							 Used for textured draws that get neither
+							 of the modes below.
 	  TEXENV_MODE_AUX      — walls: TEX0 × PRIMARY, then ADD_SIGNED the
-	                         ProcTex output (TEXTURE3), a noise palette
-	                         centred on grey, so the grain both
-	                         brightens and darkens without washing out.
+							 ProcTex output (TEXTURE3), a noise palette
+							 centred on grey, so the grain both
+							 brightens and darkens without washing out.
 	  TEXENV_MODE_OBJECT   — models: TEX0 × PRIMARY, then ADD the
-	                         fragment-light specular
-	                         (FRAGMENT_SECONDARY_COLOR).
+							 fragment-light specular
+							 (FRAGMENT_SECONDARY_COLOR).
 
 	Cached per-mode + per-texdata pointer so identical adjacent draws
 	skip GPU state changes.
@@ -1951,7 +1951,7 @@ static void configure_texenv_diffuse(void)
 	C3D_TexEnv *env = C3D_GetTexEnv(0);
 	C3D_TexEnvInit(env);
 	C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR,
-	              GPU_PRIMARY_COLOR);
+				  GPU_PRIMARY_COLOR);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 
 	C3D_TexEnvInit(C3D_GetTexEnv(1));
@@ -1963,7 +1963,7 @@ static void configure_texenv_none(void)
 	C3D_TexEnv *env = C3D_GetTexEnv(0);
 	C3D_TexEnvInit(env);
 	C3D_TexEnvSrc(env, C3D_Both, GPU_PRIMARY_COLOR, GPU_PRIMARY_COLOR,
-	              GPU_PRIMARY_COLOR);
+				  GPU_PRIMARY_COLOR);
 	C3D_TexEnvFunc(env, C3D_Both, GPU_REPLACE);
 
 	C3D_TexEnvInit(C3D_GetTexEnv(1));
@@ -1983,7 +1983,7 @@ static void configure_texenv_aux(texture_t *texdata)
 		C3D_TexEnv *env = C3D_GetTexEnv(0);
 		C3D_TexEnvInit(env);
 		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR,
-		              GPU_PRIMARY_COLOR);
+					  GPU_PRIMARY_COLOR);
 		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 	}
 
@@ -1991,7 +1991,7 @@ static void configure_texenv_aux(texture_t *texdata)
 		C3D_TexEnv *env = C3D_GetTexEnv(1);
 		C3D_TexEnvInit(env);
 		C3D_TexEnvSrc(env, C3D_Both, GPU_PREVIOUS, GPU_TEXTURE3,
-		              GPU_PRIMARY_COLOR);
+					  GPU_PRIMARY_COLOR);
 		C3D_TexEnvFunc(env, C3D_RGB,   GPU_ADD_SIGNED);
 		C3D_TexEnvFunc(env, C3D_Alpha, GPU_REPLACE);
 	}
@@ -2011,7 +2011,7 @@ static void configure_texenv_object(void)
 		C3D_TexEnv *env = C3D_GetTexEnv(0);
 		C3D_TexEnvInit(env);
 		C3D_TexEnvSrc(env, C3D_Both, GPU_TEXTURE0, GPU_PRIMARY_COLOR,
-		              GPU_PRIMARY_COLOR);
+					  GPU_PRIMARY_COLOR);
 		C3D_TexEnvFunc(env, C3D_Both, GPU_MODULATE);
 	}
 
@@ -2023,7 +2023,7 @@ static void configure_texenv_object(void)
 		C3D_TexEnv *env = C3D_GetTexEnv(1);
 		C3D_TexEnvInit(env);
 		C3D_TexEnvSrc(env, C3D_RGB, GPU_PREVIOUS,
-		              GPU_FRAGMENT_SECONDARY_COLOR, (GPU_TEVSRC)0);
+					  GPU_FRAGMENT_SECONDARY_COLOR, (GPU_TEVSRC)0);
 		C3D_TexEnvFunc(env, C3D_RGB, GPU_ADD);
 	}
 
@@ -2044,10 +2044,10 @@ static void apply_texenv_for_texture(texture_t *texdata)
 	 * while AUX is the fall-through path for level-mesh draws. */
 	texenv_mode_t mode;
 	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
-	    s_objShineEligible)
+		s_objShineEligible)
 		mode = TEXENV_MODE_OBJECT;
 	else if (s_procTexReady && g_wall_detail && !s_isOrthoDraw &&
-	         !s_skipAuxProcTex)
+			 !s_skipAuxProcTex)
 		mode = TEXENV_MODE_AUX;
 	else
 		mode = TEXENV_MODE_DIFFUSE;
@@ -2064,7 +2064,7 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		desired_mc = (material_class_t)texdata->material_class;
 		if ((unsigned)desired_mc >= MAT_COUNT) desired_mc = MAT_METAL;
 		float seed_phase =
-		    ((s_atlasSeed >> 8) & 0xFFFF) * (1.0f / 65536.0f);
+			((s_atlasSeed >> 8) & 0xFFFF) * (1.0f / 65536.0f);
 		float combined = texdata->proctex_phase + seed_phase;
 		combined -= fast_floorf(combined);
 		desired_bucket = (int)(combined * (float)ATLAS_PHASE_BUCKETS);
@@ -2074,13 +2074,13 @@ static void apply_texenv_for_texture(texture_t *texdata)
 
 	bool mode_changed = (mode != s_lastTexEnvMode) || !s_lastTexEnvTextured;
 	bool aux_state_changed = (mode == TEXENV_MODE_AUX) &&
-	    (desired_bucket != s_lastPhaseBucket ||
-	     (int)desired_mc != s_lastMatClass);
+		(desired_bucket != s_lastPhaseBucket ||
+		 (int)desired_mc != s_lastMatClass);
 
 	/* Cache check — same mode + same texture + (for AUX) same atlas
 	 * bucket means no GPU state change needed. */
 	if (!mode_changed && !aux_state_changed &&
-	    s_lastBoundTexture == (void*)texdata)
+		s_lastBoundTexture == (void*)texdata)
 		return;
 
 	/* R08: bind only on a cache miss. The early-return path provably
@@ -2095,13 +2095,13 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		 * the material class changed. */
 		material_class_t mc = desired_mc;
 		float base_freq = (mc == MAT_ROCK)    ? 13.0f
-		                : (mc == MAT_ORGANIC) ? 14.0f
-		                                      : 16.0f;
+						: (mc == MAT_ORGANIC) ? 14.0f
+											  : 16.0f;
 		float amp       = (mc == MAT_ROCK)    ? 0.31f
-		                : (mc == MAT_ORGANIC) ? 0.27f
-		                                      : 0.25f;
+						: (mc == MAT_ORGANIC) ? 0.27f
+											  : 0.25f;
 		float phase = ((float)desired_bucket + 0.5f)
-		            * (1.0f / (float)ATLAS_PHASE_BUCKETS);
+					* (1.0f / (float)ATLAS_PHASE_BUCKETS);
 		/* Use the low 3 bits of the bucket as an orthogonal frequency
 		 * axis — same phase value × 8 different frequencies = 8× the
 		 * visible variants per phase position. Combined with 64 phase
@@ -2110,7 +2110,7 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		int   freq_step = desired_bucket & 7;          /* 0..7 */
 		float freq      = base_freq * (1.0f + freq_step * 0.06f);
 		C3D_ProcTexNoiseCoefs(&s_wallProcTex[mc],
-		    C3D_ProcTex_UV, amp, freq, phase);
+			C3D_ProcTex_UV, amp, freq, phase);
 		C3D_ProcTexBind(0, &s_wallProcTex[mc]);
 		if (mode_changed || (int)mc != s_lastMatClass)
 			C3D_ProcTexColorLutBind(&s_wallProcColor[mc]);
@@ -2241,10 +2241,10 @@ static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
 	for (i = 0; path[i]; i++)
 	{
 		if ((path[i] == 'd' || path[i] == 'D') &&
-		    (path[i+1] == 'a' || path[i+1] == 'A') &&
-		    (path[i+2] == 't' || path[i+2] == 'T') &&
-		    (path[i+3] == 'a' || path[i+3] == 'A') &&
-		    (path[i+4] == '\\' || path[i+4] == '/'))
+			(path[i+1] == 'a' || path[i+1] == 'A') &&
+			(path[i+2] == 't' || path[i+2] == 'T') &&
+			(path[i+3] == 'a' || path[i+3] == 'A') &&
+			(path[i+4] == '\\' || path[i+4] == '/'))
 		{
 			data_start = &path[i+5];
 			break;
@@ -2536,16 +2536,16 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 				}
 				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 				cosa = ray.x * LightPnt->Dir.x +
-				       /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-				       ray.y * LightPnt->Dir.y +
-				       ray.z * LightPnt->Dir.z;
+					   /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+					   ray.y * LightPnt->Dir.y +
+					   ray.z * LightPnt->Dir.z;
 
 				if (rlen2 > lsize2 * 0.5f)
 				{
 					if (cosa > LightPnt->CosArc)
 						intensity = ((lsize2 - rlen2) / (0.75f * lsize2)) *
-						            /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-						            ((cosa - LightPnt->CosArc) / (1.0f - LightPnt->CosArc));
+									/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+									((cosa - LightPnt->CosArc) / (1.0f - LightPnt->CosArc));
 					else
 						goto NEXT_LIGHT;
 				}
@@ -2556,8 +2556,8 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 						(1.0f - (lsize2 * 0.5f - rlen2) / (lsize2 * 0.5f - MIN_LIGHT_SIZE));
 					if (cosa > cosarc2)
 						intensity = ((lsize2 - rlen2) / (lsize2 - MIN_LIGHT_SIZE)) *
-						            /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-						            ((cosa - cosarc2) / (1.0f - cosarc2));
+									/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+									((cosa - cosarc2) / (1.0f - cosarc2));
 					else
 						goto NEXT_LIGHT;
 				}
@@ -2616,7 +2616,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * with the dominant nearby XLight to drive the Phong specular hue.
 	 * world_matrix's translation row holds the object's world pos. */
 	if (s_objProcTexOn && s_objLightReady && g_object_shine &&
-	    s_objShineEligible && !orthographic) {
+		s_objShineEligible && !orthographic) {
 		VECTOR pos;
 		pos.x = world_matrix._41;
 		pos.y = world_matrix._42;
@@ -2664,7 +2664,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			void *key_tex = (void*)renderObject->textureGroups[key].texture;
 			sj = si - 1;
 			while (sj >= 0 &&
-			       (void*)renderObject->textureGroups[sorted_order[sj]].texture > key_tex)
+				   (void*)renderObject->textureGroups[sorted_order[sj]].texture > key_tex)
 			{
 				sorted_order[sj + 1] = sorted_order[sj];
 				sj--;
@@ -2783,7 +2783,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		 * eyes, any mode). A hit submits the retained buffer at flush
 		 * time and converts nothing. */
 		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
-		    renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
+			renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
 			int pcnt = 0;
 			gpu_vertex_t *pbuf = persist_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type), &pcnt);
@@ -2795,7 +2795,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			}
 		}
 		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic &&
-		    memo_reusable(renderObject)) {
+			memo_reusable(renderObject)) {
 			memo_hit = smemo_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
 				&memo_off, &memo_cnt,
@@ -2952,7 +2952,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		/* R05: retain this conversion for level walls. On success the
 		 * flush submits the retained buffer instead of scratch. */
 		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
-		    renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
+			renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
 			gpu_vertex_t *pbuf = persist_store(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
 				dst, totalVerts);
@@ -2975,9 +2975,9 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 		/* Check if we need to break the batch — state changed */
 		if (batch_vertCount > 0 &&
-		    ((void*)tg->texture != batch_texture ||
-		     tg->colourkey      != batch_colourkey ||
-		     eff_hasTexture     != batch_hasTexture))
+			((void*)tg->texture != batch_texture ||
+			 tg->colourkey      != batch_colourkey ||
+			 eff_hasTexture     != batch_hasTexture))
 		{
 			FLUSH_BATCH();
 		}

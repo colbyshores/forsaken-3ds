@@ -16,33 +16,33 @@ constexpr int MAXBLOCKS = 16384;
 /* Debug block tracker: one slot per live X_ allocation, recording
  * size and allocation site for leak reports. */
 struct XMemTracker {
-    bool   used[MAXBLOCKS];
-    void  *pnts[MAXBLOCKS];
-    size_t sizes[MAXBLOCKS];
-    const char *files[MAXBLOCKS];	/* __FILE__ of each live block */
-    int    lines[MAXBLOCKS];
-    int    blocks_used = 0;
+	bool   used[MAXBLOCKS];
+	void  *pnts[MAXBLOCKS];
+	size_t sizes[MAXBLOCKS];
+	const char *files[MAXBLOCKS];	/* __FILE__ of each live block */
+	int    lines[MAXBLOCKS];
+	int    blocks_used = 0;
 
-    void init()
-    {
-        for (int i = 0; i < MAXBLOCKS; i++) {
-            used[i] = false;
-            pnts[i] = nullptr;
-            sizes[i] = 0;
-        }
-    }
-    int find_free()
-    {
-        for (int i = 0; i < MAXBLOCKS; i++)
-            if (!used[i]) { blocks_used++; return i; }
-        return -1;
-    }
-    int find_same(void *p) const
-    {
-        for (int i = 0; i < MAXBLOCKS; i++)
-            if (used[i] && pnts[i] == p) return i;
-        return -1;
-    }
+	void init()
+	{
+		for (int i = 0; i < MAXBLOCKS; i++) {
+			used[i] = false;
+			pnts[i] = nullptr;
+			sizes[i] = 0;
+		}
+	}
+	int find_free()
+	{
+		for (int i = 0; i < MAXBLOCKS; i++)
+			if (!used[i]) { blocks_used++; return i; }
+		return -1;
+	}
+	int find_same(void *p) const
+	{
+		for (int i = 0; i < MAXBLOCKS; i++)
+			if (used[i] && pnts[i] == p) return i;
+		return -1;
+	}
 };
 
 XMemTracker g_mem;
@@ -179,7 +179,7 @@ void X_free( void * Pnt, const char *in_file, int in_line )
 	if( i == -1 )
 	{
 		if ( in_file != last_file || in_line != last_line )
-	 		DebugPrintf( "MEM: Tried to free un-malloced block in %s line %d\n", in_file, in_line ); // break point
+			DebugPrintf( "MEM: Tried to free un-malloced block in %s line %d\n", in_file, in_line ); // break point
 		last_file = in_file;
 		last_line = in_line;
 		return;

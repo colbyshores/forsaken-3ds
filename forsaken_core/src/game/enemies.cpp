@@ -64,7 +64,7 @@ float	DifficlutyTab[4] = { 0.25F , 1.0F , 1.75F , 2.75F }; // easy medium hard d
 float	NmeDamageModifierTab[4] = { 0.25F, 0.5F , 0.95F , 1.9F }; // easy medium hard deathwish....
 char	EnemyNotFreedString[] = "Nowhere.c";
 int8_t * EnemyNames[] =	{
- 	(int8_t*)"BeamTurret",			// 0
+	(int8_t*)"BeamTurret",			// 0
 	(int8_t*)"DuelTurret",			// 1
 	(int8_t*)"PulseTurret",			// 2
 	(int8_t*)"MissileTurret",		// 3
@@ -1709,7 +1709,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NO_SECONDARY,				//	BYTE	SecondaryWeaponType;		// which Primaryt weapon do I Fire...
 
 
-    	{
+		{
 			AI_BEHAVIOUR_ATTACK_ONSITE | AI_BEHAVIOUR_NOFRIENDLYFIRE | AI_BEHAVIOUR_WEAPONKNOWLEDGE | AI_BEHAVIOUR_ATTACKMINES | AI_BEHAVIOUR_AVOIDMINES,		// u_int32_t	Flags;	// flags to show what stuff I can Do..
 			0.5F,			// float	Anticipate_Move;				// when targeting the player how far ahead can I predict where he will be....
 			0.0F,			// float	NetworkRange;					// how far from my net work do I Wander...
@@ -3460,7 +3460,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		0,							//	int16_t	PowerLevel;
 		NO_PRIMARY,						//	BYTE	PrimaryWeaponType;			// which Primaryt weapon do I Fire...
 		NO_SECONDARY,				//	BYTE	SecondaryWeaponType;		// which Primaryt weapon do I Fire...
-    	{
+		{
 			AI_BEHAVIOUR_ATTACK_ONSITE | AI_BEHAVIOUR_NOFRIENDLYFIRE | AI_BEHAVIOUR_WEAPONKNOWLEDGE | AI_BEHAVIOUR_ATTACKMINES | AI_BEHAVIOUR_AVOIDMINES,		// u_int32_t	Flags;	// flags to show what stuff I can Do..
 			0.5F,			// float	Anticipate_Move;				// when targeting the player how far ahead can I predict where he will be....
 			0.0F,			// float	NetworkRange;					// how far from my net work do I Wander...
@@ -4113,9 +4113,9 @@ void KillUsedEnemy( ENEMY * Object )
 
 			if( Pickup != -1 )
 			{
-	   			Dir.x = Random_Jitter();
-	   			Dir.y = Random_Jitter();
-	   			Dir.z = Random_Jitter();
+				Dir.x = Random_Jitter();
+				Dir.y = Random_Jitter();
+				Dir.z = Random_Jitter();
 				NormaliseVector( &Dir );
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 				else LifeCount = -1.0F;
@@ -4127,9 +4127,9 @@ void KillUsedEnemy( ENEMY * Object )
 
 		if( ( Object->PickupHeld != INDEX_NONE ) && !( Object->Object.Flags & SHIP_Scattered ) )
 		{
-	   		Dir.x = Random_Jitter();
-	   		Dir.y = Random_Jitter();
-	   		Dir.z = Random_Jitter();
+			Dir.x = Random_Jitter();
+			Dir.y = Random_Jitter();
+			Dir.z = Random_Jitter();
 			NormaliseVector( &Dir );
 			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 			else LifeCount = -1.0F;
@@ -4462,9 +4462,9 @@ bool PreLoadEnemies( void )
 			 *                       despite the name)
 			 * Shade template = stealth FLY (CLOAK behaviour).  KEX
 			 * Ghost is just a regular flying enemy; clear the cloak
-             * flag and override primary to the new blue plasma
-             * weapon (matches KEX particle/pulsar_enemy_blue.particle:
-             * light_color={0,0,1}, blackColor1={0.25,0.25,1.0}). */
+			 * flag and override primary to the new blue plasma
+			 * weapon (matches KEX particle/pulsar_enemy_blue.particle:
+			 * light_color={0,0,1}, blackColor1={0.25,0.25,1.0}). */
 			EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
 			EnemyTypes[ ENEMY_Ghost ].ModelFilename = "n64\\ghost.mx";
 			EnemyTypes[ ENEMY_Ghost ].PrimaryWeaponType = NME_PULSAR_BLUE;
@@ -4491,7 +4491,7 @@ bool PreLoadEnemies( void )
 				for (_i = 0; _i < (int)(sizeof(_n64_ids)/sizeof(_n64_ids[0])); _i++) {
 					int _id = _n64_ids[_i];
 					if (EnemyTypes[_id].ModelFilename &&
-					    strchr(EnemyTypes[_id].ModelFilename, '\\') != NULL)
+						strchr(EnemyTypes[_id].ModelFilename, '\\') != NULL)
 					{
 						EnemyTypes[_id].StealthMode = false;
 					}
@@ -4555,13 +4555,13 @@ bool PreLoadEnemies( void )
 			 * substituted spawn looks visually wrong but the entity
 			 * exists for downstream code to find. */
 			if( ModelNum >= MAX_ENEMY_TYPES ||
-			    EnemyTypes[ ModelNum ].ModelFilename == NULL )
+				EnemyTypes[ ModelNum ].ModelFilename == NULL )
 			{
 				int j, fallback = -1;
 				for( j = 0; j < MAX_ENEMY_TYPES; j++ )
 				{
 					if( EnemyTypes[ j ].ModelFilename &&
-					    EnemyTypes[ j ].ModelFilename[ 0 ] )
+						EnemyTypes[ j ].ModelFilename[ 0 ] )
 					{ fallback = j; break; }
 				}
 				if( fallback < 0 ) continue;  /* nothing populated at all */
@@ -4786,13 +4786,13 @@ bool LoadEnemies( void )
 			 * with dangling references that crash on first tick
 			 * (defend2 Protect-Drone case). */
 			if( ModelNum >= MAX_ENEMY_TYPES ||
-			    EnemyTypes[ ModelNum ].ModelFilename == NULL )
+				EnemyTypes[ ModelNum ].ModelFilename == NULL )
 			{
 				int j, fallback = -1;
 				for( j = 0; j < MAX_ENEMY_TYPES; j++ )
 				{
 					if( EnemyTypes[ j ].ModelFilename &&
-					    EnemyTypes[ j ].ModelFilename[ 0 ] )
+						EnemyTypes[ j ].ModelFilename[ 0 ] )
 					{ fallback = j; break; }
 				}
 				if( fallback < 0 ) continue;
@@ -5700,7 +5700,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 				Models[ ModelIndex ].Rot.y = 0.0F;
 				Models[ ModelIndex ].Rot.z = 0.0F;
 				Models[ ModelIndex ].Quat = Enemy->Object.Quat;
-			   	Models[ ModelIndex ].Mat = Enemy->Object.Mat;
+				Models[ ModelIndex ].Mat = Enemy->Object.Mat;
 				Models[ ModelIndex ].InvMat = Enemy->Object.InvMat;
 
 				Models[ ModelIndex ].Func = MODFUNC_Nothing;
@@ -6450,25 +6450,25 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	{
 		Speed = Object->Speed.x * framelag;
 		ApplyMatrix( &Object->Mat, &SlideRight, &Move_Dir );			/* Calc Direction Vector */
-	   	Move_Off.x += ( Move_Dir.x * Speed );
-	   	Move_Off.y += ( Move_Dir.y * Speed );
-	   	Move_Off.z += ( Move_Dir.z * Speed );
+		Move_Off.x += ( Move_Dir.x * Speed );
+		Move_Off.y += ( Move_Dir.y * Speed );
+		Move_Off.z += ( Move_Dir.z * Speed );
 	}
 	if ( Object->Speed.y )
 	{
 		Speed = Object->Speed.y * framelag;
 		ApplyMatrix( &Object->Mat, &SlideUp, &Move_Dir );			/* Calc Direction Vector */
-	   	Move_Off.x += ( Move_Dir.x * Speed );
-	   	Move_Off.y += ( Move_Dir.y * Speed );
-	   	Move_Off.z += ( Move_Dir.z * Speed );
+		Move_Off.x += ( Move_Dir.x * Speed );
+		Move_Off.y += ( Move_Dir.y * Speed );
+		Move_Off.z += ( Move_Dir.z * Speed );
 	}
 	if ( Object->Speed.z )
 	{
 		Speed = Object->Speed.z * framelag;
 		ApplyMatrix( &Object->Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
-	   	Move_Off.x += ( Move_Dir.x * Speed );
-	   	Move_Off.y += ( Move_Dir.y * Speed );
-	   	Move_Off.z += ( Move_Dir.z * Speed );
+		Move_Off.x += ( Move_Dir.x * Speed );
+		Move_Off.y += ( Move_Dir.y * Speed );
+		Move_Off.z += ( Move_Dir.z * Speed );
 	}
 
 	// apply external and internal force vectors to ship movement
@@ -6705,7 +6705,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 					BuildRotMatrix( 0.0F, 0.0F, Object->Autolevel, &StepMat );
 					MatrixMultiply( &Object->Mat , &StepMat , &Object->Mat );
 				}
-			 	Enemy->ImInNodeTransition = true;
+				Enemy->ImInNodeTransition = true;
 			}else{
 				Enemy->PickNewNodeNow = true;
 			}
@@ -6752,7 +6752,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		{
 		bool _drone_waiting = false;
 		if( Enemy->Type == ENEMY_CargoDrone &&
-		    (TNode->Flags & 0x40) && !(TNode->Flags & 0x20) )
+			(TNode->Flags & 0x40) && !(TNode->Flags & 0x20) )
 		{
 			float _dx = Object->Pos.x - TNode->SolidPos.x;
 			float _dz = Object->Pos.z - TNode->SolidPos.z;
@@ -6800,7 +6800,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 						look_at.y = Object->Pos.y;
 						look_at.z = Object->Pos.z + fwd.z;
 						MakeViewMatrix( &Object->Pos, &look_at,
-						                &world_up, &Object->Mat );
+										&world_up, &Object->Mat );
 					}
 				}
 			}
@@ -6950,9 +6950,9 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		u_int16_t	GroundGroup;
 		NORMAL	GroundNormal;
 		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
-		                        &Object->Pos, Object->Group, &GroundOff,
-		                        &GroundPos, &GroundGroup, &GroundNormal,
-		                        &GroundNewTgt, false, NULL ) )
+								&Object->Pos, Object->Group, &GroundOff,
+								&GroundPos, &GroundGroup, &GroundNormal,
+								&GroundNewTgt, false, NULL ) )
 		{
 			Object->Pos.y = GroundPos.y + 75.0F;
 		}
@@ -7563,7 +7563,7 @@ bool Enemy2EnemyCollideSpecial( ENEMY * SEnemy , VECTOR * StartPos)
 {
 	ENEMY * TEnemy;
 	float Move_Length;
- 	float Move_Length2;
+	float Move_Length2;
 
 	TEnemy = FirstEnemyUsed;
 
@@ -8620,25 +8620,25 @@ void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
 	{
 		Speed = Object->Speed.x * framelag;
 		ApplyMatrix( &Object->Mat, &SlideRight, &Move_Dir );			/* Calc Direction Vector */
-	   	Move_Off.x += ( Move_Dir.x * Speed );
-	   	Move_Off.y += ( Move_Dir.y * Speed );
-	   	Move_Off.z += ( Move_Dir.z * Speed );
+		Move_Off.x += ( Move_Dir.x * Speed );
+		Move_Off.y += ( Move_Dir.y * Speed );
+		Move_Off.z += ( Move_Dir.z * Speed );
 	}
 	if ( Object->Speed.y )
 	{
 		Speed = Object->Speed.y * framelag;
 		ApplyMatrix( &Object->Mat, &SlideUp, &Move_Dir );			/* Calc Direction Vector */
-	   	Move_Off.x += ( Move_Dir.x * Speed );
-	   	Move_Off.y += ( Move_Dir.y * Speed );
-	   	Move_Off.z += ( Move_Dir.z * Speed );
+		Move_Off.x += ( Move_Dir.x * Speed );
+		Move_Off.y += ( Move_Dir.y * Speed );
+		Move_Off.z += ( Move_Dir.z * Speed );
 	}
 	if ( Object->Speed.z )
 	{
 		Speed = Object->Speed.z * framelag;
 		ApplyMatrix( &Object->Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
-	   	Move_Off.x += ( Move_Dir.x * Speed );
-	   	Move_Off.y += ( Move_Dir.y * Speed );
-	   	Move_Off.z += ( Move_Dir.z * Speed );
+		Move_Off.x += ( Move_Dir.x * Speed );
+		Move_Off.y += ( Move_Dir.y * Speed );
+		Move_Off.z += ( Move_Dir.z * Speed );
 	}
 
 	Object->Pos.x += Move_Off.x;
@@ -8887,7 +8887,7 @@ bool DamageEnemy( ENEMY * Enemy , float Damage , VECTOR * ImpactPoint , VECTOR *
 				break;
 			case 2:
 			case 3:
- 			case 4:
+			case 4:
 			default:
 				Enemy->Object.AI_Mode = AIMODE_DEATH_PINGOFF;
 				Enemy->Timer = PINGOFFTIME;

@@ -282,16 +282,16 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				return false;
 			}
 
-      if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount))
-      {
-        DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
-        return false;
-      }
-      if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Normals)))
-      {
-        Msg( "Mxload() normal lock failed in %s\n", Filename );
-        return false;
-      }
+	  if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount))
+	  {
+		DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
+		return false;
+	  }
+	  if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Normals)))
+	  {
+		Msg( "Mxload() normal lock failed in %s\n", Filename );
+		return false;
+	  }
 
 			/* Allocate this mesh's textureGroups[] from the TAG_LEVEL
 			 * hunk, sized to num_texture_groups. Bulk-freed via
@@ -299,12 +299,12 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			if ( num_texture_groups > 0 )
 			{
 				Mxloadheader->Group[group].renderObject[mesh].textureGroups =
-				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
-				                                num_texture_groups * sizeof(TEXTUREGROUP));
+					(TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
+												num_texture_groups * sizeof(TEXTUREGROUP));
 				if ( !Mxloadheader->Group[group].renderObject[mesh].textureGroups )
 				{
 					Msg( "Mxload() hunk-alloc failed for textureGroups[%u] %s\n",
-					     (unsigned)num_texture_groups, Filename );
+						 (unsigned)num_texture_groups, Filename );
 					return false;
 				}
 			}
@@ -410,11 +410,11 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				return false ;
 			}
 
-      if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
-      {
-        Msg( "Mxload() normal unlock failed in %s\n", Filename );
-        return false ;
-      }
+	  if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
+	  {
+		Msg( "Mxload() normal unlock failed in %s\n", Filename );
+		return false ;
+	  }
 
 			Mxloadheader->Group[group].renderObject[mesh].numTextureGroups = num_texture_groups;
 
@@ -663,7 +663,7 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 	int		group;
 	RENDERMATRIX Matrix;
 	bool	Display;
-    LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = NULL;
 	LVERTEX	*LVert = NULL;
 	POLYANIM * PolyAnim;
 	u_int32_t * u_int32Pnt;
@@ -834,16 +834,16 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 void
 ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 {
-    int i,e;
-    int group;
+	int i,e;
+	int group;
 	POLYANIM * PolyAnim;
 
 	if ( !Mxloadheader->state )
 		return;
 
-    for (group = 0; group < Mxloadheader->num_groups; group++)
+	for (group = 0; group < Mxloadheader->num_groups; group++)
 	{
-	    for (i = 0; i < Mxloadheader->Group[group].num_meshes; i++)
+		for (i = 0; i < Mxloadheader->Group[group].num_meshes; i++)
 		{
 
 			FSReleaseRenderObject(&Mxloadheader->Group[group].renderObject[i]);
@@ -869,22 +869,22 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 				for( e = 0 ; e < Mxloadheader->Group[group].num_animating_polys[i] ; e++ )
 				{
 
-				   	if( PolyAnim )
-				   	{
-				   		if( PolyAnim->vert )
-				   		{
-				   			free( PolyAnim->vert );
-				   			PolyAnim->vert = NULL;
-				   		}
-				   		if( PolyAnim->UVs )
-				   		{
-				   			free( PolyAnim->UVs );
-				   			PolyAnim->UVs = NULL;
-				   		}
-				   	}
+					if( PolyAnim )
+					{
+						if( PolyAnim->vert )
+						{
+							free( PolyAnim->vert );
+							PolyAnim->vert = NULL;
+						}
+						if( PolyAnim->UVs )
+						{
+							free( PolyAnim->UVs );
+							PolyAnim->UVs = NULL;
+						}
+					}
 					PolyAnim++;
 				}
-		   		free(Mxloadheader->Group[group].polyanim[i]);
+				free(Mxloadheader->Group[group].polyanim[i]);
 				Mxloadheader->Group[group].polyanim[i] = NULL;
 			}
 		}
@@ -1101,7 +1101,7 @@ void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  )
 					}
 
 				}
-   				PolyAnim++;
+				PolyAnim++;
 			}
 		}
 	}

@@ -50,7 +50,7 @@ render_info_t render_info;
 
 static bool parse_chdir( char *cli )
 {
-    char * option;
+	char * option;
 	char cmdline[256];
 	size_t size;
 
@@ -64,7 +64,7 @@ static bool parse_chdir( char *cli )
 
 	option = strtok(cmdline, " -+'\"");
 
-    while(option != NULL )
+	while(option != NULL )
 	{
 		// WARNING:	chdir can only be the LAST option !
 		// For running the binary from outside the game folder:
@@ -95,7 +95,7 @@ static bool parse_chdir( char *cli )
 			break;
 		}
 		// get the next token
-        option = strtok(NULL, " -+'\"");
+		option = strtok(NULL, " -+'\"");
 	}
 
 	return true;
@@ -133,13 +133,13 @@ static bool ParseCommandLine(char* args)
 	//  Locals
 	//
 
-    char * option;
+	char * option;
 	char cmdline[256];
 	size_t size;
 
-    //
-    //  Set Global Defaults
-    //
+	//
+	//  Set Global Defaults
+	//
 
 	NoSFX					= false; // turns off sound
 	Debug					= false; // turns it off now
@@ -165,7 +165,7 @@ static bool ParseCommandLine(char* args)
 	option = strtok(cmdline, " -+'\"");
 
 	// loop over every option
-    while(option != NULL )
+	while(option != NULL )
 	{
 
 		// last option
@@ -186,15 +186,15 @@ static bool ParseCommandLine(char* args)
 		}
 
 		// debugging information send to Log...
-        else if (!strcasecmp(option, "log"))
+		else if (!strcasecmp(option, "log"))
 		{
-            DebugLog = true;
+			DebugLog = true;
 		}
 
 		// debugging information
-        else if (!strcasecmp(option, "Debug"))
+		else if (!strcasecmp(option, "Debug"))
 		{
-            Debug = true;
+			Debug = true;
 		}
 
 		// start in fullscreen mode
@@ -213,7 +213,7 @@ static bool ParseCommandLine(char* args)
 		else if (!strcasecmp(option, "NoSFX"))
 		{
 			NoSFX = true;
-        }
+		}
 
 		// jump to the host screen
 		else if ( !strcasecmp( option, "QuickHost" ) )
@@ -236,7 +236,7 @@ static bool ParseCommandLine(char* args)
 			IpOnCLI = true;
 
 			// extract the address
-	        option = strtok(NULL, " ");
+			option = strtok(NULL, " ");
 			strcpy( address, option );
 
 			// try to find a port in the address
@@ -261,8 +261,8 @@ static bool ParseCommandLine(char* args)
 		// sets render_info.wireframe (no renderer reads it)
 		else if (!strcasecmp(option, "wireframe"))
 		{
-            render_info.wireframe = true;
-        }
+			render_info.wireframe = true;
+		}
 
 		// special override to allow setting up of spaceorb
 		else if ( !strcasecmp( option, "SetupSpaceOrb" ) )
@@ -315,12 +315,12 @@ static bool ParseCommandLine(char* args)
 			else {
 				DebugPrintf("cli: unknown option: %s\n",option);
 			}
-        }
+		}
 
 		// get the next token
-        option = strtok(NULL, " -+'\"");
+		option = strtok(NULL, " -+'\"");
 
-    }
+	}
 
 	return true;
 }
@@ -342,7 +342,7 @@ void CleanUpAndPostQuit(void)
 	_cleaned = true;
 
 	// kill stuff
-    ReleaseView();
+	ReleaseView();
 
 	// stop rendering and destroy objects
 	render_cleanup( &render_info );
@@ -357,7 +357,7 @@ void CleanUpAndPostQuit(void)
 	ReleaseScene();
 
 	// set flag
-    QuitRequested = true;
+	QuitRequested = true;
 
 	// we dont control the cursor anymore
 	input_grab( false );
@@ -493,8 +493,8 @@ static bool AppInit( char * args )
 	// load the view
 	if (!InitView() )
 	{
-	    Msg("InitView failed.\n");
-        return false;
+		Msg("InitView failed.\n");
+		return false;
 	}
 
 	// exclusively grab input in fullscreen mode
@@ -505,7 +505,7 @@ static bool AppInit( char * args )
 
 	// done
 	DebugPrintf("AppInit finished...\n");
-    return true;
+	return true;
 
 }
 
@@ -515,15 +515,15 @@ static bool AppInit( char * args )
 
 static bool RenderLoop()
 {
-    if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
+	if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
 		return true;
 
-    // run one game frame (game logic + draw) for the current status
-    if (!RenderScene())
+	// run one game frame (game logic + draw) for the current status
+	if (!RenderScene())
 	{
-        Msg("RenderScene failed.\n");
-        return false;
-    }
+		Msg("RenderScene failed.\n");
+		return false;
+	}
 
 	if ( quitting )
 	{
@@ -531,7 +531,7 @@ static bool RenderLoop()
 		CleanUpAndPostQuit();
 	}
 
-    // present the frame
+	// present the frame
 	if( !QuitRequested )
 	{
 		{
@@ -547,7 +547,7 @@ static bool RenderLoop()
 	}
 
 	//
-    return true;
+	return true;
 }
 
 //
@@ -573,7 +573,7 @@ int main( int argc, char* argv[] )
 #endif
 	int i;
 	char cli[500];
-    int failcount = 0; // number of times RenderLoop has failed
+	int failcount = 0; // number of times RenderLoop has failed
 
 	// build cli string
 	// TODO - cli parsing should be updated
@@ -590,8 +590,8 @@ int main( int argc, char* argv[] )
 	}
 	DebugPrintf("cli: %s\n",cli);
 
-    // Create the window and initialize all objects needed to begin rendering
-    if(!AppInit(cli))
+	// Create the window and initialize all objects needed to begin rendering
+	if(!AppInit(cli))
 		goto FAILURE;
 
 #ifdef __3DS__
@@ -610,11 +610,11 @@ int main( int argc, char* argv[] )
 		if(!handle_events())
 			goto FAILURE;
 
-        // Attempt to render a frame, if it fails, take a note.  If
-        // rendering fails more than twice, abort execution.
-        if( !RenderLoop() )
+		// Attempt to render a frame, if it fails, take a note.  If
+		// rendering fails more than twice, abort execution.
+		if( !RenderLoop() )
 		{
-            ++failcount;
+			++failcount;
 
 			if( SeriousError )
 			{
@@ -628,7 +628,7 @@ int main( int argc, char* argv[] )
 				break;
 			}
 
-        }
+		}
 
 #ifdef __3DS__
 		// no-op on both targets: a 3DS worker thread refills the music stream

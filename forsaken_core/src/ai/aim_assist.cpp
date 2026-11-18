@@ -102,9 +102,9 @@ static bool weapon_is_assisted( int8_t w )
 /* Try a candidate target. Returns true if accepted (and updates
  * best_cos + sets *out_dir + *out_dist). */
 static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
-                             u_int16_t /*bullet_group*/,
-                             const VECTOR *target_pos, u_int16_t target_group,
-                             float *best_cos, VECTOR *out_target_dir, float *out_dist )
+							 u_int16_t /*bullet_group*/,
+							 const VECTOR *target_pos, u_int16_t target_group,
+							 float *best_cos, VECTOR *out_target_dir, float *out_dist )
 {
 	VECTOR dir_to_target;
 	VECTOR norm;
@@ -117,8 +117,8 @@ static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
 	dir_to_target.z = target_pos->z - bullet_pos->z;
 
 	dist_sq = dir_to_target.x*dir_to_target.x
-	        + dir_to_target.y*dir_to_target.y
-	        + dir_to_target.z*dir_to_target.z;
+			+ dir_to_target.y*dir_to_target.y
+			+ dir_to_target.z*dir_to_target.z;
 
 	/* Skip targets past max range — falloff would zero them anyway */
 	if( dist_sq >= AIM_ASSIST_FAR_RANGE * AIM_ASSIST_FAR_RANGE )
@@ -150,7 +150,7 @@ static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
 /* ─── Public entry ──────────────────────────────────────────────── */
 
 bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
-                       u_int16_t bullet_group, int8_t weapon )
+					   u_int16_t bullet_group, int8_t weapon )
 {
 	float strength;
 	float best_cos;
@@ -186,8 +186,8 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 		if( enemy->Status & ENEMY_STATUS_Enable )
 		{
 			if( consider_target( bullet_pos, bullet_dir, bullet_group,
-			                     &enemy->Object.Pos, enemy->Object.Group,
-			                     &best_cos, &target_dir, &target_dist ) )
+								 &enemy->Object.Pos, enemy->Object.Group,
+								 &best_cos, &target_dir, &target_dist ) )
 			{
 				found_any = true;
 			}
@@ -202,11 +202,11 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 		if( !Ships[ship_idx].enable ) continue;
 		if( Ships[ship_idx].Object.Mode == LIMBO_MODE ) continue;
 		if( !( GameStatus[ship_idx] == STATUS_Normal ||
-		       GameStatus[ship_idx] == STATUS_SinglePlayer ) ) continue;
+			   GameStatus[ship_idx] == STATUS_SinglePlayer ) ) continue;
 
 		if( consider_target( bullet_pos, bullet_dir, bullet_group,
-		                     &Ships[ship_idx].Object.Pos, Ships[ship_idx].Object.Group,
-		                     &best_cos, &target_dir, &target_dist ) )
+							 &Ships[ship_idx].Object.Pos, Ships[ship_idx].Object.Group,
+							 &best_cos, &target_dir, &target_dist ) )
 		{
 			found_any = true;
 		}
@@ -220,7 +220,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 	ray_dir.y = target_dir.y * target_dist;
 	ray_dir.z = target_dir.z * target_dist;
 	if( BackgroundCollide( &MCloadheadert0, &Mloadheader, bullet_pos, bullet_group,
-	                       &ray_dir, &int_pt, &int_grp, &int_norm, &tmp, true, NULL ) )
+						   &ray_dir, &int_pt, &int_grp, &int_norm, &tmp, true, NULL ) )
 	{
 		/* Wall between bullet and target — don't assist through walls */
 		return false;
@@ -233,7 +233,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 
 	/* Effective per-frame turn = base × falloff × user strength */
 	turn_rad = (AIM_ASSIST_TURN_RATE_DEG * (3.14159265F / 180.0F))
-	         * falloff * strength;
+			 * falloff * strength;
 
 	/* How far off is the bullet from the target direction? */
 	{

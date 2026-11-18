@@ -22,16 +22,16 @@ constexpr int PXMPVINT = 118;
 
 // revision; override with -DPXRV=... (neither Makefile sets it)
 #ifndef PXRV
-    #define PXRV	 "0"
+	#define PXRV	 "0"
 #endif
 
 // tag name so we know what type of build this is
 #ifndef PXBV
-    #ifdef __3DS__
-        #define PXBV  "3DS"
-    #else
-        #define PXBV  "LINUX"
-    #endif
+	#ifdef __3DS__
+		#define PXBV  "3DS"
+	#else
+		#define PXBV  "LINUX"
+	#endif
 #endif
 
 // architecture: "64" for every non-3DS build

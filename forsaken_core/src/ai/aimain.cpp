@@ -32,7 +32,7 @@ void (* AI_AIR_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,
 	AI_AIR_FOLLOWPATH,								// Follow Path..
 	AI_AIR_IDLE,
-   	AI_AIR_SCAN,
+	AI_AIR_SCAN,
 	AI_AIR_MOVETOTARGET,
 	NULL,											//FIREATTARGET,
 	AI_AIR_DOGFIGHT,								//AIMODE_DOGFIGHT
@@ -56,7 +56,7 @@ void (* AI_TURRET_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,
 	NULL,											// Follow Path..
 	AI_TURRET_IDLE,
-   	AI_TURRET_SCAN,
+	AI_TURRET_SCAN,
 	NULL,											//MOVETOTARGET,
 	AI_TURRET_FIREATTARGET,
 	NULL,											//AIMODE_DOGFIGHT
@@ -71,7 +71,7 @@ void (* AI_CRAWL_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,
 	AI_CRAWL_FOLLOWPATH,							// Follow Path..
 	AI_CRAWL_IDLE,
-   	AI_CRAWL_SCAN,
+	AI_CRAWL_SCAN,
 	NULL,											//MOVETOTARGET,
 	NULL,											//FIREATTARGET,
 	NULL,											//AIMODE_DOGFIGHT
@@ -85,7 +85,7 @@ void (* AI_SPLINE_Mode[ ])( ENEMY * Enemy ) = {
 	AI_SPLINE_FOLLOWPATH,//NULL,
 	AI_SPLINE_FOLLOWPATH,//NULL,											//AIMODE_FOLLOWPATH
 	AI_SPLINE_FOLLOWPATH,//NULL,											//AIMODE_IDLE
-   	AI_SPLINE_FOLLOWPATH,//NULL,											//AIMODE_SCAN
+	AI_SPLINE_FOLLOWPATH,//NULL,											//AIMODE_SCAN
 	AI_SPLINE_FOLLOWPATH,//NULL,											//AIMODE_MOVETOTARGET
 	AI_SPLINE_FOLLOWPATH,//NULL,											//AIMODE_FIREATTARGET
 	AI_SPLINE_FOLLOWPATH,//NULL,											//AIMODE_DOGFIGHT
@@ -352,7 +352,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 	if ( EnemyTypes[Enemy->Type].Behave.ThinkRange == 0.0F )
 		return;
 
- 	// Are any Players in Range???
+	// Are any Players in Range???
 	for( i = 0 ; i < MAX_PLAYERS ; i++ )
 	{
 		if( Ships[i].enable )

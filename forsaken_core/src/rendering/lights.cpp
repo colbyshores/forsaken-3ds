@@ -185,7 +185,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	float	distance;
 	int		mesh;
 	int		vert;
-    LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = NULL;
 	LVERTEX	*LVert = NULL;
 	LVERTEX	*OrigLVert = NULL;
 	COLOR col;
@@ -426,7 +426,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						 * above for the rationale. */
 						LVert->color = RGBA_MAKE( r ,g ,b , orig_a );
 					}else{
-  						LVert->color = OrigLVert->color;
+						LVert->color = OrigLVert->color;
 					}
 					LVert++;
 					OrigLVert++;
@@ -557,7 +557,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 								{
 									Cell = ( CellIndex_x + NumOfxCells *
 										   ( Celly + NumOfyCells *
-										     Cellz ) );
+											 Cellz ) );
 									Cellx = CellRange_x - CellIndex_x + 1;
 
 									while( Cellx-- )
@@ -612,8 +612,8 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 								while( Celly <= CellRange_y )
 								{
 									Cell = (u_int16_t) ( CellIndex_x + NumOfxCells *
-										            ( Celly + NumOfyCells *
-										              Cellz ) );
+													( Celly + NumOfyCells *
+													  Cellz ) );
 									Cellx = CellRange_x - CellIndex_x + 1;
 
 									while( Cellx-- )
@@ -731,7 +731,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	int		group;
 	int		mesh;
 	int		vert;
-    LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = NULL;
 
 	LVERTEX	*LVert = NULL;
 	LVERTEX	*OrigLVert = NULL;
@@ -967,7 +967,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	int		group;
 	int		mesh;
 	int		vert;
-    LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = NULL;
 
 	LVERTEX	*LVert = NULL;
 	LVERTEX	*OrigLVert = NULL;

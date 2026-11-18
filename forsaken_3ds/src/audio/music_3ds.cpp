@@ -51,7 +51,7 @@ constexpr int NUM_WAVEBUFS      = 4;                        /* deep queue (~2 s 
  * Used in state-only mode to track the end-of-buffer predictor
  * context the hardware decoder will have reached. */
 void adpcm_advance(const u_int8_t *frames, u_int32_t num_frames,
-                   const u_int16_t *coefs, ndspAdpcmData *ctx)
+				   const u_int16_t *coefs, ndspAdpcmData *ctx)
 {
 	dsp_state_t st;
 	st.hist1 = (int16_t)ctx->history0;
@@ -295,7 +295,7 @@ bool MusicStream::init()
 	LightLock_Init(&lock);
 	thread_exit = false;
 	thread = threadCreate(thread_entry, this,
-	                      16 * 1024, 0x28, -2, false);
+						  16 * 1024, 0x28, -2, false);
 	if (!thread)
 		DebugPrintf("music: WARNING threadCreate failed\n");
 

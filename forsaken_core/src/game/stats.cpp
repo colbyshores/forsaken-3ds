@@ -124,8 +124,8 @@ void ResetAllStats()
 		KillCounter[x] = 0;
 	}
 
-    LevelTimeTaken = 0.0F;
-    timer_clear( &level_timer );
+	LevelTimeTaken = 0.0F;
+	timer_clear( &level_timer );
 }
 
 

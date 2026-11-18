@@ -230,10 +230,10 @@ int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
 
 	State machine lives in two functions called from the engine:
 	  controls_3ds_render_overlay() runs per-frame from the bottom-
-	    screen draw block (oct2.cpp), emits text via Print4x5Text.
+		screen draw block (oct2.cpp), emits text via Print4x5Text.
 	  controls_3ds_handle_input() runs at the top of handle_events,
-	    consumes navigation/rebind input. Returns true to suppress
-	    normal input propagation while menu is up.
+		consumes navigation/rebind input. Returns true to suppress
+		normal input propagation while menu is up.
 	No modal loop, no consoleInit, no DisplayTransfer dance.
 ===================================================================*/
 
@@ -304,9 +304,9 @@ void controls_3ds_render_overlay(void)
 		int color = (i == s_selected) ? FG_HL : FG;
 		char line[64];
 		snprintf(line, sizeof(line), "%s %-15s %s",
-		         (i == s_selected) ? ">" : " ",
-		         k_action_labels[i],
-		         button_name(s_controls.button[i]));
+				 (i == s_selected) ? ">" : " ",
+				 k_action_labels[i],
+				 button_name(s_controls.button[i]));
 		Print4x5Text(line, 8, y, color);
 		y += 10;
 	}
@@ -317,19 +317,19 @@ void controls_3ds_render_overlay(void)
 		int pct = (int)(aim_assist_current() * 100.0F + 0.5F);
 		int color = (s_selected == ROW_AIM_ASSIST) ? FG_HL : FG;
 		snprintf(line, sizeof(line), "%s %-15s <%3d%%>",
-		         (s_selected == ROW_AIM_ASSIST) ? ">" : " ",
-		         "Aim Assist",
-		         pct);
+				 (s_selected == ROW_AIM_ASSIST) ? ">" : " ",
+				 "Aim Assist",
+				 pct);
 		Print4x5Text(line, 8, y, color);
 		y += 10;
 	}
 
 	Print4x5Text((s_selected == ROW_RESET)  ? "> [RESET TO DEFAULT]" : "  [RESET TO DEFAULT]",
-	             8, y, (s_selected == ROW_RESET) ? FG_HL : FG); y += 10;
+				 8, y, (s_selected == ROW_RESET) ? FG_HL : FG); y += 10;
 	Print4x5Text((s_selected == ROW_SAVE)   ? "> [SAVE & EXIT]" : "  [SAVE & EXIT]",
-	             8, y, (s_selected == ROW_SAVE) ? FG_HL : FG); y += 10;
+				 8, y, (s_selected == ROW_SAVE) ? FG_HL : FG); y += 10;
 	Print4x5Text((s_selected == ROW_CANCEL) ? "> [CANCEL]"      : "  [CANCEL]",
-	             8, y, (s_selected == ROW_CANCEL) ? FG_HL : FG);
+				 8, y, (s_selected == ROW_CANCEL) ? FG_HL : FG);
 }
 
 bool controls_3ds_handle_input(u32 kDown, u32 kHeld)

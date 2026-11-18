@@ -36,7 +36,7 @@ void InitLines( void )
 		Lines[i].StartPos.y = 0.0F;
 		Lines[i].StartPos.z = 0.0F;
 		Lines[i].EndPos.x = 0.0F;
-    	Lines[i].EndPos.y = 0.0F;
+		Lines[i].EndPos.y = 0.0F;
 		Lines[i].EndPos.z = 0.0F;
 		Lines[i].StartCol.R = 0;
 		Lines[i].StartCol.G = 0;
@@ -143,7 +143,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 			if( Lines[ i ].Group == Group )
 			{
 				color = RGBA_MAKE( Lines[ i ].StartCol.R, Lines[ i ].StartCol.G,
-						      Lines[ i ].StartCol.B, Lines[ i ].StartTrans );
+							  Lines[ i ].StartCol.B, Lines[ i ].StartTrans );
 
 				Vert_Ptr->x = Lines[ i ].StartPos.x;
 				Vert_Ptr->y = Lines[ i ].StartPos.y;
@@ -154,7 +154,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 				Vert_Ptr++;
 
 				color = RGBA_MAKE( Lines[ i ].EndCol.R, Lines[ i ].EndCol.G,
-						      Lines[ i ].EndCol.B, Lines[ i ].EndTrans );
+							  Lines[ i ].EndCol.B, Lines[ i ].EndTrans );
 
 				Vert_Ptr->x = Lines[ i ].EndPos.x;
 				Vert_Ptr->y = Lines[ i ].EndPos.y;

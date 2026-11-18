@@ -236,7 +236,7 @@ void	FireSecondary(void);
 void	ProcessSecondaryBullets( void );
 void	CleanUpSecBull( u_int16_t i );
 u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_int16_t Group,
-					    VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
+						VECTOR * Pos, VECTOR * Offset, VECTOR * Dir, VECTOR * UpVector,
 						VECTOR * DropDir, int8_t Weapon, bool NetFlag );
 bool	PointToSphere(	VERT * TargPos, float TargRadius, VERT * BulPos );
 void	CreateExplosion( VECTOR * Pos, u_int16_t Group );

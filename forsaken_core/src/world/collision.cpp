@@ -102,8 +102,8 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 
 
 	Num = ( ( Origin.x * normal->x ) +
-		    ( Origin.y * normal->y ) +
-		    ( Origin.z * normal->z ) ) + offset;
+			( Origin.y * normal->y ) +
+			( Origin.z * normal->z ) ) + offset;
 
 	t = -( Num / Div );
 
@@ -254,7 +254,7 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 					}
 					else
 					{
-	 					*EndGroup = group;
+						*EndGroup = group;
 					}
 				}
 				else

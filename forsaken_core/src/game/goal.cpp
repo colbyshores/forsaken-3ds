@@ -186,20 +186,20 @@ static void GoalCheck( VECTOR * OldPos , VECTOR * NewPos , GOAL * goal )
 	In = false;
 	if( goal->type == ZONE_Sphere )
 	{
-   		OldIn = DistanceVector2Vector( &goal->pos , OldPos ) < goal->half_size.x;
-   		NewIn = DistanceVector2Vector( &goal->pos , NewPos ) < goal->half_size.x;
+		OldIn = DistanceVector2Vector( &goal->pos , OldPos ) < goal->half_size.x;
+		NewIn = DistanceVector2Vector( &goal->pos , NewPos ) < goal->half_size.x;
 
-   		if( !OldIn && NewIn )
-   			Entry = true;
-   		if( OldIn && !NewIn )
-   			Exit = true;
-   		if( OldIn && NewIn )
-   		{
-   			In = true;
-   		}
-   	}else{
-   		RayToHull( goal->Zone , OldPos , NewPos , goal->num_sides );
-   	}
+		if( !OldIn && NewIn )
+			Entry = true;
+		if( OldIn && !NewIn )
+			Exit = true;
+		if( OldIn && NewIn )
+		{
+			In = true;
+		}
+	}else{
+		RayToHull( goal->Zone , OldPos , NewPos , goal->num_sides );
+	}
 }
 
 GOAL *TeamGoal( int team )

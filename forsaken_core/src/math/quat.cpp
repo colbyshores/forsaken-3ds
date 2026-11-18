@@ -13,8 +13,8 @@
 
 void QUAT::MakeEuler( float XRot, float YRot, float ZRot )
 {
-    float  cosZRot, sinZRot, cosYRot, sinYRot, cosXRot, sinXRot;
-    float  half_XRot, half_YRot, half_ZRot;
+	float  cosZRot, sinZRot, cosYRot, sinYRot, cosXRot, sinXRot;
+	float  half_XRot, half_YRot, half_ZRot;
 	/* put angles into radians and divide by two, since all angles in formula
 	 *  are (angle/2)
 	 */
@@ -166,7 +166,7 @@ void QUATLERP::Step()
 	end	   =	&this->end;
 	result =	crnt;
 
-  	beta   =	( 1.0F - alpha );
+	beta   =	( 1.0F - alpha );
 
 /*===================================================================
 	Check which direction we are going around hypersphere ...
@@ -268,7 +268,7 @@ void QUAT::FromVector2( VECTOR * Tv )
 
 /*===================================================================
 	Procedure	:		create a quaternion from two vectors that rotates
-    	    	     	v1 to v2 about an axis perpendicular to both
+						v1 to v2 about an axis perpendicular to both
 	Input		:		VECTOR * v1
 				:		VECTOR * v2
 	Output		:	Nothing (operates on this)
@@ -359,16 +359,16 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 
 /*===================================================================
 	Procedure	:		make a quaternion given an axis and an angle (in radians)
-				    	notes:
-					    - rotation is counter-clockwise when rotation axis vector is
-					    	pointing at you
-				    	    - if angle or vector are 0, the identity quaternion is returned.
+						notes:
+						- rotation is counter-clockwise when rotation axis vector is
+							pointing at you
+							- if angle or vector are 0, the identity quaternion is returned.
 	Input		:		float x , y , z , angle
 	Output		:	Nothing (operates on this)
 ===================================================================*/
 void QUAT::MakeAxis( float x, float y, float z, float angle)
 {
-    float cosA, sinA;
+	float cosA, sinA;
 	/* normalize vector */
 	{
 		float dot = x*x + y*y + z*z;

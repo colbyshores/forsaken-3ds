@@ -670,7 +670,7 @@ void EVENT_TeleportDisable( u_int8_t * Data )
 /*===================================================================
 	KEX event 25 = NodeEnable.  Verified via Ghidra decompile of
 	kexForsakenNodeManager::EnableNode @ 0x697020:
-	    node->flags &= 0xffdf;  (clears the 0x20 disabled bit)
+		node->flags &= 0xffdf;  (clears the 0x20 disabled bit)
 
 	The .trg file's "TRIGGEREVENT_EnemySetTargetNode" name is
 	misleading — KEX uses this event to enable a node in the AI
@@ -700,7 +700,7 @@ void EVENT_EnemySetTargetNode( u_int8_t * Data )
 /*===================================================================
 	KEX event 26 = NodeDisable.  Verified via Ghidra decompile of
 	kexForsakenNodeManager::DisableNode @ 0x697070:
-	    node->flags |= 0x20;  (sets the disabled bit)
+		node->flags |= 0x20;  (sets the disabled bit)
 
 	Paired with NodeEnable on the next wait/top in the same lift's
 	post-anim trigger conditions.
@@ -739,7 +739,7 @@ bool Triggerload( char * Filename )
 	TRIGGERVAR	*	TVpnt;
 
 
-  	NumOfTrigVars = 0;
+	NumOfTrigVars = 0;
 	NumOfTriggers = 0;
 	NumOfTrigMods = 0;
 	NumOfTrigModQues = 0;

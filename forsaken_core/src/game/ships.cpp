@@ -803,11 +803,11 @@ bool ProcessShips()
 					}
 
 					AccellDecell( &ShipObjPnt->Angle.y , TurnDecell );
-			 		AccellDecell( &ShipObjPnt->Angle.x , TurnDecell );
-			 		AccellDecell( &ShipObjPnt->Angle.z , RollDecell );
+					AccellDecell( &ShipObjPnt->Angle.x , TurnDecell );
+					AccellDecell( &ShipObjPnt->Angle.z , RollDecell );
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					ShipObjPnt->Autolevel = AutoLevelRot( i, AutoLevel * player_config->autolevel_rate * framelag );
-			 		AccellDecell( &ShipObjPnt->Bank , BankDecell );
+					AccellDecell( &ShipObjPnt->Bank , BankDecell );
 					AccellDecell( &ShipObjPnt->Speed.x , MoveDecell );
 					AccellDecell( &ShipObjPnt->Speed.y , MoveDecell );
 
@@ -862,26 +862,26 @@ bool ProcessShips()
 						Speed = ShipObjPnt->Speed.x * framelag;
 						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						ApplyMatrix( &ShipObjPnt->Mat, &SlideRight, &Move_Dir );			/* Calc Direction Vector */
-				   		Move_Off.x += ( Move_Dir.x * Speed );
-				   		Move_Off.y += ( Move_Dir.y * Speed );
-				   		Move_Off.z += ( Move_Dir.z * Speed );
+						Move_Off.x += ( Move_Dir.x * Speed );
+						Move_Off.y += ( Move_Dir.y * Speed );
+						Move_Off.z += ( Move_Dir.z * Speed );
 					}
 					if ( ShipObjPnt->Speed.y )
 					{
 						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						Speed = ShipObjPnt->Speed.y * framelag;
 						ApplyMatrix( &ShipObjPnt->Mat, &SlideUp, &Move_Dir );			/* Calc Direction Vector */
-				   		Move_Off.x += ( Move_Dir.x * Speed );
-				   		Move_Off.y += ( Move_Dir.y * Speed );
-				   		Move_Off.z += ( Move_Dir.z * Speed );
+						Move_Off.x += ( Move_Dir.x * Speed );
+						Move_Off.y += ( Move_Dir.y * Speed );
+						Move_Off.z += ( Move_Dir.z * Speed );
 					}
 					if ( ShipObjPnt->Speed.z )
 					{
 						Speed = ShipObjPnt->Speed.z * framelag;
 						ApplyMatrix( &ShipObjPnt->Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
-				   		Move_Off.x += ( Move_Dir.x * Speed );
-				   		Move_Off.y += ( Move_Dir.y * Speed );
-				   		Move_Off.z += ( Move_Dir.z * Speed );
+						Move_Off.x += ( Move_Dir.x * Speed );
+						Move_Off.y += ( Move_Dir.y * Speed );
+						Move_Off.z += ( Move_Dir.z * Speed );
 					}
 
 					// apply external and internal force vectors to ship movement
@@ -1198,8 +1198,8 @@ bool ProcessShips()
 									AccellDecell( &ShipPnt->Move_Off.y , MoveDecell );
 									AccellDecell( &ShipPnt->Move_Off.z , MoveDecell );
 									AccellDecell( &ShipPnt->LastAngle.y , TurnDecell );
-				 					AccellDecell( &ShipPnt->LastAngle.x , TurnDecell );
-				 					AccellDecell( &ShipPnt->LastAngle.z , RollDecell );
+									AccellDecell( &ShipPnt->LastAngle.x , TurnDecell );
+									AccellDecell( &ShipPnt->LastAngle.z , RollDecell );
 								}
 						}
 
@@ -2218,7 +2218,7 @@ void WatchMode5( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 ===================================================================*/
 void Process_Remote_Camera( void )
 {
- 	( * RemoteCameraModeControl[ Ships[MAX_PLAYERS].Object.Mode ] )( &Ships[MAX_PLAYERS] , MAX_PLAYERS );		//go off and do his thing...
+	( * RemoteCameraModeControl[ Ships[MAX_PLAYERS].Object.Mode ] )( &Ships[MAX_PLAYERS] , MAX_PLAYERS );		//go off and do his thing...
 }
 
 /*===================================================================
@@ -2258,7 +2258,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		if ( Ships[WhoIAm].Object.Group != INDEX_NONE )
 		{
 			if( BackgroundCollide( &MCloadheadert0, &Mloadheader,
-   										&Ships[WhoIAm].Object.Pos, Ships[WhoIAm].Object.Group, &Move_Dir,
+										&Ships[WhoIAm].Object.Pos, Ships[WhoIAm].Object.Group, &Move_Dir,
 										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, NULL ) == true )
 			{
 				ShipPnt->Object.Pos.x = ImpactPoint.x;
@@ -2282,8 +2282,8 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		if ( Ships[WhoIAm].Object.Group != INDEX_NONE )
 		{
 			while ( BackgroundCollide( &MCloadheader, &Mloadheader,
-   										&temp, ImpactGroup, &Move_Dir,
-   										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, NULL ) )
+										&temp, ImpactGroup, &Move_Dir,
+										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, NULL ) )
 			{
 				temp = ImpactPoint;
 				Move_Dir.x = Pos_New.x - temp.x;

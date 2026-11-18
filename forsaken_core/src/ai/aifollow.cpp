@@ -254,7 +254,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 			 * fires.  The trigger that opens the barrier sets a new TNode
 			 * (not 0x40) and re-fires PickNewNodeNow. */
 			if( Enemy->Type == ENEMY_CargoDrone &&
-			    TNode && (TNode->Flags & 0x40) && !(TNode->Flags & 0x20) )
+				TNode && (TNode->Flags & 0x40) && !(TNode->Flags & 0x20) )
 			{
 				/* Pre-fetch NextTNode so slope/aim code has it, but keep TNode. */
 				if( !Enemy->NextTNode )

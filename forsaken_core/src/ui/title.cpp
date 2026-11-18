@@ -1266,7 +1266,7 @@ MENU	MENU_NEW_SetupJoystick = {
 		(u_int8_t*)LT_MENU_NEW_SetupJoystick1 /*"joystick list"*/, FONT_Small,
 		TEXTFLAG_SuppressHighlight | TEXTFLAG_CentreY | TEXTFLAG_ForceFit |
 		TEXTFLAG_AutoSelect,
-        &JoystickList, (void*)SelectConfigureAxisMenu, SelectList, DrawFlatMenuList, NULL, 0  },
+		&JoystickList, (void*)SelectConfigureAxisMenu, SelectList, DrawFlatMenuList, NULL, 0  },
 
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
@@ -2386,9 +2386,9 @@ MENU	MENU_Options = {
 		{ 200, 272, 0, 0, 0, (u_int8_t*)"HUD Show Clock",	0, 0, &ShowClockOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
 		{ 200, 288, 0, 0, 0, (u_int8_t*)"HUD Show KPM",	0, 0, &ShowKPMOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
 		{ 200, 304, 0, 0, 0, (u_int8_t*)"HUD Show Speed",	0, 0, &ShowSpeedOnHUD,NULL,SelectToggle,DrawToggle,NULL, 0 },
-        { 200, 320, 0, 0, 0, (u_int8_t*)"Show Health Above Bikes", 0, 0, &ShowPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
-        { 200, 336, 0, 0, 0, (u_int8_t*)"Show Health By Scores", 0, 0, &ShowPlayerHealthByScores,NULL,SelectToggle,DrawToggle,NULL, 0 },
-        { 200, 352, 0, 0, 0, (u_int8_t*)"Scale Font Above Bikes", 0, 0, &ScaleFontPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 320, 0, 0, 0, (u_int8_t*)"Show Health Above Bikes", 0, 0, &ShowPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Health By Scores", 0, 0, &ShowPlayerHealthByScores,NULL,SelectToggle,DrawToggle,NULL, 0 },
+		{ 200, 352, 0, 0, 0, (u_int8_t*)"Scale Font Above Bikes", 0, 0, &ScaleFontPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
 		{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
@@ -2474,7 +2474,7 @@ MENU	MENU_InGame = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu 
 					  OLDMENUITEM( 200, 224, (u_int8_t*)LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 					  OLDMENUITEM( 200, 240, (u_int8_t*)LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
 
- 					  OLDMENUITEM( 200, 256, (u_int8_t*)LT_MENU_InGame24 /*"Watch Player"*/, NULL, &MENU_Watch_Options, MenuChange, MenuItemDrawName),
+					  OLDMENUITEM( 200, 256, (u_int8_t*)LT_MENU_InGame24 /*"Watch Player"*/, NULL, &MENU_Watch_Options, MenuChange, MenuItemDrawName),
 #ifdef DEBUG_ON
 					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
 #endif
@@ -3011,8 +3011,8 @@ bool RenderModeReset( void )
 		return true;
 	if (!InitView())
 	{
-	    Msg("InitView failed.\n");
-        return false;
+		Msg("InitView failed.\n");
+		return false;
 	}
 	SetGamePrefs();
 	return true;
@@ -3031,7 +3031,7 @@ bool InitTitle()
 
 	InitModeCase();
 
-    memset(&Names, 0, sizeof(SHORTNAMETYPE) );
+	memset(&Names, 0, sizeof(SHORTNAMETYPE) );
 
 	InitFont();
 
@@ -3046,7 +3046,7 @@ bool InitTitle()
 void
 ReleaseTitle(void)
 {
- 	int i;
+	int i;
 	DebugPrintf("ReleaseTitle\n");
 	for( i = 0; i < NUM_TITLE_LOOPS; i++ )
 	{
@@ -3130,7 +3130,7 @@ void SetInitialTitleParams()
 	/**********************************************************************************
 	Viewpoint movement
 	**********************************************************************************/
-   	CameraStatus = CAMERA_AtStart;
+	CameraStatus = CAMERA_AtStart;
 	PanDone = false;
 
 
@@ -3159,7 +3159,7 @@ void SetInitialTitleParams()
 
 	CurrentTextures[0] = 1;
 	for (i = 1; i < 6; i++)
-    	CurrentTextures[i] = 0;
+		CurrentTextures[i] = 0;
 
 	/***********************
 	new slider stuff
@@ -3202,7 +3202,7 @@ bool LoadTitleModels(void)
 	int i;
 	u_int16_t CurrentModel;
 
-   	// which set of models do we want to load?
+	// which set of models do we want to load?
 	if ( MyGameStatus == STATUS_BetweenLevels )
 	{
 		TitleModelSet = InterLevelModelNames;
@@ -3301,7 +3301,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 	float point1dist, point2dist, distance2plane;
 	int intersection_points;
 	VECTOR point[MAXLINES];
-   	int i;
+	int i;
 	float thickness = 3.0F;
 	int font;
 	int scanlinenum;
@@ -3430,7 +3430,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 					BikeLine[CurrentLine] = FindFreePoly();
 
-   					if( BikeLine[CurrentLine] != INDEX_NONE )
+					if( BikeLine[CurrentLine] != INDEX_NONE )
 					{
 						LinesActive = true;
 
@@ -3440,20 +3440,20 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 						Polys[ BikeLine[CurrentLine] ].Col2.R = 255;
 						Polys[ BikeLine[CurrentLine] ].Col2.G = 255;
 						Polys[ BikeLine[CurrentLine] ].Col2.B = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Col3.R = 255;
+						Polys[ BikeLine[CurrentLine] ].Col3.R = 255;
 						Polys[ BikeLine[CurrentLine] ].Col3.G = 255;
-   						Polys[ BikeLine[CurrentLine] ].Col3.B = 255;
-   						Polys[ BikeLine[CurrentLine] ].Col4.R = 255;
+						Polys[ BikeLine[CurrentLine] ].Col3.B = 255;
+						Polys[ BikeLine[CurrentLine] ].Col4.R = 255;
 						Polys[ BikeLine[CurrentLine] ].Col4.G = 255;
-   						Polys[ BikeLine[CurrentLine] ].Col4.B = 255;
-   						Polys[ BikeLine[CurrentLine] ].Trans1 = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Trans2 = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Trans3 = 255;
-   						Polys[ BikeLine[CurrentLine] ].Trans4 = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Scale = 0.0F;
-	   					Polys[ BikeLine[CurrentLine] ].Flags = POLY_FLAG_NOTHING;
-   						Polys[ BikeLine[CurrentLine] ].Frm_Info = &Title_Fonts_Header;
-	   					Polys[ BikeLine[CurrentLine] ].Frame = TextLookup[font][1];
+						Polys[ BikeLine[CurrentLine] ].Col4.B = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans1 = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans2 = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans3 = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans4 = 255;
+						Polys[ BikeLine[CurrentLine] ].Scale = 0.0F;
+						Polys[ BikeLine[CurrentLine] ].Flags = POLY_FLAG_NOTHING;
+						Polys[ BikeLine[CurrentLine] ].Frm_Info = &Title_Fonts_Header;
+						Polys[ BikeLine[CurrentLine] ].Frame = TextLookup[font][1];
 
 						Polys[ BikeLine[CurrentLine] ].Pos1.x = Models[Model].Pos.x + (scanline[i].start.x - plane.Normal.x * (thickness / 2.0F));
 						Polys[ BikeLine[CurrentLine] ].Pos1.y = Models[Model].Pos.y + (scanline[i].start.y - plane.Normal.y * (thickness / 2.0F));
@@ -3593,7 +3593,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 					BikeLine[CurrentLine] = FindFreePoly();
 
-   					if( BikeLine[CurrentLine] != INDEX_NONE )
+					if( BikeLine[CurrentLine] != INDEX_NONE )
 					{
 						LinesActive = true;
 
@@ -3603,20 +3603,20 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 						Polys[ BikeLine[CurrentLine] ].Col2.R = 255;
 						Polys[ BikeLine[CurrentLine] ].Col2.G = 255;
 						Polys[ BikeLine[CurrentLine] ].Col2.B = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Col3.R = 255;
+						Polys[ BikeLine[CurrentLine] ].Col3.R = 255;
 						Polys[ BikeLine[CurrentLine] ].Col3.G = 255;
-   						Polys[ BikeLine[CurrentLine] ].Col3.B = 255;
-   						Polys[ BikeLine[CurrentLine] ].Col4.R = 255;
+						Polys[ BikeLine[CurrentLine] ].Col3.B = 255;
+						Polys[ BikeLine[CurrentLine] ].Col4.R = 255;
 						Polys[ BikeLine[CurrentLine] ].Col4.G = 255;
-   						Polys[ BikeLine[CurrentLine] ].Col4.B = 255;
-   						Polys[ BikeLine[CurrentLine] ].Trans1 = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Trans2 = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Trans3 = 255;
-   						Polys[ BikeLine[CurrentLine] ].Trans4 = 255;
-	   					Polys[ BikeLine[CurrentLine] ].Scale = 0.0F;
-	   					Polys[ BikeLine[CurrentLine] ].Flags = POLY_FLAG_NOTHING;
-   						Polys[ BikeLine[CurrentLine] ].Frm_Info = &Title_Fonts_Header;
-	   					Polys[ BikeLine[CurrentLine] ].Frame = TextLookup[font][1];
+						Polys[ BikeLine[CurrentLine] ].Col4.B = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans1 = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans2 = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans3 = 255;
+						Polys[ BikeLine[CurrentLine] ].Trans4 = 255;
+						Polys[ BikeLine[CurrentLine] ].Scale = 0.0F;
+						Polys[ BikeLine[CurrentLine] ].Flags = POLY_FLAG_NOTHING;
+						Polys[ BikeLine[CurrentLine] ].Frm_Info = &Title_Fonts_Header;
+						Polys[ BikeLine[CurrentLine] ].Frame = TextLookup[font][1];
 
 						Polys[ BikeLine[CurrentLine] ].Pos1.x = Models[Model].Pos.x + (scanline[i].start.x - plane.Normal.x * (thickness / 2.0F));
 						Polys[ BikeLine[CurrentLine] ].Pos1.y = Models[Model].Pos.y + (scanline[i].start.y - plane.Normal.y * (thickness / 2.0F));
@@ -3918,7 +3918,7 @@ void RotateDiscs(int disc, RotateDisc OneOnly)
 			BuildRotMatrix(0.0F, rot[disc] + angleoffset, 0.0F, &Models[BackgroundModel[disc]].Mat);
 			MatrixTranspose(&Models[BackgroundModel[disc]].Mat, &Models[BackgroundModel[disc]].InvMat);
 		}else
-		 	DiscJudder(disc);
+			DiscJudder(disc);
 }
 
 /*===================================================================
@@ -3942,7 +3942,7 @@ void RotateAllDiscs(void)
 				onceonly = true;
 			}
 			SetTextures(CurrentMenu);
-		   	ExpandDiscs();
+			ExpandDiscs();
 			break;
 		case DISC_WIGGLE:
 			WiggleDiscs();
@@ -4009,7 +4009,7 @@ void RotateOneDisc(int disc)
 		RotateDiscs(disc, DifficultyDir );
 
 		if (RotWiggle[disc] == (Judders - 1))
-		 	StackStatus = DISC_RETRACT;
+			StackStatus = DISC_RETRACT;
 
 		break;
 	case DISC_RETRACT:
@@ -4235,7 +4235,7 @@ bool DisplayTitle(void)
 	{
 		InitialTexturesSet = true;
 
-	   	for (i=0; i<6; i++)
+		for (i=0; i<6; i++)
 		{
 			Mxloadheader[i] = &ModelHeaders[BackgroundModel[i]];
 			PolyAnim[i] = Mxloadheader[i]->Group[0].polyanim[0];
@@ -4244,7 +4244,7 @@ bool DisplayTitle(void)
 		}
 
 		if ((CurrentDiscHighlight >= 0) && (CurrentDiscHighlight < 6))
-       			HighlightDisc(CurrentDiscHighlight);
+				HighlightDisc(CurrentDiscHighlight);
 
 	}
 
@@ -4445,7 +4445,7 @@ Event handling
 
 	if (CurrentMenu)
 	{
-  		for( Item = CurrentMenu->Item ; Item->x >= 0 ; Item++ )
+		for( Item = CurrentMenu->Item ; Item->x >= 0 ; Item++ )
 		{
 			if ( (Item->FuncDraw == DrawFlatMenuList) || (Item->FuncDraw == DrawSplitMenuList) )
 			{
@@ -4497,7 +4497,7 @@ void MenuRestart( MENU * Menu )
 		if ((CameraStatus == CAMERA_AtDiscs) || (CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
 		{
 			StackMode = DISC_MODE_ALL;
-	 		StackStatus = DISC_EXPAND;
+			StackStatus = DISC_EXPAND;
 			DoHighlight = true;
 		}
 	}
@@ -4556,7 +4556,7 @@ void MenuAbort( void )
 {
 	if ( (CameraStatus == CAMERA_AtLeftVDU || CameraStatus == CAMERA_AtRightVDU) && CurrentMenu )
 	{
-	   	LastMenu = CurrentMenu;
+		LastMenu = CurrentMenu;
 		VduClear();
 	}
 
@@ -4958,7 +4958,7 @@ void MenuBack()
 
 	if ( MenuStackLevel )
 	{
-	   	if ( !InTitleRoom )
+		if ( !InTitleRoom )
 			PlayCursorSfx();
 
 		DoHighlight = true;	//menu has changed, therefore ensure option is highlighted
@@ -5001,7 +5001,7 @@ void MenuBack()
 			StackStatus = DISC_EXPAND;
 		}
 
- 		// Process VDU if neccessary
+		// Process VDU if neccessary
 		if ((CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
 		{
 			VduClear();
@@ -6203,23 +6203,23 @@ void InitLevelSelectVDU( MENUITEM * /*Item*/ )
 ===================================================================*/
 void InitControls( MENU * /*Menu*/ )
 {
-    Autoleveling = Config.autolevel_rate != 0 ? true : false;
+	Autoleveling = Config.autolevel_rate != 0 ? true : false;
 
-    float s = Config.mouse_x_sensitivity;
-    SensitivityXSlider.value = s * fabsf(SensitivityXSlider.max - SensitivityXSlider.min);
-    if (SensitivityXSlider.value < SensitivityXSlider.min) {
-        SensitivityXSlider.value = SensitivityXSlider.min;
-    } else if (SensitivityXSlider.value > SensitivityXSlider.max) {
-        SensitivityXSlider.value = SensitivityXSlider.max;
-    }
+	float s = Config.mouse_x_sensitivity;
+	SensitivityXSlider.value = s * fabsf(SensitivityXSlider.max - SensitivityXSlider.min);
+	if (SensitivityXSlider.value < SensitivityXSlider.min) {
+		SensitivityXSlider.value = SensitivityXSlider.min;
+	} else if (SensitivityXSlider.value > SensitivityXSlider.max) {
+		SensitivityXSlider.value = SensitivityXSlider.max;
+	}
 
-    s = Config.mouse_y_sensitivity;
-    SensitivityYSlider.value = s * fabsf(SensitivityYSlider.max - SensitivityYSlider.min);
-    if (SensitivityYSlider.value < SensitivityYSlider.min) {
-        SensitivityYSlider.value = SensitivityYSlider.min;
-    } else if (SensitivityYSlider.value > SensitivityYSlider.max) {
-        SensitivityYSlider.value = SensitivityYSlider.max;
-    }
+	s = Config.mouse_y_sensitivity;
+	SensitivityYSlider.value = s * fabsf(SensitivityYSlider.max - SensitivityYSlider.min);
+	if (SensitivityYSlider.value < SensitivityYSlider.min) {
+		SensitivityYSlider.value = SensitivityYSlider.min;
+	} else if (SensitivityYSlider.value > SensitivityYSlider.max) {
+		SensitivityYSlider.value = SensitivityYSlider.max;
+	}
 }
 
 void SetAutolevel( MENUITEM * /*item*/ )
@@ -6234,13 +6234,13 @@ void SetAutolevel( MENUITEM * /*item*/ )
 ===================================================================*/
 void ExitControls( MENU * /*Menu*/ )
 {
-    float sX = SensitivityXSlider.value /
-        fabsf(SensitivityXSlider.max - SensitivityXSlider.min);
-    float sY = SensitivityYSlider.value /
-        fabsf(SensitivityYSlider.max - SensitivityYSlider.min);
-    Config.mouse_x_sensitivity = sX;
-    Config.mouse_y_sensitivity = sY;
-    ExitBikerMenu(NULL);
+	float sX = SensitivityXSlider.value /
+		fabsf(SensitivityXSlider.max - SensitivityXSlider.min);
+	float sY = SensitivityYSlider.value /
+		fabsf(SensitivityYSlider.max - SensitivityYSlider.min);
+	Config.mouse_x_sensitivity = sX;
+	Config.mouse_y_sensitivity = sY;
+	ExitBikerMenu(NULL);
 }
 
 /*===================================================================
@@ -6280,7 +6280,7 @@ void InitPilotList( void )
 	// for each found cfg
 	do{
 
-        // the next empty pilot slot to fill in
+		// the next empty pilot slot to fill in
 		bname = (char*)PilotList.item[PilotList.items];
 
 		// size of the pilot name
@@ -7314,11 +7314,11 @@ void InitMultiplayerHost( MENU * /*Menu*/ )
 	LevelList.selected_item = 0;
 	NewLevelNum = 0;
 
-    for (i = 0; i < NumLevels; i++)
+	for (i = 0; i < NumLevels; i++)
 	{
 		strcpy( (char*) &LevelList.item[LevelList.items][0] , (char*) &ShortLevelNames[i][0] );
 		LevelList.items++;
-    }
+	}
 
 }
 
@@ -7404,7 +7404,7 @@ void LoadLevelText( MENU * /*Menu*/ )
 
 	if ( !f )
 	{
-	 	SelectedLevelText[ 0 ] = 0;
+		SelectedLevelText[ 0 ] = 0;
 		strncpy( SelectedLevel, (char*)LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
 		return;
 	}
@@ -7412,10 +7412,10 @@ void LoadLevelText( MENU * /*Menu*/ )
 	// read level name
 	if ( !fgets( SelectedLevel, MAX_LEVEL_NAME_LENGTH, f ) )
 	{
-	  	// if error ( as oposed to end of file )
+		// if error ( as oposed to end of file )
 		if ( ferror( f ) != 0 )
 		{
-		 	SelectedLevel[ 0 ] = 0;
+			SelectedLevel[ 0 ] = 0;
 			strncpy( SelectedLevel, (char*)LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
 			fclose( f );
 			return;
@@ -7431,8 +7431,8 @@ void LoadLevelText( MENU * /*Menu*/ )
 	// read mission text
 	if ( !fgets( SelectedLevelText, MAX_LEVEL_TEXT_LENGTH, f ) )
 	{
-	  	// if error ( as oposed to end of file )
-	  	if ( ferror( f ) != 0 )
+		// if error ( as oposed to end of file )
+		if ( ferror( f ) != 0 )
 		{
 			SelectedLevelText[ 0 ] = 0;
 			fclose( f );
@@ -7575,7 +7575,7 @@ void SelectQuitCurrentGame( MENUITEM * /*Item*/ )
 	{
 		if( IsHost )
 		{
-		 	WaitingToQuit = true;
+			WaitingToQuit = true;
 			return;
 		}
 	}
@@ -7681,7 +7681,7 @@ void MenuGoFullScreen( MENUITEM * /*Item*/ )
 
 	bIgnoreWM_SIZE = true;
 
-    RenderModeSelect( render_info.CurrMode, !render_info.fullscreen, render_info.vsync );
+	RenderModeSelect( render_info.CurrMode, !render_info.fullscreen, render_info.vsync );
 
 	// user goes into window mode to do something else
 	// so release their inputs and let them click to activate
@@ -7695,7 +7695,7 @@ void MenuGoFullScreen( MENUITEM * /*Item*/ )
 		FadeHoloLight(HoloLightBrightness);
 		DarkenRoom2(RoomDarkness);
 		ProcessVduItems( CurrentMenu );
-   		InitialTexturesSet = false;
+		InitialTexturesSet = false;
 	}
 }
 
@@ -7760,12 +7760,12 @@ void NewMenuSelectMode( MENUITEM * /*Item*/ )
 
 	if ( render_info.fullscreen )
 	{
-        RenderModeSelect( mode, render_info.fullscreen, render_info.vsync );
+		RenderModeSelect( mode, render_info.fullscreen, render_info.vsync );
 	}
 	else
 	{
 		bIgnoreWM_SIZE = true;
-        RenderModeSelect( mode, render_info.fullscreen, render_info.vsync );
+		RenderModeSelect( mode, render_info.fullscreen, render_info.vsync );
 		bIgnoreWM_SIZE = false;
 
 		// user goes into window mode to do something else
@@ -7777,7 +7777,7 @@ void NewMenuSelectMode( MENUITEM * /*Item*/ )
 	DarkenRoom2(RoomDarkness);
 	ProcessVduItems( CurrentMenu );
 
-   	InitialTexturesSet = false;
+	InitialTexturesSet = false;
 }
 
 void InitDebugMenu( MENU * /*Menu*/ )
@@ -8007,28 +8007,28 @@ void GetGamePrefs( void )
 
 	// booleans
 
-    TintBikeTeamColor                = config_get_bool( "TintBikeTeamColor",		true );
-    MyResetKillsPerLevel             = config_get_bool( "ResetKillsPerLevel",		false );
-    MyBrightShips                    = config_get_bool( "BrightShips",				false );
-    MyRandomPickups                  = config_get_bool( "RandomPickups",			false );
+	TintBikeTeamColor                = config_get_bool( "TintBikeTeamColor",		true );
+	MyResetKillsPerLevel             = config_get_bool( "ResetKillsPerLevel",		false );
+	MyBrightShips                    = config_get_bool( "BrightShips",				false );
+	MyRandomPickups                  = config_get_bool( "RandomPickups",			false );
 
-    MissileCameraEnable              = config_get_bool( "MissileCameraEnable",		true );
-    RearCameraActive                 = config_get_bool( "RearCameraActive",			true );
-    BikeEnginesOn                    = config_get_bool( "BikeEnginesOn",			true );
+	MissileCameraEnable              = config_get_bool( "MissileCameraEnable",		true );
+	RearCameraActive                 = config_get_bool( "RearCameraActive",			true );
+	BikeEnginesOn                    = config_get_bool( "BikeEnginesOn",			true );
 	ShowWeaponsPossessedOnHUD		 = config_get_bool( "ShowWeaponsPossessedOnHUD", false );
 	JoystickInput					 = config_get_bool( "JoystickInput", true );
 	ShowClockOnHUD				     = config_get_bool( "ShowClockOnHUD", true );
 	ShowKPMOnHUD				     = config_get_bool( "ShowKPMOnHUD", false );
 	ShowSpeedOnHUD				     = config_get_bool( "ShowSpeedOnHUD", true );
-    ShowPlayersOnHUD                 = config_get_bool( "ShowPlayersOnHUD",			true );
-    ShowPlayersOnHUDbyKills          = config_get_bool( "ShowPlayersOnHUDbyKills",		true );
-    ShowPlayerHealthAboveBikes       = config_get_bool( "ShowPlayerHealthAboveBikes", true );
-    ShowPlayerHealthByScores         = config_get_bool( "ShowPlayerHealthByScores", true );
-    ScaleFontPlayerHealthAboveBikes  = config_get_bool( "ScaleFontPlayerHealthAboveBikes", true );
-    BikeExhausts                     = config_get_bool( "BikeExhausts",				true );
-    BountyBonus                      = config_get_bool( "BountyBonus",				true );
-    MyUseShortPackets                = config_get_bool( "UseShortPackets",			true );
-    ShowTeamInfo                     = config_get_bool( "ShowTeamInfo",				true );
+	ShowPlayersOnHUD                 = config_get_bool( "ShowPlayersOnHUD",			true );
+	ShowPlayersOnHUDbyKills          = config_get_bool( "ShowPlayersOnHUDbyKills",		true );
+	ShowPlayerHealthAboveBikes       = config_get_bool( "ShowPlayerHealthAboveBikes", true );
+	ShowPlayerHealthByScores         = config_get_bool( "ShowPlayerHealthByScores", true );
+	ScaleFontPlayerHealthAboveBikes  = config_get_bool( "ScaleFontPlayerHealthAboveBikes", true );
+	BikeExhausts                     = config_get_bool( "BikeExhausts",				true );
+	BountyBonus                      = config_get_bool( "BountyBonus",				true );
+	MyUseShortPackets                = config_get_bool( "UseShortPackets",			true );
+	ShowTeamInfo                     = config_get_bool( "ShowTeamInfo",				true );
 	render_info.fullscreen			 = config_get_bool( "FullScreen",				false );
 
 	memset( MyPickupValid, 0, sizeof(MyPickupValid) );
@@ -8058,9 +8058,9 @@ void GetGamePrefs( void )
 
 	memmove( PickupValid, MyPickupValid, sizeof(PickupValid) );//memcpy
 
-    // integers
+	// integers
 
-    WaterDetailSlider.value          = config_get_int( "water",						WaterDetailSlider.max );
+	WaterDetailSlider.value          = config_get_int( "water",						WaterDetailSlider.max );
 	CLAMP( WaterDetailSlider.value, WaterDetailSlider.max );
 	SetWaterDetail( &WaterDetailSlider );
 
@@ -8068,17 +8068,17 @@ void GetGamePrefs( void )
 		CLAMP(TextScaleSlider.value, TextScaleSlider.max);
 		SetTextScale( &TextScaleSlider );
 
-    SfxSlider.value                  = config_get_int( "SfxVolume",					(int)(SfxSlider.max				* 1.00F) );
-    FlagSfxSlider.value              = config_get_int( "FlagSfxVolume",				(int)(FlagSfxSlider.max			* 0.80F) );
+	SfxSlider.value                  = config_get_int( "SfxVolume",					(int)(SfxSlider.max				* 1.00F) );
+	FlagSfxSlider.value              = config_get_int( "FlagSfxVolume",				(int)(FlagSfxSlider.max			* 0.80F) );
 	BikerSpeechSlider.value          = config_get_int( "BikerSpeechVolume",			(int)(BikerSpeechSlider.max		* 0.60F) );
-    BikeCompSpeechSlider.value       = config_get_int( "BikeCompSpeechVol",			(int)(BikeCompSpeechSlider.max	* 0.60F) );
+	BikeCompSpeechSlider.value       = config_get_int( "BikeCompSpeechVol",			(int)(BikeCompSpeechSlider.max	* 0.60F) );
 
 	CLAMP( SfxSlider.value,				SfxSlider.max );
 	CLAMP( FlagSfxSlider.value,			FlagSfxSlider.max );
 	CLAMP( BikerSpeechSlider.value,		BikerSpeechSlider.max );
 	CLAMP( BikeCompSpeechSlider.value,	BikeCompSpeechSlider.max );
 
-    GammaSlider.value                = config_get_int( "Gamma",						(int)(GammaSlider.max * 0.65F) );
+	GammaSlider.value                = config_get_int( "Gamma",						(int)(GammaSlider.max * 0.65F) );
 
 	DebugPrintf("gamma read from config as %d, max %d\n",GammaSlider.value,GammaSlider.max);
 	CLAMP( GammaSlider.value, GammaSlider.max );
@@ -8086,12 +8086,12 @@ void GetGamePrefs( void )
 	Gamma = ((float)GammaSlider.value / 100.0F);
 	DebugPrintf("gamma variable: %d/100.0F = %f\n",GammaSlider.value,Gamma);
 
-    MaxKillsSlider.value             = config_get_int( "MaxKills",					0 );
-    MyTimeLimit.value                = config_get_int( "TimeLimit",					0);
-    CTFSlider.value                  = config_get_int( "CTFrules",					CTF_STANDARD );
-    GoalScoreSlider.value            = config_get_int( "FlagScore",					5 );
-    BountyBonusSlider.value          = config_get_int( "BountyInterval",			10 );
-    MyPacketsSlider.value            = config_get_int( "PacketsPerSecond",			10 );
+	MaxKillsSlider.value             = config_get_int( "MaxKills",					0 );
+	MyTimeLimit.value                = config_get_int( "TimeLimit",					0);
+	CTFSlider.value                  = config_get_int( "CTFrules",					CTF_STANDARD );
+	GoalScoreSlider.value            = config_get_int( "FlagScore",					5 );
+	BountyBonusSlider.value          = config_get_int( "BountyInterval",			10 );
+	MyPacketsSlider.value            = config_get_int( "PacketsPerSecond",			10 );
 
 	CLAMP( MaxKillsSlider.value,		MaxKillsSlider.max );
 	CLAMP( MyTimeLimit.value,			MyTimeLimit.max );
@@ -8100,25 +8100,25 @@ void GetGamePrefs( void )
 	CLAMP( BountyBonusSlider.value,		BountyBonusSlider.max );
 	CLAMP( MyPacketsSlider.value,		MyPacketsSlider.max );
 
-    NumPrimaryPickupsSlider.value    = config_get_int( "NumPrimaryPickups",			1 );
+	NumPrimaryPickupsSlider.value    = config_get_int( "NumPrimaryPickups",			1 );
 	CLAMP( NumPrimaryPickupsSlider.value, NumPrimaryPickupsSlider.max );
 	NumPrimaryPickups = NumPrimaryPickupsSlider.value;
 
-    render_info.default_mode.w  = config_get_int( "ScreenWidth", 0 );
-    render_info.default_mode.h  = config_get_int( "ScreenHeight", 0 );
-    render_info.vsync  = config_get_int( "VSync", 0 );
+	render_info.default_mode.w  = config_get_int( "ScreenWidth", 0 );
+	render_info.default_mode.h  = config_get_int( "ScreenHeight", 0 );
+	render_info.vsync  = config_get_int( "VSync", 0 );
 
 		MatureContent										 = config_get_int( "MatureContent", 2);
 		HUDColour												 = config_get_int( "HUDColour", YELLOW );
 		InGameMenuColour								 = config_get_int( "InGameMenuColour", YELLOW );
-    MilestoneMessagesColour          = config_get_int( "MilestoneMessagesColour",	RED );
-    KillMessageColour                = config_get_int( "KillMessageColour",			GREEN );
-    SystemMessageColour              = config_get_int( "SystemMessageColour",		YELLOW );
-    FlagMessageColour                = config_get_int( "FlagMessageColour",			BLUE );
-    PlayerMessageColour              = config_get_int( "PlayerMessageColour",		WHITE );
-    PickupMessageColour              = config_get_int( "PickupMessageColour",		GREEN );
-    TauntMessageColour               = config_get_int( "TauntMessageColour",		GREEN );
-    MyMessageColour                  = config_get_int( "MyMessageColour",			  WHITE );
+	MilestoneMessagesColour          = config_get_int( "MilestoneMessagesColour",	RED );
+	KillMessageColour                = config_get_int( "KillMessageColour",			GREEN );
+	SystemMessageColour              = config_get_int( "SystemMessageColour",		YELLOW );
+	FlagMessageColour                = config_get_int( "FlagMessageColour",			BLUE );
+	PlayerMessageColour              = config_get_int( "PlayerMessageColour",		WHITE );
+	PickupMessageColour              = config_get_int( "PickupMessageColour",		GREEN );
+	TauntMessageColour               = config_get_int( "TauntMessageColour",		GREEN );
+	MyMessageColour                  = config_get_int( "MyMessageColour",			  WHITE );
 		MaxMessageTime                   = config_get_float( "MaxMessageTime",    5.0f );
 
 	CLAMP( InGameMenuColour, MAXFONTCOLOURS );
@@ -8131,10 +8131,10 @@ void GetGamePrefs( void )
 	CLAMP( TauntMessageColour,		MAXFONTCOLOURS );
 	CLAMP( MyMessageColour,			MAXFONTCOLOURS );
 
-    MyColPerspective                   = config_get_int( "ColPerspective",			COLPERS_Descent );
+	MyColPerspective                   = config_get_int( "ColPerspective",			COLPERS_Descent );
 	CLAMP( MyColPerspective, 1 );
 
-    GameType                         = config_get_int( "GameType",					GAME_Normal );
+	GameType                         = config_get_int( "GameType",					GAME_Normal );
 	CLAMP( GameType, MAX_GAMETYPE );
 
 #ifdef __3DS__
@@ -8192,9 +8192,9 @@ void SetGamePrefs( void )
 	config_set_bool( "ShowSpeedOnHUD", ShowSpeedOnHUD );
 	config_set_bool( "ShowPlayersOnHUD",		ShowPlayersOnHUD );
 	config_set_bool( "ShowPlayersOnHUDbyKills",	ShowPlayersOnHUDbyKills );
-    config_set_bool( "ShowPlayerHealthAboveBikes", ShowPlayerHealthAboveBikes );
-    config_set_bool( "ShowPlayerHealthByScores", ShowPlayerHealthByScores );
-    config_set_bool( "ScaleFontPlayerHealthAboveBikes", ScaleFontPlayerHealthAboveBikes );
+	config_set_bool( "ShowPlayerHealthAboveBikes", ShowPlayerHealthAboveBikes );
+	config_set_bool( "ShowPlayerHealthByScores", ShowPlayerHealthByScores );
+	config_set_bool( "ScaleFontPlayerHealthAboveBikes", ScaleFontPlayerHealthAboveBikes );
 	config_set_bool( "BikeExhausts",		BikeExhausts );
 	config_set_bool( "BountyBonus",			BountyBonus );
 	config_set_bool( "RandomPickups",		MyRandomPickups );
@@ -8364,20 +8364,20 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 				blue = (u_int8_t)RGBA_GETBLUE(VertPtr->color);
 				alpha = (u_int8_t)RGBA_GETALPHA(VertPtr->color);
 
-			  	if ((CurrentExclude) && (*CurrentExclude == i))
-			  	{
-			  		ExcludedSoFar++;
-			  		if (ExcludedSoFar == NumberToExclude)
-			  			CurrentExclude = NULL;
-			  		else
-			  			CurrentExclude++;
-			  	}
+				if ((CurrentExclude) && (*CurrentExclude == i))
+				{
+					ExcludedSoFar++;
+					if (ExcludedSoFar == NumberToExclude)
+						CurrentExclude = NULL;
+					else
+						CurrentExclude++;
+				}
 				else
-			  	{
-			  		red = (u_int8_t)((float)red * percent);
-			  		green = (u_int8_t)((float)green * percent);
-			  		blue = (u_int8_t)((float)blue * percent);
-			  	}
+				{
+					red = (u_int8_t)((float)red * percent);
+					green = (u_int8_t)((float)green * percent);
+					blue = (u_int8_t)((float)blue * percent);
+				}
 
 				Colour = RGBA_MAKE( red, green, blue, alpha );
 				if( !Colour )
@@ -8496,10 +8496,10 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t Mesh, int Vertex
 	vblue = (u_int8_t)RGBA_GETBLUE(VertPtr->color);
 	valpha = (u_int8_t)RGBA_GETALPHA(VertPtr->color);
 
- 	red = (u_int8_t)((float)vred * tr);
-  	green = (u_int8_t)((float)vgreen * tg);
-  	blue = (u_int8_t)((float)vblue * tb);
-  	alpha = (u_int8_t)((float)valpha * ta);
+	red = (u_int8_t)((float)vred * tr);
+	green = (u_int8_t)((float)vgreen * tg);
+	blue = (u_int8_t)((float)vblue * tb);
+	alpha = (u_int8_t)((float)valpha * ta);
 
 	Colour = RGBA_MAKE( red, green, blue, alpha );
 	if( !Colour )
@@ -8601,7 +8601,7 @@ void AddToFlatMenuList( MENUITEM *Item )
 
 	l = (LIST *)(Item->Variable);
 
- 	for (i=0; i < Item->numtextitems; i++)
+	for (i=0; i < Item->numtextitems; i++)
 	{
 
 		TextInfo = Item->TextInfo[i];
@@ -9124,7 +9124,7 @@ void DrawFlatMenuKeyText( MENUITEM *Item )
 	DEFKEY *kdef;
 	VirtualKeycode keycode;
 	const char * keyword = NULL;
-  	TEXTINFO *TextInfo;
+	TEXTINFO *TextInfo;
 
 	if ( Item->Variable )
 	{
@@ -9173,7 +9173,7 @@ void DrawFlatMenuKey( MENUITEM *Item )
 void DrawFlatMenuKeyNum( MENUITEM *Item )
 {
 	DEFKEY *kdef;
-  	TEXTINFO *TextInfo;
+	TEXTINFO *TextInfo;
 
 	if ( Item->Variable )
 	{
@@ -9215,7 +9215,7 @@ void DrawFlatMenuKeyLeftArrowText( MENUITEM *Item )
 {
 	DEFKEY *kdef;
 	const char * arrow;
-  	TEXTINFO *TextInfo;
+	TEXTINFO *TextInfo;
 
 	arrow = EmptyString;
 	if ( Item->Variable )
@@ -9262,7 +9262,7 @@ void DrawFlatMenuKeyRightArrowText( MENUITEM *Item )
 {
 	DEFKEY *kdef;
 	const char * arrow;
-  	TEXTINFO *TextInfo;
+	TEXTINFO *TextInfo;
 
 	arrow = EmptyString;
 	if ( Item->Variable )
@@ -9631,9 +9631,9 @@ void ProcessFlatSliders(void)
 			if (( (slider->timer >= ReqFraction ) && ( slider->dt > 0.0F ) ) ||
 				( (slider->timer <= ReqFraction ) && ( slider->dt < 0.0F ) ))
 			{
-			   	slider->timer = ReqFraction;
+				slider->timer = ReqFraction;
 				if (slider->poly != INDEX_NONE)
-				   	UpdateSlider(ActiveSliderItem[i].Item);
+					UpdateSlider(ActiveSliderItem[i].Item);
 				slider->timer = -1.0F;
 			}else
 			{
@@ -10138,7 +10138,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 		{
 			if (TEXTINFO_currenty + PreviousHeight + TEXTINFO_currentheight + TEXTINFO_LineSpace > TotalHeight)
 			{
-		 		if (TextInfo->flags & TEXTFLAG_ForceFit)
+				if (TextInfo->flags & TEXTFLAG_ForceFit)
 				{
 					TextInfo->force_fit = true;
 					return false;
@@ -10204,7 +10204,7 @@ bool DrawTextEditCursor( TEXTINFO *TextInfo, int font )
 	OFF_INFO	*	Off_Ptr;
 	u_int16_t TempPoly;
 	u_int8_t i;
-  	TEXT *t;
+	TEXT *t;
 
 	t = (TEXT *)(TextItem->Variable);
 
@@ -10503,7 +10503,7 @@ void DisplayTextItem (TEXTINFO *TextInfo)
 	int i, j, font, skip, UpToChar;
 	float totalheight = 0.0;
 	TEXTINFO TempTextInfo;
-  	TEXT *t = NULL;
+	TEXT *t = NULL;
 	bool DoForceFit;
 
 	if (MenuState == MENUSTATE_Text2)
@@ -10662,7 +10662,7 @@ void PrintTextItem (TEXTINFO *TextInfo)
 
 	if (length == 0)
 	{
-	 	TextInfo->num_lines = 0;
+		TextInfo->num_lines = 0;
 		return;	//do nothing if there is no text to process
 	}
 
@@ -10672,7 +10672,7 @@ void PrintTextItem (TEXTINFO *TextInfo)
 		{
 			if(!FormatTextItem(StartPos, i, TextInfo, &newline))
 			{
-			 	if (!(TextInfo->flags & TEXTFLAG_ForceFit))
+				if (!(TextInfo->flags & TEXTFLAG_ForceFit))
 				{
 					DebugPrintf( "FormatTextItem() : returned false\tbounding box for text ( %s ) too small??\n", TextInfo->text );
 				}
@@ -10762,8 +10762,8 @@ void ProcessTextItems (void)
 		if (DrawTextItemBox && !TextStack[i]->boxdone)
 		{
 			TextStack[i]->boxdone = true;
-	  		if (!Plot2dBox (TextStack[i]))
-	  			Msg( "Plot2dBox() : failed\n" );
+			if (!Plot2dBox (TextStack[i]))
+				Msg( "Plot2dBox() : failed\n" );
 		}
 
 		DisplayTextItem (TextStack[i]);
@@ -11454,7 +11454,7 @@ void InitEventLeftVDUPan(TITLE_EVENT * /*TitleEvent*/)
 
 void EventLeftVDUPan(TITLE_EVENT *TitleEvent)
 {
- 	float currenttime;
+	float currenttime;
 
 	currenttime = GetEventCurrentTime(TitleEvent);
 
@@ -11973,7 +11973,7 @@ void ProcessTimers(void)
 	// ignore first few framelags - they are invariably huge
 	if ( FramesIgnored < 3 )
 	{
-	 	FramesIgnored++;
+		FramesIgnored++;
 		return;
 	}
 
@@ -12156,7 +12156,7 @@ void AddTitleMessage(TEXTMSG *TextMsg)
 
 void GetTitleMessage(void)
 {
- 	MENUITEM *Item;
+	MENUITEM *Item;
 	TEXTINFO dummytext;
 	int i, j;
 
@@ -12743,7 +12743,7 @@ void ExitJoySetup( MENU * /*Menu*/ )
 		{
 			if ( JoystickInfo[ joystick ].Button[ j ].action )
 			{
-			 	JoystickInfo[ joystick ].assigned = true;
+				JoystickInfo[ joystick ].assigned = true;
 			}
 		}
 	}
@@ -12958,7 +12958,7 @@ void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 	 case GameComplete::Cheated:
 		 strcpy( GameCompleteText, GameCompleteWithCheating );
 		 break;
- 	 case GameComplete::GotAllCrystalsSoFar:
+	 case GameComplete::GotAllCrystalsSoFar:
 		 strcpy( GameCompleteText, GameCompleteGotAllCrystalsSoFar );
 		 break;
 	 case GameComplete::WithAllCrystals:
@@ -13224,7 +13224,7 @@ void PlotHoloScanLine( void )
 	tempplane.Offset = CurrentHoloOffset;
 	ApplyMatrix( &Mat_R, &HoloPlane[ CurrentHoloPlane ].Normal, &tempplane.Normal);
 
-   	if (!SetUpLines( CurrentHoloModel, tempplane, &HoloRot))
+	if (!SetUpLines( CurrentHoloModel, tempplane, &HoloRot))
 		Msg("SetUpLines() returned false");
 
 	Models[ CurrentHoloModel ].IntersectionPlane = HoloPlane[ CurrentHoloPlane ];
@@ -13310,7 +13310,7 @@ void LoadHoloModel( u_int16_t model )
 
 void ScaleHoloModel( float scale )
 {
-   	if( CurrentHoloModel != INDEX_NONE )
+	if( CurrentHoloModel != INDEX_NONE )
 	{
 		Models[CurrentHoloModel].Xscale = scale * HoloModelScale;
 		Models[CurrentHoloModel].Yscale = HoloModelScale;
@@ -13967,7 +13967,7 @@ bool ProcessList( int Key )
 
 	if (CurrentList->Static)
 	{
-	 	if ( Key == SDLK_ESCAPE || Key == RIGHT_MOUSE )
+		if ( Key == SDLK_ESCAPE || Key == RIGHT_MOUSE )
 			CurrentList->Static = false;
 		return true;
 	}
@@ -14982,7 +14982,7 @@ void MenuProcess()
 		//
 		CheckCheats( Key );
 
-	    	// if last key pressed exited from menu system
+			// if last key pressed exited from menu system
 		// do not process any more keys
 		if ( !CurrentMenu )
 			goto end;
@@ -15089,7 +15089,7 @@ void MenuProcess()
 			break;
 
 
-		    case MENUSTATE_Text:
+			case MENUSTATE_Text:
 				if ( !ProcessText( Key ) )
 				{
 					MenuState = MENUSTATE_Select;

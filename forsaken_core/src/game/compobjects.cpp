@@ -43,7 +43,7 @@ constexpr int COB_VERSION_NUMBER = 2;
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight );
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
-					    VECTOR * BottomRight );
+						VECTOR * BottomRight );
 
 MODELNAME	*	ModNames = &ModelNames[ 0 ];
 
@@ -134,17 +134,17 @@ bool PreLoadCompObj( int8_t * path, u_int16_t * BaseModel, bool LevelSpecific )
 		else
 		{
 			fclose( fp );
-	        Msg( "PreLoadCompObj() Too many models in %s\n", path );
+			Msg( "PreLoadCompObj() Too many models in %s\n", path );
 			return( false );
 		}
- 	}
+	}
 	else
 	{
-        Msg( "PreLoadCompObj() Unable to open %s\n", path );
+		Msg( "PreLoadCompObj() Unable to open %s\n", path );
 		return( false );
 	}
 
- 	fclose( fp );
+	fclose( fp );
 
 	return( true );
 }
@@ -163,7 +163,7 @@ bool PreLoadCompObj( int8_t * path, u_int16_t * BaseModel, bool LevelSpecific )
 	Output		:	COMP_OBJ	*	Components ( NULL on error )
 ===================================================================*/
 COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Group,
-					    float * OverallTime, float * MidTime, u_int16_t * BaseModel,
+						float * OverallTime, float * MidTime, u_int16_t * BaseModel,
 						u_int16_t OwnerType, u_int16_t OwnerID )
 {
 	FILE		*	fp;
@@ -191,7 +191,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 			return( NULL );
 		}
 
-  		CompsPtr = (COMP_OBJ*)malloc( sizeof( COMP_OBJ ) );
+		CompsPtr = (COMP_OBJ*)malloc( sizeof( COMP_OBJ ) );
 
 		if( CompsPtr )
 		{
@@ -219,17 +219,17 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 		}
 		else
 		{
-	        Msg( "LoadCompObj() Unable to alloc CompsPtr in %s\n", path );
+			Msg( "LoadCompObj() Unable to alloc CompsPtr in %s\n", path );
 			return( NULL );
 		}
 	}
 	else
 	{
-        Msg( "LoadCompObj() Unable to load Componented object %s\n", path );
+		Msg( "LoadCompObj() Unable to load Componented object %s\n", path );
 		return( NULL );
 	}
 
- 	fclose( fp );
+	fclose( fp );
 
 	*OverallTime *= ANIM_SECOND;
 	if( *MidTime ) *MidTime *= ANIM_SECOND;
@@ -254,7 +254,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 	Output		:	FILE		*	Updated File Pointer
 ===================================================================*/
 FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
-						    VECTOR * Pos, VECTOR * Dir, u_int16_t Group,
+							VECTOR * Pos, VECTOR * Dir, u_int16_t Group,
 							float * Time, float * MidTime, u_int16_t * BaseModel,
 							u_int16_t OwnerType, u_int16_t OwnerID )
 {
@@ -401,7 +401,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			}
 			else
 			{
-		        Msg( "LoadCompObjChildren() Unable to alloc model\n" );
+				Msg( "LoadCompObjChildren() Unable to alloc model\n" );
 				return( NULL );
 			}
 		}
@@ -438,7 +438,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 					switch( TransPtr[ Count ].Type )
 					{
 						case TRANS_TRANSLATE:
-    						TransPtr[ Count ].Data = malloc( sizeof( ANI_TRANSLATE ) );
+							TransPtr[ Count ].Data = malloc( sizeof( ANI_TRANSLATE ) );
 							if( TransPtr[ Count ].Data != NULL )
 							{
 								AniTransPtr = (ANI_TRANSLATE *) TransPtr[ Count ].Data;
@@ -454,7 +454,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							}
 							else
 							{
-						        Msg( "LoadCompObjChildren() Unable to alloc TranslationData\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc TranslationData\n" );
 								return( NULL );
 							}
 							break;
@@ -487,7 +487,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							}
 							else
 							{
-						        Msg( "LoadCompObjChildren() Unable to alloc RotationData\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc RotationData\n" );
 								return( NULL );
 							}
 							break;
@@ -506,7 +506,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							}
 							else
 							{
-						        Msg( "LoadCompObjChildren() Unable to alloc MorphData\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc MorphData\n" );
 								return( NULL );
 							}
 							break;
@@ -583,7 +583,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							}
 							else
 							{
-						        Msg( "LoadCompObjChildren() Unable to alloc PropertyData\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc PropertyData\n" );
 								return( NULL );
 							}
 							break;
@@ -595,7 +595,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			}
 			else
 			{
-		        Msg( "LoadCompObjChildren() Unable to alloc Trans\n" );
+				Msg( "LoadCompObjChildren() Unable to alloc Trans\n" );
 				return( NULL );
 			}
 		}
@@ -645,7 +645,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							}
 							else
 							{
-						        Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
 								return( NULL );
 							}
 							break;
@@ -682,13 +682,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								}
 								else
 								{
-							        Msg( "LoadCompObjChildren() Unable to alloc ColZoneBoxSides\n" );
+									Msg( "LoadCompObjChildren() Unable to alloc ColZoneBoxSides\n" );
 									return( NULL );
 								}
 							}
 							else
 							{
-						        Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
 								return( NULL );
 							}
 							break;
@@ -725,13 +725,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								}
 								else
 								{
-							        Msg( "LoadCompObjChildren() Unable to alloc ColZonePoly\n" );
+									Msg( "LoadCompObjChildren() Unable to alloc ColZonePoly\n" );
 									return( NULL );
 								}
 							}
 							else
 							{
-						        Msg( "LoadCompObjChildren() Unable to alloc ColZonePolySides\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc ColZonePolySides\n" );
 								return( NULL );
 							}
 							break;
@@ -743,7 +743,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			}
 			else
 			{
-		        Msg( "LoadCompObjChildren() Unable to alloc ColZonesPtr\n" );
+				Msg( "LoadCompObjChildren() Unable to alloc ColZonesPtr\n" );
 				return( NULL );
 			}
 		}
@@ -767,7 +767,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			}
 			else
 			{
-		        Msg( "LoadCompObjChildren() Unable to alloc children\n" );
+				Msg( "LoadCompObjChildren() Unable to alloc children\n" );
 				return( NULL );
 			}
 		}
@@ -1074,7 +1074,7 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 													if( Children->ModelIndex != INDEX_NONE )
 													{
 														ApplyMatrix( &Models[ Children->ModelIndex ].Mat,
-															         &ModelHeaders[ Models[ Children->ModelIndex ].ModelNum ].Center, &TempPos );
+																	 &ModelHeaders[ Models[ Children->ModelIndex ].ModelNum ].Center, &TempPos );
 														TempPos.x += Models[ Children->ModelIndex ].Pos.x;
 														TempPos.y += Models[ Children->ModelIndex ].Pos.y;
 														TempPos.z += Models[ Children->ModelIndex ].Pos.z;
@@ -1400,7 +1400,7 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 }
 
 /*===================================================================
- 	Procedure	:		Check Ray to Col Zone
+	Procedure	:		Check Ray to Col Zone
 	Input		:		VECTOR	*	StartPos
 				:		VECTOR	*	EndPos
 				:		ZONESIDE *	Sides
@@ -1449,7 +1449,7 @@ bool RayToColZone( VECTOR * StartPos, VECTOR * EndPos, ZONESIDE * StartSide, int
 }
 
 /*===================================================================
- 	Procedure	:		Is point inside convex shape?
+	Procedure	:		Is point inside convex shape?
 	Input		:		VECTOR	*	Pos
 				:		ZONESIDE *	Sides
 				:		int16_t		NumSides
@@ -1527,7 +1527,7 @@ void GetCompObjBoundingBox( MATRIX * ParentMatrix, VECTOR * ParentPos,
 	Output		:	Nothing
 ===================================================================*/
 void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * ParentMatrix,
-								    VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight )
+									VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight )
 {
 	int16_t				Count;
 	int16_t				Trans;
@@ -2077,7 +2077,7 @@ void GetCompObjColBoundingBox( MATRIX * ParentMatrix, VECTOR * ParentPos,
 	Output		:	Nothing
 ===================================================================*/
 void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * ParentMatrix,
-								    VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight )
+									VECTOR * ParentPos, float Time, VECTOR * TopLeft, VECTOR * BottomRight )
 {
 	int16_t				Count;
 	int16_t				Trans;

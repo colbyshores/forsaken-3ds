@@ -563,7 +563,7 @@ void sound_pan(sound_source_t *src, long _pan)
 }
 
 void sound_position(sound_source_t *src, float x, float y, float z,
-                    float min_distance, float max_distance)
+					float min_distance, float max_distance)
 {
 	/* Basic positional audio approximation:
 	   Just do simple left/right panning based on x position

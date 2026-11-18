@@ -289,7 +289,7 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 	bool collided;
 	VECTOR EndPos;
 
- 	RayLength = VectorLength( Dir );
+	RayLength = VectorLength( Dir );
 	CollideNode = NULL;
 	RayPos = *StartPos;
 	RayDir = *Dir;
@@ -304,10 +304,10 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 	{
 		OldCollideNode = CollideNode;
 		*ImpactPoint = CollidePoint;
-   		*ImpactNormal = CollideNode->Normal;
-   		*ImpactOffset = CollideNode->Offset - CollisionRadius;
+		*ImpactNormal = CollideNode->Normal;
+		*ImpactOffset = CollideNode->Offset - CollisionRadius;
 
-   		return true;
+		return true;
 	}
 	else
 	{
@@ -346,8 +346,8 @@ start:
 	d1 = POINT_TO_PLANE( start_point_ptr, node_ptr ) - CollisionRadius;
 	d2 = POINT_TO_PLANE(   end_point_ptr, node_ptr ) - CollisionRadius;
 
-    if( d1 < TOLER && d1 > -TOLER ) d1 = 0.0F;
-    if( d2 < TOLER && d2 > -TOLER )
+	if( d1 < TOLER && d1 > -TOLER ) d1 = 0.0F;
+	if( d2 < TOLER && d2 > -TOLER )
 	{
 		if( d1 == 0 )
 		{
@@ -426,33 +426,33 @@ start:
 		}
 		return false;
 	}
-   	// We intersect the Plane...
+	// We intersect the Plane...
 
 
 	div = ( RayDir.x * node_ptr->Normal.x) +
-   		  ( RayDir.y * node_ptr->Normal.y) +
-   		  ( RayDir.z * node_ptr->Normal.z);
+		  ( RayDir.y * node_ptr->Normal.y) +
+		  ( RayDir.z * node_ptr->Normal.z);
 	distance2plane = POINT_TO_PLANE( &RayPos , node_ptr ) - CollisionRadius;
 
-   	distance2plane = distance2plane / div;
-   	intersection_point.x = RayPos.x - ( RayDir.x * distance2plane );
-   	intersection_point.y = RayPos.y - ( RayDir.y * distance2plane );
-   	intersection_point.z = RayPos.z - ( RayDir.z * distance2plane );
+	distance2plane = distance2plane / div;
+	intersection_point.x = RayPos.x - ( RayDir.x * distance2plane );
+	intersection_point.y = RayPos.y - ( RayDir.y * distance2plane );
+	intersection_point.z = RayPos.z - ( RayDir.z * distance2plane );
 
 	if( ( side = ( d1 < 0 ) ) )
-   	{
-   		near_node_ptr = node_ptr->Back;
-   		far_node_ptr = node_ptr->Front;
-   	}else{
-   		near_node_ptr = node_ptr->Front;
-   		far_node_ptr = node_ptr->Back;
-   	}
+	{
+		near_node_ptr = node_ptr->Back;
+		far_node_ptr = node_ptr->Front;
+	}else{
+		near_node_ptr = node_ptr->Front;
+		far_node_ptr = node_ptr->Back;
+	}
 
-   	if( ( !near_node_ptr && ( side ) ) ||
-   		( near_node_ptr && FindCollision( near_node_ptr, start_point_ptr, &intersection_point ) ) )
-   	{
-   		return true;
-   	}
+	if( ( !near_node_ptr && ( side ) ) ||
+		( near_node_ptr && FindCollision( near_node_ptr, start_point_ptr, &intersection_point ) ) )
+	{
+		return true;
+	}
 	CollideNode = node_ptr;
 	CollidePoint = intersection_point;
 	if ( !far_node_ptr )
@@ -479,14 +479,14 @@ start:
 	d = node->Normal.x * Pos->x + node->Normal.y * Pos->y + node->Normal.z * Pos->z + node->Offset;
 	if ( d > TOLER  )
 	{ // definitely in front of plane
-	 	if ( ( node = node->Front ) )
-	 	{
-	 		goto start;
-	 	}
-	 	else
-	 	{
-	 		return true;
-	 	}
+		if ( ( node = node->Front ) )
+		{
+			goto start;
+		}
+		else
+		{
+			return true;
+		}
 	}
 	if ( d < -TOLER )
 	{ // definitely behind plane

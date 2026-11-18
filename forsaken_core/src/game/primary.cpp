@@ -1045,7 +1045,7 @@ static int16_t	OnceOnlyFlag = 0;
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideUp, &UpVector );		/* Calc Up Vector */
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );	/* Calc Up Vector */
-	   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
+					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 
 					if( Toggle )
 					{
@@ -1078,7 +1078,7 @@ static int16_t	OnceOnlyFlag = 0;
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideUp, &UpVector );		/* Calc Up Vector */
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );	/* Calc Up Vector */
-	   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
+					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 
 					if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
 					{
@@ -1153,7 +1153,7 @@ static int16_t	OnceOnlyFlag = 0;
 
 											ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 											ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
-							   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
+											ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 
 											Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
 											Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
@@ -1370,7 +1370,7 @@ static int16_t	OnceOnlyFlag = 0;
 
 										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
-						   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
+										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 
 										Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
 										Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
@@ -1492,7 +1492,7 @@ void ProcessPrimaryBullets( void )
 					switch( PrimBulls[i].OwnerType )
 					{
 						case OWNER_SHIP:
-				   			ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
+							ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
 							PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Ships[ PrimBulls[i].Owner ].Object.Pos, Ships[ PrimBulls[i].Owner ].Object.Group, &TempVector );
 							ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
 							ApplyMatrix( &Ships[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
@@ -1505,7 +1505,7 @@ void ProcessPrimaryBullets( void )
 						case OWNER_ENEMY:
 							if( !Enemies[ PrimBulls[i].Owner ].Object.FirstGun )
 							{
-					   			ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
+								ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
 								PrimBulls[i].GroupImIn = MoveGroup( &Mloadheader, &Enemies[ PrimBulls[i].Owner ].Object.Pos, Enemies[ PrimBulls[i].Owner ].Object.Group, &TempVector );
 								ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].Offset, &TempVector );
 								ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalMat, &PrimBulls[i].LocalDir, &PrimBulls[i].Dir );
@@ -1586,9 +1586,9 @@ void ProcessPrimaryBullets( void )
 							break;
 
 					}
-	 				break;
+					break;
 
-   	   			case TRANSPULSE_CANNON:
+				case TRANSPULSE_CANNON:
 				case NME_TRANSPULSE:
 					if( IsGroupVisible[ PrimBulls[i].GroupImIn ] )
 					{
@@ -1606,7 +1606,7 @@ void ProcessPrimaryBullets( void )
 					}
 					break;
 
-   	   			case PYROLITE_RIFLE:
+				case PYROLITE_RIFLE:
 				case NME_PYROLITE:
 					fmpoly = PrimBulls[i].fmpoly;
 					if( fmpoly != INDEX_NONE )
@@ -1617,17 +1617,17 @@ void ProcessPrimaryBullets( void )
 					break;
 
 				case FLAMES:
-   	   			case PULSAR:
-   	   			case TROJAX:
-   	   			case SUSS_GUN:
-   	   			case ORBITPULSAR:
-   	   			case NME_PULSAR_BLUE:
-   	   			case NME_BULLET1:
-   	   			case NME_PULSAR:
-   	   			case NME_TROJAX:
-   	   			case NME_SUSS_GUN:
-   	   			default:
-   	   				break;
+				case PULSAR:
+				case TROJAX:
+				case SUSS_GUN:
+				case ORBITPULSAR:
+				case NME_PULSAR_BLUE:
+				case NME_BULLET1:
+				case NME_PULSAR:
+				case NME_TROJAX:
+				case NME_SUSS_GUN:
+				default:
+					break;
 			}
 
 			if( AmIOutsideGroup( &Mloadheader, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn ) )
@@ -1646,9 +1646,9 @@ void ProcessPrimaryBullets( void )
 			if( PrimBulls[i].OwnerType == OWNER_SHIP )
 			{
 				bool aim_assist_steer( VECTOR *pos, VECTOR *dir,
-				                              u_int16_t group, int8_t weapon );
+											  u_int16_t group, int8_t weapon );
 				aim_assist_steer( &PrimBulls[i].Pos, &PrimBulls[i].Dir,
-				                  PrimBulls[i].GroupImIn, PrimBulls[i].Weapon );
+								  PrimBulls[i].GroupImIn, PrimBulls[i].Weapon );
 			}
 
 			Speed = ( PrimBulls[ i ].Speed * NewFramelag ); //framelag );
@@ -1697,7 +1697,7 @@ void ProcessPrimaryBullets( void )
 
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			if( PrimBulls[i].ColDist < DistFromStart )
-		   	{
+			{
 				HitWall = 0;
 				DistToInt = (float) fabsf( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
 
@@ -1717,7 +1717,7 @@ void ProcessPrimaryBullets( void )
 					}
 					if( BGObject ) ChangeBGState( BGObject, PrimBulls[i].OwnerType, PrimBulls[i].Owner, SHOT, BGDamage );
 				}
-   			}
+			}
 			else
 			{
 				if( OneGroupBGObjectCol( 0.0F, 0, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, &MoveOffsetVector,
@@ -1810,19 +1810,19 @@ void ProcessPrimaryBullets( void )
 				DistToCenter = VectorLength( &TempVector );
 				NormaliseVector( &TempVector );
 
-		  		ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
+				ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
 
 				Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
 
 				switch( PrimBulls[ i ].Weapon )
 				{
 					case PULSAR:
-	   	   			case NME_PULSAR_BLUE:
-	   	   			case NME_BULLET1:
-	   	   			case NME_PULSAR:
-	   	   			case NME_TROJAX:
-	   	   			case NME_PYROLITE:
-	   	   			case NME_SUSS_GUN:
+					case NME_PULSAR_BLUE:
+					case NME_BULLET1:
+					case NME_PULSAR:
+					case NME_TROJAX:
+					case NME_PYROLITE:
+					case NME_SUSS_GUN:
 					case TROJAX:
 					case PYROLITE_RIFLE:
 					case SUSS_GUN:
@@ -1831,14 +1831,14 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case TRANSPULSE_CANNON:
-	   	   			case NME_TRANSPULSE:
+					case NME_TRANSPULSE:
 						if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched
 						Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // - unpatched
 						break;
 
 					case LASER:
-	   	   			case NME_LASER:
-	   	   			case NME_LIGHTNING:
+					case NME_LASER:
+					case NME_LIGHTNING:
 					case NME_POWERLASER:
 						TempVector.x = ( MInt_Point.x - PrimBulls[ i ].Pos.x );
 						TempVector.y = ( MInt_Point.y - PrimBulls[ i ].Pos.y );
@@ -1919,13 +1919,13 @@ void ProcessPrimaryBullets( void )
 
 				switch( PrimBulls[ i ].Weapon )
 				{
-	   	   			case NME_PULSAR_BLUE:
-	   	   			case NME_BULLET1:
+					case NME_PULSAR_BLUE:
+					case NME_BULLET1:
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
-	   	   			case NME_PULSAR:
+					case NME_PULSAR:
 						CreateNmePulsarExplosion( &MInt_Point, &NewDir, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
@@ -2005,7 +2005,7 @@ void ProcessPrimaryBullets( void )
 						Killed = true;
 						break;
 
-    				case LASER:
+					case LASER:
 						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
@@ -2045,33 +2045,33 @@ void ProcessPrimaryBullets( void )
 ===================================================================*/
 			if( HitWall != INDEX_NONE )
 			{
-		  		ReflectVector( &PrimBulls[i].Dir, &PrimBulls[i].ColPointNormal, &NewDir );
+				ReflectVector( &PrimBulls[i].Dir, &PrimBulls[i].ColPointNormal, &NewDir );
 
 				Killed = false;
 
-   				switch( PrimBulls[i].Weapon )
-   				{
+				switch( PrimBulls[i].Weapon )
+				{
 					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 						CreateSparks( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
-   						CleanUpPrimBull( i, false );
+						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
-   					case NME_PULSAR:
+					case NME_PULSAR:
 						CreateNmePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
-   						CleanUpPrimBull( i, false );
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
+						break;
 
-   					case PULSAR:
+					case PULSAR:
 						CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
-   						CleanUpPrimBull( i, false );
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
+						break;
 
-   					case NME_PYROLITE:
-   					case PYROLITE_RIFLE:
+					case NME_PYROLITE:
+					case PYROLITE_RIFLE:
 						NewPos.x = PrimBulls[i].ColPoint.x;
 						NewPos.y = PrimBulls[i].ColPoint.y;
 						NewPos.z = PrimBulls[i].ColPoint.z;
@@ -2080,27 +2080,27 @@ void ProcessPrimaryBullets( void )
 						MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
 						PrimBulls[i].Dir = NewDir;
 						PrimBulls[i].ColFlag = 0;
-   						break;
+						break;
 
 					case FLAMES:
-   						CleanUpPrimBull( i, false );
+						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
-   					case NME_TROJAX:
-   						CreateNmeTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
-   						CleanUpPrimBull( i, false );
+					case NME_TROJAX:
+						CreateNmeTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
+						break;
 
-   					case TROJAX:
-   						CreateTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
-   						CleanUpPrimBull( i, false );
+					case TROJAX:
+						CreateTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
+						break;
 
-   					case NME_TRANSPULSE:
-   						CreateNmeArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
+					case NME_TRANSPULSE:
+						CreateNmeArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
 
 						NewPos.x = PrimBulls[i].ColPoint.x;
 						NewPos.y = PrimBulls[i].ColPoint.y;
@@ -2111,13 +2111,13 @@ void ProcessPrimaryBullets( void )
 
 						if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
 						{
-	   						CleanUpPrimBull( i, false );
+							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
-   						break;
+						break;
 
-   					case TRANSPULSE_CANNON:
-   						CreateArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
+					case TRANSPULSE_CANNON:
+						CreateArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
 
 						NewPos.x = PrimBulls[i].ColPoint.x;
 						NewPos.y = PrimBulls[i].ColPoint.y;
@@ -2128,62 +2128,62 @@ void ProcessPrimaryBullets( void )
 
 						if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
 						{
-	   						CleanUpPrimBull( i, false );
+							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
-   						break;
+						break;
 
-   					case NME_SUSS_GUN:
-   						CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
+					case NME_SUSS_GUN:
+						CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
 						if( !Random_Range( 16 ) )
 						{
 							PlayPannedSfx( SFX_Ric , PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
 						}
-   						CleanUpPrimBull( i, false );
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
+						break;
 
-   					case SUSS_GUN:
-   						CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
+					case SUSS_GUN:
+						CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
 						if( !Random_Range( 16 ) )
 						{
 							PlayPannedSfx( SFX_Ric, PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
 						}
-   						CleanUpPrimBull( i, false );
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
+						break;
 
-   					case NME_LIGHTNING:
- 						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+					case NME_LIGHTNING:
+						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
-   						break;
+						break;
 
-   					case NME_LASER:
- 						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+					case NME_LASER:
+						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
-   						break;
+						break;
 
-   					case NME_POWERLASER:
+					case NME_POWERLASER:
 						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
-   					case LASER:
- 						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+					case LASER:
+						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
-   						break;
+						break;
 
-   					case ORBITPULSAR:
+					case ORBITPULSAR:
 						CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
-   						CleanUpPrimBull( i, false );
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
+						break;
 
-   					default:
-   						CleanUpPrimBull( i, false );
+					default:
+						CleanUpPrimBull( i, false );
 						Killed = true;
-   						break;
-   				}
+						break;
+				}
 
 				if( Killed ) goto loop;
 			}
@@ -2203,13 +2203,13 @@ void ProcessPrimaryBullets( void )
 
 				Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
 
-   				switch( PrimBulls[ i ].Weapon )
-   				{
-   					case TROJAX:
-   					case PULSAR:
-   					case PYROLITE_RIFLE:
-   					case SUSS_GUN:
-   					case ORBITPULSAR:
+				switch( PrimBulls[ i ].Weapon )
+				{
+					case TROJAX:
+					case PULSAR:
+					case PYROLITE_RIFLE:
+					case SUSS_GUN:
+					case ORBITPULSAR:
 					case NME_PULSAR_BLUE:
 					case NME_BULLET1:
 					case NME_PULSAR:
@@ -2217,47 +2217,47 @@ void ProcessPrimaryBullets( void )
 					case NME_PYROLITE:
 					case NME_SUSS_GUN:
 					case FLAMES:
-   						break;
+						break;
 
 					case NME_TRANSPULSE:
-   					case TRANSPULSE_CANNON:
+					case TRANSPULSE_CANNON:
 						if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched
-   						Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // -- unpatched
-   						break;
+						Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // -- unpatched
+						break;
 
 					case NME_LIGHTNING:
 					case NME_LASER:
-   					case NME_POWERLASER:
-   					case LASER:
-   						TempVector.x = ( Int_Point.x - PrimBulls[ i ].Pos.x );
-   						TempVector.y = ( Int_Point.y - PrimBulls[ i ].Pos.y );
-   						TempVector.z = ( Int_Point.z - PrimBulls[ i ].Pos.z );
-   						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-   						DistToInt = VectorLength( &TempVector );
-   						if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
-   						Damage =  ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
-   						Damage =  ( Damage * ( framelag / 3.0F ) );
-   						break;
-   				}
+					case NME_POWERLASER:
+					case LASER:
+						TempVector.x = ( Int_Point.x - PrimBulls[ i ].Pos.x );
+						TempVector.y = ( Int_Point.y - PrimBulls[ i ].Pos.y );
+						TempVector.z = ( Int_Point.z - PrimBulls[ i ].Pos.z );
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+						DistToInt = VectorLength( &TempVector );
+						if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
+						Damage =  ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
+						Damage =  ( Damage * ( framelag / 3.0F ) );
+						break;
+				}
 
 				switch( ColPerspective )
 				{
 					case COLPERS_Forsaken:
-   						if( ( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) ||
+						if( ( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) ||
 							  /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							  ( PrimBulls[i].OwnerType != OWNER_SHIP ) )
- 						{
-   							if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
-   							{
-   								Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
+						{
+							if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
+							{
+								Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
 								PrimBulls[i].TrojPower *= 1.0F - ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
-   							}
+							}
 
 							if( PrimBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
 
-   							Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
-   							Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
-   							Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
+							Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
+							Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
+							Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
 
 							if( HitTarget == WhoIAm )
 							{
@@ -2266,30 +2266,30 @@ void ProcessPrimaryBullets( void )
 							}
 							else
 							{
-	   							IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Primary, PrimBulls[i].Weapon, ONEOFF_RECOIL );
+								IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Primary, PrimBulls[i].Weapon, ONEOFF_RECOIL );
 							}
-   						}
+						}
 						break;
 
 					case COLPERS_Descent:
-   						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-   						if( HitTarget == WhoIAm )
- 						{
-   							if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
-   							{
-   								Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+						if( HitTarget == WhoIAm )
+						{
+							if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
+							{
+								Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
 								PrimBulls[i].TrojPower *= 1.0F - ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
-   							}
+							}
 
 							if( PrimBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
 
-   							Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
-   							Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
-   							Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
+							Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
+							Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
+							Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
 
 							HitMe( PrimBulls[i].OwnerType, PrimBulls[i].Owner, Damage, WEPTYPE_Primary, PrimBulls[i].Weapon );
 							ForceExternalOneOff( WhoIAm, &Recoil );
-   						}
+						}
 						break;
 				}
 
@@ -2320,9 +2320,9 @@ void ProcessPrimaryBullets( void )
 								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 255, 100, 100 );
 								break;
 							case NME_LIGHTNING:
-		    				case NME_LASER:
-		   					case NME_POWERLASER:
-		    				case LASER:
+							case NME_LASER:
+							case NME_POWERLASER:
+							case LASER:
 								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 200, 200, 255 );
 								break;
 							case NME_PULSAR_BLUE:
@@ -2358,7 +2358,7 @@ void ProcessPrimaryBullets( void )
 
 							case NME_SUSS_GUN:
 							case NME_LASER:
-		   					case NME_POWERLASER:
+							case NME_POWERLASER:
 							case NME_LIGHTNING:
 							case SUSS_GUN:
 							case LASER:
@@ -2377,7 +2377,7 @@ void ProcessPrimaryBullets( void )
 				TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
 				NormaliseVector( &TempVector );
 
-		  		ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
+				ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
 
 				Killed = false;
 
@@ -2500,7 +2500,7 @@ void ProcessPrimaryBullets( void )
 							CreateNmeArcExplosion( &Int_Point, &TempVector, PrimBulls[i].GroupImIn );
 
 							if( Ships[ HitTarget ].Invul )
- 							{
+							{
 								NewPos = Int_Point;
 								MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
 								MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
@@ -2508,13 +2508,13 @@ void ProcessPrimaryBullets( void )
 
 								if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
 								{
-			   						CleanUpPrimBull( i, false );
+									CleanUpPrimBull( i, false );
 									Killed = true;
 								}
 							}
 							else
 							{
-		   						CleanUpPrimBull( i, false );
+								CleanUpPrimBull( i, false );
 								Killed = true;
 							}
 						}
@@ -2526,7 +2526,7 @@ void ProcessPrimaryBullets( void )
 							CreateArcExplosion( &Int_Point, &TempVector, PrimBulls[i].GroupImIn );
 
 							if( Ships[ HitTarget ].Invul )
- 							{
+							{
 								NewPos = Int_Point;
 								MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
 								MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
@@ -2534,13 +2534,13 @@ void ProcessPrimaryBullets( void )
 
 								if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
 								{
-			   						CleanUpPrimBull( i, false );
+									CleanUpPrimBull( i, false );
 									Killed = true;
 								}
 							}
 							else
 							{
-		   						CleanUpPrimBull( i, false );
+								CleanUpPrimBull( i, false );
 								Killed = true;
 							}
 						}
@@ -2580,22 +2580,22 @@ void ProcessPrimaryBullets( void )
 						}
 						break;
 
-    				case NME_LIGHTNING:
+					case NME_LIGHTNING:
 						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
-    				case NME_LASER:
+					case NME_LASER:
 						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
-   					case NME_POWERLASER:
+					case NME_POWERLASER:
 						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
-    				case LASER:
+					case LASER:
 						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
@@ -2637,7 +2637,7 @@ void ProcessPrimaryBullets( void )
 				DistToCenter = VectorLength( &TempVector );
 				NormaliseVector( &TempVector );
 
-		  		ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
+				ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
 
 				Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
 				if( ( PrimBulls[ i ].Weapon == LASER ) ||
@@ -2758,22 +2758,22 @@ void ProcessPrimaryBullets( void )
 						Killed = true;
 						break;
 
-    				case NME_LIGHTNING:
+					case NME_LIGHTNING:
 						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
-    				case NME_LASER:
+					case NME_LASER:
 						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
-   					case NME_POWERLASER:
+					case NME_POWERLASER:
 						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
-    				case LASER:
+					case LASER:
 						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
@@ -2921,25 +2921,25 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 		if( FmPoly != INDEX_NONE ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
 		else NumSparks = ( Random_Range( 4 ) + 4 );
 
-	   	fmpoly = FindFreeFmPoly();
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		fmpoly = FindFreeFmPoly();
+		if( fmpoly != INDEX_NONE )
+		{
 			if( Type )
 			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
-		   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
+				FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+				FmPolys[ fmpoly ].Dir.x = 0.0F;
+				FmPolys[ fmpoly ].Dir.y = 0.0F;
+				FmPolys[ fmpoly ].Dir.z = 0.0F;
 				FmPolys[ fmpoly ].R = 128;
 				FmPolys[ fmpoly ].G = 128;
 				FmPolys[ fmpoly ].B = 128;
-		   		FmPolys[ fmpoly ].Speed = 0.0F;
+				FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				FmPolys[ fmpoly ].Group = Group;
 				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
@@ -2955,23 +2955,23 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 				ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
-		   		FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
-		   		FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
-		   		FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
-		   		FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
+				FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
+				FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
+				FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
+				FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
+				FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
-		   		FmPolys[ fmpoly ].DirVector = *Dir;
-		   		FmPolys[ fmpoly ].UpVector = TempUp;
+				FmPolys[ fmpoly ].Dir.x = 0.0F;
+				FmPolys[ fmpoly ].Dir.y = 0.0F;
+				FmPolys[ fmpoly ].Dir.z = 0.0F;
+				FmPolys[ fmpoly ].DirVector = *Dir;
+				FmPolys[ fmpoly ].UpVector = TempUp;
 				FmPolys[ fmpoly ].R = 128;
 				FmPolys[ fmpoly ].G = 128;
 				FmPolys[ fmpoly ].B = 128;
-		   		FmPolys[ fmpoly ].Speed = 0.0F;
+				FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
 				else FmPolys[ fmpoly ].RotSpeed = 0.0F;
@@ -2980,36 +2980,36 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 				FmPolys[ fmpoly ].Group = Group;
 				AddFmPolyToTPage( fmpoly, GetTPage( Trojax_Exp_Header, 0 ) );
 			}
-	   	}
+		}
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = 255;
 				FmPolys[ fmpoly ].G = 32;
 				FmPolys[ fmpoly ].B = 32;
-		   		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
+				FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				FmPolys[ fmpoly ].xsize = SPARKSIZE;
 				FmPolys[ fmpoly ].ysize = SPARKSIZE;
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -3040,25 +3040,25 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 		if( FmPoly != INDEX_NONE ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
 		else NumSparks = ( Random_Range( 4 ) + 4 );
 
-	   	fmpoly = FindFreeFmPoly();
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		fmpoly = FindFreeFmPoly();
+		if( fmpoly != INDEX_NONE )
+		{
 			if( Type )
 			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
-		   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
+				FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+				FmPolys[ fmpoly ].Dir.x = 0.0F;
+				FmPolys[ fmpoly ].Dir.y = 0.0F;
+				FmPolys[ fmpoly ].Dir.z = 0.0F;
 				FmPolys[ fmpoly ].R = 128;
 				FmPolys[ fmpoly ].G = 16;
 				FmPolys[ fmpoly ].B = 16;
-		   		FmPolys[ fmpoly ].Speed = 0.0F;
+				FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				FmPolys[ fmpoly ].Group = Group;
 				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
@@ -3074,23 +3074,23 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 				ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
-		   		FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
-		   		FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
-		   		FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
-		   		FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
+				FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
+				FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
+				FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
+				FmPolys[ fmpoly ].SeqNum = FM_TROJAX_EXP;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
+				FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
-		   		FmPolys[ fmpoly ].DirVector = *Dir;
-		   		FmPolys[ fmpoly ].UpVector = TempUp;
+				FmPolys[ fmpoly ].Dir.x = 0.0F;
+				FmPolys[ fmpoly ].Dir.y = 0.0F;
+				FmPolys[ fmpoly ].Dir.z = 0.0F;
+				FmPolys[ fmpoly ].DirVector = *Dir;
+				FmPolys[ fmpoly ].UpVector = TempUp;
 				FmPolys[ fmpoly ].R = 128;
 				FmPolys[ fmpoly ].G = 16;
 				FmPolys[ fmpoly ].B = 16;
-		   		FmPolys[ fmpoly ].Speed = 0.0F;
+				FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
 				else FmPolys[ fmpoly ].RotSpeed = 0.0F;
@@ -3099,36 +3099,36 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 				FmPolys[ fmpoly ].Group = Group;
 				AddFmPolyToTPage( fmpoly, GetTPage( Trojax_Exp_Header, 0 ) );
 			}
-	   	}
+		}
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = 255;
 				FmPolys[ fmpoly ].G = 32;
 				FmPolys[ fmpoly ].B = 32;
-		   		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
+				FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				FmPolys[ fmpoly ].xsize = SPARKSIZE;
 				FmPolys[ fmpoly ].ysize = SPARKSIZE;
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -3150,30 +3150,30 @@ void CreatePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 
 	if( IsGroupVisible[ Group ] )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].SeqNum = FM_PULSAR_EXP;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Pulsar_Exp_Header;
-	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].SeqNum = FM_PULSAR_EXP;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Pulsar_Exp_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].Trans = 255;
-	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
 			FmPolys[ fmpoly ].R = 128;
 			FmPolys[ fmpoly ].G = 128;
 			FmPolys[ fmpoly ].B = 128;
-	   		FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Speed = 0.0F;
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = PULSAR_EXPSIZE;
 			FmPolys[ fmpoly ].ysize = PULSAR_EXPSIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 	}
 }
 
@@ -3190,30 +3190,30 @@ void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 
 	if( IsGroupVisible[ Group ] )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].SeqNum = FM_PULSAR_EXP;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Pulsar_Exp_Header;
-	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].SeqNum = FM_PULSAR_EXP;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Pulsar_Exp_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].Trans = 255;
-	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
 			FmPolys[ fmpoly ].R = 255;
 			FmPolys[ fmpoly ].G = 32;
 			FmPolys[ fmpoly ].B = 32;
-	   		FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Speed = 0.0F;
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = PULSAR_EXPSIZE;
 			FmPolys[ fmpoly ].ysize = PULSAR_EXPSIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 	}
 }
 
@@ -3232,30 +3232,30 @@ void CreateNewExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	if( IsGroupVisible[ Group ] )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].SeqNum = FM_MUSHROOM;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &BigExp1_Header;
-	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].SeqNum = FM_MUSHROOM;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &BigExp1_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].Trans = 255;
-	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
 			FmPolys[ fmpoly ].R = 255;
 			FmPolys[ fmpoly ].G = 255;
 			FmPolys[ fmpoly ].B = 255;
-	   		FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Speed = 0.0F;
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = 5.0F;
 			FmPolys[ fmpoly ].ysize = 5.0F;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 	}
 
 	TempUpVector.x = 0.0F;
@@ -3299,30 +3299,30 @@ void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 
 	if( IsGroupVisible[ Group ] )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].SeqNum = FM_SHRAPNEL_EXP;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
-	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].SeqNum = FM_SHRAPNEL_EXP;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].Trans = 255;
-	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
 			FmPolys[ fmpoly ].R = 128;
 			FmPolys[ fmpoly ].G = 128;
 			FmPolys[ fmpoly ].B = 128;
-	   		FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Speed = 0.0F;
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = SUSSGUN_FLARESIZE;
 			FmPolys[ fmpoly ].ysize = SUSSGUN_FLARESIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 	}
 }
 
@@ -3339,30 +3339,30 @@ void CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group
 
 	if( IsGroupVisible[ Group ] )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].SeqNum = FM_SHRAPNEL_EXP;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
-	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].SeqNum = FM_SHRAPNEL_EXP;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].Trans = 255;
-	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
-	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
 			FmPolys[ fmpoly ].R = 64;
 			FmPolys[ fmpoly ].G = 128;
 			FmPolys[ fmpoly ].B = 64;
-	   		FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Speed = 0.0F;
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = SUSSGUN_FLARESIZE;
 			FmPolys[ fmpoly ].ysize = SUSSGUN_FLARESIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 	}
 }
 
@@ -3512,7 +3512,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 /*===================================================================
 			PULSAR
 ===================================================================*/
-		   	case PULSAR:
+			case PULSAR:
 				if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 				{
 					if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
@@ -3559,25 +3559,25 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != INDEX_NONE )
-   				{
-   					FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
-   					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
-   					FmPolys[ fmpoly ].Frame = 0.0F;
-   					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-   					FmPolys[ fmpoly ].xsize = PULSAR_FMSIZE;
-   					FmPolys[ fmpoly ].ysize = PULSAR_FMSIZE;
-   					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
+				if( fmpoly != INDEX_NONE )
+				{
+					FmPolys[ fmpoly ].LifeCount = 1000.0F;
+					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
+					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
+					FmPolys[ fmpoly ].Frame = 0.0F;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].xsize = PULSAR_FMSIZE;
+					FmPolys[ fmpoly ].ysize = PULSAR_FMSIZE;
+					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
-				   	FmPolys[ fmpoly ].Trans = 255;
-   					PrimBulls[i].numfmpolys++;
-   					PrimBulls[i].fmpoly = fmpoly;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].Trans = 255;
+					PrimBulls[i].numfmpolys++;
+					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-   				}
+				}
 
 				Trail_Length = ( (float) -( ( PrimBulls[ i ].PowerLevel * PULSAR_TAILPOWERMUL ) + PULSAR_TAILADDMIN ) );
 
@@ -3697,16 +3697,16 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
 					FmPolys[ fmpoly ].Frame = 0.0F;
-				  	FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
+					FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
 					FmPolys[ fmpoly ].DirVector = *Dir;
 					TempQuat.From2Vectors(&Forward, Dir);
 					TempQuat.ToMatrix(&FmPolys[ fmpoly ].Mat);
 					FmPolys[ fmpoly ].xsize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
 					FmPolys[ fmpoly ].ysize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
-				   	FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-				   	FmPolys[ fmpoly ].G = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-				   	FmPolys[ fmpoly ].B = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-				   	FmPolys[ fmpoly ].Trans = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].G = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].B = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].Trans = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
 
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -3777,25 +3777,25 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].xsize = ( ( PowerLevel * PYROLITE_POWERMUL ) + PYROLITE_ADDMIN );
 					FmPolys[ fmpoly ].ysize = ( ( PowerLevel * PYROLITE_POWERMUL ) + PYROLITE_ADDMIN );
 					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
-				   	FmPolys[ fmpoly ].LifeCount = 64.0F;
-				   	FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-				   	FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
-				   	FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
-				   	FmPolys[ fmpoly ].Trans = 255;
-				   	FmPolys[ fmpoly ].R = 128;
-				   	FmPolys[ fmpoly ].G = 128;
-				   	FmPolys[ fmpoly ].B = 128;
+					FmPolys[ fmpoly ].LifeCount = 64.0F;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
+					FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 128;
+					FmPolys[ fmpoly ].G = 128;
+					FmPolys[ fmpoly ].B = 128;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 				}
-		   		break;
+				break;
 
 /*===================================================================
 			TRANSPULSE CANNON
 ===================================================================*/
-		   	case TRANSPULSE_CANNON:
+			case TRANSPULSE_CANNON:
 				PrimBulls[i].Bounces = TRANSPULSE_BOUNCES;
 				PrimBulls[i].ColRadius = ( ( PrimBulls[i].PowerLevel * ARC_POWERMUL ) + ARC_ADDMIN );
 
@@ -3846,10 +3846,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].ysize = ( ( PowerLevel * TRANSPULSE_POWERMUL ) + TRANSPULSE_ADDMIN );
 					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
-				   	FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].Trans = 255;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -3869,10 +3869,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].DirVector = *Up;
 					FmPolys[ fmpoly ].UpVector = *Dir;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
-				   	FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].Trans = 255;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -3900,9 +3900,9 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				Size = SussgunTable[ PrimBulls[i].PowerLevel ];
 
 				Half = (float) ( ( 1.0F / ( Size / 5120.0F ) ) / 2.0F );
-		   		PrimBulls[i].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
-		   		PrimBulls[i].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
-		   		PrimBulls[i].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
+				PrimBulls[i].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
+				PrimBulls[i].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
+				PrimBulls[i].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
 
 				light = FindFreeXLight();
 				if( light != INDEX_NONE )					// Light attached
@@ -3929,10 +3929,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
 					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
-				   	FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].Trans = 255;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -3989,10 +3989,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-				   	FmPolys[ fmpoly ].Trans = 255;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
 					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -4075,7 +4075,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 /*===================================================================
 			ORBIT PULSAR
 ===================================================================*/
-		   	case ORBITPULSAR:
+			case ORBITPULSAR:
 				PlayPannedSfx(SFX_Orbit, PrimBulls[i].GroupImIn, Pos, 0.0F );
 				light = FindFreeXLight();
 				if( light != INDEX_NONE )					// Light attached
@@ -4093,8 +4093,8 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != INDEX_NONE )
-   				{
+				if( fmpoly != INDEX_NONE )
+				{
 					if( ( OwnerType == OWNER_SHIP ) )
 					{
 						if( ( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
@@ -4105,20 +4105,20 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						}
 					}
 
-				   	FmPolys[ fmpoly ].Trans = 255;
-   					FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
-   					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
-   					FmPolys[ fmpoly ].Frame = 0.0F;
-   					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-   					FmPolys[ fmpoly ].xsize = ORBITPULSAR_FMSIZE;
-   					FmPolys[ fmpoly ].ysize = ORBITPULSAR_FMSIZE;
-   					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].LifeCount = 1000.0F;
+					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
+					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
+					FmPolys[ fmpoly ].Frame = 0.0F;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].xsize = ORBITPULSAR_FMSIZE;
+					FmPolys[ fmpoly ].ysize = ORBITPULSAR_FMSIZE;
+					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-   					PrimBulls[i].numfmpolys++;
-   					PrimBulls[i].fmpoly = fmpoly;
+					PrimBulls[i].numfmpolys++;
+					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-   				}
+				}
 				break;
 
 /*===================================================================
@@ -4156,43 +4156,43 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != INDEX_NONE )
-   				{
-				   	FmPolys[ fmpoly ].Trans = 255;
-   					FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
-   					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
-   					FmPolys[ fmpoly ].Frame = 0.0F;
-   					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-   					FmPolys[ fmpoly ].xsize = NMEBUL1_FMSIZE;
-   					FmPolys[ fmpoly ].ysize = NMEBUL1_FMSIZE;
-   					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
+				if( fmpoly != INDEX_NONE )
+				{
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].LifeCount = 1000.0F;
+					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
+					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
+					FmPolys[ fmpoly ].Frame = 0.0F;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].xsize = NMEBUL1_FMSIZE;
+					FmPolys[ fmpoly ].ysize = NMEBUL1_FMSIZE;
+					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	if( Weapon == NME_PULSAR_BLUE )
-				   	{
-				   		/* KEX Pulsar_Enemy_Blue — Mekton-bullet sprite
-				   		 * tinted blue to match KEX's blue plasma ball
-				   		 * visual.  Sprite shape stays the chunky Mekton
-				   		 * bullet; only the per-poly color modulator
-				   		 * shifts to blue. */
-				   		/* No hint of red — pure blue plasma.  Some green
-				   		 * keeps the energy-plasma cyan glow alive so it
-				   		 * reads as bright blue plasma rather than flat
-				   		 * dark blue. */
-				   		FmPolys[ fmpoly ].R = 0;
-				   		FmPolys[ fmpoly ].G = 96;
-				   		FmPolys[ fmpoly ].B = 255;
-				   	}
-   					PrimBulls[i].numfmpolys++;
-   					PrimBulls[i].fmpoly = fmpoly;
+					if( Weapon == NME_PULSAR_BLUE )
+					{
+						/* KEX Pulsar_Enemy_Blue — Mekton-bullet sprite
+						 * tinted blue to match KEX's blue plasma ball
+						 * visual.  Sprite shape stays the chunky Mekton
+						 * bullet; only the per-poly color modulator
+						 * shifts to blue. */
+						/* No hint of red — pure blue plasma.  Some green
+						 * keeps the energy-plasma cyan glow alive so it
+						 * reads as bright blue plasma rather than flat
+						 * dark blue. */
+						FmPolys[ fmpoly ].R = 0;
+						FmPolys[ fmpoly ].G = 96;
+						FmPolys[ fmpoly ].B = 255;
+					}
+					PrimBulls[i].numfmpolys++;
+					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-   				}
+				}
 				break;
 
 /*===================================================================
 			NME PULSAR
 ===================================================================*/
-		   	case NME_PULSAR:
+			case NME_PULSAR:
 				if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 				{
 					if( !GodMode && !( Ships[ OwnerID ].Object.Flags & SHIP_SuperNashram ) )
@@ -4222,25 +4222,25 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != INDEX_NONE )
-   				{
-   					FmPolys[ fmpoly ].LifeCount = 1000.0F;
-   					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
-   					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
-   					FmPolys[ fmpoly ].Frame = 0.0F;
-   					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-   					FmPolys[ fmpoly ].xsize = PULSAR_FMSIZE;
-   					FmPolys[ fmpoly ].ysize = PULSAR_FMSIZE;
-   					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
+				if( fmpoly != INDEX_NONE )
+				{
+					FmPolys[ fmpoly ].LifeCount = 1000.0F;
+					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
+					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
+					FmPolys[ fmpoly ].Frame = 0.0F;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].xsize = PULSAR_FMSIZE;
+					FmPolys[ fmpoly ].ysize = PULSAR_FMSIZE;
+					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 64; //255;
-				   	FmPolys[ fmpoly ].B = 64; //255;
-				   	FmPolys[ fmpoly ].Trans = 255;
-   					PrimBulls[i].numfmpolys++;
-   					PrimBulls[i].fmpoly = fmpoly;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 64; //255;
+					FmPolys[ fmpoly ].B = 64; //255;
+					FmPolys[ fmpoly ].Trans = 255;
+					PrimBulls[i].numfmpolys++;
+					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-   				}
+				}
 
 				Trail_Length = ( (float) -( ( PrimBulls[ i ].PowerLevel * PULSAR_TAILPOWERMUL ) + PULSAR_TAILADDMIN ) );
 
@@ -4360,16 +4360,16 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
 					FmPolys[ fmpoly ].Frame = 0.0F;
-				  	FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
+					FmPolys[ fmpoly ].Flags = ( FM_FLAG_DIRCONST | FM_FLAG_TWOSIDED );
 					FmPolys[ fmpoly ].DirVector = *Dir;
 					TempQuat.From2Vectors(&Forward, Dir);
 					TempQuat.ToMatrix(&FmPolys[ fmpoly ].Mat);
 					FmPolys[ fmpoly ].xsize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
 					FmPolys[ fmpoly ].ysize = ( ( 3.0F + ( PLevel * 0.075F ) ) * GLOBAL_SCALE );	//TROJAX_SIZE;
-				   	FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-				   	FmPolys[ fmpoly ].G = 32; //(u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-				   	FmPolys[ fmpoly ].B = 32; //(u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-				   	FmPolys[ fmpoly ].Trans = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].G = 32; //(u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].B = 32; //(u_int8_t) ( 205 + ( PLevel * 0.5F ) );
+					FmPolys[ fmpoly ].Trans = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
 
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -4434,25 +4434,25 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].xsize = ( ( PowerLevel * PYROLITE_POWERMUL ) + PYROLITE_ADDMIN );
 					FmPolys[ fmpoly ].ysize = ( ( PowerLevel * PYROLITE_POWERMUL ) + PYROLITE_ADDMIN );
 					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
-				   	FmPolys[ fmpoly ].LifeCount = 64.0F;
-				   	FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-				   	FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
-				   	FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
-				   	FmPolys[ fmpoly ].Trans = 255;
-				   	FmPolys[ fmpoly ].R = 32; //128;
-				   	FmPolys[ fmpoly ].G = 32; //128;
-				   	FmPolys[ fmpoly ].B = 255; //128
+					FmPolys[ fmpoly ].LifeCount = 64.0F;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
+					FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 32; //128;
+					FmPolys[ fmpoly ].G = 32; //128;
+					FmPolys[ fmpoly ].B = 255; //128
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 				}
-		   		break;
+				break;
 
 /*===================================================================
 			NME TRANSPULSE CANNON
 ===================================================================*/
-		   	case NME_TRANSPULSE:
+			case NME_TRANSPULSE:
 				PrimBulls[i].Bounces = TRANSPULSE_BOUNCES;
 				PrimBulls[i].ColRadius = ( ( PrimBulls[i].PowerLevel * ARC_POWERMUL ) + ARC_ADDMIN );
 
@@ -4495,10 +4495,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].ysize = ( ( PowerLevel * TRANSPULSE_POWERMUL ) + TRANSPULSE_ADDMIN );
 					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 64; //255;
-				   	FmPolys[ fmpoly ].G = 255; //255;
-				   	FmPolys[ fmpoly ].B = 64;
-				   	FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 64; //255;
+					FmPolys[ fmpoly ].G = 255; //255;
+					FmPolys[ fmpoly ].B = 64;
+					FmPolys[ fmpoly ].Trans = 255;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4518,10 +4518,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].DirVector = *Up;
 					FmPolys[ fmpoly ].UpVector = *Dir;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 64; //255;
-				   	FmPolys[ fmpoly ].G = 255; //255;
-				   	FmPolys[ fmpoly ].B = 64;
-				   	FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 64; //255;
+					FmPolys[ fmpoly ].G = 255; //255;
+					FmPolys[ fmpoly ].B = 64;
+					FmPolys[ fmpoly ].Trans = 255;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4549,9 +4549,9 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				Size = SussgunTable[ PrimBulls[i].PowerLevel ];
 
 				Half = (float) ( ( 1.0F / ( Size / 5120.0F ) ) / 2.0F );
-		   		PrimBulls[i].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
-		   		PrimBulls[i].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
-		   		PrimBulls[i].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
+				PrimBulls[i].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
+				PrimBulls[i].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
+				PrimBulls[i].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
 
 				light = FindFreeXLight();
 				if( light != INDEX_NONE )					// Light attached
@@ -4578,10 +4578,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
 					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
-				   	FmPolys[ fmpoly ].R = 0; //255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 0; //255;
-				   	FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 0; //255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 0; //255;
+					FmPolys[ fmpoly ].Trans = 255;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4638,10 +4638,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-				   	FmPolys[ fmpoly ].Trans = 255;
-				   	FmPolys[ fmpoly ].R = 16; // 255;
-				   	FmPolys[ fmpoly ].G = 255; //255;
-				   	FmPolys[ fmpoly ].B = 16; //255;
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 16; // 255;
+					FmPolys[ fmpoly ].G = 255; //255;
+					FmPolys[ fmpoly ].B = 16; //255;
 					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -4771,10 +4771,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-				   	FmPolys[ fmpoly ].Trans = 255;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
 					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -4808,7 +4808,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 					Polys[ poly ].Frm_Info = &Laser_Header;
 					Polys[ poly ].Frame = 0.0F;
-			   		Polys[ poly ].AnimSpeed = 48.0F;
+					Polys[ poly ].AnimSpeed = 48.0F;
 					Polys[ poly ].SeqNum = POLY_POWERLASER;
 					Polys[ poly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numpolys++;
@@ -4845,7 +4845,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 						Polys[ poly ].Frm_Info = &Laser_Header;
 						Polys[ poly ].Frame = 0.0F;
-				   		Polys[ poly ].AnimSpeed = 48.0F;
+						Polys[ poly ].AnimSpeed = 48.0F;
 						Polys[ poly ].SeqNum = POLY_POWERLASER;
 						Polys[ poly ].Group = PrimBulls[i].GroupImIn;
 						PrimBulls[i].numpolys++;
@@ -4906,10 +4906,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-				   	FmPolys[ fmpoly ].Trans = 255;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
 					FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -4954,24 +4954,24 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].xsize = ( 16.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 16.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].Frm_Info = PrimaryWeaponAttribs[ Weapon ].FmFrmInfo;
-				   	FmPolys[ fmpoly ].LifeCount = 64.0F;
-				   	FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-				   	FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
-				   	FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
-				   	FmPolys[ fmpoly ].Trans = 255;
-				   	FmPolys[ fmpoly ].R = 255;
-				   	FmPolys[ fmpoly ].G = 255;
-				   	FmPolys[ fmpoly ].B = 255;
+					FmPolys[ fmpoly ].LifeCount = 64.0F;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+					FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
+					FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
+					FmPolys[ fmpoly ].Trans = 255;
+					FmPolys[ fmpoly ].R = 255;
+					FmPolys[ fmpoly ].G = 255;
+					FmPolys[ fmpoly ].B = 255;
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 				}
-		   		break;
+				break;
 
 
-		   	default:
-		   		break;
+			default:
+				break;
 		}
 
 		if( NetFlag )
@@ -5004,85 +5004,85 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	{
 		NumSparks = ( Random_Range( 10 ) + 10 );
 
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
 		if( fmpoly != INDEX_NONE )
 		{
 			TempQuat.From2Vectors(&Forward, Dir);
-		   	TempQuat.ToMatrix(&TempMat);
-		   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
+			TempQuat.ToMatrix(&TempMat);
+			ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 
-		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
-		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].SeqNum = FM_ARC_RING;
-		  	FmPolys[ fmpoly ].Frame = 0.0F;
-		  	FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
-		  	FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
-		   	FmPolys[ fmpoly ].Trans = 255;
-		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
-		  	FmPolys[ fmpoly ].DirVector = *Dir;
-		  	FmPolys[ fmpoly ].UpVector = TempUp;
-		   	FmPolys[ fmpoly ].R = 255;
-		   	FmPolys[ fmpoly ].G = 32;
-		   	FmPolys[ fmpoly ].B = 32;
-		  	FmPolys[ fmpoly ].Speed = 0.0F;
-		   	FmPolys[ fmpoly ].Rot = 0.0F;
-		   	FmPolys[ fmpoly ].RotSpeed = 0.0F;
-		   	FmPolys[ fmpoly ].xsize = TRANSPULSE_EXP_MINSIZE;
-		   	FmPolys[ fmpoly ].ysize = TRANSPULSE_EXP_MINSIZE;
+			FmPolys[ fmpoly ].LifeCount = 48.0F;
+			FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].SeqNum = FM_ARC_RING;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].DirVector = *Dir;
+			FmPolys[ fmpoly ].UpVector = TempUp;
+			FmPolys[ fmpoly ].R = 255;
+			FmPolys[ fmpoly ].G = 32;
+			FmPolys[ fmpoly ].B = 32;
+			FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Rot = 0.0F;
+			FmPolys[ fmpoly ].RotSpeed = 0.0F;
+			FmPolys[ fmpoly ].xsize = TRANSPULSE_EXP_MINSIZE;
+			FmPolys[ fmpoly ].ysize = TRANSPULSE_EXP_MINSIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
 		if( fmpoly != INDEX_NONE )
 		{
-		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
-		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].SeqNum = FM_FLARE;
-		  	FmPolys[ fmpoly ].Frame = 0.0F;
-		  	FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
-		  	FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-		   	FmPolys[ fmpoly ].Trans = 255;
-		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
-		   	FmPolys[ fmpoly ].R = 255;
-		   	FmPolys[ fmpoly ].G = 255;
-		   	FmPolys[ fmpoly ].B = 255;
-		  	FmPolys[ fmpoly ].Speed = 0.0F;
-		   	FmPolys[ fmpoly ].Rot = 0.0F;
-		   	FmPolys[ fmpoly ].RotSpeed = 0.0F;
-		   	FmPolys[ fmpoly ].xsize = TRANSPULSE_FLARE_SIZE;
-		   	FmPolys[ fmpoly ].ysize = TRANSPULSE_FLARE_SIZE;
+			FmPolys[ fmpoly ].LifeCount = 48.0F;
+			FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].SeqNum = FM_FLARE;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].R = 255;
+			FmPolys[ fmpoly ].G = 255;
+			FmPolys[ fmpoly ].B = 255;
+			FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Rot = 0.0F;
+			FmPolys[ fmpoly ].RotSpeed = 0.0F;
+			FmPolys[ fmpoly ].xsize = TRANSPULSE_FLARE_SIZE;
+			FmPolys[ fmpoly ].ysize = TRANSPULSE_FLARE_SIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = 255;
 				FmPolys[ fmpoly ].G = 32;
 				FmPolys[ fmpoly ].B = 32;
@@ -5093,7 +5093,7 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -5122,85 +5122,85 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	{
 		NumSparks = ( Random_Range( 10 ) + 10 );
 
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
 		if( fmpoly != INDEX_NONE )
 		{
 			TempQuat.From2Vectors(&Forward, Dir);
-		   	TempQuat.ToMatrix(&TempMat);
-		   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
+			TempQuat.ToMatrix(&TempMat);
+			ApplyMatrix( &TempMat, &SlideUp, &TempUp );
 
-		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
-		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].SeqNum = FM_ARC_RING;
-		  	FmPolys[ fmpoly ].Frame = 0.0F;
-		  	FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
-		  	FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
-		   	FmPolys[ fmpoly ].Trans = 255;
-		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
-		  	FmPolys[ fmpoly ].DirVector = *Dir;
-		  	FmPolys[ fmpoly ].UpVector = TempUp;
-		   	FmPolys[ fmpoly ].R = 32;
-		   	FmPolys[ fmpoly ].G = 255;
-		   	FmPolys[ fmpoly ].B = 32;
-		  	FmPolys[ fmpoly ].Speed = 0.0F;
-		   	FmPolys[ fmpoly ].Rot = 0.0F;
-		   	FmPolys[ fmpoly ].RotSpeed = 0.0F;
-		   	FmPolys[ fmpoly ].xsize = TRANSPULSE_EXP_MINSIZE;
-		   	FmPolys[ fmpoly ].ysize = TRANSPULSE_EXP_MINSIZE;
+			FmPolys[ fmpoly ].LifeCount = 48.0F;
+			FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].SeqNum = FM_ARC_RING;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].DirVector = *Dir;
+			FmPolys[ fmpoly ].UpVector = TempUp;
+			FmPolys[ fmpoly ].R = 32;
+			FmPolys[ fmpoly ].G = 255;
+			FmPolys[ fmpoly ].B = 32;
+			FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Rot = 0.0F;
+			FmPolys[ fmpoly ].RotSpeed = 0.0F;
+			FmPolys[ fmpoly ].xsize = TRANSPULSE_EXP_MINSIZE;
+			FmPolys[ fmpoly ].ysize = TRANSPULSE_EXP_MINSIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
 		if( fmpoly != INDEX_NONE )
 		{
-		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
-		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
-		  	FmPolys[ fmpoly ].SeqNum = FM_FLARE;
-		  	FmPolys[ fmpoly ].Frame = 0.0F;
-		  	FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
-		  	FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-		   	FmPolys[ fmpoly ].Trans = 255;
-		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
-		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
-		   	FmPolys[ fmpoly ].R = 64;
-		   	FmPolys[ fmpoly ].G = 255;
-		   	FmPolys[ fmpoly ].B = 64;
-		  	FmPolys[ fmpoly ].Speed = 0.0F;
-		   	FmPolys[ fmpoly ].Rot = 0.0F;
-		   	FmPolys[ fmpoly ].RotSpeed = 0.0F;
-		   	FmPolys[ fmpoly ].xsize = TRANSPULSE_FLARE_SIZE;
-		   	FmPolys[ fmpoly ].ysize = TRANSPULSE_FLARE_SIZE;
+			FmPolys[ fmpoly ].LifeCount = 48.0F;
+			FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].Pos.z = Pos->z + ( Dir->z * ( 32.0F * GLOBAL_SCALE ) );
+			FmPolys[ fmpoly ].SeqNum = FM_FLARE;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
+			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].Dir.x = 0.0F;
+			FmPolys[ fmpoly ].Dir.y = 0.0F;
+			FmPolys[ fmpoly ].Dir.z = 0.0F;
+			FmPolys[ fmpoly ].R = 64;
+			FmPolys[ fmpoly ].G = 255;
+			FmPolys[ fmpoly ].B = 64;
+			FmPolys[ fmpoly ].Speed = 0.0F;
+			FmPolys[ fmpoly ].Rot = 0.0F;
+			FmPolys[ fmpoly ].RotSpeed = 0.0F;
+			FmPolys[ fmpoly ].xsize = TRANSPULSE_FLARE_SIZE;
+			FmPolys[ fmpoly ].ysize = TRANSPULSE_FLARE_SIZE;
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = 255;
 				FmPolys[ fmpoly ].G = 32;
 				FmPolys[ fmpoly ].B = 32;
@@ -5211,7 +5211,7 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -5239,21 +5239,21 @@ void CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = 255;
 				FmPolys[ fmpoly ].G = 32;
 				FmPolys[ fmpoly ].B = 32;
@@ -5264,7 +5264,7 @@ void CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -5291,21 +5291,21 @@ void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = 64;
 				FmPolys[ fmpoly ].G = 64;
 				FmPolys[ fmpoly ].B = 64;
@@ -5316,7 +5316,7 @@ void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -5405,17 +5405,17 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 			break;
 	}
 
-   	light = PrimBulls[ i ].light;
-   	if( light != INDEX_NONE )
-   	{
-   		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-   		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-   		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+	light = PrimBulls[ i ].light;
+	if( light != INDEX_NONE )
+	{
+		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
 	}
 
-   	poly = PrimBulls[ i ].poly;
-   	if( poly != INDEX_NONE )
-   	{
+	poly = PrimBulls[ i ].poly;
+	if( poly != INDEX_NONE )
+	{
 		Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( LeftVector.x * LaserDiameter );
 		Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( LeftVector.y * LaserDiameter );
 		Polys[ poly ].Pos1.z = PrimBulls[ i ].Pos.z - ( LeftVector.z * LaserDiameter );
@@ -5431,9 +5431,9 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 
 		if( !( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) )	/* only other people see cross */
 		{
-		   	poly = Polys[ poly ].Prev;
-		   	if( poly != INDEX_NONE )
-		   	{
+			poly = Polys[ poly ].Prev;
+			if( poly != INDEX_NONE )
+			{
 				Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( UpVector.x * LaserDiameter );
 				Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( UpVector.y * LaserDiameter );
 				Polys[ poly ].Pos1.z = PrimBulls[ i ].Pos.z - ( UpVector.z * LaserDiameter );
@@ -5452,12 +5452,12 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 
 	if( IsGroupVisible[ EndGroup ] )
 	{
-	   	fmpoly = PrimBulls[ i ].fmpoly;
-	   	if( fmpoly != INDEX_NONE )
-	   	{
-	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-	   		FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-	   		FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+		fmpoly = PrimBulls[ i ].fmpoly;
+		if( fmpoly != INDEX_NONE )
+		{
+			FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+			FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+			FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
 			FmPolys[ fmpoly ].Group = EndGroup;
 		}
 
@@ -5466,41 +5466,41 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 
 		NumSparks = Random_Range( Range );
 
-	   	for( Count = 0; Count < NumSparks; Count++ )
-	   	{
-	   	   	fmpoly = FindFreeFmPoly();
+		for( Count = 0; Count < NumSparks; Count++ )
+		{
+			fmpoly = FindFreeFmPoly();
 
-	   	   	if( fmpoly != INDEX_NONE )
-	   	   	{
-	   			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-	   	   		FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-	   	   		FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
-	   	   		FmPolys[ fmpoly ].Dir = *Dir;
-	   	   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-	   	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   	   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
-	   			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-	   			FmPolys[ fmpoly ].Trans = 255;
-	   	   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-	   	   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-	   	   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
-	   			FmPolys[ fmpoly ].R = 255;
-	   			FmPolys[ fmpoly ].G = 64;
-	   			FmPolys[ fmpoly ].B = 64;
-	   	   		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
-	   			FmPolys[ fmpoly ].Rot = 0.0F;
-	   			FmPolys[ fmpoly ].xsize = SPARKSIZE;
-	   			FmPolys[ fmpoly ].ysize = SPARKSIZE;
-	   			FmPolys[ fmpoly ].Group = EndGroup;
-	   			NormaliseVector( &FmPolys[ fmpoly ].Dir );
+			if( fmpoly != INDEX_NONE )
+			{
+				FmPolys[ fmpoly ].LifeCount = 1000.0F;
+				FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+				FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+				FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+				FmPolys[ fmpoly ].Trans = 255;
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].R = 255;
+				FmPolys[ fmpoly ].G = 64;
+				FmPolys[ fmpoly ].B = 64;
+				FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
+				FmPolys[ fmpoly ].Rot = 0.0F;
+				FmPolys[ fmpoly ].xsize = SPARKSIZE;
+				FmPolys[ fmpoly ].ysize = SPARKSIZE;
+				FmPolys[ fmpoly ].Group = EndGroup;
+				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	   	}
-	   		else
-	   		{
-	   			return;
-	   		}
-	   	}
+			}
+			else
+			{
+				return;
+			}
+		}
 	}
 }
 
@@ -5583,17 +5583,17 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 			break;
 	}
 
-   	light = PrimBulls[ i ].light;
-   	if( light != INDEX_NONE )
-   	{
-   		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-   		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-   		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+	light = PrimBulls[ i ].light;
+	if( light != INDEX_NONE )
+	{
+		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
 	}
 
-   	poly = PrimBulls[ i ].poly;
-   	if( poly != INDEX_NONE )
-   	{
+	poly = PrimBulls[ i ].poly;
+	if( poly != INDEX_NONE )
+	{
 		Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( LeftVector.x * LaserDiameter );
 		Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( LeftVector.y * LaserDiameter );
 		Polys[ poly ].Pos1.z = PrimBulls[ i ].Pos.z - ( LeftVector.z * LaserDiameter );
@@ -5609,9 +5609,9 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 
 		if( !( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) )	/* only other people see cross */
 		{
-		   	poly = Polys[ poly ].Prev;
-		   	if( poly != INDEX_NONE )
-		   	{
+			poly = Polys[ poly ].Prev;
+			if( poly != INDEX_NONE )
+			{
 				Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( UpVector.x * LaserDiameter );
 				Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( UpVector.y * LaserDiameter );
 				Polys[ poly ].Pos1.z = PrimBulls[ i ].Pos.z - ( UpVector.z * LaserDiameter );
@@ -5630,12 +5630,12 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 
 	if( IsGroupVisible[ EndGroup ] )
 	{
-	   	fmpoly = PrimBulls[ i ].fmpoly;
-	   	if( fmpoly != INDEX_NONE )
-	   	{
-	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-	   		FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-	   		FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+		fmpoly = PrimBulls[ i ].fmpoly;
+		if( fmpoly != INDEX_NONE )
+		{
+			FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+			FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+			FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
 			FmPolys[ fmpoly ].Group = EndGroup;
 		}
 
@@ -5644,41 +5644,41 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 
 		NumSparks = Random_Range( Range );
 
-	   	for( Count = 0; Count < NumSparks; Count++ )
-	   	{
-	   	   	fmpoly = FindFreeFmPoly();
+		for( Count = 0; Count < NumSparks; Count++ )
+		{
+			fmpoly = FindFreeFmPoly();
 
-	   	   	if( fmpoly != INDEX_NONE )
-	   	   	{
-	   			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-	   	   		FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-	   	   		FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
-	   	   		FmPolys[ fmpoly ].Dir = *Dir;
-	   	   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-	   	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   	   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
-	   			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-	   			FmPolys[ fmpoly ].Trans = 255;
-	   	   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-	   	   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-	   	   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
-	   			FmPolys[ fmpoly ].R = 16;
-	   			FmPolys[ fmpoly ].G = 255;
-	   			FmPolys[ fmpoly ].B = 16;
-	   	   		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
-	   			FmPolys[ fmpoly ].Rot = 0.0F;
-	   			FmPolys[ fmpoly ].xsize = SPARKSIZE;
-	   			FmPolys[ fmpoly ].ysize = SPARKSIZE;
-	   			FmPolys[ fmpoly ].Group = EndGroup;
-	   			NormaliseVector( &FmPolys[ fmpoly ].Dir );
+			if( fmpoly != INDEX_NONE )
+			{
+				FmPolys[ fmpoly ].LifeCount = 1000.0F;
+				FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+				FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+				FmPolys[ fmpoly ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
+				FmPolys[ fmpoly ].Trans = 255;
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].R = 16;
+				FmPolys[ fmpoly ].G = 255;
+				FmPolys[ fmpoly ].B = 16;
+				FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
+				FmPolys[ fmpoly ].Rot = 0.0F;
+				FmPolys[ fmpoly ].xsize = SPARKSIZE;
+				FmPolys[ fmpoly ].ysize = SPARKSIZE;
+				FmPolys[ fmpoly ].Group = EndGroup;
+				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	   	}
-	   		else
-	   		{
-	   			return;
-	   		}
-	   	}
+			}
+			else
+			{
+				return;
+			}
+		}
 	}
 }
 
@@ -5760,17 +5760,17 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 
 	CreatePowerLaserSparks( &PrimBulls[i].Pos, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn, 64, 64, 192 );
 
-   	light = PrimBulls[ i ].light;
-   	if( light != INDEX_NONE )
-   	{
-   		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-   		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-   		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+	light = PrimBulls[ i ].light;
+	if( light != INDEX_NONE )
+	{
+		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
 	}
 
-   	poly = PrimBulls[ i ].poly;
-   	if( poly != INDEX_NONE )
-   	{
+	poly = PrimBulls[ i ].poly;
+	if( poly != INDEX_NONE )
+	{
 		StartShipScreenShake( ( Polys[ poly ].Frame * 4.0F ) );
 		LaserDiameter = ( Polys[ poly ].Frame * ( 32.0F * ( PrimBulls[i].PowerLevel + 1 ) ) );
 
@@ -5794,9 +5794,9 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 
 		if( !( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) )	/* only other people see cross */
 		{
-		   	poly = Polys[ poly ].Prev;
-		   	if( poly != INDEX_NONE )
-		   	{
+			poly = Polys[ poly ].Prev;
+			if( poly != INDEX_NONE )
+			{
 				Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( UpVector.x * LaserDiameter );
 				Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( UpVector.y * LaserDiameter );
 				Polys[ poly ].Pos1.z = PrimBulls[ i ].Pos.z - ( UpVector.z * LaserDiameter );
@@ -5914,18 +5914,18 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 			break;
 	}
 
-   	light = PrimBulls[ i ].light;
-   	if( light != INDEX_NONE )
-   	{
-   		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
-   		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
-   		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
+	light = PrimBulls[ i ].light;
+	if( light != INDEX_NONE )
+	{
+		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
+		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
+		XLights[ light ].Pos.z = ( PrimBulls[i].Pos.z + ( PrimBulls[ i ].Dir.z * Distance ) );
 	}
 
 /*===================================================================
 	Kill all existing polys
 ===================================================================*/
-   	poly = PrimBulls[ i ].poly;
+	poly = PrimBulls[ i ].poly;
 
 	for( Count = 0; Count < PrimBulls[i].numpolys; Count++ )
 	{
@@ -6068,9 +6068,9 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 		StartPos = EndPos;
 	}
 
-   	fmpoly = PrimBulls[ i ].fmpoly;
+	fmpoly = PrimBulls[ i ].fmpoly;
 
-   	if( fmpoly != INDEX_NONE )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].Pos = EndPos;
 		FmPolys[ fmpoly ].Group = EndGroup;
@@ -6083,37 +6083,37 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 
 	for( Count = 0; Count < NumSparks; Count++ )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = EndPos;
-	   		FmPolys[ fmpoly ].Dir = *Dir;
-	   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+			FmPolys[ fmpoly ].Pos = EndPos;
+			FmPolys[ fmpoly ].Dir = *Dir;
+			FmPolys[ fmpoly ].SeqNum = FM_BITS;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-   			FmPolys[ fmpoly ].Trans = 255;
-      	   	FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-      	   	FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-      	   	FmPolys[ fmpoly ].Dir.z += Random_Jitter();
-      		FmPolys[ fmpoly ].R = 255;
-      		FmPolys[ fmpoly ].G = 16;
-      		FmPolys[ fmpoly ].B = 16;
-      	   	FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
-      		FmPolys[ fmpoly ].Rot = 0.0F;
-      		FmPolys[ fmpoly ].xsize = SPARKSIZE;
-      		FmPolys[ fmpoly ].ysize = SPARKSIZE;
-      		FmPolys[ fmpoly ].Group = EndGroup;
-      		NormaliseVector( &FmPolys[ fmpoly ].Dir );
-  			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-   	   	}
-   		else
-   		{
-   			return;
-  		}
-   	}
+			FmPolys[ fmpoly ].Trans = 255;
+			FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+			FmPolys[ fmpoly ].R = 255;
+			FmPolys[ fmpoly ].G = 16;
+			FmPolys[ fmpoly ].B = 16;
+			FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
+			FmPolys[ fmpoly ].Rot = 0.0F;
+			FmPolys[ fmpoly ].xsize = SPARKSIZE;
+			FmPolys[ fmpoly ].ysize = SPARKSIZE;
+			FmPolys[ fmpoly ].Group = EndGroup;
+			NormaliseVector( &FmPolys[ fmpoly ].Dir );
+			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
+		}
+		else
+		{
+			return;
+		}
+	}
 }
 
 
@@ -6643,24 +6643,24 @@ void CreateDebugLine( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red,
 	VECTOR	TempDir;
 
 	line = FindFreeLine();						// Line attached
-   	if( line != INDEX_NONE )
-   	{
+	if( line != INDEX_NONE )
+	{
 		TempDir = *Dir;
 		NormaliseVector( &TempDir );
-   		Lines[ line ].StartPos = *Pos;
-   		Lines[ line ].EndPos.x = ( Pos->x + ( TempDir.x * MaxColDistance ) );
-   		Lines[ line ].EndPos.y = ( Pos->y + ( TempDir.y * MaxColDistance ) );
-   		Lines[ line ].EndPos.z = ( Pos->z + ( TempDir.z * MaxColDistance ) );
-   		Lines[ line ].StartCol.R = 255;
-   		Lines[ line ].StartCol.G = 255;
-   		Lines[ line ].StartCol.B = 255;
-   		Lines[ line ].EndCol.R = Red;
-   		Lines[ line ].EndCol.G = Green;
-   		Lines[ line ].EndCol.B = Blue;
-   		Lines[ line ].StartTrans = 255;
-   		Lines[ line ].EndTrans = 255;
-   		Lines[ line ].Group = Group;
-   	}
+		Lines[ line ].StartPos = *Pos;
+		Lines[ line ].EndPos.x = ( Pos->x + ( TempDir.x * MaxColDistance ) );
+		Lines[ line ].EndPos.y = ( Pos->y + ( TempDir.y * MaxColDistance ) );
+		Lines[ line ].EndPos.z = ( Pos->z + ( TempDir.z * MaxColDistance ) );
+		Lines[ line ].StartCol.R = 255;
+		Lines[ line ].StartCol.G = 255;
+		Lines[ line ].StartCol.B = 255;
+		Lines[ line ].EndCol.R = Red;
+		Lines[ line ].EndCol.G = Green;
+		Lines[ line ].EndCol.B = Blue;
+		Lines[ line ].StartTrans = 255;
+		Lines[ line ].EndTrans = 255;
+		Lines[ line ].Group = Group;
+	}
 }
 
 /*===================================================================
@@ -6779,7 +6779,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 			case TROJAX:								/* Fire on release or when max reached */
 				ApplyMatrix( &Ships[Ship].Object.FinalMat, &Forward, &Dir );
 				ApplyMatrix( &Ships[Ship].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
-	   			ApplyMatrix( &Ships[Ship].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
+				ApplyMatrix( &Ships[Ship].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 
 				if( TrojaxOwnersID[ Ship ] )
 				{
@@ -6991,32 +6991,32 @@ void CreateColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
-		   	fmpoly = FindFreeFmPoly();
+			fmpoly = FindFreeFmPoly();
 
-		   	if( fmpoly != INDEX_NONE )
-		   	{
+			if( fmpoly != INDEX_NONE )
+			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
-		   		FmPolys[ fmpoly ].Pos = *Pos;
-		   		FmPolys[ fmpoly ].Dir = *Dir;
-		   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-		   		FmPolys[ fmpoly ].Frame = 0.0F;
-		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+				FmPolys[ fmpoly ].Pos = *Pos;
+				FmPolys[ fmpoly ].Dir = *Dir;
+				FmPolys[ fmpoly ].SeqNum = FM_BITS;
+				FmPolys[ fmpoly ].Frame = 0.0F;
+				FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+				FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = 255;
 				FmPolys[ fmpoly ].G = 64;
 				FmPolys[ fmpoly ].B = 64;
-		   		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
+				FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				FmPolys[ fmpoly ].xsize = SPARKSIZE;
 				FmPolys[ fmpoly ].ysize = SPARKSIZE;
 				FmPolys[ fmpoly ].Group = Group;
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-		   	}
+			}
 			else
 			{
 				return;
@@ -7078,32 +7078,32 @@ void CreateSmallColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 			for( Count = 0; Count < NumSparks; Count++ )
 			{
-			   	fmpoly = FindFreeFmPoly();
+				fmpoly = FindFreeFmPoly();
 
-			   	if( fmpoly != INDEX_NONE )
-			   	{
+				if( fmpoly != INDEX_NONE )
+				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
-			   		FmPolys[ fmpoly ].Pos = *Pos;
-			   		FmPolys[ fmpoly ].Dir = *Dir;
-			   		FmPolys[ fmpoly ].SeqNum = FM_BITS;
-			   		FmPolys[ fmpoly ].Frame = 0.0F;
-			   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+					FmPolys[ fmpoly ].Pos = *Pos;
+					FmPolys[ fmpoly ].Dir = *Dir;
+					FmPolys[ fmpoly ].SeqNum = FM_BITS;
+					FmPolys[ fmpoly ].Frame = 0.0F;
+					FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 					FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 					FmPolys[ fmpoly ].Trans = 255;
-			   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-			   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-			   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+					FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+					FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+					FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 					FmPolys[ fmpoly ].R = 255;
 					FmPolys[ fmpoly ].G = 64;
 					FmPolys[ fmpoly ].B = 64;
-			   		FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
+					FmPolys[ fmpoly ].Speed = ( ( ( (float) Random_Range( 5120 ) ) / 640.F ) + 8.0F ) * GLOBAL_SCALE;
 					FmPolys[ fmpoly ].Rot = 0.0F;
 					FmPolys[ fmpoly ].xsize = SPARKSIZE;
 					FmPolys[ fmpoly ].ysize = SPARKSIZE;
 					FmPolys[ fmpoly ].Group = Group;
 					NormaliseVector( &FmPolys[ fmpoly ].Dir );
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-			   	}
+				}
 				else
 				{
 					return;
@@ -7352,7 +7352,7 @@ void GetDeathString( BYTE WeaponType, BYTE Weapon, char * DstString )
 					sprintf( DstString, LT_DEATHMETHOD_NO_PRIMARY );
 					break;
 				default:
-	   				sprintf( DstString, LT_DEATHMETHOD_KILLED );
+					sprintf( DstString, LT_DEATHMETHOD_KILLED );
 					break;
 			}
 			break;
@@ -7376,25 +7376,25 @@ void GetDeathString( BYTE WeaponType, BYTE Weapon, char * DstString )
 					sprintf( DstString, LT_DEATHMETHOD_GRAVGON );
 					break;
 				case MULTIPLEMISSILE:
-	   				sprintf( DstString, LT_DEATHMETHOD_MFRL );
+					sprintf( DstString, LT_DEATHMETHOD_MFRL );
 					break;
 				case TITANSTARMISSILE:
 					sprintf( DstString, LT_DEATHMETHOD_TITAN );
 					break;
 				case PURGEMINE:
-	   				sprintf( DstString, LT_DEATHMETHOD_PURGE_MINE );
+					sprintf( DstString, LT_DEATHMETHOD_PURGE_MINE );
 					break;
 				case PINEMINE:
-	   				sprintf( DstString, LT_DEATHMETHOD_PINE_MINE);
+					sprintf( DstString, LT_DEATHMETHOD_PINE_MINE);
 					break;
 				case QUANTUMMINE:
-	   				sprintf( DstString, LT_DEATHMETHOD_QUANTUM_MINE );
+					sprintf( DstString, LT_DEATHMETHOD_QUANTUM_MINE );
 					break;
 				case SPIDERMINE:
-	   				sprintf( DstString, LT_DEATHMETHOD_SPIDER_MINE );
+					sprintf( DstString, LT_DEATHMETHOD_SPIDER_MINE );
 					break;
 				case PINEMISSILE:
-	   				sprintf( DstString, LT_DEATHMETHOD_PINE_MISSILE );
+					sprintf( DstString, LT_DEATHMETHOD_PINE_MISSILE );
 					break;
 				case TITANSTARSHRAPNEL:
 					sprintf( DstString, LT_DEATHMETHOD_TITAN_SHRAPNEL );
@@ -7421,7 +7421,7 @@ void GetDeathString( BYTE WeaponType, BYTE Weapon, char * DstString )
 					sprintf( DstString, LT_DEATHMETHOD_NO_SECONDARY );
 					break;
 				default:
-	   				sprintf( DstString, LT_DEATHMETHOD_KILLED );
+					sprintf( DstString, LT_DEATHMETHOD_KILLED );
 					break;
 			}
 			break;
@@ -8087,10 +8087,10 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 		FmPolys[ fmpoly ].xsize = ( 16.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 16.0F * GLOBAL_SCALE );
-	  	FmPolys[ fmpoly ].Trans = 255;
-	   	FmPolys[ fmpoly ].R = Red;
-	   	FmPolys[ fmpoly ].G = Green;
-	   	FmPolys[ fmpoly ].B = Blue;
+		FmPolys[ fmpoly ].Trans = 255;
+		FmPolys[ fmpoly ].R = Red;
+		FmPolys[ fmpoly ].G = Green;
+		FmPolys[ fmpoly ].B = Blue;
 		FmPolys[ fmpoly ].Start_R = Red;
 		FmPolys[ fmpoly ].Start_G = Green;
 		FmPolys[ fmpoly ].Start_B = Blue;
@@ -8103,22 +8103,22 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 
 	for( Count = 0; Count < NumSparks; Count++ )
 	{
-	   	fmpoly = FindFreeFmPoly();
+		fmpoly = FindFreeFmPoly();
 
-	   	if( fmpoly != INDEX_NONE )
-	   	{
+		if( fmpoly != INDEX_NONE )
+		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
-	   		FmPolys[ fmpoly ].Pos = *Pos;
-	   		FmPolys[ fmpoly ].Dir = *Dir;
-	   		FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_SPARKS;
+			FmPolys[ fmpoly ].Pos = *Pos;
+			FmPolys[ fmpoly ].Dir = *Dir;
+			FmPolys[ fmpoly ].SeqNum = FM_SPOTFX_SPARKS;
 			FmPolys[ fmpoly ].AnimSpeed = 10.0F;
-	   		FmPolys[ fmpoly ].Frame = 0.0F;
-	   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
+			FmPolys[ fmpoly ].Frame = 0.0F;
+			FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Trans = 255;
-	   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
-	   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
-	   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+			FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 			FmPolys[ fmpoly ].R = Red;
 			FmPolys[ fmpoly ].G = Green;
 			FmPolys[ fmpoly ].B = Blue;
@@ -8132,7 +8132,7 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 			FmPolys[ fmpoly ].Group = Group;
 			NormaliseVector( &FmPolys[ fmpoly ].Dir );
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-	   	}
+		}
 		else
 		{
 			return;
@@ -8165,7 +8165,7 @@ void GetLaserLocalVector( u_int16_t i, VECTOR * LocalVector )
 				case OWNER_ENEMY:
 					if( !Enemies[ PrimBulls[i].Owner ].Object.FirstGun )
 					{
-		   				ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalInvMat, &PrimBulls[i].Dir, LocalVector );
+						ApplyMatrix( &Enemies[ PrimBulls[i].Owner ].Object.FinalInvMat, &PrimBulls[i].Dir, LocalVector );
 					}
 					else
 					{
@@ -8193,7 +8193,7 @@ void GetLaserLocalVector( u_int16_t i, VECTOR * LocalVector )
 					break;
 
 			}
-	 		break;
+			break;
 
 		default:
 			break;

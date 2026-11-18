@@ -71,7 +71,7 @@ bool Nodeload( char * Filename )
 	NODE		*	NodePnt;
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
-   	u_int16_t		TempGroup;
+	u_int16_t		TempGroup;
 	NORMAL		TempNormal;
 	VECTOR		TempPos_New;
 	VECTOR		Move_Off = { 0.0F , -MaxColDistance , 0.0F };
