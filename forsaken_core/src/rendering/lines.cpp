@@ -1,7 +1,4 @@
-/*===================================================================
-*	l i n e s . c
-*	All routines to do with lines...
-===================================================================*/
+/* lines.cpp -- debug line pool and per-group line batches; see lines.h. */
 #include "game/main.h"
 #include <stdio.h>
 #include "math/new3d.h"
@@ -22,7 +19,7 @@ u_int16_t	FirstLineUsed;
 u_int16_t	FirstLineFree;
 
 /*===================================================================
-	Procedure	:	Init Line Structures and Execute buffer
+	Procedure	:	Init Line Structures (empty used list, all free)
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
@@ -103,11 +100,13 @@ void KillUsedLine( u_int16_t i )
 }
 
 /*===================================================================
-	Procedure	:	Display All Faceme Polygons in specific group
+	Procedure	:	Fill renderObject with up to 400 lines of one group
 	Input		:	u_int16_t	Group
 				:	RENDEROBJECT *		renderObject
-				:	u_int16_t	* StartLine
-	Output		:	Nothing
+				:	u_int16_t	* StartLine	(in: where to resume in the
+				:				used list; out: where the next batch starts,
+				:				(u_int16_t)-1 when done)
+	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * StartLine )
 {
@@ -181,8 +180,8 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 		if( Num_Lines == 0 ) 
 			return false;
 		
-		renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = Num_Lines; // each line is a triangle
-		renderObject->textureGroups[renderObject->numTextureGroups].numVerts = Num_Lines * 2; // 3 verts in a triangle
+		renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = Num_Lines; // one primitive per line
+		renderObject->textureGroups[renderObject->numTextureGroups].numVerts = Num_Lines * 2; // two verts per line
 		renderObject->textureGroups[renderObject->numTextureGroups].startVert = 0;
 		renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
 		renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
@@ -197,7 +196,12 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 	return true;
 }
 
-
+/*===================================================================
+	Procedure	:	Draw every line in a group, batch by batch
+	Input		:	u_int16_t	Group
+				:	RENDEROBJECT *		renderObject (scratch batch)
+	Output		:	false if a draw fails
+===================================================================*/
 bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject ) 
 {
 	u_int16_t  i = 0;
