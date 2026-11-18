@@ -155,7 +155,7 @@ typedef struct AI_BEHAVIOUR{
 
 typedef struct ENEMY_TYPES {
 
-	char *	ModelFilename;		// Model Filename or Component Filename ( .MX/.MXA or .COB )
+	const char *	ModelFilename;		// Model Filename or Component Filename ( .MX/.MXA or .COB )
 	bool	StealthMode;		// Can use Stealth
 	bool	LevelSpecific;		// Level Specific
 	bool	CompCollision;		// Component collision
@@ -419,7 +419,7 @@ void SetupEnemyGroups( void );
 void AddEnemyToGroup( ENEMY * Enemy, u_int16_t Group );
 void RemoveEnemyFromGroup( ENEMY * Enemy, u_int16_t Group );
 void MoveEnemyToGroup( ENEMY * Enemy, u_int16_t OldGroup, u_int16_t NewGroup );
-bool ReadEnemyTxtFile( char *Filename );
+bool ReadEnemyTxtFile( const char * Filename );
 void ObjectForceExternalOneOff( OBJECT * Object, VECTOR *force );
 BYTE BodgePrimaryWeapon( BYTE Weapon, u_int16_t Pickup );
 u_int16_t FindDuplicateModel( int8_t * Filename, int16_t NumModels );

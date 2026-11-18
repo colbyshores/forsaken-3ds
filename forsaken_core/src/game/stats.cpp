@@ -55,8 +55,8 @@ int	KillStats[MAX_PLAYERS+1][MAX_PLAYERS+1];								// each player's KillStats[K
 int BonusStats[MAX_PLAYERS+1];													// each player's ctf/bounty points
 int KillCounter[MAX_PLAYERS+1];													// number of kills made during this life
 int	ScoreSortTab[MAX_PLAYERS + 1];												// player numbers in order of highest score to lowest 								
-char *PrimaryWeaponName[MAXPRIMARYWEAPONS+1]			= { "PULSAR", "TROJAX", "PYROLITE", "TRANSPULSE", "SUSS-GUN", "LASER", "ORBITAL" };
-char *SecondaryWeaponName[TOTALSECONDARYWEAPONS]	= { "MUG", "SOLARIS", "THIEF", "SCATTER", "GRAVGON", "MFRL", "TITAN", "PURGE MINE", "PINE MINE", "QUANTUM MINE", "SPIDER MINE", "PINE MISSILE", "TITAN SHRAPNEL", "ENEMY SPIRAL MISSILE", "ENEMY HOMING MISSILE", "ENEMY BLUE HOMING MISSILE", "ENEMY FIREBALL", "ENEMY TENTACLE", "ENEMY DEPTH CHARGE" };
+const char *PrimaryWeaponName[MAXPRIMARYWEAPONS+1]			= { "PULSAR", "TROJAX", "PYROLITE", "TRANSPULSE", "SUSS-GUN", "LASER", "ORBITAL" };
+const char *SecondaryWeaponName[TOTALSECONDARYWEAPONS]	= { "MUG", "SOLARIS", "THIEF", "SCATTER", "GRAVGON", "MFRL", "TITAN", "PURGE MINE", "PINE MINE", "QUANTUM MINE", "SPIDER MINE", "PINE MISSILE", "TITAN SHRAPNEL", "ENEMY SPIRAL MISSILE", "ENEMY HOMING MISSILE", "ENEMY BLUE HOMING MISSILE", "ENEMY FIREBALL", "ENEMY TENTACLE", "ENEMY DEPTH CHARGE" };
 bool FirstBlood = false;
 bool FirstToFifty = false;
 
@@ -66,7 +66,7 @@ bool FirstToFifty = false;
   Output    :   char*: name of weapon
 ===================================================================*/
 /* Get weapon name */
-char* GetWeaponName(int WeaponType, int Weapon)
+const char* GetWeaponName(int WeaponType, int Weapon)
 {
 	if(WeaponType == WEPTYPE_Primary)
 		return PrimaryWeaponName[Weapon];

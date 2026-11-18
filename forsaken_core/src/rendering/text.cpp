@@ -152,9 +152,9 @@ void Printu_int16_t( u_int16_t tempnum , int x , int y , int col )
 	Input		:		char * Text, u_int16_t y
 	Output		:		nothing
 ===================================================================*/
-void CenterPrint4x5Text( char * Text , int y, int col )
+void CenterPrint4x5Text( const char * Text , int y, int col )
 {
-	char * Text2;
+	const char * Text2;
 	int x;
 	int	i;
 
@@ -191,9 +191,9 @@ void CenterPrint4x5Text2( char * Text , int x, int y, int col )
 	Input		:		char * Text, int x , int y , int col
 	Output		:		nothing
 ===================================================================*/
-void RightJustifyPrint4x5Text( char * Text , int x , int y, int col )
+void RightJustifyPrint4x5Text( const char * Text , int x , int y, int col )
 {
-	char * Text2;
+	const char * Text2;
 	int	i;
 
 	Text2 = Text;
@@ -471,7 +471,7 @@ void AddColourMessageToQueShort( char ** Text, int Colour )
 }
 
 
-void AddPlayerMessageToQue( int Colour, char * Text, ... )
+void AddPlayerMessageToQue( int Colour, const char * Text, ... )
 {
 	int x, j;
 
@@ -511,7 +511,7 @@ void AddPlayerMessageToQue( int Colour, char * Text, ... )
 	}
 }
 
-void AddColourMessageToQue( int Colour, char * Text, ... )
+void AddColourMessageToQue( int Colour, const char * Text, ... )
 {
 	int x, j;
 

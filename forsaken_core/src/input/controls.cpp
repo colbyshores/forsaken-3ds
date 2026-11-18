@@ -84,7 +84,7 @@ bool flush_input = true;
 
 u_int8_t key_state[ INPUT_BUFFERS ][ SDLK_LAST ];
 
-char *ShipActionText[NUM_SHIP_ACTIONS] = {
+const char *ShipActionText[NUM_SHIP_ACTIONS] = {
   "No Action",
   "Rotate Up",
   "Rotate Down",
@@ -116,7 +116,7 @@ char *ShipActionText[NUM_SHIP_ACTIONS] = {
   "Roll Mode",
 };
 
-char *ShipAxisText[NUM_SHIP_AXIS_ACTIONS] = {
+const char *ShipAxisText[NUM_SHIP_AXIS_ACTIONS] = {
   "No Action",
   "Rotate Up/Down",
   "Rotate Left/Right",
@@ -152,7 +152,7 @@ bool ShowMessages = false;	// display long list of chat messages
 bool ShowStatistics = false;	// display statistics in game
 bool ShowNetworkInfo = false;	// display enet info in game 
 
-void FlashMenuText( char *text, float activetime, u_int16_t sfx )
+void FlashMenuText( const char * text, float activetime, u_int16_t sfx )
 {
   if( text )
   {
@@ -268,7 +268,7 @@ static struct
 int ShipAxisLookup[NUM_SHIP_AXIS_ACTIONS] = { SHIPACTION_Nothing, SHIPACTION_RotateUp, SHIPACTION_RotateLeft, SHIPACTION_RollLeft,
                         SHIPACTION_SlideUp, SHIPACTION_SlideLeft, SHIPACTION_MoveForward };
 
-char *JoystickPOVDirections[MAX_POV_DIRECTIONS] = { "Up", "Down", "Left", "Right" };
+const char *JoystickPOVDirections[MAX_POV_DIRECTIONS] = { "Up", "Down", "Left", "Right" };
 
 
 // this function receives higher level encoded bits

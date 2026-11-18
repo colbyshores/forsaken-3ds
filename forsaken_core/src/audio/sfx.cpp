@@ -148,7 +148,7 @@ enum {
 };
 
 typedef struct SFXNAME{
-	char		*Name;			// Name of the Sfx...
+	const char	*Name;			// Name of the Sfx...
 	int			Flags;
 	int			Priority;			// for compound sfx
 	int			SfxLookup;			// for biker / computer speech
@@ -948,7 +948,7 @@ void ClearLevelSpecSfx( void )
 
 		if( Sfx_Filenames[ i ].Name )
 		{
-			free( Sfx_Filenames[ i ].Name );
+			free( const_cast<char *>( Sfx_Filenames[ i ].Name ) );	/* level-specific names are malloc'd */
 			Sfx_Filenames[ i ].Name = NULL;
 		}
 		Sfx_Filenames[ i ].Flags = 0;
@@ -1135,8 +1135,9 @@ int16_t ReturnSFXIndex( char *file )
 		if ( !Sfx_Filenames[ i ].Name  )
 		{
 			Sfx_Filenames[ i ].Flags = level_spec_flags;
-			Sfx_Filenames[ i ].Name = (char *)malloc( strlen( file ) + 1 );
-			strcpy( Sfx_Filenames[ i ].Name, file );
+			char *name = (char *)malloc( strlen( file ) + 1 );
+			Sfx_Filenames[ i ].Name = name;
+			strcpy( name, file );
 			RequestSfx( i );
 			return i;
 		}

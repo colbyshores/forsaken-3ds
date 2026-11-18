@@ -59,7 +59,7 @@
 	Globals
 ===================================================================*/
 /*
-char *SecondaryDescription[MAXSECONDARYWEAPONS] = {
+const char *SecondaryDescription[MAXSECONDARYWEAPONS] = {
 
 	"Mug",
 	"Solaris",
@@ -75,7 +75,7 @@ char *SecondaryDescription[MAXSECONDARYWEAPONS] = {
 
 };
 */
-char *SecondaryDescription[MAXSECONDARYWEAPONS] = {
+const char *SecondaryDescription[MAXSECONDARYWEAPONS] = {
 	LT_MENU_NEW_SecondaryWeaponKeys17 /*"mug missile:"*/,
 	LT_MENU_NEW_SecondaryWeaponKeys18 /*"solaris missile:"*/,
 	LT_MENU_NEW_SecondaryWeaponKeys29 /*"Thief"*/,

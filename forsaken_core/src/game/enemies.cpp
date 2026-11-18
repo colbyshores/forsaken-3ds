@@ -8522,7 +8522,7 @@ typedef struct {
 	ReadEnemy handle;
 } READENEMYTXTFILE;
 
-bool ReadEnemyTxtFile( char *Filename )
+bool ReadEnemyTxtFile( const char * Filename )
 {
 	static READENEMYTXTFILE jumptab[] = {
 		{ "EnemyType",				read_EnemyType				},

@@ -129,10 +129,10 @@ u_int32_t TrojaxChargeID = 0;
 u_int32_t TrojaxOwnersID[ MAX_PLAYERS ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /*
-char *PrimaryDescription[MAXPRIMARYWEAPONS] =
+const char *PrimaryDescription[MAXPRIMARYWEAPONS] =
 { "Pulsar", "Trojax", "Pyrolite", "Transpulse", "Suss Gun", "Laser" };
 */
-char *PrimaryDescription[MAXPRIMARYWEAPONS] =
+const char *PrimaryDescription[MAXPRIMARYWEAPONS] =
 {
 	LT_MENU_NEW_PrimaryWeaponKeys2/*"Pulsar"*/,
 	LT_MENU_NEW_PrimaryWeaponKeys3/*trojax*/,

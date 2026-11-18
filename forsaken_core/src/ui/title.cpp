@@ -2786,7 +2786,7 @@ MENU	MENU_Help =
 	}
 };
 
-char *BikerText[MAXBIKETYPES] =
+const char *BikerText[MAXBIKETYPES] =
 {
 	
 	//BORG
@@ -3124,7 +3124,7 @@ bool WeaponOrderStatus;
 u_int16_t MaxWeapons;
 int16_t *PriorityList;
 int16_t *OrderList;
-char **DescriptionList;
+const char **DescriptionList;
 bool *WeaponValid;
 
 /*******************

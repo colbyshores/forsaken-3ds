@@ -92,7 +92,7 @@ char *CurrentLevelsList;
 px_timer_t level_time;
 
 // Ai Modes
-char * AiModes[] = {
+const char *AiModes[] = {
   "AIMODE_PLAYER",          // Controlled by PLAYER
   "AIMODE_FOLLOWPATH",        // Follow node path
   "AIMODE_IDLE",          // Do nothing for a while
@@ -121,7 +121,7 @@ bool  CaptureTheFlag	= false;
 // Bounty Hunt
 bool  BountyHunt = false;
 
-char *  InitViewMessages[] = {
+const char *InitViewMessages[] = {
      "Loading OffScreen Surfaces" ,
      "Texture Load Prep         " ,
      "Loading Textures          " ,

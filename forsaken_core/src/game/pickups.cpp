@@ -126,7 +126,7 @@ int16_t	NumPrimaryPickups = 1;
 
 char			CTFMessage[ MAXTEXTMSG ];
 
-char	*	Messages[] = {
+const char *Messages[] = {
 
 			LT_PICKUP_TROJAX				,//"Trojax",						// Primary Weapons
 			LT_PICKUP_PYROLITE				,//"Pyrolite Rifle",

@@ -21,7 +21,7 @@
 #define S_IWRITE 0200
 #endif
 
-FILE * file_open(char * filename, char * mode)
+FILE * file_open(const char * filename, const char * mode)
 {
 	return fopen(convert_path(filename), mode);
 }
@@ -77,7 +77,7 @@ int folder_exists( char *pathspec, ... )
 	return 0;
 }
 
-bool File_Exists( char * str )
+bool File_Exists( const char * str )
 {
 	char * path = convert_path(str);
 	int rval  = (access( path, 0 ) == 0);
@@ -86,7 +86,7 @@ bool File_Exists( char * str )
 	return rval;
 }
 
-long Write_File( char * str, char * File_Buffer, long Write_Size )
+long Write_File( const char * str, const char * File_Buffer, long Write_Size )
 {
 	int		Handle = -1;
 	long	Bytes_Written = 0;

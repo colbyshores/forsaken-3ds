@@ -97,15 +97,15 @@ float config_get_float(const char *opt, float _default)
 	return f;
 }
 
-void config_get_strncpy(char* dest, size_t size, const char *opt, char* _default)
+void config_get_strncpy(char* dest, size_t size, const char *opt, const char * _default)
 {
-	char * str;
+	const char * str;
 	lua_getglobal(L1, "config");
 	lua_getfield(L1, -1, opt);
 	if(lua_isnil(L1, -1))
 		str = _default;
 	else
-		str = (char*)luaL_checkstring(L1, -1);
+		str = luaL_checkstring(L1, -1);
 	strncpy( dest, str, size );
 	lua_pop(L1, 2);
 }
@@ -134,7 +134,7 @@ void config_set_bool(const char *opt, int i)
 	lua_pop(L1, 1);
 }
 
-void config_set_str(const char *opt, char* str)
+void config_set_str(const char *opt, const char * str)
 {
 	lua_getglobal(L1, "config");
 	lua_pushstring(L1, str);

@@ -331,6 +331,6 @@ extern float GlobalFramelagAddition;
 extern int8_t PrimaryToFireLookup[ MAXPRIMARYWEAPONS ];
 extern bool PrimaryWeaponCheat;
 extern int32_t MyColPerspective;
-extern char * PrimaryDescription[ MAXPRIMARYWEAPONS ];
+extern const char *PrimaryDescription[ MAXPRIMARYWEAPONS ];
 extern int8_t * DebugPrimStrings[];
 extern bool PrimaryValid[ MAXPRIMARYWEAPONS ];

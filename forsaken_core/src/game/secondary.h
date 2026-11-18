@@ -304,7 +304,7 @@ extern int16_t SecondaryWeaponsGot[ MAXSECONDARYWEAPONS ];
 extern int16_t NumSecBullsPerGroup[ MAXGROUPS ];
 extern int8_t SecondaryToFireLookup[ MAXSECONDARYWEAPONS ];
 extern bool SecondaryWeaponCheat;
-extern char * SecondaryDescription[ MAXSECONDARYWEAPONS ];
+extern const char *SecondaryDescription[ MAXSECONDARYWEAPONS ];
 extern px_timer_t last_mine_timer;
 extern u_int16_t HitBox;
 extern u_int16_t TargScrPolys[ 4 ];

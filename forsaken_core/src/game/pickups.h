@@ -380,6 +380,6 @@ extern bool MyRandomPickups;
 extern int16_t NumPrimaryPickups;
 extern char CTFMessage[ MAXTEXTMSG ];
 void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID );
-extern char * Messages[];
+extern const char *Messages[];
 extern int16_t SecondaryFromPickupTab[ MAXSECONDARYWEAPONS*2 ];
 void InitValidPickups();
