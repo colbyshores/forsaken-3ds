@@ -3,7 +3,6 @@
 /*
  * Defines
  */
-#define SAVEGAME_SLOTS
 #include "game/main.h"
 
 #ifdef __3DS__

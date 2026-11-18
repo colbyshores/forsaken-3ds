@@ -4,7 +4,6 @@
 /*===================================================================
 		Include Files...	
 ===================================================================*/
-#define SAVEGAME_SLOTS
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/stat.h>
@@ -117,12 +116,7 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
 
-#ifdef SAVEGAME_SLOTS
 	fp = file_open( SaveGameFileName( LoadSavedGameList.selected_item ), "rb" );
-#else
-	sprintf( &LoadGameFilename[ 0 ], "savegame\\%s", &LoadSavedGameList.item[ LoadSavedGameList.selected_item ][ 0 ] );
-	fp = file_open( &LoadGameFilename[ 0 ], "rb" );
-#endif
 
 	if( fp != NULL )
 	{
@@ -176,11 +170,7 @@ void InGameLoad( MENUITEM * /*MenuItem*/ )
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
 
-#ifdef SAVEGAME_SLOTS
 	fp = file_open( SaveGameFileName( LoadSavedGameList.selected_item ), "rb" );
-#else
-	fp = file_open( &LoadGameFilename[ 0 ], "rb" );
-#endif
 
 	if( fp != NULL )
 	{
@@ -413,13 +403,8 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 		Hours = ( u_int16_t ) ( Minutes / 60 );
 		Minutes = ( u_int16_t ) ( Minutes % 60 );
 
-#ifdef SAVEGAME_SLOTS
 		strcpy( (char*)Filename, SaveGameFileName( LoadSavedGameList.selected_item ) );
 		strcpy( (char*)SFilename, SaveGamePicFileName( LoadSavedGameList.selected_item ) );
-#else
-		sprintf( &Filename[ 0 ], "savegame\\%s - %hd-%hd-%hd - %hd of %hd Enemies killed.sav", &RealLevelName[ 0 ], Hours, Minutes, Seconds, NumKilledEnemies, NumInitEnemies );
-		sprintf( &SFilename[ 0 ], "savegame\\%s - %hd-%hd-%hd - %hd of %hd Enemies killed.ppm", &RealLevelName[ 0 ], Hours, Minutes, Seconds, NumKilledEnemies, NumInitEnemies );
-#endif
 
 		DebugPrintf( "%s\n", &Filename[ 0 ] );
 	}

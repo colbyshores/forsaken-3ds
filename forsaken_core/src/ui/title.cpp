@@ -3,7 +3,6 @@
 	Include Files...	
 ===================================================================*/
 
-#define SAVEGAME_SLOTS
 #include "game/main.h"
 #include "util/platform.h"
 #include "audio/music.h"
@@ -7625,22 +7624,13 @@ void GetSavedGameData( void )
 	CurrentSavedGameTimeLevelPlayed[0] = 0;
 	CurrentSavedGameEnemiesKilled[0] = 0;
 
-#ifdef SAVEGAME_SLOTS
 	strcpy( (char*)filename, SaveGameFileName( LoadSavedGameList.selected_item ) );
-#else
-	sprintf(filename, "savegame\\%s", LoadSavedGameList.item[ LoadSavedGameList.selected_item ] ); 
-#endif
 
 	if ( file_time( (char*)filename, &ftime ) )
 		sprintf( CurrentSavedGameDate, "saved %d-%d-%d at %2d:%02d", ftime.month, ftime.day, ftime.year, ftime.hour, ftime.minute );
 	else
 	{
-#ifdef SAVEGAME_SLOTS
 		snprintf( CurrentSavedGameDate, sizeof( CurrentSavedGameDate ), "%s", SavedGameInfo( LoadSavedGameList.selected_item ) );
-#else
-		Msg("invalid saved game file\n");
-		return;
-#endif
 	}
 
 	fp = file_open( (char*)filename, "r" );
@@ -7682,10 +7672,6 @@ void GetSavedGameData( void )
 		sprintf( CurrentSavedGameEnemiesKilled, LT_EnemiesKilled/*"enemies killed: %hd of %hd"*/, KilledEnemiesNum, InitEnemiesNum );
 	}else
 	{
-#ifndef SAVEGAME_SLOTS
-		Msg("invalid saved game file\n");
-		return;
-#endif
 	}
 
 	ext = strstr( (char*)filename, SAVEGAME_EXTENSION );
@@ -8074,9 +8060,6 @@ void ShowStartPointsToggle( MENUITEM * /*item*/ )
 ===================================================================*/
 void InitLoadSavedGameList( MENU * Menu )
 {
-#ifndef SAVEGAME_SLOTS
-	char *fname, *bname;
-#endif
 
 	LoadSavedGameList.items = 0;
 
@@ -8084,7 +8067,6 @@ void InitLoadSavedGameList( MENU * Menu )
 	else LoadSavedGameList.display_items = 8;
 
 	LoadSavedGameList.item[0][0] = 0;
-#ifdef SAVEGAME_SLOTS
 	while ( LoadSavedGameList.items < MAX_SAVEGAME_SLOTS )
 	{
 		char *gameinfo;
@@ -8123,34 +8105,6 @@ void InitLoadSavedGameList( MENU * Menu )
 		else
 			LoadSavedGameList.top_item = LoadSavedGameList.selected_item;
 	}
-#else
-	fname = find_file( SAVEGAME_FOLDER "\\" SAVEGAME_FILESPEC SAVEGAME_EXTENSION );
-
-	do
-	{
-		if(fname)
-		{
-			for ( bname = LoadSavedGameList.item[ LoadSavedGameList.items ]; fname && *fname; bname++, fname++ )
-			{
-				if ( *fname == 0 ) //'.' )
-					break;
-				*bname = *fname;
-			}
-			*bname = 0;
-		}
-		else
-		{
-			strcpy(LoadSavedGameList.item[ LoadSavedGameList.items ], "Empty");
-		}
-		fname = find_next_file();
-		LoadSavedGameList.items++;
-	}
-	while(	LoadSavedGameList.items < MAX_SAVEGAME_SLOTS );
-
-	qsort( (void *)LoadSavedGameList.item, (size_t) LoadSavedGameList.items, sizeof( LoadSavedGameList.item[ 0 ] ), compare );
-
-	find_close();
-#endif
 }
 
 /*===================================================================
