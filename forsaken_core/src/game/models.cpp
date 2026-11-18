@@ -41,7 +41,6 @@
 #include "rendering/lights.h"
 #include "world/visi.h"
 
-#define NO_GRAVGON_TIMER 0
 
 #define BALL_RADIUS	( 256 * GLOBAL_SCALE )
 constexpr int NUMBIKEDETAILS = 4;
@@ -1486,9 +1485,7 @@ void ProcessModels( void )
 				// gravgon field 1
 				// each gravgon is really 2 fields
 				case MODFUNC_Scale:
-#ifdef NO_GRAVGON_TIMER
 					Models[i].LifeCount -= framelag;
-#endif
 					if( Models[i].LifeCount <= 0.0F )
 					{
 						Models[i].LifeCount = 0.0F;
@@ -1510,9 +1507,7 @@ void ProcessModels( void )
 				// gravgon field 2
 				// each gravgon is really 2 fields
 				case MODFUNC_Scale2:
-#ifdef NO_GRAVGON_TIMER
 					Models[i].LifeCount -= framelag;
-#endif
 					if( Models[i].LifeCount <= 0.0F )
 					{
 						Models[i].LifeCount = 0.0F;
