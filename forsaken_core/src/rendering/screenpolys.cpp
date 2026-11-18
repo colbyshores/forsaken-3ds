@@ -2056,7 +2056,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	LPTRIANGLE	ScrPolyFacePnt;
     LPTLVERTEX	lpBufStart;
 	float			u1,v1,u2,v2;
-	float			x1,y1,x2,y2,x3,y3,x4,y4;
+	float			x1,y1,x3,y3;
 	bool			Textured;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
@@ -2190,12 +2190,8 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
    	   							v2 = Box_Ptr->v2;
       							x1 = ScrPolys[ i ].x1;
       							y1 = ScrPolys[ i ].y1;
-      							x2 = ScrPolys[ i ].x2;
-      							y2 = ScrPolys[ i ].y2;
       							x3 = ScrPolys[ i ].x3;
       							y3 = ScrPolys[ i ].y3;
-      							x4 = ScrPolys[ i ].x4;
-      							y4 = ScrPolys[ i ].y4;
       						}
 	      					else
 		  					{
@@ -2438,12 +2434,8 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							v2 = 1.0F;
 							x1 = ScrPolys[ i ].x1;
 							y1 = ScrPolys[ i ].y1;
-							x2 = ScrPolys[ i ].x2;
-							y2 = ScrPolys[ i ].y2;
 							x3 = ScrPolys[ i ].x3;
 							y3 = ScrPolys[ i ].y3;
-							x4 = ScrPolys[ i ].x4;
-							y4 = ScrPolys[ i ].y4;
 							
 #if ACTUAL_TRANS			
 									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, ScrPolys[ i ].Trans );
@@ -2638,7 +2630,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	LPTRIANGLE	ScrPolyFacePnt;
     LPTLVERTEX	lpBufStart;//, lpInsStart, lpPointer;
 	float			u1,v1,u2,v2;
-	float			x1,y1,x2,y2,x3,y3,x4,y4;
+	float			x1,y1,x3,y3;
 	bool			Textured;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
@@ -2771,12 +2763,8 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
    	   							v2 = Box_Ptr->v2;
       							x1 = ScrPolys[ i ].x1;
       							y1 = ScrPolys[ i ].y1;
-      							x2 = ScrPolys[ i ].x2;
-      							y2 = ScrPolys[ i ].y2;
       							x3 = ScrPolys[ i ].x3;
       							y3 = ScrPolys[ i ].y3;
-      							x4 = ScrPolys[ i ].x4;
-      							y4 = ScrPolys[ i ].y4;
       						}
 	      					else
 		  					{
@@ -3018,12 +3006,8 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							v2 = 1.0F;
 							x1 = ScrPolys[ i ].x1;
 							y1 = ScrPolys[ i ].y1;
-							x2 = ScrPolys[ i ].x2;
-							y2 = ScrPolys[ i ].y2;
 							x3 = ScrPolys[ i ].x3;
 							y3 = ScrPolys[ i ].y3;
-							x4 = ScrPolys[ i ].x4;
-							y4 = ScrPolys[ i ].y4;
 							
 			
 #if ACTUAL_TRANS			

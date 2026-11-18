@@ -1713,7 +1713,6 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 	VECTOR FeelerStart;
 	u_int16_t FeelerGroup;
 	NORMAL ImpactNormal;
-	float ImpactPlane;
 	float FeelerLength = FEELER_LENGTH_TO_RADIUS_RATIO * radius;
 	VECTOR StartPos;
 	VECTOR Pos_New; ZERO_STACK_MEM(Pos_New);
@@ -1789,7 +1788,6 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 				ImpactDist = FeelerImpactDist;
 				ImpactPoint = FeelerImpactPoint;
 				ImpactNormal = FeelerFaceNormal;
-				ImpactPlane = FeelerPlane;
 				Pos_New = FeelerPos_New;
 				if( BGObject )
 					*BGObject = FeelerBGObject;

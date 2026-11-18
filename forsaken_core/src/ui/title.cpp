@@ -3605,7 +3605,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
    	int i;
 	float thickness = 3.0F;
 	int font;
-	int edgebits;
 	int scanlinenum;
 	bool startset, endset;
 	MXALOADHEADER	* mxaheader;
@@ -3676,7 +3675,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 							end.x = tempv2.x;
 							end.y = tempv2.y;
 							end.z = tempv2.z;
-							edgebits = 1;
 							break;
 						case 1:
 							start.x = tempv2.x;
@@ -3685,7 +3683,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 							end.x = tempv3.x;
 							end.y = tempv3.y;
 							end.z = tempv3.z;
-							edgebits = 4;
 							break;
 						case 2:
 							start.x = tempv3.x;
@@ -3694,7 +3691,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 							end.x = tempv1.x;
 							end.y = tempv1.y;
 							end.z = tempv1.z;
-							edgebits = 2;
 							break;
 						}
 
@@ -3842,7 +3838,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 							end.x = tempv2.x;
 							end.y = tempv2.y;
 							end.z = tempv2.z;
-							edgebits = 1;
 							break;
 						case 1:
 							start.x = tempv2.x;
@@ -3851,7 +3846,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 							end.x = tempv3.x;
 							end.y = tempv3.y;
 							end.z = tempv3.z;
-							edgebits = 4;
 							break;
 						case 2:
 							start.x = tempv3.x;
@@ -3860,7 +3854,6 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 							end.x = tempv1.x;
 							end.y = tempv1.y;
 							end.z = tempv1.z;
-							edgebits = 2;
 							break;
 						}
 

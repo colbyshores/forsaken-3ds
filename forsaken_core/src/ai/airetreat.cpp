@@ -30,11 +30,9 @@
 void AI_AIR_RETREAT( ENEMY * Enemy )
 {
 	OBJECT * TObject;
-	OBJECT * SObject;
 	NODE * TNode;
 	NODE * NewNode;
 
-	SObject = &Enemy->Object;
 	// Is it time to think???
 	AI_THINK( Enemy , false , false);
 

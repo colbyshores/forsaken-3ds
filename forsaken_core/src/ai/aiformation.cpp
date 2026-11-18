@@ -214,11 +214,9 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 ===================================================================*/
 void AI_LITTLEGEEK_FORMATION( ENEMY * Enemy )
 {
-	OBJECT * SObject;
 	VECTOR		Offset;
 	VECTOR		TargetPos;
 	ENEMY * LinkEnemy;
-	SObject = &Enemy->Object;
 	// Is it time to think???
 	AI_THINK( Enemy , false ,false);
 

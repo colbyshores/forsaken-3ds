@@ -297,7 +297,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	VERT		*	VertPnt;
 	VERTEXCELL  *	VertexCellPnt;
 	TRIANGLE		FacePnt; // was a pointer
-	LPTRIANGLE	TempFacePnt;
 	u_int16_t			exec_type;			// the type of execute buffer
 	u_int16_t			texture_type;			// the type of texture...0 normal  1 env
 	u_int16_t			num_vertices;		// overall number of verts
@@ -559,7 +558,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				GroupTris[ group ] += num_triangles;
 	
 				MFacePnt = (MFACE *) Buffer;
-				TempFacePnt = (LPTRIANGLE ) lpIndices;
 	
 				/*	copy the faces data into the execute buffer	*/
 				for( e=0; e<num_triangles; e++)

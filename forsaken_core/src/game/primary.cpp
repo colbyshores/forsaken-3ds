@@ -841,7 +841,6 @@ static int16_t	OnceOnlyFlag = 0;
 	float	Freq;
 	u_int16_t	Model;
 	int		firing;
-	float	fb_power;
 
 	float	Speed;
 
@@ -857,7 +856,6 @@ static int16_t	OnceOnlyFlag = 0;
 	}
 
 	firing = 0;
-	fb_power = 0.0F;
 
 	if( !GodMode )
 	{
@@ -1464,7 +1462,6 @@ static int16_t	OnceOnlyFlag = 0;
 														Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 
 										firing = 1;
-										fb_power = PowerLevel / MAX_TROJAX_POWER_LEVEL;
 
 										recoil.x = 0.0F;
 										recoil.y = 0.0F;

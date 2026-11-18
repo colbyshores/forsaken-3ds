@@ -1622,8 +1622,7 @@ void PreProcessSfx( void )
 
 void RequestMainSfx( void )
 {
-	u_int16_t i, current;
-	current = 0;
+	u_int16_t i;
 	for ( i = 0; i < MAX_SFX; i++ )
 	{
 		if( (!( Sfx_Filenames[ i ].Flags & SFX_Title )) || (Sfx_Filenames[ i ].Flags & SFX_InGame) )
@@ -2375,9 +2374,7 @@ int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, 
 
 void StopLoopingSfx( int index )
 {
-	int flags;
 
-	flags = Sfx_Filenames[ SpotSfxList[ index ].sfxindex ].Flags;
 
 	if ( SpotSfxList[ index ].source )
 	{
@@ -2422,7 +2419,7 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume )
 void ProcessLoopingSfx( void )
 {
 	float	Modify = 0.0f, Distance = 0.0f, MaxDistance = 0.0f;
-	int i=0, flags=0;
+	int i=0;
 	long Volume = 0;
 	bool InRange = false;
 	bool maint_tick = false;
@@ -2453,7 +2450,6 @@ void ProcessLoopingSfx( void )
 		if ( !SpotSfxList[ i ].used )
 			continue;
 
-		flags = Sfx_Filenames[ SpotSfxList[ i ].sfxindex ].Flags;
 		
 
 //

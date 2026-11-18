@@ -29,10 +29,8 @@
 ===================================================================*/
 void AI_AIR_DEATH_PINGOFF( ENEMY * Enemy )
 {
-	OBJECT * SObject;
 	VECTOR		NewDir = { 0.0F, 1.0F, 0.0F };
 
-	SObject = &Enemy->Object;
 	Enemy->AIFlags |= AI_ANYPLAYERINRANGE;
 
 	Enemy->Timer -= framelag;

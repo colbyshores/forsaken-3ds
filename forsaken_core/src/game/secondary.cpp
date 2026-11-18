@@ -854,9 +854,7 @@ static int16_t	OnceOnlyFlag = 0;
 	VECTOR	Dir;
 	VECTOR	DropVector;
 	VECTOR	recoil;
-	int		firing;
 
-	firing = 0;
 
 #if SCATTER_TEST
 	int16_t	Count;
@@ -957,7 +955,6 @@ static int16_t	OnceOnlyFlag = 0;
 	
 				if( SecondaryAmmo[ Ships[ WhoIAm ].Secondary ] )
 				{
-					firing = 1;
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideUp, &UpVector );		/* Calc Up Vector */
 	
@@ -2008,9 +2005,7 @@ bool ProcessMines( u_int16_t i )
 	u_int16_t		Owner;
 	float		Radius;
 	u_int16_t		BulletID;
-	float		NewFramelag;
 
-	NewFramelag = ( framelag + SecBulls[i].FramelagAddition );
 	if( SecBulls[i].FramelagAddition != 0.0F )
 	{
 		SecBulls[i].FramelagAddition = 0.0F;

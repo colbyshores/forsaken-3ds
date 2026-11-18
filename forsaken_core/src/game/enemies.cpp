@@ -6412,7 +6412,6 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	VECTOR	Move_Off;	
 	VECTOR	Move_Dir;
 	QUAT	StepQuat;	
-	u_int16_t	ImpactGroup;
 	VECTOR	Bob;
 	BGOBJECT * BGObject;
 	VECTOR	ExtForce;
@@ -6517,7 +6516,6 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 		Move_Off.y = 0.0F; 
 		Move_Off.z = 0.0F;
 		ImpactPoint = Object->Pos;
-		ImpactGroup = Object->Group;
 		
 	}else{
 	
@@ -8628,11 +8626,9 @@ void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
 	VECTOR	Move_Off;	
 	VECTOR	Move_Dir;
 	VECTOR	StartPos;
-	u_int16_t	OldGroup;
 
 
 	StartPos = Object->Pos;
-	OldGroup = Object->Group;
 	AccellDecell( &Object->Speed.x , EnemyTypes[Enemy->Type].MoveRateDecell );
 	AccellDecell( &Object->Speed.y , EnemyTypes[Enemy->Type].MoveRateDecell );
 	AccellDecell( &Object->Speed.z , EnemyTypes[Enemy->Type].MoveRateDecell );
@@ -8688,12 +8684,10 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 {
 	VECTOR	ImpactPoint;
 	VECTOR	Move_Off;	
-	u_int16_t	ImpactGroup;
 	BGOBJECT * BGObject;
 	VECTOR	ExtForce;
 	bool	HasBeenExternal;
 	VECTOR	StartPos;
-	u_int16_t	OldGroup;
 	float	ShieldModifier;
 	QUAT	StepQuat;
 	NODE * Node3;
@@ -8728,7 +8722,6 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 	Enemy->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 	
 	StartPos = Object->Pos;
-	OldGroup = Object->Group;
 	
 	// carry out movements
 	Move_Off.x = 0.0F;
@@ -8755,7 +8748,6 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 		Move_Off.y = 0.0F; 
 		Move_Off.z = 0.0F;
 		ImpactPoint = Object->Pos;
-		ImpactGroup = Object->Group;
 	}else{
 		if ( Object->Group != (u_int16_t) -1 )
 		{

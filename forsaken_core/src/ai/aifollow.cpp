@@ -29,14 +29,12 @@
 ===================================================================*/
 void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 {
-	OBJECT * SObject;
 	NODE * TNode;
 	VECTOR	TempVector = { 0.0F , 0.0F , 0.0F };
 	VECTOR	TempUpVector;
 	VECTOR	TempForwardVector;
 	u_int16_t	MineIndex;
 
-	SObject = &Enemy->Object;
 
 	AI_THINK( Enemy , false , false );
 
@@ -178,10 +176,8 @@ void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 ===================================================================*/
 void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 {
-	OBJECT * SObject;
 	NODE * TNode;
 
-	SObject = &Enemy->Object;
 
 	AI_THINK( Enemy , false , false);
 

@@ -1196,7 +1196,7 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 	RENDERMATRIX	Tempproj;
 	RENDERMATRIX	Tempview;
 	VISGROUP *g;
-	int	i, group;
+	int	i;
 	u_int32_t t;
 	render_viewport_t OldViewPort;
 
@@ -1227,7 +1227,6 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 		 	ClipGroup( &CurrentCamera, (u_int16_t) g->group );
 		  CurrentGroupVisible = GroupsVisible[i];
 			GroupInVisibleList = i;
-			group = GroupsVisible[i];
 
 			if ( XLight1Group(  Mloadheader, GroupsVisible[i] ) != true  )
 				return false;

@@ -31,12 +31,10 @@
 void AI_AIR_MOVETOTARGET( ENEMY * Enemy )
 {
 	OBJECT * TObject;
-	OBJECT * SObject;
 	NODE * TNode;
 	NODE * Node;
 	NODE * NewNode;
 
-	SObject = &Enemy->Object;
 
 	// Is it time to think???
 
