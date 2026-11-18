@@ -34,13 +34,17 @@ constexpr auto ONEOVER255 = (1.0F/255.0F);
 constexpr int WATERSTATE_NOWATER = 0;
 constexpr int WATERSTATE_ALLWATER = 2;
 
-constexpr int WATERSTATUS_STATIC = 0;
-constexpr int WATERSTATUS_DRAINING = 1;
-constexpr int WATERSTATUS_FILLING = 2;
+/* A water object's level: steady, draining or filling. */
+enum class WaterStatus : u_int16_t
+{
+	Static,
+	Draining,
+	Filling,
+};
 
 typedef struct WATEROBJECT{
 	u_int32_t	AnimOncePerFrame;	// used for stuff that is displayed more than once in a single frame..or maybe called for multiple cameras..
-	u_int16_t	Status;
+	WaterStatus	Status;
 	u_int16_t	Group;
 	VECTOR	Pos;
 	float	offset;

@@ -63,7 +63,7 @@ bool InitScene(void);
 extern RENDEROBJECT RenderBufs[ 4 ];
 bool RenderScene( void );
 extern bool SeriousError;
-extern int16_t CameraRendering;
+extern CamRendering CameraRendering;
 extern char PrimaryNames[ 7 ][ 16 ];
 extern u_int16_t CameraMissile;
 extern int MissileCameraActive;

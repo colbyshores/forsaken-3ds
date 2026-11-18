@@ -5438,8 +5438,8 @@ void SetShipsVisibleFlag( void )
 			}
 			else
 			{
-				if( ( CameraRendering != CAMRENDERING_Main ) &&
-					( CameraRendering != CAMRENDERING_Rear ) )
+				if( ( CameraRendering != CamRendering::Main ) &&
+					( CameraRendering != CamRendering::Rear ) )
 				{
 					ShipVisible = true;
 				}

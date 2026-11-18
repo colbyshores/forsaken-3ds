@@ -235,7 +235,7 @@ char  TeleportNames[MAXLEVELS][128];
 char MissionTextNames[MAXLEVELS][128];
 char MissionTextPics[MAXLEVELS][128];
 
-int16_t CameraRendering = CAMRENDERING_None;
+CamRendering CameraRendering = CamRendering::None;
 
 bool SeriousError = false;
 bool DoClipping = true;
@@ -3333,7 +3333,7 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	if( ActiveRemoteCamera || (MissileCameraActive && MissileCameraEnable) )
 	{
 		CAMERA saved_camera = CurrentCamera;
-		int16_t saved_cam_rendering = CameraRendering;
+		CamRendering saved_cam_rendering = CameraRendering;
 		BYTE saved_current_cam_view = Current_Camera_View;
 		float main_fov;
 
@@ -3341,7 +3341,7 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		Current_Camera_View = INVALID_CAMERA_VIEW;
 		if( ActiveRemoteCamera )
 		{
-			CameraRendering = CAMRENDERING_Pip;
+			CameraRendering = CamRendering::Pip;
 			CurrentCamera.enable = 1;
 			CurrentCamera.GroupImIn = ActiveRemoteCamera->Group;
 			CurrentCamera.Mat = ActiveRemoteCamera->Mat;
@@ -3350,7 +3350,7 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		}
 		else
 		{
-			CameraRendering = CAMRENDERING_Missile;
+			CameraRendering = CamRendering::Missile;
 			CurrentCamera.enable = 1;
 			CurrentCamera.GroupImIn = SecBulls[ CameraMissile ].GroupImIn;
 			CurrentCamera.Mat = SecBulls[ CameraMissile ].Mat;
@@ -3483,7 +3483,7 @@ bool MainGameRender(void)
    // show regular view
    else if( !FullRearView )
    {
-      CameraRendering = CAMRENDERING_Main;
+      CameraRendering = CamRendering::Main;
       MainCamera.enable = 1;
       MainCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;
       MainCamera.Mat = Ships[Current_Camera_View].Object.FinalMat;
@@ -3549,7 +3549,7 @@ bool MainGameRender(void)
       if( RearCameraActive && !RearCameraDisable )
 #endif
       {
-        CameraRendering = CAMRENDERING_Rear;
+        CameraRendering = CamRendering::Rear;
 
         CurrentCamera.enable = 1;
         CurrentCamera.UseLowestLOD = true;
@@ -3597,7 +3597,7 @@ bool MainGameRender(void)
         float main_fov;
         TempMissileCam = Current_Camera_View;
         Current_Camera_View = INVALID_CAMERA_VIEW;
-        CameraRendering = CAMRENDERING_Pip;
+        CameraRendering = CamRendering::Pip;
         CurrentCamera.enable = 1;
         CurrentCamera.Viewport = viewport;
         CurrentCamera.Viewport.Width = viewport.Width / 2.0f;
@@ -3634,7 +3634,7 @@ bool MainGameRender(void)
     // Full Screen Rear View....
 		else
 		{
-      CameraRendering = CAMRENDERING_Rear;
+      CameraRendering = CamRendering::Rear;
       CurrentCamera.enable = 1;
       CurrentCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;  
       CurrentCamera.Mat = Ships[Current_Camera_View].Object.FinalMat; 

@@ -20,11 +20,15 @@
  * Defines
  */
 
-constexpr int CAMRENDERING_None = 0;
-constexpr int CAMRENDERING_Main = 2;
-constexpr int CAMRENDERING_Rear = 3;
-constexpr int CAMRENDERING_Missile = 4;
-constexpr int CAMRENDERING_Pip = 5;
+/* Which camera pass is being drawn (oct2.cpp's CameraRendering). */
+enum class CamRendering : int16_t
+{
+	None = 0,
+	Main = 2,
+	Rear = 3,
+	Missile = 4,
+	Pip = 5,
+};
 
 /*
  * structures

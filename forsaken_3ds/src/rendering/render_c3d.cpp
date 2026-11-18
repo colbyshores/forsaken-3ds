@@ -1691,8 +1691,8 @@ bool FSClear(XYRECT *rect)
 	 * camera. Rasterized quad clear scissored to viewport via the
 	 * rasterizer — wipes color + depth inside just the inset rect.
 	 * See clear_sub_viewport_via_quad comment for why. */
-	if (CameraRendering != CAMRENDERING_None &&
-	    CameraRendering != CAMRENDERING_Main)
+	if (CameraRendering != CamRendering::None &&
+	    CameraRendering != CamRendering::Main)
 	{
 		clear_sub_viewport_via_quad();
 		return true;

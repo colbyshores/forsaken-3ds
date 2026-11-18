@@ -198,7 +198,7 @@ bool WaterLoad( void )
 	WO->AnimOncePerFrame = 0;
 	for( i = 0 ; i < NumOfWaterObjects ; i++ )
 	{
-		WO->Status = WATERSTATUS_STATIC;
+		WO->Status = WaterStatus::Static;
 
 		/* Each water object uses exactly one texture group at draw time
 		 * (see line ~496 below). Post-Q3-refactor, RENDEROBJECT's
@@ -831,25 +831,25 @@ void WaterProcess( void )
 		return;
 	for( i = 0 ; i < NumOfWaterObjects ; i++ )
 	{
-		if( WO->Status == WATERSTATUS_DRAINING )
+		if( WO->Status == WaterStatus::Draining )
 		{
 			WO->offset -= WO->DrainRate * framelag;
 			if( WO->offset <= WO->MinLevel )
 			{
 				WO->offset = WO->MinLevel;
-				WO->Status = WATERSTATUS_STATIC;
+				WO->Status = WaterStatus::Static;
 				if( WO->Trigger_WhenDrained != 0xffff )
 					ApplyTriggerMod( &TrigMods[WO->Trigger_WhenDrained] );
 			}
 			GroupWaterLevel[WO->Group] = WO->Pos.y + WO->offset + WATER_CELLSIZE;
-		}else if( WO->Status == WATERSTATUS_FILLING )
+		}else if( WO->Status == WaterStatus::Filling )
 		{
 
 			WO->offset += WO->FillRate * framelag;
 			if( WO->offset >= WO->MaxLevel )
 			{
 				WO->offset = WO->MaxLevel;
-				WO->Status = WATERSTATUS_STATIC;
+				WO->Status = WaterStatus::Static;
 				if( WO->Trigger_WhenFilled != 0xffff )
 					ApplyTriggerMod( &TrigMods[WO->Trigger_WhenFilled] );
 			}
@@ -873,7 +873,7 @@ void TriggerWaterDrain( u_int16_t * Data )
 	if( !WO )
 		return;
 	WO += *Data;
-	WO->Status = WATERSTATUS_DRAINING;
+	WO->Status = WaterStatus::Draining;
 }
 /*===================================================================
 	Procedure	:	Trigger water to fill...
@@ -888,7 +888,7 @@ void TriggerWaterFill( u_int16_t * Data )
 	if( !WO )
 		return;
 	WO += *Data;
-	WO->Status = WATERSTATUS_FILLING;
+	WO->Status = WaterStatus::Filling;
 }
 
 
