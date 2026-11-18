@@ -1485,6 +1485,8 @@ void network_pump()
 		case ENET_EVENT_TYPE_RECEIVE:
 			new_packet( &event );
 			break;
+		case ENET_EVENT_TYPE_NONE:	// enet_host_service returns > 0 only with an event
+			break;
 		}
 	}
 	update_players();
