@@ -1,6 +1,5 @@
 
-#ifndef VISI_INCLUDED
-#define VISI_INCLUDED
+#pragma once
 
 
 #include <math.h>
@@ -50,5 +49,3 @@ extern int NumOfVertsTouched;
 extern u_int16_t NumGroupsVisible;
 extern u_int16_t GroupImIn;
 extern u_int16_t GroupsVisible[ MAXGROUPS ];
-
-#endif	// VISI_INCLUDED

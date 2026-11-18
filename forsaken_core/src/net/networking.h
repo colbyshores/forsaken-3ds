@@ -1,5 +1,4 @@
-#ifndef NETWORKING_INCLUDED
-#define NETWORKING_INCLUDED
+#pragma once
 
 // TODO in 1.19 we should change this to a byte and merge multiple bools into bit fields
 typedef int net_bool_t; // backwards compatibility need bool's in pkt structures to be int's
@@ -1054,7 +1053,3 @@ extern bool MyUseShortPackets;
 extern bool CanDoDamage[ MAX_PLAYERS+1 ];
 extern px_timer_t LastPacketTime[ MAX_PLAYERS+1 ];
 extern bool HostDuties;
-
-#endif
-
-

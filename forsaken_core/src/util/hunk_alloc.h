@@ -22,8 +22,7 @@
  *  (callers depend on the BSS-zero semantics they had before).
  *===================================================================*/
 
-#ifndef HUNK_ALLOC_INCLUDED
-#define HUNK_ALLOC_INCLUDED
+#pragma once
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -42,6 +41,3 @@ void * Hunk_Alloc(HunkTag tag, size_t size);
 void   Hunk_FreeAll(HunkTag tag);
 
 size_t Hunk_Used(HunkTag tag);
-
-
-#endif

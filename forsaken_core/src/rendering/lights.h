@@ -9,8 +9,7 @@
  *
  ***************************************************************************/
 
-#ifndef LIGHTS_INCLUDED
-#define LIGHTS_INCLUDED
+#pragma once
 
 #include <math.h>
 #include "game/main.h"
@@ -81,7 +80,3 @@ extern XLIGHT XLights[ MAXXLIGHTS ];
 extern u_int16_t FirstXLightUsed;
 extern u_int16_t FirstXLightFree;
 extern float cral;
-
-#endif // LIGHTS_INCLUDED
-
-

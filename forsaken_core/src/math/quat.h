@@ -1,5 +1,4 @@
-#ifndef	QUAT_DEFS
-#define	QUAT_DEFS
+#pragma once
 
 #include "game/main.h"
 #include "math/new3d.h"
@@ -61,6 +60,3 @@ public:
 
 	void	Step();
 };
-
-
-#endif

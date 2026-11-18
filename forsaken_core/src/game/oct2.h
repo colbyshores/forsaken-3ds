@@ -1,5 +1,4 @@
-#ifndef OCT2_INCLUDED
-#define OCT2_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "data/mload.h"
@@ -93,5 +92,3 @@ extern bool g_stereo_invert;
 extern float hfov;
 extern bool DoClipping;
 extern RENDERMATRIX proj;
-
-#endif // OCT2_INCLUDED

@@ -2,8 +2,7 @@
 	File	:	SpotFX.h
 	Content	:	SpotFX.c include file
 ===================================================================*/
-#ifndef SPOTFX_INCLUDED
-#define SPOTFX_INCLUDED
+#pragma once
 
 /*===================================================================
 	Defines
@@ -156,7 +155,3 @@ void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, 
 void CreateSpotFXHk5Afterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 FILE * SaveAllSpotFX( FILE * fp );
 FILE * LoadAllSpotFX( FILE * fp );
-
-#endif
-
-

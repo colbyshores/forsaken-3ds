@@ -1,6 +1,5 @@
 
-#ifndef TEXT_INCLUDED
-#define TEXT_INCLUDED
+#pragma once
 #include "game/main.h"
 #include "game/constants.h"
 
@@ -110,7 +109,3 @@ extern char MessageBank[ MAX_MESSAGES ][ MAXPERLINE ];
 extern int FontWidth;
 extern int FontHeight;
 extern float MaxMessageTime;
-
-#endif	// TEXT_INCLUDED
-
-

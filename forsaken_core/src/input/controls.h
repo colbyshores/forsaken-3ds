@@ -1,5 +1,4 @@
-#ifndef CONTROLS_H
-#define CONTROLS_H
+#pragma once
 
 #ifndef __3DS__
 #include <SDL.h>
@@ -193,5 +192,3 @@ extern char * ShipAxisText[ NUM_SHIP_AXIS_ACTIONS ];
 extern int ShipAxisLookup[ NUM_SHIP_AXIS_ACTIONS ];
 extern char * ShipActionText[ NUM_SHIP_ACTIONS ];
 void CheckCheats( int key );
-
-#endif // CONTROLS_H

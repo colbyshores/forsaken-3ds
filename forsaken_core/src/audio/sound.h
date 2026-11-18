@@ -1,5 +1,4 @@
-#ifndef SOUND_INCLUDED
-#define SOUND_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #ifndef __3DS__
@@ -58,6 +57,3 @@ void sound_set_pitch( sound_source_t * s, float freq );
 void sound_volume( sound_source_t * s, long decibels );
 void sound_pan( sound_source_t * s, long pan );
 void sound_position( sound_source_t * s, float x, float y, float z, float min_distance, float max_distance );
-
-
-#endif

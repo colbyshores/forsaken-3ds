@@ -2,8 +2,7 @@
 	File	:	Restart.h
 	Content	:	Restart.c include file
 ===================================================================*/
-#ifndef RESTART_INCLUDED
-#define RESTART_INCLUDED
+#pragma once
 
 /*===================================================================
 	Defines
@@ -70,7 +69,3 @@ void DisplayStartPoints( void );
 /* Defined in restart.cpp; shared with the modules that use it. */
 extern bool ShowStartPoints;
 extern RESTART * FirstRestartUsed;
-
-#endif
-
-

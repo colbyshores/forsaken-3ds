@@ -1,6 +1,5 @@
  
-#ifndef AI_H
-#define AI_H
+#pragma once
 
 #include "game/main.h"
 #include "util/util.h"
@@ -340,7 +339,6 @@ void AI_FLESHMORPH_STOPBACKWARD( register ENEMY * Enemy );
 
 
 
-#endif // AI_H
 //--------------------------------------------------------------------------
  
  

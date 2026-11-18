@@ -8,8 +8,7 @@
  *
  ***************************************************************************/
 
-#ifndef SECONDARY_INCLUDED
-#define SECONDARY_INCLUDED
+#pragma once
 #include "game/constants.h"
 #include "game/main.h"
 #include "util/timer.h"
@@ -312,7 +311,3 @@ extern u_int16_t TargScrPolys[ 4 ];
 extern int8_t * DebugSecStrings[];
 extern bool ShowNamesAnyway;
 extern bool SecondaryValid[ MAXSECONDARYWEAPONS ];
-
-#endif // SECONDARY_INCLUDED
-
-

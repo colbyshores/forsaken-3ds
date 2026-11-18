@@ -1,6 +1,5 @@
+#pragma once
 #include "util/platform.h"
-#ifndef MAIN_3DS_INCLUDED
-#define MAIN_3DS_INCLUDED
 
 #include <3ds.h>
 #include "rendering/render.h"
@@ -43,5 +42,3 @@ void c3d_transfer_eye(unsigned int eye);
 bool c3d_hud_begin_bottom(void);
 void c3d_hud_end_bottom(void);
 void c3d_clear_bottom_screen(void);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef TEXTURE_INCLUDED
-#define TEXTURE_INCLUDED
+#pragma once
 
 
 typedef struct {
@@ -14,6 +13,3 @@ typedef struct {
 
 int load_image( texture_image_t * image, int mipmap ); //, float gamma );
 void destroy_image( texture_image_t * image );
-
-
-#endif

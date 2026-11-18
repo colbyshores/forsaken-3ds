@@ -1,5 +1,4 @@
-#ifndef	SFX_INCLUDED
-#define	SFX_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "game/enemies.h"
@@ -317,5 +316,3 @@ void SendBikerTaunt();
 extern char CurrentTauntVariant;
 float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector );
 extern float GlobalSoundAttenuation;
-
-#endif

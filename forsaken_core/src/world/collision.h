@@ -9,8 +9,7 @@
  *
  ***************************************************************************/
 
-#ifndef COLLISION_INCLUDED
-#define COLLISION_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "data/file.h"
@@ -89,7 +88,3 @@ u_int16_t CheckAnyEnemyHit( void );
 extern int outside_group;
 extern int no_collision;
 extern COMP_OBJ * ColChild;
-
-#endif // COLLISION_INCLUDED
-
-

@@ -1,7 +1,6 @@
 
 
-#ifndef CAMERA_INCLUDED
-#define CAMERA_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "game/constants.h"
@@ -97,8 +96,3 @@ FILE * LoadRemoteCameras( FILE * fp );
 extern CAMERA CurrentCamera;
 extern CAMERA MainCamera;
 extern REMOTECAMERA * ActiveRemoteCamera;
-
-
-#endif
-
-

@@ -1,6 +1,5 @@
 
-#ifndef TRIGGERAREA_INCLUDED
-#define TRIGGERAREA_INCLUDED
+#pragma once
 
 /*
  * Defines
@@ -79,7 +78,3 @@ bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, 
 extern bool Entry;
 extern bool Exit;
 extern bool In;
-
-#endif	// TRIGGERAREA_INCLUDED
-
-

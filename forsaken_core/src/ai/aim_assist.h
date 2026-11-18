@@ -21,8 +21,7 @@
  * tracking).
  *===================================================================*/
 
-#ifndef AIM_ASSIST_H
-#define AIM_ASSIST_H
+#pragma once
 
 #include "math/new3d.h"  /* VECTOR */
 #include "game/main.h"   /* u_int16_t */
@@ -38,5 +37,3 @@
  *
  * Returns true if dir was modified, false otherwise. */
 bool aim_assist_steer( VECTOR *pos, VECTOR *dir, u_int16_t group, int8_t weapon );
-
-#endif /* AIM_ASSIST_H */

@@ -1,5 +1,4 @@
-#ifndef MULTIPLAYER_INCLUDED
-#define MULTIPLAYER_INCLUDED
+#pragma once
 #include "game/main.h"
 #include "game/constants.h"
 #include "ui/title.h"
@@ -29,5 +28,3 @@ extern bool ResetKillsPerLevel;
 extern MENU * GetPlayerNumMenu;
 extern bool MyResetKillsPerLevel;
 extern int TeamMembers[ MAX_TEAMS ];
-
-#endif	// MULTIPLAYER_INCLUDED

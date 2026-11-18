@@ -7,8 +7,7 @@
  *
  ***************************************************************************/
 
-#ifndef TLOAD_INCLUDED
-#define TLOAD_INCLUDED
+#pragma once
 
 #include "data/file.h"
 #include "rendering/render.h"
@@ -68,6 +67,3 @@ extern bool use_original_textures;
 /* Defined in tload.cpp; shared with the modules that use it. */
 extern TLOADHEADER Tloadheader;
 extern double Gamma;
-
-#endif	//TLOAD_INCLUDED
-

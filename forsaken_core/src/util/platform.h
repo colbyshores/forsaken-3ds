@@ -5,8 +5,7 @@
  * between SDL (desktop) and 3DS platforms.
  */
 
-#ifndef PLATFORM_INCLUDED
-#define PLATFORM_INCLUDED
+#pragma once
 
 
 #ifdef __3DS__
@@ -36,5 +35,3 @@ int SDL_EnableUNICODE(int enable);		/* SDL 1.x call, stubbed on 3DS */
 #include <SDL.h>
 
 #endif /* __3DS__ */
-
-#endif /* PLATFORM_INCLUDED */

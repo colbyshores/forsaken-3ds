@@ -1,6 +1,5 @@
 
-#ifndef TELEPORT_INCLUDED
-#define TELEPORT_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "math/new3d.h"
@@ -48,6 +47,3 @@ void StopTeleport( u_int16_t * Data );
 void DisplayTeleportsInGroup( u_int16_t Group );
 FILE * SaveTeleports( FILE * fp );
 FILE * LoadTeleports( FILE * fp );
-
-#endif	// TELEPORT_INCLUDED
-

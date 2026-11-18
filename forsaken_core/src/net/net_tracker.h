@@ -18,10 +18,7 @@
  * Boston, MA 02110-1301 USA.
  */
 
-#ifndef NET_TRACKER
-#define NET_TRACKER
+#pragma once
 
 void send_tracker_update( char* host, int port );
 void send_tracker_finished( char* host, int port );
-
-#endif /* NET_TRACKER */

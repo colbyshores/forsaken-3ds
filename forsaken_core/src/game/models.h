@@ -1,6 +1,5 @@
 
-#ifndef MODELS_INCLUDED
-#define MODELS_INCLUDED
+#pragma once
 
 #include <math.h>
 
@@ -639,4 +638,3 @@ char *GetName(int Player);
 extern MODELNAME InterLevelModelNames[ NUM_INTERLEVEL_MODELS+1 ];
 
 extern MODELNAME * ModNames;	/* defined in compobjects.cpp; declared with its type */
-#endif // MODELS_INCLUDED

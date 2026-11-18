@@ -1,5 +1,4 @@
-#ifndef LUA_VECMAT_INCLUDED
-#define LUA_VECMAT_INCLUDED
+#pragma once
 
 #include "scripting/lua_api.h"
 #include "math/new3d.h"
@@ -11,5 +10,3 @@ void lua_pushvector(lua_State *L, VECTOR *v);
 void lua_pushmatrix(lua_State *L, MATRIX *m);
 
 int luaopen_vecmat(lua_State *L);
-
-#endif /* LUA_VECMAT_INCLUDED */

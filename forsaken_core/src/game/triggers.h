@@ -1,5 +1,4 @@
-#ifndef TRIGGERS_INCLUDED
-#define TRIGGERS_INCLUDED
+#pragma once
 
 #include "net/networking.h"
 
@@ -173,7 +172,3 @@ extern int NumOfTrigVars;
 extern int NumOfTriggers;
 extern TRIGGERVAR * DecreaseTemperature;
 extern TRIGGERVAR * TimeLimitTrigger;
-
-#endif	// TRIGGERS_INCLUDED
-
-

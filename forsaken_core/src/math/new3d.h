@@ -1,5 +1,4 @@
-#ifndef __New3d_h
-#define __New3d_h
+#pragma once
 #include <math.h>
 #include "game/main.h"
 
@@ -349,6 +348,3 @@ void MxV( MATRIX * m, VECTOR * v0, VECTOR * v1 );
 extern MATRIX MATRIX_Identity;
 extern u_int16_t Seed1;
 extern u_int16_t Seed2;
-
-
-#endif

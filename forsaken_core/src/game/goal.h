@@ -1,5 +1,4 @@
-#ifndef GOAL_H
-#define GOAL_H
+#pragma once
 
 #include "game/main.h"
 #include "game/constants.h"
@@ -41,5 +40,3 @@ int DisplayGoal( u_int16_t group );
 extern int GoalTeamMembers[ MAX_TEAMS ];
 void SetTeamGoals( u_int16_t *TeamGoals );
 extern int TeamFlag[ MAX_TEAMS ];
-
-#endif // GOAL_H

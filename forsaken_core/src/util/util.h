@@ -1,5 +1,4 @@
-#ifndef UTIL_INCLUDED
-#define UTIL_INCLUDED
+#pragma once
 
 
 #include "game/main.h"
@@ -25,6 +24,3 @@ char * convert_char( char from, char to, char* in );
 
 /* Defined in util.cpp; shared with the modules that use it. */
 extern bool DebugLog;
-
-
-#endif

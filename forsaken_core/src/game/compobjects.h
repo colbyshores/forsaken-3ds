@@ -2,8 +2,7 @@
 	File	:	compobjects.h
 	Content	:	CompObjects.c include file
 ===================================================================*/
-#ifndef COMPOBJECTS_INCLUDED
-#define COMPOBJECTS_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include <stdio.h>
@@ -225,7 +224,3 @@ void AddVertToBoundingBox( VECTOR * Vert, MATRIX * Matrix, VECTOR * Pos, VECTOR 
 void SetStealthOffset( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Offset );
 void SetCompObjStealth( COMP_OBJ * Children, int16_t NumChildren );
 void SetCompObjNonStealth( COMP_OBJ * Children, int16_t NumChildren );
-
-#endif
-
-

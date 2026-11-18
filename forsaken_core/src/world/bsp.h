@@ -1,6 +1,5 @@
 
-#ifndef BSP_INCLUDED
-#define BSP_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "math/new3d.h"
@@ -94,7 +93,3 @@ extern BSP_NODE * BSP_Nodes[ 256 ];
 extern float CollisionRadius;
 bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node);
 extern BSP_NODE * OldCollideNode;
-
-#endif	// BSP_INCLUDED
-
-

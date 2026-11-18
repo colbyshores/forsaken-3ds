@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #define MAX_PLAYER_NAME_LENGTH	(16)
 
@@ -132,5 +131,3 @@ void ConfigureSpaceorbAxis( int joystick );
 extern USERCONFIG * player_config;
 void DefaultJoystickSettings( USERCONFIG *u );
 void ReInitJoysticks( void );
-
-#endif // CONFIG_H

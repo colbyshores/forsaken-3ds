@@ -8,8 +8,7 @@
  *
  ***************************************************************************/
 
-#ifndef TWODPOLYS_INCLUDED
-#define TWODPOLYS_INCLUDED
+#pragma once
 
 /*===================================================================
 	Includes
@@ -177,7 +176,3 @@ FILE * LoadFmPolys( FILE * fp );
 extern FMPOLY FmPolys[ MAXNUMOF2DPOLYS ];
 extern u_int32_t TotalFmPolysInUse;
 extern u_int16_t FirstFmPolyUsed;
-
-#endif // TWODPOLYS_INCLUDED
-
-

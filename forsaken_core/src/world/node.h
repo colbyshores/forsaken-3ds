@@ -1,5 +1,4 @@
-#ifndef NODE_INCLUDED
-#define NODE_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "game/object.h"
@@ -59,5 +58,3 @@ float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Grou
 /* Defined in node.cpp; shared with the modules that use it. */
 extern NODENETWORKHEADER NodeNetworkHeader;
 void ShowNodeNetwork( u_int32_t NetMask );
-
-#endif	// NODE_INCLUDED

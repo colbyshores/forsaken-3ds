@@ -1,6 +1,5 @@
 
-#ifndef LOCALTITLE_INCLUDED
-#define LOCALTITLE_INCLUDED
+#pragma once
 
 #define LT_MacroText1 "you ugly son of a bitch..." 
 #define LT_MacroText2 "Time to die..." 
@@ -750,6 +749,3 @@
 #define KICKED_HOST "you have been kicked out by the host"
 #define DID_NOT_HAVE_LEVEL "you did not have the level chosen by the host ( %s )"
 #define PLEASE_WAIT "please wait..."
-
-#endif // LOCALTITLE_INCLUDED
-

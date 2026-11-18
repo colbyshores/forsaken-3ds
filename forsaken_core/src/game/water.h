@@ -1,6 +1,5 @@
 
-#ifndef WATER_H
-#define WATER_H
+#pragma once
 #include "game/main.h"
 #include "game/constants.h"
 
@@ -93,5 +92,3 @@ extern float GroupWaterIntensity_Red[ MAXGROUPS ];
 extern float GroupWaterIntensity_Green[ MAXGROUPS ];
 extern float GroupWaterIntensity_Blue[ MAXGROUPS ];
 extern float WATER_CELLSIZE;
-
-#endif // WATER_H

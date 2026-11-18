@@ -1,5 +1,4 @@
-#ifndef LUA_WEAPONS_INCLUDED
-#define LUA_WEAPONS_INCLUDED
+#pragma once
 
 #include "scripting/lua_api.h"
 #include "game/main.h" /* FIXME -- needed for primary.h and secondary.h */
@@ -13,5 +12,3 @@
 #define SECOFFSET TOTALPRIMARYWEAPONS
 
 int luaopen_weapons(lua_State *L);
-
-#endif /* LUA_WEAPONS_INCLUDED */

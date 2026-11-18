@@ -1,5 +1,4 @@
-#ifndef TRANSEXE_INCLUDED
-#define TRANSEXE_INCLUDED
+#pragma once
 
 #include "rendering/render.h"
 #include "math/new3d.h"
@@ -33,5 +32,3 @@ extern int16_t	NumOfTransExe;
 void AddTransExe( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject, int UseIdentity, u_int16_t Model, u_int16_t group, int16_t NumVerts );
 void ExecuteTransExe( u_int16_t group );
 void ExecuteTransExeUnclipped( u_int16_t group );
-
-#endif	// TRANSEXE_INCLUDED

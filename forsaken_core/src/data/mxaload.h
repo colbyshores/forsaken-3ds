@@ -7,8 +7,7 @@
  *
  ***************************************************************************/
 
-#ifndef MXALOAD_INCLUDED
-#define MXALOAD_INCLUDED
+#pragma once
 
 /*===================================================================
 	Includes
@@ -122,7 +121,3 @@ bool InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 
 /* Defined in mxaload.cpp; shared with the modules that use it. */
 extern MXALOADHEADER * MxaModelHeaders;
-
-#endif
-
-

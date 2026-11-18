@@ -1,6 +1,5 @@
 
-#ifndef LOADSAVE_INCLUDED
-#define LOADSAVE_INCLUDED
+#pragma once
 /*
  * Defines
  */
@@ -32,5 +31,3 @@ char *SaveGamePicFileName( int slot );
 char *SavedGameInfo( int slot );
 char *GetMissionName( char *levelname );
 bool SaveGameSlotUsed( int slot );
-#endif	// LOADSAVE_INCLUDED
-

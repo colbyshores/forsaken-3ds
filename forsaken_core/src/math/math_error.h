@@ -1,5 +1,4 @@
-#ifndef MATH_ERROR
-#define MATH_ERROR
+#pragma once
 #ifdef DEBUG_ON
 
 extern void InitMathErrors( void );
@@ -17,4 +16,3 @@ extern int DebugMathErrors( void );
 
 
 #endif // DEBUG_ON
-#endif // MATH_ERROR

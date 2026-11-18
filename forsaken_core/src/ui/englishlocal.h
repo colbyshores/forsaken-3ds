@@ -1,3 +1,4 @@
+#pragma once
 // in the following text:
 // <team name>=any one of LT_TEAM_??? defined below
 

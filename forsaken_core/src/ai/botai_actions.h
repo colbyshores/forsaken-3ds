@@ -1,3 +1,4 @@
+#pragma once
 #ifdef LUA_BOT
 
 bool BOTAI_AimAtTarget( MATRIX * InvMat, VECTOR * SPos, VECTOR * TPos );

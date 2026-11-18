@@ -1,6 +1,5 @@
 
-#ifndef STATS
-#define STATS
+#pragma once
 #include "game/main.h"
 #include "game/constants.h"
 
@@ -44,6 +43,3 @@ int GetFriendlyKills( int Player );
 extern int KillStats[ MAX_PLAYERS+1 ][ MAX_PLAYERS+1 ];
 extern int BonusStats[ MAX_PLAYERS+1 ];
 extern int KillCounter[ MAX_PLAYERS+1 ];
-
-#endif
-

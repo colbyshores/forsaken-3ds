@@ -1,7 +1,6 @@
 
 
-#ifndef SPHERE_INCLUDED
-#define SPHERE_INCLUDED
+#pragma once
 
 
 #include <math.h>
@@ -33,6 +32,3 @@ void  SphereNormal( VECTOR * Pos , VECTOR * Point , float radius , NORMAL * Norm
 float RaytoSphere(VECTOR * sphere_pos, float radius , VECTOR * ray_org, VECTOR * ray_dir);
 bool RaytoSphere2( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rdir, VECTOR * inter, VECTOR * inter2 );
 bool RaytoSphereShort( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rdir, float rlength );
-
-
-#endif	//SPHERE_INCLUDED

@@ -1,5 +1,4 @@
-#ifndef DEMO_INCLUDED
-#define DEMO_INCLUDED
+#pragma once
 #include "game/main.h"
 
 #define MAX_DEMONAME_LENGTH		(60)
@@ -14,5 +13,3 @@ char *DemoFileName( char *demoname );
 /* Defined in demo.cpp; shared with the modules that use it. */
 extern FILE * DemoFp;
 extern FILE * DemoFpClean;
-
-#endif

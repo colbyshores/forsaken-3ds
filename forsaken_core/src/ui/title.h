@@ -1,5 +1,4 @@
-#ifndef TITLE_INCLUDED
-#define TITLE_INCLUDED
+#pragma once
 
 #include "ui/localtitle.h"
 
@@ -709,5 +708,3 @@ extern bool InitialTexturesSet;
 
 /* Nonzero while a front-end menu is up (the 3DS input layer routes keys). */
 int _3ds_is_menu_open(void);
-
-#endif

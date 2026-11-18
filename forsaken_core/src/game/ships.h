@@ -9,8 +9,7 @@
  *
  ***************************************************************************/
 
-#ifndef SHIPS_INCLUDED
-#define SHIPS_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include <math.h>
@@ -148,7 +147,3 @@ extern float NitroFuelUsed;
 extern float Start_Shield;
 extern float Start_Hull;
 void ObjForceExternalOneOff( OBJECT *Obj, VECTOR *force );
-
-#endif
-
-

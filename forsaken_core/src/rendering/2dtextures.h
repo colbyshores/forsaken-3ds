@@ -1,5 +1,4 @@
-#ifndef TEXT2D_INCLUDED
-#define TEXT2D_INCLUDED
+#pragma once
 #include "game/main.h"
 
 /*===================================================================
@@ -140,5 +139,3 @@ extern float VduScaleY;
 extern FRAME_INFO * Title_Fonts_Header;
 extern FRAME_INFO * Title_Chars1_Header;
 extern FRAME_INFO * Title_Chars2_Header;
-
-#endif

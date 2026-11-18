@@ -7,8 +7,7 @@
  *
  ***************************************************************************/
 
-#ifndef MXLOAD_INCLUDED
-#define MXLOAD_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "data/file.h"
@@ -118,6 +117,3 @@ bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model );
 
 void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  );
 bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 );
-#endif
-
-

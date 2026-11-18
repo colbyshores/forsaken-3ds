@@ -1,6 +1,5 @@
 
-#ifndef EXTFORCE_INCLUDED
-#define EXTFORCE_INCLUDED
+#pragma once
 
 #include "game/main.h"
 /*
@@ -48,6 +47,3 @@ void StopExternalForce( u_int16_t * Data );
 void DisplayExternalForcesInGroup( u_int16_t Group );
 FILE * LoadExternalForces( FILE * fp );
 FILE * SaveExternalForces( FILE * fp );
-
-#endif	// EXTFORCE_INCLUDED
-

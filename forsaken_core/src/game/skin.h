@@ -1,5 +1,4 @@
-#ifndef SKIN_INCLUDED
-#define SKIN_INCLUDED
+#pragma once
 
 /*===================================================================
 	Includes
@@ -60,7 +59,3 @@ extern bool ShowTrigZones;
 extern int16_t ShowPortal;
 extern int16_t ShowSkin;
 void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group );
-
-#endif
-
-

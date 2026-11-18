@@ -2,8 +2,7 @@
 	File	:	bgobjects.h
 	Content	:	BGObjects.c include file
 ===================================================================*/
-#ifndef ENEMIES_INCLUDED
-#define ENEMIES_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "world/node.h"
@@ -454,7 +453,3 @@ extern ENEMY * EnemyGroups[ MAXGROUPS ];
 extern ENEMY * TestEnemy;
 void UpdateEnemiesClipGroup( CAMERA * Camera );
 extern bool ShowUntriggeredNMEs;
-
-#endif
-
-

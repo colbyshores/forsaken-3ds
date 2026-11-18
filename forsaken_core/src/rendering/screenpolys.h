@@ -7,8 +7,7 @@
  *
  ***************************************************************************/
 
-#ifndef SCREENPOLYS_INCLUDED
-#define SCREENPOLYS_INCLUDED
+#pragma once
 
 /*===================================================================
 	Includes
@@ -180,6 +179,3 @@ extern SCRPOLY ScrPolys[ MAXNUMOFSCRPOLYS ];
 extern u_int16_t FlashScreenPoly;
 extern bool KilledPlayer;
 extern float Countdown_Float;
-
-#endif
-

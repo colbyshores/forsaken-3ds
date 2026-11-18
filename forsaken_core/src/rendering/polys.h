@@ -1,8 +1,7 @@
 /*==========================================================================
  *  File:       p o l y s . h
  ***************************************************************************/
-#ifndef POLYS_INCLUDED
-#define POLYS_INCLUDED
+#pragma once
 
 /*===================================================================
 	Includes
@@ -115,7 +114,3 @@ extern POLY Polys[ MAXPOLYS ];
 extern u_int32_t TotalPolysInUse;
 extern u_int16_t FirstPolyUsed;
 extern VECTOR ShieldVerts[ 4 ];
-
-#endif
-
-

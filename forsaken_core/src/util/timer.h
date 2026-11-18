@@ -1,5 +1,4 @@
-#ifndef TIMER
-#define TIMER
+#pragma once
 
 /*
 
@@ -45,6 +44,3 @@ typedef struct timer {
 float timer_run   ( px_timer_t* );
 float timer_peek  ( px_timer_t* );
 void  timer_clear ( px_timer_t* );
-
-
-#endif

@@ -9,8 +9,7 @@
  *
  ***************************************************************************/
 
-#ifndef PRIMARY_INCLUDED
-#define PRIMARY_INCLUDED
+#pragma once
 #include "game/constants.h"
 #include "game/main.h"
 
@@ -335,7 +334,3 @@ extern int32_t MyColPerspective;
 extern char * PrimaryDescription[ MAXPRIMARYWEAPONS ];
 extern int8_t * DebugPrimStrings[];
 extern bool PrimaryValid[ MAXPRIMARYWEAPONS ];
-
-#endif // PRIMARY_INCLUDED
-
-

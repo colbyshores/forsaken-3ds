@@ -1,3 +1,4 @@
+#pragma once
 #ifdef LUA_BOT
 #include "ai/botai_main.h"
  

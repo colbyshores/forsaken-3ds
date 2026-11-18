@@ -1,6 +1,5 @@
 
-#ifndef OBJECT_INCLUDED
-#define OBJECT_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "math/quat.h"
@@ -118,6 +117,3 @@ typedef struct GUNTYPE
 	BYTE				WeaponType;			// which weapon do I Fire...
 	bool				PreciseRotation;	// How Precies should I rotate...
 } GUNTYPE,*LPGUNTYPE;
-
-#endif	// OBJECT_INCLUDED
-

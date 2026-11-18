@@ -1,5 +1,4 @@
-#ifndef RENDER_INCLUDED
-#define RENDER_INCLUDED
+#pragma once
 
 
 #include <assert.h>
@@ -428,5 +427,3 @@ typedef struct {
 #define CLIP_BOTTOM              0x00000008L
 #define CLIP_FRONT               0x00000010L
 #define CLIP_BACK                0x00000020L
-
-#endif // RENDER_INCLUDED

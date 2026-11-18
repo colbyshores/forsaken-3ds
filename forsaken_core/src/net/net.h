@@ -18,8 +18,7 @@
  * Boston, MA 02110-1301 USA.
  */
 
-#ifndef NET_INCLUDED
-#define NET_INCLUDED
+#pragma once
 
 #define NETWORK_DEFAULT_PORT 2300
 
@@ -146,5 +145,3 @@ typedef struct {
 
 // this function will be most likely converted to an argument to network_setup
 void network_event( network_event_type_t, void* data );
-
-#endif // NET_INCLUDED

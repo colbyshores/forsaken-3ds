@@ -1,5 +1,4 @@
-#ifndef VERSION_HEADER
-#define VERSION_HEADER
+#pragma once
 
 // major version
 #define PXV	 "1"
@@ -43,5 +42,3 @@
 
 // this should be plenty if not please increase this
 #define MAX_PXVersion 45
-
-#endif

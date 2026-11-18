@@ -7,8 +7,7 @@
  *
  ***************************************************************************/
 
-#ifndef MLOAD_INCLUDED
-#define MLOAD_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "data/file.h"
@@ -275,7 +274,3 @@ extern GAMESTARTPOS StartPositions[ MAXSTARTPOSITIONS ];
 extern u_int16_t last_start_position;
 extern u_int16_t FirstStartPositionInGroup[ MAXGROUPS ];
 extern u_int16_t GroupTris[ MAXGROUPS ];
-
-#endif
-
-

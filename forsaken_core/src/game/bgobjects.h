@@ -2,8 +2,7 @@
 	File	:	bgobjects.h
 	Content	:	BGObjects.c include file
 ===================================================================*/
-#ifndef BGOBJECTS_INCLUDED
-#define BGOBJECTS_INCLUDED
+#pragma once
 #include "game/main.h"
 #include "game/camera.h"
 #include "game/constants.h"
@@ -258,7 +257,3 @@ extern bool ShowColZones;
 void UpdateBGObjectsClipGroup( CAMERA * Camera );
 extern BGOBJECT * FirstBGObjectUsed;
 extern BGOBJECT BGObjects[ MAXBGOBJECTS ];
-
-#endif
-
-

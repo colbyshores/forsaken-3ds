@@ -1,5 +1,4 @@
-#ifndef INPUT_INCLUDED
-#define INPUT_INCLUDED
+#pragma once
 
 
 #include "game/main.h"
@@ -298,5 +297,3 @@ enum {
 };
 
 // TODO - we need settings/implementation for joystick dead zones
-
-#endif

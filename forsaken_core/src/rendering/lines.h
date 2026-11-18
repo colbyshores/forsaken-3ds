@@ -1,8 +1,7 @@
 /*==========================================================================
  *  L i n e s . h
  ***************************************************************************/
-#ifndef LINES_INCLUDED
-#define LINES_INCLUDED
+#pragma once
 
 /*===================================================================
 	Includes
@@ -61,8 +60,3 @@ u_int16_t FindFreeLine( void );
 /* Defined in lines.cpp; shared with the modules that use it. */
 extern LINE Lines[ MAXLINES ];
 extern u_int16_t FirstLineUsed;
-
-
-#endif
-
-

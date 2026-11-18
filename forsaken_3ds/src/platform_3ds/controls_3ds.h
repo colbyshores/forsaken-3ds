@@ -1,3 +1,4 @@
+#pragma once
 #include "util/platform.h"
 /*===================================================================
 	controls_3ds.h — user-customizable button + C-stick bindings.
@@ -9,8 +10,6 @@
 	or via the START+L chord. Save persists across sessions.
 ===================================================================*/
 
-#ifndef CONTROLS_3DS_INCLUDED
-#define CONTROLS_3DS_INCLUDED
 
 #ifdef __3DS__
 
@@ -91,5 +90,3 @@ int  controls_3ds_cstick_invert_y(void);
 
 /* Feed one frame of HID state to the remap overlay; true = it consumed input. */
 bool controls_3ds_handle_input(u32 kDown, u32 kHeld);
-
-#endif /* CONTROLS_3DS_INCLUDED */

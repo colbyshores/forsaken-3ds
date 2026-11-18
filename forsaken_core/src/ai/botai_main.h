@@ -1,3 +1,4 @@
+#pragma once
 #ifdef LUA_BOT
 #include <stdio.h>
 #include "scripting/lua_api.h"

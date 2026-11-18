@@ -1,5 +1,4 @@
-#ifndef MAIN_INCLUDED
-#define MAIN_INCLUDED
+#pragma once
 
 
 /*===================================================================
@@ -136,6 +135,3 @@ void CleanUpAndPostQuit(void);
 
 /* Set when the player or the system asks to quit; the main loop exits. */
 extern bool QuitRequested;
-
-
-#endif	// MAIN_INCLUDED

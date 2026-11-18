@@ -1,3 +1,4 @@
+#pragma once
 #ifdef LUA_BOT
 VECTOR BOTAI_NodeNetwork(int node);
 VECTOR BOTAI_NodeNetworkAlpha(int node);

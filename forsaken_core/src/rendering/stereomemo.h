@@ -46,8 +46,7 @@
  * (models, water, per-slot execs) never stamp: their fields stay put
  * within a frame, which compares equal.
  */
-#ifndef STEREOMEMO_INCLUDED
-#define STEREOMEMO_INCLUDED
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -97,6 +96,3 @@ static inline int smemo_sub(int texgroup, int ortho, int prim)
 {
 	return (texgroup << 2) | (ortho << 1) | prim;
 }
-
-
-#endif

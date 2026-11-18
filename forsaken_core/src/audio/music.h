@@ -1,5 +1,4 @@
-#ifndef MUSIC_INCLUDED
-#define MUSIC_INCLUDED
+#pragma once
 
 #include "game/main.h"
 
@@ -50,6 +49,3 @@ void music_play_title(void);
 
 /* Call once per frame to refill stream buffers */
 void music_update(void);
-
-
-#endif

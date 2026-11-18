@@ -30,8 +30,7 @@
  */
 
 
-#ifndef LUA_COMMON_H
-#define LUA_COMMON_H
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -55,5 +54,3 @@ extern lua_State *L1;
 int lua_dofile(lua_State *L, const char *name);
 int lua_init(void);
 void lua_shutdown(void);
-
-#endif /* LUA_COMMON_H */

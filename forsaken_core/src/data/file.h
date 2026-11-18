@@ -1,5 +1,4 @@
-#ifndef FILE_H
-#define FILE_H
+#pragma once
 
 #include "game/main.h"
 
@@ -32,6 +31,3 @@ char* find_next_file( void );
 void find_close( void );
 
 FILE * file_open(char * filename, char * mode);
-
-
-#endif // FILE_H

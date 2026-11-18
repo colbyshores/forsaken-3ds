@@ -2,8 +2,7 @@
  *  File:       P i c k u p s . h
  *  Content:    Pickups include file
  ***************************************************************************/
-#ifndef PICKUPS_INCLUDED
-#define PICKUPS_INCLUDED
+#pragma once
 
 #include "game/main.h"
 #include "game/constants.h"
@@ -384,7 +383,3 @@ void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID );
 extern char * Messages[];
 extern int16_t SecondaryFromPickupTab[ MAXSECONDARYWEAPONS*2 ];
 void InitValidPickups();
-
-#endif
-
-
