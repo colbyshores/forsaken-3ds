@@ -568,7 +568,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			strcpy( Mloadheader->Group[group].name, in.cstring() );
 
 			// Make sure there are no start points initially in this group..
-			Mloadheader->Group[group].StartPosInThisGroup = (u_int16_t) -1;
+			Mloadheader->Group[group].StartPosInThisGroup = INDEX_NONE;
 
 			in.bytes( &Mloadheader->Group[group].center, sizeof( VERT ) );
 			in.bytes( &Mloadheader->Group[group].half_size, sizeof( VERT ) );
@@ -737,7 +737,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 		for( i = 0 ; i < MAXGROUPS ; i++ )
 		{
-			FirstStartPositionInGroup[i] = (u_int16_t) -1;
+			FirstStartPositionInGroup[i] = INDEX_NONE;
 		}
 		for( i = 0 ; i < num_start_positions ; i++ )
 		{
@@ -749,9 +749,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			StartPositions[i].Group = start.Group;
 			//Make a note in each group of which Start point is in there...
 			Mloadheader->Group[StartPositions[i].Group].StartPosInThisGroup = i;
-			if( FirstStartPositionInGroup[StartPositions[i].Group] == (u_int16_t) -1 )
+			if( FirstStartPositionInGroup[StartPositions[i].Group] == INDEX_NONE )
 			{
-				StartPositions[i].NextInGroup = (u_int16_t) -1;
+				StartPositions[i].NextInGroup = INDEX_NONE;
 				FirstStartPositionInGroup[StartPositions[i].Group] = i;
 			}else{
 				StartPositions[i].NextInGroup = FirstStartPositionInGroup[StartPositions[i].Group];
@@ -834,7 +834,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						PolyAnim->CurrentTime = 0.0F;
 						PolyAnim->MasterTime = 0.0F;
 						PolyAnim->CurrentOffset = 0;
-						PolyAnim->currentframe = (u_int16_t) -1;
+						PolyAnim->currentframe = INDEX_NONE;
 						PolyAnim->newframe = 0;
 		
 						PolyAnim->animation =animation;
@@ -1002,7 +1002,7 @@ bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  
 					&Matrix,
 					(RENDEROBJECT*)&Mloadheader->Group[group].renderObject[i],
 					0,
-					(u_int16_t) -1,
+					INDEX_NONE,
 					(u_int16_t) group,
 					Mloadheader->Group[ group ].num_verts_per_execbuf[i] 
 				);
@@ -1258,7 +1258,7 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 		{
 			
 			if( ( PolyAnim->State == TEXTUREANIM_Go ) &&
-				( PolyAnim->CurrentOffset != (u_int16_t) -1 ) &&
+				( PolyAnim->CurrentOffset != INDEX_NONE ) &&
 				( ( PolyAnim->CurrentTime -= framelag ) <= 0.0F ) )
 			{
 				ExtraTime = PolyAnim->CurrentTime;
@@ -1277,7 +1277,7 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 					else
 					{
 						// animation has reached the end of its sequence
-						PolyAnim->CurrentOffset = (u_int16_t) -1;
+						PolyAnim->CurrentOffset = INDEX_NONE;
 						if ( PolyAnim->WhenStoppedTriggerMod != -1 )
 							ApplyTriggerMod( &TrigMods[ PolyAnim->WhenStoppedTriggerMod ] );
 					}

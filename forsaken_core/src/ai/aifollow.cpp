@@ -165,7 +165,7 @@ void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 								&Enemy->Object.Pos, &TempVector, &TempForwardVector, &TempUpVector,
 								&TempVector, EnemyTypes[Enemy->Type].SecondaryWeaponType, false );
 
-					if( MineIndex != (u_int16_t) -1 )
+					if( MineIndex != INDEX_NONE )
 					{
 						SecBulls[MineIndex].LifeSpan = 10.0F * 60.0F;
 					}

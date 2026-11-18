@@ -1810,7 +1810,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 	if ( type != SFX_2D )
 	{
 		// work out sound distance...
-		if( Ships[ Current_Camera_View ].Object.Group != (u_int16_t) -1 )
+		if( Ships[ Current_Camera_View ].Object.Group != INDEX_NONE )
 		{
 			Modify = SoundInfo[Ships[ Current_Camera_View ].Object.Group][*Group];
 		}
@@ -2398,7 +2398,7 @@ void ProcessLoopingSfx( void )
 //
 
 		// work out if sound in range, get parameters
-		if( Ships[ Current_Camera_View ].Object.Group != (u_int16_t) -1 )
+		if( Ships[ Current_Camera_View ].Object.Group != INDEX_NONE )
 		{
 			Modify = 0.0F;	// just in case type is invalid...
 			
@@ -2626,7 +2626,7 @@ float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *li
 	Temp.y = sfxpos->y - listenerpos->y;
 	Temp.z = sfxpos->z - listenerpos->z;
 
-	if( listenergroup != (u_int16_t) -1 )
+	if( listenergroup != INDEX_NONE )
 	{
 		Modify= SoundInfo[ listenergroup ][ sfxgroup ];
 	}else{
@@ -2814,7 +2814,7 @@ int EnemyBikeNum( u_int16_t type )
 	case ENEMY_Bike_FlyGirl:	   
 			return 16;
 	default:
-		return (u_int16_t)-1;
+		return INDEX_NONE;
 	}
 }
 
@@ -2823,7 +2823,7 @@ void StopEnemyBikerTaunt( ENEMY *Enemy )
 	u_int16_t bike;
 
 	bike = EnemyBikeNum( Enemy->Type );
-	if( bike == (u_int16_t)-1 )
+	if( bike == INDEX_NONE )
 		return;
 
 	if ( TauntID )
@@ -2837,7 +2837,7 @@ void PlayEnemyBikerTaunt( ENEMY *Enemy )
 	u_int16_t bike;
 
 	bike = EnemyBikeNum( Enemy->Type );
-	if( bike == (u_int16_t)-1 )
+	if( bike == INDEX_NONE )
 		return;
 
 	EnemyTaunter = Enemy;

@@ -663,11 +663,11 @@ bool ProcessShips()
 					(ShipObjPnt->Mode != DEATH_MODE || Random_Range(2))       // blink 50% while dieing
 				)
 				{
-					if( ShipObjPnt->light == (u_int16_t) -1 )
+					if( ShipObjPnt->light == INDEX_NONE )
 					{
 						ShipObjPnt->light = FindFreeXLight();
 					}
-					if( ShipObjPnt->light != (u_int16_t) -1 )
+					if( ShipObjPnt->light != INDEX_NONE )
 					{
 						ShipObjPnt->Flags |= SHIP_Light;
 
@@ -684,10 +684,10 @@ bool ProcessShips()
 					}
 				}else{
 					ShipObjPnt->Flags &= ~SHIP_Light;
-					if( ShipObjPnt->light != (u_int16_t) -1 )
+					if( ShipObjPnt->light != INDEX_NONE )
 					{
 						KillUsedXLight( ShipObjPnt->light );
-						ShipObjPnt->light = (u_int16_t) -1;
+						ShipObjPnt->light = INDEX_NONE;
 					}
 				}
 
@@ -906,7 +906,7 @@ bool ProcessShips()
 					if( !no_collision )
 					{
 						NumCollides = 0;
-						if ( ShipObjPnt->Group != (u_int16_t) -1 )
+						if ( ShipObjPnt->Group != INDEX_NONE )
 						{
 							BGObject = NULL;
 
@@ -1468,10 +1468,10 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 		Ships[i].SecBullIdCount	= 0;
 		Ships[i].Object.Shield	= Start_Shield;
 		Ships[i].Object.Hull	= Start_Hull;
-		Ships[i].Object.light = (u_int16_t) -1;
+		Ships[i].Object.light = INDEX_NONE;
 		Ships[i].headlights = false;
 
-		for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
+		for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 		Ships[i].NumMultiples = 0;
 		
 		Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
@@ -1687,7 +1687,7 @@ void InitShipRandomPos( int16_t i )
 	Ships[i].NumMultiples = 0;
 	Ships[i].Primary = PULSAR;
 	Ships[i].Secondary = MUGMISSILE;
-	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
+	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 	Ships[i].NumMultiples = 0;
 
 	RestoreWeapons();
@@ -2255,7 +2255,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		Move_Dir.y = ShipPnt->Object.Pos.y - Ships[WhoIAm].Object.Pos.y ;
 		Move_Dir.z = ShipPnt->Object.Pos.z - Ships[WhoIAm].Object.Pos.z ;
 		
-		if ( Ships[WhoIAm].Object.Group != (u_int16_t) -1 )
+		if ( Ships[WhoIAm].Object.Group != INDEX_NONE )
 		{
 			if( BackgroundCollide( &MCloadheadert0, &Mloadheader,
    										&Ships[WhoIAm].Object.Pos, Ships[WhoIAm].Object.Group, &Move_Dir,
@@ -2279,7 +2279,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		temp = Ships[WhoIAm].Object.Pos;
 		NumCollides = 0;
 		ImpactGroup = Ships[WhoIAm].Object.Group;
-		if ( Ships[WhoIAm].Object.Group != (u_int16_t) -1 )
+		if ( Ships[WhoIAm].Object.Group != INDEX_NONE )
 		{
 			while ( BackgroundCollide( &MCloadheader, &Mloadheader,
    										&temp, ImpactGroup, &Move_Dir,
@@ -2477,7 +2477,7 @@ void	UpdateStartPos( void )
 
 		startpos = FirstStartPositionInGroup[Ships[WhoIAm].Object.Group];
 		
-		while( startpos != (u_int16_t) -1 )
+		while( startpos != INDEX_NONE )
 		{
 			if( ( startpos != last_start_position ) &&
 				( StartPositions[startpos].Group != StartPositions[last_start_position].Group ) )
@@ -2853,11 +2853,11 @@ void ReleaseComponentedShips( void )
 			FreeCompObjChildren( Ships[ Count ].Object.Components, 1 );
 			free( Ships[ Count ].Object.Components );
 			Ships[ Count ].Object.Components = NULL;
-			Ships[ Count ].ModelNum = (u_int16_t) -1;
+			Ships[ Count ].ModelNum = INDEX_NONE;
 		}
 		else
 		{
-			Ships[ Count ].ModelNum = (u_int16_t) -1;
+			Ships[ Count ].ModelNum = INDEX_NONE;
 		}
 	}
 }

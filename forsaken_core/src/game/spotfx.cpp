@@ -774,7 +774,7 @@ void CreateSpotFXSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -814,7 +814,7 @@ void CreateSpotFXFlame( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -853,7 +853,7 @@ void CreateSpotFXFlameSmoke( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -900,7 +900,7 @@ void CreateSpotFXSmoke( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -957,7 +957,7 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 
 		light = FindFreeXLight();
 
-		if( light != (u_int16_t ) -1 )
+		if( light != INDEX_NONE )
 		{
 			XLights[ light ].Visible = true;
 			XLights[ light ].Pos = *Pos;
@@ -972,7 +972,7 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 
 		fmpoly = FindFreeFmPoly();					// Faceme polygon attached
 	
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = 4.0F;
 			FmPolys[ fmpoly ].Pos = *Pos;
@@ -999,7 +999,7 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 		{
 		   	fmpoly = FindFreeFmPoly();
 		
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1053,7 +1053,7 @@ void CreateSpotFXExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	light = FindFreeXLight();
 
-	if( light != (u_int16_t ) -1 )
+	if( light != INDEX_NONE )
 	{
 		XLights[ light ].Visible = true;
 		XLights[ light ].Pos = *Pos;
@@ -1070,7 +1070,7 @@ void CreateSpotFXExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	{
 		fmpoly = FindFreeFmPoly();
 
-   		if( fmpoly != (u_int16_t ) -1 )
+   		if( fmpoly != INDEX_NONE )
    		{
    			FmPolys[ fmpoly ].LifeCount = 1000.0F;
    			FmPolys[ fmpoly ].Pos = *Pos;
@@ -1206,7 +1206,7 @@ void CreateSpotFXGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1250,7 +1250,7 @@ void CreateSpotFXNmeTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 20.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1288,7 +1288,7 @@ void CreateSpotFXNmeGlow( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, u_int
 
 	FmPoly = FindFreeFmPoly();
 
-	if( FmPoly != (u_int16_t) -1 )
+	if( FmPoly != INDEX_NONE )
 	{
 		FmPolys[ FmPoly ].LifeCount = 1000.0F;
   		FmPolys[ FmPoly ].Pos = *Pos;
@@ -1324,7 +1324,7 @@ void CreateSpotFXNmeVapourTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1375,7 +1375,7 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 
 		light = FindFreeXLight();
 
-		if( light != (u_int16_t ) -1 )
+		if( light != INDEX_NONE )
 		{
 			XLights[ light ].Visible = true;
 			XLights[ light ].Pos = *Pos;
@@ -1390,7 +1390,7 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 
 		fmpoly = FindFreeFmPoly();					// Faceme polygon attached
 	
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = 4.0F;
 			FmPolys[ fmpoly ].Pos = *Pos;
@@ -1417,7 +1417,7 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 		{
 		   	fmpoly = FindFreeFmPoly();
 		
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = ( (float) Random_Range( 180 ) ) + 60.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1540,7 +1540,7 @@ void CreateSpotFXBubbles( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t 
 	{
 		fmpoly = FindFreeFmPoly();
 
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = (float) Random_Range( 4 * 60 );
 
@@ -1593,7 +1593,7 @@ void CreateBubbleTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = (float) Random_Range( 3 * 60 );
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1639,7 +1639,7 @@ void CreateSpotFXDrip( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
  	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1690,7 +1690,7 @@ void CreateSpotFXDripSplash( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   	FmPolys[ fmpoly ].Pos = *Pos;
@@ -1741,7 +1741,7 @@ void CreateLargeShrapnelBit( VECTOR * Pos, VECTOR * Dir, float Speed, int16_t Gr
 
 	Model =	FindFreeModel();
 
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_NOBODY;
 		Models[ Model ].Owner = 0;
@@ -1786,7 +1786,7 @@ void CreateSmallShrapnelBit( VECTOR * Pos, VECTOR * Dir, float Speed, int16_t Gr
 
 	Model =	FindFreeModel();
 
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_NOBODY;
 		Models[ Model ].Owner = 0;
@@ -1833,7 +1833,7 @@ void CreateShrapnelTrail( VECTOR * Pos, VECTOR * Dir, float Size, u_int16_t Grou
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1872,7 +1872,7 @@ void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = ( 2.0F * 60.0F );
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -1907,7 +1907,7 @@ void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group )
 
 		fmpoly = FindFreeFmPoly();
 
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = ( 2.0F * 60.0F );
 			FmPolys[ fmpoly ].Pos = *Pos;
@@ -1950,7 +1950,7 @@ void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	{
 		fmpoly = FindFreeFmPoly();
 
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 			FmPolys[ fmpoly ].Pos = *Pos;
@@ -1982,7 +1982,7 @@ void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	fmpoly = FindFreeFmPoly();
 
-   	if( fmpoly != (u_int16_t ) -1 )
+   	if( fmpoly != INDEX_NONE )
    	{
    		FmPolys[ fmpoly ].LifeCount = 1000.0F;
    		FmPolys[ fmpoly ].Pos = *Pos;
@@ -2027,7 +2027,7 @@ void CreateSpotFXBeardAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, 
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -2074,7 +2074,7 @@ void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Grou
 
 	FmPoly = FindFreeFmPoly();
 
-	if( FmPoly != (u_int16_t) -1 )
+	if( FmPoly != INDEX_NONE )
 	{
 		FmPolys[ FmPoly ].LifeCount = 1000.0F;
   		FmPolys[ FmPoly ].Pos = *Pos;
@@ -2114,7 +2114,7 @@ void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Gro
 
 	FmPoly = FindFreeFmPoly();
 
-	if( FmPoly != (u_int16_t) -1 )
+	if( FmPoly != INDEX_NONE )
 	{
 		FmPolys[ FmPoly ].LifeCount = 1000.0F;
   		FmPolys[ FmPoly ].Pos = *Pos;
@@ -2158,7 +2158,7 @@ void CreateSpotFXHk5Afterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, fl
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = ( Speed / 2.0F ) + 5.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -2235,7 +2235,7 @@ void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group )
 FILE * SaveAllSpotFX( FILE * fp )
 {
 	int		i;
-	u_int16_t	TempIndex = (u_int16_t) -1; 
+	u_int16_t	TempIndex = INDEX_NONE; 
 
 	if( fp )
 	{
@@ -2324,16 +2324,16 @@ FILE * LoadAllSpotFX( FILE * fp )
 		for( i = 0; i < MAXGROUPS; i++ )
 		{
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) SpotFXGroups[ i ] = &SpotFX[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) SpotFXGroups[ i ] = &SpotFX[ TempIndex ];
 			else SpotFXGroups[ i ] = NULL;
 			fread( &NumSpotFXPerGroup[ i ], sizeof( u_int16_t ), 1, fp );
 		}
 
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( TempIndex != (u_int16_t) -1 ) FirstSpotFXUsed = &SpotFX[ TempIndex ];
+		if( TempIndex != INDEX_NONE ) FirstSpotFXUsed = &SpotFX[ TempIndex ];
 		else FirstSpotFXUsed = NULL;
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( TempIndex != (u_int16_t) -1 ) FirstSpotFXFree = &SpotFX[ TempIndex ];
+		if( TempIndex != INDEX_NONE ) FirstSpotFXFree = &SpotFX[ TempIndex ];
 		else FirstSpotFXFree = NULL;
 
 		for( i = 0; i < NumSpotFX; i++ )
@@ -2365,22 +2365,22 @@ FILE * LoadAllSpotFX( FILE * fp )
 			fread( &SpotFX[ i ].GenDelay, sizeof( float ), 1, fp );
 			fread( &SpotFX[ i ].MaxHeight, sizeof( float ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) SpotFX[ i ].PrevUsed = &SpotFX[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevUsed = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].PrevUsed = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) SpotFX[ i ].NextUsed = &SpotFX[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextUsed = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].NextUsed = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) SpotFX[ i ].PrevFree = &SpotFX[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevFree = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].PrevFree = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) SpotFX[ i ].NextFree = &SpotFX[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextFree = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].NextFree = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) SpotFX[ i ].PrevInGroup = &SpotFX[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevInGroup = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].PrevInGroup = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) SpotFX[ i ].NextInGroup = &SpotFX[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextInGroup = &SpotFX[ TempIndex ];
 			else SpotFX[ i ].NextInGroup = NULL;
 		}
 	}

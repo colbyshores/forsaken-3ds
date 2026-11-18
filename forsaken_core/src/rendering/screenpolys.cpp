@@ -56,8 +56,8 @@ static	float		CountDown_Wanted_Scale = TIMERSTARTSCALE;
 static	float		CountDown_Col = 1.0F;
 
 int		SinglePlayerTimeLimit = 0;
-u_int16_t	ThermoScrPoly = (u_int16_t) -1;
-u_int16_t	FlashScreenPoly	= (u_int16_t) -1;
+u_int16_t	ThermoScrPoly = INDEX_NONE;
+u_int16_t	FlashScreenPoly	= INDEX_NONE;
 
 /* [3DS bottom-screen HUD routing] When g_scrpoly_route_bottom is true at
    Add-time, the new screen poly gets SCRFLAG_BottomHUD. At display time,
@@ -145,8 +145,8 @@ void InitScrPoly( u_int16_t i )
 		ScrPolys[i].Xscale = 1.0F;
 		ScrPolys[i].Yscale = 1.0F;
 
-		ScrPolys[i].NextInTPage = (u_int16_t) -1;
-		ScrPolys[i].PrevInTPage = (u_int16_t) -1;
+		ScrPolys[i].NextInTPage = INDEX_NONE;
+		ScrPolys[i].PrevInTPage = INDEX_NONE;
 
 		// Next and Prev are left alone: the caller has already linked the poly
 
@@ -190,22 +190,22 @@ void InitScrPolys( void )
 {
 	u_int16_t	i;
 
-	FlashScreenPoly = (u_int16_t) -1;
-	HitBox = (u_int16_t) -1;
-	for( i = 0; i < 4; i++ ) TargScrPolys[ i ] = (u_int16_t) -1;
+	FlashScreenPoly = INDEX_NONE;
+	HitBox = INDEX_NONE;
+	for( i = 0; i < 4; i++ ) TargScrPolys[ i ] = INDEX_NONE;
 	ClearCountdownBuffers();
 
-	FirstScrPolyUsed = (u_int16_t) -1;
+	FirstScrPolyUsed = INDEX_NONE;
 	FirstScrPolyFree = 0;
 	
 	for( i = 0; i < MAXNUMOFSCRPOLYS; i++ )
 	{
 		ScrPolys[i].Next = i + 1;
-		ScrPolys[i].Prev = (u_int16_t) -1;
+		ScrPolys[i].Prev = INDEX_NONE;
 		InitScrPoly(i);
 	}
 
-	ScrPolys[ MAXNUMOFSCRPOLYS-1 ].Next = (u_int16_t) -1;
+	ScrPolys[ MAXNUMOFSCRPOLYS-1 ].Next = INDEX_NONE;
 
 	InitScrPolyTPages();
 
@@ -223,11 +223,11 @@ u_int16_t FindFreeScrPoly( void )
 	u_int16_t i;
 
 	i = FirstScrPolyFree;
-	if( i == (u_int16_t) -1 ) return i;
+	if( i == INDEX_NONE ) return i;
 
 	ScrPolys[i].Prev = FirstScrPolyUsed;
 
-	if ( FirstScrPolyUsed != (u_int16_t) -1)
+	if ( FirstScrPolyUsed != INDEX_NONE)
 	{
 		ScrPolys[ FirstScrPolyUsed ].Next = i;
 	}
@@ -251,14 +251,14 @@ void KillUsedScrPoly( u_int16_t i )
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
 
-	if( i == (u_int16_t) -1 ) return;
+	if( i == INDEX_NONE ) return;
 	
 	its_prev = ScrPolys[i].Prev;
 	its_next = ScrPolys[i].Next;
 
 	if ( i == FirstScrPolyUsed ) FirstScrPolyUsed = ScrPolys[ i ].Prev;
-	if( its_prev != (u_int16_t) -1) ScrPolys[ its_prev ].Next = its_next;
-	if( its_next != (u_int16_t) -1) ScrPolys[ its_next ].Prev = its_prev;
+	if( its_prev != INDEX_NONE) ScrPolys[ its_prev ].Next = its_next;
+	if( its_next != INDEX_NONE) ScrPolys[ its_next ].Prev = its_prev;
 
 	TotalScrPolysInUse--;
 
@@ -271,7 +271,7 @@ void KillUsedScrPoly( u_int16_t i )
 		RemoveScrPolyFromTPage( i, GetTPage( NULL, 0 ) );
 	}
 
-	ScrPolys[i].Prev = (u_int16_t) -1;
+	ScrPolys[i].Prev = INDEX_NONE;
 	ScrPolys[i].Next = FirstScrPolyFree;
 	FirstScrPolyFree = i;
 
@@ -295,7 +295,7 @@ void FreeAllLastAFrameScrPolys( void )
 
 	i = FirstScrPolyUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		NextScrPoly = ScrPolys[i].Prev;
 
@@ -329,7 +329,7 @@ void ScreenPolyProcess( void )
 
 	i = FirstScrPolyUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		NextScrPoly = ScrPolys[i].Prev;
 
@@ -361,7 +361,7 @@ void ScreenPolyProcess( void )
 						{
 				   			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				   			KillUsedScrPoly( i );
-							FlashScreenPoly = (u_int16_t) -1;
+							FlashScreenPoly = INDEX_NONE;
 						}
 						else
 						{
@@ -640,7 +640,7 @@ void DoLensflareEffect( void )
 							DirVector.y = ( NewVert.y - Center_Y );
 					
 							i = FindFreeScrPoly();
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								ScrPolys[ i ].Flags = SCRFLAG_Scale;
 								ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -660,7 +660,7 @@ void DoLensflareEffect( void )
 							}
 					
 							i = FindFreeScrPoly();
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								ScrPolys[ i ].Flags = SCRFLAG_Scale;
 								ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -680,7 +680,7 @@ void DoLensflareEffect( void )
 							}
 					
 							i = FindFreeScrPoly();
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								ScrPolys[ i ].Flags = SCRFLAG_Scale;
 								ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -700,7 +700,7 @@ void DoLensflareEffect( void )
 							}
 					
 							i = FindFreeScrPoly();
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								ScrPolys[ i ].Flags = SCRFLAG_Scale;
 								ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -720,7 +720,7 @@ void DoLensflareEffect( void )
 							}
 					
 							i = FindFreeScrPoly();
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								ScrPolys[ i ].Flags = SCRFLAG_Scale;
 								ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -740,7 +740,7 @@ void DoLensflareEffect( void )
 							}
 					
 							i = FindFreeScrPoly();
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								ScrPolys[ i ].Flags = SCRFLAG_Scale;
 								ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -870,7 +870,7 @@ void DoAllSecBullLensflare( void )
 	nSecWalk = 0;
 
 	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
-	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
+	while( i != INDEX_NONE && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
 		nSecWalk++;
 		if( !SoundInfo[ SecBulls[i].GroupImIn ][ CurrentCamera.GroupImIn ] )
@@ -975,7 +975,7 @@ void SecBullLensflare( u_int16_t i )
 			DirVector.y = ( NewVert.y - Center_Y );
 	
 			i = FindFreeScrPoly();
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Scale;
 				ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -995,7 +995,7 @@ void SecBullLensflare( u_int16_t i )
 			}
 
 			i = FindFreeScrPoly();
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Scale;
 				ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -1015,7 +1015,7 @@ void SecBullLensflare( u_int16_t i )
 			}
 	
 			i = FindFreeScrPoly();
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Scale;
 				ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -1035,7 +1035,7 @@ void SecBullLensflare( u_int16_t i )
 			}
 	
 			i = FindFreeScrPoly();
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Scale;
 				ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -1055,7 +1055,7 @@ void SecBullLensflare( u_int16_t i )
 			}
 	
 			i = FindFreeScrPoly();
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Scale;
 				ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -1075,7 +1075,7 @@ void SecBullLensflare( u_int16_t i )
 			}
 
 			i = FindFreeScrPoly();
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Scale;
 				ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -1293,7 +1293,7 @@ void UpdateDigit( u_int16_t * DigitArray, float XPos, float YPos, int16_t Number
 	{
 		i = DigitArray[ Count ];
 
-		if( i != (u_int16_t) -1 )
+		if( i != INDEX_NONE )
 		{
 			if( Number == 10 )
 			{
@@ -1371,16 +1371,16 @@ void ClearCountdownBuffers( void )
 
 	for( Count = 0; Count < 7; Count++ )
 	{
-		Min1Digit[ Count ] = (u_int16_t) -1;
-		Min0Digit[ Count ] = (u_int16_t) -1;
-		Sec1Digit[ Count ] = (u_int16_t) -1;
-		Sec0Digit[ Count ] = (u_int16_t) -1;
-		Hun1Digit[ Count ] = (u_int16_t) -1;
-		Hun0Digit[ Count ] = (u_int16_t) -1;
+		Min1Digit[ Count ] = INDEX_NONE;
+		Min0Digit[ Count ] = INDEX_NONE;
+		Sec1Digit[ Count ] = INDEX_NONE;
+		Sec0Digit[ Count ] = INDEX_NONE;
+		Hun1Digit[ Count ] = INDEX_NONE;
+		Hun0Digit[ Count ] = INDEX_NONE;
 	}
 
-	Bit0Digit[ 0 ] = (u_int16_t) -1;
-	Bit1Digit[ 0 ] = (u_int16_t) -1;
+	Bit0Digit[ 0 ] = INDEX_NONE;
+	Bit1Digit[ 0 ] = INDEX_NONE;
 }
 
 /*===================================================================
@@ -1401,7 +1401,7 @@ void CreateDigit( u_int16_t * DigitArray, float XPos, float YPos )
 
 		DigitArray[ Count ] = i;
 
-		if( i != (u_int16_t) -1 )
+		if( i != INDEX_NONE )
 		{
 			ScrPolys[ i ].Flags = SCRFLAG_Scale;
 			ScrPolys[ i ].Type = SCRTYPE_Normal;
@@ -1438,7 +1438,7 @@ void CreateSeperatorDigit( u_int16_t * DigitArray, float XPos, float YPos )
 
 	DigitArray[ 0 ] = i;
 
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		ScrPolys[ i ].Flags = SCRFLAG_Scale;
 		ScrPolys[ i ].Type = SCRTYPE_Normal;
@@ -1470,10 +1470,10 @@ void DeleteDigit( u_int16_t * DigitArray )
 
 	for( Count = 0; Count < 7; Count++ )
 	{
-		if( DigitArray[ Count ] != (u_int16_t) -1 )
+		if( DigitArray[ Count ] != INDEX_NONE )
 		{
 			KillUsedScrPoly( DigitArray[ Count ] );
-			DigitArray[ Count ] = (u_int16_t) -1;
+			DigitArray[ Count ] = INDEX_NONE;
 		}
 	}
 }
@@ -1485,10 +1485,10 @@ void DeleteDigit( u_int16_t * DigitArray )
 ===================================================================*/
 void DeleteSeperatorDigit( u_int16_t * DigitArray )
 {
-	if( DigitArray[ 0 ] != (u_int16_t) -1 )
+	if( DigitArray[ 0 ] != INDEX_NONE )
 	{
 		KillUsedScrPoly( DigitArray[ 0 ] );
-		DigitArray[ 0 ] = (u_int16_t) -1;
+		DigitArray[ 0 ] = INDEX_NONE;
 	}
 }
 
@@ -1538,7 +1538,7 @@ void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u
 
 	i = FindFreeScrPoly();
 
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		if( Trans == 255 ) ScrPolys[ i ].Flags = SCRFLAG_Solid;
 		else ScrPolys[ i ].Flags = SCRFLAG_Nothing;
@@ -1652,7 +1652,7 @@ void AddScreenPolyTextScale( u_int16_t Frame, float XPos, float YPos, float XSca
 
 	i = FindFreeScrPoly();
 
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		if( Trans == 255 ) ScrPolys[ i ].Flags = SCRFLAG_Solid;
 		else ScrPolys[ i ].Flags = SCRFLAG_Nothing;
@@ -1703,7 +1703,7 @@ void ShowScreenMultiples( void )
 	{
 		Model = Ships[ WhoIAm ].OrbModels[ Count ];
 
-		if( Model != (u_int16_t) -1 )
+		if( Model != INDEX_NONE )
 		{
 			Rotation.x = (float) fast_sinf( D2R( Models[ Model ].AxisRot + 180.0F ) );
 			Rotation.y = (float) fast_cosf( D2R( Models[ Model ].AxisRot + 180.0F ) );
@@ -1711,7 +1711,7 @@ void ShowScreenMultiples( void )
 			i = FindFreeScrPoly();
 	
 	
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Nothing;
 				ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -1745,7 +1745,7 @@ void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Tran
 {
 	u_int16_t	i;
 
-	if( *ScreenPolyStore != (u_int16_t) -1 )
+	if( *ScreenPolyStore != INDEX_NONE )
 	{
 		i = *ScreenPolyStore;
 
@@ -1779,7 +1779,7 @@ void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Tran
 	{
 		i = FindFreeScrPoly();
 	
-		if( i != (u_int16_t) -1 )
+		if( i != INDEX_NONE )
 		{
 			*ScreenPolyStore = i;
 	
@@ -1848,11 +1848,11 @@ void InitThermo( void )
 	WantedThermalTemp = 0.0F;
 	ThermalMinimum = 0.0F;
 
-	if( ThermoScrPoly == (u_int16_t) -1 )
+	if( ThermoScrPoly == INDEX_NONE )
 	{
 		i = FindFreeScrPoly();
 	
-		if( i != (u_int16_t) -1 )
+		if( i != INDEX_NONE )
 		{
 			ThermoScrPoly = i;
 
@@ -1898,10 +1898,10 @@ void InitThermo( void )
 ===================================================================*/
 void KillThermo( void )
 {
-	if( ThermoScrPoly != (u_int16_t) -1 )
+	if( ThermoScrPoly != INDEX_NONE )
 	{
 		KillUsedScrPoly( ThermoScrPoly );
-		ThermoScrPoly = (u_int16_t) -1;
+		ThermoScrPoly = INDEX_NONE;
 	}
 }
 	
@@ -1919,7 +1919,7 @@ void InitScrPolyTPages( void )
 
 	for( i = 0; i <= MAXTPAGESPERTLOAD; i++ )
 	{
-		ScrPolyTPages[ i ].FirstPoly = (u_int16_t) -1;
+		ScrPolyTPages[ i ].FirstPoly = INDEX_NONE;
 	}
 }
 
@@ -1933,10 +1933,10 @@ void AddScrPolyToTPage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
-	ScrPolys[ i ].PrevInTPage = (u_int16_t) -1;
+	ScrPolys[ i ].PrevInTPage = INDEX_NONE;
 	ScrPolys[ i ].NextInTPage = ScrPolyTPages[ TPage ].FirstPoly;
 
-	if( ScrPolys[ i ].NextInTPage != (u_int16_t) -1 )
+	if( ScrPolys[ i ].NextInTPage != INDEX_NONE )
 	{
 		ScrPolys[ ScrPolys[ i ].NextInTPage ].PrevInTPage = i;
 	}
@@ -1954,7 +1954,7 @@ void RemoveScrPolyFromTPage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
-	if( ScrPolys[ i ].PrevInTPage != (u_int16_t) -1 )
+	if( ScrPolys[ i ].PrevInTPage != INDEX_NONE )
 	{
 		ScrPolys[ ScrPolys[ i ].PrevInTPage ].NextInTPage = ScrPolys[ i ].NextInTPage;
 	}
@@ -1963,13 +1963,13 @@ void RemoveScrPolyFromTPage( u_int16_t i, int16_t TPage )
 		ScrPolyTPages[ TPage ].FirstPoly = ScrPolys[ i ].NextInTPage;
 	}
 
-	if( ScrPolys[ i ].NextInTPage != (u_int16_t) -1 )
+	if( ScrPolys[ i ].NextInTPage != INDEX_NONE )
 	{
 		ScrPolys[ ScrPolys[ i ].NextInTPage ].PrevInTPage = ScrPolys[ i ].PrevInTPage;
 	}
 
-	ScrPolys[ i ].PrevInTPage = (u_int16_t) -1;
-	ScrPolys[ i ].NextInTPage = (u_int16_t) -1;
+	ScrPolys[ i ].PrevInTPage = INDEX_NONE;
+	ScrPolys[ i ].NextInTPage = INDEX_NONE;
 }
 
 bool DisplaySolidScrPolys( RENDEROBJECT *renderObject )
@@ -2077,7 +2077,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		if( Count == *TPage ) i = *NextScrPoly;
 		else i = ScrPolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
 		{
 			if( !scrpoly_skip( i ) && ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 			{
@@ -2162,7 +2162,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 			if( Count == *TPage ) i = *NextScrPoly;
 			else i = ScrPolyTPages[ Count ].FirstPoly;
 	
-			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXSCREENPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
 				if( !scrpoly_skip( i ) && ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 				{
@@ -2644,7 +2644,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		if( Count == *TPage ) i = *NextScrPoly;
 		else i = ScrPolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXSCREENPOLYVERTS ) )
 		{
 			if( !scrpoly_skip( i ) && !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 			{
@@ -2728,7 +2728,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 			if( Count == *TPage ) i = *NextScrPoly;
 			else i = ScrPolyTPages[ Count ].FirstPoly;
 	
-			while( ( i != (u_int16_t) -1 ) && ( i < MAXNUMOFSCRPOLYS ) && ( StartVert < MAXSCREENPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( i < MAXNUMOFSCRPOLYS ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
 				if( !scrpoly_skip( i ) && !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
 				{
@@ -3289,7 +3289,7 @@ void ShowFlagOnShip( u_int16_t Ship )
 	Conv3DTo2D( &TempPos, &Pos, &FinalMatrix );
 
 	i = FindFreeScrPoly();
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		ScrPolys[ i ].Flags = SCRFLAG_Nothing;
 		ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -3369,7 +3369,7 @@ void ShowBountyOnShip( u_int16_t Ship )
 	Conv3DTo2D( &TempPos, &Pos, &FinalMatrix );
 
 	i = FindFreeScrPoly();
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		ScrPolys[ i ].Flags = SCRFLAG_Nothing;
 		ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -3497,7 +3497,7 @@ void ShowCTFFlagsOnShip( u_int16_t Ship )
 
 				i = FindFreeScrPoly();
 
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					ScrPolys[ i ].Flags = SCRFLAG_Solid;
 					ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -3535,7 +3535,7 @@ void ShowFlag( u_int16_t Ship )
 		return;
 
 	i = FindFreeScrPoly();
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		ScrPolys[ i ].Flags = SCRFLAG_Nothing;
 		ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -3568,7 +3568,7 @@ void ShowBounty( u_int16_t Ship )
 		return;
 
 	i = FindFreeScrPoly();
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		ScrPolys[ i ].Flags = SCRFLAG_Nothing;
 		ScrPolys[ i ].Type = SCRTYPE_LastAFrame;
@@ -3628,7 +3628,7 @@ void ShowCTFFlags( u_int16_t Ship )
 
 				i = FindFreeScrPoly();
 
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					ScrPolys[ i ].Flags = SCRFLAG_Solid;
 					ScrPolys[ i ].Type = SCRTYPE_LastAFrame;

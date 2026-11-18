@@ -2750,7 +2750,7 @@ holo-bike stuff
 ***************/
 int SelectedBikeFrame;
 u_int16_t BikeLine[MAXNUMOF2DPOLYS];
-u_int16_t CurrentHoloModel = (u_int16_t)-1;
+u_int16_t CurrentHoloModel = INDEX_NONE;
 bool LinesActive;
 int CurrentLine;
 VECTOR BikePos;
@@ -3220,7 +3220,7 @@ bool LoadTitleModels(void)
 	{
 		BackgroundModel[i] = FindFreeModel();
 				
-		if ( BackgroundModel[i] != (u_int16_t) -1)
+		if ( BackgroundModel[i] != INDEX_NONE)
 		{	CurrentModel = BackgroundModel[i];
 			Models[CurrentModel].Flags = MODFLAG_Original;
 			Models[CurrentModel].Pos.x = 0.0F;
@@ -3253,12 +3253,12 @@ bool LoadTitleModels(void)
 	// init all holo-object stuff...
 	
 	// actual model...
-	CurrentHoloModel = (u_int16_t)-1;
+	CurrentHoloModel = INDEX_NONE;
 
 	// scan lines...
 	for ( i = 0; i < MAXNUMOF2DPOLYS; i++ )
 	{
-		BikeLine[ i ] = (u_int16_t)-1;
+		BikeLine[ i ] = INDEX_NONE;
 	}
 
 	return true;
@@ -3273,10 +3273,10 @@ void KillLines(void)
 	{ 
 		for (i=0; i<CurrentLine; i++)
 		{
-			if ( BikeLine[ i ] != (u_int16_t)-1 )
+			if ( BikeLine[ i ] != INDEX_NONE )
 			{
 				KillUsedPoly( BikeLine[i] );
-				BikeLine[ i ] = (u_int16_t)-1;
+				BikeLine[ i ] = INDEX_NONE;
 			}
 		}
 
@@ -3428,7 +3428,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 					BikeLine[CurrentLine] = FindFreePoly();
 						
-   					if( BikeLine[CurrentLine] != (u_int16_t) -1 )
+   					if( BikeLine[CurrentLine] != INDEX_NONE )
 					{
 						LinesActive = true;
 
@@ -3591,7 +3591,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 					BikeLine[CurrentLine] = FindFreePoly();
 						
-   					if( BikeLine[CurrentLine] != (u_int16_t) -1 )
+   					if( BikeLine[CurrentLine] != INDEX_NONE )
 					{
 						LinesActive = true;
 
@@ -4203,14 +4203,14 @@ Display Non 0 Clipped Non Faceme Transluecent Polys
 /*===================================================================
 Display Opaque Lines
 ===================================================================*/
-		group = (u_int16_t)-1;
+		group = INDEX_NONE;
 
 		ExecuteLines( group, &RenderBufs[ 0 ] );
 
 /*===================================================================
 Display Solid Lines
 ===================================================================*/
-		group = (u_int16_t)-1;
+		group = INDEX_NONE;
 
 		ExecuteLines( group, &RenderBufs[ 0 ] );
 
@@ -9523,7 +9523,7 @@ void DrawFlatMenuSlider( MENUITEM *Item )
 	slider->timer = 0.0F;
 	slider->dt = framelag/( SLIDERSPEED * 60.0F);
 	slider->redraw_req = true;
-	slider->poly = (u_int16_t) -1;
+	slider->poly = INDEX_NONE;
 	slider->oldvalue = -1;
 
 	SliderStored = false;
@@ -9547,7 +9547,7 @@ void DrawFlatMenuSlider( MENUITEM *Item )
 	{
 		slider->poly = FindFreeScrPoly();
 
-		if (slider->poly == (u_int16_t)-1)
+		if (slider->poly == INDEX_NONE)
 		{
 			Msg("Title.c: DrawFlatMenuSlider() unable to allocate screen poly\n");
 			exit(1);
@@ -9630,12 +9630,12 @@ void ProcessFlatSliders(void)
 				( (slider->timer <= ReqFraction ) && ( slider->dt < 0.0F ) ))
 			{
 			   	slider->timer = ReqFraction;
-				if (slider->poly != (u_int16_t) -1)
+				if (slider->poly != INDEX_NONE)
 				   	UpdateSlider(ActiveSliderItem[i].Item);
 				slider->timer = -1.0F;
 			}else
 			{
-				if (slider->poly != (u_int16_t) -1)
+				if (slider->poly != INDEX_NONE)
 					UpdateSlider(ActiveSliderItem[i].Item);
 			}
 
@@ -9938,7 +9938,7 @@ void VduClear ( void )
 	for (i=0; i<CurrentScreenPoly; i++)
 	{
 		KillUsedScrPoly( screenpoly[i] );
-		screenpoly[i] = (u_int16_t)-1;
+		screenpoly[i] = INDEX_NONE;
 	}
 
 	CurrentScreenPoly = 0;
@@ -9947,10 +9947,10 @@ void VduClear ( void )
 		if (ActiveSliderItem[i].Item)
 		{
 			slider = GetSlider ( ActiveSliderItem[i].Item, &slidertype );
-			if (slider->poly != (u_int16_t) -1)
+			if (slider->poly != INDEX_NONE)
 			{
 				KillUsedScrPoly( slider->poly );
-				slider->poly = (u_int16_t)-1;
+				slider->poly = INDEX_NONE;
 			}
 			ActiveSliderItem[i].Item = NULL;
 		}
@@ -9968,7 +9968,7 @@ bool Plot2dBox (TEXTINFO *TextInfo)
 	u_int8_t r, g, b;
 
 	screenpoly[CurrentScreenPoly] = FindFreeScrPoly();					
-	if( screenpoly[CurrentScreenPoly] != (u_int16_t ) -1 )
+	if( screenpoly[CurrentScreenPoly] != INDEX_NONE )
 	{
 
 		ScrPolys[screenpoly[CurrentScreenPoly]].Type = SCRTYPE_Normal;
@@ -10232,7 +10232,7 @@ bool DrawTextEditCursor( TEXTINFO *TextInfo, int font )
 	xmin -= (TEXTINFO_TextSpace / 2.0F);
 
 	TempPoly = FindFreeScrPoly();					
-	if( TempPoly != (u_int16_t ) -1 )
+	if( TempPoly != INDEX_NONE )
 	{
 					   	
 		ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
@@ -10356,7 +10356,7 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 		}
 
 		TempPoly = FindFreeScrPoly();
-		if( TempPoly != (u_int16_t ) -1 )
+		if( TempPoly != INDEX_NONE )
 		{
 
 			ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
@@ -10431,7 +10431,7 @@ void Print3Dots(TEXTINFO *TextInfo, float totalheight)
 	for (i = 0; i < 3; i++)
 	{
 		TempPoly = FindFreeScrPoly();					
-		if( TempPoly != (u_int16_t ) -1 )
+		if( TempPoly != INDEX_NONE )
 		{
 			ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
 			ScrPolys[TempPoly].Flags = SCRFLAG_Nothing;
@@ -11248,7 +11248,7 @@ void KillBikeCharPic( MENU * /*Menu*/ )
 {
 	if (BikerDisplayed)
 	{	KillUsedScrPoly ( BikerScrPoly );
-		BikerScrPoly = (u_int16_t)-1;
+		BikerScrPoly = INDEX_NONE;
 		BikerDisplayed = false;
 	}
 }
@@ -11297,7 +11297,7 @@ void KillLevelPic( MENU * /*Menu*/ )
 {
 	if (LevelDisplayed)
 	{	KillUsedScrPoly ( LevelScrPoly );
-		LevelScrPoly = (u_int16_t)-1;
+		LevelScrPoly = INDEX_NONE;
 		LevelDisplayed = false;
 	}
 }
@@ -11307,14 +11307,14 @@ bool LoadGeneralPic(float xmin, float ymin, float xmax, float ymax, FRAME_INFO *
 {
 	if (*displayed)
 	{	KillUsedScrPoly ( *scrpoly );
-		*scrpoly = (u_int16_t)-1;
+		*scrpoly = INDEX_NONE;
 		*displayed = false;
 	}
 
 	if (!*displayed)
 	{
 		*scrpoly = FindFreeScrPoly();					
-		if( *scrpoly != (u_int16_t ) -1 )
+		if( *scrpoly != INDEX_NONE )
 		{	
 			*displayed = true;
 
@@ -11348,7 +11348,7 @@ void KillBikeChar(MENU *Menu)
 {
 	if (BikerDisplayed)
 	{	KillUsedScrPoly( BikerScrPoly );
-		BikerScrPoly = (u_int16_t)-1;
+		BikerScrPoly = INDEX_NONE;
 		BikerDisplayed = false;
 	}
 
@@ -11797,7 +11797,7 @@ void InitEventExpandCrystal(TITLE_EVENT * /*TitleEvent*/)
 void InitEventShrinkBike(TITLE_EVENT * /*TitleEvent*/)
 {
 
-	ShowHoloModel( (u_int16_t)-1 );
+	ShowHoloModel( INDEX_NONE );
 }
 
 void InitStartDiscPanTimer (TITLE_EVENT_TIMER *TitleEventTimer)
@@ -12417,7 +12417,7 @@ void InitJoystickAxisConfig ( MENU * /*Menu*/)
 	{
 		AxisTestScrPoly[i] = FindFreeScrPoly();
 
-		if (AxisTestScrPoly[i] == (u_int16_t)-1)
+		if (AxisTestScrPoly[i] == INDEX_NONE)
 		{
 			Msg("Title.c: InitJoystickAxisConfig() unable to allocate screen poly\n");
 			exit(1);
@@ -13230,10 +13230,10 @@ void PlotHoloScanLine( void )
 void KillHoloModel( void )
 {
 
-	if ( CurrentHoloModel != (u_int16_t)-1 )
+	if ( CurrentHoloModel != INDEX_NONE )
 		KillUsedModel( CurrentHoloModel );
 
-	CurrentHoloModel = (u_int16_t)-1;
+	CurrentHoloModel = INDEX_NONE;
 
 }			  
 
@@ -13243,7 +13243,7 @@ void LoadHoloModel( u_int16_t model )
 {
 	int i;
 
-	if ( CurrentHoloModel != ( u_int16_t ) -1 )
+	if ( CurrentHoloModel != INDEX_NONE )
 	{
 		KillHoloModel();
 	}
@@ -13269,7 +13269,7 @@ void LoadHoloModel( u_int16_t model )
 	
 	CurrentHoloModel = FindFreeModel();
 
-	if (CurrentHoloModel != (u_int16_t) -1)
+	if (CurrentHoloModel != INDEX_NONE)
 	{
 		HoloModelScale = 1.0F;
 		for( i = 0; i < MAXBIKETYPES; i++ )
@@ -13304,7 +13304,7 @@ void LoadHoloModel( u_int16_t model )
 
 void ScaleHoloModel( float scale )
 {
-   	if( CurrentHoloModel != (u_int16_t)-1 )
+   	if( CurrentHoloModel != INDEX_NONE )
 	{
 		Models[CurrentHoloModel].Xscale = scale * HoloModelScale;
 		Models[CurrentHoloModel].Yscale = HoloModelScale;
@@ -13316,15 +13316,15 @@ constexpr auto HOLO_SPEECH_DELAY = 60.0F;
 float HoloSpeechDelay;
 bool HoloSpeechDone = false;
 
-// specify (u_int16_t)-1 for no new model
+// specify INDEX_NONE for no new model
 void ShowHoloModel( u_int16_t model )
 {
 	HoloSpeechDelay = HOLO_SPEECH_DELAY;
 	HoloSpeechDone = false;
 	
-	if ( ( CurrentHoloModel == (u_int16_t)-1 ) && !FlyGirlActive )
+	if ( ( CurrentHoloModel == INDEX_NONE ) && !FlyGirlActive )
 	{
-		if ( model == (u_int16_t)-1  )
+		if ( model == INDEX_NONE  )
 			return;
 		
 		LoadHoloModel( model );
@@ -13385,7 +13385,7 @@ void ProcessHoloModel( void )
 	HoloRot.x = 0.0F;
 	HoloRot.z = 0.0F;
 
-	if ( ( CurrentHoloModel == (u_int16_t)-1 ) && !FlyGirlActive )
+	if ( ( CurrentHoloModel == INDEX_NONE ) && !FlyGirlActive )
 	{
 		return;
 	}
@@ -13435,7 +13435,7 @@ void ProcessHoloModel( void )
 	
 	if ( reload )
 	{
-		if ( NextHoloModel == (u_int16_t)-1 )
+		if ( NextHoloModel == INDEX_NONE )
 		{
 			if ( FlyGirlActive )
 			{

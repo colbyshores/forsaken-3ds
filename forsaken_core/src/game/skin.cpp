@@ -496,7 +496,7 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 		{
 			line = FindFreeLine();						// Line attached
 
-			if( line != (u_int16_t ) -1 )
+			if( line != INDEX_NONE )
 			{
 				if( Count == ( Vnum - 1 ) )
 				{
@@ -570,10 +570,10 @@ void KillAllSphereZones( void )
 
 	for( Count = 0; Count < NumSphereZones; Count++ )
 	{
-		if( SphereZones[ Count ] != (u_int16_t) -1 )
+		if( SphereZones[ Count ] != INDEX_NONE )
 		{
 			KillUsedModel( SphereZones[ Count ] );
-			SphereZones[ Count ] = (u_int16_t) -1;
+			SphereZones[ Count ] = INDEX_NONE;
 		}
 	}
 
@@ -599,7 +599,7 @@ void DisplaySphereZone( VECTOR * Pos, float Radius, u_int16_t Group,
 
 	Model =	FindFreeModel();
 
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Scale = ( ( Radius * 2.0F ) / ( 512.0F * GLOBAL_SCALE ) );
 
@@ -645,7 +645,7 @@ void DisplayZoneDirection( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 
 	Model =	FindFreeModel();
 
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_NOBODY;
 		Models[ Model ].Owner = 0;
@@ -684,7 +684,7 @@ void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
 
 	Model =	FindFreeModel();
 
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_NOBODY;
 		Models[ Model ].Owner = 0;
@@ -739,7 +739,7 @@ void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group
 		{
 			line = FindFreeLine();						// Line attached
 
-			if( line != (u_int16_t ) -1 )
+			if( line != INDEX_NONE )
 			{
 				if( Count == ( Vnum - 1 ) )
 				{
@@ -842,7 +842,7 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 		{
 			line = FindFreeLine();						// Line attached
 
-			if( line != (u_int16_t ) -1 )
+			if( line != INDEX_NONE )
 			{
 				if( Count == ( Vnum - 1 ) )
 				{
@@ -915,10 +915,10 @@ void KillNodeCubeLines( void )
 
 	for( Count = 0; Count < NumNodeCubeLines; Count++ )
 	{
-		if( NodeCubeLines[ Count ] != (u_int16_t) -1 )
+		if( NodeCubeLines[ Count ] != INDEX_NONE )
 		{
 			KillUsedLine( NodeCubeLines[ Count ] );
-			NodeCubeLines[ Count ] = (u_int16_t) -1;
+			NodeCubeLines[ Count ] = INDEX_NONE;
 		}
 	}
 
@@ -1502,7 +1502,7 @@ void CreateLineBox( void )
 
 		BoxLines[ Count ] = line;
 
-		if( line != (u_int16_t ) -1 )
+		if( line != INDEX_NONE )
 		{
 			StartPos.x = ( Ships[ WhoIAm ].Object.Pos.x + BoxOffsets[ Count * 2 ].x );
 			StartPos.y = ( Ships[ WhoIAm ].Object.Pos.y + BoxOffsets[ Count * 2 ].y );
@@ -1532,10 +1532,10 @@ void KillBoxLines( void )
 
 	for( Count = 0; Count < 12; Count++ )
 	{
-		if( BoxLines[ Count ] != (u_int16_t) -1 )
+		if( BoxLines[ Count ] != INDEX_NONE )
 		{
 			KillUsedLine( BoxLines[ Count ] );
-			BoxLines[ Count ] = (u_int16_t) -1;
+			BoxLines[ Count ] = INDEX_NONE;
 		}
 	}
 }

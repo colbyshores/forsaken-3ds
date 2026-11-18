@@ -108,7 +108,7 @@ static void InitDebugRays( void )
 		if ( !fread( &ray.to, sizeof( double ), 3, rf ) )
 			break;
 		line = FindFreeLine();
-		if ( line != (u_int16_t) -1 )
+		if ( line != INDEX_NONE )
 		{
 			Lines[ line ].StartPos.x = (float) ray.from.x;
 			Lines[ line ].StartPos.y = (float) ray.from.y;
@@ -1042,7 +1042,7 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 
 	GroupImIn = CurrentCamera.GroupImIn;
 
-	if ( GroupImIn != (u_int16_t) -1 )
+	if ( GroupImIn != INDEX_NONE )
 	{
 		DisplayBSPNode( OldCollideNode );
 
@@ -1164,7 +1164,7 @@ FindClipGroup( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max )
 		}
 	}
 	else // object not overlapping any visible groups
-		group = (u_int16_t) -1;
+		group = INDEX_NONE;
 
 	return group;
 }

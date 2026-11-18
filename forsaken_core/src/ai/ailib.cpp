@@ -60,7 +60,7 @@ void AI_GetNearestMINETarget( void )
 	i = FirstSecBullUsed;
 	nSecWalk = 0;
 	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
-	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
+	while( i != INDEX_NONE && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
 		nSecWalk++;
 		if( SecBulls[ i ].SecType == SEC_MINE )

@@ -160,7 +160,7 @@ int i, j; // index counters
 
 bool RearCameraActive;
 int MissileCameraActive = 0;
-u_int16_t  CameraMissile = (u_int16_t) -1;
+u_int16_t  CameraMissile = INDEX_NONE;
 BYTE  TempMissileCam;
 
 bool
@@ -1434,7 +1434,7 @@ InitScene(void)
 
   for( i = 0 ; i < MAX_PLAYERS ; i++ )
   {
-    Ships[i].ModelNum = (u_int16_t) -1;
+    Ships[i].ModelNum = INDEX_NONE;
   }
 
   switch( MyGameStatus )
@@ -1682,7 +1682,7 @@ bool ChangeLevel( void )
 
 	ActiveRemoteCamera = NULL;
 	MissileCameraActive = 0;
-	CameraMissile = (u_int16_t) -1;
+	CameraMissile = INDEX_NONE;
 
 	InitScene();
 	InitTextMessages();
@@ -4485,7 +4485,7 @@ bool Our_CalculateFrameRate(void)
 
 		// group information
 		sprintf(&buf[0], "Groups Visible %d - Current Group %s", (int) NumGroupsVisible,
-			(GroupImIn == (u_int16_t) -1) ? "(outside)" : Mloadheader.Group[GroupImIn].name );
+			(GroupImIn == INDEX_NONE) ? "(outside)" : Mloadheader.Group[GroupImIn].name );
 		CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*3, 2 );
 
 		// memory information
@@ -4762,12 +4762,12 @@ bool DispTracker( void )
 	if (!FSSetView(&view))
 		return false;
 
-	if (ReallyExecuteMxloadHeader( &ModelHeaders[MODEL_Tracker], (u_int16_t) -1 ) != true )
+	if (ReallyExecuteMxloadHeader( &ModelHeaders[MODEL_Tracker], INDEX_NONE ) != true )
 		return false;
 
   i = FindClosestShip();
   
-  if( i != (u_int16_t) -1 )
+  if( i != INDEX_NONE )
   {
     Red = 255.0F;
     Green = 255.0F;
@@ -4818,7 +4818,7 @@ bool DispTracker( void )
 	if (!FSSetView(&view))
 		return false;
 
-    if (ReallyExecuteMxloadHeader( &ModelHeaders[MODEL_Ping], (u_int16_t) -1 ) != true )
+    if (ReallyExecuteMxloadHeader( &ModelHeaders[MODEL_Ping], INDEX_NONE ) != true )
       return false;
   }
 

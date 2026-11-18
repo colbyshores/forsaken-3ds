@@ -136,6 +136,10 @@ typedef u_int32_t DWORD;
 typedef u_int8_t  BYTE;
 typedef u_int16_t WORD;
 
+/* The 'none' value of a 16-bit index: the end of a linked list, no group,
+   no model, no light, no owner. */
+constexpr u_int16_t INDEX_NONE = (u_int16_t) -1;
+
 /* Defined in main.cpp; shared with the modules that use it. */
 extern bool Debug;
 extern bool ShowFrameRate;

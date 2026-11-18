@@ -94,7 +94,7 @@ bool LoadRTLights( void )
 
 			for ( j = 0; j < rt_lights; j++ )
 			{
-				rt_light[ j ].xlight = (u_int16_t) -1;
+				rt_light[ j ].xlight = INDEX_NONE;
 				rt_light[ j ].enabled = false;
 			}
 
@@ -192,7 +192,7 @@ bool LoadRTLights( void )
 					break;
 				}
 				light->xlight = FindFreeXLight();
-				if ( light->xlight != (u_int16_t) -1 )
+				if ( light->xlight != INDEX_NONE )
 				{
 					xlight = &XLights[ light->xlight ];
 					xlight->Pos = light->pos;
@@ -231,10 +231,10 @@ bool ReleaseRTLights( void )
 		for ( j = 0; j < rt_lights; j++ )
 		{
 			light = &rt_light[ j ];
-			if ( light->xlight != (u_int16_t) -1 )
+			if ( light->xlight != INDEX_NONE )
 			{
 				KillUsedXLight( light->xlight );
-				light->xlight = (u_int16_t) -1;
+				light->xlight = INDEX_NONE;
 			}
 		}
 
@@ -371,7 +371,7 @@ void ProcessRTLights( void )
 	for ( j = 0; j < rt_lights; j++ )
 	{
 		light = &rt_light[ j ];
-		if ( light->xlight == (u_int16_t) -1 )
+		if ( light->xlight == INDEX_NONE )
 			continue; // only happens if run out of XLIGHTs
 		xlight = &XLights[ light->xlight ];
 		if ( light->delay > 0.0F )

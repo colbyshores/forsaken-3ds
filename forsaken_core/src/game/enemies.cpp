@@ -4120,12 +4120,12 @@ void KillUsedEnemy( ENEMY * Object )
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 				else LifeCount = -1.0F;
 				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-				InitOnePickup( &Object->Object.Pos, Object->Object.Group, &Dir, Speed, Pickup, (u_int16_t) -1, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
-				if( IsHost ) DropPickupSend( &Object->Object.Pos, Object->Object.Group, &Dir, 0.0F, Object->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
+				InitOnePickup( &Object->Object.Pos, Object->Object.Group, &Dir, Speed, Pickup, INDEX_NONE, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				if( IsHost ) DropPickupSend( &Object->Object.Pos, Object->Object.Group, &Dir, 0.0F, Object->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 			}
 		}
 
-		if( ( Object->PickupHeld != (u_int16_t) -1 ) && !( Object->Object.Flags & SHIP_Scattered ) )
+		if( ( Object->PickupHeld != INDEX_NONE ) && !( Object->Object.Flags & SHIP_Scattered ) )
 		{
 	   		Dir.x = Random_Jitter();
 	   		Dir.y = Random_Jitter();
@@ -4134,8 +4134,8 @@ void KillUsedEnemy( ENEMY * Object )
 			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 			else LifeCount = -1.0F;
 			Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-			InitOnePickup( &Object->Object.Pos, Object->Object.Group, &Dir, Speed, Object->PickupHeld, (u_int16_t) -1, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
-			if( IsHost ) DropPickupSend( &Object->Object.Pos, Object->Object.Group, &Dir, 0.0F, Object->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
+			InitOnePickup( &Object->Object.Pos, Object->Object.Group, &Dir, Speed, Object->PickupHeld, INDEX_NONE, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+			if( IsHost ) DropPickupSend( &Object->Object.Pos, Object->Object.Group, &Dir, 0.0F, Object->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 		}
 
 		if( Object->TriggerModPtr != NULL )
@@ -4175,10 +4175,10 @@ void KillUsedEnemy( ENEMY * Object )
 			FirstEnemyFree->PrevFree = Object;
 		}
 
-		if( Object->ModelIndex != (u_int16_t) -1 )
+		if( Object->ModelIndex != INDEX_NONE )
 		{
 			KillUsedModel( Object->ModelIndex );
-			Object->ModelIndex = (u_int16_t) -1;
+			Object->ModelIndex = INDEX_NONE;
 		}
 
 		if( Object->Object.Components )
@@ -4257,10 +4257,10 @@ void ReleaseAllEnemies( void )
 			FirstEnemyFree->PrevFree = Object;
 		}
 
-		if( Object->ModelIndex != (u_int16_t) -1 )
+		if( Object->ModelIndex != INDEX_NONE )
 		{
 			KillUsedModel( Object->ModelIndex );
-			Object->ModelIndex = (u_int16_t) -1;
+			Object->ModelIndex = INDEX_NONE;
 		}
 
 		if( Object->Object.Components )
@@ -4579,7 +4579,7 @@ bool PreLoadEnemies( void )
 					{
 						DupModel = FindDuplicateModel( (int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], NextEnemyModel );
 
-						if( DupModel != (u_int16_t) -1 )
+						if( DupModel != INDEX_NONE )
 						{
 							EnemyTypes[ ModelNum ].ModelNumber = DupModel;
 						}
@@ -4623,7 +4623,7 @@ bool PreLoadEnemies( void )
 						{
 							DupModel = FindDuplicateModel( (int8_t*)&EnemyTypes[ ModelNum ].ModelFilename[ 0 ], NextEnemyModel );
 
-							if( DupModel != (u_int16_t) -1 )
+							if( DupModel != INDEX_NONE )
 							{
 								EnemyTypes[ ModelNum ].ModelNumber = DupModel;
 							}
@@ -4855,7 +4855,7 @@ bool LoadEnemies( void )
 														&OverallTime, &MidTime, (u_int16_t*)&TempNum, OWNER_ENEMY, Count );
 									if( Comp )
 									{
-										ModelNum = (u_int16_t) -1;
+										ModelNum = INDEX_NONE;
 									}
 									else
 									{
@@ -5472,7 +5472,7 @@ bool LoadEnemies( void )
 				}
 			}else{
 				// we must fill in an enemy for the exogenon placeholder....
-				Enemy = InitOneEnemy( ENEMY_STATUS_Nothing, &Pos, &DirVector, &UpVector, Group, (u_int16_t) -1, (u_int16_t) -1 ,EnemyType , 0 , -1 , (u_int16_t) -1 , 0.0F );
+				Enemy = InitOneEnemy( ENEMY_STATUS_Nothing, &Pos, &DirVector, &UpVector, Group, INDEX_NONE, INDEX_NONE ,EnemyType , 0 , -1 , INDEX_NONE , 0.0F );
 				Enemy->Status &= ~ENEMY_STATUS_Enable;
 				Enemy->Alive = false;
 			}
@@ -5625,7 +5625,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		
 		Enemy->Object.AI_Mode = EnemyTypes[EnemyType].AiMode;
 
-		if( (FormationLink != (u_int16_t) -1) && (EnemyTypes[EnemyType].ControlType == ENEMY_CONTROLTYPE_FLY_AI) )
+		if( (FormationLink != INDEX_NONE) && (EnemyTypes[EnemyType].ControlType == ENEMY_CONTROLTYPE_FLY_AI) )
 		{
 			Enemy->FormationLink = &Enemies[FormationLink];
 		}else{
@@ -5676,14 +5676,14 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		
 
 		Enemy->TriggerMod = TriggerMod;
-		if( TriggerMod == (u_int16_t) -1 ) Enemy->TriggerModPtr = NULL;
+		if( TriggerMod == INDEX_NONE ) Enemy->TriggerModPtr = NULL;
 		else Enemy->TriggerModPtr = &TrigMods[ TriggerMod ];
 
-		if( ModelNum != (u_int16_t) -1 )
+		if( ModelNum != INDEX_NONE )
 		{
 			ModelIndex = FindFreeModel();
 	
-			if( ModelIndex != (u_int16_t) -1 )
+			if( ModelIndex != INDEX_NONE )
 			{
 				Models[ ModelIndex ].ModelNum = ( ModelNum );
 				Models[ ModelIndex ].Type = MODTYPE_Field;
@@ -5733,7 +5733,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		}
 		else
 		{
-			ModelIndex = (u_int16_t) -1;
+			ModelIndex = INDEX_NONE;
 		}
 
 		Enemy->ModelIndex = ModelIndex;
@@ -5870,7 +5870,7 @@ void ProcessEnemies( void )
 			{
 				UpdateObjectAmbientColour( &Enemy->Object );
   
-				if( Model != (u_int16_t) -1 )
+				if( Model != INDEX_NONE )
 				{
 					Models[ Model ].Pos = Enemy->Object.Pos;
 					Models[ Model ].Mat = Enemy->Object.FinalMat;
@@ -5955,7 +5955,7 @@ void ProcessEnemies( void )
 						SetCompObjModelsState( Enemy->Object.Components, 1, true );
 					}
 
-					if( Enemy->ModelIndex != (u_int16_t) -1 )
+					if( Enemy->ModelIndex != INDEX_NONE )
 					{
 						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 						Models[ Enemy->ModelIndex ].Visible = true;
@@ -6078,7 +6078,7 @@ void EnableEnemy( u_int16_t EnemyIndex )
 					SetCompObjModelsState( Enemy->Object.Components, 1, true );
 				}
 
-				if( Enemy->ModelIndex != (u_int16_t) -1 )
+				if( Enemy->ModelIndex != INDEX_NONE )
 				{
 					Models[ Enemy->ModelIndex ].Visible = true;
 				}
@@ -6503,7 +6503,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 		}
 
 		
-		if ( Object->Group != (u_int16_t) -1 )
+		if ( Object->Group != INDEX_NONE )
 		{
 			BGObject = NULL;
 			if( ObjectCollide( Object, &Move_Off, EnemyTypes[Enemy->Type].Radius, &BGObject ) )
@@ -7774,9 +7774,9 @@ void UpdateEnemiesClipGroup( CAMERA * Camera  )
 				{
 					Model = Enemy->ModelIndex;
 
-					if( Model != (u_int16_t) -1 )
+					if( Model != INDEX_NONE )
 					{
-						if( ClipGroup != (u_int16_t) -1 )
+						if( ClipGroup != INDEX_NONE )
 						{
 							Models[ Model ].Flags |= MODFLAG_UseClipGroup;
 							Models[ Model ].ClipGroup = ClipGroup;
@@ -8722,7 +8722,7 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 		Move_Off.z = 0.0F;
 		ImpactPoint = Object->Pos;
 	}else{
-		if ( Object->Group != (u_int16_t) -1 )
+		if ( Object->Group != INDEX_NONE )
 		{
 			BGObject = NULL;
 			ObjectCollide( Object, &Move_Off, EnemyTypes[Enemy->Type].Radius, &BGObject );
@@ -8784,7 +8784,7 @@ u_int16_t FindDuplicateModel( int8_t * Filename, int16_t NumModels )
 			return( Count );
 		}
 	}
-	return( (u_int16_t) -1 );
+	return( INDEX_NONE );
 }
 
 /*===================================================================

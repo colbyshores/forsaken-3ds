@@ -571,7 +571,7 @@ bool ExecuteMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t in_group  )
 					{
 						return false;
 					}
-					AddTransExe( &Matrix , &Mxaloadheader->Group[group].renderObject[i] , 0, (u_int16_t) -1, in_group, Mxaloadheader->Group[ group ].num_verts_per_execbuf[i] );
+					AddTransExe( &Matrix , &Mxaloadheader->Group[group].renderObject[i] , 0, INDEX_NONE, in_group, Mxaloadheader->Group[ group ].num_verts_per_execbuf[i] );
 				}
 				else
 				{

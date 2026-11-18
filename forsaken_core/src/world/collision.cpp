@@ -49,8 +49,8 @@ static VECTOR		ColDir;
 static BGOBJECT *	ColParent;
 static int16_t		ColZoneNum;
 
-static	u_int16_t		CompEnemyHit = (u_int16_t) -1;
-static	u_int16_t		AnyCompEnemyHit = (u_int16_t) -1;
+static	u_int16_t		CompEnemyHit = INDEX_NONE;
+static	u_int16_t		AnyCompEnemyHit = INDEX_NONE;
 static	VECTOR		CompEnemyHitPos;
 static	NORMAL		CompEnemyHitNormal;
 static	float		CompEnemyHitDist;
@@ -168,8 +168,8 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 	VECTOR	OldPPos;
 	float impact_dotp;
 
-	CompEnemyHit = (u_int16_t) -1;
-	AnyCompEnemyHit = (u_int16_t) -1;
+	CompEnemyHit = INDEX_NONE;
+	AnyCompEnemyHit = INDEX_NONE;
 	next_group = StartGroup;
 	ppos = *StartPos;
 	pmove = *MoveOffset;
@@ -356,7 +356,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 	float		ImpactOffset;
 	MCFACE		BSPFace; ZERO_STACK_MEM(BSPFace);
 	
-	if( group == (u_int16_t) -1)
+	if( group == INDEX_NONE)
 		return false;
 
 	Origin.x = Pos->x;
@@ -436,8 +436,8 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 
 		if( CheckBGObjectsCol( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
 		{
-			CompEnemyHit = (u_int16_t) -1;
-			AnyCompEnemyHit = (u_int16_t) -1;
+			CompEnemyHit = INDEX_NONE;
+			AnyCompEnemyHit = INDEX_NONE;
 			collided += ColCollided;
 			e.x = ( ImpactPoint->x - Pos->x );
 			e.y = ( ImpactPoint->y - Pos->y );
@@ -529,7 +529,7 @@ bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 	BSP_PORTAL			*bp;
 	int					j;
 	
-	if( group == (u_int16_t) -1)
+	if( group == INDEX_NONE)
 		return false;
 
 	Origin.x = Pos->x;
@@ -729,7 +729,7 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 	float			nDOTe;
 	ENEMY		*	Object;
 	int				OldColCollided;
-	u_int16_t			EnemyHit = (u_int16_t) -1;
+	u_int16_t			EnemyHit = INDEX_NONE;
 
 	ColDist = Distance;
 	ColChild = NULL;
@@ -978,13 +978,13 @@ bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VEC
 
 	int16_t	ColCount = 0;
 
-	if( Group == (u_int16_t) -1) return false;
+	if( Group == INDEX_NONE) return false;
 
 	Origin = *Pos;
 	ODir = *Dir;
 	ColRadius = Radius;
-	AnyCompEnemyHit = (u_int16_t) -1;
-	CompEnemyHit = (u_int16_t) -1;
+	AnyCompEnemyHit = INDEX_NONE;
+	CompEnemyHit = INDEX_NONE;
 
 	if(	CheckEnemyPolyCol( Group, Distance, ImpactPoint, Collided, Pos_New, FaceNormal, BGObject ) )
 	{
@@ -1664,7 +1664,7 @@ bool QCollide( VECTOR *Start_Pos, u_int16_t Start_Group, VECTOR *Move_Off, float
 ===================================================================*/
 u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance )
 {
-	if( CompEnemyHit == (u_int16_t) -1 )
+	if( CompEnemyHit == INDEX_NONE )
 	{
 		return( CompEnemyHit );
 	}

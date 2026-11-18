@@ -450,7 +450,7 @@ int16_t GetTPage( FRAME_INFO * FrameInfo, int16_t Frame )
 	   	Box_Ptr = ( FrameInfo->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 		return ( Box_Ptr->tpage );
 	}
-	return( (u_int16_t) -1 );
+	return( INDEX_NONE );
 }
 
 /*===================================================================

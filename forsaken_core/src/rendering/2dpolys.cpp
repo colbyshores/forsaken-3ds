@@ -44,7 +44,7 @@ void InitFmPoly( void )
 {
 	int i;
 
-	FirstFmPolyUsed = (u_int16_t) -1;
+	FirstFmPolyUsed = INDEX_NONE;
 	FirstFmPolyFree = 0;
 
 	for( i=0;i<MAXNUMOF2DPOLYS;i++)
@@ -64,13 +64,13 @@ void InitFmPoly( void )
 		FmPolys[i].UpVector.y = 1.0F;
 		FmPolys[i].UpVector.z = 0.0F;
 
-		FmPolys[i].NextInTPage = (u_int16_t) -1;
-		FmPolys[i].PrevInTPage = (u_int16_t) -1;
+		FmPolys[i].NextInTPage = INDEX_NONE;
+		FmPolys[i].PrevInTPage = INDEX_NONE;
 
 		FmPolys[i].Next = i + 1;
-		FmPolys[i].Prev = (u_int16_t) -1;
+		FmPolys[i].Prev = INDEX_NONE;
 	}
-	FmPolys[MAXNUMOF2DPOLYS-1].Next = (u_int16_t) -1;
+	FmPolys[MAXNUMOF2DPOLYS-1].Next = INDEX_NONE;
 
 	InitFmPolyTPages();
 }
@@ -86,11 +86,11 @@ u_int16_t FindFreeFmPoly( void )
 	u_int16_t i;
 
 	i = FirstFmPolyFree;
-	if( i == (u_int16_t) -1 ) return i;
+	if( i == INDEX_NONE ) return i;
 
 	FmPolys[i].Prev = FirstFmPolyUsed;
 
-	if ( FirstFmPolyUsed != (u_int16_t) -1)
+	if ( FirstFmPolyUsed != INDEX_NONE)
 	{
 		FmPolys[FirstFmPolyUsed].Next = i;
 	}
@@ -119,17 +119,17 @@ void KillUsedFmPoly( u_int16_t i )
 	if ( i == FirstFmPolyUsed )
 		FirstFmPolyUsed = FmPolys[i].Prev;
 
-	if( its_prev != (u_int16_t) -1)
+	if( its_prev != INDEX_NONE)
 		FmPolys[its_prev].Next = its_next;
 
-	if( its_next != (u_int16_t) -1)
+	if( its_next != INDEX_NONE)
 		FmPolys[its_next].Prev = its_prev;
 
 	TotalFmPolysInUse--;
 
 	RemoveFmPolyFromTPage( i, GetTPage( *FmPolys[i].Frm_Info, 0 ) );
 
-	FmPolys[i].Prev = (u_int16_t) -1;
+	FmPolys[i].Prev = INDEX_NONE;
 	FmPolys[i].Next = FirstFmPolyFree;
 	FmPolys[i].LifeCount = 0.0F;
 	FmPolys[i].xsize = ( 16.0F * GLOBAL_SCALE );
@@ -195,7 +195,7 @@ void FmPolyProcess( void )
 
 	i = FirstFmPolyUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		nextprim = FmPolys[i].Prev;
 
@@ -1560,7 +1560,7 @@ void InitFmPolyTPages( void )
 
 	for( i = 0; i < MAXTPAGESPERTLOAD; i++ )
 	{
-		FmPolyTPages[ i ].FirstPoly = (u_int16_t) -1;
+		FmPolyTPages[ i ].FirstPoly = INDEX_NONE;
 	}
 }
 
@@ -1574,10 +1574,10 @@ void AddFmPolyToTPage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
-	FmPolys[ i ].PrevInTPage = (u_int16_t) -1;
+	FmPolys[ i ].PrevInTPage = INDEX_NONE;
 	FmPolys[ i ].NextInTPage = FmPolyTPages[ TPage ].FirstPoly;
 
-	if( FmPolys[ i ].NextInTPage != (u_int16_t) -1 )
+	if( FmPolys[ i ].NextInTPage != INDEX_NONE )
 	{
 		FmPolys[ FmPolys[ i ].NextInTPage ].PrevInTPage = i;
 	}
@@ -1595,7 +1595,7 @@ void RemoveFmPolyFromTPage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
-	if( FmPolys[ i ].PrevInTPage != (u_int16_t) -1 )
+	if( FmPolys[ i ].PrevInTPage != INDEX_NONE )
 	{
 		FmPolys[ FmPolys[ i ].PrevInTPage ].NextInTPage = FmPolys[ i ].NextInTPage;
 	}
@@ -1604,13 +1604,13 @@ void RemoveFmPolyFromTPage( u_int16_t i, int16_t TPage )
 		FmPolyTPages[ TPage ].FirstPoly = FmPolys[ i ].NextInTPage;
 	}
 
-	if( FmPolys[ i ].NextInTPage != (u_int16_t) -1 )
+	if( FmPolys[ i ].NextInTPage != INDEX_NONE )
 	{
 		FmPolys[ FmPolys[ i ].NextInTPage ].PrevInTPage = FmPolys[ i ].PrevInTPage;
 	}
 
-	FmPolys[ i ].PrevInTPage = (u_int16_t) -1;
-	FmPolys[ i ].NextInTPage = (u_int16_t) -1;
+	FmPolys[ i ].PrevInTPage = INDEX_NONE;
+	FmPolys[ i ].NextInTPage = INDEX_NONE;
 }
 
 bool DisplayGroupClippedFmPolys( RENDEROBJECT *renderObject, u_int16_t Group )
@@ -1719,7 +1719,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 		if( Count == *TPage ) i = *NextFmPoly;
 		else i = FmPolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXFMPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXFMPOLYVERTS ) )
 		{
 			if( !( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) && ( FmPolys[i].Group == Group ) )
 			{
@@ -1779,7 +1779,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 			if( Count == *TPage ) i = *NextFmPoly;
 			else i = FmPolyTPages[ Count ].FirstPoly;
 
-			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXFMPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXFMPOLYVERTS ) )
 			{
 				if( !( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) && ( FmPolys[i].Group == Group ) )
 				{
@@ -2084,7 +2084,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 		if( Count == *TPage ) i = *NextFmPoly;
 		else i = FmPolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXFMPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXFMPOLYVERTS ) )
 		{
 			if( ( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) )
 			{
@@ -2144,7 +2144,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 			if( Count == *TPage ) i = *NextFmPoly;
 			else i = FmPolyTPages[ Count ].FirstPoly;
 
-			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXFMPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXFMPOLYVERTS ) )
 			{
 				if( ( FmPolys[i].Flags & FM_FLAG_DONTCLIP ) )
 				{
@@ -2444,7 +2444,7 @@ FILE * SaveFmPolys( FILE * fp )
 
 		i = FirstFmPolyUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fwrite( &FmPolys[ i ].Prev, sizeof( u_int16_t ), 1, fp );
@@ -2483,7 +2483,7 @@ FILE * SaveFmPolys( FILE * fp )
 
 		i = FirstFmPolyFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = FmPolys[ i ].Next;
@@ -2516,7 +2516,7 @@ FILE * LoadFmPolys( FILE * fp )
 
 		i = FirstFmPolyUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fread( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fread( &FmPolys[ i ].Prev, sizeof( u_int16_t ), 1, fp );
@@ -2554,7 +2554,7 @@ FILE * LoadFmPolys( FILE * fp )
 
 		i = FirstFmPolyFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			memset( &FmPolys[i], 0, sizeof( FMPOLY ) );
 			FmPolys[i].xsize = ( 16.0F * GLOBAL_SCALE );
@@ -2569,9 +2569,9 @@ FILE * LoadFmPolys( FILE * fp )
 			FmPolys[i].UpVector.x = 0.0F;
 			FmPolys[i].UpVector.y = 1.0F;
 			FmPolys[i].UpVector.z = 0.0F;
-			FmPolys[i].NextInTPage = (u_int16_t) -1;
-			FmPolys[i].PrevInTPage = (u_int16_t) -1;
-			FmPolys[i].Prev = (u_int16_t) -1;
+			FmPolys[i].NextInTPage = INDEX_NONE;
+			FmPolys[i].PrevInTPage = INDEX_NONE;
+			FmPolys[i].Prev = INDEX_NONE;
 
 			fread( &FmPolys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = FmPolys[ i ].Next;

@@ -13,7 +13,7 @@
  *
  * Once per camera pass BuildVisibleLightList links the lights that are
  * Visible and whose group overlaps the camera's group (visi VisibleOverlap)
- * into the FirstLightVisible chain; Group == (u_int16_t)-1 takes every used
+ * into the FirstLightVisible chain; Group == INDEX_NONE takes every used
  * light. The vertex relighting functions read only that chain.
  *
  * XLight1Group runs per visible level group before it is drawn: it applies

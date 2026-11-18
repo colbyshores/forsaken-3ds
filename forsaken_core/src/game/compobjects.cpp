@@ -350,7 +350,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 			Comp->ModelIndex = ModelIndex;
 
-			if( ModelIndex != (u_int16_t) -1 )
+			if( ModelIndex != INDEX_NONE )
 			{
 				Models[ ModelIndex ].ModelNum = ( (*BaseModel) + ID );
 				Models[ ModelIndex ].Func = MODFUNC_Nothing;
@@ -407,7 +407,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 		}
 		else
 		{
-			Comp->ModelIndex = (u_int16_t) -1;
+			Comp->ModelIndex = INDEX_NONE;
 		}
 	
 		fread( &NumTrans, sizeof( int16_t ), 1, fp );
@@ -865,10 +865,10 @@ void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 				Children->NumChildren = 0;
 			}
 
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				KillUsedModel( Children->ModelIndex );
-				Children->ModelIndex = (u_int16_t) -1;
+				Children->ModelIndex = INDEX_NONE;
 			}
 
 			Children++;
@@ -924,7 +924,7 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 			Children->InterpFrame = 0;
 			Children->InterpTime = 0.0F;
 
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Flags &= ~MODFLAG_SpotFXDisabled;
 			}
@@ -1071,7 +1071,7 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 											switch( PropData->Value )
 											{
 												case PROPSTATE_Destroy:
-													if( Children->ModelIndex != (u_int16_t) -1 )
+													if( Children->ModelIndex != INDEX_NONE )
 													{
 														ApplyMatrix( &Models[ Children->ModelIndex ].Mat,
 															         &ModelHeaders[ Models[ Children->ModelIndex ].ModelNum ].Center, &TempPos );
@@ -1085,14 +1085,14 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 
 														KillUsedModel( Children->ModelIndex );
 														Children->Flags &= ~COMPFLAG_Enable;
-														Children->ModelIndex = (u_int16_t) -1;
+														Children->ModelIndex = INDEX_NONE;
 													}
 													break;
 
 												case PROPSTATE_DisableSpotFX:
 													if( Scale < 1.0F )
 													{
-														if( Children->ModelIndex != (u_int16_t) -1 )
+														if( Children->ModelIndex != INDEX_NONE )
 														{
 															Models[ Children->ModelIndex ].Flags |= MODFLAG_SpotFXDisabled;
 														}
@@ -1141,7 +1141,7 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 			MatrixTranspose( &Children->DisplayMatrix, &Children->InvDisplayMatrix );
 			Children->DisplayPos = NewPos;
 
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Frame = Children->Frame;
 				Models[ Children->ModelIndex ].InterpFrame = Children->InterpFrame;
@@ -1281,7 +1281,7 @@ void SetCompObjModelsState( COMP_OBJ * Children, int16_t NumChildren, bool Visib
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Visible = Visible;
 			}
@@ -1639,7 +1639,7 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 			MatrixMultiply( &Children->DisplayMatrix, &Children->InitMatrix, &DisplayMatrix );
 			MatrixTranspose( &DisplayMatrix, &InvDisplayMatrix );
 
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				if( ModNames[ Models[ Children->ModelIndex ].ModelNum ].DoIMorph )
 				{
@@ -1682,7 +1682,7 @@ void UpdateCompObjColours( COMP_OBJ * Children, int16_t NumChildren, int Red, in
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Flags |= MODFLAG_AmbientLight;
 				Models[ Children->ModelIndex ].Red = Red;
@@ -1717,7 +1717,7 @@ void UpdateCompObjFlags( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Fla
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Flags &= MODFLAG_SpotFXDisabled;
 				Models[ Children->ModelIndex ].Flags |= Flags;
@@ -1748,9 +1748,9 @@ void UpdateCompObjClipGroup( COMP_OBJ * Children, int16_t NumChildren, u_int16_t
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
-				if( ClipGroup != (u_int16_t) -1 )
+				if( ClipGroup != INDEX_NONE )
 				{
 					Models[ Children->ModelIndex ].Flags |= MODFLAG_UseClipGroup;
 					Models[ Children->ModelIndex ].ClipGroup = ClipGroup;
@@ -1787,7 +1787,7 @@ void SetCompObjRealLighting( COMP_OBJ * Children, int16_t NumChildren, float Rad
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Flags |= MODFLAG_RealLight;
 				Models[ Children->ModelIndex ].Radius = Radius;
@@ -2365,7 +2365,7 @@ void SetStealthOffset( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Offse
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Flags |= MODFLAG_StealthOffset;
 				Models[ Children->ModelIndex ].StealthOffset = Offset;
@@ -2395,7 +2395,7 @@ void SetCompObjStealth( COMP_OBJ * Children, int16_t NumChildren )
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Flags &= ~MODFLAG_AmbientLight;
 				Models[ Children->ModelIndex ].Flags |= MODFLAG_Stealth;
@@ -2425,7 +2425,7 @@ void SetCompObjNonStealth( COMP_OBJ * Children, int16_t NumChildren )
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				Models[ Children->ModelIndex ].Flags |= MODFLAG_AmbientLight;
 				Models[ Children->ModelIndex ].Flags &= ~MODFLAG_Stealth;

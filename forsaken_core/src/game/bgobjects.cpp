@@ -79,7 +79,7 @@ void InitBGObjects( void )
 	{
 		memset( &BGObjects[ i ], 0, sizeof( BGOBJECT ) );
 
-		BGObjects[ i ].ModelIndex = (u_int16_t) -1;
+		BGObjects[ i ].ModelIndex = INDEX_NONE;
 
 		BGObjects[ i ].Index = i;
 		BGObjects[ i ].NextUsed = NULL;
@@ -172,10 +172,10 @@ void KillUsedBGObject( BGOBJECT * Object )
 			FirstBGObjectFree->PrevFree = Object;
 		}
 
-		if( Object->ModelIndex != (u_int16_t) -1 )
+		if( Object->ModelIndex != INDEX_NONE )
 		{
 			KillUsedModel( Object->ModelIndex );
-			Object->ModelIndex = (u_int16_t) -1;
+			Object->ModelIndex = INDEX_NONE;
 		}
 
 		FreeCompObjChildren( Object->Children, Object->NumChildren );
@@ -1084,7 +1084,7 @@ bool PreLoadBGOFiles( void )
 	BGO_FILE	*	FilePtr = NULL;
 	char			TempFilename[ 256 ];
 	u_int16_t			BaseModel;
-	u_int16_t			TempBaseModel = (u_int16_t) -1;
+	u_int16_t			TempBaseModel = INDEX_NONE;
 	FILE		*	fp;
 	const char		*	NewExt = ".BGO";
 	int16_t			NumBGObjects;
@@ -1233,9 +1233,9 @@ bool PreLoadBGOFiles( void )
 
 			while( FilePtr->Filename[ 0 ] != 0 )
 			{
-				TempBaseModel = (u_int16_t) -1;
+				TempBaseModel = INDEX_NONE;
 
-				if( TempBaseModel != (u_int16_t) -1 )
+				if( TempBaseModel != INDEX_NONE )
 				{
 					FilePtr->BaseModel = TempBaseModel;
 				}
@@ -2105,7 +2105,7 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 				if( DebugCount > MAXENEMIES )
 				{
 					Msg( "CheckBGObjectToEnemies() Link list corrupt!!" );
-					return( (u_int16_t) -1 );
+					return( INDEX_NONE );
 				}
 
 				DebugCount++;
@@ -2196,7 +2196,7 @@ bool CheckBGObjectToPickups( BGOBJECT * Object )
 			if( DebugCount > MAXPICKUPS )
 			{
 				Msg( "CheckBGObjectToPickups() Link list corrupt!!" );
-				return( (u_int16_t) -1 );
+				return( INDEX_NONE );
 			}
 
 			DebugCount++;
@@ -2219,7 +2219,7 @@ bool CheckBGObjectToPickups( BGOBJECT * Object )
 						{
 							InitOnePickup( &ColPoint, ColGroup, &Forward, 0.0F, Pickup->Type,
 										   Pickup->Owner, ++Ships[WhoIAm].PickupIdCount, -1,
-										   true, -1.0F, (u_int16_t) -1 );
+										   true, -1.0F, INDEX_NONE );
 
 							KillPickup( Pickup->Owner, Pickup->ID, PICKUPKILL_Immediate );
 						}
@@ -2314,7 +2314,7 @@ void ExplodeChildren( COMP_OBJ * Children, int16_t NumChildren )
 	{
 		for( Count = 0; Count < NumChildren; Count++ )
 		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
+			if( Children->ModelIndex != INDEX_NONE )
 			{
 				ApplyMatrix( &Models[ Children->ModelIndex ].Mat,
 							 &ModelHeaders[ Models[ Children->ModelIndex ].ModelNum ].Center, &Pos );
@@ -2404,7 +2404,7 @@ void ExplodeChildren( COMP_OBJ * Children, int16_t NumChildren )
 FILE * SaveBGObjects( FILE * fp )
 {
 	int		i;
-	u_int16_t	TempIndex = (u_int16_t) -1;
+	u_int16_t	TempIndex = INDEX_NONE;
 
 	if( fp )
 	{
@@ -2511,10 +2511,10 @@ FILE * LoadBGObjects( FILE * fp )
 	if( fp )
 	{
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( TempIndex != (u_int16_t) -1 ) FirstBGObjectUsed = &BGObjects[ TempIndex ];
+		if( TempIndex != INDEX_NONE ) FirstBGObjectUsed = &BGObjects[ TempIndex ];
 		else FirstBGObjectUsed = NULL;
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( TempIndex != (u_int16_t) -1 ) FirstBGObjectFree = &BGObjects[ TempIndex ];
+		if( TempIndex != INDEX_NONE ) FirstBGObjectFree = &BGObjects[ TempIndex ];
 		else FirstBGObjectFree = NULL;
 
 		for( i = 0; i < MAXBGOBJECTS; i++ )
@@ -2608,16 +2608,16 @@ FILE * LoadBGObjects( FILE * fp )
 			fread( &BGObjects[ i ].SoundFX_ID, sizeof( u_int32_t ), 1, fp );
 
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) BGObjects[ i ].PrevUsed = &BGObjects[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) BGObjects[ i ].PrevUsed = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].PrevUsed = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) BGObjects[ i ].NextUsed = &BGObjects[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) BGObjects[ i ].NextUsed = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].NextUsed = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) BGObjects[ i ].PrevFree = &BGObjects[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) BGObjects[ i ].PrevFree = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].PrevFree = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) BGObjects[ i ].NextFree = &BGObjects[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) BGObjects[ i ].NextFree = &BGObjects[ TempIndex ];
 			else  BGObjects[ i ].NextFree = NULL;
 		}
 	}

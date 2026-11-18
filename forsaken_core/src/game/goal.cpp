@@ -232,13 +232,13 @@ bool GenerateFlagAtHome( int team )
 			i = InitOnePickup( &goal->pos, goal->group,
 				&Dir, 0.0F, TeamFlagPickup[ team ], WhoIAm,
 				++Ships[WhoIAm].PickupIdCount, -1, true,
-				-1.0F, (u_int16_t) -1 );
+				-1.0F, INDEX_NONE );
 			
-			if( ( i != (u_int16_t) -1 )  && ( i != (u_int16_t) -2 ) )
+			if( ( i != INDEX_NONE )  && ( i != (u_int16_t) -2 ) )
 			{
 				DropPickupSend( &goal->pos, goal->group,
 					&Dir, 0.0F, TeamFlagPickup[ team ], Ships[WhoIAm].PickupIdCount,
-					-1, true, -1.0F, (u_int16_t) -1 );
+					-1, true, -1.0F, INDEX_NONE );
 			}
 			else
 			{
@@ -561,7 +561,7 @@ void ShowGoal( GOAL * Goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_
 
 			fmpoly = FindFreeFmPoly();
 
-			if( fmpoly != (u_int16_t ) -1 )
+			if( fmpoly != INDEX_NONE )
 			{
 				FmPolys[ fmpoly ].LifeCount = 20.0F;
 				FmPolys[ fmpoly ].Pos = Pos;

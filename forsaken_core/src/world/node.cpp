@@ -331,7 +331,7 @@ void ShowNodeNetwork( u_int32_t NetMask )
 					CanSee = AI_ClearLOSNonZeroNonObject( &NodePnt->Pos, NodePnt->Group, &NodeLink->Pos, SHIP_RADIUS );
 					
 					line = FindFreeLine();						// Line attached
-					if( line != (u_int16_t ) -1 )
+					if( line != INDEX_NONE )
 					{
 						Lines[ line ].StartPos = NodePnt->Pos;
 						Lines[ line ].EndPos = NodeLink->Pos;

@@ -477,7 +477,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						PolyAnim->CurrentTime = 0.0F;
 						PolyAnim->MasterTime = 0.0F;
 						PolyAnim->CurrentOffset = 0;
-						PolyAnim->currentframe = (u_int16_t) -1;
+						PolyAnim->currentframe = INDEX_NONE;
 						PolyAnim->newframe = 0;
 
 						PolyAnim->animation =animation;
@@ -730,7 +730,7 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 				if( Mxloadheader->Group[group].exec_type[i]&HASTRANSPARENCIES )
 				{
 
-					if( Model != (u_int16_t) -1 )
+					if( Model != INDEX_NONE )
 					{
 						if( ( Models[ Model ].Flags & MODFLAG_Light ) )
 						{
@@ -764,7 +764,7 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 				{
 					Display = true;
 
-					if( Model != (u_int16_t) -1 )
+					if( Model != INDEX_NONE )
 					{
 
 						if( ( Models[ Model ].Flags & MODFLAG_Light ) )

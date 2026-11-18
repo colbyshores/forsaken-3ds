@@ -84,7 +84,7 @@ void ExecuteTransExe( u_int16_t group )
 			Display = true;
 
 
-			if( TransExe[i].Model != (u_int16_t) -1 )
+			if( TransExe[i].Model != INDEX_NONE )
 			{
 				Model = TransExe[i].Model;
 				if( !( Models[ Model ].Flags & MODFLAG_Clip ) )
@@ -186,7 +186,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 			Display = true;
 
 
-			if( TransExe[i].Model != (u_int16_t) -1 )
+			if( TransExe[i].Model != INDEX_NONE )
 			{
 				Model = TransExe[i].Model;
 				if( ( Models[ Model ].Flags & MODFLAG_Clip ) )

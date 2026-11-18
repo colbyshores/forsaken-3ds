@@ -180,7 +180,7 @@ FILE * SaveRemoteCameras( FILE * fp )
 	if( fp )
 	{
 		if( ActiveRemoteCamera ) TempIndex = (u_int16_t) ( ActiveRemoteCamera - RemoteCameras );
-		else TempIndex = (u_int16_t) -1;
+		else TempIndex = INDEX_NONE;
 		fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 	}
 
@@ -209,7 +209,7 @@ FILE * LoadRemoteCameras( FILE * fp )
 	if( fp )
 	{
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( TempIndex != (u_int16_t) -1 )
+		if( TempIndex != INDEX_NONE )
 		{
 			ActiveRemoteCamera = ( RemoteCameras + TempIndex );
 			ActiveRemoteCamera->enable = true;

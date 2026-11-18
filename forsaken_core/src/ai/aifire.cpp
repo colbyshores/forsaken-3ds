@@ -189,7 +189,7 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 							i = EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 										Enemy->Object.Group, &Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,
 										GunTypes[GObject->Type].PowerLevel, (GunTypes[GObject->Type].PowerLevel +1) * 33.0F, false, GObject );
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								PrimBulls[i].FirePoint = GObject->FirePosCount;
 							}
@@ -256,7 +256,7 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 							i = EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 										Enemy->Object.Group, &Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,
 										GunTypes[GObject->Type].PowerLevel, (GunTypes[GObject->Type].PowerLevel +1) * 33.0F, false, GObject );
-							if( i != (u_int16_t) -1 )
+							if( i != INDEX_NONE )
 							{
 								PrimBulls[i].FirePoint = GObject->FirePosCount;
 							}

@@ -819,15 +819,15 @@ void SetupNetworkGame()
 		// everyone starts off normal....
 		GameStatus[i] = STATUS_Null;
 		Ships[i].BikeNum = ( i % MAXBIKETYPES );
-		Ships[i].ModelNum = (u_int16_t) -1;
+		Ships[i].ModelNum = INDEX_NONE;
 		Ships[i].Object.Type = OBJECT_TYPE_SHIP;
 		Ships[i].Object.Mode = NORMAL_MODE;
 		Ships[i].Object.Bank = 0.0F;
 		Ships[i].Object.Shield	= Start_Shield;
 		Ships[i].Object.Hull	= Start_Hull;
 		Ships[i].JustRecievedPacket = true;
-		Ships[i].Object.light = (u_int16_t) -1;
-		for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
+		Ships[i].Object.light = INDEX_NONE;
+		for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 		Ships[i].NumMultiples = 0;
 		Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
 		Ships[i].Object.Pos.x = 0.0F;;
@@ -848,7 +848,7 @@ void SetupNetworkGame()
 		Ships[i].Object.Autolevel = 0.0F;
 		Ships[i].Object.BobCount = 0.0F;
 
-		for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = (u_int16_t) -1;
+		for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = INDEX_NONE;
 	
 		InitScoreSortTab((int) i);
 
@@ -874,8 +874,8 @@ void InitShipStructure( int i , bool ResetScore )
 	Ships[i].Object.Shield	= Start_Shield;
 	Ships[i].Object.Hull	= Start_Hull;
 	Ships[i].JustRecievedPacket = true;
-	Ships[i].Object.light = (u_int16_t) -1;
-	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
+	Ships[i].Object.light = INDEX_NONE;
+	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 	Ships[i].NumMultiples = 0;
 	Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
 	
@@ -906,7 +906,7 @@ void InitShipStructure( int i , bool ResetScore )
 	if( ResetScore )
 		ResetIndividualStats(i); // (stats.cpp)
 
-	for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = (u_int16_t) -1;
+	for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = INDEX_NONE;
 
 	Ships[i].network_player = NULL;
 }
@@ -966,7 +966,7 @@ void initShip( u_int16_t i )
     Ships[i].TrigVars = ( ( NumOfTrigVars + ( MAXGENTRIGVARCOUNT - 1 ) ) / MAXGENTRIGVARCOUNT );
 
     Ships[i].NumMultiples = 0;
-	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
+	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 
 	if ( Mloadheader.state == true)
 	{
@@ -999,7 +999,7 @@ void smallinitShip( u_int16_t i )
     Ships[i].Triggers = 0;
     Ships[i].TrigVars = 0;
     Ships[i].NumMultiples = 0;
-	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = (u_int16_t) -1;
+	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 
 	NumMissedPickups = 0;
 	NumMissedInitPickups = 0;
@@ -1068,10 +1068,10 @@ void network_event_player_left( network_player_t * player )
 				if( MyGameStatus == STATUS_Normal )
 	   				AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[i][0] , HAS_LEFT_THE_GAME );
 
-				if( Ships[i].Object.light != (u_int16_t) -1  )
+				if( Ships[i].Object.light != INDEX_NONE  )
 				{
 					KillUsedXLight(Ships[i].Object.light);
-					Ships[i].Object.light = (u_int16_t) -1;
+					Ships[i].Object.light = INDEX_NONE;
 				}
 
 				Ships[i].enable = 0;
@@ -1682,7 +1682,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			CheckCharging( lpVeryShortFUpdate->WhoIAm, Ships[ lpVeryShortFUpdate->WhoIAm ].Object.Flags, lpVeryShortFUpdate->ShortGlobalShip.Flags );
 			if( !( Ships[lpVeryShortFUpdate->WhoIAm].Object.Flags & SHIP_Multiple ) && ( lpVeryShortFUpdate->ShortGlobalShip.Flags & SHIP_Multiple ) )
 			{
-				for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpVeryShortFUpdate->WhoIAm ].OrbModels[ Count ] = (u_int16_t) -1;
+				for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpVeryShortFUpdate->WhoIAm ].OrbModels[ Count ] = INDEX_NONE;
 				Ships[lpVeryShortFUpdate->WhoIAm].NumMultiples = (BYTE)((lpVeryShortFUpdate->ShortGlobalShip.Flags >> SHIP_NumMultiples_Bit1 ) & 15);
 				CreateOrbitPulsar( lpVeryShortFUpdate->WhoIAm );
 			}
@@ -1758,7 +1758,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 			if( !( Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].Object.Flags & SHIP_Multiple ) && ( lpGroupOnly_VeryShortFUpdate->ShortGlobalShip.Flags & SHIP_Multiple ) )
 			{
-				for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpGroupOnly_VeryShortFUpdate->WhoIAm ].OrbModels[ Count ] = (u_int16_t) -1;
+				for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpGroupOnly_VeryShortFUpdate->WhoIAm ].OrbModels[ Count ] = INDEX_NONE;
 				Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].NumMultiples = (BYTE)((lpGroupOnly_VeryShortFUpdate->ShortGlobalShip.Flags >> SHIP_NumMultiples_Bit1 ) & 15);
 				CreateOrbitPulsar( lpGroupOnly_VeryShortFUpdate->WhoIAm );
 			}
@@ -1840,7 +1840,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				Ships[lpVeryShortUpdate->WhoIAm].headlights = !!( lpVeryShortUpdate->ShortGlobalShip.Flags & SHIP_Light );
 				if( !( Ships[lpVeryShortUpdate->WhoIAm].Object.Flags & SHIP_Multiple ) && ( lpVeryShortUpdate->ShortGlobalShip.Flags & SHIP_Multiple ) )
 				{
-					for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpVeryShortUpdate->WhoIAm ].OrbModels[ Count ] = (u_int16_t) -1;
+					for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpVeryShortUpdate->WhoIAm ].OrbModels[ Count ] = INDEX_NONE;
 					Ships[lpVeryShortUpdate->WhoIAm].NumMultiples = (BYTE)((lpVeryShortUpdate->ShortGlobalShip.Flags >> SHIP_NumMultiples_Bit1 ) & 15);
 					CreateOrbitPulsar( lpVeryShortUpdate->WhoIAm );
 				}
@@ -1924,7 +1924,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				Ships[lpUpdate->WhoIAm].headlights = !!( lpUpdate->ShortGlobalShip.Flags & SHIP_Light );
 				if( !( Ships[lpUpdate->WhoIAm].Object.Flags & SHIP_Multiple ) && ( lpUpdate->ShortGlobalShip.Flags & SHIP_Multiple ) )
 				{
-					for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpUpdate->WhoIAm ].OrbModels[ Count ] = (u_int16_t) -1;
+					for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpUpdate->WhoIAm ].OrbModels[ Count ] = INDEX_NONE;
 					Ships[lpUpdate->WhoIAm].NumMultiples = (BYTE)((lpUpdate->ShortGlobalShip.Flags >> SHIP_NumMultiples_Bit1 ) & 15);
 					CreateOrbitPulsar( lpUpdate->WhoIAm );
 				}
@@ -1986,7 +1986,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 			if( !( Ships[lpFUpdate->WhoIAm].Object.Flags & SHIP_Multiple ) && ( lpFUpdate->ShortGlobalShip.Flags & SHIP_Multiple ) )
 			{
-				for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpFUpdate->WhoIAm ].OrbModels[ Count ] = (u_int16_t) -1;
+				for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ lpFUpdate->WhoIAm ].OrbModels[ Count ] = INDEX_NONE;
 				Ships[lpFUpdate->WhoIAm].NumMultiples = (BYTE)((lpFUpdate->ShortGlobalShip.Flags >> SHIP_NumMultiples_Bit1 ) & 15);
 				CreateOrbitPulsar( lpFUpdate->WhoIAm );
 			}
@@ -2195,7 +2195,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 		lpDropPickup = (DROPPICKUPMSG *)MsgPnt;
 #if DEBUG_PICKUPS
-		if( lpDropPickup->WhoIAm != (u_int16_t) -1 ) DebugPrintf( "PACKET OWNER '%s' : Init '%s', Owner '%s', ID %d\n", &Names[ lpDropPickup->WhoIAm ][ 0 ], Messages[ lpDropPickup->PickupInfo.Type ], &Names[ lpDropPickup->WhoIAm ][ 0 ], lpDropPickup->PickupInfo.IDCount );
+		if( lpDropPickup->WhoIAm != INDEX_NONE ) DebugPrintf( "PACKET OWNER '%s' : Init '%s', Owner '%s', ID %d\n", &Names[ lpDropPickup->WhoIAm ][ 0 ], Messages[ lpDropPickup->PickupInfo.Type ], &Names[ lpDropPickup->WhoIAm ][ 0 ], lpDropPickup->PickupInfo.IDCount );
 		else DebugPrintf( "PACKET OWNER '%s' : Init '%s', No Owner, ID %d\n", &Names[ lpDropPickup->WhoIAm ][ 0 ], Messages[ lpDropPickup->PickupInfo.Type ], lpDropPickup->PickupInfo.IDCount );
 #endif
 	 	InitOnePickup( &lpDropPickup->PickupInfo.Pos, lpDropPickup->PickupInfo.Group,
@@ -2225,7 +2225,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		TempPickup.LifeCount = lpVeryShortDropPickup->PickupInfo.LifeCount;
 		TempPickup.TriggerMod = lpVeryShortDropPickup->PickupInfo.TriggerMod;
 #if DEBUG_PICKUPS
-		if( lpVeryShortDropPickup->WhoIAm != (u_int16_t) -1 ) DebugPrintf( "PACKET OWNER '%s' : Init '%s', Owner '%s', ID %d\n", &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], Messages[ TempPickup.Type ], &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], TempPickup.IDCount );
+		if( lpVeryShortDropPickup->WhoIAm != INDEX_NONE ) DebugPrintf( "PACKET OWNER '%s' : Init '%s', Owner '%s', ID %d\n", &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], Messages[ TempPickup.Type ], &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], TempPickup.IDCount );
 		else DebugPrintf( "PACKET OWNER '%s' : Init '%s', No Owner, ID %d\n", &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], Messages[ TempPickup.Type ], TempPickup.IDCount );
 #endif
 	 	InitOnePickup( &TempPickup.Pos, TempPickup.Group,
@@ -2245,7 +2245,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			SfxForCollectPickup( lpKillPickup->KillPickupInfo.Owner, lpKillPickup->KillPickupInfo.IDCount );
 		}
 #if DEBUG_PICKUPS
-		if( lpKillPickup->KillPickupInfo.Owner != (u_int16_t) -1 ) DebugPrintf( "PACKET OWNER '%s' : Kill Pickup Owner '%s', ID %d\n", &Names[ lpKillPickup->WhoIAm ][ 0 ], &Names[ lpKillPickup->KillPickupInfo.Owner ][ 0 ], lpKillPickup->KillPickupInfo.IDCount );
+		if( lpKillPickup->KillPickupInfo.Owner != INDEX_NONE ) DebugPrintf( "PACKET OWNER '%s' : Kill Pickup Owner '%s', ID %d\n", &Names[ lpKillPickup->WhoIAm ][ 0 ], &Names[ lpKillPickup->KillPickupInfo.Owner ][ 0 ], lpKillPickup->KillPickupInfo.IDCount );
 		else DebugPrintf( "PACKET OWNER '%s' : Kill Pickup No Owner, ID %d\n", &Names[ lpKillPickup->WhoIAm ][ 0 ], lpKillPickup->KillPickupInfo.IDCount );
 #endif
 		KillPickup( lpKillPickup->KillPickupInfo.Owner, lpKillPickup->KillPickupInfo.IDCount, lpKillPickup->KillPickupInfo.Style );
@@ -2320,7 +2320,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 								&lpTitanBits->TitanBits.UpVector,
 								&lpTitanBits->TitanBits.DropDir,
 								lpTitanBits->TitanBits.Weapon, false );
-			 if( i != (u_int16_t) -1 )
+			 if( i != INDEX_NONE )
 				 SecBulls[i].FramelagAddition = GlobalFramelagAddition;
 		}
 		return;
@@ -3828,7 +3828,7 @@ void CreateReGen( u_int16_t ship )
 	}
 
 	Model =	FindFreeModel();
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_SHIP;
 		Models[ Model ].Owner = ship;

@@ -474,7 +474,7 @@ void OnceOnlyInitModel( void )
 	int i;
 	int	Count;
 
-	FirstModelUsed = (u_int16_t) -1;
+	FirstModelUsed = INDEX_NONE;
 	FirstModelFree = 0;
 	
 	for( i=0;i<MAXNUMOFMODELS;i++)
@@ -486,13 +486,13 @@ void OnceOnlyInitModel( void )
 		Models[i].Visible = true;
 		Models[i].TimeInterval = (float) 1;
 
-		for( Count = 0; Count < 12; Count++ ) Models[i].TempLines[ Count ] = (u_int16_t) -1;
+		for( Count = 0; Count < 12; Count++ ) Models[i].TempLines[ Count ] = INDEX_NONE;
 
 		Models[i].Next = i + 1;
-		Models[i].Prev = (u_int16_t) -1;
+		Models[i].Prev = INDEX_NONE;
 	}
 
-	Models[MAXNUMOFMODELS-1].Next = (u_int16_t) -1;
+	Models[MAXNUMOFMODELS-1].Next = INDEX_NONE;
 
 	NextNewModel = MODEL_ExtraModels;
 
@@ -705,11 +705,11 @@ u_int16_t	FindFreeModel()
 
 	i = FirstModelFree;
 	
-	if ( i == (u_int16_t) -1)
+	if ( i == INDEX_NONE)
 		return i;
  
 	Models[i].Prev = FirstModelUsed;
-	if ( FirstModelUsed != (u_int16_t) -1)
+	if ( FirstModelUsed != INDEX_NONE)
 	{
 		Models[FirstModelUsed].Next = i;
 	}
@@ -757,18 +757,18 @@ void	KillUsedModel( u_int16_t i )
 	if ( i == FirstModelUsed )
 		FirstModelUsed = Models[i].Prev;
 
-	if( its_prev != (u_int16_t) -1)
+	if( its_prev != INDEX_NONE)
 		Models[its_prev].Next = its_next;
 
-	if( its_next != (u_int16_t) -1)
+	if( its_next != INDEX_NONE)
 		Models[its_next].Prev = its_prev;
 
 	for( Count = 0; Count < 12; Count++ )
 	{
-		if( Models[i].TempLines[ Count ] != (u_int16_t) -1 )
+		if( Models[i].TempLines[ Count ] != INDEX_NONE )
 		{
 			KillUsedLine( Models[i].TempLines[ Count ] );
-			Models[i].TempLines[ Count ] = (u_int16_t) -1;
+			Models[i].TempLines[ Count ] = INDEX_NONE;
 		}
 	}
 
@@ -776,7 +776,7 @@ void	KillUsedModel( u_int16_t i )
 	KillAttachedSoundFX( i );
 
 	Models[i].Func = MODFUNC_Nothing;
-	Models[i].Prev = (u_int16_t) -1;
+	Models[i].Prev = INDEX_NONE;
 	Models[i].Next = FirstModelFree;
 	Models[i].LifeCount = -1.0F;
 	Models[i].Scale = 1.0F;
@@ -935,11 +935,11 @@ static void ModelVisBucket_Build( int InTitle )
 	int g;
 	for( g = 0; g < MAXGROUPS; g++ )
 	{
-		VisBucketHead[g] = (u_int16_t)-1;
-		VisBucketTail[g] = (u_int16_t)-1;
+		VisBucketHead[g] = INDEX_NONE;
+		VisBucketTail[g] = INDEX_NONE;
 	}
 	i = FirstModelUsed;
-	while( i != (u_int16_t)-1 )
+	while( i != INDEX_NONE )
 	{
 		u_int16_t clip;
 		int vis = Models[i].Visible &&
@@ -956,8 +956,8 @@ static void ModelVisBucket_Build( int InTitle )
 				continue;
 			}
 			VisBucketClip[i] = clip;
-			VisBucketNext[i] = (u_int16_t)-1;
-			if( VisBucketHead[clip] == (u_int16_t)-1 )
+			VisBucketNext[i] = INDEX_NONE;
+			if( VisBucketHead[clip] == INDEX_NONE )
 				VisBucketHead[clip] = i;
 			else
 				VisBucketNext[ VisBucketTail[clip] ] = i;
@@ -1005,7 +1005,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 	/* Walk only this group's models, in list order (the bucket chains are
 	 * tail-appended in Models[] list order). ClipGroup is implied. */
 	i = VisBucketHead[ group ];
-	while( i != (u_int16_t)-1 )
+	while( i != INDEX_NONE )
 	{
 		nextmodel = VisBucketNext[i];
 		ClipGroup = VisBucketClip[i];
@@ -1443,7 +1443,7 @@ void ProcessModels( void )
 
 	i =  FirstModelUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		nextmodel = Models[i].Prev;
 
@@ -1524,7 +1524,7 @@ void ProcessModels( void )
 					break;
 
 				case MODFUNC_BodyPart:
-					if( Models[i].Group != (u_int16_t) -1 )
+					if( Models[i].Group != INDEX_NONE )
 					{
 						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
 						TempQuat.ToMatrix(&UpMatrix);
@@ -1665,7 +1665,7 @@ void ProcessModels( void )
 					}
 	 				break;
 				case MODFUNC_TomCruise:
-					if( Models[i].Group != (u_int16_t) -1 )
+					if( Models[i].Group != INDEX_NONE )
 					{
 						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
 						TempQuat.ToMatrix(&UpMatrix);
@@ -1792,7 +1792,7 @@ void ProcessModels( void )
 					break;
 
 				case MODFUNC_LargeShrapnel:
-					if( Models[i].Group != (u_int16_t) -1 )
+					if( Models[i].Group != INDEX_NONE )
 					{
 						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
 						TempQuat.ToMatrix(&UpMatrix);
@@ -1938,7 +1938,7 @@ void ProcessModels( void )
 	 				break;
 
 				case MODFUNC_SmallShrapnel:
-					if( Models[i].Group != (u_int16_t) -1 )
+					if( Models[i].Group != INDEX_NONE )
 					{
 						TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
 						TempQuat.ToMatrix(&UpMatrix);
@@ -2607,7 +2607,7 @@ void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 	{
 		i = EnemyFirePrimary( OWNER_MODELSPOTFX, ModelIndex, 0, Weapon, Group, Pos, &TempVector, Dir, Up, 2, 0.0F, false, NULL );
 
-		if( i != (u_int16_t) -1 )
+		if( i != INDEX_NONE )
 		{
 			PrimBulls[i].SpotFX = SpotFXIndex;
 			GetLaserLocalVector( i, &PrimBulls[i].LocalDir );
@@ -3566,7 +3566,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 	nSecWalk = 0;
 
 	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
-	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
+	while( i != INDEX_NONE && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
 		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
@@ -3764,7 +3764,7 @@ bool CheckForGravgons( VECTOR * Pos )
 
 	i =  FirstModelUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		nextmodel = Models[i].Prev;
 
@@ -3840,7 +3840,7 @@ void CreateBodyPart( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t Mode
 	u_int16_t	Model;
 
 	Model =	FindFreeModel();
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_NOBODY;
 		Models[ Model ].Owner = 0;
@@ -3893,7 +3893,7 @@ void CreateTomCruise( VECTOR * Pos, u_int16_t Group )
 	float	Height;
 
 	Model =	FindFreeModel();
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_NOBODY;
 		Models[ Model ].Owner = 0;
@@ -4076,7 +4076,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 	nSecWalk = 0;
 
 	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
-	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
+	while( i != INDEX_NONE && nSecWalk < MAXSECONDARYWEAPONBULLETS )
 	{
 		nSecWalk++;
 		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
@@ -4252,11 +4252,11 @@ void CreateOrbitPulsar( u_int16_t Ship )
 
 	for( Count = 0; Count < Ships[ Ship ].NumMultiples; Count++ )
 	{
-		if( Ships[ Ship ].OrbModels[ Count ] == (u_int16_t) -1 )
+		if( Ships[ Ship ].OrbModels[ Count ] == INDEX_NONE )
 		{
 			Model =	FindFreeModel();
 
-			if( Model != (u_int16_t ) -1 )
+			if( Model != INDEX_NONE )
 			{
 				Ships[ Ship ].OrbModels[ Count ] = Model;
 				Models[ Model ].OwnerType = OWNER_SHIP;
@@ -4297,10 +4297,10 @@ void CreateOrbitPulsar( u_int16_t Ship )
 
 	for( Count = Ships[ Ship ].NumMultiples; Count < MAXMULTIPLES; Count++ )
 	{
-		if( Ships[ Ship ].OrbModels[ Count ] != (u_int16_t) -1 )
+		if( Ships[ Ship ].OrbModels[ Count ] != INDEX_NONE )
 		{
 			KillUsedModel( Ships[ Ship ].OrbModels[ Count ] );
-			Ships[ Ship ].OrbModels[ Count ] = (u_int16_t) -1;
+			Ships[ Ship ].OrbModels[ Count ] = INDEX_NONE;
 		}
 	}
 }
@@ -4317,7 +4317,7 @@ void CreateExplosionDonut( VECTOR * Pos, VECTOR * Up, u_int16_t Group )
 	u_int16_t	Model;
 
 	Model =	FindFreeModel();
-	if( Model != (u_int16_t ) -1 )
+	if( Model != INDEX_NONE )
 	{
 		Models[ Model ].OwnerType = OWNER_NOBODY;
 		Models[ Model ].Owner = 0;
@@ -4362,7 +4362,7 @@ u_int16_t CreateLine( float x1, float y1, float z1, float x2, float y2, float z2
 
 	line = FindFreeLine();						// Line attached
 
-	if( line != (u_int16_t ) -1 )
+	if( line != INDEX_NONE )
 	{
 		Lines[ line ].StartPos.x = x1;
 		Lines[ line ].StartPos.y = y1;
@@ -4545,10 +4545,10 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 
 	for( Count = 0; Count < 12; Count++ )
 	{
-		if( LineArray[ Count ] != (u_int16_t) -1 )
+		if( LineArray[ Count ] != INDEX_NONE )
 		{
 			KillUsedLine( LineArray[ Count ] );
-			LineArray[ Count ] = (u_int16_t) -1;
+			LineArray[ Count ] = INDEX_NONE;
 		}
 
 	}
@@ -4615,10 +4615,10 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 
 	for( Count = 0; Count < 12; Count++ )
 	{
-		if( LineArray[ Count ] != (u_int16_t) -1 )
+		if( LineArray[ Count ] != INDEX_NONE )
 		{
 			KillUsedLine( LineArray[ Count ] );
-			LineArray[ Count ] = (u_int16_t) -1;
+			LineArray[ Count ] = INDEX_NONE;
 		}
 
 	}
@@ -4735,11 +4735,11 @@ void UpdateShipModel( u_int16_t Ship )
 	{
 		if( BikeCompFiles[ ( Ships[ Ship ].BikeNum % MAXBIKETYPES ) ].Filename[ 0 ] )
 		{
-			if( Ships[ Ship ].ModelNum != (u_int16_t) -1 )
+			if( Ships[ Ship ].ModelNum != INDEX_NONE )
 			{
 
 				KillUsedModel( Ships[ Ship ].ModelNum );
-				Ships[ Ship ].ModelNum = (u_int16_t) -1;
+				Ships[ Ship ].ModelNum = INDEX_NONE;
 			}
 
 			if( !Ships[ Ship ].Object.Components )
@@ -4809,14 +4809,14 @@ void UpdateShipModel( u_int16_t Ship )
 				Ships[ Ship ].Object.Components = NULL;
 			}
 
-			if( Ships[ Ship ].ModelNum == (u_int16_t) -1 )
+			if( Ships[ Ship ].ModelNum == INDEX_NONE )
 			{
 #ifdef DEBUG_ON
 				PickupModelValid();
 #endif
 				Model =	FindFreeModel();
 
-				if( Model != (u_int16_t ) -1 )
+				if( Model != INDEX_NONE )
 				{
 					Models[ Model ].OwnerType = OWNER_SHIP;
 					Models[ Model ].Owner = WhoIAm;
@@ -4844,7 +4844,7 @@ void UpdateShipModel( u_int16_t Ship )
 				}
 			}
 
-			if( Ships[ Ship ].ModelNum != (u_int16_t) -1 )
+			if( Ships[ Ship ].ModelNum != INDEX_NONE )
 			{
 				Model = Ships[ Ship ].ModelNum;
 
@@ -4903,11 +4903,11 @@ void UpdateShipModel( u_int16_t Ship )
 		Ships[ Ship ].NumMultiples = 0;
 		CreateOrbitPulsar( Ship );
 
-		if( Ships[ Ship ].ModelNum != (u_int16_t) -1 )
+		if( Ships[ Ship ].ModelNum != INDEX_NONE )
 		{
 
 			KillUsedModel( Ships[ Ship ].ModelNum );
-			Ships[ Ship ].ModelNum = (u_int16_t) -1;
+			Ships[ Ship ].ModelNum = INDEX_NONE;
 		}
 
 		if( Ships[ Ship ].Object.Components )
@@ -5199,7 +5199,7 @@ FILE * SaveModels( FILE * fp )
 		
 		i = FirstModelUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fwrite( &Models[ i ].Prev, sizeof( u_int16_t ), 1, fp );
@@ -5249,7 +5249,7 @@ FILE * SaveModels( FILE * fp )
 
 		i = FirstModelFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Models[ i ].Next;
@@ -5277,7 +5277,7 @@ FILE * LoadModels( FILE * fp )
 		
 		i = FirstModelUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fread( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fread( &Models[ i ].Prev, sizeof( u_int16_t ), 1, fp );
@@ -5332,7 +5332,7 @@ FILE * LoadModels( FILE * fp )
 
 		i = FirstModelFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			memset( &Models[ i ], 0, sizeof( MODEL ) );
 			Models[i].Func = MODFUNC_Nothing;
@@ -5340,8 +5340,8 @@ FILE * LoadModels( FILE * fp )
 			Models[i].Scale = 1.0F;
 			Models[i].Visible = true;
 			Models[i].TimeInterval = (float) 1;
-			for( Count = 0; Count < 12; Count++ ) Models[i].TempLines[ Count ] = (u_int16_t) -1;
-			Models[i].Prev = (u_int16_t) -1;
+			for( Count = 0; Count < 12; Count++ ) Models[i].TempLines[ Count ] = INDEX_NONE;
+			Models[i].Prev = INDEX_NONE;
 
 			fread( &Models[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Models[ i ].Next;
@@ -5455,7 +5455,7 @@ void SetShipsVisibleFlag( void )
 		}
 		else
 		{
-			if( Ships[ Ship ].ModelNum != (u_int16_t) -1 )
+			if( Ships[ Ship ].ModelNum != INDEX_NONE )
 			{
 				Model = Ships[ Ship ].ModelNum;
 				Models[ Model ].Visible = ShipVisible;
@@ -5521,7 +5521,7 @@ void CheckModelLinkList( void )
 	
 	i = 0;
 	Count = FirstModelFree;
-	while( ( Count != (u_int16_t)-1 ) && i < MAXNUMOFMODELS*2 )
+	while( ( Count != INDEX_NONE ) && i < MAXNUMOFMODELS*2 )
 	{
 		Count = Models[Count].Next;
 		i++;
@@ -5536,7 +5536,7 @@ void CheckModelLinkList( void )
 	i = 0;
 
 	Count = FirstModelUsed;
-	while( ( Count != (u_int16_t)-1 ) && i < MAXNUMOFMODELS*2 )
+	while( ( Count != INDEX_NONE ) && i < MAXNUMOFMODELS*2 )
 	{
 		if( Models[Count].Prev == Models[Count].Next )
 		{

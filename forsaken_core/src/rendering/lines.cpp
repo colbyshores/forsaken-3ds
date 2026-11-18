@@ -27,7 +27,7 @@ void InitLines( void )
 {
 	int i;
 
-	FirstLineUsed = (u_int16_t) -1;
+	FirstLineUsed = INDEX_NONE;
 	FirstLineFree = 0;
 	
 	for( i=0; i < MAXLINES; i++ )
@@ -45,9 +45,9 @@ void InitLines( void )
 		Lines[i].EndCol.G = 0;
 		Lines[i].EndCol.B = 0;
 		Lines[i].Next = i + 1;
-		Lines[i].Prev = (u_int16_t) -1;
+		Lines[i].Prev = INDEX_NONE;
 	}
-	Lines[ MAXLINES-1 ].Next = (u_int16_t) -1;
+	Lines[ MAXLINES-1 ].Next = INDEX_NONE;
 }
 
 /*===================================================================
@@ -61,11 +61,11 @@ u_int16_t FindFreeLine( void )
 	u_int16_t i;
 
 	i = FirstLineFree;
-	if( i == (u_int16_t) -1 ) return i;
+	if( i == INDEX_NONE ) return i;
  
 	Lines[i].Prev = FirstLineUsed;
 
-	if ( FirstLineUsed != (u_int16_t) -1)
+	if ( FirstLineUsed != INDEX_NONE)
 	{
 		Lines[ FirstLineUsed ].Next = i;
 	}
@@ -91,10 +91,10 @@ void KillUsedLine( u_int16_t i )
 	its_next = Lines[ i ].Next;
 
 	if( i == FirstLineUsed ) FirstLineUsed = Lines[ i ].Prev;
-	if( its_prev != (u_int16_t) -1 ) Lines[ its_prev ].Next = its_next;
-	if( its_next != (u_int16_t) -1 ) Lines[ its_next ].Prev = its_prev;
+	if( its_prev != INDEX_NONE ) Lines[ its_prev ].Next = its_next;
+	if( its_next != INDEX_NONE ) Lines[ its_next ].Prev = its_prev;
 
-	Lines[i].Prev = (u_int16_t) -1;
+	Lines[i].Prev = INDEX_NONE;
 	Lines[i].Next = FirstLineFree;
 	FirstLineFree	= i;
 }
@@ -105,7 +105,7 @@ void KillUsedLine( u_int16_t i )
 				:	RENDEROBJECT *		renderObject
 				:	u_int16_t	* StartLine	(in: where to resume in the
 				:				used list; out: where the next batch starts,
-				:				(u_int16_t)-1 when done)
+				:				INDEX_NONE when done)
 	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * StartLine )
@@ -121,13 +121,13 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 
 	if ( !DebugInfo )
 	{
-		*StartLine = (u_int16_t) -1;
+		*StartLine = INDEX_NONE;
 		return false; // don't display lines if not debugging
 	}
 
 	renderObject->numTextureGroups = 0;
 
-	if( *StartLine != (u_int16_t) -1 )
+	if( *StartLine != INDEX_NONE )
 	{
 		if (!(FSLockVertexBuffer(renderObject, &Vert_Ptr)))
 		{
@@ -138,7 +138,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 
 		i = *StartLine;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			if( Lines[ i ].Group == Group )
 			{
@@ -207,7 +207,7 @@ bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject )
 	u_int16_t  i = 0;
 
 	i = FirstLineUsed;
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		if( LinesDispGroup( group, renderObject, &i ) )
 		{

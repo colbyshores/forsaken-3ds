@@ -583,23 +583,23 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 void	InitPrimBulls(void)
 {
 	u_int16_t	i;
-	FirstPrimBullUsed = (u_int16_t) -1;
+	FirstPrimBullUsed = INDEX_NONE;
 	FirstPrimBullFree = 0;
 	for( i = 0 ; i < MAXPRIMARYWEAPONBULLETS ; i++ )
 	{
 		memset( &PrimBulls[i], 0, sizeof( PRIMARYWEAPONBULLET ) );
 		PrimBulls[i].Used = false;
 		PrimBulls[i].Next = i + 1;
-		PrimBulls[i].Prev = (u_int16_t) -1;
-		PrimBulls[i].Type = (u_int16_t) -1;
-		PrimBulls[i].Owner = (u_int16_t) -1;
-		PrimBulls[i].GroupImIn = (u_int16_t) -1;
-		PrimBulls[i].fmpoly = (u_int16_t) -1;
-		PrimBulls[i].light = (u_int16_t) -1;
-		PrimBulls[i].line = (u_int16_t) -1;
+		PrimBulls[i].Prev = INDEX_NONE;
+		PrimBulls[i].Type = INDEX_NONE;
+		PrimBulls[i].Owner = INDEX_NONE;
+		PrimBulls[i].GroupImIn = INDEX_NONE;
+		PrimBulls[i].fmpoly = INDEX_NONE;
+		PrimBulls[i].light = INDEX_NONE;
+		PrimBulls[i].line = INDEX_NONE;
 		PrimBulls[i].TimeInterval = (float) 1;
 	}
-	PrimBulls[MAXPRIMARYWEAPONBULLETS-1].Next = (u_int16_t) -1;
+	PrimBulls[MAXPRIMARYWEAPONBULLETS-1].Next = INDEX_NONE;
 
 	RestoreWeapons();
 	RestoreAmmo();
@@ -680,7 +680,7 @@ u_int16_t	FindFreePrimBull(void)
 
 	i = FirstPrimBullFree;
 	
-	if ( i == (u_int16_t) -1)
+	if ( i == INDEX_NONE)
 		return i;
  
 	if( PrimBulls[i].Used )
@@ -690,7 +690,7 @@ u_int16_t	FindFreePrimBull(void)
 	}
 
 	PrimBulls[i].Prev = FirstPrimBullUsed;
-	if ( FirstPrimBullUsed != (u_int16_t) -1)
+	if ( FirstPrimBullUsed != INDEX_NONE)
 	{
 		PrimBulls[FirstPrimBullUsed].Next = i;
 	}
@@ -727,13 +727,13 @@ void	KillUsedPrimBull( u_int16_t i )
 	if ( i == FirstPrimBullUsed )
 		FirstPrimBullUsed = PrimBulls[i].Prev;
 
-	if( its_prev != (u_int16_t) -1)
+	if( its_prev != INDEX_NONE)
 		PrimBulls[its_prev].Next = its_next;
 
-	if( its_next != (u_int16_t) -1)
+	if( its_next != INDEX_NONE)
 		PrimBulls[its_next].Prev = its_prev;
 
-	PrimBulls[i].Prev = (u_int16_t) -1;
+	PrimBulls[i].Prev = INDEX_NONE;
 	PrimBulls[i].Next = FirstPrimBullFree;
 	FirstPrimBullFree	= i;
 	PrimBulls[i].Used = false;
@@ -959,7 +959,7 @@ static int16_t	OnceOnlyFlag = 0;
 				{
 					Model = Ships[ WhoIAm ].OrbModels[ Count ];
 
-					if( Model != (u_int16_t) -1 )
+					if( Model != INDEX_NONE )
 					{
 						if( !GodMode && !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 						{
@@ -970,10 +970,10 @@ static int16_t	OnceOnlyFlag = 0;
 						{
 							if( Ships[ WhoIAm ].NumMultiples )
 							{
-								if( Ships[ WhoIAm ].OrbModels[ Ships[ WhoIAm ].NumMultiples - 1 ] != (u_int16_t) -1 )
+								if( Ships[ WhoIAm ].OrbModels[ Ships[ WhoIAm ].NumMultiples - 1 ] != INDEX_NONE )
 								{
 									KillUsedModel( Ships[ WhoIAm ].OrbModels[ Ships[ WhoIAm ].NumMultiples - 1 ] );
-									Ships[ WhoIAm ].OrbModels[ Ships[ WhoIAm ].NumMultiples - 1 ] = (u_int16_t) -1;
+									Ships[ WhoIAm ].OrbModels[ Ships[ WhoIAm ].NumMultiples - 1 ] = INDEX_NONE;
 								}
 
 								Ships[ WhoIAm ].OrbAmmo[ Count ] = Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples - 1 ]; 
@@ -1460,7 +1460,7 @@ void ProcessPrimaryBullets( void )
 	PyroCount += framelag;
 
 	i = FirstPrimBullUsed;
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		nextprim = PrimBulls[i].Prev;
 
@@ -1604,7 +1604,7 @@ void ProcessPrimaryBullets( void )
    	   			case PYROLITE_RIFLE:
 				case NME_PYROLITE:
 					fmpoly = PrimBulls[i].fmpoly;
-					if( fmpoly != (u_int16_t) -1 )
+					if( fmpoly != INDEX_NONE )
 					{
 						FmPolys[ fmpoly ].xsize += ( NewFramelag * ( 0.075F * GLOBAL_SCALE ) ); //framelag
 						FmPolys[ fmpoly ].ysize += ( NewFramelag * ( 0.075F * GLOBAL_SCALE ) );	//framelag
@@ -1628,7 +1628,7 @@ void ProcessPrimaryBullets( void )
 			if( AmIOutsideGroup( &Mloadheader, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn ) )
 			{
 				DebugPrintf( "Killed %s for getting out of group %s\n", DebugPrimStrings[ PrimBulls[i].Weapon ],
-							 (SecBulls[i].GroupImIn == (u_int16_t) -1) ? "(outside)" : Mloadheader.Group[ SecBulls[i].GroupImIn ].name );
+							 (SecBulls[i].GroupImIn == INDEX_NONE) ? "(outside)" : Mloadheader.Group[ SecBulls[i].GroupImIn ].name );
 				CleanUpPrimBull( i, true );
 				goto loop;
 			}
@@ -1687,7 +1687,7 @@ void ProcessPrimaryBullets( void )
 
 			DistFromStart = (float) fabsf( DistanceVert2Vector( (VERT*) &NewPos, &PrimBulls[i].ColStart ) );
 
-			HitWall = (u_int16_t) -1;
+			HitWall = INDEX_NONE;
 			DistToInt = 100000.0F;									/* Distance to Intersection */
 
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -1742,37 +1742,37 @@ void ProcessPrimaryBullets( void )
 			}
 			
 			HitTarget = CheckHitShip( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &Int_Point, &Int_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
-			if( HitTarget != (u_int16_t) -1 ) HitWall = (u_int16_t) -1;
+			if( HitTarget != INDEX_NONE ) HitWall = INDEX_NONE;
 
 			HitSecondary = CheckHitSecondary( &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &MInt_Point, &MInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
-			if( HitSecondary != (u_int16_t) -1 )
+			if( HitSecondary != INDEX_NONE )
 			{
-				HitWall = (u_int16_t) -1;
-				HitTarget = (u_int16_t) -1;
+				HitWall = INDEX_NONE;
+				HitTarget = INDEX_NONE;
 			}
 
 			HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitEnemy != NULL )
 			{
-				HitWall = (u_int16_t) -1;
-				HitTarget = (u_int16_t) -1;
-				HitSecondary = (u_int16_t) -1;
+				HitWall = INDEX_NONE;
+				HitTarget = INDEX_NONE;
+				HitSecondary = INDEX_NONE;
 			}
 			else
 			{
 				TempEnemyIndex = GetComEnemyHitInfo( &EInt_Point, &ENormal, &DistToInt );
 
-				if( TempEnemyIndex != (u_int16_t) -1 )
+				if( TempEnemyIndex != INDEX_NONE )
 				{
 					HitEnemy = &Enemies[ TempEnemyIndex ];
 					EInt_Point2 = EInt_Point;
-					HitWall = (u_int16_t) -1;
-					HitTarget = (u_int16_t) -1;
-					HitSecondary = (u_int16_t) -1;
+					HitWall = INDEX_NONE;
+					HitTarget = INDEX_NONE;
+					HitSecondary = INDEX_NONE;
 				}
 			}
 
-			if( ( HitWall != (u_int16_t) -1 ) || ( HitTarget != (u_int16_t) -1 ) || ( HitSecondary != (u_int16_t) -1 ) || ( HitEnemy != NULL ) )
+			if( ( HitWall != INDEX_NONE ) || ( HitTarget != INDEX_NONE ) || ( HitSecondary != INDEX_NONE ) || ( HitEnemy != NULL ) )
 			{
 				TrigPos.x = PrimBulls[i].Pos.x + ( PrimBulls[i].Dir.x * DistToInt );
 				TrigPos.y = PrimBulls[i].Pos.y + ( PrimBulls[i].Dir.y * DistToInt );
@@ -1797,7 +1797,7 @@ void ProcessPrimaryBullets( void )
 /*===================================================================
 			Hit Secondary Weapon
 ===================================================================*/
-			if( HitSecondary != (u_int16_t) -1 )
+			if( HitSecondary != INDEX_NONE )
 			{
 				TempVector.x = ( MInt_Point.x - SecBulls[ HitSecondary ].Pos.x );
 				TempVector.y = ( MInt_Point.y - SecBulls[ HitSecondary ].Pos.y );
@@ -2038,7 +2038,7 @@ void ProcessPrimaryBullets( void )
 /*===================================================================
 			Hit Background or Background Object
 ===================================================================*/
-			if( HitWall != (u_int16_t) -1 )
+			if( HitWall != INDEX_NONE )
 			{
 		  		ReflectVector( &PrimBulls[i].Dir, &PrimBulls[i].ColPointNormal, &NewDir );
 
@@ -2186,7 +2186,7 @@ void ProcessPrimaryBullets( void )
 /*===================================================================
 			Hit Ship
 ===================================================================*/
-			if( HitTarget != (u_int16_t) -1 )							/* Hit Target? */
+			if( HitTarget != INDEX_NONE )							/* Hit Target? */
 			{
 
 				TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
@@ -2796,20 +2796,20 @@ void ProcessPrimaryBullets( void )
 
 			PrimBulls[i].Pos = NewPos;
 
-			if ( PrimBulls[i].light != (u_int16_t) -1 )
+			if ( PrimBulls[i].light != INDEX_NONE )
 			{
 				XLights[PrimBulls[i].light].Group = PrimBulls[i].GroupImIn;
 				XLights[PrimBulls[i].light].Pos = PrimBulls[i].Pos;
 			}
 
-			if( PrimBulls[i].line != (u_int16_t) -1 )
+			if( PrimBulls[i].line != INDEX_NONE )
 			{
 				Lines[ PrimBulls[i].line ].EndPos = Lines[ PrimBulls[i].line ].StartPos;
 				Lines[ PrimBulls[i].line ].StartPos = PrimBulls[i].Pos;
 				Lines[ PrimBulls[i].line ].Group = PrimBulls[i].GroupImIn;
 			}
 
-			if ( PrimBulls[i].fmpoly != (u_int16_t) -1 )
+			if ( PrimBulls[i].fmpoly != INDEX_NONE )
 			{
 				fmpoly = PrimBulls[i].fmpoly;
 
@@ -2817,7 +2817,7 @@ void ProcessPrimaryBullets( void )
 				{
 					nextfmpoly = FmPolys[ fmpoly ].Prev;
 			
-					if ( fmpoly != (u_int16_t) -1 )
+					if ( fmpoly != INDEX_NONE )
 					{
 						FmPolys[ fmpoly ].Pos.x += MoveOffsetVector.x; //(PrimBulls[i].Dir.x * Speed);
 						FmPolys[ fmpoly ].Pos.y += MoveOffsetVector.y; //(PrimBulls[i].Dir.y * Speed);
@@ -2829,7 +2829,7 @@ void ProcessPrimaryBullets( void )
 				}
 			}
 
-			if( ( PrimBulls[i].poly != (u_int16_t) -1 ) &&
+			if( ( PrimBulls[i].poly != INDEX_NONE ) &&
 				( PrimBulls[i].Weapon != LASER ) &&
 				( PrimBulls[i].Weapon != NME_LASER ) &&
 				( PrimBulls[i].Weapon != NME_POWERLASER ) &&
@@ -2841,7 +2841,7 @@ void ProcessPrimaryBullets( void )
 				{
 					nextpoly = Polys[ poly ].Prev;
 
-					if( poly != (u_int16_t) -1 )
+					if( poly != INDEX_NONE )
 					{
 						Polys[ poly ].Pos1.x += MoveOffsetVector.x;
 						Polys[ poly ].Pos1.y += MoveOffsetVector.y;
@@ -2913,11 +2913,11 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 
 	if( IsGroupVisible[ Group ] )
 	{
-		if( FmPoly != (u_int16_t) -1 ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
+		if( FmPoly != INDEX_NONE ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
 		else NumSparks = ( Random_Range( 4 ) + 4 );
 	
 	   	fmpoly = FindFreeFmPoly();
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			if( Type )
 			{
@@ -2937,7 +2937,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 		   		FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				FmPolys[ fmpoly ].Group = Group;
-				if( FmPoly != (u_int16_t) -1 ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
+				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
 				else FmPolys[ fmpoly ].RotSpeed = 0.0F;
 				FmPolys[ fmpoly ].xsize = TROJAX_EXPSIZE;
 				FmPolys[ fmpoly ].ysize = TROJAX_EXPSIZE;
@@ -2968,7 +2968,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 				FmPolys[ fmpoly ].B = 128;
 		   		FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
-				if( FmPoly != (u_int16_t) -1 ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
+				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
 				else FmPolys[ fmpoly ].RotSpeed = 0.0F;
 				FmPolys[ fmpoly ].xsize = TROJAX_EXPSIZE;
 				FmPolys[ fmpoly ].ysize = TROJAX_EXPSIZE;
@@ -2981,7 +2981,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 		{
 		   	fmpoly = FindFreeFmPoly();
 	
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -3032,11 +3032,11 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 
 	if( IsGroupVisible[ Group ] )
 	{
-		if( FmPoly != (u_int16_t) -1 ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
+		if( FmPoly != INDEX_NONE ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
 		else NumSparks = ( Random_Range( 4 ) + 4 );
 	
 	   	fmpoly = FindFreeFmPoly();
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			if( Type )
 			{
@@ -3056,7 +3056,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 		   		FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
 				FmPolys[ fmpoly ].Group = Group;
-				if( FmPoly != (u_int16_t) -1 ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
+				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
 				else FmPolys[ fmpoly ].RotSpeed = 0.0F;
 				FmPolys[ fmpoly ].xsize = TROJAX_EXPSIZE;
 				FmPolys[ fmpoly ].ysize = TROJAX_EXPSIZE;
@@ -3087,7 +3087,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 				FmPolys[ fmpoly ].B = 16;
 		   		FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Rot = 0.0F;
-				if( FmPoly != (u_int16_t) -1 ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
+				if( FmPoly != INDEX_NONE ) FmPolys[ fmpoly ].RotSpeed = FmPolys[ FmPoly ].RotSpeed;
 				else FmPolys[ fmpoly ].RotSpeed = 0.0F;
 				FmPolys[ fmpoly ].xsize = TROJAX_EXPSIZE;
 				FmPolys[ fmpoly ].ysize = TROJAX_EXPSIZE;
@@ -3100,7 +3100,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 		{
 		   	fmpoly = FindFreeFmPoly();
 	
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -3147,7 +3147,7 @@ void CreatePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -3187,7 +3187,7 @@ void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -3229,7 +3229,7 @@ void CreateNewExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -3296,7 +3296,7 @@ void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -3336,7 +3336,7 @@ void CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -3382,43 +3382,43 @@ void CleanUpPrimBull( u_int16_t i, bool LightFlag  )
 	fmpoly = PrimBulls[i].fmpoly;
 	poly = PrimBulls[i].poly;
 
-	if ( line != (u_int16_t) -1 )
+	if ( line != INDEX_NONE )
 	{
 		KillUsedLine( line );
-		PrimBulls[i].line = (u_int16_t) -1;
+		PrimBulls[i].line = INDEX_NONE;
 	}
 	
-	if ( light != (u_int16_t) -1 )
+	if ( light != INDEX_NONE )
 	{
 		if( LightFlag )
 		{
 			KillUsedXLight( light );
-			PrimBulls[i].light = (u_int16_t) -1;
+			PrimBulls[i].light = INDEX_NONE;
 		}
 		else
 		{
 			SetLightDie(PrimBulls[i].light);
-			PrimBulls[i].light = (u_int16_t) -1;
+			PrimBulls[i].light = INDEX_NONE;
 		}
 	}
 
 	for( Count = 0; Count < PrimBulls[i].numfmpolys; Count++ )
 	{
 		nextfmpoly = FmPolys[ fmpoly ].Prev;
-		if ( fmpoly != (u_int16_t) -1 ) KillUsedFmPoly( fmpoly );
+		if ( fmpoly != INDEX_NONE ) KillUsedFmPoly( fmpoly );
 		fmpoly = nextfmpoly;
 	}
 	PrimBulls[i].numfmpolys = 0;
-	PrimBulls[i].fmpoly = (u_int16_t) -1;
+	PrimBulls[i].fmpoly = INDEX_NONE;
 
 	for( Count = 0; Count < PrimBulls[i].numpolys; Count++ )
 	{
 		nextpoly = Polys[ poly ].Prev;
-		if( poly != (u_int16_t) -1 ) KillUsedPoly( poly );
+		if( poly != INDEX_NONE ) KillUsedPoly( poly );
 		poly = nextpoly;
 	}
 	PrimBulls[i].numpolys = 0;
-	PrimBulls[i].poly = (u_int16_t) -1;
+	PrimBulls[i].poly = INDEX_NONE;
 
 	PrimBulls[i].LifeCount = 0.0F;
 
@@ -3459,7 +3459,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 	i = FindFreePrimBull();
 
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		PrimBulls[i].Offset = *Offset;
 		PrimBulls[i].Pos.x = ( Pos->x + Offset->x );
@@ -3483,10 +3483,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 		PrimBulls[i].GroupImIn = Group;
 		PrimBulls[i].numfmpolys = 0;
 		PrimBulls[i].numpolys = 0;
-		PrimBulls[i].fmpoly = (u_int16_t) -1;
-		PrimBulls[i].poly = (u_int16_t) -1;
-		PrimBulls[i].line = (u_int16_t) -1;
-		PrimBulls[i].light = (u_int16_t) -1;
+		PrimBulls[i].fmpoly = INDEX_NONE;
+		PrimBulls[i].poly = INDEX_NONE;
+		PrimBulls[i].line = INDEX_NONE;
+		PrimBulls[i].light = INDEX_NONE;
 		PrimBulls[i].Bounces = 0;
 		PrimBulls[i].EnemyGun = NULL;
 		PrimBulls[i].FramelagAddition = 0.0F;
@@ -3520,7 +3520,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				if( PowerLevel >= PULSAR2SHOTPOWERLEVEL )
 				{
-					if( ( OwnerType == OWNER_SHIP ) && ( OwnerID != (u_int16_t) -1 ) )
+					if( ( OwnerType == OWNER_SHIP ) && ( OwnerID != INDEX_NONE ) )
 					{
 						if( Ships[ OwnerID ].Object.Flags & SHIP_PrimToggle )
 						{
@@ -3539,7 +3539,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				light = FindFreeXLight();
 
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -3551,10 +3551,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					PrimBulls[i].light = light;
 				}
 
-				PrimBulls[i].fmpoly = (u_int16_t) -1;
+				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != (u_int16_t ) -1 )
+   				if( fmpoly != INDEX_NONE )
    				{
    					FmPolys[ fmpoly ].LifeCount = 1000.0F;
    					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -3578,7 +3578,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				poly = FindFreePoly();
 
-				if( poly != (u_int16_t) -1 )
+				if( poly != INDEX_NONE )
 				{
 					Polys[ poly ].Pos1.x = PrimBulls[i].Pos.x - ( LeftVector.x * PULSAR_TAILSTART );
 					Polys[ poly ].Pos1.y = PrimBulls[i].Pos.y - ( LeftVector.y * PULSAR_TAILSTART );
@@ -3622,7 +3622,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				poly = FindFreePoly();
 
-				if( poly != (u_int16_t) -1 )
+				if( poly != INDEX_NONE )
 				{
 					Polys[ poly ].Pos1.x = PrimBulls[i].Pos.x - ( -Up->x * PULSAR_TAILSTART );
 					Polys[ poly ].Pos1.y = PrimBulls[i].Pos.y - ( -Up->y * PULSAR_TAILSTART );
@@ -3674,7 +3674,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx( SFX_Trojax, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -3687,7 +3687,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -3712,14 +3712,14 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						FmPolys[ PrimBulls[i].fmpoly ].RotSpeed = PLevel + 10.0F;
 						FmPolys[ PrimBulls[i].fmpoly ].Frm_Info = &Trojax2_Header;
 						FmPolys[ PrimBulls[i].fmpoly ].SeqNum = FM_TROJAX;
-						if( PrimBulls[i].light != (u_int16_t) -1 ) XLights[ PrimBulls[i].light ].Size = ( 2048.0F * GLOBAL_SCALE );
+						if( PrimBulls[i].light != INDEX_NONE ) XLights[ PrimBulls[i].light ].Size = ( 2048.0F * GLOBAL_SCALE );
 					}
 					else
 					{
 						FmPolys[ PrimBulls[i].fmpoly ].RotSpeed = PLevel + 10.0F;
 						FmPolys[ PrimBulls[i].fmpoly ].Frm_Info = &Trojax1_Header;
 						FmPolys[ PrimBulls[i].fmpoly ].SeqNum = FM_TROJAX;
-						if( PrimBulls[i].light != (u_int16_t) -1 ) XLights[ PrimBulls[i].light ].Size = ( 1536.0F * GLOBAL_SCALE );
+						if( PrimBulls[i].light != INDEX_NONE ) XLights[ PrimBulls[i].light ].Size = ( 1536.0F * GLOBAL_SCALE );
 					}
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 				}
@@ -3750,7 +3750,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					PyroLightFlag = false;
 
 					light = FindFreeXLight();
-					if( light != (u_int16_t ) -1 )					// Light attached
+					if( light != INDEX_NONE )					// Light attached
 					{
 						XLights[ light ].Pos = PrimBulls[i].Pos;
 						XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -3764,7 +3764,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
 					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
@@ -3815,7 +3815,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				PlayPannedSfx(SFX_Transpulse, PrimBulls[i].GroupImIn, Pos, 0.0F );
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -3828,7 +3828,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -3851,7 +3851,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -3900,7 +3900,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 		   		PrimBulls[i].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -3913,7 +3913,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -3962,7 +3962,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx( SFX_Laser, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -3975,7 +3975,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -3996,7 +3996,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				poly = FindFreePoly();
-				if( poly != (u_int16_t) -1 )
+				if( poly != INDEX_NONE )
 				{
 					Polys[ poly ].Pos1 = PrimBulls[i].Pos;
 					Polys[ poly ].Pos2 = PrimBulls[i].Pos;
@@ -4032,7 +4032,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				if( !( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) ) )	/* only other people see cross */
 				{
 					poly = FindFreePoly();
-					if( poly != (u_int16_t) -1 )
+					if( poly != INDEX_NONE )
 					{
 						Polys[ poly ].Pos1 = PrimBulls[i].Pos;
 						Polys[ poly ].Pos2 = PrimBulls[i].Pos;
@@ -4073,7 +4073,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 		   	case ORBITPULSAR:
 				PlayPannedSfx(SFX_Orbit, PrimBulls[i].GroupImIn, Pos, 0.0F );
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4085,10 +4085,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					PrimBulls[i].light = light;
 				}
 
-				PrimBulls[i].fmpoly = (u_int16_t) -1;
+				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != (u_int16_t ) -1 )
+   				if( fmpoly != INDEX_NONE )
    				{
 					if( ( OwnerType == OWNER_SHIP ) )
 					{
@@ -4136,7 +4136,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx( SFX_EnemyPulsar, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4148,10 +4148,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					PrimBulls[i].light = light;
 				}
 
-				PrimBulls[i].fmpoly = (u_int16_t) -1;
+				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != (u_int16_t ) -1 )
+   				if( fmpoly != INDEX_NONE )
    				{
 				   	FmPolys[ fmpoly ].Trans = 255;
    					FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -4202,7 +4202,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				light = FindFreeXLight();
 
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4214,10 +4214,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					PrimBulls[i].light = light;
 				}
 
-				PrimBulls[i].fmpoly = (u_int16_t) -1;
+				PrimBulls[i].fmpoly = INDEX_NONE;
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-   				if( fmpoly != (u_int16_t ) -1 )
+   				if( fmpoly != INDEX_NONE )
    				{
    					FmPolys[ fmpoly ].LifeCount = 1000.0F;
    					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4241,7 +4241,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				poly = FindFreePoly();
 
-				if( poly != (u_int16_t) -1 )
+				if( poly != INDEX_NONE )
 				{
 					Polys[ poly ].Pos1.x = PrimBulls[i].Pos.x - ( LeftVector.x * PULSAR_TAILSTART );
 					Polys[ poly ].Pos1.y = PrimBulls[i].Pos.y - ( LeftVector.y * PULSAR_TAILSTART );
@@ -4285,7 +4285,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 
 				poly = FindFreePoly();
 
-				if( poly != (u_int16_t) -1 )
+				if( poly != INDEX_NONE )
 				{
 					Polys[ poly ].Pos1.x = PrimBulls[i].Pos.x - ( -Up->x * PULSAR_TAILSTART );
 					Polys[ poly ].Pos1.y = PrimBulls[i].Pos.y - ( -Up->y * PULSAR_TAILSTART );
@@ -4337,7 +4337,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx( SFX_Trojax, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4350,7 +4350,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4375,14 +4375,14 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						FmPolys[ PrimBulls[i].fmpoly ].RotSpeed = PLevel + 10.0F;
 						FmPolys[ PrimBulls[i].fmpoly ].Frm_Info = &Trojax2_Header;
 						FmPolys[ PrimBulls[i].fmpoly ].SeqNum = FM_TROJAX;
-						if( PrimBulls[i].light != (u_int16_t) -1 ) XLights[ PrimBulls[i].light ].Size = ( 2048.0F * GLOBAL_SCALE );
+						if( PrimBulls[i].light != INDEX_NONE ) XLights[ PrimBulls[i].light ].Size = ( 2048.0F * GLOBAL_SCALE );
 					}
 					else
 					{
 						FmPolys[ PrimBulls[i].fmpoly ].RotSpeed = PLevel + 10.0F;
 						FmPolys[ PrimBulls[i].fmpoly ].Frm_Info = &Trojax1_Header;
 						FmPolys[ PrimBulls[i].fmpoly ].SeqNum = FM_TROJAX;
-						if( PrimBulls[i].light != (u_int16_t) -1 ) XLights[ PrimBulls[i].light ].Size = ( 1536.0F * GLOBAL_SCALE );
+						if( PrimBulls[i].light != INDEX_NONE ) XLights[ PrimBulls[i].light ].Size = ( 1536.0F * GLOBAL_SCALE );
 					}
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 				}
@@ -4407,7 +4407,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					PyroLightFlag = false;
 
 					light = FindFreeXLight();
-					if( light != (u_int16_t ) -1 )					// Light attached
+					if( light != INDEX_NONE )					// Light attached
 					{
 						XLights[ light ].Pos = PrimBulls[i].Pos;
 						XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4421,7 +4421,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
 					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
@@ -4464,7 +4464,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx(SFX_Transpulse, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4477,7 +4477,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4500,7 +4500,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4549,7 +4549,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 		   		PrimBulls[i].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / Size ) - Half );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4562,7 +4562,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4611,7 +4611,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx( SFX_Laser, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4624,7 +4624,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4645,7 +4645,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				poly = FindFreePoly();
-				if( poly != (u_int16_t) -1 )
+				if( poly != INDEX_NONE )
 				{
 					Polys[ poly ].Pos1 = PrimBulls[i].Pos;
 					Polys[ poly ].Pos2 = PrimBulls[i].Pos;
@@ -4681,7 +4681,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				if( !( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) ) )	/* only other people see cross */
 				{
 					poly = FindFreePoly();
-					if( poly != (u_int16_t) -1 )
+					if( poly != INDEX_NONE )
 					{
 						Polys[ poly ].Pos1 = PrimBulls[i].Pos;
 						Polys[ poly ].Pos2 = PrimBulls[i].Pos;
@@ -4744,7 +4744,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx( SFX_PhotonTorpedo, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4757,7 +4757,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4778,7 +4778,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				poly = FindFreePoly();
-				if( poly != (u_int16_t) -1 )
+				if( poly != INDEX_NONE )
 				{
 					Polys[ poly ].Pos1 = PrimBulls[i].Pos;
 					Polys[ poly ].Pos2 = PrimBulls[i].Pos;
@@ -4815,7 +4815,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				if( !( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) ) )	/* only other people see cross */
 				{
 					poly = FindFreePoly();
-					if( poly != (u_int16_t) -1 )
+					if( poly != INDEX_NONE )
 					{
 						Polys[ poly ].Pos1 = PrimBulls[i].Pos;
 						Polys[ poly ].Pos2 = PrimBulls[i].Pos;
@@ -4879,7 +4879,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				PlayPannedSfx( SFX_Laser, PrimBulls[i].GroupImIn, Pos, 0.0F );
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4892,7 +4892,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
@@ -4928,7 +4928,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				light = FindFreeXLight();
-				if( light != (u_int16_t ) -1 )					// Light attached
+				if( light != INDEX_NONE )					// Light attached
 				{
 					XLights[ light ].Pos = PrimBulls[i].Pos;
 					XLights[ light ].Size = PrimaryWeaponAttribs[ Weapon ].lightsize;
@@ -4941,7 +4941,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				}
 
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-				if( fmpoly != (u_int16_t ) -1 )
+				if( fmpoly != INDEX_NONE )
 				{
 					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
 					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
@@ -5001,7 +5001,7 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 	   	fmpoly = FindFreeFmPoly();
 	
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			TempQuat.From2Vectors(&Forward, Dir);
 		   	TempQuat.ToMatrix(&TempMat);
@@ -5035,7 +5035,7 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 	   	fmpoly = FindFreeFmPoly();
 	
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
 		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
@@ -5065,7 +5065,7 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		{
 		   	fmpoly = FindFreeFmPoly();
 	
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -5119,7 +5119,7 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 	   	fmpoly = FindFreeFmPoly();
 	
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			TempQuat.From2Vectors(&Forward, Dir);
 		   	TempQuat.ToMatrix(&TempMat);
@@ -5153,7 +5153,7 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 	   	fmpoly = FindFreeFmPoly();
 	
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
 		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
@@ -5183,7 +5183,7 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		{
 		   	fmpoly = FindFreeFmPoly();
 	
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -5236,7 +5236,7 @@ void CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		{
 		   	fmpoly = FindFreeFmPoly();
 	
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -5288,7 +5288,7 @@ void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		{
 		   	fmpoly = FindFreeFmPoly();
 	
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -5401,7 +5401,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 	}
 
    	light = PrimBulls[ i ].light;
-   	if( light != (u_int16_t) -1 )
+   	if( light != INDEX_NONE )
    	{
    		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
    		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
@@ -5409,7 +5409,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 	}
 
    	poly = PrimBulls[ i ].poly;
-   	if( poly != (u_int16_t) -1 )
+   	if( poly != INDEX_NONE )
    	{
 		Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( LeftVector.x * LaserDiameter );
 		Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( LeftVector.y * LaserDiameter );
@@ -5427,7 +5427,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 		if( !( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) )	/* only other people see cross */
 		{
 		   	poly = Polys[ poly ].Prev;
-		   	if( poly != (u_int16_t) -1 )
+		   	if( poly != INDEX_NONE )
 		   	{
 				Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( UpVector.x * LaserDiameter );
 				Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( UpVector.y * LaserDiameter );
@@ -5448,7 +5448,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 	if( IsGroupVisible[ EndGroup ] )
 	{
 	   	fmpoly = PrimBulls[ i ].fmpoly;
-	   	if( fmpoly != (u_int16_t) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
 	   		FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
@@ -5465,7 +5465,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 	   	{
 	   	   	fmpoly = FindFreeFmPoly();
 	   
-	   	   	if( fmpoly != (u_int16_t ) -1 )
+	   	   	if( fmpoly != INDEX_NONE )
 	   	   	{
 	   			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
@@ -5579,7 +5579,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 	}
 
    	light = PrimBulls[ i ].light;
-   	if( light != (u_int16_t) -1 )
+   	if( light != INDEX_NONE )
    	{
    		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
    		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
@@ -5587,7 +5587,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 	}
 
    	poly = PrimBulls[ i ].poly;
-   	if( poly != (u_int16_t) -1 )
+   	if( poly != INDEX_NONE )
    	{
 		Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( LeftVector.x * LaserDiameter );
 		Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( LeftVector.y * LaserDiameter );
@@ -5605,7 +5605,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 		if( !( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) )	/* only other people see cross */
 		{
 		   	poly = Polys[ poly ].Prev;
-		   	if( poly != (u_int16_t) -1 )
+		   	if( poly != INDEX_NONE )
 		   	{
 				Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( UpVector.x * LaserDiameter );
 				Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( UpVector.y * LaserDiameter );
@@ -5626,7 +5626,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 	if( IsGroupVisible[ EndGroup ] )
 	{
 	   	fmpoly = PrimBulls[ i ].fmpoly;
-	   	if( fmpoly != (u_int16_t) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
 	   		FmPolys[ fmpoly ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
@@ -5643,7 +5643,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 	   	{
 	   	   	fmpoly = FindFreeFmPoly();
 	   
-	   	   	if( fmpoly != (u_int16_t ) -1 )
+	   	   	if( fmpoly != INDEX_NONE )
 	   	   	{
 	   			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   	   		FmPolys[ fmpoly ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
@@ -5756,7 +5756,7 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 	CreatePowerLaserSparks( &PrimBulls[i].Pos, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn, 64, 64, 192 );
 
    	light = PrimBulls[ i ].light;
-   	if( light != (u_int16_t) -1 )
+   	if( light != INDEX_NONE )
    	{
    		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
    		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
@@ -5764,7 +5764,7 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 	}
 
    	poly = PrimBulls[ i ].poly;
-   	if( poly != (u_int16_t) -1 )
+   	if( poly != INDEX_NONE )
    	{
 		StartShipScreenShake( ( Polys[ poly ].Frame * 4.0F ) );
 		LaserDiameter = ( Polys[ poly ].Frame * ( 32.0F * ( PrimBulls[i].PowerLevel + 1 ) ) );
@@ -5790,7 +5790,7 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 		if( !( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) )	/* only other people see cross */
 		{
 		   	poly = Polys[ poly ].Prev;
-		   	if( poly != (u_int16_t) -1 )
+		   	if( poly != INDEX_NONE )
 		   	{
 				Polys[ poly ].Pos1.x = PrimBulls[ i ].Pos.x - ( UpVector.x * LaserDiameter );
 				Polys[ poly ].Pos1.y = PrimBulls[ i ].Pos.y - ( UpVector.y * LaserDiameter );
@@ -5910,7 +5910,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 	}
 
    	light = PrimBulls[ i ].light;
-   	if( light != (u_int16_t) -1 )
+   	if( light != INDEX_NONE )
    	{
    		XLights[ light ].Pos.x = ( PrimBulls[i].Pos.x + ( PrimBulls[ i ].Dir.x * Distance ) );
    		XLights[ light ].Pos.y = ( PrimBulls[i].Pos.y + ( PrimBulls[ i ].Dir.y * Distance ) );
@@ -5925,12 +5925,12 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 	for( Count = 0; Count < PrimBulls[i].numpolys; Count++ )
 	{
 		nextpoly = Polys[ poly ].Prev;
-		if( poly != (u_int16_t) -1 ) KillUsedPoly( poly );
+		if( poly != INDEX_NONE ) KillUsedPoly( poly );
 		poly = nextpoly;
 	}
 
 	PrimBulls[i].numpolys = 0;
-	PrimBulls[i].poly = (u_int16_t) -1;
+	PrimBulls[i].poly = INDEX_NONE;
 
 /*===================================================================
 	Create new polys
@@ -5977,7 +5977,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 		}
 
 		poly = FindFreePoly();
-		if( poly != (u_int16_t) -1 )
+		if( poly != INDEX_NONE )
 		{
 			Polys[ poly ].Pos1.x = StartPos.x - LeftVector.x;
 			Polys[ poly ].Pos1.y = StartPos.y - LeftVector.y;
@@ -6019,7 +6019,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 		}
 
 		poly = FindFreePoly();
-		if( poly != (u_int16_t) -1 )
+		if( poly != INDEX_NONE )
 		{
 			Polys[ poly ].Pos1.x = StartPos.x - UpVector.x;
 			Polys[ poly ].Pos1.y = StartPos.y - UpVector.y;
@@ -6065,7 +6065,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 
    	fmpoly = PrimBulls[ i ].fmpoly;
 
-   	if( fmpoly != (u_int16_t) -1 )
+   	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].Pos = EndPos;
 		FmPolys[ fmpoly ].Group = EndGroup;
@@ -6080,7 +6080,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   		FmPolys[ fmpoly ].Pos = EndPos;
@@ -6124,14 +6124,14 @@ void CreateTransTrail( u_int16_t i )
 	VECTOR	Right;
 	float	Num;
 
-	if( i == (u_int16_t) -1 ) return;
+	if( i == INDEX_NONE ) return;
 	if( PrimBulls[ i ].numfmpolys == 0 ) return;
 
 	CrossProduct( &PrimBulls[ i ].Dir, &FmPolys[ PrimBulls[i].fmpoly ].DirVector, &Right );
 
 	fmpoly = FindFreeFmPoly();
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		Size = (int16_t) ( ( PrimBulls[ i ].PowerLevel * ARCTRAIL_POWERMUL ) + ARCTRAIL_ADDMIN );					// Max 440;
 		Num = ( (float) ( Random_Range( (u_int16_t) ( Size * 2 ) ) - Size ) ) * GLOBAL_SCALE;
@@ -6215,7 +6215,7 @@ void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * /*IntPos2*/, u_
 				{
 					Poly = FindFreePoly();
 				
-					if( Poly != (u_int16_t) -1 )
+					if( Poly != INDEX_NONE )
 					{
 						Val = ( 1.0F / ( 256.0F / ( 255.0F - ( ( 3.0F - (float) Count ) * 40.0F ) ) ) );
 						RVal = (u_int8_t) ( (float) Red * Val );
@@ -6304,7 +6304,7 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 	float		Cos;
 	float		ShipRadius = 0.0f;
 
-	ClosestShip = (u_int16_t) -1;
+	ClosestShip = INDEX_NONE;
 	ClosestLength = *Dist;
 
 	for( Count = 0; Count < MAX_PLAYERS; Count++ )
@@ -6434,7 +6434,7 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 		}
 	}
 
-	if( ClosestShip != (u_int16_t) -1 ) *Dist = ClosestLength;
+	if( ClosestShip != INDEX_NONE ) *Dist = ClosestLength;
 
 	return( ClosestShip );
 }
@@ -6470,7 +6470,7 @@ u_int16_t CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR
 	SECONDARYWEAPONBULLET * SecBull;
 	u_int16_t		DebugCount = 0;
 
-	ClosestSecBull = (u_int16_t) -1;
+	ClosestSecBull = INDEX_NONE;
 	ClosestLength = *Dist;
 
 	GroupsVisible = VisibleGroups( Group );
@@ -6488,7 +6488,7 @@ u_int16_t CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR
 			if( DebugCount > MAXSECONDARYWEAPONBULLETS )
 			{
 				Msg( "CheckHitSecondary() Link list corrupt!!" );
-				return( (u_int16_t) -1 );
+				return( INDEX_NONE );
 			}
 
 			DebugCount++;
@@ -6552,7 +6552,7 @@ u_int16_t CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR
 		}
 	}
 
-	if( ClosestSecBull != (u_int16_t) -1 ) *Dist = ClosestLength;
+	if( ClosestSecBull != INDEX_NONE ) *Dist = ClosestLength;
 
 	return( ClosestSecBull );
 }
@@ -6638,7 +6638,7 @@ void CreateDebugLine( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red,
 	VECTOR	TempDir;
 
 	line = FindFreeLine();						// Line attached
-   	if( line != (u_int16_t ) -1 )
+   	if( line != INDEX_NONE )
    	{
 		TempDir = *Dir;
 		NormaliseVector( &TempDir );
@@ -6709,7 +6709,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 		{
 			Model = Ships[ Ship ].OrbModels[ Count ];
 			
-			if( Model != (u_int16_t) -1 )
+			if( Model != INDEX_NONE )
 			{
 				Rotation.x = (float) fast_sinf( D2R( Models[ Model ].AxisRot ) );
 				Rotation.y = (float) fast_cosf( D2R( Models[ Model ].AxisRot ) );
@@ -6722,7 +6722,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, ORBITPULSAR,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &DirVector, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6748,7 +6748,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 										Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 										Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-					if( i != (u_int16_t) -1 )
+					if( i != INDEX_NONE )
 					{
 						PrimBulls[i].FramelagAddition = FrmLagAdd;
 					}
@@ -6764,7 +6764,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 1 ), Weapon,
 										Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 										Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-					if( i != (u_int16_t) -1 )
+					if( i != INDEX_NONE )
 					{
 						PrimBulls[i].FramelagAddition = FrmLagAdd;
 					}
@@ -6787,7 +6787,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6808,7 +6808,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6820,7 +6820,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 1 ), Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6831,7 +6831,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 2 ), Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6844,7 +6844,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6860,7 +6860,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + Count ), Weapon,
 										Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 										Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-					if( i != (u_int16_t) -1 )
+					if( i != INDEX_NONE )
 					{
 						PrimBulls[i].FramelagAddition = FrmLagAdd;
 					}
@@ -6874,7 +6874,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6885,7 +6885,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 1 ), Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6898,7 +6898,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6909,7 +6909,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 1 ), Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6922,7 +6922,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
-				if( i != (u_int16_t) -1 )
+				if( i != INDEX_NONE )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
@@ -6956,7 +6956,7 @@ void CreateColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	
 		fmpoly = FindFreeFmPoly();
 	
-		if( fmpoly != (u_int16_t ) -1 )
+		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 			FmPolys[ fmpoly ].Pos = *Pos;
@@ -6988,7 +6988,7 @@ void CreateColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		{
 		   	fmpoly = FindFreeFmPoly();
 		
-		   	if( fmpoly != (u_int16_t ) -1 )
+		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -7043,7 +7043,7 @@ void CreateSmallColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			CreateBigFlash( Pos, Group, 3.5F );
 	
 			fmpoly = FindFreeFmPoly();
-			if( fmpoly != (u_int16_t ) -1 )
+			if( fmpoly != INDEX_NONE )
 			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 				FmPolys[ fmpoly ].Pos = *Pos;
@@ -7075,7 +7075,7 @@ void CreateSmallColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			{
 			   	fmpoly = FindFreeFmPoly();
 			
-			   	if( fmpoly != (u_int16_t ) -1 )
+			   	if( fmpoly != INDEX_NONE )
 			   	{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
 			   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -7270,8 +7270,8 @@ void DropPrimary( void )
 			PickupNum = ( PICKUP_Trojax + ( Ships[ WhoIAm ].Primary - 1 ) );
 			LifeCount = -1.0F;
 			Speed = PICKUP_SPEED;
-			InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
-			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
+			InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 			PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] = 0;
 		}
 	}
@@ -7450,11 +7450,11 @@ void DropShield( void )
 		LifeCount = -1.0F;
 		Speed = PICKUP_SPEED;
 
-		i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
+		i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 
-		if( ( i != (u_int16_t) -1 ) && ( i != (u_int16_t) -2 ) )
+		if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
 		{
-			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
+			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 		}
 	}
 }
@@ -7546,11 +7546,11 @@ void DropAmmo( void )
 		LifeCount = -1.0F;
 		Speed = PICKUP_SPEED;
 
-		i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
+		i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 
-		if( ( i != (u_int16_t) -1 ) && ( i != (u_int16_t) -2 ) )
+		if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
 		{
-			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, (u_int16_t) -1 );
+			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 		}
 	}
 }
@@ -7588,44 +7588,44 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 		case OWNER_SHIP:
 			Ship = TargetClosestShip( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
 			Enemy = TargetClosestEnemy( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
-			if( Enemy != (u_int16_t) -1 ) Ship = (u_int16_t) -1;
+			if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
 			Secondary = TargetClosestSecondary( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
-			if( Secondary != (u_int16_t) -1 )
+			if( Secondary != INDEX_NONE )
 			{
-				Ship = (u_int16_t) -1;
-				Enemy = (u_int16_t) -1;
+				Ship = INDEX_NONE;
+				Enemy = INDEX_NONE;
 			}
 			break;
 
 		case OWNER_ENEMY:
-			Enemy = (u_int16_t) -1;
+			Enemy = INDEX_NONE;
 			Ship = TargetClosestShip( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
 			Secondary = TargetClosestSecondary( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
-			if( Secondary != (u_int16_t) -1 )
+			if( Secondary != INDEX_NONE )
 			{
-				Ship = (u_int16_t) -1;
+				Ship = INDEX_NONE;
 			}
 			break;
 
 		case OWNER_NOBODY:
-			Enemy = (u_int16_t) -1;
+			Enemy = INDEX_NONE;
 			Ship = TargetClosestShip( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
 			Secondary = TargetClosestSecondary( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
-			if( Secondary != (u_int16_t) -1 )
+			if( Secondary != INDEX_NONE )
 			{
-				Ship = (u_int16_t) -1;
+				Ship = INDEX_NONE;
 			}
 			break;
 
 		case OWNER_MINE:
 		default:
-			Ship = (u_int16_t) -1;
-			Enemy = (u_int16_t) -1;
-			Secondary = (u_int16_t) -1;
+			Ship = INDEX_NONE;
+			Enemy = INDEX_NONE;
+			Secondary = INDEX_NONE;
 			break;
 	}
 
-	if( Ship != (u_int16_t) -1 )
+	if( Ship != INDEX_NONE )
 	{
 		NewDir.x = ( Ships[ Ship ].Object.Pos.x - Pos->x );
 		NewDir.y = ( Ships[ Ship ].Object.Pos.y - Pos->y );
@@ -7634,7 +7634,7 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 	}
 	else
 	{
-		if( Enemy != (u_int16_t) -1 )
+		if( Enemy != INDEX_NONE )
 		{
 			NewDir.x = ( Enemies[ Enemy ].Object.Pos.x - Pos->x );
 			NewDir.y = ( Enemies[ Enemy ].Object.Pos.y - Pos->y );
@@ -7647,7 +7647,7 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 		}
 		else
 		{
-			if( Secondary != (u_int16_t) -1 )
+			if( Secondary != INDEX_NONE )
 			{
 				NewDir.x = ( SecBulls[ Secondary ].Pos.x - Pos->x );
 				NewDir.y = ( SecBulls[ Secondary ].Pos.y - Pos->y );
@@ -7666,7 +7666,7 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 
 	fmpoly = PrimBulls[i].fmpoly;					// Faceme polygon attached
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		TempQuat.From2Vectors(&FmPolys[ fmpoly ].UpVector, &NewDir);
 		TempQuat.ToMatrix(&TempMatrix);
@@ -7708,7 +7708,7 @@ void ChangePulsarDir( u_int16_t i, VECTOR * Dir )
 	
 	poly = PrimBulls[i].poly;
 	
-	if( poly != (u_int16_t) -1 )
+	if( poly != INDEX_NONE )
 	{
 		Polys[ poly ].Pos1.x = PrimBulls[i].Pos.x - ( DownVector.x * PULSAR_TAILSTART );
 		Polys[ poly ].Pos1.y = PrimBulls[i].Pos.y - ( DownVector.y * PULSAR_TAILSTART );
@@ -7725,7 +7725,7 @@ void ChangePulsarDir( u_int16_t i, VECTOR * Dir )
 		poly = Polys[ poly ].Prev;
 	}
 
-	if( poly != (u_int16_t) -1 )
+	if( poly != INDEX_NONE )
 	{
 		Polys[ poly ].Pos1.x = PrimBulls[i].Pos.x - ( LeftVector.x * PULSAR_TAILSTART );
 		Polys[ poly ].Pos1.y = PrimBulls[i].Pos.y - ( LeftVector.y * PULSAR_TAILSTART );
@@ -7759,7 +7759,7 @@ void ChangeTrojaxDir( u_int16_t i, VECTOR * Dir )
 
 	fmpoly = PrimBulls[i].fmpoly;
 
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		TempQuat.From2Vectors(&Forward, Dir);
 		TempQuat.ToMatrix(&TempMatrix);
@@ -7922,7 +7922,7 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 			
 				Poly = FindFreePoly();
 					
-				if( Poly != (u_int16_t) -1 )
+				if( Poly != INDEX_NONE )
 				{
 					Polys[ Poly ].Col1.R = RVal;
 					Polys[ Poly ].Col1.G = GVal;
@@ -7997,7 +7997,7 @@ u_int16_t EnemyFirePrimary( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bu
 						int16_t PowerLevel, float PLevel, bool NetFlag, void * Gun )
 {
 	int16_t	Count;
-	u_int16_t	i = (u_int16_t) -1;
+	u_int16_t	i = INDEX_NONE;
 
 	switch( Weapon )
 	{
@@ -8028,7 +8028,7 @@ u_int16_t EnemyFirePrimary( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bu
 		case FLAMES:
 			i = InitOnePrimBull( OwnerType, OwnerID, BulletID, Weapon, Group, Pos, Offset,
 									 Dir, Up, PowerLevel, PLevel, NetFlag );
-			if( i != (u_int16_t) -1 )
+			if( i != INDEX_NONE )
 			{
 				PrimBulls[i].EnemyGun = (GUNOBJECT *) Gun;
 				GetLaserLocalVector( i, &PrimBulls[i].LocalDir );
@@ -8058,7 +8058,7 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 
 	light = FindFreeXLight();
 
-	if( light != (u_int16_t ) -1 )
+	if( light != INDEX_NONE )
 	{
 		XLights[ light ].Visible = true;
 		XLights[ light ].Pos = *Pos;
@@ -8073,7 +8073,7 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 
 	fmpoly = FindFreeFmPoly();					// Faceme polygon attached
 	
-	if( fmpoly != (u_int16_t ) -1 )
+	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 4.0F;
 		FmPolys[ fmpoly ].Pos = *Pos;
@@ -8100,7 +8100,7 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 	{
 	   	fmpoly = FindFreeFmPoly();
 	
-	   	if( fmpoly != (u_int16_t ) -1 )
+	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
 	   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -8213,7 +8213,7 @@ void CreateScaleExplosion( VECTOR * Pos, u_int16_t Group, float GlobalScale )
 		{
 			fmpoly = FindFreeFmPoly();
 	
-			if( fmpoly != (u_int16_t ) -1 )
+			if( fmpoly != INDEX_NONE )
 			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 				FmPolys[ fmpoly ].Pos = *Pos;
@@ -8329,7 +8329,7 @@ FILE * SavePrimBulls( FILE * fp )
 
 		i = FirstPrimBullUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &PrimBulls[ i ].Used, sizeof( bool ), 1, fp );
 			fwrite( &PrimBulls[ i ].Next, sizeof( u_int16_t ), 1, fp );
@@ -8344,7 +8344,7 @@ FILE * SavePrimBulls( FILE * fp )
 			}
 			else
 			{
-				TempIndex = (u_int16_t) -1;
+				TempIndex = INDEX_NONE;
 			}
 			fwrite( &TempIndex, sizeof( TempIndex ), 1, fp );
 
@@ -8389,7 +8389,7 @@ FILE * SavePrimBulls( FILE * fp )
 
 		i = FirstPrimBullFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &PrimBulls[ i ].Next, sizeof( PrimBulls[ i ].Next ), 1, fp );
 			i = PrimBulls[ i ].Next;
@@ -8434,7 +8434,7 @@ FILE * LoadPrimBulls( FILE * fp )
 		
 		i = FirstPrimBullUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fread( &PrimBulls[ i ].Used, sizeof( bool ), 1, fp );
 			fread( &PrimBulls[ i ].Next, sizeof( u_int16_t ), 1, fp );
@@ -8444,7 +8444,7 @@ FILE * LoadPrimBulls( FILE * fp )
 			fread( &PrimBulls[ i ].Owner, sizeof( u_int16_t ), 1, fp );
 
 			fread( &TempIndex, sizeof( TempIndex ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 )
+			if( TempIndex != INDEX_NONE )
 			{
 				PrimBulls[ i ].EnemyGun = ( Enemies[ PrimBulls[ i ].Owner ].Object.FirstGun + TempIndex );
 			}
@@ -8494,17 +8494,17 @@ FILE * LoadPrimBulls( FILE * fp )
 
 		i = FirstPrimBullFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			memset( &PrimBulls[i], 0, sizeof( PRIMARYWEAPONBULLET ) );
 			PrimBulls[i].Used = false;
-			PrimBulls[i].Prev = (u_int16_t) -1;
-			PrimBulls[i].Type = (u_int16_t) -1;
-			PrimBulls[i].Owner = (u_int16_t) -1;
-			PrimBulls[i].GroupImIn = (u_int16_t) -1;
-			PrimBulls[i].fmpoly = (u_int16_t) -1;
-			PrimBulls[i].light = (u_int16_t) -1;
-			PrimBulls[i].line = (u_int16_t) -1;
+			PrimBulls[i].Prev = INDEX_NONE;
+			PrimBulls[i].Type = INDEX_NONE;
+			PrimBulls[i].Owner = INDEX_NONE;
+			PrimBulls[i].GroupImIn = INDEX_NONE;
+			PrimBulls[i].fmpoly = INDEX_NONE;
+			PrimBulls[i].light = INDEX_NONE;
+			PrimBulls[i].line = INDEX_NONE;
 			PrimBulls[i].TimeInterval = (float) 1;
 
 			fread( &PrimBulls[ i ].Next, sizeof( PrimBulls[ i ].Next ), 1, fp );
@@ -8644,7 +8644,7 @@ void KillPrimBullsByOwner(  u_int16_t OwnerType, u_int16_t Owner )
 
 	i = FirstPrimBullUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		nextprim = PrimBulls[i].Prev;
 				

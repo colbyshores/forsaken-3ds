@@ -689,7 +689,7 @@ void InitPickups( void )
 
 	InitFailedKillSlots();
 
-	FirstPickupUsed = (u_int16_t) -1;
+	FirstPickupUsed = INDEX_NONE;
 	FirstPickupFree = 0;
 
 	SetupPickupGroups();
@@ -699,7 +699,7 @@ void InitPickups( void )
 	{
 		memset( &Pickups[ i ], 0, sizeof( PICKUP ) );
 		Pickups[ i ].Next = i + 1;
-		Pickups[ i ].Prev = (u_int16_t) -1;
+		Pickups[ i ].Prev = INDEX_NONE;
 
 		Pickups[ i ].NextInGroup = NULL;
 		Pickups[ i ].PrevInGroup = NULL;
@@ -707,7 +707,7 @@ void InitPickups( void )
 		Pickups[ i ].Index = i;
 		Pickups[ i ].LifeCount = -1.0F;
 		Pickups[ i ].Mode = PICKUPMODE_Normal;
-		Pickups[ i ].Type = (u_int16_t) -1;
+		Pickups[ i ].Type = INDEX_NONE;
 		Pickups[ i ].Rot.x = -1.2F;
 		Pickups[ i ].Rot.y = 2.0F;
 		Pickups[ i ].Rot.z = 1.0F;
@@ -716,11 +716,11 @@ void InitPickups( void )
 		Pickups[ i ].UpVector = SlideUp;
 		Pickups[ i ].RegenSlot = -1;
 		Pickups[ i ].TriggerModPtr = NULL;
-		Pickups[ i ].TriggerMod = (u_int16_t) -1;
+		Pickups[ i ].TriggerMod = INDEX_NONE;
 		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);
 	}
-	Pickups[ MAXPICKUPS-1 ].Next = (u_int16_t) -1;
+	Pickups[ MAXPICKUPS-1 ].Next = INDEX_NONE;
 }
 
 
@@ -770,7 +770,7 @@ bool CollectPickup( u_int16_t i )
 	
 	sprintf( (char*)&Message[0], "%s", PickupMessage( Pickups[i].Type ) );
 
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		switch( Pickups[i].Type )
 		{
@@ -1724,7 +1724,7 @@ void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style )
 
 	i = FirstPickupUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		NextPickup = Pickups[ i ].Prev;							/* Next Pickup */
 
@@ -1778,7 +1778,7 @@ void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style )
 					Pickups[ i ].PickupCount = 32.0F;
 			
 					fmpoly = FindFreeFmPoly();
-					if( fmpoly != (u_int16_t) -1 )
+					if( fmpoly != INDEX_NONE )
 					{
 						FmPolys[ fmpoly ].LifeCount = 1000.0F;
 						FmPolys[ fmpoly ].Pos = Pickups[ i ].Pos;
@@ -1810,10 +1810,10 @@ void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style )
 	}																				
 	
 
-	AddFailedKillToQue( Owner, ID, Style, (u_int16_t) -1 );
+	AddFailedKillToQue( Owner, ID, Style, INDEX_NONE );
 
 #if DEBUG_PICKUPS
-	if( Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Couldnt't kill pickup of Owner '%s', ID %d\n", &Names[ Owner ][ 0 ], ID );
+	if( Owner != INDEX_NONE ) DebugPrintf( "pickups: Couldnt't kill pickup of Owner '%s', ID %d\n", &Names[ Owner ][ 0 ], ID );
 	else DebugPrintf( "pickups: Couldnt't kill pickup of No Owner, ID %d\n", ID );
 #endif
 }
@@ -1831,10 +1831,10 @@ u_int16_t FindFreePickup( void )
 
 	i = FirstPickupFree;
 	
-	if ( i == (u_int16_t) -1 ) return i;
+	if ( i == INDEX_NONE ) return i;
  
 	Pickups[i].Prev = FirstPickupUsed;
-	if( FirstPickupUsed != (u_int16_t) -1)
+	if( FirstPickupUsed != INDEX_NONE)
 	{
 		Pickups[ FirstPickupUsed ].Next = i;
 	}
@@ -1866,8 +1866,8 @@ void KillUsedPickup( u_int16_t i )
 	its_next = Pickups[ i ].Next;
 
 	if ( i == FirstPickupUsed ) FirstPickupUsed = Pickups[ i ].Prev;
-	if( its_prev != (u_int16_t) -1 ) Pickups[ its_prev ].Next = its_next;
-	if( its_next != (u_int16_t) -1 ) Pickups[ its_next ].Prev = its_prev;
+	if( its_prev != INDEX_NONE ) Pickups[ its_prev ].Next = its_next;
+	if( its_next != INDEX_NONE ) Pickups[ its_next ].Prev = its_prev;
 
 	if( Pickups[ i ].RegenSlot != -1 )
 	{
@@ -1877,16 +1877,16 @@ void KillUsedPickup( u_int16_t i )
 			{
 				case PU_REGENTYPE_Random:		// Random each time
 					RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
-					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = (u_int16_t) -1;
-					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = (u_int16_t) -1;
+					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
+					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
 					RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Free;
 					RegenPoints[ Pickups[ i ].RegenSlot ].Wait = ( 5.0F * ANIM_SECOND );
 					break;
 
 				case PU_REGENTYPE_Const:		// Same each time
 					RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
-					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = (u_int16_t) -1;
-					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = (u_int16_t) -1;
+					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
+					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
 					RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Free;
 					RegenPoints[ Pickups[ i ].RegenSlot ].Wait = ( 5.0F * ANIM_SECOND );
 					break;
@@ -1894,15 +1894,15 @@ void KillUsedPickup( u_int16_t i )
 				case PU_REGENTYPE_Onceonly:		// Once only ( Never used again )
 					if( MaxPickupType[ Pickups[ i ].Type ] ) MaxPickupType[ Pickups[ i ].Type ]--;
 					RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
-					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = (u_int16_t) -1;
-					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = (u_int16_t) -1;
+					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
+					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
 					RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Used;
 					RegenPoints[ Pickups[ i ].RegenSlot ].Wait = 0.0F;
 					break;
 			}
 
 #if DEBUG_PICKUPS
-			if( Pickups[i].Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Killed '%s' from slot %d, Owner '%s', ID %d\n", Messages[ Pickups[i].Type ], Pickups[i].RegenSlot, &Names[ Pickups[i].Owner ][ 0 ], Pickups[i].ID );
+			if( Pickups[i].Owner != INDEX_NONE ) DebugPrintf( "pickups: Killed '%s' from slot %d, Owner '%s', ID %d\n", Messages[ Pickups[i].Type ], Pickups[i].RegenSlot, &Names[ Pickups[i].Owner ][ 0 ], Pickups[i].ID );
 			else DebugPrintf( "pickups: Killed '%s' from slot %d, No Owner, ID %d\n", Messages[ Pickups[i].Type ], Pickups[i].RegenSlot, Pickups[i].ID );
 #endif
 		}
@@ -1910,7 +1910,7 @@ void KillUsedPickup( u_int16_t i )
 		{
 			Pickups[ i ].RegenSlot = -1;
 #if DEBUG_PICKUPS
-			if( Pickups[i].Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Killed '%s'. Owner '%s', ID %d with slot grater than max slots\n", Messages[ Pickups[i].Type ], &Names[ Pickups[i].Owner ][ 0 ], Pickups[i].ID );
+			if( Pickups[i].Owner != INDEX_NONE ) DebugPrintf( "pickups: Killed '%s'. Owner '%s', ID %d with slot grater than max slots\n", Messages[ Pickups[i].Type ], &Names[ Pickups[i].Owner ][ 0 ], Pickups[i].ID );
 			else DebugPrintf( "pickups: Killed '%s'. No Owner, ID %d with slot grater than max slots\n", Messages[ Pickups[i].Type ], Pickups[i].ID );
 #endif
 		}
@@ -1918,13 +1918,13 @@ void KillUsedPickup( u_int16_t i )
 	else
 	{
 #if DEBUG_PICKUPS
-		if( Pickups[i].Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Killed '%s' from slot %d, Owner '%s', ID %d\n", Messages[ Pickups[i].Type ], Pickups[i].RegenSlot, &Names[ Pickups[i].Owner ][ 0 ], Pickups[i].ID  );
+		if( Pickups[i].Owner != INDEX_NONE ) DebugPrintf( "pickups: Killed '%s' from slot %d, Owner '%s', ID %d\n", Messages[ Pickups[i].Type ], Pickups[i].RegenSlot, &Names[ Pickups[i].Owner ][ 0 ], Pickups[i].ID  );
 		else DebugPrintf( "pickups: Killed '%s' from slot %d, No Owner, ID %d\n", Messages[ Pickups[i].Type ], Pickups[i].RegenSlot, Pickups[i].ID  );
 #endif
 	}
 
-	Pickups[ i ].Type = (u_int16_t) -1;
-	Pickups[ i ].Prev = (u_int16_t) -1;
+	Pickups[ i ].Type = INDEX_NONE;
+	Pickups[ i ].Prev = INDEX_NONE;
 	Pickups[ i ].Next = FirstPickupFree;
 	FirstPickupFree	= i;
 
@@ -1950,27 +1950,27 @@ void CleanUpPickup( u_int16_t i )
 #endif
 
 	/* kill the pickups light */
-	if( Pickups[ i ].Light != (u_int16_t) -1 )
+	if( Pickups[ i ].Light != INDEX_NONE )
 	{
 		/* cause a light to go red and get smaller then die */
 		SetLightDie( Pickups[ i ].Light );
-		Pickups[ i ].Light = (u_int16_t) -1;
+		Pickups[ i ].Light = INDEX_NONE;
 	}
 
 	/* kill the pickups faceme poly */
-	if ( Pickups[ i ].Fmpoly != (u_int16_t) -1 )
+	if ( Pickups[ i ].Fmpoly != INDEX_NONE )
 	{
 		/* Kill a used FmPoly and move it from the used list to the free list */
 		KillUsedFmPoly( Pickups[ i ].Fmpoly );
-		Pickups[ i ].Fmpoly = (u_int16_t) -1;
+		Pickups[ i ].Fmpoly = INDEX_NONE;
 	}
 
 	/* kill the pickups model */
-	if ( Pickups[ i ].ModelNum != (u_int16_t) -1 )
+	if ( Pickups[ i ].ModelNum != INDEX_NONE )
 	{
 		/* Kill a used Model and move it from the used list to the free list */
 		KillUsedModel( Pickups[ i ].ModelNum );
-		Pickups[ i ].ModelNum = (u_int16_t) -1;
+		Pickups[ i ].ModelNum = INDEX_NONE;
 	}
 
 	/* kill and remove pickup from used list to free list */
@@ -2035,7 +2035,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 
 	i = FindFreePickup();
 
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 		if( RegenSlot != -1 )
 		{
@@ -2079,7 +2079,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		Pickups[ i ].RegenSlot = RegenSlot;
 		Pickups[ i ].ModelType = PickupAttribs[ Type ].ModelType;
 		Pickups[ i ].TriggerMod = TriggerMod;
-		if( TriggerMod == (u_int16_t) -1 ) Pickups[ i ].TriggerModPtr = NULL;
+		if( TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = NULL;
 		else Pickups[ i ].TriggerModPtr = &TrigMods[ TriggerMod ];
 		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);			// Create Dir Matrix
@@ -2095,14 +2095,14 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 				RegenPoints[ RegenSlot ].PickupIndex = i;
 				RegenPoints[ RegenSlot ].PickupID = ID;
 #if DEBUG_PICKUPS
-				if( Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Initialised '%s' in slot %d. Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
+				if( Owner != INDEX_NONE ) DebugPrintf( "pickups: Initialised '%s' in slot %d. Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
 				else DebugPrintf( "pickups: Initialised '%s' in slot %d. No Owner, ID %d\n", Messages[ Type ], RegenSlot, ID );
 #endif
 			}
 			else
 			{
 #if DEBUG_PICKUPS
-				if( Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Tried to init '%s', Owner '%s', ID %d, in regen slot grater than max slots\n", Messages[ Type ], &Names[ Owner ][ 0 ], ID );
+				if( Owner != INDEX_NONE ) DebugPrintf( "pickups: Tried to init '%s', Owner '%s', ID %d, in regen slot grater than max slots\n", Messages[ Type ], &Names[ Owner ][ 0 ], ID );
 				else DebugPrintf( "pickups: Tried to init '%s', No Owner, ID %d, in regen slot grater than max slots\n", Messages[ Type ], ID );
 #endif
 			}
@@ -2110,18 +2110,18 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		else
 		{
 #if DEBUG_PICKUPS
-			if( Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Initialised '%s' in slot %d, Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
+			if( Owner != INDEX_NONE ) DebugPrintf( "pickups: Initialised '%s' in slot %d, Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
 			else DebugPrintf( "pickups: Initialised '%s' in slot %d, No Owner, ID %d\n", Messages[ Type ], RegenSlot, ID );
 #endif
 		}
 
-		light = (u_int16_t) -1;
-		model = (u_int16_t) -1;
+		light = INDEX_NONE;
+		model = INDEX_NONE;
 
 		if( PickupAttribs[ Type ].Light != 0 )
 		{
 			light = FindFreeXLight();
-			if( light != (u_int16_t ) -1 )
+			if( light != INDEX_NONE )
 			{
 				XLights[ light ].Pos = *Pos;
 				XLights[ light ].Size = PickupAttribs[ Type ].Lightsize;
@@ -2135,7 +2135,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		Pickups[ i ].Light = light;
 
 		model =	FindFreeModel();
-		if( model != (u_int16_t ) -1 )
+		if( model != INDEX_NONE )
    		{
    			Models[ model ].OwnerType = OWNER_SHIP;
    			Models[ model ].Owner = Pickups[ i ].Owner;
@@ -2158,7 +2158,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 			Pickups[ i ].PickupCount = 32.0F;
 
 			fmpoly = FindFreeFmPoly();
-			if( fmpoly != (u_int16_t) -1 )
+			if( fmpoly != INDEX_NONE )
 			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -2184,7 +2184,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		}
 
 		Pickups[ i ].ModelNum = model;
-		Pickups[ i ].Fmpoly = (u_int16_t) -1;
+		Pickups[ i ].Fmpoly = INDEX_NONE;
 
 		// check flag position
 		if ( CTF )
@@ -2230,7 +2230,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 	else
 	{
 #if DEBUG_PICKUPS
-		if( Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Couldn't Initialise '%s' in slot %d. Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
+		if( Owner != INDEX_NONE ) DebugPrintf( "pickups: Couldn't Initialise '%s' in slot %d. Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
 		else DebugPrintf( "pickups: Couldn't Initialise '%s' in slot %d. No Owner, ID %d\n", Messages[ Type ], RegenSlot, ID );
 #endif
 	}
@@ -2263,7 +2263,7 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 
 	i = FindFreePickup();
 
-	if( i != (u_int16_t) -1 )
+	if( i != INDEX_NONE )
 	{
 
 		AddPickupToGroup( i, Group );
@@ -2290,7 +2290,7 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 		Pickups[ i ].RegenSlot = RegenSlot;
 		Pickups[ i ].ModelType = PickupAttribs[ Type ].ModelType;
 		Pickups[ i ].TriggerMod = TriggerMod;
-		if( TriggerMod == (u_int16_t) -1 ) Pickups[ i ].TriggerModPtr = NULL;
+		if( TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = NULL;
 		else Pickups[ i ].TriggerModPtr = &TrigMods[ TriggerMod ];
 		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);			// Create Dir Matrix
@@ -2304,13 +2304,13 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 			RegenPoints[ RegenSlot ].PickupID = ID;
 		}
 
-		light = (u_int16_t) -1;
-		model = (u_int16_t) -1;
+		light = INDEX_NONE;
+		model = INDEX_NONE;
 
 		if( PickupAttribs[ Type ].Light != 0 )
 		{
 			light = FindFreeXLight();
-			if( light != (u_int16_t ) -1 )
+			if( light != INDEX_NONE )
 			{
 				XLights[ light ].Pos = *Pos;
 				XLights[ light ].Size = PickupAttribs[ Type ].Lightsize;
@@ -2324,7 +2324,7 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 		Pickups[ i ].Light = light;
 
 		model =	FindFreeModel();
-		if( model != (u_int16_t ) -1 )
+		if( model != INDEX_NONE )
    		{
    			Models[ model ].OwnerType = OWNER_SHIP;
    			Models[ model ].Owner = Pickups[ i ].Owner;
@@ -2347,7 +2347,7 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 			Pickups[ i ].PickupCount = 32.0F;
 
 			fmpoly = FindFreeFmPoly();
-			if( fmpoly != (u_int16_t) -1 )
+			if( fmpoly != INDEX_NONE )
 			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos = *Pos;
@@ -2373,12 +2373,12 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 		}
 
 		Pickups[ i ].ModelNum = model;
-		Pickups[ i ].Fmpoly = (u_int16_t) -1;
+		Pickups[ i ].Fmpoly = INDEX_NONE;
 	}
 	else
 	{
 #if DEBUG_PICKUPS
-		if( Owner != (u_int16_t) -1 ) DebugPrintf( "pickups: Couldn't Initialise '%s' in slot %d. Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
+		if( Owner != INDEX_NONE ) DebugPrintf( "pickups: Couldn't Initialise '%s' in slot %d. Owner '%s', ID %d\n", Messages[ Type ], RegenSlot, &Names[ Owner ][ 0 ], ID );
 		else DebugPrintf( "pickups: Couldn't Initialise '%s' in slot %d. No Owner, ID %d\n", Messages[ Type ], RegenSlot, ID );
 #endif
 	}
@@ -2423,7 +2423,7 @@ void ProcessPickups( void )
 
 	i = FirstPickupUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		NextPickup = Pickups[ i ].Prev;							/* Next Pickup */
 
@@ -2439,7 +2439,7 @@ void ProcessPickups( void )
 				Pickups[ i ].PickupCount -= framelag;
 				if( Pickups[ i ].PickupCount <= 0.0F )
 				{
-					if( Pickups[ i ].ModelNum != (u_int16_t) -1 )
+					if( Pickups[ i ].ModelNum != INDEX_NONE )
 					{
 						Models[ Pickups[ i ].ModelNum ].Visible = true;
 					}
@@ -2450,8 +2450,8 @@ void ProcessPickups( void )
 
 			case PICKUPMODE_Normal:
 				if( ( ( Pickups[ i ].Owner == WhoIAm ) ) ||
-					( ( ( Pickups[ i ].Owner == (u_int16_t) -1 ) && ( IsHost ) ) ) ||
-					( ( ( Pickups[ i ].Owner != (u_int16_t) -1 ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) ||
+					( ( ( Pickups[ i ].Owner == INDEX_NONE ) && ( IsHost ) ) ) ||
+					( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) ||
 					( PlayDemo ) )
 				{
 					if( Pickups[ i ].LifeCount != -1.0F )
@@ -2479,8 +2479,8 @@ void ProcessPickups( void )
 				if( Pickups[ i ].PickupCount <= 0.0F )
 				{
 					if( ( ( Pickups[ i ].Owner == WhoIAm ) ) ||
-						( ( ( Pickups[ i ].Owner == (u_int16_t) -1 ) && ( IsHost ) ) ) ||
-						( ( ( Pickups[ i ].Owner != (u_int16_t) -1 ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) ||
+						( ( ( Pickups[ i ].Owner == INDEX_NONE ) && ( IsHost ) ) ) ||
+						( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) ||
 						( PlayDemo ) )
 					{
 						{
@@ -2561,7 +2561,7 @@ void ProcessPickups( void )
 					MovePickupToGroup( i, OldGroup, Pickups[ i ].Group );
 				}
 	
-		   		if( Pickups[ i ].Light != (u_int16_t) -1 )									/* Light Attached? */
+		   		if( Pickups[ i ].Light != INDEX_NONE )									/* Light Attached? */
 		   		{																		
 		   			XLights[ Pickups[ i ].Light ].Pos = Pickups[ i ].Pos;				/* Update Light Position */
 					XLights[ Pickups[ i ].Light ].Group = Pickups[ i ].Group;
@@ -2572,13 +2572,13 @@ void ProcessPickups( void )
 					}
 		   		}																		
 		   																				
-		   		if( Pickups[ i ].Fmpoly != (u_int16_t) -1 )								/* Faceme Poly Attached? */
+		   		if( Pickups[ i ].Fmpoly != INDEX_NONE )								/* Faceme Poly Attached? */
 		   		{																		
 		   			FmPolys[ Pickups[ i ].Fmpoly ].Pos = Pickups[ i ].Pos;				/* Update FmPoly Position */
 		   			FmPolys[ Pickups[ i ].Fmpoly ].Group = Pickups[ i ].Group;
 		   		}																		
 		   																				
-				if( Pickups[ i ].ModelNum != (u_int16_t) -1 )								/* 3D Model Attached? */
+				if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
 		   		{																		
 		   			Models[ Pickups[ i ].ModelNum ].Pos = Pickups[ i ].Pos;
 		   			Models[ Pickups[ i ].ModelNum ].Group = Pickups[ i ].Group;
@@ -2592,7 +2592,7 @@ void ProcessPickups( void )
 				case PICKUP_Flag2:
 				case PICKUP_Flag3:
 				case PICKUP_Flag4:
-					if( Pickups[ i ].ModelNum != (u_int16_t) -1 )								/* 3D Model Attached? */
+					if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
 			   		{																		
 						Speed = ( LevelTimeTaken * 4.0F );
 						Models[ Pickups[ i ].ModelNum ].Frame = (int16_t) ( FMOD( Speed, ( 2.5F * ANIM_SECOND ) ) / ( 0.25F * ANIM_SECOND ) );
@@ -2667,7 +2667,7 @@ void ProcessPickups( void )
 	   			TempQuat.Multiply(&Pickups[ i ].DirQuat, &Pickups[ i ].DirQuat);
 	   			Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);				// Create Dir Matrix
 	
-				if( Pickups[ i ].ModelNum != (u_int16_t) -1 )								/* 3D Model Attached? */
+				if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
 		   		{																		
 					Models[ Pickups[ i ].ModelNum ].Mat = Pickups[ i ].Mat;				/* Update Model Matrix */
 		   			MatrixTranspose( &Pickups[ i ].Mat, &Models[ Pickups[ i ].ModelNum ].InvMat );
@@ -2698,7 +2698,7 @@ void SavePickupsPositions( void )
 	u_int16_t		ReGenType = PU_REGENTYPE_Random;
 	float		GenDelay = -1.0F;
 	float		LifeSpan = -1.0F;
-	u_int16_t		TriggerMod = (u_int16_t) -1;
+	u_int16_t		TriggerMod = INDEX_NONE;
 
 	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
 
@@ -2709,7 +2709,7 @@ void SavePickupsPositions( void )
 		i = FirstPickupUsed;
 		Num_Pickups = 0;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			Num_Pickups++;
 			i = Pickups[ i ].Prev;					/* Next Pickup */
@@ -2719,7 +2719,7 @@ void SavePickupsPositions( void )
 
 		i = FirstPickupUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &GenType, sizeof( u_int16_t ), 1, fp );
 			fwrite( &ReGenType, sizeof( u_int16_t ), 1, fp );
@@ -2803,7 +2803,7 @@ bool CheckValidRegenSlot( int16_t Slot )
 
 	RegenPoints[ Slot ].Status = PU_REGENSTAT_Used;
 	RegenPoints[ Slot ].Wait = 0.0F;
-	RegenPoints[ Slot ].Type = (u_int16_t) -1;
+	RegenPoints[ Slot ].Type = INDEX_NONE;
 
 	/* if you are host add pickup thats in the slot to regen list */
 	if( ( IsHost ) )
@@ -3049,7 +3049,7 @@ bool LoadPickupsPositions( void )
           (
              /* triggerMod is set */
              /* and is NOT valid */
-            ( RegenPoints[ Count ].TriggerMod != (u_int16_t) -1 ) &&
+            ( RegenPoints[ Count ].TriggerMod != INDEX_NONE ) &&
             ( RegenPoints[ Count ].TriggerMod >= NumOfTrigMods )
           )
         )
@@ -3061,9 +3061,9 @@ bool LoadPickupsPositions( void )
            * point becomes PICKUP_GeneralAmmo (even when only the trigger
            * mod was bad) and an invalid TriggerMod is cleared. */
           RegenPoints[ Count ].Type = PICKUP_GeneralAmmo;
-          if (RegenPoints[ Count ].TriggerMod != (u_int16_t)-1 &&
+          if (RegenPoints[ Count ].TriggerMod != INDEX_NONE &&
               RegenPoints[ Count ].TriggerMod >= NumOfTrigMods) {
-            RegenPoints[ Count ].TriggerMod = (u_int16_t)-1;
+            RegenPoints[ Count ].TriggerMod = INDEX_NONE;
           }
 #else
           /* quit */
@@ -3129,7 +3129,7 @@ bool LoadPickupsPositions( void )
                 &Dir,
                 0.0F,
                 RegenPoints[ Count ].Type,
-                (u_int16_t) -1,
+                INDEX_NONE,
                 ++Ships[WhoIAm].PickupIdCount,
                 Count,
                 false,
@@ -3246,11 +3246,11 @@ bool LoadPickupsPositions( void )
 ===================================================================*/
 u_int16_t InitSlotPickup( u_int16_t Slot )
 {
-	u_int16_t		i = (u_int16_t) -1;
+	u_int16_t		i = INDEX_NONE;
 	VECTOR		Dir = { 0.0F, 0.0F, 0.0F };
 
 	if( RegenPoints[ Slot ].Status != PU_REGENSTAT_TrigGen )
-		return( (u_int16_t) -1 );
+		return( INDEX_NONE );
 
 	if( RegenPoints[ Slot ].GenDelay )
 	{
@@ -3261,9 +3261,9 @@ u_int16_t InitSlotPickup( u_int16_t Slot )
 	else
 	{
 		i =	InitOnePickup( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Dir, 0.0F, RegenPoints[ Slot ].Type,
-							(u_int16_t) -1, RegenPoints[ Slot ].PickupID, Slot, true, -1.0F, RegenPoints[ Slot ].TriggerMod );
+							INDEX_NONE, RegenPoints[ Slot ].PickupID, Slot, true, -1.0F, RegenPoints[ Slot ].TriggerMod );
 #if DEBUG_PICKUPS
-		if( ( i == (u_int16_t) -1 ) || ( i == (u_int16_t) -2 ) )
+		if( ( i == INDEX_NONE ) || ( i == (u_int16_t) -2 ) )
 		{
 			DebugPrintf( "pickups: Unable to initialise pickup in slot %d\n", Slot );
 		}
@@ -3314,11 +3314,11 @@ void RegeneratePickups( void )
 				if( ( IsHost ) )
 				{
 					i = InitOnePickup( &RegenPoints[ Count ].Pos, RegenPoints[ Count ].Group,
-									   &Dir, 0.0F, RegenPoints[ Count ].Type, (u_int16_t) -1,
+									   &Dir, 0.0F, RegenPoints[ Count ].Type, INDEX_NONE,
 									   ++Ships[WhoIAm].PickupIdCount, Count, true,
 									   RegenPoints[ Count ].Lifespan, RegenPoints[ Count ].TriggerMod );
 		
-					if( ( i != (u_int16_t) -1 )  && ( i != (u_int16_t) -2 ) )
+					if( ( i != INDEX_NONE )  && ( i != (u_int16_t) -2 ) )
 					{
 						DropPickupSend( &RegenPoints[ Count ].Pos, RegenPoints[ Count ].Group,
 										&Dir, 0.0F, RegenPoints[ Count ].Type, Ships[WhoIAm].PickupIdCount,
@@ -3628,10 +3628,10 @@ bool RegeneratePickup( u_int16_t Type )
 	/* Try to init a pickup */
 	i = InitOnePickup( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Dir,
 		               0.0F, Type, WhoIAm, ++Ships[WhoIAm].PickupIdCount, Slot,
-					   true, -1.0F, (u_int16_t) -1 );
+					   true, -1.0F, INDEX_NONE );
 
 	/* the location given is occupied */
-	if ( i == (u_int16_t) -1 )
+	if ( i == INDEX_NONE )
 	{
 		DebugPrintf("pickups: RegeneratePickup (FAILED) location given is occupied.\n");
 		return false;
@@ -3647,7 +3647,7 @@ bool RegeneratePickup( u_int16_t Type )
 	RegenDelay = ( ANIM_SECOND * 0.5F );
 	DropPickupSend( &RegenPoints[ Slot ].Pos, RegenPoints[ Slot ].Group, &Dir,
 		            0.0F, Type, Ships[WhoIAm].PickupIdCount, Slot, true, -1.0F,
-					(u_int16_t) -1 );
+					INDEX_NONE );
 
 	/* Success ! */
 	return true;
@@ -3676,7 +3676,7 @@ void GenPickupList( u_int16_t Ship, SHORTPICKUP * PickupSlots, BYTE * NumPickups
 
 		if( i < MAXPICKUPS )
 		{
-			if( PickupsCopy[ Ship ][ i ].Type != (u_int16_t) -1 )
+			if( PickupsCopy[ Ship ][ i ].Type != INDEX_NONE )
 			{
 				PickupSlots[ NumUsed ].Type = PickupsCopy[ Ship ][ i ].Type;
 				PickupSlots[ NumUsed ].Group = PickupsCopy[ Ship ][ i ].Group;
@@ -3792,7 +3792,7 @@ void KillAllPickups( void )
 	i = FirstPickupUsed;
 
 	/* if pointer points to a valid pickup id */
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 
 		/* get the next pickup */
@@ -3800,7 +3800,7 @@ void KillAllPickups( void )
  
 		/* Reset the pickups triggerMod */
 		Pickups[ i ].TriggerModPtr = NULL;
-		Pickups[ i ].TriggerMod    = (u_int16_t) -1;
+		Pickups[ i ].TriggerMod    = INDEX_NONE;
 
 		/* cleanup the pickup
 		   remove any lighting or other affect the pickup does */
@@ -3825,12 +3825,12 @@ void CopyPickups( u_int16_t Player )
 
 	for( i = 0; i < MAXPICKUPS; i++ )
 	{
-		PickupsCopy[ Player ][ i ].Type = (u_int16_t) -1;
+		PickupsCopy[ Player ][ i ].Type = INDEX_NONE;
 	}
 
 	i = FirstPickupUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		memmove( &PickupsCopy[ Player ][ Num ], &Pickups[i], sizeof( PICKUP ) );//memcpy
 		Num++;
@@ -3968,7 +3968,7 @@ u_int16_t FindClosestShip( void )
 	u_int16_t		Count;
 	VECTOR		TempVector;
 	float		DistToSphere;
-	u_int16_t		ClosestShip = (u_int16_t) -1;
+	u_int16_t		ClosestShip = INDEX_NONE;
 	float		ClosestLength = 0.0f;
 
 	for( Count = 0; Count < MAX_PLAYERS; Count++ )
@@ -3983,7 +3983,7 @@ u_int16_t FindClosestShip( void )
 			
 				DistToSphere = VectorLength( &TempVector );
 			
-				if( ClosestShip != (u_int16_t) -1 )
+				if( ClosestShip != INDEX_NONE )
 				{
 					if( DistToSphere < ClosestLength )
 					{
@@ -4018,7 +4018,7 @@ void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID )
 
 	i = FirstPickupUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		NextPickup = Pickups[ i ].Prev;							/* Next Pickup */
 
@@ -4285,7 +4285,7 @@ void UnpackPickupInfo( u_int32_t *packed )
 FILE * SaveAllPickups( FILE * fp )
 {
 	u_int16_t	i;
-	u_int16_t	TempIndex = (u_int16_t) -1; 
+	u_int16_t	TempIndex = INDEX_NONE; 
 
 	if( fp )
 	{
@@ -4341,7 +4341,7 @@ FILE * SaveAllPickups( FILE * fp )
 
 		i = FirstPickupUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fwrite( &Pickups[ i ].Prev, sizeof( u_int16_t ), 1, fp );
@@ -4390,7 +4390,7 @@ FILE * SaveAllPickups( FILE * fp )
 
 		i = FirstPickupFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Pickups[ i ].Next;
@@ -4416,7 +4416,7 @@ FILE * LoadAllPickups( FILE * fp )
 		{
 			fread( &NumPickupsPerGroup[ i ], sizeof( int16_t ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) PickupGroups[ i ] = &Pickups[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) PickupGroups[ i ] = &Pickups[ TempIndex ];
 			else PickupGroups[ i ] = NULL;
 		}
 
@@ -4465,15 +4465,15 @@ FILE * LoadAllPickups( FILE * fp )
 
 		i = FirstPickupUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fread( &Pickups[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fread( &Pickups[ i ].Prev, sizeof( u_int16_t ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) Pickups[ i ].NextInGroup = &Pickups[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) Pickups[ i ].NextInGroup = &Pickups[ TempIndex ];
 			else Pickups[ i ].NextInGroup = NULL;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) Pickups[ i ].PrevInGroup = &Pickups[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) Pickups[ i ].PrevInGroup = &Pickups[ TempIndex ];
 			else Pickups[ i ].PrevInGroup = NULL;
 			fread( &Pickups[ i ].Index, sizeof( u_int16_t ), 1, fp );
 			fread( &Pickups[ i ].Type, sizeof( u_int16_t ), 1, fp );
@@ -4504,7 +4504,7 @@ FILE * LoadAllPickups( FILE * fp )
 			fread( &Pickups[ i ].UpVector, sizeof( VECTOR ), 1, fp );
 			fread( &Pickups[ i ].RegenSlot, sizeof( int16_t ), 1, fp );
 			fread( &Pickups[ i ].TriggerMod, sizeof( u_int16_t ), 1, fp );
-			if( Pickups[ i ].TriggerMod == (u_int16_t) -1 ) Pickups[ i ].TriggerModPtr = NULL;
+			if( Pickups[ i ].TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = NULL;
 			else Pickups[ i ].TriggerModPtr = &TrigMods[ Pickups[ i ].TriggerMod ];
 			fread( &Pickups[ i ].ColStart, sizeof( VECTOR ), 1, fp );
 			fread( &Pickups[ i ].ColDist, sizeof( float ), 1, fp );
@@ -4518,16 +4518,16 @@ FILE * LoadAllPickups( FILE * fp )
 
 		i = FirstPickupFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			memset( &Pickups[ i ], 0, sizeof( PICKUP ) );
-			Pickups[ i ].Prev = (u_int16_t) -1;
+			Pickups[ i ].Prev = INDEX_NONE;
 			Pickups[ i ].NextInGroup = NULL;
 			Pickups[ i ].PrevInGroup = NULL;
 			Pickups[ i ].Index = i;
 			Pickups[ i ].LifeCount = -1.0F;
 			Pickups[ i ].Mode = PICKUPMODE_Normal;
-			Pickups[ i ].Type = (u_int16_t) -1;
+			Pickups[ i ].Type = INDEX_NONE;
 			Pickups[ i ].Rot.x = -1.2F;
 			Pickups[ i ].Rot.y = 2.0F;
 			Pickups[ i ].Rot.z = 1.0F;
@@ -4536,7 +4536,7 @@ FILE * LoadAllPickups( FILE * fp )
 			Pickups[ i ].UpVector = SlideUp;
 			Pickups[ i ].RegenSlot = -1;
 			Pickups[ i ].TriggerModPtr = NULL;
-			Pickups[ i ].TriggerMod = (u_int16_t) -1;
+			Pickups[ i ].TriggerMod = INDEX_NONE;
 			Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 			Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);
 
@@ -4562,7 +4562,7 @@ void KillAllPickupsOfType( u_int16_t Type, int16_t Style )
 
 	i = FirstPickupUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		NextPickup = Pickups[ i ].Prev;							/* Next Pickup */
 
@@ -4607,7 +4607,7 @@ void KillAllPickupsOfType( u_int16_t Type, int16_t Style )
 					Pickups[ i ].PickupCount = 32.0F;
 			
 					fmpoly = FindFreeFmPoly();
-					if( fmpoly != (u_int16_t) -1 )
+					if( fmpoly != INDEX_NONE )
 					{
 						FmPolys[ fmpoly ].LifeCount = 1000.0F;
 						FmPolys[ fmpoly ].Pos = Pickups[ i ].Pos;
@@ -4652,13 +4652,13 @@ void PickupModelValid( void )
 
 	i = FirstPickupUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		NextPickup = Pickups[ i ].Prev;							/* Next Pickup */
 
 		Model = Pickups[ i ].ModelNum;
 
-		if( Model != (u_int16_t) -1 )
+		if( Model != INDEX_NONE )
 		{
 			if( Models[ Model ].ModelNum != PickupAttribs[ Pickups[ i ].Type ].ModelType )
 			{
@@ -4801,7 +4801,7 @@ void ProcessFailedKills( void )
 		{
 			Pickup = FindPickup( FailedKill[ i ].Owner, FailedKill[ i ].ID );
 
-			if( Pickup != (u_int16_t) -1 )
+			if( Pickup != INDEX_NONE )
 			{
 				KillPickup( FailedKill[ i ].Owner, FailedKill[ i ].ID, FailedKill[ i ].Style );
 				DebugPrintf( "pickups: Removed Failed KillPickup() Owner %d, ID %d from que\n", FailedKill[ i ].Owner, FailedKill[ i ].ID );
@@ -4825,7 +4825,7 @@ u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID )
 
 	i = FirstPickupUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		if( ( Pickups[ i ].Owner == Owner ) && ( Pickups[ i ].ID == ID ) )
 		{
@@ -4835,6 +4835,6 @@ u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID )
 		i = Pickups[ i ].Prev;
 	}																				
 
-	return( (u_int16_t) -1 );
+	return( INDEX_NONE );
 }	
 	

@@ -40,17 +40,17 @@ u_int16_t	FirstXLightFree;
 void	InitXLights()
 {
 	u_int16_t	i;
-	FirstXLightUsed = (u_int16_t) -1;
+	FirstXLightUsed = INDEX_NONE;
 	FirstXLightFree = 0;
 	for( i = 0 ; i < MAXXLIGHTS ; i++ )
 	{
 		XLights[i].Index = i;
 		XLights[i].Next = i + 1;
-		XLights[i].Prev = (u_int16_t) -1;
+		XLights[i].Prev = INDEX_NONE;
 		XLights[i].Type = POINT_LIGHT;
 	}
 
-	XLights[MAXXLIGHTS-1].Next = (u_int16_t) -1;
+	XLights[MAXXLIGHTS-1].Next = INDEX_NONE;
 }
 /*===================================================================
 	Procedure	:	Find a free light and move it from the free list to
@@ -64,11 +64,11 @@ u_int16_t	FindFreeXLight()
 
 	i = FirstXLightFree;
 	
-	if ( i == (u_int16_t) -1)
+	if ( i == INDEX_NONE)
 		return i;
  
 	XLights[i].Prev = FirstXLightUsed;
-	if ( FirstXLightUsed != (u_int16_t) -1)
+	if ( FirstXLightUsed != INDEX_NONE)
 	{
 		XLights[FirstXLightUsed].Next = i;
 	}
@@ -96,13 +96,13 @@ void	KillUsedXLight( u_int16_t light )
 	if ( light == FirstXLightUsed )
 		FirstXLightUsed = XLights[light].Prev;
 
-	if( its_prev != (u_int16_t) -1)
+	if( its_prev != INDEX_NONE)
 		XLights[its_prev].Next = its_next;
 
-	if( its_next != (u_int16_t) -1)
+	if( its_next != INDEX_NONE)
 		XLights[its_next].Prev = its_prev;
 
-	XLights[light].Prev = (u_int16_t) -1;
+	XLights[light].Prev = INDEX_NONE;
 	XLights[light].Next = FirstXLightFree;
 	FirstXLightFree	= light;
 }
@@ -120,7 +120,7 @@ bool	ProcessXLights( MLOADHEADER * /*Mloadheader*/ )
 	u_int16_t	oldlight;
 
 	light = FirstXLightUsed;
-	while( light != (u_int16_t ) -1 )
+	while( light != INDEX_NONE )
 	{
 		oldlight = XLights[light].Prev;
 
@@ -1261,7 +1261,7 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 /*===================================================================
 	Procedure	:	Build the FirstLightVisible chain: used lights that are
 				:	Visible and whose group overlaps the camera's group
-	Input		:	Group the current camera is in; (u_int16_t)-1 takes
+	Input		:	Group the current camera is in; INDEX_NONE takes
 				:	every used light
 	Output		:	nothing
 ===================================================================*/
@@ -1273,11 +1273,11 @@ void BuildVisibleLightList( u_int16_t Group )
 	light = FirstXLightUsed;
 	FirstLightVisible = NULL;
 
-	while( light != (u_int16_t ) -1 )
+	while( light != INDEX_NONE )
 	{
 		XLightPnt = &XLights[light];
 
-		if( (Group == (u_int16_t) -1) || (XLightPnt->Visible && VisibleOverlap( Group, XLightPnt->Group , NULL ) ) )
+		if( (Group == INDEX_NONE) || (XLightPnt->Visible && VisibleOverlap( Group, XLightPnt->Group , NULL ) ) )
 		{
 			XLightPnt->NextVisible = FirstLightVisible;
 			FirstLightVisible = XLightPnt;
@@ -1294,7 +1294,7 @@ void BuildVisibleLightList( u_int16_t Group )
 FILE * SaveXLights( FILE * fp )
 {
 	int		i;
-	u_int16_t	TempIndex = (u_int16_t) -1;
+	u_int16_t	TempIndex = INDEX_NONE;
 
 	if( fp )
 	{
@@ -1341,7 +1341,7 @@ FILE * LoadXLights( FILE * fp )
 		fread( &FirstXLightUsed, sizeof( u_int16_t ), 1, fp );
 		fread( &FirstXLightFree, sizeof( u_int16_t ), 1, fp );
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( TempIndex != (u_int16_t) -1 ) FirstLightVisible = &XLights[ TempIndex ];
+		if( TempIndex != INDEX_NONE ) FirstLightVisible = &XLights[ TempIndex ];
 		else FirstLightVisible = NULL;
 		
 		for( i = 0; i < MAXXLIGHTS; i++ )
@@ -1360,7 +1360,7 @@ FILE * LoadXLights( FILE * fp )
 			fread( &XLights[ i ].Dir, sizeof( VECTOR ), 1, fp );
 			fread( &XLights[ i ].Group, sizeof( u_int16_t ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( TempIndex != (u_int16_t) -1 ) XLights[ i ].NextVisible = &XLights[ TempIndex ];
+			if( TempIndex != INDEX_NONE ) XLights[ i ].NextVisible = &XLights[ TempIndex ];
 			else XLights[ i ].NextVisible = NULL;
 		}
 	}

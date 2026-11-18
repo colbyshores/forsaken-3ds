@@ -66,7 +66,7 @@ bool LoadStartPoints( void )
 
 		for( Count = 0 ; Count < MAXGROUPS ; Count++ )
 		{
-			FirstStartPositionInGroup[Count] = (u_int16_t) -1;
+			FirstStartPositionInGroup[Count] = INDEX_NONE;
 		}
 
 		
@@ -87,9 +87,9 @@ bool LoadStartPoints( void )
 			fread( &OllyPad, sizeof( int16_t ), 1, fp );
 			Mloadheader.Group[ StartPositions[ Count ].Group ].StartPosInThisGroup = Count;
 
-			if( FirstStartPositionInGroup[StartPositions[Count].Group] == (u_int16_t) -1 )
+			if( FirstStartPositionInGroup[StartPositions[Count].Group] == INDEX_NONE )
 			{
-				StartPositions[Count].NextInGroup = (u_int16_t) -1;
+				StartPositions[Count].NextInGroup = INDEX_NONE;
 				FirstStartPositionInGroup[StartPositions[Count].Group] = Count;
 			}else{
 				StartPositions[Count].NextInGroup = FirstStartPositionInGroup[StartPositions[Count].Group];

@@ -42,21 +42,21 @@ void InitPolys( void )
 {
 	int i;
 
-	FirstPolyUsed = (u_int16_t) -1;
+	FirstPolyUsed = INDEX_NONE;
 	FirstPolyFree = 0;
 	
 	for( i = 0; i < MAXPOLYS; i++ )
 	{
 		memset( &Polys[ i ], 0, sizeof( POLY ) );
 		Polys[i].Next = i + 1;
-		Polys[i].Prev = (u_int16_t) -1;
+		Polys[i].Prev = INDEX_NONE;
 
-		Polys[i].NextInTPage = (u_int16_t) -1;
-		Polys[i].PrevInTPage = (u_int16_t) -1;
+		Polys[i].NextInTPage = INDEX_NONE;
+		Polys[i].PrevInTPage = INDEX_NONE;
 
 		Polys[i].Frm_Info = NULL;
 	}
-	Polys[ MAXPOLYS - 1 ].Next = (u_int16_t) -1;
+	Polys[ MAXPOLYS - 1 ].Next = INDEX_NONE;
 
 	InitPolyTPages();
 }
@@ -72,11 +72,11 @@ u_int16_t FindFreePoly( void )
 	u_int16_t i;
 
 	i = FirstPolyFree;
-	if( i == (u_int16_t) -1 ) return i;
+	if( i == INDEX_NONE ) return i;
  
 	Polys[ i ].Prev = FirstPolyUsed;
 
-	if( FirstPolyUsed != (u_int16_t) -1) Polys[ FirstPolyUsed ].Next = i;
+	if( FirstPolyUsed != INDEX_NONE) Polys[ FirstPolyUsed ].Next = i;
 
 	FirstPolyUsed = i;
 	FirstPolyFree = Polys[i].Next;
@@ -100,14 +100,14 @@ void KillUsedPoly( u_int16_t i )
 	its_next = Polys[i].Next;
 
 	if( i == FirstPolyUsed ) FirstPolyUsed = Polys[ i ].Prev;
-	if( its_prev != (u_int16_t) -1 ) Polys[ its_prev ].Next = its_next;
-	if( its_next != (u_int16_t) -1 ) Polys[ its_next ].Prev = its_prev;
+	if( its_prev != INDEX_NONE ) Polys[ its_prev ].Next = its_next;
+	if( its_next != INDEX_NONE ) Polys[ its_next ].Prev = its_prev;
 
 	TotalPolysInUse--;
 
 	RemovePolyFromTPage( i, GetTPage( *Polys[i].Frm_Info, 0 ) );
 
-	Polys[ i ].Prev = (u_int16_t) -1;
+	Polys[ i ].Prev = INDEX_NONE;
 	Polys[ i ].Next = FirstPolyFree;
 	Polys[ i ].Frm_Info = NULL;
 	FirstPolyFree = i;
@@ -136,7 +136,7 @@ void ProcessPolys( void )
 
 	i = FirstPolyUsed;
 
-	while( i != (u_int16_t) -1 )
+	while( i != INDEX_NONE )
 	{
 		nextpoly = Polys[i].Prev;
 
@@ -387,7 +387,7 @@ void InitAfterBurners( void )
 
 	for( Count = 0; Count < MAX_PLAYERS; Count++ )
 	{
-		TurboIndex[ Count ] = (u_int16_t) -1;
+		TurboIndex[ Count ] = INDEX_NONE;
 		TurboLength[ Count ] = 0.0F;
 	}
 }
@@ -415,10 +415,10 @@ void DoAfterBurnerEffects( void )
 			{
 				if( ( Ships[ Ship ].Object.Flags & SHIP_Turbo ) )
 				{
-					if( TurboIndex[ Ship ] == (u_int16_t) -1 )
+					if( TurboIndex[ Ship ] == INDEX_NONE )
 					{
 						TurboIndex[ Ship ] = FindFreePoly();
-						if( TurboIndex[ Ship ] != (u_int16_t) -1 )
+						if( TurboIndex[ Ship ] != INDEX_NONE )
 						{
 							AddPolyToTPage( TurboIndex[ Ship ], GetTPage( AfterBurner_Header, 0 ) );
 						}
@@ -441,16 +441,16 @@ void DoAfterBurnerEffects( void )
 						{
 							TurboLength[ Ship ] = 0.0F;
 		
-							if( TurboIndex[ Ship ] != (u_int16_t) -1 )
+							if( TurboIndex[ Ship ] != INDEX_NONE )
 							{
 								KillUsedPoly( TurboIndex[ Ship ] );
-								TurboIndex[ Ship ] = (u_int16_t) -1;
+								TurboIndex[ Ship ] = INDEX_NONE;
 							}
 						}
 					}
 				}
 		
-				if( TurboIndex[ Ship ] != (u_int16_t) -1 )
+				if( TurboIndex[ Ship ] != INDEX_NONE )
 				{
 					TI = TurboIndex[ Ship ];
 					TL = TurboLength[ Ship ];
@@ -510,10 +510,10 @@ void DoAfterBurnerEffects( void )
 		}
 		else
 		{
-			if( TurboIndex[ Ship ] != (u_int16_t) -1 )
+			if( TurboIndex[ Ship ] != INDEX_NONE )
 			{
 				KillUsedPoly( TurboIndex[ Ship ] );
-				TurboIndex[ Ship ] = (u_int16_t) -1;
+				TurboIndex[ Ship ] = INDEX_NONE;
 				TurboLength[ Ship ] = 0.0F;
 				Ships[ Ship ].Object.Flags &= ~SHIP_Turbo;
 			}
@@ -532,7 +532,7 @@ void InitPolyTPages( void )
 
 	for( i = 0; i < MAXTPAGESPERTLOAD; i++ )
 	{
-		PolyTPages[ i ].FirstPoly = (u_int16_t) -1;
+		PolyTPages[ i ].FirstPoly = INDEX_NONE;
 	}
 }
 
@@ -546,10 +546,10 @@ void AddPolyToTPage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
-	Polys[ i ].PrevInTPage = (u_int16_t) -1;
+	Polys[ i ].PrevInTPage = INDEX_NONE;
 	Polys[ i ].NextInTPage = PolyTPages[ TPage ].FirstPoly;
 
-	if( Polys[ i ].NextInTPage != (u_int16_t) -1 )
+	if( Polys[ i ].NextInTPage != INDEX_NONE )
 	{
 		Polys[ Polys[ i ].NextInTPage ].PrevInTPage = i;
 	}
@@ -567,7 +567,7 @@ void RemovePolyFromTPage( u_int16_t i, int16_t TPage )
 {
 	if( TPage == -1 ) TPage = MAXTPAGESPERTLOAD;
 
-	if( Polys[ i ].PrevInTPage != (u_int16_t) -1 )
+	if( Polys[ i ].PrevInTPage != INDEX_NONE )
 	{
 		Polys[ Polys[ i ].PrevInTPage ].NextInTPage = Polys[ i ].NextInTPage;
 	}
@@ -576,13 +576,13 @@ void RemovePolyFromTPage( u_int16_t i, int16_t TPage )
 		PolyTPages[ TPage ].FirstPoly = Polys[ i ].NextInTPage;
 	}
 
-	if( Polys[ i ].NextInTPage != (u_int16_t) -1 )
+	if( Polys[ i ].NextInTPage != INDEX_NONE )
 	{
 		Polys[ Polys[ i ].NextInTPage ].PrevInTPage = Polys[ i ].PrevInTPage;
 	}
 
-	Polys[ i ].PrevInTPage = (u_int16_t) -1;
-	Polys[ i ].NextInTPage = (u_int16_t) -1;
+	Polys[ i ].PrevInTPage = INDEX_NONE;
+	Polys[ i ].NextInTPage = INDEX_NONE;
 }
 
 bool DisplayGroupClippedPolys(RENDEROBJECT *renderObject, u_int16_t Group )
@@ -677,7 +677,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		if( Count == *TPage ) i = *NextPoly;
 		else i = PolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
 		{
 			if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
 			{
@@ -739,7 +739,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
 	
-			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
 				{
@@ -912,7 +912,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		if( Count == *TPage ) i = *NextPoly;
 		else i = PolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
 		{
 			if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
 			{
@@ -970,7 +970,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
 	
-			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
 				{
@@ -1191,7 +1191,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		if( Count == *TPage ) i = *NextPoly;
 		else i = PolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
 		{
 			if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
 			{
@@ -1253,7 +1253,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
 	
-			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
 				{
@@ -1427,7 +1427,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		if( Count == *TPage ) i = *NextPoly;
 		else i = PolyTPages[ Count ].FirstPoly;
 
-		while( ( i != (u_int16_t) -1 ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
+		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
 		{
 			if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
 			{
@@ -1489,7 +1489,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
 	
-			while( ( i != (u_int16_t) -1 ) && ( StartVert < MAXPOLYVERTS ) )
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
 				{
@@ -1640,7 +1640,7 @@ FILE * SavePolys( FILE * fp )
 
 		i = FirstPolyUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &Polys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fwrite( &Polys[ i ].Prev, sizeof( u_int16_t ), 1, fp );
@@ -1675,7 +1675,7 @@ FILE * SavePolys( FILE * fp )
 
 		i = FirstPolyFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fwrite( &Polys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Polys[ i ].Next;
@@ -1708,7 +1708,7 @@ FILE * LoadPolys( FILE * fp )
 
 		i = FirstPolyUsed;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			fread( &Polys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			fread( &Polys[ i ].Prev, sizeof( u_int16_t ), 1, fp );
@@ -1744,12 +1744,12 @@ FILE * LoadPolys( FILE * fp )
 
 		i = FirstPolyFree;
 
-		while( i != (u_int16_t) -1 )
+		while( i != INDEX_NONE )
 		{
 			memset( &Polys[ i ], 0, sizeof( POLY ) );
-			Polys[i].Prev = (u_int16_t) -1;
-			Polys[i].NextInTPage = (u_int16_t) -1;
-			Polys[i].PrevInTPage = (u_int16_t) -1;
+			Polys[i].Prev = INDEX_NONE;
+			Polys[i].NextInTPage = INDEX_NONE;
+			Polys[i].PrevInTPage = INDEX_NONE;
 			Polys[i].Frm_Info = NULL;
 
 			fread( &Polys[ i ].Next, sizeof( u_int16_t ), 1, fp );
