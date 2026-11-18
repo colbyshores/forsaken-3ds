@@ -1,28 +1,22 @@
-/*===================================================================
- *  Q3-style hunk allocator.
- *
- *  Two arenas in one fixed-size buffer:
- *    TAG_STARTUP — process-lifetime allocations, grow from low end.
- *    TAG_LEVEL   — per-level allocations, grow from high end. Freed
- *                  in bulk via Hunk_FreeAll(TAG_LEVEL) on level
- *                  transition.
- *
- *  Why this exists rather than plain malloc/free: we have a few large
- *  per-level structures (the model-header arrays, per-execbuf
- *  texture-group arrays) that the engine used to keep in BSS at
- *  worst-case size. Migrating them to dynamic allocation is what
- *  recovers the BSS memory; the hunk just keeps fragmentation
- *  bounded across many level transitions.
- *
- *  Lives entirely on the malloc heap — Hunk_Init pulls one big
- *  block, every Hunk_Alloc bumps an offset within it. No per-alloc
- *  free; only Hunk_FreeAll(tag) which resets the tag's cursor.
- *
- *  Allocation is 8-byte aligned. Memory is zeroed before return
- *  (callers depend on the BSS-zero semantics they had before).
- *===================================================================*/
-
 #pragma once
+
+/* hunk_alloc.h -- two-tag bump allocator for per-level load data
+ *
+ * Hunk_Init mallocs one block at startup (8 MB, from main_3ds.cpp on 3DS and
+ * main_sdl.cpp on PC) and keeps it for the life of the process; a second call
+ * returns true without resizing. Hunk_Alloc bumps a cursor inside it:
+ * TAG_STARTUP grows from the low end, TAG_LEVEL from the high end, and an
+ * allocation that would make them cross returns NULL, as does any call before
+ * Hunk_Init. Sizes are rounded up to 8 bytes and the memory comes back zeroed.
+ *
+ * There is no per-block free. Hunk_FreeAll(tag) resets that tag's cursor, and
+ * every pointer from that tag is dead afterwards. ReleaseView (oct2.cpp)
+ * calls Hunk_FreeAll(TAG_LEVEL) at the end of both its title and level
+ * teardown, after the release functions that still walk the arrays. TAG_LEVEL
+ * holds the per-execbuf textureGroups[] arrays of the level mesh and models
+ * (mload / mxload / mxaload) and one texture group per water object
+ * (water.cpp). Nothing allocates from TAG_STARTUP.
+ */
 
 #include <stddef.h>
 #include <stdbool.h>

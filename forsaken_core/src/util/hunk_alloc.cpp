@@ -1,31 +1,4 @@
-/*===================================================================
- *  Q3-style hunk allocator.
- *
- *  Two arenas in one fixed-size buffer:
- *    TAG_STARTUP - process-lifetime allocations, grow from low end.
- *    TAG_LEVEL   - per-level allocations, grow from high end. Freed
- *                  in bulk via Hunk_FreeAll(TAG_LEVEL) on level
- *                  transition.
- *
- *  Why this exists rather than plain malloc/free: we have a few large
- *  per-level structures (the model-header arrays, per-execbuf
- *  texture-group arrays) that the engine used to keep in BSS at
- *  worst-case size. Migrating them to dynamic allocation is what
- *  recovers the BSS memory; the hunk just keeps fragmentation
- *  bounded across many level transitions.
- *
- *  Lives entirely on the malloc heap - Hunk_Init pulls one big
- *  block, every allocation bumps an offset within it. No per-alloc
- *  free; only free_all(tag), which resets the tag's cursor.
- *
- *  Allocation is 8-byte aligned. Memory is zeroed before return
- *  (callers depend on the BSS-zero semantics they had before).
- *
- *  C-with-classes (AGENTS.md S9): the allocator is one class owning
- *  the buffer and both cursors; the public header stays a flat C
- *  API over a single static instance so existing call sites in C
- *  translation units keep working unchanged.
- *===================================================================*/
+/* hunk_alloc.cpp -- two-tag bump allocator; see hunk_alloc.h. */
 #include "util/hunk_alloc.h"
 
 #include <stdlib.h>
