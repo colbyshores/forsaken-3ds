@@ -105,11 +105,11 @@ void KillUsedLine( u_int16_t i )
 /*===================================================================
 	Procedure	:	Display All Faceme Polygons in specific group
 	Input		:	u_int16_t	Group
-				:	LPDIRECT3DEXECUTEBUFFER ExecBuffer
+				:	RENDEROBJECT *		renderObject
 				:	u_int16_t	* StartLine
 	Output		:	Nothing
 ===================================================================*/
-bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, u_int16_t * StartLine )
+bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * StartLine )
 {
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_LINES;
@@ -179,18 +179,6 @@ bool LinesDispGroup( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/REND
 			i = Lines[ i ].Prev;
 		}
 
-/*	old render states passed to d3dline , might be needed later for reference
-
-			OP_STATE_RENDER( 2, lpPointer );
-			    STATE_DATA( D3DRENDERSTATE_WRAPU, false, lpPointer );
-			    STATE_DATA( D3DRENDERSTATE_WRAPV, false, lpPointer );
-	   		OP_PROCESS_VERTICES( 1, lpPointer );
-	   		    PROCESSVERTICES_DATA( D3DPROCESSVERTICES_TRANSFORM, 0, ( Num_Lines * 2 ), lpPointer );
-	   		OP_STATE_RENDER( 1, lpPointer );
-	   		    STATE_DATA( D3DRENDERSTATE_TEXTUREHANDLE, 0, lpPointer );
-			OP_LINE_LIST( Num_Lines, lpPointer );
-
-*/
 
 		FSUnlockVertexBuffer(renderObject);
 

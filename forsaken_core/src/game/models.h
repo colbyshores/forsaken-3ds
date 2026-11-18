@@ -562,9 +562,9 @@ typedef struct MODELNAME{
  */
 
 void OnceOnlyInitModel( void );
-bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * ModelNames ); // bjd
-bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * ModelNames); // bjd
-bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ); // bjd
+bool PreInitModel( MODELNAME * ModelNames );
+bool InitModel( MODELNAME * ModelNames);
+bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  );
 void ProcessModels( void );
 
 
@@ -573,7 +573,7 @@ u_int16_t	FindFreeModel();
 
 bool ReleaseModels( );
 bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B );
-bool ProcessModelExec( /*LPDIRECT3DEXECUTEBUFFER lpExBuf*/RENDEROBJECT *renderObject, int16_t NumVerts, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B );
+bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B );
 bool LightModel( u_int16_t Model, VECTOR * Pos );
 bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF );
 bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF );
@@ -603,7 +603,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 					    VECTOR * BottomRight );
 bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group );
 bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group );
-bool ProcessSphereZoneModelExec( /*LPDIRECT3DEXECUTEBUFFER lpExBuf*/RENDEROBJECT *renderObject, int16_t NumVerts, u_int8_t R, u_int8_t G, u_int8_t B );
+bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u_int8_t R, u_int8_t G, u_int8_t B );
 void SetupModelSpotFX( u_int16_t i );
 void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 							    u_int16_t Group, u_int8_t Weapon, u_int16_t ModelIndex, u_int16_t SpotFXIndex );

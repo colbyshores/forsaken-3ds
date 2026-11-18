@@ -1672,12 +1672,12 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 /*===================================================================
 	Procedure	:	Display All Faceme Polygons in specific group
 	Input		:	u_int16_t						Group
-				:	LPDIRECT3DEXECUTEBUFFER		Execute Buffer
+				:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List
 				:	u_int16_t	*					Current FmPoly
 	Output		:	True/False
 ===================================================================*/
-bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_FM_CLIPPED;
@@ -1783,13 +1783,6 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 
 		if( NumVerts )
 		{
-/* bjd - CHECK
-		   	OP_PROCESS_VERTICES( 1, lpPointer );
-		   	    PROCESSVERTICES_DATA( D3DPROCESSVERTICES_TRANSFORM, StartVert, NumVerts, lpPointer );
-		   	OP_STATE_RENDER( 1, lpPointer );
-		   	    STATE_DATA( D3DRENDERSTATE_TEXTUREHANDLE, Tloadheader.hTex[ Count ], lpPointer );
-		   	OP_TRIANGLE_LIST( NumTris, lpPointer );
-*/
 
 			if( Count == *TPage ) i = *NextFmPoly;
 			else i = FmPolyTPages[ Count ].FirstPoly;
@@ -2045,12 +2038,12 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 
 /*===================================================================
 	Procedure	:	Display All Faceme Polygons in specific group
-	Input		:	LPDIRECT3DEXECUTEBUFFER		Execute Buffer
+	Input		:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List
 				:	u_int16_t	*					Current FmPoly
 	Output		:	True/False
 ===================================================================*/
-bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
+bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
 	/* opt5b memo epoch: whole-scene fill (no single group). */
 	renderObject->memoEpochPass = SMEMO_PASS_FM_UNCLIPPED;
@@ -2156,13 +2149,6 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 
 		if( NumVerts )
 		{
-/* bjd - CHECK
-		   	OP_PROCESS_VERTICES( 1, lpPointer );
-		   	    PROCESSVERTICES_DATA( D3DPROCESSVERTICES_TRANSFORM, StartVert, NumVerts, lpPointer );
-		   	OP_STATE_RENDER( 1, lpPointer );
-		   	    STATE_DATA( D3DRENDERSTATE_TEXTUREHANDLE, Tloadheader.hTex[ Count ], lpPointer );
-		   	OP_TRIANGLE_LIST( NumTris, lpPointer );
-*/
 
 			if( Count == *TPage ) i = *NextFmPoly;
 			else i = FmPolyTPages[ Count ].FirstPoly;

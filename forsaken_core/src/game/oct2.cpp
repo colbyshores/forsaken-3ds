@@ -274,7 +274,7 @@ bool OnceOnlyChangeLevel = false;
 
 RENDEROBJECT RenderBufs[4];
 
-void InitRenderBufs(/*LPDIRECT3DDEVICE lpDev*/ ); // bjd
+void InitRenderBufs();
 void ReleaseRenderBufs( void );
 bool SetMatrixViewPort( void );
 void PrintInitViewStatus( BYTE Status );
@@ -325,9 +325,9 @@ MLOADHEADER  Mloadheader;
 MCLOADHEADER MCloadheader;          //  inner skin collision map...
 MCLOADHEADER MCloadheadert0;        //  0 thickness collision map...
 
-bool MainGame(); // bjd
+bool MainGame();
 
-bool DispTracker( void ); // bjd
+bool DispTracker( void );
 
 
 /*===================================================================
@@ -1547,7 +1547,7 @@ bool InitView( void )
 		case  STATUS_TitleLoadGameStartingSinglePlayer:
 		case  STATUS_StartingMultiplayer:
 		case  STATUS_GetPlayerNum:
-		if( InitTitle() != true ) // bjd
+		if( InitTitle() != true )
 		{
 			SeriousError = true;
 			return false;
@@ -1585,7 +1585,7 @@ bool InitView( void )
 		  return false;
 		}
 
-		if( !PreInitModel( TitleModelSet ) ) // bjd
+		if( !PreInitModel( TitleModelSet ) )
 		{
 		  SeriousError = true;
 		  return false;
@@ -1597,7 +1597,7 @@ bool InitView( void )
 		  SeriousError = true;
 		  return false;
 		}
-		if( !InitModel( TitleModelSet ) ) // bjd
+		if( !InitModel( TitleModelSet ) )
 		{
 		  SeriousError = true;
 		  return false;
@@ -1993,7 +1993,7 @@ bool RenderScene( void )
     if( IMustQuit )
       SpecialDestroyGame();
 
-    if( MainGame() != true ) // bjd
+    if( MainGame() != true )
       return false;
 
     if ( bSoundEnabled )
@@ -2731,7 +2731,7 @@ bool RenderScene( void )
     }
 
     EnableRelavantModels( &ModelNames[0] );
-		if( !PreInitModel( /*lpDev,*/ &ModelNames[0] ) ) // bjd
+		if( !PreInitModel( &ModelNames[0] ) )
 		{
 			SeriousError = true;
 			return false;
@@ -3045,7 +3045,7 @@ bool RenderScene( void )
     }
 #endif
 
-    if( MainGame() != true ) // bjd
+    if( MainGame() != true )
       return false;
 
     if ( bSoundEnabled && !CurrentMenu )
@@ -3655,7 +3655,7 @@ bool MainGameRender(void)
       }
       else // non stereo - normal rendering
 	  	{
-				if( RenderCurrentCameraWithMainGameMenu() != true ) // bjd
+				if( RenderCurrentCameraWithMainGameMenu() != true )
 				{
 					return false;
 				}
@@ -3711,7 +3711,7 @@ bool MainGameRender(void)
 */        
         CurrentCamera.UseLowestLOD = true;
 
-        if( RenderCurrentCamera() != true ) // bjd
+        if( RenderCurrentCamera() != true )
             return false;
       }
 
@@ -3787,7 +3787,7 @@ bool MainGameRender(void)
       CurrentCamera.Mat._31 *= -1.0F;
       CurrentCamera.UseLowestLOD = false;
 
-      if( RenderCurrentCamera() != true ) // bjd
+      if( RenderCurrentCamera() != true )
           return false;
     }
 
@@ -3798,7 +3798,7 @@ bool MainGameRender(void)
   if( TargetComputerOn )
   {
 		set_alpha_states();
-		DispTracker(); // bjd
+		DispTracker();
 		set_normal_states();
   }
 
@@ -3816,7 +3816,7 @@ bool MainGameRender(void)
   Input   :   nothing...
   Output    :   nothing
 ===================================================================*/
-bool MainGame( void ) // bjd
+bool MainGame( void )
 {
   int i;
 
@@ -4345,7 +4345,7 @@ bool ClearZBuffer()
  * sized scratch attached to each RenderBuf at InitRenderBufs time. */
 static TEXTUREGROUP s_renderbuf_groups[4][MAX_TEXTURE_GROUPS];
 
-void InitRenderBufs(/* LPDIRECT3DDEVICE lpDev */) // bjd
+void InitRenderBufs()
 {
 	int i;
 	DebugPrintf("InitRenderBufs\n");
@@ -4464,7 +4464,7 @@ bool RenderCurrentCamera( void )
 /*===================================================================
   Display Non Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
-    if( !DisplaySolidGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
+    if( !DisplaySolidGroupUnclippedPolys( &RenderBufs[ 2 ] ) )
         return false;
 
 
@@ -4485,7 +4485,7 @@ bool RenderCurrentCamera( void )
 	ExecuteLines( group, &RenderBufs[ 0 ] );
     ClipGroup( &CurrentCamera, group );
 
-      if( !ModelDisp( group, /*lpDev,*/ &ModelNames[0] ) ) // bjd
+      if( !ModelDisp( group, &ModelNames[0] ) )
       {
         return false;
       }
@@ -4494,7 +4494,7 @@ bool RenderCurrentCamera( void )
   Display Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
 
-  if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
+  if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], group ) )
   {
     return false;
   }
@@ -4540,7 +4540,7 @@ bool RenderCurrentCamera( void )
   Display Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
 
-  if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], group ) ) // bjd
+  if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], group ) )
     return false;
 
 
@@ -4548,7 +4548,7 @@ bool RenderCurrentCamera( void )
 Display Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
-  if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], group ) ) // bjd
+  if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], group ) )
       return false;
 
   ExecuteTransExe( group );
@@ -4562,13 +4562,13 @@ Display Group Clipped Faceme Transluecent Polys
   Display Non Group Clipped Faceme Transluecent Polys
 ===================================================================*/
 
-    if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) ) // bjd
+    if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) )
         return false;
 
 /*===================================================================
   Display Non Group Clipped Non Faceme Transluecent Polys
 ===================================================================*/
-    if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
+    if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) )
         return false;
   
   // display unclipped translucencies
@@ -4896,7 +4896,7 @@ void CalculateFramelag( void )
   Procedure : Disp Tracker
   Output    : bool        true/false
 ===================================================================*/
-bool DispTracker( void ) // bjd
+bool DispTracker( void )
 {
 	u_int16_t      i;
 	XYRECT     dummy;

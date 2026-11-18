@@ -4457,7 +4457,7 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 	// reset all the normal execute status flags...
 	set_normal_states();
 
-	if( !ModelDisp( 0, /*lpDev,*/ TitleModelSet ) ) // bjd
+	if( !ModelDisp( 0, TitleModelSet ) )
 	{
 		return false;
 	}
@@ -4466,7 +4466,7 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 	Display 0 solid Clipped Non Faceme Transluecent Polys
 */
 
-		if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], 0 ) ) // bjd
+		if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], 0 ) )
 				return false;
 
 	// set all the Translucent execute status flags...
@@ -4477,14 +4477,14 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 	Display 0 Clipped Non Faceme Transluecent Polys
 ===================================================================*/
 
-		if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], 0 ) ) // bjd
+		if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], 0 ) )
 				return false;
 
 /*===================================================================
 Display 0 Clipped Faceme Transluecent Polys
 ===================================================================*/
 		
-		if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], 0 ) ) // bjd
+		if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], 0 ) )
 				return false;
 
 		ExecuteTransExe( 0 );
@@ -4494,13 +4494,13 @@ Display 0 Clipped Faceme Transluecent Polys
 	Display Non 0 Clipped Faceme Transluecent Polys
 ===================================================================*/
 
-	if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) ) // bjd
+	if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) )
 			return false;
 
 /*===================================================================
 Display Non 0 Clipped Non Faceme Transluecent Polys
 ===================================================================*/
-	if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) ) // bjd
+	if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) )
 			return false;
 
 /*===================================================================

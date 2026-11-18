@@ -523,11 +523,10 @@ void OnceOnlyInitModel( void )
 
 /*===================================================================
 	Procedure	:	Pre-Init models
-	Input		:	LPDIRECT3DDEVICE	Direct 3D Device
-				:	MODELNAME	*		Current Model Name
+	Input		:	MODELNAME	*		Current Model Name
 	Output		:	bool				true/false
 ===================================================================*/
-bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
+bool PreInitModel( MODELNAME *NamePnt )
 {
 	int			i;
 	int8_t		TempFilename[ 256 ];
@@ -629,11 +628,10 @@ bool PreInitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME *NamePnt ) // bjd
 
 /*===================================================================
 	Procedure	:	Init models
-	Input		:	LPDIRECT3DDEVICE	Direct 3D Device
-				:	MODELNAME	*		Current Model Name
+	Input		:	MODELNAME	*		Current Model Name
 	Output		:	bool				true/false
 ===================================================================*/
-bool InitModel( /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt) // bjd
+bool InitModel( MODELNAME * NamePnt)
 {
 	int i;
 	int8_t		TempFilename[ 256 ];
@@ -993,7 +991,7 @@ void ModelVisCache_NewFrame( void )
 		ModelVisBucket_Build( InTitle ); } while(0)
 
 
-bool ModelDisp( u_int16_t group, /*LPDIRECT3DDEVICE lpDev,*/ MODELNAME * NamePnt  ) // bjd
+bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 {
 	RENDERMATRIX TempWorld;
 	u_int16_t	i;
@@ -2834,7 +2832,7 @@ bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale
 
 /*===================================================================
 	Procedure	:	Process Sphere Zone model
-	Input		:	LPDIRECT3DEXECUTEBUFFER	lpExBuf
+	Input		:	RENDEROBJECT *	renderObject
 				:	int16_t	NumVerts
 				:	u_int8_t	R
 				:	u_int8_t	G

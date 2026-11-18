@@ -286,27 +286,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			memmove(Mxloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 
 			//	Stuff to clip if bounding box is off screen
-/* bjd - CHECK
-			OP_SET_STATUS( D3DSETSTATUS_STATUS,  D3DSTATUS_CLIPINTERSECTIONFRONT |
-							   D3DSTATUS_CLIPINTERSECTIONTOP |
-							   D3DSTATUS_CLIPINTERSECTIONBOTTOM |
-							   D3DSTATUS_CLIPINTERSECTIONLEFT |
-							   D3DSTATUS_CLIPINTERSECTIONRIGHT, 0, 0, 0, 0, lpPointer);
-			OP_PROCESS_VERTICES(1, lpPointer);
-				PROCESSVERTICES_DATA(D3DPROCESSVERTICES_TRANSFORM, 0, 8, lpPointer);
-			OP_BRANCH_FORWARD( D3DSTATUS_CLIPINTERSECTIONFRONT |
-							   D3DSTATUS_CLIPINTERSECTIONTOP |
-							   D3DSTATUS_CLIPINTERSECTIONBOTTOM |
-							   D3DSTATUS_CLIPINTERSECTIONLEFT |
-							   D3DSTATUS_CLIPINTERSECTIONRIGHT
-							   , 0, true , 0, lpPointer);
-
-			if( Panel )
-			{
-				OP_STATE_RENDER( 1, lpPointer);
-			    STATE_DATA( D3DRENDERSTATE_CULLMODE, D3DCULL_NONE, lpPointer );
-			}
-*/
 
 			Buffer = (char *) lpLVERTEX2;
 
@@ -395,21 +374,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				Buffer = (char *) Uint16Pnt;
 
 				Mxloadheader->Group[group].texture_group_vert_off[execbuf][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
-/* bjd - CHECK
-				OP_STATE_LIGHT(1, lpPointer);
-
-				OP_PROCESS_VERTICES(1, lpPointer);
-					PROCESSVERTICES_DATA(D3DPROCESSVERTICES_TRANSFORM, group_vertex_start+8, group_vertex_num, lpPointer);
-				OP_STATE_RENDER(1, lpPointer);
-
-				if( Mxloadheader->num_texture_files == 0 ) STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, 0, lpPointer);
-				else STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, Tloadheader.hTex[Mxloadheader->TloadIndex[tpage]], lpPointer);
-
-			    if (QWORD_ALIGNED(lpPointer))
-					OP_NOP(lpPointer);
-
-				OP_TRIANGLE_LIST( (short) num_triangles, lpPointer);
-*/
 				MFacePnt = (MFACE *) Buffer;
 				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
 

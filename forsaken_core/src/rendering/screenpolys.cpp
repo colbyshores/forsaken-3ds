@@ -2030,7 +2030,7 @@ bool DisplayNonSolidScrPolys( RENDEROBJECT *renderObject )
 
 /*===================================================================
 	Procedure	:	Display All Solid Screen Polygons
-	Input		:	LPDIRECT3DEXECUTEBUFFER		Execute Buffer
+	Input		:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List
 				:	u_int16_t	*					Current ScrPoly
 	Output		:	True/False
@@ -2737,25 +2737,11 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 			{
 				renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
-/* bjd - CHECK
-			   	OP_PROCESS_VERTICES( 1, lpPointer );
-			        PROCESSVERTICES_DATA( D3DPROCESSVERTICES_COPY, StartVert, NumVerts, lpPointer );
-			   	OP_STATE_RENDER( 1, lpPointer );
-			   	    STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, 0, lpPointer);
-			   	OP_TRIANGLE_LIST( NumTris, lpPointer );
-*/
 			}
 			else
 			{
 				renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-/* bjd - CHECK
-			   	OP_PROCESS_VERTICES( 1, lpPointer );
-			        PROCESSVERTICES_DATA( D3DPROCESSVERTICES_COPY, StartVert, NumVerts, lpPointer );
-			   	OP_STATE_RENDER( 1, lpPointer );
-			   	    STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, Tloadheader.hTex[ Count ], lpPointer);
-			   	OP_TRIANGLE_LIST( NumTris, lpPointer );
-*/
 			}
 
 			if( Count == *TPage ) i = *NextScrPoly;

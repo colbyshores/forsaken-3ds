@@ -260,22 +260,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			Mxaloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mxaloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
-/* bjd - TODO
-			//	Stuff to clip if bounding box is off screen
-			OP_SET_STATUS( D3DSETSTATUS_STATUS,  D3DSTATUS_CLIPINTERSECTIONFRONT |
-							   D3DSTATUS_CLIPINTERSECTIONTOP |
-							   D3DSTATUS_CLIPINTERSECTIONBOTTOM |
-							   D3DSTATUS_CLIPINTERSECTIONLEFT |
-							   D3DSTATUS_CLIPINTERSECTIONRIGHT, 0, 0, 0, 0, lpPointer);
-			OP_PROCESS_VERTICES(1, lpPointer);
-				PROCESSVERTICES_DATA(D3DPROCESSVERTICES_TRANSFORM, 0, 8, lpPointer);
-			OP_BRANCH_FORWARD( D3DSTATUS_CLIPINTERSECTIONFRONT |
-							   D3DSTATUS_CLIPINTERSECTIONTOP |
-							   D3DSTATUS_CLIPINTERSECTIONBOTTOM |
-							   D3DSTATUS_CLIPINTERSECTIONLEFT |
-							   D3DSTATUS_CLIPINTERSECTIONRIGHT
-							   , 0, true , 0, lpPointer);
-*/
 			
 			Buffer = (char *) lpLVERTEX2;
 			

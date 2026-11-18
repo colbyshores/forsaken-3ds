@@ -31,11 +31,11 @@ TRANSEXE TransExe[MAXTRANSEXE];
 
 /*===================================================================
 	Add Translucent Execute Buffer...
-	Input	: LPD3DMATRIX  Matrix...Only needed if ya need to do a compunded view Matrix
-			  lpExBuf... Pointer to Execution Buffer
+	Input	: RENDERMATRIX *Matrix...Only needed if ya need to do a compunded view Matrix
+			  renderObject... the render object to draw later (copied)
 			  int UseIdentity....set to 0 for normal background...1 for Bikes etc..
 ===================================================================*/
-void AddTransExe( /*LPD3DMATRIX Matrix*/RENDERMATRIX *Matrix , /*LPDIRECT3DEXECUTEBUFFER lpExBuf*/RENDEROBJECT *renderObject , int UseIdentity, u_int16_t Model, u_int16_t group, int16_t NumVerts )
+void AddTransExe( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject , int UseIdentity, u_int16_t Model, u_int16_t group, int16_t NumVerts )
 {
 	if( NumOfTransExe < MAXTRANSEXE	)
 	{

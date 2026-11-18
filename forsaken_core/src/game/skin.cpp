@@ -1142,14 +1142,6 @@ bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t NumVerts, int1
    		
 	memmove(lpBufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
    
-/* bjd - CHECK   
-    OP_PROCESS_VERTICES( 1, lpPointer );
-        PROCESSVERTICES_DATA( D3DPROCESSVERTICES_TRANSFORM, 0, NumVerts, lpPointer );
-    OP_STATE_RENDER( 1, lpPointer );
-        STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, 0, lpPointer);
-    OP_TRIANGLE_LIST( NumTris, lpPointer );
-        TRIANGLE_LIST_DATA( Tris, NumTris, lpPointer );		// Copy Triangles to Execute Buffer
-*/		
    
 
 	if (!(FSUnlockVertexBuffer(&Portal_Execs[ Num_Portal_Execs ])))

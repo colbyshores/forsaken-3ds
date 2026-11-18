@@ -598,7 +598,7 @@ bool DisplayGroupClippedPolys(RENDEROBJECT *renderObject, u_int16_t Group )
 
 	while( 1 )
 	{
- 		if( !PolyDispGroupClipped( Group, /*ExecBuff*/renderObject, &TPage, &i ) )
+ 		if( !PolyDispGroupClipped( Group, renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -621,7 +621,7 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 
 	while( 1 )
 	{
- 		if( !PolyDispGroupUnclipped( /*ExecBuff*/renderObject, &TPage, &i ) )
+ 		if( !PolyDispGroupUnclipped( renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -638,13 +638,13 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 /*===================================================================
 	Procedure	:	Display All Faceme Polygons in specific group
 	Input		:	u_int16_t						Group
-				:	LPDIRECT3DEXECUTEBUFFER		Execute Buffer
+				:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List
 				:	u_int16_t	*					Current Poly
 	Output		:	True/False
 ===================================================================*/
 
-bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
+bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_POLYS_CLIPPED;
@@ -886,7 +886,7 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 
 /*===================================================================
 	Procedure	:	Display All Faceme Polygons in specific group
-	Input		:	LPDIRECT3DEXECUTEBUFFER		Execute Buffer
+	Input		:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List
 				:	u_int16_t	*					Current Poly
 	Output		:	True/False
@@ -1137,7 +1137,7 @@ bool DisplaySolidGroupClippedPolys( RENDEROBJECT *renderObject, u_int16_t Group 
 
 	while( 1 )
 	{
- 		if( !SolidPolyDispGroupClipped( Group, /*ExecBuff*/renderObject, &TPage, &i ) )
+ 		if( !SolidPolyDispGroupClipped( Group, renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -1161,7 +1161,7 @@ bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject )
 
 	while( 1 )
 	{
- 		if( !SolidPolyDispGroupUnclipped( /*ExecBuff*/renderObject, &TPage, &i ) )
+ 		if( !SolidPolyDispGroupUnclipped( renderObject, &TPage, &i ) )
 			return( true );
 
 		cull_none();
@@ -1179,12 +1179,12 @@ bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject )
 /*===================================================================
 	Procedure	:	Display All Faceme Polygons in specific group
 	Input		:	u_int16_t						Group
-				:	LPDIRECT3DEXECUTEBUFFER		Execute Buffer
+				:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List
 				:	u_int16_t	*					Current Poly
 	Output		:	True/False
 ===================================================================*/
-bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
+bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_SOLID_CLIPPED;
@@ -1427,7 +1427,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 
 /*===================================================================
 	Procedure	:	Display All Faceme Polygons in specific group
-	Input		:	LPDIRECT3DEXECUTEBUFFER		Execute Buffer
+	Input		:	RENDEROBJECT *			Render object
 				:	int16_t	*					Current TPage List
 				:	u_int16_t	*					Current Poly
 	Output		:	True/False
