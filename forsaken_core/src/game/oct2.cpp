@@ -4246,21 +4246,11 @@ bool ScoreDisplay()
 ===================================================================*/
 bool  InitScoreDisplay()
 {
-#ifdef SCROLLING_MESSAGES
-  int i;
-#endif
 
    //Create the offscreen surface, by loading our bitmap.
 
   InitFont();
 
-#ifdef SCROLLING_MESSAGES
-  // get random phrases...
-  for (i = 0; i < Num_StatsMessage_Parts; i++)
-  {
-    StatsMessages[i].current_variation = Random_Range(StatsMessages[i].num_variations);
-  }
-#endif
   // process scores...
   ScoreSort();
   ScoreDisplaySfx = true;
