@@ -15,6 +15,7 @@
 #include "game/camera.h"
 
 #include "util/util.h"
+#include "util/file_reader.h"
 
 constexpr int CAM_VERSION_NUMBER = 1;
 
@@ -46,10 +47,6 @@ bool Cameraload( char * Filename )
 {
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	int32_t		*	int32Pnt;
-	u_int32_t		*	u_int32Pnt;
-	int16_t		*	int16Pnt;
-	float		*	FloatPnt;
 	int			e;
 	long			File_Size;
 	long			Read_Size;
@@ -82,10 +79,9 @@ bool Cameraload( char * Filename )
 		Msg( "Camload Error reading file %s\n", Filename );
 		return false;
 	}
-	u_int32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *u_int32Pnt++;
-	VersionNumber = *u_int32Pnt++;
-	Buffer = (char *) u_int32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != CAM_VERSION_NUMBER  ) )
 	{
@@ -93,8 +89,7 @@ bool Cameraload( char * Filename )
 		return( false );
 	}
 
-	int32Pnt = (int32_t*) Buffer;
-	NumOfCams = *int32Pnt++;
+	NumOfCams = in.i32();
  	RemoteCameras = (REMOTECAMERA*) calloc( NumOfCams, sizeof(REMOTECAMERA) );
  	CamPnt = RemoteCameras;
 	if( !CamPnt )
@@ -102,22 +97,15 @@ bool Cameraload( char * Filename )
 		Msg( "Camload failed allocate Cam Pointer in %s \n", Filename );
 		return false;
 	}
-	Buffer = (char*) int32Pnt;
-	
+
 	for( e = 0 ; e < NumOfCams ; e++ )
 	{
 		CamPnt->enable = false;
 
-		int16Pnt = (int16_t*) Buffer;
-		CamPnt->Group = *int16Pnt++;
-		FloatPnt = (float*) int16Pnt;
-		memcpy_unaligned(&CamPnt->Pos, FloatPnt, 4*3);
-		FloatPnt+=3;
-		memcpy_unaligned(&CamPnt->Dir, FloatPnt, 4*3);
-		FloatPnt+=3;
-		memcpy_unaligned(&CamPnt->Up, FloatPnt, 4*3);
-		FloatPnt+=3;
-		Buffer = (char*) FloatPnt;
+		CamPnt->Group = in.i16();
+		CamPnt->Pos = in.vec();
+		CamPnt->Dir = in.vec();
+		CamPnt->Up = in.vec();
 		Tempv.x = CamPnt->Pos.x + CamPnt->Dir.x;
 		Tempv.y = CamPnt->Pos.y + CamPnt->Dir.y;
 		Tempv.z = CamPnt->Pos.z + CamPnt->Dir.z;
