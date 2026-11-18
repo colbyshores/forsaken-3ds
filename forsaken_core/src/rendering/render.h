@@ -354,6 +354,8 @@ bool FSLockPretransformedVertexBuffer(RENDEROBJECT *renderObject, TLVERTEX **ver
 bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *renderObject, int numVertices);
 
 bool FSCreateTexture(TEXTURE_HANDLE *texture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool * colourkey);
+/* Whether FSCreateTexture would find an image for fileName. */
+bool FSTextureExists(const char *fileName);
 bool update_texture_from_file(TEXTURE_HANDLE dstTexture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool * colourkey);
 void release_texture( TEXTURE_HANDLE texture );
 

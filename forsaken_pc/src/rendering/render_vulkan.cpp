@@ -1020,6 +1020,12 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 	return true;
 }
 
+/* The PC loads textures from the image file itself. */
+bool FSTextureExists(const char *fileName)
+{
+	return File_Exists(fileName);
+}
+
 bool FSCreateTexture(TEXTURE_HANDLE *texture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool *colourkey)
 {
 	return create_texture(texture, fileName, width, height, numMips, colourkey);

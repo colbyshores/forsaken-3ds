@@ -237,8 +237,13 @@ $(ROMFS_STAGING)/.edition: FORCE
 
 $(ROMFS_STAMP): $(ROMFS_STAGING)/.edition | romfs-freshness-check
 	@echo "Staging romfs data (this may take a while)..."
-	@mkdir -p $(ROMFS_STAGING)
-	@rsync -aL --delete --exclude='.stamp' --exclude='.edition' $(SRCDIR)/romfs/ $(ROMFS_STAGING)/
+	@mkdir -p $(ROMFS_STAGING) $(BUILD)
+	@# PNGs with an HD .t3x twin are never opened on 3DS (see
+	@# tools/texture/png_t3x_twins.py); they stay out of the romfs.
+	@python3 $(SRCDIR)/tools/texture/png_t3x_twins.py $(SRCDIR)/romfs > $(BUILD)/png_t3x_twins.txt
+	@rsync -aL --delete --delete-excluded --filter='protect /.stamp' --filter='protect /.edition' \
+		--exclude='/.stamp' --exclude='/.edition' --exclude-from=$(BUILD)/png_t3x_twins.txt \
+		$(SRCDIR)/romfs/ $(ROMFS_STAGING)/
 	@echo "Converting BMP textures to PNG (level-specific + global)..."
 	@# The 3DS texture loader (render_c3d.cpp::FSCreateTexture) substitutes
 	@# a .png extension at lookup time, so the engine looks for <name>.png
@@ -246,7 +251,8 @@ $(ROMFS_STAMP): $(ROMFS_STAGING)/.edition | romfs-freshness-check
 	@# atlases AND the global UI/weapon/sprite atlas so neither falls
 	@# through to "file not found" at runtime. Skipped: the per-level
 	@# .bmp at the level root (banner — written as 256x128 .png by
-	@# extract_remaster_levels.py's import_banners()).
+	@# extract_remaster_levels.py's import_banners()), and any texture
+	@# with an HD .t3x, which the loader uses instead of the PNG.
 	@cd $(ROMFS_STAGING) && \
 	  find . \( -path '*/levels/*/textures/*.bmp' \
 	         -o -path '*/levels/*/textures/*.BMP' \
@@ -257,7 +263,8 @@ $(ROMFS_STAMP): $(ROMFS_STAGING)/.edition | romfs-freshness-check
 	  while read bmp; do \
 	    d=$$(dirname "$$bmp"); b=$$(basename "$$bmp"); \
 	    png=$$(echo "$$b" | sed 's/\.[bB][mM][pP]$$/.png/'); \
-	    if [ ! -f "$$d/$$png" ]; then \
+	    key=$$(echo "$$d/$$png" | sed 's|^\./data/||; s/\.png$$//' | tr 'A-Z' 'a-z'); \
+	    if [ ! -f "$$d/$$png" ] && [ ! -f "hd_textures/$$key.t3x" ] && [ ! -f "hd_textures_lomem/$$key.t3x" ]; then \
 	      convert "$$bmp" -type TrueColor "PNG24:$$d/$$png" 2>/dev/null; \
 	    fi; \
 	  done

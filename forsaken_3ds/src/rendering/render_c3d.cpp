@@ -2224,20 +2224,12 @@ static void resolve_hd_textures_dirs(void)
 	}
 }
 
-static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
-	u_int16_t *width, u_int16_t *height, bool *colorkey)
+/* The part of a texture path after its "data\\" (or "data/") directory, or
+ * NULL when there is none. */
+static const char *hd_texture_key(const char *path)
 {
-	char hd_path[512];
-	char *p;
-	const char *data_start = NULL;
 	int i;
-	FILE *f;
-	texture_t *texdata;
-	Tex3DS_Texture t3x;
 
-	resolve_hd_textures_dirs();
-
-	/* Find "data\" in path */
 	for (i = 0; path[i]; i++)
 	{
 		if ((path[i] == 'd' || path[i] == 'D') &&
@@ -2245,15 +2237,18 @@ static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
 			(path[i+2] == 't' || path[i+2] == 'T') &&
 			(path[i+3] == 'a' || path[i+3] == 'A') &&
 			(path[i+4] == '\\' || path[i+4] == '/'))
-		{
-			data_start = &path[i+5];
-			break;
-		}
+			return &path[i+5];
 	}
-	if (!data_start)
-		return false;
+	return NULL;
+}
 
-	snprintf(hd_path, sizeof(hd_path), "romfs:/%s/%s", s_hd_textures_dir, data_start);
+/* romfs:/<dir>/<key with .t3x>, lowercased with forward slashes. */
+static void hd_texture_path(char *hd_path, size_t size, const char *dir,
+	const char *key)
+{
+	char *p;
+
+	snprintf(hd_path, size, "romfs:/%s/%s", dir, key);
 	for (p = hd_path; *p; p++)
 	{
 		if (*p == '\\') *p = '/';
@@ -2262,25 +2257,44 @@ static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
 	p = strrchr(hd_path, '.');
 	if (p) strcpy(p, ".t3x");
 	else strcat(hd_path, ".t3x");
+}
 
+/* Open the HD .t3x for a texture path: the preferred pack first, then the
+ * other one. NULL when neither pack has it. */
+static FILE *open_hd_texture(const char *path, char *hd_path, size_t size)
+{
+	const char *key;
+	FILE *f;
+
+	resolve_hd_textures_dirs();
+	key = hd_texture_key(path);
+	if (!key)
+		return NULL;
+
+	hd_texture_path(hd_path, size, s_hd_textures_dir, key);
 	f = fopen(hd_path, "rb");
 	if (!f)
 	{
 		/* Preferred dir isn't shipped — try the fallback. Defensive;
 		 * production CIAs always ship both packs, but this lets a
 		 * future single-pack variant work without code changes. */
-		snprintf(hd_path, sizeof(hd_path), "romfs:/%s/%s", s_hd_textures_fallback, data_start);
-		for (p = hd_path; *p; p++)
-		{
-			if (*p == '\\') *p = '/';
-			if (*p >= 'A' && *p <= 'Z') *p += 32;
-		}
-		p = strrchr(hd_path, '.');
-		if (p) strcpy(p, ".t3x");
-		else strcat(hd_path, ".t3x");
+		hd_texture_path(hd_path, size, s_hd_textures_fallback, key);
 		f = fopen(hd_path, "rb");
-		if (!f) return false;
 	}
+	return f;
+}
+
+static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
+	u_int16_t *width, u_int16_t *height, bool *colorkey)
+{
+	char hd_path[512];
+	FILE *f;
+	texture_t *texdata;
+	Tex3DS_Texture t3x;
+
+	f = open_hd_texture(path, hd_path, sizeof(hd_path));
+	if (!f)
+		return false;
 
 	/* Allocate texture_t wrapper */
 	if (*t == NULL)
@@ -2471,6 +2485,26 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path,
 		image.path, image.w, image.h, image.colorkey ? "true" : "false");
 
 	destroy_image(&image);
+	return true;
+}
+
+/* A texture exists if create_texture could load it: an HD .t3x in either
+ * pack, or the PNG it falls back to. The romfs ships no PNG for textures
+ * that have a .t3x (Makefile.3ds), so tload's path choice must accept
+ * either. */
+bool FSTextureExists(const char *fileName)
+{
+	char path[256];
+	char hd_path[512];
+	FILE *f;
+
+	Change_Ext(fileName, path, ".PNG");
+	if (File_Exists(path))
+		return true;
+	f = open_hd_texture(fileName, hd_path, sizeof(hd_path));
+	if (!f)
+		return false;
+	fclose(f);
 	return true;
 }
 

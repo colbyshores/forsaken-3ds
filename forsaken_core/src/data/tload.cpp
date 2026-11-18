@@ -287,7 +287,9 @@ bool use_original_textures = false;	// UseOriginalTextures in the config
    own textures folder wins, then data\textures\original when
    UseOriginalTextures is set, then the shared data\textures, then
    default.png. The name's extension becomes .PNG; pkups.bmp / pkupsa.bmp
-   map to titana.png, as in the original game. */
+   map to titana.png, as in the original game. A candidate counts as present
+   when the backend can load it (FSTextureExists): on 3DS that includes an
+   HD .t3x whose PNG the romfs does not ship. */
 void GetLevelTexturePath( char * destination, char * file, char * level )
 {
 	char path[256];
@@ -305,7 +307,7 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 
 	// check for level folder override
 	snprintf(path,sizeof(path),"data\\levels\\%s\\textures\\%s",level,new_file);
-	if( File_Exists( path ) )
+	if( FSTextureExists( path ) )
 	{
 		strncpy(destination,path,256);
 		return;
@@ -313,7 +315,7 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 
 	// use old textures if requested and available
 	snprintf(path,sizeof(path),"data\\textures\\original\\%s",new_file);
-	if( use_original_textures && File_Exists( path ) )
+	if( use_original_textures && FSTextureExists( path ) )
 	{
 		strncpy(destination,path,256);
 		return;
@@ -321,7 +323,7 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 
 	// default to data/textures
 	snprintf(path,sizeof(path),"data\\textures\\%s",new_file);
-	if( File_Exists( path ) )
+	if( FSTextureExists( path ) )
 	{
 		strncpy(destination,path,256);
 		return;
