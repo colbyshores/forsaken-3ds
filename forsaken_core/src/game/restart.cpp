@@ -597,7 +597,7 @@ void ProcessRestartPoints( void )
 {
 	RESTART		*	Object;
 	RESTART		*	NextObject;
-	float			StartTime, EndTime;
+	float			EndTime;
 
 	if( !ENABLE_RESTART ) return;
 
@@ -610,7 +610,6 @@ void ProcessRestartPoints( void )
 		switch( RestartType )
 		{
 			case RESTARTTYPE_MODEL:
-				StartTime = RestartSeqs[ Object->Sequence ].StartTime;
 				EndTime = RestartSeqs[ Object->Sequence ].EndTime;
 
 				switch( Object->Sequence )
