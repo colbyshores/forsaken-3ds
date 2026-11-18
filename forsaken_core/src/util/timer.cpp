@@ -1,10 +1,11 @@
 
+/* timer.cpp -- millisecond stopwatch; see timer.h. */
 #include "game/main.h"
 #include "util/platform.h"
 #include "util/timer.h"
 #include "util/util.h"
 
-// run timer and compute seconds without modifying stats
+// seconds since the last timer_run, leaving the timer unchanged
 float timer_peek( px_timer_t* stats )
 {
 	float seconds;
@@ -14,7 +15,7 @@ float timer_peek( px_timer_t* stats )
 	return seconds;
 }
 
-// clear the timer
+// restart from scratch: the next timer_run only records the tick
 void timer_clear( px_timer_t* stats )
 {
 	stats->last    = 0;
@@ -23,46 +24,36 @@ void timer_clear( px_timer_t* stats )
 	stats->seconds = 0.0F;
 }
 
-// run timer and compute calculations
+// seconds since the previous call; restarts the interval
 float timer_run( px_timer_t* stats )
 {
 
-  // current counter value
   u_int32_t time_now;
 
-  // if there is no count_before then we know this is the first run
+  // first run since timer_clear: just record the tick
   if(!stats->last)
   {
 
-    // set the the count_before
     stats->last = SDL_GetTicks();
 
-    // your program should know it's a first run
     return 0.0F;
 
   }
   
-  // get the count_after
   time_now = SDL_GetTicks();
 
-  // calculate ms since last run
   stats->millis = time_now - stats->last;
 
-  // calculate the duration in seconds
   stats->seconds = ((float)stats->millis) / 1000.0F; // 1000 ms == 1 s
 
-  // reset the last value
   stats->last = time_now;
 
-  // calculate the best
   if (stats->best == 0.0F || stats->seconds < stats->best)
     stats->best = stats->seconds;
 
-  // callculate the worst
   if (stats->worst  == 0.0F || stats->seconds > stats->worst)
     stats->worst = stats->seconds;
 
-  // nice feature
   return stats->seconds;
 
 }
