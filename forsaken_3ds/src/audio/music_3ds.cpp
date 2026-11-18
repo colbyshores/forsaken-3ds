@@ -1,5 +1,5 @@
 /*
- * music_3ds.c - CD audio music playback for 3DS via ndsp.
+ * music_3ds.cpp - CD audio music playback for 3DS via ndsp.
  *
  * Streams Nintendo DSP-ADPCM (.dsp) tracks from romfs:/music/.
  *
@@ -16,7 +16,12 @@
  *     compute the END predictor history, so the next buffer starts where
  *     this one ended. Without this, buffers share one context and drift
  *     glitches accumulate after a few minutes ("broken record" symptom).
- *   - SFX overload was breaking music: see sound_3ds.c MAX_SFX_VOICES cap.
+ *   - SFX overload was breaking music: see sound_3ds.cpp MAX_SFX_VOICES cap.
+ *
+ * C-with-classes (AGENTS.md S9): the stream is one class owning the
+ * file, the DSP buffers, the predictor state, the worker thread and its
+ * lock; the public music_* API in audio/music.h is a flat wrapper over
+ * the single instance.
  */
 
 #ifdef __3DS__
@@ -34,46 +39,21 @@
 #include "audio/dsp_adpcm.h"
 #include "audio/music_table.h"
 
+namespace {
+
 /* ---- configuration ---- */
 
-#define MUSIC_SAMPLE_RATE   32000
-#define MUSIC_CHANNEL       23
-#define STREAM_BUF_FRAMES   1170                          /* ~0.5 s @ 32 kHz */
-#define STREAM_BUF_BYTES    (STREAM_BUF_FRAMES * 8)        /* 9 360 B per buffer */
-#define NUM_WAVEBUFS        4                              /* deep queue (~2 s headroom) */
-
-/* ---- state ---- */
-
-static void       *s_stream_buf = NULL;          /* linearAlloc'd scratch (DSP DMA) */
-static ndspWaveBuf s_wavebufs[NUM_WAVEBUFS];
-
-static FILE       *s_file = NULL;
-static char        s_file_path[128];        /* saved so we can reopen on loop */
-static u_int32_t   s_data_offset = 0;
-static u_int32_t   s_data_size = 0;
-static u_int32_t   s_data_read = 0;
-
-static int         s_current_track = -1;
-static bool        s_initialized = false;
-static bool        s_playing = false;
-static float       s_volume = 1.0f;
-
-static u_int16_t     s_adpcm_coefs[16];
-static ndspAdpcmData s_adpcm_per_buf[NUM_WAVEBUFS];
-static ndspAdpcmData s_adpcm_running;
-static ndspAdpcmData s_adpcm_initial;
-
-static Thread        s_thread = NULL;
-static LightLock     s_lock;
-static volatile bool s_thread_exit = false;
-
-
+constexpr int MUSIC_SAMPLE_RATE = 32000;
+constexpr int MUSIC_CHANNEL     = 23;
+constexpr int STREAM_BUF_FRAMES = 1170;                     /* ~0.5 s @ 32 kHz */
+constexpr int STREAM_BUF_BYTES  = STREAM_BUF_FRAMES * 8;    /* 9 360 B per buffer */
+constexpr int NUM_WAVEBUFS      = 4;                        /* deep queue (~2 s headroom) */
 
 /* ---- DSP-ADPCM CPU decode (shared dsp_adpcm module) ----
  * Used in state-only mode to track the end-of-buffer predictor
  * context the hardware decoder will have reached. */
-static void adpcm_advance(const u_int8_t *frames, u_int32_t num_frames,
-                          const u_int16_t *coefs, ndspAdpcmData *ctx)
+void adpcm_advance(const u_int8_t *frames, u_int32_t num_frames,
+                   const u_int16_t *coefs, ndspAdpcmData *ctx)
 {
 	dsp_state_t st;
 	st.hist1 = (int16_t)ctx->history0;
@@ -83,17 +63,74 @@ static void adpcm_advance(const u_int8_t *frames, u_int32_t num_frames,
 	ctx->history1 = (int16_t)st.hist2;
 }
 
-/* ---- buffer fill (streamed from SD via fread) ---- */
-
-static bool fill_buffer(int buf_index)
+/* Set the music channel's mix to the stream volume on both outputs. */
+void set_channel_volume(float volume)
 {
-	ndspWaveBuf *wb = &s_wavebufs[buf_index];
-	void *dst = (u_int8_t *)s_stream_buf + (buf_index * STREAM_BUF_BYTES);
+	float mix[12] = {0};
+	mix[0] = volume; mix[1] = volume;
+	ndspChnSetMix(MUSIC_CHANNEL, mix);
+}
+
+/* Reset the music channel and configure it for this stream's ADPCM. */
+void configure_adpcm_channel(u_int16_t *coefs, float volume)
+{
+	ndspChnReset(MUSIC_CHANNEL);
+	ndspChnSetInterp(MUSIC_CHANNEL, NDSP_INTERP_LINEAR);
+	ndspChnSetRate(MUSIC_CHANNEL, (float)MUSIC_SAMPLE_RATE);
+	ndspChnSetFormat(MUSIC_CHANNEL, NDSP_FORMAT_MONO_ADPCM);
+	ndspChnSetAdpcmCoefs(MUSIC_CHANNEL, coefs);
+	set_channel_volume(volume);
+}
+
+class MusicStream {
+public:
+	bool init();
+	void shutdown();
+	void play(int track);
+	void stop();
+
+private:
+	bool fill_buffer(int buf_index);
+	bool open_track(int track);
+	void close_track();
+	void thread_loop();
+	static void thread_entry(void *self);
+
+	void        *stream_buf = NULL;            /* linearAlloc'd scratch (DSP DMA) */
+	ndspWaveBuf  wavebufs[NUM_WAVEBUFS] = {};
+
+	FILE        *file = NULL;
+	char         file_path[128] = {};          /* saved so we can reopen on loop */
+	u_int32_t    data_offset = 0;
+	u_int32_t    data_size = 0;
+	u_int32_t    data_read = 0;
+
+	int          current_track = -1;
+	bool         initialized = false;
+	bool         playing = false;
+	float        volume = 1.0f;
+
+	u_int16_t     adpcm_coefs[16] = {};
+	ndspAdpcmData adpcm_per_buf[NUM_WAVEBUFS] = {};
+	ndspAdpcmData adpcm_running = {};
+	ndspAdpcmData adpcm_initial = {};
+
+	Thread        thread = NULL;
+	LightLock     lock = 0;
+	volatile bool thread_exit = false;
+};
+
+/* ---- buffer fill (streamed from romfs via fread) ---- */
+
+bool MusicStream::fill_buffer(int buf_index)
+{
+	ndspWaveBuf *wb = &wavebufs[buf_index];
+	void *dst = (u_int8_t *)stream_buf + (buf_index * STREAM_BUF_BYTES);
 	u_int32_t remaining, to_read, nread, num_frames;
 
-	if (!s_file || !s_playing) return false;
+	if (!file || !playing) return false;
 
-	remaining = s_data_size - s_data_read;
+	remaining = data_size - data_read;
 	if (remaining == 0) {
 		/* End of track — close + reopen the file, then seek back to
 		 * the data start. fseek+clearerr alone is unreliable on
@@ -101,23 +138,23 @@ static bool fill_buffer(int buf_index)
 		 * freads keep returning 0). Predictor history reset to the
 		 * file-header initial state since we're decoding from
 		 * sample 1 again. */
-		fclose(s_file);
-		s_file = fopen(s_file_path, "rb");
-		if (!s_file) return false;
-		fseek(s_file, s_data_offset, SEEK_SET);
-		s_data_read = 0;
-		remaining = s_data_size;
-		s_adpcm_running = s_adpcm_initial;
+		fclose(file);
+		file = fopen(file_path, "rb");
+		if (!file) return false;
+		fseek(file, data_offset, SEEK_SET);
+		data_read = 0;
+		remaining = data_size;
+		adpcm_running = adpcm_initial;
 	}
 
-	to_read = remaining < STREAM_BUF_BYTES ? remaining : STREAM_BUF_BYTES;
+	to_read = remaining < (u_int32_t)STREAM_BUF_BYTES ? remaining : (u_int32_t)STREAM_BUF_BYTES;
 	to_read = (to_read / 8) * 8;
 	if (to_read == 0) to_read = 8;
 
-	nread = fread(dst, 1, to_read, s_file);
+	nread = fread(dst, 1, to_read, file);
 	if (nread == 0) return false;
 
-	s_data_read += nread;
+	data_read += nread;
 	num_frames = nread / 8;
 
 	DSP_FlushDataCache(dst, nread);
@@ -128,9 +165,9 @@ static bool fill_buffer(int buf_index)
 	wb->looping = false;
 	wb->status = NDSP_WBUF_FREE;
 
-	s_adpcm_per_buf[buf_index] = s_adpcm_running;
-	wb->adpcm_data = &s_adpcm_per_buf[buf_index];
-	adpcm_advance((u_int8_t*)dst, num_frames, s_adpcm_coefs, &s_adpcm_running);
+	adpcm_per_buf[buf_index] = adpcm_running;
+	wb->adpcm_data = &adpcm_per_buf[buf_index];
+	adpcm_advance((u_int8_t*)dst, num_frames, adpcm_coefs, &adpcm_running);
 
 	ndspChnWaveBufAdd(MUSIC_CHANNEL, wb);
 	return true;
@@ -138,82 +175,81 @@ static bool fill_buffer(int buf_index)
 
 /* ---- track open: parse DSP header ---- */
 
-static bool open_track(int track)
+bool MusicStream::open_track(int track)
 {
 	FILE *f;
 	u_int8_t hdr[96];
 	int i;
 
-	snprintf(s_file_path, sizeof(s_file_path),
+	snprintf(file_path, sizeof(file_path),
 		"romfs:/music/track%02d.dsp", track);
-	f = fopen(s_file_path, "rb");
-	if (!f) { DebugPrintf("music: cannot open %s\n", s_file_path); return false; }
+	f = fopen(file_path, "rb");
+	if (!f) { DebugPrintf("music: cannot open %s\n", file_path); return false; }
 
 	if (fread(hdr, 1, 96, f) != 96) { fclose(f); return false; }
-
-	/* Header field at offset 4 is num_adpcm_nibbles, but encoders disagree
-	 * on whether it counts data nibbles only or includes per-frame header
-	 * nibbles. We trust the file size (below) instead — much simpler. */
 
 	{
 		dsp_header_t dh;
 		dsp_parse_header(hdr, &dh);
 		for (i = 0; i < 16; i++)
-			s_adpcm_coefs[i] = dh.coefs[i];
-		s_adpcm_initial.index    = dh.initial_index;
-		s_adpcm_initial.history0 = dh.initial_hist1;
-		s_adpcm_initial.history1 = dh.initial_hist2;
+			adpcm_coefs[i] = dh.coefs[i];
+		adpcm_initial.index    = dh.initial_index;
+		adpcm_initial.history0 = dh.initial_hist1;
+		adpcm_initial.history1 = dh.initial_hist2;
 	}
-	s_adpcm_running = s_adpcm_initial;
+	adpcm_running = adpcm_initial;
 
-	/* Trust the file size, not the header's nibble count. Different DSP
-	 * encoders disagree about whether `nibble_count` covers data nibbles
-	 * only (14/frame) or includes the per-frame header nibbles (16/frame).
-	 * gc-dspadpcm-encode writes the latter, so num_nibbles/14 over-counts
-	 * frames and produces a data_size larger than the file → fread returns
-	 * 0 at the real EOF, our loop logic never fires (remaining > 0), and
-	 * the track never restarts.
-	 *
-	 * Just round file size down to a frame boundary and call it a day. */
-	s_data_offset = 96;
+	/* Trust the file size, not the header's nibble count (offset 4).
+	 * Different DSP encoders disagree about whether it covers data
+	 * nibbles only (14/frame) or includes the per-frame header nibbles
+	 * (16/frame). gc-dspadpcm-encode writes the latter, so
+	 * num_nibbles/14 over-counts frames and produces a data_size larger
+	 * than the file → fread returns 0 at the real EOF, the loop logic
+	 * never fires (remaining > 0), and the track never restarts.
+	 * Round the file size down to a frame boundary instead. */
+	data_offset = 96;
 	fseek(f, 0, SEEK_END);
 	{
 		long file_size = ftell(f);
 		u_int32_t audio_bytes = (file_size > 96) ? (file_size - 96) : 0;
-		s_data_size = (audio_bytes / 8) * 8;   /* frame-align */
+		data_size = (audio_bytes / 8) * 8;   /* frame-align */
 	}
-	fseek(f, s_data_offset, SEEK_SET);
-	s_data_read = 0;
-	s_file = f;
+	fseek(f, data_offset, SEEK_SET);
+	data_read = 0;
+	file = f;
 
 	DebugPrintf("music: opened track %02d (%u bytes ADPCM)\n",
-		track, s_data_size);
+		track, data_size);
 	return true;
 }
 
-static void close_track(void)
+void MusicStream::close_track()
 {
-	if (s_file) { fclose(s_file); s_file = NULL; }
-	s_current_track = -1;
+	if (file) { fclose(file); file = NULL; }
+	current_track = -1;
 }
 
 /* ---- background streaming thread ---- */
 
-static void music_thread_fn(void *arg)
+void MusicStream::thread_entry(void *self)
 {
-	(void)arg;
 	/* R1 (AGENTS.md §3): FPSCR is per-thread state and this worker touches
 	 * floats in the channel-restart path (ndspChnSetRate / ndspChnSetMix).
 	 * Establish Flush-to-Zero (FZ) + Default-NaN (DN) at entry so denormal
 	 * results cannot stall the VFP11 on this thread, independent of what
 	 * libctru initialized. See main_3ds.h for the full rationale. */
 	vfp_thread_fz_dn();
-	while (!s_thread_exit) {
-		LightLock_Lock(&s_lock);
-		if (s_initialized && s_playing && s_file) {
+	static_cast<MusicStream *>(self)->thread_loop();
+}
+
+void MusicStream::thread_loop()
+{
+	while (!thread_exit) {
+		LightLock_Lock(&lock);
+		if (initialized && playing && file) {
 			int i;
 			for (i = 0; i < NUM_WAVEBUFS; i++)
-				if (s_wavebufs[i].status == NDSP_WBUF_DONE)
+				if (wavebufs[i].status == NDSP_WBUF_DONE)
 					fill_buffer(i);
 
 			/* Track-loop kickstart: at the end of a track all 4 buffers
@@ -225,142 +261,129 @@ static void music_thread_fn(void *arg)
 			if (!ndspChnIsPlaying(MUSIC_CHANNEL)) {
 				int j;
 				ndspChnWaveBufClear(MUSIC_CHANNEL);
-				ndspChnReset(MUSIC_CHANNEL);
-				ndspChnSetInterp(MUSIC_CHANNEL, NDSP_INTERP_LINEAR);
-				ndspChnSetRate(MUSIC_CHANNEL, (float)MUSIC_SAMPLE_RATE);
-				ndspChnSetFormat(MUSIC_CHANNEL, NDSP_FORMAT_MONO_ADPCM);
-				ndspChnSetAdpcmCoefs(MUSIC_CHANNEL, s_adpcm_coefs);
-				{
-					float mix[12] = {0};
-					mix[0] = s_volume; mix[1] = s_volume;
-					ndspChnSetMix(MUSIC_CHANNEL, mix);
-				}
+				configure_adpcm_channel(adpcm_coefs, volume);
 				for (j = 0; j < NUM_WAVEBUFS; j++)
-					memset(&s_wavebufs[j], 0, sizeof(ndspWaveBuf));
+					memset(&wavebufs[j], 0, sizeof(ndspWaveBuf));
 				for (j = 0; j < NUM_WAVEBUFS; j++)
 					fill_buffer(j);
 			}
 		}
-		LightLock_Unlock(&s_lock);
+		LightLock_Unlock(&lock);
 		svcSleepThread(25 * 1000 * 1000ULL);
 	}
 }
 
-/* ---- public API ---- */
+/* ---- lifecycle and playback ---- */
 
-bool music_init(void)
+bool MusicStream::init()
 {
-	if (s_initialized) return true;
+	if (initialized) return true;
 
-	s_stream_buf = linearAlloc(STREAM_BUF_BYTES * NUM_WAVEBUFS);
-	if (!s_stream_buf) {
+	stream_buf = linearAlloc(STREAM_BUF_BYTES * NUM_WAVEBUFS);
+	if (!stream_buf) {
 		DebugPrintf("music: linearAlloc failed for stream buffer\n");
 		return false;
 	}
-	memset(s_stream_buf, 0, STREAM_BUF_BYTES * NUM_WAVEBUFS);
+	memset(stream_buf, 0, STREAM_BUF_BYTES * NUM_WAVEBUFS);
 
 	ndspChnReset(MUSIC_CHANNEL);
 	ndspChnSetInterp(MUSIC_CHANNEL, NDSP_INTERP_LINEAR);
 	ndspChnSetRate(MUSIC_CHANNEL, (float)MUSIC_SAMPLE_RATE);
 	ndspChnSetFormat(MUSIC_CHANNEL, NDSP_FORMAT_MONO_PCM16);
+	set_channel_volume(volume);
 
-	{
-		float mix[12] = {0};
-		mix[0] = s_volume; mix[1] = s_volume;
-		ndspChnSetMix(MUSIC_CHANNEL, mix);
-	}
+	initialized = true;
 
-	s_initialized = true;
-
-	LightLock_Init(&s_lock);
-	s_thread_exit = false;
-	s_thread = threadCreate(music_thread_fn, NULL,
-	                        16 * 1024, 0x28, -2, false);
-	if (!s_thread)
+	LightLock_Init(&lock);
+	thread_exit = false;
+	thread = threadCreate(thread_entry, this,
+	                      16 * 1024, 0x28, -2, false);
+	if (!thread)
 		DebugPrintf("music: WARNING threadCreate failed\n");
 
 	DebugPrintf("music: initialized (4x %u-byte buffers, thread=%p)\n",
-		STREAM_BUF_BYTES, (void*)s_thread);
+		(unsigned)STREAM_BUF_BYTES, (void*)thread);
 	return true;
 }
 
-void music_shutdown(void)
+void MusicStream::shutdown()
 {
-	if (!s_initialized) return;
+	if (!initialized) return;
 
-	if (s_thread) {
-		s_thread_exit = true;
-		threadJoin(s_thread, U64_MAX);
-		threadFree(s_thread);
-		s_thread = NULL;
+	if (thread) {
+		thread_exit = true;
+		threadJoin(thread, U64_MAX);
+		threadFree(thread);
+		thread = NULL;
 	}
 
-	music_stop();
+	stop();
 
-	if (s_stream_buf) { linearFree(s_stream_buf); s_stream_buf = NULL; }
+	if (stream_buf) { linearFree(stream_buf); stream_buf = NULL; }
 
-	s_initialized = false;
+	initialized = false;
 }
 
-void music_play(int track)
+void MusicStream::play(int track)
 {
 	int i;
 
-	if (!s_initialized) return;
+	if (!initialized) return;
 	if (track < MUSIC_FIRST_TRACK || track > MUSIC_LAST_TRACK) return;
 
-	LightLock_Lock(&s_lock);
-	if (s_current_track == track && s_playing) {
-		LightLock_Unlock(&s_lock);
+	LightLock_Lock(&lock);
+	if (current_track == track && playing) {
+		LightLock_Unlock(&lock);
 		return;
 	}
-	LightLock_Unlock(&s_lock);
+	LightLock_Unlock(&lock);
 
-	music_stop();
+	stop();
 
-	LightLock_Lock(&s_lock);
+	LightLock_Lock(&lock);
 	if (!open_track(track)) {
-		LightLock_Unlock(&s_lock);
+		LightLock_Unlock(&lock);
 		return;
 	}
 
-	ndspChnReset(MUSIC_CHANNEL);
-	ndspChnSetInterp(MUSIC_CHANNEL, NDSP_INTERP_LINEAR);
-	ndspChnSetRate(MUSIC_CHANNEL, (float)MUSIC_SAMPLE_RATE);
-	ndspChnSetFormat(MUSIC_CHANNEL, NDSP_FORMAT_MONO_ADPCM);
-	ndspChnSetAdpcmCoefs(MUSIC_CHANNEL, s_adpcm_coefs);
+	configure_adpcm_channel(adpcm_coefs, volume);
 
-	{
-		float mix[12] = {0};
-		mix[0] = s_volume; mix[1] = s_volume;
-		ndspChnSetMix(MUSIC_CHANNEL, mix);
-	}
-
-	s_current_track = track;
-	s_playing = true;
+	current_track = track;
+	playing = true;
 	for (i = 0; i < NUM_WAVEBUFS; i++)
 		fill_buffer(i);
-	LightLock_Unlock(&s_lock);
+	LightLock_Unlock(&lock);
 }
 
-void music_stop(void)
+void MusicStream::stop()
 {
-	if (!s_initialized) return;
+	if (!initialized) return;
 
-	LightLock_Lock(&s_lock);
-	s_playing = false;
+	LightLock_Lock(&lock);
+	playing = false;
 	ndspChnWaveBufClear(MUSIC_CHANNEL);
 	close_track();
-	LightLock_Unlock(&s_lock);
+	LightLock_Unlock(&lock);
 }
+
+MusicStream g_music;
+
+} // namespace
+
+/* ---- public API ---- */
+
+bool music_init(void) { return g_music.init(); }
+void music_shutdown(void) { g_music.shutdown(); }
+void music_play(int track) { g_music.play(track); }
+void music_stop(void) { g_music.stop(); }
 
 void music_play_for_level(int level_num)
 {
 	if (level_num < 0) return;
-	music_play(music_track_for_level(level_num));
+	g_music.play(music_track_for_level(level_num));
 }
 
-void music_play_title(void) { music_play(MUSIC_TITLE_TRACK); }
+void music_play_title(void) { g_music.play(MUSIC_TITLE_TRACK); }
 
 void music_update(void) { /* no-op — background thread handles refills */ }
 
