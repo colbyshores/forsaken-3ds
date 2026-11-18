@@ -7,9 +7,10 @@
  * in the matching *_Header global; oct2.cpp loads and frees each set with the
  * title or level. A frame is a BIT_INFO run of OFF_INFOs; each OFF_INFO places
  * one BOX_INFO (texture page, UV rect, pixel size) at an offset. Box_Info,
- * Off_Info and Bit_Info point into the loaded file buffer, so the structs must
- * match the file layout. OFF_INFO.box keeps the BOX_*FLIP flags in its top
- * bits; mask with 0x0fff for the box index.
+ * Bit_Info and Off_Info point into one block (Tables) that holds the three
+ * tables copied out of the file; the structs match the file's record layout.
+ * OFF_INFO.box keeps the BOX_*FLIP flags in its top bits; mask with 0x0fff for
+ * the box index.
  */
 
 #include "game/main.h"
@@ -41,6 +42,7 @@ typedef struct BOX_INFO {
 	int16_t	ysize;
 
 } BOX_INFO;
+static_assert( sizeof( BOX_INFO ) == 24, "BOX_INFO is a file record" );
 
 typedef struct OFF_INFO {
 
@@ -49,6 +51,7 @@ typedef struct OFF_INFO {
 	u_int16_t	box;
 
 } OFF_INFO;
+static_assert( sizeof( OFF_INFO ) == 6, "OFF_INFO is a file record" );
 
 typedef struct BIT_INFO {
 
@@ -56,11 +59,12 @@ typedef struct BIT_INFO {
 	int16_t	numbits;
 
 } BIT_INFO;
+static_assert( sizeof( BIT_INFO ) == 4, "BIT_INFO is a file record" );
 
 typedef struct FRAME_INFO {
 
 	int16_t			Num_Frames;
-	int8_t		*	File_Addr;
+	int8_t		*	Tables;			// owns Box_Info, Bit_Info and Off_Info
 	BOX_INFO	*	Box_Info;
 	OFF_INFO	*	Off_Info;
 	BIT_INFO	*	Bit_Info;

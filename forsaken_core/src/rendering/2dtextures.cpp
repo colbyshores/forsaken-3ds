@@ -10,6 +10,7 @@
 #include "game/object.h"
 #include "net/networking.h"
 #include "util/util.h"
+#include "util/file_reader.h"
 
 #include	<string.h>
 #include	"game/main.h"
@@ -181,11 +182,11 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 	u_int32_t			File_Size;
 	u_int32_t			Read_Size;
 	int8_t		*	Char_Ptr;
-	int16_t		*	Short_Ptr;
 	BOX_INFO	*	Box_Info;
 	int16_t			Num_Boxes;
 	BIT_INFO	*	Bit_Info;
 	int16_t			Num_Frames;
+	int16_t			Num_Offsets;
 	OFF_INFO	*	Off_Info;
 	FRAME_INFO	*	Frm_Info = NULL;
 	int16_t			Num_TPages;
@@ -237,7 +238,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 		Bit_Info->numbits = 1;
 
 		Frm_Info->Num_Frames = 1;
-		Frm_Info->File_Addr = ( int8_t *)Placeholder_Off_Buffer;
+		Frm_Info->Tables = ( int8_t *)Placeholder_Off_Buffer;
 		Frm_Info->Box_Info = Box_Info;
 		Frm_Info->Off_Info = Off_Info;
 		Frm_Info->Bit_Info = Bit_Info;
@@ -254,11 +255,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 			return( NULL );
 		}
 																			
-		/* +8 bytes headroom: we may need to memmove the post-filenames
-		   section forward by up to 3 bytes to make BOX_INFO* 4-byte
-		   aligned (BOX_INFO has float fields, and ARM's vldr requires
-		   4-byte alignment). See alignment shim below. */
-		Off_Buffer = (int8_t*)malloc( File_Size + 8 );
+		Off_Buffer = (int8_t*)malloc( File_Size );
 		if( Off_Buffer == NULL )
 		{
 			free( Frm_Info );
@@ -273,11 +270,10 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 			return( NULL );
 		}
 																			
-		Short_Ptr = (int16_t *) Off_Buffer;									
-																			
-		Num_TPages = *Short_Ptr++;											// Number of possible new texture pages
+		FileReader in( Off_Buffer );
+		Num_TPages = in.i16();												// Number of possible new texture pages
 
-		Char_Ptr = (int8_t *) Short_Ptr;
+		Char_Ptr = (int8_t *) in.pos();
 
 		for( Count = 0; Count < Num_TPages; Count++ )
 		{
@@ -304,32 +300,36 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 		Frm_Info->vid_tpage_index = Name_Index[ 0 ];
 		Frm_Info->sys_tpage_index = -1;
 
-		Short_Ptr = (int16_t *) Char_Ptr;
-		Num_Boxes = *Short_Ptr++;											// Number of Boxes
+		/* The three tables follow the variable-length name list, so they
+		   start at any alignment in the file. Copy them into one aligned
+		   block (boxes, then frames, then offsets) and drop the file. The
+		   on-disk BOX_INFO keeps the 2 padding bytes after tpage, so its
+		   in-memory layout is the file layout. */
+		in = FileReader( Char_Ptr );
+		Num_Boxes = in.i16();												// Number of Boxes
+		FileReader counts = in;
+		counts.skip( Num_Boxes * sizeof( BOX_INFO ) );
+		Num_Frames = counts.i16();											// Number of Frames
+		counts.skip( Num_Frames * sizeof( BIT_INFO ) );
+		Num_Offsets = counts.i16();											// Number of Offsets
 
-		/* BOX_INFO contains floats; ARM's vldr requires 4-byte alignment.
-		   Short_Ptr here has skidded off 4-byte alignment because of the
-		   variable-length filename section above. Shift the remaining
-		   bytes forward just enough to land Short_Ptr on a 4-byte boundary
-		   (Off_Buffer was malloc'd with +8 headroom for this). */
-		if( ((uintptr_t)Short_Ptr) & 3 )
+		int8_t * Tables = (int8_t*)malloc( Num_Boxes * sizeof( BOX_INFO ) + Num_Frames * sizeof( BIT_INFO ) + Num_Offsets * sizeof( OFF_INFO ) );
+		if( Tables == NULL )
 		{
-			size_t pad = (4 - (((uintptr_t)Short_Ptr) & 3)) & 3;
-			size_t used = (size_t)( (int8_t*)Short_Ptr - Off_Buffer );
-			size_t remaining = (size_t)File_Size - used;
-			memmove( (int8_t*)Short_Ptr + pad, Short_Ptr, remaining );
-			Short_Ptr = (int16_t *)( (int8_t*)Short_Ptr + pad );
+			free( Frm_Info );
+			free( Off_Buffer );
+			return( NULL );
 		}
+		Box_Info = (BOX_INFO *) Tables;
+		Bit_Info = (BIT_INFO *) ( Box_Info + Num_Boxes );
+		Off_Info = (OFF_INFO *) ( Bit_Info + Num_Frames );
 
-		Box_Info = (BOX_INFO *) Short_Ptr;
-
-		Short_Ptr = (int16_t *) ( Box_Info + Num_Boxes );
-		Num_Frames = *Short_Ptr++;											// Number of Frames
-		Bit_Info = (BIT_INFO *) Short_Ptr;
-
-		Short_Ptr = (int16_t *) ( Bit_Info + Num_Frames );
-		Short_Ptr++;											// Number of Offsets
-		Off_Info = (OFF_INFO *) Short_Ptr;
+		in.bytes( Box_Info, Num_Boxes * sizeof( BOX_INFO ) );
+		in.skip( sizeof( int16_t ) );
+		in.bytes( Bit_Info, Num_Frames * sizeof( BIT_INFO ) );
+		in.skip( sizeof( int16_t ) );
+		in.bytes( Off_Info, Num_Offsets * sizeof( OFF_INFO ) );
+		free( Off_Buffer );
 
 		for( Count = 0; Count < Num_Boxes; Count++ )
 		{
@@ -338,7 +338,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 		}
 
 		Frm_Info->Num_Frames = Num_Frames;
-		Frm_Info->File_Addr = Off_Buffer;
+		Frm_Info->Tables = Tables;
 		Frm_Info->Box_Info = Box_Info;
 		Frm_Info->Off_Info = Off_Info;
 		Frm_Info->Bit_Info = Bit_Info;
@@ -427,7 +427,7 @@ void Free_All_Off_Files( OFF_FILES * FileInfo )
 	{
 		if( *FileInfo->InfoPtrAddr != NULL )
 		{
-			free( (*FileInfo->InfoPtrAddr)->File_Addr );
+			free( (*FileInfo->InfoPtrAddr)->Tables );
 			free( *FileInfo->InfoPtrAddr );
 			*FileInfo->InfoPtrAddr = NULL;
 		}
