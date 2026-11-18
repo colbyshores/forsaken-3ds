@@ -7058,7 +7058,7 @@ void InitBikerName( char *name )
 	// set the biker config
 	snprintf( biker_config, sizeof( biker_config ), "pilots\\%s.txt", name );
 
-	// set the player name in registry
+	// remember the pilot in the config (PlayerName)
 	config_set_str("PlayerName",&biker_name[0]);
 
 	// tell everyone else in multiplayer
@@ -7073,7 +7073,7 @@ void InitBikerName( char *name )
 /********************************************\
 |
 |  Sets up the default selected pilot
-|    Looks in registry for last used biker.
+|    Uses the config's PlayerName (the last pilot used).
 |    Then looks for first cfg file found.
 |
 \********************************************/
@@ -7095,13 +7095,13 @@ void GetDefaultPilot(void)
 
 	config_get_strncpy( &pilot_name[0], size, "PlayerName", "" );
 
-	// get the PlayerName from registry
+	// the last pilot used, from the config
 	if ( strlen(pilot_name) )
 
 		// found
 		found = true;
 
-	// if failed to get registry setting
+	// no PlayerName in the config
 	else
 	{
 		char * name;

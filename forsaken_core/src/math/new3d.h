@@ -148,7 +148,7 @@ static inline float fast_ceilf(float x)
 	Structures
 ===================================================================*/
 
-// bjd - taken from d3dtypes.h
+// colour packing, as in Direct3D's d3dtypes.h
 #define RGBA_MAKE(r, g, b, a)   ((COLOR) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 #define	RGB_MAKE(r, g, b)    ((COLOR) (((r) << 16) | ((g) << 8) | (b)))
 

@@ -2899,7 +2899,7 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 		execbuf = MXAloadheader->Group[group].num_execbufs;
 		while( execbuf--)
 		{
-			/*	lock the execute buffer	*/
+			/*	lock the vertex buffer	*/
 
 			if (!(FSLockVertexBuffer(&MXAloadheader->Group[group].renderObject[execbuf], &lpPointer)))
 			{
@@ -2917,7 +2917,7 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 				lpLVERTEX++;		
 				lpLVERTEX2++;		
 			}
-			/*	unlock the execute buffer	*/
+			/*	unlock the vertex buffer	*/
 			if (!(FSUnlockVertexBuffer(&MXAloadheader->Group[group].renderObject[execbuf])))
 			{
 				return false;
@@ -5586,7 +5586,7 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 		{
 			if( (Mxloadheader->Group[group].exec_type[execbuf]&HASENVIROMENTMAP) != 0 )
 			{
-				/*	lock the execute buffer	*/
+				/*	lock the vertex buffer	*/
 
 				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], &lpLVERTEX)))
 				{
@@ -5606,7 +5606,7 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 					lpLVERTEX->tv = v;//+(Pos->y*0.001F);
 					lpLVERTEX++;
 				}
-				/*	unlock the execute buffer	*/
+				/*	unlock the vertex buffer	*/
 				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
 				{
 					return false;

@@ -271,7 +271,7 @@ FixUV_Anim( POLYANIM *PolyAnim, LPLVERTEX Vert, LPLVERTEX Orig_Vert )
 bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 {
 	TRIANGLE		FacePnt; // was a pointer
-	u_int16_t			exec_type;			// the type of execute buffer
+	u_int16_t			exec_type;			// the execbuf's type (bit 0: has transparencies)
 	u_int16_t			num_vertices;		// overall number of verts
 	u_int16_t			num_triangle_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
@@ -341,17 +341,17 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		{
 			Mloadheader->Group[group].num_animating_polys[execbuf] = 0;
 			
-			in.skip( sizeof( int16_t ) );	// D3D execute-buffer size (unused)
+			in.skip( sizeof( int16_t ) );	// Direct3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
 			exec_type = in.u16();
 			/*	get the number of verts in execution buffer	*/
 			num_vertices = in.u16();
 	
-			/*	record how what type of exec buffer	*/
+			/*	record the execbuf's type	*/
 			Mloadheader->Group[group].exec_type[execbuf] = exec_type;
 
-			/*	record how many verts there are in the exec buffer	*/
+			/*	record how many verts the execbuf has	*/
 			Mloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
 
 			if (!FSCreateVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], num_vertices))
@@ -371,7 +371,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 			lpBufStart = lpLVERTEX;
 
-			/*	copy the vertex data into the execute buffer	*/
+			/*	copy the vertices into the vertex buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
 				OLDLVERTEX old;
@@ -398,7 +398,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
-			/* bjd - allows us to retrieve copies of the original vertices in the new format! */
+			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
@@ -472,7 +472,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				
 				GroupTris[ group ] += num_triangles;
 	
-				/*	copy the faces data into the execute buffer	*/
+				/*	copy the triangles into the index and normal buffers	*/
 				for( e=0; e<num_triangles; e++)
 				{
 					MFACE face;
@@ -983,8 +983,6 @@ bool ExecuteMloadHeader( MLOADHEADER * Mloadheader  )
 	Output		:		FLASE/true
 ===================================================================*/
 
-// bjd - this function seems to draw static geometry?
-
 bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  )
 {
 	u_int16_t i;
@@ -1040,7 +1038,7 @@ void ReleaseVisible( VISTREE *v )
 
 /*
  * ReleaseMloadheader
- * Release Execute buffers
+ * Release the render objects and everything the loader allocated
  */
 void
 ReleaseMloadheader( MLOADHEADER * Mloadheader )

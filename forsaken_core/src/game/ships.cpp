@@ -1522,7 +1522,7 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 		{
 			if( (Mxloadheader->Group[group].exec_type[execbuf]&HASENVIROMENTMAP) != 0 )
 			{
-				/*	lock the execute buffer	*/
+				/*	lock the vertex buffer	*/
 
 				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], &lpLVERTEX)))
 				{
@@ -1542,7 +1542,7 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 					lpLVERTEX++;
 				}
 
-				/*	unlock the execute buffer	*/
+				/*	unlock the vertex buffer	*/
 				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
 				{
 					return false;

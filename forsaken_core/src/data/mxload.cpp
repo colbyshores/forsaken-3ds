@@ -92,7 +92,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 	TRIANGLE		FacePnt; // was a pointer
 	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
-	u_int16_t			exec_type = 0;			// the type of execute buffer
+	u_int16_t			exec_type = 0;			// the execbuf's type (bit 0: has transparencies)
 	u_int16_t			num_vertices = 0;		// overall number of verts
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
@@ -182,7 +182,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		{
 			num_texture_groups = 0;
 
-			in.skip( sizeof( u_int16_t ) );	// D3D execute-buffer size (unused)
+			in.skip( sizeof( u_int16_t ) );	// Direct3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
 			exec_type = in.u16();
@@ -190,10 +190,10 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			/*	get the number of verts in execution buffer	*/
 			num_vertices = in.u16();
 
-			/*	record how what type of exec buffer	*/
+			/*	record the execbuf's type	*/
 			Mxloadheader->Group[group].exec_type[execbuf] = exec_type;
 
-			/*	record how many verts there are in the exec buffer	*/
+			/*	record how many verts the execbuf has	*/
 			Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
 
 			/*	create a vertex buffer	*/
@@ -215,7 +215,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			lpBufStart = lpLVERTEX;
 
-			/*	copy the vertex data into the execute buffer	*/
+			/*	copy the vertices into the vertex buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
 				OLDLVERTEX old;
@@ -241,7 +241,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
-			/* bjd - allows us to retrieve copies of the original vertices in the new format! */
+			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mxloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mxloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 
@@ -324,7 +324,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
 
 
-				/*	copy the faces data into the execute buffer	*/
+				/*	copy the triangles into the index and normal buffers	*/
 				for( e=0; e<num_triangles; e++)
 				{
 					MFACE face;
@@ -377,7 +377,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			DebugPrintf("put %d indices into IB\n", tempInt);
 
-			// bjd - probably should be part of the render object.
+			// 3D panel models: put the cull state back to the default
 			if( Panel )
 			{
 				reset_cull();
@@ -829,7 +829,7 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 
 /*
  * ReleaseMxloadheader
- * Release Execute buffers
+ * Release the render objects and everything the loader allocated
  */
 void
 ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )

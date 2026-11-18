@@ -86,7 +86,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 	TRIANGLE		FacePnt; // was a pointer
 	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
-	u_int16_t			exec_type;			// the type of execute buffer
+	u_int16_t			exec_type;			// the execbuf's type (bit 0: has transparencies)
 	u_int16_t			num_vertices;		// overall number of verts
 	u_int16_t			num_texture_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
@@ -152,17 +152,17 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 		for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
 		{
-			in.skip( sizeof( u_int16_t ) );	// D3D execute-buffer size (unused)
+			in.skip( sizeof( u_int16_t ) );	// Direct3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
 			exec_type = in.u16();
 			/*	get the number of verts in execution buffer	*/
 			num_vertices = in.u16();
 
-			/*	record how what type of exec buffer	*/
+			/*	record the execbuf's type	*/
 			Mxaloadheader->Group[group].exec_type[execbuf] = exec_type;
 
-			/*	record how many verts there are in the exec buffer	*/
+			/*	record how many verts the execbuf has	*/
 			Mxaloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
 
 			/*	create a vertex buffer	*/
@@ -182,7 +182,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			}
 
 
-			/*	copy the vertex data into the execute buffer	*/
+			/*	copy the vertices into the vertex buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
 				OLDLVERTEX old;
@@ -199,7 +199,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
-			/* bjd - allows us to retrieve copies of the original vertices in the new format! */
+			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mxaloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mxaloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
@@ -277,10 +277,10 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	
 				Mxaloadheader->Group[group].texture_group_vert_off[execbuf][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
 
-				/* bjd - CHECK - might need to be start of buffer */
+				/* the index buffer holds every triangle in order, so StoreTriangles copies it from the start */
 				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
 
-				/*	copy the faces data into the execute buffer	*/
+				/*	copy the triangles into the index and normal buffers	*/
 				for( e=0; e<num_triangles; e++)
 				{
 					MFACE face;
@@ -596,7 +596,7 @@ bool ExecuteMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t in_group  )
 
 /*
  * ReleaseMxaloadheader
- * Release Execute buffers
+ * Release the render objects and everything the loader allocated
  */
 
 void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )

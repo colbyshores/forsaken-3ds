@@ -413,7 +413,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 		}
 	}
 
-	/*	copy the faces data into the execute buffer	*/
+	/*	copy the triangles into the index buffer	*/
 
 	for( x = 0 ; x < WO->XVerts-1 ; x++ )
 	{
@@ -443,7 +443,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 		return false ;
 	}
 
-	/*	set the data for the execute buffer	*/
+	/*	set up the render object	*/
 	WO->renderObject.numTextureGroups = 1;
 	WO->renderObject.textureGroups[0].numTriangles = ntris;
 	WO->renderObject.textureGroups[0].numVerts = WO->num_of_verts;
@@ -557,7 +557,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 		VertPnt += 2;
 	}
 
-	/*	lock the execute buffer	*/
+	/*	lock the vertex buffer	*/
 
 	if (!(FSLockVertexBuffer(/*WO->lpVertexBuffer*/&WO->renderObject, &lpLVERTEX)))
 	{
@@ -595,7 +595,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 			VertPnt++;
 		}
 	}
-	/*	unlock the execute buffer	*/
+	/*	unlock the vertex buffer	*/
 	if (!(FSUnlockVertexBuffer(/*WO->lpVertexBuffer*/&WO->renderObject)))
 	{
 		return;

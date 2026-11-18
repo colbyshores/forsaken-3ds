@@ -59,8 +59,8 @@ typedef struct {
     int                     CurrMode;				/* number of current display mode (only when fullscreen) */
     render_display_mode_t * Mode;					/* desc avail modes */
     render_display_mode_t   ThisMode;				/* description of this mode, identical to Mode[CurrMode] */
-    render_display_mode_t   WindowsDisplay;			/* current Windows disply mode */
-    render_display_mode_t   default_mode;			/* current Windows disply mode */
+    render_display_mode_t   WindowsDisplay;			/* desktop / screen size, set by the platform layer */
+    render_display_mode_t   default_mode;			/* mode from the config or command line (ScreenWidth / ScreenHeight) */
     bool                    fullscreen;				/* in fullscreen exclusive mode? */
     CLIENTSIZE              window_size;			/* dimensions of client win */
     bool                    bPaused;				/* the app is paused */
@@ -399,7 +399,7 @@ typedef struct OLDLVERTEX {
 } OLDLVERTEX;
 static_assert( sizeof( OLDLVERTEX ) == 32, "OLDLVERTEX is a file record" );
 
-/* bjd - remove when done. taken from SDK */
+/* Clip-outcode bits (the Direct3D values); visi.cpp uses them to clip portals. */
 constexpr auto CLIP_LEFT = 0x00000001L;
 constexpr auto CLIP_RIGHT = 0x00000002L;
 constexpr auto CLIP_TOP = 0x00000004L;

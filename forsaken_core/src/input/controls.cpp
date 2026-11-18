@@ -557,9 +557,8 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
   mouse_dy = mouse_states[ new_input ].yrel * conf->mouse_y_sensitivity * 4.0F;
 
 
-// TODO
-// win32 appear to return greator values even in some resolution
-// we should also configure a fine control setting for the mouse to turn on/off the fabsf() trick
+// Squared mouse response (dx * |dx|). TODO: make it a pilot setting; the
+// size of relative mouse motion varies by platform and resolution.
 	mouse_dx = mouse_dx * (float) fabsf( mouse_dx ) * 0.01f; // tweaked for linux
 	mouse_dy = mouse_dy * (float) fabsf( mouse_dy ) * -0.01f;
 
