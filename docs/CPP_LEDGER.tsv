@@ -113,4 +113,3 @@ render_disabled	forsaken_pc/src/rendering/render_disabled.cpp	cpp	46d152e	todo	-
 render_vulkan	forsaken_pc/src/rendering/render_vulkan.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
 texture_devil	forsaken_pc/src/rendering/texture_devil.cpp	cpp	46d152e	todo	-	n/a (Windows-only, not built)	was C (platform/backend TU) until the extern "C" removal
 texture_sdl	forsaken_pc/src/rendering/texture_sdl.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
-lua_miniupnp	forsaken_pc/src/scripting/lua_miniupnp.cpp	cpp	4ad0e84	todo	-	n/a (not in 3DS build)	

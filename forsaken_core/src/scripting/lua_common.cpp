@@ -126,17 +126,11 @@ static void assign_loader( char * name, lua_CFunction loader )
 	lua_pop(L1, 2);
 }
 
-#ifdef MINIUPNP
-int luaopen_miniupnp(lua_State *L);
-#endif
 
 static void assign_loaders( void )
 {
 	/* socket/mime load via the system Lua package paths (luasocket
 	 * 3.x); the old static luaopen_* preload registration is gone. */
-#ifdef MINIUPNP
-	assign_loader( "miniupnp", luaopen_miniupnp );
-#endif
 }
 
 static int lua_create(void)
