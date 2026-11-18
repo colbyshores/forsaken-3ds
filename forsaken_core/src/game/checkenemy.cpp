@@ -1,15 +1,24 @@
-/*===================================================================
-	checkenemy.cpp — CheckHitEnemy in its own translation unit.
-
-	Moved verbatim from enemies.cpp (same code, new home) so the host
-	test (tests/test_checkhitenemy.cpp) can link the REAL function against
-	stubbed data-layer deps. Game behavior unchanged by the move; the
-	only functional delta is the SoundInfo group pre-filter (see below),
-	which mirrors CheckHitShip's gate in primary.cpp.
-
-	Picked up automatically: both Makefiles compile every .cpp in the
-	source trees (no per-file list to update).
-===================================================================*/
+/* checkenemy.cpp -- CheckHitEnemy: weapon ray against enemy spheres
+ *
+ * CheckHitEnemy (declared in enemies.h) is the per-frame hit test the primary
+ * and secondary bullet updates run against every enabled enemy that uses
+ * sphere collision; enemies with component collision are not tested here.
+ * It returns the closest enemy whose sphere the ray reaches within DirLength
+ * and closer than the incoming *Dist, fills Int_Point / Int_Point2 with the
+ * entry and exit points, and lowers *Dist to the hit distance. A ray that
+ * starts inside a sphere hits at distance 0.
+ *
+ * Enemies whose group has a nonzero SoundInfo entry against the bullet's
+ * group are skipped before any vector math, the same gate CheckHitShip uses
+ * in primary.cpp, as are the shooting enemy itself and the Avatar boss
+ * while it is inactive. COLTYPE_Sphere widens the enemy's sphere by the
+ * weapon radius, and Trojax / Transpulse by the weapon radius scaled by how
+ * side-on the ray is, so a ray that misses the enemy's own sphere can still
+ * graze it.
+ *
+ * It lives in its own file so tests/test_checkhitenemy.cpp can link the real
+ * function against stubbed data.
+ */
 #include <stdio.h>
 #include <math.h>
 

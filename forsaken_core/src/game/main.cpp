@@ -1,3 +1,5 @@
+/* main.cpp -- program entry, command line and main loop; see main.h. */
+
 #include "game/main.h"
 #ifdef __3DS__
 #include "platform_3ds/main_3ds.h"
@@ -65,8 +67,8 @@ static bool parse_chdir( char *cli )
     while(option != NULL )
 	{
 		// WARNING:	chdir can only be the LAST option !
-		// For running the exe outside the root folder
-		// -chdir c:\\Program Files\\ProjectX
+		// For running the binary from outside the game folder:
+		// -chdir "/path/to/forsaken"
 		if (!strcasecmp(option,"chdir"))
 		{
 			// get option enclosed in quotes
@@ -173,12 +175,11 @@ static bool ParseCommandLine(char* lpCmdLine)
 			break;
 		}
 
-		// sdl + opengl setting
+		// sets render_info.force_accel (no renderer reads it)
 		else if (!strcasecmp(option,"ForceAccel")){
 			render_info.force_accel = true;
 		}
 
-		// off only works in full screen...
 		// turn on vertical syncing
 		else if (!strcasecmp(option,"VSync")){
 			render_info.vsync = true;
@@ -196,7 +197,7 @@ static bool ParseCommandLine(char* lpCmdLine)
             Debug = true;
 		}
 		
-		// start in window mode
+		// start in fullscreen mode
 		else if (!strcasecmp(option,"Fullscreen"))
 		{
 			render_info.fullscreen = true;
@@ -257,7 +258,7 @@ static bool ParseCommandLine(char* lpCmdLine)
 			strcpy( (char*)TCPAddress.text, address );
 		}
 
-		// supposedly to set wire mode for mxv's...
+		// sets render_info.wireframe (no renderer reads it)
 		else if (!strcasecmp(option, "wireframe")) 
 		{
             render_info.wireframe = true;
@@ -302,7 +303,7 @@ static bool ParseCommandLine(char* lpCmdLine)
 				render_info.aspect_ratio = (float) w / (float) h;
 			}
 
-			// modifies texture dimentions.. don't now what uv stands for..
+			// texel inset mload applies to level UVs (default UV_FUDGE)
 			else if ( sscanf( option, "UVFix:%f", &UV_Fix ) ){}
 
 			// set the horizontal frame of view
@@ -349,7 +350,7 @@ void CleanUpAndPostQuit(void)
 	// destroy the sound
 	DestroySound( DESTROYSOUND_All );
 
-	// destroy direct input
+	// close the joysticks / game pads
 	joysticks_cleanup();
   
 	// release the scene
@@ -480,8 +481,6 @@ static bool AppInit( char * lpCmdLine )
 	// because joysticks_init will wipe the joystick settings
 	GetDefaultPilot();
 
-// this is where it starts to take so long cause it scans directory for dynamic sound files...
-
 	// start the title scene
 	MyGameStatus = STATUS_Title;
 
@@ -519,7 +518,7 @@ static bool RenderLoop()
     if ( !render_info.ok_to_render || render_info.minimized || render_info.bPaused || QuitRequested )
 		return true;
 
-    // Call the sample's RenderScene to render this frame
+    // run one game frame (game logic + draw) for the current status
     if (!RenderScene())
 	{
         Msg("RenderScene failed.\n");
@@ -532,7 +531,7 @@ static bool RenderLoop()
 		CleanUpAndPostQuit();
 	}
 
-    // Blt or flip the back buffer to the front buffer
+    // present the frame
 	if( !QuitRequested )
 	{
 		{
@@ -632,7 +631,7 @@ int main( int argc, char* argv[] )
         }
 
 #ifdef __3DS__
-		// refill music stream buffers
+		// no-op on both targets: a 3DS worker thread refills the music stream
 		music_update();
 #endif
 

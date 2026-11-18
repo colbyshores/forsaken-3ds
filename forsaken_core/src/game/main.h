@@ -1,5 +1,27 @@
 #pragma once
 
+/* main.h -- program entry, game-status codes and engine-wide basics
+ *
+ * main.cpp owns main(). AppInit runs platform init, -chdir, the check for
+ * the Configs / Data / Pilots / Scripts folders, Lua, the config file and
+ * command-line overrides, video, input, then InitScene / InitView for the
+ * title; main then loops handle_events + RenderLoop until QuitRequested is
+ * set. On 3DS the loop is also gated on aptMainLoop.
+ * CleanUpAndPostQuit tears everything down once; it is safe to call more
+ * than once, and code that only wants to quit sets QuitRequested and lets
+ * the loop run the teardown after the current frame.
+ *
+ * This header is included by nearly every module. Besides the STATUS_*
+ * codes (MyGameStatus and the per-player status sent over the network) it
+ * carries the shared libc includes, the u_int*_t / DWORD / BYTE / WORD
+ * aliases, MAGIC_NUMBER (the "PRJX" tag at the start of the engine's level
+ * and model data files) and GLOBAL_SCALE (the factor the code's hard-coded
+ * sizes, speeds and distances are multiplied by).
+ *
+ * MAX and MIN expand without outer parentheses; use them only as a whole
+ * expression or wrap the call.
+ */
+
 
 /*===================================================================
 	Game Status Defines...
@@ -38,7 +60,7 @@ constexpr int STATUS_InGameLoadGameStartingSinglePlayer = 39;
 constexpr int STATUS_WaitingToStartSinglePlayer = 48; // waiting to start single player game...
 constexpr int STATUS_WaitingToStartMultiPlayerHost = 49; // waiting to start multi player game for host...
 constexpr int STATUS_WaitingToStartMultiPlayerClient = 50; // waiting to start multi player game for client...
-constexpr int STATUS_WaitingToStartTeamGame = 51; // waiting to start multi player game for client...
+constexpr int STATUS_WaitingToStartTeamGame = 51; // waiting to start a team game...
 constexpr int STATUS_QuittingFromTitles = 52; // quitting game from title screen
 constexpr int STATUS_WaitingToStartDemo = 53; // waiting to start demo
 constexpr int STATUS_WaitingToStartEndGameSequence = 54; // waiting to start end of game demo playback sequence

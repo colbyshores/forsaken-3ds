@@ -1,26 +1,21 @@
 #pragma once
 
-/*===================================================================
-	constants.h -- game-wide size limits
-
-	The fixed capacities that size arrays in more than one module.
-	They live here, at the bottom of the include graph, so a header
-	can declare an array sized by another module's limit without
-	including that module's header -- which is how the old layout
-	ended up with headers that only compiled in one include order.
-
-	Plain #defines, no includes: safe from C and C++, and every
-	module that used to define one of these still includes this
-	header, so nothing that used them lost visibility.
-
-	These are capacities baked into level data, savegames and the
-	network protocol. Changing one is a format change, not a tweak.
-===================================================================*/
+/* constants.h -- game-wide size limits
+ *
+ * The fixed capacities that size arrays in more than one module. They sit at
+ * the bottom of the include graph (no includes of their own), so a header can
+ * size an array by another module's limit without including that module's
+ * header.
+ *
+ * Most of these are baked into level data, savegames or the network protocol
+ * (MAXGROUPS bounds group indices in level files, MAX_PLAYERS sizes network
+ * packets and scoreboards). Changing one is a format change, not a tweak.
+ */
 
 /* Players and teams (network protocol + multiplayer scoreboards). */
 constexpr int MAX_PLAYERS = 16; /* was 24, 12 in earlier builds */
 constexpr int MAX_TEAMS = 4;
-constexpr int MAXMULTIPLES = 8; /* multiple-fire mount points per ship */
+constexpr int MAXMULTIPLES = 8; /* orbital pods (Orb pickups) per ship */
 
 /* World. */
 constexpr int MAXGROUPS = 128; /* visibility groups per level */
