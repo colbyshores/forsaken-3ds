@@ -28,6 +28,7 @@
 #include "util/util.h"
 #include "game/oct2.h"
 #include "game/skin.h"
+#include "util/file_reader.h"
 
 /*===================================================================
 		Defines
@@ -54,14 +55,11 @@ bool TeleportsLoad( char * Filename )
 	long			Read_Size;
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	u_int16_t		*	Uint16Pnt;
 	TELEPORT * TPpnt;
-	float * floatpnt;
 	int i,j,e;
 	TRIGGER_ZONE * ZonePnt;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
-	u_int32_t		*	u_int32Pnt;
 
 
 	NumOfTeleports = 0;
@@ -93,10 +91,9 @@ bool TeleportsLoad( char * Filename )
 	}
 
 
-	u_int32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *u_int32Pnt++;
-	VersionNumber = *u_int32Pnt++;
-	Buffer = (char *) u_int32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != TELEPORTS_VERSION_NUMBER  ) )
 	{
@@ -104,11 +101,7 @@ bool TeleportsLoad( char * Filename )
 		return( false );
 	}
 
-	
-	
-	Uint16Pnt = (u_int16_t *) Buffer;
-	NumOfTeleports = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;
+	NumOfTeleports = in.u16();
 
 	Teleports	= (TELEPORT *) malloc( NumOfTeleports * sizeof(TELEPORT) );
 	TPpnt = Teleports;
@@ -120,9 +113,8 @@ bool TeleportsLoad( char * Filename )
 
 	for( i = 0 ; i < NumOfTeleports ; i++ )
 	{
-		Uint16Pnt = (u_int16_t *) Buffer;
-		TPpnt->Group = *Uint16Pnt++;
-		TPpnt->Status = *Uint16Pnt++;
+		TPpnt->Group = in.u16();
+		TPpnt->Status = in.u16();
 		if( TeleportsGroupLink[TPpnt->Group] )
 		{
 			TPpnt->NextInGroup = TeleportsGroupLink[TPpnt->Group];
@@ -132,7 +124,7 @@ bool TeleportsLoad( char * Filename )
 			TPpnt->NextInGroup = NULL;
 		}
 
-		TPpnt->num_links = *Uint16Pnt++;
+		TPpnt->num_links = in.u16();
 		if( TPpnt->num_links > MAXTELEPORTLINKS )
 		{
 			Msg( "Teleports : To many Links in %s\n", Filename );
@@ -141,55 +133,41 @@ bool TeleportsLoad( char * Filename )
 
 		for( e = 0 ; e < TPpnt->num_links ; e++ )
 		{
-			TPpnt->Links[e] = *Uint16Pnt++;
+			TPpnt->Links[e] = in.u16();
 		}
-		
-		Buffer = (char *) Uint16Pnt;
-		floatpnt = (float *) Buffer;
-		memcpy_unaligned(&TPpnt->Pos, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&TPpnt->Dir, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&TPpnt->Up, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&TPpnt->half_size, floatpnt, 4*3);
-		floatpnt+=3;
-		Buffer = (char *) floatpnt;
-  
-		Uint16Pnt = (u_int16_t *) Buffer;
-		TPpnt->zone_type = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;
-		
+
+		TPpnt->Pos = in.vec();
+		TPpnt->Dir = in.vec();
+		TPpnt->Up = in.vec();
+		TPpnt->half_size = in.vec();
+
+		TPpnt->zone_type = in.u16();
+
 		if( TPpnt->zone_type != ZONE_Sphere )
 		{
 			// convex hull...
-			Uint16Pnt = (u_int16_t *) Buffer;
-			TPpnt->num_sides = *Uint16Pnt++;
-			Buffer = (char *) Uint16Pnt;
-			
+			TPpnt->num_sides = in.u16();
+
 			TPpnt->Zone = (TRIGGER_ZONE*) malloc( TPpnt->num_sides * sizeof( TRIGGER_ZONE ) );
 			ZonePnt = TPpnt->Zone;
-			
+
 			if( !ZonePnt )
 			{
 				Msg( "Teleport maloc Error with %s\n", Filename );
 				return( false );
 			}
-			floatpnt = (float * ) Buffer;
 			for( j = 0 ; j < TPpnt->num_sides ; j++ )
 			{
-				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
-				floatpnt+=3;
-				memcpy(&ZonePnt->offset, floatpnt++, 4);
+				ZonePnt->normal = in.vec();
+				ZonePnt->offset = in.f32();
 				ZonePnt++;
 			}
-			Buffer = (char*) floatpnt;
 		}
 		else
 		{
 			TPpnt->Zone = NULL;
 		}
-		
+
 		TPpnt++;
 	}
 	free(OrgBuffer);
