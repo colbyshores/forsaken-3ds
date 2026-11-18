@@ -792,6 +792,17 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 		
 			for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
 			{
+				/* An execbuf's vertex list starts with the 8 corners of its
+				   bounding box (written by the 1998 exporter for Direct3D's
+				   off-screen test; no triangle uses them), and the file's
+				   texture-group start vertex counts from after them. So the
+				   group's first real vertex, where its frame data begins, is
+				   start + 8. Checked against every shipped .mxa: all 726
+				   execbufs have the box, every group's triangles lie in
+				   start + 8 .. start + 8 + count, and frame 0 matches the
+				   base vertices at this offset. (Some Remaster-era .mx
+				   models have no box, but .mx models never come through
+				   here.) */
 				lpLVERTEX = 	( LPLVERTEX ) ( (char*) lpBufStart+( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
 				lpLVERTEX += 8;
 
