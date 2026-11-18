@@ -429,7 +429,7 @@ bool SetFOV( float fov )
 
 	stereo_adjust(&proj);
 
-	/* D3D->OpenGL projection conversion is handled in FSSetProjection on 3DS */
+	/* Each backend converts the projection to its own clip conventions in FSSetProjection. */
 
 	ProjMatrix._11 = proj._11;
 	ProjMatrix._22 = proj._22;
@@ -2846,20 +2846,20 @@ bool RenderScene( void )
     GameCompleted = GAMECOMPLETE_NotComplete;
     if( !ChangeLevel() ) return( false );
 #ifdef __3DS__
-    /* [3DS] Clear picaGL color buffer to black after level load completes.
+    /* [3DS] Clear the colour buffer to black after level load completes.
      *
      * ChangeLevel() contains its own internal render loop (STATUS_InitView_0,
      * STATUS_ChangeLevelPostInitView, etc.) that renders loading-screen frames
-     * into the picaGL color buffer and pumps c3d_present(), updating GX
+     * into the colour buffer and pumps c3d_present(), updating GX
      * display buffer A.  When ChangeLevel returns, one of the two GX display
      * buffers (A) still contains the last loading-screen frame.
      *
      * On the STATUS_StartingSinglePlayer break, c3d_present() is called once
      * more by platform_render_present(); this frame uses whatever is currently
-     * in the picaGL color buffer (the last loading frame).  That result is
+     * in the colour buffer (the last loading frame).  That result is
      * DMA'd into GX display buffer B, contaminating the second buffer too.
      *
-     * Fix: clear the picaGL color buffer to black here so that the
+     * Fix: clear the colour buffer to black here so that the
      * c3d_present() call at the end of this frame sends black to display B
      * instead of the stale loading frame.  STATUS_PostStartingSinglePlayer
      * (next frame) clears it again, which sends black to display A.
@@ -3196,11 +3196,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
         if( !render_camera() )
           return false;
 #ifdef __3DS__
-	/* Hardware stereo is citro3d-only. picaGL builds force
-	 * platform_get_3d_slider() to 0, so stereo_mode is never set to
-	 * STEREO_MODE_3DS and this branch is dead there — but we also
-	 * gate the symbol reference at compile time so picaGL doesn't
-	 * have to export c3d_transfer_eye at all. */
+	/* Hardware stereo: the second pass draws to the right-eye target. */
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
 		
@@ -3506,10 +3502,7 @@ bool MainGameRender(void)
       CurrentCamera.UseLowestLOD = false;
 
 #ifdef __3DS__
-      /* [3DS] Drive stereo from the 3D slider.
-       * Only the citro3d renderer supports stereo efficiently via display
-       * list replay (one BSP pass, replayed for the second eye).  picaGL
-       * would need two full render passes which halves the framerate. */
+      /* [3DS] Drive stereo from the 3D slider. */
       {
           
           float slider = platform_get_3d_slider();

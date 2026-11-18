@@ -165,14 +165,12 @@ bool platform_init(void)
 {
 	_ticks_base = svcGetSystemTick();
 
-	/* Disable upstream's Debug flag. WinMain on PC sets Debug=false during
-	 * startup (main.cpp), but on 3DS we don't run WinMain so the flag
-	 * stays at its global initialiser of true. That routes scattered
-	 * DebugPrintf("...%f...", ...) calls in level loaders (e.g. node.cpp
-	 * NodeLoad's per-node move_len trace) through vsnprintf -> _dtoa_r.
-	 * On larger levels the cost compounds and has been observed to crash
-	 * inside _dtoa_r mid-load on hardware. Force the flag off here, before
-	 * any loader can fire, so DebugPrintf returns immediately. */
+	/* Debug starts true (main.cpp); ParseCommandLine clears it, but only
+	 * after platform_init and the Lua config load have run (AppInit).
+	 * Clear it here first so DebugPrintf is a no-op from the start: with
+	 * Debug set, DebugPrintf("...%f...") calls go through vsnprintf ->
+	 * _dtoa_r, which is slow and has been seen to crash inside _dtoa_r
+	 * on hardware. */
 	Debug = false;
 
 	/* Verify __system_allocateHeaps set up mappableInit correctly.  Our

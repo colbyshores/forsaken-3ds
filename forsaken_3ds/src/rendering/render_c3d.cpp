@@ -465,7 +465,9 @@ typedef struct texture_s {
 /* bSquareOnly — shared global, always true on 3DS */
 bool bSquareOnly = true;
 
-/* Additive blend flag (matches GL1 behavior) */
+/* Set by set_alpha_states (additive translucency) and cleared by
+ * set_normal_states / reset_trans. While set, a textured draw leaves the
+ * additive blend in place instead of restoring opaque blending after it. */
 bool _additive_blend_active = false;
 
 /* Frame state tracking */
@@ -871,7 +873,7 @@ bool c3d_renderer_init(void)
 		C3D_RenderTargetSetOutput(s_targetBottom, GFX_BOTTOM, GFX_LEFT, transferFlags);
 	}
 
-	/* Match picaGL depth map: scale=1.0, offset=1.0 */
+	/* Depth map scale 1.0, offset 1.0 (the values the earlier PICA200 GL shim used). */
 	C3D_DepthMap(true, 1.0f, 1.0f);
 
 	/* GPU-lighting uniform register IDs are hardcoded to match the
@@ -1078,7 +1080,7 @@ static void matrix_to_c3d(const RENDERMATRIX *src, C3D_Mtx *dst)
 {
 	/* Engine matrices are column-major in memory: the raw float[16] is
 	 * the column-major data the old OpenGL backend uploaded as is.
-	 * Load it the same way picaGL's glLoadMatrixf does:
+	 * Load it as glLoadMatrixf would:
 	 *   row[i].x = m[0+i]   (column 0, row i)
 	 *   row[i].y = m[4+i]   (column 1, row i)
 	 *   row[i].z = m[8+i]   (column 2, row i)
