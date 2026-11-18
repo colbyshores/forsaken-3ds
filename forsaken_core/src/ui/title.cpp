@@ -3091,7 +3091,6 @@ void SetInitialTitleParams()
 	DiscLookPos.x = 0.0F; DiscLookPos.y = 72.0F; DiscLookPos.z = 0.0F;
 
 	// 'Home' position of camera
-//	DiscViewPos.x = 131.0F; DiscViewPos.y = 121.0F; DiscViewPos.z = 142.0F;
 	DiscViewPos.x = 131.0F; DiscViewPos.y = 121.0F; DiscViewPos.z = 200.0F;
 
 	StartViewPos.x = 197.0F; StartViewPos.y = 97.0F; StartViewPos.z = 908.0F;
@@ -3717,7 +3716,6 @@ void PlaceObjects(void)
 
 
 	// build rotate matrix for holopad & light...
-//	HoloRotx = 0.0F; HoloRoty = 0.0F; HoloRotz = 0.0F;
 	HoloRotx = -6.0F; HoloRoty = 0.0F; HoloRotz = 3.0F;
 	BuildRotMatrix(HoloRotx, HoloRoty, HoloRotz, &Mat_R);
 	Models[BackgroundModel[TITLE_MODEL_Holopad]].Mat = Mat_R;
@@ -4359,13 +4357,6 @@ bool DisplayTitle(void)
 	CurrentCamera.Viewport.Height = render_info.window_size.cy;
 	CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / (float)2.0;
 	CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / (float)2.0;
-
-/* bjd
-	CurrentCamera.Viewport.dvMaxX = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.dwWidth),
-									  RENDERVAL(2 * CurrentCamera.Viewport.dvScaleX));
-	CurrentCamera.Viewport.dvMaxY = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.dwHeight),
-									   RENDERVAL(2 * CurrentCamera.Viewport.dvScaleY));
-*/
 
 #ifdef __3DS__
 	{
@@ -6854,19 +6845,6 @@ void CancelListSelection( LIST *l )
 		if ( l->selected_item >= l->top_item + l->display_items )
 			l->top_item = l->selected_item - l->display_items + 1;
 	}
-/*
-	// dirty hack!!!
-	if (CurrentMenu == &MENU_NEW_Team)
-	{
-		for( NewItem = CurrentMenu->Item ; NewItem->x >= 0 ; NewItem++ )
-		{	if(( CurrentMenuItem->Variable == NewItem->Variable ) && (CurrentMenuItem != NewItem))
-			{  
-				CurrentMenuItem = NewItem;
-				break;
-			}
-		}
-	}
-*/
 }
 
 /*===================================================================
@@ -8385,9 +8363,6 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 				blue = (u_int8_t)RGBA_GETBLUE(VertPtr->color);
 				alpha = (u_int8_t)RGBA_GETALPHA(VertPtr->color);
 				
-				//DebugPrintf("vertex color rgba=%d,%d,%d,%d\n",
-				//				red, green, blue, alpha);
-
 			  	if ((CurrentExclude) && (*CurrentExclude == i))
 			  	{
 			  		ExcludedSoFar++;
@@ -8402,9 +8377,6 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 			  		green = (u_int8_t)((float)green * percent);
 			  		blue = (u_int8_t)((float)blue * percent);
 			  	}
-
-				//DebugPrintf("tinted vertex color by %f%% to rgba=%d,%d,%d,%d\n",
-				//				percent, red, green, blue, alpha);
 			  
 				Colour = RGBA_MAKE( red, green, blue, alpha );
 				if( !Colour ) 
@@ -9863,9 +9835,6 @@ void DrawGeneralWeapons( MENUITEM *Item )
 		Item->TextInfo[i]->highlighttype = HIGHLIGHT_Pulsing;
 	}
 
-//	Num_Unused_Weapons, MaxWeapons, WeaponList[];
-	//	if ( !PrimaryValid[ WeaponList[ weapon ] ] )
-
 	num_weapons = 0;
 	for ( i = 0; i < MaxWeapons; i++ )
 	{
@@ -10890,7 +10859,6 @@ void InitScreenFonts (void)
 			offset = 74;
 			space = 223;
 			break;
-		//case FONT_512X384_Small:
 		default:
 			offset = 148;
 			space = 222;

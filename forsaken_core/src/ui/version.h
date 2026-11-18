@@ -7,8 +7,6 @@
 #define PXMPV	 "18"
 
 // multiplayer compatibility flag
-		// TODO: use this format in future for now hard coded to existing format
-		//#define PXMPVINT PXV.PXMPV
 #define PXMPVINT 118
 
 // revision (should be provided at build time for official builds)

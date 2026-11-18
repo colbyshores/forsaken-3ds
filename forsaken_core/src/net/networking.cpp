@@ -1074,11 +1074,6 @@ void network_event_player_left( network_player_t * player )
 					Ships[i].Object.light = (u_int16_t) -1;
 				}
 
-				// Meth: Interesting seems that they toyd with idea of
-				//       blowing up the players mines and bullets when
-				//       they leave the game.
-				//KillOwnersSecBulls( (u_int16_t) i );
-
 				Ships[i].enable = 0;
 
 				if ( GameStatus[i] == STATUS_StartingMultiplayer )
@@ -2923,7 +2918,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				return;
 			case TEXTMSGTYPE_CaptureFlagMessage:
 				// this message is instead formatted by the sender
-				// AddColourMessageToQue(FlagMessageColour, "%s on the %s team has got the flag", Names[ lpTextMsg->WhoIAm ], TeamName[ TeamNumber[ lpTextMsg->WhoIAm ] ] );
 				AddColourMessageToQue(FlagMessageColour, "%s", lpTextMsg->Text );
 				if ( TeamNumber[ WhoIAm ] == TeamNumber[ lpTextMsg->WhoIAm ] )
 					PlaySfx( SFX_MyTeamGotFlag, FlagVolume );
@@ -3337,9 +3331,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
         nBytes = sizeof( FUPDATEMSG );
 		channel = CHANNEL_BIKE_POSITIONS;
 		flags = NETWORK_SEQUENCED;
-		// uncomment to make secondaries reliable
-		//if(mask)
-		//	flags |= NETWORK_RELIABLE;
 		Interval = NetUpdateInterval; // reset pps timer
         break;
 
@@ -3354,9 +3345,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
         nBytes = sizeof( VERYSHORTFUPDATEMSG );
 		channel = CHANNEL_BIKE_POSITIONS;
 		flags = NETWORK_SEQUENCED;
-		// uncomment to make secondaries reliable
-		//if(mask)
-		//	flags |= NETWORK_RELIABLE;
 		Interval = NetUpdateInterval; // reset pps timer
         break;
 
@@ -3371,9 +3359,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
         nBytes = sizeof( GROUPONLY_VERYSHORTFUPDATEMSG );
 		channel = CHANNEL_BIKE_POSITIONS;
 		flags = NETWORK_SEQUENCED;
-		// uncomment to make secondaries reliable
-		//if(mask)
-		//	flags |= NETWORK_RELIABLE;
         break;
 
 
@@ -3585,7 +3570,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
         lpLongStatus->MsgCode				= msg;
         lpLongStatus->WhoIAm				= WhoIAm;
         lpLongStatus->Status.MsgCode		= msg;
-        //lpLongStatus->Status.WhoIAm			= WhoIAm; // do not use this field
         lpLongStatus->Status.IsHost			= IsHost;
 		// telling everyone what I am currently doing....
 		lpLongStatus->Status.Status			= MyGameStatus;

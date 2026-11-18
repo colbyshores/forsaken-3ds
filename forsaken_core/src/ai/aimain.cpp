@@ -482,7 +482,6 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 			if( (Enemy->AIFlags & AI_TARGETED_ONEOFF ) || ( (4.0F * 1024.0F * GLOBAL_SCALE) > DistanceToMissile ) )
 			{
 				// The Missile is to close ... take a chance and try amd avoid it
-//				if( Random_Range( EnemyTypes[Enemy->Type].Behave.Avoid_Secondary ) )
 				if( Random_Range_Float( Difficulty * EnemyTypes[Enemy->Type].Behave.Avoid_Secondary ) >=1.0F )
 				{
 					
