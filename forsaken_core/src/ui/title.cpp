@@ -1135,15 +1135,10 @@ MENU	MENU_NEW_SecondaryOrder = {
 };
 
 MENU	MENU_NEW_SecondaryWeaponKeys = {
-#ifdef VDUKDEF
 	(u_int8_t*)"", InitKeyDef, NULL, NULL, 0,
-#else
-	(u_int8_t*)"", InitControls, ExitControls, NULL, 0,
-#endif
 	{
 		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys0 /*"secondary weapon"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-#ifdef VDUKDEF
 		VDUKDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys1 /*"fire secondary"*/, KDfire_secondary ),
 		VDUKDEF( 3, 28, 89, 36, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys2 /*"drop mine"*/, KDfire_mine ),
 
@@ -1164,41 +1159,14 @@ MENU	MENU_NEW_SecondaryWeaponKeys = {
 		VDUKDEF( 3, 144, 89, 152, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys13 /*"Prev weapon"*/, KDselect_prev_secondary ),
 
 		VDUKDEF( 3, 158, 89, 166, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys14 /*"drop weapon"*/, KDdrop_secondary ),
-#else
-		VDUKEYDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys15 /*"fire secondary:"*/, (void *)&Config.fire_secondary ),
-		VDUKEYDEF( 3, 28, 89, 36, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys16 /*"drop mine:"*/, (void *)&Config.fire_mine ),
-
-		VDUKEYDEF( 3, 42, 89, 50, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys17 /*"mug missile:"*/, (void *)&Config.select_secondary[ MUGMISSILE ] ),
-		VDUKEYDEF( 3, 50, 89, 58, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys18 /*"solaris missile:"*/, (void *)&Config.select_secondary[ SOLARISMISSILE ] ),
-		VDUKEYDEF( 3, 58, 89, 66, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys19 /*"scatter missile:"*/, (void *)&Config.select_secondary[ SCATTERMISSILE ] ),
-		VDUKEYDEF( 3, 66, 89, 74, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys20 /*"gravgon missile:"*/, (void *)&Config.select_secondary[ GRAVGONMISSILE ] ),
-		VDUKEYDEF( 3, 74, 89, 82, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys21 /*"mfrl:"*/, (void *)&Config.select_secondary[ MULTIPLEMISSILE ] ),
-		VDUKEYDEF( 3, 82, 89, 90, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys22 /*"Titan Missile:"*/, (void *)&Config.select_secondary[ TITANSTARMISSILE ] ),
-		VDUKEYDEF( 3, 90, 89, 98, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys29 /*"Thief Missile"*/, (void *)&Config.select_secondary[ THIEFMISSILE ] ),
-		
-		VDUKEYDEF( 3, 98, 89, 106, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys23 /*"purge mine:"*/, (void *)&Config.select_secondary[ PURGEMINE ] ),
-		VDUKEYDEF( 3, 106, 89, 114, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys24 /*"pine mine:"*/, (void *)&Config.select_secondary[ PINEMINE ] ),
-		VDUKEYDEF( 3, 114, 89, 122, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys25 /*"quantum mine:"*/, (void *)&Config.select_secondary[ QUANTUMMINE ] ),
-		VDUKEYDEF( 3, 122, 89, 130, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys30 /*"spider mine"*/, (void *)&Config.select_secondary[ SPIDERMINE ] ),
-
-		VDUKEYDEF( 3, 136, 89, 144, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys26 /*"Next weapon:"*/, (void *)&Config.select_next_secondary ),
-		VDUKEYDEF( 3, 144, 89, 152, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys27 /*"Prev weapon:"*/, (void *)&Config.select_prev_secondary ),
-
-		VDUKEYDEF( 3, 158, 89, 166, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys28 /*"drop weapon:"*/, (void *)&Config.drop_secondary ),
-#endif		
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_PrimaryWeaponKeys = {
-#ifdef VDUKDEF
 	(u_int8_t*)"", InitKeyDef, NULL, NULL, 0,
-#else
-	(u_int8_t*)"", InitControls, ExitControls, NULL, 0,
-#endif
 	{
 		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys0 /*"primary weapon"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-#ifdef VDUKDEF
 		VDUKDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys1 /*"fire primary"*/, KDfire_primary ),
 
 		VDUKDEF( 3, 34, 89, 42, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys2 /*"pulsar"*/, KDselect_primary[ PULSAR ] ),
@@ -1214,21 +1182,6 @@ MENU	MENU_NEW_PrimaryWeaponKeys = {
 		VDUKDEF( 3, 110, 89, 118, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys10 /*"drop weapon"*/, KDdrop_primary ),
 
 		VDUKDEF( 3, 124, 89, 132, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys11 /*"send msg"*/, KDsend_msg ),
-#else
-		VDUKEYDEF( 3, 20, 89, 28, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys12 /*"fire primary:"*/, (void *)&Config.fire_primary ),
-
-		VDUKEYDEF( 3, 34, 89, 42, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys13 /*"pulsar:"*/, (void *)&Config.select_primary[ PULSAR ] ),
-		VDUKEYDEF( 3, 42, 89, 50, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys14 /*"trojax:"*/, (void *)&Config.select_primary[ TROJAX ] ),
-		VDUKEYDEF( 3, 50, 89, 58, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys15 /*"suss gun:"*/, (void *)&Config.select_primary[ SUSS_GUN ] ),
-		VDUKEYDEF( 3, 58, 89, 66, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys16 /*"pyrolite:"*/, (void *)&Config.select_primary[ TRANSPULSE_CANNON ] ),
-		VDUKEYDEF( 3, 66, 89, 74, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys17 /*"transpulse:"*/, (void *)&Config.select_primary[ PYROLITE_RIFLE ] ),
-		VDUKEYDEF( 3, 74, 89, 82, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys18 /*"laser:"*/, (void *)&Config.select_primary[ LASER ] ),
-
-		VDUKEYDEF( 3, 88, 89, 96, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys19 /*"Next weapon:"*/, (void *)&Config.select_next_primary ),
-		VDUKEYDEF( 3, 96, 89, 104, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys20 /*"Prev weapon:"*/, (void *)&Config.select_prev_primary ),
-
-		VDUKEYDEF( 3, 110, 89, 118, (u_int8_t*)LT_MENU_NEW_PrimaryWeaponKeys21 /*"drop weapon:"*/, (void *)&Config.drop_primary ),
-#endif		
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -1247,15 +1200,10 @@ MENU	MENU_NEW_Weapons = {
 };
 
 MENU	MENU_NEW_ConfigureKeyboard = {
-#ifdef VDUKDEF
 	(u_int8_t*)"", InitKeyDef, NULL, NULL, 0,
-#else
-	(u_int8_t*)"", InitControls, ExitControls, NULL, 0,
-#endif
 	{
 		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard0 /*"movement controls"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
-#ifdef VDUKDEF
 		VDUKDEF( 3, 15, 80, 23, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard1 /*"rotate left"*/, KDleft ),
 		VDUKDEF( 3, 23, 80, 31, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard2 /*"rotate right"*/, KDright ),
 		VDUKDEF( 3, 31, 80, 39, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard3  /*"rotate up"*/, KDup ),
@@ -1278,32 +1226,6 @@ MENU	MENU_NEW_ConfigureKeyboard = {
 
 		VDUKDEF( 3, 150, 80, 158, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard16 /*"cruise faster"*/, KDcruise_faster ),
 		VDUKDEF( 3, 158, 80, 166, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard17 /*"cruise slower"*/, KDcruise_slower ),
-#else
-		VDUKEYDEF( 3, 15, 80, 23, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard18 /*"rotate left:"*/, (void *)&Config.left ),
-		VDUKEYDEF( 3, 23, 80, 31, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard19 /*"rotate right:"*/, (void *)&Config.right ),
-		VDUKEYDEF( 3, 31, 80, 39, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard20 /*"rotate up:"*/, (void *)&Config.up ),
-		VDUKEYDEF( 3, 39, 80, 47, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard21 /*"rotate down:"*/, (void *)&Config.down ),
-
-		VDUKEYDEF( 3, 50, 80, 58, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard22 /*"slide left:"*/, (void *)&Config.move_left ),
-		VDUKEYDEF( 3, 58, 80, 66, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard23 /*"slide right:"*/, (void *)&Config.move_right ),
-		VDUKEYDEF( 3, 66, 80, 74, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard24 /*"slide up"*/, (void *)&Config.move_up ),
-		VDUKEYDEF( 3, 74, 80, 82, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard25 /*"slide down:"*/, (void *)&Config.move_down ),
-
-		VDUKEYDEF( 3, 85, 80, 93, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard26 /*"roll left:"*/, (void *)&Config.roll_left ),
-		VDUKEYDEF( 3, 93, 80, 101, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard27 /*"roll right:"*/, (void *)&Config.roll_right ),
-
-		VDUKEYDEF( 3, 104, 80, 112, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard28 /*"slide mode:"*/, (void *)&Config.move ),
-		VDUKEYDEF( 3, 112, 80, 120, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard29 /*"roll mode:"*/, (void *)&Config.roll ),
-
-		VDUKEYDEF( 3, 123, 80, 131, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard30 /*"forward:"*/, (void *)&Config.move_forward ),
-		VDUKEYDEF( 3, 131, 80, 139, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard31 /*"reverse:"*/, (void *)&Config.move_backward ),
-		VDUKEYDEF( 3, 139, 80, 147, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard32 /*"nitro:"*/, (void *)&Config.turbo ),
-
-		VDUKEYDEF( 3, 150, 80, 158, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard33 /*"cruise faster:"*/, (void *)&Config.cruise_faster ),
-		VDUKEYDEF( 3, 158, 80, 166, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard34 /*"cruise slower:"*/, (void *)&Config.cruise_slower ),
-
-		VDUKEYDEF( 3, 170, 80, 178, (u_int8_t*)LT_MENU_NEW_ConfigureKeyboard35 /*"send msg:"*/, (void *)&Config.send_msg ),
-#endif
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -9353,12 +9275,8 @@ void CheckKeysForChanges( void )
 	{
 		if( Item->FuncDraw == DrawFlatMenuKey )
 		{	
-#ifdef VDUKDEF
 			kdef = (DEFKEY *)(Item->Variable);
 			keycode = kdef->def->key[ kdef->selected_key ];
-#else
-			keycode = *(VirtualKeycode *)(Item->Variable);
-#endif
 			if ( keycode )
 			{
 				keyword = (char *) key_name( keycode );
@@ -9424,12 +9342,8 @@ void DrawFlatMenuKeyText( MENUITEM *Item )
 
 	if ( Item->Variable )
 	{
-#ifdef VDUKDEF
 		kdef = (DEFKEY *)(Item->Variable);
 		keycode = kdef->def->key[ kdef->selected_key ];
-#else
-		keycode = *(VirtualKeycode *)(Item->Variable);
-#endif
 		if ( keycode )
 		{
 			keyword = (char *) key_name( keycode );
@@ -15407,26 +15321,15 @@ void MenuProcess()
 
 
 			case MENUSTATE_Keydef:
-#ifdef KDEF
 				if ( !ProcessDefKey( Key ) )
 					MenuState = MENUSTATE_SelectKeydef;
-#else
-				if ( !ProcessKeydef( Key ) )
-					MenuState = MENUSTATE_Select;
-#endif
 				break;
 
 
 			case MENUSTATE_Keydef2:
-#ifdef VDUKDEF
 				if ( !ProcessDefKey( Key ) )
 				{	
 					MenuState = MENUSTATE_SelectKeydef;
-#else
-				if ( !ProcessKeydef( Key ) )
-				{	
-					MenuState = MENUSTATE_Select;
-#endif
 					CheckKeysForChanges();
 					CurrentMenuItem->TextInfo[0]->highlighttype = HIGHLIGHT_Pulsing;
 				}
