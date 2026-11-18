@@ -32,6 +32,22 @@
 
 #pragma once
 
+/* lua_config.h -- typed access to the Lua `config` table
+ *
+ * The getters read config[opt] from L1 and return the default when the key is
+ * nil; the setters assign it. Values live only in the Lua state (loaded by
+ * init.lua during lua_init) until config_save calls the Lua config_save in
+ * scripts/config.lua, which writes the whole table to configs/main.txt
+ * (configs/debug.txt with DEBUG_ON).
+ *
+ * config_get_int also accepts a boolean (0 / 1). config_get_bool follows Lua
+ * truth: any value but false is true, including 0. A wrong-typed value for
+ * the int, float or string getters raises a Lua error through luaL_check*
+ * outside any protected call, which ends in Lua's panic handler.
+ * config_get_strncpy uses strncpy, so dest is not terminated when the value
+ * fills all size bytes.
+ */
+
 int config_save( void );
 
 int config_get_int(const char *opt, int _default);

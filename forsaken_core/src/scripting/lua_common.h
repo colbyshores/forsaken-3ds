@@ -32,6 +32,22 @@
 
 #pragma once
 
+/* lua_common.h -- the process-wide Lua state: startup, scripts, shutdown
+ *
+ * lua_init (main.cpp, at startup) creates the single state L1, opens the
+ * standard libraries, registers the C functions touch_file, debug and alert,
+ * runs scripts/init.lua and calls its init(debug), with debug true in DEBUG_ON
+ * builds. init.lua builds the global `config` table and loads
+ * configs/main.txt (configs/debug.txt with DEBUG_ON) into it; lua_config.h
+ * reads and writes that table. An error from init() is also written to
+ * Logs/lua_init_error.txt. lua_shutdown closes L1 at exit and does not reset
+ * it to NULL.
+ *
+ * lua_dofile runs scripts/<name>, logs any error with DebugPrintf and returns
+ * 1 on failure. ASSERT(x) returns x from the enclosing function when x is
+ * non-zero; it is not the C assert.
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -41,7 +57,6 @@
 #include "util/util.h"
 #include "data/file.h"
 
-// return rv if function does not return 0
 #define ASSERT(x) \
         { \
                 int _err = x; \

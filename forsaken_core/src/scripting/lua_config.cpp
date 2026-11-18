@@ -37,7 +37,7 @@ int config_save( void )
 {
 	int err = 0;
 	lua_settop(L1, 0);
-	lua_getglobal(L1, "config_save");    /* [bottom] init [top] */
+	lua_getglobal(L1, "config_save");    /* [bottom] config_save [top] */
 #ifdef DEBUG_ON
 	lua_pushstring(L1, "debug");
 #else
