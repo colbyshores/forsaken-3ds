@@ -1,11 +1,6 @@
 
 
-/*===================================================================
-*	c o l l i s o n . c
-*	All routines needed to load in a .mc file....
-*	and do collision to any polygon in a specified group..
-*	or to the nearest polygon..
-===================================================================*/
+/* collision.cpp -- wall, portal, BGObject and enemy-component collision; see collision.h. */
 #include "game/main.h"
 #include <stdio.h>
 #include "math/new3d.h"
@@ -70,9 +65,11 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
 
 /*===================================================================
-	Procedure	:		Load .mc File Collision file..
+	Procedure	:		Stub: .mc collision files are not read
 	Input		:		char	*	Filename , MCLOADHEADER * MCloadheader
-	Output		:		bool
+	Output		:		bool		always true
+	Wall collision uses the level BSP; the level loader still calls
+	this for both collision headers, which stay zeroed.
 ===================================================================*/
 bool MCload( char * /*Filename*/ , MCLOADHEADER * /*MCloadheader*/ )
 {
@@ -101,7 +98,7 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 		  ( ODir.y * normal->y) + 
 		  ( ODir.z * normal->z);
 	
-	if( Div >= 0.0F ) return false;		/* Reject, Parallel */
+	if( Div >= 0.0F ) return false;		/* Reject: parallel, or moving out of the front face */
 
 
 	Num = ( ( Origin.x * normal->x ) +
@@ -128,7 +125,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 
 static float hit_portal_offset = 0.0F;
 
-// version 3...
 /*
  * BackgroundCollide
  *
@@ -509,14 +505,15 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 
 
 /*===================================================================
-	Procedure	:	Does the collision between the portals in a specified group
-	Input		:	MLOADHEADER *
+	Procedure	:	Find the nearest portal of a group crossed by a ray
+	Input		:	MLOADHEADER *	(unused)
 				:	u_int16_t group
 				:	VECTOR * Pos
 				:	VECTOR * Dir
 				:	VECTOR * ImpactPoint
 				:	NORMAL * FaceNormal
-				:	u_int16_t * PortalHit
+				:	u_int16_t * Next_Group	(group behind the portal hit)
+				:	int collisionhint	(unused)
   Output		:	bool
 ===================================================================*/
 bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
@@ -584,6 +581,8 @@ bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 	return ( flag ) ? true : false;
 }
 
+/* True if EndPos lies outside the group's bounding box grown by
+ * OUTSIDE_GROUP_TOLERANCE on every axis. */
 bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup )
 {
 	VECTOR	dv;
@@ -600,9 +599,16 @@ static BGOBJECT	*	CurParent = NULL;
 
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 /*===================================================================
-	Procedure	:	Check Ship to Background Objects Collision
-	Input		:	u_int16_t	Group
-	Output		:	Nothing
+	Procedure	:	Check the current ray (Origin / ODir) against BGObject
+				:	collision zones
+	Input		:	u_int16_t	Group	(group the ray is in)
+				:	float		Distance to the nearest hit so far
+				:	VECTOR	*	ImpactPoint
+				:	int			collided (hits so far)
+				:	VECTOR	*	New_Pos
+				:	NORMAL	*	FaceNormal
+				:	BGOBJECT **	BGObject (set if the zone or side is Sensitive)
+	Output		:	bool		true if a BGObject zone is the nearest hit
 ===================================================================*/
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
@@ -809,10 +815,13 @@ SkipIt:
 }
 
 /*===================================================================
-	Procedure	:	Process components of Background Object
+	Procedure	:	Test the current ray (Origin / ODir) against the
+				:	collision zones of a component tree (recursive)
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
-	Output		:	Nothing
+	Output		:	Nothing		(nearest hit kept in ColPoint / ColSide /
+				:				ColDist / ColChild / ColZoneNum / ColParent)
+	Sphere zones are ignored; only box and polygonal zones are tested.
 ===================================================================*/
 void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 {
@@ -949,7 +958,8 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 }
 
 /*===================================================================
-	Procedure	:	Does the collision between a specified group
+	Procedure	:	Ray against enemy components and BGObjects only
+				:	(no wall test); used by primary / secondary bullets
 	Input		:	float		Distance to int
 				:	int16_t		Collided
 				:	u_int16_t		group
@@ -994,13 +1004,15 @@ bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VEC
 }
 
 /*===================================================================
-	Procedure	:	Check Background Objects To Object Collision
+	Procedure	:	Check whether a BGObject's moving components swept
+				:	through a point this frame
 	Input		:	VECTOR	*	Pos
 				:	BGOBJECT *	Object
 				:	VECTOR	*	Push Vector ( TBFI )
 				:	float	*	DamagePtr
 				:	float		Radius
-	Output		:	Nothing
+	Output		:	bool		true if hit; PushVector is half the
+				:				component's movement at that point
 ===================================================================*/
 bool CheckBGObjectCollision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVector, float * DamagePtr, float Radius )
 {
@@ -1054,13 +1066,15 @@ bool CheckBGObjectCollision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVecto
 }
 
 /*===================================================================
-	Procedure	:	Check Background Objects To Enemy Collision
+	Procedure	:	Check whether an enemy's moving components swept
+				:	through a point this frame
 	Input		:	VECTOR	*	Pos
 				:	COMP_OBJ *	CompObjects
 				:	VECTOR	*	Push Vector ( TBFI )
 				:	float	*	DamagePtr
 				:	float		Radius
-	Output		:	Nothing
+	Output		:	bool		true if hit; PushVector as for
+				:				CheckBGObjectCollision
 ===================================================================*/
 bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVector, float * DamagePtr, float Radius )
 {
@@ -1111,10 +1125,15 @@ bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVect
 }
 
 /*===================================================================
-	Procedure	:	Process components of Background Object
+	Procedure	:	Test a point (Origin) against a component tree that
+				:	moved this frame (recursive)
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
-	Output		:	Nothing
+	Output		:	Nothing		(nearest hit kept in the Col* globals)
+	The point is taken into each component's space through both its old
+	and its current inverse display matrix; the segment between the two
+	(stretched to 0.065 if shorter; a zero segment stays zero) is
+	ray-tested against the zones. ColDir keeps it for the push vector.
 ===================================================================*/
 void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 {
@@ -1286,6 +1305,13 @@ constexpr float IMPACT_OFFSET = (0.1F);
 constexpr float FEELER_LENGTH_TO_RADIUS_RATIO = (1.25F);
 
 
+/* Sweep a sphere of the given radius from Obj->Pos by *Move_Off using
+ * MAX_FEELER_RAYS rays spread across the sphere's cross-section, each
+ * reaching FEELER_LENGTH_TO_RADIUS_RATIO * radius past the move. The
+ * nearest front-facing hit clips *Move_Off. When move_object is set the
+ * object is moved and its group updated, and with bounce_object its speed
+ * is turned along the wall and a bump force applied. BGObject collision is
+ * always on: NoBGObject is passed as BGCol and is true. */
 bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )
 {
 	VECTOR Up, Right;
@@ -1496,6 +1522,10 @@ bool ObjectCollideNoBounce( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJEC
 }
 
 
+/* ObjectCollide's feeler test with MAX_QFEELER_RAYS rays, on a bare
+ * position. Moves nothing and leaves *Move_Off alone; Impact_Point and
+ * Impact_Normal are written only on a hit, Impact_Group always (the group
+ * at the clipped end point). */
 bool QCollide( VECTOR *Start_Pos, u_int16_t Start_Group, VECTOR *Move_Off, float radius, VECTOR *Impact_Point, u_int16_t *Impact_Group, NORMAL *Impact_Normal )
 {
 	VECTOR Up, Right;

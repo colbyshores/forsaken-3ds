@@ -1,15 +1,36 @@
-
-
-/*==========================================================================
- *
- *
- *  File:       collision.h
- *  Content:    collision include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* collision.h -- ray and swept-sphere collision against walls, portals,
+ * BGObjects and enemy components
+ *
+ * Wall collision is a ray cast into the level's BSP, Bsp_Header[0] (bsp.cpp,
+ * loaded per level). MCload is a stub that returns true, so MCLOADHEADER's
+ * fields stay zero; the header passed to BackgroundCollide / OneGroupPolyCol
+ * only selects behaviour. &MCloadheadert0 casts against Bsp_Header[0] and
+ * tests BGObject / enemy zones with a zero radius. &MCloadheader would cast
+ * against Bsp_Header[1], which the level loader always leaves unloaded, so it
+ * tests only BGObject / enemy zones, with a 300 * GLOBAL_SCALE radius.
+ *
+ * BackgroundCollide sweeps a point from StartPos by MoveOffset, following
+ * portals (Bsp_Portal_Header) from group to group, and on a hit returns the
+ * impact point backed off the face by about COLLISION_FUDGE, the end group,
+ * the face normal and a slide target. With BGCol set it also tests BGObject
+ * and enemy-component collision zones along the ray. MoveGroup only follows
+ * portals to find the group a move ends in.
+ *
+ * ObjectCollide and QCollide fire a fan of feeler rays (9 and 5) around a sphere of the given radius and clip the move to the
+ * nearest front-facing hit; ObjectCollide also moves the object, updates its
+ * group and deflects its speed. WouldObjectCollide is ObjectCollide without
+ * moving or bouncing (it still clips *Move_Off); ObjectCollideNoBounce moves
+ * without bouncing.
+ *
+ * Results pass through file-scope state in collision.cpp (the current ray and
+ * the nearest component hit), so none of this is re-entrant.
+ *
+ * GetComEnemyHitInfo / CheckAnyEnemyHit report the enemy whose components were
+ * hit by the most recent BackgroundCollide or OneGroupBGObjectCol (the first
+ * only for sensitive zones); read them before the next collision call.
+ */
 
 #include "game/main.h"
 #include "data/file.h"
@@ -79,6 +100,9 @@ bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVect
 u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * IntDistance );
 u_int16_t CheckAnyEnemyHit( void );
 
-/* Defined in collision.cpp; shared with the modules that use it. */
+/* Defined in collision.cpp. no_collision is a debug toggle (Shift+F12 in
+ * oct2.cpp) read by ships.cpp and pickups.cpp; while set, ships skip
+ * background collision. ColChild is the component hit by the last zone test;
+ * nothing outside collision.cpp reads it. */
 extern int no_collision;
 extern COMP_OBJ * ColChild;
