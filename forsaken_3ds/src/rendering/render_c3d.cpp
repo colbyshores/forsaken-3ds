@@ -45,7 +45,7 @@
  *      normalized floats. gpu_vertex_t stores pre-normalized float[4] colors.
  */
 
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 
 #include <3ds.h>
 #include <citro3d.h>
@@ -3070,4 +3070,4 @@ bool draw_line_object(RENDEROBJECT *renderObject)
 	return draw_render_object(renderObject, 1, false);
 }
 
-#endif /* RENDERER_C3D */
+#endif /* __3DS__ */

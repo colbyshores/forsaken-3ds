@@ -1410,7 +1410,7 @@ MENU	MENU_NEW_VisualsStereo = {
 	}
 };
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 /* Declared in render_c3d.c. Toggle the new graphics features:
  *   g_object_shine — Phong specular highlight on enemy / pickup / crate
  *                    surfaces. Free if disabled (skips fragment-lighting
@@ -1437,7 +1437,7 @@ MENU	MENU_NEW_Visuals = {
 	}
 };
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 MENU	MENU_NEW_3DS_Visuals = {
 	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_Visuals,
 	{
@@ -1882,7 +1882,7 @@ MENU	MENU_NEW_Options = {
 	{
 		{ 0, TITLE_MODEL_Disc1, 0, 0, 5,(u_int8_t*)LT_MENU_NEW_Options0 /*"Options"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 		{ 0, TITLE_MODEL_Disc2, 0, 0, 8, (u_int8_t*)LT_MENU_NEW_Options1 /*"Sound"*/, 0, 0, NULL, &MENU_NEW_Sound, MenuChange, NULL, NULL, 0 },
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, (u_int8_t*)"3DS Visual Settings", 0, 0, NULL, &MENU_NEW_3DS_Visuals, MenuChange, NULL, NULL, 0 },
 #else
 		{ 0, TITLE_MODEL_Disc3, 0, 0, 14, (u_int8_t*)LT_MENU_NEW_Options2 /*"Visuals"*/, 0, 0, NULL, &MENU_NEW_Visuals, MenuChange, NULL, NULL, 0 },
@@ -2348,7 +2348,7 @@ MENU	MENU_Visuals = {
 	}
 };
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 MENU	MENU_3DS_Visuals = {
 	(u_int8_t*)"3DS Visual Settings", NULL, NULL, NULL, 0,
 	{
@@ -2363,7 +2363,7 @@ MENU	MENU_3DS_Visuals = {
 MENU	MENU_Options = {
 	(u_int8_t*)LT_MENU_Options0/*"Options"*/, NULL, (MenuFunc) SetGamePrefs, NULL, 0,
 	{
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 		{ 200, 128, 0, 0, 0, (u_int8_t*)"3DS Visual Settings",			0, 0, NULL,						&MENU_3DS_Visuals,		MenuChange,		MenuItemDrawName,	NULL, 0 },
 #else
 		{ 200, 128, 0, 0, 0, (u_int8_t*)LT_MENU_Options1	/*"Visuals"*/,				0, 0, NULL,						&MENU_Visuals,			MenuChange,		MenuItemDrawName,	NULL, 0 },
@@ -2455,7 +2455,7 @@ MENU	MENU_InGame = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu 
 					  OLDMENUITEM( 200, 128, (u_int8_t*)LT_MENU_InGame2  /*"Toggle Full Screen"		*/,	NULL,						NULL,					MenuGoFullScreen,		MenuItemDrawName),
 					  OLDMENUITEM( 200, 144, (u_int8_t*)LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 					  OLDMENUITEM( 200, 176, (u_int8_t*)"3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
 #else
 					  OLDMENUITEM( 200, 176, (u_int8_t*)LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
@@ -2487,7 +2487,7 @@ MENU	MENU_InGameSingle = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGam
 #endif
 					  OLDMENUITEM( 200, 144, (u_int8_t*)LT_MENU_InGame3  /*"Load Game"					*/,	NULL,						&MENU_LoadSavedGame,	MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_InGame4  /*"Save Game"					*/,	NULL,						&MENU_SaveGame,			MenuChange,				MenuItemDrawName),
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 					  OLDMENUITEM( 200, 176, (u_int8_t*)"3DS Visual Settings",						NULL,						&MENU_3DS_Visuals,		MenuChange,				MenuItemDrawName),
 #else
 					  OLDMENUITEM( 200, 176, (u_int8_t*)LT_MENU_InGame5  /*"Options"					*/,	NULL,						&MENU_Options,			MenuChange,				MenuItemDrawName),
@@ -8158,7 +8158,7 @@ void GetGamePrefs( void )
     GameType                         = config_get_int( "GameType",					GAME_Normal );
 	CLAMP( GameType, MAX_GAMETYPE );
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 	g_object_shine      = config_get_bool( "ObjectShine",     true );
 	g_wall_detail       = config_get_bool( "WallDetail",      true );
 	g_stereo_invert     = config_get_bool( "Invert3D",        false );
@@ -8290,7 +8290,7 @@ void SetGamePrefs( void )
 	config_set_float( "StereoFocalDist",		render_info.stereo_focal_dist );
 	config_set_float( "StereoRightColor",		render_info.stereo_right_color );
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 	config_set_bool( "ObjectShine",     g_object_shine );
 	config_set_bool( "WallDetail",      g_wall_detail );
 	config_set_bool( "Invert3D",        g_stereo_invert );

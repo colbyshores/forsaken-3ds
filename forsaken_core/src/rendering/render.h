@@ -4,7 +4,8 @@
  *
  * Core code draws only through these FS*, draw_* and render_* calls. The 3DS
  * citro3d backend (render_c3d.cpp) and the PC Vulkan backend
- * (render_vulkan.cpp) implement them; RENDERER_C3D builds add the c3d_* calls.
+ * (render_vulkan.cpp) implement them; the 3DS build (__3DS__) adds the c3d_*
+ * calls.
  * render_info (main.cpp) is the single process-lifetime render state.
  * A RENDEROBJECT is a vertex buffer (plus optional index and normal buffers)
  * split into TEXTUREGROUP draw ranges. Loaders point textureGroups at TAG_LEVEL
@@ -365,7 +366,7 @@ bool draw_2d_object(RENDEROBJECT *renderObject);
 
 void FSReleaseRenderObject(RENDEROBJECT *renderObject);
 
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 /* Citro3D backend extensions (render_c3d.c). Material-class switches set
    per draw by the model paths, and the Visuals menu toggles behind them
    (saved as ObjectShine / WallDetail in Configs/main.txt). */

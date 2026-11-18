@@ -144,7 +144,7 @@ void ExecuteTransExe( u_int16_t group )
 
 			if( Display )
 			{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 				/* Same eligibility check as models.c: BGOBJECTs
 				 * (doors, vents, animated decorations) shouldn't
 				 * get Phong shine. The TransExe path renders
@@ -166,7 +166,7 @@ void ExecuteTransExe( u_int16_t group )
 				}
 #endif
 				draw_object(&TransExe[i].renderObject);
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 				{ c3d_set_object_shine_eligible(true); }
 #endif
 			}
@@ -248,7 +248,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 
 			if( Display )
 			{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 				{
 					/* Same eligibility check as models.c: BGOBJECT
 					 * (doors, vents, animated decorations) gets no
@@ -263,7 +263,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 				}
 #endif
 				draw_object(&TransExe[i].renderObject);
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 				{ c3d_set_object_shine_eligible(true); }
 #endif
 			}

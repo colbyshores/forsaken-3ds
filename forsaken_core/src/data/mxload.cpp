@@ -902,11 +902,11 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 
 					if( Display )
 					{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 						{ c3d_set_object_proctex(true); }
 #endif
 						bool ok = draw_object(&Mxloadheader->Group[group].renderObject[i]);
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 						{ c3d_set_object_proctex(false); }
 #endif
 						if (!ok)
@@ -1137,11 +1137,11 @@ bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t /*Model*/
 		{
 			for ( i=0 ; i<Mxloadheader->Group[group].num_execbufs; i++)
 			{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 				{ c3d_set_object_proctex(true); }
 #endif
 				bool ok = draw_object(&Mxloadheader->Group[group].renderObject[i]);
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 				{ c3d_set_object_proctex(false); }
 #endif
 				if (!ok)

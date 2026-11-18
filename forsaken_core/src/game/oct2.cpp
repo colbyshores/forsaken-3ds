@@ -1112,7 +1112,7 @@ void DrawSimplePanel()
 			// Add Crosshair Polygon..
 			if(!CurrentMenu)
 			{
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 				/* Crosshair/reticle is an in-world overlay tied to the 3D
 				   camera viewport — it belongs on the stereo top screen, not
 				   the mono bottom. Temporarily clear the bottom-HUD routing
@@ -1127,7 +1127,7 @@ void DrawSimplePanel()
 					(float) (viewport.X + (viewport.Width>>1)) ,
 					(float) (viewport.Y + (viewport.Height>>1)) ,
 					r, g, b, 255 );
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 				ScrPolySetRouteBottom(_was_routing);
 #endif
 			}
@@ -2492,7 +2492,7 @@ bool RenderScene( void )
     ReleaseView();
     ReleaseLevel();
     MyGameStatus = STATUS_Title;
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
     /* Wipe the gameplay HUD off the bottom screen — the title screen
      * never draws there, so without this the last HUD frame stays
      * frozen until the next gameplay session takes over. */
@@ -3210,7 +3210,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
         	render_set_filter( 1, 0, 0 );
         if( !render_camera() )
           return false;
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 	/* Hardware stereo is citro3d-only. picaGL builds force
 	 * platform_get_3d_slider() to 0, so stereo_mode is never set to
 	 * STEREO_MODE_3DS and this branch is dead there — but we also
@@ -3256,7 +3256,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	}
         if( !render_camera() )
           return false;
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
 		
@@ -3299,7 +3299,7 @@ void DrawMainGameMenu(void)
       MenuDraw( CurrentMenu );
       MenuItemDrawCursor( CurrentMenuItem );
     }
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
     /* [3DS citro3d] Unconditionally tag DrawSimplePanel's screen polys with
        SCRFLAG_BottomHUD so the two-pass drain routes them to the mono
        bottom screen. The in-world crosshair inside DrawSimplePanel clears
@@ -3391,11 +3391,11 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 
 		CurrentCamera.UseLowestLOD = true;
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 		c3d_memo_suspend(true);
 #endif
 		bool inset_ok = RenderCurrentCamera();
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 		c3d_memo_suspend(false);
 #endif
 		if( inset_ok != true )
@@ -3412,7 +3412,7 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 		Current_Camera_View = saved_current_cam_view;
 	}
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 	/* [3DS citro3d] Two-pass screen-poly drain:
 	 *   Pass 1: mode=1, current (stereo top) target — draws everything
 	 *           WITHOUT SCRFLAG_BottomHUD (in-world overlays: aim reticle,
@@ -4287,7 +4287,7 @@ bool RenderCurrentCamera( void )
 
   BuildVisibleLightList( CurrentCamera.GroupImIn );
 
-#if defined(RENDERER_C3D) && defined(GPU_LIGHTING)
+#ifdef GPU_LIGHTING
   /* Pack the camera's visible XLight list into the shader uniform
    * once per pass. No per-group filter — see c3d_upload_xlights for
    * why occlusion-aware filtering isn't tractable on PICA200. */

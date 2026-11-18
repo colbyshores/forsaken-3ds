@@ -73,8 +73,6 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 	-D__3DS__ \
 	-DLUA_USE_APICHECK
 
-# Citro3D is the only 3DS renderer (PicaGL backend removed).
-CFLAGS += -DRENDERER_C3D
 # Hybrid GPU vertex lighting: shader does ambient + per-vertex point-light
 # falloff + accumulation, replacing the per-vertex CPU dynamic-light loop
 # in lights.cpp::XLight1Group. Validated on hardware; default-on.

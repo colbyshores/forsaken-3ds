@@ -707,11 +707,11 @@ bool ExecuteMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t in_group  )
 				}
 				else
 				{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 					{ c3d_set_object_proctex(true); }
 #endif
 					bool ok = draw_object(&Mxaloadheader->Group[group].renderObject[i]);
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 					{ c3d_set_object_proctex(false); }
 #endif
 					if (!ok)

@@ -895,7 +895,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 		 * is black walls through doorways. Fix is in the flood-fill
 		 * expansion above the projection-compute block, not here. */
 		g->projection = cam->Proj;
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 		/* @vfp-exempt R2, R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-11-13. */
 		/* R11: skip the magnified math below when the parent viewport is
 		 * fullscreen (every mono main-camera group) — the override at
@@ -930,7 +930,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 									- ( vp->Y + vp->Height * 0.5F ) )
 							/ vp->Height;
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		/* citro3d uses scissor + unmagnified cam->Proj only when the
 		 * parent viewport (v->viewport) spans the full screen — the
@@ -1013,7 +1013,7 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 	 * magnified-projection + sub-rect-viewport path so their geometry
 	 * lands in the chase-camera inset's pixels rather than at screen
 	 * center. */
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 	{
 		render_viewport_t *_pv = cam->visible.viewport;
 		bool _full_screen = (_pv->X == 0 && _pv->Y == 0

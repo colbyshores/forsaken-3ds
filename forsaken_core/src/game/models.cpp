@@ -1227,7 +1227,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 
 					if( DoDisplay )
 					{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 						/* Same eligibility check as the
 						 * static-mxload path: BGOBJECT models
 						 * (animated doors, vents) get no shine. */
@@ -1238,13 +1238,13 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 #endif
 					if( ExecuteMxaloadHeader( &MxaModelHeaders[ModelNum], ClipGroup ) != true)
 					{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 						{ c3d_set_object_shine_eligible(true); }
 #endif
 						Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
 						return false;
 					}
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 						{ c3d_set_object_shine_eligible(true); }
 #endif
 					}
@@ -1293,7 +1293,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 
 					if( DoDisplay )
 					{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 						/* Phong specular reads as tacky on
 						 * BGOBJECT models (doors, vents, large
 						 * flat decorations). Disable shine for
@@ -1306,14 +1306,14 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 #endif
 						if( ExecuteMxloadHeader( &ModelHeaders[ ModelNum ], i ) != true)
 						{
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 							{ c3d_set_object_shine_eligible(true); }
 #endif
 							Msg( "ModelDisp() ExecuteMxloadHeader for %s Failed\n",
 								&ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
 							return false;
 						}
-#ifdef RENDERER_C3D
+#ifdef __3DS__
 						{ c3d_set_object_shine_eligible(true); }
 #endif
 					}

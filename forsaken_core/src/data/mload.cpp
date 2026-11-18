@@ -1236,7 +1236,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 
 	FreeGroupConnections();
 
-#if defined(__3DS__) && defined(RENDERER_C3D)
+#ifdef __3DS__
 	/* The backend's persistent cache holds converted copies of these
 	 * execbufs; free it with them, not after the next level has loaded. */
 	c3d_release_level_cache();
