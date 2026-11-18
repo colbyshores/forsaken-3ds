@@ -4441,7 +4441,6 @@ bool DisplayTitle(void)
 */
 
 #ifdef __3DS__
-#ifdef RENDERER_C3D
 	{
 		float _slider = platform_get_3d_slider();
 		if (_slider > 0.0f)
@@ -4458,9 +4457,6 @@ bool DisplayTitle(void)
 			render_info.stereo_enabled = false;
 		}
 	}
-#else
-	render_info.stereo_enabled = false;
-#endif
 #endif
 	if( render_info.stereo_enabled )
 	{

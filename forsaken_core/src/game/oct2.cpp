@@ -3539,7 +3539,6 @@ bool MainGameRender(void)
        * Only the citro3d renderer supports stereo efficiently via display
        * list replay (one BSP pass, replayed for the second eye).  picaGL
        * would need two full render passes which halves the framerate. */
-#ifdef RENDERER_C3D
       {
           
           float slider = platform_get_3d_slider();
@@ -3559,9 +3558,6 @@ bool MainGameRender(void)
               render_info.stereo_enabled = false;
           }
       }
-#else
-      render_info.stereo_enabled = false;
-#endif
 #endif
 
       if( render_info.stereo_enabled )
