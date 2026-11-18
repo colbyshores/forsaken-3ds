@@ -119,7 +119,7 @@ const char *PrimaryDescription[MAXPRIMARYWEAPONS] =
 {
 	LT_MENU_NEW_PrimaryWeaponKeys2/*"Pulsar"*/,
 	LT_MENU_NEW_PrimaryWeaponKeys3/*trojax*/,
-	LT_MENU_NEW_PrimaryWeaponKeys4/*Pyrolite*/, 
+	LT_MENU_NEW_PrimaryWeaponKeys4/*Pyrolite*/,
 	LT_MENU_NEW_PrimaryWeaponKeys5 /*"transpulse"*/,
 	LT_MENU_NEW_PrimaryWeaponKeys6 /*"suss gun"*/,
 	LT_MENU_NEW_PrimaryWeaponKeys7 /*"laser"*/,
@@ -165,7 +165,7 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 /*===================================================================
 	Weapon 0, Pulsar
 ===================================================================*/
-	{	
+	{
 		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move
@@ -189,121 +189,121 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 	Weapon 1, Trojax
 ===================================================================*/
 	{
-		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		1000.0F,											// float	LifeCount         
-		{ 0, 0, 0 },										// u_int16_t	FireDelay         
-		{ 1.0F, 2.0F, 3.0F },								// float	AmmoUsage         
-		{ 160.0F, 160.0F, 256.0F },							// float	Damage            
+		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		1000.0F,											// float	LifeCount
+		{ 0, 0, 0 },										// u_int16_t	FireDelay
+		{ 1.0F, 2.0F, 3.0F },								// float	AmmoUsage
+		{ 160.0F, 160.0F, 256.0F },							// float	Damage
 		{ TROJAX_COLRADIUS,									// float	Collision Radius
 		  TROJAX_COLRADIUS,									// float	Collision Radius
 		  TROJAX_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Trojax,										// float	Collision Type
-		( 2048.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 100.0F, 100.0F, 100.0F },							// float	Light red value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 255.0F, 255.0F, 255.0F },							// float	Light blue value  
-		FM_TROJAX,											// int16_t	FmSeq;            
-		&Trojax1_Header										// FRAME_INFO ** FmFrmInfo    
+		( 2048.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 100.0F, 100.0F, 100.0F },							// float	Light red value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 255.0F, 255.0F, 255.0F },							// float	Light blue value
+		FM_TROJAX,											// int16_t	FmSeq;
+		&Trojax1_Header										// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 2, Pyrolite Rifle
 ===================================================================*/
 	{
-		{( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 80.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		64.0F,												// float	LifeCount         
-		{ 2, 2, 2 },										// u_int16_t	FireDelay         
-		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage         
-		{ 2.0F, 4.0F, 6.0F },								// float	Damage            
+		{( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 80.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		64.0F,												// float	LifeCount
+		{ 2, 2, 2 },										// u_int16_t	FireDelay
+		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
+		{ 2.0F, 4.0F, 6.0F },								// float	Damage
 		{ PYROLITE_COLRADIUS,								// float	Collision Radius
 		  PYROLITE_COLRADIUS,								// float	Collision Radius
 		  PYROLITE_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Point,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 128.0F, 128.0F, 128.0F },							// float	Light red value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 16.0F, 16.0F, 16.0F },							// float	Light blue value  
-		FM_FLAME,											// int16_t	FmSeq;            
-		&Exp2_Header										// FRAME_INFO ** FmFrmInfo    
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 128.0F, 128.0F, 128.0F },							// float	Light red value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 16.0F, 16.0F, 16.0F },							// float	Light blue value
+		FM_FLAME,											// int16_t	FmSeq;
+		&Exp2_Header										// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 3, Transpulse Cannon
 ===================================================================*/
 	{
-		{( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 192.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		1000.0F,											// float	LifeCount         
-		{ 27, 21, 15 },										// u_int16_t	FireDelay         
-		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage         
-		{ 45.0F, 55.0F, 64.0F },							// float	Damage            
+		{( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 192.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		1000.0F,											// float	LifeCount
+		{ 27, 21, 15 },										// u_int16_t	FireDelay
+		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
+		{ 45.0F, 55.0F, 64.0F },							// float	Damage
 		{ TRANSPULSE_COLRADIUS,								// float	Collision Radius
 		  TRANSPULSE_COLRADIUS,								// float	Collision Radius
 		  TRANSPULSE_COLRADIUS },							// float	Collision Radius
 		COLTYPE_Transpulse,									// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
 		{ 108.0F, 180.0F, 255.0F },							// float	Light red value
 		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
 		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
-		FM_ARC,												// int16_t	FmSeq;            
-		&Arc_Header											// FRAME_INFO ** FmFrmInfo    
+		FM_ARC,												// int16_t	FmSeq;
+		&Arc_Header											// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 4, Suss Gun
 ===================================================================*/
 	{
-		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		1000.0F,											// float	LifeCount         
-		{ 9, 7, 5 },										// u_int16_t	FireDelay         
+		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		1000.0F,											// float	LifeCount
+		{ 9, 7, 5 },										// u_int16_t	FireDelay
 		{ 1.0F, 2.0F, 3.0F },								// float	AmmoUsage
-		{ 11.0F, 13.0F, 15.0F },							// float	Damage            
+		{ 11.0F, 13.0F, 15.0F },							// float	Damage
 		{ SUSSGUN_COLRADIUS,								// float	Collision Radius
 		  SUSSGUN_COLRADIUS,								// float	Collision Radius
 		  SUSSGUN_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Point,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
 		{ 84.0F, 168.0F, 255.0F },							// float	Light red value
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value 
-		FM_ARC2,											// int16_t	FmSeq;            
-		&Flare_Header										// FRAME_INFO ** FmFrmInfo    
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
+		FM_ARC2,											// int16_t	FmSeq;
+		&Flare_Header										// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 5, Laser
 ===================================================================*/
-	{	
-		{ MaxColDistance,									// float	Speed i can move  
-		  MaxColDistance,									// float	Speed i can move  
-		  MaxColDistance },									// float	Speed i can move  
-		12.0F,												// float	LifeCount         
-		{ 26, 22, 18 },										// u_int16_t	FireDelay         
+	{
+		{ MaxColDistance,									// float	Speed i can move
+		  MaxColDistance,									// float	Speed i can move
+		  MaxColDistance },									// float	Speed i can move
+		12.0F,												// float	LifeCount
+		{ 26, 22, 18 },										// u_int16_t	FireDelay
 		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
-		{ 5.6F, 5.8F, 6.0F },								// float	Damage            
+		{ 5.6F, 5.8F, 6.0F },								// float	Damage
 		{ LASER_COLRADIUS,									// float	Collision Radius
 		  LASER_COLRADIUS,									// float	Collision Radius
 		  LASER_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Point,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 255.0F, 255.0F, 255.0F },							// float	Light red value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value 
-		FM_ARC2,											// int16_t	FmSeq;            
-		&Laser_Header										// FRAME_INFO ** FmFrmInfo    
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 255.0F, 255.0F, 255.0F },							// float	Light red value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
+		FM_ARC2,											// int16_t	FmSeq;
+		&Laser_Header										// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 6, Orbit Pulsar
 ===================================================================*/
-	{	
+	{
 		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move
@@ -326,7 +326,7 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 /*===================================================================
 	Weapon 7, Nme Bullet
 ===================================================================*/
-	{	
+	{
 		{( 64.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 64.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 64.0F * GLOBAL_SCALE ) },						// float	Speed i can move
@@ -349,7 +349,7 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 /*===================================================================
 	Weapon 8, Nme Pulsar
 ===================================================================*/
-	{	
+	{
 		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
 		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move
@@ -372,179 +372,179 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 	Weapon 9, Nme Trojax
 ===================================================================*/
 	{
-		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		1000.0F,											// float	LifeCount         
-		{ 0, 0, 0 },										// u_int16_t	FireDelay         
-		{ 1.0F, 2.0F, 3.0F },								// float	AmmoUsage         
-		{ 64.0F, 160.0F, 256.0F },							// float	Damage            
+		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		1000.0F,											// float	LifeCount
+		{ 0, 0, 0 },										// u_int16_t	FireDelay
+		{ 1.0F, 2.0F, 3.0F },								// float	AmmoUsage
+		{ 64.0F, 160.0F, 256.0F },							// float	Damage
 		{ TROJAX_COLRADIUS,									// float	Collision Radius
 		  TROJAX_COLRADIUS,									// float	Collision Radius
 		  TROJAX_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Trojax,										// float	Collision Type
-		( 2048.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 150.0F, 200.0F, 255.0F },							// float	Light red value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value  
-		FM_TROJAX,											// int16_t	FmSeq;            
-		&Trojax1_Header										// FRAME_INFO ** FmFrmInfo    
+		( 2048.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 150.0F, 200.0F, 255.0F },							// float	Light red value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
+		FM_TROJAX,											// int16_t	FmSeq;
+		&Trojax1_Header										// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 10, Nme Pyrolite Rifle
 ===================================================================*/
 	{
-		{( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 80.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		64.0F,												// float	LifeCount         
-		{ 2, 2, 2 },										// u_int16_t	FireDelay         
-		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage         
-		{ 2.0F, 4.0F, 6.0F },								// float	Damage            
+		{( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 80.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		64.0F,												// float	LifeCount
+		{ 2, 2, 2 },										// u_int16_t	FireDelay
+		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
+		{ 2.0F, 4.0F, 6.0F },								// float	Damage
 		{ PYROLITE_COLRADIUS,								// float	Collision Radius
 		  PYROLITE_COLRADIUS,								// float	Collision Radius
 		  PYROLITE_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Point,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 128.0F, 128.0F, 128.0F },							// float	Light red value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 16.0F, 16.0F, 16.0F },							// float	Light blue value  
-		FM_FLAME,											// int16_t	FmSeq;            
-		&Exp2_Header										// FRAME_INFO ** FmFrmInfo    
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 128.0F, 128.0F, 128.0F },							// float	Light red value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 16.0F, 16.0F, 16.0F },							// float	Light blue value
+		FM_FLAME,											// int16_t	FmSeq;
+		&Exp2_Header										// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 11, Nme Transpulse Cannon
 ===================================================================*/
 	{
-		{( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 192.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		1000.0F,											// float	LifeCount         
-		{ 27, 21, 15 },										// u_int16_t	FireDelay         
-		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage         
-		{ 45.0F, 55.0F, 64.0F },							// float	Damage            
+		{( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 192.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 192.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		1000.0F,											// float	LifeCount
+		{ 27, 21, 15 },										// u_int16_t	FireDelay
+		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
+		{ 45.0F, 55.0F, 64.0F },							// float	Damage
 		{ TRANSPULSE_COLRADIUS,								// float	Collision Radius
 		  TRANSPULSE_COLRADIUS,								// float	Collision Radius
 		  TRANSPULSE_COLRADIUS },							// float	Collision Radius
 		COLTYPE_Transpulse,									// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
 		{ 0.0F, 0.0F, 0.0F },								// float	Light red value
 		{ 108.0F, 180.0F, 255.0F },							// float	Light green value
 		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
-		FM_ARC,												// int16_t	FmSeq;            
-		&Arc_Header											// FRAME_INFO ** FmFrmInfo    
+		FM_ARC,												// int16_t	FmSeq;
+		&Arc_Header											// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 12, Nme Suss Gun
 ===================================================================*/
 	{
-		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		1000.0F,											// float	LifeCount         
-		{ 9, 7, 5 },										// u_int16_t	FireDelay         
+		{( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 128.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		1000.0F,											// float	LifeCount
+		{ 9, 7, 5 },										// u_int16_t	FireDelay
 		{ 1.0F, 2.0F, 3.0F },								// float	AmmoUsage
-		{ 11.0F, 13.0F, 15.0F },							// float	Damage            
+		{ 11.0F, 13.0F, 15.0F },							// float	Damage
 		{ SUSSGUN_COLRADIUS,								// float	Collision Radius
 		  SUSSGUN_COLRADIUS,								// float	Collision Radius
 		  SUSSGUN_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Point,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 0.0F, 0.0F, 0.0F },								// float	Light red value 
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 0.0F, 0.0F, 0.0F },								// float	Light red value
 		{ 84.0F, 168.0F, 255.0F },							// float	Light green value
-		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value 
-		FM_ARC2,											// int16_t	FmSeq;            
-		&Flare_Header										// FRAME_INFO ** FmFrmInfo    
+		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
+		FM_ARC2,											// int16_t	FmSeq;
+		&Flare_Header										// FRAME_INFO ** FmFrmInfo
 	},
 
 /*===================================================================
 	Weapon 13, Nme Laser
 ===================================================================*/
-	{	
-		{( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move  
-		 ( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move  
-		 ( 32768.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		12.0F,												// float	LifeCount         
-		{ 26, 22, 18 },										// u_int16_t	FireDelay         
+	{
+		{( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move
+		 ( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move
+		 ( 32768.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		12.0F,												// float	LifeCount
+		{ 26, 22, 18 },										// u_int16_t	FireDelay
 		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
-		{ 5.6F, 5.8F, 6.0F },								// float	Damage            
+		{ 5.6F, 5.8F, 6.0F },								// float	Damage
 		{ LASER_COLRADIUS,									// float	Collision Radius
 		  LASER_COLRADIUS,									// float	Collision Radius
 		  LASER_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Point,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 0.0F, 0.0F, 0.0F },								// float	Light red value 
-		{ 255.0F, 255.0F, 255.0F },							// float	Light green value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value 
-		FM_ARC2,											// int16_t	FmSeq;            
-		&Laser_Header										// FRAME_INFO ** FmFrmInfo    
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 0.0F, 0.0F, 0.0F },								// float	Light red value
+		{ 255.0F, 255.0F, 255.0F },							// float	Light green value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
+		FM_ARC2,											// int16_t	FmSeq;
+		&Laser_Header										// FRAME_INFO ** FmFrmInfo
 	},
 /*===================================================================
 	Weapon 14, Nme Lightning
 ===================================================================*/
-	{	
-		{( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move  
-		 ( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move  
-		 ( 32768.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		12.0F,												// float	LifeCount         
-		{ 26, 22, 18 },										// u_int16_t	FireDelay         
+	{
+		{( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move
+		 ( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move
+		 ( 32768.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		12.0F,												// float	LifeCount
+		{ 26, 22, 18 },										// u_int16_t	FireDelay
 		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
-		{ 5.6F, 5.8F, 6.0F },								// float	Damage            
+		{ 5.6F, 5.8F, 6.0F },								// float	Damage
 		{ LASER_COLRADIUS,									// float	Collision Radius
 		  LASER_COLRADIUS,									// float	Collision Radius
 		  LASER_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Point,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 255.0F, 255.0F, 255.0F },							// float	Light red value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value 
-		FM_ARC2,											// int16_t	FmSeq;            
-		&Laser_Header										// FRAME_INFO ** FmFrmInfo    
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 255.0F, 255.0F, 255.0F },							// float	Light red value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
+		FM_ARC2,											// int16_t	FmSeq;
+		&Laser_Header										// FRAME_INFO ** FmFrmInfo
 	},
 /*===================================================================
 	Weapon 15, Flames
 ===================================================================*/
 	{
-		{( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move  
-		 ( 80.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		1000.0F,											// float	LifeCount         
-		{ 2, 2, 2 },										// u_int16_t	FireDelay         
-		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage         
-		{ 16.0F, 20.0F, 24.0F },							// float	Damage            
+		{( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 80.0F * GLOBAL_SCALE ),							// float	Speed i can move
+		 ( 80.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		1000.0F,											// float	LifeCount
+		{ 2, 2, 2 },										// u_int16_t	FireDelay
+		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
+		{ 16.0F, 20.0F, 24.0F },							// float	Damage
 		{ FLAMES_COLRADIUS,									// float	Collision Radius
 		  FLAMES_COLRADIUS,									// float	Collision Radius
 		  FLAMES_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Sphere,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 128.0F, 128.0F, 128.0F },							// float	Light red value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light green value 
-		{ 16.0F, 16.0F, 16.0F },							// float	Light blue value  
-		FM_FLAME,											// int16_t	FmSeq;            
-		&Exp2_Header										// FRAME_INFO ** FmFrmInfo    
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 128.0F, 128.0F, 128.0F },							// float	Light red value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light green value
+		{ 16.0F, 16.0F, 16.0F },							// float	Light blue value
+		FM_FLAME,											// int16_t	FmSeq;
+		&Exp2_Header										// FRAME_INFO ** FmFrmInfo
 	},
 /*===================================================================
 	Weapon 16, Nme Power Laser
 ===================================================================*/
-	{	
-		{( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move  
-		 ( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move  
-		 ( 32768.0F * GLOBAL_SCALE ) },						// float	Speed i can move  
-		88.0F,												// float	LifeCount         
-		{ 100, 100, 100 },									// u_int16_t	FireDelay         
+	{
+		{( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move
+		 ( 32768.0F * GLOBAL_SCALE ),						// float	Speed i can move
+		 ( 32768.0F * GLOBAL_SCALE ) },						// float	Speed i can move
+		88.0F,												// float	LifeCount
+		{ 100, 100, 100 },									// u_int16_t	FireDelay
 		{ 2.0F, 4.0F, 6.0F },								// float	AmmoUsage
 		{ 8.0F, 9.5F, 10.0F },								// float	Damage
 		{ PLASER_COLRADIUS,									// float	Collision Radius
 		  PLASER_COLRADIUS,									// float	Collision Radius
 		  PLASER_COLRADIUS },								// float	Collision Radius
 		COLTYPE_Sphere,										// float	Collision Type
-		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize         
-		{ 0.0F, 0.0F, 0.0F },								// float	Light red value 
-		{ 255.0F, 255.0F, 255.0F },							// float	Light green value   
-		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value 
+		( 1536.0F * GLOBAL_SCALE ),							// float	lightsize
+		{ 0.0F, 0.0F, 0.0F },								// float	Light red value
+		{ 255.0F, 255.0F, 255.0F },							// float	Light green value
+		{ 0.0F, 0.0F, 0.0F },								// float	Light blue value
 		FM_ARC2,											// int16_t	FmSeq;
 		&Laser_Header										// FRAME_INFO ** FmFrmInfo
 	},
@@ -684,10 +684,10 @@ u_int16_t	FindFreePrimBull(void)
 	u_int16_t i;
 
 	i = FirstPrimBullFree;
-	
+
 	if ( i == INDEX_NONE)
 		return i;
- 
+
 	if( PrimBulls[i].Used )
 	{
 		// This Primary Bullet has been Used before....
@@ -719,7 +719,7 @@ void	KillUsedPrimBull( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
-	
+
 	if( !PrimBulls[i].Used )
 	{
 		// This Primary Bullet has been Freed before....
@@ -816,7 +816,7 @@ static int16_t	OnceOnlyFlag = 0;
 	PrimarySelectControl();
 
 	Ships[ WhoIAm ].Object.Flags &= ~SHIP_Charging;
-	
+
 	if( control.select_primary )
 	{
 		if( PrimaryWeaponsGot[ control.select_primary - 1 ] )
@@ -928,7 +928,7 @@ static int16_t	OnceOnlyFlag = 0;
 				PowerLevel = 100.0F;
 				if ( TrojaxChargeID )
 				{
-					StopSfx( TrojaxChargeID ); 
+					StopSfx( TrojaxChargeID );
 					TrojaxChargeID = 0;
 				}
 			}
@@ -959,7 +959,7 @@ static int16_t	OnceOnlyFlag = 0;
 			if( control.fire_primary )
 			{
 				OrbitFireDelay += (float) PrimaryWeaponAttribs[ ORBITPULSAR ].FireDelay[ Ships[ WhoIAm ].Object.PowerLevel ];
-	
+
 				for( Count = 0; Count < Ships[ WhoIAm ].NumMultiples; Count++ )
 				{
 					Model = Ships[ WhoIAm ].OrbModels[ Count ];
@@ -981,7 +981,7 @@ static int16_t	OnceOnlyFlag = 0;
 									Ships[ WhoIAm ].OrbModels[ Ships[ WhoIAm ].NumMultiples - 1 ] = INDEX_NONE;
 								}
 
-								Ships[ WhoIAm ].OrbAmmo[ Count ] = Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples - 1 ]; 
+								Ships[ WhoIAm ].OrbAmmo[ Count ] = Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples - 1 ];
 
 								NumOrbs++;
 								Ships[ WhoIAm ].NumMultiples--;
@@ -994,7 +994,7 @@ static int16_t	OnceOnlyFlag = 0;
 							Ships[ WhoIAm ].Object.Flags |= SHIP_MulFire;
 							Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
 							Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-		
+
 							Rotation.x = (float) fast_sinf( D2R( Models[ Model ].AxisRot ) );
 							Rotation.y = (float) fast_cosf( D2R( Models[ Model ].AxisRot ) );
 							Rotation.z = 0.0F;
@@ -1074,12 +1074,12 @@ static int16_t	OnceOnlyFlag = 0;
 				if( control.fire_primary )
 				{
 					PrimaryFireDelay += (float) PrimaryWeaponAttribs[ PrimaryToFireLookup[ Ships[WhoIAm].Primary ] ].FireDelay[ Ships[ WhoIAm ].Object.PowerLevel ];
-		
+
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideUp, &UpVector );		/* Calc Up Vector */
 					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );	/* Calc Up Vector */
 	   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
-		
+
 					if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
 					{
 						int8_t prm;
@@ -1123,7 +1123,7 @@ static int16_t	OnceOnlyFlag = 0;
 									Toggle = !Toggle;
 								}
 								break;
-			
+
 							case TROJAX:								/* Fire on release or when max reached */
 								if( GeneralAmmo )
 								{
@@ -1142,7 +1142,7 @@ static int16_t	OnceOnlyFlag = 0;
 
 											if( TrojaxChargeID )
 											{
-												StopSfx( TrojaxChargeID ); 
+												StopSfx( TrojaxChargeID );
 											}
 
 											Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
@@ -1154,25 +1154,25 @@ static int16_t	OnceOnlyFlag = 0;
 											ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 											ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
 							   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
-						
+
 											Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
 											Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
 											Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 											InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 															Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 															Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-			
+
 											recoil.x = 0.0F;
 											recoil.y = 0.0F;
 											recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
 											ForceInternalOneOff( WhoIAm, &recoil );
-			
+
 											PowerLevel = 0.0F;
 										}
 									}
 								}
 								break;
-			
+
 							case PYROLITE_RIFLE:
 								if( PyroliteAmmo )
 								{
@@ -1209,7 +1209,7 @@ static int16_t	OnceOnlyFlag = 0;
 
 								}
 								break;
-			
+
 							case TRANSPULSE_CANNON:
 
 								if( GeneralAmmo )
@@ -1230,7 +1230,7 @@ static int16_t	OnceOnlyFlag = 0;
 								}
 
 								break;
-			
+
 							case SUSS_GUN:
 								if( SussGunAmmo )
 								{
@@ -1255,7 +1255,7 @@ static int16_t	OnceOnlyFlag = 0;
 									}
 								}
 								break;
-			
+
 							case LASER:
 
 								if( GeneralAmmo && !LaserOverheated )
@@ -1269,14 +1269,14 @@ static int16_t	OnceOnlyFlag = 0;
 									Pos.x = -GUN_SIDE_OFFSET;
 									Pos.y = -GUN_DOWN_OFFSET;
 									Pos.z = 0.0F;
-									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary, 
+									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 
 									Pos.x = GUN_SIDE_OFFSET;
 									Pos.y = -GUN_DOWN_OFFSET;
 									Pos.z = 0.0F;
-									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary, 
+									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 
@@ -1301,7 +1301,7 @@ static int16_t	OnceOnlyFlag = 0;
 									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
 									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-									
+
 								}
 								if( GeneralAmmo && !LaserOverheated )
 								{
@@ -1345,7 +1345,7 @@ static int16_t	OnceOnlyFlag = 0;
 				else
 				{
 					if( PrimaryFireDelay < 0.0F ) PrimaryFireDelay = 0.0F;
-					
+
 					if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
 					{
 						switch( Ships[WhoIAm].Primary )
@@ -1356,10 +1356,10 @@ static int16_t	OnceOnlyFlag = 0;
 									if( PowerLevel > 10.0F )
 									{
 										VECTOR recoil;
-		 
-										if( TrojaxChargeID ) 
+
+										if( TrojaxChargeID )
 										{
-											StopSfx( TrojaxChargeID ); 
+											StopSfx( TrojaxChargeID );
 										}
 
 										Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
@@ -1371,7 +1371,7 @@ static int16_t	OnceOnlyFlag = 0;
 										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
 										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
 						   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
-					
+
 										Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
 										Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
 										Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
@@ -1383,12 +1383,12 @@ static int16_t	OnceOnlyFlag = 0;
 										recoil.y = 0.0F;
 										recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
 										ForceInternalOneOff( WhoIAm, &recoil );
-		
+
 										PowerLevel = 0.0F;
 									}
 								}
 								break;
-			
+
 							case PULSAR:
 							case PYROLITE_RIFLE:
 							case TRANSPULSE_CANNON:
@@ -1593,7 +1593,7 @@ void ProcessPrimaryBullets( void )
 					if( IsGroupVisible[ PrimBulls[i].GroupImIn ] )
 					{
 						PrimBulls[i].TimeCount += NewFramelag; //framelag;
-		
+
 						if( PrimBulls[i].TimeCount >= PrimBulls[i].TimeInterval )
 						{
 							PrimBulls[i].TimeCount = 0.0F;
@@ -1745,7 +1745,7 @@ void ProcessPrimaryBullets( void )
 			{
 				CreateSplash( (VECTOR *) &Int_Point, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn );
 			}
-			
+
 			HitTarget = CheckHitShip( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &Int_Point, &Int_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitTarget != INDEX_NONE ) HitWall = INDEX_NONE;
 
@@ -2221,7 +2221,7 @@ void ProcessPrimaryBullets( void )
 
 					case NME_TRANSPULSE:
    					case TRANSPULSE_CANNON:
-						if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched 
+						if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched
    						Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // -- unpatched
    						break;
 
@@ -2378,7 +2378,7 @@ void ProcessPrimaryBullets( void )
 				NormaliseVector( &TempVector );
 
 		  		ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
-	
+
 				Killed = false;
 
 				switch( PrimBulls[ i ].Weapon )
@@ -2821,7 +2821,7 @@ void ProcessPrimaryBullets( void )
 				for( Count = 0; Count < PrimBulls[i].numfmpolys; Count++ )
 				{
 					nextfmpoly = FmPolys[ fmpoly ].Prev;
-			
+
 					if ( fmpoly != INDEX_NONE )
 					{
 						FmPolys[ fmpoly ].Pos.x += MoveOffsetVector.x; //(PrimBulls[i].Dir.x * Speed);
@@ -2829,7 +2829,7 @@ void ProcessPrimaryBullets( void )
 						FmPolys[ fmpoly ].Pos.z += MoveOffsetVector.z; //(PrimBulls[i].Dir.z * Speed);
 						FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					}
-			
+
 					fmpoly = nextfmpoly;
 				}
 			}
@@ -2862,7 +2862,7 @@ void ProcessPrimaryBullets( void )
 						Polys[ poly ].Pos4.z += MoveOffsetVector.z;
 						Polys[ poly ].Group = PrimBulls[i].GroupImIn;
 					}
-			
+
 					poly = nextpoly;
 				}
 			}
@@ -2920,7 +2920,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 	{
 		if( FmPoly != INDEX_NONE ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
 		else NumSparks = ( Random_Range( 4 ) + 4 );
-	
+
 	   	fmpoly = FindFreeFmPoly();
 	   	if( fmpoly != INDEX_NONE )
 	   	{
@@ -2953,7 +2953,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 				TempQuat.From2Vectors(&Forward, Dir);
 				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideUp, &TempUp );
-		
+
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
 		   		FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
@@ -2981,11 +2981,11 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 				AddFmPolyToTPage( fmpoly, GetTPage( Trojax_Exp_Header, 0 ) );
 			}
 	   	}
-	
+
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-	
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3039,7 +3039,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 	{
 		if( FmPoly != INDEX_NONE ) NumSparks = (int16_t) ( ( FmPolys[ FmPoly ].RotSpeed / 5.0F ) + 5 );
 		else NumSparks = ( Random_Range( 4 ) + 4 );
-	
+
 	   	fmpoly = FindFreeFmPoly();
 	   	if( fmpoly != INDEX_NONE )
 	   	{
@@ -3072,7 +3072,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 				TempQuat.From2Vectors(&Forward, Dir);
 				TempQuat.ToMatrix(&TempMat);
 				ApplyMatrix( &TempMat, &SlideUp, &TempUp );
-		
+
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
 		   		FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
 		   		FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
@@ -3100,11 +3100,11 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 				AddFmPolyToTPage( fmpoly, GetTPage( Trojax_Exp_Header, 0 ) );
 			}
 	   	}
-	
+
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-	
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3151,7 +3151,7 @@ void CreatePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3191,7 +3191,7 @@ void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3233,7 +3233,7 @@ void CreateNewExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3300,7 +3300,7 @@ void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3340,7 +3340,7 @@ void CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group
 	if( IsGroupVisible[ Group ] )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -3392,7 +3392,7 @@ void CleanUpPrimBull( u_int16_t i, bool LightFlag  )
 		KillUsedLine( line );
 		PrimBulls[i].line = INDEX_NONE;
 	}
-	
+
 	if ( light != INDEX_NONE )
 	{
 		if( LightFlag )
@@ -3537,7 +3537,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						PlayPannedSfx( SFX_Pulsar, PrimBulls[i].GroupImIn, Pos, 0.0F );
 					}
 				}
-				else 
+				else
 				{
 					PlayPannedSfx( SFX_Pulsar, PrimBulls[i].GroupImIn, &PrimBulls[i].Pos, 0.0F );
 				}
@@ -3711,7 +3711,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
-	
+
 					if( PLevel == 100.0F )
 					{
 						FmPolys[ PrimBulls[i].fmpoly ].RotSpeed = PLevel + 10.0F;
@@ -4374,7 +4374,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
-	
+
 					if( PLevel == 100.0F )
 					{
 						FmPolys[ PrimBulls[i].fmpoly ].RotSpeed = PLevel + 10.0F;
@@ -4694,16 +4694,16 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						Polys[ poly ].Pos4 = PrimBulls[i].Pos;
 						Polys[ poly ].Col1.R = 16; //255
 						Polys[ poly ].Col1.G = 255; //255;
-						Polys[ poly ].Col1.B = 16; //255; 
+						Polys[ poly ].Col1.B = 16; //255;
 						Polys[ poly ].Col2.R = 16;//255;
 						Polys[ poly ].Col2.G = 255; //255;
-						Polys[ poly ].Col2.B = 16; //255; 
+						Polys[ poly ].Col2.B = 16; //255;
 						Polys[ poly ].Col3.R = 16; //255;
 						Polys[ poly ].Col3.G = 255; //255;
-						Polys[ poly ].Col3.B = 16; //255; 
+						Polys[ poly ].Col3.B = 16; //255;
 						Polys[ poly ].Col4.R = 16; //255;
 						Polys[ poly ].Col4.G = 255; //255;
-						Polys[ poly ].Col4.B = 16; //255; 
+						Polys[ poly ].Col4.B = 16; //255;
 						Polys[ poly ].Trans1 = 255;
 						Polys[ poly ].Trans2 = 255;
 						Polys[ poly ].Trans3 = 255;
@@ -4828,16 +4828,16 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						Polys[ poly ].Pos4 = PrimBulls[i].Pos;
 						Polys[ poly ].Col1.R = 255;
 						Polys[ poly ].Col1.G = 255;
-						Polys[ poly ].Col1.B = 255; 
+						Polys[ poly ].Col1.B = 255;
 						Polys[ poly ].Col2.R = 255;
 						Polys[ poly ].Col2.G = 255;
-						Polys[ poly ].Col2.B = 255; 
+						Polys[ poly ].Col2.B = 255;
 						Polys[ poly ].Col3.R = 255;
 						Polys[ poly ].Col3.G = 255;
-						Polys[ poly ].Col3.B = 255; 
+						Polys[ poly ].Col3.B = 255;
 						Polys[ poly ].Col4.R = 255;
 						Polys[ poly ].Col4.G = 255;
-						Polys[ poly ].Col4.B = 255; 
+						Polys[ poly ].Col4.B = 255;
 						Polys[ poly ].Trans1 = 255;
 						Polys[ poly ].Trans2 = 255;
 						Polys[ poly ].Trans3 = 255;
@@ -5003,15 +5003,15 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 		NumSparks = ( Random_Range( 10 ) + 10 );
-	
+
 	   	fmpoly = FindFreeFmPoly();
-	
+
 		if( fmpoly != INDEX_NONE )
 		{
 			TempQuat.From2Vectors(&Forward, Dir);
 		   	TempQuat.ToMatrix(&TempMat);
 		   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
-		
+
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
 		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
 		  	FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
@@ -5037,9 +5037,9 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 	   	}
-	
+
 	   	fmpoly = FindFreeFmPoly();
-	
+
 		if( fmpoly != INDEX_NONE )
 		{
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
@@ -5069,7 +5069,7 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-	
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -5121,15 +5121,15 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 		NumSparks = ( Random_Range( 10 ) + 10 );
-	
+
 	   	fmpoly = FindFreeFmPoly();
-	
+
 		if( fmpoly != INDEX_NONE )
 		{
 			TempQuat.From2Vectors(&Forward, Dir);
 		   	TempQuat.ToMatrix(&TempMat);
 		   	ApplyMatrix( &TempMat, &SlideUp, &TempUp );
-		
+
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
 		  	FmPolys[ fmpoly ].Pos.x = Pos->x + ( Dir->x * ( 32.0F * GLOBAL_SCALE ) );
 		  	FmPolys[ fmpoly ].Pos.y = Pos->y + ( Dir->y * ( 32.0F * GLOBAL_SCALE ) );
@@ -5155,9 +5155,9 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 	   	}
-	
+
 	   	fmpoly = FindFreeFmPoly();
-	
+
 		if( fmpoly != INDEX_NONE )
 		{
 		   	FmPolys[ fmpoly ].LifeCount = 48.0F;
@@ -5187,7 +5187,7 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-	
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -5236,11 +5236,11 @@ void CreateSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 		NumSparks = ( Random_Range( 10 ) + 10 );
-	
+
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-	
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -5288,11 +5288,11 @@ void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 		NumSparks = ( Random_Range( 10 ) + 10 );
-	
+
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-	
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -5465,11 +5465,11 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 		if( Range > 3 ) Range = (u_int16_t) 3;
 
 		NumSparks = Random_Range( Range );
-	   
+
 	   	for( Count = 0; Count < NumSparks; Count++ )
 	   	{
 	   	   	fmpoly = FindFreeFmPoly();
-	   
+
 	   	   	if( fmpoly != INDEX_NONE )
 	   	   	{
 	   			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -5643,11 +5643,11 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 		if( Range > 3 ) Range = (u_int16_t) 3;
 
 		NumSparks = Random_Range( Range );
-	   
+
 	   	for( Count = 0; Count < NumSparks; Count++ )
 	   	{
 	   	   	fmpoly = FindFreeFmPoly();
-	   
+
 	   	   	if( fmpoly != INDEX_NONE )
 	   	   	{
 	   			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -6019,7 +6019,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 			Polys[ poly ].Group = PrimBulls[i].GroupImIn;
 			PrimBulls[i].numpolys++;
 			PrimBulls[i].poly = poly;
-	
+
 			AddPolyToTPage( poly, GetTPage( *Polys[ poly ].Frm_Info, (int16_t) Polys[ poly ].Frame ) );
 		}
 
@@ -6061,7 +6061,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 			Polys[ poly ].Group = PrimBulls[i].GroupImIn;
 			PrimBulls[i].numpolys++;
 			PrimBulls[i].poly = poly;
-	
+
 			AddPolyToTPage( poly, GetTPage( *Polys[ poly ].Frm_Info, (int16_t) Polys[ poly ].Frame ) );
 		}
 
@@ -6080,11 +6080,11 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 	if( Range > 3 ) Range = (u_int16_t) 3;
 
 	NumSparks = Random_Range( Range );
-	
+
 	for( Count = 0; Count < NumSparks; Count++ )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -6197,36 +6197,36 @@ void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * /*IntPos2*/, u_
 			TempVector.y = ( IntPos->y - Pos->y );
 			TempVector.z = ( IntPos->z - Pos->z );
 			NormaliseVector( &TempVector );
-		
+
 			TempVector2.x = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 			TempVector2.y = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 			TempVector2.z = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 			NormaliseVector( &TempVector2 );
-		
+
 			/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 			Angle = (float) acosf( DotProduct( &TempVector, &TempVector2 ) );
 			if( Angle ) Time = D2R( ( 2.0F / Angle ) );
 			else Time = 1.0F;
 			if( Time > 1.0F ) Time = 1.0F;
-		
+
 			StartQuat.From2Vectors(&Forward, &TempVector);
 			EndQuat.From2Vectors(&Forward, &TempVector2);
-		
+
 			Step = 0.0F;
-		
+
 			for( Count = 0; Count < 4; Count++ )
 			{
 				if( Step < 1.0F )
 				{
 					Poly = FindFreePoly();
-				
+
 					if( Poly != INDEX_NONE )
 					{
 						Val = ( 1.0F / ( 256.0F / ( 255.0F - ( ( 3.0F - (float) Count ) * 40.0F ) ) ) );
 						RVal = (u_int8_t) ( (float) Red * Val );
 						GVal = (u_int8_t) ( (float) Green * Val );
 						BVal = (u_int8_t) ( (float) Blue * Val );
-	
+
 						Polys[ Poly ].Col1.R = RVal;
 						Polys[ Poly ].Col1.G = GVal;
 						Polys[ Poly ].Col1.B = BVal;
@@ -6257,20 +6257,20 @@ void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * /*IntPos2*/, u_
 						Polys[ Poly ].Ship = ShipHit;
 						Polys[ Poly ].TimeStep = Time;
 						Polys[ Poly ].Group = Ships[ ShipHit ].Object.Group;
-			
+
 						Polys[ Poly ].Qlerp.Step();
-		
+
 						Polys[ Poly ].Quat.ToMatrix(&TempMat);
 						MatrixTranspose( &TempMat, &TempInvMat );
 						TempInvMat._41 = Ships[ Polys[ Poly ].Ship ].Object.Pos.x;
 						TempInvMat._42 = Ships[ Polys[ Poly ].Ship ].Object.Pos.y;
 						TempInvMat._43 = Ships[ Polys[ Poly ].Ship ].Object.Pos.z;
-		
+
 						VisPolyApplyMatrix( &TempInvMat, &ShieldVerts[ 0 ], &Polys[ Poly ].Pos1 );
 						VisPolyApplyMatrix( &TempInvMat, &ShieldVerts[ 1 ], &Polys[ Poly ].Pos2 );
 						VisPolyApplyMatrix( &TempInvMat, &ShieldVerts[ 2 ], &Polys[ Poly ].Pos3 );
 						VisPolyApplyMatrix( &TempInvMat, &ShieldVerts[ 3 ], &Polys[ Poly ].Pos4 );
-			
+
 						Step += ( Time * 6.0F );
 
 						AddPolyToTPage( Poly, GetTPage( *Polys[ Poly ].Frm_Info, (int16_t) Polys[ Poly ].Frame ) );
@@ -6332,7 +6332,7 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 							else
 								ShipRadius = SHIP_RADIUS;
 							break;
-					
+
 						case COLTYPE_Transpulse:
 							TempVector.x = ( Ships[ Count ].Object.Pos.x - Pos->x );			// Bul - Ship
 							TempVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
@@ -6342,25 +6342,25 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 							Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, UpDir ) ) ) );
 							ShipRadius = ( SHIP_RADIUS + ( WeaponRadius * Cos ) );
 							break;
-					
+
 						case COLTYPE_Sphere:
 							ShipRadius = ( SHIP_RADIUS + WeaponRadius );
 							break;
-					
+
 						case COLTYPE_Point:
 							ShipRadius = SHIP_RADIUS;
 							break;
 					}
-					
+
 					if( RaytoSphere2( (VECTOR *) &Ships[ Count ].Object.Pos, SHIP_RADIUS, Pos, Dir,
 									  &Int_Temp, &Int_Temp2 ) )
 					{
 						TempVector.x = ( Int_Temp.x - Pos->x );
 						TempVector.y = ( Int_Temp.y - Pos->y );
 						TempVector.z = ( Int_Temp.z - Pos->z );
-					
+
 						DistToSphere = VectorLength( &TempVector );
-					
+
 						if( ( DistToSphere < DirLength ) && ( DistToSphere < ClosestLength ) )
 						{
 							if( ValidGroupCollision( Pos, Group, &Int_Temp, &Ships[ Count ].Object.Pos, Ships[ Count ].Object.Group ) )
@@ -6382,9 +6382,9 @@ u_int16_t CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_in
 								TempVector.x = ( Int_Temp.x - Pos->x );
 								TempVector.y = ( Int_Temp.y - Pos->y );
 								TempVector.z = ( Int_Temp.z - Pos->z );
-							
+
 								DistToSphere = VectorLength( &TempVector );
-							
+
 								if( ( DistToSphere < DirLength ) && ( DistToSphere < ClosestLength ) )
 								{
 									if( ValidGroupCollision( Pos, Group, &Int_Temp, &Ships[ Count ].Object.Pos, Ships[ Count ].Object.Group ) )
@@ -6510,7 +6510,7 @@ u_int16_t CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR
 						Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
 						SecBullRadius = ( MINE_RADIUS + ( WeaponRadius * Cos ) );
 						break;
-				
+
 					case COLTYPE_Transpulse:
 						TempVector.x = ( SecBull->Pos.x - Pos->x );			// Bul - Ship
 						TempVector.y = ( SecBull->Pos.y - Pos->y );
@@ -6520,26 +6520,26 @@ u_int16_t CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR
 						Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, UpDir ) ) ) );
 						SecBullRadius = ( MINE_RADIUS + ( WeaponRadius * Cos ) );
 						break;
-				
+
 					case COLTYPE_Sphere:
 						SecBullRadius = ( MINE_RADIUS + WeaponRadius );
 						break;
-				
+
 					case COLTYPE_Point:
 						SecBullRadius = MINE_RADIUS;
 						break;
 				}
-				
-				
+
+
 				if( RaytoSphere2( &SecBull->Pos, SecBullRadius, Pos, Dir,
 								  &Int_Temp, &Int_Temp2 ) )
 				{
 					TempVector.x = ( Int_Temp.x - Pos->x );
 					TempVector.y = ( Int_Temp.y - Pos->y );
 					TempVector.z = ( Int_Temp.z - Pos->z );
-				
+
 					DistToSphere = VectorLength( &TempVector );
-				
+
 					if( ( DistToSphere <= DirLength ) && ( DistToSphere < ClosestLength ) )
 					{
 						if( ValidGroupCollision( Pos, Group, &Int_Temp, &SecBull->Pos, SecBull->GroupImIn ) )
@@ -6713,7 +6713,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 		for( Count = 0; Count < Ships[ Ship ].NumMultiples; Count++ )
 		{
 			Model = Ships[ Ship ].OrbModels[ Count ];
-			
+
 			if( Model != INDEX_NONE )
 			{
 				Rotation.x = (float) fast_sinf( D2R( Models[ Model ].AxisRot ) );
@@ -6775,17 +6775,17 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					}
 				}
 				break;
-		
+
 			case TROJAX:								/* Fire on release or when max reached */
 				ApplyMatrix( &Ships[Ship].Object.FinalMat, &Forward, &Dir );
 				ApplyMatrix( &Ships[Ship].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
 	   			ApplyMatrix( &Ships[Ship].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
-	
+
 				if( TrojaxOwnersID[ Ship ] )
 				{
-					StopSfx( TrojaxOwnersID[ Ship ] ); 
+					StopSfx( TrojaxOwnersID[ Ship ] );
 				}
-	
+
 				Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
 				Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
 				Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
@@ -6796,13 +6796,13 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
-		
+
 				Recoil.x = 0.0F;
 				Recoil.y = 0.0F;
 				Recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
 				ForceInternalOneOff( Ship, &Recoil );
 				break;
-		
+
 			case PYROLITE_RIFLE:
 				Pos.x = ( DownVector.x * ( 100.0F * GLOBAL_SCALE ) );
 				Pos.y = ( DownVector.y * ( 100.0F * GLOBAL_SCALE ) );
@@ -6841,7 +6841,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
 				break;
-		
+
 			case TRANSPULSE_CANNON:
 				Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
 				Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
@@ -6854,7 +6854,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
 				break;
-		
+
 			case SUSS_GUN:
 				Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
 				Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
@@ -6871,7 +6871,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					}
 				}
 				break;
-		
+
 			case LASER:
 				Pos.x = -GUN_SIDE_OFFSET;
 				Pos.y = -GUN_DOWN_OFFSET;
@@ -6883,7 +6883,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
-	
+
 				Pos.x = GUN_SIDE_OFFSET;
 				Pos.y = -GUN_DOWN_OFFSET;
 				Pos.z = 0.0F;
@@ -6907,7 +6907,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				{
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
-	
+
 				Pos.x = GUN_SIDE_OFFSET;
 				Pos.y = -GUN_DOWN_OFFSET;
 				Pos.z = 0.0F;
@@ -6932,7 +6932,7 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
 				break;
-		
+
 			default:
 				break;
 		}
@@ -6958,9 +6958,9 @@ void CreateColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	if( IsGroupVisible[ Group ] )
 	{
 		CreateBigFlash( Pos, Group, 3.5F );
-	
+
 		fmpoly = FindFreeFmPoly();
-	
+
 		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -6988,11 +6988,11 @@ void CreateColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		}
 
 		NumSparks = ( Random_Range( 2 ) + 1 );
-		
+
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-		
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -7046,7 +7046,7 @@ void CreateSmallColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		if( !Random_Range( 5 ) )
 		{
 			CreateBigFlash( Pos, Group, 3.5F );
-	
+
 			fmpoly = FindFreeFmPoly();
 			if( fmpoly != INDEX_NONE )
 			{
@@ -7073,13 +7073,13 @@ void CreateSmallColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				FmPolys[ fmpoly ].ysize = Scale;
 				AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 			}
-		
+
 			NumSparks = ( Random_Range( 2 ) + 1 );
-			
+
 			for( Count = 0; Count < NumSparks; Count++ )
 			{
 			   	fmpoly = FindFreeFmPoly();
-			
+
 			   	if( fmpoly != INDEX_NONE )
 			   	{
 					FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -7199,7 +7199,7 @@ void GivemeAllWeapons( void )
 	if( Ships[ WhoIAm ].Invul && PickupInvulnerability ) NumInvuls++;
 
 	Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
-	Ships[ WhoIAm ].Invul = true;			
+	Ships[ WhoIAm ].Invul = true;
 	PickupInvulnerability = false;
 
 	GivemeSuperNashram();
@@ -7234,7 +7234,7 @@ void LoseAllWeapons( void )
 	NitroFuel = GodModeCopyOfNitroFuel;
 
 	Ships[ WhoIAm ].InvulTimer = 0.0F;
-	Ships[ WhoIAm ].Invul = false;			
+	Ships[ WhoIAm ].Invul = false;
 	PickupInvulnerability = false;
 }
 
@@ -7356,7 +7356,7 @@ void GetDeathString( BYTE WeaponType, BYTE Weapon, char * DstString )
 					break;
 			}
 			break;
-	
+
 		case WEPTYPE_Secondary:
 			switch( Weapon )
 			{
@@ -7705,14 +7705,14 @@ void ChangePulsarDir( u_int16_t i, VECTOR * Dir )
 	ApplyMatrix( &TempMatrix, &Forward, &DirVector );
 	ApplyMatrix( &TempMatrix, &SlideDown, &DownVector );
 	ApplyMatrix( &TempMatrix, &SlideLeft, &LeftVector );
-	
+
 	PrimBulls[i].ColFlag = 0;
 	PrimBulls[i].Dir = *Dir;
 
 	Trail_Length = ( (float) -( ( PrimBulls[ i ].PowerLevel * PULSAR_TAILPOWERMUL ) + PULSAR_TAILADDMIN ) );
-	
+
 	poly = PrimBulls[i].poly;
-	
+
 	if( poly != INDEX_NONE )
 	{
 		Polys[ poly ].Pos1.x = PrimBulls[i].Pos.x - ( DownVector.x * PULSAR_TAILSTART );
@@ -7895,7 +7895,7 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 	InvulInterval = 1.0F;
 
 	InvulCount += framelag;
-		
+
 	if( InvulCount >= InvulInterval )
 	{
 		InvulCount = 0.0F;
@@ -7908,25 +7908,25 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 				TempVector.y = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 				TempVector.z = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 				NormaliseVector( &TempVector );
-			
+
 				TempVector2.x = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 				TempVector2.y = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 				TempVector2.z = ( ( ( (float) Random_Range( 5120 ) ) / 20480.0F ) - 0.125F );
 				NormaliseVector( &TempVector2 );
-			
+
 				/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 				Angle = (float) acosf( DotProduct( &TempVector, &TempVector2 ) );
 				if( Angle ) Time = D2R( ( 2.0F / Angle ) );
 				else Time = 1.0F;
 				if( Time > 1.0F ) Time = 1.0F;
-			
+
 				StartQuat.From2Vectors(&Forward, &TempVector);
 				EndQuat.From2Vectors(&Forward, &TempVector2);
-			
+
 				Step = 0.0F;
-			
+
 				Poly = FindFreePoly();
-					
+
 				if( Poly != INDEX_NONE )
 				{
 					Polys[ Poly ].Col1.R = RVal;
@@ -7959,15 +7959,15 @@ void CreateInvEffect( u_int16_t ShipHit, int16_t Num, u_int8_t RVal, u_int8_t GV
 					Polys[ Poly ].Ship = ShipHit;
 					Polys[ Poly ].TimeStep = Time;
 					Polys[ Poly ].Group = Ships[ ShipHit ].Object.Group;
-				
+
 					Polys[ Poly ].Qlerp.Step();
-			
+
 					Polys[ Poly ].Quat.ToMatrix(&TempMat);
 					MatrixTranspose( &TempMat, &TempInvMat );
 					TempInvMat._41 = Ships[ Polys[ Poly ].Ship ].Object.Pos.x;
 					TempInvMat._42 = Ships[ Polys[ Poly ].Ship ].Object.Pos.y;
 					TempInvMat._43 = Ships[ Polys[ Poly ].Ship ].Object.Pos.z;
-			
+
 					VisPolyApplyMatrix( &TempInvMat, &ShieldVerts[ 0 ], &Polys[ Poly ].Pos1 );
 					VisPolyApplyMatrix( &TempInvMat, &ShieldVerts[ 1 ], &Polys[ Poly ].Pos2 );
 					VisPolyApplyMatrix( &TempInvMat, &ShieldVerts[ 2 ], &Polys[ Poly ].Pos3 );
@@ -8077,7 +8077,7 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 	}
 
 	fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-	
+
 	if( fmpoly != INDEX_NONE )
 	{
 		FmPolys[ fmpoly ].LifeCount = 4.0F;
@@ -8098,13 +8098,13 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 		FmPolys[ fmpoly ].Group = Group;
 		AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 	}
-	
+
 	NumSparks = ( Random_Range( 10 ) + 10 );
-	
+
 	for( Count = 0; Count < NumSparks; Count++ )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -8217,7 +8217,7 @@ void CreateScaleExplosion( VECTOR * Pos, u_int16_t Group, float GlobalScale )
 		for( Count = 0; Count < ( Random_Range( 2 ) + 1 ); Count++ )
 		{
 			fmpoly = FindFreeFmPoly();
-	
+
 			if( fmpoly != INDEX_NONE )
 			{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -8235,7 +8235,7 @@ void CreateScaleExplosion( VECTOR * Pos, u_int16_t Group, float GlobalScale )
 				FmPolys[ fmpoly ].Dir.z = 0.0F;
 				FmPolys[ fmpoly ].Speed = 0.0F;
 				FmPolys[ fmpoly ].Group = Group;
-	
+
 				if( Count == 0 )
 				{
 					FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -8436,7 +8436,7 @@ FILE * LoadPrimBulls( FILE * fp )
 		fread( &PowerLevel, sizeof( PowerLevel ), 1, fp );
 		fread( &Toggle, sizeof( Toggle ), 1, fp );
 		fread( &GlobalPrimBullsID, sizeof( GlobalPrimBullsID ), 1, fp );
-		
+
 		i = FirstPrimBullUsed;
 
 		while( i != INDEX_NONE )
@@ -8652,7 +8652,7 @@ void KillPrimBullsByOwner(  u_int16_t OwnerType, u_int16_t Owner )
 	while( i != INDEX_NONE )
 	{
 		nextprim = PrimBulls[i].Prev;
-				
+
 		if( ( OwnerType == PrimBulls[i].OwnerType ) && ( Owner == PrimBulls[i].Owner ) )
 		{
 			CleanUpPrimBull( i, true );

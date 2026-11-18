@@ -15,7 +15,7 @@
 // text.cpp
 #define LT_TEAM_1		"Red"
 #define LT_TEAM_2		"Green"
-#define LT_TEAM_3		"Blue" 
+#define LT_TEAM_3		"Blue"
 #define LT_TEAM_4		"Yellow"
 
 #define LIVES			"Lives"
@@ -97,7 +97,7 @@
 
 #define TAKE_FLAG_TO_GOAL				"take the flag to the %s goal" // %s=<team name>
 #define SOMEONE_HAS_GOT_THE_FLAG		"%s on the %s team has got the flag" // %s1=<player name>, %s2=<team name>
-#define YOU_HAVE_GOT_THE_BOUNTY			"you have found the bounty" 
+#define YOU_HAVE_GOT_THE_BOUNTY			"you have found the bounty"
 #define TEAM_FLAG_RETURNED				"the %s flag has been returned" // %s=<team name>
 #define RETURN_TEAM_FLAG				"return the flag to the %s goal" // %s=<team name>
 #define CANNOT_PICKUP_OWN_FLAG			"you cannot pick up your own team's flag"

@@ -7,11 +7,11 @@
  * language selection.
  */
 
-#define LT_MacroText1 "you ugly son of a bitch..." 
-#define LT_MacroText2 "Time to die..." 
+#define LT_MacroText1 "you ugly son of a bitch..."
+#define LT_MacroText2 "Time to die..."
 #define LT_MacroText3 "I will tear your soul apart..."
 
-#define LT_GameCompleteGotAllCrystalsSoFar "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award." 
+#define LT_GameCompleteGotAllCrystalsSoFar "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award."
 #define LT_GameCompleteWithCheating "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"
 
 #define LT_MENU_NEW_SpecialMessage0 "ok"
@@ -22,18 +22,18 @@
 
 #define LT_MENU_NEW_NumberOfCrystals0 "ok"
 
-#define LT_MENU_NEW_StartSinglePlayer0 "single player game" 
-#define LT_MENU_NEW_StartSinglePlayer1 "start" 
-#define LT_MENU_NEW_StartSinglePlayer2 "select level" 
+#define LT_MENU_NEW_StartSinglePlayer0 "single player game"
+#define LT_MENU_NEW_StartSinglePlayer1 "start"
+#define LT_MENU_NEW_StartSinglePlayer2 "select level"
 
 #define LT_MENU_NEW_Error0 "ok"
 
 #define LT_MENU_NEW_GeneralLoading0 "loading..."
 
-#define LT_MENU_NEW_HostWaitingToStart0 "waiting to start..." 
-#define LT_MENU_NEW_HostWaitingToStart1 "start" 
-#define LT_MENU_NEW_HostWaitingToStart3 "Num of Players" 
-#define LT_MENU_NEW_HostWaitingToStart4 "msg:" 
+#define LT_MENU_NEW_HostWaitingToStart0 "waiting to start..."
+#define LT_MENU_NEW_HostWaitingToStart1 "start"
+#define LT_MENU_NEW_HostWaitingToStart3 "Num of Players"
+#define LT_MENU_NEW_HostWaitingToStart4 "msg:"
 
 #define LT_MENU_NEW_ValidPickups0 "allowed pickups"
 #define LT_MENU_NEW_ValidPickups1 "trojax"
@@ -64,10 +64,10 @@
 
 #define LT_MENU_NEW_MoreMultiplayerOptions2 "short packets"
 #define LT_MENU_NEW_MoreMultiplayerOptions4 "packet rate"
-#define LT_MENU_NEW_MoreMultiplayerOptions10 "Bounty bonus" 
-#define LT_MENU_NEW_MoreMultiplayerOptions11 "flag capture score" 
-#define LT_MENU_NEW_MoreMultiplayerOptions12 "bounty bonus interval" 
-#define LT_MENU_NEW_MoreMultiplayerOptions13 "own flag rule" 
+#define LT_MENU_NEW_MoreMultiplayerOptions10 "Bounty bonus"
+#define LT_MENU_NEW_MoreMultiplayerOptions11 "flag capture score"
+#define LT_MENU_NEW_MoreMultiplayerOptions12 "bounty bonus interval"
+#define LT_MENU_NEW_MoreMultiplayerOptions13 "own flag rule"
 #define LT_MENU_NEW_MoreMultiplayerOptions19 "change allowed pickups"
 #define LT_MENU_NEW_MoreMultiplayerOptions20 "randomize pickups"
 #define LT_MENU_NEW_MoreMultiplayerOptions21 "num primaries"
@@ -282,7 +282,7 @@
 
 
 #define LT_MENU_QuickTextSendWhisper0 "Whisper Message: "
-									  
+
 #define LT_MENU_EditMacro10 "Edit Message 1"
 #define LT_MENU_EditMacro11 "Enter Message 1 "
 
@@ -398,7 +398,7 @@
 #define LT_MENU_NEW_ChangeBikeComputer0 "Select Bike Computer"
 #define LT_MENU_NEW_ChangeBikeComputer1 "Choose bike computer..."
 #define LT_MENU_NEW_ChangeBikeComputer2 "list..."
-					 
+
 #define LT_MENU_SelectScreenMode0 "Select Screen Mode"
 #define LT_MENU_SelectScreenMode1 "Choose From..."
 
@@ -473,9 +473,9 @@
 #define LT_FoetoedBikerText "A HIDEOUS GENETIC MUTATION CONTAINED WITHIN A LIFE SUSTAINING STEEL WOMB, THE THING KNOWN ONLY AS FOETOID BRINGS DEATH AND DESTRUCTION TO ALL WHO WOULD STAND IN ITS WAY.~~NO HUMAN CONSCIENCE CLOUDS ITS THOUGHTS, AND NO SHRED OF MORALITY HINDERS ITS ACTIONS."
 #define LT_JapBirdBikerText "BEING A WILD AND VIOLENT PSYCHOTIC ITS NO SURPRISE THAT NIM SOO SUN HAS EARNT HERSELF THE NICKNAME 'THE BABE WITH THE BLADES'. AN EX-MEMBER OF THE GRUESOME XENO-CIRCUS, SHE NOW WORKS FREELANCE SELLING ANCIENT RELICS PLUNDERED FROM CONDEMNED WORLDS. EARTH IS HER NEXT DESTINATION..."
 #define LT_NuttaBikerText "NUTTA WAS ONCE AN EMINENT PHYSICIAN AND A MODEL CITIZEN. HOWEVER, BENEATH THIS FACADE LAY A TORTURED AND DERANGED MIND. THE DOCTOR WAS FINALLY COMMITED AFTER TRYING TO ANAESTHETIZE A PATIENT WITH A SLEDGEHAMMER! THE DOCTOR HAS NOW BEEN RELEASED, APPARENTLY CURED, UPON AN UNSUSPECTING WORLD."
-#define LT_SceptreBikerText "DESPITE BEING DEFORMED BY A GRUESOME GENETIC DISEASE, SCEPTRE HAS STILL ELEVATED HIS STATUS TO THAT OF THE TRULY FEARED AND DESPISED.~~IN THE LAST FEW YEARS HE HAS STAMPED HIS IRON WILL ON SEVERAL WORLDS AND BROUGHT THEIR TERRIFIED POPULATIONS TO HEEL." 
+#define LT_SceptreBikerText "DESPITE BEING DEFORMED BY A GRUESOME GENETIC DISEASE, SCEPTRE HAS STILL ELEVATED HIS STATUS TO THAT OF THE TRULY FEARED AND DESPISED.~~IN THE LAST FEW YEARS HE HAS STAMPED HIS IRON WILL ON SEVERAL WORLDS AND BROUGHT THEIR TERRIFIED POPULATIONS TO HEEL."
 #define LT_JoBikerText "HE IS THE ULTIMATE COMPUTER JUNKIE; A LAID BACK SLACKER ATTITUDE, MARRIED TO A HARDCORE TECHNO OBSESSION.~~JO IS IN THIS LINE OF WORK FOR JUST ONE REASON, HIS LOVE OF CYBER-JUNK, SMART WEAPONS AND GADGETRY."
-#define LT_SharkBikerText "CUVEL IS YOUR AVERAGE, CUNNING, DOUBLE-CROSSING, GAMBLING, SWINDLER... AND THEN SOME. HE KNOWS WHERE THE MONEY'S TO BE MADE AND HOW TO GET IT.~~WHY WORK FOR SOMETHING WHEN YOU CAN STEAL IT?" 
+#define LT_SharkBikerText "CUVEL IS YOUR AVERAGE, CUNNING, DOUBLE-CROSSING, GAMBLING, SWINDLER... AND THEN SOME. HE KNOWS WHERE THE MONEY'S TO BE MADE AND HOW TO GET IT.~~WHY WORK FOR SOMETHING WHEN YOU CAN STEAL IT?"
 #define LT_HK5BikerText "HK-5 REPRESENTS THE PINNACLE OF COMPUTER CONTROLLED ATTACK CRAFT TECHNOLOGY GONE WRONG. ITS SILICON BRAIN IS INFECTED WITH MEGALOMANIA, GREED AND LOATHING FOR ALL HUMANOID LIFEFORMS.~~GENOCIDE IS ITS ONLY DESIRE."
 #define LT_NubiaBikerText "NUBIA SPECIALIZES IN ARMED ROBBERY AND CONTRACT KILLINGS.~~MORE RECENTLY, SHE HAS ALSO DABBLED WITH COMPUTER CRIME AND FRAUD. NO ONE HAS CROSSED HER AND LIVED TO TELL THE TALE.~~A MEANER BITCH YOU'D BE HARD PRESSED TO FIND."
 #define LT_MophistoBikerText "TTEC IV'S. THE LATEST MULTI-PURPOSE COMBAT DROIDS. IN 2112, ALL WERE ORDERED DESTROYED DUE TO DEFECTIVE CONTROL CIRCUITRY. MOFISTO WAS A TTEC IV. THE NEWS OF HIS IMMINENT SHUTDOWN DIDN'T SIT WELL WITH HIS SURVIVAL CODE. PURE PUMPING METAL DEVASTATION JUST HIT THE STREETS!"
@@ -509,37 +509,37 @@
 #define LT_PressKey "press key or button for %s"	// %s will be name of action
 #define LT_ViewAlternateKeys "[right]=view alternate keys for %s"	// %s = action
 #define LT_ViewAlternateKeys2 "[left]=view alternate keys for %s"	// %s = action
-#define LT_SelectControl "[up/down]=select control" 
-#define LT_Cancel "[esc]=cancel" 
+#define LT_SelectControl "[up/down]=select control"
+#define LT_Cancel "[esc]=cancel"
 #define LT_Add "[enter]=add, [del]=remove key for %s"	// %s = action
 
 #define LT_Unconnected1 " is not connected"
 #define LT_Unconnected2 " unconnected"
 #define LT_AlsoControls "[%s] also controls "
 
-#define LT_ToggleOn " ON"  
+#define LT_ToggleOn " ON"
 #define LT_ToggleOff " OFF"
-#define LT_ToggleShooter " SHOOTER"  
+#define LT_ToggleShooter " SHOOTER"
 #define LT_ToggleTarget " TARGET"
-#define LT_Undef "undef"	// short for undefined 
+#define LT_Undef "undef"	// short for undefined
 
 #define LT_QuitToMainMenu "Quit to Main Menu"
 
 #define LT_LevelName "level name: %s"	// %s is name of level
-#define LT_LevelPlayedFor1 "%s played for %hd mins %hd secs"	// %s = player name, %hd = num mins, %hd = num secs  
-#define LT_LevelPlayedFor2 "played for %hd mins %hd secs"		// %s = player name, %hd = num mins, %hd = num secs  
-#define LT_EnemiesKilled "enemies killed: %hd of %hd"	// %hd = number 
+#define LT_LevelPlayedFor1 "%s played for %hd mins %hd secs"	// %s = player name, %hd = num mins, %hd = num secs
+#define LT_LevelPlayedFor2 "played for %hd mins %hd secs"		// %s = player name, %hd = num mins, %hd = num secs
+#define LT_EnemiesKilled "enemies killed: %hd of %hd"	// %hd = number
 
 #define LT_NoSavedGamesFound "no saved games found"
 
 #define LT_NoLimit "no limit"
 #define LT_OneMinute "1 min"
-#define LT_ManyMinutes "%d mins"	// %d = num minutes 
-#define LT_NoValue "no value" 
+#define LT_ManyMinutes "%d mins"	// %d = num minutes
+#define LT_NoValue "no value"
 
 #define LT_SpaceOrb "You must use spaceware to set up the spaceball axis"
 
-#define LT_NoJoysticks "No Joysticks Connected~~(you cannot connect a joystick while the game is running)"	// ~~ = newline  
+#define LT_NoJoysticks "No Joysticks Connected~~(you cannot connect a joystick while the game is running)"	// ~~ = newline
 
 #define LT_OneCrystalFound "%d crystal found so far"	// %d is number of crystals
 #define LT_CrystalsFound "%d crystals found so far"	// %d is number of crystals
@@ -547,15 +547,15 @@
 #define	LT_OneSecretFoundOutOf "%d secret found out of %d"
 #define	LT_SecretsFoundOutOf "%d secrets found out of %d"
 
-#define LT_OneGoldBarFound "%d gold bar found so far"	// %d is number of gold bars 
-#define LT_GoldBarsFound "%d gold bars found so far"	// %d is number of gold bars 
+#define LT_OneGoldBarFound "%d gold bar found so far"	// %d is number of gold bars
+#define LT_GoldBarsFound "%d gold bars found so far"	// %d is number of gold bars
 
-#define LT_OneEnemyKilled "%d enemy killed out of %d" 
-#define LT_EnemysKilled "%d enemies killed out of %d" 
+#define LT_OneEnemyKilled "%d enemy killed out of %d"
+#define LT_EnemysKilled "%d enemies killed out of %d"
 
-#define LT_TimeTaken1 "time taken %d min %d sec" 
-#define LT_TimeTaken2 "time taken %d mins %d sec" 
-#define LT_TimeTaken3 "time taken %d min %d secs" 
+#define LT_TimeTaken1 "time taken %d min %d sec"
+#define LT_TimeTaken2 "time taken %d mins %d sec"
+#define LT_TimeTaken3 "time taken %d min %d secs"
 #define LT_TimeTaken4 "time taken %d mins %d secs"
 
 #define LT_CTF_Normal "normal"

@@ -68,7 +68,7 @@ typedef struct MCLOADHEADER{
 
 bool MCload( char * Filename , MCLOADHEADER * MCloadheader );
 bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
-					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
+					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset,
 					  VECTOR *EndPos, u_int16_t *EndGroup,
 					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject );
 u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset );

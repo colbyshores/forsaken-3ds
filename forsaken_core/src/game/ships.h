@@ -57,24 +57,24 @@ constexpr float HULL_CRITICAL_LEVEL = ( 64.0F );
 typedef struct _BIKEMOD
 {
 	float	MaxMoveSpeed;
-	float	MoveAccell;		
-	float	MoveDecell;		
-	float	MaxTurboSpeed;   
-	float	TurboAccell;		
-	float	TurboDecell;		
-	float	MaxTurnSpeed;	
-	float	TurnAccell;		
-	float	TurnDecell;		
-	float	MaxRollSpeed;	
-	float	RollAccell;		
-	float	RollDecell;		
-	float	MaxBankAngle;    
-	float	BankAccell;		
+	float	MoveAccell;
+	float	MoveDecell;
+	float	MaxTurboSpeed;
+	float	TurboAccell;
+	float	TurboDecell;
+	float	MaxTurnSpeed;
+	float	TurnAccell;
+	float	TurnDecell;
+	float	MaxRollSpeed;
+	float	RollAccell;
+	float	RollDecell;
+	float	MaxBankAngle;
+	float	BankAccell;
 	float	BankDecell;
 	float	Start_Shield;
 	float	Start_Hull;
 	float	AutoLevel;
-	
+
 } BIKEMOD;
 
 

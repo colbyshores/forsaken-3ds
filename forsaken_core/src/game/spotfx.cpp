@@ -157,7 +157,7 @@ bool LoadSpotFX( void )
 				DebugPrintf( "Couldn't Initialise SpotFX (%d)\n", Count );
 				fclose( fp );
 				return( false );
-			}	
+			}
 		}
 
 		fclose( fp );
@@ -971,7 +971,7 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 		}
 
 		fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-	
+
 		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = 4.0F;
@@ -992,13 +992,13 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 		}
-	
+
 		NumSparks = ( Random_Range( 10 ) + 10 );
-		
+
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-		
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -1088,7 +1088,7 @@ void CreateSpotFXExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
    			FmPolys[ fmpoly ].Dir = *Dir;
    			FmPolys[ fmpoly ].Speed = 0.0F;
    			FmPolys[ fmpoly ].Group = Group;
-   
+
    			if( Count == 0 )
    			{
    				FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -1389,7 +1389,7 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 		}
 
 		fmpoly = FindFreeFmPoly();					// Faceme polygon attached
-	
+
 		if( fmpoly != INDEX_NONE )
 		{
 			FmPolys[ fmpoly ].LifeCount = 4.0F;
@@ -1410,13 +1410,13 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 			FmPolys[ fmpoly ].Group = Group;
 			AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
 		}
-	
+
 		NumSparks = ( Random_Range( 5 ) + 5 );
-		
+
 		for( Count = 0; Count < NumSparks; Count++ )
 		{
 		   	fmpoly = FindFreeFmPoly();
-		
+
 		   	if( fmpoly != INDEX_NONE )
 		   	{
 				FmPolys[ fmpoly ].LifeCount = ( (float) Random_Range( 180 ) ) + 60.0F;
@@ -1472,7 +1472,7 @@ void CreateSpotFXShrapnel( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	CreateSpotFXExplosion( Pos, Dir, Group );
 
 	NumBits = ( Random_Range( 4 ) + 3 );
-		
+
 	for( Count = 0; Count < NumBits; Count++ )
 	{
 		Speed = ( ( (float) Random_Range( 10000 ) ) / 1500.0F ) + 2.0F;
@@ -1507,7 +1507,7 @@ void CreateSpotFXSmallShrapnel( VECTOR * Pos, VECTOR * Dir, float Speed, u_int16
 	VECTOR	DirVector;
 
 	NumBits = ( Random_Range( 3 ) + 1 );
-		
+
 	for( Count = 0; Count < NumBits; Count++ )
 	{
 		DirVector.x = Dir->x + Random_Jitter();
@@ -1689,7 +1689,7 @@ void CreateSpotFXDripSplash( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 	for( Count = 0; Count < NumSparks; Count++ )
 	{
 	   	fmpoly = FindFreeFmPoly();
-	
+
 	   	if( fmpoly != INDEX_NONE )
 	   	{
 			FmPolys[ fmpoly ].LifeCount = 1000.0F;
@@ -2235,7 +2235,7 @@ void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group )
 FILE * SaveAllSpotFX( FILE * fp )
 {
 	int		i;
-	u_int16_t	TempIndex = INDEX_NONE; 
+	u_int16_t	TempIndex = INDEX_NONE;
 
 	if( fp )
 	{

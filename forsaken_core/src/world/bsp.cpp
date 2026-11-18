@@ -1,7 +1,7 @@
 
 
 /*===================================================================
-		Include Files...	
+		Include Files...
 ===================================================================*/
 
 #include "game/main.h"
@@ -26,7 +26,7 @@ constexpr int BSP_PORTAL_VERSION_NUMBER = (1);
 bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_point_ptr );
 
 BSP_HEADER Bsp_Header[ 2 ];
-																   
+
 BSP_NODE *	BSP_Nodes[256];
 BSP_PORTAL_HEADER Bsp_Portal_Header = { false, 0, {} };
 
@@ -38,17 +38,17 @@ static bool BSP_Loadtree( BSP_TREE *t, FileReader & in )
 
 	// get the number of nodes
 	t->NumNodes = in.i16();
-	
+
 	// initialize the root node and set aside enough space
 	// set aside size of N BSP_NODE's
 	t->Root = (BSP_NODE * ) calloc( t->NumNodes , sizeof( BSP_NODE ) );
 	if ( !t->Root )
 		return false;
-	
+
 	// initialize first node
 	New = t->Root;
 	New->Parent = NULL;
-	
+
 	// pack on node heirachy
 	for( e = 0 ; e < t->NumNodes ; e++ )
 	{
@@ -118,7 +118,7 @@ static bool BSP_LoadPortals( char *fname )
 
 	Change_Ext( fname, Filename, ".PBS" );
 
-	File_Size = Get_File_Size( Filename );	
+	File_Size = Get_File_Size( Filename );
 	if( !File_Size )
 	{
 		Msg( "Bsp_Portalload() no PBS file %s", Filename );
@@ -299,7 +299,7 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 	Depth = 0;
 
 	collided = FindCollision( Bsp_Header->Bsp_Tree[ group % Bsp_Header->NumGroups ].Root, StartPos, &EndPos );
-	
+
 	if ( collided && CollideNode )
 	{
 		OldCollideNode = CollideNode;
@@ -429,8 +429,8 @@ start:
    	// We intersect the Plane...
 
 
-	div = ( RayDir.x * node_ptr->Normal.x) + 
-   		  ( RayDir.y * node_ptr->Normal.y) + 
+	div = ( RayDir.x * node_ptr->Normal.x) +
+   		  ( RayDir.y * node_ptr->Normal.y) +
    		  ( RayDir.z * node_ptr->Normal.z);
 	distance2plane = POINT_TO_PLANE( &RayPos , node_ptr ) - CollisionRadius;
 
@@ -438,7 +438,7 @@ start:
    	intersection_point.x = RayPos.x - ( RayDir.x * distance2plane );
    	intersection_point.y = RayPos.y - ( RayDir.y * distance2plane );
    	intersection_point.z = RayPos.z - ( RayDir.z * distance2plane );
-   	
+
 	if( ( side = ( d1 < 0 ) ) )
    	{
    		near_node_ptr = node_ptr->Back;

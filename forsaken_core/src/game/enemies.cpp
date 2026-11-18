@@ -620,7 +620,7 @@ FIREPOS	SnubotFirePos = {
 		2,
 		{
 			{ ( -280.0F * GLOBAL_SCALE ), ( 320.0F * GLOBAL_SCALE ), ( 20.0F * GLOBAL_SCALE ) },
-			{ ( +280.0F * GLOBAL_SCALE ), ( 320.0F * GLOBAL_SCALE ), ( 20.0F * GLOBAL_SCALE ) } 
+			{ ( +280.0F * GLOBAL_SCALE ), ( 320.0F * GLOBAL_SCALE ), ( 20.0F * GLOBAL_SCALE ) }
 		},
 		//Fire Dir
 		{
@@ -782,7 +782,7 @@ FIREPOS	MetaTank4FirePos = {
 			{ 0.0F , 0.0F, 1.0F }
 		}
 };
-FIREPOS	Avatar1FirePos = { 
+FIREPOS	Avatar1FirePos = {
 		1,
 		{
 			{ ( 520.0F * GLOBAL_SCALE ), ( 220.0F * GLOBAL_SCALE ), ( -960.0F * GLOBAL_SCALE ) }
@@ -792,7 +792,7 @@ FIREPOS	Avatar1FirePos = {
 			{ 0.0F , -0.5F, 5.0F }
 		}
 };
-FIREPOS	Avatar2FirePos = { 
+FIREPOS	Avatar2FirePos = {
 		1,
 		{
 			{ ( -320.0F * GLOBAL_SCALE ), ( 220.0F * GLOBAL_SCALE ), ( -920.0F * GLOBAL_SCALE ) }
@@ -802,7 +802,7 @@ FIREPOS	Avatar2FirePos = {
 			{ 0.0F , -0.5F, 0.5F }
 		}
 };
-FIREPOS	Avatar3FirePos = { 
+FIREPOS	Avatar3FirePos = {
 		1,
 		{
 			{ ( -200.0F * GLOBAL_SCALE ), ( 220.0F * GLOBAL_SCALE ), ( 400.0F * GLOBAL_SCALE ) }
@@ -812,7 +812,7 @@ FIREPOS	Avatar3FirePos = {
 			{ 0.0F , 0.0F, 1.0F }
 		}
 };
-FIREPOS	Avatar4FirePos = { 
+FIREPOS	Avatar4FirePos = {
 		1,
 		{
 			{ ( 360.0F * GLOBAL_SCALE ), ( 220.0F * GLOBAL_SCALE ), ( 880.0F * GLOBAL_SCALE ) }
@@ -822,7 +822,7 @@ FIREPOS	Avatar4FirePos = {
 			{ 0.0F , 0.0F, 1.0F }
 		}
 };
-FIREPOS	Avatar5FirePos = { 
+FIREPOS	Avatar5FirePos = {
 		1,
 		{
 			{ ( -360.0F * GLOBAL_SCALE ), ( 220.0F * GLOBAL_SCALE ), ( 1120.0F * GLOBAL_SCALE ) }
@@ -1892,7 +1892,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NULL,
 		&DummyFirePos,
 		&DummyAimPos,
-		ENEMY_CONTROLTYPE_FLY_AI,	
+		ENEMY_CONTROLTYPE_FLY_AI,
 		AIMODE_FOLLOWPATH,
 		0,			// u_int16_t	NumOfGuns;			// How many Guns do I Have???
 		{GUN_Pulse},	// u_int16_t	GunType;			// What type of gun???
@@ -3822,7 +3822,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 
 };
 
-	
+
 /*===================================================================
 	Enemy Control Routines...
 ===================================================================*/
@@ -3855,7 +3855,7 @@ bool Enemy2EnemyCollide( ENEMY * SEnemy , VECTOR * Move );
 bool Enemy2EnemyCollideSpecial( ENEMY * SEnemy , VECTOR * StartPos);
 void AutoDisplayMatrix( OBJECT * Object );
 
-	
+
 void (* EnemyControlType[ ])( ENEMY * Enemy ) = {
 	NULL,
 	EnemyFlyUnderPlayerControl,
@@ -3871,11 +3871,11 @@ void (* EnemyControlType[ ])( ENEMY * Enemy ) = {
 	EnemyJumpUnderAiControl,	/* ENEMY_CONTROLTYPE_JUMP_AI */
 };
 
-void AccellDecell(  float *  value ,  float  Decell ) 
+void AccellDecell(  float *  value ,  float  Decell )
 {
 	*value *= (float) (powf( 1.0 - Decell, framelag) );
 }
-#define MIN_AUTOLEVEL_PITCH	D2R(5.0F) 
+#define MIN_AUTOLEVEL_PITCH	D2R(5.0F)
 #define MAX_AUTOLEVEL_PITCH	D2R(175.0F)
 
 constexpr auto MIN_AUTOLEVEL_ROLL_TOLERANCE = (0.01F);
@@ -3968,7 +3968,7 @@ float ObjectAutoLevelRot( OBJECT * Object, float autolevel_rate )
 	return rot;
 }
 
-	
+
 /*===================================================================
 	Procedure	:	Initialise all Enemies
 	Input		:	nothing
@@ -4091,7 +4091,7 @@ void KillUsedEnemy( ENEMY * Object )
 		Object->EnemyInFile = in_file;
 		Object->EnemyInLine = in_line;
 #endif
-		
+
 
 		NumKilledEnemies++;
 		StopEnemyBikerTaunt( Object );
@@ -4503,7 +4503,7 @@ bool PreLoadEnemies( void )
 	NextEnemyModel = NextNewModel;
 
 	for( Count = 0; Count < MAX_ENEMY_TYPES; Count++ ) EnemyTypes[ Count ].ModelNumber = -1;
-	
+
 	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
 
 	fp = file_open( &NewFilename[ 0 ], "rb" );
@@ -5504,7 +5504,7 @@ bool LoadEnemies( void )
 		fclose( fp );
 	}
 
-	// work out formation offsets....	
+	// work out formation offsets....
 	Enemy = FirstEnemyUsed;
 	while( Enemy )
 	{
@@ -5553,7 +5553,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 
 	if( Enemy != NULL )
 	{
-		
+
 #ifdef DEBUG_ON
 		Enemy->EnemyInFile = &EnemyNotFreedString[0];
 		Enemy->EnemyInLine = 0;
@@ -5575,12 +5575,12 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 			Enemy->Status = ENEMY_STATUS_Enable;
 			Enemy->GenerationDelay = 0.0F;
 			Enemy->MasterGenerationDelay = 0.0F;
-		}else{ 
+		}else{
 			Enemy->Status = ENEMY_STATUS_Nothing;
 			Enemy->MasterGenerationDelay = GenerationDelay * 60.0F;
 			Enemy->GenerationDelay = 0.0F;
 		}
-		
+
 		Enemy->Alive = true;
 		Enemy->CompCollision = false;
 
@@ -5617,12 +5617,12 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		Enemy->ImInNodeTransition = false;
 		Enemy->PickNewNodeNow = false;
 		Enemy->SmokeTime = 0.0F;
-		
+
 		Enemy->SplineNode1 = NULL;
 		Enemy->SplineNode2 = NULL;
 		Enemy->SplineNode3 = NULL;
 		Enemy->SplineNode4 = NULL;
-		
+
 		Enemy->Object.AI_Mode = EnemyTypes[EnemyType].AiMode;
 
 		if( (FormationLink != INDEX_NONE) && (EnemyTypes[EnemyType].ControlType == ENEMY_CONTROLTYPE_FLY_AI) )
@@ -5631,12 +5631,12 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		}else{
 			Enemy->FormationLink = NULL;
 		}
-		
-		
+
+
 		Enemy->Timer = 1.0F;
-		
+
 		Enemy->Viewcone = (float) COSD( EnemyTypes[EnemyType].Viewcone / 2 );
-		
+
 		Enemy->Object.Angle.x = 0.0F;
 		Enemy->Object.Angle.y = 0.0F;
 		Enemy->Object.Angle.z = 0.0F;
@@ -5662,18 +5662,18 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 				Enemy->Object.Group = TempGroup;
 			}
 		}
-	
+
 		if( Enemy->Object.ControlType != ENEMY_CONTROLTYPE_TURRET_PLAYER &&
 			Enemy->Object.ControlType != ENEMY_CONTROLTYPE_TURRET_AI )
 			FindNearestNode( &Enemy->Object );
-		
+
 		Enemy->Object.Quat.FromDirAndUp(Dir, Up);
 
 		Enemy->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
-		
+
 		Enemy->Object.Quat.ToMatrix(&Enemy->Object.Mat);
 		MatrixTranspose( &Enemy->Object.Mat, &Enemy->Object.InvMat );
-		
+
 
 		Enemy->TriggerMod = TriggerMod;
 		if( TriggerMod == INDEX_NONE ) Enemy->TriggerModPtr = NULL;
@@ -5682,7 +5682,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		if( ModelNum != INDEX_NONE )
 		{
 			ModelIndex = FindFreeModel();
-	
+
 			if( ModelIndex != INDEX_NONE )
 			{
 				Models[ ModelIndex ].ModelNum = ( ModelNum );
@@ -5739,7 +5739,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		Enemy->ModelIndex = ModelIndex;
 
 		return( Enemy );
-	
+
 	}
 	return( NULL );
 }
@@ -5780,8 +5780,8 @@ void ProcessEnemies( void )
 				Enemy->TauntPause = ENEMY_TAUNT_PAUSE;
 				PlayEnemyBikerTaunt( Enemy );
 			}
-			
-			if( (Enemy->Object.ControlType != ENEMY_CONTROLTYPE_NONE) && 
+
+			if( (Enemy->Object.ControlType != ENEMY_CONTROLTYPE_NONE) &&
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				( (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_FLESHMORPH ) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_EXOGENON ) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_TURRET_AI ) || Enemy->Object.NearestNode ) )
 			{
@@ -5796,7 +5796,7 @@ void ProcessEnemies( void )
 					GunObject->BurstTime -= framelag;
 					if( GunObject->BurstTime < 0.0F )
 						GunObject->BurstTime = 0.0F;
-					
+
 					if( !GetLastCompDispMatrix( &Enemy->Object, &GunObject->Mat, &GunObject->InvMat, &GunObject->FirePos , GunObject->GunNum) )
 				{
 					/* Fallback for a gun with no mount component (neither
@@ -5831,16 +5831,16 @@ void ProcessEnemies( void )
 
 				if( !(Enemy->Status & ENEMY_STATUS_Enable) )
 					goto KilledInAI;
- 		
+
 
 				if( ( (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_FLY_AI) ||
 					  (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_SPLINE) ) &&
 					  ( ( OldPos.x != Enemy->Object.Pos.x) || ( OldPos.y != Enemy->Object.Pos.y) || ( OldPos.z != Enemy->Object.Pos.z) ) )
 					UpdateNearestNode( &Enemy->Object );
-				
+
 				if( Enemy->AIFlags & AI_ANYPLAYERINRANGE )
 				{
-				
+
 					GunObject = Enemy->Object.FirstGun;
 					while( GunObject )
 					{
@@ -5853,15 +5853,15 @@ void ProcessEnemies( void )
 							GunRotation( GunObject , true );
 						}
 						SetTurretVector( &Enemy->Object, &GunObject->Dir , GunObject->GunNum );
-						
+
 						GunObject = GunObject->Next;
 					}
 				}
-				
+
 			}else{
 				AutoDisplay( &Enemy->Object );
 			}
-			
+
 			if( OldGroup != Enemy->Object.Group )
 			{
 				MoveEnemyToGroup( Enemy, OldGroup, Enemy->Object.Group );
@@ -5869,7 +5869,7 @@ void ProcessEnemies( void )
 
 			{
 				UpdateObjectAmbientColour( &Enemy->Object );
-  
+
 				if( Model != INDEX_NONE )
 				{
 					Models[ Model ].Pos = Enemy->Object.Pos;
@@ -5886,7 +5886,7 @@ void ProcessEnemies( void )
 					if( Enemy->Object.Flags & SHIP_Stealth ) Models[ Model ].Flags |= MODFLAG_Stealth;
 					else Models[ Model ].Flags &= ~MODFLAG_Stealth;
 				}
-				
+
 				if( Enemy->Object.Components )
 				{
 					if( Enemy->Object.CurAnimSeq != -1 && Enemy->Object.AnimSeqs )
@@ -5916,7 +5916,7 @@ void ProcessEnemies( void )
 							Enemy->Object.Time = 0.0F;
 						}
 					}
-					
+
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					UpdateCompObjChildren( Enemy->Object.Components, 1, &Enemy->Object.FinalMat, &Enemy->Object.Pos, Enemy->Object.Time, Enemy->Object.Group, &Enemy->Object.Pos );
 					UpdateCompObjColours( Enemy->Object.Components, 1, (int)Enemy->Object.Red, (int)Enemy->Object.Green, (int)Enemy->Object.Blue );
@@ -5927,7 +5927,7 @@ void ProcessEnemies( void )
 					}
 					if( ( Enemy->Type == ENEMY_Boss_FleshMorph ) || ( Enemy->Type == ENEMY_Boss_BigGeek ) || ( Enemy->Type == ENEMY_Boss_LittleGeek ) || ( Enemy->Type == ENEMY_Boss_Exogenon ) || ( Enemy->Type == ENEMY_Boss_Metatank ) )
 						UpdateCompObjFlags( Enemy->Object.Components, 1, 0 );
-					
+
 					if( AmIInvulnerable( Enemy->Object.Components, 1, Enemy->Object.Time ) )
 					{
 						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -6102,7 +6102,7 @@ void EnableEnemy( u_int16_t EnemyIndex )
 
 /*===================================================================
 	Procedure	:	Flying Enemy Under Player Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyFlyUnderPlayerControl( ENEMY * Enemy )
@@ -6110,7 +6110,7 @@ void EnemyFlyUnderPlayerControl( ENEMY * Enemy )
 	Enemy->Object.Angle.x += control.pitch;
 	Enemy->Object.Angle.y += control.yaw;
 	Enemy->Object.Angle.z += control.roll;
-	
+
 	Enemy->Object.Bank	 += control.bank;
 
 	Enemy->Object.Speed.x += control.right;
@@ -6120,14 +6120,14 @@ void EnemyFlyUnderPlayerControl( ENEMY * Enemy )
 }
 /*===================================================================
 	Procedure	:	Flying Enemy Under Ai Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyFlyUnderAiControl( ENEMY * Enemy )
 {
 	Enemy->AIMoveFlags &= (AI_CONTROL_NO_FORWARD +AI_CONTROL_NO_BACK +AI_CONTROL_NO_LEFT +AI_CONTROL_NO_RIGHT +AI_CONTROL_NO_UP +AI_CONTROL_NO_DOWN+AI_CONTROL_COLLISION );
-	
-	
+
+
 	// wooooh shit .......
 	if( Enemy->Type == ENEMY_Boss_Avatar )
 	{
@@ -6149,11 +6149,11 @@ void EnemyFlyUnderAiControl( ENEMY * Enemy )
 			AutoMovement( &Enemy->Object , Enemy ,true);
 		}
 	}
-				
+
 }
 /*===================================================================
 	Procedure	:	Crawling Enemy Under Player Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyCrawlUnderPlayerControl( ENEMY * Enemy )
@@ -6172,7 +6172,7 @@ void EnemyCrawlUnderPlayerControl( ENEMY * Enemy )
 }
 /*===================================================================
 	Procedure	:	Crawling Enemy Under Ai Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyCrawlUnderAiControl( ENEMY * Enemy )
@@ -6186,13 +6186,13 @@ void EnemyCrawlUnderAiControl( ENEMY * Enemy )
 
 	if( Enemy->AIFlags & AI_ANYPLAYERINRANGE )
 	{
-		
+
 		if( Enemy->AIMoveFlags )
 		{
 			Turn = EnemyTypes[Enemy->Type].TurnRateAccell * EnemyTypes[Enemy->Type].MaxTurnRate * framelag;
 			Move = EnemyTypes[Enemy->Type].MoveRateAccell * EnemyTypes[Enemy->Type].MaxMoveRate * framelag;
 		}
-		
+
 		if ( Enemy->AIMoveFlags&AI_CONTROL_TURNLEFT)
 		{
 			if( Enemy->AI_Angle.y < (Enemy->Object.Angle.y*framelag) )
@@ -6207,7 +6207,7 @@ void EnemyCrawlUnderAiControl( ENEMY * Enemy )
 			Enemy->Object.Speed.z += Move;
 		if ( Enemy->AIMoveFlags&AI_CONTROL_BACK )
 			Enemy->Object.Speed.z -= Move;
-		
+
 		AutoMovementCrawl( &Enemy->Object , Enemy );
 	}
 }
@@ -6236,7 +6236,7 @@ void EnemyJumpUnderAiControl( ENEMY * Enemy )
 
 /*===================================================================
 	Procedure	:	Turret Enemy Under Player Control...
-	Input		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyTurretUnderPlayerControl( ENEMY * /*Enemy*/ )
@@ -6244,7 +6244,7 @@ void EnemyTurretUnderPlayerControl( ENEMY * /*Enemy*/ )
 }
 /*===================================================================
 	Procedure	:	Turret Enemy Under Ai Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyTurretUnderAiControl( ENEMY * Enemy )
@@ -6257,7 +6257,7 @@ void EnemyTurretUnderAiControl( ENEMY * Enemy )
 
 /*===================================================================
 	Procedure	:	Enemy Under Spline Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyUnderSplineControl( ENEMY * Enemy )
@@ -6292,7 +6292,7 @@ void EnemyUnderSplineControl( ENEMY * Enemy )
 
 /*===================================================================
 	Procedure	:	Exogenon Enemy Under Ai Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyUnderExogenonControl( ENEMY * Enemy )
@@ -6303,7 +6303,7 @@ void EnemyUnderExogenonControl( ENEMY * Enemy )
 	AI_EXOGENON( Enemy );
 	if( Enemy->AIFlags & AI_ANYPLAYERINRANGE )
 	{
-		
+
 		if( Enemy->AIMoveFlags )
 		{
 			Turn = EnemyTypes[Enemy->Type].TurnRateAccell * EnemyTypes[Enemy->Type].MaxTurnRate * framelag;
@@ -6311,7 +6311,7 @@ void EnemyUnderExogenonControl( ENEMY * Enemy )
 				Turn *= 0.5F;
 
 		}
-		
+
 		if ( Enemy->AIMoveFlags&AI_CONTROL_TURNLEFT)
 		{
 			if( Enemy->AI_Angle.y < (Enemy->Object.Angle.y*framelag) )
@@ -6328,7 +6328,7 @@ void EnemyUnderExogenonControl( ENEMY * Enemy )
 }
 /*===================================================================
 	Procedure	:	FleshMorph Enemy Under Ai Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyUnderFleshMorphControl( ENEMY * Enemy )
@@ -6351,13 +6351,13 @@ void EnemyUnderFleshMorphControl( ENEMY * Enemy )
 }
 /*===================================================================
 	Procedure	:	LittleGeek Enemy Under Ai Control...
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void EnemyUnderLittleGeekControl( ENEMY * Enemy )
 {
 	Enemy->AIMoveFlags &= (AI_CONTROL_NO_FORWARD +AI_CONTROL_NO_BACK +AI_CONTROL_NO_LEFT +AI_CONTROL_NO_RIGHT +AI_CONTROL_NO_UP +AI_CONTROL_NO_DOWN+AI_CONTROL_COLLISION );
-	
+
 	// wooooh shit .......
 	AI_LITTLEGEEK( Enemy );
 
@@ -6384,9 +6384,9 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 {
 	VECTOR	ImpactPoint;
 	float	Speed;
-	VECTOR	Move_Off;	
+	VECTOR	Move_Off;
 	VECTOR	Move_Dir;
-	QUAT	StepQuat;	
+	QUAT	StepQuat;
 	VECTOR	Bob;
 	BGOBJECT * BGObject;
 	VECTOR	ExtForce;
@@ -6406,7 +6406,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	}
 	AccellDecell( &Object->Angle.z , RollDecell );
 	Object->Autolevel = ObjectAutoLevelRot( Object , 0.05F * framelag );
-	
+
 	AccellDecell( &Object->Bank , BankDecell );
 
 	AccellDecell( &Object->Speed.x , EnemyTypes[Enemy->Type].MoveRateDecell );
@@ -6427,7 +6427,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	Object->Quat.ToMatrix(&Object->Mat);
 
 	MatrixTranspose( &Object->Mat, &Object->InvMat );
-	
+
 	// carry out movements
 	Move_Off.x = 0.0F;
 	Move_Off.y = 0.0F;
@@ -6445,7 +6445,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 		Move_Off.z += Bob.z - Object->LastBob.z;
 		Object->LastBob = Bob;
 	}
-	
+
 	if ( Object->Speed.x )
 	{
 		Speed = Object->Speed.x * framelag;
@@ -6470,7 +6470,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	   	Move_Off.y += ( Move_Dir.y * Speed );
 	   	Move_Off.z += ( Move_Dir.z * Speed );
 	}
-	
+
 	// apply external and internal force vectors to ship movement
 	AccellDecell( &Object->ExternalForce.x , EnemyTypes[Enemy->Type].MoveRateDecell );
 	AccellDecell( &Object->ExternalForce.y , EnemyTypes[Enemy->Type].MoveRateDecell );
@@ -6479,21 +6479,21 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	Move_Off.x += Object->ExternalForce.x * framelag;
 	Move_Off.y += Object->ExternalForce.y * framelag;
 	Move_Off.z += Object->ExternalForce.z * framelag;
-	
+
 	// Collide with other enemies....
 	Enemy2EnemyCollide( Enemy , &Move_Off );
-	
+
 	// do collisions to background
-	
+
 	if( VectorLength( &Move_Off ) <= EnemyTypes[Enemy->Type].MoveRateAccell )
 	{
-		Move_Off.x = 0.0F; 
-		Move_Off.y = 0.0F; 
+		Move_Off.x = 0.0F;
+		Move_Off.y = 0.0F;
 		Move_Off.z = 0.0F;
 		ImpactPoint = Object->Pos;
-		
+
 	}else{
-	
+
 		// Clear out the restric movement flags....
 		Enemy->AIMoveRestrictClearTime -= framelag;
 		if( Enemy->AIMoveRestrictClearTime < 0 )
@@ -6502,7 +6502,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 			Enemy->AIMoveRestrictClearTime = EnemyTypes[Enemy->Type].MoveRestrictClearTime;
 		}
 
-		
+
 		if ( Object->Group != INDEX_NONE )
 		{
 			BGObject = NULL;
@@ -6523,7 +6523,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 		{
 			TriggerAreaEnemyCheck( &StartPos , &Object->Pos , OldGroup);
 		}
-		
+
 		ExtForce.x = 0.0F;
 		ExtForce.y = 0.0F;
 		ExtForce.z = 0.0F;
@@ -6597,7 +6597,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 
 		if( DistanceVector2Vector( &Object->Pos , &TNode->SolidPos ) < length )
 		{
-			
+
 			// We are in transition...
 			if( NextTNode && ( NextTNode != Enemy->TNode ) )
 			{
@@ -6620,7 +6620,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 					{
 						Enemy->DistanceToPointOnSlope = Distance;
 					}
-					
+
 					Distance = 1.0F - (Distance / Enemy->DistanceToPointOnSlope);
 
 					if( Distance > 0.0F && Distance < 1.0F )
@@ -6631,7 +6631,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 						ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &Up );
 						MakeViewMatrix(&Enemy->Object.Pos, &AnglePos, &Up, &Enemy->Object.Mat);
 					}
-					
+
 					Move_Off.x = AimPos.x - Object->Pos.x;
 					Move_Off.y = AimPos.y - Object->Pos.y;
 					Move_Off.z = AimPos.z - Object->Pos.z;
@@ -6659,7 +6659,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 					{
 						Enemy->DistanceToPointOnSlope = Distance;
 					}
-					
+
 					Distance = 1.0F - (Distance / Enemy->DistanceToPointOnSlope);
 
 					if( Distance > 0.0F && Distance < 1.0F )
@@ -6670,7 +6670,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 						ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &Up );
 						MakeViewMatrix(&Enemy->Object.Pos, &AnglePos, &Up, &Enemy->Object.Mat);
 					}
-					
+
 					Move_Off.x = AimPos.x - Object->Pos.x;
 					Move_Off.y = AimPos.y - Object->Pos.y;
 					Move_Off.z = AimPos.z - Object->Pos.z;
@@ -6701,7 +6701,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 					}
 					Object->Angle.z = 0.0F;
 					Object->Autolevel = ObjectAutoLevelRot( Object , 0.05F * framelag );
-					
+
 					BuildRotMatrix( 0.0F, 0.0F, Object->Autolevel, &StepMat );
 					MatrixMultiply( &Object->Mat , &StepMat , &Object->Mat );
 				}
@@ -6894,7 +6894,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		}
 
 	}
-	
+
 	MatrixTranspose( &Object->Mat, &Object->InvMat );
 	Object->FinalMat = Object->Mat;
 	Object->FinalInvMat = Object->InvMat;
@@ -6967,7 +6967,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 ===================================================================*/
 void AutoMovementExogenon( OBJECT * Object , ENEMY * Enemy )
 {
-	MATRIX	StepMat;	
+	MATRIX	StepMat;
 
 	AccellDecell( &Object->Angle.y , EnemyTypes[Enemy->Type].TurnRateDecell );
 	BuildRotMatrix( 0.0F , -(Object->Angle.y * framelag), 0.0F, &StepMat );
@@ -7032,7 +7032,7 @@ void AutoDisplayMatrix( OBJECT * Object )
 
 /*===================================================================
 	Procedure	:	Carry out the movement required by AI....
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void CarryOutAIMovementCommands( ENEMY * Enemy )
@@ -7105,7 +7105,7 @@ void CarryOutAIMovementCommands( ENEMY * Enemy )
 }
 /*===================================================================
 	Procedure	:	Carry out the movement required by AI....
-	Output		:	ENEMY	*	Enemy 
+	Output		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void CarryOutPreciseAIMovementCommands( ENEMY * Enemy )
@@ -7127,7 +7127,7 @@ void CarryOutPreciseAIMovementCommands( ENEMY * Enemy )
 	}else{
 		if( Enemy->AI_Angle.x > 0.0F )
 		{
-			
+
 			if( Enemy->AI_Angle.x > (EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F) )
 			{
 				Enemy->AI_Angle.x = EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F;
@@ -7144,7 +7144,7 @@ void CarryOutPreciseAIMovementCommands( ENEMY * Enemy )
 	}else{
 		if( Enemy->AI_Angle.y > 0.0F )
 		{
-			
+
 			if( Enemy->AI_Angle.y > (EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F) )
 			{
 				Enemy->AI_Angle.y = EnemyTypes[Enemy->Type].MaxTurnRate*framelag*0.5F;
@@ -7234,7 +7234,7 @@ void CarryOutGUN_PreciseAIMovementCommands( GUNOBJECT * GObject )
 	float Turn;
 
 	Turn = GunTypes[GObject->Type].gtMaxTurnSpeed * framelag * 0.5F;
-	
+
 	if( GObject->AI_Angle.x < 0.0F )
 	{
 		if( GObject->AI_Angle.x < -Turn )
@@ -7244,7 +7244,7 @@ void CarryOutGUN_PreciseAIMovementCommands( GUNOBJECT * GObject )
 	}else{
 		if( GObject->AI_Angle.x > 0.0F )
 		{
-			
+
 			if( GObject->AI_Angle.x > Turn )
 			{
 				GObject->AI_Angle.x = Turn;
@@ -7260,7 +7260,7 @@ void CarryOutGUN_PreciseAIMovementCommands( GUNOBJECT * GObject )
 	}else{
 		if( GObject->AI_Angle.y > 0.0F )
 		{
-			
+
 			if( GObject->AI_Angle.y > Turn )
 			{
 				GObject->AI_Angle.y = Turn;
@@ -7293,7 +7293,7 @@ void GunRotation( GUNOBJECT * Object, bool AngleDecellBefore  )
 		Object->Dir.y += Object->Angle.y;
 	}
 
-	
+
 	if( !( GunType->XRotMin == 0.0F && GunType->XRotMax == 0.0F ) )
 	{
 		if( Object->Dir.x < GunType->XRotMin )
@@ -7417,19 +7417,19 @@ void InitGuns( BYTE how_many_guns , u_int16_t * GunType , OBJECT * Object )
 {
 	GUNOBJECT * GunObject;
 	int i;
-	
+
 	if( Object->FirstGun )
 		free( Object->FirstGun );
-	
+
 	Object->FirstGun = (GUNOBJECT*) malloc( how_many_guns * sizeof(GUNOBJECT) );
-	
+
 	GunObject = Object->FirstGun;
-	
+
 	if( !GunObject )
 		return;
-	
+
 	Object->HowManyGuns = how_many_guns;
-	
+
 	for( i = 0 ; i < how_many_guns ; i++ )
 	{
 		GunObject->GunNum = i*2;
@@ -7617,7 +7617,7 @@ bool Ship2EnemyCollide( u_int16_t i , VECTOR * Move_Off )
 	NormaliseVector( &Norm_Move_Off );
 
 	TEnemy = FirstEnemyUsed;
-	
+
 	while( TEnemy )
 	{
 		if( ( TEnemy->Status & ENEMY_STATUS_Enable ) )
@@ -7630,7 +7630,7 @@ bool Ship2EnemyCollide( u_int16_t i , VECTOR * Move_Off )
 				NewPos.z = Ships[i].Object.Pos.z + Move_Off->z;
 
 				Next_Move_Length = DistanceVector2Vector( &NewPos , &TEnemy->Object.Pos );
-				
+
 				if( (Move_Length < ( SHIP_RADIUS+EnemyTypes[TEnemy->Type].Radius ) ) && ( Next_Move_Length < Move_Length ) )
 				{
 					if( Move_Length < 1.0F )
@@ -8192,29 +8192,29 @@ read_Flags( FILE *f, char *last_token )
 {
 	int i;
 	READENEMYFLAGS	tab[] = {
-		{"AI_BEHAVIOUR_LEAVENETWORK"		 ,AI_BEHAVIOUR_LEAVENETWORK		},		
-		{"AI_BEHAVIOUR_NOFRIENDLYFIRE"		 ,AI_BEHAVIOUR_NOFRIENDLYFIRE	},	
-		{"AI_BEHAVIOUR_AVOID_PRIMARY"		 ,AI_BEHAVIOUR_AVOID_PRIMARY	},	
+		{"AI_BEHAVIOUR_LEAVENETWORK"		 ,AI_BEHAVIOUR_LEAVENETWORK		},
+		{"AI_BEHAVIOUR_NOFRIENDLYFIRE"		 ,AI_BEHAVIOUR_NOFRIENDLYFIRE	},
+		{"AI_BEHAVIOUR_AVOID_PRIMARY"		 ,AI_BEHAVIOUR_AVOID_PRIMARY	},
 		{"AI_BEHAVIOUR_AVOID_SECONDARY"		 ,AI_BEHAVIOUR_AVOID_SECONDARY	},
 		{"AI_BEHAVIOUR_AVOID_MINES"			 ,AI_BEHAVIOUR_AVOID_MINES		},
 		{"AI_BEHAVIOUR_ANTICIPATE_MOVE"		 ,AI_BEHAVIOUR_ANTICIPATE_MOVE	},
-		{"AI_BEHAVIOUR_ATTACK_ONSITE"		 ,AI_BEHAVIOUR_ATTACK_ONSITE	},	
-		{"AI_BEHAVIOUR_ATTACK_PROVOKE"		 ,AI_BEHAVIOUR_ATTACK_PROVOKE	},	
+		{"AI_BEHAVIOUR_ATTACK_ONSITE"		 ,AI_BEHAVIOUR_ATTACK_ONSITE	},
+		{"AI_BEHAVIOUR_ATTACK_PROVOKE"		 ,AI_BEHAVIOUR_ATTACK_PROVOKE	},
 		{"AI_BEHAVIOUR_ATTACK_FIND"			 ,AI_BEHAVIOUR_ATTACK_FIND		},
 		{"AI_BEHAVIOUR_NETWORKRANGE"		 ,AI_BEHAVIOUR_NETWORKRANGE		},
 		{"AI_BEHAVIOUR_WEAPONKNOWLEDGE"		 ,AI_BEHAVIOUR_WEAPONKNOWLEDGE	},
-		{"AI_BEHAVIOUR_ICANTPITCH"			 ,AI_BEHAVIOUR_ICANTPITCH		},	
+		{"AI_BEHAVIOUR_ICANTPITCH"			 ,AI_BEHAVIOUR_ICANTPITCH		},
 		{"AI_BEHAVIOUR_ICANTYAW"			 ,AI_BEHAVIOUR_ICANTYAW			},
 		{"AI_BEHAVIOUR_ATTACKMINES"			 ,AI_BEHAVIOUR_ATTACKMINES		},
-		{"AI_BEHAVIOUR_AVOIDMINES"			 ,AI_BEHAVIOUR_AVOIDMINES		},	
-		{"AI_BEHAVIOUR_DROPMINES"			 ,AI_BEHAVIOUR_DROPMINES		},	
+		{"AI_BEHAVIOUR_AVOIDMINES"			 ,AI_BEHAVIOUR_AVOIDMINES		},
+		{"AI_BEHAVIOUR_DROPMINES"			 ,AI_BEHAVIOUR_DROPMINES		},
 		{"AI_BEHAVIOUR_RAMMINES"			 ,AI_BEHAVIOUR_RAMMINES			},
 		{"AI_BEHAVIOUR_RETREAT"				 ,AI_BEHAVIOUR_RETREAT			},
 		{"AI_BEHAVIOUR_DONTSTOPANDTURN"		 ,AI_BEHAVIOUR_DONTSTOPANDTURN	},
 		{"AI_BEHAVIOUR_PRECISECONTROL"		 ,AI_BEHAVIOUR_PRECISECONTROL	},
 		{"AI_BEHAVIOUR_CLOAK"				 ,AI_BEHAVIOUR_CLOAK			},
 		{ NULL , 0 } };
-	
+
 	EnemyTypes[CurrentEnemy].Behave.Flags = 0;
 	while ( fscanf( f, " %80s", last_token ) == 1 )
 	{
@@ -8231,7 +8231,7 @@ read_Flags( FILE *f, char *last_token )
 		if( !tab[i].keyword )
 			return 0;
 	}
-	
+
 	fscanf( f, " %80s", last_token );
 	return 1;
 }
@@ -8268,37 +8268,37 @@ static int read_EnemyType( FILE *f, char *last_token )
 		{"ENEMY_Hunter",			ENEMY_Hunter			 },
 		{"ENEMY_Legz",			ENEMY_Legz				 },
 		{"ENEMY_GuardBot",		ENEMY_GuardBot			 },
-		{"ENEMY_Boss_Metatank",		 ENEMY_Boss_Metatank },     
-		{"ENEMY_Boss_BigGeek",		 ENEMY_Boss_BigGeek  },     
-		{"ENEMY_Boss_Avatar",		 ENEMY_Boss_Avatar   },     
-		{"ENEMY_Boss_FleshMorph",	 ENEMY_Boss_FleshMorph },   
+		{"ENEMY_Boss_Metatank",		 ENEMY_Boss_Metatank },
+		{"ENEMY_Boss_BigGeek",		 ENEMY_Boss_BigGeek  },
+		{"ENEMY_Boss_Avatar",		 ENEMY_Boss_Avatar   },
+		{"ENEMY_Boss_FleshMorph",	 ENEMY_Boss_FleshMorph },
 		{"ENEMY_Boss_Exogenon",		 ENEMY_Boss_Exogenon } ,
-		{"ENEMY_Bike_Lokasena",      ENEMY_Bike_Lokasenna } ,  		 	
-		{"ENEMY_Bike_Beard",       	 ENEMY_Bike_Beard } ,       	
-		{"ENEMY_Bike_LAJay",    	 ENEMY_Bike_LAJay } ,    		
-		{"ENEMY_Bike_ExCop",     	 ENEMY_Bike_ExCop } ,     		
-		{"ENEMY_Bike_RexHardy",  	 ENEMY_Bike_RexHardy } ,  		
-		{"ENEMY_Bike_Foetoid",    	 ENEMY_Bike_Foetoid } ,    		
-		{"ENEMY_Bike_NimSoo",    	 ENEMY_Bike_NimSoo } ,    		
-		{"ENEMY_Bike_Nutta",      	 ENEMY_Bike_Nutta } ,      		
-		{"ENEMY_Bike_Sceptre",    	 ENEMY_Bike_Sceptre } ,    		
-		{"ENEMY_Bike_Jo",         	 ENEMY_Bike_Jo } ,         		
-		{"ENEMY_Bike_CuvelClark",	 ENEMY_Bike_CuvelClark } ,		
-		{"ENEMY_Bike_HK5",       	 ENEMY_Bike_HK5 } ,       		
-		{"ENEMY_Bike_Nubia",      	 ENEMY_Bike_Nubia } ,      		
-		{"ENEMY_Bike_Mofisto",    	 ENEMY_Bike_Mofisto } ,    		
-		{"ENEMY_Bike_Cerbero",    	 ENEMY_Bike_Cerbero } ,    		
-		{"ENEMY_Bike_Slick",      	 ENEMY_Bike_Slick } ,      		
-		{"ENEMY_LEADER_Swarm",	  	 ENEMY_LEADER_Swarm } ,	
+		{"ENEMY_Bike_Lokasena",      ENEMY_Bike_Lokasenna } ,
+		{"ENEMY_Bike_Beard",       	 ENEMY_Bike_Beard } ,
+		{"ENEMY_Bike_LAJay",    	 ENEMY_Bike_LAJay } ,
+		{"ENEMY_Bike_ExCop",     	 ENEMY_Bike_ExCop } ,
+		{"ENEMY_Bike_RexHardy",  	 ENEMY_Bike_RexHardy } ,
+		{"ENEMY_Bike_Foetoid",    	 ENEMY_Bike_Foetoid } ,
+		{"ENEMY_Bike_NimSoo",    	 ENEMY_Bike_NimSoo } ,
+		{"ENEMY_Bike_Nutta",      	 ENEMY_Bike_Nutta } ,
+		{"ENEMY_Bike_Sceptre",    	 ENEMY_Bike_Sceptre } ,
+		{"ENEMY_Bike_Jo",         	 ENEMY_Bike_Jo } ,
+		{"ENEMY_Bike_CuvelClark",	 ENEMY_Bike_CuvelClark } ,
+		{"ENEMY_Bike_HK5",       	 ENEMY_Bike_HK5 } ,
+		{"ENEMY_Bike_Nubia",      	 ENEMY_Bike_Nubia } ,
+		{"ENEMY_Bike_Mofisto",    	 ENEMY_Bike_Mofisto } ,
+		{"ENEMY_Bike_Cerbero",    	 ENEMY_Bike_Cerbero } ,
+		{"ENEMY_Bike_Slick",      	 ENEMY_Bike_Slick } ,
+		{"ENEMY_LEADER_Swarm",	  	 ENEMY_LEADER_Swarm } ,
 		{"ENEMY_LEADER_Hunter",	  	 ENEMY_LEADER_Hunter } ,
 		{"ENEMY_LEADER_Mekton",	  	 ENEMY_LEADER_Mekton } ,
 		{"ENEMY_LEADER_SnubBot",  	 ENEMY_LEADER_SnubBot } ,
-		{"ENEMY_LEADER_Legz",	  	 ENEMY_LEADER_Legz } ,	
-		{"ENEMY_LEADER_Shade",	  	 ENEMY_LEADER_Shade } ,	
+		{"ENEMY_LEADER_Legz",	  	 ENEMY_LEADER_Legz } ,
+		{"ENEMY_LEADER_Shade",	  	 ENEMY_LEADER_Shade } ,
 		{"ENEMY_LEADER_Supressor",	 ENEMY_LEADER_Supressor } ,
 		{"ENEMY_LEADER_LeviTank", 	 ENEMY_LEADER_LeviTank } ,
 		{"ENEMY_LEADER_LazerBot", 	 ENEMY_LEADER_LazerBot } ,
-		{"ENEMY_LEADER_Max",	  	 ENEMY_LEADER_Max } ,	
+		{"ENEMY_LEADER_Max",	  	 ENEMY_LEADER_Max } ,
 		{"ENEMY_LEADER_AirMoble", 	 ENEMY_LEADER_AirMoble } ,
 		{"ENEMY_Fodder1", 			 ENEMY_Fodder1 } ,
 		{"ENEMY_Boss_LittleGeek",	ENEMY_Boss_LittleGeek },
@@ -8596,7 +8596,7 @@ void ObjectForceExternalOneOff( OBJECT * Object, VECTOR *force )
 void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
 {
 	float	Speed;
-	VECTOR	Move_Off;	
+	VECTOR	Move_Off;
 	VECTOR	Move_Dir;
 	VECTOR	StartPos;
 
@@ -8651,12 +8651,12 @@ void AutoMovementFleshmorph( OBJECT * Object , ENEMY * Enemy )
 /*===================================================================
 	Procedure	:	Carry out all External force modifiers for Spline Following enemies..
 	Output		:	OBJECt * Object
-	Output		:	bool TURE/false....Wether there was any 
+	Output		:	bool TURE/false....Wether there was any
 ===================================================================*/
 bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 {
 	VECTOR	ImpactPoint;
-	VECTOR	Move_Off;	
+	VECTOR	Move_Off;
 	BGOBJECT * BGObject;
 	VECTOR	ExtForce;
 	bool	HasBeenExternal;
@@ -8681,7 +8681,7 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 
 	Enemy->AI_Angle.x *= EnemyTypes[Enemy->Type].TurnRateDecell * framelag;
 	Enemy->AI_Angle.y *= EnemyTypes[Enemy->Type].TurnRateDecell * framelag;
-	
+
 
 	StepQuat.MakeEuler(Enemy->AI_Angle.x, Enemy->AI_Angle.y, Object->Autolevel);
 	Object->Quat.Multiply(&StepQuat, &Object->Quat);
@@ -8691,11 +8691,11 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 	Object->FinalQuat = Object->Quat;
 	Object->FinalMat = Object->Mat;
 	Object->FinalInvMat = Object->InvMat;
-	
+
 	Enemy->Object.RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
-	
+
 	StartPos = Object->Pos;
-	
+
 	// carry out movements
 	Move_Off.x = 0.0F;
 	Move_Off.y = 0.0F;
@@ -8706,19 +8706,19 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 	AccellDecell( &Object->ExternalForce.x , EnemyTypes[Enemy->Type].MoveRateDecell );
 	AccellDecell( &Object->ExternalForce.y , EnemyTypes[Enemy->Type].MoveRateDecell );
 	AccellDecell( &Object->ExternalForce.z , EnemyTypes[Enemy->Type].MoveRateDecell );
-	
+
 	// Collide with other enemies....
 	Enemy2EnemyCollide( Enemy , &Move_Off );
 
 	Move_Off.x += Object->ExternalForce.x * framelag;
 	Move_Off.y += Object->ExternalForce.y * framelag;
 	Move_Off.z += Object->ExternalForce.z * framelag;
-	
-	
+
+
 	if( VectorLength( &Move_Off ) <= EnemyTypes[Enemy->Type].MoveRateAccell )
 	{
-		Move_Off.x = 0.0F; 
-		Move_Off.y = 0.0F; 
+		Move_Off.x = 0.0F;
+		Move_Off.y = 0.0F;
 		Move_Off.z = 0.0F;
 		ImpactPoint = Object->Pos;
 	}else{
@@ -8740,9 +8740,9 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 		{
 			ObjectForceExternalOneOff( Object, &ExtForce );
 		}
-	
+
 	}
-	
+
 	if( Move_Off.x + Move_Off.y + Move_Off.z )
 		return true;
 	else
@@ -8791,7 +8791,7 @@ u_int16_t FindDuplicateModel( int8_t * Filename, int16_t NumModels )
 	Procedure	:	Perform Damage on an Enemy....If its not in a death
 				:	MODE then put it in one or Destroy it....
 	Input		:	ENEMY * Enemy
-	Output		:	bool Destroyed 
+	Output		:	bool Destroyed
 ===================================================================*/
 bool DamageEnemy( ENEMY * Enemy , float Damage , VECTOR * ImpactPoint , VECTOR * Dir, float Speed , u_int16_t Owner , u_int16_t OwnerType )
 {
@@ -8837,7 +8837,7 @@ bool DamageEnemy( ENEMY * Enemy , float Damage , VECTOR * ImpactPoint , VECTOR *
 				PlayPannedSfx( SFX_FleshmorphDeathCry, Enemy->Object.Group , &Enemy->Object.Pos, 0.0F );
 			}
 
-			
+
 			Pos = Enemy->Object.Pos;
 
 			Pos.x += 512.0F;
@@ -8858,7 +8858,7 @@ bool DamageEnemy( ENEMY * Enemy , float Damage , VECTOR * ImpactPoint , VECTOR *
 			if ( !Random_Range( 6 ) )
 				PlaySfx( SFX_BIKER_VP, 0.0F );
 		}
-	
+
 		if( !(Enemy->Object.AI_Mode >= AIMODE_DEATH_CRASHNBURN ) &&
 			 (Enemy->Object.ControlType != ENEMY_CONTROLTYPE_FLY_AI) )
 		{
@@ -8960,7 +8960,7 @@ bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_
 	*NewPos = *Pos;
 
 	LegalGroup = false;
-		
+
 	if( !PointInsideSkin( Pos, Group ) )
 	{
 		for( i = 0 ; i < Mloadheader.num_groups ; i++ )
@@ -8996,7 +8996,7 @@ bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_
 		}
 
 	}
-	
+
 	return true;
 }
 
@@ -9016,7 +9016,7 @@ bool Enemy_Save( FILE * fp )
 	fwrite( &NumInitEnemies, sizeof( NumInitEnemies ), 1, fp );
 	fwrite( &NumKilledEnemies, sizeof( NumKilledEnemies ), 1, fp );
 	fwrite( &DifficultyLevel, sizeof( DifficultyLevel ), 1, fp );
-	
+
 
 	e = -1;
 	if( ( Enemy = FirstEnemyUsed ) )
@@ -9033,7 +9033,7 @@ bool Enemy_Save( FILE * fp )
 	fwrite( &e, sizeof( e ), 1, fp );
 
 	fwrite( &FleshMorphTimer, sizeof( FleshMorphTimer ), 1, fp );
-	
+
 	for( i = 0 ; i < NumInitEnemies ; i++ )
 	{
 		fwrite( &Enemies[i].Used, sizeof( Enemies[i].Used ), 1, fp );
@@ -9229,7 +9229,7 @@ bool Enemy_Load( FILE * fp )
 		NumEnemiesPerGroup[i] = 0;
 	}
 
-	
+
 	fread( &NumKilledEnemies, sizeof( NumKilledEnemies ), 1, fp );
 	fread( &DifficultyLevel, sizeof( DifficultyLevel ), 1, fp );
 
@@ -9249,7 +9249,7 @@ bool Enemy_Load( FILE * fp )
 	}
 
 	fread( &FleshMorphTimer, sizeof( FleshMorphTimer ), 1, fp );
-	
+
 	for( i = 0 ; i < NumInitEnemies ; i++ )
 	{
 		fread( &Enemies[i].Used, sizeof( Enemies[i].Used ), 1, fp );
@@ -9342,7 +9342,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &Enemies[i].Delay, sizeof( Enemies[i].Delay ), 1, fp );
 
 
-		
+
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
@@ -9546,7 +9546,7 @@ bool Object_Save( FILE * fp , OBJECT * Obj )
 		e = Node->NodeNum;
 	}
 	fwrite( &e, sizeof( e ), 1, fp );
-	
+
 	fwrite( &Obj->HowManyGuns, sizeof( Obj->HowManyGuns ), 1, fp );
 
 	if( Obj->HowManyGuns )

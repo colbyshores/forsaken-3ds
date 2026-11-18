@@ -39,7 +39,7 @@ float timer_run( px_timer_t* stats )
     return 0.0F;
 
   }
-  
+
   time_now = SDL_GetTicks();
 
   stats->millis = time_now - stats->last;

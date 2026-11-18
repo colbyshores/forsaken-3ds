@@ -69,7 +69,7 @@ bool LoadStartPoints( void )
 			FirstStartPositionInGroup[Count] = INDEX_NONE;
 		}
 
-		
+
 		fread( &num_start_positions, sizeof( int16_t ), 1, fp );
 
 		for( Count = 0; Count < num_start_positions; Count++ )

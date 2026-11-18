@@ -101,12 +101,12 @@ USERCONFIG default_config = {
 			0,							// primary #6 priority
 	},
 	{
-			5,							// primary order #1 
-			4,							// primary order #2 
-			1,							// primary order #3 
-			2,							// primary order #4 
-			3,							// primary order #5 
-			0,							// primary order #6 
+			5,							// primary order #1
+			4,							// primary order #2
+			1,							// primary order #3
+			2,							// primary order #4
+			3,							// primary order #5
+			0,							// primary order #6
 	},
 	{
 			6,							// secondary #1 priority
@@ -122,15 +122,15 @@ USERCONFIG default_config = {
 			-1,							// secondary #11 priority
 	},
 	{
-			6,							// secondary order #1 
-			3,							// secondary order #2 
-			5,							// secondary order #3 
-			4,							// secondary order #4 
-			1,							// secondary order #5 
-			0,							// secondary order #6 
-			9,							// secondary order #7 
-			8,							// secondary order #8 
-			7,							// secondary order #9 
+			6,							// secondary order #1
+			3,							// secondary order #2
+			5,							// secondary order #3
+			4,							// secondary order #4
+			1,							// secondary order #5
+			0,							// secondary order #6
+			9,							// secondary order #7
+			8,							// secondary order #8
+			7,							// secondary order #9
 			-1,							// secondary order #10
 			-1,							// secondary order #11
 	},
@@ -222,12 +222,12 @@ USERCONFIG my_controls = {
 			0,							// primary #6 priority
 	},
 	{
-			5,							// primary order #1 
-			4,							// primary order #2 
-			1,							// primary order #3 
-			2,							// primary order #4 
-			3,							// primary order #5 
-			0,							// primary order #6 
+			5,							// primary order #1
+			4,							// primary order #2
+			1,							// primary order #3
+			2,							// primary order #4
+			3,							// primary order #5
+			0,							// primary order #6
 	},
 	{
 			6,							// secondary #1 priority
@@ -243,15 +243,15 @@ USERCONFIG my_controls = {
 			-1,							// secondary #11 priority
 	},
 	{
-			6,							// secondary order #1 
-			3,							// secondary order #2 
-			5,							// secondary order #3 
-			4,							// secondary order #4 
-			1,							// secondary order #5 
-			0,							// secondary order #6 
-			9,							// secondary order #7 
-			8,							// secondary order #8 
-			7,							// secondary order #9 
+			6,							// secondary order #1
+			3,							// secondary order #2
+			5,							// secondary order #3
+			4,							// secondary order #4
+			1,							// secondary order #5
+			0,							// secondary order #6
+			9,							// secondary order #7
+			8,							// secondary order #8
+			7,							// secondary order #9
 			-1,							// secondary order #10
 			-1,							// secondary order #11
 	},
@@ -271,7 +271,7 @@ char * get_key_name( int i )
 	char * name = (char*)SDL_GetKeyName(i);
 	if(0==strcasecmp(name,"unknown key"))
 		return NULL;
-	return convert_char( ' ', '_', 
+	return convert_char( ' ', '_',
 		(char*)strdup(name)
 	);
 }
@@ -637,7 +637,7 @@ read_general_macro( FILE *f, char *config_macro, char *last_token, TEXT *macro )
 	static char fmt[80];
 
 	sprintf( fmt, " %%%d[^\n]", MAXTEXTMSG );
-	
+
 	fscanf( f, fmt, tempstr );
    	strncpy( config_macro, tempstr, MAXTEXTMSG );
 	strncpy( macro->text, tempstr, MAXTEXTMSG );
@@ -651,7 +651,7 @@ static int
 read_macro1( FILE *f, USERCONFIG *u, char *last_token )
 {
 	read_general_macro( f, u->macro1, last_token, &MacroText1 );
-	
+
 	return 1;
 }
 
@@ -659,7 +659,7 @@ static int
 read_macro2( FILE *f, USERCONFIG *u, char *last_token )
 {
 	read_general_macro( f, u->macro2, last_token, &MacroText2 );
-	
+
 	return 1;
 }
 
@@ -667,7 +667,7 @@ static int
 read_macro3( FILE *f, USERCONFIG *u, char *last_token )
 {
 	read_general_macro( f, u->macro3, last_token, &MacroText3 );
-	
+
 	return 1;
 }
 
@@ -1029,7 +1029,7 @@ read_joystick_info( FILE *f, USERCONFIG *u, char *last_token )
 	{
 		if (Num_Joysticks < MAX_JOYSTICKS)
 		{
-			// create joystick info, but mark as unattached 
+			// create joystick info, but mark as unattached
 			// (will ensure that joystick is written back to config file)
 			joynum = Num_Joysticks++;
 			joy = &JoystickInfo[ joynum ];
@@ -1149,7 +1149,7 @@ void ConfigureSpaceorbAxis( int joystick )
 
 	DebugPrintf("Spaceorb detected - auto configuring axis...\n");
 	JoystickInfo[ joystick ].assigned = true;
-	
+
 	for ( k = AXIS_Start; k <= AXIS_End; k++ )
 	{
 		JoystickInfo[ joystick ].Axis[ k ].deadzone = 1;
@@ -1291,7 +1291,7 @@ void DefaultJoystickSettings( USERCONFIG *u )
 
 void ReInitJoysticks( void )
 {
-	JOYSTICKINFO tempJoystickInfo[MAX_JOYSTICKS];	
+	JOYSTICKINFO tempJoystickInfo[MAX_JOYSTICKS];
 	int i, j, k;
 
 	DebugPrintf("ReInitJoysticks: started with %d joysticks\n", Num_Joysticks);
@@ -1329,7 +1329,7 @@ void ReInitJoysticks( void )
 	}
 
 	Num_Joysticks = j;
-	
+
 	memmove( JoystickInfo, tempJoystickInfo, sizeof( JOYSTICKINFO ) * MAX_JOYSTICKS );
 	DebugPrintf("ReInitJoysticks: finished with %d joysticks\n", Num_Joysticks);
 }
@@ -1424,7 +1424,7 @@ read_config( USERCONFIG *u, char *cfg_name )
 	// since all config settings are now zero, any new additions to config structure
 	// must be initialised here, in order to be backwardly compatible with old config
 	// files...
-	u->invert_turn = 0;	
+	u->invert_turn = 0;
 	u->invert_pitch = 0;
 	u->mouse_x_sensitivity = 0.6F;
 	u->mouse_y_sensitivity = 0.6F;
@@ -1483,7 +1483,7 @@ read_config( USERCONFIG *u, char *cfg_name )
 const char *key_fullname( int keycode )
 {
 	int i;
-	VIRTUALKEYMAP *vk;	
+	VIRTUALKEYMAP *vk;
 	init_key_map();
 
 	for ( i = 0; i < KEY_MAP_LAST; i++ )
@@ -1839,8 +1839,8 @@ write_config( USERCONFIG *u, char *cfg_name )
 
 					sensitivity = JoystickInfo[ joystick ].Axis[ axis ].sensitivity;
 					fprintf( f, "%s %d %d %d %d %d\n", axistok[axis],
-						JoystickInfo[joystick].Axis[axis].inverted, 
-						JoystickInfo[joystick].Axis[axis].deadzone, 
+						JoystickInfo[joystick].Axis[axis].inverted,
+						JoystickInfo[joystick].Axis[axis].deadzone,
 						( sensitivity < 1.0F ) ?
 						(int) floorf( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100,
 						JoystickInfo[ joystick ].Axis[ axis ].fine,

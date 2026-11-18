@@ -55,9 +55,9 @@ void AI_TURRET_FIREATTARGET( ENEMY * Enemy )
 			SetCurAnimSeq( TURRETSEQ_Open, &Enemy->Object );
 		}
 	}
-	
-	
-	
+
+
+
 	AI_THINK( Enemy , true , true );
 
 
@@ -106,13 +106,13 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 
 	if( !TObject || TObject->Mode != NORMAL_MODE )
 		return;
-	
+
 	GObject = Enemy->Object.FirstGun;
 
-	
+
 	while( GObject )
 	{
-		
+
 		if( TObject && ( (Enemy->AIFlags & AI_ICANSEEPLAYER) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_SPLINE) || (Enemy->Object.ControlType == ENEMY_CONTROLTYPE_JUMP_AI) ) )
 		{
 			FirePosPnt = EnemyTypes[Enemy->Type].GunFirePoints[GObject->GunNum>>1];
@@ -123,24 +123,24 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 			FireOffset.x -= Enemy->Object.Pos.x;
 			FireOffset.y -= Enemy->Object.Pos.y;
 			FireOffset.z -= Enemy->Object.Pos.z;
-			
+
 			ApplyMatrix( &GObject->Mat, EnemyTypes[ Enemy->Type ].GunAimPos[GObject->GunNum>>1], &AimOffset );
 			AimOffset.x += Enemy->Object.Pos.x;
 			AimOffset.y += Enemy->Object.Pos.y;
 			AimOffset.z += Enemy->Object.Pos.z;
-			
+
 			if( !GunTypes[GObject->Type].BurstMasterCount )
 			{
 				// Normal gun that just fires when it can..
-				
+
 				if( GunTypes[GObject->Type].PrimarySecondary )
 				{
 					AI_LookAhead( EnemyTypes[Enemy->Type].Behave.Anticipate_Move ,&AimOffset, TObject , &NewPos , SecondaryWeaponAttribs[GunTypes[GObject->Type].WeaponType].Speed);
 				}else{
 					AI_LookAhead( EnemyTypes[Enemy->Type].Behave.Anticipate_Move ,&AimOffset, TObject , &NewPos , PrimaryWeaponAttribs[GunTypes[GObject->Type].WeaponType].Speed[GunTypes[GObject->Type].PowerLevel]);
 				}
-				
-				
+
+
 				AI_AimAtTarget( &GObject->InvMat , &AimOffset, &NewPos );
 				GObject->AIMoveFlags |= AimData.Flags;
 				GObject->AI_Angle = AimData.Angle;
@@ -157,7 +157,7 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 				{
 					ApplyMatrix( &GObject->Mat, &Forward, &TempVector );
 					ApplyMatrix( &GObject->Mat, &SlideUp, &TempUpVector );
-					
+
 					if( !(Enemy->Object.Flags & SHIP_Scattered ) && (!GunTypes[GObject->Type].Range || ( DistanceVector2Vector( &TObject->Pos , &Enemy->Object.Pos) < GunTypes[GObject->Type].Range ) ))
 					{
 
@@ -168,13 +168,13 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 								SetCurAnimSeq( TURRETSEQ_Fire, &Enemy->Object );
 							}
 						}
-						
+
 						if( GunTypes[GObject->Type].PrimarySecondary )
 						{
 							InitOneSecBull( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Enemy->Object.Group,
 								&Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,
 								&TempOffset, GunTypes[GObject->Type].WeaponType, false );
-							
+
 						}else{
 							/* BodgePrimaryWeapon rewrites NME_* weapons to player
 							 * pickups when PickupHeld <= PICKUP_Laser. For NME_*
@@ -197,8 +197,8 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 						GObject->FirePosCount++;
 						if( GObject->FirePosCount >= FirePosPnt->NumPoints )
 							GObject->FirePosCount = 0;
-						
-						
+
+
 						GObject->ReloadTime =GunTypes[GObject->Type].ReloadTime;
 					}
 				}
@@ -206,7 +206,7 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 				// A Gun That Does a Burst...
 				if( GObject->BurstCount )
 				{
-					
+
 					if( GunTypes[GObject->Type].PrimarySecondary )
 					{
 						AI_LookAhead( EnemyTypes[Enemy->Type].Behave.Anticipate_Move ,&AimOffset, TObject , &NewPos , SecondaryWeaponAttribs[GunTypes[GObject->Type].WeaponType].Speed);
@@ -241,7 +241,7 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 							InitOneSecBull( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Enemy->Object.Group,
 								&Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,
 								&TempOffset, GunTypes[GObject->Type].WeaponType, false );
-							
+
 						}else{
 							/* BodgePrimaryWeapon rewrites NME_* weapons to player
 							 * pickups when PickupHeld <= PICKUP_Laser. For NME_*
@@ -261,26 +261,26 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 								PrimBulls[i].FirePoint = GObject->FirePosCount;
 							}
 						}
-						
+
 						GObject->FirePosCount++;
 						if( GObject->FirePosCount >= FirePosPnt->NumPoints )
 							GObject->FirePosCount = 0;
-						
+
 						GObject->ReloadTime = GunTypes[GObject->Type].ReloadTime;
 						GObject->BurstCount--;
 					}
 				}
-				
+
 				if( !GObject->BurstCount && GunTypes[GObject->Type].BurstMasterCount )
 				{
-					
+
 					if( GunTypes[GObject->Type].PrimarySecondary )
 					{
 						AI_LookAhead( EnemyTypes[Enemy->Type].Behave.Anticipate_Move ,&AimOffset, TObject , &NewPos , SecondaryWeaponAttribs[GunTypes[GObject->Type].WeaponType].Speed);
 					}else{
 						AI_LookAhead( EnemyTypes[Enemy->Type].Behave.Anticipate_Move ,&AimOffset, TObject , &NewPos , PrimaryWeaponAttribs[GunTypes[GObject->Type].WeaponType].Speed[GunTypes[GObject->Type].PowerLevel]);
 					}
-					
+
 					AI_AimAtTarget( &GObject->InvMat , &AimOffset, &NewPos );
 					GObject->AIMoveFlags |= AimData.Flags;
 					GObject->AI_Angle = AimData.Angle;
@@ -294,7 +294,7 @@ void AI_UPDATEGUNS( ENEMY * Enemy )
 						}
 					}
 				}
-				
+
 			}
 		}
 		GObject = GObject->Next;

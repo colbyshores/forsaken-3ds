@@ -18,25 +18,25 @@ void QUAT::MakeEuler( float XRot, float YRot, float ZRot )
 	/* put angles into radians and divide by two, since all angles in formula
 	 *  are (angle/2)
 	 */
-	
+
 	half_ZRot = ZRot * 0.5F;
 	half_YRot = YRot * 0.5F;
 	half_XRot = XRot * 0.5F;
-	
+
 	cosZRot = (float) COSD(half_ZRot);
 	sinZRot = (float) SIND(half_ZRot);
-	
+
 	cosYRot = (float) COSD(half_YRot);
 	sinYRot = (float) SIND(half_YRot);
-	
+
 	cosXRot = (float) COSD(half_XRot);
 	sinXRot = (float) SIND(half_XRot);
-	
-	
+
+
 	x = sinXRot * cosYRot * cosZRot - cosXRot * sinYRot * sinZRot;
 	y = cosXRot * sinYRot * cosZRot + sinXRot * cosYRot * sinZRot;
 	z = cosXRot * cosYRot * sinZRot - sinXRot * sinYRot * cosZRot;
-	
+
 	w = cosXRot * cosYRot * cosZRot + sinXRot * sinYRot * sinZRot;
 
 }	/* q_from_euler */
@@ -85,7 +85,7 @@ void QUAT::Normalise()
 			z *= len;
 			w *= len;
 		}
-	}			   
+	}
 }
 
 /*===================================================================
@@ -160,7 +160,7 @@ void QUATLERP::Step()
 	QUAT	*	start;
 	QUAT	*	end;
 	QUAT	*	result;
-	
+
 	alpha  =	time;
 	start  =	&this->start;
 	end	   =	&this->end;
@@ -181,7 +181,7 @@ void QUATLERP::Step()
 	result->y = ( ( beta * start->y ) ) + ( ( alpha * end->y ) );
 	result->z = ( ( beta * start->z ) ) + ( ( alpha * end->z ) );
 	result->w = ( ( beta * start->w ) ) + ( ( alpha * end->w ) );
-					 
+
 	result->Normalise();
 }
 
@@ -281,7 +281,7 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 	float	theta_complement;
 	float	crossProductMagnitude;
 /*
-** Normalize both vectors and take cross product to get rotation axis. 
+** Normalize both vectors and take cross product to get rotation axis.
 */
 	u1 = *v1;
 	u2 = *v2;
@@ -293,7 +293,7 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 /*
 ** | u1 X u2 | = |u1||u2|fast_sinf(theta)
 **
-** Since u1 and u2 are normalized, 
+** Since u1 and u2 are normalized,
 **
 **  theta = arcsin(|axis|)
 */
@@ -360,7 +360,7 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 /*===================================================================
 	Procedure	:		make a quaternion given an axis and an angle (in radians)
 				    	notes:
-					    - rotation is counter-clockwise when rotation axis vector is 
+					    - rotation is counter-clockwise when rotation axis vector is
 					    	pointing at you
 				    	    - if angle or vector are 0, the identity quaternion is returned.
 	Input		:		float x , y , z , angle

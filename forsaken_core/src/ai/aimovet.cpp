@@ -53,12 +53,12 @@ void AI_AIR_MOVETOTARGET( ENEMY * Enemy )
 		AI_SetFOLLOWPATH( Enemy );
 		return;
 	}
-	
+
 	Enemy->Timer -= framelag;
 
 	if( Enemy->Timer < 0.0F )
 		Enemy->Timer = 0.0F;
-	
+
 	if( Enemy->AIFlags & AI_ICANSEEPLAYER )
 	{
 		AI_SetDOGFIGHT( Enemy );
@@ -70,7 +70,7 @@ void AI_AIR_MOVETOTARGET( ENEMY * Enemy )
 		Enemy->TNode = Enemy->Object.NearestNode;
 		Enemy->Timer = EnemyTypes[Enemy->Type].Behave.BlindSearchTime;	// How long I Search if I lose sight of target
 	}
-	
+
 	AI_UPDATEGUNS( Enemy );
 	// Aim at target
 	if( Enemy->TNode )
@@ -106,7 +106,7 @@ void AI_AIR_MOVETOTARGET( ENEMY * Enemy )
 			}
 
 		}
-		
+
 		if( DistanceVector2Vector( &Enemy->Object.Pos , &TNode->Pos ) < 64.0F )
 		{
 			// Make my target my nearest automatically.....This might cause problems.....But it fixes others

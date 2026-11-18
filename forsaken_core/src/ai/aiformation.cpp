@@ -68,7 +68,7 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 
 	TObject = (OBJECT*) Enemy->TShip;
 
-	
+
 	Enemy->Timer -= framelag;
 	if( Enemy->Timer < 0.0F )
 		Enemy->Timer = 0.0F;
@@ -105,7 +105,7 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 		AI_SetRETREAT( Enemy );
 		return;
 	}
-	
+
 	AI_UPDATEGUNS( Enemy );
 	// Aim at target
 
@@ -118,7 +118,7 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 			NewPos = TObject->Pos;
 		}
 		AI_AimAtTarget( &Enemy->Object.InvMat , &Enemy->Object.Pos, &NewPos );
-		
+
 		if( !( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_ICANTPITCH ) )
 		{
 			Enemy->AIMoveFlags |= AimData.Flags;
@@ -132,9 +132,9 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 			{
 				Enemy->AIMoveFlags |=  AI_CONTROL_DOWN;
 			}
-			
+
 		}
-		
+
 		Enemy->AI_Angle = AimData.Angle;
 	}else{
 		ApplyMatrix( &LinkEnemy->Object.Mat, &Forward, &TempDir );
@@ -159,9 +159,9 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 			{
 				Enemy->AIMoveFlags |=  AI_CONTROL_DOWN;
 			}
-			
+
 		}
-		
+
 		Enemy->AI_Angle = AimData.Angle;
 	}
 

@@ -76,7 +76,7 @@ void * X_strdup( const char *str, const char *in_file, int in_line )
 {
 	void * Pnt;
 	int i;
-	
+
 	i = XMem_FindFree();
 	if( i == -1 )
 	{
@@ -85,7 +85,7 @@ void * X_strdup( const char *str, const char *in_file, int in_line )
 	}
 
 	Pnt = strdup( str );
-	
+
 	if( !Pnt )
 		return Pnt;
 
@@ -105,7 +105,7 @@ void * X_malloc( size_t size, const char *in_file, int in_line )
 {
 	void * Pnt;
 	int i;
-	
+
 	i = XMem_FindFree();
 	if( i == -1 )
 	{
@@ -114,7 +114,7 @@ void * X_malloc( size_t size, const char *in_file, int in_line )
 	}
 
 	Pnt = malloc( size );
-	
+
 	if( !Pnt )
 		return Pnt;
 
@@ -154,7 +154,7 @@ void * X_calloc( size_t num,size_t size, const char *in_file, int in_line )
 	BlockInFile[i] = in_file;
 	BlockInLine[i] = in_line;
 	MemUsed += num * size;
-	
+
 	memset(Pnt,0,size); // redundant: calloc already zeroed the block (this covers only size bytes)
 
 	return Pnt;
@@ -166,7 +166,7 @@ void X_free( void * Pnt, const char *in_file, int in_line )
 	int i;
 	static const char *last_file = NULL;
 	static int last_line = -1;
-	
+
 	if ( !Pnt )
 	{
 		if ( in_file != last_file || in_line != last_line )

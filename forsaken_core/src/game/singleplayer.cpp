@@ -56,7 +56,7 @@ bool LoadASinglePlayerGame( MENUITEM * Item )
 	memset(&Names, 0, sizeof(SHORTNAMETYPE) );
 	set_my_player_name();
 	Ships[ WhoIAm ].BikeNum = ( SelectedBike % MAXBIKETYPES );
-	
+
 
 	NewLevelNum = -1;
 	PreInGameLoad( Item );

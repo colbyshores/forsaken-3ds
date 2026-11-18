@@ -64,17 +64,17 @@ void AI_AIR_DEATH_PSYCHO( ENEMY * Enemy )
 	{
 		ApplyMatrix( &SObject->Mat, &Forward, &TempVector );
 		ApplyMatrix( &SObject->Mat, &SlideUp, &TempUpVector );
-		
+
 		if( (Enemy->PrimaryFireTimer == 0.0F) && ( EnemyTypes[Enemy->Type].PrimaryWeaponType != NO_PRIMARY )  )
 		{
 			Enemy->PrimaryFireTimer = EnemyTypes[Enemy->Type].PrimaryFireRate * 0.5F;
-			
+
 			Weapon = BodgePrimaryWeapon( EnemyTypes[Enemy->Type].PrimaryWeaponType, Enemy->PickupHeld );
-		
+
 			EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 				Enemy->Object.Group, &Enemy->Object.Pos, &TempOffset, &TempVector, &TempUpVector,
 				EnemyTypes[Enemy->Type].PowerLevel, (EnemyTypes[Enemy->Type].PowerLevel +1) * 33.0F, false, NULL );
 		}
 	}
-	
+
 }

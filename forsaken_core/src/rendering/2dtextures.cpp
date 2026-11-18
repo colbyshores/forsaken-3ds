@@ -146,14 +146,14 @@ FRAME_INFO	*	Title_TVFrame_Header;
 
 OFF_FILES Title_OffsetFiles[] = {
 
-	{ (int8_t*)"chars1.off",			&Title_Chars1_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },		
-	{ (int8_t*)"chars2.off",			&Title_Chars2_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },		
-	{ (int8_t*)"",					&Title_LevelPics_Header, DO_LOAD, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 256, 128 },		
-	{ (int8_t*)"",					&Title_TVFrame_Header, DO_LOAD, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 128, 128 },		
+	{ (int8_t*)"chars1.off",			&Title_Chars1_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },
+	{ (int8_t*)"chars2.off",			&Title_Chars2_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },
+	{ (int8_t*)"",					&Title_LevelPics_Header, DO_LOAD, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 256, 128 },
+	{ (int8_t*)"",					&Title_TVFrame_Header, DO_LOAD, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 128, 128 },
 	{ &TitleFontFile[ 0 ],	&Title_Fonts_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },	// vdu font page
 	{ &FontFile[ 0 ],		&Text512_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },	// 512x284 Font/Text
   { &FontFileBig[ 0 ], &Text512b_Header, DONT_LOAD, LOAD_TPAGES, 0, 0 }, // bigger font/text
-	{ NULL,					NULL, DO_LOAD, LOAD_TPAGES_FINISH, 0, 0 },			  
+	{ NULL,					NULL, DO_LOAD, LOAD_TPAGES_FINISH, 0, 0 },
 };
 
 
@@ -190,13 +190,13 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 	char			tpagename[32];
 	int8_t			TempFilename[ 256 ];
 	OFF_BUFFER		*Placeholder_Off_Buffer;
-	
+
 	Frm_Info = (FRAME_INFO*)malloc( sizeof( FRAME_INFO ) );							// Allocate memory for return structure
 	if( Frm_Info == NULL ) return( NULL );
 
 	if( placeholder )
 	{
-		Placeholder_Off_Buffer = (OFF_BUFFER *)malloc( sizeof( OFF_BUFFER ) );									// Allocate memory 
+		Placeholder_Off_Buffer = (OFF_BUFFER *)malloc( sizeof( OFF_BUFFER ) );									// Allocate memory
 		if( Placeholder_Off_Buffer == NULL )
 		{
 			free( Frm_Info );
@@ -218,7 +218,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 		Off_Info = &Placeholder_Off_Buffer->off_info;
 		Bit_Info = &Placeholder_Off_Buffer->bit_info;
 
-		Box_Info->tpage = Frm_Info->vid_tpage_index; 
+		Box_Info->tpage = Frm_Info->vid_tpage_index;
 		Box_Info->u1 = 0.0F;
 		Box_Info->v1 = 0.0F;
 		Box_Info->u2 = 1.0F;
@@ -250,14 +250,14 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 			free( Frm_Info );
 			return( NULL );
 		}
-																			
+
 		Off_Buffer = (int8_t*)malloc( File_Size );
 		if( Off_Buffer == NULL )
 		{
 			free( Frm_Info );
 			return( NULL );
 		}
-																			
+
 		Read_Size = Read_File( (char*)Filename, (char*)Off_Buffer, File_Size );			// Read file
 		if( Read_Size != File_Size )
 		{
@@ -265,7 +265,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 			free( Off_Buffer );
 			return( NULL );
 		}
-																			
+
 		FileReader in( Off_Buffer );
 		Num_TPages = in.i16();												// Number of possible new texture pages
 

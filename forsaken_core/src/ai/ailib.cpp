@@ -42,7 +42,7 @@
 
 TARGETDATA			TargetInfo;
 
-TARGETDATA *		Tinfo = & TargetInfo;   
+TARGETDATA *		Tinfo = & TargetInfo;
 
 
 AIMDATA			AimData;
@@ -77,13 +77,13 @@ void AI_GetNearestMINETarget( void )
 					{
 						Tinfo->TObject = (void*) &SecBulls[i];
 						Tinfo->TFlags = _TARGET_MINES;
-						Tinfo->Nearest = dist;         
+						Tinfo->Nearest = dist;
 					}
 				}
 			}
 		}
 		i = SecBulls[ i ].Prev;											/* Next SecBull */
-	}																				
+	}
 }
 /*===================================================================
 	Procedure	:	Find Nearest Ship in any group...
@@ -95,7 +95,7 @@ void AI_GetNearestSHIPTargetInAnyGROUP( void )
 	if( Ships[WhoIAm].enable && (Ships[WhoIAm].Object.Mode == NORMAL_MODE) && ( !(Ships[WhoIAm].Object.Flags & SHIP_Stealth) || (Ships[WhoIAm].Object.Flags & SHIP_Litup) ) )
 	{
 		Tinfo->TObject = (void*) &Ships[WhoIAm];
-		Tinfo->Nearest = DistanceVector2Vector( &Ships[WhoIAm].Object.Pos , &Tinfo->Pos);         
+		Tinfo->Nearest = DistanceVector2Vector( &Ships[WhoIAm].Object.Pos , &Tinfo->Pos);
 	}
 }
 /*===================================================================
@@ -111,7 +111,7 @@ void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * Ne
 	float	Speed;
 	float	Time;
 	float	Distance;
-	
+
 	if( Accuracy == 0.0F )
 	{
 		NewPos->x = TObject->Pos.x;
@@ -134,10 +134,10 @@ void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * Ne
 	Move_Off.x += ( Move_Dir.x * Speed );
 	Move_Off.y += ( Move_Dir.y * Speed );
 	Move_Off.z += ( Move_Dir.z * Speed );
-	
+
 	Distance = DistanceVector2Vector( &TObject->Pos , SPos  );
 	Time = ( Distance / SpeedOfBullet );
-	
+
 	Time *= Accuracy;
 	NewPos->x = TObject->Pos.x + ( Move_Off.x * Time );
 	NewPos->y = TObject->Pos.y + ( Move_Off.y * Time );
@@ -146,7 +146,7 @@ void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * Ne
 
 /*===================================================================
 	Procedure	:	AI Find the best least hassle free Next Node...
-	Input		:	OBJECT	*	Object 
+	Input		:	OBJECT	*	Object
 	Output		:	Nothing
 ===================================================================*/
 void AI_GetNearestNODETarget( OBJECT * Object )
@@ -171,15 +171,15 @@ void AI_GetNearestNODETarget( OBJECT * Object )
 		if( NodeLink->NetMask & Object->NodeNetwork )
 		{
 			AI_AimAtTarget( &Object->InvMat , &Object->Pos, &NodeLink->Pos );
-			
+
 			TempAngle = (AimData.Angle.x*AimData.Angle.x) + (AimData.Angle.y*AimData.Angle.y);
-			
+
 			if( !FoundOne || ( (TempAngle < Angle) && ( Random_Range(2) || !(NodeLink->Flags&NODE_DECISION) ) ) )
 			{
 				FoundOne = true;
 				Angle = TempAngle;
 				Tinfo->TObject = (void*) NodeLink;
-				
+
 			}
 		}
 
@@ -228,7 +228,7 @@ void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos )
 	{
 		AimData.Flags |= AI_CONTROL_TURNLEFT;
 	}
-	
+
 	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	Angle = (float) acosf( TempDir.y );
 	Angle = 90.0F - R2D( Angle );
@@ -266,17 +266,17 @@ bool AI_InViewCone( VECTOR * Pos, MATRIX * Mat , VECTOR * TPos, float ViewConeCo
 
 	if( ViewConeCos == 1.0F )
 		return true;
-	
+
 	Dir.x = ( TPos->x - Pos->x );
 	Dir.y = ( TPos->y - Pos->y );
 	Dir.z = ( TPos->z - Pos->z );
 	NormVector = Dir;
 	NormaliseVector( &NormVector );
-			
+
 	ApplyMatrix( Mat, &Forward, &Dir );			/* Calc Direction Vector */
 
 	Cos = DotProduct( &NormVector, &Dir );
-	
+
 	if( Cos > ViewConeCos )
 	{
 		return true;
@@ -301,13 +301,13 @@ bool AI_ClearLOS( VECTOR * SPos, u_int16_t Group , VECTOR * Pos )
 	Dir.x = ( Pos->x - SPos->x );
 	Dir.y = ( Pos->y - SPos->y );
 	Dir.z = ( Pos->z - SPos->z );
-	
+
 	if( BackgroundCollide( &MCloadheadert0, &Mloadheader, SPos, Group, &Dir,
 						&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 /*===================================================================
@@ -361,7 +361,7 @@ bool AI_ClearLOSNonZeroNonObject( VECTOR * SPos, u_int16_t Group , VECTOR * Pos 
 void AI_GetDistToNearestTarget( ENEMY * Enemy )
 {
 	OBJECT * TObject;
-	   
+
 	// Initialise
 	Tinfo->Pos.x 	= Enemy->Object.Pos.x;
 	Tinfo->Pos.y 	= Enemy->Object.Pos.y;
@@ -375,11 +375,11 @@ void AI_GetDistToNearestTarget( ENEMY * Enemy )
 	Tinfo->TObject	= NULL;
 
 	// What type of target are we looking for ...
-   
+
 	if ( TARGET_PLAYERS )
 	{
 	    AI_GetNearestSHIPTargetInAnyGROUP();
-	   
+
 		if ( ( TObject = (OBJECT*) Tinfo->TObject ) )
 		{
 			Enemy->LastDistance	= Tinfo->Nearest + SoundInfo[Enemy->Object.Group][TObject->Group];
@@ -390,7 +390,7 @@ void AI_GetDistToNearestTarget( ENEMY * Enemy )
 				return;
 			}
 		}
-	}      
+	}
 	if( TARGET_NODES )
 	{
 		AI_GetNearestNODETarget( &Enemy->Object );
@@ -399,7 +399,7 @@ void AI_GetDistToNearestTarget( ENEMY * Enemy )
 			Tinfo->TFlags = _TARGET_NODES;
 			return;
 		}
-	}	  	
+	}
 	if( TARGET_MINES )
 	{
 		AI_GetNearestMINETarget();

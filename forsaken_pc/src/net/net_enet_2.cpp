@@ -227,11 +227,11 @@ static network_return_t enet_setup( char* str_address, int port )
 		}
 		initialized = 1;
 	}
-	
+
 	DebugPrintf("network: enet setup initialized\n");
 
 	if ( ! str_address ) address.host = ENET_HOST_ANY;
-	else enet_address_set_host( &address, str_address ); 
+	else enet_address_set_host( &address, str_address );
 
 	address.port = (port) ? port : NETWORK_DEFAULT_PORT;
 	my_local_port = address.port;
@@ -262,10 +262,10 @@ static int enet_connect( char* str_address, int port )
 	network_peer_data_t * peer_data;
 
 	if ( ! str_address ) address.host = ENET_HOST_ANY;
-	else enet_address_set_host( &address, str_address ); 
+	else enet_address_set_host( &address, str_address );
 
 	address.port = (port) ? port : NETWORK_DEFAULT_PORT;
-	
+
 	DebugPrintf("network: enet connect to address %s\n",
 		address_to_str(&address));
 
@@ -279,7 +279,7 @@ static int enet_connect( char* str_address, int port )
 	init_peer( peer );
 	peer_data = (network_peer_data_t*)peer->data;
 	peer_data->state = CONNECTING;
-	
+
 	if( network_state == NETWORK_CONNECTING )
 		host = peer;
 
@@ -306,8 +306,8 @@ static void enet_send_packet( ENetPeer* peer, ENetPacket* packet, int channel, f
 }
 
 static void enet_send(
-	ENetPeer* peer, void* data, int size, 
-	enet_uint32 type, int channel, flush_t flush 
+	ENetPeer* peer, void* data, int size,
+	enet_uint32 type, int channel, flush_t flush
 )
 {
 	ENetPacket * packet = enet_packet_create( data, size, type );
@@ -341,7 +341,7 @@ static network_player_t * find_player_with_lowest_id( void )
 static void migrate_host( void )
 {
 	network_player_t * player = find_player_with_lowest_id();
-	if ( ! player ) 
+	if ( ! player )
 	{
 		i_am_host = 1;
 		host = NULL;
@@ -584,7 +584,7 @@ typedef enum {
 
 	// nat punching
 	NAT_PUNCH_THROUGH_LIST, // see explanation in new_connection()
-	
+
 } p2p_event_t;
 
 typedef struct {
@@ -678,7 +678,7 @@ static void new_connection( ENetPeer * peer )
 			my_player_name);
 	}
 
-	// 
+	//
 	if ( i_am_host )
 	{
 		// tell the new player his id
@@ -773,13 +773,13 @@ static void lost_connection( ENetPeer * peer, enet_uint32 data )
 		switch(reason[0])
 		{
 			case FAILED_SYNCH:
-				DebugPrintf("network: reason was because you failed to synch with player %d\n", reason[1]); 
+				DebugPrintf("network: reason was because you failed to synch with player %d\n", reason[1]);
 				break;
 			case HOST_SAID_SO:
-				DebugPrintf("network: reason was because host told me to disconnect from you\n"); 
+				DebugPrintf("network: reason was because host told me to disconnect from you\n");
 				break;
 			case I_QUIT:
-				DebugPrintf("network: reason was because I'm leaving the game\n"); 
+				DebugPrintf("network: reason was because I'm leaving the game\n");
 				break;
 			default:
 				DebugPrintf("network: reason was unspecified\n");
@@ -803,7 +803,7 @@ static void lost_connection( ENetPeer * peer, enet_uint32 data )
 	}
 
 	// we are in the game
-	if ( network_state == NETWORK_CONNECTED ) 
+	if ( network_state == NETWORK_CONNECTED )
 	{
 		// backup data so we can kill peer before we broadcast
 		peer_id_t id = peer_data->id;
@@ -1089,7 +1089,7 @@ static void new_packet( ENetEvent * event )
 					p2p_id_packet_t packet;
 					packet.type = CONNECTED_TO;
 					packet.id = peer_data->id;
-					network_send( host_data->player, &packet, sizeof(packet), 
+					network_send( host_data->player, &packet, sizeof(packet),
 						NETWORK_RELIABLE, system_channel );
 					DebugPrintf("network: telling host that we have connected to new player %d\n",
 						peer_data->id);
@@ -1230,7 +1230,7 @@ static void new_packet( ENetEvent * event )
 				if( i_am_host )
 				{
 					if( PEER_STATE(bad_peer) == SYNCHING )
-					{			
+					{
 						// tell everyone to drop the connection
 						DebugPrintf("network: dropping player %d because they failed to synch with %d\n",
 							packet->id, peer_data->id );
@@ -1283,7 +1283,7 @@ static void new_packet( ENetEvent * event )
 						packet2.id = packet->id;
 						network_send( peer_data->player, &packet2, sizeof(packet2),
 							NETWORK_RELIABLE, system_channel );
-						DebugPrintf("network security: telling player %d to drop unknown player %d\n", 
+						DebugPrintf("network security: telling player %d to drop unknown player %d\n",
 							peer_data->id, packet->id);
 					}
 				}
@@ -1367,7 +1367,7 @@ static void new_packet( ENetEvent * event )
 		else
 		{
 			DebugPrintf("network security: got application packet from non player at address %s\n",
-				address_to_str(&peer->address) );	
+				address_to_str(&peer->address) );
 		}
 	}
 	enet_packet_destroy( event->packet );
@@ -1432,7 +1432,7 @@ void network_cleanup( void )
 
 void network_send(
 	network_player_t* player, void* data, int size,
-	network_flags_t flags, int channel 
+	network_flags_t flags, int channel
 )
 {
 	if( enet_host == NULL ) return;

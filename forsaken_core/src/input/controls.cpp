@@ -140,7 +140,7 @@ bool FullRearView = false;
 bool ShowStats = false;
 bool ShowMessages = false;	// display long list of chat messages
 bool ShowStatistics = false;	// display statistics in game
-bool ShowNetworkInfo = false;	// display enet info in game 
+bool ShowNetworkInfo = false;	// display enet info in game
 
 void FlashMenuText( const char * text, float activetime, u_int16_t sfx )
 {
@@ -246,7 +246,7 @@ static struct
   int (*cheatfunc)( char * );
   bool allowmultiplayer;
   int next;
-} CheatTable[] = 
+} CheatTable[] =
 {
   { { SDLK_b, SDLK_u, SDLK_b, SDLK_b, SDLK_l, SDLK_e, SDLK_s, 0 }, EnableCheats, true, 0 },
   { { SDLK_j, SDLK_i, SDLK_m, SDLK_b, SDLK_e, SDLK_a, SDLK_m, 0 }, JimBeam, false, 0 },
@@ -422,13 +422,13 @@ void CheckCheats( int key )
             if ( CheatTable[ j ].cheatfunc && ( CheatsEnabled || !j ) )
             {
               CheatTable[ j ].cheatfunc( (char*)CheatTable[ j ].cheatcode );
-        
+
               // reset all cheats...
               for( i = 0; i < cheats; i++ )
               {
                 CheatTable[ i ].next = 0;
               }
-              break;    
+              break;
             }
           }
           CheatTable[ j ].next = 0;
@@ -655,7 +655,7 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
         ctrl->bank -= BankAccell * MaxBankAngle * mouse_dx * turn_sign;
       }
     }
-    
+
     if ( key_held( &conf->down ) )
     {
       ctrl->pitch -= TurnAccell * MaxTurnSpeed * framelag;
@@ -678,7 +678,7 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
   {
     ctrl->right += MoveAccell * MaxMoveSpeed * framelag;
   }
-  
+
   if ( key_held( &conf->move_down ) )
   {
     ctrl->up -= MoveAccell * MaxMoveSpeed * framelag;
@@ -687,7 +687,7 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
   {
     ctrl->up += MoveAccell * MaxMoveSpeed * framelag;
   }
-  
+
   if ( key_held( &conf->roll_left ) )
   {
     ctrl->roll += RollAccell * MaxRollSpeed * framelag;
@@ -734,10 +734,10 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 
   ctrl->select_next_primary = key_pressed( &conf->select_next_primary );
   ctrl->select_prev_primary = key_pressed( &conf->select_prev_primary );
-  
+
   ctrl->select_next_secondary = key_pressed( &conf->select_next_secondary );
   ctrl->select_prev_secondary = key_pressed( &conf->select_prev_secondary );
-  
+
   ctrl->drop_primary      = key_pressed( &conf->drop_primary );
   ctrl->drop_secondary    = key_pressed( &conf->drop_secondary );
   ctrl->drop_shield     = key_pressed( &conf->drop_shield );
@@ -769,7 +769,7 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
     MenuRestart( &MENU_QuickTextSend );
   }
 
-  
+
 	if ( JoystickInput )
 	{
 		for (joystick = 0; joystick < Num_Joysticks; joystick++)
@@ -893,7 +893,7 @@ bool joystick_poll( int joysticknum )
 	// copy joystick button state
 	for( i = 0; i < MAX_JOYSTICK_BUTTONS; i++ )
 	{
-		js_buttons[new_input][joysticknum][i] = 
+		js_buttons[new_input][joysticknum][i] =
 			joy_button_state[joysticknum][i];
 	}
 

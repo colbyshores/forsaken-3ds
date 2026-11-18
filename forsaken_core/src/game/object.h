@@ -34,11 +34,11 @@ typedef struct OBJECT
 	VECTOR				Pos;		// x , y , z position
 	QUAT				Quat;		// what my current viewing angles are...
 	float				Bank;		// How much Am I banked....
-	MATRIX				Mat;		// view matrix...............befor banking.. 
-	MATRIX				InvMat;		// view matrix...............befor banking.. 
-	
-	MATRIX				FinalMat;	// Final view matrix...............after banking.. 
-	MATRIX				FinalInvMat;// Final inverse view matrix.......after banking.. 
+	MATRIX				Mat;		// view matrix...............befor banking..
+	MATRIX				InvMat;		// view matrix...............befor banking..
+
+	MATRIX				FinalMat;	// Final view matrix...............after banking..
+	MATRIX				FinalInvMat;// Final inverse view matrix.......after banking..
 	QUAT				FinalQuat;	// what my current viewing angles are with the banking...
 
 	VECTOR				DirVector;			// Direction Vector
@@ -120,10 +120,10 @@ typedef struct GUNTYPE
 	int					BurstMasterCount;	// How many shots a burst should have
 	float				BurstAngle;			// How much angle between each Shot in a burst
 	float				XRotMin;			// How far in the X can I Rotate..
-	float				XRotMax;			
+	float				XRotMax;
 	float				YRotMin;			// How far in the Y can I Rotate..
-	float				YRotMax;			
-	float				Range;			
+	float				YRotMax;
+	float				Range;
 	int16_t				PowerLevel;			// Power Level of weapon....
 	bool				PrimarySecondary;	// False for Primary True for Secondary...
 	BYTE				WeaponType;			// which weapon do I Fire...

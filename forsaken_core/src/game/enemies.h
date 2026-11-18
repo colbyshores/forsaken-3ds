@@ -68,7 +68,7 @@ typedef struct ENEMY {
 
 	void *	NextTNode;		// What node Im Trying to get nearest to....after my current TNode...
 	void *	LastTNode;		// What node I was nearest to before my Next Target Node...
-	
+
 	float	LastDistance;
 	BYTE	LastPrimaryFiredAtMe;
 	BYTE	LastSecondaryFiredAtMe;
@@ -84,7 +84,7 @@ typedef struct ENEMY {
 
 	float	AvoidTimer;
 	u_int16_t	AvoidType;
-	
+
 	u_int16_t	Status;				// Status
 	u_int16_t	GenType;			// Generation Type
 	u_int16_t	BulletID;			// ID

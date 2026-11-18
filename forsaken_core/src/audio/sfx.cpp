@@ -28,72 +28,72 @@ int sound_minimum_volume = -10000 / 3;
 Biker speech lookup table identifiers
 **************************************/
 enum {
-	SFX_BIKER_LOOKUP_GP, //	-	general        
-	SFX_BIKER_LOOKUP_VP, //	-	victory        
-	SFX_BIKER_LOOKUP_LP, //	-	losing         
+	SFX_BIKER_LOOKUP_GP, //	-	general
+	SFX_BIKER_LOOKUP_VP, //	-	victory
+	SFX_BIKER_LOOKUP_LP, //	-	losing
 	SFX_BIKER_LOOKUP_BW, //	-	big weapon gain
-	SFX_BIKER_LOOKUP_LE, //	-	low energy     
-	SFX_BIKER_LOOKUP_TN, //	-	taunt          
-	SFX_BIKER_LOOKUP_PN, //	-	pain           
-	SFX_BIKER_LOOKUP_DT, //	-	death          
-	SFX_BIKER_LOOKUP_EX, //	-	extra          
+	SFX_BIKER_LOOKUP_LE, //	-	low energy
+	SFX_BIKER_LOOKUP_TN, //	-	taunt
+	SFX_BIKER_LOOKUP_PN, //	-	pain
+	SFX_BIKER_LOOKUP_DT, //	-	death
+	SFX_BIKER_LOOKUP_EX, //	-	extra
 };
 
 /*************************************
 Bike Computer lookup table identifiers
 **************************************/
 enum {
-	SFX_BIKECOMP_LOOKUP_AM,  //	-	assassin missile                        
+	SFX_BIKECOMP_LOOKUP_AM,  //	-	assassin missile
 	SFX_BIKECOMP_LOOKUP_AP,  //	-	picking up a weapon which is already pre
-	SFX_BIKECOMP_LOOKUP_BL,  //	-	beam laser                              
-	SFX_BIKECOMP_LOOKUP_BN,  //	-	bad navigation                          
-	SFX_BIKECOMP_LOOKUP_CA,  //	-	camping                                 
-	SFX_BIKECOMP_LOOKUP_CD,  //	-	chaff dispenser                         
-	SFX_BIKECOMP_LOOKUP_CS,  //	-	chaos shield                            
-	SFX_BIKECOMP_LOOKUP_DY,  //	-	destroying yourself                     
-	SFX_BIKECOMP_LOOKUP_EA,  //	-	extra ammo                              
-	SFX_BIKECOMP_LOOKUP_EX,  //	-	extra,   miscellaneous phrases            
-	SFX_BIKECOMP_LOOKUP_FL,  //	-	flares                                  
-	SFX_BIKECOMP_LOOKUP_GK,  //	-	good kill total                         
-	SFX_BIKECOMP_LOOKUP_GL,  //	-	general ammo low                        
-	SFX_BIKECOMP_LOOKUP_GM,  //	-	gravgon missile                         
-	SFX_BIKECOMP_LOOKUP_GP,  //	-	golden power pod                        
-	SFX_BIKECOMP_LOOKUP_HC,  //	-	hull critical                           
-	SFX_BIKECOMP_LOOKUP_IN,  //	-	incoming                                
-	SFX_BIKECOMP_LOOKUP_IR,  //	-	IR goggles                              
-	SFX_BIKECOMP_LOOKUP_MA,  //	-	maximum ammo                            
-	SFX_BIKECOMP_LOOKUP_MK,  //	-	many kills in a short time period       
-	SFX_BIKECOMP_LOOKUP_MR,  //	-	MRFL                                    
-	SFX_BIKECOMP_LOOKUP_MU,  //	-	mug                                     
-	SFX_BIKECOMP_LOOKUP_NK,  //	-	no kills for a lengthy time period      
-	SFX_BIKECOMP_LOOKUP_NL,  //	-	nitro low                               
-	SFX_BIKECOMP_LOOKUP_NP,  //	-	selecting a weapon which is not present 
-	SFX_BIKECOMP_LOOKUP_NT,  //	-	nitro                                   
-	SFX_BIKECOMP_LOOKUP_OP,  //	-	orbit pulsar                            
-	SFX_BIKECOMP_LOOKUP_PG,  //	-	petro gel                               
-	SFX_BIKECOMP_LOOKUP_PK,  //	-	poor kill total                         
-	SFX_BIKECOMP_LOOKUP_PL,  //	-	pyrolite fuel low                       
-	SFX_BIKECOMP_LOOKUP_PM,  //	-	pine mine                               
-	SFX_BIKECOMP_LOOKUP_PO,  //	-	power pod                               
-	SFX_BIKECOMP_LOOKUP_PP,  //	-	plasma pack                             
-	SFX_BIKECOMP_LOOKUP_PR,  //	-	purge mine                              
-	SFX_BIKECOMP_LOOKUP_PS,  //	-	pulsar                                  
-	SFX_BIKECOMP_LOOKUP_PY,  //	-	pyrolite                                
-	SFX_BIKECOMP_LOOKUP_QM,  //	-	quantum mine                            
-	SFX_BIKECOMP_LOOKUP_RR,  //	-	resnic reanimator                       
-	SFX_BIKECOMP_LOOKUP_SA,  //	-	scatter missile                         
-	SFX_BIKECOMP_LOOKUP_SC,  //	-	shield critical                         
-	SFX_BIKECOMP_LOOKUP_SG,  //	-	suss-gun                                
-	SFX_BIKECOMP_LOOKUP_SH,  //	-	shield                                  
-	SFX_BIKECOMP_LOOKUP_SI,  //	-	scatter missile impact                  
-	SFX_BIKECOMP_LOOKUP_SL,  //	-	suss gun ammo low                       
-	SFX_BIKECOMP_LOOKUP_SM,  //	-	smoke streamer                          
-	SFX_BIKECOMP_LOOKUP_SO,  //	-	spider mine                             
-	SFX_BIKECOMP_LOOKUP_SP,  //	-	solaris heatseaker                      
-	SFX_BIKECOMP_LOOKUP_ST,  //	-	stealth mantle                          
-	SFX_BIKECOMP_LOOKUP_TI,  //	-	titan star missile                      
-	SFX_BIKECOMP_LOOKUP_TR,  //	-	transpulse                              
-	SFX_BIKECOMP_LOOKUP_TX,  //	-	trojax  
+	SFX_BIKECOMP_LOOKUP_BL,  //	-	beam laser
+	SFX_BIKECOMP_LOOKUP_BN,  //	-	bad navigation
+	SFX_BIKECOMP_LOOKUP_CA,  //	-	camping
+	SFX_BIKECOMP_LOOKUP_CD,  //	-	chaff dispenser
+	SFX_BIKECOMP_LOOKUP_CS,  //	-	chaos shield
+	SFX_BIKECOMP_LOOKUP_DY,  //	-	destroying yourself
+	SFX_BIKECOMP_LOOKUP_EA,  //	-	extra ammo
+	SFX_BIKECOMP_LOOKUP_EX,  //	-	extra,   miscellaneous phrases
+	SFX_BIKECOMP_LOOKUP_FL,  //	-	flares
+	SFX_BIKECOMP_LOOKUP_GK,  //	-	good kill total
+	SFX_BIKECOMP_LOOKUP_GL,  //	-	general ammo low
+	SFX_BIKECOMP_LOOKUP_GM,  //	-	gravgon missile
+	SFX_BIKECOMP_LOOKUP_GP,  //	-	golden power pod
+	SFX_BIKECOMP_LOOKUP_HC,  //	-	hull critical
+	SFX_BIKECOMP_LOOKUP_IN,  //	-	incoming
+	SFX_BIKECOMP_LOOKUP_IR,  //	-	IR goggles
+	SFX_BIKECOMP_LOOKUP_MA,  //	-	maximum ammo
+	SFX_BIKECOMP_LOOKUP_MK,  //	-	many kills in a short time period
+	SFX_BIKECOMP_LOOKUP_MR,  //	-	MRFL
+	SFX_BIKECOMP_LOOKUP_MU,  //	-	mug
+	SFX_BIKECOMP_LOOKUP_NK,  //	-	no kills for a lengthy time period
+	SFX_BIKECOMP_LOOKUP_NL,  //	-	nitro low
+	SFX_BIKECOMP_LOOKUP_NP,  //	-	selecting a weapon which is not present
+	SFX_BIKECOMP_LOOKUP_NT,  //	-	nitro
+	SFX_BIKECOMP_LOOKUP_OP,  //	-	orbit pulsar
+	SFX_BIKECOMP_LOOKUP_PG,  //	-	petro gel
+	SFX_BIKECOMP_LOOKUP_PK,  //	-	poor kill total
+	SFX_BIKECOMP_LOOKUP_PL,  //	-	pyrolite fuel low
+	SFX_BIKECOMP_LOOKUP_PM,  //	-	pine mine
+	SFX_BIKECOMP_LOOKUP_PO,  //	-	power pod
+	SFX_BIKECOMP_LOOKUP_PP,  //	-	plasma pack
+	SFX_BIKECOMP_LOOKUP_PR,  //	-	purge mine
+	SFX_BIKECOMP_LOOKUP_PS,  //	-	pulsar
+	SFX_BIKECOMP_LOOKUP_PY,  //	-	pyrolite
+	SFX_BIKECOMP_LOOKUP_QM,  //	-	quantum mine
+	SFX_BIKECOMP_LOOKUP_RR,  //	-	resnic reanimator
+	SFX_BIKECOMP_LOOKUP_SA,  //	-	scatter missile
+	SFX_BIKECOMP_LOOKUP_SC,  //	-	shield critical
+	SFX_BIKECOMP_LOOKUP_SG,  //	-	suss-gun
+	SFX_BIKECOMP_LOOKUP_SH,  //	-	shield
+	SFX_BIKECOMP_LOOKUP_SI,  //	-	scatter missile impact
+	SFX_BIKECOMP_LOOKUP_SL,  //	-	suss gun ammo low
+	SFX_BIKECOMP_LOOKUP_SM,  //	-	smoke streamer
+	SFX_BIKECOMP_LOOKUP_SO,  //	-	spider mine
+	SFX_BIKECOMP_LOOKUP_SP,  //	-	solaris heatseaker
+	SFX_BIKECOMP_LOOKUP_ST,  //	-	stealth mantle
+	SFX_BIKECOMP_LOOKUP_TI,  //	-	titan star missile
+	SFX_BIKECOMP_LOOKUP_TR,  //	-	transpulse
+	SFX_BIKECOMP_LOOKUP_TX,  //	-	trojax
 };
 
 typedef struct SFXNAME{
@@ -127,26 +127,26 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 	*************************************************/
 
 	{ "killingspree", 0, 0, -1 },  // voices
-	{ "rampage", 0, 0, -1 },  
-	{ "dominating", 0, 0, -1 },  
-	{ "unstoppable", 0, 0, -1 },  
-	{ "wickedsick", 0, 0, -1 },  
-	{ "godlike", 0, 0, -1 }, 
-	{ "doublekill", 0, 0, -1 }, 
-	{ "firstblood", 0, 0, -1 }, 
- 	{ "combowhore", 0, 0, -1 }, 
-	{ "hattrick", 0, 0, -1 }, 
-	{ "holyshit", 0, 0, -1 }, 
-	{ "humiliation", 0, 0, -1 }, 
-	{ "impressive", 0, 0, -1 }, 
-	{ "ludicrouskill", 0, 0, -1 }, 
-	{ "megakill", 0, 0, -1 }, 
-	{ "monsterkill", 0, 0, -1 }, 
-	{ "multikill", 0, 0, -1 }, 
-	{ "play", 0, 0, -1 }, 
-	{ "teamkiller", 0, 0, -1 }, 
-	{ "triplekill", 0, 0, -1 }, 
-	{ "ultrakill", 0, 0, -1 }, 
+	{ "rampage", 0, 0, -1 },
+	{ "dominating", 0, 0, -1 },
+	{ "unstoppable", 0, 0, -1 },
+	{ "wickedsick", 0, 0, -1 },
+	{ "godlike", 0, 0, -1 },
+	{ "doublekill", 0, 0, -1 },
+	{ "firstblood", 0, 0, -1 },
+ 	{ "combowhore", 0, 0, -1 },
+	{ "hattrick", 0, 0, -1 },
+	{ "holyshit", 0, 0, -1 },
+	{ "humiliation", 0, 0, -1 },
+	{ "impressive", 0, 0, -1 },
+	{ "ludicrouskill", 0, 0, -1 },
+	{ "megakill", 0, 0, -1 },
+	{ "monsterkill", 0, 0, -1 },
+	{ "multikill", 0, 0, -1 },
+	{ "play", 0, 0, -1 },
+	{ "teamkiller", 0, 0, -1 },
+	{ "triplekill", 0, 0, -1 },
+	{ "ultrakill", 0, 0, -1 },
 	{ "airbubb1", 0, 0, -1 },  // bubbles rising in water
 	{ "bikexpl", 0, 0, -1 },  // bike explodes, as player dies
 	//{ "bminelay", 0, 0, -1 },  // quantum/pine mine drop
@@ -335,7 +335,7 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 	/************************************************
 	Biker
 	*************************************************/
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_GP  }, //	-	general 
+	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_GP  }, //	-	general
 	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_VP  }, //	-	victory
 	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_LP  }, //	-	losing
 	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_BW  }, //	-	big weapon gain
@@ -343,8 +343,8 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_TN  }, //	-	taunt
 	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_PN  }, //	-	pain
 	{ NULL, SFX_Biker | SFX_BikerSpeechOveride, 0, SFX_BIKER_LOOKUP_DT  }, //	-	death
-	{ NULL, SFX_Biker | SFX_Title, 0, SFX_BIKER_LOOKUP_EX  }, //	-	extra 
-  
+	{ NULL, SFX_Biker | SFX_Title, 0, SFX_BIKER_LOOKUP_EX  }, //	-	extra
+
 	{ NULL, SFX_LevelSpec, 0, 0 }, // first level spec sfx
 
 };
@@ -385,7 +385,7 @@ sound_buffer_t * sound_buffer_create( char *file, int sfxnum )
 
 	if( sound_buffers[ sfxnum ] )
 		return sound_buffers[ sfxnum ];
-	
+
 	buffer = sound_load( file );
 
 	if ( ! buffer )
@@ -394,16 +394,16 @@ sound_buffer_t * sound_buffer_create( char *file, int sfxnum )
 		DebugPrintf("failed to load sfxnum %d from %s\n",sfxnum,file);
 		return NULL;
 	}
-	
+
 	sound_buffers[ sfxnum ] = buffer;
 
 	return buffer;
 }
 
-// TODO 
+// TODO
 //   openal will not really delete the buffer until you delete all the sources...
 //   make a table of sources and tell everything else to point to id's in that table ?
-//   that way we can simply iterate one list... 
+//   that way we can simply iterate one list...
 
 // use this if you want sound to reinit
 void sound_buffer_delete( int sfx )
@@ -721,7 +721,7 @@ const char *BikerSpeechNames[MAXBIKETYPES] = {
 };
 
 const char *BikerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
-	"GP",	//	-	general 
+	"GP",	//	-	general
 	"VP",	//	-	victory
 	"LP",	//	-	losing
 	"BW",	//	-	big weapon gain
@@ -729,7 +729,7 @@ const char *BikerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
 	"TN",	//	-	taunt
 	"PN",	//	-	pain
 	"DT",	//	-	death
-	"EX",	//	-	extra 
+	"EX",	//	-	extra
 };
 
 const char *GenericSfxPath = {
@@ -831,7 +831,7 @@ constexpr int SFX_HOLDERTYPE_Taunt = 4;
 	description	:		Marks an SfxHolder as unused
 						If Sfx being played was biker speech, reset CurrentBikerSpeech
 *****************************************/
-void FreeSfxHolder( int index ) 
+void FreeSfxHolder( int index )
 {
 	CheckSpeech( index );
 
@@ -848,7 +848,7 @@ void FreeSfxHolder( int index )
 		sound_release_source(SfxHolder[index].source);
 		SfxHolder[index].source = NULL;
 	}
-	
+
 	SfxHolder[ index ].Used = false;
 }
 
@@ -858,7 +858,7 @@ void FreeSfxHolder( int index )
 	Input		:		int sfxnum:	sfx index ( in Sfx_Filenames table )
 	Output		:		prefix placed in *file
 	notes		:		BikeCompSpeechSlider can be zero ( volume ) to indicate no bike computer
-						
+
 *****************************************/
 void GetSfxFileNamePrefix( int sfxnum, char *file )
 {
@@ -868,7 +868,7 @@ void GetSfxFileNamePrefix( int sfxnum, char *file )
 		strcat( file, "_" );
 		strcat( file, BikeComputerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
 		return;
-	}				
+	}
 
 	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_Biker )
 	{
@@ -882,7 +882,7 @@ void GetSfxFileNamePrefix( int sfxnum, char *file )
 }
 
 /****************************************
-	Procedure	: ClearLevelSpecSfx		
+	Procedure	: ClearLevelSpecSfx
 	description	: removes current level specific sfx from LevelSpecificEffects table
 	Input		: none
 	Output		: none
@@ -972,7 +972,7 @@ bool IsDigit( char check )
 /****************************************
 	Procedure	: ReturnSFXIndex
 	description	: returns an index to Sfx_Filenames for the requested sfx.
-				  if sfx does not already exist in table, sfx is added as 
+				  if sfx does not already exist in table, sfx is added as
 				  a level specific sfx at the end of the table.
 	Input		:  char *file: Sfx name
 	Output		: int16_t: index no.
@@ -1022,7 +1022,7 @@ int16_t ReturnSFXIndex( char *file )
 			}
 		}else
 			break;
-		
+
 	// look up sfx in table of possible level spec sfx ( neccesary in order to get correct flags )...
 	i = 0;
 	level_spec_flags = SFX_LevelSpec;
@@ -1032,7 +1032,7 @@ int16_t ReturnSFXIndex( char *file )
 	{
 		if ( !strcasecmp( LevelSpecificSfxLookup[ i ].file, file ) )
 		{
-			if ( SfxExists( SFX_LEVELSPEC_Start , file ) )	
+			if ( SfxExists( SFX_LEVELSPEC_Start , file ) )
 			{
 				level_spec_flags |= LevelSpecificSfxLookup[ i ].flags;
 				found = true;
@@ -1101,7 +1101,7 @@ void PauseAllSfx( void )
 {
 	u_int16_t i;
 	SPOT_SFX_LIST temp;
-	
+
 	// looping sfx info has to be stored for later retriggering
 	for ( i = 0; i < MAX_LOOPING_SFX; i++ )
 	{
@@ -1109,7 +1109,7 @@ void PauseAllSfx( void )
 		{
 			temp = SpotSfxList[ i ];
 			// StopSfx will free the source
-			// so we can't leave the old pointer here 
+			// so we can't leave the old pointer here
 			temp.source = NULL;
 			StopSfx( SpotSfxList[ i ].uid );
 			SpotSfxList[ i ] = temp;
@@ -1167,9 +1167,9 @@ void ReTriggerSfx( void )
 		{
 			temp = SpotSfxList[ i ];
 			SpotSfxList[ i ].used = false;
-			
+
 			tempuid = 0;
-			
+
 			if ( temp.type == LOOPING_SFX_FixedGroup )
 			{
 				tempuid = PlayFixedSpotSfx( temp.sfxindex, temp.fixedgroup, &temp.fixedpos, temp.freq, temp.vol, temp.Effects );
@@ -1219,7 +1219,7 @@ void GetFullBikeSfxPath( char *fullpath, int sfxnum, int variant, int total_vari
 	// add _
 	strcat( filename, "_" );
 
-	// 
+	//
 	strcat( filename, BikerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
 
 	// create filename with no num extension
@@ -1282,7 +1282,7 @@ void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants
 {
 	char filename[256];
 	char numstr[12];
-	
+
 	if ( ( variant > total_variants ) && total_variants )
 	{
 		DebugPrintf("GetFullSfxPath: invalid parameters\n");
@@ -1314,7 +1314,7 @@ void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants
 void PreInitSfx( void )
 {
 	int i;
-	
+
 	for( i = 0; i < MAX_SFX; i++ )
 	{
 		SndLookup[ i ].Num_Variants = 0;
@@ -1410,7 +1410,7 @@ void GetBikeVariants( void )
 {
 	int bike, i, j;
 	char filename[256];
-	
+
 	for ( i = 0; i < MAX_SFX; i++ )
 	{
 		if ( i >= SFX_LEVELSPEC_Start )
@@ -1429,7 +1429,7 @@ void GetBikeVariants( void )
 
 				if ( File_Exists ( filename ) )
 				{
-					BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ]++; 
+					BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ]++;
 					continue;
 				}
 
@@ -1444,7 +1444,7 @@ void GetBikeVariants( void )
 						GetFullBikeSfxPath( filename, i, j++, BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ], bike );
 
 					if ( File_Exists( filename ) )
-						BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ]++; 
+						BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ]++;
 					else
 						break;
 
@@ -1458,7 +1458,7 @@ void GetBikeCompVariants( void )
 {
 	int bikecomp, i, j;
 	char filename[256];
-	
+
 	for ( i = 0; i < MAX_SFX; i++ )
 	{
 		if ( i >= SFX_LEVELSPEC_Start )
@@ -1476,7 +1476,7 @@ void GetBikeCompVariants( void )
 
 				if ( File_Exists ( filename ) )
 				{
-					BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ]++; 
+					BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ]++;
 					continue;
 				}
 
@@ -1492,7 +1492,7 @@ void GetBikeCompVariants( void )
 						GetFullBikeCompSfxPath( filename, i, j++, BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ], bikecomp );
 
 					if ( File_Exists( filename ) )
-						BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ]++; 
+						BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ]++;
 					else
 						break;
 
@@ -1516,14 +1516,14 @@ void PreProcessSfx( void )
 	{
 		if ( ( i >= SFX_LEVELSPEC_Start ) && !Sfx_Filenames[ i ].Name )
 			break;
-		
+
 		if ( ! SndLookup[ i ].Requested )
 			continue;
 
-		SndLookup[ i ].Num_Variants = 0; 
+		SndLookup[ i ].Num_Variants = 0;
 
 		GetSfxFileNamePrefix( i, filename );
-	
+
 		// if no filename given, sound is left marked with zero variants
 		if ( !filename[0] )
 			continue;
@@ -1550,7 +1550,7 @@ void PreProcessSfx( void )
 
 			if ( File_Exists( fullpath ) )
 			{
-				SndLookup[ i ].Num_Variants++; 
+				SndLookup[ i ].Num_Variants++;
 
 				SfxFullPath[ i ][ j ] = (char *)malloc( strlen( fullpath ) + 1 );
 				strcpy( SfxFullPath[ i ][ j ], fullpath );
@@ -1592,7 +1592,7 @@ void RequestTitleSfx( void )
 
 /****************************************
 	Procedure	: InitializeSound
-	description	: 
+	description	:
 	Input		: none
 	Output		: none
 *****************************************/
@@ -1607,7 +1607,7 @@ bool InitializeSound( int flags )
 		DebugPrintf("Tried to init sound before destroying!\n");
 		return false;
 	}
-	
+
 	DebugPrintf("Initializing sound.\n");
 
 	// check sound is valid
@@ -1690,13 +1690,13 @@ void DestroySound( int /*flags*/ )
 		}
 		SpotSfxList[i].used = false;
 	}
-	
+
 	// clear all sfx holders...
 	for( i = 0; i < MAX_ANY_SFX; i++ )
 	{
 		FreeSfxHolder( i );
 	}
-		
+
 	for (i = 0; i < MAX_SFX; i++)
 	{
 		if (sound_buffers[i])
@@ -1734,12 +1734,12 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 	if( flags & SFX_Biker )
     	VolModify *= ( (float)BikerSpeechSlider.value / (float)BikerSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
 
-	if( flags & SFX_BikeComp ) 
+	if( flags & SFX_BikeComp )
     	VolModify *= ( (float)BikeCompSpeechSlider.value / (float)BikeCompSpeechSlider.max ) * SPEECH_AMPLIFY;	// when multiplied with max value for GlobalSoundAttenuation, gives 1.0F;
 
 	if ( !VolModify )
 		return false;
-	
+
 	switch ( SndLookup[ Sfx ].Num_Variants )
 	{
 	case 0:
@@ -1798,13 +1798,13 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 		SfxHolder[ HolderIndex ].SfxFlags = SFX_HOLDERTYPE_Looping;
 		SfxHolder[ HolderIndex ].SndObjIndex = sndobj_index;
 		SfxHolder[ HolderIndex ].SfxBufferIndex = InitLoopingSfx(
-			Sfx, offset, Group, SfxPos, Freq, VolModify, type, HolderIndex, Effects, SfxHolder[ HolderIndex ].UniqueID 
+			Sfx, offset, Group, SfxPos, Freq, VolModify, type, HolderIndex, Effects, SfxHolder[ HolderIndex ].UniqueID
 		);
 		if ( SfxHolder[ HolderIndex ].SfxBufferIndex < 0 )
 			return false;
 		return true;
 	}
-	
+
 	// TODO - all this volume hacking should be removed for openal
 
 	if ( type != SFX_2D )
@@ -1831,11 +1831,11 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 
 		MaxDistance = 24 * BLOCKSIZE;
 
-		if( Distance >= MaxDistance ) 
+		if( Distance >= MaxDistance )
 			return false;
 
 		// check to see if another sfx of the same type has already been started...if it has but is further away..override it...
-		if( !OverideDistanceCheck && (Distance+25.0F) >= LastDistance[Sfx] ) 
+		if( !OverideDistanceCheck && (Distance+25.0F) >= LastDistance[Sfx] )
 			return false;
 	}
 	else
@@ -1874,7 +1874,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 			_type = SFX_TYPE_Panned;
 			file = SfxFullPath[ Sfx ][ Random_Range( SndLookup[ Sfx ].Num_Variants )];
 		}
-		
+
 		if( ! (SfxHolder[ HolderIndex ].source = sound_source_create( file, Sfx )) )
 			return false;
 
@@ -1882,17 +1882,17 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 		{
 			sound_volume( SfxHolder[ HolderIndex ].source, Volume );
 		}
-  
+
 		if ( ( _type == SFX_TYPE_Panned ) || ( _type == SFX_TYPE_Taunt ) )
 		{
-			SetPannedSourceParams( 
-				SfxHolder[ HolderIndex ].source, 
-				SfxPos, 
-				Freq, 
-				&Temp, 
-				Distance, 
-				Volume, 
-				Effects 
+			SetPannedSourceParams(
+				SfxHolder[ HolderIndex ].source,
+				SfxPos,
+				Freq,
+				&Temp,
+				Distance,
+				Volume,
+				Effects
 			);
 		}
 
@@ -1915,7 +1915,7 @@ void InitSfxHolders( void )
 	SfxUniqueID = 1;
 }
 
-// TODO we should probably find the farthest sound and kill it? 
+// TODO we should probably find the farthest sound and kill it?
 // isn't this done already in looping sfx or somewhere else ?
 int FindFreeSfxHolder( void )
 {
@@ -2043,7 +2043,7 @@ u_int32_t PlaySpotSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Fre
 
 	if ( !GlobalSoundAttenuation || !bSoundEnabled )
 		return 0;
-	
+
 	index = FindFreeSfxHolder();
 	if ( index < 0 )
 	{
@@ -2069,7 +2069,7 @@ u_int32_t PlayFixedSpotSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float
 
 	if ( !GlobalSoundAttenuation || !bSoundEnabled )
 		return 0;
-	
+
 	index = FindFreeSfxHolder();
 	if ( index < 0 )
 	{
@@ -2112,12 +2112,12 @@ bool StopSfx( u_int32_t uid )
 	if ( i != -1 )
 	{
 		if ( SfxHolder[ i ].SfxFlags == SFX_HOLDERTYPE_Looping )
-			StopLoopingSfx( SfxHolder[ i ].SfxBufferIndex ); 
+			StopLoopingSfx( SfxHolder[ i ].SfxBufferIndex );
 
 		FreeSfxHolder( i );
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -2165,7 +2165,7 @@ void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECT
 			// z is probably used to adjust for field of view (as things get farther away they
 			// move towards the center of screen)
 			currentdist = (float) sqrtf( ( Temp2.x * Temp2.x ) + ( Temp2.z * Temp2.z ) );
-		
+
 			if( currentdist )
 			{
 				nz = Temp2.z / currentdist;
@@ -2289,7 +2289,7 @@ int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, 
 	 	DebugPrintf("No free looping sfx list places!\n");
 		return -1;
 	}
-	
+
 	SpotSfxList[ index ].sfxindex = Sfx;
 	SpotSfxList[ index ].type = type;
 	SpotSfxList[ index ].variant = variant;
@@ -2311,7 +2311,7 @@ int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, 
 	SpotSfxList[ index ].distance = 0.0F;
 	SpotSfxList[ index ].used = true;
 	SpotSfxList[ index ].Effects = Effects;
-	SpotSfxList[ index ].uid = uid;	
+	SpotSfxList[ index ].uid = uid;
 	return index;
 }
 
@@ -2384,14 +2384,14 @@ void ProcessLoopingSfx( void )
 		if ( !SpotSfxList[ i ].used )
 			continue;
 
-		
+
 
 //
 // Sound3D
 //
 //           in/out of range will not be needed if we implement a sound stealing algorithm
 //           so if we need to create a new sound and we are the max sounds then we can find
-//           the least significant sound based on distance/volume (attenuation?) and kill 
+//           the least significant sound based on distance/volume (attenuation?) and kill
 //           that sound so we can fire off the new one. unless the new one is worse.
 //
 //           volume hacking based on distance calculations will not be needed
@@ -2401,15 +2401,15 @@ void ProcessLoopingSfx( void )
 		if( Ships[ Current_Camera_View ].Object.Group != INDEX_NONE )
 		{
 			Modify = 0.0F;	// just in case type is invalid...
-			
-			if ( SpotSfxList[ i ].type == LOOPING_SFX_FixedGroup ) 
+
+			if ( SpotSfxList[ i ].type == LOOPING_SFX_FixedGroup )
 			{
-			 	Pos = SpotSfxList[ i ].fixedpos; 
+			 	Pos = SpotSfxList[ i ].fixedpos;
 				Modify = SoundInfo[Ships[ Current_Camera_View ].Object.Group][SpotSfxList[ i ].fixedgroup];
 			}
-			if ( SpotSfxList[ i ].type == LOOPING_SFX_VariableGroup ) 
+			if ( SpotSfxList[ i ].type == LOOPING_SFX_VariableGroup )
 			{
-			 	Pos = *( SpotSfxList[ i ].pos ); 
+			 	Pos = *( SpotSfxList[ i ].pos );
 				Modify = SoundInfo[Ships[ Current_Camera_View ].Object.Group][*(SpotSfxList[ i ].group)];
 			}
 		}
@@ -2427,7 +2427,7 @@ void ProcessLoopingSfx( void )
 			Distance = (float) sqrtf( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
 			Distance += Modify;
 			MaxDistance = 24 * BLOCKSIZE * LOOPING_SFX_SCALE;
-			if( Distance >= MaxDistance ) 
+			if( Distance >= MaxDistance )
 				InRange = false;
 			else
 				InRange = true;
@@ -2493,12 +2493,12 @@ void ProcessLoopingSfx( void )
 
 			SetPannedSourceParams(
 				SpotSfxList[ i ].source,
-				&Pos, 
+				&Pos,
 				SpotSfxList[ i ].freq,
 				&Temp,
 				Distance,
 				Volume,
-				SpotSfxList[ i ].Effects 
+				SpotSfxList[ i ].Effects
 			);
 
 			if( ! sound_is_playing( (sound_source_t*)SpotSfxList[ i ].source ) )
@@ -2539,7 +2539,7 @@ FILE *LoadAllSfx( FILE *fp )
 {
 	u_int16_t num_active_sfx = 0;
 	int16_t i;
-	
+
 	if( fp )
 	{
 		// work out number of sfx to load...
@@ -2552,13 +2552,13 @@ FILE *LoadAllSfx( FILE *fp )
 				StopSfx( SpotSfxList[ i ].uid );
 			SpotSfxList[ i ].used = false;
 		}
-		
+
 		// read in sfx data...
 		for ( i = 0; i < num_active_sfx; i++ )
 			fread( &SpotSfxList[ i ], sizeof( SPOT_SFX_LIST ), 1, fp );
 
 		fread( &SfxUniqueID, sizeof( u_int32_t ), 1, fp );
-		
+
 		ReTriggerSfx();
 	}
 
@@ -2588,7 +2588,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 		DebugPrintf("Unable to find last slash in %s\n", TauntPath);
 		return;
 	}
-	
+
 	last_slash++;
 	strcpy( last_slash, BikerSpeechNames[ biker ] );
 	strcat( last_slash, "_" );
@@ -2608,7 +2608,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 			strcat( TauntPath, numstr );
 		}
 	}
-	
+
 	strcat( TauntPath, ".wav" );
 
 	TauntID =  PlayGeneralPannedSfx( sfx, Group, SfxPos, Freq, false, SPOT_SFX_TYPE_Taunt, 1.0F );
@@ -2677,7 +2677,7 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 
 	Distance = ReturnDistanceVolumeVector( SfxPos, Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, NULL, &sfxvector );
 
-	if( Distance < 0.0F ) 
+	if( Distance < 0.0F )
 	{
 	 	StopSfx( uid );
 		return false;
@@ -2691,14 +2691,14 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 
 		// set source parameters
 		DebugPrintf("UpdateTaunt:\n");
-		SetPannedSourceParams( 
+		SetPannedSourceParams(
 			SfxHolder[ i ].source,
-			SfxPos, 
-			0.0F, 
-			&sfxvector, 
+			SfxPos,
+			0.0F,
+			&sfxvector,
 			Distance,
-			Volume, 
-			SPOT_SFX_TYPE_Taunt 
+			Volume,
+			SPOT_SFX_TYPE_Taunt
 		);
 	}
 	else
@@ -2716,11 +2716,11 @@ void ProcessEnemyBikerTaunt( void )
 {
 	if ( !TauntID  || !TauntUpdatable )
 	{
-		return;							 
+		return;
 	}
 
 	ProcessTauntPause -= framelag;
-	
+
 	if ( ProcessTauntPause < 0.0F )
 	{
 		ProcessTauntPause = TAUNT_PAUSE;
@@ -2745,7 +2745,7 @@ void PlayUpdatableBikerTaunt( VECTOR *pos, u_int16_t Group, u_int16_t bike, char
 	dist = ReturnDistanceVolumeVector( pos, Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, NULL, NULL );
 	if( dist < 0.0F )
 		return;
-	
+
 	if ( dist > MAX_TAUNT_DISTANCE )
 	{
 		return;
@@ -2779,39 +2779,39 @@ int EnemyBikeNum( u_int16_t type )
 {
 	switch( type )
 	{
-	case ENEMY_Bike_Lokasenna:     
-			return 0; 
-	case ENEMY_Bike_Beard:         
+	case ENEMY_Bike_Lokasenna:
+			return 0;
+	case ENEMY_Bike_Beard:
 			return 1;
-	case ENEMY_Bike_LAJay:    	   
+	case ENEMY_Bike_LAJay:
 			return 2;
-	case ENEMY_Bike_ExCop:     	   
+	case ENEMY_Bike_ExCop:
 			return 3;
-	case ENEMY_Bike_RexHardy:  	   
+	case ENEMY_Bike_RexHardy:
 			return 4;
-	case ENEMY_Bike_Foetoid:       
+	case ENEMY_Bike_Foetoid:
 			return 5;
-	case ENEMY_Bike_NimSoo:    	   
+	case ENEMY_Bike_NimSoo:
 			return 6;
-	case ENEMY_Bike_Nutta:         
+	case ENEMY_Bike_Nutta:
 			return 7;
-	case ENEMY_Bike_Sceptre:       
+	case ENEMY_Bike_Sceptre:
 			return 8;
-	case ENEMY_Bike_Jo:        	   
+	case ENEMY_Bike_Jo:
 			return 9;
-	case ENEMY_Bike_CuvelClark:	   
+	case ENEMY_Bike_CuvelClark:
 			return 10;
-	case ENEMY_Bike_HK5:       	   
+	case ENEMY_Bike_HK5:
 			return 11;
-	case ENEMY_Bike_Nubia:         
+	case ENEMY_Bike_Nubia:
 			return 12;
-	case ENEMY_Bike_Mofisto:       
+	case ENEMY_Bike_Mofisto:
 			return 13;
-	case ENEMY_Bike_Cerbero:       
+	case ENEMY_Bike_Cerbero:
 			return 14;
-	case ENEMY_Bike_Slick:         
+	case ENEMY_Bike_Slick:
 			return 15;
-	case ENEMY_Bike_FlyGirl:	   
+	case ENEMY_Bike_FlyGirl:
 			return 16;
 	default:
 		return INDEX_NONE;

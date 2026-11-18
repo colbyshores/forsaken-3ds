@@ -1,6 +1,6 @@
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 #include "game/main.h"
 #include <stdio.h>
@@ -26,7 +26,7 @@
 #include "util/file_reader.h"
 
 /*===================================================================
-		Externs...	
+		Externs...
 ===================================================================*/
 
 /*===================================================================
@@ -35,7 +35,7 @@
 constexpr int WAT_VERSION_NUMBER = 1;
 
 /*===================================================================
-		Globals...	
+		Globals...
 ===================================================================*/
 float WATER_CELLSIZE = 64.0F;
 
@@ -131,7 +131,7 @@ bool PreWaterLoad( char * Filename )
 	while ( ( *FileNamePnt++ = *Buffer++ ) != 0 );
 
 	GetLevelTexturePath( (char*)&TempFilename[ 0 ], &buf[0], &ShortLevelNames[ LevelNum ][ 0 ] );
-	
+
 	DebugPrintf("loading water texture: %s\n",TempFilename);
 
 	WaterTPage = AddTexture( &Tloadheader , (char*)&TempFilename[ 0 ], true , true, 0, 0 );		// dont colourkey
@@ -173,14 +173,14 @@ bool WaterLoad( void )
 		GroupWaterIntensity_Blue[i] = RGBA_GETBLUE(col) * ONEOVER255;
 	}
 
-	
+
 	FirstWaterObject = (WATEROBJECT*) malloc( NumOfWaterObjects * sizeof(WATEROBJECT) );
 	if( !FirstWaterObject )
 	{
 		Msg( "Water Load : Unable to allocate buffer" );
 		return( false );
 	}
-	
+
 	/* Bug fix: sizeof(FirstWaterObject) is sizeof(pointer) = 4 bytes,
 	 * not sizeof(WATEROBJECT). The original line zeroed only ~N×4 bytes
 	 * of the N×sizeof(WATEROBJECT) buffer, leaving each element's
@@ -192,7 +192,7 @@ bool WaterLoad( void )
 	 * transition (when the heap had accumulated enough residue for the
 	 * fields to read non-zero). */
 	memset(FirstWaterObject, 0, NumOfWaterObjects * sizeof(WATEROBJECT));
-	
+
 	WO = FirstWaterObject;
 	WO->Group = 0;
 	WO->AnimOncePerFrame = 0;
@@ -406,7 +406,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 			LVert->tu = 0.0F;
 			LVert->tv = 0.0F;
 			LVert->color = RGBA_MAKE(128,128,128,128);
-			
+
 			LVert++;
 
 			vertsCount++;
@@ -436,7 +436,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 		DebugPrintf( "water FSUnlockVertexBuffer failed\n");
 		return false;
 	}
-	
+
 	if (!(FSUnlockIndexBuffer(&WO->renderObject)))
 	{
 		DebugPrintf( "water FSUnlockIndexBuffer failed\n");
@@ -449,7 +449,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 	WO->renderObject.textureGroups[0].numVerts = WO->num_of_verts;
 	WO->renderObject.textureGroups[0].startIndex = 0;
 	WO->renderObject.textureGroups[0].startVert = 0;
-	WO->renderObject.textureGroups[0].texture = Tloadheader.TexHandle[WaterTPage]; 
+	WO->renderObject.textureGroups[0].texture = Tloadheader.TexHandle[WaterTPage];
 	WO->renderObject.textureGroups[0].colourkey = Tloadheader.ColourKey[WaterTPage];
 
 	return true;
@@ -475,7 +475,7 @@ void GroupWaterProcessDisplay( u_int16_t group )
 			WO->AnimOncePerFrame = AnimOncePerFrame;
 
 			// store orig water rgb
-			r = WO->Red; g = WO->Green; b = WO->Blue; 
+			r = WO->Red; g = WO->Green; b = WO->Blue;
 			// apply fade value ( should be 0 to 1 )
 			WO->Red *= WaterFade; WO->Green *= WaterFade; WO->Blue *= WaterFade;
 
@@ -549,7 +549,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 			temp += temp2 * ROOTTWO;
 			temp *= SPECIALROOTTWO;
 
-			*VelsPnt += Tick * (temp - org);  // Accel 
+			*VelsPnt += Tick * (temp - org);  // Accel
 			*VelsPnt *= Damp;						// Damping
 			*VertPnt++ += *VelsPnt++ * framelag;
 		}
@@ -565,7 +565,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	}
 
 	VertPnt = WO->Verts;
-	
+
 	for( x = 0 ; x < WO->XVerts ; x++ )
 	{
 		for( y = 0 ; y < WO->YVerts ; y++ )
@@ -609,7 +609,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	Output		:		Nothing
 ===================================================================*/
 void DisplayWaterObject(WATEROBJECT * Wo)
-{										 
+{
 	TempWorld = identity;
 	TempWorld._41 = Wo->Pos.x;
 	TempWorld._42 = Wo->Pos.y + Wo->offset;
@@ -710,18 +710,18 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 	Pos.y += Wo->offset;
 
 
-	
+
 	WaterOffset = -DotProduct( &WaterNormal, &Pos );
 /*===================================================================
 	Calculate T
 ===================================================================*/
-	Div = ( Offset->x * WaterNormal.x) + 
-		  ( Offset->y * WaterNormal.y) + 
+	Div = ( Offset->x * WaterNormal.x) +
+		  ( Offset->y * WaterNormal.y) +
 		  ( Offset->z * WaterNormal.z);
 	if( Div == 0.0F ) return false;		/* Reject, Parallel */
 	Num = ( ( Origin->x * WaterNormal.x ) +
 		    ( Origin->y * WaterNormal.y ) +
-		    ( Origin->z * WaterNormal.z ) ) + WaterOffset ; 
+		    ( Origin->z * WaterNormal.z ) ) + WaterOffset ;
 	t = -( Num / Div );
 
 /*===================================================================
@@ -760,7 +760,7 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 		if( NewDamage < 0.75F )
 			NewDamage = 0.75F;
 	}
-	
+
 	Impact = WATER_IMPACT * NewDamage;
 	if( CollidePos->y > Origin->y )
 		// shooting from below.....
@@ -772,10 +772,10 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 	Vels = Wo->Vels;
 
 	Verts = Wo->Verts;
-	
+
 	Verts += (IWaterX * Wo->YVerts ) + IWaterY;
 	Vels += (IWaterX * Wo->YVerts ) + IWaterY;
-	if( *Verts < BLOCKSIZE && 
+	if( *Verts < BLOCKSIZE &&
 		*Verts > -BLOCKSIZE )
 	{
 		*Vels = Impact * ( dx + dy );
@@ -784,7 +784,7 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 	Vels++;
 	if ( IWaterY + 1 < Wo->YVerts)
 	{
-		if( *Verts < BLOCKSIZE && 
+		if( *Verts < BLOCKSIZE &&
 			*Verts  > -BLOCKSIZE )
 		{
 			*Vels = Impact * ( dx + ( 1 - dy ) );
@@ -795,7 +795,7 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 		Verts += Wo->YVerts-1;
 		Vels += Wo->YVerts-1;
 
-		if( *Verts < BLOCKSIZE && 
+		if( *Verts < BLOCKSIZE &&
 			*Verts > -BLOCKSIZE )
 		{
 			*Vels = Impact * ( ( 1 - dx ) + dy );
@@ -804,14 +804,14 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 		{
 			Verts++;
 			Vels++;
-			if( *Verts < BLOCKSIZE && 
+			if( *Verts < BLOCKSIZE &&
 				*Verts > -BLOCKSIZE )
 			{
 				*Vels = Impact * ( ( 1 - dx ) + ( 1 - dy ) );
 			}
 		}
 	}
-	
+
 	return true;
 }
 

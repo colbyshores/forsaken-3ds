@@ -73,20 +73,20 @@ u_int32_t TeamFlagMask[ MAX_TEAMS ] = {
 		Bike Modifiers.....
 ===================================================================*/
 float	MaxMoveSpeed	=	MAXMOVESPEED;
-float	MoveAccell		=	MOVEACCELL;		
-float	MoveDecell		=	MOVEDECELL;		
-float	MaxTurboSpeed   =	MAXTURBOSPEED;   
-float	TurboAccell		=	TURBOACCELL;		
-float	TurboDecell		=	TURBODECELL;		
-float	MaxTurnSpeed	=	MAXTURNSPEED;	
-float	TurnAccell		=	TURNACCELL;		
-float	TurnDecell		=	TURNDECELL;		
-float	MaxRollSpeed	=	MAXROLLSPEED;	
-float	RollAccell		=	ROLLACCELL;		
-float	RollDecell		=	ROLLDECELL;		
-float	MaxBankAngle    =	MAXBANKANGLE;    
-float	BankAccell		=	BANKACCELL;		
-float	BankDecell		=	BANKDECELL;		
+float	MoveAccell		=	MOVEACCELL;
+float	MoveDecell		=	MOVEDECELL;
+float	MaxTurboSpeed   =	MAXTURBOSPEED;
+float	TurboAccell		=	TURBOACCELL;
+float	TurboDecell		=	TURBODECELL;
+float	MaxTurnSpeed	=	MAXTURNSPEED;
+float	TurnAccell		=	TURNACCELL;
+float	TurnDecell		=	TURNDECELL;
+float	MaxRollSpeed	=	MAXROLLSPEED;
+float	RollAccell		=	ROLLACCELL;
+float	RollDecell		=	ROLLDECELL;
+float	MaxBankAngle    =	MAXBANKANGLE;
+float	BankAccell		=	BANKACCELL;
+float	BankDecell		=	BANKDECELL;
 float	Start_Shield	=	START_SHIELD;
 float	Start_Hull		=	START_HULL;
 float	AutoLevel		=	1.0F;
@@ -95,381 +95,381 @@ constexpr float BikeMod = (2.0F);
 
 BIKEMOD	BikeMods[MAXBIKETYPES+3] = {
 	{	// Default
-		MAXMOVESPEED, 
-		MOVEACCELL,	
-		MOVEDECELL,	
+		MAXMOVESPEED,
+		MOVEACCELL,
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED,
-		TURNACCELL,	
-		TURNDECELL,	
+		TURNACCELL,
+		TURNDECELL,
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
 		BANKDECELL,
 		START_SHIELD,
 		START_HULL,
 		1.0F
 	},
 	{	// In The Water...
-		MAXMOVESPEED * 0.75F, 
-		MOVEACCELL * 0.50F,	
-		MOVEDECELL * 0.5F,	
+		MAXMOVESPEED * 0.75F,
+		MOVEACCELL * 0.50F,
+		MOVEDECELL * 0.5F,
 		MAXTURBOSPEED * 0.75F,
 		TURBOACCELL * 0.5F,
 		TURBODECELL * 0.5F,
 		MAXTURNSPEED * 0.5F,
-		TURNACCELL * 0.5F,	
-		TURNDECELL * 0.5F,	
+		TURNACCELL * 0.5F,
+		TURNDECELL * 0.5F,
 		MAXROLLSPEED * 0.5F,
-		ROLLACCELL * 0.5F,	
-		ROLLDECELL * 0.5F,	
-		MAXBANKANGLE, 
-		BANKACCELL * 1.0F,	
+		ROLLACCELL * 0.5F,
+		ROLLDECELL * 0.5F,
+		MAXBANKANGLE,
+		BANKACCELL * 1.0F,
 		BANKDECELL * 1.0F,
 		START_SHIELD,
 		START_HULL,
 		0.5F
 	},
 	{	// Lokasenna
-		MAXMOVESPEED * (1.0F - ( 0.01F * BikeMod )), 
-		MOVEACCELL *1.0F,	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F - ( 0.01F * BikeMod )),
+		MOVEACCELL *1.0F,
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * 1.0F,
 		START_HULL *1.0F,
 		1.0F
 	},
 	{	// Beard
-		MAXMOVESPEED * 1.0F, 
-		MOVEACCELL * 1.0F,	
-		MOVEDECELL,	
+		MAXMOVESPEED * 1.0F,
+		MOVEACCELL * 1.0F,
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * 1.0F,
-		TURNACCELL * 1.0F,	
-		TURNDECELL * 1.0F,	
+		TURNACCELL * 1.0F,
+		TURNDECELL * 1.0F,
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * 1.0F,
 		START_HULL * 1.0F,
 		1.0F
 	},
 	{	// L.A. Jay
-		MAXMOVESPEED * (1.0F + ( 0.03F * BikeMod )), 
-		MOVEACCELL* (1.0F+ ( 0.03F * BikeMod )),	
-		MOVEDECELL* (1.0F+ ( 0.03F * BikeMod )),	
+		MAXMOVESPEED * (1.0F + ( 0.03F * BikeMod )),
+		MOVEACCELL* (1.0F+ ( 0.03F * BikeMod )),
+		MOVEDECELL* (1.0F+ ( 0.03F * BikeMod )),
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED* (1.0F+ ( 0.03F * BikeMod )),
-		TURNACCELL* (1.0F+ ( 0.03F * BikeMod )),	
-		TURNDECELL* (1.0F+ ( 0.03F * BikeMod )),	
+		TURNACCELL* (1.0F+ ( 0.03F * BikeMod )),
+		TURNDECELL* (1.0F+ ( 0.03F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F - ( 0.02F * BikeMod )),
 		START_HULL * (1.0F - ( 0.03F * BikeMod )),
 		1.0F
 	},
 	{	// Ex-Cop
-		MAXMOVESPEED * (1.0F + ( 0.01F * BikeMod )), 
-		MOVEACCELL * (1.0F - ( 0.01F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F + ( 0.01F * BikeMod )),
+		MOVEACCELL * (1.0F - ( 0.01F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F + ( 0.01F * BikeMod )),
 		START_HULL * (1.0F - ( 0.02F * BikeMod )),
 		1.0F
 	},
 	{	// Rex Hardy
-		MAXMOVESPEED * (1.0F - ( 0.03F * BikeMod )), 
-		MOVEACCELL * (1.0F - ( 0.03F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F - ( 0.03F * BikeMod )),
+		MOVEACCELL * (1.0F - ( 0.03F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F - ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F + ( 0.05F * BikeMod )),
 		START_HULL * 1.0F,
 		1.0F
 	},
 	{	// Foetoid
-		MAXMOVESPEED, 
-		MOVEACCELL * (1.0F - ( 0.01F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED,
+		MOVEACCELL * (1.0F - ( 0.01F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F - ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F + ( 0.02F * BikeMod )),
 		START_HULL * 1.0F,
 		1.0F
 	},
 	{	// Nim Soo
-		MAXMOVESPEED * 1.0F, 
-		MOVEACCELL * 1.0F,	
-		MOVEDECELL,	
+		MAXMOVESPEED * 1.0F,
+		MOVEACCELL * 1.0F,
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F - ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F+ ( 0.01F * BikeMod )),
 		START_HULL * 1.0F,
 		1.0F
 	},
 	{	// Nutta
-		MAXMOVESPEED * (1.0F + ( 0.05F * BikeMod )), 
-		MOVEACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F + ( 0.05F * BikeMod )),
+		MOVEACCELL * (1.0F + ( 0.01F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F - ( 0.04F * BikeMod )),
 		START_HULL * (1.0F - ( 0.03F * BikeMod )),
 		1.0F
 	},
 	{	// Sceptre
-		MAXMOVESPEED * (1.0F - ( 0.03F * BikeMod )), 
-		MOVEACCELL * (1.0F - ( 0.03F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F - ( 0.03F * BikeMod )),
+		MOVEACCELL * (1.0F - ( 0.03F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F - ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F - ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F - ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F + ( 0.04F * BikeMod )),
 		START_HULL * 1.0F,
 		1.0F
 	},
 	{	// Jo
-		MAXMOVESPEED * 1.0F, 
-		MOVEACCELL * (1.0F + ( 0.04F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * 1.0F,
+		MOVEACCELL * (1.0F + ( 0.04F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F - ( 0.02F * BikeMod )),
 		START_HULL * (1.0F - ( 0.02F * BikeMod )),
 		1.0F
 	},
 	{	// Cuvel Clark
-		MAXMOVESPEED * (1.0F + ( 0.05F * BikeMod )), 
-		MOVEACCELL * (1.0F + ( 0.05F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F + ( 0.05F * BikeMod )),
+		MOVEACCELL * (1.0F + ( 0.05F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.05F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.05F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.05F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.05F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.05F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F - ( 0.05F * BikeMod )),
 		START_HULL * (1.0F - ( 0.05F * BikeMod )),
 		1.0F
 	},
 	{	// HK-5
-		MAXMOVESPEED * (1.0F - ( 0.02F * BikeMod )), 
-		MOVEACCELL * (1.0F - ( 0.02F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F - ( 0.02F * BikeMod )),
+		MOVEACCELL * (1.0F - ( 0.02F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F - ( 0.02F * BikeMod )),
-		TURNACCELL * (1.0F - ( 0.02F * BikeMod )),	
-		TURNDECELL * (1.0F - ( 0.02F * BikeMod )),	
+		TURNACCELL * (1.0F - ( 0.02F * BikeMod )),
+		TURNDECELL * (1.0F - ( 0.02F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F + ( 0.03F * BikeMod )),
 		START_HULL * (1.0F - ( 0.01F * BikeMod )),
 		1.0F
 	},
 	{	// Nubia
-		MAXMOVESPEED * (1.0F + ( 0.01F * BikeMod )), 
-		MOVEACCELL * (1.0F + ( 0.03F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F + ( 0.01F * BikeMod )),
+		MOVEACCELL * (1.0F + ( 0.03F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.01F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.01F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.01F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F - ( 0.02F * BikeMod )),
 		START_HULL * (1.0F - ( 0.01F * BikeMod )),
 		1.0F
 	},
 	{	// Mofisto
-		MAXMOVESPEED * (1.0F - ( 0.02F * BikeMod )), 
-		MOVEACCELL * (1.0F - ( 0.02F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED * (1.0F - ( 0.02F * BikeMod )),
+		MOVEACCELL * (1.0F - ( 0.02F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * 1.0F,
-		TURNACCELL * 1.0F,	
-		TURNDECELL * 1.0F,	
+		TURNACCELL * 1.0F,
+		TURNDECELL * 1.0F,
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * 1.0F,
 		START_HULL * 1.0F,
 		1.0F
 	},
 	{	// Cerbero
-		MAXMOVESPEED, 
-		MOVEACCELL,	
-		MOVEDECELL,	
+		MAXMOVESPEED,
+		MOVEACCELL,
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED,
-		TURNACCELL,	
-		TURNDECELL,	
+		TURNACCELL,
+		TURNDECELL,
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD,
 		START_HULL,
 		1.0F
 	},
 	{	// Slick
-		MAXMOVESPEED, 
-		MOVEACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED,
+		MOVEACCELL * (1.0F + ( 0.01F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.03F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.03F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.03F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.03F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.03F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F + ( 0.01F * BikeMod )),
 		START_HULL * (1.0F - ( 0.01F * BikeMod )),
 		1.0F
 	},
 	{	// FlyGirl
-		MAXMOVESPEED, 
-		MOVEACCELL * (1.0F + ( 0.01F * BikeMod )),	
-		MOVEDECELL,	
+		MAXMOVESPEED,
+		MOVEACCELL * (1.0F + ( 0.01F * BikeMod )),
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED * (1.0F + ( 0.03F * BikeMod )),
-		TURNACCELL * (1.0F + ( 0.03F * BikeMod )),	
-		TURNDECELL * (1.0F + ( 0.03F * BikeMod )),	
+		TURNACCELL * (1.0F + ( 0.03F * BikeMod )),
+		TURNDECELL * (1.0F + ( 0.03F * BikeMod )),
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
-		BANKDECELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
+		BANKDECELL,
 		START_SHIELD * (1.0F + ( 0.01F * BikeMod )),
 		START_HULL * (1.0F - ( 0.01F * BikeMod )),
 		1.0F
@@ -478,22 +478,22 @@ BIKEMOD	BikeMods[MAXBIKETYPES+3] = {
 //
 // Speed Cap ?
 // Who ordered that ?
-//		MAXMOVESPEED * 0.9F, 
+//		MAXMOVESPEED * 0.9F,
 //
 		MAXMOVESPEED,
-		MOVEACCELL,	
-		MOVEDECELL,	
+		MOVEACCELL,
+		MOVEDECELL,
 		MAXTURBOSPEED,
 		TURBOACCELL,
 		TURBODECELL,
 		MAXTURNSPEED,
-		TURNACCELL,	
-		TURNDECELL,	
+		TURNACCELL,
+		TURNDECELL,
 		MAXROLLSPEED,
-		ROLLACCELL,	
-		ROLLDECELL,	
-		MAXBANKANGLE, 
-		BANKACCELL,	
+		ROLLACCELL,
+		ROLLDECELL,
+		MAXBANKANGLE,
+		BANKACCELL,
 		BANKDECELL,
 		START_SHIELD,
 		START_HULL,
@@ -520,7 +520,7 @@ float BountyTime = 0.0F;
 bool ShieldCritical = false;
 bool HullCritical = false;
 
-RENDERMATRIX  TempWorld;	
+RENDERMATRIX  TempWorld;
 
 float	WhiteOut = 0.0F;
 float	RandomBubbleTimer = 0.0F;
@@ -574,9 +574,9 @@ bool ProcessShips()
 	BYTE	i;
 	VECTOR	ImpactPoint;
 	float	Speed;
-	VECTOR	Move_Off;	
+	VECTOR	Move_Off;
 	VECTOR	Move_Dir;
-	QUAT	StepQuat;	
+	QUAT	StepQuat;
 	VECTOR	Bob;
 	VECTOR	StartPos;
 	BGOBJECT * BGObject;
@@ -673,7 +673,7 @@ bool ProcessShips()
 
 						XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
 						XLights[ShipObjPnt->light].CosArc = (float)fast_cosf(D2R(35));
-						
+
 						ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
 						XLights[ShipObjPnt->light].r = 192.0F;
 						XLights[ShipObjPnt->light].g = 192.0F;
@@ -715,8 +715,8 @@ bool ProcessShips()
 						SteamTime = 10.0F;
 					}
 				}
-				
-				
+
+
 				if( !GodMode )
 				{
 					if( ShipPnt->InvulTimer != 0.0F )
@@ -763,7 +763,7 @@ bool ProcessShips()
 						if( ShipPnt->ShakeDirTimer <= 0.0F )
 						{
 							ShipPnt->ShakeDirTimer = 2.0F + ( Random_Range(32) * ( 1.0F / 32.0F ) );
-					
+
 							ExtForce.x = -(ShipPnt->ShakeForce * 0.5F ) + (Random_Range(32) * ( ShipPnt->ShakeForce / 32.0F));
 							ExtForce.y = -(ShipPnt->ShakeForce * 0.5F ) + (Random_Range(32) * ( ShipPnt->ShakeForce / 32.0F));
 							ExtForce.z = 0.0F;
@@ -781,9 +781,9 @@ bool ProcessShips()
 				}
 
 				// watch mode
-				if(WatchPlayerSelect.value != WhoIAm && ShipObjPnt->Mode != DEMO_MODE	) 
-					ShipObjPnt->Mode = WATCH_MODE; 
-		
+				if(WatchPlayerSelect.value != WhoIAm && ShipObjPnt->Mode != DEMO_MODE	)
+					ShipObjPnt->Mode = WATCH_MODE;
+
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				( * ModeControl[ ShipObjPnt->Mode ] )( ShipPnt , i );		//go off and do his thing...
 
@@ -835,7 +835,7 @@ bool ProcessShips()
 						ShipObjPnt->Flags &= ~SHIP_Turbo;
 						AccellDecell( &ShipObjPnt->Speed.z , MoveDecell );
 					}
-				
+
 					StepQuat.MakeEuler(ShipObjPnt->Angle.x * framelag, ShipObjPnt->Angle.y * framelag, ShipObjPnt->Angle.z * framelag + ShipObjPnt->Autolevel);
 					ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
 					ShipObjPnt->RotationForce.Multiply(&ShipObjPnt->Quat, &ShipObjPnt->Quat);
@@ -849,14 +849,14 @@ bool ProcessShips()
 					ShipObjPnt->Quat.ToMatrix(&ShipObjPnt->Mat);
 					ShipObjPnt->RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				
+
 					// carry out movements
 					BobShip( i, &Bob );
 					Move_Off.x = Bob.x - ShipObjPnt->LastBob.x;
 					Move_Off.y = Bob.y - ShipObjPnt->LastBob.y;
 					Move_Off.z = Bob.z - ShipObjPnt->LastBob.z;
 					ShipObjPnt->LastBob = Bob;
-					
+
 					if ( ShipObjPnt->Speed.x )
 					{
 						Speed = ShipObjPnt->Speed.x * framelag;
@@ -898,10 +898,10 @@ bool ProcessShips()
 					{
 						Object2Object |= Ship2ShipCollide( i , &Move_Off );
 					}
-					
+
 					// Collide with the enemies....
 					Object2Object |= Ship2EnemyCollide( i , &Move_Off );
-					
+
 					// do collisions to background
 					if( !no_collision )
 					{
@@ -934,7 +934,7 @@ bool ProcessShips()
 								else
 								{
 									u_int16_t g;
-									
+
 									for ( g = 0; g < Mloadheader.num_groups; g++ )
 									{
 										if ( PointInsideSkin( &ShipObjPnt->Pos, g ) )
@@ -962,7 +962,7 @@ bool ProcessShips()
 					ShieldModifier = 0.0F;
 					HasBeenExternal = ExternalForcesAreaCheck( &ShipObjPnt->Pos , &StartPos , ShipObjPnt->Group, &ExtForce , &ShieldModifier);
 					TriggerAreaPlayerCheck( &StartPos , &ShipObjPnt->Pos , ShipObjPnt->Group);
-					
+
 					if( OldGroup != ShipObjPnt->Group )
 					{
 						TriggerAreaPlayerCheck( &StartPos , &ShipObjPnt->Pos , OldGroup);
@@ -1024,7 +1024,7 @@ bool ProcessShips()
 										UpdateBonusStats(i,score);
 										AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
 											TeamName[ TeamNumber[ i ] ] );
-										
+
 										SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
 									}
 									else
@@ -1033,7 +1033,7 @@ bool ProcessShips()
 											TeamName[ TeamNumber[ i ] ] );
 										SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
 									}
-								
+
 								IKnowINeedFlag = false;
 							}
 							else
@@ -1130,7 +1130,7 @@ bool ProcessShips()
 						}
 
 					}
-					
+
 					if( HasBeenExternal )
 					{
 						ForceExternalOneOff( i, &ExtForce );
@@ -1165,7 +1165,7 @@ bool ProcessShips()
 					CheckPickup();
 				}
 
-		
+
 			} // end of processing 'you'
 
 			// Start of Special Stuff for other players Ship Movement..Carries on even if no new packet arrives..
@@ -1183,8 +1183,8 @@ bool ProcessShips()
 								Move_Off.x = ShipPnt->Move_Off.x * framelag;
 								Move_Off.y = ShipPnt->Move_Off.y * framelag;
 								Move_Off.z = ShipPnt->Move_Off.z * framelag;
-								ShipObjPnt->Pos.x += Move_Off.x;		
-								ShipObjPnt->Pos.y += Move_Off.y;		
+								ShipObjPnt->Pos.x += Move_Off.x;
+								ShipObjPnt->Pos.y += Move_Off.y;
 								ShipObjPnt->Pos.z += Move_Off.z;
 								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 								StepQuat.MakeEuler(ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel);
@@ -1208,7 +1208,7 @@ bool ProcessShips()
 						Move_Off.y = ShipObjPnt->Pos.y - StartPos.y;
 						Move_Off.z = ShipObjPnt->Pos.z - StartPos.z;
 						ShipObjPnt->Group = MoveGroup( &Mloadheader, &StartPos, ShipObjPnt->Group, &Move_Off );
-					
+
 						// update other player's bounty points
 						if ( BountyHunt && ShipObjPnt->Flags & SHIP_CarryingBounty )
 						{
@@ -1219,7 +1219,7 @@ bool ProcessShips()
 								UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
 								BountyTime = FMOD( BountyTime, BountyBonusInterval );
 							}
-						}					
+						}
 					}
 				}
 				else
@@ -1270,7 +1270,7 @@ bool ProcessShips()
 	}
 
 	SetPosVelDir_Listner( &Ships[WhoIAm].Object.Pos , &Ships[WhoIAm].Move_Off , &Ships[WhoIAm].Object.Mat );
-	
+
 	return true;
 }
 
@@ -1342,7 +1342,7 @@ void RotateInternal( u_int16_t ship, float xrot, float yrot, float zrot )
 
 
 // min/max autolevel pitch = +/-75 degrees from horizontal
-#define MIN_AUTOLEVEL_PITCH	D2R(5.0F) 
+#define MIN_AUTOLEVEL_PITCH	D2R(5.0F)
 #define MAX_AUTOLEVEL_PITCH	D2R(175.0F)
 
 constexpr auto MIN_AUTOLEVEL_ROLL_TOLERANCE = (0.2F);
@@ -1473,9 +1473,9 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 
 		for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 		Ships[i].NumMultiples = 0;
-		
+
 		Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
-		
+
 		if ( Mloadheader->state == true)
 		{
 			/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
@@ -1565,7 +1565,7 @@ int16_t DoDamage( bool OverrideInvul )
 	int16_t	TriggerSFX = -1;
 
 	Message[ 0 ] = 0;
-			
+
 	if( GodMode ) return 0;
 	if( Ships[ WhoIAm ].Invul && !OverrideInvul && GameStatus[ WhoIAm ] == STATUS_SinglePlayer ) return 0;
 
@@ -1573,7 +1573,7 @@ int16_t DoDamage( bool OverrideInvul )
 	{
 		if( Ships[WhoIAm].Damage )
 		{
-			if( Ships[ WhoIAm ].Invul) 
+			if( Ships[ WhoIAm ].Invul)
 				Ships[WhoIAm].Damage *= -0.50F;
 			else
 				Ships[WhoIAm].Damage *= -1.0F;
@@ -1650,7 +1650,7 @@ int16_t DoDamage( bool OverrideInvul )
 			AddColourMessageToQue( SystemMessageColour, "%s", &Message[ 0 ] );
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -1700,7 +1700,7 @@ void InitShipRandomPos( int16_t i )
 			orgtry = Random_Range( num_start_positions );
 			// pick a random startpos to try first then try all others..
 
-			
+
 			for( e = 0 ; e < num_start_positions ; e++ )
 			{
 				/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
@@ -1709,7 +1709,7 @@ void InitShipRandomPos( int16_t i )
 				MineVec.x = StartPositions[trys].Pos.x;
 				MineVec.y = StartPositions[trys].Pos.y;
 				MineVec.z = StartPositions[trys].Pos.z;
-				
+
 				if(	!IsStartPosVacantVisibleGroup( i , trys ) &&
 					!CheckForMines( &MineVec) &&
 					!CheckForGravgons( &MineVec ) )
@@ -1727,7 +1727,7 @@ void InitShipRandomPos( int16_t i )
 				MineVec.x = StartPositions[trys].Pos.x;
 				MineVec.y = StartPositions[trys].Pos.y;
 				MineVec.z = StartPositions[trys].Pos.z;
-				
+
 				if( !IsStartPosVacant( i , trys ) &&
 					!CheckForMines( &MineVec) &&
 					!CheckForGravgons( &MineVec ) )
@@ -1738,7 +1738,7 @@ void InitShipRandomPos( int16_t i )
 				}
 			}
 		}
-		
+
 		// 1 last try...
 		startpos = Random_Range( num_start_positions );
 		InitShipStartPos( i, startpos );
@@ -1777,9 +1777,9 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	{
 		/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 		startpos = pos % num_start_positions;
-		
+
 		Ships[i].Object.Pos.x = StartPositions[startpos].Pos.x;
-		Ships[i].Object.Pos.y = StartPositions[startpos].Pos.y;			
+		Ships[i].Object.Pos.y = StartPositions[startpos].Pos.y;
 		Ships[i].Object.Pos.z = StartPositions[startpos].Pos.z;
 		Start_Dir = StartPositions[ startpos ].Dir;
 		Ships[i].Object.Quat.From2Vectors(&Forward, &Start_Dir);
@@ -1798,7 +1798,7 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	ZQuat.From2Vectors(&Ship_Up, &Start_Up);
 	ZQuat.Multiply(&Ships[i].Object.Quat, &Ships[i].Object.Quat);
 	// reset external and internal force vectors to ship movement
-	
+
 	Ships[i].Object.ExternalForce.x = 0.0F;
 	Ships[i].Object.ExternalForce.y = 0.0F;
 	Ships[i].Object.ExternalForce.z = 0.0F;
@@ -1872,7 +1872,7 @@ bool GotoRoom( int16_t i, char *roomname )
 		return false;
 	}
 	Ships[i].Object.Pos.x = Start_Pos.x;
-	Ships[i].Object.Pos.y = Start_Pos.y;			
+	Ships[i].Object.Pos.y = Start_Pos.y;
 	Ships[i].Object.Pos.z = Start_Pos.z;
 	Ships[i].Object.Quat.ToMatrix(&Ships[i].Object.Mat);
 	ApplyMatrix( &Ships[i].Object.Mat, &SlideUp, &Ship_Up );
@@ -1880,9 +1880,9 @@ bool GotoRoom( int16_t i, char *roomname )
 	CrossProduct( &Start_Right, &Start_Dir, &Start_Up );
 	ZQuat.From2Vectors(&Ship_Up, &Start_Up);
 	ZQuat.Multiply(&Ships[i].Object.Quat, &Ships[i].Object.Quat);
-	
+
 	// reset external and internal force vectors to ship movement
-	
+
 	Ships[i].Object.ExternalForce.x = 0.0F;
 	Ships[i].Object.ExternalForce.y = 0.0F;
 	Ships[i].Object.ExternalForce.z = 0.0F;
@@ -1906,14 +1906,14 @@ void ShipMode0( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 
 	// make sure the white out stuff is reset..
 	WhiteOut = 0.0F;
-	
+
 	//			Handle all the Input Stuff
 	control_ship( player_config, &control );
-	
+
 	ShipPnt->Object.Angle.x += control.pitch;
 	ShipPnt->Object.Angle.y += control.yaw;
 	ShipPnt->Object.Angle.z += control.roll;
-	
+
 	ShipPnt->Object.Bank	 += control.bank;
 
 	ShipPnt->Object.CruiseControl += control.cruise_control;
@@ -1954,7 +1954,7 @@ void ShipMode0( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 			break;
 		}
 	}
-	
+
 	ShipPnt->Object.Speed.x += control.right;
 	ShipPnt->Object.Speed.y += control.up;
 }
@@ -1979,7 +1979,7 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 	control.turbo = 0;
 	ShipPnt->Object.CruiseControl = CRUISE_NORMAL;
 
-	// if timer is 0 then set up remote Camera....	
+	// if timer is 0 then set up remote Camera....
 	if( ShipPnt->Timer == 0 )
 	{
 		Ships[MAX_PLAYERS].enable = 1;
@@ -2003,7 +2003,7 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 		Move_Off.z = Move_Off.z * -(512.0F*GLOBAL_SCALE);
 		Ships[MAX_PLAYERS].Object.Pos = ShipPnt->Object.Pos;
 		Ships[MAX_PLAYERS].Object.Group = ShipPnt->Object.Group;
-		
+
 		ObjectCollide( &Ships[ MAX_PLAYERS ].Object, &Move_Off, SHIP_RADIUS, NULL );
 		Ships[MAX_PLAYERS].Object.Mode = DEATH_MODE;
 		if( Ships[MAX_PLAYERS].Object.Pos.x == Ships[WhoIAm].Object.Pos.x &&
@@ -2030,7 +2030,7 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 		DrawPanel = false;
 		RearCameraDisable = true;
 	}
-	
+
 	ShipPnt->Timer -= real_framelag;
 
 	ShipPnt->Object.Angle.y += ( MaxTurnSpeed * 0.04F ) * framelag;
@@ -2114,7 +2114,7 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 			}
 
 			// reset watch mode
-			if(SwitchedToWatchMode)	
+			if(SwitchedToWatchMode)
 			{
 				SwitchedToWatchMode = false;
 				// send a message to everybody saying im in watch mode
@@ -2124,10 +2124,10 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 			WhiteOut = 0.0F;
 			InitShipRandomPos( i );
 			ShipPnt->Object.Mode = NORMAL_MODE;
-			ShipPnt->InvulTimer = RGENINVULTIME;		// approx 1 second of invulnerability...			
+			ShipPnt->InvulTimer = RGENINVULTIME;		// approx 1 second of invulnerability...
 			ShipPnt->Invul = true;
 			PlaySfx( SFX_PlayerGenerate, 1.0F );
-			
+
 			// play a general biker phrase on respawning, but only in single player
 			if( MyGameStatus == STATUS_SinglePlayer )
 			{
@@ -2234,15 +2234,15 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 	float	Speed;
 
 	VECTOR	ImpactPoint;
-	VECTOR	Move_Off;	
-	VECTOR	Pos_New;	
+	VECTOR	Move_Off;
+	VECTOR	Pos_New;
 	u_int16_t	ImpactGroup;
 	NORMAL	FaceNormal;
 
 	if( !DebugInfo )
 	{
-		temp.x = ShipPnt->Object.Pos.x - Ships[WhoIAm].Object.Pos.x; 
-		temp.y = ShipPnt->Object.Pos.y - Ships[WhoIAm].Object.Pos.y; 
+		temp.x = ShipPnt->Object.Pos.x - Ships[WhoIAm].Object.Pos.x;
+		temp.y = ShipPnt->Object.Pos.y - Ships[WhoIAm].Object.Pos.y;
 		temp.z = ShipPnt->Object.Pos.z - Ships[WhoIAm].Object.Pos.z;
 		if( (float) sqrtf( (temp.x*temp.x) + (temp.y*temp.y) + (temp.z*temp.z) ) <= (SHIP_RADIUS+(SHIP_RADIUS*0.5F) ) )
 		{
@@ -2250,11 +2250,11 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		}else{
 			Current_Camera_View = i;
 		}
-		
+
 		Move_Dir.x = ShipPnt->Object.Pos.x - Ships[WhoIAm].Object.Pos.x ;
 		Move_Dir.y = ShipPnt->Object.Pos.y - Ships[WhoIAm].Object.Pos.y ;
 		Move_Dir.z = ShipPnt->Object.Pos.z - Ships[WhoIAm].Object.Pos.z ;
-		
+
 		if ( Ships[WhoIAm].Object.Group != INDEX_NONE )
 		{
 			if( BackgroundCollide( &MCloadheadert0, &Mloadheader,
@@ -2267,15 +2267,15 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 				ShipPnt->Object.Group = ImpactGroup;
 			}
 		}
-		
+
 		ApplyMatrix( &Ships[WhoIAm].Object.Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
 		ApplyMatrix( &Ships[WhoIAm].Object.Mat, &SlideUp, &Move_Dir2 );			/* Calc Direction Vector */
-		
+
 		Speed = 800.0F*GLOBAL_SCALE;
 		Move_Dir.x = -( Move_Dir.x * Speed ) + ( Move_Dir2.x * 32.0F ) ;
 		Move_Dir.y = -( Move_Dir.y * Speed ) + ( Move_Dir2.y * 32.0F );
 		Move_Dir.z = -( Move_Dir.z * Speed ) + ( Move_Dir2.z * 32.0F );
-		
+
 		temp = Ships[WhoIAm].Object.Pos;
 		NumCollides = 0;
 		ImpactGroup = Ships[WhoIAm].Object.Group;
@@ -2286,8 +2286,8 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
    										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, NULL ) )
 			{
 				temp = ImpactPoint;
-				Move_Dir.x = Pos_New.x - temp.x; 
-				Move_Dir.y = Pos_New.y - temp.y; 
+				Move_Dir.x = Pos_New.x - temp.x;
+				Move_Dir.y = Pos_New.y - temp.y;
 				Move_Dir.z = Pos_New.z - temp.z;
 				NumCollides += 1;
 				if( NumCollides	> MAXCOLLISIONS )
@@ -2295,14 +2295,14 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 			}
 		}
 		temp = ImpactPoint;
-		
+
 		Move_Off.x = temp.x - ShipPnt->Object.Pos.x ;
 		Move_Off.y = temp.y - ShipPnt->Object.Pos.y ;
 		Move_Off.z = temp.z - ShipPnt->Object.Pos.z ;
-		
-		
+
+
 		Speed = 0.15F;
-		
+
 		Move_Off.x = ( Move_Off.x * Speed )*framelag;
 		Move_Off.y = ( Move_Off.y * Speed )*framelag;
 		Move_Off.z = ( Move_Off.z * Speed )*framelag;
@@ -2312,7 +2312,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 
 		ApplyMatrix( &Ships[WhoIAm].Object.Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
 		Speed = 800.0F*GLOBAL_SCALE;
-		
+
 		ShipPnt->Object.Group = Ships[WhoIAm].Object.Group;
 		ShipPnt->Object.Pos.x = Ships[WhoIAm].Object.Pos.x - ( Move_Dir.x * Speed );
 		ShipPnt->Object.Pos.y = Ships[WhoIAm].Object.Pos.y - ( Move_Dir.y * Speed );
@@ -2345,7 +2345,7 @@ void RemoteCameraMode1( GLOBALSHIP * ShipPnt , BYTE i )
 		MatrixTranspose( &ShipPnt->Object.FinalMat, &ShipPnt->Object.FinalInvMat );
 		return;
 	}
-	
+
 	BobShip( i, &Bob );
 	Move_Off.x = Bob.x - ShipPnt->Object.LastBob.x;
 	Move_Off.y = Bob.y - ShipPnt->Object.LastBob.y;
@@ -2466,17 +2466,17 @@ void	UpdateStartPos( void )
 {
 	VECTOR	Temp;
 	u_int16_t	startpos;
-	
+
 	if( (MyGameStatus==STATUS_SinglePlayer) || (MyGameStatus==STATUS_StartingSinglePlayer) )
 	{
-		
+
 		if( last_start_position >= num_start_positions )
 		{
 			last_start_position = 0;
 		}
 
 		startpos = FirstStartPositionInGroup[Ships[WhoIAm].Object.Group];
-		
+
 		while( startpos != INDEX_NONE )
 		{
 			if( ( startpos != last_start_position ) &&
@@ -2527,23 +2527,23 @@ void SetBikeMods( u_int16_t Bike )
 	if( Bike >= MAXBIKETYPES+3 )
 		return;
 	MaxMoveSpeed	=	BikeMods[Bike].MaxMoveSpeed;
-	MoveAccell		=	BikeMods[Bike].MoveAccell;	  
-	MoveDecell		=	BikeMods[Bike].MoveDecell;	  
-	MaxTurboSpeed   =	BikeMods[Bike].MaxTurboSpeed;   
-	TurboAccell		=	BikeMods[Bike].TurboAccell;	  	
-	TurboDecell		=	BikeMods[Bike].TurboDecell;	  	
-	MaxTurnSpeed	=	BikeMods[Bike].MaxTurnSpeed; 
-	TurnAccell		=	BikeMods[Bike].TurnAccell;	  
-	TurnDecell		=	BikeMods[Bike].TurnDecell;	  
-	MaxRollSpeed	=	BikeMods[Bike].MaxRollSpeed;  
-	RollAccell		=	BikeMods[Bike].RollAccell;	  
-	RollDecell		=	BikeMods[Bike].RollDecell;	  
-	MaxBankAngle    =	BikeMods[Bike].MaxBankAngle;    
-	BankAccell		=	BikeMods[Bike].BankAccell;	  
-	BankDecell		=	BikeMods[Bike].BankDecell;	  
+	MoveAccell		=	BikeMods[Bike].MoveAccell;
+	MoveDecell		=	BikeMods[Bike].MoveDecell;
+	MaxTurboSpeed   =	BikeMods[Bike].MaxTurboSpeed;
+	TurboAccell		=	BikeMods[Bike].TurboAccell;
+	TurboDecell		=	BikeMods[Bike].TurboDecell;
+	MaxTurnSpeed	=	BikeMods[Bike].MaxTurnSpeed;
+	TurnAccell		=	BikeMods[Bike].TurnAccell;
+	TurnDecell		=	BikeMods[Bike].TurnDecell;
+	MaxRollSpeed	=	BikeMods[Bike].MaxRollSpeed;
+	RollAccell		=	BikeMods[Bike].RollAccell;
+	RollDecell		=	BikeMods[Bike].RollDecell;
+	MaxBankAngle    =	BikeMods[Bike].MaxBankAngle;
+	BankAccell		=	BikeMods[Bike].BankAccell;
+	BankDecell		=	BikeMods[Bike].BankDecell;
 	Start_Shield	=	BikeMods[Bike].Start_Shield;
-	Start_Hull		=	BikeMods[Bike].Start_Hull;	
-	AutoLevel		=	BikeMods[Bike].AutoLevel;	
+	Start_Hull		=	BikeMods[Bike].Start_Hull;
+	AutoLevel		=	BikeMods[Bike].AutoLevel;
 }
 
 /*===================================================================
@@ -2565,13 +2565,13 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 	bool	HasBeen = false;
 	bool	ok;
 	u_int16_t	NewGroup;
-	
+
 	Norm_Move_Off = *Move_Off;
 	NormaliseVector( &Norm_Move_Off );
-	
+
 	for( Count = 0; Count < MAX_PLAYERS; Count++ )
 	{
-		
+
 		if ( (Ships[Count].enable != 0) && (Ships[Count].Object.Mode != LIMBO_MODE) && (Ships[Count].Object.Mode != GAMEOVER_MODE) && ((GameStatus[Count] == STATUS_Normal )||(GameStatus[Count] == STATUS_SinglePlayer ) ) &&
 			 ( Count != i ) )//&& ( VectorLength( &Ships[Count].Move_Off) <= OldMove) && !( ( OldMove == 0.0F ) && (VectorLength( &Ships[Count].Move_Off) == 0.0F ) ) )
 		{
@@ -2598,12 +2598,12 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 				NewPos.z = Ships[i].Object.Pos.z + Move_Off->z;
 
 				Next_Move_Length = DistanceVector2Vector( &NewPos , &Ships[Count].Object.Pos );
-				
+
 				if( (Move_Length < ( SHIP_RADIUS*2.0F ) ) && ( Next_Move_Length < Move_Length ) )
 				{
 					if( Move_Length < 1.0F )
 						Move_Length = 1.0F;
-		
+
 					// the ships are to close....Move them apart...Guarenteed..
 					Move_Dir.x = Ships[i].Object.Pos.x - Ships[Count].Object.Pos.x;
 					Move_Dir.y = Ships[i].Object.Pos.y - Ships[Count].Object.Pos.y;
@@ -2641,8 +2641,8 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 }
 bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 {
-	VECTOR	Move_Off;	
-	QUAT	StepQuat;	
+	VECTOR	Move_Off;
+	QUAT	StepQuat;
 	BGOBJECT * BGObject;
 	float	ShieldModifier;
 	bool Impact = false;
@@ -2676,7 +2676,7 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 	{
 		Impact = true;
 	}
-		
+
 	BGObject = NULL;
 	if( ObjectCollide( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &BGObject ) )
 		Impact = true;
@@ -2902,7 +2902,7 @@ FILE * SaveShips( FILE * fp )
 			Ships[ i ].Object.Components = TempPtr;
 			TempPtr = NULL;
 		}
-			
+
 		fwrite( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
 		fwrite( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
 		fwrite( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );
@@ -2944,7 +2944,7 @@ FILE * SaveShips( FILE * fp )
 			fclose( fp );
 			return( NULL );
 		}
-			
+
 		fwrite( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
 		fwrite( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
 		fwrite( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );
@@ -3001,7 +3001,7 @@ FILE * LoadShips( FILE * fp )
 			fclose( fp );
 			return( NULL );
 		}
-			
+
 		fread( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
 		fread( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
 		fread( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );
@@ -3041,7 +3041,7 @@ FILE * LoadShips( FILE * fp )
 			fclose( fp );
 			return( NULL );
 		}
-			
+
 		fread( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
 		fread( &Ships[ i ].ShipThatLastKilledMe, sizeof( Ships[ i ].ShipThatLastKilledMe ), 1, fp );
 		fread( &Ships[ i ].ShipThatLastHitMe, sizeof( Ships[ i ].ShipThatLastHitMe ), 1, fp );

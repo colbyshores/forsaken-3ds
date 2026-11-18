@@ -109,11 +109,11 @@ long Get_File_Size( char * Filename )
 
 	char * path = convert_path(Filename);
 
-  if ( !stat( path, &st ) ) 
+  if ( !stat( path, &st ) )
 	{
 		return (long) st.st_size;
   }
- 	else 
+ 	else
 	{
 		DebugPrintf("file '%s' does not exist\n",path);
 		perror("stat");
@@ -154,7 +154,7 @@ long Read_File( char * Filename, char * File_Buffer, long Read_Size )
 
 	char * path = convert_path(Filename);
 
-	if( Read_Size == 0 ) 
+	if( Read_Size == 0 )
 		Read_Size = Get_File_Size( path );
 
 	Handle = open( path, O_RDONLY );

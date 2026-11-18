@@ -767,14 +767,14 @@ bool CollectPickup( u_int16_t i )
 	int16_t	TriggeredSFX = -1;
 	bool	ShowTextAnyway = false;
 	bool	Speech = true;
-	
+
 	sprintf( (char*)&Message[0], "%s", PickupMessage( Pickups[i].Type ) );
 
 	if( i != INDEX_NONE )
 	{
 		switch( Pickups[i].Type )
 		{
-			case PICKUP_Trojax: 
+			case PICKUP_Trojax:
 				if( !PrimaryWeaponsGot[ TROJAX ] )
 				{
 					PrimaryWeaponsGot[ TROJAX ] = 1;
@@ -1283,7 +1283,7 @@ bool CollectPickup( u_int16_t i )
 				if( !Ships[ WhoIAm ].Invul )
 				{
 					Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
-					Ships[ WhoIAm ].Invul = true;			
+					Ships[ WhoIAm ].Invul = true;
 					PickupInvulnerability = true;
 					MessageSFX = SFX_Select_Invul;
 				}
@@ -1448,7 +1448,7 @@ bool CollectPickup( u_int16_t i )
 
 					sprintf( CTFMessage, SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
 					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
-					
+
 				}
 				break;
 
@@ -1459,9 +1459,9 @@ bool CollectPickup( u_int16_t i )
 					BountyTime = 0.0F;
 					Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingBounty;
 					AddColourMessageToQue(FlagMessageColour, YOU_HAVE_GOT_THE_BOUNTY );
-					
+
 					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_BountyMessage, 0);
-					
+
 				}
 				break;
 
@@ -1519,7 +1519,7 @@ bool CollectPickup( u_int16_t i )
 								Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
 								AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
 									TeamName[ TeamNumber[ WhoIAm ] ] );
-								
+
 								sprintf( CTFMessage, SOMEONE_HAS_OTHER_TEAM_FLAG,
 									Names[ WhoIAm ],
 									TeamName[ TeamNumber[ WhoIAm ] ],
@@ -1529,7 +1529,7 @@ bool CollectPickup( u_int16_t i )
 							break;
 						}
 					}
-					
+
 				}
 				break;
 
@@ -1565,7 +1565,7 @@ bool CollectPickup( u_int16_t i )
 						PickupEnable = false;
 					}
 				}
-				break;		 
+				break;
 		}
 
 		if( PickupEnable || no_collision )
@@ -1600,7 +1600,7 @@ bool CollectPickup( u_int16_t i )
 						PlaySfxWithTrigger( MessageSFX, TriggeredSFX );
 					else
 						PlaySfx( MessageSFX, Sfx_Volume );
-	 
+
 					if( ShowTextAnyway )
 						AddColourMessageToQue( PickupMessageColour, "%s", &Message[ 0 ] );
 				}
@@ -1705,7 +1705,7 @@ void CheckPickup( void )
 
 			Pickup = NextPickup;
 		}
-	}																				
+	}
 }
 
 /*===================================================================
@@ -1776,7 +1776,7 @@ void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style )
 					Pickups[ i ].LifeCount = 0.0F;
 					Pickups[ i ].Mode = PICKUPMODE_Disappear;
 					Pickups[ i ].PickupCount = 32.0F;
-			
+
 					fmpoly = FindFreeFmPoly();
 					if( fmpoly != INDEX_NONE )
 					{
@@ -1807,8 +1807,8 @@ void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style )
 		}
 
 		i = NextPickup;											/* Next Pickup */
-	}																				
-	
+	}
+
 
 	AddFailedKillToQue( Owner, ID, Style, INDEX_NONE );
 
@@ -1830,9 +1830,9 @@ u_int16_t FindFreePickup( void )
 	u_int16_t i;
 
 	i = FirstPickupFree;
-	
+
 	if ( i == INDEX_NONE ) return i;
- 
+
 	Pickups[i].Prev = FirstPickupUsed;
 	if( FirstPickupUsed != INDEX_NONE)
 	{
@@ -1849,7 +1849,7 @@ u_int16_t FindFreePickup( void )
 /*===================================================================
 	Procedure	:	Kill a used Pickup and move it from the used
 				:	list to the free list
-	Input		:	u_int16_t number of Pickup to kill.... 
+	Input		:	u_int16_t number of Pickup to kill....
 	Output		:	nothing
 ===================================================================*/
 void KillUsedPickup( u_int16_t i )
@@ -2022,7 +2022,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 				case PICKUP_Flag4:
 					KillAllPickupsOfType( Type, PICKUPKILL_Immediate );
 	   				break;
-	
+
 	   			default:
 #if DEBUG_PICKUPS
 	   				DebugPrintf( "pickups: Tried to generated more %s's than allowed\n", Messages[ Type ] );
@@ -2190,7 +2190,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		if ( CTF )
 		{
 			int team;
-			
+
 			team = -1;
 			switch ( Pickups[ i ].Type )
 			{
@@ -2413,7 +2413,7 @@ void ProcessPickups( void )
 		if( ( Ships[ i ].enable ) && ( ( GameStatus[ i ] == STATUS_Normal ) || ( GameStatus[ i ] == STATUS_SinglePlayer) ) )
 		{
 			EnabledPlayers++;
-			NumPowerPodsGot += ( Ships[ i ].Object.PowerLevel ); 
+			NumPowerPodsGot += ( Ships[ i ].Object.PowerLevel );
 		}
 	}
 
@@ -2522,7 +2522,7 @@ void ProcessPickups( void )
 	   			NewDir.x = ( Pickups[ i ].Dir.x * Speed );
 	   			NewDir.y = ( Pickups[ i ].Dir.y * Speed );
 	   			NewDir.z = ( Pickups[ i ].Dir.z * Speed );
-	
+
 				OldGroup = Pickups[ i ].Group;
 
 /*===================================================================
@@ -2531,7 +2531,7 @@ void ProcessPickups( void )
 				NewPos.x = ( Pickups[ i ].Pos.x + NewDir.x );
 				NewPos.y = ( Pickups[ i ].Pos.y + NewDir.y );
 				NewPos.z = ( Pickups[ i ].Pos.z + NewDir.z );
-				
+
 				if( QCollide( &Pickups[ i ].Pos, Pickups[ i ].Group, &NewDir, PICKUP_MODEL_RADIUS,
 							  (VECTOR *) &Pickups[ i ].ColPoint, &Pickups[ i ].Group, &Pickups[ i ].ColPointNormal ) )
 				{
@@ -2560,9 +2560,9 @@ void ProcessPickups( void )
 				{
 					MovePickupToGroup( i, OldGroup, Pickups[ i ].Group );
 				}
-	
+
 		   		if( Pickups[ i ].Light != INDEX_NONE )									/* Light Attached? */
-		   		{																		
+		   		{
 		   			XLights[ Pickups[ i ].Light ].Pos = Pickups[ i ].Pos;				/* Update Light Position */
 					XLights[ Pickups[ i ].Light ].Group = Pickups[ i ].Group;
 					if( XLights[ Pickups[ i ].Light ].Type == SPOT_LIGHT )
@@ -2570,21 +2570,21 @@ void ProcessPickups( void )
 						ApplyMatrix( &Pickups[ i ].Mat, &Forward, &XLights[ Pickups[ i ].Light ].Dir );
 						NormaliseVector( &XLights[ Pickups[ i ].Light ].Dir );
 					}
-		   		}																		
-		   																				
+		   		}
+
 		   		if( Pickups[ i ].Fmpoly != INDEX_NONE )								/* Faceme Poly Attached? */
-		   		{																		
+		   		{
 		   			FmPolys[ Pickups[ i ].Fmpoly ].Pos = Pickups[ i ].Pos;				/* Update FmPoly Position */
 		   			FmPolys[ Pickups[ i ].Fmpoly ].Group = Pickups[ i ].Group;
-		   		}																		
-		   																				
+		   		}
+
 				if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
-		   		{																		
+		   		{
 		   			Models[ Pickups[ i ].ModelNum ].Pos = Pickups[ i ].Pos;
 		   			Models[ Pickups[ i ].ModelNum ].Group = Pickups[ i ].Group;
-		   		}																		
+		   		}
 	   		}
-	
+
 			switch( Pickups[ i ].Type )
 			{
 				case PICKUP_Flag:
@@ -2593,7 +2593,7 @@ void ProcessPickups( void )
 				case PICKUP_Flag3:
 				case PICKUP_Flag4:
 					if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
-			   		{																		
+			   		{
 						Speed = ( LevelTimeTaken * 4.0F );
 						Models[ Pickups[ i ].ModelNum ].Frame = (int16_t) ( FMOD( Speed, ( 2.5F * ANIM_SECOND ) ) / ( 0.25F * ANIM_SECOND ) );
 						Models[ Pickups[ i ].ModelNum ].InterpFrame = ( Models[ Pickups[ i ].ModelNum ].Frame + 1 );
@@ -2603,7 +2603,7 @@ void ProcessPickups( void )
 					if ( CTF )
 					{
 						int team;
-						
+
 						team = -1;
 						switch ( Pickups[ i ].Type )
 						{
@@ -2666,9 +2666,9 @@ void ProcessPickups( void )
 	   			TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
 	   			TempQuat.Multiply(&Pickups[ i ].DirQuat, &Pickups[ i ].DirQuat);
 	   			Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);				// Create Dir Matrix
-	
+
 				if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
-		   		{																		
+		   		{
 					Models[ Pickups[ i ].ModelNum ].Mat = Pickups[ i ].Mat;				/* Update Model Matrix */
 		   			MatrixTranspose( &Pickups[ i ].Mat, &Models[ Pickups[ i ].ModelNum ].InvMat );
 		   			Models[ Pickups[ i ].ModelNum ].Pos = Pickups[ i ].Pos;
@@ -2678,7 +2678,7 @@ void ProcessPickups( void )
 
 			i = NextPickup;											/* Next Pickup */
 		}
-	}																				
+	}
 }
 
 /*===================================================================
@@ -3028,7 +3028,7 @@ bool LoadPickupsPositions( void )
         /* reset the regen point */
         RegenPoints[ Count ].Status = PU_REGENSTAT_Free;
         RegenPoints[ Count ].Wait = 0.0F;
-    
+
         /* extract each field for the regen point */
         fread( &RegenPoints[ Count ].GenType,  sizeof( u_int16_t ), 1, fp );
         fread( &RegenPoints[ Count ].RegenType,  sizeof( u_int16_t ), 1, fp );
@@ -3099,8 +3099,8 @@ bool LoadPickupsPositions( void )
         continue;
 
       /* if pickup is NOT valid */
-      if( 
-         !FilterPickup( RegenPoints[ Count ].Type ) && 
+      if(
+         !FilterPickup( RegenPoints[ Count ].Type ) &&
 				 (!
 					 (( ( RegenPoints[ Count ].Type == PICKUP_Flag) && CaptureTheFlag) ||
 		       ( (RegenPoints[ Count ].Type == PICKUP_Bounty) && BountyHunt ))
@@ -3203,7 +3203,7 @@ bool LoadPickupsPositions( void )
             MaxPickupType[ i ] = NumPrimaryPickups;
 
 		    if( IsHost )
-                NumPrimWeapons[ Count ] += ( NumPrimaryPickups - NumPickupType [ i ] ); 
+                NumPrimWeapons[ Count ] += ( NumPrimaryPickups - NumPickupType [ i ] );
         }
     }
   }
@@ -3284,7 +3284,7 @@ void RegeneratePickups( void )
 	int16_t				Count;
 	VECTOR				Dir = { 0.0F, 0.0F, 1.0F };
 	u_int16_t				i;
- 
+
 	if( RegenDelay != 0.0F )
 	{
 		RegenDelay -= framelag;
@@ -3317,7 +3317,7 @@ void RegeneratePickups( void )
 									   &Dir, 0.0F, RegenPoints[ Count ].Type, INDEX_NONE,
 									   ++Ships[WhoIAm].PickupIdCount, Count, true,
 									   RegenPoints[ Count ].Lifespan, RegenPoints[ Count ].TriggerMod );
-		
+
 					if( ( i != INDEX_NONE )  && ( i != (u_int16_t) -2 ) )
 					{
 						DropPickupSend( &RegenPoints[ Count ].Pos, RegenPoints[ Count ].Group,
@@ -3325,7 +3325,7 @@ void RegeneratePickups( void )
 										Count, false, RegenPoints[ Count ].Lifespan, RegenPoints[ Count ].TriggerMod );
 					}
 				}
-	
+
 				RegenPoints[ Count ].Wait = 0.0F;
 			}
 		}
@@ -3557,7 +3557,7 @@ bool RegeneratePickup( u_int16_t Type )
 	NumFreeTypeSlots = 0;
 
 	/* locate all free regen points
-	   if any regen points cator specifically to the given pickup type 
+	   if any regen points cator specifically to the given pickup type
 	   then exclusively use them instead of random points */
 
 	/* for each regen point */
@@ -3603,22 +3603,22 @@ bool RegeneratePickup( u_int16_t Type )
 
 	if( NumFreeTypeSlots )
 	{
-		
+
 		/* pick a random slot */
 		Slot = FreeTypeSlots[ Random_Range( NumFreeTypeSlots ) ];
 
 	}
 
-	
+
 	/* There are no regen points which only cator the current pickup
 	   So use any pickup location that doesn't have a defined type */
 
 	else
 	{
-		
+
 		/* pick a random location */
 		Slot = FreeSlots[ Random_Range( NumFreeSlots ) ];
-		
+
      	/* if slots less than 5 ditch out */
 		if( NumFreeSlots < 5 )
 			return false;
@@ -3636,7 +3636,7 @@ bool RegeneratePickup( u_int16_t Type )
 		DebugPrintf("pickups: RegeneratePickup (FAILED) location given is occupied.\n");
 		return false;
 	}
-	
+
 	/* too many of same type */
 	if( i == (u_int16_t) -2 ){
 		DebugPrintf("pickups: RegeneratePickup (FAILED) too many of same type.\n");
@@ -3797,7 +3797,7 @@ void KillAllPickups( void )
 
 		/* get the next pickup */
 		NextPickup = Pickups[ i ].Prev;
- 
+
 		/* Reset the pickups triggerMod */
 		Pickups[ i ].TriggerModPtr = NULL;
 		Pickups[ i ].TriggerMod    = INDEX_NONE;
@@ -3806,11 +3806,11 @@ void KillAllPickups( void )
 		   remove any lighting or other affect the pickup does */
 
 		CleanUpPickup( i );
- 		
+
 		/* go to the next pickup */
 		i = NextPickup;
 
-	}																				
+	}
 }
 
 /*===================================================================
@@ -3836,7 +3836,7 @@ void CopyPickups( u_int16_t Player )
 		Num++;
 
 		i = Pickups[ i ].Prev;							/* Next Secondary Bullet */
-	}																				
+	}
 }
 
 /*===================================================================
@@ -3980,9 +3980,9 @@ u_int16_t FindClosestShip( void )
 				TempVector.x = ( Ships[ Count ].Object.Pos.x - Ships[ WhoIAm ].Object.Pos.x );
 				TempVector.y = ( Ships[ Count ].Object.Pos.y - Ships[ WhoIAm ].Object.Pos.y );
 				TempVector.z = ( Ships[ Count ].Object.Pos.z - Ships[ WhoIAm ].Object.Pos.z );
-			
+
 				DistToSphere = VectorLength( &TempVector );
-			
+
 				if( ClosestShip != INDEX_NONE )
 				{
 					if( DistToSphere < ClosestLength )
@@ -4026,7 +4026,7 @@ void SfxForCollectPickup( u_int16_t Owner, u_int16_t ID )
 		{
 			switch( Pickups[i].Type )
 			{
-			case PICKUP_Trojax: 
+			case PICKUP_Trojax:
 				PlaySfx( SFX_Select_Trojax, Sfx_Volume );
 				return;
 			case PICKUP_Pyrolite:
@@ -4200,7 +4200,7 @@ void MovePickupToGroup( u_int16_t i, u_int16_t OldGroup, u_int16_t NewGroup )
 void InitValidPickups()
 {
 	int i;
-	
+
 	for ( i = 0; i < MAXPICKUPTYPES; i++ )
 	{
 		PickupValid[ i ] = true;
@@ -4269,7 +4269,7 @@ void UnpackPickupInfo( u_int32_t *packed )
 {
 	u_int8_t i;
 	int psize = sizeof( packed[ 0 ] ) * 8;
-	
+
 	for ( i = 0; i < MAXPICKUPTYPES; i++ )
 	{
 		/* @vfp-exempt R11 — network pickup-state bit-packing, per network tick bounded by pickup count, not per frame. measured n/a. Verified 2026-10-25. */
@@ -4285,7 +4285,7 @@ void UnpackPickupInfo( u_int32_t *packed )
 FILE * SaveAllPickups( FILE * fp )
 {
 	u_int16_t	i;
-	u_int16_t	TempIndex = INDEX_NONE; 
+	u_int16_t	TempIndex = INDEX_NONE;
 
 	if( fp )
 	{
@@ -4605,7 +4605,7 @@ void KillAllPickupsOfType( u_int16_t Type, int16_t Style )
 					Pickups[ i ].LifeCount = 0.0F;
 					Pickups[ i ].Mode = PICKUPMODE_Disappear;
 					Pickups[ i ].PickupCount = 32.0F;
-			
+
 					fmpoly = FindFreeFmPoly();
 					if( fmpoly != INDEX_NONE )
 					{
@@ -4635,7 +4635,7 @@ void KillAllPickupsOfType( u_int16_t Type, int16_t Style )
 		}
 
 		i = NextPickup;											/* Next Pickup */
-	}																				
+	}
 }
 
 
@@ -4667,7 +4667,7 @@ void PickupModelValid( void )
 		}
 
 		i = NextPickup;											/* Next Pickup */
-	}																				
+	}
 }
 
 
@@ -4734,13 +4734,13 @@ int16_t FindFreeFailedKillSlot( void )
 	int16_t i;
 
 	i = FirstFailedKillFree;
-	
+
 	if ( i == -1 )
 	{
 		Msg( "Failed Kill Pickup Que Overflowed!!!\n" );
 		return( i );
 	}
- 
+
 	FailedKill[ i ].Prev = FirstFailedKillUsed;
 
 	if( FirstFailedKillUsed != -1 )
@@ -4791,7 +4791,7 @@ void ProcessFailedKills( void )
 		NextFailedKill = FailedKill[ i ].Prev;
 
 		FailedKill[ i ].Life -= framelag;
-		
+
 		if( FailedKill[ i ].Life < 0.0F )
 		{
 			DebugPrintf( "pickups: ************** Dropped Failed KillPickup() Owner %d, ID %d from que\n", FailedKill[ i ].Owner, FailedKill[ i ].ID );
@@ -4833,8 +4833,7 @@ u_int16_t FindPickup( u_int16_t Owner, u_int16_t ID )
 		}
 
 		i = Pickups[ i ].Prev;
-	}																				
+	}
 
 	return( INDEX_NONE );
-}	
-	
+}

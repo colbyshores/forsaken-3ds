@@ -17,7 +17,7 @@ int Msg( const char * fmt, ... );
 void DebugPrintf_( const char * format, ... ); // no prefix timestamp
 void DebugPrintf( const char * format, ... );  // prefix timestamp
 void DebugState( const char * str );           // only prints if str changed
-void DebugPuts( char * str );                  // 
+void DebugPuts( char * str );                  //
 
 void Change_Ext( const char * Src, char * Dest, const char * Ext );
 void Get_Ext( u_int8_t * Src, u_int8_t * Dest );

@@ -21,7 +21,7 @@
  * Defines
  */
 constexpr double TOLER = (0.03125); //0.0000076F
- 
+
 
 constexpr int MAX_BSP_MODELS = (2);
 /*
@@ -46,7 +46,7 @@ struct	BSP_NODE * Parent;
 struct	BSP_NODE * Front;
 struct	BSP_NODE * Back;
 }BSP_NODE;
- 
+
 typedef struct BSP_TREE
 {
    int	NumNodes;

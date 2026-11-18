@@ -86,7 +86,7 @@ constexpr auto TROJAX_COLRADIUS = ( ( 512.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto TROJAX_EXPSIZE = ( ( 4.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto TROJAX_EXPMAXSIZE = ( ( 16.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto TROJAX_EXPINC = ( ( 0.333F * GLOBAL_SCALE ) * 1.0F );
-  
+
 constexpr auto PYROLITE_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto PYROLITE_POWERMUL = ( ( 0.5F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto PYROLITE_ADDMIN = ( ( 0.75F * GLOBAL_SCALE ) * 1.0F );
@@ -191,7 +191,7 @@ typedef struct PRIMARYWEAPONATTRIB {
 
 typedef struct PRIMARYWEAPONBULLET {
 	bool		Used;
-	u_int16_t		Next;							// link list.....	
+	u_int16_t		Next;							// link list.....
 	u_int16_t		Prev;							// link list.....
 	u_int16_t		Type;							// which type of bullet am I
 	u_int16_t		OwnerType;						// who fired me...

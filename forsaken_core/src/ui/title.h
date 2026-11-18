@@ -224,10 +224,10 @@ typedef struct
 	u_int8_t	oldtext[MAX_TEXT_LENGTH];	// used for checking if text has changed
 	bool	highlight;					// item highlighted?
 	HighlightType	highlighttype;		// pulsing or static box
-	int		xmin;						// 
+	int		xmin;						//
 	int		ymin;						// bounding box for text
 	int		xmax;						// (VDU co-ordinates)
-	int		ymax;						// 
+	int		ymax;						//
 	int		font;						// font size (small, medium, large)
 	int		flags;						// formatting info
 	int		num_lines;					// number of lines once formatted
@@ -239,8 +239,8 @@ typedef struct
 	int		currentchar[MAXNUMLINES];	// used for teletype mode
 	float 	currentx[MAXNUMLINES];		// used for teletype mode
 	bool	boxdone;					// used for teletype mode
-	int		num_pointers_to_free;		
-	void	*pointer[MAXPOINTERS];		
+	int		num_pointers_to_free;
+	void	*pointer[MAXPOINTERS];
 
 	float 	currenty;		// possibly replace with local variables?
 	float	char1x;
@@ -337,7 +337,7 @@ struct _TITLE_EVENT
 };
 
 enum
-{	
+{
 	TITLE_EVENT_TIMER_IDLE,
 	TITLE_EVENT_TIMER_ACTIVE,
 	TITLE_EVENT_TIMER_FINISHED,

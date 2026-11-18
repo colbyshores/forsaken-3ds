@@ -1,6 +1,6 @@
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 
 #include <stdio.h>
@@ -36,9 +36,9 @@ constexpr int MSG_VERSION_NUMBER = 1;
 u_int8_t Colourtrans[MAXFONTCOLOURS][3] = {
 	// r, g, b   values...
 	{ 192,192,192 },	// gray
-	{ 255,64,64 },		// red 
-	{ 64,255,64 },		// green 
-	{ 64,64,255 },		// blue 
+	{ 255,64,64 },		// red
+	{ 64,255,64 },		// green
+	{ 64,64,255 },		// blue
 	{ 255,255,64 },		// yellow
 	{ 64,255,255 },		// cyan
 	{ 255,64,255 },		// purple
@@ -129,7 +129,7 @@ void Printu_int16_t( u_int16_t tempnum , int x , int y , int col )
 
 	if( (y + FontHeight ) >= render_info.window_size.cy )
 		return;
-	
+
 	r = Colourtrans[col][0];
 	g = Colourtrans[col][1];
 	b = Colourtrans[col][2];
@@ -163,8 +163,8 @@ void CenterPrint4x5Text( const char * Text , int y, int col )
 	while( *Text2++ != 0 ) i++;
 
 	x = (render_info.window_size.cx >> 1 ) - (i * ( FontWidth >> 1 )  ); // i *2 is half the size of the chars...
-	
-	Print4x5Text( Text , x , y , col );	
+
+	Print4x5Text( Text , x , y , col );
 }
 
 /*===================================================================
@@ -182,7 +182,7 @@ void CenterPrint4x5Text2( char * Text , int x, int y, int col )
 	while( *Text2++ != 0 ) i++;
 
 	x -= (i * ( FontWidth >> 1 )  ); // i *2 is half the size of the chars...
-	
+
 	Print4x5Text( Text , x , y , col );
 }
 
@@ -229,7 +229,7 @@ int Print4x5Text( const char * Text , int x , int y , int color )
 
 		if ( num )
 				AddScreenPolyText( (u_int16_t) num, (float) PermX , (float) y, r , g , b, 255 );
-	
+
 		PermX += FontWidth;
 	}
 
@@ -270,7 +270,7 @@ void	PlayerMessageQuePrint( void )
 						ypos-= FontHeight;
 					else
 						break;
-				}	
+				}
 		}
 	}
 
@@ -284,17 +284,17 @@ void	PlayerMessageQuePrint( void )
 					{
 						strncpy(&MessageBuff[0],&PlayerMessageBank[i][MAX*z],MAX);
 						MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
-						
+
 						Print4x5Text( &MessageBuff[0], FontWidth*12 , ypos+FontHeight*y , PlayerMessageColours[i] ); // left-aligned
 						y++;
 					}
 					else
 						break;
-				}	
+				}
 		}
 	}
 }
-				
+
 /*===================================================================
 	Procedure	:		Print All Message in the normal Que (last 4 messages)...
 	Input		:		nothing
@@ -331,7 +331,7 @@ void	MessageQuePrint( void )
 					}
 					else
 						break;
-				}	
+				}
 		}
 	}
 }
@@ -463,7 +463,7 @@ void AddPlayerMessageToQue( int Colour, const char * Text, ... )
 	if(Colour > -1)
 	{
 		char * Pnt;
-		va_list args;		
+		va_list args;
 
 		for(x = MAX_MESSAGES_LONG-1; x > 0; x--)
 		{
@@ -503,7 +503,7 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 	if(Colour > -1)
 	{
 		char * Pnt;
-		va_list args;		
+		va_list args;
 
 		for(x = MAX_MESSAGES_LONG-1; x > 0; x--)
 		{
@@ -534,7 +534,7 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 			AddColourMessageToQueShort( &Pnt, Colour );
 	}
 }
-	
+
 /*===================================================================
 	Procedure	:		Print the Scores....
 	Input		:		nothing
@@ -571,13 +571,13 @@ void PrintScoreSort( void )
 		FlashToggle = !FlashToggle;
 		FlashSpeed = FMOD( FlashSpeed, FLASH_RATE );
 	}
-	
+
 	if( !TeamGame )
 	{
 		if( ShowPlayersOnHUD )
  		{
 			int top_offset = FontHeight; // initial gap
-			int line_height = FontHeight+1;	
+			int line_height = FontHeight+1;
 
 			// calculate the width of the score column
 			if(ShowPlayersOnHUDbyKills)
@@ -586,7 +586,7 @@ void PrintScoreSort( void )
 				{
 					tempwidth = (u_int16_t) log10(abs(GetKills(i)))+1;
 					if(GetKills(i) < 0)	tempwidth++;
-					if(tempwidth > scorewidth) scorewidth = tempwidth;			
+					if(tempwidth > scorewidth) scorewidth = tempwidth;
 				}
 			}
 			else
@@ -625,11 +625,11 @@ void PrintScoreSort( void )
 					Print4x5Text( &Names[ShipID][0], left_offset, top_offset, WHITE );
 
 				left_offset += ( 8 * FontWidth );
-				
+
 				// print real score
 				if(ShowPlayersOnHUDbyKills)
 					// kills - suicides - friendly
-					Printint16_t( GetKills(ShipID), left_offset, top_offset, GRAY ); 
+					Printint16_t( GetKills(ShipID), left_offset, top_offset, GRAY );
 				else
 					// points + kills - suicides - friendly - deaths
 					Printint16_t( GetRealScore(ShipID), left_offset, top_offset, GRAY );
@@ -669,7 +669,7 @@ void PrintScoreSort( void )
 			TeamCol[i] = i + 1;
 			TeamBounty[ i ] = 0;
 		}
-		
+
 		for (i = 0; i < MAX_PLAYERS; i++)
 		{
 			if ( (TeamNumber[i] < MAX_TEAMS) && (GameStatus[i] == STATUS_Normal ) )
@@ -728,7 +728,7 @@ void PrintScoreSort( void )
 			e = pos + 1;
 			for( i = 0 ; i < MAX_PLAYERS ; i++ )
 			{
-				if( ( TeamNumber[WhoIAm] == TeamNumber[i] || SwitchedToWatchMode) 
+				if( ( TeamNumber[WhoIAm] == TeamNumber[i] || SwitchedToWatchMode)
 						&& (GameStatus[i] == STATUS_Normal) && (Ships[i].Object.Mode != LIMBO_MODE) )
 				{
 					col = ( WhoIAm == i ) ? 0 : TeamCol[ TeamNumber[ i ] ];
@@ -892,7 +892,7 @@ bool ReadMsgFile( char *Filename )
 	TextMsgInfo = NULL;
 	if( !NumOfTextMessages)
 		return true;
-	
+
 	File_Size = Get_File_Size( Filename );
 	if( !File_Size )
 	{
@@ -1111,7 +1111,7 @@ void DisplayConnectionStatus( int num , int x , int y)
         dot = 83; // blue
     else
         dot = 85; // red
-	
+
 	// display
     AddScreenPolyText( dot, (float) x , (float) y+2, 255, 255, 255, 255 );
 }

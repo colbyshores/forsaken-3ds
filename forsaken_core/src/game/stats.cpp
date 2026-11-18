@@ -1,15 +1,15 @@
 /*******************************************************************\
-*																	
-*	stats.cpp														
-*																
-*	Deals with all statistical related proceedures				
-*																
+*
+*	stats.cpp
+*
+*	Deals with all statistical related proceedures
+*
 ********************************************************************\
 *
 *	List of places where UpdateKillStats() is called:
-*		
+*
 *		networking.cpp	- update stats 1 (stats.cpp) -- somebody killed me
-*		networking.cpp	- update stats 2 (stats.cpp) -- you killed someone 
+*		networking.cpp	- update stats 2 (stats.cpp) -- you killed someone
 *		networking.cpp	- update stats 3 (stats.cpp) -- somebody killed someone
 *		models.cpp	- update stats 4 (stats.cpp) -- killed yourself with missile splash damage
 *		models.cpp	- update stats 5 (stats.cpp) -- i killed myself
@@ -54,7 +54,7 @@ int	SecondaryStats[MAX_PLAYERS+1][TOTALSECONDARYWEAPONS];		// SecondaryStats[Kil
 int	KillStats[MAX_PLAYERS+1][MAX_PLAYERS+1];								// each player's KillStats[Killer][Victim];
 int BonusStats[MAX_PLAYERS+1];													// each player's ctf/bounty points
 int KillCounter[MAX_PLAYERS+1];													// number of kills made during this life
-int	ScoreSortTab[MAX_PLAYERS + 1];												// player numbers in order of highest score to lowest 								
+int	ScoreSortTab[MAX_PLAYERS + 1];												// player numbers in order of highest score to lowest
 const char *PrimaryWeaponName[MAXPRIMARYWEAPONS+1]			= { "PULSAR", "TROJAX", "PYROLITE", "TRANSPULSE", "SUSS-GUN", "LASER", "ORBITAL" };
 const char *SecondaryWeaponName[TOTALSECONDARYWEAPONS]	= { "MUG", "SOLARIS", "THIEF", "SCATTER", "GRAVGON", "MFRL", "TITAN", "PURGE MINE", "PINE MINE", "QUANTUM MINE", "SPIDER MINE", "PINE MISSILE", "TITAN SHRAPNEL", "ENEMY SPIRAL MISSILE", "ENEMY HOMING MISSILE", "ENEMY BLUE HOMING MISSILE", "ENEMY FIREBALL", "ENEMY TENTACLE", "ENEMY DEPTH CHARGE" };
 bool FirstBlood = false;
@@ -177,11 +177,11 @@ void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon)
 						break;
 					}
 			}
-			
+
 			// this is the first (non-suicide) kill
 			if(!FirstBlood && Killer != Victim)
 			{
-					FirstBlood = true;					
+					FirstBlood = true;
 					if(Killer == WhoIAm)
 						AddColourMessageToQue(MilestoneMessagesColour, "YOU GOT FIRST BLOOD");
 					else
@@ -204,7 +204,7 @@ void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon)
 						break;
 					}
 			}
-			
+
 			// this is the person to 50 kills
 			if(!FirstToFifty && Killer!=Victim && GetTotalKills(Killer) == 49)
 			{
@@ -226,14 +226,14 @@ void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon)
 	{
 			PlaySfx( SFX_HOLYSHIT, 1.0F );
 			AddColourMessageToQue( MilestoneMessagesColour, "HOLY SHIT" );
-			return;				
+			return;
 	}
 	// killed with a gravgon
 	if(WeaponType == WEPTYPE_Secondary && Weapon == 4)
 	{
 			if(Victim == WatchPlayerSelect.value) PlaySfx( SFX_HUMILIATION, 1.0F );
 			AddColourMessageToQue( MilestoneMessagesColour, "HUMILIATION" );
-			return;		
+			return;
 	}
 
 	// note who killed whom
@@ -307,7 +307,7 @@ void UpdateKillCount(int Killer)
 			if(PlaySound) PlaySfx( sound, 1.0F ); \
 			AddColourMessageToQue( MilestoneMessagesColour, "%s %s (%d KILLS)", prefix, msg, count ); \
 			break;
-	
+
 		MILESTONE_CASE(  3,  SFX_KILLINGSPREE, "ON A KILLING SPREE" )
 		MILESTONE_CASE(  5,  SFX_RAMPAGE,      "ON A RAMPAGE" )
 		MILESTONE_CASE(  8,  SFX_DOMINATING,   "DOMINATING" )
@@ -336,7 +336,7 @@ void UpdateBonusStats(int Player, int Points)
 int GetKillStats(int Killer, int Victim)
 {
 	// return the amount of kills on victim
-	return KillStats[Killer][Victim];	
+	return KillStats[Killer][Victim];
 }
 
 /*===================================================================
@@ -365,7 +365,7 @@ int GetScoreStats(int Player)
 int GetBonusStats(int Player)
 {
 	// return an individual player's bonus points
-	return BonusStats[Player];	
+	return BonusStats[Player];
 }
 
 /*===================================================================
@@ -458,7 +458,7 @@ void ScoreSort()
 		for( i = 0; i < (players-1); i++ ) // -1 because we need to compare with next valid player
 		{
 			// if my score is worse than player bellow me
-			if(	GetRealScore(ScoreSortTab[i]) < GetRealScore(ScoreSortTab[i+1])	) 
+			if(	GetRealScore(ScoreSortTab[i]) < GetRealScore(ScoreSortTab[i+1])	)
 			{
 				// swap places
 				temp				= ScoreSortTab[i];

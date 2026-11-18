@@ -1,6 +1,6 @@
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 #include "game/main.h"
 #include <stdio.h>
@@ -36,7 +36,7 @@ void AddTransExe( RENDERMATRIX *Matrix , RENDEROBJECT *renderObject , int UseIde
 	if( NumOfTransExe < MAXTRANSEXE	)
 	{
 		TransExe[NumOfTransExe].UseIdentity = UseIdentity;
-		
+
 		if( UseIdentity == 0 )
 		{
 			TransExe[NumOfTransExe].Matrix = *Matrix;
@@ -100,7 +100,7 @@ void ExecuteTransExe( u_int16_t group )
 					case MODFUNC_Explode:
 						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
 						break;
-		
+
 					case MODFUNC_Regen:
 						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
 						break;
@@ -122,7 +122,7 @@ void ExecuteTransExe( u_int16_t group )
 
 					case MODFUNC_ScaleDonut:
 						break;
-					
+
 					case MODFUNC_Nothing:
 					default:
 						break;
@@ -205,7 +205,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 					case MODFUNC_Regen:
 						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
 						break;
-		
+
 					case MODFUNC_Scale:
 					case MODFUNC_Scale2:
 						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
@@ -224,7 +224,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 
 					case MODFUNC_ScaleDonut:
 						break;
-					
+
 					case MODFUNC_Nothing:
 					default:
 						break;

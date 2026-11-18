@@ -101,7 +101,7 @@ void app_resize( SDL_WindowEvent * /*window*/ )
 
 	if( MyGameStatus == STATUS_Title )
 	{
-		LastMenu = CurrentMenu;	
+		LastMenu = CurrentMenu;
 		VduClear();
 	}
 
@@ -256,7 +256,7 @@ void app_mouse_button( SDL_MouseButtonEvent * _event )
 	//
 	// Every other mouse button works like normal
 	//
-	default: 
+	default:
 		// save the button state
 		mouse_state.buttons[ button ] = ( _event->type == SDL_MOUSEBUTTONDOWN );
 		break;
@@ -328,7 +328,7 @@ void app_joy_axis( SDL_JoyAxisEvent * axis )
 
 	// if movement greater then deadzone then apply
 	// other wise no movement at all is registered
-	joy_axis_state[ axis->which ][ axis->axis ] = 
+	joy_axis_state[ axis->which ][ axis->axis ] =
 		( abs(value) > deadzone ) ? value : 0 ;
 }
 
@@ -483,14 +483,14 @@ bool joysticks_init(void)
 
 		JoystickInfo[i].Name = (char *)strdup( SDL_JoystickNameForIndex(i) );
 
-		DebugPrintf( 
-			"joysticks_init: joystick (%d), name='%s', axises=%d, buttons=%d, hats=%d\n", 
+		DebugPrintf(
+			"joysticks_init: joystick (%d), name='%s', axises=%d, buttons=%d, hats=%d\n",
 			i, JoystickInfo[i].Name, JoystickInfo[i].NumAxis, JoystickInfo[i].NumButtons,
 			JoystickInfo[i].NumPOVs
 		);
 
 		for (j = 0; j < JoystickInfo[i].NumAxis; j++)
-		{	
+		{
 			JoystickInfo[i].Axis[j].action		= SHIPACTION_Nothing;
 			JoystickInfo[i].Axis[j].inverted	= false;
 			JoystickInfo[i].Axis[j].deadzone	= 20;
@@ -511,33 +511,33 @@ bool joysticks_init(void)
 		{
 			JoystickInfo[i].Button[j].action = SHIPACTION_Nothing;
 
-			JoystickInfo[i].Button[j].name = 
+			JoystickInfo[i].Button[j].name =
 				(char *) malloc (MAX_JOYNAME+1);
 
 			sprintf(
 				JoystickInfo[i].Button[j].name,
-				"Button %d", 
+				"Button %d",
 				j
 			);
 		}
 
 		for (j = 0; j < JoystickInfo[i].NumPOVs; j++)
 		{
-			JoystickInfo[i].POV[j].name = 
+			JoystickInfo[i].POV[j].name =
 				(char *) malloc (MAX_JOYNAME+1);
-  
+
 			sprintf(
 				JoystickInfo[i].POV[j].name,
-				"Hat %d", 
+				"Hat %d",
 				j
 			);
 
 			for (k = 0; k < MAX_POV_DIRECTIONS; k++)
 			{
 				JoystickInfo[i].POV[j].action[k] =
-					SHIPACTION_Nothing;      
-				
-				 JoystickInfo[i].POV[j].dirname[k] = 
+					SHIPACTION_Nothing;
+
+				 JoystickInfo[i].POV[j].dirname[k] =
 					(char *) malloc (MAX_JOYNAME+1);
 
 				sprintf(

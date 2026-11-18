@@ -1,7 +1,7 @@
 
 
 /*===================================================================
-		Include Files...	
+		Include Files...
 ===================================================================*/
 #include <stdio.h>
 
@@ -68,8 +68,8 @@ bool TeleportsLoad( char * Filename )
 		TeleportsGroupLink[i] = NULL;
 	}
 
-	
-	File_Size = Get_File_Size( Filename );	
+
+	File_Size = Get_File_Size( Filename );
 	if( !File_Size )
 	{
 		// dont need Teleports..
@@ -212,7 +212,7 @@ bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJ
 	TELEPORT * newTPpnt;
 
 	TPpnt = TeleportsGroupLink[Group];
-	
+
 	while( TPpnt )
 	{
 		if( TPpnt->Status == TELEPORTACTIVE )
@@ -250,7 +250,7 @@ void DisplayTeleportsInGroup( u_int16_t Group )
 	if( !ShowTeleports ) return;
 
 	TPpnt = TeleportsGroupLink[Group];
-	
+
 	while( TPpnt )
 	{
 		if( TPpnt->Status == TELEPORTACTIVE )

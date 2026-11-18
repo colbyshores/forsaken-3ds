@@ -104,7 +104,7 @@ typedef struct POLY {
 	int16_t			SeqNum;				// Process Sequence
 	u_int16_t			Group;				// Group
 	float			TimeStep;			// Time step for interpolation
-	QUATLERP		Qlerp;				// Quaternion Interpolation 
+	QUATLERP		Qlerp;				// Quaternion Interpolation
 	QUAT			Quat;				// Quat
 	u_int16_t			Ship;				// Ship
 

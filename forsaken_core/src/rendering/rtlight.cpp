@@ -698,7 +698,7 @@ FILE * SaveRealTimeLights( FILE * fp )
 		fwrite( &rt_lights, sizeof( u_int16_t ), 1, fp );
 
 		RTLPtr = rt_light;
-		
+
 		for( i = 0; i < rt_lights; i++ )
 		{
 			fwrite( &RTLPtr->xlight, sizeof( u_int16_t ), 1, fp );
@@ -736,7 +736,7 @@ FILE * LoadRealTimeLights( FILE * fp )
 		}
 
 		RTLPtr = rt_light;
-		
+
 		for( i = 0; i < rt_lights; i++ )
 		{
 			fread( &RTLPtr->xlight, sizeof( u_int16_t ), 1, fp );

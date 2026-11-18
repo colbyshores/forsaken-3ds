@@ -33,7 +33,7 @@
 #endif
 
 constexpr int PIC_VERSION_NUMBER = 1;
-								
+
 constexpr int MAXPICKUPS = 256;
 /* Bumped 46 -> 128 to fit Remaster N64 pickup IDs at slots 100-105
  * (StablizerCrystal + ComputerCapsule + 4 BlackHoleGun parts). Slots
@@ -54,10 +54,10 @@ constexpr auto PICKUP_SPEED = ( 40.0F * GLOBAL_SCALE );
 constexpr auto PICKUP_DEC = ( 0.20F * GLOBAL_SCALE );
 constexpr float COLOUR_SCALE = 0.5F;
 constexpr auto PICKUP_MODEL_RADIUS = ( 310.0F * GLOBAL_SCALE );
-								
+
 constexpr int MPU_TYPE_KILL = 0;
 constexpr int MPU_TYPE_INIT = 1;
-								
+
 constexpr auto INVULNERABILITY_TIME = ( 30.0F * 60.0F );
 
 constexpr int MAXFAILEDKILLS = 100;
@@ -178,7 +178,7 @@ typedef struct PICKUPATTRIB {
 
 typedef struct PICKUP {
 
-	u_int16_t	Next;				// link list.....	
+	u_int16_t	Next;				// link list.....
 	u_int16_t	Prev;				// link list.....
 	struct PICKUP * NextInGroup;		// Next in same group ....
 	struct PICKUP *	PrevInGroup;	// Previous in same group ....
@@ -261,7 +261,7 @@ typedef struct REGENPICKUPINFO {
 
 typedef struct FAILEDKILL {
 
-	int16_t	Next;				// link list.....	
+	int16_t	Next;				// link list.....
 	int16_t	Prev;				// link list.....
 	float	Life;
 	u_int16_t	Owner;

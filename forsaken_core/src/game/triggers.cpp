@@ -1,6 +1,6 @@
 
 /*===================================================================
-		Include Files...	
+		Include Files...
 ===================================================================*/
 
 #include <stdio.h>
@@ -117,7 +117,7 @@ void ProcessTriggerModQue( void )
 
 
 /*===================================================================
-	Procedure	:		Update a trigger var..and then checks to see if 
+	Procedure	:		Update a trigger var..and then checks to see if
 						all the triggers associated with any condition that this
 						trigger is used in is complete if it is Set the events off...
 	Input		:		TRIGGERMOD	* TrigMod
@@ -142,7 +142,7 @@ void ApplyTriggerMod( TRIGGERMOD * TrigMod )
 
 
 /*===================================================================
-	Procedure	:		Update a trigger var..and then checks to see if 
+	Procedure	:		Update a trigger var..and then checks to see if
 						all the triggers associated with any condition that this
 						trigger is used in is complete if it is Set the events off...
 	Input		:		TRIGGERVAR * TrigVar
@@ -291,7 +291,7 @@ void TestAllConditions( TRIGGER * Trig )
 		}
 
 
-		
+
 		if( e == Con->NumOfTriggers )
 		{
 			AddCondition( Con );
@@ -302,7 +302,7 @@ void TestAllConditions( TRIGGER * Trig )
 
 /*===================================================================
 	Procedure	:		Add Condition to the list of conditions that
-						have been proved true and will therefor have 
+						have been proved true and will therefor have
 						there event list processed...
 	Input		:		CONDITION * Con..
 	Output		:		nothing
@@ -343,7 +343,7 @@ void ProcessActiveConditions( void )
 	{
 		Con = ActiveConditions[i];
 
-		
+
 		// all triggers are Active so do the event List....
 		for( f = 0 ; f < Con->NumOfEvents ; f++ )
 		{
@@ -354,7 +354,7 @@ void ProcessActiveConditions( void )
 
 	ProcessTriggerModQue();
 }
-	  
+
 /*===================================================================
 	Function	:	Event List Procs..
 ===================================================================*/
@@ -363,15 +363,15 @@ void EVENT_EnemySetTargetNode( u_int8_t * Data );
 void EVENT_EnemySetNextTargetNode( u_int8_t * Data );
 #endif
 void (* EventList[ ])( u_int8_t * Data ) = {
-		EVENT_PickupGenerate,			// TRIGGEREVENT_Pickup				0     
-		EVENT_EnemyGenerate,			// TRIGGEREVENT_Enemy				1     
-		EVENT_OpenDoor,					// TRIGGEREVENT_OpenDoor			2     
-		EVENT_CloseDoor,				// TRIGGEREVENT_CloseDoor			3     
-		EVENT_LockDoor,					// TRIGGEREVENT_LockDoor			4     
-		EVENT_UnlockDoor,				// TRIGGEREVENT_UnlockDoor			5     
-		EVENT_StartBGOAnim,				// TRIGGEREVENT_StartBGOAnim		6     
+		EVENT_PickupGenerate,			// TRIGGEREVENT_Pickup				0
+		EVENT_EnemyGenerate,			// TRIGGEREVENT_Enemy				1
+		EVENT_OpenDoor,					// TRIGGEREVENT_OpenDoor			2
+		EVENT_CloseDoor,				// TRIGGEREVENT_CloseDoor			3
+		EVENT_LockDoor,					// TRIGGEREVENT_LockDoor			4
+		EVENT_UnlockDoor,				// TRIGGEREVENT_UnlockDoor			5
+		EVENT_StartBGOAnim,				// TRIGGEREVENT_StartBGOAnim		6
 		EVENT_StopBGOAnim,				// TRIGGEREVENT_StopBGOAnim			7
-		EVENT_StartTexAnim,				// TRIGGEREVENT_StartTexAnim		8     
+		EVENT_StartTexAnim,				// TRIGGEREVENT_StartTexAnim		8
 		EVENT_StopTexAnim,				// TRIGGEREVENT_StopTexAnim			9
 		EVENT_StartExternalForce,		// TRIGGEREVENT_StartExternalForce	10
 		EVENT_StopExternalForce,		// TRIGGEREVENT_StopExternalForce	11
@@ -407,7 +407,7 @@ void (* EventList[ ])( u_int8_t * Data ) = {
 		NULL,
 		NULL,
 };
- 
+
 /*===================================================================
 	Procedure	:		Process Event...
 	Input		:		EVENT * Event
@@ -1095,7 +1095,7 @@ bool Triggerload( char * Filename )
 		}
 	}
 
-	// Search for the Avatar boss Activation	
+	// Search for the Avatar boss Activation
 	TVpnt =	TrigVars;
 	if( TVpnt )
 	{
@@ -1158,7 +1158,7 @@ bool Triggerload( char * Filename )
 		TrigModQue[i].Time = 0.0F;
 	}
 	NumOfActiveConditions = 0;
-	
+
 	free( OrgBuffer );
 	return true;
 }
@@ -1393,7 +1393,7 @@ void HowManySecrets( int * NumOfSecrets , int * SecretsFound )
 		return;
 	for( i = 0 ; i < NumOfTrigVars ; i ++ )
 	{
-		
+
 		if( !(strncasecmp( "secret" , &TVpnt->Name[0], 6 ) ) )
 		{
 			*NumOfSecrets += 1;

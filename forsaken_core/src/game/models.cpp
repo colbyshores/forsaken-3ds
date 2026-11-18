@@ -71,7 +71,7 @@ bool	ENVMxa( MXALOADHEADER * Mxaloadheader , MATRIX * Mat ,VECTOR * Pos);
 /*===================================================================
 	In game models
 ===================================================================*/
-MODELNAME	ModelNames[MAXMODELHEADERS] ={	
+MODELNAME	ModelNames[MAXMODELHEADERS] ={
 
 	{ "heat.mx" , 1 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Heatseaker missile
 	{ "fheat.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// LOD 1..
@@ -89,8 +89,8 @@ MODELNAME	ModelNames[MAXMODELHEADERS] ={
 	{ "sbeam.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// LOD 1..
 	{ "pod.mx" , 1 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// powerpod..
 	{ "spod.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// LOD 1..
-	{ "fuel.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Fuel				
-//	{ "sfuel.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// LOD 1..				
+	{ "fuel.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Fuel
+//	{ "sfuel.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// LOD 1..
 	{ "shld.mx" , 1 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Shield
 	{ "sshld.mx" , 0 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// LOD 1..
 	{ "ammo.mx" , 1 , false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Suss Gun
@@ -405,7 +405,7 @@ MODELNAME	ModelNames[MAXMODELHEADERS] ={
 ===================================================================*/
 MODELNAME *TitleModelSet;
 
-MODELNAME	TitleModelNames[ MAXMODELHEADERS ] ={	
+MODELNAME	TitleModelNames[ MAXMODELHEADERS ] ={
 	{ "disc1.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Disc 1
 	{ "disc2.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Disc 2
 	{ "disc3.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// Disc 3
@@ -421,20 +421,20 @@ MODELNAME	TitleModelNames[ MAXMODELHEADERS ] ={
 	{ "menutv.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			// TV screen
 	{ "hglaire.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// translucent glare effect for holopad
 	{ "bracket.mx", 0, false, MODELTYPE_Static, 0, DISCARD_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		// VDU bracket
-	{ "borg400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "brd400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "laj400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "xcop400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "truk400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "foet400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "jap400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "nut400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "rhes400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "jo400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			
-	{ "shrk400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "hk400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },			
-	{ "nbia400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
-	{ "mofi400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },		
+	{ "borg400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "brd400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "laj400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "xcop400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "truk400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "foet400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "jap400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "nut400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "rhes400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "jo400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "shrk400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "hk400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "nbia400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
+	{ "mofi400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 	{ "cerb400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 	{ "slick400.mxa", 0, false, MODELTYPE_Morphing, 0, RETAIN_POLYS,  LOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD },
 	{ "" , 0 , false, MODELTYPE_Static, 0, false, DONTLOAD_TPAGES, NOT_LEVEL_SPECIFIC, DO_LOAD }
@@ -476,7 +476,7 @@ void OnceOnlyInitModel( void )
 
 	FirstModelUsed = INDEX_NONE;
 	FirstModelFree = 0;
-	
+
 	for( i=0;i<MAXNUMOFMODELS;i++)
 	{
 		memset( &Models[i], 0, sizeof( MODEL ) );
@@ -704,10 +704,10 @@ u_int16_t	FindFreeModel()
 #endif
 
 	i = FirstModelFree;
-	
+
 	if ( i == INDEX_NONE)
 		return i;
- 
+
 	Models[i].Prev = FirstModelUsed;
 	if ( FirstModelUsed != INDEX_NONE)
 	{
@@ -747,7 +747,7 @@ void	KillUsedModel( u_int16_t i )
 	u_int16_t		its_prev;
 	u_int16_t		its_next;
 	int16_t		Count;
-	
+
 #ifdef DEBUG_ON
 	CheckModelLinkList();
 #endif
@@ -1034,7 +1034,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 					MatrixMultiply( &TempMatrix, &Models[i].Mat, &Models[i].Mat );
 					MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
 					break;
-			
+
 				case MODFUNC_RealScale:
 					Models[ i ].Mat = MATRIX_Identity;
 					Models[ i ].Mat._11 = Models[i].Scale;
@@ -1050,12 +1050,12 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 					TempMatrix._33 *= Models[i].Zscale;
 
 					BuildRotMatrix(HoloRot.x, HoloRot.y, HoloRot.z, &TempRotMatrix);
-							
+
 
 					MatrixMultiply( &TempMatrix, &TempRotMatrix, &Models[i].Mat );
 					MatrixTranspose( &Models[ i ].Mat, &Models[ i ].InvMat );
 					break;
-						
+
 				case MODFUNC_ScaleDonut:
 					Models[ i ].Mat = MATRIX_Identity;
 					Models[ i ].Mat._11 = Models[i].Scale;
@@ -1071,7 +1071,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 			}
 
 			ENV( &ModelHeaders[Models[i].ModelNum] , &Models[i].Mat , &Models[i].Pos);
-				
+
 			TempWorld._11 = Models[i].InvMat._11;
 			TempWorld._12 = Models[i].InvMat._12;
 			TempWorld._13 = Models[i].InvMat._13;
@@ -1095,18 +1095,18 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 				Msg( "ModelDisp() SetMatrix1 Failed\n" );
 				return false;
 			}
-					
+
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			// TODO - BEEF UP LOD LEVEL HANDLING (read notes bellow)
 
 			// set ModelNum = 0 bellow for best lod level
 			// set ModelNum = ModelHeaders[Models[i].ModelNum].LOD bellow for worst lod level
-					
+
 			// should probably add a switch to completely disable this...
 
 			/*	Execute it	*/
-			temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos ); 
-		
+			temp = DistanceVector2Vector( &Models[i].Pos, &CurrentCamera.Pos );
+
 			// this is for objects that dont' support diff lod values like in title room
  			if( ModelHeaders[Models[i].ModelNum].LOD == 0 )
 			{
@@ -1117,17 +1117,17 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 			else
 			{
 				{
-					// appears the larger you make this number 
+					// appears the larger you make this number
 					// the farther away we can see the object with better lod's
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					// we should probably make this a global so people can control it on it's own
-					float distance = CurrentCamera.UseLowestLOD ? 
+					float distance = CurrentCamera.UseLowestLOD ?
 									6144.0F	:	// down grade for smaller cams
 									12288.0F;	// larger value for full screen
 
 					// appears to be based on how many many pickups need to be rendered
 					temp2 = ( temp + ( ( (float) NumPickupsPerGroup[ group ] ) * ( 128.0F * GLOBAL_SCALE ) ) );
-								
+
 					// wtf is this?
 					if( temp2 >= ( ( distance * GLOBAL_SCALE )  * ( (float) ModelHeaders[Models[i].ModelNum].LOD ) )  )
 					{
@@ -1151,7 +1151,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 			// END OF TODO
 
 			ModelNum += Models[i].ModelNum;
-		
+
 			if( ( temp > ( PICKUP_RADIUS * 0.75F ) ) || ( Models[i].Type == MODTYPE_Field ) )
 			{
 				DoDisplay = true;
@@ -1269,7 +1269,7 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 						TempMatrix._41 = Models[i].Pos.x;
 						TempMatrix._42 = Models[i].Pos.y;
 						TempMatrix._43 = Models[i].Pos.z;
-						XLightMxloadHeader( &ModelHeaders[ ModelNum ], &Models[i].Pos, 
+						XLightMxloadHeader( &ModelHeaders[ ModelNum ], &Models[i].Pos,
 							Models[i].Radius, &TempMatrix );
 					}
 
@@ -1556,28 +1556,28 @@ void ProcessModels( void )
 	     				TempDir.x = ( Models[i].Dir.x * framelag );
 	     				TempDir.y = ( Models[i].Dir.y * framelag );
 	     				TempDir.z = ( Models[i].Dir.z * framelag );
-		  
+
 	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
 	     									  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
 	     									  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
 	     				{
 							Models[i].Pos = Int_Point;
 	     					CreateBloodSplat( &Int_Point, (VECTOR *) &Int_Normal, Models[i].Group );
-		
+
 	     					TempVector = Models[i].Dir;
 	     					NormaliseVector( &TempVector );
 	     					Speed = VectorLength( &Models[i].Dir );
 	     					ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
 	     					Speed *= 0.5F;
-		  
+
 							PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
-		
+
 	     					if( Speed < ( 5.0F * GLOBAL_SCALE ) )
 	     					{
 		  						KillUsedModel( i );
 	     						break;
 	     					}
-		  
+
 	     					Models[i].Dir.x *= Speed;
 	     					Models[i].Dir.y *= Speed;
 	     					Models[i].Dir.z *= Speed;
@@ -1626,7 +1626,7 @@ void ProcessModels( void )
 	     				TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 						ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
-		  
+
 	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
 	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
 	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
@@ -1634,9 +1634,9 @@ void ProcessModels( void )
 	     	   			TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
 	     	   			Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
 	     	   			MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
-		
+
 						BloodPtr = &BloodOffsets[ 0 ];
-						
+
 						ApplyMatrix( &Models[i].Mat, BloodPtr, &TempVector );
 	     				NormaliseVector( &TempVector );
 						BloodPtr++;
@@ -1647,7 +1647,7 @@ void ProcessModels( void )
 							if( IsGroupVisible[ Models[i].Group ] )
 							{
 								Models[i].TimeCount += framelag;
-		
+
 								if( Models[i].TimeCount >= Models[i].TimeInterval )
 								{
 									Models[i].TimeCount = 0.0F;
@@ -1702,7 +1702,7 @@ void ProcessModels( void )
 	     				TempDir.x = ( Models[i].Dir.x * framelag );
 	     				TempDir.y = ( Models[i].Dir.y * framelag );
 	     				TempDir.z = ( Models[i].Dir.z * framelag );
-		  
+
 	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
 	     									  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
 	     									  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
@@ -1817,7 +1817,7 @@ void ProcessModels( void )
 	     				TempDir.x = ( Models[i].Dir.x * framelag );
 	     				TempDir.y = ( Models[i].Dir.y * framelag );
 	     				TempDir.z = ( Models[i].Dir.z * framelag );
-		  
+
 						WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 255 );
 
 	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
@@ -1845,13 +1845,13 @@ void ProcessModels( void )
 	     						Speed = VectorLength( &Models[i].Dir );
 	     						ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
 	     						Speed *= 0.5F;
-			  
+
 	     						if( Speed < ( 5.0F * GLOBAL_SCALE ) )
 	     						{
 		  							KillUsedModel( i );
 	     							break;
 	     						}
-			  
+
 	     						Models[i].Dir.x *= Speed;
 	     						Models[i].Dir.y *= Speed;
 	     						Models[i].Dir.z *= Speed;
@@ -1901,7 +1901,7 @@ void ProcessModels( void )
 	     				TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 						ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
-		  
+
 	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
 	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
 	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
@@ -1963,7 +1963,7 @@ void ProcessModels( void )
 	     				TempDir.x = ( Models[i].Dir.x * framelag );
 	     				TempDir.y = ( Models[i].Dir.y * framelag );
 	     				TempDir.z = ( Models[i].Dir.z * framelag );
-		  
+
 						WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 128 );
 
 	     				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
@@ -1977,13 +1977,13 @@ void ProcessModels( void )
 	     					Speed = VectorLength( &Models[i].Dir );
 	     					ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
 	     					Speed *= 0.5F;
-		  
+
 	     					if( Speed < ( 5.0F * GLOBAL_SCALE ) )
 	     					{
 		  						KillUsedModel( i );
 	     						break;
 	     					}
-		  
+
 	     					Models[i].Dir.x *= Speed;
 	     					Models[i].Dir.y *= Speed;
 	     					Models[i].Dir.z *= Speed;
@@ -2032,7 +2032,7 @@ void ProcessModels( void )
 	     				TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
 
 						ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
-		  
+
 	     	   			FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
 	     	   			FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
 	     	   			FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
@@ -2698,7 +2698,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 	u_int16_t					Red;
 	u_int16_t					Green;
 	u_int16_t					Blue;
-	
+
 	LVERTEX			*VertPtr;
 
 	COLOR_RGBA *			DestRGBA;
@@ -2736,7 +2736,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 
 				VertPtr++;
 				DstVerts++;
-				
+
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
@@ -2778,7 +2778,7 @@ bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale
 	{
 		return false;
 	}
-	
+
 	while( NumVerts-- )
 	{
 		DstVerts->color = Colour;
@@ -2905,15 +2905,15 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 			}
 
 			OrigLVert = MXAloadheader->Group[group].originalVerts[mesh];
-			
+
 			LVert = VertBase;
 			vert = MXAloadheader->Group[group].num_verts_per_mesh[mesh];
 			while( vert --)
 			{
 				LVert->color = OrigLVert->color;
 				LVert->color |= 0xFF000000;
-				LVert++;		
-				OrigLVert++;		
+				LVert++;
+				OrigLVert++;
 			}
 			/*	unlock the vertex buffer	*/
 			if (!(FSUnlockVertexBuffer(&MXAloadheader->Group[group].renderObject[mesh])))
@@ -3123,7 +3123,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 				}
 				else
 				{
-					if( TempPoint.z < 0.0F ) 
+					if( TempPoint.z < 0.0F )
 					{
 						RF = 255.0F; GF = 255.0F; BF = 255.0F; TF = 255.0F;
 					}
@@ -3178,18 +3178,18 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 	DstMloadheader = &ModelHeaders[ Model ];
 
 	LightPnt = FirstLightVisible;
-	
+
 	while( LightPnt )
 	{
 		DistVector.x = ( Pos->x - LightPnt->Pos.x );
 		DistVector.y = ( Pos->y - LightPnt->Pos.y );
 		DistVector.z = ( Pos->z - LightPnt->Pos.z );
 		Dist = VectorLength( &DistVector );
-		
+
 		if( Dist < LightPnt->Size )
 		{
 			Val = ( 1.0F - ( Dist / LightPnt->Size ) );
-	
+
 			RF += ( LightPnt->r * Val );
 			GF += ( LightPnt->g * Val );
 			BF += ( LightPnt->b * Val );
@@ -3197,7 +3197,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 		}
 		LightPnt = LightPnt->NextVisible;
 	}
-		
+
 	if( RF > 255.0F ) RF = 255.0F;
 	if( GF > 255.0F ) GF = 255.0F;
 	if( BF > 255.0F ) BF = 255.0F;
@@ -3261,18 +3261,18 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 	DstMloadheader = &ModelHeaders[ Model ];
 
 	LightPnt = FirstLightVisible;
-	
+
 	while( LightPnt )
 	{
 		DistVector.x = ( Pos->x - LightPnt->Pos.x );
 		DistVector.y = ( Pos->y - LightPnt->Pos.y );
 		DistVector.z = ( Pos->z - LightPnt->Pos.z );
 		Dist = VectorLength( &DistVector );
-		
+
 		if( Dist < LightPnt->Size )
 		{
 			Val = ( 1.0F - ( Dist / LightPnt->Size ) );
-	
+
 			RF += ( LightPnt->r * Val );
 			GF += ( LightPnt->g * Val );
 			BF += ( LightPnt->b * Val );
@@ -3280,7 +3280,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 		}
 		LightPnt = LightPnt->NextVisible;
 	}
-		
+
 	if( RF > 255.0F ) RF = 255.0F;
 	if( GF > 255.0F ) GF = 255.0F;
 	if( BF > 255.0F ) BF = 255.0F;
@@ -3352,11 +3352,11 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 			DistVector.y = ( Pos->y - LightPnt->Pos.y );
 			DistVector.z = ( Pos->z - LightPnt->Pos.z );
 			Dist = VectorLength( &DistVector );
-			
+
 			if( Dist < LightPnt->Size )
 			{
 				Val = ( 1.0F - ( Dist / LightPnt->Size ) );
-		
+
 				RF += ( LightPnt->r * Val );
 				GF += ( LightPnt->g * Val );
 				BF += ( LightPnt->b * Val );
@@ -3364,7 +3364,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 			}
 			LightPnt = LightPnt->NextVisible;
 		}
-		
+
 		if( RF > 255.0F ) RF = 255.0F;
 		if( GF > 255.0F ) GF = 255.0F;
 		if( BF > 255.0F ) BF = 255.0F;
@@ -3382,15 +3382,15 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 				{
 					return false;
 				}
-	
+
 				Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
-	
+
 				while( Vert-- )
 				{
 					DstVerts->color = Colour;
 					DstVerts++;
 				}
-	
+
 				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 				{
 					return false;
@@ -3431,18 +3431,18 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 	if( DstMloadheader->state == true )
 	{
 		LightPnt = FirstLightVisible;
-	
+
 		while( LightPnt )
 		{
 			DistVector.x = ( Pos->x - LightPnt->Pos.x );
 			DistVector.y = ( Pos->y - LightPnt->Pos.y );
 			DistVector.z = ( Pos->z - LightPnt->Pos.z );
 			Dist = VectorLength( &DistVector );
-			
+
 			if( Dist < LightPnt->Size )
 			{
 				Val = ( 1.0F - ( Dist / LightPnt->Size ) );
-		
+
 				RF += ( LightPnt->r * Val );
 				GF += ( LightPnt->g * Val );
 				BF += ( LightPnt->b * Val );
@@ -3450,7 +3450,7 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 			}
 			LightPnt = LightPnt->NextVisible;
 		}
-		
+
 		if( RF > 255.0F ) RF = 255.0F;
 		if( GF > 255.0F ) GF = 255.0F;
 		if( BF > 255.0F ) BF = 255.0F;
@@ -3467,15 +3467,15 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 				{
 					return false;
 				}
-	
+
 				Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
-	
+
 				while( Vert-- )
 				{
 					DstVerts->color = Colour;
 					DstVerts++;
 				}
-	
+
 				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 				{
 					return false;
@@ -3524,7 +3524,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 					DistVector.y = ( Ships[ WhoIAm ].Object.Pos.y - Pos->y );
 					DistVector.z = ( Ships[ WhoIAm ].Object.Pos.z - Pos->z );
 					DistFromCenter = VectorLength( &DistVector );
-			
+
 					if( DistFromCenter < ( Radius + SHIP_RADIUS ) )
 					{
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -3532,14 +3532,14 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 									  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 						{
 							Damage = ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) );
-			
+
 							Recoil.x = ( ( DistVector.x / DistFromCenter ) * ( Damage / 4.0F ) );
 							Recoil.y = ( ( DistVector.y / DistFromCenter ) * ( Damage / 4.0F ) );
 							Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 4.0F ) );
-			
+
 							Damage = ( Damage * framelag );
 							if( OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
-			
+
 
 							HitMe( OwnerType, Owner, Damage, WEPTYPE_Secondary, Weapon );
 							ForceExternal( WhoIAm, &Recoil );
@@ -3579,7 +3579,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
    			DistVector.y = ( SecBulls[ i ].Pos.y - Pos->y );
    			DistVector.z = ( SecBulls[ i ].Pos.z - Pos->z );
    			DistFromCenter = VectorLength( &DistVector );
-   
+
    			if( DistFromCenter < ( Radius + MINE_RADIUS ) )
    			{
    				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -3623,7 +3623,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 					DistVector.y = ( Enemy->Object.Pos.y - Pos->y );
 					DistVector.z = ( Enemy->Object.Pos.z - Pos->z );
 					DistFromCenter = VectorLength( &DistVector );
-				   
+
 					if( DistFromCenter < ( Radius + SHIP_RADIUS ) )
 					{
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -3631,15 +3631,15 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 									  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 						{
 							Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) ) * framelag );
-				
+
 							Recoil.x = ( ( DistVector.x / DistFromCenter ) * ( Damage / 4.0F ) );
 							Recoil.y = ( ( DistVector.y / DistFromCenter ) * ( Damage / 4.0F ) );
 							Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 4.0F ) );
-				
+
 							Enemy->Object.ExternalForce.x = ( Recoil.x * framelag );
 							Enemy->Object.ExternalForce.y = ( Recoil.y * framelag );
 							Enemy->Object.ExternalForce.z = ( Recoil.z * framelag );
-				
+
 							if( OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
 
 							Enemy->Object.Shield -= Damage;
@@ -3690,7 +3690,7 @@ void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_
 	   		DistVector.y = ( Ships[ WhoIAm ].Object.Pos.y - Pos->y );
 	   		DistVector.z = ( Ships[ WhoIAm ].Object.Pos.z - Pos->z );
 	   		DistFromCenter = VectorLength( &DistVector );
-	   
+
 	   		if( ( DistFromCenter < ( Radius + SHIP_RADIUS ) ) && ( DistFromCenter > ( ( Radius / 8.0F ) + SHIP_RADIUS ) ) )
 	   		{
 	   			if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -3698,7 +3698,7 @@ void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_
 	   						  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 	   			{
 	   				Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
-	   
+
 	   				force.x = -( ( ( DistVector.x / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
 	   				force.y = -( ( ( DistVector.y / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
 	   				force.z = -( ( ( DistVector.z / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
@@ -3725,7 +3725,7 @@ void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_
 				DistVector.y = ( Enemy->Object.Pos.y - Pos->y );
 				DistVector.z = ( Enemy->Object.Pos.z - Pos->z );
 				DistFromCenter = VectorLength( &DistVector );
-			   
+
 		   		if( ( DistFromCenter < ( Radius + SHIP_RADIUS ) ) && ( DistFromCenter > ( ( Radius / 8.0F ) + SHIP_RADIUS ) ) )
 				{
 					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -3733,7 +3733,7 @@ void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_
 								  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 					{
 	   					Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
-		   
+
 	   					force.x = -( ( ( DistVector.x / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
 	   					force.y = -( ( ( DistVector.y / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
 	   					force.z = -( ( ( DistVector.z / DistFromCenter ) * Gravity ) * GLOBAL_SCALE ) * 0.5F;
@@ -3775,7 +3775,7 @@ bool CheckForGravgons( VECTOR * Pos )
 				DistVector.y = ( Pos->y - Models[ i ].Pos.y );
 				DistVector.z = ( Pos->z - Models[ i ].Pos.z );
 				DistToGravgon = VectorLength( &DistVector );
-	
+
 				if( DistToGravgon <= ( ( BALL_RADIUS * Models[i].MaxScale ) + ( SHIP_RADIUS * 8.0F ) ) )
 				{
 					return true;
@@ -3984,7 +3984,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 							DistVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
 							DistVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
 							DistFromCenter = VectorLength( &DistVector );
-							
+
 							if( DistFromCenter < ( Radius + SHIP_RADIUS ) )
 							{
 								if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -3992,13 +3992,13 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 											  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 								{
 									Damage = ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) );
-							
+
 									Recoil.x = ( ( DistVector.x / DistFromCenter ) * ( Damage / 10.0F ) );
 									Recoil.y = ( ( DistVector.y / DistFromCenter ) * ( Damage / 10.0F ) );
 									Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 10.0F ) );
-							
+
 									Damage = ( Damage * framelag );
-							
+
 									if( Count != WhoIAm )
 									{
 										IHitYou( (BYTE) Count, Damage, &Recoil, &TempVector, &TempVector, 0.0F, WEPTYPE_Secondary, Weapon, FRAMELAGED_RECOIL );
@@ -4009,11 +4009,11 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 										{
 											Ships[ WhoIAm ].Damage = Damage;
 											Ships[WhoIAm].ShipThatLastHitMe = WhoIAm;
-								
+
 											if( DoDamage( DONT_OVERRIDE_INVUL ) == 1 )						// Did I Die?
 											{
 												GetDeathString( WEPTYPE_Secondary, Weapon, &methodstr[0] );
-							
+
 												Ships[ WhoIAm ].ShipThatLastKilledMe = WhoIAm;
 												Ships[ WhoIAm ].Object.Mode = DEATH_MODE;
 												Ships[ WhoIAm ].Timer = 0.0F;
@@ -4045,7 +4045,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 					DistVector.y = ( Ships[ WhoIAm ].Object.Pos.y - Pos->y );
 					DistVector.z = ( Ships[ WhoIAm ].Object.Pos.z - Pos->z );
 					DistFromCenter = VectorLength( &DistVector );
-					
+
 					if( DistFromCenter < ( Radius + SHIP_RADIUS ) )
 					{
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -4053,11 +4053,11 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 									  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 						{
 							Damage = ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) );
-					
+
 							Recoil.x = ( ( DistVector.x / DistFromCenter ) * ( Damage / 10.0F ) );
 							Recoil.y = ( ( DistVector.y / DistFromCenter ) * ( Damage / 10.0F ) );
 							Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 10.0F ) );
-					
+
 							Damage = ( Damage * framelag );
 							HitMe( OWNER_SHIP, Owner, Damage, WEPTYPE_Secondary, Weapon );
 							ForceExternalOneOff( WhoIAm, &Recoil );
@@ -4087,7 +4087,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 			DistVector.y = ( SecBulls[ i ].Pos.y - Pos->y );
 			DistVector.z = ( SecBulls[ i ].Pos.z - Pos->z );
 			DistFromCenter = VectorLength( &DistVector );
-			
+
 			if( DistFromCenter < ( Radius + MINE_RADIUS ) )
 			{
 				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -4097,7 +4097,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 					Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + MINE_RADIUS ) / Center_Damage ) ) ) * framelag );
 					SecBulls[ i ].Shield -= Damage;
 					if( SecBulls[ i ].Shield < 0.0F ) SecBulls[ i ].Shield = 0.0F;
-			
+
 					if( SecBulls[ i ].Shield == 0.0F )
 					{
 						DestroySecondary( i, &SecBulls[i].Pos );
@@ -4126,7 +4126,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 				DistVector.y = ( Enemy->Object.Pos.y - Pos->y );
 				DistVector.z = ( Enemy->Object.Pos.z - Pos->z );
 				DistFromCenter = VectorLength( &DistVector );
-			   
+
 				if( DistFromCenter < ( Radius + SHIP_RADIUS ) )
 				{
 					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
@@ -4134,15 +4134,15 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 								  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
 					{
 						Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) ) * framelag );
-			
+
 						Recoil.x = ( ( DistVector.x / DistFromCenter ) * ( Damage / 4.0F ) );
 						Recoil.y = ( ( DistVector.y / DistFromCenter ) * ( Damage / 4.0F ) );
 						Recoil.z = ( ( DistVector.z / DistFromCenter ) * ( Damage / 4.0F ) );
-			
+
 						Enemy->Object.ExternalForce.x = ( Recoil.x * framelag );
 						Enemy->Object.ExternalForce.y = ( Recoil.y * framelag );
 						Enemy->Object.ExternalForce.z = ( Recoil.z * framelag );
-			
+
 						Enemy->Object.Shield -= Damage;
 						if( Enemy->Object.Shield < 0 ) Enemy->Object.Shield = 0;
 						if( Enemy->Object.Shield == 0 )
@@ -4187,14 +4187,14 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 			else Ships[ WhoIAm ].ShipThatLastKilledMe = (u_int8_t) OwnerID;
 			Ships[ WhoIAm ].Object.Mode = DEATH_MODE;
 			Ships[ WhoIAm ].Timer = 0.0F;
-			
+
 			// i killed myself lolzers
 			if( ( OwnerType == OWNER_SHIP ) && ( OwnerID == WhoIAm ) )
 			{
 				PlaySfx( SFX_BIKECOMP_DY, 1.0F );
 				AddColourMessageToQue(KillMessageColour, YOU_KILLED_YOURSELF_HOW, &methodstr[0] ); // called in both multiplayer  & single player
 				// update stats 5 (stats.cpp) -- i killed myself
-				UpdateKillStats(WhoIAm,WhoIAm,WeaponType,Weapon); 
+				UpdateKillStats(WhoIAm,WhoIAm,WeaponType,Weapon);
 			}
 			else
 			{
@@ -4220,8 +4220,8 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 						// somebody killed me
 						AddColourMessageToQue( KillMessageColour, SOMEONE_KILLED_YOU, &Names[Ships[WhoIAm].ShipThatLastKilledMe][0], &methodstr[0], &teamstr[0] );
 						// update stats 6 (stats.cpp) -- somebody killed me
-						UpdateKillStats(Ships[WhoIAm].ShipThatLastKilledMe,WhoIAm,WeaponType,Weapon); 
-						
+						UpdateKillStats(Ships[WhoIAm].ShipThatLastKilledMe,WhoIAm,WeaponType,Weapon);
+
 					}
 					// wtf i died? why? please tell me!
 					else
@@ -4234,7 +4234,7 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 		}
 	}
 }
-	
+
 /*===================================================================
 	Procedure	:	Create Orbit Pulsar
 	Input		:	u_int16_t		Ship
@@ -4522,7 +4522,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -4583,7 +4583,7 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 	LineArray[ 5 ] = CreateLine( Verts[ 5 ].x, Verts[ 5 ].y, Verts[ 5 ].z, Verts[ 7 ].x, Verts[ 7 ].y, Verts[ 7 ].z, Group2 );
 	LineArray[ 6 ] = CreateLine( Verts[ 7 ].x, Verts[ 7 ].y, Verts[ 7 ].z, Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Group2 );
 	LineArray[ 7 ] = CreateLine( Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Verts[ 4 ].x, Verts[ 4 ].y, Verts[ 4 ].z, Group2 );
-			   
+
 	LineArray[ 8 ] = CreateLine( Verts[ 0 ].x, Verts[ 0 ].y, Verts[ 0 ].z, Verts[ 4 ].x, Verts[ 4 ].y, Verts[ 4 ].z, Group2 );
 	LineArray[ 9 ] = CreateLine( Verts[ 1 ].x, Verts[ 1 ].y, Verts[ 1 ].z, Verts[ 5 ].x, Verts[ 5 ].y, Verts[ 5 ].z, Group2 );
 	LineArray[ 10 ] = CreateLine( Verts[ 2 ].x, Verts[ 2 ].y, Verts[ 2 ].z, Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Group2 );
@@ -4653,7 +4653,7 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 	LineArray[ 5 ] = CreateLine( Verts[ 5 ].x, Verts[ 5 ].y, Verts[ 5 ].z, Verts[ 7 ].x, Verts[ 7 ].y, Verts[ 7 ].z, Group2 );
 	LineArray[ 6 ] = CreateLine( Verts[ 7 ].x, Verts[ 7 ].y, Verts[ 7 ].z, Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Group2 );
 	LineArray[ 7 ] = CreateLine( Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Verts[ 4 ].x, Verts[ 4 ].y, Verts[ 4 ].z, Group2 );
-			   
+
 	LineArray[ 8 ] = CreateLine( Verts[ 0 ].x, Verts[ 0 ].y, Verts[ 0 ].z, Verts[ 4 ].x, Verts[ 4 ].y, Verts[ 4 ].z, Group2 );
 	LineArray[ 9 ] = CreateLine( Verts[ 1 ].x, Verts[ 1 ].y, Verts[ 1 ].z, Verts[ 5 ].x, Verts[ 5 ].y, Verts[ 5 ].z, Group2 );
 	LineArray[ 10 ] = CreateLine( Verts[ 2 ].x, Verts[ 2 ].y, Verts[ 2 ].z, Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Group2 );
@@ -4663,7 +4663,7 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 	{
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -5004,9 +5004,9 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 
 
 	RF = GF = BF = 0.0F;
-	
+
 	LightPnt = FirstLightVisible;
-	
+
 	while( LightPnt )
 	{
 		DistVector.x = ( Pos->x - LightPnt->Pos.x );
@@ -5015,13 +5015,13 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 
 		Size2 = LightPnt->Size;
 		Size2 *= Size2;
-		
+
 		Dist = ( DistVector.x * DistVector.x ) + ( DistVector.y * DistVector.y ) + ( DistVector.z * DistVector.z );
-	
+
 		if( Dist < Size2 )
 		{
 			Val = ( 1.0F - ( Dist / Size2 ) );
-	
+
 			RF += ( LightPnt->r * Val );
 			GF += ( LightPnt->g * Val );
 			BF += ( LightPnt->b * Val );
@@ -5072,7 +5072,7 @@ u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_
 
 	if( OwnerID >= MAX_PLAYERS )
 		return SoundFX_ID;
-	
+
 	if ( framelag )
 	  	Speed /= framelag;
 	else
@@ -5099,11 +5099,11 @@ u_int32_t EngineCode( u_int16_t OwnerType, u_int16_t OwnerID, u_int32_t SoundFX_
 	{
 		Speed += SpeedStore[ OwnerID ][ i ];
 	}
-	
+
 	Speed /= (float)ENGINEUPDATEPAUSEFRAMES;
 	if ( Speed > MAXMOVESPEED )
 		Speed = MAXMOVESPEED;
-	
+
 	switch( OwnerType )
 	{
 		case OWNER_SHIP:
@@ -5196,7 +5196,7 @@ FILE * SaveModels( FILE * fp )
 	{
 		fwrite( &FirstModelUsed, sizeof( FirstModelUsed ), 1, fp );
 		fwrite( &FirstModelFree, sizeof( FirstModelFree ), 1, fp );
-		
+
 		i = FirstModelUsed;
 
 		while( i != INDEX_NONE )
@@ -5274,7 +5274,7 @@ FILE * LoadModels( FILE * fp )
 	{
 		fread( &FirstModelUsed, sizeof( FirstModelUsed ), 1, fp );
 		fread( &FirstModelFree, sizeof( FirstModelFree ), 1, fp );
-		
+
 		i = FirstModelUsed;
 
 		while( i != INDEX_NONE )
@@ -5445,7 +5445,7 @@ void SetShipsVisibleFlag( void )
 				}
 			}
 		}
-			
+
 		if( BikeCompFiles[ ( Ships[ Ship ].BikeNum % MAXBIKETYPES ) ].Filename[ 0 ] )
 		{
 			if( Ships[ Ship ].Object.Components )
@@ -5518,7 +5518,7 @@ void CheckModelLinkList( void )
 	u_int16_t Count;
 
 
-	
+
 	i = 0;
 	Count = FirstModelFree;
 	while( ( Count != INDEX_NONE ) && i < MAXNUMOFMODELS*2 )

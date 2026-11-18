@@ -109,7 +109,7 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 
 	switch( ShowSkin )
 	{
-		case 0: 
+		case 0:
 			return true;
 			break;
 		case 2:
@@ -146,7 +146,7 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 
 		FaceCnt = MCloadheader->num_of_faces_in_group[ Group ];
 		FacePtr = MCloadheader->GroupFacePnt[ Group ];
-	
+
 		for( Count = 0; Count < FaceCnt; Count++, FacePtr++ )
 		{
 			Vnum = (int16_t) ( ( FacePtr->type & 1 ) + 3 );
@@ -251,7 +251,7 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				SkinVerts[ SkinVertCount ].tv = 0.0F;
 				SkinVerts[ SkinVertCount ].color = color;
 				SkinVertCount++;
-	
+
 				SkinVerts[ SkinVertCount ].x = Verts[ 3 ].x;
 				SkinVerts[ SkinVertCount ].y = Verts[ 3 ].y;
 				SkinVerts[ SkinVertCount ].z = Verts[ 3 ].z;
@@ -259,7 +259,7 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				SkinVerts[ SkinVertCount ].tv = 0.0F;
 				SkinVerts[ SkinVertCount ].color = color;
 				SkinVertCount++;
-	
+
 				SkinVerts[ SkinVertCount ].x = Verts[ 0 ].x;
 				SkinVerts[ SkinVertCount ].y = Verts[ 0 ].y;
 				SkinVerts[ SkinVertCount ].z = Verts[ 0 ].z;
@@ -267,7 +267,7 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				SkinVerts[ SkinVertCount ].tv = 0.0F;
 				SkinVerts[ SkinVertCount ].color = color;
 				SkinVertCount++;
-	
+
 				SkinTris[ SkinTriCount ].v1 = SkinVertCount - 3;
 				SkinTris[ SkinTriCount ].v2 = SkinVertCount - 2;
 				SkinTris[ SkinTriCount ].v3 = SkinVertCount - 1;
@@ -339,7 +339,7 @@ void DisplayBSPNode( BSP_NODE * Node )
 				TempNode = TempNode->Parent;
 				NumNodes += 1.0F;
 			}
-		
+
 			while( Node )
 			{
 				D = ( DotProduct( &CurrentCamera.Pos, &Node->Normal ) + Node->Offset );
@@ -355,17 +355,17 @@ void DisplayBSPNode( BSP_NODE * Node )
 				{
 					color = Node->Colour;
 				}
-		
+
 				TLPos.x = ( Ships[ WhoIAm ].Object.Pos.x - BOXSIZE );
 				TLPos.y = ( Ships[ WhoIAm ].Object.Pos.y - BOXSIZE );
 				TLPos.z = ( Ships[ WhoIAm ].Object.Pos.z - BOXSIZE );
-			
+
 				BRPos.x = ( Ships[ WhoIAm ].Object.Pos.x + BOXSIZE );
 				BRPos.y = ( Ships[ WhoIAm ].Object.Pos.y + BOXSIZE );
 				BRPos.z = ( Ships[ WhoIAm ].Object.Pos.z + BOXSIZE );
-		
+
 				Vnum = PlaneToCubeIntersectionShape( &TLPos, &BRPos, &Node->Normal, Node->Offset, &TempVerts[0] );
-			
+
 				for( Count = 0; Count < Vnum; Count++ )
 				{
 					SkinVerts[ SkinVertCount ].x = TempVerts[ Count ].x;
@@ -376,27 +376,27 @@ void DisplayBSPNode( BSP_NODE * Node )
 					SkinVerts[ SkinVertCount ].color = color;
 					SkinVertCount++;
 				}
-			
+
 				for( Count = 0; Count < ( Vnum - 2 ); Count++ )
 				{
 					SkinTris[ SkinTriCount ].v1 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v3 = Count+2;
 					SkinTriCount++;
-		
+
 					SkinTris[ SkinTriCount ].v3 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v1 = Count+2;
 					SkinTriCount++;
 				}
-			
+
 				if( SkinTriCount )
 				{
 					MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
 					SkinVertCount = 0;
 					SkinTriCount = 0;
 				}
-		
+
 				Node = Node->Parent;
 				NumNodes--;
 			}
@@ -426,13 +426,13 @@ void DisplayBSPNode( BSP_NODE * Node )
 				TLPos.x = ( Ships[ WhoIAm ].Object.Pos.x - BOXSIZE );
 				TLPos.y = ( Ships[ WhoIAm ].Object.Pos.y - BOXSIZE );
 				TLPos.z = ( Ships[ WhoIAm ].Object.Pos.z - BOXSIZE );
-			
+
 				BRPos.x = ( Ships[ WhoIAm ].Object.Pos.x + BOXSIZE );
 				BRPos.y = ( Ships[ WhoIAm ].Object.Pos.y + BOXSIZE );
 				BRPos.z = ( Ships[ WhoIAm ].Object.Pos.z + BOXSIZE );
-		
+
 				Vnum = PlaneToCubeIntersectionShape( &TLPos, &BRPos, &BSP_Nodes[ NodeNum ]->Normal, BSP_Nodes[ NodeNum ]->Offset, &TempVerts[0] );
-			
+
 				for( Count = 0; Count < Vnum; Count++ )
 				{
 					SkinVerts[ SkinVertCount ].x = TempVerts[ Count ].x;
@@ -443,20 +443,20 @@ void DisplayBSPNode( BSP_NODE * Node )
 					SkinVerts[ SkinVertCount ].color = color;
 					SkinVertCount++;
 				}
-			
+
 				for( Count = 0; Count < ( Vnum - 2 ); Count++ )
 				{
 					SkinTris[ SkinTriCount ].v1 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v3 = Count+2;
 					SkinTriCount++;
-		
+
 					SkinTris[ SkinTriCount ].v3 = 0;
 					SkinTris[ SkinTriCount ].v2 = Count+1;
 					SkinTris[ SkinTriCount ].v1 = Count+2;
 					SkinTriCount++;
 				}
-			
+
 				if( SkinTriCount )
 				{
 					MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
@@ -491,7 +491,7 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 		color = Node->Colour | 0x80000000L;
 
 		Vnum = GimmeNodeVertices( Node, StartNode, Side, &TempVerts[ 0 ] );
-	
+
 		for( Count = 0; Count < Vnum; Count++ )
 		{
 			line = FindFreeLine();						// Line attached
@@ -508,7 +508,7 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 					Lines[ line ].StartPos = TempVerts[ Count ];
 					Lines[ line ].EndPos = TempVerts[ Count + 1 ];
 				}
-					
+
 				Lines[ line ].StartCol.R = 255;
 				Lines[ line ].StartCol.G = 255;
 				Lines[ line ].StartCol.B = 255;
@@ -533,27 +533,27 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 			SkinVerts[ SkinVertCount ].color = color;
 			SkinVertCount++;
 		}
-	
+
 		for( Count = 0; Count < ( Vnum - 2 ); Count++ )
 		{
 			SkinTris[ SkinTriCount ].v1 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v3 = Count+2;
 			SkinTriCount++;
-	
+
 			SkinTris[ SkinTriCount ].v3 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v1 = Count+2;
 			SkinTriCount++;
 		}
-	
+
 		if( SkinTriCount )
 		{
 			MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
 			SkinVertCount = 0;
 			SkinTriCount = 0;
 		}
-	
+
 		TempNode = Node;
 		Node = TempNode->Parent;
 	}
@@ -734,7 +734,7 @@ void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group
 		color = RGBA_MAKE( Red, Green, Blue, Trans ); //0, 64, 0, 128 );
 
 		Vnum = GimmeTriggerZoneVertices( Sides, StartSide, NumSides, Side, &TempVerts[ 0 ] );
-	
+
 		for( Count = 0; Count < Vnum; Count++ )
 		{
 			line = FindFreeLine();						// Line attached
@@ -751,7 +751,7 @@ void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group
 					Lines[ line ].StartPos = TempVerts[ Count ];
 					Lines[ line ].EndPos = TempVerts[ Count + 1 ];
 				}
-					
+
 				Lines[ line ].StartCol.R = 255;
 				Lines[ line ].StartCol.G = 255;
 				Lines[ line ].StartCol.B = 255;
@@ -776,27 +776,27 @@ void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group
 			SkinVerts[ SkinVertCount ].color = color;
 			SkinVertCount++;
 		}
-	
+
 		for( Count = 0; Count < ( Vnum - 2 ); Count++ )
 		{
 			SkinTris[ SkinTriCount ].v1 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v3 = Count+2;
 			SkinTriCount++;
-	
+
 			SkinTris[ SkinTriCount ].v3 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v1 = Count+2;
 			SkinTriCount++;
 		}
-	
+
 		if( SkinTriCount )
 		{
 			MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
 			SkinVertCount = 0;
 			SkinTriCount = 0;
 		}
-	
+
 		Sides++;
 	}
 }
@@ -828,16 +828,16 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 	{
 		if( Sensitive )
 		{
-			color = RGBA_MAKE( 64, 0, 0, 128 ); 
+			color = RGBA_MAKE( 64, 0, 0, 128 );
 		}
 		else
 		{
-			if( Sides->Sensitive ) color = RGBA_MAKE( 64, 0, 0, 128 ); 
+			if( Sides->Sensitive ) color = RGBA_MAKE( 64, 0, 0, 128 );
 			else color = RGBA_MAKE( 0, 64, 0, 128 );
 		}
 
 		Vnum = GimmeColZoneVertices( Sides, StartSide, NumSides, Side, &TempVerts[ 0 ] );
-	
+
 		for( Count = 0; Count < Vnum; Count++ )
 		{
 			line = FindFreeLine();						// Line attached
@@ -854,7 +854,7 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 					Lines[ line ].StartPos = TempVerts[ Count ];
 					Lines[ line ].EndPos = TempVerts[ Count + 1 ];
 				}
-					
+
 				Lines[ line ].StartCol.R = 255;
 				Lines[ line ].StartCol.G = 255;
 				Lines[ line ].StartCol.B = 255;
@@ -879,27 +879,27 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 			SkinVerts[ SkinVertCount ].color = color;
 			SkinVertCount++;
 		}
-	
+
 		for( Count = 0; Count < ( Vnum - 2 ); Count++ )
 		{
 			SkinTris[ SkinTriCount ].v1 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v3 = Count+2;
 			SkinTriCount++;
-	
+
 			SkinTris[ SkinTriCount ].v3 = 0;
 			SkinTris[ SkinTriCount ].v2 = Count+1;
 			SkinTris[ SkinTriCount ].v1 = Count+2;
 			SkinTriCount++;
 		}
-	
+
 		if( SkinTriCount )
 		{
 			MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
 			SkinVertCount = 0;
 			SkinTriCount = 0;
 		}
-	
+
 		Sides++;
 	}
 }
@@ -947,14 +947,14 @@ bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int
 	{
 		return false;
 	}
-   
+
 	if (!(FSLockVertexBuffer(&Skin_Execs[ Num_Skin_Execs ], &BufStart)))
 	{
 		return false;
 	}
-   		
+
 	memmove(BufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
-   
+
 	if (!(FSUnlockVertexBuffer(&Skin_Execs[ Num_Skin_Execs ])))
 	{
 		return false;
@@ -1013,7 +1013,7 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 
 	switch( ShowPortal )
 	{
-		case 0: 
+		case 0:
 			return true;
 			break;
 		case 2:
@@ -1032,7 +1032,7 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 	{
 		PortalCnt = Mloadheader->Group[ GroupsVisible[ g ] ].num_portals;
 		PortalPtr = Mloadheader->Group[ GroupsVisible[ g ] ].Portal;
-	
+
 		for( Count = 0; Count < PortalCnt; Count++ )
 		{
 			PolyPtr = PortalPtr->Poly;
@@ -1141,10 +1141,10 @@ bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, i
 	{
 		return false;
 	}
-   		
+
 	memmove(BufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
-   
-   
+
+
 
 	if (!(FSUnlockVertexBuffer(&Portal_Execs[ Num_Portal_Execs ])))
 	{
@@ -1217,7 +1217,7 @@ struct
 	|                 |     |
 	|     |           |     |
 	|     |           |     |
-	0      -------8-  |  -- 
+	0      -------8-  |  --
 	|    /            2    /
 	|   4             |   /
 	|  /              |  7
@@ -1350,7 +1350,7 @@ int PlaneToCubeIntersectionShape( VECTOR * min_ptr, VECTOR * max_ptr, VECTOR * v
 	float	x, y, z;
 	int		i, count;
 	int		side;
-	
+
 	// Code.
 
 	for( i = 0; i < 12; i++ )
@@ -1469,7 +1469,7 @@ VECTOR	BoxOffsets[ 24 ] = {
    	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
    	{ -BOXSIZE,  BOXSIZE, -BOXSIZE },
    	{ -BOXSIZE, -BOXSIZE, -BOXSIZE },
-   						  
+
    	{ -BOXSIZE, -BOXSIZE,  BOXSIZE },
    	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
    	{  BOXSIZE, -BOXSIZE,  BOXSIZE },
@@ -1490,7 +1490,7 @@ VECTOR	BoxOffsets[ 24 ] = {
 };
 
 void CreateLineBox( void )
-{ 
+{
 	int16_t	Count;
 	u_int16_t	line;
 	VECTOR	StartPos;
@@ -1527,7 +1527,7 @@ void CreateLineBox( void )
 }
 
 void KillBoxLines( void )
-{ 
+{
 	int16_t	Count;
 
 	for( Count = 0; Count < 12; Count++ )
@@ -1760,7 +1760,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 		{
 
 			// Calculate distance from each pin to the intersecting plane.
-	
+
 			pin_ptr = first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
@@ -1768,12 +1768,12 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 											pin_ptr->y * space_ptr->Normal.y +
 											pin_ptr->z * space_ptr->Normal.z +
 														 space_ptr->Offset );
-	
+
 				pin_ptr = pin_ptr->next_ptr;
 			}
-	
+
 			// Create intersection points.
-	
+
 			pin_ptr = first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
@@ -1782,68 +1782,68 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 				{
 					next_pin_ptr = first_pin_ptr;
 				}
-	
+
 				// We've got a pair of points. See if there is an intersection.
-	
+
 				if( ( pin_ptr->dist < 0 && next_pin_ptr->dist >= 0 ) || ( pin_ptr->dist >= 0 && next_pin_ptr->dist < 0 ) )
 				{
 					// Grab new structure.
-	
+
 					if( NULL != first_free_pin_ptr )
 					{
 						new_pin_ptr = first_free_pin_ptr;
 						first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-	
+
 						// Set up new structure.
-	
+
 						front_portion = pin_ptr->dist / ( pin_ptr->dist - next_pin_ptr->dist );
 						back_portion = 1 - front_portion;
-	
+
 						new_pin_ptr->x = next_pin_ptr->x * front_portion + pin_ptr->x * back_portion;
 						new_pin_ptr->y = next_pin_ptr->y * front_portion + pin_ptr->y * back_portion;
 						new_pin_ptr->z = next_pin_ptr->z * front_portion + pin_ptr->z * back_portion;
 						new_pin_ptr->dist = 0.0F;
-	
+
 						// Link it into the list.
-	
+
 						new_pin_ptr->next_ptr = pin_ptr->next_ptr;
 						pin_ptr->next_ptr = new_pin_ptr;
-	
+
 						// Ensure the new point is skipped.
-	
+
 						pin_ptr = new_pin_ptr;
 					}
 				}
-	
+
 				pin_ptr = pin_ptr->next_ptr;
 			}
-	
+
 			// Remove dead points.
-	
+
 			pin_ptr = first_pin_ptr;
 			prev_pin_ptr_ptr = &first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
-	
+
 				if( pin_ptr->dist < 0 )
 				{
 					// Remove from list.
-	
+
 					*prev_pin_ptr_ptr = pin_ptr->next_ptr;
-	
+
 					// Add to free list.
-	
+
 					pin_ptr->next_ptr = first_free_pin_ptr;
 					first_free_pin_ptr = pin_ptr;
 				}
 				else
 				{
 					// Keep in list.
-	
+
 					prev_pin_ptr_ptr = &pin_ptr->next_ptr;
 				}
-	
+
 				pin_ptr = next_pin_ptr;
 			}
 		}
@@ -2066,7 +2066,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 		{
 
 			// Calculate distance from each pin to the intersecting plane.
-	
+
 			pin_ptr = first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
@@ -2074,12 +2074,12 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 											pin_ptr->y * space_ptr->normal.y +
 											pin_ptr->z * space_ptr->normal.z +
 														 space_ptr->offset );
-	
+
 				pin_ptr = pin_ptr->next_ptr;
 			}
-	
+
 			// Create intersection points.
-	
+
 			pin_ptr = first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
@@ -2088,68 +2088,68 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 				{
 					next_pin_ptr = first_pin_ptr;
 				}
-	
+
 				// We've got a pair of points. See if there is an intersection.
-	
+
 				if( ( pin_ptr->dist < 0 && next_pin_ptr->dist >= 0 ) || ( pin_ptr->dist >= 0 && next_pin_ptr->dist < 0 ) )
 				{
 					// Grab new structure.
-	
+
 					if( NULL != first_free_pin_ptr )
 					{
 						new_pin_ptr = first_free_pin_ptr;
 						first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-	
+
 						// Set up new structure.
-	
+
 						front_portion = pin_ptr->dist / ( pin_ptr->dist - next_pin_ptr->dist );
 						back_portion = 1 - front_portion;
-	
+
 						new_pin_ptr->x = next_pin_ptr->x * front_portion + pin_ptr->x * back_portion;
 						new_pin_ptr->y = next_pin_ptr->y * front_portion + pin_ptr->y * back_portion;
 						new_pin_ptr->z = next_pin_ptr->z * front_portion + pin_ptr->z * back_portion;
 						new_pin_ptr->dist = 0.0F;
-	
+
 						// Link it into the list.
-	
+
 						new_pin_ptr->next_ptr = pin_ptr->next_ptr;
 						pin_ptr->next_ptr = new_pin_ptr;
-	
+
 						// Ensure the new point is skipped.
-	
+
 						pin_ptr = new_pin_ptr;
 					}
 				}
-	
+
 				pin_ptr = pin_ptr->next_ptr;
 			}
-	
+
 			// Remove dead points.
-	
+
 			pin_ptr = first_pin_ptr;
 			prev_pin_ptr_ptr = &first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
-	
+
 				if( pin_ptr->dist < 0 )
 				{
 					// Remove from list.
-	
+
 					*prev_pin_ptr_ptr = pin_ptr->next_ptr;
-	
+
 					// Add to free list.
-	
+
 					pin_ptr->next_ptr = first_free_pin_ptr;
 					first_free_pin_ptr = pin_ptr;
 				}
 				else
 				{
 					// Keep in list.
-	
+
 					prev_pin_ptr_ptr = &pin_ptr->next_ptr;
 				}
-	
+
 				pin_ptr = next_pin_ptr;
 			}
 		}
@@ -2360,7 +2360,7 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 		{
 
 			// Calculate distance from each pin to the intersecting plane.
-	
+
 			pin_ptr = first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
@@ -2368,12 +2368,12 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 											pin_ptr->y * space_ptr->Normal.y +
 											pin_ptr->z * space_ptr->Normal.z +
 														 space_ptr->PlaneOffset );
-	
+
 				pin_ptr = pin_ptr->next_ptr;
 			}
-	
+
 			// Create intersection points.
-	
+
 			pin_ptr = first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
@@ -2382,68 +2382,68 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 				{
 					next_pin_ptr = first_pin_ptr;
 				}
-	
+
 				// We've got a pair of points. See if there is an intersection.
-	
+
 				if( ( pin_ptr->dist < 0 && next_pin_ptr->dist >= 0 ) || ( pin_ptr->dist >= 0 && next_pin_ptr->dist < 0 ) )
 				{
 					// Grab new structure.
-	
+
 					if( NULL != first_free_pin_ptr )
 					{
 						new_pin_ptr = first_free_pin_ptr;
 						first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-	
+
 						// Set up new structure.
-	
+
 						front_portion = pin_ptr->dist / ( pin_ptr->dist - next_pin_ptr->dist );
 						back_portion = 1 - front_portion;
-	
+
 						new_pin_ptr->x = next_pin_ptr->x * front_portion + pin_ptr->x * back_portion;
 						new_pin_ptr->y = next_pin_ptr->y * front_portion + pin_ptr->y * back_portion;
 						new_pin_ptr->z = next_pin_ptr->z * front_portion + pin_ptr->z * back_portion;
 						new_pin_ptr->dist = 0.0F;
-	
+
 						// Link it into the list.
-	
+
 						new_pin_ptr->next_ptr = pin_ptr->next_ptr;
 						pin_ptr->next_ptr = new_pin_ptr;
-	
+
 						// Ensure the new point is skipped.
-	
+
 						pin_ptr = new_pin_ptr;
 					}
 				}
-	
+
 				pin_ptr = pin_ptr->next_ptr;
 			}
-	
+
 			// Remove dead points.
-	
+
 			pin_ptr = first_pin_ptr;
 			prev_pin_ptr_ptr = &first_pin_ptr;
 			while( NULL != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
-	
+
 				if( pin_ptr->dist < 0 )
 				{
 					// Remove from list.
-	
+
 					*prev_pin_ptr_ptr = pin_ptr->next_ptr;
-	
+
 					// Add to free list.
-	
+
 					pin_ptr->next_ptr = first_free_pin_ptr;
 					first_free_pin_ptr = pin_ptr;
 				}
 				else
 				{
 					// Keep in list.
-	
+
 					prev_pin_ptr_ptr = &pin_ptr->next_ptr;
 				}
-	
+
 				pin_ptr = next_pin_ptr;
 			}
 		}

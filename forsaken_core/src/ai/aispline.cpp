@@ -99,7 +99,7 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 
 	Distance = DistanceVector2Vector( &Node2->Pos , &Node3->Pos );
 	Time = (Distance / (EnemyTypes[Enemy->Type].MaxMoveRate * 0.65F) );
-	
+
 	Distance = 0.0F;
 	Count = 0;
 	do
@@ -114,12 +114,12 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 			Node1 = (NODE*)Enemy->SplineNode1;
 			Node2 = (NODE*)Enemy->SplineNode2;
 			Node3 = (NODE*)Enemy->SplineNode3;
-			
+
 			Enemy->Timer = ((Enemy->Timer - 1.0F) * Time);
 			Distance = DistanceVector2Vector( &Node2->Pos , &Node3->Pos );
 			Time = (Distance / (EnemyTypes[Enemy->Type].MaxMoveRate*0.65F) );
 			Enemy->Timer /= Time;
-			
+
 			Enemy->SplineNode4 = (void*) FindSuitableSplineNodeRandom( Enemy->Object.NodeNetwork ,Node3 , Node1 , Node2 , Node3 , NULL );
 			Node4 = (NODE*)Enemy->SplineNode4;
 			/* Defensive: FindSuitableSplineNodeRandom can return NULL.
@@ -133,8 +133,8 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 				return;
 			}
 		}
-	
-		
+
+
 		TempPos = Enemy->Object.Pos;
 
 		spline(&Enemy->Object.Pos, Enemy->Timer, &Node1->Pos, &Node2->Pos, &Node3->Pos, &Node4->Pos);
@@ -143,7 +143,7 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 		Count++;
 
 	}while( ( Distance < WantedDistance ) && (Count < 100) );
-	
+
 
 	AI_THINK( Enemy , true , true);
 
@@ -152,7 +152,7 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 		Enemy->PrimaryFireTimer -= framelag;
 		if( Enemy->PrimaryFireTimer < 0.0F )
 			Enemy->PrimaryFireTimer = 0.0F;
-		
+
 		if(Enemy->PrimaryFireTimer == 0.0F)
 		{
 			if( !Enemy->TShip )

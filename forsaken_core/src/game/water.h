@@ -57,7 +57,7 @@ typedef struct WATEROBJECT{
 	int		YVerts;
 	int		XVerts;
 	int		num_of_verts;
-	float *	Verts;				// Y positions...		
+	float *	Verts;				// Y positions...
 	float *	Vels;				// Y Velocities..
 
 	float	Red;

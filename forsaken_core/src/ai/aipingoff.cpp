@@ -47,7 +47,7 @@ void AI_AIR_DEATH_PINGOFF( ENEMY * Enemy )
 		KillUsedEnemy( Enemy );
 		return;
 	}
-	
+
 	Enemy->Object.ExternalForce.x += (Enemy->LastDamageDir.x * (EnemyTypes[Enemy->Type].MoveRateAccell * Enemy->LastDamageSpeed) * framelag) * ( ( 1.0F/PINGOFFTIME )*Enemy->Timer);
 	Enemy->Object.ExternalForce.y += (Enemy->LastDamageDir.y * (EnemyTypes[Enemy->Type].MoveRateAccell * Enemy->LastDamageSpeed) * framelag) * ( ( 1.0F/PINGOFFTIME )*Enemy->Timer);
 	Enemy->Object.ExternalForce.z += (Enemy->LastDamageDir.z * (EnemyTypes[Enemy->Type].MoveRateAccell * Enemy->LastDamageSpeed) * framelag) * ( ( 1.0F/PINGOFFTIME )*Enemy->Timer);

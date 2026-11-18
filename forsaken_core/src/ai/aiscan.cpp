@@ -48,7 +48,7 @@ void AI_AIR_SCAN( ENEMY * Enemy )
 	{
   		TObject = (OBJECT*)Tinfo->TObject;
 		dist = DistanceVector2Vector( &Enemy->Object.Pos , &Tinfo->Pos ) + SoundInfo[Enemy->Object.Group][TObject->Group];
-		
+
 		if( AI_InViewCone( &Enemy->Object.Pos , &Enemy->Object.Mat , &TObject->Pos, Enemy->Viewcone ) || ( (dist <= EnemyTypes[Enemy->Type].Behave.HearRange) && TObject->Noise ) )
 		{
 			if( AI_ClearLOS( &Enemy->Object.Pos , Enemy->Object.Group , &TObject->Pos ) )
@@ -70,12 +70,12 @@ void AI_AIR_SCAN( ENEMY * Enemy )
 
 	// Switch to AIMODE_IDLE
 	AI_SetIDLE( Enemy );
-   
+
 }
 
 /*===================================================================
 	Procedure	:	AI for a turret while its SCANNING..
-	Input		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void AI_TURRET_SCAN( ENEMY * Enemy )
@@ -94,13 +94,13 @@ void AI_TURRET_SCAN( ENEMY * Enemy )
 		if( Enemy->AIFlags & AI_ANYPLAYERINRANGE )
 		{
 			SET_TARGET_PLAYERS;
-			
+
 			AI_GetDistToNearestTarget( Enemy );
-			
+
 			switch( Tinfo->TFlags )
 			{
 			case _TARGET_PLAYERS:
-				
+
 				TObject = (OBJECT*)Tinfo->TObject;
 				if( AI_InViewCone( &Enemy->Object.Pos ,&Enemy->Object.Mat , &TObject->Pos, Enemy->Viewcone ) )
 				{
@@ -118,7 +118,7 @@ void AI_TURRET_SCAN( ENEMY * Enemy )
 				Enemy->Object.AI_Mode = AIMODE_IDLE;
 				Enemy->Timer  =	RESET_IDLE_TIME;
 				break;
-				
+
 			}
 		}else{
 			Enemy->Object.AI_Mode = AIMODE_IDLE;
@@ -129,7 +129,7 @@ void AI_TURRET_SCAN( ENEMY * Enemy )
 
 /*===================================================================
 	Procedure	:	AI for a Crawling Enemy while its SCANNING..
-	Input		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void AI_CRAWL_SCAN( ENEMY * Enemy )
@@ -139,12 +139,12 @@ void AI_CRAWL_SCAN( ENEMY * Enemy )
 	{
 		return;
 	}
-	
+
 	if ( Enemy->Timer )
 	{
 		Enemy->Timer -= framelag;
 
-      
+
 		if ( Enemy->Timer < 0.0F )
 		{
 			//------------------------------------------------------------------------------
@@ -152,9 +152,9 @@ void AI_CRAWL_SCAN( ENEMY * Enemy )
 			//------------------------------------------------------------------------------
 			Enemy->Object.AI_Mode = AIMODE_IDLE;
 			Enemy->Timer  =	RESET_SCAN_TIME + (float) Random_Range( (u_int16_t) RESET_SCAN_TIME );
-			return;         
+			return;
 		}
-	}         
+	}
 
 
 }

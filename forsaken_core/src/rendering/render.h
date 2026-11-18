@@ -34,8 +34,8 @@ typedef struct {
     DWORD       Height;       /* Viewport Dimensions */
     float       MinZ;         /* Min/max of clip Volume */
     float       MaxZ;
-    float	ScaleX; 
-    float	ScaleY; 
+    float	ScaleX;
+    float	ScaleY;
 } render_viewport_t;
 
 typedef struct {

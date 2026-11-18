@@ -38,7 +38,7 @@
  */
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 #include <stdio.h>
 #include "game/main.h"
@@ -70,7 +70,7 @@ constexpr int MXA_VERSION_NUMBER = 2;
 
 
 /*===================================================================
-		Globals...	
+		Globals...
 ===================================================================*/
 /* Allocated with ModelHeaders by PreInitModel; see models.cpp. */
 MXALOADHEADER *MxaModelHeaders = NULL;
@@ -201,8 +201,8 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mxaloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mxaloadheader->Group[group].originalVerts[mesh], &LVert[0], sizeof(LVERTEX) * num_vertices);//memcpy
-	
-			
+
+
 			num_texture_groups = in.u16();
 			Mxaloadheader->Group[group].num_texture_groups[mesh] = num_texture_groups;
 
@@ -273,7 +273,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
 				tpage = in.u16();
 				num_triangles = in.u16();
-	
+
 				Mxaloadheader->Group[group].texture_group_vert_off[mesh][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
 
 				/* the index buffer holds every triangle in order, so StoreTriangles copies it from the start */
@@ -324,14 +324,14 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			if (StoreTriangles)
 			{	Mxaloadheader->Group[group].num_polys_per_mesh[mesh] = /*num_triangles*/triangleCount;
-				Mxaloadheader->Group[group].poly_ptr[mesh] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);			
-			
+				Mxaloadheader->Group[group].poly_ptr[mesh] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);
+
 				memmove(Mxaloadheader->Group[group].poly_ptr[mesh], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
 			}
 			else
 			{
 				Mxaloadheader->Group[group].num_polys_per_mesh[mesh] = 0;
-				Mxaloadheader->Group[group].poly_ptr[mesh] = NULL;			
+				Mxaloadheader->Group[group].poly_ptr[mesh] = NULL;
 			}
 
 			if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh])))
@@ -357,7 +357,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 		}
 	}
-				
+
 
 	// is there any vispoly info..... (any other value is not consumed: it
 	// is read again below as the fire point flag)
@@ -365,7 +365,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	{
 		in.skip( sizeof( u_int16_t ) );
 /*===================================================================
- *		Particular Stuff Related Anims	
+ *		Particular Stuff Related Anims
 ===================================================================*/
 		Mxaloadheader->num_frames = in.u16();
 
@@ -430,7 +430,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			Mxaloadheader->frame_pnts = NULL;
 		}
 	}
-	
+
 /*===================================================================
 	Point Direction Data
 ===================================================================*/
@@ -495,7 +495,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Colour = in.u32();
 
 				strcpy( (char*)&SFXFilename[ 0 ], in.cstring() );
-				
+
 				if( SpotFXPtr->Type == SPOTFX_SoundFX )
 				{
 					if( ( SpotFXPtr->ActiveDelay == 0.0F ) && ( SpotFXPtr->InactiveDelay == 0.0F ) )
@@ -631,7 +631,7 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 		free( Mxaloadheader->OrgAddr );
 		Mxaloadheader->OrgAddr = NULL;
 	}
-	
+
 	if( Mxaloadheader->SpotFX && Mxaloadheader->NumSpotFX )
 	{
 		free( Mxaloadheader->SpotFX );
@@ -685,7 +685,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 	Mxaloadheader->state = false;
 	Mxaloadheader->Buffer = NULL;
 
-	File_Size = Get_File_Size( Filename );	
+	File_Size = Get_File_Size( Filename );
 
 	if( !File_Size )
 	{
@@ -728,14 +728,14 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 		Msg( "PreMxaload() Too many textures in mxamodel\n%s\n", Filename );
 		return false;
 	}
-	
+
 	if ( Mxaloadheader->num_texture_files !=0)
 	{
 		/*	put the filenames in the tex struct	*/
 		for( i = 0;	 i < Mxaloadheader->num_texture_files; i++)
 		{
 			strcpy( Mxaloadheader->ImageFile[i], in.cstring() );
-	
+
 			if( LevelSpecific )
 				GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mxaloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 			else
@@ -743,7 +743,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 
 			if (Mxaloadheader->AllocateTPage & LOAD_TPAGES)
 				Mxaloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[0] , true ,false, 0, 0 );
-			
+
 			if( Mxaloadheader->TloadIndex[i] == -1 )
 			{
 				Msg( "PreMxaload() Too many TPages\n" );
@@ -759,7 +759,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 
 /*===================================================================
 	Procedure	:		Interp between frames for MXA Anim...
-	Input		:		MXALOADHEADER * Mxaloadheader 
+	Input		:		MXALOADHEADER * Mxaloadheader
 				:		int FrameFrom, int FrameTo , float Interp
 	Output		:		FALSE/true
 ===================================================================*/
@@ -788,7 +788,7 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 			{
 				return false;
 			}
-		
+
 			for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[mesh] ; texgroup++)
 			{
 				/* A mesh's vertex list starts with the 8 corners of its
@@ -807,7 +807,7 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 
 				OrigLVert = ( LVERTEX *) ( (char*) Mxaloadheader->Group[group].originalVerts[mesh] + ( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[mesh][texgroup]));
 				OrigLVert += 8;
-				
+
 				FromVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[FromFrame][group][mesh][texgroup];
 				ToVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[ToFrame][group][mesh][texgroup];
 
@@ -848,6 +848,6 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 			}
 		}
 	}
-	
+
 	return true;
 }

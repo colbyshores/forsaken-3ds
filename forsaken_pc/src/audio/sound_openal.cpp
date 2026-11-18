@@ -53,7 +53,7 @@ struct sound_source_t {
 static ALCdevice* Device = NULL;
 static ALCcontext* Context = NULL;
 
-static void print_info ( void ) 
+static void print_info ( void )
 {
 	ALint version_major, version_minor;
 	ALenum error;
@@ -65,28 +65,28 @@ static void print_info ( void )
 	DebugPrintf("EAX2.0 support = %s\n",
 		alIsExtensionPresent("EAX2.0")?"true":"false");
 
-	if(alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT") == AL_TRUE) 
+	if(alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT") == AL_TRUE)
 	{
 		DebugPrintf("default playback: %s\n",alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER));
 		DebugPrintf("default capture: %s\n",alcGetString(NULL, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
-		{	
+		{
 			// print all playback devices
 			const char * s = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
 			while(s && *s != '\0')
 			{
-				DebugPrintf("playback: %s\n", s); 
+				DebugPrintf("playback: %s\n", s);
 				s += strlen(s)+1;
 			}
 			// print all capture devices
 			s = alcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER);
 			while(s && *s != '\0')
-			{ 
-				DebugPrintf("capture: %s\n", s); 
+			{
+				DebugPrintf("capture: %s\n", s);
 				s += strlen(s)+1;
 			}
 		}
-	} 
-	else 
+	}
+	else
 		DebugPrintf("No device enumeration available\n");
 
 	DebugPrintf("Default device: %s\n", alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER));
@@ -99,7 +99,7 @@ static void print_info ( void )
 
 	alcGetIntegerv(device, ALC_MAJOR_VERSION, 1, &version_major);
 	alcGetIntegerv(device, ALC_MINOR_VERSION, 1, &version_minor);
-	
+
 	if ((error = alGetError()) != AL_NO_ERROR)
 		DebugPrintf("error:  :%s\n", alGetString(error));
 
@@ -188,7 +188,7 @@ bool sound_listener_velocity( float x, float y, float z )
 	return true;
 }
 
-bool sound_listener_orientation( 
+bool sound_listener_orientation(
 	float fx, float fy, float fz, // forward vector
 	float ux, float uy, float uz  // up vector
 )

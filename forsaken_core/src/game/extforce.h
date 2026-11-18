@@ -22,7 +22,7 @@ constexpr int EXTERNALFORCEINACTIVE = 1;
 constexpr int EXTERNALFORCETYPE_Move = 0;
 constexpr int EXTERNALFORCETYPE_Shield = 1;
 constexpr int EXTERNALFORCETYPE_Shake = 2;
- 
+
 /*
  * Structures
  */

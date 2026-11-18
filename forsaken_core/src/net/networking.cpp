@@ -303,10 +303,10 @@ void SendANormalUpdate( void )
 	{
 		ShortGlobalShip.Flags = BuildShipFlags(WhoIAm);
 
-		ShortGlobalShip.GroupImIn	= (BYTE) Ships[WhoIAm].Object.Group;    // 
+		ShortGlobalShip.GroupImIn	= (BYTE) Ships[WhoIAm].Object.Group;    //
 		ShortGlobalShip.Pos			= Ships[WhoIAm].Object.Pos		;	  // x , y , z position
 		ShortGlobalShip.Move_Off	= Ships[WhoIAm].Move_Off;	  // Last Movement..x , y , z
-		ShortGlobalShip.Quat		= Ships[WhoIAm].Object.Quat;	  // Final inverse view Quat.......after banking.. 
+		ShortGlobalShip.Quat		= Ships[WhoIAm].Object.Quat;	  // Final inverse view Quat.......after banking..
 		ShortGlobalShip.Status		= MyGameStatus;
 		ShortGlobalShip.Angle		= Ships[WhoIAm].Object.Angle;
 		ShortGlobalShip.Bank			= (int16_t) (Ships[ WhoIAm ].Object.Bank * SHORTBANKMODIFIER);
@@ -315,7 +315,7 @@ void SendANormalUpdate( void )
 	else
 	{
 		VeryShortGlobalShip.Flags = BuildShipFlags(WhoIAm);
-		VeryShortGlobalShip.GroupImIn			= (BYTE) Ships[WhoIAm].Object.Group;    // 
+		VeryShortGlobalShip.GroupImIn			= (BYTE) Ships[WhoIAm].Object.Group;    //
 		VeryShortGlobalShip.Pos.x					= (int16_t) Ships[WhoIAm].Object.Pos.x;
 		VeryShortGlobalShip.Pos.y					= (int16_t) Ships[WhoIAm].Object.Pos.y;
 		VeryShortGlobalShip.Pos.z					= (int16_t) Ships[WhoIAm].Object.Pos.z;
@@ -338,7 +338,7 @@ void SendANormalUpdate( void )
 	}
 }
 
- 
+
 void NetworkGameUpdate()
 {
 	int i;
@@ -355,13 +355,13 @@ void NetworkGameUpdate()
 	else
 	{
 		ReceiveGameMessages();
-	
+
 		// if health changed, notify other players
         if( Ships[WhoIAm].Object.Hull != PrevHull || Ships[WhoIAm].Object.Shield != PrevShield )
         {
             SendGameMessage(MSG_SHIPHEALTH, 0, 0, 0, 0);
-			PrevHull = Ships[WhoIAm].Object.Hull; 
-			PrevShield = Ships[WhoIAm].Object.Shield; 
+			PrevHull = Ships[WhoIAm].Object.Hull;
+			PrevShield = Ships[WhoIAm].Object.Shield;
         }
 
 		// Update each bike's health colour timer
@@ -371,18 +371,18 @@ void NetworkGameUpdate()
 			if( ShipHealthColourInterval[i] <= 0.0F )
 				ShipHealthColour[i] = YELLOW; // default
 		}
-	
+
 		if( ( Ships[WhoIAm].Object.Flags & ( SHIP_PrimFire | SHIP_SecFire | SHIP_MulFire ) ) )
 		{
 			if( !UseShortPackets )
 			{
 				FShortGlobalShip.Flags					= BuildShipFlags(WhoIAm);
-				FShortGlobalShip.GroupImIn				= (BYTE) Ships[WhoIAm].Object.Group;    // 
+				FShortGlobalShip.GroupImIn				= (BYTE) Ships[WhoIAm].Object.Group;    //
 				FShortGlobalShip.Primary				= PrimaryToFireLookup[ Ships[WhoIAm].Primary ];
 				FShortGlobalShip.Secondary				= SecondaryToFireLookup[ Ships[WhoIAm].Secondary ];
 				FShortGlobalShip.Pos					= Ships[WhoIAm].Object.Pos		;	  // x , y , z position
 				FShortGlobalShip.Move_Off				= Ships[WhoIAm].Move_Off;	  // Last Movement..x , y , z
-				FShortGlobalShip.Quat					= Ships[WhoIAm].Object.Quat;// Final inverse view Quat.......after banking.. 
+				FShortGlobalShip.Quat					= Ships[WhoIAm].Object.Quat;// Final inverse view Quat.......after banking..
 				FShortGlobalShip.PrimPowerLevel			= (BYTE) Ships[ WhoIAm ].PrimPowerLevel;
 				FShortGlobalShip.Angle					= Ships[ WhoIAm ].Object.Angle;
 				FShortGlobalShip.Bank					= (int16_t) (Ships[ WhoIAm ].Object.Bank * SHORTBANKMODIFIER);
@@ -394,7 +394,7 @@ void NetworkGameUpdate()
 			else
 			{
 				FVeryShortGlobalShip.Flags				= BuildShipFlags(WhoIAm);
-				FVeryShortGlobalShip.GroupImIn			= (BYTE) Ships[WhoIAm].Object.Group;    // 
+				FVeryShortGlobalShip.GroupImIn			= (BYTE) Ships[WhoIAm].Object.Group;    //
 				FVeryShortGlobalShip.Pos.x				= (int16_t) Ships[WhoIAm].Object.Pos.x;
 				FVeryShortGlobalShip.Pos.y				= (int16_t) Ships[WhoIAm].Object.Pos.y;
 				FVeryShortGlobalShip.Pos.z				= (int16_t) Ships[WhoIAm].Object.Pos.z;
@@ -415,7 +415,7 @@ void NetworkGameUpdate()
 				FVeryShortGlobalShip.Primary			= PrimaryToFireLookup[ Ships[WhoIAm].Primary ];
 				FVeryShortGlobalShip.Secondary			= SecondaryToFireLookup[ Ships[WhoIAm].Secondary ];
 				FVeryShortGlobalShip.PrimPowerLevel		= (BYTE) Ships[ WhoIAm ].PrimPowerLevel;
-				
+
 				/* As written since 1998, SHIP_MulFire is always set here; the
 				 * evident intent is Flags & (SHIP_SecFire | SHIP_MulFire). It is
 				 * on the wire, so changing it is a protocol decision (owner). */
@@ -423,7 +423,7 @@ void NetworkGameUpdate()
 			}
 			Ships[ WhoIAm ].Object.Flags &=  ~( SHIP_PrimFire | SHIP_SecFire | SHIP_MulFire );
 			Interval = NetUpdateInterval;
-		
+
 		}
 		else
 		{
@@ -443,10 +443,10 @@ void NetworkGameUpdate()
 			HostDuties = false;
 			// If someone has joined or somebody requests it then send everyone a stats update
 			if( IsHost == true )
-			{			
+			{
 				for( i = 0 ; i < MAX_PLAYERS ; i++ )
 				{
-					if( ( i != WhoIAm ) && (GameStatus[i] == STATUS_Joining ) ) 
+					if( ( i != WhoIAm ) && (GameStatus[i] == STATUS_Joining ) )
 					{
 						if( Ships[i].RegenSlots != 0 )
 						{
@@ -454,7 +454,7 @@ void NetworkGameUpdate()
 							HostDuties = true;
 							Ships[i].RegenSlots = 0;
 						}
-						else if( Ships[i].Triggers != 0 ) 
+						else if( Ships[i].Triggers != 0 )
 						{
 							SendGameMessage( MSG_SHORTTRIGGER, 0, (BYTE) i, 0, 0 );
 							HostDuties = true;
@@ -505,7 +505,7 @@ void NetworkGameUpdate()
 				AddColourMessageToQue( SystemMessageColour, "SHOOTER NOW DECIDES COLLISIONS" );
 			else if(ColPerspective == COLPERS_Descent)
 				AddColourMessageToQue( SystemMessageColour, "TARGET NOW DECIDES COLLISIONS" );
-					
+
 		}
 		// changed short packets
 		if ( OldUseShortPackets != UseShortPackets )
@@ -516,7 +516,7 @@ void NetworkGameUpdate()
 				AddColourMessageToQue( SystemMessageColour, "SHORT PACKETS ENABLED" );
 			else
 				AddColourMessageToQue( SystemMessageColour, "SHORT PACKETS DISABLED" );
-				
+
 		}
 	}
 }
@@ -580,7 +580,7 @@ void TitanBitsSend( u_int16_t OwnerType, u_int16_t Owner, u_int16_t BulletID, u_
 
 void	IHitYou( BYTE you, float Damage, VECTOR * Recoil, VECTOR * Point, VECTOR * Dir, float Force, BYTE WeaponType, BYTE Weapon, bool FramelagRecoil )
 {
-	VECTOR	Recoil_Off;		
+	VECTOR	Recoil_Off;
 	if( Ships[ you ].Object.Mode != LIMBO_MODE )
 	{
 		if( !UseShortPackets )
@@ -813,7 +813,7 @@ void SetupNetworkGame()
     memset(&PlayerHealths,  0,              sizeof(PlayerHealths));
     memset(&ShipHealthColourInterval, 0.0F, sizeof(ShipHealthColourInterval));
 
-	
+
 	for(i=0; i<(MAX_PLAYERS+1); i++)
 	{
 		// everyone starts off normal....
@@ -849,7 +849,7 @@ void SetupNetworkGame()
 		Ships[i].Object.BobCount = 0.0F;
 
 		for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = INDEX_NONE;
-	
+
 		InitScoreSortTab((int) i);
 
         PlayerHealths[i].WhoIAm = i;
@@ -867,7 +867,7 @@ void InitShipStructure( int i , bool ResetScore )
 
 	Ships[i].BikeNum = ( i % MAXBIKETYPES );
 	Ships[i].ShieldHullCount = 0;
-	
+
 	Ships[i].Object.Type = OBJECT_TYPE_SHIP;
 	Ships[i].Object.Mode = NORMAL_MODE;
 	Ships[i].Object.Bank = 0.0F;
@@ -878,12 +878,12 @@ void InitShipStructure( int i , bool ResetScore )
 	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[i].OrbModels[ Count ] = INDEX_NONE;
 	Ships[i].NumMultiples = 0;
 	Ships[i].Object.Quat.MakeEuler(0.0F, 0.0F, 0.0F);
-	
+
 	Ships[i].Object.Pos.x = 0.0F;;
 	Ships[i].Object.Pos.y = 0.0F;;
 	Ships[i].Object.Pos.z = 0.0F;;
 	Ships[i].Object.Group = 0;
-	
+
 	Ships[i].enable = 0;
 
 	Ships[i].Object.Mat = TempMatrix;
@@ -902,7 +902,7 @@ void InitShipStructure( int i , bool ResetScore )
 
 	PrevHull = 0;
 	PrevShield = 0;
-	
+
 	if( ResetScore )
 		ResetIndividualStats(i); // (stats.cpp)
 
@@ -920,7 +920,7 @@ void DestroyGame( void )
 
 	if( PlayDemo )
 		return;
-	
+
 	MyGameStatus = STATUS_Left;
 	IsHost = false;
 
@@ -1064,7 +1064,7 @@ void network_event_player_left( network_player_t * player )
 		for( i = 0 ; i < MAX_PLAYERS ; i++ )
 		{
 			if( ( i != WhoIAm ) && (player == Ships[i].network_player) )
-			{	
+			{
 				if( MyGameStatus == STATUS_Normal )
 	   				AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[i][0] , HAS_LEFT_THE_GAME );
 
@@ -1141,7 +1141,7 @@ void network_event_new_host( network_player_t * player )
 void network_event_player_joined( network_player_t * player )
 {
 	DebugPrintf("network_event_player_joined\n");
-	
+
 	// we have joined the game
 	if( player == NULL )
 	{
@@ -1324,13 +1324,13 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					ShipHealthColour[ShipHealthMsg->WhoIAm] = GREEN;
 					ShipHealthColourInterval[ShipHealthMsg->WhoIAm] = 30.0F;
 				}
-				
+
 				PlayerHealths[ShipHealthMsg->WhoIAm].Hull = ShipHealthMsg->Hull;
 				PlayerHealths[ShipHealthMsg->WhoIAm].Shield = ShipHealthMsg->Shield;
 			}
 			return;
 	}
-     
+
 	// check if it's a valid packet
 
 	if( ! msg_is_valid( *MsgPnt ) )
@@ -1374,10 +1374,10 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 		// make sure player id is a valid player
 
-		if ( 
+		if (
 			*MsgPnt != MSG_HEREIAM && // player id not valid yet
 			*MsgPnt != MSG_INIT && *MsgPnt != MSG_STATUS && *MsgPnt != MSG_LONGSTATUS && // will add to following structures
-			(GameStatus[id] == STATUS_Left || GameStatus[id] == STATUS_LeftCrashed || GameStatus[id] == STATUS_Null) 
+			(GameStatus[id] == STATUS_Left || GameStatus[id] == STATUS_LeftCrashed || GameStatus[id] == STATUS_Null)
 		){
 			DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) for using inactive player id: %d\n",
 				from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, id );
@@ -1439,7 +1439,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	// set flag sfx volume
 	FlagVolume = FlagSfxSlider.value / ( FlagSfxSlider.max / GLOBAL_MAX_SFX );
-	
+
 	if( *(MsgPnt+1) < MAX_PLAYERS )
 	{
 		timer_run( &LastPacketTime[*(MsgPnt+1)] );
@@ -1452,7 +1452,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	}
 
-	
+
 	if( MyGameStatus == STATUS_GetPlayerNum )
  		if ( *MsgPnt != MSG_INIT )
 			return;
@@ -1701,7 +1701,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[VeryShortFUpdateMsg->WhoIAm].Object.Pos.z		= (float) VeryShortFUpdateMsg->ShortGlobalShip.Pos.z;
 			Ships[VeryShortFUpdateMsg->WhoIAm].Move_Off.x		= (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off.x * ONEOVER32767) * (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 );
 			Ships[VeryShortFUpdateMsg->WhoIAm].Move_Off.y		= (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off.y * ONEOVER32767) * (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 );
-			Ships[VeryShortFUpdateMsg->WhoIAm].Move_Off.z		= (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off.z * ONEOVER32767) * (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 ); 
+			Ships[VeryShortFUpdateMsg->WhoIAm].Move_Off.z		= (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off.z * ONEOVER32767) * (VeryShortFUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 );
 			Ships[VeryShortFUpdateMsg->WhoIAm].Object.Group	= (int16_t) VeryShortFUpdateMsg->ShortGlobalShip.GroupImIn;
 			Ships[VeryShortFUpdateMsg->WhoIAm].Object.Quat.w	= (float)(VeryShortFUpdateMsg->ShortGlobalShip.Quat.w * ONEOVER32767 );
 			Ships[VeryShortFUpdateMsg->WhoIAm].Object.Quat.x	= (float)(VeryShortFUpdateMsg->ShortGlobalShip.Quat.x * ONEOVER32767 );
@@ -1716,13 +1716,13 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[VeryShortFUpdateMsg->WhoIAm].PrimPowerLevel = (float) VeryShortFUpdateMsg->ShortGlobalShip.PrimPowerLevel;
 			Ships[VeryShortFUpdateMsg->WhoIAm].JustRecievedPacket = true;
 			Ships[VeryShortFUpdateMsg->WhoIAm].Object.Noise		= 1.0F;
-			
+
 
 			// Need This for missiles to work....
 			SetShipBankAndMat( &Ships[VeryShortFUpdateMsg->WhoIAm].Object );
-			
+
 			if( ( Ships[ VeryShortFUpdateMsg->WhoIAm ].Object.Flags & SHIP_PrimFire ) || ( Ships[ VeryShortFUpdateMsg->WhoIAm ].Object.Flags & SHIP_MulFire ) )
-				FirePrimaryWeapons( VeryShortFUpdateMsg->WhoIAm );					// Fire Primary Weapons	
+				FirePrimaryWeapons( VeryShortFUpdateMsg->WhoIAm );					// Fire Primary Weapons
 			if( ( Ships[ VeryShortFUpdateMsg->WhoIAm ].Object.Flags & SHIP_SecFire ) )
 				FireSecondaryWeapons( VeryShortFUpdateMsg->WhoIAm );					// Fire Secondary Weapons
 
@@ -1785,12 +1785,12 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[GroupOnly_VeryShortFUpdateMsg->WhoIAm].Secondary			= GroupOnly_VeryShortFUpdateMsg->ShortGlobalShip.Secondary;
 			Ships[GroupOnly_VeryShortFUpdateMsg->WhoIAm].PrimPowerLevel	= (float) GroupOnly_VeryShortFUpdateMsg->ShortGlobalShip.PrimPowerLevel;
 			Ships[GroupOnly_VeryShortFUpdateMsg->WhoIAm].Object.Noise		= 1.0F;
-			
+
 			// Need This for missiles to work....
 			SetShipBankAndMat( &Ships[GroupOnly_VeryShortFUpdateMsg->WhoIAm].Object );
-			
+
 			if( ( Ships[ GroupOnly_VeryShortFUpdateMsg->WhoIAm ].Object.Flags & SHIP_PrimFire ) || ( Ships[ GroupOnly_VeryShortFUpdateMsg->WhoIAm ].Object.Flags & SHIP_MulFire ) )
-				FirePrimaryWeapons( GroupOnly_VeryShortFUpdateMsg->WhoIAm );					// Fire Primary Weapons	
+				FirePrimaryWeapons( GroupOnly_VeryShortFUpdateMsg->WhoIAm );					// Fire Primary Weapons
 			if( ( Ships[ GroupOnly_VeryShortFUpdateMsg->WhoIAm ].Object.Flags & SHIP_SecFire ) )
 				FireSecondaryWeapons( GroupOnly_VeryShortFUpdateMsg->WhoIAm );					// Fire Secondary Weapons
 
@@ -1859,7 +1859,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				Ships[VeryShortUpdateMsg->WhoIAm].Object.Pos.z		= (float) VeryShortUpdateMsg->ShortGlobalShip.Pos.z;
 				Ships[VeryShortUpdateMsg->WhoIAm].Move_Off.x		= (VeryShortUpdateMsg->ShortGlobalShip.Move_Off.x * ONEOVER32767) * (VeryShortUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 );
 				Ships[VeryShortUpdateMsg->WhoIAm].Move_Off.y		= (VeryShortUpdateMsg->ShortGlobalShip.Move_Off.y * ONEOVER32767) * (VeryShortUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 );
-				Ships[VeryShortUpdateMsg->WhoIAm].Move_Off.z		= (VeryShortUpdateMsg->ShortGlobalShip.Move_Off.z * ONEOVER32767) * (VeryShortUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 ); 
+				Ships[VeryShortUpdateMsg->WhoIAm].Move_Off.z		= (VeryShortUpdateMsg->ShortGlobalShip.Move_Off.z * ONEOVER32767) * (VeryShortUpdateMsg->ShortGlobalShip.Move_Off_Scalar * ONEOVER256 );
 				Ships[VeryShortUpdateMsg->WhoIAm].Object.Group		= (int16_t) VeryShortUpdateMsg->ShortGlobalShip.GroupImIn;
 				Ships[VeryShortUpdateMsg->WhoIAm].Object.Quat.w	= (float)(VeryShortUpdateMsg->ShortGlobalShip.Quat.w * ONEOVER32767 );
 				Ships[VeryShortUpdateMsg->WhoIAm].Object.Quat.x		= (float)(VeryShortUpdateMsg->ShortGlobalShip.Quat.x * ONEOVER32767 );
@@ -1874,7 +1874,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 				if( VeryShortUpdateMsg->ShortGlobalShip.Flags & SHIP_IsHost  )
 					OverallGameStatus = VeryShortUpdateMsg->ShortGlobalShip.Status;
-				
+
 
 				if( ( ( OldMode == DEATH_MODE ) && ( Ships[VeryShortUpdateMsg->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
 					( ( OldMode == NORMAL_MODE ) && ( Ships[VeryShortUpdateMsg->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
@@ -1883,7 +1883,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					PlayPannedSfx( SFX_BikeExplode, Ships[ VeryShortUpdateMsg->WhoIAm ].Object.Group , &Ships[VeryShortUpdateMsg->WhoIAm].Object.Pos, 0.0F );
 					StopTaunt();
 				}
-				
+
 				if( ( ( OldMode == LIMBO_MODE ) && ( Ships[VeryShortUpdateMsg->WhoIAm].Object.Mode == NORMAL_MODE ) )
 					|| ( ( OldStatus != STATUS_Normal) && (GameStatus[VeryShortUpdateMsg->WhoIAm] == STATUS_Normal ) ) )
 				{
@@ -2014,9 +2014,9 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			// Need This for missiles to work....
 			SetShipBankAndMat( &Ships[FUpdateMsg->WhoIAm].Object );
 			Ships[FUpdateMsg->WhoIAm].Object.Noise = 1.0F;
-			
+
 			if( ( Ships[ FUpdateMsg->WhoIAm ].Object.Flags & SHIP_PrimFire ) || ( Ships[ FUpdateMsg->WhoIAm ].Object.Flags & SHIP_MulFire ) )
-				FirePrimaryWeapons( FUpdateMsg->WhoIAm );					// Fire Primary Weapons	
+				FirePrimaryWeapons( FUpdateMsg->WhoIAm );					// Fire Primary Weapons
 			if( ( Ships[ FUpdateMsg->WhoIAm ].Object.Flags & SHIP_SecFire ) )
 				FireSecondaryWeapons( FUpdateMsg->WhoIAm );					// Fire Secondary Weapons
 
@@ -2060,7 +2060,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		//
 		// Check if we are allowed in game
 		//
-		
+
 		WhoIAm	= InitMsg->YouAre;
 		DebugPrintf("MSG_INIT: Host says my player id is: %d\n",WhoIAm);
 
@@ -2068,7 +2068,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		// tells us we are not allowed in game and reason
 		if( WhoIAm >= MAX_PLAYERS )
 			return;
-		
+
 		//
 		// Check if we have the level
 		//
@@ -2146,7 +2146,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			GoalScore = InitMsg->GoalScore;
 
 		if ( CTF )
-		{					
+		{
 			switch ( InitMsg->CTF_Type )
 			{
 			case CTF_STANDARD:
@@ -2391,7 +2391,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	// Someone is claiming to have hit me...
     case MSG_SHORTSHIPHIT:
-		
+
    		ShortShipHitMsg = (SHORTSHIPHITMSG *)MsgPnt;
 
 		if( ShortShipHitMsg->You == WhoIAm )
@@ -2401,7 +2401,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Point.z = ShortShipHitMsg->ShipHit.Point.z + Ships[ WhoIAm ].Object.Pos.z;
 			Recoil.x = (ShortShipHitMsg->ShipHit.Recoil.x * ONEOVER32767) * (ShortShipHitMsg->ShipHit.Recoil_Scalar * ONEOVER256 );
 			Recoil.y = (ShortShipHitMsg->ShipHit.Recoil.y * ONEOVER32767) * (ShortShipHitMsg->ShipHit.Recoil_Scalar * ONEOVER256 );
-			Recoil.z = (ShortShipHitMsg->ShipHit.Recoil.z * ONEOVER32767) * (ShortShipHitMsg->ShipHit.Recoil_Scalar * ONEOVER256 ); 
+			Recoil.z = (ShortShipHitMsg->ShipHit.Recoil.z * ONEOVER32767) * (ShortShipHitMsg->ShipHit.Recoil_Scalar * ONEOVER256 );
 			Force = ShortShipHitMsg->ShipHit.Force;
 			Dir.x = (float)(ShortShipHitMsg->ShipHit.Dir.x * ONEOVER32767);
 			Dir.y = (float)(ShortShipHitMsg->ShipHit.Dir.y * ONEOVER32767);
@@ -2485,7 +2485,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 		// print a message reflecting the weapon
 		GetDeathString( ShipDiedMsg->WeaponType, ShipDiedMsg->Weapon, &methodstr[0] );
-		
+
 		// if you killed them
 		if( WhoIAm == ShipDiedMsg->WhoKilledMe )
 		{
@@ -2512,13 +2512,13 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 						{
 							// you killed the person who was carrying the bounty
 							if ( Ships[ ShipDiedMsg->WhoIAm ].Object.Flags & SHIP_CarryingBounty )
-								AddColourMessageToQue( KillMessageColour, "%s %s %s %s" "%s", 
+								AddColourMessageToQue( KillMessageColour, "%s %s %s %s" "%s",
 									"YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], WITH_THE_BOUNTY, "WITH ", &methodstr[0] );
 							// you had the bounty and killed someone
 							else
 								AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s",
 									"YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
-							
+
 							PlaySfx( SFX_BIKER_VP, 1.0F );
 							AddKill();
 							// update stats 8 (stats.cpp) -- you killed someone in a team bounty game
@@ -2539,7 +2539,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 						AddKill();
 						// update stats 9 (stats.cpp) -- you killed someone in a team game
 						UpdateKillStats(WhoIAm, ShipDiedMsg->WhoIAm, ShipDiedMsg->WeaponType, ShipDiedMsg->Weapon);
-						
+
 						if ( !Random_Range( 4 ) )
 							PlaySfx( SFX_BIKER_VP, 1.0F );
 					}
@@ -2559,7 +2559,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 						// you had the bounty and killed someone
 						else
 							AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
-						
+
 						PlaySfx( SFX_BIKER_VP, 1.0F );
 						AddKill();
 						// update stats 10 (stats.cpp) -- you killed someone in a bounty game
@@ -2578,8 +2578,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
    					// you killed someone
 					AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
 					AddKill();
-					// update stats 2 (stats.cpp) -- you killed someone 
-					UpdateKillStats(WhoIAm,ShipDiedMsg->WhoIAm,ShipDiedMsg->WeaponType,ShipDiedMsg->Weapon); 
+					// update stats 2 (stats.cpp) -- you killed someone
+					UpdateKillStats(WhoIAm,ShipDiedMsg->WhoIAm,ShipDiedMsg->WeaponType,ShipDiedMsg->Weapon);
 					if ( !Random_Range( 4 ) )
 						PlaySfx( SFX_BIKER_VP, 1.0F );
 				}
@@ -2587,7 +2587,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		}
 		// if you were not who killed them
 		else
-		{				
+		{
 			if( ShipDiedMsg->WhoIAm == ShipDiedMsg->WhoKilledMe )
 			{
 				// gee someone killed themselves...
@@ -2619,7 +2619,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		if ( !STATUS_VALID_PLAYER(GameStatus[StatusMsg->WhoIAm]) && STATUS_VALID_PLAYER(StatusMsg->Status) )
 			reset_tracker();
 
-		if( ( GameStatus[StatusMsg->WhoIAm] != STATUS_Normal) && (StatusMsg->Status == STATUS_Normal ) ) 
+		if( ( GameStatus[StatusMsg->WhoIAm] != STATUS_Normal) && (StatusMsg->Status == STATUS_Normal ) )
 			CreateReGen( StatusMsg->WhoIAm );
 
 		GameStatus[StatusMsg->WhoIAm] = StatusMsg->Status;
@@ -2648,7 +2648,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
    				{
 					BYTE tempstatus;
 					Ships[StatusMsg->WhoIAm].Object.Flags |= SHIP_IsHost;
-					
+
 					// its a status change from the Host...
 					tempstatus = OverallGameStatus;
    					OverallGameStatus = StatusMsg->Status;
@@ -2720,7 +2720,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		if ( !STATUS_VALID_PLAYER(GameStatus[LongStatusMsg->WhoIAm]) && STATUS_VALID_PLAYER(LongStatusMsg->Status.Status) )
 			reset_tracker();
 
-		if( ( GameStatus[LongStatusMsg->WhoIAm] != STATUS_Normal) && (LongStatusMsg->Status.Status == STATUS_Normal ) ) 
+		if( ( GameStatus[LongStatusMsg->WhoIAm] != STATUS_Normal) && (LongStatusMsg->Status.Status == STATUS_Normal ) )
 			CreateReGen( LongStatusMsg->WhoIAm );
 
 		GameStatus[LongStatusMsg->WhoIAm]			= LongStatusMsg->Status.Status;
@@ -2730,7 +2730,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		Ships[LongStatusMsg->WhoIAm].Mines			= LongStatusMsg->Status.Mines;
 		Ships[LongStatusMsg->WhoIAm].Triggers		= LongStatusMsg->Status.Triggers;
 		Ships[LongStatusMsg->WhoIAm].TrigVars		= LongStatusMsg->Status.TrigVars;
-		
+
 		if( !IsHost )
    		{
    			if( LongStatusMsg->Status.IsHost )
@@ -3177,7 +3177,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 			for( i = 0; i < MAX_PLAYERS; i++ )
 				if(	! (GameStatus[i] == STATUS_Left || GameStatus[i] == STATUS_LeftCrashed || GameStatus[i] == STATUS_Null) )
 					player_count++;
-			
+
 			DebugPrintf("MSG_INIT: current player_count %d\n",player_count);
 
 			if( player_count >= MaxPlayersSlider.value )
@@ -3234,7 +3234,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 			TeamNumber[new_player_id]			= 0;							// starts off on team zero
 			Ships[new_player_id].network_player	= to;							// save network pointer
 			set_player_name( new_player_id, to->name );							// copy in their name
-			
+
 			//
 			// the current game state is saved and propagated to the player over the next few frames
 			// this is why you see the screen that says, "mines left, pickups left, etc..."
@@ -3242,7 +3242,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 			if(	MyGameStatus == STATUS_Normal ) // should this be here? maybe this info isn't ready unless in game already?
 			{
-				CopyPickups(	(u_int16_t) new_player_id );					
+				CopyPickups(	(u_int16_t) new_player_id );
 				CopyRegenSlots( (u_int16_t) new_player_id );
 				CopyTriggers(	(u_int16_t) new_player_id );
 				CopyTrigVars(	(u_int16_t) new_player_id );
@@ -3286,7 +3286,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 		strncpy( InitMsg->LevelName, ShortLevelNames[NewLevelNum], sizeof( InitMsg->LevelName ) - 1 );
 		InitMsg->LevelName[ sizeof( InitMsg->LevelName ) - 1 ] = 0;						// level we are on
-       
+
 		break;
 
 
@@ -3316,7 +3316,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 	// following 3 pkts are bullet pkts
 	// they also contain the player position information
 	// so they must be sent on the player position channel
-	
+
 	// BUG: we should really break apart fire updates and position updates
 	// InitOnePrimBull() and InitOneSecBull() support sending over network
 	// probably just use those and turn off the f updates...
@@ -3469,7 +3469,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
     case MSG_SHIPHIT:
     	DebugPrintf("net_msg: MSG_SHIPHIT\n");
-		
+
         ShipHitMsg = (SHIPHITMSG *)&CommBuff[0];
         ShipHitMsg->MsgCode = msg;
         ShipHitMsg->You = ShipNum;
@@ -3540,11 +3540,11 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		StatusMsg->Status					= MyGameStatus;
 		StatusMsg->TeamNumber				= TeamNumber[WhoIAm];
 		StatusMsg->IAmReady					= PlayerReady[WhoIAm];
-		StatusMsg->Pickups					= Ships[WhoIAm].Pickups;	 
+		StatusMsg->Pickups					= Ships[WhoIAm].Pickups;
 		StatusMsg->RegenSlots				= Ships[WhoIAm].RegenSlots;
-		StatusMsg->Mines						= Ships[WhoIAm].Mines;		 
-		StatusMsg->Triggers					= Ships[WhoIAm].Triggers;	 
-		StatusMsg->TrigVars					= Ships[WhoIAm].TrigVars;	 
+		StatusMsg->Mines						= Ships[WhoIAm].Mines;
+		StatusMsg->Triggers					= Ships[WhoIAm].Triggers;
+		StatusMsg->TrigVars					= Ships[WhoIAm].TrigVars;
 		nBytes = sizeof( STATUSMSG );
 		flags |= NETWORK_RELIABLE;
         break;
@@ -3575,10 +3575,10 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		LongStatusMsg->Status.Status			= MyGameStatus;
 		LongStatusMsg->Status.TeamNumber		= TeamNumber[WhoIAm];
 		LongStatusMsg->Status.IAmReady		= PlayerReady[WhoIAm];
-		LongStatusMsg->Status.Pickups		= Ships[WhoIAm].Pickups;	 
+		LongStatusMsg->Status.Pickups		= Ships[WhoIAm].Pickups;
 		LongStatusMsg->Status.RegenSlots		= Ships[WhoIAm].RegenSlots;
-		LongStatusMsg->Status.Mines			= Ships[WhoIAm].Mines;		 
-		LongStatusMsg->Status.Triggers		= Ships[WhoIAm].Triggers;	 
+		LongStatusMsg->Status.Mines			= Ships[WhoIAm].Mines;
+		LongStatusMsg->Status.Triggers		= Ships[WhoIAm].Triggers;
 		LongStatusMsg->Status.TrigVars		= Ships[WhoIAm].TrigVars;
 		strncpy( &LongStatusMsg->LevelName[0], &ShortLevelNames[NewLevelNum][0], sizeof( LongStatusMsg->LevelName ) - 1 );
 		LongStatusMsg->LevelName[ sizeof( LongStatusMsg->LevelName ) - 1 ] = 0;
@@ -3669,7 +3669,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		TextMsg = (TEXTMSG *)&CommBuff[0];
         TextMsg->MsgCode	= msg;
         TextMsg->WhoIAm	= WhoIAm;
-        
+
 		switch( Type )
 		{
 			case TEXTMSGTYPE_Taunt1:
@@ -3782,7 +3782,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 // goto send if you want to break out of the switch
 send:
-	
+
 	// only record if message is sent to whole of the group....
 
 	BytesPerSecSent += nBytes;
@@ -3857,7 +3857,7 @@ int FindSameLevel( char * Name )
 	int i;
     for (i = 0; i < NumLevels; i++)
 	{
-		if( strcasecmp( (char*) &ShortLevelNames[i][0] , Name ) == 0 ) 
+		if( strcasecmp( (char*) &ShortLevelNames[i][0] , Name ) == 0 )
 		{
 			return i;
 		}

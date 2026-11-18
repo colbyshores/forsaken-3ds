@@ -1,7 +1,7 @@
 
 
 /*===================================================================
-		Include Files...	
+		Include Files...
 ===================================================================*/
 #include <stdio.h>
 
@@ -68,8 +68,8 @@ bool ExternalForcesLoad( char * Filename )
 	{
 		ExternalForcesGroupLink[i] = NULL;
 	}
-	
-	File_Size = Get_File_Size( Filename );	
+
+	File_Size = Get_File_Size( Filename );
 	if( !File_Size )
 	{
 		// dont need External Forces..
@@ -207,7 +207,7 @@ bool ExternalForcesAreaCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Grou
 	bool	OnehasEffectedMe = false;
 
 	EFpnt = ExternalForcesGroupLink[Group];
-	
+
 	while( EFpnt )
 	{
 		if( EFpnt->Status == EXTERNALFORCEACTIVE )
@@ -263,7 +263,7 @@ void DisplayExternalForcesInGroup( u_int16_t Group )
 	if( !ShowEFZones ) return;
 
 	EFpnt = ExternalForcesGroupLink[Group];
-	
+
 	while( EFpnt )
 	{
 		if( EFpnt->Status == EXTERNALFORCEACTIVE )

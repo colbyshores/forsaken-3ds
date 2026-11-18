@@ -61,10 +61,10 @@ bool GoalLoad( void )
 
 	if ( !CaptureTheFlag && !CTF )
 		return true;
-	
+
 	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], (char*)NewExt );
 
-	File_Size = Get_File_Size( (char*)Filename );	
+	File_Size = Get_File_Size( (char*)Filename );
 
 	if( !File_Size ) return true;
 
@@ -88,7 +88,7 @@ bool GoalLoad( void )
 	}
 
 	NumGoals = in.u16();
-	Goal = (GOAL *) calloc( NumGoals, sizeof( GOAL ) );	
+	Goal = (GOAL *) calloc( NumGoals, sizeof( GOAL ) );
 	if ( !Goal )
 	{
 		NumGoals = 0;
@@ -136,7 +136,7 @@ bool GoalLoad( void )
 		}
 		GoalPnt++;
 	}
-	
+
 	free( OrgBuffer );
 
 	for ( j = 0; j < MAX_TEAMS; j++ )
@@ -227,13 +227,13 @@ bool GenerateFlagAtHome( int team )
 			GOAL *goal;
 			u_int16_t i;
 			VECTOR Dir = { 0.0F, 0.0F, 0.0F };
-			
+
 			goal = &Goal[ j ];
 			i = InitOnePickup( &goal->pos, goal->group,
 				&Dir, 0.0F, TeamFlagPickup[ team ], WhoIAm,
 				++Ships[WhoIAm].PickupIdCount, -1, true,
 				-1.0F, INDEX_NONE );
-			
+
 			if( ( i != INDEX_NONE )  && ( i != (u_int16_t) -2 ) )
 			{
 				DropPickupSend( &goal->pos, goal->group,
@@ -371,7 +371,7 @@ void ProcessGoals( void )
 	}
 	for ( k = 0; k < MAX_PLAYERS; k++ )
 	{
-		if ( ( ( GameStatus[ k ] == MyGameStatus && !PlayDemo ) 
+		if ( ( ( GameStatus[ k ] == MyGameStatus && !PlayDemo )
 			|| ( GameStatus[ k ] == STATUS_Normal && PlayDemo ) )
 			&& TeamNumber[ k ] < MAX_TEAMS )
 		{
@@ -474,7 +474,7 @@ int GoalCheckTeam( VECTOR * OldPos , VECTOR * NewPos, u_int16_t Group, int team 
 			&& ( Goal[ j ].group == Group || GroupsAreConnected( Goal[ j ].group, Group ) ) )
 		{
 			GoalCheck( OldPos , NewPos , &Goal[ j ] );
-			
+
 			if( Entry )
 			{
 				if ( Goal[ j ].team == team )

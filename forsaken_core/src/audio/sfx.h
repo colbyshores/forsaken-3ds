@@ -243,18 +243,18 @@ enum {
 	/************************************************
 	Biker
 	*************************************************/
-	SFX_BIKER_GP, //	-	general         
-	SFX_BIKER_VP, //	-	victory         
-	SFX_BIKER_LP, //	-	losing          
-	SFX_BIKER_BW, //	-	big weapon gain 
-	SFX_BIKER_LE, //	-	low energy      
-	SFX_BIKER_TN, //	-	taunt           
+	SFX_BIKER_GP, //	-	general
+	SFX_BIKER_VP, //	-	victory
+	SFX_BIKER_LP, //	-	losing
+	SFX_BIKER_BW, //	-	big weapon gain
+	SFX_BIKER_LE, //	-	low energy
+	SFX_BIKER_TN, //	-	taunt
 	SFX_BikerPain,	//	-	pain
 	SFX_Die,	//	-	death
-	SFX_BIKER_EX, //	-	extra           
+	SFX_BIKER_EX, //	-	extra
 
 	/************************************************
-	Level Specific	
+	Level Specific
 	*************************************************/
 	SFX_LEVELSPEC_Start, //	-	level specific
 	SFX_LEVELSPEC_End = SFX_LEVELSPEC_Start + ( MAX_LEVELSPECIFIC_SFX - 1 ),

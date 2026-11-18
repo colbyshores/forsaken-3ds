@@ -54,7 +54,7 @@ void AI_EXOGENON_IDLE( ENEMY * Enemy )
 		SetCurAnimSeq( EXOGENONSEQ_Stop_Up, &Enemy->Object );
 		return;
 	}
-	
+
 	Enemy->Object.Pos = Exogenon_StartPos[0];
 	Enemy->Object.Pos.y += 256.0F * 10.0F;
 	if( !(Enemy->AIFlags & AI_ANYPLAYERINRANGE) )
@@ -83,7 +83,7 @@ void AI_EXOGENON_IDLE( ENEMY * Enemy )
 		i--;
 	}
 
-	
+
 	SetCurAnimSeq( EXOGENONSEQ_Move_Down, &Enemy->Object );
 	Enemy->Object.AI_Mode = AIMODE_EXOGENON_MOVEDOWN;
 }
@@ -149,7 +149,7 @@ void AI_EXOGENON_SCAN( ENEMY * Enemy )
 		ExogenonFireLeftRight( Enemy );
 		return;
 	}
-	
+
 	Enemy->Object.AI_Mode = AIMODE_EXOGENON_FIRE;
 	SetCurAnimSeq( EXOGENONSEQ_Fire, &Enemy->Object );
 	Enemy->Timer = 60.0F * 2.5F;
@@ -167,10 +167,10 @@ void AI_EXOGENON_FIRE( ENEMY * Enemy )
 	VECTOR		TempUpVector;
 	VECTOR		TempOffset = { 0.0F, 0.0F, 180.0F };
 	float		Distance;
-	
+
 
 	Enemy->Object.AnimSpeed = 1.0F;
-	
+
 	if( Enemy->Timer )
 	{
 		Enemy->Timer -= framelag;
@@ -192,7 +192,7 @@ void AI_EXOGENON_FIRE( ENEMY * Enemy )
 				NormaliseVector(&TempVector);
 
 				ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &TempUpVector );
-				
+
 				EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, EnemyTypes[Enemy->Type].PrimaryWeaponType,
 					Enemy->Object.Group, &Enemy->Object.Pos, &TempOffset, &TempVector, &TempUpVector,
 					EnemyTypes[Enemy->Type].PowerLevel, (EnemyTypes[Enemy->Type].PowerLevel +1) * 33.0F, false, NULL );
@@ -218,7 +218,7 @@ void AI_EXOGENON_MOVEUP( ENEMY * Enemy )
 	{
 		return;
 	}
-	
+
 	Enemy->Object.AI_Mode = AIMODE_EXOGENON_IDLE;
 	Enemy->Timer = 60.0F * ( 0.5F + Random_Range_Float( 0.5F ) );
 }
@@ -256,7 +256,7 @@ void AI_EXOGENON_SWEEP( ENEMY * Enemy )
 		ExogenonAim( Enemy );
 
 	}
-	
+
 	if( Enemy->Object.Animating )
 	{
 		return;

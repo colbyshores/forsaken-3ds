@@ -208,7 +208,7 @@ void CrossProduct( VECTOR * a, VECTOR * b, VECTOR * ab )
 				:	VECTOR * b
 	Output		:	float		Dot Product
 ===================================================================*/
-float DotProduct( VECTOR * a , VECTOR * b ) 
+float DotProduct( VECTOR * a , VECTOR * b )
 {
 	return( ( a->x * b->x ) +
 		    ( a->y * b->y ) +
@@ -279,9 +279,9 @@ void NormaliseVector( VECTOR *  v )
 				:	VECTOR	*  VECTOR
 	Output		:	float		Dot Product
 ===================================================================*/
-float VectorLength( VECTOR * v ) 
+float VectorLength( VECTOR * v )
 {
-	return( (float) sqrtf( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) ) ); 
+	return( (float) sqrtf( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) ) );
 }
 
 /*===================================================================
@@ -290,12 +290,12 @@ float VectorLength( VECTOR * v )
 				:	VECTOR	*  VECTOR
 	Output		:	float		Dot Product
 ===================================================================*/
-float DistanceVert2Vector( VERT *  a , VECTOR * b ) 
+float DistanceVert2Vector( VERT *  a , VECTOR * b )
 {
 	float x;
 	float y;
 	float z;
-	
+
 	x = a->x - b->x;
 	y = a->y - b->y;
 	z = a->z - b->z;
@@ -475,17 +475,17 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 		rotx._12 = -( axis->x * axis->y ) / ( xz * xyz );
 		rotx._13 = -( axis->z / xz );
 		rotx._14 = 0.0F;
-		
+
 		rotx._21 = ( axis->y / xyz );
 		rotx._22 = ( xz / xyz );
 		rotx._23 = 0.0F;
 		rotx._24 = 0.0F;
-		
+
 		rotx._31 = ( axis->z / xyz );
 		rotx._32 = -( axis->y * axis->z ) / ( xz * xyz );
 		rotx._33 = ( axis->x / xz );
 		rotx._34 = 0.0F;
-		
+
 		rotx._41 = 0.0F;
 		rotx._42 = 0.0F;
 		rotx._43 = 0.0F;
@@ -497,17 +497,17 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
 		rotx._12 = -( axis->y / xyz );
 		rotx._13 = 0.0F;
 		rotx._14 = 0.0F;
-		
+
 		rotx._21 = ( axis->y / xyz );
 		rotx._22 = 0.0F;
 		rotx._23 = 0.0F;
 		rotx._24 = 0.0F;
-		
+
 		rotx._31 = 0.0F;
 		rotx._32 = 0.0F;
 		rotx._33 = 1.0F;
 		rotx._34 = 0.0F;
-		
+
 		rotx._41 = 0.0F;
 		rotx._42 = 0.0F;
 		rotx._43 = 0.0F;
@@ -521,17 +521,17 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
    	rotangle._12 = 0.0F;
    	rotangle._13 = 0.0F;
    	rotangle._14 = 0.0F;
-   	
+
    	rotangle._21 = 0.0F;
    	rotangle._22 = c;
    	rotangle._23 = s;
    	rotangle._24 = 0.0F;
-   	
+
    	rotangle._31 = 0.0F;
    	rotangle._32 = -s;
    	rotangle._33 = c;
    	rotangle._34 = 0.0F;
-   	
+
    	rotangle._41 = 0.0F;
    	rotangle._42 = 0.0F;
    	rotangle._43 = 0.0F;
@@ -549,7 +549,7 @@ void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot )
  * and 1. p1, p2, p3, p4    Points defining spline curve. p, at parameter
  * t along the spline curve
  */
-void 
+void
 spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4)
 {
     float t2, t3, m1, m2, m3, m4;

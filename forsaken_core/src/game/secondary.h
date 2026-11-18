@@ -43,7 +43,7 @@ constexpr int MIS_HOMING = 3;
 constexpr int MIS_GRAVITY = 4;
 constexpr int MIS_SPIRALING = 5;
 constexpr int MIS_RETRACTTENTACLE = 6;
-									
+
 constexpr int MISMOVE_STRAIGHT = 0; // Movement types
 constexpr int MISMOVE_HOMING = 1;
 
@@ -149,7 +149,7 @@ typedef struct SECONDARYWEAPONATTRIB {
 typedef struct SECONDARYWEAPONBULLET {
 	bool	Used;
 
-	u_int16_t	Next;				// link list.....	
+	u_int16_t	Next;				// link list.....
 	u_int16_t	Prev;				// link list.....
 	struct SECONDARYWEAPONBULLET * NextInGroup;// Next in same group ....
 	struct SECONDARYWEAPONBULLET * PrevInGroup;// Previous in same group ....
@@ -176,7 +176,7 @@ typedef struct SECONDARYWEAPONBULLET {
 	VECTOR	Offset;
 	VECTOR	StartPos;			// where was i when initialised
 	VECTOR	StartDir;			// where was i looking when initialised
-	MATRIX	StartMat;		
+	MATRIX	StartMat;
 	VECTOR	ColStart;			// where I was when started going straight.
 	float	ColDist;			// Length from Collision to ColStart.
 	u_int16_t	ColFlag;			// have I checked if im going to collide with something

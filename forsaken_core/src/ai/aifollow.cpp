@@ -78,8 +78,8 @@ void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 		AI_SetKILLMINE( Enemy );
 		return;
 	}
-	
-	
+
+
 	if( ( TNode = (NODE*) Enemy->TNode ) )
 	{
 		if( !(Enemy->Object.NodeNetwork&TNode->NetMask) )
@@ -88,13 +88,13 @@ void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 			if( Enemy->Object.LastNearestNode )
 			{
 				TNode = (NODE*) ( Enemy->TNode = WhichNode( 1 , (NODE*)Enemy->Object.NearestNode , (NODE*)Enemy->Object.LastNearestNode ) );
-				
+
 				if( !TNode )
 				{
 					AI_SetSCAN( Enemy );
 					return;
 				}
-				
+
 				if( !AI_ClearLOSNonZero( &Enemy->Object, &TNode->Pos , EnemyTypes[Enemy->Type].Radius  ) )
 				{
 					// couldnt find a node that will take me to my target so go back to my nearest...
@@ -126,7 +126,7 @@ void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 
 		}
 
-		
+
 		if( DistanceVector2Vector( &Enemy->Object.Pos , &TNode->Pos ) < 64.0F )
 		{
 			Tinfo->Flags = 0;
@@ -147,20 +147,20 @@ void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 		if( !Enemy->AvoidTimer)
 		{
 			TNode = (NODE*)Enemy->Object.NearestNode;
-			if( (TNode->Flags&NODE_DROPMINES) && (EnemyTypes[Enemy->Type].Behave.Flags&AI_BEHAVIOUR_DROPMINES) ) 
+			if( (TNode->Flags&NODE_DROPMINES) && (EnemyTypes[Enemy->Type].Behave.Flags&AI_BEHAVIOUR_DROPMINES) )
 			{
 				Enemy->SecondaryFireTimer -= framelag;
 				if( Enemy->SecondaryFireTimer < 0.0F )
 					Enemy->SecondaryFireTimer = 0.0F;
-				
+
 				if( (Enemy->SecondaryFireTimer == 0.0F) )
 				{
 					Enemy->SecondaryFireTimer = EnemyTypes[Enemy->Type].SecondaryFireRate + (float) Random_Range( (u_int16_t) EnemyTypes[Enemy->Type].SecondaryFireRate );
 					//This is where we Lay Mines....
-					
+
 					ApplyMatrix( &Enemy->Object.Mat, &Forward, &TempForwardVector );
 					ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &TempUpVector );
-					
+
 					MineIndex = InitOneSecBull( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Enemy->Object.Group,
 								&Enemy->Object.Pos, &TempVector, &TempForwardVector, &TempUpVector,
 								&TempVector, EnemyTypes[Enemy->Type].SecondaryWeaponType, false );
@@ -196,7 +196,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 
 	if( Enemy->Timer < 0.0F )
 		Enemy->Timer = 0.0F;
-	
+
 	if(Enemy->Timer == 0.0F)
 	{
 		if( !(Enemy->AIFlags & AI_ICANSEEPLAYER ))
@@ -208,7 +208,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 		}
 		Enemy->Timer  =	RESET_VALIDATE_TIME + (float) Random_Range( (u_int16_t) RESET_VALIDATE_TIME );
 	}
-	
+
 	AI_UPDATEGUNS( Enemy );
 
 
@@ -221,7 +221,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 		Enemy->Object.AnimSpeed = 0.5F + ( ( Enemy->Object.Speed.z / EnemyTypes[Enemy->Type].MaxMoveRate ) * 2.0F );
 	}
 
-	
+
 	if( ( TNode = (NODE*) Enemy->TNode ) )
 	{
 
@@ -231,7 +231,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 			Enemy->AIMoveFlags |= AimData.Flags;
 			Enemy->AI_Angle = AimData.Angle;
 
- 
+
 			if( ( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_DONTSTOPANDTURN ) || ( (AimData.Angle.y < 10.0F) && (AimData.Angle.y > -10.0F) ) )
 			{
 				Enemy->AIMoveFlags |= AI_CONTROL_FORWARD;

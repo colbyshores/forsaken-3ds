@@ -203,7 +203,7 @@ void ProcessBGObjects( bool Collide )
 	BGOBJECT	*	Object;
 	BGOBJECT	*	NextObject;
 	VECTOR			PushVector;
-	bool			UndoAnim = false;	
+	bool			UndoAnim = false;
 
 	Object = FirstBGObjectUsed;
 
@@ -232,9 +232,9 @@ void ProcessBGObjects( bool Collide )
 
 				Object->OldOldTime = Object->OldTime;
 				Object->OldTime = Object->Time;
-		
+
 				switch( Object->State )
-				{	
+				{
 					case DOOR_OPENING:
 						Object->Time += ( framelag * Object->AnimSpeed );
 						if( Object->Time > Object->MidTime )
@@ -254,7 +254,7 @@ void ProcessBGObjects( bool Collide )
 							break;
 						}
 						break;
-			
+
 					case DOOR_REVERSEOPENING:
 						Object->Time -= ( framelag * Object->AnimSpeed );
 						if( Object->Time < 0.0F )
@@ -273,7 +273,7 @@ void ProcessBGObjects( bool Collide )
 							break;
 						}
 						break;
-		
+
 					case DOOR_OPEN:
 						Object->Timer -= ( framelag * Object->AnimSpeed );
 
@@ -290,7 +290,7 @@ void ProcessBGObjects( bool Collide )
 							break;
 						}
 						break;
-			
+
 					case DOOR_CLOSING:
 						Object->Time += ( framelag * Object->AnimSpeed );
 						if( Object->Time > Object->OverallTime )
@@ -305,7 +305,7 @@ void ProcessBGObjects( bool Collide )
 							}
 						}
 						break;
-			
+
 					case DOOR_REVERSECLOSING:
 						Object->Time -= ( framelag * Object->AnimSpeed );
 						if( Object->Time < Object->MidTime )
@@ -321,19 +321,19 @@ void ProcessBGObjects( bool Collide )
 							}
 						}
 						break;
-		
+
 					case DOOR_CLOSED:
 						Object->Time = 0.0F;
 						break;
-		
+
 					default:
 						break;
 				}
-		
+
 				if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
 				{
 					UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
-			
+
 					if( Object->Time != Object->OldTime )
 					{
 						Object->UpdateCount = 3;
@@ -913,7 +913,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 						Object->StateChangeDelay = ANIM_SECOND;
 						StartOrChangeDoorSoundFX( Object );
 						break;
-						
+
 					case DOOR_OPEN:
 						Object->State = DOOR_CLOSING;
 						if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
@@ -923,7 +923,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 
 					case DOOR_OPENING:
 						break;
-					
+
 					case DOOR_CLOSING:
 						Object->State = DOOR_REVERSECLOSING;
 						if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
@@ -1122,7 +1122,7 @@ bool PreLoadBGOFiles( void )
 		}
 
 		BGOFilesPtr = (BGO_FILE *) malloc( ( NumBGObjects + 1 ) * sizeof( BGO_FILE ) );
-		
+
 		if( BGOFilesPtr != NULL )
 		{
 			FilePtr = BGOFilesPtr;
@@ -1130,7 +1130,7 @@ bool PreLoadBGOFiles( void )
 			for( Count = 0; Count < NumBGObjects; Count++ )
 			{
 				i = 0;
-				
+
 				do
 				{
 					fread( &TempFilename[ i ], sizeof( int8_t ), 1, fp );
@@ -1248,7 +1248,7 @@ bool PreLoadBGOFiles( void )
 				        Msg( "PreloadBGOFiles() PreloadCompObj() failed on %s\n", &FilePtr->Filename[ 0 ] );
 						return( false );
 				}	}
-		
+
 				FilePtr++;
 			}
 
@@ -1287,7 +1287,7 @@ bool LoadBGOFiles( void )
 	if( BGOFilesPtr )
 	{
 		FilePtr = BGOFilesPtr;
-	
+
 		while( FilePtr->Filename[ 0 ] != 0 )
 		{
 			BaseModel = FilePtr->BaseModel;
@@ -1372,7 +1372,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 	MATRIX			TempMatrix;
 
 	Object = FindFreeBGObject();
-	
+
 	if( Object != NULL )
 	{
 		Object->State = DOOR_CLOSED;
@@ -1416,7 +1416,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->OpenedBy = OpenedBy;
 				Object->DoorSfxType = DoorSfxType;
 				break;
-	
+
 /*	LOOPING ANIM */
 
 			case BGOTYPE_Looping_Anim:
@@ -1560,7 +1560,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 		Object->AnimSpeed = 1.0F;
 		Object->UpdateCount = 3;
 		Object->SoundFX_ID = 0;
-	
+
 	   	TempQuat.FromDirAndUp(DirVector, UpVector);
 	   	TempQuat.ToMatrix(&Object->ColMatrix);
 		MatrixTranspose( &Object->ColMatrix, &Object->InvColMatrix );
@@ -1570,19 +1570,19 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 	   	TempMatrix._33 = 1.0F;
 	   	MatrixMultiply( &Object->ColMatrix, &TempMatrix, &Object->Matrix );
 		MatrixTranspose( &Object->Matrix, &Object->InvMatrix );
-	
+
 		TempMatrix = MATRIX_Identity;
 		TempMatrix._11 = 1.0F;
 		TempMatrix._22 = 1.0F;
 		TempMatrix._33 = 1.0F;
 		Object->InvScaleMatrix = TempMatrix;
-	
+
 	   	TempMatrix = MATRIX_Identity;
 	   	TempMatrix._11 = 1.0F;
 	   	TempMatrix._22 = 1.0F;
 	   	TempMatrix._33 = 1.0F;
 		Object->ScaleMatrix = TempMatrix;
-	
+
 		Object->NumChildren = 1;
 		Object->Children = LoadCompObj( Filename, Pos, DirVector, Group,
 				    &Object->OverallTime, &Object->MidTime, BaseModel, OWNER_BGOBJECT, Object->Index );
@@ -1859,13 +1859,13 @@ void OpenDoor( u_int16_t Index )
 		case DOOR_CLOSED:
 			Object->State = DOOR_OPENING;
 			break;
-						
+
 		case DOOR_OPEN:
 			break;
 
 		case DOOR_OPENING:
 			break;
-		
+
 		case DOOR_CLOSING:
 			Object->State = DOOR_REVERSECLOSING;
 			break;
@@ -1890,7 +1890,7 @@ void CloseDoor( u_int16_t Index )
 	{
 		case DOOR_CLOSED:
 			break;
-						
+
 		case DOOR_OPEN:
 			Object->State = DOOR_CLOSING;
 			break;
@@ -1898,7 +1898,7 @@ void CloseDoor( u_int16_t Index )
 		case DOOR_OPENING:
 			Object->State = DOOR_REVERSEOPENING;
 			break;
-		
+
 		case DOOR_CLOSING:
 			break;
 
@@ -2150,7 +2150,7 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 					}
 				}
 			}
-			
+
 			Enemy = NextEnemy;
 		}
 	}
@@ -2210,7 +2210,7 @@ bool CheckBGObjectToPickups( BGOBJECT * Object )
 				Pickup->ColFlag = 0;
 				NormaliseVector( &Pickup->Dir );
 
-				if( QCollide( &Pickup->Pos, Pickup->Group, &PushVector, PICKUP_MODEL_RADIUS, 
+				if( QCollide( &Pickup->Pos, Pickup->Group, &PushVector, PICKUP_MODEL_RADIUS,
 							  &ColPoint, &ColGroup, &ColNormal ) )
 				{
 					if( MyGameStatus == STATUS_SinglePlayer )			// Pickup being crushed!!!
@@ -2226,7 +2226,7 @@ bool CheckBGObjectToPickups( BGOBJECT * Object )
 					}
 				}
 			}
-			
+
 			Pickup = NextPickup;
 		}
 	}
@@ -2278,7 +2278,7 @@ bool CheckBGObjectToMines( BGOBJECT * Object )
 				default:
 					break;
 			}
-			
+
 			SecBull = NextSecBull;
 		}
 	}
@@ -2412,7 +2412,7 @@ FILE * SaveBGObjects( FILE * fp )
 		else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( FirstBGObjectFree != NULL ) fwrite( &FirstBGObjectFree->Index, sizeof( u_int16_t ), 1, fp );
 		else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		
+
 		for( i = 0; i < MAXBGOBJECTS; i++ )
 		{
 			fwrite( &BGObjects[ i ].State, sizeof( int16_t ), 1, fp );
@@ -2786,7 +2786,7 @@ void StartOrChangeDoorSoundFX( BGOBJECT * Object )
 			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartClosedSoundFX;
 			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosedSoundFX;
 			break;
-			
+
 		case DOOR_OPEN:
 			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartOpenSoundFX;
 			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpenSoundFX;
@@ -2796,7 +2796,7 @@ void StartOrChangeDoorSoundFX( BGOBJECT * Object )
 			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartOpeningSoundFX;
 			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpeningSoundFX;
 			break;
-		
+
 		case DOOR_CLOSING:
 			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartClosingSoundFX;
 			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosingSoundFX;

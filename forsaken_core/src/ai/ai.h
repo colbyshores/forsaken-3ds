@@ -51,7 +51,7 @@ enum
 	AIMODE_FOLLOWPATH,				// Follow node path
 	AIMODE_IDLE,					// Do nothing for a while
 	AIMODE_SCAN,					// Look around for a target
-	AIMODE_MOVETOTARGET,			// Move towards selected target   
+	AIMODE_MOVETOTARGET,			// Move towards selected target
 	AIMODE_FIRE,					// Fire at PLAYER
 	AIMODE_DOGFIGHT,				// Spar with the player		Move in swrily motion...
 	AIMODE_KILLMINE,				// Attack And kill a Mine....
@@ -64,7 +64,7 @@ enum
 
 	// No brain implements the modes from here down; nothing sets them.
 	AIMODE_DEATH_DEADINTHEWATER,	// Float or stop occasionally Spark or explode...
-	
+
 	AIMODE_STRAFE,					// Do a passing Run at the player firing as I go..
 	AIMODE_GETBEHIND,				// Get behind the player then start dog fighting him again...
 	AIMODE_AVOIDHOMING,				// Avoid a Homing Missile..
@@ -192,7 +192,7 @@ constexpr auto PINGOFFTIME = (ONE_SECOND * 3.0F);
 //--------------------------------------------------------------------------
 typedef struct PRIMARYWEAPONKNOWLEDGE{
 	float	MinDistance;		// How close should I get to make the weapon less effective....
-	float	AccuracyAngle;		// How accurate does the player have to be to hit me.... 
+	float	AccuracyAngle;		// How accurate does the player have to be to hit me....
 }PRIMARYWEAPONKNOWLEDGE;
 
 
@@ -208,7 +208,7 @@ typedef struct {
 	float			PosDist;								// Distance of 'Pos' from targetting SHIP
 	float			Nearest;								// Distance to nearest target
 	u_int32_t			Flags;								// Flags - see below
-	void	*		SObject;								// Pointer to targetting SHIP   
+	void	*		SObject;								// Pointer to targetting SHIP
 	void	*		TObject;								// Pointer to target
 	u_int32_t			TFlags;								// Flags - see below
 } TARGETDATA;
@@ -365,5 +365,5 @@ void AI_FLESHMORPH_STOPBACKWARD( ENEMY * Enemy );
 
 
 //--------------------------------------------------------------------------
- 
- 
+
+

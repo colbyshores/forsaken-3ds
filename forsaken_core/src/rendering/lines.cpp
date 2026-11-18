@@ -29,7 +29,7 @@ void InitLines( void )
 
 	FirstLineUsed = INDEX_NONE;
 	FirstLineFree = 0;
-	
+
 	for( i=0; i < MAXLINES; i++ )
 	{
 		Lines[i].StartPos.x = 0.0F;
@@ -62,7 +62,7 @@ u_int16_t FindFreeLine( void )
 
 	i = FirstLineFree;
 	if( i == INDEX_NONE ) return i;
- 
+
 	Lines[i].Prev = FirstLineUsed;
 
 	if ( FirstLineUsed != INDEX_NONE)
@@ -86,7 +86,7 @@ void KillUsedLine( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
-	
+
 	its_prev = Lines[ i ].Prev;
 	its_next = Lines[ i ].Next;
 
@@ -144,7 +144,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 			{
 				color = RGBA_MAKE( Lines[ i ].StartCol.R, Lines[ i ].StartCol.G,
 						      Lines[ i ].StartCol.B, Lines[ i ].StartTrans );
-	
+
 				Vert_Ptr->x = Lines[ i ].StartPos.x;
 				Vert_Ptr->y = Lines[ i ].StartPos.y;
 				Vert_Ptr->z = Lines[ i ].StartPos.z;
@@ -152,10 +152,10 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 				Vert_Ptr->tv = 0.0F;
 				Vert_Ptr->color = color;
 				Vert_Ptr++;
-	
+
 				color = RGBA_MAKE( Lines[ i ].EndCol.R, Lines[ i ].EndCol.G,
 						      Lines[ i ].EndCol.B, Lines[ i ].EndTrans );
-	
+
 				Vert_Ptr->x = Lines[ i ].EndPos.x;
 				Vert_Ptr->y = Lines[ i ].EndPos.y;
 				Vert_Ptr->z = Lines[ i ].EndPos.z;
@@ -176,10 +176,10 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 		FSUnlockVertexBuffer(renderObject);
 
 		*StartLine = i;
-		
-		if( Num_Lines == 0 ) 
+
+		if( Num_Lines == 0 )
 			return false;
-		
+
 		renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = Num_Lines; // one primitive per line
 		renderObject->textureGroups[renderObject->numTextureGroups].numVerts = Num_Lines * 2; // two verts per line
 		renderObject->textureGroups[renderObject->numTextureGroups].startVert = 0;
@@ -202,7 +202,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 				:	RENDEROBJECT *		renderObject (scratch batch)
 	Output		:	false if a draw fails
 ===================================================================*/
-bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject ) 
+bool ExecuteLines( u_int16_t group, RENDEROBJECT *renderObject )
 {
 	u_int16_t  i = 0;
 

@@ -53,7 +53,7 @@ bool IpOnCLI = false;
 
 MENU  *				GetPlayerNumMenu;
 
-u_int16_t	RandomStartPosModify = 0;							
+u_int16_t	RandomStartPosModify = 0;
 
 void SetUpGameSubType( int /*type*/ )
 {
@@ -87,7 +87,7 @@ void SetUpGameSubType( int /*type*/ )
 	}
 }
 
-void SetUpGameType( int type ) 
+void SetUpGameType( int type )
 {
 	TeamGame = false;
 	CTF = false;
@@ -96,7 +96,7 @@ void SetUpGameType( int type )
 	CanCarryOwnFlag			= false;
 	CaptureTheFlag = false;
 	BountyHunt = false;
-	
+
 	switch ( type )
 	{
 	case GAME_Normal:
@@ -165,7 +165,7 @@ void StartAHostSession ( MENUITEM * Item )
 	CopyOfSeed1 = Seed1;
 	CopyOfSeed2 = Seed2;
 
-	
+
 
 	IsHost = true;
 
@@ -201,7 +201,7 @@ void StartAHostSession ( MENUITEM * Item )
 				if( local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
 				sprintf(error_str, "%s %s %s %s",
-						"The selected port is in use or invalid.", 
+						"The selected port is in use or invalid.",
 						str,
 						"Disable the program using the port or",
 						"select a different local port under network options." );
@@ -227,7 +227,7 @@ void StartAHostSession ( MENUITEM * Item )
 	{
 		GameStatus[i] = STATUS_Null;
 	}
-	
+
 	WhoIAm = 0;								// I was the first to join...
 	Ships[WhoIAm].network_player = NULL;
 
@@ -237,7 +237,7 @@ void StartAHostSession ( MENUITEM * Item )
 		MenuChange( Item );
 
 	MyGameStatus = STATUS_StartingMultiplayer;
-	
+
 	Current_Camera_View = 0;				// set camera to that view
 	Ships[WhoIAm].Pickups = 0;
 	Ships[WhoIAm].RegenSlots = 0;
@@ -248,7 +248,7 @@ void StartAHostSession ( MENUITEM * Item )
 	set_my_player_name();
 
 	Ships[ WhoIAm ].BikeNum = ( SelectedBike % MAXBIKETYPES );
-	
+
 	NewLevelNum = LevelList.selected_item;	// I Select Which Level We Start on...
 
 	if( TimeLimit.value )
@@ -261,7 +261,7 @@ void StartAHostSession ( MENUITEM * Item )
 	}
 
 
-	
+
 	BrightShips = MyBrightShips;
 
 	return;
@@ -279,7 +279,7 @@ void GetPlayersInCurrentSession( MENUITEM * /*Item*/ )
 	PlayersList.items = 0;
 	PlayersList.top_item = 0;
 	PlayersList.selected_item = -1;
-	
+
 	NumOfPlayersSlider.value = 0;
 
 	for ( i = 0; i < MAX_PLAYERS; i++ )
@@ -313,7 +313,7 @@ void GoToSynchup ( MENUITEM * /*Item*/ )
 	}else{
 
 		if (CameraStatus != CAMERA_AtStart)
-		{	
+		{
 			LastMenu = CurrentMenu;
 			VduClear();
 		}
@@ -368,7 +368,7 @@ void InitTeamLists( MENU * /*Menu*/ )
 	TeamList[0] = PlayersList;
 	TeamList[0].selected_item = -1;
 	TeamList[0].display_items = 12;
-	
+
 	for (i = 1; i < MAX_TEAMS; i++)
 	{
 		TeamList[i].items = 0;
@@ -403,7 +403,7 @@ void InitTeamSelection( MENU *Menu )
 		if 	( ( item->Variable == &TeamList[0] ) ||
 		    ( item->Variable == &TeamList[1] ) ||
 		    ( item->Variable == &TeamList[2] ) ||
-		    ( item->Variable == &TeamList[3] ) ) 
+		    ( item->Variable == &TeamList[3] ) )
 		{
 			item->FuncSelect = SelectTeamList;
 		}
@@ -440,7 +440,7 @@ void DistributeTeamsToLists(int * /*dummy*/)
 	}
 
 	num_players = 0;
-	
+
 	for ( player = 0; player < MAX_PLAYERS; player++ )	// server dosn't count as player
 	{
 		// player has left, therefore reset their team number...
@@ -455,10 +455,10 @@ void DistributeTeamsToLists(int * /*dummy*/)
 			if ( ( player == WhoIAm ) || ( GameStatus[ player ] == STATUS_StartingMultiplayer ) || ( GameStatus[ player ] == STATUS_Normal ) )
 			{
 				num_players++;
-				
+
 				if ( !PlayerReady[player] && ( GameStatus[ player ] != STATUS_Normal ) )
 				{
-					if (Pulse >= 0.5F)			 
+					if (Pulse >= 0.5F)
 					{
 						TeamList[team].item[TeamList[team].items++][0] = 0;
 					}

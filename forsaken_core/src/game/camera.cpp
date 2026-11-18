@@ -1,7 +1,7 @@
 
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 #include "game/main.h"
 #include <stdio.h>
@@ -40,7 +40,7 @@ REMOTECAMERA * RemoteCameras = NULL;
 
 /*===================================================================
 	Procedure	:		Load .Cam File
-	Input		:		char	*	Filename 
+	Input		:		char	*	Filename
 	Output		:		Nothing
 ===================================================================*/
 bool Cameraload( char * Filename )
@@ -59,7 +59,7 @@ bool Cameraload( char * Filename )
 	RemoteCameras = NULL;
 
 
-	File_Size = Get_File_Size( Filename );	
+	File_Size = Get_File_Size( Filename );
 
 	if( !File_Size )
 	{

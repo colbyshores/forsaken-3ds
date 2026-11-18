@@ -64,7 +64,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 		AI_SetFOLLOWPATH( Enemy );
 		return;
 	}
-	
+
 	Enemy->Timer -= framelag;
 	if( Enemy->Timer < 0.0F )
 		Enemy->Timer = 0.0F;
@@ -88,7 +88,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 	AI_AimAtTarget( &Enemy->Object.InvMat , &Enemy->Object.Pos, &NewPos );
 
 
-	
+
 	if( Enemy->AIFlags & ( AI_ICANSEEPLAYER + AI_ICANHEARPLAYER ) )
 	{
 		Enemy->TNode = NULL;
@@ -96,13 +96,13 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 		{
 			ApplyMatrix( &SObject->Mat, &Forward, &TempVector );
 			ApplyMatrix( &SObject->Mat, &SlideUp, &TempUpVector );
-			
+
 			if( (Enemy->PrimaryFireTimer == 0.0F) && ( EnemyTypes[Enemy->Type].PrimaryWeaponType != NO_PRIMARY )  )
 			{
 				Enemy->PrimaryFireTimer = EnemyTypes[Enemy->Type].PrimaryFireRate + (float) Random_Range( (u_int16_t) EnemyTypes[Enemy->Type].PrimaryFireRate );
-				
+
 				Weapon = BodgePrimaryWeapon( EnemyTypes[Enemy->Type].PrimaryWeaponType, Enemy->PickupHeld );
-				
+
 				EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 					Enemy->Object.Group, &Enemy->Object.Pos, &TempOffset, &TempVector, &TempUpVector,
 					EnemyTypes[Enemy->Type].PowerLevel, (EnemyTypes[Enemy->Type].PowerLevel +1) * 33.0F, false, NULL );
@@ -116,7 +116,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 				if( ( Enemy->Type != ENEMY_Boss_BigGeek ) || ( AimData.Angle.y < 45.0F && AimData.Angle.y > -45.0F ) )
 				{
 					Enemy->SecondaryFireTimer = EnemyTypes[Enemy->Type].SecondaryFireRate + (float) Random_Range( (u_int16_t) EnemyTypes[Enemy->Type].SecondaryFireRate );
-					
+
 					FirePosPnt = EnemyTypes[Enemy->Type].FirePoints;
 					ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &TempUpVector );
 
@@ -133,7 +133,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 						{
 							ApplyMatrix( &Enemy->Object.Mat, &FirePosPnt->Dir[i], &TempVector );
 							ApplyMatrix( &Enemy->Object.Mat , &FirePosPnt->Points[i] , &FireOffset );
-							
+
 							InitOneSecBull( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Enemy->Object.Group,
 								&Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,
 								&TempOffset, EnemyTypes[Enemy->Type].SecondaryWeaponType, false );
@@ -142,12 +142,12 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 				}else{
 					// Big Geek Should Fire Depth Charges.....
 					Enemy->SecondaryFireTimer = EnemyTypes[Enemy->Type].SecondaryFireRate;
-				
+
 					if( AimData.Angle.y > 0.0F )
 						FirePosPnt = &BigGeekFirePos3;
 					else
 						FirePosPnt = &BigGeekFirePos2;
-	
+
 					ApplyMatrix( &Enemy->Object.Mat, &SlideUp, &TempUpVector );
 
 					i = Random_Range( FirePosPnt->NumPoints );
@@ -156,7 +156,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 					InitOneSecBull( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Enemy->Object.Group,
 						&Enemy->Object.Pos, &FireOffset, &TempVector, &TempUpVector,
 						&TempOffset, ENEMYDEPTHCHARGE, false );
-				
+
 				}
 			}
 		}
@@ -164,19 +164,19 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 		AI_SetMOVETOTARGET( Enemy );
 		return;
 	}
-	
 
-	
+
+
 	if( (Enemy->Object.Flags & SHIP_Scattered ) || ((EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_RETREAT) && ( Enemy->Object.Shield <= (EnemyTypes[Enemy->Type].Shield * 0.15 ) ) ) )
 	{
 		// we should get out of hear..
 		AI_SetRETREAT( Enemy );
 		return;
 	}
-	
+
 	AI_UPDATEGUNS( Enemy );
-	
-	
+
+
 	if( !( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_ICANTPITCH ) )
 	{
 		Enemy->AIMoveFlags |= AimData.Flags;
@@ -190,10 +190,10 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 		{
 			Enemy->AIMoveFlags |=  AI_CONTROL_DOWN;
 		}
-		
+
 	}
 
-	
+
 	if( Enemy->AvoidTimer )
 	{
 		if( Enemy->AIFlags & AI_MINEAVOID )
@@ -209,7 +209,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 		MinRange = EnemyTypes[Enemy->Type].MinRange;
 		MaxRange = EnemyTypes[Enemy->Type].MaxRange;
 		Range = MaxRange - MinRange;
-		
+
 		Dist = DistanceVector2Vector( &Enemy->Object.Pos , &TObject->Pos );
 
 		if( ( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_WEAPONKNOWLEDGE ) && ( Enemy->AIFlags & AI_PLAYERHASFIREDPRIMARY ) && PrimaryKnowledge[Enemy->LastPrimaryFiredAtMe].MinDistance )
@@ -240,5 +240,5 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 			Enemy->AIMoveFlags |= AI_CONTROL_FORWARD;
 	}
 	Enemy->AI_Angle = AimData.Angle;
-	
+
 }

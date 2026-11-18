@@ -109,7 +109,7 @@ const char *InitViewMessages[] = {
      "Init Ambient Lighting     " ,
      "Loading Sfx               " ,
      "Everything Else...Nodes   " ,
-     "" 
+     ""
 };
 
 bool  InsideResizeViewport = false;
@@ -122,7 +122,7 @@ int   Depth;
 void CalculateFramelag( void );
 
 float FPS = 0.0F;         // Frames Per Second...
-//double  TPS = 0.0;          // Textures Per Second...     
+//double  TPS = 0.0;          // Textures Per Second...
 
 #define MYTIMER
 #undef MYTIMER
@@ -210,8 +210,8 @@ bool  Panel = true;
 bool ChangeLevel( void );
 
 float pixel_aspect_ratio;
-float Oldframelag;  
-float framelag = 0.0F; 
+float Oldframelag;
+float framelag = 0.0F;
 float real_framelag = 0.0F;
 float Demoframelag = 0.5F;
 
@@ -262,21 +262,21 @@ char PrimaryNames[7][16] = {
             {"Trans" } ,
             {"Suss" } ,
             {"Laser" } ,
-            {"" }  
+            {"" }
 };
 char SecondaryNames[12][16] = {
             {"Mug" } ,
             {"Solaris" } ,
             {"Thief" } ,
             {"Scatter" } ,
-            {"Gravgon" } , 
-            {"MFRL" } , 
+            {"Gravgon" } ,
+            {"MFRL" } ,
             {"Titan" } ,
             {"Purge" } ,
             {"Pine" } ,
             {"Quantum" } ,
             {"Spider" } ,
-            {"" }  
+            {"" }
 
 };
 
@@ -286,7 +286,7 @@ char SecondaryNames[12][16] = {
 
 float ModeScaleX;
 float ModeScaleY;
-  
+
 /*===================================================================
     Off Screen Sufaces...Used to Blit to screen...
 ===================================================================*/
@@ -301,7 +301,7 @@ bool DispTracker( void );
 
 /*===================================================================
   Global Variables
-===================================================================*/   
+===================================================================*/
 /* Capacity of the per-frame batch buffers (RenderBufs[] and the stack
    buffers RenderScene and PrintInitViewStatus draw screen polys with), in
    vertices; their index buffers hold three per vertex. */
@@ -528,7 +528,7 @@ void ProcessGameKeys( void )
 	}
 
   // debuggin keys
-  if ( DebugInfo ) 
+  if ( DebugInfo )
 	{
 
     // Shift Modifier
@@ -555,7 +555,7 @@ void ProcessGameKeys( void )
         // Shift + Ctrl + F2
         if ( input_buffer_find( SDLK_F2 ) )
           SetFOV( chosen_fov = normal_fov );
-        
+
         // Shift + Ctrl + F3
         if ( input_buffer_find( SDLK_F3 ) )
           SetFOV( chosen_fov = normal_fov );
@@ -703,8 +703,8 @@ void ProcessGameKeys( void )
           MenuExit();
 				}
 			}
-  
-      // F4        
+
+      // F4
       if ( input_buffer_find( SDLK_F4 ) )
 			{
         // quick save
@@ -822,10 +822,10 @@ bool InitLevels( const char * levels_list )
   if ( !levels_list ){
     levels_list = LEVELSFILE;
   }
-  
+
   // path to data\\levels\\<type>.bat
   sprintf( levels_file, "data\\levels\\%s", levels_list );
-  
+
   // set some globals
   CurrentLevelsList = levels_list;
 
@@ -957,7 +957,7 @@ void DrawSimplePanel()
 
 	if( Panel && !PlayDemo )
 	{
-		if( !DrawPanel ) 
+		if( !DrawPanel )
 		{
 			// HUD settings only shown in normal mode
 			if(!SwitchedToWatchMode)
@@ -972,28 +972,28 @@ void DrawSimplePanel()
 						current = (Count == Ships[WhoIAm].Primary);
 						if( current || PrimaryWeaponsGot[ Count ] > 0 )
 						{
-							Print4x5Text( PrimaryNames[ Count ], left, top, HUDColour );	
+							Print4x5Text( PrimaryNames[ Count ], left, top, HUDColour );
 							if( Count == PULSAR )
-								Printu_int16_t( GeneralAmmo, right, top, HUDColour );	
-						}	
+								Printu_int16_t( GeneralAmmo, right, top, HUDColour );
+						}
 						top += FontHeight;
 					}
-		
+
 					// primaries using pyro ammo
 					current = (PYROLITE_RIFLE == Ships[WhoIAm].Primary);
 					if( current || PrimaryWeaponsGot[ PYROLITE_RIFLE ] > 0 )
 					{
-						Print4x5Text( PrimaryNames[ PYROLITE_RIFLE ], left, top, HUDColour );	
-						Printu_int16_t( PyroliteAmmo, right, top, HUDColour );	
-					}	
+						Print4x5Text( PrimaryNames[ PYROLITE_RIFLE ], left, top, HUDColour );
+						Printu_int16_t( PyroliteAmmo, right, top, HUDColour );
+					}
 					top += FontHeight;
 
 					// primaries using suss ammo
 					current = (SUSS_GUN == Ships[WhoIAm].Primary);
 					if( current || PrimaryWeaponsGot[ SUSS_GUN ] > 0 )
 					{
-						Print4x5Text( PrimaryNames[ SUSS_GUN ], left, top, HUDColour );	
-						Printu_int16_t( SussGunAmmo, right, top, HUDColour );	
+						Print4x5Text( PrimaryNames[ SUSS_GUN ], left, top, HUDColour );
+						Printu_int16_t( SussGunAmmo, right, top, HUDColour );
 					}
 					top += FontHeight*2;
 
@@ -1004,9 +1004,9 @@ void DrawSimplePanel()
 						if(Count == 7) top += FontHeight; // add space for mines
 						if( current || (u_int16_t) SecondaryAmmo[ Count ] > 0 )
 						{
-							Print4x5Text( SecondaryNames[Count], left, top, HUDColour );	
-							Printu_int16_t( (u_int16_t) SecondaryAmmo[ Count ] , right, top, HUDColour );	
-						}	
+							Print4x5Text( SecondaryNames[Count], left, top, HUDColour );
+							Printu_int16_t( (u_int16_t) SecondaryAmmo[ Count ] , right, top, HUDColour );
+						}
 						top += FontHeight;
 					}
 				} // end of show full inventory
@@ -1022,7 +1022,7 @@ void DrawSimplePanel()
 					Print4x5Text( SecondaryNames[mine], left-FontWidth*10, top, HUDColour );
 					Printu_int16_t( (u_int16_t) SecondaryAmmo[mine], left-FontWidth*2, top, HUDColour );
 				}
-		
+
 				// bottom right
 				top = render_info.window_size.cy - FontHeight*5;
 
@@ -1040,9 +1040,9 @@ void DrawSimplePanel()
 					// 72-8 (last frame)  is power bar at full charge
 					if( energy > 8 ) energy = 8;
 					AddScreenPolyText(
-						(72-energy), 
-						(float) (viewport.X + (viewport.Width>>1))-16 , 
-						(float) (viewport.Y + (viewport.Height>>1))+4 , 
+						(72-energy),
+						(float) (viewport.X + (viewport.Width>>1))-16 ,
+						(float) (viewport.Y + (viewport.Height>>1))+4 ,
 						r, g, b, 255 );
 				}
 
@@ -1052,20 +1052,20 @@ void DrawSimplePanel()
 					float bar = ( Ships[WhoIAm].Object.Flags & SHIP_SuperNashram ) ?
 						(float) Ships[WhoIAm].SuperNashramTimer*0.008f :
 						(float) NitroFuel*0.04f;
-					AddScreenPolyTextScale( 
-						72, 
-						(float) ( (render_info.window_size.cx>>1) - (NitroFuel - 8) ), 
+					AddScreenPolyTextScale(
+						72,
+						(float) ( (render_info.window_size.cx>>1) - (NitroFuel - 8) ),
 						(float) (viewport.Y + (viewport.Height>>1)-7 ) ,
 						bar,
-						1.0F, 
+						1.0F,
 						r, g, b, 255 );
 				}
- 
+
 				// Average Kills Per Minute
 				if(ShowKPMOnHUD)
 				{
 					sprintf( MessageBuff, "KPM: %.2f", (float)
-							(GetTotalKills(WhoIAm) - GetFriendlyKills(WhoIAm)) 
+							(GetTotalKills(WhoIAm) - GetFriendlyKills(WhoIAm))
 							/ (LevelTimeTaken / 60.0F) );
 					Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*6, RED);
 				}
@@ -1078,14 +1078,14 @@ void DrawSimplePanel()
 			}
 
 			// HUD settings common to both normal and watch mode
- 
+
 			// bottom left
 			top   = render_info.window_size.cy - FontWidth*3;
 			left  = FontWidth;
 			right = FontWidth*8;
-			   
+
 			// shield
-			Print4x5Text( "Shield", left, top, HUDColour );	
+			Print4x5Text( "Shield", left, top, HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
 			{
 				Printu_int16_t( (u_int16_t) Ships[WhoIAm].Object.Shield, right, top, HUDColour );
@@ -1097,11 +1097,11 @@ void DrawSimplePanel()
 
 			// hull
 			top++;
-			Print4x5Text( "Hull", left, top, HUDColour );	
+			Print4x5Text( "Hull", left, top, HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
 			{
 				Printu_int16_t( (u_int16_t) Ships[WhoIAm].Object.Hull, right, top, HUDColour );
-				if( HullHit ) HullHit -=1;          
+				if( HullHit ) HullHit -=1;
 			}
 			else
 				Printu_int16_t( PlayerHealths[WatchPlayerSelect.value].Hull, right, top, HUDColour );
@@ -1115,8 +1115,8 @@ void DrawSimplePanel()
 				   camera viewport — it belongs on the stereo top screen, not
 				   the mono bottom. Temporarily clear the bottom-HUD routing
 				   so this AddScreenPolyText creates a top-screen poly. */
-				
-				
+
+
 				bool _was_routing = ScrPolyGetRouteBottom();
 				ScrPolySetRouteBottom(false);
 #endif
@@ -1136,7 +1136,7 @@ void DrawSimplePanel()
 				sprintf( MessageBuff, "%02d:%02d", (int)(LevelTimeTaken / 60), (int)((int)LevelTimeTaken % 60) );
 				Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*5, WHITE);
 			}
-			
+
 			// Current Speed
 			if(ShowSpeedOnHUD)
 			{
@@ -1151,7 +1151,7 @@ void DrawSimplePanel()
 				sprintf( MessageBuff, "%.0f", BikeSpeed/3.0F); // attempt scale 0-100
 				Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*8, YELLOW);
 				SpeedInterval -= framelag;
-			} 
+			}
 
 			// bottom right
 			top = render_info.window_size.cy - FontHeight*4;
@@ -1160,9 +1160,9 @@ void DrawSimplePanel()
 
 			// power pods
 			Print4x5Text( "Power", left+FontWidth*3, top, HUDColour );
-			Printu_int16_t( (u_int16_t) Ships[WatchPlayerSelect.value].Object.PowerLevel+1, right, top, HUDColour );	
+			Printu_int16_t( (u_int16_t) Ships[WatchPlayerSelect.value].Object.PowerLevel+1, right, top, HUDColour );
 			top+=FontHeight;
-                 
+
 			// primary
 			Print4x5Text( PrimaryNames[Ships[WatchPlayerSelect.value].Primary], left, top, HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
@@ -1173,11 +1173,11 @@ void DrawSimplePanel()
 			Print4x5Text( SecondaryNames[Ships[WatchPlayerSelect.value].Secondary], left, top, HUDColour );
 			if( WatchPlayerSelect.value == WhoIAm )
 				Printu_int16_t( (u_int16_t) GetCurSecAmmo(), right, top, HUDColour );
-              
+
 			top = render_info.window_size.cy - FontHeight*7;
 
 			// chaos
-			if( Ships[WatchPlayerSelect.value].Invul ) 
+			if( Ships[WatchPlayerSelect.value].Invul )
 			{
 				Print4x5Text( "Chaos", right-FontWidth*9, top, HUDColour );
 				if( WatchPlayerSelect.value == WhoIAm )
@@ -1201,25 +1201,25 @@ void DrawSimplePanel()
 				if( WatchPlayerSelect.value == WhoIAm )
 					Printu_int16_t( (u_int16_t) (Ships[WhoIAm].StealthTime / 60.0F), right, top, HUDColour );
 			}
- 
+
 		} // end of !DrawPanel
-	
+
 		if( (NamesAreLegal != 0) || IsHost )
 		{
 			ScoreSort();
 			PrintScoreSort();
 			CheckMetKillLimit();
 		}
-		
+
 		// show long message history
-		if(ShowMessages) 
+		if(ShowMessages)
 			MessageQuePrintAll();
 
 		// show last 3 recent messages
 		else
 		{
 			MessageQuePrint();
-			PlayerMessageQuePrint();	
+			PlayerMessageQuePrint();
 		}
 
 		if( ! (CurrentMenu && CurrentMenuItem ) )
@@ -1245,7 +1245,7 @@ void DrawSimplePanel()
 			ScoreSort();
 			PrintScoreSort();
 
-			if(ShowMessages) 
+			if(ShowMessages)
 				MessageQuePrintAll();
 			else
 			{
@@ -1254,10 +1254,10 @@ void DrawSimplePanel()
 			}
 
 			if( DemoEyesSelect.value != MAX_PLAYERS )
-			Print4x5Text( 
+			Print4x5Text(
 				Names[DemoEyesSelect.value],
-				render_info.window_size.cx - (FontWidth*9), 
-				FontHeight, 
+				render_info.window_size.cx - (FontWidth*9),
+				FontHeight,
 				0 );
 		}
 	}
@@ -1334,7 +1334,7 @@ ReleaseScene(void)
   case  STATUS_StartingSinglePlayer:
   case  STATUS_TitleLoadGameStartingSinglePlayer:
     break;
-  
+
   default:
     DestroyGame();
     break;
@@ -1373,7 +1373,7 @@ void ReleaseView(void)
      * After ReleaseTitleModels above, NumSpotFX is 0 so the read
      * is a no-op. */
     {
-      
+
       Hunk_FreeAll(TAG_LEVEL);
     }
     break;
@@ -1409,7 +1409,7 @@ void ReleaseView(void)
      * ModelHeaders / MxaModelHeaders are intentionally kept live until
      * the next PreInitModel — see the title-branch comment for why. */
     {
-      
+
       Hunk_FreeAll(TAG_LEVEL);
     }
   }
@@ -1588,7 +1588,7 @@ bool InitView( void )
 		MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
 		CurrentCamera.Pos = View;
 		CurrentCamera.GroupImIn = -1;
-		CurrentCamera.Viewport = viewport;	
+		CurrentCamera.Viewport = viewport;
 		CurrentCamera.Viewport.X = 0;
 		CurrentCamera.Viewport.Y = 0;
 		CurrentCamera.Viewport.Width = render_info.window_size.cx;
@@ -1604,9 +1604,9 @@ bool InitView( void )
   case STATUS_ViewingStats:
     InitStatsDisplay();
     break;
-  
+
   default:
-    
+
     // this will cause a lovely game loop and crash the game
 		// so don't remove this !!!!!!!!!
     if( MyGameStatus != STATUS_InitView_0 )
@@ -1640,16 +1640,16 @@ void Build_View()
 
   ApplyMatrix( &CurrentCamera.InvMat, &Trans, &Trans2 );      /* Set Translation */
 
-  view._11 = CurrentCamera.Mat._11; 
+  view._11 = CurrentCamera.Mat._11;
   view._12 = CurrentCamera.Mat._12;
   view._13 = CurrentCamera.Mat._13;
   view._14 = CurrentCamera.Mat._14;
-             
+
   view._21 = CurrentCamera.Mat._21;
   view._22 = CurrentCamera.Mat._22;
   view._23 = CurrentCamera.Mat._23;
   view._24 = CurrentCamera.Mat._24;
-             
+
   view._31 = CurrentCamera.Mat._31;
   view._32 = CurrentCamera.Mat._32;
   view._33 = CurrentCamera.Mat._33;
@@ -1795,7 +1795,7 @@ bool RenderScene( void )
       return false;
     }
     done = VduFinished( &MENU_NEW_GeneralLoading );
-      
+
     if ( done )
       WaitFrames--;
     if ( !WaitFrames )
@@ -1862,7 +1862,7 @@ bool RenderScene( void )
       LevelNum = -1;
 
       MyGameStatus = STATUS_PreStartingMultiplayerSynch;
-      if( !ChangeLevel() ) 
+      if( !ChangeLevel() )
         return( false );
     }
     break;
@@ -1924,7 +1924,7 @@ bool RenderScene( void )
 
     if ( !CheatsDisabled )
       DisableCheats();
-  
+
     if( IMustQuit )
       SpecialDestroyGame();
 
@@ -2012,7 +2012,7 @@ bool RenderScene( void )
       // un load all graphics
       ReleaseView();
       ReleaseLevel();
-	  
+
       // tell them all they can now look at the scores...
       MyGameStatus = STATUS_ViewingScore;
       GameStatus[WhoIAm] = MyGameStatus;
@@ -2141,7 +2141,7 @@ bool RenderScene( void )
 			ResetAllStats();
 
       for( i = 0 ; i < MAX_PLAYERS ; i++ )
-      {      
+      {
         if( (GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && (GameStatus[i] != STATUS_Null ) )
         {
 
@@ -2149,7 +2149,7 @@ bool RenderScene( void )
             sprintf( buf, "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
             CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_WaitingAfterScore ? 2 : 1 );
           }
-          
+
           e++;
         }
       }
@@ -2249,7 +2249,7 @@ bool RenderScene( void )
 
     CenterPrint4x5Text( "TrigVars Left  " , (render_info.window_size.cy>>1)+(FontHeight<<2), GRAY );
     Printu_int16_t( (u_int16_t) Ships[WhoIAm].TrigVars , (render_info.window_size.cx>>1)+((17*FontWidth>>1)), (render_info.window_size.cy>>1)+(FontHeight<<2), 2 );
- 
+
 
 	DisplayNonSolidScrPolys(&ro);
 	DisplaySolidScrPolys(&ro);
@@ -2278,7 +2278,7 @@ bool RenderScene( void )
 
       MyGameStatus = OverallGameStatus;
 			input_grab( true );
-	  
+
 
       GameStatus[WhoIAm] = OverallGameStatus;
       SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
@@ -2312,7 +2312,7 @@ bool RenderScene( void )
     {
       break;
     }
-    
+
     if( ( CurrentMenu ) && ( CurrentMenuItem ) )
     {
       if( DisplayTitle() != true )
@@ -2340,12 +2340,12 @@ bool RenderScene( void )
     {
       if( !IsHost )
       {
-        if( ( OverallGameStatus == STATUS_StartingMultiplayerSynch ) || 
+        if( ( OverallGameStatus == STATUS_StartingMultiplayerSynch ) ||
           ( (OverallGameStatus == STATUS_Normal) && (!TeamGame || PlayerReady[WhoIAm]) ) )
         {
 
           if ((CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
-          { 
+          {
             MenuChangeEx( &MENU_NEW_GeneralLoading );
             MenuDraw( CurrentMenu );  // because menu processing will not be done when MyGameStatus changes
           }
@@ -2468,7 +2468,7 @@ bool RenderScene( void )
       }
     }
     break;
-  
+
 
   case STATUS_QuitCurrentGame:
 	DebugState("STATUS_QuitCurrentGame\n");
@@ -2497,9 +2497,9 @@ bool RenderScene( void )
 
     clear_black();
     ReceiveGameMessages();
-    
+
     CenterPrint4x5Text( "Requesting Player Number" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , 2 );
-                                          
+
     sprintf( &buf[0] , "Attempt %d\n" , GetPlayerNumCount );
     CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-(FontHeight>>1) , 2 );
 
@@ -2638,7 +2638,7 @@ bool RenderScene( void )
        * (which writes back to NextNewModel) so the pickup slots end
        * up past the enemy slots. PreInitModel below loads everything
        * registered up to NextNewModel. */
-      { 
+      {
         if( !PreLoadPickups() )
         {
           SeriousError = true;
@@ -2687,7 +2687,7 @@ bool RenderScene( void )
       return false;   // the collision data
     }
     Bsp_Header[ 1 ].State = false; // no non-zero .BSP any more
-    
+
     // might not be any water...
     WaterLoad();
 
@@ -2951,7 +2951,7 @@ bool RenderScene( void )
          * description text) left over from the title screen.  VduClear() only
          * clears VDU-specific entries; InitScrPolys() resets the entire
          * ScrPolys[] linked list so nothing stale renders this frame. */
-        
+
         InitScrPolys();
     }
 #endif
@@ -2994,7 +2994,7 @@ bool RenderScene( void )
     ReleaseLevel();
 
     ReleaseView();
-      
+
     MyGameStatus = STATUS_BetweenLevels;
     InitScene();
     InitView();
@@ -3042,7 +3042,7 @@ bool RenderScene( void )
 
     smallinitShip( WhoIAm );
     InGameLoad( NULL );
-    
+
 
     MyGameStatus = STATUS_SinglePlayer;
     GameStatus[WhoIAm] = MyGameStatus;
@@ -3100,7 +3100,7 @@ void MainRoutines( void )
   ProcessGoals();
   WaterProcess();
   ProcessRTLights();
-  
+
 }
 
 void CheckLevelEnd ( void )
@@ -3142,7 +3142,7 @@ void CheckLevelEnd ( void )
         NewLevelNum++;
         GameCompleted = GameComplete::NotComplete;
       }
-      
+
       return;
   }
 
@@ -3203,7 +3203,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 	/* Hardware stereo: the second pass draws to the right-eye target. */
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
-		
+
 		c3d_transfer_eye(GFX_LEFT);
 	}
 #endif
@@ -3244,7 +3244,7 @@ bool RenderCurrentCameraInStereo( RenderCurrentCameraPt render_camera )
 #ifdef __3DS__
 	if(render_info.stereo_mode == STEREO_MODE_3DS)
 	{
-		
+
 		c3d_transfer_eye(GFX_RIGHT);
 	}
 #endif
@@ -3416,8 +3416,8 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 	 * cycles through "Quantum" / "Solaris" / etc and obscured the
 	 * counter completely. */
 	{
-		
-		
+
+
 
 		char fps_buf[24];
 		snprintf(fps_buf, sizeof(fps_buf), "FPS:%d", forsaken_get_fps());
@@ -3508,7 +3508,7 @@ bool MainGameRender(void)
 #ifdef __3DS__
       /* [3DS] Drive stereo from the 3D slider. */
       {
-          
+
           float slider = platform_get_3d_slider();
           if (slider > 0.0f)
           {
@@ -3558,12 +3558,12 @@ bool MainGameRender(void)
 
         CurrentCamera.enable = 1;
         CurrentCamera.UseLowestLOD = true;
-        CurrentCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;  
-        CurrentCamera.Mat = Ships[Current_Camera_View].Object.FinalMat; 
-        CurrentCamera.InvMat = Ships[Current_Camera_View].Object.FinalInvMat; 
-        CurrentCamera.Pos = Ships[Current_Camera_View].Object.Pos;  
-        CurrentCamera.Viewport = viewport;  
-        CurrentCamera.Proj = proj;  
+        CurrentCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;
+        CurrentCamera.Mat = Ships[Current_Camera_View].Object.FinalMat;
+        CurrentCamera.InvMat = Ships[Current_Camera_View].Object.FinalInvMat;
+        CurrentCamera.Pos = Ships[Current_Camera_View].Object.Pos;
+        CurrentCamera.Viewport = viewport;
+        CurrentCamera.Proj = proj;
         CurrentCamera.InvMat._31 *= -1.0F;
         CurrentCamera.InvMat._32 *= -1.0F;
         CurrentCamera.InvMat._33 *= -1.0F;
@@ -3612,7 +3612,7 @@ bool MainGameRender(void)
         CurrentCamera.UseLowestLOD = true;
         main_fov = hfov;
         SetFOV( normal_fov );
-        CurrentCamera.Proj = proj;  
+        CurrentCamera.Proj = proj;
         Current_Camera_View=TempMissileCam;
         SetFOV( main_fov );
 
@@ -3633,20 +3633,20 @@ bool MainGameRender(void)
 					SetCam(MAX_PLAYERS+1, CamerasSet);
 					CamerasSet++;
 				}
-			} 
+			}
     }
-	
+
     // Full Screen Rear View....
 		else
 		{
       CameraRendering = CamRendering::Rear;
       CurrentCamera.enable = 1;
-      CurrentCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;  
-      CurrentCamera.Mat = Ships[Current_Camera_View].Object.FinalMat; 
-      CurrentCamera.InvMat = Ships[Current_Camera_View].Object.FinalInvMat; 
-      CurrentCamera.Pos = Ships[Current_Camera_View].Object.Pos;  
-      CurrentCamera.Viewport = viewport;  
-      CurrentCamera.Proj = proj;  
+      CurrentCamera.GroupImIn = Ships[Current_Camera_View].Object.Group;
+      CurrentCamera.Mat = Ships[Current_Camera_View].Object.FinalMat;
+      CurrentCamera.InvMat = Ships[Current_Camera_View].Object.FinalInvMat;
+      CurrentCamera.Pos = Ships[Current_Camera_View].Object.Pos;
+      CurrentCamera.Viewport = viewport;
+      CurrentCamera.Proj = proj;
       CurrentCamera.InvMat._31 *= -1.0F;
       CurrentCamera.InvMat._32 *= -1.0F;
       CurrentCamera.InvMat._33 *= -1.0F;
@@ -3705,7 +3705,7 @@ bool MainGame( void )
 
 
 /*===================================================================
-  Procedure :  Main Routines to be called before Rendering....  
+  Procedure :  Main Routines to be called before Rendering....
 ===================================================================*/
 
   InitIndirectVisible( Ships[Current_Camera_View].Object.Group );
@@ -3750,10 +3750,10 @@ bool MainGame( void )
 ===================================================================*/
 void SetCam(int ship, int Cam)
 {
-        CurrentCamera.GroupImIn = Ships[ship].Object.Group; 
-        CurrentCamera.Mat = Ships[ship].Object.FinalMat;  
-        CurrentCamera.InvMat = Ships[ship].Object.FinalInvMat; 
-        CurrentCamera.Pos = Ships[ship].Object.Pos; 
+        CurrentCamera.GroupImIn = Ships[ship].Object.Group;
+        CurrentCamera.Mat = Ships[ship].Object.FinalMat;
+        CurrentCamera.InvMat = Ships[ship].Object.FinalInvMat;
+        CurrentCamera.Pos = Ships[ship].Object.Pos;
 
 				switch(Cam)
 				{
@@ -3774,12 +3774,12 @@ void SetCam(int ship, int Cam)
 					// top right
 					case 2:
 				        CurrentCamera.Viewport.X = CurrentCamera.Viewport.Width;
-        				CurrentCamera.Viewport.Y = 0.0;			
+        				CurrentCamera.Viewport.Y = 0.0;
 								Print4x5Text( (char *)GetName(ship), (viewport.Width/(float)2.0) + (CurrentCamera.Viewport.Width/(float)2.0), CurrentCamera.Viewport.Height-(2.0*FontHeight), 4 );
 								break;
 
 					// bottom right
-					case 3:	
+					case 3:
         				CurrentCamera.Viewport.X = CurrentCamera.Viewport.Width;
         				CurrentCamera.Viewport.Y = CurrentCamera.Viewport.Height;
 								Print4x5Text( (char *)GetName(ship), (viewport.Width/(float)2.0) + (CurrentCamera.Viewport.Width/(float)2.0), viewport.Height-(2.0*FontHeight), 4 );
@@ -3801,7 +3801,7 @@ void ShowDeathModeStats()
 {
 	ShowGameStats( BOX_BG );
 	if( Ships[ WhoIAm ].Timer < RESPAWN_TIMER )
-		CenterPrint4x5Text( "Press any key to continue" , render_info.window_size.cy - (FontHeight*2) , GREEN );	
+		CenterPrint4x5Text( "Press any key to continue" , render_info.window_size.cy - (FontHeight*2) , GREEN );
 }
 
 /* Display the Statistics in-game when key is pressed */
@@ -3840,7 +3840,7 @@ void DisplayNetworkInfo()
 	{
 		if( GameStatus[i] != STATUS_Normal || WhoIAm == i )
 			continue;
-			
+
 		total_height += (3*row_height);
 	}
 
@@ -3858,7 +3858,7 @@ void DisplayNetworkInfo()
 
 		int left_offset = x_center - (20*FontWidth);
 
-		// for packet loss 
+		// for packet loss
 		DisplayConnectionStatus( ShipID, left_offset, top_offset );
 		left_offset += ( 2 * FontWidth );
 
@@ -3869,18 +3869,18 @@ void DisplayNetworkInfo()
 			Print4x5Text( &Names[ShipID][0], left_offset, top_offset,  WHITE );
 
 		left_offset += ( 8 * FontWidth );
-		
+
 		if( Ships[ShipID].network_player != NULL )
 		{
 			sprintf( (char*) &buf[0] ,"IP: %s PORT: %d",
 				Ships[ShipID].network_player->ip,
 				Ships[ShipID].network_player->port);
-			
+
 			Print4x5Text( &buf[0] , left_offset, top_offset, GREEN );
 
 			top_offset+=row_height;
-			
-			sprintf( (char*) &buf[0] ,"PING: %lu LOSS: %lu LOST: %lu", 
+
+			sprintf( (char*) &buf[0] ,"PING: %lu LOSS: %lu LOST: %lu",
 				Ships[ShipID].network_player->ping,
 				Ships[ShipID].network_player->packet_loss,
 				Ships[ShipID].network_player->packets_lost);
@@ -4075,7 +4075,7 @@ void ShowGameStats( stats_mode_t mode )
 			//
 			// print line
 			//
-			
+
 			// name
 			Print4x5Text( (char*)&Names[GetPlayerByRank(i)], xpos, top_offset, (left) ? DARKGRAY : color );
 
@@ -4088,7 +4088,7 @@ void ShowGameStats( stats_mode_t mode )
 			// points + kills - suicides - friendly - deaths
 			Printint16_t( GetRealScore(GetPlayerByRank(i)),	(xpos+=col_width), top_offset, (left) ? DARKGRAY : GRAY	);
 			// kills - suicides - friendly
-			Printint16_t( GetKills(GetPlayerByRank(i)),	(xpos+=col_width), top_offset, (left) ? DARKGRAY : GREEN );	
+			Printint16_t( GetKills(GetPlayerByRank(i)),	(xpos+=col_width), top_offset, (left) ? DARKGRAY : GREEN );
 			// suicides + deaths
 			Printint16_t( GetTotalDeaths(GetPlayerByRank(i)), (xpos+=col_width), top_offset, (left) ? DARKGRAY : RED );
 
@@ -4110,7 +4110,7 @@ void ShowGameStats( stats_mode_t mode )
 bool ScoreDisplay()
 {
 	ShowGameStats( FULL_BG ); // use BLT background
-	CenterPrint4x5Text( "Press Space to continue" , render_info.window_size.cy - (FontHeight*2) , 0 );	
+	CenterPrint4x5Text( "Press Space to continue" , render_info.window_size.cy - (FontHeight*2) , 0 );
 	return true;
 }
 
@@ -4404,7 +4404,7 @@ Display Group Clipped Faceme Transluecent Polys
 ===================================================================*/
     if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) )
         return false;
-  
+
   // display unclipped translucencies
   for ( g = CurrentCamera.visible.first_visible; g; g = g->next_visible )
   {
@@ -4442,7 +4442,7 @@ Display Group Clipped Faceme Transluecent Polys
 
   return true;
 }
-  
+
 /*===================================================================
   Procedure :  Our Calculate frame rate...
   Input   :
@@ -4477,7 +4477,7 @@ bool Our_CalculateFrameRate(void)
 			our_count = 0;
 		}
 	}
-  
+
 	// display the framerate
 	if( ShowFrameRate )
 	{
@@ -4531,7 +4531,7 @@ bool Our_CalculateFrameRate(void)
 
 			// show all secondary weapon kills
 			for( i = 0 ; i < TOTALSECONDARYWEAPONS ; i++ )
-			{		
+			{
 				// display secondary weapon name
 				Print4x5Text( GetWeaponName(WEPTYPE_Secondary,i),	(render_info.window_size.cx>>1)+(5*FontWidth),	(viewport.Y + (viewport.Height>>2))+( i * ( FontHeight+(FontHeight>>1) ) ), 2 );
 				// display secondary weapon kills
@@ -4601,7 +4601,7 @@ InitViewport( void )
 #endif
 		return false;
 	}
-	
+
 	SetFOV( hfov );
 
 	clear_black();
@@ -4680,7 +4680,7 @@ void CalculateFramelag( void )
 
   // thus  internal clock between the two pc's will be altered by 24.3
   // with the slower pc being *ahead* of the faster one in game time
-  
+
   // not sure on the meaning of the math here but it looks like
   // this should represent a change of +0.18th of a second
   // 24.3 * 0.007 = 0.18225
@@ -4744,16 +4744,16 @@ bool DispTracker( void )
 	TempMatrix._33 = 1.25F;
 	MatrixMultiply( &TempMatrix, &Ships[ WhoIAm ].Object.FinalMat, &TempMatrix );
 
-	view._11 = TempMatrix._11; 
+	view._11 = TempMatrix._11;
 	view._12 = TempMatrix._12;
 	view._13 = TempMatrix._13;
 	view._14 = TempMatrix._14;
-	         
+
 	view._21 = TempMatrix._21;
 	view._22 = TempMatrix._22;
 	view._23 = TempMatrix._23;
 	view._24 = TempMatrix._24;
-	         
+
 	view._31 = TempMatrix._31;
 	view._32 = TempMatrix._32;
 	view._33 = TempMatrix._33;
@@ -4771,7 +4771,7 @@ bool DispTracker( void )
 		return false;
 
   i = FindClosestShip();
-  
+
   if( i != INDEX_NONE )
   {
     Red = 255.0F;
@@ -4907,7 +4907,7 @@ void PrintInitViewStatus( BYTE Status )
 	 * but it's a subset of this broader cleanup. Calling InitScrPolys
 	 * always at status=33 covers both. */
 	if (Status == 33) {
-		
+
 		InitScrPolys();
 	}
 #endif
@@ -4983,7 +4983,7 @@ void CheckMetKillLimit()
 		{
 			// identify which teams are active
 			for (i = 0; i < MAX_TEAMS; i++)
-			{	
+			{
 				teamOK[i] = false;
 				teamleft[i] = true;
 			}

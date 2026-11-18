@@ -35,10 +35,10 @@ num_zones : u_int16_t
 	enemy_secondary : int16_t
 }[ num_zones ]
 */
- 
- 
+
+
 /*===================================================================
-		Include Files...	
+		Include Files...
 ===================================================================*/
 
 #include <stdio.h>
@@ -109,14 +109,14 @@ bool TriggerAreaload( char * Filename )
 	}
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
-		GroupTriggerArea_player[i] = NULL;      
+		GroupTriggerArea_player[i] = NULL;
 		GroupTriggerArea_player_shoots[i] = NULL;
-		GroupTriggerArea_enemy[i] = NULL;       
-		GroupTriggerArea_enemy_shoots[i] = NULL;		
+		GroupTriggerArea_enemy[i] = NULL;
+		GroupTriggerArea_enemy_shoots[i] = NULL;
 	}
-	
 
-	File_Size = Get_File_Size( Filename );	
+
+	File_Size = Get_File_Size( Filename );
 
 	if( !File_Size ) return true;
 
@@ -140,7 +140,7 @@ bool TriggerAreaload( char * Filename )
 	}
 
 	NumZones = in.u16();
-	Zones = (TRIGGER_AREA*) calloc( NumZones , sizeof(TRIGGER_AREA) );	
+	Zones = (TRIGGER_AREA*) calloc( NumZones , sizeof(TRIGGER_AREA) );
 	AreaPnt = Zones;
 
 	for( i = 0 ; i < NumZones ; i++ )
@@ -190,7 +190,7 @@ bool TriggerAreaload( char * Filename )
 
 		AreaPnt++;
 	}
-	
+
 	free( OrgBuffer );
 
 	// Build the four per-group lists. Each list keeps file order and only
@@ -339,7 +339,7 @@ bool	TriggerAreaPlayerCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group
 		if( Area->state == TRIGGER_AREA_STATE_On )
 		{
 			TriggerAreaProcess( OldPos , NewPos , Area );
-			
+
 			if( Entry )
 			{
 				if( Area->when_player_enters != 0xffff )
@@ -364,8 +364,8 @@ bool	TriggerAreaPlayerCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group
 
 /*===================================================================
  	Procedure	:		Check Player's shot hits trigger area...
-	Input		:		VECTOR	*	Old Position 
-				:		VECTOR	*	New Position 
+	Input		:		VECTOR	*	Old Position
+				:		VECTOR	*	New Position
 				:		u_int16_t		Group
 				:		u_int8_t		Weapon Type
 				:		u_int8_t		Weapon
@@ -382,7 +382,7 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 		if( Area->state == TRIGGER_AREA_STATE_On )
 		{
 			CanActivate = false;
-			
+
 			// Weapon filter: both -1 or both 0 means any weapon fires it.
 			if( ( ( Area->player_primary != -1 )|| ( Area->player_secondary != -1 ) ) &&
 				( ( Area->player_primary != 0 ) || ( Area->player_secondary != 0 ) ) )
@@ -395,7 +395,7 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 						CanActivate = true;
 					}
 					break;
-					
+
 				case WEPTYPE_Secondary:
 					if( Weapon == Area->player_secondary )
 					{
@@ -411,7 +411,7 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 			if( CanActivate )
 			{
 				TriggerAreaProcess( OldPos , NewPos , Area );
-				
+
 				if( Entry )			/* Entry only, trigger will not activate if bullet starts in zone */
 				{
 					if( Area->when_player_shoots != 0xffff )
@@ -441,7 +441,7 @@ bool	TriggerAreaEnemyCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group 
 		if( Area->state == TRIGGER_AREA_STATE_On )
 		{
 			TriggerAreaProcess( OldPos , NewPos , Area );
-			
+
 			if( Entry )
 			{
 				if( Area->when_enemy_enters != 0xffff )
@@ -466,8 +466,8 @@ bool	TriggerAreaEnemyCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group 
 
 /*===================================================================
  	Procedure	:		Check Enemy's shot hits trigger area...
-	Input		:		VECTOR	*	Old Position 
-				:		VECTOR	*	New Position 
+	Input		:		VECTOR	*	Old Position
+				:		VECTOR	*	New Position
 				:		u_int16_t		Group
 				:		u_int8_t		Weapon Type
 				:		u_int8_t		Weapon
@@ -484,7 +484,7 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 		if( Area->state == TRIGGER_AREA_STATE_On )
 		{
 			CanActivate = false;
-			
+
 			// Weapon filter: both -1 or both 0 means any weapon fires it.
 			if( ( ( Area->enemy_primary != -1 )|| ( Area->enemy_secondary != -1 ) ) &&
 				( ( Area->enemy_primary != 0 ) || ( Area->enemy_secondary != 0 ) ) )
@@ -497,7 +497,7 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 						CanActivate = true;
 					}
 					break;
-					
+
 				case WEPTYPE_Secondary:
 					if( Weapon == Area->enemy_secondary )
 					{
@@ -513,7 +513,7 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 			if( CanActivate )
 			{
 				TriggerAreaProcess( OldPos , NewPos , Area );
-				
+
 				if( Entry )			/* Entry only, trigger will not activate if bullet starts in zone */
 				{
 					if( Area->when_enemy_shoots != 0xffff )

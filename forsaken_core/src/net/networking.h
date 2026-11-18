@@ -359,7 +359,7 @@ typedef struct _SETTIME
 typedef struct _GLOBALSHIP
 {
 	OBJECT				Object;						//
-	
+
 	BYTE				enable;						// is this ship active?
 	BYTE				ShipThatLastKilledMe;		// the ship who killed me last...
 	BYTE				ShipThatLastHitMe;			// the ship who killed me last...
@@ -900,7 +900,7 @@ typedef struct _NETSETTINGSMSG
 	net_bool_t		IsHost;
 	float		PacketsPerSecond;
 	net_bool_t		CollisionPerspective;
-	net_bool_t		ShortPackets;	
+	net_bool_t		ShortPackets;
 } NETSETTINGSMSG;
 
 typedef struct _LONGSTATUSMSG

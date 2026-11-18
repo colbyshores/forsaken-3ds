@@ -15,7 +15,7 @@
  */
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 #include <stdio.h>
 #include "game/main.h"
@@ -46,7 +46,7 @@ constexpr int MAXNODES = 768;
 constexpr int NOD_VERSION_NUMBER = 1;
 
 /*===================================================================
-		Globals...	
+		Globals...
 ===================================================================*/
 
 NODENETWORKHEADER	NodeNetworkHeader;
@@ -58,7 +58,7 @@ NODE *	NodeInGroup[MAXGROUPS];
 
 /*===================================================================
 	Procedure	:		Load .Nod File
-	Input		:		char	*	Filename 
+	Input		:		char	*	Filename
 	Output		:		Nothing
 ===================================================================*/
 bool Nodeload( char * Filename )
@@ -82,11 +82,11 @@ bool Nodeload( char * Filename )
 	{
 		NodeInGroup[i] = NULL;
 	}
-	
+
 	NodeNetworkHeader.State = false;
 
 
-	File_Size = Get_File_Size( Filename );	
+	File_Size = Get_File_Size( Filename );
 
 	if( !File_Size )
 	{
@@ -136,10 +136,10 @@ bool Nodeload( char * Filename )
 		return false;
 
 	}
-	
+
 	NodeNetworkHeader.FirstNode = (NODE*) calloc( NodeNetworkHeader.NumOfNodes, sizeof(NODE) );
-	
-	
+
+
 	NodePnt = NodeNetworkHeader.FirstNode;
 	if( !NodePnt )
 	{
@@ -156,7 +156,7 @@ bool Nodeload( char * Filename )
 		NodePnt->NetMask = in.u32();				// which networks this node is in...
 		NodePnt->Flags = (u_int16_t) in.i16();
 		NodePnt->NumOfLinks = in.i16();
-		
+
 		if( NodePnt->NumOfLinks > MAXLINKSPERNODE )
 		{
 #ifdef EDITION_REMASTER
@@ -196,9 +196,9 @@ _skipped_extra_links: ;
 
 		NodePnt->SolidPos = NodePnt->Pos;
 		// we need a Point on the background that is below the Node...
-		
+
 		LegalGroup = false;
-		
+
 		if( !PointInsideSkin( &NodePnt->Pos, NodePnt->Group ) )
 		{
 			DebugPrintf( "NoadLoad failed Node %d is in WRONG Group (%s)\n", e, Mloadheader.Group[ NodePnt->Group ].name );
@@ -252,20 +252,20 @@ _skipped_extra_links: ;
 #endif
 
 		NodePnt->LegalGroup = LegalGroup;
-		
+
 		NodePnt->NextNodeInGroup = NodeInGroup[NodePnt->Group];
 		NodeInGroup[NodePnt->Group] = NodePnt;
-		
+
 		NodePnt++;
 	}
 
 	// All Node Networks have been loaded...
 	free(OrgBuffer);
-	
+
 	NodeNetworkHeader.State = true;
 
 	SetNetworkDistance();
-	
+
 	return true;
 }
 
@@ -327,9 +327,9 @@ void ShowNodeNetwork( u_int32_t NetMask )
 						if( NodePnt == NodeLink->NodeLink[e] )
 							Mutual = true;
 					}
-					
+
 					CanSee = AI_ClearLOSNonZeroNonObject( &NodePnt->Pos, NodePnt->Group, &NodeLink->Pos, SHIP_RADIUS );
-					
+
 					line = FindFreeLine();						// Line attached
 					if( line != INDEX_NONE )
 					{
@@ -395,7 +395,7 @@ void NodeRecurse( NODE * NodeFrom , NODE * NodeTo , float Distance )
 	// Set the NA pointer to the place in the NodeArray we are interested in....
 	NA = NodeArray;
 	NA += ( Source->NodeNum * NodeNetworkHeader.NumOfNodes ) + NodeTo->NodeNum;
-	
+
 	if( ( *NA == -1.0F ) ||	( Distance < *NA ) )
 	{
 		*NA = Distance;
@@ -421,9 +421,9 @@ void SetNetworkDistance( void )
 
 	if( !NodeNetworkHeader.State )
 		return;
-							  
+
 	NodeFrom = NodeNetworkHeader.FirstNode;
-	
+
 	for( e = 0 ; e < NodeNetworkHeader.NumOfNodes ; e++ )
 	{
 		for( o = 0 ; o < NodeNetworkHeader.NumOfNodes ; o++ )
@@ -433,13 +433,13 @@ void SetNetworkDistance( void )
 			na += ( e * NodeNetworkHeader.NumOfNodes ) + o;
 			*na = -1.0F;
 		}
-		
+
 		na = NodeArray;
 		na += ( e * NodeNetworkHeader.NumOfNodes ) + e;
 		*na = 0.0F;
 	}
-	
-	
+
+
 	for( e = 0 ; e < NodeNetworkHeader.NumOfNodes ; e++ )
 	{
 		Source =  NodeFrom;
@@ -507,18 +507,18 @@ void UpdateNearestNode( OBJECT * Object )
 	Node = (NODE *) Object->NearestNode;
 
 	Distance = DistanceVector2Vector( (VECTOR*) &Node->Pos , (VECTOR*) &Object->Pos );
-	
+
 	for( i = 0 ; i < Node->NumOfLinks ; i ++ )
 	{
 
 		NodeLink = Node->NodeLink[i];
-		
+
 		Temp = DistanceVector2Vector( (VECTOR*) &NodeLink->Pos , (VECTOR*) &Object->Pos );
-		
+
 		if( ( Temp < Distance ) && AI_ClearLOS( &Object->Pos ,Object->Group, &NodeLink->Pos ) )
 		{
 			Distance = Temp;
-			
+
 			if( !( Object->NodeNetwork & NodeLink->NetMask ) )
 			{
 				// uh oh im leaving my node network......
@@ -528,7 +528,7 @@ void UpdateNearestNode( OBJECT * Object )
 					Object->LastNearestNode = (void*) Node;
 				}
 			}
-			
+
 			Object->NearestNode = (void*) NodeLink;
 		}
 	}
@@ -554,10 +554,10 @@ NODE * WhichNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 
 	if( (NodeFrom == NodeTo) || !NodeFrom || !NodeTo )
 		return NodeFrom;
-	
+
 	Distance = -1.0F;
 	NodeReturn = NULL;
-  
+
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
 		NodeLink = NodeFrom->NodeLink[i];
@@ -598,10 +598,10 @@ NODE * WhichRetreatNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 
 	if( (NodeFrom == NodeTo) || !NodeFrom || !NodeTo )
 		return NodeFrom;
-	
+
 	Distance = -1.0F;
 	NodeReturn = NULL;
-  
+
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
 		NodeLink = NodeFrom->NodeLink[i];
@@ -767,9 +767,9 @@ void UpdateNearestNodeSpecial( OBJECT * Object )
 	Node = (NODE *) Object->NearestNode;
 	if( !Node )
 		return;
-	
+
 	Distance = NODE_DIST( &Node->Pos , &Object->Pos );
-	
+
 	for( i = 0 ; i < Node->NumOfLinks ; i ++ )
 	{
 		NodeLink = Node->NodeLink[i];
@@ -831,7 +831,7 @@ float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Grou
 	float		Temp;
 	NODE	*	Node;
 	NODE	*	NearestNode = NULL;
-	float		Distance = -1.0F; 
+	float		Distance = -1.0F;
 
 	if( !NodeNetworkHeader.State )
 		return Distance;

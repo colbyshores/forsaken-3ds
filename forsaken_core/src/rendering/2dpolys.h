@@ -109,7 +109,7 @@ constexpr int FM_BLUEPHOTON = 53; // Blue Photon Torpedo?
 constexpr int FM_FIREBALL = 54; // Fireball
 constexpr int FM_SPARKLE = 55; // Sparkle?
 constexpr int FM_GOALSPARKLE = 56; // Hacky goal Sparkle?
-	
+
 /*===================================================================
 	Faceme Flags
 ===================================================================*/
@@ -167,7 +167,7 @@ typedef struct FMPOLY{
 	float			UpSpeed;			// Speed
 	float			xsize;				// in world space
 	float			ysize;				// in world space
-	
+
 }FMPOLY;
 
 

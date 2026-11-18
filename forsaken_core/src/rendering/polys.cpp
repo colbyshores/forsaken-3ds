@@ -44,7 +44,7 @@ void InitPolys( void )
 
 	FirstPolyUsed = INDEX_NONE;
 	FirstPolyFree = 0;
-	
+
 	for( i = 0; i < MAXPOLYS; i++ )
 	{
 		memset( &Polys[ i ], 0, sizeof( POLY ) );
@@ -73,7 +73,7 @@ u_int16_t FindFreePoly( void )
 
 	i = FirstPolyFree;
 	if( i == INDEX_NONE ) return i;
- 
+
 	Polys[ i ].Prev = FirstPolyUsed;
 
 	if( FirstPolyUsed != INDEX_NONE) Polys[ FirstPolyUsed ].Next = i;
@@ -95,7 +95,7 @@ void KillUsedPoly( u_int16_t i )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
-	
+
 	its_prev = Polys[i].Prev;
 	its_next = Polys[i].Next;
 
@@ -179,7 +179,7 @@ void ProcessPolys( void )
 				}
 
     			if( Polys[ i ].Qlerp.time != 1.0F )
-				{				
+				{
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
 					if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
@@ -200,7 +200,7 @@ void ProcessPolys( void )
 					R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col4.R = 0;
 					else Polys[ i ].Col4.R = (u_int8_t) R;
-				
+
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col1.G = 0;
@@ -217,7 +217,7 @@ void ProcessPolys( void )
 					G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col4.G = 0;
 					else Polys[ i ].Col4.G = (u_int8_t) G;
-				
+
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col1.B = 0;
@@ -270,7 +270,7 @@ void ProcessPolys( void )
 		   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   	case POLY_SHIELD:								// Ship Shield Effect>
     			if( Polys[ i ].Qlerp.time != 1.0F )
-				{				
+				{
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
 					if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
@@ -291,7 +291,7 @@ void ProcessPolys( void )
 					R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
 					if( R < 0.0F ) Polys[ i ].Col4.R = 0;
 					else Polys[ i ].Col4.R = (u_int8_t) R;
-				
+
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col1.G = 0;
@@ -308,7 +308,7 @@ void ProcessPolys( void )
 					G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
 					if( G < 0.0F ) Polys[ i ].Col4.G = 0;
 					else Polys[ i ].Col4.G = (u_int8_t) G;
-				
+
 					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 					B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
 					if( B < 0.0F ) Polys[ i ].Col1.B = 0;
@@ -423,7 +423,7 @@ void DoAfterBurnerEffects( void )
 							AddPolyToTPage( TurboIndex[ Ship ], GetTPage( AfterBurner_Header, 0 ) );
 						}
 					}
-		
+
 					if( TurboLength[ Ship ] != MAX_AFTERBURNER_LENGTH )
 					{
 						TurboLength[ Ship ] += AFTERBURNER_INC;
@@ -440,7 +440,7 @@ void DoAfterBurnerEffects( void )
 						if( TurboLength[ Ship ] <= 0.0F )
 						{
 							TurboLength[ Ship ] = 0.0F;
-		
+
 							if( TurboIndex[ Ship ] != INDEX_NONE )
 							{
 								KillUsedPoly( TurboIndex[ Ship ] );
@@ -449,26 +449,26 @@ void DoAfterBurnerEffects( void )
 						}
 					}
 				}
-		
+
 				if( TurboIndex[ Ship ] != INDEX_NONE )
 				{
 					TI = TurboIndex[ Ship ];
 					TL = TurboLength[ Ship ];
-		
+
 					if( framelag ) Angle = (float) Random_Range( 360 );
 					else Angle = 0.0F;
 					LeftDir.x = (float) COSD( Angle );
 					LeftDir.y = (float) SIND( Angle );
 					LeftDir.z = (float) 0.0F;
-		
+
 					ApplyMatrix( &Ships[ Ship ].Object.FinalMat, &Forward, &DirVector );
 					ApplyMatrix( &Ships[ Ship ].Object.FinalMat, &LeftDir, &LeftVector );
 					ApplyMatrix( &Ships[ Ship ].Object.FinalMat, &SlideUp, &UpVector );
-			
+
 					Pos.x = ( Ships[ Ship ].Object.Pos.x + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.x ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.x ) );
 					Pos.y = ( Ships[ Ship ].Object.Pos.y + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.y ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.y ) );
 					Pos.z = ( Ships[ Ship ].Object.Pos.z + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.z ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.z ) );
-		
+
 					Polys[ TI ].Pos1.x = Pos.x - ( LeftVector.x * FlameDiameter );
 					Polys[ TI ].Pos1.y = Pos.y - ( LeftVector.y * FlameDiameter );
 					Polys[ TI ].Pos1.z = Pos.z - ( LeftVector.z * FlameDiameter );
@@ -481,7 +481,7 @@ void DoAfterBurnerEffects( void )
 					Polys[ TI ].Pos4.x = Polys[ TI ].Pos1.x + ( -DirVector.x * TL );
 					Polys[ TI ].Pos4.y = Polys[ TI ].Pos1.y + ( -DirVector.y * TL );
 					Polys[ TI ].Pos4.z = Polys[ TI ].Pos1.z + ( -DirVector.z * TL );
-		
+
 					Polys[ TI ].Col1.R = 255;
 					Polys[ TI ].Col1.G = 255;
 					Polys[ TI ].Col1.B = 255;
@@ -691,7 +691,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 					}
 				}
 			}
-				
+
 			i = Polys[ i ].NextInTPage;
 		}
 
@@ -715,8 +715,8 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	{
 		return false;
 	}
-		
-	
+
+
 	if (!(FSLockIndexBuffer(renderObject, &Indices)))
 	{
 		return false;
@@ -738,7 +738,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		{
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
-	
+
 			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
@@ -754,7 +754,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
@@ -764,7 +764,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
@@ -772,9 +772,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
- 
+
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos3.z;
@@ -782,9 +782,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   	
+
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-	   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
@@ -792,7 +792,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   		
+
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
@@ -839,7 +839,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 						}
 					}
 				}
-		
+
 				i = Polys[ i ].NextInTPage;
 			}
 		}
@@ -926,7 +926,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 					}
 				}
 			}
-			
+
 			i = Polys[ i ].NextInTPage;
 		}
 
@@ -946,7 +946,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	{
 		return false;
 	}
-	
+
 	if (!(FSLockIndexBuffer(renderObject, &Indices)))
 	{
 		return false;
@@ -969,7 +969,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		{
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
-	
+
 			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
@@ -986,7 +986,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
@@ -996,7 +996,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
@@ -1004,10 +1004,10 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   							
-	
+
+
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos3.z;
@@ -1015,10 +1015,10 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   					
-	
+
+
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-	   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
@@ -1026,7 +1026,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   		
+
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
@@ -1038,7 +1038,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 				   			PolyFacePnt->v3 = 3;
 				   			PolyFacePnt++;
 							ntris++;
-				
+
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
@@ -1073,7 +1073,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 						}
 					}
 				}
-		
+
 				i = Polys[ i ].NextInTPage;
 			}
 		}
@@ -1084,7 +1084,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	if (!(FSUnlockVertexBuffer(renderObject)))
 	{
 		return false;
-	}	
+	}
 
 	if (!(FSUnlockIndexBuffer(renderObject)))
 	{
@@ -1205,7 +1205,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 					}
 				}
 			}
-			
+
 			i = Polys[ i ].NextInTPage;
 		}
 
@@ -1229,7 +1229,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 	{
 		return false;
 	}
-			
+
 	if (!(FSLockIndexBuffer(renderObject, &Indices)))
 	{
 		return false;
@@ -1252,7 +1252,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		{
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
-	
+
 			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
@@ -1269,7 +1269,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
@@ -1279,7 +1279,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
@@ -1287,7 +1287,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   							
+
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
@@ -1299,7 +1299,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-	   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
@@ -1307,7 +1307,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   		
+
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
@@ -1319,7 +1319,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 				   			PolyFacePnt->v3 = 3;
 				   			PolyFacePnt++;
 							ntris++;
-				
+
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = 0;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = NumVerts;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = 0;
@@ -1354,7 +1354,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 						}
 					}
 				}
-		
+
 				i = Polys[ i ].NextInTPage;
 			}
 		}
@@ -1441,7 +1441,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 					}
 				}
 			}
-			
+
 			i = Polys[ i ].NextInTPage;
 		}
 
@@ -1465,12 +1465,12 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	{
 		return false;
 	}
-		
+
 	if (!(FSLockIndexBuffer(renderObject, &Indices)))
 	{
 		return false;
 	}
-	
+
 	PolyFacePnt = (TRIANGLE *) Indices;
 	PolyVertPnt = (LVERTEX *) BufStart;
 
@@ -1488,7 +1488,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		{
 			if( Count == *TPage ) i = *NextPoly;
 			else i = PolyTPages[ Count ].FirstPoly;
-	
+
 			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
@@ -1504,7 +1504,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos1.z;
@@ -1514,7 +1514,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt++;
 
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos2.z;
@@ -1522,9 +1522,9 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->tv = Box_Ptr->v1;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   							
+
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos3.z;
@@ -1532,9 +1532,9 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   					
+
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-	   		
+
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
 		   					PolyVertPnt->z = Polys[ i ].Pos4.z;
@@ -1542,7 +1542,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->tv = Box_Ptr->v2;
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
-   		
+
 				   			PolyFacePnt->v1 = 0;
 				   			PolyFacePnt->v2 = 1;
 				   			PolyFacePnt->v3 = 2;
@@ -1632,7 +1632,7 @@ FILE * SavePolys( FILE * fp )
 		fwrite( &TotalPolysInUse, sizeof( u_int32_t ),1 ,fp );
 		fwrite( &FirstPolyUsed, sizeof( FirstPolyUsed ), 1, fp );
 		fwrite( &FirstPolyFree, sizeof( FirstPolyFree ), 1, fp );
-		
+
 		for( i = 0; i < ( MAXTPAGESPERTLOAD + 1 ); i++ )
 		{
 			fwrite( &PolyTPages[ i ].FirstPoly, sizeof( u_int16_t ), 1, fp );
@@ -1700,7 +1700,7 @@ FILE * LoadPolys( FILE * fp )
 		fread( &TotalPolysInUse, sizeof( u_int32_t ),1 ,fp );
 		fread( &FirstPolyUsed, sizeof( FirstPolyUsed ), 1, fp );
 		fread( &FirstPolyFree, sizeof( FirstPolyFree ), 1, fp );
-		
+
 		for( i = 0; i < ( MAXTPAGESPERTLOAD + 1 ); i++ )
 		{
 			fread( &PolyTPages[ i ].FirstPoly, sizeof( u_int16_t ), 1, fp );

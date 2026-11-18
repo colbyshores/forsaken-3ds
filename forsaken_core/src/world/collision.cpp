@@ -94,17 +94,17 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 /*===================================================================
 	Calculate T
 ===================================================================*/
-	Div = ( ODir.x * normal->x) + 
-		  ( ODir.y * normal->y) + 
+	Div = ( ODir.x * normal->x) +
+		  ( ODir.y * normal->y) +
 		  ( ODir.z * normal->z);
-	
+
 	if( Div >= 0.0F ) return false;		/* Reject: parallel, or moving out of the front face */
 
 
 	Num = ( ( Origin.x * normal->x ) +
 		    ( Origin.y * normal->y ) +
-		    ( Origin.z * normal->z ) ) + offset; 
-		
+		    ( Origin.z * normal->z ) ) + offset;
+
 	t = -( Num / Div );
 
 /*===================================================================
@@ -149,7 +149,7 @@ static float hit_portal_offset = 0.0F;
  *	true if collided with background, false if no collision
  */
 bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
-					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
+					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset,
 					  VECTOR *EndPos, u_int16_t *EndGroup,
 					  NORMAL *FaceNormal, VECTOR *NewTarget, bool BGCol, BGOBJECT ** BGObject )
 {
@@ -186,13 +186,13 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 			BSP_PORTAL			*bp;
 			int					j;
 			float				d;
-			
+
 			dv.x = epos.x - StartPos->x;
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			dv.y = epos.y - StartPos->y;
 			dv.z = epos.z - StartPos->z;
 			dist_bg = (float) sqrtf( dv.x * dv.x + dv.y * dv.y + dv.z * dv.z );
-			
+
 			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			pg = &Bsp_Portal_Header.group[ group ];
 			for ( j = 0; j < pg->portals; j++ )
@@ -355,7 +355,7 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 	VECTOR		ImpactNormal;
 	float		ImpactOffset;
 	MCFACE		BSPFace; ZERO_STACK_MEM(BSPFace);
-	
+
 	if( group == INDEX_NONE)
 		return false;
 
@@ -452,24 +452,24 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 		else
 		{
 			if( !collided ) return (false);
-		   	
+
 			FaceNormal->nx = CollFace->nx;
 			FaceNormal->ny = CollFace->ny;
 			FaceNormal->nz = CollFace->nz;
 			C = CollFace->D;
-		   	
-			e.x = Pos->x + Dir->x;	
-			e.y = Pos->y + Dir->y;	
-			e.z = Pos->z + Dir->z;	
-		   	
+
+			e.x = Pos->x + Dir->x;
+			e.y = Pos->y + Dir->y;
+			e.z = Pos->z + Dir->z;
+
 			nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
-		   		
-			D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
-		   	
-			Dn.x = D * FaceNormal->nx; 
-			Dn.y = D * FaceNormal->ny; 
-			Dn.z = D * FaceNormal->nz; 
-		   	
+
+			D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ;
+
+			Dn.x = D * FaceNormal->nx;
+			Dn.y = D * FaceNormal->ny;
+			Dn.z = D * FaceNormal->nz;
+
 			Pos_New->x = e.x + Dn.x;
 			Pos_New->y = e.y + Dn.y;
 			Pos_New->z = e.z + Dn.z;
@@ -478,24 +478,24 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 	else
 	{
 		if( !collided ) return (false);
-	   	
+
 		FaceNormal->nx = CollFace->nx;
 		FaceNormal->ny = CollFace->ny;
 		FaceNormal->nz = CollFace->nz;
 		C = CollFace->D;
-	   	
-		e.x = Pos->x + Dir->x;	
-		e.y = Pos->y + Dir->y;	
-		e.z = Pos->z + Dir->z;	
-	   	
+
+		e.x = Pos->x + Dir->x;
+		e.y = Pos->y + Dir->y;
+		e.z = Pos->z + Dir->z;
+
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
-	   		
-		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
-	   	
-		Dn.x = D * FaceNormal->nx; 
-		Dn.y = D * FaceNormal->ny; 
-		Dn.z = D * FaceNormal->nz; 
-	   	
+
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ;
+
+		Dn.x = D * FaceNormal->nx;
+		Dn.y = D * FaceNormal->ny;
+		Dn.z = D * FaceNormal->nz;
+
 		Pos_New->x = e.x + Dn.x;
 		Pos_New->y = e.y + Dn.y;
 		Pos_New->z = e.z + Dn.z;
@@ -523,12 +523,12 @@ bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 {
 	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	float		Distance = 0.0f;
-	u_int16_t		flag = 0;	
+	u_int16_t		flag = 0;
 	bool		res;
 	BSP_PORTAL_GROUP	*pg;
 	BSP_PORTAL			*bp;
 	int					j;
-	
+
 	if( group == INDEX_NONE)
 		return false;
 
@@ -679,18 +679,18 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 
 		C = -( ( FaceNormal->nx * ImpactPoint->x ) + ( FaceNormal->ny * ImpactPoint->y ) + ( FaceNormal->nz * ImpactPoint->z ) );
 
-		e.x = Origin.x + ODir.x;	
-		e.y = Origin.y + ODir.y;	
-		e.z = Origin.z + ODir.z;	
-	
+		e.x = Origin.x + ODir.x;
+		e.y = Origin.y + ODir.y;
+		e.z = Origin.z + ODir.z;
+
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
-		
-		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
-	
-		Dn.x = D * FaceNormal->nx; 
-		Dn.y = D * FaceNormal->ny; 
-		Dn.z = D * FaceNormal->nz; 
-	
+
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ;
+
+		Dn.x = D * FaceNormal->nx;
+		Dn.y = D * FaceNormal->ny;
+		Dn.z = D * FaceNormal->nz;
+
 		New_Pos->x = e.x + Dn.x;
 		New_Pos->y = e.y + Dn.y;
 		New_Pos->z = e.z + Dn.z;
@@ -778,18 +778,18 @@ SkipIt:
 
 		C = -( ( FaceNormal->nx * ImpactPoint->x ) + ( FaceNormal->ny * ImpactPoint->y ) + ( FaceNormal->nz * ImpactPoint->z ) );
 
-		e.x = Origin.x + ODir.x;	
-		e.y = Origin.y + ODir.y;	
-		e.z = Origin.z + ODir.z;	
-	
+		e.x = Origin.x + ODir.x;
+		e.y = Origin.y + ODir.y;
+		e.z = Origin.z + ODir.z;
+
 		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
-		
-		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
-	
-		Dn.x = D * FaceNormal->nx; 
-		Dn.y = D * FaceNormal->ny; 
-		Dn.z = D * FaceNormal->nz; 
-	
+
+		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ;
+
+		Dn.x = D * FaceNormal->nx;
+		Dn.y = D * FaceNormal->ny;
+		Dn.z = D * FaceNormal->nz;
+
 		New_Pos->x = e.x + Dn.x;
 		New_Pos->y = e.y + Dn.y;
 		New_Pos->z = e.z + Dn.z;
@@ -863,7 +863,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 						case ZONE_Sphere:
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							break;
-	
+
 						case ZONE_Box:
 							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
@@ -903,7 +903,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							}
 							break;
-	
+
 						case ZONE_Polygonal:
 							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
@@ -946,7 +946,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 					ZonesPtr++;
 				}
 			}
-					
+
 			if( Children->NumChildren )
 			{
 				CollideBGOChildren( Children->Children, Children->NumChildren );
@@ -1172,7 +1172,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 				NewDir.x = ( NewOrigin.x - OldOrigin.x );
 				NewDir.y = ( NewOrigin.y - OldOrigin.y );
 				NewDir.z = ( NewOrigin.z - OldOrigin.z );
-	
+
 				NewOrigin = OldOrigin;
 
 				Length = VectorLength( &NewDir );
@@ -1198,7 +1198,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 						case ZONE_Sphere:
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							break;
-	
+
 						case ZONE_Box:
 							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
@@ -1239,7 +1239,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 							}
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							break;
-	
+
 						case ZONE_Polygonal:
 							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
@@ -1283,7 +1283,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 					ZonesPtr++;
 				}
 			}
-					
+
 			if( Children->NumChildren )
 			{
 				CollideBGOToCompObjChildren( Children->Children, Children->NumChildren );
@@ -1364,7 +1364,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 	VECTOR Pos_New; ZERO_STACK_MEM(Pos_New);
 	bool hit;
 	VECTOR ImpactPoint;
-	
+
 	hit = false;
 	StartPos = Obj->Pos;
 	Move_Dir = *Move_Off;
@@ -1568,7 +1568,7 @@ bool QCollide( VECTOR *Start_Pos, u_int16_t Start_Group, VECTOR *Move_Off, float
 	VECTOR StartPos;
 	bool hit;
 	VECTOR ImpactPoint;
-	
+
 	hit = false;
 	StartPos = *Start_Pos;
 	Move_Dir = *Move_Off;
@@ -1668,7 +1668,7 @@ u_int16_t GetComEnemyHitInfo( VECTOR * IntPoint, NORMAL * IntNormal, float * Int
 	{
 		return( CompEnemyHit );
 	}
-	
+
 	IntPoint->x = CompEnemyHitPos.x;
 	IntPoint->y = CompEnemyHitPos.y;
 	IntPoint->z = CompEnemyHitPos.z;

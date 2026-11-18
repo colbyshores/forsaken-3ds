@@ -36,11 +36,11 @@ void AI_AIR_IDLE( ENEMY * Enemy )
 	{
 		Enemy->Timer -= framelag;
 
-      
+
 		if ( Enemy->Timer < 0.0F )
 			Enemy->Timer = 0.0F;
-		return;         
-	}         
+		return;
+	}
 	// Switch to AIMODE_SCAN
 	Enemy->Object.AI_Mode = AIMODE_SCAN;
 	Enemy->Timer  =	RESET_SCAN_TIME + (float) Random_Range( (u_int16_t) RESET_SCAN_TIME );
@@ -56,10 +56,10 @@ void AI_TURRET_IDLE( ENEMY * Enemy )
 	{
 		return;
 	}
-	
+
 	if( Enemy->Object.CurAnimSeq != TURRETSEQ_Closed )
 		SetCurAnimSeq( TURRETSEQ_Closed, &Enemy->Object );
-	
+
 	AI_UPDATEGUNS( Enemy );
 
 	if ( Enemy->Timer )
@@ -67,8 +67,8 @@ void AI_TURRET_IDLE( ENEMY * Enemy )
 		Enemy->Timer -= framelag;
 		if ( Enemy->Timer < 0.0F )
 			Enemy->Timer = 0.0F;
-		return;         
-	}         
+		return;
+	}
 	// Switch to AIMODE_SCAN
 
 	AI_THINK( Enemy , true , true );
@@ -99,8 +99,8 @@ void AI_CRAWL_IDLE( ENEMY * Enemy )
 		Enemy->Timer -= framelag;
 		if ( Enemy->Timer < 0.0F )
 			Enemy->Timer = 0.0F;
-		return;         
-	}         
+		return;
+	}
 	// Switch to AIMODE_SCAN
 	Enemy->Object.AI_Mode = AIMODE_SCAN;
 	Enemy->Timer  =	RESET_SCAN_TIME + (float) Random_Range( (u_int16_t) RESET_SCAN_TIME );

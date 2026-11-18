@@ -6,7 +6,7 @@
 #include "rendering/text.h"
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 
 #include "game/main.h"
@@ -16,7 +16,7 @@
 
 
 /*===================================================================
-		Globals...	
+		Globals...
 ===================================================================*/
 TLOADHEADER	Tloadheader;
 double	Gamma = 1.0;
@@ -38,9 +38,9 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 		Tloadheader->MipMap[i]		  = false;
 		Tloadheader->PlaceHolder[i]	  = false;
 
-		Tloadheader->Xsize[ i ] = 0;		
+		Tloadheader->Xsize[ i ] = 0;
 		Tloadheader->Ysize[ i ] = 0;
-		
+
 		Tloadheader->PlaceHolderFile[ i ] = NULL;
 	}
 	return	true;
@@ -87,7 +87,7 @@ bool Tload( TLOADHEADER * Tloadheader  )
 
 	return( true );
 }
-	
+
 /* Create page n from its file (a placeholder is left empty until
    TloadReloadPlaceHolder fills it). numMips 0 asks the backend for a full
    mip chain, 1 for the base level only. */
@@ -253,12 +253,12 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t Co
 		Tloadheader->PlaceHolder[i] = true;
 		Tloadheader->num_texture_files++;
 
-		Tloadheader->Xsize[ i ] = xsize;		
-		Tloadheader->Ysize[ i ] = ysize;		
+		Tloadheader->Xsize[ i ] = xsize;
+		Tloadheader->Ysize[ i ] = ysize;
 
 		return i;
 	}
-			
+
 	DebugPrintf("Added Texture: %s\n",Name);
 
 	// has the Texture allready been Added ??

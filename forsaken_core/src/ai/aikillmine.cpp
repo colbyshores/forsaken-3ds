@@ -60,15 +60,15 @@ void AI_AIR_KILLMINE( ENEMY * Enemy )
 		AI_SetFOLLOWPATH( Enemy );
 		return;
 	}
-	
+
 	Enemy->AIFlags &= ~AI_MINEAVOID;
 
-	
+
 	AI_UPDATEGUNS( Enemy );
 	// Aim at target
 
 	AI_AimAtTarget( &SObject->InvMat , &SObject->Pos, &Enemy->MinePos );
-	
+
 	if( !( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_ICANTPITCH ) )
 	{
 		Enemy->AIMoveFlags |= AimData.Flags;
@@ -82,7 +82,7 @@ void AI_AIR_KILLMINE( ENEMY * Enemy )
 		{
 			Enemy->AIMoveFlags |=  AI_CONTROL_DOWN;
 		}
-		
+
 	}
 	if( Enemy->AvoidTimer && Enemy->AvoidType )
 	{
@@ -91,7 +91,7 @@ void AI_AIR_KILLMINE( ENEMY * Enemy )
 		Enemy->AvoidTimer = 0.0F;
 		ApplyMatrix( &SObject->Mat, &Forward, &TempVector );
 		ApplyMatrix( &SObject->Mat, &SlideUp, &TempUpVector );
-		  
+
 		if( !(Enemy->Object.Flags & SHIP_Scattered ) && (Enemy->PrimaryFireTimer == 0.0F) && ( EnemyTypes[Enemy->Type].PrimaryWeaponType != NO_PRIMARY )  )
 		{
 			Enemy->PrimaryFireTimer = EnemyTypes[Enemy->Type].PrimaryFireRate + (float) Random_Range( (u_int16_t) EnemyTypes[Enemy->Type].PrimaryFireRate );

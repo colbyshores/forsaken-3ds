@@ -19,7 +19,7 @@ char * convert_char( char from, char to, char* in )
 		return in;
 	pch = strchr( in, from );
 	while( pch != NULL )
-	{ 
+	{
 		*pch = to;
 		pch = strchr( pch+1, from );
 	}
@@ -47,8 +47,8 @@ void strtoupper(char *str)
 {
 	while (*str)
 	{
-		*str = (char) toupper(*str); 
-		str++; 
+		*str = (char) toupper(*str);
+		str++;
 	}
 }
 
@@ -189,7 +189,7 @@ void DebugPuts( char * buf )
 void DebugState( const char * str )
 {
 	static const char * last;
-	if ( !Debug ) 
+	if ( !Debug )
 		return;
 	if ( last && strcmp( str, last ) == 0 )
 		return;

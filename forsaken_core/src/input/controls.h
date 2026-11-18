@@ -107,7 +107,7 @@ enum
 	AXIS_RzAxis,
 	AXIS_SliderAxis0,
 	AXIS_SliderAxis1,
-};					 
+};
 
 constexpr auto AXIS_Start = AXIS_XAxis;
 constexpr auto AXIS_End = AXIS_SliderAxis1;

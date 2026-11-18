@@ -23,7 +23,7 @@
 
 
 /*===================================================================
-		Globals...	
+		Globals...
 ===================================================================*/
 
 XLIGHT * FirstLightVisible = NULL;
@@ -63,10 +63,10 @@ u_int16_t	FindFreeXLight()
 	u_int16_t i;
 
 	i = FirstXLightFree;
-	
+
 	if ( i == INDEX_NONE)
 		return i;
- 
+
 	XLights[i].Prev = FirstXLightUsed;
 	if ( FirstXLightUsed != INDEX_NONE)
 	{
@@ -89,7 +89,7 @@ void	KillUsedXLight( u_int16_t light )
 {
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
-	
+
 	its_prev = XLights[light].Prev;
 	its_next = XLights[light].Next;
 
@@ -154,7 +154,7 @@ bool	ProcessXLights( MLOADHEADER * /*Mloadheader*/ )
 ===================================================================*/
 
 void SetLightDie ( u_int16_t light )
-{				
+{
 	XLights[light].SizeCount = 50.0F;
 	XLights[light].ColorCount = 2.0F;
 	XLights[light].r = 255.0F;
@@ -218,9 +218,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	u_int32_t	tempiG;
 	u_int32_t	tempiB;
 	u_int32_t	tempiA;
-	float	centerx;  
-	float	centery;  
-	float	centerz;  
+	float	centerx;
+	float	centery;
+	float	centerz;
 	float	half_sizex;
 	float	half_sizey;
 	float	half_sizez;
@@ -241,7 +241,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		intWhiteOut = (256 - (intWhiteOut-256) );
 	}
 
-	
+
 	CellSize = Mloadheader->CellSize;
 	mesh = Mloadheader->Group[group].num_meshes;
 	while( mesh--)
@@ -249,7 +249,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &VertBase)))
 		{
 			return false;
-		}	
+		}
 		/* The colour pass below restores the baked colours (stable from
 		 * frame to frame) unless white-out or water rewrite them every
 		 * frame; tell the backend's caches which (render.h SMEMO_PASS). */
@@ -271,7 +271,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 
 			for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[mesh] ; i++ )
 			{
-				
+
 				if( PolyAnim->currentframe != PolyAnim->newframe )
 				{
 					// something has changed....
@@ -292,15 +292,15 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 				PolyAnim++;
 			}
 		}
-		
-		
-		
+
+
+
 		LVert = VertBase;
 		{
 			OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
-			
+
 			vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
-			
+
 			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 			if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
 			{
@@ -310,8 +310,8 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					{
 						while( vert --)
 						{
-							LVert++;		
-							OrigLVert++;		
+							LVert++;
+							OrigLVert++;
 						}
 					}
 					else
@@ -319,11 +319,11 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						while( vert --)
 						{
 							LVert->color = OrigLVert->color;
-							LVert++;		
-							OrigLVert++;		
+							LVert++;
+							OrigLVert++;
 						}
 					}
-					
+
 				}
 				else
 				{
@@ -341,9 +341,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 							b = 255;
 						col |= (b<<24)+(b<<16);
 						LVert->color = col;
-						LVert++;		
-						OrigLVert++;		
-						
+						LVert++;
+						OrigLVert++;
+
 					}
 				}
 			}else if( GroupWaterInfo[group] == WATERSTATE_ALLWATER )
@@ -461,7 +461,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					Posz = XLightPnt->Pos.z;
 					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					OSize  = XLightPnt->Size;
-			
+
 					Temp.x = Posx - centerx;
 					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 					if( Temp.x < 0.0F )	Temp.x *= -1.0F;
@@ -477,8 +477,8 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					{
 						SizeX2 = OSize * OSize;
 						Size = 1 / SizeX2;
-						rlf	= XLightPnt->r; 
-						glf	= XLightPnt->g; 
+						rlf	= XLightPnt->r;
+						glf	= XLightPnt->g;
 						blf	= XLightPnt->b;
 
 						if( XLightPnt->Type == SPOT_LIGHT )
@@ -488,8 +488,8 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 							Dirz = XLightPnt->Dir.z;
 							CosArc = XLightPnt->CosArc;
 						}
-				
-					
+
+
 						CellIndex.x = Posx - Mloadheader->Group[group].cell_origin[mesh].x;
 						CellIndex.y = Posy - Mloadheader->Group[group].cell_origin[mesh].y;
 						CellIndex.z = Posz - Mloadheader->Group[group].cell_origin[mesh].z;
@@ -499,8 +499,8 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						CellRange_x = (int) fast_floorf( (CellIndex.x + OSize) * CellSize );
 						CellRange_y = (int) fast_floorf( (CellIndex.y + OSize) * CellSize );
 						CellRange_z = (int) fast_floorf( (CellIndex.z + OSize) * CellSize );
-					
-					
+
+
 						if( CellIndex_x < 0 )
 						{
 							CellIndex_x = 0;
@@ -522,7 +522,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 							if( CellIndex_z >= NumOfzCells )
 								CellIndex_z = NumOfzCells-1;
 						}
-					
+
 						if( CellRange_x < 0 )
 						{
 							CellRange_x = 0;
@@ -544,14 +544,14 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 							if( CellRange_z >= NumOfzCells )
 								CellRange_z = NumOfzCells-1;
 						}
-					
+
 						switch( XLightPnt->Type )
 						{
 						case POINT_LIGHT:
 							Cellz = CellIndex_z;
-			
+
 							while( Cellz <= CellRange_z )
-							{			   
+							{
 								Celly = CellIndex_y;
 								while( Celly <= CellRange_y )
 								{
@@ -559,12 +559,12 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 										   ( Celly + NumOfyCells *
 										     Cellz ) );
 									Cellx = CellRange_x - CellIndex_x + 1;
-									
+
 									while( Cellx-- )
 									{
 										VertexIndexPnt = OrgVertexIndexPnt+VertexCellPnt[Cell].start_vert_in_cell;
 										vert = VertexCellPnt[Cell].num_verts_in_cell;
-			
+
 										while( vert-- )
 										{
 											LVert = VertBase + *VertexIndexPnt++;
@@ -575,7 +575,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 											x -= Posx;
 											y -= Posy;
 											z -= Posz;
-			
+
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											distance = (x*x) + (y*y) + (z*z);
 											if ( distance <  SizeX2  )					// float
@@ -592,11 +592,11 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 												clamp = carry - ( carry >> 8 );
 												col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 												col |= tempiA;
-			
+
 												LVert->color = col;
 											}
 										}
-			
+
 										Cell++;
 									}
 									Celly++;
@@ -615,7 +615,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 										            ( Celly + NumOfyCells *
 										              Cellz ) );
 									Cellx = CellRange_x - CellIndex_x + 1;
-									
+
 									while( Cellx-- )
 									{
 										VertexIndexPnt = OrgVertexIndexPnt+VertexCellPnt[Cell].start_vert_in_cell;
@@ -628,12 +628,12 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 											y = LVert->y - Posy;
 											z = LVert->z - Posz;
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-											distance = (x*x) + (y*y) + (z*z); 
-					
+											distance = (x*x) + (y*y) + (z*z);
+
 											if ( distance <  SizeX2  )
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											{
-							
+
 												if( distance > 0.0F )
 												{
 													distance = (float) sqrtf( distance );
@@ -644,7 +644,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 												}
 												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 												Cosa = ( ( x*Dirx ) + ( y*Diry ) + ( z*Dirz ) );
-												
+
 												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 												if( distance > 0.5F * OSize )
 												{
@@ -658,7 +658,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 													}
 												}else if ( distance > MIN_LIGHT_SIZE ) {
 													float cosarc2;
-					
+
 													/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 													cosarc2 = CosArc * ( 1.0F - ( ( OSize * 0.5F - distance ) / ( OSize * 0.5F - MIN_LIGHT_SIZE ) ) );
 													if ( Cosa > cosarc2 )
@@ -676,7 +676,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 														intense = 1.0F + Cosa;
 													}
 												}
-												
+
 												col =  LVert->color;				// int
 												tempiA = col & 0xff000000;
 												tempiR = (int) ( rlf * intense );
@@ -697,7 +697,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 								Cellz++;
 							}
 							break;
-					
+
 						}
 					}
 				}
@@ -759,7 +759,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	group = MXloadheader->num_groups;
 	while( group--)
 	{
-	
+
 		mesh = MXloadheader->Group[group].num_meshes;
 		while( mesh--)
 		{
@@ -806,7 +806,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 					Posy = XLightPnt->Pos.y;
 					Posz = XLightPnt->Pos.z;
 					OSize  = XLightPnt->Size;
-		
+
 					Temp.x = Posx - Pos->x;
 					if( Temp.x < 0.0F )	Temp.x *= -1.0F;
 					Temp.y = Posy - Pos->y;
@@ -819,8 +819,8 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 					{
 						SizeX2 = OSize * OSize;
 						Size = 1 / SizeX2;
-						rlf	= XLightPnt->r; 
-						glf	= XLightPnt->g; 
+						rlf	= XLightPnt->r;
+						glf	= XLightPnt->g;
 						blf	= XLightPnt->b;
 
 						if( XLightPnt->Type == SPOT_LIGHT )
@@ -830,25 +830,25 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 							Dirz = XLightPnt->Dir.z;
 							CosArc = XLightPnt->CosArc;
 						}
-					
+
 						LVert = VertBase;
 						vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
-		
+
 						switch( XLightPnt->Type )
 						{
 						case POINT_LIGHT:
-		
+
 							while( vert-- )
 							{
 								/* find the distance from vert to light */
 
 								ApplyMatrix( Matrix, (VECTOR*) LVert, &Temp );
-								
+
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
 								z = Temp.z - Posz;
 								distance = (x*x) + (y*y) + (z*z);
-		
+
 								if ( distance <  SizeX2  )					// float
 								{
 									distance = 1.0F - ( distance * Size );	// float
@@ -878,7 +878,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 								z = Temp.z - Posz;
 
 								distance = (x*x) + (y*y) + (z*z);
-		
+
 								if ( distance <  SizeX2  )
 								{
 									if( distance > 0.0F )
@@ -890,7 +890,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 										z *= rlen;
 									}
 									Cosa = ( ( x*Dirx ) + ( y*Diry ) + ( z*Dirz ) );
-									
+
 									if( distance > 0.5F * OSize )
 									{
 										if ( Cosa > CosArc )
@@ -902,7 +902,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 										}
 									}else if ( distance > MIN_LIGHT_SIZE ) {
 										float cosarc2;
-		
+
 										cosarc2 = CosArc * ( 1.0F - ( ( OSize * 0.5F - distance ) / ( OSize * 0.5F - MIN_LIGHT_SIZE ) ) );
 										if ( Cosa > cosarc2 )
 										{
@@ -947,7 +947,7 @@ PLOP:
 			}
 		}
 	}
-	
+
 	return true;
 }
 /*===================================================================
@@ -995,7 +995,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	group = MXloadheader->num_groups;
 	while( group--)
 	{
-	
+
 		mesh = MXloadheader->Group[group].num_meshes;
 		while( mesh--)
 		{
@@ -1003,7 +1003,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 			{
 				return false;
 			}
-		
+
 			LVert = VertBase;
 			vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
 			OrigLVert = MXloadheader->Group[group].originalVerts[mesh];
@@ -1028,7 +1028,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 					Posy = XLightPnt->Pos.y;
 					Posz = XLightPnt->Pos.z;
 					OSize  = XLightPnt->Size;
-		
+
 					Temp.x = Posx - Pos->x;
 					if( Temp.x < 0.0F )	Temp.x *= -1.0F;
 					Temp.y = Posy - Pos->y;
@@ -1041,8 +1041,8 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 					{
 						SizeX2 = OSize * OSize;
 						Size = 1 / SizeX2;
-						rlf	= XLightPnt->r; 
-						glf	= XLightPnt->g; 
+						rlf	= XLightPnt->r;
+						glf	= XLightPnt->g;
 						blf	= XLightPnt->b;
 
 						if( XLightPnt->Type == SPOT_LIGHT )
@@ -1052,25 +1052,25 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 							Dirz = XLightPnt->Dir.z;
 							CosArc = XLightPnt->CosArc;
 						}
-					
+
 						LVert = VertBase;
 						vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
-		
+
 						switch( XLightPnt->Type )
 						{
 						case POINT_LIGHT:
-		
+
 							while( vert-- )
 							{
 								/* find the distance from vert to light */
 
 								ApplyMatrix( Matrix, (VECTOR*) LVert, &Temp );
-								
+
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
 								z = Temp.z - Posz;
 								distance = (x*x) + (y*y) + (z*z);
-		
+
 								if ( distance <  SizeX2  )					// float
 								{
 									distance = 1.0F - ( distance * Size );	// float
@@ -1094,12 +1094,12 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 							{
 								/* find the distance from vert to light */
 								ApplyMatrix( Matrix, (VECTOR*) LVert, &Temp );
-								
+
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
 								z = Temp.z - Posz;
-								distance = (x*x) + (y*y) + (z*z); 
-		
+								distance = (x*x) + (y*y) + (z*z);
+
 								if ( distance <  SizeX2  )
 								{
 									if( distance > 0.0F )
@@ -1111,7 +1111,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 										z *= rlen;
 									}
 									Cosa = ( ( x*Dirx ) + ( y*Diry ) + ( z*Dirz ) );
-									
+
 									if( distance > 0.5F * OSize )
 									{
 										if ( Cosa > CosArc )
@@ -1123,7 +1123,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 										}
 									}else if ( distance > MIN_LIGHT_SIZE ) {
 										float cosarc2;
-		
+
 										cosarc2 = CosArc * ( 1.0F - ( ( OSize * 0.5F - distance ) / ( OSize * 0.5F - MIN_LIGHT_SIZE ) ) );
 										if ( Cosa > cosarc2 )
 										{
@@ -1168,7 +1168,7 @@ PLOP2:
 			}
 		}
 	}
-	
+
 	return true;
 }
 
@@ -1197,7 +1197,7 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 	float	CellSize;
 	int		r,g,b;
 
-	
+
 	r=g=b=0;
 	CellSize = Mloadheader->CellSize;
 	NumOfxCells = Mloadheader->Group[group].xcells[0];
@@ -1231,18 +1231,18 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 		if( CellIndex_z >= NumOfzCells )
 			CellIndex_z = -1;
 	}
-	
+
 	if( CellIndex_x != -1 && CellIndex_y != -1 && CellIndex_z != -1 )
 	{
-		
+
 		Cell = ( CellIndex_x + NumOfxCells *
 			( CellIndex_y + NumOfyCells *
 			CellIndex_z ) );
-		
+
 		colpnt = Mloadheader->Group[group].colour_cell_pnt[0];
 		colpnt += Cell;
 		Col = *colpnt;
-		
+
 		r = RGBA_GETRED(Col);
 		g = RGBA_GETGREEN(Col);
 		b = RGBA_GETBLUE(Col);
@@ -1302,7 +1302,7 @@ FILE * SaveXLights( FILE * fp )
 		fwrite( &FirstXLightFree, sizeof( u_int16_t ), 1, fp );
 		if( FirstLightVisible  ) fwrite( &FirstLightVisible->Index, sizeof( u_int16_t ), 1, fp );
 		else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		
+
 		for( i = 0; i < MAXXLIGHTS; i++ )
 		{
 			fwrite( &XLights[ i ].Type, sizeof( int ), 1, fp );
@@ -1343,7 +1343,7 @@ FILE * LoadXLights( FILE * fp )
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstLightVisible = &XLights[ TempIndex ];
 		else FirstLightVisible = NULL;
-		
+
 		for( i = 0; i < MAXXLIGHTS; i++ )
 		{
 			fread( &XLights[ i ].Type, sizeof( int ), 1, fp );

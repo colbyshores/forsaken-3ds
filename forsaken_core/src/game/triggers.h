@@ -46,7 +46,7 @@ constexpr int TRIGGERTYPE_FlagCount = 6;
 constexpr int TRIGGERTYPE_FlagTest = 7;
 
 
- 
+
 /*
  * Structures
  */

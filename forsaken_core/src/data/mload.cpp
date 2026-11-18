@@ -64,7 +64,7 @@
  */
 
 /*===================================================================
-		Include File...	
+		Include File...
 ===================================================================*/
 
 #include "game/main.h"
@@ -100,7 +100,7 @@ constexpr float UV_FUDGE = (0.5F);
 constexpr float SAME_UV = (2.0F);
 
 /*===================================================================
-		Globals...	
+		Globals...
 ===================================================================*/
 float	UV_Fix = UV_FUDGE;
 u_int16_t	num_start_positions = 0;
@@ -336,18 +336,18 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			Msg( "Mload : num_meshes > MAXMESHESPERGROUP\n" );
 			return false;
 		}
-		
+
 		for( mesh = 0; mesh < Mloadheader->Group[group].num_meshes; mesh++)
 		{
 			Mloadheader->Group[group].num_animating_polys[mesh] = 0;
-			
+
 			in.skip( sizeof( int16_t ) );	// Direct3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
 			mesh_type = in.u16();
 			/*	get the number of verts in execution buffer	*/
 			num_vertices = in.u16();
-	
+
 			/*	record the mesh's type	*/
 			Mloadheader->Group[group].mesh_type[mesh] = mesh_type;
 
@@ -401,7 +401,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mloadheader->Group[group].originalVerts[mesh], &LVert[0], sizeof(LVERTEX) * num_vertices);//memcpy
-	
+
 			num_triangle_groups = in.u16();
 
 			triangleCount = 0;
@@ -469,9 +469,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
 				tpage = in.u16();
 				num_triangles = in.u16();
-				
+
 				GroupTris[ group ] += num_triangles;
-	
+
 				/*	copy the triangles into the index and normal buffers	*/
 				for( e=0; e<num_triangles; e++)
 				{
@@ -545,8 +545,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 		}
 	}
-				
-	
+
+
 	// is there any vispoly info..... (a zero here is not consumed: it is
 	// read again below as the animation count)
 	if ( in.peek_u16() != 0)
@@ -560,7 +560,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		}
 
 /*===================================================================
- *		Particular Stuff Related To Visiploys	
+ *		Particular Stuff Related To Visiploys
 ===================================================================*/
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
@@ -578,11 +578,11 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			if(Mloadheader->Group[group].num_portals > MAXPORTALSPERGROUP)
 			{
 				Msg( "Mload : NumPortals > MAXPORTALSPERGROUP\n" );
-				return false;    
+				return false;
 			}
-			
+
 			Mloadheader->Group[group].Portal = (PORTAL*) malloc( Mloadheader->Group[group].num_portals * sizeof(PORTAL) );
-			
+
 			for( portal = 0 ; portal < Mloadheader->Group[group].num_portals ; portal ++ )
 			{
 				/*	get the number of Verts in the Portal	*/
@@ -591,9 +591,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				if(Mloadheader->Group[group].Portal[portal].num_vertices_in_portal > MAXVERTSPERPORTAL)
 				{
 					Msg( "Mload : More than MAXVERTSPERPORTAL\n" );
-					return false;  
+					return false;
 				}
-	
+
 				{
 					VERT sum = {0,0,0};
 					VERT centroid = {0,0,0};
@@ -631,8 +631,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					in.bytes( &Mloadheader->Group[group].Portal[portal].Poly[pnum], sizeof( MCFACE ) );
 				}
 			}
-		
-		}		
+
+		}
 		// get the recursive group/portal visibility tree
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
@@ -658,7 +658,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 					for ( vnum = 0; vnum < Mloadheader->Group[group].Portal[portal].visible.num_visible; vnum++ )
 					{
-						if ( !read_visible( Mloadheader, &Mloadheader->Group[group].Portal[portal].visible.visible[vnum], 
+						if ( !read_visible( Mloadheader, &Mloadheader->Group[group].Portal[portal].visible.visible[vnum],
 								Mloadheader->Group[group].Portal[portal].visible.group, in ) )
 						{
 							Msg( "Mload : Read visible failed\n" );
@@ -671,7 +671,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 		}
 /*===================================================================
- *		End Of Visiploy Stuff	
+ *		End Of Visiploy Stuff
 ===================================================================*/
 
 		if ( !ReadGroupConnections( Mloadheader, in ) )
@@ -679,7 +679,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		ReadSoundInfo( Mloadheader, in );
 
 /*===================================================================
- *		Start of Cell Index Stuff	
+ *		Start of Cell Index Stuff
 ===================================================================*/
 		// is there any cell index info..... (a zero here is not consumed: it
 		// is read again below as the start position count)
@@ -728,7 +728,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				}
 				in.bytes( Mloadheader->Group[group].colour_cell_pnt[0], Mloadheader->Group[group].numofcells[0] * sizeof( COLOR ) );
 			}
-		
+
 		}
 /*===================================================================
  *		Start of Start Pos Stuff
@@ -788,7 +788,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	// Background Animation Stuff......
 	num_animations = in.u16();
 	Mloadheader->AnimData.num_animations = num_animations;
-	
+
 	if( num_animations )
 	{
 		for( i = 0 ; i < num_animations ; i++ )
@@ -799,18 +799,18 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			Mloadheader->AnimData.AnimSeq[i] = (u_int16_t *) malloc( animsize * sizeof( u_int16_t ) );
 			in.bytes( Mloadheader->AnimData.AnimSeq[i], animsize * sizeof( u_int16_t ) );
 		}
-		
+
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
 			for( mesh=0 ; mesh<Mloadheader->Group[group].num_meshes; mesh++)
 			{
-				// Animating background polys......		
+				// Animating background polys......
 				Mloadheader->Group[group].num_animating_polys[mesh] = in.u16();
 				if( Mloadheader->Group[group].num_animating_polys[mesh] != 0 )
 				{
 					Mloadheader->Group[group].polyanim[mesh] = (POLYANIM*)malloc( Mloadheader->Group[group].num_animating_polys[mesh] * sizeof( POLYANIM ) );
-		
-		
+
+
 					PolyAnim = Mloadheader->Group[group].polyanim[mesh];
 					if( !PolyAnim )
 					{
@@ -828,22 +828,22 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						animation = in.u16();
 						frames = in.u16();
 						vertices = in.u16();
-		
-		
+
+
 						PolyAnim->State = TEXTUREANIM_Go;
 						PolyAnim->CurrentTime = 0.0F;
 						PolyAnim->MasterTime = 0.0F;
 						PolyAnim->CurrentOffset = 0;
 						PolyAnim->currentframe = INDEX_NONE;
 						PolyAnim->newframe = 0;
-		
+
 						PolyAnim->animation =animation;
 						PolyAnim->frames	=frames;
 						PolyAnim->vertices	=vertices;
-		
+
 						PolyAnim->vert = NULL;
 						PolyAnim->UVs = NULL;
-						
+
 						PolyAnim->vert = (int *) malloc( vertices * sizeof(int) );
 						if( !PolyAnim->vert)
 						{
@@ -856,15 +856,15 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 							Msg( "Mload : PolyAnim uv is null\n" );
 							return false;
 						}
-		
+
 						intPnt = PolyAnim->vert;
 						TanimUV = PolyAnim->UVs;
-		
+
 						for( e = 0 ; e < vertices  ; e++ )
 						{
 							*intPnt++ = in.u16();
 						}
-		
+
 						for( o = 0 ; o < vertices*frames ; o++ )
 						{
 							TanimUV->u = in.f32();
@@ -909,7 +909,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		}
 	}
 
-	
+
 	// Background Poly Info Index Animation Stuff......
 	Mloadheader->AnimData.TAnimInfoIndex = NULL;
 	Mloadheader->AnimData.num_animating_polys = 0;
@@ -917,7 +917,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	{
 		Mloadheader->AnimData.num_animating_polys = in.u16();
 		Mloadheader->AnimData.TAnimInfoIndex = ( TEXTUREANIMINFOINDEX * ) malloc( Mloadheader->AnimData.num_animating_polys * sizeof(TEXTUREANIMINFOINDEX) );
-	   
+
 		TAnimInfoIndexPnt = Mloadheader->AnimData.TAnimInfoIndex;
 		if( !TAnimInfoIndexPnt )
 		{
@@ -987,7 +987,7 @@ bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  
 {
 	u_int16_t i;
 	RENDERMATRIX Matrix;
-	
+
 	if (Mloadheader->state == true )
 	{
 		for ( i=0 ; i<Mloadheader->Group[group].num_meshes; i++)
@@ -1004,7 +1004,7 @@ bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  
 					0,
 					INDEX_NONE,
 					(u_int16_t) group,
-					Mloadheader->Group[ group ].num_verts_per_mesh[i] 
+					Mloadheader->Group[ group ].num_verts_per_mesh[i]
 				);
 			}
 			else
@@ -1094,9 +1094,9 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 			}
 
 			PolyAnim = Mloadheader->Group[group].polyanim[i];
-			
+
 			for( e = 0 ; e < Mloadheader->Group[group].num_animating_polys[i] ; e++ )
-			{	
+			{
 			   	if( PolyAnim )
 			   	{
 			   		if( PolyAnim->vert )
@@ -1115,7 +1115,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 
 			if (Mloadheader->Group[group].polyanim[i])
 		   		free(Mloadheader->Group[group].polyanim[i]);
-			
+
 			Mloadheader->Group[group].polyanim[i] = NULL;
 		}
 	}
@@ -1131,7 +1131,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 		free(Mloadheader->AnimData.TAnimInfoIndex);
 		Mloadheader->AnimData.TAnimInfoIndex = NULL;
 	}
-	
+
 	if ( Mloadheader->OrgAddr )
 	{
 		free( Mloadheader->OrgAddr );
@@ -1245,18 +1245,18 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 	POLYANIM * PolyAnim;
 	u_int16_t * AnimData;
 	float	ExtraTime;
-	
+
 	if( AnimOncePerFrame == Mloadheader->Group[group].AnimOncePerFrame )
 		return;
 	Mloadheader->Group[group].AnimOncePerFrame = AnimOncePerFrame;
-	
+
 	for( mesh=0 ; mesh<Mloadheader->Group[group].num_meshes; mesh++)
 	{
 		PolyAnim = Mloadheader->Group[group].polyanim[mesh];
-		
+
 		for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[mesh] ; i++ )
 		{
-			
+
 			if( ( PolyAnim->State == TEXTUREANIM_Go ) &&
 				( PolyAnim->CurrentOffset != INDEX_NONE ) &&
 				( ( PolyAnim->CurrentTime -= framelag ) <= 0.0F ) )
@@ -1283,7 +1283,7 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 					}
 					smemo_invalidate(); /* shared UVs just stepped */
 				}
-				
+
 			}
 			PolyAnim++;
 		}
@@ -1411,7 +1411,7 @@ FILE *LoadTextureAnimations( FILE *f )
 		for( mesh=0 ; mesh<Mloadheader.Group[group].num_meshes; mesh++)
 		{
 			PolyAnim = Mloadheader.Group[group].polyanim[mesh];
-			
+
 			for( i = 0 ; i < Mloadheader.Group[group].num_animating_polys[mesh] ; i++ )
 			{
 				fread( &PolyAnim->State, sizeof( PolyAnim->State ), 1, f );
@@ -1439,7 +1439,7 @@ FILE *SaveTextureAnimations( FILE *f )
 		for( mesh=0 ; mesh<Mloadheader.Group[group].num_meshes; mesh++)
 		{
 			PolyAnim = Mloadheader.Group[group].polyanim[mesh];
-			
+
 			for( i = 0 ; i < Mloadheader.Group[group].num_animating_polys[mesh] ; i++ )
 			{
 				fwrite( &PolyAnim->State, sizeof( PolyAnim->State ), 1, f );

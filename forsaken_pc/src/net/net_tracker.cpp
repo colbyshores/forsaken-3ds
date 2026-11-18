@@ -77,7 +77,7 @@ static void send_tracker_message( char* host, int port, char* message )
 	ENetAddress address;
 	ENetBuffer send_buffer;
 
-	enet_address_set_host( &address, host ); 
+	enet_address_set_host( &address, host );
 	address.port = port;
 
 	send_buffer.data = message;

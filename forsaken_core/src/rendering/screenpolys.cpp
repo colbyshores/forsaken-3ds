@@ -106,7 +106,7 @@ bool		KilledPlayer = false;
 bool		IllegalTime = false;
 
 int16_t	NumberSegments[ 11 ][ 7 ] = {
-//		  0   1   2   3   4   5   6 
+//		  0   1   2   3   4   5   6
 		{ -1, -1, -1, -1, -1, -1,  0 },	// 0
 		{  0, -1, -1,  0,  0,  0,  0 },	// 1
 		{ -1, -1,  0, -1, -1,  0, -1 },	// 2
@@ -183,7 +183,7 @@ void InitScrPoly( u_int16_t i )
 		ScrPolys[i].Col4.G = 0;
 		ScrPolys[i].Col4.B = 0;
 		ScrPolys[i].Col4.Trans = 0;
-		
+
 }
 
 void InitScrPolys( void )
@@ -197,7 +197,7 @@ void InitScrPolys( void )
 
 	FirstScrPolyUsed = INDEX_NONE;
 	FirstScrPolyFree = 0;
-	
+
 	for( i = 0; i < MAXNUMOFSCRPOLYS; i++ )
 	{
 		ScrPolys[i].Next = i + 1;
@@ -252,7 +252,7 @@ void KillUsedScrPoly( u_int16_t i )
 	u_int16_t	its_next;
 
 	if( i == INDEX_NONE ) return;
-	
+
 	its_prev = ScrPolys[i].Prev;
 	its_next = ScrPolys[i].Next;
 
@@ -277,7 +277,7 @@ void KillUsedScrPoly( u_int16_t i )
 
 	// cleanup the poly
 	// this is important other wise bugs will appear
-	// not all routines that get a poly 
+	// not all routines that get a poly
 	// clear out all previous possible settings
 
 	InitScrPoly( i );
@@ -303,7 +303,7 @@ void FreeAllLastAFrameScrPolys( void )
 		{
 			KillUsedScrPoly( i );
 		}
-		
+
 		// bustage! we are pointing to our selves!
 		// most likely we are zero and never initialized
 		if(i == NextScrPoly)
@@ -345,14 +345,14 @@ void ScreenPolyProcess( void )
 				{
 				   	case ScrSeq::Anim:								// Explosion?
 				   		ScrPolys[i].Frame += ( framelag / ScrPolys[i].FrameRate );
-		
+
 				   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 				   		if( ScrPolys[i].Frame >= (*ScrPolys[i].Frm_Info)->Num_Frames )
 				   		{
 				   			KillUsedScrPoly( i );
 				   		}
 				   		break;
-	
+
 				   	case ScrSeq::Fade:								// Fade
 						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						Speed = ( framelag * 20.0F );
@@ -518,7 +518,7 @@ void ScreenPolyProcess( void )
 						ScrPolys[i].B = (u_int8_t) ScrPolys[i].FadeBlue;
 						ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
 						break;
-						
+
 					case ScrSeq::Nothing:
 					default:
 				   		break;
@@ -588,18 +588,18 @@ void DoLensflareEffect( void )
 					ApplyMatrix( &Ships[ Count ].Object.FinalMat, &Forward, &DirVector );
 					ApplyMatrix( &Ships[ Count ].Object.FinalMat, &SlideLeft, &LeftVector );
 					ApplyMatrix( &Ships[ Count ].Object.FinalMat, &SlideUp, &UpVector );
-					
+
 					Vert.x = ( Ships[ Count ].Object.Pos.x + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.x ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.x ) );
 					Vert.y = ( Ships[ Count ].Object.Pos.y + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.y ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.y ) );
 					Vert.z = ( Ships[ Count ].Object.Pos.z + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.z ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.z ) );
-					
+
 					ShipVector.x = ( Vert.x - CurrentCamera.Pos.x );
 					ShipVector.y = ( Vert.y - CurrentCamera.Pos.y );
 					ShipVector.z = ( Vert.z - CurrentCamera.Pos.z );
-					
+
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					DistToShip = VectorLength( &ShipVector );
-					
+
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					TempVector = ShipVector;
 					NormaliseVector( &TempVector );
@@ -612,7 +612,7 @@ void DoLensflareEffect( void )
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 					Angle = (float) R2D( acosf( Cos ) );
-					
+
 					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					ApplyMatrix( &Ships[ Count ].Object.FinalMat, &Forward, &TempVector );
 					NormaliseVector( &TempVector );
@@ -621,12 +621,12 @@ void DoLensflareEffect( void )
 					else if ( Cos2 > 1.0F ) Cos2 = 1.0F;
 					/* @vfp-exempt R3,R6 — angle clamp + acosf: inverse trig has no LUT form and the clamp compare is gameplay-facing; integerizing changes output. measured n/a. Verified 2026-10-25. */
 					Angle2 = (float) R2D( acosf( Cos2 ) );
-					
+
 					if( DistToShip < CUTOFF ) DistFactor = 1.0F;
 					else DistFactor = ( 1.0F - ( ( DistToShip - CUTOFF ) / CUTOFF ) );
-					
+
 					Int = (u_int8_t) ( ( Cos * Cos2 * DistFactor ) * 255.0F );
-					
+
 					if( ( Angle < 45.0F ) && ( Angle2 < 90.0F ) && ( DistToShip < ( 2.0F * CUTOFF ) ) )
 					{
 						if( !BackgroundCollide( &MCloadheadert0, &Mloadheader,
@@ -638,7 +638,7 @@ void DoLensflareEffect( void )
 							Conv3DTo2D( &Vert, &NewVert, &FinalMatrix );
 							DirVector.x = ( NewVert.x - Center_X );
 							DirVector.y = ( NewVert.y - Center_Y );
-					
+
 							i = FindFreeScrPoly();
 							if( i != INDEX_NONE )
 							{
@@ -658,7 +658,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Yscale = 0.3125F;
 								AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 							}
-					
+
 							i = FindFreeScrPoly();
 							if( i != INDEX_NONE )
 							{
@@ -678,7 +678,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Yscale = 0.234F;
 								AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 							}
-					
+
 							i = FindFreeScrPoly();
 							if( i != INDEX_NONE )
 							{
@@ -698,7 +698,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Yscale = 0.5F;
 								AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 							}
-					
+
 							i = FindFreeScrPoly();
 							if( i != INDEX_NONE )
 							{
@@ -718,7 +718,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Yscale = 1.167F;
 								AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 							}
-					
+
 							i = FindFreeScrPoly();
 							if( i != INDEX_NONE )
 							{
@@ -738,7 +738,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Yscale = 0.75F;
 								AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 							}
-					
+
 							i = FindFreeScrPoly();
 							if( i != INDEX_NONE )
 							{
@@ -928,7 +928,7 @@ void SecBullLensflare( u_int16_t i )
 	ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &DirVector );
 	ApplyMatrix( &SecBulls[ i ].Mat, &SlideLeft, &LeftVector );
 	ApplyMatrix( &SecBulls[ i ].Mat, &SlideUp, &UpVector );
-				
+
 	Vert.x = ( SecBulls[ i ].Pos.x + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.x ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.x ) );
 	Vert.y = ( SecBulls[ i ].Pos.y + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.y ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.y ) );
 	Vert.z = ( SecBulls[ i ].Pos.z + ( ( 270.0F * GLOBAL_SCALE ) * -DirVector.z ) + ( ( 26.0F * GLOBAL_SCALE ) * UpVector.z ) );
@@ -973,7 +973,7 @@ void SecBullLensflare( u_int16_t i )
 			Conv3DTo2D( &Vert, &NewVert, &FinalMatrix );
 			DirVector.x = ( NewVert.x - Center_X );
 			DirVector.y = ( NewVert.y - Center_Y );
-	
+
 			i = FindFreeScrPoly();
 			if( i != INDEX_NONE )
 			{
@@ -1013,7 +1013,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Yscale = 0.234F;
 				AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 			}
-	
+
 			i = FindFreeScrPoly();
 			if( i != INDEX_NONE )
 			{
@@ -1033,7 +1033,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Yscale = 0.5F;
 				AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 			}
-	
+
 			i = FindFreeScrPoly();
 			if( i != INDEX_NONE )
 			{
@@ -1053,7 +1053,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Yscale = 1.167F;
 				AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 			}
-	
+
 			i = FindFreeScrPoly();
 			if( i != INDEX_NONE )
 			{
@@ -1182,7 +1182,7 @@ void UpdateCountdownDigits( void )
 	 	Countdown_Float = 0.0F;
 	}
 
-	
+
 	if( Toggle )
 	{
 		ScaleInc = ( ( CountDown_Wanted_Scale - CountDown_Scale ) / 420.0F );
@@ -1220,7 +1220,7 @@ void UpdateCountdownDigits( void )
 		CountDown_Col += ( ( 1.0F / 300.0F ) * framelag );
 		if( CountDown_Col > 1.0F ) CountDown_Col = 1.0F;
 	}
-	
+
 	Center_X = CountDown_X;
 	Center_Y = CountDown_Y;
 	Scale = CountDown_Scale * ( 23.0F / CountDownFontWidth[ CurrentCountDownFont ] );
@@ -1230,7 +1230,7 @@ void UpdateCountdownDigits( void )
 	XPos = Center_X - ( ( Width * 4.173913F ) * Scale );
 	YPos = Center_Y;
 	UpdateDigit( &Min1Digit[ 0 ], XPos, YPos, (int16_t) ( DigitNumber % 10 ), Scale, CountDown_Col, Graphics );
-	
+
 	DigitNumber = ( Number / 6000 );
 	Number -= ( DigitNumber * 6000 );
 	XPos = Center_X - ( ( Width * 2.7826F ) * Scale );
@@ -1709,8 +1709,8 @@ void ShowScreenMultiples( void )
 			Rotation.y = (float) fast_cosf( D2R( Models[ Model ].AxisRot + 180.0F ) );
 
 			i = FindFreeScrPoly();
-	
-	
+
+
 			if( i != INDEX_NONE )
 			{
 				ScrPolys[ i ].Flags = SCRFLAG_Nothing;
@@ -1754,7 +1754,7 @@ void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Tran
 		else
 			ScrPolys[ i ].Flags = SCRFLAG_UseCoords;
 
-		if( SeqNum != ScrSeq::FadeUp ) 
+		if( SeqNum != ScrSeq::FadeUp )
 		{
 			ScrPolys[ i ].LifeCount = 255.0F;
 			ScrPolys[ i ].R = Red;						// R Colour
@@ -1778,17 +1778,17 @@ void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Tran
 	else
 	{
 		i = FindFreeScrPoly();
-	
+
 		if( i != INDEX_NONE )
 		{
 			*ScreenPolyStore = i;
-	
+
 			if( Trans == 255 )
 				ScrPolys[ i ].Flags = SCRFLAG_Solid | SCRFLAG_UseCoords;
 			else
 				ScrPolys[ i ].Flags = SCRFLAG_UseCoords;
 
-			if( SeqNum != ScrSeq::FadeUp ) 
+			if( SeqNum != ScrSeq::FadeUp )
 			{
 				ScrPolys[ i ].LifeCount = 255.0F;
 				ScrPolys[ i ].R = Red;						// R Colour
@@ -1851,14 +1851,14 @@ void InitThermo( void )
 	if( ThermoScrPoly == INDEX_NONE )
 	{
 		i = FindFreeScrPoly();
-	
+
 		if( i != INDEX_NONE )
 		{
 			ThermoScrPoly = i;
 
 			Center_X = ( CurrentCamera.Viewport.X + CurrentCamera.Viewport.Width - ( CurrentCamera.Viewport.Width / 6.0F ) );
 			Center_Y = ( CurrentCamera.Viewport.Y + CurrentCamera.Viewport.Height - ( CurrentCamera.Viewport.Height / 5.0F ) );
-			
+
 			ScrPolys[ i ].Flags = SCRFLAG_Scale;
 			ScrPolys[ i ].Type = SCRTYPE_Normal;
 			ScrPolys[ i ].LifeCount = 255.0F;
@@ -1904,7 +1904,7 @@ void KillThermo( void )
 		ThermoScrPoly = INDEX_NONE;
 	}
 }
-	
+
 
 TPAGEINFO	ScrPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
 
@@ -2122,7 +2122,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	if (!(FSLockPretransformedVertexBuffer(renderObject, &BufStart)))
 	{
 		return false;
-	}	
+	}
 
 	if (!(FSLockIndexBuffer(renderObject, &Indices)))
 	{
@@ -2154,14 +2154,14 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
 			}
 			else
-			{	
+			{
 				renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 			}
-			
+
 			if( Count == *TPage ) i = *NextScrPoly;
 			else i = ScrPolyTPages[ Count ].FirstPoly;
-	
+
 			while( ( i != INDEX_NONE ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
 				if( !scrpoly_skip( i ) && ( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
@@ -2177,7 +2177,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
    	   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
    	   						Box_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
-   
+
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_UseCoords ) )
 	      					{
    	   							u1 = Box_Ptr->u1;
@@ -2195,19 +2195,19 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		  		   				Yoff = ( Off_Ptr->yoff * ScrPolys[ i ].Yscale );
       			   				Xsize = ( Box_Ptr->xsize * ScrPolys[ i ].Xscale );
       			   				Ysize = ( Box_Ptr->ysize * ScrPolys[ i ].Yscale );
-      						
+
       							if( ( ScrPolys[ i ].Flags & SCRFLAG_Scale ) )
       							{
       			   					Ysize = ( Ysize / Xsize );
       			   					Xsize = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xsize );
       			   					Ysize *= ( ( Xsize ) * pixel_aspect_ratio );
-      							
+
       								if( Xoff != 0.0F ) Yoff = ( Yoff / Xoff );
       								else Yoff = 0.0F;
       			   					Xoff = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xoff );
       			   					Yoff *= ( ( Xoff ) * pixel_aspect_ratio );
       							}
-      							
+
       							switch( Off_Ptr->box & BOX_BOTHFLIP )
       							{
       								case BOX_XFLIP:							// X Flip
@@ -2220,7 +2220,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
       									u2 = Box_Ptr->u1;
       									v2 = Box_Ptr->v2;
       									break;
-      							
+
       								case BOX_YFLIP:							// Y Flip
       					   				x1 = ( ScrPolys[ i ].Pos.x + Xoff );
       					   				y3 = ( ScrPolys[ i ].Pos.y + Yoff );
@@ -2231,7 +2231,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
       									u2 = Box_Ptr->u2;
       									v2 = Box_Ptr->v1;
       									break;
-      							
+
       								case BOX_BOTHFLIP:						// X & Y Flip
       					   				x3 = ( ScrPolys[ i ].Pos.x + Xoff );
       					   				y3 = ( ScrPolys[ i ].Pos.y + Yoff );
@@ -2242,7 +2242,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
       									u2 = Box_Ptr->u1;
       									v2 = Box_Ptr->v1;
       									break;
-      							
+
       								default:								// No Flip
       					   				x1 = ( ScrPolys[ i ].Pos.x + Xoff );
       					   				y1 = ( ScrPolys[ i ].Pos.y + Yoff );
@@ -2253,7 +2253,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
       									u2 = Box_Ptr->u2;
       									v2 = Box_Ptr->v2;
       									break;
-      							
+
       							}
 							}
 
@@ -2271,12 +2271,12 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      				ScrPolyVertPnt->tu = u1;
 		      				ScrPolyVertPnt->tv = v1;
 		      				ScrPolyVertPnt++;
-		      					
+
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
 		      				ScrPolyVertPnt++;
-		      					
+
 		      				ScrPolyVertPnt->sx = x3;
 		      				ScrPolyVertPnt->sy = y3;
 		      				ScrPolyVertPnt->sz = ZValue;
@@ -2285,12 +2285,12 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      				ScrPolyVertPnt->tu = u2;
 		      				ScrPolyVertPnt->tv = v2;
 		      				ScrPolyVertPnt++;
-		      						
+
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
 		      				ScrPolyVertPnt++;
-    					
+
 		      				if( ClipBox( ScrPolyVertPnt-4, ScrPolyVertPnt-2 ) )
 		      				{
 		      					( ScrPolyVertPnt - 4 )->sx = 0.0F;
@@ -2307,12 +2307,12 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      				( ScrPolyVertPnt - 3 )->sy = ( ScrPolyVertPnt - 4 )->sy;
 		      				( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
 		      				( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 4 )->tv;
-		      					
+
 		      				( ScrPolyVertPnt - 1 )->sx = ( ScrPolyVertPnt - 4 )->sx;
 		      				( ScrPolyVertPnt - 1 )->sy = ( ScrPolyVertPnt - 2 )->sy;
 		      				( ScrPolyVertPnt - 1 )->tu = ( ScrPolyVertPnt - 4 )->tu;
 		      				( ScrPolyVertPnt - 1 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-		   
+
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_Rot90 ) )
 							{
 								u1 = ( ScrPolyVertPnt - 4 )->tu;
@@ -2338,7 +2338,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      		   		ScrPolyFacePnt->v3 = 3;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
-      		
+
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 								renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
@@ -2430,9 +2430,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							y1 = ScrPolys[ i ].y1;
 							x3 = ScrPolys[ i ].x3;
 							y3 = ScrPolys[ i ].y3;
-							
+
 									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
-									
+
 	      					ScrPolyVertPnt->sx = x1;
 	      					ScrPolyVertPnt->sy = y1;
 	      					ScrPolyVertPnt->sz = ZValue;
@@ -2441,12 +2441,12 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      				ScrPolyVertPnt->tu = u1;
 		      				ScrPolyVertPnt->tv = v1;
 		      				ScrPolyVertPnt++;
-		      					
+
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
 		      				ScrPolyVertPnt++;
-		      					
+
 		      				ScrPolyVertPnt->sx = x3;
 		      				ScrPolyVertPnt->sy = y3;
 		      				ScrPolyVertPnt->sz = ZValue;
@@ -2455,7 +2455,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      				ScrPolyVertPnt->tu = u2;
 		      				ScrPolyVertPnt->tv = v2;
 		      				ScrPolyVertPnt++;
-		      						
+
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
@@ -2472,17 +2472,17 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		      					( ScrPolyVertPnt - 1 )->sx = 0.0F;
 		      					( ScrPolyVertPnt - 1 )->sy = 0.0F;
 		      				}
-   					
+
 		      				( ScrPolyVertPnt - 3 )->sx = ( ScrPolyVertPnt - 2 )->sx;
 		      				( ScrPolyVertPnt - 3 )->sy = ( ScrPolyVertPnt - 4 )->sy;
 		      				( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
 		      				( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 4 )->tv;
-		      					
+
 		      				( ScrPolyVertPnt - 1 )->sx = ( ScrPolyVertPnt - 4 )->sx;
 		      				( ScrPolyVertPnt - 1 )->sy = ( ScrPolyVertPnt - 2 )->sy;
 		      				( ScrPolyVertPnt - 1 )->tu = ( ScrPolyVertPnt - 4 )->tu;
 		      				( ScrPolyVertPnt - 1 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-							
+
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_Rot90 ) )
 							{
 								u1 = ( ScrPolyVertPnt - 4 )->tu;
@@ -2562,7 +2562,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 						}
 					}
 				}
-		
+
 				i = ScrPolys[ i ].NextInTPage;
 			}
 		}
@@ -2663,7 +2663,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 					NumVerts += 4;
 				}
 			}
-			
+
 			i = ScrPolys[ i ].NextInTPage;
 		}
 
@@ -2727,7 +2727,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 
 			if( Count == *TPage ) i = *NextScrPoly;
 			else i = ScrPolyTPages[ Count ].FirstPoly;
-	
+
 			while( ( i != INDEX_NONE ) && ( i < MAXNUMOFSCRPOLYS ) && ( StartVert < MAXSCREENPOLYVERTS ) )
 			{
 				if( !scrpoly_skip( i ) && !( ScrPolys[ i ].Flags & SCRFLAG_Solid ) )
@@ -2736,14 +2736,14 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 					{
 	   					Bit_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Bit_Info + (int16_t) ScrPolys[ i ].Frame );
 	   					Off_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-      		
+
 		  				for( BitCount = 0; BitCount < Bit_Ptr->numbits; BitCount++ )
 	      				{
 							int ntris = 0;
 
    	   						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
    	   						Box_Ptr = ( (*ScrPolys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
-   
+
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_UseCoords ) )
 	      					{
    	   							u1 = Box_Ptr->u1;
@@ -2761,19 +2761,19 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		  		   				Yoff = ( Off_Ptr->yoff * ScrPolys[ i ].Yscale );
       			   				Xsize = ( Box_Ptr->xsize * ScrPolys[ i ].Xscale );
       			   				Ysize = ( Box_Ptr->ysize * ScrPolys[ i ].Yscale );
-      						
+
       							if( ( ScrPolys[ i ].Flags & SCRFLAG_Scale ) )
       							{
       			   					Ysize = ( Ysize / Xsize );
       			   					Xsize = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xsize );
       			   					Ysize *= ( ( Xsize ) * pixel_aspect_ratio );
-      							
+
       								if( Xoff != 0.0F ) Yoff = ( Yoff / Xoff );
       								else Yoff = 0.0F;
       			   					Xoff = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xoff );
       			   					Yoff *= ( ( Xoff ) * pixel_aspect_ratio );
       							}
-      							
+
       							switch( Off_Ptr->box & BOX_BOTHFLIP )
       							{
       								case BOX_XFLIP:							// X Flip
@@ -2786,7 +2786,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
       									u2 = Box_Ptr->u1;
       									v2 = Box_Ptr->v2;
       									break;
-      							
+
       								case BOX_YFLIP:							// Y Flip
       					   				x1 = ( ScrPolys[ i ].Pos.x + Xoff );
       					   				y3 = ( ScrPolys[ i ].Pos.y + Yoff );
@@ -2797,7 +2797,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
       									u2 = Box_Ptr->u2;
       									v2 = Box_Ptr->v1;
       									break;
-      							
+
       								case BOX_BOTHFLIP:						// X & Y Flip
       					   				x3 = ( ScrPolys[ i ].Pos.x + Xoff );
       					   				y3 = ( ScrPolys[ i ].Pos.y + Yoff );
@@ -2808,7 +2808,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
       									u2 = Box_Ptr->u1;
       									v2 = Box_Ptr->v1;
       									break;
-      							
+
       								default:								// No Flip
       					   				x1 = ( ScrPolys[ i ].Pos.x + Xoff );
       					   				y1 = ( ScrPolys[ i ].Pos.y + Yoff );
@@ -2827,7 +2827,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 ===================================================================*/
 
 									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
-								
+
 		      				ScrPolyVertPnt->sx = x1;
 		      				ScrPolyVertPnt->sy = y1;
 		      				ScrPolyVertPnt->sz = ZValue;
@@ -2836,12 +2836,12 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				ScrPolyVertPnt->tu = u1;
 		      				ScrPolyVertPnt->tv = v1;
 		      				ScrPolyVertPnt++;
-		      					
+
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
 		      				ScrPolyVertPnt++;
-		      					
+
 		      				ScrPolyVertPnt->sx = x3;
 		      				ScrPolyVertPnt->sy = y3;
 		      				ScrPolyVertPnt->sz = ZValue;
@@ -2850,12 +2850,12 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				ScrPolyVertPnt->tu = u2;
 		      				ScrPolyVertPnt->tv = v2;
 		      				ScrPolyVertPnt++;
-		      						
+
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
 		      				ScrPolyVertPnt++;
-      					
+
 		      				if( ClipBox( ScrPolyVertPnt-4, ScrPolyVertPnt-2 ) )
 		      				{
 		      					( ScrPolyVertPnt - 4 )->sx = 0.0F;
@@ -2872,12 +2872,12 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				( ScrPolyVertPnt - 3 )->sy = ( ScrPolyVertPnt - 4 )->sy;
 		      				( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
 		      				( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 4 )->tv;
-		      					
+
 		      				( ScrPolyVertPnt - 1 )->sx = ( ScrPolyVertPnt - 4 )->sx;
 		      				( ScrPolyVertPnt - 1 )->sy = ( ScrPolyVertPnt - 2 )->sy;
 		      				( ScrPolyVertPnt - 1 )->tu = ( ScrPolyVertPnt - 4 )->tu;
 		      				( ScrPolyVertPnt - 1 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-		   
+
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_Rot90 ) )
 							{
 								u1 = ( ScrPolyVertPnt - 4 )->tu;
@@ -2903,7 +2903,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      		   		ScrPolyFacePnt->v3 = 3;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
-							
+
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
@@ -2995,10 +2995,10 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							y1 = ScrPolys[ i ].y1;
 							x3 = ScrPolys[ i ].x3;
 							y3 = ScrPolys[ i ].y3;
-							
-			
+
+
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col1.R, ScrPolys[ i ].Col1.G, ScrPolys[ i ].Col1.B, 255 );
-									
+
 	      					ScrPolyVertPnt->sx = x1;
 	      					ScrPolyVertPnt->sy = y1;
 	      					ScrPolyVertPnt->sz = ZValue;
@@ -3007,7 +3007,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				ScrPolyVertPnt->tu = u1;
 		      				ScrPolyVertPnt->tv = v1;
 		      				ScrPolyVertPnt++;
-		      					
+
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col2.R, ScrPolys[ i ].Col2.G, ScrPolys[ i ].Col2.B, 255 );
 
 		      				ScrPolyVertPnt->sz = ZValue;
@@ -3016,7 +3016,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				ScrPolyVertPnt++;
 
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col3.R, ScrPolys[ i ].Col3.G, ScrPolys[ i ].Col3.B, 255 );
-							
+
 		      				ScrPolyVertPnt->sx = x3;
 		      				ScrPolyVertPnt->sy = y3;
 		      				ScrPolyVertPnt->sz = ZValue;
@@ -3027,12 +3027,12 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				ScrPolyVertPnt++;
 
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col4.R, ScrPolys[ i ].Col4.G, ScrPolys[ i ].Col4.B, 255 );
-							
+
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
 		      				ScrPolyVertPnt++;
-  					
+
 		      				if( ClipBox( ScrPolyVertPnt-4, ScrPolyVertPnt-2 ) )
 		      				{
 		      					( ScrPolyVertPnt - 4 )->sx = 0.0F;
@@ -3044,17 +3044,17 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      					( ScrPolyVertPnt - 1 )->sx = 0.0F;
 		      					( ScrPolyVertPnt - 1 )->sy = 0.0F;
 		      				}
- 					
+
 		      				( ScrPolyVertPnt - 3 )->sx = ( ScrPolyVertPnt - 2 )->sx;
 		      				( ScrPolyVertPnt - 3 )->sy = ( ScrPolyVertPnt - 4 )->sy;
 		      				( ScrPolyVertPnt - 3 )->tu = ( ScrPolyVertPnt - 2 )->tu;
 		      				( ScrPolyVertPnt - 3 )->tv = ( ScrPolyVertPnt - 4 )->tv;
-		      					
+
 		      				( ScrPolyVertPnt - 1 )->sx = ( ScrPolyVertPnt - 4 )->sx;
 		      				( ScrPolyVertPnt - 1 )->sy = ( ScrPolyVertPnt - 2 )->sy;
 		      				( ScrPolyVertPnt - 1 )->tu = ( ScrPolyVertPnt - 4 )->tu;
 		      				( ScrPolyVertPnt - 1 )->tv = ( ScrPolyVertPnt - 2 )->tv;
-							
+
 	      					if( ( ScrPolys[ i ].Flags & SCRFLAG_Rot90 ) )
 							{
 								u1 = ( ScrPolyVertPnt - 4 )->tu;
@@ -3080,7 +3080,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      		   		ScrPolyFacePnt->v3 = 3;
 		      		   		ScrPolyFacePnt++;
 							ntris++;
-      						
+
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
@@ -3134,7 +3134,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 						}
 					}
 				}
-		
+
 				i = ScrPolys[ i ].NextInTPage;
 			}
 
@@ -3203,7 +3203,7 @@ FILE * SaveScreenPolys( FILE * fp )
 ===================================================================*/
 FILE * LoadScreenPolys( FILE * fp )
 {
-    int16_t minutes;	
+    int16_t minutes;
     int16_t seconds;
 
 	if( fp )
@@ -3260,7 +3260,7 @@ void ShowFlagOnShip( u_int16_t Ship )
 	Trans2.x *= ( SHIP_RADIUS * 0.5F );
 	Trans2.y *= ( SHIP_RADIUS * 0.5F );
 	Trans2.z *= ( SHIP_RADIUS * 0.5F );
-	
+
 	Pos1.x = ( Ships[ Ship ].Object.Pos.x + Trans1.x - Trans2.x );
 	Pos1.y = ( Ships[ Ship ].Object.Pos.y + Trans1.y - Trans2.y );
 	Pos1.z = ( Ships[ Ship ].Object.Pos.z + Trans1.z - Trans2.z );
@@ -3268,7 +3268,7 @@ void ShowFlagOnShip( u_int16_t Ship )
 	Pos2.x = ( Ships[ Ship ].Object.Pos.x - Trans1.x + Trans2.x );
 	Pos2.y = ( Ships[ Ship ].Object.Pos.y - Trans1.y + Trans2.y );
 	Pos2.z = ( Ships[ Ship ].Object.Pos.z - Trans1.z + Trans2.z );
-	
+
 	Conv3DTo2D( &Pos1, &ScrPos1, &FinalMatrix );
 	Conv3DTo2D( &Pos2, &ScrPos2, &FinalMatrix );
 
@@ -3340,7 +3340,7 @@ void ShowBountyOnShip( u_int16_t Ship )
 	Trans2.x *= SHIP_RADIUS;
 	Trans2.y *= SHIP_RADIUS;
 	Trans2.z *= SHIP_RADIUS;
-	
+
 	Pos1.x = ( Ships[ Ship ].Object.Pos.x + Trans1.x - Trans2.x );
 	Pos1.y = ( Ships[ Ship ].Object.Pos.y + Trans1.y - Trans2.y );
 	Pos1.z = ( Ships[ Ship ].Object.Pos.z + Trans1.z - Trans2.z );
@@ -3348,7 +3348,7 @@ void ShowBountyOnShip( u_int16_t Ship )
 	Pos2.x = ( Ships[ Ship ].Object.Pos.x - Trans1.x + Trans2.x );
 	Pos2.y = ( Ships[ Ship ].Object.Pos.y - Trans1.y + Trans2.y );
 	Pos2.z = ( Ships[ Ship ].Object.Pos.z - Trans1.z + Trans2.z );
-	
+
 	Conv3DTo2D( &Pos1, &ScrPos1, &FinalMatrix );
 	Conv3DTo2D( &Pos2, &ScrPos2, &FinalMatrix );
 
@@ -3455,7 +3455,7 @@ void ShowCTFFlagsOnShip( u_int16_t Ship )
 		Trans2.x *= ( SHIP_RADIUS * 0.5F );
 		Trans2.y *= ( SHIP_RADIUS * 0.5F );
 		Trans2.z *= ( SHIP_RADIUS * 0.5F );
-		
+
 		Pos1.x = ( Ships[ Ship ].Object.Pos.x + Trans1.x - Trans2.x );
 		Pos1.y = ( Ships[ Ship ].Object.Pos.y + Trans1.y - Trans2.y );
 		Pos1.z = ( Ships[ Ship ].Object.Pos.z + Trans1.z - Trans2.z );
@@ -3463,7 +3463,7 @@ void ShowCTFFlagsOnShip( u_int16_t Ship )
 		Pos2.x = ( Ships[ Ship ].Object.Pos.x - Trans1.x + Trans2.x );
 		Pos2.y = ( Ships[ Ship ].Object.Pos.y - Trans1.y + Trans2.y );
 		Pos2.z = ( Ships[ Ship ].Object.Pos.z - Trans1.z + Trans2.z );
-		
+
 		Conv3DTo2D( &Pos1, &ScrPos1, &FinalMatrix );
 		Conv3DTo2D( &Pos2, &ScrPos2, &FinalMatrix );
 

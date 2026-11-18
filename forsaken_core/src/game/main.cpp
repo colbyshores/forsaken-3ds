@@ -128,7 +128,7 @@ static bool missing_folders( void )
 
 static bool ParseCommandLine(char* args)
 {
-	
+
 	//
 	//  Locals
 	//
@@ -140,7 +140,7 @@ static bool ParseCommandLine(char* args)
     //
     //  Set Global Defaults
     //
-	
+
 	NoSFX					= false; // turns off sound
 	Debug					= false; // turns it off now
 
@@ -196,7 +196,7 @@ static bool ParseCommandLine(char* args)
 		{
             Debug = true;
 		}
-		
+
 		// start in fullscreen mode
 		else if (!strcasecmp(option,"Fullscreen"))
 		{
@@ -214,15 +214,15 @@ static bool ParseCommandLine(char* args)
 		{
 			NoSFX = true;
         }
-		
+
 		// jump to the host screen
-		else if ( !strcasecmp( option, "QuickHost" ) ) 
+		else if ( !strcasecmp( option, "QuickHost" ) )
 		{
 			QuickStart = QuickStartMode::Start;
 		}
 
 		// jump to the join game screen
-		else if ( !strcasecmp( option, "QuickJoin" ) ) 
+		else if ( !strcasecmp( option, "QuickJoin" ) )
 		{
 			QuickStart = QuickStartMode::Join;
 		}
@@ -259,7 +259,7 @@ static bool ParseCommandLine(char* args)
 		}
 
 		// sets render_info.wireframe (no renderer reads it)
-		else if (!strcasecmp(option, "wireframe")) 
+		else if (!strcasecmp(option, "wireframe"))
 		{
             render_info.wireframe = true;
         }
@@ -271,7 +271,7 @@ static bool ParseCommandLine(char* args)
 		}
 
 		// use sscanf
-		else 
+		else
 		{
 			int w,h;
 
@@ -352,7 +352,7 @@ void CleanUpAndPostQuit(void)
 
 	// close the joysticks / game pads
 	joysticks_cleanup();
-  
+
 	// release the scene
 	ReleaseScene();
 

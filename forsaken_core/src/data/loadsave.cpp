@@ -26,7 +26,7 @@
  */
 
 /*===================================================================
-		Include Files...	
+		Include Files...
 ===================================================================*/
 #include <stdio.h>
 #include <stdarg.h>
@@ -122,17 +122,17 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 			fread( &buf[i], sizeof(char), 1, fp );
 		}
 		while( buf[ i++ ] != 0 );
-		
+
 		for (i = 0; i < NumLevels; i++)
 		{
 
-			if( strcasecmp( (char*) &ShortLevelNames[i][0] , (char*) &buf[0] ) == 0 ) 
+			if( strcasecmp( (char*) &ShortLevelNames[i][0] , (char*) &buf[0] ) == 0 )
 			{
 				NewLevelNum = i;
 				break;
 			}
 		}
-		
+
 		if( ( NewLevelNum == -1 ) || ( i == 256 ) )
 		{
 			fclose( fp );
@@ -318,8 +318,8 @@ char *GetMissionName( char *levelname )
 
 	for (i = 0; i < NumLevels; i++)
 	{
-		
-		if( strcasecmp( (char*) &ShortLevelNames[i][0] , levelname ) == 0 ) 
+
+		if( strcasecmp( (char*) &ShortLevelNames[i][0] , levelname ) == 0 )
 		{
 			break;
 		}
@@ -480,7 +480,7 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 		if( !fp ) return false;
 		fp = SaveAllText( fp );
 		if( !fp ) return false;
-		
+
 		fwrite( &Cheated, sizeof( bool ), 1, fp );
 
 		fclose( fp );

@@ -127,27 +127,27 @@ PRIMARYWEAPONKNOWLEDGE PrimaryKnowledge[] = {
 	},
 	{// Trojax
 		(3 * BLOCKSIZE),		// distance at which the weapon becomes less effective...
-		13.0F,						// How accurate does the player have to be to hit me.... 
+		13.0F,						// How accurate does the player have to be to hit me....
 	},
 	{// Pyrolite
 		0.0F,		// distance at which the weapon becomes less effective...
-		10.0F,						// How accurate does the player have to be to hit me.... 
+		10.0F,						// How accurate does the player have to be to hit me....
 	},
 	{// Transpulse
 		(3 * BLOCKSIZE),		// distance at which the weapon becomes less effective...
-		12.0F,						// How accurate does the player have to be to hit me.... 
+		12.0F,						// How accurate does the player have to be to hit me....
 	},
 	{// Suss gun
 		(7 * BLOCKSIZE),		// distance at which the weapon becomes less effective...
-		20.0F,						// How accurate does the player have to be to hit me.... 
+		20.0F,						// How accurate does the player have to be to hit me....
 	},
 	{// Laser
 		(2 * BLOCKSIZE),		// distance at which the weapon becomes less effective...
-		10.0F,						// How accurate does the player have to be to hit me.... 
+		10.0F,						// How accurate does the player have to be to hit me....
 	},
 	{// Orbit pulsar
 		0.0F,						// distance at which the weapon becomes less effective...
-		10.0F,						// How accurate does the player have to be to hit me.... 
+		10.0F,						// How accurate does the player have to be to hit me....
 	},
 };
 
@@ -161,7 +161,7 @@ void AI_AIR( ENEMY * Enemy )
 	// Process current AI mode ...
 	if( AI_AIR_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_AIR_Mode[ Enemy->Object.AI_Mode ] )(Enemy);		//go off and do his thing...
-	
+
 }
 /*===================================================================
 	Procedure	:	TURRET AI
@@ -173,7 +173,7 @@ void AI_TURRET( ENEMY * Enemy )
 	// Process current AI mode ...
 	if( AI_TURRET_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_TURRET_Mode[ Enemy->Object.AI_Mode ] )(Enemy);		//go off and do his thing...
-	
+
 }
 /*===================================================================
 	Procedure	:	SPLINE AI
@@ -185,7 +185,7 @@ void AI_SPLINE( ENEMY * Enemy )
 	// Process current AI mode ...
 	if( AI_SPLINE_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_SPLINE_Mode[ Enemy->Object.AI_Mode ] )(Enemy);		//go off and do his thing...
-	
+
 }
 /*===================================================================
 	Procedure	:	CRAWL AI
@@ -198,7 +198,7 @@ void AI_CRAWL( ENEMY * Enemy )
 
 	if( AI_CRAWL_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_CRAWL_Mode[ Enemy->Object.AI_Mode ] )(Enemy);		//go off and do his thing...
-	
+
 }
 /*===================================================================
 	Procedure	:	EXOGENON AI
@@ -210,7 +210,7 @@ void AI_EXOGENON( ENEMY * Enemy )
 	// Process current AI mode ...
 	if( AI_EXOGENON_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_EXOGENON_Mode[ Enemy->Object.AI_Mode ] )(Enemy);		//go off and do his thing...
-	
+
 }
 /*===================================================================
 	Procedure	:	LITTLEGEEK AI
@@ -222,7 +222,7 @@ void AI_LITTLEGEEK( ENEMY * Enemy )
 	// Process current AI mode ...
 	if( AI_LITTLEGEEK_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_LITTLEGEEK_Mode[ Enemy->Object.AI_Mode ] )(Enemy);		//go off and do his thing...
-	
+
 }
 /*===================================================================
 	Procedure	:	FLESHMORPH AI
@@ -240,7 +240,7 @@ void AI_FLESHMORPH( ENEMY * Enemy )
 	// Process current AI mode ...
 	if( AI_FLESHMORPH_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_FLESHMORPH_Mode[ Enemy->Object.AI_Mode ] )(Enemy);		//go off and do his thing...
-	
+
 }
 /*===================================================================
 	Procedure	:	Enemy to Enemy Check Friendly Fire...
@@ -282,7 +282,7 @@ bool Enemy2EnemyFriendlyFireCheck( ENEMY * SEnemy )
 
 /*===================================================================
 	Procedure	:	AI Do a think and update how I perceive the world..
-	Input		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange )
@@ -320,7 +320,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 		return;
 	}
 
-	
+
 	AI_AVOIDCHECK( Enemy );
 
 	if( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_CLOAK )
@@ -340,7 +340,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 			}
 		}
 	}
-	
+
 	Enemy->ThinkTimer -= framelag;
 	if(  !OverideThinkTime && Enemy->ThinkTimer > 0.0F )
 		return;
@@ -367,7 +367,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 
 	if( Enemy->IveBeenHitTimer || GroupsAreVisible( Ships[WhoIAm].Object.Group, Enemy->Object.Group ) )
 		Enemy->AIFlags |= AI_ANYPLAYERINRANGE;
-	
+
 	if( Enemy->FormationLink )
 	{
 		// If im linked I know what my master knows...
@@ -401,7 +401,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 		// see if im close enough to hear the target if it has made any noise...
 		if( ( (Enemy->LastDistance <= (EnemyTypes[Enemy->Type].Behave.HearRange * 1.5F) ) && TObject->Noise )  )
 			Enemy->AIFlags |= AI_ICANHEARPLAYER;
-		
+
 		if( Enemy->AIFlags & AI_ICANHEARPLAYER )
 		{
 			// if an enemy can hear a player he should be able to use that to see him.....
@@ -438,13 +438,13 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 			}
 		}else if( Enemy->IveBeenHitTimer && ( !(TObject->Flags & SHIP_Stealth) || (TObject->Flags & SHIP_Litup) ) )
 		{
-			// if I cant see the player in my viewcone but there is a los then I should go to full alert.... 
+			// if I cant see the player in my viewcone but there is a los then I should go to full alert....
 			Enemy->AIFlags |= AI_ICANSEEPLAYER;
 			Enemy->AIFlags |= AI_IHAVESEENPLAYER;
 			Enemy->AIFlags |= AI_ICANHEARPLAYER;
 		}
 
-		
+
 		if( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_NOFRIENDLYFIRE )
 		{
 			if( Enemy2EnemyFriendlyFireCheck( Enemy ) )
@@ -457,7 +457,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 
 /*===================================================================
 	Procedure	:	Check if a target is firing at me... And suggest something to do to avoid it....
-	Input		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy
 	Output		:	Nothing
 ===================================================================*/
 void AI_AVOIDCHECK( ENEMY * Enemy )
@@ -490,7 +490,7 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 				// The Missile is to close ... take a chance and try amd avoid it
 				if( Random_Range_Float( Difficulty * EnemyTypes[Enemy->Type].Behave.Avoid_Secondary ) >=1.0F )
 				{
-					
+
 					Enemy->AvoidTimer = 60.0F;
 					Enemy->AvoidType = 0;
 
@@ -543,7 +543,7 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 			Enemy->AIFlags |= AI_MINEAVOID;
 		}
 	}
-	
+
 	Enemy->AIFlags &= ~(AI_PLAYERISTARGETINGME + AI_TARGETED + AI_MINEISCLOSE);
 
 	// do I have a target??
@@ -585,7 +585,7 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 		Cone = 90.0F;
 	if( Cone < 1.0F )
 		Cone = 1.0F;
-	
+
 	// is he targeting me....
 	InCone = AI_InViewCone( &TObject->Pos, &TObject->Mat ,&Enemy->Object.Pos , (float) COSD( Cone * 0.5F ) );
 
@@ -610,14 +610,14 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 			{
 				Range = Difficulty * EnemyTypes[Enemy->Type].Behave.Avoid_Secondary;
 			}
-			
-			// its Firing at me.....woh...How can I best avoid it,,,			
+
+			// its Firing at me.....woh...How can I best avoid it,,,
 			if( Random_Range_Float( Range ) >= 1.0F)
 			{
 				Enemy->AvoidTimer = 15.0F;
 				Enemy->AvoidType = 0;
-				
-				
+
+
 				if( AimData.Angle.y < 0.0F )
 				{
 					if( Enemy->AIMoveFlags & AI_CONTROL_NO_RIGHT )
@@ -632,7 +632,7 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 					else
 						Enemy->AvoidType |= AVOID_LEFT;
 				}
-				
+
 				if( AimData.Angle.x < -1.0F )
 				{
 					if( Enemy->AIMoveFlags & AI_CONTROL_NO_UP )
@@ -650,7 +650,7 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 			}
 		}
 
-		
+
 	}
 
 }

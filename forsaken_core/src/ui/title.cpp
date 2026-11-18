@@ -1,6 +1,6 @@
 
 /*===================================================================
-	Include Files...	
+	Include Files...
 ===================================================================*/
 
 #include "game/main.h"
@@ -819,7 +819,7 @@ char SecretsFoundText[ 64 ];
 char EnemiesKilledText[ 64 ];
 char TimeTakenText[ 64 ];
 char GameCompleteText[ 256 ];
-			       
+
 const char *GameCompleteGotAllCrystalsSoFar		= LT_GameCompleteGotAllCrystalsSoFar		/* "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award."*/;
 const char *GameCompleteWithCheating				= LT_GameCompleteWithCheating				/* "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"*/;
 
@@ -908,7 +908,7 @@ MENU	MENU_NEW_Error = {
 	{
 		{ 0,   0, 200, 150, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, (void *)ErrorMessage, NULL, NULL, DrawFlatMenuName, NULL, 0  },
 		{ 0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_Error0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, MenuItemBackFromError, DrawFlatMenuItem, NULL, 0  },
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -918,7 +918,7 @@ MENU	MENU_NEW_Notify = {
 	{
 		{ 0,   0, 200, 150, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, (void *)NotifyMessage, NULL, NULL, DrawFlatMenuName, NULL, 0  },
 		{ 0, 150, 200, 170, 0, (u_int8_t*)LT_MENU_NEW_Error0/*ok*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, TitleReset, DrawFlatMenuItem, NULL, 0  },
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -928,7 +928,7 @@ MENU	MENU_NEW_GeneralLoading = {
 	(u_int8_t*)"", NULL, NULL, NULL, 0,
 	{
 		{ 0, 0, 200, 150, 0, (u_int8_t*)LT_MENU_NEW_GeneralLoading0/*loading..."*/, FONT_Medium, TEXTFLAG_BottomY | TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -959,7 +959,7 @@ MENU	MENU_NEW_SelectLevel = {
 		{  0,  0, 200,  20, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_ForceFit, (void *)SelectedLevel, NULL, NULL, DrawFlatMenuName, NULL, 0  },
 		{ 30, 20, 168,  76, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, LoadLevelPic, NULL, 0 },
 		{ 10, 84, 190, 155, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit , (void *)SelectedLevelText, NULL, NULL, DrawFlatMenuName, NULL, 0  },
-	 
+
 		{ -1, -1, 0, 0, 0,(u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -970,7 +970,7 @@ MENU	MENU_NEW_ValidPickups_Second_Page = {
 	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
 		{  0,   0, 200,  20, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups0	/*"allowed pickups"*/,	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 },
-		
+
 		{ 10,  28, 200,  36, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups24	/*"missiles"*/,			FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 } ,
 
 		{ 10,  44, 120,  52, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups6	/*mug*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Mugs ],				NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
@@ -980,14 +980,14 @@ MENU	MENU_NEW_ValidPickups_Second_Page = {
 		{ 10,  76, 120,  84, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups10	/*"mfrl"*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Launcher ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10,  84, 120,  92, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups11	/*"titan"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_TitanStar ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10,  92, 120, 100, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups20	/*"thief missle"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Thief ],				NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		
+
 		{ 10, 108, 200, 116, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups25	/*"mines"*/,			FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,	NULL,				DrawFlatMenuItem,	NULL, 0 } ,
 
 		{ 10, 124, 120, 132, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups12	/*"purge mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_PurgePickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10, 132, 120, 140, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups13	/*"pine mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_PinePickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10, 140, 120, 148, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups14	/*"quantum mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_QuantumPickup ],		NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10, 148, 120, 156, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups21	/*"spider mine"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_SpiderPod ],			NULL,	SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -996,23 +996,23 @@ MENU	MENU_NEW_ValidPickups = {
 	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
 		{  0,   0, 200,  20, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups0				/*"allowed pickups"*/,	FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
-		
+
 		{ 10,  28, 200,  36, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups22				/*"primary weapons"*/,	FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
 		{ 10,  44, 120,  52, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups1				/*"trojax"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Trojax ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10,  52, 120,  60, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups2				/*"pyrolite"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Pyrolite ],			NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10,  60, 120,  68, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups3				/*"transpulse"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Transpulse ],			NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10,  68, 120,  76, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups4				/*"suss gun"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_SussGun ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10,  76, 120,  84, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups5				/*laser*/,				FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Laser ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		
+
 		{ 10,  92, 200, 100, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups23				/*"power-ups"*/,		FONT_Small,		TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,										NULL,								NULL,				DrawFlatMenuItem,	NULL, 0 } ,
 		{ 10, 108, 120, 116, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups15				/*"invulnerability"*/,	FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Inv ],					NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10, 116, 120, 124, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups16				/*"nitro"*/,			FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Nitro ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10, 124, 120, 132, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups17				/*"stealth mantle"*/,	FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Mantle ],				NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10, 132, 120, 140, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups18				/*"orbit pulsar"*/,		FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_Orb ],					NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
 		{ 10, 140, 120, 148, 0, (u_int8_t*)LT_MENU_NEW_ValidPickups19				/*"golden power pod"*/, FONT_Small,		TEXTFLAG_CentreY,						&MyPickupValid[ PICKUP_GoldenPowerPod ],		NULL,								SelectMultiToggle,	DrawFlatMenuToggle, NULL, 0 } ,
-		
+
 		{ 10, 156, 120, 164, 0, (u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions22	/*"next page"*/,		FONT_Small,		TEXTFLAG_CentreY,						NULL,										&MENU_NEW_ValidPickups_Second_Page, MenuChange,			DrawFlatMenuItem,	NULL, 0 } ,
-		
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -1025,7 +1025,7 @@ void GameTypeRefresh( int * /*i*/ )
 
 MENU MENU_NEW_GameType = {
 	(u_int8_t*)"",NULL,NULL,GameTypeRefresh,TITLE_TIMER_PanToLeftVDU,
-	{		
+	{
 
 		{   0,   0, 200,   0, 0,	(u_int8_t*)LT_MENU_NEW_CreateGame8  /*"game type"*/,				FONT_Medium,	TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 } ,
 
@@ -1107,7 +1107,7 @@ MENU	MENU_NEW_PrimaryOrder = {
 		{ 5, 50, 95, 180, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CentreY  | TEXTFLAG_ForceFit,  &Config.primary_order, NULL, NULL, DrawPrimaryWeapons, NULL, 0  },
 		{ 5, 35, 95, 50, 0, (u_int8_t*)LT_MENU_NEW_PrimaryOrder1 /*"auto"*/, FONT_Medium, TEXTFLAG_CentreY ,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 		{ 105, 35, 195, 50, 0, (u_int8_t*)LT_MENU_NEW_PrimaryOrder2 /*"manual"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -1119,7 +1119,7 @@ MENU	MENU_NEW_SecondaryOrder = {
 		{ 5, 50, 95, 180, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CentreY | TEXTFLAG_ForceFit,  &Config.primary_order, NULL, NULL, DrawSecondaryWeapons, NULL, 0  },
 		{ 5, 35, 95, 50, 0, (u_int8_t*)LT_MENU_NEW_SecondaryOrder1 /*"auto"*/, FONT_Medium, TEXTFLAG_CentreY ,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 		{ 105, 35, 195, 50, 0, (u_int8_t*)LT_MENU_NEW_SecondaryOrder2 /*"manual"*/, FONT_Medium, TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -1139,7 +1139,7 @@ MENU	MENU_NEW_SecondaryWeaponKeys = {
 		VDUKDEF( 3, 74, 89, 82, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys7 /*"mfrl"*/, KDselect_secondary[ MULTIPLEMISSILE ] ),
 		VDUKDEF( 3, 82, 89, 90, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys8 /*"Titan Missile"*/, KDselect_secondary[ TITANSTARMISSILE ] ),
 		VDUKDEF( 3, 90, 89, 98, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys29 /*"Thief Missile"*/, KDselect_secondary[ THIEFMISSILE ] ),
-		
+
 		VDUKDEF( 3,  98, 89, 106, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys9 /*"purge mine"*/, KDselect_secondary[ PURGEMINE ] ),
 		VDUKDEF( 3, 106, 89, 114, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys10 /*"pine mine"*/, KDselect_secondary[ PINEMINE ] ),
 		VDUKDEF( 3, 114, 89, 122, (u_int8_t*)LT_MENU_NEW_SecondaryWeaponKeys11 /*"quantum mine"*/, KDselect_secondary[ QUANTUMMINE ] ),
@@ -1184,7 +1184,7 @@ MENU	MENU_NEW_Weapons = {
 		{ 10, 70, 200, 90, 0, (u_int8_t*)LT_MENU_NEW_Weapons2 /*"secondary weapon keys"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_SecondaryWeaponKeys, MenuChange, DrawFlatMenuItem, NULL, 0  },
 		{ 10, 100, 200, 120, 0, (u_int8_t*)LT_MENU_NEW_Weapons3 /*"primary weapon preferences"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_PrimaryOrder, MenuChange, DrawFlatMenuItem, NULL, 0  },
 		{ 10, 125, 200, 145, 0, (u_int8_t*)LT_MENU_NEW_Weapons4 /*"secondary weapon preferences"*/, FONT_Small, TEXTFLAG_CentreY,  NULL, &MENU_NEW_SecondaryOrder, MenuChange, DrawFlatMenuItem, NULL, 0  },
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -1239,7 +1239,7 @@ MENU MENU_NEW_ConfigJoyAxis = {
 		{ 5, 85, 85, 95, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis4 /*"sensitivity"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &SensitivitySlider, (void*)SetAxisSensitivity, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
 
 		{ 5, 100, 85, 110, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis5 /*"deadzone"*/, FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY, &DeadzoneSlider, (void*)SetAxisDeadzone, SelectSlider, DrawFlatMenuSlider, NULL, 0  },
-		
+
 		{ 5, 115, 85, 125, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis6 /*"fine control"*/, FONT_Small, TEXTFLAG_CentreY, &FineControl, (void*)SetAxisFineControl, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0  },
 
 		{ 0, 130, 200, 140, 0, (u_int8_t*)LT_MENU_NEW_ConfigJoyAxis7 /*"test:"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
@@ -1264,7 +1264,7 @@ MENU	MENU_NEW_SetupJoystick = {
 
 		{ 10, 30, 200, 100, 0,
 		(u_int8_t*)LT_MENU_NEW_SetupJoystick1 /*"joystick list"*/, FONT_Small,
-		TEXTFLAG_SuppressHighlight | TEXTFLAG_CentreY | TEXTFLAG_ForceFit | 
+		TEXTFLAG_SuppressHighlight | TEXTFLAG_CentreY | TEXTFLAG_ForceFit |
 		TEXTFLAG_AutoSelect,
         &JoystickList, (void*)SelectConfigureAxisMenu, SelectList, DrawFlatMenuList, NULL, 0  },
 
@@ -1292,7 +1292,7 @@ MENU	MENU_NEW_SetupMouse = {
 MENU	MENU_NEW_Controls = {
 	(u_int8_t*)"", InitControls, ExitControls, NULL, TITLE_TIMER_PanToLeftVDU,
 	{
-		
+
 
 		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_Controls0 /*"controls"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
@@ -1323,7 +1323,7 @@ MENU	MENU_NEW_DetailLevels = {
 		{ 10, 102, 150, 102, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels15/*"Show Weapon Kills"*/, FONT_Small, TEXTFLAG_CentreY, &ShowWeaponKills, NULL, SelectFlatMenuToggle, DrawFlatMenuToggle, NULL, 0 },
 		{ 10, 150, 150, 150, 0, (u_int8_t*)LT_MENU_NEW_DetailLevels16/*"Back"*/, FONT_Small, TEXTFLAG_CentreY,		NULL,		NULL,	MenuItemBack, DrawFlatMenuItem, NULL, 0 },
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
-	 
+
 	}
 };
 
@@ -1375,9 +1375,9 @@ const char *StereoModeSliderFunc( SLIDER *slider )
 	switch( slider->value )
 	{
 	case STEREO_MODE_COLOR:
-		return "RED/BLUE"; 
+		return "RED/BLUE";
 	case STEREO_MODE_HALF_HEIGHT:
-		return "HALF_HEIGHT"; 
+		return "HALF_HEIGHT";
 	case STEREO_MODE_HALF_WIDTH:
 		return "HALF_WIDTH";
 	default:
@@ -1409,10 +1409,10 @@ MENU	MENU_NEW_VisualsStereo = {
 	(u_int8_t*)"Stereo", NULL, NULL, NULL, 0,
 	{
 		{  0,   0, 200,  20, 0,					(u_int8_t*)"stereo",											FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY,	NULL,			NULL,						NULL,					DrawFlatMenuItem,	NULL, 0 },
-		{ 20,  40, 150,  50, 0,					(u_int8_t*)"enable stereo",								FONT_Small, TEXTFLAG_CentreY,				&render_info.stereo_enabled,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },		 
-		{ 20,  50, 150,  70, SLIDER_User,		(u_int8_t*)"stereo mode",								FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,				&StereoModeSlider,			NULL,						SelectSlider,	DrawFlatMenuSlider,	NULL, 0 },		 
-		{ 20,  70, 150,  70, SLIDER_User,		(u_int8_t*)"right eye color",									FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&StereoColorSlider,	NULL,					SelectSlider,			DrawFlatMenuSlider,			NULL, 0 },		 
-		{ 20, 140, 100, 150, 0,					(u_int8_t*)"back",												FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },		 
+		{ 20,  40, 150,  50, 0,					(u_int8_t*)"enable stereo",								FONT_Small, TEXTFLAG_CentreY,				&render_info.stereo_enabled,			NULL,						SelectFlatMenuToggle,	DrawFlatMenuToggle,	NULL, 0 },
+		{ 20,  50, 150,  70, SLIDER_User,		(u_int8_t*)"stereo mode",								FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,				&StereoModeSlider,			NULL,						SelectSlider,	DrawFlatMenuSlider,	NULL, 0 },
+		{ 20,  70, 150,  70, SLIDER_User,		(u_int8_t*)"right eye color",									FONT_Small, TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&StereoColorSlider,	NULL,					SelectSlider,			DrawFlatMenuSlider,			NULL, 0 },
+		{ 20, 140, 100, 150, 0,					(u_int8_t*)"back",												FONT_Small, TEXTFLAG_CentreY,						NULL,			NULL,						MenuItemBack,			DrawFlatMenuItem,	NULL, 0 },
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -1497,9 +1497,9 @@ void JoiningEnter(MENU * /*Menu*/)
 		PrintErrorMessage (LT_NoLevelsInstalled, 1, NULL, ERROR_USE_MENUFUNCS );
 		return;
 	}
-	
+
 	PlayDemo = false;
-	
+
 	// this means I need a ship number
 	WhoIAm = UNASSIGNED_SHIP;
 
@@ -1538,7 +1538,7 @@ void JoiningEnter(MENU * /*Menu*/)
 				if( local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
 				sprintf(error_str, "%s %s %s %s",
-						"The selected port is in use or invalid.", 
+						"The selected port is in use or invalid.",
 						str,
 						"Disable the program using the port or",
 						"select a different local port." );
@@ -1617,7 +1617,7 @@ MENU	MENU_NEW_Joining = {
 	}
 };
 
-MENUITEM MENU_ITEM_JoinMultiplayer = 
+MENUITEM MENU_ITEM_JoinMultiplayer =
 		{ 0, 0, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, &MENU_NEW_Joining, MenuChange, NULL, NULL, 0  };
 
 constexpr int MAX_GAME_LIST = 7;
@@ -1627,7 +1627,7 @@ char GameName[MAX_GAME_LIST][MAX_GAME_LENGTH];
 char GameList[MAX_GAME_LIST][MAX_GAME_LENGTH];
 
 void UpdateGameList( void )
-{	
+{
 	int i;
 	int length;
 
@@ -1719,7 +1719,7 @@ MENU	MENU_NEW_ChangeBike = {
 		{ 27, 130, 72 , 137, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike0 /*"speed"*/, FONT_Small, TEXTFLAG_CentreY , &SpeedFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
 		{ 27, 137, 72 , 144, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike1 /*"accel"*/, FONT_Small, TEXTFLAG_CentreY , &AccelFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
 		{ 65, 144, 110 , 151, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike2 /*"handling"*/, FONT_Small, TEXTFLAG_CentreY , &HandleFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
-		
+
 		{ 114, 130, 157 , 137, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike3 /*"shield"*/, FONT_Small, TEXTFLAG_CentreY , &ShieldFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
 		{ 114, 137, 157 , 144, SLIDER_Bike, (u_int8_t*)LT_MENU_NEW_ChangeBike4 /*"hull"*/, FONT_Small, TEXTFLAG_CentreY , &HullFeat, NULL, NULL, DrawFlatMenuSlider, NULL, 0 } ,
 
@@ -1738,7 +1738,7 @@ MENU	MENU_NEW_ChoosePlayer = {
 		{ 15 , 30, 100, 150, 0, (u_int8_t*)LT_MENU_NEW_ChoosePlayer1 /*"list..."*/ , FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotList, NULL , NULL , DrawFlatMenuList, NULL, 0},
 
 		{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0},
-			
+
 		{ -1, -1, 0, 0, 0,(u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 
 	}
@@ -1750,20 +1750,20 @@ MENU	MENU_NEW_NewPlayer = {
 		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_NewPlayer0 /*"Enter Player Name"*/, FONT_Medium, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
 		{ 15 , 50, 15, 70, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotName, NULL, SelectFlatMenutext, DrawFlatMenuText, NULL, 0},
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
-};										 
+};
 
 MENU MENU_NEW_ChangePlayerName = {
 	(u_int8_t*)"", InitPilotReName, MoveConfigFile, NULL, TITLE_TIMER_PanToRightVDU,
 	{
-		
+
 		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_ChangePlayerName0 /*"Enter new Name"*/, FONT_Medium, TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 
 		{ 15 , 50, 15, 70, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_SuppressHighlight | TEXTFLAG_AutoSelect | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PilotReName, NULL, SelectFlatMenutext, DrawFlatMenuText, NULL, 0},
-		
-						 
+
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
@@ -1786,9 +1786,9 @@ MENU	MENU_NEW_SelectBiker = {
 
 		{ -1, -1, 0, 0, 0,  (u_int8_t*)"",0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
-};										 
+};
 
-MENUITEM BikeCharItem = 
+MENUITEM BikeCharItem =
 		{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , NULL, NULL , NULL , LoadBikeChar, NULL, 0};
 
 
@@ -1832,7 +1832,7 @@ MENU	MENU_NEW_Sound = {
 		{ 10, 100,	100,	110,	0, (u_int8_t*)LT_MENU_NEW_Sound6 /*"biker speech"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikerSpeechSlider,			NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
 		{ 10, 110,	100,	120,	0, (u_int8_t*)LT_MENU_NEW_Sound7 /*"bike computer"		*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&BikeCompSpeechSlider,	NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
 		{ 10,	120,	100,	130,	0, (u_int8_t*)LT_MENU_NEW_Sound8 /*"flag sfx"				*/, FONT_Small,		TEXTFLAG_AutoSelect | TEXTFLAG_CentreY,	&FlagSfxSlider,					NULL, SelectSlider,				DrawFlatMenuSlider,		NULL, 0 } ,
-		
+
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
@@ -1845,7 +1845,7 @@ MENU	MENU_NEW_InGameSound = {
 		{ 200, 128 + (3*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound4 /*"biker volume  "		*/, 0, 0, &BikerSpeechSlider,			NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
 		{ 200, 128 + (4*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound5 /*"bike computer "	*/, 0, 0, &BikeCompSpeechSlider,	NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
 		{ 200, 128 + (5*16)  , 0, 0, 0, (u_int8_t*)LT_MENU_NEW_InGameSound6 /*"flag sfx "				*/, 0, 0, &FlagSfxSlider,					NULL,						SelectSlider,	DrawSlider,		NULL, 0 },
-		
+
 		{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
@@ -1879,13 +1879,13 @@ MENU	MENU_NEW_RestoreGame = {
 	{
 		{ 0, 0, 200, 20, 0, (u_int8_t*)LT_MENU_NEW_RestoreGame0 /*"Restore Game"*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
 		{ 5, 70, 100, 80, 0, (u_int8_t*)LT_MENU_NEW_RestoreGame3 /*"load game"*/, FONT_Small, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, &MENU_NEW_LoadGame, MenuChange, DrawFlatMenuItem, NULL, 0  },
-						 
+
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
 	}
 };
 
 MENU	MENU_NEW_Options = {
-	(u_int8_t*)"", SetDiscStatus, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
+	(u_int8_t*)"", SetDiscStatus, NULL, NULL, TITLE_TIMER_ChooseDiscPan,
 	{
 		{ 0, TITLE_MODEL_Disc1, 0, 0, 5,(u_int8_t*)LT_MENU_NEW_Options0 /*"Options"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 		{ 0, TITLE_MODEL_Disc2, 0, 0, 8, (u_int8_t*)LT_MENU_NEW_Options1 /*"Sound"*/, 0, 0, NULL, &MENU_NEW_Sound, MenuChange, NULL, NULL, 0 },
@@ -1915,11 +1915,11 @@ MENU	MENU_NEW_Setup = {
 
 		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
 	}
-};  
+};
 
 /* battle */
 MENU	MENU_NEW_Battle = {
-	(u_int8_t*)"", InitBattleMenu, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
+	(u_int8_t*)"", InitBattleMenu, NULL, NULL, TITLE_TIMER_ChooseDiscPan,
 	{
 		{ 0, TITLE_MODEL_Disc1, 0, 0, 3, (u_int8_t*)LT_MENU_NEW_Battle0 /*"death match"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 		{ 0, TITLE_MODEL_Disc2, 0, 0, 2, (u_int8_t*)LT_MENU_NEW_Battle1 /*"Create Game"*/, 0, 0, NULL, &MENU_NEW_CreateGame, MenuChange, NULL, NULL, 0 },
@@ -1934,7 +1934,7 @@ MENU	MENU_NEW_Battle = {
 
 /* single */
 MENU	MENU_NEW_MissionMenu = {
-	(u_int8_t*)"", InitDifficultyLevel, NULL, NULL, TITLE_TIMER_ChooseDiscPan, 
+	(u_int8_t*)"", InitDifficultyLevel, NULL, NULL, TITLE_TIMER_ChooseDiscPan,
 	{
 		{ 0, TITLE_MODEL_Disc1, 0, 0, 0,(u_int8_t*)LT_MENU_NEW_MissionMenu0 /*"single player"*/, 0, 0, NULL, NULL, NULL, NULL, NULL, 0 },
 		{ 0, TITLE_MODEL_Disc2, 0, 0, 4, (u_int8_t*)LT_MENU_NEW_MissionMenu1 /*"Start Game"*/, 0, 0, NULL, &MENU_NEW_StartSinglePlayer, MenuChange, NULL, NULL, 0 },
@@ -2044,7 +2044,7 @@ MENU	MENU_Team = {
 };
 
 MENU	MENU_NEW_Team = {
-	
+
 	(u_int8_t*)"" , InitTeamSelection , BailMultiplayerFrontEnd , DistributeTeamsToLists, TITLE_TIMER_PanToLeftVDU,
 	{
 		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_Team0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
@@ -2057,9 +2057,9 @@ MENU	MENU_NEW_Team = {
 		{ 53, 45, 98, 126, 0, (u_int8_t*)LT_MENU_NEW_Team6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 		{ 101, 45, 146, 126, 0, (u_int8_t*)LT_MENU_NEW_Team7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 		{ 149, 45, 194, 126, 0, (u_int8_t*)LT_MENU_NEW_Team8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		
+
 		{ 0, 116, 200, 126, 0, (u_int8_t*)LT_MENU_NEW_Team9 /*"waiting for team selection"*/, FONT_Small, TEXTFLAG_Instant | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_Pulse, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		
+
 		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
@@ -2087,7 +2087,7 @@ MENU	MENU_NEW_WatchTeamSelect = {
 		{ 149, 45, 194, 126, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
 
 		{ 0, 116, 200, 126, 0, (u_int8_t*)LT_MENU_NEW_WatchTeamSelect9 /*"waiting for team selection"*/, FONT_Small, TEXTFLAG_Instant | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_Pulse, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		
+
 		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
 		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
@@ -2138,7 +2138,7 @@ MENU	MENU_LevelSelect = {
 
 MENUITEM	NewJoinItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_JoinWaitingToStart,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
 
-						
+
 MENU	MENU_ChooseSessionToJoin = {
 	(u_int8_t*)"" , NULL , NULL, NULL, 0,
 	{
@@ -2170,16 +2170,16 @@ MENU	MENU_Keyboard =
 	{
 		KDEF( 0, 200, 112, (u_int8_t*)LT_MENU_Keyboard1 /*"Rotate Left"*/, KDleft ),
 		KDEF( 0, 200, 128, (u_int8_t*)LT_MENU_Keyboard2 /*"Rotate Right"*/, KDright ),
-		KDEF( 0, 200, 144, (u_int8_t*)LT_MENU_Keyboard3 /*"Rotate Up"*/, KDup ),	      
+		KDEF( 0, 200, 144, (u_int8_t*)LT_MENU_Keyboard3 /*"Rotate Up"*/, KDup ),
 		KDEF( 0, 200, 160, (u_int8_t*)LT_MENU_Keyboard4 /*"Rotate Down"*/, KDdown ),
-			      
-		KDEF( 0, 200, 184, (u_int8_t*)LT_MENU_Keyboard5 /*"Slide Left"*/, KDmove_left ),	         
+
+		KDEF( 0, 200, 184, (u_int8_t*)LT_MENU_Keyboard5 /*"Slide Left"*/, KDmove_left ),
 		KDEF( 0, 200, 200, (u_int8_t*)LT_MENU_Keyboard6 /*"Slide Right"*/, KDmove_right ),
-			   
-		KDEF( 0, 200, 216, (u_int8_t*)LT_MENU_Keyboard7 /*"Slide Up"*/, KDmove_up ),         
+
+		KDEF( 0, 200, 216, (u_int8_t*)LT_MENU_Keyboard7 /*"Slide Up"*/, KDmove_up ),
 		KDEF( 0, 200, 232, (u_int8_t*)LT_MENU_Keyboard8 /*"Slide Down"*/, KDmove_down ),
-			   
-		KDEF( 0, 200, 256, (u_int8_t*)LT_MENU_Keyboard9 /*"Roll Left"*/, KDroll_left ),  
+
+		KDEF( 0, 200, 256, (u_int8_t*)LT_MENU_Keyboard9 /*"Roll Left"*/, KDroll_left ),
 		KDEF( 0, 200, 272, (u_int8_t*)LT_MENU_Keyboard10 /*"Roll Right"*/, KDroll_right ),
 
 		KDEF( 0, 200, 296, (u_int8_t*)LT_MENU_Keyboard11 /*"Slide Mode"*/, KDmove ),
@@ -2215,12 +2215,12 @@ MENU	MENU_Keyboard =
 		KDEF( 2, 200, 232,(u_int8_t*)LT_MENU_Keyboard32 /*"Prev Prim"*/, KDselect_prev_primary ),
 		KDEF( 2, 200, 256,(u_int8_t*)LT_MENU_Keyboard33 /*"Next Sec"*/, KDselect_next_secondary ),
 		KDEF( 2, 200, 272,(u_int8_t*)LT_MENU_Keyboard34 /*"Prev Sec"*/, KDselect_prev_secondary ),
-		
+
 		KDEF( 2, 200, 296,(u_int8_t*)LT_MENU_Keyboard35 /*"Send Msg"*/, KDsend_msg),
 		KDEF( 2, 200, 312,(u_int8_t*)LT_MENU_Keyboard1a /*"headlights"*/, KDheadlights),
 		KDEF( 2, 200, 328,(u_int8_t*)LT_MENU_Keyboard1b /*"full rear view"*/, KDfull_rearview),
 		// 4th page
-		
+
 		KDEF( 3, 200, 112, (u_int8_t*)LT_MENU_Keyboard37 /*"Mug Missile"*/, KDselect_secondary[ MUGMISSILE ] ),
 		KDEF( 3, 200, 128, (u_int8_t*)LT_MENU_Keyboard38 /*"Solaris"*/, KDselect_secondary[ SOLARISMISSILE ] ),
 		KDEF( 3, 200, 144, (u_int8_t*)LT_MENU_Keyboard39 /*"Scatter"*/, KDselect_secondary[ SCATTERMISSILE ] ),
@@ -2259,7 +2259,7 @@ MENU	MENU_Controls = {
 		{ 200, 272, 0, 0, 0, (u_int8_t*)LT_MENU_Controls7 /*"X Sensitivity     "*/, 0, 0,		&SensitivityXSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
 		{ 200, 288, 0, 0, 0, (u_int8_t*)LT_MENU_Controls8 /*"Y Sensitivity     "*/, 0, 0,		&SensitivityYSlider,		NULL,						SelectSlider,		DrawSlider, NULL, 0 },
 		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}																					
+	}
 };
 
 // in-game-menu
@@ -2277,9 +2277,9 @@ MENU	MENU_Detail = {
 MENU	MENU_DebugMode = {
 	(u_int8_t*)"Select Debug Mode" , InitDebugMode , NULL , NULL, 0,
 	{
-		
+
 		{ 200, 96, 0, 0, 0, (u_int8_t*)"Show Plane RGB", 0, 0, &ShowPlaneRGB, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		
+
 		{ 200, 144, 0, 0, 0, (u_int8_t*)"external forces", 0, 0, &ShowEFZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 160, 0, 0, 0, (u_int8_t*)"show teleports", 0, 0, &ShowTeleports, NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 176, 0, 0, 0, (u_int8_t*)"trigger zones", 0, 0, &ShowTrigZones, NULL, SelectToggle, DrawToggle, NULL, 0 },
@@ -2291,7 +2291,7 @@ MENU	MENU_DebugMode = {
 		{ 200, 272, 0, 0, 0, (u_int8_t*)"Old BSP Cube", 0, 0, &OldNodeCube, NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 288, 0, 0, 0, (u_int8_t*)"BSP Node Cube", 0, 0, &NodeCube, NULL, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 304, 0, 0, 0, (u_int8_t*)"BSP Nodes tested", 0, 0, &NodeCubeType, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		
+
 		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Nodes", 0, 0, &ShowNode, (void*)ShowNodeToggle, SelectToggle, DrawToggle, NULL, 0 },
 		{ 200, 352, 0, 0, 0, (u_int8_t*)"Show Startpoints", 0, 0, &ShowStartPoints, (void*)ShowStartPointsToggle, SelectToggle, DrawToggle, NULL, 0 },
 
@@ -2338,7 +2338,7 @@ MENU	MENU_Visuals = {
 	(u_int8_t*)LT_MENU_Visuals0 /*"Visuals"*/, NULL, NULL, NULL, 0,
 	{
 		{ 200, 128 + ( 0*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_Visuals1		/*"Select Screen Mode"		*/, 0, 0, NULL,									&MENU_SelectScreenMode,		MenuChange,			MenuItemDrawName,		NULL, 0 },
-		
+
 		{ 200, 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)"TEXT SCALE", 0, 0,	&TextScaleSlider,	NULL,	SelectSlider,	DrawSlider, NULL, 0 },
 
 		{ 200, 128 + ( 3*16 ), 0, 0, 0, (u_int8_t*)"HUD COLOUR ", 0, 0, &HUDColour,	NULL,		SelectColourToggle,	DrawMessagesToggle,	NULL, 0 },
@@ -2445,15 +2445,15 @@ MENU	MENU_Host_Options = { (u_int8_t*)"HOST OPTIONS FOR THIS GAME" , InitHostMen
 					OLDMENUITEM( 200, 128, (u_int8_t*)LT_MENU_InGame36		/*"short packets"				*/,	&UseShortPackets,			NULL,								SelectToggle,	DrawToggle),
 					OLDMENUITEM( 200, 160, (u_int8_t*)LT_MENU_Options5		/*"Packets Per Second"		*/,	(void*)&PacketsSlider,		NULL,								SelectSlider,	DrawSlider),
 					OLDMENUITEM( 200, 176, (u_int8_t*)LT_MENU_InGame6		/*"Level Select"				*/,	NULL,								&MENU_LevelSelect,			MenuChange,	MenuItemDrawName),
-					OLDMENUITEM( 200, 192, (u_int8_t*)LT_MENU_RemovePlayer	/*"remove player"				*/,	&HostPlayersList,				(void*)HostListPlayerSelected,		SelectList,		DrawList ),  
+					OLDMENUITEM( 200, 192, (u_int8_t*)LT_MENU_RemovePlayer	/*"remove player"				*/,	&HostPlayersList,				(void*)HostListPlayerSelected,		SelectList,		DrawList ),
 
-			{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+			{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } }
 };
 
 MENU	MENU_Watch_Options = { (u_int8_t*)LT_MENU_InGame24 /*"Watch Options"*/ , InitWatchList , NULL , NULL,	0,
 			{
-				OLDMENUITEM( 200, 112, (u_int8_t*)LT_MENU_InGame24	/*"Watch Player"*/,	&HostPlayersList, (void*)WatchPlayerSelected, SelectList, DrawList ),  
-			{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+				OLDMENUITEM( 200, 112, (u_int8_t*)LT_MENU_InGame24	/*"Watch Player"*/,	&HostPlayersList, (void*)WatchPlayerSelected, SelectList, DrawList ),
+			{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } }
 };
 
 MENU	MENU_InGame = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu , ExitInGameMenu , NULL,	0,
@@ -2473,16 +2473,16 @@ MENU	MENU_InGame = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu 
 					  OLDMENUITEM( 200, 192, (u_int8_t*)LT_MENU_InGame26 /*"Host Options"				*/,	NULL,						&MENU_Host_Options,		MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 224, (u_int8_t*)LT_MENU_InGame8  /*"Quit to Main Menu"			*/,	NULL,						NULL,					SelectQuitCurrentGame,	MenuItemDrawName),
 					  OLDMENUITEM( 200, 240, (u_int8_t*)LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
-				
+
  					  OLDMENUITEM( 200, 256, (u_int8_t*)LT_MENU_InGame24 /*"Watch Player"*/, NULL, &MENU_Watch_Options, MenuChange, MenuItemDrawName),
 #ifdef DEBUG_ON
 					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
 #endif
 					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
-					
-					  
-					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+
+
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } }
 };
 
 
@@ -2511,8 +2511,8 @@ MENU	MENU_InGameSingle = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGam
 #endif
 					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
-					  					  
-					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } 
+
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } }
 };
 
 MENU	MENU_ForceAbort = {
@@ -2563,7 +2563,7 @@ MENU	MENU_DebugHelp =
 
 const char *BikerText[MAXBIKETYPES] =
 {
-	
+
 	//BORG
 	LT_BorgBikerText,
 
@@ -2590,7 +2590,7 @@ const char *BikerText[MAXBIKETYPES] =
 
 	//SEPTRE
 	LT_SceptreBikerText,
-		
+
 	//JO
 	LT_JoBikerText,
 
@@ -2667,7 +2667,7 @@ MXLOADHEADER * Mxloadheader[6];
 u_int16_t BikerScrPoly;
 u_int16_t LevelScrPoly;
 
-typedef struct 
+typedef struct
 {
 	VECTOR	Pos;
 	VECTOR	Look;
@@ -2706,7 +2706,7 @@ u_int16_t *HoloModelLookup;
 
 
 float	DiscExpand;
-float	DiscSpeed; 
+float	DiscSpeed;
 float	DiscWiggleDistance;
 bool	DiscExpandOut;
 float	DiscPauseTime;
@@ -2737,13 +2737,13 @@ float VDUoffsetX = 105.0F;
 float VDUoffsetY = 15.0F;
 u_int16_t screenpoly[MAXNUMOFSCRPOLYS];
 int CurrentScreenPoly;
-float	TEXTINFO_currentx;					
-float	TEXTINFO_currenty;					
-float	TEXTINFO_currentheight;				
-float	TEXTINFO_TextSpace;				
-float	TEXTINFO_LineSpace;				
+float	TEXTINFO_currentx;
+float	TEXTINFO_currenty;
+float	TEXTINFO_currentheight;
+float	TEXTINFO_TextSpace;
+float	TEXTINFO_LineSpace;
 int		TEXTINFO_currentendpoint;
-u_int16_t TextLookup[NUMSCREENFONTS][256];		
+u_int16_t TextLookup[NUMSCREENFONTS][256];
 MENUITEM *LastMenuItem;
 bool ForceNewLine;
 
@@ -2890,11 +2890,11 @@ TITLE_EVENT Title_Events[MAXTITLEEVENTS] = {
 	{InitEventFadeOffHoloLight, EventFadeOffHoloLight, ExitEventFadeOffHoloLight,				TITLE_TIMER_PanToDiscsFromRight, 0.0F, 0.2F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventShrinkBike, NULL, NULL,				TITLE_TIMER_PanToDiscsFromRight, 0.0F, 0.2F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventLowerHoloPad, EventLowerHoloPad, NULL,						TITLE_TIMER_PanToDiscsFromRight, 0.2F, 0.5F, TITLE_EVENT_STATUS_IDLE},
-	
+
 	{InitEventDiscPan, EventDiscPan, NULL,	TITLE_TIMER_PanToDiscsFromLeft, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventRotateInLeftVDU, EventRotateInLeftVDU, NULL,		TITLE_TIMER_PanToDiscsFromLeft, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventLightenRoom, EventLightenRoom, NULL,				TITLE_TIMER_PanToDiscsFromLeft, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
-	
+
 	{InitEventRightVDUPan, EventRightVDUPan, ExitEventVDUPan,	TITLE_TIMER_PanToRightVDU, 0.0F, 0.6F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventRotateOutRightVDU, EventRotateOutRightVDU, ExitEventRotateOutVDU,	TITLE_TIMER_PanToRightVDU, 0.3F, 0.6F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventDarkenRoom, EventDarkenRoom, NULL,				TITLE_TIMER_PanToRightVDU, 0.0F, 0.6F, TITLE_EVENT_STATUS_IDLE},
@@ -2910,11 +2910,11 @@ TITLE_EVENT Title_Events[MAXTITLEEVENTS] = {
 	{InitEventRaiseHoloPad, EventRaiseHoloPad, ExitEventRaiseHolopad,			TITLE_TIMER_InterLevelPan, 0.3F, 0.6F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventJudderHoloPad, EventJudderHoloPad, ExitEventJudderHoloPad,			TITLE_TIMER_InterLevelPan, 0.6F, 0.8F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventExpandCrystal, NULL, NULL, TITLE_TIMER_InterLevelPan, 0.8F, 1.0F, TITLE_EVENT_STATUS_IDLE},
-	
+
 	{InitEventLeftVDUPan, EventLeftVDUPan, ExitEventVDUPan,		TITLE_TIMER_PanToLeftVDU, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventRotateOutLeftVDU, EventRotateOutLeftVDU, ExitEventRotateOutVDU,	TITLE_TIMER_PanToLeftVDU, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventDarkenRoom, EventDarkenRoom, NULL,				TITLE_TIMER_PanToLeftVDU, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
-	
+
 	{InitEventFadeOffHoloLight, EventFadeOffHoloLight, ExitEventFadeOffHoloLight,				TITLE_TIMER_SwapBikes, 0.0F, 0.25F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventFadeOnHoloLight, EventFadeOnHoloLight, NULL,					TITLE_TIMER_SwapBikes, 0.25F, 0.5F, TITLE_EVENT_STATUS_IDLE},
 	{TriggerBikeSpeech, NULL, NULL,					TITLE_TIMER_SwapBikes, 1.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
@@ -2930,7 +2930,7 @@ TITLE_EVENT Title_Events[MAXTITLEEVENTS] = {
 	{InitEventRightVDUPan, EventRightVDUPan, ExitEventVDUPan,	TITLE_TIMER_NormalPanToRightVDU, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventRotateOutRightVDU, EventRotateOutRightVDU, ExitEventRotateOutVDU,	TITLE_TIMER_NormalPanToRightVDU, 0.5F, 1.0F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventDarkenRoom, EventDarkenRoom, NULL,				TITLE_TIMER_NormalPanToRightVDU, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
-	
+
 	{InitEventDiscPan, EventDiscPan, ExitEventDiscPanFromRight,				TITLE_TIMER_NormalPanToDiscsFromRight, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventRotateInRightVDU, EventRotateInRightVDU, NULL,				TITLE_TIMER_NormalPanToDiscsFromRight, 0.0F, 0.5F, TITLE_EVENT_STATUS_IDLE},
 	{InitEventLightenRoom, EventLightenRoom, NULL,							TITLE_TIMER_NormalPanToDiscsFromRight, 0.0F, 1.0F, TITLE_EVENT_STATUS_IDLE},
@@ -3028,7 +3028,7 @@ bool InitTitle()
 
 	if( ! render_info.fullscreen )
 		input_grab( false );
-    
+
 	InitModeCase();
 
     memset(&Names, 0, sizeof(SHORTNAMETYPE) );
@@ -3067,7 +3067,7 @@ void SetInitialTitleParams()
 	/**********************************************************************************
 	Positioning
 	**********************************************************************************/
-	
+
 	// Position of point on VDU to home in on
 	RightVDU.Look.x = -398.0F; RightVDU.Look.y = 58.0F; RightVDU.Look.z = -7.0F;
 	RightVDU.View.x = -640.0F; RightVDU.View.y = 58.0F; RightVDU.View.z = 614.0F;
@@ -3087,7 +3087,7 @@ void SetInitialTitleParams()
 	LeftVDU.BracketStartRot = 259.0F;
 	LeftVDU.BracketEndRot = 175.0F;
 
-				  
+
 	//Position of point on discs to home in on
 	DiscLookPos.x = 0.0F; DiscLookPos.y = 72.0F; DiscLookPos.z = 0.0F;
 
@@ -3101,7 +3101,7 @@ void SetInitialTitleParams()
 	View = StartViewPos;
 	Look = StartLookPos;
 	Up.x = 0.0F; Up.y = 1.0F; Up.z = 0.0F;
-	
+
 
 	/**********************************************************************************
 	Disc Stack
@@ -3109,17 +3109,17 @@ void SetInitialTitleParams()
 	DiscExpand = 3.0F;	// y distance that disc 1 will expand out by
 	DiscSpeed = 0.2F; 	// multiplier for disc rotate fn
 	DiscWiggleDistance = 4.0F;	// max y amount that discs wiggle by after expanding
-	DiscExpandOut = true;	 
+	DiscExpandOut = true;
 	DiscPauseTime = 0.0F;
 	DiscWiggleUp = true;
 	CurrentDiscHighlight = -1;
 	RotateSetup = false;
 	StackStatus = DISC_NOTHING;
 	InitialTexturesSet = false;
-					 
+
 	for (i=0; i<6; i++)
-		Turned[i] = true;  
-					 
+		Turned[i] = true;
+
 
 	/**********************************************************************************
 	VDU Screen
@@ -3221,7 +3221,7 @@ bool LoadTitleModels(void)
 	for (i=0; i < NumTitleModelsToLoad; i++)
 	{
 		BackgroundModel[i] = FindFreeModel();
-				
+
 		if ( BackgroundModel[i] != INDEX_NONE)
 		{	CurrentModel = BackgroundModel[i];
 			Models[CurrentModel].Flags = MODFLAG_Original;
@@ -3230,8 +3230,8 @@ bool LoadTitleModels(void)
 			Models[CurrentModel].Pos.z = 0.0F;
 			Models[CurrentModel].Mat = MATRIX_Identity;
 			MatrixTranspose( &Models[CurrentModel].Mat, &Models[CurrentModel].InvMat );
-			
-			if ( (CurrentModel == TITLE_MODEL_HoloLight) || 
+
+			if ( (CurrentModel == TITLE_MODEL_HoloLight) ||
 				(CurrentModel == TITLE_MODEL_Bracket) ||
 				(CurrentModel == TITLE_MODEL_MenuTVDummy) )
 				Models[CurrentModel].Visible = 0;
@@ -3253,7 +3253,7 @@ bool LoadTitleModels(void)
 	TitleInitDone = false;
 
 	// init all holo-object stuff...
-	
+
 	// actual model...
 	CurrentHoloModel = INDEX_NONE;
 
@@ -3264,15 +3264,15 @@ bool LoadTitleModels(void)
 	}
 
 	return true;
-		
+
 }
 
 void KillLines(void)
 {
 	int i;
-	
+
 	if (LinesActive)
-	{ 
+	{
 		for (i=0; i<CurrentLine; i++)
 		{
 			if ( BikeLine[ i ] != INDEX_NONE )
@@ -3283,7 +3283,7 @@ void KillLines(void)
 		}
 
 		LinesActive = false;
-		CurrentLine = 0;	  
+		CurrentLine = 0;
 	}
 
 }
@@ -3292,7 +3292,7 @@ void KillLines(void)
 
 bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 {
-	int num_polys;	
+	int num_polys;
 	int poly, edge;
 	TRIANGLE *poly_ptr;
 	LVERTEX *vertex_ptr;
@@ -3313,7 +3313,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 	float scaleout = 1.01F;
 
 	font = GetScreenFont(FONT_Large);
-	 
+
 	BuildRotMatrix(rot->x, rot->y, rot->z, &Mat_R);
 
 	if ( TitleModelSet[ Model ].DoIMorph )
@@ -3323,8 +3323,8 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 		for( Group = 0; Group < mxaheader->num_groups; Group++ )
 		{
 			for( Mesh = 0; Mesh < mxaheader->Group[ Group ].num_meshes; Mesh++ )
-			{   
-  
+			{
+
 				num_polys = mxaheader->Group[Group].num_polys_per_mesh[Mesh];
 				poly_ptr = mxaheader->Group[Group].poly_ptr[Mesh];
 				vertex_ptr = mxaheader->Group[Group].originalVerts[Mesh];
@@ -3346,7 +3346,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					tempv3.x = vertex_ptr[poly_ptr->v3].x;
 					tempv3.y = vertex_ptr[poly_ptr->v3].y;
 					tempv3.z = vertex_ptr[poly_ptr->v3].z;
-					
+
 					ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
 					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
 					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
@@ -3359,16 +3359,16 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					tempv3.x *= HoloModelScale * scaleout;
 					tempv3.y *= HoloModelScale * scaleout;
 					tempv3.z *= HoloModelScale * scaleout;
-					
+
 					startset = false;
 					endset = false;
 
 					for (edge = 0; edge < 3; edge++)
-					{					 
+					{
 						switch (edge)
 						{
 						case 0:
-							start.x = tempv1.x;	  
+							start.x = tempv1.x;
 							start.y = tempv1.y;
 							start.z = tempv1.z;
 							end.x = tempv2.x;
@@ -3399,7 +3399,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 						if (!(((point1dist > 0.0F) && (point2dist > 0.0F)) || ((point1dist < 0.0F) && (point2dist < 0.0F))))
 						{	//store points of intersection here...
 							distance2plane = (point1dist / (point1dist - point2dist));
-							
+
 							IntPoint.x = start.x + ( distance2plane * (end.x - start.x ) );
 							IntPoint.y = start.y + ( distance2plane * (end.y - start.y ) );
 							IntPoint.z = start.z + ( distance2plane * (end.z - start.z ) );
@@ -3417,9 +3417,9 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 						}
 					}
-					
+
 					scanline[scanlinenum].poly = *poly_ptr;
-					
+
 					if ((startset) && (endset))
 						scanlinenum++;
 
@@ -3429,7 +3429,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 				{
 
 					BikeLine[CurrentLine] = FindFreePoly();
-						
+
    					if( BikeLine[CurrentLine] != INDEX_NONE )
 					{
 						LinesActive = true;
@@ -3485,8 +3485,8 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 		for( Group = 0; Group < mxheader->num_groups; Group++ )
 		{
 			for( Mesh = 0; Mesh < mxheader->Group[ Group ].num_meshes; Mesh++ )
-			{   
-  
+			{
+
 				num_polys = mxheader->Group[Group].num_polys_per_mesh[Mesh];
 				poly_ptr = mxheader->Group[Group].poly_ptr[Mesh];
 				vertex_ptr = mxheader->Group[Group].originalVerts[Mesh];
@@ -3508,7 +3508,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					tempv3.x = vertex_ptr[poly_ptr->v3].x;
 					tempv3.y = vertex_ptr[poly_ptr->v3].y;
 					tempv3.z = vertex_ptr[poly_ptr->v3].z;
-					
+
 					ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
 					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
 					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
@@ -3522,16 +3522,16 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					tempv3.x *= HoloModelScale * scaleout;
 					tempv3.y *= HoloModelScale * scaleout;
 					tempv3.z *= HoloModelScale * scaleout;
-					
+
 					startset = false;
 					endset = false;
 
 					for (edge = 0; edge < 3; edge++)
-					{					 
+					{
 						switch (edge)
 						{
 						case 0:
-							start.x = tempv1.x;	  
+							start.x = tempv1.x;
 							start.y = tempv1.y;
 							start.z = tempv1.z;
 							end.x = tempv2.x;
@@ -3562,7 +3562,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 						if (!(((point1dist > 0.0F) && (point2dist > 0.0F)) || ((point1dist < 0.0F) && (point2dist < 0.0F))))
 						{	//store points of intersection here...
 							distance2plane = (point1dist / (point1dist - point2dist));
-							
+
 							IntPoint.x = start.x + ( distance2plane * (end.x - start.x ) );
 							IntPoint.y = start.y + ( distance2plane * (end.y - start.y ) );
 							IntPoint.z = start.z + ( distance2plane * (end.z - start.z ) );
@@ -3580,9 +3580,9 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 						}
 					}
-					
+
 					scanline[scanlinenum].poly = *poly_ptr;
-					
+
 					if ((startset) && (endset))
 						scanlinenum++;
 
@@ -3592,7 +3592,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 				{
 
 					BikeLine[CurrentLine] = FindFreePoly();
-						
+
    					if( BikeLine[CurrentLine] != INDEX_NONE )
 					{
 						LinesActive = true;
@@ -3642,7 +3642,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 		}
 	}
-	
+
 	return true;
 }
 
@@ -3662,7 +3662,7 @@ void PlaceObjects(void)
 	Mbot.x = 0.0F; Mbot.y = 35.0F; Mbot.z = -100.0F;
 	CurrentVDUPos = RightVDU.Pos;
 	VDUrot = RightVDU.StartRot;
-									 
+
 	Models[BackgroundModel[TITLE_MODEL_Mtop]].Pos = Mtop;
 	Models[BackgroundModel[TITLE_MODEL_Mbot]].Pos = Mbot;
 	Models[BackgroundModel[TITLE_MODEL_VDU]].Pos = CurrentVDUPos;
@@ -3678,7 +3678,7 @@ void PlaceObjects(void)
 	BikePos.y = Holopad.y + 100.0F;
 	BikePos.z = Holopad.z;
 
-  
+
 	Models[BackgroundModel[TITLE_MODEL_HoloLight]].Pos.x = Holopad.x;
 	Models[BackgroundModel[TITLE_MODEL_HoloLight]].Pos.y = Holopad.y - 2.0F;
 	Models[BackgroundModel[TITLE_MODEL_HoloLight]].Pos.z = Holopad.z;
@@ -3701,7 +3701,7 @@ void PlaceObjects(void)
 	stackpos[5] = Models[BackgroundModel[TITLE_MODEL_Disc5]].Pos;
 	stackpos[6] = Models[BackgroundModel[TITLE_MODEL_Disc6]].Pos;
 	stackpos[7] = Models[BackgroundModel[TITLE_MODEL_Mbot]].Pos;
-	
+
 	// build rotate matrix...
 	BuildRotMatrix(0.0F, VDUrot, 0.0F, &Mat_R);
 
@@ -3728,7 +3728,7 @@ void PlaceObjects(void)
 }
 
 /*===================================================================
-	Procedure	:		Expand / Contract discs, according to DiscExpandOut 
+	Procedure	:		Expand / Contract discs, according to DiscExpandOut
 	Input		:		nothing...
 	Output		:		nothing...
 ===================================================================*/
@@ -3740,7 +3740,7 @@ void ExpandDiscs(void)
 	float *currentY;
 
 	dy = 0.3F * framelag;
-	
+
 	for (i = 0; i <= 6; i++)
 	{
 		CurrentDisc = i;
@@ -3824,7 +3824,7 @@ void SetUpRotate(int disc)
 		}else{
 			rotspeed[disc] = 1.0F + rnd/1000.0F;
 		}
-	
+
 }
 
 /*===================================================================
@@ -3886,7 +3886,7 @@ void RotateDiscs(int disc, RotateDisc OneOnly)
 
 		if (Turned[disc] != LastTurned[disc])
 		{	if ( (rot[disc] >= viewangle) || (rot[disc] <= (viewangle - 180.0F)) )
-			{  		
+			{
 				switch ( OneOnly )
 				{
 				case RotateDisc::All:
@@ -3914,7 +3914,7 @@ void RotateDiscs(int disc, RotateDisc OneOnly)
 				angleoffset = 180.0F;
 			else
 				angleoffset = 0.0F;
-		  
+
 			BuildRotMatrix(0.0F, rot[disc] + angleoffset, 0.0F, &Models[BackgroundModel[disc]].Mat);
 			MatrixTranspose(&Models[BackgroundModel[disc]].Mat, &Models[BackgroundModel[disc]].InvMat);
 		}else
@@ -3987,7 +3987,7 @@ void RotateOneDisc(int disc)
 {
 
 	static bool onceonly = false;
-	
+
 	switch (StackStatus)
 	{
 	case DISC_EXPAND:
@@ -4010,14 +4010,14 @@ void RotateOneDisc(int disc)
 
 		if (RotWiggle[disc] == (Judders - 1))
 		 	StackStatus = DISC_RETRACT;
-		
+
 		break;
 	case DISC_RETRACT:
 		ExpandDiscs();
 		break;
 	case DISC_NOTHING:
 		StackMode = DISC_MODE_NONE;
-		DiscWiggleDistance = 4.0F; 
+		DiscWiggleDistance = 4.0F;
 		onceonly = false;
 		break;
 	}
@@ -4040,7 +4040,7 @@ void MorphHoloLight(void)
 	{
 		intensity = 1.0F - (((float)SIND(theta + (i * 15)) + 1.0F)/2.0F * 0.4F) * 2.0f; // methods: final *2.0f added to increase affect of light pulse
 		TintOneVertex( Model, 0, 0, HoloTintVerts[i], intensity, intensity, intensity, 1.0F );
-	} 
+	}
 }
 
 void RotateHoloLight(void)
@@ -4048,7 +4048,7 @@ void RotateHoloLight(void)
 	MATRIX Mat_Rx, Mat_Ry, Mat_Rz, Mat_temp, Mat_res;
 
 	HoloRoty += 0.75F * framelag;
-	
+
 	if (HoloRoty > 360.0F)
 		HoloRoty -= 360.0F;
 
@@ -4059,7 +4059,7 @@ void RotateHoloLight(void)
 	MatrixMultiply(&Mat_Rz, &Mat_Ry, &Mat_temp);
 	MatrixMultiply(&Mat_Rx, &Mat_temp, &Mat_res);
 
-	
+
 	Models[BackgroundModel[TITLE_MODEL_HoloLight]].Mat = Mat_res;
 	MatrixTranspose(&Mat_res, &Models[BackgroundModel[TITLE_MODEL_HoloLight]].InvMat);
 
@@ -4078,7 +4078,7 @@ void PulsateVDU(void)
 		UseThese = RightVertices;
 	else
 		UseThese = LeftVertices;
-	
+
 	theta += (float)((framelag/(1.0 * 60.0F)) * 90.0F);
 
 	if (theta > 360.0F)
@@ -4086,7 +4086,7 @@ void PulsateVDU(void)
 
 	for (i=0; i<4; i++)
 	{
-		tintamount = 1.0F - (((float)SIND(theta + i * 90.0F) + 1.0F)/2.0F * 0.6F); 
+		tintamount = 1.0F - (((float)SIND(theta + i * 90.0F) + 1.0F)/2.0F * 0.6F);
 		TintOneVertex( BackgroundModel[TITLE_MODEL_VDU], 0, 1, UseThese[i], tintamount,tintamount,tintamount, 1.0F );
 	}
 }
@@ -4162,7 +4162,7 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 /*===================================================================
 Display 0 Clipped Faceme Transluecent Polys
 ===================================================================*/
-		
+
 		if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], 0 ) )
 				return false;
 
@@ -4291,9 +4291,9 @@ bool DisplayTitle(void)
 			CameraStatus = CAMERA_AtLeftVDU;
 			StackMode = DISC_MODE_NONE;
 			StackStatus = DISC_NOTHING;
-			
+
 			MENU_Start = MENU_NEW_CreateGame;
-			
+
 			MenuRestart( &MENU_Start );
 			StackMode = DISC_MODE_NONE;
 			StackStatus = DISC_NOTHING;
@@ -4306,13 +4306,13 @@ bool DisplayTitle(void)
 			CameraStatus = CAMERA_AtLeftVDU;
 			StackMode = DISC_MODE_NONE;
 			StackStatus = DISC_NOTHING;
-			
+
 			MENU_Start = MENU_NEW_ChooseConnectionToJoin;
-			
+
 			MenuRestart( &MENU_Start );
 			StackMode = DISC_MODE_NONE;
 			StackStatus = DISC_NOTHING;
-			
+
 			if(IpOnCLI)
 				SelectConnectionToJoin( NULL );
 			break;
@@ -4322,9 +4322,9 @@ bool DisplayTitle(void)
 			CameraStatus = CAMERA_AtLeftVDU;
 			StackMode = DISC_MODE_NONE;
 			StackStatus = DISC_NOTHING;
-			
+
 			MENU_Start = MENU_NEW_Notify;
-			
+
 			MenuRestart( &MENU_Start );
 			StackMode = DISC_MODE_NONE;
 			StackStatus = DISC_NOTHING;
@@ -4351,7 +4351,7 @@ bool DisplayTitle(void)
 	MatrixTranspose( &CurrentCamera.Mat, &CurrentCamera.InvMat );
 	CurrentCamera.Pos = View;
 	CurrentCamera.GroupImIn = -1;
-	CurrentCamera.Viewport = viewport;	
+	CurrentCamera.Viewport = viewport;
 	CurrentCamera.Viewport.X = 0;
 	CurrentCamera.Viewport.Y = 0;
 	CurrentCamera.Viewport.Width = render_info.window_size.cx;
@@ -4419,7 +4419,7 @@ Event handling
 	ProcessEvents();
 
 	MorphHoloLight();
-	
+
 	ProcessTextItems();
 
 	if( CurrentMenu && CurrentMenuItem )
@@ -4429,7 +4429,7 @@ Event handling
 		if (!WasteAFrame)
 		{
 			MenuItemDrawCursor( CurrentMenuItem );
-		
+
 			MenuProcess();
 		}else
 		{	NewMenuSelectMode(NULL);
@@ -4439,21 +4439,21 @@ Event handling
 	else
 	{
 		if( MyGameStatus == STATUS_Title )
-			MenuRestart( &MENU_Start );	
+			MenuRestart( &MENU_Start );
 		SetFOV(START_FOV);
 	}
 
 	if (CurrentMenu)
 	{
   		for( Item = CurrentMenu->Item ; Item->x >= 0 ; Item++ )
-		{	
+		{
 			if ( (Item->FuncDraw == DrawFlatMenuList) || (Item->FuncDraw == DrawSplitMenuList) )
-			{	
+			{
 				l = (LIST *)(Item->Variable);
 
 				if ( l->FuncInfo )
 					l->FuncInfo( l );
-				
+
 				AddToFlatMenuList( Item );
 			}
 		}
@@ -4487,11 +4487,11 @@ void MenuRestart( MENU * Menu )
 	{
 		PauseAllSfx();
 	}
-	
+
 	FramesIgnored = 0;
 
 	input_buffer_reset();
-	
+
 	if ( QuickStart == QuickStartMode::None )
 	{
 		if ((CameraStatus == CAMERA_AtDiscs) || (CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
@@ -4525,8 +4525,8 @@ void MenuRestart( MENU * Menu )
 	}
 
 	// go into selection mode by default
-	MenuState = MENUSTATE_Select;	
-	
+	MenuState = MENUSTATE_Select;
+
 	// fire selection event on item if it exists
 	// this must come last so it can change things like MenuState
 	MenuItemSelect(CurrentMenuItem);
@@ -4560,7 +4560,7 @@ void MenuAbort( void )
 		VduClear();
 	}
 
-	CurrentMenu = NULL;			   
+	CurrentMenu = NULL;
 	CurrentMenuItem = NULL;
 	MenuStackLevel = 0;
 	MenuState = MENUSTATE_Select;
@@ -4894,9 +4894,9 @@ void MenuChangeEx( MENU *Menu )
 ===================================================================*/
 void MenuChange( MENUITEM * Item )
 {
-	
+
 	MenuState = MENUSTATE_Select;
-	
+
 	DoHighlight = true;	//menu has changed, therefore ensure option is highlighted
 
 
@@ -4915,12 +4915,12 @@ void MenuChange( MENUITEM * Item )
 
 		// Animate discs if neccesary
 		if ((CurrentMenu->MenuStatus == TITLE_TIMER_ChooseDiscPan) && (OldMenuStatus == TITLE_TIMER_ChooseDiscPan))
-																	      
+
 		{	StackMode = DISC_MODE_ALL;
 			StackStatus = DISC_EXPAND;
 		}
 
-				 
+
 		CurrentMenuItem = CurrentMenu->Item;
 		while ( !CurrentMenuItem->FuncSelect && (CurrentMenuItem->x >= 0 ) )
 		{
@@ -4955,26 +4955,26 @@ void MenuBack()
 
 	if ( NoMenuBack )
 		return;
-	
+
 	if ( MenuStackLevel )
 	{
 	   	if ( !InTitleRoom )
 			PlayCursorSfx();
-			
+
 		DoHighlight = true;	//menu has changed, therefore ensure option is highlighted
 
 
 		PanDone = false;
 
 		OldMenuStatus = CurrentMenu->MenuStatus;
-	
+
 		// if going back to old menu system...
-		if ( CurrentMenu == &MENU_NEW_Start ) 
-		{	
+		if ( CurrentMenu == &MENU_NEW_Start )
+		{
 			CameraStatus = CAMERA_AtStart;
 		}
-	
-			
+
+
 		if ( CurrentMenu->FuncExit && !IgnoreMenuFuncs)
 		{
 			CurrentMenu->FuncExit( CurrentMenu );
@@ -5067,7 +5067,7 @@ void	MenuItemDrawCursor( MENUITEM * Item )
 {
 	int	x;
 	int	y;
-	
+
 	switch (CameraStatus)
 	{
 	case CAMERA_AtDiscs:
@@ -5077,20 +5077,20 @@ void	MenuItemDrawCursor( MENUITEM * Item )
 			CurrentDiscHighlight = Item->y;
 			HighlightDisc(CurrentDiscHighlight);
 			DoHighlight = false;
-		} 
+		}
 		break;
 	case CAMERA_AtStart:
 		if ( MenuState != MENUSTATE_Select && MenuState != MENUSTATE_SelectKeydef )
 			return;
 		x = (int) ( ( ( Item->x - 18 ) >> 1 ) * ModeScaleX );
 		y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
-		
-		if ( !( Item->highlightflags & TEXTFLAG_AutoSelect ) ) 
+
+		if ( !( Item->highlightflags & TEXTFLAG_AutoSelect ) )
 			Print4x5Text( "0" , x , y , 0 );
 		break;
 	}
 
-		
+
 }
 
 /*===================================================================
@@ -5129,7 +5129,7 @@ void CursorUp()
 	MENUITEM *wrap;
 	MENUITEM *item;
 
-	
+
 
 	x = CurrentMenuItem->x;
 	y = CurrentMenuItem->y;
@@ -5175,8 +5175,8 @@ void CursorDown()
 		MENUITEM *wrap;
 		MENUITEM *item;
 
-		
-	
+
+
 		x = CurrentMenuItem->x;
 		y = CurrentMenuItem->y;
 		next = NULL;
@@ -5210,7 +5210,7 @@ void CursorDown()
 				PlayCursorSfx();
 			}
 		}
-	
+
 }
 
 
@@ -5222,7 +5222,7 @@ void CursorLeft()
 	MENUITEM *wrap;
 	MENUITEM *item;
 
-	
+
 
 	x = CurrentMenuItem->x;
 	y = CurrentMenuItem->y;
@@ -5266,7 +5266,7 @@ void CursorRight()
 	MENUITEM *wrap;
 	MENUITEM *item;
 
-	
+
 
 	x = CurrentMenuItem->x;
 	y = CurrentMenuItem->y;
@@ -5308,8 +5308,8 @@ void CursorHome()
 	MENUITEM *next;
 	MENUITEM *item;
 
-	
-	
+
+
 	next = NULL;
 	for ( item = CurrentMenu->Item; item->x >= 0; item++ )
 	{
@@ -5334,7 +5334,7 @@ void CursorEnd()
 	MENUITEM *next;
 	MENUITEM *item;
 
-	
+
 
 	next = NULL;
 	for ( item = CurrentMenu->Item; item->x >= 0; item++ )
@@ -5364,7 +5364,7 @@ void CursorSearch( char *keyword )
 	MENUITEM *item;
 	int keyword_len;
 
-	
+
 
 	if ( !keyword )
 		return;
@@ -5792,7 +5792,7 @@ void DrawSlider( MENUITEM *Item )
 	sprintf( max, "%d", s->max );
 	sprintf( val, "%d", s->value );
 
-	// slider value 
+	// slider value
 	Print4x5Text( val, sx + ( ex - sx ) * ( s->value - s->min ) / ( s->max - s->min ), y, RED );
 
 	// minimum value
@@ -6005,7 +6005,7 @@ void DrawMessagesToggle( MENUITEM *Item )
 	Output		:		Nothing
 ===================================================================*/
 void SelectKey( MENUITEM *Item )
-{	
+{
 	MenuState = MENUSTATE_Keydef;
 	KeyItem = Item;
 
@@ -6018,7 +6018,7 @@ void SelectKey( MENUITEM *Item )
 	Output		:		Nothing
 ===================================================================*/
 void SelectKeyDef( MENUITEM *Item )
-{	
+{
 	MenuState = MENUSTATE_Keydef;
 	KeyItem = Item;
 	PlaySfx( SFX_InGameMenuSelect, 1.0F );
@@ -6077,7 +6077,7 @@ void DrawKeyDef( MENUITEM *Item )
 			}
 		}
 	}
- 
+
 }
 
 /*===================================================================
@@ -6186,9 +6186,9 @@ void InitBikeListVDU( MENU *Menu )
 	AddBikeArrow( bike_name, BikeList.selected_item );
 
 	OldSelectedBike = BikeList.selected_item;
-	
+
 	strcpy(biker_text,BikerText[BikeList.selected_item]);
-	
+
 }
 
 
@@ -6308,7 +6308,7 @@ void InitPilotList( void )
 	// for each pilot
 	for ( j = 0; j < PilotList.items; j++ )
 	{
-		// 
+		//
 		if ( !strcasecmp( (char*)PilotList.item[ j ], biker_name ) )
 			PilotList.selected_item = j;
 	}
@@ -6415,12 +6415,12 @@ void SetPilotName( MENUITEM * /*item*/ )
 	// write the cfg file
 	write_config( player_config, biker_config );
 
-	// 
+	//
 	tempbike = SelectedBike;
 
 	//
 	SelectedBike = Config.bike;
-	
+
 	// if config bike and selected bike are not the same
 	// then swap displayed bike
 	if ( tempbike != SelectedBike )
@@ -6436,7 +6436,7 @@ void SetPilotName( MENUITEM * /*item*/ )
 		ShowHoloModel( BikeModelLookup[ SelectedBike ] );
 
 	}
-	
+
 	// re-initialize the biker list
 	InitPilotList();
 
@@ -6481,7 +6481,7 @@ void SetPilotNameInGame( MENUITEM * /*item*/ )
 	SelectedBike = Config.bike;
 	GetBikeDetails(SelectedBike, NULL );
 	UpdateSfxForBiker( SelectedBike );
-	
+
 	InitPilotList();
 }
 
@@ -6532,7 +6532,7 @@ void RenamePilotName( MENUITEM * /*item*/ )
 	write_config( player_config, biker_config );
 	tempbike = SelectedBike;
 	SelectedBike = Config.bike;
-	
+
 	if ( tempbike != SelectedBike )
 	{
 		// need to swap displayed bike
@@ -6540,7 +6540,7 @@ void RenamePilotName( MENUITEM * /*item*/ )
 		UpdateSfxForBiker( SelectedBike );
 		ShowHoloModel( BikeModelLookup[ SelectedBike ] );
 	}
-	
+
 	InitPilotList();
 
 	if (CurrentMenu == &MENU_NEW_NewPlayer)
@@ -6562,16 +6562,16 @@ void InitPilotMenu( MENU * /*Menu*/ )
 // as above, but auto selects list and highlights current player.
 void InitVDUPilotMenu ( MENU *Menu )
 {
-  
+
 	MENUITEM *Item;
-	
+
 
 	for( Item = Menu->Item ; Item->x >= 0 ; Item++ )
-	{	
+	{
 		if (Item->Variable == &PilotList)
 			CurrentMenuItem = Item;
 	}
-	
+
 	MenuState = MENUSTATE_SelectPlayer;
 	InitPilotList();
 }
@@ -6601,7 +6601,7 @@ void SelectPilot( MENUITEM *item )
 		if ( player_config->bike > ( BikeList.items - 1 ) )
 		{
 			player_config->bike = 0;
-		}		
+		}
 
 		Config = *player_config;
 		Config.bike = ValidBikeSelected( Config.bike );
@@ -6610,7 +6610,7 @@ void SelectPilot( MENUITEM *item )
 			SelectedBike = 0;
 		UpdateSfxForBiker( SelectedBike );
 
-   
+
 		GetBikeDetails(SelectedBike, item);
 	}
 }
@@ -6618,13 +6618,13 @@ void SelectPilot( MENUITEM *item )
 void SelectTeamList( MENUITEM *Item )
 {
 	MENUITEM *NewItem;
-	
+
 	TeamNumber[WhoIAm] = *((int *)Item->Value);
 
 	// move cursor to ready button...
 	for( NewItem = CurrentMenu->Item ; NewItem->x >= 0 ; NewItem++ )
 	{	if( NewItem->FuncDraw == DrawReadyButton )
-		{  
+		{
 			CurrentMenuItem = NewItem;
 			break;
 		}
@@ -6922,7 +6922,7 @@ void DrawTextItem( MENUITEM *Item )
 	// display each line of text
 	for(z=0; z*MAX < t->insert_pos; z++)
 	{
-		strncpy(&MessageBuff[0],&t->text[MAX*z],MAX); 
+		strncpy(&MessageBuff[0],&t->text[MAX*z],MAX);
 		Print4x5Text( &MessageBuff[0], tx, y + (z*(FontHeight+16)), 1);
 	}
 
@@ -6949,7 +6949,7 @@ void DrawTextItem( MENUITEM *Item )
 void GetVduTextFormattingInfo (TEXT *t)
 {
 	t->VDU_insert_pos = 0;
-	
+
 	TextItem->TextInfo[1]->text = (u_int8_t*)t->text;
 	PrintTextItem( TextItem->TextInfo[1] );
 
@@ -7123,7 +7123,7 @@ void GetDefaultPilot(void)
 			find_close();
 		}
 	}
-	
+
 	// if found
 	if ( found )
 
@@ -7248,7 +7248,7 @@ void InitDebugMode( MENU *Menu )
 			item->Value == &ScreenSaving ||
 			item->Value == &OldNodeCube ||
 			item->Value == &NodeCube ||
-			item->Value == &NodeCubeType 
+			item->Value == &NodeCubeType
 		)
 		{
 			if ( DebugInfo )
@@ -7295,7 +7295,7 @@ char *SearchKey( char c )
 
 
 void SelectQuit( MENUITEM * /*Item*/ )
-{	
+{
 	if(IsHost && tracker_enabled)
 		send_tracker_finished( tracker_server, tracker_port );
 	SetGamePrefs();
@@ -7426,14 +7426,14 @@ void LoadLevelText( MENU * /*Menu*/ )
 	newlinechar = strchr( SelectedLevel, '\n' );
 	if ( newlinechar )
 		*newlinechar = 0;
-		
+
 
 	// read mission text
 	if ( !fgets( SelectedLevelText, MAX_LEVEL_TEXT_LENGTH, f ) )
 	{
 	  	// if error ( as oposed to end of file )
 	  	if ( ferror( f ) != 0 )
-		{		
+		{
 			SelectedLevelText[ 0 ] = 0;
 			fclose( f );
 			return;
@@ -7536,7 +7536,7 @@ void InitTitleLoad( MENU * /*Menu*/ )
 	InitSinglePlayerGame( NULL );
 	InitLoadSavedGameList( NULL );
 
-	if ( LevelList.items ) 
+	if ( LevelList.items )
 	{
 		// if no saved games, go to error screen
 		if ( !LoadSavedGameList.items )
@@ -7609,7 +7609,7 @@ void AddBikeArrow( char *name, int num )
 		{
 				rightarrow = true;
 		}
-	}				   
+	}
 
 	strcpy( tempbikename, name );
 
@@ -7629,7 +7629,7 @@ void AddBikeArrow( char *name, int num )
 
 void ExitBikeSelection( MENUITEM * /*item*/ )
 {
-	
+
 
 	if( CameraStatus != CAMERA_AtStart )
 		ShowHoloModel( HoloModelLookup[ BikeList.selected_item ] );
@@ -7656,7 +7656,7 @@ void ExitBikeComputerSelection( MENUITEM * /*item*/ )
 
 	player_config->bikecomp = BikeComputerList.selected_item;
 	Config.bikecomp = player_config->bikecomp;	// backward compatability
-	
+
 	UpdateSfxForBikeComputer( player_config->bikecomp );
 
 	if ( CurrentSpeechID ) StopSfx( CurrentSpeechID );
@@ -7675,7 +7675,7 @@ void MenuGoFullScreen( MENUITEM * /*Item*/ )
 {
 	if( MyGameStatus == STATUS_Title )
 	{
-		LastMenu = CurrentMenu;	
+		LastMenu = CurrentMenu;
 		VduClear();
 	}
 
@@ -7698,7 +7698,7 @@ void MenuGoFullScreen( MENUITEM * /*Item*/ )
    		InitialTexturesSet = false;
 	}
 }
-	
+
 
 
 /*===================================================================
@@ -7728,12 +7728,12 @@ void MakeModeList( MENU * /*Menu*/ )
 				sprintf( (char*)&ModeList.item[ModeList.items][0], "%d x %d" ,
 					render_info.Mode[i].w , render_info.Mode[i].h );
 
-			if( (render_info.Mode[i].w == render_info.ThisMode.w) &&				
+			if( (render_info.Mode[i].w == render_info.ThisMode.w) &&
 				(render_info.Mode[i].h == render_info.ThisMode.h))
 			{
 				ModeList.selected_item = ModeList.items;
 			}
-			
+
 			ModeList.items++;
 		}
 	}
@@ -7755,7 +7755,7 @@ void NewMenuSelectMode( MENUITEM * /*Item*/ )
 {
 	int mode = WhichMode[ModeList.selected_item];
 
-	LastMenu = CurrentMenu;	
+	LastMenu = CurrentMenu;
 	VduClear();
 
 	if ( render_info.fullscreen )
@@ -8006,7 +8006,7 @@ void GetGamePrefs( void )
 	tracker_enabled = config_get_bool( "TrackerEnabled", true );
 
 	// booleans
- 
+
     TintBikeTeamColor                = config_get_bool( "TintBikeTeamColor",		true );
     MyResetKillsPerLevel             = config_get_bool( "ResetKillsPerLevel",		false );
     MyBrightShips                    = config_get_bool( "BrightShips",				false );
@@ -8120,7 +8120,7 @@ void GetGamePrefs( void )
     TauntMessageColour               = config_get_int( "TauntMessageColour",		GREEN );
     MyMessageColour                  = config_get_int( "MyMessageColour",			  WHITE );
 		MaxMessageTime                   = config_get_float( "MaxMessageTime",    5.0f );
-		
+
 	CLAMP( InGameMenuColour, MAXFONTCOLOURS );
 	CLAMP( MilestoneMessagesColour,	MAXFONTCOLOURS );
 	CLAMP( KillMessageColour,		MAXFONTCOLOURS );
@@ -8166,17 +8166,17 @@ void GetGamePrefs( void )
 void SetGamePrefs( void )
 {
 	// ip / port
-	
+
 	config_set_str( "HostAddress",	TCPAddress.text );	// remote address
 	config_set_str( "HostPort",	host_port_str.text );	// remote port
 	config_set_str( "LocalPort",	local_port_str.text );	// local
 
 	// tracker
-	
+
 	config_set_str( "TrackerServer",		tracker_server );
 	config_set_int( "TrackerPort",			tracker_port );
 	config_set_bool( "TrackerEnabled",		tracker_enabled );
-	
+
 	// booleans
 
   config_set_bool( "TintBikeTeamColor",     TintBikeTeamColor );
@@ -8333,7 +8333,7 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
 		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
-		{   
+		{
 			if ((Exclude) && (Exclude->Mesh == Mesh) && (Exclude->Group == Group))
 			{	CurrentExclude = Exclude->VertexPtr;
 				NumberToExclude = Exclude->NumVertices;
@@ -8356,14 +8356,14 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			VertPtr = DstMloadheader->Group[Group].originalVerts[Mesh];
-		
+
 			for (i=0; i<Vert; i++)
 			{
 				red = (u_int8_t)RGBA_GETRED(VertPtr->color);
 				green = (u_int8_t)RGBA_GETGREEN(VertPtr->color);
 				blue = (u_int8_t)RGBA_GETBLUE(VertPtr->color);
 				alpha = (u_int8_t)RGBA_GETALPHA(VertPtr->color);
-				
+
 			  	if ((CurrentExclude) && (*CurrentExclude == i))
 			  	{
 			  		ExcludedSoFar++;
@@ -8378,11 +8378,11 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 			  		green = (u_int8_t)((float)green * percent);
 			  		blue = (u_int8_t)((float)blue * percent);
 			  	}
-			  
+
 				Colour = RGBA_MAKE( red, green, blue, alpha );
-				if( !Colour ) 
+				if( !Colour )
 					return false;
-				
+
 				DstVerts->color = Colour;
 				DstVerts++;
 
@@ -8416,11 +8416,11 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 
 		*minoffset = 0.0F;
 		*maxoffset = 0.0F;
-						  
+
 		for( Group = 0; Group < ModelHeaderPtr->num_groups; Group++ )
 		{
 			for( Mesh = 0; Mesh < ModelHeaderPtr->Group[ Group ].num_meshes; Mesh++ )
-			{   
+			{
 				TotalVerts = ModelHeaderPtr->Group[ Group ].num_verts_per_mesh[ Mesh ];
 				VertPtr = ModelHeaderPtr->Group[Group].originalVerts[Mesh];
 
@@ -8446,11 +8446,11 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 
 		*minoffset = 0.0F;
 		*maxoffset = 0.0F;
-						  
+
 		for( Group = 0; Group < MxModelHeaderPtr->num_groups; Group++ )
 		{
 			for( Mesh = 0; Mesh < MxModelHeaderPtr->Group[ Group ].num_meshes; Mesh++ )
-			{   
+			{
 				TotalVerts = MxModelHeaderPtr->Group[ Group ].num_verts_per_mesh[ Mesh ];
 				VertPtr = MxModelHeaderPtr->Group[Group].originalVerts[Mesh];
 
@@ -8490,28 +8490,28 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t Mesh, int Vertex
 	}
 
 	VertPtr = &(DstMloadheader->Group[Group].originalVerts[Mesh])[VertexNo];
-	  
+
 	vred = (u_int8_t)RGBA_GETRED(VertPtr->color);
 	vgreen = (u_int8_t)RGBA_GETGREEN(VertPtr->color);
 	vblue = (u_int8_t)RGBA_GETBLUE(VertPtr->color);
 	valpha = (u_int8_t)RGBA_GETALPHA(VertPtr->color);
-	
+
  	red = (u_int8_t)((float)vred * tr);
   	green = (u_int8_t)((float)vgreen * tg);
   	blue = (u_int8_t)((float)vblue * tb);
   	alpha = (u_int8_t)((float)valpha * ta);
 
 	Colour = RGBA_MAKE( red, green, blue, alpha );
-	if( !Colour ) 
+	if( !Colour )
 		return false;
-			
+
 	DstVerts[VertexNo].color = Colour;
 
 	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 	{
 		return false;
 	}
-   	
+
 	return true;
 }
 
@@ -8579,15 +8579,15 @@ TEXTINFO *InitTextInfo( void )
 	TextInfo->text = NULL;						// text string
 	TextInfo->highlight = false;					// item highlighted?
 	TextInfo->highlighttype = HighlightType::Pulsing;
-	TextInfo->xmin = 0;						// 
+	TextInfo->xmin = 0;						//
 	TextInfo->ymin = 0;						// bounding box for text
 	TextInfo->xmax = 0;						// (VDU co-ordinates)
-	TextInfo->ymax = 0;						// 
+	TextInfo->ymax = 0;						//
 	TextInfo->font = FONT_Small;						// font size (small, medium, large)
 	TextInfo->flags = 0;						// formatting info
 	TextInfo->num_lines = 0;					// number of lines once formatted
-	TextInfo->boxdone = false;					
-	TextInfo->num_pointers_to_free = 0;		
+	TextInfo->boxdone = false;
+	TextInfo->num_pointers_to_free = 0;
 	TextInfo->force_fit = false;
 
 	return TextInfo;
@@ -8614,7 +8614,7 @@ void AddToFlatMenuList( MENUITEM *Item )
 		if (current >= l->items)
 		{
 			if (TextInfo->text != (u_int8_t*)EmptyString)
-			{	
+			{
 				TextInfo->text = (u_int8_t*)EmptyString;
 				PrintTextItem(TextInfo);
 			}
@@ -8658,7 +8658,7 @@ void AddToTextStack( TEXTINFO *TextInfo )
 	int i;
 
 	if(!TextInfo)return;
-	
+
 	for ( i = 0; i < TextStackLevel; i++ )
 	{
 		if ( !TextStack[ i ] )
@@ -8689,11 +8689,11 @@ void DrawFlatMenuList( MENUITEM *Item )
 	{
 
 		strncpy( (char*)l->old_item[i] , EmptyString , sizeof(l->item[0])  );
-		
+
 		Item->TextInfo[i] = InitTextInfo();
 
 		Item->numtextitems++;
-		
+
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[i];
 
@@ -8703,7 +8703,7 @@ void DrawFlatMenuList( MENUITEM *Item )
 		TextInfo->ymax = (((Item->ymax - Item->y)/l->display_items) * (i + 1)) + Item->y;
 		TextInfo->font = Item->font;
 		TextInfo->flags = Item->highlightflags;
-	
+
 		AddToTextStack( TextInfo );
 
 	}
@@ -8734,11 +8734,11 @@ void DrawSplitMenuList( MENUITEM *Item )
 		{
 
 			strncpy( (char*)l->old_item[i + column * (l->display_items / 2)] , EmptyString , sizeof(l->item[0])  );
-		
+
 			Item->TextInfo[i + column * (l->display_items / 2)] = InitTextInfo();
 
 			Item->numtextitems++;
-		
+
 			//write relevent info into structure
 			TextInfo = Item->TextInfo[i + column * (l->display_items / 2)];
 
@@ -8749,7 +8749,7 @@ void DrawSplitMenuList( MENUITEM *Item )
 			TextInfo->ymax += TextInfo->ymax - TextInfo->ymin;
 			TextInfo->font = Item->font;
 			TextInfo->flags = Item->highlightflags;
-	
+
 			//add to text stack...
 			AddToTextStack( TextInfo );
 
@@ -8776,7 +8776,7 @@ void DrawFlatTextStatus( MENUITEM *Item )
 	TextInfo->flags = Item->highlightflags;
 
 	TextInfo->text = (u_int8_t*)t->text;
-	
+
 	//format text item...
 	PrintTextItem(TextInfo);
 }
@@ -8809,7 +8809,7 @@ void DrawLeftArrow( MENUITEM *Item )
 		Item->TextInfo[0] = InitTextInfo();
 
 		Item->numtextitems++;
-			
+
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
@@ -8846,7 +8846,7 @@ void DrawRightArrow( MENUITEM *Item )
 		Item->TextInfo[0] = InitTextInfo();
 
 		Item->numtextitems++;
-			
+
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
@@ -8878,7 +8878,7 @@ void DrawFlatMenuItem( MENUITEM *Item )
 	Item->TextInfo[0] = InitTextInfo();
 
 	Item->numtextitems++;
-		
+
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[0];
 
@@ -8895,7 +8895,7 @@ void DrawFlatMenuItem( MENUITEM *Item )
 
 	//format text item...
 	PrintTextItem(TextInfo);
-	
+
 }
 
 void DrawReadyStatus(MENUITEM *Item)
@@ -8944,11 +8944,11 @@ TEXTINFO * DrawFlatRadioBtnStatus( MENUITEM *Item )
 		{
 			TextInfo->text = (u_int8_t*)RadioBtnNotSelected;
 		}
-	
+
 		//format text item...
 		PrintTextItem(TextInfo);
 	}
-		
+
 	return TextInfo;
 }
 
@@ -8966,7 +8966,7 @@ TEXTINFO * DrawFlatToggleStatus( MENUITEM *Item )
 	{
 		status = ToggleStatusOff;
 	}
-		
+
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[1];
 
@@ -8987,7 +8987,7 @@ TEXTINFO * DrawFlatToggleStatus( MENUITEM *Item )
 void SelectFlatRadioButton( MENUITEM *Item )
 {
 	MENUITEM *TempItem;
-	
+
 	SelectRadioButton(Item);
 
 	for( TempItem = CurrentMenu->Item ; TempItem->x >= 0 ; TempItem++ )
@@ -9006,7 +9006,7 @@ void SelectFlatMenuToggle( MENUITEM *Item )
 		SelectToggle(Item);
 		DrawFlatToggleStatus(Item);
 	}
-	
+
 }
 
 void SelectMultiToggle( MENUITEM *Item )
@@ -9056,11 +9056,11 @@ void CheckKeysForChanges( void )
 	VirtualKeycode keycode;
 	const char *keyword;
 	DEFKEY *kdef;
-	
+
 	for( Item = CurrentMenu->Item ; Item->x >= 0 ; Item++ )
 	{
 		if( Item->FuncDraw == DrawFlatMenuKey )
-		{	
+		{
 			kdef = (DEFKEY *)(Item->Variable);
 			keycode = kdef->def->key[ kdef->selected_key ];
 			if ( keycode )
@@ -9071,8 +9071,8 @@ void CheckKeysForChanges( void )
 			}
 			else
 				keyword = UndefinedKey;
-			
-			Item->TextInfo[0]->text = (u_int8_t*)keyword; 
+
+			Item->TextInfo[0]->text = (u_int8_t*)keyword;
 		}
 		else if ( Item->FuncDraw == DrawFlatMenuKeyLeftArrow )
 		{
@@ -9163,7 +9163,7 @@ void DrawFlatMenuKey( MENUITEM *Item )
 	Item->TextInfo[0] = InitTextInfo();
 
 	Item->numtextitems++;
-		
+
 	//add to text stack...
 	AddToTextStack( Item->TextInfo[0] );
 
@@ -9183,7 +9183,7 @@ void DrawFlatMenuKeyNum( MENUITEM *Item )
 		Item->TextInfo[0] = InitTextInfo();
 
 		Item->numtextitems++;
-			
+
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
@@ -9250,7 +9250,7 @@ void DrawFlatMenuKeyLeftArrow( MENUITEM *Item )
 	Item->TextInfo[0] = InitTextInfo();
 
 	Item->numtextitems++;
-		
+
 	//add to text stack...
 	AddToTextStack( Item->TextInfo[0] );
 
@@ -9297,7 +9297,7 @@ void DrawFlatMenuKeyRightArrow( MENUITEM *Item )
 	Item->TextInfo[0] = InitTextInfo();
 
 	Item->numtextitems++;
-		
+
 	//add to text stack...
 	AddToTextStack( Item->TextInfo[0] );
 
@@ -9382,7 +9382,7 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 		}else{
 			percentage = (1.0F * (float) ( 9 - DemoSpeed.value )) * 100.0F;
 		}
-		num = sprintf( (char*)TextInfo->text, "%3.1f%%", percentage );  
+		num = sprintf( (char*)TextInfo->text, "%3.1f%%", percentage );
 		offset = 58;
 		break;
 	case SLIDER_User:
@@ -9439,7 +9439,7 @@ void UpdateSlider (MENUITEM *Item)
 
 	frac = Slider->timer * ((float)( Slider->max - Slider->min ) / (float)Slider->max);
 	frac += 1.0F - ((float)( Slider->max - Slider->min ) / (float)Slider->max);
-	
+
 	if (slidertype == SLIDER_Bike)
 	{
 		space = 1;
@@ -9454,7 +9454,7 @@ void UpdateSlider (MENUITEM *Item)
 
 	xmin = (Item->xmax + space + VDUoffsetX) * ModeScaleX;
 	xmax = (Item->xmax + space + frac * width + VDUoffsetX) * ModeScaleX;
-  
+
 	ymin = (Item->y + VDUoffsetY + decreaseY) * ModeScaleY;
 	ymax = (Item->ymax + VDUoffsetY - decreaseY) * ModeScaleY;
 
@@ -9464,15 +9464,15 @@ void UpdateSlider (MENUITEM *Item)
 	xmax = (float)ceilf(xmax);
 	ymin = (float)floorf(ymin);
 	ymax = ymin + height;
-	
+
 	ScrPolys[Slider->poly].x1 = xmin;
-	ScrPolys[Slider->poly].y1 = ymin;	
+	ScrPolys[Slider->poly].y1 = ymin;
 	ScrPolys[Slider->poly].x2 = xmin;
 	ScrPolys[Slider->poly].y2 = ymax;
-	ScrPolys[Slider->poly].x3 = xmax;	
+	ScrPolys[Slider->poly].x3 = xmax;
 	ScrPolys[Slider->poly].y3 = ymax;
-	ScrPolys[Slider->poly].x4 = xmax;					
-	ScrPolys[Slider->poly].y4 = ymin;					
+	ScrPolys[Slider->poly].x4 = xmax;
+	ScrPolys[Slider->poly].y4 = ymin;
 
 	ScrPolys[Slider->poly].Col1.R = 0;
 	ScrPolys[Slider->poly].Col1.G = 32;
@@ -9504,7 +9504,7 @@ SLIDER *GetSlider( MENUITEM *Item, int *slidertype )
 		*slidertype = SLIDER_Normal;
 
 	if (*slidertype == SLIDER_Bike)
-	{	
+	{
 		feature = *((int *) (Item->Variable));
 		slider = &BikeFeatureSlider[OldSelectedBike][feature];
 	}else
@@ -9554,7 +9554,7 @@ void DrawFlatMenuSlider( MENUITEM *Item )
 			Msg("Title.c: DrawFlatMenuSlider() unable to allocate screen poly\n");
 			exit(1);
 		}
-	
+
 		ScrPolys[slider->poly].Type = SCRTYPE_Normal;
 		ScrPolys[slider->poly].Flags = SCRFLAG_UseCoords;
 		ScrPolys[slider->poly].Type = SCRTYPE_Normal;
@@ -9597,7 +9597,7 @@ void DrawFlatMenuSlider( MENUITEM *Item )
 	}
 
 	Item->TextInfo[1]->pointer[Item->TextInfo[1]->num_pointers_to_free++] = Item->TextInfo[1]->text;
-	
+
 	Item->numtextitems++;
 
 	DrawFlatSliderStatus(Item);
@@ -9612,13 +9612,13 @@ void ProcessFlatSliders(void)
 	int i, slidertype;
 	SLIDER *slider;
 	float ReqFraction;
-	
+
 	for (i=0; i<MAXSLIDERSPERMENU; i++)
 	{
 		if (ActiveSliderItem[i].Item)
 		{
 			slider = GetSlider ( ActiveSliderItem[i].Item, &slidertype );
-		 
+
 			if (slider->redraw_req)
 			{
 				RedrawFlatMenuSlider(ActiveSliderItem[i].Item);
@@ -9644,7 +9644,7 @@ void ProcessFlatSliders(void)
 		}
 	}
 }
- 
+
 void RedrawFlatMenuSlider( MENUITEM *Item )
 {
 	SLIDER *slider;
@@ -9678,11 +9678,11 @@ void DrawFlatMenuName( MENUITEM *Item )
 	TEXTINFO *TextInfo;
 
 	var = (char*)Item->Variable;
-	  
+
 	//allocate space for textinfo
 	Item->TextInfo[0] = InitTextInfo();
 	Item->numtextitems++;
-		
+
 	//write relevent info into structure
 	TextInfo = Item->TextInfo[0];
 
@@ -9705,7 +9705,7 @@ void DrawFlatMenuName( MENUITEM *Item )
 
 	//format text item...
 	PrintTextItem(TextInfo);
-	
+
 }
 
 void DrawGeneralWeaponText( MENUITEM *Item )
@@ -9740,10 +9740,10 @@ void DrawGeneralWeaponText( MENUITEM *Item )
 		TextInfo->ymin = (((Item->ymax - Item->y)/Total_Slots) * line) + Item->y;
 
 		TextInfo->text = (u_int8_t*)DescriptionList[WeaponList[i]];
-		
+
 		TextInfo->xmax = Item->xmax + offset;
 		TextInfo->ymax = (((Item->ymax - Item->y)/Total_Slots) * (line + 1)) + Item->y;
-		TextInfo->font = Item->font;				  
+		TextInfo->font = Item->font;
 		TextInfo->flags = Item->highlightflags;
 
 		PrintTextItem(TextInfo);
@@ -9809,7 +9809,7 @@ void StoreWeaponOrder( MENU * /*Menu*/ )
 		OrderList[i] = -1;
 		PriorityList[WeaponList[i]] = -1;
 	}
-	
+
 	{
 		*player_config = Config;
 		write_config( player_config, biker_config );
@@ -9822,7 +9822,7 @@ void DrawGeneralWeapons( MENUITEM *Item )
 
 	bool used[ MAX( MAX_PRIMARY_WEAPONS, MAX_SECONDARY_WEAPONS ) ];
 
-	memset( used, false, MAX( MAX_PRIMARY_WEAPONS, MAX_SECONDARY_WEAPONS ) * sizeof ( bool ) ); 
+	memset( used, false, MAX( MAX_PRIMARY_WEAPONS, MAX_SECONDARY_WEAPONS ) * sizeof ( bool ) );
 
 	SelectedWeapon = 0;
 	WeaponItem = Item;
@@ -9878,7 +9878,7 @@ void ProcessVduItems( MENU *Menu )
 	if(!Menu)return;
 	for( Item = Menu->Item ; Item->x >= 0 ; Item++ )
 	{	if( Item->FuncDraw )
-		{  
+		{
 			Item->FuncDraw( Item );
 		}
 	}
@@ -9887,7 +9887,7 @@ void ProcessVduItems( MENU *Menu )
 void KillTextInfo ( TEXTINFO *TextInfo )
 {
 	int i;
-	
+
 	if ( TextInfo )
 	{
 		while(TextInfo->num_pointers_to_free)
@@ -9935,7 +9935,7 @@ void VduClear ( void )
 		for( Item = LastMenu->Item ; Item->x >= 0 ; Item++ )
 			Item->numtextitems = 0;
 
-		
+
 	// kill all polys used for boxes...
 	for (i=0; i<CurrentScreenPoly; i++)
 	{
@@ -9969,19 +9969,19 @@ bool Plot2dBox (TEXTINFO *TextInfo)
 {
 	u_int8_t r, g, b;
 
-	screenpoly[CurrentScreenPoly] = FindFreeScrPoly();					
+	screenpoly[CurrentScreenPoly] = FindFreeScrPoly();
 	if( screenpoly[CurrentScreenPoly] != INDEX_NONE )
 	{
 
 		ScrPolys[screenpoly[CurrentScreenPoly]].Type = SCRTYPE_Normal;
 		ScrPolys[screenpoly[CurrentScreenPoly]].Flags = SCRFLAG_UseCoords;
-		ScrPolys[screenpoly[CurrentScreenPoly]].R = 255;					
-		ScrPolys[screenpoly[CurrentScreenPoly]].G = 255;					
-		ScrPolys[screenpoly[CurrentScreenPoly]].B = 255;				  
-		ScrPolys[screenpoly[CurrentScreenPoly]].Trans = 255;				
-		ScrPolys[screenpoly[CurrentScreenPoly]].Xscale = 1.0F;				
-		ScrPolys[screenpoly[CurrentScreenPoly]].Yscale = 1.0F;			  
-		ScrPolys[screenpoly[CurrentScreenPoly]].Frame = 11.0F;			 
+		ScrPolys[screenpoly[CurrentScreenPoly]].R = 255;
+		ScrPolys[screenpoly[CurrentScreenPoly]].G = 255;
+		ScrPolys[screenpoly[CurrentScreenPoly]].B = 255;
+		ScrPolys[screenpoly[CurrentScreenPoly]].Trans = 255;
+		ScrPolys[screenpoly[CurrentScreenPoly]].Xscale = 1.0F;
+		ScrPolys[screenpoly[CurrentScreenPoly]].Yscale = 1.0F;
+		ScrPolys[screenpoly[CurrentScreenPoly]].Frame = 11.0F;
 		ScrPolys[screenpoly[CurrentScreenPoly]].Frm_Info = NULL;
 		ScrPolys[screenpoly[CurrentScreenPoly]].x1 = ((float)TextInfo->xmin + VDUoffsetX) * ModeScaleX;
 		ScrPolys[screenpoly[CurrentScreenPoly]].y1 = ((float)TextInfo->ymin + VDUoffsetY) * ModeScaleY;
@@ -9992,9 +9992,9 @@ bool Plot2dBox (TEXTINFO *TextInfo)
 		ScrPolys[screenpoly[CurrentScreenPoly]].x4 = ((float)TextInfo->xmin + VDUoffsetX) * ModeScaleX;
 		ScrPolys[screenpoly[CurrentScreenPoly]].y4 = ((float)TextInfo->ymax + VDUoffsetY) * ModeScaleY;
 		AddScrPolyToTPage(screenpoly[CurrentScreenPoly], GetTPage( NULL, 0 ) );
-		
+
 		r = 255; g = 255; b = 255;
-		
+
 		ScrPolys[screenpoly[CurrentScreenPoly]].Col1.R = r;
 		ScrPolys[screenpoly[CurrentScreenPoly]].Col1.G = g;
 		ScrPolys[screenpoly[CurrentScreenPoly]].Col1.B = b;
@@ -10041,7 +10041,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 	BIT_INFO	*	Bit_Ptr;
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
-	
+
 	*newline = false;
 
 
@@ -10055,7 +10055,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 	RemainingWidth = xmax - TEXTINFO_currentx - xmin;
 
 	font = GetScreenFont(TextInfo->font);
-	
+
 	 //find total width of word...
 	WordWidth = 0.0F;
 	TrailingSpace = false;
@@ -10068,7 +10068,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 	for (i = start; i <= end; i++)
 	{
 		CurrentChar = TextLookup[font][TextInfo->text[i]];
-					  
+
 		if ((CurrentChar) || (TextInfo->text[i] == '~'))
 		{
 			Bit_Ptr = ( Title_Fonts_Header->Bit_Info + (int16_t)(CurrentChar) );
@@ -10076,15 +10076,15 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 			Box_Ptr = ( Title_Fonts_Header->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 			WordWidth += Box_Ptr->xsize * VduScaleX;
-		
-		
+
+
 			if ( i == end)
 			{
 				if (TextInfo->text[i] == ' ')
 					TrailingSpace = true;
 				if (TextInfo->text[i] == '~')
 					ForceNewLineNext = true;
-			
+
 			}else
 				WordWidth += TEXTINFO_TextSpace; //add a space between characters
 
@@ -10104,7 +10104,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 
 	// if word is too long for bounding box...
 	if (WordWidth > TotalWidth)
-	{	
+	{
 		if (TextInfo->flags & TEXTFLAG_ForceFit)
 		{
 			TextInfo->force_fit = true;
@@ -10128,7 +10128,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 	// if word will not fit on current line...
 	if ((WordWidth > RemainingWidth) || ForceNewLine)
 	{
-		
+
 		//try stripping trailing space if any...
 		if (TrailingSpace && (RemainingWidth >= WordWidth - TrailingSpaceWidth) && !ForceNewLine)
 		{	end--;
@@ -10143,13 +10143,13 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 					TextInfo->force_fit = true;
 					return false;
 				}
-		
+
 				return false;	//no room for new line
 			}
 			else
-			{	
+			{
 				//start new line...
-				
+
 				//remove trailing space if still there..
 				if (TextInfo->text[TEXTINFO_currentendpoint] == ' ')
 				{
@@ -10163,7 +10163,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 				TextInfo->startpoint[TextInfo->num_lines] = start;
 				TextInfo->num_lines++;
 				*newline = true;
-				
+
 				TEXTINFO_currenty += PreviousHeight + TEXTINFO_LineSpace;
 				TEXTINFO_currentx = 0.0F;
 
@@ -10183,14 +10183,14 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 	}
 
 	TEXTINFO_currentendpoint = end;
-	 
+
 	TEXTINFO_currentx += WordWidth + TEXTINFO_TextSpace;
 
 	for ( i = 0; i < TextInfo->num_lines; i++ )
 		TextInfo->finished[ i ] = false;
 
 	return true;
-	
+
 }
 
 
@@ -10233,24 +10233,24 @@ bool DrawTextEditCursor( TEXTINFO *TextInfo, int font )
 
 	xmin -= (TEXTINFO_TextSpace / 2.0F);
 
-	TempPoly = FindFreeScrPoly();					
+	TempPoly = FindFreeScrPoly();
 	if( TempPoly != INDEX_NONE )
 	{
-					   	
+
 		ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
 		ScrPolys[TempPoly].Flags = SCRFLAG_Nothing;
 
-		ScrPolys[TempPoly].Pos.x = xmin;			  
+		ScrPolys[TempPoly].Pos.x = xmin;
 		ScrPolys[TempPoly].Pos.y = ymin;
-		ScrPolys[TempPoly].R = 255;					
-		ScrPolys[TempPoly].G = 255;					
-		ScrPolys[TempPoly].B = 255;				  
-		ScrPolys[TempPoly].Trans = 255;				
-		ScrPolys[TempPoly].Xscale = VduScaleX;				
-		ScrPolys[TempPoly].Yscale = VduScaleY;			  
+		ScrPolys[TempPoly].R = 255;
+		ScrPolys[TempPoly].G = 255;
+		ScrPolys[TempPoly].B = 255;
+		ScrPolys[TempPoly].Trans = 255;
+		ScrPolys[TempPoly].Xscale = VduScaleX;
+		ScrPolys[TempPoly].Yscale = VduScaleY;
 		ScrPolys[TempPoly].Frame = TextLookup[font][(u_int8_t)cursor];
 		ScrPolys[TempPoly].Frm_Info = &Title_Fonts_Header;
-					
+
 		AddScrPolyToTPage( TempPoly, GetTPage( *ScrPolys[ TempPoly ].Frm_Info, 0 ) );
 
 	}
@@ -10259,7 +10259,7 @@ bool DrawTextEditCursor( TEXTINFO *TextInfo, int font )
 
 	return true;
 }
- 
+
 void GetTextPos(TEXTINFO *TextInfo, float *xpos, float *ypos, int line, float totalheight)
 {
 
@@ -10274,25 +10274,25 @@ void GetTextPos(TEXTINFO *TextInfo, float *xpos, float *ypos, int line, float to
 	ymax = (TextInfo->ymax + VDUoffsetY) * ModeScaleY;
 
 	//default x, y pos...
-	*xpos = (currentx + xmin);	
-		  
+	*xpos = (currentx + xmin);
+
 	*ypos = (currenty + ymin + TextInfo->height[0] - TEXTINFO_LineSpace);
 
 	if (TextInfo->flags)
 	{
-			 
+
 		if (TextInfo->flags & TEXTFLAG_RightX)
 			*xpos = (currentx + xmin) + xmax - xmin - TextInfo->length[line];
 
 		if (TextInfo->flags & TEXTFLAG_CentreX)
-			*xpos = (xmin + currentx + (int)((float)(xmax - xmin)/2.0F - TextInfo->length[line]/2.0F)) - TEXTINFO_TextSpace * 2.0F;			  
+			*xpos = (xmin + currentx + (int)((float)(xmax - xmin)/2.0F - TextInfo->length[line]/2.0F)) - TEXTINFO_TextSpace * 2.0F;
 
 		if (TextInfo->flags & TEXTFLAG_CentreY)
 			*ypos = ((ymax - ymin)/(TextInfo->num_lines + 1)) * (line + 1) + ymin + (TextInfo->height[0] - TEXTINFO_LineSpace) * ((line+1)/(float)(TextInfo->num_lines + 1));
-		
+
 		if (TextInfo->flags & TEXTFLAG_BottomY)
 			*ypos = (ymax - totalheight + currenty);
-		
+
 		if (TextInfo->flags & TEXTFLAG_CentreYBunched)
 			*ypos = ( TextInfo->height[0] - TEXTINFO_LineSpace + currenty + (ymax - ymin - totalheight) / 2.0F ) + ymin;
 
@@ -10302,7 +10302,7 @@ void GetTextPos(TEXTINFO *TextInfo, float *xpos, float *ypos, int line, float to
 
 bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float totalheight)
 {
-   
+
 	float xpos, ypos, xmin;
 	BIT_INFO	*	Bit_Ptr;
 	BOX_INFO	*	Box_Ptr;
@@ -10317,12 +10317,12 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 
 	if ((pos != -1) && (pos != -2))
 	{	if (TextLookup[font][TextInfo->text[pos]])
-			OKtoProcess = true;		
+			OKtoProcess = true;
 	}
-	
+
 	if ((OKtoProcess) || (pos == -1) || (pos == -2))
 	{
-	
+
 		GetTextPos(TextInfo, &xpos, &ypos, line, totalheight);
 
 		if (pos == TextInfo->startpoint[line])
@@ -10379,9 +10379,9 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 				ScrPolys[TempPoly].B = 255;
 			}
 
-			ScrPolys[TempPoly].Trans = 255;				
-			ScrPolys[TempPoly].Xscale = VduScaleX;				
-			ScrPolys[TempPoly].Yscale = VduScaleY;			  
+			ScrPolys[TempPoly].Trans = 255;
+			ScrPolys[TempPoly].Xscale = VduScaleX;
+			ScrPolys[TempPoly].Yscale = VduScaleY;
 			switch (pos)
 			{
 				case -1:
@@ -10394,9 +10394,9 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 				default:
 					ScrPolys[TempPoly].Frame = TextLookup[font][TextInfo->text[pos]];
 			}
-								
+
 			ScrPolys[TempPoly].Frm_Info = &Title_Fonts_Header;
-				
+
 			AddScrPolyToTPage( TempPoly, GetTPage( *ScrPolys[ TempPoly ].Frm_Info, 0 ) );
 
 		}
@@ -10417,12 +10417,12 @@ void Print3Dots(TEXTINFO *TextInfo, float totalheight)
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	u_int16_t TempPoly;
-	
+
 	font = GetScreenFont(TextInfo->font);
 
 	GetTextPos(TextInfo, &xpos, &ypos, TextInfo->num_lines - 1, totalheight);
-		
-	
+
+
 	Bit_Ptr = ( Title_Fonts_Header->Bit_Info + (int16_t)(TextLookup[font]['.']) );
 	Off_Ptr = ( Title_Fonts_Header->Off_Info + Bit_Ptr->startbit );
 	Box_Ptr = ( Title_Fonts_Header->Box_Info + ( Off_Ptr->box & 0x0fff ) );
@@ -10432,20 +10432,20 @@ void Print3Dots(TEXTINFO *TextInfo, float totalheight)
 
 	for (i = 0; i < 3; i++)
 	{
-		TempPoly = FindFreeScrPoly();					
+		TempPoly = FindFreeScrPoly();
 		if( TempPoly != INDEX_NONE )
 		{
 			ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
 			ScrPolys[TempPoly].Flags = SCRFLAG_Nothing;
 
-			ScrPolys[TempPoly].Pos.x = xpos;			  
+			ScrPolys[TempPoly].Pos.x = xpos;
 			ScrPolys[TempPoly].Pos.y = ypos;
-			ScrPolys[TempPoly].R = 255;					
-			ScrPolys[TempPoly].G = 255;					
-			ScrPolys[TempPoly].B = 255;				  
-			ScrPolys[TempPoly].Trans = 255;				
-			ScrPolys[TempPoly].Xscale = VduScaleX;				
-			ScrPolys[TempPoly].Yscale = VduScaleY;			  
+			ScrPolys[TempPoly].R = 255;
+			ScrPolys[TempPoly].G = 255;
+			ScrPolys[TempPoly].B = 255;
+			ScrPolys[TempPoly].Trans = 255;
+			ScrPolys[TempPoly].Xscale = VduScaleX;
+			ScrPolys[TempPoly].Yscale = VduScaleY;
 			ScrPolys[TempPoly].Frame = TextLookup[font]['.'];
 			ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
 			ScrPolys[TempPoly].Frm_Info = &Title_Fonts_Header;
@@ -10471,9 +10471,9 @@ bool VduFinished( MENU *Menu )
 
 	if ( !TextStackLevel )
 		return false;
-	
+
 	for (i=0; i<TextStackLevel; i++)
-	{	
+	{
 		for ( j = 0; j < TextStack[i]->num_lines; j++ )
 		{
 			if ( !TextStack[ i ]->finished[ j ] )
@@ -10508,7 +10508,7 @@ void DisplayTextItem (TEXTINFO *TextInfo)
 
 	if (MenuState == MENUSTATE_Text2)
 		t = (TEXT *)(TextItem->Variable);
-	
+
 	font = GetScreenFont(TextInfo->font);
 
 
@@ -10538,7 +10538,7 @@ void DisplayTextItem (TEXTINFO *TextInfo)
 
 		if ( !NewTextCharDisplayed )
 			TextInfo->finished[ i ] = true;
-		
+
 		if ( (i == TextInfo->num_lines - 1) && (TextInfo->currentchar[i] - 1 == TextInfo->endpoint[i] - TextInfo->startpoint[i]))
 		{
 			DoForceFit = true;
@@ -10552,7 +10552,7 @@ void DisplayTextItem (TEXTINFO *TextInfo)
 		for (j=0; j <= UpToChar; j++)
 		{
 			if ((MenuState == MENUSTATE_Text2) && (t->insert_pos - t->VDU_insert_pos == j))
-			{	
+			{
 				if ((TextInfo == TextItem->TextInfo[1]) && CursorTimer > 1.0F)
 					DrawTextEditCursor( TextItem->TextInfo[1], font );
 			}
@@ -10563,7 +10563,7 @@ void DisplayTextItem (TEXTINFO *TextInfo)
 					DisplayTextCharacter(TextInfo, i,TextInfo->startpoint[i] + j, font, totalheight);
 			}
 		}
-	
+
 		if (i != TextInfo->num_lines - 1)
 		{
 			TextInfo->currenty += TextInfo->height[i];
@@ -10581,22 +10581,22 @@ void DisplayTextItem (TEXTINFO *TextInfo)
 	TextInfo->currenty = 0.0F;
 	TempTextInfo = *TextInfo;
 
-	
+
 	if (!(TempTextInfo.flags & TEXTFLAG_Instant))
 	{
 		for (i=0; i<TempTextInfo.num_lines; i++)
 		{
-			if (TempTextInfo.currentchar[i] <= (TempTextInfo.endpoint[i] - TempTextInfo.startpoint[i]))  
+			if (TempTextInfo.currentchar[i] <= (TempTextInfo.endpoint[i] - TempTextInfo.startpoint[i]))
 			{
 				DisplayTextCharacter(&TempTextInfo, i, -2, font, totalheight);
 				TextInfo->finished[ i ] = false;
 			}
-			
+
 			TempTextInfo.currenty += TempTextInfo.height[i];
 		}
 	}
 }
- 	
+
 void GetFinalChars( TEXTINFO *TextInfo, int currentpos, int length)
 {
 	BIT_INFO	*	Bit_Ptr;
@@ -10607,7 +10607,7 @@ void GetFinalChars( TEXTINFO *TextInfo, int currentpos, int length)
 	int font;
 
 	font = GetScreenFont(TextInfo->font);
-	
+
 	width = TextInfo->xmax * ModeScaleX - TextInfo->xmin * ModeScaleX;
 
 	for (i = currentpos; i < length; i++)
@@ -10626,9 +10626,9 @@ void GetFinalChars( TEXTINFO *TextInfo, int currentpos, int length)
 	}
 
 	TEXTINFO_currentendpoint--;
-	
+
 }
-						 
+
 void PrintTextItem (TEXTINFO *TextInfo)
 {
 	int StartPos;
@@ -10646,7 +10646,7 @@ void PrintTextItem (TEXTINFO *TextInfo)
 	length = strlen((char*)str);
 
 	TEXTINFO_currentx = 0.0F;
-	TEXTINFO_currenty = 0.0F;	
+	TEXTINFO_currenty = 0.0F;
 	TEXTINFO_currentheight = 0.0F;
 	TextInfo->num_lines = 1;
 	TextInfo->char1x = 999.0F;
@@ -10656,7 +10656,7 @@ void PrintTextItem (TEXTINFO *TextInfo)
 	TextInfo->startpoint[0] = 0;
 	TextInfo->endpoint[0] = 0;
 	TextInfo->force_fit = false;
-	
+
 	newline = true;
 	ForceNewLine = false;
 
@@ -10665,7 +10665,7 @@ void PrintTextItem (TEXTINFO *TextInfo)
 	 	TextInfo->num_lines = 0;
 		return;	//do nothing if there is no text to process
 	}
-	
+
 	for (i=0; i<length; i++)
 	{
 		if ((str[i] == ' ') || (str[i] == '~') || (i == length - 1))
@@ -10690,7 +10690,7 @@ void PrintTextItem (TEXTINFO *TextInfo)
 
 
 	}
-	
+
 
 	TextInfo->length[TextInfo->num_lines-1] = TEXTINFO_currentx;
 	TextInfo->height[TextInfo->num_lines-1] = TEXTINFO_currentheight + TEXTINFO_LineSpace;
@@ -10735,7 +10735,7 @@ void ProcessTextItems (void)
 
 	NewTextCharDisplayed = false;
 	for (i=0; i<TextStackLevel; i++)
-	{	
+	{
 		if ( ! TextStack[ i ] )
 			continue;
 
@@ -10754,7 +10754,7 @@ void ProcessTextItems (void)
 		}
 
 		if (TextStack[i]->highlight)
-		{ 
+		{
 			HighlightItem[ CurrentHighlightItem ] = TextStack[i];
 			HighlightStatus[ CurrentHighlightItem++ ] = TextStack[i]->highlighttype;
 		}
@@ -10765,7 +10765,7 @@ void ProcessTextItems (void)
 	  		if (!Plot2dBox (TextStack[i]))
 	  			Msg( "Plot2dBox() : failed\n" );
 		}
-		
+
 		DisplayTextItem (TextStack[i]);
 
 		// do not do sfx for instant text
@@ -10790,7 +10790,7 @@ void ProcessTextItems (void)
 	{
 		LastMenuItem = CurrentMenuItem;
 	}
-	
+
 	if (
 		 CurrentMenuItem	&&
 		 VDU_Ready			&&
@@ -10823,11 +10823,11 @@ Highlight box
 	r = (u_int8_t)(64.0F * multiplier);
 	b = r;
 	g = (u_int8_t)(255.0F * multiplier);
-	
+
 	for (i = 0; i < MAXHIGHLIGHTITEMS; i++)
 	{
 		if (HighlightItem[i] && VDU_Ready)
-		{	
+		{
 			switch (HighlightStatus[i])
 			{
 			case HighlightType::Static:
@@ -10867,10 +10867,10 @@ void InitScreenFonts (void)
 		}
 
 		TextLookup[font][0] = 0 + offset;	//ASCII 0 used for cursor
-		
+
 		for (i=1; i<= 15; i++)
 			TextLookup[font][i] = 0;
-		
+
 		TextLookup[font][16] = 71 + offset;	//	right arrow
 		TextLookup[font][17] = 70 + offset;	// left arrow
 
@@ -10908,54 +10908,54 @@ void InitScreenFonts (void)
 		TextLookup[font][']'] = 7 + offset;
 
 		// foreign characters...
-		TextLookup[font][(u_int8_t)'\xe0'] = 56 + offset; 
-		TextLookup[font][(u_int8_t)'\xe0'] = 56 + offset; 
-		TextLookup[font][(u_int8_t)'\xc0'] = 56 + offset; 
-		TextLookup[font][(u_int8_t)'\xe1'] = 57 + offset; 
-		TextLookup[font][(u_int8_t)'\xc1'] = 57 + offset; 
-		TextLookup[font][(u_int8_t)'\xe4'] = 58 + offset; 
-		TextLookup[font][(u_int8_t)'\xc4'] = 58 + offset; 
-		TextLookup[font][(u_int8_t)'\xe8'] = 59 + offset; 
-		TextLookup[font][(u_int8_t)'\xc8'] = 59 + offset; 
-		TextLookup[font][(u_int8_t)'\xe9'] = 60 + offset; 
-		TextLookup[font][(u_int8_t)'\xc9'] = 60 + offset; 
-		TextLookup[font][(u_int8_t)'\xea'] = 61 + offset; 
-		TextLookup[font][(u_int8_t)'\xec'] = 62 + offset; 
-		TextLookup[font][(u_int8_t)'\xf2'] = 63 + offset; 
-		TextLookup[font][(u_int8_t)'\xd2'] = 63 + offset; 
-		TextLookup[font][(u_int8_t)'\xf3'] = 64 + offset; 
-		TextLookup[font][(u_int8_t)'\xd3'] = 64 + offset; 
-		TextLookup[font][(u_int8_t)'\xf6'] = 65 + offset; 
-		TextLookup[font][(u_int8_t)'\xd6'] = 65 + offset; 
-		TextLookup[font][(u_int8_t)'\xf9'] = 66 + offset; 
-		TextLookup[font][(u_int8_t)'\xd9'] = 66 + offset; 
-		TextLookup[font][(u_int8_t)'\xfa'] = 67 + offset; 
-		TextLookup[font][(u_int8_t)'\xda'] = 67 + offset; 
-		TextLookup[font][(u_int8_t)'\xfc'] = 68 + offset; 
-		TextLookup[font][(u_int8_t)'\xdc'] = 68 + offset; 
-		TextLookup[font][(u_int8_t)'\xf1'] = 69 + offset; 
+		TextLookup[font][(u_int8_t)'\xe0'] = 56 + offset;
+		TextLookup[font][(u_int8_t)'\xe0'] = 56 + offset;
+		TextLookup[font][(u_int8_t)'\xc0'] = 56 + offset;
+		TextLookup[font][(u_int8_t)'\xe1'] = 57 + offset;
+		TextLookup[font][(u_int8_t)'\xc1'] = 57 + offset;
+		TextLookup[font][(u_int8_t)'\xe4'] = 58 + offset;
+		TextLookup[font][(u_int8_t)'\xc4'] = 58 + offset;
+		TextLookup[font][(u_int8_t)'\xe8'] = 59 + offset;
+		TextLookup[font][(u_int8_t)'\xc8'] = 59 + offset;
+		TextLookup[font][(u_int8_t)'\xe9'] = 60 + offset;
+		TextLookup[font][(u_int8_t)'\xc9'] = 60 + offset;
+		TextLookup[font][(u_int8_t)'\xea'] = 61 + offset;
+		TextLookup[font][(u_int8_t)'\xec'] = 62 + offset;
+		TextLookup[font][(u_int8_t)'\xf2'] = 63 + offset;
+		TextLookup[font][(u_int8_t)'\xd2'] = 63 + offset;
+		TextLookup[font][(u_int8_t)'\xf3'] = 64 + offset;
+		TextLookup[font][(u_int8_t)'\xd3'] = 64 + offset;
+		TextLookup[font][(u_int8_t)'\xf6'] = 65 + offset;
+		TextLookup[font][(u_int8_t)'\xd6'] = 65 + offset;
+		TextLookup[font][(u_int8_t)'\xf9'] = 66 + offset;
+		TextLookup[font][(u_int8_t)'\xd9'] = 66 + offset;
+		TextLookup[font][(u_int8_t)'\xfa'] = 67 + offset;
+		TextLookup[font][(u_int8_t)'\xda'] = 67 + offset;
+		TextLookup[font][(u_int8_t)'\xfc'] = 68 + offset;
+		TextLookup[font][(u_int8_t)'\xdc'] = 68 + offset;
+		TextLookup[font][(u_int8_t)'\xf1'] = 69 + offset;
 		TextLookup[font][(u_int8_t)'\xd1'] = 69 + offset;
 		TextLookup[font][(u_int8_t)'\xdf'] = TextLookup[font][(u_int8_t)'B'];
-		
+
 /*
-  128  Ç ( 199 )  144  É ( 201 )  160  á ( 225 )   
-  129  ü ( 252 )  145  æ ( 230 )  161  í ( 237 )  
-  130  é ( 233 )  146  Æ ( 198 )  162  ó ( 243 )  
-  131  â ( 226 )  147  ô ( 244 )  163  ú ( 250 )  
-  132  ä ( 228 )  148  ö ( 246 )  164  ñ ( 241 )  
-  133  à ( 224 )  149  ò ( 242 )  165  Ñ ( 209 )  
-  134  å ( 229 )  150  û ( 251 )  166  ª ( 170 )  
+  128  Ç ( 199 )  144  É ( 201 )  160  á ( 225 )
+  129  ü ( 252 )  145  æ ( 230 )  161  í ( 237 )
+  130  é ( 233 )  146  Æ ( 198 )  162  ó ( 243 )
+  131  â ( 226 )  147  ô ( 244 )  163  ú ( 250 )
+  132  ä ( 228 )  148  ö ( 246 )  164  ñ ( 241 )
+  133  à ( 224 )  149  ò ( 242 )  165  Ñ ( 209 )
+  134  å ( 229 )  150  û ( 251 )  166  ª ( 170 )
   135  ç ( 231 )  151  ù ( 249 )  167  º ( 186 )
   136  ê ( 234 )  152  ÿ ( 255 )  168  ¿ ( 191 )
   137  ë ( 235 )  153  Ö ( 214 )  169  _ ( 095 )
-  138  è ( 232 )  154  Ü ( 220 )  170  ¬ ( 172 )  
-  139  ï ( 239 )  155  ¢ ( 162 )  171  ½ ( 189 )  
-  140  î ( 238 )  156  £ ( 163 )  172  ¼ ( 188 )  
-  141  ì ( 236 )  157  ¥ ( 165 )  173  ¡ ( 161 )  
-  142  Ä ( 196 )  158  P ( 080 )  174  « ( 171 )  
-  143  Å ( 197 )  159   ( 131 )  175  » ( 187 )  
+  138  è ( 232 )  154  Ü ( 220 )  170  ¬ ( 172 )
+  139  ï ( 239 )  155  ¢ ( 162 )  171  ½ ( 189 )
+  140  î ( 238 )  156  £ ( 163 )  172  ¼ ( 188 )
+  141  ì ( 236 )  157  ¥ ( 165 )  173  ¡ ( 161 )
+  142  Ä ( 196 )  158  P ( 080 )  174  « ( 171 )
+  143  Å ( 197 )  159   ( 131 )  175  » ( 187 )
 */
-		
+
 		TextLookup[font][1] = 225;	// glowing effect for bike scan
 
 		TextLookup[font]['_'] = space; // underscore prints as space
@@ -11038,7 +11038,7 @@ void SinPan2(VECTOR ViewFrom, VECTOR ViewTo, VECTOR *CurrentView,
 	theta = Time * 90.0F;
 
 	SinTheta = (float)SIND(theta);
-	OneMinus = 1 - SinTheta;	
+	OneMinus = 1 - SinTheta;
 
 	CurrentView->x = OneMinus * ViewFrom.x + SinTheta * ViewTo.x;
 	CurrentView->y = OneMinus * ViewFrom.y + SinTheta * ViewTo.y;
@@ -11047,7 +11047,7 @@ void SinPan2(VECTOR ViewFrom, VECTOR ViewTo, VECTOR *CurrentView,
 	CurrentLook->x = OneMinus * LookFrom.x + SinTheta * LookTo.x;
 	CurrentLook->y = OneMinus * LookFrom.y + SinTheta * LookTo.y;
 	CurrentLook->z = OneMinus * LookFrom.z + SinTheta * LookTo.z;
-  
+
 }
 
 void RotateVDU2(float time, float start, float end)
@@ -11058,10 +11058,10 @@ void RotateVDU2(float time, float start, float end)
 	theta = time * 90.0F;
 
 	SinTheta = (float)SIND(theta);
-	OneMinus = 1 - SinTheta;	
+	OneMinus = 1 - SinTheta;
 
 	VDUrot = OneMinus * start + SinTheta * end;
-	
+
 	// build rotate matrix...
 	BuildRotMatrix(0.0F, VDUrot, 0.0F, &Mat_R);
 
@@ -11078,10 +11078,10 @@ void RotateBracket(float time, float start, float end)
 	theta = time * 90.0F;
 
 	SinTheta = (float)SIND(theta);
-	OneMinus = 1 - SinTheta;	
+	OneMinus = 1 - SinTheta;
 
 	BracketRot = OneMinus * start + SinTheta * end;
-	
+
 	// build rotate matrix...
 	BuildRotMatrix(0.0F, BracketRot, 0.0F, &Mat_R);
 
@@ -11103,11 +11103,11 @@ void DarkenRoom2(float darkness)
 	float RoomDim;
 
 	darkness = 1.0F - darkness;
-	
+
 	RoomDim = ((1.0F - darkness) * 0.6F) + 0.4F;	//1 - 0.4
-	
+
 	for (model = 0; model < NumTitleModelsToLoad; model++)
-	{	
+	{
 		switch (model)
 		{
 		case TITLE_MODEL_HoloLight:
@@ -11128,7 +11128,7 @@ void DarkenRoom2(float darkness)
 			TintModelVertices( BackgroundModel[model], RoomDim, NULL );
 			break;
 		}
-		
+
 	}
 }
 
@@ -11145,7 +11145,7 @@ void RotateDiscStack(float theta)
 
 	for (i=0; i<8; i++)
 	{
-		
+
 		stackoffset.x = stackpos[i].x - rotpoint.x;
 		stackoffset.y = stackpos[i].y - rotpoint.y;
 		stackoffset.z = stackpos[i].z - rotpoint.z;
@@ -11157,7 +11157,7 @@ void RotateDiscStack(float theta)
 		Models[BackgroundModel[modellookup[i]]].Pos.x = rotpoint.x + stackoffset.x;
 		Models[BackgroundModel[modellookup[i]]].Pos.y = rotpoint.y + stackoffset.y;
 		Models[BackgroundModel[modellookup[i]]].Pos.z = rotpoint.z + stackoffset.z;
-		
+
 		Models[BackgroundModel[TITLE_MODEL_Mtop]].Mat = Mat_R;
 		MatrixTranspose(&Mat_R, &Models[BackgroundModel[modellookup[i]]].InvMat);
 
@@ -11187,12 +11187,12 @@ void LoadBikeChar(MENUITEM *Item)
 	float xmin, xmax, ymin, ymax, newxmax, newymax, xgap, ygap;
 	float BikeCharScale = 0.7F;
 	FRAME_INFO **header;
-	
+
 	xmin = (Item->x + VDUoffsetX) * ModeScaleX;
 	xmax = (Item->xmax + VDUoffsetX) * ModeScaleX;
 	ymin = (Item->y + VDUoffsetY) * ModeScaleY;
 	ymax = (Item->ymax + VDUoffsetY) * ModeScaleY;
-	
+
 	Biker = SelectedBikeFrame;
 
 	if( Biker < 0 )
@@ -11202,23 +11202,23 @@ void LoadBikeChar(MENUITEM *Item)
 	}
 
 	if ((Biker <= 7) && (Biker >= 0))
-	{	
+	{
 		header = &Title_Chars1_Header;
 	}
 	else
-	{	
+	{
 		if ((Biker >= 8) && (Biker <= 15))
 		{
 			header = &Title_Chars2_Header;
 			Biker -= 8;
 		}
 		else
-		{	
+		{
 			Msg("Title.c: LoadBikeChar() invalid char no.");
 			exit(1);
 		}
 	}
-	
+
 	if (!LoadGeneralPic(0, 0, 0, 0, header, &Biker, &BikerScrPoly, &BikerDisplayed))
 	{
 		Msg("Title.c LoadBikeChar() unable to allocate screen poly\n");
@@ -11236,14 +11236,14 @@ void LoadBikeChar(MENUITEM *Item)
 	ygap = (ymax - newymax) / 2.0F;
 
 	xmin = xmin + xgap;
-	ymin = ymin + ygap;	
-	xmax = newxmax + xgap;					
-	ymax = newymax + xgap;	
+	ymin = ymin + ygap;
+	xmax = newxmax + xgap;
+	ymax = newymax + xgap;
 
 	ScrPolys[BikerScrPoly].x1 = xmin;
-	ScrPolys[BikerScrPoly].y1 = ymin;	
-	ScrPolys[BikerScrPoly].x3 = xmax;					
-	ScrPolys[BikerScrPoly].y3 = ymax;					
+	ScrPolys[BikerScrPoly].y1 = ymin;
+	ScrPolys[BikerScrPoly].x3 = xmax;
+	ScrPolys[BikerScrPoly].y3 = ymax;
 }
 
 void KillBikeCharPic( MENU * /*Menu*/ )
@@ -11283,7 +11283,7 @@ void LoadSavedGamePic( char *file )
 {
 	if ( DummyTextureIndex == -1 )
 		return;
-	
+
 	strcpy( Tloadheader.PlaceHolderFile[ DummyTextureIndex ], file );
 
 	if ( !TloadReloadPlaceHolder( &Tloadheader, DummyTextureIndex ) )
@@ -11315,9 +11315,9 @@ bool LoadGeneralPic(float xmin, float ymin, float xmax, float ymax, FRAME_INFO *
 
 	if (!*displayed)
 	{
-		*scrpoly = FindFreeScrPoly();					
+		*scrpoly = FindFreeScrPoly();
 		if( *scrpoly != INDEX_NONE )
-		{	
+		{
 			*displayed = true;
 
 			ScrPolys[*scrpoly].Type = SCRTYPE_Normal;
@@ -11330,7 +11330,7 @@ bool LoadGeneralPic(float xmin, float ymin, float xmax, float ymax, FRAME_INFO *
 
 			AddScrPolyToTPage( *scrpoly, GetTPage( *ScrPolys[ *scrpoly ].Frm_Info, 0 ) );
 
-			ScrPolys[*scrpoly].Xscale = 1.0F;				
+			ScrPolys[*scrpoly].Xscale = 1.0F;
 			ScrPolys[*scrpoly].Yscale = 1.0F;
 		}
 		else
@@ -11338,9 +11338,9 @@ bool LoadGeneralPic(float xmin, float ymin, float xmax, float ymax, FRAME_INFO *
 	}
 
 	ScrPolys[*scrpoly].x1 = xmin;
-	ScrPolys[*scrpoly].y1 = ymin;	
-	ScrPolys[*scrpoly].x3 = xmax;					
-	ScrPolys[*scrpoly].y3 = ymax;					
+	ScrPolys[*scrpoly].y1 = ymin;
+	ScrPolys[*scrpoly].x3 = xmax;
+	ScrPolys[*scrpoly].y3 = ymax;
 	ScrPolys[ *scrpoly ].Frame = (float)*frame;
 
 	return true;
@@ -11395,7 +11395,7 @@ void InitEventRightVDUPan(TITLE_EVENT * /*TitleEvent*/)
 		Models[BackgroundModel[TITLE_MODEL_Bracket]].Pos = RightVDU.BracketPos;
 		VDUrot = RightVDU.StartRot;
 		BracketRot = RightVDU.BracketStartRot;
-	
+
 		BuildRotMatrix(0.0F, BracketRot, 0.0F, &Mat_R);
 
 		Models[BackgroundModel[TITLE_MODEL_Bracket]].Mat = Mat_R;
@@ -11435,9 +11435,9 @@ void InitEventLeftVDUPan(TITLE_EVENT * /*TitleEvent*/)
 		Models[BackgroundModel[TITLE_MODEL_VDU]].Pos = LeftVDU.Pos;
 		Models[BackgroundModel[TITLE_MODEL_Bracket]].Pos = LeftVDU.BracketPos;
 		VDUrot = LeftVDU.StartRot;
-	
+
 		BracketRot = RightVDU.BracketStartRot;
-	
+
 		BuildRotMatrix(0.0F, BracketRot, 0.0F, &Mat_R);
 
 		Models[BackgroundModel[TITLE_MODEL_Bracket]].Mat = Mat_R;
@@ -11496,7 +11496,7 @@ void InitEventRotateInRightVDU(TITLE_EVENT * /*TitleEvent*/)
 void EventRotateInRightVDU(TITLE_EVENT *TitleEvent)
 {
 	float currenttime;
-	
+
 	currenttime = GetEventCurrentTime(TitleEvent);
 
 	RotateVDU2(currenttime, OldVDUrot, RightVDU.StartRot);
@@ -11514,7 +11514,7 @@ void EventRotateOutLeftVDU(TITLE_EVENT *TitleEvent)
 	float currenttime;
 
 	currenttime = GetEventCurrentTime(TitleEvent);
-	
+
 	RotateVDU2(currenttime, OldVDUrot, LeftVDU.EndRot);
 	RotateBracket(currenttime, OldBracketRot, LeftVDU.BracketEndRot);
 }
@@ -11547,11 +11547,11 @@ void EventDarkenRoom(TITLE_EVENT *TitleEvent)
 	float currenttime;
 
 	currenttime = GetEventCurrentTime(TitleEvent);
-	
+
 	currenttime = 1.0F - currenttime;
-	
+
 	RoomDarkness = OldRoomDarkness * currenttime;
-	
+
 	DarkenRoom2(RoomDarkness);
 
 }
@@ -11565,9 +11565,9 @@ void EventLightenRoom(TITLE_EVENT *TitleEvent)
 	float currenttime;
 
 	currenttime = GetEventCurrentTime(TitleEvent);
-	
+
 	RoomDarkness = ((1.0F - OldRoomDarkness) * currenttime) + OldRoomDarkness;
-	
+
 	DarkenRoom2(RoomDarkness);
 }
 
@@ -11623,7 +11623,7 @@ void EventFadeOffHoloLight(TITLE_EVENT *TitleEvent)
 	currenttime = GetEventCurrentTime(TitleEvent);
 
 	currenttime = 1.0F - currenttime;
-	
+
 	HoloLightBrightness = OldHoloLightBrightness * currenttime;
 
 	FadeHoloLight(HoloLightBrightness);
@@ -11641,7 +11641,7 @@ void EventRaiseHoloPad(TITLE_EVENT *TitleEvent)
 	currenttime = GetEventCurrentTime(TitleEvent);
 
 	raiseby = ((Holopad.y - OldHoloPadHeight) * currenttime) + OldHoloPadHeight;
-	
+
 	Models[BackgroundModel[TITLE_MODEL_Holopad]].Pos.y = raiseby;
 
 
@@ -11664,9 +11664,9 @@ void EventLowerHoloPad(TITLE_EVENT *TitleEvent)
 	currenttime = GetEventCurrentTime(TitleEvent);
 
 	currenttime = 1.0F - currenttime;
-	
+
 	raiseby = (currenttime * (OldHoloPadHeight - (Holopad.y - HolopadRange) ) ) + (Holopad.y - HolopadRange);
-	
+
 	Models[BackgroundModel[TITLE_MODEL_Holopad]].Pos.y = raiseby;
 }
 
@@ -11678,7 +11678,7 @@ void EventJudderHoloPad(TITLE_EVENT *TitleEvent)
 {
 	float currenttime;
 
-	
+
 	if (HolopadJudderReq)
 	{
 		currenttime = GetEventCurrentTime(TitleEvent);
@@ -11742,7 +11742,7 @@ void EventLowerStack(TITLE_EVENT *TitleEvent)
 void ExitEventLowerStack(TITLE_EVENT * /*TitleEvent*/)
 {
 }
- 
+
 void InitEventJudderStack(TITLE_EVENT * /*TitleEvent*/)
 {
 	StackJudderNum = 0;
@@ -11772,7 +11772,7 @@ void EventJudderStack(TITLE_EVENT *TitleEvent)
 
 	start = 0.2F * StackJudderNum;
 	end = 0.2F * (StackJudderNum + 1);
-	
+
 	currenttime = (currenttime - start) / (end - start);
 
 	currenttime = (float)SIND(currenttime * 90.0F);
@@ -11806,7 +11806,7 @@ void InitStartDiscPanTimer (TITLE_EVENT_TIMER *TitleEventTimer)
 {
 	CameraStatus = CAMERA_AtDiscs;
 	InitEventGeneralPan(NULL);
-	
+
 	TitleEventTimer->Status = TITLE_EVENT_TIMER_ACTIVE;
 	TitleEventTimer->CurrentTime = 0.0F;
 }
@@ -11909,18 +11909,18 @@ void ResetAllEvents(void)
 			Event->Status = TITLE_EVENT_STATUS_IDLE;
 		}
 	}
-	
+
 	for (Timer = Title_Timers; Timer->Interval >= 0; Timer++)
 	{
 		Timer->Status = TITLE_EVENT_TIMER_IDLE;
 	}
 
-} 
+}
 
 
 void ProcessEvents(void)
 {
-	
+
 	TITLE_EVENT *Event;
 	TITLE_EVENT_TIMER Timer;
 
@@ -11939,7 +11939,7 @@ void ProcessEvents(void)
 
 					Event->Status = TITLE_EVENT_STATUS_ACTIVE;
 				}
-			}	
+			}
 		}
 
 		if (Event->Status == TITLE_EVENT_STATUS_ACTIVE)
@@ -11992,7 +11992,7 @@ void ProcessTimers(void)
 		}
 	}
 }
-							   
+
 void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 {
 	float xmin, ymin, xmax, ymax, widthX, widthY, height, length, actuallength;
@@ -12011,7 +12011,7 @@ void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 	for (i = 0; i < TextInfo->num_lines; i++)
 	{
 		height += TextInfo->height[i];
-		
+
 		if (TextInfo->currentx[i] > length)
 			length = TextInfo->currentx[i];
 
@@ -12022,7 +12022,7 @@ void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 	length += 2.0F * ModeScaleX;
 	if (length > actuallength)
 		length = actuallength;
-	
+
 	xmin = TextInfo->char1x - widthX;
 	xmax = xmin + length + widthX * 2.0F;
 	ymin = TextInfo->text_y_min - widthY;
@@ -12039,7 +12039,7 @@ void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 u_int16_t PlotHighlightPoly (float xmin, float ymin, float xmax, float ymax, u_int8_t r, u_int8_t g, u_int8_t b)
 {
 	u_int16_t poly;
-	
+
 	poly =FindFreeScrPoly();
 
 	ScrPolys[poly].Flags = SCRFLAG_UseCoords;
@@ -12047,9 +12047,9 @@ u_int16_t PlotHighlightPoly (float xmin, float ymin, float xmax, float ymax, u_i
 	ScrPolys[poly].Frm_Info = NULL;
 	ScrPolys[poly].Frame = 238.0F;
 	ScrPolys[poly].x1 = xmin;
-	ScrPolys[poly].y1 = ymin;	
-	ScrPolys[poly].x3 = xmax;					
-	ScrPolys[poly].y3 = ymax;					
+	ScrPolys[poly].y1 = ymin;
+	ScrPolys[poly].x3 = xmax;
+	ScrPolys[poly].y3 = ymax;
 
 	ScrPolys[poly].Col1.R = r;
 	ScrPolys[poly].Col1.G = g;
@@ -12125,7 +12125,7 @@ void SendTitleMessage(MENUITEM *Item)
 	TEXTMSG TextMsg;
 
 	text = (TEXT *)Item->Variable;
-   	
+
 	strncpy( &MacroText4.text[0], &text->text[0], MAXTEXTMSG );
 	MacroText4.text[ MAXTEXTMSG - 1 ] = 0;
 	SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_TitleMessage, 0);
@@ -12140,7 +12140,7 @@ void SendTitleMessage(MENUITEM *Item)
 
 void AddTitleMessage(TEXTMSG *TextMsg)
 {
-	
+
 	if (TotalTitleMsgs != MAX_TITLE_MSGS)
 	{
 		char * name = (WhoIAm == TextMsg->WhoIAm) ? biker_name : Names[TextMsg->WhoIAm];
@@ -12159,7 +12159,7 @@ void GetTitleMessage(void)
  	MENUITEM *Item;
 	TEXTINFO dummytext;
 	int i, j;
-	
+
 	TitleMessageTimer -= framelag;
 	if (TitleMessageTimer < 0.0F)
 	{
@@ -12167,14 +12167,14 @@ void GetTitleMessage(void)
 		if (TotalTitleMsgs > 0)
 		{
 			dummytext.xmin = 5;
-			dummytext.ymin = 0;						
-			dummytext.xmax = 200;					  
-			dummytext.ymax = 16;						
-			dummytext.font = FONT_Small;				   
-			dummytext.flags = TEXTFLAG_ForceFit;						
-			dummytext.num_lines = 0;				
-			dummytext.boxdone = false;					
-			dummytext.num_pointers_to_free = 0;		
+			dummytext.ymin = 0;
+			dummytext.xmax = 200;
+			dummytext.ymax = 16;
+			dummytext.font = FONT_Small;
+			dummytext.flags = TEXTFLAG_ForceFit;
+			dummytext.num_lines = 0;
+			dummytext.boxdone = false;
+			dummytext.num_pointers_to_free = 0;
 			dummytext.force_fit = false;
 			dummytext.text = (u_int8_t*)&TitleMsgQue[TitleMsgQueEnd].text[0];
 			PrintTextItem( &dummytext );
@@ -12187,7 +12187,7 @@ void GetTitleMessage(void)
 				{
 					strcpy( TitleMessage[j], TitleMessage[j - 1] );
 				}
-				
+
 				strncpy( &TitleMessage[0][0], (char*)&dummytext.text[dummytext.startpoint[i]], dummytext.endpoint[i] - dummytext.startpoint[i] + 1);
 				TitleMessage[0][dummytext.endpoint[i] - dummytext.startpoint[i] + 1] = '\0';
 			}
@@ -12199,7 +12199,7 @@ void GetTitleMessage(void)
 				TitleMsgQueEnd = 0;
 
 			for( Item = CurrentMenu->Item ; Item->x >= 0 ; Item++ )
-			{	
+			{
 				if (Item->Variable)
 				{
 					for (i = 0; i < MAX_TITLE_MSG_TIME; i++)
@@ -12236,7 +12236,7 @@ void PrintErrorMessage (const char * ErrorStr, int BackBy, MENU *NewMenu, int ty
 	ErrorNewMenu = NewMenu;
 
 	IgnoreMenuFuncs = true;
-	
+
 	ChangeItem.Value = &MENU_NEW_Error;
 	MenuChange( &ChangeItem );
 }
@@ -12278,7 +12278,7 @@ void MenuItemBackFromError ( MENUITEM * /*Item*/ )
 
 void SelectConfigureAxisMenu ( MENUITEM * /*Item*/ )
 {
-	if ( !strcasecmp( (char*)JoystickList.item[ JoystickList.selected_item ], "Spacetec SpaceOrb 360" ) 
+	if ( !strcasecmp( (char*)JoystickList.item[ JoystickList.selected_item ], "Spacetec SpaceOrb 360" )
 		&& !SpaceOrbSetup )
 	{
 		// do not allow axis setup
@@ -12392,7 +12392,7 @@ void InitJoystickAxisConfig ( MENU * /*Menu*/)
 			break;
 		}
 	}
-	
+
 	AxisSlider.min = 0;
 	AxisSlider.max = JoystickAxisList.items - 1;
 	AxisSlider.step = 1;
@@ -12407,9 +12407,9 @@ void InitJoystickAxisConfig ( MENU * /*Menu*/)
 	AxisActionSlider.FuncUser = AxisActionName;
 	AxisActionSlider.FuncSet = SetAxisActionSlider;
 
-	AxisInvert = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].inverted; 
-	FineControl = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].fine; 
-	DeadzoneSlider.value = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].deadzone; 
+	AxisInvert = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].inverted;
+	FineControl = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].fine;
+	DeadzoneSlider.value = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].deadzone;
 	sensitivity = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[AxisMap[0]].sensitivity;
 	SensitivitySlider.value =
 		( sensitivity < 1.0F ) ? (int) floorf( 0.49F + ( 100 * sensitivity - 1 ) / sensitivity ) : 100;
@@ -12440,13 +12440,13 @@ void InitJoystickAxisConfig ( MENU * /*Menu*/)
 
 	AxisPtr_mid = (AXISTEST_XPos + AXISTEST_Width / 2.0F) + VDUoffsetX;
 	AxisPtr_mid *= ModeScaleX;
-	
+
 	AxisPtr_ymin = AXISTEST_YPos + VDUoffsetY;
 	AxisPtr_ymax = AXISTEST_YPos + AXISTEST_Height + VDUoffsetY;
 
 	AxisPtr_ymin *= ModeScaleY;
 	AxisPtr_ymax *= ModeScaleY;
-	
+
 	UpdateAxisPtr( 0.0F );	// 0 = centered
 
 }
@@ -12458,7 +12458,7 @@ void UpdateAxisPtr( float pos )
 	float distance, dx, xmin[2], xmax[2];
 	SCRPOLY_RGB light, dark, polycol[NUM_SHIP_AXIS_ACTIONS][2];
 	int i;
-	
+
 	light.R = 64;
 	light.G = 255;
 	light.B = 64;
@@ -12469,7 +12469,7 @@ void UpdateAxisPtr( float pos )
 	dark.Trans = 0;
 
 	distance = (AXISTEST_Width / 2.0F) * ModeScaleX;
-	
+
 	if ( pos < -1.0F )
 		pos = -1.0F;
 	else if ( pos > 1.0F )
@@ -12509,12 +12509,12 @@ void UpdateAxisPtr( float pos )
 	for (i = 0; i < 2; i++)
 	{
 		ScrPolys[AxisTestScrPoly[i]].x1 = xmin[i] + dx;
-		ScrPolys[AxisTestScrPoly[i]].y1 = AxisPtr_ymin;	
+		ScrPolys[AxisTestScrPoly[i]].y1 = AxisPtr_ymin;
 		ScrPolys[AxisTestScrPoly[i]].x2 = xmin[i] + dx;
 		ScrPolys[AxisTestScrPoly[i]].y2 = AxisPtr_ymax;
-		ScrPolys[AxisTestScrPoly[i]].x3 = xmax[i] + dx;	
+		ScrPolys[AxisTestScrPoly[i]].x3 = xmax[i] + dx;
 		ScrPolys[AxisTestScrPoly[i]].y3 = AxisPtr_ymax;
-		ScrPolys[AxisTestScrPoly[i]].x4 = xmax[i] + dx;					
+		ScrPolys[AxisTestScrPoly[i]].x4 = xmax[i] + dx;
 		ScrPolys[AxisTestScrPoly[i]].y4 = AxisPtr_ymin;
 		ScrPolys[AxisTestScrPoly[i]].Col1 = polycol[i][0];
 		ScrPolys[AxisTestScrPoly[i]].Col2 = polycol[i][1];
@@ -12531,7 +12531,7 @@ void ChooseJoyAxis( MENUITEM * /*Item*/ )
 
 	joystick = JoystickMap[JoystickList.selected_item];
 	axis = AxisMap[JoystickAxisList.selected_item];
-	
+
 	action = JoystickInfo[joystick].Axis[axis].action;
 
 	AxisActionList.selected_item = 0;
@@ -12547,17 +12547,17 @@ void ChooseJoyAxis( MENUITEM * /*Item*/ )
 
 	// find toggle & slider items...
 	for( CheckItem = CurrentMenu->Item ; CheckItem->x >= 0 ; CheckItem++ )
-	{  
-		if ( CheckItem->Variable == &AxisInvert) 
+	{
+		if ( CheckItem->Variable == &AxisInvert)
 			ToggleItem = CheckItem;
 
-		if ( CheckItem->Variable == &DeadzoneSlider) 
+		if ( CheckItem->Variable == &DeadzoneSlider)
 			SliderItem = CheckItem;
 
 		if ( CheckItem->Variable == &AxisActionSlider )
 			AxisActionItem = CheckItem;
 
-		if ( CheckItem->Variable == &SensitivitySlider) 
+		if ( CheckItem->Variable == &SensitivitySlider)
 			SensitivityItem = CheckItem;
 
 		if ( CheckItem->Variable == &FineControl )
@@ -12579,7 +12579,7 @@ void ChooseJoyAxis( MENUITEM * /*Item*/ )
 
 	// set deadzone...
 	DeadzoneSlider.oldvalue = DeadzoneSlider.value;
-	DeadzoneSlider.value = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[axis].deadzone; 
+	DeadzoneSlider.value = JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[axis].deadzone;
 	RedrawFlatMenuSlider( SliderItem );
 
 	RedrawFlatMenuSlider( AxisActionItem );
@@ -12623,7 +12623,7 @@ void InitShipActionList( void )
 void SetAxis( MENU * /*Menu*/ )
 {
 	int i;
-	
+
 	SetUpJoystickAxis(JoystickMap[JoystickList.selected_item]);
 
 	// remove axistest scrpoly...
@@ -12712,11 +12712,11 @@ void CheckJoyAxis( int * /*dummy*/ )
 void ExitJoySetup( MENU * /*Menu*/ )
 {
    int joystick, i, j, k;
-	
+
 	for ( i = 0; i < JoystickList.items; i++ )
 	{
 		joystick = JoystickMap[ i ];
-		
+
 		// check all axis
 		for (j = 0; j < MAX_JOYSTICK_AXIS; j++)
 		{
@@ -12814,7 +12814,7 @@ void RestoreDefaultControlSettings( MENUITEM * /*Item*/ )
 	// re-init controls...
 	InitControls( NULL );
 
-	LastMenu = CurrentMenu;	
+	LastMenu = CurrentMenu;
 	VduClear();
 	ProcessVduItems( CurrentMenu );
 }
@@ -12879,7 +12879,7 @@ void InitCrystalsFoundText( MENU * /*Menu*/ )
 	{
 		sprintf( GoldBarsFoundText, LT_GoldBarsFound, (int)NumGoldBars );
 	}
-	
+
 	if( Secrets == 1 )
 	{
 		sprintf( SecretsFoundText, LT_OneSecretFoundOutOf, Secrets, TotalSecrets );
@@ -12900,19 +12900,19 @@ void InitCrystalsFoundText( MENU * /*Menu*/ )
 
 	if ( ( ( LevelTimeTaken / 60 ) == 1 ) && ( ( (int)LevelTimeTaken % 60 ) == 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken1/*"time taken %d min %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) ); 
+		sprintf( TimeTakenText, LT_TimeTaken1/*"time taken %d min %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 	if ( ( ( LevelTimeTaken / 60 ) != 1 ) && ( ( (int)LevelTimeTaken % 60 ) == 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken2/*"time taken %d mins %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) ); 
+		sprintf( TimeTakenText, LT_TimeTaken2/*"time taken %d mins %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 	if ( ( ( LevelTimeTaken / 60 ) == 1 ) && ( ( (int)LevelTimeTaken % 60 ) != 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken3/*"time taken %d min %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) ); 
+		sprintf( TimeTakenText, LT_TimeTaken3/*"time taken %d min %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 	if ( ( ( LevelTimeTaken / 60 ) != 1 ) && ( ( (int)LevelTimeTaken % 60 ) != 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken4/*"time taken %d mins %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) ); 
+		sprintf( TimeTakenText, LT_TimeTaken4/*"time taken %d mins %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 }
 
@@ -12945,7 +12945,7 @@ void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 	KillHoloModel();
 	Models[BackgroundModel[TITLE_MODEL_HoloLight]].Visible = 0;
 	Models[BackgroundModel[TITLE_MODEL_Holopad]].Visible = 0;
-	
+
 	switch( GameCompleted )
 	 {
 	 case GameComplete::NotComplete:
@@ -12970,7 +12970,7 @@ void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
 		 return;
 	 }
-	
+
 	 MenuChangeEx( &MENU_NEW_SpecialMessage );
 }
 
@@ -13046,9 +13046,9 @@ void InGameSaveASinglePlayerGame( MENUITEM *item )
 
 void SaveMacros( MENUITEM * /*Item*/ )
 {
-	strcpy( player_config->macro1, MacroText1.text ); 
-	strcpy( player_config->macro2, MacroText2.text ); 
-	strcpy( player_config->macro3, MacroText3.text ); 
+	strcpy( player_config->macro1, MacroText1.text );
+	strcpy( player_config->macro2, MacroText2.text );
+	strcpy( player_config->macro3, MacroText3.text );
 
 	write_config( player_config, biker_config );
 }
@@ -13058,7 +13058,7 @@ bool SetGamma( SLIDER *slider )
 	double tempgamma;
 
 	tempgamma = Gamma;
-	
+
 	Gamma = (double)((float)slider->value / 100.0F);
 
 	// convert to float to get rid of small rounding errors
@@ -13187,7 +13187,7 @@ float CurrentHoloOffset;
 void InitHoloScanLine( void )
 {
 	int i;
-	
+
 	CurrentHoloPlane = 0;
 
 	for( i = 0; i < NUM_HOLO_SCANPLANES; i++ )
@@ -13207,7 +13207,7 @@ void PlotHoloScanLine( void )
 	PLANE tempplane;
 
 	if ( CurrentHoloOffset >= MaxHoloPlaneOffset[ CurrentHoloPlane ] )
-	{	
+	{
 		if (++CurrentHoloPlane == NUM_HOLO_SCANPLANES)
 		{
 			CurrentHoloPlane = 0;
@@ -13228,7 +13228,7 @@ void PlotHoloScanLine( void )
 		Msg("SetUpLines() returned false");
 
 	Models[ CurrentHoloModel ].IntersectionPlane = HoloPlane[ CurrentHoloPlane ];
-	
+
 	CurrentHoloOffset += HOLOSCANSPEED * framelag;
 }
 
@@ -13241,7 +13241,7 @@ void KillHoloModel( void )
 
 	CurrentHoloModel = INDEX_NONE;
 
-}			  
+}
 
 bool FlyGirlActive = false;
 
@@ -13272,7 +13272,7 @@ void LoadHoloModel( u_int16_t model )
 	{
 		FlyGirlActive = false;
 	}
-	
+
 	CurrentHoloModel = FindFreeModel();
 
 	if (CurrentHoloModel != INDEX_NONE)
@@ -13286,7 +13286,7 @@ void LoadHoloModel( u_int16_t model )
 				break;
 			}
 		}
-		
+
 		Models[CurrentHoloModel].Pos = BikePos;
 		Models[CurrentHoloModel].Mat = MATRIX_Identity;
 		MatrixTranspose ( &Models[ CurrentHoloModel ].Mat, &Models[ CurrentHoloModel ].InvMat );
@@ -13327,12 +13327,12 @@ void ShowHoloModel( u_int16_t model )
 {
 	HoloSpeechDelay = HOLO_SPEECH_DELAY;
 	HoloSpeechDone = false;
-	
+
 	if ( ( CurrentHoloModel == INDEX_NONE ) && !FlyGirlActive )
 	{
 		if ( model == INDEX_NONE  )
 			return;
-		
+
 		LoadHoloModel( model );
 		HoloModelTimer = 0.0F;
 		HoloModelMode = HoloModel::Expand;
@@ -13340,7 +13340,7 @@ void ShowHoloModel( u_int16_t model )
 	}else
 	{
 		KillLines();
-		
+
 		switch( HoloModelMode )
 		{
 		case HoloModel::Done:
@@ -13396,7 +13396,7 @@ void ProcessHoloModel( void )
 		return;
 	}
 
-	
+
 	switch( HoloModelMode )
 	{
 	case HoloModel::Done:
@@ -13438,7 +13438,7 @@ void ProcessHoloModel( void )
 		HoloModelMode = HoloModel::Done;
 		HoloModelTimer = 1.0F;
 	}
-	
+
 	if ( reload )
 	{
 		if ( NextHoloModel == INDEX_NONE )
@@ -13524,7 +13524,7 @@ void InitWatchList( MENU * /*Menu*/ )
 		{
 			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 );
 			HostPlayersList.item[ HostPlayersList.items ][ sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 ] = 0;
-			
+
 			if(i == WhoIAm)
 				strcat( (char*)HostPlayersList.item[ HostPlayersList.items ], " (YOU)");
 
@@ -13546,7 +13546,7 @@ void RefreshHostPlayersList( LIST * /*List*/ )
 	BYTE i;
 
 	HostPlayersList.items = 0;
-	
+
 	for(i = 0; i < MAX_PLAYERS; i++ )
 	{
 		if ( GameStatus[ i ] == STATUS_Normal && i != WhoIAm)
@@ -13652,18 +13652,18 @@ bool ProcessSelectKeydef( int Key )
 		case SDLK_UP:
 			CursorUp();
 			break;
-			
+
 		case DOWN_MOUSE:
 		case SDLK_DOWN:
 			CursorDown();
 			break;
-			
+
 		case SDLK_LEFT:
 			if ( CurrentMenuItem->FuncSelect == SelectKeyDef
 				|| CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
 			{
 				DEFKEY *kdef;
-				
+
 				kdef = (DEFKEY *)(CurrentMenuItem->Variable);
 				if ( kdef->selected_key > 0 )
 				{
@@ -13681,7 +13681,7 @@ bool ProcessSelectKeydef( int Key )
 				|| CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
 			{
 				DEFKEY *kdef;
-				
+
 				kdef = (DEFKEY *)(CurrentMenuItem->Variable);
 				if ( kdef->selected_key < kdef->def->keys - 1 )
 				{
@@ -13697,7 +13697,7 @@ bool ProcessSelectKeydef( int Key )
 		case SDLK_HOME:
 			CursorHome();
 			break;
-			
+
 		case SDLK_END:
 			CursorEnd();
 			break;
@@ -13709,7 +13709,7 @@ bool ProcessSelectKeydef( int Key )
 					|| CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
 				{
 					DEFKEY *kdef;
-					
+
 					kdef = (DEFKEY *)(CurrentMenuItem->Variable);
 						if ( kdef->def->keys < MAX_KEYS_PER_CONTROL )
 						{
@@ -13732,7 +13732,7 @@ bool ProcessSelectKeydef( int Key )
 				|| CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
 			{
 				DEFKEY *kdef;
-				
+
 				kdef = (DEFKEY *)(CurrentMenuItem->Variable);
 				if ( kdef->def->keys < MAX_KEYS_PER_CONTROL )
 				{
@@ -13752,21 +13752,21 @@ bool ProcessSelectKeydef( int Key )
 				|| CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
 			{
 				DEFKEY *kdef;
-				
+
 				kdef = (DEFKEY *)(CurrentMenuItem->Variable);
 				KeyDelete( kdef, kdef->selected_key );
 			}
-			
+
 			if ( CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
 				CheckKeysForChanges();
-			
+
 			break;
-			
+
 		case SDLK_ESCAPE:
 			MenuBack();
 			done = true;
 			break;
-			
+
 		case SDLK_PAGEUP:
 			if ( CurrentMenu == &MENU_Keyboard )
 			{
@@ -13777,7 +13777,7 @@ bool ProcessSelectKeydef( int Key )
 				}
 			}
 			break;
-			
+
 		case SDLK_PAGEDOWN:
 			if ( CurrentMenu == &MENU_Keyboard )
 			{
@@ -13788,11 +13788,11 @@ bool ProcessSelectKeydef( int Key )
 				}
 			}
 			break;
-		
+
 		// TODO - need to pass unicode char to this function
 		}
 	}
-	
+
 	return !done;
 }
 
@@ -13804,7 +13804,7 @@ bool ProcessSlider( int Key )
 	MenuItemFunc set_fn;
 
 	slider = (SLIDER *)SliderItem->Variable;
-	
+
 	done = false;
 	switch( Key )
 	{
@@ -13864,7 +13864,7 @@ bool ProcessSlider2( int Key )
 	MenuItemFunc set_fn;
 
 	slider = (SLIDER *)SliderItem->Variable;
-	
+
 	done = false;
 	redraw = false;
 	refresh = false;
@@ -13949,14 +13949,14 @@ bool ProcessSlider2( int Key )
 			set_fn ( SliderItem );
 		}
 	}
-	
+
 	return !done;
 }
 
 
 /* process list movement
    lists are not the rotating disks
-   but text lists ... 
+   but text lists ...
    while in the pregame menu's */
 
 bool ProcessList( int Key )
@@ -14046,7 +14046,7 @@ bool ProcessList( int Key )
 		PlayCursorSfx();
 		SelectListEnd( CurrentList );
 		break;
-	
+
 	case LEFT_MOUSE:
 	case SDLK_RETURN:
 			FuncSet = (MenuItemFunc) CurrentMenuItem->Value;
@@ -14069,7 +14069,7 @@ bool ProcessList( int Key )
 	case SDLK_DELETE:
 		if ( CurrentList->FuncDelete )
 		{
-			if ( CurrentList->selected_item >= 0 && CurrentList->selected_item < CurrentList->items 
+			if ( CurrentList->selected_item >= 0 && CurrentList->selected_item < CurrentList->items
 				&& !CurrentList->FuncDelete( CurrentList, CurrentList->selected_item ) )
 			{
 				PlaySfx( SFX_Error, 1.0F );
@@ -14175,7 +14175,7 @@ void ProcessSelect( int Key )
 	/* should we process ? */
 	if (StackStatus != DISC_NOTHING)
 		return;
-	
+
 	/*********************\
 	|
 	| Key Definitions
@@ -14197,8 +14197,8 @@ void ProcessSelect( int Key )
 		if ( Key == SDLK_DELETE || Key == SDLK_BACKSPACE ){
 
 			/* reset the key to nothing */
-			*(VirtualKeycode *)(CurrentMenuItem->Variable) = (VirtualKeycode) 0; 
-			
+			*(VirtualKeycode *)(CurrentMenuItem->Variable) = (VirtualKeycode) 0;
+
 			/* */
 			if ( CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
 				CheckKeysForChanges();
@@ -14209,7 +14209,7 @@ void ProcessSelect( int Key )
 	}
 
 
-			
+
 	/************************\
 	|
 	| Selection & Navigation
@@ -14248,11 +14248,11 @@ void ProcessSelect( int Key )
 
 		}
 		else
-			
+
 			CursorLeft();
 
 	}
-				
+
 	/* cursor left */
 	else if ( Key == SDLK_RIGHT  )
 	{
@@ -14276,7 +14276,7 @@ void ProcessSelect( int Key )
 		else
 
 			CursorRight();
-	
+
 	}
 
 	/* cursor first */
@@ -14448,7 +14448,7 @@ bool ProcessBikerList ( int Key )
 
 	if (redraw)
 	{
-		LastMenu = CurrentMenu;	// because we are not actually changing menus, 
+		LastMenu = CurrentMenu;	// because we are not actually changing menus,
 								// but we still want to clear this menu
 		VduClear();
 		OldSelectedBike = BikeList.selected_item;
@@ -14501,7 +14501,7 @@ bool ProcessSavedGameList( int Key )
 	if (redraw)
 	{
 		GetSavedGameData();
-		LastMenu = CurrentMenu;	// because we are not actually changing menus, 
+		LastMenu = CurrentMenu;	// because we are not actually changing menus,
 								// but we still want to clear this menu
 		VduClear();
 		ProcessVduItems(CurrentMenu);
@@ -14511,7 +14511,7 @@ bool ProcessSavedGameList( int Key )
 }
 
 /*===================================================================
-	Procedure	:		Processes the player list - auto selects highlighted item, 
+	Procedure	:		Processes the player list - auto selects highlighted item,
 						and draws corresponding biker character.
 	Input		:		key pressed...
 	Output		:		bool - indicates when player list is no longer being used.
@@ -14521,14 +14521,14 @@ bool ProcessPlayerList ( int Key )
 	bool done, redraw;
 	char old_bike_name[16];
 
-	done = false;	 
+	done = false;
 	redraw = false;
 
 	strcpy(old_bike_name, bike_name);
 
 	switch(Key)
 	{
-		
+
 	case UP_MOUSE:
 	case SDLK_UP:
 		//make selected item 1 up
@@ -14576,7 +14576,7 @@ bool ProcessPlayerList ( int Key )
 	case SDLK_DELETE:
 		if ( PilotList.FuncDelete )
 		{
-			if ( PilotList.selected_item >= 0 && PilotList.selected_item < PilotList.items 
+			if ( PilotList.selected_item >= 0 && PilotList.selected_item < PilotList.items
 				&& !PilotList.FuncDelete( &PilotList, PilotList.selected_item ) )
 			{
 				PlaySfx( SFX_Error, 1.0F );
@@ -14598,9 +14598,9 @@ bool ProcessPlayerList ( int Key )
 		}
 		break;
 	}
-  
+
 	if (redraw)
-	{	
+	{
 		SelectPilot(CurrentMenuItem);
 		if (strcmp(old_bike_name, bike_name))	// if bike name has changed....
 		{
@@ -14614,7 +14614,7 @@ bool ProcessPlayerList ( int Key )
 
 	}
 
-	
+
 	return !done;
 }
 
@@ -14626,7 +14626,7 @@ bool ProcessWeaponOrder ( int Key )
 
 	done = false;
 	redraw = false;
-	
+
 	switch(Key)
 	{
 	case DOWN_MOUSE:
@@ -14678,7 +14678,7 @@ bool ProcessWeaponOrder ( int Key )
 			WeaponItem->TextInfo[SelectedWeapon]->highlighttype = highlighttype;
 		}
 		break;
-		
+
 	case UP_MOUSE:
 	case SDLK_UP:
 		PlayCursorSfx();
@@ -14895,13 +14895,13 @@ bool ProcessLevelList ( int Key )
 		done = true;
 		MenuBack();
 		break;
-		
+
 	case UP_MOUSE:
 	case SDLK_UP:
 		if (MenuState == MENUSTATE_SelectLevelQuick)
 		{
 			CursorUp();
-			done = true; 
+			done = true;
 		}
 		break;
 	case DOWN_MOUSE:
@@ -14939,7 +14939,7 @@ bool ProcessLevelList ( int Key )
 	{
 		if (MenuState == MENUSTATE_SelectLevelSlow)
 		{
-			LastMenu = CurrentMenu;	// because we are not actually changing menus, 
+			LastMenu = CurrentMenu;	// because we are not actually changing menus,
 									// but we still want to clear this menu
 			LoadLevelText( NULL );
 			VduClear();
@@ -14986,7 +14986,7 @@ void MenuProcess()
 		// do not process any more keys
 		if ( !CurrentMenu )
 			goto end;
-				
+
 		//  set global to define if we are in a title room
 		switch ( MyGameStatus )
 		{
@@ -15052,7 +15052,7 @@ void MenuProcess()
 
 			case MENUSTATE_Keydef2:
 				if ( !ProcessDefKey( Key ) )
-				{	
+				{
 					MenuState = MENUSTATE_SelectKeydef;
 					CheckKeysForChanges();
 					CurrentMenuItem->TextInfo[0]->highlighttype = HighlightType::Pulsing;

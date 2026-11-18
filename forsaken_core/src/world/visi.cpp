@@ -35,7 +35,7 @@
 #include "world/bsp.h"
 
 /*===================================================================
-		Globals...	
+		Globals...
 ===================================================================*/
 
 
@@ -1016,7 +1016,7 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 #endif
         return false;
     }
-	
+
 	return 1;
 }
 
@@ -1024,7 +1024,7 @@ int ClipGroup( CAMERA *cam, u_int16_t group )
 		Disp Visipoly Model
 ===================================================================*/
 bool
-DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam ) 
+DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 {
 	RENDERMATRIX	Tempproj;
 	RENDERMATRIX	Tempview;
@@ -1086,7 +1086,7 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 			return false;
 	}
 
-    if (!FSSetViewPort(&OldViewPort)) 
+    if (!FSSetViewPort(&OldViewPort))
 	{
 #ifdef DEBUG_VIEWPORT
 		SetViewportError( "ClipGroup", &g->viewport );
@@ -1103,7 +1103,7 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 		return false;
 	if (!FSSetView(&view))
 		return false;
-	
+
 	return true;
 }
 

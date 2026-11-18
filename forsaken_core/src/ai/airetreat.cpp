@@ -49,18 +49,18 @@ void AI_AIR_RETREAT( ENEMY * Enemy )
 		AI_SetFOLLOWPATH( Enemy );
 		return;
 	}
-	
+
 	Enemy->Timer -= framelag;
 
 	if( Enemy->Timer < 0.0F )
 		Enemy->Timer = 0.0F;
-	
+
 	if( !Enemy->TNode )
 	{
 		Enemy->TNode = Enemy->Object.NearestNode;
 		Enemy->Timer = EnemyTypes[Enemy->Type].Behave.RetreatTime;	// How long I Run away for...
 	}
-	
+
 	AI_UPDATEGUNS( Enemy );
 	// Aim at target
 
@@ -96,7 +96,7 @@ void AI_AIR_RETREAT( ENEMY * Enemy )
 			}
 
 		}
-		
+
 		if( DistanceVector2Vector( &Enemy->Object.Pos , &TNode->Pos ) < 64.0F )
 		{
 			Enemy->Object.NearestNode = TNode;
@@ -106,13 +106,13 @@ void AI_AIR_RETREAT( ENEMY * Enemy )
 			{
 				// The node Im Targetting is not on my network...Better try and find one...
 				TNode = WhichNode( 1 , (NODE*)Enemy->Object.NearestNode , (NODE*)Enemy->Object.LastNearestNode );
-				
+
 				if( !TNode )
 				{
 					Enemy->Object.LastNearestNode = NULL;
 					return;
 				}
-				
+
 				/* If I can't see the ideal node, keep going to my previous target. */
 				if( AI_ClearLOSNonZero( &Enemy->Object, &TNode->Pos , EnemyTypes[Enemy->Type].Radius  ) )
 				{

@@ -109,7 +109,7 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 					if( !IsAvatarActive() )
 						goto SkipIt;
 				}
-			
+
 				switch( ColType )
 				{
 					case COLTYPE_Trojax:
@@ -149,9 +149,9 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 					TempVector.x = ( Int_Temp.x - Pos->x );
 					TempVector.y = ( Int_Temp.y - Pos->y );
 					TempVector.z = ( Int_Temp.z - Pos->z );
-					
+
 					DistToSphere = VectorLength( &TempVector );
-					
+
 					if( ( DistToSphere <= DirLength ) && ( DistToSphere < ClosestLength ) )
 					{
 						ClosestLength = DistToSphere;
@@ -185,9 +185,9 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
    								TempVector.x = ( Int_Temp.x - Pos->x );
    								TempVector.y = ( Int_Temp.y - Pos->y );
    								TempVector.z = ( Int_Temp.z - Pos->z );
-   						
+
    								DistToSphere = VectorLength( &TempVector );
-   						
+
    								if( ( DistToSphere <= DirLength ) && ( DistToSphere < ClosestLength ) )
    								{
    									ClosestLength = DistToSphere;

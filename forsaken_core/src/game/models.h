@@ -59,10 +59,10 @@ constexpr int MODFLAG_ShockwaveHitMe = 256;
 constexpr int MODFLAG_StealthOffset = 512;
 
 enum {
-	BIKE_Lokasenna, 
-	BIKE_Beard, 
-	BIKE_LAJay, 
-	BIKE_ExCop, 
+	BIKE_Lokasenna,
+	BIKE_Beard,
+	BIKE_LAJay,
+	BIKE_ExCop,
 	BIKE_RexHardy,
 	BIKE_Foetoid,
 	BIKE_NimSoo,
@@ -90,8 +90,8 @@ enum {
 	MODEL_Pyrolite_LOD1,		// 7
 	MODEL_Transpulse,			// 8
 	MODEL_Transpulse_LOD1,		// 9
-	MODEL_SussGun,				// 10 
-	MODEL_SussGun_LOD1,			// 11 
+	MODEL_SussGun,				// 10
+	MODEL_SussGun_LOD1,			// 11
 	MODEL_Laser,				// 12
 	MODEL_Laser_LOD1,			// 13
 	MODEL_PowerPod,				// 14
@@ -248,7 +248,7 @@ enum {
 	MODEL_Beard_Stealth_LOD2,
 	MODEL_Beard_Stealth_LOD3,
 	MODEL_Beard_Stealth_LOD4,
-	
+
 	MODEL_LaJay,				// 147
 	MODEL_LaJay_LOD1,
 	MODEL_LaJay_LOD2,
@@ -259,7 +259,7 @@ enum {
 	MODEL_LaJay_Stealth_LOD2,
 	MODEL_LaJay_Stealth_LOD3,
 	MODEL_LaJay_Stealth_LOD4,
-	
+
 	MODEL_Excop,				// 157
 	MODEL_Excop_LOD1,
 	MODEL_Excop_LOD2,
@@ -270,9 +270,9 @@ enum {
 	MODEL_Excop_Stealth_LOD2,
 	MODEL_Excop_Stealth_LOD3,
 	MODEL_Excop_Stealth_LOD4,
-	
+
 	MODEL_Trucker,				// 167
-	MODEL_Trucker_LOD1,				 
+	MODEL_Trucker_LOD1,
 	MODEL_Trucker_LOD2,
 	MODEL_Trucker_LOD3,
 	MODEL_Trucker_LOD4,
@@ -281,7 +281,7 @@ enum {
 	MODEL_Trucker_Stealth_LOD2,
 	MODEL_Trucker_Stealth_LOD3,
 	MODEL_Trucker_Stealth_LOD4,
-	
+
 	MODEL_Foetoid,				// 177
 	MODEL_Foetoid_LOD1,
 	MODEL_Foetoid_LOD2,
@@ -292,7 +292,7 @@ enum {
 	MODEL_Foetoid_Stealth_LOD2,
 	MODEL_Foetoid_Stealth_LOD3,
 	MODEL_Foetoid_Stealth_LOD4,
-	
+
 	MODEL_JapBird,				// 187
 	MODEL_JapBird_LOD1,
 	MODEL_JapBird_LOD2,
@@ -303,7 +303,7 @@ enum {
 	MODEL_JapBird_Stealth_LOD2,
 	MODEL_JapBird_Stealth_LOD3,
 	MODEL_JapBird_Stealth_LOD4,
-	
+
 	MODEL_Nutter,				// 197
 	MODEL_Nutter_LOD1,
 	MODEL_Nutter_LOD2,
@@ -314,7 +314,7 @@ enum {
 	MODEL_Nutter_Stealth_LOD2,
 	MODEL_Nutter_Stealth_LOD3,
 	MODEL_Nutter_Stealth_LOD4,
-	
+
 	MODEL_Rhesus,				// 207
 	MODEL_Rhesus_LOD1,
 	MODEL_Rhesus_LOD2,
@@ -325,7 +325,7 @@ enum {
 	MODEL_Rhesus_Stealth_LOD2,
 	MODEL_Rhesus_Stealth_LOD3,
 	MODEL_Rhesus_Stealth_LOD4,
-	
+
 	MODEL_Joe,					// 217
 	MODEL_Joe_LOD1,
 	MODEL_Joe_LOD2,
@@ -336,7 +336,7 @@ enum {
 	MODEL_Joe_Stealth_LOD2,
 	MODEL_Joe_Stealth_LOD3,
 	MODEL_Joe_Stealth_LOD4,
-	
+
 	MODEL_Shark,				// 227
 	MODEL_Shark_LOD1,
 	MODEL_Shark_LOD2,
@@ -347,7 +347,7 @@ enum {
 	MODEL_Shark_Stealth_LOD2,
 	MODEL_Shark_Stealth_LOD3,
 	MODEL_Shark_Stealth_LOD4,
-	
+
 	MODEL_HK5,					// 237
 	MODEL_HK5_LOD1,
 	MODEL_HK5_LOD2,
@@ -358,7 +358,7 @@ enum {
 	MODEL_HK5_Stealth_LOD2,
 	MODEL_HK5_Stealth_LOD3,
 	MODEL_HK5_Stealth_LOD4,
-	
+
 	MODEL_Nubia,				// 247
 	MODEL_Nubia_LOD1,
 	MODEL_Nubia_LOD2,
@@ -415,7 +415,7 @@ enum {
 	TITLE_MODEL_Disc3,				//2 - Disc 3
 	TITLE_MODEL_Disc4,				//3 - Disc 4
 	TITLE_MODEL_Disc5,				//4 - Disc 5
-	TITLE_MODEL_Disc6,				//5 - Disc 6			  
+	TITLE_MODEL_Disc6,				//5 - Disc 6
 	TITLE_MODEL_Mbot,				//6 - Bottom of mech. device
 	TITLE_MODEL_Room,				//7 - Main Room
 	TITLE_MODEL_VDU,				//8 - VDU
@@ -426,10 +426,10 @@ enum {
 	TITLE_MODEL_HoloLight,			//12 - Top of spinning mechanical device
 	TITLE_MODEL_Bracket,			//13 - Top of spinning mechanical device
 
-	TITLE_MODEL_Lokasenna, 
-	TITLE_MODEL_Beard, 
-	TITLE_MODEL_LAJay, 
-	TITLE_MODEL_ExCop, 
+	TITLE_MODEL_Lokasenna,
+	TITLE_MODEL_Beard,
+	TITLE_MODEL_LAJay,
+	TITLE_MODEL_ExCop,
 	TITLE_MODEL_RexHardy,
 	TITLE_MODEL_Foetoid,
 	TITLE_MODEL_NimSoo,
@@ -451,12 +451,12 @@ enum{
 	TITLE_MODEL_Crystal = TITLE_MODEL_Bracket + 1,
 	TITLE_MODEL_GoldBar,
 };
-		
-enum {								
-									
-	MODFUNC_Nothing,				
-	MODFUNC_Explode,				
-	MODFUNC_Scale,					
+
+enum {
+
+	MODFUNC_Nothing,
+	MODFUNC_Explode,
+	MODFUNC_Scale,
 	MODFUNC_Scale2,
 	MODFUNC_BodyPart,
 	MODFUNC_OrbitPulsar,

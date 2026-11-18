@@ -91,13 +91,13 @@ bool PreLoadCompObj( int8_t * path, u_int16_t * BaseModel, bool LevelSpecific )
 			Msg( "PreLoadCompObj() Corrupt Componented Object (.COB) file %s", path );
 			return( false );
 		}
-   	
+
 		if( ( (*BaseModel) + NumModels + 1 ) < MAXMODELHEADERS )
 		{
 			for( Count = 0; Count < NumModels; Count++ )
 			{
 				i = 0;
-		
+
 				do
 				{
 					if( fread( &ModNames[ (*BaseModel) + Count ].Name[ i ], sizeof( int8_t ), 1, fp ) != 1 )
@@ -118,7 +118,7 @@ bool PreLoadCompObj( int8_t * path, u_int16_t * BaseModel, bool LevelSpecific )
 				ModNames[ (*BaseModel) + Count ].LevelSpecific = LevelSpecific;
 				ModNames[ (*BaseModel) + Count ].LoadEnable = DO_LOAD;
 			}
- 		
+
 			ModNames[ (*BaseModel) + NumModels ].Name[0] = 0;
 			ModNames[ (*BaseModel) + NumModels ].LOD = 0;
 			ModNames[ (*BaseModel) + NumModels ].Panel = false;
@@ -196,7 +196,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 		if( CompsPtr )
 		{
 			fread( &NumModels, sizeof( int16_t ), 1, fp );
-		
+
 			for( Count = 0; Count < NumModels; Count++ )
 			{
 				do
@@ -334,7 +334,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 		Comp->OldDisplayPos.z = 0.0F;
 		Comp->OldDisplayMatrix = MATRIX_Identity;
 		Comp->OldInvDisplayMatrix = MATRIX_Identity;
-		
+
 		Comp->OldOldDisplayPos.x = 0.0F;
 		Comp->OldOldDisplayPos.y = 0.0F;
 		Comp->OldOldDisplayPos.z = 0.0F;
@@ -343,7 +343,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 		TempQuat.FromDirAndUp(&Comp->Dir, &Comp->Up);
 		TempQuat.ToMatrix(&Comp->InitMatrix);
-	
+
 		if( ID != -1 )
 		{
 			ModelIndex = FindFreeModel();
@@ -397,7 +397,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 				Models[ ModelIndex ].OwnerType = OwnerType;
 				Models[ ModelIndex ].Owner = OwnerID;
 				MatrixTranspose( &Models[ ModelIndex ].Mat, &Models[ ModelIndex ].InvMat );
-	
+
 			}
 			else
 			{
@@ -409,15 +409,15 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 		{
 			Comp->ModelIndex = INDEX_NONE;
 		}
-	
+
 		fread( &NumTrans, sizeof( int16_t ), 1, fp );
-		
+
 		NumMorphs = 0;
 
 		if( NumTrans )
 		{
 			TransPtr = (ANI_TRANS*)malloc( sizeof( ANI_TRANS ) * NumTrans );
-	
+
 			if( TransPtr != NULL )
 			{
 #ifdef DEBUG_COMP
@@ -429,7 +429,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 					fread( &TransPtr[ Count ].Type, sizeof( int16_t ), 1, fp );
 					fread( &TransStart, sizeof( float ), 1, fp );
 					fread( &TransDuration, sizeof( float ), 1, fp );
-		
+
 					if( ( TransStart + TransDuration ) > *Time ) *Time = ( TransStart + TransDuration );
 
 					TransPtr[ Count ].TimeStart = ( TransStart * ANIM_SECOND );
@@ -448,7 +448,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								fread( &AniTransPtr->Local, sizeof( int16_t ), 1, fp );
 #ifdef DEBUG_COMP
 								DebugPrintf("	TRANSLATION	:%f:%f: %f, %f, %f\n", TransStart, ( TransStart + TransDuration ),
-												AniTransPtr->Trans.x, AniTransPtr->Trans.y, AniTransPtr->Trans.z ); 
+												AniTransPtr->Trans.x, AniTransPtr->Trans.y, AniTransPtr->Trans.z );
 #endif
 
 							}
@@ -458,7 +458,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								return( NULL );
 							}
 							break;
-				
+
 						case TRANS_ROTATE:
 							TransPtr[ Count ].Data = malloc( sizeof( ANI_ROTATE ) );
 							if( TransPtr[ Count ].Data != NULL )
@@ -482,7 +482,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 												TransStart, ( TransStart + TransDuration ),
 												AniRotPtr->Axis.x, AniRotPtr->Axis.y, AniRotPtr->Axis.z,
 												AniRotPtr->Origin.x, AniRotPtr->Origin.y, AniRotPtr->Origin.z,
-												AniRotPtr->Angle, AniRotPtr->Local ); 
+												AniRotPtr->Angle, AniRotPtr->Local );
 #endif
 							}
 							else
@@ -491,7 +491,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								return( NULL );
 							}
 							break;
-				
+
 						case TRANS_MORPH:
 							NumMorphs++;
 							TransPtr[ Count ].Data = malloc( sizeof( ANI_MORPH ) );
@@ -510,7 +510,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								return( NULL );
 							}
 							break;
-				
+
 						case TRANS_PROPERTY:
 							TransPtr[ Count ].Data = malloc( sizeof( ANI_PROPERTY ) );
 							if( TransPtr[ Count ].Data != NULL )
@@ -589,7 +589,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							break;
 					}
 				}
-	
+
 				Comp->NumTrans = NumTrans;
 				Comp->Trans = TransPtr;
 			}
@@ -604,13 +604,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			Comp->NumTrans = NumTrans;
 			Comp->Trans = NULL;
 		}
-		
+
 		fread( &NumColZones, sizeof( int16_t ), 1, fp );
 
 		if( NumColZones )
 		{
 			ZonesPtr = (ANI_ZONES*)malloc( sizeof( ANI_ZONES ) * NumColZones );
-	
+
 			if( ZonesPtr )
 			{
 				for( Zone = 0; Zone < NumColZones; Zone++ )
@@ -623,20 +623,20 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 					ZonesPtr[ Zone ].Type = ColZoneType;
 					ZonesPtr[ Zone ].Sensitive = ColZoneSensitive;
 					ZonesPtr[ Zone ].Damage = ColZoneDamage;
-	
+
 					fread( &BoxCenter.x, sizeof( float ), 1, fp );
 					fread( &BoxCenter.y, sizeof( float ), 1, fp );
 					fread( &BoxCenter.z, sizeof( float ), 1, fp );
-					
+
 					fread( &BoxHalfSize.x, sizeof( float ), 1, fp );
 					fread( &BoxHalfSize.y, sizeof( float ), 1, fp );
 					fread( &BoxHalfSize.z, sizeof( float ), 1, fp );
-	
+
 					switch( ColZoneType )
 					{
 						case ZONE_Sphere:
 							ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_SPHERE ) );
-	
+
 							if( ZonesPtr[ Zone ].Data )
 							{
 								AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr[ Zone ].Data;
@@ -649,25 +649,25 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								return( NULL );
 							}
 							break;
-	
+
 						case ZONE_Box:
 							ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_BOX ) );
-	
+
 							if( ZonesPtr[ Zone ].Data )
 							{
 								AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr[ Zone ].Data;
 								AniZoneBoxPtr->Center = BoxCenter;
 								AniZoneBoxPtr->HalfSize = BoxHalfSize;
-	
+
 								fread( &NumSides, sizeof( int16_t ), 1, fp );
-	
+
 								AniZoneBoxPtr->NumSides = NumSides;
 								AniZoneBoxPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
-	
+
 								if( AniZoneBoxPtr->Sides )
 								{
 									SidesPtr = AniZoneBoxPtr->Sides;
-	
+
 									for( Side = 0; Side < NumSides; Side++ )
 									{
 										fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
@@ -692,25 +692,25 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								return( NULL );
 							}
 							break;
-	
+
 						case ZONE_Polygonal:
 							ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_POLYGONAL ) );
-	
+
 							if( ZonesPtr[ Zone ].Data )
 							{
 								AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr[ Zone ].Data;
 								AniZonePolyPtr->Center = BoxCenter;
 								AniZonePolyPtr->HalfSize = BoxHalfSize;
-	
+
 								fread( &NumSides, sizeof( int16_t ), 1, fp );
-	
+
 								AniZonePolyPtr->NumSides = NumSides;
 								AniZonePolyPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
-	
+
 								if( AniZonePolyPtr->Sides )
 								{
 									SidesPtr = AniZonePolyPtr->Sides;
-	
+
 									for( Side = 0; Side < NumSides; Side++ )
 									{
 										fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
@@ -737,7 +737,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							break;
 					}
 				}
-	
+
 				Comp->NumColZones = NumColZones;
 				Comp->ColZones = ZonesPtr;
 			}
@@ -754,7 +754,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 		}
 
 		fread( &Comp->NumChildren, sizeof( int16_t ), 1, fp );
-	
+
 		if( Comp->NumChildren )
 		{
 			CompsPtr = (COMP_OBJ*)malloc( ( sizeof( COMP_OBJ ) * Comp->NumChildren ) );
@@ -824,7 +824,7 @@ void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 					{
 						case ZONE_Sphere:
 							break;
-	
+
 						case ZONE_Box:
 							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
@@ -834,7 +834,7 @@ void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 								AniZoneBoxPtr->NumSides = 0;
 							}
 							break;
-	
+
 						case ZONE_Polygonal:
 							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
@@ -997,7 +997,7 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 				NewPos.x = 0.0F;
 				NewPos.y = 0.0F;
 				NewPos.z = 0.0F;
-	
+
 				if( Children->NumTrans )
 				{
 					for( Trans = 0; Trans < Children->NumTrans; Trans++ )
@@ -1005,12 +1005,12 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 						Start = Children->Trans[ Trans ].TimeStart;
 						Duration = Children->Trans[ Trans ].TimeDuration;
 						End = ( Start + Duration );
-		
+
 						if( Time >= Start )
 						{
 							if( Time < End ) Scale = ( ( Time - Start ) / Duration );
 							else Scale = 1.0F;
-		
+
 							switch( Children->Trans[ Trans ].Type )
 							{
 								case TRANS_TRANSLATE:
@@ -1020,10 +1020,10 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 									NewPos.y += ( TransData->Trans.y * Scale );
 									NewPos.z += ( TransData->Trans.z * Scale );
 									break;
-							
+
 								case TRANS_ROTATE:
 									RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
-	
+
 									if( RotData->Local )
 									{
 										ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
@@ -1046,10 +1046,10 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 										NewPos.z += ( NewPos2.z - NewOrigin.z );
 									}
 									break;
-							
+
 								case TRANS_MORPH:
 									MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
-	
+
 									if( Scale != 1.0F )
 									{
 										Children->InterpFrame = MorphData->Frame;
@@ -1060,7 +1060,7 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 										Children->Frame = MorphData->Frame;
 									}
 									break;
-							
+
 								case TRANS_PROPERTY:
 									PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
 
@@ -1245,7 +1245,7 @@ bool GetCompObjAxis( COMP_OBJ * Comp )
 			{
 				case TRANS_TRANSLATE:
 					break;
-			
+
 				case TRANS_ROTATE:
 					RotData = (ANI_ROTATE *) Comp->Trans[ Trans ].Data;
 
@@ -1253,10 +1253,10 @@ bool GetCompObjAxis( COMP_OBJ * Comp )
 					Comp->UserAxis = RotData->Axis;
 					return( true );
 					break;
-			
+
 				case TRANS_MORPH:
 					break;
-			
+
 				case TRANS_PROPERTY:
 					break;
 			}
@@ -1335,7 +1335,7 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 
 							NumSides = 0;
 							break;
-	
+
 						case ZONE_Box:
 							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
@@ -1359,7 +1359,7 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 
 							DisplayColZone( &ZoneSides[ 0 ], NumSides, Group, ZonesPtr->Sensitive );
 							break;
-	
+
 						case ZONE_Polygonal:
 							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
@@ -1563,12 +1563,12 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 					Start = Children->Trans[ Trans ].TimeStart;
 					Duration = Children->Trans[ Trans ].TimeDuration;
 					End = ( Start + Duration );
-		
+
 					if( Time > Start )
 					{
 						if( Time < End ) Scale = ( ( Time - Start ) / Duration );
 						else Scale = 1.0F;
-		
+
 						switch( Children->Trans[ Trans ].Type )
 						{
 							case TRANS_TRANSLATE:
@@ -1578,10 +1578,10 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 								NewPos.y += ( TransData->Trans.y * Scale );
 								NewPos.z += ( TransData->Trans.z * Scale );
 								break;
-						
+
 							case TRANS_ROTATE:
 								RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
-	
+
 								if( RotData->Local )
 								{
 									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
@@ -1604,10 +1604,10 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 									NewPos.z += ( NewPos2.z - NewOrigin.z );
 								}
 								break;
-						
+
 							case TRANS_MORPH:
 								MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
-	
+
 								if( Scale != 1.0F )
 								{
 									Children->InterpFrame = MorphData->Frame;
@@ -1618,7 +1618,7 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 									Children->Frame = MorphData->Frame;
 								}
 								break;
-						
+
 							case TRANS_PROPERTY:
 								break;
 						}
@@ -1854,7 +1854,7 @@ bool AmIInvulnerable( COMP_OBJ * Children, int16_t NumChildren, float Time )
 					Start = Children->Trans[ Trans ].TimeStart;
 					Duration = Children->Trans[ Trans ].TimeDuration;
 					End = ( Start + Duration );
-		
+
 					if( ( Time >= Start ) && ( Time < End ) )
 					{
 						switch( Children->Trans[ Trans ].Type )
@@ -1863,7 +1863,7 @@ bool AmIInvulnerable( COMP_OBJ * Children, int16_t NumChildren, float Time )
 							case TRANS_ROTATE:
 							case TRANS_MORPH:
 								break;
-							
+
 							case TRANS_PROPERTY:
 								PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
 
@@ -2113,12 +2113,12 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 					Start = Children->Trans[ Trans ].TimeStart;
 					Duration = Children->Trans[ Trans ].TimeDuration;
 					End = ( Start + Duration );
-		
+
 					if( Time > Start )
 					{
 						if( Time < End ) Scale = ( ( Time - Start ) / Duration );
 						else Scale = 1.0F;
-		
+
 						switch( Children->Trans[ Trans ].Type )
 						{
 							case TRANS_TRANSLATE:
@@ -2128,10 +2128,10 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 								NewPos.y += ( TransData->Trans.y * Scale );
 								NewPos.z += ( TransData->Trans.z * Scale );
 								break;
-						
+
 							case TRANS_ROTATE:
 								RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
-	
+
 								if( RotData->Local )
 								{
 									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
@@ -2154,10 +2154,10 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 									NewPos.z += ( NewPos2.z - NewOrigin.z );
 								}
 								break;
-						
+
 							case TRANS_MORPH:
 								MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
-	
+
 								if( Scale != 1.0F )
 								{
 									Children->InterpFrame = MorphData->Frame;
@@ -2168,7 +2168,7 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 									Children->Frame = MorphData->Frame;
 								}
 								break;
-						
+
 							case TRANS_PROPERTY:
 								break;
 						}
@@ -2230,14 +2230,14 @@ void GetCompObjColZoneBoundingBox( COMP_OBJ * Children, MATRIX * DisplayMatrix, 
 			{
 				case ZONE_Sphere:
 					break;
-	
+
 				case ZONE_Box:
 					AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
 					GetZoneBoundingBox( &AniZoneBoxPtr->Center, &AniZoneBoxPtr->HalfSize,
 										DisplayMatrix, DisplayPos, TopLeft, BottomRight );
 					break;
-	
+
 				case ZONE_Polygonal:
 					AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
