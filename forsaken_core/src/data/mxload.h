@@ -47,7 +47,6 @@ typedef struct PVFIREPOINT{
 typedef struct PVSPOTFX {
 
 	u_int16_t		Type;
-	u_int16_t		Group;
 	int8_t		Primary;
 	int8_t		Secondary;
 	u_int8_t		Red;
