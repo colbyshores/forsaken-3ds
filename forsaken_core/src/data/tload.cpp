@@ -1,12 +1,9 @@
+/* tload.cpp -- builds and releases the shared texture page table
+ * (Tloadheader); see tload.h. */
+
 #include "ui/title.h"
 #include "util/platform.h"
 #include "rendering/text.h"
-/*==========================================================================
- *
- *  File: Tload.c
- *	loads all the textures necessary for a level..
- *  rescaling if nescessary...
-***************************************************************************/
 
 /*===================================================================
 		Include File...	
@@ -36,10 +33,10 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 	Tloadheader->num_texture_files = 0;
 	for( i = 0 ; i < MAXTPAGESPERTLOAD ; i++ )
 	{
-		Tloadheader->lpTexture[i]     = NULL; // texture
+		Tloadheader->lpTexture[i]     = NULL;
 
-		Tloadheader->MipMap[i]		  = false;// Should it have Mip Maps
-		Tloadheader->PlaceHolder[i]	  = false;// Is it a placeholder ( for subsequent dynamicly loaded textures )
+		Tloadheader->MipMap[i]		  = false;
+		Tloadheader->PlaceHolder[i]	  = false;
 
 		Tloadheader->Xsize[ i ] = 0;		
 		Tloadheader->Ysize[ i ] = 0;
@@ -91,10 +88,9 @@ bool Tload( TLOADHEADER * Tloadheader  )
 	return( true );
 }
 	
-//
-// this will create and set a brand new texture pointer
-//
-
+/* Create page n from its file (a placeholder is left empty until
+   TloadReloadPlaceHolder fills it). numMips 0 asks the backend for a full
+   mip chain, 1 for the base level only. */
 bool TloadTextureSurf( TLOADHEADER * Tloadheader , int n)
 {
 	LPTEXTURE lpSrcTexture = NULL;
@@ -123,11 +119,9 @@ bool TloadTextureSurf( TLOADHEADER * Tloadheader , int n)
 	return true;
 }
 
-//
-// this will either create a new texture pointer if it doesn't exist
-// or reload a new surface while keeping the pointer the same
-//
-
+/* Load the file named in PlaceHolderFile[n] into placeholder page n:
+   create the texture the first time, afterwards reload it in place so
+   everything that holds lpTexture[n] sees the new image. */
 bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n )
 {
 	// create only one mipmap level (original texture only)
@@ -137,11 +131,11 @@ bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n )
 	if( !Tloadheader->PlaceHolderFile[n] || !Tloadheader->PlaceHolderFile[n][0] )
 		return false;
 
-	// let d3d generate mipmaps for us that are needed
+	// 0 = let the backend build the mip chain
 	if(Tloadheader->MipMap[n])
 		numMips = 0;
 
-	// for some reason level pic would not show up properly if you let update_texture_from_file create the texture for us
+	// the first load creates the texture; update_texture_from_file only replaces an existing one
 	if(!Tloadheader->lpTexture[n])
 		FSCreateTexture(
 			&Tloadheader->lpTexture[n], &Tloadheader->PlaceHolderFile[n][0],
@@ -156,13 +150,7 @@ bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n )
 	return true;
 }
 
-/*
- * TloadReleaseTexture
- * Release this texture surface and texture interface.  Remember, a texture
- * handle is NOT an object and does not need to be released or destroyed.
- * The handle is no longer valid after the device is destroyed, so set it to
- * zero here.
- */
+/* Release page n's texture, and a placeholder's file-name buffer. */
 void
 TloadReleaseTexture(TLOADHEADER * Tloadheader, int n)
 {
@@ -175,11 +163,7 @@ TloadReleaseTexture(TLOADHEADER * Tloadheader, int n)
 	}
 }
 
-/*
- * ReleaseTloadheader
- * Release all texture surfaces and texture interfaces
- * Release Execute buffers
- */
+/* Release every page and reset the table to empty. */
 void
 ReleaseTloadheader( TLOADHEADER * Tloadheader )
 {
@@ -297,13 +281,13 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t Co
 	return i;
 }
 
-// Allows consolodating commonly used texture files
-// use texture in level folder as the ultimate source
-// if it doesn't exist then look for it in data/textures
-// or fall back to default.png
-// also pkupsa?.bmp is hard coded to map to titana.png as the old game did
-// size of destination should always be 256, path should end up at least 256-1
-bool use_original_textures = false;
+bool use_original_textures = false;	// UseOriginalTextures in the config
+
+/* Choose the file for a level texture (destination: 256 bytes). The level's
+   own textures folder wins, then data\textures\original when
+   UseOriginalTextures is set, then the shared data\textures, then
+   default.png. The name's extension becomes .PNG; pkups.bmp / pkupsa.bmp
+   map to titana.png, as in the original game. */
 void GetLevelTexturePath( char * destination, char * file, char * level )
 {
 	char path[256];

@@ -1,13 +1,24 @@
-/*==========================================================================
- *
- *
- *  File:       tload.h
- *  Content:    Tload include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* tload.h -- the texture page table shared by the level, models and sprites
+ *
+ * Tloadheader is the one table of texture pages for the current title screen
+ * or level. Loaders register pages with AddTexture (which returns the index
+ * they keep, e.g. MLOADHEADER::TloadIndex, and returns the existing index if
+ * a page of the same file name is already there), then Tload creates them
+ * all through the backend's FSCreateTexture, which fills Xsize / Ysize /
+ * ColourKey from the image actually loaded (on the 3DS an HD .t3x when one
+ * exists, otherwise the PNG). Indices are only meaningful in Tloadheader:
+ * code holding a loader's local texture number must map it through that
+ * loader's TloadIndex first.
+ *
+ * A placeholder page (AddTexture with an empty name) is a slot whose image
+ * is chosen at run time: the title screen writes a file name into
+ * PlaceHolderFile and calls TloadReloadPlaceHolder (level preview pictures,
+ * saved-game pictures). GetLevelTexturePath picks the file for a level
+ * texture: the level's own textures folder, then data\textures\original
+ * when UseOriginalTextures is set, then data\textures, then default.png.
+ */
 
 #include "data/file.h"
 #include "rendering/render.h"
@@ -28,16 +39,16 @@ constexpr int LOAD_TPAGES_FINISH = 8;
  */
 
 typedef struct TLOADHEADER{
-	int		state;
+	int		state;						// true once Tload has created every page
 	u_int16_t num_texture_files;
-	u_int16_t				Xsize[MAXTPAGESPERTLOAD];		// the Xsize now
-	u_int16_t				Ysize[MAXTPAGESPERTLOAD];		// the Ysize now
-	bool				ColourKey[MAXTPAGESPERTLOAD];	// 0 not colour keyed
-    char                ImageFile[MAXTPAGESPERTLOAD][256]; /* files */
-    LPTEXTURE			lpTexture[MAXTPAGESPERTLOAD]; /* texture objs */
-	bool				MipMap[MAXTPAGESPERTLOAD];
-	bool				PlaceHolder[MAXTPAGESPERTLOAD];	// is the texture a placeholder ( for subsequent dynamic loading of textures? )
-	char				*PlaceHolderFile[MAXTPAGESPERTLOAD];	// current full path of file occupying placeholder ( needed to restore surface )
+	u_int16_t				Xsize[MAXTPAGESPERTLOAD];		// width and height of the image loaded (for a
+	u_int16_t				Ysize[MAXTPAGESPERTLOAD];		// placeholder, the size requested until filled)
+	bool				ColourKey[MAXTPAGESPERTLOAD];	// black texels are transparent
+    char                ImageFile[MAXTPAGESPERTLOAD][256]; // path as registered (empty for a placeholder)
+    LPTEXTURE			lpTexture[MAXTPAGESPERTLOAD];	// the backend texture
+	bool				MipMap[MAXTPAGESPERTLOAD];		// create a mip chain
+	bool				PlaceHolder[MAXTPAGESPERTLOAD];	// image chosen at run time (see above)
+	char				*PlaceHolderFile[MAXTPAGESPERTLOAD];	// 256-byte buffer: the file now in the placeholder
 }TLOADHEADER;
 
 /*
