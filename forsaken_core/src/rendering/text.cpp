@@ -56,7 +56,7 @@ float MaxMessageTime = 5.0f;
 int16_t	TextActivatedOrder = 0;
 int16_t	CurrentTextActivated = 0;
 int	TeamCol[MAX_TEAMS] = { 1, 2, 3, 4 };
-char *TeamName[ MAX_TEAMS ] = // team colour names should match TeamCol[] colours (given in Colourtrans[][] below)
+const char *TeamName[ MAX_TEAMS ] = // team colour names should match TeamCol[] colours (given in Colourtrans[][] below)
 {
 	LT_TEAM_1, // red
 	LT_TEAM_2, // green
@@ -883,12 +883,12 @@ void InitTextMessages( void )
 	}
 }
 typedef struct {
-	char *keyword;
+	const char *keyword;
 	int  num;
 } MESSAGE_NUM_LOOKUP;
 
 typedef struct {
-	char *keyword;
+	const char *keyword;
 	void *var_ptr;
 } MESSAGE_VAR_LOOKUP;
 

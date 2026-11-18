@@ -87,7 +87,7 @@ u_int32_t        AnimOncePerFrame = 0;         // used for stuff that is display
 extern int Num_StatsMessage_Parts;
 
 BYTE  PreSynchupStatus;
-char *CurrentLevelsList;
+const char *CurrentLevelsList;
 
 px_timer_t level_time;
 
@@ -869,7 +869,7 @@ void ProcessGameKeys( void )
   } // end normal keys
 } // ProcessGameKeys
 
-bool InitLevels( char * levels_list )
+bool InitLevels( const char * levels_list )
 {
 
   FILE *f;

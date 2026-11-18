@@ -126,7 +126,7 @@ const char *ShipAxisText[NUM_SHIP_AXIS_ACTIONS] = {
   "Move Forward/Back",
 };
 
-char *ShipAxisSeperateText[NUM_SHIP_AXIS_ACTIONS * 2] = {
+const char *ShipAxisSeperateText[NUM_SHIP_AXIS_ACTIONS * 2] = {
   "No Action",
   "No Action",
   "Rotate Up",

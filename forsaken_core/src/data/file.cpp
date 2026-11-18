@@ -42,7 +42,7 @@ bool is_folder( char* str )
 	return false;
 }
 
-int folder_exists( char *pathspec, ... )
+int folder_exists( const char * pathspec, ... )
 {
 	char * path;
 	static char pathname[ 256 ];
@@ -214,7 +214,7 @@ static int find_globerr( const char *epath, int eerrno )
 	return 0;
 }
 
-char* find_file( char * str )
+char* find_file( const char * str )
 {
 	char * path = convert_path(str);
 	DebugPrintf("file: find_file called with %s\n",path);

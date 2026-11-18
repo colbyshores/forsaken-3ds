@@ -752,7 +752,7 @@ char *BikeComputerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
 	NULL,
 };
 
-char *BikerSpeechNames[MAXBIKETYPES] = {
+const char *BikerSpeechNames[MAXBIKETYPES] = {
 	"LOK",	//	-	Lokasenna
 	"BRD",	//	-	Beard
 	"JAY",	//	-	L.A. Jay

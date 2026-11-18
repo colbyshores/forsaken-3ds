@@ -22,7 +22,7 @@
 typedef int (*ReadConfig)( FILE *, USERCONFIG *, char * );
 
 typedef struct {
-	char *keyword;
+	const char *keyword;
 	ReadConfig handle;
 } READCONFIGTABLE;
 
@@ -1642,7 +1642,7 @@ const char *key_name( int keycode )
 
 
 static void
-write_keydef( FILE *f, char *ctl_name, USERKEY *keydef )
+write_keydef( FILE *f, const char * ctl_name, USERKEY *keydef )
 {
 	int k;
 
@@ -1666,7 +1666,7 @@ write_keydef( FILE *f, char *ctl_name, USERKEY *keydef )
 
 
 static void
-write_keydef_indexed( FILE *f, char *ctl_name, USERKEY *keydef, int index )
+write_keydef_indexed( FILE *f, const char * ctl_name, USERKEY *keydef, int index )
 {
 	int k;
 
@@ -1695,7 +1695,7 @@ write_keydef_indexed( FILE *f, char *ctl_name, USERKEY *keydef, int index )
 
 
 static void
-write_preferred( FILE *f, char *ctl_name, int16_t *order, int max_entries )
+write_preferred( FILE *f, const char * ctl_name, int16_t *order, int max_entries )
 {
 	int j;
 

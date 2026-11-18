@@ -264,7 +264,7 @@ bool msg_is_valid( int msg_type )
 	return false;
 }
 
-char* msg_to_str( int msg_type )
+const char* msg_to_str( int msg_type )
 {
 	switch( msg_type )
 	{

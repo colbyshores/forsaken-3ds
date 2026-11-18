@@ -197,7 +197,7 @@ extern bool ShowNetworkInfo;
 extern bool flush_input;
 void clear_last_mouse_state(void);
 extern float FlashTextActive;
-extern char * ShipAxisSeperateText[ NUM_SHIP_AXIS_ACTIONS*2 ];
+extern const char *ShipAxisSeperateText[ NUM_SHIP_AXIS_ACTIONS*2 ];
 extern const char *ShipAxisText[ NUM_SHIP_AXIS_ACTIONS ];
 extern int ShipAxisLookup[ NUM_SHIP_AXIS_ACTIONS ];
 extern const char *ShipActionText[ NUM_SHIP_ACTIONS ];

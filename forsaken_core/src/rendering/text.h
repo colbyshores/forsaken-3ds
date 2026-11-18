@@ -113,7 +113,7 @@ typedef enum {
 
 /* Defined in text.cpp; shared with the modules that use it. */
 int Printint16_t( int16_t num , int x , int y , int color );
-extern char * TeamName[ MAX_TEAMS ];
+extern const char *TeamName[ MAX_TEAMS ];
 extern u_int8_t Colourtrans[ MAXFONTCOLOURS ][ 3 ];
 extern int TeamCol[ MAX_TEAMS ];
 extern char * StatusTab[ 256 ];

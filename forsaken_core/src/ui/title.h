@@ -559,7 +559,7 @@ bool LoadTitleModels(void);
 void VduClear ( void );
 void UpdateSessions ( int *dummy );
 void SelectQuit( MENUITEM *Item );
-void PrintErrorMessage (char *ErrorStr, int BackBy, MENU *NewMenu, int type);
+void PrintErrorMessage (const char * ErrorStr, int BackBy, MENU *NewMenu, int type);
 void MenuItemBackFromError ( MENUITEM *Item );
 void MenuChangeEx( MENU *Menu );
 void LoadLevelText( MENU *Menu );
@@ -570,7 +570,7 @@ void DrawReadyButton( MENUITEM *Item );
 void PlayerConfirm( MENUITEM *Item );
 void SelectTeamList( MENUITEM *Item );
 void TitleReset( MENUITEM *item );
-void SetTitleNotify( char *str );
+void SetTitleNotify( const char * str );
 
 /* Defined in title.cpp; shared with the modules that use it. */
 void DrawFlatMenuItem( MENUITEM *Item );
@@ -678,7 +678,7 @@ extern bool NoMenuBack;
 extern SLIDER CTFSlider;
 extern bool MyBrightShips;
 extern float Pulse;
-extern char * EmptyString;
+extern const char *EmptyString;
 extern LIST PlayersList;
 extern LIST TeamList[ MAX_TEAMS ];
 extern MENUITEM TeamItem;

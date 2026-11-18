@@ -8212,7 +8212,7 @@ read_SecondaryWeaponType( FILE *f, char *last_token )
 }
 // Read the Flags
 typedef struct {
-	char *keyword;
+	const char *keyword;
 	u_int32_t Flags;
 } READENEMYFLAGS;
 
@@ -8268,7 +8268,7 @@ read_Flags( FILE *f, char *last_token )
 
 // read the enemy type.....
 typedef struct {
-	char *keyword;
+	const char *keyword;
 	u_int16_t EnemyType;
 } READENEMYTYPE;
 
@@ -8518,7 +8518,7 @@ static int read_Gun_WeaponType( FILE *f, char *last_token )
 ===================================================================*/
 typedef int (*ReadEnemy)( FILE *, char * );
 typedef struct {
-	char *keyword;
+	const char *keyword;
 	ReadEnemy handle;
 } READENEMYTXTFILE;
 

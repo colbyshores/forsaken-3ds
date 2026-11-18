@@ -251,10 +251,10 @@ exit_with_error:
 	Output		:		-1 if no match found otherwise number of texture
 ===================================================================*/
 
-int16_t	FindTexture( TLOADHEADER * Tloadheader , char * Name )
+int16_t	FindTexture( TLOADHEADER * Tloadheader , const char * Name )
 {
 	int	i;
-	char * pnt1;
+	const char * pnt1;
 	char * pnt2;
 
 	pnt1 = strrchr( Name, '\\' );
@@ -287,7 +287,7 @@ int16_t	FindTexture( TLOADHEADER * Tloadheader , char * Name )
 	Output		:		-1 if too many tpages
 ===================================================================*/
 
-int16_t	AddTexture( TLOADHEADER * Tloadheader , char * Name , u_int16_t ColourKey  , bool Scale , bool MipMap, int16_t xsize, int16_t ysize )
+int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t ColourKey  , bool Scale , bool MipMap, int16_t xsize, int16_t ysize )
 {
 	int16_t i;
 	char * NamePnt;

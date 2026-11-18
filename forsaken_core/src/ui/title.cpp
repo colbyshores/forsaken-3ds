@@ -552,7 +552,7 @@ int	GameType			= GAME_Normal;
 
 // these are really only meant for displaying in create game menu
 // the order of this list must match the order of game_t
-char* GameTypeNameTable[7] = {
+const char *GameTypeNameTable[7] = {
 	LT_MENU_NEW_CreateGame9,  /*"free for all"*/
 	LT_MENU_NEW_CreateGame12, /*"flag chase"*/
 	LT_MENU_NEW_CreateGame13, /*"bounty hunt"*/
@@ -833,12 +833,12 @@ char EnemiesKilledText[ 64 ];
 char TimeTakenText[ 64 ];
 char GameCompleteText[ 256 ];
 			       
-char *GameCompleteWithoutCrystals			= LT_GameCompleteWithoutCrystals			/* "well done. You completed all the levels but you didn't get all the crystals. You'll have to do it all over again if you want to be properly rewarded."*/;
-char *GameCompleteGotAllCrystalsSoFar		= LT_GameCompleteGotAllCrystalsSoFar		/* "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award."*/;
-char *GameCompleteWithAllCrystals			= LT_GameCompleteWithAllCrystals			/* "well done, you got all the crystals. You get the secret biker."*/; 
-char *GameCompleteWithAllCrystalsExceptLast = LT_GameCompleteWithAllCrystalsExceptLast	/* "well you got through the secret level, but you didn't get the final crystal. Better luck next time."*/;
-char *GameCompleteWithCheating				= LT_GameCompleteWithCheating				/* "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"*/;
-char *GameCompleteAdditionalLevels			= LT_GameCompleteAdditionalLevels			/* "congratulations. You have completed all the currently installed additional levels. Look out for further mission packs!!"*/;
+const char *GameCompleteWithoutCrystals			= LT_GameCompleteWithoutCrystals			/* "well done. You completed all the levels but you didn't get all the crystals. You'll have to do it all over again if you want to be properly rewarded."*/;
+const char *GameCompleteGotAllCrystalsSoFar		= LT_GameCompleteGotAllCrystalsSoFar		/* "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award."*/;
+const char *GameCompleteWithAllCrystals			= LT_GameCompleteWithAllCrystals			/* "well done, you got all the crystals. You get the secret biker."*/; 
+const char *GameCompleteWithAllCrystalsExceptLast = LT_GameCompleteWithAllCrystalsExceptLast	/* "well you got through the secret level, but you didn't get the final crystal. Better luck next time."*/;
+const char *GameCompleteWithCheating				= LT_GameCompleteWithCheating				/* "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"*/;
+const char *GameCompleteAdditionalLevels			= LT_GameCompleteAdditionalLevels			/* "congratulations. You have completed all the currently installed additional levels. Look out for further mission packs!!"*/;
 
 MENU MENU_NEW_SpecialMessage = {
 	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_LowerHolopad,
@@ -1673,7 +1673,7 @@ void JoiningEnter(MENU *Menu)
 }
 
 char join_status_msg[255] = "";
-void update_join_status( char* str )
+void update_join_status( const char * str )
 {
 	strncpy( join_status_msg, str, 254 );
 	join_status_msg[254] = 0;
@@ -3057,25 +3057,25 @@ bool ListRedrawReq;
 int OldMenuStatus;
 
 // customisable display messages
-char *ToggleColourRed = LT_RED;
-char *ToggleColourBlue = LT_BLUE;
-char *ToggleColourDisabled = LT_DISABLED;
+const char *ToggleColourRed = LT_RED;
+const char *ToggleColourBlue = LT_BLUE;
+const char *ToggleColourDisabled = LT_DISABLED;
 
 
-char *ToggleStatusOn = LT_ToggleStatusOn;
-char *ToggleStatusOff = LT_ToggleStatusOff;
-char *ToggleStatusShooter = LT_ToggleStatusShooter;	// collision perspective
-char *ToggleStatusTarget = LT_ToggleStatusTarget;
-char *RadioBtnSelected = "*";
-char *RadioBtnNotSelected = "";
-char *EmptyString = "";
-char *UndefinedKey = LT_Undef;
-char *WeaponSelectFirst = "Use arrow keys to select weapon to move then press enter";
-char *WeaponSelectSecond = "use right arrow to place item in unused list~"
+const char *ToggleStatusOn = LT_ToggleStatusOn;
+const char *ToggleStatusOff = LT_ToggleStatusOff;
+const char *ToggleStatusShooter = LT_ToggleStatusShooter;	// collision perspective
+const char *ToggleStatusTarget = LT_ToggleStatusTarget;
+const char *RadioBtnSelected = "*";
+const char *RadioBtnNotSelected = "";
+const char *EmptyString = "";
+const char *UndefinedKey = LT_Undef;
+const char *WeaponSelectFirst = "Use arrow keys to select weapon to move then press enter";
+const char *WeaponSelectSecond = "use right arrow to place item in unused list~"
 					"use left arrow to place item in used list~"
 					"or use up/down arrows to change position, then press enter to place";
-char *WaitingForConfirm = LT_SelectWhenReady;
-char *WaitingForReset = LT_WaitingForReset;
+const char *WaitingForConfirm = LT_SelectWhenReady;
+const char *WaitingForReset = LT_WaitingForReset;
 int MAXSLIDERINFOLENGTH = 32;
 /**********************
 new slider globals
@@ -6365,7 +6365,7 @@ void SelectKey( MENUITEM *Item )
 void DrawKey( MENUITEM *Item )
 {
 	VirtualKeycode keycode;
-	char *keyword;
+	const char *keyword;
 	int	x;
 	int	y;
 	int colour;
@@ -6424,7 +6424,7 @@ void DrawKeyDef( MENUITEM *Item )
 {
 	DEFKEY *keydef;
 	VirtualKeycode keycode;
-	char *keyword;
+	const char *keyword;
 	int	x;
 	int	y;
 	int colour;
@@ -9417,7 +9417,7 @@ TEXTINFO * DrawFlatRadioBtnStatus( MENUITEM *Item )
 TEXTINFO * DrawFlatToggleStatus( MENUITEM *Item )
 {
 	TEXTINFO *TextInfo;
-	char *status;
+	const char * status;
 
 	if ( *(bool *)(Item->Variable ) )
 	{
@@ -9515,7 +9515,7 @@ void CheckKeysForChanges( void )
 {
 	MENUITEM *Item;
 	VirtualKeycode keycode;
-	char *keyword;
+	const char *keyword;
 	DEFKEY *kdef;
 	
 	for( Item = CurrentMenu->Item ; Item->x >= 0 ; Item++ )
@@ -9541,7 +9541,7 @@ void CheckKeysForChanges( void )
 		}
 		else if ( Item->FuncDraw == DrawFlatMenuKeyLeftArrow )
 		{
-			char *arrow;
+			const char * arrow;
 
 			arrow = EmptyString;
 			if ( Item->Variable )
@@ -9556,7 +9556,7 @@ void CheckKeysForChanges( void )
 		}
 		else if ( Item->FuncDraw == DrawFlatMenuKeyRightArrow )
 		{
-			char *arrow;
+			const char *arrow;
 
 			arrow = EmptyString;
 			if ( Item->Variable )
@@ -9588,7 +9588,7 @@ void DrawFlatMenuKeyText( MENUITEM *Item )
 {
 	DEFKEY *kdef;
 	VirtualKeycode keycode;
-	char *keyword = NULL;
+	const char * keyword = NULL;
   	TEXTINFO *TextInfo;
 
 	if ( Item->Variable )
@@ -9683,7 +9683,7 @@ void DrawFlatMenuKeyNum( MENUITEM *Item )
 void DrawFlatMenuKeyLeftArrowText( MENUITEM *Item )
 {
 	DEFKEY *kdef;
-	char *arrow;
+	const char * arrow;
   	TEXTINFO *TextInfo;
 
 	arrow = EmptyString;
@@ -9730,7 +9730,7 @@ void DrawFlatMenuKeyLeftArrow( MENUITEM *Item )
 void DrawFlatMenuKeyRightArrowText( MENUITEM *Item )
 {
 	DEFKEY *kdef;
-	char *arrow;
+	const char * arrow;
   	TEXTINFO *TextInfo;
 
 	arrow = EmptyString;
@@ -12744,7 +12744,7 @@ void GetTitleMessage(void)
 
 // type - whether or not to execute exit/entry functions of menus passed through
 // NewMenu - new menu to go into after stepping back (can be NULL)
-void PrintErrorMessage (char *ErrorStr, int BackBy, MENU *NewMenu, int type)
+void PrintErrorMessage (const char * ErrorStr, int BackBy, MENU *NewMenu, int type)
 {
 	MENUITEM ChangeItem;
 
@@ -13202,8 +13202,8 @@ void CheckJoyAxis( int *dummy )
 	float pos;
 
 
-	char *left;
-	char *right;
+	const char * left;
+	const char * right;
 
 	axis = AxisMap[JoystickAxisList.selected_item];
 
@@ -14123,7 +14123,7 @@ void TitleReset( MENUITEM *item )
 	QuickStart = QUICKSTART_None;
 }
 
-void SetTitleNotify( char *str )
+void SetTitleNotify( const char * str )
 {
 	strncpy( NotifyMessage, str, sizeof( NotifyMessage ) - 1 );
 	NotifyMessage[ sizeof( NotifyMessage ) - 1 ] = 0;

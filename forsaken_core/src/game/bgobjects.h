@@ -180,7 +180,7 @@ typedef struct BGO_FILE {
 
 typedef struct BIKEINFO {
 
-	char	*	Filename;
+	const char *	Filename;
 	u_int16_t		BaseModel;
 	u_int16_t		StealthBaseModel;
 	float		OverallTime;

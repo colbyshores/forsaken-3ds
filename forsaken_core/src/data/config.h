@@ -57,7 +57,7 @@ typedef struct _DEFKEY
 
 
 typedef struct {
-	char *keyword;
+	const char *keyword;
 	VirtualKeycode keycode;
 } VIRTUALKEYMAP;
 
