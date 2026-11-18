@@ -55,6 +55,7 @@ typedef struct MXAVERT {
 	float tv;
 	int32_t flags;
 } MXAVERT;
+static_assert( sizeof( MXAVERT ) == 32, "MXAVERT is a file record" );
 
 
 typedef struct COLOR_RGBA {
@@ -88,8 +89,8 @@ typedef struct MXALOADHEADER{
 	int					WantedFrame;
 	float				Interp;								// how close to the wanted frame....
 	float				Time;
-	char		*		OrgAddr;
-	char		*		Buffer;
+	char		*		OrgAddr;							// the .mxa file, from PreMxaload until Mxaload has copied it out
+	const char	*		Buffer;								// where Mxaload starts reading OrgAddr
 	u_int16_t				num_texture_files;
 	u_int16_t				num_groups;
 	MXAGROUP			Group[MAX_MXAGROUPS];
@@ -98,7 +99,7 @@ typedef struct MXALOADHEADER{
 	u_int16_t				num_frames;
 	MXAVERTCOUNT *		num_anim_vertices;// points to the begining of each set of verts...	
 	MXAVERTFRAME *		frame_pnts;		  // points to the begining of each set of verts...	
-	void		*		aligned_verts;	  // aligned copy of all MXAVERT frame data (avoids per-frame memcpy)
+	MXAVERT		*		anim_verts;		  // every frame's MXAVERTs; frame_pnts point into this
 	int					AllocateTPage;
 	u_int16_t				NumFirePoints;							// Number of FirePoints
 	PVFIREPOINT	*		FirePoints;								// FirePoints

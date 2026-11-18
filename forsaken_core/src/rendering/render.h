@@ -396,7 +396,7 @@ typedef struct OLDLVERTEX {
 	COLOR	specular;
 	float	tu;
 	float	tv;
-} OLDLVERTEX, *LPOLDLVERTEX;
+} OLDLVERTEX;
 static_assert( sizeof( OLDLVERTEX ) == 32, "OLDLVERTEX is a file record" );
 
 /* bjd - remove when done. taken from SDK */

@@ -67,6 +67,7 @@ num_frames : u_int16_t // number of animation frames
 #include "data/tload.h"
 #include "game/ships.h"
 #include "util/hunk_alloc.h"
+#include "util/file_reader.h"
 
 /*===================================================================
 		Defines
@@ -89,13 +90,6 @@ MXALOADHEADER *MxaModelHeaders = NULL;
 bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangles  )
 {
 
-	char		*	Buffer;
-	char		*	tempBuffer;
-	int16_t		*	Int16Pnt;
-	u_int32_t		*	Uint32Pnt;
-	u_int16_t		*	Uint16Pnt;
-	float		*	FloatPnt;
-	MFACE		*	MFacePnt;
 	TRIANGLE		FacePnt; // was a pointer
 	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
 	u_int16_t			exec_type;			// the type of execute buffer
@@ -103,19 +97,16 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	u_int16_t			num_texture_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			group_vertex_start; // where in the vert list to start processing
-	LPOLDLVERTEX lpLVERTEX2;
 	LPLVERTEX	lpLVERTEX;
 	WORD			*lpIndices = NULL;
 	NORMAL		*lpNormals = NULL;
 	int				ibIndex = 0;
 	u_int16_t			frame;
 	u_int16_t			texgroup;
-	u_int16_t			num_anim_vertices;
 	int				i,e;
 	u_int16_t			tpage = 0;
 	int				execbuf;
 	int				group;
-	u_int16_t			ExecSize;
 
 	u_int16_t			NumSpotFX;
 	PVSPOTFX *		SpotFXPtr;
@@ -123,11 +114,8 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	PVFIREPOINT *	FirePointPtr;
 	u_int32_t			Colour;
 	int				colourkey = 0;
-	int16_t			c;
-	int8_t		*	Int8Pnt;
 	int8_t			SFXFilename[ 128 ];
 
-	int numTriangles = 0;
 	int triangleCount = 0;
 	int indexOffset = 0;
 	int tempInt;
@@ -141,18 +129,15 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 	DebugPrintf("MxaLoad\n");
 
-	Buffer = Mxaloadheader->Buffer;
-	if( Buffer == NULL)
+	if( Mxaloadheader->Buffer == NULL)
 	{
 		Msg( "Mxaload() Unable to allocate buffer in %s\n", Filename );
 		return false;
 	}
-
+	FileReader in( Mxaloadheader->Buffer );
 
 	/*	get the number of groups	*/
-	Uint16Pnt = (u_int16_t *) Buffer;
-	Mxaloadheader->num_groups = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;
+	Mxaloadheader->num_groups = in.u16();
 
 	if ( Mxaloadheader->num_groups > MAXGROUPS )
 	{
@@ -163,9 +148,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	for( group=0 ; group<Mxaloadheader->num_groups; group++)
 	{
 		/*	get the number of execbufs in this group	*/
-		Uint16Pnt = (u_int16_t *) Buffer;
-		Mxaloadheader->Group[group].num_execbufs = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;
+		Mxaloadheader->Group[group].num_execbufs = in.u16();
 
 		if ( Mxaloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
 		{
@@ -175,24 +158,18 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 		for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
 		{
-			Uint16Pnt = (u_int16_t *) Buffer;
-
-			ExecSize = 	*Uint16Pnt++;
-			ExecSize += 512;
+			in.skip( sizeof( u_int16_t ) );	// D3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
-			exec_type = *Uint16Pnt++;
+			exec_type = in.u16();
 			/*	get the number of verts in execution buffer	*/
-			num_vertices =	*Uint16Pnt++;
-			Buffer = (char *) Uint16Pnt;
+			num_vertices = in.u16();
 
 			/*	record how what type of exec buffer	*/
 			Mxaloadheader->Group[group].exec_type[execbuf] = exec_type;
 
 			/*	record how many verts there are in the exec buffer	*/
 			Mxaloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
-
-			lpLVERTEX2 = (LPOLDLVERTEX ) Buffer;
 
 			/*	create a vertex buffer	*/
 			if (!FSCreateVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], num_vertices))
@@ -214,26 +191,20 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			/*	copy the vertex data into the execute buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
+				OLDLVERTEX old;
+				in.bytes( &old, sizeof( old ) );
 
-				/* lpLVERTEX2 points into a buffer at variable alignment
-				   (filename strings precede it); copy 32-byte OLDLVERTEX
-				   to a stack-aligned local before float reads. */
-				__typeof__(*lpLVERTEX2) _ovx_local;
-				memcpy_unaligned(&_ovx_local, lpLVERTEX2, sizeof(*lpLVERTEX2));
-				LPOLDLVERTEX old = &_ovx_local;
-
-				lpLVERTEX[i].x = old->x;
-				lpLVERTEX[i].y = old->y;
-				lpLVERTEX[i].z = old->z;
-				lpLVERTEX[i].tu = old->tu;
-				lpLVERTEX[i].tv = old->tv;
-				lpLVERTEX[i].color = old->color;
+				lpLVERTEX[i].x = old.x;
+				lpLVERTEX[i].y = old.y;
+				lpLVERTEX[i].z = old.z;
+				lpLVERTEX[i].tu = old.tu;
+				lpLVERTEX[i].tv = old.tv;
+				lpLVERTEX[i].color = old.color;
 
 				lpLVERTEX[i].color |= 0xFF000000;
 				// nothing used specular so we removed it from LVERTEX
 				// lpLVERTEX->specular = lpLVERTEX2->specular;
 //				lpLVERTEX->dwReserved = 0;
-				lpLVERTEX2++;
 			}
 
 			/* bjd - allows us to retrieve copies of the original vertices in the new format! */
@@ -241,33 +212,22 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			memmove(Mxaloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
 			
-			Buffer = (char *) lpLVERTEX2;
-			
-			Uint16Pnt = (u_int16_t *) Buffer;
-			num_texture_groups = *Uint16Pnt++;    
-			Buffer = (char *) Uint16Pnt;		
+			num_texture_groups = in.u16();
 			Mxaloadheader->Group[group].num_texture_groups[execbuf] = num_texture_groups;
 
 			/* find out how many vertexes we'll need to load into our vertex buffer */
 			triangleCount = 0;
 			tempInt = 0;
-			tempBuffer = Buffer;
 
-			for ( i=0 ; i<num_texture_groups; i++)
 			{
-				u_int16_t *temp = (u_int16_t *) tempBuffer;
-				
-				/* skip over unwated stuff */
-				temp += 4;
-
-				numTriangles = *temp++;
-
-				tempBuffer = (char*) temp;
-				MFacePnt = (MFACE *) tempBuffer;
-
-				MFacePnt += numTriangles;
-				tempBuffer = (char *) MFacePnt; 
-				triangleCount += numTriangles;
+				FileReader scan = in;
+				for ( i=0 ; i<num_texture_groups; i++)
+				{
+					scan.skip( 4 * sizeof( u_int16_t ) );
+					u_int16_t numTriangles = scan.u16();
+					scan.skip( numTriangles * sizeof( MFACE ) );
+					triangleCount += numTriangles;
+				}
 			}
 
 			/*	create an index buffer	*/
@@ -317,17 +277,13 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			for ( i=0 ; i<num_texture_groups; i++)
 			{
-				Uint16Pnt = (u_int16_t *) Buffer;
-				Uint16Pnt++;	// texture type (unused)
-				group_vertex_start = *Uint16Pnt++;
-				Uint16Pnt++;	// group vertex count (unused)
-				tpage = *Uint16Pnt++;
-				num_triangles = *Uint16Pnt++;    
-				Buffer = (char *) Uint16Pnt;		
+				in.skip( sizeof( u_int16_t ) );	// texture type (unused)
+				group_vertex_start = in.u16();
+				in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
+				tpage = in.u16();
+				num_triangles = in.u16();
 	
 				Mxaloadheader->Group[group].texture_group_vert_off[execbuf][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
-
-				MFacePnt = (MFACE *) Buffer;
 
 				/* bjd - CHECK - might need to be start of buffer */
 				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
@@ -335,9 +291,11 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				/*	copy the faces data into the execute buffer	*/
 				for( e=0; e<num_triangles; e++)
 				{
-					FacePnt.v1 = MFacePnt->v1;
-					FacePnt.v2 = MFacePnt->v2;
-					FacePnt.v3 = MFacePnt->v3;
+					MFACE face;
+					in.bytes( &face, sizeof( face ) );
+					FacePnt.v1 = face.v1;
+					FacePnt.v2 = face.v2;
+					FacePnt.v3 = face.v3;
 
 					lpIndices[ibIndex] = FacePnt.v1;
 					ibIndex++;
@@ -346,24 +304,20 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 					lpIndices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
-					memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
-					memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
-					memcpy(&lpNormals->nz, &MFacePnt->nz, 4);
+					lpNormals->nx = face.nx;
+					lpNormals->ny = face.ny;
+					lpNormals->nz = face.nz;
 
-					if ( MFacePnt->pad & 1 )
+					if ( face.pad & 1 )
 					{
 						// colourkey triangle found
 						colourkey++;
-						MFacePnt->pad &= ~1;
 					}
-					MFacePnt++;
 					lpNormals++;
 					tempInt+=3;
 				}
 
 				DebugPrintf("put %d verts into VB\n", tempInt);
-
-				Buffer = (char *) MFacePnt;
 
 				// BJD - check this. correct value to place here?
 				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;
@@ -414,16 +368,15 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	}
 				
 
-	Uint16Pnt = (u_int16_t *) Buffer;
-	// is there any vispoly info.....
-	if ( *Uint16Pnt++ == 2)				// 2 means .mxa format
+	// is there any vispoly info..... (any other value is not consumed: it
+	// is read again below as the fire point flag)
+	if ( in.peek_u16() == 2)				// 2 means .mxa format
 	{
+		in.skip( sizeof( u_int16_t ) );
 /*===================================================================
  *		Particular Stuff Related Anims	
 ===================================================================*/
-		Mxaloadheader->num_frames = *Uint16Pnt++;
-
-		Buffer = (char * ) Uint16Pnt;
+		Mxaloadheader->num_frames = in.u16();
 
 		if ( Mxaloadheader->num_frames > 1 )
 		{
@@ -437,100 +390,47 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Msg( "Mxaload() calloc(num_frames=%d) failed in %s\n", Mxaloadheader->num_frames, Filename );
 				return false;
 			}
-			Mxaloadheader->aligned_verts = NULL;
 
+			/* Each frame stores, per texture group, a vertex count and that
+			   many MXAVERTs. Size all of them first, then copy them into one
+			   block (anim_verts) that frame_pnts point into. */
+			size_t total = 0;
 			{
-				/* First pass: record frame_pnts into raw buffer and count total
-				 * MXAVERT bytes.  We'll allocate an aligned copy afterwards so
-				 * InterpFrames can use direct pointer access instead of per-vertex
-				 * memcpy on every frame. */
+				FileReader scan = in;
 				for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
-				{
 					for( group=0 ; group<Mxaloadheader->num_groups; group++)
-					{
 						for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
-						{
-							if (!(FSLockVertexBuffer(&Mxaloadheader->Group[ group ].renderObject[execbuf], &lpLVERTEX)))
-							{
-								Msg( "Mxaload : Lock VertexBuffer failed\n" );
-								return false;
-							}
-
 							for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
 							{
-								Uint16Pnt = (u_int16_t *) Buffer;
-								num_anim_vertices = *Uint16Pnt++;
-								Buffer = (char * ) Uint16Pnt;
-								Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup] = num_anim_vertices;
-								Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] = (MXAVERT*) Buffer;
-								lpLVERTEX = 	( LPLVERTEX ) ( lpLVERTEX +( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
-								lpLVERTEX += 8;
-								Buffer += ( num_anim_vertices * sizeof( MXAVERT ) );
+								u_int16_t count = scan.u16();
+								scan.skip( count * sizeof( MXAVERT ) );
+								total += count;
 							}
+			}
 
-							if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
-							{
-								Msg( "Mxaload : Unlock VertexBuffer failed\n" );
-								return false ;
-							}
-						}
-					}
-				}
-
-				/* Allocate a single aligned buffer and pack MXAVERT arrays
-				 * consecutively (without the u16 count-fields that appear
-				 * between them in the raw file).  malloc returns 8-byte
-				 * aligned; MXAVERT is 32 bytes; so every packed array is
-				 * 4-byte aligned and vldr in InterpFrames is safe.
-				 *
-				 * Important: the previous implementation preserved raw
-				 * offsets, which meant a frame_pnts that landed at
-				 * BufferStart+2 stayed at aligned+2 — still 2-mod-4 and
-				 * still crashing on ARM11. Packing fixes that. */
+			MXAVERT * dst = NULL;
+			if ( total )
+			{
+				dst = (MXAVERT *) malloc( total * sizeof( MXAVERT ) );
+				if ( !dst )
 				{
-					size_t total = 0;
-					for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
-						for( group=0 ; group<Mxaloadheader->num_groups; group++)
-							for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
-								for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
-									total += (size_t)Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup]
-									         * sizeof(MXAVERT);
-
-					if ( total )
-					{
-						char *aligned = (char*)malloc( total );
-						if ( aligned )
-						{
-							char *dst = aligned;
-							Mxaloadheader->aligned_verts = aligned;
-
-							for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
-							{
-								for( group=0 ; group<Mxaloadheader->num_groups; group++)
-								{
-									for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
-									{
-										for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
-										{
-											size_t nbytes =
-												(size_t)Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup]
-												* sizeof(MXAVERT);
-											/* Source is the raw pointer (possibly 2-mod-4); use
-											   byte-wise copy so GCC doesn't fuse it to `ldm`. */
-											memcpy_unaligned( dst,
-												Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup],
-												nbytes );
-											Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] =
-												(MXAVERT*) dst;
-											dst += nbytes;
-										}
-									}
-								}
-							}
-						}
-					}
+					Msg( "Mxaload() malloc(%u frame verts) failed in %s\n", (unsigned) total, Filename );
+					return false;
 				}
 			}
+			Mxaloadheader->anim_verts = dst;
+
+			for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
+				for( group=0 ; group<Mxaloadheader->num_groups; group++)
+					for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
+						for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+						{
+							u_int16_t count = in.u16();
+							Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup] = count;
+							Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] = dst;
+							in.bytes( dst, count * sizeof( MXAVERT ) );
+							dst += count;
+						}
 		}
 		else
 		{
@@ -543,10 +443,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 /*===================================================================
 	Point Direction Data
 ===================================================================*/
-	Uint16Pnt = (u_int16_t *) Buffer;
-	if( *Uint16Pnt++ )
+	if( in.u16() )
 	{
-		NumFirePoints = *Uint16Pnt++;
+		NumFirePoints = in.u16();
 
 		if( NumFirePoints )
 		{
@@ -563,16 +462,10 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			for( i = 0; i < NumFirePoints; i++ )
 			{
-				FirePointPtr->ID = *Uint16Pnt++;				// ID ( u_int16_t )
-				FloatPnt = (float *) Uint16Pnt;
-
-				memcpy_unaligned(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
-				FloatPnt+=3;
-				memcpy_unaligned(&FirePointPtr->Dir, FloatPnt, 3*4);				// Dir ( 3 floats )
-				FloatPnt+=3;
-				memcpy_unaligned(&FirePointPtr->Up, FloatPnt, 3*4);				// Up ( 3 floats )
-				FloatPnt+=3;
-				Uint16Pnt = (u_int16_t *) FloatPnt;
+				FirePointPtr->ID = in.u16();					// ID ( u_int16_t )
+				FirePointPtr->Pos = in.vec();			// Pos ( 3 floats )
+				FirePointPtr->Dir = in.vec();			// Dir ( 3 floats )
+				FirePointPtr->Up = in.vec();			// Up ( 3 floats )
 				FirePointPtr++;
 			}
 		}
@@ -582,7 +475,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			Mxaloadheader->NumFirePoints = 0;
 		}
 
-		NumSpotFX = *Uint16Pnt++;
+		NumSpotFX = in.u16();
 
 		if( NumSpotFX )
 		{
@@ -599,34 +492,18 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			for( i = 0; i < NumSpotFX; i++ )
 			{
-				SpotFXPtr->Type = *Uint16Pnt++;				// Type ( u_int16_t )
-				FloatPnt = (float *) Uint16Pnt;
+				SpotFXPtr->Type = in.u16();					// Type ( u_int16_t )
+				SpotFXPtr->Pos = in.vec();			// Pos ( 3 floats )
+				SpotFXPtr->DirVector = in.vec();	// Dir ( 3 floats )
+				SpotFXPtr->UpVector = in.vec();	// Up ( 3 floats )
+				SpotFXPtr->StartDelay = in.f32() * ANIM_SECOND;		// Start Delay
+				SpotFXPtr->ActiveDelay = in.f32() * ANIM_SECOND;	// Active Delay
+				SpotFXPtr->InactiveDelay = in.f32() * ANIM_SECOND;	// Inactive Delay
+				SpotFXPtr->Primary = (int8_t) in.i16();		// Primary ( int16_t )
+				SpotFXPtr->Secondary = (int8_t) in.i16();	// Secondary ( int16_t )
+				Colour = in.u32();
 
-				memcpy_unaligned(&SpotFXPtr->Pos, FloatPnt, 4*3);
-				FloatPnt+=3;
-				memcpy_unaligned(&SpotFXPtr->DirVector.x, FloatPnt, 4*3);
-				FloatPnt+=3;
-				memcpy_unaligned(&SpotFXPtr->UpVector, FloatPnt, 4*3);
-				FloatPnt+=3;
-				memcpy(&SpotFXPtr->StartDelay, FloatPnt++, 4); SpotFXPtr->StartDelay*= ANIM_SECOND;	// Start Delay
-				memcpy(&SpotFXPtr->ActiveDelay, FloatPnt++,4); SpotFXPtr->ActiveDelay*= ANIM_SECOND;	// Active Delay
-				memcpy(&SpotFXPtr->InactiveDelay, FloatPnt++, 4); SpotFXPtr->InactiveDelay*= ANIM_SECOND;	// Inactive Delay
-				Int16Pnt = (int16_t *) FloatPnt;
-				SpotFXPtr->Primary = (int8_t) *Int16Pnt++;	// Primary ( int16_t )
-				SpotFXPtr->Secondary = (int8_t) *Int16Pnt++;	// Secondary ( int16_t )
-				Uint32Pnt = (u_int32_t *) Int16Pnt;
-				Colour = *Uint32Pnt++;
-
-
-				Int8Pnt = (int8_t *) Uint32Pnt;
-
-				c = 0;
-				do
-				{
-					SFXFilename[ c ] = *Int8Pnt++;
-					c++;
-				}
-				while( SFXFilename[ ( c - 1 ) ] != 0 );
+				strcpy( (char*)&SFXFilename[ 0 ], in.cstring() );
 				
 				if( SpotFXPtr->Type == SPOTFX_SoundFX )
 				{
@@ -645,10 +522,8 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 					SpotFXPtr->SoundFX = -1;
 				}
 
-				FloatPnt = (float *) Int8Pnt;
-				memcpy(&SpotFXPtr->SoundFXVolume, FloatPnt++, 4);
-				memcpy(&SpotFXPtr->SoundFXSpeed, FloatPnt++, 4);
-				Uint16Pnt = (u_int16_t *) FloatPnt;
+				SpotFXPtr->SoundFXVolume = in.f32();
+				SpotFXPtr->SoundFXSpeed = in.f32();
 
 				SpotFXPtr->Red = (u_int8_t) ( ( Colour >> 16 ) & 255 );
 				SpotFXPtr->Green = (u_int8_t) ( ( Colour >> 8 ) & 255 );
@@ -661,8 +536,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			Mxaloadheader->SpotFX = NULL;
 			Mxaloadheader->NumSpotFX = 0;
 		}
-
-		Buffer = (char *) Uint16Pnt;
 	}
 	else
 	{
@@ -670,8 +543,12 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 		Mxaloadheader->FirePoints = NULL;
 		Mxaloadheader->NumSpotFX = 0;
 		Mxaloadheader->SpotFX = NULL;
-		Buffer = (char *) ( Uint16Pnt + 1 );
 	}
+
+	/* Everything the model keeps has been copied out of the file. */
+	free( Mxaloadheader->OrgAddr );
+	Mxaloadheader->OrgAddr = NULL;
+	Mxaloadheader->Buffer = NULL;
 
 	if ( colourkey )
 		DebugPrintf( "Mxaload: %d colourkey triangles found\n", colourkey );
@@ -788,9 +665,8 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 			free ( Mxaloadheader->frame_pnts );
 		Mxaloadheader->frame_pnts = NULL;
 
-		if ( Mxaloadheader->aligned_verts )
-			free( Mxaloadheader->aligned_verts );
-		Mxaloadheader->aligned_verts = NULL;
+		free( Mxaloadheader->anim_verts );
+		Mxaloadheader->anim_verts = NULL;
 	}
 
 	Mxaloadheader->state = false;
@@ -806,11 +682,8 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 	long			File_Size;
 	long			Read_Size;
 	char		*	Buffer;
-	u_int16_t		*	Uint16Pnt;
 	int			i;
-	char	*	FileNamePnt;
 	MXALOADHEADER * Mxaloadheader;
-	u_int32_t		*	Uint32Pnt;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 	int8_t			TempFilename[ 256 ];
@@ -847,10 +720,9 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 
 	Mxaloadheader->OrgAddr = Buffer;
 
-	Uint32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *Uint32Pnt++;
-	VersionNumber = *Uint32Pnt++;
-	Buffer = (char *) Uint32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != MXA_VERSION_NUMBER  ) )
 	{
@@ -858,10 +730,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 		return( false );
 	}
 
-	Uint16Pnt = (u_int16_t *) Buffer;
-
-	Mxaloadheader->num_texture_files = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;		
+	Mxaloadheader->num_texture_files = in.u16();
 
 	if ( Mxaloadheader->num_texture_files > MAXTPAGESPERMXALOAD )
 	{
@@ -874,8 +743,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 		/*	put the filenames in the tex struct	*/
 		for( i = 0;	 i < Mxaloadheader->num_texture_files; i++)
 		{
-			FileNamePnt = (char *) &Mxaloadheader->ImageFile[i];
-			while ( ( *FileNamePnt++ = *Buffer++ ) != 0 );
+			strcpy( Mxaloadheader->ImageFile[i], in.cstring() );
 	
 			if( LevelSpecific )
 				GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mxaloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
@@ -893,7 +761,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 		}
 	}
 
-	Mxaloadheader->Buffer = Buffer;
+	Mxaloadheader->Buffer = (const char *) in.pos();
 
 	return true;
 }
