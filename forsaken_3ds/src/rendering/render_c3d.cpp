@@ -241,13 +241,15 @@ void c3d_memo_suspend(bool suspend)
  * stable across frames qualify (memoEpochPass == SMEMO_PASS_UNSET;
  * XLight1Group marks white-out / underwater execbufs PER_FRAME).
  * Validity is keyed by smemo_persist_gen(): level texture-animation
- * steps bump it (reconvert into the same allocations); level load bumps
- * the reset count (buffers freed lazily at the next FSBeginScene).
+ * steps bump it (reconvert into the same allocations). The buffers are
+ * freed when their level is released (c3d_release_level_cache).
  * Allocation failure or table pressure falls back to the scratch
  * path — never stale data, never a skipped draw. */
 #define PERSIST_BITS 11
 #define PERSIST_SIZE (1u << PERSIST_BITS)
 #define PERSIST_MASK (PERSIST_SIZE - 1u)
+/* Linear memory the cache always leaves free (see persist_store). */
+#define PERSIST_LINEAR_RESERVE (2u * 1024u * 1024u)
 typedef struct {
 	uintptr_t ro;
 	int sub;
@@ -257,7 +259,6 @@ typedef struct {
 	unsigned gen;
 } persist_entry_t;
 static persist_entry_t s_persist[PERSIST_SIZE];
-static unsigned s_persistResetsSeen = 0;
 static unsigned s_persistBytes = 0;
 /* Runtime gate (owner policy 2026-11-14): persist pays in mono
  * (-8.6% measured) and is wall-flat in stereo, where its stills are
@@ -321,6 +322,12 @@ static gpu_vertex_t *persist_store(const void *ro, int sub,
 			e->buf = NULL;
 			e->cap = 0;
 		}
+		/* Never let the cache take the linear memory a texture or
+		 * vertex buffer needs: refuse (the group converts per frame as
+		 * before) unless PERSIST_LINEAR_RESERVE stays free. Checked
+		 * only when allocating, never on a refill or a hit. */
+		if (linearSpaceFree() < count * sizeof(gpu_vertex_t) + PERSIST_LINEAR_RESERVE)
+			return NULL;
 		e->buf = (gpu_vertex_t *)linearAlloc(count * sizeof(gpu_vertex_t));
 		if (!e->buf)
 			return NULL;
@@ -695,6 +702,25 @@ void c3d_clear_bottom_screen(void)
 
 	s_targetCurrent = NULL;
 	s_hudDrawnThisFrame = false;
+}
+
+/* Level release: the persistent cache's buffers belong to the level
+ * being released. Wait until the GPU has finished every queued draw
+ * that may still read them (an empty SYNCDRAW frame waits for the
+ * queue, as c3d_clear_bottom_screen does), then free them, so the next
+ * level loads with that linear memory back. */
+void c3d_release_level_cache(void)
+{
+	if (s_persistBytes == 0)
+		return;
+	if (s_inFrame)
+	{
+		C3D_FrameEnd(0);
+		s_inFrame = false;
+	}
+	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+	C3D_FrameEnd(0);
+	persist_free_all();
 }
 
 void c3d_hud_end_bottom(void)
@@ -1474,12 +1500,6 @@ bool FSBeginScene(void)
 		render_info.stereo_mode == STEREO_MODE_3DS;
 	s_memoMode = stereo_frame ? SMEMO_RECORD : SMEMO_OFF;
 	s_memoSuspended = false;
-	/* Level load/unload bumped the persist reset count: free retained
-	 * buffers once, lazily, before any new conversion can reuse them. */
-	if (s_persistResetsSeen != smemo_persist_resets()) {
-		s_persistResetsSeen = smemo_persist_resets();
-		persist_free_all();
-	}
 	/* Slider gate: mono only (see s_persistActive comment). */
 	s_persistActive = !stereo_frame;
 	s_scratchUsed = 0;

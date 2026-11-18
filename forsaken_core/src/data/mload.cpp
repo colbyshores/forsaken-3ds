@@ -1157,9 +1157,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	DebugPrintf( "Mload: %d colourkey triangles found\n", colourkey );
 	// Mloadheader is valid and can be executed...
 	Mloadheader->state = true;
-	/* New level geometry: retained conversions from any previous
-	 * level must never be reused (backend frees them lazily). */
-	smemo_persist_reset();
 
 #if MXV_VERSION_NUMBER < 3
 	if ( !FindGroupConnections( Mloadheader ) )
@@ -1266,6 +1263,12 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 	}
 
 	FreeGroupConnections();
+
+#if defined(__3DS__) && defined(RENDERER_C3D)
+	/* The backend's persistent cache holds converted copies of these
+	 * execbufs; free it with them, not after the next level has loaded. */
+	c3d_release_level_cache();
+#endif
 
     	for (group = 0; group < Mloadheader->num_groups; group++)
 	{

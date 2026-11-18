@@ -39,7 +39,6 @@ struct StereoMemo {
     Entry tab[SMEMO_SIZE];
     unsigned gen = 1;         /* 0 = invalid (never a valid generation) */
     unsigned persist_gen = 1; /* slower generation, see header */
-    unsigned persist_resets = 0;
 
     static unsigned hash_key(uintptr_t ro, int sub)
     {
@@ -75,13 +74,6 @@ struct StereoMemo {
 
     /* Memo-only: for content the persistent level cache never holds. */
     void invalidate_frame() { bump_gen(); }
-
-    void persist_reset()
-    {
-        ++persist_gen;
-        if (persist_gen == 0) persist_gen = 1;
-        ++persist_resets;
-    }
 
     void record(const void *renderObject, int sub,
                 long offset, int count,
@@ -141,8 +133,6 @@ void smemo_begin_frame(void) { g_memo.begin_frame(); }
 void smemo_invalidate(void) { g_memo.invalidate(); }
 void smemo_invalidate_frame(void) { g_memo.invalidate_frame(); }
 unsigned smemo_persist_gen(void) { return g_memo.persist_gen; }
-void smemo_persist_reset(void) { g_memo.persist_reset(); }
-unsigned smemo_persist_resets(void) { return g_memo.persist_resets; }
 
 void smemo_record(const void *renderObject, int sub,
                   long offset, int count,

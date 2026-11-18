@@ -377,6 +377,7 @@ void c3d_set_object_proctex(bool on);
 void c3d_set_object_shine_eligible(bool eligible);
 void c3d_transfer_eye(unsigned int eye);	/* stereo: switch to the other eye's target */
 void c3d_memo_suspend(bool suspend);		/* stereo: render a nested camera (missile inset) with no memo */
+void c3d_release_level_cache(void);		/* free the persistent level cache (level release) */
 void c3d_upload_xlights(void);				/* push the visible XLights to the vshader */
 void c3d_clear_bottom_screen(void);
 bool c3d_hud_begin_bottom(void);			/* route HUD draws to the bottom screen */

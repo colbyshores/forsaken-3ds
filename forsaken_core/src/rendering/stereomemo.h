@@ -66,15 +66,11 @@ void smemo_invalidate_frame(void);
  * eye never reuses pre-change bytes. */
 void smemo_invalidate(void);
 
-/* R05 persistent-geometry generation: bumped ONLY by smemo_invalidate
- * and smemo_persist_reset (level load), never per frame. The render
- * backend keys retained converted buffers by it; a bump makes them
- * reconvert (into the same allocations) instead of drawing stale. */
+/* Persistent-geometry generation: bumped ONLY by smemo_invalidate,
+ * never per frame. The render backend keys retained converted buffers
+ * by it; a bump makes them reconvert (into the same allocations)
+ * instead of drawing stale. The backend frees them at level release. */
 unsigned smemo_persist_gen(void);
-void smemo_persist_reset(void);
-/* Monotonic reset count: the backend frees retained buffers when it
- * observes this increase (level unload/load), lazily at frame begin. */
-unsigned smemo_persist_resets(void);
 
 /* Record eye 1's converted range for this batch identity plus its fill
  * epoch (pass, group, resume index). Offsets are element counts (never
