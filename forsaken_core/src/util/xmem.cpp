@@ -1,4 +1,5 @@
-#define XMEM_INCLUDED // we don't want xmem.h to include here
+/* xmem.cpp -- DEBUG_ON allocation tracker and MemUsed; see xmem.h. */
+#define XMEM_INCLUDED // keep xmem.h (and its malloc/free redirects) out of this file
 #include <stdio.h>
 #include "game/main.h"
 #include "util/util.h"
@@ -124,7 +125,7 @@ void * X_malloc( size_t size, const char *in_file, int in_line )
 	BlockInLine[i] = in_line;
 	MemUsed += size;
 
-	memset(Pnt,0,size); // this protects whole program against dirty memory (was sizeof(Pnt): 8-byte overrun on small blocks)
+	memset(Pnt,0,size); // DEBUG_ON builds hand out zeroed blocks; release malloc does not
 
 	return Pnt;
 
@@ -154,7 +155,7 @@ void * X_calloc( size_t num,size_t size, const char *in_file, int in_line )
 	BlockInLine[i] = in_line;
 	MemUsed += num * size;
 	
-	memset(Pnt,0,size); // this protects whole program against dirty memory (was sizeof(Pnt): 8-byte overrun on small blocks)
+	memset(Pnt,0,size); // redundant: calloc already zeroed the block (this covers only size bytes)
 
 	return Pnt;
 
