@@ -37,11 +37,9 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 	for( i = 0 ; i < MAXTPAGESPERTLOAD ; i++ )
 	{
 		Tloadheader->lpTexture[i]     = NULL; // texture
-		Tloadheader->Scale[i]		  = false;// Should it scale??
 
 		Tloadheader->MipMap[i]		  = false;// Should it have Mip Maps
 		Tloadheader->PlaceHolder[i]	  = false;// Is it a placeholder ( for subsequent dynamicly loaded textures )
-		Tloadheader->LOD[i]			  = false;// How many Levels of Mip Map
 
 		Tloadheader->Xsize[ i ] = 0;		
 		Tloadheader->Ysize[ i ] = 0;
@@ -256,7 +254,7 @@ int16_t	FindTexture( TLOADHEADER * Tloadheader , const char * Name )
 	Output		:		-1 if too many tpages
 ===================================================================*/
 
-int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t ColourKey  , bool Scale , bool MipMap, int16_t xsize, int16_t ysize )
+int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t ColourKey  , bool MipMap, int16_t xsize, int16_t ysize )
 {
 	int16_t i;
 	char * NamePnt;
@@ -266,7 +264,6 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t Co
 	{
 	 	i = Tloadheader->num_texture_files;
 		Tloadheader->ColourKey[i] = ColourKey;
-		Tloadheader->Scale[i] = false;		// cannot allow scaling of placeholder!
 		Tloadheader->MipMap[i] = MipMap;
 		Tloadheader->ImageFile[i][0] = 0;
 		Tloadheader->PlaceHolder[i] = true;
@@ -291,7 +288,6 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t Co
 
 	i = Tloadheader->num_texture_files;
 	Tloadheader->ColourKey[i] = ColourKey;
-	Tloadheader->Scale[i] = Scale;
 	Tloadheader->MipMap[i] = MipMap;
 	NamePnt = (char *) &Tloadheader->ImageFile[i];
 	while( ( *NamePnt++ = *Name++ ) != 0 )

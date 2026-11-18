@@ -743,7 +743,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 				sprintf( (char*)&TempFilename[ 0 ], "data\\textures\\%s", &Mxaloadheader->ImageFile[i][0] );
 
 			if (Mxaloadheader->AllocateTPage & LOAD_TPAGES)
-				Mxaloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[0] , true , true ,false, 0, 0 );
+				Mxaloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[0] , true ,false, 0, 0 );
 			
 			if( Mxaloadheader->TloadIndex[i] == -1 )
 			{

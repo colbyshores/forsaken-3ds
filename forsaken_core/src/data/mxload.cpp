@@ -1004,7 +1004,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 			else
 				sprintf( (char*)&TempFilename[ 0 ], "data\\textures\\%s", &Mxloadheader->ImageFile[i][0] );
 
-			Mxloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[ 0 ], (u_int16_t) (Panel ^ true) , Panel ^ true, false, 0, 0 );
+			Mxloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[ 0 ], (u_int16_t) (Panel ^ true) , false, 0, 0 );
 			if( Mxloadheader->TloadIndex[i] == -1 )
 			{
 				Msg( "PreMxload() Too many TPages\n" );

@@ -134,7 +134,7 @@ bool PreWaterLoad( char * Filename )
 	
 	DebugPrintf("loading water texture: %s\n",TempFilename);
 
-	WaterTPage = AddTexture( &Tloadheader , (char*)&TempFilename[ 0 ], true , true , true, 0, 0 );		// dont colourkey
+	WaterTPage = AddTexture( &Tloadheader , (char*)&TempFilename[ 0 ], true , true, 0, 0 );		// dont colourkey
 	WaterBuffer = Buffer;
 	return true;
 }

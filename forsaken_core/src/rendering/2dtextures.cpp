@@ -26,9 +26,6 @@
 /*===================================================================
 	Globals
 ===================================================================*/
-#define	DO_SCALE		true
-#define	DONT_SCALE		false
-
 int8_t	*	OffsetPath = (int8_t*)"data\\offsets\\";
 int8_t  * FontBigFile = (int8_t*)"fontbig.off";
 int8_t	*	Font512File = (int8_t*)"font512.off";
@@ -90,54 +87,54 @@ float VduScaleX, VduScaleY;
 
 OFF_FILES OffsetFiles[] = {
 
-	{ (int8_t*)"Credits.off",	&CreditsFont_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Credits Font
-	{ (int8_t*)"Num2.off",		&Numbers_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Countdown Numbers
-	{ (int8_t*)"Num3.off",		&Numbers2_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Countdown Numbers
-	{ (int8_t*)"arc.off",		&Arc_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Arc
-	{ (int8_t*)"bits.off",		&Bits_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Bits
-	{ (int8_t*)"expl.off",		&Exp2_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Gregs Explosion
-	{ (int8_t*)"flare.off",		&Flare_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Flare
-	{ (int8_t*)"laser.off",		&Laser_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Laser
-	{ (int8_t*)"pulsar.off",		&Pulsar_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Pulsar
-	{ (int8_t*)"puls_exp.off",	&Pulsar_Exp_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Pulsar Explosion
-	{ (int8_t*)"pultrail.off",	&Pulsar_Trail_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Pulsar Trail
-	{ (int8_t*)"shrapnel.off",	&Shrapnel_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Shrapnel Explosion
-	{ (int8_t*)"smlexpl.off",	&Exp_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// My Explosion
-	{ (int8_t*)"Trojax1.off",	&Trojax1_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Trojax 1
-	{ (int8_t*)"Trojax2.off",	&Trojax2_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Trojax 2
-	{ (int8_t*)"Troj_exp.off",	&Trojax_Exp_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Trojax Explosion
-	{ (int8_t*)"Circle.off",		&Circle_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Pickup Circle
-	{ (int8_t*)"Blood.off",		&Blood_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Blood
-	{ (int8_t*)"Lensflar.off",	&LensFlare_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Lensflare
-	{ (int8_t*)"Afterbrn.off",	&AfterBurner_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Afterburner
-	{ (int8_t*)"Grvtrail.off",	&GravgonTrail_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Gravgon Trail
-	{ (int8_t*)"Soltrail.off",	&SolarisTrail_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Solaris Trail
-	{ (int8_t*)"Newtrail.off",	&NewTrail_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// New Trail
-	{ (int8_t*)"Pikgen.off",		&PickupRegen_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Pickup Regeneration
-    { (int8_t*)"Scttrail.off",	&ScatterTrail_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Scatter Trail
-	{ (int8_t*)"Greyflar.off",	&GreyFlare_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Grey Flare Trail
-	{ (int8_t*)"BigFlash.off",	&BigFlash_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Grey Flare Trail
-	{ (int8_t*)"Splat.off",		&BloodSplat_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Blood Splat
-	{ (int8_t*)"SpltDrib.off",	&BloodDribble_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Blood Splat & Dribble
-	{ (int8_t*)"Target.off",		&Target_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Target
-	{ (int8_t*)"Orb.off",		&Orb_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Orb
-	{ (int8_t*)"Solid.off",		&Solid_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Solid 8x8
-	{ (int8_t*)"Multiple.off",	&Multiple_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Multiple
-	{ (int8_t*)"Thermo.off",		&Thermo_Header,			DONT_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Thermo Meter
-	{ (int8_t*)"Nmebuits.off",	&NMEBullet_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// NME Bullets
-	{ (int8_t*)"Bigexp1.off",	&BigExp1_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Big Explosion 1
-	{ (int8_t*)"Mushroom.off",	&Mushroom_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Mushroom Explosion
-	{ (int8_t*)"Bubble.off",		&Bubble_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Bubble Header
-	{ (int8_t*)"Nmegen.off",		&EnemyGen_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Enemy Generation
-	{ (int8_t*)"Bubble.off",		&Drip_Header,			DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Drip
-	{ (int8_t*)"Restart.off",	&Restart_Header,		DONT_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Restart
-	{ (int8_t*)"BlueSprk.off",	&BlueSpark_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Blue Spark
-	{ (int8_t*)"Tentacle.off",	&Tentacle_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Tentacle
-	{ (int8_t*)"Flag.off",		&Flag_Header,			DONT_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Flag
-	{ (int8_t*)"Flags.off",		&Flags_Header,			DONT_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Flags
-	{ &FontFile[ 0 ],	&Text512_Header,		DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// 512x284 Font/Text
-	{ &FontFileBig[0], &Text512b_Header, DONT_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 }, // bigger Font/text
-	{ NULL,				NULL,					DO_LOAD,	DO_SCALE,	LOAD_TPAGES_FINISH, 0, 0 },
+	{ (int8_t*)"Credits.off",	&CreditsFont_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Credits Font
+	{ (int8_t*)"Num2.off",		&Numbers_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Countdown Numbers
+	{ (int8_t*)"Num3.off",		&Numbers2_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Countdown Numbers
+	{ (int8_t*)"arc.off",		&Arc_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Arc
+	{ (int8_t*)"bits.off",		&Bits_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Bits
+	{ (int8_t*)"expl.off",		&Exp2_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Gregs Explosion
+	{ (int8_t*)"flare.off",		&Flare_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Flare
+	{ (int8_t*)"laser.off",		&Laser_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Laser
+	{ (int8_t*)"pulsar.off",		&Pulsar_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Pulsar
+	{ (int8_t*)"puls_exp.off",	&Pulsar_Exp_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Pulsar Explosion
+	{ (int8_t*)"pultrail.off",	&Pulsar_Trail_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Pulsar Trail
+	{ (int8_t*)"shrapnel.off",	&Shrapnel_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Shrapnel Explosion
+	{ (int8_t*)"smlexpl.off",	&Exp_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// My Explosion
+	{ (int8_t*)"Trojax1.off",	&Trojax1_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Trojax 1
+	{ (int8_t*)"Trojax2.off",	&Trojax2_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Trojax 2
+	{ (int8_t*)"Troj_exp.off",	&Trojax_Exp_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Trojax Explosion
+	{ (int8_t*)"Circle.off",		&Circle_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Pickup Circle
+	{ (int8_t*)"Blood.off",		&Blood_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Blood
+	{ (int8_t*)"Lensflar.off",	&LensFlare_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Lensflare
+	{ (int8_t*)"Afterbrn.off",	&AfterBurner_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Afterburner
+	{ (int8_t*)"Grvtrail.off",	&GravgonTrail_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Gravgon Trail
+	{ (int8_t*)"Soltrail.off",	&SolarisTrail_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Solaris Trail
+	{ (int8_t*)"Newtrail.off",	&NewTrail_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// New Trail
+	{ (int8_t*)"Pikgen.off",		&PickupRegen_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Pickup Regeneration
+    { (int8_t*)"Scttrail.off",	&ScatterTrail_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Scatter Trail
+	{ (int8_t*)"Greyflar.off",	&GreyFlare_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Grey Flare Trail
+	{ (int8_t*)"BigFlash.off",	&BigFlash_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Grey Flare Trail
+	{ (int8_t*)"Splat.off",		&BloodSplat_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Blood Splat
+	{ (int8_t*)"SpltDrib.off",	&BloodDribble_Header,	DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Blood Splat & Dribble
+	{ (int8_t*)"Target.off",		&Target_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Target
+	{ (int8_t*)"Orb.off",		&Orb_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Orb
+	{ (int8_t*)"Solid.off",		&Solid_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Solid 8x8
+	{ (int8_t*)"Multiple.off",	&Multiple_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Multiple
+	{ (int8_t*)"Thermo.off",		&Thermo_Header,			DONT_LOAD,	LOAD_TPAGES, 0, 0 },	// Thermo Meter
+	{ (int8_t*)"Nmebuits.off",	&NMEBullet_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// NME Bullets
+	{ (int8_t*)"Bigexp1.off",	&BigExp1_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Big Explosion 1
+	{ (int8_t*)"Mushroom.off",	&Mushroom_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Mushroom Explosion
+	{ (int8_t*)"Bubble.off",		&Bubble_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Bubble Header
+	{ (int8_t*)"Nmegen.off",		&EnemyGen_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Enemy Generation
+	{ (int8_t*)"Bubble.off",		&Drip_Header,			DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Drip
+	{ (int8_t*)"Restart.off",	&Restart_Header,		DONT_LOAD,	LOAD_TPAGES, 0, 0 },	// Restart
+	{ (int8_t*)"BlueSprk.off",	&BlueSpark_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Blue Spark
+	{ (int8_t*)"Tentacle.off",	&Tentacle_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// Tentacle
+	{ (int8_t*)"Flag.off",		&Flag_Header,			DONT_LOAD,	LOAD_TPAGES, 0, 0 },	// Flag
+	{ (int8_t*)"Flags.off",		&Flags_Header,			DONT_LOAD,	LOAD_TPAGES, 0, 0 },	// Flags
+	{ &FontFile[ 0 ],	&Text512_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// 512x284 Font/Text
+	{ &FontFileBig[0], &Text512b_Header, DONT_LOAD, LOAD_TPAGES, 0, 0 }, // bigger Font/text
+	{ NULL,				NULL,					DO_LOAD,	LOAD_TPAGES_FINISH, 0, 0 },
 
 };
 
@@ -149,14 +146,14 @@ FRAME_INFO	*	Title_TVFrame_Header;
 
 OFF_FILES Title_OffsetFiles[] = {
 
-	{ (int8_t*)"chars1.off",			&Title_Chars1_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 },		
-	{ (int8_t*)"chars2.off",			&Title_Chars2_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 },		
-	{ (int8_t*)"",					&Title_LevelPics_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 256, 128 },		
-	{ (int8_t*)"",					&Title_TVFrame_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 128, 128 },		
-	{ &TitleFontFile[ 0 ],	&Title_Fonts_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 },	// vdu font page
-	{ &FontFile[ 0 ],		&Text512_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 },	// 512x284 Font/Text
-  { &FontFileBig[ 0 ], &Text512b_Header, DONT_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 }, // bigger font/text
-	{ NULL,					NULL, DO_LOAD, DO_SCALE, LOAD_TPAGES_FINISH, 0, 0 },			  
+	{ (int8_t*)"chars1.off",			&Title_Chars1_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },		
+	{ (int8_t*)"chars2.off",			&Title_Chars2_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },		
+	{ (int8_t*)"",					&Title_LevelPics_Header, DO_LOAD, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 256, 128 },		
+	{ (int8_t*)"",					&Title_TVFrame_Header, DO_LOAD, LOAD_TPAGES_PLACEHOLDER | LOAD_TPAGES, 128, 128 },		
+	{ &TitleFontFile[ 0 ],	&Title_Fonts_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },	// vdu font page
+	{ &FontFile[ 0 ],		&Text512_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },	// 512x284 Font/Text
+  { &FontFileBig[ 0 ], &Text512b_Header, DONT_LOAD, LOAD_TPAGES, 0, 0 }, // bigger font/text
+	{ NULL,					NULL, DO_LOAD, LOAD_TPAGES_FINISH, 0, 0 },			  
 };
 
 
@@ -171,11 +168,10 @@ typedef struct
 	Procedure	:	Load Texture Pages, Offsets and Sizes
 				:	for 2D Faceme polygons
 	Input		:	int8_t		*	Filename of offset file
-				:	bool			Scale
 				:	bool			LoadTPages
 	Output		:	FRAME_INFO	*	Structure for offset file
 ===================================================================*/
-FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16_t *last_tpage, int16_t xsize, int16_t ysize, bool placeholder )
+FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpage, int16_t xsize, int16_t ysize, bool placeholder )
 {
 	int16_t			Name_Index[ MAX_NAMES ];
 	int8_t		*	Off_Buffer;
@@ -207,7 +203,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 			return( NULL );
 		}
 
-		Frm_Info->vid_tpage_index = AddTexture( &Tloadheader, "", true , Scale , false, xsize, ysize );	// add dummy texture
+		Frm_Info->vid_tpage_index = AddTexture( &Tloadheader, "", true , false, xsize, ysize );	// add dummy texture
 		if( Frm_Info->vid_tpage_index == -1 )
 		{
 			free( Frm_Info );
@@ -281,7 +277,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 
 			if( LoadTPages & LOAD_TPAGES)
 			{
-				Name_Index[ Count ] = AddTexture( &Tloadheader, (char*)&TempFilename[ 0 ], true , Scale , false, 0, 0 );
+				Name_Index[ Count ] = AddTexture( &Tloadheader, (char*)&TempFilename[ 0 ], true , false, 0, 0 );
 				strcpy ( tpagename, (char*)Char_Ptr );
 				*last_tpage = Name_Index[ Count ];
 				if( Name_Index[ Count ] == -1 )
@@ -401,7 +397,7 @@ bool Load_All_Off_Files( OFF_FILES * FileInfo )
 
 			sprintf((char*)TempFilename,"%s%s",OffsetPath,FileInfo->Filename);
 
-			*FileInfo->InfoPtrAddr = Load_Off_File( &TempFilename[ 0 ], FileInfo->Scale, FileInfo->LoadTPages, &last_tpage, FileInfo->xsize, FileInfo->ysize, ( FileInfo->LoadTPages & LOAD_TPAGES_PLACEHOLDER ) );
+			*FileInfo->InfoPtrAddr = Load_Off_File( &TempFilename[ 0 ], FileInfo->LoadTPages, &last_tpage, FileInfo->xsize, FileInfo->ysize, ( FileInfo->LoadTPages & LOAD_TPAGES_PLACEHOLDER ) );
 			if( *FileInfo->InfoPtrAddr == NULL )
 			{
 				Msg( "offset file missing or too many tpages\n%s\n", &TempFilename[ 0 ] );

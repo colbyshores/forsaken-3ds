@@ -32,14 +32,12 @@ typedef struct TLOADHEADER{
 	u_int16_t num_texture_files;
 	u_int16_t				Xsize[MAXTPAGESPERTLOAD];		// the Xsize now
 	u_int16_t				Ysize[MAXTPAGESPERTLOAD];		// the Ysize now
-	bool				Scale[MAXTPAGESPERTLOAD];		// Can I Be Scaled....???
 	bool				ColourKey[MAXTPAGESPERTLOAD];	// 0 not colour keyed
     char                ImageFile[MAXTPAGESPERTLOAD][256]; /* files */
     LPTEXTURE			lpTexture[MAXTPAGESPERTLOAD]; /* texture objs */
 	bool				MipMap[MAXTPAGESPERTLOAD];
 	bool				PlaceHolder[MAXTPAGESPERTLOAD];	// is the texture a placeholder ( for subsequent dynamic loading of textures? )
 	char				*PlaceHolderFile[MAXTPAGESPERTLOAD];	// current full path of file occupying placeholder ( needed to restore surface )
-	int					LOD[MAXTPAGESPERTLOAD];
 }TLOADHEADER;
 
 /*
@@ -55,7 +53,7 @@ bool TloadAllTextures(TLOADHEADER * Tloadheader);
 int16_t	FindTexture( TLOADHEADER * Tloadheader , const char * Name );
 
 void GetLevelTexturePath( char * destination, char * file, char * level );
-int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t ColourKey , bool Scale , bool MipMap, int16_t xsize, int16_t ysize );
+int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t ColourKey , bool MipMap, int16_t xsize, int16_t ysize );
 int16_t	FindTexture( TLOADHEADER * Tloadheader , const char * Name );
 
 bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n );
