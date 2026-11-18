@@ -71,8 +71,6 @@ static	VECTOR	ODir;
 static	VECTOR	IPoint;
 static	float	IDist;
 
-bool CheckRestartPointCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
-					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
 
 bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
@@ -440,21 +438,6 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 
 	}
 
-#if ENABLE_RESTART
-	if( CheckRestartPointCol( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
-	{
-		collided += ColCollided;
-		e.x = ( ImpactPoint->x - Pos->x );
-		e.y = ( ImpactPoint->y - Pos->y );
-		e.z = ( ImpactPoint->z - Pos->z );
-		Distance = VectorLength( &e );
-		BSPFace.nx = FaceNormal->nx;
-		BSPFace.ny = FaceNormal->ny;
-		BSPFace.nz = FaceNormal->nz;
-		BSPFace.D = -DotProduct( (VECTOR *) FaceNormal, ImpactPoint );
-		CollFace = &BSPFace;
-	}
-#endif
 
 	if( BGCol )
 	{
@@ -738,83 +721,6 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 	return( false );
 }
 
-/*===================================================================
-	Procedure	:	Check Ship to RestartPoints Collision
-	Input		:	u_int16_t		Group
-				:	float		Distance to intersection
-				:	VECTOR	*	ImpactPoint
-				:	int			collided
-				:	VECTOR	*	New_Pos
-				:	NORMAL	*	Collision Normal
-				:	BGOBJECT ** Bgobject
-	Output		:	bool		True/False
-===================================================================*/
-bool CheckRestartPointCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
-					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject )
-{
-	float			D;
-	VECTOR			Dn;
-	float			C;
-	VECTOR			e;
-	float			nDOTe;
-
-	RESTART		*	Object;
-
-	ColDist = Distance;
-	ColChild = NULL;
-	ColCollided = collided;
-	CurParent = NULL;
-
-	Object = FirstRestartUsed;
-
-	while( Object != NULL )
-	{
-		if( !SoundInfo[ Object->Group ][ Group ] )
-		{
-			if( Object->Components )
-			{
-				CollideBGOChildren( Object->Components, 1 );
-			}
-		}
-
-		Object = Object->NextUsed;
-	}
-
-	if( ColChild )
-	{
-		ApplyMatrix( &ColChild->DisplayMatrix, &ColPoint, ImpactPoint );
-		ImpactPoint->x += ColChild->DisplayPos.x;
-		ImpactPoint->y += ColChild->DisplayPos.y;
-		ImpactPoint->z += ColChild->DisplayPos.z;
-		ApplyMatrix( &ColChild->DisplayMatrix, &ColSide->Normal, (VECTOR *) FaceNormal );
-
-		C = -( ( FaceNormal->nx * ImpactPoint->x ) + ( FaceNormal->ny * ImpactPoint->y ) + ( FaceNormal->nz * ImpactPoint->z ) );
-
-		e.x = Origin.x + ODir.x;	
-		e.y = Origin.y + ODir.y;	
-		e.z = Origin.z + ODir.z;	
-	
-		nDOTe =	( ( e.x * FaceNormal->nx ) + ( e.y * FaceNormal->ny ) + ( e.z * FaceNormal->nz ) ) + C;
-		
-		D = ( (float) fabsf(nDOTe) ) + COLLISION_FUDGE ; 
-	
-		Dn.x = D * FaceNormal->nx; 
-		Dn.y = D * FaceNormal->ny; 
-		Dn.z = D * FaceNormal->nz; 
-	
-		New_Pos->x = e.x + Dn.x;
-		New_Pos->y = e.y + Dn.y;
-		New_Pos->z = e.z + Dn.z;
-		return( true );
-	}
-
-	if( BGObject )
-	{
-		*BGObject = NULL;
-	}
-
-	return( false );
-}
 
 /*===================================================================
 	Procedure	:	Check Ray to Enemy Polygonal Collision

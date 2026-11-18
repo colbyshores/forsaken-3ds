@@ -2506,8 +2506,6 @@ void	UpdateStartPos( void )
 					(Temp.y <= SHIP_RADIUS * 4.0F ) &&
 					(Temp.z <= SHIP_RADIUS * 4.0F ) )
 				{
-					ActivateRestartPoint( startpos, last_start_position );
-
 					PlaySfx( SFX_RestartPointReached, 1.0F );
 					AddColourMessageToQue(SystemMessageColour, RESTART_ACTIVATED );
 					last_start_position = startpos;

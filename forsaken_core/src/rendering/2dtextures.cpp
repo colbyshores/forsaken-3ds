@@ -544,8 +544,7 @@ void EnableRelevantOffFiles( OFF_FILES * FileInfo )
 		if( !DecreaseTemperature ) DisableOffFile( &OffsetFiles[ 0 ], (int8_t*)"Thermo.off" );
 		else EnableOffFile( &OffsetFiles[ 0 ], (int8_t*)"Thermo.off" );
 
-		if( !ENABLE_RESTART ) DisableOffFile( &OffsetFiles[ 0 ], (int8_t*)"Restart.off" );
-		else EnableOffFile( &OffsetFiles[ 0 ], (int8_t*)"Restart.off" );
+		DisableOffFile( &OffsetFiles[ 0 ], (int8_t*)"Restart.off" );
 
 		if( !CaptureTheFlag && !BountyHunt ) DisableOffFile( &OffsetFiles[ 0 ], (int8_t*)"Flag.off" );
 		else EnableOffFile( &OffsetFiles[ 0 ], (int8_t*)"Flag.off" );

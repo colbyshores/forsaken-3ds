@@ -1315,7 +1315,6 @@ void ReleaseLevel(void)
 
     KillAllBGObjects();
     ReleaseAllEnemies();
-    ReleaseAllRestartPoints();
     DestroySound( DESTROYSOUND_All );
     break;
   }
@@ -1450,7 +1449,6 @@ InitScene(void)
   InitAmmoUsed();
   InitAfterBurners();
   InitBGObjects();
-  InitRestartPoints();
   InitEnemies();
 
   for( i = 0 ; i < MAX_PLAYERS ; i++ )
@@ -2654,11 +2652,6 @@ bool RenderScene( void )
         SeriousError = true;
         return false;
       }
-      if( !PreLoadRestartPoints() )
-      {
-        SeriousError = true;
-        return false;
-      }
       if( !PreLoadEnemies() )
       {
         SeriousError = true;
@@ -2787,13 +2780,6 @@ bool RenderScene( void )
     {
       SeriousError = true;
       Msg( "LoadStartPoints() failed\n" );
-      return( false );
-    }
-
-    if( !LoadRestartPoints() )
-    {
-      SeriousError = true;
-      Msg( "LoadRestartPoints() failed\n" );
       return( false );
     }
 
@@ -3125,7 +3111,6 @@ void MainRoutines( void )
   if( !PlayDemo ) RegeneratePickups();
   ProcessPickups();
   ProcessBGObjects( true );
-  ProcessRestartPoints();
   ProcessModels();
   ProcessPolys();
   ProcessXLights( &Mloadheader );
