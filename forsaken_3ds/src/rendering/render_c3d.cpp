@@ -2630,7 +2630,7 @@ NEXT_LIGHT:
 
 /*===================================================================
 	Draw functions — native citro3d path
-	Submits triangles directly with C3D_DrawArrays; picaGL is not linked.
+	Submits triangles directly with C3D_DrawArrays.
 ===================================================================*/
 
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)

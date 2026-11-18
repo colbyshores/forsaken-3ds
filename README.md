@@ -109,7 +109,7 @@ either platform.
   mesh group through one shared `cam->Proj` projection paired with a
   GPU scissor masking writes to the per-group sub-rect, so shared
   vertices project to bit-identical screen pixels in every group
-  that draws them. picaGL keeps the engine standard.
+  that draws them. The PC (Vulkan) build keeps the engine standard.
 - **In-game graphics toggles + persistence.** Pause → Options → Visuals
   exposes "Object shine" and "Wall detail" toggles, persisted via
   `Configs/main.txt` (keys `ObjectShine` / `WallDetail`). Each toggle
@@ -149,8 +149,7 @@ either platform.
 export DEVKITPRO=/opt/devkitpro
 export DEVKITARM=$DEVKITPRO/devkitARM
 
-# Default renderer is citro3d (native, hardware stereo).
-# `RENDERER=picagl` builds the mono fallback path.
+# The renderer is citro3d (native, hardware stereo).
 make -f Makefile.3ds
 
 # Output: forsaken3ds.3dsx
@@ -546,7 +545,6 @@ needed.
   KPF extraction pipeline
 - **Community source port**: [ForsakenX](https://github.com/ForsakenX/forsaken)
 - **3DS port**: Colby Shores
-- **picaGL**: [masterfeizz](https://github.com/masterfeizz/picaGL)
 - **HD texture source**: Forsaken Remastered 4K texture pack
 - **CIA tooling**: 3DSGuy/Project_CTR (`makerom`),
   carstene1ns/3ds-bannertool
