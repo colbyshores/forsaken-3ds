@@ -37,6 +37,7 @@
 
 #include "world/collision.h"
 #include "game/oct2.h"
+#include "util/file_reader.h"
 
 /*===================================================================
 		Defines
@@ -64,10 +65,6 @@ bool Nodeload( char * Filename )
 {
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	int32_t		*	int32Pnt;
-	u_int32_t		*	u_int32Pnt;
-	int16_t		*	int16Pnt;
-	float		*	FloatPnt;
 	int			e,o,i;
 	long			File_Size;
 	long			Read_Size;
@@ -113,10 +110,9 @@ bool Nodeload( char * Filename )
 		return false;
 	}
 
-	u_int32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *u_int32Pnt++;
-	VersionNumber = *u_int32Pnt++;
-	Buffer = (char *) u_int32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != NOD_VERSION_NUMBER  ) )
 	{
@@ -124,8 +120,7 @@ bool Nodeload( char * Filename )
 		return( false );
 	}
 
-	int32Pnt = (int32_t*) Buffer;
-	NodeNetworkHeader.NumOfNodes = *int32Pnt++;
+	NodeNetworkHeader.NumOfNodes = in.i32();
 
 	if( NodeNetworkHeader.NumOfNodes >= MAXNODES )
 	{
@@ -151,24 +146,16 @@ bool Nodeload( char * Filename )
 		Msg( "Nodeload failed allocate Node Pointer in %s \n", Filename );
 		return false;
 	}
-	Buffer = (char*) int32Pnt;
-	
+
 	for( e = 0 ; e < NodeNetworkHeader.NumOfNodes ; e++ )
 	{
-		int16Pnt = (int16_t*) Buffer;
-		NodePnt->Group = *int16Pnt++;
-		FloatPnt = (float*) int16Pnt;
-		
+		NodePnt->Group = in.i16();
 		NodePnt->NodeNum = e;
-		memcpy_unaligned(&NodePnt->Pos, FloatPnt, 4*3);
-		FloatPnt+=3;
-		memcpy(&NodePnt->Radius, FloatPnt++, 4);
-		u_int32Pnt = (u_int32_t*) FloatPnt;
-		NodePnt->NetMask = *u_int32Pnt++;				// which networks this node is in...
-
-		int16Pnt = (int16_t*) u_int32Pnt;
-		NodePnt->Flags = (u_int16_t) *int16Pnt++;
-		NodePnt->NumOfLinks = *int16Pnt++;
+		NodePnt->Pos = in.vec();
+		NodePnt->Radius = in.f32();
+		NodePnt->NetMask = in.u32();				// which networks this node is in...
+		NodePnt->Flags = (u_int16_t) in.i16();
+		NodePnt->NumOfLinks = in.i16();
 		
 		if( NodePnt->NumOfLinks > MAXLINKSPERNODE )
 		{
@@ -183,14 +170,12 @@ bool Nodeload( char * Filename )
 			 * failing to load entirely. */
 			int over = NodePnt->NumOfLinks - MAXLINKSPERNODE;
 			NodePnt->NumOfLinks = MAXLINKSPERNODE;
-			int32Pnt = (int32_t*) int16Pnt;
 			for( o = 0 ; o < MAXLINKSPERNODE ; o++ )
 			{
-				NodePnt->NodeLink[o] = NodeNetworkHeader.FirstNode + *int32Pnt++;
+				NodePnt->NodeLink[o] = NodeNetworkHeader.FirstNode + in.i32();
 			}
 			/* skip the extra link IDs in the file */
-			int32Pnt += over;
-			int16Pnt = (int16_t*) int32Pnt;
+			in.skip( over * sizeof( int32_t ) );
 			goto _skipped_extra_links;
 #else
 			Msg( "NoadLoad failed too many Nodelinks in network , Node %d \n", e );
@@ -201,11 +186,9 @@ bool Nodeload( char * Filename )
 		{
 			DebugPrintf("No Links for Node %d\n" , e );
 		}
-		int32Pnt = (int32_t*) int16Pnt;
 		for( o = 0 ; o < NodePnt->NumOfLinks ; o++ )
 		{
-
-			NodePnt->NodeLink[o] = NodeNetworkHeader.FirstNode + *int32Pnt++;
+			NodePnt->NodeLink[o] = NodeNetworkHeader.FirstNode + in.i32();
 		}
 #ifdef EDITION_REMASTER
 _skipped_extra_links: ;
@@ -274,7 +257,6 @@ _skipped_extra_links: ;
 		NodeInGroup[NodePnt->Group] = NodePnt;
 		
 		NodePnt++;
-		Buffer = (char*) int32Pnt;
 	}
 
 	// All Node Networks have been loaded...
