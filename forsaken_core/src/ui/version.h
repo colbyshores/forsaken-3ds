@@ -1,16 +1,26 @@
 #pragma once
 
+/* version.h -- build name and multiplayer protocol version
+ *
+ * PXVersion is "ProjectX-<PXV>.<PXMPV>.<PXRV>-<PXBV>-<ARCH>", e.g.
+ * ProjectX-1.18.0-3DS-ARM. The PC window title shows it, networking.cpp puts
+ * it in its version messages, and the PC net tracker (net_tracker.cpp) sends
+ * it in a space-separated "hosting" line, so it must contain no spaces and
+ * fit in MAX_PXVersion. PXMPVINT is the number the join handshake compares
+ * (networking.cpp); bump PXMPV and PXMPVINT together whenever multiplayer
+ * compatibility breaks.
+ */
+
 // major version
 #define PXV	 "1"
 
 // multiplayer version (increase if you break multiplayer compatibility)
 #define PXMPV	 "18"
 
-// multiplayer compatibility flag
+// numeric PXV + PXMPV, sent and compared when a player joins
 #define PXMPVINT 118
 
-// revision (should be provided at build time for official builds)
-// make PXRV=$(svn info | grep Revision | awk '{print $NF}')
+// revision; override with -DPXRV=... (neither Makefile sets it)
 #ifndef PXRV
     #define PXRV	 "0"
 #endif
@@ -24,7 +34,7 @@
     #endif
 #endif
 
-// architecture
+// architecture: "64" for every non-3DS build
 #ifdef __3DS__
   #define ARCH "ARM"
 #else
@@ -34,5 +44,5 @@
 // the full version name (must contain no spaces for net_tracker)
 #define PXVersion "ProjectX-" PXV "." PXMPV "." PXRV "-" PXBV "-" ARCH
 
-// this should be plenty if not please increase this
+// space net_tracker.cpp reserves for PXVersion in its hosting message
 #define MAX_PXVersion 45

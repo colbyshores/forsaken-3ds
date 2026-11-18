@@ -1,4 +1,14 @@
 #pragma once
+
+/* englishlocal.h -- English in-game message strings
+ *
+ * String-literal macros (team, pickup and death-method names; network,
+ * flag, bounty, pickup and HUD messages), grouped under the .cpp that prints
+ * them. Included only through ui/local.h; front-end menu strings are in
+ * localtitle.h. Many are printf formats: the trailing comments give the
+ * arguments, and the sprintf calls must pass matching types.
+ */
+
 // in the following text:
 // <team name>=any one of LT_TEAM_??? defined below
 
@@ -26,9 +36,6 @@
 #define THE_COLOUR_TEAM_FLAG_HAS_ESCAPED_FROM_THEIR_GOAL "the %s team flag has escaped from their goal"	// %s=<team name>
 #define HAS_GOT_THE_BOUNTY "has got the bounty"
 #define ON_YOUR_OWN_TEAM "On Your Own Team"
-
-// multiplayer.cpp
-
 
 // pickups.cpp
 // in the following text:
@@ -85,8 +92,8 @@
 #define YOUVE_EARNED_EXTRA_LIFE			"You've earned yourself an extra life..."
 #define YOU_HAVE_ONE_GOLD_BAR			"You now have %hd gold bar" // %hd=1
 #define YOU_HAVE_GOLD_BARS				"You now have %hd gold bars" // %hd=2, 3, 4...
-#define YOU_HAVE_ONE_CRYSTAL			"You now have %d crystal" // %hd=1
-#define YOU_HAVE_CRYSTALS				"You now have %d crystals" // %hd=2, 3, 4...
+#define YOU_HAVE_ONE_CRYSTAL			"You now have %d crystal" // %d=1
+#define YOU_HAVE_CRYSTALS				"You now have %d crystals" // %d=2, 3, 4...
 
 #define TAKE_FLAG_TO_GOAL				"take the flag to the %s goal" // %s=<team name>
 #define SOMEONE_HAS_GOT_THE_FLAG		"%s on the %s team has got the flag" // %s1=<player name>, %s2=<team name>
@@ -172,7 +179,7 @@
 #define IF_YOU_CANT_TAKE_THE_HEAT		"If you can't take the heat"
 #define GET_OUT_OF_THE_KITCHEN			"get out of the kitchen...."
 
-// credits screen
+// title.cpp: default pilot name
 
 
 
