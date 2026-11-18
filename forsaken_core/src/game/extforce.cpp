@@ -28,6 +28,7 @@
 #include "util/util.h"
 #include "game/oct2.h"
 #include "ui/title.h"
+#include "util/file_reader.h"
 
 /*===================================================================
 		Defines
@@ -53,15 +54,11 @@ bool ExternalForcesLoad( char * Filename )
 	long			File_Size;
 	long			Read_Size;
 	char		*	Buffer;
-	u_int16_t		*	Uint16Pnt;
 	EXTERNALFORCE * EFpnt;
-	float * floatpnt;
 	int i,j;
 	TRIGGER_ZONE * ZonePnt;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
-	u_int32_t		*	u_int32Pnt;
-	int32_t		*	int32Pnt;
 	char		*	OrgBuffer;
 
 	DebugPrintf("You might crash right here... Let methods know... That external forces is fucked...\n");
@@ -92,10 +89,9 @@ bool ExternalForcesLoad( char * Filename )
 		Msg( "External Forces Load Error reading %s\n", Filename );
 		return( false );
 	}
-	u_int32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *u_int32Pnt++;
-	VersionNumber = *u_int32Pnt++;
-	Buffer = (char *) u_int32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != EXTERNALFORCES_VERSION_NUMBER  ) )
 	{
@@ -103,9 +99,7 @@ bool ExternalForcesLoad( char * Filename )
 		return( false );
 	}
 
-	int32Pnt = (int32_t *) Buffer;
-	NumOfExternalForces = *int32Pnt++;
-	Buffer = (char *) int32Pnt;
+	NumOfExternalForces = in.i32();
 
 	ExternalForces	= (EXTERNALFORCE *) malloc( NumOfExternalForces * sizeof(EXTERNALFORCE) );
 	EFpnt = ExternalForces;
@@ -114,15 +108,12 @@ bool ExternalForcesLoad( char * Filename )
 		Msg( "External Forces : cant allocate buffer %s\n", Filename );
 		return( false );
 	}
-	
 
 	for( i = 0 ; i < NumOfExternalForces ; i++ )
 	{
-		Uint16Pnt = (u_int16_t *) Buffer;
-		EFpnt->Status = *Uint16Pnt++;
-		EFpnt->ForceType = *Uint16Pnt++;
-		EFpnt->Group = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;
+		EFpnt->Status = in.u16();
+		EFpnt->ForceType = in.u16();
+		EFpnt->Group = in.u16();
 
 		if( ExternalForcesGroupLink[EFpnt->Group] )
 		{
@@ -133,60 +124,40 @@ bool ExternalForcesLoad( char * Filename )
 			EFpnt->NextInGroup = NULL;
 		}
 
-		floatpnt = (float *) Buffer;
-		memcpy_unaligned(&EFpnt->Origin, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&EFpnt->Dir, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&EFpnt->Up, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy(&EFpnt->MinForce, floatpnt++, 4);
-		memcpy(&EFpnt->MaxForce, floatpnt++, 4);
-		memcpy(&EFpnt->Width, floatpnt++, 4);
-		memcpy(&EFpnt->Height, floatpnt++, 4);
-		memcpy(&EFpnt->Range , floatpnt++, 4);
+		EFpnt->Origin = in.vec();
+		EFpnt->Dir = in.vec();
+		EFpnt->Up = in.vec();
+		EFpnt->MinForce = in.f32();
+		EFpnt->MaxForce = in.f32();
+		EFpnt->Width = in.f32();
+		EFpnt->Height = in.f32();
+		EFpnt->Range = in.f32();
 		EFpnt->Range=1.0f/EFpnt->Range;
-		Buffer = (char *) floatpnt;
 
-		Uint16Pnt = (u_int16_t *) Buffer;
-		EFpnt->Type = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;
-		floatpnt = (float *) Buffer;
+		EFpnt->Type = in.u16();
 
-		memcpy_unaligned(&EFpnt->Pos, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&EFpnt->half_size, floatpnt, 4*3);
-		floatpnt+=3;
-		Buffer = (char *) floatpnt;
-		
+		EFpnt->Pos = in.vec();
+		EFpnt->half_size = in.vec();
+
 		if( EFpnt->Type != ZONE_Sphere )
 		{
 			// convex hull...
-			Uint16Pnt = (u_int16_t *) Buffer;
-			EFpnt->num_sides = *Uint16Pnt++;
-			Buffer = (char *) Uint16Pnt;
-			
+			EFpnt->num_sides = in.u16();
+
 			EFpnt->Zone = (TRIGGER_ZONE*) malloc( EFpnt->num_sides * sizeof( TRIGGER_ZONE ) );
 			ZonePnt = EFpnt->Zone;
-			
+
 			if( !ZonePnt )
 			{
 				Msg( "External Forces maloc Error with %s\n", Filename );
 				return( false );
 			}
-			floatpnt = (float * ) Buffer;
 			for( j = 0 ; j < EFpnt->num_sides ; j++ )
 			{
-// crashes here loading subway level
-// appears that the file data stops !
-// but we were told that there was more data...
-// we would need to properly track the location in the stream and not go over the stream size
-				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
-				floatpnt+=3;
-				memcpy(&ZonePnt->offset, floatpnt++, 4);
+				ZonePnt->normal = in.vec();
+				ZonePnt->offset = in.f32();
 				ZonePnt++;
 			}
-			Buffer = (char*) floatpnt;
 		}
 
 		EFpnt++;
