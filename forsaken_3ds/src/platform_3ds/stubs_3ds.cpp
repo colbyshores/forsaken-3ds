@@ -154,24 +154,4 @@ void globfree(glob_t *pglob)
 	pglob->gl_pathc = 0;
 }
 
-/* ---- ftime replacement ----
- * newlib's <sys/timeb.h> declares ftime() and struct timeb but ships no
- * implementation; util.cpp's DebugPrintf timestamps need one. */
-
-#include <sys/types.h>
-#include <sys/timeb.h>
-
-int ftime(struct timeb *tp)
-{
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	if (tp) {
-		tp->time = tv.tv_sec;
-		tp->millitm = tv.tv_usec / 1000;
-		tp->timezone = 0;
-		tp->dstflag = 0;
-	}
-	return 0;
-}
-
 #endif /* __3DS__ */

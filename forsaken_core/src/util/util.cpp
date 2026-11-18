@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
-#include <sys/timeb.h>
+#include <sys/time.h>
 #include "game/main.h"
 #include "data/file.h"
 #include "util/util.h"
@@ -113,10 +113,10 @@ void DebugPrintf( const char * format, ... ) // timestamp prefix
 	if(!Debug)
 		return;
 
-	struct timeb now;
-	ftime(&now);
+	struct timeval now;
+	gettimeofday(&now, NULL);
 	sprintf( buf, "%lld.%.3d ",
-		(long long) now.time, now.millitm);
+		(long long) now.tv_sec, (int)( now.tv_usec / 1000 ));
 
 	buf2 = strchr(buf,0);
 	buf_length = sizeof(buf)-strlen(buf);
