@@ -261,11 +261,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				else
 				*/
 				{
-#if ACTUAL_TRANS
-						a = 128;
-#else
 						a = 255;
-#endif
 				}
 
 				color = RGBA_MAKE( r , g , b , a  );

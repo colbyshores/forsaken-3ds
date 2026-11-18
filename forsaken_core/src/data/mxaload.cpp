@@ -231,9 +231,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				lpLVERTEX[i].tv = old->tv;
 				lpLVERTEX[i].color = old->color;
 
-#if !ACTUAL_TRANS
 				lpLVERTEX[i].color |= 0xFF000000;
-#endif
 				// nothing used specular so we removed it from LVERTEX
 				// lpLVERTEX->specular = lpLVERTEX2->specular;
 //				lpLVERTEX->dwReserved = 0;

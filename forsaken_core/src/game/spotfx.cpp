@@ -783,11 +783,7 @@ void CreateSpotFXSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 		FmPolys[ fmpoly ].Start_R = Red;
 		FmPolys[ fmpoly ].Start_G = Green;
 		FmPolys[ fmpoly ].Start_B = Blue;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &NewTrail_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -826,11 +822,7 @@ void CreateSpotFXFlame( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].Start_R = 255;
 		FmPolys[ fmpoly ].Start_G = 255;
 		FmPolys[ fmpoly ].Start_B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -870,11 +862,7 @@ void CreateSpotFXFlameSmoke( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].Start_R = 64;
 		FmPolys[ fmpoly ].Start_G = 64;
 		FmPolys[ fmpoly ].Start_B = 64;
-#if ACTUAL_TRANS
 		FmPolys[ fmpoly ].Trans = 128;
-#else
-		FmPolys[ fmpoly ].Trans = 128;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &NewTrail_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -921,11 +909,7 @@ void CreateSpotFXSmoke( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 		FmPolys[ fmpoly ].Start_R = Red;
 		FmPolys[ fmpoly ].Start_G = Green;
 		FmPolys[ fmpoly ].Start_B = Blue;
-#if ACTUAL_TRANS
 		FmPolys[ fmpoly ].Trans = 128;
-#else
-		FmPolys[ fmpoly ].Trans = 128;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &NewTrail_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -993,11 +977,7 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 			FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-#if ACTUAL_TRANS
-		   	FmPolys[ fmpoly ].Trans = 128;
-#else
 		   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   	FmPolys[ fmpoly ].R = Red;
 		   	FmPolys[ fmpoly ].G = Green;
 		   	FmPolys[ fmpoly ].B = Blue;
@@ -1100,11 +1080,7 @@ void CreateSpotFXExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			FmPolys[ fmpoly ].Start_R = 192;
 			FmPolys[ fmpoly ].Start_G = 192;
 			FmPolys[ fmpoly ].Start_B = 192;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
    			FmPolys[ fmpoly ].Dir = *Dir;
    			FmPolys[ fmpoly ].Speed = 0.0F;
    			FmPolys[ fmpoly ].Group = Group;
@@ -1235,11 +1211,7 @@ void CreateSpotFXGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 255;
 		FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &GravgonTrail_Header;
    		FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
 		FmPolys[ fmpoly ].Rot = 0.0F;
@@ -1423,11 +1395,7 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 			FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 			FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 			FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-#if ACTUAL_TRANS
-		   	FmPolys[ fmpoly ].Trans = 128;
-#else
 		   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   	FmPolys[ fmpoly ].R = Red;
 		   	FmPolys[ fmpoly ].G = Green;
 		   	FmPolys[ fmpoly ].B = Blue;
@@ -1588,11 +1556,7 @@ void CreateSpotFXBubbles( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t 
 			FmPolys[ fmpoly ].Start_R = Red;
 			FmPolys[ fmpoly ].Start_G = Green;
 			FmPolys[ fmpoly ].Start_B = Blue;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 			FmPolys[ fmpoly ].Frm_Info = &Bubble_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Rot = 0.0F;
@@ -1639,11 +1603,7 @@ void CreateBubbleTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 		FmPolys[ fmpoly ].Start_R = Red;
 		FmPolys[ fmpoly ].Start_G = Green;
 		FmPolys[ fmpoly ].Start_B = Blue;
-#if ACTUAL_TRANS
-   		FmPolys[ fmpoly ].Trans = 128;
-#else
    		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &Bubble_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = 0.0F;
@@ -1689,11 +1649,7 @@ void CreateSpotFXDrip( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red
 		FmPolys[ fmpoly ].Start_R = Red;
 		FmPolys[ fmpoly ].Start_G = Green;
 		FmPolys[ fmpoly ].Start_B = Blue;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &Drip_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = 0.0F;
@@ -2003,11 +1959,7 @@ void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			FmPolys[ fmpoly ].Start_R = 64;
 			FmPolys[ fmpoly ].Start_G = 64;
 			FmPolys[ fmpoly ].Start_B = 64;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 			FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -2042,11 +1994,7 @@ void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].Start_R = 64;
 		FmPolys[ fmpoly ].Start_G = 64;
 		FmPolys[ fmpoly ].Start_B = 64;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
    		FmPolys[ fmpoly ].Dir = *Dir;
    		FmPolys[ fmpoly ].Speed = 0.0F;
    		FmPolys[ fmpoly ].Group = Group;
@@ -2089,11 +2037,7 @@ void CreateSpotFXBeardAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, 
 		FmPolys[ fmpoly ].Start_R = FmPolys[ fmpoly ].R;
 		FmPolys[ fmpoly ].Start_G = FmPolys[ fmpoly ].G;
 		FmPolys[ fmpoly ].Start_B = FmPolys[ fmpoly ].B;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );

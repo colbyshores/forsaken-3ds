@@ -2265,11 +2265,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		Create Colour Value for polys
 ===================================================================*/
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, ScrPolys[ i ].Trans );
-#else
 									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
-#endif
 
 		      				ScrPolyVertPnt->sx = x1;
 		      				ScrPolyVertPnt->sy = y1;
@@ -2437,11 +2433,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							x3 = ScrPolys[ i ].x3;
 							y3 = ScrPolys[ i ].y3;
 							
-#if ACTUAL_TRANS			
-									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, ScrPolys[ i ].Trans );
-#else						
 									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
-#endif					
 									
 	      					ScrPolyVertPnt->sx = x1;
 	      					ScrPolyVertPnt->sy = y1;
@@ -2837,11 +2829,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		Create Colour Value for polys
 ===================================================================*/
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, ScrPolys[ i ].Trans );
-#else
 									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
-#endif
 								
 		      				ScrPolyVertPnt->sx = x1;
 		      				ScrPolyVertPnt->sy = y1;
@@ -3010,11 +2998,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							y3 = ScrPolys[ i ].y3;
 							
 			
-#if ACTUAL_TRANS			
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col1.R, ScrPolys[ i ].Col1.G, ScrPolys[ i ].Col1.B, ScrPolys[ i ].Col1.Trans );
-#else																						      				        
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col1.R, ScrPolys[ i ].Col1.G, ScrPolys[ i ].Col1.B, 255 );
-#endif						
 									
 	      					ScrPolyVertPnt->sx = x1;
 	      					ScrPolyVertPnt->sy = y1;
@@ -3025,22 +3009,14 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				ScrPolyVertPnt->tv = v1;
 		      				ScrPolyVertPnt++;
 		      					
-#if ACTUAL_TRANS			
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col2.R, ScrPolys[ i ].Col2.G, ScrPolys[ i ].Col2.B, ScrPolys[ i ].Col2.Trans );
-#else																						      				        
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col2.R, ScrPolys[ i ].Col2.G, ScrPolys[ i ].Col2.B, 255 );
-#endif						
 
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;
 		      				ScrPolyVertPnt->rhw = RHWValue;
 		      				ScrPolyVertPnt++;
 
-#if ACTUAL_TRANS			
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col3.R, ScrPolys[ i ].Col3.G, ScrPolys[ i ].Col3.B, ScrPolys[ i ].Col3.Trans );
-#else																						      				        
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col3.R, ScrPolys[ i ].Col3.G, ScrPolys[ i ].Col3.B, 255 );
-#endif						
 							
 		      				ScrPolyVertPnt->sx = x3;
 		      				ScrPolyVertPnt->sy = y3;
@@ -3051,11 +3027,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		      				ScrPolyVertPnt->tv = v2;
 		      				ScrPolyVertPnt++;
 
-#if ACTUAL_TRANS			
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col4.R, ScrPolys[ i ].Col4.G, ScrPolys[ i ].Col4.B, ScrPolys[ i ].Col4.Trans );
-#else																						      				        
 									Colour = RGBA_MAKE2( ScrPolys[ i ].Col4.R, ScrPolys[ i ].Col4.G, ScrPolys[ i ].Col4.B, 255 );
-#endif				
 							
 		      				ScrPolyVertPnt->sz = ZValue;
 		      				ScrPolyVertPnt->color = Colour;

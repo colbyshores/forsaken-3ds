@@ -528,11 +528,7 @@ RESTART * InitOneFaceMeRestartPoint( u_int16_t Group, VECTOR * Pos, VECTOR * Dir
 			FmPolys[ FmPoly ].SeqNum = FM_RESTART_INACTIVE;
 			FmPolys[ FmPoly ].RotSpeed = 5.0F;
 			FmPolys[ FmPoly ].Frame = 0.0F;
-#if ACTUAL_TRANS
-			FmPolys[ FmPoly ].Trans = 128;
-#else
 			FmPolys[ FmPoly ].Trans = 255;
-#endif
 			FmPolys[ FmPoly ].R = 128;
 			FmPolys[ FmPoly ].G = 128;
 			FmPolys[ FmPoly ].B = 128;

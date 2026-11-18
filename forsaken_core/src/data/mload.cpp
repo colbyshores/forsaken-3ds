@@ -449,11 +449,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				else
 				*/
 				{
-#if ACTUAL_TRANS
-						a = 128;
-#else
 						a = 255;
-#endif
 				}
 
 				// right here you could override texture coloring if you wanted

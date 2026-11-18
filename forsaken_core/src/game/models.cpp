@@ -2678,11 +2678,7 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 	if( B ) Blue = Col;
 	else Blue = 0;
 
-#if ACTUAL_TRANS
-		Colour = RGBA_MAKE( Red, Green, Blue, Col );
-#else
 		Colour = RGBA_MAKE( Red, Green, Blue, 255 );
-#endif
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
@@ -2805,11 +2801,7 @@ bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale
 	if( B ) Blue = Col;
 	else Blue = 0;
 
-#if ACTUAL_TRANS
-		Colour = RGBA_MAKE( Red, Green, Blue, Col );
-#else
 		Colour = RGBA_MAKE( Red, Green, Blue, 255 );
-#endif
 
 	if (!(FSLockVertexBuffer(renderObject, &DstlpD3DLVERTEX)))
 	{
@@ -2844,11 +2836,7 @@ bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	COLOR				Colour;
 
-#if ACTUAL_TRANS
 		Colour = RGBA_MAKE( R, G, B, 255 );
-#else
-		Colour = RGBA_MAKE( R, G, B, 255 );
-#endif
 
 	if (!(FSLockVertexBuffer(renderObject, &DstlpD3DLVERTEX)))
 	{

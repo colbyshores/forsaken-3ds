@@ -60,11 +60,7 @@ void InitFmPoly( void )
 		FmPolys[i].R = 255;
 		FmPolys[i].G = 255;
 		FmPolys[i].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[i].Trans = 128;
-#else
 		FmPolys[i].Trans = 255;
-#endif
 		FmPolys[i].DirVector.x = 0.0F;
 		FmPolys[i].DirVector.y = 0.0F;
 		FmPolys[i].DirVector.z = 1.0F;
@@ -1797,11 +1793,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 		Create Colour Value for polys
 ===================================================================*/
 
-#if ACTUAL_TRANS
-								Colour = RGBA_MAKE2( FmPolys[ i ].R, FmPolys[ i ].G, FmPolys[ i ].B, FmPolys[ i ].Trans );
-#else
 								Colour = RGBA_MAKE2( FmPolys[ i ].R, FmPolys[ i ].G, FmPolys[ i ].B, 255 );
-#endif
 
 /*===================================================================
 		Set Dir and Up Vectors
@@ -2163,11 +2155,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 		Create Colour Value for polys
 ===================================================================*/
 
-#if ACTUAL_TRANS
-								Colour = RGBA_MAKE2( FmPolys[ i ].R, FmPolys[ i ].G, FmPolys[ i ].B, FmPolys[ i ].Trans );
-#else
 								Colour = RGBA_MAKE2( FmPolys[ i ].R, FmPolys[ i ].G, FmPolys[ i ].B, 255 );
-#endif
 
 /*===================================================================
 		Set Dir and Up Vectors
@@ -2572,11 +2560,7 @@ FILE * LoadFmPolys( FILE * fp )
 			FmPolys[i].R = 255;
 			FmPolys[i].G = 255;
 			FmPolys[i].B = 255;
-#if ACTUAL_TRANS
-			FmPolys[i].Trans = 128;
-#else
 			FmPolys[i].Trans = 255;
-#endif
 			FmPolys[i].DirVector.x = 0.0F;
 			FmPolys[i].DirVector.y = 0.0F;
 			FmPolys[i].DirVector.z = 1.0F;

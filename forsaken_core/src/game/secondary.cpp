@@ -1616,11 +1616,7 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
    					FmPolys[ fmpoly ].Pos = SecBulls[i].Pos;
    					FmPolys[ fmpoly ].SeqNum = FM_ZERO;
    					FmPolys[ fmpoly ].Frame = 0.0F;
-#if ACTUAL_TRANS
-					FmPolys[ fmpoly ].Trans = 128;
-#else
 					FmPolys[ fmpoly ].Trans = 255;
-#endif
 					FmPolys[ fmpoly ].R = 64;
 					FmPolys[ fmpoly ].G = 64;
 					FmPolys[ fmpoly ].B = 255;
@@ -3763,11 +3759,7 @@ void CreateExplosion( VECTOR * Pos, u_int16_t Group )
 				FmPolys[ fmpoly ].R = 192;
 				FmPolys[ fmpoly ].G = 192;
 				FmPolys[ fmpoly ].B = 192;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 				FmPolys[ fmpoly ].Dir.x = 0.0F;
 				FmPolys[ fmpoly ].Dir.y = 0.0F;
 				FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3828,11 +3820,7 @@ void CreateSmallExplosion( VECTOR * Pos, u_int16_t Group )
 			FmPolys[ fmpoly ].R = 192;
 			FmPolys[ fmpoly ].G = 192;
 			FmPolys[ fmpoly ].B = 192;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 			FmPolys[ fmpoly ].Dir.x = 0.0F;
 			FmPolys[ fmpoly ].Dir.y = 0.0F;
 			FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3884,11 +3872,7 @@ void CreateBigExplosion( VECTOR * Pos, u_int16_t Group )
 				FmPolys[ fmpoly ].R = 192;
 				FmPolys[ fmpoly ].G = 192;
 				FmPolys[ fmpoly ].B = 192;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 				FmPolys[ fmpoly ].Dir.x = 0.0F;
 				FmPolys[ fmpoly ].Dir.y = 0.0F;
 				FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3933,11 +3917,7 @@ void CreateSingleExplosion( VECTOR * Pos, u_int16_t Group )
 			FmPolys[ fmpoly ].R = 192;
 			FmPolys[ fmpoly ].G = 192;
 			FmPolys[ fmpoly ].B = 192;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 			FmPolys[ fmpoly ].Dir.x = 0.0F;
 			FmPolys[ fmpoly ].Dir.y = 0.0F;
 			FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3979,11 +3959,7 @@ void CreateTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 255;
 		FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -4021,11 +3997,7 @@ void CreateBloodTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
    		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
    		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 10240.0F ) - 0.25F );
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].R = 192;
 		FmPolys[ fmpoly ].G = 192;
 		FmPolys[ fmpoly ].B = 192;
@@ -4096,11 +4068,7 @@ void CreateBloodSplat( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		   	FmPolys[ fmpoly ].R = 192; //255;
 		   	FmPolys[ fmpoly ].G = 50; //255;
 		   	FmPolys[ fmpoly ].B = 50; //255;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 		  	FmPolys[ fmpoly ].Speed = 0.0F;
 		   	FmPolys[ fmpoly ].Rot = 0.0F;
 		   	FmPolys[ fmpoly ].RotSpeed = 0.0F;
@@ -4136,11 +4104,7 @@ void CreateGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 255;
 		FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &GravgonTrail_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = 0.0F;
@@ -4177,11 +4141,7 @@ void CreateSolarisTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 255;
 		FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &SolarisTrail_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = 0.0F;
@@ -4218,11 +4178,7 @@ void CreateNewTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 255;
 		FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &NewTrail_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -6566,11 +6522,7 @@ void CreateBigFlash( VECTOR * Pos, u_int16_t Group, float Size )
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 255;
 		FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &BigFlash_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 		FmPolys[ fmpoly ].Rot = 0.0F;
@@ -6607,11 +6559,7 @@ void CreateMuzzleFlash( VECTOR * Pos, u_int16_t Group, float Size )
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 255;
 		FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].Frm_Info = &GreyFlare_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 		FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -7315,11 +7263,7 @@ void DoDamagedEffects( u_int16_t i )
 							FmPolys[ fmpoly ].R = ( 64 - (BYTE)Ships[ i ].Object.Hull ) * 3;
 							FmPolys[ fmpoly ].G = ( 64 - (BYTE)Ships[ i ].Object.Hull ) * 3;
 							FmPolys[ fmpoly ].B = ( 64 - (BYTE)Ships[ i ].Object.Hull ) * 3;
-#if ACTUAL_TRANS
-							FmPolys[ fmpoly ].Trans = 128;
-#else
 							FmPolys[ fmpoly ].Trans = 255;
-#endif
 							FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
 							FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 							FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -7655,11 +7599,7 @@ void CreateSmokeRing( VECTOR * Pos, VECTOR * DirVector, VECTOR * UpVector, u_int
 			FmPolys[ fmpoly ].R = 255;
 			FmPolys[ fmpoly ].G = 255;
 			FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 			FmPolys[ fmpoly ].Frm_Info = &NewTrail_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -8063,11 +8003,7 @@ void CreateFireBall( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 			FmPolys[ fmpoly ].Start_R = 128;
 			FmPolys[ fmpoly ].Start_G = 64;
 			FmPolys[ fmpoly ].Start_B = 64;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 			FmPolys[ fmpoly ].Frm_Info = &Exp_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
@@ -8101,11 +8037,7 @@ void CreateFireBall( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		FmPolys[ fmpoly ].Start_R = 64;
 		FmPolys[ fmpoly ].Start_G = 64;
 		FmPolys[ fmpoly ].Start_B = 64;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
    		FmPolys[ fmpoly ].Dir = *Dir;
    		FmPolys[ fmpoly ].Speed = 0.0F;
    		FmPolys[ fmpoly ].Group = Group;

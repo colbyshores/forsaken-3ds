@@ -756,11 +756,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
 		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, Polys[ i ].Trans1 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
@@ -770,11 +766,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, Polys[ i ].Trans2 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
@@ -784,11 +776,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
  
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, Polys[ i ].Trans3 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
@@ -798,11 +786,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
    	
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, Polys[ i ].Trans4 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-#endif
 	   		
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
@@ -1001,11 +985,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, Polys[ i ].Trans1 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
@@ -1015,11 +995,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, Polys[ i ].Trans2 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
@@ -1030,11 +1006,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt++;
    							
 	
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, Polys[ i ].Trans3 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
@@ -1045,11 +1017,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		   					PolyVertPnt++;
    					
 	
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, Polys[ i ].Trans4 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-#endif
 	   		
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
@@ -1297,11 +1265,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, Polys[ i ].Trans1 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
@@ -1311,11 +1275,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, Polys[ i ].Trans2 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
@@ -1325,11 +1285,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
    							
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, Polys[ i ].Trans3 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-#endif
 
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
@@ -1339,11 +1295,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, Polys[ i ].Trans4 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-#endif
 	   		
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;
@@ -1544,11 +1496,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
 		   					Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, Polys[ i ].Trans1 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos1.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos1.y;
@@ -1558,11 +1506,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
 
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, Polys[ i ].Trans2 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos2.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos2.y;
@@ -1572,11 +1516,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
    							
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, Polys[ i ].Trans3 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-#endif
    		
 		   					PolyVertPnt->x = Polys[ i ].Pos3.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos3.y;
@@ -1586,11 +1526,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		   					PolyVertPnt->color = Colour;
 		   					PolyVertPnt++;
    					
-#if ACTUAL_TRANS
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, Polys[ i ].Trans4 );
-#else
 									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-#endif
 	   		
 		   					PolyVertPnt->x = Polys[ i ].Pos4.x;
 		   					PolyVertPnt->y = Polys[ i ].Pos4.y;

@@ -3002,11 +3002,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 		   		FmPolys[ fmpoly ].Frame = 0.0F;
 		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
 		   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3036,11 +3032,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 		   		FmPolys[ fmpoly ].Frame = 0.0F;
 		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
 		   		FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3073,11 +3065,7 @@ void CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_
 		   		FmPolys[ fmpoly ].Frame = 0.0F;
 		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 		   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 		   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
@@ -3133,11 +3121,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 		   		FmPolys[ fmpoly ].Frame = 0.0F;
 		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
 		   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3167,11 +3151,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 		   		FmPolys[ fmpoly ].Frame = 0.0F;
 		   		FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
 		   		FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 		   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3204,11 +3184,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 		   		FmPolys[ fmpoly ].Frame = 0.0F;
 		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 		   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 		   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 		   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
@@ -3254,11 +3230,7 @@ void CreatePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   		FmPolys[ fmpoly ].Frm_Info = &Pulsar_Exp_Header;
 	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3298,11 +3270,7 @@ void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   		FmPolys[ fmpoly ].Frm_Info = &Pulsar_Exp_Header;
 	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3344,11 +3312,7 @@ void CreateNewExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   		FmPolys[ fmpoly ].Frm_Info = &BigExp1_Header;
 	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3415,11 +3379,7 @@ void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   		FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3459,11 +3419,7 @@ void CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group
 	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   		FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 	   		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-			FmPolys[ fmpoly ].Trans = 128;
-#else
 			FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   		FmPolys[ fmpoly ].Dir.x = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.y = 0.0F;
 	   		FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -3687,11 +3643,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
    					PrimBulls[i].numfmpolys++;
    					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -3727,17 +3679,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Col4.R = 255;
 					Polys[ poly ].Col4.G = 255;
 					Polys[ poly ].Col4.B = 255;
-#if ACTUAL_TRANS
-					Polys[ poly ].Trans1 = 128;
-					Polys[ poly ].Trans2 = 128;
-					Polys[ poly ].Trans3 = 128;
-					Polys[ poly ].Trans4 = 128;
-#else
 					Polys[ poly ].Trans1 = 255;
 					Polys[ poly ].Trans2 = 255;
 					Polys[ poly ].Trans3 = 255;
 					Polys[ poly ].Trans4 = 255;
-#endif
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED;
 					Polys[ poly ].Frm_Info = &Pulsar_Trail_Header;
 					Polys[ poly ].Frame = 0.0F;
@@ -3778,17 +3723,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Col4.R = 255;
 					Polys[ poly ].Col4.G = 255;
 					Polys[ poly ].Col4.B = 255;
-#if ACTUAL_TRANS
-					Polys[ poly ].Trans1 = 128;
-					Polys[ poly ].Trans2 = 128;
-					Polys[ poly ].Trans3 = 128;
-					Polys[ poly ].Trans4 = 128;
-#else
 					Polys[ poly ].Trans1 = 255;
 					Polys[ poly ].Trans2 = 255;
 					Polys[ poly ].Trans3 = 255;
 					Polys[ poly ].Trans4 = 255;
-#endif
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED;
 					Polys[ poly ].Frm_Info = &Pulsar_Trail_Header;
 					Polys[ poly ].Frame = 0.0F;
@@ -3838,11 +3776,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
 				   	FmPolys[ fmpoly ].G = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
 				   	FmPolys[ fmpoly ].B = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-#endif
 
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -3917,11 +3851,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				   	FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 				   	FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 				   	FmPolys[ fmpoly ].R = 128;
 				   	FmPolys[ fmpoly ].G = 128;
 				   	FmPolys[ fmpoly ].B = 128;
@@ -3989,11 +3919,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4016,11 +3942,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4080,11 +4002,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4141,11 +4059,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
@@ -4175,17 +4089,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Col4.R = 255;
 					Polys[ poly ].Col4.G = 255;
 					Polys[ poly ].Col4.B = 255;
-#if ACTUAL_TRANS
-					Polys[ poly ].Trans1 = 128;
-					Polys[ poly ].Trans2 = 128;
-					Polys[ poly ].Trans3 = 128;
-					Polys[ poly ].Trans4 = 128;
-#else
 					Polys[ poly ].Trans1 = 255;
 					Polys[ poly ].Trans2 = 255;
 					Polys[ poly ].Trans3 = 255;
 					Polys[ poly ].Trans4 = 255;
-#endif
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 					Polys[ poly ].Frm_Info = &Laser_Header;
 					Polys[ poly ].Frame = 0.0F;
@@ -4218,17 +4125,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						Polys[ poly ].Col4.R = 255;
 						Polys[ poly ].Col4.G = 255;
 						Polys[ poly ].Col4.B = 255;
-#if ACTUAL_TRANS
-						Polys[ poly ].Trans1 = 128;
-						Polys[ poly ].Trans2 = 128;
-						Polys[ poly ].Trans3 = 128;
-						Polys[ poly ].Trans4 = 128;
-#else
 						Polys[ poly ].Trans1 = 255;
 						Polys[ poly ].Trans2 = 255;
 						Polys[ poly ].Trans3 = 255;
 						Polys[ poly ].Trans4 = 255;
-#endif
 						Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 						Polys[ poly ].Frm_Info = &Laser_Header;
 						Polys[ poly ].Frame = 0.0F;
@@ -4275,11 +4175,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						}
 					}
 
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
    					FmPolys[ fmpoly ].LifeCount = 1000.0F;
    					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
    					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
@@ -4332,11 +4228,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				fmpoly = FindFreeFmPoly();					// Faceme polygon attached
    				if( fmpoly != (u_int16_t ) -1 )
    				{
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
    					FmPolys[ fmpoly ].LifeCount = 1000.0F;
    					FmPolys[ fmpoly ].Pos = PrimBulls[i].Pos;
    					FmPolys[ fmpoly ].SeqNum = PrimaryWeaponAttribs[ Weapon ].FmSeq;
@@ -4414,11 +4306,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 64; //255;
 				   	FmPolys[ fmpoly ].B = 64; //255;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
    					PrimBulls[i].numfmpolys++;
    					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4454,17 +4342,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Col4.R = 255;
 					Polys[ poly ].Col4.G = 64; //255;
 					Polys[ poly ].Col4.B = 64; //255;
-#if ACTUAL_TRANS
-					Polys[ poly ].Trans1 = 128;
-					Polys[ poly ].Trans2 = 128;
-					Polys[ poly ].Trans3 = 128;
-					Polys[ poly ].Trans4 = 128;
-#else
 					Polys[ poly ].Trans1 = 255;
 					Polys[ poly ].Trans2 = 255;
 					Polys[ poly ].Trans3 = 255;
 					Polys[ poly ].Trans4 = 255;
-#endif
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED;
 					Polys[ poly ].Frm_Info = &Pulsar_Trail_Header;
 					Polys[ poly ].Frame = 0.0F;
@@ -4505,17 +4386,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Col4.R = 255;
 					Polys[ poly ].Col4.G = 64; //255;
 					Polys[ poly ].Col4.B = 64; //255;
-#if ACTUAL_TRANS
-					Polys[ poly ].Trans1 = 128;
-					Polys[ poly ].Trans2 = 128;
-					Polys[ poly ].Trans3 = 128;
-					Polys[ poly ].Trans4 = 128;
-#else
 					Polys[ poly ].Trans1 = 255;
 					Polys[ poly ].Trans2 = 255;
 					Polys[ poly ].Trans3 = 255;
 					Polys[ poly ].Trans4 = 255;
-#endif
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED;
 					Polys[ poly ].Frm_Info = &Pulsar_Trail_Header;
 					Polys[ poly ].Frame = 0.0F;
@@ -4565,11 +4439,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
 				   	FmPolys[ fmpoly ].G = 32; //(u_int8_t) ( 205 + ( PLevel * 0.5F ) );
 				   	FmPolys[ fmpoly ].B = 32; //(u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = (u_int8_t) ( 205 + ( PLevel * 0.5F ) );
-#endif
 
 					FmPolys[ fmpoly ].Group = PrimBulls[i].GroupImIn;
 					PrimBulls[i].numfmpolys++;
@@ -4638,11 +4508,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				   	FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 				   	FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 				   	FmPolys[ fmpoly ].R = 32; //128;
 				   	FmPolys[ fmpoly ].G = 32; //128;
 				   	FmPolys[ fmpoly ].B = 255; //128
@@ -4702,11 +4568,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 64; //255;
 				   	FmPolys[ fmpoly ].G = 255; //255;
 				   	FmPolys[ fmpoly ].B = 64;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4729,11 +4591,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 64; //255;
 				   	FmPolys[ fmpoly ].G = 255; //255;
 				   	FmPolys[ fmpoly ].B = 64;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4793,11 +4651,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].R = 0; //255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 0; //255;
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 					PrimBulls[i].numfmpolys++;
 					PrimBulls[i].fmpoly = fmpoly;
 					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
@@ -4854,11 +4708,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 				   	FmPolys[ fmpoly ].R = 16; // 255;
 				   	FmPolys[ fmpoly ].G = 255; //255;
 				   	FmPolys[ fmpoly ].B = 16; //255;
@@ -4888,17 +4738,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Col4.R = 16; //255;
 					Polys[ poly ].Col4.G = 255; //255;
 					Polys[ poly ].Col4.B = 16; //255;
-#if ACTUAL_TRANS
-					Polys[ poly ].Trans1 = 128;
-					Polys[ poly ].Trans2 = 128;
-					Polys[ poly ].Trans3 = 128;
-					Polys[ poly ].Trans4 = 128;
-#else
 					Polys[ poly ].Trans1 = 255;
 					Polys[ poly ].Trans2 = 255;
 					Polys[ poly ].Trans3 = 255;
 					Polys[ poly ].Trans4 = 255;
-#endif
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 					Polys[ poly ].Frm_Info = &Laser_Header;
 					Polys[ poly ].Frame = 0.0F;
@@ -4931,17 +4774,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						Polys[ poly ].Col4.R = 16; //255;
 						Polys[ poly ].Col4.G = 255; //255;
 						Polys[ poly ].Col4.B = 16; //255; 
-#if ACTUAL_TRANS
-						Polys[ poly ].Trans1 = 128;
-						Polys[ poly ].Trans2 = 128;
-						Polys[ poly ].Trans3 = 128;
-						Polys[ poly ].Trans4 = 128;
-#else
 						Polys[ poly ].Trans1 = 255;
 						Polys[ poly ].Trans2 = 255;
 						Polys[ poly ].Trans3 = 255;
 						Polys[ poly ].Trans4 = 255;
-#endif
 						Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 						Polys[ poly ].Frm_Info = &Laser_Header;
 						Polys[ poly ].Frame = 0.0F;
@@ -5005,11 +4841,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
@@ -5039,17 +4871,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					Polys[ poly ].Col4.R = 255;
 					Polys[ poly ].Col4.G = 255;
 					Polys[ poly ].Col4.B = 255;
-#if ACTUAL_TRANS
-					Polys[ poly ].Trans1 = 128;
-					Polys[ poly ].Trans2 = 128;
-					Polys[ poly ].Trans3 = 128;
-					Polys[ poly ].Trans4 = 128;
-#else
 					Polys[ poly ].Trans1 = 255;
 					Polys[ poly ].Trans2 = 255;
 					Polys[ poly ].Trans3 = 255;
 					Polys[ poly ].Trans4 = 255;
-#endif
 					Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 					Polys[ poly ].Frm_Info = &Laser_Header;
 					Polys[ poly ].Frame = 0.0F;
@@ -5083,17 +4908,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						Polys[ poly ].Col4.R = 255;
 						Polys[ poly ].Col4.G = 255;
 						Polys[ poly ].Col4.B = 255; 
-#if ACTUAL_TRANS
-						Polys[ poly ].Trans1 = 128;
-						Polys[ poly ].Trans2 = 128;
-						Polys[ poly ].Trans3 = 128;
-						Polys[ poly ].Trans4 = 128;
-#else
 						Polys[ poly ].Trans1 = 255;
 						Polys[ poly ].Trans2 = 255;
 						Polys[ poly ].Trans3 = 255;
 						Polys[ poly ].Trans4 = 255;
-#endif
 						Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 						Polys[ poly ].Frm_Info = &Laser_Header;
 						Polys[ poly ].Frame = 0.0F;
@@ -5158,11 +4976,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 					FmPolys[ fmpoly ].xsize = ( 6.0F * GLOBAL_SCALE );
 					FmPolys[ fmpoly ].ysize = ( 6.0F * GLOBAL_SCALE );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
@@ -5214,11 +5028,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 				   	FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				   	FmPolys[ fmpoly ].Rot = (float) Random_Range( 360 );
 				   	FmPolys[ fmpoly ].RotSpeed = (float) ( Random_Range( 30 ) + 20 );
-#if ACTUAL_TRANS
-				   	FmPolys[ fmpoly ].Trans = 128;
-#else
 				   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 				   	FmPolys[ fmpoly ].R = 255;
 				   	FmPolys[ fmpoly ].G = 255;
 				   	FmPolys[ fmpoly ].B = 255;
@@ -5280,11 +5090,7 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		  	FmPolys[ fmpoly ].Frame = 0.0F;
 		  	FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
 		  	FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
-#if ACTUAL_TRANS
-		   	FmPolys[ fmpoly ].Trans = 128;
-#else
 		   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -5314,11 +5120,7 @@ void CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		  	FmPolys[ fmpoly ].Frame = 0.0F;
 		  	FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 		  	FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-		   	FmPolys[ fmpoly ].Trans = 128;
-#else
 		   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -5406,11 +5208,7 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		  	FmPolys[ fmpoly ].Frame = 0.0F;
 		  	FmPolys[ fmpoly ].Frm_Info = &Trojax_Exp_Header;
 		  	FmPolys[ fmpoly ].Flags = FM_FLAG_DIRCONST;
-#if ACTUAL_TRANS
-		   	FmPolys[ fmpoly ].Trans = 128;
-#else
 		   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -5440,11 +5238,7 @@ void CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 		  	FmPolys[ fmpoly ].Frame = 0.0F;
 		  	FmPolys[ fmpoly ].Frm_Info = &Flare_Header;
 		  	FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-#if ACTUAL_TRANS
-		   	FmPolys[ fmpoly ].Trans = 128;
-#else
 		   	FmPolys[ fmpoly ].Trans = 255;
-#endif
 		  	FmPolys[ fmpoly ].Dir.x = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.y = 0.0F;
 		  	FmPolys[ fmpoly ].Dir.z = 0.0F;
@@ -5757,11 +5551,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 	   	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   	   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 	   			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-#if ACTUAL_TRANS
-	   			FmPolys[ fmpoly ].Trans = 128;
-#else
 	   			FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   	   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 	   	   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 	   	   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
@@ -5939,11 +5729,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 	   	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   	   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 	   			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-#if ACTUAL_TRANS
-	   			FmPolys[ fmpoly ].Trans = 128;
-#else
 	   			FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   	   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 	   	   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
 	   	   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
@@ -6292,17 +6078,10 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 			Polys[ poly ].Col4.R = 255;
 			Polys[ poly ].Col4.G = 255;
 			Polys[ poly ].Col4.B = 255;
-#if ACTUAL_TRANS
-			Polys[ poly ].Trans1 = 128;
-			Polys[ poly ].Trans2 = 128;
-			Polys[ poly ].Trans3 = 128;
-			Polys[ poly ].Trans4 = 128;
-#else
 			Polys[ poly ].Trans1 = 255;
 			Polys[ poly ].Trans2 = 255;
 			Polys[ poly ].Trans3 = 255;
 			Polys[ poly ].Trans4 = 255;
-#endif
 			Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 			Polys[ poly ].Frm_Info = &Laser_Header;
 			Polys[ poly ].Frame = Frame;
@@ -6341,17 +6120,10 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 			Polys[ poly ].Col4.R = 255;
 			Polys[ poly ].Col4.G = 255;
 			Polys[ poly ].Col4.B = 255;
-#if ACTUAL_TRANS
-			Polys[ poly ].Trans1 = 128;
-			Polys[ poly ].Trans2 = 128;
-			Polys[ poly ].Trans3 = 128;
-			Polys[ poly ].Trans4 = 128;
-#else
 			Polys[ poly ].Trans1 = 255;
 			Polys[ poly ].Trans2 = 255;
 			Polys[ poly ].Trans3 = 255;
 			Polys[ poly ].Trans4 = 255;
-#endif
 			Polys[ poly ].Flags = POLY_FLAG_TWOSIDED | POLY_FLAG_DONTCLIP;
 			Polys[ poly ].Frm_Info = &Laser_Header;
 			Polys[ poly ].Frame = Frame;
@@ -6392,11 +6164,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 	   		FmPolys[ fmpoly ].Frame = 0.0F;
 	   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-#if ACTUAL_TRANS
-   			FmPolys[ fmpoly ].Trans = 128;
-#else
    			FmPolys[ fmpoly ].Trans = 255;
-#endif
       	   	FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
       	   	FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
       	   	FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
@@ -6451,11 +6219,7 @@ void CreateTransTrail( u_int16_t i )
 		FmPolys[ fmpoly ].Frame = 0.0F;
 		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 		FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
-#if ACTUAL_TRANS
-		FmPolys[ fmpoly ].Trans = 128;
-#else
 		FmPolys[ fmpoly ].Trans = 255;
-#endif
 		FmPolys[ fmpoly ].R = 255;
 		FmPolys[ fmpoly ].G = 64;
 		FmPolys[ fmpoly ].B = 64;
@@ -8461,11 +8225,7 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 		FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
 		FmPolys[ fmpoly ].xsize = ( 16.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 16.0F * GLOBAL_SCALE );
-#if ACTUAL_TRANS
-	  	FmPolys[ fmpoly ].Trans = 128;
-#else
 	  	FmPolys[ fmpoly ].Trans = 255;
-#endif
 	   	FmPolys[ fmpoly ].R = Red;
 	   	FmPolys[ fmpoly ].G = Green;
 	   	FmPolys[ fmpoly ].B = Blue;
@@ -8607,11 +8367,7 @@ void CreateScaleExplosion( VECTOR * Pos, u_int16_t Group, float GlobalScale )
 				FmPolys[ fmpoly ].R = 192;
 				FmPolys[ fmpoly ].G = 192;
 				FmPolys[ fmpoly ].B = 192;
-#if ACTUAL_TRANS
-				FmPolys[ fmpoly ].Trans = 128;
-#else
 				FmPolys[ fmpoly ].Trans = 255;
-#endif
 				FmPolys[ fmpoly ].Dir.x = 0.0F;
 				FmPolys[ fmpoly ].Dir.y = 0.0F;
 				FmPolys[ fmpoly ].Dir.z = 0.0F;
