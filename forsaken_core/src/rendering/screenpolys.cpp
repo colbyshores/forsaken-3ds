@@ -1,7 +1,4 @@
-/*===================================================================
-*	2 d p o l y s . c
-*	All routines to do with 2d always face you polygons...
-===================================================================*/
+/* screenpolys.cpp -- ScrPoly HUD quads, countdown, lens flare; see screenpolys.h. */
 #include <stdio.h>
 
 #include "math/new3d.h"
@@ -788,9 +785,11 @@ void Conv3DTo2D( VECTOR * SrcVert, VECTOR * DstVert, MATRIX * FinalMat )
 
 /*===================================================================
 	Procedure	:	Clip box to viewport
-	Input		:	LPTLVERTEX	Vert1
-				:	LPTLVERTEX	Vert3
-	Output		:	false if box is inside viewport, true if outside
+	Input		:	LPTLVERTEX	Top-left vertex
+				:	LPTLVERTEX	Bottom-right vertex
+	Output		:	true if the box is wholly outside the viewport;
+				:	otherwise false, with a partly visible box clipped
+				:	in place (positions and UVs)
 ===================================================================*/
 
 bool ClipBox( LPTLVERTEX topleft, LPTLVERTEX bottomright )
@@ -1521,8 +1520,9 @@ void StartCountDown( int16_t Minutes, int16_t Seconds )
 }
 
 /*===================================================================
-	Procedure	:	Add Solid ScreenPoly Text
-	Input		:	u_int16_t	BoxNumber
+	Procedure	:	Add a one-frame ScreenPoly text glyph (solid when
+				:	Trans is 255)
+	Input		:	u_int16_t	Frame (glyph)
 				:	float	XPos
 				:	float	YPos
 				:	u_int8_t	Red
@@ -1633,8 +1633,9 @@ void ResetCountDownBombTag( float Amount )
 }
 
 /*===================================================================
-	Procedure	:	Add Solid ScreenPoly Text
-	Input		:	u_int16_t	BoxNumber
+	Procedure	:	Add a one-frame ScreenPoly text glyph (solid when
+				:	Trans is 255)
+	Input		:	u_int16_t	Frame (glyph)
 				:	float	XPos
 				:	float	YPos
 				:	float	XScale
@@ -1946,7 +1947,7 @@ void AddScrPolyToTPage( u_int16_t i, int16_t TPage )
 /*===================================================================
 	Procedure	:	Remove ScreenPoly From TPage Link List
 	Input		:	u_int16_t		ScreenPoly Index
-				:	u_int16_t		TPage to add to
+				:	u_int16_t		TPage to remove from
 	Output		:	Nothing
 ===================================================================*/
 void RemoveScrPolyFromTPage( u_int16_t i, int16_t TPage )
@@ -2060,7 +2061,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 #endif
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 	TotalVerts = 0;
 
@@ -2360,13 +2361,13 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 								 * 3DS mid-draw flush — textured quad path (ScrPolyDispSolid).
 								 *
 								 * WHY THIS EXISTS:
-								 *   On PC, INCREASE_TEXTURE_GROUPS() contains
-								 *   assert(numTextureGroups < MAX_TEXTURE_GROUPS).  On 3DS
-								 *   assert() calls abort(), crashing the console.  Loading
-								 *   screens and menus allocate one TEXTUREGROUP per sprite blit
-								 *   and easily exceed the 64-slot fixed array (see
-								 *   MAX_TEXTURE_GROUPS in render.h).  Growing the array further
-								 *   would push RENDEROBJECT past the ~80 MB RAM budget.
+								 *   INCREASE_TEXTURE_GROUPS() asserts
+								 *   numTextureGroups < MAX_TEXTURE_GROUPS, which is 64 on
+								 *   3DS (600 on PC).  Loading screens and menus use one
+								 *   TEXTUREGROUP per sprite quad and easily pass 64.  The
+								 *   batch objects' textureGroups point at fixed scratch
+								 *   arrays of that size (RenderBufs' static scratch and
+								 *   stack arrays in oct2.cpp), so 3DS flushes instead.
 								 *
 								 * WHAT THE FIX DOES:
 								 *   After committing each group we check whether the array is
@@ -2387,9 +2388,11 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 								 *
 								 * CRITICAL ORDERING:
 								 *   start_index, StartVert, and batchVert are ALL advanced
-								 *   BEFORE this flush check.  If the check came first, the group
-								 *   just committed would record stale startVert/startIndex from
-								 *   the previous iteration, corrupting that draw call.
+								 *   BEFORE this flush check, so a flush leaves start_index
+								 *   and batchVert at 0 for the first group of the next
+								 *   batch.  Advancing after the reset would offset that
+								 *   group by one quad.  StartVert is never reset: it keeps
+								 *   the MAXSCREENPOLYVERTS bound tied to pass 1's count.
 								 */
 #ifdef __3DS__
 								batchVert += 4;
@@ -2535,8 +2538,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							 * resets to 0 on each flush, keeping vertex indices correct
 							 * relative to the freshly re-locked buffer.  Advances
 							 * (start_index, StartVert, batchVert) happen BEFORE this check so
-							 * the group just committed has already recorded correct offsets
-							 * before the counters are zeroed.
+							 * that a flush leaves the cursors at 0 for the next batch.
 							 */
 #ifdef __3DS__
 							batchVert += 4;
@@ -2569,7 +2571,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	}
 
 /*===================================================================
-		UnLock Exec Buffer and set data description
+		Unlock the buffers and return the resume point
 ===================================================================*/
 
 	if (!FSUnlockVertexBuffer(renderObject))
@@ -2626,7 +2628,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 #endif
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 	TotalVerts = 0;
 
@@ -2681,7 +2683,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	RHWValue = ( 1.0F / ZValue );
 
 /*===================================================================
-		Lock Exec Buffer and get ready to fill in...
+		Lock the vertex and index buffers
 ===================================================================*/
 
 	if (!(FSLockPretransformedVertexBuffer(renderObject, &lpBufStart)))
@@ -2699,7 +2701,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
 
 /*===================================================================
-		Fill in Exec Buffer ( Verts and Faces Simultaneously )
+		Pass 2: fill verts and indices, one texture group per quad
 ===================================================================*/
 	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
 	{
@@ -2924,13 +2926,13 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							 * 3DS mid-draw flush — textured quad path (ScrPolyDispNonSolid).
 							 *
 							 * WHY THIS EXISTS:
-							 *   On PC, INCREASE_TEXTURE_GROUPS() contains
-							 *   assert(numTextureGroups < MAX_TEXTURE_GROUPS).  On 3DS
-							 *   assert() calls abort(), crashing the console.  Loading
-							 *   screens and menus allocate one TEXTUREGROUP per sprite blit
-							 *   and easily exceed the 64-slot fixed array (see
-							 *   MAX_TEXTURE_GROUPS in render.h).  Growing the array further
-							 *   would push RENDEROBJECT past the ~80 MB RAM budget.
+							 *   INCREASE_TEXTURE_GROUPS() asserts
+							 *   numTextureGroups < MAX_TEXTURE_GROUPS, which is 64 on
+							 *   3DS (600 on PC).  Loading screens and menus use one
+							 *   TEXTUREGROUP per sprite quad and easily pass 64.  The
+							 *   batch objects' textureGroups point at fixed scratch
+							 *   arrays of that size (RenderBufs' static scratch and
+							 *   stack arrays in oct2.cpp), so 3DS flushes instead.
 							 *
 							 * WHAT THE FIX DOES:
 							 *   After committing each group we check whether the array is
@@ -2951,9 +2953,11 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							 *
 							 * CRITICAL ORDERING:
 							 *   start_index, StartVert, and batchVert are ALL advanced
-							 *   BEFORE this flush check.  If the check came first, the group
-							 *   just committed would record stale startVert/startIndex from
-							 *   the previous iteration, corrupting that draw call.
+							 *   BEFORE this flush check, so a flush leaves start_index
+							 *   and batchVert at 0 for the first group of the next
+							 *   batch.  Advancing after the reset would offset that
+							 *   group by one quad.  StartVert is never reset: it keeps
+							 *   the MAXSCREENPOLYVERTS bound tied to pass 1's count.
 							 */
 #ifdef __3DS__
 							batchVert += 4;
@@ -3106,8 +3110,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							 * resets to 0 on each flush, keeping vertex indices correct
 							 * relative to the freshly re-locked buffer.  Advances
 							 * (start_index, StartVert, batchVert) happen BEFORE this check so
-							 * the group just committed has already recorded correct offsets
-							 * before the counters are zeroed.
+							 * that a flush leaves the cursors at 0 for the next batch.
 							 */
 #ifdef __3DS__
 							batchVert += 4;
@@ -3141,7 +3144,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	}
 
 /*===================================================================
-		UnLock Exec Buffer and set data description
+		Unlock the buffers and return the resume point
 ===================================================================*/
 
 	if (!FSUnlockVertexBuffer(renderObject))

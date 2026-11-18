@@ -1,13 +1,37 @@
-/*==========================================================================
- *
- *
- *  File:       ScreenPolys.h
- *  Content:    ScreenPolys.h include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* screenpolys.h -- ScrPolys: screen-space HUD quads, countdown, lens flare
+ *
+ * ScrPolys[] is a fixed pool of MAXNUMOFSCRPOLYS pre-transformed 2D quads:
+ * HUD text (AddScreenPolyText), the countdown digits, lens flares, screen
+ * flashes, the thermo bar, and flag / bounty markers over ships. InitScrPolys
+ * resets the whole pool; it runs from InitScene and, on 3DS, again when
+ * single-player gameplay starts and at the last loading-screen redraw, so
+ * polys left over from the title screen are dropped. FindFreeScrPoly /
+ * KillUsedScrPoly move an entry between the free list and the used list
+ * (FirstScrPolyUsed, walked through Prev); KillUsedScrPoly also unlinks the
+ * texture page and resets the entry to defaults. SCRTYPE_LastAFrame polys are
+ * killed by the next ScreenPolyProcess, so callers re-add them every frame;
+ * SCRTYPE_Normal polys persist until killed and are animated by their
+ * SCRSEQ_* sequence in ScreenPolyProcess.
+ *
+ * A quad is placed at Pos plus its FRAME_INFO bit offsets times Xscale /
+ * Yscale (SCRFLAG_Scale also scales by viewport width / 320), or at x1,y1 -
+ * x3,y3 with SCRFLAG_UseCoords. Polys with no Frm_Info sit on the extra
+ * untextured page (MAXTPAGESPERTLOAD), which these fills do draw. Every quad
+ * is clipped to CurrentCamera.Viewport by ClipBox. DisplaySolidScrPolys and
+ * DisplayNonSolidScrPolys draw the SCRFLAG_Solid and other polys separately,
+ * in batches of at most MAXSCREENPOLYVERTS verts with one texture group per
+ * quad, via draw_2d_object with z-buffer and culling off. On 3DS a full
+ * textureGroups array is flushed mid-fill (see the comments in the fills).
+ *
+ * 3DS HUD routing: while ScrPolySetRouteBottom(true) is in effect, polys
+ * added or reset get SCRFLAG_BottomHUD; ScrPolySetDisplayMode(1 / 2) then
+ * limits a draw to the top-screen or bottom-screen subset (0 draws all).
+ *
+ * SaveScreenPolys / LoadScreenPolys store only the countdown and thermo
+ * state; the pool itself is rebuilt by its owners.
+ */
 
 /*===================================================================
 	Includes
@@ -91,11 +115,11 @@ typedef struct SCRPOLY {
 	u_int8_t			B;					// Colour
 	u_int8_t			Trans;				// Amount of transparency
 	float			Xscale;				// XScale
-	float			Yscale;				// XScale
+	float			Yscale;				// YScale
 	float			Frame;				// Animation Frame
 	float			FrameRate;			// FrameRate
 	FRAME_INFO	**	Frm_Info;			// Offset Info
-	int16_t			SeqNum;				// FrameRate
+	int16_t			SeqNum;				// SCRSEQ_* process sequence
 	float			LifeCount;			// LifeCount
 	float			FadeRed;			// Red
 	float			FadeGreen;			// Green
