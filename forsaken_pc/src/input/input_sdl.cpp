@@ -91,9 +91,6 @@ void app_resize( SDL_WindowEvent * /*window*/ )
 		VduClear();
 	}
 
-	// resize d3d to match the window size..
-	// TODO does d3d do the resizing on it's own now?
-
 	if( MyGameStatus == STATUS_Title )
 	{
 		FadeHoloLight(HoloLightBrightness);

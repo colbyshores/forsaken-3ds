@@ -300,7 +300,6 @@ enum
 constexpr int MAXTITLEEVENTS = 128;
 constexpr int MAXTITLETIMERS = 32;
 
-constexpr int DINPUT_BUFFERSIZE = 32; /* Number of buffer elements (for menu screens) */
 
 enum
 {

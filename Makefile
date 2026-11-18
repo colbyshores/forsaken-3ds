@@ -91,7 +91,7 @@ vpath %.cpp $(SRC_DIRS)
 INC=$(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.h))
 # Every translation unit is C++ (C with classes, AGENTS.md S9); the
 # phase-2 language restrictions mean banned constructs must not compile.
-CXXSRC=$(filter-out render_d3d.cpp breakpad.cpp,$(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp)))))
+CXXSRC=$(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))))
 CXXOBJ=$(patsubst %.cpp,$(BUILD_PC)/%.o,$(CXXSRC))
 OBJ=$(CXXOBJ)
 CXXFLAGS=$(CFLAGS) -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics

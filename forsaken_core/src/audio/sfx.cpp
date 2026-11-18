@@ -71,8 +71,7 @@ FILE *LoadAllSfx( FILE *fp ){return fp;}
 #include "util/util.h"
 /* Owner for sound.h's sound_minimum_volume extern (was a tentative
    definition in the header; illegal as C++ TUs now include sound.h).
-   Sound3D stays defined per-backend (sound_3ds.c / sound_openal.c /
-   sound_dsound.c), as before. */
+   Sound3D stays defined per-backend (sound_3ds.cpp / sound_openal.cpp). */
 int sound_minimum_volume = -10000 / 3;
 
 /*************************************

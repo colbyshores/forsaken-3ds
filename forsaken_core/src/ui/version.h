@@ -21,8 +21,6 @@
 #ifndef PXBV
     #ifdef __3DS__
         #define PXBV  "3DS"
-    #elif defined(WIN32)
-            #define PXBV  "OPEN"
     #else
         #define PXBV  "LINUX"
     #endif

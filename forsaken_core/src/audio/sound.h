@@ -3,9 +3,8 @@
 /* sound.h -- low-level sound backend seam: buffers, sources, listener
  *
  * Implemented by sound_3ds.cpp (ndsp, SFX capped at 8 voices with the
- * oldest evicted) and sound_openal.cpp; sound_dsound.cpp is a DirectSound
- * backend neither Makefile selects. sfx.cpp is the only game-side caller.
- * Units keep the DirectSound conventions: volume in millibels (0 = full,
+ * oldest evicted) and sound_openal.cpp. sfx.cpp is the only game-side
+ * caller. Units keep the 1998 DirectSound conventions: volume in millibels (0 = full,
  * negative attenuates, sound_minimum_volume is the floor and is owned by
  * sfx.cpp), pan in -10000..10000, pitch as a multiplier with 0 meaning
  * as recorded. Each backend defines Sound3D.
@@ -48,13 +47,8 @@ bool sound_listener_orientation(
 // Buffers
 //
 
-#ifdef SOUND_DSOUND
-#include <dsound.h>
-typedef IDirectSoundBuffer sound_source_t;
-#else
 typedef struct sound_source_t sound_source_t;
 typedef struct sound_buffer_t sound_buffer_t;
-#endif
 
 sound_buffer_t * sound_load(char* file);
 sound_source_t * sound_source( sound_buffer_t * buffer );

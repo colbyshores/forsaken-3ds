@@ -391,10 +391,6 @@ void CleanUpAndPostQuit(void)
 // Initializes the application
 //
 
-#ifdef BREAKPAD
-// breakpad running through wine, built for windows doens't work well..
-extern bool breakpad_init( void );
-#endif
 
 #include "data/mload.h"
 
@@ -412,17 +408,6 @@ static bool AppInit( char * lpCmdLine )
 	render_info.vsync = false;
 
 
-#ifdef BREAKPAD
-// breakpad running through wine, built for windows doens't work well..
-
-	// initialize google breakpad crash reporting
-	if(!breakpad_init())
-		return false;
-
-	// test breakpad by uncommenting this
-	//{ *(int*)0=0; }
-
-#endif
 
 #ifdef DEBUG_ON
 
@@ -487,11 +472,6 @@ static bool AppInit( char * lpCmdLine )
 	}
 #endif
 
-	// appears dinput has to be after init window
-
-	// initialize direct input
-	// This requires an application and window handle
-	// so it most not come earlier than here
 	if (!joysticks_init())
 	{
 		Msg("Failed to initialized joysticks!");
