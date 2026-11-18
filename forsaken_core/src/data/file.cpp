@@ -9,7 +9,6 @@
 #include	"util/util.h"
 
 #include	<time.h>      // for file_time function
-#define		O_BINARY 	0 // no such thing on unixa
 
 #include <unistd.h>
 
@@ -93,7 +92,7 @@ long Write_File( const char * str, const char * File_Buffer, long Write_Size )
 
 	char * path = convert_path(str);
 
-	Handle = open( path, O_CREAT | O_TRUNC | O_BINARY | O_RDWR ,
+	Handle = open( path, O_CREAT | O_TRUNC | O_RDWR ,
 							  S_IREAD | S_IWRITE );
 	if( Handle != -1 ) {
 		Bytes_Written = write( Handle, File_Buffer, Write_Size );
@@ -157,7 +156,7 @@ long Read_File( char * Filename, char * File_Buffer, long Read_Size )
 		Read_Size = Get_File_Size( path );
 
 	// open the file handle
-	Handle = open( path, O_RDONLY | O_BINARY );
+	Handle = open( path, O_RDONLY );
 
 	// file opened successfully
 	if( Handle != -1 )
