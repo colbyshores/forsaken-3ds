@@ -316,11 +316,7 @@ void SendANormalUpdate( void )
 		ShortGlobalShip.Quat		= Ships[WhoIAm].Object.Quat;	  // Final inverse view Quat.......after banking.. 
 		ShortGlobalShip.Status		= MyGameStatus;
 		ShortGlobalShip.Angle		= Ships[WhoIAm].Object.Angle;
-#ifdef	SHORTBANK
 		ShortGlobalShip.Bank			= (int16_t) (Ships[ WhoIAm ].Object.Bank * SHORTBANKMODIFIER);
-#else
-		ShortGlobalShip.Bank = Ships[ WhoIAm ].Object.Bank;
-#endif
 		SendGameMessage(MSG_UPDATE, 0, 0, 0, 0);
 	}
 	else
@@ -396,11 +392,7 @@ void NetworkGameUpdate()
 				FShortGlobalShip.Quat					= Ships[WhoIAm].Object.Quat;// Final inverse view Quat.......after banking.. 
 				FShortGlobalShip.PrimPowerLevel			= (BYTE) Ships[ WhoIAm ].PrimPowerLevel;
 				FShortGlobalShip.Angle					= Ships[ WhoIAm ].Object.Angle;
-#ifdef	SHORTBANK
 				FShortGlobalShip.Bank					= (int16_t) (Ships[ WhoIAm ].Object.Bank * SHORTBANKMODIFIER);
-#else
-				FShortGlobalShip.Bank					= Ships[ WhoIAm ].Object.Bank;
-#endif
 				/* As written since 1998, SHIP_MulFire is always set here; the
 				 * evident intent is Flags & (SHIP_SecFire | SHIP_MulFire). It is
 				 * on the wire, so changing it is a protocol decision (owner). */
@@ -1971,11 +1963,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				Ships[lpUpdate->WhoIAm].Object.Group	= (int16_t) lpUpdate->ShortGlobalShip.GroupImIn;
 				Ships[lpUpdate->WhoIAm].Object.Quat	= lpUpdate->ShortGlobalShip.Quat;
 				Ships[lpUpdate->WhoIAm].LastAngle		= lpUpdate->ShortGlobalShip.Angle;
-#ifdef	SHORTBANK
 				Ships[lpUpdate->WhoIAm].Object.Bank	= (float) (lpUpdate->ShortGlobalShip.Bank / SHORTBANKMODIFIER);
-#else
-				Ships[lpUpdate->WhoIAm].Object.Bank	= lpUpdate->ShortGlobalShip.Bank;
-#endif
 				Ships[lpUpdate->WhoIAm].JustRecievedPacket = true;
 				GameStatus[lpUpdate->WhoIAm] = lpUpdate->ShortGlobalShip.Status;
 
@@ -2040,11 +2028,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[lpFUpdate->WhoIAm].Object.Quat	= lpFUpdate->ShortGlobalShip.Quat;
 			Ships[lpFUpdate->WhoIAm].PrimPowerLevel = (float) lpFUpdate->ShortGlobalShip.PrimPowerLevel;
 			Ships[lpFUpdate->WhoIAm].LastAngle	= lpFUpdate->ShortGlobalShip.Angle;
-#ifdef	SHORTBANK
 			Ships[lpFUpdate->WhoIAm].Object.Bank	= (float) (lpFUpdate->ShortGlobalShip.Bank / SHORTBANKMODIFIER);
-#else
-			Ships[lpFUpdate->WhoIAm].Object.Bank	= lpFUpdate->ShortGlobalShip.Bank;
-#endif
 			Ships[lpFUpdate->WhoIAm].JustRecievedPacket = true;
 
 			// Need This for missiles to work....

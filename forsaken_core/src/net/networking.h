@@ -40,7 +40,6 @@ extern char host_address[256];
 
 constexpr auto MULTIPLAYER_VERSION = (0x010d);
 constexpr auto DEMO_MULTIPLAYER_VERSION = (0x0109);
-#define SHORTBANK
 #define VERYSHORTPACKETS
 constexpr auto NOISEFALLOFFFACTOR = ( 1.0F / 120.0F ); // approx 2 seconds....
 constexpr int NORMAL_MODE = 0;
@@ -417,11 +416,7 @@ typedef struct _SHORTGLOBALSHIP
 	VECTOR				Pos;			// x , y , z position
 	VECTOR				Move_Off;		// Last MoveMent...x , y , z
 	VECTOR				Angle;			// Last Rotation..
-#ifdef	SHORTBANK
 	int16_t				Bank;			// How much Am I banked....
-#else
-	float				Bank;			// How much Am I banked....
-#endif
 	QUAT				Quat;			// Final Quat...
 } SHORTGLOBALSHIP, *LPSHORTGLOBALSHIP;
 
@@ -449,11 +444,7 @@ typedef struct _FSHORTGLOBALSHIP
 	VECTOR				Pos;			// x , y , z position
 	VECTOR				Move_Off;		// Last MoveMent...x , y , z
 	VECTOR				Angle;			// Last Rotation..
-#ifdef	SHORTBANK
 	int16_t				Bank;		// How much Am I banked....
-#else
-	float				Bank;		// How much Am I banked....
-#endif
 	QUAT				Quat;		// Final Quat...
 } FSHORTGLOBALSHIP, *LPFSHORTGLOBALSHIP;
 
