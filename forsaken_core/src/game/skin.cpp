@@ -297,7 +297,6 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 ===================================================================*/
 void DisplayBSPNode( BSP_NODE * Node )
 {
-#ifdef BSP
 	int16_t			Count;
 	int16_t			Vnum;
 	VECTOR			TLPos;
@@ -308,7 +307,6 @@ void DisplayBSPNode( BSP_NODE * Node )
 	BSP_NODE	*	TempNode;
 	float			NumNodes = 0.0F;
 	int16_t			NodeNum;
-#endif
 
 	SkinVertCount = 0;
 	SkinTriCount = 0;
@@ -318,7 +316,6 @@ void DisplayBSPNode( BSP_NODE * Node )
 	KillBoxLines();
 	KillAllSphereZones();
 
-#ifdef BSP
 	if( NodeCube ) DisplayNewBSPNode( Node );
 	if( !OldNodeCube ) return;
 
@@ -461,7 +458,6 @@ void DisplayBSPNode( BSP_NODE * Node )
 			}
 			break;
 	}
-#endif
 }
 
 /*===================================================================
@@ -471,7 +467,6 @@ void DisplayBSPNode( BSP_NODE * Node )
 ===================================================================*/
 void DisplayNewBSPNode( BSP_NODE * Node )
 {
-#ifdef BSP
 	int16_t			Count;
 	int16_t			Vnum;
 	COLOR		color;
@@ -554,7 +549,6 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 		TempNode = Node;
 		Node = TempNode->Parent;
 	}
-#endif
 }
 
 /*===================================================================

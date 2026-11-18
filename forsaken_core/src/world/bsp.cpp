@@ -200,7 +200,6 @@ static bool BSP_LoadPortals( char *fname )
 ===================================================================*/
 bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 {
-#ifdef BSP
 	long			File_Size;
 	long			Read_Size;
 	char		*	Buffer;
@@ -253,7 +252,6 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 	}
 	free( OrgBuffer );
 
-#endif
 	Bsp_Header->State = true;
 
 	if ( !BSP_LoadPortals( Filename ) )
@@ -268,7 +266,6 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 ===================================================================*/
 void Bspfree( void )
 {
-#ifdef BSP
 	int			i;
 	int			bsp_num;
 
@@ -312,7 +309,6 @@ void Bspfree( void )
 		}
 		Bsp_Portal_Header.state = false;
 	}
-#endif
 }
 
 

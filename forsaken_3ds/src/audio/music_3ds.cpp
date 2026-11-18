@@ -25,7 +25,6 @@
  */
 
 #ifdef __3DS__
-#ifdef SOUND_SUPPORT
 
 #include <3ds.h>
 #include <stdio.h>
@@ -387,15 +386,4 @@ void music_play_title(void) { g_music.play(MUSIC_TITLE_TRACK); }
 
 void music_update(void) { /* no-op — background thread handles refills */ }
 
-#else /* !SOUND_SUPPORT */
-
-bool music_init(void) { return false; }
-void music_shutdown(void) {}
-void music_play(int track) { (void)track; }
-void music_stop(void) {}
-void music_play_for_level(int level_num) { (void)level_num; }
-void music_play_title(void) {}
-void music_update(void) {}
-
-#endif /* SOUND_SUPPORT */
 #endif /* __3DS__ */

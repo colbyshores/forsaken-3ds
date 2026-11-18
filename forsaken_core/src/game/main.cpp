@@ -367,7 +367,6 @@ void CleanUpAndPostQuit(void)
 	// cleanup networking
 	network_cleanup();
 
-#ifdef SOUND_SUPPORT
 
 #ifdef __3DS__
 	// cleanup music
@@ -377,7 +376,6 @@ void CleanUpAndPostQuit(void)
 	// cleanup sound system
 	sound_destroy();
 
-#endif
 
 	// should come last
 #ifdef __3DS__

@@ -15,7 +15,6 @@
  */
 
 #ifndef __3DS__
-#ifdef SOUND_SUPPORT
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -141,15 +140,4 @@ void music_play_for_level(int level_num)
 void music_play_title(void) { music_play(MUSIC_TITLE_TRACK); }
 void music_update(void) { /* whole-track buffer: nothing to refill */ }
 
-#else /* !SOUND_SUPPORT */
-
-bool music_init(void) { return false; }
-void music_shutdown(void) {}
-void music_play(int track) { (void)track; }
-void music_stop(void) {}
-void music_play_for_level(int level_num) { (void)level_num; }
-void music_play_title(void) {}
-void music_update(void) {}
-
-#endif
 #endif /* !__3DS__ */

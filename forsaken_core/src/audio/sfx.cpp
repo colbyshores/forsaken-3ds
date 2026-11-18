@@ -5,56 +5,6 @@
 #include "game/enemies.h"
 #include "game/oct2.h"
 
-#ifndef SOUND_SUPPORT
-
-float LastDistance[MAX_SFX];
-bool  bSoundEnabled = false;
-char  CurrentTauntVariant;
-bool  NoSFX = true;
-
-bool InitializeSound( int flags ){return 1;}
-
-void PlayEnemyBikerTaunt( ENEMY *Enemy ){}
-u_int32_t PlaySfx( int16_t Sfx, float Vol ){return 0;}
-void PlayRecievedSpeechTaunt( BYTE player, char variant ){}
-u_int32_t PlaySfxWithTrigger( int16_t Sfx, int16_t TriggeredSfx ){return 0;}
-u_int32_t PlayPannedSfx(int16_t Sfx, u_int16_t Group, VECTOR * SfxPos, float Freq ){return 0;}
-u_int32_t ForcePlayPannedSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq ){return 0;}
-u_int32_t PlaySpotSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects ){return 0;}
-u_int32_t PlayFixedSpotSfx(int16_t Sfx, u_int16_t Group , VECTOR * SfxPos, float Freq, float Vol, u_int16_t Effects ){return 0;}
-u_int32_t PlayPannedSfxWithVolModify(int16_t Sfx, u_int16_t Group, VECTOR * SfxPos, float Freq, float Vol ){return 0;}
-
-void StopEnemyBikerTaunt( ENEMY *Enemy ){}
-bool StopSfx( u_int32_t uid ){return 0;}
-void StopTaunt( void ){}
-
-void DestroySound( int flags ){}
-
-void PauseAllSfx( void ){}
-
-void UpdateSfxForBiker( u_int16_t biker ){}
-void UpdateSfxForBikeComputer( u_int16_t bikecomp ){}
-
-void ProcessLoopingSfx( void ){}
-void ProcessEnemyBikerTaunt( void ){}
-
-bool RestoreSfxData( u_int32_t id, VECTOR *pos, u_int16_t *group ){return 0;}
-int16_t ReturnSFXIndex( char *file ){return -1;}
-void ReTriggerSfx( void ){}
-
-void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume ){}
-
-void CheckSBufferList( void ){}
-
-bool SetPosVelDir_Listner( VECTOR * Pos , VECTOR * Velocity , MATRIX * Mat ){return 0;}
-void SetSoundLevels( int *dummy ){}
-
-float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector ){return 0;}
-
-FILE *SaveAllSfx( FILE *fp ){return fp;}
-FILE *LoadAllSfx( FILE *fp ){return fp;}
-
-#else
 
 #include "game/main.h"
 #include "math/quat.h"
@@ -2910,4 +2860,3 @@ void PlayEnemyBikerTaunt( ENEMY *Enemy )
 }
 
 
-#endif

@@ -1,4 +1,3 @@
-#ifdef TEXTURE_PNG
 
 #include "game/main.h"
 #include <stdio.h>
@@ -158,4 +157,3 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
   return 0;
 }
 
-#endif

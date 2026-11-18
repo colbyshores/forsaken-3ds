@@ -7,7 +7,6 @@
  */
 
 #ifdef __3DS__
-#ifdef SOUND_SUPPORT
 
 #include <3ds.h>
 #include <string.h>
@@ -603,5 +602,4 @@ void sound_release_buffer(sound_buffer_t *buffer)
 	free(buffer);
 }
 
-#endif /* SOUND_SUPPORT */
 #endif /* __3DS__ */

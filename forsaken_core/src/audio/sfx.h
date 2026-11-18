@@ -9,7 +9,6 @@
  * Positional volume uses straight-line distance plus the
  * SoundInfo[listener group][source group] path penalty; a negative
  * penalty means inaudible. Freq is a pitch multiplier, 0 = as recorded.
- * Without SOUND_SUPPORT every entry point is a stub.
  */
 
 #include "game/main.h"
