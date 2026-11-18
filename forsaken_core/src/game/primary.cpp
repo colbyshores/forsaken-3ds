@@ -7464,7 +7464,7 @@ void GivemeAllWeapons( void )
 {
 	int16_t	Count;
 
-	if( ( WhoIAm < 0 ) || ( WhoIAm >= ( MAX_PLAYERS + 1 ) ) ) return;
+	if( WhoIAm >= ( MAX_PLAYERS + 1 ) ) return;	// WhoIAm is unsigned (BYTE)
 
 	for( Count = 0; Count < MAXPRIMARYWEAPONS; Count++ ) GodModeCopyOfWeaponsGot[ Count ] = PrimaryWeaponsGot[ Count ];
 	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
@@ -7521,7 +7521,7 @@ void LoseAllWeapons( void )
 
 	LoseSuperNashram();
 
-	if( ( WhoIAm < 0 ) || ( WhoIAm >= ( MAX_PLAYERS + 1 ) ) ) return;
+	if( WhoIAm >= ( MAX_PLAYERS + 1 ) ) return;	// WhoIAm is unsigned (BYTE)
 
 	for( Count = 0; Count < MAXPRIMARYWEAPONS; Count++ ) PrimaryWeaponsGot[ Count ] = GodModeCopyOfWeaponsGot[ Count ];
 	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
@@ -8114,7 +8114,7 @@ void GivemeSuperNashram( void )
 {
 	int16_t	Count;
 
-	if( ( WhoIAm < 0 ) || ( WhoIAm >= ( MAX_PLAYERS + 1 ) ) ) return;
+	if( WhoIAm >= ( MAX_PLAYERS + 1 ) ) return;	// WhoIAm is unsigned (BYTE)
 
 	CopyOfPowerLevel = Ships[ WhoIAm ].Object.PowerLevel;
 	CopyOfGeneralAmmo = GeneralAmmo;
@@ -8152,7 +8152,7 @@ void LoseSuperNashram( void )
 {
 	int16_t	Count;
 
-	if( ( WhoIAm < 0 ) || ( WhoIAm >= ( MAX_PLAYERS + 1 ) ) ) return;
+	if( WhoIAm >= ( MAX_PLAYERS + 1 ) ) return;	// WhoIAm is unsigned (BYTE)
 
 	for( Count = 0; Count < MAXMULTIPLES; Count++ ) Ships[ WhoIAm ].OrbAmmo[ Count ] = CopyOfOrbAmmo[ Count ];
 
@@ -8183,7 +8183,7 @@ void HostGivemeSuperNashram( u_int16_t Player )
 {
 	int16_t	Count;
 
-	if( ( Player < 0 ) || ( Player >= ( MAX_PLAYERS + 1 ) ) ) return;
+	if( Player >= ( MAX_PLAYERS + 1 ) ) return;	// Player is unsigned
 
 	Host_CopyOfPowerLevel[ Player ] = Host_PowerLevel[ Player ];
 	Host_CopyOfGeneralAmmo[ Player ] = Host_GeneralAmmo[ Player ];
@@ -8221,7 +8221,7 @@ void HostLoseSuperNashram( u_int16_t Player )
 {
 	int16_t	Count;
 
-	if( ( Player < 0 ) || ( Player >= ( MAX_PLAYERS + 1 ) ) ) return;
+	if( Player >= ( MAX_PLAYERS + 1 ) ) return;	// Player is unsigned
 
 	for( Count = 0; Count < MAXMULTIPLES; Count++ )
 	{
