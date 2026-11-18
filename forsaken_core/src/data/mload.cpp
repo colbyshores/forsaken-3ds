@@ -791,11 +791,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
  *		End Of Visiploy Stuff	
 ===================================================================*/
 
-#if MXV_VERSION_NUMBER >= 3
 		if ( !ReadGroupConnections( Mloadheader, &Buffer ) )
 			return false;
 		ReadSoundInfo( Mloadheader, &Buffer );
-#endif
 
 /*===================================================================
  *		Start of Cell Index Stuff	
@@ -841,7 +839,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 																	Mloadheader->Group[group].zcells[execbuf];
 
 
-#if MXV_VERSION_NUMBER >= 2
 					if ( !execbuf )
 						Mloadheader->Group[group].colour_cell_pnt[0] = (COLOR*) malloc( Mloadheader->Group[group].numofcells[execbuf] * sizeof(COLOR) );
 					else
@@ -851,14 +848,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						Msg( "Mload : Couldnt allocate enough memory for the cell colour info\n" );
 						return false;
 					}
-#else
-					Mloadheader->Group[group].colour_cell_pnt[execbuf] = (COLOR*) malloc( Mloadheader->Group[group].numofcells[execbuf] * sizeof(COLOR) );
-					if( !Mloadheader->Group[group].colour_cell_pnt[execbuf] )
-					{
-						Msg( "Mload : Couldnt allocate enough memory for the cell colour info\n" );
-						return false;
-					}
-#endif
 					Mloadheader->Group[group].num_vertex_indices[execbuf] = *Uint16Pnt++;
 
 					Mloadheader->Group[group].vertex_index_pnt[execbuf] = Uint16Pnt;
@@ -874,14 +863,12 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					Buffer = (char *) VertexCellPnt;
 					
 				}
-#if MXV_VERSION_NUMBER >= 2
 				ambient = (COLOR *) Buffer;
 				for ( i = 0; i < Mloadheader->Group[group].numofcells[0]; i++ )
 				{
 					Mloadheader->Group[group].colour_cell_pnt[0][i] = *ambient++;
 				}
 				Buffer = (char *) ambient;
-#endif
 			}
 		
 		}
@@ -1148,10 +1135,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	// Mloadheader is valid and can be executed...
 	Mloadheader->state = true;
 
-#if MXV_VERSION_NUMBER < 3
-	if ( !FindGroupConnections( Mloadheader ) )
-		return false;
-#endif
 
 	return( true );
 }
@@ -1698,40 +1681,6 @@ float IsGroupVisibleSoundInfo3( MLOADHEADER * Mloadheader , u_int16_t group , u_
 ===================================================================*/
 void InitSoundInfo( MLOADHEADER * /*Mloadheader*/ )
 {
-#if MXV_VERSION_NUMBER <= 2
-	u_int16_t i,e;
-	// Find any groups that a group can see and any groups that are connected to those groups...
-	for( i = 0 ; i < Mloadheader->num_groups ; i++ )
-	{
-		for( e = 0 ; e < Mloadheader->num_groups ; e++ )
-		{
-			SoundInfo[i][e] = 0.0F;
-			if( i != e )
-			{
-				memset( &TempGroups , 0 , sizeof( TempGroups ) );
-				if( IsGroupVisibleSoundInfo( Mloadheader , i , e ) == -1.0F )
-				{
-					SoundInfo[i][e] = IsGroupVisibleSoundInfo2( Mloadheader , i , e );
-				}
-			}
-		}
-	}
-
-	// Find any groups that can see ANY of the allready cassified Groups....
-	for( i = 0 ; i < Mloadheader->num_groups ; i++ )
-	{
-		for( e = 0 ; e < Mloadheader->num_groups ; e++ )
-		{
-			if( i != e )
-			{
-   				if( SoundInfo[i][e] == -1.0F )
-   				{
-   					SoundInfo[i][e] = IsGroupVisibleSoundInfo3( Mloadheader , i , e );
-				}
-			}
-		}
-	}
-#endif
 }
 
 
