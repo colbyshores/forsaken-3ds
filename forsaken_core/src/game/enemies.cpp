@@ -6459,7 +6459,11 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	Move_Off.y = 0.0F;
 	Move_Off.z = 0.0F;
 
-	if( !EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_NOBOB )
+	/* As written since 1998: (!Flags) is 0 or 1 and AI_BEHAVIOUR_NOBOB is
+	 * bit 21, so this is always false and no enemy bobs. The evident
+	 * intent is !(Flags & AI_BEHAVIOUR_NOBOB); changing it would make
+	 * every enemy without NOBOB start bobbing (owner decision). */
+	if( ( !EnemyTypes[Enemy->Type].Behave.Flags ) & AI_BEHAVIOUR_NOBOB )
 	{
 		ObjectBob( Object , &Bob );
 		Move_Off.x += Bob.x - Object->LastBob.x;
@@ -9049,14 +9053,14 @@ bool Enemy_Save( FILE * fp )
 	
 
 	e = -1;
-	if( Enemy = FirstEnemyUsed )
+	if( ( Enemy = FirstEnemyUsed ) )
 	{
 		e = Enemy->Index;
 	}
 	fwrite( &e, sizeof( e ), 1, fp );
 
 	e = -1;
-	if( Enemy = FirstEnemyFree )
+	if( ( Enemy = FirstEnemyFree ) )
 	{
 		e = Enemy->Index;
 	}
@@ -9094,19 +9098,19 @@ bool Enemy_Save( FILE * fp )
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Node = (NODE*)Enemies[i].TNode )
+		if( ( Node = (NODE*)Enemies[i].TNode ) )
 		{
 			e = Node->NodeNum;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Node = (NODE*)Enemies[i].NextTNode )
+		if( ( Node = (NODE*)Enemies[i].NextTNode ) )
 		{
 			e = Node->NodeNum;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Node = (NODE*)Enemies[i].LastTNode )
+		if( ( Node = (NODE*)Enemies[i].LastTNode ) )
 		{
 			e = Node->NodeNum;
 		}
@@ -9136,37 +9140,37 @@ bool Enemy_Save( FILE * fp )
 		fwrite( &Enemies[i].Delay, sizeof( Enemies[i].Delay ), 1, fp );
 
 		e = -1;
-		if( Enemy = Enemies[i].PrevUsed )
+		if( ( Enemy = Enemies[i].PrevUsed ) )
 		{
 			e = Enemy->Index;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Enemy = Enemies[i].NextUsed )
+		if( ( Enemy = Enemies[i].NextUsed ) )
 		{
 			e = Enemy->Index;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Enemy = Enemies[i].PrevFree )
+		if( ( Enemy = Enemies[i].PrevFree ) )
 		{
 			e = Enemy->Index;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Enemy = Enemies[i].NextFree )
+		if( ( Enemy = Enemies[i].NextFree ) )
 		{
 			e = Enemy->Index;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Enemy = Enemies[i].NextInGroup )
+		if( ( Enemy = Enemies[i].NextInGroup ) )
 		{
 			e = Enemy->Index;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Enemy = Enemies[i].PrevInGroup )
+		if( ( Enemy = Enemies[i].PrevInGroup ) )
 		{
 			e = Enemy->Index;
 		}
@@ -9179,7 +9183,7 @@ bool Enemy_Save( FILE * fp )
 		fwrite( &Enemies[i].DistanceToPointOnSlope, sizeof( Enemies[i].DistanceToPointOnSlope ), 1, fp );
 
 		e = -1;
-		if( Enemy = Enemies[i].FormationLink )
+		if( ( Enemy = Enemies[i].FormationLink ) )
 		{
 			e = Enemy->Index;
 		}
@@ -9189,27 +9193,27 @@ bool Enemy_Save( FILE * fp )
 
 
 		e = -1;
-		if( Node = (NODE*)Enemies[i].SplineNode1 )
+		if( ( Node = (NODE*)Enemies[i].SplineNode1 ) )
 		{
 			e = Node->NodeNum;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 		e = -1;
-		if( Node = (NODE*)Enemies[i].SplineNode2 )
-		{
-			e = Node->NodeNum;
-		}
-		fwrite( &e, sizeof( e ), 1, fp );
-
-		e = -1;
-		if( Node = (NODE*)Enemies[i].SplineNode3 )
+		if( ( Node = (NODE*)Enemies[i].SplineNode2 ) )
 		{
 			e = Node->NodeNum;
 		}
 		fwrite( &e, sizeof( e ), 1, fp );
 
 		e = -1;
-		if( Node = (NODE*)Enemies[i].SplineNode4 )
+		if( ( Node = (NODE*)Enemies[i].SplineNode3 ) )
+		{
+			e = Node->NodeNum;
+		}
+		fwrite( &e, sizeof( e ), 1, fp );
+
+		e = -1;
+		if( ( Node = (NODE*)Enemies[i].SplineNode4 ) )
 		{
 			e = Node->NodeNum;
 		}
@@ -9565,13 +9569,13 @@ bool Object_Save( FILE * fp , OBJECT * Obj )
 
 
 	e = -1;
-	if( Node = (NODE*)Obj->NearestNode )
+	if( ( Node = (NODE*)Obj->NearestNode ) )
 	{
 		e = Node->NodeNum;
 	}
 	fwrite( &e, sizeof( e ), 1, fp );
 	e = -1;
-	if( Node = (NODE*)Obj->LastNearestNode )
+	if( ( Node = (NODE*)Obj->LastNearestNode ) )
 	{
 		e = Node->NodeNum;
 	}

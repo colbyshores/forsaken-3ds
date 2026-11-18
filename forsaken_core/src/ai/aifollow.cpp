@@ -74,7 +74,7 @@ void AI_AIR_FOLLOWPATH( register ENEMY * Enemy )
 	}
 	
 	
-	if( TNode = (NODE*) Enemy->TNode )
+	if( ( TNode = (NODE*) Enemy->TNode ) )
 	{
 		if( !(Enemy->Object.NodeNetwork&TNode->NetMask) )
 		{
@@ -218,7 +218,7 @@ void AI_CRAWL_FOLLOWPATH( register ENEMY * Enemy )
 	}
 
 	
-	if( TNode = (NODE*) Enemy->TNode )
+	if( ( TNode = (NODE*) Enemy->TNode ) )
 	{
 
 		if( !(EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_NOTURN) )

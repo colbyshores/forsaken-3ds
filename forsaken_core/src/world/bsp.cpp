@@ -490,7 +490,7 @@ start:
 
 	if( (d1 < -CollisionRadius) && (d2 < -CollisionRadius) )
 	{
-		if( node_ptr = node_ptr->Back )
+		if( ( node_ptr = node_ptr->Back ) )
 		{
 			goto start;
 		}
@@ -499,7 +499,7 @@ start:
 	}
 	if( (d1 >= CollisionRadius) && (d2 >= CollisionRadius) )
 	{
-		if( node_ptr = node_ptr->Front )
+		if( ( node_ptr = node_ptr->Front ) )
 		{
 			goto start;
 		}
@@ -518,7 +518,7 @@ start:
    	intersection_point.y = RayPos.y - ( RayDir.y * distance2plane );
    	intersection_point.z = RayPos.z - ( RayDir.z * distance2plane );
    	
-	if( side = d1 < 0 )
+	if( ( side = ( d1 < 0 ) ) )
    	{
    		near_node_ptr = node_ptr->Back;
    		far_node_ptr = node_ptr->Front;
@@ -558,7 +558,7 @@ start:
 	d = node->Normal.x * Pos->x + node->Normal.y * Pos->y + node->Normal.z * Pos->z + node->Offset;
 	if ( d > TOLER  )
 	{ // definitely in front of plane
-	 	if ( node = node->Front )
+	 	if ( ( node = node->Front ) )
 	 	{
 	 		goto start;
 	 	}
@@ -569,7 +569,7 @@ start:
 	}
 	if ( d < -TOLER )
 	{ // definitely behind plane
-		if ( node = node->Back )
+		if ( ( node = node->Back ) )
 		{
 			goto start;
 		}

@@ -401,7 +401,7 @@ void AI_GetDistToNearestTarget( register ENEMY * Enemy )
 	{
 	    AI_GetNearestSHIPTargetInAnyGROUP();
 	   
-		if ( TObject = (OBJECT*) Tinfo->TObject )
+		if ( ( TObject = (OBJECT*) Tinfo->TObject ) )
 		{
 			Enemy->LastDistance	= Tinfo->Nearest + SoundInfo[Enemy->Object.Group][TObject->Group];
 			//See if target is within think range....

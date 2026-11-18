@@ -418,7 +418,10 @@ void NetworkGameUpdate()
 #else
 				FShortGlobalShip.Bank					= Ships[ WhoIAm ].Object.Bank;
 #endif
-				SendGameMessage(MSG_FUPDATE, 0, 0, 0, (BYTE)(Ships[WhoIAm].Object.Flags & SHIP_SecFire | SHIP_MulFire));
+				/* As written since 1998, SHIP_MulFire is always set here; the
+				 * evident intent is Flags & (SHIP_SecFire | SHIP_MulFire). It is
+				 * on the wire, so changing it is a protocol decision (owner). */
+				SendGameMessage(MSG_FUPDATE, 0, 0, 0, (BYTE)((Ships[WhoIAm].Object.Flags & SHIP_SecFire) | SHIP_MulFire));
 			}
 			else
 			{
@@ -445,7 +448,10 @@ void NetworkGameUpdate()
 				FVeryShortGlobalShip.Secondary			= SecondaryToFireLookup[ Ships[WhoIAm].Secondary ];
 				FVeryShortGlobalShip.PrimPowerLevel		= (BYTE) Ships[ WhoIAm ].PrimPowerLevel;
 				
-				SendGameMessage(MSG_VERYSHORTFUPDATE, 0, 0, 0, (BYTE)(Ships[WhoIAm].Object.Flags & SHIP_SecFire | SHIP_MulFire));
+				/* As written since 1998, SHIP_MulFire is always set here; the
+				 * evident intent is Flags & (SHIP_SecFire | SHIP_MulFire). It is
+				 * on the wire, so changing it is a protocol decision (owner). */
+				SendGameMessage(MSG_VERYSHORTFUPDATE, 0, 0, 0, (BYTE)((Ships[WhoIAm].Object.Flags & SHIP_SecFire) | SHIP_MulFire));
 			}
 			Ships[ WhoIAm ].Object.Flags &=  ~( SHIP_PrimFire | SHIP_SecFire | SHIP_MulFire );
 			Interval = NetUpdateInterval;
@@ -1790,8 +1796,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[ lpVeryShortFUpdate->WhoIAm ].Secondary = ConvSecToNormWeapon( Ships[ lpVeryShortFUpdate->WhoIAm ].Secondary );
 
 /* Added by DC 30/6/98 */
-			if( ( OldMode == DEATH_MODE ) && ( Ships[lpVeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ||
-				( OldMode == NORMAL_MODE ) && ( Ships[lpVeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) )
+			if( ( ( OldMode == DEATH_MODE ) && ( Ships[lpVeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
+				( ( OldMode == NORMAL_MODE ) && ( Ships[lpVeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
 			{
 				ThrowOutRider( lpVeryShortFUpdate->WhoIAm );
 				PlayPannedSfx( SFX_BikeExplode, Ships[ lpVeryShortFUpdate->WhoIAm ].Object.Group , &Ships[lpVeryShortFUpdate->WhoIAm].Object.Pos, 0.0F );
@@ -1858,8 +1864,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[ lpGroupOnly_VeryShortFUpdate->WhoIAm ].Primary = ConvPrimToNormWeapon( Ships[ lpGroupOnly_VeryShortFUpdate->WhoIAm ].Primary );
 			Ships[ lpGroupOnly_VeryShortFUpdate->WhoIAm ].Secondary = ConvSecToNormWeapon( Ships[ lpGroupOnly_VeryShortFUpdate->WhoIAm ].Secondary );
 
-			if( ( OldMode == DEATH_MODE ) && ( Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ||
-				( OldMode == NORMAL_MODE ) && ( Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) )
+			if( ( ( OldMode == DEATH_MODE ) && ( Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
+				( ( OldMode == NORMAL_MODE ) && ( Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
 			{
 				ThrowOutRider( lpGroupOnly_VeryShortFUpdate->WhoIAm );
 				PlayPannedSfx( SFX_BikeExplode, Ships[ lpGroupOnly_VeryShortFUpdate->WhoIAm ].Object.Group , &Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].Object.Pos, 0.0F );
@@ -1956,8 +1962,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					}
 #endif
 
-				if( ( OldMode == DEATH_MODE ) && ( Ships[lpVeryShortUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ||
-					( OldMode == NORMAL_MODE ) && ( Ships[lpVeryShortUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) )
+				if( ( ( OldMode == DEATH_MODE ) && ( Ships[lpVeryShortUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
+					( ( OldMode == NORMAL_MODE ) && ( Ships[lpVeryShortUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
 				{
 					ThrowOutRider( lpVeryShortUpdate->WhoIAm );
 					PlayPannedSfx( SFX_BikeExplode, Ships[ lpVeryShortUpdate->WhoIAm ].Object.Group , &Ships[lpVeryShortUpdate->WhoIAm].Object.Pos, 0.0F );
@@ -2055,8 +2061,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					}
 #endif
 
-				if( ( OldMode == DEATH_MODE ) && ( Ships[lpUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ||
-					( OldMode == NORMAL_MODE ) && ( Ships[lpUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) )
+				if( ( ( OldMode == DEATH_MODE ) && ( Ships[lpUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
+					( ( OldMode == NORMAL_MODE ) && ( Ships[lpUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
 				{
 					ThrowOutRider( lpUpdate->WhoIAm );
 					PlayPannedSfx( SFX_BikeExplode, Ships[ lpUpdate->WhoIAm ].Object.Group , &Ships[lpUpdate->WhoIAm].Object.Pos, 0.0F );
@@ -2131,8 +2137,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[ lpFUpdate->WhoIAm ].Primary = ConvPrimToNormWeapon( Ships[ lpFUpdate->WhoIAm ].Primary );
 			Ships[ lpFUpdate->WhoIAm ].Secondary = ConvSecToNormWeapon( Ships[ lpFUpdate->WhoIAm ].Secondary );
 
-			if( ( OldMode == DEATH_MODE ) && ( Ships[lpFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ||
-				( OldMode == NORMAL_MODE ) && ( Ships[lpFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) )
+			if( ( ( OldMode == DEATH_MODE ) && ( Ships[lpFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
+				( ( OldMode == NORMAL_MODE ) && ( Ships[lpFUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
 			{
 				ThrowOutRider( lpFUpdate->WhoIAm );
 				PlayPannedSfx( SFX_BikeExplode, Ships[ lpFUpdate->WhoIAm ].Object.Group , &Ships[lpFUpdate->WhoIAm].Object.Pos, 0.0F );
