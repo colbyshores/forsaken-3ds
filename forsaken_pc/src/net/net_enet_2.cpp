@@ -183,17 +183,18 @@ static ENetPeer * find_peer_by_id( peer_id_t id )
 
 static peer_id_t find_free_id( void )
 {
-	peer_id_t id;
 	static peer_id_t last = LOWEST_ID;
 	if( last == HIGHEST_ID )
 		last = LOWEST_ID;
 	last++;
-	for( id = last; id <= HIGHEST_ID; id++ )
+	// int, not peer_id_t: an unsigned char counter never exceeds HIGHEST_ID
+	// (255), so the loop would wrap to NO_ID (0) instead of ending
+	for( int id = last; id <= HIGHEST_ID; id++ )
 	{
-		if( id != my_id && ! find_peer_by_id( id ) )
+		if( id != my_id && ! find_peer_by_id( (peer_id_t) id ) )
 		{
-			last = id;
-			return id;
+			last = (peer_id_t) id;
+			return (peer_id_t) id;
 		}
 	}
 	return NO_ID;
