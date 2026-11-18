@@ -84,7 +84,7 @@ capture exists for Forsaken yet, so `hotpath_corpus.json` is explicitly
 `MainRoutines` `oct2.c:4551` / `MainGameRender` `oct2.c:5026` →
 `RenderCurrentCamera` `oct2.c:5910`) and the ≥256×/frame criterion. The
 gate prints that on every run. The first audit deliverable is a real
-capture written to `docs/validation/perf-YYYY-MM-DD-*.log`; then set
+capture, summarised in `docs/OPTIMIZATION-LOG.md`; then set
 `provisional: false`, set `captured`, and re-derive the seed from the
 profile. A hand-maintained hot list silently stops covering; the corpus is
 only as good as its last measurement.

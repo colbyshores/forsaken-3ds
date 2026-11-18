@@ -100,7 +100,7 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 				/* SoundInfo group pre-filter (mirrors CheckHitShip, primary.cpp):
 				 * skip enemies in groups with no direct visibility from the
 				 * bullet's group before any per-enemy vector math. */
-				/* @vfp-exempt R3 — protected hit-set pre-filter mirroring the shipped ship gate; fidelity A/B + multi-trajectory in perf/OPTIMIZATION-LOG.md. measured -7.7ms/frame wall (ramqan mono). Verified 2026-11-11. */
+				/* @vfp-exempt R3 — protected hit-set pre-filter mirroring the shipped ship gate; fidelity A/B + multi-trajectory in docs/OPTIMIZATION-LOG.md. measured -7.7ms/frame wall (ramqan mono). Verified 2026-11-11. */
 				if( SoundInfo[ Enemy->Object.Group ][ Group ] )
 					goto SkipIt;
 

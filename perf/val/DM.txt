@@ -1,5 +1,0 @@
-workload=forsaken
-status=started
-scenario=forsaken-bench
-level=defend2 slot=5 resolve=exact
-stereo=forced_stereo target_frames=240 warmup=30 budget_us=14084

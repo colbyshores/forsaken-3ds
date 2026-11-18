@@ -1,2 +1,0 @@
-workload=atm_workload_ok
-phase=started

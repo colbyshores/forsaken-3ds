@@ -1849,7 +1849,7 @@ bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
 	 * so allocate exactly that many WORDs. The old *3 triple-counted and
 	 * reserved 589,806 bytes per 98,301-index dynamic buffer instead of
 	 * 196,602 (768 KiB recovered across the two). Write-bounds audit in
-	 * perf/OPTIMIZATION-LOG.md: per-frame fills are MAXPOLYVERTS-capped
+	 * docs/OPTIMIZATION-LOG.md: per-frame fills are MAXPOLYVERTS-capped
 	 * (800 verts/call), text overlays write tens of quads, load-time
 	 * loops write exactly triangleCount*3 — all far below requested. */
 	renderObject->indexBuffer = linearAlloc(numIndices * sizeof(WORD));
