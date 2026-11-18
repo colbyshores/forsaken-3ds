@@ -1273,7 +1273,6 @@ bool CollectPickup( u_int16_t i )
 						ShieldCritical = false;
 					if( Ships[ WhoIAm ].Object.Shield > MAX_SHIELD ) Ships[ WhoIAm ].Object.Shield = MAX_SHIELD;
 					MessageSFX = SFX_Select_Shield;
-					JustPickedUpShield = true;
 				}
 				else
 				{

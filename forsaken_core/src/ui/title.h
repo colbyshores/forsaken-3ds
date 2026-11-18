@@ -276,7 +276,6 @@ enum
 };
 
 
-
 constexpr int MAXTITLEEVENTS = 128;
 constexpr int MAXTITLETIMERS = 32;
 
@@ -610,7 +609,6 @@ extern float VDUoffsetX;
 extern float VDUoffsetY;
 extern LIST LevelList;
 extern MENUSTATE MenuState;
-extern bool MenuFrozen;
 extern int16_t InGameLoadGameLevelNum;
 extern bool BrightShips;
 extern int GameCompleted;

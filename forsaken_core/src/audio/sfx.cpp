@@ -455,7 +455,6 @@ SPOT_SFX_LIST SpotSfxList[ MAX_LOOPING_SFX ];
 
 char TauntPath[ 128 ];
 
-bool BikerSpeechPlaying = false;
 
 u_int32_t SfxUniqueID = 1;
 
@@ -1914,7 +1913,6 @@ void InitSfxHolders( void )
 		SfxHolder[ i ].Used = false;
 
 	SfxUniqueID = 1;
-	BikerSpeechPlaying = false;
 }
 
 // TODO we should probably find the farthest sound and kill it? 

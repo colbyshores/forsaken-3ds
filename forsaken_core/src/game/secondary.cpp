@@ -6783,7 +6783,6 @@ void RegenerateQuedMines( void )
 
 		NumMissedMines = 0;
 		NumMissedInitMines = 0;
-		NumMissedKillMines = 0;
 	}
 }
 

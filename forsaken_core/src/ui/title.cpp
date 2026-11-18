@@ -611,7 +611,6 @@ SLIDER WatchPlayerSelect				= { 0, MAX_PLAYERS+1, 1, 0, 0, 0.0F }; // which play
 SLIDER TextScaleSlider				= { 0, 5, 1, 1, 0, 0.0F, 0.0F, 0, false, NULL, NULL, SetTextScale };
 
 bool ShowTeamInfo;
-bool MenuFrozen					= false;
 bool NoTeamSelect				= false;
 bool UseNewMenus				= true;
 bool Autoleveling				= true;
@@ -2634,13 +2633,11 @@ MENUITEM *MenuItemStack[ MAXMENULEVELS ];
 TEXTINFO *TextStack[ MAXTEXTITEMS ];
 int MenuStackLevel = 0;
 int TextStackLevel = 0;
-bool ForceConfigSave = false;
 
 bool TitleOnceOnly = true;
 
 VECTOR View, Look, Up, DiscLookPos, DiscViewPos, StartLookPos, StartViewPos;
 
-float CurrentFOV;
 VECTOR OrigPos[NUMOFTITLEMODELS];
 
 float rot[6], rotspeed[6], RotPause[6], StackY[7];
@@ -2688,9 +2685,6 @@ float VDUrot;
 VDUINFO	LeftVDU, RightVDU;
 
 
-int CurrentTextItem;
-
-bool VduProcessed;
 bool InitialTexturesSet;
 bool LevelDisplayed;
 bool BikerDisplayed;
@@ -2737,7 +2731,6 @@ new text globals
 ***************/
 #define VDU_Width 200
 
-int Current2dBox;
 bool DrawTextItemBox;
 float VDUoffsetX = 105.0F;
 float VDUoffsetY = 15.0F;
@@ -2748,30 +2741,22 @@ float	TEXTINFO_currenty;
 float	TEXTINFO_currentheight;				
 float	TEXTINFO_TextSpace;				
 float	TEXTINFO_LineSpace;				
-int		TEXTINFO_currentstartpoint;			
 int		TEXTINFO_currentendpoint;
-extern int CurrentTextItem;
-u_int16_t testboxpoly;	
 u_int16_t TextLookup[NUMSCREENFONTS][256];		
-int CurrentTeletype;
 MENUITEM *LastMenuItem;
-bool ScreenPolyCursorActive;
 bool ForceNewLine;
 
 /***************
 holo-bike stuff
 ***************/
 int SelectedBikeFrame;
-u_int16_t SelectedBikeModel;
 u_int16_t BikeLine[MAXNUMOF2DPOLYS];
 u_int16_t CurrentHoloModel = (u_int16_t)-1;
 bool LinesActive;
 int CurrentLine;
 VECTOR BikePos;
 SCANLINES scanline[MAXNUMOF2DPOLYS];
-bool BikeLoaded;
 float CurrentOffset;
-bool BikeOnSwap;
 
 
 /**************
@@ -2787,20 +2772,17 @@ bool VDU_Ready;
 float HoloLightBrightness, OldHoloLightBrightness;
 
 float OldHoloPadHeight;
-float StackRot;
 
 VECTOR stackpos[8];
 
-bool StackDown;
 float MaxStackTheta = 170.0F;
 
 int		StackJudderNum;
 float	StackRotAmount;
 float	OldStackRotAmount;
 
-float BikeSwapScale;
 
-float SelectedBikeScale, OldSelectedBikeScale;
+float SelectedBikeScale;
 int	OldSelectedBike;
 bool HolopadJudderReq;
 
@@ -2810,7 +2792,6 @@ float TeleTypeTimer;
 int TeleTypeSkip;
 bool NewTextCharDisplayed = false;
 
-bool ListRedrawReq;
 
 int OldMenuStatus;
 
@@ -2849,9 +2830,6 @@ typedef struct
 	float xmax;
 }HIGHLIGHTPOLYINFO;
 
-int HighlightPolyListStart;
-int HighlightPolyListEnd;
-bool HighlightListEmpty;
 bool WasteAFrame = false;
 
 /********************
@@ -2877,8 +2855,6 @@ float CursorTimer = 0.0F;
 #define CursorInterval	1.0F
 
 
-int oldlistitems;
-
 bool TitleInitDone;
 
 /*********************
@@ -2895,7 +2871,6 @@ typedef struct
 TITLEMSG TitleMsgQue[MAX_TITLE_MSGS];
 int		TitleMsgQueStart, TitleMsgQueEnd, TotalTitleMsgs;
 float TitleMessageTimer;
-int MessagesDisplayed;
 
 
 /**************
@@ -3126,7 +3101,6 @@ void SetInitialTitleParams()
 	View = StartViewPos;
 	Look = StartLookPos;
 	Up.x = 0.0F; Up.y = 1.0F; Up.z = 0.0F;
-	CurrentFOV = 80.0F;
 	
 
 	/**********************************************************************************
@@ -3153,9 +3127,6 @@ void SetInitialTitleParams()
 	CurrentVDUHighlight = -1;
 
 
-	VduProcessed = false;
-
-
 	/**********************************************************************************
 	Viewpoint movement
 	**********************************************************************************/
@@ -3166,33 +3137,23 @@ void SetInitialTitleParams()
 	/***********************
 	new text stuff
 	************************/
-	Current2dBox = 0;
 	DrawTextItemBox = false;	//draw the bounding box for VDU text items?
 	CurrentScreenPoly = 0;
-	CurrentTextItem = 0;
-	CurrentTeletype = 0;
 	LastMenuItem = CurrentMenuItem;
-	ScreenPolyCursorActive = false;
 
 
 	/***********************
 	holo-bike stuff
 	************************/
 	LinesActive = false;
-	BikeLoaded = false;
 	CurrentOffset = 0.0F;
-	BikeOnSwap = false;
 
 	VDU_Ready = false;
-	StackRot = 0.0F;
 
-	StackDown = false;
-	BikeSwapScale = 0.0F;
 
 	OldSelectedBike = -1;
 
 	HolopadJudderReq = true;
-	ListRedrawReq = true;
 
 	RoomDarkness = 1.0F;
 
@@ -3210,9 +3171,6 @@ void SetInitialTitleParams()
 	/**********************
 	new highlight stuff
 	***********************/
-	HighlightPolyListStart = 0;
-	HighlightPolyListEnd = 0;
-	HighlightListEmpty = true;
 
 	ResetAllEvents();
 
@@ -3227,7 +3185,6 @@ void SetInitialTitleParams()
 	InitTitleMessaging();
 
 	TitleMessageTimer = 0.0F;
-	MessagesDisplayed = 0;
 
 	// team game stuff....
 	memset( &PlayerReady, false, sizeof(bool) * MAX_PLAYERS);
@@ -3393,15 +3350,15 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					ApplyMatrix( &Mat_R, &tempv1, &tempv1 );
 					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
 					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
-					tempv1.x *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv1.y *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv1.z *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv2.x *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv2.y *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv2.z *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv3.x *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv3.y *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv3.z *= HoloModelScale * scaleout; //* BikeSwapScale;
+					tempv1.x *= HoloModelScale * scaleout;
+					tempv1.y *= HoloModelScale * scaleout;
+					tempv1.z *= HoloModelScale * scaleout;
+					tempv2.x *= HoloModelScale * scaleout;
+					tempv2.y *= HoloModelScale * scaleout;
+					tempv2.z *= HoloModelScale * scaleout;
+					tempv3.x *= HoloModelScale * scaleout;
+					tempv3.y *= HoloModelScale * scaleout;
+					tempv3.z *= HoloModelScale * scaleout;
 					
 					startset = false;
 					endset = false;
@@ -3556,15 +3513,15 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 					ApplyMatrix( &Mat_R, &tempv2, &tempv2 );
 					ApplyMatrix( &Mat_R, &tempv3, &tempv3 );
 
-					tempv1.x *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv1.y *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv1.z *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv2.x *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv2.y *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv2.z *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv3.x *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv3.y *= HoloModelScale * scaleout; //* BikeSwapScale;
-					tempv3.z *= HoloModelScale * scaleout; //* BikeSwapScale;
+					tempv1.x *= HoloModelScale * scaleout;
+					tempv1.y *= HoloModelScale * scaleout;
+					tempv1.z *= HoloModelScale * scaleout;
+					tempv2.x *= HoloModelScale * scaleout;
+					tempv2.y *= HoloModelScale * scaleout;
+					tempv2.z *= HoloModelScale * scaleout;
+					tempv3.x *= HoloModelScale * scaleout;
+					tempv3.y *= HoloModelScale * scaleout;
+					tempv3.z *= HoloModelScale * scaleout;
 					
 					startset = false;
 					endset = false;
@@ -4950,7 +4907,6 @@ void MenuChange( MENUITEM * Item )
 	
 	DoHighlight = true;	//menu has changed, therefore ensure option is highlighted
 
-	VduProcessed = false;
 
 	PanDone = false;
 
@@ -5015,7 +4971,6 @@ void MenuBack()
 			
 		DoHighlight = true;	//menu has changed, therefore ensure option is highlighted
 
-		VduProcessed = false;
 
 		PanDone = false;
 
@@ -6178,7 +6133,6 @@ void NewInitBikeMenu ( MENU * /*Menu*/)
 	InitBikeList(NULL);
 
 	SelectedBikeFrame = BikeChars[ BikeList.selected_item ];
-	SelectedBikeModel = BikeModelLookup[ BikeList.selected_item ];
 	SelectedBikeScale = BikeModelScale[ BikeList.selected_item ];
 }
 
@@ -6190,7 +6144,6 @@ void NewInitBikeMenu ( MENU * /*Menu*/)
 void ExitBikerMenu( MENU *Menu )
 {
 	{
-		ForceConfigSave = false;
 		*player_config = Config;
 		write_config( player_config, biker_config );
 	}
@@ -6635,7 +6588,6 @@ void GetBikeDetails(int Bike, MENUITEM * /*item*/)
 {
 
 	SelectedBikeFrame = BikeChars[ Bike ];
-	SelectedBikeModel = BikeModelLookup[ Bike ];
 	SelectedBikeScale = BikeModelScale[ Bike ];
 	strcpy(bike_name,(char*)BikeList.item[ Bike ]);
 	if ( WhoIAm != (u_int8_t) -1 )
@@ -7705,12 +7657,9 @@ void ExitBikeSelection( MENUITEM * /*item*/ )
 
 	SelectedBike = BikeList.selected_item;
 	SelectedBikeFrame = BikeChars[ BikeList.selected_item ];
-	SelectedBikeModel = BikeModelLookup[ BikeList.selected_item ];
-	OldSelectedBikeScale = SelectedBikeScale;
 	SelectedBikeScale = BikeModelScale[ BikeList.selected_item ];
 	Config.bike = SelectedBike;
 	player_config->bike = Config.bike;
-	ForceConfigSave = false;
 	write_config( player_config, biker_config );
 	strcpy(bike_name,(char*)BikeList.item[BikeList.selected_item]);
 	AddBikeArrow( bike_name, SelectedBike );
@@ -8785,7 +8734,6 @@ void DrawFlatMenuList( MENUITEM *Item )
 		AddToTextStack( TextInfo );
 
 	}
-	oldlistitems = l->items;
 
 	AddToFlatMenuList( Item );
 }
@@ -8834,7 +8782,6 @@ void DrawSplitMenuList( MENUITEM *Item )
 
 		}
 	}
-	oldlistitems = l->items;
 
 	AddToFlatMenuList( Item );
 }
@@ -10013,7 +9960,6 @@ void VduClear ( void )
 		}
 
 	TextStackLevel = 0;
-	CurrentTeletype = 0;
 
 	if(LastMenu)
 		for( Item = LastMenu->Item ; Item->x >= 0 ; Item++ )
@@ -10054,7 +10000,6 @@ bool Plot2dBox (TEXTINFO *TextInfo)
 	u_int8_t r, g, b;
 
 	screenpoly[CurrentScreenPoly] = FindFreeScrPoly();					
-	testboxpoly = screenpoly[CurrentScreenPoly];
 	if( screenpoly[CurrentScreenPoly] != (u_int16_t ) -1 )
 	{
 
@@ -10755,8 +10700,6 @@ void PrintTextItem (TEXTINFO *TextInfo)
 	{
 		if ((str[i] == ' ') || (str[i] == '~') || (i == length - 1))
 		{
-			if (newline)
-				TEXTINFO_currentstartpoint = StartPos;
 			if(!FormatTextItem(StartPos, i, TextInfo, &newline))
 			{
 			 	if (!(TextInfo->flags & TEXTFLAG_ForceFit))
@@ -10778,8 +10721,6 @@ void PrintTextItem (TEXTINFO *TextInfo)
 
 	}
 	
-	if (newline)
-		TEXTINFO_currentstartpoint = StartPos;
 
 	TextInfo->length[TextInfo->num_lines-1] = TEXTINFO_currentx;
 	TextInfo->height[TextInfo->num_lines-1] = TEXTINFO_currentheight + TEXTINFO_LineSpace;
@@ -15058,7 +14999,7 @@ void MenuProcess()
 	if (Pulse > 1.0F)
 		Pulse -= (float)floorf((double)Pulse);
 
-	// TODO - need to handle MENU_NEW_Error and MenuFrozen
+	// TODO - need to handle MENU_NEW_Error
 
 	for( i = 0 ; i < input_buffer_count ; i++ )
 	{

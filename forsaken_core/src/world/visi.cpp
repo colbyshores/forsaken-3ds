@@ -38,7 +38,6 @@
 ===================================================================*/
 
 
-
 static int GTabRowSize;
 
 #define GROUP2GROUP_OFFSET( G1, G2 )	( ( (G2) >> 5 ) + ( (G1) * GTabRowSize ) )
@@ -65,12 +64,9 @@ u_int16_t IndirectVisible[ MAXGROUPS ];
 
 static VECTOR clip_top, clip_bottom, clip_left, clip_right; // clipping planes
 
-int		NumOfVertsConsidered= 0;
 int		NumOfVertsTouched= 0;
 
 u_int16_t	GroupImIn;
-u_int16_t	CurrentGroupVisible;						// the real group thats visible
-u_int16_t	GroupInVisibleList;							// where it is in the visibility list
 u_int16_t	NumGroupsVisible;
 u_int16_t	GroupsVisible[MAXGROUPS];
 u_int16_t	IsGroupVisible[MAXGROUPS];
@@ -1057,7 +1053,6 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 	Tempproj = proj;
 	Tempview = view;
 
-	NumOfVertsConsidered= 0;
 	NumOfVertsTouched= 0;
 
 	FSGetViewPort(&OldViewPort);
@@ -1079,8 +1074,6 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 		for ( g = cam->visible.first_visible, i = 0; g; g = g->next_visible, i++ )
 		{
 		 	ClipGroup( &CurrentCamera, (u_int16_t) g->group );
-		  CurrentGroupVisible = GroupsVisible[i];
-			GroupInVisibleList = i;
 
 			if ( XLight1Group(  Mloadheader, GroupsVisible[i] ) != true  )
 				return false;

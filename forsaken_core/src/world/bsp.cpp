@@ -320,7 +320,6 @@ static float RayLength;
 VECTOR CollidePoint;
 BSP_NODE *CollideNode;
 BSP_NODE *OldCollideNode;
-VECTOR OldCollidePoint;
 float CollisionRadius = 0.0F;
 
 bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *ImpactPoint, VECTOR *ImpactNormal, float *ImpactOffset , u_int16_t group)
@@ -342,7 +341,6 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 	if ( collided && CollideNode )
 	{
 		OldCollideNode = CollideNode;
-		OldCollidePoint = CollidePoint;
 		*ImpactPoint = CollidePoint;
    		*ImpactNormal = CollideNode->Normal;
    		*ImpactOffset = CollideNode->Offset - CollisionRadius;

@@ -71,7 +71,6 @@ void SpecialDestroyGame( void );
 extern float real_framelag;
 extern float Oldframelag;
 extern float Demoframelag;
-extern bool OldDrawPanel;
 bool InitLevels( const char * levels_list );
 extern const char *CurrentLevelsList;
 extern int Depth;

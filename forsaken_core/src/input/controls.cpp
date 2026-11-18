@@ -13,7 +13,6 @@ long joy_axis_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_AXIS ];
 bool joy_button_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
 u_int8_t joy_hat_state[ MAX_JOYSTICKS ][ MAX_JOYSTICK_POVS ][ MAX_POV_DIRECTIONS ];
 int input_buffer_count;
-bool input_grabbed = false;
 
 #include "data/config.h"
 #include "ui/title.h"
@@ -42,8 +41,6 @@ bool input_grabbed = false;
 /*===================================================================
     Some Keyboard and Mouse Globals
 ===================================================================*/
-
-
 
 
 #define KEY_HELD( K )     ( key_state[ new_input ][ K ] )

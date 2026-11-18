@@ -3825,7 +3825,6 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 
 };
 
-ENEMY * TestEnemy = NULL;
 	
 /*===================================================================
 	Enemy Control Routines...
@@ -6158,8 +6157,6 @@ void EnemyFlyUnderAiControl( ENEMY * Enemy )
 	if( ( Enemy->AIFlags & AI_ANYPLAYERINRANGE ) || (Enemy->Type == ENEMY_Boss_Avatar) )
 	{
 
-		if( Enemy->AIFlags & AI_PLAYERISTARGETINGME )
-			TestEnemy = Enemy;
 		if( EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_PRECISECONTROL )
 		{
 			CarryOutPreciseAIMovementCommands( Enemy );

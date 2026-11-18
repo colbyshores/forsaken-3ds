@@ -22,13 +22,11 @@ void input_grab( bool grab )
 	// 3. don't remember who asked or why ? need to enable again.
 	if( render_info.fullscreen )
 	{
-		input_grabbed = true;
 		SDL_SetWindowGrab( render_info.window, SDL_TRUE );
 		SDL_ShowCursor( SDL_DISABLE );
 		return;
 	}
 	// window mode
-	input_grabbed = grab;
 
 	SDL_SetWindowGrab( render_info.window, grab ? SDL_TRUE : SDL_FALSE );
 	SDL_ShowCursor( grab ? SDL_DISABLE : SDL_ENABLE );

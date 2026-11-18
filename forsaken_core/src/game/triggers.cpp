@@ -45,7 +45,6 @@ constexpr int TRG_VERSION_NUMBER = 1;
 TRIGGERVAR * AvatarActivated = NULL;
 TRIGGERVAR * Level_End = NULL;
 TRIGGERVAR * DecreaseTemperature = NULL;
-TRIGGERVAR * MinimumTemperature = NULL;
 TRIGGERVAR * TimeLimitTrigger = NULL;
 int	NumOfTrigMods = 0;
 TRIGGERMOD	*TrigMods = NULL;
@@ -752,7 +751,6 @@ bool Triggerload( char * Filename )
 	Level_End = NULL;
 	AvatarActivated = NULL;
 	DecreaseTemperature = NULL;
-	MinimumTemperature = NULL;
 	TimeLimitTrigger = NULL;
 
 
@@ -1155,7 +1153,6 @@ bool Triggerload( char * Filename )
 		{
 			if( !(strncasecmp( "Minimumtemperature" , &TVpnt->Name[0], 18 ) ) )
 			{
-				MinimumTemperature = TVpnt;
 				break;
 			}
 			TVpnt++;

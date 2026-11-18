@@ -94,11 +94,6 @@ int16_t	MaxKills = 0;
 extern	float	DemoAvgFps;
 
 
-bool	CanDoDamage[MAX_PLAYERS+1];
-
-bool		JustGenerated = false;
-bool		JustPickedUpShield = false;
-
 int16_t	NextworkOldBikeNum = -1;
 
 float PrevHull;
@@ -181,10 +176,8 @@ MISSEDMINEMSG				MissedMines[ MAXMISSEDMINES ];
 SHORTMINE						MissedInitMines[ MAXMISSEDMINES ];
 int16_t								NumMissedMines = 0;
 int16_t								NumMissedInitMines = 0;
-int16_t								NumMissedKillMines = 0;
 
 GLOBALSHIP              Ships[MAX_PLAYERS+1];
-bool	DemoShipInit[MAX_PLAYERS+1];
 
 px_timer_t	LastPacketTime[MAX_PLAYERS+1];
 BYTE	CommBuff[MAX_BUFFER_SIZE];
@@ -820,13 +813,11 @@ void SetupNetworkGame()
     memset(&PlayerHealths,  0,              sizeof(PlayerHealths));
     memset(&ShipHealthColourInterval, 0.0F, sizeof(ShipHealthColourInterval));
 
-	JustGenerated = true;
 	
 	for(i=0; i<(MAX_PLAYERS+1); i++)
 	{
 		// everyone starts off normal....
 		GameStatus[i] = STATUS_Null;
-		CanDoDamage[i] = true;
 		Ships[i].BikeNum = ( i % MAXBIKETYPES );
 		Ships[i].ModelNum = (u_int16_t) -1;
 		Ships[i].Object.Type = OBJECT_TYPE_SHIP;
@@ -873,7 +864,6 @@ void InitShipStructure( int i , bool ResetScore )
 {
 	int16_t Count;
 
-	CanDoDamage[i] = true;
 
 	Ships[i].BikeNum = ( i % MAXBIKETYPES );
 	Ships[i].ShieldHullCount = 0;
@@ -1017,7 +1007,6 @@ void smallinitShip( u_int16_t i )
 
 	NumMissedMines = 0;
 	NumMissedInitMines = 0;
-	NumMissedKillMines = 0;
 
 	if ( Mloadheader.state == true)
 	{
@@ -1755,7 +1744,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			}
 /* ------------------- */
 
-			DemoShipInit[ lpVeryShortFUpdate->WhoIAm ] = true;
 			return;
 		}
 		else
@@ -1822,7 +1810,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				StopTaunt();
 			}
 
-			DemoShipInit[ lpGroupOnly_VeryShortFUpdate->WhoIAm ] = true;
 			return;
 		}
 		else
@@ -1908,7 +1895,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					CreateReGen( lpVeryShortUpdate->WhoIAm );
 				}
 
-				DemoShipInit[ lpVeryShortUpdate->WhoIAm ] = true;				
 				return;
 			}
 			else
@@ -1985,7 +1971,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					CreateReGen( lpUpdate->WhoIAm );
 				}
 
-				DemoShipInit[ lpUpdate->WhoIAm ] = true;				
 				return;
 			}
 			else
@@ -2051,7 +2036,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				StopTaunt();
 			}
 
-			DemoShipInit[ lpFUpdate->WhoIAm ] = true;
 			return;
 		}
 		else

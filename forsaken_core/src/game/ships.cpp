@@ -1438,7 +1438,6 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 	u_int16_t	i;
 	u_int16_t	spos;
 	int16_t	Count;
-	JustGenerated = true;
 
 	for( i = 0 ; i < (MAX_PLAYERS+1) ; i++ )
 	{
@@ -1677,7 +1676,6 @@ void InitShipRandomPos( int16_t i )
 	Ships[i].Object.NearestNode = NULL;
 	Ships[i].Object.Type = OBJECT_TYPE_SHIP;
 
-	JustGenerated = true;
 	Ships[i].Object.Shield = Start_Shield;
 	Ships[i].Object.Hull	= Start_Hull;
 	Ships[i].Object.Angle.x = 0.0F;
@@ -1765,7 +1763,6 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	VECTOR	Start_Right;
 	VECTOR	Ship_Up;
 	QUAT	ZQuat;
-	JustGenerated = true;
 
 	if( (MyGameStatus==STATUS_SinglePlayer) || (MyGameStatus==STATUS_StartingSinglePlayer) )
 	{
@@ -2034,7 +2031,6 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 		ShipPnt->Object.ExternalForce.z = ShipPnt->Move_Off.z;
 
 		Current_Camera_View = MAX_PLAYERS;
-		OldDrawPanel = DrawPanel;
 		DrawPanel = false;
 		RearCameraDisable = true;
 	}
@@ -2134,7 +2130,6 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 
 			WhiteOut = 0.0F;
 			InitShipRandomPos( i );
-			JustGenerated = true;
 			ShipPnt->Object.Mode = NORMAL_MODE;
 			ShipPnt->InvulTimer = RGENINVULTIME;		// approx 1 second of invulnerability...			
 			ShipPnt->Invul = true;
@@ -2739,7 +2734,6 @@ bool MultiSfxTaunt1Off = false;
 
 u_int16_t CurrentKillPos = 0;
 px_timer_t	KillMemoryTime[MAXKILLMEMORY];
-int16_t	KillMemory[MAXKILLMEMORY];
 
 px_timer_t	camping_time;
 VECTOR		CampingPos;
@@ -2775,7 +2769,6 @@ void MultiSfxHandle( void )
 			// Clear stuff out so it doesnt get played again..
 			while( KillIndex != CurrentKillPos )
 			{
-				KillMemory[KillIndex] = -1;
 				KillIndex += 1;
 				KillIndex &= ( MAXKILLMEMORY -1 );
 			}
@@ -2831,7 +2824,6 @@ void MultiSfxHandle( void )
 ===================================================================*/
 void AddKill( void )
 {
-	KillMemory[CurrentKillPos] = GetTotalKills(WhoIAm);
 	timer_run( &KillMemoryTime[CurrentKillPos] );
 	CurrentKillPos++;
 	if( CurrentKillPos >= MAXKILLMEMORY )
@@ -2844,7 +2836,6 @@ void InitMultiSfxHandle( void )
 	int i;
 	for( i = 0 ; i < MAXKILLMEMORY ; i ++ )
 	{
-		KillMemory[i] = -1;
 		timer_run( &KillMemoryTime[i] );
 	}
 	CurrentKillPos = 0;

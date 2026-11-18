@@ -90,7 +90,6 @@ px_timer_t level_time;
 
 // Ai Modes
 
-bool  ScoreDisplaySfx = true;
 bool  IMustQuit = false;
 // Capture The Flag Stuff
 bool  CaptureTheFlag	= false;
@@ -132,8 +131,6 @@ float FPS = 0.0F;         // Frames Per Second...
 
 #define FOV_GROW(A)     ((A) + 10.0F)
 #define FOV_SHRINK(A)   ((A) - 10.0F)
-
-
 
 
 bool InitViewport( void );
@@ -207,9 +204,7 @@ float chosen_fov = START_FOV;
 float normal_fov = START_FOV;
 
 bool  DrawPanel = false;
-bool  ReMakeSimplePanel = true;
 
-bool  OldDrawPanel = true;
 bool  Panel = true;
 
 bool ChangeLevel( void );
@@ -2593,7 +2588,6 @@ bool RenderScene( void )
 
     clear_black();
 
-    MenuFrozen = false; // ensure that menus are OK to use once in game
     JustExitedMenu = false;
 
     QuickStart = QUICKSTART_None;
@@ -2608,7 +2602,6 @@ bool RenderScene( void )
     }
     InitFont();
 
-    ReMakeSimplePanel = true;
 
     InitSkinExecs();
     InitPortalExecs();
@@ -4160,7 +4153,6 @@ bool  InitScoreDisplay()
 
   // process scores...
   ScoreSort();
-  ScoreDisplaySfx = true;
 
   return true;
 }

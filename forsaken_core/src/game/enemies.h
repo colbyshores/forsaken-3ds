@@ -361,8 +361,6 @@ enum
 };
 
 
-
-
 constexpr int ENEMY_STATUS_Nothing = 0;
 constexpr int ENEMY_STATUS_Enable = 1;
 constexpr int ENEMY_STATUS_Generating = 2;
@@ -387,7 +385,6 @@ void InitEnemies( void );
 ENEMY * FindFreeEnemy( void );
 
 
-
 #ifdef DEBUG_ON
 void KillUsedEnemyDebugOn( ENEMY * Object, char *in_file, int in_line );
 #undef KillUsedEnemy
@@ -395,7 +392,6 @@ void KillUsedEnemyDebugOn( ENEMY * Object, char *in_file, int in_line );
 #else
 void KillUsedEnemy( ENEMY * Object );
 #endif
-
 
 
 bool PreLoadEnemies( void );
@@ -444,6 +440,5 @@ extern ENEMY Enemies[ MAXENEMIES ];
 extern int16_t NumInitEnemies;
 extern int16_t NumKilledEnemies;
 extern ENEMY * EnemyGroups[ MAXGROUPS ];
-extern ENEMY * TestEnemy;
 void UpdateEnemiesClipGroup( CAMERA * Camera );
 extern bool ShowUntriggeredNMEs;

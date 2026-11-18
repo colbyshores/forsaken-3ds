@@ -58,7 +58,6 @@ static	float		CountDown_Scale = TIMERSTARTSCALE;
 static	float		CountDown_Wanted_Scale = TIMERSTARTSCALE;
 static	float		CountDown_Col = 1.0F;
 
-u_int16_t	ScreenMultiples[ MAXMULTIPLES ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
 int		SinglePlayerTimeLimit = 0;
 u_int16_t	ThermoScrPoly = (u_int16_t) -1;
 u_int16_t	FlashScreenPoly	= (u_int16_t) -1;
@@ -199,7 +198,6 @@ void InitScrPolys( void )
 	FlashScreenPoly = (u_int16_t) -1;
 	HitBox = (u_int16_t) -1;
 	for( i = 0; i < 4; i++ ) TargScrPolys[ i ] = (u_int16_t) -1;
-	for( i = 0; i < MAXMULTIPLES; i++ ) ScreenMultiples[ i ] = (u_int16_t) -1;
 	ClearCountdownBuffers();
 
 	FirstScrPolyUsed = (u_int16_t) -1;
@@ -1713,7 +1711,6 @@ void ShowScreenMultiples( void )
 
 			i = FindFreeScrPoly();
 	
-			ScreenMultiples[ Count ] = i;
 	
 			if( i != (u_int16_t) -1 )
 			{

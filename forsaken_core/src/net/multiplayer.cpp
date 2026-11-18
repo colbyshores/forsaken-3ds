@@ -50,7 +50,6 @@ bool IpOnCLI = false;
  * Globals to this module
  */
 
-int						TeamMembers[MAX_TEAMS];
 
 MENU  *				GetPlayerNumMenu;
 
@@ -369,7 +368,6 @@ void InitTeamLists( MENU * /*Menu*/ )
 	TeamList[0] = PlayersList;
 	TeamList[0].selected_item = -1;
 	TeamList[0].display_items = 12;
-	TeamMembers[0] = PlayersList.items;
 	
 	for (i = 1; i < MAX_TEAMS; i++)
 	{
@@ -378,7 +376,6 @@ void InitTeamLists( MENU * /*Menu*/ )
 		TeamList[i].display_items = 12;			// hard wired in because MAX_PLAYERS will increase
 		TeamList[i].selected_item = -1;
 
-		TeamMembers[i] = 0;
 	}
 
 	for ( i = 0; i < MAX_PLAYERS; i++ )

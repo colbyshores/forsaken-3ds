@@ -36,4 +36,3 @@ extern bool TintBikeTeamColor;
 extern bool ResetKillsPerLevel;
 extern MENU * GetPlayerNumMenu;
 extern bool MyResetKillsPerLevel;
-extern int TeamMembers[ MAX_TEAMS ];

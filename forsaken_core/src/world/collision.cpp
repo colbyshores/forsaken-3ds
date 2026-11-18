@@ -39,12 +39,10 @@ constexpr int MAX_FEELER_RAYS = (9);
 constexpr int MAX_QFEELER_RAYS = (5);
 
 
-
 constexpr double POINT_ON_PORTAL_TOLERANCE = (0.1);
 constexpr float OUTSIDE_GROUP_TOLERANCE = (25.0F);
 
 int no_collision = 0;
-int outside_group = 0;
 
 static VECTOR		ColPoint;
 static ZONESIDE	*	ColSide;
@@ -281,12 +279,6 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 		EndPos->y = StartPos->y + MoveOffset->y;
 		EndPos->z = StartPos->z + MoveOffset->z;
 	}
-	dv.x = (float) fabsf( EndPos->x - m->Group[ *EndGroup ].center.x );
-	dv.y = (float) fabsf( EndPos->y - m->Group[ *EndGroup ].center.y );
-	dv.z = (float) fabsf( EndPos->z - m->Group[ *EndGroup ].center.z );
-	outside_group = dv.x > m->Group[ *EndGroup ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
-					dv.y > m->Group[ *EndGroup ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
-					dv.z > m->Group[ *EndGroup ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
 	return hit_bg;
 }
 
@@ -315,7 +307,6 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 	u_int16_t group;
 	u_int16_t next_group;
 	bool hit_portal;
-	VECTOR dv;
 
 	next_group = StartGroup;
 	ppos = *StartPos;
@@ -333,12 +324,6 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 		}
 	} while ( hit_portal );
 
-	dv.x = (float) fabsf( StartPos->x + MoveOffset->x - m->Group[ group ].center.x );
-	dv.y = (float) fabsf( StartPos->y + MoveOffset->y - m->Group[ group ].center.y );
-	dv.z = (float) fabsf( StartPos->z + MoveOffset->z - m->Group[ group ].center.z );
-	outside_group = dv.x > m->Group[ group ].half_size.x + OUTSIDE_GROUP_TOLERANCE ||
-					dv.y > m->Group[ group ].half_size.y + OUTSIDE_GROUP_TOLERANCE ||
-					dv.z > m->Group[ group ].half_size.z + OUTSIDE_GROUP_TOLERANCE;
 
 	return group;
 }

@@ -54,7 +54,6 @@ void InitIndirectVisible( u_int16_t g );
 void AddIndirectVisible( u_int16_t g );
 bool ReadGroupConnections( MLOADHEADER *m, char **pbuf );
 extern u_int16_t IsGroupVisible[ MAXGROUPS ];
-extern int NumOfVertsConsidered;
 extern int NumOfVertsTouched;
 extern u_int16_t NumGroupsVisible;
 extern u_int16_t GroupImIn;
