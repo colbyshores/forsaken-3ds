@@ -28,7 +28,7 @@ constexpr int MAX_MESSAGES_LONG = 100;
 #else
 #define MAXTEXTMESSAGES 128
 #endif
-constexpr int MAXPERLINE = 512; // message buffer width - line width set in (Text.c) MessageQuePrint/All
+constexpr int MAXPERLINE = 512; // message buffer width - line width set in (text.cpp) MessageQuePrint/All
 
 constexpr int MAX_STATS_MESSAGE_VARIATIONS = 16;
 constexpr int MAX_STATS_MESSAGE_LENGTH = 128;
@@ -91,7 +91,7 @@ void DisplayConnectionStatus( int num , int x , int y);
 // if you add a color then up this count...
 constexpr int MAXFONTCOLOURS = 11;
 
-// must align this enum with rgb values in Colourtrans (text.c)
+// must align this enum with rgb values in Colourtrans (text.cpp)
 typedef enum {
  GRAY,
  RED,

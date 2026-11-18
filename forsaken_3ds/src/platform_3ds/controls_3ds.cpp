@@ -1,7 +1,7 @@
 #include "ui/title.h"
 #include "rendering/text.h"
 /*===================================================================
-	controls_3ds.c — bindings + persistence + rebind UI.
+	controls_3ds.cpp — bindings + persistence + rebind UI.
 	See controls_3ds.h for API contract.
 ===================================================================*/
 
@@ -128,7 +128,7 @@ static void apply_defaults(bool is_n3ds)
 	}
 	/* Weapon-switch (Next/Prev Primary+Special) and Slide Up/Down are
 	 * unbound by default: the D-pad already drives them through the POV
-	 * hat (config.c binds POV left/right = prev/next primary, up/down =
+	 * hat (config.cpp binds POV left/right = prev/next primary, up/down =
 	 * slide down/up). These rows let the player additionally map them to
 	 * face buttons. */
 
@@ -230,7 +230,7 @@ int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
 
 	State machine lives in two functions called from the engine:
 	  controls_3ds_render_overlay() runs per-frame from the bottom-
-	    screen draw block (oct2.c), emits text via Print4x5Text.
+	    screen draw block (oct2.cpp), emits text via Print4x5Text.
 	  controls_3ds_handle_input() runs at the top of handle_events,
 	    consumes navigation/rebind input. Returns true to suppress
 	    normal input propagation while menu is up.

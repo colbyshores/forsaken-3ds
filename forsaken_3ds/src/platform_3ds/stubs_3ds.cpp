@@ -1,5 +1,5 @@
 /*
- * stubs_3ds.c - Stubs for functions not available on 3DS
+ * stubs_3ds.cpp - Stubs for functions not available on 3DS
  *
  * Provides no-op implementations of desktop/network functions
  * that the engine references but are not available on 3DS.

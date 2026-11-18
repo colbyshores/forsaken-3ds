@@ -681,7 +681,7 @@ void EVENT_TeleportDisable( u_int8_t * Data )
 	The drone's TNode advance happens implicitly: when a lift
 	completes its lever's trigger pair fires (EnableNode on the
 	next wait/top, DisableNode on the current wait), the wait
-	suppressor in enemies.c releases (because the now-disabled
+	suppressor in enemies.cpp releases (because the now-disabled
 	wait has 0x20 set), the close-to-TNode logic sets
 	PickNewNodeNow, and FindSuitableSplineNode picks the newly
 	enabled neighbor.

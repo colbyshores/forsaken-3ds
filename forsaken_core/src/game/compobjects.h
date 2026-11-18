@@ -1,6 +1,6 @@
 /*===================================================================
 	File	:	compobjects.h
-	Content	:	CompObjects.c include file
+	Content	:	compobjects.cpp include file
 ===================================================================*/
 #pragma once
 

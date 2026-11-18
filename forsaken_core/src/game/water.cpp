@@ -279,7 +279,7 @@ load_fail:
 	/* Bail-out cleanup. Without this, FirstWaterObject is left malloc'd
 	 * with partially populated WATEROBJECTs (Group, XVerts, YVerts set
 	 * from the file but Verts/Vels/renderObject still NULL because
-	 * InitWaterObject hasn't run). The caller in oct2.c ignores
+	 * InitWaterObject hasn't run). The caller in oct2.cpp ignores
 	 * WaterLoad's return value, so the engine continues into gameplay
 	 * with that half-loaded state. The first frame's
 	 * GroupWaterProcessDisplay then matches WO->Group and calls

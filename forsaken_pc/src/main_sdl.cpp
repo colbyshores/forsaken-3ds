@@ -151,7 +151,7 @@ static bool create_video_surface( u_int32_t window_flags )
 		Msg("main_sdl: failed to create window: %s\n",SDL_GetError());
 		return false;
 	}
-	/* Vulkan surface/device creation lives in render_vulkan.c
+	/* Vulkan surface/device creation lives in render_vulkan.cpp
 	 * (render_init), called by sdl_init_video below. */
 
 	print_info();

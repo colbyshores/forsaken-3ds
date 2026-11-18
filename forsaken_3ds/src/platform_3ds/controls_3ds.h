@@ -22,12 +22,12 @@
 #include <3ds.h>
 
 /* The actions the engine cares about. The index doubles as BOTH the
- * joy-button slot input_3ds.c writes into joy_button_state[0][N] AND
- * the engine joystick-button index config.c::DefaultJoystickSettings
+ * joy-button slot input_3ds.cpp writes into joy_button_state[0][N] AND
+ * the engine joystick-button index config.cpp::DefaultJoystickSettings
  * binds via AddButton( j, N, &u->... ). Those two MUST stay in lockstep
  * — a mismatch is exactly the "Next Weapon actually does Thrust Forward"
  * class of bug. Slots 2/3 are thrust (not weapon switch); real weapon
- * switching lives on slots 10-13 and on the D-pad POV (see config.c). */
+ * switching lives on slots 10-13 and on the D-pad POV (see config.cpp). */
 typedef enum {
 	CTRL_FIRE_PRIMARY = 0,    /* slot 0  -> fire primary    */
 	CTRL_FIRE_SECONDARY,      /* slot 1  -> fire secondary  */

@@ -773,7 +773,7 @@ DEFKEY KDshow_networkinfo	= { &Config.show_networkinfo, 0 };
 
 #if defined(__3DS__)
 /* Launch the touchscreen controls-remap menu from within the
- * in-game pause menu. Defined in controls_3ds.c — extern'd here
+ * in-game pause menu. Defined in controls_3ds.cpp — extern'd here
  * so the menu select callback can fire it directly. The remap UI
  * is modal: takes over the bottom screen, returns when the player
  * saves or cancels. */
@@ -1411,7 +1411,7 @@ MENU	MENU_NEW_VisualsStereo = {
 };
 
 #ifdef __3DS__
-/* Declared in render_c3d.c. Toggle the new graphics features:
+/* Declared in render_c3d.cpp. Toggle the new graphics features:
  *   g_object_shine — Phong specular highlight on enemy / pickup / crate
  *                    surfaces. Free if disabled (skips fragment-lighting
  *                    binding + extra TexEnv stage).
@@ -2621,7 +2621,7 @@ const char *BikerText[MAXBIKETYPES] =
 MENU * CurrentMenu = NULL;
 MENUITEM * CurrentMenuItem = NULL;
 
-/* Called from input_3ds.c to check if a menu is open without
+/* Called from input_3ds.cpp to check if a menu is open without
  * pulling in the full title.h dependency chain. */
 int _3ds_is_menu_open(void) { return CurrentMenu != NULL; }
 TEXTINFO * HighlightItem[MAXHIGHLIGHTITEMS];
@@ -2656,7 +2656,7 @@ bool Turned[6], LastTurned[6], RotateSetup, DoHighlight, PanDone;
 
 /* (extern declaration of ModelHeaders is at the top of this file —
  * the duplicate static definition that used to live here merged
- * with the real one in models.c only because of -fcommon, which
+ * with the real one in models.cpp only because of -fcommon, which
  * doesn't survive the array→pointer migration.) */
 
 POLYANIM *PolyAnim[6];
@@ -4366,7 +4366,7 @@ bool DisplayTitle(void)
 			render_info.stereo_enabled = true;
 			gfxSet3D(true);
 			render_info.stereo_mode = STEREO_MODE_3DS;
-			/* Max 3D effect halved 2026-11-14 (see oct2.c slider drive). */
+			/* Max 3D effect halved 2026-11-14 (see oct2.cpp slider drive). */
 			render_info.stereo_eye_sep = _slider * 15.0f;
 		}
 		else
@@ -4479,7 +4479,7 @@ void MenuRestart( MENU * Menu )
 {
 	/* [3DS] Previously blocked during STATUS_SinglePlayer due to stale
 	 * SDLK_ESCAPE events from level loading.  Fixed by three-step guard
-	 * in oct2.c: hidScanInput + input_buffer_reset + MenuAbort in
+	 * in oct2.cpp: hidScanInput + input_buffer_reset + MenuAbort in
 	 * STATUS_PostStartingSinglePlayer, plus one-shot guard on first
 	 * STATUS_SinglePlayer frame. */
 	if ( MyGameStatus == STATUS_SinglePlayer )

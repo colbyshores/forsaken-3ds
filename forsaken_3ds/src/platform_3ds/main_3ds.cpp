@@ -1,9 +1,9 @@
 /*
- * main_3ds.c - Nintendo 3DS platform layer replacing main_sdl.c
+ * main_3ds.cpp - Nintendo 3DS platform layer replacing main_sdl.cpp
  *
  * Initializes the 3DS hardware (gfx, HID, romfs),
  * sets up the Citro3D context on the top screen, and provides
- * the platform_*() functions consumed by main.c.
+ * the platform_*() functions consumed by main.cpp.
  */
 
 #ifdef __3DS__
@@ -37,9 +37,9 @@
  * osGetMemRegionSize(MEMREGION_APPLICATION) — the actual region the OS
  * gave us:
  *   - >= 96 MB (N3DS SystemModeExt = 124 MB, or OG HIMEM = 96 MB):
- *     32+32 MB heap, 512² texture pack via render_c3d.c.
+ *     32+32 MB heap, 512² texture pack via render_c3d.cpp.
  *   - <  96 MB (OG without HIMEM grant = 64 MB):
- *     32+22 MB heap, 256² texture pack via render_c3d.c. */
+ *     32+22 MB heap, 256² texture pack via render_c3d.cpp. */
 #ifndef MALLOC_HEAP_MB
 #define MALLOC_HEAP_MB 32
 #endif
@@ -166,9 +166,9 @@ bool platform_init(void)
 	_ticks_base = svcGetSystemTick();
 
 	/* Disable upstream's Debug flag. WinMain on PC sets Debug=false during
-	 * startup (main.c:161), but on 3DS we don't run WinMain so the flag
+	 * startup (main.cpp), but on 3DS we don't run WinMain so the flag
 	 * stays at its global initialiser of true. That routes scattered
-	 * DebugPrintf("...%f...", ...) calls in level loaders (e.g. node.c
+	 * DebugPrintf("...%f...", ...) calls in level loaders (e.g. node.cpp
 	 * NodeLoad's per-node move_len trace) through vsnprintf -> _dtoa_r.
 	 * On larger levels the cost compounds and has been observed to crash
 	 * inside _dtoa_r mid-load on hardware. Force the flag off here, before

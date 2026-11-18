@@ -112,7 +112,7 @@ typedef u_int32_t DWORD;
 typedef u_int8_t  BYTE;
 typedef u_int16_t WORD;
 
-/* Defined in main.c; shared with the modules that use it. */
+/* Defined in main.cpp; shared with the modules that use it. */
 extern bool Debug;
 extern bool ShowFrameRate;
 extern bool ShowInfo;

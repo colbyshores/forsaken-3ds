@@ -1,14 +1,14 @@
 /*===================================================================
-	checkenemy.c — CheckHitEnemy in its own translation unit.
+	checkenemy.cpp — CheckHitEnemy in its own translation unit.
 
-	Moved verbatim from enemies.c (same code, new home) so the host
-	test (tests/test_checkhitenemy.c) can link the REAL function against
+	Moved verbatim from enemies.cpp (same code, new home) so the host
+	test (tests/test_checkhitenemy.cpp) can link the REAL function against
 	stubbed data-layer deps. Game behavior unchanged by the move; the
 	only functional delta is the SoundInfo group pre-filter (see below),
-	which mirrors CheckHitShip's gate in primary.c.
+	which mirrors CheckHitShip's gate in primary.cpp.
 
-	Picked up automatically: Makefile.3ds compiles every root *.c
-	outside EXCLUDE_SRC (wildcard, no per-file list to update).
+	Picked up automatically: both Makefiles compile every .cpp in the
+	source trees (no per-file list to update).
 ===================================================================*/
 #include <stdio.h>
 #include <math.h>
@@ -88,7 +88,7 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 		{
 			if( ( Enemy->Status & ENEMY_STATUS_Enable ) && ( Enemy->CompCollision == SPHERECOLLISION ) )
 			{
-				/* SoundInfo group pre-filter (mirrors CheckHitShip, primary.c):
+				/* SoundInfo group pre-filter (mirrors CheckHitShip, primary.cpp):
 				 * skip enemies in groups with no direct visibility from the
 				 * bullet's group before any per-enemy vector math. */
 				/* @vfp-exempt R3 — protected hit-set pre-filter mirroring the shipped ship gate; fidelity A/B + multi-trajectory in perf/OPTIMIZATION-LOG.md. measured -7.7ms/frame wall (ramqan mono). Verified 2026-11-11. */

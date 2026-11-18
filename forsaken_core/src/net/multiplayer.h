@@ -15,7 +15,7 @@
 #include "ui/title.h"
 
 //
-// Networking functions mainly used by title.c
+// Networking functions mainly used by title.cpp
 //
 
 void StartAHostSession ( MENUITEM * Item );

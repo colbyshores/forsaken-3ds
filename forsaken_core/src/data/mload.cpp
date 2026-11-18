@@ -1084,7 +1084,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 			free( Mloadheader->Group[group].vertex_cell_pnt[i] );
 			Mloadheader->Group[group].vertex_cell_pnt[i] = NULL;
 
-			/* Per-execbuf vertex copy allocated at mload.c:507. Without
+			/* Per-execbuf vertex copy allocated at mload.cpp. Without
 			 * this free the buffer leaks every level transition — about
 			 * 1–2 MB per level depending on geometry density, which
 			 * accumulates and exhausts the OG 3DS 24 MB malloc heap by

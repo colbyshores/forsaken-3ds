@@ -15,7 +15,7 @@
 extern u_int32_t platform_get_ticks(void);
 extern void platform_delay(u_int32_t ms);
 
-/* 3DS platform services used by the game (main_3ds.c, controls_3ds.c). */
+/* 3DS platform services used by the game (main_3ds.cpp, controls_3ds.cpp). */
 float platform_get_3d_slider(void);		/* 0..1, 0 = mono */
 void controls_3ds_remap_menu(void);		/* open the button-remap overlay */
 bool controls_3ds_menu_is_open(void);

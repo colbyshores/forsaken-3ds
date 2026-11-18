@@ -37,8 +37,8 @@ constexpr float PI = 3.14159265358979323846F;
 
 /*===================================================================
 	Fast sin/cos via a 1024-entry LUT with linear interpolation.
-	Table is built once by trig_table_init() (new3d.c, called from
-	main.c); max error vs sinf() is < 4.7e-6.  4 KB fits in the
+	Table is built once by trig_table_init() (new3d.cpp, called from
+	main.cpp); max error vs sinf() is < 4.7e-6.  4 KB fits in the
 	ARM11's 16 KB L1D.
 
 	Both accessors are static inline for the same reason

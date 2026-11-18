@@ -40,7 +40,7 @@ void platform_shutdown(void);
 u_int32_t platform_get_ticks(void);
 void platform_delay(u_int32_t ms);
 
-/* Citro3D context/present glue (render_c3d.c). These replace the old
+/* Citro3D context/present glue (render_c3d.cpp). These replace the old
  * picaGL-named shim; picaGL itself is gone. */
 void c3d_context_init(void);
 void c3d_context_exit(void);

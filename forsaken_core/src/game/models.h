@@ -628,7 +628,7 @@ void EnableRelavantModels( MODELNAME * ModelNamesPtr );
 void KillAttachedSpotFX( u_int16_t i );
 bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner );
 
-/* Per-camera model-visibility memo invalidation. Defined in models.c for
+/* Per-camera model-visibility memo invalidation. Defined in models.cpp for
  * both build modes (no-op work when neither optimization flag is on); call
  * once before a camera's visible-group walk. */
 void ModelVisCache_NewFrame( void );

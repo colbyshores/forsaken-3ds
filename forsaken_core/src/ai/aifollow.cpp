@@ -272,7 +272,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 				if( !is_neighbor )
 				{
 					/* Not adjacent yet — take one natural hop toward dest via
-					 * FindSuitableSplineNode.  node.c now adds 0x20-fallback passes
+					 * FindSuitableSplineNode.  node.cpp now adds 0x20-fallback passes
 					 * so shaft nodes (whose only links are 0x20) traverse correctly
 					 * without a raw link-walk here. */
 					NODE * next_hop = FindSuitableSplineNode( Enemy->Object.NodeNetwork,

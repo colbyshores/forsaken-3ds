@@ -4176,7 +4176,7 @@ bool ClearZBuffer()
 
 
 /* Process-lifetime scratch storage for the dynamic per-frame poly
- * batchers (polys.c / 2dpolys.c / screenpolys.c). They write
+ * batchers (polys.cpp / 2dpolys.cpp / screenpolys.cpp). They write
  * textureGroups[numTextureGroups++] for each face accumulated this
  * frame. Was an inline RENDEROBJECT.textureGroups[64] BSS field
  * before the textureGroups migration; now an explicit MAX_TEXTURE_GROUPS-

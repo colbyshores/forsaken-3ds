@@ -1,8 +1,8 @@
 /*
- * render_vulkan.c - Vulkan renderer for the Linux PC build.
+ * render_vulkan.cpp - Vulkan renderer for the Linux PC build.
  *
  * Replaces the old OpenGL backends (render_gl1/2/3 + shared) behind
- * the same FS interface that render_c3d.c implements on 3DS. One
+ * the same FS interface that render_c3d.cpp implements on 3DS. One
  * vertex/fragment shader pair mirrors the old GL shaders (BGRA vertex
  * colours, colour-key discard, textureGrad), with a Y-flip in the
  * vertex shader to bridge GL-style bottom-up NDC to Vulkan's

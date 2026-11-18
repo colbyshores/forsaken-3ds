@@ -320,7 +320,7 @@ void AI_AIR_DEATH_PINGOFF( ENEMY * Enemy );
 void AI_AIR_DEATH_PSYCHO( ENEMY * Enemy );
 
 
-// AIEXOGENON.c
+// aiexogenon.cpp
 void AI_EXOGENON_IDLE( ENEMY * Enemy );
 void AI_EXOGENON_MOVEDOWN( ENEMY * Enemy );
 void AI_EXOGENON_FIRE( ENEMY * Enemy );
@@ -328,7 +328,7 @@ void AI_EXOGENON_MOVEUP( ENEMY * Enemy );
 void AI_EXOGENON_SCAN( ENEMY * Enemy );
 void AI_EXOGENON_SWEEP( ENEMY * Enemy );
 
-// AIFLESHMORPH.c
+// aifleshmorph.cpp
 void AI_FLESHMORPH_IDLE( ENEMY * Enemy );
 void AI_FLESHMORPH_MOVEFORWARDS( ENEMY * Enemy );
 void AI_FLESHMORPH_STOPFORWARD( ENEMY * Enemy );

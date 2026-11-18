@@ -1,6 +1,6 @@
 /*===================================================================
 	File	:	bgobjects.h
-	Content	:	BGObjects.c include file
+	Content	:	bgobjects.cpp include file
 ===================================================================*/
 #pragma once
 
@@ -122,7 +122,7 @@ struct ENEMY * FormationLink;
 
 #ifdef EDITION_REMASTER
 	/* Jump AI state (Boss_Ramqan only). Inactive/zero on every other
-	 * enemy — see aijump.c for the parametric-arc hop logic. */
+	 * enemy — see aijump.cpp for the parametric-arc hop logic. */
 	float	JumpT;			/* tick counter, 0..JUMP_DURATION_TICKS */
 	bool	JumpInAir;
 	VECTOR	JumpStart;

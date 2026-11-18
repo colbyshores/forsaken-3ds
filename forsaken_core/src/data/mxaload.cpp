@@ -73,7 +73,7 @@
 		Globals...	
 ===================================================================*/
 /* Pointer to a TAG_LEVEL hunk allocation. See ModelHeaders comment
- * in models.c — same migration, same rationale. */
+ * in models.cpp — same migration, same rationale. */
 MXALOADHEADER *MxaModelHeaders = NULL;
 
 /*===================================================================
@@ -617,7 +617,7 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 				Mxaloadheader->Group[group].poly_ptr[i] = NULL;
 			}
 
-			/* Per-execbuf vertex copy from mxaload.c:281 — same leak
+			/* Per-execbuf vertex copy from mxaload.cpp — same leak
 			 * pattern as mload/mxload, fixed there too. */
 			if (Mxaloadheader->Group[group].originalVerts[i])
 			{

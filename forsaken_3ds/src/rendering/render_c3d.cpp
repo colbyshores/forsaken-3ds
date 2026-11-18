@@ -1,5 +1,5 @@
 /*
- * render_c3d.c — Native citro3d renderer for Nintendo 3DS
+ * render_c3d.cpp — Native citro3d renderer for Nintendo 3DS
  *
  * Replaces the picaGL (GL1 immediate mode) path with direct citro3d
  * calls, enabling:
@@ -137,7 +137,7 @@ static C3D_Light     s_objLight;
 static C3D_LightLut  s_objLightLut;
 static bool          s_objLightReady = false;
 
-/* User-toggleable graphics features (persisted via title.c's config_*).
+/* User-toggleable graphics features (persisted via title.cpp's config_*).
  * Renderer reads these per-draw to decide whether to apply Phong shine
  * and detail-map ADD. Both default true; the detail map is now
  * grey-centred (high-pass via -compose mathematics) so ADD_SIGNED
@@ -186,7 +186,7 @@ typedef struct {
  * differing per-eye culling cannot drop geometry the way the old
  * whole-list replay did (missed inset/HUD draws on one eye). A miss
  * converts live — always safe, never stale. Table lives one frame
- * (generation counter in stereomemo.c); overflow of the scratch arena
+ * (generation counter in stereomemo.cpp); overflow of the scratch arena
  * disarms the memo for the rest of the frame (recorded offsets would
  * be recycled).
  *
@@ -520,7 +520,7 @@ typedef enum {
 static texenv_mode_t s_lastTexEnvMode = TEXENV_MODE_NONE;
 
 /* Toggle: enable Phong-shine path for the next textured draw. Set by
- * mxload.c / mxaload.c around their draw_object calls so model + enemy
+ * mxload.cpp / mxaload.cpp around their draw_object calls so model + enemy
  * meshes get the specular highlight. (Name preserved for ABI; misnomer
  * since proctex was retired.) */
 void c3d_set_object_proctex(bool enable)
@@ -530,7 +530,7 @@ void c3d_set_object_proctex(bool enable)
 
 /* Per-call eligibility gate for the OBJECT shine path. Defaults true
  * (every object draw gets shine). Set false by callers that want to
- * suppress shine for a specific model — currently used by models.c
+ * suppress shine for a specific model — currently used by models.cpp
  * for OWNER_BGOBJECT models (doors, vents, animated decorations)
  * where Phong specular reads as tacky on the large flat surfaces. */
 static bool s_objShineEligible = true;
@@ -560,7 +560,7 @@ void c3d_context_init(void)
 	/* 16× the default GPU command buffer (256 KB → 4 MB).
 	 *
 	 * Required for the multi-pass flood-fill expansion in
-	 * visi.c FindVisible: each pass adds visible groups for chained
+	 * visi.cpp FindVisible: each pass adds visible groups for chained
 	 * portal traversal, which cleans up the "black wall through
 	 * doorway" symptom on Remaster levels (powerdown, starship,
 	 * spc-sp01 — geometry rendered black because dynamic-light
@@ -1097,8 +1097,8 @@ void c3d_renderer_cleanup(void)
 
 static void matrix_to_c3d(const RENDERMATRIX *src, C3D_Mtx *dst)
 {
-	/* Engine matrices are column-major in memory (see render_gl_shared.c
-	 * line 929-937). The raw float[16] IS the GL column-major data.
+	/* Engine matrices are column-major in memory: the raw float[16] is
+	 * the column-major data the old OpenGL backend uploaded as is.
 	 * Load it the same way picaGL's glLoadMatrixf does:
 	 *   row[i].x = m[0+i]   (column 0, row i)
 	 *   row[i].y = m[4+i]   (column 1, row i)
@@ -1167,7 +1167,7 @@ static void upload_matrices(void)
 
 	The vertex shader sums ambient + per-light distance falloff for up
 	to GPU_MAX_LIGHTS lights, replacing the per-vertex CPU iteration in
-	lights.c::XLight1Group. Models still use CPU lighting (their
+	lights.cpp::XLight1Group. Models still use CPU lighting (their
 	per-vertex baseline restoration in mxload / mxaload is not yet
 	hooked into this path). SPOT lights are treated as points (no cone
 	math) — visually negligible for Forsaken's transient blaster/RT
@@ -1257,7 +1257,7 @@ void c3d_upload_xlights(void)
 			((XLIGHT*)L)->Pos.z,
 			invSizeSq);
 
-		/* Color values matched to lights.c::XLight1Group: 0..255 → 0..1
+		/* Color values matched to lights.cpp::XLight1Group: 0..255 → 0..1
 		 * with no dimming. Saturation behaviour now identical to CPU. */
 		float r = ((XLIGHT*)L)->r / 255.0f;
 		float g = ((XLIGHT*)L)->g / 255.0f;
@@ -1317,7 +1317,7 @@ void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 
 	/* Sampled ambient at object position: baked level base + every
 	 * visible XLight's per-position contribution (linear falloff, same
-	 * math as lights.c::XLight1Group). Returned in 0..255 range. */
+	 * math as lights.cpp::XLight1Group). Returned in 0..255 range. */
 	float ar, ag, ab, aa;
 	GetRealLightAmbientWorldSpace(world_pos, &ar, &ag, &ab, &aa);
 
@@ -1451,7 +1451,7 @@ void render_set_filter(bool red, bool green, bool blue)
 {
 	/* No-op on citro3d — software anaglyph removed.
 	 * Hardware stereo uses separate render targets instead of color masking.
-	 * Function retained because shared code in oct2.c calls it. */
+	 * Function retained because shared code in oct2.cpp calls it. */
 	(void)red; (void)green; (void)blue;
 }
 
@@ -1750,7 +1750,7 @@ bool FSGetViewPort(render_viewport_t *view)
 }
 
 /* One-shot flag set by FSSetNextViewPortScissorMode() and consumed
- * (then reset) by the next FSSetViewPort() call. Allows visi.c
+ * (then reset) by the next FSSetViewPort() call. Allows visi.cpp
  * ClipGroup to hand-off per-group "use scissor instead of sub-rect
  * viewport" decisions without changing FSSetViewPort's signature
  * (which would touch every caller). */
@@ -1790,7 +1790,7 @@ bool FSSetViewPort(render_viewport_t *view)
 	{
 		/* Per-group draws (level-mesh visibility groups). Full-screen
 		 * GPU viewport + scissor to the sub-rect, paired with the
-		 * unmagnified cam->Proj that visi.c uploads. Every visible
+		 * unmagnified cam->Proj that visi.cpp uploads. Every visible
 		 * group shares the same projection — eliminates the per-group
 		 * magnified-projection flicker / cracks at portal boundaries
 		 * that PICA200 produced under the sub-rect-viewport path. */
@@ -1803,7 +1803,7 @@ bool FSSetViewPort(render_viewport_t *view)
 	{
 		/* HUD / 2D / orthographic dispatch — sub-rect viewport, no
 		 * scissor. Used for non-3D-mesh draws which don't go through
-		 * visi.c's per-group projection setup. */
+		 * visi.cpp's per-group projection setup. */
 		C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0);
 		C3D_SetViewport((u32)pica_x, (u32)pica_y,
 		                (u32)pica_w, (u32)pica_h);
@@ -2511,7 +2511,7 @@ bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName,
 }
 
 /*===================================================================
-	Lighting — CPU-side per-vertex, ported from render_gl1.c
+	Lighting — CPU-side per-vertex, ported from the old OpenGL 1 backend
 ===================================================================*/
 
 /* Lighting globals — set by the engine's TransExe system per object */

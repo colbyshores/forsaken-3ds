@@ -1,5 +1,5 @@
 /*
- * sound_3ds.c - Nintendo 3DS ndsp audio replacing sound_openal.c
+ * sound_3ds.cpp - Nintendo 3DS ndsp audio replacing sound_openal.cpp
  *
  * Uses the DSP service (ndsp) from libctru.
  * All audio buffers are allocated in linear memory so
@@ -57,7 +57,7 @@ struct sound_source_t {
  * skipping audio when too many channels are active simultaneously (which
  * killed both SFX and music under heavy combat). Capping total concurrent
  * SFX voices keeps the DSP under its mixing budget. Music owns channel 23
- * directly via music_3ds.c; SFX stay in 0-(MAX_SFX_VOICES-1).
+ * directly via music_3ds.cpp; SFX stay in 0-(MAX_SFX_VOICES-1).
  *
  * When all SFX slots are full, alloc evicts the OLDEST-allocated channel
  * (round-robin replacement) so a new gunshot doesn't get silently dropped. */

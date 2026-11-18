@@ -904,7 +904,7 @@ void InitShipStructure( int i , bool ResetScore )
 	PrevShield = 0;
 	
 	if( ResetScore )
-		ResetIndividualStats(i); // (stats.c)
+		ResetIndividualStats(i); // (stats.cpp)
 
 	for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = (u_int16_t) -1;
 
@@ -937,7 +937,7 @@ void DestroyGame( void )
 		ScatterWeapons( &DirVector, MAXPICKUPS );
 		RegeneratePickups();
 
-		ResetAllStats(); // stats.c
+		ResetAllStats(); // stats.cpp
 	}
 
 	network_cleanup();
@@ -2467,7 +2467,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
    					AddColourMessageToQue( KillMessageColour, "%s %s %s %s",
 							&Names[Ships[WhoIAm].ShipThatLastKilledMe][0],
 							"KILLED YOU WITH", &methodstr[0]  ,&teamstr[0] );
-					// update stats 1 (stats.c) -- somebody killed me
+					// update stats 1 (stats.cpp) -- somebody killed me
 					UpdateKillStats(lpShortShipHit->WhoHitYou,WhoIAm,lpShortShipHit->ShipHit.WeaponType, lpShortShipHit->ShipHit.Weapon);
 					// kill me :(
 					ShipDiedSend( lpShortShipHit->ShipHit.WeaponType, lpShortShipHit->ShipHit.Weapon );
@@ -2498,7 +2498,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 						// you killed someone on your own team
 						AddColourMessageToQue( KillMessageColour, "%s %s %s %s" " %s",
 							"YOU KILLED", &Names[lpShipDied->WhoIAm][0], "WITH", &methodstr[0], ON_YOUR_OWN_TEAM );
-						// update stats 7 (stats.c) -- you killed someone on your own team
+						// update stats 7 (stats.cpp) -- you killed someone on your own team
 						UpdateKillStats(WhoIAm, lpShipDied->WhoIAm, lpShipDied->WeaponType, lpShipDied->Weapon);
 					}
 				}
@@ -2521,7 +2521,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 							
 							PlaySfx( SFX_BIKER_VP, 1.0F );
 							AddKill();
-							// update stats 8 (stats.c) -- you killed someone in a team bounty game
+							// update stats 8 (stats.cpp) -- you killed someone in a team bounty game
 							UpdateKillStats(WhoIAm, lpShipDied->WhoIAm, lpShipDied->WeaponType, lpShipDied->Weapon);
 						}
 						else
@@ -2537,7 +2537,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 						// you killed someone in a team game
 						AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[lpShipDied->WhoIAm][0], "WITH ", &methodstr[0] );
 						AddKill();
-						// update stats 9 (stats.c) -- you killed someone in a team game
+						// update stats 9 (stats.cpp) -- you killed someone in a team game
 						UpdateKillStats(WhoIAm, lpShipDied->WhoIAm, lpShipDied->WeaponType, lpShipDied->Weapon);
 						
 						if ( !Random_Range( 4 ) )
@@ -2562,7 +2562,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 						
 						PlaySfx( SFX_BIKER_VP, 1.0F );
 						AddKill();
-						// update stats 10 (stats.c) -- you killed someone in a bounty game
+						// update stats 10 (stats.cpp) -- you killed someone in a bounty game
 						UpdateKillStats(WhoIAm, lpShipDied->WhoIAm, lpShipDied->WeaponType, lpShipDied->Weapon);
 					}
 					else
@@ -2578,7 +2578,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
    					// you killed someone
 					AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[lpShipDied->WhoIAm][0], "WITH ", &methodstr[0] );
 					AddKill();
-					// update stats 2 (stats.c) -- you killed someone 
+					// update stats 2 (stats.cpp) -- you killed someone 
 					UpdateKillStats(WhoIAm,lpShipDied->WhoIAm,lpShipDied->WeaponType,lpShipDied->Weapon); 
 					if ( !Random_Range( 4 ) )
 						PlaySfx( SFX_BIKER_VP, 1.0F );
@@ -2604,7 +2604,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				AddColourMessageToQue( KillMessageColour, "%s %s %s %s %s" " %s", &Names[lpShipDied->WhoKilledMe][0], "KILLED", &Names[lpShipDied->WhoIAm][0], "WITH", &methodstr[0], &teamstr[0] );
 			}
 
-			// update stats 3 (stats.c) -- somebody killed someone
+			// update stats 3 (stats.cpp) -- somebody killed someone
 			UpdateKillStats(lpShipDied->WhoKilledMe,lpShipDied->WhoIAm,lpShipDied->WeaponType,lpShipDied->Weapon);
 		}
 		return;
@@ -2930,7 +2930,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					PlaySfx( SFX_MyTeamScored, FlagVolume );
 				else
 					PlaySfx( SFX_OtherTeamScored , FlagVolume );
-				// update bonus 6 (stats.c) -- someone else scored with flag
+				// update bonus 6 (stats.cpp) -- someone else scored with flag
 				UpdateBonusStats((int) lpTextMsg->WhoIAm, GoalScoreSlider.value);
 				return;
 			case TEXTMSGTYPE_ReturningFlag:

@@ -1,5 +1,5 @@
 /*===================================================================
- * aim_assist.c — Subtle aim-assist for player primary bullets.
+ * aim_assist.cpp — Subtle aim-assist for player primary bullets.
  *
  * See aim_assist.h for design rationale + parameter rationale.
  *

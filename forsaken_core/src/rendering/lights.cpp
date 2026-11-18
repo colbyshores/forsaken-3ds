@@ -443,7 +443,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 #ifdef GPU_LIGHTING
 		/* Skip the per-vertex CPU dynamic-light loop — the vertex shader
 		 * adds light contribution on top of the baked-color baseline that
-		 * was already restored above. See render_c3d.c::c3d_upload_xlights
+		 * was already restored above. See render_c3d.cpp::c3d_upload_xlights
 		 * and shaders/render_c3d.v.pica. */
 /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 #else
@@ -799,7 +799,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 			 * the baseline restored above (using world-space vertex
 			 * pos via the modelView uniform = model→world transform).
 			 * Skip the per-vertex per-light CPU loop. See
-			 * render_c3d.c::upload_matrices and render_c3d.v.pica. */
+			 * render_c3d.cpp::upload_matrices and render_c3d.v.pica. */
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
 			{
@@ -1018,7 +1018,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 			 * the baseline restored above (using world-space vertex
 			 * pos via the modelView uniform = model→world transform).
 			 * Skip the per-vertex per-light CPU loop. See
-			 * render_c3d.c::upload_matrices and render_c3d.v.pica. */
+			 * render_c3d.cpp::upload_matrices and render_c3d.v.pica. */
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
 			{

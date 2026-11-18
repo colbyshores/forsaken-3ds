@@ -854,8 +854,8 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 				Mxloadheader->Group[group].poly_ptr[i] = NULL;
 			}
 
-			/* Per-execbuf vertex copy from mxload.c:313 — same leak
-			 * pattern as mload.c, fixed there too. */
+			/* Per-execbuf vertex copy from mxload.cpp — same leak
+			 * pattern as mload.cpp, fixed there too. */
 			if (Mxloadheader->Group[group].originalVerts[i])
 			{
 				free(Mxloadheader->Group[group].originalVerts[i]);

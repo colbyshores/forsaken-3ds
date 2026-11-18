@@ -1,5 +1,5 @@
 /*
- * input_3ds.c - Nintendo 3DS HID input replacing input_sdl.c
+ * input_3ds.cpp - Nintendo 3DS HID input replacing input_sdl.cpp
  *
  * Maps 3DS controls to Forsaken's input system:
  *   Circle Pad  -> pitch / yaw
@@ -46,7 +46,7 @@ JOYSTICKINFO JoystickInfo[MAX_JOYSTICKS];
 
 /* old_input, new_input, mouse_state, mouse_states, input_buffer*,
    joy_axis_state, joy_button_state, joy_hat_state are all declared
-   (as non-extern globals) in input.h and defined via controls.c.
+   (as non-extern globals) in input.h and defined via controls.cpp.
    We do NOT redefine them here. */
 
 /* ---- keyboard state array ---- */
@@ -80,7 +80,7 @@ bool joysticks_init(void)
 	JoystickInfo[0].connected = true;
 	static char name[] = "3DS Controls";	/* Name is a writable, owned string on PC */
 	JoystickInfo[0].Name      = name;
-	JoystickInfo[0].NumButtons = 16;  /* 0-9 core + 10-13 weapon-switch + 14-15 slide (see controls_3ds.h / config.c) */
+	JoystickInfo[0].NumButtons = 16;  /* 0-9 core + 10-13 weapon-switch + 14-15 slide (see controls_3ds.h / config.cpp) */
 	JoystickInfo[0].NumPOVs   = 1;
 	JoystickInfo[0].NumAxis   = 4; /* circle pad X/Y + C-stick X/Y */
 
@@ -199,8 +199,8 @@ bool handle_events(void)
 		return true;
 	}
 
-	/* Do NOT swap old_input/new_input here — ReadInput() in controls.c
-	 * handles the swap.  The SDL input path (input_sdl.c) also does not
+	/* Do NOT swap old_input/new_input here — ReadInput() in controls.cpp
+	 * handles the swap.  The SDL input path (input_sdl.cpp) also does not
 	 * swap here.  Double-swapping breaks button release detection: the
 	 * old_input buffer is never written by joystick_poll, so
 	 * JOYSTICK_BUTTON_RELEASED always returns false and AnyKeyReleased()
@@ -216,7 +216,7 @@ bool handle_events(void)
 	hidCstickRead(&cstick);
 
 	/* axis 0/1 = circle pad (yaw / pitch)
-	 * Apply deadzone matching the SDL path (app_joy_axis in input_sdl.c). */
+	 * Apply deadzone matching the SDL path (app_joy_axis in input_sdl.cpp). */
 	{
 		long ax0 = (long)(cpad.dx  * CPAD_SCALE);
 		long ax1 = (long)(-cpad.dy * CPAD_SCALE);  /* invert Y */

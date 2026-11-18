@@ -5,7 +5,7 @@
 #include "input/input.h"
 #include "game/oct2.h"
 /* Definitions for input.h externs (were tentative definitions in the header;
-   illegal as C++ TUs now include input.h). controls.c is the owner. */
+   illegal as C++ TUs now include input.h). controls.cpp is the owner. */
 int input_buffer[MAX_INPUT_BUFFER];
 mouse_state_t mouse_state;
 mouse_state_t mouse_states[ INPUT_BUFFERS ];

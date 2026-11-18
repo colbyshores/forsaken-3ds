@@ -1,6 +1,6 @@
 /*===================================================================
 	File	:	SpotFX.h
-	Content	:	SpotFX.c include file
+	Content	:	spotfx.cpp include file
 ===================================================================*/
 #pragma once
 

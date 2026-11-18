@@ -1,6 +1,6 @@
 
 //
-// Networking functions mainly used by title.c
+// Networking functions mainly used by title.cpp
 //
 
 #include <stdio.h>

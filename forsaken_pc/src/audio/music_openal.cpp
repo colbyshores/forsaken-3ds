@@ -1,5 +1,5 @@
 /*
- * music_openal.c - CD audio music playback for the PC build.
+ * music_openal.cpp - CD audio music playback for the PC build.
  *
  * Plays the same Nintendo DSP-ADPCM (.dsp) track files the 3DS
  * streams to its hardware decoder (romfs/music/trackNN.dsp), decoded
@@ -10,7 +10,7 @@
  * The whole track is decoded to PCM at play time (a 5-minute track
  * is ~20 MB at 32 kHz mono s16) and looped as a single OpenAL
  * buffer. Playback uses whichever OpenAL context the SFX system
- * (sound_openal.c) has made current; if sound is not initialised,
+ * (sound_openal.cpp) has made current; if sound is not initialised,
  * music calls are silent no-ops.
  */
 

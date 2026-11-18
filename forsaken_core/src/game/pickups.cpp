@@ -2838,7 +2838,7 @@ static int16_t s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
 				:	files into fresh ModelNames[] slots and bumps
 				:	NextNewModel past them so subsequent BG-object /
 				:	enemy / etc. registrations don't collide. Called
-				:	from oct2.c's IV0 OnceOnly block, after PreLoadEnemies
+				:	from oct2.cpp's IV0 OnceOnly block, after PreLoadEnemies
 				:	(which is the last consumer of NextNewModel before
 				:	PreInitModel runs the actual model load).
 ===================================================================*/

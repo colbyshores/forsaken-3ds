@@ -2,8 +2,8 @@
  * dsp_adpcm - shared Nintendo DSP-ADPCM (.dsp) decoding.
  *
  * One asset set serves every platform: the 3DS streams .dsp files to
- * the ndsp hardware decoder (music_3ds.c), the PC decodes the same
- * files in software (music_openal.c). This module holds the parts
+ * the ndsp hardware decoder (music_3ds.cpp), the PC decodes the same
+ * files in software (music_openal.cpp). This module holds the parts
  * that must agree bit-for-bit: the big-endian header layout, the
  * coefficient table, and the predictor decode math.
  *

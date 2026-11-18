@@ -1,5 +1,5 @@
 /*
- * net_3ds.c - Network stubs for 3DS (single-player only)
+ * net_3ds.cpp - Network stubs for 3DS (single-player only)
  *
  * Provides no-op implementations of the network API
  * so the game compiles without enet.

@@ -123,7 +123,7 @@ bool FSClearDepth(XYRECT * rect);
  * LEVELRENDEROBJECT (the level-mesh form of RENDEROBJECT, distinct from
  * the model RENDEROBJECT which uses MAX_TEXTURE_GROUPS).
  *
- * Was 8 on 3DS. The unguarded INCREASE_TEXTURE_GROUPS at mload.c:664
+ * Was 8 on 3DS. The unguarded INCREASE_TEXTURE_GROUPS at mload.cpp
  * checks against MAX_TEXTURE_GROUPS (64) — not MAX_LEVEL_TEXTURE_GROUPS —
  * so when a level mesh execbuf used more than 8 unique textures, the
  * loader silently wrote textureGroups[8..N] past the end of the 8-slot
@@ -156,7 +156,7 @@ bool FSClearDepth(XYRECT * rect);
  * once per sprite blit — hundreds of times per frame — so even 64 groups
  * can be exhausted before a single screen is fully composited.
  *
- * The mid-draw flush mechanism in screenpolys.c (ScrPolyDispSolid /
+ * The mid-draw flush mechanism in screenpolys.cpp (ScrPolyDispSolid /
  * ScrPolyDispNonSolid) acts as a safety net: when numTextureGroups reaches
  * MAX_TEXTURE_GROUPS the current batch is flushed (unlock → draw → re-lock)
  * and the counter is reset to 0, preventing the assert/abort that
@@ -331,7 +331,7 @@ bool FSSetViewPort(render_viewport_t *newViewPort);
  * instead of collapsing the GPU viewport to that sub-rect. The flag
  * auto-resets to false after one FSSetViewPort call so other callers
  * (HUD, missile cam, stats screen, title) keep the engine standard
- * behaviour. Set by visi.c ClipGroup for groups whose use_scissor_mode
+ * behaviour. Set by visi.cpp ClipGroup for groups whose use_scissor_mode
  * is true — see VISGROUP::use_scissor_mode in camera.h for the why. */
 void FSSetNextViewPortScissorMode(bool scissor_mode);
 
@@ -367,7 +367,7 @@ bool draw_2d_object(RENDEROBJECT *renderObject);
 void FSReleaseRenderObject(RENDEROBJECT *renderObject);
 
 #ifdef __3DS__
-/* Citro3D backend extensions (render_c3d.c). Material-class switches set
+/* Citro3D backend extensions (render_c3d.cpp). Material-class switches set
    per draw by the model paths, and the Visuals menu toggles behind them
    (saved as ObjectShine / WallDetail in Configs/main.txt). */
 void c3d_set_object_proctex(bool on);

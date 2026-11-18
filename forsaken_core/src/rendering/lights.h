@@ -4,7 +4,7 @@
  *
  *
  *  File:       Lights.h
- *  Content:    Lights.c include file
+ *  Content:    lights.cpp include file
  *
  *
  ***************************************************************************/

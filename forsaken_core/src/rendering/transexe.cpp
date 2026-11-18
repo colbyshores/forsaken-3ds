@@ -145,7 +145,7 @@ void ExecuteTransExe( u_int16_t group )
 			if( Display )
 			{
 #ifdef __3DS__
-				/* Same eligibility check as models.c: BGOBJECTs
+				/* Same eligibility check as models.cpp: BGOBJECTs
 				 * (doors, vents, animated decorations) shouldn't
 				 * get Phong shine. The TransExe path renders
 				 * animating/transparent geometry — moving doors go
@@ -153,7 +153,7 @@ void ExecuteTransExe( u_int16_t group )
 				 * on while opening/closing. TransExe[i].Model is
 				 * the Models[] index; check OwnerType. */
 				{
-					/* Same eligibility check as models.c: BGOBJECT
+					/* Same eligibility check as models.cpp: BGOBJECT
 					 * (doors, vents, animated decorations) gets no
 					 * Phong shine. TransExe[i].Model is the Models[]
 					 * index; can be -1 (= 0xFFFF) for animated mxa
@@ -250,7 +250,7 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 			{
 #ifdef __3DS__
 				{
-					/* Same eligibility check as models.c: BGOBJECT
+					/* Same eligibility check as models.cpp: BGOBJECT
 					 * (doors, vents, animated decorations) gets no
 					 * Phong shine. TransExe[i].Model is the Models[]
 					 * index; can be -1 (= 0xFFFF) for animated mxa

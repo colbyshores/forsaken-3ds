@@ -89,7 +89,7 @@
 /* SDL_VERSION_ATLEAST macro - always false on 3DS */
 #define SDL_VERSION_ATLEAST(x,y,z) 0
 
-/* Keyboard state - maintained by input_3ds.c */
+/* Keyboard state - maintained by input_3ds.cpp */
 extern u_int8_t _3ds_key_state[SDLK_LAST];
 static inline u_int8_t* SDL_GetKeyboardState(int *numkeys) {
 	if (numkeys) *numkeys = SDLK_LAST;

@@ -749,7 +749,7 @@ bool ProcessShips()
 						BountyTime += framelag / 60.0F;
 						if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
 						{
-							// update bonus 4 (stats.c) -- bounty hunt points
+							// update bonus 4 (stats.cpp) -- bounty hunt points
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 							UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -980,7 +980,7 @@ bool ProcessShips()
 							PickupsGot[ PICKUP_Flag ] = 0;
 							Ships[ i ].Object.Flags &= ~SHIP_CarryingFlag;
 							FlagsToGenerate++;
-							// update bonus 2 (stats.c) -- flag chase scored
+							// update bonus 2 (stats.cpp) -- flag chase scored
 							UpdateBonusStats(i,GoalScore);
 							AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
 								TeamName[ TeamNumber[ i ] ] );
@@ -1024,7 +1024,7 @@ bool ProcessShips()
 									}
 									if ( score )
 									{
-										// update bonus 3 (stats.c) -- CTF scored
+										// update bonus 3 (stats.cpp) -- CTF scored
 										UpdateBonusStats(i,score);
 										AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
 											TeamName[ TeamNumber[ i ] ] );
@@ -1219,7 +1219,7 @@ bool ProcessShips()
 							BountyTime += framelag / 60.0F;
 							if ( BountyBonusInterval > 0 && BountyTime >= BountyBonusInterval )
 							{
-								// update bonus 7 (stats.c) -- bounty hunt points
+								// update bonus 7 (stats.cpp) -- bounty hunt points
 								UpdateBonusStats(i,(int16_t) fast_floorf( BountyTime / BountyBonusInterval ));
 								BountyTime = FMOD( BountyTime, BountyBonusInterval );
 							}

@@ -4373,7 +4373,7 @@ bool PreLoadEnemies( void )
 
 			/* Boss_Ramqan (102): 19-part walking boss with parametric-
 			 * arc hop locomotion (kexForsakenAIBrainJump → JUMP_AI,
-			 * see aijump.c). */
+			 * see aijump.cpp). */
 			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
 			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
 			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 15000; /* KEX defs/n64Enemies.txt */
@@ -4446,7 +4446,7 @@ bool PreLoadEnemies( void )
 			 * NME_SUSS_GUN primary (green snub bullets).  Override
 			 * primary to NME_PULSAR for KEX-faithful red Pulsar
 			 * shots; FLY_AI brain reads PrimaryWeaponType directly
-			 * (aidogfight.c:87).  Secondary stays Hunter default. */
+			 * (aidogfight.cpp).  Secondary stays Hunter default. */
 			EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
 			EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "n64\\enforcer.mx";
 			EnemyTypes[ ENEMY_Enforcer ].PrimaryWeaponType = NME_PULSAR;

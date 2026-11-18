@@ -1,6 +1,6 @@
 /*******************************************************************\
 *																	
-*	stats.c														
+*	stats.cpp														
 *																
 *	Deals with all statistical related proceedures				
 *																
@@ -8,24 +8,24 @@
 *
 *	List of places where UpdateKillStats() is called:
 *		
-*		networking.c	- update stats 1 (stats.c) -- somebody killed me
-*		networking.c	- update stats 2 (stats.c) -- you killed someone 
-*		networking.c	- update stats 3 (stats.c) -- somebody killed someone
-*		models.c	- update stats 4 (stats.c) -- killed yourself with missile splash damage
-*		models.c	- update stats 5 (stats.c) -- i killed myself
-*		models.c	- update stats 6 (stats.c) -- somebody killed me
-*		networking.c	- update stats 7 (stats.c) -- you killed someone on your own team
-*		networking.c	- update stats 8 (stats.c) -- you killed someone in a team bounty game
-*		networking.c	- update stats 9 (stats.c) -- you killed someone in a team game
-*		networking.c	- update stats 10 (stats.c) -- you killed someone in a bounty game
+*		networking.cpp	- update stats 1 (stats.cpp) -- somebody killed me
+*		networking.cpp	- update stats 2 (stats.cpp) -- you killed someone 
+*		networking.cpp	- update stats 3 (stats.cpp) -- somebody killed someone
+*		models.cpp	- update stats 4 (stats.cpp) -- killed yourself with missile splash damage
+*		models.cpp	- update stats 5 (stats.cpp) -- i killed myself
+*		models.cpp	- update stats 6 (stats.cpp) -- somebody killed me
+*		networking.cpp	- update stats 7 (stats.cpp) -- you killed someone on your own team
+*		networking.cpp	- update stats 8 (stats.cpp) -- you killed someone in a team bounty game
+*		networking.cpp	- update stats 9 (stats.cpp) -- you killed someone in a team game
+*		networking.cpp	- update stats 10 (stats.cpp) -- you killed someone in a bounty game
 *
 *	List of places where UpdateBonusStats() is called:
 *
-*		Ships.c		- update bonus 2 (stats.c) -- flag chase scored
-*		Ships.c		- update bonus 3 (stats.c) -- CTF scored
-*		Ships.c		- update bonus 4 (stats.c) -- bounty hunt points
-*		networking.c	- update bonus 6 (stats.c) -- someone else scored with flag
-*		Ships.c		- update bonus 7 (stats.c) -- someone else's bounty hunt points -- Notes: there is a lag of 1 point if person has it when u join
+*		ships.cpp		- update bonus 2 (stats.cpp) -- flag chase scored
+*		ships.cpp		- update bonus 3 (stats.cpp) -- CTF scored
+*		ships.cpp		- update bonus 4 (stats.cpp) -- bounty hunt points
+*		networking.cpp	- update bonus 6 (stats.cpp) -- someone else scored with flag
+*		ships.cpp		- update bonus 7 (stats.cpp) -- someone else's bounty hunt points -- Notes: there is a lag of 1 point if person has it when u join
 *
 \*******************************************************************/
 

@@ -1,6 +1,6 @@
 /*===================================================================
 	File	:	bgobjects.h
-	Content	:	BGObjects.c include file
+	Content	:	bgobjects.cpp include file
 ===================================================================*/
 #pragma once
 #include "game/main.h"

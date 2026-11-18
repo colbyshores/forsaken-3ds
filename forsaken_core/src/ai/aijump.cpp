@@ -152,7 +152,7 @@ u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
  * space (via inverse body matrix), produces yaw + pitch angles, and
  * writes them to the turret comp. The body stays in spawn
  * orientation, the turret swivels. We follow the same shape: the
- * UserContComps[] wired in enemies.c carries the aim, body matrix
+ * UserContComps[] wired in enemies.cpp carries the aim, body matrix
  * stays static. */
 static void JumpFaceTarget( ENEMY * Enemy )
 {
@@ -253,7 +253,7 @@ void AI_JUMP_FOLLOWPATH( ENEMY * Enemy )
 	 * (`AIFlags & AI_ICANSEEPLAYER`) silently filters out every
 	 * shot — boss hops correctly but never fires. Mirrors the
 	 * `SET_TARGET_PLAYERS` + `Tinfo->TObject` acquisition pattern
-	 * in aifollow.c / aiscan.c. */
+	 * in aifollow.cpp / aiscan.cpp. */
 	Tinfo->Flags = 0;
 	SET_TARGET_PLAYERS;
 	AI_GetDistToNearestTarget( Enemy );
@@ -278,7 +278,7 @@ void AI_JUMP_FOLLOWPATH( ENEMY * Enemy )
 	/* Per Ghidra decomp of kexForsakenAIBrainJump::MODE_FollowPath:
 	 * KEX calls UpdateGuns unconditionally every frame, including
 	 * during the arc — boss fires while airborne, just like he does
-	 * during dwell. The aifire.c:130 gate has been extended to
+	 * during dwell. The aifire.cpp gate has been extended to
 	 * bypass AI_ICANSEEPLAYER for JUMP_AI (mirroring the SPLINE
 	 * bypass) so the per-gun BurstAngle check is what gates fire. */
 	AI_UPDATEGUNS( Enemy );

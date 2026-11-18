@@ -2,7 +2,7 @@
 // in the following text:
 // <team name>=any one of LT_TEAM_??? defined below
 
-// text.c
+// text.cpp
 #define LT_TEAM_1		"Red"
 #define LT_TEAM_2		"Green"
 #define LT_TEAM_3		"Blue" 
@@ -27,10 +27,10 @@
 #define HAS_GOT_THE_BOUNTY "has got the bounty"
 #define ON_YOUR_OWN_TEAM "On Your Own Team"
 
-// Multiplayer.c
+// multiplayer.cpp
 
 
-// Pickups.c
+// pickups.cpp
 // in the following text:
 // <player name>=any player's name (typed in by player)
 // <pickup name>=any one of LT_PICKUP_??? defined below
@@ -98,7 +98,7 @@
 #define FLAG_DRIFTED_BACK				"the %s flag drifted back into their goal" // %s=<team name>
 #define FLAG_ESCAPED					"the %s flag escaped from their goal" // %s=<team name>
 
-// models.c
+// models.cpp
 // in the following text:
 // <death method>=any one of the LT_DEATHMETHOD_??? defined below
 #define ENEMY_KILLED_YOU					"enemy killed you with %s"		// %s=<death method>
@@ -107,7 +107,7 @@
 #define FROM_YOUR_OWN_TEAM			"from your own team"
 #define YOU_DIED								"you died"
 
-// primary.c
+// primary.cpp
 #define LT_DEATHMETHOD_KILLED					"a kamikaze"
 #define LT_DEATHMETHOD_PURGE_MINE			"a purge mine"
 #define LT_DEATHMETHOD_PINE_MINE				"a pine mine"
@@ -152,7 +152,7 @@
 #define YOU_DONT_HAVE_THAT_WEAPON		"You don't have that weapon"
 #define LASER_OVERHEATED							"Laser Overheated"
 
-// ships.c
+// ships.cpp
 #define TEAM_SCORED						"the %s team have scored" // %s=<team name>
 #define OTHER_TEAM_FLAG_RETURNED		"the %s team have returned their flag" // %s=<team name>
 #define YOU_NEED_FLAG					"you need the %s flag to score" // %s=<team name>
@@ -167,12 +167,12 @@
 #define HULL_CRITICAL					"hull critical"
 
 
-// screenpolys.c
+// screenpolys.cpp
 #define OUT_OF_TIME						"Out of time"
 #define IF_YOU_CANT_TAKE_THE_HEAT		"If you can't take the heat"
 #define GET_OUT_OF_THE_KITCHEN			"get out of the kitchen...."
 
-// credits.c
+// credits screen
 
 
 
