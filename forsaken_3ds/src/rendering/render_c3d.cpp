@@ -327,6 +327,20 @@ static int s_monoActive = 0;
  * but validated working on real hardware. */
 #define GPU_SCRATCH_SIZE  (4 * 1024 * 1024)
 static gpu_vertex_t *s_scratch = NULL;
+
+/* Point the vertex attribute buffer at v for the next draw. citro3d
+ * re-sends the buffer config only when C3D_GetBufInfo() has marked it
+ * dirty, and the draw that sends it clears the mark (C3Di_UpdateContext),
+ * so every draw needs its own C3D_GetBufInfo(): editing the struct after
+ * a draw is silently ignored and the next draw reads the previous
+ * buffer. That is what drew corrupt sprite quads in the right eye once
+ * FLUSH_BATCH split a batch into several runs. */
+static inline void bind_vertex_buffer(const gpu_vertex_t *v)
+{
+	C3D_BufInfo *bi = C3D_GetBufInfo();
+	BufInfo_Init(bi);
+	BufInfo_Add(bi, v, sizeof(gpu_vertex_t), 3, 0x210);
+}
 static int s_scratchUsed = 0;
 static int s_scratchMax = 0;
 
@@ -1609,9 +1623,7 @@ static void clear_sub_viewport_via_quad(void)
 	C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD,
 		GPU_ONE, GPU_ZERO, GPU_ONE, GPU_ZERO);
 
-	C3D_BufInfo *bi = C3D_GetBufInfo();
-	BufInfo_Init(bi);
-	BufInfo_Add(bi, dst, sizeof(gpu_vertex_t), 3, 0x210);
+	bind_vertex_buffer(dst);
 	C3D_DrawArrays(GPU_TRIANGLES, 0, 6);
 
 	/* Restore standard game-draw state */
@@ -2744,7 +2756,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
  * the left eye never converted is simply converted live instead. */
 #define FLUSH_BATCH() do { \
 	if (batch_vertCount > 0) { \
-		C3D_BufInfo *_bi = C3D_GetBufInfo(); \
 		int _has_persist = 0; \
 		{ int _pi; for (_pi = batch_tg0; _pi < group; _pi++) if (tg_persist_buf[_pi]) { _has_persist = 1; break; } } \
 		if ((_has_persist || (s_memoMode == SMEMO_LOOKUP)) && !orthographic) { \
@@ -2756,21 +2767,18 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			for (_si = batch_tg0; _si < group && _consumed < batch_vertCount; _si++) { \
 				if (tg_persist_buf[_si]) { \
 					if (_run_open) { \
-						BufInfo_Init(_bi); \
-						BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
+						bind_vertex_buffer(s_scratch + _run_off); \
 						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
 						_run_open = 0; \
 					} \
-					BufInfo_Init(_bi); \
-					BufInfo_Add(_bi, tg_persist_buf[_si], sizeof(gpu_vertex_t), 3, 0x210); \
+					bind_vertex_buffer(tg_persist_buf[_si]); \
 					C3D_DrawArrays(GPU_TRIANGLES, 0, tg_persist_cnt[_si]); \
 					_consumed += tg_persist_cnt[_si]; \
 					continue; \
 				} \
 				if (tg_memo_cnt[_si] <= 0 || (_run_open && tg_memo_off[_si] != _run_off + _run_cnt)) { \
 					if (_run_open) { \
-						BufInfo_Init(_bi); \
-						BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
+						bind_vertex_buffer(s_scratch + _run_off); \
 						C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
 						_run_open = 0; \
 					} \
@@ -2786,13 +2794,11 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				_consumed += tg_memo_cnt[_si]; \
 			} \
 			if (_run_open) { \
-				BufInfo_Init(_bi); \
-				BufInfo_Add(_bi, s_scratch + _run_off, sizeof(gpu_vertex_t), 3, 0x210); \
+				bind_vertex_buffer(s_scratch + _run_off); \
 				C3D_DrawArrays(GPU_TRIANGLES, 0, _run_cnt); \
 			} \
 		} else { \
-			BufInfo_Init(_bi); \
-			BufInfo_Add(_bi, s_scratch + batch_startOffset, sizeof(gpu_vertex_t), 3, 0x210); \
+			bind_vertex_buffer(s_scratch + batch_startOffset); \
 			C3D_DrawArrays(GPU_TRIANGLES, 0, batch_vertCount); \
 		} \
 		if (batch_colourkey) \
