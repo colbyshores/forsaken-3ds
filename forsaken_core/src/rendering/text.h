@@ -49,7 +49,7 @@ void PrintScoreSort( void );
 void CenterPrint4x5Text( char * Text , int y , int color );
 void CenterPrint4x5Text2( char * Text , int x, int y, int color );
 int	 Print4x5Text( const char * Text , int x , int y , int color );
-int	 Print4x5TextSmall( char * Text , int x , int y , int color );
+void Print4x5TextSmall( char * Text , int x , int y , int color );
 void Printu_int16_t( u_int16_t tempnum , int x , int y , int color );
 void MessageQuePrint( void );
 void PlayerMessageQuePrint( void );

@@ -203,7 +203,7 @@ void RightJustifyPrint4x5Text( char * Text , int x , int y, int col )
 	Print4x5Text( Text , x , y , col );
 }
 
-int Print4x5TextSmall( char * Text , int x , int y , int color )
+void Print4x5TextSmall( char * Text , int x , int y , int color )
 {
 		int OldFontHeight = FontHeight;
 		int OldFontWidth = FontWidth;
