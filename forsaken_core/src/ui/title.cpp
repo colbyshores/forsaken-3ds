@@ -8207,8 +8207,10 @@ void InitDebugMenu( MENU *Menu )
 {
 	InitRoomList();
 	if ( RoomList.selected_item >= 0 && RoomList.selected_item < RoomList.items )
+	{
 		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) - 1 );
 		RoomName.text[ sizeof( RoomName.text ) - 1 ] = 0;
+	}
 }
 
 
