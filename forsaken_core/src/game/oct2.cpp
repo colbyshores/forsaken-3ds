@@ -3169,10 +3169,6 @@ void CheckLevelEnd ( void )
   if( HasLevelEnded() )
   {
     PauseAllSfx();
-#ifdef FINAL_RELEASE
-    if( OriginalLevels )
-    {
-#endif
       LevelNum = -1;
       if( NewLevelNum == ( LevelList.items - 2 ) )
       {
@@ -3208,21 +3204,6 @@ void CheckLevelEnd ( void )
       }
       
       return;
-#ifdef FINAL_RELEASE
-    }else
-    {
-      if( NewLevelNum == ( LevelList.items - 1 ) )
-      {
-        // completed all levels ( not original levels )
-        GameCompleted = GAMECOMPLETE_AdditionalLevels;
-        return;
-      }else
-      {
-        NewLevelNum++;
-        GameCompleted = GAMECOMPLETE_NotComplete;
-      }
-    }
-#endif
   }
 
 }

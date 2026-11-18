@@ -1189,10 +1189,8 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 					x1.z = 0.0F;
 					x2 = x1;
 
-#ifndef FINAL_RELEASE
 					CreateMXABoundingBox( &MxaModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 										  &Models[i].TempLines[ 0 ], Models[i].Group );
-#endif
 
 					ENVMxa( &MxaModelHeaders[ ModelNum ] , &Models[i].Mat , &Models[i].Pos);
 
@@ -1266,10 +1264,8 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 					x1.z = 0.0F;
 					x2 = x1;
 
-#ifndef FINAL_RELEASE
 					CreateMXBoundingBox( &ModelHeaders[ ModelNum ],	&Models[i].Mat, &Models[i].Pos,
 										 &Models[i].TempLines[ 0 ], Models[i].Group );
-#endif
 
 					if( Models[i].Flags & MODFLAG_AmbientLight )
 					{

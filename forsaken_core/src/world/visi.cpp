@@ -147,9 +147,7 @@ void InitVisiStats( MLOADHEADER *m )
 		VisiStats[ j ].tmin = -1;
 		VisiStats[ j ].visits = 0;
 	}
-#ifndef FINAL_RELEASE
 	InitDebugRays();
-#endif
 }
 
 
