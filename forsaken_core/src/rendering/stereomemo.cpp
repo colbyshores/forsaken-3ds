@@ -73,6 +73,9 @@ struct StereoMemo {
         ++persist_gen;
     }
 
+    /* Memo-only: for content the persistent level cache never holds. */
+    void invalidate_frame() { bump_gen(); }
+
     void persist_reset()
     {
         ++persist_gen;
@@ -136,6 +139,7 @@ StereoMemo g_memo;
 
 void smemo_begin_frame(void) { g_memo.begin_frame(); }
 void smemo_invalidate(void) { g_memo.invalidate(); }
+void smemo_invalidate_frame(void) { g_memo.invalidate_frame(); }
 unsigned smemo_persist_gen(void) { return g_memo.persist_gen; }
 void smemo_persist_reset(void) { g_memo.persist_reset(); }
 unsigned smemo_persist_resets(void) { return g_memo.persist_resets; }

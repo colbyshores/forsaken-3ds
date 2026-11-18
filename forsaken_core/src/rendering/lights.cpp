@@ -275,6 +275,12 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		{
 			return false;
 		}	
+		/* The colour pass below restores the baked colours (stable from
+		 * frame to frame) unless white-out or water rewrite them every
+		 * frame; tell the backend's caches which (render.h SMEMO_PASS). */
+		Mloadheader->Group[group].renderObject[execbuf].memoEpochPass =
+			( ( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
+				SMEMO_PASS_UNSET : SMEMO_PASS_PER_FRAME;
 
 		VertexCellPnt = Mloadheader->Group[group].vertex_cell_pnt[execbuf];
 		OrgVertexIndexPnt = Mloadheader->Group[group].vertex_index_pnt[execbuf];

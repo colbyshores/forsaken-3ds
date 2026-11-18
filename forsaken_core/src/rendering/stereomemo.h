@@ -56,6 +56,11 @@
 /* New frame: invalidates all entries (generation bump, no clearing). */
 void smemo_begin_frame(void);
 
+/* Memo-only mid-frame invalidation, for content the persistent level
+ * cache never holds (water mesh, model UVs): makes the other eye
+ * reconvert without discarding every retained level buffer. */
+void smemo_invalidate_frame(void);
+
 /* Mid-frame invalidation: call when shared vertex content actually
  * changes (texture-animation step, water integration) so the other
  * eye never reuses pre-change bytes. */

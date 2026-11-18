@@ -234,13 +234,15 @@ void c3d_memo_suspend(bool suspend)
 	}
 }
 
-/* ---- R05 persistent level geometry (PERSIST_VERTS, default off) ----
+/* ---- Persistent level geometry ----
  * Level-wall (VERT_OWNER_LEVEL) texgroups are converted once into
- * retained linear buffers and resubmitted every frame/eye without
- * reconversion or scratch traffic. Validity is keyed by
- * smemo_persist_gen(): texture-animation steps and water integration
- * bump it (reconvert into the same allocations); level load bumps the
- * reset count (buffers freed lazily at the next FSBeginScene).
+ * retained linear buffers and resubmitted every frame without
+ * reconversion or scratch traffic. Only execbufs whose content is
+ * stable across frames qualify (memoEpochPass == SMEMO_PASS_UNSET;
+ * XLight1Group marks white-out / underwater execbufs PER_FRAME).
+ * Validity is keyed by smemo_persist_gen(): level texture-animation
+ * steps bump it (reconvert into the same allocations); level load bumps
+ * the reset count (buffers freed lazily at the next FSBeginScene).
  * Allocation failure or table pressure falls back to the scratch
  * path — never stale data, never a skipped draw. */
 #define PERSIST_BITS 11
@@ -259,9 +261,9 @@ static unsigned s_persistResetsSeen = 0;
 static unsigned s_persistBytes = 0;
 /* Runtime gate (owner policy 2026-11-14): persist pays in mono
  * (-8.6% measured) and is wall-flat in stereo, where its stills are
- * only LSB-equivalent across eyes. So it is active only while the
- * 3D slider is down (stereo_mode != STEREO_MODE_3DS), refreshed at
- * every FSBeginScene; stereo keeps the proven memo-only path.
+ * only LSB-equivalent across eyes. So it is active only in mono frames
+ * (slider down; see the stereo_frame gate in FSBeginScene), refreshed at
+ * every FSBeginScene; stereo keeps the memo-only path.
  * Buffers stay allocated across slider moves and simply go unused
  * in stereo (generation unchanged, still valid if mono resumes). */
 static int s_persistActive = 0;
@@ -346,9 +348,6 @@ static void persist_free_all(void)
 	s_persistBytes = 0;
 }
 
-/* Mono gate for the slider-down paths: refreshed per FSBeginScene
- * from the same stereo_mode signal as s_persistActive. */
-static int s_monoActive = 0;
 
 /* Scratch buffer for vertex conversion.
  * 4MB = ~116000 verts at 36 bytes each.  Needs to handle heavy
@@ -1464,8 +1463,16 @@ bool FSBeginScene(void)
 	 * skipped — only the vertex-conversion memcpy, on memo hits. */
 	smemo_begin_frame();
 	/* Gated on 3DS stereo: mono frames must not pay the record cost. */
-	s_memoMode = (render_info.stereo_mode == STEREO_MODE_3DS) ?
-		SMEMO_RECORD : SMEMO_OFF;
+	/* A frame is hardware stereo only while the slider is up
+	 * (stereo_enabled, refreshed every frame) and the technique is 3DS
+	 * stereo. stereo_mode alone is the saved technique choice: it stays
+	 * STEREO_MODE_3DS after the slider goes down, which used to keep the
+	 * mono persistent cache off for good. The slider is read after this
+	 * point, so the gate lags a transition by one frame; both caches are
+	 * correct in either kind of frame, only the cost differs. */
+	const bool stereo_frame = render_info.stereo_enabled &&
+		render_info.stereo_mode == STEREO_MODE_3DS;
+	s_memoMode = stereo_frame ? SMEMO_RECORD : SMEMO_OFF;
 	s_memoSuspended = false;
 	/* Level load/unload bumped the persist reset count: free retained
 	 * buffers once, lazily, before any new conversion can reuse them. */
@@ -1474,8 +1481,7 @@ bool FSBeginScene(void)
 		persist_free_all();
 	}
 	/* Slider gate: mono only (see s_persistActive comment). */
-	s_persistActive = (render_info.stereo_mode != STEREO_MODE_3DS);
-	s_monoActive = (render_info.stereo_mode != STEREO_MODE_3DS);
+	s_persistActive = !stereo_frame;
 	s_scratchUsed = 0;
 	if (!s_inFrame)
 	{
@@ -2914,7 +2920,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		/* R05: level walls consult the retained buffers first (both
 		 * eyes, any mode). A hit submits the retained buffer at flush
 		 * time and converts nothing. */
-		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
+		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
+		    renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
 			int pcnt = 0;
 			gpu_vertex_t *pbuf = persist_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type), &pcnt);
@@ -3033,7 +3040,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 		/* R05: retain this conversion for level walls. On success the
 		 * flush submits the retained buffer instead of scratch. */
-		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL) {
+		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
+		    renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
 			gpu_vertex_t *pbuf = persist_store(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
 				dst, totalVerts);

@@ -220,7 +220,12 @@ typedef enum {
 	 * renderObject: FmPoly fills with FM_FLAG_MOVEOUT (pulled toward
 	 * CurrentCamera.Pos, which differs per eye) and TransExe copies
 	 * (slot address, refilled per camera pass in visibility order). */
-	SMEMO_PASS_NO_REUSE = 8
+	SMEMO_PASS_NO_REUSE = 8,
+	/* Level execbuf whose colours are rewritten every frame (death
+	 * white-out, underwater tint) but identically for both eyes: the
+	 * stereo memo may reuse it within the frame; the persistent level
+	 * cache must not keep it. Set and cleared per frame by XLight1Group. */
+	SMEMO_PASS_PER_FRAME = 9
 } SMEMO_PASS;
 /* Fill epoch for a whole-scene (unclipped) fill: no single group. */
 #define SMEMO_WHOLE_GROUP 0xFFFFFFFFu

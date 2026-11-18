@@ -627,7 +627,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	{
 		return;
 	}
-	smemo_invalidate(); /* shared verts just integrated */
+	smemo_invalidate_frame(); /* water verts just integrated (never in the persistent cache) */
 }
 
 /*===================================================================
