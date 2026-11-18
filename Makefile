@@ -10,7 +10,9 @@ ifeq ($(M32),1)
   FLAGS+= -m32
 endif
 FLAGS+= -pipe
-CFLAGS=$(FLAGS) -Wall -Wextra
+# -Wno-missing-field-initializers: the menu tables and the Vulkan create-info
+# initialisers name the leading members and rely on the rest being zero.
+CFLAGS=$(FLAGS) -Wall -Wextra -Wno-missing-field-initializers
 LDFLAGS=$(FLAGS)
 
 # right now non debug build would probably crash anyway
