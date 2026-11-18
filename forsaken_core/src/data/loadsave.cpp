@@ -561,7 +561,7 @@ char *SavedGameInfo( int slot )
 		fread( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
 		fread( &Lives, sizeof( Lives ), 1, fp );
 		if ( strcasecmp( (char*)biker, DEFAULT_PLAYER_NAME ) )
-			sprintf( info, "%s in %s %hd'%02hd %hd/%hd",
+			snprintf( info, sizeof( info ), "%s in %s %hd'%02hd %hd/%hd",
 				biker,
 				LevelName,
 				Hours * 60 + Minutes, Seconds,

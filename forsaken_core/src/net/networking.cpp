@@ -310,7 +310,8 @@ char* msg_to_str( int msg_type )
 void set_player_name( int BikeNum, char* name )
 {
 	if( !name || BikeNum < 0 || BikeNum >= MAX_PLAYERS ) return;
-	strncpy( &Names[BikeNum][0], name, MAXSHORTNAME );
+	strncpy( &Names[BikeNum][0], name, sizeof( Names[BikeNum] ) - 1 );
+	Names[BikeNum][ sizeof( Names[BikeNum] ) - 1 ] = 0;
 	Names[BikeNum][MAXSHORTNAME-1] = 0;
 }
 
@@ -3480,7 +3481,8 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		memmove( lpInit->GameStatus,		GameStatus,		sizeof(lpInit->GameStatus));		// other players game status//memcpy
 		memmove( lpInit->TeamNumber,		TeamNumber,		sizeof(lpInit->TeamNumber));		// what team everyone is on//memcpy
 
-		strncpy( lpInit->LevelName, ShortLevelNames[NewLevelNum], 32 );						// level we are on
+		strncpy( lpInit->LevelName, ShortLevelNames[NewLevelNum], sizeof( lpInit->LevelName ) - 1 );
+		lpInit->LevelName[ sizeof( lpInit->LevelName ) - 1 ] = 0;						// level we are on
        
 		break;
 
@@ -3785,7 +3787,8 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		lpLongStatus->Status.Mines			= Ships[WhoIAm].Mines;		 
 		lpLongStatus->Status.Triggers		= Ships[WhoIAm].Triggers;	 
 		lpLongStatus->Status.TrigVars		= Ships[WhoIAm].TrigVars;
-		strncpy( &lpLongStatus->LevelName[0], &ShortLevelNames[NewLevelNum][0], 32 );
+		strncpy( &lpLongStatus->LevelName[0], &ShortLevelNames[NewLevelNum][0], sizeof( lpLongStatus->LevelName ) - 1 );
+		lpLongStatus->LevelName[ sizeof( lpLongStatus->LevelName ) - 1 ] = 0;
 		{ // send update if level change
 			static int16_t MyNewLevelNum = 0;
 			if(MyNewLevelNum != NewLevelNum)

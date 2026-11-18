@@ -442,6 +442,7 @@ sound_source_t *sound_source(sound_buffer_t *buffer)
 	src->volume  = 1.0f;
 	src->pan     = 0.0f;
 	strncpy(src->path, buffer->path, MAX_PATH_LEN - 1);
+	src->path[MAX_PATH_LEN - 1] = 0;
 
 	/* configure ndsp channel */
 	ndspChnReset(ch);

@@ -1257,7 +1257,7 @@ void ReTriggerSfx( void )
 void GetFullBikeSfxPath( char *fullpath, int sfxnum, int variant, int total_variants, int bike )
 {
 	char filename[256];
-	char numstr[3];
+	char numstr[12];
 
 	if ( ( variant > total_variants ) && total_variants )
 	{
@@ -1288,7 +1288,7 @@ void GetFullBikeSfxPath( char *fullpath, int sfxnum, int variant, int total_vari
 	{
 		GetSfxPath( sfxnum , fullpath );
 		strcat( fullpath, filename );
-		sprintf( numstr, "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
+		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
 		strcat( fullpath, numstr );
 		strcat( fullpath, ".wav" );
 	}
@@ -1298,7 +1298,7 @@ void GetFullBikeSfxPath( char *fullpath, int sfxnum, int variant, int total_vari
 void GetFullBikeCompSfxPath( char *fullpath, int sfxnum, int variant, int total_variants, int bikecomp )
 {
 	char filename[256];
-	char numstr[3];
+	char numstr[12];
 
 	if ( ( variant > total_variants ) && total_variants )
 	{
@@ -1323,7 +1323,7 @@ void GetFullBikeCompSfxPath( char *fullpath, int sfxnum, int variant, int total_
 		// create filename with num extension
 		GetSfxPath( sfxnum, fullpath );
 		strcat( fullpath, filename );
-		sprintf( numstr, "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
+		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
 		strcat( fullpath, numstr );
 		strcat( fullpath, ".wav" );
 	}
@@ -1334,7 +1334,7 @@ void GetFullBikeCompSfxPath( char *fullpath, int sfxnum, int variant, int total_
 void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants )
 {
 	char filename[256];
-	char numstr[3];
+	char numstr[12];
 	
 	if ( ( variant > total_variants ) && total_variants )
 	{
@@ -1357,7 +1357,7 @@ void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants
 		// create filename with num extension
 		GetSfxPath( sfxnum , fullpath );
 		strcat( fullpath, filename );
-		sprintf( numstr, "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
+		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
 		strcat( fullpath, numstr );
 		strcat( fullpath, ".wav" );
 	}
@@ -2637,7 +2637,7 @@ FILE *LoadAllSfx( FILE *fp )
 void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, float Freq, int biker, char variant, bool update )
 {
 	char *last_slash;
-	char numstr[ 3 ];
+	char numstr[ 12 ];
 
 	if ( !( Sfx_Filenames[ sfx ].Flags & SFX_Biker ) )
 		return;
@@ -2665,7 +2665,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 
 	if ( variant != -1 )
 	{
-		sprintf( numstr, "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
+		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
 		strcat( last_slash, numstr );
 	}else
 	{

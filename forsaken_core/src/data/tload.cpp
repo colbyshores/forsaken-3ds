@@ -355,7 +355,7 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 	Change_Ext( file, new_file, ".PNG" );
 
 	// check for level folder override
-	sprintf(path,"data\\levels\\%s\\textures\\%s",level,new_file);
+	snprintf(path,sizeof(path),"data\\levels\\%s\\textures\\%s",level,new_file);
 	if( File_Exists( path ) )
 	{
 		strncpy(destination,path,256);
@@ -363,7 +363,7 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 	}
 
 	// use old textures if requested and available
-	sprintf(path,"data\\textures\\original\\%s",new_file);
+	snprintf(path,sizeof(path),"data\\textures\\original\\%s",new_file);
 	if( use_original_textures && File_Exists( path ) )
 	{
 		strncpy(destination,path,256);
@@ -371,7 +371,7 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 	}
 
 	// default to data/textures
-	sprintf(path,"data\\textures\\%s",new_file);
+	snprintf(path,sizeof(path),"data\\textures\\%s",new_file);
 	if( File_Exists( path ) )
 	{
 		strncpy(destination,path,256);

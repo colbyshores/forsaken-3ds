@@ -1666,7 +1666,8 @@ void JoiningEnter(MENU *Menu)
 	}
 
 	// convert host
-	strncpy( host_address, TCPAddress.text, sizeof(host_address) );
+	strncpy( host_address, TCPAddress.text, sizeof( host_address ) - 1 );
+	host_address[ sizeof( host_address ) - 1 ] = 0;
 
 	network_join( host_address, host_port );
 }
@@ -6683,7 +6684,7 @@ void InitPilotList( void )
 		if ( j > 0 && j < MAX_PLAYER_NAME_LENGTH )
 		{
 			// set the pilot name
-			strncpy( bname, fname, j );
+			memcpy( bname, fname, j );
 
 			// set end of c string
 			bname[ j ] = 0;
@@ -6763,7 +6764,7 @@ void SetPilotName( MENUITEM *item )
 		return;
 
 	// path to the cfg file
-	sprintf( filepath, "pilots\\%s.txt", PilotName.text );
+	snprintf( filepath, sizeof( filepath ), "pilots\\%s.txt", PilotName.text );
 
 	// open the new/existing file to cfg open
 	f = file_open( filepath, "r" );
@@ -6853,7 +6854,7 @@ void SetPilotNameInGame( MENUITEM *item )
 	if ( !strlen( PilotNameInGame.text ) )
 		return; // abort if pilot name empty
 
-	sprintf( fname, "pilots\\%s.txt", PilotNameInGame.text );
+	snprintf( fname, sizeof( fname ), "pilots\\%s.txt", PilotNameInGame.text );
 
 	f = file_open( fname, "r" );
 	if ( f )
@@ -6909,7 +6910,7 @@ void RenamePilotName( MENUITEM *item )
 	if ( !strlen( PilotReName.text ) )
 		return; // abort if pilot name empty
 
-	sprintf( fname, "pilots\\%s.txt", PilotReName.text );
+	snprintf( fname, sizeof( fname ), "pilots\\%s.txt", PilotReName.text );
 
 	f = file_open( fname, "r" );
 	if ( f )
@@ -7464,7 +7465,7 @@ void InitBikerName( char *name )
 	biker_name[ sizeof( biker_name ) - 1 ] = 0;
 
 	// set the biker config
-	sprintf( biker_config, "pilots\\%s.txt", name );
+	snprintf( biker_config, sizeof( biker_config ), "pilots\\%s.txt", name );
 
 	// set the player name in registry
 	config_set_str("PlayerName",&biker_name[0]);
@@ -7515,7 +7516,8 @@ void GetDefaultPilot(void)
 		char * name;
 		if( (name = find_file( "Pilots\\*.txt" )))
 		{
-			strncpy( &pilot_name[0], name, sizeof(pilot_name) );
+			strncpy( &pilot_name[0], name, sizeof( pilot_name ) - 1 );
+			pilot_name[ sizeof( pilot_name ) - 1 ] = 0;
 
 			// remove the .cfg
 			strptr = strrchr( pilot_name , '.' );
@@ -7796,7 +7798,8 @@ void ExitMultiplayerHostVDUPeerPeer ( MENU *Menu )
 
 void RedrawMultiplayerHostVDUPeerPeer( int * i )
 {
-	strncpy( GameTypeName, GameTypeNameTable[ GameType ], sizeof(GameTypeName) );
+	strncpy( GameTypeName, GameTypeNameTable[ GameType ], sizeof( GameTypeName ) - 1 );
+	GameTypeName[ sizeof( GameTypeName ) - 1 ] = 0;
 	config_set_str( "LevelName", (char*)LevelList.item[ LevelList.selected_item ] );
 }
 
@@ -7923,7 +7926,7 @@ void GetSavedGameData( void )
 
 		sprintf( CurrentSavedGameLevel, LT_LevelName/*"level name: %s"*/, GetMissionName( (char*)buf ) );
 		if ( strcasecmp( (char*)biker, (char*)DEFAULT_PLAYER_NAME ) )
-			sprintf( CurrentSavedGameTimeLevelPlayed, LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
+			snprintf( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
 		else
 			sprintf( CurrentSavedGameTimeLevelPlayed, LT_LevelPlayedFor2/*"played for %hd mins %hd secs"*/, Hours * 60 + Minutes, Seconds );
 		sprintf( CurrentSavedGameEnemiesKilled, LT_EnemiesKilled/*"enemies killed: %hd of %hd"*/, KilledEnemiesNum, InitEnemiesNum );
@@ -8205,7 +8208,8 @@ void InitDebugMenu( MENU *Menu )
 {
 	InitRoomList();
 	if ( RoomList.selected_item >= 0 && RoomList.selected_item < RoomList.items )
-		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) );
+		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) - 1 );
+		RoomName.text[ sizeof( RoomName.text ) - 1 ] = 0;
 }
 
 
@@ -8256,7 +8260,8 @@ void ChooseRoom( MENUITEM *item )
 		return; // abort if invalid room
 	if ( GotoRoom( WhoIAm, (char*)(char*)RoomList.item[ RoomList.selected_item ] ) )
 	{
-		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) );
+		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) - 1 );
+		RoomName.text[ sizeof( RoomName.text ) - 1 ] = 0;
 		AddColourMessageToQue( SystemMessageColour, "You are now in %s", (char*)RoomList.item[ RoomList.selected_item ] );
 	}
 	else
@@ -9655,7 +9660,7 @@ void DrawFlatMenuKeyNum( MENUITEM *Item )
 		TextInfo->text = (u_int8_t*)malloc( 16 );
 		if ( kdef->def->keys > 1 )
 		{
-			sprintf( (char*)TextInfo->text, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
+			snprintf( (char*)TextInfo->text, sizeof( TextInfo->text ), "%d/%d", kdef->selected_key + 1, kdef->def->keys );
 		}
 		else
 			TextInfo->text[ 0 ] = 0;
@@ -10161,7 +10166,8 @@ void DrawFlatMenuName( MENUITEM *Item )
 
 	if (Item->highlightflags & TEXTFLAG_CheckForRefresh)
 	{
-		strncpy((char*)TextInfo->oldtext, (char*)TextInfo->text, MAX_TEXT_LENGTH);
+		strncpy( (char*)TextInfo->oldtext, (char*)TextInfo->text, sizeof( TextInfo->oldtext ) - 1 );
+		TextInfo->oldtext[ sizeof( TextInfo->oldtext ) - 1 ] = 0;
 	}
 
 	//add to text stack...
@@ -11226,7 +11232,8 @@ void ProcessTextItems (void)
 			(strncmp((char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, MAX_TEXT_LENGTH) != 0)
 		)
 		{
-			strncpy((char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, MAX_TEXT_LENGTH);
+			strncpy( (char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, sizeof( TextStack[i]->oldtext ) - 1 );
+			TextStack[i]->oldtext[ sizeof( TextStack[i]->oldtext ) - 1 ] = 0;
 			PrintTextItem(TextStack[i]);
 		}
 
@@ -12612,8 +12619,10 @@ void SelectConnectionToJoin (MENUITEM *Item)
 		if( index )
 		{
 			// update the host settings
-			strncpy(TCPAddress.text, games_ip_at(index), sizeof(TCPAddress.text));
-			strncpy(host_port_str.text, games_port_at(index), sizeof(host_port_str.text));
+			strncpy( TCPAddress.text, games_ip_at(index), sizeof( TCPAddress.text ) - 1 );
+			TCPAddress.text[ sizeof( TCPAddress.text ) - 1 ] = 0;
+			strncpy( host_port_str.text, games_port_at(index), sizeof( host_port_str.text ) - 1 );
+			host_port_str.text[ sizeof( host_port_str.text ) - 1 ] = 0;
 		}
 		// game was not found
 		else
@@ -14049,7 +14058,8 @@ void InitWatchList( MENU *Menu )
 	{
 		if ( GameStatus[ i ] == STATUS_Normal || i == WhoIAm )
 		{
-			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ 0 ] ) );
+			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 );
+			HostPlayersList.item[ HostPlayersList.items ][ sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 ] = 0;
 			
 			if(i == WhoIAm)
 				strcat( (char*)HostPlayersList.item[ HostPlayersList.items ], " (YOU)");
@@ -14077,7 +14087,8 @@ void RefreshHostPlayersList( LIST *List )
 	{
 		if ( GameStatus[ i ] == STATUS_Normal && i != WhoIAm)
 		{
-			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ 0 ] ) );
+			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 );
+			HostPlayersList.item[ HostPlayersList.items ][ sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 ] = 0;
 			HostGamePlayersWhoIAm[ HostPlayersList.items ] = i;
 			HostPlayersList.items++;
 		}
@@ -14115,7 +14126,8 @@ void TitleReset( MENUITEM *item )
 
 void SetTitleNotify( char *str )
 {
-	strncpy( NotifyMessage, str, sizeof( NotifyMessage ) );
+	strncpy( NotifyMessage, str, sizeof( NotifyMessage ) - 1 );
+	NotifyMessage[ sizeof( NotifyMessage ) - 1 ] = 0;
 	QuickStart = QUICKSTART_Notify;
 }
 

@@ -30,7 +30,8 @@ char* convert_path( const char* _str )
 {
 	static char temp[500];
 	char * str = temp;
-	strncpy( temp, _str, sizeof(temp) );
+	strncpy( temp, _str, sizeof( temp ) - 1 );
+	temp[ sizeof( temp ) - 1 ] = 0;
 	while (*str)
 	{
 		if (*str == '\\')
