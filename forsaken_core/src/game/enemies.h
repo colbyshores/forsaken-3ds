@@ -47,7 +47,7 @@ typedef struct FIREPOS {
 	VECTOR	Dir[ 6 ];
 } FIREPOS;
 
-#define ENEMY_TAUNT_PAUSE 600.0F;
+constexpr auto ENEMY_TAUNT_PAUSE = 600.0F;
 
 typedef struct ENEMY {
 	bool	Used;

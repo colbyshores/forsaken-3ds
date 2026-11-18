@@ -179,7 +179,6 @@ enum
 };
 
 
-#define	MAXTEXTMSG			512		// the number of chars in a message you can send.....
 //	Strucures
 constexpr int TEXTFLAG_CentreX = 1; // centre text along x axis of bounding box
 constexpr int TEXTFLAG_CentreY = 2; // centre text along y axis of bounding box

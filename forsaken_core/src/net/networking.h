@@ -68,7 +68,7 @@ constexpr int WATCH_MODE = 5;
 constexpr float MAX_SHIELD = 255.0F;
 constexpr float START_SHIELD = 128.0F;
 constexpr float START_HULL = 128.0F;
-#define MAXTEXTMSG							512		// the number of chars in a message you can send.....
+constexpr int MAXTEXTMSG = 512; // the number of chars in a message you can send.....
 constexpr int MAXGENPICKUPCOUNT = 5;
 constexpr int MAXGENREGENSLOTCOUNT = 6;
 constexpr int MAXGENMINECOUNT = 3; //4

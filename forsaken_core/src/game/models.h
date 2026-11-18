@@ -38,9 +38,9 @@ constexpr int NUM_INTERLEVEL_MODELS = 17;
  * comp objects loaded for that level). 608 gives a ~24-entry margin.
  * If a future level crashes during PreLoadCompObj("Too many models"),
  * bump this AND MAXMXAMODELHEADERS together (they share index space). */
-#define	MAXMODELHEADERS		608
+constexpr int MAXMODELHEADERS = 608;
 #else
-#define	MAXMODELHEADERS		1024
+constexpr int MAXMODELHEADERS = 1024;
 #endif
 constexpr auto ORBIT_RADIUS = ( 256 * GLOBAL_SCALE );
 constexpr int MAXMODELSPOTFX = 10;

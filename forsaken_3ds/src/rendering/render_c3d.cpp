@@ -76,7 +76,7 @@ constexpr int UNIFORM_PROJECTION = 0; /* fvec4[4] — view × proj, PICA-adjuste
 constexpr int UNIFORM_MODELVIEW = 4; /* fvec4[4] — world_matrix (model→world) */
 constexpr int UNIFORM_AMBIENT = 8; /* fvec4    — .xyz=ambient, .w=unused */
 constexpr int UNIFORM_LIGHT_COUNT = 9; /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
-#define UNIFORM_LIGHTS      10   /* fvec4[24]— GPU_MAX_LIGHTS × 3 fvec4 each
+constexpr int UNIFORM_LIGHTS = 10;   /* fvec4[24]— GPU_MAX_LIGHTS × 3 fvec4 each
                                   *   light[3i+0] = (Pos.xyz, invSizeSq)
                                   *   light[3i+1] = (r, g, b, type)
                                   *   light[3i+2] = (Dir.xyz, CosArc)  */

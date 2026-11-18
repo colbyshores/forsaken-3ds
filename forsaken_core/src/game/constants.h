@@ -19,7 +19,7 @@ constexpr int MAXMULTIPLES = 8; /* orbital pods (Orb pickups) per ship */
 
 /* World. */
 constexpr int MAXGROUPS = 128; /* visibility groups per level */
-#define MAXBIKETYPES			17		/* selectable bikes (ship models) */
+constexpr int MAXBIKETYPES = 17; /* selectable bikes (ship models) */
 
 /* Weapons. */
 constexpr int MAXPRIMARYWEAPONS = 6;

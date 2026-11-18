@@ -17,7 +17,7 @@
  * defines
  */
 constexpr int MAXMXGROUPS = 1;
-#define MAXMXATEXTUREGROUPSPER 8
+constexpr int MAXMXATEXTUREGROUPSPER = 8;
 constexpr int MAXTPAGESPERMXLOAD = 8;
 
 enum {

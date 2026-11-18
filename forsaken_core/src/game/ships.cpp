@@ -45,7 +45,7 @@
 
 constexpr float RGENINVULTIME = 60.0F;
 
-#define FRAMES_PER_SEC	(60.0F)
+constexpr auto FRAMES_PER_SEC = (60.0F);
 
 #define BOB_XSIZE		(30.0F * GLOBAL_SCALE)
 #define BOB_YSIZE		(10.0F * GLOBAL_SCALE)
@@ -1345,8 +1345,8 @@ void RotateInternal( u_int16_t ship, float xrot, float yrot, float zrot )
 #define MIN_AUTOLEVEL_PITCH	D2R(5.0F) 
 #define MAX_AUTOLEVEL_PITCH	D2R(175.0F)
 
-#define MIN_AUTOLEVEL_ROLL_TOLERANCE	(0.2F)
-#define AUTOLEVEL_RATE					(0.1F)
+constexpr auto MIN_AUTOLEVEL_ROLL_TOLERANCE = (0.2F);
+constexpr auto AUTOLEVEL_RATE = (0.1F);
 
 
 float AutoLevelRot( u_int16_t ship, float autolevel_rate )

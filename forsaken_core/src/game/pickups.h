@@ -32,7 +32,7 @@
 #define DEBUG_PICKUPS			0
 #endif
 
-#define	PIC_VERSION_NUMBER	1
+constexpr int PIC_VERSION_NUMBER = 1;
 								
 constexpr int MAXPICKUPS = 256;
 /* Bumped 46 -> 128 to fit Remaster N64 pickup IDs at slots 100-105

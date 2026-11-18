@@ -34,11 +34,11 @@ constexpr int MUSIC_FIRST_TRACK = 2;
  * Cyclotron). On disk we keep CD-style 1-offset numbering so the user's
  * existing track02-10 from extract_assets.py stay valid; OGG 10-18 land
  * at track11.dsp..track19.dsp. extract_remaster_levels.py converts them. */
-#define MUSIC_LAST_TRACK   19
+constexpr int MUSIC_LAST_TRACK = 19;
 #else
-#define MUSIC_LAST_TRACK   10
+constexpr int MUSIC_LAST_TRACK = 10;
 #endif
-#define MUSIC_NUM_TRACKS   (MUSIC_LAST_TRACK - MUSIC_FIRST_TRACK + 1)
+constexpr auto MUSIC_NUM_TRACKS = (MUSIC_LAST_TRACK - MUSIC_FIRST_TRACK + 1);
 
 /* Title screen track */
 constexpr int MUSIC_TITLE_TRACK = 2;

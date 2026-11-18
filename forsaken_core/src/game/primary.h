@@ -28,6 +28,7 @@
 
 #include "game/constants.h"
 #include "game/main.h"
+#include "rendering/2dtextures.h"
 
 /*===================================================================
 	Defines
@@ -160,7 +161,7 @@ constexpr int WEPTYPE_Various = 2;
 constexpr int OWNER_NOBODY = 0;
 constexpr int OWNER_SHIP = 1;
 constexpr int OWNER_ENEMY = 2;
-#define	OWNER_BGOBJECT		3
+constexpr int OWNER_BGOBJECT = 3;
 constexpr int OWNER_MINE = 4;
 constexpr int OWNER_MODELSPOTFX = 5;
 

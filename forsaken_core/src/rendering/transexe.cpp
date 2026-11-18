@@ -12,11 +12,7 @@
 #include "game/bgobjects.h"
 #include "game/object.h"
 #include "net/networking.h"
-/* OWNER_BGOBJECT (= 3) — defined in primary.h, but that header pulls
- * in FRAME_INFO etc.; inlined to avoid the include cascade. */
-#ifndef OWNER_BGOBJECT
-#define OWNER_BGOBJECT 3
-#endif
+#include "game/primary.h"
 
 #include "rendering/transexe.h"
 #include "game/models.h"

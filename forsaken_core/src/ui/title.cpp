@@ -1613,8 +1613,8 @@ MENU	MENU_NEW_Joining = {
 MENUITEM MENU_ITEM_JoinMultiplayer = 
 		{ 0, 0, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, &MENU_NEW_Joining, MenuChange, NULL, NULL, 0  };
 
-#define MAX_GAME_LIST 7
-#define MAX_GAME_LENGTH 100
+constexpr int MAX_GAME_LIST = 7;
+constexpr int MAX_GAME_LENGTH = 100;
 
 char GameName[MAX_GAME_LIST][MAX_GAME_LENGTH];
 char GameList[MAX_GAME_LIST][MAX_GAME_LENGTH];
@@ -1844,7 +1844,7 @@ MENU	MENU_NEW_InGameSound = {
 };
 
 
-#define MAX_SAVEDGAME_INFO_LENGTH 128
+constexpr int MAX_SAVEDGAME_INFO_LENGTH = 128;
 
 char CurrentSavedGameLevel[ MAX_SAVEDGAME_INFO_LENGTH ];
 char CurrentSavedGameDate[ MAX_SAVEDGAME_INFO_LENGTH ];
@@ -2614,9 +2614,9 @@ const char *BikerText[MAXBIKETYPES] =
 		Globals ...
 ===================================================================*/
 
-#define MAXHIGHLIGHTITEMS 8
-#define HIGHLIGHT_Pulsing	0
-#define HIGHLIGHT_Static	1
+constexpr int MAXHIGHLIGHTITEMS = 8;
+constexpr int HIGHLIGHT_Pulsing = 0;
+constexpr int HIGHLIGHT_Static = 1;
 
 MENU * CurrentMenu = NULL;
 MENUITEM * CurrentMenuItem = NULL;
@@ -2642,13 +2642,13 @@ VECTOR OrigPos[NUMOFTITLEMODELS];
 
 float rot[6], rotspeed[6], RotPause[6], StackY[7];
 
-#define ROTATE_DISC_All 0
-#define ROTATE_DISC_DifficultyForward 1
-#define ROTATE_DISC_DifficultyBack 2
+constexpr int ROTATE_DISC_All = 0;
+constexpr int ROTATE_DISC_DifficultyForward = 1;
+constexpr int ROTATE_DISC_DifficultyBack = 2;
 
 int DiscStatus, StackStatus, StackMode, RotWiggle[6], CurrentTextures[6], CurrentDiscHighlight, CurrentVDUHighlight, CameraStatus, DifficultyDir;
 
-#define Judders 7
+constexpr int Judders = 7;
 
 float JudderAngle[Judders] = {180.0F, 182.0F, 178.0F, 181.0F, 179.0F, 180.0F, 180.0F};
 
@@ -2729,7 +2729,7 @@ int HoloTintVerts[24] = {10, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 11, 15,
 /***************
 new text globals
 ***************/
-#define VDU_Width 200
+constexpr int VDU_Width = 200;
 
 bool DrawTextItemBox;
 float VDUoffsetX = 105.0F;
@@ -2810,8 +2810,8 @@ int MAXSLIDERINFOLENGTH = 32;
 /**********************
 new slider globals
 ***********************/
-#define MAXSLIDERSPERMENU 8
-#define SLIDERSPEED 1.0F
+constexpr int MAXSLIDERSPERMENU = 8;
+constexpr auto SLIDERSPEED = 1.0F;
 
 typedef struct
 {
@@ -2852,7 +2852,7 @@ bool *WeaponValid;
 text editing
 ********************/
 float CursorTimer = 0.0F;
-#define CursorInterval	1.0F
+constexpr auto CursorInterval = 1.0F;
 
 
 bool TitleInitDone;
@@ -2860,9 +2860,9 @@ bool TitleInitDone;
 /*********************
 Multi-player messaging
 *********************/
-#define MAX_TITLE_MSGS 16
-#define MAX_TITLE_MSG_SIZE 128
-#define	MAX_TITLE_MSG_TIME 100.0F
+constexpr int MAX_TITLE_MSGS = 16;
+constexpr int MAX_TITLE_MSG_SIZE = 128;
+constexpr auto MAX_TITLE_MSG_TIME = 100.0F;
 typedef struct
 {
 	char text[MAX_TITLE_MSG_SIZE];
@@ -4699,7 +4699,7 @@ void DrawKeyDefHelp2( MENUITEM * Item )
 }
 
 
-#define HELP_MAX	64
+constexpr int HELP_MAX = 64;
 
 #define UNCONNECTED1 LT_Unconnected1/*" is not connected"*/
 #define UNCONNECTED2 LT_Unconnected2/*" unconnected"*/
@@ -13160,16 +13160,16 @@ bool SetAxisActionSlider( SLIDER *s )
 		return false;
 }
 
-#define HOLOMODEL_Done		0
-#define HOLOMODEL_Expand	1
-#define HOLOMODEL_Shrink	2
+constexpr int HOLOMODEL_Done = 0;
+constexpr int HOLOMODEL_Expand = 1;
+constexpr int HOLOMODEL_Shrink = 2;
 
 float HoloModelTimer;
 int HoloModelMode;
 u_int16_t NextHoloModel;
 
-#define HOLOSCANSPEED 0.5F
-#define NUM_HOLO_SCANPLANES 2
+constexpr auto HOLOSCANSPEED = 0.5F;
+constexpr int NUM_HOLO_SCANPLANES = 2;
 PLANE HoloPlane[ NUM_HOLO_SCANPLANES ] = {
 	{ 0.0F, 0.0F, -1.0F, 0.0F },
 	{ 0.0F, 0.0F, 1.0F, 0.0F },
@@ -13313,7 +13313,7 @@ void ScaleHoloModel( float scale )
 	}
 }
 
-#define HOLO_SPEECH_DELAY 60.0F
+constexpr auto HOLO_SPEECH_DELAY = 60.0F;
 float HoloSpeechDelay;
 bool HoloSpeechDone = false;
 

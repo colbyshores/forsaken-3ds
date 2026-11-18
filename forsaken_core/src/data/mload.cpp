@@ -94,7 +94,7 @@ static void ReadSoundInfo( MLOADHEADER *m, FileReader & in );
 /*===================================================================
 		Defines
 ===================================================================*/
-#define	MXV_VERSION_NUMBER	3
+constexpr int MXV_VERSION_NUMBER = 3;
 
 constexpr float UV_FUDGE = (0.5F);
 constexpr float SAME_UV = (2.0F);

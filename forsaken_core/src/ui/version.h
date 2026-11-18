@@ -18,7 +18,7 @@
 #define PXMPV	 "18"
 
 // numeric PXV + PXMPV, sent and compared when a player joins
-#define PXMPVINT 118
+constexpr int PXMPVINT = 118;
 
 // revision; override with -DPXRV=... (neither Makefile sets it)
 #ifndef PXRV
@@ -45,4 +45,4 @@
 #define PXVersion "ProjectX-" PXV "." PXMPV "." PXRV "-" PXBV "-" ARCH
 
 // space net_tracker.cpp reserves for PXVersion in its hosting message
-#define MAX_PXVersion 45
+constexpr int MAX_PXVersion = 45;

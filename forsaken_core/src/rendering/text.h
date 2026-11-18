@@ -24,9 +24,9 @@
 constexpr int MAX_MESSAGES = 4;
 constexpr int MAX_MESSAGES_LONG = 100;
 #ifdef DEBUG_ON
-#define MAXTEXTMESSAGES (128+256)
+constexpr auto MAXTEXTMESSAGES = (128+256);
 #else
-#define MAXTEXTMESSAGES 128
+constexpr int MAXTEXTMESSAGES = 128;
 #endif
 constexpr int MAXPERLINE = 512; // message buffer width - line width set in (text.cpp) MessageQuePrint/All
 

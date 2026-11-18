@@ -74,7 +74,7 @@ constexpr int SCRFLAG_Scale = 1;
 constexpr int SCRFLAG_UseCoords = 2;
 constexpr int SCRFLAG_Solid = 8;
 constexpr int SCRFLAG_Rot90 = 16;
-#define	SCRFLAG_BottomHUD	32  /* [3DS] route this poly to the mono bottom screen
+constexpr int SCRFLAG_BottomHUD = 32; /* [3DS] route this poly to the mono bottom screen
                                       instead of the stereo top screen */
 
 /*===================================================================

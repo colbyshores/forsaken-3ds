@@ -32,7 +32,7 @@ static struct {
 	int playing;
 } stats;	/* live OpenAL object counts, for print_info */
 
-#define MAX_PATH 500
+constexpr int MAX_PATH = 500;
 
 struct sound_buffer_t {
 	ALuint id;

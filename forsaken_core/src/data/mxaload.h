@@ -17,20 +17,20 @@
 #include "data/mload.h"
 #include "rendering/transexe.h"
 #include "game/constants.h"
+#include "data/mxload.h"
 
 /*===================================================================
 	Defines
 ===================================================================*/
 constexpr int MAX_MXAGROUPS = 1;
-#define MAXMXATEXTUREGROUPSPER 8
 constexpr int MAXTPAGESPERMXALOAD = 8;
 #ifdef __3DS__
 /* Must be == MAXMODELHEADERS — model indices are shared between MX and MXA
  * headers, so the smaller of the two limits the system. See models.h for
  * the sizing rationale. */
-#define	MAXMXAMODELHEADERS		608
+constexpr int MAXMXAMODELHEADERS = 608;
 #else
-#define	MAXMXAMODELHEADERS		1024
+constexpr int MAXMXAMODELHEADERS = 1024;
 #endif
 
 

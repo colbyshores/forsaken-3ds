@@ -3878,10 +3878,10 @@ void AccellDecell(  float *  value ,  float  Decell )
 #define MIN_AUTOLEVEL_PITCH	D2R(5.0F) 
 #define MAX_AUTOLEVEL_PITCH	D2R(175.0F)
 
-#define MIN_AUTOLEVEL_ROLL_TOLERANCE	(0.01F)
-#define AUTOLEVEL_RATE					(0.1F)
+constexpr auto MIN_AUTOLEVEL_ROLL_TOLERANCE = (0.01F);
+constexpr auto AUTOLEVEL_RATE = (0.1F);
 
-#define FRAMES_PER_SEC	(60.0F)
+constexpr auto FRAMES_PER_SEC = (60.0F);
 
 #define BOB_XSIZE		(30.0F * GLOBAL_SCALE)
 #define BOB_YSIZE		(10.0F * GLOBAL_SCALE)

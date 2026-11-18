@@ -162,9 +162,9 @@ bool FSClearDepth(XYRECT * rect);
  * and the counter is reset to 0, preventing the assert/abort that
  * INCREASE_TEXTURE_GROUPS would otherwise trigger on overflow.
  */
-#define MAX_TEXTURE_GROUPS 64
+constexpr int MAX_TEXTURE_GROUPS = 64;
 #else
-#define MAX_TEXTURE_GROUPS 600
+constexpr int MAX_TEXTURE_GROUPS = 600;
 #endif
 
 #define INCREASE_TEXTURE_GROUPS( group ) \
