@@ -107,7 +107,7 @@ endif
 
 # Level lists: assets/level_orderings/ is the single source of truth for
 # both builds (Makefile.3ds stages the same files into the romfs).
-# Installed into Data/levels/ for the edition being built; copied on
+# Installed into data/levels/ for the edition being built; copied on
 # every build so an edition switch always takes effect.
 ifeq ($(EDITION),remaster)
 LEVEL_LISTS_SRC := assets/level_orderings
@@ -122,12 +122,12 @@ CXX?=g++
 .DEFAULT_GOAL := all
 
 # ETC2 texture pack for the PC (Vulkan) build: every opaque PNG master
-# under Data/ gets a .ktx2 sibling (ETC2, build-time encoded). Masters
+# under data/ gets a .ktx2 sibling (ETC2, build-time encoded). Masters
 # with meaningful alpha exit 2 in the encoder and stay on the RGBA
 # path - they are the designated RGBA exception class. Generated files
 # are gitignored; masters are the source of truth.
 ETC2ENC=tools/texture/etc2enc
-PNG_TEXTURES:=$(shell find Data -name '*.png' 2>/dev/null)
+PNG_TEXTURES:=$(shell find data -name '*.png' 2>/dev/null)
 KTX2_TEXTURES:=$(PNG_TEXTURES:.png=.ktx2)
 
 # Vulkan shaders: GLSL -> SPIR-V at build time, embedded via xxd. xxd runs
@@ -159,9 +159,9 @@ textures-etc2: $(KTX2_TEXTURES)
 all: textures-etc2 level-lists $(BIN)
 
 level-lists:
-	@mkdir -p Data/levels
+	@mkdir -p data/levels
 	@for f in $(LEVEL_LISTS); do \
-		cmp -s $(LEVEL_LISTS_SRC)/$$f Data/levels/$$f || cp -f $(LEVEL_LISTS_SRC)/$$f Data/levels/$$f; \
+		cmp -s $(LEVEL_LISTS_SRC)/$$f data/levels/$$f || cp -f $(LEVEL_LISTS_SRC)/$$f data/levels/$$f; \
 	done
 
 $(BIN): $(OBJ)

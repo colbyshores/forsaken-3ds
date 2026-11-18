@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-extract_remaster_levels.py - Build a complete EDITION=remaster Data/ tree
+extract_remaster_levels.py - Build a complete EDITION=remaster data/ tree
 from Forsaken Remastered's ForsakenEX.kpf
 
 Designed to fully replace extract_assets.py for a Remaster build — the user
@@ -23,9 +23,9 @@ Pipeline (no 1998 ISO required):
 
     python3 extract_remaster_levels.py <ForsakenEX.kpf>
 
-    → Populates Data/{Levels,models,bgobjects,textures,sound,splash,Demos}
+    → Populates data/{levels,models,bgobjects,textures,sound,splash,Demos}
       from the KPF, downscaled crate-menu banners (256x128) per level,
-      Data/{offsets,txt} + Data/projectx-32x32.bmp from the port repo,
+      data/{offsets,txt} + data/projectx-32x32.bmp from the port repo,
       and 9 new music tracks at romfs/music/track11..19.dsp.
 
 If you'd rather build from the 1998 ISO, use extract_assets.py against the
@@ -41,10 +41,10 @@ behaviourally approximate, visually correct.
 Usage:
     python3 extract_remaster_levels.py <ForsakenEX.kpf> \\
         [--steam-dir /path/to/Forsaken\\ Remastered] \\
-        [--levels-output Data/Levels] \\
-        [--models-output Data/models] \\
-        [--bgobjects-output Data/bgobjects] \\
-        [--data-output Data] \\
+        [--levels-output data/levels] \\
+        [--models-output data/models] \\
+        [--bgobjects-output data/bgobjects] \\
+        [--data-output data] \\
         [--music-output romfs/music] \\
         [--skip-music] [--skip-levels] [--skip-models] \\
         [--skip-banners] [--skip-bulk] [--skip-runtime]
@@ -175,7 +175,7 @@ def _downscale_banner_png(src_fileobj, out_path):
 
 def import_levels(kpf_path, output_dir):
     # Create the output dir if missing — keeps the script self-bootstrapping
-    # when running against an empty Data/ tree. The bulk extract usually
+    # when running against an empty data/ tree. The bulk extract usually
     # creates this already, but the per-level overlay can run standalone too.
     os.makedirs(output_dir, exist_ok=True)
 
@@ -222,13 +222,13 @@ def import_banners(kpf_path, output_dir):
     accworld, endscene, probeworld) keep their existing banner.
 
     Lives outside import_levels() so it can run against a fully-
-    populated Data/Levels/ — existing banners get overwritten in place,
+    populated data/levels/ — existing banners get overwritten in place,
     matching how the romfs-staging rsync expects to see them."""
     if not os.path.isdir(output_dir):
         # Banners are level-specific overwrites — if the dir doesn't
         # exist there's nothing to write. Skip without erroring; this
         # happens when the user passes --skip-bulk --skip-levels and
-        # also has no pre-existing Data/Levels.
+        # also has no pre-existing data/levels.
         print(f"  (no levels at {output_dir}, skipping banners)")
         return True
 
@@ -274,7 +274,7 @@ def import_banners(kpf_path, output_dir):
 #
 # The Remaster ships single-mesh .mx files for the simpler N64 enemies
 # (Cargodrone, Enforcer, Ghost) and pickups (StablizerCrystal, BlackHole-
-# GunPart1..4). Pull just those into Data/models/n64/ so the engine's
+# GunPart1..4). Pull just those into data/models/n64/ so the engine's
 # template-copy step can point ModelFilename / ModelType at the real
 # meshes instead of substituting 1998-era visuals.
 #
@@ -433,12 +433,12 @@ def import_n64_cobs(kpf_path, bgobjects_output):
     return True
 
 
-# ----- Bulk KPF asset extraction (full Data/ tree from KPF) ------------------
+# ----- Bulk KPF asset extraction (full data/ tree from KPF) ------------------
 #
 # A full Remaster build doesn't need the 1998 ISO at all — the KPF is a
 # complete superset of the original game data. This step walks the KPF's
-# top-level dirs and lays them out under the local Data/ tree using 1998
-# path conventions (e.g., KPF "sounds/" → "Data/sound/").
+# top-level dirs and lays them out under the local data/ tree using 1998
+# path conventions (e.g., KPF "sounds/" → "data/sound/").
 #
 # Skipped: KEX-engine-only directories (defs/, particles/, sprites/, gfx/,
 # progs/, trails/, fonts/, lensflares/, localization/, localized/) and
@@ -446,9 +446,9 @@ def import_n64_cobs(kpf_path, bgobjects_output):
 #
 # Run once per asset refresh; subsequent runs are idempotent (overwrites
 # existing files in place — fine because content is byte-identical to the
-# previous extract). To redo from scratch, rm -rf Data/ first.
+# previous extract). To redo from scratch, rm -rf data/ first.
 
-# Map KPF top-level dir → local Data/ subdir. Anything not in this map
+# Map KPF top-level dir → local data/ subdir. Anything not in this map
 # is skipped (KEX-only assets the 1998 engine can't read anyway). Output
 # names are lowercase to match extract_assets.py's lowercase_tree() output
 # and the Makefile's romfs-staging expectations (BMP→PNG find pattern,
@@ -476,7 +476,7 @@ def _is_locale_path(rel_path):
 def import_kpf_assets(kpf_path, data_output):
     """Bulk-extract every asset directory the 1998 engine reads from the
     KPF into data_output. Replaces what extract_assets.py would copy from
-    the 1998 ISO (Data/{models,bgobjects,levels,textures,sound,splash,
+    the 1998 ISO (data/{models,bgobjects,levels,textures,sound,splash,
     Demos}). Idempotent — re-running overwrites files in place.
 
     All output paths are lowercased to match extract_assets.py's
@@ -878,21 +878,21 @@ def main():
     ap.add_argument("--steam-dir", default=None,
                     help="Forsaken Remastered Steam install dir "
                          "(default: directory containing the KPF)")
-    ap.add_argument("--levels-output", default="Data/levels",
-                    help="Destination level directory (default: Data/levels)")
+    ap.add_argument("--levels-output", default="data/levels",
+                    help="Destination level directory (default: data/levels)")
     ap.add_argument("--music-output", default="romfs/music",
                     help="Destination music directory (default: romfs/music)")
-    ap.add_argument("--models-output", default="Data/models",
-                    help="Destination models directory (default: Data/models)")
-    ap.add_argument("--bgobjects-output", default="Data/bgobjects",
+    ap.add_argument("--models-output", default="data/models",
+                    help="Destination models directory (default: data/models)")
+    ap.add_argument("--bgobjects-output", default="data/bgobjects",
                     help="Destination bgobjects directory for boss .cob files "
-                         "(default: Data/bgobjects)")
-    ap.add_argument("--data-output", default="Data",
-                    help="Destination Data/ root for bulk asset extraction "
-                         "(default: Data). The bulk pass populates "
-                         "Data/{Levels,models,bgobjects,textures,sound,"
-                         "splash,Demos} from the KPF and Data/{offsets,txt}+"
-                         "Data/projectx-32x32.bmp from "
+                         "(default: data/bgobjects)")
+    ap.add_argument("--data-output", default="data",
+                    help="Destination data/ root for bulk asset extraction "
+                         "(default: data). The bulk pass populates "
+                         "data/{levels,models,bgobjects,textures,sound,"
+                         "splash,Demos} from the KPF and data/{offsets,txt}+"
+                         "data/projectx-32x32.bmp from "
                          "assets/engine_runtime_1998/.")
     ap.add_argument("--skip-levels", action="store_true",
                     help="Don't import the per-level overlay (NEW_LEVELS list)")
@@ -903,11 +903,11 @@ def main():
     ap.add_argument("--skip-banners", action="store_true",
                     help="Don't (re-)import the 256x128 crate-menu banners")
     ap.add_argument("--skip-bulk", action="store_true",
-                    help="Don't bulk-extract the full Data/ tree from the KPF "
-                         "(use if you've already populated Data/ via "
+                    help="Don't bulk-extract the full data/ tree from the KPF "
+                         "(use if you've already populated data/ via "
                          "extract_assets.py and just want Remaster overlays)")
     ap.add_argument("--skip-runtime", action="store_true",
-                    help="Don't copy assets/engine_runtime_1998/ into Data/. "
+                    help="Don't copy assets/engine_runtime_1998/ into data/. "
                          "Implies you've populated those bits some other way.")
     ap.add_argument("--skip-visi-repair", action="store_true",
                     help="Don't rebuild Connected/Visible/IndirectVisibleGroup "
@@ -925,7 +925,7 @@ def main():
     repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     ok = True
-    # Bulk first — lays down the full Data/ tree from the KPF.
+    # Bulk first — lays down the full data/ tree from the KPF.
     if not args.skip_bulk:
         ok = import_kpf_assets(args.kpf, args.data_output) and ok
     if not args.skip_runtime:

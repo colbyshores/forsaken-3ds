@@ -349,7 +349,7 @@ def find_switch_chains(trigvars, triggers, trigmods, events, conditions):
 
 
 def main():
-    path = sys.argv[1] if len(sys.argv) > 1 else "/mnt/nas/Development/forsaken/Data/levels/defend2/defend2.trg"
+    path = sys.argv[1] if len(sys.argv) > 1 else "/mnt/nas/Development/forsaken/data/levels/defend2/defend2.trg"
     with open(path, 'rb') as f:
         data = f.read()
     print(f"Parsing {path}  ({len(data)} bytes)\n")

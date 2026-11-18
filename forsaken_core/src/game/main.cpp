@@ -109,7 +109,7 @@ constexpr int CRITICAL_FOLDERS = 4;
 static bool missing_folders( void )
 {
 	int x = 0;
-	const char* folders[CRITICAL_FOLDERS] = {"Configs","Data","Pilots","Scripts"};
+	const char* folders[CRITICAL_FOLDERS] = {"configs","data","pilots","scripts"};
 	for( x = 0; x < CRITICAL_FOLDERS; x++ )
 		if( ! is_folder(folders[x]) )
 		{

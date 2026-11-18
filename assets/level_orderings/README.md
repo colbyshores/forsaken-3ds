@@ -2,7 +2,7 @@
 
 The single source of truth for level lists on both builds. `Makefile.3ds`
 copies the edition's lists into the romfs staging; the PC `Makefile`
-installs them into `Data/levels/`. Either way they replace whatever
+installs them into `data/levels/`. Either way they replace whatever
 `extract_assets.py` / `extract_remaster_levels.py` produced.
 
 | File | Edition | Purpose |

@@ -215,7 +215,7 @@ bool platform_init(void)
 	 * is reported later by missing_folders() in AppInit. */
 	romfsInit();
 
-	/* Set working directory so relative paths (Data/, Configs/) resolve */
+	/* Set working directory so relative paths (data/, configs/) resolve */
 	chdir("romfs:/");
 
 	/* Create save game directory on SD card (romfs is read-only) */

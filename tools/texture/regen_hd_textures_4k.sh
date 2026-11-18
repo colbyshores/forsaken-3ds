@@ -3,8 +3,8 @@
 #
 # Source priority (per texture):
 #   1. $K4_PACK/<path>.bmp           — 4K Forsaken Remastered pack (preferred)
-#   2. Data/Levels/<lvl>/textures/   — original per-level BMP/PNG (correct atlas)
-#   3. Data/textures/<name>.png      — global original (fallback)
+#   2. data/levels/<lvl>/textures/   — original per-level BMP/PNG (correct atlas)
+#   3. data/textures/<name>.png      — global original (fallback)
 #
 # Output: romfs/hd_textures/{textures,levels/<lvl>/textures}/<name>.t3x
 # Each t3x is downscaled to fit within 512x512 preserving aspect, with
@@ -156,7 +156,7 @@ convert_one() {
     #   sprite    → small/effect atlas (pkups, fire, etc.) → ETC1A4, no mips
     #   wall      → big level surface (>=256², per-level, not sprite) → see below
     #   menu page → m-tpage* → ETC1 (no alpha — solid black needed), no mips
-    #   global    → other Data/textures/* → ETC1A4, no mips
+    #   global    → other data/textures/* → ETC1A4, no mips
     #
     # Walls split further based on whether SOURCE has any pure-black pixels:
     #   wall with no black pixels   → ETC1 + mips (e.g. plain corridor walls;
@@ -189,7 +189,7 @@ convert_one() {
         local lvl
         lvl=$(echo "$dst" | sed -nE 's|.*/levels/([^/]+)/textures/.*|\1|p')
         local orig_bmp
-        orig_bmp=$(find Data/Levels -ipath "*/${lvl}/textures/${base}.bmp" 2>/dev/null | head -1)
+        orig_bmp=$(find data/levels -ipath "*/${lvl}/textures/${base}.bmp" 2>/dev/null | head -1)
         local has_pure_black=0
         if [ -n "$orig_bmp" ] && [ -f "$orig_bmp" ]; then
             local n
@@ -254,8 +254,8 @@ resolve_source() {
     # menu/UI atlas (m-tpage*.bmp), so its layout does NOT match the engine's
     # authored UVs (verified: 19-30% RMSE on menu pages, vs 2-5% on per-level).
     if [ "$kind" = "global" ]; then
-        [ -f "Data/textures/${name}.png" ] && { echo "Data/textures/${name}.png"; return; }
-        [ -f "Data/textures/${name}.bmp" ] && { echo "Data/textures/${name}.bmp"; return; }
+        [ -f "data/textures/${name}.png" ] && { echo "data/textures/${name}.png"; return; }
+        [ -f "data/textures/${name}.bmp" ] && { echo "data/textures/${name}.bmp"; return; }
         # 4K fallback only if original missing
         local found=$(find "$K4_PACK/textures" -maxdepth 1 -type f -iname "${name}.bmp" -o -iname "${name}.png" 2>/dev/null | head -1)
         [ -n "$found" ] && { echo "$found"; return; }
@@ -271,28 +271,28 @@ resolve_source() {
     fi
 
     # Fallback: original per-level BMP/PNG
-    local found=$(find Data/Levels -ipath "*/${level}/textures/${name}.bmp" -o \
+    local found=$(find data/levels -ipath "*/${level}/textures/${name}.bmp" -o \
                                    -ipath "*/${level}/textures/${name}.png" 2>/dev/null | head -1)
     [ -n "$found" ] && { echo "$found"; return; }
 
     # Fallback: original global (engine itself falls back here, so atlas matches)
-    [ -f "Data/textures/${name}.png" ] && { echo "Data/textures/${name}.png"; return; }
-    [ -f "Data/textures/${name}.bmp" ] && { echo "Data/textures/${name}.bmp"; return; }
+    [ -f "data/textures/${name}.png" ] && { echo "data/textures/${name}.png"; return; }
+    [ -f "data/textures/${name}.bmp" ] && { echo "data/textures/${name}.bmp"; return; }
 
     # Last resort: any per-level variant of this name
-    found=$(find Data/Levels -iname "${name}.bmp" -o -iname "${name}.png" 2>/dev/null | head -1)
+    found=$(find data/levels -iname "${name}.bmp" -o -iname "${name}.png" 2>/dev/null | head -1)
     [ -n "$found" ] && { echo "$found"; return; }
 
     return 1
 }
 
-# Global textures (every texture in Data/textures/, prefer original for atlas).
+# Global textures (every texture in data/textures/, prefer original for atlas).
 # The Remaster build pipeline (extract_remaster_levels.py) ships textures as
 # .bmp from the KPF; the 1998 ISO pipeline (extract_assets.py) historically
 # left both .bmp and .png. Iterate both extensions and dedupe by basename so
 # either source layout produces a complete HD texture pack.
 declare -A SEEN_GLOBAL
-for src_orig in Data/textures/*.png Data/textures/*.bmp; do
+for src_orig in data/textures/*.png data/textures/*.bmp; do
     [ -f "$src_orig" ] || continue
     name=$(basename "$src_orig" | sed 's/\.[^.]*$//' | tr 'A-Z' 'a-z')
     [ -n "${SEEN_GLOBAL[$name]}" ] && continue
@@ -303,12 +303,12 @@ done
 
 # Per-level textures: gather every (level, name) pair the engine could request.
 # Sources of truth, unioned:
-#   1. Data/Levels/<lvl>/textures/*.{bmp,png}  — local per-level files
+#   1. data/levels/<lvl>/textures/*.{bmp,png}  — local per-level files
 #   2. /tmp/4k_pack/levels/<lvl>/textures/*.bmp  — 4K pack per-level files
 #   3. Any prior HD texture tree — engine path expectations (it referenced
 #      these paths even when no per-level BMP existed locally)
 {
-    find Data/Levels -mindepth 3 -type f \( -iname '*.bmp' -o -iname '*.png' \) 2>/dev/null
+    find data/levels -mindepth 3 -type f \( -iname '*.bmp' -o -iname '*.png' \) 2>/dev/null
     find /tmp/4k_pack/levels -mindepth 3 -type f \( -iname '*.bmp' -o -iname '*.png' \) 2>/dev/null
     find /tmp/backup_hd_old_squashed_*/levels -mindepth 3 -type f -name '*.t3x' 2>/dev/null
     find romfs/hd_old/levels -mindepth 3 -type f -name '*.t3x' 2>/dev/null

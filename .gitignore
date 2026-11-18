@@ -33,11 +33,9 @@ mingw*
 
 # ---- Game data / assets (large binaries, not code) ----
 # Retail game data directories (textures, models, sounds, levels)
-/Data/
 /data/
 Demos/
-Pilots/
-pilots/
+/pilots/
 romfs/
 savegame/
 logs/
@@ -47,9 +45,9 @@ data1.cab
 # Level lists live in assets/level_orderings/ (Remaster) and
 # assets/level_orderings/original/ (1998), tracked normally; both
 # Makefiles install the edition's lists (romfs staging on 3DS,
-# Data/levels/ on PC).
+# data/levels/ on PC).
 
-# Config directories (lowercase = runtime copies, uppercase = tracked overrides)
+# Config directory: only configs/main.txt is tracked.
 configs/
 
 # ---- Asset file types ----
@@ -100,9 +98,9 @@ picaGL/
 # Lua game scripts (code, not assets)
 !scripts/
 !scripts/**
-# Configs override for 3DS
-!Configs/
-!Configs/main.txt
+# The shipped default config
+!configs/
+!configs/main.txt
 # CI workflows
 !.github/
 !.github/**
@@ -161,15 +159,8 @@ __pycache__/
 # absent via romfs/ rules)
 romfs_hd/
 
-# Per-developer debug overlay (ships in Configs/debug.txt locally; never commit)
-Configs/debug.txt
-
-# Top-level symlinks pointing into Data/Pilots/Configs source trees.
-# The trailing-slash forms below match directories only, not symlinks,
-# so we list these explicitly.
-/configs
-/data
-/pilots
+# Per-developer debug overlay (configs/debug.txt locally; never commit)
+configs/debug.txt
 
 # CIA build assets (small + needed to build the .cia)
 !assets/icon.png
@@ -182,7 +173,7 @@ forsaken_stereo.txt
 /.progress-log/
 
 # build-time ETC2 pack (from PNG masters)
-Data/**/*.ktx2
+data/**/*.ktx2
 tools/texture/etc2enc
 forsaken_pc/shaders/*.spv
 forsaken_pc/src/rendering/vulkan_shaders.h

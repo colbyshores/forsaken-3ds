@@ -111,7 +111,7 @@ static void init_video_modes( u_int32_t window_flags )
 
 static void set_window_icon( void )
 {
-	SDL_Surface* icon = SDL_LoadBMP("Data/ProjectX-32x32.bmp");
+	SDL_Surface* icon = SDL_LoadBMP("data/projectx-32x32.bmp");
 	if(icon)
 	{
 		SDL_SetWindowIcon(render_info.window, icon);

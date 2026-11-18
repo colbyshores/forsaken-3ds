@@ -254,7 +254,7 @@ int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
 
 /* Bridge to USERCONFIG so the aim-assist row reads/writes the same
  * value the engine uses at runtime. write_config persists it to the
- * main config file (Configs/main.txt). */
+ * main config file (configs/main.txt). */
 #include "data/config.h"
 
 constexpr float AIM_ASSIST_STEP = 0.05F;

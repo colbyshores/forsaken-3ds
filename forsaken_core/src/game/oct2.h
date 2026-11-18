@@ -100,7 +100,7 @@ extern render_viewport_t viewport;
 bool SetFOV( float fov );
 void InitModeCase(void);
 /* Flips the stereoscopic per-eye parallax sign so the 3D reads as receding
- * depth vs. popping out of the screen. Saved as Invert3D in Configs/main.txt. */
+ * depth vs. popping out of the screen. Saved as Invert3D in configs/main.txt. */
 extern bool g_stereo_invert;
 extern float hfov;
 extern bool DoClipping;

@@ -1424,7 +1424,7 @@ MENU	MENU_NEW_VisualsStereo = {
  *                    binding + extra TexEnv stage).
  *   g_wall_detail  — ADD_SIGNED detail-map modulation on wall textures
  *                    that ship with a sibling <name>_d.t3x file.
- * Saved as ObjectShine / WallDetail in Configs/main.txt. */
+ * Saved as ObjectShine / WallDetail in configs/main.txt. */
 #endif
 
 MENU	MENU_NEW_Visuals = {

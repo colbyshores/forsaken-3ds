@@ -284,7 +284,7 @@ ifeq ($(EDITION),remaster)
 	@# orderings (from assets/level_orderings/) over the 1998 originals
 	@# that came in via extract_assets.py. assets/level_orderings/ is the
 	@# source of truth for both builds (the PC Makefile installs the same
-	@# files into Data/levels/); fail the build if either is missing.
+	@# files into data/levels/); fail the build if either is missing.
 	@echo "Applying EDITION=remaster level orderings..."
 	@LDIR=$(ROMFS_STAGING)/data/levels; SDIR=$(SRCDIR)/assets/level_orderings; \
 	if [ ! -f $$SDIR/mission.dat ] || [ ! -f $$SDIR/battle.dat ]; then \

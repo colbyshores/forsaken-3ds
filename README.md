@@ -112,7 +112,7 @@ either platform.
   that draws them. The PC (Vulkan) build keeps the engine standard.
 - **In-game graphics toggles + persistence.** Pause → Options → Visuals
   exposes "Object shine" and "Wall detail" toggles, persisted via
-  `Configs/main.txt` (keys `ObjectShine` / `WallDetail`). Each toggle
+  `configs/main.txt` (keys `ObjectShine` / `WallDetail`). Each toggle
   is a free fast-path when off — the renderer falls through to the
   legacy diffuse-modulate path without binding the LightEnv or extra
   TexEnv stages. Lets users on tighter OG-3DS frames buy back ~1-2 ms
@@ -120,10 +120,10 @@ either platform.
 - **One-shot Remaster KPF importer (`extract_remaster_levels.py`).**
   Steam's Forsaken Remastered ships its game data in a single
   KEX-engine `ForsakenEX.kpf` archive. The importer converts the
-  whole pack into a `Data/` tree the 1998 engine can read: bulk-
+  whole pack into a `data/` tree the 1998 engine can read: bulk-
   walks every engine-readable top-level dir into 1998 path
   conventions, pulls per-limb `.mx` meshes for N64 boss components
-  into `Data/models/n64/`, downscales 1280×720 loading-screen art
+  into `data/models/n64/`, downscales 1280×720 loading-screen art
   to 256×128 crate-menu banners, transcodes the 9 OGG-only music
   tracks to DSP-ADPCM via `gc-dspadpcm-encode`, and runs
   `mxv_visi_repair.py` as the final pass to rebuild visibility
@@ -153,7 +153,7 @@ tools/           build_matrix.sh, verify_identical.sh, perf/ (gates),
 assets/          icons, banners, RSFs, level orderings, 1998 engine files
 scripts/         the game's Lua scripts (shipped in romfs)
 docs/            notes/, OPTIMIZATION-LOG.md
-Configs/ Data/ Pilots/ Demos/ romfs/   game data (not in git)
+configs/ data/ pilots/ Demos/ romfs/   game data (not in git)
 ```
 
 ## Quick start
@@ -244,7 +244,7 @@ pass to rebuild both at extract time so the 1998 engine sees a
 healthy file. Idempotent and gated on the data signal — runs only on
 levels missing the data, leaves the rest alone.
 
-The script also bulk-extracts every asset into `Data/`, downscales
+The script also bulk-extracts every asset into `data/`, downscales
 the Remaster's 1280×720 loading-screen art to 256×128 crate-menu
 banners, and converts the OGG-only tracks 10–18 to DSP-ADPCM. The
 ~110 KB of 1998-engine-runtime data KEX dropped (`.off` sprite-
@@ -262,7 +262,7 @@ python3 tools/assets/extract_remaster_levels.py --skip-bulk --skip-runtime \
 make -f Makefile.3ds EDITION=remaster
 ```
 
-Use this if you'd rather seed `Data/` from a 1998 ISO you already own
+Use this if you'd rather seed `data/` from a 1998 ISO you already own
 and just layer the Remaster additions on top. Functionally equivalent
 to Option A.
 
@@ -274,9 +274,9 @@ to Option A.
   template-copy entries for the new N64 enemy/pickup IDs (100–108
   enemies, 100–105 pickups) so they render with real Remaster meshes
   and behave with the closest-matching 1998 AI brain.
-- Substitutes `Data/Levels/mission_remaster.dat` (23 SP campaign
+- Substitutes `data/levels/mission_remaster.dat` (23 SP campaign
   entries + 7 N64 secret levels; biolab and tuben64 dropped for
-  engine-incompatibility reasons) and `Data/Levels/battle_remaster.dat`
+  engine-incompatibility reasons) and `data/levels/battle_remaster.dat`
   (24 MP arenas) over the 1998 originals during ROMFS staging, so the
   in-game crate menu sees the expanded line-up.
 
@@ -499,7 +499,7 @@ needed.
   KPF files are zip archives; the script extracts them once into `/tmp/4k_pack/`.
 - Per-level textures take their atlas from the 4K pack (verified to match
   the original layout). Globals (UI, sprites, fonts) take their atlas from
-  `Data/textures/` originals — Night Dive's 4K versions of those textures
+  `data/textures/` originals — Night Dive's 4K versions of those textures
   re-arranged the menu UI atlas, breaking UV math.
 - Walls: `tex3ds -f etc1 -m gaussian` (no alpha plane, Gaussian-kernel
   mip chain). Gaussian's wider footprint dilutes isolated outlier pixels

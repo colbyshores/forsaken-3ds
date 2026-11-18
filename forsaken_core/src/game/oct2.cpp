@@ -3150,7 +3150,7 @@ void CheckLevelEnd ( void )
 
 
 /* "Invert 3D depth" toggle (3DS crate menu Options -> 3DS Visual Settings,
- * persisted as Invert3D in Configs/main.txt). Flips the sign of the per-eye
+ * persisted as Invert3D in configs/main.txt). Flips the sign of the per-eye
  * parallax offset below, swapping pop-out vs. recede-into-depth without
  * touching the eye->panel (GFX_LEFT/RIGHT) mapping. Default false = the
  * shipped behaviour. Defined here (always compiled) so the flip works for

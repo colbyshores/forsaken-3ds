@@ -370,7 +370,7 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject);
 #ifdef __3DS__
 /* Citro3D backend extensions (render_c3d.cpp). Material-class switches set
    per draw by the model paths, and the Visuals menu toggles behind them
-   (saved as ObjectShine / WallDetail in Configs/main.txt). */
+   (saved as ObjectShine / WallDetail in configs/main.txt). */
 void c3d_set_object_proctex(bool on);
 void c3d_set_object_shine_eligible(bool eligible);
 void c3d_transfer_eye(unsigned int eye);	/* stereo: switch to the other eye's target */

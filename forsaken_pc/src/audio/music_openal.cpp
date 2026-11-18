@@ -1,7 +1,7 @@
 /* music_openal.cpp -- music.h for the PC: .dsp tracks decoded into OpenAL
  *
  * Plays the same DSP-ADPCM trackNN.dsp files the 3DS streams to its DSP
- * (looked up in romfs/music, Data/music, then music), decoded on the CPU by
+ * (looked up in romfs/music, data/music, then music), decoded on the CPU by
  * the shared dsp_adpcm module. music_play decodes the whole track to 16-bit
  * mono PCM at 32 kHz (about 20 MB for five minutes) and loops it as a single
  * OpenAL buffer and source, so music_update has nothing to do. It plays on
@@ -38,7 +38,7 @@ static bool load_track_pcm(int track, int16_t **out_pcm, long *out_samples)
 {
 	char path[128];
 	FILE *f = NULL;
-	const char *dirs[] = { "romfs/music", "Data/music", "music" };
+	const char *dirs[] = { "romfs/music", "data/music", "music" };
 	for (unsigned i = 0; i < sizeof(dirs) / sizeof(dirs[0]) && !f; i++) {
 		snprintf(path, sizeof(path), "%s/track%02d.dsp", dirs[i], track);
 		f = file_open(path, "rb");

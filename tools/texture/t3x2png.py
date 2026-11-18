@@ -121,7 +121,7 @@ def main():
                     r, g, b = dec[y * 4 + x]
                     px[bx * 4 + x, by * 4 + y] = (r, g, b, a)
     # Texture data is bottom-up (row 0 = image bottom); PNG masters
-    # are top-down, matching every other master in Data/.
+    # are top-down, matching every other master in data/.
     img = img.transpose(Image.FLIP_TOP_BOTTOM)
     img.save(outp)
     print(f"{inp}: {w}x{h} fmt={fmt} -> {outp}")
