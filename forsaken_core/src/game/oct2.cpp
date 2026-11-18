@@ -302,6 +302,11 @@ bool DispTracker( void );
 /*===================================================================
   Global Variables
 ===================================================================*/   
+/* Capacity of the per-frame batch buffers (RenderBufs[] and the stack
+   buffers RenderScene and PrintInitViewStatus draw screen polys with), in
+   vertices; their index buffers hold three per vertex. */
+constexpr int BATCH_BUFFER_VERTS = 32767;
+
 constexpr auto Near = ( 100.0F * GLOBAL_SCALE );
 constexpr auto Far = ( 49152.0F * GLOBAL_SCALE );
 constexpr auto MinNear = ( 50.0F * GLOBAL_SCALE );
@@ -2226,8 +2231,8 @@ bool RenderScene( void )
 	TEXTUREGROUP ro_groups[MAX_TEXTURE_GROUPS];
 	ZERO_STACK_MEM(ro);
 	ro.textureGroups = ro_groups;
-	FSCreateDynamic2dVertexBuffer(&ro, 32767);
-	FSCreateIndexBuffer(&ro, 32767*3);
+	FSCreateDynamic2dVertexBuffer(&ro, BATCH_BUFFER_VERTS);
+	FSCreateIndexBuffer(&ro, BATCH_BUFFER_VERTS * 3);
 
 
     CenterPrint4x5Text( "Pickups Left   " , (render_info.window_size.cy>>1)-(FontHeight<<2), GRAY );
@@ -4181,14 +4186,14 @@ void InitRenderBufs()
 	DebugPrintf("InitRenderBufs\n");
 	ReleaseRenderBufs();
 	// just vertex data
-	FSCreateDynamicVertexBuffer(&RenderBufs[0], 32767);
-	FSCreateDynamicVertexBuffer(&RenderBufs[1], 32767);
+	FSCreateDynamicVertexBuffer(&RenderBufs[0], BATCH_BUFFER_VERTS);
+	FSCreateDynamicVertexBuffer(&RenderBufs[1], BATCH_BUFFER_VERTS);
 	// index data as well
-	FSCreateDynamicVertexBuffer(&RenderBufs[2], 32767);
-	FSCreateDynamicIndexBuffer(&RenderBufs[2], 32767*3);
+	FSCreateDynamicVertexBuffer(&RenderBufs[2], BATCH_BUFFER_VERTS);
+	FSCreateDynamicIndexBuffer(&RenderBufs[2], BATCH_BUFFER_VERTS * 3);
 	// indexed pre-transformed (2d)
-	FSCreateDynamic2dVertexBuffer(&RenderBufs[3], 32767);
-	FSCreateDynamicIndexBuffer(&RenderBufs[3], 32767*3);
+	FSCreateDynamic2dVertexBuffer(&RenderBufs[3], BATCH_BUFFER_VERTS);
+	FSCreateDynamicIndexBuffer(&RenderBufs[3], BATCH_BUFFER_VERTS * 3);
 	for (i = 0; i < 4; i++) {
 		RenderBufs[i].textureGroups = s_renderbuf_groups[i];
 		RenderBufs[i].vertOwner = VERT_OWNER_SHARED;
@@ -4848,8 +4853,8 @@ void PrintInitViewStatus( BYTE Status )
 	ZERO_STACK_MEM(ro);
 	ro.textureGroups = ro_groups;
 	{
-		bool _vok = FSCreateDynamic2dVertexBuffer(&ro, 32767);
-		bool _iok = FSCreateIndexBuffer(&ro, 32767*3);
+		bool _vok = FSCreateDynamic2dVertexBuffer(&ro, BATCH_BUFFER_VERTS);
+		bool _iok = FSCreateIndexBuffer(&ro, BATCH_BUFFER_VERTS * 3);
 		/* If either allocation failed (linear heap exhausted/fragmented),
 		 * skip the draw rather than feeding NULL buffers into the renderer. */
 		if (!_vok || !_iok) {
