@@ -70,17 +70,9 @@ stereomemo	forsaken_core/src/rendering/stereomemo.cpp	cpp	3bd8416	todo	test_ster
 text	forsaken_core/src/rendering/text.cpp	cpp	ff84d3d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 texture_png	forsaken_core/src/rendering/texture_png.cpp	cpp	4bf7fc9	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 transexe	forsaken_core/src/rendering/transexe.cpp	cpp	ffe2bec	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_bullets	forsaken_core/src/scripting/lua_bullets.cpp	cpp	bd4eacd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_collision	forsaken_core/src/scripting/lua_collision.cpp	cpp	9c15219	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lua_common	forsaken_core/src/scripting/lua_common.cpp	cpp	3466132	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lua_config	forsaken_core/src/scripting/lua_config.cpp	cpp	6742088	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_controls	forsaken_core/src/scripting/lua_controls.cpp	cpp	e168f91	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_enemies	forsaken_core/src/scripting/lua_enemies.cpp	cpp	af70a9c	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 lua_games	forsaken_core/src/scripting/lua_games.cpp	cpp	b1f9b78	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_object	forsaken_core/src/scripting/lua_object.cpp	cpp	3cecf7f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_ships	forsaken_core/src/scripting/lua_ships.cpp	cpp	ece2d75	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_vecmat	forsaken_core/src/scripting/lua_vecmat.cpp	cpp	9420a67	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-lua_weapons	forsaken_core/src/scripting/lua_weapons.cpp	cpp	1c5753d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 title	forsaken_core/src/ui/title.cpp	cpp	591d0e4	todo	-	PASS fid-ab-20261116 (tier3)	
 hunk_alloc	forsaken_core/src/util/hunk_alloc.cpp	cpp	4f19b6a	todo	test_modules	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 timer	forsaken_core/src/util/timer.cpp	cpp	12e46c1	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	

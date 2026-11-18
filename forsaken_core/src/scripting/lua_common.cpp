@@ -116,23 +116,6 @@ static int run_init_func( void )
 	return err;
 }
 
-static void assign_loader( char * name, lua_CFunction loader )
-{
-	// package.preload[ name ] = loader
-	lua_getglobal(L1, "package");
-	lua_getfield(L1, -1, "preload");
-	lua_pushcfunction(L1, loader);
-	lua_setfield(L1, -2, name);
-	lua_pop(L1, 2);
-}
-
-
-static void assign_loaders( void )
-{
-	/* socket/mime load via the system Lua package paths (luasocket
-	 * 3.x); the old static luaopen_* preload registration is gone. */
-}
-
 static int lua_create(void)
 {
 	L1 = luaL_newstate();
@@ -142,7 +125,6 @@ static int lua_create(void)
 		return 1;
 	}
 	luaL_openlibs(L1);
-	assign_loaders();
 	return 0;
 }
 
