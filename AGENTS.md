@@ -522,7 +522,7 @@ pass.
 6. Citro3D `renderqueue.c` (frame sync, queue completion, cache flush).
 7. T2K `AGENTS.md` rev 2026-10-14/amended 2026-10-19 — contract shape and
    rule lineage; T2K's project-frozen waiver does **not** apply here.
-   allocator), `3DS_PORT_NOTES.md` (memory history), `new3d.h` header
+   allocator), `docs/notes/3DS_PORT_NOTES.md` (memory history), `new3d.h` header
    comments (LUT rationale).
 
 ### Changes
