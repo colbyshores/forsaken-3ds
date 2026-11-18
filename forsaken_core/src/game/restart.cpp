@@ -220,7 +220,7 @@ bool LoadStartPoints( void )
 {
 	FILE	*	fp;
 	int16_t		Count;
-	char	*	NewExt = ".STP";
+	const char	*	NewExt = ".STP";
 	char		NewFilename[ 256 ];
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
@@ -290,7 +290,7 @@ bool LoadStartPoints( void )
 ===================================================================*/
 bool PreLoadRestartPoints( void )
 {
-	char	*	RestartFilename = "data\\bgobjects\\Restart.cob";
+	const char	*	RestartFilename = "data\\bgobjects\\Restart.cob";
 	int16_t		TempModel;
 
 	if( !ENABLE_RESTART ) return( true );
@@ -331,7 +331,7 @@ bool PreLoadRestartPoints( void )
 bool LoadRestartPoints( void )
 {
 	int16_t		Count;
-	char	*	RestartFilename = "data\\bgobjects\\Restart.cob";
+	const char	*	RestartFilename = "data\\bgobjects\\Restart.cob";
 	u_int16_t		Group;
 	VECTOR		Pos;
 	VECTOR		DirVector;

@@ -50,7 +50,7 @@ bool LoadRTLights( void )
 {
 	FILE	*	fp;
 	int8_t		Filename[ 256 ];
-	char	*	NewExt = ".RTL";
+	const char	*	NewExt = ".RTL";
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
 	int			j;

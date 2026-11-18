@@ -295,7 +295,7 @@ static void init_key_map( void )
 	initialized = 1;
 	for( i = 0; i <= KEY_MAP_LAST; i++ )
 	{
-		char * name;
+		const char * name;
 		if(i > MOUSE_RANGE && i < DIK_JOYSTICK)
 		{
 			switch(i)

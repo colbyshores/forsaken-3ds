@@ -2725,7 +2725,7 @@ void ProcessPickups( void )
 
 void SavePickupsPositions( void )
 {
-	char	*	NewExt = ".PIC";
+	const char	*	NewExt = ".PIC";
 	FILE	*	fp;
 	u_int16_t		i;
 	int16_t		Num_Pickups;
@@ -2928,7 +2928,7 @@ bool LoadPickupsPositions( void )
 {
 
   /* the extension of the file with pickup data */
-  char  * NewExt = ".PIC";
+  const char  * NewExt = ".PIC";
 
   FILE    * fp;
   int16_t   Count;

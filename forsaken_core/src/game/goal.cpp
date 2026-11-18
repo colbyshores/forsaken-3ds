@@ -47,7 +47,7 @@ int LastEnable[ MAX_PLAYERS ];
 bool GoalLoad( void )
 {
 	int8_t		Filename[ 256 ];
-	char	*	NewExt = ".GOL";
+	const char	*	NewExt = ".GOL";
 	long			File_Size;
 	long			Read_Size;
 	char		*	Buffer;

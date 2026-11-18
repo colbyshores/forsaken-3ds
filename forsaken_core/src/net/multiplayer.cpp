@@ -206,7 +206,7 @@ void StartAHostSession ( MENUITEM * Item )
 			break;
 		case NETWORK_ERROR_BIND:
 			{
-				char * str = "";
+				const char * str = "";
 				if( local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
 				sprintf(error_str, "%s %s %s %s",

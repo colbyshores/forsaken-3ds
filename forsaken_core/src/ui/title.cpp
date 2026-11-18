@@ -213,7 +213,7 @@ bool IgnoreMenuFuncs = false;
 ===================================================================*/
 void InitBattleMenu( MENU *Menu );
 void InitInGameLevelSelect( MENU *menu );
-char *CTF_Type( SLIDER *s );
+const char *CTF_Type( SLIDER *s );
 void InGameSaveASinglePlayerGame( MENUITEM *item );
 char TypeFileName( TEXT *t, char c );
 void LoadLevelText( MENU *Menu );
@@ -295,8 +295,8 @@ void MorphHoloLight(void);
 
 bool ListDelete( LIST *l, int item );
 
-char *AxisName( SLIDER *s );
-char *AxisActionName( SLIDER *s );
+const char *AxisName( SLIDER *s );
+const char *AxisActionName( SLIDER *s );
 bool SetAxisSlider( SLIDER *s );
 bool SetAxisActionSlider( SLIDER *s );
 
@@ -1435,7 +1435,7 @@ MENU	MENU_NEW_ScreenRes = {
 	}
 };
 
-char *StereoColorSliderFunc( SLIDER *slider )
+const char *StereoColorSliderFunc( SLIDER *slider )
 {
 	switch( slider->value )
 	{
@@ -1467,7 +1467,7 @@ bool SetStereoColor( SLIDER *slider )
 	}
 }
 
-char *StereoModeSliderFunc( SLIDER *slider )
+const char *StereoModeSliderFunc( SLIDER *slider )
 {
 	switch( slider->value )
 	{
@@ -1648,7 +1648,7 @@ void JoiningEnter(MENU *Menu)
 			break;
 		case NETWORK_ERROR_BIND:
 			{
-				char * str = "";
+				const char * str = "";
 				if( local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
 				sprintf(error_str, "%s %s %s %s",
@@ -9800,7 +9800,7 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 	int slidertype;
 	int offset;
 	float percentage;
-	char *uservalue;
+	const char *uservalue;
 
 	slider = GetSlider ( Item, &slidertype );
 
@@ -13528,7 +13528,7 @@ char TypeFileName( TEXT *t, char c )
 }
 
 
-char *CTF_Type( SLIDER *s )
+const char *CTF_Type( SLIDER *s )
 {
 	switch ( s->value )
 	{
@@ -13654,13 +13654,13 @@ bool SetNumPrimaryPickups( SLIDER *slider )
 	return true;
 }
 
-char *AxisName( SLIDER *s )
+const char *AxisName( SLIDER *s )
 {
 	return ( s->value >= 0 && s->value < JoystickAxisList.items ) ? (char*)JoystickAxisList.item[ s->value ] : NULL;
 }
 
 
-char *AxisActionName( SLIDER *s )
+const char *AxisActionName( SLIDER *s )
 {
 	return ( s->value >= 0 && s->value < AxisActionList.items ) ? (char*)AxisActionList.item[ s->value ] : NULL;
 }

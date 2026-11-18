@@ -4295,7 +4295,7 @@ bool PreLoadEnemies( void )
 {
 	FILE	*	fp;
 	int16_t		Count;
-	char	*	NewExt = ".NME";
+	const char	*	NewExt = ".NME";
 	char		NewFilename[ 128 ];
 	char		TempFilename[ 256 ];
 	u_int16_t		Group;
@@ -4726,7 +4726,7 @@ bool LoadEnemies( void )
 	FILE	*	fp;
 	int16_t		Count;
 	int16_t		CompCount;
-	char	*	NewExt = ".NME";
+	const char	*	NewExt = ".NME";
 	char		NewFilename[ 128 ];
 	char		TempFilename[ 256 ];
 	u_int16_t		Group;

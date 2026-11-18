@@ -80,7 +80,8 @@ bool joysticks_init(void)
 
 	JoystickInfo[0].assigned  = false; /* let DefaultJoystickSettings bind buttons */
 	JoystickInfo[0].connected = true;
-	JoystickInfo[0].Name      = "3DS Controls";
+	static char name[] = "3DS Controls";	/* Name is a writable, owned string on PC */
+	JoystickInfo[0].Name      = name;
 	JoystickInfo[0].NumButtons = 16;  /* 0-9 core + 10-13 weapon-switch + 14-15 slide (see controls_3ds.h / config.c) */
 	JoystickInfo[0].NumPOVs   = 1;
 	JoystickInfo[0].NumAxis   = 4; /* circle pad X/Y + C-stick X/Y */

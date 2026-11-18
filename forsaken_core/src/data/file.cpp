@@ -32,7 +32,7 @@ void touch_file( char* path )
 		Write_File(path, "", 0);
 }
 
-bool is_folder( char* str )
+bool is_folder( const char * str )
 {
 	static struct stat s;
 	char * path = convert_path(str);

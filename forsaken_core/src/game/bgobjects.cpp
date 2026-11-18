@@ -1088,7 +1088,7 @@ bool PreLoadBGOFiles( void )
 	u_int16_t			TempBaseModel = (u_int16_t) -1;
 	BGO_FILE	*	TempPtr;
 	FILE		*	fp;
-	char		*	NewExt = ".BGO";
+	const char		*	NewExt = ".BGO";
 	int16_t			NumBGObjects;
 	int16_t			Count;
 	int16_t			i;

@@ -4082,7 +4082,7 @@ void ShowGameStats( stats_mode_t mode )
 	//
 
 	{
-		char* title = "KILL MATRIX";
+		const char* title = "KILL MATRIX";
 		Print4x5Text( title, (x_center-((strlen(title)*FontWidth)/2)), top_offset, WHITE );
 		top_offset += (row_height * 2);
 	}
@@ -4170,7 +4170,7 @@ void ShowGameStats( stats_mode_t mode )
 	//
 
 	{
-		char* title = "Player Stats";
+		const char* title = "Player Stats";
 		Print4x5Text( title, (x_center-((strlen(title)*FontWidth)/2)), top_offset, WHITE );
 		top_offset += (row_height * 2);
 	}
@@ -4192,7 +4192,7 @@ void ShowGameStats( stats_mode_t mode )
 
 			// names and colors
 			int columns = 4;
-			char* names[4] = {"TEAM", "OVERALL", "KILLS", "DEATHS"};
+			const char* names[4] = {"TEAM", "OVERALL", "KILLS", "DEATHS"};
 			int colors[4]  = {YELLOW,      GRAY,   GREEN,      RED};
 
 			// NOT team game

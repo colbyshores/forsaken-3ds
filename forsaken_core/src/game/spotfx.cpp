@@ -61,7 +61,7 @@ bool LoadSpotFX( void )
 	VECTOR		Pos, Dir, Up;
 	u_int16_t		Type, Group;
 	int8_t		Filename[ 256 ];
-	char	*	NewExt = ".FX";
+	const char	*	NewExt = ".FX";
 	SPOTFX	*	SpotFX;
 	u_int16_t		GenType;
 	float		GenDelay;

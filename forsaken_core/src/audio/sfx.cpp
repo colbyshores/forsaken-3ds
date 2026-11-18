@@ -688,7 +688,7 @@ LEVELSPEC_SFX_FILES LevelSpecificSfxLookup[ 256 ] = {
 	{ "", SFX_End },
 };
 
-char *BikeComputerSpeechNames[MAXBIKECOMPTYPES] = {
+const char *BikeComputerSpeechNames[MAXBIKECOMPTYPES] = {
 	"P3B",	//	-	Phil3B
 	"BRE",	//	-	Brenda
 	"LAN",	//	-	Lani-1
@@ -697,7 +697,7 @@ char *BikeComputerSpeechNames[MAXBIKECOMPTYPES] = {
 };
 #define MAX_BIKE_COMPUTER_SFX 64 
 
-char *BikeComputerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
+const char *BikeComputerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
 	"AM",	//  -	assassin missile
 	"AP",	//  -	picking up a weapon which is already present
 	"BL",	//  -	beam laser
@@ -772,7 +772,7 @@ const char *BikerSpeechNames[MAXBIKETYPES] = {
 	"BEL",	//	-	Flygirl
 };
 
-char *BikerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
+const char *BikerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
 	"GP",	//	-	general 
 	"VP",	//	-	victory
 	"LP",	//	-	losing
@@ -784,16 +784,16 @@ char *BikerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
 	"EX",	//	-	extra 
 };
 
-char *GenericSfxPath = {
+const char *GenericSfxPath = {
 	"data\\sound\\generic\\",
 };
-char *BikeCompSfxPath = {
+const char *BikeCompSfxPath = {
 	"data\\sound\\BikeComp\\",
 };
-char *BikerSfxPath = {
+const char *BikerSfxPath = {
 	"data\\sound\\Biker\\",
 };
-char *LevelSpecSfxPath = {
+const char *LevelSpecSfxPath = {
 	"data\\sound\\Mapped\\",
 };
 

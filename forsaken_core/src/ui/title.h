@@ -267,7 +267,7 @@ typedef void (* MenuStatusFunc)(int *);
 typedef void (* EventFunc)(TITLE_EVENT *);
 typedef void (* TimerFunc)(TITLE_EVENT_TIMER *);
 typedef char (* TextTypeFunc)( TEXT *, char );
-typedef char *(* SliderUserFunc)( SLIDER * );
+typedef const char *(* SliderUserFunc)( SLIDER * );
 typedef bool (* SliderSetFunc)( SLIDER * );
 typedef bool (* ListDeleteFunc) ( LIST *, int );
 typedef void (* ListInfoFunc) ( LIST * );

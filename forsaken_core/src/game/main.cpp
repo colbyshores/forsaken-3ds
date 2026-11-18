@@ -107,7 +107,7 @@ static bool parse_chdir( char *cli )
 static bool missing_folders( void )
 {
 	int x = 0;
-	char* folders[CRITICAL_FOLDERS] = {"Configs","Data","Pilots","Scripts"};
+	const char* folders[CRITICAL_FOLDERS] = {"Configs","Data","Pilots","Scripts"};
 	for( x = 0; x < CRITICAL_FOLDERS; x++ )
 		if( ! is_folder(folders[x]) )
 		{

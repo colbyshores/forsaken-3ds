@@ -87,7 +87,7 @@ int MessageColourLong[MAX_MESSAGES_LONG];
 u_int8_t	CharTrans[256];
 
 u_int16_t NumOfTextMessages = 0;
-char * TextMessagesPnt[MAXTEXTMESSAGES];
+const char * TextMessagesPnt[MAXTEXTMESSAGES];
 char * TextMessages = NULL;
 TEXTMSGINFO * TextMsgInfo = NULL;
 
