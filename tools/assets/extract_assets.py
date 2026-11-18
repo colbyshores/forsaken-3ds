@@ -317,45 +317,6 @@ def setup_music(audio_files, output_dir):
     return (dsp_count + wav_count) > 0
 
 
-def setup_hd_textures(output_dir, project_root):
-    """Optionally regenerate the HD texture set if a 4K texture pack and
-    the regen script are present.  Skips silently if either is missing —
-    the engine falls back to the standard PNG path for any texture lacking
-    an HD variant."""
-    print(f"\n── HD textures ──")
-    pack = os.path.expanduser("~/Downloads/4ktexturepack.rar")
-    extracted = "/tmp/4k_pack"
-    regen = os.path.join(project_root, "regen_hd_old_4k.sh")
-
-    if not os.path.exists(regen):
-        print("  No regen_hd_old_4k.sh — skipping HD textures.")
-        return False
-
-    if not os.path.isdir(extracted):
-        if not os.path.isfile(pack):
-            print(f"  No 4K pack at {pack} — skipping HD textures.")
-            print("  (Engine will use the standard PNGs in romfs/data/textures/)")
-            return False
-        if not check_tool("unrar"):
-            print("  unrar not installed — skipping HD textures.")
-            return False
-        print(f"  Extracting 4K pack ({pack}) to {extracted}…")
-        os.makedirs(extracted, exist_ok=True)
-        run(["unrar", "x", "-o+", pack, extracted + "/"],
-            stdout=subprocess.DEVNULL)
-        # kpf files are zip archives; extract them all into the same tree
-        for kpf in sorted(glob.glob(os.path.join(extracted, "mods/*.kpf"))):
-            run(["unzip", "-oq", kpf, "-d", extracted],
-                stdout=subprocess.DEVNULL)
-
-    print("  Running regen_hd_old_4k.sh…")
-    run(["bash", regen], cwd=project_root)
-    t3x_count = len(glob.glob(os.path.join(output_dir, "hd_old/**/*.t3x"),
-                              recursive=True))
-    print(f"  {t3x_count} HD textures generated in romfs/hd_old/")
-    return t3x_count > 0
-
-
 def extract_from_iso(iso_path, output_dir):
     """Full extraction pipeline for a standalone .iso file."""
     if not check_tool("7z") or not check_tool("ffmpeg"):
