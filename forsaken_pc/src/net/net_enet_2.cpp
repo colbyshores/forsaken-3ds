@@ -54,7 +54,7 @@ network_state_t network_state;
 
 // my settings
 static int i_am_host = 0;
-peer_id_t my_id = NO_ID; // used by nettest
+peer_id_t my_id = NO_ID; // assigned by the host (YOUR_ID); LOWEST_ID when hosting
 char my_player_name[NETWORK_MAX_NAME_LENGTH] = {0};
 int my_local_port = 0;
 
@@ -616,7 +616,7 @@ typedef struct {
 	p2p_event_t type;
 	ENetAddress address; // ip and port as the host see's it
 	unsigned short int connect_port;
-} p2p_punch_packet_t; // see explanation in net_connection()
+} p2p_punch_packet_t; // see explanation in new_connection()
 
 static void disconnect_all( void )
 {
@@ -1325,7 +1325,7 @@ static void new_packet( ENetEvent * event )
 				}
 			}
 			break;
-		case NAT_PUNCH_THROUGH_LIST: // see explanation of this in net_connection()
+		case NAT_PUNCH_THROUGH_LIST: // see explanation of this in new_connection()
 			{
 				p2p_punch_packet_t * packet = (p2p_punch_packet_t*) event->packet->data;
 				ENetAddress * address  = &packet->address;

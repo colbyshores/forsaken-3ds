@@ -1,3 +1,18 @@
+/* sound_openal.cpp -- sound.h for the PC, on OpenAL (built with SOUND_OPENAL)
+ *
+ * sound_init opens the default device and makes one context current; it
+ * runs once per process (a later call returns true without reopening, even
+ * after sound_destroy). Each sound_buffer_t is one OpenAL buffer filled from
+ * a WAV through SDL_LoadWAV (8-bit data stored unsigned, 16-bit signed, as
+ * OpenAL wants); each sound_source_t is one OpenAL source on that buffer.
+ * Millibels become gain 10^(mb/2000). Sound3D is always false, so sources
+ * are listener-relative and sound_pan puts the source on the unit circle in
+ * the listener's x/y plane (straight above it at centre): pan never changes
+ * the distance. z is negated for OpenAL's right-handed axes. The listener
+ * gain is fixed at 0.5 to reduce crackling. music_openal.cpp plays on the
+ * same context.
+ */
+
 #ifdef SOUND_OPENAL
 
 #include "game/main.h"
@@ -125,10 +140,9 @@ bool sound_init( void )
 
 	alcMakeContextCurrent(Context);
 
-	// since the game was based around dsound
-	// it performs some volume calculations using this value
-	// dsound defines DSBVOLUME_MIN as -10000
-	// and forsaken defined min volume as 1/3 of that
+	// the game's volume maths use DirectSound units, where silence
+	// (DSBVOLUME_MIN) is -10000 millibels; forsaken's floor is 1/3 of that.
+	// sfx.cpp already initialises it to this value.
 	sound_minimum_volume = -10000 / 3;
 
 	// global listener sound set to 50% to reduce crackling
@@ -207,18 +221,17 @@ void sound_volume( sound_source_t * source, long millibels )
 	ALfloat f;
 	millibels = ( millibels > 0 ) ? 0 : millibels;
 	// gain is scaled to (silence) 0.0f through (no change) 1.0f
-	// millibels = hundredths of decibels (dB)
-	// defined in Dsound.h as (no change) 0 and (silence) -10,000
+	// millibels = hundredths of decibels (dB): 0 is no change and
+	// -10000 is silence, as in DirectSound
 	f = (ALfloat) powf(10.0, millibels/2000.0);
 	alSourcef(source->id, AL_GAIN, f);
 }
 
 void sound_pan( sound_source_t * source, long _pan )
 {
-	// where pan is -1 (left) to +1 (right)
-	// must be scaled from -1 <-> +1
-	// probably need to scale down by 10,000, since dsound goes from -10000 to +10000
-	// so:
+	// pan arrives in DirectSound units, -10000 (left) to +10000 (right);
+	// scale to -1..+1 and place the (listener-relative) source on the unit
+	// circle, so panning never changes its distance
 	float pan = (float) _pan / 10000.0f;
 	float pan2 = (float) sqrtf(1 - pan*pan);
 	alSource3f(source->id, AL_POSITION, pan, pan2, 0.0f);

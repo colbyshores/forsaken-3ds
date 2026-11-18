@@ -1,17 +1,12 @@
-/*
- * music_openal.cpp - CD audio music playback for the PC build.
+/* music_openal.cpp -- music.h for the PC: .dsp tracks decoded into OpenAL
  *
- * Plays the same Nintendo DSP-ADPCM (.dsp) track files the 3DS
- * streams to its hardware decoder (romfs/music/trackNN.dsp), decoded
- * in software by the shared dsp_adpcm module and presented through
- * OpenAL. One asset set, identical music on both platforms; only
- * the decode/output layer differs (ndsp hardware vs CPU + OpenAL).
- *
- * The whole track is decoded to PCM at play time (a 5-minute track
- * is ~20 MB at 32 kHz mono s16) and looped as a single OpenAL
- * buffer. Playback uses whichever OpenAL context the SFX system
- * (sound_openal.cpp) has made current; if sound is not initialised,
- * music calls are silent no-ops.
+ * Plays the same DSP-ADPCM trackNN.dsp files the 3DS streams to its DSP
+ * (looked up in romfs/music, Data/music, then music), decoded on the CPU by
+ * the shared dsp_adpcm module. music_play decodes the whole track to 16-bit
+ * mono PCM at 32 kHz (about 20 MB for five minutes) and loops it as a single
+ * OpenAL buffer and source, so music_update has nothing to do. It plays on
+ * whatever OpenAL context sound_openal.cpp made current; with no context
+ * (sound not initialised) music_play does nothing.
  */
 
 #ifndef __3DS__

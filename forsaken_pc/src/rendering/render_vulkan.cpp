@@ -1,26 +1,31 @@
-/*
- * render_vulkan.cpp - Vulkan renderer for the Linux PC build.
+/* render_vulkan.cpp -- render.h for the PC, on Vulkan
  *
- * Replaces the old OpenGL backends (render_gl1/2/3 + shared) behind
- * the same FS interface that render_c3d.cpp implements on 3DS. One
- * vertex/fragment shader pair mirrors the old GL shaders (BGRA vertex
- * colours, colour-key discard, textureGrad), with a Y-flip in the
- * vertex shader to bridge GL-style bottom-up NDC to Vulkan's
- * top-down framebuffer. Engine projection matrices are already
- * D3D-style [0,1] depth, which matches Vulkan.
+ * The PC backend of the same FS* / draw_* seam render_c3d.cpp implements on
+ * 3DS; it replaced the old OpenGL backends (render_gl1/2/3). Two vertex
+ * shaders (3D, and 2D for orthographic draws) share one fragment shader:
+ * BGRA vertex colours, colour-key discard, textureGrad sampling. Each draw
+ * pushes world x view x projection (a screen ortho matrix for 2D draws) as
+ * a push constant, and the vertex shaders flip Y to turn GL-style bottom-up
+ * NDC into Vulkan's top-down framebuffer; the engine's projections already
+ * use D3D-style [0,1] depth, as Vulkan does. A pipeline is built on first
+ * use and cached for each combination of ortho, topology, blend, depth test
+ * / write and cull state.
  *
- * Textures: opaque masters default to ETC2 - a build-time-encoded
- * .ktx2 sibling (tools/texture/etc2enc.c, run by the PC Makefile)
- * uploaded as VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK when the device
- * exposes textureCompressionETC2. Alpha-bearing textures never get
- * a .ktx2 (encoder skips them) and load RGBA from PNG - the
- * designated RGBA exception class. If ETC2 is unavailable, or no
- * .ktx2 exists, the PNG/RGBA path is used.
+ * Frames: two in flight, each with its own command buffer, fence and
+ * semaphores. FSBeginScene waits on the fence of the slot it reuses, acquires
+ * a swapchain image and opens the render pass; render_flip submits and
+ * presents, recreating the swapchain when it is out of date. Vertex, index
+ * and normal buffers are host-visible and stay mapped, so the FSLock* calls
+ * return the mapping; FSReleaseRenderObject retires them until their frame
+ * slot has cycled. Texture and other uploads use one-time command buffers
+ * that wait for the queue to go idle. render_mode_select only rebuilds the
+ * swapchain: the device, buffers and textures survive a mode change.
  *
- * Frame model deliberately simple: FSBeginScene acquires and opens
- * the single command buffer, render_flip submits and presents;
- * buffer/texture uploads use one-time command buffers with a queue
- * wait. vkQueueWaitIdle per frame keeps ownership trivially correct.
+ * Textures: an opaque texture loads from a build-time .ktx2 sibling
+ * (tools/texture/etc2enc.c, run by the PC Makefile) as
+ * VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK when the device has
+ * textureCompressionETC2. Alpha-bearing textures get no .ktx2 and load RGBA
+ * from PNG, which is also the path when ETC2 or the .ktx2 is missing.
  */
 #include "game/main.h"
 #include "util/util.h"

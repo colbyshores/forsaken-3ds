@@ -1,3 +1,23 @@
+/* input_sdl.cpp -- input.h for the PC, on SDL2
+ *
+ * handle_events drains the SDL event queue once a frame. Key presses go to
+ * input_buffer as SDLK codes (Shift restores capitals for text entry;
+ * Shift+F12 toggles full screen); mouse buttons and the wheel as the
+ * LEFT_MOUSE.. / UP_MOUSE / DOWN_MOUSE codes; joystick button and hat presses
+ * as joystick key codes (DIK_JOYSTICK, JOYSTICK_POVDIR_KEYCODE). Held state
+ * goes to mouse_state and joy_*_state; joystick axes are scaled from SDL's
+ * +-32768 to the engine's +-100 and zeroed inside the axis deadzone. Window
+ * focus grabs or releases the mouse (always grabbed in full screen, in a
+ * window only during play with no menu open). SDL_QUIT asks for confirmation.
+ * An SDL_USEREVENT runs the callback in data1 with data2, so timers can call
+ * back on the main thread.
+ *
+ * read_mouse hands out the accumulated motion at most every 0.028 s and
+ * repeats the last value in between: the mouse reports at about 125 Hz,
+ * slower than the frame rate. joysticks_init opens every SDL joystick (up to
+ * MAX_JOYSTICKS) and names its axes, buttons and hats.
+ */
+
 #include "game/main.h"
 #include "input/input.h"
 #include "util/util.h"
@@ -62,10 +82,11 @@ int input_buffer_find( int code )
 // Window and Activate Events
 //////////////////////////////////////////////
 
-// TODO
-//	when this is ready then pass SDL_RESIZABLE to SDL_SetVideoMode
-//  need to resize video with SDL_SetVideoMode
-bool bIgnoreWM_SIZE = false; // ignores resize events
+// Despite the name, app_resize does its work only while this is true, and
+// title.cpp sets it true only for the length of a RenderModeSelect call,
+// during which handle_events does not run. So resizing the (resizable)
+// window only logs.
+bool bIgnoreWM_SIZE = false;
 void app_resize( SDL_WindowEvent * /*window*/ )
 {
 	DebugPrintf("Window size changed.\n");
@@ -149,7 +170,6 @@ void app_quit( void )
 	{
 		// user wants to quit
 		// let our code know we're quitting and not failing
-		// let the message reach DefWindowProc so it calls CloseWindow
 		CleanUpAndPostQuit();
 		return;
 	}
@@ -329,7 +349,7 @@ void app_joy_button( SDL_JoyButtonEvent * button )
 	joy_button_state[ button->which ][ button->button ] =
 		(button->type == SDL_JOYBUTTONDOWN);
 
-	// pass down mouse events for menu processing
+	// pass down joystick button presses for menu processing
 	if(  button->type == SDL_JOYBUTTONDOWN )
 	{
 		input_buffer_send(
@@ -555,9 +575,6 @@ bool joysticks_cleanup( void )
 
 		if(JoystickInfo[i].sdl_joy)
 		{
-// seems to not be included anymore
-// but since sdl_joy is not null then
-// seems like we would always have a joystick opened here
 			SDL_JoystickClose(
 				JoystickInfo[i].sdl_joy
 			);
