@@ -56,23 +56,6 @@ constexpr auto MISSILE_SPEED = ( MAXMOVESPEED * 1.6F ); // Ship Speed * 1.6
 /*===================================================================
 	Globals
 ===================================================================*/
-/*
-const char *SecondaryDescription[MAXSECONDARYWEAPONS] = {
-
-	"Mug",
-	"Solaris",
-	"Thief",
-	"Scatter",
-	"Gravgon",
-	"MFRL",
-	"Titan",
-	"Purge Mine",
-	"Pine Mine",
-	"Quantum Mine",
-	"Spider Mine"
-
-};
-*/
 const char *SecondaryDescription[MAXSECONDARYWEAPONS] = {
 	LT_MENU_NEW_SecondaryWeaponKeys17 /*"mug missile:"*/,
 	LT_MENU_NEW_SecondaryWeaponKeys18 /*"solaris missile:"*/,
@@ -4330,54 +4313,6 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 /* end new code */
 
-/*
-    This code will drop the golden
-    But as stands objects don't remember their own values
-	This should be an option once objects remember their own values
-	So leave this code here for later
-*/
-
-/* 
-
-        // take away golden and add to regen list
-		LoseSuperNashram();
-
-		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-
-		NormaliseVector( &DirVector );
-
-		PickupNum = PICKUP_GoldenPowerPod;
-
-		if( MyGameStatus != STATUS_SinglePlayer )
-		  LifeCount = (float) ( Random_Range( 600 ) + 600 );
-		else
-		  LifeCount = -1.0F;
-
-		Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) +
-		        ( PICKUP_SPEED / 2.0F );
-
-		i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group,
-		                   &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount,
-						   -1, false, LifeCount, (u_int16_t) -1 );
-
-		if( ( i != (u_int16_t) -1 ) && ( i != (u_int16_t) -2 ) )
-		{
-			DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector,
-			                Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount,
-							(u_int16_t) -1 );
-			TotalPickups++;
-		}
-
-		// take golden off regen list
-		// cause we just spit it out
-		if( !GodMode )
-		{
-			NumSuperNashrams--;
-		}
-
-*/
 	}
 
 	if ( BountyHunt && Ships[ WhoIAm ].Object.Flags & SHIP_CarryingBounty )
@@ -7168,9 +7103,6 @@ void CreateTitanStarShrapnel( u_int16_t i, VECTOR * Pos, VECTOR * Dir, u_int16_t
 								NormaliseVector( &DirVector );
 							}
 
-//							InitOneSecBull( SecBulls[i].OwnerType, (BYTE) SecBulls[i].Owner, ++Ships[ SecBulls[i].Owner ].SecBullIdCount,
-//											Group, Pos, &DropVector, &DirVector, &UpVector,
-//											&DropVector, TITANSTARSHRAPNEL, true );
 							InitOneSecBull( SecBulls[i].OwnerType, (BYTE) SecBulls[i].Owner, ++Ships[ SecBulls[i].Owner ].SecBullIdCount,
 											Group, Pos, &DropVector, &DirVector, &UpVector,
 											&DropVector, TITANSTARSHRAPNEL, false );
@@ -7207,9 +7139,6 @@ void CreateTitanStarShrapnel( u_int16_t i, VECTOR * Pos, VECTOR * Dir, u_int16_t
 							NormaliseVector( &DirVector );
 						}
 
-//						InitOneSecBull( SecBulls[i].OwnerType, (BYTE) SecBulls[i].Owner, ++Ships[ SecBulls[i].Owner ].SecBullIdCount,
-//										Group, Pos, &DropVector, &DirVector, &UpVector,
-//										&DropVector, TITANSTARSHRAPNEL, true );
 						InitOneSecBull( SecBulls[i].OwnerType, (BYTE) SecBulls[i].Owner, ++Ships[ SecBulls[i].Owner ].SecBullIdCount,
 										Group, Pos, &DropVector, &DirVector, &UpVector,
 										&DropVector, TITANSTARSHRAPNEL, false );
@@ -7238,9 +7167,6 @@ void CreateTitanStarShrapnel( u_int16_t i, VECTOR * Pos, VECTOR * Dir, u_int16_t
 		   		DirVector.z = Dir->z + ( ( ( (float) Random_Range( 10000 ) ) / 12500.0F ) - 0.4F );
 				NormaliseVector( &DirVector );
 		
-//				InitOneSecBull( SecBulls[i].OwnerType, (BYTE) SecBulls[i].Owner, ++Ships[ SecBulls[i].Owner ].SecBullIdCount,
-//								Group, Pos, &DropVector, &DirVector, &UpVector,
-//								&DropVector, TITANSTARSHRAPNEL, true );
 				InitOneSecBull( SecBulls[i].OwnerType, (BYTE) SecBulls[i].Owner, ++Ships[ SecBulls[i].Owner ].SecBullIdCount,
 								Group, Pos, &DropVector, &DirVector, &UpVector,
 								&DropVector, TITANSTARSHRAPNEL, false );

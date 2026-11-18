@@ -2265,7 +2265,6 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		( 1024.0F * 2.0F ) * 2.25F * GLOBAL_SCALE,	// float	MaxRange;			// maximum range I can dogfight at...
 		1536,		// Shield
 		(ONE_SECOND * 0.5F),		//	float	MoveRestrictClearTime;
-//		600.0F * GLOBAL_SCALE,		//	float	Radius;
 		0.0F * GLOBAL_SCALE,		//	float	Radius;
 		13.0F,						//	float	PrimaryFireRate;
 		60.0F,						//	float	SecondaryFireRate;

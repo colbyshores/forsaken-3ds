@@ -1063,7 +1063,6 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 					PortalVerts[ PortalVertCount + Count2 ].tu = 0.0F;
 					PortalVerts[ PortalVertCount + Count2 ].tv = 0.0F;
 					PortalVerts[ PortalVertCount + Count2 ].color = color;
-//					PortalVerts[ PortalVertCount + Count2 ].dwReserved = 0;
 				}
 
 				for( Count2 = 0; Count2 < TriCount; Count2++ )				// Count Tris

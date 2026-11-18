@@ -901,12 +901,6 @@ bool InitLevels( const char * levels_list )
 
 bool SetMatrixViewPort( void )
 {
-/* TODO - what did this function do in d3d6 ?
-	if (lpView->lpVtbl->SetBackground(lpView, hBmat) != D3D_OK) {
-		return false;
-	}
-*/
-
 	FSSetProjection(&proj);
 	FSSetView(&identity);
 	FSSetWorld(&world);
@@ -1731,8 +1725,6 @@ bool RenderScene( void )
 {
   u_int16_t  i,e;
   char  buf[256];
-  //struct _stat stat_buf;
-  //int result;
   static int WaitFrames = 2;
   bool done;
 
@@ -2012,13 +2004,6 @@ bool RenderScene( void )
       }
       if( i != MAX_PLAYERS )
         break;  // not yet..
-
-      // Added the if check to not call OutputVisiStats improperly
-      // The order of code will always result in LevelNum being -1 here
-      // So no point in even leaving this code uncommented...
-      // We'll probably just end up getting rid of visi stats anyway later
-      //if ( LevelNum != -1 )
-      //	OutputVisiStats( &Mloadheader, LevelNames[ LevelNum ] );
 
       // un load all graphics
       ReleaseView();
@@ -3601,12 +3586,6 @@ bool MainGameRender(void)
         CurrentCamera.Viewport.ScaleX = CurrentCamera.Viewport.Width / 2.0f;
         CurrentCamera.Viewport.ScaleY = CurrentCamera.Viewport.Height / 2.0f;
 
-/* bjd
-        CurrentCamera.Viewport.dvMaxX = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.dwWidth),
-                           RENDERVAL(2 * CurrentCamera.Viewport.dvScaleX));
-        CurrentCamera.Viewport.dvMaxY = (float)D3DDivide(RENDERVAL(CurrentCamera.Viewport.dwHeight),
-                           RENDERVAL(2 * CurrentCamera.Viewport.dvScaleY));
-*/        
         CurrentCamera.UseLowestLOD = true;
 
         if( RenderCurrentCamera() != true )
@@ -4262,7 +4241,6 @@ bool RenderCurrentCamera( void )
 	int16_t Count;
 	VISGROUP  *g;
 	u_int16_t  group;
-//	float R, G, B;
 	NumOfTransExe = 0;
 	Build_View();
 	CurrentCamera.View = view;
@@ -4739,11 +4717,6 @@ void CalculateFramelag( void )
   framelag = real_framelag * 71.0F;
 
 
-  // debugging
-  //if (TimeWorst == 0.0 || seconds > TimeWorst) TimeWorst = seconds;
-  //if (TimeBest  == 0.0 || seconds < TimeBest)  TimeBest  = seconds;
-  //DebugPrintf("Loop Time: seconds=%5f - worst:%5f - best:%5f\n",seconds,TimeWorst,TimeBest);
-  
   //  who knows why
   if( CurrentMenu && (MyGameStatus == STATUS_SinglePlayer) )
     framelag = 0.0F;

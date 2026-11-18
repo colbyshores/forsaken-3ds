@@ -43,10 +43,6 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					    VECTOR * BottomRight );
 
-//#ifdef OPT_ON
-//#pragma optimize( "gty", on )
-//#endif
-
 MODELNAME	*	ModNames = &ModelNames[ 0 ];
 
 /*===================================================================

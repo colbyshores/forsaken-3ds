@@ -2081,9 +2081,6 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 	}
 	else
 	{
-		// commented out because it was causing conflicts with watch mode
-	//	Current_Camera_View = MAX_PLAYERS;	// set it back to Remote Camera..
-	//	Ships[MAX_PLAYERS].enable = 1;		// Turn Off the remote camera...
 		ShipPnt->Timer -= real_framelag;
 
 		WhiteOut += framelag;

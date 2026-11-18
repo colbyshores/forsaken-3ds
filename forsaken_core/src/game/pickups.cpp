@@ -2013,7 +2013,6 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 	   		{
 	   			case PICKUP_Mugs:
 	   			case PICKUP_Shield:
-//	   			case PICKUP_PowerPod:
 	   			case PICKUP_GeneralAmmo:
 	   			case PICKUP_SussGunAmmo:
 	   			case PICKUP_PyroliteAmmo:

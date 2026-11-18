@@ -122,10 +122,6 @@ int8_t	*	DebugPrimStrings[] = {
 u_int32_t TrojaxChargeID = 0;
 u_int32_t TrojaxOwnersID[ MAX_PLAYERS ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-/*
-const char *PrimaryDescription[MAXPRIMARYWEAPONS] =
-{ "Pulsar", "Trojax", "Pyrolite", "Transpulse", "Suss Gun", "Laser" };
-*/
 const char *PrimaryDescription[MAXPRIMARYWEAPONS] =
 {
 	LT_MENU_NEW_PrimaryWeaponKeys2/*"Pulsar"*/,
@@ -2217,9 +2213,6 @@ void ProcessPrimaryBullets( void )
    				switch( PrimBulls[ i ].Weapon )
    				{
    					case TROJAX:
-					//	Damage =  PrimBulls[i].TrojPower / 100.0F * 512.0F; // -- unpatched? (doesn't work as it should)
-					//  Damage = 32.0F + (PrimBulls[i].TrojPower / 100.0F * (256.0F-32.0F)); // -- patched
-   					//	break;
    					case PULSAR:
    					case PYROLITE_RIFLE:
    					case SUSS_GUN:
