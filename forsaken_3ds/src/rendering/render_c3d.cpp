@@ -79,15 +79,15 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 #include "rendering/render_c3d_shbin.h"
 
 /* ---- uniform register locations (must match .v.pica) ---- */
-#define UNIFORM_PROJECTION   0   /* fvec4[4] — full MVP */
-#define UNIFORM_MODELVIEW    4   /* fvec4[4] — identity (kept for compat) */
-#define UNIFORM_AMBIENT      8   /* fvec4    — .xyz=ambient, .w=unused */
-#define UNIFORM_LIGHT_COUNT  9   /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
+constexpr int UNIFORM_PROJECTION = 0; /* fvec4[4] — full MVP */
+constexpr int UNIFORM_MODELVIEW = 4; /* fvec4[4] — identity (kept for compat) */
+constexpr int UNIFORM_AMBIENT = 8; /* fvec4    — .xyz=ambient, .w=unused */
+constexpr int UNIFORM_LIGHT_COUNT = 9; /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
 #define UNIFORM_LIGHTS      10   /* fvec4[12]— GPU_MAX_LIGHTS × 3 fvec4 each
                                   *   light[3i+0] = (Pos.xyz, invSizeSq)
                                   *   light[3i+1] = (r, g, b, type)
                                   *   light[3i+2] = (Dir.xyz, CosArc)  */
-#define GPU_MAX_LIGHTS       8   /* must match .v.pica `lights[24]` (= 8*3) */
+constexpr int GPU_MAX_LIGHTS = 8; /* must match .v.pica `lights[24]` (= 8*3) */
 
 /* ---- citro3d state ---- */
 
@@ -245,11 +245,11 @@ void c3d_memo_suspend(bool suspend)
  * freed when their level is released (c3d_release_level_cache).
  * Allocation failure or table pressure falls back to the scratch
  * path — never stale data, never a skipped draw. */
-#define PERSIST_BITS 11
-#define PERSIST_SIZE (1u << PERSIST_BITS)
-#define PERSIST_MASK (PERSIST_SIZE - 1u)
+constexpr int PERSIST_BITS = 11;
+constexpr auto PERSIST_SIZE = (1u << PERSIST_BITS);
+constexpr auto PERSIST_MASK = (PERSIST_SIZE - 1u);
 /* Linear memory the cache always leaves free (see persist_store). */
-#define PERSIST_LINEAR_RESERVE (2u * 1024u * 1024u)
+constexpr auto PERSIST_LINEAR_RESERVE = (2u * 1024u * 1024u);
 typedef struct {
 	uintptr_t ro;
 	int sub;
@@ -365,7 +365,7 @@ static void persist_free_all(void)
  * Same value on both the OG-tier and N3DS-tier paths of the unified
  * CIA. On OG (22 MB linear heap) this is ~18% of the budget — tight
  * but validated working on real hardware. */
-#define GPU_SCRATCH_SIZE  (4 * 1024 * 1024)
+constexpr auto GPU_SCRATCH_SIZE = (4 * 1024 * 1024);
 static gpu_vertex_t *s_scratch = NULL;
 
 /* Point the vertex attribute buffer at v for the next draw. citro3d
@@ -492,7 +492,7 @@ static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs verte
 static u32  s_atlasSeed        = 0;
 static int  s_lastMatClass     = -1;
 static int  s_lastPhaseBucket  = -1;
-#define ATLAS_PHASE_BUCKETS    64
+constexpr int ATLAS_PHASE_BUCKETS = 64;
 
 /* True while inside an orthographic draw_render_object (HUD, screen
  * polys, damage-flash overlay). apply_texenv_for_texture suppresses

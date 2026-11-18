@@ -31,9 +31,9 @@
 
 // id stuff
 typedef unsigned char peer_id_t;
-#define NO_ID 0
-#define LOWEST_ID 1
-#define HIGHEST_ID 255
+constexpr int NO_ID = 0;
+constexpr int LOWEST_ID = 1;
+constexpr int HIGHEST_ID = 255;
 
 /*
  *

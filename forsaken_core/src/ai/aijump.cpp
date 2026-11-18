@@ -44,8 +44,8 @@
  * body is compiled out of the original edition. */
 #ifdef EDITION_REMASTER
 
-#define JUMP_DURATION_TICKS	75.0F
-#define JUMP_ARC_SCALE		4.0F
+constexpr float JUMP_DURATION_TICKS = 75.0F;
+constexpr float JUMP_ARC_SCALE = 4.0F;
 
 /* Walk the current node's neighbor list, pick a random valid one
  * (excluding prev/cur). Mirrors KEX's biased reservoir sample —

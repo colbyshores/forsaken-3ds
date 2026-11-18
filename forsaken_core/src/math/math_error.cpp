@@ -9,7 +9,7 @@ int sqrt_exceptions = 0;
 int pow_exceptions = 0;
 int unhandled_exceptions = 0;
 int total_exceptions = 0;
-#define MAX_EXCEPTION_TYPES (6)
+constexpr int MAX_EXCEPTION_TYPES = (6);
 int type_exceptions[ MAX_EXCEPTION_TYPES ];
 int unknown_exceptions = 0;
 static char * MathErrStrings[] = { 

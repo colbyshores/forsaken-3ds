@@ -30,7 +30,7 @@
 #include "audio/dsp_adpcm.h"
 #include "audio/music_table.h"
 
-#define MUSIC_SAMPLE_RATE 32000
+constexpr int MUSIC_SAMPLE_RATE = 32000;
 
 static bool  s_initialized = false;
 static bool  s_playing = false;

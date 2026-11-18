@@ -257,9 +257,9 @@ int controls_3ds_cstick_invert_y(void) { return s_controls.cstick_invert_y; }
  * main config file (Configs/main.txt). */
 #include "data/config.h"
 
-#define AIM_ASSIST_STEP        0.05F
-#define AIM_ASSIST_MIN         0.00F
-#define AIM_ASSIST_MAX         1.00F
+constexpr float AIM_ASSIST_STEP = 0.05F;
+constexpr float AIM_ASSIST_MIN = 0.00F;
+constexpr float AIM_ASSIST_MAX = 1.00F;
 static float s_aim_assist_backup = 0.0F;
 
 static float aim_assist_current(void)

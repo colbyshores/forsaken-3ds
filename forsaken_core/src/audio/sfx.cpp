@@ -169,7 +169,7 @@ BYTE Taunter = 0xFF;
 u_int32_t TauntID = 0;
 bool TauntUpdatable = false;
 char CurrentTauntVariant;
-#define MAX_ANY_SFX 256 // openal soft max is 256 so this feels good
+constexpr int MAX_ANY_SFX = 256; // openal soft max is 256 so this feels good
 
 SFXNAME	Sfx_Filenames[MAX_SFX] =
 {
@@ -501,7 +501,7 @@ typedef struct _SPOT_SFX_LIST
 	u_int32_t   uid;
 } SPOT_SFX_LIST;
 
-#define MAX_LOOPING_SFX 64
+constexpr int MAX_LOOPING_SFX = 64;
 SPOT_SFX_LIST SpotSfxList[ MAX_LOOPING_SFX ];
 
 char TauntPath[ 128 ];
@@ -510,7 +510,7 @@ bool BikerSpeechPlaying = false;
 
 u_int32_t SfxUniqueID = 1;
 
-#define MAX_SFX_VARIANTS 16
+constexpr int MAX_SFX_VARIANTS = 16;
 char *SfxFullPath[ MAX_SFX ][ MAX_SFX_VARIANTS ];
 
 /****************************************
@@ -524,7 +524,7 @@ typedef struct
 	int	flags;
 }LEVELSPEC_SFX_FILES;
 
-#define SFX_End	128	// end of sfx batch
+constexpr int SFX_End = 128; // end of sfx batch
 LEVELSPEC_SFX_FILES LevelSpecificSfxLookup[ 256 ] = {
 	{ "acidpool", SFX_Looping },  // bubbling ambience for slime/acid pools (are there any?)
 	{ "aircond1", SFX_Looping },  // normal air conditioning ventilator air rush
@@ -695,7 +695,7 @@ const char *BikeComputerSpeechNames[MAXBIKECOMPTYPES] = {
 	"LEP",	//	-	Lepracom
 	"ROA",	//	-	Roadster
 };
-#define MAX_BIKE_COMPUTER_SFX 64 
+constexpr int MAX_BIKE_COMPUTER_SFX = 64;
 
 const char *BikeComputerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
 	"AM",	//  -	assassin missile
@@ -872,10 +872,10 @@ void CheckSpeech( int index )
 	}
 }
 
-#define SFX_HOLDERTYPE_Static 0
-#define SFX_HOLDERTYPE_Dynamic 2
-#define SFX_HOLDERTYPE_Looping 3
-#define SFX_HOLDERTYPE_Taunt 4
+constexpr int SFX_HOLDERTYPE_Static = 0;
+constexpr int SFX_HOLDERTYPE_Dynamic = 2;
+constexpr int SFX_HOLDERTYPE_Looping = 3;
+constexpr int SFX_HOLDERTYPE_Taunt = 4;
 /****************************************
 	Procedure	:		FreeSfxHolder
 	Input		:		int index:	index to SfxHolder
@@ -1148,7 +1148,7 @@ int16_t ReturnSFXIndex( char *file )
 	return -1;
 }
 
-#define NUM_ESSENTIAL_SFX 26
+constexpr int NUM_ESSENTIAL_SFX = 26;
 
 void PauseAllSfx( void )
 {
@@ -1178,10 +1178,10 @@ void PauseAllSfx( void )
 	}
 }
 
-#define LOOPING_SFX_SCALE 0.75F		// used for max distance of looping sfx ( fraction of max distance used for normal sfx )
-#define LOOPING_SFX_FRAME_SKIP 5.0F	// process looping sfx every 5 frames
-#define LOOPING_SFX_FixedGroup 0
-#define LOOPING_SFX_VariableGroup 1
+constexpr float LOOPING_SFX_SCALE = 0.75F; // used for max distance of looping sfx ( fraction of max distance used for normal sfx )
+constexpr float LOOPING_SFX_FRAME_SKIP = 5.0F; // process looping sfx every 5 frames
+constexpr int LOOPING_SFX_FixedGroup = 0;
+constexpr int LOOPING_SFX_VariableGroup = 1;
 
 bool RestoreSfxData( u_int32_t id, VECTOR *pos, u_int16_t *group )
 {
@@ -1650,7 +1650,7 @@ void RequestTitleSfx( void )
 	Input		: none
 	Output		: none
 *****************************************/
-#define DESTROYSOUND_KeepLevelSpecTable 1
+constexpr int DESTROYSOUND_KeepLevelSpecTable = 1;
 bool InitializeSound( int flags )
 {
 	int i;
@@ -1766,7 +1766,7 @@ void DestroySound( int flags )
 void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECTOR *Temp, float Distance, long Volume, u_int16_t Effects );
 
 #define SPEECH_AMPLIFY	( 1.0F / GLOBAL_MAX_SFX )
-#define SFX_2D 2
+constexpr int SFX_2D = 2;
 
 bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, int type, int HolderIndex, float VolModify, u_int16_t Effects, bool OverideDistanceCheck )
 {
@@ -2252,7 +2252,7 @@ void SetSoundLevels( int *dummy )
 	GlobalSoundAttenuation = SfxSlider.value / ( SfxSlider.max / GLOBAL_MAX_SFX );
 }
 
-#define TRIGGER_SFX_PAUSE_VALUE 20.0F	// pause between triggered sfx ( 20.0F = 1/3 second )
+constexpr float TRIGGER_SFX_PAUSE_VALUE = 20.0F; // pause between triggered sfx ( 20.0F = 1/3 second )
 void CheckSBufferList( void )
 {
 	int i;
@@ -2408,11 +2408,11 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume )
 	}
 }
 
-#define START_LINE 5
-#define GAP_SIZE 50
-#define X_OFFSET 5
-#define LINE_HEIGHT 8
-#define DATA_OFFSET 100
+constexpr int START_LINE = 5;
+constexpr int GAP_SIZE = 50;
+constexpr int X_OFFSET = 5;
+constexpr int LINE_HEIGHT = 8;
+constexpr int DATA_OFFSET = 100;
 
 void ProcessLoopingSfx( void )
 {
@@ -2773,7 +2773,7 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 	return true;
 }
 
-#define TAUNT_PAUSE 5.0F
+constexpr float TAUNT_PAUSE = 5.0F;
 float ProcessTauntPause = TAUNT_PAUSE;
 void ProcessTaunt( void )
 {
@@ -2819,8 +2819,8 @@ void ProcessEnemyBikerTaunt( void )
 	}
 }
 
-#define TAUNT_OVERIDE_DISTANCE_FACTOR 2.0F
-#define MAX_TAUNT_DISTANCE 2240.0F 
+constexpr float TAUNT_OVERIDE_DISTANCE_FACTOR = 2.0F;
+constexpr float MAX_TAUNT_DISTANCE = 2240.0F;
 
 void SendBikerTaunt()
 {

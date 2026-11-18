@@ -252,8 +252,8 @@ bool platform_init(void)
  * Same aspect ratio as the Open Pandora (800x480) which runs Forsaken
  * natively at 5:3 without any letterboxing.  Render at the full native
  * resolution for maximum screen utilisation. */
-#define SCREEN_WIDTH        400
-#define SCREEN_HEIGHT       240
+constexpr int SCREEN_WIDTH = 400;
+constexpr int SCREEN_HEIGHT = 240;
 
 bool platform_init_video(void)
 {

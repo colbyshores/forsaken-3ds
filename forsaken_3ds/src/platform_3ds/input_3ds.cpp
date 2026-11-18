@@ -135,7 +135,7 @@ mouse_state_t* read_mouse(void)
  * The engine expects axis values in the range ±100 (NOT ±32767).
  * The SDL path divides SDL's ±32768 by 327.67 to get ±100.
  * We do the same: map ±155 to ±100. */
-#define CPAD_SCALE  (100.0f / 155.0f)
+constexpr auto CPAD_SCALE = (100.0f / 155.0f);
 
 bool handle_events(void)
 {

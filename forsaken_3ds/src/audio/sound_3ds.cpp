@@ -24,8 +24,8 @@
 
 /* ---- configuration ---- */
 
-#define MAX_CHANNELS 24
-#define MAX_PATH_LEN 500
+constexpr int MAX_CHANNELS = 24;
+constexpr int MAX_PATH_LEN = 500;
 
 bool Sound3D = false;
 /* sound_minimum_volume is defined in sfx.cpp (always-compiled owner). */
@@ -62,7 +62,7 @@ struct sound_source_t {
  *
  * When all SFX slots are full, alloc evicts the OLDEST-allocated channel
  * (round-robin replacement) so a new gunshot doesn't get silently dropped. */
-#define MAX_SFX_VOICES 8
+constexpr int MAX_SFX_VOICES = 8;
 static bool       channel_used[MAX_CHANNELS];
 static u_int64_t  channel_alloc_time[MAX_CHANNELS];
 static u_int64_t  s_alloc_seq = 0;
