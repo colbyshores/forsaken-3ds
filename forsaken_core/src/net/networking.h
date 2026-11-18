@@ -220,7 +220,6 @@ typedef struct _VERYSHORTPICKUPINFO
 }VERYSHORTPICKUPINFO; // 28
 
 
-
 typedef struct _KILLPICKUPINFO
 {
 	u_int16_t		Owner;
@@ -336,7 +335,6 @@ typedef struct _SHORTSHIPHIT
 }SHORTSHIPHIT;
 
 
-
 typedef struct _SETTIME
 {
 	float		Time;
@@ -407,7 +405,6 @@ typedef struct _GLOBALSHIP
 	u_int16_t		RealGroup;
 
 } GLOBALSHIP, *LPGLOBALSHIP;
-
 
 
 /*		this is all that really needs to be sent	*/
@@ -1002,7 +999,6 @@ void DemoPlayingNetworkGameUpdate(void);
 int FindSameLevel( char * Name );
 void	RequestTime( void  );
 void	SetTime( float Time );
-void Demo_fwrite( const void *buffer, size_t size, size_t count , FILE *stream );
 void StopDemoRecording( void );
 
 void set_my_player_name( void );
@@ -1024,11 +1020,9 @@ extern u_int32_t CurrentBytesPerSecRec;
 extern u_int32_t CurrentBytesPerSecSent;
 extern u_int32_t MaxCurrentBytesPerSecRec;
 extern u_int32_t MaxCurrentBytesPerSecSent;
-extern BYTE PreDemoEndMyGameStatus;
 extern int16_t NextworkOldBikeNum;
 extern int16_t MaxKills;
 extern BYTE OverallGameStatus;
-extern bool RemoteCameraActive;
 extern int16_t NamesAreLegal;
 extern bool JustPickedUpShield;
 extern MISSEDPICKUPMSG MissedPickups[ MAXMISSEDPICKUPS ];

@@ -35,9 +35,7 @@ typedef enum {
 } HunkTag;
 
 bool   Hunk_Init(size_t bytes);
-void   Hunk_Shutdown(void);
 
 void * Hunk_Alloc(HunkTag tag, size_t size);
 void   Hunk_FreeAll(HunkTag tag);
 
-size_t Hunk_Used(HunkTag tag);

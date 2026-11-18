@@ -195,7 +195,6 @@ constexpr int AXISTEST_PtrWidth = 30;
 float AxisPtr_ymin, AxisPtr_ymax, AxisPtr_mid;
 constexpr int JOYCONFIG_SelectAction = 0;
 constexpr int JOYCONFIG_AssignButton = 1;
-int JoystickConfigState;
 
 bool InTitleRoom;
 
@@ -830,10 +829,7 @@ char EnemiesKilledText[ 64 ];
 char TimeTakenText[ 64 ];
 char GameCompleteText[ 256 ];
 			       
-const char *GameCompleteWithoutCrystals			= LT_GameCompleteWithoutCrystals			/* "well done. You completed all the levels but you didn't get all the crystals. You'll have to do it all over again if you want to be properly rewarded."*/;
 const char *GameCompleteGotAllCrystalsSoFar		= LT_GameCompleteGotAllCrystalsSoFar		/* "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award."*/;
-const char *GameCompleteWithAllCrystals			= LT_GameCompleteWithAllCrystals			/* "well done, you got all the crystals. You get the secret biker."*/; 
-const char *GameCompleteWithAllCrystalsExceptLast = LT_GameCompleteWithAllCrystalsExceptLast	/* "well you got through the secret level, but you didn't get the final crystal. Better luck next time."*/;
 const char *GameCompleteWithCheating				= LT_GameCompleteWithCheating				/* "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"*/;
 const char *GameCompleteAdditionalLevels			= LT_GameCompleteAdditionalLevels			/* "congratulations. You have completed all the currently installed additional levels. Look out for further mission packs!!"*/;
 
@@ -1113,8 +1109,6 @@ MENU	MENU_NEW_CreateGame = {
 	}
 };
 
-MENUITEM MENU_ITEM_IdiotText = 
-		{ 0, 150, 200, 170, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_CentreY,  NULL, NULL, NULL, NULL, NULL, 0  };
 
 MENU	MENU_NEW_PrimaryOrder = {
 	(u_int8_t*)"", NULL, StoreWeaponOrder, NULL, 0,
@@ -1570,23 +1564,6 @@ MENU	MENU_NEW_JoinWaitingToStart = {
 	}
 };
 
-MENU	MENU_NEW_GetTeamPlayers = {
-	(u_int8_t*)"" , GetInitialPlayers, BailMultiplayer , CheckForMenuChange, 0,
-	{
-
-		{ 0, 0, 200, 10, 0, (u_int8_t*)LT_MENU_NEW_GetTeamPlayers0 /*"waiting for host..."*/, FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,  NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0  },
-		{ 5, 27, 100, 37, SLIDER_Value, (u_int8_t*)LT_MENU_NEW_GetTeamPlayers1 /*"Num of Players"*/, FONT_Small, TEXTFLAG_CentreY, &NumOfPlayersSlider, NULL, NULL, DrawFlatMenuSlider, NULL, 0 },
-		{ 5, 40, 100, 165, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY , &PlayersList, NULL , NULL , DrawFlatMenuList, NULL, 0 } ,
-
-		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 155, 25, 162, 0, (u_int8_t*)LT_MENU_NEW_GetTeamPlayers2 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
-
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
-	}
-};
 
 void JoiningExit(MENU * /*Menu*/)
 {
@@ -2074,14 +2051,6 @@ MENU	MENU_NEW_Start = {
 	}
 };
 
-MENU	MENU_STATS_Start = {
-	(u_int8_t*)"a", InitStartMenu, NULL, NULL, TITLE_TIMER_NormalPanToRightVDU,
-	{
-		{ 0, 0, 200, 20, 0, (u_int8_t*)"press enter", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , GoToNextLevel , DrawFlatMenuItem, NULL, 0 } ,
-		
-		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0, NULL, NULL, NULL, NULL, NULL, 0 }
-	}
-};
 
 px_timer_t quick_text_timer;
 bool quick_text_timer_initialized = false;
@@ -2217,31 +2186,6 @@ MENU	MENU_NEW_WatchTeamSelect = {
 	}
 };
 
-MENU  MENU_NEW_ChooseTeamForExistingGame = {
-	(u_int8_t*)"" , InitExistingGameJoin , BailMultiplayerFrontEnd , DistributeTeamsToLists, 0,
-	{
-		{ 0, 0, 200, 15, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame0 /*"select teams"*/, FONT_Large, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL , NULL , DrawFlatMenuItem, NULL, 0 } ,
-		{ 0, 15, 200, 30, 0, (u_int8_t*)"", FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY, NULL, NULL, PlayerConfirm , DrawReadyButton, NULL, 0 } ,
-		{ 5, 30, 50, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame1 /*"Red"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[0], &Team1 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 53, 30, 98, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame2 /*"Green"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[1], &Team2 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 101, 30, 146, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame3 /*"Blue"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[2], &Team3 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 149, 30, 194, 40, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame4 /*"Yellow"*/,  FONT_Small,TEXTFLAG_ForceFit | TEXTFLAG_CentreX | TEXTFLAG_CentreY | TEXTFLAG_TeamItem, &TeamList[3], &Team4 , SelectTeamList, DrawFlatMenuItem, NULL, 0 } ,
-		{ 5, 45, 50, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame5 /*"Red"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[0], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 53, 45, 98, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame6 /*"Green"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[1], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 101, 45, 146, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame7 /*"Blue"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[2], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-		{ 149, 45, 194, 126, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame8 /*"Yellow"*/,  FONT_Small, TEXTFLAG_Unselectable | TEXTFLAG_SuppressHighlight | TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TeamList[3], NULL , SelectList, DrawFlatMenuList, NULL, 0 } ,
-
-		{ 5, 126, 200, 133, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[3], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 133, 200, 140, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[2], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 140, 200, 147, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[1], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-		{ 5, 147, 200, 154, 0, (u_int8_t*)"", FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, (void *)TitleMessage[0], NULL , NULL , DrawFlatMenuName, NULL, 0 } ,
-
-		{ 5, 155, 25, 162, 0, (u_int8_t*)LT_MENU_NEW_ChooseTeamForExistingGame9 /*"msg:"*/, FONT_Small, TEXTFLAG_ForceFit | TEXTFLAG_CentreY | TEXTFLAG_Instant, &TitlePlayerMessage, NULL ,SelectFlatMenutext , DrawFlatMenuText, NULL, 0 } ,
-
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" ,0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
 
 MENUITEM	TeamItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToDoTeamGame", 0, 0,	NULL,	&MENU_Team,	MenuChange,		MenuItemDrawName, NULL, 0 };
 
@@ -2255,14 +2199,6 @@ MENU	MENU_HostWaitingToStart = {
 	}
 };
 
-MENU	MENU_JoinWaitingToStart = {
-	(u_int8_t*)"Waiting for Host" , NULL , BailMultiplayer , NULL, 0,
-	{
-		{ 200, 128, 0, 0, 0, (u_int8_t*)"Num of Players ", 0, 0, &NumOfPlayersSlider, NULL, NULL, DrawSlider, NULL, 0 },
-		{ 200, 128, 0, 0, 0, (u_int8_t*)"", 0, 0, &PlayersList, NULL , NULL , GetPlayersInCurrentSession, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL, NULL , NULL, NULL, 0 }
-	}
-};
 
 MENU	MENU_Host = {
 	(u_int8_t*)"Hosting a MultiPlayer Game" , InitMultiplayerHost , NULL , NULL, 0,
@@ -2288,9 +2224,7 @@ MENU	MENU_LevelSelect = {
 };
 
 
-MENUITEM	JoinItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_JoinWaitingToStart,	MenuChange,		MenuItemDrawName, NULL, 0 };
 MENUITEM	NewJoinItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_JoinWaitingToStart,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
-MENUITEM	WatchTeamSelectionItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_Team,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
 
 						
 MENU	MENU_ChooseSessionToJoin = {
@@ -2317,48 +2251,6 @@ MENU	MENU_SaveGame = {
 	}
 };
 
-MENU	MENU_WeaponPriority =
-{
-	(u_int8_t*)"Weapon Priority", NULL, NULL, NULL, 0,
-	{
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-MENU	MENU_WeaponKeys =
-{
-	(u_int8_t*)"Weapon Selection", NULL, NULL, NULL, 0,
-	{
-		KEYDEF( 32, 112,(u_int8_t*)"Pulsar", (void *)&Config.select_primary[ PULSAR ] ),
-		KEYDEF( 32, 128,(u_int8_t*)"Trojax", (void *)&Config.select_primary[ TROJAX ] ),
-		KEYDEF( 32, 144,(u_int8_t*)"Suss Gun", (void *)&Config.select_primary[ SUSS_GUN ] ),
-		KEYDEF( 32, 160,(u_int8_t*)"Transpulse", (void *)&Config.select_primary[ TRANSPULSE_CANNON ] ),
-		KEYDEF( 32, 176,(u_int8_t*)"Pyrolite", (void *)&Config.select_primary[ PYROLITE_RIFLE ] ),
-		KEYDEF( 32, 192,(u_int8_t*)"Beam Laser", (void *)&Config.select_primary[ LASER ] ),
-		
-		KEYDEF( 32, 224,(u_int8_t*)"Next Prim", (void *)&Config.select_next_primary ),
-		KEYDEF( 32, 240,(u_int8_t*)"Prev Prim", (void *)&Config.select_prev_primary ),
-		
-		KEYDEF( 32, 272,(u_int8_t*)"Next Sec", (void *)&Config.select_next_secondary ),
-		KEYDEF( 32, 288,(u_int8_t*)"Prev Sec", (void *)&Config.select_prev_secondary ),
-		
-		KEYDEF( 352, 112, (u_int8_t*)"Mug Missile", (void *)&Config.select_secondary[ MUGMISSILE ] ),
-		KEYDEF( 352, 128,(u_int8_t*)"Solaris", (void *)&Config.select_secondary[ SOLARISMISSILE ] ),
-		KEYDEF( 352, 160, (u_int8_t*)"Scatter", (void *)&Config.select_secondary[ SCATTERMISSILE ] ),
-		KEYDEF( 352, 176, (u_int8_t*)"Gravgon", (void *)&Config.select_secondary[ GRAVGONMISSILE ] ),
-		KEYDEF( 352, 192, (u_int8_t*)"MFRL", (void *)&Config.select_secondary[ MULTIPLEMISSILE ] ),
-		KEYDEF( 352, 208, (u_int8_t*)"Titan Star", (void *)&Config.select_secondary[ TITANSTARMISSILE ] ),
-		KEYDEF( 352, 224, (u_int8_t*)"Thief Missile", (void *)&Config.select_secondary[ THIEFMISSILE ] ),
-
-		KEYDEF( 352, 256, (u_int8_t*)"Purge Mine", (void *)&Config.select_secondary[ PURGEMINE ] ),
-		KEYDEF( 352, 272, (u_int8_t*)"Pine Mine", (void *)&Config.select_secondary[ PINEMINE ] ),
-		KEYDEF( 352, 288, (u_int8_t*)"Quantum Mine", (void *)&Config.select_secondary[ QUANTUMMINE ] ),
-		KEYDEF( 352, 304, (u_int8_t*)"Spider Mine", (void *)&Config.select_secondary[ SPIDERMINE ] ),
-
-
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
 
 MENU	MENU_Keyboard =
 {
@@ -2756,25 +2648,6 @@ MENU	MENU_DebugHelp =
 	}
 };
 
-MENU	MENU_Help =
-{
-	(u_int8_t*)LT_MENU_Help0/*"In-Game Help"*/, NULL, NULL, NULL, 0,
-	{							 
-		HELPKEY( 200, 112, (void*)"ESC",(u_int8_t*)LT_MENU_Help1	/*"Toggle menu"*/ ),
-		HELPKEY( 200, 128, (void*)"F1", (u_int8_t*)LT_MENU_Help2	/*"Toggle help screen" */),
-		HELPKEY( 200, 144, (void*)"F2", (u_int8_t*)LT_MENU_Help3	/*"Increase window size" */),
-		HELPKEY( 200, 160, (void*)"F3", (u_int8_t*)LT_MENU_Help4	/*"Decrease window size" */),
-		HELPKEY( 200, 176, (void*)"F4", (u_int8_t*)LT_MENU_Help5	/*"Toggle panel text" */),
-		HELPKEY( 200, 192, (void*)"F5", (u_int8_t*)LT_MENU_Help6	/*"Toggle remote camera"*/ ),
-		HELPKEY( 200, 208, (void*)"F6", (u_int8_t*)LT_MENU_Help7	/*"Toggle rear camera" */),
-		HELPKEY( 200, 224, (void*)"F7", (u_int8_t*)LT_MENU_Help8	/*"Toggle missile camera"*/ ),
-		HELPKEY( 200, 240, (void*)"F8", (u_int8_t*)LT_MENU_Help9	/*"Toggle player names" */),
-
-		{ 200, 272, 0, 0, 0, (u_int8_t*)LT_MENU_Help10/*"Return to game"*/, 0, 0, NULL, NULL, MenuItemBack, MenuItemDrawName, NULL, 0 },
-
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
 
 const char *BikerText[MAXBIKETYPES] =
 {
@@ -2960,8 +2833,6 @@ EXCLUDEDVERTICES VduScreenExcluded = {0, 1, EXCLUDE_ALL, {0}};
 
 int HoloTintVerts[24] = {10, 13, 17, 21, 25, 29, 33, 37, 41, 45, 49, 53, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55};
 
-float BikeAlpha = 1.0F;
-float BikeCol = 0.5F;
 
 /***************
 new text globals
@@ -3004,7 +2875,6 @@ bool BikeLoaded;
 float CurrentOffset;
 bool BikeOnSwap;
 
-bool BikeExpanded = false;
 
 /**************
 new event globals
@@ -3030,7 +2900,7 @@ int		StackJudderNum;
 float	StackRotAmount;
 float	OldStackRotAmount;
 
-float BikeSwapScale, OldBikeSwapScale;
+float BikeSwapScale;
 
 float SelectedBikeScale, OldSelectedBikeScale;
 int	OldSelectedBike;
@@ -3047,23 +2917,14 @@ bool ListRedrawReq;
 int OldMenuStatus;
 
 // customisable display messages
-const char *ToggleColourRed = LT_RED;
-const char *ToggleColourBlue = LT_BLUE;
-const char *ToggleColourDisabled = LT_DISABLED;
 
 
 const char *ToggleStatusOn = LT_ToggleStatusOn;
 const char *ToggleStatusOff = LT_ToggleStatusOff;
-const char *ToggleStatusShooter = LT_ToggleStatusShooter;	// collision perspective
-const char *ToggleStatusTarget = LT_ToggleStatusTarget;
 const char *RadioBtnSelected = "*";
 const char *RadioBtnNotSelected = "";
 const char *EmptyString = "";
 const char *UndefinedKey = LT_Undef;
-const char *WeaponSelectFirst = "Use arrow keys to select weapon to move then press enter";
-const char *WeaponSelectSecond = "use right arrow to place item in unused list~"
-					"use left arrow to place item in used list~"
-					"or use up/down arrows to change position, then press enter to place";
 const char *WaitingForConfirm = LT_SelectWhenReady;
 const char *WaitingForReset = LT_WaitingForReset;
 int MAXSLIDERINFOLENGTH = 32;
@@ -11753,49 +11614,6 @@ void KillLevelPic( MENU * /*Menu*/ )
 	}
 }
 
-void GetTVCoords( POLY *poly, float zoffset )
-{
-	int g, e, vert;
-	LPLVERTEX VertPtr;
-
-	for ( g = 0; g < ModelHeaders[ TITLE_MODEL_MenuTV ].num_groups; g++ )
-	{
-		for ( e = 0; e < ModelHeaders[ TITLE_MODEL_MenuTV ].Group[ g ].num_execbufs; e++ )
-		{
-			if ( ModelHeaders[ TITLE_MODEL_MenuTV ].Group[ g ].polyanim[ e ]->vertices )
-			{
-				for ( vert = 0; vert < ModelHeaders[ TITLE_MODEL_MenuTV ].Group[ g ].polyanim[ e ]->vertices; vert++ )
-				{
-					VertPtr = &ModelHeaders[ TITLE_MODEL_MenuTV ].Group[ g ].originalVerts[ e ][ ModelHeaders[ TITLE_MODEL_MenuTV ].Group[ g ].polyanim[ e ]->vert[ vert ] ];
-					
-					switch( vert )
-					{
-						case 0:
-							poly->Pos1.x = VertPtr->x;
-							poly->Pos1.y = VertPtr->y;
-							poly->Pos1.z = VertPtr->z + zoffset;
-							break;
-						case 1:
-							poly->Pos2.x = VertPtr->x;
-							poly->Pos2.y = VertPtr->y;
-							poly->Pos2.z = VertPtr->z + zoffset;
-							break;
-						case 2:
-							poly->Pos3.x = VertPtr->x;
-							poly->Pos3.y = VertPtr->y;
-							poly->Pos3.z = VertPtr->z + zoffset;
-							break;
-						case 3:
-							poly->Pos4.x = VertPtr->x;
-							poly->Pos4.y = VertPtr->y;
-							poly->Pos4.z = VertPtr->z + zoffset;
-							break;
-					}
-				}
-			}
-		}
-	}
-}
 
 bool LoadGeneralPic(float xmin, float ymin, float xmax, float ymax, FRAME_INFO **header, int *frame, u_int16_t *scrpoly, bool *displayed)
 {
@@ -13539,10 +13357,6 @@ void InGameSaveASinglePlayerGame( MENUITEM *item )
 }
 
 
-void DebugLastError( void )
-{
-}
-
 void SaveMacros( MENUITEM * /*Item*/ )
 {
 	strcpy( player_config->macro1, MacroText1.text ); 
@@ -14000,7 +13814,6 @@ void InitTitleMessaging( void )
 
 	TitlePlayerMessage.text[ 0 ] = 0;
 }
-
 
 
 void WatchPlayerSelected( MENUITEM * /*Item*/)

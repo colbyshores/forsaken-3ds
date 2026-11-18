@@ -46,7 +46,6 @@ bool MyResetKillsPerLevel;
 bool IpOnCLI = false;
 
 
-
 /*
  * Globals to this module
  */
@@ -386,12 +385,6 @@ void InitTeamLists( MENU * /*Menu*/ )
 		PlayerReady[ i ] = false;
 }
 
-void InitExistingGameJoin( MENU * /*Menu*/ )
-{
-	InitTeamLists( NULL );
-
-	InitTitleMessaging();
-}
 
 /*===================================================================
 	Procedure	:	Set the Team player lists..
@@ -432,13 +425,6 @@ void InitTeamSelection( MENU *Menu )
 	InitTitleMessaging();
 }
 
-void CheckForMenuChange(int * /*dummy*/)
-{
-	if (TeamNumber[0] != 255)
-		MenuChange( &WatchTeamSelectionItem );
-
-	GetPlayersInCurrentSession ( NULL );
-}
 
 void DistributeTeamsToLists(int * /*dummy*/)
 {

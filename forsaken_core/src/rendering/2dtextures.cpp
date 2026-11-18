@@ -158,13 +158,6 @@ OFF_FILES Title_OffsetFiles[] = {
 	{ NULL,					NULL, DO_LOAD, DO_SCALE, LOAD_TPAGES_FINISH, 0, 0 },			  
 };
 
-OFF_FILES Splash_OffsetFiles[] = {
-	{ (int8_t*)"Credits.off", &CreditsFont_Header,	DO_LOAD,	DONT_SCALE, LOAD_TPAGES, 0, 0 },	// Credits Font
-	{ (int8_t*)"Bubble.off", &Drip_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 },				// Drip
-	{ (int8_t*)"bits.off", &Bits_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 },				// Bits
-	{ (int8_t*)"flare.off", &Flare_Header, DO_LOAD, DONT_SCALE, LOAD_TPAGES, 0, 0 },				// Flare
-	{ NULL, NULL, DO_SCALE, DO_SCALE, LOAD_TPAGES_FINISH, 0, 0 },			  
-};
 
 typedef struct
 {

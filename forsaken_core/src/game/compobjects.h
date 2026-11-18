@@ -205,7 +205,6 @@ void UpdateCompObjColours( COMP_OBJ * Children, int16_t NumChildren, int Red, in
 void UpdateCompObjClipGroup( COMP_OBJ * Children, int16_t NumChildren, u_int16_t ClipGroup );
 void MaximizeBoundingBox( VECTOR * TopLeft, VECTOR * BottomRight );
 void SetCompObjRealLighting( COMP_OBJ * Children, int16_t NumChildren, float Radius );
-void ClearCompObjRealLighting( COMP_OBJ * Children, int16_t NumChildren );
 bool AmIInvulnerable( COMP_OBJ * Children, int16_t NumChildren, float Time );
 void UpdateCompObjFlags( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Flags );
 FILE * SaveAllCompObj( FILE * fp, COMP_OBJ * Children, int16_t NumChildren );

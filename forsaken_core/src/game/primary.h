@@ -298,11 +298,6 @@ u_int8_t GetPrevValidPrimaryWeapon( void );
 int8_t ConvPrimToNormWeapon( int8_t Primary );
 void TogglePrimaryWeapons( int8_t Primary );
 void KillPrimBullsByOwner(  u_int16_t OwnerType, u_int16_t Owner );
-void HostGivemeSuperNashram( u_int16_t Player );
-void HostLoseSuperNashram( u_int16_t Player );
-void HostRestoreWeapons( int16_t Player );
-void HostRestoreAmmo( int16_t Player );
-float GetPrimaryAmmoUsage( int16_t Ship, int8_t Weapon );
 
 /* Defined in primary.cpp; shared with the modules that use it. */
 extern PRIMARYWEAPONATTRIB PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ];

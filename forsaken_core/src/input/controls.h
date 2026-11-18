@@ -179,7 +179,6 @@ ReadInput( void );
 
 void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum);
 void SetUpJoystickAxis(int joystick);
-bool IsJoystickButtonPressed( int joysticknum );
 bool IsJoystickButtonReleased( int joysticknum );
 bool IsAnyJoystickButtonReleased( void );
 int ToggleGodMode( char *cheat );
@@ -188,7 +187,6 @@ void ProcessMenuFlashText( void );
 void DisableCheats( void );
 
 /* Defined in controls.cpp; shared with the modules that use it. */
-extern const char *JoystickPOVDirections[ MAX_POV_DIRECTIONS ];
 extern bool FullRearView;
 extern bool ShowStats;
 extern bool ShowMessages;

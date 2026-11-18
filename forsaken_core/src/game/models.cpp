@@ -51,9 +51,6 @@ constexpr int NUMBIKEDETAILS = 4;
 	Globals
 ===================================================================*/
 void CheckModelLinkList( void );
-void CreateTracker( void );
-u_int16_t	Tracker = (u_int16_t) -1;
-u_int16_t	TrackerTarget = (u_int16_t) -1;
 MODEL	Models[MAXNUMOFMODELS];
 u_int16_t	FirstModelUsed;
 u_int16_t	FirstModelFree;
@@ -62,7 +59,6 @@ static u_int32_t ModelVisGeneration;
 int16_t	NextNewModel = -1;
 bool	ShowBoundingBoxes = false;
 
-int8_t	*	ModelPath = (int8_t*)"data\\models\\";
 
 /* Pointer to a TAG_LEVEL hunk allocation, sized at level load to
  * the active model count (see PreInitModel). Was a static
@@ -2841,80 +2837,6 @@ bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u
 	return true;
 }
 
-/*===================================================================
-	Procedure	:	Create Tracker
-	Input		:	Nothing
-	Output		:	Nothing
-===================================================================*/
-void CreateTracker( void )
-{
-	u_int16_t	Model;
-
-	Model =	FindFreeModel();
-
-	if( Model != (u_int16_t ) -1 )
-	{
-		Models[ Model ].OwnerType = OWNER_NOBODY;
-		Models[ Model ].Owner = 0;
-		Models[ Model ].ModelNum = MODEL_Tracker;
-		Models[ Model ].Type = MODTYPE_Missile;
-		Models[ Model ].Flags = MODFLAG_Clip;
-		Models[ Model ].Visible = true;
-		Models[ Model ].Pos = Ships[ WhoIAm ].Object.Pos;
-		Models[ Model ].Dir.x = 0.0F;
-		Models[ Model ].Dir.y = 0.0F;
-		Models[ Model ].Dir.z = 0.0F;
-		Models[ Model ].Rot.x = 0.0F;
-		Models[ Model ].Rot.y = 0.0F;
-		Models[ Model ].Rot.z = 0.0F;
-		Models[ Model ].Quat.w = 1.0F;
-		Models[ Model ].Quat.x = 0.0F;
-		Models[ Model ].Quat.y = 0.0F;
-		Models[ Model ].Quat.z = 0.0F;
-		Models[ Model ].Mat = MATRIX_Identity;
-		MatrixTranspose( &Models[ Model ].Mat, &Models[ Model ].InvMat );
-		Models[ Model ].Func = MODFUNC_Nothing;
-		Models[ Model ].Scale = 1.0F;
-		Models[ Model ].MaxScale = 1.0F;
-		Models[ Model ].Group = Ships[ WhoIAm ].Object.Group;
-		Models[ Model ].LifeCount = (float) -0.0F;
-	}
-
-	Tracker = Model;
-
-	Model =	FindFreeModel();
-
-	if( Model != (u_int16_t ) -1 )
-	{
-		Models[ Model ].OwnerType = OWNER_NOBODY;
-		Models[ Model ].Owner = 0;
-		Models[ Model ].ModelNum = MODEL_Ping;
-		Models[ Model ].Type = MODTYPE_Missile;
-		Models[ Model ].Flags = MODFLAG_Clip;
-		Models[ Model ].Visible = true;
-		Models[ Model ].Pos = Ships[ WhoIAm ].Object.Pos;
-		Models[ Model ].Dir.x = 0.0F;
-		Models[ Model ].Dir.y = 0.0F;
-		Models[ Model ].Dir.z = 0.0F;
-		Models[ Model ].Rot.x = 0.0F;
-		Models[ Model ].Rot.y = 0.0F;
-		Models[ Model ].Rot.z = 0.0F;
-		Models[ Model ].Quat.w = 1.0F;
-		Models[ Model ].Quat.x = 0.0F;
-		Models[ Model ].Quat.y = 0.0F;
-		Models[ Model ].Quat.z = 0.0F;
-		Models[ Model ].Mat = MATRIX_Identity;
-		MatrixTranspose( &Models[ Model ].Mat, &Models[ Model ].InvMat );
-		Models[ Model ].Func = MODFUNC_RealScale;
-		Models[ Model ].Scale = 1.0F; //0.125F;
-		Models[ Model ].MaxScale = 1.0F;
-		Models[ Model ].Group = Ships[ WhoIAm ].Object.Group;
-		Models[ Model ].LifeCount = (float) -0.0F;
-	}
-
-	TrackerTarget = Model;
-
-}
 
 /*===================================================================
 	Procedure	:	Light model

@@ -101,7 +101,6 @@ extern FRAME_INFO * GreyFlare_Header;
 extern FRAME_INFO * Flare_Header;
 extern OFF_FILES OffsetFiles[];
 extern OFF_FILES Title_OffsetFiles[];
-extern OFF_FILES Splash_OffsetFiles[];
 extern FRAME_INFO * Circle_Header;
 extern FRAME_INFO * PickupRegen_Header;
 extern FRAME_INFO * Pulsar_Header;

@@ -40,7 +40,6 @@ bool DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam );
 void InitVisiStats( MLOADHEADER *m );
 bool OutputVisiStats( MLOADHEADER *m, char *lname );
 
-bool FindGroupConnections( MLOADHEADER *m );
 void FreeGroupConnections( void );
 GROUPLIST *VisibleGroups( u_int16_t g );
 int VisibleOverlap( u_int16_t g1, u_int16_t g2, u_int16_t *overlapping_group );

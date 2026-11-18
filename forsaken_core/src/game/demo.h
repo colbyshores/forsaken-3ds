@@ -18,8 +18,6 @@ constexpr int MAX_DEMOFILENAME_LENGTH = (80); // must be at least MAX_DEMONAME_L
 #define DEMOFILE_EXTENSION		".DMO"
 #define DEMOFILE_SEARCHPATH		DEMOFOLDER "\\*" DEMOFILE_EXTENSION
 
-char *DemoFileName( char *demoname );
 
 /* Defined in demo.cpp; shared with the modules that use it. */
 extern FILE * DemoFp;
-extern FILE * DemoFpClean;

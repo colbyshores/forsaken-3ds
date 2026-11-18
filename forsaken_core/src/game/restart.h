@@ -59,7 +59,6 @@ RESTART * InitOneRestartPoint( u_int16_t Group, VECTOR * Pos, VECTOR * DirVector
 							  COMP_OBJ * CompObj, float OverallTime );
 void ProcessRestartPoints( void );
 void SetupRestartPointGroups( void );
-void AddRestartPointToGroup( RESTART * Object, u_int16_t Group );
 void RemoveRestartPointFromGroup( RESTART * Object, u_int16_t Group );
 void ActivateRestartPoint( u_int16_t NewStartPos, u_int16_t OldStartPos );
 FILE * SaveStartRestartPoints( FILE * fp );

@@ -2223,21 +2223,6 @@ void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group )
 	NumSpotFXPerGroup[ Group ]++;
 }
 
-/*===================================================================
-	Procedure	:	Remove SpotFX from group link list
-	Input		:	SPOTFX	*	SpotFX
-				:	u_int16_t		Group
-	Output		:	Nothing
-===================================================================*/
-void RemoveSpotFXFromGroup( SPOTFX * SpotFX, u_int16_t Group )
-{
-	if( SpotFX->PrevInGroup ) SpotFX->PrevInGroup->NextInGroup = SpotFX->NextInGroup;
-	else SpotFXGroups[ Group ] = SpotFX->NextInGroup;
-	if( SpotFX->NextInGroup ) SpotFX->NextInGroup->PrevInGroup = SpotFX->PrevInGroup;
-	SpotFX->PrevInGroup = NULL;
-	SpotFX->NextInGroup = NULL;
-	NumSpotFXPerGroup[ Group ]--;
-}
 
 /*===================================================================
 	Procedure	:	Save SpotFX Array & Connected Global Variables

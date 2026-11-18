@@ -332,7 +332,6 @@ void NormaliseVector( VECTOR *  v );
 void BuildRotMatrix( float xa, float ya, float za, MATRIX * m );
 void MatrixMultiply( MATRIX * m0, MATRIX * m1, MATRIX * m0m1 );
 void ApplyMatrix( MATRIX * m, VECTOR * v0, VECTOR * v1 );
-void AddMatrixTrans( float xt, float yt, float zt, MATRIX * m );
 
 void ReflectVector( VECTOR * old, NORMAL * normal, VECTOR * new1 );
 
@@ -355,7 +354,6 @@ void CalcViewAxes(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, VECTOR *vx, VECT
 void ScaleMatrix( MATRIX * m, VECTOR * v );
 void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot );
 void spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4);
-void MxV( MATRIX * m, VECTOR * v0, VECTOR * v1 );
 
 /* Defined in new3d.cpp; shared with the modules that use it. */
 extern MATRIX MATRIX_Identity;

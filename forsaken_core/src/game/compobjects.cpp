@@ -47,10 +47,6 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 //#pragma optimize( "gty", on )
 //#endif
 
-/*===================================================================
-	Global Variables
-===================================================================*/
-int8_t * CompObjPath = (int8_t*)"data\\bgobjects\\";
 MODELNAME	*	ModNames = &ModelNames[ 0 ];
 
 /*===================================================================
@@ -1805,34 +1801,6 @@ void SetCompObjRealLighting( COMP_OBJ * Children, int16_t NumChildren, float Rad
 	}
 }
 
-/*===================================================================
-	Procedure	:	Clear components model real lighting flag
-	Input		:	COMP_OBJ	*	Children
-				:	int16_t			NumChildren
-	Output		:	Nothing
-===================================================================*/
-void ClearCompObjRealLighting( COMP_OBJ * Children, int16_t NumChildren )
-{
-	int16_t	Count;
-
-	if( Children )
-	{
-		for( Count = 0; Count < NumChildren; Count++ )
-		{
-			if( Children->ModelIndex != (u_int16_t) -1 )
-			{
-				Models[ Children->ModelIndex ].Flags &= ~MODFLAG_RealLight;
-			}
-
-			if( Children->NumChildren && Children->Children )
-			{
-				ClearCompObjRealLighting( Children->Children, Children->NumChildren );
-			}
-
-			Children++;
-		}
-	}
-}
 
 /*===================================================================
 	Procedure	:	Maximize Bounding box

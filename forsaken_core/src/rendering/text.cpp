@@ -91,7 +91,6 @@ const char * TextMessagesPnt[MAXTEXTMESSAGES];
 char * TextMessages = NULL;
 TEXTMSGINFO * TextMsgInfo = NULL;
 
-STATSMESSAGE StatsMessages[MAX_STATS_MESSAGES];
 
 /*===================================================================
 	Procedure	:		Print a int16_t number in small 4x4 chars..
@@ -186,22 +185,6 @@ void CenterPrint4x5Text2( char * Text , int x, int y, int col )
 	Print4x5Text( Text , x , y , col );
 }
 
-/*===================================================================
-	Procedure	:		Print some Right Justified text at a specified Y
-	Input		:		char * Text, int x , int y , int col
-	Output		:		nothing
-===================================================================*/
-void RightJustifyPrint4x5Text( const char * Text , int x , int y, int col )
-{
-	const char * Text2;
-	int	i;
-
-	Text2 = Text;
-	i = 0;
-	while( *Text2++ != 0 ) i++;
-	x = x - (i * FontWidth);
-	Print4x5Text( Text , x , y , col );
-}
 
 void Print4x5TextSmall( char * Text , int x , int y , int color )
 {
@@ -885,13 +868,6 @@ typedef struct {
 	const char *keyword;
 	void *var_ptr;
 } MESSAGE_VAR_LOOKUP;
-
-
-void InitStatsMessages( void )
-{
-
-
-}
 
 
 /*===================================================================

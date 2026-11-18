@@ -142,10 +142,3 @@ void config_set_str(const char *opt, const char * str)
 	lua_pop(L1, 1);
 }
 
-void config_set_strn(const char *opt, char* str, size_t size)
-{
-	lua_getglobal(L1, "config");
-	lua_pushlstring(L1, str, size);
-	lua_setfield(L1, -2, opt);
-	lua_pop(L1, 1);
-}

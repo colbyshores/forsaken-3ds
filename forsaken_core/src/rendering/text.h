@@ -69,7 +69,6 @@ void MessageQuePrint( void );
 void PlayerMessageQuePrint( void );
 void AddColourMessageToQue(  int Colour, const char * Text, ... );
 void AddPlayerMessageToQue( int Colour, const char * Text, ... );
-void RightJustifyPrint4x5Text( const char * Text , int x , int y, int color );
 void InitTextMessages( void );
 
 void InitFont( void );
@@ -90,7 +89,6 @@ FILE * SaveAllText( FILE * fp );
 void DisplayConnectionStatus( int num , int x , int y);
 
 
-
 // if you add a color then up this count...
 constexpr int MAXFONTCOLOURS = 11;
 
@@ -108,7 +106,6 @@ typedef enum {
  BLACK,
  WHITE
 } colors_t;
-
 
 
 /* Defined in text.cpp; shared with the modules that use it. */

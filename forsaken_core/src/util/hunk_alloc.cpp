@@ -43,7 +43,7 @@ constexpr size_t align_up(size_t x)
  * grows from the low end, TAG_LEVEL from the high end; the tags
  * meet in the middle and allocation fails when they would cross. */
 struct Hunk {
-    char  *base  = nullptr;   /* owned buffer, freed by shutdown() */
+    char  *base  = nullptr;   /* owned buffer, for the life of the process */
     size_t total = 0;
     size_t low   = 0;         /* TAG_STARTUP cursor: bytes used from low end */
     size_t high  = 0;         /* TAG_LEVEL   cursor: bytes used from high end */
@@ -57,13 +57,6 @@ struct Hunk {
         total = bytes;
         low = high = 0;
         return true;
-    }
-
-    void shutdown()
-    {
-        free(base);
-        base = nullptr;
-        total = low = high = 0;
     }
 
     void *alloc(HunkTag tag, size_t size)
@@ -89,8 +82,6 @@ struct Hunk {
         else                    high = 0;
     }
 
-    size_t used(HunkTag tag) const { return tag == TAG_STARTUP ? low : high; }
-    size_t available() const { return total - low - high; }
 };
 
 Hunk g_hunk;
@@ -98,7 +89,5 @@ Hunk g_hunk;
 } // namespace
 
 bool Hunk_Init(size_t bytes) { return g_hunk.init(bytes); }
-void Hunk_Shutdown(void) { g_hunk.shutdown(); }
 void *Hunk_Alloc(HunkTag tag, size_t size) { return g_hunk.alloc(tag, size); }
 void Hunk_FreeAll(HunkTag tag) { g_hunk.free_all(tag); }
-size_t Hunk_Used(HunkTag tag) { return g_hunk.used(tag); }

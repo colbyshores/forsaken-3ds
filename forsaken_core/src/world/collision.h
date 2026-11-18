@@ -34,7 +34,6 @@ constexpr float SCALE_FUDGE = (1.015F);
  */
 
 
-
 typedef struct MCLOADHEADER{
 	int		state;
 	char * Buffer;
@@ -44,13 +43,11 @@ typedef struct MCLOADHEADER{
 }MCLOADHEADER;
 
 
-
 /*
  * fn prototypes
  */
 
 bool MCload( char * Filename , MCLOADHEADER * MCloadheader );
-bool ColRayPolyIntersect( MCFACE *face );
 bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 					  VECTOR *StartPos, u_int16_t StartGroup, VECTOR *MoveOffset, 
 					  VECTOR *EndPos, u_int16_t *EndGroup,

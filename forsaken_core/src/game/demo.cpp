@@ -30,22 +30,4 @@
 #include "rendering/screenpolys.h"
 
 FILE	*	DemoFp = NULL;
-FILE	*	DemoFpClean = NULL;
 
-char *DemoFileName( char *demoname )
-{
-	static char filename[ MAX_DEMOFILENAME_LENGTH  ];
-	char *dmo;
-
-	folder_exists( DEMOFOLDER );
-	strcpy( filename, DEMOFOLDER );
-	strncat( filename, "\\", MAX_DEMONAME_LENGTH );
-	strncat( filename, demoname, MAX_DEMONAME_LENGTH );
-	filename[ strlen( DEMOFOLDER ) + 1 + MAX_DEMONAME_LENGTH ] = 0;
-	strtoupper( filename );
-	dmo = strstr( filename, DEMOFILE_EXTENSION );
-	if ( !dmo )
-		strcat( filename, DEMOFILE_EXTENSION );
-
-	return filename;
-}

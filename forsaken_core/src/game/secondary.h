@@ -289,7 +289,6 @@ u_int8_t GetPrevValidSecondaryWeapon( void );
 int8_t ConvSecToNormWeapon( int8_t Secondary );
 void ToggleSecondaryWeapons( int8_t Secondary );
 
-int16_t HostGenerateSecondaryPickups( u_int16_t Ship, int16_t NumAllowed );
 
 /* Defined in secondary.cpp; shared with the modules that use it. */
 extern SECONDARYWEAPONATTRIB SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ];

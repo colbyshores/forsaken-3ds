@@ -730,20 +730,6 @@ void SetupRestartPointGroups( void )
 	}
 }
 
-/*===================================================================
-	Procedure	:	Add RestartPoint to group link list
-	Input		:	RESTART	*	RestartPoint
-				:	u_int16_t		Group
-	Output		:	Nothing
-===================================================================*/
-void AddRestartPointToGroup( RESTART * Object, u_int16_t Group )
-{
-	Object->PrevInGroup = NULL;
-	Object->NextInGroup = RestartPointGroups[ Group ];
-	if( Object->NextInGroup ) Object->NextInGroup->PrevInGroup = Object;
-	RestartPointGroups[ Group ] = Object;
-	NumRestartPointsPerGroup[ Group ]++;
-}
 
 /*===================================================================
 	Procedure	:	Remove RestartPoint from group link list

@@ -2774,26 +2774,6 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 
 constexpr float TAUNT_PAUSE = 5.0F;
 float ProcessTauntPause = TAUNT_PAUSE;
-void ProcessTaunt( void )
-{
-	if ( !TauntID || !TauntUpdatable || Taunter == 0xFF )
-	{
-		return;							 
-	}
-
-	ProcessTauntPause -= framelag;
-	
-	if ( ProcessTauntPause < 0.0F )
-	{
-		ProcessTauntPause = TAUNT_PAUSE;
-		if ( !UpdateTaunt( TauntID, Ships[ Taunter ].Object.Group, &Ships[ Taunter ].Object.Pos ) )
-		{
-			TauntID = 0;	// shouldn't be needed
-			Taunter = 0xFF;
-			TauntUpdatable = false;
-		}
-	}
-}
 
 void ProcessEnemyBikerTaunt( void )
 {
@@ -2821,25 +2801,6 @@ void ProcessEnemyBikerTaunt( void )
 constexpr float TAUNT_OVERIDE_DISTANCE_FACTOR = 2.0F;
 constexpr float MAX_TAUNT_DISTANCE = 2240.0F;
 
-void SendBikerTaunt()
-{
-	float dist;
-	int i;
-
-	// for every player in the game
-	for(i = 0; i < MAX_PLAYERS; i++)
-	{
-		// excluding myself and those who aren't in normal mode
-		if((GameStatus[ i ] ==  0x0a/*STATUS_NORMAL*/) && (i != WhoIAm))
-		{
-			// if they are close to me
-			dist = ReturnDistanceVolumeVector( &Ships[ i ].Object.Pos, Ships[ i ].Object.Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, NULL, NULL );
-			if( (dist >= 0.0F) && ( dist <= MAX_TAUNT_DISTANCE ))
-				// send them speech taunt
-				SendGameMessage(MSG_TEXTMSG, Ships[i].network_player, WhoIAm, TEXTMSGTYPE_SpeechTaunt, 0);
-		}
-	}
-}
 
 void PlayUpdatableBikerTaunt( VECTOR *pos, u_int16_t Group, u_int16_t bike, char variant )
 {

@@ -35,7 +35,6 @@ XLIGHT	XLights[MAXXLIGHTS];
 u_int16_t	FirstXLightUsed;
 u_int16_t	FirstXLightFree;
 
-WORD	status;		
 
 /*===================================================================
 	Floating Point Cull Mode

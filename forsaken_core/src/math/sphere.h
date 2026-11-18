@@ -15,15 +15,8 @@
 /*===================================================================
 	Prototypes
 
-	Ray/sphere intersection tests. intersect/RaytoSphere return a
-	distance along the ray (0 = miss). All functions are pure:
-	inputs are not modified except the explicit out-parameters.
+	Ray/sphere intersection tests. Both are pure: inputs are not
+	modified except the explicit out-parameters.
 ===================================================================*/
-float isNotZero(float x);
-float solveQuadric(float * c, float * s);
-float closest_intersection(float *x, float x_num);
-float intersect(VECTOR * sphere_pos, float radius , VECTOR * ray_org, VECTOR * ray_dir);
-void  SphereNormal( VECTOR * Pos , VECTOR * Point , float radius , NORMAL * Normal );
-float RaytoSphere(VECTOR * sphere_pos, float radius , VECTOR * ray_org, VECTOR * ray_dir);
 bool RaytoSphere2( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rdir, VECTOR * inter, VECTOR * inter2 );
 bool RaytoSphereShort( VECTOR * sorigin, float radius, VECTOR * rorigin, VECTOR * rdir, float rlength );

@@ -76,8 +76,6 @@ u_int16_t	FirstPrimBullFree;
 float	PrimaryFireDelay = 0.0F;
 float	OrbitFireDelay = 0.0F;
 float	LaserDiameter = ( 40.0F * GLOBAL_SCALE );
-int8_t	PowerString[ 20 ];
-int8_t	LaserString[ 20 ];
 float	PyroliteAmmo = 0.0F;	//MAXPYROLITEAMMO;
 float	SussGunAmmo = 0.0F;		//MAXSUSSGUNAMMO;
 float	GeneralAmmo = MAXGENERALAMMO;
@@ -666,59 +664,6 @@ void RestoreAmmo( void )
 	SecondaryAmmo[ MUGMISSILE ] = 5;
 }
 
-/*===================================================================
-	Procedure	:	Restore ammo to starting amount
-	Input		:	Nothing
-	Output		:	Nothing
-===================================================================*/
-void HostRestoreWeapons( int16_t Player )
-{
-	Host_PrimaryWeaponsGot[ Player ][ PULSAR ] = 1;
-	Host_PrimaryWeaponsGot[ Player ][ TROJAX ] = 0;
-	Host_PrimaryWeaponsGot[ Player ][ PYROLITE_RIFLE ] = 0;
-	Host_PrimaryWeaponsGot[ Player ][ TRANSPULSE_CANNON ] = 0;
-	Host_PrimaryWeaponsGot[ Player ][ SUSS_GUN ] = 0;
-	Host_PrimaryWeaponsGot[ Player ][ LASER ] = 0;
-	Host_PowerLevel[ Player ] = 0;
-	Host_CopyOfPowerLevel[ Player ] = 0;
-	Host_Flags[ Player ] = 0;
-
-	Ships[ Player ].Primary = PULSAR;
-	Ships[ Player ].Secondary = MUGMISSILE;
-	Ships[ Player ].SuperNashramTimer = 0.0F;
-	Ships[ Player ].InvulTimer = 0.0F;
-	Ships[ Player ].StealthTime = 0.0F;
-}
-
-/*===================================================================
-	Procedure	:	Restore ammo to starting amount
-	Input		:	Nothing
-	Output		:	Nothing
-===================================================================*/
-void HostRestoreAmmo( int16_t Player )
-{
-	int16_t	Count;
-
-	Host_PyroliteAmmo[ Player ] = 0.0F;				//MAXPYROLITEAMMO;
-	Host_CopyOfPyroliteAmmo[ Player ] = 0.0F;		//MAXPYROLITEAMMO;
-	Host_SussGunAmmo[ Player ] = 0.0F;				//MAXSUSSGUNAMMO;
-	Host_CopyOfSussGunAmmo[ Player ] = 0.0F;		//MAXSUSSGUNAMMO;
-	Host_GeneralAmmo[ Player ] = MAXGENERALAMMO;
-	Host_CopyOfGeneralAmmo[ Player ] = MAXGENERALAMMO;
-	Host_NitroFuel[ Player ] = 0.0F;
-	Host_CopyOfNitroFuel[ Player ] = 0.0F;
-	Host_NumOfOrbitals[ Player ] = 0;
-	Host_CopyOfNumOfOrbitals[ Player ] = 0;
-
-	for( Count = 0; Count < MAXSECONDARYWEAPONS; Count++ )
-	{
-		Host_SecondaryAmmo[ Player ][ Count ] = 0;
-		Host_SecondaryWeaponsGot[ Player ][ Count ] = 0;
-	}
-
-	Host_SecondaryWeaponsGot[ Player ][ MUGMISSILE ] = 1;
-	Host_SecondaryAmmo[ Player ][ MUGMISSILE ] = 5;
-}
 
 /*===================================================================
 	Procedure	:	Init ammo used to zero
@@ -7935,72 +7880,6 @@ void LoseSuperNashram( void )
 	}
 }
 
-/*===================================================================
-	Procedure	:	Give me Super Nashram weapon
-	Input		:	u_int16_t Player
-	Output		:	Nothing
-===================================================================*/
-void HostGivemeSuperNashram( u_int16_t Player )
-{
-	int16_t	Count;
-
-	if( Player >= ( MAX_PLAYERS + 1 ) ) return;	// Player is unsigned
-
-	Host_CopyOfPowerLevel[ Player ] = Host_PowerLevel[ Player ];
-	Host_CopyOfGeneralAmmo[ Player ] = Host_GeneralAmmo[ Player ];
-	Host_CopyOfSussGunAmmo[ Player ] = Host_SussGunAmmo[ Player ];
-	Host_CopyOfPyroliteAmmo[ Player ] = Host_PyroliteAmmo[ Player ];
-	Host_CopyOfNitroFuel[ Player ] = Host_NitroFuel[ Player ];
-	Host_CopyOfNumOfOrbitals[ Player ] = Host_NumOfOrbitals[ Player ];
-
-	Host_PowerLevel[ Player ] = ( MAXPOWERLEVELS - 1 );
-
-	for( Count = 0; Count <  MAXMULTIPLES; Count++ )
-	{
-		Host_CopyOfOrbAmmo[ Player ][ Count ] = Host_OrbAmmo[ Player ][ Count ];
-	}
-
-	for( Count = 0; Count < 4; Count++ )
-	{
-		Host_OrbAmmo[ Player ][ Count ] = MAXMULTIPLEAMMO;
-	}
-
-	Ships[ Player ].SuperNashramTimer = ( 30.0F * 60.0F );
-
-	Host_PyroliteAmmo[ Player ] = MAXPYROLITEAMMO;		//MAXPYROLITEAMMO;
-	Host_SussGunAmmo[ Player ] = MAXSUSSGUNAMMO;		//MAXSUSSGUNAMMO;
-	Host_GeneralAmmo[ Player ] = MAXGENERALAMMO;
-	Host_NitroFuel[ Player ] = 100.0F;
-}
-
-/*===================================================================
-	Procedure	:	Lose Super Nashram weapon
-	Input		:	u_int16_t	Player
-	Output		:	Nothing
-===================================================================*/
-void HostLoseSuperNashram( u_int16_t Player )
-{
-	int16_t	Count;
-
-	if( Player >= ( MAX_PLAYERS + 1 ) ) return;	// Player is unsigned
-
-	for( Count = 0; Count < MAXMULTIPLES; Count++ )
-	{
-		Host_OrbAmmo[ Player ][ Count ] = Host_CopyOfOrbAmmo[ Player ][ Count ];
-	}
-
-	Host_NumOfOrbitals[ Player ] = Host_CopyOfNumOfOrbitals[ Player ];
-	Host_PowerLevel[ Player ] = Host_CopyOfPowerLevel[ Player ];
-	Host_GeneralAmmo[ Player ] = Host_CopyOfGeneralAmmo[ Player ];
-	Host_SussGunAmmo[ Player ] = Host_CopyOfSussGunAmmo[ Player ];
-	Host_PyroliteAmmo[ Player ] = Host_CopyOfPyroliteAmmo[ Player ];
-	Host_NitroFuel[ Player ] = Host_CopyOfNitroFuel[ Player ];
-
-	Ships[ Player ].SuperNashramTimer = 0.0F;
-
-	NumSuperNashrams++;
-}
-
 
 /*===================================================================
 	Procedure	:	Create Shield Effect when Invulnerable
@@ -8797,56 +8676,3 @@ void KillPrimBullsByOwner(  u_int16_t OwnerType, u_int16_t Owner )
 	}
 }
 
-/*===================================================================
-	Procedure	:	Get Ammo Usage for primary weapons
-	Input		:	int16_t		Ship
-				:	int8_t		Weapon
-	Output		:	float		Ammo Usage
-===================================================================*/
-float GetPrimaryAmmoUsage( int16_t Ship, int8_t Weapon )
-{
-	float	Ammo = 0.0F;
-
-	switch( Weapon )
-	{
-		case PULSAR:
-			Ammo += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ Ships[ Ship ].Object.PowerLevel ];
-			if( Ships[ Ship ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL )
-			{
-				Ammo *= 2.0F;
-			}
-			break;
-	
-		case TROJAX:								/* Fire on release or when max reached */
-			break;
-	
-		case PYROLITE_RIFLE:
-			Ammo += ( PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ Ships[ Ship ].Object.PowerLevel ] * 3.0F );
-			break;
-	
-		case TRANSPULSE_CANNON:
-			Ammo += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ Ships[ Ship ].Object.PowerLevel ];
-			break;
-	
-		case SUSS_GUN:
-			Ammo += ( PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ Ships[ Ship ].Object.PowerLevel ] * 4.0F );
-			break;
-	
-		case LASER:
-			Ammo += ( PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ Ships[ Ship ].Object.PowerLevel ] * 2.0F );
-			break;
-
-		case NME_LIGHTNING:
-			Ammo += ( PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ Ships[ Ship ].Object.PowerLevel ] * 2.0F );
-			break;
-
-		case NME_POWERLASER:
-			Ammo += PrimaryWeaponAttribs[ Weapon ].AmmoUsage[ Ships[ Ship ].Object.PowerLevel ];
-			break;
-	
-		default:
-			break;
-	}
-
-	return( Ammo );
-}

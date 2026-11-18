@@ -70,7 +70,6 @@ static	VECTOR	Origin;
 static	VECTOR	ODir;
 static	VECTOR	IPoint;
 static	float	IDist;
-static	float	*IPointp = (float *) &IPoint;
 
 bool CheckRestartPointCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject );
@@ -97,142 +96,6 @@ typedef enum
 	Z_Axis = 2
 } AxisIndex;
 
-bool ColRayPolyIntersect( MCFACE *face )
-{
-	float		t;
-	float		Div, Num;
-	float		v0x;
-	float		v0y;
-	float		v1x;
-	float		v1y;
-	float		v2x;
-	float		v2y;
-	float		v3x;
-	float		v3y;
-	float		ix;
-	float		iy;
-	bool		Clockwise;
-
-	if ( !DebugInfo && ( face->type & 0x800000L ) )
-		return false; // ignore backfacing patch collision polys unless debugging
-/*===================================================================
-	Calculate T
-===================================================================*/
-	Div = ( ODir.x * face->nx) + 
-		  ( ODir.y * face->ny) + 
-		  ( ODir.z * face->nz);
-	
-	if( Div >= 0.0F ) return false;		/* Reject, Parallel */
-
-
-	Num = ( ( Origin.x * face->nx ) +
-		    ( Origin.y * face->ny ) +
-		    ( Origin.z * face->nz ) ) + face->D ; 
-		
-	t = -( Num / Div );
-
-/*===================================================================
-	Do Polygon collision
-===================================================================*/
-
-	if( t < 0.0F ) return false;		/* Intersection behind origin */
-	if( t > 1.0F ) return false;		/* Intersection Greater then ray length */
-
-	IPoint.x = ( Origin.x + ( ODir.x * t ) );
-	IPoint.y = ( Origin.y + ( ODir.y * t ) );
-	IPoint.z = ( Origin.z + ( ODir.z * t ) );
-
-/*===================================================================
-	Find projected 2D coords of vertices and intersection point
-===================================================================*/
-
-	v0x = face->v[ 0 ].u;
-	v0y = face->v[ 0 ].v;
-	v1x = face->v[ 1 ].u;
-	v1y = face->v[ 1 ].v;
-	v2x = face->v[ 2 ].u;
-	v2y = face->v[ 2 ].v;
-
-	ix = IPointp[ ( face->type & 6 ) ? X_Axis : Y_Axis ];
-	iy = IPointp[ ( face->type & 4 ) ? Y_Axis : Z_Axis ];
-
-
-/*===================================================================
-	Check if point within triangle
-===================================================================*/
-
-	if( ( ix * ( v0y - v1y ) ) +
-	    ( v0x * ( v1y - iy ) ) +
-	    ( v1x * ( iy - v0y ) ) < 0.0F )
-	{
-		Clockwise = true;
-	}
-	else
-	{
-		Clockwise = false;
-	}
-
-	if( ( ix * ( v1y - v2y ) ) +
-	    ( v1x * ( v2y - iy ) ) +
-	    ( v2x * ( iy - v1y ) ) < 0.0F )
-	{
-		if( !Clockwise )
-			return false;
-	}
-	else
-	{
-		if( Clockwise )
-			return false;
-	}
-
-	if( face->type & 1 ) // face is a quad
-	{
-		v3x = face->v[ 3 ].u;
-		v3y = face->v[ 3 ].v;
-
-		if( ( ix * ( v2y - v3y ) ) +
-		    ( v2x * ( v3y - iy ) ) +
-		    ( v3x * ( iy - v2y ) ) < 0.0F )
-		{
-			if( !Clockwise )
-				return false;
-		}
-		else
-		{
-			if( Clockwise )
-				return false;
-		}
-		if( ( ix * ( v3y - v0y ) ) +
-		    ( v3x * ( v0y - iy ) ) +
-		    ( v0x * ( iy - v3y ) ) < 0.0F )
-		{
-			if( !Clockwise )
-				return false;
-		}
-		else
-		{
-			if( Clockwise )
-				return false;
-		}
-	}
-	else // face only a tri
-	{
-		if( ( ix * ( v2y - v0y ) ) +
-		    ( v2x * ( v0y - iy ) ) +
-		    ( v0x * ( iy - v2y ) ) < 0.0F )
-		{
-			if( !Clockwise )
-				return false;
-		}
-		else
-		{
-			if( Clockwise )
-				return false;
-		}
-	}
-	IDist = t;
-	return true;
-}
 
 bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 {
@@ -1546,7 +1409,6 @@ static bool bounce_object = true;
 static bool NoBGObject = true;
 
 
-
 constexpr float BACKFACING_PLANE_TOLERANCE = (-0.001F);
 constexpr float IMPACT_OFFSET = (0.1F);
 constexpr float FEELER_LENGTH_TO_RADIUS_RATIO = (1.25F);
@@ -1736,7 +1598,6 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 
 	return hit;
 }
-
 
 
 bool WouldObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGObject )

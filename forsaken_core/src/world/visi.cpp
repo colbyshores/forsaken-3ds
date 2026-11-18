@@ -211,20 +211,6 @@ bool OutputVisiStats( MLOADHEADER *m, char *lname )
 }
 
 
-static void RelateGroups( GROUPRELATION *rel, u_int16_t g1, u_int16_t g2 )
-{
-	u_int32_t *t, mask;
-
-	t = rel->table + GROUP2GROUP_OFFSET( g1, g2 );
-	mask = GROUP2GROUP_MASK( g1, g2 );
-	if ( !( *t & mask ) )
-	{
-		*t |= mask;
-		rel->list[ g1 ].groups++;
-	}
-}
-
-
 static bool AreGroupsRelated( GROUPRELATION *rel, u_int16_t g1, u_int16_t g2 )
 {
 	u_int32_t *t, mask;
@@ -235,18 +221,6 @@ static bool AreGroupsRelated( GROUPRELATION *rel, u_int16_t g1, u_int16_t g2 )
 		return true;
 	else
 		return false;
-}
-
-
-static void FindGroupsVisible( GROUPRELATION *vis, u_int16_t from_group, VISTREE *visible )
-{
-	int j;
-
-	RelateGroups( vis, from_group, visible->group );
-	for ( j = 0; j < visible->num_visible; j++ )
-	{
-		FindGroupsVisible( vis, from_group, &visible->visible[ j ] );
-	}
 }
 
 
@@ -385,113 +359,6 @@ bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 
 	*pbuf = buf;
 
-
-	return true;
-}
-
-
-bool FindGroupConnections( MLOADHEADER *m )
-{
-	u_int32_t tabsize;
-	u_int16_t g, p, g2;
-	LVLGROUP *group;
-	PORTAL *portal;
-	u_int16_t gnum;
-
-	for ( g = 0; g < MAXGROUPS; g++ )
-	{
-		ConnectedGroup.list[ g ].groups = 0;
-		ConnectedGroup.list[ g ].group = NULL;
-		VisibleGroup.list[ g ].groups = 0;
-		VisibleGroup.list[ g ].group = NULL;
-		IndirectVisibleGroup.list[ g ].groups = 0;
-		IndirectVisibleGroup.list[ g ].group = NULL;
-	}
-
-	InitConnections = true;
-
-	GTabRowSize = (int)ceilf(MAXGROUPS/32.0F);
-	tabsize = MAXGROUPS * GTabRowSize * sizeof( u_int32_t );
-	if ( !ConnectedGroup.table )
-	{
-		ConnectedGroup.table = (u_int32_t *) malloc( tabsize );
-		if ( !ConnectedGroup.table )
-		{
-			Msg( "FindGroupConnections: failed malloc for ConnectedGroup.table\n" );
-			return false;
-		}
-	}
-	if ( !VisibleGroup.table )
-	{
-		VisibleGroup.table = (u_int32_t *) malloc( tabsize );
-		if ( !VisibleGroup.table )
-		{
-			Msg( "FindGroupConnections: failed malloc for VisibleGroup.table\n" );
-			return false;
-		}
-	}
-	IndirectVisibleGroup.table = NULL;
-	memset( ConnectedGroup.table, 0, tabsize );
-	memset( VisibleGroup.table, 0, tabsize );
-
-	for ( g = 0; g < m->num_groups; g++ )
-	{
-		group = &m->Group[ g ];
-		ConnectedGroup.list[ g ].groups = 0;
-		VisibleGroup.list[ g ].groups = 0;
-		// make group visible from itself
-		RelateGroups( &VisibleGroup, g, g );
-		for ( p = 0; p < group->num_portals; p++ )
-		{
-			portal = &group->Portal[ p ];
-			// find groups connected to this one
-			RelateGroups( &ConnectedGroup, g, portal->visible.group );
-			// find groups visible from this one
-			FindGroupsVisible( &VisibleGroup, g, &portal->visible );
-		}
-		if ( ConnectedGroup.list[ g ].groups )
-		{
-			ConnectedGroup.list[ g ].group = (u_int16_t *) calloc( ConnectedGroup.list[ g ].groups, sizeof( u_int16_t ) );
-			if ( !ConnectedGroup.list[ g ].group )
-			{
-				Msg( "FindGroupConnections: failed X_calloc for ConnectedGroup.list[ %d ]\n", g );
-				return false;
-			}
-			gnum = 0;
-			for ( g2 = 0; g2 < m->num_groups; g2++ )
-			{
-				if ( GroupsAreConnected( g, g2 ) )
-				{
-					ConnectedGroup.list[ g ].group[ gnum++ ] = g2;
-				}
-			}
-		}
-		else
-		{
-			ConnectedGroup.list[ g ].group = NULL;
-		}
-		if ( VisibleGroup.list[ g ].groups )
-		{
-			VisibleGroup.list[ g ].group = (u_int16_t *) calloc( VisibleGroup.list[ g ].groups, sizeof( u_int16_t ) );
-			if ( !VisibleGroup.list[ g ].group )
-			{
-				Msg( "FindGroupConnections: failed X_calloc for VisibleGroup.list[ %d ]\n", g );
-				return false;
-			}
-			gnum = 0;
-			for ( g2 = 0; g2 < m->num_groups; g2++ )
-			{
-				if ( GroupsAreVisible( g, g2 ) )
-				{
-					VisibleGroup.list[ g ].group[ gnum++ ] = g2;
-				}
-			}
-		}
-		else
-		{
-			VisibleGroup.list[ g ].group = NULL;
-		}
-	}
 
 	return true;
 }

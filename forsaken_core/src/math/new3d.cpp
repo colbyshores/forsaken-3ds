@@ -150,12 +150,6 @@ void MatrixMultiply( MATRIX * m0, MATRIX * m1, MATRIX * m0m1 )
 ===================================================================*/
 
 // this is how you really apply a matrix to a vector
-void MxV( MATRIX * m, VECTOR * v0, VECTOR * v1 )
-{
-	v1->x = m->_11 * v0->x + m->_21 * v0->y + m->_31 * v0->z + m->_41;
-	v1->y = m->_12 * v0->x + m->_22 * v0->y + m->_32 * v0->z + m->_42;
-	v1->z = m->_13 * v0->x + m->_23 * v0->y + m->_33 * v0->z + m->_43;
-}
 
 // this is not a general purpose m*v function
 // it's meant to only be used in certain places
@@ -195,21 +189,6 @@ void VisPolyApplyMatrix( MATRIX * m, VECTOR * v0, VECTOR * v1 )
 	v1->z /= w;
 }
 
-
-/*===================================================================
-	Procedure	:	Add XYZ Translation to Matrix
-	Input		:	float		X Translation
-				:	float		Y Translation
-				:	float		Z Translation
-				:	MATRIX	*	Matrix to add translation
-	Output		:	Nothing
-===================================================================*/
-void AddMatrixTrans( float xt, float yt, float zt, MATRIX * m )
-{
-	m->_41 = xt;
-	m->_42 = yt;
-	m->_43 = zt;
-}
 
 /*===================================================================
 	Procedure	:	Calculate the Cross product of 2 Vectors
@@ -263,8 +242,6 @@ void ReflectVector( VECTOR * old, NORMAL * normal, VECTOR * new1 )
         new1->z = ( old->z + ( lambda * normal->nz ) );
    }
 }
-
-
 
 
 /*===================================================================
@@ -411,7 +388,6 @@ float Random_Range_Float( float Max )
 }
 
 
-
 void MakeViewMatrix(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, MATRIX *view)
 {
 	VECTOR vx, vy, vz;
@@ -434,7 +410,6 @@ void MakeViewMatrix(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, MATRIX *view)
 	view->_43 = 0.0F;
 	view->_44 = 1.0F;
 }
-
 
 
 /*===================================================================
@@ -468,7 +443,6 @@ void CalcViewAxes( VECTOR * viewpos, VECTOR * lookpos, VECTOR * up,
 	CrossProduct( vz, vx, vy);
 	NormaliseVector( vy );
 }
-
 
 
 /*===================================================================

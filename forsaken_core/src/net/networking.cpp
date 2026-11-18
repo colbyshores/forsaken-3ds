@@ -131,11 +131,9 @@ int16_t	BikeModels[ MAXBIKETYPES ] = {
 
 };
 
-char					tempstr[MAXTEXTMSG];
 int16_t					NamesAreLegal = 1;
 SHORTNAMETYPE			Names;	// all the players short Names....
 BYTE					MyGameStatus = STATUS_Normal;//
-BYTE					PreDemoEndMyGameStatus = 0;
 BYTE					OverallGameStatus = STATUS_Null;
 BYTE					GameStatus[MAX_PLAYERS + 1];	// Game Status for every Ship...
 														// this tells the drones what status the host thinks hes in..
@@ -150,7 +148,6 @@ bool	HostDuties = false;
 bool					IsHost = true;
 
 BYTE					Current_Camera_View = 0;		// which object is currently using the camera view....
-bool					RemoteCameraActive = false;
 
 PRIMBULLPOSDIR				TempPrimBullPosDir;
 SECBULLPOSDIR				TempSecBullPosDir;
@@ -3913,13 +3910,6 @@ int FindSameLevel( char * Name )
 		}
     }
 	return -1;
-}
-
-void Demo_fwrite( const void *buffer, size_t size, size_t count , FILE *stream )
-{
-	if( !RecordDemo || !DemoFp )
-		return;
-	fwrite( buffer, size , count , stream );
 }
 
 

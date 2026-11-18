@@ -574,7 +574,6 @@ bool SetUpShips()
 }
 
 
-
 bool ProcessShips()
 {
 	BYTE	i;
@@ -3140,5 +3139,3 @@ FILE * LoadShips( FILE * fp )
 	return( fp );
 }
 
-float	MyShield;
-float	MyHull;

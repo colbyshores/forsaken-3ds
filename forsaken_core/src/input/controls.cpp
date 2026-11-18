@@ -268,8 +268,6 @@ static struct
 int ShipAxisLookup[NUM_SHIP_AXIS_ACTIONS] = { SHIPACTION_Nothing, SHIPACTION_RotateUp, SHIPACTION_RotateLeft, SHIPACTION_RollLeft,
                         SHIPACTION_SlideUp, SHIPACTION_SlideLeft, SHIPACTION_MoveForward };
 
-const char *JoystickPOVDirections[MAX_POV_DIRECTIONS] = { "Up", "Down", "Left", "Right" };
-
 
 // this function receives higher level encoded bits
 
@@ -793,7 +791,6 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 	}
 
 
-
   MaxMove = MoveAccell * MaxMoveSpeed * framelag;
   MaxTurbo = TurboAccell * MaxTurboSpeed * framelag;
   MaxTurn = TurnAccell * MaxTurnSpeed * framelag;
@@ -971,29 +968,6 @@ void ReadJoystickInput(SHIPCONTROL *ctrl, int joysticknum)
 	}
 }
 
-/*===================================================================
-  Procedure : Check if any buttons of a specific joystick are
-        : pressed
-  Input   : int     Joystick Number
-  Output    : bool    true/false
-===================================================================*/
-bool IsJoystickButtonPressed( int joysticknum )
-{
-  int i;
-
-  if( joysticknum >= Num_Joysticks )
-	  return false;
-
-  for( i = 0; i < JoystickInfo[joysticknum].NumButtons; i++)
-  {
-    if ( JOYSTICK_BUTTON_PRESSED( joysticknum, i ) )
-    {
-      return( true );
-    }
-  }
-
-  return( false );
-}
 
 /*===================================================================
   Procedure : Check if any buttons of a specific joystick are

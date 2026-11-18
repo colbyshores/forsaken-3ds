@@ -14,27 +14,6 @@
 *									*
 ************************************************************************/
 
-float intersect(VECTOR * sphere_pos, float radius , VECTOR * ray_org, VECTOR * ray_dir)
-{
-	float	c[2];			    // coefficients of the quadric equation.
-	float	s[2];			    // solutions of the quadric equation
-	float	num;
-	VECTOR	d;
-
-	d.x = ray_org->x - sphere_pos->x; // vector from the center of the sphere to
-	d.y = ray_org->y - sphere_pos->y; // the origin of the ray.                 
-	d.z = ray_org->z - sphere_pos->z; 
-	
-	// compute the coefficients of the resolvent equation
-	c[1] = DotProduct( ray_dir , &d);
-	c[0] = DotProduct(&d , &d) - radius * radius;
-	
-//	return the closest intersection point
-
-	num = solveQuadric( (float*) &c, (float*) &s);
-  
-	return closest_intersection( (float*) &s , num );
-}
 
 /************************************************************************
 *									*
@@ -42,12 +21,6 @@ float intersect(VECTOR * sphere_pos, float radius , VECTOR * ray_org, VECTOR * r
 * intersection. (NB: normalization is "built-in" for the sphere).	*
 *									*
 ************************************************************************/
-void	SphereNormal( VECTOR * Pos , VECTOR * Point , float radius , NORMAL * Normal )
-{
-	Normal->nx = ( Point->x - Pos->x ) / radius;
-	Normal->ny = ( Point->y - Pos->y ) / radius;
-	Normal->nz = ( Point->z - Pos->z ) / radius;
-}
 
 //vec3 Sphere::normalAt(vec3& p)
 //{ return (p - pos) / radius; }
@@ -60,12 +33,6 @@ void	SphereNormal( VECTOR * Pos , VECTOR * Point , float radius , NORMAL * Norma
 *							*
 ********************************************************/
 
-float isNotZero(float x)
-{
-	if( ( x > -EPS ) && ( x < EPS ) )
-		return 0.0F;
-	return x;
-}
 
 /********************************************************
 *							*
@@ -80,35 +47,6 @@ float isNotZero(float x)
 *							*
 ********************************************************/
 
-float solveQuadric(float * c, float * s)
-{
-float p, q, D;
-float sqrt_D;
-
-	// normal for: x^2 + px + q
-	p = c[1];
-	q = c[0];
-	D = p * p - q;
-
-	if (!isNotZero(D))
-	    {
-	    // one double root
-	    s[0] = s[1] = -p;
-	    return 1.0F;
-	    }
-	
-	if (D < 0.0F)
-	    // no real root
-	    return 0.0F;
-
-    // two real roots
-    sqrt_D = (float) sqrtf(D);
-    s[0] = sqrt_D - p;
-    s[1] = -sqrt_D - p;
-    return 2.0F;
-}
-
-
 
 /************************************************************************
 *									*
@@ -119,63 +57,6 @@ float sqrt_D;
 *									*
 ************************************************************************/
 
-float closest_intersection(float * x, float x_num)
-{
-int	i;
-float	x_min;
-	x_min = (x_num) ? x[0] : 0.0F;
-	for ( i = 1 ; i < x_num ; i++ )
-	{
-	    if (x[i] < x_min)
-		x_min = x[i];
-	}
-	return x_min;
-}
-
-
-
-
-/*===================================================================
-	Procedure	:	Perform ray to sphere intersection
-	Input		:	VECTOR * sphere_pos
-				:	float radius
-				:	VECTOR * ray_org
-				:	VECTOR * ray_dir
-	Output		:	float how far from the ray_org the sphere was
-				:	intersected...0.0F if none < 0.0F if there is one
-===================================================================*/
-
-float RaytoSphere(VECTOR * sphere_pos, float radius , VECTOR * ray_org, VECTOR * ray_dir)
-{
-	float	s0,s1;			    // solutions of the quadric equation
-	VECTOR	d;
-	float p, q, D;
-	float sqrt_D;
-
-	d.x = ray_org->x - sphere_pos->x; // vector from the center of the sphere to
-	d.y = ray_org->y - sphere_pos->y; // the origin of the ray.                 
-	d.z = ray_org->z - sphere_pos->z; 
-	
-	
-	// normal for: x^2 + px + q
-	p =	( ray_dir->x * d.x ) + ( ray_dir->y * d.y ) + ( ray_dir->z * d.z ); // cos
-
-	q = ( ( d.x * d.x ) + ( d.y * d.y ) + ( d.z * d.z ) ) - radius * radius;
-
-	D = p * p - q ;
-
-	if (D < 0.0F)			// no real root
-		return 0.0F;
-
-	// two real roots
-	sqrt_D = (float) sqrtf(D);
-	s0 = sqrt_D - p;
-	s1 = -sqrt_D - p;
-
-	if ( s0 < s1 )
-		return s0;
-	return s1;
-}
 
 /*--------------------------------------------------------------------------------------------------------------------------
  * RAY -> SPHERE collision: RADIUS = 256

@@ -42,7 +42,6 @@ void config_set_float(const char *opt, float f);
 
 void config_get_strncpy(char* dest, size_t size, const char *opt, const char * _default);
 void config_set_str(const char *opt, const char * str);
-void config_set_strn(const char *opt, char* str, size_t size);
 
 int config_get_bool(const char *opt, int _default);
 void config_set_bool(const char *opt, int i);

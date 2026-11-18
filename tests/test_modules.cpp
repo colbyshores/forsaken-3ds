@@ -58,15 +58,19 @@ static void test_hunk(void)
     void *b = Hunk_Alloc(TAG_LEVEL, 200);
     CHECK(a != nullptr && b != nullptr, "allocs succeed");
     CHECK(((uintptr_t)a & 7) == 0 && ((uintptr_t)b & 7) == 0, "8-byte alignment");
-    CHECK(Hunk_Used(TAG_STARTUP) >= 100 && Hunk_Used(TAG_LEVEL) >= 200, "used accounting");
     const unsigned char *z = (const unsigned char *)a;
     bool zeroed = true;
     for (int i = 0; i < 100; i++) if (z[i]) zeroed = false;
     CHECK(zeroed, "allocations are zeroed");
     CHECK(Hunk_Alloc(TAG_LEVEL, 100000) == nullptr, "overflow fails cleanly");
+    /* 104 startup + 200 level used: 900 more level bytes do not fit */
+    memset(a, 0x5a, 100);
+    CHECK(Hunk_Alloc(TAG_LEVEL, 900) == nullptr, "level arena full before free_all");
     Hunk_FreeAll(TAG_LEVEL);
-    CHECK(Hunk_Used(TAG_LEVEL) == 0 && Hunk_Used(TAG_STARTUP) >= 100, "free_all is per-tag");
-    Hunk_Shutdown();
+    CHECK(Hunk_Alloc(TAG_LEVEL, 900) != nullptr, "free_all releases the level arena");
+    bool kept = true;
+    for (int i = 0; i < 100; i++) if (z[i] != 0x5a) kept = false;
+    CHECK(kept, "free_all leaves the startup arena alone");
 }
 
 int main(void)

@@ -149,7 +149,6 @@ void CreateSpotFXBeardAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, 
 void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed );
 void SetupSpotFXGroups( void );
 void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group );
-void RemoveSpotFXFromGroup( SPOTFX * SpotFX, u_int16_t Group );
 void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group );
 void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed );
 void CreateSpotFXHk5Afterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
