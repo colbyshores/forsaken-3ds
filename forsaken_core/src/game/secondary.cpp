@@ -1,9 +1,4 @@
-
-
-/*===================================================================
-*	s e c o n d . c
-*	All routines to do with Secondary weapons...
-===================================================================*/
+/* secondary.cpp -- secondary weapons: missiles, mines, targeting; see secondary.h. */
 #include <stdio.h>
 #include "game/main.h"
 #include "math/new3d.h"
@@ -47,11 +42,6 @@ constexpr auto MISSILE_SPEED = ( MAXMOVESPEED * 1.6F ); // Ship Speed * 1.6
 #include "game/camera.h"
 #include "game/oct2.h"
 #include "rendering/2dtextures.h"
-
-/*===================================================================
-	Externs
-===================================================================*/
-																	// this tells the drones what status the host thinks hes in..
 
 /*===================================================================
 	Globals
@@ -3850,7 +3840,7 @@ void CreateSingleExplosion( VECTOR * Pos, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Create Explosion
+	Procedure	:	Create Smoke Trail
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
@@ -3887,7 +3877,7 @@ void CreateTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Create Explosion
+	Procedure	:	Create Blood Trail
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
@@ -3995,7 +3985,7 @@ void CreateBloodSplat( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Create Smoke Trail
+	Procedure	:	Create Gravgon Trail
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
@@ -4032,7 +4022,7 @@ void CreateGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Create Smoke Trail
+	Procedure	:	Create Solaris Trail
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
@@ -4812,8 +4802,9 @@ int16_t GetCurSecAmmo( void )
 }
 
 /*===================================================================
-	Procedure	:	Ammo level control
-	Input		:	Check ammo levels and do appropriate changed
+	Procedure	:	Auto-select the next secondary of the same kind
+				:	( missile / mine ) when the current one runs out
+	Input		:	Nothing
 	Output		:	void
 ===================================================================*/
 void SecondarySelectControl( void )
@@ -4850,7 +4841,7 @@ void SecondarySelectControl( void )
 }
 
 /*===================================================================
-	Procedure	:	Drop best mine you have
+	Procedure	:	Get best mine you have
 	Input		:	Nothing
 	Output		:	u_int16_t	Mine ( -1 None )
 ===================================================================*/
@@ -5372,7 +5363,8 @@ void HeatseakerTarget( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 }
 
 /*===================================================================
-	Procedure	:	Targeting Computer
+	Procedure	:	Pick the look-ahead and heat-seeker targets and
+				:	draw their HUD boxes
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
@@ -6655,7 +6647,8 @@ void RegenMineList( SHORTMINE * Slots, BYTE Num )
 }
 
 /*===================================================================
-	Procedure	:	Copy Mines into copy of mines
+	Procedure	:	Age received mines by the time since the mine
+				:	list arrived ( last_mine_timer )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
@@ -6830,7 +6823,7 @@ bool CheckForMines( VECTOR * Pos )
 }
 
 /*===================================================================
-	Procedure	:	Create Explosion
+	Procedure	:	Smoke / damage effects for a damaged ship
 	Input		:	u_int16_t		Ship
 	Output		:	Nothing
 ===================================================================*/
@@ -7240,7 +7233,7 @@ void CreateSmokeRing( VECTOR * Pos, VECTOR * DirVector, VECTOR * UpVector, u_int
 }
 
 /*===================================================================
-	Procedure	:	Create New Smoke Ring
+	Procedure	:	Create Splash
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	DirVector
 				:	u_int16_t		Group

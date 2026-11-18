@@ -1,14 +1,33 @@
-
-/*==========================================================================
- *
- *
- *  File:       Secondary.h
- *  Content:    Secondary include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* secondary.h -- secondary weapons: missiles, mines, their pool and targeting
+ *
+ * SecondaryWeaponAttribs[TOTALSECONDARYWEAPONS] is indexed by weapon number:
+ * the player weapons MUGMISSILE..SPIDERMINE, the spawned PINEMISSILE and
+ * TITANSTARSHRAPNEL, then the enemy-only weapons ENEMYSPIRALMISSILE..
+ * ENEMYDEPTHCHARGE. SecBulls[] is the live missile/mine pool; its used list
+ * starts at FirstSecBullUsed and is walked through Prev, and each entry is
+ * also on a per-group list (SecBullGroups[]). InitSecBulls clears it at scene
+ * init.
+ *
+ * Once per frame FireSecondary turns the local player's input into missiles
+ * or mines, and ProcessSecondaryBullets runs ProcessMissiles or ProcessMines
+ * on each entry by SecType. InitOneSecBull creates every entry and sends it
+ * to other players only when NetFlag is set: mines and pine missiles are sent
+ * that way, while other machines recreate the local player's missiles in
+ * FireSecondaryWeapons from ship updates. Mines in play are snapshotted per
+ * joining player (CopyMines / GenMineList) and rebuilt on the joiner
+ * (RegenMineList; SyncMines then ages them by the time since the first mine
+ * message arrived, last_mine_timer).
+ *
+ * The module also owns the HUD targeting box and heat-seeker lock
+ * (TargetingComputer, HeatseakerTarget), the on-screen player names, explosion
+ * and trail effects, ScatterWeapons (the local ship throws its weapons out as
+ * pickups, on death or when hit by a scatter missile) and DoDamagedEffects
+ * (smoke from a damaged ship). SecondaryAmmo, SecondaryWeaponsGot and
+ * SecAmmoUsed describe the local player only.
+ */
+
 #include "game/constants.h"
 #include "game/main.h"
 #include "util/timer.h"

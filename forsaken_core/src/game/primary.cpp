@@ -1,9 +1,4 @@
- 
-
-/*===================================================================
-*	p r i m a r y . c
-*	All routines to do with Primary weapons...
-===================================================================*/
+/* primary.cpp -- primary weapons: bullet pool, firing, hits; see primary.h. */
 #include <stdio.h>
 #include "game/main.h"
 
@@ -50,13 +45,6 @@
 #include "game/oct2.h"
 
 
-/*===================================================================
-	Externs
-===================================================================*/
-
-													// this tells the drones what status the host thinks hes in..
-
-														
 /*===================================================================
 	Globals
 ===================================================================*/
@@ -562,7 +550,7 @@ PRIMARYWEAPONATTRIB	PrimaryWeaponAttribs[ TOTALPRIMARYWEAPONS ] = {
 	1998 engine's Mekton bullet IS chunky-ball-shaped, so use that
 	sprite as the base.  Light color from KEX
 	particles/pulsar_enemy_blue.particle: light_color={0,0,1}.
-	Used by ShieldTurret (and Ghost when wired); per-bullet
+	Used by ShieldTurret and Ghost; per-bullet
 	color tint (R/G/B) is overridden in InitOnePrimBull's NME_PULSAR_BLUE
 	branch since case NME_BULLET1 hardcodes the Mekton red tint.
 ===================================================================*/
@@ -618,7 +606,7 @@ void	InitPrimBulls(void)
 }
 
 /*===================================================================
-	Procedure	:	Restore ammo to starting amount
+	Procedure	:	Restore weapons to starting set
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
@@ -4992,7 +4980,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 }
 
 /*===================================================================
-	Procedure	:	Create Explosion
+	Procedure	:	Create Arc Explosion
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
@@ -6601,8 +6589,9 @@ bool ValidGroupCollision( VECTOR * StartPos, u_int16_t StartGroup, VECTOR * IntP
 }
 
 /*===================================================================
-	Procedure	:	Ammo level control
-	Input		:	Check ammo levels and do appropriate changed
+	Procedure	:	Auto-select the next primary in the player's order
+				:	when the current one is not held or has no ammo
+	Input		:	Nothing
 	Output		:	void
 ===================================================================*/
 void PrimarySelectControl( void )
@@ -7032,7 +7021,7 @@ void CreateColSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Create Collision Sparks
+	Procedure	:	Create Small Collision Sparks
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
@@ -7693,7 +7682,7 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 	Procedure	:	Change Direction of Pulsar
 	Input		:	u_int16_t		Primary Bullet Index
 				:	VECTOR	*	New Direction
-	Output		:	bool		True/False
+	Output		:	Nothing
 ===================================================================*/
 void ChangePulsarDir( u_int16_t i, VECTOR * Dir )
 {
@@ -7754,10 +7743,10 @@ void ChangePulsarDir( u_int16_t i, VECTOR * Dir )
 }
 
 /*===================================================================
-	Procedure	:	Change Direction of Pulsar
+	Procedure	:	Change Direction of Trojax
 	Input		:	u_int16_t		Primary Bullet Index
 				:	VECTOR	*	New Direction
-	Output		:	bool		True/False
+	Output		:	Nothing
 ===================================================================*/
 void ChangeTrojaxDir( u_int16_t i, VECTOR * Dir )
 {
@@ -7780,10 +7769,10 @@ void ChangeTrojaxDir( u_int16_t i, VECTOR * Dir )
 }
 
 /*===================================================================
-	Procedure	:	Change Direction of Pulsar
+	Procedure	:	Change Direction of Suss-Gun bullet
 	Input		:	u_int16_t		Primary Bullet Index
 				:	VECTOR	*	New Direction
-	Output		:	bool		True/False
+	Output		:	Nothing
 ===================================================================*/
 void ChangeSussgunDir( u_int16_t i, VECTOR * Dir )
 {
@@ -7795,7 +7784,7 @@ void ChangeSussgunDir( u_int16_t i, VECTOR * Dir )
 	Procedure	:	Change Direction of OrbitPulsar
 	Input		:	u_int16_t		Primary Bullet Index
 				:	VECTOR	*	New Direction
-	Output		:	bool		True/False
+	Output		:	Nothing
 ===================================================================*/
 void ChangeOrbitPulsarDir( u_int16_t i, VECTOR * Dir )
 {
@@ -8207,7 +8196,7 @@ void GetLaserLocalVector( u_int16_t i, VECTOR * LocalVector )
 }
 
 /*===================================================================
-	Procedure	:	Create Explosion
+	Procedure	:	Create Scaled Explosion
 	Input		:	VECTOR	*	Position
 				:	u_int16_t		Group
 	Output		:	Nothing
@@ -8643,7 +8632,7 @@ void TogglePrimaryWeapons( int8_t Primary )
 }
 
 /*===================================================================
-	Procedure	:	Kill Primary bullets assight to
+	Procedure	:	Kill Primary bullets belonging to
 				:	OwnerType and Owner
 	Input		:	u_int16_t	OwnerType
 				:	u_int16_t	Owner

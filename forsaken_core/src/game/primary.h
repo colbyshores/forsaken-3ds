@@ -1,15 +1,31 @@
-
-
-/*==========================================================================
- *
- *
- *  File:       primary.h
- *  Content:    primary include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* primary.h -- primary weapons: weapon table, bullet pool, firing and hits
+ *
+ * PrimaryWeaponAttribs[TOTALPRIMARYWEAPONS] is indexed by weapon number: the
+ * player weapons PULSAR..LASER, ORBITPULSAR, then the enemy-only weapons
+ * NME_BULLET1..NME_PULSAR_BLUE (FLAMES included). PrimBulls[] is the live
+ * bullet pool; its used list starts at FirstPrimBullUsed and is walked through
+ * Prev. InitPrimBulls clears it at scene init and also resets the local
+ * player's weapons and ammo (RestoreWeapons / RestoreAmmo).
+ *
+ * Once per frame FirePrimary turns the local player's fire input into bullets
+ * and spends ammo, and ProcessPrimaryBullets moves every bullet and tests it
+ * against the level, ships, enemies and secondary weapons. All bullets are
+ * created by InitOnePrimBull, which sends the shot to other players only when
+ * NetFlag is set; player shots are not sent that way, and other machines
+ * recreate them in FirePrimaryWeapons from the fire flags in ship updates.
+ * Enemies and model spot FX fire through EnemyFirePrimary, which records the
+ * firing GUNOBJECT on the bullet.
+ *
+ * Ship hits follow ColPerspective: COLPERS_Forsaken lets the machine that
+ * owns the bullet resolve the hit (IHitYou for a remote victim), while
+ * COLPERS_Descent only resolves hits on the local ship. The ammo globals,
+ * PowerLevel and LaserTemperature describe the local player only.
+ * NmeDamageModifier (set from the difficulty level by PreLoadEnemies) scales
+ * the damage enemy weapons do to ships.
+ */
+
 #include "game/constants.h"
 #include "game/main.h"
 
