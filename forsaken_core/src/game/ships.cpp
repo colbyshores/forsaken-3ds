@@ -581,7 +581,6 @@ static	LONGLONG	TempTime;
 static	LONGLONG	TempTime2;
 #endif
 
-static	float	Interp;	
 
 bool ProcessShips()
 {

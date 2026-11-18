@@ -4537,7 +4537,6 @@ Display Solid Lines
 bool DisplayTitle(void)
 {
 	u_int16_t i;
-	u_int16_t	group;
 	MENUITEM *Item;
 	LIST *l;
 
@@ -12670,7 +12669,6 @@ void SendTitleMessage(MENUITEM *Item)
 
 void AddTitleMessage(LPTEXTMSG lpTextMsg)
 {
-	char tempbuf[ 256 ];
 	
 	if (TotalTitleMsgs != MAX_TITLE_MSGS)
 	{

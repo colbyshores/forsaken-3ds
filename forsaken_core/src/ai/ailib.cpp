@@ -380,7 +380,6 @@ bool AI_ClearLOSNonZeroNonObject( VECTOR * SPos, u_int16_t Group , VECTOR * Pos 
 ===================================================================*/
 void AI_GetDistToNearestTarget( ENEMY * Enemy )
 {
-	u_int16_t	group = Enemy->Object.Group;
 	OBJECT * TObject;
 	   
 	// Initialise

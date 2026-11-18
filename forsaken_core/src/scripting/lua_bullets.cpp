@@ -89,7 +89,6 @@ static int luaprimbull_index(lua_State *L)
 {
 	PRIMARYWEAPONBULLET *bullet;
 	const char *name;
-	int *id;
 	int bullidx = *((int *) luaL_checkudata(L, 1, "PRIMARYWEAPONBULLETIDX"));
 	bullet = &PrimBulls[bullidx];
 	name = luaL_checkstring(L, 2);
@@ -187,7 +186,6 @@ static int luasecbull_index(lua_State *L)
 {
 	SECONDARYWEAPONBULLET *bullet;
 	const char *name;
-	int *id;
 	int bullidx = *((int *) luaL_checkudata(L, 1, "SECONDARYWEAPONBULLETIDX"));
 	bullet = &SecBulls[bullidx];
 	name = luaL_checkstring(L, 2);

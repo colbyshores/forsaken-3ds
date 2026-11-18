@@ -488,7 +488,7 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 ===================================================================*/
 void QUAT::MakeAxis( float x, float y, float z, float angle)
 {
-    float length, cosA, sinA;
+    float cosA, sinA;
 	/* normalize vector */
 	{
 		float dot = x*x + y*y + z*z;

@@ -452,7 +452,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				 * MXAVERT bytes.  We'll allocate an aligned copy afterwards so
 				 * InterpFrames can use direct pointer access instead of per-vertex
 				 * memcpy on every frame. */
-				char *BufferStart = Buffer;
 				for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
 				{
 					for( group=0 ; group<Mxaloadheader->num_groups; group++)

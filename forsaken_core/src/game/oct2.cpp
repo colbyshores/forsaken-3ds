@@ -1012,7 +1012,7 @@ void DrawSimplePanel()
 	int right = render_info.window_size.cx - FontWidth*5;
 	int top   = render_info.window_size.cy - FontHeight*30;
 	int energy;
-	u_int8_t Count; u_int8_t pos = 0;
+	u_int8_t Count;
  	u_int8_t r = Colourtrans[HUDColour][0];
 	u_int8_t g = Colourtrans[HUDColour][1];
 	u_int8_t b = Colourtrans[HUDColour][2];
@@ -4901,9 +4901,6 @@ void CalculateFramelag( void )
 bool DispTracker( void )
 {
 	u_int16_t      i;
-	XYRECT     dummy;
-	render_viewport_t newviewport;
-	float       screen_width, screen_height;
 	VECTOR      TempVector;
 	MATRIX      TempMatrix;
 	float       TargetDistance;

@@ -566,7 +566,6 @@ void PrintScoreSort( void )
 	bool teamleft[MAX_TEAMS];
 	int i,e, pos;
 	int16_t TeamBounty[MAX_TEAMS];
-	int TeamBadConnection[MAX_TEAMS];
 	char buf[256];
 	int col;
 	u_int16_t scorewidth = 1;

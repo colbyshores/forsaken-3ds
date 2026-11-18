@@ -8546,7 +8546,6 @@ void CreatePowerLaserSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 ===================================================================*/
 void GetLaserLocalVector( u_int16_t i, VECTOR * LocalVector )
 {
-	PVSPOTFX	*	SpotFXPtr;
 	GUNOBJECT	*	GunPtr;		// the first gun...
 
 	switch( PrimBulls[i].Weapon )

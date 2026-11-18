@@ -4177,7 +4177,6 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 	u_int16_t		i, Next;
 	u_int16_t		nSecWalk;
 	char		methodstr[256];
-	char		tempstr[256];
 	ENEMY	*	Enemy;
 	ENEMY	*	NextEnemy;
 
@@ -4383,7 +4382,6 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t WeaponType, u_int8_t Weapon )
 {
 	char	methodstr[256];
-	char	tempstr[256];
 	char	teamstr[256];
 
 	if( !(Ships[ WhoIAm ].Invul && GameStatus[ WhoIAm ] == STATUS_SinglePlayer) )
