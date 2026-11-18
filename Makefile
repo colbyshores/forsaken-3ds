@@ -2,9 +2,6 @@
 # General Compiler Settings
 #
 
-# for cross compiling be sure to specify your compiler ex:
-# make CXX=i686-w64-mingw32-g++
-
 # general compiler settings
 FLAGS+= -pipe
 # -Wno-missing-field-initializers: the menu tables and the Vulkan create-info
