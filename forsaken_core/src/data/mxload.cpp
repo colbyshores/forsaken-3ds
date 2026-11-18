@@ -1,7 +1,7 @@
 /* mxload.cpp -- loads static (.mx) models
  *
  * PreMxload reads the file and queues its textures; Mxload builds each
- * execbuf's vertex, index and normal buffers and texture groups, keeps
+ * mesh's vertex, index and normal buffers and texture groups, keeps
  * originalVerts (the baked vertex colours that lighting restores each frame)
  * and, for models flagged StoreTriangles, a copy of the triangles (the
  * title screen intersects them to lay menu text across its 3D models). It
@@ -16,9 +16,9 @@
  *   magic, version (u32 each)
  *   num_texture_files, texture names (NUL-terminated)       -- PreMxload
  *   num_groups
- *   per group: num_execbufs
- *     per execbuf:
- *       execute-buffer size (unused), exec_type (bit 0: has
+ *   per group: num_meshes
+ *     per mesh:
+ *       execute-buffer size (unused), mesh_type (bit 0: has
  *       transparencies), num_vertices
  *       OLDLVERTEX[num_vertices]       x y z, reserved, colour, specular, tu tv
  *       num_texture_groups
@@ -30,7 +30,7 @@
  *   num_animations
  *   per animation: frame count and max loops (unused), length,
  *       u16[length] (frame numbers and TEXANIM_* commands)
- *   if num_animations: per group, per execbuf: num_animating_polys
+ *   if num_animations: per group, per mesh: num_animating_polys
  *     per poly: tag (32 bytes), animation, frames, vertices,
  *               u16[vertices] (vertex numbers), { tu, tv }[vertices * frames]
  *   fire point flag: if non-zero,
@@ -92,7 +92,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 	TRIANGLE		FacePnt; // was a pointer
 	TRIANGLE	*TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
-	u_int16_t			exec_type = 0;			// the execbuf's type (bit 0: has transparencies)
+	u_int16_t			mesh_type = 0;			// the mesh's type (bit 0: has transparencies)
 	u_int16_t			num_vertices = 0;		// overall number of verts
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
@@ -103,7 +103,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	int				ibIndex = 0;
 	int				i,e,o;
 	u_int16_t			tpage = 0;
-	int				execbuf;
+	int				mesh;
 	int				group;
 	u_int16_t			animation,frames,vertices;
 	POLYANIM	*	PolyAnim;
@@ -169,45 +169,45 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 	for( group=0 ; group<Mxloadheader->num_groups; group++)
 	{
-		/*	get the number of execbufs in this group	*/
-		Mxloadheader->Group[group].num_execbufs = in.u16();
+		/*	get the number of meshes in this group	*/
+		Mxloadheader->Group[group].num_meshes = in.u16();
 
-		if ( Mxloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
+		if ( Mxloadheader->Group[group].num_meshes > MAXMESHESPERGROUP )
 		{
-			Msg( "Mxload() numexecbufs > MAXEXECBUFSPERGROUP in %s\n", Filename );
+			Msg( "Mxload() num_meshes > MAXMESHESPERGROUP in %s\n", Filename );
 			return false;
 		}
 
-		for( execbuf=0 ; execbuf<Mxloadheader->Group[group].num_execbufs; execbuf++)
+		for( mesh=0 ; mesh<Mxloadheader->Group[group].num_meshes; mesh++)
 		{
 			num_texture_groups = 0;
 
 			in.skip( sizeof( u_int16_t ) );	// Direct3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
-			exec_type = in.u16();
+			mesh_type = in.u16();
 
 			/*	get the number of verts in execution buffer	*/
 			num_vertices = in.u16();
 
-			/*	record the execbuf's type	*/
-			Mxloadheader->Group[group].exec_type[execbuf] = exec_type;
+			/*	record the mesh's type	*/
+			Mxloadheader->Group[group].mesh_type[mesh] = mesh_type;
 
-			/*	record how many verts the execbuf has	*/
-			Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
+			/*	record how many verts the mesh has	*/
+			Mxloadheader->Group[group].num_verts_per_mesh[mesh] = num_vertices;
 
 			/*	create a vertex buffer	*/
-			if (!FSCreateVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], num_vertices))
+			if (!FSCreateVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], num_vertices))
 			{
-				Msg( "Mxload : MakeExecBuffer Failed\n" );
+				Msg( "Mxload : FSCreateVertexBuffer failed\n" );
 				return false;
 			}
-			Mxloadheader->Group[group].renderObject[execbuf].vertOwner = VERT_OWNER_MODEL;
+			Mxloadheader->Group[group].renderObject[mesh].vertOwner = VERT_OWNER_MODEL;
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 
 			/*	lock the vertex buffer	*/
-			if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], &lpLVERTEX)))
+			if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
@@ -242,14 +242,14 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
-			Mxloadheader->Group[group].originalVerts[execbuf] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
-			memmove(Mxloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
+			Mxloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
+			memmove(Mxloadheader->Group[group].originalVerts[mesh], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 
 			//	Stuff to clip if bounding box is off screen
 
 			num_texture_groups = in.u16();
 			DebugPrintf("texture groups: %d\n", num_texture_groups);
-			Mxloadheader->Group[group].num_texture_groups[execbuf] = num_texture_groups;
+			Mxloadheader->Group[group].num_texture_groups[mesh] = num_texture_groups;
 
 
 			triangleCount = 0;
@@ -268,7 +268,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			}
 
 			/*	create an index buffer	*/
-			if (!FSCreateIndexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], triangleCount * 3))
+			if (!FSCreateIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount * 3))
 			{
 				return false;
 			}
@@ -276,32 +276,32 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			DebugPrintf("created index buffer to hold :%d incidices\n", triangleCount * 3);
 
 			/*	lock the index buffer	*/
-			if (!(FSLockIndexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], &lpIndices)))
+			if (!(FSLockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpIndices)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
 			}
 
-      if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[execbuf], triangleCount))
+      if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount))
       {
         DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
         return false;
       }
-      if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[execbuf], &lpNormals)))
+      if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpNormals)))
       {
         Msg( "Mxload() normal lock failed in %s\n", Filename );
         return false;
       }
 
-			/* Allocate this execbuf's textureGroups[] from the TAG_LEVEL
+			/* Allocate this mesh's textureGroups[] from the TAG_LEVEL
 			 * hunk, sized to num_texture_groups. Bulk-freed via
 			 * Hunk_FreeAll(TAG_LEVEL) on level transition. */
 			if ( num_texture_groups > 0 )
 			{
-				Mxloadheader->Group[group].renderObject[execbuf].textureGroups =
+				Mxloadheader->Group[group].renderObject[mesh].textureGroups =
 				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
 				                                num_texture_groups * sizeof(TEXTUREGROUP));
-				if ( !Mxloadheader->Group[group].renderObject[execbuf].textureGroups )
+				if ( !Mxloadheader->Group[group].renderObject[mesh].textureGroups )
 				{
 					Msg( "Mxload() hunk-alloc failed for textureGroups[%u] %s\n",
 					     (unsigned)num_texture_groups, Filename );
@@ -350,28 +350,28 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						colourkey++;
 					}
 					if( Mxloadheader->num_texture_files )
-						FixUV( &FacePnt, lpBufStart, Mxloadheader->TloadIndex[tpage], Mxloadheader->Group[group].originalVerts[execbuf]);
+						FixUV( &FacePnt, lpBufStart, Mxloadheader->TloadIndex[tpage], Mxloadheader->Group[group].originalVerts[mesh]);
 					lpNormals++;
 					tempInt+=3;
 				}
 
 				// BJD - check this. correct value to place here?
-				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;//num_triangles * 3;
-				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numTriangles = num_triangles;
+				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;//num_triangles * 3;
+				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numTriangles = num_triangles;
 
 				/* keep track of our offset into our index buffer */
-				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].startIndex = indexOffset;
+				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].startIndex = indexOffset;
 				indexOffset += num_triangles * 3;
 
 				if( Mxloadheader->num_texture_files == 0 )
 				{
-					Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = NULL;
-					Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = false;
+					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = NULL;
+					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = false;
 				}
 				else
 				{
-					Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mxloadheader->TloadIndex[tpage]];
-					Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxloadheader->TloadIndex[tpage]];
+					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.lpTexture[Mxloadheader->TloadIndex[tpage]];
+					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxloadheader->TloadIndex[tpage]];
 				}
 			}
 
@@ -384,39 +384,39 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			}
 
 			if (StoreTriangles)
-			{	Mxloadheader->Group[group].num_polys_per_execbuf[execbuf] = triangleCount;//num_triangles;
-				Mxloadheader->Group[group].poly_ptr[execbuf] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);
+			{	Mxloadheader->Group[group].num_polys_per_mesh[mesh] = triangleCount;//num_triangles;
+				Mxloadheader->Group[group].poly_ptr[mesh] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);
 
-				memmove(Mxloadheader->Group[group].poly_ptr[execbuf], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
+				memmove(Mxloadheader->Group[group].poly_ptr[mesh], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
 
 			}
 			else
 			{
-				Mxloadheader->Group[group].num_polys_per_execbuf[execbuf] = 0;
-				Mxloadheader->Group[group].poly_ptr[execbuf] = NULL;
+				Mxloadheader->Group[group].num_polys_per_mesh[mesh] = 0;
+				Mxloadheader->Group[group].poly_ptr[mesh] = NULL;
 			}
 
 			/*	unlock the vertex buffer	*/
-			if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxload() vb unlock failed in %s\n", Filename );
 				return false ;
 			}
 
 			/*	unlock the index buffer	*/
-			if (!(FSUnlockIndexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxload() ib unlock failed in %s\n", Filename );
 				return false ;
 			}
 
-      if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
+      if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
       {
         Msg( "Mxload() normal unlock failed in %s\n", Filename );
         return false ;
       }
 
-			Mxloadheader->Group[group].renderObject[execbuf].numTextureGroups = num_texture_groups;
+			Mxloadheader->Group[group].renderObject[mesh].numTextureGroups = num_texture_groups;
 
 
 			/* update the renderObject */
@@ -442,29 +442,29 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 		for( group=0 ; group<Mxloadheader->num_groups; group++)
 		{
-			for( execbuf=0 ; execbuf<Mxloadheader->Group[group].num_execbufs; execbuf++)
+			for( mesh=0 ; mesh<Mxloadheader->Group[group].num_meshes; mesh++)
 			{
 				// Animating background polys......
-				Mxloadheader->Group[group].num_animating_polys[execbuf] = in.u16();
-				if( Mxloadheader->Group[group].num_animating_polys[execbuf] != 0 )
+				Mxloadheader->Group[group].num_animating_polys[mesh] = in.u16();
+				if( Mxloadheader->Group[group].num_animating_polys[mesh] != 0 )
 				{
-					Mxloadheader->Group[group].polyanim[execbuf] = (POLYANIM*)malloc( Mxloadheader->Group[group].num_animating_polys[execbuf] * sizeof( POLYANIM ) );
+					Mxloadheader->Group[group].polyanim[mesh] = (POLYANIM*)malloc( Mxloadheader->Group[group].num_animating_polys[mesh] * sizeof( POLYANIM ) );
 
 
-					PolyAnim = Mxloadheader->Group[group].polyanim[execbuf];
+					PolyAnim = Mxloadheader->Group[group].polyanim[mesh];
 					if( !PolyAnim )
 					{
 						Msg( "Mxload() Polyanim failed in %s\n", Filename );
 						return false;
 					}
 
-					if (!(FSLockVertexBuffer(&Mxloadheader->Group[ group ].renderObject[execbuf], &lpLVERTEX)))
+					if (!(FSLockVertexBuffer(&Mxloadheader->Group[ group ].renderObject[mesh], &lpLVERTEX)))
 					{
-						Msg( "Mxload : Lock ExecBuffer failed\n" );
+						Msg( "Mxload : FSLockVertexBuffer failed\n" );
 						return false;
 					}
 
-					for( i = 0 ; i < Mxloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
+					for( i = 0 ; i < Mxloadheader->Group[group].num_animating_polys[mesh] ; i++ )
 					{
 						in.bytes( PolyAnim->Tag, sizeof( PolyAnim->Tag ) );
 
@@ -515,7 +515,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 							TanimUV++;
 						}
 
-						FixUV_Anim( PolyAnim, lpLVERTEX, Mxloadheader->Group[group].originalVerts[execbuf] );
+						FixUV_Anim( PolyAnim, lpLVERTEX, Mxloadheader->Group[group].originalVerts[mesh] );
 
 						if( Panel )
 						{
@@ -525,9 +525,9 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						PolyAnim++;
 					}
 
-					if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
+					if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
 					{
-						Msg( "Mxload : Unlock ExecBuffer failed\n" );
+						Msg( "Mxload : FSUnlockVertexBuffer failed\n" );
 						return false ;
 					}
 				}
@@ -676,7 +676,7 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 	{
 		for ( group=0 ; group<Mxloadheader->num_groups ; group++)
 		{
-			for ( i=0 ; i<Mxloadheader->Group[group].num_execbufs; i++)
+			for ( i=0 ; i<Mxloadheader->Group[group].num_meshes; i++)
 			{
 				VertBufferLocked = false;
 
@@ -727,7 +727,7 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 					VertBufferLocked = false;
 				}
 
-				if( Mxloadheader->Group[group].exec_type[i]&HASTRANSPARENCIES )
+				if( Mxloadheader->Group[group].mesh_type[i]&HASTRANSPARENCIES )
 				{
 
 					if( Model != INDEX_NONE )
@@ -753,11 +753,11 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 
 					if( Models[ Model ].Flags & MODFLAG_UseClipGroup )
 					{
-						AddTransExe( &Matrix , &Mxloadheader->Group[group].renderObject[i] , 0, Model, Models[ Model ].ClipGroup, Mxloadheader->Group[ group ].num_verts_per_execbuf[i] );
+						AddTransExe( &Matrix , &Mxloadheader->Group[group].renderObject[i] , 0, Model, Models[ Model ].ClipGroup, Mxloadheader->Group[ group ].num_verts_per_mesh[i] );
 					}
 					else
 					{
-						AddTransExe( &Matrix , &Mxloadheader->Group[group].renderObject[i] , 0, Model, Models[ Model ].Group, Mxloadheader->Group[ group ].num_verts_per_execbuf[i] );
+						AddTransExe( &Matrix , &Mxloadheader->Group[group].renderObject[i] , 0, Model, Models[ Model ].Group, Mxloadheader->Group[ group ].num_verts_per_mesh[i] );
 					}
 				}
 				else
@@ -843,7 +843,7 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 
     for (group = 0; group < Mxloadheader->num_groups; group++)
 	{
-	    for (i = 0; i < Mxloadheader->Group[group].num_execbufs; i++)
+	    for (i = 0; i < Mxloadheader->Group[group].num_meshes; i++)
 		{
 
 			FSReleaseRenderObject(&Mxloadheader->Group[group].renderObject[i]);
@@ -854,7 +854,7 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 				Mxloadheader->Group[group].poly_ptr[i] = NULL;
 			}
 
-			/* Per-execbuf vertex copy from mxload.cpp — same leak
+			/* Per-mesh vertex copy from mxload.cpp — same leak
 			 * pattern as mload.cpp, fixed there too. */
 			if (Mxloadheader->Group[group].originalVerts[i])
 			{
@@ -1033,7 +1033,7 @@ bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t /*Model*/
 	{
 		for ( group=0 ; group<Mxloadheader->num_groups ; group++)
 		{
-			for ( i=0 ; i<Mxloadheader->Group[group].num_execbufs; i++)
+			for ( i=0 ; i<Mxloadheader->Group[group].num_meshes; i++)
 			{
 #ifdef __3DS__
 				{ c3d_set_object_proctex(true); }
@@ -1061,7 +1061,7 @@ void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  )
 {
 	u_int16_t		*	Uint16Pnt;
 	int	i;
-	int	execbuf;
+	int	mesh;
 	int	group;
 	POLYANIM * PolyAnim;
 	u_int16_t * AnimData;
@@ -1075,11 +1075,11 @@ void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  )
 
 	for( group=0 ; group<Mxloadheader->num_groups; group++)
 	{
-		for( execbuf=0 ; execbuf<Mxloadheader->Group[group].num_execbufs; execbuf++)
+		for( mesh=0 ; mesh<Mxloadheader->Group[group].num_meshes; mesh++)
 		{
-			PolyAnim = Mxloadheader->Group[group].polyanim[execbuf];
+			PolyAnim = Mxloadheader->Group[group].polyanim[mesh];
 
-			for( i = 0 ; i < Mxloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
+			for( i = 0 ; i < Mxloadheader->Group[group].num_animating_polys[mesh] ; i++ )
 			{
 
 				if( ( PolyAnim->State == TEXTUREANIM_Go ) &&
@@ -1124,7 +1124,7 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 		return false;
 	for ( group=0 ; group<Mxloadheader1->num_groups ; group++)
 	{
-		for ( i=0 ; i<Mxloadheader1->Group[group].num_execbufs; i++)
+		for ( i=0 ; i<Mxloadheader1->Group[group].num_meshes; i++)
 		{
 			if (!(FSLockVertexBuffer(&Mxloadheader1->Group[group].renderObject[i], &dstVert)))
 			{
@@ -1133,7 +1133,7 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 
 			VertPtr = Mxloadheader1->Group[group].originalVerts[i];
 
-			for( e = 0 ; e < Mxloadheader1->Group[group].num_verts_per_execbuf[i] ; e++ )
+			for( e = 0 ; e < Mxloadheader1->Group[group].num_verts_per_mesh[i] ; e++ )
 			{
 				dstVert->color = VertPtr->color;
 				VertPtr++;

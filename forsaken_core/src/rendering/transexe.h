@@ -2,7 +2,7 @@
 
 /* transexe.h -- deferred translucent draws, replayed per visibility group
  *
- * Model and level-mesh draw paths call AddTransExe for execbufs with
+ * Model and level-mesh draw paths call AddTransExe for meshes with
  * translucent faces instead of drawing them; ExecuteTransExe(group) draws that
  * group's entries after its opaque geometry, and ExecuteTransExeUnclipped draws
  * entries for models without MODFLAG_Clip. TransExe[] lives in transexe.cpp and

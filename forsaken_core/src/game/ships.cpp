@@ -1512,24 +1512,24 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	VECTOR Temp;
 	u_int16_t group;
 	u_int16_t vert;
-	u_int16_t execbuf;
+	u_int16_t mesh;
 	LVERTEX	*lpLVERTEX = NULL;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )
 	{
-		for( execbuf = 0 ; execbuf < Mxloadheader->Group[group].num_execbufs ; execbuf++ )
+		for( mesh = 0 ; mesh < Mxloadheader->Group[group].num_meshes ; mesh++ )
 		{
-			if( (Mxloadheader->Group[group].exec_type[execbuf]&HASENVIROMENTMAP) != 0 )
+			if( (Mxloadheader->Group[group].mesh_type[mesh]&HASENVIROMENTMAP) != 0 )
 			{
 				/*	lock the vertex buffer	*/
 
-				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], &lpLVERTEX)))
+				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
 				{
 					return false;
 				}
 
-				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] ; vert ++ )
+				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_mesh[mesh] ; vert ++ )
 				{
 					ApplyMatrix( Mat , (VECTOR *) lpLVERTEX,  &Temp);
 					NormaliseVector( &Temp );
@@ -1543,7 +1543,7 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 				}
 
 				/*	unlock the vertex buffer	*/
-				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
+				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
 				{
 					return false;
 				}

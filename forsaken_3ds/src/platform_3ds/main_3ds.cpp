@@ -197,11 +197,11 @@ bool platform_init(void)
 		osSetSpeedupEnable(true);
 	}
 
-	/* Q3-style hunk arena for per-execbuf textureGroups[] arrays. The
+	/* Q3-style hunk arena for per-mesh textureGroups[] arrays. The
 	 * level mesh's Mloadheader.Group[].renderObject[].textureGroups[]
 	 * and the model loaders' Mx(a)loadheader.Group.renderObject[]
 	 * .textureGroups[] used to be inline MAX_TEXTURE_GROUPS-sized
-	 * arrays in BSS; they're now small per-execbuf hunk allocations
+	 * arrays in BSS; they're now small per-mesh hunk allocations
 	 * sized to numTextureGroups. Hundreds of small allocs per level
 	 * is exactly what the hunk is for — bulk-freed via
 	 * Hunk_FreeAll(TAG_LEVEL) on level transition. 8 MB easily covers

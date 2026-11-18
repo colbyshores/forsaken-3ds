@@ -14,9 +14,9 @@
  *   magic, version (u32 each)
  *   num_texture_files, texture names (NUL-terminated)       -- PreMxaload
  *   num_groups
- *   per group: num_execbufs
- *     per execbuf:
- *       execute-buffer size (unused), exec_type (bit 0: has
+ *   per group: num_meshes
+ *     per mesh:
+ *       execute-buffer size (unused), mesh_type (bit 0: has
  *       transparencies), num_vertices
  *       OLDLVERTEX[num_vertices]       x y z, reserved, colour, specular, tu tv
  *       num_texture_groups
@@ -26,7 +26,7 @@
  *         colour-keyed), face normal
  *   format flag: 2 = animation frames follow (any other value is not
  *       consumed: it is read again as the fire point flag)
- *   if 2: num_frames; if num_frames > 1, per frame, per group, per execbuf,
+ *   if 2: num_frames; if num_frames > 1, per frame, per group, per mesh,
  *       per texture group: count, MXAVERT[count]  x y z, colour, specular,
  *       tu tv, flags (MXA_ANIM_POS / RGB / UV)
  *   fire point flag: if non-zero,
@@ -85,7 +85,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 	TRIANGLE		FacePnt; // was a pointer
 	TRIANGLE	*TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
-	u_int16_t			exec_type;			// the execbuf's type (bit 0: has transparencies)
+	u_int16_t			mesh_type;			// the mesh's type (bit 0: has transparencies)
 	u_int16_t			num_vertices;		// overall number of verts
 	u_int16_t			num_texture_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
@@ -98,7 +98,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	u_int16_t			texgroup;
 	int				i,e;
 	u_int16_t			tpage = 0;
-	int				execbuf;
+	int				mesh;
 	int				group;
 
 	u_int16_t			NumSpotFX;
@@ -140,41 +140,41 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 	for( group=0 ; group<Mxaloadheader->num_groups; group++)
 	{
-		/*	get the number of execbufs in this group	*/
-		Mxaloadheader->Group[group].num_execbufs = in.u16();
+		/*	get the number of meshes in this group	*/
+		Mxaloadheader->Group[group].num_meshes = in.u16();
 
-		if ( Mxaloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
+		if ( Mxaloadheader->Group[group].num_meshes > MAXMESHESPERGROUP )
 		{
-			Msg( "Mxaload() num_execbufs > MAXEXECBUFSPERGROUP\n", Filename );
+			Msg( "Mxaload() num_meshes > MAXMESHESPERGROUP\n", Filename );
 			return false;
 		}
 
-		for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
+		for( mesh=0 ; mesh<Mxaloadheader->Group[group].num_meshes; mesh++)
 		{
 			in.skip( sizeof( u_int16_t ) );	// Direct3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
-			exec_type = in.u16();
+			mesh_type = in.u16();
 			/*	get the number of verts in execution buffer	*/
 			num_vertices = in.u16();
 
-			/*	record the execbuf's type	*/
-			Mxaloadheader->Group[group].exec_type[execbuf] = exec_type;
+			/*	record the mesh's type	*/
+			Mxaloadheader->Group[group].mesh_type[mesh] = mesh_type;
 
-			/*	record how many verts the execbuf has	*/
-			Mxaloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
+			/*	record how many verts the mesh has	*/
+			Mxaloadheader->Group[group].num_verts_per_mesh[mesh] = num_vertices;
 
 			/*	create a vertex buffer	*/
-			if (!FSCreateVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], num_vertices))
+			if (!FSCreateVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], num_vertices))
 			{
 				return false;
 			}
-			Mxaloadheader->Group[group].renderObject[execbuf].vertOwner = VERT_OWNER_MXA;
+			Mxaloadheader->Group[group].renderObject[mesh].vertOwner = VERT_OWNER_MXA;
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 
 			/*	lock the vertex buffer	*/
-			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], &lpLVERTEX)))
+			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
@@ -199,12 +199,12 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
-			Mxaloadheader->Group[group].originalVerts[execbuf] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
-			memmove(Mxaloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
+			Mxaloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
+			memmove(Mxaloadheader->Group[group].originalVerts[mesh], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
 			
 			num_texture_groups = in.u16();
-			Mxaloadheader->Group[group].num_texture_groups[execbuf] = num_texture_groups;
+			Mxaloadheader->Group[group].num_texture_groups[mesh] = num_texture_groups;
 
 			/* find out how many vertexes we'll need to load into our vertex buffer */
 			triangleCount = 0;
@@ -222,7 +222,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			}
 
 			/*	create an index buffer	*/
-			if (!FSCreateIndexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], triangleCount * 3))
+			if (!FSCreateIndexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], triangleCount * 3))
 			{
 				return false;
 			}
@@ -230,32 +230,32 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			DebugPrintf("created index buffer to hold :%d incidices\n", triangleCount * 3);
 
 			/*	lock the index buffer	*/
-			if (!(FSLockIndexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], &lpIndices)))
+			if (!(FSLockIndexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpIndices)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
 			}
 
-			if (!FSCreateNormalBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], triangleCount))
+			if (!FSCreateNormalBuffer(&Mxaloadheader->Group[group].renderObject[mesh], triangleCount))
 			{
 				DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
 				return false;
 			}
-			if (!(FSLockNormalBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], &lpNormals)))
+			if (!(FSLockNormalBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpNormals)))
 			{
 				Msg( "Mxload() normal lock failed in %s\n", Filename );
 				return false;
 			}
 
-			/* Allocate this execbuf's textureGroups[] from the TAG_LEVEL
+			/* Allocate this mesh's textureGroups[] from the TAG_LEVEL
 			 * hunk, sized to num_texture_groups. Bulk-freed via
 			 * Hunk_FreeAll(TAG_LEVEL) on level transition. */
 			if ( num_texture_groups > 0 )
 			{
-				Mxaloadheader->Group[group].renderObject[execbuf].textureGroups =
+				Mxaloadheader->Group[group].renderObject[mesh].textureGroups =
 				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
 				                                num_texture_groups * sizeof(TEXTUREGROUP));
-				if ( !Mxaloadheader->Group[group].renderObject[execbuf].textureGroups )
+				if ( !Mxaloadheader->Group[group].renderObject[mesh].textureGroups )
 				{
 					Msg( "Mxaload() hunk-alloc failed for textureGroups[%u] %s\n",
 					     (unsigned)num_texture_groups, Filename );
@@ -274,7 +274,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				tpage = in.u16();
 				num_triangles = in.u16();
 	
-				Mxaloadheader->Group[group].texture_group_vert_off[execbuf][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
+				Mxaloadheader->Group[group].texture_group_vert_off[mesh][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
 
 				/* the index buffer holds every triangle in order, so StoreTriangles copies it from the start */
 				TempFacePnt = (TRIANGLE *) /*lpLVERTEX*/lpIndices;
@@ -311,49 +311,49 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				DebugPrintf("put %d verts into VB\n", tempInt);
 
 				// BJD - check this. correct value to place here?
-				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;
-				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numTriangles = num_triangles;
+				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;
+				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numTriangles = num_triangles;
 
 				/* keep track of our offset into our index buffer */
-				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].startIndex = indexOffset;
+				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].startIndex = indexOffset;
 				indexOffset += num_triangles * 3;
 
-				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mxaloadheader->TloadIndex[tpage]];
-				Mxaloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxaloadheader->TloadIndex[tpage]];
+				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.lpTexture[Mxaloadheader->TloadIndex[tpage]];
+				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxaloadheader->TloadIndex[tpage]];
 			}
 
 			if (StoreTriangles)
-			{	Mxaloadheader->Group[group].num_polys_per_execbuf[execbuf] = /*num_triangles*/triangleCount;
-				Mxaloadheader->Group[group].poly_ptr[execbuf] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);			
+			{	Mxaloadheader->Group[group].num_polys_per_mesh[mesh] = /*num_triangles*/triangleCount;
+				Mxaloadheader->Group[group].poly_ptr[mesh] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);			
 			
-				memmove(Mxaloadheader->Group[group].poly_ptr[execbuf], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
+				memmove(Mxaloadheader->Group[group].poly_ptr[mesh], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
 			}
 			else
 			{
-				Mxaloadheader->Group[group].num_polys_per_execbuf[execbuf] = 0;
-				Mxaloadheader->Group[group].poly_ptr[execbuf] = NULL;			
+				Mxaloadheader->Group[group].num_polys_per_mesh[mesh] = 0;
+				Mxaloadheader->Group[group].poly_ptr[mesh] = NULL;			
 			}
 
-			if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxaload() unlock failed in %s\n", Filename );
 				return false ;
 			}
 
 			/*	unlock the index buffer	*/
-			if (!(FSUnlockIndexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockIndexBuffer(&Mxaloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxload() ib unlock failed in %s\n", Filename );
 				return false ;
 			}
 
-			if (!(FSUnlockNormalBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockNormalBuffer(&Mxaloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxload() normal unlock failed in %s\n", Filename );
 				return false ;
 			}
 
-			Mxaloadheader->Group[group].renderObject[execbuf].numTextureGroups = num_texture_groups;
+			Mxaloadheader->Group[group].renderObject[mesh].numTextureGroups = num_texture_groups;
 
 		}
 	}
@@ -390,8 +390,8 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				FileReader scan = in;
 				for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
 					for( group=0 ; group<Mxaloadheader->num_groups; group++)
-						for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
-							for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+						for( mesh=0 ; mesh<Mxaloadheader->Group[group].num_meshes; mesh++)
+							for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[mesh] ; texgroup++)
 							{
 								u_int16_t count = scan.u16();
 								scan.skip( count * sizeof( MXAVERT ) );
@@ -413,12 +413,12 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			for( frame=0 ; frame<Mxaloadheader->num_frames; frame++)
 				for( group=0 ; group<Mxaloadheader->num_groups; group++)
-					for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
-						for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+					for( mesh=0 ; mesh<Mxaloadheader->Group[group].num_meshes; mesh++)
+						for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[mesh] ; texgroup++)
 						{
 							u_int16_t count = in.u16();
-							Mxaloadheader->num_anim_vertices[frame][group][execbuf][texgroup] = count;
-							Mxaloadheader->frame_pnts[frame][group][execbuf][texgroup] = dst;
+							Mxaloadheader->num_anim_vertices[frame][group][mesh][texgroup] = count;
+							Mxaloadheader->frame_pnts[frame][group][mesh][texgroup] = dst;
 							in.bytes( dst, count * sizeof( MXAVERT ) );
 							dst += count;
 						}
@@ -563,15 +563,15 @@ bool ExecuteMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t in_group  )
 	{
 		for ( group=0 ; group<Mxaloadheader->num_groups ; group++)
 		{
-			for ( i=0 ; i<Mxaloadheader->Group[group].num_execbufs; i++)
+			for ( i=0 ; i<Mxaloadheader->Group[group].num_meshes; i++)
 			{
-				if( Mxaloadheader->Group[group].exec_type[i]&HASTRANSPARENCIES )
+				if( Mxaloadheader->Group[group].mesh_type[i]&HASTRANSPARENCIES )
 				{
 					if (!FSGetWorld(&Matrix))
 					{
 						return false;
 					}
-					AddTransExe( &Matrix , &Mxaloadheader->Group[group].renderObject[i] , 0, INDEX_NONE, in_group, Mxaloadheader->Group[ group ].num_verts_per_execbuf[i] );
+					AddTransExe( &Matrix , &Mxaloadheader->Group[group].renderObject[i] , 0, INDEX_NONE, in_group, Mxaloadheader->Group[ group ].num_verts_per_mesh[i] );
 				}
 				else
 				{
@@ -607,7 +607,7 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 		return;
     for (group = 0; group < Mxaloadheader->num_groups; group++)
 	{
-	    for (i = 0; i < Mxaloadheader->Group[group].num_execbufs; i++)
+	    for (i = 0; i < Mxaloadheader->Group[group].num_meshes; i++)
 		{
 			FSReleaseRenderObject(&Mxaloadheader->Group[group].renderObject[i]);
 			if (Mxaloadheader->Group[group].poly_ptr[i])
@@ -616,7 +616,7 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 				Mxaloadheader->Group[group].poly_ptr[i] = NULL;
 			}
 
-			/* Per-execbuf vertex copy from mxaload.cpp — same leak
+			/* Per-mesh vertex copy from mxaload.cpp — same leak
 			 * pattern as mload/mxload, fixed there too. */
 			if (Mxaloadheader->Group[group].originalVerts[i])
 			{
@@ -772,7 +772,7 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 	MXAVERT *		ToVert;
 	u_int16_t			texgroup;
 	u_int16_t			num_anim_vertices;
-	int execbuf;
+	int mesh;
 	int group;
 	COLOR_RGBA * color;
 	COLOR_RGBA * from_color;
@@ -782,36 +782,36 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 
 	for( group=0 ; group<Mxaloadheader->num_groups; group++)
 	{
-		for( execbuf=0 ; execbuf<Mxaloadheader->Group[group].num_execbufs; execbuf++)
+		for( mesh=0 ; mesh<Mxaloadheader->Group[group].num_meshes; mesh++)
 		{
-			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf], &lpBufStart)))
+			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpBufStart)))
 			{
 				return false;
 			}
 		
-			for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[execbuf] ; texgroup++)
+			for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[mesh] ; texgroup++)
 			{
-				/* An execbuf's vertex list starts with the 8 corners of its
+				/* A mesh's vertex list starts with the 8 corners of its
 				   bounding box (written by the 1998 exporter for Direct3D's
 				   off-screen test; no triangle uses them), and the file's
 				   texture-group start vertex counts from after them. So the
 				   group's first real vertex, where its frame data begins, is
 				   start + 8. Checked against every shipped .mxa: all 726
-				   execbufs have the box, every group's triangles lie in
+				   meshes have the box, every group's triangles lie in
 				   start + 8 .. start + 8 + count, and frame 0 matches the
 				   base vertices at this offset. (Some Remaster-era .mx
 				   models have no box, but .mx models never come through
 				   here.) */
-				lpLVERTEX = 	( LVERTEX *) ( (char*) lpBufStart+( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
+				lpLVERTEX = 	( LVERTEX *) ( (char*) lpBufStart+( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[mesh][texgroup]));
 				lpLVERTEX += 8;
 
-				lpLVERTEX2 = ( LVERTEX *) ( (char*) Mxaloadheader->Group[group].originalVerts[execbuf] + ( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
+				lpLVERTEX2 = ( LVERTEX *) ( (char*) Mxaloadheader->Group[group].originalVerts[mesh] + ( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[mesh][texgroup]));
 				lpLVERTEX2 += 8;
 				
-				FromVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[FromFrame][group][execbuf][texgroup];
-				ToVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[ToFrame][group][execbuf][texgroup];
+				FromVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[FromFrame][group][mesh][texgroup];
+				ToVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[ToFrame][group][mesh][texgroup];
 
-				for( num_anim_vertices = 0 ; num_anim_vertices <  Mxaloadheader->num_anim_vertices[FromFrame][group][execbuf][texgroup] ; num_anim_vertices++ )
+				for( num_anim_vertices = 0 ; num_anim_vertices <  Mxaloadheader->num_anim_vertices[FromFrame][group][mesh][texgroup] ; num_anim_vertices++ )
 				{
 					if ( FromVert->flags & MXA_ANIM_POS )
 					{
@@ -842,7 +842,7 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 					ToVert++;
 				}
 			}
-			if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh])))
 			{
 				return false;
 			}

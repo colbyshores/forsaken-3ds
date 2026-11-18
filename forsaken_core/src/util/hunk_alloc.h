@@ -13,7 +13,7 @@
  * every pointer from that tag is dead afterwards. ReleaseView (oct2.cpp)
  * calls Hunk_FreeAll(TAG_LEVEL) at the end of both its title and level
  * teardown, after the release functions that still walk the arrays. TAG_LEVEL
- * holds the per-execbuf textureGroups[] arrays of the level mesh and models
+ * holds the per-mesh textureGroups[] arrays of the level mesh and models
  * (mload / mxload / mxaload) and one texture group per water object
  * (water.cpp). Nothing allocates from TAG_STARTUP.
  */

@@ -17,7 +17,7 @@
  * defines
  */
 constexpr int MAXTPAGESPERMLOAD = 8;
-constexpr int MAXEXECBUFSPERGROUP = 16;
+constexpr int MAXMESHESPERGROUP = 16;
 constexpr int MAXPORTALSPERGROUP = 64;
 constexpr int MAXVERTSPERPORTAL = 32;
 constexpr int MAXPOLYSPERPORTAL = 32;
@@ -142,7 +142,7 @@ typedef struct  {
 
 typedef struct _TEXTUREANIMINFOINDEX{
 	u_int16_t	Group;
-	u_int16_t	Execbuf;
+	u_int16_t	Mesh;
 	u_int16_t	PolyAnim;
 	u_int16_t	InitState;
 }TEXTUREANIMINFOINDEX;
@@ -157,11 +157,11 @@ TEXTUREANIMINFOINDEX * TAnimInfoIndex;
 
 
 typedef struct LVLGROUP{
-	u_int16_t	num_execbufs;
-	u_int16_t	exec_type[MAXEXECBUFSPERGROUP];
-	u_int16_t	num_verts_per_execbuf[MAXEXECBUFSPERGROUP];
-	LEVELRENDEROBJECT			renderObject[MAXEXECBUFSPERGROUP];
-	LVERTEX *originalVerts[MAXEXECBUFSPERGROUP];
+	u_int16_t	num_meshes;
+	u_int16_t	mesh_type[MAXMESHESPERGROUP];
+	u_int16_t	num_verts_per_mesh[MAXMESHESPERGROUP];
+	LEVELRENDEROBJECT			renderObject[MAXMESHESPERGROUP];
+	LVERTEX *originalVerts[MAXMESHESPERGROUP];
 	char	name[32];
 	VERT	center;
 	VERT	half_size;
@@ -173,19 +173,19 @@ typedef struct LVLGROUP{
 	float	BGClear_Green;
 	float	BGClear_Blue;
 
-	VECTOR	cell_origin[MAXEXECBUFSPERGROUP];
-	u_int16_t	xcells[MAXEXECBUFSPERGROUP];
-	u_int16_t	ycells[MAXEXECBUFSPERGROUP];
-	u_int16_t	zcells[MAXEXECBUFSPERGROUP];
-	u_int16_t	numofcells[MAXEXECBUFSPERGROUP];
-	u_int16_t	num_vertex_indices[MAXEXECBUFSPERGROUP];
-	u_int16_t * vertex_index_pnt[MAXEXECBUFSPERGROUP];
-	VERTEXCELL * vertex_cell_pnt[MAXEXECBUFSPERGROUP];
-	COLOR * colour_cell_pnt[MAXEXECBUFSPERGROUP];
+	VECTOR	cell_origin[MAXMESHESPERGROUP];
+	u_int16_t	xcells[MAXMESHESPERGROUP];
+	u_int16_t	ycells[MAXMESHESPERGROUP];
+	u_int16_t	zcells[MAXMESHESPERGROUP];
+	u_int16_t	numofcells[MAXMESHESPERGROUP];
+	u_int16_t	num_vertex_indices[MAXMESHESPERGROUP];
+	u_int16_t * vertex_index_pnt[MAXMESHESPERGROUP];
+	VERTEXCELL * vertex_cell_pnt[MAXMESHESPERGROUP];
+	COLOR * colour_cell_pnt[MAXMESHESPERGROUP];
 
-	u_int16_t	num_animating_polys[MAXEXECBUFSPERGROUP];
+	u_int16_t	num_animating_polys[MAXMESHESPERGROUP];
 
-	POLYANIM *polyanim[MAXEXECBUFSPERGROUP];
+	POLYANIM *polyanim[MAXMESHESPERGROUP];
 	u_int16_t	StartPosInThisGroup;
 	u_int32_t				AnimOncePerFrame;					// used for stuff that is displayed more than once in a single frame..
 }LVLGROUP;

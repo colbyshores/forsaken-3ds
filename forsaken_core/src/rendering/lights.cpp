@@ -183,7 +183,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	VECTOR	Temp;
 	VECTOR	CellIndex;
 	float	distance;
-	int		execbuf;
+	int		mesh;
 	int		vert;
     LVERTEX	*lpPointer = NULL;
 	LVERTEX	*lpLVERTEX = NULL;
@@ -243,33 +243,33 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 
 	
 	CellSize = Mloadheader->CellSize;
-	execbuf = Mloadheader->Group[group].num_execbufs;
-	while( execbuf--)
+	mesh = Mloadheader->Group[group].num_meshes;
+	while( mesh--)
 	{
-		if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], &lpPointer)))
+		if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpPointer)))
 		{
 			return false;
 		}	
 		/* The colour pass below restores the baked colours (stable from
 		 * frame to frame) unless white-out or water rewrite them every
 		 * frame; tell the backend's caches which (render.h SMEMO_PASS). */
-		Mloadheader->Group[group].renderObject[execbuf].memoEpochPass =
+		Mloadheader->Group[group].renderObject[mesh].memoEpochPass =
 			( ( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
 				SMEMO_PASS_UNSET : SMEMO_PASS_PER_FRAME;
 
-		VertexCellPnt = Mloadheader->Group[group].vertex_cell_pnt[execbuf];
-		OrgVertexIndexPnt = Mloadheader->Group[group].vertex_index_pnt[execbuf];
+		VertexCellPnt = Mloadheader->Group[group].vertex_cell_pnt[mesh];
+		OrgVertexIndexPnt = Mloadheader->Group[group].vertex_index_pnt[mesh];
 
-		NumOfxCells = Mloadheader->Group[group].xcells[execbuf];
-		NumOfyCells = Mloadheader->Group[group].ycells[execbuf];
-		NumOfzCells = Mloadheader->Group[group].zcells[execbuf];
+		NumOfxCells = Mloadheader->Group[group].xcells[mesh];
+		NumOfyCells = Mloadheader->Group[group].ycells[mesh];
+		NumOfzCells = Mloadheader->Group[group].zcells[mesh];
 
-		if( Mloadheader->Group[group].num_animating_polys[execbuf] != 0 )
+		if( Mloadheader->Group[group].num_animating_polys[mesh] != 0 )
 		{
 
-			PolyAnim = Mloadheader->Group[group].polyanim[execbuf];
+			PolyAnim = Mloadheader->Group[group].polyanim[mesh];
 
-			for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
+			for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[mesh] ; i++ )
 			{
 				
 				if( PolyAnim->currentframe != PolyAnim->newframe )
@@ -297,9 +297,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		
 		lpLVERTEX = lpPointer;
 		{
-			lpLVERTEX2 = Mloadheader->Group[group].originalVerts[execbuf];
+			lpLVERTEX2 = Mloadheader->Group[group].originalVerts[mesh];
 			
-			vert = Mloadheader->Group[group].num_verts_per_execbuf[execbuf];
+			vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 			
 			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 			if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
@@ -349,9 +349,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			}else if( GroupWaterInfo[group] == WATERSTATE_ALLWATER )
 			{
 				// ****************** Full Water Effect ********************************
-				lpLVERTEX2 = Mloadheader->Group[group].originalVerts[execbuf];
+				lpLVERTEX2 = Mloadheader->Group[group].originalVerts[mesh];
 				lpLVERTEX = lpPointer;
-				vert = Mloadheader->Group[group].num_verts_per_execbuf[execbuf];
+				vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 				//	Special Lighting effects
 				while( vert --)
 				{
@@ -390,10 +390,10 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 				// ****************** End of Water Effect ******************************
 			}else{
 				// ****************** Partial Water Effect ******************************
-				lpLVERTEX2 = Mloadheader->Group[group].originalVerts[execbuf];
+				lpLVERTEX2 = Mloadheader->Group[group].originalVerts[mesh];
 				lpLVERTEX = lpPointer;
 				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-				vert = Mloadheader->Group[group].num_verts_per_execbuf[execbuf];
+				vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 				//	Special Lighting effects
 				while( vert --)
 				{
@@ -490,9 +490,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						}
 				
 					
-						CellIndex.x = Posx - Mloadheader->Group[group].cell_origin[execbuf].x;
-						CellIndex.y = Posy - Mloadheader->Group[group].cell_origin[execbuf].y;
-						CellIndex.z = Posz - Mloadheader->Group[group].cell_origin[execbuf].z;
+						CellIndex.x = Posx - Mloadheader->Group[group].cell_origin[mesh].x;
+						CellIndex.y = Posy - Mloadheader->Group[group].cell_origin[mesh].y;
+						CellIndex.z = Posz - Mloadheader->Group[group].cell_origin[mesh].z;
 						CellIndex_x = (int) fast_floorf( (CellIndex.x - OSize) * CellSize );
 						CellIndex_y = (int) fast_floorf( (CellIndex.y - OSize) * CellSize );
 						CellIndex_z = (int) fast_floorf( (CellIndex.z - OSize) * CellSize );
@@ -706,7 +706,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		}
 #endif /* GPU_LIGHTING */
 		/*	unlock the vertex buffer	*/
-		if(!FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf]))
+		if(!FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh]))
 			return false;
 	}
 
@@ -729,7 +729,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	VECTOR	Temp;
 	float	distance;
 	int		group;
-	int		execbuf;
+	int		mesh;
 	int		vert;
     LVERTEX	*lpPointer = NULL;
 
@@ -760,17 +760,17 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	while( group--)
 	{
 	
-		execbuf = MXloadheader->Group[group].num_execbufs;
-		while( execbuf--)
+		mesh = MXloadheader->Group[group].num_meshes;
+		while( mesh--)
 		{
-			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf], &lpPointer)))
+			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh], &lpPointer)))
 			{
 				return false;
 			}
 
 			lpLVERTEX = lpPointer;
-			vert = MXloadheader->Group[group].num_verts_per_execbuf[execbuf];
-			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[execbuf];
+			vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
+			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[mesh];
 
 #ifdef GPU_LIGHTING
 			/* The baked-colour restore is skipped here (lock/unlock is
@@ -832,7 +832,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 						}
 					
 						lpLVERTEX = lpPointer;
-						vert = MXloadheader->Group[group].num_verts_per_execbuf[execbuf];
+						vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
 		
 						switch( XLightPnt->Type )
 						{
@@ -941,7 +941,7 @@ PLOP:
 			}
 #endif /* !GPU_LIGHTING */
 			/*	unlock the vertex buffer	*/
-			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh])))
 			{
 				return false;
 			}
@@ -965,7 +965,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	VECTOR	Temp;
 	float	distance;
 	int		group;
-	int		execbuf;
+	int		mesh;
 	int		vert;
     LVERTEX	*lpPointer = NULL;
 
@@ -996,17 +996,17 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	while( group--)
 	{
 	
-		execbuf = MXloadheader->Group[group].num_execbufs;
-		while( execbuf--)
+		mesh = MXloadheader->Group[group].num_meshes;
+		while( mesh--)
 		{
-			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf], &lpPointer)))
+			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh], &lpPointer)))
 			{
 				return false;
 			}
 		
 			lpLVERTEX = lpPointer;
-			vert = MXloadheader->Group[group].num_verts_per_execbuf[execbuf];
-			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[execbuf];
+			vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
+			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[mesh];
 			while( vert --)
 			{
 				lpLVERTEX->color = lpLVERTEX2->color;
@@ -1054,7 +1054,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 						}
 					
 						lpLVERTEX = lpPointer;
-						vert = MXloadheader->Group[group].num_verts_per_execbuf[execbuf];
+						vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
 		
 						switch( XLightPnt->Type )
 						{
@@ -1162,7 +1162,7 @@ PLOP2:
 			}
 #endif /* !GPU_LIGHTING */
 			/*	unlock the vertex buffer	*/
-			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh])))
 			{
 				return false;
 			}
@@ -1173,7 +1173,7 @@ PLOP2:
 }
 
 /*===================================================================
-	Procedure	:	Sample the baked colour grid (execbuf 0's cells)
+	Procedure	:	Sample the baked colour grid (mesh 0's cells)
 				:	of a level group at a point
 	Input		:	MLOADHEADER *	Level
 				:	VECTOR *		Position

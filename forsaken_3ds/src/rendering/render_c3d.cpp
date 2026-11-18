@@ -229,9 +229,9 @@ void c3d_memo_suspend(bool suspend)
 /* ---- Persistent level geometry ----
  * Level-wall (VERT_OWNER_LEVEL) texgroups are converted once into
  * retained linear buffers and resubmitted every frame without
- * reconversion or scratch traffic. Only execbufs whose content is
+ * reconversion or scratch traffic. Only meshes whose content is
  * stable across frames qualify (memoEpochPass == SMEMO_PASS_UNSET;
- * XLight1Group marks white-out / underwater execbufs PER_FRAME).
+ * XLight1Group marks white-out / underwater meshes PER_FRAME).
  * Validity is keyed by smemo_persist_gen(): level texture-animation
  * steps bump it (reconvert into the same allocations). The buffers are
  * freed when their level is released (c3d_release_level_cache).
@@ -478,7 +478,7 @@ static bool s_inFrame = false;
 static void *s_lastBoundTexture = NULL;  /* last texture_t* passed to C3D_TexBind */
 static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs vertex-only */
 
-/* Per-execbuf ProcTex phase variation. draw_render_object writes a
+/* Per-mesh ProcTex phase variation. draw_render_object writes a
  * per-renderObject seed; apply_texenv_for_texture reads it to pick a
  * phase bucket so two adjacent walls sharing the same base texture
  * get visually distinct grain. Folded into g_wall_detail — there's no
@@ -2053,7 +2053,7 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		mode = TEXENV_MODE_DIFFUSE;
 
 	/* Compute desired ProcTex state up front so the cache key includes
-	 * the per-execbuf atlas bucket. Two adjacent execbufs sharing the
+	 * the per-mesh atlas bucket. Two adjacent meshes sharing the
 	 * same texture but different atlas seeds will land in different
 	 * buckets and force a (cheap) NoiseCoefs rewrite — the color LUT
 	 * stays cached across the bucket change. */
@@ -2603,9 +2603,9 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 {
 	int group;
 
-	/* Per-execbuf atlas seed — hash of the renderObject pointer.
-	 * Stable for the lifetime of the level, distinct per execbuf, so
-	 * walls in different execbufs sharing the same base texture each
+	/* Per-mesh atlas seed — hash of the renderObject pointer.
+	 * Stable for the lifetime of the level, distinct per mesh, so
+	 * walls in different meshes sharing the same base texture each
 	 * land in their own ProcTex phase bucket. */
 	s_atlasSeed   = (u32)((uintptr_t)renderObject) * 0x9E3779B1u;
 	s_isOrthoDraw = orthographic;

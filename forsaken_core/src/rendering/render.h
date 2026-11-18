@@ -119,25 +119,25 @@ bool FSClearBlack(void);
 bool FSClear(XYRECT * rect);
 bool FSClearDepth(XYRECT * rect);
 
-/* MAX_LEVEL_TEXTURE_GROUPS — per-execbuf texture group cap inside a
+/* MAX_LEVEL_TEXTURE_GROUPS — per-mesh texture group cap inside a
  * LEVELRENDEROBJECT (the level-mesh form of RENDEROBJECT, distinct from
  * the model RENDEROBJECT which uses MAX_TEXTURE_GROUPS).
  *
  * Was 8 on 3DS. The unguarded INCREASE_TEXTURE_GROUPS at mload.cpp
  * checks against MAX_TEXTURE_GROUPS (64) — not MAX_LEVEL_TEXTURE_GROUPS —
- * so when a level mesh execbuf used more than 8 unique textures, the
+ * so when a level-mesh mesh used more than 8 unique textures, the
  * loader silently wrote textureGroups[8..N] past the end of the 8-slot
- * array, clobbering the start of the next execbuf's LEVELRENDEROBJECT
+ * array, clobbering the start of the next mesh's LEVELRENDEROBJECT
  * (vertexBuffer, indexBuffer, vbLocked). At render time the next
- * execbuf's draws fed garbage pointers to the GPU and produced nothing —
+ * mesh's draws fed garbage pointers to the GPU and produced nothing —
  * presenting as the "black void where the next room should be" portal
  * regression on Remaster / N64-port levels (vol2 stays under 8 textures
- * per execbuf so it never triggered).
+ * per mesh so it never triggered).
  *
  * Raised to 64 to match MAX_TEXTURE_GROUPS so the array and the
  * INCREASE_TEXTURE_GROUPS assert agree and overflow is properly caught
  * (or in release, properly bounded). Cost ~2.7 MB extra BSS in
- * Mloadheader's per-group renderObject[MAXEXECBUFSPERGROUP] arrays —
+ * Mloadheader's per-group renderObject[MAXMESHESPERGROUP] arrays —
  * small fraction of the existing ~27 MB ModelHeaders BSS, fits comfortably
  * inside the OG 3DS application memory budget. */
 
@@ -200,7 +200,7 @@ typedef struct {
  * MAX_TEXTURE_GROUPS-element array (~2 KB per RENDEROBJECT, ~256 KB
  * per Mloadheader.Group[g].renderObject[16] BSS) — moved to dynamic
  * allocation so each entry costs exactly numTextureGroups *
- * sizeof(TEXTUREGROUP) instead of 2 KB. Per-execbuf textureGroups[]
+ * sizeof(TEXTUREGROUP) instead of 2 KB. Per-mesh textureGroups[]
  * across an entire level fits comfortably in an 8 MB hunk.
  *
  * The two struct types are now structurally identical; LEVELRENDEROBJECT
@@ -230,7 +230,7 @@ typedef enum {
 	 * CurrentCamera.Pos, which differs per eye) and TransExe copies
 	 * (slot address, refilled per camera pass in visibility order). */
 	SMEMO_PASS_NO_REUSE = 8,
-	/* Level execbuf whose colours are rewritten every frame (death
+	/* Level mesh whose colours are rewritten every frame (death
 	 * white-out, underwater tint) but identically for both eyes: the
 	 * stereo memo may reuse it within the frame; the persistent level
 	 * cache must not keep it. Set and cleared per frame by XLight1Group. */

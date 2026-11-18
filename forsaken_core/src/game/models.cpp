@@ -2630,7 +2630,7 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	COLOR				Colour;
 	float					Col2;
 	u_int8_t					Col;
@@ -2653,14 +2653,14 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -2668,7 +2668,7 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 				DstVerts++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -2692,7 +2692,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	float					Col2;
 	u_int16_t					Col;
 	u_int16_t					Red;
@@ -2716,15 +2716,15 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
-			VertPtr = DstMloadheader->Group[ Group ].originalVerts[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
+			VertPtr = DstMloadheader->Group[ Group ].originalVerts[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -2739,7 +2739,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 				
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -2840,7 +2840,7 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
 
@@ -2851,14 +2851,14 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -2866,7 +2866,7 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 				DstVerts++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -2886,7 +2886,7 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 	LVERTEX	*lpLVERTEX;
     LVERTEX	*lpLVERTEX2;
 	int		group;
-	int		execbuf;
+	int		mesh;
 	int		vert;
 
 
@@ -2894,20 +2894,20 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 
 	while( group--)
 	{
-		execbuf = MXAloadheader->Group[group].num_execbufs;
-		while( execbuf--)
+		mesh = MXAloadheader->Group[group].num_meshes;
+		while( mesh--)
 		{
 			/*	lock the vertex buffer	*/
 
-			if (!(FSLockVertexBuffer(&MXAloadheader->Group[group].renderObject[execbuf], &lpPointer)))
+			if (!(FSLockVertexBuffer(&MXAloadheader->Group[group].renderObject[mesh], &lpPointer)))
 			{
 				return false;
 			}
 
-			lpLVERTEX2 = MXAloadheader->Group[group].originalVerts[execbuf];
+			lpLVERTEX2 = MXAloadheader->Group[group].originalVerts[mesh];
 			
 			lpLVERTEX = lpPointer;
-			vert = MXAloadheader->Group[group].num_verts_per_execbuf[execbuf];
+			vert = MXAloadheader->Group[group].num_verts_per_mesh[mesh];
 			while( vert --)
 			{
 				lpLVERTEX->color = lpLVERTEX2->color;
@@ -2916,7 +2916,7 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 				lpLVERTEX2++;		
 			}
 			/*	unlock the vertex buffer	*/
-			if (!(FSUnlockVertexBuffer(&MXAloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockVertexBuffer(&MXAloadheader->Group[group].renderObject[mesh])))
 			{
 				return false;
 			}
@@ -2938,7 +2938,7 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 	LVERTEX			*SrcVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	COLOR				Colour;
 	u_int32_t					tempiA;
 	u_int32_t					carry, clamp;
@@ -2966,15 +2966,15 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 	inc_carry = ( ( inc_inv + 0x00010101) ^ ( inc_inv ^ 0x00010101 ) ) & 0x01010100;
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			SrcVerts = DstMloadheader->Group[ Group ].originalVerts[ExecBuf];
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			SrcVerts = DstMloadheader->Group[ Group ].originalVerts[Mesh];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -2994,7 +2994,7 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 				SrcVerts++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -3014,7 +3014,7 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 	LVERTEX			*SrcVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	COLOR				Colour;
 	u_int32_t					tempiA;
 	u_int32_t					carry, clamp;
@@ -3043,16 +3043,16 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 	inc_carry = ( ( inc_inv + 0x00010101) ^ ( inc_inv ^ 0x00010101 ) ) & 0x01010100;
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			SrcVerts = DstMloadheader->Group[ Group ].originalVerts[ExecBuf];
+			SrcVerts = DstMloadheader->Group[ Group ].originalVerts[Mesh];
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -3072,7 +3072,7 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 				SrcVerts++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -3094,7 +3094,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
 	float					RF, GF, BF, TF;
@@ -3104,14 +3104,14 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -3141,7 +3141,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 				DstVerts++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -3165,7 +3165,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 	float					Dist;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
     float					Val;
@@ -3208,15 +3208,15 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
 
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -3224,7 +3224,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 				DstVerts++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -3248,7 +3248,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 	float					Dist;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
     float					Val;
@@ -3291,15 +3291,15 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{
 
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
 			while( Vert-- )
 			{
@@ -3307,7 +3307,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 				DstVerts++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -3335,7 +3335,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 	float					Dist;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
     float					Val;
@@ -3375,15 +3375,15 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 
 		for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 		{
-			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+			for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 			{
 
-				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 				{
 					return false;
 				}
 	
-				Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+				Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 	
 				while( Vert-- )
 				{
@@ -3391,7 +3391,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 					DstVerts++;
 				}
 	
-				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 				{
 					return false;
 				}
@@ -3420,7 +3420,7 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 	float					Dist;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXALOADHEADER	*		DstMloadheader;
 	COLOR				Colour;
     float					Val;
@@ -3461,14 +3461,14 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 
 		for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 		{
-			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+			for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 			{
-				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 				{
 					return false;
 				}
 	
-				Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+				Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 	
 				while( Vert-- )
 				{
@@ -3476,7 +3476,7 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 					DstVerts++;
 				}
 	
-				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 				{
 					return false;
 				}
@@ -4398,13 +4398,13 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	VECTOR					TempVert;
 
 	Group = 0;
-	ExecBuf = 0;
+	Mesh = 0;
 
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 	{
 		return false;
 	}
@@ -4442,7 +4442,7 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 		DstVerts++;
 	}
 
-	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 	{
 		return false;
 	}
@@ -4475,12 +4475,12 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	VECTOR					TempVert;
 
 	Group = 0;
-	ExecBuf = 0;
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+	Mesh = 0;
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 	{
 		return false;
 	}
@@ -4518,7 +4518,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 		DstVerts++;
 	}
 
-	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 	{
 		return false;
 	}
@@ -4540,7 +4540,7 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	VECTOR					Verts[ 8 ];
 
 	for( Count = 0; Count < 12; Count++ )
@@ -4555,8 +4555,8 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 	if( !ShowBoundingBoxes ) return true;
 
 	Group = 0;
-	ExecBuf = 0;
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+	Mesh = 0;
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 	{
 		return false;
 	}
@@ -4589,7 +4589,7 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 	LineArray[ 10 ] = CreateLine( Verts[ 2 ].x, Verts[ 2 ].y, Verts[ 2 ].z, Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Group2 );
 	LineArray[ 11 ] = CreateLine( Verts[ 3 ].x, Verts[ 3 ].y, Verts[ 3 ].z, Verts[ 7 ].x, Verts[ 7 ].y, Verts[ 7 ].z, Group2 );
 
-	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 	{
 		return false;
 	}
@@ -4610,7 +4610,7 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	VECTOR					Verts[ 8 ];
 
 	for( Count = 0; Count < 12; Count++ )
@@ -4625,8 +4625,8 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 	if( !ShowBoundingBoxes ) return true;
 
 	Group = 0;
-	ExecBuf = 0;
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+	Mesh = 0;
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 	{
 		return false;
 	}
@@ -4659,7 +4659,7 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 	LineArray[ 10 ] = CreateLine( Verts[ 2 ].x, Verts[ 2 ].y, Verts[ 2 ].z, Verts[ 6 ].x, Verts[ 6 ].y, Verts[ 6 ].z, Group2 );
 	LineArray[ 11 ] = CreateLine( Verts[ 3 ].x, Verts[ 3 ].y, Verts[ 3 ].z, Verts[ 7 ].x, Verts[ 7 ].y, Verts[ 7 ].z, Group2 );
 
-	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 	{
 		return false;
 	}
@@ -5574,24 +5574,24 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	VECTOR Temp;
 	u_int16_t group;
 	u_int16_t vert;
-	u_int16_t execbuf;
+	u_int16_t mesh;
 	LVERTEX	*lpLVERTEX = NULL;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )
 	{
-		for( execbuf = 0 ; execbuf < Mxloadheader->Group[group].num_execbufs ; execbuf++ )
+		for( mesh = 0 ; mesh < Mxloadheader->Group[group].num_meshes ; mesh++ )
 		{
-			if( (Mxloadheader->Group[group].exec_type[execbuf]&HASENVIROMENTMAP) != 0 )
+			if( (Mxloadheader->Group[group].mesh_type[mesh]&HASENVIROMENTMAP) != 0 )
 			{
 				/*	lock the vertex buffer	*/
 
-				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], &lpLVERTEX)))
+				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
 				{
 					return false;
 				}
 
-				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] ; vert ++ )
+				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_mesh[mesh] ; vert ++ )
 				{
 					ApplyMatrix( Mat , (VECTOR *) lpLVERTEX,  &Temp);
 
@@ -5605,7 +5605,7 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 					lpLVERTEX++;
 				}
 				/*	unlock the vertex buffer	*/
-				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf])))
+				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
 				{
 					return false;
 				}

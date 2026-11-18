@@ -265,7 +265,7 @@ void GetSavedGameData( void );
 
 bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclude );
 void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *maxoffset );
-bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int VertexNo, float tr, float tg, float tb, float ta );
+bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t Mesh, int VertexNo, float tr, float tg, float tb, float ta );
 
 bool CompareVectors(VECTOR vector1, VECTOR vector2);
 void SetDiscStatus(MENU *menu);
@@ -3308,7 +3308,7 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 	bool startset, endset;
 	MXALOADHEADER	* mxaheader;
 	MXLOADHEADER	* mxheader;
-	int Group, ExecBuf;
+	int Group, Mesh;
 	MATRIX Mat_R;
 	float scaleout = 1.01F;
 
@@ -3322,12 +3322,12 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 		for( Group = 0; Group < mxaheader->num_groups; Group++ )
 		{
-			for( ExecBuf = 0; ExecBuf < mxaheader->Group[ Group ].num_execbufs; ExecBuf++ )
+			for( Mesh = 0; Mesh < mxaheader->Group[ Group ].num_meshes; Mesh++ )
 			{   
   
-				num_polys = mxaheader->Group[Group].num_polys_per_execbuf[ExecBuf];
-				poly_ptr = mxaheader->Group[Group].poly_ptr[ExecBuf];
-				vertex_ptr = mxaheader->Group[Group].originalVerts[ExecBuf];
+				num_polys = mxaheader->Group[Group].num_polys_per_mesh[Mesh];
+				poly_ptr = mxaheader->Group[Group].poly_ptr[Mesh];
+				vertex_ptr = mxaheader->Group[Group].originalVerts[Mesh];
 
 				intersection_points = 0;
 				scanlinenum = 0;
@@ -3484,12 +3484,12 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 
 		for( Group = 0; Group < mxheader->num_groups; Group++ )
 		{
-			for( ExecBuf = 0; ExecBuf < mxheader->Group[ Group ].num_execbufs; ExecBuf++ )
+			for( Mesh = 0; Mesh < mxheader->Group[ Group ].num_meshes; Mesh++ )
 			{   
   
-				num_polys = mxheader->Group[Group].num_polys_per_execbuf[ExecBuf];
-				poly_ptr = mxheader->Group[Group].poly_ptr[ExecBuf];
-				vertex_ptr = mxheader->Group[Group].originalVerts[ExecBuf];
+				num_polys = mxheader->Group[Group].num_polys_per_mesh[Mesh];
+				poly_ptr = mxheader->Group[Group].poly_ptr[Mesh];
+				vertex_ptr = mxheader->Group[Group].originalVerts[Mesh];
 
 				intersection_points = 0;
 				scanlinenum = 0;
@@ -8318,7 +8318,7 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXLOADHEADER	*		DstMloadheader;
 	LVERTEX			*VertPtr;
 	COLOR				Colour;
@@ -8332,9 +8332,9 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
-		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
+		for( Mesh = 0; Mesh < DstMloadheader->Group[ Group ].num_meshes; Mesh++ )
 		{   
-			if ((Exclude) && (Exclude->ExecBuf == ExecBuf) && (Exclude->Group == Group))
+			if ((Exclude) && (Exclude->Mesh == Mesh) && (Exclude->Group == Group))
 			{	CurrentExclude = Exclude->VertexPtr;
 				NumberToExclude = Exclude->NumVertices;
 				ExcludedSoFar = 0;
@@ -8348,14 +8348,14 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 				continue;
 
 
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 			{
 				return false;
 			}
 
-			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
+			Vert = DstMloadheader->Group[ Group ].num_verts_per_mesh[ Mesh ];
 
-			VertPtr = DstMloadheader->Group[Group].originalVerts[ExecBuf];
+			VertPtr = DstMloadheader->Group[Group].originalVerts[Mesh];
 		
 			for (i=0; i<Vert; i++)
 			{
@@ -8389,7 +8389,7 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 				VertPtr++;
 			}
 
-			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 			{
 				return false;
 			}
@@ -8401,7 +8401,7 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, float *maxoffset )
 {
 	u_int16_t					Group;
-	u_int16_t					ExecBuf;
+	u_int16_t					Mesh;
 	MXALOADHEADER	*		ModelHeaderPtr;
 	MXLOADHEADER	*		MxModelHeaderPtr;
 	int i, TotalVerts;
@@ -8419,10 +8419,10 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 						  
 		for( Group = 0; Group < ModelHeaderPtr->num_groups; Group++ )
 		{
-			for( ExecBuf = 0; ExecBuf < ModelHeaderPtr->Group[ Group ].num_execbufs; ExecBuf++ )
+			for( Mesh = 0; Mesh < ModelHeaderPtr->Group[ Group ].num_meshes; Mesh++ )
 			{   
-				TotalVerts = ModelHeaderPtr->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
-				VertPtr = ModelHeaderPtr->Group[Group].originalVerts[ExecBuf];
+				TotalVerts = ModelHeaderPtr->Group[ Group ].num_verts_per_mesh[ Mesh ];
+				VertPtr = ModelHeaderPtr->Group[Group].originalVerts[Mesh];
 
 				for (i=8; i<TotalVerts; i++)	//ignore bounding box, so start at 8...
 				{
@@ -8449,10 +8449,10 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 						  
 		for( Group = 0; Group < MxModelHeaderPtr->num_groups; Group++ )
 		{
-			for( ExecBuf = 0; ExecBuf < MxModelHeaderPtr->Group[ Group ].num_execbufs; ExecBuf++ )
+			for( Mesh = 0; Mesh < MxModelHeaderPtr->Group[ Group ].num_meshes; Mesh++ )
 			{   
-				TotalVerts = MxModelHeaderPtr->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
-				VertPtr = MxModelHeaderPtr->Group[Group].originalVerts[ExecBuf];
+				TotalVerts = MxModelHeaderPtr->Group[ Group ].num_verts_per_mesh[ Mesh ];
+				VertPtr = MxModelHeaderPtr->Group[Group].originalVerts[Mesh];
 
 				for (i=8; i<TotalVerts; i++)	//ignore bounding box, so start at 8...
 				{
@@ -8473,7 +8473,7 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 	}
 }
 
-bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int VertexNo, float tr, float tg, float tb, float ta )
+bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t Mesh, int VertexNo, float tr, float tg, float tb, float ta )
 {
 	LVERTEX			*DstVerts = NULL;
 	MXLOADHEADER	*		DstMloadheader;
@@ -8484,12 +8484,12 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int Ver
 
 	DstMloadheader = &ModelHeaders[ Model ];
 
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh], &DstVerts)))
 	{
 		return false;
 	}
 
-	VertPtr = &(DstMloadheader->Group[Group].originalVerts[ExecBuf])[VertexNo];
+	VertPtr = &(DstMloadheader->Group[Group].originalVerts[Mesh])[VertexNo];
 	  
 	vred = (u_int8_t)RGBA_GETRED(VertPtr->color);
 	vgreen = (u_int8_t)RGBA_GETGREEN(VertPtr->color);
@@ -8507,7 +8507,7 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int Ver
 			
 	DstVerts[VertexNo].color = Colour;
 
-	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
+	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[Mesh])))
 	{
 		return false;
 	}

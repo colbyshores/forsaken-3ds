@@ -62,18 +62,18 @@ typedef struct PVSPOTFX {
 
 
 typedef struct MXGROUP{
-	u_int16_t		num_execbufs;
-	u_int16_t		exec_type[MAXEXECBUFSPERGROUP];
-	u_int16_t		num_verts_per_execbuf[MAXEXECBUFSPERGROUP];
-	u_int16_t	num_polys_per_execbuf[MAXEXECBUFSPERGROUP];
+	u_int16_t		num_meshes;
+	u_int16_t		mesh_type[MAXMESHESPERGROUP];
+	u_int16_t		num_verts_per_mesh[MAXMESHESPERGROUP];
+	u_int16_t	num_polys_per_mesh[MAXMESHESPERGROUP];
 	u_int16_t	num_texture_groups[MAXMXATEXTUREGROUPSPER];
 	RENDEROBJECT renderObject[MAXMXATEXTUREGROUPSPER];
-	LVERTEX *originalVerts[MAXEXECBUFSPERGROUP];
+	LVERTEX *originalVerts[MAXMESHESPERGROUP];
 
-	TRIANGLE *poly_ptr	[MAXEXECBUFSPERGROUP];
+	TRIANGLE *poly_ptr	[MAXMESHESPERGROUP];
 	char		name[16];
-	u_int16_t		num_animating_polys[MAXEXECBUFSPERGROUP];
-	POLYANIM *	polyanim[MAXEXECBUFSPERGROUP];
+	u_int16_t		num_animating_polys[MAXMESHESPERGROUP];
+	POLYANIM *	polyanim[MAXMESHESPERGROUP];
 
 }MXGROUP;
 

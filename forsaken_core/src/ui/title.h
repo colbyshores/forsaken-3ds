@@ -448,7 +448,7 @@ constexpr int MAXEXCLUDEDVERTICES = 16;
 
 typedef struct
 {	int Group;
-	int ExecBuf;
+	int Mesh;
 	int NumVertices;
 	int VertexPtr[MAXEXCLUDEDVERTICES];
 } EXCLUDEDVERTICES;

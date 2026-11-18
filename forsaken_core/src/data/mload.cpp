@@ -16,9 +16,9 @@
  *   magic, version (u32 each; version 3)
  *   num_texture_files, texture names (NUL-terminated)       -- PreMload
  *   num_groups
- *   per group: num_execbufs
- *     per execbuf:
- *       execute-buffer size (i16, unused), exec_type (bit 0: has
+ *   per group: num_meshes
+ *     per mesh:
+ *       execute-buffer size (i16, unused), mesh_type (bit 0: has
  *       transparencies), num_vertices
  *       OLDLVERTEX[num_vertices]       x y z, reserved, colour, specular, tu tv
  *       num_texture_groups
@@ -42,24 +42,24 @@
  *     cell flag: 0 = no lighting cells (the 0 is read again as
  *       num_start_positions); otherwise
  *       cell size (float; stored as its reciprocal)
- *       per group: num_execbufs (ignored), then per execbuf: cell origin
+ *       per group: num_meshes (ignored), then per mesh: cell origin
  *         (VECTOR), x / y / z cell counts, num_vertex_indices,
  *         u16[num_vertex_indices] (vertex numbers), VERTEXCELL[cells]
  *         (each a start and count in the vertex numbers)
- *       and per group: COLOR[cells of execbuf 0] (ambient per cell)
+ *       and per group: COLOR[cells of mesh 0] (ambient per cell)
  *     num_start_positions, STARTPOS[...] (40 bytes: pos, dir, up, group, pad)
  *     up flag: 0 = every group's up is (0, 1, 0) (the 0 is read again as
  *       num_animations); otherwise VECTOR[num_groups]
  *   num_animations
  *   per animation: frame count and max loops (unused), length,
  *       u16[length] (frame numbers and TEXANIM_* commands)
- *   if num_animations: per group, per execbuf: num_animating_polys
+ *   if num_animations: per group, per mesh: num_animating_polys
  *     per poly: animation, frames, vertices, u16[vertices] (vertex numbers),
  *               { tu, tv }[vertices * frames]
  *   num_colours: if non-zero, per group a u32 background clear colour
  *       (top byte: clear flag)
  *   animation index flag: if non-zero, count, then per entry group,
- *       execbuf, poly, initial state and the trigger mod fired when it stops
+ *       mesh, poly, initial state and the trigger mod fired when it stops
  *       (i16); triggers address the animations through this index
  */
 
@@ -271,7 +271,7 @@ FixUV_Anim( POLYANIM *PolyAnim, LVERTEX *Vert, LVERTEX *Orig_Vert )
 bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 {
 	TRIANGLE		FacePnt; // was a pointer
-	u_int16_t			exec_type;			// the execbuf's type (bit 0: has transparencies)
+	u_int16_t			mesh_type;			// the mesh's type (bit 0: has transparencies)
 	u_int16_t			num_vertices;		// overall number of verts
 	u_int16_t			num_triangle_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
@@ -286,7 +286,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	int				triangleCount = 0;
 	int			i,e,o;
 	u_int16_t tpage;
-	int execbuf;
+	int mesh;
 	int group;
 	int r,g,b,a;
 	COLOR color;
@@ -328,42 +328,42 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	for( group = 0; group < Mloadheader->num_groups; group++)
 	{
 		GroupTris[ group ] = 0;
-		/*	get the number of execbufs in this group	*/
-		Mloadheader->Group[group].num_execbufs = in.u16();
+		/*	get the number of meshes in this group	*/
+		Mloadheader->Group[group].num_meshes = in.u16();
 
-		if ( Mloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
+		if ( Mloadheader->Group[group].num_meshes > MAXMESHESPERGROUP )
 		{
-			Msg( "Mload : NumExecBufs > MAXEXECBUFSPERGROUP\n" );
+			Msg( "Mload : num_meshes > MAXMESHESPERGROUP\n" );
 			return false;
 		}
 		
-		for( execbuf = 0; execbuf < Mloadheader->Group[group].num_execbufs; execbuf++)
+		for( mesh = 0; mesh < Mloadheader->Group[group].num_meshes; mesh++)
 		{
-			Mloadheader->Group[group].num_animating_polys[execbuf] = 0;
+			Mloadheader->Group[group].num_animating_polys[mesh] = 0;
 			
 			in.skip( sizeof( int16_t ) );	// Direct3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
-			exec_type = in.u16();
+			mesh_type = in.u16();
 			/*	get the number of verts in execution buffer	*/
 			num_vertices = in.u16();
 	
-			/*	record the execbuf's type	*/
-			Mloadheader->Group[group].exec_type[execbuf] = exec_type;
+			/*	record the mesh's type	*/
+			Mloadheader->Group[group].mesh_type[mesh] = mesh_type;
 
-			/*	record how many verts the execbuf has	*/
-			Mloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
+			/*	record how many verts the mesh has	*/
+			Mloadheader->Group[group].num_verts_per_mesh[mesh] = num_vertices;
 
-			if (!FSCreateVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], num_vertices))
+			if (!FSCreateVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], num_vertices))
 			{
-				Msg( "Mload : MakeExecBuffer Failed\n" );
+				Msg( "Mload : FSCreateVertexBuffer failed\n" );
 				return false;
 			}
-			Mloadheader->Group[group].renderObject[execbuf].vertOwner = VERT_OWNER_LEVEL;
+			Mloadheader->Group[group].renderObject[mesh].vertOwner = VERT_OWNER_LEVEL;
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 
-			if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], &lpLVERTEX)))
+			if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
 			{
 				Msg( "Mload() lock failed in %s\n", Filename );
 				return false;
@@ -399,8 +399,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
-			Mloadheader->Group[group].originalVerts[execbuf] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
-			memmove(Mloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
+			Mloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
+			memmove(Mloadheader->Group[group].originalVerts[mesh], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
 			num_triangle_groups = in.u16();
 
@@ -419,39 +419,39 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 
 			/*	create an index buffer	*/
-			if (!FSCreateIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], triangleCount * 3))
+			if (!FSCreateIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], triangleCount * 3))
 			{
 				return false;
 			}
 
 			/*	lock the index buffer	*/
-			if (!(FSLockIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], &lpIndices)))
+			if (!(FSLockIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpIndices)))
 			{
 				Msg( "Mload() lock failed in %s\n", Filename );
 				return false;
 			}
 
-			if (!FSCreateNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], triangleCount))
+			if (!FSCreateNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], triangleCount))
 			{
 				Msg( "Mload() failed to create normal buffer %s\n", Filename );
 				return false;
 			}
 
-			if (!(FSLockNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], &lpNormals)))
+			if (!(FSLockNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpNormals)))
 			{
 				Msg( "Mload() failed to lock normal buffer %s\n", Filename );
 				return false;
 			}
 
-			/* Allocate this execbuf's textureGroups[] from the TAG_LEVEL
+			/* Allocate this mesh's textureGroups[] from the TAG_LEVEL
 			 * hunk, sized to the file's `num_triangle_groups` count.
 			 * Bulk-freed in ReleaseView via Hunk_FreeAll(TAG_LEVEL). */
 			if ( num_triangle_groups > 0 )
 			{
-				Mloadheader->Group[group].renderObject[execbuf].textureGroups =
+				Mloadheader->Group[group].renderObject[mesh].textureGroups =
 				    (TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
 				                                num_triangle_groups * sizeof(TEXTUREGROUP));
-				if ( !Mloadheader->Group[group].renderObject[execbuf].textureGroups )
+				if ( !Mloadheader->Group[group].renderObject[mesh].textureGroups )
 				{
 					Msg( "Mload() hunk-alloc failed for textureGroups[%u] %s\n",
 					     (unsigned)num_triangle_groups, Filename );
@@ -498,47 +498,47 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						colourkey++;
 					}
 
-					FixUV( &FacePnt, lpBufStart, Mloadheader->TloadIndex[tpage], Mloadheader->Group[group].originalVerts[execbuf] );
+					FixUV( &FacePnt, lpBufStart, Mloadheader->TloadIndex[tpage], Mloadheader->Group[group].originalVerts[mesh] );
 					lpNormals++;
 				}
 
-				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;
-				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].numTriangles = num_triangles;
+				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].numVerts = num_vertices;
+				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].numTriangles = num_triangles;
 
 				/* keep track of our offset into our index buffer */
-				Mloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].startIndex = indexOffset;
+				Mloadheader->Group[ group ].renderObject[mesh].textureGroups[i].startIndex = indexOffset;
 				indexOffset += num_triangles * 3;
 
-				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].texture = Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]];
-				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].colourkey = Tloadheader.ColourKey[Mloadheader->TloadIndex[tpage]];
+				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].texture = Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]];
+				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mloadheader->TloadIndex[tpage]];
 
 
 				{
-					LEVELRENDEROBJECT * obj = &(Mloadheader->Group[group].renderObject[execbuf]);
+					LEVELRENDEROBJECT * obj = &(Mloadheader->Group[group].renderObject[mesh]);
 					INCREASE_TEXTURE_GROUPS( obj );
 				}
 			}
 
 
-			Mloadheader->Group[group].polyanim[execbuf] = NULL;
-			Mloadheader->Group[group].num_animating_polys[execbuf] = 0;
+			Mloadheader->Group[group].polyanim[mesh] = NULL;
+			Mloadheader->Group[group].num_animating_polys[mesh] = 0;
 
 			// this go here?
 			/*	unlock the vertex buffer	*/
-			if (!(FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxload() vb unlock failed in %s\n", Filename );
 				return false ;
 			}
 
 			/*	unlock the index buffer	*/
-			if (!(FSUnlockIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxload() ib unlock failed in %s\n", Filename );
 				return false ;
 			}
 
-			if (!(FSUnlockNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf])))
+			if (!(FSUnlockNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh])))
 			{
 				Msg( "Mxload() normal unlock failed in %s\n", Filename );
 				return false ;
@@ -691,40 +691,40 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 			for( group=0 ; group<Mloadheader->num_groups; group++)
 			{
-				in.skip( sizeof( u_int16_t ) ); //dont need the number of exec buffs......
-				for( execbuf=0 ; execbuf<Mloadheader->Group[group].num_execbufs; execbuf++)
+				in.skip( sizeof( u_int16_t ) ); // the number of meshes, not needed here
+				for( mesh=0 ; mesh<Mloadheader->Group[group].num_meshes; mesh++)
 				{
-					Mloadheader->Group[group].cell_origin[execbuf] = in.vec();
-					Mloadheader->Group[group].xcells[execbuf] = in.u16();
-					Mloadheader->Group[group].ycells[execbuf] = in.u16();
-					Mloadheader->Group[group].zcells[execbuf] = in.u16();
-					Mloadheader->Group[group].numofcells[execbuf] =	Mloadheader->Group[group].xcells[execbuf] *
-																	Mloadheader->Group[group].ycells[execbuf] *
-																	Mloadheader->Group[group].zcells[execbuf];
+					Mloadheader->Group[group].cell_origin[mesh] = in.vec();
+					Mloadheader->Group[group].xcells[mesh] = in.u16();
+					Mloadheader->Group[group].ycells[mesh] = in.u16();
+					Mloadheader->Group[group].zcells[mesh] = in.u16();
+					Mloadheader->Group[group].numofcells[mesh] =	Mloadheader->Group[group].xcells[mesh] *
+																	Mloadheader->Group[group].ycells[mesh] *
+																	Mloadheader->Group[group].zcells[mesh];
 
 
-					if ( !execbuf )
-						Mloadheader->Group[group].colour_cell_pnt[0] = (COLOR*) malloc( Mloadheader->Group[group].numofcells[execbuf] * sizeof(COLOR) );
+					if ( !mesh )
+						Mloadheader->Group[group].colour_cell_pnt[0] = (COLOR*) malloc( Mloadheader->Group[group].numofcells[mesh] * sizeof(COLOR) );
 					else
-						Mloadheader->Group[group].colour_cell_pnt[execbuf] = NULL;
+						Mloadheader->Group[group].colour_cell_pnt[mesh] = NULL;
 					if( !Mloadheader->Group[group].colour_cell_pnt[0] )
 					{
 						Msg( "Mload : Couldnt allocate enough memory for the cell colour info\n" );
 						return false;
 					}
-					Mloadheader->Group[group].num_vertex_indices[execbuf] = in.u16();
+					Mloadheader->Group[group].num_vertex_indices[mesh] = in.u16();
 
-					Mloadheader->Group[group].vertex_index_pnt[execbuf] =
-						(u_int16_t *) malloc( Mloadheader->Group[group].num_vertex_indices[execbuf] * sizeof( u_int16_t ) );
-					Mloadheader->Group[group].vertex_cell_pnt[execbuf] =
-						(VERTEXCELL *) malloc( Mloadheader->Group[group].numofcells[execbuf] * sizeof( VERTEXCELL ) );
-					if( !Mloadheader->Group[group].vertex_index_pnt[execbuf] || !Mloadheader->Group[group].vertex_cell_pnt[execbuf] )
+					Mloadheader->Group[group].vertex_index_pnt[mesh] =
+						(u_int16_t *) malloc( Mloadheader->Group[group].num_vertex_indices[mesh] * sizeof( u_int16_t ) );
+					Mloadheader->Group[group].vertex_cell_pnt[mesh] =
+						(VERTEXCELL *) malloc( Mloadheader->Group[group].numofcells[mesh] * sizeof( VERTEXCELL ) );
+					if( !Mloadheader->Group[group].vertex_index_pnt[mesh] || !Mloadheader->Group[group].vertex_cell_pnt[mesh] )
 					{
 						Msg( "Mload : Couldnt allocate enough memory for the cell index info\n" );
 						return false;
 					}
-					in.bytes( Mloadheader->Group[group].vertex_index_pnt[execbuf], Mloadheader->Group[group].num_vertex_indices[execbuf] * sizeof( u_int16_t ) );
-					in.bytes( Mloadheader->Group[group].vertex_cell_pnt[execbuf], Mloadheader->Group[group].numofcells[execbuf] * sizeof( VERTEXCELL ) );
+					in.bytes( Mloadheader->Group[group].vertex_index_pnt[mesh], Mloadheader->Group[group].num_vertex_indices[mesh] * sizeof( u_int16_t ) );
+					in.bytes( Mloadheader->Group[group].vertex_cell_pnt[mesh], Mloadheader->Group[group].numofcells[mesh] * sizeof( VERTEXCELL ) );
 				}
 				in.bytes( Mloadheader->Group[group].colour_cell_pnt[0], Mloadheader->Group[group].numofcells[0] * sizeof( COLOR ) );
 			}
@@ -802,28 +802,28 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
-			for( execbuf=0 ; execbuf<Mloadheader->Group[group].num_execbufs; execbuf++)
+			for( mesh=0 ; mesh<Mloadheader->Group[group].num_meshes; mesh++)
 			{
 				// Animating background polys......		
-				Mloadheader->Group[group].num_animating_polys[execbuf] = in.u16();
-				if( Mloadheader->Group[group].num_animating_polys[execbuf] != 0 )
+				Mloadheader->Group[group].num_animating_polys[mesh] = in.u16();
+				if( Mloadheader->Group[group].num_animating_polys[mesh] != 0 )
 				{
-					Mloadheader->Group[group].polyanim[execbuf] = (POLYANIM*)malloc( Mloadheader->Group[group].num_animating_polys[execbuf] * sizeof( POLYANIM ) );
+					Mloadheader->Group[group].polyanim[mesh] = (POLYANIM*)malloc( Mloadheader->Group[group].num_animating_polys[mesh] * sizeof( POLYANIM ) );
 		
 		
-					PolyAnim = Mloadheader->Group[group].polyanim[execbuf];
+					PolyAnim = Mloadheader->Group[group].polyanim[mesh];
 					if( !PolyAnim )
 					{
 						Msg( "Mload : No PolyAnim\n" );
 						return false;
 					}
-					if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[ group ].renderObject[execbuf], &lpLVERTEX)))
+					if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[ group ].renderObject[mesh], &lpLVERTEX)))
 					{
 						Msg( "Mload : Lock VertexBuffer failed\n" );
 						return false;
 					}
 
-					for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
+					for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[mesh] ; i++ )
 					{
 						animation = in.u16();
 						frames = in.u16();
@@ -871,11 +871,11 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 							TanimUV->v = in.f32();
 							TanimUV++;
 						}
-						FixUV_Anim( PolyAnim, lpLVERTEX, Mloadheader->Group[group].originalVerts[execbuf] );
+						FixUV_Anim( PolyAnim, lpLVERTEX, Mloadheader->Group[group].originalVerts[mesh] );
 						PolyAnim++;
 					}
 
-					if (!(FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf])))
+					if (!(FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh])))
 					{
 						Msg( "Mload : Unlock VertexBuffer failed\n" );
 						return false;
@@ -927,19 +927,19 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		for( i = 0 ; i < Mloadheader->AnimData.num_animating_polys ; i++ )
 		{
 			group = in.u16();
-			execbuf = in.u16();
+			mesh = in.u16();
 			polyanim = in.u16();
 			initstate = in.u16();
 			whenstoppedtriggermod = in.i16();
 
-			PolyAnim = Mloadheader->Group[group].polyanim[execbuf];
+			PolyAnim = Mloadheader->Group[group].polyanim[mesh];
 			PolyAnim += polyanim;
 			PolyAnim->State = initstate;
 			PolyAnim->WhenStoppedTriggerMod = whenstoppedtriggermod;
 
 
 			TAnimInfoIndexPnt->Group = group;
-			TAnimInfoIndexPnt->Execbuf = execbuf;
+			TAnimInfoIndexPnt->Mesh = mesh;
 			TAnimInfoIndexPnt->PolyAnim = polyanim;
 			TAnimInfoIndexPnt->InitState = initstate;
 			TAnimInfoIndexPnt++;
@@ -990,9 +990,9 @@ bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  
 	
 	if (Mloadheader->state == true )
 	{
-		for ( i=0 ; i<Mloadheader->Group[group].num_execbufs; i++)
+		for ( i=0 ; i<Mloadheader->Group[group].num_meshes; i++)
 		{
-			if( Mloadheader->Group[group].exec_type[i]&HASTRANSPARENCIES )
+			if( Mloadheader->Group[group].mesh_type[i]&HASTRANSPARENCIES )
 			{
 				if (!FSGetWorld(&Matrix))
 				{
@@ -1004,7 +1004,7 @@ bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  
 					0,
 					INDEX_NONE,
 					(u_int16_t) group,
-					Mloadheader->Group[ group ].num_verts_per_execbuf[i] 
+					Mloadheader->Group[ group ].num_verts_per_mesh[i] 
 				);
 			}
 			else
@@ -1057,7 +1057,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 
 #ifdef __3DS__
 	/* The backend's persistent cache holds converted copies of these
-	 * execbufs; free it with them, not after the next level has loaded. */
+	 * meshes; free it with them, not after the next level has loaded. */
 	c3d_release_level_cache();
 #endif
 
@@ -1070,7 +1070,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 
 		free( Mloadheader->Group[group].Portal );
 
-		for (i = 0; i < Mloadheader->Group[group].num_execbufs; i++)
+		for (i = 0; i < Mloadheader->Group[group].num_meshes; i++)
 		{
 			FSReleaseRenderObject((RENDEROBJECT*)&(Mloadheader->Group[group].renderObject[i]));
 
@@ -1082,7 +1082,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 			free( Mloadheader->Group[group].vertex_cell_pnt[i] );
 			Mloadheader->Group[group].vertex_cell_pnt[i] = NULL;
 
-			/* Per-execbuf vertex copy allocated at mload.cpp. Without
+			/* Per-mesh vertex copy allocated at mload.cpp. Without
 			 * this free the buffer leaks every level transition — about
 			 * 1–2 MB per level depending on geometry density, which
 			 * accumulates and exhausts the OG 3DS 24 MB malloc heap by
@@ -1241,7 +1241,7 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 {
 	u_int16_t		*	Uint16Pnt;
 	int	i;
-	int	execbuf;
+	int	mesh;
 	POLYANIM * PolyAnim;
 	u_int16_t * AnimData;
 	float	ExtraTime;
@@ -1250,11 +1250,11 @@ void BackGroundTextureAnimation( MLOADHEADER * Mloadheader , u_int16_t group )
 		return;
 	Mloadheader->Group[group].AnimOncePerFrame = AnimOncePerFrame;
 	
-	for( execbuf=0 ; execbuf<Mloadheader->Group[group].num_execbufs; execbuf++)
+	for( mesh=0 ; mesh<Mloadheader->Group[group].num_meshes; mesh++)
 	{
-		PolyAnim = Mloadheader->Group[group].polyanim[execbuf];
+		PolyAnim = Mloadheader->Group[group].polyanim[mesh];
 		
-		for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
+		for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[mesh] ; i++ )
 		{
 			
 			if( ( PolyAnim->State == TEXTUREANIM_Go ) &&
@@ -1374,7 +1374,7 @@ void TriggerBackgroundAnimationGo( u_int16_t * Data )
 	if( !TAnimInfoIndexPnt )
 		return;
 	TAnimInfoIndexPnt += *Data;
-	PolyAnim = Mloadheader.Group[TAnimInfoIndexPnt->Group].polyanim[TAnimInfoIndexPnt->Execbuf];
+	PolyAnim = Mloadheader.Group[TAnimInfoIndexPnt->Group].polyanim[TAnimInfoIndexPnt->Mesh];
 	PolyAnim += TAnimInfoIndexPnt->PolyAnim;
 	PolyAnim->State = TEXTUREANIM_Go;
 }
@@ -1394,7 +1394,7 @@ void TriggerBackgroundAnimationStop( u_int16_t * Data )
 	if( !TAnimInfoIndexPnt )
 		return;
 	TAnimInfoIndexPnt += *Data;
-	PolyAnim = Mloadheader.Group[TAnimInfoIndexPnt->Group].polyanim[TAnimInfoIndexPnt->Execbuf];
+	PolyAnim = Mloadheader.Group[TAnimInfoIndexPnt->Group].polyanim[TAnimInfoIndexPnt->Mesh];
 	PolyAnim += TAnimInfoIndexPnt->PolyAnim;
 	PolyAnim->State = TEXTUREANIM_Stop;
 }
@@ -1402,17 +1402,17 @@ void TriggerBackgroundAnimationStop( u_int16_t * Data )
 FILE *LoadTextureAnimations( FILE *f )
 {
 	u_int16_t group;
-	int	execbuf;
+	int	mesh;
 	int	i;
 	POLYANIM * PolyAnim;
 
 	for ( group = 0; group < Mloadheader.num_groups; group++ )
 	{
-		for( execbuf=0 ; execbuf<Mloadheader.Group[group].num_execbufs; execbuf++)
+		for( mesh=0 ; mesh<Mloadheader.Group[group].num_meshes; mesh++)
 		{
-			PolyAnim = Mloadheader.Group[group].polyanim[execbuf];
+			PolyAnim = Mloadheader.Group[group].polyanim[mesh];
 			
-			for( i = 0 ; i < Mloadheader.Group[group].num_animating_polys[execbuf] ; i++ )
+			for( i = 0 ; i < Mloadheader.Group[group].num_animating_polys[mesh] ; i++ )
 			{
 				fread( &PolyAnim->State, sizeof( PolyAnim->State ), 1, f );
 				fread( &PolyAnim->MasterTime, sizeof( PolyAnim->MasterTime ), 1, f );
@@ -1430,17 +1430,17 @@ FILE *LoadTextureAnimations( FILE *f )
 FILE *SaveTextureAnimations( FILE *f )
 {
 	u_int16_t group;
-	int	execbuf;
+	int	mesh;
 	int	i;
 	POLYANIM * PolyAnim;
 
 	for ( group = 0; group < Mloadheader.num_groups; group++ )
 	{
-		for( execbuf=0 ; execbuf<Mloadheader.Group[group].num_execbufs; execbuf++)
+		for( mesh=0 ; mesh<Mloadheader.Group[group].num_meshes; mesh++)
 		{
-			PolyAnim = Mloadheader.Group[group].polyanim[execbuf];
+			PolyAnim = Mloadheader.Group[group].polyanim[mesh];
 			
-			for( i = 0 ; i < Mloadheader.Group[group].num_animating_polys[execbuf] ; i++ )
+			for( i = 0 ; i < Mloadheader.Group[group].num_animating_polys[mesh] ; i++ )
 			{
 				fwrite( &PolyAnim->State, sizeof( PolyAnim->State ), 1, f );
 				fwrite( &PolyAnim->MasterTime, sizeof( PolyAnim->MasterTime ), 1, f );

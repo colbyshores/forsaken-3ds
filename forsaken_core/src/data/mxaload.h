@@ -62,21 +62,21 @@ typedef struct COLOR_RGBA {
 } COLOR_RGBA;
 
 typedef struct MXAGROUP{
-	u_int16_t	num_execbufs;
-	u_int16_t	exec_type[MAXEXECBUFSPERGROUP];
-	u_int16_t	num_verts_per_execbuf[MAXEXECBUFSPERGROUP];
-	u_int16_t	num_polys_per_execbuf[MAXEXECBUFSPERGROUP];
+	u_int16_t	num_meshes;
+	u_int16_t	mesh_type[MAXMESHESPERGROUP];
+	u_int16_t	num_verts_per_mesh[MAXMESHESPERGROUP];
+	u_int16_t	num_polys_per_mesh[MAXMESHESPERGROUP];
 	u_int16_t	num_texture_groups[MAXMXATEXTUREGROUPSPER];
-	RENDEROBJECT renderObject[MAXEXECBUFSPERGROUP];
-	LVERTEX *originalVerts[MAXEXECBUFSPERGROUP];
-	TRIANGLE *poly_ptr	[MAXEXECBUFSPERGROUP];
-	u_int32_t	texture_group_vert_off[MAXEXECBUFSPERGROUP][MAXMXATEXTUREGROUPSPER];
+	RENDEROBJECT renderObject[MAXMESHESPERGROUP];
+	LVERTEX *originalVerts[MAXMESHESPERGROUP];
+	TRIANGLE *poly_ptr	[MAXMESHESPERGROUP];
+	u_int32_t	texture_group_vert_off[MAXMESHESPERGROUP][MAXMXATEXTUREGROUPSPER];
 	char	name[16];
 }MXAGROUP;
 
 
-typedef u_int16_t MXAVERTCOUNT[MAX_MXAGROUPS][MAXEXECBUFSPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...	
-typedef	MXAVERT	*MXAVERTFRAME[MAX_MXAGROUPS][MAXEXECBUFSPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...	
+typedef u_int16_t MXAVERTCOUNT[MAX_MXAGROUPS][MAXMESHESPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...	
+typedef	MXAVERT	*MXAVERTFRAME[MAX_MXAGROUPS][MAXMESHESPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...	
 
 typedef struct MXALOADHEADER{
 

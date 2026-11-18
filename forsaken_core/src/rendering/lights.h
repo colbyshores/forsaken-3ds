@@ -17,7 +17,7 @@
  * light. The vertex relighting functions read only that chain.
  *
  * XLight1Group runs per visible level group before it is drawn: it applies
- * POLYANIM UV frame changes, restores each execbuf's baked colours from
+ * POLYANIM UV frame changes, restores each mesh's baked colours from
  * originalVerts (or writes the white-out / underwater shimmer, phase cral),
  * then adds each visible light's falloff on the CPU. XLightMxloadHeader /
  * XLightMxaloadHeader do the restore + add for one MODFLAG_RealLight model.

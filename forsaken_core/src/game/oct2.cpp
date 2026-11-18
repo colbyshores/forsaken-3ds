@@ -1357,7 +1357,7 @@ void ReleaseView(void)
     ReleaseTitleModels();
     Free_All_Off_Files( &Title_OffsetFiles[ 0 ] );
     ReleaseRenderBufs();
-    /* Hunk_FreeAll(TAG_LEVEL) bulk-releases all the per-execbuf
+    /* Hunk_FreeAll(TAG_LEVEL) bulk-releases all the per-mesh
      * textureGroups[] arrays the title loaders set up. ModelHeaders
      * and MxaModelHeaders are intentionally NOT freed here — the
      * next PreInitModel re-frees-and-allocs them, and leaving them
