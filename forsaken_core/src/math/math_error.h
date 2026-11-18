@@ -3,9 +3,8 @@
 /* math_error.h -- debug-build floating-point exception reporting
  *
  * Only active with DEBUG_ON. math_error.cpp's DebugMathErrors prints a summary
- * of the fenv exception flags raised;
- * main.cpp calls it on the failure exit path, and every frame when
- * DEBUG_ALL_MATH_ERRORS is set.
+ * of the fenv exception flags raised; main.cpp calls it on the failure
+ * exit path.
  */
 
 #ifdef DEBUG_ON

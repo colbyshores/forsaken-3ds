@@ -646,9 +646,6 @@ int main( int argc, char* argv[] )
 			SDL_Delay( cliSleep );
 #endif
 
-#if defined(DEBUG_ON) && defined(DEBUG_ALL_MATH_ERRORS)
-		DebugMathErrors();
-#endif
 	}
 
 	/* Normal-exit teardown. On 3DS, QuitRequested is set by the
