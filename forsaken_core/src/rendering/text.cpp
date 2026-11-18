@@ -731,12 +731,7 @@ void PrintScoreSort( void )
 				{
 					col = ( teamleft[i] ) ? 8 :
 						  ( TeamNumber[ WhoIAm ] == i && FlashToggle ) ? 0 : TeamCol[i] ;
-#ifdef TEAM_NUMBERS
-					Print4x5Text( TEAM, 8 , pos*(FontHeight+1)+FontHeight , col );
-					Printu_int16_t( (u_int16_t)(i + 1) , 8+(5*FontWidth) , pos*(FontHeight+1)+FontHeight , col );
-#else
 					Print4x5Text( TeamName[ i ] , 8 , pos*(FontHeight+1)+FontHeight , col );
-#endif
 					Printint16_t( GetTeamScoreByTeamNumber(i) , 8+(7*FontWidth) , pos*(FontHeight+1)+FontHeight , col );
 				}
 				pos++;
