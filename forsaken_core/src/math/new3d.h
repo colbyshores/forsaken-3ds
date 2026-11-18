@@ -351,7 +351,6 @@ float Random_Range_Float( float Max );
 
 void	MakeViewMatrix(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, MATRIX *view);
 void CalcViewAxes(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, VECTOR *vx, VECTOR *vy, VECTOR *vz);
-void ScaleMatrix( MATRIX * m, VECTOR * v );
 void MatrixFromAxisAndAngle( float angle, VECTOR * axis, MATRIX * rot );
 void spline(VECTOR * p, float t, VECTOR * p1, VECTOR * p2, VECTOR * p3, VECTOR * p4);
 

@@ -764,20 +764,11 @@ DEFKEY KDshow_networkinfo	= { &Config.show_networkinfo, 0 };
 		{ (X) +-100, (Y),0, 0, 0, (LABEL), 0, 0, NULL, (void *)(PAGE), NULL, MenuItemDrawPageName, NULL, 0 },\
 		{ (X) + 208, (Y), 0, 0, 0, (LABEL), 0, 0, (void *)&(KEY), (void *)(PAGE), SelectKeyDef, DrawKeyDef, NULL, 0 }
 
-#define KEYDEF( X, Y, LABEL, KEY )\
-		{ (X) +   0, (Y),0, 0, 0, (LABEL), 0, 0, NULL, NULL, NULL, MenuItemDrawName, NULL, 0 },\
-		{ (X) + 128, (Y), 0, 0, 0, (LABEL), 0, 0, KEY.key[ 0 ], NULL, SelectKey, DrawKey, NULL, 0 },\
-		{ (X) + 198, (Y), 0, 0, 0, (LABEL), 0, 0, KEY.key[ 1 ], NULL, SelectKey, DrawKey , NULL, 0}
 
 #define VDUKDEF( XMIN, YMIN, XMAX, YMAX, LABEL, KEY )\
 		{ XMIN, YMIN, XMAX, YMAX, 0 , (LABEL), FONT_Small, TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 },\
 		{ XMAX + 3, YMIN, XMAX + 25, YMAX, 0, (LABEL), FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_CentreY, (void *)&(KEY), NULL, NULL, DrawFlatMenuKeyNum, NULL, 0 },\
 		{ XMAX + 30, YMIN, XMAX + 120, YMAX, 0, (LABEL), FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, (void *)&(KEY), NULL, SelectFlatMenuKey, DrawFlatMenuKey, NULL, 0 }
-
-#define VDUKEYDEF( XMIN, YMIN, XMAX, YMAX, LABEL, KEY )\
-		{ XMIN, YMIN, XMAX, YMAX, 0 , (LABEL), FONT_Small, TEXTFLAG_CentreY, NULL, NULL, NULL, DrawFlatMenuItem, NULL, 0 },\
-		{ XMAX + 5, YMIN, XMAX + 55, YMAX, 0, (LABEL), FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, KEY.key[ 0 ], NULL, SelectFlatMenuKey, DrawFlatMenuKey, NULL, 0 },\
-		{ XMAX + 60, YMIN, XMAX + 110, YMAX, 0, (LABEL), FONT_Small, TEXTFLAG_CheckForRefresh | TEXTFLAG_ForceFit | TEXTFLAG_CentreY, KEY.key[ 1 ], NULL, SelectFlatMenuKey, DrawFlatMenuKey, NULL, 0 }
 
 
 #define HELPKEY( X, Y, KEY, MSG )\
@@ -830,7 +821,6 @@ char GameCompleteText[ 256 ];
 			       
 const char *GameCompleteGotAllCrystalsSoFar		= LT_GameCompleteGotAllCrystalsSoFar		/* "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award."*/;
 const char *GameCompleteWithCheating				= LT_GameCompleteWithCheating				/* "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"*/;
-const char *GameCompleteAdditionalLevels			= LT_GameCompleteAdditionalLevels			/* "congratulations. You have completed all the currently installed additional levels. Look out for further mission packs!!"*/;
 
 MENU MENU_NEW_SpecialMessage = {
 	(u_int8_t*)"", NULL, NULL, NULL, TITLE_TIMER_LowerHolopad,
@@ -2680,8 +2670,6 @@ bool Turned[6], LastTurned[6], RotateSetup, DoHighlight, PanDone;
 POLYANIM *PolyAnim[6];
 MXLOADHEADER * Mxloadheader[6];
 
-u_int16_t fmpoly[2];
-u_int16_t scrpoly[MAXVDULINES][MAXVDULINELENGTH];
 u_int16_t BikerScrPoly;
 u_int16_t LevelScrPoly;
 
@@ -2705,9 +2693,8 @@ float VDUrot;
 
 VDUINFO	LeftVDU, RightVDU;
 
-int KeyDefLines[MAXVDULINES];
 
-int CurrentTextItem, CurrentKeyDef;
+int CurrentTextItem;
 
 bool VduProcessed;
 bool InitialTexturesSet;
@@ -5494,15 +5481,6 @@ void CursorSearch( char *keyword )
 }
 
 
-static void
-DefineKey( MENUITEM *item, VirtualKeycode key )
-{
-	VirtualKeycode *kdef;//, *other_kdef;
-
-	kdef = (VirtualKeycode *)(item->Variable);
-	*kdef = key;
-}
-
 static void KeySelect( DEFKEY *kdef, int key )
 {
 	int k;
@@ -6103,51 +6081,6 @@ void SelectKey( MENUITEM *Item )
 
 }
 
-/*===================================================================
-	Procedure	:		Draw a key menuitem
-	Input		:		MENUITEM * Item...
-	Output		:		Nothing
-===================================================================*/
-void DrawKey( MENUITEM *Item )
-{
-	VirtualKeycode keycode;
-	const char *keyword;
-	int	x;
-	int	y;
-	int colour;
-
-	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
-	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
-
-	if ( Item->Variable )
-	{
-		keycode = *(VirtualKeycode *)(Item->Variable);
-		if ( MenuState == MENUSTATE_Keydef && Item == KeyItem )
-		{
-			colour = SelectionColour();
-		}
-		else
-		{
-			colour = 1;
-		}
-		if ( keycode )
-		{
-			keyword = (char *) key_name( keycode );
-			if ( keyword )
-			{
-				Print4x5Text( keyword, x , y , colour );
-			}
-		}
-		else
-		{
-			if ( MenuState == MENUSTATE_Keydef && Item == KeyItem )
-			{
-				Print4x5Text( LT_Undef/*"undef"*/, x , y , colour );
-			}
-		}
-	}
- 
-}
 
 /*===================================================================
 	Procedure	:		Select a keydef menuitem
@@ -13143,9 +13076,6 @@ void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 		 MenuChangeEx( &MENU_NEW_GeneralLoading );
 		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
 		 return;
-	 case GAMECOMPLETE_AdditionalLevels:
-		 strcpy( GameCompleteText, GameCompleteAdditionalLevels );
-		 break;
 	 }
 	
 	 MenuChangeEx( &MENU_NEW_SpecialMessage );
@@ -13966,60 +13896,6 @@ bool ProcessSelectKeydef( int Key )
 		}
 	}
 	
-	return !done;
-}
-
-bool ProcessKeydef( int Key )
-{
-	bool done;
-	int KeyDefNo;
-	MENUITEM *Item, *nextitem;
-
-	done = false;
-	switch( Key )
-	{
-	case SDLK_ESCAPE:
-	case SDLK_F1:
-	case SDLK_F2:
-	case SDLK_F3:
-	case SDLK_F4:
-	case SDLK_F5:
-	case SDLK_F6:
-	case SDLK_F7:
-	case SDLK_F8:
-	case SDLK_F9:
-	case SDLK_F10:
-	case SDLK_F11:
-	case SDLK_F12:
-		done = true; // back out of key definition mode if illegal key selected
-		break;
-	default:
-		if ( Key )
-		{
-			if ( KeyItem->Variable )
-			{
-				DefineKey( KeyItem, (VirtualKeycode) Key );
-			}
-			done = true;
-		}
-		break;
-	}
-
-	nextitem = CurrentMenu->Item;
-
-	for ( KeyDefNo = 0; KeyDefNo <= CurrentKeyDef; KeyDefNo++)
-	{
-		for( Item = nextitem; Item->x >= 0; Item++ )
-		{	
-			if (Item->FrameNo == KeyDefLines[KeyDefNo])
-			{
-				CurrentKeyDef--;
-				nextitem = Item;	
-				break;
-			}
-		}
-	}
-
 	return !done;
 }
 

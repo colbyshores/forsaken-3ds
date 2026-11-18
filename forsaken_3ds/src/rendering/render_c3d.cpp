@@ -2515,14 +2515,8 @@ bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName,
 ===================================================================*/
 
 /* Lighting globals — set by the engine's TransExe system per object */
-int render_color_blend_red   = 0;
-int render_color_blend_green = 0;
-int render_color_blend_blue  = 0;
 
-int render_lighting_enabled = 0;
 int render_lighting_point_lights_only = 1;
-int render_lighting_use_only_light_color = 0;
-int render_lighting_use_only_light_color_and_blend = 0;
 
 int render_light_ambience = 0;
 int render_light_ambience_alpha = 255.0f;

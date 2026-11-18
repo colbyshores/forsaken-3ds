@@ -317,7 +317,6 @@ void Bspfree( void )
 static VECTOR RayPos;
 static VECTOR RayDir;
 static float RayLength;
-bool Collided;
 VECTOR CollidePoint;
 BSP_NODE *CollideNode;
 BSP_NODE *OldCollideNode;

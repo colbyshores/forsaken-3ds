@@ -101,12 +101,6 @@ char *SaveGamePicFileName( int slot )
 	return name;
 }
 
-/*===================================================================
-	Procedure	:	PreInGame Load
-	Input		:	MENUITEM * MenuItem
-	Output		:	nothing
-===================================================================*/
-int8_t	LoadGameFilename[ 256 ];
 
 bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 {

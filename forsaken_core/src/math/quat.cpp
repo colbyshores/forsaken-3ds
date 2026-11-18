@@ -60,47 +60,6 @@ void QUAT::Multiply( const QUAT * q2, QUAT * q1q2 ) const
 	q1q2->z = ( (q1_w * q2_z) + (q1_z * q2_w) + (q1_x * q2_y) - (q1_y * q2_x) );
 }
 
-/*===================================================================
-	Procedure	:	Multiply X Quaternion by Y Quaternion creating
-				:	new XY quaternion
-	Input		:	QUAT	*	Y Quaternion
-				:	QUAT	*	New Quaternion
-	Output		:	Nothing
-===================================================================*/
-void QUAT::MultiplyX_Y( const QUAT * qy, QUAT * qxy ) const
-{
-	float	x_w, x_x;
-	float	y_w, y_y;
-
-	x_w = w;	x_x = x;
-	y_w = qy->w;	y_y = qy->y;
-
-	qxy->w = ( ( x_w * y_w ) );
-	qxy->x = ( ( x_x * y_w ) );
-	qxy->y = ( ( x_w * y_y ) );
-	qxy->z = ( ( x_x * y_y ) );
-}
-
-/*===================================================================
-	Procedure	:	Multiply XY Quaternion by Z Quaternion creating
-				:	new XYZ Quaternion
-	Input		:	QUAT	*	Z Quaternion
-				:	QUAT	*	New Quaternion
-	Output		:	Nothing
-===================================================================*/
-void QUAT::MultiplyXY_Z( const QUAT * qz, QUAT * qxyz ) const
-{
-	float	xy_w, xy_x, xy_y, xy_z;
-	float	z_w, z_z;
-
-	xy_w = w;	xy_x = x;	xy_y = y;	xy_z = z;
-	z_w = qz->w;	z_z = qz->z;
-
-	qxyz->w = ( ( xy_w * z_w ) - ( xy_z * z_z ) );
-	qxyz->x = ( ( xy_x * z_w ) + ( xy_y * z_z ) );
-	qxyz->y = ( ( xy_y * z_w ) - ( xy_x * z_z ) );
-	qxyz->z = ( ( xy_w * z_z ) + ( xy_z * z_w ) );
-}
 
 /*===================================================================
 	Procedure	:	Normalise a Quaternion
@@ -306,85 +265,6 @@ void QUAT::FromVector2( VECTOR * Tv )
 	Normalise();
 }
 
-/*===================================================================
-	Procedure	:		Quaternion Spherical Interpolation (Slerp)
-	Input		:		float		alpha ( interpolation parameter (0 to 1) )
-				:		QUAT	*	b ( end unit quaternions )
-				:		QUAT	*	q ( output interpolated quaternion )
-				:		int		spin ( number of extra spin rotations )
-	Output		:	Nothing
-===================================================================*/
-void QUAT::Slerp( float alpha, const QUAT * b, QUAT * q, int spin ) const
-{
-	float	beta;			/* complementary interp parameter */
-	float	theta;			/* angle between A and B */
-	float	sin_t, cos_t;	/* sine, cosine of theta */
-	float	phi;			/* theta plus spins */
-	int		bflip;			/* use negation of B? */
-
-	cos_t = Dot( b );
-
-	/* if B is on opposite hemisphere from A, use -B instead */
- 	if( cos_t < 0.0F )
-	{
-		cos_t = -cos_t;
-		bflip = true;
-	}
-	else
-	{
-		bflip = false;
-	}
-
-	/* if B is (within precision limits) the same as A,
-	 * just linear interpolate between A and B.
-	 * Can't do spins, since we don't know what direction to spin.
-	 */
-	if( ( 1.0F - cos_t ) < EPS )
-	{
-		beta = ( 1.0F - alpha );
- 	}
-	else
-	{				/* normal case */
-		/* @vfp-exempt R6 — acosf has no LUT form (fast trig is sin/cos only);
-		 * quaternion slerp angle per-ship-per-frame; LUT-izing inverse trig is
-		 * new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
- 		theta	= ( (float) acosf( cos_t ) );
- 		phi		= ( theta + ( spin * M_PI ) );
- 		sin_t	= ( (float) fast_sinf( theta ) );
- 		beta	= ( (float) fast_sinf( theta - ( alpha * phi ) ) / sin_t );
- 		alpha	= ( (float) fast_sinf( alpha * phi ) / sin_t );
- 	}
-
-	if( bflip ) alpha = -alpha;
-
-	/* interpolate */
- 	q->x = ( ( beta * x ) + ( alpha * b->x ) );
- 	q->y = ( ( beta * y ) + ( alpha * b->y ) );
- 	q->z = ( ( beta * z ) + ( alpha * b->z ) );
- 	q->w = ( ( beta * w ) + ( alpha * b->w ) );
-}
-
-/*===================================================================
-	Procedure	:		Invert Quaternion
-				:		Create it's multiplicative inverse.
-	Input		:		QUAT	*	Destin Quaternion
-	Output		:	Nothing
-===================================================================*/
-void QUAT::Inverse( QUAT * d ) const
-{
-    float	sNorm;
-
-	sNorm = ( 1.0F / ( ( x * x ) +
-					   ( y * y ) +
-					   ( z * z ) +
-					   ( w * w ) ) );
-
-	d->x = -x * sNorm;
-	d->y = -y * sNorm;
-	d->z = -z * sNorm;
-	d->w =  w * sNorm;
-
-}
 
 /*===================================================================
 	Procedure	:		create a quaternion from two vectors that rotates
@@ -519,73 +399,6 @@ void QUAT::MakeAxis( float x, float y, float z, float angle)
 
 }
 
-/*===================================================================
-	Procedure	:		Convert GL 4x4 row-major 
-    	    	    	rotation matrix to unit quaternion.
-	Input		:		MATRIX	*	SrcMatrix
-	Output		:	Nothing (operates on this)
-===================================================================*/
-void QUAT::FromMatrix( const MATRIX * srcMatrix)
-{
-    float	trace, s;
-    int     i, j, k;
-	int 	next[3] = {1, 2, 0};
-	float	Temp[4][4];
-	trace = srcMatrix->_11 + srcMatrix->_22 + srcMatrix->_33;
-
-if (trace > 0.0F)
-    {
-    s = sqrtf(trace + 1.0F);
-    w = s * 0.5F;
-    s = 0.5F / s;
-    
-    x = (srcMatrix->_23 - srcMatrix->_32) * s;
-    y = (srcMatrix->_31 - srcMatrix->_13) * s;
-    z = (srcMatrix->_12 - srcMatrix->_21) * s;
-    } 
-else 
-    {
-
-	Temp[0][0]=srcMatrix->_11;Temp[0][1]=srcMatrix->_12;Temp[0][2]=srcMatrix->_13;Temp[0][3]=srcMatrix->_14;
-	Temp[1][0]=srcMatrix->_21;Temp[1][1]=srcMatrix->_22;Temp[1][2]=srcMatrix->_23;Temp[1][3]=srcMatrix->_24;
-	Temp[2][0]=srcMatrix->_31;Temp[2][1]=srcMatrix->_32;Temp[2][2]=srcMatrix->_33;Temp[2][3]=srcMatrix->_34;
-	Temp[3][0]=srcMatrix->_41;Temp[3][1]=srcMatrix->_42;Temp[3][2]=srcMatrix->_43;Temp[3][3]=srcMatrix->_44;
-
-    
-	i = 0;
-    if (Temp[1][1] > Temp[0][0])
-	i = 1;
-    if (Temp[2][2] > Temp[i][i])
-	i = 2;
-    j = next[i];  
-    k = next[j];
-    
-    s = (float) sqrtf( (Temp[i][i] - (Temp[j][j]+Temp[k][k])) + 1.0F );
-	if( i == 0)
-		x = s*0.5F;
-	if( i == 1)
-		y = s*0.5F;
-	if( i == 2)
-		z = s*0.5F;
-    
-    s = 0.5F / s;
-    
-    w = (Temp[j][k] - Temp[k][j]) * s;
-	if( j == 0)
-		x = (Temp[i][j] + Temp[j][i]) * s;
-	if( j == 1)
-		y = (Temp[i][j] + Temp[j][i]) * s;
-	if( j == 2)
-		z = (Temp[i][j] + Temp[j][i]) * s;
-
-	if( k == 0)
-		x = (Temp[i][k] + Temp[k][i]) * s;
-	if( k == 1)
-		y = (Temp[i][k] + Temp[k][i]) * s;
-	if( k == 2)
-		z = (Temp[i][k] + Temp[k][i]) * s;
-    }
-}
 
 /*===================================================================
 	Procedure	:		Create Quat from dir vector and up vector

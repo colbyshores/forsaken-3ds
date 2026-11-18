@@ -73,7 +73,6 @@ VECTOR OldPos;
 float SpeedInterval = 0.0F;
 float BikeSpeed = 0.0F;
 
-bool OriginalLevels = false;
 bool CheatsDisabled = false;
 bool WaitingToQuit;
 
@@ -835,7 +834,6 @@ bool InitLevels( const char * levels_list )
   
   // set some globals
   CurrentLevelsList = levels_list;
-  OriginalLevels = true;
 
   /////
   // Read Levels From File
@@ -3848,11 +3846,6 @@ void ShowInGameStats()
 	ShowGameStats( NO_BG );	// don't use BLT background
 }
 
-void PaintBackground( rect_t * /*box*/ ) // pass NULL to black out all of the screen
-
-{
-	/* would simply blit the area defined by box on the backbuffer to black */
-}
 
 bool StatsNamePulse( void )
 {
@@ -3963,27 +3956,6 @@ void ShowGameStats( stats_mode_t mode )
 
 // ROWS += 1
 
-	// paint black background or black box
-
-	if( 0 && mode != NO_BG ) // TODO - could use flashbackgroundcolor function here if we want later
-	{
-		rect_t box;
-		if( mode == BOX_BG )
-		{
-			int y_padding = FontHeight*2;
-
-			// whole width
-			box.left = 0;
-			box.right = render_info.window_size.cx;
-
-			//box.left = left_offset - x_padding;						// begging of first col
-			//box.right = column[ ncols-1 ] + col_width + x_padding;	// end of last col
-
-			box.top = top_offset - y_padding;							// begging of first row
-			box.bottom = top_offset + total_height + y_padding;			// bottom of last row
-		}
-		PaintBackground(&box);
-	}
 
 	//
 	// Kill Matrix

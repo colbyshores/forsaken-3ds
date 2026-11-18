@@ -16,7 +16,6 @@
 #define LT_GameCompleteWithAllCrystals "well done, you got all the crystals. You get the secret biker."
 #define LT_GameCompleteWithAllCrystalsExceptLast "well you got through the secret level, but you didn't get the final crystal. Better luck next time."
 #define LT_GameCompleteWithCheating "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"
-#define LT_GameCompleteAdditionalLevels "congratulations. You have completed all the currently installed additional levels. Look out for further mission packs!!"
 
 #define LT_MENU_NEW_SpecialMessage0 "ok"
 

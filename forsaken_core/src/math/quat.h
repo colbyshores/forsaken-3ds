@@ -43,18 +43,13 @@ public:
 
 	void	MakeEuler( float XRot, float YRot, float ZRot );
 	void	Multiply( const QUAT * q2, QUAT * q1q2 ) const;
-	void	MultiplyX_Y( const QUAT * qy, QUAT * qxy ) const;
-	void	MultiplyXY_Z( const QUAT * qz, QUAT * qxyz ) const;
 	void	Normalise();
 	void	ToMatrix( MATRIX * m ) const;
 	float	Dot( const QUAT * q2 ) const;
-	void	Slerp( float alpha, const QUAT * b, QUAT * q, int spin ) const;
 	void	FromVector( VECTOR * Tv );
 	void	FromVector2( VECTOR * Tv );
-	void	Inverse( QUAT * d ) const;
 	void	MakeAxis( float x, float y, float z, float angle );
 	void	From2Vectors( const VECTOR * v1, const VECTOR * v2 );
-	void	FromMatrix( const MATRIX * srcMatrix );
 	void	FromDirAndUp( const VECTOR * Dir, const VECTOR * Up );
 };
 

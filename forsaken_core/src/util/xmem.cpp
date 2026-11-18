@@ -195,37 +195,6 @@ void X_free( void * Pnt, const char *in_file, int in_line )
 	BlocksUsed--;
 }
 
-void * X_realloc( void * Pnt , size_t size, const char *in_file, int in_line )
-{
-	int i;
-	
-	i = XMem_FindSame( Pnt );
-	if( i == -1 )
-	{
-		DebugPrintf( "MEM: tried to realloc un-alloced block\n"); // break point
-		return NULL;
-	}
-
-	Pnt = realloc( Pnt , size );
-
-	if( !Pnt )
-		return Pnt;
-
-	BlockUsed[i] = true;
-	BlockPnts[i] = Pnt;
-	BlockInFile[i] = in_file;
-	BlockInLine[i] = in_line;
-
-	if(size > BlockSize[i]) // this protects whole program against dirty memory
-		memset((char *)Pnt+BlockSize[i],0,size-BlockSize[i]);
-
-	MemUsed -= BlockSize[i];
-	BlockSize[i] = size;
-	MemUsed += size;
-	
-	return Pnt;
-
-}
 
 int UnMallocedBlocks( void )
 {

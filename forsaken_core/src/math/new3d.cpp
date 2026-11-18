@@ -445,26 +445,6 @@ void CalcViewAxes( VECTOR * viewpos, VECTOR * lookpos, VECTOR * up,
 }
 
 
-/*===================================================================
-	Function	:	Scale a matrix
-	Input		:	MATRIX	*	Matrix
-				:	VECTOR	*	Scale Vector
-	Output		:	Nothing
-===================================================================*/
-void ScaleMatrix( MATRIX * m, VECTOR * v )
-{
-	m->_11 = ( m->_11 * v->x );
-	m->_12 = ( m->_12 * v->y );
-	m->_13 = ( m->_13 * v->z );
-
-	m->_21 = ( m->_21 * v->x );
-	m->_22 = ( m->_22 * v->y );
-	m->_23 = ( m->_23 * v->z );
-
-	m->_31 = ( m->_31 * v->x );
-	m->_32 = ( m->_32 * v->y );
-	m->_33 = ( m->_33 * v->z );
-}
 
 /* rotate_matrix
 

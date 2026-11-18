@@ -79,7 +79,6 @@ constexpr int GAMECOMPLETE_GotAllCrystalsSoFar = 2; // got all crystals so far (
 constexpr int GAMECOMPLETE_WithAllCrystals = 3; // with all crystals plus secret level crystal ( secret biker end game sequence )
 constexpr int GAMECOMPLETE_WithAllCrystalsExceptLast = 4; // with all crystals except secret level crystal ( standard end game sequence )
 constexpr int GAMECOMPLETE_Cheated = 5; // got to last but one level, but with cheating
-constexpr int GAMECOMPLETE_AdditionalLevels = 6; // completed all levels ( not original levels )
 
 constexpr float PAN_TIME = 1.0F;
 
@@ -511,7 +510,6 @@ void	SelectRadioButton( MENUITEM *Item );
 void	SelectSlider( MENUITEM *Item );
 void	DrawSlider( MENUITEM *Item );
 void	SelectKey( MENUITEM *Item );
-void	DrawKey( MENUITEM *Item );
 void	MenuItemBack( MENUITEM *item );
 void	DecrementSlider( MENUITEM *Item );
 void	IncrementSlider( MENUITEM *Item );
@@ -541,7 +539,6 @@ void	TextHome( TEXT *t );
 void	TextEnd( TEXT *t );
 void	TextEnter( MENUITEM *item );
 void	TextCancel( TEXT *t );
-bool	ProcessKeydef( int Key );
 bool	ProcessText( int Key );
 bool	ProcessBikerList ( int Key );
 bool	ProcessList( int Key );
