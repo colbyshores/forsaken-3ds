@@ -619,7 +619,6 @@ void ProcessBGObjects( bool Collide )
 									upper_is_intermediate_wait = (upper_node->Flags & 0x40) != 0;
 									if( upper_is_intermediate_wait )
 									{
-										extern bool TriggerAreaEnemyCheck( VECTOR * OldPos, VECTOR * NewPos, u_int16_t Group );
 										VECTOR oldPos = drone->Object.Pos;
 										drone->Object.Pos.x = upper_node->SolidPos.x;
 										drone->Object.Pos.y = upper_node->SolidPos.y;

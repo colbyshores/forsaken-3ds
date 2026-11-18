@@ -4679,7 +4679,6 @@ bool DisplayTitle(void)
 #ifdef __3DS__
 #ifdef RENDERER_C3D
 	{
-		extern float platform_get_3d_slider(void);
 		float _slider = platform_get_3d_slider();
 		if (_slider > 0.0f)
 		{

@@ -6863,7 +6863,6 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		 * and gives the real barrier position. */
 		if( Enemy->Type == ENEMY_CargoDrone )
 		{
-			extern BGOBJECT * FirstBGObjectUsed;
 			float stop_r = EnemyTypes[ Enemy->Type ].Radius + 60.0F;
 			BGOBJECT * bgo;
 			for( bgo = FirstBGObjectUsed; bgo; bgo = bgo->NextUsed )

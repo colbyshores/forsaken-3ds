@@ -26,6 +26,7 @@
 #include "rendering/2dpolys.h"
 #include "math/quat.h"
 #include "game/models.h"
+#include "data/file.h"
 #include "math/sphere.h"
 #include "input/controls.h"
 #include "world/visi.h"
@@ -2874,8 +2875,6 @@ static int16_t s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
 ===================================================================*/
 bool PreLoadPickups( void )
 {
-	extern int16_t NextNewModel;
-	extern bool File_Exists( char * );
 
 	static const char * const n64_pickup_files[5] = {
 		"n64\\stcrys.mx",   /* PICKUP_StablizerCrystal (100) */
