@@ -283,7 +283,7 @@ static VkPipeline get_pipeline(int ortho, int topo)
     stages[1].module = s_fs;
     stages[1].pName = "main";
 
-    VkVertexInputBindingDescription binds[1] = {{ 0, ortho ? sizeof(TLVERTEX) : sizeof(LVERTEX), VK_VERTEX_INPUT_RATE_VERTEX }};
+    VkVertexInputBindingDescription binds[1] = {{ 0, (uint32_t)( ortho ? sizeof(TLVERTEX) : sizeof(LVERTEX) ), VK_VERTEX_INPUT_RATE_VERTEX }};
     VkVertexInputAttributeDescription attrs[3];
     if (ortho) {
         attrs[0] = (VkVertexInputAttributeDescription){ 0, 0, VK_FORMAT_R32G32B32A32_SFLOAT, 0 };
@@ -613,7 +613,7 @@ bool FSSetViewPort(render_viewport_t *view)
     s_viewport = *view;
     if (s_frame_active) {
         VkViewport vp = { (float)view->X, (float)view->Y, (float)view->Width, (float)view->Height, view->MinZ, view->MaxZ };
-        VkRect2D sc = { { view->X, view->Y }, { (uint32_t)view->Width, (uint32_t)view->Height } };
+        VkRect2D sc = { { (int32_t)view->X, (int32_t)view->Y }, { (uint32_t)view->Width, (uint32_t)view->Height } };
         vkCmdSetViewport(s_cur, 0, 1, &vp);
         vkCmdSetScissor(s_cur, 0, 1, &sc);
     }
@@ -701,7 +701,7 @@ bool FSClear(XYRECT *rect)
     };
     atts[1].clearValue.depthStencil.depth = 1.0f;
     int y = render_info.ThisMode.h - rect->y1 - (rect->y2 - rect->y1);
-    VkClearRect cr = { { { rect->x1, y }, { (uint32_t)(rect->x2 - rect->x1), (uint32_t)(rect->y2 - rect->y1) } }, 0, 1 };
+    VkClearRect cr = { { { (int32_t)rect->x1, y }, { (uint32_t)(rect->x2 - rect->x1), (uint32_t)(rect->y2 - rect->y1) } }, 0, 1 };
     vkCmdClearAttachments(s_cur, 2, atts, 1, &cr);
     return true;
 }
@@ -719,7 +719,7 @@ bool FSClearDepth(XYRECT *rect)
     VkClearAttachment att = { VK_IMAGE_ASPECT_DEPTH_BIT, 0, { { 0, 0, 0, 0 } } };
     att.clearValue.depthStencil.depth = 1.0f;
     int y = render_info.ThisMode.h - rect->y1 - (rect->y2 - rect->y1);
-    VkClearRect cr = { { { rect->x1, y }, { (uint32_t)(rect->x2 - rect->x1), (uint32_t)(rect->y2 - rect->y1) } }, 0, 1 };
+    VkClearRect cr = { { { (int32_t)rect->x1, y }, { (uint32_t)(rect->x2 - rect->x1), (uint32_t)(rect->y2 - rect->y1) } }, 0, 1 };
     vkCmdClearAttachments(s_cur, 1, &att, 1, &cr);
     return true;
 }
