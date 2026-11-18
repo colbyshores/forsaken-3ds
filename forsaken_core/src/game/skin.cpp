@@ -683,11 +683,7 @@ void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
 {
 	u_int16_t	Model;
 	QUAT	TempQuat;
-	VECTOR	TempDir;
 
-	TempDir.x = -Dir->x;
-	TempDir.y = -Dir->y;
-	TempDir.z = -Dir->z;
 
 	Model =	FindFreeModel();
 

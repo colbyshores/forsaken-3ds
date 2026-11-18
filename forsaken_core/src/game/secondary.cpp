@@ -6439,7 +6439,6 @@ void CreateTentacle( u_int16_t i )
 	MATRIX		TempMat;
 	u_int8_t		Red1, Green1, Blue1, Trans1;
 	u_int8_t		Red2, Green2, Blue2, Trans2;
-	float		Frame;
 
 	Poly = SecBulls[i].poly;
 	for( Count = 0; Count < SecBulls[ i ].numpolys; Count++ )
@@ -6477,8 +6476,6 @@ void CreateTentacle( u_int16_t i )
 	Green2 = 64;
 	Blue2 = 64;
 
-	Frame = (float) ( ( SecBulls[i].LifeCount / 2.0F ) - (float) ( fast_floorf( ( SecBulls[i].LifeCount / 2.0F ) / ScatterTrail_Header->Num_Frames )
-					* ScatterTrail_Header->Num_Frames ) );
 
 	for( Count = (int16_t) SecBulls[i].RetractPos; Count < SecBulls[ i ].NumOldPos; Count++ )
 	{

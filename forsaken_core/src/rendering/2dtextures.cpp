@@ -194,7 +194,6 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 	BIT_INFO	*	Bit_Info;
 	int16_t			Num_Frames;
 	OFF_INFO	*	Off_Info;
-	int16_t			Num_Offs;
 	FRAME_INFO	*	Frm_Info = NULL;
 	int16_t			Num_TPages;
 	int16_t			Count;
@@ -336,7 +335,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, bool Scale, int LoadTPages, int16
 		Bit_Info = (BIT_INFO *) Short_Ptr;
 
 		Short_Ptr = (int16_t *) ( Bit_Info + Num_Frames );
-		Num_Offs = *Short_Ptr++;											// Number of Offsets
+		Short_Ptr++;											// Number of Offsets
 		Off_Info = (OFF_INFO *) Short_Ptr;
 
 		for( Count = 0; Count < Num_Boxes; Count++ )

@@ -99,15 +99,12 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	TRIANGLE		FacePnt; // was a pointer
 	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
 	u_int16_t			exec_type;			// the type of execute buffer
-	u_int16_t			texture_type;		// the type of texture...0 normal  1 env
 	u_int16_t			num_vertices;		// overall number of verts
 	u_int16_t			num_texture_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			group_vertex_start; // where in the vert list to start processing
-	u_int16_t			group_vertex_num;	// and how many to do...
 	LPOLDLVERTEX lpLVERTEX2;
 	LPLVERTEX	lpLVERTEX;
-	LPLVERTEX	lpBufStart = NULL;
 	WORD			*lpIndices = NULL;
 	NORMAL		*lpNormals = NULL;
 	int				ibIndex = 0;
@@ -215,7 +212,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				return false;
 			}
 
-			lpBufStart = lpLVERTEX;
 
 			/*	copy the vertex data into the execute buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
@@ -326,9 +322,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			for ( i=0 ; i<num_texture_groups; i++)
 			{
 				Uint16Pnt = (u_int16_t *) Buffer;
-				texture_type = *Uint16Pnt++;
+				Uint16Pnt++;	// texture type (unused)
 				group_vertex_start = *Uint16Pnt++;
-				group_vertex_num = *Uint16Pnt++;
+				Uint16Pnt++;	// group vertex count (unused)
 				tpage = *Uint16Pnt++;
 				num_triangles = *Uint16Pnt++;    
 				Buffer = (char *) Uint16Pnt;		

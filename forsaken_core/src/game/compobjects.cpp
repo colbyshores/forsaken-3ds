@@ -1317,7 +1317,6 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 	int16_t					Side;
 	ZONESIDE			*	Sides;
 	ANI_ZONES			*	ZonesPtr;
-	ANI_ZONE_SPHERE		*	AniZoneSpherePtr;
 	ANI_ZONE_BOX		*	AniZoneBoxPtr;
 	ANI_ZONE_POLYGONAL	*	AniZonePolyPtr;
 	ZONESIDE				ZoneSides[ 64 ];
@@ -1339,7 +1338,6 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 					switch( ZonesPtr->Type )
 					{
 						case ZONE_Sphere:
-							AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr->Data;
 
 							NumSides = 0;
 							break;
@@ -1542,7 +1540,6 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 	ANI_TRANSLATE	*	TransData;
 	ANI_ROTATE		*	RotData;
 	ANI_MORPH		*	MorphData;
-	ANI_PROPERTY	*	PropData;
 	float				Start;
 	float				Duration;
 	float				End;
@@ -1627,7 +1624,6 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 								break;
 						
 							case TRANS_PROPERTY:
-								PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
 								break;
 						}
 					}
@@ -2122,7 +2118,6 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 	ANI_TRANSLATE	*	TransData;
 	ANI_ROTATE		*	RotData;
 	ANI_MORPH		*	MorphData;
-	ANI_PROPERTY	*	PropData;
 	float				Start;
 	float				Duration;
 	float				End;
@@ -2207,7 +2202,6 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 								break;
 						
 							case TRANS_PROPERTY:
-								PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
 								break;
 						}
 					}

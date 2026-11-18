@@ -92,12 +92,10 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	TRIANGLE		FacePnt; // was a pointer
 	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
 	u_int16_t			exec_type = 0;			// the type of execute buffer
-	u_int16_t			texture_type = 0;		// the type of texture...0 normal  1 env
 	u_int16_t			num_vertices = 0;		// overall number of verts
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
 	u_int16_t			group_vertex_start = 0; // where in the vert list to start processing
-	u_int16_t			group_vertex_num = 0;	// and how many to do...
 	LPOLDLVERTEX lpLVERTEX2 = NULL;
 	LPLVERTEX	lpLVERTEX = NULL;
 	LPLVERTEX	lpBufStart = NULL;
@@ -114,7 +112,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	TANIMUV		*	TanimUV;
 	int			*	intPnt;
 	u_int16_t			num_animations;
-	u_int16_t			maxloops;
 	u_int16_t			animsize;
 	int				r,g,b,a;
 	COLOR		color;
@@ -365,9 +362,9 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			for ( i=0 ; i<num_texture_groups; i++)
 			{
 				Uint16Pnt = (u_int16_t *) Buffer;
-				texture_type = *Uint16Pnt++;
+				Uint16Pnt++;	// texture type (unused)
 				group_vertex_start = *Uint16Pnt++;
-				group_vertex_num = *Uint16Pnt++;
+				Uint16Pnt++;	// group vertex count (unused)
 				tpage = *Uint16Pnt++;
 				num_triangles = *Uint16Pnt++;
 				DebugPrintf("trinagles %d\n", num_triangles);
@@ -489,7 +486,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		for( i = 0 ; i < num_animations ; i++ )
 		{
 			frames = *Uint16Pnt++;
-			maxloops = *Uint16Pnt++;
+			Uint16Pnt++;	// max loops (unused)
 			animsize = *Uint16Pnt++;
 			Mxloadheader->AnimData.AnimSeq[i] = (u_int16_t *) malloc( animsize * sizeof( u_int16_t ) );
 			Uint16Pnt2 = Mxloadheader->AnimData.AnimSeq[i];

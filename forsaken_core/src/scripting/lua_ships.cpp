@@ -254,10 +254,9 @@ static int luaship_equals(lua_State *L)
 
 static int luaship_arrayindex(lua_State *L)
 {
-	GLOBALSHIP *ships;
 	int *shipidx;
 	int i;
-	ships = *((GLOBALSHIP **) luaL_checkudata(L, 1, "GLOBALSHIPARRAYPTR"));
+	luaL_checkudata(L, 1, "GLOBALSHIPARRAYPTR");
 	i = luaL_checkint(L, 2);
 	if (i < 0 || i >= MAX_PLAYERS)
 		return luaL_argerror(L, 2, "invalid ship index");

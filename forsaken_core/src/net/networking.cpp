@@ -1361,12 +1361,10 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
     char				methodstr[256];
 	char				teamstr[256];
     LPSETTIMEMSG	lpSetTime;
-    LPREQTIMEMSG	lpReqTime;
 	VECTOR	Point;
 	VECTOR	Recoil;
 	VECTOR	Dir;
 	float	Force;
-	u_int16_t	Pickup;
 
 	switch (*MsgPnt)
 	{
@@ -2314,7 +2312,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		if( lpDropPickup->WhoIAm != (u_int16_t) -1 ) DebugPrintf( "PACKET OWNER '%s' : Init '%s', Owner '%s', ID %d\n", &Names[ lpDropPickup->WhoIAm ][ 0 ], Messages[ lpDropPickup->PickupInfo.Type ], &Names[ lpDropPickup->WhoIAm ][ 0 ], lpDropPickup->PickupInfo.IDCount );
 		else DebugPrintf( "PACKET OWNER '%s' : Init '%s', No Owner, ID %d\n", &Names[ lpDropPickup->WhoIAm ][ 0 ], Messages[ lpDropPickup->PickupInfo.Type ], lpDropPickup->PickupInfo.IDCount );
 #endif
-	 	Pickup = InitOnePickup( &lpDropPickup->PickupInfo.Pos, lpDropPickup->PickupInfo.Group,
+	 	InitOnePickup( &lpDropPickup->PickupInfo.Pos, lpDropPickup->PickupInfo.Group,
 		 				   &lpDropPickup->PickupInfo.Dir, lpDropPickup->PickupInfo.Speed,
 		 				   lpDropPickup->PickupInfo.Type, lpDropPickup->WhoIAm,
 	 					   lpDropPickup->PickupInfo.IDCount, lpDropPickup->PickupInfo.RegenSlot,
@@ -2344,7 +2342,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		if( lpVeryShortDropPickup->WhoIAm != (u_int16_t) -1 ) DebugPrintf( "PACKET OWNER '%s' : Init '%s', Owner '%s', ID %d\n", &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], Messages[ TempPickup.Type ], &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], TempPickup.IDCount );
 		else DebugPrintf( "PACKET OWNER '%s' : Init '%s', No Owner, ID %d\n", &Names[ lpVeryShortDropPickup->WhoIAm ][ 0 ], Messages[ TempPickup.Type ], TempPickup.IDCount );
 #endif
-	 	Pickup = InitOnePickup( &TempPickup.Pos, TempPickup.Group,
+	 	InitOnePickup( &TempPickup.Pos, TempPickup.Group,
 		 				   &TempPickup.Dir, TempPickup.Speed,
 		 				   TempPickup.Type, lpVeryShortDropPickup->WhoIAm,
 	 					   TempPickup.IDCount, TempPickup.RegenSlot,
@@ -3167,7 +3165,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_REQTIME:
 
-		lpReqTime = (LPREQTIMEMSG)MsgPnt;
 		if( IsHost ) SetTime( Countdown_Float );
 		return;
 
@@ -3251,7 +3248,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 	// text variables
 	int				MessageColour = GREEN;
-	char			VersionMessage[30];
 
 	// set flag sfx volume
 	FlagVolume = FlagSfxSlider.value / ( FlagSfxSlider.max / GLOBAL_MAX_SFX );
@@ -3921,7 +3917,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 				{
 					// display my version number
 					AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
-					VersionMessage[0] = 0;
 				}
 				break;
 			case TEXTMSGTYPE_QuickTauntWhisper:

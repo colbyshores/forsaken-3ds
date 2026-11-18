@@ -602,7 +602,6 @@ bool ProcessShips()
 	VECTOR	ExtForce;
 	bool HasBeenExternal;
 	float	ShieldModifier;
-	u_int32_t	OldInWater;
 	bool	Object2Object;
 	NODE * NodePnt;
 	OBJECT * ShipObjPnt;
@@ -1113,7 +1112,6 @@ bool ProcessShips()
 					}
 
 					// this is where we go into and out of water
-					OldInWater = ShipObjPnt->Flags & SHIP_InWater;
 					ShipObjPnt->Flags &= ~SHIP_InWater;
 					if( InWater( ShipObjPnt->Group , &ShipObjPnt->Pos , &ShieldModifier) )
 					{
@@ -1851,7 +1849,6 @@ void InitShipRandomPos( int16_t i )
 void InitShipStartPos( int16_t i, int16_t pos )
 {
 	u_int16_t startpos;
-	VECTOR	MineVec;
 	VECTOR	Start_Dir;
 	VECTOR	Start_Up;
 	VECTOR	Start_Right;
@@ -1876,9 +1873,6 @@ void InitShipStartPos( int16_t i, int16_t pos )
 	{
 		/* @vfp-exempt R11 — cold path: level-load/spawn selection, never per-frame. measured n/a. Verified 2026-10-25. */
 		startpos = pos % num_start_positions;
-		MineVec.x = StartPositions[startpos].Pos.x;
-		MineVec.y = StartPositions[startpos].Pos.y;
-		MineVec.z = StartPositions[startpos].Pos.z;
 		
 		Ships[i].Object.Pos.x = StartPositions[startpos].Pos.x;
 		Ships[i].Object.Pos.y = StartPositions[startpos].Pos.y;			
@@ -1923,7 +1917,6 @@ void InitShipStartPos( int16_t i, int16_t pos )
 bool GotoRoom( int16_t i, char *roomname )
 {
 	u_int16_t startpos;
-	VECTOR	MineVec;
 	VECTOR	Start_Pos;
 	VECTOR	Start_Dir;
 	VECTOR	Start_Up;
@@ -1974,9 +1967,6 @@ bool GotoRoom( int16_t i, char *roomname )
 	}else{
 		return false;
 	}
-	MineVec.x = Start_Pos.x;
-	MineVec.y = Start_Pos.y;
-	MineVec.z = Start_Pos.z;
 	Ships[i].Object.Pos.x = Start_Pos.x;
 	Ships[i].Object.Pos.y = Start_Pos.y;			
 	Ships[i].Object.Pos.z = Start_Pos.z;
@@ -2675,7 +2665,6 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 	float Move_Length;
 	float Next_Move_Length;
 	VECTOR Move_Dir;
-	float OldMove;
 	VECTOR	inter;
 	VECTOR	inter2;
 	VECTOR	Norm_Move_Off;
@@ -2687,7 +2676,6 @@ bool Ship2ShipCollide( u_int16_t i , VECTOR * Move_Off )
 	
 	Norm_Move_Off = *Move_Off;
 	NormaliseVector( &Norm_Move_Off );
-	OldMove = VectorLength( &Ships[i].Move_Off);
 	
 	for( Count = 0; Count < MAX_PLAYERS; Count++ )
 	{
@@ -2765,7 +2753,6 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 	QUAT	StepQuat;	
 	BGOBJECT * BGObject;
 	float	ShieldModifier;
-	u_int32_t	OldInWater;
 	bool Impact = false;
 
 	AccellDecell( &ShipPnt->Object.Angle.y , TurnDecell );
@@ -2803,7 +2790,6 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 		Impact = true;
 	if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
 
-	OldInWater = ShipPnt->Object.Flags & SHIP_InWater;
 	ShipPnt->Object.Flags &= ~SHIP_InWater;
 	if( InWater( ShipPnt->Object.Group , &ShipPnt->Object.Pos , &ShieldModifier) )
 	{

@@ -3273,8 +3273,6 @@ void ShowFlagOnShip( u_int16_t Ship )
 	VECTOR			Trans1, Trans2;
 	VECTOR			Pos1, Pos2;
 	VECTOR			ScrPos1, ScrPos2;
-	VECTOR			DirVector;
-	float			Dist;
 	float			Xsize, Ysize;
 	BIT_INFO	*	Bit_Ptr;
 	BOX_INFO	*	Box_Ptr;
@@ -3311,10 +3309,6 @@ void ShowFlagOnShip( u_int16_t Ship )
 	Xsize = ( ( ScrPos2.x - ScrPos1.x ) / Box_Ptr->xsize ) * 1.8F;
 	Ysize = ( ( ScrPos2.y - ScrPos1.y ) / Box_Ptr->ysize ) * 1.0F;
 
-	DirVector.x = ( Ships[ Ship ].Object.Pos.x - CurrentCamera.Pos.x );
-	DirVector.y = ( Ships[ Ship ].Object.Pos.y - CurrentCamera.Pos.y );
-	DirVector.z = ( Ships[ Ship ].Object.Pos.z - CurrentCamera.Pos.z );
-	Dist = VectorLength( &DirVector );
 
 	ApplyMatrix( &CurrentCamera.Mat, &SlideUp, &Trans1 );
 
@@ -3359,8 +3353,6 @@ void ShowBountyOnShip( u_int16_t Ship )
 	VECTOR			Trans1, Trans2;
 	VECTOR			Pos1, Pos2;
 	VECTOR			ScrPos1, ScrPos2;
-	VECTOR			DirVector;
-	float			Dist;
 	float			Xsize, Ysize;
 	BIT_INFO	*	Bit_Ptr;
 	BOX_INFO	*	Box_Ptr;
@@ -3397,10 +3389,6 @@ void ShowBountyOnShip( u_int16_t Ship )
 	Xsize = ( ( ScrPos2.x - ScrPos1.x ) / Box_Ptr->xsize ) * 0.75F;
 	Ysize = ( ( ScrPos2.y - ScrPos1.y ) / Box_Ptr->ysize ) * 0.75F;
 
-	DirVector.x = ( Ships[ Ship ].Object.Pos.x - CurrentCamera.Pos.x );
-	DirVector.y = ( Ships[ Ship ].Object.Pos.y - CurrentCamera.Pos.y );
-	DirVector.z = ( Ships[ Ship ].Object.Pos.z - CurrentCamera.Pos.z );
-	Dist = VectorLength( &DirVector );
 
 	ApplyMatrix( &CurrentCamera.Mat, &SlideUp, &Trans1 );
 
@@ -3469,8 +3457,6 @@ void ShowCTFFlagsOnShip( u_int16_t Ship )
 	VECTOR			Trans1, Trans2;
 	VECTOR			Pos1, Pos2;
 	VECTOR			ScrPos1, ScrPos2;
-	VECTOR			DirVector;
-	float			Dist;
 	float			Xsize, Ysize;
 	BIT_INFO	*	Bit_Ptr;
 	BOX_INFO	*	Box_Ptr;
@@ -3518,10 +3504,6 @@ void ShowCTFFlagsOnShip( u_int16_t Ship )
 		Xsize = ( ( ScrPos2.x - ScrPos1.x ) / Box_Ptr->xsize ) * 1.8F;
 		Ysize = ( ( ScrPos2.y - ScrPos1.y ) / Box_Ptr->ysize ) * 1.0F;
 
-		DirVector.x = ( Ships[ Ship ].Object.Pos.x - CurrentCamera.Pos.x );
-		DirVector.y = ( Ships[ Ship ].Object.Pos.y - CurrentCamera.Pos.y );
-		DirVector.z = ( Ships[ Ship ].Object.Pos.z - CurrentCamera.Pos.z );
-		Dist = VectorLength( &DirVector );
 
 		ApplyMatrix( &CurrentCamera.Mat, &SlideUp, &Trans1 );
 		ApplyMatrix( &CurrentCamera.Mat, &SlideRight, &Trans2 );

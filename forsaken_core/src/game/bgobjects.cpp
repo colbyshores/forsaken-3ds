@@ -1086,7 +1086,9 @@ bool PreLoadBGOFiles( void )
 	char			TempFilename[ 256 ];
 	u_int16_t			BaseModel;
 	u_int16_t			TempBaseModel = (u_int16_t) -1;
+#if	DUPLICATE_BGOBJECTS == 0
 	BGO_FILE	*	TempPtr;
+#endif
 	FILE		*	fp;
 	const char		*	NewExt = ".BGO";
 	int16_t			NumBGObjects;
@@ -1235,10 +1237,10 @@ bool PreLoadBGOFiles( void )
 
 			while( FilePtr->Filename[ 0 ] != 0 )
 			{
-				TempPtr = BGOFilesPtr;
 				TempBaseModel = (u_int16_t) -1;
 
 #if	DUPLICATE_BGOBJECTS == 0
+				TempPtr = BGOFilesPtr;
 				while( TempPtr != FilePtr )
 				{
 					if( !strcasecmp( &TempPtr->Filename[ 0 ], &FilePtr->Filename[ 0 ] ) )

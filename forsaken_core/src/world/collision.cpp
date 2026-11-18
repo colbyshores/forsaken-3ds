@@ -1185,7 +1185,6 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 	VECTOR					NewDir;
 	VECTOR					NewEnd;
 	ANI_ZONES			*	ZonesPtr;
-	ANI_ZONE_SPHERE		*	AniZoneSpherePtr;
 	ANI_ZONE_BOX		*	AniZoneBoxPtr;
 	ANI_ZONE_POLYGONAL	*	AniZonePolyPtr;
 	VECTOR					IntPoint;
@@ -1217,7 +1216,6 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 					{
 						case ZONE_Sphere:
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr->Data;
 							break;
 	
 						case ZONE_Box:
@@ -1501,7 +1499,6 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 	VECTOR					NewDir;
 	VECTOR					NewEnd;
 	ANI_ZONES			*	ZonesPtr;
-	ANI_ZONE_SPHERE		*	AniZoneSpherePtr;
 	ANI_ZONE_BOX		*	AniZoneBoxPtr;
 	ANI_ZONE_POLYGONAL	*	AniZonePolyPtr;
 	VECTOR					IntPoint;
@@ -1556,7 +1553,6 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 					{
 						case ZONE_Sphere:
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr->Data;
 							break;
 	
 						case ZONE_Box:

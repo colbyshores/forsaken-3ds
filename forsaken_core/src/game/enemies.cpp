@@ -7630,7 +7630,6 @@ bool Ship2EnemyCollide( u_int16_t i , VECTOR * Move_Off )
 	float Move_Length;
 	float Next_Move_Length;
 	VECTOR Move_Dir;
-	float OldMove;
 	VECTOR	inter;
 	VECTOR	inter2;
 	VECTOR	Norm_Move_Off;
@@ -7641,7 +7640,6 @@ bool Ship2EnemyCollide( u_int16_t i , VECTOR * Move_Off )
 
 	Norm_Move_Off = *Move_Off;
 	NormaliseVector( &Norm_Move_Off );
-	OldMove = VectorLength( &Ships[i].Move_Off);
 
 	TEnemy = FirstEnemyUsed;
 	

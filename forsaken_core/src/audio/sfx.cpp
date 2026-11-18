@@ -1654,7 +1654,6 @@ void RequestTitleSfx( void )
 bool InitializeSound( int flags )
 {
 	int i;
-	u_int16_t Num_Sfx = 0;
 
 	// check sound is not already initialised
 	if ( bSoundEnabled )
@@ -1678,7 +1677,6 @@ bool InitializeSound( int flags )
 
 	PreInitSfx();
 
-	Num_Sfx = 0;
 
 	PreProcessSfx();
 

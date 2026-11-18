@@ -2934,7 +2934,6 @@ bool LoadPickupsPositions( void )
   int16_t   Count;
   VECTOR  Dir = { 0.0F, 0.0F, 0.0F };
   u_int16_t  i = 0;
-  int32_t   FileSize;
   u_int32_t  MagicNumber;
   u_int32_t  VersionNumber;
 
@@ -3011,7 +3010,6 @@ bool LoadPickupsPositions( void )
   Ships[WhoIAm].PickupIdCount = (u_int16_t) 0;
 
   /* get the size of the file */
-  FileSize = Get_File_Size( &NewFilename[ 0 ] );
 
   /* open the file for reading */
   fp = file_open( &NewFilename[ 0 ], "rb" );

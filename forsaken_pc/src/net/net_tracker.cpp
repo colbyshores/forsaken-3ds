@@ -75,7 +75,6 @@ void send_tracker_finished( char* host, int port )
 // protocol is line oriented so you must send a new line to end message
 static void send_tracker_message( char* host, int port, char* message )
 {
-	int sent = 0;
 	int size = strlen(message);
 	ENetAddress address;
 	ENetBuffer send_buffer;
@@ -89,6 +88,6 @@ static void send_tracker_message( char* host, int port, char* message )
 	DebugPrintf("tracker message: %s\n",message);
 
 	if(enet_host)
-		sent = enet_socket_send( enet_host->socket, &address, &send_buffer, 1 );
+		enet_socket_send( enet_host->socket, &address, &send_buffer, 1 );
 
 }

@@ -4946,7 +4946,6 @@ void DrawKeyDefPage( MENUITEM * Item )
 void DrawKeyDefHelp1( MENUITEM * Item )
 {
 	static char help[ 80 ];
-	int	x;
 	int	y;
 	static int col = 0;
 	char *keyname;
@@ -4982,7 +4981,6 @@ void DrawKeyDefHelp1( MENUITEM * Item )
 	{
 		sprintf( help, LT_SelectControl/*"[up/down]=select control"*/ );
 	}
-	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 	CenterPrint4x5Text( help, y, col );
 }
@@ -4990,7 +4988,6 @@ void DrawKeyDefHelp1( MENUITEM * Item )
 void DrawKeyDefHelp2( MENUITEM * Item )
 {
 	static char help[ 80 ];
-	int	x;
 	int	y;
 	static int col = 0;
 	char *keyname;
@@ -5011,7 +5008,6 @@ void DrawKeyDefHelp2( MENUITEM * Item )
 	{
 		help[ 0 ] = 0;
 	}
-	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 	CenterPrint4x5Text( help, y, col );
 }
@@ -5027,7 +5023,6 @@ void DrawKeyDefHelp2( MENUITEM * Item )
 void DrawKeyDefHelp3( MENUITEM * Item )
 {
 	static char help[ HELP_MAX * 2 ];
-	int	x;
 	int	y;
 	static int col = 0;
 	char *keyname;
@@ -5114,7 +5109,6 @@ void DrawKeyDefHelp3( MENUITEM * Item )
 	}
 	if ( help[ 0 ] )
 	{
-		x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 		y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 		CenterPrint4x5Text( help, y, col );
 	}
@@ -5626,15 +5620,11 @@ void CursorRight()
 
 void CursorHome()
 {
-	int x;
-	int y;
 	MENUITEM *next;
 	MENUITEM *item;
 
 	
 	
-	x = CurrentMenuItem->x;
-	y = CurrentMenuItem->y;
 	next = NULL;
 	for ( item = CurrentMenu->Item; item->x >= 0; item++ )
 	{
@@ -5656,15 +5646,11 @@ void CursorHome()
 
 void CursorEnd()
 {
-	int x;
-	int y;
 	MENUITEM *next;
 	MENUITEM *item;
 
 	
 
-	x = CurrentMenuItem->x;
-	y = CurrentMenuItem->y;
 	next = NULL;
 	for ( item = CurrentMenu->Item; item->x >= 0; item++ )
 	{
@@ -10381,13 +10367,12 @@ void KillTextInfo ( TEXTINFO *TextInfo )
 ===================================================================*/
 void VduClear ( void )
 {
-	int i, tempstacklevel, slidertype;
+	int i, slidertype;
 	MENUITEM *Item;
 	SLIDER *slider;
 
 	NewTextCharDisplayed = false;
 
-	tempstacklevel = 0;
 
 	for (i=0; i<TextStackLevel; i++)
 		if ( TextStack[ i ] )
@@ -10772,15 +10757,13 @@ void GetTextPos(TEXTINFO *TextInfo, float *xpos, float *ypos, int line, float to
 bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float totalheight)
 {
    
-	float xpos, ypos, currentx, currenty, xmin;
+	float xpos, ypos, xmin;
 	BIT_INFO	*	Bit_Ptr;
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	bool	OKtoProcess;
 	u_int16_t TempPoly;
 
-	currentx = TextInfo->currentx[line];
-	currenty = TextInfo->currenty;
 
 	xmin = (TextInfo->xmin + VDUoffsetX) * ModeScaleX;
 
@@ -10971,7 +10954,7 @@ bool VduFinished( MENU *Menu )
 
 void DisplayTextItem (TEXTINFO *TextInfo)
 {
-	int i, j, font, num_invalid_chars, skip, UpToChar;
+	int i, j, font, skip, UpToChar;
 	float totalheight = 0.0;
 	TEXTINFO TempTextInfo;
   	TEXT *t = NULL;
@@ -10982,7 +10965,6 @@ void DisplayTextItem (TEXTINFO *TextInfo)
 	
 	font = GetScreenFont(TextInfo->font);
 
-	num_invalid_chars = 0;
 
 	for (i = 0; i < TextInfo->num_lines; i++)
 	{
@@ -11191,13 +11173,12 @@ void PrintTextItem (TEXTINFO *TextInfo)
 
 void ProcessTextItems (void)
 {
-	int i, teletypenum;
+	int i;
 	static float VidTextSfxPause = 0.0F;
 	static float theta = 0.0F;
 	u_int8_t r, g, b;
 	float multiplier;
 
-	teletypenum = 0;
 
 	for (i = 0; i < MAXHIGHLIGHTITEMS; i++)
 	{	HighlightItem[i] = NULL;
@@ -12516,12 +12497,12 @@ void ProcessTimers(void)
 							   
 void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 {
-	float xmin, ymin, xmax, ymax, widthX, widthY, height, length, templength, actuallength;
-	int i, font;
+	float xmin, ymin, xmax, ymax, widthX, widthY, height, length, actuallength;
+	int i;
 
 	if(!TextInfo)return;
 
-	font = GetScreenFont(TextInfo->font);
+	GetScreenFont(TextInfo->font);	// sets the text spacing globals
 
 	widthX = (float)ceilf(ModeScaleX);
 	widthY = (float)ceilf(ModeScaleY);
@@ -12529,7 +12510,6 @@ void DrawHighlightBox(TEXTINFO *TextInfo, u_int8_t r, u_int8_t g, u_int8_t b)
 	height = 0.0F;
 	length = 0.0F;
 	actuallength = 0.0F;
-	templength = 0.0F;
 	for (i = 0; i < TextInfo->num_lines; i++)
 	{
 		height += TextInfo->height[i];
@@ -13907,7 +13887,6 @@ void ProcessFlyGirl( float scale )
 
 void ProcessHoloModel( void )
 {
-	float oldtimer;
 	bool reload = false;
 
 	HoloRot.y -= 0.5F * framelag;
@@ -13922,7 +13901,6 @@ void ProcessHoloModel( void )
 		return;
 	}
 
-	oldtimer = HoloModelTimer;
 	
 	switch( HoloModelMode )
 	{

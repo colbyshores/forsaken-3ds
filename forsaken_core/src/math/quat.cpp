@@ -69,11 +69,11 @@ void QUAT::Multiply( const QUAT * q2, QUAT * q1q2 ) const
 ===================================================================*/
 void QUAT::MultiplyX_Y( const QUAT * qy, QUAT * qxy ) const
 {
-	float	x_w, x_x, x_y, x_z;
-	float	y_w, y_x, y_y, y_z;
+	float	x_w, x_x;
+	float	y_w, y_y;
 
-	x_w = w;	x_x = x;	x_y = y;	x_z = z;
-	y_w = qy->w;	y_x = qy->x;	y_y = qy->y;	y_z = qy->z;
+	x_w = w;	x_x = x;
+	y_w = qy->w;	y_y = qy->y;
 
 	qxy->w = ( ( x_w * y_w ) );
 	qxy->x = ( ( x_x * y_w ) );
@@ -91,10 +91,10 @@ void QUAT::MultiplyX_Y( const QUAT * qy, QUAT * qxy ) const
 void QUAT::MultiplyXY_Z( const QUAT * qz, QUAT * qxyz ) const
 {
 	float	xy_w, xy_x, xy_y, xy_z;
-	float	z_w, z_x, z_y, z_z;
+	float	z_w, z_z;
 
 	xy_w = w;	xy_x = x;	xy_y = y;	xy_z = z;
-	z_w = qz->w;	z_x = qz->x;	z_y = qz->y;	z_z = qz->z;
+	z_w = qz->w;	z_z = qz->z;
 
 	qxyz->w = ( ( xy_w * z_w ) - ( xy_z * z_z ) );
 	qxyz->x = ( ( xy_x * z_w ) + ( xy_y * z_z ) );

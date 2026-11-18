@@ -139,8 +139,6 @@ static void InitDebugRays( void )
 void InitVisiStats( MLOADHEADER *m )
 {
 	int j;
-	LVLGROUP *g;
-	VECTOR min, max;
 
 	for ( j = 0; j < m->num_groups; j++ )
 	{
@@ -148,13 +146,6 @@ void InitVisiStats( MLOADHEADER *m )
 		VisiStats[ j ].tmax = 0;
 		VisiStats[ j ].tmin = -1;
 		VisiStats[ j ].visits = 0;
-		g = &m->Group[ j ];
-		min.x = g->center.x - g->half_size.x;
-		min.y = g->center.y - g->half_size.y;
-		min.z = g->center.z - g->half_size.z;
-		max.x = g->center.x + g->half_size.x;
-		max.y = g->center.y + g->half_size.y;
-		max.z = g->center.z + g->half_size.z;
 	}
 #ifndef FINAL_RELEASE
 	InitDebugRays();

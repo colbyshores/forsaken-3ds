@@ -840,7 +840,6 @@ static int16_t	OnceOnlyFlag = 0;
 	float	Old_PowerLevel;
 	float	Freq;
 	u_int16_t	Model;
-	int		firing;
 
 	float	Speed;
 
@@ -855,7 +854,6 @@ static int16_t	OnceOnlyFlag = 0;
 		GodModeOnceOnly = false;
 	}
 
-	firing = 0;
 
 	if( !GodMode )
 	{
@@ -1022,14 +1020,6 @@ static int16_t	OnceOnlyFlag = 0;
 		LaserTemperature -= ( framelag * 0.5F );
 		if( LaserTemperature < 0.0F ) LaserTemperature = 0.0F;
 		if( LaserTemperature < 30.0F ) LaserOverheated = 0;
-	}
-
-	if ( control.fire_primary && Ships[ WhoIAm ].Primary != TROJAX )
-	{
-		if ( ( Ships[ WhoIAm ].Primary == SUSS_GUN && SussGunAmmo > 0 ) ||
-			 ( Ships[ WhoIAm ].Primary == PYROLITE_RIFLE && PyroliteAmmo > 0 ) ||
-			 ( GeneralAmmo > 0 && ( Ships[ WhoIAm ].Primary != LASER || !LaserOverheated ) ) )
-			 firing = 1;
 	}
 
 	if( ( Ships[ WhoIAm ].NumMultiples ) )
@@ -1242,8 +1232,6 @@ static int16_t	OnceOnlyFlag = 0;
 															Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 															Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 			
-											firing = 1;
-
 											recoil.x = 0.0F;
 											recoil.y = 0.0F;
 											recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
@@ -1460,8 +1448,6 @@ static int16_t	OnceOnlyFlag = 0;
 										InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 														Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 														Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-										firing = 1;
 
 										recoil.x = 0.0F;
 										recoil.y = 0.0F;
