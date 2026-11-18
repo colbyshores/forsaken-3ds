@@ -1,8 +1,4 @@
-
-/*===================================================================
-*	l i g h t s . c
-*	All routines to do with Lights...
-===================================================================*/
+/* lights.cpp -- dynamic XLights and vertex relighting; see lights.h. */
 #include <stdio.h>
 #include <string.h>
 
@@ -35,10 +31,6 @@ XLIGHT	XLights[MAXXLIGHTS];
 u_int16_t	FirstXLightUsed;
 u_int16_t	FirstXLightFree;
 
-
-/*===================================================================
-	Floating Point Cull Mode
-===================================================================*/
 
 /*===================================================================
 	Procedure	:	Set up And Init all XLights
@@ -117,9 +109,10 @@ void	KillUsedXLight( u_int16_t light )
 
 
 /*===================================================================
-	Procedure	:	Process all XLights
-	Input		:	nothing
-	Output		:	nothing
+	Procedure	:	Process all XLights: shrink and dim lights with a
+				:	non-zero SizeCount, free them when Size reaches 0
+	Input		:	MLOADHEADER * (unused)
+	Output		:	true
 ===================================================================*/
 /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 bool	ProcessXLights( MLOADHEADER * /*Mloadheader*/ )
@@ -170,10 +163,15 @@ void SetLightDie ( u_int16_t light )
 	XLights[light].b = 0.0F;
 }
 /*===================================================================
-	Procedure	:	Xlight 1 Group Only...
-	Input		:	nothing
-	Output		:	nothing
+	Procedure	:	Relight one level group: POLYANIM UV frames, baked
+				:	colour restore or white-out / water shimmer, then
+				:	(CPU path only) visible XLight contributions
+	Input		:	MLOADHEADER *	Level
+				:	u_int16_t		Group
+	Output		:	false if a vertex buffer lock / unlock fails
 ===================================================================*/
+/* Phase (degrees) of the white-out / underwater shimmer; advanced each
+ * frame in oct2.cpp. */
 float	cral = 0.0F;
 
 
@@ -382,13 +380,10 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					if( b > 255 )
 						b = 255;
 					/* Preserve the baked vertex alpha (typically 255 for
-					 * solid level mesh). The 1998 code wrote 128 here
-					 * because the D3D renderer had alpha-blend disabled
-					 * on the opaque level-mesh pass and ignored vertex
-					 * alpha entirely; in our citro3d/picaGL pipeline
-					 * alpha-blend is uniformly enabled for textured
-					 * surfaces, so a hardcoded 128 made underwater
-					 * walls look 50% transparent. */
+					 * solid level mesh). The citro3d renderer alpha-blends
+					 * every textured surface with the vertex alpha, so a
+					 * fixed 128 here makes underwater walls render 50%
+					 * transparent. */
 					lpLVERTEX->color = RGBA_MAKE( r ,g ,b , orig_a );
 					lpLVERTEX++;
 					lpLVERTEX2++;
@@ -711,7 +706,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			}
 		}
 #endif /* GPU_LIGHTING */
-		/*	unlock the execute buffer	*/
+		/*	unlock the vertex buffer	*/
 		if(!FSUnlockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf]))
 			return false;
 	}
@@ -720,9 +715,14 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 }
 
 /*===================================================================
-	Procedure	:	Xlight Mxloadheader...
-	Input		:	nothing
-	Output		:	nothing
+	Procedure	:	Relight a static (.mx) model. CPU path: restore baked
+				:	colours, then add visible XLights. GPU_LIGHTING:
+				:	only locks and unlocks the buffers
+	Input		:	MXLOADHEADER *	Model
+				:	VECTOR *		World position (light range test)
+				:	float			Model radius
+				:	MATRIX *		Model to world (vertex positions)
+	Output		:	false if a vertex buffer lock / unlock fails
 ===================================================================*/
 bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radius , MATRIX * Matrix )
 {
@@ -774,14 +774,13 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[execbuf];
 
 #ifdef GPU_LIGHTING
-			/* R06: restore skipped — idempotent copy. Audit: under
-			 * GPU_LIGHTING no per-frame path writes computed colors
-			 * into static-MX live verts. AmbientLightMxModel and
-			 * LightMxModel set render_color_blend globals and return;
-			 * InterpFrames color morphs and ENVMxa UV writes are
-			 * MXA-only; mxload writes both copies at load. The else-if
-			 * dispatch excludes a second writer in the same frame, so
-			 * live == original every frame. Lock/unlock retained. */
+			/* The baked-colour restore is skipped here (lock/unlock is
+			 * kept): it assumes the live colours still equal
+			 * originalVerts. Note that AmbientLightMxModel and
+			 * LightMxModel (models.cpp) do write computed colours into
+			 * these same per-model live vertices, and the vertices are
+			 * shared by every instance of the model, so colours they
+			 * leave behind are not undone by this path. */
 			(void)vert;
 			(void)lpLVERTEX;
 			(void)lpLVERTEX2;
@@ -795,11 +794,10 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 #endif
 
 #ifndef GPU_LIGHTING
-			/* Vertex shader adds dynamic-light contribution on top of
-			 * the baseline restored above (using world-space vertex
-			 * pos via the modelView uniform = model→world transform).
-			 * Skip the per-vertex per-light CPU loop. See
-			 * render_c3d.cpp::upload_matrices and render_c3d.v.pica. */
+			/* CPU lighting: add every visible light in range, transforming
+			 * each vertex to world space with Matrix. Under GPU_LIGHTING the
+			 * vertex shader does this instead, from the model-to-world
+			 * modelView uniform (render_c3d.cpp::upload_matrices). */
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
 			{
@@ -943,7 +941,7 @@ PLOP:
 				XLightPnt = XLightPnt->NextVisible;
 			}
 #endif /* !GPU_LIGHTING */
-			/*	unlock the execute buffer	*/
+			/*	unlock the vertex buffer	*/
 			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf])))
 			{
 				return false;
@@ -954,9 +952,13 @@ PLOP:
 	return true;
 }
 /*===================================================================
-	Procedure	:	Xlight Mxloadheader...
-	Input		:	nothing
-	Output		:	nothing
+	Procedure	:	Relight an animated (.mxa) model: restore baked
+				:	colours, then (CPU path only) add visible XLights
+	Input		:	MXALOADHEADER *	Model
+				:	VECTOR *		World position (light range test)
+				:	float			Model radius
+				:	MATRIX *		Model to world (vertex positions)
+	Output		:	false if a vertex buffer lock / unlock fails
 ===================================================================*/
 bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Radius , MATRIX * Matrix )
 {
@@ -1014,11 +1016,10 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 			}
 
 #ifndef GPU_LIGHTING
-			/* Vertex shader adds dynamic-light contribution on top of
-			 * the baseline restored above (using world-space vertex
-			 * pos via the modelView uniform = model→world transform).
-			 * Skip the per-vertex per-light CPU loop. See
-			 * render_c3d.cpp::upload_matrices and render_c3d.v.pica. */
+			/* CPU lighting: add every visible light in range, transforming
+			 * each vertex to world space with Matrix. Under GPU_LIGHTING the
+			 * vertex shader does this instead, from the model-to-world
+			 * modelView uniform (render_c3d.cpp::upload_matrices). */
 			XLightPnt = FirstLightVisible;
 			while( XLightPnt )
 			{
@@ -1161,7 +1162,7 @@ PLOP2:
 				XLightPnt = XLightPnt->NextVisible;
 			}
 #endif /* !GPU_LIGHTING */
-			/*	unlock the execute buffer	*/
+			/*	unlock the vertex buffer	*/
 			if (!(FSUnlockVertexBuffer(&MXloadheader->Group[group].renderObject[execbuf])))
 			{
 				return false;
@@ -1173,9 +1174,14 @@ PLOP2:
 }
 
 /*===================================================================
-	Procedure	:	Find Nearest Cell Colour..
-	Input		:	MLOADHEADER * Mloadheader
-	Output		:	COLOR
+	Procedure	:	Sample the baked colour grid (execbuf 0's cells)
+				:	of a level group at a point
+	Input		:	MLOADHEADER *	Level
+				:	VECTOR *		Position
+				:	u_int16_t		Group
+	Output		:	COLOR	cell colour with alpha 0; black outside
+				:			the grid; halved while BrightShips is on
+				:			in STATUS_Normal
 ===================================================================*/
 COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t group )
 {
@@ -1254,8 +1260,10 @@ COLOR FindNearestCellColour( MLOADHEADER * Mloadheader,VECTOR * Pos, u_int16_t g
 }
 
 /*===================================================================
-	Procedure	:	Build a list of the lights that are currently potentially visible...
-	Input		:	Group the Current camera is in..
+	Procedure	:	Build the FirstLightVisible chain: used lights that are
+				:	Visible and whose group overlaps the camera's group
+	Input		:	Group the current camera is in; (u_int16_t)-1 takes
+				:	every used light
 	Output		:	nothing
 ===================================================================*/
 void BuildVisibleLightList( u_int16_t Group )

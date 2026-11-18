@@ -1,15 +1,34 @@
-
-
-/*==========================================================================
- *
- *
- *  File:       Lights.h
- *  Content:    lights.cpp include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* lights.h -- dynamic point/spot lights (XLights) and vertex relighting
+ *
+ * XLights[] is a fixed pool of MAXXLIGHTS dynamic lights owned by weapons,
+ * ships, pickups, spot effects and real-time level lights (rtlight). It is
+ * per level: InitXLights (from InitScene) resets it. Owners take a light with
+ * FindFreeXLight, set Pos / Group / colour / Size, and either free it with
+ * KillUsedXLight or give it a non-zero SizeCount (SetLightDie does this), in
+ * which case ProcessXLights shrinks and dims it once per frame and frees it
+ * when Size reaches 0. The used list starts at FirstXLightUsed and is walked
+ * through Prev.
+ *
+ * Once per camera pass BuildVisibleLightList links the lights that are
+ * Visible and whose group overlaps the camera's group (visi VisibleOverlap)
+ * into the FirstLightVisible chain; Group == (u_int16_t)-1 takes every used
+ * light. The vertex relighting functions read only that chain.
+ *
+ * XLight1Group runs per visible level group before it is drawn: it applies
+ * POLYANIM UV frame changes, restores each execbuf's baked colours from
+ * originalVerts (or writes the white-out / underwater shimmer, phase cral),
+ * then adds each visible light's falloff on the CPU. XLightMxloadHeader /
+ * XLightMxaloadHeader do the restore + add for one MODFLAG_RealLight model.
+ * With GPU_LIGHTING (the 3DS build) the per-light CPU loops are compiled out
+ * and the citro3d vertex shader adds the lights instead (uploaded by
+ * c3d_upload_xlights); XLightMxloadHeader then also skips the colour restore.
+ * The PC build lights on the CPU.
+ *
+ * FindNearestCellColour samples the level's baked colour grid at a point
+ * (alpha 0; halved while BrightShips is on in STATUS_Normal).
+ */
 
 #include <math.h>
 #include "game/main.h"
