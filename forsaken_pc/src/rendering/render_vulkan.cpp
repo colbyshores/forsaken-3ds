@@ -76,7 +76,7 @@ static VkCommandPool    s_pool;
 /* Two frames in flight: per-slot command buffer, fence and
  * semaphores. FSBeginScene waits only the slot it is about to
  * reuse, so frame N+1 CPU work overlaps frame N GPU work. */
-#define FRAMES_IN_FLIGHT 2
+constexpr int FRAMES_IN_FLIGHT = 2;
 static VkCommandBuffer  s_cmd[FRAMES_IN_FLIGHT];
 static VkSemaphore      s_img_avail[FRAMES_IN_FLIGHT], s_done[FRAMES_IN_FLIGHT];
 static VkFence          s_fence[FRAMES_IN_FLIGHT];

@@ -20,26 +20,26 @@
 		Some Keyboard and Mouse Globals
 ===================================================================*/
 
-#define CRUISE_NORMAL		(0)
-#define CRUISE_FORWARD		(1)
-#define CRUISE_NITRO		(2)
-#define CRUISE_REVERSE		(-1)
+constexpr int CRUISE_NORMAL = (0);
+constexpr int CRUISE_FORWARD = (1);
+constexpr int CRUISE_NITRO = (2);
+constexpr int CRUISE_REVERSE = (-1);
 
 #define MAXMOVESPEED	(45.0F*GLOBAL_SCALE)
-#define MOVEACCELL		0.065F
-#define MOVEDECELL		0.0611F
+constexpr float MOVEACCELL = 0.065F;
+constexpr float MOVEDECELL = 0.0611F;
 #define MAXTURBOSPEED   (MAXMOVESPEED * 2.0F)
-#define TURBOACCELL		0.13F
-#define TURBODECELL		0.1151F
-#define MAXTURNSPEED	2.625F
-#define TURNACCELL		0.065F
-#define TURNDECELL		0.0611F
-#define MAXROLLSPEED	1.875F
-#define ROLLACCELL		0.25F
-#define ROLLDECELL		0.2F 
-#define MAXBANKANGLE    30.0F
-#define BANKACCELL		0.03F
-#define BANKDECELL		0.03F
+constexpr float TURBOACCELL = 0.13F;
+constexpr float TURBODECELL = 0.1151F;
+constexpr float MAXTURNSPEED = 2.625F;
+constexpr float TURNACCELL = 0.065F;
+constexpr float TURNDECELL = 0.0611F;
+constexpr float MAXROLLSPEED = 1.875F;
+constexpr float ROLLACCELL = 0.25F;
+constexpr float ROLLDECELL = 0.2F;
+constexpr float MAXBANKANGLE = 30.0F;
+constexpr float BANKACCELL = 0.03F;
+constexpr float BANKDECELL = 0.03F;
 
 #define CLAMP( V, MAX )\
 	if ( (V) > (MAX) ) { (V) = (MAX);  }\
@@ -89,12 +89,12 @@ typedef struct {
 	int action;
 } JOYSTICKBTN;
 
-#define MAX_POV_DIRECTIONS 4
-#define POV_Centre	0
-#define POV_Up		1
-#define POV_Down	2
-#define POV_Left	4
-#define POV_Right	8
+constexpr int MAX_POV_DIRECTIONS = 4;
+constexpr int POV_Centre = 0;
+constexpr int POV_Up = 1;
+constexpr int POV_Down = 2;
+constexpr int POV_Left = 4;
+constexpr int POV_Right = 8;
 
 typedef struct {
 	char *name;
@@ -118,7 +118,7 @@ enum
 #define AXIS_End AXIS_SliderAxis1
 
 #define NUM_SHIP_ACTIONS		SHIPACTION_MAX
-#define NUM_SHIP_AXIS_ACTIONS	7
+constexpr int NUM_SHIP_AXIS_ACTIONS = 7;
 
 enum {
 	SHIPACTION_Nothing,				// 0

@@ -179,7 +179,7 @@ static inline const char* SDL_GetKeyName(int key)
 // Buffers //
 /////////////
 
-#define INPUT_BUFFERS (2)
+constexpr int INPUT_BUFFERS = (2);
 
 extern int old_input;
 extern int new_input;
@@ -206,7 +206,7 @@ bool handle_events( void );
 
 // TODO - probably ok to rewrite this to simply have codes
 
-#define MAX_INPUT_BUFFER 100
+constexpr int MAX_INPUT_BUFFER = 100;
 extern int input_buffer[MAX_INPUT_BUFFER];
 extern int input_buffer_count;
 int input_buffer_find( int code );
@@ -216,7 +216,7 @@ void input_buffer_reset( void );
 // Mouse //
 ///////////
 
-#define MAX_MOUSE_BUTTONS (255)
+constexpr int MAX_MOUSE_BUTTONS = (255);
 
 typedef struct {
 
@@ -265,12 +265,12 @@ mouse_state_t* read_mouse(void);
 // Joysticks //
 ///////////////
 
-#define MAX_JOYSTICKS			16
-#define MAX_JOYSTICK_BUTTONS	128
-#define MAX_JOYSTICK_POVS		4
-#define MAX_JOYSTICK_AXIS		8
-#define MAX_JOYSTICK_TEXT		128
-#define MAX_JOYNAME				16
+constexpr int MAX_JOYSTICKS = 16;
+constexpr int MAX_JOYSTICK_BUTTONS = 128;
+constexpr int MAX_JOYSTICK_POVS = 4;
+constexpr int MAX_JOYSTICK_AXIS = 8;
+constexpr int MAX_JOYSTICK_TEXT = 128;
+constexpr int MAX_JOYNAME = 16;
 
 extern int Num_Joysticks;
 

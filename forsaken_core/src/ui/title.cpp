@@ -62,14 +62,14 @@
 #include "world/node.h"
 
 
-#define MAX_SAVEGAME_SLOTS		16
+constexpr int MAX_SAVEGAME_SLOTS = 16;
 #define MAX_PILOTNAME_LENGTH	(MAX_PLAYER_NAME_LENGTH - 1)
 
 //#pragma optimize( "gty", on )
 
 bool SpaceOrbSetup = false;
 
-#define MAX_KEYDEF_PAGES	(4)
+constexpr int MAX_KEYDEF_PAGES = (4);
 int CurrentPage = 0;
 int MaxPage = 0;
 bool MissileCameraEnable;
@@ -97,9 +97,9 @@ void ProcessTextItems (void);
 
 int GameCompleted = GAMECOMPLETE_NotComplete;
 
-#define NUM_TITLE_LOOPS 2
-#define TITLE_LOOP_DiscAmbience 0
-#define TITLE_LOOP_VduAmbience 1
+constexpr int NUM_TITLE_LOOPS = 2;
+constexpr int TITLE_LOOP_DiscAmbience = 0;
+constexpr int TITLE_LOOP_VduAmbience = 1;
 u_int32_t TitleLoopId[ NUM_TITLE_LOOPS ];
 
 bool JoystickInput = true;
@@ -173,8 +173,8 @@ typedef struct
 	int num;
 	int dir;
 }PSEUDOJOYBTN;
-#define BTNTYPE_Button 0
-#define BTNTYPE_POV 1
+constexpr int BTNTYPE_Button = 0;
+constexpr int BTNTYPE_POV = 1;
 LIST JoystickAxisList = { 0 };
 LIST AxisActionList = { 0 };
 bool AxisInvert = false;
@@ -185,16 +185,16 @@ SLIDER AxisSlider;
 SLIDER AxisActionSlider;
 int AxisMap[MAX_JOYSTICK_AXIS];
 int JoystickMap[MAX_JOYSTICKS];
-#define NUM_AXIS_TEST_SCRPOLYS 2
+constexpr int NUM_AXIS_TEST_SCRPOLYS = 2;
 u_int16_t AxisTestScrPoly[NUM_AXIS_TEST_SCRPOLYS];
-#define AXISTEST_XPos 20
-#define AXISTEST_YPos 150
-#define AXISTEST_Width 160
-#define AXISTEST_Height 10
-#define AXISTEST_PtrWidth 30
+constexpr int AXISTEST_XPos = 20;
+constexpr int AXISTEST_YPos = 150;
+constexpr int AXISTEST_Width = 160;
+constexpr int AXISTEST_Height = 10;
+constexpr int AXISTEST_PtrWidth = 30;
 float AxisPtr_ymin, AxisPtr_ymax, AxisPtr_mid;
-#define JOYCONFIG_SelectAction 0
-#define JOYCONFIG_AssignButton 1
+constexpr int JOYCONFIG_SelectAction = 0;
+constexpr int JOYCONFIG_AssignButton = 1;
 int JoystickConfigState;
 
 bool InTitleRoom;
@@ -529,7 +529,7 @@ enum
 	BIKE_FEATURE_Ammo,
 };
 
-#define TITLE_TEXT_MSGS_STORED 6
+constexpr int TITLE_TEXT_MSGS_STORED = 6;
 char TitleMessage[TITLE_TEXT_MSGS_STORED][MAXTEXTMSG];
 
 void SelectKeyDef( MENUITEM *Item );

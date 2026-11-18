@@ -20,16 +20,16 @@
 #include "game/constants.h"
 #include "net/networking.h"
 
-#define QUICKSTART_None		0
-#define QUICKSTART_Start	1
-#define QUICKSTART_Join		2
-#define QUICKSTART_Notify	5
+constexpr int QUICKSTART_None = 0;
+constexpr int QUICKSTART_Start = 1;
+constexpr int QUICKSTART_Join = 2;
+constexpr int QUICKSTART_Notify = 5;
 
 #define ALLOWED_BIKETYPES	MAXBIKETYPES
 
-#define MAX_LEVEL_TEXT_LENGTH 512
-#define MAX_LEVEL_NAME_LENGTH 128
-#define MAX_SESSION_DESC_LENGTH 64
+constexpr int MAX_LEVEL_TEXT_LENGTH = 512;
+constexpr int MAX_LEVEL_NAME_LENGTH = 128;
+constexpr int MAX_SESSION_DESC_LENGTH = 64;
 
 #define DEFAULT_PLAYER_NAME		"Player"
 
@@ -40,29 +40,29 @@
 
 #define DEMO_LEVELS				MULTIPLAYER_LEVELS
 
-#define MAXMENULEVELS	16
-#define MAXMENUITEMS	128
-#define MAXLISTITEMS	128
-#define MAXVDULINES		64
-#define MAXVDULINELENGTH	64
-#define MAXTEXTITEMS	128
+constexpr int MAXMENULEVELS = 16;
+constexpr int MAXMENUITEMS = 128;
+constexpr int MAXLISTITEMS = 128;
+constexpr int MAXVDULINES = 64;
+constexpr int MAXVDULINELENGTH = 64;
+constexpr int MAXTEXTITEMS = 128;
 
-#define ERROR_DONTUSE_MENUFUNCS		0
-#define ERROR_USE_MENUFUNCS			1
-#define ERROR_QUIT					2
+constexpr int ERROR_DONTUSE_MENUFUNCS = 0;
+constexpr int ERROR_USE_MENUFUNCS = 1;
+constexpr int ERROR_QUIT = 2;
 
-#define	DIFF_Easy 0
-#define	DIFF_Norm 1
-#define	DIFF_Hard 2
-#define	DIFF_Vhard 3
+constexpr int DIFF_Easy = 0;
+constexpr int DIFF_Norm = 1;
+constexpr int DIFF_Hard = 2;
+constexpr int DIFF_Vhard = 3;
 
-#define CONTROL_Mouse		0
-#define CONTROL_Keyboard	1
-#define CONTROL_Joystick	2
-#define CONTROL_Gamepad		3
+constexpr int CONTROL_Mouse = 0;
+constexpr int CONTROL_Keyboard = 1;
+constexpr int CONTROL_Joystick = 2;
+constexpr int CONTROL_Gamepad = 3;
 
 // order of this list must match GameTypeNameTable
-#define MAX_GAMETYPE		5
+constexpr int MAX_GAMETYPE = 5;
 typedef enum
 {
 GAME_Normal,			// 0 free for all
@@ -73,15 +73,15 @@ GAME_Team,				// 4
 GAME_CTF,				// 5
 } game_t;
 
-#define GAMECOMPLETE_NotComplete				0
-#define GAMECOMPLETE_WithoutAllCrystals			1	// never got to secret level because not all crystals were found ( standard end game sequence )
-#define GAMECOMPLETE_GotAllCrystalsSoFar		2	// got all crystals so far ( will now go to secret level )
-#define GAMECOMPLETE_WithAllCrystals			3	// with all crystals plus secret level crystal ( secret biker end game sequence )
-#define GAMECOMPLETE_WithAllCrystalsExceptLast	4	// with all crystals except secret level crystal ( standard end game sequence )
-#define GAMECOMPLETE_Cheated					5	// got to last but one level, but with cheating
-#define GAMECOMPLETE_AdditionalLevels			6	// completed all levels ( not original levels )
+constexpr int GAMECOMPLETE_NotComplete = 0;
+constexpr int GAMECOMPLETE_WithoutAllCrystals = 1; // never got to secret level because not all crystals were found ( standard end game sequence )
+constexpr int GAMECOMPLETE_GotAllCrystalsSoFar = 2; // got all crystals so far ( will now go to secret level )
+constexpr int GAMECOMPLETE_WithAllCrystals = 3; // with all crystals plus secret level crystal ( secret biker end game sequence )
+constexpr int GAMECOMPLETE_WithAllCrystalsExceptLast = 4; // with all crystals except secret level crystal ( standard end game sequence )
+constexpr int GAMECOMPLETE_Cheated = 5; // got to last but one level, but with cheating
+constexpr int GAMECOMPLETE_AdditionalLevels = 6; // completed all levels ( not original levels )
 
-#define PAN_TIME 1.0F
+constexpr float PAN_TIME = 1.0F;
 
 typedef enum
 {
@@ -153,7 +153,7 @@ enum
 	FONT_Slider,
 };
 
-#define NUMSCREENFONTS 15
+constexpr int NUMSCREENFONTS = 15;
 
 enum
 {
@@ -193,31 +193,31 @@ enum
 
 #define	MAXTEXTMSG			512		// the number of chars in a message you can send.....
 //	Strucures
-#define	TEXTFLAG_Nothing			0
-#define	TEXTFLAG_CentreX			1		// centre text along x axis of bounding box
-#define	TEXTFLAG_CentreY			2		// centre text along y axis of bounding box
-#define	TEXTFLAG_BottomY			4		// justify text to bottom of box
-#define	TEXTFLAG_Instant			8		// text is displayed instantly
-#define	TEXTFLAG_RightX				16		// right justify
-#define	TEXTFLAG_NotImplemented		32		// display text dimmed (only works with screenpoly text, ie. 3dfx)
-#define	TEXTFLAG_AutoSelect			64		// automatically select this menu item if highlighted
-#define TEXTFLAG_RefreshList		128		// not currently used (all lists are continually refreshed)
-#define TEXTFLAG_ForceFit			256		// do not wrap text, truncate with ... if neccesary
-#define TEXTFLAG_SuppressHighlight	512		// prevent highlight box from appearing around text
-#define TEXTFLAG_Unselectable		1024	// do not allow this item to be selected
-#define TEXTFLAG_CheckForRefresh	2048	// this text item may change - refresh if neccesary
-#define TEXTFLAG_ManualListHighlight 4096   // I want to specify how a list is highlighted manually
+constexpr int TEXTFLAG_Nothing = 0;
+constexpr int TEXTFLAG_CentreX = 1; // centre text along x axis of bounding box
+constexpr int TEXTFLAG_CentreY = 2; // centre text along y axis of bounding box
+constexpr int TEXTFLAG_BottomY = 4; // justify text to bottom of box
+constexpr int TEXTFLAG_Instant = 8; // text is displayed instantly
+constexpr int TEXTFLAG_RightX = 16; // right justify
+constexpr int TEXTFLAG_NotImplemented = 32; // display text dimmed (only works with screenpoly text, ie. 3dfx)
+constexpr int TEXTFLAG_AutoSelect = 64; // automatically select this menu item if highlighted
+constexpr int TEXTFLAG_RefreshList = 128; // not currently used (all lists are continually refreshed)
+constexpr int TEXTFLAG_ForceFit = 256; // do not wrap text, truncate with ... if neccesary
+constexpr int TEXTFLAG_SuppressHighlight = 512; // prevent highlight box from appearing around text
+constexpr int TEXTFLAG_Unselectable = 1024; // do not allow this item to be selected
+constexpr int TEXTFLAG_CheckForRefresh = 2048; // this text item may change - refresh if neccesary
+constexpr int TEXTFLAG_ManualListHighlight = 4096; // I want to specify how a list is highlighted manually
 											// ( default is pulsing when active, static when not active )
-#define TEXTFLAG_CentreYBunched	 8192		// text is bunched up in centre of bounding box	
-#define TEXTFLAG_Pulse			 16384		// pulse text on and off
-#define TEXTFLAG_TeamItem		 32768		// team select item
+constexpr int TEXTFLAG_CentreYBunched = 8192; // text is bunched up in centre of bounding box
+constexpr int TEXTFLAG_Pulse = 16384; // pulse text on and off
+constexpr int TEXTFLAG_TeamItem = 32768; // team select item
 
-#define MAXNUMLINES 64 
-#define MAXCHARSPERLINE 128
-#define MAXNUMOFVDUPOLYS	512
-#define MAXPOINTERS			8
+constexpr int MAXNUMLINES = 64;
+constexpr int MAXCHARSPERLINE = 128;
+constexpr int MAXNUMOFVDUPOLYS = 512;
+constexpr int MAXPOINTERS = 8;
 
-#define MAX_TEXT_LENGTH 64
+constexpr int MAX_TEXT_LENGTH = 64;
 
 typedef struct
 {
@@ -297,10 +297,10 @@ enum
 #define EVENT_ACTIVE		true
 #define EVENT_NOT_ACTIVE	false
 
-#define MAXTITLEEVENTS 128
-#define MAXTITLETIMERS 32
+constexpr int MAXTITLEEVENTS = 128;
+constexpr int MAXTITLETIMERS = 32;
 
-#define DINPUT_BUFFERSIZE       32      /* Number of buffer elements (for menu screens) */
+constexpr int DINPUT_BUFFERSIZE = 32; /* Number of buffer elements (for menu screens) */
 
 enum
 {
@@ -367,7 +367,7 @@ typedef struct _LEVEL_LOOKUP
 	bool		rotated;
 }LEVEL_LOOKUP;
 
-#define MAXTEXTPERMENUITEM 32
+constexpr int MAXTEXTPERMENUITEM = 32;
 
 typedef struct
 {
@@ -450,8 +450,8 @@ struct _TEXT
 	TextTypeFunc FuncType;
 };
 
-#define EXCLUDE_ALL -1
-#define MAXEXCLUDEDVERTICES 16
+constexpr int EXCLUDE_ALL = -1;
+constexpr int MAXEXCLUDEDVERTICES = 16;
 
 typedef struct
 {	int Group;

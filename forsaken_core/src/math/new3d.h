@@ -24,11 +24,11 @@ typedef DWORD COLOR; // bgra
 	Defines
 ===================================================================*/
 
-#define	ourX					0
-#define	ourY					1
-#define	ourZ					2
-#define	EPS					1e-7
-#define PI					3.14159265358979323846F
+constexpr int ourX = 0;
+constexpr int ourY = 1;
+constexpr int ourZ = 2;
+constexpr auto EPS = 1e-7;
+constexpr float PI = 3.14159265358979323846F;
 #ifndef M_PI // defined in mingw
 #define M_PI				3.14159265358979323846F
 #endif
@@ -74,9 +74,9 @@ typedef DWORD COLOR; // bgra
 	phase, wrap it before the call rather than adding a branch here.
 ===================================================================*/
 
-#define TRIG_TABLE_SIZE  1024
-#define TRIG_TABLE_MASK  (TRIG_TABLE_SIZE - 1)
-#define TRIG_SCALE       (TRIG_TABLE_SIZE / (2.0f * 3.14159265358979323846f))
+constexpr int TRIG_TABLE_SIZE = 1024;
+constexpr auto TRIG_TABLE_MASK = (TRIG_TABLE_SIZE - 1);
+constexpr auto TRIG_SCALE = (TRIG_TABLE_SIZE / (2.0f * 3.14159265358979323846f));
 
 extern void  trig_table_init(void);
 extern float fast_sin_table[TRIG_TABLE_SIZE + 1]; /* +1 for the interpolation boundary */
