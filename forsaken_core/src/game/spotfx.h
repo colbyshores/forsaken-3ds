@@ -7,11 +7,11 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	MAXSPOTFX	512
+constexpr int MAXSPOTFX = 512;
 
-#define	SPOTFX_FLAGS_Nothing	0
-#define	SPOTFX_FLAGS_Enabled	1
-#define	SPOTFX_FLAGS_DoneOnce	2
+constexpr int SPOTFX_FLAGS_Nothing = 0;
+constexpr int SPOTFX_FLAGS_Enabled = 1;
+constexpr int SPOTFX_FLAGS_DoneOnce = 2;
 
 enum
 {

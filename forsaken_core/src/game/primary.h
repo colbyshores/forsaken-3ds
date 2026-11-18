@@ -16,147 +16,147 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	MAXPRIMARYWEAPONBULLETS	256
+constexpr int MAXPRIMARYWEAPONBULLETS = 256;
 
-#define	MAXENEMYPRIMARYWEAPONS	11	/* +1 for NME_PULSAR_BLUE */
-#define	TOTALPRIMARYWEAPONS		( MAXPRIMARYWEAPONS + 1 + MAXENEMYPRIMARYWEAPONS )
+constexpr int MAXENEMYPRIMARYWEAPONS = 11; /* +1 for NME_PULSAR_BLUE */
+constexpr auto TOTALPRIMARYWEAPONS = ( MAXPRIMARYWEAPONS + 1 + MAXENEMYPRIMARYWEAPONS );
 
-#define	MAXPOWERLEVELS			3
+constexpr int MAXPOWERLEVELS = 3;
 
-#define	MAXGENERALAMMO		2000.0F
-#define	MAXPYROLITEAMMO		3000.0F
-#define	MAXSUSSGUNAMMO		3000.0F
-#define	MAXMULTIPLEAMMO		1000.0F
+constexpr float MAXGENERALAMMO = 2000.0F;
+constexpr float MAXPYROLITEAMMO = 3000.0F;
+constexpr float MAXSUSSGUNAMMO = 3000.0F;
+constexpr float MAXMULTIPLEAMMO = 1000.0F;
 
-#define	MINIMUM_TOTAL_AMMO	100.0F
+constexpr float MINIMUM_TOTAL_AMMO = 100.0F;
 
-#define	GENERALAMMOPERPOD	500.0F
-#define	PYROLITEAMMOPERPOD	500.0F
-#define	SUSSGUNAMMOPERPOD	500.0F
+constexpr float GENERALAMMOPERPOD = 500.0F;
+constexpr float PYROLITEAMMOPERPOD = 500.0F;
+constexpr float SUSSGUNAMMOPERPOD = 500.0F;
 
-#define	PULSAR				0
-#define	TROJAX				1
-#define	PYROLITE_RIFLE		2
-#define	TRANSPULSE_CANNON	3
-#define	SUSS_GUN			4
-#define	LASER				5
-#define	ORBITPULSAR			6
-#define	NME_BULLET1			7
-#define	NME_PULSAR			8
-#define	NME_TROJAX			9
-#define	NME_PYROLITE		10
-#define	NME_TRANSPULSE		11
-#define	NME_SUSS_GUN		12
-#define	NME_LASER			13
-#define	NME_LIGHTNING		14
-#define	FLAMES				15
-#define	NME_POWERLASER		16
-#define	NME_PULSAR_BLUE		17		/* KEX Pulsar_Enemy_Blue — blue plasma (ShieldTurret, Ghost) */
+constexpr int PULSAR = 0;
+constexpr int TROJAX = 1;
+constexpr int PYROLITE_RIFLE = 2;
+constexpr int TRANSPULSE_CANNON = 3;
+constexpr int SUSS_GUN = 4;
+constexpr int LASER = 5;
+constexpr int ORBITPULSAR = 6;
+constexpr int NME_BULLET1 = 7;
+constexpr int NME_PULSAR = 8;
+constexpr int NME_TROJAX = 9;
+constexpr int NME_PYROLITE = 10;
+constexpr int NME_TRANSPULSE = 11;
+constexpr int NME_SUSS_GUN = 12;
+constexpr int NME_LASER = 13;
+constexpr int NME_LIGHTNING = 14;
+constexpr int FLAMES = 15;
+constexpr int NME_POWERLASER = 16;
+constexpr int NME_PULSAR_BLUE = 17; /* KEX Pulsar_Enemy_Blue — blue plasma (ShieldTurret, Ghost) */
 
-#define	NO_PRIMARY			128
+constexpr int NO_PRIMARY = 128;
 
-#define	ORBITPULSAR_FMSIZE	( ( 2.0F * GLOBAL_SCALE ) * 0.5F )
+constexpr auto ORBITPULSAR_FMSIZE = ( ( 2.0F * GLOBAL_SCALE ) * 0.5F );
 
-#define	PULSAR_COLRADIUS	( ( 0.0F * GLOBAL_SCALE ) * 1.0F )
-#define	PULSAR_FMSIZE		( ( 5.0F * GLOBAL_SCALE ) * 0.5F )
-#define	PULSAR_TAILSTART	( ( 40.0F * GLOBAL_SCALE ) * 0.5F )
-#define	PULSAR_TAILEND		( ( 20.0F * GLOBAL_SCALE ) * 0.5F )
-#define	PULSAR_TAILPOWERMUL	( ( 240.0F * GLOBAL_SCALE ) * 0.5F )
-#define	PULSAR_TAILADDMIN	( ( 376.0F * GLOBAL_SCALE ) * 0.5F )
-#define	PULSAR_EXPSIZE		( ( 8.0F * GLOBAL_SCALE ) * 0.5F )
+constexpr auto PULSAR_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto PULSAR_FMSIZE = ( ( 5.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto PULSAR_TAILSTART = ( ( 40.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto PULSAR_TAILEND = ( ( 20.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto PULSAR_TAILPOWERMUL = ( ( 240.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto PULSAR_TAILADDMIN = ( ( 376.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto PULSAR_EXPSIZE = ( ( 8.0F * GLOBAL_SCALE ) * 0.5F );
 
-#define	TROJAX_COLRADIUS	( ( 512.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TROJAX_SIZE			( ( 8.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TROJAX_EXPSIZE		( ( 4.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TROJAX_EXPMAXSIZE	( ( 16.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TROJAX_EXPINC		( ( 0.333F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto TROJAX_COLRADIUS = ( ( 512.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TROJAX_SIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TROJAX_EXPSIZE = ( ( 4.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TROJAX_EXPMAXSIZE = ( ( 16.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TROJAX_EXPINC = ( ( 0.333F * GLOBAL_SCALE ) * 1.0F );
   
-#define	PYROLITE_COLRADIUS	( ( 0.0F * GLOBAL_SCALE ) * 1.0F )
-#define	PYROLITE_POWERMUL	( ( 0.5F * GLOBAL_SCALE ) * 1.0F )
-#define	PYROLITE_ADDMIN		( ( 0.75F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto PYROLITE_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto PYROLITE_POWERMUL = ( ( 0.5F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto PYROLITE_ADDMIN = ( ( 0.75F * GLOBAL_SCALE ) * 1.0F );
 
-#define	TRANSPULSE_COLRADIUS ( ( 0.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_POWERMUL	( ( 2.4F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_ADDMIN	( ( 4.2F * GLOBAL_SCALE ) * 1.0F )
-#define	ARC_POWERMUL		( ( 3.0F * GLOBAL_SCALE ) * 1.0F )
-#define	ARC_ADDMIN			( ( 6.0F * GLOBAL_SCALE ) * 1.0F )
-#define	ARC_LENGTH			( ( 12.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_SPARKSIZE ( ( 4.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_EXP_INC	( ( 0.333F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_EXP_MINSIZE	( ( 1.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_EXP_MAXSIZE	( ( 16.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_FLARE_SIZE ( ( 10.0F * GLOBAL_SCALE ) * 1.0F )
-#define	TRANSPULSE_BOUNCES	( 1 )
-#define	TRANSPULSE_VIEWCONE	( 160.0F / 2.0F )
+constexpr auto TRANSPULSE_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TRANSPULSE_POWERMUL = ( ( 2.4F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TRANSPULSE_ADDMIN = ( ( 4.2F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto ARC_POWERMUL = ( ( 3.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto ARC_ADDMIN = ( ( 6.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto ARC_LENGTH = ( ( 12.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TRANSPULSE_SPARKSIZE = ( ( 4.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TRANSPULSE_EXP_INC = ( ( 0.333F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TRANSPULSE_EXP_MINSIZE = ( ( 1.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TRANSPULSE_EXP_MAXSIZE = ( ( 16.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto TRANSPULSE_FLARE_SIZE = ( ( 10.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr int TRANSPULSE_BOUNCES = ( 1 );
+constexpr auto TRANSPULSE_VIEWCONE = ( 160.0F / 2.0F );
 
-#define	ARCTRAIL_POWERMUL	( ( 360.0F * GLOBAL_SCALE ) * 1.0F )
-#define	ARCTRAIL_ADDMIN		( ( 580.0F * GLOBAL_SCALE ) * 1.0F )
-#define	SUSSGUN_COLRADIUS	( ( 0.0F * GLOBAL_SCALE ) * 1.0F )
-#define	SUSSGUN_POWERMUL	( ( 0.5F * GLOBAL_SCALE ) * 1.0F )
-#define	SUSSGUN_ADDMIN		( ( 0.5F * GLOBAL_SCALE ) * 1.0F )
-#define	SUSSGUN_FLARESIZE	( ( 4.0F * GLOBAL_SCALE ) * 1.0F )
-#define	SUSSGUN_EXPSIZE		( ( 8.0F * GLOBAL_SCALE ) * 1.0F )
-#define	SUSSGUNLIFE_POWERMUL ( 10.0F )
-#define	SUSSGUNLIFE_ADDMIN	 ( 10.0F )
+constexpr auto ARCTRAIL_POWERMUL = ( ( 360.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto ARCTRAIL_ADDMIN = ( ( 580.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto SUSSGUN_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto SUSSGUN_POWERMUL = ( ( 0.5F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto SUSSGUN_ADDMIN = ( ( 0.5F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto SUSSGUN_FLARESIZE = ( ( 4.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto SUSSGUN_EXPSIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr float SUSSGUNLIFE_POWERMUL = ( 10.0F );
+constexpr float SUSSGUNLIFE_ADDMIN = ( 10.0F );
 
-#define	LASER_COLRADIUS		( ( 0.0F * GLOBAL_SCALE ) * 1.0F )
-#define	LASER_WIDTH_POWERMUL ( ( 8.0F * GLOBAL_SCALE ) * 1.0F )
-#define	LASER_WIDTH_ADDMIN	( ( 24.0F * GLOBAL_SCALE ) * 1.0F )
-#define	LASER_TEMP_POWERMUL ( 0.5F )
-#define	LASER_TEMP_ADDMIN	( 0.5F )
+constexpr auto LASER_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto LASER_WIDTH_POWERMUL = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto LASER_WIDTH_ADDMIN = ( ( 24.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr float LASER_TEMP_POWERMUL = ( 0.5F );
+constexpr float LASER_TEMP_ADDMIN = ( 0.5F );
 
-#define	NMEBUL1_COLRADIUS	( ( 0.0F * GLOBAL_SCALE ) * 1.0F )
-#define	NMEBUL1_FMSIZE		( ( 5.0F * GLOBAL_SCALE ) * 2.0F )
-#define	NMEBUL1_TAILSTART	( ( 40.0F * GLOBAL_SCALE ) * 0.5F )
-#define	NMEBUL1_TAILEND		( ( 20.0F * GLOBAL_SCALE ) * 0.5F )
-#define	NMEBUL1_TAILPOWERMUL ( ( 240.0F * GLOBAL_SCALE ) * 0.5F )
-#define	NMEBUL1_TAILADDMIN	( ( 376.0F * GLOBAL_SCALE ) * 0.5F )
-#define	NMEBUL1_EXPSIZE		( ( 8.0F * GLOBAL_SCALE ) * 0.5F )
+constexpr auto NMEBUL1_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto NMEBUL1_FMSIZE = ( ( 5.0F * GLOBAL_SCALE ) * 2.0F );
+constexpr auto NMEBUL1_TAILSTART = ( ( 40.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto NMEBUL1_TAILEND = ( ( 20.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto NMEBUL1_TAILPOWERMUL = ( ( 240.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto NMEBUL1_TAILADDMIN = ( ( 376.0F * GLOBAL_SCALE ) * 0.5F );
+constexpr auto NMEBUL1_EXPSIZE = ( ( 8.0F * GLOBAL_SCALE ) * 0.5F );
 
-#define	SPARKSIZE			( ( 8.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto SPARKSIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	SHIP_EXPLO_SIZE		( ( 8.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto SHIP_EXPLO_SIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	NORM_EXPLO_SIZE		( ( 16.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto NORM_EXPLO_SIZE = ( ( 16.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	SMOKE_TRAIL_SIZE	( ( 2.0F * GLOBAL_SCALE ) * 1.0F )
-#define	GRAVGON_TRAIL_SIZE	( ( 7.0F * GLOBAL_SCALE ) * 1.0F )
-#define	GRAVGON_TRAIL_INC	( ( 0.4F * GLOBAL_SCALE ) * 1.0F )
-#define	SOLARIS_TRAIL_SIZE	( ( 7.0F * GLOBAL_SCALE ) * 1.0F )
-#define	NEW_TRAIL_SIZE		( ( 7.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto SMOKE_TRAIL_SIZE = ( ( 2.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto GRAVGON_TRAIL_SIZE = ( ( 7.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto GRAVGON_TRAIL_INC = ( ( 0.4F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto SOLARIS_TRAIL_SIZE = ( ( 7.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto NEW_TRAIL_SIZE = ( ( 7.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	PLASER_COLRADIUS	( ( 200.0F * GLOBAL_SCALE ) * 1.0F )
-#define	PLASER_WIDTH_POWERMUL ( ( 16.0F * GLOBAL_SCALE ) * 1.0F )
-#define	PLASER_WIDTH_ADDMIN	( ( 48.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto PLASER_COLRADIUS = ( ( 200.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto PLASER_WIDTH_POWERMUL = ( ( 16.0F * GLOBAL_SCALE ) * 1.0F );
+constexpr auto PLASER_WIDTH_ADDMIN = ( ( 48.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	GRAVGON_SCALE_DEC	0.075F
+constexpr float GRAVGON_SCALE_DEC = 0.075F;
 
-#define	PICKUP_REGEN_SIZE	( ( 8.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto PICKUP_REGEN_SIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	BLOODSIZE			( ( 4.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto BLOODSIZE = ( ( 4.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	FLAMES_COLRADIUS	( ( 500.0F * GLOBAL_SCALE ) * 1.0F )
+constexpr auto FLAMES_COLRADIUS = ( ( 500.0F * GLOBAL_SCALE ) * 1.0F );
 
-#define	PULSAR2SHOTPOWERLEVEL	( 1 )
+constexpr int PULSAR2SHOTPOWERLEVEL = ( 1 );
 
-#define	COLTYPE_Point		0
-#define	COLTYPE_Sphere		1
-#define	COLTYPE_Trojax		2
-#define	COLTYPE_Transpulse	3
+constexpr int COLTYPE_Point = 0;
+constexpr int COLTYPE_Sphere = 1;
+constexpr int COLTYPE_Trojax = 2;
+constexpr int COLTYPE_Transpulse = 3;
 
-#define	WEPTYPE_Primary		0
-#define	WEPTYPE_Secondary	1
-#define	WEPTYPE_Various		2
+constexpr int WEPTYPE_Primary = 0;
+constexpr int WEPTYPE_Secondary = 1;
+constexpr int WEPTYPE_Various = 2;
 
-#define	OWNER_NOBODY		0
-#define	OWNER_SHIP			1
-#define	OWNER_ENEMY			2
+constexpr int OWNER_NOBODY = 0;
+constexpr int OWNER_SHIP = 1;
+constexpr int OWNER_ENEMY = 2;
 #define	OWNER_BGOBJECT		3
-#define	OWNER_MINE			4
-#define	OWNER_MODELSPOTFX	5
+constexpr int OWNER_MINE = 4;
+constexpr int OWNER_MODELSPOTFX = 5;
 
-#define	COLPERS_Forsaken	0					// Forsaken Collision ( shooter Perspective )
-#define	COLPERS_Descent	1					// Descent Collision ( target Perspective )
+constexpr int COLPERS_Forsaken = 0; // Forsaken Collision ( shooter Perspective )
+constexpr int COLPERS_Descent = 1; // Descent Collision ( target Perspective )
 
 /*===================================================================
 	Structures

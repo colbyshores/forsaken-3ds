@@ -36,7 +36,7 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	COB_VERSION_NUMBER	2
+constexpr int COB_VERSION_NUMBER = 2;
 
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight );

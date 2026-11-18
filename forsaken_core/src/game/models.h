@@ -29,9 +29,9 @@
 /*
  * defines
  */
-#define MAXNUMOFMODELS		1024
-#define NUMOFTITLEMODELS	32
-#define NUM_INTERLEVEL_MODELS 17
+constexpr int MAXNUMOFMODELS = 1024;
+constexpr int NUMOFTITLEMODELS = 32;
+constexpr int NUM_INTERLEVEL_MODELS = 17;
 #ifdef __3DS__
 /* Sized to the peak model index observed across the SP campaign.
  * Military Base sets the high-water mark at ~584 (BGOs + ship/enemy
@@ -42,22 +42,22 @@
 #else
 #define	MAXMODELHEADERS		1024
 #endif
-#define	ORBIT_RADIUS		( 256 * GLOBAL_SCALE )
-#define	MAXMODELSPOTFX		10
+constexpr auto ORBIT_RADIUS = ( 256 * GLOBAL_SCALE );
+constexpr int MAXMODELSPOTFX = 10;
 
-#define SCAN_WINDOW_WIDTH 20.0F
+constexpr float SCAN_WINDOW_WIDTH = 20.0F;
 
-#define	MODFLAG_Nothing			0
-#define	MODFLAG_Clip			1
-#define	MODFLAG_Light			2
-#define	MODFLAG_AmbientLight	4
-#define	MODFLAG_UseClipGroup	8
-#define	MODFLAG_RealLight		16
-#define	MODFLAG_Stealth			32
-#define	MODFLAG_Original		64
-#define MODFLAG_SpotFXDisabled	128
-#define MODFLAG_ShockwaveHitMe	256
-#define MODFLAG_StealthOffset	512
+constexpr int MODFLAG_Nothing = 0;
+constexpr int MODFLAG_Clip = 1;
+constexpr int MODFLAG_Light = 2;
+constexpr int MODFLAG_AmbientLight = 4;
+constexpr int MODFLAG_UseClipGroup = 8;
+constexpr int MODFLAG_RealLight = 16;
+constexpr int MODFLAG_Stealth = 32;
+constexpr int MODFLAG_Original = 64;
+constexpr int MODFLAG_SpotFXDisabled = 128;
+constexpr int MODFLAG_ShockwaveHitMe = 256;
+constexpr int MODFLAG_StealthOffset = 512;
 
 enum {
 	BIKE_Lokasenna, 
@@ -552,7 +552,7 @@ typedef struct MODEL{
 
 }MODEL;
 
-#define NUM_FADE_FRAMES 120.0F
+constexpr float NUM_FADE_FRAMES = 120.0F;
 
 typedef struct MODELNAME{
 	char		Name[128];			// Name of the Model...

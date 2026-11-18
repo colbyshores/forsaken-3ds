@@ -18,18 +18,18 @@
 ===================================================================*/
 
 /* Players and teams (network protocol + multiplayer scoreboards). */
-#define MAX_PLAYERS				16		/* was 24, 12 in earlier builds */
-#define MAX_TEAMS				4
-#define MAXMULTIPLES			8		/* multiple-fire mount points per ship */
+constexpr int MAX_PLAYERS = 16; /* was 24, 12 in earlier builds */
+constexpr int MAX_TEAMS = 4;
+constexpr int MAXMULTIPLES = 8; /* multiple-fire mount points per ship */
 
 /* World. */
-#define MAXGROUPS				128		/* visibility groups per level */
+constexpr int MAXGROUPS = 128; /* visibility groups per level */
 #define MAXBIKETYPES			17		/* selectable bikes (ship models) */
 
 /* Weapons. */
-#define MAXPRIMARYWEAPONS		6
-#define MAXSECONDARYWEAPONS		11
+constexpr int MAXPRIMARYWEAPONS = 6;
+constexpr int MAXSECONDARYWEAPONS = 11;
 
 /* Network resync queues: pickups / mines a client missed. */
-#define MAXMISSEDPICKUPS		256
-#define MAXMISSEDMINES			100
+constexpr int MAXMISSEDPICKUPS = 256;
+constexpr int MAXMISSEDMINES = 100;

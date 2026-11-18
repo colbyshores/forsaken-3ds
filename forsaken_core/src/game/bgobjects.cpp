@@ -59,8 +59,8 @@ DOORTYPESFX DoorTypeSFX[] = {
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	BGO_VERSION_NUMBER	3
-#define	BGOPush				1
+constexpr int BGO_VERSION_NUMBER = 3;
+constexpr int BGOPush = 1;
 #define	DUPLICATE_BGOBJECTS	1
 
 /*===================================================================
@@ -2306,7 +2306,7 @@ bool CheckBGObjectToMines( BGOBJECT * Object )
 				:	int16_t			Number of Children
 	Output		:	Nothing
 ===================================================================*/
-#define	STEPSIZE	( BLOCKSIZE * 0.5F )
+constexpr auto STEPSIZE = ( BLOCKSIZE * 0.5F );
 
 void ExplodeChildren( COMP_OBJ * Children, int16_t NumChildren )
 {

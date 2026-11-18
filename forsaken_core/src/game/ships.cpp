@@ -45,7 +45,7 @@
 #include "net/multiplayer.h"
 #include "world/collision.h"
 
-#define	RGENINVULTIME 60.0F
+constexpr float RGENINVULTIME = 60.0F;
 
 #define FRAMES_PER_SEC	(60.0F)
 
@@ -98,7 +98,7 @@ float	Start_Shield	=	START_SHIELD;
 float	Start_Hull		=	START_HULL;
 float	AutoLevel		=	1.0F;
 
-#define	BikeMod  (2.0F)
+constexpr float BikeMod = (2.0F);
 
 BIKEMOD	BikeMods[MAXBIKETYPES+3] = {
 	{	// Default
@@ -512,8 +512,8 @@ BIKEMOD	BikeMods[MAXBIKETYPES+3] = {
 /*===================================================================
 		Detail Level Globals ...
 ===================================================================*/
-#define	MAXBIKEDETAIL	4.0F
-#define	MAXCOLLISIONS	3
+constexpr float MAXBIKEDETAIL = 4.0F;
+constexpr int MAXCOLLISIONS = 3;
 
 
 int		outside_map = 0;
@@ -2839,12 +2839,12 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 	Input		:	Nothing..
 	Output		:	Nothing..
 ===================================================================*/
-#define MAXKILLMEMORY 8
-#define KILLSOVERTIME 5			// Number of kills to get....
-#define TIMEKILLSOVER 60		// Length of time on seconds over which the kills have to have been made...
-#define BADTIMEKILLSOVER 50		// if you go without a kill for this amoutn of time you get a taunt for your trouble...
-#define	CAMPINGTIME 45			// how long you have to stay in 1 approx position...
-#define	CAMPINGRANGE ( 1024.0F * GLOBAL_SCALE * 4.0F )	// Range for camping
+constexpr int MAXKILLMEMORY = 8;
+constexpr int KILLSOVERTIME = 5; // Number of kills to get....
+constexpr int TIMEKILLSOVER = 60; // Length of time on seconds over which the kills have to have been made...
+constexpr int BADTIMEKILLSOVER = 50; // if you go without a kill for this amoutn of time you get a taunt for your trouble...
+constexpr int CAMPINGTIME = 45; // how long you have to stay in 1 approx position...
+constexpr auto CAMPINGRANGE = ( 1024.0F * GLOBAL_SCALE * 4.0F ); // Range for camping
 
 bool MultiSfxTaunt1Off = false;
 

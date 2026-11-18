@@ -21,57 +21,57 @@
 #define DEBUG_TRIGGERS		0
 
 
-#define MAXDATAPEREVENT		64	// in bytes
+constexpr int MAXDATAPEREVENT = 64; // in bytes
 
-#define TRIGGEROP_Set		0
-#define TRIGGEROP_Reset		1
-#define TRIGGEROP_Inc		2
-#define TRIGGEROP_Dec		3
-#define TRIGGEROP_Or		4
-#define TRIGGEROP_And		5
-#define TRIGGEROP_Xor		6
-#define TRIGGEROP_Multiply	7
-#define TRIGGEROP_Divide	8
-#define TRIGGEROP_Random	9
-#define TRIGGEROP_Setflag	10
-#define TRIGGEROP_Clearflag	11
-
-
-#define TRIGGERTYPE_Equal				0
-#define TRIGGERTYPE_NotEqual			1
-#define TRIGGERTYPE_Less				2
-#define TRIGGERTYPE_Greater				3
-#define TRIGGERTYPE_LessEqual			4
-#define TRIGGERTYPE_GreaterEqual		5
-#define TRIGGERTYPE_FlagCount			6
-#define TRIGGERTYPE_FlagTest			7
+constexpr int TRIGGEROP_Set = 0;
+constexpr int TRIGGEROP_Reset = 1;
+constexpr int TRIGGEROP_Inc = 2;
+constexpr int TRIGGEROP_Dec = 3;
+constexpr int TRIGGEROP_Or = 4;
+constexpr int TRIGGEROP_And = 5;
+constexpr int TRIGGEROP_Xor = 6;
+constexpr int TRIGGEROP_Multiply = 7;
+constexpr int TRIGGEROP_Divide = 8;
+constexpr int TRIGGEROP_Random = 9;
+constexpr int TRIGGEROP_Setflag = 10;
+constexpr int TRIGGEROP_Clearflag = 11;
 
 
-#define	TRIGGEREVENT_Pickup			0
-#define	TRIGGEREVENT_Enemy			1
-#define	TRIGGEREVENT_OpenDoor		2
-#define	TRIGGEREVENT_CloseDoor		3
-#define	TRIGGEREVENT_LockDoor		4
-#define	TRIGGEREVENT_UnlockDoor		5
-#define	TRIGGEREVENT_StartBGOAnim	6
-#define	TRIGGEREVENT_StopBGOAnim	7
-#define	TRIGGEREVENT_StartTexAnim	8
-#define	TRIGGEREVENT_StopTexAnim	9
-#define	TRIGGEREVENT_StartExternalForce	10
-#define	TRIGGEREVENT_StopExternalForce	11
-#define	TRIGGEREVENT_EnableTeleport		12
-#define	TRIGGEREVENT_DisableTeleport	13
-#define	TRIGGEREVENT_WaterFill			14
-#define	TRIGGEREVENT_WaterDrain			15
-#define	TRIGGEREVENT_StartSpotFX		16
-#define	TRIGGEREVENT_StopSpotFX			17
-#define	TRIGGEREVENT_ShowMessage		18
-#define	TRIGGEREVENT_LightEnable		19
-#define	TRIGGEREVENT_LightDisable		20
-#define	TRIGGEREVENT_TriggerAreaEnable	21
-#define	TRIGGEREVENT_TriggerAreaDisable	22
-#define	TRIGGEREVENT_CameraEnable	23
-#define	TRIGGEREVENT_CameraDisable	24
+constexpr int TRIGGERTYPE_Equal = 0;
+constexpr int TRIGGERTYPE_NotEqual = 1;
+constexpr int TRIGGERTYPE_Less = 2;
+constexpr int TRIGGERTYPE_Greater = 3;
+constexpr int TRIGGERTYPE_LessEqual = 4;
+constexpr int TRIGGERTYPE_GreaterEqual = 5;
+constexpr int TRIGGERTYPE_FlagCount = 6;
+constexpr int TRIGGERTYPE_FlagTest = 7;
+
+
+constexpr int TRIGGEREVENT_Pickup = 0;
+constexpr int TRIGGEREVENT_Enemy = 1;
+constexpr int TRIGGEREVENT_OpenDoor = 2;
+constexpr int TRIGGEREVENT_CloseDoor = 3;
+constexpr int TRIGGEREVENT_LockDoor = 4;
+constexpr int TRIGGEREVENT_UnlockDoor = 5;
+constexpr int TRIGGEREVENT_StartBGOAnim = 6;
+constexpr int TRIGGEREVENT_StopBGOAnim = 7;
+constexpr int TRIGGEREVENT_StartTexAnim = 8;
+constexpr int TRIGGEREVENT_StopTexAnim = 9;
+constexpr int TRIGGEREVENT_StartExternalForce = 10;
+constexpr int TRIGGEREVENT_StopExternalForce = 11;
+constexpr int TRIGGEREVENT_EnableTeleport = 12;
+constexpr int TRIGGEREVENT_DisableTeleport = 13;
+constexpr int TRIGGEREVENT_WaterFill = 14;
+constexpr int TRIGGEREVENT_WaterDrain = 15;
+constexpr int TRIGGEREVENT_StartSpotFX = 16;
+constexpr int TRIGGEREVENT_StopSpotFX = 17;
+constexpr int TRIGGEREVENT_ShowMessage = 18;
+constexpr int TRIGGEREVENT_LightEnable = 19;
+constexpr int TRIGGEREVENT_LightDisable = 20;
+constexpr int TRIGGEREVENT_TriggerAreaEnable = 21;
+constexpr int TRIGGEREVENT_TriggerAreaDisable = 22;
+constexpr int TRIGGEREVENT_CameraEnable = 23;
+constexpr int TRIGGEREVENT_CameraDisable = 24;
  
 /*
  * Structures

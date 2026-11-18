@@ -10,29 +10,29 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define TRANS_TRANSLATE				0
-#define TRANS_ROTATE				1
-#define TRANS_MORPH					2
-#define TRANS_PROPERTY				3
+constexpr int TRANS_TRANSLATE = 0;
+constexpr int TRANS_ROTATE = 1;
+constexpr int TRANS_MORPH = 2;
+constexpr int TRANS_PROPERTY = 3;
 
-#define	PROPTYPE_Unknown			-1				// Unknown
-#define	PROPTYPE_State				0				// Property Types
-#define	PROPTYPE_SFX				1
+constexpr int PROPTYPE_Unknown = -1; // Unknown
+constexpr int PROPTYPE_State = 0; // Property Types
+constexpr int PROPTYPE_SFX = 1;
 
-#define	PROPSTATE_Opening			0				// States
-#define	PROPSTATE_Open				1
-#define	PROPSTATE_Closing			2
-#define	PROPSTATE_Closed			3
-#define	PROPSTATE_UserControl		4
-#define	PROPSTATE_Invulnerable		5
-#define	PROPSTATE_Destroy			6
-#define	PROPSTATE_DisableSpotFX		7
+constexpr int PROPSTATE_Opening = 0; // States
+constexpr int PROPSTATE_Open = 1;
+constexpr int PROPSTATE_Closing = 2;
+constexpr int PROPSTATE_Closed = 3;
+constexpr int PROPSTATE_UserControl = 4;
+constexpr int PROPSTATE_Invulnerable = 5;
+constexpr int PROPSTATE_Destroy = 6;
+constexpr int PROPSTATE_DisableSpotFX = 7;
 
-#define	COMPFLAG_Enable				1
+constexpr int COMPFLAG_Enable = 1;
 
-#define	ANIM_SECOND					60.0F
+constexpr float ANIM_SECOND = 60.0F;
 
-#define	MAX_USER_CONT_COMPS			10
+constexpr int MAX_USER_CONT_COMPS = 10;
 /*===================================================================
 	Structures
 ===================================================================*/

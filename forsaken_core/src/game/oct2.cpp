@@ -156,11 +156,11 @@ float FPS = 0.0F;         // Frames Per Second...
 #define FOV_SHRINK(A)   ((A) - 10.0F)
 
 
-#define MIN_VIEWPORT_WIDTH  (64)
-#define MIN_VIEWPORT_HEIGHT (64)
+constexpr int MIN_VIEWPORT_WIDTH = (64);
+constexpr int MIN_VIEWPORT_HEIGHT = (64);
 
-#define VIEWPORT_GROW   (1.1F)
-#define VIEWPORT_SHRINK   (1.0F/1.1F)
+constexpr float VIEWPORT_GROW = (1.1F);
+constexpr auto VIEWPORT_SHRINK = (1.0F/1.1F);
 
 bool InitViewport( void );
 
@@ -333,9 +333,9 @@ bool DispTracker( void );
 /*===================================================================
   Global Variables
 ===================================================================*/   
-#define Near  ( 100.0F * GLOBAL_SCALE )
-#define Far   ( 49152.0F * GLOBAL_SCALE )
-#define MinNear ( 50.0F * GLOBAL_SCALE )
+constexpr auto Near = ( 100.0F * GLOBAL_SCALE );
+constexpr auto Far = ( 49152.0F * GLOBAL_SCALE );
+constexpr auto MinNear = ( 50.0F * GLOBAL_SCALE );
 
 RENDERMATRIX proj = {
     RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),

@@ -27,15 +27,15 @@ extern bool SwitchedToWatchMode;
 
 #define DEG2RAD(D)				((D) * PI / 180.0F)
 
-#define RESPAWN_TIMER -3.5F // = -250.0F / 71.0f - framelag hack reversal
+constexpr float RESPAWN_TIMER = -3.5F; // = -250.0F / 71.0f - framelag hack reversal
 
-#define	SHIP_RADIUS	( 300.0F * GLOBAL_SCALE )
-#define MOVE_TOLERANCE ( 2.0F * GLOBAL_SCALE )
-#define	MAX_NITRO_FUEL	( 100.0F )
-#define	NITROLOSS	( 0.08333F )
+constexpr auto SHIP_RADIUS = ( 300.0F * GLOBAL_SCALE );
+constexpr auto MOVE_TOLERANCE = ( 2.0F * GLOBAL_SCALE );
+constexpr float MAX_NITRO_FUEL = ( 100.0F );
+constexpr float NITROLOSS = ( 0.08333F );
 
-#define SHIELD_CRITICAL_LEVEL ( 10.0F )
-#define HULL_CRITICAL_LEVEL ( 64.0F )
+constexpr float SHIELD_CRITICAL_LEVEL = ( 10.0F );
+constexpr float HULL_CRITICAL_LEVEL = ( 64.0F );
 
 #define	OVERRIDE_INVUL		( true )
 #define	DONT_OVERRIDE_INVUL	( false )

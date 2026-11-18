@@ -72,7 +72,7 @@ TRIGGER_AREA * GroupTriggerArea_enemy_shoots[MAXGROUPS];
 /*===================================================================
 		Defines
 ===================================================================*/
-#define	ZON_VERSION_NUMBER	2
+constexpr int ZON_VERSION_NUMBER = 2;
 
 /*===================================================================
 	Procedure	:		Load .zon File

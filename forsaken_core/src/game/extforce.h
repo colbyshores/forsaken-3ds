@@ -16,12 +16,12 @@
 /*
  * Defines
  */
-#define	EXTERNALFORCEACTIVE 0
-#define	EXTERNALFORCEINACTIVE 1
+constexpr int EXTERNALFORCEACTIVE = 0;
+constexpr int EXTERNALFORCEINACTIVE = 1;
 
-#define	EXTERNALFORCETYPE_Move 0
-#define	EXTERNALFORCETYPE_Shield 1
-#define	EXTERNALFORCETYPE_Shake 2
+constexpr int EXTERNALFORCETYPE_Move = 0;
+constexpr int EXTERNALFORCETYPE_Shield = 1;
+constexpr int EXTERNALFORCETYPE_Shake = 2;
  
 /*
  * Structures

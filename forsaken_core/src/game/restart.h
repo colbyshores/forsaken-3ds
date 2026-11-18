@@ -9,15 +9,15 @@
 ===================================================================*/
 #define	ENABLE_RESTART		0
 
-#define	RESTARTTYPE_MODEL	0
-#define	RESTARTTYPE_FACEME	1
+constexpr int RESTARTTYPE_MODEL = 0;
+constexpr int RESTARTTYPE_FACEME = 1;
 
-#define MAXRESTARTPOINTS	128
+constexpr int MAXRESTARTPOINTS = 128;
 
-#define	RESTARTSEQ_Inactive		0
-#define	RESTARTSEQ_Activating	1
-#define	RESTARTSEQ_Active		2
-#define	RESTARTSEQ_Deactivating	3
+constexpr int RESTARTSEQ_Inactive = 0;
+constexpr int RESTARTSEQ_Activating = 1;
+constexpr int RESTARTSEQ_Active = 2;
+constexpr int RESTARTSEQ_Deactivating = 3;
 
 /*===================================================================
 	Structures

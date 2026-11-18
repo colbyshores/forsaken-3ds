@@ -12,11 +12,11 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	FRONT_LEFT	0
-#define	FRONT_RIGHT	1
-#define	BACK_LEFT	2
-#define	BACK_RIGHT	3
-#define MAXGUNSPERENEMY 5
+constexpr int FRONT_LEFT = 0;
+constexpr int FRONT_RIGHT = 1;
+constexpr int BACK_LEFT = 2;
+constexpr int BACK_RIGHT = 3;
+constexpr int MAXGUNSPERENEMY = 5;
 
 #define	ENABLEENEMYCOLLISIONS	1
 
@@ -368,17 +368,17 @@ enum
 
 
 
-#define	ENEMY_STATUS_Nothing	0
-#define	ENEMY_STATUS_Enable		1
-#define	ENEMY_STATUS_Generating	2
+constexpr int ENEMY_STATUS_Nothing = 0;
+constexpr int ENEMY_STATUS_Enable = 1;
+constexpr int ENEMY_STATUS_Generating = 2;
 
-#define	FIRSTENEMYMODEL			0 //MODEL_BeamTurret
-#define	MAXENEMIES				256
+constexpr int FIRSTENEMYMODEL = 0; //MODEL_BeamTurret
+constexpr int MAXENEMIES = 256;
 /* Bumped 56 -> 128 to fit Remaster N64 enemy IDs at slots 100-108
  * (Boss_Manmech .. Ghost). Slots 56-99 stay zero-initialised; nothing
  * references them. Memory cost: 72 unused slots × sizeof(ENEMY_TYPES)
  * (~150 bytes) ≈ 11 KB BSS, negligible. */
-#define	MAX_ENEMY_TYPES			128
+constexpr int MAX_ENEMY_TYPES = 128;
 
 #define	YES_STEALTH_MODE		true
 #define	NO_STEALTH_MODE			false

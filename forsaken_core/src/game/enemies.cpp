@@ -47,9 +47,9 @@ void AutoMovementExogenon( OBJECT * Object , ENEMY * Enemy );
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	ENEMY_SHIELD	128
-#define	NME_VERSION_NUMBER	3
-#define	SPECIALENEMYNODENUM	16384
+constexpr int ENEMY_SHIELD = 128;
+constexpr int NME_VERSION_NUMBER = 3;
+constexpr int SPECIALENEMYNODENUM = 16384;
 
 /*===================================================================
 	Global Variables

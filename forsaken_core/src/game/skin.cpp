@@ -22,7 +22,7 @@
 
 #define USE_BSP_COLOURS
 
-#define	BOXSIZE		96.0F
+constexpr float BOXSIZE = 96.0F;
 #define	NODECUBE_Branch	false
 #define	NODECUBE_Array	true
 
@@ -1571,8 +1571,8 @@ struct Pin
 	float	dist;
 };
 
-#define FAR_AWAY 64000.0F
-#define	MAX_PINS	256
+constexpr float FAR_AWAY = 64000.0F;
+constexpr int MAX_PINS = 256;
 
 Pin	PinBuf[ MAX_PINS ];
 

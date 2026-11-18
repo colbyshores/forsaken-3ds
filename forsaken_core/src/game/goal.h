@@ -14,12 +14,12 @@
 
 #include "game/main.h"
 #include "game/constants.h"
-#define GOALSTATE_Off	(0)
-#define GOALSTATE_On	(1)
+constexpr int GOALSTATE_Off = (0);
+constexpr int GOALSTATE_On = (1);
 
-#define GOAL_NONE		(0)
-#define GOAL_SCORED		(1)
-#define GOAL_WRONG		(-1)
+constexpr int GOAL_NONE = (0);
+constexpr int GOAL_SCORED = (1);
+constexpr int GOAL_WRONG = (-1);
 
 typedef struct GOAL
 {

@@ -49,7 +49,7 @@
 #include "game/models.h"
 #include "game/oct2.h"
 
-#define MAX_TROJAX_POWER_LEVEL	(100.0F)
+constexpr float MAX_TROJAX_POWER_LEVEL = (100.0F);
 
 /*===================================================================
 	Externs
@@ -65,11 +65,11 @@ extern	int16_t	TargetingWeaponCheat;
 	Globals
 ===================================================================*/
 
-#define	SUPERNASHRAM_RED	96
-#define	SUPERNASHRAM_GREEN	96
-#define	SUPERNASHRAM_BLUE	255
+constexpr int SUPERNASHRAM_RED = 96;
+constexpr int SUPERNASHRAM_GREEN = 96;
+constexpr int SUPERNASHRAM_BLUE = 255;
 
-#define	LASER_MINDAMAGERANGE	( ( 10.0F * 1024.0F ) * GLOBAL_SCALE )
+constexpr auto LASER_MINDAMAGERANGE = ( ( 10.0F * 1024.0F ) * GLOBAL_SCALE );
 
 float	NmeDamageModifier = 0.75F;
 
@@ -823,7 +823,7 @@ float TrojaxFreqTable[] = {	0.6F, 0.8F, 1.0F };
 
 float TrojaxChargeRateTable[] = { 1.0F, 1.5F, 2.0F };
 
-#define	NO_AMMO_FIRERATE	120
+constexpr int NO_AMMO_FIRERATE = 120;
 
 void FirePrimary(void)
 {

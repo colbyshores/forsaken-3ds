@@ -20,11 +20,11 @@
  * Defines
  */
 
-#define	CAMRENDERING_None		0
-#define CAMRENDERING_Main		2
-#define CAMRENDERING_Rear		3
-#define CAMRENDERING_Missile	4
-#define CAMRENDERING_Pip		5
+constexpr int CAMRENDERING_None = 0;
+constexpr int CAMRENDERING_Main = 2;
+constexpr int CAMRENDERING_Rear = 3;
+constexpr int CAMRENDERING_Missile = 4;
+constexpr int CAMRENDERING_Pip = 5;
 
 /*
  * structures

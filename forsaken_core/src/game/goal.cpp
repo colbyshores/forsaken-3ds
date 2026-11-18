@@ -30,7 +30,7 @@
 #include "net/multiplayer.h"
 #include "rendering/2dtextures.h"
 
-#define GOAL_VERSION_NUMBER		(1)
+constexpr int GOAL_VERSION_NUMBER = (1);
 
 
 void ShowGoal( GOAL * Goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );

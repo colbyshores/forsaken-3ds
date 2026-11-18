@@ -17,79 +17,79 @@
 	Defines
 ===================================================================*/
 
-#define	MIS_ACCELERATE		0		// Missile Sequences
-#define	MIS_DROP			1		
-#define	MIS_STRAIGHT		2		
-#define	MIS_HOMING			3		
-#define	MIS_GRAVITY			4		
-#define	MIS_SPIRALING		5
-#define	MIS_RETRACTTENTACLE	6
+constexpr int MIS_ACCELERATE = 0; // Missile Sequences
+constexpr int MIS_DROP = 1;
+constexpr int MIS_STRAIGHT = 2;
+constexpr int MIS_HOMING = 3;
+constexpr int MIS_GRAVITY = 4;
+constexpr int MIS_SPIRALING = 5;
+constexpr int MIS_RETRACTTENTACLE = 6;
 									
-#define	MISMOVE_STRAIGHT	0		// Movement types
-#define	MISMOVE_HOMING		1
+constexpr int MISMOVE_STRAIGHT = 0; // Movement types
+constexpr int MISMOVE_HOMING = 1;
 
-#define	SEC_MISSILE			0		// Secondary Weapon Type
-#define	SEC_MINE			1
-#define	SEC_XMISSILE		2
+constexpr int SEC_MISSILE = 0; // Secondary Weapon Type
+constexpr int SEC_MINE = 1;
+constexpr int SEC_XMISSILE = 2;
 
-#define	MAXSECONDARYWEAPONBULLETS	256
+constexpr int MAXSECONDARYWEAPONBULLETS = 256;
 
-#define MAXENEMYSECONDARYWEAPONS	6
-#define	TOTALSECONDARYWEAPONS	( MAXSECONDARYWEAPONS + 2 + MAXENEMYSECONDARYWEAPONS )
+constexpr int MAXENEMYSECONDARYWEAPONS = 6;
+constexpr auto TOTALSECONDARYWEAPONS = ( MAXSECONDARYWEAPONS + 2 + MAXENEMYSECONDARYWEAPONS );
 
-#define	MAXSCATTERED		9
+constexpr int MAXSCATTERED = 9;
 
-#define	MUGMISSILE				0		// Straight
-#define	SOLARISMISSILE			1		// Homing
-#define	THIEFMISSILE			2		// Straight ( Grab best weapon )
-#define	SCATTERMISSILE			3		// Scatter ( Grab all weapons )
-#define	GRAVGONMISSILE			4		// Straight ( Gravity effecting )
-#define	MULTIPLEMISSILE			5		// Multiple Rocket Launcher
-#define	TITANSTARMISSILE		6		// Titan Star ( Create shrapnel on contact )
-#define	PURGEMINE				7		// Purge Mine ( Proximity detonated )
-#define	PINEMINE				8		// Pine Mine ( Aim and fire )
-#define	QUANTUMMINE				9		// Quantum Mine ( Proximity detonated )
-#define	SPIDERMINE				10		// Spider Mine ( Proximity detonated, Moving )
-#define	PINEMISSILE				11		// Pine Mine Missile
-#define	TITANSTARSHRAPNEL		12		// Titan Star Shrapnel
-#define	ENEMYSPIRALMISSILE		13		// Straight Spiralling destructable missile
-#define	ENEMYHOMINGMISSILE		14		// Homing destructable missile
-#define	ENEMYBLUEHOMINGMISSILE	15		// Homing destructable missile ( BLUE )
-#define	ENEMYFIREBALL			16		// FireBall
-#define	ENEMYTENTACLE			17		// Tentacle
-#define	ENEMYDEPTHCHARGE		18		// DepthCharge
+constexpr int MUGMISSILE = 0; // Straight
+constexpr int SOLARISMISSILE = 1; // Homing
+constexpr int THIEFMISSILE = 2; // Straight ( Grab best weapon )
+constexpr int SCATTERMISSILE = 3; // Scatter ( Grab all weapons )
+constexpr int GRAVGONMISSILE = 4; // Straight ( Gravity effecting )
+constexpr int MULTIPLEMISSILE = 5; // Multiple Rocket Launcher
+constexpr int TITANSTARMISSILE = 6; // Titan Star ( Create shrapnel on contact )
+constexpr int PURGEMINE = 7; // Purge Mine ( Proximity detonated )
+constexpr int PINEMINE = 8; // Pine Mine ( Aim and fire )
+constexpr int QUANTUMMINE = 9; // Quantum Mine ( Proximity detonated )
+constexpr int SPIDERMINE = 10; // Spider Mine ( Proximity detonated, Moving )
+constexpr int PINEMISSILE = 11; // Pine Mine Missile
+constexpr int TITANSTARSHRAPNEL = 12; // Titan Star Shrapnel
+constexpr int ENEMYSPIRALMISSILE = 13; // Straight Spiralling destructable missile
+constexpr int ENEMYHOMINGMISSILE = 14; // Homing destructable missile
+constexpr int ENEMYBLUEHOMINGMISSILE = 15; // Homing destructable missile ( BLUE )
+constexpr int ENEMYFIREBALL = 16; // FireBall
+constexpr int ENEMYTENTACLE = 17; // Tentacle
+constexpr int ENEMYDEPTHCHARGE = 18; // DepthCharge
 
-#define	NO_SECONDARY		128		// No Secondary weapon to speak of....
+constexpr int NO_SECONDARY = 128; // No Secondary weapon to speak of....
 
-#define	COS_CONE			-2.0F	//0.7071F
-#define	MAX_ENTRYS			10
-#define	MINE_RADIUS			( 256.0F * GLOBAL_SCALE )	// Mine Radius
-#define	MINE_TRIGGER_RADIUS	( 800.0F * GLOBAL_SCALE )	// Detonation Radius
+constexpr float COS_CONE = -2.0F; //0.7071F
+constexpr int MAX_ENTRYS = 10;
+constexpr auto MINE_RADIUS = ( 256.0F * GLOBAL_SCALE ); // Mine Radius
+constexpr auto MINE_TRIGGER_RADIUS = ( 800.0F * GLOBAL_SCALE ); // Detonation Radius
 
-#define PURGE_SHOCKWAVE		4.0F
-#define PINE_SHOCKWAVE		4.0F
-#define	QUANTUM_SHOCKWAVE	20.0F
-#define	SPIDER_SHOCKWAVE	4.0F
-#define MISSILE_SHOCKWAVE	( 512 * GLOBAL_SCALE )		// Missile Shockwave ( Actual size )
-#define	TITANSTAR_SHOCKWAVE	15.0F
-#define	TENTACLE_SHOCKWAVE	10.0F
-#define DEPTHCHARGE_SHOCKWAVE 10.0F
+constexpr float PURGE_SHOCKWAVE = 4.0F;
+constexpr float PINE_SHOCKWAVE = 4.0F;
+constexpr float QUANTUM_SHOCKWAVE = 20.0F;
+constexpr float SPIDER_SHOCKWAVE = 4.0F;
+constexpr auto MISSILE_SHOCKWAVE = ( 512 * GLOBAL_SCALE ); // Missile Shockwave ( Actual size )
+constexpr float TITANSTAR_SHOCKWAVE = 15.0F;
+constexpr float TENTACLE_SHOCKWAVE = 10.0F;
+constexpr float DEPTHCHARGE_SHOCKWAVE = 10.0F;
 
-#define	MAXOLDPOS			10
-#define	MAXTENTOLDPOS		20
-#define	NUMSCATTERPOINTS	3
+constexpr int MAXOLDPOS = 10;
+constexpr int MAXTENTOLDPOS = 20;
+constexpr int NUMSCATTERPOINTS = 3;
 
-#define	SEC_LIGHTSIZE		( 1536.0F * GLOBAL_SCALE )
+constexpr auto SEC_LIGHTSIZE = ( 1536.0F * GLOBAL_SCALE );
 
-#define	MM_TYPE_KILL		0
-#define	MM_TYPE_INIT		1
+constexpr int MM_TYPE_KILL = 0;
+constexpr int MM_TYPE_INIT = 1;
 
-#define	SECFLAGS_Nothing	0
-#define	SECFLAGS_CanShoot	1		// Can be shot.
-#define	SECFLAGS_CanTarget	2		// Can be targeted
-#define	SECFLAGS_NoIncoming	4		// Dont Play Incoming
+constexpr int SECFLAGS_Nothing = 0;
+constexpr int SECFLAGS_CanShoot = 1; // Can be shot.
+constexpr int SECFLAGS_CanTarget = 2; // Can be targeted
+constexpr int SECFLAGS_NoIncoming = 4; // Dont Play Incoming
 
-#define	SPIRAL_RADIUS		( 100 * GLOBAL_SCALE )
+constexpr auto SPIRAL_RADIUS = ( 100 * GLOBAL_SCALE );
 
 /*===================================================================
 	Structures

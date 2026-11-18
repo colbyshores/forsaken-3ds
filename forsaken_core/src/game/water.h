@@ -26,18 +26,18 @@
  * Fc[MAXMESHX*MAXMESHY] scratch buffer. WaterLoad still validates
  * XVerts*YVerts against MAXMESHX*MAXMESHY, so a level with bigger
  * water will still bail (and now cleans up properly on bail). */
-#define	MAXMESHX 64
-#define	MAXMESHY 64
-#define WATER_IMPACT	(-4.0F)
-#define	ONEOVER255	(1.0F/255.0F)
+constexpr int MAXMESHX = 64;
+constexpr int MAXMESHY = 64;
+constexpr float WATER_IMPACT = (-4.0F);
+constexpr auto ONEOVER255 = (1.0F/255.0F);
 
-#define	WATERSTATE_NOWATER 0
-#define	WATERSTATE_SOMEWATER 1
-#define	WATERSTATE_ALLWATER 2
+constexpr int WATERSTATE_NOWATER = 0;
+constexpr int WATERSTATE_SOMEWATER = 1;
+constexpr int WATERSTATE_ALLWATER = 2;
 
-#define	WATERSTATUS_STATIC		0
-#define	WATERSTATUS_DRAINING	1
-#define	WATERSTATUS_FILLING		2
+constexpr int WATERSTATUS_STATIC = 0;
+constexpr int WATERSTATUS_DRAINING = 1;
+constexpr int WATERSTATUS_FILLING = 2;
 
 typedef struct WATEROBJECT{
 	u_int32_t	AnimOncePerFrame;	// used for stuff that is displayed more than once in a single frame..or maybe called for multiple cameras..

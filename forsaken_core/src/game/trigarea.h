@@ -4,12 +4,12 @@
 /*
  * Defines
  */
-#define TRIGGER_AREA_STATE_Off 0
-#define TRIGGER_AREA_STATE_On 1
+constexpr int TRIGGER_AREA_STATE_Off = 0;
+constexpr int TRIGGER_AREA_STATE_On = 1;
 
-#define ZONE_Sphere			0
-#define ZONE_Box			1
-#define ZONE_Polygonal		2
+constexpr int ZONE_Sphere = 0;
+constexpr int ZONE_Box = 1;
+constexpr int ZONE_Polygonal = 2;
 
 enum {
 

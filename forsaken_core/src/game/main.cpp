@@ -103,7 +103,7 @@ static bool parse_chdir( char *cli )
 // checks for all critical folders
 //
 
-#define CRITICAL_FOLDERS 4
+constexpr int CRITICAL_FOLDERS = 4;
 static bool missing_folders( void )
 {
 	int x = 0;

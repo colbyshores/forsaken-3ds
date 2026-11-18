@@ -45,7 +45,7 @@
 #define NO_GRAVGON_TIMER 0
 
 #define BALL_RADIUS	( 256 * GLOBAL_SCALE )
-#define	NUMBIKEDETAILS	4
+constexpr int NUMBIKEDETAILS = 4;
 
 /*===================================================================
 	Globals
@@ -5263,9 +5263,9 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 
 #define POINT_TO_PLANE( P, N ) ( (P)->x * (N)->Normal.x + (P)->y * (N)->Normal.y + (P)->z * (N)->Normal.z + ( (N)->Offset) )
 
-#define SHIP_MIN_FREQ 0.5F
-#define SHIP_MAX_FREQ 1.0F
-#define ENGINEUPDATEPAUSEFRAMES 5
+constexpr float SHIP_MIN_FREQ = 0.5F;
+constexpr float SHIP_MAX_FREQ = 1.0F;
+constexpr int ENGINEUPDATEPAUSEFRAMES = 5;
 
 float FrameLagStore[ MAX_PLAYERS ];
 int CurrentStoredSpeed[ MAX_PLAYERS ];

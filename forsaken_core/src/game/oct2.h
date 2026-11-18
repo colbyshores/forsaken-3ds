@@ -21,7 +21,7 @@
 #include "util/timer.h"
 #include "world/collision.h"
 
-#define MAX_SHORT_LEVEL_NAME 32
+constexpr int MAX_SHORT_LEVEL_NAME = 32;
 extern char ShortLevelNames[MAXLEVELS][MAX_SHORT_LEVEL_NAME];
 
 extern int16_t NewLevelNum;

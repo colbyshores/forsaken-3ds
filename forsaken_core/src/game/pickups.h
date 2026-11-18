@@ -18,7 +18,7 @@
 
 #define	PIC_VERSION_NUMBER	1
 								
-#define	MAXPICKUPS				256
+constexpr int MAXPICKUPS = 256;
 /* Bumped 46 -> 128 to fit Remaster N64 pickup IDs at slots 100-105
  * (StablizerCrystal + ComputerCapsule + 4 BlackHoleGun parts). Slots
  * 46-99 + 106-127 stay zero-initialised. Memory cost: 82 unused
@@ -31,21 +31,21 @@
  * tonally-similar 1998 pickup. Visual is approximate (Stabilizer
  * Crystal reuses Crystal model) but the pickup spawns into a real
  * slot rather than being substituted to PICKUP_GeneralAmmo. */
-#define MAXPICKUPTYPES			128
-#define	PICKUP_RADIUS			( 562.5F * GLOBAL_SCALE )
-#define	PICKUPLIGHT_RADIUS		( 1536.0F * GLOBAL_SCALE )
-#define	PICKUP_SPEED			( 40.0F * GLOBAL_SCALE )
-#define	PICKUP_DEC				( 0.20F * GLOBAL_SCALE )
-#define	COLOUR_SCALE			0.5F
-#define	PICKUP_MODEL_RADIUS		( 310.0F * GLOBAL_SCALE )
+constexpr int MAXPICKUPTYPES = 128;
+constexpr auto PICKUP_RADIUS = ( 562.5F * GLOBAL_SCALE );
+constexpr auto PICKUPLIGHT_RADIUS = ( 1536.0F * GLOBAL_SCALE );
+constexpr auto PICKUP_SPEED = ( 40.0F * GLOBAL_SCALE );
+constexpr auto PICKUP_DEC = ( 0.20F * GLOBAL_SCALE );
+constexpr float COLOUR_SCALE = 0.5F;
+constexpr auto PICKUP_MODEL_RADIUS = ( 310.0F * GLOBAL_SCALE );
 								
-#define	MPU_TYPE_KILL			0
-#define	MPU_TYPE_INIT			1
+constexpr int MPU_TYPE_KILL = 0;
+constexpr int MPU_TYPE_INIT = 1;
 								
-#define	INVULNERABILITY_TIME	( 30.0F * 60.0F )
+constexpr auto INVULNERABILITY_TIME = ( 30.0F * 60.0F );
 
-#define	MAXFAILEDKILLS			100
-#define	FAILEDKILLTIMEOUT		( 15.0F * 60.0F )
+constexpr int MAXFAILEDKILLS = 100;
+constexpr auto FAILEDKILLTIMEOUT = ( 15.0F * 60.0F );
 
 enum {							// Pickup Mode
 

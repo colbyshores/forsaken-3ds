@@ -19,9 +19,9 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	MAXSKINEXECS		MAXGROUPS
-#define	MAXPORTALEXECS		MAXGROUPS
-#define	MAX_TRIS_PER_EXEC	300
+constexpr auto MAXSKINEXECS = MAXGROUPS;
+constexpr auto MAXPORTALEXECS = MAXGROUPS;
+constexpr int MAX_TRIS_PER_EXEC = 300;
 
 /*===================================================================
 	Prototypes

@@ -10,51 +10,51 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	MAXBGOBJECTS				256
+constexpr int MAXBGOBJECTS = 256;
 
-#define	BGOTYPE_Static				0
-#define	BGOTYPE_Door				1
-#define	BGOTYPE_Looping_Anim		2
-#define	BGOTYPE_MultipleStep_Anim	3
-#define	BGOTYPE_OneOff_Anim			4
-#define	BGOTYPE_Sequences			5
+constexpr int BGOTYPE_Static = 0;
+constexpr int BGOTYPE_Door = 1;
+constexpr int BGOTYPE_Looping_Anim = 2;
+constexpr int BGOTYPE_MultipleStep_Anim = 3;
+constexpr int BGOTYPE_OneOff_Anim = 4;
+constexpr int BGOTYPE_Sequences = 5;
 
-#define	DOOR_CLOSED					0
-#define	DOOR_OPENING				1
-#define	DOOR_OPEN					2
-#define	DOOR_CLOSING				3
-#define	DOOR_REVERSEOPENING			4
-#define	DOOR_REVERSECLOSING			5
+constexpr int DOOR_CLOSED = 0;
+constexpr int DOOR_OPENING = 1;
+constexpr int DOOR_OPEN = 2;
+constexpr int DOOR_CLOSING = 3;
+constexpr int DOOR_REVERSEOPENING = 4;
+constexpr int DOOR_REVERSECLOSING = 5;
 
-#define	WHEN_PlayerBump				1
-#define	WHEN_PlayerShot				2
-#define	WHEN_EnemyBump				4
-#define	WHEN_EnemyShot				8
+constexpr int WHEN_PlayerBump = 1;
+constexpr int WHEN_PlayerShot = 2;
+constexpr int WHEN_EnemyBump = 4;
+constexpr int WHEN_EnemyShot = 8;
 
-#define	BUMP						0
-#define	SHOT						1
+constexpr int BUMP = 0;
+constexpr int SHOT = 1;
 
-#define	BGOGENTYPE_Immediate		0
-#define	BGOGENTYPE_AfterTime		1
-#define	BGOGENTYPE_Triggered		2
+constexpr int BGOGENTYPE_Immediate = 0;
+constexpr int BGOGENTYPE_AfterTime = 1;
+constexpr int BGOGENTYPE_Triggered = 2;
 
-#define	LOOPANIM_WaitForDelay		0
-#define	LOOPANIM_WaitForTrigger		1
-#define	LOOPANIM_Animating			2
+constexpr int LOOPANIM_WaitForDelay = 0;
+constexpr int LOOPANIM_WaitForTrigger = 1;
+constexpr int LOOPANIM_Animating = 2;
 
-#define	ONEOFFANIM_WaitForDelay		0
-#define	ONEOFFANIM_WaitForTrigger	1
-#define	ONEOFFANIM_Animating		2
+constexpr int ONEOFFANIM_WaitForDelay = 0;
+constexpr int ONEOFFANIM_WaitForTrigger = 1;
+constexpr int ONEOFFANIM_Animating = 2;
 
-#define	DOORSFXTYPE_Generic			0
-#define	DOORSFXTYPE_Stone			1
-#define	DOORSFXTYPE_ForceField		2
-#define	DOORSFXTYPE_Lift			3
-#define	DOORSFXTYPE_Smoke			4
-#define	DOORSFXTYPE_Electric1		5
-#define	DOORSFXTYPE_Electric2		6
-#define	DOORSFXTYPE_Electric3		7
-#define	DOORSFXTYPE_Electric4		8
+constexpr int DOORSFXTYPE_Generic = 0;
+constexpr int DOORSFXTYPE_Stone = 1;
+constexpr int DOORSFXTYPE_ForceField = 2;
+constexpr int DOORSFXTYPE_Lift = 3;
+constexpr int DOORSFXTYPE_Smoke = 4;
+constexpr int DOORSFXTYPE_Electric1 = 5;
+constexpr int DOORSFXTYPE_Electric2 = 6;
+constexpr int DOORSFXTYPE_Electric3 = 7;
+constexpr int DOORSFXTYPE_Electric4 = 8;
 
 /*===================================================================
 	Structures

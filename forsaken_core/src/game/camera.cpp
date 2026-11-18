@@ -16,7 +16,7 @@
 
 #include "util/util.h"
 
-#define	CAM_VERSION_NUMBER 1
+constexpr int CAM_VERSION_NUMBER = 1;
 
 /*===================================================================
 		Externals ...

@@ -20,12 +20,12 @@
 /*
  * Defines
  */
-#define	TELEPORTINACTIVE 1
-#define	TELEPORTACTIVE 0
+constexpr int TELEPORTINACTIVE = 1;
+constexpr int TELEPORTACTIVE = 0;
 
-#define	TELEPORTSHIPS 1
-#define	TELEPORTENEMIES 2
-#define	MAXTELEPORTLINKS 8
+constexpr int TELEPORTSHIPS = 1;
+constexpr int TELEPORTENEMIES = 2;
+constexpr int MAXTELEPORTLINKS = 8;
 /*
  * Structures
  */
