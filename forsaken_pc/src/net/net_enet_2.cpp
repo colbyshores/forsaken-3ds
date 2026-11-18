@@ -94,7 +94,7 @@ typedef enum {
 	SYNCHING,   // host telling everyone to synch
 } network_peer_state_t;
 
-// peer->data = 
+// what each ENet peer's peer->data points to
 typedef struct {
 	peer_id_t id;
 	network_peer_state_t state;
@@ -1025,8 +1025,6 @@ static void new_packet( ENetEvent * event )
 	if ( event->channelID == system_channel )
 	{
 		p2p_packet_t * packet = ((p2p_packet_t *) event->packet->data);
-		//DebugPrintf("network extra: new system packet type %d\n",
-		//	packet->type);
 		switch( packet->type )
 		{
 		case YOUR_ID:

@@ -401,8 +401,6 @@ sound_source_t * sound_source( sound_buffer_t * buffer )
 		Sound3D ? AL_FALSE : AL_TRUE);
 
 	stats.sources++;
-	//DebugPrintf("sound_source: sources %d buffers %d playing %d source %d\n",
-	//			stats.sources,stats.buffers,stats.playing,source);
 
 	return source;
 }
@@ -424,8 +422,6 @@ void sound_release_source( sound_source_t * source )
 	free(source);
 	// show stats
 	stats.sources--;
-	//DebugPrintf("sound_release_source: buffers %d sources %d playing %d source %d\n",
-	//			stats.buffers,stats.sources,stats.playing,source);
 	source = NULL;
 }
 

@@ -49,8 +49,6 @@ void send_tracker_update( char* host, int port )
 	{
 		if ( i != WhoIAm && STATUS_VALID_PLAYER(GameStatus[i]) )
 		{
-			//DebugPrintf("net_tracker_update: adding player %d with status %d\n",
-			//	i, GameStatus[i]);
 			strcat(message,",");
 			strncat(message,Names[i],MAXSHORTNAME);
 		}

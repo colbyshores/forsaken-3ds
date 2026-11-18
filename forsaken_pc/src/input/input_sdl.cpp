@@ -461,9 +461,6 @@ bool joysticks_init(void)
 		JoystickInfo[i].NumButtons	= SDL_JoystickNumButtons(joy);
 		JoystickInfo[i].NumPOVs		= SDL_JoystickNumHats(joy);
 
-		// TODO
-		// JoystickInfo[i].NumBalls = SDL_JoystickNumBalls(joy);
-
 		JoystickInfo[i].Name = (char *)strdup( SDL_JoystickNameForIndex(i) );
 
 		DebugPrintf( 
