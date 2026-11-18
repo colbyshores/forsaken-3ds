@@ -58,7 +58,7 @@ constexpr int SUPERNASHRAM_RED = 96;
 constexpr int SUPERNASHRAM_GREEN = 96;
 constexpr int SUPERNASHRAM_BLUE = 255;
 
-constexpr auto LASER_MINDAMAGERANGE = ( ( 10.0F * 1024.0F ) * GLOBAL_SCALE );
+constexpr auto LASER_MINDAMAGERANGE = ( 10.0F * BLOCKSIZE );
 
 float	NmeDamageModifier = 0.75F;
 
