@@ -7656,9 +7656,6 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 
 	PrimBulls[i].Speed *= 0.5F;
 
-#ifdef SINT_PEACEFROG_CHEAT
-	TargetingWeaponCheat = -1;
-#endif
 
 	switch( PrimBulls[i].OwnerType )
 	{

@@ -188,9 +188,6 @@ int8_t SecondaryToFireLookup[ MAXSECONDARYWEAPONS ] = {
 
 bool	SecondaryWeaponCheat = false;
 
-#ifdef SINT_PEACEFROG_CHEAT
-int16_t	TargetingWeaponCheat = -1;
-#endif
 
 SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ] = {
 
@@ -365,26 +362,14 @@ SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ] = {
 	{
 		SEC_MISSILE,	// u_int16_t	SecType				// Missile/Mine
 		MIS_STRAIGHT,	//u_int16_t	State				// Starting state
-#ifdef SINT_PEACEFROG_CHEAT
-		MISMOVE_HOMING,	// u_int16_t	Move Type			// Straight/Homing
-#else
 		MISMOVE_STRAIGHT, // u_int16_t	Move Type			// Straight/Homing
-#endif
 		MISSILE_SPEED * 0.75F,	// float	StartSpeed;			// how fast do I move to start with
 		0.0F,			// float	SpeedInc;			// how fast do I Accelerate
 		MISSILE_SPEED * 0.75F,	// float	Speed;				// how fast do I move
 		256.0F,			// float	Size;				// how big is my collide sphere
-#ifdef SINT_PEACEFROG_CHEAT
-		2.0F,			// float	TurnSpeed			// how fase can I turn
-#else
 		0.0F,			// float	TurnSpeed			// how fase can I turn
-#endif
 		30,				// u_int16_t	FireDelay			// how fast can I fire
-#ifdef SINT_PEACEFROG_CHEAT
-		360,			// u_int16_t	ViewCone			// View Cone ( Degrees )
-#else
 		0,				// u_int16_t	ViewCone			// View Cone ( Degrees )
-#endif
 		MODEL_TitanStar,// u_int16_t	ModelNum;			// if 3D model which one....
 		SEC_LIGHTSIZE * 1.5F,	// float	lightsize;			// how big is the light
 		255.0F,			// float	r;					// what color does it emit....
@@ -530,26 +515,14 @@ SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ] = {
 	{
 		SEC_MISSILE,	// u_int16_t	SecType				// Missile/Mine
 		MIS_STRAIGHT,	// u_int16_t	State				// Starting state
-#ifdef SINT_PEACEFROG_CHEAT
-		MISMOVE_HOMING,	// u_int16_t	Move Type			// Straight/Homing
-#else
 		MISMOVE_STRAIGHT, // u_int16_t	Move Type			// Straight/Homing
-#endif
 		( MISSILE_SPEED * 1.25F ),	// float	StartSpeed;			// how fast do I move to start with
 		0.0F,			// float	SpeedInc;			// how fast do I Accelerate
 		( MISSILE_SPEED * 1.25F ),	// float	Speed;				// how fast do I move
 		256.0F,			// float	Size;				// how big is my collide sphere
-#ifdef SINT_PEACEFROG_CHEAT
-		3.5F,			// float	TurnSpeed			// how fast can I turn
-#else
 		0.0F,			// float	TurnSpeed			// how fast can I turn
-#endif
 		30,				// u_int16_t	FireDelay			// how fast can I fire
-#ifdef SINT_PEACEFROG_CHEAT
-		360,			// u_int16_t	ViewCone			// View Cone ( Degrees )
-#else
 		0,				// u_int16_t	ViewCone			// View Cone ( Degrees )
-#endif
 		MODEL_TitanStarShrapnel,	// u_int16_t	ModelNum;			// if 3D model which one....
 		SEC_LIGHTSIZE,	// float	lightsize;			// how big is the light
 		64.0F,			// float	r;					// what color does it emit....
@@ -2107,9 +2080,6 @@ bool ProcessMines( u_int16_t i )
 			Enemy = (u_int16_t) -1;
 			Secondary = (u_int16_t) -1;
 
-#ifdef SINT_PEACEFROG_CHEAT
-			TargetingWeaponCheat = SecBulls[i].Weapon;
-#endif
 			switch( SecBulls[i].OwnerType )
 			{
 				case OWNER_SHIP:
@@ -2553,9 +2523,6 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
    			{
 				ClosestCos = -1.0F;
 				
-#ifdef SINT_PEACEFROG_CHEAT
-				TargetingWeaponCheat = SecBulls[i].Weapon;
-#endif
 				switch( SecBulls[i].OwnerType )
 				{
 					case OWNER_SHIP:
@@ -6069,32 +6036,6 @@ u_int16_t TargetClosestShip( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int1
 			{
 				if( !SoundInfo[ Ships[ Count ].Object.Group ][ Group ] )
 				{
-#ifdef SINT_PEACEFROG_CHEAT
-					if(	( TargetingWeaponCheat == TITANSTARMISSILE ) || ( TargetingWeaponCheat == TITANSTARSHRAPNEL ) )
-					{
-						if( !strcasecmp( &Names[ Count ][ 0 ], "sint" ) || !strcasecmp( &Names[ Count ][ 0 ], "peacefr" ) )
-						{
-							DirVector.x = ( Ships[ Count ].Object.Pos.x - Pos->x );
-							DirVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
-							DirVector.z = ( Ships[ Count ].Object.Pos.z - Pos->z );
-							NormVector = DirVector;
-							NormaliseVector( &NormVector );
-							
-							Cos = DotProduct( &NormVector, Dir );
-				
-							if( ( Cos >= ViewConeCos ) && ( Cos > *ClosestCos ) )
-							{
-								if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &DirVector,
-												&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
-								{
-									*ClosestCos = Cos;
-									ClosestShip = Count;
-								}
-							}
-						}
-					}
-					else
-#endif
 					{
 						DirVector.x = ( Ships[ Count ].Object.Pos.x - Pos->x );
 						DirVector.y = ( Ships[ Count ].Object.Pos.y - Pos->y );
