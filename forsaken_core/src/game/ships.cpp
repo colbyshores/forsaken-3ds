@@ -580,10 +580,6 @@ bool ProcessShips()
 	VECTOR	ImpactPoint;
 	float	Speed;
 	VECTOR	Move_Off;	
-#ifndef MULTI_RAY_COLLISION
-	VECTOR	Pos_New;	
-	NORMAL	FaceNormal;
-#endif
 	VECTOR	Move_Dir;
 	QUAT	StepQuat;	
 	VECTOR	Bob;
@@ -916,7 +912,6 @@ bool ProcessShips()
 					{
 						NumCollides = 0;
 						if ( ShipObjPnt->Group != (u_int16_t) -1 )
-#ifdef MULTI_RAY_COLLISION
 						{
 							BGObject = NULL;
 
@@ -957,41 +952,6 @@ bool ProcessShips()
 								}
 							}
 						}
-#else
-						{
-							while ( BackgroundCollide( &MCloadheader, &Mloadheader,
-														&ShipObjPnt->Pos, ShipObjPnt->Group, &Move_Off,
-														&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, &BGObject ) )
-							{
-								if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
-						
-								ShipObjPnt->Pos = ImpactPoint;
-								ShipObjPnt->Group = ImpactGroup;
-								Move_Off.x = Pos_New.x - ShipObjPnt->Pos.x; 
-								Move_Off.y = Pos_New.y - ShipObjPnt->Pos.y; 
-								Move_Off.z = Pos_New.z - ShipObjPnt->Pos.z;
-								
-								if( VectorLength( &Move_Off ) <= MoveAccell )
-								{
-									Move_Off.x = 0.0F; 
-									Move_Off.y = 0.0F; 
-									Move_Off.z = 0.0F;
-									break;								
-								}
-								
-								NumCollides += 1;
-								if( NumCollides	> MAXCOLLISIONS )
-									break;
-							}
-							outside_map = outside_group;
-						}
-						
-						{
-							// the end point is actually outside...
-							ShipObjPnt->Pos = ImpactPoint;
-							ShipObjPnt->Group = ImpactGroup;
-						}
-#endif
 					}
 					else
 					{

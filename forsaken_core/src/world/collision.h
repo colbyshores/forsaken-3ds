@@ -23,7 +23,6 @@
 /*
  * defines
  */
-#define MULTI_RAY_COLLISION
 
 #define MAXCOLGROUPS MAXGROUPS
 constexpr float SCALE_FUDGE = (1.015F);
