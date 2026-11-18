@@ -1,3 +1,5 @@
+/* music_table.cpp -- per-edition level -> music track tables; see music_table.h. */
+
 #include <string.h>
 
 #include "audio/music_table.h"
@@ -5,7 +7,7 @@
 #include "game/oct2.h"
 
 /* Level->track mapping, keyed by level name. Track values are CD-style
- * track numbers naming romfs/music/trackNN.dsp files.
+ * track numbers naming the music/trackNN.dsp files.
  *
  * Keyed by name, not by position in the level list: the list is data
  * (assets/level_orderings/, and InitLevels skips levels whose .mxv is

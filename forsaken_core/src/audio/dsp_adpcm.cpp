@@ -1,19 +1,4 @@
-/*
- * dsp_adpcm - shared Nintendo DSP-ADPCM (.dsp) decoding.
- *
- * One asset set serves every platform: the 3DS streams .dsp files to
- * the ndsp hardware decoder (music_3ds.cpp), the PC decodes the same
- * files in software (music_openal.cpp). This module holds the parts
- * that must agree bit-for-bit: the big-endian header layout, the
- * coefficient table, and the predictor decode math.
- *
- * A .dsp file is a 96-byte header followed by 8-byte frames; each
- * frame carries a predictor/scale byte and 14 4-bit samples.
- *
- * C-with-classes (AGENTS.md S9): the decoder is a small value type
- * with explicit state; the public header stays a flat C API so the
- * C backends on both platforms keep calling it unchanged.
- */
+/* dsp_adpcm.cpp -- DSP-ADPCM header parse and decode; see dsp_adpcm.h. */
 #include "audio/dsp_adpcm.h"
 #include <stddef.h>
 

@@ -1,16 +1,18 @@
 #pragma once
 
-/*
- * dsp_adpcm - shared Nintendo DSP-ADPCM (.dsp) decoding.
+/* dsp_adpcm.h -- shared Nintendo DSP-ADPCM (.dsp) header parsing and decode
  *
- * One asset set serves every platform: the 3DS streams .dsp files to
- * the ndsp hardware decoder (music_3ds.cpp), the PC decodes the same
- * files in software (music_openal.cpp). This module holds the parts
- * that must agree bit-for-bit: the big-endian header layout, the
- * coefficient table, and the predictor decode math.
+ * One set of music files serves both platforms: music_3ds.cpp streams the
+ * .dsp tracks to the ndsp hardware decoder, music_openal.cpp decodes them
+ * in software. This module holds the parts that must agree bit-for-bit:
+ * the big-endian header layout, the per-file coefficient table, and the
+ * predictor decode math. Stateless apart from the caller's dsp_state_t; no
+ * allocation, no I/O.
  *
- * A .dsp file is a 96-byte header followed by 8-byte frames; each
- * frame carries a predictor/scale byte and 14 4-bit samples.
+ * A .dsp file is a 96-byte header followed by 8-byte frames; each frame
+ * carries a predictor/scale byte and 14 4-bit samples. The 3DS hands each
+ * ndsp buffer its own start context, so it runs dsp_decode with out == NULL
+ * to carry the predictor history from one buffer to the next.
  */
 
 #include <stdint.h>
@@ -29,7 +31,8 @@ typedef struct {
     int32_t hist2;            /* previous decoded sample */
 } dsp_state_t;
 
-/* Parse the 96-byte .dsp header (big-endian on disk). */
+/* Parse the 96-byte .dsp header (big-endian on disk). Fails only on NULL
+ * arguments; the header contents are not validated. */
 bool dsp_parse_header(const uint8_t hdr[96], dsp_header_t *out);
 
 /* Initialise decode state from a parsed header. */
