@@ -87,37 +87,11 @@ void AI_GetNearestMINETarget( void )
 ===================================================================*/
 void AI_GetNearestSHIPTargetInAnyGROUP( void )
 {
-#ifdef COOPERATIVE
-	float	dist;
-	int	i;
-	for( i = 0 ; i < MAX_PLAYERS ; i++ )
-	{
-		/* @vfp-exempt R3 — AI target-selection distance compare; integerizing changes target choice. measured n/a. Verified 2026-10-25. */
-		if( Ships[i].enable && (Ships[i].Object.Mode == NORMAL_MODE) && ( &Ships[i].Object != Tinfo->SObject ) && ( !(Ships[i].Object.Flags & SHIP_Stealth) || (Ships[i].Object.Flags & SHIP_Litup) ) )
-		{
-			if( !SoundInfo[Tinfo->Group][Ships[i].Object.Group] )
-			{
-				dist = DistanceVector2Vector( &Ships[i].Object.Pos , &Tinfo->Pos );
-				if( Ships[i].Object.Noise != 0.0F )
-				{
-					dist *= ( 1.0F * ( 0.2F * Ships[i].Object.Noise ) );
-				}
-				
-				if( dist < Tinfo->Nearest )
-				{
-					Tinfo->TObject = (void*) &Ships[i];
-					Tinfo->Nearest = dist;         
-				}
-			}
-		}
-	}
-#else
 	if( Ships[WhoIAm].enable && (Ships[WhoIAm].Object.Mode == NORMAL_MODE) && ( !(Ships[WhoIAm].Object.Flags & SHIP_Stealth) || (Ships[WhoIAm].Object.Flags & SHIP_Litup) ) )
 	{
 		Tinfo->TObject = (void*) &Ships[WhoIAm];
 		Tinfo->Nearest = DistanceVector2Vector( &Ships[WhoIAm].Object.Pos , &Tinfo->Pos);         
 	}
-#endif
 }
 /*===================================================================
 	Procedure	:	AI Look Ahead and try and predict where someone will be...

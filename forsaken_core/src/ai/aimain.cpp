@@ -302,19 +302,6 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 	{
 		Enemy->AIFlags &= AI_MINEAVOID + AI_IHAVESEENPLAYER + AI_PLAYERISTARGETINGME + AI_PLAYERHASFIREDPRIMARY + AI_PLAYERHASFIREDSECONDARY;	// some flags need to be preserved!!!!
 		// Are any Players in Range???
-#ifdef COOPERATIVE
-		for( i = 0 ; i < MAX_PLAYERS ; i++ )
-		{
-			if( Ships[i].enable )
-			{
-				if( EnemyTypes[Enemy->Type].Behave.ThinkRange > (DistanceVector2Vector( &Enemy->Object.Pos , &Ships[i].Object.Pos) + SoundInfo[Enemy->Object.Group][Ships[i].Object.Group]) )
-				{
-					Enemy->AIFlags |= AI_ANYPLAYERINRANGE;
-					break;
-				}
-			}
-		}
-#else
 		if( Ships[WhoIAm].enable )
 		{
 			if( EnemyTypes[Enemy->Type].Behave.ThinkRange > (DistanceVector2Vector( &Enemy->Object.Pos , &Ships[WhoIAm].Object.Pos) + SoundInfo[Enemy->Object.Group][Ships[WhoIAm].Object.Group]) )
@@ -322,7 +309,6 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 				Enemy->AIFlags |= AI_ANYPLAYERINRANGE;
 			}
 		}
-#endif
 		if( Enemy->IveBeenHitTimer || GroupsAreVisible( Ships[WhoIAm].Object.Group, Enemy->Object.Group ) )
 			Enemy->AIFlags |= AI_ANYPLAYERINRANGE;
 		return;
