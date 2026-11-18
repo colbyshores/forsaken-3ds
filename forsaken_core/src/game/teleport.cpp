@@ -148,12 +148,10 @@ bool TeleportsLoad( char * Filename )
 		floatpnt = (float *) Buffer;
 		memcpy_unaligned(&TPpnt->Pos, floatpnt, 4*3);
 		floatpnt+=3;
-#if TELEPORTS_VERSION_NUMBER >= 2
 		memcpy_unaligned(&TPpnt->Dir, floatpnt, 4*3);
 		floatpnt+=3;
 		memcpy_unaligned(&TPpnt->Up, floatpnt, 4*3);
 		floatpnt+=3;
-#endif
 		memcpy_unaligned(&TPpnt->half_size, floatpnt, 4*3);
 		floatpnt+=3;
 		Buffer = (char *) floatpnt;
@@ -252,10 +250,8 @@ bool TeleportsAreaCheck( VECTOR * NewPos , VECTOR * OldPos ,u_int16_t Group, OBJ
 				newTPpnt += TPpnt->Links[Random_Range(TPpnt->num_links)];
 				obj->Group = newTPpnt->Group;
 				obj->Pos = newTPpnt->Pos;
-#if TELEPORTS_VERSION_NUMBER >= 2
 				obj->Quat.FromDirAndUp(&newTPpnt->Dir, &newTPpnt->Up);
 				obj->Quat.ToMatrix(&obj->Mat);
-#endif
 				return true;
 			}
 		}
