@@ -1,13 +1,9 @@
-/*==========================================================================
- *
- *
- *  File:       mxload.h
- *  Content:    Mxload include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* mxload.h -- static model (.mx) loader: MXLOADHEADER with its groups, fire
+ * points and spot effects; the file layout and loader are described in
+ * mxload.cpp.
+ */
 
 #include "game/main.h"
 #include "data/file.h"

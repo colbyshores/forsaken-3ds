@@ -1,13 +1,9 @@
-/*==========================================================================
- *
- *
- *  File:       mload.h
- *  Content:    Mload include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* mload.h -- level mesh (.mxv) loader: MLOADHEADER with its groups, portals
+ * and visibility trees, the .mxv file records, start positions and texture
+ * animation; the file layout and loader are described in mload.cpp.
+ */
 
 #include "game/main.h"
 #include "data/file.h"

@@ -1,13 +1,9 @@
-/*==========================================================================
- *
- *
- *  File:       mxaload.h
- *  Content:    Mxaload include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* mxaload.h -- animated model (.mxa) loader: MXALOADHEADER, the MXAVERT
+ * frame record and InterpFrames; the file layout and loader are described in
+ * mxaload.cpp.
+ */
 
 /*===================================================================
 	Includes
