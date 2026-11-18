@@ -1,8 +1,12 @@
-/*
- * stubs_3ds.cpp - Stubs for functions not available on 3DS
+/* stubs_3ds.cpp -- 3DS stand-ins for symbols the PC layer provides
  *
- * Provides no-op implementations of desktop/network functions
- * that the engine references but are not available on 3DS.
+ * The core is shared with the PC build and still names a few things that
+ * the PC platform layer or its libraries define. This file defines them:
+ * the net_tracker.h calls (no tracker on 3DS), SDL_EnableUNICODE (an SDL 1.2
+ * call title.cpp makes because SDL_VERSION_ATLEAST is always false on 3DS),
+ * the bIgnoreWM_SIZE flag (input_sdl.cpp owns it on PC; title.cpp writes it,
+ * nothing reads it here), and glob / globfree, which devkitARM declares but
+ * does not implement (file.cpp's find_file uses them).
  */
 
 #ifdef __3DS__
@@ -36,7 +40,7 @@ int SDL_EnableUNICODE(int enable)
 	return 0;
 }
 
-/* ---- Windows API stubs ---- */
+/* ---- window-resize flag (input_sdl.cpp on PC) ---- */
 
 int bIgnoreWM_SIZE = 0;
 
@@ -49,7 +53,10 @@ int bIgnoreWM_SIZE = 0;
 int glob(const char *pattern, int flags,
 	int (*errfunc)(const char *, int), glob_t *pglob)
 {
-	/* Simple glob implementation for 3DS - handles wildcards at end of path */
+	/* Minimal glob: only the first '*' in the last path component is a
+	 * wildcard; no '?' or bracket classes; flags and errfunc ignored. Without a '*' the
+	 * name is compared case-insensitively; the '*' prefix and suffix are
+	 * compared case-sensitively. Results are not sorted. */
 	DIR *dir;
 	struct dirent *entry;
 	char dirpath[256], match[256];

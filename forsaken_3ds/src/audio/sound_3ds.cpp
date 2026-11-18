@@ -1,9 +1,20 @@
-/*
- * sound_3ds.cpp - Nintendo 3DS ndsp audio replacing sound_openal.cpp
+/* sound_3ds.cpp -- sound.h for the 3DS, on libctru's DSP service (ndsp)
  *
- * Uses the DSP service (ndsp) from libctru.
- * All audio buffers are allocated in linear memory so
- * the DSP hardware can read them directly.
+ * sound_load parses the RIFF WAV itself (PCM, 8 or 16 bit, mono or stereo)
+ * into linear memory, which the DSP reads directly; 8-bit data is flipped to
+ * the signed form ndsp expects. sound_source claims an ndsp channel from a
+ * pool of MAX_SFX_VOICES (channels 0-7) for the life of the source. When all
+ * are taken, the channel claimed longest ago is reset and handed over: the
+ * evicted source goes silent but still holds the channel number. Channel 23
+ * belongs to music_3ds.cpp. Volume (millibels) and pan become the channel's
+ * left/right mix. The listener calls are no-ops and Sound3D is false, so
+ * sfx.cpp pans in software and never calls sound_position.
+ *
+ * sound_init first copies romfs:/dspfirm.cdc to sdmc:/3ds/dspfirm.cdc if the
+ * SD copy is missing, because ndspInit loads the DSP firmware from there.
+ * Only development .3dsx builds carry the romfs copy (see sound_3ds.h for the
+ * boot-time warning when neither exists); without the firmware sound_init
+ * fails and the game runs silent.
  */
 
 #ifdef __3DS__
@@ -102,11 +113,10 @@ static void free_channel(int ch)
 
 static bool ndsp_initialized = false;
 
-/* On first launch from a CIA install we may be missing the DSP firmware
- * blob at sdmc:/3ds/dspfirm.cdc, which ndspInit absolutely requires.
- * The CIA bundles a copy in romfs; lazily extract it on demand if the
- * SD copy is missing or zero-length. Bootstrapping in-band so the user
- * doesn't have to run a separate dumper before launching the game. */
+/* ndspInit requires the DSP firmware blob at sdmc:/3ds/dspfirm.cdc.
+ * Development .3dsx builds bundle a copy in romfs (the CIA and the release
+ * .3dsx do not); copy it to the SD if the SD copy is missing or
+ * zero-length, so emulator and dev runs need no separate dump step. */
 static void ensure_dspfirm_on_sd(void)
 {
 	const char *sd_path  = "sdmc:/3ds/dspfirm.cdc";
@@ -155,16 +165,17 @@ bool sound_check_dsp_firmware_available(void)
 		fseek(f, 0, SEEK_END);
 		long sz = ftell(f);
 		fclose(f);
-		if (sz > 0) return true;       /* 3DSX build, will be auto-copied */
+		if (sz > 0) return true;       /* dev .3dsx build, will be auto-copied */
 	}
 	return false;
 }
 
-/* Top-screen console warning shown on CIA installs where the user has
- * not run dsp1 yet. Runs before c3d_context_init so we can cleanly hand over
- * the top screen to citro3d once the user dismisses it.
+/* Top-screen console warning shown when neither firmware copy exists (a
+ * CIA or release .3dsx on a console that never ran dsp1). Runs before
+ * c3d_context_init so we can cleanly hand over the top screen to citro3d
+ * once the user dismisses it.
  *
- * Requires gfxInitDefault() to have run already. */
+ * Requires gfxInit() to have run already. */
 void sound_show_missing_firmware_warning(void)
 {
 	consoleInit(GFX_TOP, NULL);
@@ -246,7 +257,7 @@ void sound_destroy(void)
 	DebugPrintf("sound_destroy: ndsp shut down\n");
 }
 
-/* ---- 3D listener (stubs for now, ndsp doesn't have built-in 3D) ---- */
+/* ---- 3D listener (no-ops: ndsp has no 3D positioning) ---- */
 
 bool sound_listener_position(float x, float y, float z)
 {

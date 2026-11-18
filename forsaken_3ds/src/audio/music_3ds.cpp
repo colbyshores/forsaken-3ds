@@ -1,27 +1,26 @@
-/*
- * music_3ds.cpp - CD audio music playback for 3DS via ndsp.
+/* music_3ds.cpp -- music.h for the 3DS: DSP-ADPCM tracks streamed to ndsp
  *
- * Streams Nintendo DSP-ADPCM (.dsp) tracks from romfs:/music/.
+ * Tracks are romfs:/music/trackNN.dsp (mono, 32 kHz) and play on ndsp
+ * channel 23, outside the SFX pool in sound_3ds.cpp (whose voice cap also
+ * keeps the DSP from skipping music); the DSP decodes the samples, the CPU
+ * only tracks predictor state (below). A track is streamed in ~0.5 s
+ * chunks through NUM_WAVEBUFS linear-memory wave buffers rather than loaded
+ * whole, to spare the linear heap the textures need. A worker thread (25 ms
+ * tick) refills finished buffers so a long game frame cannot starve the
+ * channel; at end of track it reopens the file and starts over, and if the
+ * channel has drained completely it resets and refills it.
  *
- * Design notes:
- *   - DSP-ADPCM is decoded by 3DS hardware, zero CPU during playback.
- *   - Streamed in 0.5 s ADPCM chunks from the romfs file (no full-track
- *     RAM buffer — the SFX system needs the linear-memory pool too, and
- *     HD textures already eat much of it).
- *   - A background thread refills wave buffers on a 25 ms tick so heavy
- *     gameplay frames cannot starve the music channel. All shared state
- *     is guarded by a LightLock.
- *   - Each wave buffer carries its OWN ndspAdpcmData start context;
- *     after writing each buffer we CPU-decode its frames just enough to
- *     compute the END predictor history, so the next buffer starts where
- *     this one ended. Without this, buffers share one context and drift
- *     glitches accumulate after a few minutes ("broken record" symptom).
- *   - SFX overload was breaking music: see sound_3ds.cpp MAX_SFX_VOICES cap.
+ * Each wave buffer carries its own ADPCM start context. After filling a
+ * buffer the code decodes its frames on the CPU in state-only mode
+ * (adpcm_advance) to get the predictor history at its end, which is the
+ * next buffer's start context; with one shared context the predictor drifts
+ * and playback glitches after a few minutes.
  *
- * C-with-classes (AGENTS.md S9): the stream is one class owning the
- * file, the DSP buffers, the predictor state, the worker thread and its
- * lock; the public music_* API in audio/music.h is a flat wrapper over
- * the single instance.
+ * C with classes (AGENTS.md S9): one MusicStream instance owns the file, the
+ * buffers, the predictor state, the worker thread and the LightLock that
+ * guards them; the music.h functions are flat wrappers over it. Volume is
+ * fixed at 1.0. Track length comes from the file size, not the header (see
+ * open_track).
  */
 
 #ifdef __3DS__

@@ -1,8 +1,10 @@
-/*
- * net_3ds.cpp - Network stubs for 3DS (single-player only)
+/* net_3ds.cpp -- net.h for the 3DS: no networking
  *
- * Provides no-op implementations of the network API
- * so the game compiles without enet.
+ * The 3DS build has no enet and no network backend, so every net.h call is a
+ * no-op: network_setup reports NETWORK_OK, network_join returns 0 (failed),
+ * network_state stays NETWORK_DISCONNECTED, network_players stays empty and
+ * network_event is never called. networking.cpp is still compiled and runs
+ * against these stubs. The tracker calls are stubbed in stubs_3ds.cpp.
  */
 
 #ifdef __3DS__

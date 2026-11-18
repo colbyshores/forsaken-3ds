@@ -1,25 +1,22 @@
-/*
- * input_3ds.cpp - Nintendo 3DS HID input replacing input_sdl.cpp
+/* input_3ds.cpp -- input.h for the 3DS: HID buttons and sticks
  *
- * Maps 3DS controls to Forsaken's input system:
- *   Circle Pad  -> pitch / yaw
- *   C-Stick     -> strafe / vertical thrust  (New 3DS only)
- *   D-Pad       -> strafe / vertical thrust  (Old 3DS fallback)
- *   L/R         -> strafe left/right
- *   A           -> fire primary
- *   B           -> fire secondary
- *   X           -> next weapon
- *   Y           -> prev weapon
- *   Start       -> menu / pause
- *   Select      -> rear view (N3DS) / nitro (OG 3DS — no ZL)
- *   ZL          -> nitro    (N3DS only)
- *   ZR          -> drop mine (N3DS only — drops on OG 3DS)
+ * The 3DS presents as one joystick. handle_events runs once per frame: it
+ * reads HID, writes the circle pad to axes 0/1 and the C-stick to the axes
+ * the remap settings choose, scaled to the engine's +-100 range with the
+ * axis deadzone; drives joystick button slots 0-15 from the user-rebindable
+ * bindings in controls_3ds.cpp (slot = controls_action_t); reports the D-pad
+ * as POV hat 0; and fakes SDL key codes (RETURN, ESCAPE, arrows) for the
+ * menus in input_buffer and _3ds_key_state. config.cpp maps those slots and
+ * the hat to ship actions. The default bindings are A/B fire, X/Y thrust,
+ * L/R strafe, and on New 3DS SELECT rear view, ZL nitro, ZR drop mine. The
+ * Old 3DS has no ZL/ZR, so there SELECT is nitro (needed to finish SP level
+ * 3) and rear view and drop mine start unbound.
  *
- * OG 3DS lacks the ZL/ZR shoulder buttons that the New 3DS adds.
- * Without ZL there's no way to engage nitro, which is mandatory to
- * complete the third SP level. Re-binding SELECT to nitro on OG
- * costs the rear-view function but unblocks progression. The
- * binding swap is platform-detected at startup.
+ * The first poll checks APT_CheckNew3DS once and loads the bindings
+ * (controls_3ds_init). While the remap overlay is open it takes all input
+ * and the engine sees none. START+SELECT requests quit on New 3DS only (on
+ * Old 3DS SELECT is held for nitro). old_input / new_input are swapped by
+ * ReadInput, not here.
  */
 
 #ifdef __3DS__
@@ -45,15 +42,15 @@ JOYSTICKINFO JoystickInfo[MAX_JOYSTICKS];
 
 
 /* old_input, new_input, mouse_state, mouse_states, input_buffer*,
-   joy_axis_state, joy_button_state, joy_hat_state are all declared
-   (as non-extern globals) in input.h and defined via controls.cpp.
-   We do NOT redefine them here. */
+   joy_axis_state, joy_button_state, joy_hat_state are declared extern
+   in input.h and defined in controls.cpp. We do NOT redefine them here. */
 
 /* ---- keyboard state array ---- */
 
 /* Forsaken reads a key_state array indexed by SDLK_* values.
    On 3DS we don't have a keyboard, but the engine still references it.
-   We provide a zeroed array so nothing crashes.
+   handle_events clears it each frame and sets RETURN, ESCAPE and SPACE
+   from buttons.
    This is extern'd in input.h as _3ds_key_state for SDL compat. */
 
 u_int8_t _3ds_key_state[SDLK_LAST];
