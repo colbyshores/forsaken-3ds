@@ -2579,6 +2579,21 @@ headroom quad would have exploited. QUADIDX_VERTS default back to
 Not a keeper today — same conservative rule as 2026-11-12, now
 with the bucket interaction measured rather than assumed.
 
+## 2026-11-14 — MERGED to master (HARDWARE-PROVEN)
+
+experimental/frame-interp merged into master. Resolutions:
+render_c3d.c + shader taken wholesale from experimental (36B
+vertex path; master's R04 24B not ported per verdict, display-list
+replay retired — 0 s_dlReplay symbols remain); atm counters unioned
+(master fillq/hitskip + experimental memo/vown/splits); visi.c keeps
+master's early unmagnified shortcut + experimental's in-block
+fullscreen guard; q3 ring dump stubbed (lived in master's backend;
+FILLQ counters remain, stay 0); tests/Makefile unioned.
+Merged ramqan stereo (Old 3DS, defaults): avg 71,306us — faster
+than either parent (branch tip 77,426; master stack unmeasured as
+one) — fill-cuts/bullprim from master compose with memo+buckets.
+Fidelity byte-identical, memo_hit=34368, scratch_splits=0.
+Gates ALL PASS on merged tree; host tests all green.
 ## 2026-11-14 — WIRING BUG: release builds never had the memo (found by slider build)
 
 -DSTEREO_REPLAY/-DPERSIST_VERTS were wired inside the ATM_PROFILING

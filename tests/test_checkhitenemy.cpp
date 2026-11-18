@@ -178,6 +178,58 @@ int main(void)
 	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == NULL, "connected off-ray misses");
 
+	/* Case 7: far enemy beyond reach is skipped, Dist untouched.
+	 * dist 100 > DirLength 50 + Radius 10 + WeaponRadius 0. */
+	memset(SoundInfo, 0, sizeof(SoundInfo));
+	mk_enemy(&eA, 5, 0, 200.0f, 0.0f, 0.0f, true);
+	FirstEnemyUsed = &eA;
+	dist = 1000.0f;
+	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
+	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+	CHECK(hit == NULL, "beyond-reach enemy skipped");
+	CHECK(dist == 1000.0f, "Dist untouched on skip");
+
+	/* Case 8: just inside reach still hits (no over-cull at boundary).
+	 * dist 59 <= 50 + 10, on-ray: surface at 49. */
+	memset(SoundInfo, 0, sizeof(SoundInfo));
+	mk_enemy(&eA, 5, 0, 41.0f, 0.0f, 0.0f, true);
+	FirstEnemyUsed = &eA;
+	dist = 1000.0f;
+	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
+	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+	CHECK(hit == &eA, "inside-reach enemy hit");
+	CHECK(WITHIN(dist, 49.0f, 0.01f), "inside-reach distance");
+
+	/* Case 9: Trojax far enemy skipped (Cos path never runs). */
+	memset(SoundInfo, 0, sizeof(SoundInfo));
+	mk_enemy(&eA, 5, 0, -200.0f, 0.0f, 0.0f, true);
+	FirstEnemyUsed = &eA;
+	dist = 1000.0f;
+	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
+	                    &ip, &ip2, &dist, 5.0f, COLTYPE_Trojax);
+	CHECK(hit == NULL, "trojax far enemy skipped");
+	CHECK(dist == 1000.0f, "Dist untouched on trojax skip");
+
+	/* Case 10: negative WeaponRadius falls through to old logic (guard). */
+	memset(SoundInfo, 0, sizeof(SoundInfo));
+	mk_enemy(&eA, 5, 0, 0.0f, 0.0f, 0.0f, true);
+	FirstEnemyUsed = &eA;
+	dist = 1000.0f;
+	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
+	                    &ip, &ip2, &dist, -1.0f, COLTYPE_Sphere);
+	CHECK(hit == &eA, "negative weapon radius still hits near");
+	CHECK(WITHIN(dist, 90.0f, 0.01f), "negative-W distance");
+
+	/* Case 11: zero-length ray overlapping bullet still hits inside. */
+	memset(SoundInfo, 0, sizeof(SoundInfo));
+	mk_enemy(&eA, 5, 0, 100.0f, 0.0f, 0.0f, true);
+	FirstEnemyUsed = &eA;
+	dist = 1000.0f;
+	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 0.0f,
+	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+	CHECK(hit == &eA, "zero-length overlapping ray hits");
+	CHECK(dist == 0.0f, "inside-start distance zero");
+
 	if (failures == 0) printf("PASS checkhitenemy\n");
 	return failures != 0;
 }

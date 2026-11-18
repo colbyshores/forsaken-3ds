@@ -17,7 +17,7 @@ CORE    := ../forsaken_core/src
 INCLUDE := -I$(CORE) $(shell pkg-config --cflags sdl2)
 CXXFLAGS := -g -Wall -Wextra $(INCLUDE) -std=gnu++17 -fno-exceptions -fno-rtti
 
-all: test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d
+all: test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d test_sincos test_clipmath
 
 test_secwalk: test_secwalk.cpp $(CORE)/ai/ailib.cpp
 	$(CXX) $(CXXFLAGS) -o $@ test_secwalk.cpp $(CORE)/ai/ailib.cpp -lm
@@ -47,7 +47,15 @@ test_new3d: test_new3d.cpp $(CORE)/math/new3d.cpp
 	$(CXX) $(CXXFLAGS) -o $@ test_new3d.cpp $(CORE)/math/new3d.cpp -lm
 	./test_new3d
 
-clean:
-	rm -f test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d
+test_sincos: test_sincos.cpp $(CORE)/math/new3d.cpp
+	$(CXX) $(CXXFLAGS) -o $@ test_sincos.cpp $(CORE)/math/new3d.cpp -lm
+	./test_sincos
 
-.PHONY: all clean test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d
+test_clipmath: test_clipmath.cpp $(CORE)/world/clipmath.h
+	$(CXX) $(CXXFLAGS) -o $@ test_clipmath.cpp -lm
+	./test_clipmath
+
+clean:
+	rm -f test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d test_sincos test_clipmath
+
+.PHONY: all clean test_secwalk test_checkhitenemy test_stereomemo test_modules test_quat test_sphere test_new3d test_sincos test_clipmath

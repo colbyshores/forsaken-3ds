@@ -110,6 +110,28 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 						goto SkipIt;
 				}
 
+				/* Squared-distance pre-reject (bullets): a ray of length
+				 * DirLength can only touch spheres within DirLength +
+				 * ColRadius of its origin, and ColRadius <= Radius +
+				 * WeaponRadius (Cos in [0,1] for Trojax/Transpulse,
+				 * equality for Sphere, unused for Point). Triangle
+				 * inequality, so this skips only provable misses — one
+				 * multiply-add chain instead of up to two sqrt-bearing
+				 * RaytoSphere2 + VectorLength per enemy. Guards keep the
+				 * old path for non-physical inputs. */
+				/* @vfp-exempt R3 — protected hit-set reach check; integerizing the radius changes which enemies are tested. measured pending hardware A/B. Verified 2026-11-12. */
+				{
+					float bdx = Enemy->Object.Pos.x - Pos->x;
+					float bdy = Enemy->Object.Pos.y - Pos->y;
+					float bdz = Enemy->Object.Pos.z - Pos->z;
+					if( WeaponRadius >= 0.0F && DirLength >= 0.0F )
+					{
+						float reach = DirLength + EnemyTypes[ Enemy->Type ].Radius + WeaponRadius;
+						if( ( ( bdx * bdx ) + ( bdy * bdy ) + ( bdz * bdz ) ) > ( reach * reach ) )
+							goto SkipIt;
+					}
+				}
+
 				switch( ColType )
 				{
 					case COLTYPE_Trojax:

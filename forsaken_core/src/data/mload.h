@@ -188,6 +188,8 @@ typedef struct LVLGROUP{
 	POLYANIM *polyanim[MAXMESHESPERGROUP];
 	u_int16_t	StartPosInThisGroup;
 	u_int32_t				AnimOncePerFrame;					// used for stuff that is displayed more than once in a single frame..
+	u_int8_t		color_clean;						// the meshes hold their baked colours: XLight1Group can skip restoring them
+	u_int8_t		color_clean_pad[3];
 }LVLGROUP;
 
 

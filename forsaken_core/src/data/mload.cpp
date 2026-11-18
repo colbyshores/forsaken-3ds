@@ -328,6 +328,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	for( group = 0; group < Mloadheader->num_groups; group++)
 	{
 		GroupTris[ group ] = 0;
+		Mloadheader->Group[group].color_clean = 0;	/* restore the colours on the first XLight1Group call */
 		/*	get the number of meshes in this group	*/
 		Mloadheader->Group[group].num_meshes = in.u16();
 

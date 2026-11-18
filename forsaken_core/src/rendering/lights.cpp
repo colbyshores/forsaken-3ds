@@ -230,6 +230,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	u_int32_t r,g,b,intWhiteOut;
 	POLYANIM * PolyAnim;
 	int i,e;
+	int		color_already_clean;	/* the group's colours were clean on entry */
 	u_int32_t * u_int32Pnt;
 	TANIMUV * TanimUV;
 	float	intensity;
@@ -243,6 +244,18 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 
 
 	CellSize = Mloadheader->CellSize;
+	/* Snapshot and clear the group's clean flag on entry: only a plain
+	 * restore in this call may set it again, so a mesh is never skipped on
+	 * the strength of a flag set earlier in the same call. The skip is only
+	 * sound when nothing writes the colours after the restore, which holds
+	 * when the vertex shader does the dynamic lighting; the CPU light loop
+	 * (no GPU_LIGHTING) adds to them every call. */
+#ifdef GPU_LIGHTING
+	color_already_clean = Mloadheader->Group[group].color_clean;
+#else
+	color_already_clean = 0;
+#endif
+	Mloadheader->Group[group].color_clean = 0;
 	mesh = Mloadheader->Group[group].num_meshes;
 	while( mesh--)
 	{
@@ -302,6 +315,12 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 
 			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+		/* Skip the colour pass when the previous call left the baked
+		 * colours in place and this one would only copy them again, as
+		 * for the second stereo eye of a frame. */
+		if( !( color_already_clean && !ShowPlaneRGB && WhiteOut == 0.0F &&
+		       GroupWaterInfo[group] == WATERSTATE_NOWATER ) )
+		{
 			if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
 			{
 				if( WhiteOut == 0.0F )
@@ -322,6 +341,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 							LVert++;
 							OrigLVert++;
 						}
+						Mloadheader->Group[group].color_clean = 1;
 					}
 
 				}
@@ -433,6 +453,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 				}
 				// ****************** End of Water Effect ******************************
 			}
+		}
 		}
 #ifdef GPU_LIGHTING
 		/* Skip the per-vertex CPU dynamic-light loop — the vertex shader

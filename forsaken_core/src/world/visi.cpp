@@ -15,6 +15,7 @@
 #include "data/mload.h"
 #include "game/camera.h"
 #include "world/visi.h"
+#include "world/clipmath.h"
 #include <float.h>
 #include "data/file.h"
 #include "game/triggers.h"
@@ -596,6 +597,42 @@ Transform2Viewport( CAMERA *cam, VISLIST *v, VERT *wpos, VECTOR *vpos )
 }
 
 
+/* Screen bounds of a portal that straddles the near plane: transform its
+ * vertices to clip space and let clipmath.h clip and bound the visible
+ * fragment (host-tested in tests/test_clipmath.cpp). Writes x/y into *e and
+ * leaves z to the caller, so depth order is unchanged. Returns 0 when the
+ * clipped polygon is empty or degenerate; the caller then falls back to the
+ * camera's whole window. */
+static int
+NearClipPortalExtent( VISLIST *v, PORTAL *p, EXTENT *e )
+{
+	float clip[ FILLCLIP_CAP * 4 ];
+	RENDERMATRIX *mp = &v->viewproj;
+	render_viewport_t *vp = v->viewport;
+	float minx, miny, maxx, maxy;
+	int n, i;
+	if ( (int)p->num_vertices_in_portal > FILLCLIP_CAP - 4 )
+		return 0;
+	n = (int)p->num_vertices_in_portal;
+	for ( i = 0; i < n; i++ )
+	{
+		float x = p->Verts[ i ].x, y = p->Verts[ i ].y, z = p->Verts[ i ].z;
+		clip[i*4+0] = mp->m[0][0]*x + mp->m[1][0]*y + mp->m[2][0]*z + mp->m[3][0];
+		clip[i*4+1] = mp->m[0][1]*x + mp->m[1][1]*y + mp->m[2][1]*z + mp->m[3][1];
+		clip[i*4+2] = mp->m[0][2]*x + mp->m[1][2]*y + mp->m[2][2]*z + mp->m[3][2];
+		clip[i*4+3] = mp->m[0][3]*x + mp->m[1][3]*y + mp->m[2][3]*z + mp->m[3][3];
+	}
+	if ( !fillclip_tight_bounds( clip, n,
+		(float)vp->X, (float)vp->Y, (float)vp->Width, (float)vp->Height,
+		vp->ScaleX, vp->ScaleY, &minx, &miny, &maxx, &maxy ) )
+		return 0;
+	e->min.x = minx;
+	e->min.y = miny;
+	e->max.x = maxx;
+	e->max.y = maxy;
+	return 1;
+}
+
 static int
 VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 {
@@ -651,7 +688,10 @@ VisiblePortalExtent( CAMERA *cam, VISLIST *v, PORTAL *p, EXTENT *e )
 	}
 	if ( clip_any & CLIP_FRONT )
 	{
-		*e = v->first_visible->extent; // portal clipped by front plane -> force extents fullscreen
+		/* Bound the visible fragment of a portal cut by the near plane;
+		 * if that fails, use the camera's whole window. */
+		if ( !NearClipPortalExtent( v, p, e ) )
+			*e = v->first_visible->extent;
 	}
 	return 1;
 }
