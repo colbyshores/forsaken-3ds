@@ -1,14 +1,31 @@
-
-/*==========================================================================
- *
- *
- *  File:       2dpolys.h
- *  Content:    2dpolys.h include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* 2dpolys.h -- FmPolys: camera-facing world sprites (explosions, smoke, trails)
+ *
+ * FmPolys[] is a fixed pool of MAXNUMOF2DPOLYS "face-me" sprites placed at a
+ * world position. Each frame of a sprite's FRAME_INFO is one or more bits, and
+ * each bit becomes one textured quad. The pool is per level: InitFmPoly (from
+ * InitScene) resets it. FindFreeFmPoly / KillUsedFmPoly move an entry between
+ * the free list and the used list (FirstFmPolyUsed, walked through Prev); the
+ * owner also links it into its texture page with
+ * AddFmPolyToTPage(GetTPage(*Frm_Info, 0)), which KillUsedFmPoly undoes, so
+ * Frm_Info must be valid when it is killed. FmPolyProcess runs once per frame:
+ * it plays each sprite's FM_* sequence (animate, move, fade, rotate, spawn
+ * trails) and kills sprites whose sequence has ended.
+ *
+ * Orientation: by default the quad faces the camera, rolled by Rot;
+ * FM_FLAG_RELATIVE treats DirVector / UpVector as a camera-relative
+ * orientation, and FM_FLAG_DIRCONST uses them as a fixed world orientation.
+ * FM_FLAG_MOVEOUT draws the sprite pulled toward the camera by up to
+ * EXPLO_DISTANCE (Pos itself is unchanged).
+ *
+ * Drawing follows polys.h: DisplayGroupClippedFmPolys per visible group,
+ * DisplayGroupUnclippedFmPolys for FM_FLAG_DONTCLIP sprites, both in batches
+ * of at most MAXFMPOLYVERTS verts with one texture group per quad, drawn with
+ * culling off; on 3DS a full textureGroups array is flushed mid-fill.
+ * TPAGEINFO (below) is the per-page list head shared by Polys, FmPolys and
+ * ScrPolys.
+ */
 
 /*===================================================================
 	Includes
@@ -98,7 +115,7 @@ constexpr int FM_GOALSPARKLE = 56; // Hacky goal Sparkle?
 ===================================================================*/
 constexpr int FM_FLAG_ZERO = 0; // Do Nothing
 constexpr int FM_FLAG_MOVEOUT = 1; // Move 2D Sprite toward Camera.
-constexpr int FM_FLAG_DIRCONST = 2; // Direction and Up Vector Constant.
+constexpr int FM_FLAG_DIRCONST = 2; // Use DirVector / UpVector as-is (not camera facing).
 constexpr int FM_FLAG_TWOSIDED = 4; // Double Sided Poly
 constexpr int FM_FLAG_DONTCLIP = 8; // Don't Clip
 constexpr int FM_FLAG_RELATIVE = 16; // Direction and Up Vector Relative to camera.

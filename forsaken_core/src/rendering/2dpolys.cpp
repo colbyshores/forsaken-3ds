@@ -1,7 +1,4 @@
-/*===================================================================
-*	2 d p o l y s . c
-*	All routines to do with 2d always face you polygons...
-===================================================================*/
+/* 2dpolys.cpp -- FmPoly camera-facing sprites: sequences and batches; see 2dpolys.h. */
 #include "game/main.h"
 #include <stdio.h>
 #include "math/new3d.h"
@@ -569,7 +566,7 @@ void FmPolyProcess( void )
 		   		break;
 
 		   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-		   	case FM_BLOODDRIBBLE:							// Blood Splat?
+		   	case FM_BLOODDRIBBLE:							// Blood Dribble?
 		   		FmPolys[i].Frame += ( framelag / 8.0F ); //6.0F;
 		   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 		   		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
@@ -1113,19 +1110,19 @@ void FmPolyProcess( void )
 				}
 				else
 				{
-					if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE1 )			// 0 - 3
+					if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE1 )			// stage 0
 					{
-			   			FmPolys[ i ].Rot -= ( ( 360.0F / NMEGEN_STAGE0_LEN ) * framelag ); // 1 Rot in 3 seconds
+			   			FmPolys[ i ].Rot -= ( ( 360.0F / NMEGEN_STAGE0_LEN ) * framelag ); // one turn over stage 0
 			   			FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
 						FmPolys[ i ].R = (u_int8_t) ( 172.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE1 ) * ( 172.0F / NMEGEN_STAGE0_LEN ) ) );
 						FmPolys[ i ].G = (u_int8_t) ( 49.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE1 ) * ( 49.0F / NMEGEN_STAGE0_LEN ) ) );
 					}
 					else
 					{
-			   			FmPolys[ i ].Rot -= ( ( 360.0F / ( NMEGEN_STAGE1_LEN + NMEGEN_STAGE2_LEN ) ) * framelag );	// 1 Rot in 2 Seconds
+			   			FmPolys[ i ].Rot -= ( ( 360.0F / ( NMEGEN_STAGE1_LEN + NMEGEN_STAGE2_LEN ) ) * framelag );	// one turn over stages 1-2
 			   			FmPolys[ i ].Rot = FMOD( FmPolys[ i ].Rot, 360.0F );
 
-						if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE2 )		// 3 - 4
+						if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE2 )		// stage 1
 						{
 							FmPolys[ i ].R = (u_int8_t) ( 255.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE2 ) * ( 83.0F / NMEGEN_STAGE1_LEN ) ) );
 							FmPolys[ i ].G = (u_int8_t) ( 255.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE2 ) * ( 206.0F / NMEGEN_STAGE1_LEN ) ) );
@@ -1134,7 +1131,7 @@ void FmPolyProcess( void )
 							FmPolys[ i ].xsize -= ( ( ( 6.0F * GLOBAL_SCALE ) / NMEGEN_STAGE1_LEN ) * framelag );
 							FmPolys[ i ].ysize = FmPolys[ i ].xsize;
 						}
-						else												// 4 - 5
+						else												// stage 2
 						{
 							FmPolys[ i ].xsize -= ( ( ( 10.0F * GLOBAL_SCALE ) / NMEGEN_STAGE2_LEN ) * framelag );
 							FmPolys[ i ].ysize = FmPolys[ i ].xsize;
@@ -1150,7 +1147,7 @@ void FmPolyProcess( void )
 				}
 				else
 				{
-					if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE1 )			// 0 - 3
+					if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE1 )			// stage 0
 					{
 						FmPolys[ i ].R = (u_int8_t) ( 172.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE1 ) * ( 172.0F / NMEGEN_STAGE0_LEN ) ) );
 						FmPolys[ i ].G = (u_int8_t) ( 172.0F - ( ( FmPolys[ i ].LifeCount - NMEGEN_STAGE1 ) * ( 172.0F / NMEGEN_STAGE0_LEN ) ) );
@@ -1160,14 +1157,14 @@ void FmPolyProcess( void )
 					}
 					else
 					{
-						if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE2 )		// 3 - 4
+						if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE2 )		// stage 1
 						{
 							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							FmPolys[ i ].xsize -= ( ( ( 6.0F * GLOBAL_SCALE ) / NMEGEN_STAGE1_LEN ) * framelag );
 							FmPolys[ i ].ysize = FmPolys[ i ].xsize;
 						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						}
-						else												// 4 - 5
+						else												// stage 2
 						{
 							FmPolys[ i ].xsize -= ( ( ( 8.0F * GLOBAL_SCALE ) / NMEGEN_STAGE2_LEN ) * framelag );
 							FmPolys[ i ].ysize = FmPolys[ i ].xsize;
@@ -1591,7 +1588,7 @@ void AddFmPolyToTPage( u_int16_t i, int16_t TPage )
 /*===================================================================
 	Procedure	:	Remove FmPoly From TPage Link List
 	Input		:	u_int16_t		FmPoly Index
-				:	u_int16_t		TPage to add to
+				:	u_int16_t		TPage to remove from
 	Output		:	Nothing
 ===================================================================*/
 void RemoveFmPolyFromTPage( u_int16_t i, int16_t TPage )
@@ -1665,12 +1662,12 @@ bool DisplayGroupUnclippedFmPolys(RENDEROBJECT *renderObject )
 }
 
 /*===================================================================
-	Procedure	:	Display All Faceme Polygons in specific group
+	Procedure	:	Fill one batch of a group's FmPolys
 	Input		:	u_int16_t						Group
 				:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current FmPoly
-	Output		:	True/False
+				:	int16_t	*					Current TPage List (in/out)
+				:	u_int16_t	*					Current FmPoly (in/out)
+	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
@@ -1709,7 +1706,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 	int				start_index = 0;
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 	TotalVerts = 0;
 
@@ -1750,7 +1747,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 	renderObject->numTextureGroups = 0;
 
 /*===================================================================
-		Lock Exec Buffer and get ready to fill in...
+		Lock the vertex and index buffers
 ===================================================================*/
 
 	if (!(FSLockVertexBuffer(renderObject, &lpBufStart)))
@@ -1768,7 +1765,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 	FmPolyVertPnt = (LPLVERTEX) lpBufStart;
 
 /*===================================================================
-		Fill in Exec Buffer ( Verts and Faces Simultaneously )
+		Pass 2: fill verts and indices, one texture group per quad
 ===================================================================*/
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
 	{
@@ -1887,7 +1884,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 									break;
 							}
 
-/*-------------- Errrrmmmmmmm ---------------*/
+/*-------------- MOVEOUT: draw pulled toward the camera ---------------*/
 							if( ( FmPolys[ i ].Flags & FM_FLAG_MOVEOUT ) )
 							{
 								renderObject->memoEpochPass = SMEMO_PASS_NO_REUSE;
@@ -1976,6 +1973,9 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 							StartVert += 4;
 
 #ifdef __3DS__
+							/* Mid-draw flush: textureGroups is full (one group per
+							 * quad), so draw what is filled and refill from the
+							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
@@ -2008,7 +2008,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 	}
 
 /*===================================================================
-		UnLock Exec Buffer and set data description
+		Unlock the buffers and return the resume point
 ===================================================================*/
 	if (!(FSUnlockVertexBuffer(renderObject)))
 	{
@@ -2028,11 +2028,11 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 }
 
 /*===================================================================
-	Procedure	:	Display All Faceme Polygons in specific group
+	Procedure	:	Fill one batch of FM_FLAG_DONTCLIP FmPolys
 	Input		:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current FmPoly
-	Output		:	True/False
+				:	int16_t	*					Current TPage List (in/out)
+				:	u_int16_t	*					Current FmPoly (in/out)
+	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextFmPoly )
 {
@@ -2071,7 +2071,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 	int				start_index = 0;
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 	TotalVerts = 0;
 
@@ -2112,7 +2112,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 	renderObject->numTextureGroups = 0;
 
 /*===================================================================
-		Lock Exec Buffer and get ready to fill in...
+		Lock the vertex and index buffers
 ===================================================================*/
 
 	if (!(FSLockVertexBuffer(renderObject, &lpBufStart)))
@@ -2130,7 +2130,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 	FmPolyVertPnt = (LPLVERTEX) lpBufStart;
 
 /*===================================================================
-		Fill in Exec Buffer ( Verts and Faces Simultaneously )
+		Pass 2: fill verts and indices, one texture group per quad
 ===================================================================*/
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
 	{
@@ -2249,7 +2249,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 									break;
 							}
 
-/*-------------- Errrrmmmmmmm ---------------*/
+/*-------------- MOVEOUT: draw pulled toward the camera ---------------*/
 							if( ( FmPolys[ i ].Flags & FM_FLAG_MOVEOUT ) )
 							{
 								renderObject->memoEpochPass = SMEMO_PASS_NO_REUSE;
@@ -2338,6 +2338,9 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 							StartVert += 4;
 
 #ifdef __3DS__
+							/* Mid-draw flush: textureGroups is full (one group per
+							 * quad), so draw what is filled and refill from the
+							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
@@ -2370,7 +2373,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 	}
 
 /*===================================================================
-		UnLock Exec Buffer and set data description
+		Unlock the buffers and return the resume point
 ===================================================================*/
 
 	if (!(FSUnlockVertexBuffer(renderObject)))
