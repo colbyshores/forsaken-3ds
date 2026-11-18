@@ -38,7 +38,6 @@
 #include "util/util.h"
 #include "util/timer.h"
 
-#define	SCATTER_TEST	0
 
 constexpr auto MISSILE_SPEED = ( MAXMOVESPEED * 1.6F ); // Ship Speed * 1.6
 
@@ -278,17 +277,9 @@ SECONDARYWEAPONATTRIB	SecondaryWeaponAttribs[ TOTALSECONDARYWEAPONS ] = {
 		0.0F,			// float	SpeedInc;			// how fast do I Accelerate
 		MISSILE_SPEED,	// float	Speed;				// how fast do I move
 		256.0F,			// float	Size;				// how big is my collide sphere
-#if SCATTER_TEST
-		3.0F,			// float	TurnSpeed			// how fase can I turn
-#else
 		2.0F,			// float	TurnSpeed			// how fase can I turn
-#endif
 		30,				// u_int16_t	FireDelay			// how fast can I fire
-#if SCATTER_TEST
-		360,			// u_int16_t	ViewCone			// View Cone ( Degrees )
-#else
 		180,			// u_int16_t	ViewCone			// View Cone ( Degrees )
-#endif
 		MODEL_Scatter,	// u_int16_t	ModelNum;			// if 3D model which one....
 		SEC_LIGHTSIZE,	// float	lightsize;			// how big is the light
 		255.0F,			// float	r;					// what color does it emit....
@@ -826,9 +817,6 @@ static int16_t	OnceOnlyFlag = 0;
 	VECTOR	recoil;
 
 
-#if SCATTER_TEST
-	int16_t	Count;
-#endif
 	RegenerateQuedMines();
 
 	if( WhoIAm == MAX_PLAYERS ) return;
@@ -1046,23 +1034,6 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.y = -1.0F;
 							DropVector.z = 0.0F;
 		
-#if SCATTER_TEST
-							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos = Ships[ WhoIAm ].Object.Pos;
-
-							for( Count = 0; Count < 8; Count++ )
-							{
-								Dir.x = (float) fast_sinf( D2R( ( 360.0F / 8.0F ) * Count ) );
-								Dir.y = (float) fast_cosf( D2R( ( 360.0F / 8.0F ) * Count ) );
-								Dir.z = 0.0F;
-								UpVector.x = 0.0F;
-								UpVector.y = 0.0F;
-								UpVector.z = -1.0F;
-								ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Dir, &Dir );
-								ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &UpVector, &UpVector );
-								InitOneSecBull( WhoIAm, Ships[WhoIAm].Object.Group, Pos, Dir, UpVector, DropVector, ++Ships[ WhoIAm ].SecBullIdCount, Ships[ WhoIAm ].Secondary, false );
-							}
-#else
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
 							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
 							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
@@ -1070,7 +1041,6 @@ static int16_t	OnceOnlyFlag = 0;
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
-#endif
 							break;
 	
 /*===================================================================
@@ -6328,9 +6298,6 @@ void FireSecondaryWeapons( u_int8_t Ship )
 	u_int16_t	ID;
 	int16_t	Toggle;
 	u_int16_t	i = (u_int16_t) -1;
-#if SCATTER_TEST
-	int16_t	Count;
-#endif
 
 	if( ( Ships[Ship].Object.Flags & SHIP_SecToggle ) ) Toggle = 1;
 	else Toggle = 0;
