@@ -152,7 +152,7 @@ tools/           build_matrix.sh, verify_identical.sh, perf/ (gates),
                  t3x tools), probe/ (memory-tier CIA), net_test/
 assets/          icons, banners, RSFs, level orderings, 1998 engine files
 scripts/         the game's Lua scripts (shipped in romfs)
-docs/            notes/, OPTIMIZATION-LOG.md, KEX decomp (ai_analysis/)
+docs/            notes/, OPTIMIZATION-LOG.md
 Configs/ Data/ Pilots/ Demos/ romfs/   game data (not in git)
 ```
 
