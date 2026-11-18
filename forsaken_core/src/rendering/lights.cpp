@@ -487,15 +487,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						glf	= XLightPnt->g; 
 						blf	= XLightPnt->b;
 
-						/* bjd curr driver = 0 use to be software mode
-						if(!render_info.CurrDriver ) // is it ramp mode..
-						{
-							rlf = ( rlf+glf+blf ) * 0.33333F;
-							glf = rlf;
-							blf = glf;
-						}
-						*/
-
 						if( XLightPnt->Type == SPOT_LIGHT )
 						{
 							Dirx = XLightPnt->Dir.x;
@@ -835,15 +826,6 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 						glf	= XLightPnt->g; 
 						blf	= XLightPnt->b;
 
-						/* bjd curr driver = 0 use to be software mode
-						if(!render_info.CurrDriver ) // is it ramp mode..
-						{
-							rlf = ( rlf+glf+blf ) * 0.33333F;
-							glf = rlf;
-							blf = glf;
-						}
-						*/
-
 						if( XLightPnt->Type == SPOT_LIGHT )
 						{
 							Dirx = XLightPnt->Dir.x;
@@ -1062,15 +1044,6 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 						rlf	= XLightPnt->r; 
 						glf	= XLightPnt->g; 
 						blf	= XLightPnt->b;
-
-						/* bjd curr driver = 0 use to be software mode
-						if(!render_info.CurrDriver ) // is it ramp mode..
-						{
-							rlf = ( rlf+glf+blf ) * 0.33333F;
-							glf = rlf;
-							blf = glf;
-						}
-						*/
 
 						if( XLightPnt->Type == SPOT_LIGHT )
 						{

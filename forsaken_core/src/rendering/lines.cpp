@@ -143,11 +143,8 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 		{
 			if( Lines[ i ].Group == Group )
 			{
-				/* bjd curr driver = 0 use to be software mode */
-				{
-						color = RGBA_MAKE( Lines[ i ].StartCol.R, Lines[ i ].StartCol.G,
-										   Lines[ i ].StartCol.B, Lines[ i ].StartTrans );
-				}
+				color = RGBA_MAKE( Lines[ i ].StartCol.R, Lines[ i ].StartCol.G,
+						      Lines[ i ].StartCol.B, Lines[ i ].StartTrans );
 	
 				Vert_Ptr->x = Lines[ i ].StartPos.x;
 				Vert_Ptr->y = Lines[ i ].StartPos.y;
@@ -157,11 +154,8 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 				Vert_Ptr->color = color;
 				Vert_Ptr++;
 	
-				/* bjd curr driver = 0 use to be software mode */
-				{
-						color = RGBA_MAKE( Lines[ i ].EndCol.R, Lines[ i ].EndCol.G,
-										   Lines[ i ].EndCol.B, Lines[ i ].EndTrans );
-				}
+				color = RGBA_MAKE( Lines[ i ].EndCol.R, Lines[ i ].EndCol.G,
+						      Lines[ i ].EndCol.B, Lines[ i ].EndTrans );
 	
 				Vert_Ptr->x = Lines[ i ].EndPos.x;
 				Vert_Ptr->y = Lines[ i ].EndPos.y;

@@ -151,9 +151,7 @@ void InitScrPoly( u_int16_t i )
 		ScrPolys[i].NextInTPage = (u_int16_t) -1;
 		ScrPolys[i].PrevInTPage = (u_int16_t) -1;
 
-		// do not clear these they are set by caller
-		//ScrPolys[i].Next = (u_int16_t) -1;
-		//ScrPolys[i].Prev = (u_int16_t) -1;
+		// Next and Prev are left alone: the caller has already linked the poly
 
 		ScrPolys[i].x1 = 0.0F;
 		ScrPolys[i].y1 = 0.0F;
