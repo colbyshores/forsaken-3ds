@@ -141,7 +141,7 @@ void InitScrPoly( u_int16_t i )
 		ScrPolys[i].Frame = 0.0F;
 		ScrPolys[i].FrameRate = 1.0F;
 		ScrPolys[i].Frm_Info = NULL;
-		ScrPolys[i].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[i].SeqNum = ScrSeq::Nothing;
 		ScrPolys[i].Xscale = 1.0F;
 		ScrPolys[i].Yscale = 1.0F;
 
@@ -343,7 +343,7 @@ void ScreenPolyProcess( void )
 			{
 				switch( ScrPolys[i].SeqNum )
 				{
-				   	case SCRSEQ_Anim:								// Explosion?
+				   	case ScrSeq::Anim:								// Explosion?
 				   		ScrPolys[i].Frame += ( framelag / ScrPolys[i].FrameRate );
 		
 				   		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
@@ -353,7 +353,7 @@ void ScreenPolyProcess( void )
 				   		}
 				   		break;
 	
-				   	case SCRSEQ_Fade:								// Fade
+				   	case ScrSeq::Fade:								// Fade
 						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 						Speed = ( framelag * 20.0F );
 						ScrPolys[i].LifeCount -= Speed;
@@ -382,7 +382,7 @@ void ScreenPolyProcess( void )
 							ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
 						}
 						break;
-				   	case SCRSEQ_FadeUp:								// Fade
+				   	case ScrSeq::FadeUp:								// Fade
 						ScrPolys[i].LifeCount += framelag / ( 60.0F * 10.0F );
 						if( ScrPolys[i].LifeCount >= 1.0F )
 						{
@@ -394,7 +394,7 @@ void ScreenPolyProcess( void )
 						ScrPolys[i].B = (u_int8_t) ((float)ScrPolys[i].FadeBlue * ScrPolys[i].LifeCount);
 						ScrPolys[i].Trans = (u_int8_t) ((float)ScrPolys[i].FadeTrans * ScrPolys[i].LifeCount);
 						break;
-				   	case SCRSEQ_Thermo:								// Explosion?
+				   	case ScrSeq::Thermo:								// Explosion?
 						if( CheckDecreaseTemperature() )
 						{
 							if( WantedThermalTemp > ThermalMinimum )
@@ -460,7 +460,7 @@ void ScreenPolyProcess( void )
 				   		break;
 
 				   	/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-				   	case SCRSEQ_Logo:								// Logos
+				   	case ScrSeq::Logo:								// Logos
 						ScrPolys[i].LifeCount += framelag;
 
 						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
@@ -519,7 +519,7 @@ void ScreenPolyProcess( void )
 						ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
 						break;
 						
-					case SCRSEQ_Nothing:
+					case ScrSeq::Nothing:
 					default:
 				   		break;
 				}
@@ -652,7 +652,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 								ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 								ScrPolys[ i ].FrameRate = 1.0F;
-								ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+								ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 								ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 								ScrPolys[ i ].Xscale = 0.3125F;
 								ScrPolys[ i ].Yscale = 0.3125F;
@@ -672,7 +672,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 								ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 								ScrPolys[ i ].FrameRate = 1.0F;
-								ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+								ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 								ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 								ScrPolys[ i ].Xscale = 0.234F;
 								ScrPolys[ i ].Yscale = 0.234F;
@@ -692,7 +692,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 								ScrPolys[ i ].Frame = 1.0F;					// Animation Frame
 								ScrPolys[ i ].FrameRate = 1.0F;
-								ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+								ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 								ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 								ScrPolys[ i ].Xscale = 0.50F;
 								ScrPolys[ i ].Yscale = 0.5F;
@@ -712,7 +712,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 								ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 								ScrPolys[ i ].FrameRate = 1.0F;
-								ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+								ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 								ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 								ScrPolys[ i ].Xscale = 1.167F;
 								ScrPolys[ i ].Yscale = 1.167F;
@@ -732,7 +732,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 								ScrPolys[ i ].Frame = 2.0F;					// Animation Frame
 								ScrPolys[ i ].FrameRate = 1.0F;
-								ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+								ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 								ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 								ScrPolys[ i ].Xscale = 0.75F;
 								ScrPolys[ i ].Yscale = 0.75F;
@@ -752,7 +752,7 @@ void DoLensflareEffect( void )
 								ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 								ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 								ScrPolys[ i ].FrameRate = 1.0F;
-								ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+								ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 								ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 								ScrPolys[ i ].Xscale = 0.75F;
 								ScrPolys[ i ].Yscale = 0.75F;
@@ -987,7 +987,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 				ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 				ScrPolys[ i ].FrameRate = 1.0F;
-				ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 				ScrPolys[ i ].Xscale = 0.3125F;
 				ScrPolys[ i ].Yscale = 0.3125F;
@@ -1007,7 +1007,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 				ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 				ScrPolys[ i ].FrameRate = 1.0F;
-				ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 				ScrPolys[ i ].Xscale = 0.234F;
 				ScrPolys[ i ].Yscale = 0.234F;
@@ -1027,7 +1027,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 				ScrPolys[ i ].Frame = 1.0F;					// Animation Frame
 				ScrPolys[ i ].FrameRate = 1.0F;
-				ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 				ScrPolys[ i ].Xscale = 0.50F;
 				ScrPolys[ i ].Yscale = 0.5F;
@@ -1047,7 +1047,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 				ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 				ScrPolys[ i ].FrameRate = 1.0F;
-				ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 				ScrPolys[ i ].Xscale = 1.167F;
 				ScrPolys[ i ].Yscale = 1.167F;
@@ -1067,7 +1067,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 				ScrPolys[ i ].Frame = 2.0F;					// Animation Frame
 				ScrPolys[ i ].FrameRate = 1.0F;
-				ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 				ScrPolys[ i ].Xscale = 0.75F;
 				ScrPolys[ i ].Yscale = 0.75F;
@@ -1087,7 +1087,7 @@ void SecBullLensflare( u_int16_t i )
 				ScrPolys[ i ].Trans = ( Int );				// Amount of transparency
 				ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 				ScrPolys[ i ].FrameRate = 1.0F;
-				ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ i ].Frm_Info = &LensFlare_Header;	// Offset Info
 				ScrPolys[ i ].Xscale = 0.75F;
 				ScrPolys[ i ].Yscale = 0.75F;
@@ -1414,7 +1414,7 @@ void CreateDigit( u_int16_t * DigitArray, float XPos, float YPos )
 			ScrPolys[ i ].Trans = 64;					// Amount of transparency
 			ScrPolys[ i ].Frame = (float) Count;		// Animation Frame
 			ScrPolys[ i ].FrameRate = 0.0F;
-			ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+			ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 			ScrPolys[ i ].Frm_Info = &Numbers_Header;	// Offset Info
 			ScrPolys[ i ].Xscale = 0.125F;
 			ScrPolys[ i ].Yscale = 0.125F;
@@ -1451,7 +1451,7 @@ void CreateSeperatorDigit( u_int16_t * DigitArray, float XPos, float YPos )
 		ScrPolys[ i ].Trans = 64;					// Amount of transparency
 		ScrPolys[ i ].Frame = 7.0F;					// Animation Frame
 		ScrPolys[ i ].FrameRate = 0.0F;
-		ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 		ScrPolys[ i ].Frm_Info = &Numbers_Header;	// Offset Info
 		ScrPolys[ i ].Xscale = 0.125F;
 		ScrPolys[ i ].Yscale = 0.125F;
@@ -1554,7 +1554,7 @@ void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u
 		ScrPolys[ i ].Trans = Trans;				// Amount of transparency
 		ScrPolys[ i ].Frame = (float) Frame;		// Animation Frame
 		ScrPolys[ i ].FrameRate = 0.0F;
-		ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 
 		if(Frame >= 63 && Frame <= 72) // don't scale the cross hair or trojax power
 		{
@@ -1666,7 +1666,7 @@ void AddScreenPolyTextScale( u_int16_t Frame, float XPos, float YPos, float XSca
 		ScrPolys[ i ].Trans = Trans;				// Amount of transparency
 		ScrPolys[ i ].Frame = (float) Frame;		// Animation Frame
 		ScrPolys[ i ].FrameRate = 0.0F;
-		ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 		ScrPolys[ i ].Xscale = XScale*(FontWidth/8.0F);
 		ScrPolys[ i ].Yscale = YScale*(FontHeight/8.0F);
 
@@ -1723,7 +1723,7 @@ void ShowScreenMultiples( void )
 				ScrPolys[ i ].Trans = 255;					// Amount of transparency
 				ScrPolys[ i ].Frame = 0.0F;
 				ScrPolys[ i ].FrameRate = 0.0F;
-				ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ i ].Frm_Info = &Orb_Header;		// Offset Info
 				ScrPolys[ i ].Xscale = 1.0F;
 				ScrPolys[ i ].Yscale = 1.0F;
@@ -1741,7 +1741,7 @@ void ShowScreenMultiples( void )
 				:	u_int8_t	Trans
 	Output		:	Nothing
 ===================================================================*/
-void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans, u_int16_t *ScreenPolyStore, int16_t SeqNum )
+void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans, u_int16_t *ScreenPolyStore, ScrSeq SeqNum )
 {
 	u_int16_t	i;
 
@@ -1754,7 +1754,7 @@ void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Tran
 		else
 			ScrPolys[ i ].Flags = SCRFLAG_UseCoords;
 
-		if( SeqNum != SCRSEQ_FadeUp ) 
+		if( SeqNum != ScrSeq::FadeUp ) 
 		{
 			ScrPolys[ i ].LifeCount = 255.0F;
 			ScrPolys[ i ].R = Red;						// R Colour
@@ -1788,7 +1788,7 @@ void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Tran
 			else
 				ScrPolys[ i ].Flags = SCRFLAG_UseCoords;
 
-			if( SeqNum != SCRSEQ_FadeUp ) 
+			if( SeqNum != ScrSeq::FadeUp ) 
 			{
 				ScrPolys[ i ].LifeCount = 255.0F;
 				ScrPolys[ i ].R = Red;						// R Colour
@@ -1882,7 +1882,7 @@ void InitThermo( void )
 			ScrPolys[ i ].FadeTrans = (float) 255.0F;
 			ScrPolys[ i ].Frame = 0.0F;
 			ScrPolys[ i ].FrameRate = 4.0F;
-			ScrPolys[ i ].SeqNum = SCRSEQ_Thermo;
+			ScrPolys[ i ].SeqNum = ScrSeq::Thermo;
 			ScrPolys[ i ].Frm_Info = &Thermo_Header; // Offset Info
 			ScrPolys[ i ].Xscale = 1.0F;
 			ScrPolys[ i ].Yscale = 1.0F;
@@ -3301,7 +3301,7 @@ void ShowFlagOnShip( u_int16_t Ship )
 		ScrPolys[ i ].Trans = 255;
 		ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 		ScrPolys[ i ].FrameRate = 1.0F;
-		ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 		ScrPolys[ i ].Frm_Info = &Flag_Header;	// Offset Info
 		ScrPolys[ i ].Xscale = Xsize;
 		ScrPolys[ i ].Yscale = Ysize;
@@ -3381,7 +3381,7 @@ void ShowBountyOnShip( u_int16_t Ship )
 		ScrPolys[ i ].Trans = 255;
 		ScrPolys[ i ].Frame = 1.0F;					// Animation Frame
 		ScrPolys[ i ].FrameRate = 1.0F;
-		ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 		ScrPolys[ i ].Frm_Info = &Flag_Header;	// Offset Info
 		ScrPolys[ i ].Xscale = Xsize;
 		ScrPolys[ i ].Yscale = Ysize;
@@ -3509,7 +3509,7 @@ void ShowCTFFlagsOnShip( u_int16_t Ship )
 					ScrPolys[ i ].Trans = 255;
 					ScrPolys[ i ].Frame = (float) Count;					// Animation Frame
 					ScrPolys[ i ].FrameRate = 1.0F;
-					ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+					ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 					ScrPolys[ i ].Frm_Info = &Flags_Header;	// Offset Info
 					ScrPolys[ i ].Xscale = Xsize;
 					ScrPolys[ i ].Yscale = Ysize;
@@ -3547,7 +3547,7 @@ void ShowFlag( u_int16_t Ship )
 		ScrPolys[ i ].Trans = 255;
 		ScrPolys[ i ].Frame = 0.0F;					// Animation Frame
 		ScrPolys[ i ].FrameRate = 1.0F;
-		ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 		ScrPolys[ i ].Frm_Info = &Flag_Header;	// Offset Info
 		ScrPolys[ i ].Xscale = 0.8F;
 		ScrPolys[ i ].Yscale = 0.8F;
@@ -3580,7 +3580,7 @@ void ShowBounty( u_int16_t Ship )
 		ScrPolys[ i ].Trans = 255;
 		ScrPolys[ i ].Frame = 1.0F;					// Animation Frame
 		ScrPolys[ i ].FrameRate = 1.0F;
-		ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+		ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 		ScrPolys[ i ].Frm_Info = &Flag_Header;	// Offset Info
 		ScrPolys[ i ].Xscale = 0.8F;
 		ScrPolys[ i ].Yscale = 0.8F;
@@ -3640,7 +3640,7 @@ void ShowCTFFlags( u_int16_t Ship )
 					ScrPolys[ i ].Trans = 255;
 					ScrPolys[ i ].Frame = (float) Count;					// Animation Frame
 					ScrPolys[ i ].FrameRate = 1.0F;
-					ScrPolys[ i ].SeqNum = SCRSEQ_Nothing;
+					ScrPolys[ i ].SeqNum = ScrSeq::Nothing;
 					ScrPolys[ i ].Frm_Info = &Flags_Header;	// Offset Info
 					ScrPolys[ i ].Xscale = 0.5F;
 					ScrPolys[ i ].Yscale = 0.5F;

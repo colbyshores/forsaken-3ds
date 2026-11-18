@@ -5076,7 +5076,7 @@ void TargetingComputer( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 			ScrPolys[ HitBox ].G = 255;
 			ScrPolys[ HitBox ].B = 255;
 			ScrPolys[ HitBox ].Trans = 255;
-			ScrPolys[ HitBox ].SeqNum = SCRSEQ_Nothing;
+			ScrPolys[ HitBox ].SeqNum = ScrSeq::Nothing;
 			ScrPolys[ HitBox ].Frame = 4.0F;
 			ScrPolys[ HitBox ].Frm_Info = &Target_Header;
 			ScrPolys[ HitBox ].Xscale = 1.0F;
@@ -5127,7 +5127,7 @@ void TargetingComputer( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 				ScrPolys[ HitBox ].G = 255;
 				ScrPolys[ HitBox ].B = 255;
 				ScrPolys[ HitBox ].Trans = 255;
-				ScrPolys[ HitBox ].SeqNum = SCRSEQ_Nothing;
+				ScrPolys[ HitBox ].SeqNum = ScrSeq::Nothing;
 				ScrPolys[ HitBox ].Frame = 4.0F;
 				ScrPolys[ HitBox ].Frm_Info = &Target_Header;
 				ScrPolys[ HitBox ].Xscale = 1.0F;
@@ -5216,7 +5216,7 @@ void HeatseakerTarget( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 					ScrPolys[ TargScrPolys[ Count ] ].R = 255;
 					ScrPolys[ TargScrPolys[ Count ] ].G = 255;
 					ScrPolys[ TargScrPolys[ Count ] ].B = 255;
-					ScrPolys[ TargScrPolys[ Count ] ].SeqNum = SCRSEQ_Nothing;
+					ScrPolys[ TargScrPolys[ Count ] ].SeqNum = ScrSeq::Nothing;
 					ScrPolys[ TargScrPolys[ Count ] ].Trans = 255;
 					ScrPolys[ TargScrPolys[ Count ] ].Frame = (float) Count;
 					ScrPolys[ TargScrPolys[ Count ] ].Frm_Info = &Target_Header;
@@ -5309,7 +5309,7 @@ void HeatseakerTarget( u_int16_t ClosestShip, u_int16_t ClosestEnemy )
 						ScrPolys[ TargScrPolys[ Count ] ].R = 255;
 						ScrPolys[ TargScrPolys[ Count ] ].G = 255;
 						ScrPolys[ TargScrPolys[ Count ] ].B = 255;
-						ScrPolys[ TargScrPolys[ Count ] ].SeqNum = SCRSEQ_Nothing;
+						ScrPolys[ TargScrPolys[ Count ] ].SeqNum = ScrSeq::Nothing;
 						ScrPolys[ TargScrPolys[ Count ] ].Trans = 255;
 						ScrPolys[ TargScrPolys[ Count ] ].Frame = (float) Count;
 						ScrPolys[ TargScrPolys[ Count ] ].Frm_Info = &Target_Header;

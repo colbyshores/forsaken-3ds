@@ -1584,7 +1584,7 @@ int16_t DoDamage( bool OverrideInvul )
 			{
 				if( Ships[WhoIAm].Object.Mode == NORMAL_MODE )
 				{
-					MakeScreenFlash( 208, 0, 0, 128, &FlashScreenPoly, SCRSEQ_Fade );
+					MakeScreenFlash( 208, 0, 0, 128, &FlashScreenPoly, ScrSeq::Fade );
 
 					// play pain cry once in a while ( will be overwritten if shield / hull critical )
 					// no speech will be played on death

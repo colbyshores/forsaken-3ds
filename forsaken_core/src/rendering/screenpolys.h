@@ -13,7 +13,7 @@
  * texture page and resets the entry to defaults. SCRTYPE_LastAFrame polys are
  * killed by the next ScreenPolyProcess, so callers re-add them every frame;
  * SCRTYPE_Normal polys persist until killed and are animated by their
- * SCRSEQ_* sequence in ScreenPolyProcess.
+ * ScrSeq sequence in ScreenPolyProcess.
  *
  * A quad is placed at Pos plus its FRAME_INFO bit offsets times Xscale /
  * Yscale (SCRFLAG_Scale also scales by viewport width / 320), or at x1,y1 -
@@ -80,12 +80,15 @@ constexpr int SCRFLAG_BottomHUD = 32; /* [3DS] route this poly to the mono botto
 /*===================================================================
 	Process Sequences
 ===================================================================*/
-constexpr int SCRSEQ_Nothing = 0;
-constexpr int SCRSEQ_Anim = 1;
-constexpr int SCRSEQ_Fade = 2;
-constexpr int SCRSEQ_Thermo = 3;
-constexpr int SCRSEQ_Logo = 4;
-constexpr int SCRSEQ_FadeUp = 5;
+enum class ScrSeq : int16_t
+{
+	Nothing,
+	Anim,
+	Fade,
+	Thermo,
+	Logo,
+	FadeUp,
+};
 
 /*===================================================================
 	Structures
@@ -119,7 +122,7 @@ typedef struct SCRPOLY {
 	float			Frame;				// Animation Frame
 	float			FrameRate;			// FrameRate
 	FRAME_INFO	**	Frm_Info;			// Offset Info
-	int16_t			SeqNum;				// SCRSEQ_* process sequence
+	ScrSeq			SeqNum;				// process sequence
 	float			LifeCount;			// LifeCount
 	float			FadeRed;			// Red
 	float			FadeGreen;			// Green
@@ -169,7 +172,7 @@ void ClearCountdownBuffers( void );
 void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
 void AddScreenPolyTextScale( u_int16_t Frame, float XPos, float YPos, float XScale, float YScale, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans );
 void ShowScreenMultiples( void );
-void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans, u_int16_t *ScreenPolyStore, int16_t SeqNum );
+void MakeScreenFlash( u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans, u_int16_t *ScreenPolyStore, ScrSeq SeqNum );
 void InitThermo( void );
 void KillThermo( void );
 void ResetCountDownBombTag( float Amount );
