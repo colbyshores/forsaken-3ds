@@ -22,9 +22,6 @@
 *									*
 ************************************************************************/
 
-//vec3 Sphere::normalAt(vec3& p)
-//{ return (p - pos) / radius; }
-
 /********************************************************
 *							*
 * This function determines if a float is small enough	*

@@ -154,7 +154,6 @@ void MatrixMultiply( MATRIX * m0, MATRIX * m1, MATRIX * m0m1 )
 // this is not a general purpose m*v function
 // it's meant to only be used in certain places
 
-//#ifndef USEASM
 void ApplyMatrix( MATRIX * m, VECTOR * v0, VECTOR * v1 )
 {
 	float x = m->_41;

@@ -2378,10 +2378,6 @@ void ProcessLoopingSfx( void )
 	 * every-frame, so audibility timing is unchanged. */
 	maint_tick = ((maint_frame++ & 3UL) == 0UL);
 
-	// print debug info
-	// only looping sound i know of is the bike engines
-	//PrintLoopingSfxDebug();
-
 	// process all looping sfx
 	for ( i = 0; i < MAX_LOOPING_SFX; i++ )
 	{

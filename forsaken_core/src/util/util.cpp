@@ -201,8 +201,6 @@ void DebugState( const char * str )
 // Creates a message box and returns ok/cancel press
 //
 
-// temporarily jumps to desktop mode
-//#include "render.h"
 int Msg( const char * msg, ... )
 {
 
