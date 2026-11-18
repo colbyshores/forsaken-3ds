@@ -15757,6 +15757,7 @@ void MenuProcess()
 
 			case MENUSTATE_Select:
 				ProcessSelect( Key );
+				[[fallthrough]];	// the auto-select step runs here too
 
 			default:
 				MenuItemSelect(CurrentMenuItem);

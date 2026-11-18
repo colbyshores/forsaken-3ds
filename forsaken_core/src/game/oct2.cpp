@@ -1971,9 +1971,9 @@ bool RenderScene( void )
   // the main menu screen
   case STATUS_Title:
 	DebugState("STATUS_Title\n");
+	[[fallthrough]];
 
-
-  // ??
+  // the title screen runs the between-levels body too
   case STATUS_BetweenLevels:
 	if(MyGameStatus != STATUS_Title)
 		DebugState("STATUS_BetweenLevels\n");
