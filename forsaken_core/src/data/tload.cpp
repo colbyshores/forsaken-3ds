@@ -33,7 +33,7 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 	Tloadheader->num_texture_files = 0;
 	for( i = 0 ; i < MAXTPAGESPERTLOAD ; i++ )
 	{
-		Tloadheader->lpTexture[i]     = NULL;
+		Tloadheader->TexHandle[i]     = NULL;
 
 		Tloadheader->MipMap[i]		  = false;
 		Tloadheader->PlaceHolder[i]	  = false;
@@ -93,35 +93,35 @@ bool Tload( TLOADHEADER * Tloadheader  )
    mip chain, 1 for the base level only. */
 bool TloadTextureSurf( TLOADHEADER * Tloadheader , int n)
 {
-	TEXTURE_HANDLE lpSrcTexture = NULL;
-	release_texture(Tloadheader->lpTexture[n]);
-	Tloadheader->lpTexture[n] = NULL;
+	TEXTURE_HANDLE newTexture = NULL;
+	release_texture(Tloadheader->TexHandle[n]);
+	Tloadheader->TexHandle[n] = NULL;
 	if ( !Tloadheader->PlaceHolder[ n ] )
 	{
 		if( Tloadheader->MipMap[n] )
 		{
 			FSCreateTexture(
-				&lpSrcTexture, &Tloadheader->ImageFile[n][0],
+				&newTexture, &Tloadheader->ImageFile[n][0],
 				&Tloadheader->Xsize[n], &Tloadheader->Ysize[n],
 				0, &Tloadheader->ColourKey[n]);
 		}
 		else
 		{
 			FSCreateTexture(
-				&lpSrcTexture, &Tloadheader->ImageFile[n][0],
+				&newTexture, &Tloadheader->ImageFile[n][0],
 				&Tloadheader->Xsize[n], &Tloadheader->Ysize[n],
 				1, &Tloadheader->ColourKey[n]);
 		}
 	}
-	Tloadheader->lpTexture[n] = lpSrcTexture;
-	lpSrcTexture = NULL;
+	Tloadheader->TexHandle[n] = newTexture;
+	newTexture = NULL;
 
 	return true;
 }
 
 /* Load the file named in PlaceHolderFile[n] into placeholder page n:
    create the texture the first time, afterwards reload it in place so
-   everything that holds lpTexture[n] sees the new image. */
+   everything that holds TexHandle[n] sees the new image. */
 bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n )
 {
 	// create only one mipmap level (original texture only)
@@ -136,14 +136,14 @@ bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n )
 		numMips = 0;
 
 	// the first load creates the texture; update_texture_from_file only replaces an existing one
-	if(!Tloadheader->lpTexture[n])
+	if(!Tloadheader->TexHandle[n])
 		FSCreateTexture(
-			&Tloadheader->lpTexture[n], &Tloadheader->PlaceHolderFile[n][0],
+			&Tloadheader->TexHandle[n], &Tloadheader->PlaceHolderFile[n][0],
 			&Tloadheader->Xsize[n], &Tloadheader->Ysize[n],
 			numMips, &Tloadheader->ColourKey[n]);
 	else
 		update_texture_from_file(
-			Tloadheader->lpTexture[n], &Tloadheader->PlaceHolderFile[n][0],
+			Tloadheader->TexHandle[n], &Tloadheader->PlaceHolderFile[n][0],
 			&Tloadheader->Xsize[n], &Tloadheader->Ysize[n],
 			numMips, &Tloadheader->ColourKey[n]);
 
@@ -154,8 +154,8 @@ bool TloadReloadPlaceHolder( TLOADHEADER *Tloadheader, int16_t n )
 void
 TloadReleaseTexture(TLOADHEADER * Tloadheader, int n)
 {
-	release_texture(Tloadheader->lpTexture[n]);
-	Tloadheader->lpTexture[n] = NULL;
+	release_texture(Tloadheader->TexHandle[n]);
+	Tloadheader->TexHandle[n] = NULL;
 	if ( Tloadheader->PlaceHolder[ n ] )
 	{
 		free( Tloadheader->PlaceHolderFile[ n ] );

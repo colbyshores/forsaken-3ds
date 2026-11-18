@@ -2882,9 +2882,9 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 ===================================================================*/
 bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 {
-    LVERTEX	*lpPointer = NULL;
-	LVERTEX	*lpLVERTEX;
-    LVERTEX	*lpLVERTEX2;
+    LVERTEX	*VertBase = NULL;
+	LVERTEX	*LVert;
+    LVERTEX	*OrigLVert;
 	int		group;
 	int		mesh;
 	int		vert;
@@ -2899,21 +2899,21 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 		{
 			/*	lock the vertex buffer	*/
 
-			if (!(FSLockVertexBuffer(&MXAloadheader->Group[group].renderObject[mesh], &lpPointer)))
+			if (!(FSLockVertexBuffer(&MXAloadheader->Group[group].renderObject[mesh], &VertBase)))
 			{
 				return false;
 			}
 
-			lpLVERTEX2 = MXAloadheader->Group[group].originalVerts[mesh];
+			OrigLVert = MXAloadheader->Group[group].originalVerts[mesh];
 			
-			lpLVERTEX = lpPointer;
+			LVert = VertBase;
 			vert = MXAloadheader->Group[group].num_verts_per_mesh[mesh];
 			while( vert --)
 			{
-				lpLVERTEX->color = lpLVERTEX2->color;
-				lpLVERTEX->color |= 0xFF000000;
-				lpLVERTEX++;		
-				lpLVERTEX2++;		
+				LVert->color = OrigLVert->color;
+				LVert->color |= 0xFF000000;
+				LVert++;		
+				OrigLVert++;		
 			}
 			/*	unlock the vertex buffer	*/
 			if (!(FSUnlockVertexBuffer(&MXAloadheader->Group[group].renderObject[mesh])))
@@ -5575,7 +5575,7 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t mesh;
-	LVERTEX	*lpLVERTEX = NULL;
+	LVERTEX	*LVert = NULL;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )
@@ -5586,23 +5586,23 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 			{
 				/*	lock the vertex buffer	*/
 
-				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
+				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &LVert)))
 				{
 					return false;
 				}
 
 				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_mesh[mesh] ; vert ++ )
 				{
-					ApplyMatrix( Mat , (VECTOR *) lpLVERTEX,  &Temp);
+					ApplyMatrix( Mat , (VECTOR *) LVert,  &Temp);
 
 					NormaliseVector( &Temp );
 
 					u = (0.25f + (-0.25f * Temp.x) );
 					v = (0.5f + (-0.5f * Temp.y) );
 
-					lpLVERTEX->tu = u;//+(Pos->x*0.001F)+(Pos->z*0.001F);
-					lpLVERTEX->tv = v;//+(Pos->y*0.001F);
-					lpLVERTEX++;
+					LVert->tu = u;//+(Pos->x*0.001F)+(Pos->z*0.001F);
+					LVert->tv = v;//+(Pos->y*0.001F);
+					LVert++;
 				}
 				/*	unlock the vertex buffer	*/
 				if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))

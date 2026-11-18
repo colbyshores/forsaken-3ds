@@ -185,9 +185,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	float	distance;
 	int		mesh;
 	int		vert;
-    LVERTEX	*lpPointer = NULL;
-	LVERTEX	*lpLVERTEX = NULL;
-	LVERTEX	*lpLVERTEX2 = NULL;
+    LVERTEX	*VertBase = NULL;
+	LVERTEX	*LVert = NULL;
+	LVERTEX	*OrigLVert = NULL;
 	COLOR col;
 	VERTEXCELL * VertexCellPnt;
 	u_int16_t * VertexIndexPnt;
@@ -246,7 +246,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	mesh = Mloadheader->Group[group].num_meshes;
 	while( mesh--)
 	{
-		if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpPointer)))
+		if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &VertBase)))
 		{
 			return false;
 		}	
@@ -280,11 +280,11 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					for( e = 0 ; e < PolyAnim->vertices ; e++ )
 					{
 
-						lpLVERTEX = lpPointer+ *u_int32Pnt++;
+						LVert = VertBase+ *u_int32Pnt++;
 						TanimUV = PolyAnim->UVs;
 						TanimUV += e + (PolyAnim->vertices * PolyAnim->newframe);
-						memcpy(&lpLVERTEX->tu, &TanimUV->u, 4);
-						memcpy(&lpLVERTEX->tv, &TanimUV->v, 4);
+						memcpy(&LVert->tu, &TanimUV->u, 4);
+						memcpy(&LVert->tv, &TanimUV->v, 4);
 					}
 
 					PolyAnim->currentframe = PolyAnim->newframe;
@@ -295,9 +295,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		
 		
 		
-		lpLVERTEX = lpPointer;
+		LVert = VertBase;
 		{
-			lpLVERTEX2 = Mloadheader->Group[group].originalVerts[mesh];
+			OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
 			
 			vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 			
@@ -310,17 +310,17 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					{
 						while( vert --)
 						{
-							lpLVERTEX++;		
-							lpLVERTEX2++;		
+							LVert++;		
+							OrigLVert++;		
 						}
 					}
 					else
 					{
 						while( vert --)
 						{
-							lpLVERTEX->color = lpLVERTEX2->color;
-							lpLVERTEX++;		
-							lpLVERTEX2++;		
+							LVert->color = OrigLVert->color;
+							LVert++;		
+							OrigLVert++;		
 						}
 					}
 					
@@ -330,36 +330,36 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					//	Special Lighting effects
 					while( vert --)
 					{
-						x = (float)((int) (lpLVERTEX2->x * 0.35F) % 360);
-						y = (float)((int) (lpLVERTEX2->y * 0.35F) % 360);
-						z = (float)((int) (lpLVERTEX2->z * 0.35F) % 360);
-						col = lpLVERTEX2->color;
+						x = (float)((int) (OrigLVert->x * 0.35F) % 360);
+						y = (float)((int) (OrigLVert->y * 0.35F) % 360);
+						z = (float)((int) (OrigLVert->z * 0.35F) % 360);
+						col = OrigLVert->color;
 						col &= 0xffff;
 						b = (int)  ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
 						b+= intWhiteOut;
 						if( b > 255 )
 							b = 255;
 						col |= (b<<24)+(b<<16);
-						lpLVERTEX->color = col;
-						lpLVERTEX++;		
-						lpLVERTEX2++;		
+						LVert->color = col;
+						LVert++;		
+						OrigLVert++;		
 						
 					}
 				}
 			}else if( GroupWaterInfo[group] == WATERSTATE_ALLWATER )
 			{
 				// ****************** Full Water Effect ********************************
-				lpLVERTEX2 = Mloadheader->Group[group].originalVerts[mesh];
-				lpLVERTEX = lpPointer;
+				OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
+				LVert = VertBase;
 				vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 				//	Special Lighting effects
 				while( vert --)
 				{
 					int orig_a;
-					x = (float)((int) (lpLVERTEX2->x * 0.35F) % 360);
-					y = (float)((int) (lpLVERTEX2->y * 0.35F) % 360);
-					z = (float)((int) (lpLVERTEX2->z * 0.35F) % 360);
-					col = lpLVERTEX2->color;
+					x = (float)((int) (OrigLVert->x * 0.35F) % 360);
+					y = (float)((int) (OrigLVert->y * 0.35F) % 360);
+					z = (float)((int) (OrigLVert->z * 0.35F) % 360);
+					col = OrigLVert->color;
 					r = RGBA_GETRED(col);
 					g = RGBA_GETGREEN(col);
 					b = RGBA_GETBLUE(col);
@@ -383,27 +383,27 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 					 * every textured surface with the vertex alpha, so a
 					 * fixed 128 here makes underwater walls render 50%
 					 * transparent. */
-					lpLVERTEX->color = RGBA_MAKE( r ,g ,b , orig_a );
-					lpLVERTEX++;
-					lpLVERTEX2++;
+					LVert->color = RGBA_MAKE( r ,g ,b , orig_a );
+					LVert++;
+					OrigLVert++;
 				}
 				// ****************** End of Water Effect ******************************
 			}else{
 				// ****************** Partial Water Effect ******************************
-				lpLVERTEX2 = Mloadheader->Group[group].originalVerts[mesh];
-				lpLVERTEX = lpPointer;
+				OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
+				LVert = VertBase;
 				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 				vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 				//	Special Lighting effects
 				while( vert --)
 				{
-					if( lpLVERTEX2->y < GroupWaterLevel[group] )
+					if( OrigLVert->y < GroupWaterLevel[group] )
 					{
 						int orig_a;
-						x = (float)((int) (lpLVERTEX2->x * 0.35F) % 360);
-						y = (float)((int) (lpLVERTEX2->y * 0.35F) % 360);
-						z = (float)((int) (lpLVERTEX2->z * 0.35F) % 360);
-						col = lpLVERTEX2->color;
+						x = (float)((int) (OrigLVert->x * 0.35F) % 360);
+						y = (float)((int) (OrigLVert->y * 0.35F) % 360);
+						z = (float)((int) (OrigLVert->z * 0.35F) % 360);
+						col = OrigLVert->color;
 						r = RGBA_GETRED(col);
 						g = RGBA_GETGREEN(col);
 						b = RGBA_GETBLUE(col);
@@ -424,12 +424,12 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 							b = 255;
 						/* Preserve baked alpha — see ALLWATER branch
 						 * above for the rationale. */
-						lpLVERTEX->color = RGBA_MAKE( r ,g ,b , orig_a );
+						LVert->color = RGBA_MAKE( r ,g ,b , orig_a );
 					}else{
-  						lpLVERTEX->color = lpLVERTEX2->color;
+  						LVert->color = OrigLVert->color;
 					}
-					lpLVERTEX++;
-					lpLVERTEX2++;
+					LVert++;
+					OrigLVert++;
 				}
 				// ****************** End of Water Effect ******************************
 			}
@@ -567,11 +567,11 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			
 										while( vert-- )
 										{
-											lpLVERTEX = lpPointer + *VertexIndexPnt++;
+											LVert = VertBase + *VertexIndexPnt++;
 											/* find the distance from vert to light */
-											x = lpLVERTEX->x;
-											y = lpLVERTEX->y;
-											z = lpLVERTEX->z;
+											x = LVert->x;
+											y = LVert->y;
+											z = LVert->z;
 											x -= Posx;
 											y -= Posy;
 											z -= Posz;
@@ -582,7 +582,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 											{
 												distance = 1.0F - ( distance * Size );	// float
 
-												col = lpLVERTEX->color;
+												col = LVert->color;
 												tempiA = col & 0xff000000;
 												tempiR = (int) ( rlf * distance );
 												tempiG = (int) ( glf * distance );
@@ -593,7 +593,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 												col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 												col |= tempiA;
 			
-												lpLVERTEX->color = col;
+												LVert->color = col;
 											}
 										}
 			
@@ -622,11 +622,11 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 										vert = VertexCellPnt[Cell].num_verts_in_cell;
 										while( vert-- )
 										{
-											lpLVERTEX = lpPointer + *VertexIndexPnt++;
+											LVert = VertBase + *VertexIndexPnt++;
 											/* find the distance from vert to light */
-											x = lpLVERTEX->x - Posx;
-											y = lpLVERTEX->y - Posy;
-											z = lpLVERTEX->z - Posz;
+											x = LVert->x - Posx;
+											y = LVert->y - Posy;
+											z = LVert->z - Posz;
 											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											distance = (x*x) + (y*y) + (z*z); 
 					
@@ -677,7 +677,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 													}
 												}
 												
-												col =  lpLVERTEX->color;				// int
+												col =  LVert->color;				// int
 												tempiA = col & 0xff000000;
 												tempiR = (int) ( rlf * intense );
 												tempiG = (int) ( glf * intense );
@@ -687,7 +687,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 												clamp = carry - ( carry >> 8 );
 												col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 												col |= tempiA;
-												lpLVERTEX->color = col;
+												LVert->color = col;
 											}
 										}
 										Cell++;
@@ -731,10 +731,10 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	int		group;
 	int		mesh;
 	int		vert;
-    LVERTEX	*lpPointer = NULL;
+    LVERTEX	*VertBase = NULL;
 
-	LVERTEX	*lpLVERTEX = NULL;
-	LVERTEX	*lpLVERTEX2 = NULL;
+	LVERTEX	*LVert = NULL;
+	LVERTEX	*OrigLVert = NULL;
 	COLOR col;
 	float	Size,OSize;
 	float	SizeX2;
@@ -763,14 +763,14 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 		mesh = MXloadheader->Group[group].num_meshes;
 		while( mesh--)
 		{
-			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh], &lpPointer)))
+			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh], &VertBase)))
 			{
 				return false;
 			}
 
-			lpLVERTEX = lpPointer;
+			LVert = VertBase;
 			vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
-			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[mesh];
+			OrigLVert = MXloadheader->Group[group].originalVerts[mesh];
 
 #ifdef GPU_LIGHTING
 			/* The baked-colour restore is skipped here (lock/unlock is
@@ -781,14 +781,14 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 			 * shared by every instance of the model, so colours they
 			 * leave behind are not undone by this path. */
 			(void)vert;
-			(void)lpLVERTEX;
-			(void)lpLVERTEX2;
+			(void)LVert;
+			(void)OrigLVert;
 #else
 			while( vert --)
 			{
-				lpLVERTEX->color = lpLVERTEX2->color;
-				lpLVERTEX++;
-				lpLVERTEX2++;
+				LVert->color = OrigLVert->color;
+				LVert++;
+				OrigLVert++;
 			}
 #endif
 
@@ -831,7 +831,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 							CosArc = XLightPnt->CosArc;
 						}
 					
-						lpLVERTEX = lpPointer;
+						LVert = VertBase;
 						vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
 		
 						switch( XLightPnt->Type )
@@ -842,7 +842,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 							{
 								/* find the distance from vert to light */
 
-								ApplyMatrix( Matrix, (VECTOR*) lpLVERTEX, &Temp );
+								ApplyMatrix( Matrix, (VECTOR*) LVert, &Temp );
 								
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
@@ -852,7 +852,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 								if ( distance <  SizeX2  )					// float
 								{
 									distance = 1.0F - ( distance * Size );	// float
-									col =  lpLVERTEX->color;				// int
+									col =  LVert->color;				// int
 									tempiA = col & 0xff000000;
 									tempiR = (int) ( rlf * distance );
 									tempiG = (int) ( glf * distance );
@@ -862,16 +862,16 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 									clamp = carry - ( carry >> 8 );
 									col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 									col |= tempiA;
-									lpLVERTEX->color = col;
+									LVert->color = col;
 								}
-								lpLVERTEX++;
+								LVert++;
 							}
 							break;
 						case SPOT_LIGHT:
 							while( vert-- )
 							{
 								/* find the distance from vert to light */
-								ApplyMatrix( Matrix, (VECTOR*) lpLVERTEX, &Temp );
+								ApplyMatrix( Matrix, (VECTOR*) LVert, &Temp );
 
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
@@ -918,7 +918,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 											intense = 1.0F + Cosa;
 										}
 									}
-									col =  lpLVERTEX->color;				// int
+									col =  LVert->color;				// int
 									tempiA = col & 0xff000000;
 									tempiR = (int) ( rlf * intense );
 									tempiG = (int) ( glf * intense );
@@ -928,10 +928,10 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 									clamp = carry - ( carry >> 8 );
 									col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 									col |= tempiA;
-									lpLVERTEX->color = col;
+									LVert->color = col;
 								}
 PLOP:
-								lpLVERTEX++;
+								LVert++;
 							}
 							break;
 						}
@@ -967,10 +967,10 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	int		group;
 	int		mesh;
 	int		vert;
-    LVERTEX	*lpPointer = NULL;
+    LVERTEX	*VertBase = NULL;
 
-	LVERTEX	*lpLVERTEX = NULL;
-	LVERTEX	*lpLVERTEX2 = NULL;
+	LVERTEX	*LVert = NULL;
+	LVERTEX	*OrigLVert = NULL;
 	COLOR col;
 	float	Size,OSize;
 	float	SizeX2;
@@ -999,19 +999,19 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 		mesh = MXloadheader->Group[group].num_meshes;
 		while( mesh--)
 		{
-			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh], &lpPointer)))
+			if (!(FSLockVertexBuffer(&MXloadheader->Group[group].renderObject[mesh], &VertBase)))
 			{
 				return false;
 			}
 		
-			lpLVERTEX = lpPointer;
+			LVert = VertBase;
 			vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
-			lpLVERTEX2 = MXloadheader->Group[group].originalVerts[mesh];
+			OrigLVert = MXloadheader->Group[group].originalVerts[mesh];
 			while( vert --)
 			{
-				lpLVERTEX->color = lpLVERTEX2->color;
-				lpLVERTEX++;
-				lpLVERTEX2++;
+				LVert->color = OrigLVert->color;
+				LVert++;
+				OrigLVert++;
 			}
 
 #ifndef GPU_LIGHTING
@@ -1053,7 +1053,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 							CosArc = XLightPnt->CosArc;
 						}
 					
-						lpLVERTEX = lpPointer;
+						LVert = VertBase;
 						vert = MXloadheader->Group[group].num_verts_per_mesh[mesh];
 		
 						switch( XLightPnt->Type )
@@ -1064,7 +1064,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 							{
 								/* find the distance from vert to light */
 
-								ApplyMatrix( Matrix, (VECTOR*) lpLVERTEX, &Temp );
+								ApplyMatrix( Matrix, (VECTOR*) LVert, &Temp );
 								
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
@@ -1074,7 +1074,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 								if ( distance <  SizeX2  )					// float
 								{
 									distance = 1.0F - ( distance * Size );	// float
-									col =  lpLVERTEX->color;				// int
+									col =  LVert->color;				// int
 									tempiA = col & 0xff000000;
 									tempiR = (int) ( rlf * distance );
 									tempiG = (int) ( glf * distance );
@@ -1084,16 +1084,16 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 									clamp = carry - ( carry >> 8 );
 									col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 									col |= tempiA;
-									lpLVERTEX->color = col;
+									LVert->color = col;
 								}
-								lpLVERTEX++;
+								LVert++;
 							}
 							break;
 						case SPOT_LIGHT:
 							while( vert-- )
 							{
 								/* find the distance from vert to light */
-								ApplyMatrix( Matrix, (VECTOR*) lpLVERTEX, &Temp );
+								ApplyMatrix( Matrix, (VECTOR*) LVert, &Temp );
 								
 								x = Temp.x - Posx;
 								y = Temp.y - Posy;
@@ -1139,7 +1139,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 											intense = 1.0F + Cosa;
 										}
 									}
-									col =  lpLVERTEX->color;				// int
+									col =  LVert->color;				// int
 									tempiA = col & 0xff000000;
 									tempiR = (int) ( rlf * intense );
 									tempiG = (int) ( glf * intense );
@@ -1149,10 +1149,10 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 									clamp = carry - ( carry >> 8 );
 									col = ( ( col + inc - carry ) | clamp) & 0x00ffffff;
 									col |= tempiA;
-									lpLVERTEX->color = col;
+									LVert->color = col;
 								}
 PLOP2:
-								lpLVERTEX++;
+								LVert++;
 							}
 							break;
 						}

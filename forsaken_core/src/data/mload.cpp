@@ -277,10 +277,10 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			verts;
 	u_int16_t			portal;
-	LVERTEX	*lpLVERTEX;
-	LVERTEX	*lpBufStart = NULL;
-	WORD			*lpIndices = NULL;
-	NORMAL * lpNormals = NULL;
+	LVERTEX	*LVert;
+	LVERTEX	*BufStart = NULL;
+	WORD			*Indices = NULL;
+	NORMAL * Normals = NULL;
 	int				indexOffset = 0;
 	int				ibIndex = 0;
 	int				triangleCount = 0;
@@ -363,13 +363,13 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 
-			if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
+			if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &LVert)))
 			{
 				Msg( "Mload() lock failed in %s\n", Filename );
 				return false;
 			}
 
-			lpBufStart = lpLVERTEX;
+			BufStart = LVert;
 
 			/*	copy the vertices into the vertex buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
@@ -377,11 +377,11 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				OLDLVERTEX old;
 				in.bytes( &old, sizeof( old ) );
 
-				lpLVERTEX[i].x = old.x;
-				lpLVERTEX[i].y = old.y;
-				lpLVERTEX[i].z = old.z;
-				lpLVERTEX[i].tu = old.tu;
-				lpLVERTEX[i].tv = old.tv;
+				LVert[i].x = old.x;
+				LVert[i].y = old.y;
+				LVert[i].z = old.z;
+				LVert[i].tu = old.tu;
+				LVert[i].tv = old.tv;
 
 				color = old.color;
 				a = (color>>24)&255;
@@ -393,14 +393,14 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 				// right here you could override texture coloring if you wanted
 				color = RGBA_MAKE( r , g , b , a  );
-				lpLVERTEX[i].color = color;
+				LVert[i].color = color;
 
 				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
-			memmove(Mloadheader->Group[group].originalVerts[mesh], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
+			memmove(Mloadheader->Group[group].originalVerts[mesh], &LVert[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
 			num_triangle_groups = in.u16();
 
@@ -425,7 +425,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 
 			/*	lock the index buffer	*/
-			if (!(FSLockIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpIndices)))
+			if (!(FSLockIndexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &Indices)))
 			{
 				Msg( "Mload() lock failed in %s\n", Filename );
 				return false;
@@ -437,7 +437,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				return false;
 			}
 
-			if (!(FSLockNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &lpNormals)))
+			if (!(FSLockNormalBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[mesh], &Normals)))
 			{
 				Msg( "Mload() failed to lock normal buffer %s\n", Filename );
 				return false;
@@ -481,16 +481,16 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					FacePnt.v2 = face.v2;
 					FacePnt.v3 = face.v3;
 
-					lpIndices[ibIndex] = FacePnt.v1;
+					Indices[ibIndex] = FacePnt.v1;
 					ibIndex++;
-					lpIndices[ibIndex] = FacePnt.v2;
+					Indices[ibIndex] = FacePnt.v2;
 					ibIndex++;
-					lpIndices[ibIndex] = FacePnt.v3;
+					Indices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
-					lpNormals->nx = face.nx;
-					lpNormals->ny = face.ny;
-					lpNormals->nz = face.nz;
+					Normals->nx = face.nx;
+					Normals->ny = face.ny;
+					Normals->nz = face.nz;
 
 					if ( face.pad & 1 )
 					{
@@ -498,8 +498,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						colourkey++;
 					}
 
-					FixUV( &FacePnt, lpBufStart, Mloadheader->TloadIndex[tpage], Mloadheader->Group[group].originalVerts[mesh] );
-					lpNormals++;
+					FixUV( &FacePnt, BufStart, Mloadheader->TloadIndex[tpage], Mloadheader->Group[group].originalVerts[mesh] );
+					Normals++;
 				}
 
 				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].numVerts = num_vertices;
@@ -509,7 +509,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				Mloadheader->Group[ group ].renderObject[mesh].textureGroups[i].startIndex = indexOffset;
 				indexOffset += num_triangles * 3;
 
-				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].texture = Tloadheader.lpTexture[Mloadheader->TloadIndex[tpage]];
+				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].texture = Tloadheader.TexHandle[Mloadheader->TloadIndex[tpage]];
 				Mloadheader->Group[group].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mloadheader->TloadIndex[tpage]];
 
 
@@ -817,7 +817,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						Msg( "Mload : No PolyAnim\n" );
 						return false;
 					}
-					if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[ group ].renderObject[mesh], &lpLVERTEX)))
+					if (!(FSLockVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[ group ].renderObject[mesh], &LVert)))
 					{
 						Msg( "Mload : Lock VertexBuffer failed\n" );
 						return false;
@@ -871,7 +871,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 							TanimUV->v = in.f32();
 							TanimUV++;
 						}
-						FixUV_Anim( PolyAnim, lpLVERTEX, Mloadheader->Group[group].originalVerts[mesh] );
+						FixUV_Anim( PolyAnim, LVert, Mloadheader->Group[group].originalVerts[mesh] );
 						PolyAnim++;
 					}
 

@@ -90,9 +90,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	u_int16_t			num_texture_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			group_vertex_start; // where in the vert list to start processing
-	LVERTEX	*lpLVERTEX;
-	WORD			*lpIndices = NULL;
-	NORMAL		*lpNormals = NULL;
+	LVERTEX	*LVert;
+	WORD			*Indices = NULL;
+	NORMAL		*Normals = NULL;
 	int				ibIndex = 0;
 	u_int16_t			frame;
 	u_int16_t			texgroup;
@@ -174,7 +174,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 
 			/*	lock the vertex buffer	*/
-			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
+			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &LVert)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
@@ -187,20 +187,20 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				OLDLVERTEX old;
 				in.bytes( &old, sizeof( old ) );
 
-				lpLVERTEX[i].x = old.x;
-				lpLVERTEX[i].y = old.y;
-				lpLVERTEX[i].z = old.z;
-				lpLVERTEX[i].tu = old.tu;
-				lpLVERTEX[i].tv = old.tv;
-				lpLVERTEX[i].color = old.color;
+				LVert[i].x = old.x;
+				LVert[i].y = old.y;
+				LVert[i].z = old.z;
+				LVert[i].tu = old.tu;
+				LVert[i].tv = old.tv;
+				LVert[i].color = old.color;
 
-				lpLVERTEX[i].color |= 0xFF000000;
+				LVert[i].color |= 0xFF000000;
 				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mxaloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
-			memmove(Mxaloadheader->Group[group].originalVerts[mesh], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
+			memmove(Mxaloadheader->Group[group].originalVerts[mesh], &LVert[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
 			
 			num_texture_groups = in.u16();
@@ -230,7 +230,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			DebugPrintf("created index buffer to hold :%d incidices\n", triangleCount * 3);
 
 			/*	lock the index buffer	*/
-			if (!(FSLockIndexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpIndices)))
+			if (!(FSLockIndexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &Indices)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
@@ -241,7 +241,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
 				return false;
 			}
-			if (!(FSLockNormalBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpNormals)))
+			if (!(FSLockNormalBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &Normals)))
 			{
 				Msg( "Mxload() normal lock failed in %s\n", Filename );
 				return false;
@@ -277,7 +277,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Mxaloadheader->Group[group].texture_group_vert_off[mesh][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
 
 				/* the index buffer holds every triangle in order, so StoreTriangles copies it from the start */
-				TempFacePnt = (TRIANGLE *) /*lpLVERTEX*/lpIndices;
+				TempFacePnt = (TRIANGLE *) /*LVert*/Indices;
 
 				/*	copy the triangles into the index and normal buffers	*/
 				for( e=0; e<num_triangles; e++)
@@ -288,23 +288,23 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 					FacePnt.v2 = face.v2;
 					FacePnt.v3 = face.v3;
 
-					lpIndices[ibIndex] = FacePnt.v1;
+					Indices[ibIndex] = FacePnt.v1;
 					ibIndex++;
-					lpIndices[ibIndex] = FacePnt.v2;
+					Indices[ibIndex] = FacePnt.v2;
 					ibIndex++;
-					lpIndices[ibIndex] = FacePnt.v3;
+					Indices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
-					lpNormals->nx = face.nx;
-					lpNormals->ny = face.ny;
-					lpNormals->nz = face.nz;
+					Normals->nx = face.nx;
+					Normals->ny = face.ny;
+					Normals->nz = face.nz;
 
 					if ( face.pad & 1 )
 					{
 						// colourkey triangle found
 						colourkey++;
 					}
-					lpNormals++;
+					Normals++;
 					tempInt+=3;
 				}
 
@@ -318,7 +318,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].startIndex = indexOffset;
 				indexOffset += num_triangles * 3;
 
-				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.lpTexture[Mxaloadheader->TloadIndex[tpage]];
+				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.TexHandle[Mxaloadheader->TloadIndex[tpage]];
 				Mxaloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxaloadheader->TloadIndex[tpage]];
 			}
 
@@ -765,9 +765,9 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 ===================================================================*/
 bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp )
 {
-    LVERTEX	*lpBufStart = NULL;
-	LVERTEX	*lpLVERTEX;
-	LVERTEX	*lpLVERTEX2;
+    LVERTEX	*BufStart = NULL;
+	LVERTEX	*LVert;
+	LVERTEX	*OrigLVert;
 	MXAVERT *		FromVert;
 	MXAVERT *		ToVert;
 	u_int16_t			texgroup;
@@ -784,7 +784,7 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 	{
 		for( mesh=0 ; mesh<Mxaloadheader->Group[group].num_meshes; mesh++)
 		{
-			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &lpBufStart)))
+			if (!(FSLockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh], &BufStart)))
 			{
 				return false;
 			}
@@ -802,11 +802,11 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 				   base vertices at this offset. (Some Remaster-era .mx
 				   models have no box, but .mx models never come through
 				   here.) */
-				lpLVERTEX = 	( LVERTEX *) ( (char*) lpBufStart+( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[mesh][texgroup]));
-				lpLVERTEX += 8;
+				LVert = 	( LVERTEX *) ( (char*) BufStart+( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[mesh][texgroup]));
+				LVert += 8;
 
-				lpLVERTEX2 = ( LVERTEX *) ( (char*) Mxaloadheader->Group[group].originalVerts[mesh] + ( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[mesh][texgroup]));
-				lpLVERTEX2 += 8;
+				OrigLVert = ( LVERTEX *) ( (char*) Mxaloadheader->Group[group].originalVerts[mesh] + ( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[mesh][texgroup]));
+				OrigLVert += 8;
 				
 				FromVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[FromFrame][group][mesh][texgroup];
 				ToVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[ToFrame][group][mesh][texgroup];
@@ -815,13 +815,13 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 				{
 					if ( FromVert->flags & MXA_ANIM_POS )
 					{
-						lpLVERTEX->x = FromVert->x + ( ToVert->x - FromVert->x ) * Interp;
-						lpLVERTEX->y = FromVert->y + ( ToVert->y - FromVert->y ) * Interp;
-						lpLVERTEX->z = FromVert->z + ( ToVert->z - FromVert->z ) * Interp;
+						LVert->x = FromVert->x + ( ToVert->x - FromVert->x ) * Interp;
+						LVert->y = FromVert->y + ( ToVert->y - FromVert->y ) * Interp;
+						LVert->z = FromVert->z + ( ToVert->z - FromVert->z ) * Interp;
 					}
 					if ( FromVert->flags & MXA_ANIM_RGB )
 					{
-						color = (COLOR_RGBA *) &lpLVERTEX2->color;
+						color = (COLOR_RGBA *) &OrigLVert->color;
 
 
 						from_color = (COLOR_RGBA *) &FromVert->color;
@@ -832,12 +832,12 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 					}
 					if ( FromVert->flags & MXA_ANIM_UV )
 					{
-						lpLVERTEX->tu = FromVert->tu + ( ToVert->tu - FromVert->tu ) * Interp;
-						lpLVERTEX->tv = FromVert->tv + ( ToVert->tv - FromVert->tv ) * Interp;
+						LVert->tu = FromVert->tu + ( ToVert->tu - FromVert->tu ) * Interp;
+						LVert->tv = FromVert->tv + ( ToVert->tv - FromVert->tv ) * Interp;
 					}
 
-					lpLVERTEX++;
-					lpLVERTEX2++;
+					LVert++;
+					OrigLVert++;
 					FromVert++;
 					ToVert++;
 				}

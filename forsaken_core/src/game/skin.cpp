@@ -935,7 +935,7 @@ void KillNodeCubeLines( void )
 ===================================================================*/
 bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
 {
-    LVERTEX	*lpBufStart = NULL;//, lpInsStart, lpPointer;
+    LVERTEX	*BufStart = NULL;
 
 	if( Num_Skin_Execs >= MAXSKINEXECS )
 	{
@@ -948,12 +948,12 @@ bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int
 		return false;
 	}
    
-	if (!(FSLockVertexBuffer(&Skin_Execs[ Num_Skin_Execs ], &lpBufStart)))
+	if (!(FSLockVertexBuffer(&Skin_Execs[ Num_Skin_Execs ], &BufStart)))
 	{
 		return false;
 	}
    		
-	memmove(lpBufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
+	memmove(BufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
    
 	if (!(FSUnlockVertexBuffer(&Skin_Execs[ Num_Skin_Execs ])))
 	{
@@ -1124,7 +1124,7 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 ===================================================================*/
 bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
 {
-    LVERTEX	*lpBufStart = NULL;//, lpInsStart, lpPointer;
+    LVERTEX	*BufStart = NULL;
 
 	if( Num_Portal_Execs >= MAXPORTALEXECS )
 	{
@@ -1137,12 +1137,12 @@ bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, i
 		return false;
 	}
 
-	if (!(FSLockVertexBuffer(&Portal_Execs[ Num_Portal_Execs ], &lpBufStart)))
+	if (!(FSLockVertexBuffer(&Portal_Execs[ Num_Portal_Execs ], &BufStart)))
 	{
 		return false;
 	}
    		
-	memmove(lpBufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
+	memmove(BufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
    
    
 

@@ -96,10 +96,10 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int16_t			num_vertices = 0;		// overall number of verts
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
-	LVERTEX	*lpLVERTEX = NULL;
-	LVERTEX	*lpBufStart = NULL;
-	WORD			*lpIndices = NULL;
-	NORMAL		*lpNormals = NULL;
+	LVERTEX	*LVert = NULL;
+	LVERTEX	*BufStart = NULL;
+	WORD			*Indices = NULL;
+	NORMAL		*Normals = NULL;
 	int				ibIndex = 0;
 	int				i,e,o;
 	u_int16_t			tpage = 0;
@@ -207,13 +207,13 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
 
 			/*	lock the vertex buffer	*/
-			if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
+			if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &LVert)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
 			}
 
-			lpBufStart = lpLVERTEX;
+			BufStart = LVert;
 
 			/*	copy the vertices into the vertex buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
@@ -221,11 +221,11 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				OLDLVERTEX old;
 				in.bytes( &old, sizeof( old ) );
 
-				lpLVERTEX[i].x = old.x;
-				lpLVERTEX[i].y = old.y;
-				lpLVERTEX[i].z = old.z;
-				lpLVERTEX[i].tu = old.tu;
-				lpLVERTEX[i].tv = old.tv;
+				LVert[i].x = old.x;
+				LVert[i].y = old.y;
+				LVert[i].z = old.z;
+				LVert[i].tu = old.tu;
+				LVert[i].tv = old.tv;
 
 				color = old.color;
 				a = (color>>24)&255;
@@ -236,14 +236,14 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				a = 255;
 
 				color = RGBA_MAKE( r , g , b , a  );
-				lpLVERTEX[i].color = color;
+				LVert[i].color = color;
 
 				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
 			Mxloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
-			memmove(Mxloadheader->Group[group].originalVerts[mesh], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
+			memmove(Mxloadheader->Group[group].originalVerts[mesh], &LVert[0], sizeof(LVERTEX) * num_vertices);//memcpy
 
 			//	Stuff to clip if bounding box is off screen
 
@@ -276,7 +276,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			DebugPrintf("created index buffer to hold :%d incidices\n", triangleCount * 3);
 
 			/*	lock the index buffer	*/
-			if (!(FSLockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpIndices)))
+			if (!(FSLockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Indices)))
 			{
 				Msg( "Mxload() lock failed in %s\n", Filename );
 				return false;
@@ -287,7 +287,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
         DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
         return false;
       }
-      if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpNormals)))
+      if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Normals)))
       {
         Msg( "Mxload() normal lock failed in %s\n", Filename );
         return false;
@@ -321,7 +321,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				num_triangles = in.u16();
 				DebugPrintf("trinagles %d\n", num_triangles);
 
-				TempFacePnt = (TRIANGLE *) /*lpLVERTEX*/lpIndices;
+				TempFacePnt = (TRIANGLE *) /*LVert*/Indices;
 
 
 				/*	copy the triangles into the index and normal buffers	*/
@@ -333,16 +333,16 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 					FacePnt.v2 = face.v2;
 					FacePnt.v3 = face.v3;
 
-					lpIndices[ibIndex] = FacePnt.v1;
+					Indices[ibIndex] = FacePnt.v1;
 					ibIndex++;
-					lpIndices[ibIndex] = FacePnt.v2;
+					Indices[ibIndex] = FacePnt.v2;
 					ibIndex++;
-					lpIndices[ibIndex] = FacePnt.v3;
+					Indices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
-					lpNormals->nx = face.nx;
-					lpNormals->ny = face.ny;
-					lpNormals->nz = face.nz;
+					Normals->nx = face.nx;
+					Normals->ny = face.ny;
+					Normals->nz = face.nz;
 
 					if ( face.pad & 1 )
 					{
@@ -350,8 +350,8 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						colourkey++;
 					}
 					if( Mxloadheader->num_texture_files )
-						FixUV( &FacePnt, lpBufStart, Mxloadheader->TloadIndex[tpage], Mxloadheader->Group[group].originalVerts[mesh]);
-					lpNormals++;
+						FixUV( &FacePnt, BufStart, Mxloadheader->TloadIndex[tpage], Mxloadheader->Group[group].originalVerts[mesh]);
+					Normals++;
 					tempInt+=3;
 				}
 
@@ -370,7 +370,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				}
 				else
 				{
-					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.lpTexture[Mxloadheader->TloadIndex[tpage]];
+					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.TexHandle[Mxloadheader->TloadIndex[tpage]];
 					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxloadheader->TloadIndex[tpage]];
 				}
 			}
@@ -458,7 +458,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						return false;
 					}
 
-					if (!(FSLockVertexBuffer(&Mxloadheader->Group[ group ].renderObject[mesh], &lpLVERTEX)))
+					if (!(FSLockVertexBuffer(&Mxloadheader->Group[ group ].renderObject[mesh], &LVert)))
 					{
 						Msg( "Mxload : FSLockVertexBuffer failed\n" );
 						return false;
@@ -515,7 +515,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 							TanimUV++;
 						}
 
-						FixUV_Anim( PolyAnim, lpLVERTEX, Mxloadheader->Group[group].originalVerts[mesh] );
+						FixUV_Anim( PolyAnim, LVert, Mxloadheader->Group[group].originalVerts[mesh] );
 
 						if( Panel )
 						{
@@ -663,8 +663,8 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 	int		group;
 	RENDERMATRIX Matrix;
 	bool	Display;
-    LVERTEX	*lpPointer = NULL;
-	LVERTEX	*lpLVERTEX = NULL;
+    LVERTEX	*VertBase = NULL;
+	LVERTEX	*LVert = NULL;
 	POLYANIM * PolyAnim;
 	u_int32_t * u_int32Pnt;
 	TANIMUV * TanimUV;
@@ -693,7 +693,7 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 							// something has changed....
 							if( !VertBufferLocked )
 							{
-								if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[i], &lpPointer)))
+								if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[i], &VertBase)))
 								{
 									return false;
 								}
@@ -705,12 +705,12 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 							for( e = 0 ; e < PolyAnim->vertices ; e++ )
 							{
 
-								lpLVERTEX = lpPointer+ *u_int32Pnt++;
+								LVert = VertBase+ *u_int32Pnt++;
 								TanimUV = PolyAnim->UVs;
 								TanimUV += e + (PolyAnim->vertices * PolyAnim->newframe);
 
-								memcpy(&lpLVERTEX->tu, &TanimUV->u, 4);
-								memcpy(&lpLVERTEX->tv, &TanimUV->v, 4);
+								memcpy(&LVert->tu, &TanimUV->u, 4);
+								memcpy(&LVert->tv, &TanimUV->v, 4);
 							}
 							PolyAnim->currentframe = PolyAnim->newframe;
 						}

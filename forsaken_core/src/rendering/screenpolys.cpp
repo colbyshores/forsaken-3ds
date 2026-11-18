@@ -2050,11 +2050,11 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	COLOR		Colour;
 	TLVERTEX	*ScrPolyVertPnt; // pre-transformed verts!
 	TRIANGLE	*ScrPolyFacePnt;
-    TLVERTEX	*lpBufStart;
+    TLVERTEX	*BufStart;
 	float			u1,v1,u2,v2;
 	float			x1,y1,x3,y3;
 	bool			Textured;
-	WORD			*lpIndices = NULL;
+	WORD			*Indices = NULL;
 	int				start_index = 0;
 #ifdef __3DS__
 	int				batchVert = 0;  /* buffer position within current draw batch */
@@ -2119,19 +2119,19 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		Lock Buffer and get ready to fill in...
 ===================================================================*/
 
-	if (!(FSLockPretransformedVertexBuffer(renderObject, &lpBufStart)))
+	if (!(FSLockPretransformedVertexBuffer(renderObject, &BufStart)))
 	{
 		return false;
 	}	
 
-	if (!(FSLockIndexBuffer(renderObject, &lpIndices)))
+	if (!(FSLockIndexBuffer(renderObject, &Indices)))
 	{
 		return false;
 	}
 
-	ScrPolyFacePnt = (TRIANGLE *) lpIndices;
+	ScrPolyFacePnt = (TRIANGLE *) Indices;
 
-	ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
+	ScrPolyVertPnt = (TLVERTEX *) BufStart;
 
 /*===================================================================
 		Fill in Buffer ( Verts and Faces Simultaneously )
@@ -2155,7 +2155,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 			}
 			else
 			{	
-				renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
+				renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 			}
 			
@@ -2347,7 +2347,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 #else
 								renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 #endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
+							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 #ifdef __3DS__
 								renderObject->numTextureGroups++;
@@ -2407,10 +2407,10 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 									renderObject->numTextureGroups = 0;
 									start_index = 0;
 									batchVert = 0;
-									FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
-									FSLockIndexBuffer(renderObject, &lpIndices);
-									ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
-									ScrPolyFacePnt = (TRIANGLE *) lpIndices;
+									FSLockPretransformedVertexBuffer(renderObject, &BufStart);
+									FSLockIndexBuffer(renderObject, &Indices);
+									ScrPolyVertPnt = (TLVERTEX *) BufStart;
+									ScrPolyFacePnt = (TRIANGLE *) Indices;
 								}
 #endif
 	      					Off_Ptr++;
@@ -2553,10 +2553,10 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								batchVert = 0;
-								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
-								FSLockIndexBuffer(renderObject, &lpIndices);
-								ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
-								ScrPolyFacePnt = (TRIANGLE *) lpIndices;
+								FSLockPretransformedVertexBuffer(renderObject, &BufStart);
+								FSLockIndexBuffer(renderObject, &Indices);
+								ScrPolyVertPnt = (TLVERTEX *) BufStart;
+								ScrPolyFacePnt = (TRIANGLE *) Indices;
 							}
 #endif
 						}
@@ -2617,11 +2617,11 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	COLOR		Colour;
 	TLVERTEX	*ScrPolyVertPnt; // pre-transformed vertex type!
 	TRIANGLE	*ScrPolyFacePnt;
-    TLVERTEX	*lpBufStart;//, lpInsStart, lpPointer;
+    TLVERTEX	*BufStart;
 	float			u1,v1,u2,v2;
 	float			x1,y1,x3,y3;
 	bool			Textured;
-	WORD			*lpIndices = NULL;
+	WORD			*Indices = NULL;
 	int				start_index = 0;
 #ifdef __3DS__
 	int				batchVert = 0;
@@ -2686,19 +2686,19 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		Lock the vertex and index buffers
 ===================================================================*/
 
-	if (!(FSLockPretransformedVertexBuffer(renderObject, &lpBufStart)))
+	if (!(FSLockPretransformedVertexBuffer(renderObject, &BufStart)))
 	{
 		return false;
 	}
 
-	if (!(FSLockIndexBuffer(renderObject, &lpIndices)))
+	if (!(FSLockIndexBuffer(renderObject, &Indices)))
 	{
 		return false;
 	}
 
-	ScrPolyFacePnt = (TRIANGLE *) lpIndices;
+	ScrPolyFacePnt = (TRIANGLE *) Indices;
 
-	ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
+	ScrPolyVertPnt = (TLVERTEX *) BufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -2721,7 +2721,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 			}
 			else
 			{
-				renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
+				renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 			}
 
@@ -2912,7 +2912,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 #else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 #endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.lpTexture[Count];
+							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 #ifdef __3DS__
 							renderObject->numTextureGroups++;
@@ -2972,10 +2972,10 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								batchVert = 0;
-								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
-								FSLockIndexBuffer(renderObject, &lpIndices);
-								ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
-								ScrPolyFacePnt = (TRIANGLE *) lpIndices;
+								FSLockPretransformedVertexBuffer(renderObject, &BufStart);
+								FSLockIndexBuffer(renderObject, &Indices);
+								ScrPolyVertPnt = (TLVERTEX *) BufStart;
+								ScrPolyFacePnt = (TRIANGLE *) Indices;
 							}
 #endif
 	      					Off_Ptr++;
@@ -3125,10 +3125,10 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 								renderObject->numTextureGroups = 0;
 								start_index = 0;
 								batchVert = 0;
-								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
-								FSLockIndexBuffer(renderObject, &lpIndices);
-								ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
-								ScrPolyFacePnt = (TRIANGLE *) lpIndices;
+								FSLockPretransformedVertexBuffer(renderObject, &BufStart);
+								FSLockIndexBuffer(renderObject, &Indices);
+								ScrPolyVertPnt = (TLVERTEX *) BufStart;
+								ScrPolyFacePnt = (TRIANGLE *) Indices;
 							}
 #endif
 						}

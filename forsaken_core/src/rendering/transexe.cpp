@@ -98,19 +98,19 @@ void ExecuteTransExe( u_int16_t group )
 				switch( Models[ Model ].Func )
 				{
 					case MODFUNC_Explode:
-						ProcessModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
+						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
 						break;
 		
 					case MODFUNC_Regen:
-						ProcessModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
+						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
 						break;
 					case MODFUNC_Scale:
 					case MODFUNC_Scale2:
-						ProcessModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
+						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
 						break;
 
 					case MODFUNC_SphereZone:
-						ProcessSphereZoneModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
+						ProcessSphereZoneModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
 						break;
 
 					case MODFUNC_OrbitPulsar:
@@ -200,19 +200,19 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 				switch( Models[ Model ].Func )
 				{
 					case MODFUNC_Explode:
-						ProcessModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
+						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
 						break;
 					case MODFUNC_Regen:
-						ProcessModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
+						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
 						break;
 		
 					case MODFUNC_Scale:
 					case MODFUNC_Scale2:
-						ProcessModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
+						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
 						break;
 
 					case MODFUNC_SphereZone:
-						ProcessSphereZoneModelExec( /*TransExe[i].lpExBuf*/&TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
+						ProcessSphereZoneModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
 						break;
 
 					case MODFUNC_OrbitPulsar:

@@ -126,7 +126,7 @@ static bool missing_folders( void )
 // Parse the Command Line
 //
 
-static bool ParseCommandLine(char* lpCmdLine)
+static bool ParseCommandLine(char* args)
 {
 	
 	//
@@ -150,13 +150,13 @@ static bool ParseCommandLine(char* lpCmdLine)
 	// Get the command line string
 	//
 
-	size = strlen(lpCmdLine)+1;
+	size = strlen(args)+1;
 	if ( size > sizeof(cmdline) )
 	{
 		Msg("Command line to long!");
 		return false;
 	}
-	strcpy(cmdline,lpCmdLine);
+	strcpy(cmdline,args);
 
 	//
 	// extract and process tokens from command line
@@ -393,7 +393,7 @@ void CleanUpAndPostQuit(void)
 
 #include "data/mload.h"
 
-static bool AppInit( char * lpCmdLine )
+static bool AppInit( char * args )
 {
 #ifdef DEBUG_ON
 	InitMathErrors();
@@ -427,7 +427,7 @@ static bool AppInit( char * lpCmdLine )
 	trig_table_init();
 
 	// parse chdir from command line first
-	if(!parse_chdir(lpCmdLine)) {
+	if(!parse_chdir(args)) {
 		return false;
 	}
 
@@ -450,7 +450,7 @@ static bool AppInit( char * lpCmdLine )
 	// now we can check the command line for overrides
 
 	// parse the command line
-	if(!ParseCommandLine(lpCmdLine)) {
+	if(!ParseCommandLine(args)) {
 		return false;
 	}
 

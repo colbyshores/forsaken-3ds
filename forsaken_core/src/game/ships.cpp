@@ -1513,7 +1513,7 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t mesh;
-	LVERTEX	*lpLVERTEX = NULL;
+	LVERTEX	*LVert = NULL;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )
@@ -1524,22 +1524,22 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 			{
 				/*	lock the vertex buffer	*/
 
-				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &lpLVERTEX)))
+				if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &LVert)))
 				{
 					return false;
 				}
 
 				for( vert = 0 ; vert < 	Mxloadheader->Group[group].num_verts_per_mesh[mesh] ; vert ++ )
 				{
-					ApplyMatrix( Mat , (VECTOR *) lpLVERTEX,  &Temp);
+					ApplyMatrix( Mat , (VECTOR *) LVert,  &Temp);
 					NormaliseVector( &Temp );
 
 					u = (0.125f + (-0.125f * Temp.x) );
 					v = (0.125f + (-0.125f * Temp.y) );
 
-					lpLVERTEX->tu = u;//+(Pos->x*0.001F)+(Pos->z*0.001F);
-					lpLVERTEX->tv = v;//+(Pos->y*0.001F);
-					lpLVERTEX++;
+					LVert->tu = u;//+(Pos->x*0.001F)+(Pos->z*0.001F);
+					LVert->tv = v;//+(Pos->y*0.001F);
+					LVert++;
 				}
 
 				/*	unlock the vertex buffer	*/

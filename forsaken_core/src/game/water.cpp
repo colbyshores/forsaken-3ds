@@ -353,8 +353,8 @@ bool InitWaterObject(WATEROBJECT * WO)
 {
 	int x,y;
 	TRIANGLE	*FacePnt = NULL;
-	LVERTEX	*lpLVERTEX = NULL;
-	WORD			*lpIndices = NULL;
+	LVERTEX	*LVert = NULL;
+	WORD			*Indices = NULL;
 	int			i;
 	int ntris = 0;
 	int vertsCount = 0;
@@ -382,32 +382,32 @@ bool InitWaterObject(WATEROBJECT * WO)
 		return false;
 	}
 
-	if (!FSLockVertexBuffer(&WO->renderObject, &lpLVERTEX))
+	if (!FSLockVertexBuffer(&WO->renderObject, &LVert))
 	{
 		DebugPrintf("water FSLockVertexBuffer failed\n");
 		return false;
 	}
 
-	if (!(FSLockIndexBuffer(&WO->renderObject, &lpIndices)))
+	if (!(FSLockIndexBuffer(&WO->renderObject, &Indices)))
 	{
 		DebugPrintf("water FSLockIndexBuffer failed\n");
 		return false;
 	}
 
-	FacePnt =  (TRIANGLE *) lpIndices;
+	FacePnt =  (TRIANGLE *) Indices;
 
 	for( x = 0 ; x < WO->XVerts ; x++ )
 	{
 		for( y = 0 ; y < WO->YVerts ; y++ )
 		{
-			lpLVERTEX->x = -( ((WO->XVerts-1) * WATER_CELLSIZE ) * 0.5F ) + (x*WATER_CELLSIZE);
-			lpLVERTEX->z = -( ((WO->YVerts-1) * WATER_CELLSIZE ) * 0.5F ) + (y*WATER_CELLSIZE);
-			lpLVERTEX->y = 0.0F;
-			lpLVERTEX->tu = 0.0F;
-			lpLVERTEX->tv = 0.0F;
-			lpLVERTEX->color = RGBA_MAKE(128,128,128,128);
+			LVert->x = -( ((WO->XVerts-1) * WATER_CELLSIZE ) * 0.5F ) + (x*WATER_CELLSIZE);
+			LVert->z = -( ((WO->YVerts-1) * WATER_CELLSIZE ) * 0.5F ) + (y*WATER_CELLSIZE);
+			LVert->y = 0.0F;
+			LVert->tu = 0.0F;
+			LVert->tv = 0.0F;
+			LVert->color = RGBA_MAKE(128,128,128,128);
 			
-			lpLVERTEX++;
+			LVert++;
 
 			vertsCount++;
 		}
@@ -449,7 +449,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 	WO->renderObject.textureGroups[0].numVerts = WO->num_of_verts;
 	WO->renderObject.textureGroups[0].startIndex = 0;
 	WO->renderObject.textureGroups[0].startVert = 0;
-	WO->renderObject.textureGroups[0].texture = Tloadheader.lpTexture[WaterTPage]; 
+	WO->renderObject.textureGroups[0].texture = Tloadheader.TexHandle[WaterTPage]; 
 	WO->renderObject.textureGroups[0].colourkey = Tloadheader.ColourKey[WaterTPage];
 
 	return true;
@@ -503,7 +503,7 @@ void GroupWaterProcessDisplay( u_int16_t group )
 void UpdateWaterMesh( WATEROBJECT * WO )
 {
 	int x,y;
-	LVERTEX	*lpLVERTEX;
+	LVERTEX	*LVert;
 	int col;
 	float dx, dy;
 	float u, v;
@@ -559,7 +559,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 
 	/*	lock the vertex buffer	*/
 
-	if (!(FSLockVertexBuffer(/*WO->vertexBuffer*/&WO->renderObject, &lpLVERTEX)))
+	if (!(FSLockVertexBuffer(/*WO->vertexBuffer*/&WO->renderObject, &LVert)))
 	{
 		return;
 	}
@@ -570,7 +570,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 	{
 		for( y = 0 ; y < WO->YVerts ; y++ )
 		{
-			lpLVERTEX->y = *VertPnt;
+			LVert->y = *VertPnt;
 			if( x > 0 && x < WO->XVerts-1 && y > 0 && y < WO->YVerts-1 )
 			{
 				dx = *(VertPnt+WO->YVerts) - *(VertPnt-WO->YVerts) + 0.25F
@@ -583,15 +583,15 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 			}
 			u = (float) ( x + dx * 0.025F) / WO->XVerts;
 			v = 1.0F - (float) ( y + dy * 0.025F) / WO->YVerts;
-			lpLVERTEX->tu = (u * WO->uRange) + WO->uTL;
-			lpLVERTEX->tv = (v * WO->vRange) + WO->vTL;
+			LVert->tu = (u * WO->uRange) + WO->uTL;
+			LVert->tv = (v * WO->vRange) + WO->vTL;
 			col = 192 + (int) ( dy * 8 );
 			if( col > 255 )
 				col = 255;
 			if( col < 0 )
 				col = 0;
-			lpLVERTEX->color = RGBA_MAKE( (int)(col * WO->Red) , (int)(col * WO->Green) , (int)(col * WO->Blue) , 128);
-			lpLVERTEX++;
+			LVert->color = RGBA_MAKE( (int)(col * WO->Red) , (int)(col * WO->Green) , (int)(col * WO->Blue) , 128);
+			LVert++;
 			VertPnt++;
 		}
 	}

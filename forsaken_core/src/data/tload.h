@@ -45,7 +45,7 @@ typedef struct TLOADHEADER{
 	u_int16_t				Ysize[MAXTPAGESPERTLOAD];		// placeholder, the size requested until filled)
 	bool				ColourKey[MAXTPAGESPERTLOAD];	// black texels are transparent
     char                ImageFile[MAXTPAGESPERTLOAD][256]; // path as registered (empty for a placeholder)
-    TEXTURE_HANDLE			lpTexture[MAXTPAGESPERTLOAD];	// the backend texture
+    TEXTURE_HANDLE			TexHandle[MAXTPAGESPERTLOAD];	// the backend texture
 	bool				MipMap[MAXTPAGESPERTLOAD];		// create a mip chain
 	bool				PlaceHolder[MAXTPAGESPERTLOAD];	// image chosen at run time (see above)
 	char				*PlaceHolderFile[MAXTPAGESPERTLOAD];	// 256-byte buffer: the file now in the placeholder
