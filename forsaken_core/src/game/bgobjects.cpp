@@ -61,7 +61,6 @@ DOORTYPESFX DoorTypeSFX[] = {
 ===================================================================*/
 constexpr int BGO_VERSION_NUMBER = 3;
 constexpr int BGOPush = 1;
-#define	DUPLICATE_BGOBJECTS	1
 
 /*===================================================================
 	Procedure	:	Initialise all Background Objects
@@ -1086,9 +1085,6 @@ bool PreLoadBGOFiles( void )
 	char			TempFilename[ 256 ];
 	u_int16_t			BaseModel;
 	u_int16_t			TempBaseModel = (u_int16_t) -1;
-#if	DUPLICATE_BGOBJECTS == 0
-	BGO_FILE	*	TempPtr;
-#endif
 	FILE		*	fp;
 	const char		*	NewExt = ".BGO";
 	int16_t			NumBGObjects;
@@ -1239,18 +1235,6 @@ bool PreLoadBGOFiles( void )
 			{
 				TempBaseModel = (u_int16_t) -1;
 
-#if	DUPLICATE_BGOBJECTS == 0
-				TempPtr = BGOFilesPtr;
-				while( TempPtr != FilePtr )
-				{
-					if( !strcasecmp( &TempPtr->Filename[ 0 ], &FilePtr->Filename[ 0 ] ) )
-					{
-						TempBaseModel = TempPtr->BaseModel;
-						break;
-					}
-					TempPtr++;
-				}
-#endif		
 				if( TempBaseModel != (u_int16_t) -1 )
 				{
 					FilePtr->BaseModel = TempBaseModel;
