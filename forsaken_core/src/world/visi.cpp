@@ -187,8 +187,8 @@ bool OutputVisiStats( MLOADHEADER *m, char *lname )
 			( VisiStats[ j ].tmax > 1000 ) ? "*" : " ",
 			j,
 			(int)VisiStats[ j ].tmax,
-			(int)( VisiStats[ j ].visits ) ? VisiStats[ j ].tsum / VisiStats[ j ].visits : 0,
-			(int)( VisiStats[ j ].visits ) ? VisiStats[ j ].tmin : 0,
+			(unsigned long)( VisiStats[ j ].visits ? VisiStats[ j ].tsum / VisiStats[ j ].visits : 0 ),
+			(unsigned long)( VisiStats[ j ].visits ? VisiStats[ j ].tmin : 0 ),
 			(int)VisiStats[ j ].visits,
 			m->Group[ j ].name );
 	}

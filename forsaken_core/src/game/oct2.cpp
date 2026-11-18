@@ -489,9 +489,9 @@ void SetViewportError( char *where, render_viewport_t *vp )
     //"xmax=%f ymax=%f\n"
     "zmin=%f zmax=%f\n",
     where,
-    sizeof( *vp ),
-    vp->X, vp->Y,
-    vp->Width, vp->Height,
+    (int) sizeof( *vp ),
+    (unsigned long) vp->X, (unsigned long) vp->Y,
+    (unsigned long) vp->Width, (unsigned long) vp->Height,
     vp->ScaleX, vp->ScaleY,
     //vp->dvMaxX, vp->dvMaxY,
     vp->MinZ, vp->MaxZ );
