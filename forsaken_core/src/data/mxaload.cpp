@@ -123,11 +123,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	PVFIREPOINT *	FirePointPtr;
 	u_int32_t			Colour;
 	int				colourkey = 0;
-#if	MXA_VERSION_NUMBER == 2
 	int16_t			c;
 	int8_t		*	Int8Pnt;
 	int8_t			SFXFilename[ 128 ];
-#endif
 
 	int numTriangles = 0;
 	int triangleCount = 0;
@@ -619,7 +617,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Uint32Pnt = (u_int32_t *) Int16Pnt;
 				Colour = *Uint32Pnt++;
 
-#if	MXA_VERSION_NUMBER == 2
 
 				Int8Pnt = (int8_t *) Uint32Pnt;
 
@@ -652,9 +649,6 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				memcpy(&SpotFXPtr->SoundFXVolume, FloatPnt++, 4);
 				memcpy(&SpotFXPtr->SoundFXSpeed, FloatPnt++, 4);
 				Uint16Pnt = (u_int16_t *) FloatPnt;
-#else
-				Uint16Pnt = (u_int16_t *) Uint32Pnt;
-#endif
 
 				SpotFXPtr->Red = (u_int8_t) ( ( Colour >> 16 ) & 255 );
 				SpotFXPtr->Green = (u_int8_t) ( ( Colour >> 8 ) & 255 );
