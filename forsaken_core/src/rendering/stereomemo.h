@@ -18,10 +18,24 @@
  * its content identity (pass, group, resume index — see SMEMO_PASS_* in
  * render.h) and every entry carries it; a lookup hits only when the
  * current fill's epoch matches, so aliasing degrades to a safe
- * live-convert miss instead of a false hit. Converted vertices are
- * eye-independent (world-space pos, baked color, raw UV — lighting is
- * shader-side), so an epoch-confirmed reuse with eye 2's live uniforms
- * and draw order reuses the same bytes eye 1 submitted. It is NOT
+ * live-convert miss instead of a false hit. The resume point must
+ * include the poly a fill starts from, not just its texture page: a
+ * fill that runs out of vertex space mid-page resumes on the same page,
+ * and a page-only stamp let eye 2 draw another chunk's sprites
+ * (corrupted, misplaced explosion and shot quads; fixed 2026-11-17).
+ * Converted vertices are eye-independent (world-space pos, baked
+ * color, raw UV — lighting is shader-side) EXCEPT where the fill reads
+ * the eye position: FM_FLAG_MOVEOUT FmPolys are pulled toward
+ * CurrentCamera.Pos, so those fills stamp SMEMO_PASS_NO_REUSE and
+ * are never recorded or reused. Fills that hit MAX_TEXTURE_GROUPS
+ * mid-fill (one texgroup per sprite quad, busy scenes) add
+ * SMEMO_CHUNK_STEP per chunk. Only stamped fills, level walls and water
+ * are reused at all (render_c3d memo_reusable): model vertex buffers are
+ * rewritten per on-screen copy, TransExe copies are keyed by a reused
+ * slot, and the missile inset runs with the memo suspended
+ * (c3d_memo_suspend). Otherwise an epoch-confirmed reuse
+ * with eye 2's live uniforms and draw order reuses the same bytes
+ * eye 1 submitted. It is NOT
  * unconditionally pixel-identical to a live eye-2 convert: batches
  * whose source UVs advance once per frame (texture animation) can
  * epoch-match while content stepped, leaving a one-step UV lag in
@@ -64,7 +78,7 @@ unsigned smemo_persist_resets(void);
  * pointer conversion ever appears at a call site. */
 void smemo_record(const void *renderObject, int sub,
                    long offset, int count,
-                   uint32_t epass, uint32_t epgroup, uint32_t etpage);
+                   uint32_t epass, uint32_t epgroup, uint32_t eresume);
 
 /* Eye 2 hit: fills the offset/count outs with the recorded range, but
  * only when the recorded fill epoch matches the current fill's epoch.
@@ -73,7 +87,7 @@ void smemo_record(const void *renderObject, int sub,
  * converts live (the safe fallback — never stale data). */
 bool smemo_lookup(const void *renderObject, int sub,
                    long *offset, int *count,
-                   uint32_t epass, uint32_t epgroup, uint32_t etpage);
+                   uint32_t epass, uint32_t epgroup, uint32_t eresume);
 
 /* Pack (texgroup id, orthographic, primitive) into the sub-key.
  * Pure int arithmetic — texgroup ids are small non-negative array

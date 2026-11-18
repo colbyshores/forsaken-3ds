@@ -649,7 +649,7 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_POLYS_CLIPPED;
 	renderObject->memoEpochGroup = Group;
-	renderObject->memoEpochTPage = *TPage;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextPoly);
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
@@ -840,6 +840,7 @@ bool PolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuffer
 								FSUnlockIndexBuffer(renderObject);
 								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
+								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
@@ -895,7 +896,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	/* opt5b memo epoch: whole-scene fill (no single group). */
 	renderObject->memoEpochPass = SMEMO_PASS_POLYS_UNCLIPPED;
 	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
-	renderObject->memoEpochTPage = *TPage;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextPoly);
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
@@ -1086,6 +1087,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 								FSUnlockIndexBuffer(renderObject);
 								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
+								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
@@ -1187,7 +1189,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_SOLID_CLIPPED;
 	renderObject->memoEpochGroup = Group;
-	renderObject->memoEpochTPage = *TPage;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextPoly);
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
@@ -1379,6 +1381,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecB
 								FSUnlockIndexBuffer(renderObject);
 								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
+								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
@@ -1434,7 +1437,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	/* opt5b memo epoch: whole-scene fill (no single group). */
 	renderObject->memoEpochPass = SMEMO_PASS_SOLID_UNCLIPPED;
 	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
-	renderObject->memoEpochTPage = *TPage;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextPoly);
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			TotalVerts;
@@ -1625,6 +1628,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 								FSUnlockIndexBuffer(renderObject);
 								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
+								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);

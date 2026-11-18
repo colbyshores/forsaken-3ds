@@ -3500,7 +3500,14 @@ bool RenderCurrentCameraWithMainGameMenu(void)
 
 		CurrentCamera.UseLowestLOD = true;
 
-		if( RenderCurrentCamera() != true )
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		c3d_memo_suspend(true);
+#endif
+		bool inset_ok = RenderCurrentCamera();
+#if defined(__3DS__) && defined(RENDERER_C3D)
+		c3d_memo_suspend(false);
+#endif
+		if( inset_ok != true )
 			return false;
 
 		Current_Camera_View = TempMissileCam;

@@ -214,10 +214,31 @@ typedef enum {
 	SMEMO_PASS_SOLID_UNCLIPPED = 4,
 	SMEMO_PASS_FM_CLIPPED = 5,
 	SMEMO_PASS_FM_UNCLIPPED = 6,
-	SMEMO_PASS_LINES = 7
+	SMEMO_PASS_LINES = 7,
+	/* Never recorded, never reused: the other eye (or frame) converts
+	 * its own. Stamped where the content is not identified by the
+	 * renderObject: FmPoly fills with FM_FLAG_MOVEOUT (pulled toward
+	 * CurrentCamera.Pos, which differs per eye) and TransExe copies
+	 * (slot address, refilled per camera pass in visibility order). */
+	SMEMO_PASS_NO_REUSE = 8
 } SMEMO_PASS;
 /* Fill epoch for a whole-scene (unclipped) fill: no single group. */
 #define SMEMO_WHOLE_GROUP 0xFFFFFFFFu
+/* Resume point of a poly/FmPoly fill: the texture page AND the poly it
+ * starts from. A fill that runs out of vertex space mid-page resumes on
+ * the same page from a later poly, so the page alone does not identify
+ * the content (two chunks of one page would share an epoch and the
+ * right eye would draw the other chunk's vertices). */
+static inline unsigned int smemo_resume(int tpage, unsigned int poly)
+{
+	return (((unsigned int)tpage & 0xFFFu) << 16) | (poly & 0xFFFFu);
+}
+/* A fill that reaches MAX_TEXTURE_GROUPS (one texgroup per sprite quad)
+ * draws, resets numTextureGroups and keeps filling: every chunk after
+ * the first adds this step so its texgroup ids do not alias the earlier
+ * chunk's. Pages fit in 12 bits (MAXTPAGESPERTLOAD is 50), leaving the
+ * top 4 bits for the chunk number. */
+#define SMEMO_CHUNK_STEP (1u << 28)
 
 /* Vertex-owner class (R05 sizing + future persistent-geometry tagging).
  * Set once at buffer-creation time by the owning loader; never changed
@@ -242,7 +263,7 @@ typedef struct RENDEROBJECT
 	TEXTUREGROUP *textureGroups;
 	unsigned int memoEpochPass;
 	unsigned int memoEpochGroup;
-	unsigned int memoEpochTPage;
+	unsigned int memoEpochResume;
 	unsigned int vertOwner;
 } RENDEROBJECT;
 
@@ -256,7 +277,7 @@ typedef struct LEVELRENDEROBJECT
 	TEXTUREGROUP *textureGroups;
 	unsigned int memoEpochPass;
 	unsigned int memoEpochGroup;
-	unsigned int memoEpochTPage;
+	unsigned int memoEpochResume;
 	unsigned int vertOwner;
 } LEVELRENDEROBJECT;
 
@@ -350,6 +371,7 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject);
 void c3d_set_object_proctex(bool on);
 void c3d_set_object_shine_eligible(bool eligible);
 void c3d_transfer_eye(unsigned int eye);	/* stereo: switch to the other eye's target */
+void c3d_memo_suspend(bool suspend);		/* stereo: render a nested camera (missile inset) with no memo */
 void c3d_upload_xlights(void);				/* push the visible XLights to the vshader */
 void c3d_clear_bottom_screen(void);
 bool c3d_hud_begin_bottom(void);			/* route HUD draws to the bottom screen */

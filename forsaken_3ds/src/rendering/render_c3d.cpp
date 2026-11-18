@@ -199,6 +199,40 @@ typedef enum {
 	SMEMO_LOOKUP      /* right eye: reuse recorded ranges, convert misses */
 } smemo_mode_t;
 static smemo_mode_t s_memoMode = SMEMO_OFF;
+/* c3d_memo_suspend: a nested camera pass (missile inset) runs inside an
+ * eye pass and refills the same stamped fills from another camera, so
+ * it must neither record over the eye's ranges nor reuse them. */
+static smemo_mode_t s_memoSaved = SMEMO_OFF;
+static bool s_memoSuspended = false;
+
+/* Whether this renderObject's converted vertices may be recorded and
+ * reused by the other eye. Stamped shared fills carry their content
+ * identity; level walls and water are converted once per frame from
+ * content that does not change between the eyes. Everything else
+ * (models: one vertex buffer per model type, rewritten per on-screen
+ * copy for pose, colour and UVs) converts live in each eye. */
+static bool memo_reusable(const RENDEROBJECT *ro)
+{
+	if (ro->memoEpochPass == SMEMO_PASS_NO_REUSE)
+		return false;
+	if (ro->memoEpochPass != SMEMO_PASS_UNSET)
+		return true;
+	return ro->vertOwner == VERT_OWNER_LEVEL || ro->vertOwner == VERT_OWNER_WATER;
+}
+
+void c3d_memo_suspend(bool suspend)
+{
+	if (suspend) {
+		if (!s_memoSuspended) {
+			s_memoSaved = s_memoMode;
+			s_memoMode = SMEMO_OFF;
+			s_memoSuspended = true;
+		}
+	} else if (s_memoSuspended) {
+		s_memoMode = s_memoSaved;
+		s_memoSuspended = false;
+	}
+}
 
 /* ---- R05 persistent level geometry (PERSIST_VERTS, default off) ----
  * Level-wall (VERT_OWNER_LEVEL) texgroups are converted once into
@@ -1432,6 +1466,7 @@ bool FSBeginScene(void)
 	/* Gated on 3DS stereo: mono frames must not pay the record cost. */
 	s_memoMode = (render_info.stereo_mode == STEREO_MODE_3DS) ?
 		SMEMO_RECORD : SMEMO_OFF;
+	s_memoSuspended = false;
 	/* Level load/unload bumped the persist reset count: free retained
 	 * buffers once, lazily, before any new conversion can reuse them. */
 	if (s_persistResetsSeen != smemo_persist_resets()) {
@@ -2838,6 +2873,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				 * fully live. */
 				if (s_memoMode != SMEMO_OFF)
 					s_memoMode = SMEMO_OFF;
+				s_memoSaved = SMEMO_OFF;	/* a suspended pass must not re-arm it */
 				C3D_BindProgram(&s_shaderProgram);
 				{
 					C3D_AttrInfo *ai = C3D_GetAttrInfo();
@@ -2889,13 +2925,14 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 				totalVerts = pcnt;
 			}
 		}
-		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic) {
+		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic &&
+		    memo_reusable(renderObject)) {
 			memo_hit = smemo_lookup(renderObject,
 				smemo_sub(sorted_order[group], 0, primitive_type),
 				&memo_off, &memo_cnt,
 				renderObject->memoEpochPass,
 				renderObject->memoEpochGroup,
-				renderObject->memoEpochTPage);
+				renderObject->memoEpochResume);
 		}
 		/* Convert live unless the memo/persist hit (VERIFY converts
 		 * anyway for the oracle compare below). */
@@ -2985,13 +3022,13 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		if (!orthographic) {
 			tg_memo_off[group] = dst - s_scratch;
 			tg_memo_cnt[group] = totalVerts;
-			if (s_memoMode == SMEMO_RECORD) {
+			if (s_memoMode == SMEMO_RECORD && memo_reusable(renderObject)) {
 				smemo_record(renderObject,
 					smemo_sub(sorted_order[group], 0, primitive_type),
 					dst - s_scratch, totalVerts,
 					renderObject->memoEpochPass,
 					renderObject->memoEpochGroup,
-					renderObject->memoEpochTPage);
+					renderObject->memoEpochResume);
 			}
 		}
 		/* R05: retain this conversion for level walls. On success the

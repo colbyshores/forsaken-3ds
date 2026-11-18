@@ -1685,7 +1685,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 	/* opt5b memo epoch: stamp this fill's content identity. */
 	renderObject->memoEpochPass = SMEMO_PASS_FM_CLIPPED;
 	renderObject->memoEpochGroup = Group;
-	renderObject->memoEpochTPage = *TPage;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			BitCount;
@@ -1909,6 +1909,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 /*-------------- Errrrmmmmmmm ---------------*/
 							if( ( FmPolys[ i ].Flags & FM_FLAG_MOVEOUT ) )
 							{
+								renderObject->memoEpochPass = SMEMO_PASS_NO_REUSE;
 								TempVector.x = ( FmPolys[ i ].Pos.x - CurrentCamera.Pos.x );
 								TempVector.y = ( FmPolys[ i ].Pos.y - CurrentCamera.Pos.y );
 								TempVector.z = ( FmPolys[ i ].Pos.z - CurrentCamera.Pos.z );
@@ -2000,6 +2001,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, /*LPDIRECT3DEXECUTEBUFFER ExecBuff
 								FSUnlockIndexBuffer(renderObject);
 								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
+								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
@@ -2056,7 +2058,7 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 	/* opt5b memo epoch: whole-scene fill (no single group). */
 	renderObject->memoEpochPass = SMEMO_PASS_FM_UNCLIPPED;
 	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
-	renderObject->memoEpochTPage = *TPage;
+	renderObject->memoEpochResume = smemo_resume(*TPage, *NextFmPoly);
 	u_int16_t			i;
 	int16_t			Count;
 	int16_t			BitCount;
@@ -2280,6 +2282,7 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 /*-------------- Errrrmmmmmmm ---------------*/
 							if( ( FmPolys[ i ].Flags & FM_FLAG_MOVEOUT ) )
 							{
+								renderObject->memoEpochPass = SMEMO_PASS_NO_REUSE;
 								TempVector.x = ( FmPolys[ i ].Pos.x - CurrentCamera.Pos.x );
 								TempVector.y = ( FmPolys[ i ].Pos.y - CurrentCamera.Pos.y );
 								TempVector.z = ( FmPolys[ i ].Pos.z - CurrentCamera.Pos.z );
@@ -2371,6 +2374,7 @@ bool FmPolyDispGroupUnclipped( /*LPDIRECT3DEXECUTEBUFFER ExecBuffer*/RENDEROBJEC
 								FSUnlockIndexBuffer(renderObject);
 								draw_billboard_object(renderObject);
 								renderObject->numTextureGroups = 0;
+								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);

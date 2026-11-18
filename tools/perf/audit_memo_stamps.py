@@ -95,7 +95,7 @@ def main():
                 continue
             if f"memoEpochPass = {want}" not in body:
                 failures.append(f"{fname}:{func} missing stamp memoEpochPass = {want}")
-            if "memoEpochGroup" not in body or "memoEpochTPage" not in body:
+            if "memoEpochGroup" not in body or "memoEpochResume" not in body:
                 failures.append(f"{fname}:{func} stamp incomplete (need Group+TPage)")
 
     # 2. No unstamped, unallowlisted fill-shaped function anywhere scanned.

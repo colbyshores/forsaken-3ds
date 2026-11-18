@@ -56,6 +56,12 @@ void AddTransExe( /*LPD3DMATRIX Matrix*/RENDERMATRIX *Matrix , /*LPDIRECT3DEXECU
 		 * RENDEROBJECT* that used to overread the source is no
 		 * longer a concern (same size, same layout). */
 		TransExe[NumOfTransExe].renderObject = (*renderObject);
+		/* The copy is drawn from its slot, and slots are refilled every
+		 * camera pass in visibility order, so the slot address does not
+		 * identify the content: keep it out of the stereo memo and the
+		 * persistent level cache (both key on the renderObject). */
+		TransExe[NumOfTransExe].renderObject.memoEpochPass = SMEMO_PASS_NO_REUSE;
+		TransExe[NumOfTransExe].renderObject.vertOwner = VERT_OWNER_OTHER;
 		TransExe[NumOfTransExe].Model = Model;
 		TransExe[NumOfTransExe].NumVerts = NumVerts;
 		TransExe[NumOfTransExe].group = group;

@@ -26,7 +26,7 @@ struct Entry {
     int count;
     uint32_t epass;
     uint32_t epgroup;
-    uint32_t etpage;
+    uint32_t eresume;
     unsigned gen;
 };
 
@@ -82,7 +82,7 @@ struct StereoMemo {
 
     void record(const void *renderObject, int sub,
                 long offset, int count,
-                uint32_t epass, uint32_t epgroup, uint32_t etpage)
+                uint32_t epass, uint32_t epgroup, uint32_t eresume)
     {
         const unsigned i = hash_key((uintptr_t)renderObject, sub);
         for (unsigned n = 0; n < SMEMO_PROBE_MAX; n++) {
@@ -94,7 +94,7 @@ struct StereoMemo {
                 e->count = count;
                 e->epass = epass;
                 e->epgroup = epgroup;
-                e->etpage = etpage;
+                e->eresume = eresume;
                 e->gen = gen;
                 return;
             }
@@ -105,7 +105,7 @@ struct StereoMemo {
 
     bool lookup(const void *renderObject, int sub,
                 long *offset, int *count,
-                uint32_t epass, uint32_t epgroup, uint32_t etpage) const
+                uint32_t epass, uint32_t epgroup, uint32_t eresume) const
     {
         const unsigned i = hash_key((uintptr_t)renderObject, sub);
         for (unsigned n = 0; n < SMEMO_PROBE_MAX; n++) {
@@ -119,7 +119,7 @@ struct StereoMemo {
             if (e->gen != gen)
                 return false;
             if (e->ro == (uintptr_t)renderObject && e->sub == sub) {
-                if (e->epass != epass || e->epgroup != epgroup || e->etpage != etpage)
+                if (e->epass != epass || e->epgroup != epgroup || e->eresume != eresume)
                     return false;
                 *offset = e->offset;
                 *count = e->count;
@@ -142,14 +142,14 @@ unsigned smemo_persist_resets(void) { return g_memo.persist_resets; }
 
 void smemo_record(const void *renderObject, int sub,
                   long offset, int count,
-                  uint32_t epass, uint32_t epgroup, uint32_t etpage)
+                  uint32_t epass, uint32_t epgroup, uint32_t eresume)
 {
-    g_memo.record(renderObject, sub, offset, count, epass, epgroup, etpage);
+    g_memo.record(renderObject, sub, offset, count, epass, epgroup, eresume);
 }
 
 bool smemo_lookup(const void *renderObject, int sub,
                   long *offset, int *count,
-                  uint32_t epass, uint32_t epgroup, uint32_t etpage)
+                  uint32_t epass, uint32_t epgroup, uint32_t eresume)
 {
-    return g_memo.lookup(renderObject, sub, offset, count, epass, epgroup, etpage);
+    return g_memo.lookup(renderObject, sub, offset, count, epass, epgroup, eresume);
 }
