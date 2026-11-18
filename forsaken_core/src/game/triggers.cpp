@@ -31,7 +31,6 @@
 #include "game/oct2.h"
 #include "world/node.h"
 
-#undef DEBUG_TRIGGERS
 
 /*===================================================================
 		Defines
@@ -203,10 +202,6 @@ void ModifyTriggerVar( TRIGGERVAR * TrigVar , int Op , int Val )
 
 	if( TrigVar->State == old_state ) return;
 
-#ifdef DEBUG_TRIGGERS
-	DebugPrintf( "modifytrigvar: var=%s(=%d) op=%d val=%d -> %d\n",
-		TrigVar->Name, old_state, Op, Val, TrigVar->State );
-#endif
 
 	for( i = 0 ; i < TrigVar->NumOfTriggers ; i++ )
 	{
@@ -257,10 +252,6 @@ void ModifyTriggerVar( TRIGGERVAR * TrigVar , int Op , int Val )
 
 		if ( Doit )
 		{
-#ifdef DEBUG_TRIGGERS
-			DebugPrintf( "modifytrigvar: trigger %d (type=%d, activestate=%d) activated (was %d)\n",
-				Trig - Triggers, (int) Trig->Type, Trig->ActiveState, Trig->Active );
-#endif
 			if( !(strncasecmp( "secret" , &TrigVar->Name[0], 6 ) ) )
 			{
 				PlaySfx( SFX_Secret, 1.0F );
@@ -333,10 +324,6 @@ void AddCondition( CONDITION * Con )
 		return;
 	}else{
 		// it is a new condition...
-#ifdef DEBUG_TRIGGERS
-		DebugPrintf( "AddCondition: condition %d (triggers=%d) activated\n",
-			Con - Conditions, Con->NumOfTriggers );
-#endif
 		ActiveConditions[NumOfActiveConditions] = Con;
 		NumOfActiveConditions++;
 	}
@@ -428,10 +415,6 @@ void (* EventList[ ])( u_int8_t * Data ) = {
 ===================================================================*/
 void ProcessEvent( EVENT * Event )
 {
-#ifdef DEBUG_TRIGGERS
-	DebugPrintf( "ProcessEvent: type=%d, data[0-3]=0x%08X\n",
-		(int) Event->Type, *(int *) Event->Data );
-#endif
 	if( EventList[ Event->Type ] )
 		( * EventList[ Event->Type ] )( (u_int8_t*) &Event->Data);		//go off and do his thing...
 }
@@ -1312,9 +1295,6 @@ void GenTriggerList( u_int16_t Ship, SHORTTRIGGER * TriggerSlots, BYTE * NumTrig
 		}
 	}
 
-#if DEBUG_TRIGGERS
-	DebugPrintf( "Part %d, %d Triggers\n", ( Section - 1 ), NumUsed );
-#endif
 
 	*NumTriggerSlots = (BYTE) NumUsed;
 }
@@ -1334,9 +1314,6 @@ void RegenTriggerList( SHORTTRIGGER * Slots, BYTE Num )
 
 	for( Count = 0; Count < Num; Count++ )
 	{
-#if DEBUG_TRIGGERS
-		DebugPrintf( "Part %d, Trigger %d Active = %d\n", Ships[ WhoIAm ].Triggers, ( ( Ships[ WhoIAm ].Triggers * MAXGENTRIGGERCOUNT ) + Count ), Slots->Active );
-#endif
 		Ptr->Active = Slots->Active;
 		Slots++;
 		Ptr++;
@@ -1384,9 +1361,6 @@ void GenTrigVarList( u_int16_t Ship, SHORTTRIGVAR * TrigVarSlots, BYTE * NumTrig
 		}
 	}
 
-#if DEBUG_TRIGGERS
-	DebugPrintf( "Part %d, %d TrigVars\n", ( Section - 1 ), NumUsed );
-#endif
 
 	*NumTrigVarSlots = (BYTE) NumUsed;
 }
@@ -1406,9 +1380,6 @@ void RegenTrigVarList( SHORTTRIGVAR * Slots, BYTE Num )
 
 	for( Count = 0; Count < Num; Count++ )
 	{
-#if DEBUG_TRIGGERS
-		DebugPrintf( "Part %d, TrigVar %d State = %d\n", Ships[ WhoIAm ].TrigVars, ( ( Ships[ WhoIAm ].TrigVars * MAXGENTRIGVARCOUNT ) + Count ), Slots->State );
-#endif
 		Ptr->State = Slots->State;
 		Slots++;
 		Ptr++;

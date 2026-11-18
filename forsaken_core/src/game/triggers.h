@@ -18,7 +18,6 @@
  * Defines
  */
 
-#define DEBUG_TRIGGERS		0
 
 
 constexpr int MAXDATAPEREVENT = 64; // in bytes
