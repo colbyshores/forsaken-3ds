@@ -23,6 +23,7 @@
 #include "game/oct2.h"
 #include "game/ships.h"
 #include "util/hunk_alloc.h"
+#include "util/file_reader.h"
 
 /*===================================================================
 		Externs...	
@@ -73,8 +74,6 @@ bool PreWaterLoad( char * Filename )
 	long			File_Size;
 	long			Read_Size;
 	char		*	Buffer;
-	u_int16_t * Uint16Pnt;
-	u_int32_t * Uint32Pnt;
 	char	*	FileNamePnt;
 	char buf[256];
 	int i;
@@ -115,10 +114,9 @@ bool PreWaterLoad( char * Filename )
 		return( false );
 	}
 
-	Uint32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *Uint32Pnt++;
-	VersionNumber = *Uint32Pnt++;
-	Buffer = (char *) Uint32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != WAT_VERSION_NUMBER  ) )
 	{
@@ -126,10 +124,8 @@ bool PreWaterLoad( char * Filename )
 		return( false );
 	}
 
-	Uint16Pnt = (u_int16_t *) Buffer;
-
-	NumOfWaterObjects = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;		
+	NumOfWaterObjects = in.u16();
+	Buffer = (char *) in.pos();
 	// get the Tpage sorted out...
 	FileNamePnt = (char *) &buf[0];
 	while ( ( *FileNamePnt++ = *Buffer++ ) != 0 );
@@ -154,12 +150,8 @@ bool WaterLoad( void )
 	char		*	OrgBuffer;
 	int			i;
 	WATEROBJECT	* WO;
-	float * FloatPnt;
-	u_int16_t * Uint16Pnt;
-	int16_t * int16Pnt;
 	u_int16_t NumOfGroups = 0;
 	COLOR col;
-	COLOR * D3DColourPnt;
 
 	FirstWaterObject = NULL;
 	Buffer = WaterBuffer;
@@ -168,25 +160,17 @@ bool WaterLoad( void )
 	if( !Buffer )
 		return true;
 
-	Uint16Pnt = (u_int16_t *) Buffer;
-	NumOfGroups = *Uint16Pnt++;
-	Buffer = (char*) Uint16Pnt;
+	FileReader in( Buffer );
+	NumOfGroups = in.u16();
 
 	for( i = 0 ; i < NumOfGroups ; i++ )
 	{
-		Uint16Pnt = (u_int16_t *) Buffer;
-		GroupWaterInfo[i] = *Uint16Pnt++;
-		Buffer = (char*) Uint16Pnt;
-
-		D3DColourPnt = (COLOR *) Buffer;
-		col = *D3DColourPnt++;
+		GroupWaterInfo[i] = in.u16();
+		col = in.u32();
 
 		GroupWaterIntensity_Red[i] = RGBA_GETRED(col) * ONEOVER255;
 		GroupWaterIntensity_Green[i] = RGBA_GETGREEN(col) * ONEOVER255;
 		GroupWaterIntensity_Blue[i] = RGBA_GETBLUE(col) * ONEOVER255;
-
-		Buffer = (char*) D3DColourPnt;
-
 	}
 
 	
@@ -232,19 +216,16 @@ bool WaterLoad( void )
 			}
 		}
 
-		Uint16Pnt = (u_int16_t *) Buffer;
-		WO->Group = *Uint16Pnt++;
-		FloatPnt = (float*) Uint16Pnt;
-		memcpy_unaligned(&WO->Pos, FloatPnt, 4*3);
-		FloatPnt+=3;
+		WO->Group = in.u16();
+		WO->Pos = in.vec();
 		WO->offset = 0.0F;
 		GroupWaterLevel[WO->Group] = WO->Pos.y + WATER_CELLSIZE;
-		memcpy(&WO->XSize, FloatPnt++, 4);
-		memcpy(&WO->YSize, FloatPnt++, 4);
-		memcpy(&WO->uTL, FloatPnt++, 4);
-		memcpy(&WO->vTL, FloatPnt++, 4);
-		memcpy(&WO->uBR, FloatPnt++, 4);
-		memcpy(&WO->vBR, FloatPnt++, 4);
+		WO->XSize = in.f32();
+		WO->YSize = in.f32();
+		WO->uTL = in.f32();
+		WO->vTL = in.f32();
+		WO->uBR = in.f32();
+		WO->vBR = in.f32();
 
 		WO->uRange = WO->uBR - WO->uTL;
 		WO->vRange = WO->vBR - WO->vTL;
@@ -272,30 +253,22 @@ bool WaterLoad( void )
 
 		}
 		AddWaterLink(WO);
-		Buffer = (char *) FloatPnt;		
 
-		D3DColourPnt = (COLOR *) Buffer;
-		col = *D3DColourPnt++;
+		col = in.u32();
 		WO->Red = RGBA_GETRED(col) * ONEOVER255;
 		WO->Green = RGBA_GETGREEN(col) * ONEOVER255;
 		WO->Blue = RGBA_GETBLUE(col) * ONEOVER255;
-		Buffer = (char*) D3DColourPnt;
-		
-		FloatPnt = (float*) Buffer;
-		memcpy(&WO->MaxLevel, FloatPnt++, 4);
-		memcpy(&WO->MinLevel, FloatPnt++, 4);
-		memcpy(&WO->FillRate, FloatPnt++, 4); WO->FillRate/=60.0f;
-		memcpy(&WO->DrainRate, FloatPnt++, 4); WO->DrainRate/=60.0f;
-		memcpy(&WO->Density, FloatPnt++, 4);
-		memcpy(&WO->MaxWaveSize, FloatPnt++, 4);
-		Buffer = (char *) FloatPnt;		
 
-		Uint16Pnt = (u_int16_t *) Buffer;
-		WO->Trigger_WhenFilled = *Uint16Pnt++;
-		WO->Trigger_WhenDrained = *Uint16Pnt++;
-		int16Pnt = (int16_t*) Uint16Pnt;
-		WO->Damage = (((float) *int16Pnt++) / 60.0F);
-		Buffer = (char *) int16Pnt;
+		WO->MaxLevel = in.f32();
+		WO->MinLevel = in.f32();
+		WO->FillRate = in.f32(); WO->FillRate/=60.0f;
+		WO->DrainRate = in.f32(); WO->DrainRate/=60.0f;
+		WO->Density = in.f32();
+		WO->MaxWaveSize = in.f32();
+
+		WO->Trigger_WhenFilled = in.u16();
+		WO->Trigger_WhenDrained = in.u16();
+		WO->Damage = (((float) in.i16()) / 60.0F);
 
 		WO++;
 	}
