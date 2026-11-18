@@ -709,7 +709,7 @@ void	TeamGoalsSend( u_int16_t * TeamGoals )
 	SendGameMessage( MSG_TEAMGOALS, 0, 0, 0, 0 );
 }
 
-void	CreateShockwaveSend( u_int16_t OwnerShip, u_int16_t Owner, VECTOR * Pos, u_int16_t Group, float ShockwaveSize, BYTE Weapon )
+void	CreateShockwaveSend( u_int16_t /*OwnerShip*/, u_int16_t Owner, VECTOR * Pos, u_int16_t Group, float ShockwaveSize, BYTE Weapon )
 {
 	float dist;
 	int i;

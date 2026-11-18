@@ -3051,7 +3051,7 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 				:	float		R,G,B,Trans
 	Output		:	bool		True/False
 ===================================================================*/
-bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, int A , float rp , float gp , float bp)
+bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	LPLVERTEX			SrclpD3DLVERTEX = NULL;
@@ -3157,7 +3157,7 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 				:	float		R,G,B,Trans
 	Output		:	bool		True/False
 ===================================================================*/
-bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, int A , float rp , float gp , float bp)
+bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
 	LPLVERTEX			DstlpD3DLVERTEX = NULL;
 	LPLVERTEX			SrclpD3DLVERTEX = NULL;
@@ -3880,7 +3880,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void GravityWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center_Grav, u_int16_t Group )
+void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_Grav, u_int16_t Group )
 {
 	int16_t	Gravity;
 	u_int16_t	EndGroup;
@@ -5791,7 +5791,7 @@ bool EngineEnabled( u_int16_t OwnerType, u_int16_t Owner )
 /*===================================================================
 		True EnviroMent Mapping for an Mxaloadheader...
 ===================================================================*/
-bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
+bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 {
 	VECTOR Temp;
 	u_int16_t group;

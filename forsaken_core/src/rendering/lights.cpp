@@ -123,7 +123,7 @@ void	KillUsedXLight( u_int16_t light )
 	Output		:	nothing
 ===================================================================*/
 /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-bool	ProcessXLights( MLOADHEADER * Mloadheader )
+bool	ProcessXLights( MLOADHEADER * /*Mloadheader*/ )
 {
 	u_int16_t	light;
 	u_int16_t	oldlight;

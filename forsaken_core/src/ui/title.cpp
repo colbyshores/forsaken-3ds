@@ -1035,7 +1035,7 @@ MENU	MENU_NEW_ValidPickups = {
 };
 
 
-void GameTypeRefresh( int * i )
+void GameTypeRefresh( int * /*i*/ )
 {
 	BountyBonusInterval = ( BountyBonus ) ? BountyBonusSlider.value : 0;
 }
@@ -1591,12 +1591,12 @@ MENU	MENU_NEW_GetTeamPlayers = {
 	}
 };
 
-void JoiningExit(MENU *Menu)
+void JoiningExit(MENU * /*Menu*/)
 {
 	network_cleanup();
 }
 
-void JoiningEnter(MENU *Menu)
+void JoiningEnter(MENU * /*Menu*/)
 {
 	network_return_t rv;
 
@@ -1680,7 +1680,7 @@ void update_join_status( const char * str )
 }
 
 char show_f1[100] = "( press F1 to retry )";
-void CheckJoinStatus( int * i )
+void CheckJoinStatus( int * /*i*/ )
 {
 	// disconnect and reconnect if f1 is pressed
 	if ( input_buffer_find( SDLK_F1 ) )
@@ -1776,13 +1776,13 @@ void UpdateGameList( void )
 
 px_timer_t game_list_timer;
 
-void Enter_ChooseConnectionToJoin( MENU *Menu )
+void Enter_ChooseConnectionToJoin( MENU * /*Menu*/ )
 {
 	timer_clear( &game_list_timer );
 	UpdateGameList();
 }
 
-void Update_ChooseConnectionToJoin( int * z )
+void Update_ChooseConnectionToJoin( int * /*z*/ )
 {
 	// check time passed
 	if ( timer_peek( &game_list_timer ) < 2 ) return;
@@ -2098,12 +2098,12 @@ bool quick_text_timer_ok( void )
 	}
 	return timer_peek(&quick_text_timer) > 0.05f;
 }
-void InitQuickText( MENU *Menu )
+void InitQuickText( MENU * /*Menu*/ )
 {
 	if(!quick_text_timer_ok())
 		MenuExit();
 }
-void QuitQuickText( MENU *Menu )
+void QuitQuickText( MENU * /*Menu*/ )
 {
 	timer_run(&quick_text_timer);
 }
@@ -5358,7 +5358,7 @@ void MenuBack()
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void MenuItemBack( MENUITEM *item )
+void MenuItemBack( MENUITEM * /*item*/ )
 {
 	MenuBack();
 }
@@ -5369,7 +5369,7 @@ void MenuItemBack( MENUITEM *item )
 	Input		:		MENUITEM * Item...
 	Output		:		Nothing
 ===================================================================*/
-void	SetDifficulty( MENUITEM * Item )
+void	SetDifficulty( MENUITEM * /*Item*/ )
 {
 }
 
@@ -5900,14 +5900,14 @@ void SetKeyDefPage( int page )
 	}
 }
 
-void InitKeyDefPage( MENU *Menu )
+void InitKeyDefPage( MENU * /*Menu*/ )
 {
 	SetKeyDefPage( 0 );
 	MenuState = MENUSTATE_SelectKeydef;
 }
 
 
-void InitKeyDef( MENU *Menu )
+void InitKeyDef( MENU * /*Menu*/ )
 {
 	MenuState = MENUSTATE_SelectKeydef;
 }
@@ -6455,7 +6455,7 @@ void DrawKeyDef( MENUITEM *Item )
 	Output		:		Nothing
 ===================================================================*/
 
-void ExitDetailLevels( MENU *Menu )
+void ExitDetailLevels( MENU * /*Menu*/ )
 {
 	SetGamePrefs();
 }
@@ -6473,7 +6473,7 @@ void InitBikerMenu( MENU *Menu )
 	InitPilotMenu( Menu );
 }
 
-void InitBikeComputerMenu( MENU *Menu )
+void InitBikeComputerMenu( MENU * /*Menu*/ )
 {
 	static u_int32_t CurrentSpeechID = 0;
 	BikeComputerList.selected_item = player_config->bikecomp;
@@ -6483,7 +6483,7 @@ void InitBikeComputerMenu( MENU *Menu )
 	CurrentSpeechID = PlaySfx( SFX_BIKECOMP_EX, 1.0F );
 }
 
-void NewInitBikeMenu ( MENU *Menu)
+void NewInitBikeMenu ( MENU * /*Menu*/)
 //same as above, but also stores biker name
 {
 	Config = *player_config;
@@ -6515,7 +6515,7 @@ void ExitBikerMenu( MENU *Menu )
 }
 
 
-void MoveConfigFile( MENU *Menu )
+void MoveConfigFile( MENU * /*Menu*/ )
 {
 	if ( !PilotReName.text[ 0 ] )
 	{
@@ -6541,7 +6541,7 @@ void MoveConfigFile( MENU *Menu )
 	Input		:		pointer to menu
 	Output		:		Nothing
 ===================================================================*/
-void InitBikeList( MENU *Menu )
+void InitBikeList( MENU * /*Menu*/ )
 {
 	BikeList.selected_item = ValidBikeSelected( SelectedBike );
 	strcpy(bike_name,(char*)BikeList.item[BikeList.selected_item]);
@@ -6563,7 +6563,7 @@ void InitBikeListVDU( MENU *Menu )
 }
 
 
-void InitLevelSelectVDU( MENUITEM *Item )
+void InitLevelSelectVDU( MENUITEM * /*Item*/ )
 {
 	MenuState = MENUSTATE_SelectLevelQuick;
 }
@@ -6572,7 +6572,7 @@ void InitLevelSelectVDU( MENUITEM *Item )
 	Input		:		pointer to menu
 	Output		:		Nothing
 ===================================================================*/
-void InitControls( MENU *Menu )
+void InitControls( MENU * /*Menu*/ )
 {
     Autoleveling = Config.autolevel_rate != 0 ? true : false;
 
@@ -6593,7 +6593,7 @@ void InitControls( MENU *Menu )
     }
 }
 
-void SetAutolevel( MENUITEM *item )
+void SetAutolevel( MENUITEM * /*item*/ )
 {
 	Config.autolevel_rate = ( Autoleveling ) ? 0.05F : 0.0F;
 }
@@ -6603,7 +6603,7 @@ void SetAutolevel( MENUITEM *item )
 	Input		:		pointer to menu
 	Output		:		Nothing
 ===================================================================*/
-void ExitControls( MENU *Menu )
+void ExitControls( MENU * /*Menu*/ )
 {
     float sX = SensitivityXSlider.value /
         fabsf(SensitivityXSlider.max - SensitivityXSlider.min);
@@ -6703,7 +6703,7 @@ void InitPilotList( void )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void InitPilotName( MENU *menu )
+void InitPilotName( MENU * /*menu*/ )
 {
 
 	// back up current config
@@ -6730,7 +6730,7 @@ void InitPilotName( MENU *menu )
 	Output		:		Nothing
 ===================================================================*/
 
-void SetPilotName( MENUITEM *item )
+void SetPilotName( MENUITEM * /*item*/ )
 {
 	FILE *f;
 	u_int16_t tempbike;
@@ -6823,7 +6823,7 @@ void SetPilotName( MENUITEM *item )
 	Input		:		pointer to pilot name menu item
 	Output		:		Nothing
 ===================================================================*/
-void SetPilotNameInGame( MENUITEM *item )
+void SetPilotNameInGame( MENUITEM * /*item*/ )
 {
 	FILE *f;
 	static char fname[ 255 ];
@@ -6862,7 +6862,7 @@ void SetPilotNameInGame( MENUITEM *item )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void InitPilotReName( MENU *menu )
+void InitPilotReName( MENU * /*menu*/ )
 {
 	strcpy( old_config, biker_config );
 	strcpy( PilotReName.text, DEFAULT_NEWNAME );
@@ -6878,7 +6878,7 @@ void InitPilotReName( MENU *menu )
 	Input		:		pointer to pilot name menu item
 	Output		:		Nothing
 ===================================================================*/
-void RenamePilotName( MENUITEM *item )
+void RenamePilotName( MENUITEM * /*item*/ )
 {
 	FILE *f;
 	u_int16_t tempbike;
@@ -6924,7 +6924,7 @@ void RenamePilotName( MENUITEM *item )
 	Input		:		pointer to menu
 	Output		:		Nothing
 ===================================================================*/
-void InitPilotMenu( MENU *Menu )
+void InitPilotMenu( MENU * /*Menu*/ )
 {
 	InitPilotName(NULL);
 	InitPilotList();
@@ -6947,7 +6947,7 @@ void InitVDUPilotMenu ( MENU *Menu )
 	InitPilotList();
 }
 
-void GetBikeDetails(int Bike, MENUITEM *item)
+void GetBikeDetails(int Bike, MENUITEM * /*item*/)
 {
 
 	SelectedBikeFrame = BikeChars[ Bike ];
@@ -7541,12 +7541,12 @@ void GetDefaultPilot(void)
 
 }
 
-void InitStartMenu( MENU *Menu )
+void InitStartMenu( MENU * /*Menu*/ )
 {
 }
 
 
-void ExitInGameMenu( MENU *Menu )
+void ExitInGameMenu( MENU * /*Menu*/ )
 {
 	input_grab( true );
 }
@@ -7679,7 +7679,7 @@ char *SearchKey( char c )
 }
 
 
-void SelectQuit( MENUITEM *Item )
+void SelectQuit( MENUITEM * /*Item*/ )
 {	
 	if(IsHost && tracker_enabled)
 		send_tracker_finished( tracker_server, tracker_port );
@@ -7689,7 +7689,7 @@ void SelectQuit( MENUITEM *Item )
 }
 
 
-void InitMultiplayerHost( MENU *Menu )
+void InitMultiplayerHost( MENU * /*Menu*/ )
 {
 	int i;
 
@@ -7708,7 +7708,7 @@ void InitMultiplayerHost( MENU *Menu )
 }
 
 /* init */
-void InitMultiplayerHostVDUPeerPeer( MENU *Menu )
+void InitMultiplayerHostVDUPeerPeer( MENU * /*Menu*/ )
 {
 	int selected_level = -1;
 	int i;
@@ -7767,20 +7767,20 @@ void InitMultiplayerHostVDUPeerPeer( MENU *Menu )
 }
 
 /* exit */
-void ExitMultiplayerHostVDUPeerPeer ( MENU *Menu )
+void ExitMultiplayerHostVDUPeerPeer ( MENU * /*Menu*/ )
 {
 	// save any changes to multi player prefrences
 	SetGamePrefs();
 }
 
-void RedrawMultiplayerHostVDUPeerPeer( int * i )
+void RedrawMultiplayerHostVDUPeerPeer( int * /*i*/ )
 {
 	strncpy( GameTypeName, GameTypeNameTable[ GameType ], sizeof( GameTypeName ) - 1 );
 	GameTypeName[ sizeof( GameTypeName ) - 1 ] = 0;
 	config_set_str( "LevelName", (char*)LevelList.item[ LevelList.selected_item ] );
 }
 
-void LoadLevelText( MENU *Menu )
+void LoadLevelText( MENU * /*Menu*/ )
 {
 	FILE *f;
 	char *newlinechar;
@@ -7929,7 +7929,7 @@ void GetSavedGameData( void )
 	}
 }
 
-void InitTitleLoad( MENU *Menu )
+void InitTitleLoad( MENU * /*Menu*/ )
 {
 	InitSinglePlayerGame( NULL );
 	InitLoadSavedGameList( NULL );
@@ -7948,7 +7948,7 @@ void InitTitleLoad( MENU *Menu )
 	}
 }
 
-void ExitTitleLoad( MENU *Menu )
+void ExitTitleLoad( MENU * /*Menu*/ )
 {
 	// display proper tv
 	Models[ BackgroundModel[ TITLE_MODEL_MenuTVDummy ] ].Visible = 0;
@@ -7956,7 +7956,7 @@ void ExitTitleLoad( MENU *Menu )
 
 }
 
-void InitSinglePlayerGame( MENU *Menu )
+void InitSinglePlayerGame( MENU * /*Menu*/ )
 {
 	if ( !InitLevels( SINGLEPLAYER_LEVELS ) && !InitLevels( DEFAULT_LEVELS ) )
 	{
@@ -7966,7 +7966,7 @@ void InitSinglePlayerGame( MENU *Menu )
 	Lives = 5;
 }
 
-void SelectQuitCurrentGame( MENUITEM *Item )
+void SelectQuitCurrentGame( MENUITEM * /*Item*/ )
 {
 	// If the host is performing transfer of stuff to other players wait until hes finished before he quits..
 	if( HostDuties )
@@ -8025,7 +8025,7 @@ void AddBikeArrow( char *name, int num )
 	strcpy( name, tempbikename );
 }
 
-void ExitBikeSelection( MENUITEM * item )
+void ExitBikeSelection( MENUITEM * /*item*/ )
 {
 	
 
@@ -8051,7 +8051,7 @@ void ExitBikeSelection( MENUITEM * item )
 	UpdateSfxForBiker( SelectedBike );
 }
 
-void ExitBikeComputerSelection( MENUITEM * item )
+void ExitBikeComputerSelection( MENUITEM * /*item*/ )
 {
 	static u_int32_t CurrentSpeechID = 0;
 
@@ -8072,7 +8072,7 @@ void ExitBikeComputerSelection( MENUITEM * item )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void MenuGoFullScreen( MENUITEM *Item )
+void MenuGoFullScreen( MENUITEM * /*Item*/ )
 {
 	if( MyGameStatus == STATUS_Title )
 	{
@@ -8105,7 +8105,7 @@ void MenuGoFullScreen( MENUITEM *Item )
 /*===================================================================
 		Mode changing stuff..
 ===================================================================*/
-void MakeModeList( MENU *Menu )
+void MakeModeList( MENU * /*Menu*/ )
 {
 	int i;
 	ModeList.items = 0;
@@ -8146,13 +8146,13 @@ void MakeModeList( MENU *Menu )
 	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
-void MenuSelectMode( MENU *Menu )
+void MenuSelectMode( MENU * /*Menu*/ )
 {
 	if ( render_info.CurrMode != WhichMode[ModeList.selected_item] )
 		RenderModeSelect(WhichMode[ModeList.selected_item], render_info.fullscreen, render_info.vsync);
 }
 
-void NewMenuSelectMode( MENUITEM *Item )
+void NewMenuSelectMode( MENUITEM * /*Item*/ )
 {
 	int mode = WhichMode[ModeList.selected_item];
 
@@ -8181,7 +8181,7 @@ void NewMenuSelectMode( MENUITEM *Item )
    	InitialTexturesSet = false;
 }
 
-void InitDebugMenu( MENU *Menu )
+void InitDebugMenu( MENU * /*Menu*/ )
 {
 	InitRoomList();
 	if ( RoomList.selected_item >= 0 && RoomList.selected_item < RoomList.items )
@@ -8215,7 +8215,7 @@ void InitRoomList( void )
 }
 
 
-void SetRoomName( MENUITEM *item )
+void SetRoomName( MENUITEM * /*item*/ )
 {
 	if ( !strlen( RoomName.text ) )
 		return; // abort if room name empty
@@ -8233,7 +8233,7 @@ void SetRoomName( MENUITEM *item )
 }
 
 
-void ChooseRoom( MENUITEM *item )
+void ChooseRoom( MENUITEM * /*item*/ )
 {
 	if ( RoomList.selected_item < 0 || RoomList.selected_item >= Mloadheader.num_groups )
 		return; // abort if invalid room
@@ -8254,7 +8254,7 @@ void ChooseRoom( MENUITEM *item )
 int8_t	DebuggingString[] = "Cheating";
 int8_t	NotDebuggingString[] = "No Longer Cheating";
 
-void DebugModeChanged( MENUITEM *item )
+void DebugModeChanged( MENUITEM * /*item*/ )
 {
 	if( DebugInfo )
 	{
@@ -8271,17 +8271,17 @@ void DebugModeChanged( MENUITEM *item )
 	InitInGameMenu( &MENU_InGame );
 }
 
-void SavePickups( MENUITEM *item )
+void SavePickups( MENUITEM * /*item*/ )
 {
 	SavePickupsPositions();
 }
 
-void ShowNodeToggle( MENUITEM *item )
+void ShowNodeToggle( MENUITEM * /*item*/ )
 {
 	ShowNodeNetwork( ( ShowNode ) ? 1 : 0 );
 }
 
-void ShowStartPointsToggle( MENUITEM *item )
+void ShowStartPointsToggle( MENUITEM * /*item*/ )
 {
 	if( ShowStartPoints )
 	{
@@ -8391,7 +8391,7 @@ void PauseDemoToggle( MENUITEM *Item )
 	SelectToggle( Item );
 }
 
-void GoToStats( MENUITEM *Item )
+void GoToStats( MENUITEM * /*Item*/ )
 {
 	CurrentMenu = NULL;
 	CurrentMenuItem = NULL;
@@ -8407,7 +8407,7 @@ void GoToStats( MENUITEM *Item )
 	Input		:	MENU * Menu
 	Output		:	nothing
 ===================================================================*/
-void ExitLevelSelect( MENU * Menu )
+void ExitLevelSelect( MENU * /*Menu*/ )
 {
 	CurrentMenu = NULL;
 	CurrentMenuItem = NULL;
@@ -8837,7 +8837,7 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 	return true;
 }
 
-void GetExtremeOffsets( u_int16_t Model, PLANE *plane, float *minoffset, float *maxoffset )
+void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, float *maxoffset )
 {
 	u_int16_t					Group;
 	u_int16_t					ExecBuf;
@@ -8982,7 +8982,7 @@ void ResetDisc(int disc)
 	Output		:		nothing
 ===================================================================*/
 
-void DifficultySet (MENUITEM *item)
+void DifficultySet (MENUITEM * /*item*/)
 {
 
 	MenuState = MENUSTATE_DifficultySet;
@@ -10202,7 +10202,7 @@ void DrawGeneralWeaponText( MENUITEM *Item )
 
 }
 
-static u_int16_t GetNumUsed( int16_t *priority, bool *valid, u_int16_t Max )
+static u_int16_t GetNumUsed( int16_t *priority, bool *valid, u_int16_t /*Max*/ )
 {
 	u_int16_t i, unused;
 
@@ -10243,7 +10243,7 @@ void DrawSecondaryWeapons( MENUITEM *Item )
 	DrawGeneralWeapons( Item );
 }
 
-void StoreWeaponOrder( MENU *Menu )
+void StoreWeaponOrder( MENU * /*Menu*/ )
 {
 	int i;
 
@@ -11550,7 +11550,7 @@ void RotateBracket(float time, float start, float end)
 }
 
 
-void DarkenRoomForStart( MENU *Menu )
+void DarkenRoomForStart( MENU * /*Menu*/ )
 {
 	RoomDarkness = 0.0F;
 	DarkenRoom2(RoomDarkness);
@@ -11705,7 +11705,7 @@ void LoadBikeChar(MENUITEM *Item)
 	ScrPolys[BikerScrPoly].y3 = ymax;					
 }
 
-void KillBikeCharPic( MENU *Menu )
+void KillBikeCharPic( MENU * /*Menu*/ )
 {
 	if (BikerDisplayed)
 	{	KillUsedScrPoly ( BikerScrPoly );
@@ -11754,7 +11754,7 @@ void LoadSavedGamePic( char *file )
 }
 
 
-void KillLevelPic( MENU *Menu )
+void KillLevelPic( MENU * /*Menu*/ )
 {
 	if (LevelDisplayed)
 	{	KillUsedScrPoly ( LevelScrPoly );
@@ -11859,7 +11859,7 @@ void KillBikeChar(MENU *Menu)
 	InitBikeList( Menu );
 }
 
-void InitEventGeneralPan(TITLE_EVENT *TitleEvent)
+void InitEventGeneralPan(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldLookPos = Look;
 	OldViewPos = View;
@@ -11869,7 +11869,7 @@ void InitEventGeneralPan(TITLE_EVENT *TitleEvent)
 	PlaySfx( SFX_TitlePan, 0.7F );
 }
 
-void InitEventDiscPan(TITLE_EVENT *TitleEvent)
+void InitEventDiscPan(TITLE_EVENT * /*TitleEvent*/)
 {
 }
 
@@ -11882,12 +11882,12 @@ void EventDiscPan(TITLE_EVENT *TitleEvent)
 	SinPan2(OldLookPos, DiscLookPos ,&Look, OldViewPos, DiscViewPos, &View, currenttime);
 }
 
-void ExitEventDiscPanFromRight(TITLE_EVENT *TitleEvent)
+void ExitEventDiscPanFromRight(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldSelectedBike = -1;
 }
 
-void InitEventRightVDUPan(TITLE_EVENT *TitleEvent)
+void InitEventRightVDUPan(TITLE_EVENT * /*TitleEvent*/)
 {
 	MATRIX Mat_R;
 
@@ -11922,13 +11922,13 @@ void EventRightVDUPan(TITLE_EVENT *TitleEvent)
 	SinPan2(OldLookPos, RightVDU.Look ,&Look, OldViewPos, RightVDU.View, &View, currenttime);
 }
 
-void ExitEventVDUPan(TITLE_EVENT *TitleEvent)
+void ExitEventVDUPan(TITLE_EVENT * /*TitleEvent*/)
 {
 	ProcessVduItems( CurrentMenu );
 	VDU_Ready = true;
 }
 
-void InitEventLeftVDUPan(TITLE_EVENT *TitleEvent)
+void InitEventLeftVDUPan(TITLE_EVENT * /*TitleEvent*/)
 {
 	MATRIX Mat_R;
 
@@ -11964,7 +11964,7 @@ void EventLeftVDUPan(TITLE_EVENT *TitleEvent)
 }
 
 
-void InitEventRotateOutRightVDU(TITLE_EVENT *TitleEvent)
+void InitEventRotateOutRightVDU(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldVDUrot = VDUrot;
 	OldBracketRot = BracketRot;
@@ -11981,12 +11981,12 @@ void EventRotateOutRightVDU(TITLE_EVENT *TitleEvent)
 
 }
 
-void ExitEventRotateOutVDU(TITLE_EVENT *TitleEvent)
+void ExitEventRotateOutVDU(TITLE_EVENT * /*TitleEvent*/)
 {
 	PlaySfx( SFX_VduOn, 0.8F );
 }
 
-void InitEventRotateInRightVDU(TITLE_EVENT *TitleEvent)
+void InitEventRotateInRightVDU(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldVDUrot = VDUrot;
 	OldBracketRot = BracketRot;
@@ -12005,7 +12005,7 @@ void EventRotateInRightVDU(TITLE_EVENT *TitleEvent)
 	RotateBracket(currenttime, OldBracketRot, RightVDU.BracketEndRot);
 }
 
-void InitEventRotateOutLeftVDU(TITLE_EVENT *TitleEvent)
+void InitEventRotateOutLeftVDU(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldVDUrot = VDUrot;
 	OldBracketRot = BracketRot;
@@ -12021,7 +12021,7 @@ void EventRotateOutLeftVDU(TITLE_EVENT *TitleEvent)
 	RotateBracket(currenttime, OldBracketRot, LeftVDU.BracketEndRot);
 }
 
-void InitEventRotateInLeftVDU(TITLE_EVENT *TitleEvent)
+void InitEventRotateInLeftVDU(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldVDUrot = VDUrot;
 	OldBracketRot = BracketRot;
@@ -12040,7 +12040,7 @@ void EventRotateInLeftVDU(TITLE_EVENT *TitleEvent)
 }
 
 
-void InitEventDarkenRoom(TITLE_EVENT *TitleEvent)
+void InitEventDarkenRoom(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldRoomDarkness = RoomDarkness;
 }
@@ -12058,7 +12058,7 @@ void EventDarkenRoom(TITLE_EVENT *TitleEvent)
 
 }
 
-void InitEventLightenRoom(TITLE_EVENT *TitleEvent)
+void InitEventLightenRoom(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldRoomDarkness = RoomDarkness;
 }
@@ -12073,13 +12073,13 @@ void EventLightenRoom(TITLE_EVENT *TitleEvent)
 	DarkenRoom2(RoomDarkness);
 }
 
-void InitEventFadeOnHoloLight(TITLE_EVENT *TitleEvent)
+void InitEventFadeOnHoloLight(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldHoloLightBrightness = HoloLightBrightness;
 	Models[BackgroundModel[TITLE_MODEL_HoloLight]].Visible = 1;
 }
 
-void TriggerBikeSpeech( TITLE_EVENT *TitleEvent )
+void TriggerBikeSpeech( TITLE_EVENT * /*TitleEvent*/ )
 {
 	static u_int32_t CurrentSpeechID = 0;
 
@@ -12108,11 +12108,11 @@ void EventFadeOnHoloLight(TITLE_EVENT *TitleEvent)
 	FadeHoloLight(HoloLightBrightness);
 }
 
-void ExitEventFadeOffHoloLight(TITLE_EVENT *TitleEvent)
+void ExitEventFadeOffHoloLight(TITLE_EVENT * /*TitleEvent*/)
 {
 }
 
-void InitEventFadeOffHoloLight(TITLE_EVENT *TitleEvent)
+void InitEventFadeOffHoloLight(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldHoloLightBrightness = HoloLightBrightness;
 	Models[BackgroundModel[TITLE_MODEL_HoloLight]].Visible = 0;
@@ -12131,7 +12131,7 @@ void EventFadeOffHoloLight(TITLE_EVENT *TitleEvent)
 	FadeHoloLight(HoloLightBrightness);
 }
 
-void InitEventRaiseHoloPad(TITLE_EVENT *TitleEvent)
+void InitEventRaiseHoloPad(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldHoloPadHeight = Models[BackgroundModel[TITLE_MODEL_Holopad]].Pos.y;
 }
@@ -12149,11 +12149,11 @@ void EventRaiseHoloPad(TITLE_EVENT *TitleEvent)
 
 }
 
-void ExitEventRaiseHolopad(TITLE_EVENT *TitleEvent)
+void ExitEventRaiseHolopad(TITLE_EVENT * /*TitleEvent*/)
 {
 }
 
-void InitEventLowerHoloPad(TITLE_EVENT *TitleEvent)
+void InitEventLowerHoloPad(TITLE_EVENT * /*TitleEvent*/)
 {
 	OldHoloPadHeight = Models[BackgroundModel[TITLE_MODEL_Holopad]].Pos.y;
 	HolopadJudderReq = true;
@@ -12172,7 +12172,7 @@ void EventLowerHoloPad(TITLE_EVENT *TitleEvent)
 	Models[BackgroundModel[TITLE_MODEL_Holopad]].Pos.y = raiseby;
 }
 
-void InitEventJudderHoloPad(TITLE_EVENT *TitleEvent)
+void InitEventJudderHoloPad(TITLE_EVENT * /*TitleEvent*/)
 {
 }
 
@@ -12203,13 +12203,13 @@ void EventJudderHoloPad(TITLE_EVENT *TitleEvent)
 
 }
 
-void ExitEventJudderHoloPad(TITLE_EVENT *TitleEvent)
+void ExitEventJudderHoloPad(TITLE_EVENT * /*TitleEvent*/)
 {
 	HolopadJudderReq = false;
 }
 
 
-void InitEventDiscPanFromRightInit(TITLE_EVENT *TitleEvent)
+void InitEventDiscPanFromRightInit(TITLE_EVENT * /*TitleEvent*/)
 {
 }
 
@@ -12222,7 +12222,7 @@ void EventDiscPanInit(TITLE_EVENT *TitleEvent)
 	SinPan2(OldLookPos, DiscLookPos ,&Look, OldViewPos, DiscViewPos, &View, currenttime);
 }
 
-void InitEventLowerStack( TITLE_EVENT *TitleEvent )
+void InitEventLowerStack( TITLE_EVENT * /*TitleEvent*/ )
 {
 	PlaySfx( SFX_StackDown, 1.0F );
 }
@@ -12241,11 +12241,11 @@ void EventLowerStack(TITLE_EVENT *TitleEvent)
 
 }
 
-void ExitEventLowerStack(TITLE_EVENT *TitleEvent)
+void ExitEventLowerStack(TITLE_EVENT * /*TitleEvent*/)
 {
 }
  
-void InitEventJudderStack(TITLE_EVENT *TitleEvent)
+void InitEventJudderStack(TITLE_EVENT * /*TitleEvent*/)
 {
 	StackJudderNum = 0;
 	StackRotAmount = 0.0F;
@@ -12284,21 +12284,21 @@ void EventJudderStack(TITLE_EVENT *TitleEvent)
 	RotateDiscStack(StackRotAmount);
 }
 
-void ExitEventDiscPanInit( TITLE_EVENT *TitleEvent )
+void ExitEventDiscPanInit( TITLE_EVENT * /*TitleEvent*/ )
 {
 }
 
-void InitEventExpandBike(TITLE_EVENT *TitleEvent)
+void InitEventExpandBike(TITLE_EVENT * /*TitleEvent*/)
 {
 	ShowHoloModel( HoloModelLookup[ BikeList.selected_item ] );
 }
 
-void InitEventExpandCrystal(TITLE_EVENT *TitleEvent)
+void InitEventExpandCrystal(TITLE_EVENT * /*TitleEvent*/)
 {
 	ShowHoloModel( TITLE_MODEL_Crystal );
 }
 
-void InitEventShrinkBike(TITLE_EVENT *TitleEvent)
+void InitEventShrinkBike(TITLE_EVENT * /*TitleEvent*/)
 {
 
 	ShowHoloModel( (u_int16_t)-1 );
@@ -12575,7 +12575,7 @@ u_int16_t PlotHighlightPoly (float xmin, float ymin, float xmax, float ymax, u_i
 	return poly;
 }
 
-void SelectConnectionToStart (MENUITEM *Item)
+void SelectConnectionToStart (MENUITEM * /*Item*/)
 {
 	MenuState = MENUSTATE_Select;
 }
@@ -12608,12 +12608,12 @@ void SelectConnectionToJoin (MENUITEM *Item)
 }
 
 
-void UpdateSessions ( int *dummy )
+void UpdateSessions ( int * /*dummy*/ )
 {
 	GetPlayersInCurrentSession ( NULL );
 }
 
-void GetInitialPlayers ( MENU *menu )
+void GetInitialPlayers ( MENU * /*menu*/ )
 {
 	NumOfPlayersSlider.oldvalue = -1;
 	PlayersList.display_items = 16;
@@ -12743,7 +12743,7 @@ void PrintErrorMessage (const char * ErrorStr, int BackBy, MENU *NewMenu, int ty
 	MenuChange( &ChangeItem );
 }
 
-void MenuItemBackFromError ( MENUITEM *Item )
+void MenuItemBackFromError ( MENUITEM * /*Item*/ )
 {
 	MENUITEM ChangeItem;
 	int i;
@@ -12778,7 +12778,7 @@ void MenuItemBackFromError ( MENUITEM *Item )
 
 }
 
-void SelectConfigureAxisMenu ( MENUITEM *Item )
+void SelectConfigureAxisMenu ( MENUITEM * /*Item*/ )
 {
 	if ( !strcasecmp( (char*)JoystickList.item[ JoystickList.selected_item ], "Spacetec SpaceOrb 360" ) 
 		&& !SpaceOrbSetup )
@@ -12791,7 +12791,7 @@ void SelectConfigureAxisMenu ( MENUITEM *Item )
 	}
 }
 
-void InitJoystickList ( MENU *Menu )
+void InitJoystickList ( MENU * /*Menu*/ )
 {
 	int i, j;
 	bool jsfound = false;
@@ -12831,7 +12831,7 @@ void InitJoystickList ( MENU *Menu )
 }
 
 
-void InitJoystickAxisConfig ( MENU *Menu)
+void InitJoystickAxisConfig ( MENU * /*Menu*/)
 {
 	int i, j;
 	SCRPOLY_RGB light, dark, polycol[NUM_SHIP_AXIS_ACTIONS][2];
@@ -13025,7 +13025,7 @@ void UpdateAxisPtr( float pos )
 	}
 }
 
-void ChooseJoyAxis( MENUITEM *Item )
+void ChooseJoyAxis( MENUITEM * /*Item*/ )
 {
 	int i, joystick, axis, action;
 	MENUITEM *ToggleItem=NULL, *SliderItem=NULL, *CheckItem=NULL, *AxisActionItem=NULL, *SensitivityItem=NULL, *FineItem=NULL;
@@ -13122,7 +13122,7 @@ void InitShipActionList( void )
 	}
 }
 
-void SetAxis( MENU *Menu )
+void SetAxis( MENU * /*Menu*/ )
 {
 	int i;
 	
@@ -13133,7 +13133,7 @@ void SetAxis( MENU *Menu )
 		KillUsedScrPoly(AxisTestScrPoly[i]);
 }
 
-void SetAxisInv( MENUITEM *Item )
+void SetAxisInv( MENUITEM * /*Item*/ )
 {
 	int axis;
 
@@ -13141,7 +13141,7 @@ void SetAxisInv( MENUITEM *Item )
 	JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[axis].inverted = !(JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[axis].inverted);
 }
 
-void SetAxisFineControl( MENUITEM *Item )
+void SetAxisFineControl( MENUITEM * /*Item*/ )
 {
 	int axis;
 
@@ -13149,7 +13149,7 @@ void SetAxisFineControl( MENUITEM *Item )
 	JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[axis].fine = !(JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[axis].fine);
 }
 
-void SetAxisDeadzone( MENUITEM *Item )
+void SetAxisDeadzone( MENUITEM * /*Item*/ )
 {
 	int axis;
 
@@ -13159,7 +13159,7 @@ void SetAxisDeadzone( MENUITEM *Item )
 	SetUpJoystickAxis(JoystickMap[JoystickList.selected_item]);
 }
 
-void SetAxisSensitivity( MENUITEM *Item )
+void SetAxisSensitivity( MENUITEM * /*Item*/ )
 {
 	int axis;
 
@@ -13168,7 +13168,7 @@ void SetAxisSensitivity( MENUITEM *Item )
 		( SensitivitySlider.value < 100 ) ?	1.0F / ( 100 - SensitivitySlider.value ) : 1.0F;
 }
 
-void CheckJoyAxis( int *dummy )
+void CheckJoyAxis( int * /*dummy*/ )
 {
 	int joystick = JoystickMap[JoystickList.selected_item];
 	int axis;
@@ -13211,7 +13211,7 @@ void CheckJoyAxis( int *dummy )
 	}
 }
 
-void ExitJoySetup( MENU *Menu )
+void ExitJoySetup( MENU * /*Menu*/ )
 {
    int joystick, i, j, k;
 	
@@ -13253,7 +13253,7 @@ void ExitJoySetup( MENU *Menu )
 	write_config( player_config, biker_config );
 }
 
-void ExitMouseSetup( MENU *Menu )
+void ExitMouseSetup( MENU * /*Menu*/ )
 {
 	{
 		*player_config = Config;
@@ -13262,7 +13262,7 @@ void ExitMouseSetup( MENU *Menu )
 }
 
 
-void GoToNextLevel( MENUITEM *Item )
+void GoToNextLevel( MENUITEM * /*Item*/ )
 {
 #ifdef __3DS__
 	/* [3DS] Force VDU flush before handing off to the game-status machine.
@@ -13298,13 +13298,13 @@ void GoToNextLevel( MENUITEM *Item )
 	StartASinglePlayerGame( NULL );
 }
 
-void TitleLoadGame( MENUITEM *Item )
+void TitleLoadGame( MENUITEM * /*Item*/ )
 {
 	LoadASinglePlayerGame( NULL );
 }
 
 
-void RestoreDefaultControlSettings( MENUITEM *Item )
+void RestoreDefaultControlSettings( MENUITEM * /*Item*/ )
 {
 	// replace config...
 	Config = default_config;
@@ -13321,7 +13321,7 @@ void RestoreDefaultControlSettings( MENUITEM *Item )
 	ProcessVduItems( CurrentMenu );
 }
 
-void PrepareNextLevelStart( MENU *Menu )
+void PrepareNextLevelStart( MENU * /*Menu*/ )
 {
 	LoadLevelText( NULL );
 	MyGameStatus = STATUS_WaitingToStartSinglePlayer;
@@ -13339,12 +13339,12 @@ void HostAboutToStart( MENUITEM *Item )
 	}
 }
 
-void ExitSoundMenu( MENU *Menu )
+void ExitSoundMenu( MENU * /*Menu*/ )
 {
 	write_config( player_config, biker_config );
 }
 
-void SendQuickText( MENUITEM *Item )
+void SendQuickText( MENUITEM * /*Item*/ )
 {
 	MenuExit();
 	SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_QuickTaunt, 0);
@@ -13352,7 +13352,7 @@ void SendQuickText( MENUITEM *Item )
 	JustExitedMenu = false;
 	flush_input = true;
 }
-void SendQuickTextWhisper( MENUITEM *Item )
+void SendQuickTextWhisper( MENUITEM * /*Item*/ )
 {
 	MenuExit();
 	SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_QuickTauntWhisper, 0);
@@ -13362,7 +13362,7 @@ void SendQuickTextWhisper( MENUITEM *Item )
 }
 
 
-void InitCrystalsFoundText( MENU *Menu )
+void InitCrystalsFoundText( MENU * /*Menu*/ )
 {
 	if ( CrystalsFound == 1 )
 	{
@@ -13418,12 +13418,12 @@ void InitCrystalsFoundText( MENU *Menu )
 	}
 }
 
-void SelectGoldBarModel( MENU *Menu )
+void SelectGoldBarModel( MENU * /*Menu*/ )
 {
 	ShowHoloModel( TITLE_MODEL_GoldBar );
 }
 
-void AfterSpecialMessage( MENUITEM *Item )
+void AfterSpecialMessage( MENUITEM * /*Item*/ )
 {
 	switch( GameCompleted )
 	 {
@@ -13441,7 +13441,7 @@ void AfterSpecialMessage( MENUITEM *Item )
 	InitView();
 }
 
-void NextLevelOrGameComplete( MENUITEM *Item )
+void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 {
 	// kill off hololight, holopad & holo-object
 	KillHoloModel();
@@ -13479,7 +13479,7 @@ void NextLevelOrGameComplete( MENUITEM *Item )
 	 MenuChangeEx( &MENU_NEW_SpecialMessage );
 }
 
-char TypeFileName( TEXT *t, char c )
+char TypeFileName( TEXT * /*t*/, char c )
 {
 	switch ( c )
 	{
@@ -13553,7 +13553,7 @@ void DebugLastError( void )
 {
 }
 
-void SaveMacros( MENUITEM *Item )
+void SaveMacros( MENUITEM * /*Item*/ )
 {
 	strcpy( player_config->macro1, MacroText1.text ); 
 	strcpy( player_config->macro2, MacroText2.text ); 
@@ -13995,7 +13995,7 @@ bool DeletePilot( LIST *l, int item )
 		return false;
 }
 
-void ToggleBikeEngines( MENUITEM *Item )
+void ToggleBikeEngines( MENUITEM * /*Item*/ )
 {
 }
 
@@ -14013,12 +14013,12 @@ void InitTitleMessaging( void )
 
 
 
-void WatchPlayerSelected( MENUITEM *Item)
+void WatchPlayerSelected( MENUITEM * /*Item*/)
 {
 	WatchPlayerSelect.value = HostGamePlayersWhoIAm[HostPlayersList.selected_item];
 }
 
-void InitWatchList( MENU *Menu )
+void InitWatchList( MENU * /*Menu*/ )
 {
 	BYTE i;
 
@@ -14047,7 +14047,7 @@ void InitWatchList( MENU *Menu )
 	HostPlayersList.selected_item = -1;
 }
 
-void RefreshHostPlayersList( LIST *List )
+void RefreshHostPlayersList( LIST * /*List*/ )
 {
 	BYTE i;
 
@@ -14065,14 +14065,14 @@ void RefreshHostPlayersList( LIST *List )
 	}
 }
 
-void InitHostMenu( MENU *Menu )
+void InitHostMenu( MENU * /*Menu*/ )
 {
 	HostPlayersList.display_items = 16;
 	HostPlayersList.selected_item = -1;
 	HostPlayersList.FuncInfo = RefreshHostPlayersList;
 }
 
-void HostListPlayerSelected( MENUITEM *Item )
+void HostListPlayerSelected( MENUITEM * /*Item*/ )
 {
 	// this is called directly after a player is selected
 	SendGameMessage(MSG_YOUQUIT, 0, (BYTE) HostGamePlayersWhoIAm[HostPlayersList.selected_item] , 0, 0);
@@ -14084,7 +14084,7 @@ void InitHostWaitingToStart( MENU *Menu )
 	GetInitialPlayers( Menu );
 }
 
-void TitleReset( MENUITEM *item )
+void TitleReset( MENUITEM * /*item*/ )
 {
 	MenuAbort();
 	SetInitialTitleParams();

@@ -14,7 +14,7 @@ void destroy_image( texture_image_t * image )
 	memset(image,0,sizeof(*image));
 }
 
-int load_image( texture_image_t * image, int mipmap )
+int load_image( texture_image_t * image, int /*mipmap*/ )
 {
   png_byte magic[8];
   png_structp png_ptr;

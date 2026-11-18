@@ -71,7 +71,7 @@ bool LoadASinglePlayerGame( MENUITEM * Item )
 	return true;
 }
 
-bool StartASinglePlayerGame( MENUITEM * Item )
+bool StartASinglePlayerGame( MENUITEM * /*Item*/ )
 {
 	int i;
 

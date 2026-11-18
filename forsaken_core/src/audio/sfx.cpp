@@ -1715,7 +1715,7 @@ bool InitializeSound( int flags )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-void DestroySound( int flags )
+void DestroySound( int /*flags*/ )
 {
 	int i, j;
 
@@ -2247,7 +2247,7 @@ void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECT
 	}
 }
 
-void SetSoundLevels( int *dummy )
+void SetSoundLevels( int * /*dummy*/ )
 {
 	GlobalSoundAttenuation = SfxSlider.value / ( SfxSlider.max / GLOBAL_MAX_SFX );
 }
@@ -2322,7 +2322,7 @@ void CheckSBufferList( void )
 // globals used in functions below:
 // SPOT_SFX_LIST *LoopingSfxListStart - set to NULL in InitializeSound
 
-int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, float Freq, float Volume, int type, int SfxHolderIndex, u_int16_t Effects, u_int32_t uid )
+int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, float Freq, float Volume, int type, int /*SfxHolderIndex*/, u_int16_t Effects, u_int32_t uid )
 {
 	int index, i;
 

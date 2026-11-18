@@ -1601,7 +1601,7 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 /*===================================================================
 		True EnviroMent Mapping for an Mloadheader...
 ===================================================================*/
-bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * Pos)
+bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 {
 	VECTOR Temp;
 	u_int16_t group;
@@ -1997,7 +1997,7 @@ bool GotoRoom( int16_t i, char *roomname )
 	Input		:	int16_t which Ship
 	Output		:	Nothing
 ===================================================================*/
-void ShipMode0( GLOBALSHIP * ShipPnt , BYTE i )
+void ShipMode0( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 {
 
 	// make sure the white out stuff is reset..
@@ -2261,7 +2261,7 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 	Input		:	int16_t which Ship
 	Output		:	Nothing
 ===================================================================*/
-void ShipMode4( GLOBALSHIP * ShipPnt , BYTE i )
+void ShipMode4( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 {
 	input_grab(false);
 	Current_Camera_View = MAX_PLAYERS;	// set it back to Remote Camera..
@@ -2286,7 +2286,7 @@ void ShipMode4( GLOBALSHIP * ShipPnt , BYTE i )
 	Input		:	int16_t which Ship
 	Output		:	Nothing
 ===================================================================*/
-void WatchMode5( GLOBALSHIP * ShipPnt , BYTE i )
+void WatchMode5( GLOBALSHIP * ShipPnt , BYTE /*i*/ )
 {
 	VECTOR	ScatterDir;
 

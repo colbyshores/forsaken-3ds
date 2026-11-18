@@ -73,7 +73,7 @@ int input_buffer_find( int code )
 //	when this is ready then pass SDL_RESIZABLE to SDL_SetVideoMode
 //  need to resize video with SDL_SetVideoMode
 bool bIgnoreWM_SIZE = false; // ignores resize events
-void app_resize( SDL_WindowEvent * window )
+void app_resize( SDL_WindowEvent * /*window*/ )
 {
 	DebugPrintf("Window size changed.\n");
 
@@ -322,7 +322,7 @@ void app_joy_axis( SDL_JoyAxisEvent * axis )
 		( abs(value) > deadzone ) ? value : 0 ;
 }
 
-void app_joy_ball( SDL_JoyBallEvent * ball )
+void app_joy_ball( SDL_JoyBallEvent * /*ball*/ )
 {
 }
 

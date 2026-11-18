@@ -109,7 +109,7 @@ char *SaveGamePicFileName( int slot )
 ===================================================================*/
 int8_t	LoadGameFilename[ 256 ];
 
-bool PreInGameLoad( MENUITEM * MenuItem )
+bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 {
 	FILE	*	fp;
 	int16_t		i;
@@ -165,7 +165,7 @@ bool PreInGameLoad( MENUITEM * MenuItem )
 	Input		:	MENUITEM * MenuItem
 	Output		:	nothing
 ===================================================================*/
-void InGameLoad( MENUITEM * MenuItem )
+void InGameLoad( MENUITEM * /*MenuItem*/ )
 {
 	FILE	*	fp;
 	int8_t		buf[ 256 ];
@@ -376,7 +376,7 @@ char *GetMissionName( char *levelname )
 	Input		:	MENUITEM * MenuItem
 	Output		:	bool	True/False
 ===================================================================*/
-bool InGameSave( MENUITEM * MenuItem )
+bool InGameSave( MENUITEM * /*MenuItem*/ )
 {
 	FILE	*	fp;
 	FILE	*	f;

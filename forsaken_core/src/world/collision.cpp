@@ -83,7 +83,7 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 	Input		:		char	*	Filename , MCLOADHEADER * MCloadheader
 	Output		:		bool
 ===================================================================*/
-bool MCload( char * Filename , MCLOADHEADER * MCloadheader )
+bool MCload( char * /*Filename*/ , MCLOADHEADER * /*MCloadheader*/ )
 {
 #ifdef POLYGONAL_COLLISIONS
 	long			File_Size;
@@ -573,7 +573,7 @@ u_int16_t MoveGroup( MLOADHEADER *m, VECTOR *StartPos, u_int16_t StartGroup, VEC
 				:	bool	BGCol
   Output		:	bool
 ===================================================================*/
-bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , u_int16_t group ,
+bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 					 VECTOR * Pos, VECTOR * Dir  ,
 					 VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, bool BGCol, BGOBJECT ** BGColObject )
 {
@@ -805,10 +805,10 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * Mloadheader , 
 				:	u_int16_t * PortalHit
   Output		:	bool
 ===================================================================*/
-bool OneGroupPortalCol( MLOADHEADER * Mloadheader , u_int16_t group ,
+bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 						VECTOR * Pos, VECTOR * Dir  ,
 						VECTOR * ImpactPoint , NORMAL * FaceNormal, u_int16_t *Next_Group,
-						int collisionhint )
+						int /*collisionhint*/ )
 {
 	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 	float		Distance = 0.0f;
@@ -1077,7 +1077,7 @@ bool CheckRestartPointCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint
 	Output		:	bool		True/False
 ===================================================================*/
 bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
-					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** BGObject )
+					  int collided, VECTOR * New_Pos, NORMAL * FaceNormal, BGOBJECT ** /*BGObject*/ )
 {
 	float			D;
 	VECTOR			Dn;

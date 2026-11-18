@@ -1616,7 +1616,7 @@ float IsGroupVisibleSoundInfo( MLOADHEADER * Mloadheader , u_int16_t group , u_i
 	Input		:		MLOADHEADER * , group in , group to..
 	Output		:		Nothing
 ===================================================================*/
-float IsGroupVisibleSoundInfo2( MLOADHEADER * Mloadheader , u_int16_t group , u_int16_t group2 )
+float IsGroupVisibleSoundInfo2( MLOADHEADER * Mloadheader , u_int16_t /*group*/ , u_int16_t group2 )
 {
 	u_int16_t i;
 	float Distance;
@@ -1700,7 +1700,7 @@ float IsGroupVisibleSoundInfo3( MLOADHEADER * Mloadheader , u_int16_t group , u_
 	Input		:		MLOADHEADER *
 	Output		:		Nothing
 ===================================================================*/
-void InitSoundInfo( MLOADHEADER * Mloadheader )
+void InitSoundInfo( MLOADHEADER * /*Mloadheader*/ )
 {
 #if MXV_VERSION_NUMBER <= 2
 	u_int16_t i,e;

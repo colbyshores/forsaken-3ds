@@ -595,7 +595,7 @@ void KillAllSphereZones( void )
 	Output		:		Nothing
 ===================================================================*/
 void DisplaySphereZone( VECTOR * Pos, float Radius, u_int16_t Group,
-					   u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t Trans )
+					   u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_t /*Trans*/ )
 {
 	float	Scale;
 	u_int16_t	Model;
@@ -932,7 +932,7 @@ void KillNodeCubeLines( void )
 	Input		:		Nothing
 	Output		:		bool		True/False
 ===================================================================*/
-bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t	NumVerts, int16_t NumTris )
+bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
 {
     LPLVERTEX	lpBufStart = NULL;//, lpInsStart, lpPointer;
 
@@ -1116,7 +1116,7 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 	Input		:		Nothing
 	Output		:		bool		True/False
 ===================================================================*/
-bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t NumVerts, int16_t NumTris )
+bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
 {
     LPLVERTEX	lpBufStart = NULL;//, lpInsStart, lpPointer;
 

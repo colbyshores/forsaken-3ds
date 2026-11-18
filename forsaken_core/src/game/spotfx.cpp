@@ -1172,7 +1172,7 @@ void CreateSpotFXFireSecondary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 	Output		:	Nothing
 ===================================================================*/
 void CreateSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
-							    u_int16_t Group, u_int8_t Weapon, u_int16_t OwnerType, u_int16_t OwnerID )
+							    u_int16_t Group, u_int8_t Weapon, u_int16_t /*OwnerType*/, u_int16_t /*OwnerID*/ )
 {
 	VECTOR	TempVector = { 0.0F, 0.0F, 0.0F };
 
@@ -1306,7 +1306,7 @@ void CreateSpotFXNmeTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t
 				:	u_int8_t		Blue
 	Output		:	Nothing
 ===================================================================*/
-void CreateSpotFXNmeGlow( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue )
+void CreateSpotFXNmeGlow( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue )
 {
 	u_int16_t	FmPoly;
 
@@ -2115,7 +2115,7 @@ void CreateSpotFXBeardAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, 
 				:	float		Speed
 	Output		:	Nothing
 ===================================================================*/
-void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed )
+void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, float Speed )
 {
 	u_int16_t	FmPoly;
 	float	Size;
@@ -2155,7 +2155,7 @@ void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, f
 				:	float		Speed
 	Output		:	Nothing
 ===================================================================*/
-void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed )
+void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, float Speed )
 {
 	u_int16_t	FmPoly;
 	float	Size;

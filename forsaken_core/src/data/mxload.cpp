@@ -1142,7 +1142,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 				:		u_int16_t		Models[] Index
 	Output		:		FLASE/true
 ===================================================================*/
-bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model )
+bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t /*Model*/ )
 {
 	int			i;
 	int			group;

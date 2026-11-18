@@ -6264,7 +6264,7 @@ void EnemyJumpUnderAiControl( ENEMY * Enemy )
 	Output		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
-void EnemyTurretUnderPlayerControl( ENEMY * Enemy )
+void EnemyTurretUnderPlayerControl( ENEMY * /*Enemy*/ )
 {
 }
 /*===================================================================
@@ -7530,7 +7530,7 @@ void RestrictMovement( ENEMY * Enemy , VECTOR * Move )
 				:	VECTOR * Move offset....
 	Output		:	Nothing
 ===================================================================*/
-bool Enemy2EnemyCollide( ENEMY * SEnemy , VECTOR * Move )
+bool Enemy2EnemyCollide( ENEMY * SEnemy , VECTOR * /*Move*/ )
 {
 	ENEMY * TEnemy;
 	float Move_Length;
@@ -8168,13 +8168,13 @@ read_BlindSearchTime( FILE *f, char *last_token )
 
 // Read the ControlType
 static int
-read_ControlType( FILE *f, char *last_token )
+read_ControlType( FILE * /*f*/, char * /*last_token*/ )
 {
 		return 0;
 }
 // Read the AiMode
 static int
-read_AiMode( FILE *f, char *last_token )
+read_AiMode( FILE * /*f*/, char * /*last_token*/ )
 {
 		return 0;
 }

@@ -3940,7 +3940,7 @@ void ShowInGameStats()
 	ShowGameStats( NO_BG );	// don't use BLT background
 }
 
-void PaintBackground( rect_t * box ) // pass NULL to black out all of the screen
+void PaintBackground( rect_t * /*box*/ ) // pass NULL to black out all of the screen
 
 {
 	/* would simply blit the area defined by box on the backbuffer to black */
@@ -5260,7 +5260,7 @@ bool SavePPM( u_int8_t * Filename, u_int8_t * ScreenPtr, u_int32_t Width, u_int3
   Input   :   int8_t  * Filename
   Output    :   bool    True/False
 ===================================================================*/
-bool SaveSnapShot( int8_t * Filename )
+bool SaveSnapShot( int8_t * /*Filename*/ )
 {
 	return true;
 }

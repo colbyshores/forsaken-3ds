@@ -177,7 +177,7 @@ void ProcessMenuFlashText( void )
   }
 }
 
-int EnableCheats( char *cheat )
+int EnableCheats( char * /*cheat*/ )
 {
   CheatsEnabled = true;
   FlashMenuText( "cheat mode enabled", 120.0F, SFX_Secret );
@@ -186,7 +186,7 @@ int EnableCheats( char *cheat )
   return 1;
 }
 
-int JimBeam( char *cheat )
+int JimBeam( char * /*cheat*/ )
 {
   if( PrimaryWeaponCheat )
   {
@@ -207,7 +207,7 @@ int JimBeam( char *cheat )
   return 1;
 }
 
-int Lumberjack( char *cheat )
+int Lumberjack( char * /*cheat*/ )
 {
   if( SecondaryWeaponCheat )
   {
@@ -233,7 +233,7 @@ int Lumberjack( char *cheat )
   return 1;
 }
 
-int ToggleGodMode( char *cheat )
+int ToggleGodMode( char * /*cheat*/ )
 {
   if( !GodMode )
   {
@@ -908,7 +908,7 @@ void DoShipAction( SHIPCONTROL *ctrl, int Action, float amount )
 
 // this function doesn't really do anything important needed to port
 
-void SetUpJoystickAxis(int joystick)
+void SetUpJoystickAxis(int /*joystick*/)
 {
 }
 

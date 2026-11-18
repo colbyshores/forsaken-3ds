@@ -4336,7 +4336,7 @@ void CreateShockwave( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int1
 				:	float		ShockwaveSize
 	Output		:	int16_t		Number of generated pickups
 ===================================================================*/
-void ExplodeSecondary( VECTOR * Pos, u_int16_t Group, u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize )
+void ExplodeSecondary( VECTOR * /*Pos*/, u_int16_t /*Group*/, u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize )
 {
 	u_int16_t	i;
 	u_int16_t	Next;
@@ -7758,7 +7758,7 @@ void CreateSplash( VECTOR * Pos, VECTOR * DirVector, u_int16_t Group )
 				:	float	*	Closest Cos
 	Output		:	u_int16_t		Enemy Index (-1 if none)
 ===================================================================*/
-u_int16_t TargetClosestEnemy( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t MeType, u_int16_t Me, float ViewConeCos, float * ClosestCos )
+u_int16_t TargetClosestEnemy( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t /*MeType*/, u_int16_t /*Me*/, float ViewConeCos, float * ClosestCos )
 {
 	float		Cos;
 	u_int16_t		ClosestEnemy = (u_int16_t) -1;

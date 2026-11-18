@@ -3238,7 +3238,7 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreatePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
+void CreatePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 
@@ -3282,7 +3282,7 @@ void CreatePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
+void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 
@@ -3399,7 +3399,7 @@ void CreateNewExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
+void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 
@@ -3443,7 +3443,7 @@ void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
+void CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 
@@ -5611,7 +5611,7 @@ void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup )
+void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -5793,7 +5793,7 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Grou
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup )
+void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -5975,7 +5975,7 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t G
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup )
+void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -6107,7 +6107,7 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup )
+void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
 {
 	u_int16_t	fmpoly;
 	u_int16_t	poly;
@@ -6478,7 +6478,7 @@ void CreateTransTrail( u_int16_t i )
 				:	int16_t		Number of Spirals
 	Output		:	Nothing
 ===================================================================*/
-void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * IntPos2, u_int16_t ShipHit, int16_t Num,
+void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * /*IntPos2*/, u_int16_t ShipHit, int16_t Num,
 						  u_int8_t Red, u_int8_t Green, u_int8_t Blue )
 {
 	int16_t	Count;

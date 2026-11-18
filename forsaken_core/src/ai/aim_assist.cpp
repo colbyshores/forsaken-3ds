@@ -106,7 +106,7 @@ static bool weapon_is_assisted( int8_t w )
 /* Try a candidate target. Returns true if accepted (and updates
  * best_cos + sets *out_dir + *out_dist). */
 static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
-                             u_int16_t bullet_group,
+                             u_int16_t /*bullet_group*/,
                              const VECTOR *target_pos, u_int16_t target_group,
                              float *best_cos, VECTOR *out_target_dir, float *out_dist )
 {

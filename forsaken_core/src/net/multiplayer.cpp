@@ -61,7 +61,7 @@ MENU  *				GetPlayerNumMenu;
 
 u_int16_t	RandomStartPosModify = 0;							
 
-void SetUpGameSubType( int type )
+void SetUpGameSubType( int /*type*/ )
 {
 	switch ( CTFSlider.value )
 	{
@@ -355,7 +355,7 @@ void StartAHostSession ( MENUITEM * Item )
 	Input		:	MENUITEM * Item
 	Output		:	nothing
 ===================================================================*/
-void GetPlayersInCurrentSession( MENUITEM *Item )
+void GetPlayersInCurrentSession( MENUITEM * /*Item*/ )
 {
 	int i;
 
@@ -381,7 +381,7 @@ void GetPlayersInCurrentSession( MENUITEM *Item )
 	Input		:	MENUITEM * Item
 	Output		:	nothing
 ===================================================================*/
-void GoToSynchup ( MENUITEM * Item )
+void GoToSynchup ( MENUITEM * /*Item*/ )
 {
 
 	if( TeamGame )
@@ -412,7 +412,7 @@ void GoToSynchup ( MENUITEM * Item )
 	Input		:	MENUITEM * Item
 	Output		:	nothing
 ===================================================================*/
-void TeamGoToSynchup ( MENUITEM * Item )
+void TeamGoToSynchup ( MENUITEM * /*Item*/ )
 {
 	PreSynchupStatus = MyGameStatus;
 	MyGameStatus = STATUS_WaitingToStartTeamGame;
@@ -427,7 +427,7 @@ void TeamGoToSynchup ( MENUITEM * Item )
 	Input		:	MENU * Menu
 	Output		:	nothing
 ===================================================================*/
-void BailMultiplayer( MENU * Menu )
+void BailMultiplayer( MENU * /*Menu*/ )
 {
 	MyGameStatus = STATUS_Left;
     if ( WhoIAm < MAX_PLAYERS )
@@ -444,7 +444,7 @@ void BailMultiplayerFrontEnd( MENU *Menu )
 	BailMultiplayer( Menu );
 }
 
-void InitTeamLists( MENU *Menu )
+void InitTeamLists( MENU * /*Menu*/ )
 {
 	int i;
 
@@ -467,7 +467,7 @@ void InitTeamLists( MENU *Menu )
 		PlayerReady[ i ] = false;
 }
 
-void InitExistingGameJoin( MENU *Menu )
+void InitExistingGameJoin( MENU * /*Menu*/ )
 {
 	InitTeamLists( NULL );
 
@@ -513,7 +513,7 @@ void InitTeamSelection( MENU *Menu )
 	InitTitleMessaging();
 }
 
-void CheckForMenuChange(int *dummy)
+void CheckForMenuChange(int * /*dummy*/)
 {
 	if (TeamNumber[0] != 255)
 		MenuChange( &WatchTeamSelectionItem );
@@ -521,7 +521,7 @@ void CheckForMenuChange(int *dummy)
 	GetPlayersInCurrentSession ( NULL );
 }
 
-void DistributeTeamsToLists(int *dummy)
+void DistributeTeamsToLists(int * /*dummy*/)
 {
 	int team, player, num_players;
 	bool OkayToStart = true;
