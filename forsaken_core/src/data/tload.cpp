@@ -93,7 +93,7 @@ bool Tload( TLOADHEADER * Tloadheader  )
    mip chain, 1 for the base level only. */
 bool TloadTextureSurf( TLOADHEADER * Tloadheader , int n)
 {
-	LPTEXTURE lpSrcTexture = NULL;
+	TEXTURE_HANDLE lpSrcTexture = NULL;
 	release_texture(Tloadheader->lpTexture[n]);
 	Tloadheader->lpTexture[n] = NULL;
 	if ( !Tloadheader->PlaceHolder[ n ] )

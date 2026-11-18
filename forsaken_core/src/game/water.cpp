@@ -184,7 +184,7 @@ bool WaterLoad( void )
 	/* Bug fix: sizeof(FirstWaterObject) is sizeof(pointer) = 4 bytes,
 	 * not sizeof(WATEROBJECT). The original line zeroed only ~N×4 bytes
 	 * of the N×sizeof(WATEROBJECT) buffer, leaving each element's
-	 * embedded RENDEROBJECT (lpNormalBuffer / lpIndexBuffer /
+	 * embedded RENDEROBJECT (normalBuffer / indexBuffer /
 	 * numTextureGroups / textureGroups[]) full of malloc residue.
 	 * FSReleaseRenderObject then linearFree'd those garbage pointers
 	 * and iterated `for (i=0; i<numTextureGroups; i++)` with a garbage
@@ -559,7 +559,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 
 	/*	lock the vertex buffer	*/
 
-	if (!(FSLockVertexBuffer(/*WO->lpVertexBuffer*/&WO->renderObject, &lpLVERTEX)))
+	if (!(FSLockVertexBuffer(/*WO->vertexBuffer*/&WO->renderObject, &lpLVERTEX)))
 	{
 		return;
 	}
@@ -596,7 +596,7 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 		}
 	}
 	/*	unlock the vertex buffer	*/
-	if (!(FSUnlockVertexBuffer(/*WO->lpVertexBuffer*/&WO->renderObject)))
+	if (!(FSUnlockVertexBuffer(/*WO->vertexBuffer*/&WO->renderObject)))
 	{
 		return;
 	}

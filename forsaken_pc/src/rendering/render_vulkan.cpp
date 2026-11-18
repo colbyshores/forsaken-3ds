@@ -730,18 +730,18 @@ bool FSClearDepth(XYRECT *rect)
 }
 
 /* ---- vertex/index/normal buffers (host-visible, persistently mapped) ---- */
-bool FSCreateVertexBuffer(RENDEROBJECT *ro, int n) { ro->lpVertexBuffer = (LPVERTEXBUFFER)vkbuf_create((VkDeviceSize)n * sizeof(LVERTEX), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
+bool FSCreateVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * sizeof(LVERTEX), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
 bool FSCreateDynamicVertexBuffer(RENDEROBJECT *ro, int n) { return FSCreateVertexBuffer(ro, n); }
-bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *ro, int n) { ro->lpVertexBuffer = (LPVERTEXBUFFER)vkbuf_create((VkDeviceSize)n * sizeof(TLVERTEX), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
-bool FSCreateNormalBuffer(RENDEROBJECT *ro, int n) { ro->lpNormalBuffer = (LPVERTEXBUFFER)vkbuf_create((VkDeviceSize)n * sizeof(NORMAL), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
-bool FSCreateIndexBuffer(RENDEROBJECT *ro, int n) { ro->lpIndexBuffer = (LPVERTEXBUFFER)vkbuf_create((VkDeviceSize)n * 3 * sizeof(WORD), VK_BUFFER_USAGE_INDEX_BUFFER_BIT); return true; }
+bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * sizeof(TLVERTEX), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
+bool FSCreateNormalBuffer(RENDEROBJECT *ro, int n) { ro->normalBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * sizeof(NORMAL), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
+bool FSCreateIndexBuffer(RENDEROBJECT *ro, int n) { ro->indexBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * 3 * sizeof(WORD), VK_BUFFER_USAGE_INDEX_BUFFER_BIT); return true; }
 bool FSCreateDynamicIndexBuffer(RENDEROBJECT *ro, int n) { return FSCreateIndexBuffer(ro, n); }
 
-bool FSLockVertexBuffer(RENDEROBJECT *ro, LVERTEX **verts) { *verts = (LVERTEX *)((vkbuf_t *)ro->lpVertexBuffer)->mapped; return *verts != NULL; }
+bool FSLockVertexBuffer(RENDEROBJECT *ro, LVERTEX **verts) { *verts = (LVERTEX *)((vkbuf_t *)ro->vertexBuffer)->mapped; return *verts != NULL; }
 bool FSUnlockVertexBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
-bool FSLockNormalBuffer(RENDEROBJECT *ro, NORMAL **normals) { *normals = (NORMAL *)((vkbuf_t *)ro->lpNormalBuffer)->mapped; return *normals != NULL; }
+bool FSLockNormalBuffer(RENDEROBJECT *ro, NORMAL **normals) { *normals = (NORMAL *)((vkbuf_t *)ro->normalBuffer)->mapped; return *normals != NULL; }
 bool FSUnlockNormalBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
-bool FSLockIndexBuffer(RENDEROBJECT *ro, WORD **indices) { *indices = (WORD *)((vkbuf_t *)ro->lpIndexBuffer)->mapped; return *indices != NULL; }
+bool FSLockIndexBuffer(RENDEROBJECT *ro, WORD **indices) { *indices = (WORD *)((vkbuf_t *)ro->indexBuffer)->mapped; return *indices != NULL; }
 bool FSUnlockIndexBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
 bool FSLockPretransformedVertexBuffer(RENDEROBJECT *ro, TLVERTEX **verts) { return FSLockVertexBuffer(ro, (LVERTEX **)verts); }
 
@@ -757,9 +757,9 @@ void FSReleaseRenderObject(RENDEROBJECT *ro)
 {
     /* Buffers may be referenced by in-flight frames: retire them;
      * FSBeginScene frees them once their frame slot has cycled. */
-    if (ro->lpVertexBuffer) { retire_buf((vkbuf_t *)ro->lpVertexBuffer); ro->lpVertexBuffer = NULL; }
-    if (ro->lpNormalBuffer) { retire_buf((vkbuf_t *)ro->lpNormalBuffer); ro->lpNormalBuffer = NULL; }
-    if (ro->lpIndexBuffer) { retire_buf((vkbuf_t *)ro->lpIndexBuffer); ro->lpIndexBuffer = NULL; }
+    if (ro->vertexBuffer) { retire_buf((vkbuf_t *)ro->vertexBuffer); ro->vertexBuffer = NULL; }
+    if (ro->normalBuffer) { retire_buf((vkbuf_t *)ro->normalBuffer); ro->normalBuffer = NULL; }
+    if (ro->indexBuffer) { retire_buf((vkbuf_t *)ro->indexBuffer); ro->indexBuffer = NULL; }
     for (int i = 0; i < ro->numTextureGroups; i++) {
         ro->textureGroups[i].numVerts = 0;
         ro->textureGroups[i].startVert = 0;
@@ -888,7 +888,7 @@ static bool load_ktx2(vktex_t *t, const char *path, u_int16_t *width, u_int16_t 
     return true;
 }
 
-static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_int16_t *height, int numMips, bool *colorkey)
+static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width, u_int16_t *height, int numMips, bool *colorkey)
 {
     vktex_t *texdata;
     texture_image_t image;
@@ -900,7 +900,7 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
         if (s_etc2 && File_Exists(ktxpath)) {
             texdata = vktex_alloc();
             if (load_ktx2(texdata, ktxpath, width, height, colorkey)) {
-                *t = (LPTEXTURE)texdata;
+                *t = (TEXTURE_HANDLE)texdata;
                 return true;
             }
             free(texdata);
@@ -1013,23 +1013,23 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
         }
         end_one_time(cb);
         vktex_finish(texdata, VK_FORMAT_R8G8B8A8_SRGB, levels);
-        *t = (LPTEXTURE)texdata;
+        *t = (TEXTURE_HANDLE)texdata;
     }
 
     destroy_image(&image);
     return true;
 }
 
-bool FSCreateTexture(LPTEXTURE *texture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool *colourkey)
+bool FSCreateTexture(TEXTURE_HANDLE *texture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool *colourkey)
 {
     return create_texture(texture, fileName, width, height, numMips, colourkey);
 }
-bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool *colorkey)
+bool update_texture_from_file(TEXTURE_HANDLE dstTexture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool *colorkey)
 {
     create_texture(&dstTexture, fileName, width, height, numMips, colorkey);
     return true;
 }
-void release_texture(LPTEXTURE texture)
+void release_texture(TEXTURE_HANDLE texture)
 {
     if (!texture) return;
     vktex_t *t = (vktex_t *)texture;
@@ -1099,15 +1099,15 @@ static void push_mvp(int ortho)
 
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
 {
-    if (!s_frame_active || !renderObject->lpVertexBuffer) return true;
+    if (!s_frame_active || !renderObject->vertexBuffer) return true;
     VkPipeline pipe = get_pipeline(orthographic ? 1 : 0, primitive_type == 1 ? 1 : 0);
     if (!pipe) return false;
     vkCmdBindPipeline(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe);
-    VkBuffer vbuf = ((vkbuf_t *)renderObject->lpVertexBuffer)->buf;
+    VkBuffer vbuf = ((vkbuf_t *)renderObject->vertexBuffer)->buf;
     VkDeviceSize off = 0;
     vkCmdBindVertexBuffers(s_cur, 0, 1, &vbuf, &off);
-    if (renderObject->lpIndexBuffer)
-        vkCmdBindIndexBuffer(s_cur, ((vkbuf_t *)renderObject->lpIndexBuffer)->buf, 0, VK_INDEX_TYPE_UINT16);
+    if (renderObject->indexBuffer)
+        vkCmdBindIndexBuffer(s_cur, ((vkbuf_t *)renderObject->indexBuffer)->buf, 0, VK_INDEX_TYPE_UINT16);
     push_mvp(orthographic ? 1 : 0);
 
     for (int i = 0; i < renderObject->numTextureGroups; i++) {
@@ -1116,7 +1116,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
         vkCmdPushConstants(s_cur, s_layout, VK_SHADER_STAGE_FRAGMENT_BIT, 64, 8, frag);
         vktex_t *tex = group->texture ? (vktex_t *)group->texture : default_tex();
         vkCmdBindDescriptorSets(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, s_layout, 0, 1, &tex->set, 0, NULL);
-        if (renderObject->lpIndexBuffer)
+        if (renderObject->indexBuffer)
             vkCmdDrawIndexed(s_cur, (uint32_t)group->numTriangles * 3, 1, (uint32_t)group->startIndex, (int32_t)group->startVert, 0);
         else
             vkCmdDraw(s_cur, (uint32_t)group->numVerts, 1, (uint32_t)group->startVert, 0);

@@ -128,7 +128,7 @@ bool FSClearDepth(XYRECT * rect);
  * so when a level mesh execbuf used more than 8 unique textures, the
  * loader silently wrote textureGroups[8..N] past the end of the 8-slot
  * array, clobbering the start of the next execbuf's LEVELRENDEROBJECT
- * (lpVertexBuffer, lpIndexBuffer, vbLocked). At render time the next
+ * (vertexBuffer, indexBuffer, vbLocked). At render time the next
  * execbuf's draws fed garbage pointers to the GPU and produced nothing —
  * presenting as the "black void where the next room should be" portal
  * regression on Remaster / N64-port levels (vol2 stays under 8 textures
@@ -171,7 +171,8 @@ bool FSClearDepth(XYRECT * rect);
 	assert( group->numTextureGroups < MAX_TEXTURE_GROUPS ); \
 	group->numTextureGroups++;
 
-typedef void * LPTEXTURE;
+/* A backend texture (opaque to the engine). */
+typedef void * TEXTURE_HANDLE;
 
 typedef struct TEXTUREGROUP
 {
@@ -180,14 +181,12 @@ typedef struct TEXTUREGROUP
 	int numVerts;
 	int numTriangles;
 	bool colourkey;
-	LPTEXTURE texture;
+	TEXTURE_HANDLE texture;
 } TEXTUREGROUP;
 
-typedef void * LPVERTEXBUFFER;
-typedef void * LPARRAYBUFFER;
-typedef void * LPINDEXBUFFER;
+/* A backend's vertex, normal or index buffer (opaque to the engine). */
+typedef void * BUFFER_HANDLE;
 
-// taken from d3d9
 
 typedef struct {
     float r;
@@ -270,9 +269,9 @@ typedef enum {
 
 typedef struct RENDEROBJECT
 {
-	LPVERTEXBUFFER	lpVertexBuffer;
-	LPARRAYBUFFER	lpNormalBuffer;
-	LPINDEXBUFFER	lpIndexBuffer;
+	BUFFER_HANDLE	vertexBuffer;
+	BUFFER_HANDLE	normalBuffer;
+	BUFFER_HANDLE	indexBuffer;
 	bool			vbLocked;
 	int numTextureGroups;
 	TEXTUREGROUP *textureGroups;
@@ -284,9 +283,9 @@ typedef struct RENDEROBJECT
 
 typedef struct LEVELRENDEROBJECT
 {
-	LPVERTEXBUFFER	lpVertexBuffer;
-	LPARRAYBUFFER	lpNormalBuffer;
-	LPINDEXBUFFER	lpIndexBuffer;
+	BUFFER_HANDLE	vertexBuffer;
+	BUFFER_HANDLE	normalBuffer;
+	BUFFER_HANDLE	indexBuffer;
 	bool			vbLocked;
 	int numTextureGroups;
 	TEXTUREGROUP *textureGroups;
@@ -354,9 +353,9 @@ bool FSUnlockIndexBuffer(RENDEROBJECT *renderObject);
 bool FSLockPretransformedVertexBuffer(RENDEROBJECT *renderObject, TLVERTEX **verts);
 bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *renderObject, int numVertices);
 
-bool FSCreateTexture(LPTEXTURE *texture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool * colourkey);
-bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool * colourkey);
-void release_texture( LPTEXTURE texture );
+bool FSCreateTexture(TEXTURE_HANDLE *texture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool * colourkey);
+bool update_texture_from_file(TEXTURE_HANDLE dstTexture, const char *fileName, u_int16_t *width, u_int16_t *height, int numMips, bool * colourkey);
+void release_texture( TEXTURE_HANDLE texture );
 
 bool draw_render_object( RENDEROBJECT *renderObject, int primitive_type, bool orthographic );
 bool draw_line_object(RENDEROBJECT *renderObject);

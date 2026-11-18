@@ -447,7 +447,7 @@ MATRIX proj_matrix;
 MATRIX view_matrix;
 MATRIX world_matrix;
 
-/* Texture handle — wraps a C3D_Tex for the engine's LPTEXTURE (void*).
+/* Texture handle — wraps a C3D_Tex for the engine's TEXTURE_HANDLE (void*).
  * material_class is set at load time by classify_texture() based on
  * the source filename; consumed by configure_texenv_aux to pick which
  * ProcTex preset to bind. proctex_phase is a deterministic hash of
@@ -1827,8 +1827,8 @@ bool FSSetProjection(RENDERMATRIX *matrix)
 
 bool FSCreateVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
 {
-	renderObject->lpVertexBuffer = linearAlloc(numVertices * sizeof(LVERTEX));
-	return renderObject->lpVertexBuffer != NULL;
+	renderObject->vertexBuffer = linearAlloc(numVertices * sizeof(LVERTEX));
+	return renderObject->vertexBuffer != NULL;
 }
 
 bool FSCreateDynamicVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
@@ -1838,8 +1838,8 @@ bool FSCreateDynamicVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
 
 bool FSCreateNormalBuffer(RENDEROBJECT *renderObject, int numNormals)
 {
-	renderObject->lpNormalBuffer = linearAlloc(numNormals * sizeof(NORMAL));
-	return renderObject->lpNormalBuffer != NULL;
+	renderObject->normalBuffer = linearAlloc(numNormals * sizeof(NORMAL));
+	return renderObject->normalBuffer != NULL;
 }
 
 bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
@@ -1852,8 +1852,8 @@ bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
 	 * perf/OPTIMIZATION-LOG.md: per-frame fills are MAXPOLYVERTS-capped
 	 * (800 verts/call), text overlays write tens of quads, load-time
 	 * loops write exactly triangleCount*3 — all far below requested. */
-	renderObject->lpIndexBuffer = linearAlloc(numIndices * sizeof(WORD));
-	return renderObject->lpIndexBuffer != NULL;
+	renderObject->indexBuffer = linearAlloc(numIndices * sizeof(WORD));
+	return renderObject->indexBuffer != NULL;
 }
 
 bool FSCreateDynamicIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
@@ -1863,13 +1863,13 @@ bool FSCreateDynamicIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
 
 bool FSLockIndexBuffer(RENDEROBJECT *renderObject, WORD **indices)
 {
-	*indices = (WORD *)renderObject->lpIndexBuffer;
+	*indices = (WORD *)renderObject->indexBuffer;
 	return true;
 }
 
 bool FSLockVertexBuffer(RENDEROBJECT *renderObject, LVERTEX **verts)
 {
-	*verts = (LVERTEX *)renderObject->lpVertexBuffer;
+	*verts = (LVERTEX *)renderObject->vertexBuffer;
 	return true;
 }
 
@@ -1878,7 +1878,7 @@ bool FSUnlockVertexBuffer(RENDEROBJECT *renderObject) { (void)renderObject; retu
 
 bool FSLockNormalBuffer(RENDEROBJECT *renderObject, NORMAL **normals)
 {
-	*normals = (NORMAL *)renderObject->lpNormalBuffer;
+	*normals = (NORMAL *)renderObject->normalBuffer;
 	return true;
 }
 
@@ -1886,33 +1886,33 @@ bool FSUnlockNormalBuffer(RENDEROBJECT *renderObject) { (void)renderObject; retu
 
 bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
 {
-	renderObject->lpVertexBuffer = linearAlloc(numVertices * sizeof(TLVERTEX));
-	return renderObject->lpVertexBuffer != NULL;
+	renderObject->vertexBuffer = linearAlloc(numVertices * sizeof(TLVERTEX));
+	return renderObject->vertexBuffer != NULL;
 }
 
 bool FSLockPretransformedVertexBuffer(RENDEROBJECT *renderObject, TLVERTEX **verts)
 {
-	*verts = (TLVERTEX*)renderObject->lpVertexBuffer;
+	*verts = (TLVERTEX*)renderObject->vertexBuffer;
 	return true;
 }
 
 void FSReleaseRenderObject(RENDEROBJECT *renderObject)
 {
 	int i;
-	if (renderObject->lpVertexBuffer)
+	if (renderObject->vertexBuffer)
 	{
-		linearFree(renderObject->lpVertexBuffer);
-		renderObject->lpVertexBuffer = NULL;
+		linearFree(renderObject->vertexBuffer);
+		renderObject->vertexBuffer = NULL;
 	}
-	if (renderObject->lpNormalBuffer)
+	if (renderObject->normalBuffer)
 	{
-		linearFree(renderObject->lpNormalBuffer);
-		renderObject->lpNormalBuffer = NULL;
+		linearFree(renderObject->normalBuffer);
+		renderObject->normalBuffer = NULL;
 	}
-	if (renderObject->lpIndexBuffer)
+	if (renderObject->indexBuffer)
 	{
-		linearFree(renderObject->lpIndexBuffer);
-		renderObject->lpIndexBuffer = NULL;
+		linearFree(renderObject->indexBuffer);
+		renderObject->indexBuffer = NULL;
 	}
 	for (i = 0; i < renderObject->numTextureGroups; i++)
 		renderObject->textureGroups[i].texture = NULL;
@@ -2147,7 +2147,7 @@ static void apply_texenv_untextured(void)
 	Texture management
 ===================================================================*/
 
-void release_texture(LPTEXTURE texture)
+void release_texture(TEXTURE_HANDLE texture)
 {
 	if (!texture) return;
 	texture_t *texdata = (texture_t*)texture;
@@ -2224,7 +2224,7 @@ static void resolve_hd_textures_dirs(void)
 	}
 }
 
-static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
+static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
 	u_int16_t *width, u_int16_t *height, bool *colorkey)
 {
 	char hd_path[512];
@@ -2335,7 +2335,7 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	texdata->initialized   = true;
 	texdata->material_class = classify_texture(path);
 	texdata->proctex_phase  = proctex_phase_from_path(path);
-	*t = (LPTEXTURE)texdata;
+	*t = (TEXTURE_HANDLE)texdata;
 
 	Tex3DS_TextureFree(t3x);
 
@@ -2345,7 +2345,7 @@ static bool try_load_hd_texture(LPTEXTURE *t, const char *path,
 	return true;
 }
 
-static bool create_texture(LPTEXTURE *t, const char *path,
+static bool create_texture(TEXTURE_HANDLE *t, const char *path,
 	u_int16_t *width, u_int16_t *height, int numMips, bool *colorkey)
 {
 	texture_image_t image;
@@ -2443,7 +2443,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		if (!C3D_TexInit(&texdata->tex, image.w, image.h, GPU_RGBA4))
 		{
 			texdata->initialized = false;
-			*t = (LPTEXTURE)texdata;
+			*t = (TEXTURE_HANDLE)texdata;
 			destroy_image(&image);
 			return true; /* non-fatal — draw path falls back to vertex color */
 		}
@@ -2464,7 +2464,7 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 		texdata->initialized   = true;
 		texdata->material_class = classify_texture(path);
 	texdata->proctex_phase  = proctex_phase_from_path(path);
-		*t = (LPTEXTURE)texdata;
+		*t = (TEXTURE_HANDLE)texdata;
 	}
 
 	DebugPrintf("Created texture: file=%s, width=%d, height=%d, colorkey=%s\n",
@@ -2474,13 +2474,13 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 	return true;
 }
 
-bool FSCreateTexture(LPTEXTURE *texture, const char *fileName,
+bool FSCreateTexture(TEXTURE_HANDLE *texture, const char *fileName,
 	u_int16_t *width, u_int16_t *height, int numMips, bool *colourkey)
 {
 	return create_texture(texture, fileName, width, height, numMips, colourkey);
 }
 
-bool update_texture_from_file(LPTEXTURE dstTexture, const char *fileName,
+bool update_texture_from_file(TEXTURE_HANDLE dstTexture, const char *fileName,
 	u_int16_t *width, u_int16_t *height, int numMips, bool *colorkey)
 {
 	create_texture(&dstTexture, fileName, width, height, numMips, colorkey);
@@ -2630,7 +2630,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * state, uniforms and draw order all run live per eye, so inset
 	 * and HUD draws are unaffected by construction. */
 
-	if (!s_shaderReady || !renderObject || !renderObject->lpVertexBuffer || !s_scratch)
+	if (!s_shaderReady || !renderObject || !renderObject->vertexBuffer || !s_scratch)
 		return false;
 
 	if (!orthographic)
@@ -2863,14 +2863,14 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		} else
 		/* Convert LVERTEX/TLVERTEX → gpu_vertex_t, expanding indices */
 		{
-		if (renderObject->lpIndexBuffer)
+		if (renderObject->indexBuffer)
 		{
-			WORD *indices = (WORD*)renderObject->lpIndexBuffer + tg->startIndex;
+			WORD *indices = (WORD*)renderObject->indexBuffer + tg->startIndex;
 
 
 			if (orthographic)
 			{
-				TLVERTEX *verts = (TLVERTEX*)renderObject->lpVertexBuffer;
+				TLVERTEX *verts = (TLVERTEX*)renderObject->vertexBuffer;
 				for (i = 0; i < numIndices; i++)
 				{
 					TLVERTEX *v = &verts[startVert + indices[i]];
@@ -2887,7 +2887,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			}
 			else
 			{
-				LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
+				LVERTEX *verts = (LVERTEX*)renderObject->vertexBuffer;
 				for (i = 0; i < numIndices; i++)
 				{
 					int vi = startVert + indices[i];
@@ -2908,7 +2908,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		}
 		else
 		{
-			LVERTEX *verts = (LVERTEX*)renderObject->lpVertexBuffer;
+			LVERTEX *verts = (LVERTEX*)renderObject->vertexBuffer;
 			int numVerts = tg->numVerts;
 			if (s_scratchUsed + numVerts > s_scratchMax) {
 				tg_memo_cnt[group] = 0;

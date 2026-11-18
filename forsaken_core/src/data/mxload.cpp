@@ -1117,7 +1117,7 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 {
 	int		i,e;
 	int		group;
-	LVERTEX	*lpD3DLVERTEX1 = NULL;
+	LVERTEX	*dstVert = NULL;
 	LVERTEX			*VertPtr;
 
 	if( !Mxloadheader1->state )
@@ -1126,7 +1126,7 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 	{
 		for ( i=0 ; i<Mxloadheader1->Group[group].num_execbufs; i++)
 		{
-			if (!(FSLockVertexBuffer(&Mxloadheader1->Group[group].renderObject[i], &lpD3DLVERTEX1)))
+			if (!(FSLockVertexBuffer(&Mxloadheader1->Group[group].renderObject[i], &dstVert)))
 			{
 				return false;
 			}
@@ -1135,9 +1135,9 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 
 			for( e = 0 ; e < Mxloadheader1->Group[group].num_verts_per_execbuf[i] ; e++ )
 			{
-				lpD3DLVERTEX1->color = VertPtr->color;
+				dstVert->color = VertPtr->color;
 				VertPtr++;
-				lpD3DLVERTEX1++;
+				dstVert++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&Mxloadheader1->Group[group].renderObject[i])))
