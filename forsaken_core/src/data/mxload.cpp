@@ -54,6 +54,7 @@ mxtype : u_int16_t // always 0 for mx format
 #include "data/mload.h"
 #include "data/tload.h"
 #include "util/hunk_alloc.h"
+#include "util/file_reader.h"
 
 /*===================================================================
 		Defines
@@ -80,15 +81,6 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
 bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool StoreTriangles )
 {
 
-	char		*	Buffer;
-	char		*	tempBuffer;
-	int16_t		*	Int16Pnt;
-	u_int8_t		*	Uint8Pnt;
-	u_int16_t		*	Uint16Pnt;
-	u_int32_t		*	Uint32Pnt;
-	u_int16_t		*	Uint16Pnt2;
-	float		*	FloatPnt;
-	MFACE		*	MFacePnt;
 	TRIANGLE		FacePnt; // was a pointer
 	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
 	u_int16_t			exec_type = 0;			// the type of execute buffer
@@ -96,7 +88,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
 	u_int16_t			group_vertex_start = 0; // where in the vert list to start processing
-	LPOLDLVERTEX lpLVERTEX2 = NULL;
 	LPLVERTEX	lpLVERTEX = NULL;
 	LPLVERTEX	lpBufStart = NULL;
 	WORD			*lpIndices = NULL;
@@ -106,7 +97,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int16_t			tpage = 0;
 	int				execbuf;
 	int				group;
-	u_int16_t			ExecSize;
 	u_int16_t			animation,frames,vertices;
 	POLYANIM	*	PolyAnim;
 	TANIMUV		*	TanimUV;
@@ -122,11 +112,8 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int32_t			Colour;
 	int				colourkey = 0;
 
-	int16_t			c;
-	int8_t		*	Int8Pnt;
 	int8_t			SFXFilename[ 128 ];
 
-	int numTriangles = 0;
 	int triangleCount = 0;
 	int indexOffset = 0;
 	int tempInt;
@@ -156,17 +143,15 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		}
 	}
 
-	Buffer = Mxloadheader->Buffer;
-	if( Buffer == NULL)
+	if( Mxloadheader->Buffer == NULL)
 	{
 		Msg( "Mxload() Buffer was not allocated in %s\n", Filename );
 		return false;
 	}
+	FileReader in( Mxloadheader->Buffer );
 
 	/*	get the number of groups	*/
-	Uint16Pnt = (u_int16_t *) Buffer;
-	Mxloadheader->num_groups = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;
+	Mxloadheader->num_groups = in.u16();
 
 	if ( Mxloadheader->num_groups > MAXGROUPS )
 	{
@@ -177,9 +162,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	for( group=0 ; group<Mxloadheader->num_groups; group++)
 	{
 		/*	get the number of execbufs in this group	*/
-		Uint16Pnt = (u_int16_t *) Buffer;
-		Mxloadheader->Group[group].num_execbufs = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;
+		Mxloadheader->Group[group].num_execbufs = in.u16();
 
 		if ( Mxloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
 		{
@@ -190,25 +173,20 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		for( execbuf=0 ; execbuf<Mxloadheader->Group[group].num_execbufs; execbuf++)
 		{
 			num_texture_groups = 0;
-			Uint16Pnt = (u_int16_t *) Buffer;
 
-			ExecSize = 	*Uint16Pnt++;
-			ExecSize += 1024;
+			in.skip( sizeof( u_int16_t ) );	// D3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
-			exec_type = *Uint16Pnt++;
+			exec_type = in.u16();
 
 			/*	get the number of verts in execution buffer	*/
-			num_vertices =	*Uint16Pnt++;
-			Buffer = (char *) Uint16Pnt;
+			num_vertices = in.u16();
 
 			/*	record how what type of exec buffer	*/
 			Mxloadheader->Group[group].exec_type[execbuf] = exec_type;
 
 			/*	record how many verts there are in the exec buffer	*/
 			Mxloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
-
-			lpLVERTEX2 = (LPOLDLVERTEX ) Buffer;
 
 			/*	create a vertex buffer	*/
 			if (!FSCreateVertexBuffer(&Mxloadheader->Group[group].renderObject[execbuf], num_vertices))
@@ -232,20 +210,16 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			/*	copy the vertex data into the execute buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
-				/* lpLVERTEX2 points into a buffer at variable alignment
-				   (filename strings precede it); copy 32-byte OLDLVERTEX
-				   to a stack-aligned local before float reads. */
-				__typeof__(*lpLVERTEX2) _ovx_local;
-				memcpy_unaligned(&_ovx_local, lpLVERTEX2, sizeof(*lpLVERTEX2));
-				LPOLDLVERTEX old = &_ovx_local;
+				OLDLVERTEX old;
+				in.bytes( &old, sizeof( old ) );
 
-				lpLVERTEX[i].x = old->x;
-				lpLVERTEX[i].y = old->y;
-				lpLVERTEX[i].z = old->z;
-				lpLVERTEX[i].tu = old->tu;
-				lpLVERTEX[i].tv = old->tv;
+				lpLVERTEX[i].x = old.x;
+				lpLVERTEX[i].y = old.y;
+				lpLVERTEX[i].z = old.z;
+				lpLVERTEX[i].tu = old.tu;
+				lpLVERTEX[i].tv = old.tv;
 
-				color = old->color;
+				color = old.color;
 				a = (color>>24)&255;
 				r = (color>>16)&255;
 				g = (color>>8)&255;
@@ -264,12 +238,9 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 				color = RGBA_MAKE( r , g , b , a  );
 				lpLVERTEX[i].color = color;
-				lpLVERTEX2->color = color;
 
 				// nothing used specular so we removed it from LVERTEX
 				//lpLVERTEX[i]->specular = lpLVERTEX2->specular;
-
-				lpLVERTEX2++;
 			}
 
 			/* bjd - allows us to retrieve copies of the original vertices in the new format! */
@@ -278,34 +249,24 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			//	Stuff to clip if bounding box is off screen
 
-			Buffer = (char *) lpLVERTEX2;
-
-			Uint16Pnt = (u_int16_t *) Buffer;
-			num_texture_groups = *Uint16Pnt++;
+			num_texture_groups = in.u16();
 			DebugPrintf("texture groups: %d\n", num_texture_groups);
-			Buffer = (char *) Uint16Pnt;
 			Mxloadheader->Group[group].num_texture_groups[execbuf] = num_texture_groups;
 
 
 			triangleCount = 0;
 			tempInt = 0;
-			tempBuffer = Buffer;
 
 			/* find out how many vertexes we'll need to load into our vertex buffer */
-			for ( i=0 ; i<num_texture_groups; i++)
 			{
-				u_int16_t *temp = (u_int16_t *) tempBuffer;
-
-				temp += 4;
-
-				numTriangles = *temp++;
-
-				tempBuffer = (char*) temp;
-				MFacePnt = (MFACE *) tempBuffer;
-
-				MFacePnt += numTriangles;
-				tempBuffer = (char *) MFacePnt;
-				triangleCount += numTriangles;
+				FileReader scan = in;
+				for ( i=0 ; i<num_texture_groups; i++)
+				{
+					scan.skip( 4 * sizeof( u_int16_t ) );
+					u_int16_t numTriangles = scan.u16();
+					scan.skip( numTriangles * sizeof( MFACE ) );
+					triangleCount += numTriangles;
+				}
 			}
 
 			/*	create an index buffer	*/
@@ -355,26 +316,25 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			for ( i=0 ; i<num_texture_groups; i++)
 			{
-				Uint16Pnt = (u_int16_t *) Buffer;
-				Uint16Pnt++;	// texture type (unused)
-				group_vertex_start = *Uint16Pnt++;
-				Uint16Pnt++;	// group vertex count (unused)
-				tpage = *Uint16Pnt++;
-				num_triangles = *Uint16Pnt++;
+				in.skip( sizeof( u_int16_t ) );	// texture type (unused)
+				group_vertex_start = in.u16();
+				in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
+				tpage = in.u16();
+				num_triangles = in.u16();
 				DebugPrintf("trinagles %d\n", num_triangles);
-				Buffer = (char *) Uint16Pnt;
 
 				Mxloadheader->Group[group].texture_group_vert_off[execbuf][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
-				MFacePnt = (MFACE *) Buffer;
 				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
 
 
 				/*	copy the faces data into the execute buffer	*/
 				for( e=0; e<num_triangles; e++)
 				{
-					FacePnt.v1 = MFacePnt->v1;
-					FacePnt.v2 = MFacePnt->v2;
-					FacePnt.v3 = MFacePnt->v3;
+					MFACE face;
+					in.bytes( &face, sizeof( face ) );
+					FacePnt.v1 = face.v1;
+					FacePnt.v2 = face.v2;
+					FacePnt.v3 = face.v3;
 
 					lpIndices[ibIndex] = FacePnt.v1;
 					ibIndex++;
@@ -383,22 +343,19 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 					lpIndices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
-          memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
-          memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
-          memcpy(&lpNormals->nz, &MFacePnt->nz, 4);
+					lpNormals->nx = face.nx;
+					lpNormals->ny = face.ny;
+					lpNormals->nz = face.nz;
 
-					if ( MFacePnt->pad & 1 )
+					if ( face.pad & 1 )
 					{
 						// colourkey triangle found
 						colourkey++;
-						MFacePnt->pad &= ~1;
 					}
 					FixUV( &FacePnt, lpBufStart, tpage, Mxloadheader->Group[group].originalVerts[execbuf]);
-					MFacePnt++;
 					lpNormals++;
 					tempInt+=3;
 				}
-				Buffer = (char *) MFacePnt;
 
 				// BJD - check this. correct value to place here?
 				Mxloadheader->Group[ group ].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;//num_triangles * 3;
@@ -470,35 +427,27 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	}
 
 	// Background Animation Stuff......
-	Uint16Pnt = (u_int16_t *) Buffer;
-	Uint16Pnt++;		// skip old mxv flag..
-	num_animations = *Uint16Pnt++;
+	in.skip( sizeof( u_int16_t ) );		// skip old mxv flag..
+	num_animations = in.u16();
 	Mxloadheader->AnimData.num_animations = num_animations;
 
 	if( num_animations )
 	{
 		for( i = 0 ; i < num_animations ; i++ )
 		{
-			frames = *Uint16Pnt++;
-			Uint16Pnt++;	// max loops (unused)
-			animsize = *Uint16Pnt++;
+			in.skip( sizeof( u_int16_t ) );	// frames (unused)
+			in.skip( sizeof( u_int16_t ) );	// max loops (unused)
+			animsize = in.u16();
 			Mxloadheader->AnimData.AnimSeq[i] = (u_int16_t *) malloc( animsize * sizeof( u_int16_t ) );
-			Uint16Pnt2 = Mxloadheader->AnimData.AnimSeq[i];
-			for( e = 0 ; e < animsize ; e++ )
-			{
-				*Uint16Pnt2++ = *Uint16Pnt++;
-			}
+			in.bytes( Mxloadheader->AnimData.AnimSeq[i], animsize * sizeof( u_int16_t ) );
 		}
-		Buffer = ( char * ) Uint16Pnt;
 
 		for( group=0 ; group<Mxloadheader->num_groups; group++)
 		{
 			for( execbuf=0 ; execbuf<Mxloadheader->Group[group].num_execbufs; execbuf++)
 			{
 				// Animating background polys......
-				Uint16Pnt = (u_int16_t *) Buffer;
-				Mxloadheader->Group[group].num_animating_polys[execbuf] = *Uint16Pnt++;
-				Buffer = ( char * ) Uint16Pnt;
+				Mxloadheader->Group[group].num_animating_polys[execbuf] = in.u16();
 				if( Mxloadheader->Group[group].num_animating_polys[execbuf] != 0 )
 				{
 					Mxloadheader->Group[group].polyanim[execbuf] = (POLYANIM*)malloc( Mxloadheader->Group[group].num_animating_polys[execbuf] * sizeof( POLYANIM ) );
@@ -519,17 +468,11 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 					for( i = 0 ; i < Mxloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
 					{
-						Uint8Pnt = (u_int8_t *) Buffer;
-						for( e = 0 ; e < 32 ; e ++ )
-						{
-							PolyAnim->Tag[e] = *Uint8Pnt++;
-						}
-						Buffer = ( char * ) Uint8Pnt;
+						in.bytes( PolyAnim->Tag, sizeof( PolyAnim->Tag ) );
 
-						Uint16Pnt = (u_int16_t *) Buffer;
-						animation = *Uint16Pnt++;
-						frames = *Uint16Pnt++;
-						vertices = *Uint16Pnt++;
+						animation = in.u16();
+						frames = in.u16();
+						vertices = in.u16();
 
 
 						PolyAnim->State = TEXTUREANIM_Go;
@@ -562,24 +505,17 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						intPnt = PolyAnim->vert;
 						TanimUV = PolyAnim->UVs;
 
-						Buffer = ( char * ) Uint16Pnt;
-
-						Uint16Pnt = (u_int16_t *) Buffer;
 						for( e = 0 ; e < vertices  ; e++ )
 						{
-							*intPnt++ = *Uint16Pnt++;
+							*intPnt++ = in.u16();
 						}
-						Buffer = ( char * ) Uint16Pnt;
 
-						FloatPnt = (float*) Buffer;
 						for( o = 0 ; o < vertices*frames ; o++ )
 						{
-
-							memcpy(&TanimUV->u, FloatPnt++, 4);
-							memcpy(&TanimUV->v, FloatPnt++, 4);
+							TanimUV->u = in.f32();
+							TanimUV->v = in.f32();
 							TanimUV++;
 						}
-						Buffer = ( char * ) FloatPnt;
 
 						FixUV_Anim( PolyAnim, lpLVERTEX, Mxloadheader->Group[group].originalVerts[execbuf] );
 
@@ -600,19 +536,13 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			}
 		}
 	}
-	else
-	{
-		Buffer = (char *) Uint16Pnt;
-	}
 
 /*===================================================================
 	Point Direction Data
 ===================================================================*/
-	Uint16Pnt = (u_int16_t *) Buffer;
-
-	if( *Uint16Pnt++ )
+	if( in.u16() )
 	{
-		NumFirePoints = *Uint16Pnt++;
+		NumFirePoints = in.u16();
 
 		if( NumFirePoints )
 		{
@@ -629,16 +559,10 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			for( i = 0; i < NumFirePoints; i++ )
 			{
-				FirePointPtr->ID = *Uint16Pnt++;				// ID ( u_int16_t )
-				FloatPnt = (float *) Uint16Pnt;
-
-				memcpy_unaligned(&FirePointPtr->Pos, FloatPnt, 4*3);				// Pos ( 3 floats )
-				FloatPnt+=3;
-				memcpy_unaligned(&FirePointPtr->Dir, FloatPnt, 4*3);				// Dir ( 3 floats )
-				FloatPnt+=3;
-				memcpy_unaligned(&FirePointPtr->Up, FloatPnt, 4*3);				// Up ( 3 floats )
-				FloatPnt+=3;
-				Uint16Pnt = (u_int16_t *) FloatPnt;
+				FirePointPtr->ID = in.u16();					// ID ( u_int16_t )
+				FirePointPtr->Pos = in.vec();			// Pos ( 3 floats )
+				FirePointPtr->Dir = in.vec();			// Dir ( 3 floats )
+				FirePointPtr->Up = in.vec();			// Up ( 3 floats )
 				FirePointPtr++;
 			}
 		}
@@ -648,7 +572,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			Mxloadheader->NumFirePoints = 0;
 		}
 
-		NumSpotFX = *Uint16Pnt++;
+		NumSpotFX = in.u16();
 
 		if( NumSpotFX )
 		{
@@ -665,34 +589,18 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			for( i = 0; i < NumSpotFX; i++ )
 			{
-				SpotFXPtr->Type = *Uint16Pnt++;				// Type ( u_int16_t )
-				FloatPnt = (float *) Uint16Pnt;
+				SpotFXPtr->Type = in.u16();					// Type ( u_int16_t )
+				SpotFXPtr->Pos = in.vec();			// Pos ( 3 floats )
+				SpotFXPtr->DirVector = in.vec();	// Dir ( 3 floats )
+				SpotFXPtr->UpVector = in.vec();	// Up ( 3 floats )
+				SpotFXPtr->StartDelay = in.f32() * ANIM_SECOND;		// Start Delay
+				SpotFXPtr->ActiveDelay = in.f32() * ANIM_SECOND;	// Active Delay
+				SpotFXPtr->InactiveDelay = in.f32() * ANIM_SECOND;	// Inactive Delay
+				SpotFXPtr->Primary = (int8_t) in.i16();		// Primary ( int16_t )
+				SpotFXPtr->Secondary = (int8_t) in.i16();	// Secondary ( int16_t )
+				Colour = in.u32();
 
-				memcpy_unaligned(&SpotFXPtr->Pos, FloatPnt, 3*4);				// Pos ( 3 floats )
-				FloatPnt+=3;
-				memcpy_unaligned(&SpotFXPtr->DirVector, FloatPnt, 3*4);		// Dir ( 3 floats )
-				FloatPnt+=3;
-				memcpy_unaligned(&SpotFXPtr->UpVector, FloatPnt, 3*4);		// Up ( 3 floats )
-				FloatPnt+=3;
-				memcpy(&SpotFXPtr->StartDelay, FloatPnt++, 4); SpotFXPtr->StartDelay  *= ANIM_SECOND;	// Start Delay
-				memcpy(&SpotFXPtr->ActiveDelay, FloatPnt++, 4); SpotFXPtr->ActiveDelay *= ANIM_SECOND;	// Active Delay
-				memcpy(&SpotFXPtr->InactiveDelay, FloatPnt++, 4); SpotFXPtr->InactiveDelay  *= ANIM_SECOND;	// Inactive Delay
-				Int16Pnt = (int16_t *) FloatPnt;
-				SpotFXPtr->Primary = (int8_t) *Int16Pnt++;	// Primary ( int16_t )
-				SpotFXPtr->Secondary = (int8_t) *Int16Pnt++;	// Secondary ( int16_t )
-				Uint32Pnt = (u_int32_t *) Int16Pnt;
-				Colour = *Uint32Pnt++;
-
-
-				Int8Pnt = (int8_t *) Uint32Pnt;
-
-				c = 0;
-				do
-				{
-					SFXFilename[ c ] = *Int8Pnt++;
-					c++;
-				}
-				while( SFXFilename[ ( c - 1 ) ] != 0 );
+				strcpy( (char*)&SFXFilename[ 0 ], in.cstring() );
 
 				if( SpotFXPtr->Type == SPOTFX_SoundFX )
 				{
@@ -711,10 +619,8 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 					SpotFXPtr->SoundFX = -1;
 				}
 
-				FloatPnt = (float *) Int8Pnt;
-				memcpy(&SpotFXPtr->SoundFXVolume, FloatPnt++, 4);
-				memcpy(&SpotFXPtr->SoundFXSpeed, FloatPnt++, 4);
-				Uint16Pnt = (u_int16_t *) FloatPnt;
+				SpotFXPtr->SoundFXVolume = in.f32();
+				SpotFXPtr->SoundFXSpeed = in.f32();
 				SpotFXPtr->Red = (u_int8_t) ( ( Colour >> 16 ) & 255 );
 				SpotFXPtr->Green = (u_int8_t) ( ( Colour >> 8 ) & 255 );
 				SpotFXPtr->Blue = (u_int8_t) ( Colour & 255 );
@@ -726,8 +632,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			Mxloadheader->SpotFX = NULL;
 			Mxloadheader->NumSpotFX = 0;
 		}
-
-		Buffer = (char *) Uint16Pnt;
 	}
 	else
 	{
@@ -735,8 +639,12 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		Mxloadheader->FirePoints = NULL;
 		Mxloadheader->NumSpotFX = 0;
 		Mxloadheader->SpotFX = NULL;
-		Buffer = (char *) ( Uint16Pnt + 1 );
 	}
+
+	/* Everything the model keeps has been copied out of the file. */
+	free( Mxloadheader->OrgAddr );
+	Mxloadheader->OrgAddr = NULL;
+	Mxloadheader->Buffer = NULL;
 
 	if ( colourkey )
 		DebugPrintf( "Mxload: %d colourkey triangles found\n", colourkey );
@@ -1023,10 +931,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 	long			File_Size;
 	long			Read_Size;
 	char		*	Buffer;
-	u_int16_t		*	Uint16Pnt;
 	int			i;
-	char	*	FileNamePnt;
-	u_int32_t		*	Uint32Pnt;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 	int8_t			TempFilename[ 256 ];
@@ -1071,10 +976,9 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 
 	Mxloadheader->OrgAddr = Buffer;
 
-	Uint32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *Uint32Pnt++;
-	VersionNumber = *Uint32Pnt++;
-	Buffer = (char *) Uint32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != MX_VERSION_NUMBER  ) )
 	{
@@ -1082,10 +986,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 		return( false );
 	}
 
-	Uint16Pnt = (u_int16_t *) Buffer;
-
-	Mxloadheader->num_texture_files = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;
+	Mxloadheader->num_texture_files = in.u16();
 
 	if ( Mxloadheader->num_texture_files > MAXTPAGESPERMXLOAD )
 	{
@@ -1098,8 +999,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 		/*	put the filenames in the tex struct	*/
 		for( i = 0;	 i < Mxloadheader->num_texture_files; i++)
 		{
-			FileNamePnt = (char *) &Mxloadheader->ImageFile[i];
-			while ( ( *FileNamePnt++ = *Buffer++ ) != 0 );
+			strcpy( Mxloadheader->ImageFile[i], in.cstring() );
 
 			if( LevelSpecific )
 				GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mxloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
@@ -1116,7 +1016,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 
 	}
 
-	Mxloadheader->Buffer = Buffer;
+	Mxloadheader->Buffer = (const char *) in.pos();
 	return( true );
 }
 

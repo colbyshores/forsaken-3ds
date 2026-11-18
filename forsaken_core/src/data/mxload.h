@@ -87,8 +87,8 @@ typedef struct MXGROUP{
 typedef struct MXLOADHEADER{
 	int					state;								// false if not loaded properly...
 	u_int32_t				AnimOncePerFrame;					// used for stuff that is displayed more than once in a single frame..
-	char		*		OrgAddr;
-	char		*		Buffer;
+	char		*		OrgAddr;							// the .mx file, from PreMxload until Mxload has copied it out
+	const char	*		Buffer;								// where Mxload starts reading OrgAddr
 	u_int16_t				num_texture_files;
 	u_int16_t				num_groups;
 	MXGROUP				Group[MAXMXGROUPS];
