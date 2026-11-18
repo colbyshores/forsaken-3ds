@@ -29,8 +29,6 @@
 // architecture
 #ifdef __3DS__
   #define ARCH "ARM"
-#elif defined(__i386__)
-  #define ARCH "32"
 #else
   #define ARCH "64"
 #endif

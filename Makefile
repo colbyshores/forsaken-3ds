@@ -6,9 +6,6 @@
 # make CXX=i686-w64-mingw32-g++
 
 # general compiler settings
-ifeq ($(M32),1)
-  FLAGS+= -m32
-endif
 FLAGS+= -pipe
 # -Wno-missing-field-initializers: the menu tables and the Vulkan create-info
 # initialisers name the leading members and rely on the rest being zero.
