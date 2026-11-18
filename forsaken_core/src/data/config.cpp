@@ -1205,7 +1205,6 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			JoystickInfo[ j ].assigned );
 		if ( JoystickInfo[ j ].connected && !JoystickInfo[ j ].assigned )
 		{
-			// if spaceorb...
 			if ( !strcasecmp( JoystickInfo[ j ].Name, "Spacetec SpaceOrb 360" ) )
 			{
 				DebugPrintf( "DefaultJoystickSettings: player '%s' joystick #%d='%s' configuring as SpaceOrb\n",
@@ -1233,7 +1232,7 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			}
 #ifdef __3DS__
 			/* 3DS button layout. The button INDEX here MUST match the
-			 * controls_action_t slot in controls_3ds.h that input_3ds.c
+			 * controls_action_t slot in controls_3ds.h that input_3ds.cpp
 			 * writes into joy_button_state[0][index] — a mismatch is the
 			 * "Next Weapon actually does Thrust Forward" bug:
 			 *  0=A  fire_primary    1=B  fire_secondary
@@ -1245,8 +1244,8 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			 *  14-15 slide up/down
 			 * Circle pad = camera (axis 0/1 → yaw/pitch, set above).
 			 * The D-pad (POV hat 0) is the DEFAULT weapon-switch + slide
-			 * scheme (L/R = prev/next primary, U/D = slide down/up); the
-			 * 10-15 face-button binds default unbound in controls_3ds.c
+			 * scheme (L/R = prev/next primary, U/D = slide up/down); the
+			 * 10-15 face-button binds default unbound in controls_3ds.cpp
 			 * and are opt-in. */
 			AddButton( j, 0,  &u->fire_primary );
 			AddButton( j, 1,  &u->fire_secondary );
@@ -1269,7 +1268,8 @@ void DefaultJoystickSettings( USERCONFIG *u )
 			JoystickInfo[ j ].POV[0].action[JOY_HAT_UP]   = SHIPACTION_SlideUp;
 			JoystickInfo[ j ].POV[0].action[JOY_HAT_DOWN] = SHIPACTION_SlideDown;
 #else
-			/* Xbox controller (SDL 1.2 xpad):
+			/* Xbox-layout pad, numbered as the Linux xpad driver (and so
+			 * SDL's joystick API) reports it:
 			 *  0=A fire_primary  1=B fire_secondary
 			 *  2=X forward       3=Y backward
 			 *  4=LB strafe_left  5=RB strafe_right */

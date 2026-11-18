@@ -1,8 +1,9 @@
-
 #pragma once
-/*
- * Defines
- */
+
+/* loadsave.h -- single-player saved games (see loadsave.cpp for the file
+ * layout). Saves go to SAVEGAME_FOLDER: the SD card on the 3DS (romfs is
+ * read-only), the Savegame folder on PC. */
+
 #include "game/main.h"
 
 #ifdef __3DS__

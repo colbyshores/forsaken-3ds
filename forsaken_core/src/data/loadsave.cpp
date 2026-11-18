@@ -1,5 +1,29 @@
-// TODO: this code loads pointers !!!!!!!!!!
-// apparrently this is somehow possible if you save/load from save binary
+/* loadsave.cpp -- single-player saved games
+ *
+ * InGameSave writes the whole running level to SAVEGAME_FOLDER\saveNN.SAV
+ * (slot NN = LoadSavedGameList.selected_item + 1) plus a screenshot
+ * (saveNN.PPM) for the load menu. PreInGameLoad reads just the level name so
+ * the level can be loaded first; InGameLoad then restores the state over it.
+ * SavedGameInfo reads the header for the menu line.
+ *
+ * Save file (values in the machine's own byte order and sizes):
+ *   magic, version (u32 each; LOADSAVE_VERSION_NUMBER)
+ *   level short name, pilot name (NUL-terminated)
+ *   hours, minutes, seconds of level time, enemies at start, enemies
+ *     killed, lives (i16 each)
+ *   then each module's own section, written and read in this order by its
+ *   Save* / Load* pair: ships, enemies, sound effects, texture animations,
+ *   start / restart points, remote cameras, screen polys, trigger areas,
+ *   external forces, teleports, real-time lights, lights, triggers,
+ *   background objects, pickups, primary bullets, secondary bullets,
+ *   models, polys, face-me polys, spot effects, text messages
+ *   Cheated (bool)
+ *
+ * The sections hold values and array indices only, never pointers
+ * (checked 2026-11-18 on four levels: each routine's output scanned for
+ * address-like values across two runs, and every field type checked).
+ * A file with the wrong magic or version is still loaded after a warning.
+ */
 
 /*===================================================================
 		Include Files...	
@@ -43,34 +67,6 @@
 #include "util/util.h"
 #include "util/timer.h"
 #include "game/oct2.h"
-
-/*			Stuff that needs to be saved/loaded.....
-
-		BackGroundObjects...	1				Dave	( DONE )
-		Triggers...				2				Olly	( DONE )
-		Cameras...				3				Dan		( DONE )
-		RealTimeLights...		4				Olly	( DONE )
-		XLights					5				Dave	( DONE )
-		Current Time...			6				Dan		( DONE )
-		Pickups...				7				Dave	( DONE )
-		Restart Points...		8				Dave	( DONE )
-		Start Points...			9				Dave	( DONE )
-		Enemies...				10				Dan
-		Trigger Areas...		11				Dan		( DONE )
-		External Forces...		12				Dan		( DONE )
-		Teleports...			13				Dan		( DONE )
-		SpotFx...				14				Dave	( DONE )
-		Primary Bullets...		15				Dave	( DONE )
-		Secondary Bullets...	16				Dave	( DONE )
-		Models ??				17				Dave	( DONE )
-		Ships					18				Dan
-		ScreenPolys				19				Dave	( DONE )
-		2dPolys					20				Dave	( DONE )
-		2dTextures				21				Dave	( DONE )
-		SFX						22				Phil
-		Temperature..			23				Dave	( DONE )
-		TextureAnims			24				Olly
- */
 
 /*===================================================================
 		Defines

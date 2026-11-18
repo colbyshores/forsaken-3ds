@@ -144,6 +144,9 @@ bool file_time( const char * path, struct filetime *t )
 	return true;
 }
 
+/* Read Read_Size bytes (0: the whole file) of Filename into File_Buffer
+   with a single read(). Returns the bytes read, 0 if the file can't be
+   opened or read; callers compare it with the size they asked for. */
 long Read_File( char * Filename, char * File_Buffer, long Read_Size )
 {
 	int	Handle = -1;
@@ -151,29 +154,19 @@ long Read_File( char * Filename, char * File_Buffer, long Read_Size )
 
 	char * path = convert_path(Filename);
 
-	// get the size of the file
 	if( Read_Size == 0 ) 
 		Read_Size = Get_File_Size( path );
 
-	// open the file handle
 	Handle = open( path, O_RDONLY );
 
-	// file opened successfully
 	if( Handle != -1 )
 	{
-		// read in the file
 		Bytes_Read = read( Handle, File_Buffer, Read_Size );
-
-		// set bytes read to 0
-		// if no data was read
 		if( Bytes_Read == -1 ) Bytes_Read = 0;
 
-		// close up the file
 		close( Handle );
-
 	}
 
-	// return the size of the file
 	return ( Bytes_Read );
 }
 
@@ -183,10 +176,11 @@ bool delete_file( char * str )
 	return (unlink( path )==0);
 }
 
-//
-// Find File Wrapper
-//
-
+/* File search: find_file starts a glob (after convert_path) and returns the
+   first match's file name without its folder, find_next_file the next, NULL
+   when there are no more; find_close frees the search. Names point into
+   the glob results and stay valid until the next find_file or find_close.
+   One search at a time. */
 
 #include <glob.h>
 /* devkitARM's glob.h uses GLOB_ABEND instead of GLOB_ABORTED */
