@@ -11417,52 +11417,52 @@ void InitScreenFonts (void)
 		TextLookup[font][']'] = 7 + offset;
 
 		// foreign characters...
-		TextLookup[font][(u_int8_t)'�'] = 56 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 56 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 56 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 57 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 57 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 58 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 58 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 59 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 59 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 60 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 60 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 61 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 62 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 63 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 63 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 64 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 64 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 65 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 65 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 66 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 66 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 67 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 67 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 68 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 68 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 69 + offset; 
-		TextLookup[font][(u_int8_t)'�'] = 69 + offset;
-		TextLookup[font][(u_int8_t)'�'] = TextLookup[font][(u_int8_t)'B'];
+		TextLookup[font][(u_int8_t)'\xe0'] = 56 + offset; 
+		TextLookup[font][(u_int8_t)'\xe0'] = 56 + offset; 
+		TextLookup[font][(u_int8_t)'\xc0'] = 56 + offset; 
+		TextLookup[font][(u_int8_t)'\xe1'] = 57 + offset; 
+		TextLookup[font][(u_int8_t)'\xc1'] = 57 + offset; 
+		TextLookup[font][(u_int8_t)'\xe4'] = 58 + offset; 
+		TextLookup[font][(u_int8_t)'\xc4'] = 58 + offset; 
+		TextLookup[font][(u_int8_t)'\xe8'] = 59 + offset; 
+		TextLookup[font][(u_int8_t)'\xc8'] = 59 + offset; 
+		TextLookup[font][(u_int8_t)'\xe9'] = 60 + offset; 
+		TextLookup[font][(u_int8_t)'\xc9'] = 60 + offset; 
+		TextLookup[font][(u_int8_t)'\xea'] = 61 + offset; 
+		TextLookup[font][(u_int8_t)'\xec'] = 62 + offset; 
+		TextLookup[font][(u_int8_t)'\xf2'] = 63 + offset; 
+		TextLookup[font][(u_int8_t)'\xd2'] = 63 + offset; 
+		TextLookup[font][(u_int8_t)'\xf3'] = 64 + offset; 
+		TextLookup[font][(u_int8_t)'\xd3'] = 64 + offset; 
+		TextLookup[font][(u_int8_t)'\xf6'] = 65 + offset; 
+		TextLookup[font][(u_int8_t)'\xd6'] = 65 + offset; 
+		TextLookup[font][(u_int8_t)'\xf9'] = 66 + offset; 
+		TextLookup[font][(u_int8_t)'\xd9'] = 66 + offset; 
+		TextLookup[font][(u_int8_t)'\xfa'] = 67 + offset; 
+		TextLookup[font][(u_int8_t)'\xda'] = 67 + offset; 
+		TextLookup[font][(u_int8_t)'\xfc'] = 68 + offset; 
+		TextLookup[font][(u_int8_t)'\xdc'] = 68 + offset; 
+		TextLookup[font][(u_int8_t)'\xf1'] = 69 + offset; 
+		TextLookup[font][(u_int8_t)'\xd1'] = 69 + offset;
+		TextLookup[font][(u_int8_t)'\xdf'] = TextLookup[font][(u_int8_t)'B'];
 		
 /*
-  128  � ( 199 )  144  � ( 201 )  160  � ( 225 )   
-  129  � ( 252 )  145  � ( 230 )  161  � ( 237 )  
-  130  � ( 233 )  146  � ( 198 )  162  � ( 243 )  
-  131  � ( 226 )  147  � ( 244 )  163  � ( 250 )  
-  132  � ( 228 )  148  � ( 246 )  164  � ( 241 )  
-  133  � ( 224 )  149  � ( 242 )  165  � ( 209 )  
-  134  � ( 229 )  150  � ( 251 )  166  � ( 170 )  
-  135  � ( 231 )  151  � ( 249 )  167  � ( 186 )
-  136  � ( 234 )  152  � ( 255 )  168  � ( 191 )
-  137  � ( 235 )  153  � ( 214 )  169  _ ( 095 )
-  138  � ( 232 )  154  � ( 220 )  170  � ( 172 )  
-  139  � ( 239 )  155  � ( 162 )  171  � ( 189 )  
-  140  � ( 238 )  156  � ( 163 )  172  � ( 188 )  
-  141  � ( 236 )  157  � ( 165 )  173  � ( 161 )  
-  142  � ( 196 )  158  P ( 080 )  174  � ( 171 )  
-  143  � ( 197 )  159  � ( 131 )  175  � ( 187 )  
+  128  Ç ( 199 )  144  É ( 201 )  160  á ( 225 )   
+  129  ü ( 252 )  145  æ ( 230 )  161  í ( 237 )  
+  130  é ( 233 )  146  Æ ( 198 )  162  ó ( 243 )  
+  131  â ( 226 )  147  ô ( 244 )  163  ú ( 250 )  
+  132  ä ( 228 )  148  ö ( 246 )  164  ñ ( 241 )  
+  133  à ( 224 )  149  ò ( 242 )  165  Ñ ( 209 )  
+  134  å ( 229 )  150  û ( 251 )  166  ª ( 170 )  
+  135  ç ( 231 )  151  ù ( 249 )  167  º ( 186 )
+  136  ê ( 234 )  152  ÿ ( 255 )  168  ¿ ( 191 )
+  137  ë ( 235 )  153  Ö ( 214 )  169  _ ( 095 )
+  138  è ( 232 )  154  Ü ( 220 )  170  ¬ ( 172 )  
+  139  ï ( 239 )  155  ¢ ( 162 )  171  ½ ( 189 )  
+  140  î ( 238 )  156  £ ( 163 )  172  ¼ ( 188 )  
+  141  ì ( 236 )  157  ¥ ( 165 )  173  ¡ ( 161 )  
+  142  Ä ( 196 )  158  P ( 080 )  174  « ( 171 )  
+  143  Å ( 197 )  159   ( 131 )  175  » ( 187 )  
 */
 		
 		TextLookup[font][1] = 225;	// glowing effect for bike scan
@@ -11476,60 +11476,60 @@ void InitScreenFonts (void)
 			TextLookup[font][96] = 228; // apostrophe
 			TextLookup[font][','] = 231; // comma
 
-			TextLookup[font][(u_int8_t)'�'] = 234;
-			TextLookup[font][(u_int8_t)'�'] = 237;
-			TextLookup[font][(u_int8_t)'�'] = 240;
-			TextLookup[font][(u_int8_t)'�'] = 240;
+			TextLookup[font][(u_int8_t)'\xa1'] = 234;
+			TextLookup[font][(u_int8_t)'\xbf'] = 237;
+			TextLookup[font][(u_int8_t)'\xc7'] = 240;
+			TextLookup[font][(u_int8_t)'\xe7'] = 240;
 
-			TextLookup[font][(u_int8_t)'�'] = 243;
-			TextLookup[font][(u_int8_t)'�'] = 246;
-			TextLookup[font][(u_int8_t)'�'] = 249;
-			TextLookup[font][(u_int8_t)'�'] = 252;
-			TextLookup[font][(u_int8_t)'�'] = 255;
-			TextLookup[font][(u_int8_t)'�'] = 258;
-			TextLookup[font][(u_int8_t)'�'] = 258;
-			TextLookup[font][(u_int8_t)'�'] = 261;
-			TextLookup[font][(u_int8_t)'�'] = 264;
+			TextLookup[font][(u_int8_t)'\xe2'] = 243;
+			TextLookup[font][(u_int8_t)'\xe5'] = 246;
+			TextLookup[font][(u_int8_t)'\xeb'] = 249;
+			TextLookup[font][(u_int8_t)'\xef'] = 252;
+			TextLookup[font][(u_int8_t)'\xee'] = 255;
+			TextLookup[font][(u_int8_t)'\xed'] = 258;
+			TextLookup[font][(u_int8_t)'\xcd'] = 258;
+			TextLookup[font][(u_int8_t)'\xf4'] = 261;
+			TextLookup[font][(u_int8_t)'\xfb'] = 264;
 			break;
 		case FONT_512X384_Medium:
 			TextLookup[font][39] = 227; // apostrophe
 			TextLookup[font][96] = 227; // apostrophe
 			TextLookup[font][','] = 230; // comma
 
-			TextLookup[font][(u_int8_t)'�'] = 233;
-			TextLookup[font][(u_int8_t)'�'] = 236;
-			TextLookup[font][(u_int8_t)'�'] = 239;
-			TextLookup[font][(u_int8_t)'�'] = 239;
+			TextLookup[font][(u_int8_t)'\xa1'] = 233;
+			TextLookup[font][(u_int8_t)'\xbf'] = 236;
+			TextLookup[font][(u_int8_t)'\xc7'] = 239;
+			TextLookup[font][(u_int8_t)'\xe7'] = 239;
 
-			TextLookup[font][(u_int8_t)'�'] = 242;
-			TextLookup[font][(u_int8_t)'�'] = 245;
-			TextLookup[font][(u_int8_t)'�'] = 248;
-			TextLookup[font][(u_int8_t)'�'] = 251;
-			TextLookup[font][(u_int8_t)'�'] = 254;
-			TextLookup[font][(u_int8_t)'�'] = 257;
-			TextLookup[font][(u_int8_t)'�'] = 257;
-			TextLookup[font][(u_int8_t)'�'] = 260;
-			TextLookup[font][(u_int8_t)'�'] = 263;
+			TextLookup[font][(u_int8_t)'\xe2'] = 242;
+			TextLookup[font][(u_int8_t)'\xe5'] = 245;
+			TextLookup[font][(u_int8_t)'\xeb'] = 248;
+			TextLookup[font][(u_int8_t)'\xef'] = 251;
+			TextLookup[font][(u_int8_t)'\xee'] = 254;
+			TextLookup[font][(u_int8_t)'\xed'] = 257;
+			TextLookup[font][(u_int8_t)'\xcd'] = 257;
+			TextLookup[font][(u_int8_t)'\xf4'] = 260;
+			TextLookup[font][(u_int8_t)'\xfb'] = 263;
 			break;
 		case FONT_512X384_Large:
 			TextLookup[font][39] = 226; // apostrophe
 			TextLookup[font][96] = 226; // apostrophe
 			TextLookup[font][','] = 229; // comma
 
-			TextLookup[font][(u_int8_t)'�'] = 232;
-			TextLookup[font][(u_int8_t)'�'] = 235;
-			TextLookup[font][(u_int8_t)'�'] = 238;
-			TextLookup[font][(u_int8_t)'�'] = 238;
+			TextLookup[font][(u_int8_t)'\xa1'] = 232;
+			TextLookup[font][(u_int8_t)'\xbf'] = 235;
+			TextLookup[font][(u_int8_t)'\xc7'] = 238;
+			TextLookup[font][(u_int8_t)'\xe7'] = 238;
 
-			TextLookup[font][(u_int8_t)'�'] = 241;
-			TextLookup[font][(u_int8_t)'�'] = 244;
-			TextLookup[font][(u_int8_t)'�'] = 247;
-			TextLookup[font][(u_int8_t)'�'] = 250;
-			TextLookup[font][(u_int8_t)'�'] = 253;
-			TextLookup[font][(u_int8_t)'�'] = 256;
-			TextLookup[font][(u_int8_t)'�'] = 256;
-			TextLookup[font][(u_int8_t)'�'] = 259;
-			TextLookup[font][(u_int8_t)'�'] = 262;
+			TextLookup[font][(u_int8_t)'\xe2'] = 241;
+			TextLookup[font][(u_int8_t)'\xe5'] = 244;
+			TextLookup[font][(u_int8_t)'\xeb'] = 247;
+			TextLookup[font][(u_int8_t)'\xef'] = 250;
+			TextLookup[font][(u_int8_t)'\xee'] = 253;
+			TextLookup[font][(u_int8_t)'\xed'] = 256;
+			TextLookup[font][(u_int8_t)'\xcd'] = 256;
+			TextLookup[font][(u_int8_t)'\xf4'] = 259;
+			TextLookup[font][(u_int8_t)'\xfb'] = 262;
 			break;
 		}
 	}
