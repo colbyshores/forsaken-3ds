@@ -18,7 +18,6 @@ constexpr int BACK_LEFT = 2;
 constexpr int BACK_RIGHT = 3;
 constexpr int MAXGUNSPERENEMY = 5;
 
-#define	ENABLEENEMYCOLLISIONS	1
 
 /*===================================================================
 	Structures

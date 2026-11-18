@@ -461,7 +461,6 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 		if( MCloadheaderp == &MCloadheadert0 ) ColRadius = 0.0F;
 		if( MCloadheaderp == &MCloadheader ) ColRadius = ( 300.0F * GLOBAL_SCALE );
 
-#if ENABLEENEMYCOLLISIONS
 		if( CheckEnemyPolyCol( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
 		{
 			collided += ColCollided;
@@ -475,7 +474,6 @@ bool OneGroupPolyCol( MCLOADHEADER * MCloadheaderp ,MLOADHEADER * /*Mloadheader*
 			BSPFace.D = -DotProduct( (VECTOR *) FaceNormal, ImpactPoint );
 			CollFace = &BSPFace;
 		}
-#endif
 
 		if( CheckBGObjectsCol( group, Distance, ImpactPoint, collided, Pos_New, FaceNormal, BGColObject ) )
 		{
@@ -1081,7 +1079,6 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VECTOR * Pos, VECTOR * Dir  ,
 					 VECTOR * ImpactPoint , NORMAL  * FaceNormal , VECTOR * Pos_New, BGOBJECT ** BGObject, float Radius )
 {
-#if ENABLEENEMYCOLLISIONS
 
 	int16_t	ColCount = 0;
 
@@ -1106,17 +1103,6 @@ bool OneGroupBGObjectCol( float Distance, int16_t Collided, u_int16_t Group, VEC
 
 	if( !ColCount ) return( false );
 
-#else
-
-	if( Group == (u_int16_t) -1) return false;
-
-	Origin = *Pos;
-	ODir = *Dir;
-	ColRadius = Radius;
-
-	if( !CheckBGObjectsCol( Group, Distance, ImpactPoint, Collided, Pos_New, FaceNormal, BGObject ) ) return (false);
-
-#endif
 
 	return(true);
 }

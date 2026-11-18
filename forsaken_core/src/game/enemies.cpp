@@ -5776,10 +5776,8 @@ void ProcessEnemies( void )
 	VECTOR			OldPos;
 	bool			OldComponentCollide;
 
-#if ENABLEENEMYCOLLISIONS
 	VECTOR			PushVector;
 	float			Damage;
-#endif
 	Enemy = FirstEnemyUsed;
 
 	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -5942,12 +5940,10 @@ void ProcessEnemies( void )
 					UpdateCompObjChildren( Enemy->Object.Components, 1, &Enemy->Object.FinalMat, &Enemy->Object.Pos, Enemy->Object.Time, Enemy->Object.Group, &Enemy->Object.Pos );
 					UpdateCompObjColours( Enemy->Object.Components, 1, (int)Enemy->Object.Red, (int)Enemy->Object.Green, (int)Enemy->Object.Blue );
 
-#if ENABLEENEMYCOLLISIONS
 					if( CheckCompObjectCollision( &Ships[ WhoIAm ].Object.Pos, Enemy->Object.Components, &PushVector, &Damage, SHIP_RADIUS ) )
 					{
 						ForceExternalOneOff( WhoIAm, &PushVector );
 					}
-#endif
 					if( ( Enemy->Type == ENEMY_Boss_FleshMorph ) || ( Enemy->Type == ENEMY_Boss_BigGeek ) || ( Enemy->Type == ENEMY_Boss_LittleGeek ) || ( Enemy->Type == ENEMY_Boss_Exogenon ) || ( Enemy->Type == ENEMY_Boss_Metatank ) )
 						UpdateCompObjFlags( Enemy->Object.Components, 1, 0 );
 					
