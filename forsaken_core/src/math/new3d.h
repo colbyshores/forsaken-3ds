@@ -158,7 +158,6 @@ static inline float fast_ceilf(float x)
 #define RGBA_GETGREEN(rgb)    (((rgb) >> 8) & 0xff)
 #define RGBA_GETBLUE(rgb)    ((rgb) & 0xff)
 
-#define RENDERVAL(val)    ((float)val)
 
 /*
 	Pre-DX8 vertex formats

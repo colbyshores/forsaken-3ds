@@ -307,16 +307,16 @@ constexpr auto Far = ( 49152.0F * GLOBAL_SCALE );
 constexpr auto MinNear = ( 50.0F * GLOBAL_SCALE );
 
 RENDERMATRIX proj = {
-    RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(Far/(Far-Near)), RENDERVAL(1.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(-Far*Near/(Far-Near)), RENDERVAL(0.0) };
+    2.0F, 0.0F, 0.0F, 0.0F,
+    0.0F, 2.0F, 0.0F, 0.0F,
+    0.0F, 0.0F, Far/(Far-Near), 1.0F,
+    0.0F, 0.0F, -Far*Near/(Far-Near), 0.0F };
 
 MATRIX  ProjMatrix = {
-    RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(2.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(Far/(Far-Near)), RENDERVAL(1.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(-Far*Near/(Far-Near)), RENDERVAL(0.0) };
+    2.0F, 0.0F, 0.0F, 0.0F,
+    0.0F, 2.0F, 0.0F, 0.0F,
+    0.0F, 0.0F, Far/(Far-Near), 1.0F,
+    0.0F, 0.0F, -Far*Near/(Far-Near), 0.0F };
 
 
   VECTOR  SlideLeft = { -1.0F, 0.0F, 0.0F };
@@ -336,17 +336,17 @@ MATRIX  ProjMatrix = {
 
 RENDERMATRIX view;
 RENDERMATRIX identity = {
-    RENDERVAL(1.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(1.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(1.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(1.0)
+    1.0F, 0.0F, 0.0F, 0.0F,
+    0.0F, 1.0F, 0.0F, 0.0F,
+    0.0F, 0.0F, 1.0F, 0.0F,
+    0.0F, 0.0F, 0.0F, 1.0F
 };
 
 RENDERMATRIX world = {
-    RENDERVAL(1.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(1.0), RENDERVAL(0.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(1.0), RENDERVAL(0.0),
-    RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(0.0), RENDERVAL(1.0)
+    1.0F, 0.0F, 0.0F, 0.0F,
+    0.0F, 1.0F, 0.0F, 0.0F,
+    0.0F, 0.0F, 1.0F, 0.0F,
+    0.0F, 0.0F, 0.0F, 1.0F
 };
 
 void stereo_adjust( RENDERMATRIX *m )
@@ -414,17 +414,17 @@ bool SetFOV( float fov )
 	{
 		Scale = ( ( MAX_FOV - fov ) / ( MAX_FOV - START_FOV ) );
 		NewNear = ( MinNear + ( ( Near - MinNear ) * Scale ) );
-		proj._33 = RENDERVAL(Far/(Far-NewNear));
-		proj._34 = RENDERVAL( 1.0 );
-		proj._43 = RENDERVAL(-Far*NewNear/(Far-NewNear));
-		proj._44 = RENDERVAL( 0.0 );
+		proj._33 = Far/(Far-NewNear);
+		proj._34 = 1.0F;
+		proj._43 = -Far*NewNear/(Far-NewNear);
+		proj._44 = 0.0F;
 	}
 	else
 	{
-		proj._33 = RENDERVAL(Far/(Far-Near));
-		proj._34 = RENDERVAL( 1.0 );
-		proj._43 = RENDERVAL(-Far*Near/(Far-Near));
-		proj._44 = RENDERVAL( 0.0 );
+		proj._33 = Far/(Far-Near);
+		proj._34 = 1.0F;
+		proj._43 = -Far*Near/(Far-Near);
+		proj._44 = 0.0F;
 	}
 
 	stereo_adjust(&proj);
@@ -462,7 +462,6 @@ void SetViewportError( char *where, render_viewport_t *vp )
     (unsigned long) vp->X, (unsigned long) vp->Y,
     (unsigned long) vp->Width, (unsigned long) vp->Height,
     vp->ScaleX, vp->ScaleY,
-    //vp->dvMaxX, vp->dvMaxY,
     vp->MinZ, vp->MaxZ );
   Msg( msg );
 }
