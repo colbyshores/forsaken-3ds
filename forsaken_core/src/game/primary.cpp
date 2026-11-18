@@ -57,9 +57,6 @@ constexpr float MAX_TROJAX_POWER_LEVEL = (100.0F);
 
 													// this tells the drones what status the host thinks hes in..
 
-#ifdef SINT_PEACEFROG_CHEAT
-extern	int16_t	TargetingWeaponCheat;
-#endif
 														
 /*===================================================================
 	Globals

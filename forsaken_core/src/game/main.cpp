@@ -124,8 +124,6 @@ static bool missing_folders( void )
 // Parse the Command Line
 //
 
-extern int cliSleep;
-
 static bool ParseCommandLine(char* lpCmdLine)
 {
 	
