@@ -1,6 +1,4 @@
-/*===================================================================
-		Include File...	
-===================================================================*/
+/* ships.cpp -- player ship movement, modes, collision and damage; see ships.h. */
 #include <stdio.h>
 #include "game/main.h"
 
@@ -70,8 +68,6 @@ u_int32_t TeamFlagMask[ MAX_TEAMS ] = {
 	SHIP_CarryingFlag4,
 };
 
-
-											// this tells the drones what status the host thinks hes in..
 
 /*===================================================================
 		Bike Modifiers.....
@@ -1509,7 +1505,7 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 }
 
 /*===================================================================
-		True EnviroMent Mapping for an Mloadheader...
+		True EnviroMent Mapping for an Mxloadheader...
 ===================================================================*/
 bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 {
@@ -1659,7 +1655,7 @@ int16_t DoDamage( bool OverrideInvul )
 }
 
 /*===================================================================
-	Procedure	:	InitShipRandomStartPos
+	Procedure	:	InitShipRandomPos
 	Input		:	int16_t which Ship
 	Output		:	Nothing
 ===================================================================*/

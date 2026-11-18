@@ -1,15 +1,27 @@
-
-
-/*==========================================================================
- *
- *
- *  File:       ships.h
- *  Content:    shipstuff include file
- *
- *
- ***************************************************************************/
-
 #pragma once
+
+/* ships.h -- player ships: per-frame movement, modes, collision and damage
+ *
+ * The ships themselves live in Ships[MAX_PLAYERS + 1] (GLOBALSHIP, defined in
+ * networking.cpp); slot MAX_PLAYERS is the remote / demo-playback camera.
+ * InitShipsChangeLevel resets every slot at level load, enables only the
+ * local ship (WhoIAm), places each ship at a start position and restores the
+ * local player's weapons and ammo.
+ *
+ * ProcessShips runs once per frame. For the local ship it calls the mode
+ * handler ModeControl[Object.Mode] (normal, death, limbo, demo, game over,
+ * watch), then applies movement and external forces and collides with the
+ * level, enemies and other ships, handles water entry, and collects pickups
+ * (CheckPickup). Between network updates other players' ships are
+ * dead-reckoned from their last received velocity and turn rate, which decay
+ * once PacketDelay runs out. DoDamage applies Ships[WhoIAm].Damage to the
+ * local ship only and reports whether that hit killed it.
+ *
+ * The movement tunables (MaxMoveSpeed, TurnAccell, ...) are globals loaded by
+ * SetBikeMods from BikeMods[]: index 0 is the multiplayer default, 1 the
+ * in-water set, and 2 + SelectedBike the single-player bike. ProcessShips
+ * switches between them as the local ship enters and leaves water.
+ */
 
 #include "game/main.h"
 #include <math.h>
