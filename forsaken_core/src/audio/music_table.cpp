@@ -1,31 +1,66 @@
+#include <string.h>
+
 #include "audio/music_table.h"
 #include "audio/music.h"
+#include "game/oct2.h"
 
-/* Level->track mapping. Track values are CD-style track numbers
- * naming romfs/music/trackNN.dsp files.
+/* Level->track mapping, keyed by level name. Track values are CD-style
+ * track numbers naming romfs/music/trackNN.dsp files.
  *
- * Remaster: indices line up with Data/Levels/mission_remaster.dat
- * (the authoritative 24-entry SP order + 8 N64 secret levels); track
- * values come from the Remaster KPF's musictrack assignments.
- * Original: indices line up with Data/Levels/mission.dat (1998 SP
- * campaign); values extracted from ForsakenHW.exe's embedded
- * "<levelname> <trackN>" array - the authoritative 1998 mapping. */
+ * Keyed by name, not by position in the level list: the list is data
+ * (assets/level_orderings/, and InitLevels skips levels whose .mxv is
+ * missing), so a positional table silently shifts every later level's
+ * music whenever a level is added, dropped or absent.
+ *
+ * Remaster: the Remaster KPF's musictrack assignments for its SP
+ * campaign and the N64 secret levels (biolab and tuben64 are out of
+ * the rotation but keep their tracks).
+ * Original: ForsakenHW.exe's embedded "<levelname> <trackN>" array,
+ * the authoritative 1998 mapping. */
+namespace {
+
+struct LevelTrack
+{
+	const char *name;
+	int track;
+};
+
 #ifdef EDITION_REMASTER
-static const int s_level_track[] = {
-     5, 9, 6, 3, 2, 13, 8, 10, 7, 4, 12, 9, 3, 15, 7, 8,
-     10, 5, 14, 4, 11, 2, 3, 6, 16, 12, 13, 11, 18, 15, 7, 8
+constexpr LevelTrack kLevelTracks[] = {
+	{ "vol2",         5 }, { "asubchb",      9 }, { "nps-sp01",     6 },
+	{ "thermal",      3 }, { "fedbankv",     2 }, { "defend2",     13 },
+	{ "pship",        8 }, { "stableizers", 10 }, { "powerdown",    7 },
+	{ "spc-sp01",     4 }, { "starship",    12 }, { "bio-sphere",   9 },
+	{ "nukerf",       3 }, { "battlebase",  15 }, { "capship",      7 },
+	{ "space",        8 }, { "high",        10 }, { "military",     5 },
+	{ "munitions",   14 }, { "biolab",       4 }, { "ramqan",      11 },
+	{ "temple",       2 }, { "azt-sp01",     3 }, { "azchb",        6 },
+	{ "nuken64",     16 }, { "shipn64",     12 }, { "aztec64",     13 },
+	{ "blackhole",   11 }, { "genstation",  18 }, { "tuben64",     15 },
+	{ "fishy",        7 }, { "final",        8 },
 };
 #else
-static const int s_level_track[] = {
-    5, 9, 6, 3, 2, 8, 4, 9, 3, 7, 8, 10, 5, 3, 6
+constexpr LevelTrack kLevelTracks[] = {
+	{ "vol2",         5 }, { "asubchb",      9 }, { "nps-sp01",     6 },
+	{ "thermal",      3 }, { "fedbankv",     2 }, { "pship",        8 },
+	{ "spc-sp01",     4 }, { "bio-sphere",   9 }, { "nukerf",       3 },
+	{ "capship",      7 }, { "space",        8 }, { "high",        10 },
+	{ "military",     5 }, { "azt-sp01",     3 }, { "azchb",        6 },
 };
 #endif
-#define NUM_LEVEL_TRACKS (int)(sizeof(s_level_track) / sizeof(s_level_track[0]))
+
+} // namespace
 
 int music_track_for_level(int level_num)
 {
-    if (level_num < 0) level_num = 0;
-    if (level_num < NUM_LEVEL_TRACKS)
-        return s_level_track[level_num];
-    return MUSIC_FIRST_TRACK + (level_num % MUSIC_NUM_TRACKS);
+	if (level_num < 0) level_num = 0;
+	if (level_num < MAXLEVELS)
+	{
+		const char *name = ShortLevelNames[level_num];
+		for (const LevelTrack &lt : kLevelTracks)
+			if (strcmp(lt.name, name) == 0)
+				return lt.track;
+	}
+	/* Levels with no assignment (multiplayer arenas) cycle the tracks. */
+	return MUSIC_FIRST_TRACK + (level_num % MUSIC_NUM_TRACKS);
 }

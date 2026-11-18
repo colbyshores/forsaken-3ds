@@ -304,11 +304,9 @@ $(ROMFS_STAMP): $(ROMFS_STAGING)/.edition | romfs-freshness-check
 ifeq ($(EDITION),remaster)
 	@# EDITION=remaster: substitute Remaster's authoritative SP / MP
 	@# orderings (from assets/level_orderings/) over the 1998 originals
-	@# that came in via extract_assets.py. music_3ds.c's s_level_track[]
-	@# is keyed on this 32-entry SP ordering when -DEDITION_REMASTER is
-	@# set, so the substitution is mandatory — fail the build if either
-	@# source file is missing rather than silently producing a CIA whose
-	@# level menu and music table disagree.
+	@# that came in via extract_assets.py. assets/level_orderings/ is the
+	@# source of truth for both builds (the PC Makefile installs the same
+	@# files into Data/levels/); fail the build if either is missing.
 	@echo "Applying EDITION=remaster level orderings..."
 	@LDIR=$(ROMFS_STAGING)/data/levels; SDIR=$(SRCDIR)/assets/level_orderings; \
 	if [ ! -f $$SDIR/mission.dat ] || [ ! -f $$SDIR/battle.dat ]; then \
@@ -316,6 +314,10 @@ ifeq ($(EDITION),remaster)
 	fi; \
 	cp -f $$SDIR/mission.dat $$LDIR/mission.dat; \
 	cp -f $$SDIR/battle.dat  $$LDIR/battle.dat
+else
+	@# EDITION=original: the authoritative 1998 SP order (from Forsaken.exe)
+	@# over whatever extract_assets.py produced.
+	@cp -f $(SRCDIR)/assets/level_orderings/original/mission.dat $(ROMFS_STAGING)/data/levels/mission.dat
 endif
 	@echo "Placing .keep files so makerom doesn't strip empty critical dirs..."
 	@# missing_folders() in main.c requires all four to exist. The .3dsx

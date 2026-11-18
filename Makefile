@@ -114,6 +114,18 @@ ifeq ($(EDITION),remaster)
   CFLAGS+= -DEDITION_REMASTER
 endif
 
+# Level lists: assets/level_orderings/ is the single source of truth for
+# both builds (Makefile.3ds stages the same files into the romfs).
+# Installed into Data/levels/ for the edition being built; copied on
+# every build so an edition switch always takes effect.
+ifeq ($(EDITION),remaster)
+LEVEL_LISTS_SRC := assets/level_orderings
+LEVEL_LISTS := mission.dat battle.dat
+else
+LEVEL_LISTS_SRC := assets/level_orderings/original
+LEVEL_LISTS := mission.dat
+endif
+
 BIN=projectx
 CXX?=g++
 .DEFAULT_GOAL := all
@@ -153,7 +165,13 @@ $(ETC2ENC): tools/texture/etc2enc.c
 
 textures-etc2: $(KTX2_TEXTURES)
 
-all: textures-etc2 $(BIN)
+all: textures-etc2 level-lists $(BIN)
+
+level-lists:
+	@mkdir -p Data/levels
+	@for f in $(LEVEL_LISTS); do \
+		cmp -s $(LEVEL_LISTS_SRC)/$$f Data/levels/$$f || cp -f $(LEVEL_LISTS_SRC)/$$f Data/levels/$$f; \
+	done
 
 $(BIN): $(OBJ)
 	$(if $(CXXOBJ),$(CXX),$(CC)) -o $(BIN) $(OBJ) $(LDFLAGS) $(LIB) $(if $(CXXOBJ),-lstdc++)
@@ -194,4 +212,4 @@ check:
 	@echo "LIB = $(LIB)"
 	@echo
 
-.PHONY: all clean
+.PHONY: all clean level-lists
