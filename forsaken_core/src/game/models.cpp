@@ -57,12 +57,10 @@ int16_t	NextNewModel = -1;
 bool	ShowBoundingBoxes = false;
 
 
-/* Pointer to a TAG_LEVEL hunk allocation, sized at level load to
- * the active model count (see PreInitModel). Was a static
- * MXLOADHEADER[MAXMODELHEADERS] BSS array; moved to the hunk to
- * give back ~6 MB of always-locked BSS budget on small/medium
- * levels. ModelHeaders[i] indexing works identically with either
- * declaration. */
+/* calloc'd by PreInitModel, sized to cover the highest populated
+ * ModelNames[] slot, and freed by the next PreInitModel (so the array
+ * outlives ReleaseView: level teardown still reads it). It replaced a
+ * MAXMODELHEADERS-sized static array to give back ~6 MB of BSS. */
 MXLOADHEADER *ModelHeaders = NULL;
 
 #define	RETAIN_POLYS		true
@@ -1341,7 +1339,7 @@ bool ReleaseTitleModels( )
 {
 	int i;
 
-	/* ModelHeaders / MxaModelHeaders are TAG_LEVEL hunk allocations.
+	/* ModelHeaders / MxaModelHeaders are allocated by PreInitModel.
 	 * If neither has been allocated yet (e.g. ReleaseView fires before
 	 * the first PreInitModel on the boot path), there's nothing to
 	 * release — bail out cleanly. */

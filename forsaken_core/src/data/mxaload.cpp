@@ -72,8 +72,7 @@
 /*===================================================================
 		Globals...	
 ===================================================================*/
-/* Pointer to a TAG_LEVEL hunk allocation. See ModelHeaders comment
- * in models.cpp — same migration, same rationale. */
+/* Allocated with ModelHeaders by PreInitModel; see models.cpp. */
 MXALOADHEADER *MxaModelHeaders = NULL;
 
 /*===================================================================
@@ -552,7 +551,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 /*===================================================================
 	Procedure	:		Execute all group buffers for a Mxaloadheader
 	Input		;		MXALOADHEADER *
-	Output		:		FLASE/true
+	Output		:		FALSE/true
 ===================================================================*/
 
 bool ExecuteMxaloadHeader( MXALOADHEADER * Mxaloadheader, u_int16_t in_group  )
@@ -762,7 +761,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 	Procedure	:		Interp between frames for MXA Anim...
 	Input		:		MXALOADHEADER * Mxaloadheader 
 				:		int FrameFrom, int FrameTo , float Interp
-	Output		:		FLASE/true
+	Output		:		FALSE/true
 ===================================================================*/
 bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp )
 {

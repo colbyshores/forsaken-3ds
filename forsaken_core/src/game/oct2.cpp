@@ -1459,7 +1459,7 @@ InitScene(void)
 
 /*===================================================================
   Procedure :   Init the view...This might be title or score or main game....
-  Output    :   bool true/FLASE
+  Output    :   bool true/FALSE
 ===================================================================*/
 
 bool InitView( void )

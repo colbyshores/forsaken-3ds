@@ -654,7 +654,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	Procedure	:		Execute all group buffers for a Mxloadheader
 	Input		;		MXLOADHEADER *
 				:		u_int16_t		Models[] Index
-	Output		:		FLASE/true
+	Output		:		FALSE/true
 ===================================================================*/
 
 bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
@@ -1022,7 +1022,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 	Procedure	:		Execute all group buffers for a Mxloadheader
 	Input		;		MXLOADHEADER *
 				:		u_int16_t		Models[] Index
-	Output		:		FLASE/true
+	Output		:		FALSE/true
 ===================================================================*/
 bool ReallyExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t /*Model*/ )
 {
@@ -1110,7 +1110,7 @@ void ModelTextureAnimation( MXLOADHEADER * Mxloadheader  )
 /*===================================================================
 	Procedure	:		Restore the coolours for a Mxloadheader..
 	Input		;		MXLOADHEADER *
-	Output		:		FLASE/true
+	Output		:		FALSE/true
 ===================================================================*/
 
 bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )

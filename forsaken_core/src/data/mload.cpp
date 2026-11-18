@@ -962,7 +962,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 /*===================================================================
 	Procedure	:		Execute all group buffers for a Mloadheader
 	Input		;		MLOADHEADER *
-	Output		:		FLASE/true
+	Output		:		FALSE/true
 ===================================================================*/
 
 bool ExecuteMloadHeader( MLOADHEADER * Mloadheader  )
@@ -980,7 +980,7 @@ bool ExecuteMloadHeader( MLOADHEADER * Mloadheader  )
 /*===================================================================
 	Procedure	:		Execute one group for an Mloadheader
 	Input		;		MLOADHEADER *
-	Output		:		FLASE/true
+	Output		:		FALSE/true
 ===================================================================*/
 
 bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  )
