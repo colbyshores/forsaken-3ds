@@ -122,11 +122,9 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int32_t			Colour;
 	int				colourkey = 0;
 
-#if	MX_VERSION_NUMBER == 2
 	int16_t			c;
 	int8_t		*	Int8Pnt;
 	int8_t			SFXFilename[ 128 ];
-#endif
 
 	int numTriangles = 0;
 	int triangleCount = 0;
@@ -685,7 +683,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				Uint32Pnt = (u_int32_t *) Int16Pnt;
 				Colour = *Uint32Pnt++;
 
-#if	MX_VERSION_NUMBER == 2
 
 				Int8Pnt = (int8_t *) Uint32Pnt;
 
@@ -718,9 +715,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				memcpy(&SpotFXPtr->SoundFXVolume, FloatPnt++, 4);
 				memcpy(&SpotFXPtr->SoundFXSpeed, FloatPnt++, 4);
 				Uint16Pnt = (u_int16_t *) FloatPnt;
-#else
-				Uint16Pnt = (u_int16_t *) Uint32Pnt;
-#endif
 				SpotFXPtr->Red = (u_int8_t) ( ( Colour >> 16 ) & 255 );
 				SpotFXPtr->Green = (u_int8_t) ( ( Colour >> 8 ) & 255 );
 				SpotFXPtr->Blue = (u_int8_t) ( Colour & 255 );
