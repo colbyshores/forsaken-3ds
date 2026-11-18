@@ -1,4 +1,8 @@
-
+/* texture_png.cpp -- libpng decoder behind load_image / destroy_image; see texture.h.
+ *
+ * Accepts 8-bit RGB or RGBA PNGs only (grey, palette and 16-bit images
+ * return -1). RGB images get an opaque alpha channel added and colorkey set.
+ */
 #include "game/main.h"
 #include <stdio.h>
 #include <string.h>
@@ -137,8 +141,7 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
   /* setup a pointer array.  Each one points at the begening of a row. */
   row_pointers = (png_bytep *)malloc (sizeof (png_bytep) * image->h);
 
-  // TODO - need to detect *row-order*
-  // in case y axis is stored up side down
+  /* PNG rows are stored top to bottom. */
   for (i = 0; i < image->h; ++i)
       row_pointers[i] = (png_bytep)(image->data +
 	  (i * image->w * 4));
