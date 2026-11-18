@@ -303,9 +303,9 @@ void UpdateKillCount(int Killer)
 	switch(KillCounter[Killer])
 	{
 #define MILESTONE_CASE( count, sound, msg ) \
-		case count: \	
+		case count: \
 			if(PlaySound) PlaySfx( sound, 1.0F ); \
-   			AddColourMessageToQue( MilestoneMessagesColour, "%s %s (%d KILLS)", prefix, msg, count ); \
+			AddColourMessageToQue( MilestoneMessagesColour, "%s %s (%d KILLS)", prefix, msg, count ); \
 			break;
 	
 		MILESTONE_CASE(  3,  SFX_KILLINGSPREE, "ON A KILLING SPREE" )
