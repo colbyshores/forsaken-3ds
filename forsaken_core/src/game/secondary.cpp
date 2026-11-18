@@ -35,6 +35,9 @@
 
 
 constexpr auto MISSILE_SPEED = ( MAXMOVESPEED * 1.6F ); // Ship Speed * 1.6
+/* Missiles and mines leave the ship this far out along their launch or drop
+   direction. */
+constexpr float SEC_LAUNCH_OFFSET = ( 75.0F * GLOBAL_SCALE );
 
 
 #include "ui/localtitle.h"
@@ -927,9 +930,9 @@ static int16_t	OnceOnlyFlag = 0;
 							}
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
@@ -955,9 +958,9 @@ static int16_t	OnceOnlyFlag = 0;
 							}
 	
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
@@ -973,9 +976,9 @@ static int16_t	OnceOnlyFlag = 0;
 							NormaliseVector( &DropVector );
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
@@ -990,9 +993,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
@@ -1007,9 +1010,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
@@ -1024,9 +1027,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
@@ -1041,9 +1044,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 			
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
@@ -1062,9 +1065,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = -1.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
@@ -1079,9 +1082,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = -1.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
@@ -1096,9 +1099,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = -1.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
@@ -1113,9 +1116,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = -1.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
@@ -1130,9 +1133,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
@@ -1146,9 +1149,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
@@ -1162,9 +1165,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
@@ -1178,9 +1181,9 @@ static int16_t	OnceOnlyFlag = 0;
 							DropVector.z = 0.0F;
 		
 							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-							Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-							Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+							Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+							Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+							Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 							InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 											Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 											&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
@@ -4915,9 +4918,9 @@ void DropMine( void )
 			DropVector.z = -1.0F;
 		
 			ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 							Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 							&Pos, &Dir, &UpVector, &DropVector, (BYTE) Mine, true );
@@ -4932,9 +4935,9 @@ void DropMine( void )
 			DropVector.z = -1.0F;
 		
 			ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 							Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 							&Pos, &Dir, &UpVector, &DropVector, (BYTE) Mine, true );
@@ -4949,9 +4952,9 @@ void DropMine( void )
 			DropVector.z = -1.0F;
 		
 			ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 							Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 							&Pos, &Dir, &UpVector, &DropVector, (BYTE) Mine, true );
@@ -4966,9 +4969,9 @@ void DropMine( void )
 			DropVector.z = -1.0F;
 		
 			ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
 							Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
 							&Pos, &Dir, &UpVector, &DropVector, (BYTE) Mine, true );
@@ -6252,9 +6255,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			}
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6280,9 +6283,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 		 	}
 	
 		 	ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6298,9 +6301,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			NormaliseVector( &DropVector );
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6315,9 +6318,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6332,9 +6335,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 							&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 							&DropVector, Ships[ Ship ].Secondary, false );
@@ -6349,9 +6352,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 			
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6366,9 +6369,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6383,9 +6386,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6400,9 +6403,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6416,9 +6419,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );
@@ -6432,9 +6435,9 @@ void FireSecondaryWeapons( u_int8_t Ship )
 			DropVector.z = 0.0F;
 		
 			ApplyMatrix( &Ships[Ship].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-			Pos.x = ( DropVector.x * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.y = ( DropVector.y * ( 75.0F * GLOBAL_SCALE ) );
-			Pos.z = ( DropVector.z * ( 75.0F * GLOBAL_SCALE ) );
+			Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+			Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+			Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
 			i = InitOneSecBull( OWNER_SHIP, Ship, ID, Ships[ Ship ].Object.Group,
 								&Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 								&DropVector, Ships[ Ship ].Secondary, false );

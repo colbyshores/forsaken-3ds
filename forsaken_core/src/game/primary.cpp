@@ -49,6 +49,11 @@
 	Globals
 ===================================================================*/
 
+/* Where a ship's guns sit: this far to either side of its centre and this
+   far below it. */
+constexpr float GUN_SIDE_OFFSET = ( 100.0F * GLOBAL_SCALE );
+constexpr float GUN_DOWN_OFFSET = ( 75.0F * GLOBAL_SCALE );
+
 constexpr int SUPERNASHRAM_RED = 96;
 constexpr int SUPERNASHRAM_GREEN = 96;
 constexpr int SUPERNASHRAM_BLUE = 255;
@@ -1044,9 +1049,9 @@ static int16_t	OnceOnlyFlag = 0;
 
 					if( Toggle )
 					{
-						Pos.x = ( LeftVector.x * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-						Pos.y = ( LeftVector.y * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-						Pos.z = ( LeftVector.z * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+						Pos.x = ( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
+						Pos.y = ( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
+						Pos.z = ( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
 						InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PULSAR,
 										Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 										0, PowerLevel, false );
@@ -1054,9 +1059,9 @@ static int16_t	OnceOnlyFlag = 0;
 					}
 					if( !Toggle )
 					{
-						Pos.x = -( LeftVector.x * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-						Pos.y = -( LeftVector.y * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-						Pos.z = -( LeftVector.z * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+						Pos.x = -( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
+						Pos.y = -( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
+						Pos.z = -( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
 						InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PULSAR,
 										Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 										0, PowerLevel, false );
@@ -1095,9 +1100,9 @@ static int16_t	OnceOnlyFlag = 0;
 
 									if( ( Toggle ) || ( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
 									{
-										Pos.x = ( LeftVector.x * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-										Pos.y = ( LeftVector.y * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-										Pos.z = ( LeftVector.z * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+										Pos.x = ( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
+										Pos.y = ( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
+										Pos.z = ( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
 										InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 														Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 														Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1108,9 +1113,9 @@ static int16_t	OnceOnlyFlag = 0;
 
 									if( ( !Toggle ) || ( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
 									{
-										Pos.x = -( LeftVector.x * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-										Pos.y = -( LeftVector.y * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-										Pos.z = -( LeftVector.z * ( 100.0F * GLOBAL_SCALE ) ) + ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+										Pos.x = -( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
+										Pos.y = -( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
+										Pos.z = -( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
 										InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 														Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 														Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1150,9 +1155,9 @@ static int16_t	OnceOnlyFlag = 0;
 											ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
 							   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 						
-											Pos.x = ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-											Pos.y = ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-											Pos.z = ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+											Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+											Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+											Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 											InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 															Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 															Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1215,9 +1220,9 @@ static int16_t	OnceOnlyFlag = 0;
 									Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
 									Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
 
-									Pos.x = ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-									Pos.y = ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-									Pos.z = ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+									Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+									Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+									Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1238,9 +1243,9 @@ static int16_t	OnceOnlyFlag = 0;
 
 								for( Count = 0; Count < 4; Count++ )
 								{
-									Pos.x = ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-									Pos.y = ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-									Pos.z = ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+									Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+									Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+									Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 
 									if( SussGunAmmo )
 									{
@@ -1261,16 +1266,16 @@ static int16_t	OnceOnlyFlag = 0;
 									Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
 									Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
 
-									Pos.x = ( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-									Pos.y = (    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-									Pos.z = (    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+									Pos.x = -GUN_SIDE_OFFSET;
+									Pos.y = -GUN_DOWN_OFFSET;
+									Pos.z = 0.0F;
 									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary, 
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
 
-									Pos.x = -( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-									Pos.y = -(    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-									Pos.z = -(    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+									Pos.x = GUN_SIDE_OFFSET;
+									Pos.y = -GUN_DOWN_OFFSET;
+									Pos.z = 0.0F;
 									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary, 
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1290,9 +1295,9 @@ static int16_t	OnceOnlyFlag = 0;
 									Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
 									Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
 
-									Pos.x = ( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-									Pos.y = (    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-									Pos.z = (    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+									Pos.x = -GUN_SIDE_OFFSET;
+									Pos.y = -GUN_DOWN_OFFSET;
+									Pos.z = 0.0F;
 									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
 									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1300,9 +1305,9 @@ static int16_t	OnceOnlyFlag = 0;
 								}
 								if( GeneralAmmo && !LaserOverheated )
 								{
-									Pos.x = -( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-									Pos.y = -(    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-									Pos.z = -(    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+									Pos.x = GUN_SIDE_OFFSET;
+									Pos.y = -GUN_DOWN_OFFSET;
+									Pos.z = 0.0F;
 									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
 									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1320,9 +1325,9 @@ static int16_t	OnceOnlyFlag = 0;
 									Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
 									Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
 
-									Pos.x = (   0.0F * GLOBAL_SCALE );
-									Pos.y = ( -75.0F * GLOBAL_SCALE );
-									Pos.z = (   0.0F * GLOBAL_SCALE );
+									Pos.x = 0.0F;
+									Pos.y = -GUN_DOWN_OFFSET;
+									Pos.z = 0.0F;
 									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
 													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -1367,9 +1372,9 @@ static int16_t	OnceOnlyFlag = 0;
 										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
 						   				ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 					
-										Pos.x = ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-										Pos.y = ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-										Pos.z = ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+										Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+										Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+										Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 										InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
 														Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
 														Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
@@ -6742,9 +6747,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 
 				if( ( Toggle ) || ( Ships[ Ship ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
 				{
-					Pos.x = ( LeftVector.x * ( 100.0F * GLOBAL_SCALE ) )+(DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-					Pos.y = ( LeftVector.y * ( 100.0F * GLOBAL_SCALE ) )+(DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-					Pos.z = ( LeftVector.z * ( 100.0F * GLOBAL_SCALE ) )+(DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+					Pos.x = ( LeftVector.x * GUN_SIDE_OFFSET )+( DownVector.x * GUN_DOWN_OFFSET );
+					Pos.y = ( LeftVector.y * GUN_SIDE_OFFSET )+( DownVector.y * GUN_DOWN_OFFSET );
+					Pos.z = ( LeftVector.z * GUN_SIDE_OFFSET )+( DownVector.z * GUN_DOWN_OFFSET );
 					i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 										Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 										Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6758,9 +6763,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 
 				if( ( !Toggle ) || ( Ships[ Ship ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
 				{
-					Pos.x = -(LeftVector.x * ( 100.0F * GLOBAL_SCALE ) )+(DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-					Pos.y = -(LeftVector.y * ( 100.0F * GLOBAL_SCALE ) )+(DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-					Pos.z = -(LeftVector.z * ( 100.0F * GLOBAL_SCALE ) )+(DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+					Pos.x = -( LeftVector.x * GUN_SIDE_OFFSET )+( DownVector.x * GUN_DOWN_OFFSET );
+					Pos.y = -( LeftVector.y * GUN_SIDE_OFFSET )+( DownVector.y * GUN_DOWN_OFFSET );
+					Pos.z = -( LeftVector.z * GUN_SIDE_OFFSET )+( DownVector.z * GUN_DOWN_OFFSET );
 					i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 1 ), Weapon,
 										Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 										Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6781,9 +6786,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					StopSfx( TrojaxOwnersID[ Ship ] ); 
 				}
 	
-				Pos.x = ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-				Pos.y = ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-				Pos.z = ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+				Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+				Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+				Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6838,9 +6843,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				break;
 		
 			case TRANSPULSE_CANNON:
-				Pos.x = ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-				Pos.y = ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-				Pos.z = ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+				Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+				Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+				Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6851,9 +6856,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				break;
 		
 			case SUSS_GUN:
-				Pos.x = ( DownVector.x * ( 75.0F * GLOBAL_SCALE ) );
-				Pos.y = ( DownVector.y * ( 75.0F * GLOBAL_SCALE ) );
-				Pos.z = ( DownVector.z * ( 75.0F * GLOBAL_SCALE ) );
+				Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+				Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+				Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
 
 				for( Count = 0; Count < 4; Count++ )
 				{
@@ -6868,9 +6873,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				break;
 		
 			case LASER:
-				Pos.x = ( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-				Pos.y = (    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-				Pos.z = (    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+				Pos.x = -GUN_SIDE_OFFSET;
+				Pos.y = -GUN_DOWN_OFFSET;
+				Pos.z = 0.0F;
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6879,9 +6884,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
 	
-				Pos.x = -( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-				Pos.y = -(    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-				Pos.z = -(    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+				Pos.x = GUN_SIDE_OFFSET;
+				Pos.y = -GUN_DOWN_OFFSET;
+				Pos.z = 0.0F;
 				i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 1 ), Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6892,9 +6897,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				break;
 
 			case NME_LIGHTNING:
-				Pos.x = ( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-				Pos.y = (    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-				Pos.z = (    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+				Pos.x = -GUN_SIDE_OFFSET;
+				Pos.y = -GUN_DOWN_OFFSET;
+				Pos.z = 0.0F;
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6903,9 +6908,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 					PrimBulls[i].FramelagAddition = FrmLagAdd;
 				}
 	
-				Pos.x = -( -100.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
-				Pos.y = -(    0.0F * GLOBAL_SCALE ) + ( -75.0F * GLOBAL_SCALE );
-				Pos.z = -(    0.0F * GLOBAL_SCALE ) + (   0.0F * GLOBAL_SCALE );
+				Pos.x = GUN_SIDE_OFFSET;
+				Pos.y = -GUN_DOWN_OFFSET;
+				Pos.z = 0.0F;
 				i = InitOnePrimBull( OWNER_SHIP, Ship, (u_int16_t) ( ID + 1 ), Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
@@ -6916,9 +6921,9 @@ void FirePrimaryWeapons( u_int8_t Ship )
 				break;
 
 			case NME_POWERLASER:
-				Pos.x = (   0.0F * GLOBAL_SCALE );
-				Pos.y = ( -75.0F * GLOBAL_SCALE );
-				Pos.z = (   0.0F * GLOBAL_SCALE );
+				Pos.x = 0.0F;
+				Pos.y = -GUN_DOWN_OFFSET;
+				Pos.z = 0.0F;
 				i = InitOnePrimBull( OWNER_SHIP, Ship, ID, Weapon,
 									Ships[ Ship ].Object.Group, &Ships[ Ship ].Object.Pos, &Pos, &Dir, &UpVector,
 									Ships[ Ship ].Object.PowerLevel, PowerLevel, false );
