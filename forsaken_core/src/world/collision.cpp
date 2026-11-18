@@ -32,17 +32,13 @@
 #include "ui/title.h"
 #include "world/visi.h"
 
-constexpr int MC_VERSION_NUMBER = 1;
 
-constexpr int BSP_ENABLE = 1;
 #undef BSP2
 
 constexpr int MAX_FEELER_RAYS = (9);
 constexpr int MAX_QFEELER_RAYS = (5);
 
-#define BACKGROUND_PORTAL_TOLERANCE		(12.0F * GLOBAL_SCALE)
 
-#define PORTAL_IMPACTOFFSET		(0.1F * GLOBAL_SCALE)
 
 constexpr double POINT_ON_PORTAL_TOLERANCE = (0.1);
 constexpr float OUTSIDE_GROUP_TOLERANCE = (25.0F);
@@ -131,7 +127,6 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 	return true;
 }
 
-#define NIL ((u_int16_t) -1)
 
 static float hit_portal_offset = 0.0F;
 

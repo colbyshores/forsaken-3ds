@@ -38,9 +38,6 @@ extern char host_address[256];
  * defines
  */
 
-constexpr auto MULTIPLAYER_VERSION = (0x010d);
-constexpr auto DEMO_MULTIPLAYER_VERSION = (0x0109);
-#define VERYSHORTPACKETS
 constexpr auto NOISEFALLOFFFACTOR = ( 1.0F / 120.0F ); // approx 2 seconds....
 constexpr int NORMAL_MODE = 0;
 constexpr int DEATH_MODE = 1;
@@ -50,7 +47,6 @@ constexpr int GAMEOVER_MODE = 4; // this is the mode the player goes into when s
 constexpr int WATCH_MODE = 5;
 constexpr float MAX_SHIELD = 255.0F;
 constexpr float START_SHIELD = 128.0F;
-constexpr float MAX_HULL = 255.0F;
 constexpr float START_HULL = 128.0F;
 #define MAXTEXTMSG							512		// the number of chars in a message you can send.....
 constexpr int MAXGENPICKUPCOUNT = 5;
@@ -950,7 +946,6 @@ typedef struct _SHIPHEALTHMSG
     u_int8_t Shield;
 } SHIPHEALTHMSG, *LPSHIPHEALTHMSG;
 
-constexpr int MAXLEVELSPERBATCH = 8;
 
 // expose Names to all that care
 extern SHORTNAMETYPE Names;

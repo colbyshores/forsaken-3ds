@@ -24,9 +24,6 @@ typedef DWORD COLOR; // bgra
 	Defines
 ===================================================================*/
 
-constexpr int ourX = 0;
-constexpr int ourY = 1;
-constexpr int ourZ = 2;
 constexpr auto EPS = 1e-7;
 constexpr float PI = 3.14159265358979323846F;
 #ifndef M_PI // defined in mingw

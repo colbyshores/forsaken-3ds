@@ -46,31 +46,6 @@ constexpr int TRIGGERTYPE_FlagCount = 6;
 constexpr int TRIGGERTYPE_FlagTest = 7;
 
 
-constexpr int TRIGGEREVENT_Pickup = 0;
-constexpr int TRIGGEREVENT_Enemy = 1;
-constexpr int TRIGGEREVENT_OpenDoor = 2;
-constexpr int TRIGGEREVENT_CloseDoor = 3;
-constexpr int TRIGGEREVENT_LockDoor = 4;
-constexpr int TRIGGEREVENT_UnlockDoor = 5;
-constexpr int TRIGGEREVENT_StartBGOAnim = 6;
-constexpr int TRIGGEREVENT_StopBGOAnim = 7;
-constexpr int TRIGGEREVENT_StartTexAnim = 8;
-constexpr int TRIGGEREVENT_StopTexAnim = 9;
-constexpr int TRIGGEREVENT_StartExternalForce = 10;
-constexpr int TRIGGEREVENT_StopExternalForce = 11;
-constexpr int TRIGGEREVENT_EnableTeleport = 12;
-constexpr int TRIGGEREVENT_DisableTeleport = 13;
-constexpr int TRIGGEREVENT_WaterFill = 14;
-constexpr int TRIGGEREVENT_WaterDrain = 15;
-constexpr int TRIGGEREVENT_StartSpotFX = 16;
-constexpr int TRIGGEREVENT_StopSpotFX = 17;
-constexpr int TRIGGEREVENT_ShowMessage = 18;
-constexpr int TRIGGEREVENT_LightEnable = 19;
-constexpr int TRIGGEREVENT_LightDisable = 20;
-constexpr int TRIGGEREVENT_TriggerAreaEnable = 21;
-constexpr int TRIGGEREVENT_TriggerAreaDisable = 22;
-constexpr int TRIGGEREVENT_CameraEnable = 23;
-constexpr int TRIGGEREVENT_CameraDisable = 24;
  
 /*
  * Structures

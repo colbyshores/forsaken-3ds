@@ -21,7 +21,6 @@
 /* No letterboxing — render at the native 400x240 (5:3) resolution.
  * The Open Pandora port (800x480, also 5:3) proves this aspect ratio
  * works correctly with the engine's projection and HUD layout. */
-constexpr int FS3DS_LETTERBOX_OFFSET_X = 0;
 
 /* R1 (AGENTS.md §3): establish FPSCR Flush-to-Zero (FZ) + Default-NaN (DN)
  * on every thread that executes float math, at thread entry, before any hot

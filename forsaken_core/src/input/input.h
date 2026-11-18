@@ -43,27 +43,17 @@
 #define SDLK_a       97
 #define SDLK_b       98
 #define SDLK_c       99
-#define SDLK_d       100
 #define SDLK_e       101
-#define SDLK_f       102
-#define SDLK_g       103
 #define SDLK_h       104
 #define SDLK_i       105
 #define SDLK_j       106
 #define SDLK_k       107
 #define SDLK_l       108
 #define SDLK_m       109
-#define SDLK_n       110
-#define SDLK_o       111
-#define SDLK_p       112
 #define SDLK_q       113
 #define SDLK_r       114
 #define SDLK_s       115
-#define SDLK_t       116
 #define SDLK_u       117
-#define SDLK_v       118
-#define SDLK_w       119
-#define SDLK_x       120
 #define SDLK_y       121
 #define SDLK_z       122
 #define SDLK_0       48
@@ -77,7 +67,6 @@
 #define SDLK_8       56
 #define SDLK_9       57
 #define SDLK_MINUS   45
-#define SDLK_EQUALS  61
 #define SDLK_LSHIFT  304
 #define SDLK_RSHIFT  303
 #define SDLK_LCTRL   306
@@ -89,36 +78,9 @@
 #define SDLK_HOME    278
 #define SDLK_END     279
 #define SDLK_INSERT  277
-#define SDLK_KP0     256
-#define SDLK_KP1     257
-#define SDLK_KP2     258
-#define SDLK_KP3     259
-#define SDLK_KP4     260
-#define SDLK_KP5     261
-#define SDLK_KP6     262
-#define SDLK_KP7     263
-#define SDLK_KP8     264
-#define SDLK_KP9     265
-#define SDLK_KP_PERIOD   266
-#define SDLK_KP_DIVIDE   267
-#define SDLK_KP_MULTIPLY 268
 #define SDLK_KP_MINUS    269
 #define SDLK_KP_PLUS     270
-#define SDLK_KP_ENTER    271
 #define SDLK_BACKQUOTE   96
-#define SDLK_COMMA       44
-#define SDLK_PERIOD      46
-#define SDLK_SLASH        47
-#define SDLK_SEMICOLON    59
-#define SDLK_QUOTE        39
-#define SDLK_LEFTBRACKET  91
-#define SDLK_RIGHTBRACKET 93
-#define SDLK_BACKSLASH    92
-#define SDLK_CAPSLOCK    301
-#define SDLK_NUMLOCK     300
-#define SDLK_SCROLLOCK   302
-#define SDLK_PAUSE       19
-#define SDLK_PRINT       316
 
 /* SDL compatibility stubs for 3DS */
 #include <stdio.h>
@@ -140,7 +102,6 @@ static inline u_int8_t* SDL_GetKeyState(int *numkeys) {
 /* Mod key state - always 0 on 3DS (no keyboard modifiers) */
 #define KMOD_CTRL  0x0040
 #define KMOD_SHIFT 0x0001
-#define KMOD_ALT   0x0100
 static inline int SDL_GetModState(void) { return 0; }
 
 static inline const char* SDL_GetKeyName(int key)
@@ -269,7 +230,6 @@ constexpr int MAX_JOYSTICKS = 16;
 constexpr int MAX_JOYSTICK_BUTTONS = 128;
 constexpr int MAX_JOYSTICK_POVS = 4;
 constexpr int MAX_JOYSTICK_AXIS = 8;
-constexpr int MAX_JOYSTICK_TEXT = 128;
 constexpr int MAX_JOYNAME = 16;
 
 extern int Num_Joysticks;

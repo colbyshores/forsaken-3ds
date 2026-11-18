@@ -30,7 +30,6 @@ constexpr int MAX_MESSAGES_LONG = 100;
 #endif
 constexpr int MAXPERLINE = 512; // message buffer width - line width set in (Text.c) MessageQuePrint/All
 
-constexpr int MAX_STATS_MESSAGES = 32;
 constexpr int MAX_STATS_MESSAGE_VARIATIONS = 16;
 constexpr int MAX_STATS_MESSAGE_LENGTH = 128;
 constexpr int MAX_STATS_FORMATING_VARS = 8;

@@ -27,8 +27,6 @@ constexpr int MAXLINKSPERNODE = 32;
 
 constexpr auto NODE_DECISION = (1<<0);
 constexpr auto NODE_DROPMINES = (1<<1);
-constexpr auto NODE_SNIPE_POSITION = (1<<2);
-constexpr auto NODE_HIDE_POSITION = (1<<3);
 constexpr auto NODE_TERMINATE = (1<<4);
 
 typedef struct NODE

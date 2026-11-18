@@ -48,7 +48,6 @@ constexpr int SCRTYPE_LastAFrame = 1;
 constexpr int SCRFLAG_Nothing = 0;
 constexpr int SCRFLAG_Scale = 1;
 constexpr int SCRFLAG_UseCoords = 2;
-constexpr int SCRFLAG_Onscreen = 4;
 constexpr int SCRFLAG_Solid = 8;
 constexpr int SCRFLAG_Rot90 = 16;
 #define	SCRFLAG_BottomHUD	32  /* [3DS] route this poly to the mono bottom screen

@@ -128,7 +128,6 @@ bool NoMenuBack = false;
 
 int16_t DummyTextureIndex;
 
-#define REGISTRY_EXPIRE_TIME	"ServiceID"
 #define DEFAULT_CONFIG_FILE		DEFAULT_PLAYER_NAME".txt"
 
 char	*config_name = NULL;
@@ -172,8 +171,6 @@ typedef struct
 	int num;
 	int dir;
 }PSEUDOJOYBTN;
-constexpr int BTNTYPE_Button = 0;
-constexpr int BTNTYPE_POV = 1;
 LIST JoystickAxisList = { 0 };
 LIST AxisActionList = { 0 };
 bool AxisInvert = false;
@@ -192,8 +189,6 @@ constexpr int AXISTEST_Width = 160;
 constexpr int AXISTEST_Height = 10;
 constexpr int AXISTEST_PtrWidth = 30;
 float AxisPtr_ymin, AxisPtr_ymax, AxisPtr_mid;
-constexpr int JOYCONFIG_SelectAction = 0;
-constexpr int JOYCONFIG_AssignButton = 1;
 
 bool InTitleRoom;
 
@@ -2685,7 +2680,6 @@ typedef struct
 	float BracketEndRot;
 }VDUINFO;
 
-#define Left	true
 #define	Right	false
 
 VECTOR CurrentVDUPos;
@@ -2715,8 +2709,6 @@ float InterLevelModelScale[MAXBIKETYPES] = {0.41F, 0.6F };
 float *HoloScaleLookupTable;
 u_int16_t *HoloModelLookup;
 
-#define NOT_ROTATED false
-#define ROTATED true
 
 float	DiscExpand;
 float	DiscSpeed; 
@@ -2728,8 +2720,6 @@ float HoloRotx = 0.0F;
 float HoloRoty = 0.0F;
 float HoloRotz = 0.0F;
 
-#define	WipeOut	true
-#define	WipeIn	false
 
 VECTOR Holopad = {-486.0F, -86.0F, 497.0F};
 float HolopadRange = 150.0F;
@@ -2840,10 +2830,7 @@ int MAXSLIDERINFOLENGTH = 32;
 new slider globals
 ***********************/
 #define MAXSLIDERSPERMENU 8
-#define NUMPOLYSPERSLIDER 1
 #define SLIDERSPEED 1.0F
-#define SLIDER_RefreshNeeded true
-#define SLIDER_RefreshNotNeeded false
 
 typedef struct
 {
@@ -2855,7 +2842,6 @@ ACTIVESLIDERINFO ActiveSliderItem[MAXSLIDERSPERMENU];
 /**********************
 highlight box globals
 ***********************/
-#define MAXEDGEPOLYS 32
 
 typedef struct
 {
@@ -2865,8 +2851,6 @@ typedef struct
 
 int HighlightPolyListStart;
 int HighlightPolyListEnd;
-#define HIGHLIGHT_SPEED			0.5F	// lowest res pixels per frame
-#define HIGHLIGHT_POLY_WIDTH	10	// lowest res pixels
 bool HighlightListEmpty;
 bool WasteAFrame = false;
 
@@ -2913,7 +2897,6 @@ int		TitleMsgQueStart, TitleMsgQueEnd, TotalTitleMsgs;
 float TitleMessageTimer;
 int MessagesDisplayed;
 
-#define MAX_TIMERS 16
 
 /**************
 event stuff

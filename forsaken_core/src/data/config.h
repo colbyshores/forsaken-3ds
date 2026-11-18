@@ -42,7 +42,6 @@ constexpr auto DIK_JOYSTICK_POV = (0x080);
 
 typedef short VirtualKeycode;
 
-constexpr int MAX_KEYNAME_LENGTH = 32;
 typedef struct {
 	int keys;
 	VirtualKeycode key[MAX_KEYS_PER_CONTROL];

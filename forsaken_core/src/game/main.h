@@ -33,7 +33,6 @@ constexpr int STATUS_ViewingStats = 35; // Viewing Stats Single Player...
 
 constexpr int STATUS_TitleLoadGameStartingSinglePlayer = 36;
 constexpr int STATUS_TitleLoadGamePostStartingSinglePlayer = 37;
-constexpr int STATUS_ChangeLevelPostLoadGame = 38;
 constexpr int STATUS_InGameLoadGameStartingSinglePlayer = 39;
 
 constexpr int STATUS_WaitingToStartSinglePlayer = 48; // waiting to start single player game...
@@ -45,16 +44,7 @@ constexpr int STATUS_WaitingToStartDemo = 53; // waiting to start demo
 constexpr int STATUS_WaitingToStartEndGameSequence = 54; // waiting to start end of game demo playback sequence
 
 constexpr int STATUS_InitView_0 = 128; // 0 of Preping for a level..
-constexpr int STATUS_InitView_1 = 129; // 1 of Preping for a level..
-constexpr int STATUS_InitView_2 = 130; // 2 of Preping for a level..
-constexpr int STATUS_InitView_3 = 131; // 3 of Preping for a level..
-constexpr int STATUS_InitView_4 = 132; // 4 of Preping for a level..
-constexpr int STATUS_InitView_5 = 133; // 5 of Preping for a level..
-constexpr int STATUS_InitView_6 = 134; // 6 of Preping for a level..
-constexpr int STATUS_InitView_7 = 135; // 7 of Preping for a level..
-constexpr int STATUS_InitView_8 = 136; // 8 of Preping for a level..
 constexpr int STATUS_InitView_9 = 137; // 9 of Preping for a level..
-constexpr int STATUS_InitView_10 = 138; // 10 of Preping for a level..
 
 constexpr int STATUS_LeftCrashed = 254; // I have left and crashed...
 constexpr int STATUS_Null = 255; // Im not doing anything yet...

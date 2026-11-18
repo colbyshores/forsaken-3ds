@@ -60,7 +60,6 @@ DOORTYPESFX DoorTypeSFX[] = {
 	Defines
 ===================================================================*/
 constexpr int BGO_VERSION_NUMBER = 3;
-constexpr int BGOPush = 1;
 
 /*===================================================================
 	Procedure	:	Initialise all Background Objects

@@ -509,7 +509,6 @@ BIKEMOD	BikeMods[MAXBIKETYPES+3] = {
 /*===================================================================
 		Detail Level Globals ...
 ===================================================================*/
-constexpr float MAXBIKEDETAIL = 4.0F;
 constexpr int MAXCOLLISIONS = 3;
 
 

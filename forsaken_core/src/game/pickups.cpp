@@ -50,8 +50,6 @@
 ===================================================================*/
 
 #define	PIC_VERSION_NUMBER	1
-constexpr auto HOST_BOUNTY_TIME = ( 10 * ANIM_SECOND );
-constexpr auto HOST_FLAG_TIME = ( 10 * ANIM_SECOND );
 
 
 /*===================================================================

@@ -1097,7 +1097,6 @@ int16_t ReturnSFXIndex( char *file )
 	return -1;
 }
 
-constexpr int NUM_ESSENTIAL_SFX = 26;
 
 void PauseAllSfx( void )
 {
@@ -1128,7 +1127,6 @@ void PauseAllSfx( void )
 }
 
 constexpr float LOOPING_SFX_SCALE = 0.75F; // used for max distance of looping sfx ( fraction of max distance used for normal sfx )
-constexpr float LOOPING_SFX_FRAME_SKIP = 5.0F; // process looping sfx every 5 frames
 constexpr int LOOPING_SFX_FixedGroup = 0;
 constexpr int LOOPING_SFX_VariableGroup = 1;
 
@@ -2357,11 +2355,6 @@ void ModifyLoopingSfx( u_int32_t uid, float Freq, float Volume )
 	}
 }
 
-constexpr int START_LINE = 5;
-constexpr int GAP_SIZE = 50;
-constexpr int X_OFFSET = 5;
-constexpr int LINE_HEIGHT = 8;
-constexpr int DATA_OFFSET = 100;
 
 void ProcessLoopingSfx( void )
 {
@@ -2748,7 +2741,6 @@ void ProcessEnemyBikerTaunt( void )
 	}
 }
 
-constexpr float TAUNT_OVERIDE_DISTANCE_FACTOR = 2.0F;
 constexpr float MAX_TAUNT_DISTANCE = 2240.0F;
 
 

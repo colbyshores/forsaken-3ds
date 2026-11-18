@@ -17,9 +17,6 @@
 #include "util/util.h"
 #include "stdio.h"
 
-constexpr int BLANK_RED = (255);
-constexpr int BLANK_GREEN = (255);
-constexpr int BLANK_BLUE = (255);
 
 /*===================================================================
 		Globals...	

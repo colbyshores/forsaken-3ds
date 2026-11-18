@@ -11,10 +11,7 @@
 #define LT_MacroText2 "Time to die..." 
 #define LT_MacroText3 "I will tear your soul apart..."
 
-#define LT_GameCompleteWithoutCrystals "well done. You completed all the levels but you didn't get all the crystals. You'll have to do it all over again if you want to be properly rewarded." 
 #define LT_GameCompleteGotAllCrystalsSoFar "well done, you got all the crystals. Take an extra life for the secret level. Find the crystal here for a special award." 
-#define LT_GameCompleteWithAllCrystals "well done, you got all the crystals. You get the secret biker."
-#define LT_GameCompleteWithAllCrystalsExceptLast "well you got through the secret level, but you didn't get the final crystal. Better luck next time."
 #define LT_GameCompleteWithCheating "well, you completed the game but you cheated, didn't you. If you want to see the secret level and have a chance to get a special reward, you'll have to do it properly!"
 
 #define LT_MENU_NEW_SpecialMessage0 "ok"
@@ -35,7 +32,6 @@
 
 #define LT_MENU_NEW_HostWaitingToStart0 "waiting to start..." 
 #define LT_MENU_NEW_HostWaitingToStart1 "start" 
-#define LT_MENU_NEW_HostWaitingToStart2 "IP:" 
 #define LT_MENU_NEW_HostWaitingToStart3 "Num of Players" 
 #define LT_MENU_NEW_HostWaitingToStart4 "msg:" 
 
@@ -66,19 +62,12 @@
 #define LT_MENU_NEW_ValidPickups24 "missiles"
 #define LT_MENU_NEW_ValidPickups25 "mines"
 
-#define LT_MENU_NEW_MoreMultiplayerOptions0 "Multiplayer options"
-#define LT_MENU_NEW_MoreMultiplayerOptions1 "collision perspective"
 #define LT_MENU_NEW_MoreMultiplayerOptions2 "short packets"
 #define LT_MENU_NEW_MoreMultiplayerOptions4 "packet rate"
 #define LT_MENU_NEW_MoreMultiplayerOptions10 "Bounty bonus" 
 #define LT_MENU_NEW_MoreMultiplayerOptions11 "flag capture score" 
 #define LT_MENU_NEW_MoreMultiplayerOptions12 "bounty bonus interval" 
 #define LT_MENU_NEW_MoreMultiplayerOptions13 "own flag rule" 
-#define LT_MENU_NEW_MoreMultiplayerOptions14 "record demo"
-#define LT_MENU_NEW_MoreMultiplayerOptions15 "demo name"
-#define LT_MENU_NEW_MoreMultiplayerOptions16 "damage done when..."
-#define LT_MENU_NEW_MoreMultiplayerOptions17 "i think my shots hit you"
-#define LT_MENU_NEW_MoreMultiplayerOptions18 "i think your shots hit me"
 #define LT_MENU_NEW_MoreMultiplayerOptions19 "change allowed pickups"
 #define LT_MENU_NEW_MoreMultiplayerOptions20 "randomize pickups"
 #define LT_MENU_NEW_MoreMultiplayerOptions21 "num primaries"
@@ -86,8 +75,6 @@
 
 #define LT_MENU_NEW_CreateGame0 "Create Multiplayer Game"
 #define LT_MENU_NEW_CreateGame1 "Start game"
-#define LT_MENU_NEW_CreateGame2 "IP:"
-#define LT_MENU_NEW_CreateGame3 "session name"
 #define LT_MENU_NEW_CreateGame4 "level"
 #define LT_MENU_NEW_CreateGame5 "player limit"
 #define LT_MENU_NEW_CreateGame6 "score limit"
@@ -99,7 +86,6 @@
 #define LT_MENU_NEW_CreateGame12 "flag chase"
 #define LT_MENU_NEW_CreateGame13 "bounty hunt"
 #define LT_MENU_NEW_CreateGame14 "Team bounty hunt"
-#define LT_MENU_NEW_CreateGame16 "more options"
 
 #define LT_MENU_NEW_PrimaryOrder0 "primary weapon selection preferences"
 #define LT_MENU_NEW_PrimaryOrder1 "auto"
@@ -124,20 +110,13 @@
 #define LT_MENU_NEW_SecondaryWeaponKeys12 "Next weapon"
 #define LT_MENU_NEW_SecondaryWeaponKeys13 "Prev weapon"
 #define LT_MENU_NEW_SecondaryWeaponKeys14 "drop weapon"
-#define LT_MENU_NEW_SecondaryWeaponKeys15 "fire secondary"
-#define LT_MENU_NEW_SecondaryWeaponKeys16 "drop mine"
 #define LT_MENU_NEW_SecondaryWeaponKeys17 "mug missile"
 #define LT_MENU_NEW_SecondaryWeaponKeys18 "solaris missile"
-#define LT_MENU_NEW_SecondaryWeaponKeys19 "scatter missile"
-#define LT_MENU_NEW_SecondaryWeaponKeys20 "gravgon missile"
 #define LT_MENU_NEW_SecondaryWeaponKeys21 "mfrl"
 #define LT_MENU_NEW_SecondaryWeaponKeys22 "Titan Missile"
 #define LT_MENU_NEW_SecondaryWeaponKeys23 "purge mine"
 #define LT_MENU_NEW_SecondaryWeaponKeys24 "pine mine"
 #define LT_MENU_NEW_SecondaryWeaponKeys25 "quantum mine"
-#define LT_MENU_NEW_SecondaryWeaponKeys26 "Next weapon"
-#define LT_MENU_NEW_SecondaryWeaponKeys27 "Prev weapon"
-#define LT_MENU_NEW_SecondaryWeaponKeys28 "drop weapon"
 #define LT_MENU_NEW_SecondaryWeaponKeys29 "thief missile"
 #define LT_MENU_NEW_SecondaryWeaponKeys30 "spider mine"
 
@@ -153,16 +132,6 @@
 #define LT_MENU_NEW_PrimaryWeaponKeys9 "Prev weapon"
 #define LT_MENU_NEW_PrimaryWeaponKeys10 "drop weapon"
 #define LT_MENU_NEW_PrimaryWeaponKeys11 "send msg"
-#define LT_MENU_NEW_PrimaryWeaponKeys12 "fire primary"
-#define LT_MENU_NEW_PrimaryWeaponKeys13 "pulsar"
-#define LT_MENU_NEW_PrimaryWeaponKeys14 "trojax"
-#define LT_MENU_NEW_PrimaryWeaponKeys15 "suss gun"
-#define LT_MENU_NEW_PrimaryWeaponKeys16 "pyrolite"
-#define LT_MENU_NEW_PrimaryWeaponKeys17 "transpulse"
-#define LT_MENU_NEW_PrimaryWeaponKeys18 "laser"
-#define LT_MENU_NEW_PrimaryWeaponKeys19 "Next weapon"
-#define LT_MENU_NEW_PrimaryWeaponKeys20 "Prev weapon"
-#define LT_MENU_NEW_PrimaryWeaponKeys21 "drop weapon"
 
 #define LT_MENU_NEW_Weapons0 "weapons"
 #define LT_MENU_NEW_Weapons1 "primary weapon keys"
@@ -188,24 +157,6 @@
 #define LT_MENU_NEW_ConfigureKeyboard15 "nitro"
 #define LT_MENU_NEW_ConfigureKeyboard16 "cruise faster"
 #define LT_MENU_NEW_ConfigureKeyboard17 "cruise slower"
-#define LT_MENU_NEW_ConfigureKeyboard18 "rotate left:"
-#define LT_MENU_NEW_ConfigureKeyboard19 "rotate right:"
-#define LT_MENU_NEW_ConfigureKeyboard20 "rotate up:"
-#define LT_MENU_NEW_ConfigureKeyboard21 "rotate down:"
-#define LT_MENU_NEW_ConfigureKeyboard22 "slide left:"
-#define LT_MENU_NEW_ConfigureKeyboard23 "slide right:"
-#define LT_MENU_NEW_ConfigureKeyboard24 "slide up"
-#define LT_MENU_NEW_ConfigureKeyboard25 "slide down:"
-#define LT_MENU_NEW_ConfigureKeyboard26 "roll left:"
-#define LT_MENU_NEW_ConfigureKeyboard27 "roll right:"
-#define LT_MENU_NEW_ConfigureKeyboard28 "slide mode:"
-#define LT_MENU_NEW_ConfigureKeyboard29 "roll mode:"
-#define LT_MENU_NEW_ConfigureKeyboard30 "forward:"
-#define LT_MENU_NEW_ConfigureKeyboard31 "reverse:"
-#define LT_MENU_NEW_ConfigureKeyboard32 "nitro:"
-#define LT_MENU_NEW_ConfigureKeyboard33 "cruise faster:"
-#define LT_MENU_NEW_ConfigureKeyboard34 "cruise slower:"
-#define LT_MENU_NEW_ConfigureKeyboard35 "send msg:"
 
 #define LT_MENU_NEW_ConfigJoyAxis0 "setup axis"
 #define LT_MENU_NEW_ConfigJoyAxis1 "select axis:"
@@ -216,7 +167,6 @@
 #define LT_MENU_NEW_ConfigJoyAxis6 "fine control"
 #define LT_MENU_NEW_ConfigJoyAxis7 "test:"
 
-#define LT_MENU_NEW_SetupJoystick22 "configure Axis"
 
 #define LT_MENU_NEW_SetupJoystick0 "choose joystick"
 #define LT_MENU_NEW_SetupJoystick1 "joystick list"
@@ -236,23 +186,10 @@
 #define LT_MENU_NEW_Controls5 "restore defaults"
 #define LT_MENU_NEW_Controls6 "back"
 
-#define LT_MENU_NEW_Lights0 "LIGHTS"
-#define LT_MENU_NEW_Lights1 "Primary Lights"
-#define LT_MENU_NEW_Lights2 "Secondary Lights"
-#define LT_MENU_NEW_Lights3 "Pickup Lights"
-#define LT_MENU_NEW_Lights4 "Back"
 
 #define LT_MENU_NEW_DetailLevels0 "DETAIL LEVELS"
-#define LT_MENU_NEW_DetailLevels1 "in game Bi-Linear"
-#define LT_MENU_NEW_DetailLevels2 "Perspective Correct"
 #define LT_MENU_NEW_DetailLevels4 "Team Info"
-#define LT_MENU_NEW_DetailLevels5 "Auto Detail"
-#define LT_MENU_NEW_DetailLevels7 "Bike Detail"
 #define LT_MENU_NEW_DetailLevels8 "Water Detail"
-#define LT_MENU_NEW_DetailLevels10 "Primary Lights"
-#define LT_MENU_NEW_DetailLevels11 "Secondary Lights"
-#define LT_MENU_NEW_DetailLevels12 "Pickup Lights"
-#define LT_MENU_NEW_DetailLevels13 "Lights..."
 #define LT_MENU_NEW_DetailLevels14 "Show Extra Info "
 #define LT_MENU_NEW_DetailLevels15 "Show Weapon Kills"
 #define LT_MENU_NEW_DetailLevels16 "Back"
@@ -260,13 +197,10 @@
 #define LT_MENU_NEW_ScreenRes0 "Choose From..."
 #define LT_MENU_NEW_ScreenRes1 "press escape to go back"
 
-#define LT_MENU_NEW_TextureFormat0 "Choose From..."
-#define LT_MENU_NEW_TextureFormat1 "press escape to go back"
 
 #define LT_MENU_NEW_Visuals0 "Visuals"
 #define LT_MENU_NEW_Visuals1 "Change Detail Levels"
 #define LT_MENU_NEW_Visuals2 "Change Screen Res"
-#define LT_MENU_NEW_Visuals3 "Select Texture Format"
 #define LT_MENU_NEW_Visuals4 "gamma"
 #define LT_MENU_NEW_Visuals5 "back"
 
@@ -274,9 +208,6 @@
 #define LT_MENU_NEW_JoinWaitingToStart1 "Num of Players"
 #define LT_MENU_NEW_JoinWaitingToStart2 "msg:"
 
-#define LT_MENU_NEW_GetTeamPlayers0 "waiting for host..."
-#define LT_MENU_NEW_GetTeamPlayers1 "Num of Players"
-#define LT_MENU_NEW_GetTeamPlayers2 "msg:"
 
 #define LT_MENU_NEW_ChangeBike0 "speed"
 #define LT_MENU_NEW_ChangeBike1 "accel"
@@ -298,11 +229,6 @@
 #define LT_MENU_NEW_SelectBiker4 "Change Bike computer"
 #define LT_MENU_NEW_SelectBiker5 "Exit"
 
-#define LT_MENU_NEW_DemoPlayBack0 "play back demo"
-#define LT_MENU_NEW_DemoPlayBack1 "Start"
-#define LT_MENU_NEW_DemoPlayBack2 "playback speed"
-#define LT_MENU_NEW_DemoPlayBack3 "watch player"
-#define LT_MENU_NEW_DemoPlayBack4 "choose demo"
 
 #define LT_MENU_LoadSavedGame0 "Load Saved Game"
 #define LT_MENU_LoadSavedGame1 "Choose From..."
@@ -323,13 +249,8 @@
 #define LT_MENU_NEW_InGameSound5 "bike computer "
 #define LT_MENU_NEW_InGameSound6 "flag sfx      "
 
-#define LT_MENU_NEW_DemoCleaning0 "clean a demo"
-#define LT_MENU_NEW_DemoCleaning1 "Start"
-#define LT_MENU_NEW_DemoCleaning2 "choose demo"
 
 #define LT_MENU_NEW_RestoreGame0 "Restore Game"
-#define LT_MENU_NEW_RestoreGame1 "Play Demo"
-#define LT_MENU_NEW_RestoreGame2 "Clean Demo"
 #define LT_MENU_NEW_RestoreGame3 "load game"
 
 #define LT_MENU_NEW_Options0 "Options"
@@ -341,33 +262,24 @@
 #define LT_MENU_NEW_Setup1 "Select Bike"
 #define LT_MENU_NEW_Setup2 "Controls"
 #define LT_MENU_NEW_Setup3 "Weapons"
-#define LT_MENU_NEW_Setup4 "back"
 
 #define LT_MENU_NEW_Battle0 "death match"
 #define LT_MENU_NEW_Battle1 "Create Game"
 #define LT_MENU_NEW_Battle2 "Join Game"
 #define LT_MENU_NEW_Battle3 "back"
 
-#define LT_MENU_NEW_CoOp0 "Co Op"
-#define LT_MENU_NEW_CoOp1 "Join Game"
-#define LT_MENU_NEW_CoOp2 "Network Setup"
-#define LT_MENU_NEW_CoOp3 "Modem/Serial"
-#define LT_MENU_NEW_CoOp4 "Exit"
 
 #define LT_MENU_NEW_MissionMenu0 "single player"
 #define LT_MENU_NEW_MissionMenu1 "Start Game"
 #define LT_MENU_NEW_MissionMenu2 "back"
 
-#define LT_MENU_NEW_Start0 "single player"
 #define LT_MENU_NEW_Start1 "single player"
 #define LT_MENU_NEW_Start2 "death match"
 #define LT_MENU_NEW_Start3 "Setup Biker"
-#define LT_MENU_NEW_Start4 "Play demo"
 #define LT_MENU_NEW_Start5 "load Game"
 #define LT_MENU_NEW_Start6 "Options"
 #define LT_MENU_NEW_Start7 "Exit"
 
-#define LT_MENU_QuickTextSend0 "Message: "
 
 #define LT_MENU_QuickTextSendWhisper0 "Whisper Message: "
 									  
@@ -404,16 +316,6 @@
 #define LT_MENU_NEW_WatchTeamSelect9 "waiting for team selection"
 #define LT_MENU_NEW_WatchTeamSelect10 "msg:"
 
-#define LT_MENU_NEW_ChooseTeamForExistingGame0 "select teams"
-#define LT_MENU_NEW_ChooseTeamForExistingGame1 "Red"
-#define LT_MENU_NEW_ChooseTeamForExistingGame2 "Green"
-#define LT_MENU_NEW_ChooseTeamForExistingGame3 "Blue"
-#define LT_MENU_NEW_ChooseTeamForExistingGame4 "Yellow"
-#define LT_MENU_NEW_ChooseTeamForExistingGame5 "Red"
-#define LT_MENU_NEW_ChooseTeamForExistingGame6 "Green"
-#define LT_MENU_NEW_ChooseTeamForExistingGame7 "Blue"
-#define LT_MENU_NEW_ChooseTeamForExistingGame8 "Yellow"
-#define LT_MENU_NEW_ChooseTeamForExistingGame9 "msg:"
 
 #define LT_MENU_LevelSelect0 "Level Selection"
 #define LT_MENU_LevelSelect1 "Ability To Change "
@@ -458,7 +360,6 @@
 #define LT_MENU_Keyboard33 "Next Sec"
 #define LT_MENU_Keyboard34 "Prev Sec"
 #define LT_MENU_Keyboard35 "Send Msg"
-#define LT_MENU_Keyboard36 "speech taunt"
 #define LT_MENU_Keyboard37 "Mug Missile"
 #define LT_MENU_Keyboard38 "Solaris"
 #define LT_MENU_Keyboard39 "Scatter"
@@ -476,7 +377,6 @@
 
 #define LT_MENU_Controls0 "Bike Controls"
 #define LT_MENU_Controls1 "Configure controls"
-#define LT_MENU_Controls2 "Mouse             "
 #define LT_MENU_Controls3 "Joystick          "
 #define LT_MENU_Controls4 "Autoleveling      "
 #define LT_MENU_Controls5 "Invert X          "
@@ -485,17 +385,9 @@
 #define LT_MENU_Controls8 "Y Sensitivity     "
 
 #define LT_MENU_Detail0 "Detail Levels"
-#define LT_MENU_Detail1 "Bi Linear Filtering"
-#define LT_MENU_Detail2 "Perspective Correct"
 #define LT_MENU_Detail4 "Team Info          "
-#define LT_MENU_Detail5 "Primary Lights     "
-#define LT_MENU_Detail6 "Secondary Lights   "
-#define LT_MENU_Detail7 "Pickup Lights      "
-#define LT_MENU_Detail10 "Auto Detail        "
-#define LT_MENU_Detail11 "Bike Detail        "
 #define LT_MENU_Detail12 "Water Detail       "
 #define LT_MENU_Detail13 "gamma              "
-#define LT_MENU_Detail16 "Lightning Laser    "
 
 #define LT_MENU_SelectBike0 "Select Bike"
 #define LT_MENU_SelectBike1 "Choose From..."
@@ -510,12 +402,9 @@
 #define LT_MENU_SelectScreenMode0 "Select Screen Mode"
 #define LT_MENU_SelectScreenMode1 "Choose From..."
 
-#define LT_MENU_SelectTextureFormat0 "Select Texture Format"
-#define LT_MENU_SelectTextureFormat1 "Choose From..."
 
 #define LT_MENU_Visuals0 "Visuals"
 #define LT_MENU_Visuals1 "Select Screen Mode"
-#define LT_MENU_Visuals2 "Select Texture Format"
 
 #define LT_MENU_Options0 "Options"
 #define LT_MENU_Options1 "Visuals"
@@ -523,43 +412,20 @@
 #define LT_MENU_Options3 "Detail Levels"
 #define LT_MENU_Options4 "Show Frame Rate "
 #define LT_MENU_Options5 "Packets Per Second "
-#define LT_MENU_Options7 "update (secs)"
 #define LT_MENU_Options8 "Show Extra Info "
 #define LT_MENU_Options9 "Show Weapon Kills"
-#define LT_MENU_Options10 "Restore Defaults"
-#define LT_MENU_Options11 "Show Statistics"
 #define LT_MENU_Options13 "Show Players on HUD"
 
-#define LT_MENU_SelfPlayOptions0 "Options"
-#define LT_MENU_SelfPlayOptions1 "Select Screen Mode"
-#define LT_MENU_SelfPlayOptions2 "Select Texture Format"
-#define LT_MENU_SelfPlayOptions3 "Detail Levels"
-#define LT_MENU_SelfPlayOptions4 "Show Player Names "
-#define LT_MENU_SelfPlayOptions5 "Show Frame Rate "
 
 #define LT_MENU_DemoPlaying0 "Demo Playing"
 #define LT_MENU_DemoPlaying1 "Pause Demo "
-#define LT_MENU_DemoPlaying2 "Playback Speed"
-#define LT_MENU_DemoPlaying3 "Watch Player"
-#define LT_MENU_DemoPlaying4 "Options"
-#define LT_MENU_DemoPlaying5 "Quit to Main Menu"
-#define LT_MENU_DemoPlaying6 "Grab 3dfx demo "
 #define LT_MENU_DemoPlaying7 "Playback Speed"
 #define LT_MENU_DemoPlaying8 "Watch Player"
 #define LT_MENU_DemoPlaying9 "Options"
 #define LT_MENU_DemoPlaying10 "Debugging"
 #define LT_MENU_DemoPlaying11 "Quit to Title Screen"
 
-#define LT_MENU_DemoPlayBack0 "Demo Playback"
-#define LT_MENU_DemoPlayBack1 "Start"
-#define LT_MENU_DemoPlayBack2 "Playback Speed"
-#define LT_MENU_DemoPlayBack3 "Watch Player"
-#define LT_MENU_DemoPlayBack4 "Choose From..."
 
-#define LT_MENU_DemoCleaning0 "Clean A Demo"
-#define LT_MENU_DemoCleaning1 "Start"
-#define LT_MENU_DemoCleaning2 "Output Name  "
-#define LT_MENU_DemoCleaning3 "Choose From..."
 
 #define LT_MENU_SetUpBiker0 "Set Up Biker"
 #define LT_MENU_SetUpBiker1 "Create New Biker  "
@@ -578,20 +444,10 @@
 #define LT_MENU_InGame4 "Save Game"
 #define LT_MENU_InGame5 "Options"
 #define LT_MENU_InGame6 "Level Select"
-#define LT_MENU_InGame7 "End level and show stats"
 #define LT_MENU_InGame8 "Quit to Main Menu"
 #define LT_MENU_InGame11 "Debugging"
-#define LT_MENU_InGame13 "Wireframe Mode"
 #define LT_MENU_InGame14 "Save Menu"
 #define LT_MENU_InGame15 "Debug Menu"
-#define LT_MENU_InGame16 "IP "
-#define LT_MENU_InGame17 "Packets Per Second "
-#define LT_MENU_InGame18 "Set Up Biker  "
-#define LT_MENU_InGame19 "Load Game"
-#define LT_MENU_InGame20 "Save Game"
-#define LT_MENU_InGame21 "options"
-#define LT_MENU_InGame22 "Quit to Main Menu"
-#define LT_MENU_InGame23 "Debugging"
 #define LT_MENU_InGame24 "Watch Player"
 #define LT_MENU_InGame25 "Quit to desktop"
 #define LT_MENU_InGame26 "Host Options"
@@ -606,17 +462,6 @@
 #define LT_MENU_InGame35 "your messages "
 #define LT_MENU_InGame36 "short packets"
 
-#define LT_MENU_Help0 "In-Game Help"
-#define LT_MENU_Help1 "Toggle menu"
-#define LT_MENU_Help2 "Toggle help screen" 
-#define LT_MENU_Help3 "Increase window size" 
-#define LT_MENU_Help4 "Decrease window size" 
-#define LT_MENU_Help5 "Toggle panel text" 
-#define LT_MENU_Help6 "Toggle remote camera" 
-#define LT_MENU_Help7 "Toggle rear camera" 
-#define LT_MENU_Help8 "Toggle missile camera" 
-#define LT_MENU_Help9 "Toggle player names"
-#define LT_MENU_Help10 "Return to game"
 
 // note to translator: the ~ character in the next section represents a line break
 
@@ -640,8 +485,6 @@
 
 #define LT_ToggleStatusOn "on"
 #define LT_ToggleStatusOff "off"
-#define LT_ToggleStatusShooter "shooter"
-#define LT_ToggleStatusTarget "target"
 
 // Custom message colours
 #define LT_WHITE "white"
@@ -682,7 +525,6 @@
 
 #define LT_QuitToMainMenu "Quit to Main Menu"
 
-#define LT_SavedGameName "saved %d-%d-%d at %2d:%02d"	// %d-%d-%d is day-month-year %2d:%02d is time
 #define LT_LevelName "level name: %s"	// %s is name of level
 #define LT_LevelPlayedFor1 "%s played for %hd mins %hd secs"	// %s = player name, %hd = num mins, %hd = num secs  
 #define LT_LevelPlayedFor2 "played for %hd mins %hd secs"		// %s = player name, %hd = num mins, %hd = num secs  
@@ -733,22 +575,11 @@
 
 #define LT_MENU_RemovePlayer "remove player"
 
-#define LT_MENU_NEW_ChooseConnectionToStart1 "press 'esc' to quit"
 
-#define LT_Extra3 "session created %d-%d-%d at %02d:%02d"
-#define LT_Extra4 "level: %s"
-#define LT_Extra5 "players: %d / %d"
-#define LT_Extra6 "game: %s%s"
-#define LT_Extra7 "packets: short %s"
-#define LT_Extra8 "collision perspective: %s"
-#define LT_Extra11 "kills limit %d ( current top %d )"
-#define LT_Extra12 "time limit %d mins ( %d left )"
 
 #define LT_NoLevelsInstalled "no levels installed!"
 #define LT_NoSinglePlayerLevelsInstalled "no single player levels installed!"
 
-#define LT_Extra1b "%d packets per second"
-#define LT_MENU_Detail1a "Tri Linear Filtering"
 #define LT_MENU_NEW_MoreMultiplayerOptions1a "target collision perspective"
 #define LT_MENU_NEW_MoreMultiplayerOptions2a "shooter collision perspective"
 #define KICKED_HOST "you have been kicked out by the host"

@@ -21,9 +21,6 @@
  * Defines
  */
 constexpr double TOLER = (0.03125); //0.0000076F
-constexpr int INSIDE = 1;
-constexpr int OUTSIDE = -1;
-constexpr int ONPLANE = 0;
  
 
 constexpr int MAX_BSP_MODELS = (2);

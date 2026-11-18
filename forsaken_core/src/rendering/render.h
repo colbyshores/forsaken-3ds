@@ -139,7 +139,6 @@ bool FSClearDepth(XYRECT * rect);
  * Mloadheader's per-group renderObject[MAXEXECBUFSPERGROUP] arrays —
  * small fraction of the existing ~27 MB ModelHeaders BSS, fits comfortably
  * inside the OG 3DS application memory budget. */
-constexpr int MAX_LEVEL_TEXTURE_GROUPS = 64;
 
 #ifdef __3DS__
 /*
@@ -424,4 +423,3 @@ constexpr auto CLIP_RIGHT = 0x00000002L;
 constexpr auto CLIP_TOP = 0x00000004L;
 constexpr auto CLIP_BOTTOM = 0x00000008L;
 constexpr auto CLIP_FRONT = 0x00000010L;
-constexpr auto CLIP_BACK = 0x00000020L;

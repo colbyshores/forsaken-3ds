@@ -25,7 +25,6 @@
  */
 
 #define MAXCOLGROUPS MAXGROUPS
-constexpr float SCALE_FUDGE = (1.015F);
 #define COLLISION_FUDGE (10.0F*GLOBAL_SCALE)
 
 /*

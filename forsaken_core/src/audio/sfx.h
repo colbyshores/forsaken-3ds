@@ -24,7 +24,6 @@ constexpr int SPOT_SFX_TYPE_Taunt = 2;
 
 constexpr int SFX_TYPE_Normal = 1;
 constexpr int SFX_TYPE_Panned = 2;
-constexpr int SFX_TYPE_Looping = 3;
 constexpr int SFX_TYPE_Taunt = 4;
 
 constexpr float GLOBAL_MAX_SFX = ( 0.9F );
@@ -32,10 +31,6 @@ constexpr float GLOBAL_MAX_SFX = ( 0.9F );
 // sfx is -1 if free
 // allocate one variable only - sfx loader can wait if not available
 
-constexpr int SFX_TYPE_Nothing = 0;
-constexpr int SFX_TYPE_Static = 1;
-constexpr int SFX_TYPE_Dynamic = 2;
-constexpr int SFX_TYPE_Compound = 3;
 
 constexpr int MAX_LEVELSPECIFIC_SFX = 64;
 

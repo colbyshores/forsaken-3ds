@@ -70,7 +70,6 @@ enum
 
 
 // Ai Status.... Enemy->AIFlags
-constexpr auto AI_ITHINK = (1<<0);
 constexpr auto AI_PLAYERINRANGE = (1<<1);
 constexpr auto AI_ANYPLAYERINRANGE = (1<<2);
 constexpr auto AI_ICANSEEPLAYER = (1<<3);
@@ -78,7 +77,6 @@ constexpr auto AI_IHAVESEENPLAYER = (1<<4);
 constexpr auto AI_FRIENDLYFIRE = (1<<5); // If I fire at my target I might cause friendly fire....
 constexpr auto AI_PLAYERCANSEEME = (1<<6);
 constexpr auto AI_PLAYERISTARGETINGME = (1<<7);
-constexpr auto AI_PLAYERHASFIREDATME = (1<<8);
 constexpr auto AI_IVEBEENHITBYPLAYER = (1<<9);
 constexpr auto AI_ICANHEARPLAYER = (1<<10);
 constexpr auto AI_PLAYERHASFIREDPRIMARY = (1<<11);
@@ -127,7 +125,6 @@ constexpr auto AI_CONTROL_TURNLEFT = (1<<6);
 constexpr auto AI_CONTROL_TURNRIGHT = (1<<7);
 constexpr auto AI_CONTROL_TURNUP = (1<<8);
 constexpr auto AI_CONTROL_TURNDOWN = (1<<9);
-constexpr auto AI_CONTROL_FIREPRIMARY = (1<<10);
 
 
 constexpr auto AI_CONTROL_NO_FORWARD = (1<<11);
@@ -148,7 +145,6 @@ constexpr auto AVOID_RIGHT = (AI_CONTROL_RIGHT);
 constexpr auto AVOID_UP = (AI_CONTROL_UP);
 constexpr auto AVOID_DOWN = (AI_CONTROL_DOWN);
 constexpr auto AVOID_FORWARD = (AI_CONTROL_FORWARD);
-constexpr auto AVOID_BACK = (AI_CONTROL_BACK);
 
 
 
@@ -211,25 +207,15 @@ constexpr auto _TARGET_PICKUPS = (1 << 4); // Target PICKUPS
 constexpr auto _TARGET_TRIGGERS = (1 << 5); // Target TRIGGERS
 constexpr auto _TARGET_MINES = (1 << 6); // Target MINES
 
-#define	SET_TARGET_CURRENT	(Tinfo->Flags |= _TARGET_CURRENT)
-#define	SET_TARGET_ENEMIES	(Tinfo->Flags |= _TARGET_ENEMIES)
 #define	SET_TARGET_PLAYERS	(Tinfo->Flags |= _TARGET_PLAYERS)
 #define	SET_TARGET_NODES	(Tinfo->Flags |= _TARGET_NODES)
-#define	SET_TARGET_PICKUPS	(Tinfo->Flags |= _TARGET_PICKUPS)
-#define	SET_TARGET_TRIGGERS	(Tinfo->Flags |= _TARGET_TRIGGERS)
-#define	SET_TARGET_MINES	(Tinfo->Flags |= _TARGET_MINES)
 
-#define	TARGET_CURRENT			(Tinfo->Flags & _TARGET_CURRENT)
-#define	TARGET_ENEMIES			(Tinfo->Flags & _TARGET_ENEMIES)
 #define	TARGET_PLAYERS			(Tinfo->Flags & _TARGET_PLAYERS)
 #define	TARGET_NODES			(Tinfo->Flags & _TARGET_NODES)
-#define	TARGET_PICKUPS			(Tinfo->Flags & _TARGET_PICKUPS)
-#define	TARGET_TRIGGERS			(Tinfo->Flags & _TARGET_TRIGGERS)
 #define	TARGET_MINES			(Tinfo->Flags & _TARGET_MINES)
 
 constexpr float BIGDISTANCE = (32000.0F);
 
-#define 	END_OF_TYPES			((int8_t) 255)
 
 //--------------------------------------------------------------------------
 // External data

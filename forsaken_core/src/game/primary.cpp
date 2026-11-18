@@ -49,7 +49,6 @@
 #include "game/models.h"
 #include "game/oct2.h"
 
-constexpr float MAX_TROJAX_POWER_LEVEL = (100.0F);
 
 /*===================================================================
 	Externs

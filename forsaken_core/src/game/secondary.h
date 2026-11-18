@@ -61,8 +61,6 @@ constexpr int ENEMYDEPTHCHARGE = 18; // DepthCharge
 
 constexpr int NO_SECONDARY = 128; // No Secondary weapon to speak of....
 
-constexpr float COS_CONE = -2.0F; //0.7071F
-constexpr int MAX_ENTRYS = 10;
 constexpr auto MINE_RADIUS = ( 256.0F * GLOBAL_SCALE ); // Mine Radius
 constexpr auto MINE_TRIGGER_RADIUS = ( 800.0F * GLOBAL_SCALE ); // Detonation Radius
 

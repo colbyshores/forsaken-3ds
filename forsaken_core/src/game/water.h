@@ -32,7 +32,6 @@ constexpr float WATER_IMPACT = (-4.0F);
 constexpr auto ONEOVER255 = (1.0F/255.0F);
 
 constexpr int WATERSTATE_NOWATER = 0;
-constexpr int WATERSTATE_SOMEWATER = 1;
 constexpr int WATERSTATE_ALLWATER = 2;
 
 constexpr int WATERSTATUS_STATIC = 0;

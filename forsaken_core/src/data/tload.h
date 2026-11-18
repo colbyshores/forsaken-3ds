@@ -17,7 +17,6 @@
  * defines
  */
 constexpr int MAXTPAGESPERTLOAD = 50;
-constexpr int SCALEMAX = 2;
 
 constexpr int DONTLOAD_TPAGES = 0;
 constexpr int LOAD_TPAGES = 1;

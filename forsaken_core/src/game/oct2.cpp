@@ -78,7 +78,6 @@ bool WaitingToQuit;
 
 bool Cheated = false;
 
-#define SAVESCREEN_3DFX
 
 u_int32_t        AnimOncePerFrame = 0;         // used for stuff that is displayed more than once in a single frame..
 
@@ -135,11 +134,7 @@ float FPS = 0.0F;         // Frames Per Second...
 #define FOV_SHRINK(A)   ((A) - 10.0F)
 
 
-constexpr int MIN_VIEWPORT_WIDTH = (64);
-constexpr int MIN_VIEWPORT_HEIGHT = (64);
 
-constexpr float VIEWPORT_GROW = (1.1F);
-constexpr auto VIEWPORT_SHRINK = (1.0F/1.1F);
 
 bool InitViewport( void );
 

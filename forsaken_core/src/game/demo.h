@@ -12,11 +12,7 @@
 #include "game/main.h"
 
 constexpr int MAX_DEMONAME_LENGTH = (60);
-constexpr int MAX_DEMOFILENAME_LENGTH = (80); // must be at least MAX_DEMONAME_LENGTH + strlen( DEMOFOLDER ) + strlen( DEMOFILE_EXTENSION ) + 1
 
-#define DEMOFOLDER				"Demos"
-#define DEMOFILE_EXTENSION		".DMO"
-#define DEMOFILE_SEARCHPATH		DEMOFOLDER "\\*" DEMOFILE_EXTENSION
 
 
 /* Defined in demo.cpp; shared with the modules that use it. */

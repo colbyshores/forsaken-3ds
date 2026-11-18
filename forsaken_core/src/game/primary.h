@@ -66,7 +66,6 @@ constexpr auto PULSAR_TAILADDMIN = ( ( 376.0F * GLOBAL_SCALE ) * 0.5F );
 constexpr auto PULSAR_EXPSIZE = ( ( 8.0F * GLOBAL_SCALE ) * 0.5F );
 
 constexpr auto TROJAX_COLRADIUS = ( ( 512.0F * GLOBAL_SCALE ) * 1.0F );
-constexpr auto TROJAX_SIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto TROJAX_EXPSIZE = ( ( 4.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto TROJAX_EXPMAXSIZE = ( ( 16.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto TROJAX_EXPINC = ( ( 0.333F * GLOBAL_SCALE ) * 1.0F );
@@ -107,15 +106,9 @@ constexpr float LASER_TEMP_ADDMIN = ( 0.5F );
 
 constexpr auto NMEBUL1_COLRADIUS = ( ( 0.0F * GLOBAL_SCALE ) * 1.0F );
 constexpr auto NMEBUL1_FMSIZE = ( ( 5.0F * GLOBAL_SCALE ) * 2.0F );
-constexpr auto NMEBUL1_TAILSTART = ( ( 40.0F * GLOBAL_SCALE ) * 0.5F );
-constexpr auto NMEBUL1_TAILEND = ( ( 20.0F * GLOBAL_SCALE ) * 0.5F );
-constexpr auto NMEBUL1_TAILPOWERMUL = ( ( 240.0F * GLOBAL_SCALE ) * 0.5F );
-constexpr auto NMEBUL1_TAILADDMIN = ( ( 376.0F * GLOBAL_SCALE ) * 0.5F );
-constexpr auto NMEBUL1_EXPSIZE = ( ( 8.0F * GLOBAL_SCALE ) * 0.5F );
 
 constexpr auto SPARKSIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
 
-constexpr auto SHIP_EXPLO_SIZE = ( ( 8.0F * GLOBAL_SCALE ) * 1.0F );
 
 constexpr auto NORM_EXPLO_SIZE = ( ( 16.0F * GLOBAL_SCALE ) * 1.0F );
 

@@ -12,10 +12,6 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-constexpr int FRONT_LEFT = 0;
-constexpr int FRONT_RIGHT = 1;
-constexpr int BACK_LEFT = 2;
-constexpr int BACK_RIGHT = 3;
 constexpr int MAXGUNSPERENEMY = 5;
 
 
@@ -371,7 +367,6 @@ constexpr int ENEMY_STATUS_Nothing = 0;
 constexpr int ENEMY_STATUS_Enable = 1;
 constexpr int ENEMY_STATUS_Generating = 2;
 
-constexpr int FIRSTENEMYMODEL = 0; //MODEL_BeamTurret
 constexpr int MAXENEMIES = 256;
 /* Bumped 56 -> 128 to fit Remaster N64 enemy IDs at slots 100-108
  * (Boss_Manmech .. Ghost). Slots 56-99 stay zero-initialised; nothing

@@ -9,17 +9,14 @@
 #define LT_TEAM_4		"Yellow"
 
 #define LIVES			"Lives"
-#define TEAM			"Team"
 
 // networking
 #define IS_JOINING_THE_GAME "is joining the game"		// player is joining the games
-#define THE_SESSION_HAS_BEEN_LOST_PLEASE_QUIT "The Session has been lost please quit"
 #define YOU_HAVE_BECOME_THE_HOST "You Have Become The Host"
 #define HAS_LEFT_THE_GAME "has left the game"
 #define FROM_YOUR_OWN_TEAM "from your own team"
 #define WITH_THE_BOUNTY "with the bounty"
 #define NO_POINTS_FOR_KILLING_PLAYER_WITHOUT_THE_BOUNTY "no points for killing %s without the bounty" // %s= Name of Player
-#define HIMSELF "himself"
 #define ON_HIS_OWN_TEAM "on his own team"
 #define PACKETS_PER_SECOND_SET "Packets per second set"
 #define THE_COLOUR_TEAM_HAVE_SCORED "the %s team have scored" // %s=<team name>
@@ -31,12 +28,6 @@
 #define ON_YOUR_OWN_TEAM "On Your Own Team"
 
 // Multiplayer.c
-#define YOU_NEED_TO_INSATLL_THE_DIRECT_PLAY_50A_UPDATE "You need to install DirectX 6 to use the patch\n"
-#define CONNECTION_INITIALIZATION_ERROR "Connection Initialization Error..."
-#define COULDNT_GET_SERVICE_PROVIDER_CAPS "Couldnt Get Service Provider Caps"
-#define COULDNT_OPEN_SESSION "Couldnt Open Session"
-#define COULDNT_CREATE_PLAYER "Couldnt Create Player"
-#define NO_MULTIPLAYER_LEVELS "No multiplayer levels"
 
 
 // Pickups.c
@@ -110,7 +101,6 @@
 // models.c
 // in the following text:
 // <death method>=any one of the LT_DEATHMETHOD_??? defined below
-#define AN_ENEMY_KILLED_YOU				"an enemy killed you with %s"	// %s=<death method>
 #define ENEMY_KILLED_YOU					"enemy killed you with %s"		// %s=<death method>
 #define YOU_KILLED_YOURSELF_HOW		"you killed yourself with %s"	// %s=<death method>
 #define SOMEONE_KILLED_YOU				"%s killed you with %s %s"		// %s1=<player name> %s2=<death method>, %s3=either FROM_YOUR_OWN_TEAM (see following line) or empty
@@ -183,28 +173,9 @@
 #define GET_OUT_OF_THE_KITCHEN			"get out of the kitchen...."
 
 // credits.c
-#define	GAME_COMPLETE1				"CONGRATULATIONS"
-#define	GAME_COMPLETE2				"You completed all the"
-#define	GAME_COMPLETE3				"levels."
 
-#define	COMPLETE_NOT_ALL_CRYSTALS1	"but you didn't get all the"
-#define	COMPLETE_NOT_ALL_CRYSTALS2	"crystals."
-#define COMPLETE_NOT_ALL_CRYSTALS3	"You'll have to do it all"
-#define COMPLETE_NOT_ALL_CRYSTALS4	"over again if you want"
-#define COMPLETE_NOT_ALL_CRYSTALS5	"to be properly rewarded."
 
-#define	COMPLETE_ALL_CRYSTALS1		"and collected all the"
-#define	COMPLETE_ALL_CRYSTALS2		"crystals."
-#define	COMPLETE_ALL_CRYSTALS3		"You have been awarded"
-#define	COMPLETE_ALL_CRYSTALS4		"The secret biker."
 
-#define	COMPLETE_ALLBUT1_CRYSTALS1	"you got through the"
-#define	COMPLETE_ALLBUT1_CRYSTALS2	"secret level."
-#define	COMPLETE_ALLBUT1_CRYSTALS3	"but you didn't get the"
-#define	COMPLETE_ALLBUT1_CRYSTALS4	"final crystal. Better"
-#define	COMPLETE_ALLBUT1_CRYSTALS5	"luck next time."
 
-#define	PRESS_ANY_KEY1				""
-#define	PRESS_ANY_KEY2				"Press any key"
 
 #define DEFAULT_NEWNAME "newname"

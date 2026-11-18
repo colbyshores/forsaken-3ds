@@ -43,7 +43,6 @@
 
 
 #define BALL_RADIUS	( 256 * GLOBAL_SCALE )
-constexpr int NUMBIKEDETAILS = 4;
 
 /*===================================================================
 	Globals

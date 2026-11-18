@@ -90,11 +90,6 @@ typedef struct {
 } JOYSTICKBTN;
 
 constexpr int MAX_POV_DIRECTIONS = 4;
-constexpr int POV_Centre = 0;
-constexpr int POV_Up = 1;
-constexpr int POV_Down = 2;
-constexpr int POV_Left = 4;
-constexpr int POV_Right = 8;
 
 typedef struct {
 	char *name;

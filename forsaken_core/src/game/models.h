@@ -45,7 +45,6 @@ constexpr int NUM_INTERLEVEL_MODELS = 17;
 constexpr auto ORBIT_RADIUS = ( 256 * GLOBAL_SCALE );
 constexpr int MAXMODELSPOTFX = 10;
 
-constexpr float SCAN_WINDOW_WIDTH = 20.0F;
 
 constexpr int MODFLAG_Nothing = 0;
 constexpr int MODFLAG_Clip = 1;
@@ -552,7 +551,6 @@ typedef struct MODEL{
 
 }MODEL;
 
-constexpr float NUM_FADE_FRAMES = 120.0F;
 
 typedef struct MODELNAME{
 	char		Name[128];			// Name of the Model...

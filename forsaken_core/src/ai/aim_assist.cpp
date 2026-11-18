@@ -51,7 +51,6 @@ constexpr int AA_NME_POWERLASER = 16;
  * setting (0.0 = off, 1.0 = full).
  *
  * Default is 0.0 (off) — user opts in via the 3DS Controls menu. */
-constexpr float AIM_ASSIST_CONE_HALF_DEG = 12.0F; /* 12° forward cone */
 constexpr float AIM_ASSIST_CONE_COS = 0.9781476F; /* cos(12°) */
 
 constexpr float AIM_ASSIST_TURN_RATE_DEG = 1.5F; /* deg/frame at strength=1 */

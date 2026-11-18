@@ -23,8 +23,6 @@
 constexpr int TELEPORTINACTIVE = 1;
 constexpr int TELEPORTACTIVE = 0;
 
-constexpr int TELEPORTSHIPS = 1;
-constexpr int TELEPORTENEMIES = 2;
 constexpr int MAXTELEPORTLINKS = 8;
 /*
  * Structures

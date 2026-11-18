@@ -43,13 +43,8 @@ bool input_grabbed = false;
     Some Keyboard and Mouse Globals
 ===================================================================*/
 
-constexpr int MOUSE_ZSTEP = (120);
 
-constexpr float MAX_MOUSE_DELTA_X = (40.0F);
-constexpr float MAX_MOUSE_DELTA_Y = (40.0F);
 
-constexpr auto MouseXFactor = (  1.0F / ( MAX_MOUSE_DELTA_X * MAX_MOUSE_DELTA_X ) );
-constexpr auto MouseYFactor = ( -1.0F / ( MAX_MOUSE_DELTA_Y * MAX_MOUSE_DELTA_Y ) );
 
 #define KEY_HELD( K )     ( key_state[ new_input ][ K ] )
 #define KEY_PRESSED( K )    ( !( key_state[ old_input ][ K ] ) && ( key_state[ new_input ][ K ] ) )
@@ -67,8 +62,6 @@ constexpr auto MouseYFactor = ( -1.0F / ( MAX_MOUSE_DELTA_Y * MAX_MOUSE_DELTA_Y 
 
 bool CheatsEnabled = false;
 
-constexpr int TOTAL_JOYSTICK_ACTIONS = 140; // 5 axis positions, 3 axis rotations, 4 POV hats and 128 buttons!
-constexpr int TOTAL_JOYSTICK_AXIS = 8; // 5 axis positions, 3 axis rotations
 
 int js_buttons[ INPUT_BUFFERS ][ MAX_JOYSTICKS ][ MAX_JOYSTICK_BUTTONS ];
 

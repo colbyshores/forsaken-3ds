@@ -37,9 +37,7 @@
 		Globals...	
 ===================================================================*/
 
-constexpr auto MAXPORTVERTS = (MAXPORTALSPERGROUP * MAXVERTSPERPORTAL);
 
-constexpr int MAXGROUPSVISIBLE = 16;
 
 static int GTabRowSize;
 

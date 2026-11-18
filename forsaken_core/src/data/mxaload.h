@@ -26,7 +26,6 @@
 	Defines
 ===================================================================*/
 constexpr int MAX_MXAGROUPS = 1;
-constexpr int MAX_ANIM_FRAMES = 16; //1
 #define MAXMXATEXTUREGROUPSPER 8
 constexpr int MAXTPAGESPERMXALOAD = 8;
 #ifdef __3DS__

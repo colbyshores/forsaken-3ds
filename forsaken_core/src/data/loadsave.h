@@ -11,10 +11,7 @@
 #else
 #define SAVEGAME_FOLDER			"Savegame"
 #endif
-#define SNAPSHOT_FOLDER			"ScreenShots"
-#define FMVSNAPSHOT_FOLDER		"ScreenShots"
 #define SAVEGAME_EXTENSION		".SAV"
-#define SAVEGAME_FILESPEC		"save??"
 #define SAVEGAMEPIC_EXTENSION	".PPM"
 
 constexpr int LOADSAVE_VERSION_NUMBER = 5;

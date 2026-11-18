@@ -25,26 +25,20 @@ constexpr int QUICKSTART_Start = 1;
 constexpr int QUICKSTART_Join = 2;
 constexpr int QUICKSTART_Notify = 5;
 
-#define ALLOWED_BIKETYPES	MAXBIKETYPES
 
 constexpr int MAX_LEVEL_TEXT_LENGTH = 512;
 constexpr int MAX_LEVEL_NAME_LENGTH = 128;
-constexpr int MAX_SESSION_DESC_LENGTH = 64;
 
 #define DEFAULT_PLAYER_NAME		"Player"
 
 #define DEFAULT_LEVELS			"levels.dat"
 #define SINGLEPLAYER_LEVELS		"mission.dat"
 #define MULTIPLAYER_LEVELS		"battle.dat"
-#define SPLASH_LEVELS			"splash.dat"
 
-#define DEMO_LEVELS				MULTIPLAYER_LEVELS
 
 constexpr int MAXMENULEVELS = 16;
 constexpr int MAXMENUITEMS = 128;
 constexpr int MAXLISTITEMS = 128;
-constexpr int MAXVDULINES = 64;
-constexpr int MAXVDULINELENGTH = 64;
 constexpr int MAXTEXTITEMS = 128;
 
 constexpr int ERROR_DONTUSE_MENUFUNCS = 0;
@@ -56,10 +50,6 @@ constexpr int DIFF_Norm = 1;
 constexpr int DIFF_Hard = 2;
 constexpr int DIFF_Vhard = 3;
 
-constexpr int CONTROL_Mouse = 0;
-constexpr int CONTROL_Keyboard = 1;
-constexpr int CONTROL_Joystick = 2;
-constexpr int CONTROL_Gamepad = 3;
 
 // order of this list must match GameTypeNameTable
 constexpr int MAX_GAMETYPE = 5;
@@ -80,7 +70,6 @@ constexpr int GAMECOMPLETE_WithAllCrystals = 3; // with all crystals plus secret
 constexpr int GAMECOMPLETE_WithAllCrystalsExceptLast = 4; // with all crystals except secret level crystal ( standard end game sequence )
 constexpr int GAMECOMPLETE_Cheated = 5; // got to last but one level, but with cheating
 
-constexpr float PAN_TIME = 1.0F;
 
 typedef enum
 {
@@ -192,7 +181,6 @@ enum
 
 #define	MAXTEXTMSG			512		// the number of chars in a message you can send.....
 //	Strucures
-constexpr int TEXTFLAG_Nothing = 0;
 constexpr int TEXTFLAG_CentreX = 1; // centre text along x axis of bounding box
 constexpr int TEXTFLAG_CentreY = 2; // centre text along y axis of bounding box
 constexpr int TEXTFLAG_BottomY = 4; // justify text to bottom of box
@@ -200,7 +188,6 @@ constexpr int TEXTFLAG_Instant = 8; // text is displayed instantly
 constexpr int TEXTFLAG_RightX = 16; // right justify
 constexpr int TEXTFLAG_NotImplemented = 32; // display text dimmed (only works with screenpoly text, ie. 3dfx)
 constexpr int TEXTFLAG_AutoSelect = 64; // automatically select this menu item if highlighted
-constexpr int TEXTFLAG_RefreshList = 128; // not currently used (all lists are continually refreshed)
 constexpr int TEXTFLAG_ForceFit = 256; // do not wrap text, truncate with ... if neccesary
 constexpr int TEXTFLAG_SuppressHighlight = 512; // prevent highlight box from appearing around text
 constexpr int TEXTFLAG_Unselectable = 1024; // do not allow this item to be selected
@@ -212,8 +199,6 @@ constexpr int TEXTFLAG_Pulse = 16384; // pulse text on and off
 constexpr int TEXTFLAG_TeamItem = 32768; // team select item
 
 constexpr int MAXNUMLINES = 64;
-constexpr int MAXCHARSPERLINE = 128;
-constexpr int MAXNUMOFVDUPOLYS = 512;
 constexpr int MAXPOINTERS = 8;
 
 constexpr int MAX_TEXT_LENGTH = 64;
@@ -290,11 +275,7 @@ enum
 	EXTERNALLY_TRIGGERED,
 };
 
-#define EVENT_DONE			true
-#define	EVENT_NOT_DONE		false
 
-#define EVENT_ACTIVE		true
-#define EVENT_NOT_ACTIVE	false
 
 constexpr int MAXTITLEEVENTS = 128;
 constexpr int MAXTITLETIMERS = 32;

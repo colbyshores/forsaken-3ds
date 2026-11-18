@@ -46,15 +46,6 @@ constexpr int ONEOFFANIM_WaitForDelay = 0;
 constexpr int ONEOFFANIM_WaitForTrigger = 1;
 constexpr int ONEOFFANIM_Animating = 2;
 
-constexpr int DOORSFXTYPE_Generic = 0;
-constexpr int DOORSFXTYPE_Stone = 1;
-constexpr int DOORSFXTYPE_ForceField = 2;
-constexpr int DOORSFXTYPE_Lift = 3;
-constexpr int DOORSFXTYPE_Smoke = 4;
-constexpr int DOORSFXTYPE_Electric1 = 5;
-constexpr int DOORSFXTYPE_Electric2 = 6;
-constexpr int DOORSFXTYPE_Electric3 = 7;
-constexpr int DOORSFXTYPE_Electric4 = 8;
 
 /*===================================================================
 	Structures

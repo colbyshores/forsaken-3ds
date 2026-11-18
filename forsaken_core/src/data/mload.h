@@ -20,7 +20,6 @@
 /*
  * defines
  */
-constexpr float CELLSIZE = ( 256.0F );
 #define	BLOCKSIZE		( 1024.0F * GLOBAL_SCALE )
 
 constexpr int MAXTPAGESPERMLOAD = 8;
@@ -29,13 +28,11 @@ constexpr int MAXPORTALSPERGROUP = 64;
 constexpr int MAXVERTSPERPORTAL = 32;
 constexpr int MAXPOLYSPERPORTAL = 32;
 constexpr int MAXVERTSPERPORTALPOLY = 4;
-constexpr int MAXGROUPSVISIBLEPERPORTAL = 64;
 #define MAXSTARTPOSITIONS	MAXGROUPS
 constexpr auto HASTRANSPARENCIES = 0x001;
 constexpr auto HASENVIROMENTMAP = 0x002;
 
 
-constexpr int MAXPOLYANIMSPEREXECBUF = 64;
 constexpr int MAXANIMSEQS = 128;
 constexpr int MAXANIMLOOPSTACK = 8;
 constexpr int TEXTUREANIM_Stop = 0;
