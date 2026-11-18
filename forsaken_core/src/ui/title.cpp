@@ -1034,21 +1034,6 @@ MENU	MENU_NEW_ValidPickups = {
 	}
 };
 
-/*
-MENU	MENU_NEW_MoreMultiplayerOptions = {
-	"", NULL, NULL, NULL, TITLE_TIMER_PanToLeftVDU,
-	{
-		{  0,   0, 200,  20, 0,				"Other options",													FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY,		NULL,						NULL,					NULL,						DrawFlatMenuItem,		NULL, 0 } ,
-
-		{ 10,  86, 100,  93, 0,				(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions7  /* "bike exhausts"          , FONT_Small,  TEXTFLAG_CentreY,							&BikeExhausts,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
-		{ 10,  93, 100, 100, 0,				(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions8  /* "bright bikes"           , FONT_Small,  TEXTFLAG_CentreY,							&MyBrightShips,				NULL,					SelectFlatMenuToggle,		DrawFlatMenuToggle,		NULL, 0 } ,
-		
-		{  10, 116,  85, 116, 0,			(u_int8_t*)LT_MENU_NEW_MoreMultiplayerOptions14/*"demo"        , FONT_Small,		TEXTFLAG_CentreY,													&RecordDemo,						NULL,								SelectFlatMenuToggle,	DrawFlatMenuToggle,		NULL, 0 } ,
-
-		{ -1, -1, 0, 0, 0, (u_int8_t*)"", 0, 0,  NULL, NULL, NULL, NULL, NULL, 0 }
-	}
-};
-*/
 
 void GameTypeRefresh( int * i )
 {

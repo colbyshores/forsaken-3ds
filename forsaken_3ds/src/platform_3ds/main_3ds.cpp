@@ -23,13 +23,6 @@
 
 
 /* ---- 3DS heap configuration ---- */
-/* [3DS] Heap reduced from 80 MB to 64 MB to avoid OOM during level transitions.
- *
- * The level-load path allocates two full copies of MODELHEADERS[512] and
- * MXAMODELHEADERS[512] simultaneously (old level still resident while the new
- * level is loading), plus texture upload staging buffers.  At 80 MB the
- * combined allocation exceeded available RAM on some levels.
- *
 /* Heap sizing — runtime-detected via __system_allocateHeaps override.
  *
  * The shipping unified CIA (assets/forsaken.rsf) requests SystemModeExt

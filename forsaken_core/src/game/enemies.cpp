@@ -6567,9 +6567,9 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 			Enemy->TShip = NULL;
 		}
 	}
-/*===================================================================����
+/*===================================================================
 			Set the Banking Matrix
-/*===================================================================����*/
+===================================================================*/
 	StepQuat.MakeEuler(0.0F, 0.0F, Object->Bank);
 	Object->Quat.Multiply(&StepQuat, &Object->FinalQuat);
 	Object->FinalQuat.ToMatrix(&Object->FinalMat);

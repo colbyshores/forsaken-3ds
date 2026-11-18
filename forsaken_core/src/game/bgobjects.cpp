@@ -1161,14 +1161,14 @@ bool PreLoadBGOFiles( void )
 
 				switch( FilePtr->Type )
 				{
-/*���������	STATIC ANIM �������������������������������������������*/
+/*	STATIC ANIM */
 
 					case BGOTYPE_Static:
 						FilePtr->open_event = -1;
 						FilePtr->CloseEvent = -1;
 						break;
 
-/*���������	DOOR ��������������������������������������������������*/
+/*	DOOR */
 
 					case BGOTYPE_Door:
 						fread( &FilePtr->open_event, sizeof( int16_t ), 1, fp );
@@ -1182,7 +1182,7 @@ bool PreLoadBGOFiles( void )
 						RequestDoorTypeSFX( FilePtr->DoorSfxType );
 						break;
 
-/*���������	LOOPING ANIM ������������������������������������������*/
+/*	LOOPING ANIM */
 
 					case BGOTYPE_Looping_Anim:
 						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
@@ -1192,7 +1192,7 @@ bool PreLoadBGOFiles( void )
 						fread( &FilePtr->Delay, sizeof( float ), 1, fp );
 						break;
 
-/*���������	ONEOFF ANIM �������������������������������������������*/
+/*	ONEOFF ANIM */
 
 					case BGOTYPE_OneOff_Anim:
 						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
@@ -1203,7 +1203,7 @@ bool PreLoadBGOFiles( void )
 						fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
 						break;
 
-/*���������	MULTISTEP ANIM ����������������������������������������*/
+/*	MULTISTEP ANIM */
 
 					case BGOTYPE_MultipleStep_Anim:
 						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
@@ -1215,12 +1215,12 @@ bool PreLoadBGOFiles( void )
 						fread( &FilePtr->DamagePerInterval, sizeof( float ), 1, fp );
 						break;
 
-/*���������	SEQUENCES ANIM ����������������������������������������*/
+/*	SEQUENCES ANIM */
 
 					case BGOTYPE_Sequences:
 						break;
 
-/*���������	UNKNOWN ANIM ������������������������������������������*/
+/*	UNKNOWN ANIM */
 
 					default:
 						break;
@@ -1394,7 +1394,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 
 		switch( Type )
 		{
-/*���������	STATIC ANIM �������������������������������������������*/
+/*	STATIC ANIM */
 
 			case BGOTYPE_Static:
 				Object->OpenTrigMod = -1;
@@ -1409,7 +1409,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->EndTrigModPtr = NULL;
 				break;
 
-/*���������	DOOR ��������������������������������������������������*/
+/*	DOOR */
 
 			case BGOTYPE_Door:
 				Object->OpenTrigMod = OpenTrigMod;
@@ -1432,7 +1432,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->DoorSfxType = DoorSfxType;
 				break;
 	
-/*���������	LOOPING ANIM ������������������������������������������*/
+/*	LOOPING ANIM */
 
 			case BGOTYPE_Looping_Anim:
 				Object->OpenTrigMod = -1;
@@ -1465,7 +1465,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				}
 				break;
 
-/*���������	ONEOFF ANIM �������������������������������������������*/
+/*	ONEOFF ANIM */
 
 			case BGOTYPE_OneOff_Anim:
 				Object->OpenTrigMod = -1;
@@ -1499,7 +1499,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				}
 				break;
 
-/*���������	MULTISTEP ANIM ����������������������������������������*/
+/*	MULTISTEP ANIM */
 
 			case BGOTYPE_MultipleStep_Anim:
 				Object->OpenTrigMod = -1;
@@ -1519,12 +1519,12 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->OpenedBy = OpenedBy;
 				break;
 
-/*���������	SEQUENCES ANIM ����������������������������������������*/
+/*	SEQUENCES ANIM */
 
 			case BGOTYPE_Sequences:
 				break;
 
-/*���������	UNKNOWN ANIM ������������������������������������������*/
+/*	UNKNOWN ANIM */
 
 			default:
 				break;
@@ -1719,17 +1719,17 @@ void StartBGOAnim( u_int16_t Index )
 
 	switch( Object->Type )
 	{
-/*���������	STATIC ANIM �������������������������������������������*/
+/*	STATIC ANIM */
 
 		case BGOTYPE_Static:
 			break;
 
-/*���������	DOOR ��������������������������������������������������*/
+/*	DOOR */
 
 		case BGOTYPE_Door:
 			break;
 
-/*���������	LOOPING ANIM ������������������������������������������*/
+/*	LOOPING ANIM */
 
 		case BGOTYPE_Looping_Anim:
 			switch( Object->State )
@@ -1757,7 +1757,7 @@ void StartBGOAnim( u_int16_t Index )
 			}
 			break;
 
-/*���������	ONEOFF ANIM �������������������������������������������*/
+/*	ONEOFF ANIM */
 
 		case BGOTYPE_OneOff_Anim:
 			switch( Object->State )
@@ -1787,17 +1787,17 @@ void StartBGOAnim( u_int16_t Index )
 			}
 			break;
 
-/*���������	MULTISTEP ANIM ����������������������������������������*/
+/*	MULTISTEP ANIM */
 
 		case BGOTYPE_MultipleStep_Anim:
 			break;
 
-/*���������	SEQUENCES ANIM ����������������������������������������*/
+/*	SEQUENCES ANIM */
 
 		case BGOTYPE_Sequences:
 			break;
 
-/*���������	UNKNOWN ANIM ������������������������������������������*/
+/*	UNKNOWN ANIM */
 
 		default:
 			break;

@@ -806,7 +806,6 @@ bool CollectPickup( u_int16_t i )
 	{
 		switch( Pickups[i].Type )
 		{
-/*�����������������������������������������������������������������*/
 			case PICKUP_Trojax: 
 				if( !PrimaryWeaponsGot[ TROJAX ] )
 				{
@@ -823,7 +822,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Pyrolite:
 
 				if( !PrimaryWeaponsGot[ PYROLITE_RIFLE ] )
@@ -850,7 +848,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Transpulse:
 
 				if( !PrimaryWeaponsGot[ TRANSPULSE_CANNON ] )
@@ -869,7 +866,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SussGun:
 				if( !PrimaryWeaponsGot[ SUSS_GUN ] )
 				{
@@ -894,7 +890,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Laser:
 
 				if( !PrimaryWeaponsGot[ LASER ] )
@@ -912,11 +907,9 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Mug:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Mugs:
 				if( SecondaryAmmo[ MUGMISSILE ] < 10 )
 				{
@@ -938,11 +931,9 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Heatseaker:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_HeatseakerPickup:
 				if( SecondaryAmmo[ SOLARISMISSILE ] < 10 )
 				{
@@ -964,7 +955,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Thief:
 
 				if( !SecondaryAmmo[ THIEFMISSILE ] )
@@ -981,7 +971,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Scatter:
 
 				if( SecondaryAmmo[ SCATTERMISSILE ] < 3 )
@@ -999,7 +988,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Gravgon:
 				if( !SecondaryAmmo[ GRAVGONMISSILE ] )
 				{
@@ -1015,7 +1003,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Launcher:
 				if( SecondaryAmmo[ MULTIPLEMISSILE ] < 100 )
 				{
@@ -1037,7 +1024,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_TitanStar:
 				if( SecondaryAmmo[ TITANSTARMISSILE ] < 3 )
 				{
@@ -1054,7 +1040,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PurgePickup:
 				if( SecondaryAmmo[ PURGEMINE ] < 10 )
 				{
@@ -1076,7 +1061,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PinePickup:
 
 				if( SecondaryAmmo[ PINEMINE ] < 6 )
@@ -1100,7 +1084,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_QuantumPickup:
 
 				if( !SecondaryAmmo[ QUANTUMMINE ] )
@@ -1118,7 +1101,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SpiderPod:
 
 				if( SecondaryAmmo[ SPIDERMINE ] < 6 )
@@ -1141,19 +1123,16 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Parasite:
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Flare:
 
 				MessageSFX = SFX_BIKECOMP_FL;
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_GeneralAmmo:
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 				{
@@ -1185,7 +1164,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PyroliteAmmo:
 
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
@@ -1219,7 +1197,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SussGunAmmo:
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 				{
@@ -1251,7 +1228,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PowerPod:
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 				{
@@ -1301,7 +1277,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_GoldenPowerPod:
 
 				if( !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
@@ -1318,7 +1293,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Shield:
 				if( Ships[ WhoIAm ].Object.Shield != MAX_SHIELD )
 				{
@@ -1337,7 +1311,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Inv:
 
 				if( !Ships[ WhoIAm ].Invul )
@@ -1356,25 +1329,21 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_ExtraLife:
 				Lives += 1;
 				MessageSFX = SFX_ResnicReanimator;
 				PlaySfx( SFX_ExtraLife, 1.0F );
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Computer:
 
 				TargetComputerOn = true;
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Smoke:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Nitro:
 
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
@@ -1420,11 +1389,9 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Goggles:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Gold:
 				NumGoldBars ++;
 				if( !( NumGoldBars % 10 ) )
@@ -1443,7 +1410,6 @@ bool CollectPickup( u_int16_t i )
 				ShowTextAnyway = true;
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Mantle:
 
 				if( !( Ships[ WhoIAm ].Object.Flags & SHIP_Stealth ) )
@@ -1462,7 +1428,6 @@ bool CollectPickup( u_int16_t i )
 
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Crystal:
 				CrystalsFound += 1;
 				if( CrystalsFound == 1 )
@@ -1478,7 +1443,6 @@ bool CollectPickup( u_int16_t i )
 				ShowTextAnyway = true;
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_DNA:
 
 				MessageSFX = SFX_PickupGeneral;
@@ -1486,7 +1450,6 @@ bool CollectPickup( u_int16_t i )
 				ShowTextAnyway = true;
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SkeletonKey:
 
 				MessageSFX = SFX_PickupGeneral;
@@ -1494,7 +1457,6 @@ bool CollectPickup( u_int16_t i )
 				ShowTextAnyway = true;
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Bomb:
 
 				MessageSFX = SFX_PickupGeneral;
@@ -1502,7 +1464,6 @@ bool CollectPickup( u_int16_t i )
 				ShowTextAnyway = true;
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_GoldFigure:
 
 				MessageSFX = SFX_PickupGeneral;
@@ -1510,7 +1471,6 @@ bool CollectPickup( u_int16_t i )
 				ShowTextAnyway = true;
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Flag:
 				if ( CaptureTheFlag )
 				{
@@ -1525,7 +1485,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Bounty:
 				if ( BountyHunt )
 				{
@@ -1539,7 +1498,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Flag1:
 			case PICKUP_Flag2:
 			case PICKUP_Flag3:
@@ -1608,7 +1566,6 @@ bool CollectPickup( u_int16_t i )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Orb:
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 				{
@@ -1642,7 +1599,6 @@ bool CollectPickup( u_int16_t i )
 					}
 				}
 				break;		 
-/*�����������������������������������������������������������������*/
 		}
 
 		if( PickupEnable || no_collision )
@@ -1727,11 +1683,11 @@ void NewPrimaryWeapon( int16_t Weapon )
 	}
 }
 
-/*===================================================================����
+/*===================================================================
 	Procedure	:	Ship to Pickups collision
 	Input		:	Nothing
 	Output		:	All registers reserved
-/*===================================================================���*/
+===================================================================*/
 void CheckPickup( void )
 {
 	float		Length;
@@ -4911,7 +4867,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 	{
 		switch( Pickups[i].Type )
 		{
-/*�����������������������������������������������������������������*/
 			case PICKUP_Trojax: 
 				if( !Host_PrimaryWeaponsGot[ Player ][ TROJAX ] )
 				{
@@ -4920,7 +4875,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Pyrolite:
 				if( !Host_PrimaryWeaponsGot[ Player ][ PYROLITE_RIFLE ] )
 				{
@@ -4938,7 +4892,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Transpulse:
 				if( !Host_PrimaryWeaponsGot[ Player ][ TRANSPULSE_CANNON ] )
 				{
@@ -4947,7 +4900,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SussGun:
 				if( !Host_PrimaryWeaponsGot[ Player ][ SUSS_GUN ] )
 				{
@@ -4966,7 +4918,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Laser:
 				if( !Host_PrimaryWeaponsGot[ Player ][ LASER ] )
 				{
@@ -4975,11 +4926,9 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Mug:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Mugs:
 				if( Host_SecondaryAmmo[ Player ][ MUGMISSILE ] < 10 )
 				{
@@ -4997,11 +4946,9 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Heatseaker:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_HeatseakerPickup:
 				if( Host_SecondaryAmmo[ Player ][ SOLARISMISSILE ] < 10 )
 				{
@@ -5019,7 +4966,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Thief:
 				if( !Host_SecondaryAmmo[ Player ][ THIEFMISSILE ] )
 				{
@@ -5029,7 +4975,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Scatter:
 				if( Host_SecondaryAmmo[ Player ][ SCATTERMISSILE ] < 3 )
 				{
@@ -5039,7 +4984,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Gravgon:
 				if( !Host_SecondaryAmmo[ Player ][ GRAVGONMISSILE ] )
 				{
@@ -5049,7 +4993,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Launcher:
 				if( Host_SecondaryAmmo[ Player ][ MULTIPLEMISSILE ] < 100 )
 				{
@@ -5065,7 +5008,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_TitanStar:
 				if( Host_SecondaryAmmo[ Player ][ TITANSTARMISSILE ] < 3 )
 				{
@@ -5075,7 +5017,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PurgePickup:
 				if( Host_SecondaryAmmo[ Player ][ PURGEMINE ] < 10 )
 				{
@@ -5091,7 +5032,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PinePickup:
 				if( Host_SecondaryAmmo[ Player ][ PINEMINE ] < 6 )
 				{
@@ -5107,7 +5047,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_QuantumPickup:
 				if( !Host_SecondaryAmmo[ Player ][ QUANTUMMINE ] )
 				{
@@ -5117,7 +5056,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SpiderPod:
 				if( Host_SecondaryAmmo[ Player ][ SPIDERMINE ] < 6 )
 				{
@@ -5134,15 +5072,12 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Parasite:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Flare:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_GeneralAmmo:
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
@@ -5162,7 +5097,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PyroliteAmmo:
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
@@ -5182,7 +5116,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SussGunAmmo:
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
@@ -5202,7 +5135,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_PowerPod:
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
@@ -5222,7 +5154,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_GoldenPowerPod:
 				if( Ships[ Player ].SuperNashramTimer == 0.0F )
 				{
@@ -5231,12 +5162,10 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Shield:
 				PickupEnable = true;
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Inv:
 				if( Ships[ Player ].InvulTimer == 0.0F )
 				{
@@ -5246,19 +5175,15 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_ExtraLife:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Computer:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Smoke:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Nitro:
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
@@ -5290,15 +5215,12 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Goggles:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Gold:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Mantle:
 				if( Ships[ Player ].StealthTime == 0.0F )
 				{
@@ -5307,27 +5229,21 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Crystal:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_DNA:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_SkeletonKey:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Bomb:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_GoldFigure:
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Flag:
 				if( CaptureTheFlag )
 				{
@@ -5336,7 +5252,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Bounty:
 				if ( BountyHunt )
 				{
@@ -5345,7 +5260,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Flag1:
 			case PICKUP_Flag2:
 			case PICKUP_Flag3:
@@ -5415,7 +5329,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;
 
-/*�����������������������������������������������������������������*/
 			case PICKUP_Orb:
 				if( Ships[ Player ].SuperNashramTimer != 0.0F )
 				{
@@ -5437,7 +5350,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 				}
 				break;		 
 
-/*�����������������������������������������������������������������*/
 		}
 
 		if( PickupEnable )
@@ -5463,15 +5375,11 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 	}
 }
 
-/*===================================================================����
-	Procedure	:	Ships to Pickups collision
-	Input		:	Nothing
-	Output		:	All registers reserved
-/*===================================================================����
+/*===================================================================
 	Procedure	:	Correct for Extra or Missing Pickups
 	Input		:	Nothing
 	Output		:	Nothing
-/*===================================================================���*/
+===================================================================*/
 int16_t SecondaryFromPickupTab[ MAXSECONDARYWEAPONS * 2 ] = {
 
 	PICKUP_Mugs,				3,

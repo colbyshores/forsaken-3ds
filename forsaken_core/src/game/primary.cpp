@@ -1777,14 +1777,12 @@ void ProcessPrimaryBullets( void )
 				PrimBulls[i].ColDist = (float) fabsf( DistanceVert2Vector( (VERT*) &PrimBulls[i].ColPoint, &PrimBulls[i].Pos ) );
 			}
 
-/*�����������������������������������������������������������������*/
 			DistFromStart = (float) fabsf( DistanceVert2Vector( (VERT*) &NewPos, &PrimBulls[i].ColStart ) );
 
 			HitWall = (u_int16_t) -1;
 			DistToInt = 100000.0F;									/* Distance to Intersection */
 
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-/*�����������������������������������������������������������������*/
 			if( PrimBulls[i].ColDist < DistFromStart )
 		   	{
 				HitWall = 0;
@@ -1828,7 +1826,6 @@ void ProcessPrimaryBullets( void )
 				}
 			}
 
-/*�����������������������������������������������������������������*/
 			Damage = (int16_t) PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
 
 			if ( WaterObjectCollide( PrimBulls[i].GroupImIn,&PrimBulls[i].Pos, &MoveOffsetVector, &Int_Point , Damage) )
@@ -1836,11 +1833,9 @@ void ProcessPrimaryBullets( void )
 				CreateSplash( (VECTOR *) &Int_Point, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn );
 			}
 			
-/*�����������������������������������������������������������������*/
 			HitTarget = CheckHitShip( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &Int_Point, &Int_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitTarget != (u_int16_t) -1 ) HitWall = (u_int16_t) -1;
 
-/*�����������������������������������������������������������������*/
 			HitSecondary = CheckHitSecondary( &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &MInt_Point, &MInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitSecondary != (u_int16_t) -1 )
 			{
@@ -1848,7 +1843,6 @@ void ProcessPrimaryBullets( void )
 				HitTarget = (u_int16_t) -1;
 			}
 
-/*�����������������������������������������������������������������*/
 			HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
 			if( HitEnemy != NULL )
 			{

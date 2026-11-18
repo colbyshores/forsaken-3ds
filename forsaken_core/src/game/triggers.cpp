@@ -1194,7 +1194,6 @@ bool Triggerload( char * Filename )
 			TVpnt++;
 		}
 	}
-/*�����������������������������������������������������������������*/
 
 	for( i = 0 ; i < NumOfTrigModQues ; i++ )
 	{
