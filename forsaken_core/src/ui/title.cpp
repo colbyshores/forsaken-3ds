@@ -8315,7 +8315,7 @@ void SetDiscStatus(MENU *menu)
 ===================================================================*/
 bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclude )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -8348,7 +8348,7 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 				continue;
 
 
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
@@ -8383,8 +8383,8 @@ bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclud
 				if( !Colour ) 
 					return false;
 				
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
 
 				VertPtr++;
 			}
@@ -8475,7 +8475,7 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 
 bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int VertexNo, float tr, float tg, float tb, float ta )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	MXLOADHEADER	*		DstMloadheader;
 	LVERTEX			*VertPtr;
 	COLOR				Colour;
@@ -8484,7 +8484,7 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int Ver
 
 	DstMloadheader = &ModelHeaders[ Model ];
 
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 	{
 		return false;
 	}
@@ -8505,7 +8505,7 @@ bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int Ver
 	if( !Colour ) 
 		return false;
 			
-	DstlpD3DLVERTEX[VertexNo].color = Colour;
+	DstVerts[VertexNo].color = Colour;
 
 	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
 	{

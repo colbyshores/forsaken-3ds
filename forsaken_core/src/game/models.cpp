@@ -2627,7 +2627,7 @@ void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 ===================================================================*/
 bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -2655,7 +2655,7 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
@@ -2664,8 +2664,8 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 
 			while( Vert-- )
 			{
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -2689,7 +2689,7 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 ===================================================================*/
 bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -2718,7 +2718,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
@@ -2728,14 +2728,14 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 
 			while( Vert-- )
 			{
-				DestRGBA = (COLOR_RGBA *) &DstlpD3DLVERTEX->color;
+				DestRGBA = (COLOR_RGBA *) &DstVerts->color;
 
 				DestRGBA->r = (u_int8_t) ( ( (u_int16_t) (RGBA_GETRED(VertPtr->color) * Red) ) >> 8 );
 				DestRGBA->g = (u_int8_t) ( ( (u_int16_t) (RGBA_GETGREEN(VertPtr->color) * Green) ) >> 8 );
 				DestRGBA->b = (u_int8_t) ( ( (u_int16_t) (RGBA_GETBLUE(VertPtr->color) * Blue) ) >> 8 );
 
 				VertPtr++;
-				DstlpD3DLVERTEX++;
+				DstVerts++;
 				
 			}
 
@@ -2753,7 +2753,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 ===================================================================*/
 bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	COLOR				Colour;
 	float					Col2;
 	u_int8_t					Col;
@@ -2774,15 +2774,15 @@ bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale
 
 		Colour = RGBA_MAKE( Red, Green, Blue, 255 );
 
-	if (!(FSLockVertexBuffer(renderObject, &DstlpD3DLVERTEX)))
+	if (!(FSLockVertexBuffer(renderObject, &DstVerts)))
 	{
 		return false;
 	}
 	
 	while( NumVerts-- )
 	{
-		DstlpD3DLVERTEX->color = Colour;
-		DstlpD3DLVERTEX++;
+		DstVerts->color = Colour;
+		DstVerts++;
 	}
 
 	if (!(FSUnlockVertexBuffer(renderObject)))
@@ -2804,20 +2804,20 @@ bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale
 ===================================================================*/
 bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u_int8_t R, u_int8_t G, u_int8_t B )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	COLOR				Colour;
 
 		Colour = RGBA_MAKE( R, G, B, 255 );
 
-	if (!(FSLockVertexBuffer(renderObject, &DstlpD3DLVERTEX)))
+	if (!(FSLockVertexBuffer(renderObject, &DstVerts)))
 	{
 		return false;
 	}
 
 	while( NumVerts-- )
 	{
-		DstlpD3DLVERTEX->color = Colour;
-		DstlpD3DLVERTEX++;
+		DstVerts->color = Colour;
+		DstVerts++;
 	}
 
 	if (!(FSUnlockVertexBuffer(renderObject)))
@@ -2837,7 +2837,7 @@ bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u
 ===================================================================*/
 bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -2853,7 +2853,7 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
@@ -2862,8 +2862,8 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 
 			while( Vert-- )
 			{
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -2934,8 +2934,8 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 ===================================================================*/
 bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
-	LVERTEX			*SrclpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*SrcVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -2968,17 +2968,17 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
 
-			SrclpD3DLVERTEX = DstMloadheader->Group[ Group ].originalVerts[ExecBuf];
+			SrcVerts = DstMloadheader->Group[ Group ].originalVerts[ExecBuf];
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
 			while( Vert-- )
 			{
-				Colour = SrclpD3DLVERTEX->color;
+				Colour = SrcVerts->color;
 				tempiA = Colour & 0xff000000;
 				// for subtraction, simply add the negative
 				carry = ( ( Colour + col_inc ) ^ ( Colour ^ col_inc ) ) & 0x01010100;
@@ -2989,9 +2989,9 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 				clamp = carry - ( carry >> 8 );
 				Colour = ( Colour & clamp ) & 0x00ffffff;
 				Colour |= tempiA;
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
-				SrclpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
+				SrcVerts++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -3010,8 +3010,8 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 ===================================================================*/
 bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
-	LVERTEX			*SrclpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*SrcVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -3045,18 +3045,18 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
 
-			SrclpD3DLVERTEX = DstMloadheader->Group[ Group ].originalVerts[ExecBuf];
+			SrcVerts = DstMloadheader->Group[ Group ].originalVerts[ExecBuf];
 
 			Vert = DstMloadheader->Group[ Group ].num_verts_per_execbuf[ ExecBuf ];
 
 			while( Vert-- )
 			{
-				Colour = SrclpD3DLVERTEX->color;
+				Colour = SrcVerts->color;
 				tempiA = Colour & 0xff000000;
 				// for subtraction, simply add the negative
 				carry = ( ( Colour + col_inc ) ^ ( Colour ^ col_inc ) ) & 0x01010100;
@@ -3067,9 +3067,9 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 				clamp = carry - ( carry >> 8 );
 				Colour = ( Colour & clamp ) & 0x00ffffff;
 				Colour |= tempiA;
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
-				SrclpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
+				SrcVerts++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -3091,7 +3091,7 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 ===================================================================*/
 bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -3106,7 +3106,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
@@ -3115,7 +3115,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 
 			while( Vert-- )
 			{
-				ApplyMatrix( Matrix, (VECTOR*) DstlpD3DLVERTEX, &TempPoint );
+				ApplyMatrix( Matrix, (VECTOR*) DstVerts, &TempPoint );
 				TempPoint.z += ZTrans;
 				if( TempPoint.z > Range )
 				{
@@ -3137,8 +3137,8 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 
 				Colour = RGBA_MAKE( (u_int8_t) RF, (u_int8_t) GF, (u_int8_t) BF, (u_int8_t) TF );
 
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -3160,7 +3160,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 bool LightModel( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3211,7 +3211,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
 
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
@@ -3220,8 +3220,8 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 
 			while( Vert-- )
 			{
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -3243,7 +3243,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 bool LightModel2( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3294,7 +3294,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 		{
 
-			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+			if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 			{
 				return false;
 			}
@@ -3303,8 +3303,8 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 
 			while( Vert-- )
 			{
-				DstlpD3DLVERTEX->color = Colour;
-				DstlpD3DLVERTEX++;
+				DstVerts->color = Colour;
+				DstVerts++;
 			}
 
 			if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -3330,7 +3330,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3378,7 +3378,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{
 
-				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 				{
 					return false;
 				}
@@ -3387,8 +3387,8 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 	
 				while( Vert-- )
 				{
-					DstlpD3DLVERTEX->color = Colour;
-					DstlpD3DLVERTEX++;
+					DstVerts->color = Colour;
+					DstVerts++;
 				}
 	
 				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -3415,7 +3415,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3463,7 +3463,7 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 		{
 			for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
 			{
-				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+				if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 				{
 					return false;
 				}
@@ -3472,8 +3472,8 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 	
 				while( Vert-- )
 				{
-					DstlpD3DLVERTEX->color = Colour;
-					DstlpD3DLVERTEX++;
+					DstVerts->color = Colour;
+					DstVerts++;
 				}
 	
 				if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -4395,7 +4395,7 @@ u_int16_t CreateLine( float x1, float y1, float z1, float x2, float y2, float z2
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -4404,16 +4404,16 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 	Group = 0;
 	ExecBuf = 0;
 
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 	{
 		return false;
 	}
 
 	for( Count = 0; Count < 8; Count++ )
 	{
-		TempVert.x = DstlpD3DLVERTEX->x;
-		TempVert.y = DstlpD3DLVERTEX->y;
-		TempVert.z = DstlpD3DLVERTEX->z;
+		TempVert.x = DstVerts->x;
+		TempVert.y = DstVerts->y;
+		TempVert.z = DstVerts->z;
 		ApplyMatrix( Matrix, &TempVert, &TempVert );
 		TempVert.x += Pos->x;
 		TempVert.y += Pos->y;
@@ -4439,7 +4439,7 @@ bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * 
 			if( TempVert.z > BottomRight->z ) BottomRight->z = TempVert.z;
 		}
 
-		DstlpD3DLVERTEX++;
+		DstVerts++;
 	}
 
 	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -4472,7 +4472,7 @@ char *GetName(int Player)
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					    VECTOR * BottomRight )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -4480,16 +4480,16 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 
 	Group = 0;
 	ExecBuf = 0;
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 	{
 		return false;
 	}
 
 	for( Count = 0; Count < 8; Count++ )
 	{
-		TempVert.x = DstlpD3DLVERTEX->x;
-		TempVert.y = DstlpD3DLVERTEX->y;
-		TempVert.z = DstlpD3DLVERTEX->z;
+		TempVert.x = DstVerts->x;
+		TempVert.y = DstVerts->y;
+		TempVert.z = DstVerts->z;
 		ApplyMatrix( Matrix, &TempVert, &TempVert );
 		TempVert.x += Pos->x;
 		TempVert.y += Pos->y;
@@ -4515,7 +4515,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 			if( TempVert.z > BottomRight->z ) BottomRight->z = TempVert.z;
 		}
 
-		DstlpD3DLVERTEX++;
+		DstVerts++;
 	}
 
 	if (!(FSUnlockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf])))
@@ -4537,7 +4537,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 ===================================================================*/
 bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -4556,22 +4556,22 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 
 	Group = 0;
 	ExecBuf = 0;
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 	{
 		return false;
 	}
 
 	for( Count = 0; Count < 8; Count++ )
 	{
-		Verts[ Count ].x = DstlpD3DLVERTEX->x;
-		Verts[ Count ].y = DstlpD3DLVERTEX->y;
-		Verts[ Count ].z = DstlpD3DLVERTEX->z;
+		Verts[ Count ].x = DstVerts->x;
+		Verts[ Count ].y = DstVerts->y;
+		Verts[ Count ].z = DstVerts->z;
 		ApplyMatrix( Matrix, &Verts[ Count ], &Verts[ Count ] );
 		Verts[ Count ].x += Pos->x;
 		Verts[ Count ].y += Pos->y;
 		Verts[ Count ].z += Pos->z;
 
-		DstlpD3DLVERTEX++;
+		DstVerts++;
 	}
 
 	LineArray[ 0 ] = CreateLine( Verts[ 0 ].x, Verts[ 0 ].y, Verts[ 0 ].z, Verts[ 1 ].x, Verts[ 1 ].y, Verts[ 1 ].z, Group2 );
@@ -4607,7 +4607,7 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 ===================================================================*/
 bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstVerts = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -4626,22 +4626,22 @@ bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECT
 
 	Group = 0;
 	ExecBuf = 0;
-	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstlpD3DLVERTEX)))
+	if (!(FSLockVertexBuffer(&DstMloadheader->Group[ Group ].renderObject[ExecBuf], &DstVerts)))
 	{
 		return false;
 	}
 
 	for( Count = 0; Count < 8; Count++ )
 	{
-		Verts[ Count ].x = DstlpD3DLVERTEX->x;
-		Verts[ Count ].y = DstlpD3DLVERTEX->y;
-		Verts[ Count ].z = DstlpD3DLVERTEX->z;
+		Verts[ Count ].x = DstVerts->x;
+		Verts[ Count ].y = DstVerts->y;
+		Verts[ Count ].z = DstVerts->z;
 		ApplyMatrix( Matrix, &Verts[ Count ], &Verts[ Count ] );
 		Verts[ Count ].x += Pos->x;
 		Verts[ Count ].y += Pos->y;
 		Verts[ Count ].z += Pos->z;
 
-		DstlpD3DLVERTEX++;
+		DstVerts++;
 	}
 
 	LineArray[ 0 ] = CreateLine( Verts[ 0 ].x, Verts[ 0 ].y, Verts[ 0 ].z, Verts[ 1 ].x, Verts[ 1 ].y, Verts[ 1 ].z, Group2 );
