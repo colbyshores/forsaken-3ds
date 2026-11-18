@@ -1,15 +1,11 @@
 #pragma once
 
-/* util.h -- logging, file-name helpers and the alignment-safe copy
+/* util.h -- logging and file-name helpers
  *
  * Msg() only logs (no dialog) and always reports OK. DebugPrintf writes to
  * stderr only when Debug is set, and also to a timestamped file under Logs/
  * when DebugLog is set. convert_path() lower-cases and converts backslashes
  * into a static buffer that the next call overwrites.
- *
- * memcpy_unaligned is a byte-wise copy, defined in main_3ds.cpp on 3DS and in
- * util.cpp elsewhere; use it for float-bearing structs read out of
- * byte-parsed file buffers.
  */
 
 #include "game/main.h"
@@ -28,9 +24,6 @@ void Get_Ext( u_int8_t * Src, u_int8_t * Dest );
 
 char* convert_path( const char* _str );
 
-/* Byte-wise copy GCC cannot fuse into ldm/stm: safe for float-bearing
- * structs read out of byte-parsed file buffers on ARM11. */
-void memcpy_unaligned(void *dst, const void *src, size_t n);
 char * convert_char( char from, char to, char* in );
 
 /* Defined in util.cpp; shared with the modules that use it. */

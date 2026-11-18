@@ -8,9 +8,8 @@
  * platform_get_ticks is milliseconds since platform_init.
  * Every thread that does float math calls vfp_set_fz_dn or
  * vfp_thread_fz_dn at entry: FPSCR is per-thread and the engine assumes
- * flush-to-zero with default NaN. memcpy_unaligned is a deliberately
- * non-inlined byte copy for float-bearing structs read from byte-parsed
- * file buffers. The c3d_* functions are defined in render_c3d.cpp.
+ * flush-to-zero with default NaN. The c3d_* functions are defined in
+ * render_c3d.cpp.
  */
 
 #include "util/platform.h"
@@ -40,11 +39,6 @@ void platform_render_present(render_info_t *info);
 void platform_shutdown(void);
 u_int32_t platform_get_ticks(void);
 void platform_delay(u_int32_t ms);
-
-/* Byte-wise memcpy that GCC cannot inline to `ldm/stm` (which require
- * 4-byte alignment on ARM and fault on misaligned file-buffer sources).
- * Use when copying structs out of a raw byte-parsed buffer. */
-void memcpy_unaligned(void *dst, const void *src, size_t n);
 
 /* Citro3D context/present glue (render_c3d.c). These replace the old
  * picaGL-named shim; picaGL itself is gone. */

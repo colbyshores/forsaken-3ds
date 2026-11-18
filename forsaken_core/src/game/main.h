@@ -109,11 +109,6 @@ typedef uint8_t  u_int8_t;
 typedef uint16_t u_int16_t;
 typedef uint32_t u_int32_t;
 typedef u_int32_t DWORD;
-#ifdef __3DS__
-
-/* memcpy_unaligned is declared in util.h (defined in main_3ds.c
- * on 3DS, util.cpp elsewhere). */
-#endif
 typedef u_int8_t  BYTE;
 typedef u_int16_t WORD;
 

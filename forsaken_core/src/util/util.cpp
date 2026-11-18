@@ -223,15 +223,3 @@ int Msg( const char * msg, ... )
 	// IDOK	OK button was selected.
 	return res;
 }
-
-
-#ifndef __3DS__
-/* memcpy_unaligned: the 3DS build gets it from main_3ds.c; elsewhere a
- * plain byte copy is alignment-safe on every target. */
-void memcpy_unaligned(void *dst, const void *src, size_t n)
-{
-	unsigned char *d = (unsigned char *)dst;
-	const unsigned char *s = (const unsigned char *)src;
-	while (n--) *d++ = *s++;
-}
-#endif
