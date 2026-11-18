@@ -1,7 +1,4 @@
-/*===================================================================
-*	P i c k u p s . c
-*	All routines to do with pickup objects.....
-===================================================================*/
+/* pickups.cpp -- pickup pool, collection, regeneration points; see pickups.h. */
 #include <stdio.h>
 
 #include "game/main.h"
@@ -1657,7 +1654,7 @@ void NewPrimaryWeapon( int16_t Weapon )
 /*===================================================================
 	Procedure	:	Ship to Pickups collision
 	Input		:	Nothing
-	Output		:	All registers reserved
+	Output		:	Nothing
 ===================================================================*/
 void CheckPickup( void )
 {
@@ -2390,7 +2387,7 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 }
 
 /*===================================================================
-	Procedure	:	Process Secondary Bullets
+	Procedure	:	Process Pickups
 	Input		:	nothing
 	Output		:	nothing
 ===================================================================*/
@@ -2824,10 +2821,10 @@ bool CheckValidRegenSlot( int16_t Slot )
 
 #ifdef EDITION_REMASTER
 /* Slot indices (into ModelNames[]) where PreLoadPickups registers each
- * N64 pickup mesh. ModelType in PickupAttribs is just an index into this
- * table, so once the slots are reserved we point the new pickup IDs at
- * them. -1 means the slot wasn't allocated (e.g., PreLoadPickups skipped
- * because the OnceOnly init didn't fire). */
+ * N64 pickup mesh. PickupAttribs[].ModelType is a ModelNames[] index, so
+ * once the slots are reserved we point the new pickup IDs at them. -1
+ * means the slot wasn't allocated (mesh file missing, or PreLoadPickups
+ * has not run). */
 static int16_t s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
 
 /*===================================================================
@@ -2838,9 +2835,9 @@ static int16_t s_n64_pickup_model_idx[5] = { -1, -1, -1, -1, -1 };
 				:	files into fresh ModelNames[] slots and bumps
 				:	NextNewModel past them so subsequent BG-object /
 				:	enemy / etc. registrations don't collide. Called
-				:	from oct2.cpp's IV0 OnceOnly block, after PreLoadEnemies
-				:	(which is the last consumer of NextNewModel before
-				:	PreInitModel runs the actual model load).
+				:	from oct2.cpp's OnceOnlyChangeLevel block, after
+				:	PreLoadEnemies (which also advances NextNewModel)
+				:	and before PreInitModel loads the models.
 ===================================================================*/
 bool PreLoadPickups( void )
 {
@@ -2889,7 +2886,7 @@ bool PreLoadPickups( void )
 #endif /* EDITION_REMASTER */
 
 /*===================================================================
-	Procedure	:	Save Pickup Positions
+	Procedure	:	Load Pickup Positions ( level .PIC regen points )
 	Input		:	Nothing
 	Output		:	bool	True/False
 ===================================================================*/
@@ -2911,21 +2908,16 @@ bool LoadPickupsPositions( void )
 
 
   /* Populate Remaster N64 pickup slots (100-105) by template-copying
-   * from a similar 1998 pickup. One-shot — guarded by a static flag
-   * so subsequent level loads don't re-template after any tuning has
-   * happened. The visual is approximate (StablizerCrystal uses 1998's
-   * Crystal model, BlackHoleGun parts use PowerPod, etc.); proper
-   * fidelity needs the .mx files extracted from the Remaster KPF —
+   * from a similar 1998 pickup (light / glow attribs), then pointing
+   * ModelType at the N64 mesh PreLoadPickups registered, if any.
+   * One-shot — guarded by a static flag, so ModelType keeps the slot
+   * indices from the first level load. */
 #ifdef EDITION_REMASTER
   {
     static bool _n64_pickup_init_done = false;
     if (!_n64_pickup_init_done)
     {
       _n64_pickup_init_done = true;
-
-      /* RegenPickupInfo is in dead `#if 0` code so we only need to
-       * initialise PickupAttribs (the actual rendering / light /
-       * model-type metadata for each pickup slot). */
 
       /* StablizerCrystal (100): glowing crystal pickup → Crystal template
        * for light/glow attribs, then override ModelType to the real
@@ -3064,16 +3056,11 @@ bool LoadPickupsPositions( void )
         )
         {
 #ifdef EDITION_REMASTER
-          /* Forsaken Remastered's .PIC files reference pickup types beyond
-           * the 1998 engine's MAXPICKUPTYPES=46 (e.g. stableizers uses new
-           * pickup categories from Remaster's expanded item set). The
-           * proper fix would be to bump MAXPICKUPTYPES and resize all the
-           * MaxPickupType[]/NumPickupType[]/PickupValid[] arrays plus port
-           * the new pickup behaviours; for now, skip the offending regen
-           * point so the level still loads and the autotest can advance.
-           * Use Type=PICKUP_GeneralAmmo as a benign substitute so the slot
-           * still spawns SOMETHING rather than leaving a hole in the pickup
-           * count math downstream. */
+          /* A Remaster .PIC regen point with a Type >= MAXPICKUPTYPES or a
+           * TriggerMod past NumOfTrigMods makes the non-Remaster build
+           * (#else) reject the whole file. Keep the level loadable: the
+           * point becomes PICKUP_GeneralAmmo (even when only the trigger
+           * mod was bad) and an invalid TriggerMod is cleared. */
           RegenPoints[ Count ].Type = PICKUP_GeneralAmmo;
           if (RegenPoints[ Count ].TriggerMod != (u_int16_t)-1 &&
               RegenPoints[ Count ].TriggerMod >= NumOfTrigMods) {
@@ -3190,8 +3177,9 @@ bool LoadPickupsPositions( void )
     }
   }
 
-  /* minus 1000 from the count of pickups
-     why did we even add 1000 further up ?? */
+  /* remove the 1000 headroom added above; it kept InitOnePickup's
+     NumPickupType >= MaxPickupType cap from refusing pickups while
+     the level was being seeded */
 
   for( Count = 0; Count < MAXPICKUPTYPES; Count++ )
     MaxPickupType[ Count ] -= 1000;
@@ -3551,7 +3539,7 @@ void RegenerateQuedPickups( void )
 }
 
 /*===================================================================
-	Procedure	:	Regenerate required pickups
+	Procedure	:	Regenerate one pickup of the given type
 	Input		:	u_int16_t		Pickup Type
 	Output		:	bool		True/False
 ===================================================================*/

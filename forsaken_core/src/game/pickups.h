@@ -1,8 +1,24 @@
-/*==========================================================================
- *  File:       P i c k u p s . h
- *  Content:    Pickups include file
- ***************************************************************************/
 #pragma once
+
+/* pickups.h -- pickups: types, the live pickup pool and regeneration points
+ *
+ * PickupAttribs[] (pickups.cpp) gives each PICKUP_* type its model and light.
+ * Pickups[MAXPICKUPS] is the live pool, reset by InitPickups at scene init;
+ * the used list starts at FirstPickupUsed and is walked through Prev, and each
+ * pickup is also on a per-group list (PickupGroups[]). LoadPickupsPositions
+ * reads the level .PIC into RegenPoints[] (malloc'd per level, plus one copy
+ * per player in RegenSlotsCopy[]) and seeds the level's pickups.
+ *
+ * Once per frame ProcessPickups moves and animates them and RegeneratePickups
+ * (skipped during demo playback) counts down timed regen points; only the
+ * host creates regenerated pickups. CheckPickup, called from the local ship's
+ * movement, collects any pickup the ship's path passed through.
+ *
+ * Pickups are identified across the network by (Owner, ID). KillPickup on a
+ * pair not yet present queues it in a failed-kill list that ProcessFailedKills
+ * retries for FAILEDKILLTIMEOUT frames. The Copy* / Gen*List / Regen*List
+ * functions snapshot and rebuild pickups and regen slots for a joining player.
+ */
 
 #include "game/main.h"
 #include "game/constants.h"
@@ -21,16 +37,16 @@
 constexpr int MAXPICKUPS = 256;
 /* Bumped 46 -> 128 to fit Remaster N64 pickup IDs at slots 100-105
  * (StablizerCrystal + ComputerCapsule + 4 BlackHoleGun parts). Slots
- * 46-99 + 106-127 stay zero-initialised. Memory cost: 82 unused
- * slots × ~24 bytes (PICKUPATTRIB + REGENPICKUPINFO + per-type
- * counters) ≈ 2 KB BSS. Negligible.
+ * 46-99 + 106-127 stay zero-initialised. Cost: 82 extra entries in
+ * PickupAttribs[] and the per-type arrays (counters, valid flags).
  *
  * Counterpart to the MAX_ENEMY_TYPES bump in enemies.h — same minimal-
  * correct pattern: extend the cap, add enum entries with explicit
  * values, populate the new slots at runtime via template-copy from a
- * tonally-similar 1998 pickup. Visual is approximate (Stabilizer
- * Crystal reuses Crystal model) but the pickup spawns into a real
- * slot rather than being substituted to PICKUP_GeneralAmmo. */
+ * tonally-similar 1998 pickup (light / glow), with the model swapped
+ * for the Remaster mesh when PreLoadPickups found it. The pickup
+ * spawns into a real slot rather than being substituted to
+ * PICKUP_GeneralAmmo. */
 constexpr int MAXPICKUPTYPES = 128;
 constexpr auto PICKUP_RADIUS = ( 562.5F * GLOBAL_SCALE );
 constexpr auto PICKUPLIGHT_RADIUS = ( 1536.0F * GLOBAL_SCALE );
@@ -111,7 +127,7 @@ enum {
 
 	/* Remaster N64 pickup IDs imported from defs/n64Pickups.txt.
 	 * Slots 100-105 populated at runtime in LoadPickupsPositions
-	 * by template-copying from tonally-similar 1998 pickups. See
+	 * by template-copying from tonally-similar 1998 pickups. */
 	PICKUP_StablizerCrystal      = 100,	// 100  (template: PICKUP_Crystal)
 	PICKUP_ComputerCapsule       = 101,	// 101  (template: PICKUP_Computer)
 	PICKUP_BlackHoleGunPart1     = 102,	// 102  (template: PICKUP_PowerPod)
