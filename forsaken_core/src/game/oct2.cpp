@@ -256,7 +256,6 @@ char  LevelNames[MAXLEVELS][128];
 char  CollisionNames[MAXLEVELS][128];
 char  CollisionZNames[MAXLEVELS][128];
 char  BspNames[MAXLEVELS][128];
-char  BspZNames[MAXLEVELS][128];
 char  ZoneNames[MAXLEVELS][128];
 char  WaterNames[MAXLEVELS][128];
 char  TextNames[MAXLEVELS][128];
@@ -918,7 +917,6 @@ bool InitLevels( char * levels_list )
 	sprintf( CollisionNames[ j ],		"data\\levels\\%s\\%s.mc",    ShortLevelNames[ j ], ShortLevelNames[ j ] );
 	sprintf( CollisionZNames[ j ],		"data\\levels\\%s\\%sz.mc",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
 	sprintf( BspNames[ j ],				"data\\levels\\%s\\%s.bsp",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-	sprintf( BspZNames[ j ],			"data\\levels\\%s\\%sz.bsp",  ShortLevelNames[ j ], ShortLevelNames[ j ] );
 	sprintf( ZoneNames[ j ],			"data\\levels\\%s\\%s.zon",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
 	sprintf( WaterNames[ j ],			"data\\levels\\%s\\%s.wat",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
 	sprintf( TextNames[ j ],			"data\\levels\\%s\\%s.txt",   ShortLevelNames[ j ], ShortLevelNames[ j ] );

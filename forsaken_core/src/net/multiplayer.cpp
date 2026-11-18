@@ -467,14 +467,7 @@ void InitTeamLists( MENU *Menu )
 
 void InitExistingGameJoin( MENU *Menu )
 {
-	int i;
-	
 	InitTeamLists( NULL );
-
-	for (i = 0; i < MAX_TEAMS; i++)
-	{
-		strcpy(TeamCurrentScore[i], ": 0");
-	}
 
 	InitTitleMessaging();
 }
@@ -582,10 +575,5 @@ void DistributeTeamsToLists(int *dummy)
 	if ( IsHost && OkayToStart && num_players )
 	{
 		TeamGoToSynchup(NULL);
-	}
-
-	for (team = 0; team < MAX_TEAMS; team++)
-	{
-		sprintf(TeamCurrentScore[team], ": %d",TeamScore[team]);
 	}
 }

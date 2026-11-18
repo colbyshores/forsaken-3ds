@@ -573,10 +573,6 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 
 bool SetUpShips()
 {
-	sprintf( NickName, "%s", player_config->name );
-
-	sprintf( MyName, "%s's game", player_config->name );
-
 	return true;
 }
 

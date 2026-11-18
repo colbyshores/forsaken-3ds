@@ -146,8 +146,6 @@ int16_t	BikeModels[ MAXBIKETYPES ] = {
 
 };
 
-char					MyName[ 32 ] = "Default game";
-char					NickName[ 32 ] = "Default game";
 char					tempstr[MAXTEXTMSG];
 int16_t					NamesAreLegal = 1;
 SHORTNAMETYPE			Names;	// all the players short Names....

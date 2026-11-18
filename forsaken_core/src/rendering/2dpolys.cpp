@@ -180,7 +180,6 @@ void KillUsedFmPoly( u_int16_t i )
 #define	NMEGEN_STAGE2_LEN	( NMEGEN_STAGE2 - NMEGEN_END )
 
 
-static	int16_t	GlobCount;
 static	u_int8_t	ShadeTable[ 16 ] = { 255, 200, 128, 104, 96, 92, 80, 77, 74, 72, 69, 66, 64, 64, 64, 64 };
 static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 
@@ -201,8 +200,6 @@ void FmPolyProcess( void )
 	MATRIX	InvUpMatrix;
 	QUAT	TempQuat;
 	VECTOR	OldPos;
-
-	GlobCount += (int16_t) framelag;								// Use Timer!!!
 
 	i = FirstFmPolyUsed;
 

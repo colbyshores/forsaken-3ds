@@ -451,7 +451,6 @@ extern ENEMY Enemies[ MAXENEMIES ];
 extern int16_t NumInitEnemies;
 extern int16_t NumKilledEnemies;
 extern ENEMY * EnemyGroups[ MAXGROUPS ];
-extern int EnemiesActive;
 extern ENEMY * TestEnemy;
 void UpdateEnemiesClipGroup( CAMERA * Camera );
 extern bool ShowUntriggeredNMEs;

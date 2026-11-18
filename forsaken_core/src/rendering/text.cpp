@@ -67,7 +67,6 @@ char *TeamName[ MAX_TEAMS ] = // team colour names should match TeamCol[] colour
 int FontWidth = 8;
 int FontHeight = 8;
 
-int16_t	NumOfActivePlayers = 0;
 
 int	PermX;
 u_int16_t big[4] = { 10000 , 1000 , 100 , 10 };
@@ -571,8 +570,6 @@ void PrintScoreSort( void )
 	u_int16_t tempwidth = 0;
 	BYTE ShipID;
 
-	NumOfActivePlayers = 0;
-
 	// single player
 	if( MyGameStatus == STATUS_SinglePlayer )
 	{
@@ -760,16 +757,8 @@ void PrintScoreSort( void )
 
 					DisplayConnectionStatus( i , 2 , e*(FontHeight+1)+(FontHeight*4) );
 					e++;
-					NumOfActivePlayers++;
 				}
 			}
-		}
-
-		// update number of active players
-		for( i = 0 ; i < MAX_PLAYERS ; i++ )
-		{
-			if ( (GameStatus[i] == STATUS_Normal ) )
-				NumOfActivePlayers++;
 		}
 	}
 }

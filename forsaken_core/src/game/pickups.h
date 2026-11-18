@@ -302,7 +302,6 @@ FILE * LoadAllPickups( FILE * fp );
 void KillAllPickupsOfType( u_int16_t Type, int16_t Style );
 
 void PickupModelValid( void );
-void CountMinesInLevel( void );
 void KillAllPickupsOfTypeAndSend( u_int16_t Type, int16_t Style );
 
 void InitFailedKillSlots( void );
@@ -338,7 +337,6 @@ extern int16_t PrimaryInPlayers[ MAXPRIMARYWEAPONS ];
 extern int16_t SecondaryInPlayers[ MAXSECONDARYWEAPONS ];
 extern int16_t PrimaryToGenerate[ MAXPRIMARYWEAPONS ];
 extern int16_t SecondaryToGenerate[ MAXSECONDARYWEAPONS ];
-extern int16_t MinesInLevel[ MAXSECONDARYWEAPONS ];
 extern int16_t OrbsInLevel;
 extern int16_t OrbsToGenerate;
 extern int16_t OrbsInPlayers;
@@ -358,7 +356,6 @@ extern int16_t Host_SecondaryAmmo[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
 extern int16_t Host_SecAmmoUsed[ MAXSECONDARYWEAPONS ];
 extern int8_t Host_SecWeaponsGot[ MAX_PLAYERS ][ MAXPICKUPS ];
 extern float Host_NitroFuel[ MAX_PLAYERS ];
-extern float Host_NitroFuelUsed;
 extern int16_t Host_PowerLevel[ MAX_PLAYERS ];
 extern float Host_OrbAmmo[ MAX_PLAYERS ][ MAXMULTIPLES ];
 extern BYTE Host_NumOfOrbitals[ MAX_PLAYERS ];

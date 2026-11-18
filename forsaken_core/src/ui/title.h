@@ -680,7 +680,6 @@ extern SLIDER PacketsSlider;
 extern MENUITEM JoinItem;
 extern MENUITEM NewJoinItem;
 extern MENUITEM WatchTeamSelectionItem;
-extern char TeamCurrentScore[ MAX_TEAMS ][ 64 ];
 extern int GameType;
 void SetGamePrefs( void );
 extern SLIDER MyPacketsSlider;

@@ -105,7 +105,6 @@ int16_t	Host_SecondaryAmmo[ MAX_PLAYERS ][ MAXSECONDARYWEAPONS ];
 int16_t	Host_SecAmmoUsed[ MAXSECONDARYWEAPONS ];
 int8_t	Host_SecWeaponsGot[ MAX_PLAYERS ][ MAXPICKUPS ];
 float	Host_NitroFuel[ MAX_PLAYERS ];
-float	Host_NitroFuelUsed;
 BYTE	Host_NumOfOrbitals[ MAX_PLAYERS ];
 float	Host_OrbAmmo[ MAX_PLAYERS ][ MAXMULTIPLES ];
 int16_t	Host_PowerLevel[ MAX_PLAYERS ];
@@ -4907,7 +4906,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 {
 	int16_t	PickupEnable = false;
 	int16_t	Temp;
-	float	TempFloat;
 
 	if( i != (u_int16_t) -1 )
 	{
@@ -5270,8 +5268,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 						if( Host_CopyOfNitroFuel[ Player ] > MAX_NITRO_FUEL )
 						{
-							TempFloat = ( Host_CopyOfNitroFuel[ Player ] - MAX_NITRO_FUEL );
-							Host_NitroFuelUsed += TempFloat;
 							Host_CopyOfNitroFuel[ Player ] = MAX_NITRO_FUEL;
 						}
 
@@ -5286,8 +5282,6 @@ bool CanPlayerCollectPickup( u_int16_t i, u_int16_t Player )
 
 						if( Host_NitroFuel[ Player ] > MAX_NITRO_FUEL )
 						{
-							TempFloat = ( Host_NitroFuel[ Player ] - MAX_NITRO_FUEL );
-							Host_NitroFuelUsed += TempFloat;
 							Host_NitroFuel[ Player ] = MAX_NITRO_FUEL;
 						}
 
@@ -5499,7 +5493,6 @@ int16_t	PrimaryInPlayers[ MAXPRIMARYWEAPONS ];
 int16_t	SecondaryInPlayers[ MAXSECONDARYWEAPONS ];
 int16_t	PrimaryToGenerate[ MAXPRIMARYWEAPONS ];
 int16_t	SecondaryToGenerate[ MAXSECONDARYWEAPONS ];
-int16_t	MinesInLevel[ MAXSECONDARYWEAPONS ];
 int16_t	OrbsInLevel;
 int16_t	OrbsToGenerate;
 int16_t	OrbsInPlayers;
@@ -5524,36 +5517,6 @@ int		FlagsInShips;
 int		TeamFlagsInLevel[ MAX_TEAMS ];
 int		TeamFlagsInShips[ MAX_TEAMS ];
 
-/*===================================================================
-	Procedure	:	Count Mines currently active in level
-	Input		:	Nothing
-	Output		:	Nothing
-===================================================================*/
-void CountMinesInLevel( void )
-{
-	u_int16_t	i;
-	u_int16_t	Next;
-	u_int16_t	nSecWalk;
-
-	for( i = 0; i < MAXSECONDARYWEAPONS; i++ ) MinesInLevel[ i ] = 0;
-
-	i = FirstSecBullUsed;
-	nSecWalk = 0;
-
-	/* Bound the used-chain walk: a corrupt/empty Prev chain must terminate. */
-	while( i != (u_int16_t) -1 && nSecWalk < MAXSECONDARYWEAPONBULLETS )
-	{
-		nSecWalk++;
-		Next = SecBulls[ i ].Prev;							/* Next Secondary Bullet */
-
-		if( SecBulls[i].SecType == SEC_MINE )
-		{
-			MinesInLevel[ SecBulls[i].Weapon ]++;
-		}
-
-		i = Next;
-	}																				
-}
 
 
 int16_t		FirstFailedKillUsed = -1;

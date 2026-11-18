@@ -109,7 +109,6 @@ extern float MessageTime[ MAX_MESSAGES ];
 extern char MessageBank[ MAX_MESSAGES ][ MAXPERLINE ];
 extern int FontWidth;
 extern int FontHeight;
-extern int16_t NumOfActivePlayers;
 extern float MaxMessageTime;
 
 #endif	// TEXT_INCLUDED

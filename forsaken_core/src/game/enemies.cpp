@@ -54,7 +54,6 @@ void AutoMovementExogenon( OBJECT * Object , ENEMY * Enemy );
 /*===================================================================
 	Global Variables
 ===================================================================*/
-int		EnemiesActive = 0;
 bool	ShowUntriggeredNMEs = false;
 int		Exogenon_Num_StartPos = 0;
 VECTOR	Exogenon_StartPos[6];
@@ -5781,7 +5780,6 @@ void ProcessEnemies( void )
 	VECTOR			PushVector;
 	float			Damage;
 #endif
-	EnemiesActive = 0;
 	Enemy = FirstEnemyUsed;
 
 	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -5863,7 +5861,6 @@ void ProcessEnemies( void )
 				
 				if( Enemy->AIFlags & AI_ANYPLAYERINRANGE )
 				{
-					EnemiesActive++;
 				
 					GunObject = Enemy->Object.FirstGun;
 					while( GunObject )

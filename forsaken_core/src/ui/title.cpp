@@ -192,7 +192,7 @@ u_int16_t AxisTestScrPoly[NUM_AXIS_TEST_SCRPOLYS];
 #define AXISTEST_Width 160
 #define AXISTEST_Height 10
 #define AXISTEST_PtrWidth 30
-float AxisPtr_xmin, AxisPtr_xmax, AxisPtr_ymin, AxisPtr_ymax, AxisPtr_mid;
+float AxisPtr_ymin, AxisPtr_ymax, AxisPtr_mid;
 #define JOYCONFIG_SelectAction 0
 #define JOYCONFIG_AssignButton 1
 int JoystickConfigState;
@@ -531,7 +531,6 @@ enum
 
 #define TITLE_TEXT_MSGS_STORED 6
 char TitleMessage[TITLE_TEXT_MSGS_STORED][MAXTEXTMSG];
-char TeamCurrentScore[MAX_TEAMS][64];
 
 void SelectKeyDef( MENUITEM *Item );
 void DrawKeyDef( MENUITEM *Item );
@@ -12997,8 +12996,6 @@ void InitJoystickAxisConfig ( MENU *Menu)
 	AxisPtr_ymin = AXISTEST_YPos + VDUoffsetY;
 	AxisPtr_ymax = AXISTEST_YPos + AXISTEST_Height + VDUoffsetY;
 
-	AxisPtr_xmin *= ModeScaleX;
-	AxisPtr_xmax *= ModeScaleX;
 	AxisPtr_ymin *= ModeScaleY;
 	AxisPtr_ymax *= ModeScaleY;
 	

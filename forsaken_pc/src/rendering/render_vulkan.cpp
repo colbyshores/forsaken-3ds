@@ -106,7 +106,6 @@ static bool s_depth_write = true;
 static int  s_cull = CULL_BACK;
 
 static MATRIX proj_matrix, view_matrix, world_matrix;
-static bool mvp_needs_update = true;
 static render_viewport_t s_viewport;
 
 static uint32_t find_mem_type(uint32_t filter, VkMemoryPropertyFlags props)
@@ -604,10 +603,10 @@ void cull_none(void) { s_cull = CULL_OFF; }
 void reset_cull(void) { s_cull = CULL_BACK; }
 
 /* ---- matrices ---- */
-bool FSSetView(RENDERMATRIX *matrix) { memmove(&view_matrix, &matrix->m, sizeof(view_matrix)); mvp_needs_update = true; return true; }
-bool FSSetWorld(RENDERMATRIX *matrix) { memmove(&world_matrix, &matrix->m, sizeof(world_matrix)); mvp_needs_update = true; return true; }
+bool FSSetView(RENDERMATRIX *matrix) { memmove(&view_matrix, &matrix->m, sizeof(view_matrix)); return true; }
+bool FSSetWorld(RENDERMATRIX *matrix) { memmove(&world_matrix, &matrix->m, sizeof(world_matrix)); return true; }
 bool FSGetWorld(RENDERMATRIX *matrix) { memmove(&matrix->m, &world_matrix, sizeof(matrix->m)); return true; }
-bool FSSetProjection(RENDERMATRIX *matrix) { memmove(&proj_matrix, &matrix->m, sizeof(proj_matrix)); mvp_needs_update = true; return true; }
+bool FSSetProjection(RENDERMATRIX *matrix) { memmove(&proj_matrix, &matrix->m, sizeof(proj_matrix)); return true; }
 
 bool FSSetViewPort(render_viewport_t *view)
 {
