@@ -202,12 +202,19 @@ constexpr int MAXPOINTERS = 8;
 
 constexpr int MAX_TEXT_LENGTH = 64;
 
+/* How a highlighted TEXTINFO is drawn: a pulsing box or a steady one. */
+enum class HighlightType : int
+{
+	Pulsing,
+	Static,
+};
+
 typedef struct
 {
 	u_int8_t	*text;						// text string
 	u_int8_t	oldtext[MAX_TEXT_LENGTH];	// used for checking if text has changed
 	bool	highlight;					// item highlighted?
-	int		highlighttype;				// highlight type?
+	HighlightType	highlighttype;		// pulsing or static box
 	int		xmin;						// 
 	int		ymin;						// bounding box for text
 	int		xmax;						// (VDU co-ordinates)

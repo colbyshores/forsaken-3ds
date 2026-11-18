@@ -274,7 +274,14 @@ void HighlightDisc(int disc);
 void ResetDisc(int disc);
 void ExpandDiscs(void);
 void SetUpRotate(int disc);
-void RotateDiscs(int disc, int DifficultyLevel);
+/* Which discs RotateDiscs turns, and which way the difficulty disc steps. */
+enum class RotateDisc : int
+{
+	All,
+	DifficultyForward,
+	DifficultyBack,
+};
+void RotateDiscs(int disc, RotateDisc OneOnly);
 void WiggleDiscs(void);
 void SetTextures (MENU *menu);
 void InitDifficultyLevel ( MENU *Menu );
@@ -2615,8 +2622,6 @@ const char *BikerText[MAXBIKETYPES] =
 ===================================================================*/
 
 constexpr int MAXHIGHLIGHTITEMS = 8;
-constexpr int HIGHLIGHT_Pulsing = 0;
-constexpr int HIGHLIGHT_Static = 1;
 
 MENU * CurrentMenu = NULL;
 MENUITEM * CurrentMenuItem = NULL;
@@ -2625,7 +2630,7 @@ MENUITEM * CurrentMenuItem = NULL;
  * pulling in the full title.h dependency chain. */
 int _3ds_is_menu_open(void) { return CurrentMenu != NULL; }
 TEXTINFO * HighlightItem[MAXHIGHLIGHTITEMS];
-int HighlightStatus[MAXHIGHLIGHTITEMS];
+HighlightType HighlightStatus[MAXHIGHLIGHTITEMS];
 int CurrentHighlightItem;
 
 MENU *MenuStack[ MAXMENULEVELS ];
@@ -2642,11 +2647,8 @@ VECTOR OrigPos[NUMOFTITLEMODELS];
 
 float rot[6], rotspeed[6], RotPause[6], StackY[7];
 
-constexpr int ROTATE_DISC_All = 0;
-constexpr int ROTATE_DISC_DifficultyForward = 1;
-constexpr int ROTATE_DISC_DifficultyBack = 2;
-
-int DiscStatus, StackStatus, StackMode, RotWiggle[6], CurrentTextures[6], CurrentDiscHighlight, CurrentVDUHighlight, CameraStatus, DifficultyDir;
+int DiscStatus, StackStatus, StackMode, RotWiggle[6], CurrentTextures[6], CurrentDiscHighlight, CurrentVDUHighlight, CameraStatus;
+RotateDisc DifficultyDir;
 
 constexpr int Judders = 7;
 
@@ -3861,12 +3863,12 @@ void DiscJudder(int disc)
 
 /*===================================================================
 	Procedure	:		RotateDiscs
-	Input		:		disc number, OneOnly: ROTATE_DISC_All ( all discs )
-											  ROTATE_DISC_DifficultyForward
-											  ROTATE_DISC_DifficultyBack
+	Input		:		disc number, OneOnly: RotateDisc::All ( all discs )
+											  RotateDisc::DifficultyForward
+											  RotateDisc::DifficultyBack
 	Output		:		nothing...
 ===================================================================*/
-void RotateDiscs(int disc, int OneOnly)
+void RotateDiscs(int disc, RotateDisc OneOnly)
 {
 	float angleoffset, viewangle, x, y;
 
@@ -3887,16 +3889,16 @@ void RotateDiscs(int disc, int OneOnly)
 			{  		
 				switch ( OneOnly )
 				{
-				case ROTATE_DISC_All:
+				case RotateDisc::All:
 					PolyAnim[disc]->newframe = CurrentTextures[disc];
 					break;
-				case ROTATE_DISC_DifficultyForward:
+				case RotateDisc::DifficultyForward:
 					PolyAnim[disc]->newframe = PolyAnim[disc]->currentframe + 2;
 					if (PolyAnim[disc]->newframe > 11)
 						PolyAnim[disc]->newframe = 5;
 					CurrentTextures[disc] = PolyAnim[disc]->newframe - 1;
 					break;
-				case ROTATE_DISC_DifficultyBack:
+				case RotateDisc::DifficultyBack:
 					PolyAnim[disc]->newframe = PolyAnim[disc]->currentframe - 2;
 					if (PolyAnim[disc]->newframe < 5)
 						PolyAnim[disc]->newframe = 11;
@@ -3953,7 +3955,7 @@ void RotateAllDiscs(void)
 			}
 
 			for (i=0; i<=5; i++)
-				RotateDiscs(i, ROTATE_DISC_All );
+				RotateDiscs(i, RotateDisc::All );
 
 			count = 0;
 			for (i = 0; i <= 5; i++)
@@ -6882,7 +6884,7 @@ void SelectFlatMenutext( MENUITEM *Item )
 	MenuEnterTextInputState(MENUSTATE_Text2);
 	t->VDU_insert_pos = 0;
 	TextType (t, 0);	// ensures VDU cursor is placed in correct position
-	Item->TextInfo[0]->highlighttype = HIGHLIGHT_Static;
+	Item->TextInfo[0]->highlighttype = HighlightType::Static;
 }
 
 
@@ -8576,7 +8578,7 @@ TEXTINFO *InitTextInfo( void )
 
 	TextInfo->text = NULL;						// text string
 	TextInfo->highlight = false;					// item highlighted?
-	TextInfo->highlighttype = HIGHLIGHT_Pulsing;
+	TextInfo->highlighttype = HighlightType::Pulsing;
 	TextInfo->xmin = 0;						// 
 	TextInfo->ymin = 0;						// bounding box for text
 	TextInfo->xmax = 0;						// (VDU co-ordinates)
@@ -8644,9 +8646,9 @@ void AddToFlatMenuList( MENUITEM *Item )
 		if (!(CurrentMenuItem->highlightflags & TEXTFLAG_ManualListHighlight))
 		{
 			if (CurrentMenuItem == Item)
-				TextInfo->highlighttype = HIGHLIGHT_Pulsing;
+				TextInfo->highlighttype = HighlightType::Pulsing;
 			else
-				TextInfo->highlighttype = HIGHLIGHT_Static;
+				TextInfo->highlighttype = HighlightType::Static;
 		}
 	}
 }
@@ -9044,7 +9046,7 @@ void DrawFlatMenuToggle( MENUITEM *Item )
 void SelectFlatMenuKey( MENUITEM *Item )
 {
 	MenuState = MENUSTATE_Keydef2;
-	Item->TextInfo[0]->highlighttype = HIGHLIGHT_Static;
+	Item->TextInfo[0]->highlighttype = HighlightType::Static;
 	KeyItem = Item;
 }
 
@@ -9831,7 +9833,7 @@ void DrawGeneralWeapons( MENUITEM *Item )
 		Item->numtextitems++;
 		AddToTextStack( Item->TextInfo[i] );
 		Item->TextInfo[i]->highlight = false;
-		Item->TextInfo[i]->highlighttype = HIGHLIGHT_Pulsing;
+		Item->TextInfo[i]->highlighttype = HighlightType::Pulsing;
 	}
 
 	num_weapons = 0;
@@ -9860,7 +9862,7 @@ void DrawGeneralWeapons( MENUITEM *Item )
 
 	DrawGeneralWeaponText( Item );
 	Item->TextInfo[0]->highlight = true;
-	Item->TextInfo[0]->highlighttype = HIGHLIGHT_Pulsing;
+	Item->TextInfo[0]->highlighttype = HighlightType::Pulsing;
 
 	MenuState = MENUSTATE_WeaponOrder;
 }
@@ -10722,7 +10724,7 @@ void ProcessTextItems (void)
 
 	for (i = 0; i < MAXHIGHLIGHTITEMS; i++)
 	{	HighlightItem[i] = NULL;
-		HighlightStatus[i] = HIGHLIGHT_Pulsing;
+		HighlightStatus[i] = HighlightType::Pulsing;
 	}
 	CurrentHighlightItem = 0;
 
@@ -10828,7 +10830,7 @@ Highlight box
 		{	
 			switch (HighlightStatus[i])
 			{
-			case HIGHLIGHT_Static:
+			case HighlightType::Static:
 				DrawHighlightBox(HighlightItem[i], 64, 255, 64);
 				break;
 			default:
@@ -13159,12 +13161,16 @@ bool SetAxisActionSlider( SLIDER *s )
 		return false;
 }
 
-constexpr int HOLOMODEL_Done = 0;
-constexpr int HOLOMODEL_Expand = 1;
-constexpr int HOLOMODEL_Shrink = 2;
+/* The holo-model's grow / shrink animation state. */
+enum class HoloModel : int
+{
+	Done,
+	Expand,
+	Shrink,
+};
 
 float HoloModelTimer;
-int HoloModelMode;
+HoloModel HoloModelMode;
 u_int16_t NextHoloModel;
 
 constexpr auto HOLOSCANSPEED = 0.5F;
@@ -13329,7 +13335,7 @@ void ShowHoloModel( u_int16_t model )
 		
 		LoadHoloModel( model );
 		HoloModelTimer = 0.0F;
-		HoloModelMode = HOLOMODEL_Expand;
+		HoloModelMode = HoloModel::Expand;
 
 	}else
 	{
@@ -13337,13 +13343,13 @@ void ShowHoloModel( u_int16_t model )
 		
 		switch( HoloModelMode )
 		{
-		case HOLOMODEL_Done:
-			HoloModelMode = HOLOMODEL_Shrink;
+		case HoloModel::Done:
+			HoloModelMode = HoloModel::Shrink;
 			break;
-		case HOLOMODEL_Expand:
-			HoloModelMode = HOLOMODEL_Shrink;
+		case HoloModel::Expand:
+			HoloModelMode = HoloModel::Shrink;
 			break;
-		case HOLOMODEL_Shrink:
+		case HoloModel::Shrink:
 			break;
 		}
 	}
@@ -13393,7 +13399,7 @@ void ProcessHoloModel( void )
 	
 	switch( HoloModelMode )
 	{
-	case HOLOMODEL_Done:
+	case HoloModel::Done:
 		if( !FlyGirlActive )
 		{
 			PlotHoloScanLine();
@@ -13413,14 +13419,14 @@ void ProcessHoloModel( void )
 			ProcessFlyGirl((float)fabsf(HoloModelTimer));
 		}
 		return;
-	case HOLOMODEL_Expand:
+	case HoloModel::Expand:
 		HoloModelTimer += framelag / 18.0F;
 		break;
-	case HOLOMODEL_Shrink:
+	case HoloModel::Shrink:
 		HoloModelTimer -= framelag / 18.0F;
 		if ( HoloModelTimer < 0.0F )
 		{
-			HoloModelMode = HOLOMODEL_Expand;
+			HoloModelMode = HoloModel::Expand;
 			HoloModelTimer = (float)fabsf(HoloModelTimer);
 			reload = true;
 		}
@@ -13429,7 +13435,7 @@ void ProcessHoloModel( void )
 
 	if ( HoloModelTimer > 1.0F )
 	{
-		HoloModelMode = HOLOMODEL_Done;
+		HoloModelMode = HoloModel::Done;
 		HoloModelTimer = 1.0F;
 	}
 	
@@ -13445,7 +13451,7 @@ void ProcessHoloModel( void )
 			{
 				KillHoloModel();
 			}
-			HoloModelMode = HOLOMODEL_Done;
+			HoloModelMode = HoloModel::Done;
 			return;
 		}
 		else
@@ -13463,7 +13469,7 @@ void ProcessHoloModel( void )
 		ScaleHoloModel( (float)fabsf(HoloModelTimer));
 	}
 
-	if( ( HoloModelMode == HOLOMODEL_Done ) && ( !FlyGirlActive ) )
+	if( ( HoloModelMode == HoloModel::Done ) && ( !FlyGirlActive ) )
 	{
 		InitHoloScanLine();
 	}
@@ -14337,7 +14343,7 @@ bool ProcessDifficultySet ( int Key )
 	case SDLK_LEFT:
 		StackMode = DISC_MODE_ONE;
 		StackStatus = DISC_EXPAND;
-		DifficultyDir = ROTATE_DISC_DifficultyBack;
+		DifficultyDir = RotateDisc::DifficultyBack;
 		DifficultyLevel--;
 		if( DifficultyLevel < DIFF_Easy )
 			DifficultyLevel = DIFF_Vhard;
@@ -14345,7 +14351,7 @@ bool ProcessDifficultySet ( int Key )
 	case SDLK_RIGHT:
 		StackMode = DISC_MODE_ONE;
 		StackStatus = DISC_EXPAND;
-		DifficultyDir = ROTATE_DISC_DifficultyForward;
+		DifficultyDir = RotateDisc::DifficultyForward;
 		DifficultyLevel++;
 		if( DifficultyLevel > DIFF_Vhard )
 			DifficultyLevel = DIFF_Easy;
@@ -14615,7 +14621,8 @@ bool ProcessPlayerList ( int Key )
 bool ProcessWeaponOrder ( int Key )
 {
 	bool done, redraw;
-	int highlighttype, temp, oldselectedweapon, i;
+	HighlightType highlighttype;
+	int temp, oldselectedweapon, i;
 
 	done = false;
 	redraw = false;
@@ -14751,8 +14758,8 @@ bool ProcessWeaponOrder ( int Key )
 					redraw = true;
 				}
 				// return to choosing first weapon...
-				WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HIGHLIGHT_Pulsing;
-				WeaponItem->TextInfo[oldselectedweapon]->highlighttype = HIGHLIGHT_Pulsing;
+				WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HighlightType::Pulsing;
+				WeaponItem->TextInfo[oldselectedweapon]->highlighttype = HighlightType::Pulsing;
 				WeaponOrderStatus = WEAPON_ChoosingFirst;
 			}else
 			{
@@ -14801,8 +14808,8 @@ bool ProcessWeaponOrder ( int Key )
 					redraw = true;
 				}
 				// return to choosing first weapon...
-				WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HIGHLIGHT_Pulsing;
-				WeaponItem->TextInfo[oldselectedweapon]->highlighttype = HIGHLIGHT_Pulsing;
+				WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HighlightType::Pulsing;
+				WeaponItem->TextInfo[oldselectedweapon]->highlighttype = HighlightType::Pulsing;
 				WeaponOrderStatus = WEAPON_ChoosingFirst;
 			}else
 			{
@@ -14824,11 +14831,11 @@ bool ProcessWeaponOrder ( int Key )
 	case SDLK_RETURN:
 		if (WeaponOrderStatus == WEAPON_ChoosingFirst)
 		{
-			WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HIGHLIGHT_Static;
+			WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HighlightType::Static;
 			WeaponOrderStatus = WEAPON_ChoosingSecond;
 		}else
 		{
-			WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HIGHLIGHT_Pulsing;
+			WeaponItem->TextInfo[SelectedWeapon]->highlighttype = HighlightType::Pulsing;
 			WeaponOrderStatus = WEAPON_ChoosingFirst;
 		}
 		break;
@@ -15048,7 +15055,7 @@ void MenuProcess()
 				{	
 					MenuState = MENUSTATE_SelectKeydef;
 					CheckKeysForChanges();
-					CurrentMenuItem->TextInfo[0]->highlighttype = HIGHLIGHT_Pulsing;
+					CurrentMenuItem->TextInfo[0]->highlighttype = HighlightType::Pulsing;
 				}
 				break;
 
@@ -15098,7 +15105,7 @@ void MenuProcess()
 				if ( !ProcessText( Key ) )
 				{
 					MenuState = MENUSTATE_Select;
-					CurrentMenuItem->TextInfo[0]->highlighttype = HIGHLIGHT_Pulsing;
+					CurrentMenuItem->TextInfo[0]->highlighttype = HighlightType::Pulsing;
 					if (CurrentMenu && (CurrentMenuItem->highlightflags & TEXTFLAG_AutoSelect))	// safe to assume only menu item if autoselected
 					{
 						MenuBack();
