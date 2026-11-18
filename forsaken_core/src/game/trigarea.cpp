@@ -54,6 +54,7 @@ num_zones : u_int16_t
 #include "game/secondary.h"
 #include "util/util.h"
 #include "game/oct2.h"
+#include "util/file_reader.h"
 
 bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, int16_t Side );
 bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides );
@@ -85,14 +86,10 @@ bool TriggerAreaload( char * Filename )
 	long			Read_Size;
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	int16_t			*	int16_tpnt;
-	u_int16_t			*	u_int16_tpnt;
-	u_int32_t			*	u_int32_tpnt;
 	int			i, j;
 	TRIGGER_AREA * OldAreaPnt;
 	TRIGGER_AREA * AreaPnt;
 	TRIGGER_ZONE * ZonePnt;
-	float * floatpnt;
 	u_int32_t	MagicNumber;
 	u_int32_t	VersionNumber;
 
@@ -123,10 +120,9 @@ bool TriggerAreaload( char * Filename )
 
 	if( Read_Size != File_Size ) return false;
 
-	u_int32_tpnt = (u_int32_t *) Buffer;
-	MagicNumber = *u_int32_tpnt++;
-	VersionNumber = *u_int32_tpnt++;
-	Buffer = (char *) u_int32_tpnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != ZON_VERSION_NUMBER  ) )
 	{
@@ -134,20 +130,15 @@ bool TriggerAreaload( char * Filename )
 		return( false );
 	}
 
-	u_int16_tpnt = (u_int16_t *) Buffer;
-	NumZones = *u_int16_tpnt++;
-	Buffer = (char*) u_int16_tpnt;
+	NumZones = in.u16();
 	Zones = (TRIGGER_AREA*) calloc( NumZones , sizeof(TRIGGER_AREA) );	
 	AreaPnt = Zones;
 
 	for( i = 0 ; i < NumZones ; i++ )
 	{
-		u_int16_tpnt = (u_int16_t *) Buffer;
-		AreaPnt->group = *u_int16_tpnt++;
-		AreaPnt->generation_type = *u_int16_tpnt++;
-		floatpnt = (float * ) u_int16_tpnt;
-		memcpy(&AreaPnt->generation_delay, floatpnt++, 4);
-		u_int16_tpnt = (u_int16_t *) floatpnt;
+		AreaPnt->group = in.u16();
+		AreaPnt->generation_type = in.u16();
+		AreaPnt->generation_delay = in.f32();
 
 		if( AreaPnt->generation_type != TRIGGER_AREA_GENTYPE_Initialised )
 		{
@@ -156,52 +147,37 @@ bool TriggerAreaload( char * Filename )
 			AreaPnt->state = TRIGGER_AREA_STATE_On;
 		}
 
-		AreaPnt->type = *u_int16_tpnt++;
+		AreaPnt->type = in.u16();
 
-		floatpnt = (float * ) u_int16_tpnt;
-		memcpy_unaligned(&AreaPnt->pos, floatpnt, 4*3);
-		floatpnt+=3;
-		memcpy_unaligned(&AreaPnt->half_size, floatpnt, 4*3);
-		floatpnt+=3;
-		Buffer = (char*) floatpnt;
+		AreaPnt->pos = in.vec();
+		AreaPnt->half_size = in.vec();
 		if( AreaPnt->type != ZONE_Sphere )
 		{
 			// convex hull...
-			u_int16_tpnt = (u_int16_t*) Buffer;
-			AreaPnt->num_sides = *u_int16_tpnt++;
-			Buffer = (char*) u_int16_tpnt;
+			AreaPnt->num_sides = in.u16();
 			AreaPnt->Zone = (TRIGGER_ZONE*) malloc( AreaPnt->num_sides * sizeof( TRIGGER_ZONE ) );
 			ZonePnt = AreaPnt->Zone;
 
-			floatpnt = (float * ) Buffer;
-			
 			for( j = 0 ; j < AreaPnt->num_sides ; j++ )
 			{
-				memcpy_unaligned(&ZonePnt->normal, floatpnt, 4*3);
-				floatpnt+=3;
-				memcpy(&ZonePnt->offset, floatpnt++, 4);
+				ZonePnt->normal = in.vec();
+				ZonePnt->offset = in.f32();
 				ZonePnt++;
 			}
-			Buffer = (char*) floatpnt;
 		}
-		u_int16_tpnt = (u_int16_t *) Buffer;
 
-		AreaPnt->when_player_isin = *u_int16_tpnt++;
-		AreaPnt->when_player_enters = *u_int16_tpnt++;
-		AreaPnt->when_player_exits = *u_int16_tpnt++;
-		AreaPnt->when_player_shoots = *u_int16_tpnt++;
-		int16_tpnt = (int16_t *) u_int16_tpnt;
-		AreaPnt->player_primary = *int16_tpnt++;
-		AreaPnt->player_secondary = *int16_tpnt++;
-		u_int16_tpnt = (u_int16_t *) int16_tpnt;
-		AreaPnt->when_enemy_isin = *u_int16_tpnt++;
-		AreaPnt->when_enemy_enters = *u_int16_tpnt++;
-		AreaPnt->when_enemy_exits = *u_int16_tpnt++;
-		AreaPnt->when_enemy_shoots = *u_int16_tpnt++;
-		int16_tpnt = (int16_t *) u_int16_tpnt;
-		AreaPnt->enemy_primary = *int16_tpnt++;
-		AreaPnt->enemy_secondary = *int16_tpnt++;
-		Buffer = (char*) int16_tpnt;
+		AreaPnt->when_player_isin = in.u16();
+		AreaPnt->when_player_enters = in.u16();
+		AreaPnt->when_player_exits = in.u16();
+		AreaPnt->when_player_shoots = in.u16();
+		AreaPnt->player_primary = in.i16();
+		AreaPnt->player_secondary = in.i16();
+		AreaPnt->when_enemy_isin = in.u16();
+		AreaPnt->when_enemy_enters = in.u16();
+		AreaPnt->when_enemy_exits = in.u16();
+		AreaPnt->when_enemy_shoots = in.u16();
+		AreaPnt->enemy_primary = in.i16();
+		AreaPnt->enemy_secondary = in.i16();
 
 		AreaPnt++;
 	}
