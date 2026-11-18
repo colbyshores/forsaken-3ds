@@ -81,18 +81,6 @@ num_frames : u_int16_t // number of animation frames
  * in models.c — same migration, same rationale. */
 MXALOADHEADER *MxaModelHeaders = NULL;
 
-static void
-FixUV_MXA( u_int16_t vertices, MXAVERT *MXA_Vert, LPLVERTEX Vert, LPLVERTEX Orig_Vert )
-{
-	int vnum;
-
-	for ( vnum = 0; vnum < vertices; vnum++ )
-	{
-		MXA_Vert[ vnum ].tu += Vert[ vnum ].tu - Orig_Vert[ vnum ].tu;
-		MXA_Vert[ vnum ].tv += Vert[ vnum ].tv - Orig_Vert[ vnum ].tv;
-	}
-}
-
 /*===================================================================
 	Procedure	:		Load .Mx File
 	Input		:		char	*	Filename , MXALOADHEADER *

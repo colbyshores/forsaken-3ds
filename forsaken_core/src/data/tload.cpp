@@ -325,8 +325,9 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , char * Name , u_int16_t ColourKe
 	Tloadheader->Scale[i] = Scale;
 	Tloadheader->MipMap[i] = MipMap;
 	NamePnt = (char *) &Tloadheader->ImageFile[i];
-	while( ( *NamePnt++ = *Name++ ) != 0 );
-		Tloadheader->PlaceHolder[i] = false;
+	while( ( *NamePnt++ = *Name++ ) != 0 )
+		;
+	Tloadheader->PlaceHolder[i] = false;
 	Tloadheader->num_texture_files++;
 	return i;
 }

@@ -16,7 +16,7 @@
 
 #define DEMOFOLDER				"Demos"
 #define DEMOFILE_EXTENSION		".DMO"
-#define DEMOFILE_SEARCHPATH		DEMOFOLDER"\\*"DEMOFILE_EXTENSION
+#define DEMOFILE_SEARCHPATH		DEMOFOLDER "\\*" DEMOFILE_EXTENSION
 
 char *DemoFileName( char *demoname );
 

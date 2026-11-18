@@ -1071,6 +1071,8 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 			break;
 		case ST_RIGHT:
 			lr += 0.5f * render_info.stereo_focal_dist / render_info.stereo_eye_sep;
+		default:
+			break;
 		}
 
 		g->projection._31 = lr / vp->Width;

@@ -199,7 +199,7 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 				NormaliseVector( &Normal );
 				PlaneOffset = -DotProduct( (VECTOR *) &Verts[ 0 ], &Normal );
 				I = ( Normal.x + Normal.y + Normal.z + PlaneOffset );
-				*(float *) &Shade = I;
+				memcpy( &Shade, &I, sizeof( Shade ) );
 				srand( Shade );
 				C.x = (float) rand() / RAND_MAX - 0.5F;
 				C.y = (float) rand() / RAND_MAX - 0.5F;

@@ -216,6 +216,8 @@ void StartAHostSession ( MENUITEM * Item )
 						"select a different local port under network options." );
 			}
 			break;
+		default:
+			break;
 		}
 		PrintErrorMessage(error_str, 2, &MENU_NEW_CreateGame, 0);
 		return;

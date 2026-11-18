@@ -1658,6 +1658,8 @@ void JoiningEnter(MENU *Menu)
 						"select a different local port." );
 			}
 			break;
+		default:
+			break;
 		}
 		PrintErrorMessage(error_str, 2, &MENU_NEW_ChooseConnectionToJoin, 0);
 		return;
@@ -5100,7 +5102,7 @@ void DrawKeyDefHelp3( MENUITEM * Item )
 											{
 												help_length = strlen( help );
 												if ( help_length + 1 < HELP_MAX  )
-													strncat( help, "+"ABBREVIATED, HELP_MAX - 1 - help_length );
+													strncat( help, "+" ABBREVIATED, HELP_MAX - 1 - help_length );
 												else
 													strcpy( help + HELP_MAX - 4, ABBREVIATED );
 												help[ HELP_MAX - 1 ] = 0;
@@ -5743,24 +5745,6 @@ void CursorSearch( char *keyword )
 	{
 		SearchKey( 0 );
 	}
-}
-
-
-static VirtualKeycode *KeyDefined( USERCONFIG *cfg, VirtualKeycode key )
-{
-	USERKEY *keydef;
-	int j;
-
-	for ( keydef = &cfg->up; keydef < &cfg->select_secondary[ MAX_SECONDARY_WEAPONS ]; keydef++ )
-	{
-		for ( j = 0; j < keydef->keys; j++ )
-		{
-			if ( keydef->key[ j ] == key )
-				return &keydef->key[ j ];
-		}
-	}
-
-	return NULL;
 }
 
 
@@ -7753,7 +7737,7 @@ void InitMultiplayerHostVDUPeerPeer( MENU *Menu )
 
 	config_get_strncpy( &level_name[0], 64, "LevelName", "ship" );
 
-	if(level_name || (strlen(level_name) != 0) )
+	if( level_name[0] != 0 )
 	{
 		DebugPrintf("level select: config says last level was %s\n",level_name);
 		DebugPrintf("level select: finding level by name in %d items\n",LevelList.items);
@@ -10697,7 +10681,7 @@ bool DrawTextEditCursor( TEXTINFO *TextInfo, int font )
 	xmin = TextInfo->char1x;
 	ymin = TextInfo->text_y_min;
 
-	Bit_Ptr = ( Title_Fonts_Header->Bit_Info + (int16_t)(TextLookup[font][cursor]) );
+	Bit_Ptr = ( Title_Fonts_Header->Bit_Info + (int16_t)(TextLookup[font][(u_int8_t)cursor]) );
 	Off_Ptr = ( Title_Fonts_Header->Off_Info + Bit_Ptr->startbit );
 	Box_Ptr = ( Title_Fonts_Header->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
@@ -10734,7 +10718,7 @@ bool DrawTextEditCursor( TEXTINFO *TextInfo, int font )
 		ScrPolys[TempPoly].Trans = 255;				
 		ScrPolys[TempPoly].Xscale = VduScaleX;				
 		ScrPolys[TempPoly].Yscale = VduScaleY;			  
-		ScrPolys[TempPoly].Frame = TextLookup[font][cursor];
+		ScrPolys[TempPoly].Frame = TextLookup[font][(u_int8_t)cursor];
 		ScrPolys[TempPoly].Frm_Info = &Title_Fonts_Header;
 					
 		AddScrPolyToTPage( TempPoly, GetTPage( *ScrPolys[ TempPoly ].Frm_Info, 0 ) );
@@ -15242,7 +15226,7 @@ bool ProcessWeaponOrder ( int Key )
 					// if no weapons in unused list...
 					if (Num_Unused_Weapons == 0)
 						Num_Unused_Weapons++;
-						redraw = true;
+					redraw = true;
 				}else
 				{
 					// swap current weapon with one below...
@@ -15292,7 +15276,7 @@ bool ProcessWeaponOrder ( int Key )
 					// if no weapons in used list...
 					if (Num_Unused_Weapons == MaxWeapons)
 						Num_Unused_Weapons--;
-						redraw = true;
+					redraw = true;
 				}else
 				{
 					// swap current weapon with one above...

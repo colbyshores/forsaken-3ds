@@ -403,6 +403,8 @@ void stereo_adjust( RENDERMATRIX *m )
 		left += offset;
 		right += offset;
 		break;
+	default:
+		break;
 	}
 
 	m->_31 = (right+left)/(right-left);

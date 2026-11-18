@@ -669,6 +669,8 @@ void DisableRTLight( u_int16_t *data )
 		case LIGHT_PULSING:
 			light->now_time = light->pulse.off_time * TurnOffPoint( light, light->pulse.type );
 			break;
+		default:
+			break;
 		}
 		break;
 	case STATE_ON:
