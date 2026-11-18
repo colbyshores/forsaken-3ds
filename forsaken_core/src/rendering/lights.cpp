@@ -109,8 +109,7 @@ void	KillUsedXLight( u_int16_t light )
 
 
 /*===================================================================
-	Procedure	:	Process all XLights: shrink and dim lights with a
-				:	non-zero SizeCount, free them when Size reaches 0
+	Procedure	:	Shrink and fade dying XLights; free the ones gone
 	Input		:	MLOADHEADER * (unused)
 	Output		:	true
 ===================================================================*/
