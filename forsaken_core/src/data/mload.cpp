@@ -1,88 +1,67 @@
-/*==========================================================================
+/* mload.cpp -- loads the level mesh and its tables from the .mxv file
  *
- *  File: Mload.c
- *	loads in a bin....
- *  extracts the names of the ppm's and creates a suface and material...
- *  make an execution list per group of....
- *  make a list of D3DVERTEX's.....and TRIANGLE's....
-***************************************************************************/
-
-/*
-Execution list format with visibility info and vertex index (*.mxv):
-
-num_texture_files : u_int16_t
-texture_file_name[num_texture_files] : '\0' separated strings
-num_groups : u_int16_t
-{
-	num_exec_lists : u_int16_t
-	{
-		exec_type : u_int16_t // 0 = entirely opaque, 1 = contains transparencies
-		num_vertices : u_int16_t
-		vertex(x,y,z,reserved,colour,specular,tu,tv)[num_vertices] : x, y, z float, others u_int32_t
-		num_texture_groups : u_int16_t
-		{
-		  texture_type : u_int16_t // 0 = normal, 1 = environment mapped
-		  start_vertex : u_int16_t
-		  num_vertices : u_int16_t
-		  texture_no : u_int16_t
-		  num_triangles : u_int16_t
-		  triangles(v0,v1,v2,pad16,nx,ny,nz)[num_triangles] : v? u_int16_t, pad16 u_int16_t, n? float
-		}[num_texture_groups]
-	
-		num_animating_polys : u_int16_t
-		{
-		  animation : u_int16_t
-		  frames : u_int16_t
-		  vertices : u_int16_t
-		  vertex[ vertices ] : u_int16_t
-		  {
-		     {
-		  	tu, tv : float
-		     }[ vertices ]
-		  }[ frames ]
-		}[ num_animating_polys ]
-
-	}[num_exec_lists]
-}[num_groups]
-num_animations : u_int16_t
-{
-	frames : u_int16_t
-	maxloops : u_int16_t
-	animsize : u_int16_t
-	animdata[ animsize ] : u_int16_t
-}[ num_animations ]
-mxvflag : u_int16_t // always 1 for mxv format
-{
-	group_name : '\0' separated string
-	group_center(x, y, z) : all float
-	group_half_size(x, y, z) : all float
-	num_portals_in_group : u_int16_t
-	{
-		num_vertices_in_portal : u_int16_t
-		vertex(x, y, z)[num_vertices_in_portal] : all float
-		num_groups_visible_from_portal : u_int16_t
-		groups_visible_from_portal[num_groups_visible_from_portal] : u_int16_t
-	}[num_portals_in_group]
-}[num_groups]
-mxviflag : u_int16_t // always 1 for mxv format with vertex index
-{
-	num_exec_lists : u_int16_t
-	{
-		cell_origin(x, y, z) : all float
-		xcells, ycells, zcells : all u_int16_t
-		num_vertex_indices : u_int16_t
-		vertex_index[num_vertex_indices] : u_int16_t // points into exec buffer vertex[]
-		vertex_cell(num_verts_in_cell : u_int16_t
-			start_vert_in_cell : u_int16_t)[num_vertex_cells] // points into vertex_index[]
-	}[num_exec_lists]
-}[num_groups]
-num_start_points : u_int16_t
-{
-	x, y, z : float
-	in_group : u_int16_t
-}[num_start_points]
-
-*/
+ * PreMload reads the file and the texture names (and queues the textures);
+ * Mload then builds, per visibility group, the render objects (vertex, index
+ * and normal buffers plus texture groups), and reads the portals and their
+ * visibility tree, the group relation tables (visi.cpp), the group-to-group
+ * sound attenuation table, the lighting cells, the start positions, the group
+ * up vectors, the background texture animations and the per-group clear
+ * colours. Everything is copied out of the file, which is freed at the end of
+ * Mload. ExecuteMloadHeader / ExecuteSingleGroupMloadHeader draw the groups;
+ * BackGroundTextureAnimation steps the texture animations each frame.
+ *
+ * .mxv layout (little-endian, packed: fields have no alignment, so every read
+ * goes through FileReader). Counts are u16 unless noted.
+ *
+ *   magic, version (u32 each; version 3)
+ *   num_texture_files, texture names (NUL-terminated)       -- PreMload
+ *   num_groups
+ *   per group: num_execbufs
+ *     per execbuf:
+ *       execute-buffer size (i16, unused), exec_type (bit 0: has
+ *       transparencies), num_vertices
+ *       OLDLVERTEX[num_vertices]       x y z, reserved, colour, specular, tu tv
+ *       num_texture_groups
+ *       per texture group:
+ *         texture type, start vertex, vertex count (all unused), tpage,
+ *         num_triangles, MFACE[num_triangles]  v1 v2 v3, flags (bit 0:
+ *         colour-keyed), face normal
+ *   visibility flag: 0 = no visibility section (this 0 is then read again
+ *       as num_animations below); 2 = present; anything else is rejected
+ *   if present:
+ *     per group: name, centre (VERT), half size (VERT), num_portals
+ *       per portal: num_vertices, VERT[num_vertices], num_polys,
+ *                   MCFACE[num_polys] (the portal's collision polygons)
+ *     per group, per portal: the portal's visibility tree: target group,
+ *       num_visible, then num_visible child nodes, each { portal index,
+ *       group, num_visible, children ... } (read_visible)
+ *     group relation tables, three times (connected, visible, indirectly
+ *       visible): a bitmap of num_groups rows of DIV_CEIL(MAXGROUPS, 32)
+ *       u32s, then per group a count and that many group numbers
+ *     sound attenuation: float[num_groups][num_groups]
+ *     cell flag: 0 = no lighting cells (the 0 is read again as
+ *       num_start_positions); otherwise
+ *       cell size (float; stored as its reciprocal)
+ *       per group: num_execbufs (ignored), then per execbuf: cell origin
+ *         (VECTOR), x / y / z cell counts, num_vertex_indices,
+ *         u16[num_vertex_indices] (vertex numbers), VERTEXCELL[cells]
+ *         (each a start and count in the vertex numbers)
+ *       and per group: COLOR[cells of execbuf 0] (ambient per cell)
+ *     num_start_positions, STARTPOS[...] (40 bytes: pos, dir, up, group, pad)
+ *     up flag: 0 = every group's up is (0, 1, 0) (the 0 is read again as
+ *       num_animations); otherwise VECTOR[num_groups]
+ *   num_animations
+ *   per animation: frame count and max loops (unused), length,
+ *       u16[length] (frame numbers and TEXANIM_* commands)
+ *   if num_animations: per group, per execbuf: num_animating_polys
+ *     per poly: animation, frames, vertices, u16[vertices] (vertex numbers),
+ *               { tu, tv }[vertices * frames]
+ *   num_colours: if non-zero, per group a u32 background clear colour
+ *       (top byte: clear flag)
+ *   animation index flag: if non-zero, count, then per entry group,
+ *       execbuf, poly, initial state and the trigger mod fired when it stops
+ *       (i16); triggers address the animations through this index
+ */
 
 /*===================================================================
 		Include File...	

@@ -1,37 +1,46 @@
-/*==========================================================================
+/* mxload.cpp -- loads static (.mx) models
  *
- *  File: Mxload.c
- *	loads in a bin....
- *  extracts the names of the ppm's and creates a suface and material...
- *  make an execution list per group of....
- *  make a list of D3DVERTEX's.....and TRIANGLE's....
-***************************************************************************/
+ * PreMxload reads the file and queues its textures; Mxload builds each
+ * execbuf's vertex, index and normal buffers and texture groups, keeps
+ * originalVerts (the baked vertex colours that lighting restores each frame)
+ * and, for models flagged StoreTriangles, a copy of the triangles (the
+ * title screen intersects them to lay menu text across its 3D models). It
+ * also reads the model's texture animations and its fire
+ * points and spot effects. Everything is copied out of the file, which is
+ * freed at the end of Mxload. Models loaded with Panel set are the 3D HUD
+ * panel; their animations tagged "Primary", "Secondary", "Mine" or
+ * "MineNum" are remembered so the HUD can switch frames.
+ *
+ * .mx layout (little-endian, packed; read through FileReader, counts u16):
+ *
+ *   magic, version (u32 each)
+ *   num_texture_files, texture names (NUL-terminated)       -- PreMxload
+ *   num_groups
+ *   per group: num_execbufs
+ *     per execbuf:
+ *       execute-buffer size (unused), exec_type (bit 0: has
+ *       transparencies), num_vertices
+ *       OLDLVERTEX[num_vertices]       x y z, reserved, colour, specular, tu tv
+ *       num_texture_groups
+ *       per texture group:
+ *         texture type (unused), first vertex, vertex count (unused), tpage,
+ *         num_triangles, MFACE[num_triangles]  v1 v2 v3, flags (bit 0:
+ *         colour-keyed), face normal
+ *   a u16 that is skipped (an old format flag)
+ *   num_animations
+ *   per animation: frame count and max loops (unused), length,
+ *       u16[length] (frame numbers and TEXANIM_* commands)
+ *   if num_animations: per group, per execbuf: num_animating_polys
+ *     per poly: tag (32 bytes), animation, frames, vertices,
+ *               u16[vertices] (vertex numbers), { tu, tv }[vertices * frames]
+ *   fire point flag: if non-zero,
+ *     num_fire_points, per point: id, pos, dir, up (VECTORs)
+ *     num_spot_fx, per effect: type, pos, dir, up (VECTORs), start /
+ *       active / inactive delays (float seconds), primary and secondary
+ *       weapon (i16), colour (u32), sound name (NUL-terminated), sound
+ *       volume and speed (float)
+ */
 
-/*
-Execution list format  (*.mx):
-
-num_texture_files : u_int16_t
-texture_file_name[num_texture_files] : '\0' separated strings
-num_groups : u_int16_t
-{
-	num_exec_lists : u_int16_t
-	{
-	  exec_type : u_int16_t // 0 = entirely opaque, 1 = contains transparencies
-	  num_vertices : u_int16_t
-	  vertex(x,y,z,reserved,colour,specular,tu,tv)[num_vertices] : x, y, z float, others u_int32_t
-	  num_texture_groups : u_int16_t
-	  {
-	    texture_type : u_int16_t // 0 = normal, 1 = environment mapped
-		start_vertex : u_int16_t
-		num_vertices : u_int16_t
-		texture_no : u_int16_t
-		num_triangles : u_int16_t
-		triangles(v0,v1,v2,pad16,nx,ny,nz)[num_triangles] : v? u_int16_t, pad16 u_int16_t, n? float
-	  }[num_texture_groups]
-	}[num_exec_lists]
-}[num_groups]
-mxtype : u_int16_t // always 0 for mx format
-*/
 /*===================================================================
 		Include File...
 ===================================================================*/

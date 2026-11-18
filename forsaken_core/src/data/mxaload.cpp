@@ -1,48 +1,42 @@
-/*==========================================================================
+/* mxaload.cpp -- loads animated (.mxa) models
  *
- *  File: Mxaload.c
- *	loads in a bin....
- *  extracts the names of the ppm's and creates a suface and material...
- *  make an execution list per group of....
- *  make a list of D3DVERTEX's.....and TRIANGLE's....
-***************************************************************************/
+ * PreMxaload reads the file and queues its textures; Mxaload builds the
+ * render objects the same way as mxload.cpp (vertex colours are forced
+ * opaque; StoreTriangles keeps the triangles for the title screen) and reads the animation frames into one block, anim_verts, that
+ * frame_pnts point into, plus the fire points and spot effects. The file is
+ * freed at the end of Mxaload. InterpFrames blends two frames into the
+ * vertex buffer each time the model's animation moves: position and UV
+ * into the live vertices, colour into originalVerts, per vertex as its
+ * MXA_ANIM_* flags say.
+ *
+ * .mxa layout (little-endian, packed; read through FileReader, counts u16):
+ *
+ *   magic, version (u32 each)
+ *   num_texture_files, texture names (NUL-terminated)       -- PreMxaload
+ *   num_groups
+ *   per group: num_execbufs
+ *     per execbuf:
+ *       execute-buffer size (unused), exec_type (bit 0: has
+ *       transparencies), num_vertices
+ *       OLDLVERTEX[num_vertices]       x y z, reserved, colour, specular, tu tv
+ *       num_texture_groups
+ *       per texture group:
+ *         texture type (unused), first vertex, vertex count (unused), tpage,
+ *         num_triangles, MFACE[num_triangles]  v1 v2 v3, flags (bit 0:
+ *         colour-keyed), face normal
+ *   format flag: 2 = animation frames follow (any other value is not
+ *       consumed: it is read again as the fire point flag)
+ *   if 2: num_frames; if num_frames > 1, per frame, per group, per execbuf,
+ *       per texture group: count, MXAVERT[count]  x y z, colour, specular,
+ *       tu tv, flags (MXA_ANIM_POS / RGB / UV)
+ *   fire point flag: if non-zero,
+ *     num_fire_points, per point: id, pos, dir, up (VECTORs)
+ *     num_spot_fx, per effect: type, pos, dir, up (VECTORs), start /
+ *       active / inactive delays (float seconds), primary and secondary
+ *       weapon (i16), colour (u32), sound name (NUL-terminated), sound
+ *       volume and speed (float)
+ */
 
-/*
-Execution list format with animated vertices (*.mxa):
-
-num_texture_files : u_int16_t
-texture_file_name[num_texture_files] : '\0' separated strings
-num_groups : u_int16_t
-{
-	num_exec_lists : u_int16_t
-	{
-	  exec_type : u_int16_t // 0 = entirely opaque, 1 = contains transparencies
-	  num_vertices : u_int16_t
-	  vertex(x,y,z,reserved,colour,specular,tu,tv)[num_vertices] : x, y, z float, others u_int32_t
-	  num_texture_groups : u_int16_t
-	  {
-	    texture_type : u_int16_t // 0 = normal, 1 = environment mapped
-		start_vertex : u_int16_t
-		num_vertices : u_int16_t
-		texture_no : u_int16_t
-		num_triangles : u_int16_t
-		triangles(v0,v1,v2,pad16,nx,ny,nz)[num_triangles] : v? u_int16_t, pad16 u_int16_t, n? float
-	  }[num_texture_groups]
-	}[num_exec_lists]
-}[num_groups]
-mxtype : u_int16_t // always 2 for mxa format
-num_frames : u_int16_t // number of animation frames
-{
-	{
-		{
-			{
-				num_anim_vertices : u_int16_t // number of animating vertices for this texture group
-				vertex(x, y, z)[num_anim_vertices] : all float
-			}[num_texture_groups]
-		}[num_exec_lists]
-	}[num_groups]
-}[num_frames]
-*/
 /*===================================================================
 		Include File...	
 ===================================================================*/
