@@ -663,23 +663,6 @@ void ProcessGameKeys( void )
 		if ( input_buffer_find( SDLK_F2 ) )
 			ShowTrigZones = !ShowTrigZones;
 
-#ifdef REMOTE_CAMERA_ENABLED
-		// Ctrl + F3
-		if ( input_buffer_find( SDLK_F3 ) )
-			if( !RemoteCameraActive )
-			{
-				RemoteCameraActive = true;
-				Ships[MAX_PLAYERS].Object.Pos = Ships[WhoIAm].Object.Pos;
-				Ships[MAX_PLAYERS].Object.Group = Ships[WhoIAm].Object.Group;
-				Ships[MAX_PLAYERS].Object.Mode = NORMAL_MODE;
-				Ships[MAX_PLAYERS].enable = 1;
-				Current_Camera_View = MAX_PLAYERS;    // which object is currently using the camera view....
-			}else{
-				RemoteCameraActive = false;
-				Ships[MAX_PLAYERS].enable = 0;
-				Current_Camera_View = WhoIAm;   // which object is currently using the camera view....
-			}
-#endif
 
     } // end ctrl modifier
     else // no modifiers
