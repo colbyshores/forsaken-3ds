@@ -111,11 +111,43 @@ romfs/ is ever regenerated, rerun the checker. Owner confirmed on hardware.
    tests (`tests/`), the static perf/contract gates (`tools/perf/`, run by
    `build_matrix.sh`), `verify_identical.sh`/`verify_o0.sh`.
 8. Support channel: `sdmc:/forsaken_boot.log` (tier/texture-pack lines
+9. Two 1998 expressions whose evident intent differs from what they do
+   (kept as-is, spelled out with parentheses and a comment, e28cfba):
+   `enemies.cpp` `( !Flags ) & AI_BEHAVIOUR_NOBOB` is always 0, so no
+   enemy bobs (intent: `!(Flags & AI_BEHAVIOUR_NOBOB)`); `networking.cpp`
+   MSG_FUPDATE / MSG_VERYSHORTFUPDATE always set SHIP_MulFire (intent:
+   `Flags & (SHIP_SecFire | SHIP_MulFire)`; on the wire). Fix either?
+10. `title.cpp` weapon-order menu: `if (...) Num_Unused_Weapons++;` then
+    `redraw = true;` was indented as if both were guarded; redraw is
+    unconditional and stays so (0d51273). Intended?
 
-Next (no decision needed): data written but never read (e.g.
-`BspZNames[]`), empty `{ }` blocks and bare blocks left by earlier passes,
-`#pragma once` + header comments, the 2,566 warnings `-isystem` was hiding, `constexpr`/`enum class`/`std::array` sweep, then classes for
-state-owning modules (A/B batch).
+### Phase 2 progress, night of 2026-11-17/18 (all on `experimental/cpp-phase2`)
+
+Proof per commit: `verify_identical.sh`; where parameter types change C++
+mangled names, objects are additionally compared with symbol and section
+names stripped (instructions, relocation types, data) -- see the commit
+messages. Behaviour-changing commits are bug fixes, each on its own:
+- Sprite regression root cause and stereo/persist fixes (e480d93, e1a820d,
+  c3b905f, 984a69c, 8033d6f); title model bucket (d572e59); level lists +
+  music by name (b43863e).
+- Bugs found by the warning pass: Print4x5TextSmall fell off a non-void
+  function (b7b52d9); destroy_image cleared sizeof(pointer) (e0536ab);
+  networking join could index slot -1 (e1c6e78); printf formats vs
+  time_t/unsigned long (6c8bb33); the title font's accented characters had
+  been U+FFFD since the 3DS port (16d1342); the missing-texture fallback
+  wrote into the caller's header name and left the path unset (3efae47);
+  wrapped message lines printed past their width (d638bed).
+- Cleanup: write-only data (c835f8a), empty blocks (7191f9f), D3D comment
+  leftovers (95dcef4), `#pragma once` (940be03), a header comment on every
+  header (e237f74), mangled comment banners (dc89833), explicit parentheses
+  (e28cfba), `register` (0e015b9), small warnings (0d51273), bounded string
+  copies (dc5adcb, 4b25138), the last block-scope externs (525a317),
+  const char * for read-only strings (b9ed8a7, f1ca013, 8a330fa).
+- 3DS warnings: 1,122 unique -> 17. Left: 16 -Wformat/-Wstringop-truncation
+  notes on deliberately bounded copies, and assign_loader unused (decision 5).
+
+Next (no decision needed): `constexpr`/`enum class`/`std::array` sweep,
+then classes for state-owning modules; PC (-Wall -Wextra) warning pass.
 
 **Last, after the conversion is complete (owner request 2026-11-17):** fully
 refactor the Forsaken Obsidian docs (`port-docs` vault,
