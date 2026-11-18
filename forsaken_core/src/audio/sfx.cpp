@@ -1711,7 +1711,7 @@ void DestroySound( int /*flags*/ )
 
 void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECTOR *Temp, float Distance, long Volume, u_int16_t Effects );
 
-#define SPEECH_AMPLIFY	( 1.0F / GLOBAL_MAX_SFX )
+constexpr auto SPEECH_AMPLIFY = ( 1.0F / GLOBAL_MAX_SFX );
 constexpr int SFX_2D = 2;
 
 bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq, int type, int HolderIndex, float VolModify, u_int16_t Effects, bool OverideDistanceCheck )
@@ -2615,7 +2615,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 	TauntUpdatable = update;
 }
 
-#define MAX_DISTANCE  ( 24 * 1024 * GLOBAL_SCALE )
+constexpr auto MAX_DISTANCE = ( 24 * 1024 * GLOBAL_SCALE );
 float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector )
 {
 	VECTOR	Temp;

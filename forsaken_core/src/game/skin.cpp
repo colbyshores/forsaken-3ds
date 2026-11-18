@@ -20,8 +20,8 @@
 
 
 constexpr float BOXSIZE = 96.0F;
-#define	NODECUBE_Branch	false
-#define	NODECUBE_Array	true
+constexpr auto NODECUBE_Branch = false;
+constexpr auto NODECUBE_Array = true;
 
 /*===================================================================
 	Globals variables and structures

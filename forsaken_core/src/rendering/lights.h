@@ -47,7 +47,7 @@ constexpr int MAXXLIGHTS = 256;
 constexpr int POINT_LIGHT = 0;
 constexpr int SPOT_LIGHT = 1;
  
-#define MIN_LIGHT_SIZE	( 1536.0F * GLOBAL_SCALE )
+constexpr auto MIN_LIGHT_SIZE = ( 1536.0F * GLOBAL_SCALE );
  
 /*
  * structures

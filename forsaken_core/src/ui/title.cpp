@@ -2677,7 +2677,6 @@ typedef struct
 	float BracketEndRot;
 }VDUINFO;
 
-#define	Right	false
 
 VECTOR CurrentVDUPos;
 float VDUrot;
@@ -2839,8 +2838,8 @@ int WeaponList[ MAX( MAX_PRIMARY_WEAPONS, MAX_SECONDARY_WEAPONS ) ];
 int16_t SelectedWeapon;
 u_int16_t Num_Unused_Weapons;
 MENUITEM *WeaponItem;
-#define WEAPON_ChoosingFirst	false
-#define WEAPON_ChoosingSecond	true
+constexpr auto WEAPON_ChoosingFirst = false;
+constexpr auto WEAPON_ChoosingSecond = true;
 bool WeaponOrderStatus;
 u_int16_t MaxWeapons;
 int16_t *PriorityList;

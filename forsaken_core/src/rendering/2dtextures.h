@@ -20,8 +20,8 @@
 ===================================================================*/
 constexpr int MAX_NAMES = 8;
 
-#define	DO_LOAD			true
-#define	DONT_LOAD		false
+constexpr auto DO_LOAD = true;
+constexpr auto DONT_LOAD = false;
 
 constexpr auto BOX_NOFLIP = 0x0000;
 constexpr auto BOX_XFLIP = 0x2000;

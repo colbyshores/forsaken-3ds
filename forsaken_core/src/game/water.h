@@ -16,8 +16,8 @@
 #include "game/main.h"
 #include "game/constants.h"
 
-#define	ROOTTWO  (1.0F / (float)sqrt(2.0F))
-#define	SPECIALROOTTWO (1.0F / (4.0F+(1.0F / (float)sqrt(2.0F))*4.0F))
+constexpr auto ROOTTWO = (1.0F / (float)sqrt(2.0F));
+constexpr auto SPECIALROOTTWO = (1.0F / (4.0F+(1.0F / (float)sqrt(2.0F))*4.0F));
 /* Water mesh cell budget. Original 32×32 = 1024 was sized for the
  * 1998 levels (largest is fedbankv at ~600 cells). Remaster /
  * Night-Dive levels can exceed this — tuben64's water is 37×29 =

@@ -374,8 +374,8 @@ void ProcessPolys( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-#define	MAX_AFTERBURNER_LENGTH	( 512.0F * GLOBAL_SCALE )
-#define	AFTERBURNER_INC			( 30.0F * GLOBAL_SCALE )
+constexpr auto MAX_AFTERBURNER_LENGTH = ( 512.0F * GLOBAL_SCALE );
+constexpr auto AFTERBURNER_INC = ( 30.0F * GLOBAL_SCALE );
 
 static	u_int16_t	TurboIndex[ MAX_PLAYERS ];
 static	float	TurboLength[ MAX_PLAYERS ];

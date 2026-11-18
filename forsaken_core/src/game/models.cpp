@@ -42,7 +42,7 @@
 #include "world/visi.h"
 
 
-#define BALL_RADIUS	( 256 * GLOBAL_SCALE )
+constexpr auto BALL_RADIUS = ( 256 * GLOBAL_SCALE );
 
 /*===================================================================
 	Globals
@@ -63,8 +63,8 @@ bool	ShowBoundingBoxes = false;
  * MAXMODELHEADERS-sized static array to give back ~6 MB of BSS. */
 MXLOADHEADER *ModelHeaders = NULL;
 
-#define	RETAIN_POLYS		true
-#define	DISCARD_POLYS		false
+constexpr auto RETAIN_POLYS = true;
+constexpr auto DISCARD_POLYS = false;
 void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * Blue );
 bool	ENVMxa( MXALOADHEADER * Mxaloadheader , MATRIX * Mat ,VECTOR * Pos);
 

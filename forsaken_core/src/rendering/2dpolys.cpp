@@ -163,10 +163,10 @@ void KillUsedFmPoly( u_int16_t i )
 	Output		:	Nothing
 ===================================================================*/
 
-#define	NMEGEN_START		( 2.0F * ANIM_SECOND )
-#define	NMEGEN_STAGE1		( 0.8F * ANIM_SECOND )
-#define	NMEGEN_STAGE2		( 0.4F * ANIM_SECOND )
-#define	NMEGEN_END			( 0.0F * ANIM_SECOND )
+constexpr auto NMEGEN_START = ( 2.0F * ANIM_SECOND );
+constexpr auto NMEGEN_STAGE1 = ( 0.8F * ANIM_SECOND );
+constexpr auto NMEGEN_STAGE2 = ( 0.4F * ANIM_SECOND );
+constexpr auto NMEGEN_END = ( 0.0F * ANIM_SECOND );
 #define	NMEGEN_STAGE0_LEN	( NMEGEN_START - NMEGEN_STAGE1 )
 #define	NMEGEN_STAGE1_LEN	( NMEGEN_STAGE1 - NMEGEN_STAGE2 )
 #define	NMEGEN_STAGE2_LEN	( NMEGEN_STAGE2 - NMEGEN_END )

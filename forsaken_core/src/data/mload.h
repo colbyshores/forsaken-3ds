@@ -24,7 +24,7 @@ constexpr int MAXPORTALSPERGROUP = 64;
 constexpr int MAXVERTSPERPORTAL = 32;
 constexpr int MAXPOLYSPERPORTAL = 32;
 constexpr int MAXVERTSPERPORTALPOLY = 4;
-#define MAXSTARTPOSITIONS	MAXGROUPS
+constexpr auto MAXSTARTPOSITIONS = MAXGROUPS;
 constexpr auto HASTRANSPARENCIES = 0x001;
 constexpr auto HASENVIROMENTMAP = 0x002;
 
@@ -42,8 +42,8 @@ constexpr auto TEXANIM_LOOPINIT = (0x8003); // loop var, number of repeats
 constexpr auto TEXANIM_LOOPEND = (0x8004); // loop var, start of loop
 constexpr auto TEXANIM_END = (0xFFFF); // (end of animation)
 
-#define	LEVEL_SPECIFIC			true
-#define	NOT_LEVEL_SPECIFIC		false
+constexpr auto LEVEL_SPECIFIC = true;
+constexpr auto NOT_LEVEL_SPECIFIC = false;
 
 /*
  * structures

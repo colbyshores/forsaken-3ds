@@ -3883,12 +3883,12 @@ constexpr auto AUTOLEVEL_RATE = (0.1F);
 
 constexpr auto FRAMES_PER_SEC = (60.0F);
 
-#define BOB_XSIZE		(30.0F * GLOBAL_SCALE)
-#define BOB_YSIZE		(10.0F * GLOBAL_SCALE)
-#define BOB_XPERIOD		(2.0F * FRAMES_PER_SEC)
-#define BOB_YPERIOD		(1.0F * FRAMES_PER_SEC)
-#define BOB_XFREQ		(2.0F * PI / BOB_XPERIOD)
-#define BOB_YFREQ		(2.0F * PI / BOB_YPERIOD)
+constexpr auto BOB_XSIZE = (30.0F * GLOBAL_SCALE);
+constexpr auto BOB_YSIZE = (10.0F * GLOBAL_SCALE);
+constexpr auto BOB_XPERIOD = (2.0F * FRAMES_PER_SEC);
+constexpr auto BOB_YPERIOD = (1.0F * FRAMES_PER_SEC);
+constexpr auto BOB_XFREQ = (2.0F * PI / BOB_XPERIOD);
+constexpr auto BOB_YFREQ = (2.0F * PI / BOB_YPERIOD);
 
 void ObjectBob( OBJECT * Object, VECTOR *bob )
 {

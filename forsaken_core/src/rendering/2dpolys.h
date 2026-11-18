@@ -44,9 +44,9 @@
 /*===================================================================
 	Defines
 ===================================================================*/
-#define	EXPLO_DISTANCE		( 256.0F * GLOBAL_SCALE )
+constexpr auto EXPLO_DISTANCE = ( 256.0F * GLOBAL_SCALE );
 constexpr int MAXNUMOF2DPOLYS = 2000;
-#define MaxColDistance		( 64000.0F * GLOBAL_SCALE )
+constexpr auto MaxColDistance = ( 64000.0F * GLOBAL_SCALE );
 constexpr int MAXFMPOLYVERTS = 700;
 
 /*===================================================================

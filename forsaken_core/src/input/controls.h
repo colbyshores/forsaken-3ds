@@ -25,7 +25,7 @@ constexpr int CRUISE_FORWARD = (1);
 constexpr int CRUISE_NITRO = (2);
 constexpr int CRUISE_REVERSE = (-1);
 
-#define MAXMOVESPEED	(45.0F*GLOBAL_SCALE)
+constexpr auto MAXMOVESPEED = (45.0F*GLOBAL_SCALE);
 constexpr float MOVEACCELL = 0.065F;
 constexpr float MOVEDECELL = 0.0611F;
 #define MAXTURBOSPEED   (MAXMOVESPEED * 2.0F)
@@ -109,10 +109,9 @@ enum
 	AXIS_SliderAxis1,
 };					 
 
-#define AXIS_Start AXIS_XAxis
-#define AXIS_End AXIS_SliderAxis1
+constexpr auto AXIS_Start = AXIS_XAxis;
+constexpr auto AXIS_End = AXIS_SliderAxis1;
 
-#define NUM_SHIP_ACTIONS		SHIPACTION_MAX
 constexpr int NUM_SHIP_AXIS_ACTIONS = 7;
 
 enum {
@@ -147,6 +146,8 @@ enum {
 	SHIPACTION_RollMode,			// 28
 	SHIPACTION_MAX					// always last in list
 };
+
+constexpr auto NUM_SHIP_ACTIONS = SHIPACTION_MAX;
 
 enum {
 	JOYSTICK_XAxisPos,

@@ -45,8 +45,8 @@
  * defines
  */
 
-#define MAXCOLGROUPS MAXGROUPS
-#define COLLISION_FUDGE (10.0F*GLOBAL_SCALE)
+constexpr auto MAXCOLGROUPS = MAXGROUPS;
+constexpr auto COLLISION_FUDGE = (10.0F*GLOBAL_SCALE);
 
 /*
  * structures

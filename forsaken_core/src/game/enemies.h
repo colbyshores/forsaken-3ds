@@ -392,11 +392,11 @@ constexpr int MAXENEMIES = 256;
  * ENEMY_TYPES entries in static data. */
 constexpr int MAX_ENEMY_TYPES = 128;
 
-#define	YES_STEALTH_MODE		true
-#define	NO_STEALTH_MODE			false
+constexpr auto YES_STEALTH_MODE = true;
+constexpr auto NO_STEALTH_MODE = false;
 
-#define	COMPONENTCOLLISION		true
-#define	SPHERECOLLISION			false
+constexpr auto COMPONENTCOLLISION = true;
+constexpr auto SPHERECOLLISION = false;
 
 /*===================================================================
 	Prototypes

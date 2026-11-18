@@ -76,8 +76,8 @@ constexpr int MAXGENTRIGGERCOUNT = 60;
 constexpr int MAXGENTRIGVARCOUNT = 60;
 constexpr int MAX_PICKUPFLAGS = 2;
 constexpr int MAX_BUFFER_SIZE = 1024;
-#define FRAMELAGED_RECOIL					true
-#define ONEOFF_RECOIL						false
+constexpr auto FRAMELAGED_RECOIL = true;
+constexpr auto ONEOFF_RECOIL = false;
 constexpr int NUMTITANBITS = 10;
 
 extern bool PlayerReady[MAX_PLAYERS];
@@ -530,26 +530,26 @@ constexpr int SHIP_NumMultiples_Bit2 = 1;
 constexpr int SHIP_NumMultiples_Bit1 = 0;
 
 constexpr auto SHIP_Light = ( 1 << SHIP_Light_Bit );
-#define	SHIP_CarryingFlag4	( 1 << SHIP_CarryingFlag4_Bit )
-#define	SHIP_CarryingFlag3	( 1 << SHIP_CarryingFlag3_Bit )
-#define	SHIP_CarryingFlag2	( 1 << SHIP_CarryingFlag2_Bit )
-#define	SHIP_CarryingFlag1	( 1 << SHIP_CarryingFlag1_Bit )
+constexpr auto SHIP_CarryingFlag4 = ( 1 << SHIP_CarryingFlag4_Bit );
+constexpr auto SHIP_CarryingFlag3 = ( 1 << SHIP_CarryingFlag3_Bit );
+constexpr auto SHIP_CarryingFlag2 = ( 1 << SHIP_CarryingFlag2_Bit );
+constexpr auto SHIP_CarryingFlag1 = ( 1 << SHIP_CarryingFlag1_Bit );
 constexpr auto SHIP_CarryingFlag = ( 1 << SHIP_CarryingFlag_Bit );
-#define	SHIP_CarryingFlags	( SHIP_CarryingFlag1 \
-							| SHIP_CarryingFlag2 \
-							| SHIP_CarryingFlag3 \
-							| SHIP_CarryingFlag4 )
-#define	SHIP_NumMultiplesBit4	( 1 << SHIP_NumMultiples_Bit4 )
-#define	SHIP_NumMultiplesBit3	( 1 << SHIP_NumMultiples_Bit3 )
-#define	SHIP_NumMultiplesBit2	( 1 << SHIP_NumMultiples_Bit2 )
-#define	SHIP_NumMultiplesBit1	( 1 << SHIP_NumMultiples_Bit1 )
+constexpr auto SHIP_CarryingFlags = ( SHIP_CarryingFlag1
+							| SHIP_CarryingFlag2
+							| SHIP_CarryingFlag3
+							| SHIP_CarryingFlag4 );
+constexpr auto SHIP_NumMultiplesBit4 = ( 1 << SHIP_NumMultiples_Bit4 );
+constexpr auto SHIP_NumMultiplesBit3 = ( 1 << SHIP_NumMultiples_Bit3 );
+constexpr auto SHIP_NumMultiplesBit2 = ( 1 << SHIP_NumMultiples_Bit2 );
+constexpr auto SHIP_NumMultiplesBit1 = ( 1 << SHIP_NumMultiples_Bit1 );
 constexpr auto SHIP_Shield = ( 1 << SHIP_Shield_Bit );
-#define	SHIP_HullBit2		( 1 << SHIP_Hull_Bit2 )
-#define	SHIP_HullBit1		( 1 << SHIP_Hull_Bit1 )
-#define	SHIP_ModeBit2		( 1 << SHIP_Mode_Bit2 )
-#define	SHIP_ModeBit1		( 1 << SHIP_Mode_Bit1 )
-#define	SHIP_PowerLevelBit2	( 1 << SHIP_PowerLevel_Bit2 )
-#define	SHIP_PowerLevelBit1	( 1 << SHIP_PowerLevel_Bit1 )
+constexpr auto SHIP_HullBit2 = ( 1 << SHIP_Hull_Bit2 );
+constexpr auto SHIP_HullBit1 = ( 1 << SHIP_Hull_Bit1 );
+constexpr auto SHIP_ModeBit2 = ( 1 << SHIP_Mode_Bit2 );
+constexpr auto SHIP_ModeBit1 = ( 1 << SHIP_Mode_Bit1 );
+constexpr auto SHIP_PowerLevelBit2 = ( 1 << SHIP_PowerLevel_Bit2 );
+constexpr auto SHIP_PowerLevelBit1 = ( 1 << SHIP_PowerLevel_Bit1 );
 constexpr auto SHIP_CarryingBounty = ( 1 << SHIP_CarryingBounty_Bit );
 constexpr auto SHIP_Scattered = ( 1 << SHIP_Scattered_Bit);
 constexpr auto SHIP_Litup = ( 1 << SHIP_Litup_Bit );
@@ -557,10 +557,10 @@ constexpr auto SHIP_InWater = ( 1 << SHIP_InWater_Bit );
 constexpr auto SHIP_SuperNashram = ( 1 << SHIP_SuperNashram_Bit );
 constexpr auto SHIP_Invul = ( 1 << SHIP_Invul_Bit );
 constexpr auto SHIP_MulFire = ( 1 << SHIP_MulFire_Bit );
-#define	SHIP_Multiple		( ( 1 << SHIP_NumMultiples_Bit4 ) \
-							| ( 1 << SHIP_NumMultiples_Bit3 ) \
-							| ( 1 << SHIP_NumMultiples_Bit2 ) \
-							| ( 1 << SHIP_NumMultiples_Bit1 ) )
+constexpr auto SHIP_Multiple = ( ( 1 << SHIP_NumMultiples_Bit4 )
+							| ( 1 << SHIP_NumMultiples_Bit3 )
+							| ( 1 << SHIP_NumMultiples_Bit2 )
+							| ( 1 << SHIP_NumMultiples_Bit1 ) );
 constexpr auto SHIP_Charging = ( 1 << SHIP_Charging_Bit );
 constexpr auto SHIP_Turbo = ( 1 << SHIP_Turbo_Bit );
 constexpr auto SHIP_Stealth = ( 1 << SHIP_Stealth_Bit );
@@ -971,7 +971,7 @@ extern SHORTNAMETYPE Names;
 
 extern GLOBALSHIP Ships[MAX_PLAYERS+1];
 extern BYTE Current_Camera_View; // which object is currently using the camera view....
-#define INVALID_CAMERA_VIEW MAX_PLAYERS+2
+constexpr auto INVALID_CAMERA_VIEW = MAX_PLAYERS + 2;
 #define CAMERA_VIEW_IS_VALID (Current_Camera_View >= 0 && Current_Camera_View < MAX_PLAYERS+1)
 
 /*
