@@ -202,9 +202,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				lpLVERTEX[i].color = old.color;
 
 				lpLVERTEX[i].color |= 0xFF000000;
-				// nothing used specular so we removed it from LVERTEX
-				// lpLVERTEX->specular = lpLVERTEX2->specular;
-//				lpLVERTEX->dwReserved = 0;
+				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
 			/* bjd - allows us to retrieve copies of the original vertices in the new format! */

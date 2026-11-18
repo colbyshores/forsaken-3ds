@@ -225,22 +225,12 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				g = (color>>8)&255;
 				b = color&255;
 
-				/* bjd curr driver = 0 use to be software mode
-				if(render_info.CurrDriver == 0) // is it or ramp mode..
-				{
-						a = 128;
-				}
-				else
-				*/
-				{
-						a = 255;
-				}
+				a = 255;
 
 				color = RGBA_MAKE( r , g , b , a  );
 				lpLVERTEX[i].color = color;
 
-				// nothing used specular so we removed it from LVERTEX
-				//lpLVERTEX[i]->specular = lpLVERTEX2->specular;
+				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
 			/* bjd - allows us to retrieve copies of the original vertices in the new format! */

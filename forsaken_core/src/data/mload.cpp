@@ -403,23 +403,13 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				g = (color>>8)&255;
 				b = color&255;
 
-				/* bjd curr driver = 0 use to be software mode
-				if(render_info.CurrDriver == 0) // is it or ramp mode..
-				{
-						a = 128;
-				}
-				else
-				*/
-				{
-						a = 255;
-				}
+				a = 255;
 
 				// right here you could override texture coloring if you wanted
 				color = RGBA_MAKE( r , g , b , a  );
 				lpLVERTEX[i].color = color;
 
-				// nothing used specular so we removed it from LVERTEX
-				//lpLVERTEX->specular = lpLVERTEX2->specular;
+				// the file's specular colour is unused (LVERTEX has no specular)
 			}
 
 			/* bjd - allows us to retrieve copies of the original vertices in the new format! */
@@ -639,8 +629,6 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 					Mloadheader->Group[group].Portal[portal].centroid = centroid;
 
-					//DebugPrintf("group %d portal %d centroid = { %f, %f, %f }\n", 
-					//	group, portal, centroid.x, centroid.y, centroid.z);
 				}
 
 				// get the polys in the portal
