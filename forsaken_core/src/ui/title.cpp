@@ -12138,14 +12138,14 @@ void SendTitleMessage(MENUITEM *Item)
 	GetVduTextFormattingInfo ( &TitlePlayerMessage );
 }
 
-void AddTitleMessage(TEXTMSG *lpTextMsg)
+void AddTitleMessage(TEXTMSG *TextMsg)
 {
 	
 	if (TotalTitleMsgs != MAX_TITLE_MSGS)
 	{
-		char * name = (WhoIAm == lpTextMsg->WhoIAm) ? biker_name : Names[lpTextMsg->WhoIAm];
+		char * name = (WhoIAm == TextMsg->WhoIAm) ? biker_name : Names[TextMsg->WhoIAm];
 		snprintf( TitleMsgQue[TitleMsgQueStart].text, MAX_TITLE_MSG_SIZE,
-			"%s: %s", name, &lpTextMsg->Text[0] );
+			"%s: %s", name, &TextMsg->Text[0] );
 		TitleMsgQue[TitleMsgQueStart].timer = MAX_TITLE_MSG_TIME;
 		TitleMsgQueStart++;
 		TotalTitleMsgs++;
