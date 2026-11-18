@@ -7885,7 +7885,7 @@ void GetSavedGameData( void )
 	else
 	{
 #ifdef SAVEGAME_SLOTS
-		sprintf( CurrentSavedGameDate, SavedGameInfo( LoadSavedGameList.selected_item ) );
+		snprintf( CurrentSavedGameDate, sizeof( CurrentSavedGameDate ), "%s", SavedGameInfo( LoadSavedGameList.selected_item ) );
 #else
 		Msg("invalid saved game file\n");
 		return;
