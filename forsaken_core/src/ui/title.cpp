@@ -14049,10 +14049,6 @@ bool DeletePilot( LIST *l, int item )
 
 void ToggleBikeEngines( MENUITEM *Item )
 {
-	if ( !BikeEnginesOn )
-	{
-		// call to stop bike engines
-	}
 }
 
 void InitTitleMessaging( void )

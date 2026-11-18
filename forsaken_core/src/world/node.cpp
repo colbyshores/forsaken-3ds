@@ -467,22 +467,6 @@ void SetNetworkDistance( void )
 		}
 		NodeFrom++;
 	}
-
-
-	for( e = 0 ; e < 1 ; e++ )
-	{
-		for( o = 0 ; o < NodeNetworkHeader.NumOfNodes ; o++ )
-		{
-			na = NodeArray;
-			na += ( e * NodeNetworkHeader.NumOfNodes ) + o;
-			if( *na == -1.0F )
-			{
-				// a node is not connected to another node
-//				DebugPrintf("Node %d Is not Connected to Node %d in any way...THIS IS BAD..FIX IT!\n", o , e  );
-//				Msg( "Node %d Is not Connected to Node %d in any way...THIS IS BAD..FIX IT!\n", o , e );
-			}
-		}
-	}
 }
 
 
@@ -605,12 +589,6 @@ NODE * WhichNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 			{
 				NodeReturn = NodeLink;
 				Distance = Temp;
-			}
-			else
-			{
-				//if its not on my network but is closer then the one on my network is useless so dont use it..
-//				NodeReturn = NULL;
-//				Distance = Temp;
 			}
 		}
 

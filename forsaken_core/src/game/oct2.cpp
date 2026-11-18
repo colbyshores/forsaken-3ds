@@ -774,12 +774,6 @@ void ProcessGameKeys( void )
 
     }
 
-	// multiplayer
-	else
-	{
-		// F3
-		// F4
-	}
 
     // F5
     if ( input_buffer_find( SDLK_F5 ) )
@@ -2384,9 +2378,6 @@ bool RenderScene( void )
     if( Browl <= 0.0F )
     {
       Browl = 30.0F;
-      if( TeamGame &&  (OverallGameStatus == STATUS_Normal) )
-	  {
-	  }
       SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
     }
 

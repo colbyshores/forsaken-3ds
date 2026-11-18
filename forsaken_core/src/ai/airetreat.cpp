@@ -109,11 +109,10 @@ void AI_AIR_RETREAT( register ENEMY * Enemy )
 					return;
 				}
 				
-				if( !AI_ClearLOSNonZero( &Enemy->Object, &TNode->Pos , EnemyTypes[Enemy->Type].Radius  ) )
+				/* If I can't see the ideal node, keep going to my previous target. */
+				if( AI_ClearLOSNonZero( &Enemy->Object, &TNode->Pos , EnemyTypes[Enemy->Type].Radius  ) )
 				{
-					// cant see the ideal node so just keep going to my previous target...
-				}else{
-				Enemy->TNode = TNode;
+					Enemy->TNode = TNode;
 				}
 			}else{
 				// If I can leave my network to follow a target then do so if I have to...
@@ -122,10 +121,9 @@ void AI_AIR_RETREAT( register ENEMY * Enemy )
 				else
 					NewNode = (NODE*) WhichRetreatNode( Enemy->Object.NodeNetwork , (NODE*)Enemy->Object.NearestNode , (NODE*)TObject->NearestNode );
 
-				if( !NewNode || !AI_ClearLOSNonZero( &Enemy->Object, &NewNode->Pos , EnemyTypes[Enemy->Type].Radius  ) ) 
+				/* If I can't see the ideal node, keep going to my previous target. */
+				if( NewNode && AI_ClearLOSNonZero( &Enemy->Object, &NewNode->Pos , EnemyTypes[Enemy->Type].Radius  ) )
 				{
-					// cant see the ideal node so just keep going to my previous target...
-				}else{
 					Enemy->TNode = NewNode;
 				}
 			}

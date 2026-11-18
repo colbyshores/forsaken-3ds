@@ -2480,9 +2480,6 @@ static bool create_texture(LPTEXTURE *t, const char *path,
 			C3D_TexFlush(&texdata->tex);
 			linearFree(tiled);
 		}
-		else
-		{
-		}
 
 		C3D_TexSetFilter(&texdata->tex, GPU_LINEAR, GPU_LINEAR);
 		C3D_TexSetWrap(&texdata->tex, GPU_REPEAT, GPU_REPEAT);

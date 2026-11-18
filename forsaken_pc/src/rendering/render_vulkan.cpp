@@ -952,10 +952,6 @@ static bool create_texture(LPTEXTURE *t, const char *path, u_int16_t *width, u_i
     region.imageSubresource.layerCount = 1;
     region.imageExtent = (VkExtent3D){ (uint32_t)image.w, (uint32_t)image.h, 1 };
     vkCmdCopyBufferToImage(cb, st->buf, texdata->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-    if (!*t || texdata->image) {
-        /* generate the mip chain by blitting down (fresh textures) */
-        if (*t == NULL || levels > 1) { /* handled below via flag */ }
-    }
     transition(cb, texdata->image, 0, 1, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT);
     end_one_time(cb);
     vkbuf_destroy(st);

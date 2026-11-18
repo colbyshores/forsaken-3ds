@@ -42,15 +42,9 @@ void AI_TURRET_FIREATTARGET( register ENEMY * Enemy )
 			return;
 		}
 	}else{
-		if( Enemy->Object.Animating && (Enemy->Object.CurAnimSeq == TURRETSEQ_Opening ) )
+		if( !Enemy->Object.Animating )
 		{
-
-		}else{
-
-			if( !Enemy->Object.Animating )
-			{
-				SetCurAnimSeq( TURRETSEQ_Open, &Enemy->Object );
-			}
+			SetCurAnimSeq( TURRETSEQ_Open, &Enemy->Object );
 		}
 	}
 	

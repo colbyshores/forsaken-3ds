@@ -1503,13 +1503,6 @@ bool CheckDecreaseTemperature( void )
 		}
 	}
 
-	TVpnt = MinimumTemperature;
-
-	if( TVpnt )
-	{
-
-	}
-
 	return false;
 }
 

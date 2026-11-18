@@ -958,39 +958,6 @@ bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t	NumVerts, int16_
    		
 	memmove(lpBufStart, Verts, sizeof(LVERTEX) * NumVerts);//memcpy
    
-   	if( ( ShowSkin == 3  ) || ( ShowSkin == 4 ) )
-   	{
-/* bjd - CHECK
-   	   	OP_STATE_RENDER( 1, lpPointer);
-   			STATE_DATA( D3DRENDERSTATE_FILLMODE, D3DFILL_WIREFRAME, lpPointer );
-*/
-   	}
-   	else
-   	{
-		if( ShowSkin == 5 )
-		{
-/* bjd - CHECK
-	   	   	OP_STATE_RENDER( 8, lpPointer);
-				STATE_DATA( D3DRENDERSTATE_TEXTUREMAPBLEND, D3DTBLEND_MODULATE, lpPointer );
-				STATE_DATA( D3DRENDERSTATE_BLENDENABLE, false, lpPointer );
-				STATE_DATA( D3DRENDERSTATE_ZWRITEENABLE, true, lpPointer );
-				STATE_DATA( D3DRENDERSTATE_STIPPLEDALPHA , false, lpPointer );
-				STATE_DATA( D3DRENDERSTATE_SRCBLEND, D3DBLEND_ONE, lpPointer );
-				STATE_DATA( D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO, lpPointer );
-			    STATE_DATA( D3DRENDERSTATE_WRAPU, false, lpPointer );
-			    STATE_DATA( D3DRENDERSTATE_WRAPV, false, lpPointer );
-*/
-		}
-   	}
-/* bjd - CHECK
-    OP_PROCESS_VERTICES( 1, lpPointer );
-        PROCESSVERTICES_DATA( D3DPROCESSVERTICES_TRANSFORM, 0, NumVerts, lpPointer );
-    OP_STATE_RENDER( 1, lpPointer );
-        STATE_DATA(D3DRENDERSTATE_TEXTUREHANDLE, 0, lpPointer);
-    OP_TRIANGLE_LIST( NumTris, lpPointer );
-        TRIANGLE_LIST_DATA( Tris, NumTris, lpPointer );		// Copy Triangles to Execute Buffer
-*/
-
 	if (!(FSUnlockVertexBuffer(&Skin_Execs[ Num_Skin_Execs ])))
 	{
 		return false;

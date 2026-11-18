@@ -8361,8 +8361,6 @@ static int read_EnemyType( FILE *f, char *last_token )
 		if( i < tab_size )
 		{
 			CurrentEnemy = tab[i].EnemyType;
-		}else{
-			// Illegal Enemy Type
 		}
 	}
 	fscanf( f, " %80s", last_token );

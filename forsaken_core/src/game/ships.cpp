@@ -1209,9 +1209,7 @@ bool ProcessShips()
 					}
 
 
-					if( TeleportsAreaCheck( &ShipObjPnt->Pos , &StartPos , OldGroup, ShipObjPnt ) )
-					{
-					}
+					TeleportsAreaCheck( &ShipObjPnt->Pos , &StartPos , OldGroup, ShipObjPnt );
 
 					if ( framelag )
 					{
@@ -1728,12 +1726,6 @@ int16_t DoDamage( bool OverrideInvul )
 
 						PlaySfx( SFX_Die, 1.0F );
 						Ships[WhoIAm].Object.Hull = 0.0F;
-						if( Ships[WhoIAm].ShipThatLastHitMe == WhoIAm )
-						{
-							// killed myself....Doh
-							// stats.c (not sure when this is callled or what weapon caused it??)
-							//UpdateKillStats(WhoIAm, WhoIAm, int WeaponType, int Weapon)
-						}
 						return 1;
 					}
 				}

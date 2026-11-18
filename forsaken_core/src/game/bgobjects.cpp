@@ -2239,9 +2239,6 @@ bool CheckBGObjectToPickups( BGOBJECT * Object )
 							KillPickup( Pickup->Owner, Pickup->ID, PICKUPKILL_Immediate );
 						}
 					}
-					else
-					{
-					}
 				}
 			}
 			
