@@ -20,7 +20,6 @@
 #include "world/bsp.h"
 #include "world/visi.h"
 
-#define USE_BSP_COLOURS
 
 constexpr float BOXSIZE = 96.0F;
 #define	NODECUBE_Branch	false
@@ -486,11 +485,7 @@ void DisplayNewBSPNode( BSP_NODE * Node )
 
 	while( Node )
 	{
-#ifdef USE_BSP_COLOURS
 		color = Node->Colour | 0x80000000L;
-#else
-		color = RGBA_MAKE( 128, 0, 0, 128 );
-#endif
 
 		Vnum = GimmeNodeVertices( Node, StartNode, Side, &TempVerts[ 0 ] );
 	
