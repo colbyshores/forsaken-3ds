@@ -57,7 +57,6 @@ PORTLIBS   := $(DEVKITPRO)/portlibs/3ds
 CORE_SRCDIR := $(SRCDIR)/forsaken_core/src
 PLAT_SRCDIR := $(SRCDIR)/forsaken_3ds/src
 SRC_DIRS    := $(sort $(shell find $(CORE_SRCDIR) $(PLAT_SRCDIR) -type d))
-vpath %.c   $(SRC_DIRS)
 vpath %.cpp $(SRC_DIRS)
 
 
@@ -68,13 +67,9 @@ vpath %.cpp $(SRC_DIRS)
 ARCH := -march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
 CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
-	-Wno-missing-braces -Wno-pointer-sign -Wno-sign-compare \
-	-Wno-incompatible-pointer-types \
-	-Wno-implicit-function-declaration \
-	-Wno-implicit-int -Wno-int-conversion \
-	-ffunction-sections -fdata-sections -fcommon \
+	-Wno-missing-braces -Wno-sign-compare \
+	-ffunction-sections -fdata-sections \
 	-fno-math-errno \
-	-std=gnu99 \
 	-D__3DS__ \
 	-DLUA_USE_APICHECK
 
@@ -82,7 +77,7 @@ CFLAGS := $(ARCH) -O2 -Wall -Wno-unused-variable -Wno-unused-but-set-variable \
 CFLAGS += -DRENDERER_C3D
 # Hybrid GPU vertex lighting: shader does ambient + per-vertex point-light
 # falloff + accumulation, replacing the per-vertex CPU dynamic-light loop
-# in lights.c::XLight1Group. Validated on hardware; default-on.
+# in lights.cpp::XLight1Group. Validated on hardware; default-on.
 CFLAGS += -DGPU_LIGHTING
 
 # VERIFY_CFLAGS: verification builds only (tools/verify_identical.sh). It
@@ -91,25 +86,14 @@ CFLAGS += -DGPU_LIGHTING
 # (no stale objects) and in FORBIDDEN_FLAGS (never in a release).
 CFLAGS += $(VERIFY_CFLAGS)
 
-ALL_SRC := $(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.c))))
-CFILES  := $(ALL_SRC)
-OFILES  := $(CFILES:.c=.o)
-
-# C-with-classes (AGENTS.md 9): .cpp files in the source trees compile as C++
-# with the contract's language flags (-fno-exceptions -fno-rtti: the banned
-# constructs must not merely be discouraged, they must not compile). There are
-# the gates' "3DS build scope" claim stays true: every .cpp under the core and
-# 3DS trees is in scope for the gates, therefore it must be in the build.
+# Every translation unit is C++ (C with classes, AGENTS.md 9), compiled with
+# the contract's language flags (-fno-exceptions -fno-rtti: the banned
+# constructs must not merely be discouraged, they must not compile). Every
+# .cpp under the core and 3DS trees is built, which keeps the gates' "3DS
+# build scope" claim true.
 CXXFILES := $(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))))
-CXXOFILES := $(CXXFILES:.cpp=.o)
-OFILES += $(CXXOFILES)
-# Link with the C++ driver when any C++ object exists: it pulls libstdc++ and
-# the C++ startup bits the objects reference.
-ifeq ($(strip $(CXXOFILES)),)
-LINK_CC := $(CC)
-else
-LINK_CC := $(CXX)
-endif
+OFILES   := $(CXXFILES:.cpp=.o)
+LINK_CC  := $(CXX)
 CXXFLAGS_ADD := -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics
 
 ifeq ($(EDITION),remaster)
@@ -163,7 +147,7 @@ ROMFS_STAMP   := $(ROMFS_STAGING)/.stamp
 
 # CIA-specific romfs staging excludes dspfirm.cdc. Nintendo's DSP
 # firmware blob is bundled into the .3dsx for emulator convenience
-# (ensure_dspfirm_on_sd() in sound_3ds.c auto-copies it to the virtual
+# (ensure_dspfirm_on_sd() in sound_3ds.cpp auto-copies it to the virtual
 # SD on first launch), but we don't ship it inside the CIA — CFW users
 # installing on real hardware already have dspfirm.cdc on their SD from
 # the standard DSP1 dump step, and shipping the blob in a redistributable
@@ -195,7 +179,7 @@ $(STAMP): FORCE
 FORCE: ;
 
 # Compile PICA200 vertex shader and embed into a C header for source inclusion.
-# render_c3d.c does `#include "render_c3d_shbin.h"` to get the shader bytecode
+# render_c3d.cpp does `#include "render_c3d_shbin.h"` to get the shader bytecode
 # baked into the binary. Without this rule, a developer who edited the .pica
 # would see no behavioral change because picasso runs but xxd never gets called
 SHADER_DIR    := $(SRCDIR)/forsaken_3ds/shaders
@@ -258,7 +242,7 @@ $(ROMFS_STAMP): $(ROMFS_STAGING)/.edition | romfs-freshness-check
 	@mkdir -p $(ROMFS_STAGING)
 	@rsync -aL --delete --exclude='.stamp' --exclude='.edition' $(SRCDIR)/romfs/ $(ROMFS_STAGING)/
 	@echo "Converting BMP textures to PNG (level-specific + global)..."
-	@# The 3DS texture loader (render_c3d.c::FSCreateTexture) substitutes
+	@# The 3DS texture loader (render_c3d.cpp::FSCreateTexture) substitutes
 	@# a .png extension at lookup time, so the engine looks for <name>.png
 	@# even when the data ships as <name>.bmp. Convert both per-level
 	@# atlases AND the global UI/weapon/sprite atlas so neither falls
@@ -309,7 +293,7 @@ else
 	@cp -f $(SRCDIR)/assets/level_orderings/original/mission.dat $(ROMFS_STAGING)/data/levels/mission.dat
 endif
 	@echo "Placing .keep files so makerom doesn't strip empty critical dirs..."
-	@# missing_folders() in main.c requires all four to exist. The .3dsx
+	@# missing_folders() in main.cpp requires all four to exist. The .3dsx
 	@# ships fine because 3dsxtool preserves empty directories; makerom
 	@# strips them. A tiny .keep file guarantees the dir survives the
 	@# romfs pack on both paths. convert_path() lowercases lookups, and
@@ -342,11 +326,6 @@ $(OUTPUT_3DSX): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(ROMFS_STAMP)
 $(OUTPUT_ELF): $(addprefix $(BUILD)/,$(OFILES))
 	@echo "Linking $(notdir $@)..."
 	$(LINK_CC) $(LDFLAGS) $^ $(LIBS) -o $@
-
-$(BUILD)/%.o: %.c $(STAMP)
-	@echo $(notdir $<)
-	@mkdir -p $(BUILD)
-	$(CC) -MMD -MP -MF $(BUILD)/$*.d $(CFLAGS) -c $< -o $@
 
 # C++ translation units (phase 2). Same numeric flags as C -- the contract
 # applies to both -- plus the language flags AGENTS.md 9 requires. -std=gnu99
@@ -515,7 +494,7 @@ $(OUTPUT_CIA_ALT): $(OUTPUT_ELF) $(OUTPUT_SMDH) $(OUTPUT_BNR) $(RSF_FILE_ALT) $(
 # HIMEM grant (`SystemMode: 96MB`).  For users with HIMEM-capable HOME
 # menus who want full 512² textures on OG.  Uses the SAME ELF + romfs
 # as the unified primary — only the RSF differs (and the UniqueId).
-# Auto-detection in main_3ds.c / render_c3d.c picks the right heap
+# Auto-detection in main_3ds.cpp / render_c3d.cpp picks the right heap
 # sizes + texture pack based on the granted region.
 # UniqueIds 0xff4be (primary) / 0xff4bf (alt).
 #---------------------------------------------------------------------------------
