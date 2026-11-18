@@ -408,7 +408,7 @@ static void update_players( void )
 	}
 }
 
-static void set_player_name( char * target, char * source )
+static void set_player_name( char * target, const char * source )
 {
 	strncpy( target, source, NETWORK_MAX_NAME_LENGTH-1 );
 	target[NETWORK_MAX_NAME_LENGTH-1] = 0;
@@ -762,7 +762,7 @@ static void lost_connection( ENetPeer * peer, enet_uint32 data )
 
 	// print debug info
 	{
-		char * name = "NULL";
+		const char * name = "NULL";
 		if( peer_data->player && (peer_data->player->name[0] != 0) )
 			name = peer_data->player->name;
 		DebugPrintf("network security: lost connection from %s %d (%s@%s)\n",
