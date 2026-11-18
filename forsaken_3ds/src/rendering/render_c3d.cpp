@@ -1,48 +1,41 @@
-/*
- * render_c3d.cpp — Native citro3d renderer for Nintendo 3DS
+/* render_c3d.cpp -- render.h for the 3DS, on citro3d (PICA200)
  *
- * Replaces the picaGL (GL1 immediate mode) path with direct citro3d
- * calls, enabling:
- *   - GPU-side modelview+projection transforms via PICA200 vertex shader
- *   - Cached vertex/index buffers in linear VRAM (linearAlloc)
- *   - Single-pass stereo (same geometry, swap projection uniform)
+ * The 3DS backend of the FS* / draw_* seam (render_vulkan.cpp is the PC one),
+ * plus the c3d_* calls render.h declares under __3DS__. c3d_context_init runs
+ * C3D_Init once, with a 16x (4 MB) command buffer. c3d_renderer_init, called
+ * from render_init and idempotent, loads the vertex shader and creates the
+ * render targets (left and right top-screen eyes, and the bottom screen,
+ * where the HUD is drawn), the 4 MB linear vertex scratch, the ProcTex
+ * wall-grain tables and the fragment-light setup for object shine.
+ * FSBeginScene opens the frame on the left target and sets the GPU state
+ * draws depend on; c3d_present ends it, and C3D_FrameEnd's display transfer
+ * puts it on screen. c3d_transfer_eye moves the second stereo pass to the
+ * right target.
  *
- * Build:
- *   make -f Makefile.3ds RENDERER=citro3d   # this renderer
- *   make -f Makefile.3ds RENDERER=picagl    # picaGL fallback (GL=1)
+ * Engine vertex, index and normal buffers are linearAlloc memory holding
+ * engine-format vertices. draw_render_object converts each texture group's
+ * LVERTEX / TLVERTEX (packed colour) to gpu_vertex_t (36 bytes, float
+ * colour) in the scratch and draws from there. Two caches skip that
+ * conversion: the stereo memo lets the right eye resubmit what the left eye
+ * converted (keyed by batch, so no draw is ever skipped), and in mono frames
+ * level walls stay converted in retained linear buffers until a texture
+ * animation step or c3d_release_level_cache.
  *
- * Architecture:
- *   - picaGL is NOT linked. We provide our own c3d_context_init/c3d_present/c3d_context_exit
- *     stubs that use citro3d directly for GPU init and frame presentation.
- *   - c3d_context_init() calls C3D_Init(). c3d_renderer_init() creates the render
- *     target, shader, and scratch buffer.
- *   - FSBeginScene() calls C3D_FrameBegin + C3D_FrameDrawOn + binds shader
- *     + initializes GPU state (AttrInfo, TexEnv, depth, cull, uniforms).
- *   - draw_render_object() converts LVERTEX/TLVERTEX to gpu_vertex_t (36 bytes,
- *     all floats) in a linearAlloc scratch buffer, then C3D_DrawArrays.
- *   - c3d_present() calls C3D_FrameEnd which triggers the auto display
- *     transfer via C3D_RenderTargetSetOutput. DO NOT call picaGL's real
- *     c3d_present — its GX_DisplayTransfer conflicts with citro3d's
- *     auto-transfer and produces a black screen.
+ * upload_matrices puts world_matrix in the shader's modelView uniform and
+ * view x projection (with the PICA depth remap and the 90-degree screen
+ * rotation) in projection, so the shader has world-space positions for its
+ * per-vertex lighting: ambient plus up to GPU_MAX_LIGHTS point lights from
+ * c3d_upload_xlights. Textures load as .t3x through Tex3DS from the HD pack
+ * the memory tier selects, else from PNG converted to RGBA4444 and Morton
+ * tiled. TexEnv modes: DIFFUSE (texture x vertex colour), AUX (walls, plus
+ * ProcTex grain: "Wall detail"), OBJECT (models, plus fragment-light Phong
+ * specular: "Object shine"). For full-screen cameras visi.cpp asks for
+ * scissor mode: FSSetViewPort keeps the full viewport and scissors to the
+ * group's rect, so adjacent groups share one projection.
  *
- * Key lessons learned during development:
- *   1. Mandarine emulator DOES support citro3d render targets + auto-transfer.
- *      The earlier black screen was caused by c3d_present conflicting with
- *      C3D_FrameEnd's display transfer, NOT emulator limitations.
- *   2. GPU state (AttrInfo, BufInfo, TexEnv, DepthTest, CullFace) must be
- *      explicitly initialized in FSBeginScene. Uninitialized GPU registers
- *      cause invisible geometry (no crash, just no output).
- *   3. The shader has two uniform matrix slots: projection (reg 0-3) and
- *      modelView (reg 4-7). upload_matrices() writes combined MVP to
- *      projection and FSBeginScene writes identity to modelView. Both
- *      must be initialized or the shader reads garbage.
- *   4. Engine matrices are column-major (despite [4][4] declaration).
- *      matrix_to_c3d() transposes using the picaGL glLoadMatrixf pattern:
- *      dst->r[i].x = m[0+i], .y = m[4+i], .z = m[8+i], .w = m[12+i].
- *   5. Textures use GPU_RGBA4 (16-bit) to avoid VRAM exhaustion. GPU_RGBA8
- *      runs out after ~7 1024x1024 textures.
- *   6. Vertex colors are packed u32 ARGB in LVERTEX but the shader needs
- *      normalized floats. gpu_vertex_t stores pre-normalized float[4] colors.
+ * Hard-won rules: initialise GPU state (AttrInfo, TexEnv, depth, cull,
+ * uniforms) explicitly, since unset registers draw nothing without
+ * crashing; and every draw needs its own C3D_GetBufInfo (bind_vertex_buffer).
  */
 
 #ifdef __3DS__
@@ -79,11 +72,11 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 #include "rendering/render_c3d_shbin.h"
 
 /* ---- uniform register locations (must match .v.pica) ---- */
-constexpr int UNIFORM_PROJECTION = 0; /* fvec4[4] — full MVP */
-constexpr int UNIFORM_MODELVIEW = 4; /* fvec4[4] — identity (kept for compat) */
+constexpr int UNIFORM_PROJECTION = 0; /* fvec4[4] — view × proj, PICA-adjusted */
+constexpr int UNIFORM_MODELVIEW = 4; /* fvec4[4] — world_matrix (model→world) */
 constexpr int UNIFORM_AMBIENT = 8; /* fvec4    — .xyz=ambient, .w=unused */
 constexpr int UNIFORM_LIGHT_COUNT = 9; /* fvec4    — .x=count(0..GPU_MAX_LIGHTS) */
-#define UNIFORM_LIGHTS      10   /* fvec4[12]— GPU_MAX_LIGHTS × 3 fvec4 each
+#define UNIFORM_LIGHTS      10   /* fvec4[24]— GPU_MAX_LIGHTS × 3 fvec4 each
                                   *   light[3i+0] = (Pos.xyz, invSizeSq)
                                   *   light[3i+1] = (r, g, b, type)
                                   *   light[3i+2] = (Dir.xyz, CosArc)  */
@@ -138,11 +131,9 @@ static C3D_LightLut  s_objLightLut;
 static bool          s_objLightReady = false;
 
 /* User-toggleable graphics features (persisted via title.cpp's config_*).
- * Renderer reads these per-draw to decide whether to apply Phong shine
- * and detail-map ADD. Both default true; the detail map is now
- * grey-centred (high-pass via -compose mathematics) so ADD_SIGNED
- * contributes signed-symmetric per-pixel modulation rather than
- * brightening-only. */
+ * apply_texenv_for_texture reads these per draw: g_object_shine enables the
+ * OBJECT mode (Phong specular on models), g_wall_detail the AUX mode
+ * (ProcTex grain ADD_SIGNED onto walls). Both default true. */
 bool g_object_shine = true;
 bool g_wall_detail  = true;
 
@@ -159,8 +150,9 @@ static int  s_hudSavedWinCx     = 0;
 static int  s_hudSavedWinCy     = 0;
 static bool              s_stereoFrame   = false;
 
-/* GPU lighting uniform locations, resolved at init from the shader DVLE
- * (don't depend on picasso's declaration-order register assignment). */
+/* GPU lighting uniform registers, set at init to the hardcoded UNIFORM_*
+ * values (libctru's uniform lookup returns -1 for these; see
+ * c3d_renderer_init). */
 static s8 s_loc_ambient     = -1;
 static s8 s_loc_light_count = -1;
 static s8 s_loc_lights      = -1;
@@ -508,21 +500,20 @@ static bool s_isOrthoDraw      = false;
  * wall grain. */
 static bool s_skipAuxProcTex   = false;
 
-/* Phase 4 of wall-normal-detail-mapping: track the last TexEnv mode
- * so we can re-init when transitioning between single-stage (legacy
- * MODULATE) and multi-stage (aux normal/detail) draws. */
+/* Track the last TexEnv mode so the combiner stages are reconfigured
+ * only when a draw needs a different mode. */
 typedef enum {
 	TEXENV_MODE_NONE = 0,    /* untextured / vertex-only */
 	TEXENV_MODE_DIFFUSE,     /* single-stage diffuse * vertex */
-	TEXENV_MODE_AUX,         /* wall: diffuse + ADD_SIGNED detail */
-	TEXENV_MODE_OBJECT,      /* model: diffuse * vertex * proctex grain */
+	TEXENV_MODE_AUX,         /* wall: diffuse + ADD_SIGNED ProcTex grain */
+	TEXENV_MODE_OBJECT,      /* model: diffuse + Phong specular */
 } texenv_mode_t;
 static texenv_mode_t s_lastTexEnvMode = TEXENV_MODE_NONE;
 
 /* Toggle: enable Phong-shine path for the next textured draw. Set by
  * mxload.cpp / mxaload.cpp around their draw_object calls so model + enemy
- * meshes get the specular highlight. (Name preserved for ABI; misnomer
- * since proctex was retired.) */
+ * meshes get the specular highlight. (A misnomer: the OBJECT mode no
+ * longer uses ProcTex.) */
 void c3d_set_object_proctex(bool enable)
 {
 	s_objProcTexOn = enable;
@@ -540,8 +531,8 @@ void c3d_set_object_shine_eligible(bool enable)
 }
 
 
-/* picaGL is NOT linked for the citro3d renderer. We provide our own
- * c3d_context_init/c3d_context_exit/c3d_present/c3d_transfer_eye implementations. */
+/* Context lifetime, frame present and stereo eye switch: the c3d_* calls
+ * main_3ds.cpp and oct2.cpp make. */
 void c3d_context_init(void)
 {
 	/* Idempotent: paired with c3d_renderer_init's own idempotency. If
@@ -557,24 +548,12 @@ void c3d_context_init(void)
 	if (_c3d_context_inited) return;
 	_c3d_context_inited = true;
 
-	/* 16× the default GPU command buffer (256 KB → 4 MB).
-	 *
-	 * Required for the multi-pass flood-fill expansion in
-	 * visi.cpp FindVisible: each pass adds visible groups for chained
-	 * portal traversal, which cleans up the "black wall through
-	 * doorway" symptom on Remaster levels (powerdown, starship,
-	 * spc-sp01 — geometry rendered black because dynamic-light
-	 * iterator never reached those groups). 4 passes × up to 64
-	 * extra groups = significantly more draw calls per frame than
-	 * the 1 MB cmd buffer can absorb. Specifically, asubchb subway
-	 * (small dense interconnected portals) trips
-	 * GPUCMD_AddInternal's svcBreak with the 1 MB budget when
-	 * flood-fill is on.
-	 *
-	 * Memory cost: +3 MB linear heap. Fine on N3DS (24 MB linear
-	 * heap, ~14 MB peak gameplay use). On OG 3DS this might push
-	 * past available — but OG support is gated on the Q3 memory
-	 * refactor"). */
+	/* 16× the default GPU command buffer (256 KB → 4 MB), taken from
+	 * the linear heap. A full command buffer trips GPUCMD_AddInternal's
+	 * svcBreak. It was raised from 1 MB for a multi-pass flood-fill in
+	 * visi.cpp FindVisible that has since been removed (the level
+	 * extractor now repairs the visibility data); the size has not been
+	 * re-measured since. */
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE * 16);
 }
 
@@ -1167,11 +1146,11 @@ static void upload_matrices(void)
 
 	The vertex shader sums ambient + per-light distance falloff for up
 	to GPU_MAX_LIGHTS lights, replacing the per-vertex CPU iteration in
-	lights.cpp::XLight1Group. Models still use CPU lighting (their
-	per-vertex baseline restoration in mxload / mxaload is not yet
-	hooked into this path). SPOT lights are treated as points (no cone
-	math) — visually negligible for Forsaken's transient blaster/RT
-	lights and keeps the shader simple.
+	lights.cpp for the level mesh (XLight1Group) and for models (the
+	model paths only restore the baked colours and leave the lights to
+	the shader). SPOT lights are treated as points (no cone math) —
+	visually negligible for Forsaken's transient blaster/RT lights and
+	keeps the shader simple.
 
 	See shaders/render_c3d.v.pica for the shader side.
 ===================================================================*/
@@ -1537,10 +1516,9 @@ bool FSBeginScene(void)
 		s_lastMatClass = -1;
 		s_lastPhaseBucket = -1;
 
-		/* Initialize modelView uniform (register 4) to identity.
-		 * upload_matrices writes combined MVP to register 0 (projection),
-		 * so the shader's modelView * pos must be identity to avoid
-		 * double-transforming the already-combined MVP result. */
+		/* Initialize modelView uniform (register 4) to identity, so
+		 * draws before the first upload_matrices (which writes
+		 * world_matrix there) see no model transform. */
 		/* Write identity to modelView uniform (register 4) via GPUCMD */
 		{
 			float id[16] = {
@@ -1946,14 +1924,15 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject)
 
 	  TEXENV_MODE_NONE     — untextured (HUD vertex-color paths).
 	  TEXENV_MODE_DIFFUSE  — single-stage modulate: TEX0 × PRIMARY_COLOR.
-	                         Used for every textured draw without a
-	                         detail map.
-	  TEXENV_MODE_AUX      — two stages: TEX0 × PRIMARY (legacy diffuse)
-	                         then ADD_SIGNED TEX1 (high-pass detail map
-	                         centred on grey). Detail brightens raised
-	                         midfreq features, darkens the rest, giving
-	                         close-range surface texture without the
-	                         multiply-induced wash-out a modulate would.
+	                         Used for textured draws that get neither
+	                         of the modes below.
+	  TEXENV_MODE_AUX      — walls: TEX0 × PRIMARY, then ADD_SIGNED the
+	                         ProcTex output (TEXTURE3), a noise palette
+	                         centred on grey, so the grain both
+	                         brightens and darkens without washing out.
+	  TEXENV_MODE_OBJECT   — models: TEX0 × PRIMARY, then ADD the
+	                         fragment-light specular
+	                         (FRAGMENT_SECONDARY_COLOR).
 
 	Cached per-mode + per-texdata pointer so identical adjacent draws
 	skip GPU state changes.
@@ -2046,19 +2025,15 @@ static void configure_texenv_object(void)
 		C3D_TexEnvFunc(env, C3D_RGB, GPU_ADD);
 	}
 
-	/* Stage 2: ADD_SIGNED proctex grain on top — chromatic micro-noise
-	 * that breaks up flat surface tones. Uncommenting this layers the
-	 * proctex grain over the Phong-shaded surface. Disabled now
-	 * because the visual budget is being spent on shine; re-enable
-	 * later if the model surfaces still look flat in shadowed areas. */
+	/* Stage 2 left empty. A ProcTex grain stage (ADD_SIGNED, as in AUX
+	 * mode) could go here; it was dropped to keep models to the shine
+	 * alone. */
 	C3D_TexEnvInit(C3D_GetTexEnv(2));
 }
 
 /* Apply the right TexEnv mode for a textured draw, given the bound
- * texture handle. Caches by mode + texdata pointer to skip redundant
- * GPU state changes within a batch. Returns true if the texture was
- * (re)bound — caller can use this to know whether to invalidate other
- * cached state if needed (currently no callers care). */
+ * texture handle. Caches by mode + texdata pointer (+ ProcTex bucket in
+ * AUX mode) to skip redundant GPU state changes within a batch. */
 static void apply_texenv_for_texture(texture_t *texdata)
 {
 	/* OBJECT (Phong shine on enemies / pickups) takes precedence over
