@@ -3412,9 +3412,9 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				{
 					if( !( HitEnemy->Object.Flags & SHIP_Scattered ) )
 					{
-	   					TempVector.x = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   					TempVector.y = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   					TempVector.z = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+	   					TempVector.x = Random_Jitter();
+	   					TempVector.y = Random_Jitter();
+	   					TempVector.z = Random_Jitter();
 						NormaliseVector( &TempVector );
 						if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 						else LifeCount = -1.0F;
@@ -3427,9 +3427,9 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				}
 				else
 				{
-	   				TempVector.x = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   				TempVector.y = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   				TempVector.z = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+	   				TempVector.x = Random_Jitter();
+	   				TempVector.y = Random_Jitter();
+	   				TempVector.z = Random_Jitter();
 					NormaliseVector( &TempVector );
 					if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 					else LifeCount = -1.0F;
@@ -4307,9 +4307,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 	if ( BountyHunt && Ships[ WhoIAm ].Object.Flags & SHIP_CarryingBounty )
 	{
-		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+		DirVector.x = ( Dir->x + Random_Jitter() );
+		DirVector.y = ( Dir->y + Random_Jitter() );
+		DirVector.z = ( Dir->z + Random_Jitter() );
 		NormaliseVector( &DirVector );
 		PickupNum = PICKUP_Bounty;
 		LifeCount = -1.0F;
@@ -4326,9 +4326,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 	if ( CaptureTheFlag && Ships[ WhoIAm ].Object.Flags & SHIP_CarryingFlag )
 	{
-		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+		DirVector.x = ( Dir->x + Random_Jitter() );
+		DirVector.y = ( Dir->y + Random_Jitter() );
+		DirVector.z = ( Dir->z + Random_Jitter() );
 		NormaliseVector( &DirVector );
 		PickupNum = PICKUP_Flag;
 		LifeCount = -1.0F;
@@ -4349,9 +4349,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 		{
 			if ( Ships[ WhoIAm ].Object.Flags & TeamFlagMask[ team ] )
 			{
-				DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-				DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-				DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
 				NormaliseVector( &DirVector );
 				PickupNum = TeamFlagPickup[ team ];
 				LifeCount = -1.0F;
@@ -4376,9 +4376,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 	{
 		if( PrimaryWeaponsGot[ Count ] && ( TotalPickups < MaxPickupsAllowed ) )
 		{
-	   		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-	   		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-	   		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+	   		DirVector.x = ( Dir->x + Random_Jitter() );
+	   		DirVector.y = ( Dir->y + Random_Jitter() );
+	   		DirVector.z = ( Dir->z + Random_Jitter() );
 			NormaliseVector( &DirVector );
 			PickupNum = ( PICKUP_Trojax + ( Count - 1 ) );
 			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4401,9 +4401,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 			if( Ships[ WhoIAm ].Object.PowerLevel >= 3 )
 			{
 				Ships[ WhoIAm ].Object.PowerLevel -= 3;
-		   		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		   		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		   		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+		   		DirVector.x = ( Dir->x + Random_Jitter() );
+		   		DirVector.y = ( Dir->y + Random_Jitter() );
+		   		DirVector.z = ( Dir->z + Random_Jitter() );
 				NormaliseVector( &DirVector );
 				PickupNum = PICKUP_GoldenPowerPod;
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4419,9 +4419,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 			else
 			{
 				Ships[ WhoIAm ].Object.PowerLevel--;
-		   		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		   		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		   		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+		   		DirVector.x = ( Dir->x + Random_Jitter() );
+		   		DirVector.y = ( Dir->y + Random_Jitter() );
+		   		DirVector.z = ( Dir->z + Random_Jitter() );
 				NormaliseVector( &DirVector );
 				PickupNum = PICKUP_PowerPod;
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4441,9 +4441,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 	if( TotalPickups < MaxPickupsAllowed )
 	{
-		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+		DirVector.x = ( Dir->x + Random_Jitter() );
+		DirVector.y = ( Dir->y + Random_Jitter() );
+		DirVector.z = ( Dir->z + Random_Jitter() );
 		NormaliseVector( &DirVector );
 		PickupNum = PICKUP_Shield;
 		if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4461,9 +4461,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 	for( Count = 0; Count < NumSecWeapons; Count++ )
 	{
-   		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-   		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-   		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+   		DirVector.x = ( Dir->x + Random_Jitter() );
+   		DirVector.y = ( Dir->y + Random_Jitter() );
+   		DirVector.z = ( Dir->z + Random_Jitter() );
 		NormaliseVector( &DirVector );
 		PickupNum = SecWeaponsGot[ Count ];
 		if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4485,9 +4485,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 			{
 				if( TotalPickups < MaxPickupsAllowed )
 				{
-					DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-					DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-					DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+					DirVector.x = ( Dir->x + Random_Jitter() );
+					DirVector.y = ( Dir->y + Random_Jitter() );
+					DirVector.z = ( Dir->z + Random_Jitter() );
 					NormaliseVector( &DirVector );
 					PickupNum = PICKUP_Nitro;
 					if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4523,9 +4523,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 
 		if( TotalPickups < MaxPickupsAllowed )
 		{
-	   		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-	   		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-	   		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+	   		DirVector.x = ( Dir->x + Random_Jitter() );
+	   		DirVector.y = ( Dir->y + Random_Jitter() );
+	   		DirVector.z = ( Dir->z + Random_Jitter() );
 			NormaliseVector( &DirVector );
 			PickupNum = PICKUP_Mantle;
 			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
@@ -4558,9 +4558,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 		{
 			if( TotalPickups < MaxPickupsAllowed )
 			{
-		   		DirVector.x = ( Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		   		DirVector.y = ( Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
-		   		DirVector.z = ( Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F ) );
+		   		DirVector.x = ( Dir->x + Random_Jitter() );
+		   		DirVector.y = ( Dir->y + Random_Jitter() );
+		   		DirVector.z = ( Dir->z + Random_Jitter() );
 				NormaliseVector( &DirVector );
 				PickupNum = PICKUP_Orb;
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );

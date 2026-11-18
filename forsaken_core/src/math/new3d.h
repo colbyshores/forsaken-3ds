@@ -293,6 +293,13 @@ void MatrixTranspose( MATRIX * m1, MATRIX * m2 );
 u_int16_t	Random_Range( u_int16_t Max );
 float Random_Range_Float( float Max );
 
+/* A random float in [-0.5, 0.5), for jittering directions and positions:
+   one Random_Range( 5120 ) draw, scaled. */
+inline float Random_Jitter( void )
+{
+	return ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F;
+}
+
 
 void	MakeViewMatrix(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, MATRIX *view);
 void CalcViewAxes(VECTOR *viewpos, VECTOR *lookpos, VECTOR *up, VECTOR *vx, VECTOR *vy, VECTOR *vz);

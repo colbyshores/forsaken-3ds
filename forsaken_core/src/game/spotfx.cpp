@@ -920,9 +920,9 @@ void CreateSpotFXSmoke( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 		FmPolys[ fmpoly ].xsize = ( 20.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].ysize = ( 20.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].Dir = *Dir;
-   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-  		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+  		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 		NormaliseVector( &FmPolys[ fmpoly ].Dir );
 		FmPolys[ fmpoly ].Speed = ( 10.0F * GLOBAL_SCALE );
 		FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -1010,9 +1010,9 @@ void CreateSpotFXSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t R
 		   		FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				FmPolys[ fmpoly ].R = Red;
 				FmPolys[ fmpoly ].G = Green;
 				FmPolys[ fmpoly ].B = Blue;
@@ -1181,9 +1181,9 @@ void CreateSpotFXElectricBeams( VECTOR * Pos, VECTOR * Dir, VECTOR * Up, u_int16
 
 	for( Count = 0; Count < NumBeams; Count++ )
 	{
-		TempDir.x = Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		TempDir.y = Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		TempDir.z = Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+		TempDir.x = Dir->x + Random_Jitter();
+		TempDir.y = Dir->y + Random_Jitter();
+		TempDir.z = Dir->z + Random_Jitter();
 		NormaliseVector( &TempDir );
 
 		InitOnePrimBull( OWNER_NOBODY, WhoIAm, GlobalPrimBullsID++, NME_LIGHTNING, Group, Pos, &TempVector, &TempDir, Up, 2, 0.0F, false );
@@ -1427,9 +1427,9 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 		   		FmPolys[ fmpoly ].Frame = (float) Random_Range( (*FmPolys[ fmpoly ].Frm_Info)->Num_Frames );
 				FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 				FmPolys[ fmpoly ].Trans = 255;
-		   		FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		   		FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		   		FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+		   		FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+		   		FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+		   		FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 				NormaliseVector( &FmPolys[ fmpoly ].Dir );
 				FmPolys[ fmpoly ].Dir.x *= ( ( (float) Random_Range( 10000 ) ) / 2000.0F ) + 3.0F;
 				FmPolys[ fmpoly ].Dir.y *= ( ( (float) Random_Range( 10000 ) ) / 2000.0F ) + 3.0F;
@@ -1476,9 +1476,9 @@ void CreateSpotFXShrapnel( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	for( Count = 0; Count < NumBits; Count++ )
 	{
 		Speed = ( ( (float) Random_Range( 10000 ) ) / 1500.0F ) + 2.0F;
-		DirVector.x = Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		DirVector.y = Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		DirVector.z = Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+		DirVector.x = Dir->x + Random_Jitter();
+		DirVector.y = Dir->y + Random_Jitter();
+		DirVector.z = Dir->z + Random_Jitter();
 		NormaliseVector( &DirVector );
 
 		if( Random_Range( 3 ) )
@@ -1510,9 +1510,9 @@ void CreateSpotFXSmallShrapnel( VECTOR * Pos, VECTOR * Dir, float Speed, u_int16
 		
 	for( Count = 0; Count < NumBits; Count++ )
 	{
-		DirVector.x = Dir->x + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		DirVector.y = Dir->y + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		DirVector.z = Dir->z + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+		DirVector.x = Dir->x + Random_Jitter();
+		DirVector.y = Dir->y + Random_Jitter();
+		DirVector.z = Dir->z + Random_Jitter();
 		NormaliseVector( &DirVector );
 		CreateSmallShrapnelBit( Pos, &DirVector, Speed, Group, MODEL_Shrapnel2 );
 	}
@@ -1565,9 +1565,9 @@ void CreateSpotFXBubbles( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t 
 			FmPolys[ fmpoly ].Rot = 0.0F;
 			FmPolys[ fmpoly ].xsize = (float) ( Random_Range( 100 ) / 50.0F ) + 0.25F;
 			FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
-   			FmPolys[ fmpoly ].Dir.x = ( Dir->x * 2.0F ) + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-   			FmPolys[ fmpoly ].Dir.y = ( Dir->y * 2.0F ) + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-   			FmPolys[ fmpoly ].Dir.z = ( Dir->z * 2.0F ) + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+   			FmPolys[ fmpoly ].Dir.x = ( Dir->x * 2.0F ) + Random_Jitter();
+   			FmPolys[ fmpoly ].Dir.y = ( Dir->y * 2.0F ) + Random_Jitter();
+   			FmPolys[ fmpoly ].Dir.z = ( Dir->z * 2.0F ) + Random_Jitter();
 			NormaliseVector( &FmPolys[ fmpoly ].Dir );
 			FmPolys[ fmpoly ].Speed = ( ( Random_Range( 10000 ) / 10000.0F ) * 4.0F ) + 1.0F;
 			FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -1612,9 +1612,9 @@ void CreateBubbleTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Re
 		FmPolys[ fmpoly ].Rot = 0.0F;
 		FmPolys[ fmpoly ].xsize = (float) ( Random_Range( 100 ) / 75.0F ) + 0.25F;
 		FmPolys[ fmpoly ].ysize = FmPolys[ fmpoly ].xsize;
-   		FmPolys[ fmpoly ].Dir.x = ( Dir->x * 3.0F ) + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-   		FmPolys[ fmpoly ].Dir.y = ( Dir->y * 3.0F ) + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-   		FmPolys[ fmpoly ].Dir.z = ( Dir->z * 3.0F ) + ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+   		FmPolys[ fmpoly ].Dir.x = ( Dir->x * 3.0F ) + Random_Jitter();
+   		FmPolys[ fmpoly ].Dir.y = ( Dir->y * 3.0F ) + Random_Jitter();
+   		FmPolys[ fmpoly ].Dir.z = ( Dir->z * 3.0F ) + Random_Jitter();
 		NormaliseVector( &FmPolys[ fmpoly ].Dir );
 		FmPolys[ fmpoly ].Speed = ( ( Random_Range( 10000 ) / 10000.0F ) * 4.0F ) + 1.0F;
 		FmPolys[ fmpoly ].UpSpeed = 0.0F;
@@ -1701,9 +1701,9 @@ void CreateSpotFXDripSplash( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 		   	FmPolys[ fmpoly ].Frm_Info = &Bits_Header;
 			FmPolys[ fmpoly ].Flags = FM_FLAG_ZERO;
 			FmPolys[ fmpoly ].Trans = 255;
-		   	FmPolys[ fmpoly ].Dir.x += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		   	FmPolys[ fmpoly ].Dir.y += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-		   	FmPolys[ fmpoly ].Dir.z += ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+		   	FmPolys[ fmpoly ].Dir.x += Random_Jitter();
+		   	FmPolys[ fmpoly ].Dir.y += Random_Jitter();
+		   	FmPolys[ fmpoly ].Dir.z += Random_Jitter();
 			FmPolys[ fmpoly ].R = Red;
 			FmPolys[ fmpoly ].G = Green;
 			FmPolys[ fmpoly ].B = Blue;

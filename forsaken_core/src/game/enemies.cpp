@@ -4113,9 +4113,9 @@ void KillUsedEnemy( ENEMY * Object )
 
 			if( Pickup != -1 )
 			{
-	   			Dir.x = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   			Dir.y = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   			Dir.z = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+	   			Dir.x = Random_Jitter();
+	   			Dir.y = Random_Jitter();
+	   			Dir.z = Random_Jitter();
 				NormaliseVector( &Dir );
 				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 				else LifeCount = -1.0F;
@@ -4127,9 +4127,9 @@ void KillUsedEnemy( ENEMY * Object )
 
 		if( ( Object->PickupHeld != (u_int16_t) -1 ) && !( Object->Object.Flags & SHIP_Scattered ) )
 		{
-	   		Dir.x = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   		Dir.y = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
-	   		Dir.z = ( ( ( (float) Random_Range( 5120 ) ) / 5120.0F ) - 0.5F );
+	   		Dir.x = Random_Jitter();
+	   		Dir.y = Random_Jitter();
+	   		Dir.z = Random_Jitter();
 			NormaliseVector( &Dir );
 			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
 			else LifeCount = -1.0F;
