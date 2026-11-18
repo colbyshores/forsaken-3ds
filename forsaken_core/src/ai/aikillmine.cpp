@@ -27,7 +27,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_KILLMINE( register ENEMY * Enemy )
+void AI_AIR_KILLMINE( ENEMY * Enemy )
 {
 	OBJECT * SObject;
 	VECTOR		TempVector;

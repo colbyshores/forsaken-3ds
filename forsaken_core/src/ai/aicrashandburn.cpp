@@ -28,7 +28,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_DEATH_CRASHANDBURN( register ENEMY * Enemy )
+void AI_AIR_DEATH_CRASHANDBURN( ENEMY * Enemy )
 {
 	OBJECT * SObject;
 	VECTOR		NewDir = { 0.0F, 1.0F, 0.0F };

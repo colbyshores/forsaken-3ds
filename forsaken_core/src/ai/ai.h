@@ -248,23 +248,23 @@ extern	PRIMARYWEAPONKNOWLEDGE PrimaryKnowledge[];
 
 // AILIB.C
 
-void AI_GetDistToNearestTarget( register ENEMY * Enemy );
+void AI_GetDistToNearestTarget( ENEMY * Enemy );
 bool AI_InViewCone( VECTOR * Pos, MATRIX * Mat ,VECTOR * TPos, float ViewConeCos );
 bool AI_ClearLOS( VECTOR * SPos, u_int16_t Group , VECTOR * Pos );
 bool AI_ClearLOSNonZero( OBJECT * SObject, VECTOR * Pos , float radius );
 bool AI_ClearLOSNonZeroNonObject( VECTOR * SPos, u_int16_t Group , VECTOR * Pos , float radius );
-void AI_SetIDLE( register ENEMY * Enemy );
-void AI_SetSCAN( register ENEMY * Enemy );
+void AI_SetIDLE( ENEMY * Enemy );
+void AI_SetSCAN( ENEMY * Enemy );
 void AI_SetMOVETOTARGET( ENEMY * Enemy );
 void AI_SetFIREATTARGET( ENEMY * Enemy );
 void AI_AimAtTarget( MATRIX * InvMat , VECTOR * SPos, VECTOR * TPos );
 void AI_GetNearestNODETarget( OBJECT * Object );
 void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * NewPos , float SpeedOfBullet );
-void AI_SetFOLLOWPATH( register ENEMY * Enemy );
-void AI_SetDOGFIGHT( register ENEMY * Enemy );
-void AI_SetKILLMINE( register ENEMY * Enemy );
+void AI_SetFOLLOWPATH( ENEMY * Enemy );
+void AI_SetDOGFIGHT( ENEMY * Enemy );
+void AI_SetKILLMINE( ENEMY * Enemy );
 void AI_GetNearestMINETarget( void );
-void AI_SetRETREAT( register ENEMY * Enemy );
+void AI_SetRETREAT( ENEMY * Enemy );
 
 // AIMAIN.C
 void AI_AIR( ENEMY * Enemy );
@@ -275,14 +275,14 @@ extern AIMDATA AimData;
 extern VECTOR FleshmorphPos;
 
 void AI_CRAWL( ENEMY * Enemy );
-void AI_THINK( register ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange );
-void AI_AVOIDCHECK( register ENEMY * Enemy );
+void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange );
+void AI_AVOIDCHECK( ENEMY * Enemy );
 void AI_SPLINE( ENEMY * Enemy );
 void AI_EXOGENON( ENEMY * Enemy );
 void AI_LITTLEGEEK( ENEMY * Enemy );
 void AI_FLESHMORPH( ENEMY * Enemy );
 void AI_JUMP( ENEMY * Enemy );
-void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy );
+void AI_JUMP_FOLLOWPATH( ENEMY * Enemy );
 bool Enemy2EnemyFriendlyFireCheck( ENEMY * SEnemy );
 
 // AIIDLE.C
@@ -294,44 +294,44 @@ void AI_CRAWL_IDLE( ENEMY * Enemy );
 void AI_AIR_SCAN( ENEMY * Enemy );
 void AI_TURRET_SCAN( ENEMY * Enemy );
 void AI_CRAWL_SCAN( ENEMY * Enemy );
-void AI_DO_SCAN( register ENEMY * Enemy );
+void AI_DO_SCAN( ENEMY * Enemy );
 
 // AIMOVET.C
 void AI_AIR_MOVETOTARGET( ENEMY * Enemy );
 
 // AIDOGFIGHT.C
-void AI_AIR_DOGFIGHT( register ENEMY * Enemy );
+void AI_AIR_DOGFIGHT( ENEMY * Enemy );
 
 // AIKILLMINE.C
-void AI_AIR_KILLMINE( register ENEMY * Enemy );
+void AI_AIR_KILLMINE( ENEMY * Enemy );
 
 
 // AIFIRE.C
 void AI_TURRET_FIREATTARGET( ENEMY * Enemy );
-void AI_UPDATEGUNS( register ENEMY * Enemy );
+void AI_UPDATEGUNS( ENEMY * Enemy );
 
 // AIFOLLOW.C
-void AI_AIR_FOLLOWPATH( register ENEMY * Enemy );
-void AI_CRAWL_FOLLOWPATH( register ENEMY * Enemy );
+void AI_AIR_FOLLOWPATH( ENEMY * Enemy );
+void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy );
 
 
 // AIRETREAT.C
-void AI_AIR_RETREAT( register ENEMY * Enemy );
+void AI_AIR_RETREAT( ENEMY * Enemy );
 
 // AIFORMATION.C
-void AI_AIR_FORMATION( register ENEMY * Enemy );
-void AI_LITTLEGEEK_FORMATION( register ENEMY * Enemy );
+void AI_AIR_FORMATION( ENEMY * Enemy );
+void AI_LITTLEGEEK_FORMATION( ENEMY * Enemy );
 
 // AISPLINE.C
-void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy );
+void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy );
 
 
 // AICRASHANDBURN.C
-void AI_AIR_DEATH_CRASHANDBURN( register ENEMY * Enemy );
+void AI_AIR_DEATH_CRASHANDBURN( ENEMY * Enemy );
 // AIPINGOFF.C
-void AI_AIR_DEATH_PINGOFF( register ENEMY * Enemy );
+void AI_AIR_DEATH_PINGOFF( ENEMY * Enemy );
 // AIPSYCHO.C
-void AI_AIR_DEATH_PSYCHO( register ENEMY * Enemy );
+void AI_AIR_DEATH_PSYCHO( ENEMY * Enemy );
 
 
 // AIEXOGENON.c
@@ -343,11 +343,11 @@ void AI_EXOGENON_SCAN( ENEMY * Enemy );
 void AI_EXOGENON_SWEEP( ENEMY * Enemy );
 
 // AIFLESHMORPH.c
-void AI_FLESHMORPH_IDLE( register ENEMY * Enemy );
-void AI_FLESHMORPH_MOVEFORWARDS( register ENEMY * Enemy );
-void AI_FLESHMORPH_STOPFORWARD( register ENEMY * Enemy );
-void AI_FLESHMORPH_MOVEBACKWARDS( register ENEMY * Enemy );
-void AI_FLESHMORPH_STOPBACKWARD( register ENEMY * Enemy );
+void AI_FLESHMORPH_IDLE( ENEMY * Enemy );
+void AI_FLESHMORPH_MOVEFORWARDS( ENEMY * Enemy );
+void AI_FLESHMORPH_STOPFORWARD( ENEMY * Enemy );
+void AI_FLESHMORPH_MOVEBACKWARDS( ENEMY * Enemy );
+void AI_FLESHMORPH_STOPBACKWARD( ENEMY * Enemy );
 
 
 

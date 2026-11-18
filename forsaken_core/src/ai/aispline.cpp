@@ -28,7 +28,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_SPLINE_FOLLOWPATH( register ENEMY * Enemy )
+void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 {
 	NODE * TNode;
 	NODE * Node1;

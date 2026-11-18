@@ -28,7 +28,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_TURRET_FIREATTARGET( register ENEMY * Enemy )
+void AI_TURRET_FIREATTARGET( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 
@@ -80,7 +80,7 @@ void AI_TURRET_FIREATTARGET( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_UPDATEGUNS( register ENEMY * Enemy )
+void AI_UPDATEGUNS( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 	GUNOBJECT * GObject;

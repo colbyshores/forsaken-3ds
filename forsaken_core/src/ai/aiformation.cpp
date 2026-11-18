@@ -27,7 +27,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_FORMATION( register ENEMY * Enemy )
+void AI_AIR_FORMATION( ENEMY * Enemy )
 {
 	float	Dist;
 	OBJECT * TObject;
@@ -212,7 +212,7 @@ void AI_AIR_FORMATION( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_LITTLEGEEK_FORMATION( register ENEMY * Enemy )
+void AI_LITTLEGEEK_FORMATION( ENEMY * Enemy )
 {
 	OBJECT * SObject;
 	VECTOR		Offset;

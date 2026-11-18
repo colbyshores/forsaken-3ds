@@ -24,7 +24,7 @@
 #include "game/oct2.h"
 
 // Globals
-void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy );
+void AI_FLESHMORPH_RANDOMFIREBALL( ENEMY * Enemy );
 
 VECTOR	FleshmorphPos;
 
@@ -33,7 +33,7 @@ VECTOR	FleshmorphPos;
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_FLESHMORPH_IDLE( register ENEMY * Enemy )
+void AI_FLESHMORPH_IDLE( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 
@@ -82,7 +82,7 @@ void AI_FLESHMORPH_IDLE( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_FLESHMORPH_MOVEFORWARDS( register ENEMY * Enemy )
+void AI_FLESHMORPH_MOVEFORWARDS( ENEMY * Enemy )
 {
 
 	if( !Enemy->Object.Animating )
@@ -111,7 +111,7 @@ void AI_FLESHMORPH_MOVEFORWARDS( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_FLESHMORPH_STOPFORWARD( register ENEMY * Enemy )
+void AI_FLESHMORPH_STOPFORWARD( ENEMY * Enemy )
 {
 	OBJECT * SObject;
 	VECTOR		TempVector;
@@ -200,7 +200,7 @@ void AI_FLESHMORPH_STOPFORWARD( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_FLESHMORPH_MOVEBACKWARDS( register ENEMY * Enemy )
+void AI_FLESHMORPH_MOVEBACKWARDS( ENEMY * Enemy )
 {
 	AI_FLESHMORPH_RANDOMFIREBALL( Enemy );
 	if ( Enemy->Timer )
@@ -231,7 +231,7 @@ void AI_FLESHMORPH_MOVEBACKWARDS( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_FLESHMORPH_STOPBACKWARD( register ENEMY * Enemy )
+void AI_FLESHMORPH_STOPBACKWARD( ENEMY * Enemy )
 {
 	if( !Enemy->Object.Animating )
 	{
@@ -274,7 +274,7 @@ VECTOR	FireOffs[4] = { { (-800.0F * GLOBAL_SCALE), (1400.0F * GLOBAL_SCALE), (60
 						{ (-800.0F * GLOBAL_SCALE), (1400.0F * GLOBAL_SCALE), (600.0F * GLOBAL_SCALE) }
 };
 
-void AI_FLESHMORPH_RANDOMFIREBALL( register ENEMY * Enemy )
+void AI_FLESHMORPH_RANDOMFIREBALL( ENEMY * Enemy )
 {
 	VECTOR		TempVector;
 	VECTOR		TempUpVector = { 0.0F, 1.0F, 0.0F };

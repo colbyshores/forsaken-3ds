@@ -25,7 +25,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_SCAN( register ENEMY * Enemy )
+void AI_AIR_SCAN( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 	float dist;
@@ -71,7 +71,7 @@ void AI_AIR_SCAN( register ENEMY * Enemy )
 	Output		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
-void AI_TURRET_SCAN( register ENEMY * Enemy )
+void AI_TURRET_SCAN( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 
@@ -125,7 +125,7 @@ void AI_TURRET_SCAN( register ENEMY * Enemy )
 	Output		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
-void AI_CRAWL_SCAN( register ENEMY * Enemy )
+void AI_CRAWL_SCAN( ENEMY * Enemy )
 {
 
 	if( Enemy->Object.Animating )
@@ -158,7 +158,7 @@ void AI_CRAWL_SCAN( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_DO_SCAN( register ENEMY * Enemy )
+void AI_DO_SCAN( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 	// Scan for target

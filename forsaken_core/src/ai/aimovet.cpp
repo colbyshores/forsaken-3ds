@@ -28,7 +28,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_MOVETOTARGET( register ENEMY * Enemy )
+void AI_AIR_MOVETOTARGET( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 	OBJECT * SObject;

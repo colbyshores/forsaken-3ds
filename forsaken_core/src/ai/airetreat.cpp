@@ -27,7 +27,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_RETREAT( register ENEMY * Enemy )
+void AI_AIR_RETREAT( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 	OBJECT * SObject;

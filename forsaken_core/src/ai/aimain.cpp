@@ -150,7 +150,7 @@ PRIMARYWEAPONKNOWLEDGE PrimaryKnowledge[] = {
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR( register ENEMY * Enemy )
+void AI_AIR( ENEMY * Enemy )
 {
 	// Process current AI mode ...
 	if( AI_AIR_Mode[ Enemy->Object.AI_Mode ] )
@@ -162,7 +162,7 @@ void AI_AIR( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_TURRET( register ENEMY * Enemy )
+void AI_TURRET( ENEMY * Enemy )
 {
 	// Process current AI mode ...
 	if( AI_TURRET_Mode[ Enemy->Object.AI_Mode ] )
@@ -174,7 +174,7 @@ void AI_TURRET( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_SPLINE( register ENEMY * Enemy )
+void AI_SPLINE( ENEMY * Enemy )
 {
 	// Process current AI mode ...
 	if( AI_SPLINE_Mode[ Enemy->Object.AI_Mode ] )
@@ -186,7 +186,7 @@ void AI_SPLINE( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_CRAWL( register ENEMY * Enemy )
+void AI_CRAWL( ENEMY * Enemy )
 {
 	// Process current AI mode ...
 
@@ -199,7 +199,7 @@ void AI_CRAWL( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_EXOGENON( register ENEMY * Enemy )
+void AI_EXOGENON( ENEMY * Enemy )
 {
 	// Process current AI mode ...
 	if( AI_EXOGENON_Mode[ Enemy->Object.AI_Mode ] )
@@ -211,7 +211,7 @@ void AI_EXOGENON( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_LITTLEGEEK( register ENEMY * Enemy )
+void AI_LITTLEGEEK( ENEMY * Enemy )
 {
 	// Process current AI mode ...
 	if( AI_LITTLEGEEK_Mode[ Enemy->Object.AI_Mode ] )
@@ -223,7 +223,7 @@ void AI_LITTLEGEEK( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_FLESHMORPH( register ENEMY * Enemy )
+void AI_FLESHMORPH( ENEMY * Enemy )
 {
 	if(FleshMorphTimer > 0.0F)
 	{
@@ -279,7 +279,7 @@ bool Enemy2EnemyFriendlyFireCheck( ENEMY * SEnemy )
 	Output		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
-void AI_THINK( register ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange )
+void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange )
 {
 	OBJECT * TObject;
 	bool	InViewCone;
@@ -468,7 +468,7 @@ void AI_THINK( register ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPl
 	Output		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
-void AI_AVOIDCHECK( register ENEMY * Enemy )
+void AI_AVOIDCHECK( ENEMY * Enemy )
 {
 	OBJECT * TObject;
 	float	Cone;

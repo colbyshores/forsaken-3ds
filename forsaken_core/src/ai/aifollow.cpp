@@ -27,7 +27,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_FOLLOWPATH( register ENEMY * Enemy )
+void AI_AIR_FOLLOWPATH( ENEMY * Enemy )
 {
 	OBJECT * SObject;
 	NODE * TNode;
@@ -176,7 +176,7 @@ void AI_AIR_FOLLOWPATH( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_CRAWL_FOLLOWPATH( register ENEMY * Enemy )
+void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 {
 	OBJECT * SObject;
 	NODE * TNode;

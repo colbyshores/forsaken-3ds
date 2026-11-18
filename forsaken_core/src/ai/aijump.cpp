@@ -243,7 +243,7 @@ static void JumpDoMovement( ENEMY * Enemy )
 /*===================================================================
 	AI_JUMP_FOLLOWPATH — main per-frame entry from AI_JUMP_Mode[].
 ===================================================================*/
-void AI_JUMP_FOLLOWPATH( register ENEMY * Enemy )
+void AI_JUMP_FOLLOWPATH( ENEMY * Enemy )
 {
 	NODE * pick;
 
@@ -335,7 +335,7 @@ void (* AI_JUMP_Mode[ ])( ENEMY * Enemy ) = {
 	NULL,			/* DEATH_PINGOFF */
 };
 
-void AI_JUMP( register ENEMY * Enemy )
+void AI_JUMP( ENEMY * Enemy )
 {
 	if( AI_JUMP_Mode[ Enemy->Object.AI_Mode ] )
 		( * AI_JUMP_Mode[ Enemy->Object.AI_Mode ] )( Enemy );

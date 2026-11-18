@@ -25,7 +25,7 @@
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_AIR_IDLE( register ENEMY * Enemy )
+void AI_AIR_IDLE( ENEMY * Enemy )
 {
 	if ( Enemy->Timer )
 	{
@@ -45,7 +45,7 @@ void AI_AIR_IDLE( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_TURRET_IDLE( register ENEMY * Enemy )
+void AI_TURRET_IDLE( ENEMY * Enemy )
 {
 	if( Enemy->Object.Animating )
 	{
@@ -82,7 +82,7 @@ void AI_TURRET_IDLE( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_CRAWL_IDLE( register ENEMY * Enemy )
+void AI_CRAWL_IDLE( ENEMY * Enemy )
 {
 	if( Enemy->Object.Animating )
 	{

@@ -35,7 +35,7 @@ void	ExogenonFireLeftRight( ENEMY * Enemy );
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_EXOGENON_IDLE( register ENEMY * Enemy )
+void AI_EXOGENON_IDLE( ENEMY * Enemy )
 {
 	int i;
 	int startpos = 0;
@@ -85,7 +85,7 @@ void AI_EXOGENON_IDLE( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_EXOGENON_MOVEDOWN( register ENEMY * Enemy )
+void AI_EXOGENON_MOVEDOWN( ENEMY * Enemy )
 {
 	VECTOR	TempUpVector;
 	VECTOR	FireDir;
@@ -126,7 +126,7 @@ void AI_EXOGENON_MOVEDOWN( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_EXOGENON_SCAN( register ENEMY * Enemy )
+void AI_EXOGENON_SCAN( ENEMY * Enemy )
 {
 	ExogenonAim( Enemy );
 
@@ -154,7 +154,7 @@ void AI_EXOGENON_SCAN( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_EXOGENON_FIRE( register ENEMY * Enemy )
+void AI_EXOGENON_FIRE( ENEMY * Enemy )
 {
 	VECTOR		TempVector;
 	VECTOR		TempUpVector;
@@ -204,7 +204,7 @@ void AI_EXOGENON_FIRE( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_EXOGENON_MOVEUP( register ENEMY * Enemy )
+void AI_EXOGENON_MOVEUP( ENEMY * Enemy )
 {
 	Enemy->Object.AnimSpeed = 2.0F;
 	if( Enemy->Object.Animating )
@@ -234,7 +234,7 @@ void ExogenonAim( ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_EXOGENON_SWEEP( register ENEMY * Enemy )
+void AI_EXOGENON_SWEEP( ENEMY * Enemy )
 {
 	if( Enemy->Timer )
 	{

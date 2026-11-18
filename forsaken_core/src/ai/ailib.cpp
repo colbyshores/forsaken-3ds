@@ -378,9 +378,9 @@ bool AI_ClearLOSNonZeroNonObject( VECTOR * SPos, u_int16_t Group , VECTOR * Pos 
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing..But Tinfo struct is filled in...
 ===================================================================*/
-void AI_GetDistToNearestTarget( register ENEMY * Enemy )
+void AI_GetDistToNearestTarget( ENEMY * Enemy )
 {
-	register u_int16_t	group = Enemy->Object.Group;
+	u_int16_t	group = Enemy->Object.Group;
 	OBJECT * TObject;
 	   
 	// Initialise
@@ -480,7 +480,7 @@ void AI_SetKILLMINE( ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_SetIDLE( register ENEMY * Enemy )
+void AI_SetIDLE( ENEMY * Enemy )
 {
 	Enemy->TShip = NULL;
 	Enemy->Object.AI_Mode = AIMODE_IDLE;
@@ -491,7 +491,7 @@ void AI_SetIDLE( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_SetSCAN( register ENEMY * Enemy )
+void AI_SetSCAN( ENEMY * Enemy )
 {
 	Enemy->TShip = NULL;
 	Enemy->Object.AI_Mode = AIMODE_SCAN;
@@ -502,7 +502,7 @@ void AI_SetSCAN( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_SetFOLLOWPATH( register ENEMY * Enemy )
+void AI_SetFOLLOWPATH( ENEMY * Enemy )
 {
 	Enemy->TShip = NULL;
 	Enemy->Object.AI_Mode = AIMODE_FOLLOWPATH;
@@ -513,7 +513,7 @@ void AI_SetFOLLOWPATH( register ENEMY * Enemy )
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
-void AI_SetFIREATTARGET( register ENEMY * Enemy )
+void AI_SetFIREATTARGET( ENEMY * Enemy )
 {
 	Enemy->Object.AI_Mode = AIMODE_FIRE;
 	Enemy->Timer  = RESET_FIRE_TIME + (float) Random_Range( (u_int16_t) RESET_FIRE_TIME );
