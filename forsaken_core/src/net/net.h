@@ -20,6 +20,25 @@
 
 #pragma once
 
+/* net.h -- network seam: session setup, players, packets and events
+ *
+ * Implemented by net_enet_2.cpp on PC (enet, built with NET_ENET_2) and
+ * stubbed by net_3ds.cpp, where every call is a no-op and network_state stays
+ * NETWORK_DISCONNECTED. networking.cpp is the game side: it sends through
+ * network_send / network_broadcast and defines network_event, which the
+ * backend calls from inside network_pump.
+ *
+ * network_setup opens the local socket (port 0 = NETWORK_DEFAULT_PORT) and
+ * must come first; calling it again tears the old session down. Then
+ * network_host makes this machine the host at once, or network_join starts
+ * an asynchronous connect (1 = pending, 0 or -1 = failed). A join completes
+ * with a NETWORK_JOIN event carrying NULL (we are in), then one JOIN per
+ * player already in the game. network_players holds the remote players that
+ * finished joining; the local player is never in it. A NULL player in a
+ * NETWORK_HOST event means this machine has become the host. The packet in a
+ * NETWORK_DATA event is freed when network_event returns.
+ */
+
 constexpr int NETWORK_DEFAULT_PORT = 2300;
 
 typedef enum {
@@ -111,16 +130,20 @@ void network_set_player_name( char* name );
 
 // NOTES
 
-// no need to over channalize 
+// no need to over channalize
 // use different channels for different streams
 
+// The values overlap: NETWORK_FLUSH is RELIABLE | SEQUENCED, not a bit of its
+// own, so passing it also makes the packet reliable. The enet backend sends
+// at once (flushes) any packet with RELIABLE or SEQUENCED set, and
+// network_broadcast always flushes.
 typedef enum {
 	NETWORK_RELIABLE	= 2, // note: reliable is also sequenced
 	NETWORK_SEQUENCED	= 4, //
-	NETWORK_FLUSH		= 6, // flushes the current packet
+	NETWORK_FLUSH		= 6, // = RELIABLE | SEQUENCED (see above)
 } network_flags_t;
 
-// channel 0 is reserved
+// channel 0 is reserved (the enet backend's own handshake traffic)
 // data is copied... so you can free it right after function call
 void network_send( network_player_t*, void* data, int size, network_flags_t flags, int channel );
 void network_broadcast( void* data, int size, network_flags_t flags, int channel );
@@ -143,5 +166,5 @@ typedef struct {
 	network_player_t* from;
 } network_packet_t;
 
-// this function will be most likely converted to an argument to network_setup
+// implemented by the game (networking.cpp), called by the backend from network_pump
 void network_event( network_event_type_t, void* data );

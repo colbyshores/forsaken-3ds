@@ -3795,7 +3795,8 @@ send:
 }
 
 /*===================================================================
-	Procedure	:		Read packet stuff from a file and pass it on..
+	Procedure	:		Network update while a demo plays back (empty:
+					nothing reads demo packets; DemoFp is never opened)
 	Input		:		nothing
 	Output		:		nothing
 ===================================================================*/

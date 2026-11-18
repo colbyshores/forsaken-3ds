@@ -1,5 +1,25 @@
 #pragma once
 
+/* networking.h -- multiplayer game protocol: ship state, messages, events
+ *
+ * networking.cpp is the game side of net.h. It owns Ships[], WhoIAm (this
+ * machine's ship number, UNASSIGNED_SHIP until the host gives one out),
+ * GameStatus[] and Names. SendGameMessage packs one MSG_* message into
+ * CommBuff and passes it to network_send, or to network_broadcast when `to`
+ * is NULL; reliability and channel are chosen per message (ship position
+ * updates go sequenced but unreliable, on a channel of their own).
+ * network_event takes the backend's join / leave / host / name / data events,
+ * and EvaluateMessage unpacks a received message. NetworkGameUpdate runs once
+ * a frame in a network game: it pumps the network (ReceiveGameMessages, which
+ * also refreshes the tracker while hosting) and sends this ship's updates.
+ *
+ * The *MSG structs are the wire format, sent as raw memory, so their layout
+ * must not change without breaking play with other builds (net_bool_t keeps
+ * bool fields int-sized for that reason). SendGameMessage sends nothing while
+ * a demo plays back. Ships[] and most of these globals are used by
+ * single-player code too, and on 3DS, where net.h is stubbed (net_3ds.cpp).
+ */
+
 // TODO in 1.19 we should change this to a byte and merge multiple bools into bit fields
 typedef int net_bool_t; // backwards compatibility need bool's in pkt structures to be int's
 

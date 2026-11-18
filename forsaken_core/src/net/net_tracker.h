@@ -20,5 +20,17 @@
 
 #pragma once
 
+/* net_tracker.h -- announcements to the game tracker (master server)
+ *
+ * net_tracker.cpp (PC) sends one-line UDP text messages and reads nothing
+ * back: "hosting <port> <version> <host name>[,<player>...] <level>\n" while
+ * hosting and "finished <port>\n" when the game ends. They go out from the
+ * enet host's own socket, so the tracker sees the public address and port
+ * that joining players will connect to; with no enet host nothing is sent.
+ * networking.cpp's update_tracker resends the update every 20 seconds while
+ * this machine hosts with the tracker enabled. stubs_3ds.cpp makes both calls
+ * no-ops on 3DS.
+ */
+
 void send_tracker_update( char* host, int port );
 void send_tracker_finished( char* host, int port );
