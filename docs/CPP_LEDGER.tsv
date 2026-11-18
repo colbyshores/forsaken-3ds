@@ -94,7 +94,7 @@ bsp	forsaken_core/src/world/bsp.cpp	cpp	697102f	todo	-	transitive (ramqan bench 
 collision	forsaken_core/src/world/collision.cpp	cpp	372c223	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 node	forsaken_core/src/world/node.cpp	cpp	63f93d5	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 visi	forsaken_core/src/world/visi.cpp	cpp	386542d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-music_3ds	forsaken_3ds/src/audio/music_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+music_3ds	forsaken_3ds/src/audio/music_3ds.cpp	cpp	46d152e	done 6f9da6d	-	P2: on-device listen pending (start, loop, level change, title)	was C (platform/backend TU) until the extern "C" removal
 sound_3ds	forsaken_3ds/src/audio/sound_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 net_3ds	forsaken_3ds/src/net/net_3ds.cpp	cpp	e60c503	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 controls_3ds	forsaken_3ds/src/platform_3ds/controls_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal

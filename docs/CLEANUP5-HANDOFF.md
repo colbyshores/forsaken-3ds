@@ -146,8 +146,96 @@ messages. Behaviour-changing commits are bug fixes, each on its own:
 - 3DS warnings: 1,122 unique -> 17. Left: 16 -Wformat/-Wstringop-truncation
   notes on deliberately bounded copies, and assign_loader unused (decision 5).
 
-Next (no decision needed): `constexpr`/`enum class`/`std::array` sweep,
-then classes for state-owning modules; PC (-Wall -Wextra) warning pass.
+The constexpr sweep and the PC warning pass are done; see the next section.
+
+### Phase 2 progress, rest of the night of 2026-11-18 (`experimental/cpp-phase2`)
+
+None of this is on hardware yet. The 3DS still has FORSAKEN-TEST4 (c3b905f).
+Behaviour-changing commits are bug fixes, each on its own, listed first.
+
+**Bugs fixed (worth a look in the morning):**
+- `pickups.cpp` FilterPickup let `PickupType == MAXPICKUPTYPES` through and
+  read `PickupValid[128]`, one past the end (8155c1b).
+- PC net `net_enet_2.cpp`:
+  - find_free_id counted with an `unsigned char`, so `id <= 255` never
+    ended. With id 255 in use it wrapped and could hand out NO_ID (9d5682c).
+  - peer_connected_to's "already in the game" guard read ENet's own peer
+    state instead of the game's, so it never fired. A repeated
+    connected-to message re-ran new_player(): duplicate player, second
+    NETWORK_JOIN (c3ce729).
+- `title.cpp` passed the saved-game info (which contains the pilot name) to
+  sprintf as the format string. It is also 256 bytes going into 128
+  (01a7cf2).
+- **Needs an on-device listen:** `music_3ds` is now one `MusicStream` class
+  (6f9da6d), the first state-owning module done in the Hunk pattern. The
+  checks are track start, loop at end of track, level change, and title.
+
+**Proven identical (3DS objects byte-identical, or the stated -O2 allocation-only difference):**
+- **constexpr sweep complete** (d7dffdd, 5f73328, c390056, 69c1090). A
+  numeric macro stays a macro only when one of these holds:
+  - the preprocessor tests it;
+  - it has several definitions;
+  - it is pasted or stringified;
+  - it collides with a system macro (`INET_ADDRSTRLEN`, `O_BINARY`,
+    `MAX_PATH`);
+  - it is the 3DS SDL key-name shim, or a Windows SDK version macro;
+  - it is `MAXBIKETYPES` (constexpr changes -O2 code at its `%` sites);
+  - it sits in a file no build compiles (decisions 1 and 2).
+- **PC `-Wall -Wextra` pass:**
+  - Unique warnings went from 2,252 to 997. What remains is almost
+    entirely decision 11 below.
+  - Unused variables (6f830f0) and set-but-never-read locals (3eb0e20,
+    59122ba, 7d61450). The -O2 differences there are register allocation,
+    plus the dead calls that were removed.
+  - Unused parameters left unnamed as `TYPE /*name*/` (9baddd5).
+  - [[fallthrough]] (6b7e103); printf casts (bcf02e0); Vulkan narrowing
+    (0512c3f); ENet switch and const (243f9e2, cbc0877); sign compare
+    (8dd99aa); always-false unsigned tests (9b9a297).
+  - `-Wno-missing-field-initializers`: the menu tables and Vulkan
+    create-info structs rely on zero-fill (256ed04).
+- **PC Makefile:**
+  - The dead C pipeline is gone: `-std=gnu99`, `-fcommon`, the `%.c` rule,
+    and the doubled `$(FLAGS)` (324ddb7).
+  - The generated shader header's banner no longer trips `-Wcomment`
+    (944f913).
+- `DebugPrintf` uses gettimeofday; the 3DS `ftime` stub is gone (8fafef1).
+- `TargetingWeaponCheat` is declared in `secondary.h` (5e7a1ad).
+- Gate note: a `@vfp-exempt` pin covers findings up to 800 characters below
+  it, not only the next line. The two `ZONE_Sphere` pins in `collision.cpp`
+  look orphaned but are not.
+
+**Assessed, not done, by recommendation:**
+- `enum class`: of the 88 enums, nearly all are anonymous constant groups.
+  Their values live in `int16_t`/`u_int8_t` fields, index arrays, and go into
+  save files and network packets. Scoped enums would add a cast at almost
+  every use, with no change in behaviour. The candidates are the few named
+  state enums (`net.h`). Even those mean qualifying every use, because
+  `using enum` is C++20 and the tree is gnu++17. Recommendation: leave them.
+- `std::array`: the large global tables decay to pointers, are memcpy'd, and
+  are serialised by `sizeof`. Converting them means `.data()` at every such
+  site. With exceptions off, `.at()` gives nothing. Recommendation: use it
+  only in new code.
+- More state-owning classes, in the `music_3ds` shape:
+  - `controls_3ds` and `sound_3ds` are the next good fits.
+  - `render_c3d` and `render_vulkan` hold the most state, but they are the
+    hot path. Do them only with a perf A/B on hardware.
+
+**Owner decisions, new:**
+
+11. Unchecked reads. About 913 `fread` calls in the save/load serialisers
+    (one per field, in every game module) never check the return value.
+    The same is true of 66 `fscanf`/`fgets` calls in the `enemies.txt` and
+    config parsers. A truncated save today loads garbage silently. The fix
+    is a small checked-reader helper that records the first short read, so
+    the loader can refuse the file. That is a behaviour change to the save
+    path. Do it, or leave it?
+12. Ordinary functions that ignore a parameter: `Create*Explosion` `Dir`,
+    the laser-pulse `Group`, `ExplodeSecondary` `Pos`/`Group`,
+    `TargetClosestEnemy` `Me`/`MeType`, and a few more. Remove those
+    parameters (call-site changes), or keep them as documentation?
+
+Next (no decision needed): after the music_3ds listen, the same class
+shape for `sound_3ds` and `controls_3ds`.
 
 **Last, after the conversion is complete (owner request 2026-11-17):** fully
 refactor the Forsaken Obsidian docs (`port-docs` vault,
