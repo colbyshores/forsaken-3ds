@@ -105,7 +105,6 @@ sound_dsound	forsaken_pc/src/audio/sound_dsound.cpp	cpp	46d152e	todo	-	n/a (Wind
 sound_openal	forsaken_pc/src/audio/sound_openal.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
 input_dinput	forsaken_pc/src/input/input_dinput.cpp	cpp	46d152e	todo	-	n/a (Windows-only, not built)	was C (platform/backend TU) until the extern "C" removal
 input_sdl	forsaken_pc/src/input/input_sdl.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
-net_enet	forsaken_pc/src/net/net_enet.cpp	cpp	cafe450	todo	-	n/a (not in 3DS build)	
 net_enet_2	forsaken_pc/src/net/net_enet_2.cpp	cpp	f3dbde2	todo	-	n/a (not in 3DS build)	
 net_tracker	forsaken_pc/src/net/net_tracker.cpp	cpp	961da60	todo	-	n/a (not in 3DS build)	
 private_address	forsaken_pc/src/net/private_address.cpp	cpp	6317617	todo	-	n/a (not in 3DS build)	
