@@ -298,7 +298,8 @@ void	PlayerMessageQuePrint( void )
 				{
 					if(strcmp(&PlayerMessageBank[i][MAX*z],(const char*) "\0") != 0)
 					{
-						strncpy(&MessageBuff[0],&PlayerMessageBank[i][MAX*z],MAX); 
+						strncpy(&MessageBuff[0],&PlayerMessageBank[i][MAX*z],MAX);
+						MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
 						
 						Print4x5Text( &MessageBuff[0], FontWidth*12 , ypos+FontHeight*y , PlayerMessageColours[i] ); // left-aligned
 						y++;
@@ -339,7 +340,8 @@ void	MessageQuePrint( void )
 				{
 					if(strcmp(&MessageBank[i][MAX*z],(const char*) "\0") != 0)
 					{
-						strncpy(&MessageBuff[0],&MessageBank[i][MAX*z],MAX); 
+						strncpy(&MessageBuff[0],&MessageBank[i][MAX*z],MAX);
+						MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
 						CenterPrint4x5Text( &MessageBuff[0],((y*(FontHeight+1))+16) , MessageColour[i] );	// original centered
 						y++;
 					}
@@ -371,7 +373,8 @@ void	MessageQuePrintAll( void )
 			{
 				if(strcmp(&MessageBankLong[i][MAX*z],(const char*) "\0") != 0)
 				{
-					strncpy(&MessageBuff[0],&MessageBankLong[i][MAX*z],MAX); 
+					strncpy(&MessageBuff[0],&MessageBankLong[i][MAX*z],MAX);
+					MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
 					Print4x5Text( &MessageBuff[0], FontWidth*23 , ((y*(FontHeight+1))+16) , MessageColourLong[i] );
 					y++;
 				}
