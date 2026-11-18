@@ -21,6 +21,8 @@
 #include "game/skin.h"
 #include "game/camera.h"
 
+class FileReader;
+
 typedef struct _GROUPLIST
 {
 	int groups;
@@ -52,7 +54,7 @@ bool PointInGroupBoundingBox( MLOADHEADER * Mloadheader, VECTOR * Pos, u_int16_t
 /* Defined in visi.cpp; shared with the modules that use it. */
 void InitIndirectVisible( u_int16_t g );
 void AddIndirectVisible( u_int16_t g );
-bool ReadGroupConnections( MLOADHEADER *m, char **pbuf );
+bool ReadGroupConnections( MLOADHEADER *m, FileReader & in );
 extern u_int16_t IsGroupVisible[ MAXGROUPS ];
 extern int NumOfVertsTouched;
 extern u_int16_t NumGroupsVisible;

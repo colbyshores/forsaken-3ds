@@ -26,6 +26,7 @@
 #include "ui/title.h"
 #include "game/restart.h"
 #include "util/util.h"
+#include "util/file_reader.h"
 #include "game/water.h"
 #include "rendering/render.h"
 #include "data/tload.h"
@@ -229,12 +230,10 @@ bool GroupsAreVisible( u_int16_t g1, u_int16_t g2 )
 	return AreGroupsRelated( &VisibleGroup, g1, g2 );
 }
 
-bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
+bool ReadGroupConnections( MLOADHEADER *m, FileReader & in )
 {
 	u_int32_t tabsize;
 	u_int16_t g;
-	char *buf;
-	u_int16_t *buf16;
 
 	// initialise data structures to reasonable defaults
 	for ( g = 0; g < MAXGROUPS; g++ )
@@ -283,16 +282,12 @@ bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 	memset( VisibleGroup.table, 0, tabsize );
 	memset( IndirectVisibleGroup.table, 0, tabsize );
 
-	buf = *pbuf;
-
 	// read connectivity table
-	memmove( ConnectedGroup.table, buf, tabsize );
-	buf += tabsize;
+	in.bytes( ConnectedGroup.table, tabsize );
 
-	buf16 = (u_int16_t *) buf;
 	for ( g = 0; g < m->num_groups; g++ )
 	{
-		ConnectedGroup.list[ g ].groups = *buf16++;
+		ConnectedGroup.list[ g ].groups = in.u16();
 		if ( ConnectedGroup.list[ g ].groups )
 		{
 			ConnectedGroup.list[ g ].group = (u_int16_t *) calloc( ConnectedGroup.list[ g ].groups, sizeof( u_int16_t ) );
@@ -301,20 +296,16 @@ bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 				Msg( "ReadGroupConnections: failed X_calloc for ConnectedGroup.list[ %d ]\n", g );
 				return false;
 			}
-			memmove( ConnectedGroup.list[ g ].group, buf16, ConnectedGroup.list[ g ].groups * sizeof( u_int16_t ) );
-			buf16 += ConnectedGroup.list[ g ].groups;
+			in.bytes( ConnectedGroup.list[ g ].group, ConnectedGroup.list[ g ].groups * sizeof( u_int16_t ) );
 		}
 	}
-	buf = (char *) buf16;
 
 	// read visibility summary table
-	memmove( VisibleGroup.table, buf, tabsize );
-	buf += tabsize;
+	in.bytes( VisibleGroup.table, tabsize );
 
-	buf16 = (u_int16_t *) buf;
 	for ( g = 0; g < m->num_groups; g++ )
 	{
-		VisibleGroup.list[ g ].groups = *buf16++;
+		VisibleGroup.list[ g ].groups = in.u16();
 		if ( VisibleGroup.list[ g ].groups )
 		{
 			VisibleGroup.list[ g ].group = (u_int16_t *) calloc( VisibleGroup.list[ g ].groups, sizeof( u_int16_t ) );
@@ -323,20 +314,16 @@ bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 				Msg( "ReadGroupConnections: failed X_calloc for VisibleGroup.list[ %d ]\n", g );
 				return false;
 			}
-			memmove( VisibleGroup.list[ g ].group, buf16, VisibleGroup.list[ g ].groups * sizeof( u_int16_t ) );
-			buf16 += VisibleGroup.list[ g ].groups;
+			in.bytes( VisibleGroup.list[ g ].group, VisibleGroup.list[ g ].groups * sizeof( u_int16_t ) );
 		}
 	}
-	buf = (char *) buf16;
 
 	// read indirect visibility summary table
-	memmove( IndirectVisibleGroup.table, buf, tabsize );
-	buf += tabsize;
+	in.bytes( IndirectVisibleGroup.table, tabsize );
 
-	buf16 = (u_int16_t *) buf;
 	for ( g = 0; g < m->num_groups; g++ )
 	{
-		IndirectVisibleGroup.list[ g ].groups = *buf16++;
+		IndirectVisibleGroup.list[ g ].groups = in.u16();
 		if ( IndirectVisibleGroup.list[ g ].groups )
 		{
 			IndirectVisibleGroup.list[ g ].group = (u_int16_t *) calloc( IndirectVisibleGroup.list[ g ].groups, sizeof( u_int16_t ) );
@@ -345,13 +332,9 @@ bool ReadGroupConnections( MLOADHEADER *m, char **pbuf )
 				Msg( "ReadGroupConnections: failed X_calloc for IndirectVisibleGroup.list[ %d ]\n", g );
 				return false;
 			}
-			memmove( IndirectVisibleGroup.list[ g ].group, buf16, IndirectVisibleGroup.list[ g ].groups * sizeof( u_int16_t ) );
-			buf16 += IndirectVisibleGroup.list[ g ].groups;
+			in.bytes( IndirectVisibleGroup.list[ g ].group, IndirectVisibleGroup.list[ g ].groups * sizeof( u_int16_t ) );
 		}
 	}
-	buf = (char *) buf16;
-
-	*pbuf = buf;
 
 
 	return true;

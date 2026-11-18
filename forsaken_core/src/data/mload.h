@@ -67,6 +67,7 @@ typedef struct MCFACE {
 	float D;
 	PROJPOINT v[ 4 ];
 } MCFACE;
+static_assert( sizeof( MCFACE ) == 52, "MCFACE is a file record" );
 
 
 typedef struct VERTEXCELL{
@@ -81,6 +82,7 @@ typedef struct STARTPOS{
 	VECTOR	Up;
 	u_int16_t	Group;
 }STARTPOS;
+static_assert( sizeof( STARTPOS ) == 40, "STARTPOS is a file record (2 trailing pad bytes)" );
 
 typedef struct _GAMESTARTPOS{
 	VECTOR	Pos;
@@ -197,9 +199,8 @@ typedef struct LVLGROUP{
 
 typedef struct MLOADHEADER{
 	int					state;								// false if not loaded properly...
-	char		*		OrgAddr;
-	char		*		Buffer;
-	char		*		testBuffer;
+	char		*		OrgAddr;							// the .mxv file, from PreMload until Mload has copied it out
+	const char	*		Buffer;								// where Mload starts reading OrgAddr
 	u_int16_t				num_texture_files;
 	u_int16_t				num_groups;
 	LVLGROUP				Group[MAXGROUPS];
@@ -231,6 +232,7 @@ typedef struct MFACE {
 	float ny;
 	float nz;
 } MFACE;
+static_assert( sizeof( MFACE ) == 20, "MFACE is a file record" );
 
 
 typedef struct VISPOLVERTEX {

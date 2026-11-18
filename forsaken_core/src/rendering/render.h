@@ -385,38 +385,19 @@ extern bool g_wall_detail;
 #endif
 
 
-// this is used to read the file because the file
-typedef struct {
-    union {
-		float     x;             /* Homogeneous coordinates */
-		float     dvX;
-    };
-    union {
-		float     y;
-		float     dvY;
-    };
-    union {
-		float     z;
-		float     dvZ;
-    };
-    DWORD            dwReserved;
-    union {
-		COLOR     color;         /* Vertex color */
-		COLOR     dcColor;
-    };
-    union {
-		COLOR     specular;      /* Specular component of vertex */
-		COLOR     dcSpecular;
-    };
-    union {
-		float     tu;            /* Texture coordinates */
-		float     dvTU;
-    };
-    union {
-		float     tv;
-		float     dvTV;
-    };
-} *LPOLDLVERTEX;
+/* One vertex as stored in the .mxv, .mx and .mxa files: Direct3D's 32-byte
+   D3DLVERTEX record. The loaders convert each one to an LVERTEX. */
+typedef struct OLDLVERTEX {
+	float	x;
+	float	y;
+	float	z;
+	DWORD	dwReserved;
+	COLOR	color;
+	COLOR	specular;
+	float	tu;
+	float	tv;
+} OLDLVERTEX, *LPOLDLVERTEX;
+static_assert( sizeof( OLDLVERTEX ) == 32, "OLDLVERTEX is a file record" );
 
 /* bjd - remove when done. taken from SDK */
 constexpr auto CLIP_LEFT = 0x00000001L;

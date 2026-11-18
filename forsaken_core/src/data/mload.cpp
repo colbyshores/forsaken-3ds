@@ -108,8 +108,9 @@ num_start_points : u_int16_t
 #include "data/tload.h"
 #include "util/hunk_alloc.h"
 #include "world/visi.h"
+#include "util/file_reader.h"
 
-void ReadSoundInfo( MLOADHEADER *m, char **pbuf );
+static void ReadSoundInfo( MLOADHEADER *m, FileReader & in );
 
 /*===================================================================
 		Defines
@@ -138,21 +139,20 @@ u_int16_t	GroupTris[ MAXGROUPS ];
 	Input		:		Who can tell...
 	Output		:		int93???
 ===================================================================*/
-static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group, u_int16_t **Uint16PntPtr )
+static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group, FileReader & in )
 {
 	bool ok;
-	u_int16_t *ptr;
 	u_int16_t vnum;
 
 	ok = true;
-	ptr = *Uint16PntPtr;
-	if ( *ptr < MAXPORTALSPERGROUP ) // nb cannot check against Mloadheader->Group[group].num_portals yet...
+	u_int16_t portal = in.u16();
+	if ( portal < MAXPORTALSPERGROUP ) // nb cannot check against Mloadheader->Group[group].num_portals yet...
 	{
-		v->portal = &Mloadheader->Group[group].Portal[*ptr++];
-		v->group = *ptr++;
+		v->portal = &Mloadheader->Group[group].Portal[portal];
+		v->group = in.u16();
 		if ( v->group < Mloadheader->num_groups )
 		{
-			v->num_visible = *ptr++;
+			v->num_visible = in.u16();
 			if ( v->num_visible )
 			{
 				v->visible = (VISTREE *) calloc( v->num_visible, sizeof( VISTREE ) );
@@ -160,7 +160,7 @@ static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group
 				{
 					for ( vnum = 0; vnum < v->num_visible; vnum++ )
 					{
-						if ( !read_visible( Mloadheader, &v->visible[ vnum ], v->group, &ptr ) )
+						if ( !read_visible( Mloadheader, &v->visible[ vnum ], v->group, in ) )
 						{
 							ok = false;
 							break;
@@ -178,7 +178,6 @@ static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group
 	}
 	else
 		ok = false;
-	*Uint16PntPtr = ptr;
 	return ok;
 }
 
@@ -285,16 +284,6 @@ FixUV_Anim( POLYANIM *PolyAnim, LPLVERTEX Vert, LPLVERTEX Orig_Vert )
 ===================================================================*/
 bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 {
-	char		*	FileNamePnt;
-	char		*	Buffer;
-	char		*	tempBuffer;
-	u_int16_t		*	Uint16Pnt;
-	u_int16_t		*	Uint16Pnt2;
-	int16_t		*	int16Pnt;
-	float		*	FloatPnt;
-	MFACE		*	MFacePnt;
-	VERT		*	VertPnt;
-	VERTEXCELL  *	VertexCellPnt;
 	TRIANGLE		FacePnt; // was a pointer
 	u_int16_t			exec_type;			// the type of execute buffer
 	u_int16_t			num_vertices;		// overall number of verts
@@ -302,25 +291,19 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			verts;
 	u_int16_t			portal;
-	u_int16_t			ExecSize;
-	LPOLDLVERTEX	lpLVERTEX2 = NULL;
 	LPLVERTEX	lpLVERTEX;
 	LPLVERTEX	lpBufStart = NULL;
 	WORD			*lpIndices = NULL;
 	NORMAL * lpNormals = NULL;
 	int				indexOffset = 0;
 	int				ibIndex = 0;
-	int				numTriangles = 0;
-	int				tempInt = 0;
 	int				triangleCount = 0;
-	STARTPOS	  *	StartPosPnt;
 	int			i,e,o;
 	u_int16_t tpage;
 	int execbuf;
 	int group;
 	int r,g,b,a;
 	COLOR color;
-	float		*	up;
 	u_int16_t	animation,frames,vertices;
 	POLYANIM * PolyAnim;
 	TANIMUV * TanimUV;
@@ -329,12 +312,10 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	u_int16_t	animsize;
 	u_int16_t	NumColours;
 	u_int32_t	TempColour;
-	u_int32_t	*	Uint32Pnt;
 	TEXTUREANIMINFOINDEX * TAnimInfoIndexPnt;
 	u_int16_t	polyanim;
 	u_int16_t	initstate;
 	int16_t	whenstoppedtriggermod;
-	COLOR *ambient;
 	int colourkey = 0;
 
 	DebugPrintf("Mload - %s\n",Filename);
@@ -342,17 +323,15 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	// Mloadheader is not valid until everything has been done..
 	Mloadheader->state = false;
 
-	Buffer = Mloadheader->Buffer;
-	if( Buffer == NULL)
+	if( Mloadheader->Buffer == NULL)
 	{
 		Msg( "Mload : Error Allocating Buffer\n" );
 		return false;
 	}
+	FileReader in( Mloadheader->Buffer );
 
 	/*	get the number of groups	*/
-	Uint16Pnt = (u_int16_t *) Buffer;
-	Mloadheader->num_groups = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;
+	Mloadheader->num_groups = in.u16();
 
 	if ( Mloadheader->num_groups > MAXGROUPS )
 	{
@@ -364,9 +343,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	{
 		GroupTris[ group ] = 0;
 		/*	get the number of execbufs in this group	*/
-		Uint16Pnt = (u_int16_t *) Buffer;
-		Mloadheader->Group[group].num_execbufs = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;
+		Mloadheader->Group[group].num_execbufs = in.u16();
 
 		if ( Mloadheader->Group[group].num_execbufs > MAXEXECBUFSPERGROUP )
 		{
@@ -378,26 +355,18 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		{
 			Mloadheader->Group[group].num_animating_polys[execbuf] = 0;
 			
-			int16Pnt = (int16_t *) Buffer;
-			ExecSize = 	*int16Pnt++;
-			ExecSize += 512;
-			Buffer = (char *) int16Pnt;		
-			
-			Uint16Pnt = (u_int16_t *) Buffer;
+			in.skip( sizeof( int16_t ) );	// D3D execute-buffer size (unused)
 
 			/*	get the type of execution buffer	*/
-			exec_type = *Uint16Pnt++;
+			exec_type = in.u16();
 			/*	get the number of verts in execution buffer	*/
-			num_vertices =	*Uint16Pnt++;     
-			Buffer = (char *) Uint16Pnt;		
+			num_vertices = in.u16();
 	
 			/*	record how what type of exec buffer	*/
 			Mloadheader->Group[group].exec_type[execbuf] = exec_type;
 
 			/*	record how many verts there are in the exec buffer	*/
 			Mloadheader->Group[group].num_verts_per_execbuf[execbuf] = num_vertices;
-
-			lpLVERTEX2 = (LPOLDLVERTEX ) Buffer;
 
 			if (!FSCreateVertexBuffer((RENDEROBJECT*)&Mloadheader->Group[group].renderObject[execbuf], num_vertices))
 			{
@@ -419,22 +388,16 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			/*	copy the vertex data into the execute buffer	*/
 			for ( i=0 ; i<num_vertices; i++)
 			{
-				/* lpLVERTEX2 points into the raw buffer at an offset
-				   that depends on the variable-length filename section
-				   above; it can be 2-mod-4. Reading old->x via vldr
-				   would fault. Copy the whole 32-byte OLDLVERTEX into
-				   a stack-aligned local first. */
-				__typeof__(*lpLVERTEX2) _ovx_local;
-				memcpy_unaligned(&_ovx_local, lpLVERTEX2, sizeof(*lpLVERTEX2));
-				LPOLDLVERTEX old = &_ovx_local;
+				OLDLVERTEX old;
+				in.bytes( &old, sizeof( old ) );
 
-				lpLVERTEX[i].x = old->x;
-				lpLVERTEX[i].y = old->y;
-				lpLVERTEX[i].z = old->z;
-				lpLVERTEX[i].tu = old->tu;
-				lpLVERTEX[i].tv = old->tv;
+				lpLVERTEX[i].x = old.x;
+				lpLVERTEX[i].y = old.y;
+				lpLVERTEX[i].z = old.z;
+				lpLVERTEX[i].tu = old.tu;
+				lpLVERTEX[i].tv = old.tv;
 
-				color = old->color;
+				color = old.color;
 				a = (color>>24)&255;
 				r = (color>>16)&255;
 				g = (color>>8)&255;
@@ -454,42 +417,29 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				// right here you could override texture coloring if you wanted
 				color = RGBA_MAKE( r , g , b , a  );
 				lpLVERTEX[i].color = color;
-				lpLVERTEX2->color = color;
 
 				// nothing used specular so we removed it from LVERTEX
 				//lpLVERTEX->specular = lpLVERTEX2->specular;
-				lpLVERTEX2++;
 			}
 
 			/* bjd - allows us to retrieve copies of the original vertices in the new format! */
 			Mloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
-			Buffer = (char *) lpLVERTEX2;
-			
-			Uint16Pnt = (u_int16_t *) Buffer;
-			num_triangle_groups = *Uint16Pnt++;    
-			Buffer = (char *) Uint16Pnt;
+			num_triangle_groups = in.u16();
 
 			triangleCount = 0;
-			tempInt = 0;
-			tempBuffer = Buffer;
 
 			/* find out how many vertexes we'll need to load into our vertex buffer */
-			for ( i=0 ; i<num_triangle_groups; i++)
 			{
-				u_int16_t *temp = (u_int16_t *) tempBuffer;
-
-				temp += 4;
-
-				numTriangles = *temp++;
-
-				tempBuffer = (char*) temp;
-				MFacePnt = (MFACE *) tempBuffer;
-
-				MFacePnt += numTriangles;
-				tempBuffer = (char *) MFacePnt;
-				triangleCount += numTriangles;
+				FileReader scan = in;
+				for ( i=0 ; i<num_triangle_groups; i++)
+				{
+					scan.skip( 4 * sizeof( u_int16_t ) );
+					u_int16_t numTriangles = scan.u16();
+					scan.skip( numTriangles * sizeof( MFACE ) );
+					triangleCount += numTriangles;
+				}
 			}
 
 			/*	create an index buffer	*/
@@ -538,24 +488,22 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 			for ( i=0 ; i<num_triangle_groups; i++)
 			{
-				Uint16Pnt = (u_int16_t *) Buffer;
-				Uint16Pnt++;	// texture type (unused)
-				Uint16Pnt++;	// group vertex start (unused)
-				Uint16Pnt++;	// group vertex count (unused)
-				tpage = *Uint16Pnt++;
-				num_triangles = *Uint16Pnt++;    
-				Buffer = (char *) Uint16Pnt;
+				in.skip( sizeof( u_int16_t ) );	// texture type (unused)
+				in.skip( sizeof( u_int16_t ) );	// group vertex start (unused)
+				in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
+				tpage = in.u16();
+				num_triangles = in.u16();
 				
 				GroupTris[ group ] += num_triangles;
-	
-				MFacePnt = (MFACE *) Buffer;
 	
 				/*	copy the faces data into the execute buffer	*/
 				for( e=0; e<num_triangles; e++)
 				{
-					FacePnt.v1 = MFacePnt->v1;
-					FacePnt.v2 = MFacePnt->v2;
-					FacePnt.v3 = MFacePnt->v3;
+					MFACE face;
+					in.bytes( &face, sizeof( face ) );
+					FacePnt.v1 = face.v1;
+					FacePnt.v2 = face.v2;
+					FacePnt.v3 = face.v3;
 
 					lpIndices[ibIndex] = FacePnt.v1;
 					ibIndex++;
@@ -564,23 +512,19 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					lpIndices[ibIndex] = FacePnt.v3;
 					ibIndex++;
 
-					memcpy(&lpNormals->nx, &MFacePnt->nx, 4);
-					memcpy(&lpNormals->ny, &MFacePnt->ny, 4);
-					memcpy(&lpNormals->nz, &MFacePnt->nz, 4);
+					lpNormals->nx = face.nx;
+					lpNormals->ny = face.ny;
+					lpNormals->nz = face.nz;
 
-					if ( MFacePnt->pad & 1 )
+					if ( face.pad & 1 )
 					{
 						// colourkey triangle found
 						colourkey++;
-						MFacePnt->pad &= ~1;
 					}
 
 					FixUV( &FacePnt, lpBufStart, tpage, Mloadheader->Group[group].originalVerts[execbuf] );
-					MFacePnt++;
 					lpNormals++;
-					tempInt+=3;
 				}
-				Buffer = (char *) MFacePnt;
 
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].numVerts = num_vertices;
 				Mloadheader->Group[group].renderObject[execbuf].textureGroups[i].numTriangles = num_triangles;
@@ -627,48 +571,34 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	}
 				
 	
-	Uint16Pnt = (u_int16_t *) Buffer;
-	// is there any vispoly info.....
-	if ( *Uint16Pnt != 0)
+	// is there any vispoly info..... (a zero here is not consumed: it is
+	// read again below as the animation count)
+	if ( in.peek_u16() != 0)
 	{
 		u_int16_t pnum, vnum;
 
-		if ( *Uint16Pnt != 2 )
+		if ( in.u16() != 2 )
 		{
 			Msg( "Mload : Not in new recursive format\n" );
 			return false; // error if not in new recursive group/portal visibility tree format
 		}
 
-		Uint16Pnt++;
 /*===================================================================
  *		Particular Stuff Related To Visiploys	
 ===================================================================*/
-		Buffer = ( char * ) Uint16Pnt;
-
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
 			/*	copy over the groups Name	*/
-			FileNamePnt = (char*) &Mloadheader->Group[group].name;
-			while ( ( *FileNamePnt++ = *Buffer++ ) != 0 );
-	
+			strcpy( Mloadheader->Group[group].name, in.cstring() );
 
 			// Make sure there are no start points initially in this group..
 			Mloadheader->Group[group].StartPosInThisGroup = (u_int16_t) -1;
 
-			VertPnt = ( VERT* )	Buffer;
-			/* Group name above is null-terminated, so VertPnt may land on
-			   any byte alignment. Plain memcpy(VERT) inlines to `ldm`
-			   which faults on misaligned sources; use the noinline helper. */
-			{ extern void memcpy_unaligned(void*, const void*, size_t);
-			  memcpy_unaligned(&Mloadheader->Group[group].center,    VertPnt,     sizeof(VERT));
-			  memcpy_unaligned(&Mloadheader->Group[group].half_size, VertPnt + 1, sizeof(VERT)); }
-			VertPnt += 2;
-			Buffer = ( char * ) VertPnt;
+			in.bytes( &Mloadheader->Group[group].center, sizeof( VERT ) );
+			in.bytes( &Mloadheader->Group[group].half_size, sizeof( VERT ) );
 
-			Uint16Pnt = (u_int16_t *) Buffer;
 			/*	get the number of portals in the group	*/
-			Mloadheader->Group[group].num_portals = *Uint16Pnt++;    
-			Buffer = (char *) Uint16Pnt;		
+			Mloadheader->Group[group].num_portals = in.u16();
 			if(Mloadheader->Group[group].num_portals > MAXPORTALSPERGROUP)
 			{
 				Msg( "Mload : NumPortals > MAXPORTALSPERGROUP\n" );
@@ -679,10 +609,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			
 			for( portal = 0 ; portal < Mloadheader->Group[group].num_portals ; portal ++ )
 			{
-				Uint16Pnt = (u_int16_t *) Buffer;
 				/*	get the number of Verts in the Portal	*/
-				Mloadheader->Group[group].Portal[portal].num_vertices_in_portal = *Uint16Pnt++;
-				Buffer = (char *) Uint16Pnt;		
+				Mloadheader->Group[group].Portal[portal].num_vertices_in_portal = in.u16();
 
 				if(Mloadheader->Group[group].Portal[portal].num_vertices_in_portal > MAXVERTSPERPORTAL)
 				{
@@ -695,15 +623,10 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					VERT centroid = {0,0,0};
 					int length = Mloadheader->Group[group].Portal[portal].num_vertices_in_portal;
 
-					VertPnt = ( VERT* )	Buffer;
 					for( verts = 0 ; verts < length ; verts++ )
 					{
-#ifdef __3DS__
 						VERT vert;
-						memcpy(&vert, VertPnt++, sizeof(vert));
-#else
-						VERT vert = *VertPnt++;
-#endif
+						in.bytes( &vert, sizeof( vert ) );
 						sum.x += vert.x;
 						sum.y += vert.y;
 						sum.z += vert.z;
@@ -720,11 +643,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					//	group, portal, centroid.x, centroid.y, centroid.z);
 				}
 
-				Buffer = (char *) VertPnt;		
-					
-				Uint16Pnt = (u_int16_t *) Buffer;
 				// get the polys in the portal
-				Mloadheader->Group[group].Portal[portal].num_polys_in_portal = *Uint16Pnt++;
+				Mloadheader->Group[group].Portal[portal].num_polys_in_portal = in.u16();
 
 				if ( Mloadheader->Group[group].Portal[portal].num_polys_in_portal > MAXPOLYSPERPORTAL )
 				{
@@ -734,16 +654,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 				for ( pnum = 0; pnum < Mloadheader->Group[group].Portal[portal].num_polys_in_portal; pnum++ )
 				{
-					/* Uint16Pnt is 2-byte aligned; GCC compiles the struct
-					   assignment below into `ldm` which requires 4-byte
-					   alignment and faults on ARM11. */
-					{ extern void memcpy_unaligned(void*, const void*, size_t);
-					  memcpy_unaligned(&Mloadheader->Group[group].Portal[portal].Poly[pnum],
-					                   Uint16Pnt, sizeof(MCFACE)); }
-					Uint16Pnt = (u_int16_t *) ( (char *) Uint16Pnt + sizeof(MCFACE) );
+					in.bytes( &Mloadheader->Group[group].Portal[portal].Poly[pnum], sizeof( MCFACE ) );
 				}
-	
-				Buffer = (char *) Uint16Pnt;		
 			}
 		
 		}		
@@ -753,13 +665,13 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			for( portal = 0 ; portal < Mloadheader->Group[group].num_portals ; portal ++ )
 			{
 				Mloadheader->Group[group].Portal[portal].visible.portal = &Mloadheader->Group[group].Portal[portal];
-				Mloadheader->Group[group].Portal[portal].visible.group = *Uint16Pnt++;
+				Mloadheader->Group[group].Portal[portal].visible.group = in.u16();
 				if ( Mloadheader->Group[group].Portal[portal].visible.group >= Mloadheader->num_groups )
 				{
 					Msg( "Mload : Group > Num groups\n" );
 					return false;
 				}
-				Mloadheader->Group[group].Portal[portal].visible.num_visible = *Uint16Pnt++;
+				Mloadheader->Group[group].Portal[portal].visible.num_visible = in.u16();
 				if ( Mloadheader->Group[group].Portal[portal].visible.num_visible > 0 )
 				{
 					Mloadheader->Group[group].Portal[portal].visible.visible =
@@ -773,7 +685,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					for ( vnum = 0; vnum < Mloadheader->Group[group].Portal[portal].visible.num_visible; vnum++ )
 					{
 						if ( !read_visible( Mloadheader, &Mloadheader->Group[group].Portal[portal].visible.visible[vnum], 
-								Mloadheader->Group[group].Portal[portal].visible.group, &Uint16Pnt ) )
+								Mloadheader->Group[group].Portal[portal].visible.group, in ) )
 						{
 							Msg( "Mload : Read visible failed\n" );
 							return false;
@@ -784,55 +696,34 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					Mloadheader->Group[group].Portal[portal].visible.visible = NULL;
 			}
 		}
-		Buffer = (char *) Uint16Pnt;		
-	
 /*===================================================================
  *		End Of Visiploy Stuff	
 ===================================================================*/
 
-		if ( !ReadGroupConnections( Mloadheader, &Buffer ) )
+		if ( !ReadGroupConnections( Mloadheader, in ) )
 			return false;
-		ReadSoundInfo( Mloadheader, &Buffer );
+		ReadSoundInfo( Mloadheader, in );
 
 /*===================================================================
  *		Start of Cell Index Stuff	
 ===================================================================*/
-		Uint16Pnt = (u_int16_t *) Buffer;
-		// is there any cell index info.....
-		if ( *Uint16Pnt++ != 0)
+		// is there any cell index info..... (a zero here is not consumed: it
+		// is read again below as the start position count)
+		if ( in.peek_u16() != 0)
 		{
-			Buffer = (char *) Uint16Pnt;		
+			in.skip( sizeof( u_int16_t ) );
 
-			FloatPnt = ( float * ) Buffer;
-#ifdef __3DS__
-			memcpy(&Mloadheader->CellSize, FloatPnt++, 4);
-			Mloadheader->CellSize = 1.0F / Mloadheader->CellSize;
-#else
-			Mloadheader->CellSize = 1.0F / *FloatPnt++;
-#endif
-			Buffer = (char * ) FloatPnt;
+			Mloadheader->CellSize = 1.0F / in.f32();
 
 			for( group=0 ; group<Mloadheader->num_groups; group++)
 			{
-				Uint16Pnt = (u_int16_t *) Buffer;
-				Uint16Pnt++; //dont need the number of exec buffs......
-				Buffer = (char *) Uint16Pnt;
+				in.skip( sizeof( u_int16_t ) ); //dont need the number of exec buffs......
 				for( execbuf=0 ; execbuf<Mloadheader->Group[group].num_execbufs; execbuf++)
 				{
-					FloatPnt = (float * ) Buffer;
-#ifdef __3DS__
-					memcpy_unaligned(&Mloadheader->Group[group].cell_origin[execbuf], FloatPnt, 4*3);
-					FloatPnt += 3;
-#else
-					Mloadheader->Group[group].cell_origin[execbuf].x = *FloatPnt++;
-					Mloadheader->Group[group].cell_origin[execbuf].y = *FloatPnt++;
-					Mloadheader->Group[group].cell_origin[execbuf].z = *FloatPnt++;
-#endif
-					Buffer = (char * ) FloatPnt;
-					Uint16Pnt = (u_int16_t *) Buffer;
-					Mloadheader->Group[group].xcells[execbuf] = *Uint16Pnt++;
-					Mloadheader->Group[group].ycells[execbuf] = *Uint16Pnt++;
-					Mloadheader->Group[group].zcells[execbuf] = *Uint16Pnt++;
+					Mloadheader->Group[group].cell_origin[execbuf] = in.vec();
+					Mloadheader->Group[group].xcells[execbuf] = in.u16();
+					Mloadheader->Group[group].ycells[execbuf] = in.u16();
+					Mloadheader->Group[group].zcells[execbuf] = in.u16();
 					Mloadheader->Group[group].numofcells[execbuf] =	Mloadheader->Group[group].xcells[execbuf] *
 																	Mloadheader->Group[group].ycells[execbuf] *
 																	Mloadheader->Group[group].zcells[execbuf];
@@ -847,52 +738,41 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						Msg( "Mload : Couldnt allocate enough memory for the cell colour info\n" );
 						return false;
 					}
-					Mloadheader->Group[group].num_vertex_indices[execbuf] = *Uint16Pnt++;
+					Mloadheader->Group[group].num_vertex_indices[execbuf] = in.u16();
 
-					Mloadheader->Group[group].vertex_index_pnt[execbuf] = Uint16Pnt;
-
-					Uint16Pnt += Mloadheader->Group[group].num_vertex_indices[execbuf];
-
-					VertexCellPnt  = (VERTEXCELL * ) Uint16Pnt;
-
-					Mloadheader->Group[group].vertex_cell_pnt[execbuf] = VertexCellPnt;
-
-					VertexCellPnt += Mloadheader->Group[group].numofcells[execbuf];
-
-					Buffer = (char *) VertexCellPnt;
-					
+					Mloadheader->Group[group].vertex_index_pnt[execbuf] =
+						(u_int16_t *) malloc( Mloadheader->Group[group].num_vertex_indices[execbuf] * sizeof( u_int16_t ) );
+					Mloadheader->Group[group].vertex_cell_pnt[execbuf] =
+						(VERTEXCELL *) malloc( Mloadheader->Group[group].numofcells[execbuf] * sizeof( VERTEXCELL ) );
+					if( !Mloadheader->Group[group].vertex_index_pnt[execbuf] || !Mloadheader->Group[group].vertex_cell_pnt[execbuf] )
+					{
+						Msg( "Mload : Couldnt allocate enough memory for the cell index info\n" );
+						return false;
+					}
+					in.bytes( Mloadheader->Group[group].vertex_index_pnt[execbuf], Mloadheader->Group[group].num_vertex_indices[execbuf] * sizeof( u_int16_t ) );
+					in.bytes( Mloadheader->Group[group].vertex_cell_pnt[execbuf], Mloadheader->Group[group].numofcells[execbuf] * sizeof( VERTEXCELL ) );
 				}
-				ambient = (COLOR *) Buffer;
-				for ( i = 0; i < Mloadheader->Group[group].numofcells[0]; i++ )
-				{
-					Mloadheader->Group[group].colour_cell_pnt[0][i] = *ambient++;
-				}
-				Buffer = (char *) ambient;
+				in.bytes( Mloadheader->Group[group].colour_cell_pnt[0], Mloadheader->Group[group].numofcells[0] * sizeof( COLOR ) );
 			}
 		
 		}
 /*===================================================================
  *		Start of Start Pos Stuff
 ===================================================================*/
-		Uint16Pnt = (u_int16_t *) Buffer;
-		num_start_positions = *Uint16Pnt++;
-		Buffer = (char *) Uint16Pnt;		
+		num_start_positions = in.u16();
 
 		for( i = 0 ; i < MAXGROUPS ; i++ )
 		{
 			FirstStartPositionInGroup[i] = (u_int16_t) -1;
 		}
-		StartPosPnt = (STARTPOS * ) Buffer;
 		for( i = 0 ; i < num_start_positions ; i++ )
 		{
-			/* STARTPOS* cast from Buffer after a u16 read — may be
-			   2-mod-4. GCC inlines a plain memcpy(VECTOR) to `ldm`
-			   which requires 4-byte alignment; use the noinline helper. */
-			{ extern void memcpy_unaligned(void*, const void*, size_t);
-			  memcpy_unaligned(&StartPositions[i].Pos, &StartPosPnt->Pos, sizeof(VECTOR));
-			  memcpy_unaligned(&StartPositions[i].Dir, &StartPosPnt->Dir, sizeof(VECTOR));
-			  memcpy_unaligned(&StartPositions[i].Up,  &StartPosPnt->Up,  sizeof(VECTOR)); }
-			StartPositions[i].Group = StartPosPnt->Group;  /* u16 — safe */
+			STARTPOS start;
+			in.bytes( &start, sizeof( start ) );
+			StartPositions[i].Pos = start.Pos;
+			StartPositions[i].Dir = start.Dir;
+			StartPositions[i].Up = start.Up;
+			StartPositions[i].Group = start.Group;
 			//Make a note in each group of which Start point is in there...
 			Mloadheader->Group[StartPositions[i].Group].StartPosInThisGroup = i;
 			if( FirstStartPositionInGroup[StartPositions[i].Group] == (u_int16_t) -1 )
@@ -903,31 +783,20 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 				StartPositions[i].NextInGroup = FirstStartPositionInGroup[StartPositions[i].Group];
 				FirstStartPositionInGroup[StartPositions[i].Group] = i;
 			}
-			StartPosPnt++;
 		}
-		Buffer = (char *) StartPosPnt;		
 
 /*===================================================================
  *		Start of group up vector Stuff
 ===================================================================*/
-		Uint16Pnt = (u_int16_t *) Buffer;
-		// is there any up vector info.....
-		if ( *Uint16Pnt++ != 0)
+		// is there any up vector info..... (a zero here is not consumed: it is
+		// read again below as the animation count)
+		if ( in.peek_u16() != 0)
 		{
-			Buffer = (char *) Uint16Pnt;
-			up = (float *) Buffer;
+			in.skip( sizeof( u_int16_t ) );
 			for ( i = 0; i < Mloadheader->num_groups; i++ )
 			{
-#ifdef __3DS__
-				memcpy_unaligned(&Mloadheader->Group[ i ].up, up, 4*3);
-				up += 3;
-#else
-				Mloadheader->Group[ i ].up.x = *up++;
-				Mloadheader->Group[ i ].up.y = *up++;
-				Mloadheader->Group[ i ].up.z = *up++;
-#endif
+				Mloadheader->Group[ i ].up = in.vec();
 			}
-			Buffer = (char *) up;
 		}
 		else
 		{
@@ -943,35 +812,26 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	}
 
 	// Background Animation Stuff......
-	Uint16Pnt = (u_int16_t *) Buffer;
-	num_animations = *Uint16Pnt++;
+	num_animations = in.u16();
 	Mloadheader->AnimData.num_animations = num_animations;
-	Buffer = (char *) Uint16Pnt;
 	
 	if( num_animations )
 	{
 		for( i = 0 ; i < num_animations ; i++ )
 		{
-			frames = *Uint16Pnt++;
-			Uint16Pnt++;	// max loops (unused)
-			animsize = *Uint16Pnt++;
+			in.skip( sizeof( u_int16_t ) );	// frames (unused)
+			in.skip( sizeof( u_int16_t ) );	// max loops (unused)
+			animsize = in.u16();
 			Mloadheader->AnimData.AnimSeq[i] = (u_int16_t *) malloc( animsize * sizeof( u_int16_t ) );
-			Uint16Pnt2 = Mloadheader->AnimData.AnimSeq[i];
-			for( e = 0 ; e < animsize ; e++ )
-			{
-				*Uint16Pnt2++ = *Uint16Pnt++;
-			}
+			in.bytes( Mloadheader->AnimData.AnimSeq[i], animsize * sizeof( u_int16_t ) );
 		}
-		Buffer = ( char * ) Uint16Pnt;
 		
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
 			for( execbuf=0 ; execbuf<Mloadheader->Group[group].num_execbufs; execbuf++)
 			{
 				// Animating background polys......		
-				Uint16Pnt = (u_int16_t *) Buffer;
-				Mloadheader->Group[group].num_animating_polys[execbuf] = *Uint16Pnt++;
-				Buffer = ( char * ) Uint16Pnt;
+				Mloadheader->Group[group].num_animating_polys[execbuf] = in.u16();
 				if( Mloadheader->Group[group].num_animating_polys[execbuf] != 0 )
 				{
 					Mloadheader->Group[group].polyanim[execbuf] = (POLYANIM*)malloc( Mloadheader->Group[group].num_animating_polys[execbuf] * sizeof( POLYANIM ) );
@@ -991,10 +851,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 					for( i = 0 ; i < Mloadheader->Group[group].num_animating_polys[execbuf] ; i++ )
 					{
-						Uint16Pnt = (u_int16_t *) Buffer;
-						animation = *Uint16Pnt++;
-						frames = *Uint16Pnt++;
-						vertices = *Uint16Pnt++;
+						animation = in.u16();
+						frames = in.u16();
+						vertices = in.u16();
 		
 		
 						PolyAnim->State = TEXTUREANIM_Go;
@@ -1026,26 +885,18 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		
 						intPnt = PolyAnim->vert;
 						TanimUV = PolyAnim->UVs;
-						
-						Buffer = ( char * ) Uint16Pnt;
 		
-						Uint16Pnt = (u_int16_t *) Buffer;
 						for( e = 0 ; e < vertices  ; e++ )
 						{
-							*intPnt++ = *Uint16Pnt++;
+							*intPnt++ = in.u16();
 						}
-						Buffer = ( char * ) Uint16Pnt;
 		
-						FloatPnt = (float*) Buffer;
 						for( o = 0 ; o < vertices*frames ; o++ )
 						{
-							/* ARM unaligned access fix: buffer pointer may not
-							 * be 4-byte aligned after reading u_int16_t data. */
-							memcpy(&TanimUV->u, FloatPnt++, 4);
-							memcpy(&TanimUV->v, FloatPnt++, 4);
+							TanimUV->u = in.f32();
+							TanimUV->v = in.f32();
 							TanimUV++;
 						}
-						Buffer = ( char * ) FloatPnt;
 						FixUV_Anim( PolyAnim, lpLVERTEX, Mloadheader->Group[group].originalVerts[execbuf] );
 						PolyAnim++;
 					}
@@ -1060,24 +911,18 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		}
 	}
 
-	Uint16Pnt = (u_int16_t *) Buffer;
-	NumColours = *Uint16Pnt++;
+	NumColours = in.u16();
 
 	if( NumColours )
 	{
-		Buffer = (char *) Uint16Pnt;
-		Uint32Pnt = (u_int32_t *) Buffer;
-
 		for( group=0; group < Mloadheader->num_groups; group++ )
 		{
-			TempColour = *Uint32Pnt++;
+			TempColour = in.u32();
 			Mloadheader->Group[group].BGClear_Flag	= (int16_t) ( ( TempColour >> 24 ) & 255 );
 			Mloadheader->Group[group].BGClear_Red	= ( ( ( (float) ( ( TempColour >> 16 ) & 255 ) ) ) / 255.0F );
 			Mloadheader->Group[group].BGClear_Green = ( ( ( (float) ( ( TempColour >> 8 ) & 255 ) ) ) / 255.0F );
 			Mloadheader->Group[group].BGClear_Blue	= ( ( ( (float) ( ( TempColour >> 0 ) & 255 ) ) ) / 255.0F );
 		}
-
-		Buffer = ( char * ) Uint32Pnt;
 	}
 	else
 	{
@@ -1088,17 +933,15 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			Mloadheader->Group[group].BGClear_Green = 0.0F;
 			Mloadheader->Group[group].BGClear_Blue	= 0.0F;
 		}
-		Buffer = ( char * ) Uint16Pnt;
 	}
 
 	
 	// Background Poly Info Index Animation Stuff......
 	Mloadheader->AnimData.TAnimInfoIndex = NULL;
 	Mloadheader->AnimData.num_animating_polys = 0;
-	Uint16Pnt = (u_int16_t *) Buffer;
-	if( *Uint16Pnt++)
+	if( in.u16() )
 	{
-		Mloadheader->AnimData.num_animating_polys = *Uint16Pnt++;
+		Mloadheader->AnimData.num_animating_polys = in.u16();
 		Mloadheader->AnimData.TAnimInfoIndex = ( TEXTUREANIMINFOINDEX * ) malloc( Mloadheader->AnimData.num_animating_polys * sizeof(TEXTUREANIMINFOINDEX) );
 	   
 		TAnimInfoIndexPnt = Mloadheader->AnimData.TAnimInfoIndex;
@@ -1109,11 +952,11 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		}
 		for( i = 0 ; i < Mloadheader->AnimData.num_animating_polys ; i++ )
 		{
-			group = *Uint16Pnt++;
-			execbuf = *Uint16Pnt++;
-			polyanim = *Uint16Pnt++;
-			initstate = *Uint16Pnt++;
-			whenstoppedtriggermod = (int16_t) *Uint16Pnt++;
+			group = in.u16();
+			execbuf = in.u16();
+			polyanim = in.u16();
+			initstate = in.u16();
+			whenstoppedtriggermod = in.i16();
 
 			PolyAnim = Mloadheader->Group[group].polyanim[execbuf];
 			PolyAnim += polyanim;
@@ -1128,7 +971,11 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			TAnimInfoIndexPnt++;
 		}
 	}
-	Buffer = (char *) Uint16Pnt;
+
+	/* Everything the level keeps has been copied out of the file. */
+	free( Mloadheader->OrgAddr );
+	Mloadheader->OrgAddr = NULL;
+	Mloadheader->Buffer = NULL;
 
 	DebugPrintf( "Mload: %d colourkey triangles found\n", colourkey );
 	// Mloadheader is valid and can be executed...
@@ -1258,6 +1105,10 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 			if ( Mloadheader->Group[group].colour_cell_pnt[i] )
 				free( Mloadheader->Group[group].colour_cell_pnt[i] );
 			Mloadheader->Group[group].colour_cell_pnt[i] = NULL;
+			free( Mloadheader->Group[group].vertex_index_pnt[i] );
+			Mloadheader->Group[group].vertex_index_pnt[i] = NULL;
+			free( Mloadheader->Group[group].vertex_cell_pnt[i] );
+			Mloadheader->Group[group].vertex_cell_pnt[i] = NULL;
 
 			/* Per-execbuf vertex copy allocated at mload.c:507. Without
 			 * this free the buffer leaks every level transition — about
@@ -1330,10 +1181,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 	long			File_Size;
 	long			Read_Size;
 	char		*	Buffer;
-	u_int16_t		*	Uint16Pnt;
-	u_int32_t		*	Uint32Pnt;
 	int				i;
-	char		*	FileNamePnt;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 	int8_t			TempFilename[ 256 ];
@@ -1370,10 +1218,9 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	Mloadheader->OrgAddr = Buffer;
 
-	Uint32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *Uint32Pnt++;
-	VersionNumber = *Uint32Pnt++;
-	Buffer = (char *) Uint32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != MXV_VERSION_NUMBER  ) )
 	{
@@ -1381,10 +1228,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 		return( false );
 	}
 
-	Uint16Pnt = (u_int16_t *) Buffer;
-
-	Mloadheader->num_texture_files = *Uint16Pnt++;
-	Buffer = (char *) Uint16Pnt;
+	Mloadheader->num_texture_files = in.u16();
 
 	if ( Mloadheader->num_texture_files > MAXTPAGESPERMLOAD )
 	{
@@ -1397,9 +1241,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 		/*	put the filenames in the tex struct	*/
 		for( i = 0;	 i < Mloadheader->num_texture_files; i++)
 		{
-			// moves the pointer forward ???
-			FileNamePnt = (char *) &Mloadheader->ImageFile[i];
-			while ( ( *FileNamePnt++ = *Buffer++ ) != 0 );
+			strcpy( Mloadheader->ImageFile[i], in.cstring() );
 
 			GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 
@@ -1414,7 +1256,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	}
 
-	Mloadheader->Buffer = Buffer;
+	Mloadheader->Buffer = (const char *) in.pos();
 	return( true );
 }
 
@@ -1531,25 +1373,17 @@ void InitSoundInfo( MLOADHEADER * /*Mloadheader*/ )
 }
 
 
-void ReadSoundInfo( MLOADHEADER *m, char **pbuf )
+static void ReadSoundInfo( MLOADHEADER *m, FileReader & in )
 {
-	float *buf;
 	int j, k;
 
-	buf = (float *) *pbuf;
 	for ( j = 0; j < m->num_groups; j++ )
 	{
 		for ( k = 0; k < m->num_groups; k++ )
 		{
-#ifdef __3DS__
-			memcpy(&SoundInfo[ j ][ k ], buf++, 4);
-#else
-			SoundInfo[ j ][ k ] = *buf++;
-#endif
+			SoundInfo[ j ][ k ] = in.f32();
 		}
 	}
-
-	*pbuf = (char *) buf;
 }
 
 /*===================================================================
