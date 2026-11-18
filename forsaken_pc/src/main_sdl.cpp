@@ -138,7 +138,6 @@ static u_int32_t create_window_flags( void )
 
 static bool create_video_surface( u_int32_t window_flags )
 {
-#ifndef RENDER_DISABLED
 	render_info.window = SDL_CreateWindow(
 		"ProjectX",
 		SDL_WINDOWPOS_CENTERED,
@@ -156,7 +155,6 @@ static bool create_video_surface( u_int32_t window_flags )
 	 * (render_init), called by sdl_init_video below. */
 
 	print_info();
-#endif
 
 	return true;
 }
