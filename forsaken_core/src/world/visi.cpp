@@ -1226,9 +1226,6 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
  			if ( ExecuteSingleGroupMloadHeader(  Mloadheader, (u_int16_t) g->group ) != true  )
 				return false;
 
-#ifdef NEW_LIGHTING
-			render_reset_lighting_variables();
-#endif
 
 			DispGroupTriggerAreas( (u_int16_t) g->group );
 			if ( CaptureTheFlag || CTF )

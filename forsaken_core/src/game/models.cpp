@@ -1251,9 +1251,6 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 						{ c3d_set_object_shine_eligible(true); }
 #endif
 						Msg( "ModelDisp() ExecuteMxaloadHeader for %s Failed\n", &ModelNames[ Models[ i ].ModelNum ].Name[ 0 ] );
-#ifdef NEW_LIGHTING
-						render_reset_lighting_variables();
-#endif
 						return false;
 					}
 #ifdef RENDERER_C3D
@@ -1261,9 +1258,6 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 #endif
 					}
 
-#ifdef NEW_LIGHTING
-					render_reset_lighting_variables();
-#endif
 				}
 				else
 				{
@@ -1328,9 +1322,6 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 #endif
 							Msg( "ModelDisp() ExecuteMxloadHeader for %s Failed\n",
 								&ModelNames[ Models[i].ModelNum ].Name[ 0 ] );
-#ifdef NEW_LIGHTING
-							render_reset_lighting_variables();
-#endif
 							return false;
 						}
 #ifdef RENDERER_C3D
@@ -1338,9 +1329,6 @@ bool ModelDisp( u_int16_t group, MODELNAME * NamePnt  )
 #endif
 					}
 
-#ifdef NEW_LIGHTING
-					render_reset_lighting_variables();
-#endif
 				}
 			}
 		}
@@ -2992,10 +2980,6 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 	int		execbuf;
 	int		vert;
 
-#ifdef NEW_LIGHTING
-	render_reset_lighting_variables();
-	return true;
-#endif
 
 	group = MXAloadheader->num_groups;
 
@@ -3056,13 +3040,6 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 	int r ,g ,b ,a;
 #endif
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_color_blend_red   = R;
-	render_color_blend_green = G;
-	render_color_blend_blue  = B;
-	return true;
-#endif
 
 	R -= (int) rp;
 	G -= (int) gp;
@@ -3162,13 +3139,6 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 	int r ,g ,b ,a;
 #endif
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_color_blend_red   = R;
-	render_color_blend_green = G;
-	render_color_blend_blue  = B;
-	return true;
-#endif
 
 	R -= (int) rp;
 	G -= (int) gp;
@@ -3341,13 +3311,6 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 	float					GF = 0.0F;
 	float					BF = 0.0F;
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_light_ambience = 0.0f;
-	render_light_ambience_alpha = 0.0f;
-	render_lighting_use_only_light_color = 1;
-	return true;
-#endif
 
 	DstMloadheader = &ModelHeaders[ Model ];
 
@@ -3431,13 +3394,6 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 	float					GF = 128.0F;
 	float					BF = 128.0F;
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_light_ambience = 128.0f;
-	render_light_ambience_alpha = 255.0f;
-	render_lighting_use_only_light_color = 1;
-	return true;
-#endif
 
 	DstMloadheader = &ModelHeaders[ Model ];
 
@@ -3521,15 +3477,6 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 	COLOR				Colour;
     float					Val;
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_light_ambience_alpha = 255.0f;
-	render_lighting_use_only_light_color_and_blend = 1;
-	render_color_blend_red   = RF;
-	render_color_blend_green = GF;
-	render_color_blend_blue  = BF;
-	return true;
-#endif
 
 	DstMloadheader = &ModelHeaders[ Model ];
 
@@ -3615,15 +3562,6 @@ bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF,
 	COLOR				Colour;
     float					Val;
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_light_ambience_alpha = 255.0f;
-	render_lighting_use_only_light_color_and_blend = 1;
-	render_color_blend_red   = RF;
-	render_color_blend_green = GF;
-	render_color_blend_blue  = BF;
-	return true;
-#endif
 
 	DstMloadheader = &MxaModelHeaders[ Model ];
 
@@ -5201,9 +5139,6 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 	float	RF,GF,BF;
 	float Size2;
 
-#ifdef NEW_LIGHTING
-	return true;
-#endif
 
 	RF = GF = BF = 0.0F;
 	

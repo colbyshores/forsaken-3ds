@@ -238,27 +238,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	TANIMUV * TanimUV;
 	float	intensity;
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_lighting_point_lights_only = 0;
-	
-	if( WhiteOut != 0.0f )
-		render_lighting_env_whiteout = (int) WhiteOut;
-	
-	if(GroupWaterInfo[group] != WATERSTATE_NOWATER)
-	{
-		render_lighting_env_water = 1;
-		if( GroupWaterInfo[group] != WATERSTATE_ALLWATER )
-		{
-			render_lighting_env_water = 2;
-			render_lighting_env_water_level = GroupWaterLevel[group];
-		}
-		render_lighting_env_water_red = GroupWaterIntensity_Red[group];
-		render_lighting_env_water_green = GroupWaterIntensity_Green[group];
-		render_lighting_env_water_blue= GroupWaterIntensity_Blue[group];
-	}
-	return true;
-#endif
 
 	intWhiteOut = (int)WhiteOut;
 	if( intWhiteOut >= 256 )
@@ -787,11 +766,6 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	float	glf;
 	float	rlf;
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_lighting_point_lights_only = 0;
-	return true;
-#endif
 
 	group = MXloadheader->num_groups;
 	while( group--)
@@ -1035,11 +1009,6 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	float	glf;
 	float	rlf;
 
-#ifdef NEW_LIGHTING
-	render_lighting_enabled = 1;
-	render_lighting_point_lights_only = 0;
-	return true;
-#endif
 
 	group = MXloadheader->num_groups;
 	while( group--)
