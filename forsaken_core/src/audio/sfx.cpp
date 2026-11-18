@@ -1829,7 +1829,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 
 		Distance += Modify;
 
-		MaxDistance = 24 * 1024 * GLOBAL_SCALE;
+		MaxDistance = 24 * BLOCKSIZE;
 
 		if( Distance >= MaxDistance ) 
 			return false;
@@ -2426,7 +2426,7 @@ void ProcessLoopingSfx( void )
 
 			Distance = (float) sqrtf( ( Temp.x * Temp.x ) + ( Temp.y * Temp.y ) + ( Temp.z * Temp.z ) );
 			Distance += Modify;
-			MaxDistance = 24 * 1024 * GLOBAL_SCALE * LOOPING_SFX_SCALE;
+			MaxDistance = 24 * BLOCKSIZE * LOOPING_SFX_SCALE;
 			if( Distance >= MaxDistance ) 
 				InRange = false;
 			else
@@ -2615,7 +2615,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 	TauntUpdatable = update;
 }
 
-constexpr auto MAX_DISTANCE = ( 24 * 1024 * GLOBAL_SCALE );
+constexpr auto MAX_DISTANCE = ( 24 * BLOCKSIZE );
 float ReturnDistanceVolumeVector( VECTOR *sfxpos, u_int16_t sfxgroup, VECTOR *listenerpos, u_int16_t listenergroup, long *vol, VECTOR *sfxvector )
 {
 	VECTOR	Temp;

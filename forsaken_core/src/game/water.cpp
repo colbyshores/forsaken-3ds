@@ -775,8 +775,8 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 	
 	Verts += (IWaterX * Wo->YVerts ) + IWaterY;
 	Vels += (IWaterX * Wo->YVerts ) + IWaterY;
-	if( *Verts < ( 1024.0F * GLOBAL_SCALE ) && 
-		*Verts > -( 1024.0F * GLOBAL_SCALE ) )
+	if( *Verts < BLOCKSIZE && 
+		*Verts > -BLOCKSIZE )
 	{
 		*Vels = Impact * ( dx + dy );
 	}
@@ -784,8 +784,8 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 	Vels++;
 	if ( IWaterY + 1 < Wo->YVerts)
 	{
-		if( *Verts < ( 1024.0F * GLOBAL_SCALE ) && 
-			*Verts  > -( 1024.0F * GLOBAL_SCALE ) )
+		if( *Verts < BLOCKSIZE && 
+			*Verts  > -BLOCKSIZE )
 		{
 			*Vels = Impact * ( dx + ( 1 - dy ) );
 		}
@@ -795,8 +795,8 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 		Verts += Wo->YVerts-1;
 		Vels += Wo->YVerts-1;
 
-		if( *Verts < ( 1024.0F * GLOBAL_SCALE ) && 
-			*Verts > -( 1024.0F * GLOBAL_SCALE ) )
+		if( *Verts < BLOCKSIZE && 
+			*Verts > -BLOCKSIZE )
 		{
 			*Vels = Impact * ( ( 1 - dx ) + dy );
 		}
@@ -804,8 +804,8 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 		{
 			Verts++;
 			Vels++;
-			if( *Verts < ( 1024.0F * GLOBAL_SCALE ) && 
-				*Verts > -( 1024.0F * GLOBAL_SCALE ) )
+			if( *Verts < BLOCKSIZE && 
+				*Verts > -BLOCKSIZE )
 			{
 				*Vels = Impact * ( ( 1 - dx ) + ( 1 - dy ) );
 			}

@@ -138,9 +138,9 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 		Enemy->AI_Angle = AimData.Angle;
 	}else{
 		ApplyMatrix( &LinkEnemy->Object.Mat, &Forward, &TempDir );
-		TempDir.x *= 1024.0F * GLOBAL_SCALE * 5.0F;
-		TempDir.y *= 1024.0F * GLOBAL_SCALE * 5.0F;
-		TempDir.z *= 1024.0F * GLOBAL_SCALE * 5.0F;
+		TempDir.x *= BLOCKSIZE * 5.0F;
+		TempDir.y *= BLOCKSIZE * 5.0F;
+		TempDir.z *= BLOCKSIZE * 5.0F;
 		NewPos.x = LinkEnemy->Object.Pos.x + TempDir.x;
 		NewPos.y = LinkEnemy->Object.Pos.y + TempDir.y;
 		NewPos.z = LinkEnemy->Object.Pos.z + TempDir.z;

@@ -1793,7 +1793,7 @@ void ProcessSecondaryBullets( void )
 			{
 				PlayPannedSfx( SFX_Lockon, SecBulls[ MissileNum ].GroupImIn , &SecBulls[ MissileNum ].Pos, 0.0F );
 			}
-			TargetedDelay += ( ( MissileDistance / ( 1024.0F * GLOBAL_SCALE ) ) * 2.0F );
+			TargetedDelay += ( ( MissileDistance / BLOCKSIZE ) * 2.0F );
 		}
 	}
 	else

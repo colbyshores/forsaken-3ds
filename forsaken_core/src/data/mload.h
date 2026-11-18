@@ -16,8 +16,6 @@
 /*
  * defines
  */
-#define	BLOCKSIZE		( 1024.0F * GLOBAL_SCALE )
-
 constexpr int MAXTPAGESPERMLOAD = 8;
 constexpr int MAXEXECBUFSPERGROUP = 16;
 constexpr int MAXPORTALSPERGROUP = 64;

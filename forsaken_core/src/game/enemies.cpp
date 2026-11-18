@@ -245,7 +245,7 @@ GUNTYPE	GunTypes[] = {
 		45.0F,	//XRotMax
 		0.0F,	//YRotMin
 		0.0F,	//YRotMax
-		4.0F * 1024.0F * GLOBAL_SCALE,		// Range
+		4.0F * BLOCKSIZE,		// Range
 		0,		//PowerLevel
 		true,	// false for Primary true for Secondary...
 		GRAVGONMISSILE,	//WeaponType

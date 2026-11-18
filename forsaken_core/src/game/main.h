@@ -16,7 +16,8 @@
  * carries the shared libc includes, the u_int*_t / DWORD / BYTE / WORD
  * aliases, MAGIC_NUMBER (the "PRJX" tag at the start of the engine's level
  * and model data files) and GLOBAL_SCALE (the factor the code's hard-coded
- * sizes, speeds and distances are multiplied by).
+ * sizes, speeds and distances are multiplied by) and BLOCKSIZE (one level
+ * block, 1024 units before scaling; most ranges are written in blocks).
  *
  * MAX and MIN expand without outer parentheses; use them only as a whole
  * expression or wrap the call.
@@ -86,6 +87,7 @@ constexpr int MAXLEVELS = (64);
 constexpr auto MAGIC_NUMBER = 0x584A5250;
 
 constexpr float GLOBAL_SCALE = (0.25F);
+constexpr float BLOCKSIZE = ( 1024.0F * GLOBAL_SCALE ); // one level block
 
 typedef struct
 {

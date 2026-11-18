@@ -5835,7 +5835,7 @@ void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16
 	int16_t	NumSparks;
 	float	RandomX;
 	float	RandomY;
-	float	SubDivision = ( 128 * GLOBAL_SCALE ); //( 1024.0F * GLOBAL_SCALE );
+	float	SubDivision = ( 128 * GLOBAL_SCALE );
 	float	CurrentOffset;
 	u_int16_t	XRange = 16;
 	u_int16_t	YRange = 16;
