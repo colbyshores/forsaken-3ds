@@ -1405,7 +1405,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	// check the size of the packet is proper for message type
 
-	if( RealPacketSize[*MsgPnt] != len )
+	if( (DWORD) RealPacketSize[*MsgPnt] != len )
 	{
 		DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) for invalid size of %d expected %d\n",
 			from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, len, RealPacketSize[*MsgPnt]);
