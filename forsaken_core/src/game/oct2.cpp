@@ -1,4 +1,3 @@
-#define INSIDE_BSP // disable to use bounding box inside check instead
 
 #include "game/main.h"
 #include "util/platform.h"
@@ -3789,9 +3788,7 @@ bool MainGame( void )
   ProcessGameKeys(); // here is where we process F keys
   ScreenPolyProcess();
 
-#ifdef INSIDE_BSP
   Inside = PointInsideSkin( &Ships[WhoIAm].Object.Pos, Ships[WhoIAm].Object.Group );
-#endif
 
 /* Secondary routines called after rendering */
 
