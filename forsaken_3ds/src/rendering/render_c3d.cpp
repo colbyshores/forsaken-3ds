@@ -2884,9 +2884,41 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 			continue;
 		}
 
+		/* Memo lookup (right eye only, never ortho): reuse the recorded
+		 * range and skip conversion. Misses convert live below. */
+		long memo_off = 0;
+		int memo_cnt = 0;
+		bool memo_hit = false;
+		bool persist_hit = false;
+		/* R05: level walls consult the retained buffers first (both
+		 * eyes, any mode). A hit submits the retained buffer at flush
+		 * time and converts nothing. */
+		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
+		    renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
+			int pcnt = 0;
+			gpu_vertex_t *pbuf = persist_lookup(renderObject,
+				smemo_sub(sorted_order[group], 0, primitive_type), &pcnt);
+			if (pbuf) {
+				persist_hit = true;
+				tg_persist_buf[group] = pbuf;
+				tg_persist_cnt[group] = pcnt;
+				totalVerts = pcnt;
+			}
+		}
+		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic &&
+		    memo_reusable(renderObject)) {
+			memo_hit = smemo_lookup(renderObject,
+				smemo_sub(sorted_order[group], 0, primitive_type),
+				&memo_off, &memo_cnt,
+				renderObject->memoEpochPass,
+				renderObject->memoEpochGroup,
+				renderObject->memoEpochResume);
+		}
+
 		/* Mid-frame flush: if scratch is nearly full, flush pending batch
-		 * and split the frame to reset the scratch pointer. */
-		if (s_scratchUsed + numIndices > s_scratchMax)
+		 * and split the frame to reset the scratch pointer. Hits convert
+		 * nothing and take no scratch, so only a live convert checks. */
+		if (!persist_hit && !memo_hit && s_scratchUsed + numIndices > s_scratchMax)
 		{
 			if (s_inFrame)
 			{
@@ -2931,36 +2963,6 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 		dst = s_scratch + s_scratchUsed;
 
-		/* Memo lookup (right eye only, never ortho): reuse the recorded
-		 * range and skip conversion. Misses convert live below. */
-		long memo_off = 0;
-		int memo_cnt = 0;
-		bool memo_hit = false;
-		bool persist_hit = false;
-		/* R05: level walls consult the retained buffers first (both
-		 * eyes, any mode). A hit submits the retained buffer at flush
-		 * time and converts nothing. */
-		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
-		    renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
-			int pcnt = 0;
-			gpu_vertex_t *pbuf = persist_lookup(renderObject,
-				smemo_sub(sorted_order[group], 0, primitive_type), &pcnt);
-			if (pbuf) {
-				persist_hit = true;
-				tg_persist_buf[group] = pbuf;
-				tg_persist_cnt[group] = pcnt;
-				totalVerts = pcnt;
-			}
-		}
-		if (!persist_hit && s_memoMode == SMEMO_LOOKUP && !orthographic &&
-		    memo_reusable(renderObject)) {
-			memo_hit = smemo_lookup(renderObject,
-				smemo_sub(sorted_order[group], 0, primitive_type),
-				&memo_off, &memo_cnt,
-				renderObject->memoEpochPass,
-				renderObject->memoEpochGroup,
-				renderObject->memoEpochResume);
-		}
 		/* Convert live unless the memo/persist hit (VERIFY converts
 		 * anyway for the oracle compare below). */
 		if (persist_hit) {
@@ -3118,7 +3120,8 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 
 		/* Accumulate into current batch */
 		batch_vertCount += totalVerts;
-		s_scratchUsed += totalVerts;
+		if (!persist_hit && !memo_hit)	/* hits wrote no scratch */
+			s_scratchUsed += totalVerts;
 	}
 
 	/* Flush the final pending batch */
