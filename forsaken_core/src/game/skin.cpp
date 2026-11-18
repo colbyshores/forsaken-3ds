@@ -927,15 +927,15 @@ void KillNodeCubeLines( void )
 
 /*===================================================================
 	Procedure	:		Copy vertices into the next skin vertex buffer
-	Input		:		LPLVERTEX		Verts
-				:		LPTRIANGLE		Tris ( unused )
+	Input		:		LVERTEX		*Verts
+				:		TRIANGLE		*Tris ( unused )
 				:		int16_t			NumVerts
 				:		int16_t			NumTris ( unused )
 	Output		:		bool		True/False
 ===================================================================*/
-bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
+bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
 {
-    LPLVERTEX	lpBufStart = NULL;//, lpInsStart, lpPointer;
+    LVERTEX	*lpBufStart = NULL;//, lpInsStart, lpPointer;
 
 	if( Num_Skin_Execs >= MAXSKINEXECS )
 	{
@@ -1116,15 +1116,15 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 
 /*===================================================================
 	Procedure	:		Copy vertices into the next portal vertex buffer
-	Input		:		LPLVERTEX		Verts
-				:		LPTRIANGLE		Tris ( unused )
+	Input		:		LVERTEX		*Verts
+				:		TRIANGLE		*Tris ( unused )
 				:		int16_t			NumVerts
 				:		int16_t			NumTris ( unused )
 	Output		:		bool		True/False
 ===================================================================*/
-bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
+bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
 {
-    LPLVERTEX	lpBufStart = NULL;//, lpInsStart, lpPointer;
+    LVERTEX	*lpBufStart = NULL;//, lpInsStart, lpPointer;
 
 	if( Num_Portal_Execs >= MAXPORTALEXECS )
 	{

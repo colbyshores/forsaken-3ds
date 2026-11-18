@@ -84,13 +84,13 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 {
 
 	TRIANGLE		FacePnt; // was a pointer
-	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
+	TRIANGLE	*TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
 	u_int16_t			exec_type;			// the execbuf's type (bit 0: has transparencies)
 	u_int16_t			num_vertices;		// overall number of verts
 	u_int16_t			num_texture_groups;// number of triangle groups
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			group_vertex_start; // where in the vert list to start processing
-	LPLVERTEX	lpLVERTEX;
+	LVERTEX	*lpLVERTEX;
 	WORD			*lpIndices = NULL;
 	NORMAL		*lpNormals = NULL;
 	int				ibIndex = 0;
@@ -199,7 +199,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
-			Mxaloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
+			Mxaloadheader->Group[group].originalVerts[execbuf] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mxaloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
 			
@@ -277,7 +277,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				Mxaloadheader->Group[group].texture_group_vert_off[execbuf][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
 
 				/* the index buffer holds every triangle in order, so StoreTriangles copies it from the start */
-				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
+				TempFacePnt = (TRIANGLE *) /*lpLVERTEX*/lpIndices;
 
 				/*	copy the triangles into the index and normal buffers	*/
 				for( e=0; e<num_triangles; e++)
@@ -324,7 +324,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 			if (StoreTriangles)
 			{	Mxaloadheader->Group[group].num_polys_per_execbuf[execbuf] = /*num_triangles*/triangleCount;
-				Mxaloadheader->Group[group].poly_ptr[execbuf] = (LPTRIANGLE)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);			
+				Mxaloadheader->Group[group].poly_ptr[execbuf] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);			
 			
 				memmove(Mxaloadheader->Group[group].poly_ptr[execbuf], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
 			}
@@ -765,9 +765,9 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 ===================================================================*/
 bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp )
 {
-    LPLVERTEX	lpBufStart = NULL;
-	LPLVERTEX	lpLVERTEX;
-	LPLVERTEX	lpLVERTEX2;
+    LVERTEX	*lpBufStart = NULL;
+	LVERTEX	*lpLVERTEX;
+	LVERTEX	*lpLVERTEX2;
 	MXAVERT *		FromVert;
 	MXAVERT *		ToVert;
 	u_int16_t			texgroup;
@@ -802,10 +802,10 @@ bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , 
 				   base vertices at this offset. (Some Remaster-era .mx
 				   models have no box, but .mx models never come through
 				   here.) */
-				lpLVERTEX = 	( LPLVERTEX ) ( (char*) lpBufStart+( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
+				lpLVERTEX = 	( LVERTEX *) ( (char*) lpBufStart+( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
 				lpLVERTEX += 8;
 
-				lpLVERTEX2 = ( LPLVERTEX ) ( (char*) Mxaloadheader->Group[group].originalVerts[execbuf] + ( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
+				lpLVERTEX2 = ( LVERTEX *) ( (char*) Mxaloadheader->Group[group].originalVerts[execbuf] + ( (u_int32_t) Mxaloadheader->Group[group].texture_group_vert_off[execbuf][texgroup]));
 				lpLVERTEX2 += 8;
 				
 				FromVert = ( MXAVERT * ) Mxaloadheader->frame_pnts[FromFrame][group][execbuf][texgroup];

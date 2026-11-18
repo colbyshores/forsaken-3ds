@@ -87,7 +87,7 @@ typedef struct OBJECT
 	float		Blue;
 
 //struct	COLTYPE	*		ColType;	//
-} OBJECT,*LPOBJECT;
+} OBJECT;
 
 
 typedef struct GUNOBJECT
@@ -108,7 +108,7 @@ typedef struct GUNOBJECT
 	float				ReloadTime;			// how long before I am able to fire..
 	float				BurstStartSign;		// did I start this on the left or right side....
 	int16_t				GunNum;
-} GUNOBJECT,*LPGUNOBJECT;
+} GUNOBJECT;
 
 typedef struct GUNTYPE
 {
@@ -128,4 +128,4 @@ typedef struct GUNTYPE
 	bool				PrimarySecondary;	// False for Primary True for Secondary...
 	BYTE				WeaponType;			// which weapon do I Fire...
 	bool				PreciseRotation;	// How Precies should I rotate...
-} GUNTYPE,*LPGUNTYPE;
+} GUNTYPE;

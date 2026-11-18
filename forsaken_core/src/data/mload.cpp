@@ -167,9 +167,9 @@ static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group
    tpage must go through its TloadIndex first); the step is measured in that
    texture's texels. A vertex moves at most one step from its original
    position (Orig_Vert), however many triangles share it. */
-void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert )
+void FixUV( TRIANGLE *Tri, LVERTEX *Vert, u_int16_t Tpage, LVERTEX *Orig_Vert )
 {
-	static LPLVERTEX TriVert[ 3 ], Orig_TriVert[ 3 ];
+	static LVERTEX *TriVert[ 3 ], *Orig_TriVert[ 3 ];
 	static float u[ 3 ], v[ 3 ];
 	float du = 0.0f, dv = 0.0f;
 	int j = 0, k = 0;
@@ -244,7 +244,7 @@ void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert
 
 
 void
-FixUV_Anim( POLYANIM *PolyAnim, LPLVERTEX Vert, LPLVERTEX Orig_Vert )
+FixUV_Anim( POLYANIM *PolyAnim, LVERTEX *Vert, LVERTEX *Orig_Vert )
 {
 	int vnum, frame, vi;
 	TANIMUV *UV;
@@ -277,8 +277,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			verts;
 	u_int16_t			portal;
-	LPLVERTEX	lpLVERTEX;
-	LPLVERTEX	lpBufStart = NULL;
+	LVERTEX	*lpLVERTEX;
+	LVERTEX	*lpBufStart = NULL;
 	WORD			*lpIndices = NULL;
 	NORMAL * lpNormals = NULL;
 	int				indexOffset = 0;
@@ -399,7 +399,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
-			Mloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
+			Mloadheader->Group[group].originalVerts[execbuf] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 	
 			num_triangle_groups = in.u16();

@@ -75,7 +75,7 @@ typedef struct _BIKEMOD
 	float	Start_Hull;
 	float	AutoLevel;
 	
-} BIKEMOD,*LPBIKEMOD;
+} BIKEMOD;
 
 
 /*

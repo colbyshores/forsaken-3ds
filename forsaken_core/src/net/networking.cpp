@@ -1263,43 +1263,43 @@ void ReceiveGameMessages( void )
 
 void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 {
-    LPSHIPHEALTHMSG                 lpShipHealth;
-    LPUPDATEMSG							lpUpdate;
-    LPVERYSHORTUPDATEMSG			lpVeryShortUpdate;
-    LPFUPDATEMSG						lpFUpdate;
-    LPVERYSHORTFUPDATEMSG		lpVeryShortFUpdate;
-    LPGROUPONLY_VERYSHORTFUPDATEMSG		lpGroupOnly_VeryShortFUpdate;
-    LPINITMSG								lpInit;
-    LPSHIPHITMSG							lpShipHit;
-    LPSHORTSHIPHITMSG				lpShortShipHit;
-    LPSHIPDIEDMSG						lpShipDied;
-    LPPRIMBULLPOSDIRMSG				lpPrimBullPosDir;
-    LPSECBULLPOSDIRMSG				lpSecBullPosDir;
-    LPTITANBITSMSG						lpTitanBits;
-    LPDROPPICKUPMSG					lpDropPickup;
-    LPVERYSHORTDROPPICKUPMSG   lpVeryShortDropPickup;
-    LPKILLPICKUPMSG						lpKillPickup;
-    LPTEAMGOALSMSG					lpTeamGoals;
-    LPSHOCKWAVEMSG					lpShockwave;
-    LPBGOUPDATEMSG					lpBGOUpdate;
-    LPSTATUSMSG							lpStatus;
-    LPLONGSTATUSMSG					lpLongStatus;
-    LPSHORTPICKUPMSG					lpShortPickup;
-    LPSHORTREGENSLOTMSG			lpShortRegenSlot;
-    LPSHORTTRIGGERMSG				lpShortTrigger;
-    LPSHORTTRIGVARMSG				lpShortTrigVar;
-    LPSHORTMINEMSG					lpShortMine;
-    LPTEXTMSG								lpTextMsg;
-	LPBIKENUMMSG						lpBikeNumMsg;
-	LPYOUQUITMSG						lpYouQuitMsg;
-	LPNETSETTINGSMSG					lpNetSettingsMsg;
+    SHIPHEALTHMSG                 *lpShipHealth;
+    UPDATEMSG							*lpUpdate;
+    VERYSHORTUPDATEMSG			*lpVeryShortUpdate;
+    FUPDATEMSG						*lpFUpdate;
+    VERYSHORTFUPDATEMSG		*lpVeryShortFUpdate;
+    GROUPONLY_VERYSHORTFUPDATEMSG		*lpGroupOnly_VeryShortFUpdate;
+    INITMSG								*lpInit;
+    SHIPHITMSG							*lpShipHit;
+    SHORTSHIPHITMSG				*lpShortShipHit;
+    SHIPDIEDMSG						*lpShipDied;
+    PRIMBULLPOSDIRMSG				*lpPrimBullPosDir;
+    SECBULLPOSDIRMSG				*lpSecBullPosDir;
+    TITANBITSMSG						*lpTitanBits;
+    DROPPICKUPMSG					*lpDropPickup;
+    VERYSHORTDROPPICKUPMSG   *lpVeryShortDropPickup;
+    KILLPICKUPMSG						*lpKillPickup;
+    TEAMGOALSMSG					*lpTeamGoals;
+    SHOCKWAVEMSG					*lpShockwave;
+    BGOUPDATEMSG					*lpBGOUpdate;
+    STATUSMSG							*lpStatus;
+    LONGSTATUSMSG					*lpLongStatus;
+    SHORTPICKUPMSG					*lpShortPickup;
+    SHORTREGENSLOTMSG			*lpShortRegenSlot;
+    SHORTTRIGGERMSG				*lpShortTrigger;
+    SHORTTRIGVARMSG				*lpShortTrigVar;
+    SHORTMINEMSG					*lpShortMine;
+    TEXTMSG								*lpTextMsg;
+	BIKENUMMSG						*lpBikeNumMsg;
+	YOUQUITMSG						*lpYouQuitMsg;
+	NETSETTINGSMSG					*lpNetSettingsMsg;
 	int					i;
 	BYTE				OldMode;
 	BYTE				OldStatus;
 	int16_t				Count;
     char				methodstr[256];
 	char				teamstr[256];
-    LPSETTIMEMSG	lpSetTime;
+    SETTIMEMSG	*lpSetTime;
 	VECTOR	Point;
 	VECTOR	Recoil;
 	VECTOR	Dir;
@@ -1309,7 +1309,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	{
 		case MSG_SHIPHEALTH:
 			DebugPrintf("received msg_shiphealth\n");
-			lpShipHealth = (LPSHIPHEALTHMSG)MsgPnt;
+			lpShipHealth = (SHIPHEALTHMSG *)MsgPnt;
 			if( lpShipHealth->WhoIAm != WhoIAm)
 			{
 				if(lpShipHealth->Hull < PlayerHealths[lpShipHealth->WhoIAm].Hull ||
@@ -1466,7 +1466,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		switch (*MsgPnt)
 		{
 		    case MSG_SECBULLPOSDIR:
-				lpSecBullPosDir = (LPSECBULLPOSDIRMSG)MsgPnt;
+				lpSecBullPosDir = (SECBULLPOSDIRMSG *)MsgPnt;
 
 				if( SecondaryWeaponAttribs[ lpSecBullPosDir->SecBullPosDir.Weapon ].SecType == SEC_MINE )
 				{
@@ -1498,7 +1498,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				break;
 
 			case MSG_DROPPICKUP:
-				lpDropPickup = (LPDROPPICKUPMSG)MsgPnt;
+				lpDropPickup = (DROPPICKUPMSG *)MsgPnt;
 
 				if( NumMissedPickups != MAXMISSEDPICKUPS )
 		 		{
@@ -1531,7 +1531,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				break;
 
 			case MSG_VERYSHORTDROPPICKUP:
-				lpVeryShortDropPickup = (LPVERYSHORTDROPPICKUPMSG)MsgPnt;
+				lpVeryShortDropPickup = (VERYSHORTDROPPICKUPMSG *)MsgPnt;
 
 				if( NumMissedPickups != MAXMISSEDPICKUPS )
 		 		{
@@ -1568,7 +1568,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				break;
 
 			case MSG_KILLPICKUP:
-   				lpKillPickup = (LPKILLPICKUPMSG)MsgPnt;
+   				lpKillPickup = (KILLPICKUPMSG *)MsgPnt;
    				if( NumMissedPickups != MAXMISSEDPICKUPS )
    				{
    					MissedKillPickups[ NumMissedKillPickups ].Owner = lpKillPickup->KillPickupInfo.Owner;
@@ -1663,7 +1663,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	case MSG_YOUQUIT:
 
 		// I have been asked by the host to quit......
-		lpYouQuitMsg = (LPYOUQUITMSG)MsgPnt;
+		lpYouQuitMsg = (YOUQUITMSG *)MsgPnt;
 		if( lpYouQuitMsg->You == WhoIAm )
 		{
 			IMustQuit = true;
@@ -1674,7 +1674,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_VERYSHORTFUPDATE:
 
-		lpVeryShortFUpdate = (LPVERYSHORTFUPDATEMSG)MsgPnt;
+		lpVeryShortFUpdate = (VERYSHORTFUPDATEMSG *)MsgPnt;
 		if( lpVeryShortFUpdate->WhoIAm != WhoIAm )
 		{
 			OldMode = Ships[lpVeryShortFUpdate->WhoIAm].Object.Mode;
@@ -1750,7 +1750,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_GROUPONLY_VERYSHORTFUPDATE:
 
-		lpGroupOnly_VeryShortFUpdate = (LPGROUPONLY_VERYSHORTFUPDATEMSG)MsgPnt;
+		lpGroupOnly_VeryShortFUpdate = (GROUPONLY_VERYSHORTFUPDATEMSG *)MsgPnt;
 		if( lpGroupOnly_VeryShortFUpdate->WhoIAm != WhoIAm )
 		{
 			OldMode = Ships[lpGroupOnly_VeryShortFUpdate->WhoIAm].Object.Mode;
@@ -1816,7 +1816,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_VERYSHORTUPDATE:
 
-		lpVeryShortUpdate = (LPVERYSHORTUPDATEMSG) MsgPnt;
+		lpVeryShortUpdate = (VERYSHORTUPDATEMSG *) MsgPnt;
 
 		UpdatePlayer( from, lpVeryShortUpdate->WhoIAm );
 
@@ -1902,7 +1902,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_UPDATE:
 
-		lpUpdate = (LPUPDATEMSG) MsgPnt;
+		lpUpdate = (UPDATEMSG *) MsgPnt;
 
 		UpdatePlayer( from, lpUpdate->WhoIAm );
 
@@ -1977,7 +1977,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_FUPDATE:
 
-		lpFUpdate = (LPFUPDATEMSG)MsgPnt;
+		lpFUpdate = (FUPDATEMSG *)MsgPnt;
 		if( lpFUpdate->WhoIAm != WhoIAm )
 		{
 			OldMode = Ships[lpFUpdate->WhoIAm].Object.Mode;
@@ -2044,7 +2044,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 		if( IsHost && !PlayDemo )
 		{
-			LPHEREIAMMSG msg = (LPHEREIAMMSG) MsgPnt;
+			HEREIAMMSG *msg = (HEREIAMMSG *) MsgPnt;
 			SendGameMessage(MSG_INIT, from, msg->WhoIAm, 0, msg->MPVersion);
 			SendGameMessage(MSG_STATUS, from, 0, 0, 0);
 		}
@@ -2052,7 +2052,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_INIT:
 
-		lpInit = (LPINITMSG) MsgPnt;
+		lpInit = (INITMSG *) MsgPnt;
 
 		// save host network pointer
 		host_network_player = from;
@@ -2193,7 +2193,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_DROPPICKUP:
 
-		lpDropPickup = (LPDROPPICKUPMSG)MsgPnt;
+		lpDropPickup = (DROPPICKUPMSG *)MsgPnt;
 #if DEBUG_PICKUPS
 		if( lpDropPickup->WhoIAm != (u_int16_t) -1 ) DebugPrintf( "PACKET OWNER '%s' : Init '%s', Owner '%s', ID %d\n", &Names[ lpDropPickup->WhoIAm ][ 0 ], Messages[ lpDropPickup->PickupInfo.Type ], &Names[ lpDropPickup->WhoIAm ][ 0 ], lpDropPickup->PickupInfo.IDCount );
 		else DebugPrintf( "PACKET OWNER '%s' : Init '%s', No Owner, ID %d\n", &Names[ lpDropPickup->WhoIAm ][ 0 ], Messages[ lpDropPickup->PickupInfo.Type ], lpDropPickup->PickupInfo.IDCount );
@@ -2209,7 +2209,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_VERYSHORTDROPPICKUP:
 
-		lpVeryShortDropPickup = (LPVERYSHORTDROPPICKUPMSG)MsgPnt;
+		lpVeryShortDropPickup = (VERYSHORTDROPPICKUPMSG *)MsgPnt;
 		TempPickup.Pos.x = (float) lpVeryShortDropPickup->PickupInfo.Pos.x;
 		TempPickup.Pos.y = (float) lpVeryShortDropPickup->PickupInfo.Pos.y;
 		TempPickup.Pos.z = (float) lpVeryShortDropPickup->PickupInfo.Pos.z;
@@ -2239,7 +2239,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_KILLPICKUP:
 
-   		lpKillPickup = (LPKILLPICKUPMSG)MsgPnt;
+   		lpKillPickup = (KILLPICKUPMSG *)MsgPnt;
 		if( PlayDemo && ( Current_Camera_View == lpKillPickup->WhoIAm ) && ( lpKillPickup->KillPickupInfo.Style == PICKUPKILL_Immediate ) )
 		{
 			SfxForCollectPickup( lpKillPickup->KillPickupInfo.Owner, lpKillPickup->KillPickupInfo.IDCount );
@@ -2252,12 +2252,12 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		return;
 
     case MSG_TEAMGOALS:
-		lpTeamGoals = (LPTEAMGOALSMSG)MsgPnt;
+		lpTeamGoals = (TEAMGOALSMSG *)MsgPnt;
 		SetTeamGoals( &lpTeamGoals->TeamGoalsInfo.TeamGoals[ 0 ] );
    		return;
 
     case MSG_SHOCKWAVE:
-   		lpShockwave = (LPSHOCKWAVEMSG)MsgPnt;
+   		lpShockwave = (SHOCKWAVEMSG *)MsgPnt;
    		CreateShockwave( OWNER_SHIP,
 						 lpShockwave->ShockwaveInfo.Owner,
    						 &lpShockwave->ShockwaveInfo.Pos,
@@ -2267,14 +2267,14 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
    		return;
 
     case MSG_BGOUPDATE:
-   		lpBGOUpdate = (LPBGOUPDATEMSG)MsgPnt;
+   		lpBGOUpdate = (BGOUPDATEMSG *)MsgPnt;
    		UpdateBGObject( lpBGOUpdate->BGOUpdateInfo.BGObject,
 						lpBGOUpdate->BGOUpdateInfo.State,
 						lpBGOUpdate->BGOUpdateInfo.Time );
    		return;
 
     case MSG_PRIMBULLPOSDIR:
-   		lpPrimBullPosDir = (LPPRIMBULLPOSDIRMSG)MsgPnt;
+   		lpPrimBullPosDir = (PRIMBULLPOSDIRMSG *)MsgPnt;
 		InitOnePrimBull( lpPrimBullPosDir->PrimBullPosDir.OwnerType,
 						lpPrimBullPosDir->PrimBullPosDir.OwnerID,
 						lpPrimBullPosDir->PrimBullPosDir.BulletID,
@@ -2291,7 +2291,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_SECBULLPOSDIR:
 
-   		lpSecBullPosDir = (LPSECBULLPOSDIRMSG)MsgPnt;
+   		lpSecBullPosDir = (SECBULLPOSDIRMSG *)MsgPnt;
 		InitOneSecBull( lpSecBullPosDir->SecBullPosDir.OwnerType,
 						lpSecBullPosDir->SecBullPosDir.Owner,
 						lpSecBullPosDir->SecBullPosDir.BulletID,
@@ -2307,7 +2307,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_TITANBITS:
 
-   		lpTitanBits = (LPTITANBITSMSG)MsgPnt;
+   		lpTitanBits = (TITANBITSMSG *)MsgPnt;
 		for( Count = 0; Count < NUMTITANBITS; Count++ )
 		{
 			 i = InitOneSecBull( lpTitanBits->TitanBits.OwnerType,
@@ -2329,7 +2329,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	// Someone is claiming to have hit me...
     case MSG_SHIPHIT:
 
-   		lpShipHit = (LPSHIPHITMSG)MsgPnt;
+   		lpShipHit = (SHIPHITMSG *)MsgPnt;
 
 		if( lpShipHit->You == WhoIAm )
    		{
@@ -2392,7 +2392,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	// Someone is claiming to have hit me...
     case MSG_SHORTSHIPHIT:
 		
-   		lpShortShipHit = (LPSHORTSHIPHITMSG)MsgPnt;
+   		lpShortShipHit = (SHORTSHIPHITMSG *)MsgPnt;
 
 		if( lpShortShipHit->You == WhoIAm )
    		{
@@ -2481,7 +2481,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	// this is called in multiplayer
     case MSG_SHIPDIED:
 
-		lpShipDied = (LPSHIPDIEDMSG)MsgPnt;
+		lpShipDied = (SHIPDIEDMSG *)MsgPnt;
 
 		// print a message reflecting the weapon
 		GetDeathString( lpShipDied->WeaponType, lpShipDied->Weapon, &methodstr[0] );
@@ -2614,7 +2614,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	This is where the host gets told what state he thinks we are in
 ===================================================================*/
     case MSG_STATUS:
-   		lpStatus = (LPSTATUSMSG)MsgPnt;
+   		lpStatus = (STATUSMSG *)MsgPnt;
 
 		if ( !STATUS_VALID_PLAYER(GameStatus[lpStatus->WhoIAm]) && STATUS_VALID_PLAYER(lpStatus->Status) )
 			reset_tracker();
@@ -2670,7 +2670,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	case MSG_NETSETTINGS:
 
-			lpNetSettingsMsg = (LPNETSETTINGSMSG)MsgPnt;
+			lpNetSettingsMsg = (NETSETTINGSMSG *)MsgPnt;
 
 			// clients must update their settings
 			if(!IsHost)
@@ -2715,7 +2715,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_LONGSTATUS:
 
-   		lpLongStatus = (LPLONGSTATUSMSG)MsgPnt;
+   		lpLongStatus = (LONGSTATUSMSG *)MsgPnt;
 
 		if ( !STATUS_VALID_PLAYER(GameStatus[lpLongStatus->WhoIAm]) && STATUS_VALID_PLAYER(lpLongStatus->Status.Status) )
 			reset_tracker();
@@ -2764,7 +2764,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_SHORTPICKUP:
 
-   		lpShortPickup = (LPSHORTPICKUPMSG)MsgPnt;
+   		lpShortPickup = (SHORTPICKUPMSG *)MsgPnt;
    		if( lpShortPickup->Pickups == Ships[WhoIAm].Pickups )
    		{
 #if DEBUG_PICKUPS
@@ -2781,7 +2781,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		return;
 
     case MSG_SHORTREGENSLOT:
-		lpShortRegenSlot = (LPSHORTREGENSLOTMSG)MsgPnt;
+		lpShortRegenSlot = (SHORTREGENSLOTMSG *)MsgPnt;
    		if( lpShortRegenSlot->RegenSlots == Ships[WhoIAm].RegenSlots )
    		{
 #if DEBUG_PICKUPS
@@ -2800,7 +2800,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_SHORTTRIGGER:
 
-		lpShortTrigger = (LPSHORTTRIGGERMSG)MsgPnt;
+		lpShortTrigger = (SHORTTRIGGERMSG *)MsgPnt;
    		if( lpShortTrigger->Triggers == Ships[WhoIAm].Triggers )
    		{
   			DebugPrintf( "Message from host to init trigger\n" );
@@ -2817,7 +2817,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_SHORTTRIGVAR:
 
-		lpShortTrigVar = (LPSHORTTRIGVARMSG)MsgPnt;
+		lpShortTrigVar = (SHORTTRIGVARMSG *)MsgPnt;
    		if( lpShortTrigVar->TrigVars == Ships[WhoIAm].TrigVars )
    		{
   			DebugPrintf( "Message from host to init trigvar\n" );
@@ -2834,7 +2834,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_SHORTMINE:
 
-   		lpShortMine = (LPSHORTMINEMSG)MsgPnt;
+   		lpShortMine = (SHORTMINEMSG *)MsgPnt;
    		if( lpShortMine->Mines == Ships[WhoIAm].Mines )
    		{
 			if( Ships[WhoIAm].Mines == ( ( MAXSECONDARYWEAPONBULLETS / MAXGENMINECOUNT	) + 1 ) )
@@ -2855,7 +2855,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_TEXTMSG:
 
-		lpTextMsg = (LPTEXTMSG)MsgPnt;
+		lpTextMsg = (TEXTMSG *)MsgPnt;
 		if( lpTextMsg->Text[MAXTEXTMSG-1] != 0 )
 		{
 			DebugPrintf("EvaluateMessage: from %s (%s:%d) %s (%d) forcing last byte to be null\n",
@@ -2961,7 +2961,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_SETTIME:
 
-		lpSetTime = (LPSETTIMEMSG)MsgPnt;
+		lpSetTime = (SETTIMEMSG *)MsgPnt;
 		if( IllegalTime )
 		{
 			Countdown_Float = lpSetTime->TimeInfo.Time;
@@ -2977,7 +2977,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
     case MSG_BIKENUM:
 
-		lpBikeNumMsg = (LPBIKENUMMSG)MsgPnt;
+		lpBikeNumMsg = (BIKENUMMSG *)MsgPnt;
 
 	  	if( PlayDemo )
 		{
@@ -3011,39 +3011,39 @@ typedef enum {
 
 void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, BYTE mask )
 {
-    LPSHIPHEALTHMSG                     lpShipHealth;
-    LPVERYSHORTUPDATEMSG				lpVeryShortUpdate;
-    LPUPDATEMSG							lpUpdate;
-    LPFUPDATEMSG						lpFUpdate;
-	LPVERYSHORTFUPDATEMSG				lpVeryShortFUpdate;
-	LPGROUPONLY_VERYSHORTFUPDATEMSG		lpGroupOnly_VeryShortFUpdate;
-    LPHEREIAMMSG						lpHereIAm;
-    LPINITMSG							lpInit;
-    LPPRIMBULLPOSDIRMSG					lpPrimBullPosDir;
-    LPSECBULLPOSDIRMSG					lpSecBullPosDir;
-    LPTITANBITSMSG						lpTitanBits;
-    LPSHIPHITMSG						lpShipHit;
-    LPSHORTSHIPHITMSG					lpShortShipHit;
-    LPSHIPDIEDMSG						lpShipDied;
-    LPDROPPICKUPMSG						lpDropPickup;
-    LPVERYSHORTDROPPICKUPMSG			lpVeryShortDropPickup;
-    LPKILLPICKUPMSG						lpKillPickup;
-    LPTEAMGOALSMSG						lpTeamGoals;
-    LPSHOCKWAVEMSG						lpShockwave;
-    LPBGOUPDATEMSG						lpBGOUpdate;
-    LPSTATUSMSG							lpStatus;
-    LPLONGSTATUSMSG						lpLongStatus;
-    LPSHORTPICKUPMSG					lpShortPickup;
-    LPSHORTREGENSLOTMSG					lpShortRegenSlot;
-    LPSHORTTRIGGERMSG					lpShortTrigger;
-    LPSHORTTRIGVARMSG					lpShortTrigVar;
-    LPSHORTMINEMSG						lpShortMine;
-    LPTEXTMSG							lpTextMsg;
-	LPBIKENUMMSG						lpBikeNumMsg;
-	LPYOUQUITMSG						lpYouQuitMsg;
-	LPSETTIMEMSG						lpSetTime;
-	LPREQTIMEMSG						lpReqTime;
-	LPNETSETTINGSMSG					lpNetSettingsMsg;
+    SHIPHEALTHMSG                     *lpShipHealth;
+    VERYSHORTUPDATEMSG				*lpVeryShortUpdate;
+    UPDATEMSG							*lpUpdate;
+    FUPDATEMSG						*lpFUpdate;
+	VERYSHORTFUPDATEMSG				*lpVeryShortFUpdate;
+	GROUPONLY_VERYSHORTFUPDATEMSG		*lpGroupOnly_VeryShortFUpdate;
+    HEREIAMMSG						*lpHereIAm;
+    INITMSG							*lpInit;
+    PRIMBULLPOSDIRMSG					*lpPrimBullPosDir;
+    SECBULLPOSDIRMSG					*lpSecBullPosDir;
+    TITANBITSMSG						*lpTitanBits;
+    SHIPHITMSG						*lpShipHit;
+    SHORTSHIPHITMSG					*lpShortShipHit;
+    SHIPDIEDMSG						*lpShipDied;
+    DROPPICKUPMSG						*lpDropPickup;
+    VERYSHORTDROPPICKUPMSG			*lpVeryShortDropPickup;
+    KILLPICKUPMSG						*lpKillPickup;
+    TEAMGOALSMSG						*lpTeamGoals;
+    SHOCKWAVEMSG						*lpShockwave;
+    BGOUPDATEMSG						*lpBGOUpdate;
+    STATUSMSG							*lpStatus;
+    LONGSTATUSMSG						*lpLongStatus;
+    SHORTPICKUPMSG					*lpShortPickup;
+    SHORTREGENSLOTMSG					*lpShortRegenSlot;
+    SHORTTRIGGERMSG					*lpShortTrigger;
+    SHORTTRIGVARMSG					*lpShortTrigVar;
+    SHORTMINEMSG						*lpShortMine;
+    TEXTMSG							*lpTextMsg;
+	BIKENUMMSG						*lpBikeNumMsg;
+	YOUQUITMSG						*lpYouQuitMsg;
+	SETTIMEMSG						*lpSetTime;
+	REQTIMEMSG						*lpReqTime;
+	NETSETTINGSMSG					*lpNetSettingsMsg;
 
 	// network variables
 	DWORD			nBytes = 0;
@@ -3068,7 +3068,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHIPHEALTH:
         DebugPrintf("net_msg: MSG_SHIPHEALTH\n");
 
-        lpShipHealth = (LPSHIPHEALTHMSG)&CommBuff[0];
+        lpShipHealth = (SHIPHEALTHMSG *)&CommBuff[0];
         lpShipHealth->MsgCode = msg;
         lpShipHealth->WhoIAm = WhoIAm;
         lpShipHealth->Hull = (u_int8_t) Ships[WhoIAm].Object.Hull;
@@ -3080,7 +3080,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_YOUQUIT:
     	DebugPrintf("net_msg: MSG_YOUQUIT\n");
 
-		lpYouQuitMsg = (LPYOUQUITMSG)&CommBuff[0];
+		lpYouQuitMsg = (YOUQUITMSG *)&CommBuff[0];
         lpYouQuitMsg->MsgCode = msg;
 		lpYouQuitMsg->WhoIAm = WhoIAm;
 		lpYouQuitMsg->You = ShipNum;
@@ -3093,7 +3093,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_BIKENUM:
     	DebugPrintf("net_msg: MSG_BIKENUM\n");
 
-		lpBikeNumMsg = (LPBIKENUMMSG)&CommBuff[0];
+		lpBikeNumMsg = (BIKENUMMSG *)&CommBuff[0];
         lpBikeNumMsg->MsgCode = msg;
 		lpBikeNumMsg->WhoIAm = WhoIAm;
 		lpBikeNumMsg->BikeNum = (BYTE) Ships[WhoIAm].BikeNum;
@@ -3104,7 +3104,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 	case MSG_HEREIAM:
 		DebugPrintf("net_msg: MSG_HEREIAM\n");
 
-        lpHereIAm = (LPHEREIAMMSG)&CommBuff[0];
+        lpHereIAm = (HEREIAMMSG *)&CommBuff[0];
         lpHereIAm->MsgCode = msg;
         lpHereIAm->WhoIAm = WhoIAm;
 		lpHereIAm->MPVersion = PXMPVINT;
@@ -3148,7 +3148,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		// setup the basic message flags
 		flags |= NETWORK_RELIABLE;
 		nBytes = sizeof( INITMSG );
-		lpInit = (LPINITMSG)&CommBuff[0];
+		lpInit = (INITMSG *)&CommBuff[0];
 		lpInit->MsgCode	= msg;
 		lpInit->WhoIAm  = WhoIAm;
 
@@ -3292,7 +3292,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
     case MSG_VERYSHORTUPDATE: // short packets on
 
-        lpVeryShortUpdate = (LPVERYSHORTUPDATEMSG)&CommBuff[0];
+        lpVeryShortUpdate = (VERYSHORTUPDATEMSG *)&CommBuff[0];
         lpVeryShortUpdate->MsgCode = msg;
         lpVeryShortUpdate->WhoIAm = WhoIAm;
 		lpVeryShortUpdate->ShortGlobalShip = VeryShortGlobalShip;
@@ -3304,7 +3304,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
     case MSG_UPDATE: // short packets off
 
-        lpUpdate = (LPUPDATEMSG)&CommBuff[0];
+        lpUpdate = (UPDATEMSG *)&CommBuff[0];
         lpUpdate->MsgCode = msg;
         lpUpdate->WhoIAm = WhoIAm;
 				lpUpdate->ShortGlobalShip = ShortGlobalShip;
@@ -3324,7 +3324,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_FUPDATE: // short packets off + fire weapon data
     	DebugPrintf("net_msg: MSG_FUPDATE\n");
 
-        lpFUpdate = (LPFUPDATEMSG)&CommBuff[0];
+        lpFUpdate = (FUPDATEMSG *)&CommBuff[0];
         lpFUpdate->MsgCode = msg;
         lpFUpdate->WhoIAm = WhoIAm;
 		lpFUpdate->ShortGlobalShip = FShortGlobalShip;
@@ -3338,7 +3338,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_VERYSHORTFUPDATE: // short packets on + fire weapon data
     	DebugPrintf("net_msg: MSG_VERYSHORTFUPDATE\n");
 
-        lpVeryShortFUpdate = (LPVERYSHORTFUPDATEMSG)&CommBuff[0];
+        lpVeryShortFUpdate = (VERYSHORTFUPDATEMSG *)&CommBuff[0];
         lpVeryShortFUpdate->MsgCode = msg;
         lpVeryShortFUpdate->WhoIAm = WhoIAm;
 		lpVeryShortFUpdate->ShortGlobalShip = FVeryShortGlobalShip;
@@ -3352,7 +3352,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_GROUPONLY_VERYSHORTFUPDATE:
     	DebugPrintf("net_msg: MSG_GROUPONLY_VERYSHORTFUPDATE\n");
 
-        lpGroupOnly_VeryShortFUpdate = (LPGROUPONLY_VERYSHORTFUPDATEMSG)&CommBuff[0];
+        lpGroupOnly_VeryShortFUpdate = (GROUPONLY_VERYSHORTFUPDATEMSG *)&CommBuff[0];
         lpGroupOnly_VeryShortFUpdate->MsgCode = msg;
         lpGroupOnly_VeryShortFUpdate->WhoIAm = WhoIAm;
 		lpGroupOnly_VeryShortFUpdate->ShortGlobalShip = GroupOnly_FVeryShortGlobalShip;
@@ -3365,7 +3365,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_DROPPICKUP:
     	DebugPrintf("net_msg: MSG_DROPPICKUP\n");
 
-        lpDropPickup = (LPDROPPICKUPMSG) &CommBuff[0];
+        lpDropPickup = (DROPPICKUPMSG *) &CommBuff[0];
         lpDropPickup->MsgCode = msg;
         lpDropPickup->WhoIAm = WhoIAm;
         lpDropPickup->PickupInfo = TempPickup;
@@ -3377,7 +3377,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_VERYSHORTDROPPICKUP:
     	DebugPrintf("net_msg: MSG_VERYSHORTDROPPICKUP\n");
 
-        lpVeryShortDropPickup = (LPVERYSHORTDROPPICKUPMSG) &CommBuff[0];
+        lpVeryShortDropPickup = (VERYSHORTDROPPICKUPMSG *) &CommBuff[0];
         lpVeryShortDropPickup->MsgCode = msg;
         lpVeryShortDropPickup->WhoIAm = WhoIAm;
         lpVeryShortDropPickup->PickupInfo = VeryShortTempPickup;
@@ -3389,7 +3389,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_KILLPICKUP:
     	DebugPrintf("net_msg: MSG_KILLPICKUP\n");
 
-        lpKillPickup = (LPKILLPICKUPMSG) &CommBuff[0];
+        lpKillPickup = (KILLPICKUPMSG *) &CommBuff[0];
         lpKillPickup->MsgCode = msg;
         lpKillPickup->WhoIAm = WhoIAm;
         lpKillPickup->KillPickupInfo = TempKillPickup;
@@ -3401,7 +3401,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_TEAMGOALS:
     	DebugPrintf("net_msg: MSG_TEAMGOALS\n");
 
-        lpTeamGoals = (LPTEAMGOALSMSG) &CommBuff[0];
+        lpTeamGoals = (TEAMGOALSMSG *) &CommBuff[0];
         lpTeamGoals->MsgCode = msg;
         lpTeamGoals->WhoIAm = WhoIAm;
         lpTeamGoals->TeamGoalsInfo = TempTeamGoals;
@@ -3413,7 +3413,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHOCKWAVE:
     	DebugPrintf("net_msg: MSG_SHOCKWAVE\n");
 
-        lpShockwave = (LPSHOCKWAVEMSG) &CommBuff[0];
+        lpShockwave = (SHOCKWAVEMSG *) &CommBuff[0];
         lpShockwave->MsgCode = msg;
         lpShockwave->WhoIAm = WhoIAm;
         lpShockwave->ShockwaveInfo = TempShockwave;
@@ -3424,7 +3424,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_BGOUPDATE:
     	DebugPrintf("net_msg: MSG_BGOUPDATE\n");
 
-        lpBGOUpdate = (LPBGOUPDATEMSG) &CommBuff[0];
+        lpBGOUpdate = (BGOUPDATEMSG *) &CommBuff[0];
         lpBGOUpdate->MsgCode = msg;
         lpBGOUpdate->WhoIAm = WhoIAm;
         lpBGOUpdate->BGOUpdateInfo = TempBGOUpdate;
@@ -3435,7 +3435,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
     case MSG_PRIMBULLPOSDIR:
     	DebugPrintf("net_msg: MSG_PRIMBULLPOSDIR\n");
-        lpPrimBullPosDir = (LPPRIMBULLPOSDIRMSG)&CommBuff[0];
+        lpPrimBullPosDir = (PRIMBULLPOSDIRMSG *)&CommBuff[0];
         lpPrimBullPosDir->MsgCode = msg;
         lpPrimBullPosDir->WhoIAm = WhoIAm;
         lpPrimBullPosDir->PrimBullPosDir = TempPrimBullPosDir;
@@ -3446,7 +3446,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
     case MSG_SECBULLPOSDIR:
     	DebugPrintf("net_msg: MSG_SECBULLPOSDIR\n");
-        lpSecBullPosDir = (LPSECBULLPOSDIRMSG)&CommBuff[0];
+        lpSecBullPosDir = (SECBULLPOSDIRMSG *)&CommBuff[0];
         lpSecBullPosDir->MsgCode = msg;
         lpSecBullPosDir->WhoIAm = WhoIAm;
         lpSecBullPosDir->SecBullPosDir = TempSecBullPosDir;
@@ -3458,7 +3458,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_TITANBITS:
     	DebugPrintf("net_msg: MSG_TITANBITS\n");
 
-        lpTitanBits = (LPTITANBITSMSG)&CommBuff[0];
+        lpTitanBits = (TITANBITSMSG *)&CommBuff[0];
         lpTitanBits->MsgCode = msg;
         lpTitanBits->WhoIAm = WhoIAm;
         lpTitanBits->TitanBits = TempTitanBits;
@@ -3470,7 +3470,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHIPHIT:
     	DebugPrintf("net_msg: MSG_SHIPHIT\n");
 		
-        lpShipHit = (LPSHIPHITMSG)&CommBuff[0];
+        lpShipHit = (SHIPHITMSG *)&CommBuff[0];
         lpShipHit->MsgCode = msg;
         lpShipHit->You = ShipNum;
 	    lpShipHit->WhoHitYou = WhoIAm;
@@ -3483,7 +3483,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHORTSHIPHIT:
     	DebugPrintf("net_msg: MSG_SHORTSHIPHIT\n");
 
-        lpShortShipHit = (LPSHORTSHIPHITMSG)&CommBuff[0];
+        lpShortShipHit = (SHORTSHIPHITMSG *)&CommBuff[0];
         lpShortShipHit->MsgCode = msg;
         lpShortShipHit->You = ShipNum;
 		lpShortShipHit->WhoHitYou = WhoIAm;
@@ -3496,7 +3496,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHIPDIED:
     	DebugPrintf("net_msg: MSG_SHIPDIED\n");
 
-        lpShipDied = (LPSHIPDIEDMSG)&CommBuff[0];
+        lpShipDied = (SHIPDIEDMSG *)&CommBuff[0];
         lpShipDied->MsgCode = msg;
         lpShipDied->WhoIAm = WhoIAm;
 		lpShipDied->Pos = Ships[WhoIAm].Object.Pos;
@@ -3511,7 +3511,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
     case MSG_REQTIME:
     	DebugPrintf("net_msg: MSG_REQTIME\n");
-        lpReqTime = (LPREQTIMEMSG)&CommBuff[0];
+        lpReqTime = (REQTIMEMSG *)&CommBuff[0];
         lpReqTime->MsgCode = msg;
         lpReqTime->WhoIAm = WhoIAm;
 		nBytes = sizeof( REQTIMEMSG );
@@ -3522,7 +3522,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SETTIME:
     	DebugPrintf("net_msg: MSG_SETTIME\n");
 
-        lpSetTime = (LPSETTIMEMSG)&CommBuff[0];
+        lpSetTime = (SETTIMEMSG *)&CommBuff[0];
         lpSetTime->MsgCode = msg;
         lpSetTime->WhoIAm = WhoIAm;
 		lpSetTime->TimeInfo = TempTimeSet;
@@ -3533,7 +3533,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_STATUS:
     	DebugPrintf("net_msg: MSG_STATUS\n");
 
-		lpStatus							= (LPSTATUSMSG)&CommBuff[0];
+		lpStatus							= (STATUSMSG *)&CommBuff[0];
         lpStatus->MsgCode					= msg;
         lpStatus->WhoIAm					= WhoIAm;
         lpStatus->IsHost					= IsHost;
@@ -3552,7 +3552,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 	case MSG_NETSETTINGS:
 		DebugPrintf("net_msg: MSG_NETSETTINGS\n");
 
-		lpNetSettingsMsg						= (LPNETSETTINGSMSG)&CommBuff[0];
+		lpNetSettingsMsg						= (NETSETTINGSMSG *)&CommBuff[0];
         lpNetSettingsMsg->MsgCode				= msg;
         lpNetSettingsMsg->WhoIAm				= WhoIAm;
         lpNetSettingsMsg->IsHost				= IsHost;
@@ -3566,7 +3566,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_LONGSTATUS:
     	DebugPrintf("net_msg: MSG_LONGSTATUS\n");
 
-		lpLongStatus = (LPLONGSTATUSMSG)&CommBuff[0];
+		lpLongStatus = (LONGSTATUSMSG *)&CommBuff[0];
         lpLongStatus->MsgCode				= msg;
         lpLongStatus->WhoIAm				= WhoIAm;
         lpLongStatus->Status.MsgCode		= msg;
@@ -3597,7 +3597,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHORTPICKUP:
     	DebugPrintf("net_msg: MSG_SHORTPICKUP\n");
 
-		lpShortPickup = (LPSHORTPICKUPMSG)&CommBuff[0];
+		lpShortPickup = (SHORTPICKUPMSG *)&CommBuff[0];
         lpShortPickup->MsgCode	= msg;
         lpShortPickup->WhoIAm	= WhoIAm;
         lpShortPickup->Pickups	= Ships[ShipNum].Pickups;
@@ -3611,7 +3611,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHORTREGENSLOT:
     	DebugPrintf("net_msg: MSG_SHORTREGENSLOT\n");
 
-		lpShortRegenSlot = (LPSHORTREGENSLOTMSG)&CommBuff[0];
+		lpShortRegenSlot = (SHORTREGENSLOTMSG *)&CommBuff[0];
         lpShortRegenSlot->MsgCode		= msg;
         lpShortRegenSlot->WhoIAm		= WhoIAm;
         lpShortRegenSlot->RegenSlots	= Ships[ShipNum].RegenSlots;
@@ -3625,7 +3625,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHORTTRIGGER:
     	DebugPrintf("net_msg: MSG_SHORTTRIGGER\n");
 
-		lpShortTrigger = (LPSHORTTRIGGERMSG)&CommBuff[0];
+		lpShortTrigger = (SHORTTRIGGERMSG *)&CommBuff[0];
         lpShortTrigger->MsgCode		= msg;
         lpShortTrigger->WhoIAm		= WhoIAm;
         lpShortTrigger->Triggers	= Ships[ShipNum].Triggers;
@@ -3639,7 +3639,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHORTTRIGVAR:
     	DebugPrintf("net_msg: MSG_SHORTTRIGVAR\n");
 
-		lpShortTrigVar = (LPSHORTTRIGVARMSG)&CommBuff[0];
+		lpShortTrigVar = (SHORTTRIGVARMSG *)&CommBuff[0];
         lpShortTrigVar->MsgCode		= msg;
         lpShortTrigVar->WhoIAm		= WhoIAm;
         lpShortTrigVar->TrigVars	= Ships[ShipNum].TrigVars;
@@ -3653,7 +3653,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_SHORTMINE:
     	DebugPrintf("net_msg: MSG_SHORTMINE\n");
 
-		lpShortMine				= (LPSHORTMINEMSG)&CommBuff[0];
+		lpShortMine				= (SHORTMINEMSG *)&CommBuff[0];
         lpShortMine->MsgCode	= msg;
         lpShortMine->WhoIAm		= WhoIAm;
         lpShortMine->Mines		= Ships[ShipNum].Mines;
@@ -3666,7 +3666,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
     case MSG_TEXTMSG:
     	DebugPrintf("net_msg: MSG_TEXTMSG\n");
 
-		lpTextMsg = (LPTEXTMSG)&CommBuff[0];
+		lpTextMsg = (TEXTMSG *)&CommBuff[0];
         lpTextMsg->MsgCode	= msg;
         lpTextMsg->WhoIAm	= WhoIAm;
         

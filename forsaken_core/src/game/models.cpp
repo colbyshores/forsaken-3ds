@@ -2627,7 +2627,7 @@ void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 ===================================================================*/
 bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -2689,7 +2689,7 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 ===================================================================*/
 bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -2699,7 +2699,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 	u_int16_t					Green;
 	u_int16_t					Blue;
 	
-	LPLVERTEX			VertPtr;
+	LVERTEX			*VertPtr;
 
 	COLOR_RGBA *			DestRGBA;
 
@@ -2753,7 +2753,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 ===================================================================*/
 bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	COLOR				Colour;
 	float					Col2;
 	u_int8_t					Col;
@@ -2804,7 +2804,7 @@ bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale
 ===================================================================*/
 bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u_int8_t R, u_int8_t G, u_int8_t B )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	COLOR				Colour;
 
 		Colour = RGBA_MAKE( R, G, B, 255 );
@@ -2837,7 +2837,7 @@ bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u
 ===================================================================*/
 bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -2882,9 +2882,9 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 ===================================================================*/
 bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 {
-    LPLVERTEX	lpPointer = NULL;
-	LPLVERTEX	lpLVERTEX;
-    LPLVERTEX	lpLVERTEX2;
+    LVERTEX	*lpPointer = NULL;
+	LVERTEX	*lpLVERTEX;
+    LVERTEX	*lpLVERTEX2;
 	int		group;
 	int		execbuf;
 	int		vert;
@@ -2934,8 +2934,8 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 ===================================================================*/
 bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
-	LPLVERTEX			SrclpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*SrclpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -3010,8 +3010,8 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 ===================================================================*/
 bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
-	LPLVERTEX			SrclpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
+	LVERTEX			*SrclpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -3091,7 +3091,7 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 ===================================================================*/
 bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
@@ -3160,7 +3160,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 bool LightModel( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3243,7 +3243,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 bool LightModel2( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3330,7 +3330,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3415,7 +3415,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -4395,7 +4395,7 @@ u_int16_t CreateLine( float x1, float y1, float z1, float x2, float y2, float z2
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -4472,7 +4472,7 @@ char *GetName(int Player)
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					    VECTOR * BottomRight )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -4537,7 +4537,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 ===================================================================*/
 bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -4607,7 +4607,7 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 ===================================================================*/
 bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					ExecBuf;
@@ -5575,7 +5575,7 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t execbuf;
-	LPLVERTEX	lpLVERTEX = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )

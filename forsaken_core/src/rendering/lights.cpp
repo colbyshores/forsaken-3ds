@@ -185,9 +185,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	float	distance;
 	int		execbuf;
 	int		vert;
-    LPLVERTEX	lpPointer = NULL;
-	LPLVERTEX	lpLVERTEX = NULL;
-	LPLVERTEX	lpLVERTEX2 = NULL;
+    LVERTEX	*lpPointer = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
+	LVERTEX	*lpLVERTEX2 = NULL;
 	COLOR col;
 	VERTEXCELL * VertexCellPnt;
 	u_int16_t * VertexIndexPnt;
@@ -731,10 +731,10 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	int		group;
 	int		execbuf;
 	int		vert;
-    LPLVERTEX	lpPointer = NULL;
+    LVERTEX	*lpPointer = NULL;
 
-	LPLVERTEX	lpLVERTEX = NULL;
-	LPLVERTEX	lpLVERTEX2 = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
+	LVERTEX	*lpLVERTEX2 = NULL;
 	COLOR col;
 	float	Size,OSize;
 	float	SizeX2;
@@ -967,10 +967,10 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	int		group;
 	int		execbuf;
 	int		vert;
-    LPLVERTEX	lpPointer = NULL;
+    LVERTEX	*lpPointer = NULL;
 
-	LPLVERTEX	lpLVERTEX = NULL;
-	LPLVERTEX	lpLVERTEX2 = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
+	LVERTEX	*lpLVERTEX2 = NULL;
 	COLOR col;
 	float	Size,OSize;
 	float	SizeX2;

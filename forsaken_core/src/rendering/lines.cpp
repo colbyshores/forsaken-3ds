@@ -114,7 +114,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 	renderObject->memoEpochPass = SMEMO_PASS_LINES;
 	renderObject->memoEpochGroup = Group;
 	renderObject->memoEpochResume = *StartLine;
-	LPLVERTEX	Vert_Ptr;
+	LVERTEX	*Vert_Ptr;
 	COLOR		color;
 	int16_t			Num_Lines;
 	u_int16_t			i;

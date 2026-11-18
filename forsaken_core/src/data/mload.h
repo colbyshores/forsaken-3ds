@@ -163,7 +163,7 @@ typedef struct LVLGROUP{
 	u_int16_t	exec_type[MAXEXECBUFSPERGROUP];
 	u_int16_t	num_verts_per_execbuf[MAXEXECBUFSPERGROUP];
 	LEVELRENDEROBJECT			renderObject[MAXEXECBUFSPERGROUP];
-	LPLVERTEX originalVerts[MAXEXECBUFSPERGROUP];
+	LVERTEX *originalVerts[MAXEXECBUFSPERGROUP];
 	char	name[32];
 	VERT	center;
 	VERT	half_size;
@@ -260,8 +260,8 @@ extern FILE *SaveTextureAnimations( FILE *f );
 
 /* Defined in mload.cpp; shared with the modules that use it. */
 extern float SoundInfo[ MAXGROUPS ][ MAXGROUPS ];
-void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert );
-void FixUV_Anim( POLYANIM *PolyAnim, LPLVERTEX Vert, LPLVERTEX Orig_Vert );
+void FixUV( TRIANGLE *Tri, LVERTEX *Vert, u_int16_t Tpage, LVERTEX *Orig_Vert );
+void FixUV_Anim( POLYANIM *PolyAnim, LVERTEX *Vert, LVERTEX *Orig_Vert );
 extern float UV_Fix;
 void InitSoundInfo( MLOADHEADER * Mloadheader );
 extern u_int16_t num_start_positions;

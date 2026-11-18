@@ -190,7 +190,7 @@ typedef struct {
         float tv;
         float dvTV;
 	};
-} LVERTEX, *LPLVERTEX;
+} LVERTEX;
 
 typedef struct {
     union {
@@ -226,7 +226,7 @@ typedef struct {
         float dvTV;
     };
 
-} TLVERTEX, *LPTLVERTEX;
+} TLVERTEX;
 
 typedef struct {
     union {
@@ -241,7 +241,7 @@ typedef struct {
         WORD v3;
         WORD wV3;
     };
-} TRIANGLE, *LPTRIANGLE;
+} TRIANGLE;
 
 
 /*===================================================================

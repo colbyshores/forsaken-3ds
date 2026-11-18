@@ -352,8 +352,8 @@ void AddWaterLink(WATEROBJECT * WO)
 bool InitWaterObject(WATEROBJECT * WO)
 {
 	int x,y;
-	LPTRIANGLE	FacePnt = NULL;
-	LPLVERTEX	lpLVERTEX = NULL;
+	TRIANGLE	*FacePnt = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
 	WORD			*lpIndices = NULL;
 	int			i;
 	int ntris = 0;
@@ -394,7 +394,7 @@ bool InitWaterObject(WATEROBJECT * WO)
 		return false;
 	}
 
-	FacePnt =  (LPTRIANGLE) lpIndices;
+	FacePnt =  (TRIANGLE *) lpIndices;
 
 	for( x = 0 ; x < WO->XVerts ; x++ )
 	{
@@ -503,7 +503,7 @@ void GroupWaterProcessDisplay( u_int16_t group )
 void UpdateWaterMesh( WATEROBJECT * WO )
 {
 	int x,y;
-	LPLVERTEX	lpLVERTEX;
+	LVERTEX	*lpLVERTEX;
 	int col;
 	float dx, dy;
 	float u, v;

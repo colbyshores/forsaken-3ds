@@ -91,13 +91,13 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 {
 
 	TRIANGLE		FacePnt; // was a pointer
-	LPTRIANGLE	TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
+	TRIANGLE	*TempFacePnt; ZERO_STACK_MEM(TempFacePnt);
 	u_int16_t			exec_type = 0;			// the execbuf's type (bit 0: has transparencies)
 	u_int16_t			num_vertices = 0;		// overall number of verts
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
-	LPLVERTEX	lpLVERTEX = NULL;
-	LPLVERTEX	lpBufStart = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
+	LVERTEX	*lpBufStart = NULL;
 	WORD			*lpIndices = NULL;
 	NORMAL		*lpNormals = NULL;
 	int				ibIndex = 0;
@@ -242,7 +242,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			}
 
 			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
-			Mxloadheader->Group[group].originalVerts[execbuf] = (LPLVERTEX)malloc(sizeof(LVERTEX) * num_vertices);
+			Mxloadheader->Group[group].originalVerts[execbuf] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
 			memmove(Mxloadheader->Group[group].originalVerts[execbuf], &lpLVERTEX[0], sizeof(LVERTEX) * num_vertices);//memcpy
 
 			//	Stuff to clip if bounding box is off screen
@@ -321,7 +321,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				num_triangles = in.u16();
 				DebugPrintf("trinagles %d\n", num_triangles);
 
-				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
+				TempFacePnt = (TRIANGLE *) /*lpLVERTEX*/lpIndices;
 
 
 				/*	copy the triangles into the index and normal buffers	*/
@@ -385,7 +385,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 			if (StoreTriangles)
 			{	Mxloadheader->Group[group].num_polys_per_execbuf[execbuf] = triangleCount;//num_triangles;
-				Mxloadheader->Group[group].poly_ptr[execbuf] = (LPTRIANGLE)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);
+				Mxloadheader->Group[group].poly_ptr[execbuf] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);
 
 				memmove(Mxloadheader->Group[group].poly_ptr[execbuf], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
 
@@ -663,8 +663,8 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 	int		group;
 	RENDERMATRIX Matrix;
 	bool	Display;
-    LPLVERTEX	lpPointer = NULL;
-	LPLVERTEX	lpLVERTEX = NULL;
+    LVERTEX	*lpPointer = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
 	POLYANIM * PolyAnim;
 	u_int32_t * u_int32Pnt;
 	TANIMUV * TanimUV;
@@ -1117,8 +1117,8 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 {
 	int		i,e;
 	int		group;
-	LPLVERTEX	lpD3DLVERTEX1 = NULL;
-	LPLVERTEX			VertPtr;
+	LVERTEX	*lpD3DLVERTEX1 = NULL;
+	LVERTEX			*VertPtr;
 
 	if( !Mxloadheader1->state )
 		return false;

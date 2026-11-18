@@ -785,14 +785,14 @@ void Conv3DTo2D( VECTOR * SrcVert, VECTOR * DstVert, MATRIX * FinalMat )
 
 /*===================================================================
 	Procedure	:	Clip box to viewport
-	Input		:	LPTLVERTEX	Top-left vertex
-				:	LPTLVERTEX	Bottom-right vertex
+	Input		:	TLVERTEX	*Top-left vertex
+				:	TLVERTEX	*Bottom-right vertex
 	Output		:	true if the box is wholly outside the viewport;
 				:	otherwise false, with a partly visible box clipped
 				:	in place (positions and UVs)
 ===================================================================*/
 
-bool ClipBox( LPTLVERTEX topleft, LPTLVERTEX bottomright )
+bool ClipBox( TLVERTEX *topleft, TLVERTEX *bottomright )
 {
 	float xmin = 0.0f, ymin = 0.0f, xmax = 0.0f, ymax = 0.0f;
 	int clip_topleft, clip_bottomright;
@@ -2048,9 +2048,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	COLOR		Colour;
-	LPTLVERTEX	ScrPolyVertPnt; // pre-transformed verts!
-	LPTRIANGLE	ScrPolyFacePnt;
-    LPTLVERTEX	lpBufStart;
+	TLVERTEX	*ScrPolyVertPnt; // pre-transformed verts!
+	TRIANGLE	*ScrPolyFacePnt;
+    TLVERTEX	*lpBufStart;
 	float			u1,v1,u2,v2;
 	float			x1,y1,x3,y3;
 	bool			Textured;
@@ -2129,9 +2129,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		return false;
 	}
 
-	ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+	ScrPolyFacePnt = (TRIANGLE *) lpIndices;
 
-	ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
+	ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
 
 /*===================================================================
 		Fill in Buffer ( Verts and Faces Simultaneously )
@@ -2409,8 +2409,8 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 									batchVert = 0;
 									FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
 									FSLockIndexBuffer(renderObject, &lpIndices);
-									ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
-									ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+									ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
+									ScrPolyFacePnt = (TRIANGLE *) lpIndices;
 								}
 #endif
 	      					Off_Ptr++;
@@ -2555,8 +2555,8 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 								batchVert = 0;
 								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
-								ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+								ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
+								ScrPolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #endif
 						}
@@ -2615,9 +2615,9 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	COLOR		Colour;
-	LPTLVERTEX	ScrPolyVertPnt; // pre-transformed vertex type!
-	LPTRIANGLE	ScrPolyFacePnt;
-    LPTLVERTEX	lpBufStart;//, lpInsStart, lpPointer;
+	TLVERTEX	*ScrPolyVertPnt; // pre-transformed vertex type!
+	TRIANGLE	*ScrPolyFacePnt;
+    TLVERTEX	*lpBufStart;//, lpInsStart, lpPointer;
 	float			u1,v1,u2,v2;
 	float			x1,y1,x3,y3;
 	bool			Textured;
@@ -2696,9 +2696,9 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		return false;
 	}
 
-	ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+	ScrPolyFacePnt = (TRIANGLE *) lpIndices;
 
-	ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
+	ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -2974,8 +2974,8 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 								batchVert = 0;
 								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
-								ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+								ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
+								ScrPolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #endif
 	      					Off_Ptr++;
@@ -3127,8 +3127,8 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 								batchVert = 0;
 								FSLockPretransformedVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								ScrPolyVertPnt = (LPTLVERTEX) lpBufStart;
-								ScrPolyFacePnt = (LPTRIANGLE) lpIndices;
+								ScrPolyVertPnt = (TLVERTEX *) lpBufStart;
+								ScrPolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #endif
 						}

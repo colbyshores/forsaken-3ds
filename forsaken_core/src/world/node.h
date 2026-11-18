@@ -42,14 +42,14 @@ typedef struct NODE
 	int16_t	NumOfLinks;
 struct	NODE *	NodeLink[MAXLINKSPERNODE];
 struct	NODE *	NextNodeInGroup;
-} NODE,*LPNODE;
+} NODE;
 
 typedef struct _NODENETWORKHEADER
 {
 	bool	State;
 	int32_t	NumOfNodes;
 	NODE *	FirstNode;
-} NODENETWORKHEADER,*LPNODENETWORKHEADER;
+} NODENETWORKHEADER;
 
 
 void NodeRelease(void);

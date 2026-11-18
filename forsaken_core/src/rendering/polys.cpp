@@ -657,9 +657,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	COLOR		Colour;
-	LPLVERTEX	PolyVertPnt;
-	LPTRIANGLE	PolyFacePnt;
-    LPLVERTEX	lpBufStart;
+	LVERTEX	*PolyVertPnt;
+	TRIANGLE	*PolyFacePnt;
+    LVERTEX	*lpBufStart;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
 
@@ -722,8 +722,8 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		return false;
 	}
 
-	PolyFacePnt = (LPTRIANGLE) lpIndices;
-	PolyVertPnt = (LPLVERTEX) lpBufStart;
+	PolyFacePnt = (TRIANGLE *) lpIndices;
+	PolyVertPnt = (LVERTEX *) lpBufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -829,8 +829,8 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								PolyVertPnt = (LPLVERTEX) lpBufStart;
-								PolyFacePnt = (LPTRIANGLE) lpIndices;
+								PolyVertPnt = (LVERTEX *) lpBufStart;
+								PolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #else
 							INCREASE_TEXTURE_GROUPS(renderObject);
@@ -891,9 +891,9 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	COLOR		Colour;
-	LPLVERTEX	PolyVertPnt;
-	LPTRIANGLE	PolyFacePnt;
-    LPLVERTEX	lpBufStart;
+	LVERTEX	*PolyVertPnt;
+	TRIANGLE	*PolyFacePnt;
+    LVERTEX	*lpBufStart;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
 
@@ -952,8 +952,8 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 		return false;
 	}
 
-	PolyFacePnt = (LPTRIANGLE) lpIndices;
-	PolyVertPnt = (LPLVERTEX) lpBufStart;
+	PolyFacePnt = (TRIANGLE *) lpIndices;
+	PolyVertPnt = (LVERTEX *) lpBufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -1063,8 +1063,8 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								PolyVertPnt = (LPLVERTEX) lpBufStart;
-								PolyFacePnt = (LPTRIANGLE) lpIndices;
+								PolyVertPnt = (LVERTEX *) lpBufStart;
+								PolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #else
 							INCREASE_TEXTURE_GROUPS(renderObject);
@@ -1171,9 +1171,9 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	COLOR		Colour;
-	LPLVERTEX	PolyVertPnt;
-	LPTRIANGLE	PolyFacePnt;
-    LPLVERTEX	lpBufStart;
+	LVERTEX	*PolyVertPnt;
+	TRIANGLE	*PolyFacePnt;
+    LVERTEX	*lpBufStart;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
 
@@ -1235,8 +1235,8 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 		return false;
 	}
 
-	PolyFacePnt = (LPTRIANGLE) lpIndices;
-	PolyVertPnt = (LPLVERTEX) lpBufStart;
+	PolyFacePnt = (TRIANGLE *) lpIndices;
+	PolyVertPnt = (LVERTEX *) lpBufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -1344,8 +1344,8 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								PolyVertPnt = (LPLVERTEX) lpBufStart;
-								PolyFacePnt = (LPTRIANGLE) lpIndices;
+								PolyVertPnt = (LVERTEX *) lpBufStart;
+								PolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #else
 							INCREASE_TEXTURE_GROUPS(renderObject);
@@ -1407,9 +1407,9 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	BOX_INFO	*	Box_Ptr;
 	OFF_INFO	*	Off_Ptr;
 	COLOR		Colour;
-	LPLVERTEX	PolyVertPnt;
-	LPTRIANGLE	PolyFacePnt;
-    LPLVERTEX	lpBufStart;
+	LVERTEX	*PolyVertPnt;
+	TRIANGLE	*PolyFacePnt;
+    LVERTEX	*lpBufStart;
 	WORD			*lpIndices = NULL;
 	int				start_index = 0;
 
@@ -1471,8 +1471,8 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 		return false;
 	}
 	
-	PolyFacePnt = (LPTRIANGLE) lpIndices;
-	PolyVertPnt = (LPLVERTEX) lpBufStart;
+	PolyFacePnt = (TRIANGLE *) lpIndices;
+	PolyVertPnt = (LVERTEX *) lpBufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -1579,8 +1579,8 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								PolyVertPnt = (LPLVERTEX) lpBufStart;
-								PolyFacePnt = (LPTRIANGLE) lpIndices;
+								PolyVertPnt = (LVERTEX *) lpBufStart;
+								PolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #else
 							INCREASE_TEXTURE_GROUPS(renderObject);

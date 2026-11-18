@@ -3293,8 +3293,8 @@ bool SetUpLines (u_int16_t Model, PLANE plane, VECTOR *rot)
 {
 	int num_polys;	
 	int poly, edge;
-	LPTRIANGLE poly_ptr;
-	LPLVERTEX vertex_ptr;
+	TRIANGLE *poly_ptr;
+	LVERTEX *vertex_ptr;
 	VECTOR tempv1, tempv2, tempv3;
 	VECTOR start, end, IntPoint;
 	float point1dist, point2dist, distance2plane;
@@ -8314,12 +8314,12 @@ void SetDiscStatus(MENU *menu)
 ===================================================================*/
 bool TintModelVertices( u_int16_t Model, float percent, EXCLUDEDVERTICES *Exclude )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
 	MXLOADHEADER	*		DstMloadheader;
-	LPLVERTEX			VertPtr;
+	LVERTEX			*VertPtr;
 	COLOR				Colour;
 	u_int8_t red, green, blue, alpha;
 	int i;
@@ -8404,7 +8404,7 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 	MXALOADHEADER	*		ModelHeaderPtr;
 	MXLOADHEADER	*		MxModelHeaderPtr;
 	int i, TotalVerts;
-	LPLVERTEX			VertPtr;
+	LVERTEX			*VertPtr;
 	VECTOR tempvert;
 	float dist;
 
@@ -8474,9 +8474,9 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 
 bool TintOneVertex( u_int16_t Model, u_int16_t Group, u_int16_t ExecBuf, int VertexNo, float tr, float tg, float tb, float ta )
 {
-	LPLVERTEX			DstlpD3DLVERTEX = NULL;
+	LVERTEX			*DstlpD3DLVERTEX = NULL;
 	MXLOADHEADER	*		DstMloadheader;
-	LPLVERTEX			VertPtr;
+	LVERTEX			*VertPtr;
 	COLOR				Colour;
 	u_int8_t red, green, blue, alpha;
 	u_int8_t vred, vgreen, vblue, valpha;
@@ -12137,7 +12137,7 @@ void SendTitleMessage(MENUITEM *Item)
 	GetVduTextFormattingInfo ( &TitlePlayerMessage );
 }
 
-void AddTitleMessage(LPTEXTMSG lpTextMsg)
+void AddTitleMessage(TEXTMSG *lpTextMsg)
 {
 	
 	if (TotalTitleMsgs != MAX_TITLE_MSGS)

@@ -669,7 +669,7 @@ extern bool BountyBonus;
 extern TEXT MacroText4;
 extern TEXT QuickText;
 extern TEXT QuickTextWhisper;
-void AddTitleMessage(LPTEXTMSG lpTextMsg);
+void AddTitleMessage(TEXTMSG *lpTextMsg);
 extern int TauntMessageColour;
 extern int MyMessageColour;
 extern SLIDER FlagSfxSlider;

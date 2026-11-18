@@ -1513,7 +1513,7 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t execbuf;
-	LPLVERTEX	lpLVERTEX = NULL;
+	LVERTEX	*lpLVERTEX = NULL;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )

@@ -1697,9 +1697,9 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
  	float			Distance;
 	MATRIX			MatrixCopy;
 	COLOR		Colour;
-	LPLVERTEX	FmPolyVertPnt;
-	LPTRIANGLE	FmPolyFacePnt;
-    LPLVERTEX	lpBufStart;
+	LVERTEX	*FmPolyVertPnt;
+	TRIANGLE	*FmPolyFacePnt;
+    LVERTEX	*lpBufStart;
 	MATRIX			TempMatrix;
 	QUAT			TempQuat;
 	WORD			*lpIndices = NULL;
@@ -1760,9 +1760,9 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 		return false;
 	}
 
-	FmPolyFacePnt = (LPTRIANGLE) lpIndices;
+	FmPolyFacePnt = (TRIANGLE *) lpIndices;
 
-	FmPolyVertPnt = (LPLVERTEX) lpBufStart;
+	FmPolyVertPnt = (LVERTEX *) lpBufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -1987,8 +1987,8 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								FmPolyVertPnt = (LPLVERTEX) lpBufStart;
-								FmPolyFacePnt = (LPTRIANGLE) lpIndices;
+								FmPolyVertPnt = (LVERTEX *) lpBufStart;
+								FmPolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #else
 							INCREASE_TEXTURE_GROUPS(renderObject);
@@ -2062,9 +2062,9 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
  	float			Distance;
 	MATRIX			MatrixCopy;
 	COLOR		Colour;
-	LPLVERTEX	FmPolyVertPnt;
-	LPTRIANGLE	FmPolyFacePnt;
-    LPLVERTEX	lpBufStart;
+	LVERTEX	*FmPolyVertPnt;
+	TRIANGLE	*FmPolyFacePnt;
+    LVERTEX	*lpBufStart;
 	MATRIX			TempMatrix;
 	QUAT			TempQuat;
 	WORD			*lpIndices = NULL;
@@ -2125,9 +2125,9 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 		return false;
 	}
 
-	FmPolyFacePnt = (LPTRIANGLE) lpIndices;
+	FmPolyFacePnt = (TRIANGLE *) lpIndices;
 
-	FmPolyVertPnt = (LPLVERTEX) lpBufStart;
+	FmPolyVertPnt = (LVERTEX *) lpBufStart;
 
 /*===================================================================
 		Pass 2: fill verts and indices, one texture group per quad
@@ -2352,8 +2352,8 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 								StartVert = 0;
 								FSLockVertexBuffer(renderObject, &lpBufStart);
 								FSLockIndexBuffer(renderObject, &lpIndices);
-								FmPolyVertPnt = (LPLVERTEX) lpBufStart;
-								FmPolyFacePnt = (LPTRIANGLE) lpIndices;
+								FmPolyVertPnt = (LVERTEX *) lpBufStart;
+								FmPolyFacePnt = (TRIANGLE *) lpIndices;
 							}
 #else
 							INCREASE_TEXTURE_GROUPS(renderObject);

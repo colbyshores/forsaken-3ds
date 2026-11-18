@@ -51,7 +51,7 @@ constexpr int MAX_TRIS_PER_EXEC = 300;
 	Prototypes
 ===================================================================*/
 bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible );
-bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t	NumVerts, int16_t NumTris );
+bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE *Tris, int16_t	NumVerts, int16_t NumTris );
 void ReleaseSkinExecs( void );
 void DisplayBSPNode( BSP_NODE * Node );
 void DisplayNewBSPNode( BSP_NODE * Node );
@@ -61,7 +61,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 void KillNodeCubeLines( void );
 void KillBoxLines( void );
 void InitSkinExecs( void );
-bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE Tris, int16_t NumVerts, int16_t NumTris );
+bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE *Tris, int16_t NumVerts, int16_t NumTris );
 bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible );
 void ReleasePortalExecs( void );
 void InitPortalExecs( void );
