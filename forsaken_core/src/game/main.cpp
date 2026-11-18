@@ -218,13 +218,13 @@ static bool ParseCommandLine(char* lpCmdLine)
 		// jump to the host screen
 		else if ( !strcasecmp( option, "QuickHost" ) ) 
 		{
-			QuickStart = QUICKSTART_Start;
+			QuickStart = QuickStartMode::Start;
 		}
 
 		// jump to the join game screen
 		else if ( !strcasecmp( option, "QuickJoin" ) ) 
 		{
-			QuickStart = QUICKSTART_Join;
+			QuickStart = QuickStartMode::Join;
 		}
 
 		// set the ip address for game to join

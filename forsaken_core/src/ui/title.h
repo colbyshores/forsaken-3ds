@@ -20,10 +20,15 @@
 #include "game/constants.h"
 #include "net/networking.h"
 
-constexpr int QUICKSTART_None = 0;
-constexpr int QUICKSTART_Start = 1;
-constexpr int QUICKSTART_Join = 2;
-constexpr int QUICKSTART_Notify = 5;
+/* A start-up shortcut past the title menus (command-line host or join),
+   or Notify for a pending message box. */
+enum class QuickStartMode : u_int8_t
+{
+	None = 0,
+	Start = 1,
+	Join = 2,
+	Notify = 5,
+};
 
 
 constexpr int MAX_LEVEL_TEXT_LENGTH = 512;
@@ -63,12 +68,16 @@ GAME_Team,				// 4
 GAME_CTF,				// 5
 } game_t;
 
-constexpr int GAMECOMPLETE_NotComplete = 0;
-constexpr int GAMECOMPLETE_WithoutAllCrystals = 1; // never got to secret level because not all crystals were found ( standard end game sequence )
-constexpr int GAMECOMPLETE_GotAllCrystalsSoFar = 2; // got all crystals so far ( will now go to secret level )
-constexpr int GAMECOMPLETE_WithAllCrystals = 3; // with all crystals plus secret level crystal ( secret biker end game sequence )
-constexpr int GAMECOMPLETE_WithAllCrystalsExceptLast = 4; // with all crystals except secret level crystal ( standard end game sequence )
-constexpr int GAMECOMPLETE_Cheated = 5; // got to last but one level, but with cheating
+/* How the single-player campaign ended, which picks the end sequence. */
+enum class GameComplete : int
+{
+	NotComplete = 0,
+	WithoutAllCrystals = 1,			// never got to secret level because not all crystals were found ( standard end game sequence )
+	GotAllCrystalsSoFar = 2,		// got all crystals so far ( will now go to secret level )
+	WithAllCrystals = 3,			// with all crystals plus secret level crystal ( secret biker end game sequence )
+	WithAllCrystalsExceptLast = 4,	// with all crystals except secret level crystal ( standard end game sequence )
+	Cheated = 5,					// got to last but one level, but with cheating
+};
 
 
 typedef enum
@@ -579,7 +588,7 @@ extern char * config_name;
 extern TEXT local_port_str;
 extern bool SpaceOrbSetup;
 extern TEXT host_port_str;
-extern u_int8_t QuickStart;
+extern QuickStartMode QuickStart;
 void GetGamePrefs( void );
 void GetDefaultPilot(void);
 extern VECTOR HoloRot;
@@ -617,7 +626,7 @@ extern LIST LevelList;
 extern MENUSTATE MenuState;
 extern int16_t InGameLoadGameLevelNum;
 extern bool BrightShips;
-extern int GameCompleted;
+extern GameComplete GameCompleted;
 extern bool ScreenSaving;
 extern MENU MENU_EditMacro1;
 extern MENU MENU_EditMacro2;

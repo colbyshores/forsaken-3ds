@@ -2574,7 +2574,7 @@ bool RenderScene( void )
 
     JustExitedMenu = false;
 
-    QuickStart = QUICKSTART_None;
+    QuickStart = QuickStartMode::None;
     WaitingToQuit = false;
 
     ReceiveGameMessages();
@@ -2842,7 +2842,7 @@ bool RenderScene( void )
       NumGoldBars = 0;
       CrystalsFound = 0;
     }
-    GameCompleted = GAMECOMPLETE_NotComplete;
+    GameCompleted = GameComplete::NotComplete;
     if( !ChangeLevel() ) return( false );
 #ifdef __3DS__
     /* [3DS] Clear the colour buffer to black after level load completes.
@@ -3010,7 +3010,7 @@ bool RenderScene( void )
     LevelNum = -1;
     NumGoldBars = 0;
     CrystalsFound = 0;
-    GameCompleted = GAMECOMPLETE_NotComplete;
+    GameCompleted = GameComplete::NotComplete;
     if( !ChangeLevel() ) return( false );
     break;
 
@@ -3027,7 +3027,7 @@ bool RenderScene( void )
     LevelNum = -1;
     NumGoldBars = 0;
     CrystalsFound = 0;
-    GameCompleted = GAMECOMPLETE_NotComplete;
+    GameCompleted = GameComplete::NotComplete;
     if( !ChangeLevel() ) return( false );
     break;
 
@@ -3110,7 +3110,7 @@ void CheckLevelEnd ( void )
         // if they cheated at any point
         if ( Cheated )
         {
-          GameCompleted = GAMECOMPLETE_Cheated;
+          GameCompleted = GameComplete::Cheated;
         }else
         {
           // Check for Secret level...
@@ -3118,24 +3118,24 @@ void CheckLevelEnd ( void )
           {
             //They can go to the secret level
             NewLevelNum = ( LevelList.items - 1 );
-            GameCompleted = GAMECOMPLETE_GotAllCrystalsSoFar;
+            GameCompleted = GameComplete::GotAllCrystalsSoFar;
           }else{
             // go straight to the end sequence
-            GameCompleted = GAMECOMPLETE_WithoutAllCrystals;
+            GameCompleted = GameComplete::WithoutAllCrystals;
           }
         }
       }else if( NewLevelNum == ( LevelList.items - 1 ) ){
         // They have completed the Secret level
         if( CrystalsFound == ( LevelList.items ) )
         {
-          GameCompleted = GAMECOMPLETE_WithAllCrystals;
+          GameCompleted = GameComplete::WithAllCrystals;
         }else
         {
-          GameCompleted = GAMECOMPLETE_WithAllCrystalsExceptLast;
+          GameCompleted = GameComplete::WithAllCrystalsExceptLast;
         }
       }else{
         NewLevelNum++;
-        GameCompleted = GAMECOMPLETE_NotComplete;
+        GameCompleted = GameComplete::NotComplete;
       }
       
       return;

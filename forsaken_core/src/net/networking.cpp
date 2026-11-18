@@ -2984,8 +2984,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			// if we are playing end game demo, we want to substitute the displayed bike for the players bike
 			switch( GameCompleted )
 			{
-			case GAMECOMPLETE_WithoutAllCrystals:
-			case GAMECOMPLETE_WithAllCrystalsExceptLast:
+			case GameComplete::WithoutAllCrystals:
+			case GameComplete::WithAllCrystalsExceptLast:
 				Ships[lpBikeNumMsg->WhoIAm].BikeNum = player_config->bike;
 				break;
 			default:

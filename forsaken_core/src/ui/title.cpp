@@ -94,7 +94,7 @@ void MoveConfigFile( MENU *Menu );
 
 void ProcessTextItems (void);
 
-int GameCompleted = GAMECOMPLETE_NotComplete;
+GameComplete GameCompleted = GameComplete::NotComplete;
 
 constexpr int NUM_TITLE_LOOPS = 2;
 constexpr int TITLE_LOOP_DiscAmbience = 0;
@@ -4097,7 +4097,7 @@ void ScaleHoloModel( float scale );
 void ShowHoloModel( u_int16_t model );
 void ProcessHoloModel( void );
 
-u_int8_t QuickStart = QUICKSTART_None; 
+QuickStartMode QuickStart = QuickStartMode::None;
 
 bool RenderCurrentMenu(void) // this renders broken main menu
 {
@@ -4285,7 +4285,7 @@ bool DisplayTitle(void)
 
 		switch ( QuickStart )
 		{
-		case QUICKSTART_Start:
+		case QuickStartMode::Start:
 
 			InitStartMenu( NULL );
 			CameraStatus = CAMERA_AtLeftVDU;
@@ -4301,7 +4301,7 @@ bool DisplayTitle(void)
 			SelectConnectionToStart( NULL );
 
 			break;
-		case QUICKSTART_Join:
+		case QuickStartMode::Join:
 			InitStartMenu( NULL );
 			CameraStatus = CAMERA_AtLeftVDU;
 			StackMode = DISC_MODE_NONE;
@@ -4317,7 +4317,7 @@ bool DisplayTitle(void)
 				SelectConnectionToJoin( NULL );
 			break;
 
-		case QUICKSTART_Notify:
+		case QuickStartMode::Notify:
 			InitStartMenu( NULL );
 			CameraStatus = CAMERA_AtLeftVDU;
 			StackMode = DISC_MODE_NONE;
@@ -4492,7 +4492,7 @@ void MenuRestart( MENU * Menu )
 
 	input_buffer_reset();
 	
-	if ( !QuickStart )
+	if ( QuickStart == QuickStartMode::None )
 	{
 		if ((CameraStatus == CAMERA_AtDiscs) || (CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
 		{
@@ -5023,7 +5023,7 @@ void MenuBack()
 		CurrentMenu = NULL;
 		CurrentMenuItem = NULL;
 
-		if ( ( MyGameStatus == STATUS_Title ) && ( QuickStart ) )
+		if ( ( MyGameStatus == STATUS_Title ) && ( QuickStart != QuickStartMode::None ) )
 		{
 			TitleReset( NULL );
 		}
@@ -12925,7 +12925,7 @@ void AfterSpecialMessage( MENUITEM * /*Item*/ )
 {
 	switch( GameCompleted )
 	 {
-	 case GAMECOMPLETE_GotAllCrystalsSoFar:
+	 case GameComplete::GotAllCrystalsSoFar:
 		 MenuChangeEx( &MENU_NEW_BetweenLevels );
 		 return;
 	 }
@@ -12948,24 +12948,24 @@ void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 	
 	switch( GameCompleted )
 	 {
-	 case GAMECOMPLETE_NotComplete:
+	 case GameComplete::NotComplete:
 		 MenuChangeEx( &MENU_NEW_BetweenLevels );
 		 return;
-	 case GAMECOMPLETE_WithoutAllCrystals:
+	 case GameComplete::WithoutAllCrystals:
 		 MenuChangeEx( &MENU_NEW_GeneralLoading );
 		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
 		 return;
-	 case GAMECOMPLETE_Cheated:
+	 case GameComplete::Cheated:
 		 strcpy( GameCompleteText, GameCompleteWithCheating );
 		 break;
- 	 case GAMECOMPLETE_GotAllCrystalsSoFar:
+ 	 case GameComplete::GotAllCrystalsSoFar:
 		 strcpy( GameCompleteText, GameCompleteGotAllCrystalsSoFar );
 		 break;
-	 case GAMECOMPLETE_WithAllCrystals:
+	 case GameComplete::WithAllCrystals:
 		 MenuChangeEx( &MENU_NEW_GeneralLoading );
 		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
 		 return;
-	 case GAMECOMPLETE_WithAllCrystalsExceptLast:
+	 case GameComplete::WithAllCrystalsExceptLast:
 		 MenuChangeEx( &MENU_NEW_GeneralLoading );
 		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
 		 return;
@@ -13585,14 +13585,14 @@ void TitleReset( MENUITEM * /*item*/ )
 	PlaceObjects();
 	TitleInitDone = false;
 	CameraStatus = CAMERA_AtStart;
-	QuickStart = QUICKSTART_None;
+	QuickStart = QuickStartMode::None;
 }
 
 void SetTitleNotify( const char * str )
 {
 	strncpy( NotifyMessage, str, sizeof( NotifyMessage ) - 1 );
 	NotifyMessage[ sizeof( NotifyMessage ) - 1 ] = 0;
-	QuickStart = QUICKSTART_Notify;
+	QuickStart = QuickStartMode::Notify;
 }
 
 void InitInGameLevelSelect( MENU *menu )
