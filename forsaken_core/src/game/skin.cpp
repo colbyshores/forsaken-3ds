@@ -1,6 +1,4 @@
-/*===================================================================
-	Debugging display routines collision skin
-===================================================================*/
+/* skin.cpp -- debug views of collision skin, portals, BSP nodes and zones; see skin.h. */
 #include <stdio.h>
 #include "game/main.h"
 #include "math/new3d.h"
@@ -73,10 +71,14 @@ void InitSkinExecs( void )
 }
 
 /*===================================================================
-	Procedure	:		Modify Collision Skin Execution Buffer
-	Input		:		MLOADHEADER	*	Mloadheader
+	Procedure	:		Build collision skin vertex buffers for the
+					visible groups
+	Input		:		MCLOADHEADER	*	MCloadheader
 				:		int16_t			Number of Groups Visible
-	Output		:		Nothing
+	Output		:		bool			false if a buffer failed
+	Notes		:		ShowSkin picks the mode: even values show only
+					the first visible group, 5 colours each face by
+					a hash of its plane.
 ===================================================================*/
 bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 {
@@ -291,9 +293,15 @@ bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible )
 }
 
 /*===================================================================
-	Procedure	:		Create New Execute Buffer
-	Input		:		Nothing
-	Output		:		bool		True/False
+	Procedure	:		Reset the debug views and show BSP node planes
+	Input		:		BSP_NODE	*	Node ( deepest node to show )
+	Output		:		Nothing
+	Notes		:		Always releases the skin buffers, node / box
+					lines and sphere-zone models first. OldNodeCube
+					draws BSP planes cut to a box round the player:
+					Node's parent chain, or the BSP_Nodes array when
+					NodeCubeType is set. NodeCube draws the node
+					volumes (DisplayNewBSPNode).
 ===================================================================*/
 void DisplayBSPNode( BSP_NODE * Node )
 {
@@ -704,6 +712,7 @@ void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group )
 	Input		:		TRIGGER_ZONE *	Zone Sides
 				:		int16_t			NumSides
 				:		u_int16_t			Group
+				:		u_int8_t			Red, Green, Blue, Trans
 	Output		:		Nothing
 ===================================================================*/
 void DisplayTriggerZone( TRIGGER_ZONE * Sides, int16_t NumSides, u_int16_t Group,
@@ -897,7 +906,7 @@ void DisplayColZone( ZONESIDE * Sides, int16_t NumSides, u_int16_t Group, int16_
 
 /*===================================================================
 	Procedure	:		Kill Node Cube Lines
-	Input		:		BSP_NODE	*	Node
+	Input		:		Nothing
 	Output		:		Nothing
 ===================================================================*/
 void KillNodeCubeLines( void )
@@ -917,8 +926,11 @@ void KillNodeCubeLines( void )
 }
 
 /*===================================================================
-	Procedure	:		Create New Execute Buffer
-	Input		:		Nothing
+	Procedure	:		Copy vertices into the next skin vertex buffer
+	Input		:		LPLVERTEX		Verts
+				:		LPTRIANGLE		Tris ( unused )
+				:		int16_t			NumVerts
+				:		int16_t			NumTris ( unused )
 	Output		:		bool		True/False
 ===================================================================*/
 bool MakeNewSkinExec( LPLVERTEX Verts, LPTRIANGLE /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
@@ -973,10 +985,13 @@ void ReleaseSkinExecs( void )
 
 
 /*===================================================================
-	Procedure	:		Modify Collision Portal Execution Buffer
+	Procedure	:		Build portal polygon vertex buffers for the
+					visible groups
 	Input		:		MLOADHEADER	*	Mloadheader
 				:		int16_t			Number of Groups Visible
-	Output		:		Nothing
+	Output		:		bool			false if a buffer failed
+	Notes		:		ShowPortal 2 and 4 show only the first visible
+					group.
 ===================================================================*/
 bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 {
@@ -1100,8 +1115,11 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 }
 
 /*===================================================================
-	Procedure	:		Create New Execute Buffer for portal polys
-	Input		:		Nothing
+	Procedure	:		Copy vertices into the next portal vertex buffer
+	Input		:		LPLVERTEX		Verts
+				:		LPTRIANGLE		Tris ( unused )
+				:		int16_t			NumVerts
+				:		int16_t			NumTris ( unused )
 	Output		:		bool		True/False
 ===================================================================*/
 bool MakeNewPortalExec( LPLVERTEX Verts, LPTRIANGLE /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
@@ -1870,7 +1888,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 				:		int16_t			Num Sides in Space
 				:		int16_t			Side
 				:		VECTOR		*	Vertices to output
-	Output		:		bool			True/False
+	Output		:		int				Number of vertices output
 ===================================================================*/
 int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr, int NumSides, int side, VECTOR * out_ptr )
 {
@@ -2164,7 +2182,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 				:		int16_t			Num Sides in Space
 				:		int16_t			Side
 				:		VECTOR		*	Vertices to output
-	Output		:		bool			True/False
+	Output		:		int				Number of vertices output
 ===================================================================*/
 int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSides, int side, VECTOR * out_ptr )
 {

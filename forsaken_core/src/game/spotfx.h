@@ -1,8 +1,32 @@
-/*===================================================================
-	File	:	SpotFX.h
-	Content	:	spotfx.cpp include file
-===================================================================*/
 #pragma once
+
+/* spotfx.h -- level spot effects and the particle-burst helpers they use
+ *
+ * spotfx.cpp owns SpotFX[], a fixed pool of level-placed emitters (smoke,
+ * steam, sparks, flames, drips, bubbles, weapon fire, ambient sounds, ...)
+ * kept on used / free lists. SetupSpotFX empties the pool in InitScene;
+ * LoadSpotFX then fills it from the level's .FX file (a missing file means
+ * none), so the pool is per level. ProcessSpotFX runs once per frame.
+ *
+ * Each emitter cycles Active -> Inactive on ActiveDelay / InactiveDelay
+ * (game ticks, 60 per second): an InactiveDelay of 0 keeps it active, a
+ * negative one disables it after its first active period. GENTYPE_Time
+ * emitters wait GenDelay first; GENTYPE_Trigger ones wait for EnableSpotFX,
+ * which trigger events call with the emitter's index in the file (the pool
+ * fills in file order). Particle emitters only spawn while their group is
+ * visible or overlaps the camera ship's group; one-shot types (explosion,
+ * shrapnel, primary / secondary fire, drip, sounds) fire once per active
+ * period, tracked by SPOTFX_FLAGS_DoneOnce.
+ *
+ * The CreateSpotFX* / Create*Shrapnel* / afterburner functions are also the
+ * shared particle recipes for model spot FX (models.cpp), enemies, background
+ * objects and component objects; they spawn face-me sprites (FmPolys),
+ * models, lights or bullets directly and do not touch the SpotFX pool.
+ *
+ * The whole pool, including its list links and the per-group lists
+ * (SpotFXGroups, only read by the save code), is written into saved games
+ * by SaveAllSpotFX / LoadAllSpotFX.
+ */
 
 /*===================================================================
 	Defines
@@ -56,9 +80,9 @@ enum
 
 enum {
 
-	SPOTFX_GENTYPE_Initialised,		// Initialised immediatly
-	SPOTFX_GENTYPE_Time,			// Initialised after time
-	SPOTFX_GENTYPE_Trigger,			// Initialised by trigger
+	SPOTFX_GENTYPE_Initialised,		// Active from level start
+	SPOTFX_GENTYPE_Time,			// Active once GenDelay runs out
+	SPOTFX_GENTYPE_Trigger,			// Waits for EnableSpotFX
 };
 
 enum {

@@ -1,5 +1,29 @@
 #pragma once
 
+/* skin.h -- debug views of collision skin, portals, BSP nodes and zones
+ *
+ * Nothing here affects gameplay; it only draws level data that is otherwise
+ * invisible. visi.cpp calls DisplayBSPNode, CreatePortalExecList and
+ * CreateSkinExecList once per camera pass, and oct2.cpp draws the resulting
+ * Skin_Execs / Portal_Execs vertex buffers when one of the Show* /
+ * NodeCube switches is on (debug keys and debug menu toggles). Zone
+ * owners (trigarea, extforce, teleport, compobjects for background-object
+ * collision zones) call the Display* functions per visible group for their
+ * own volumes.
+ *
+ * The buffers are rebuilt every pass: DisplayBSPNode releases the skin
+ * buffers, the debug lines (NodeCubeLines, the line box) and the
+ * sphere-zone models, so it must run before anything else adds to them that
+ * pass. Each face of a hull volume (BSP node, trigger or collision zone) is
+ * a huge quad in that side's plane clipped by the other sides
+ * (Gimme*Vertices), drawn as a filled polygon plus white edge lines; sphere
+ * zones and direction markers borrow entries from Models[].
+ *
+ * MakeNewSkinExec / MakeNewPortalExec copy vertices only and ignore the
+ * triangle list, so the vertex array is drawn as it is laid out. ShowSkin is
+ * never set above 0, so CreateSkinExecList currently returns at once.
+ */
+
 /*===================================================================
 	Includes
 ===================================================================*/

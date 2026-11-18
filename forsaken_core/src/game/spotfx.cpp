@@ -1,3 +1,5 @@
+/* spotfx.cpp -- level spot effects and particle-burst helpers; see spotfx.h. */
+
 /*===================================================================
 	Includes
 ===================================================================*/
@@ -50,9 +52,9 @@ constexpr int FX_VERSION_NUMBER = 4;
 	SPOTFX	*	FirstSpotFXFree = NULL;
 
 /*===================================================================
-	Procedure	:	Load all SpotFX
+	Procedure	:	Load all SpotFX from the level's .FX file
 	Input		:	nothing
-	Output		:	bool	True/False
+	Output		:	bool	True/False ( true if there is no file )
 ===================================================================*/
 bool LoadSpotFX( void )
 {
@@ -594,7 +596,7 @@ void SetupSpotFX( void )
 				:	int16_t		SoundFX
 				:	float		Volume;
 				:	float		Speed;
-				:	float		SFXType;
+				:	int16_t		SFXType;
 	Output		:	SPOTFX	*	SpotFX ( NULL if not available )
 ===================================================================*/
 SPOTFX * InitOneSpotFX( u_int16_t GenType, float GenDelay, u_int16_t Type, u_int16_t Group,
@@ -663,6 +665,8 @@ SPOTFX * InitOneSpotFX( u_int16_t GenType, float GenDelay, u_int16_t Type, u_int
 
 		AddSpotFXToGroup( Object, Group );
 
+		// MaxHeight = distance to the level geometry straight up; bubbles
+		// use it to cap their lifetime so they do not rise through it.
 		RayVector.x = ( SlideUp.x * MaxColDistance );
 		RayVector.y = ( SlideUp.y * MaxColDistance );
 		RayVector.z = ( SlideUp.z * MaxColDistance );
@@ -1187,7 +1191,7 @@ void CreateSpotFXElectricBeams( VECTOR * Pos, VECTOR * Dir, VECTOR * Up, u_int16
 }
 
 /*===================================================================
-	Procedure	:	Create SpotFX Smoke Trail
+	Procedure	:	Create SpotFX Gravgon Trail
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	u_int16_t		Group
@@ -1455,7 +1459,6 @@ void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8
 	Procedure	:	Create SpotFX Shrapnel Explosion
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
-				:	float		Speed
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
@@ -1490,7 +1493,7 @@ void CreateSpotFXShrapnel( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 }
 
 /*===================================================================
-	Procedure	:	Create SpotFX Shrapnel Explosion
+	Procedure	:	Create SpotFX Small Shrapnel Explosion
 	Input		:	VECTOR	*	Position
 				:	VECTOR	*	Direction
 				:	float		Speed
@@ -2225,7 +2228,7 @@ void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group )
 
 
 /*===================================================================
-	Procedure	:	Save SpotFX Array & Connected Global Variables
+	Procedure	:	Save SpotFX pool, list links and group lists
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
@@ -2297,9 +2300,10 @@ FILE * SaveAllSpotFX( FILE * fp )
 }
 
 /*===================================================================
-	Procedure	:	Load SpotFX Array & Connected Global Variables
+	Procedure	:	Load SpotFX pool, list links and group lists
 	Input		:	FILE	*	File Pointer
-	Output		:	FILE	*	Updated File Pointer
+	Output		:	FILE	*	Updated File Pointer ( closed and NULL
+					if the count does not match the level )
 ===================================================================*/
 FILE * LoadAllSpotFX( FILE * fp )
 {

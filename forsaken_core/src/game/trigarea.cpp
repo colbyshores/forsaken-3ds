@@ -1,13 +1,18 @@
 
-/*
-Trigger zone format (*.zon):
+/* trigarea.cpp -- trigger areas; see trigarea.h.
 
+Trigger zone format (*.zon), little-endian:
+
+magic : u_int32_t // MAGIC_NUMBER
+version : u_int32_t // ZON_VERSION_NUMBER
 num_zones : u_int16_t
 {
 	group : u_int16_t
+	generation_type : u_int16_t // TRIGGER_AREA_GENTYPE_*
+	generation_delay : float
 	type : u_int16_t // 0 = ZONE_Sphere, 1 = ZONE_Box, 2 = ZONE_Polygonal
 	pos( x, y, z ) : all float
-	half_size( x, y, z ) : all float
+	half_size( x, y, z ) : all float // sphere radius in x
 	if type != ZONE_Sphere
 	{
 		num_sides : u_int16_t
@@ -16,14 +21,18 @@ num_zones : u_int16_t
 			offset : float
 		}[ num_sides ]
 	}
-	when_player_isin : u_int16_t // index into action table
-	when_player_enters : u_int16_t // index into action table
-	when_player_exits : u_int16_t // index into action table
-	when_player_shoots : u_int16_t // index into action table
-	when_enemy_isin : u_int16_t // index into action table
-	when_enemy_enters : u_int16_t // index into action table
-	when_enemy_exits : u_int16_t // index into action table
-	when_enemy_shoots : u_int16_t // index into action table
+	when_player_isin : u_int16_t // index into TrigMods, 0xffff = none
+	when_player_enters : u_int16_t
+	when_player_exits : u_int16_t
+	when_player_shoots : u_int16_t
+	player_primary : int16_t // weapon filter for when_player_shoots
+	player_secondary : int16_t
+	when_enemy_isin : u_int16_t
+	when_enemy_enters : u_int16_t
+	when_enemy_exits : u_int16_t
+	when_enemy_shoots : u_int16_t
+	enemy_primary : int16_t // weapon filter for when_enemy_shoots
+	enemy_secondary : int16_t
 }[ num_zones ]
 */
  
@@ -78,7 +87,7 @@ constexpr int ZON_VERSION_NUMBER = 2;
 /*===================================================================
 	Procedure	:		Load .zon File
 	Input		:		char	*	Filename
-	Output		:		bool	true/false
+	Output		:		bool	true/false ( true if there is no file )
 ===================================================================*/
 bool TriggerAreaload( char * Filename )
 {
@@ -184,7 +193,8 @@ bool TriggerAreaload( char * Filename )
 	
 	free( OrgBuffer );
 
-	// Make up Group Link List....
+	// Build the four per-group lists. Each list keeps file order and only
+	// holds areas with at least one action for that kind of event.
 
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
@@ -313,9 +323,11 @@ bool	Entry;
 bool	Exit;
 bool	In;
 /*===================================================================
- 	Procedure	:		Check Player...
-	Input		:		void
-	Output		:		void
+ 	Procedure	:		Check a player's move against the group's areas
+	Input		:		VECTOR	*	Old Position
+				:		VECTOR	*	New Position
+				:		u_int16_t		Group
+	Output		:		bool		true
 ===================================================================*/
 bool	TriggerAreaPlayerCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group )
 {
@@ -371,6 +383,7 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 		{
 			CanActivate = false;
 			
+			// Weapon filter: both -1 or both 0 means any weapon fires it.
 			if( ( ( Area->player_primary != -1 )|| ( Area->player_secondary != -1 ) ) &&
 				( ( Area->player_primary != 0 ) || ( Area->player_secondary != 0 ) ) )
 			{
@@ -412,9 +425,11 @@ bool	TriggerAreaPlayerShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t
 	return true;
 }
 /*===================================================================
- 	Procedure	:		Check Enemy...
-	Input		:		void
-	Output		:		void
+ 	Procedure	:		Check an enemy's move against the group's areas
+	Input		:		VECTOR	*	Old Position
+				:		VECTOR	*	New Position
+				:		u_int16_t		Group
+	Output		:		bool		true
 ===================================================================*/
 bool	TriggerAreaEnemyCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t Group )
 {
@@ -470,6 +485,7 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 		{
 			CanActivate = false;
 			
+			// Weapon filter: both -1 or both 0 means any weapon fires it.
 			if( ( ( Area->enemy_primary != -1 )|| ( Area->enemy_secondary != -1 ) ) &&
 				( ( Area->enemy_primary != 0 ) || ( Area->enemy_secondary != 0 ) ) )
 			{
@@ -513,15 +529,15 @@ bool	TriggerAreaEnemyShootsCheck( VECTOR * OldPos , VECTOR * NewPos , u_int16_t 
 
 
 /*===================================================================
- 	Procedure	:		Check Ray to Col Zone
-	Input		:		VECTOR	*	StartPos
+ 	Procedure	:		Classify a segment against a convex hull
+	Input		:		TRIGGER_ZONE *	Sides
+				:		VECTOR	*	StartPos
 				:		VECTOR	*	EndPos
-				:		ZONESIDE *	Sides
-				:		int16_t		NumSides
-				:		VECTOR	*	Intersection Point ( TBFI )
-				:		ZONESIDE **	Intersection Side ( TBFI )
-				:		float		Collision Radius
-	Output		:		void
+				:		u_int16_t		NumSides
+	Output		:		bool		true if Entry, Exit or In was set
+	Notes		:		Sets the Entry / Exit / In globals but never clears
+					them; the caller clears them first. In means the
+					segment crosses no side and both ends are inside.
 ===================================================================*/
 bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos , u_int16_t StartNumSides )
 {
@@ -583,9 +599,14 @@ bool RayToHull( TRIGGER_ZONE * StartSide , VECTOR * StartPos , VECTOR * EndPos ,
 /*===================================================================
  	Procedure	:		Is point inside convex shape?
 	Input		:		VECTOR	*	Pos
-				:		ZONESIDE *	Sides
+				:		TRIGGER_ZONE *	Sides
 				:		int16_t		NumSides
+				:		int16_t		Side to skip
 	Output		:		bool		true/false
+	Notes		:		Side is the down-counter value RayToHull had when
+					it found the crossing, not a 0-based index; both
+					loops count down from NumSides the same way, so
+					it skips the plane the point lies on.
 ===================================================================*/
 bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, int16_t Side )
 {
@@ -606,8 +627,10 @@ bool ClassifyPointInHull( VECTOR * Pos, TRIGGER_ZONE * Sides, int16_t NumSides, 
 
 /*===================================================================
  	Procedure	:		Process and clasify 2 positions with an area..
-	Input		:		void
-	Output		:		void
+	Input		:		VECTOR	*	Old Position
+				:		VECTOR	*	New Position
+				:		TRIGGER_AREA *	Area
+	Output		:		void ( result in Entry / Exit / In )
 ===================================================================*/
 
 void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area )
@@ -804,7 +827,7 @@ void DisableTriggerArea( u_int16_t * Data )
 	AreaPnt->state = TRIGGER_AREA_STATE_Off;
 }
 /*===================================================================
- 	Procedure	:		Check Enemy...
+ 	Procedure	:		Count down timed areas and switch them on
 	Input		:		void
 	Output		:		void
 ===================================================================*/
@@ -831,7 +854,7 @@ void ProcessTriggerAreas( void )
 }
 
 /*===================================================================
-	Procedure	:	Save TriggerAreas arrays & Connected Global Variables
+	Procedure	:	Save trigger area on/off states
 	Input		:	FILE	*	File Pointer
 	Output		:	FILE	*	Updated File Pointer
 ===================================================================*/
@@ -857,9 +880,10 @@ FILE * SaveTriggerAreas( FILE * fp )
 }
 
 /*===================================================================
-	Procedure	:	Load TriggerAreas Arrays & Connected Global Variables
+	Procedure	:	Load trigger area on/off states
 	Input		:	FILE	*	File Pointer
-	Output		:	FILE	*	Updated File Pointer
+	Output		:	FILE	*	Updated File Pointer ( closed and NULL
+					if the area count does not match the level )
 ===================================================================*/
 FILE * LoadTriggerAreas( FILE * fp )
 {

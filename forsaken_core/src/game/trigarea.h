@@ -1,6 +1,30 @@
 
 #pragma once
 
+/* trigarea.h -- trigger areas: level volumes that fire trigger mods
+ *
+ * trigarea.cpp loads the level's .zon file (TriggerAreaload, called from
+ * oct2.cpp's level init; a missing file just means no areas) into the Zones
+ * array and builds four per-group singly linked lists: areas with a player
+ * in/enter/exit action, a player-shoots action, an enemy in/enter/exit action,
+ * and an enemy-shoots action. All of it is per level and is freed by
+ * ReleaseTriggerArea.
+ *
+ * Movers call the Check functions with the segment they moved along this
+ * frame and the group they are in (ships, enemies, primary and secondary
+ * bullets). Each area that is On classifies the segment as Entry / In / Exit
+ * and applies TrigMods[when_*] for the matching event; 0xffff means no
+ * action. A sphere zone uses half_size.x as its radius; a box or polygonal
+ * zone is a convex hull of TRIGGER_ZONE planes whose inside is where
+ * dot(pos, normal) + offset <= 0 for every side. Shoot checks only fire on
+ * Entry, so a bullet spawned inside an area does not trigger it.
+ *
+ * RayToHull reports through the Entry / Exit / In globals and only ever sets
+ * them; callers clear them first. teleport, extforce and goal reuse it for
+ * their own hull zones. Area on/off state is the only thing saved with a
+ * game (SaveTriggerAreas / LoadTriggerAreas).
+ */
+
 /*
  * Defines
  */
@@ -13,9 +37,9 @@ constexpr int ZONE_Polygonal = 2;
 
 enum {
 
-	TRIGGER_AREA_GENTYPE_Initialised,		// Initialised immediatly
-	TRIGGER_AREA_GENTYPE_Time,			// Initialised after time
-	TRIGGER_AREA_GENTYPE_Trigger,			// Initialised by trigger
+	TRIGGER_AREA_GENTYPE_Initialised,		// On from level start
+	TRIGGER_AREA_GENTYPE_Time,			// Turned on once generation_delay runs out (ProcessTriggerAreas)
+	TRIGGER_AREA_GENTYPE_Trigger,			// Turned on by an EnableTriggerArea trigger event
 };
 
 /*
