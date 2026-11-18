@@ -82,7 +82,7 @@ in place 2026-11-17 (payload untouched); `tools/texture/t3x_check.py
 romfs/hd_textures romfs/hd_textures_lomem` now passes all 816 files. If
 romfs/ is ever regenerated, rerun the checker. Owner confirmed on hardware.
 
-**Owner decisions pending:**
+**Owner decisions pending** (1, 2, 4, 5 resolved 2026-11-18 by deletion, see "Dead code removed"):
 1. Optional features under never-defined macros — keep or delete:
    `DEMO_SUPPORT`, `LUA_BOT` (botai_*, lua_bot: compiled empty everywhere),
    `PLAYER_SPEECH_TAUNTS`, `COOPERATIVE`, `SCROLLING_MESSAGES`,
@@ -236,6 +236,75 @@ Behaviour-changing commits are bug fixes, each on its own, listed first.
 
 Next (no decision needed): after the music_3ds listen, the same class
 shape for `sound_3ds` and `controls_3ds`.
+
+### Dead code removed, 2026-11-18 (owner: "slim it down to just what I plan to use")
+
+Owner decisions 1, 2, 4 and 5 are resolved by deletion. The tree now holds
+only code that some build compiles, and that compiled code reaches. About
+15,500 lines went, in 49 commits (5a7aeb7..08503a5), one kind of removal
+per commit. Fixed point reached: the four checks below find nothing more,
+apart from `ObjectBob`, which waits on decision 9.
+
+**Removed:**
+- **Windows-only code:** DirectSound, Direct3D, DirectInput, Breakpad,
+  the `WIN32` paths, and the M32 (32-bit x86) build.
+- **Backends no build selects:** DevIL, SDL_image, the headless renderer
+  and input, the first ENet backend, and MiniUPnP.
+- **The multiplayer bot AI** (`LUA_BOT`).
+- **Code under never-defined feature macros:** the demo macros,
+  `ACTUAL_TRANS`, `COOPERATIVE`, `NEW_LIGHTING`, `PLAYER_SPEECH_TAUNTS`,
+  `POLYGONAL_COLLISIONS`, `REMOTE_CAMERA_ENABLED`, `SCROLLING_MESSAGES`,
+  `SINT_PEACEFROG_CHEAT`, `TEAM_NUMBERS`, and two debug switches.
+- **`FINAL_RELEASE`:** resolved to the behaviour every build shipped
+  (all levels take the original campaign's completion path).
+- **The eight Lua binding modules nothing registers.**
+- **Fixed in-source settings, each pinned at its one value:**
+  - the file-format versions `MXV`, `MX`, `MXA` and `TELEPORTS`;
+  - `SAVEGAME_SLOTS`, `KDEF`/`VDUKDEF`, `DUPLICATE_BGOBJECTS`,
+    `ENABLEENEMYCOLLISIONS` and nine more;
+  - flags both Makefiles always pass: `SOUND_SUPPORT`, `BSP`, `TEXTURE_PNG`.
+- **Restart points (`ENABLE_RESTART` was 0):** start points, the
+  "restart point reached" message and `last_start_position` in saves stay.
+- **The C build pipeline** in both Makefiles.
+- **Unreferenced code:** 194 functions and variables, 433 constants, and
+  43 globals that were written but never read.
+- **Gate configuration:** 70 stale perf-gate baseline keys and the dead
+  `title.c` exemptions.
+- `scripts/ghidra_dump_ai.py` no longer ships in romfs; it now sits in
+  `docs/ai_analysis/`.
+
+**How "dead" was established** (scratch tools, not in the repo; the
+approach is in the commit messages):
+1. **Undefined macros:** every macro a conditional tests that nothing
+   defines on either target. Our `#define`s, Makefile `-D` flags, compiler
+   predefines and system headers on both toolchains all count as defined.
+2. **Unreferenced symbols:** the six configurations (3DS remaster/original;
+   PC remaster/original × debug/non-debug) linked at -O0 with section GC.
+   Nothing is inlined at -O0, so a symbol missing from every final binary
+   is referenced by no compiled code.
+3. **Dead branches:** every translation unit preprocessed under all six
+   configurations; a branch none of whose lines reaches the compiler in
+   any of them is dead.
+4. **Constants:** names that occur only in their own definition.
+
+**Proof:**
+- Preprocessor-only commits: `verify_identical.sh`, byte-identical in all
+  four configurations.
+- Symbol removals: a per-symbol comparison. Every removed symbol was
+  intended, nothing was added, and every surviving function's instructions
+  and relocation types are unchanged, except named call sites that lost a
+  call to a function that only returned.
+- Runtime: the 3DS title under Mandarine and the PC title under lavapipe
+  both run.
+- Host tests now pin the live API: QUATLERP::Step, RaytoSphere2/Short, and
+  the hunk through Hunk_Alloc/FreeAll.
+
+**Not removed:**
+- Portability fallbacks (`S_IREAD`, `M_PI`, `GLOB_ABORTED`, the `PXRV`
+  override).
+- `RENDERER_C3D` and `GPU_LIGHTING`: these name the 3DS renderer seam that
+  core code relies on.
+- `ObjectBob`, pending decision 9.
 
 **Last, after the conversion is complete (owner request 2026-11-17):** fully
 refactor the Forsaken Obsidian docs (`port-docs` vault,
