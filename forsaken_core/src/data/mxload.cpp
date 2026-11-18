@@ -23,8 +23,8 @@
  *       OLDLVERTEX[num_vertices]       x y z, reserved, colour, specular, tu tv
  *       num_texture_groups
  *       per texture group:
- *         texture type (unused), first vertex, vertex count (unused), tpage,
- *         num_triangles, MFACE[num_triangles]  v1 v2 v3, flags (bit 0:
+ *         texture type, first vertex and vertex count (all unused),
+ *         tpage, num_triangles, MFACE[num_triangles]  v1 v2 v3, flags (bit 0:
  *         colour-keyed), face normal
  *   a u16 that is skipped (an old format flag)
  *   num_animations
@@ -96,7 +96,6 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int16_t			num_vertices = 0;		// overall number of verts
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
-	u_int16_t			group_vertex_start = 0; // where in the vert list to start processing
 	LPLVERTEX	lpLVERTEX = NULL;
 	LPLVERTEX	lpBufStart = NULL;
 	WORD			*lpIndices = NULL;
@@ -316,13 +315,12 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			for ( i=0 ; i<num_texture_groups; i++)
 			{
 				in.skip( sizeof( u_int16_t ) );	// texture type (unused)
-				group_vertex_start = in.u16();
+				in.skip( sizeof( u_int16_t ) );	// first vertex (unused)
 				in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
 				tpage = in.u16();
 				num_triangles = in.u16();
 				DebugPrintf("trinagles %d\n", num_triangles);
 
-				Mxloadheader->Group[group].texture_group_vert_off[execbuf][i] = (u_int32_t) (group_vertex_start*sizeof(LVERTEX));
 				TempFacePnt = (LPTRIANGLE ) /*lpLVERTEX*/lpIndices;
 
 

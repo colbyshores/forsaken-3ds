@@ -75,7 +75,6 @@ typedef struct MXGROUP{
 	LPLVERTEX originalVerts[MAXEXECBUFSPERGROUP];
 
 	LPTRIANGLE poly_ptr	[MAXEXECBUFSPERGROUP];
-	u_int32_t		texture_group_vert_off[MAXEXECBUFSPERGROUP][MAXMXATEXTUREGROUPSPER];
 	char		name[16];
 	u_int16_t		num_animating_polys[MAXEXECBUFSPERGROUP];
 	POLYANIM *	polyanim[MAXEXECBUFSPERGROUP];
