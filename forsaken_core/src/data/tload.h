@@ -33,7 +33,6 @@ typedef struct TLOADHEADER{
 	u_int16_t				Xsize[MAXTPAGESPERTLOAD];		// the Xsize now
 	u_int16_t				Ysize[MAXTPAGESPERTLOAD];		// the Ysize now
 	bool				Scale[MAXTPAGESPERTLOAD];		// Can I Be Scaled....???
-	u_int16_t				CurScale[MAXTPAGESPERTLOAD];	// 0 normal...1 X half 2 X and Y half..
 	bool				ColourKey[MAXTPAGESPERTLOAD];	// 0 not colour keyed
     char                ImageFile[MAXTPAGESPERTLOAD][256]; /* files */
     LPTEXTURE			lpTexture[MAXTPAGESPERTLOAD]; /* texture objs */

@@ -21,8 +21,6 @@
 /*===================================================================
 		Globals...	
 ===================================================================*/
-constexpr int MAXSCALE = 3;
-
 TLOADHEADER	Tloadheader;
 double	Gamma = 1.0;
 
@@ -39,7 +37,6 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 	for( i = 0 ; i < MAXTPAGESPERTLOAD ; i++ )
 	{
 		Tloadheader->lpTexture[i]     = NULL; // texture
-		Tloadheader->CurScale[i]      = 0;	  // handle
 		Tloadheader->Scale[i]		  = false;// Should it scale??
 
 		Tloadheader->MipMap[i]		  = false;// Should it have Mip Maps
@@ -62,9 +59,7 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 ===================================================================*/
 bool Tload( TLOADHEADER * Tloadheader  )
 {
-	int	i,e;
-	int LeastScaledThatCanbe;
-	int LeastScaledThatCanbeScale;
+	int	i;
 
 	build_gamma_table( Gamma );
 
@@ -89,29 +84,6 @@ bool Tload( TLOADHEADER * Tloadheader  )
 		{
 			Msg( "TLoadAllTextures() Failed\n" );
 			return false;
-		}
-	}
-	
-	for( e = 0 ; e < Tloadheader->num_texture_files*MAXSCALE ; e ++ )
-	{
-		LeastScaledThatCanbe = -1;
-		LeastScaledThatCanbeScale = MAXSCALE;
-
-		for( i = Tloadheader->num_texture_files-1 ; i >= 0 ; i-- )
-		{
-			if( Tloadheader->Scale[i] && ( Tloadheader->CurScale[i] < LeastScaledThatCanbeScale ) )
-			{
-				LeastScaledThatCanbeScale = Tloadheader->CurScale[i];
-				LeastScaledThatCanbe = i;
-			}
-		}
-
-		if( LeastScaledThatCanbe != -1 )
-		{
-			Tloadheader->CurScale[LeastScaledThatCanbe]++;
-		}else{
-			// couldnt find any more to scale....
-			break;
 		}
 	}
 

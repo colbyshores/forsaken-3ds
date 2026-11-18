@@ -349,7 +349,8 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						// colourkey triangle found
 						colourkey++;
 					}
-					FixUV( &FacePnt, lpBufStart, tpage, Mxloadheader->Group[group].originalVerts[execbuf]);
+					if( Mxloadheader->num_texture_files )
+						FixUV( &FacePnt, lpBufStart, Mxloadheader->TloadIndex[tpage], Mxloadheader->Group[group].originalVerts[execbuf]);
 					lpNormals++;
 					tempInt+=3;
 				}

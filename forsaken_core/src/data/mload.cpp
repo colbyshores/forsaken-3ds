@@ -160,6 +160,13 @@ static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group
 	return ok;
 }
 
+/* Pull a triangle's texture coordinates in by UV_Fix (half a texel) where an
+   edge runs along a line of constant u or v (within SAME_UV texels), so
+   filtering doesn't sample the neighbouring area of the texture page across
+   that edge. Tpage is the texture's index in Tloadheader (a loader's local
+   tpage must go through its TloadIndex first); the step is measured in that
+   texture's texels. A vertex moves at most one step from its original
+   position (Orig_Vert), however many triangles share it. */
 void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert )
 {
 	static LPLVERTEX TriVert[ 3 ], Orig_TriVert[ 3 ];
@@ -170,8 +177,8 @@ void FixUV( LPTRIANGLE Tri, LPLVERTEX Vert, u_int16_t Tpage, LPLVERTEX Orig_Vert
 	float su = 0.0f, sv = 0.0f;
 	int Xsize = 0, Ysize = 0;
 
-	Xsize = Tloadheader.Xsize[Tpage] / ( 1 << Tloadheader.CurScale[Tpage] );
-	Ysize = Tloadheader.Ysize[Tpage] / ( 1 << Tloadheader.CurScale[Tpage] );
+	Xsize = Tloadheader.Xsize[Tpage];
+	Ysize = Tloadheader.Ysize[Tpage];
 
 	if( bSquareOnly )
 	{
@@ -491,7 +498,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						colourkey++;
 					}
 
-					FixUV( &FacePnt, lpBufStart, tpage, Mloadheader->Group[group].originalVerts[execbuf] );
+					FixUV( &FacePnt, lpBufStart, Mloadheader->TloadIndex[tpage], Mloadheader->Group[group].originalVerts[execbuf] );
 					lpNormals++;
 				}
 
