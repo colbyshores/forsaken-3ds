@@ -12,6 +12,7 @@
 #include "data/file.h"
 
 #include "util/util.h"
+#include "util/file_reader.h"
 #include "game/oct2.h"
 #include "world/collision.h"
 
@@ -30,17 +31,13 @@ BSP_NODE *	BSP_Nodes[256];
 BSP_PORTAL_HEADER Bsp_Portal_Header = { false, 0, {} };
 
 
-static bool BSP_Loadtree( BSP_TREE *t, char **Buffer )
+static bool BSP_Loadtree( BSP_TREE *t, FileReader & in )
 {
-	BSP_RAWNODE * Raw;
 	BSP_NODE * New;
-	int16_t		*	int16_tpnt;
 	int16_t		e;
 
-	// get the number of nodes and move to next pointer
-	int16_tpnt = ( int16_t * ) *Buffer;
-	t->NumNodes = *int16_tpnt++;
-	*Buffer = (char * ) int16_tpnt;
+	// get the number of nodes
+	t->NumNodes = in.i16();
 	
 	// initialize the root node and set aside enough space
 	// set aside size of N BSP_NODE's
@@ -48,9 +45,6 @@ static bool BSP_Loadtree( BSP_TREE *t, char **Buffer )
 	if ( !t->Root )
 		return false;
 	
-	// cast buffer to BSP_RAWNODE for extracting values
-	Raw = (BSP_RAWNODE *) *Buffer;
-
 	// initialize first node
 	New = t->Root;
 	New->Parent = NULL;
@@ -58,70 +52,48 @@ static bool BSP_Loadtree( BSP_TREE *t, char **Buffer )
 	// pack on node heirachy
 	for( e = 0 ; e < t->NumNodes ; e++ )
 	{
-		/* Raw points into a byte-parsed buffer after a u16 NumNodes read
-		   so it's 2-mod-4; `New->Normal = Raw->Normal` compiles to
-		   `ldm` which faults on misaligned sources. Normal/Offset are
-		   floats — use the noinline helper. Front/Back/Colour are u32
-		   and single `ldr` tolerates unaligned on ARM11. */
-		{ extern void memcpy_unaligned(void*, const void*, size_t);
-		  memcpy_unaligned(&New->Normal, &Raw->Normal, sizeof(VECTOR));
-		  memcpy_unaligned(&New->Offset, &Raw->Offset, sizeof(float));
-		  memcpy_unaligned(&New->Colour, &Raw->Colour, sizeof(int)); }
-		if( !Raw->Front ) New->Front = NULL;
+		BSP_RAWNODE Raw;
+		in.bytes( &Raw, sizeof( Raw ) );
+		New->Normal = Raw.Normal;
+		New->Offset = Raw.Offset;
+		New->Colour = Raw.Colour;
+		if( !Raw.Front ) New->Front = NULL;
 		else{
-			New->Front = t->Root + Raw->Front;
+			New->Front = t->Root + Raw.Front;
 			New->Front->Parent = New;
 		}
-		if( !Raw->Back ) New->Back = NULL;
+		if( !Raw.Back ) New->Back = NULL;
 		else{
-			New->Back  = t->Root + Raw->Back;
+			New->Back  = t->Root + Raw.Back;
 			New->Back->Parent = New;
 		}
 		New++;
-		Raw++;
 	}
-
-	// rest of data is garbage
-	*Buffer = (char*) Raw;
 
 	return true;
 }
 
 
-static bool BSP_LoadPortal( BSP_PORTAL *p, char **Buffer )
+static bool BSP_LoadPortal( BSP_PORTAL *p, FileReader & in )
 {
-	int16_t	*	int16_tpnt;
-	float	*	floatpnt;
+	p->group = in.i16();
+	p->normal = in.vec();
+	p->offset = in.f32();
 
-	int16_tpnt = (int16_t *) *Buffer;
-	p->group = *int16_tpnt++;
-	floatpnt = (float *) int16_tpnt;
-	/* GCC inlines memcpy(dst, src, 12) to ldm which requires 4-byte
-	   source alignment; floatpnt is only 2-byte aligned here. */
-	{ extern void memcpy_unaligned(void*, const void*, size_t);
-	  memcpy_unaligned(&p->normal, floatpnt, 4*3);
-	  floatpnt+=3;
-	  memcpy_unaligned(&p->offset, floatpnt, 4);
-	  floatpnt++; }
-	*Buffer = (char *) floatpnt;
-
-	return BSP_Loadtree( &p->bsp, Buffer );
+	return BSP_Loadtree( &p->bsp, in );
 }
 
 
-static bool BSP_LoadPortalGroup( BSP_PORTAL_GROUP *pg, char **Buffer )
+static bool BSP_LoadPortalGroup( BSP_PORTAL_GROUP *pg, FileReader & in )
 {
-	int16_t		*	int16_tpnt;
 	int				i;
 
-	int16_tpnt = (int16_t *) *Buffer;
-	pg->portals = *int16_tpnt++;
-	*Buffer = (char *) int16_tpnt;
+	pg->portals = in.i16();
 
 	pg->portal = (BSP_PORTAL *) calloc( pg->portals, sizeof( BSP_PORTAL ) );
 	for ( i = 0; i < pg->portals; i++ )
 	{
-		if ( !BSP_LoadPortal( &pg->portal[ i ], Buffer ) )
+		if ( !BSP_LoadPortal( &pg->portal[ i ], in ) )
 		{
 			return false;
 		}
@@ -138,9 +110,7 @@ static bool BSP_LoadPortals( char *fname )
 	long			Read_Size;
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	int16_t		*	int16_tpnt;
 	int16_t			i;
-	u_int32_t		*	Uint32Pnt;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 
@@ -164,23 +134,20 @@ static bool BSP_LoadPortals( char *fname )
 
 	if( Read_Size != File_Size ) return false;
 
-	Uint32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *Uint32Pnt++;
-	VersionNumber = *Uint32Pnt++;
-	Buffer = (char *) Uint32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != BSP_PORTAL_VERSION_NUMBER  ) )
 	{
 		Msg( "Bsp_Portalload() Incompatible PBS file %s", Filename );
 		return( false );
 	}
-	int16_tpnt = ( int16_t * ) Buffer;
-	Bsp_Portal_Header.groups = *int16_tpnt++;
-	Buffer = (char * ) int16_tpnt;
+	Bsp_Portal_Header.groups = in.i16();
 
 	for ( i = 0; i < Bsp_Portal_Header.groups; i++ )
 	{
-		if ( !BSP_LoadPortalGroup( &Bsp_Portal_Header.group[ i ], &Buffer ) )
+		if ( !BSP_LoadPortalGroup( &Bsp_Portal_Header.group[ i ], in ) )
 		{
 			return false;
 		}
@@ -204,9 +171,7 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 	long			Read_Size;
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	int16_t		*	int16_tpnt;
 	int16_t			i;
-	u_int32_t		*	Uint32Pnt;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 
@@ -229,23 +194,20 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 
 	if( Read_Size != File_Size ) return false;
 
-	Uint32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *Uint32Pnt++;
-	VersionNumber = *Uint32Pnt++;
-	Buffer = (char *) Uint32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != BSP_VERSION_NUMBER  ) )
 	{
 		Msg( "Bspload() Incompatible BSP file %s", Filename );
 		return( false );
 	}
-	int16_tpnt = ( int16_t * ) Buffer;
-	Bsp_Header->NumGroups = *int16_tpnt++;
-	Buffer = (char * ) int16_tpnt;
+	Bsp_Header->NumGroups = in.i16();
 
 	for( i = 0 ; i < Bsp_Header->NumGroups ; i++ )
 	{
-		if ( !BSP_Loadtree( &Bsp_Header->Bsp_Tree[ i ], &Buffer ) )
+		if ( !BSP_Loadtree( &Bsp_Header->Bsp_Tree[ i ], in ) )
 		{
 			return false;
 		}

@@ -35,6 +35,7 @@ constexpr int MAX_BSP_MODELS = (2);
 	int		Back;
 	int		Colour;
  }BSP_RAWNODE;
+static_assert( sizeof( BSP_RAWNODE ) == 28, "BSP_RAWNODE is a file record" );
 
 typedef struct BSP_NODE
 {
