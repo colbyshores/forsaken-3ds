@@ -3050,7 +3050,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					// display my version number
 					AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
 					// send my version number back
-					strncpy( (char *)&QuickText.text, PXVersion , sizeof(PXVersion) );
+					strncpy( QuickText.text, PXVersion , sizeof(QuickText.text) - 1 );
 					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_QuickTaunt, 0);
 					QuickText.text[0] = 0; // clean message buffer
 				}
@@ -3403,6 +3403,15 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 						}
 
 			DebugPrintf("MSG_INIT: new_player_id set to %d\n", new_player_id);
+
+			/* The full-game check above leaves a free slot whenever it
+			 * lets a join through; refuse rather than index slot -1 if
+			 * that ever stops being true. */
+			if( new_player_id == -1 )
+			{
+				lpInit->YouAre = MAX_PLAYERS+2;
+				goto send;
+			}
 
 			lpInit->YouAre = (BYTE) new_player_id;	// tell new player who he is
 
