@@ -4425,6 +4425,11 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 {
 	u_int16_t	group;
 
+	/* The model bucket filters on Models[].Visible, which the title
+	 * toggles without creating or killing models (save-game TV, holo
+	 * pad): rebuild it every menu frame, as the game camera does. */
+	ModelVisCache_NewFrame();
+
 	Build_View();
 	CurrentCamera.View = view;
 
