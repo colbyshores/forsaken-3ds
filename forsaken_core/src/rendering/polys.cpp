@@ -1,7 +1,4 @@
-/*===================================================================
-*	p o l y s . c
-*	All routines to do with 3d user defined polygons...
-===================================================================*/
+/* polys.cpp -- world-space textured quads and their per-page batches; see polys.h. */
 #include <stdio.h>
 
 #include "math/new3d.h"
@@ -563,7 +560,7 @@ void AddPolyToTPage( u_int16_t i, int16_t TPage )
 /*===================================================================
 	Procedure	:	Remove Poly From TPage Link List
 	Input		:	u_int16_t		Poly Index
-				:	u_int16_t		TPage to add to
+				:	u_int16_t		TPage to remove from
 	Output		:	Nothing
 ===================================================================*/
 void RemovePolyFromTPage( u_int16_t i, int16_t TPage )
@@ -636,12 +633,12 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject )
 }
 
 /*===================================================================
-	Procedure	:	Display All Faceme Polygons in specific group
+	Procedure	:	Fill one batch of a group's non-solid polys
 	Input		:	u_int16_t						Group
 				:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current Poly
-	Output		:	True/False
+				:	int16_t	*					Current TPage List (in/out)
+				:	u_int16_t	*					Current Poly (in/out)
+	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 
 bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
@@ -667,7 +664,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	int				start_index = 0;
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 	TotalVerts = 0;
 
@@ -711,7 +708,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	renderObject->numTextureGroups = 0;
 
 /*===================================================================
-		Lock Exec Buffer and get ready to fill in...
+		Lock the vertex and index buffers
 ===================================================================*/
 
 	if (!(FSLockVertexBuffer(renderObject, &lpBufStart)))
@@ -729,7 +726,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	PolyVertPnt = (LPLVERTEX) lpBufStart;
 
 /*===================================================================
-		Fill in Exec Buffer ( Verts and Faces Simultaneously )
+		Pass 2: fill verts and indices, one texture group per quad
 ===================================================================*/
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
 	{
@@ -818,6 +815,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 							StartVert += 4;
 
 #ifdef __3DS__
+							/* Mid-draw flush: textureGroups is full (one group per
+							 * quad), so draw what is filled and refill from the
+							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
@@ -848,7 +848,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	}
 
 /*===================================================================
-		UnLock Exec Buffer and set data description
+		Unlock the buffers and return the resume point
 ===================================================================*/
 
 	if (!(FSUnlockVertexBuffer(renderObject)))
@@ -869,11 +869,11 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 }
 
 /*===================================================================
-	Procedure	:	Display All Faceme Polygons in specific group
+	Procedure	:	Fill one batch of non-solid POLY_FLAG_DONTCLIP polys
 	Input		:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current Poly
-	Output		:	True/False
+				:	int16_t	*					Current TPage List (in/out)
+				:	u_int16_t	*					Current Poly (in/out)
+	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
@@ -898,7 +898,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	int				start_index = 0;
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 
 	TotalVerts = 0;
@@ -956,7 +956,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	PolyVertPnt = (LPLVERTEX) lpBufStart;
 
 /*===================================================================
-		Fill in Exec Buffer ( Verts and Faces Simultaneously )
+		Pass 2: fill verts and indices, one texture group per quad
 ===================================================================*/
 
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
@@ -1049,6 +1049,9 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 							StartVert += 4;
 
 #ifdef __3DS__
+							/* Mid-draw flush: textureGroups is full (one group per
+							 * quad), so draw what is filled and refill from the
+							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
@@ -1145,12 +1148,12 @@ bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject )
 }
 
 /*===================================================================
-	Procedure	:	Display All Faceme Polygons in specific group
+	Procedure	:	Fill one batch of a group's POLY_FLAG_SOLID polys
 	Input		:	u_int16_t						Group
 				:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current Poly
-	Output		:	True/False
+				:	int16_t	*					Current TPage List (in/out)
+				:	u_int16_t	*					Current Poly (in/out)
+	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
@@ -1175,7 +1178,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 	int				start_index = 0;
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 	TotalVerts = 0;
 
@@ -1219,7 +1222,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 	renderObject->numTextureGroups = 0;
 
 /*===================================================================
-		Lock Exec Buffer and get ready to fill in...
+		Lock the vertex and index buffers
 ===================================================================*/
 
 	if (!(FSLockVertexBuffer(renderObject, &lpBufStart)))
@@ -1236,7 +1239,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 	PolyVertPnt = (LPLVERTEX) lpBufStart;
 
 /*===================================================================
-		Fill in Exec Buffer ( Verts and Faces Simultaneously )
+		Pass 2: fill verts and indices, one texture group per quad
 ===================================================================*/
 
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
@@ -1327,6 +1330,9 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 							StartVert += 4;
 
 #ifdef __3DS__
+							/* Mid-draw flush: textureGroups is full (one group per
+							 * quad), so draw what is filled and refill from the
+							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
@@ -1357,7 +1363,7 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 	}
 
 /*===================================================================
-		UnLock Exec Buffer and set data description
+		Unlock the buffers and return the resume point
 ===================================================================*/
 
 	if (!(FSUnlockVertexBuffer(renderObject)))
@@ -1378,11 +1384,12 @@ bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int
 }
 
 /*===================================================================
-	Procedure	:	Display All Faceme Polygons in specific group
+	Procedure	:	Fill one batch of POLY_FLAG_SOLID, POLY_FLAG_DONTCLIP
+				:	polys
 	Input		:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List
-				:	u_int16_t	*					Current Poly
-	Output		:	True/False
+				:	int16_t	*					Current TPage List (in/out)
+				:	u_int16_t	*					Current Poly (in/out)
+	Output		:	true if a batch was filled and should be drawn
 ===================================================================*/
 bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
 {
@@ -1407,7 +1414,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	int				start_index = 0;
 
 /*===================================================================
-		Find out how may verts involved in Exec Buffer
+		Pass 1: count verts per texture page
 ===================================================================*/
 	TotalVerts = 0;
 
@@ -1451,7 +1458,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	renderObject->numTextureGroups = 0;
 
 /*===================================================================
-		Lock Exec Buffer and get ready to fill in...
+		Lock the vertex and index buffers
 ===================================================================*/
 
 	if (!(FSLockVertexBuffer(renderObject, &lpBufStart)))
@@ -1468,7 +1475,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	PolyVertPnt = (LPLVERTEX) lpBufStart;
 
 /*===================================================================
-		Fill in Exec Buffer ( Verts and Faces Simultaneously )
+		Pass 2: fill verts and indices, one texture group per quad
 ===================================================================*/
 
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
@@ -1558,6 +1565,9 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 							StartVert += 4;
 
 #ifdef __3DS__
+							/* Mid-draw flush: textureGroups is full (one group per
+							 * quad), so draw what is filled and refill from the
+							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
@@ -1587,7 +1597,7 @@ bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u
 	}
 
 /*===================================================================
-		UnLock Exec Buffer and set data description
+		Unlock the buffers and return the resume point
 ===================================================================*/
 
 	if (!(FSUnlockVertexBuffer(renderObject)))

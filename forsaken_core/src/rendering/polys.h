@@ -1,7 +1,33 @@
-/*==========================================================================
- *  File:       p o l y s . h
- ***************************************************************************/
 #pragma once
+
+/* polys.h -- world-space textured quads (lasers, shields, afterburner trails)
+ *
+ * Polys[] is a fixed pool of MAXPOLYS four-corner quads whose corners are set
+ * explicitly by the owner (weapons in primary.cpp / secondary.cpp, the title
+ * screen, and the afterburner flames DoAfterBurnerEffects keeps per ship), as
+ * opposed to the camera-facing sprites in 2dpolys.h. The pool is per level:
+ * InitPolys (from InitScene) resets it. FindFreePoly / KillUsedPoly move an
+ * entry between the free list and the used list (FirstPolyUsed, walked
+ * through Prev). Each used poly must also be linked into its texture page with
+ * AddPolyToTPage(GetTPage(*Frm_Info, 0)); KillUsedPoly unlinks it, so Frm_Info
+ * must be valid when it is called. ProcessPolys advances laser / INVBITS
+ * animation frames and the shield / INVBITS fades once per frame.
+ *
+ * Drawing is per page: Display*Polys walk PolyTPages from page 0 and call the
+ * matching *PolyDisp* fill, which counts verts per page (pass 1), then writes
+ * one texture group per quad into the shared RENDEROBJECT (pass 2), stopping
+ * at MAXPOLYVERTS and returning the page / poly to resume from; the caller
+ * draws each batch with draw_billboard_object, culling off. "Clipped" fills
+ * take polys of one group (drawn while that group is clipped); "Unclipped"
+ * fills take POLY_FLAG_DONTCLIP polys. The Solid variants take
+ * POLY_FLAG_SOLID polys, which nothing currently creates. Vertex alpha is
+ * always 255; Trans1..4 are not used by the fills.
+ *
+ * On 3DS textureGroups only has MAX_TEXTURE_GROUPS entries, so a fill that
+ * fills it draws the batch mid-fill (unlock, draw, re-lock) and carries on
+ * from the start of the buffers. Only pages 0..MAXTPAGESPERTLOAD-1 are drawn;
+ * the extra PolyTPages slot holds polys whose page is -1.
+ */
 
 /*===================================================================
 	Includes
