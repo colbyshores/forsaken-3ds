@@ -379,6 +379,6 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 	}
 
 	// we can't find it so set it to default for safety
-	strncpy(file,"data\\textures\\defaults.png",sizeof(destination));
+	strncpy(destination,"data\\textures\\default.png",256);
 	DebugPrintf("ERROR: GetTexturePath() could not find %s\n",new_file);
 }
