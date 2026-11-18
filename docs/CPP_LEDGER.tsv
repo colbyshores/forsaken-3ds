@@ -36,7 +36,7 @@ demo	forsaken_core/src/game/demo.cpp	cpp	5d340cc	todo	-	transitive (ramqan bench
 enemies	forsaken_core/src/game/enemies.cpp	cpp	e5af6fc	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 extforce	forsaken_core/src/game/extforce.cpp	cpp	c321b0d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 goal	forsaken_core/src/game/goal.cpp	cpp	61d7466	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-main	forsaken_core/src/game/main.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+main	forsaken_core/src/game/main.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 models	forsaken_core/src/game/models.cpp	cpp	222509b	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 oct2	forsaken_core/src/game/oct2.cpp	cpp	4f65e74	todo	-	PASS fid-ab-20261116 (tier3)	
 pickups	forsaken_core/src/game/pickups.cpp	cpp	5ab8bbd	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -55,7 +55,7 @@ water	forsaken_core/src/game/water.cpp	cpp	571e88b	todo	-	transitive (ramqan ben
 controls	forsaken_core/src/input/controls.cpp	cpp	b2f9f4c	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 math_error	forsaken_core/src/math/math_error.cpp	cpp	d39c0f3	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 new3d	forsaken_core/src/math/new3d.cpp	cpp	a584770	todo	test_new3d,test_quat,test_sphere	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-quat	forsaken_core/src/math/quat.cpp	cpp	bf5252c	done 872d887	test_quat	P1 transitive; P2 PASS fid-ab-20261116-quat	
+quat	forsaken_core/src/math/quat.cpp	cpp	bf5252c	done 610fa35	test_quat	P1 transitive; P2 PASS fid-ab-20261116-quat	
 sphere	forsaken_core/src/math/sphere.cpp	cpp	26191fa	todo	test_sphere,test_checkhitenemy	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 multiplayer	forsaken_core/src/net/multiplayer.cpp	cpp	7a9548f	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 networking	forsaken_core/src/net/networking.cpp	cpp	df67b8d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
@@ -82,18 +82,18 @@ bsp	forsaken_core/src/world/bsp.cpp	cpp	697102f	todo	-	transitive (ramqan bench 
 collision	forsaken_core/src/world/collision.cpp	cpp	372c223	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 node	forsaken_core/src/world/node.cpp	cpp	63f93d5	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
 visi	forsaken_core/src/world/visi.cpp	cpp	386542d	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-music_3ds	forsaken_3ds/src/audio/music_3ds.cpp	cpp	46d152e	done 6f9da6d	-	P2: on-device listen pending (start, loop, level change, title)	was C (platform/backend TU) until the extern "C" removal
-sound_3ds	forsaken_3ds/src/audio/sound_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+music_3ds	forsaken_3ds/src/audio/music_3ds.cpp	cpp	3568753	done c58f4b1	-	P2: on-device listen pending (start, loop, level change, title)	was C (platform/backend TU) until the extern "C" removal
+sound_3ds	forsaken_3ds/src/audio/sound_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
 net_3ds	forsaken_3ds/src/net/net_3ds.cpp	cpp	e60c503	todo	-	transitive (ramqan bench tick240 = master ref); per-module A/B pending	
-controls_3ds	forsaken_3ds/src/platform_3ds/controls_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
-input_3ds	forsaken_3ds/src/platform_3ds/input_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
-main_3ds	forsaken_3ds/src/platform_3ds/main_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
-stubs_3ds	forsaken_3ds/src/platform_3ds/stubs_3ds.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
-render_c3d	forsaken_3ds/src/rendering/render_c3d.cpp	cpp	46d152e	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
-main_sdl	forsaken_pc/src/main_sdl.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
-music_openal	forsaken_pc/src/audio/music_openal.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
-sound_openal	forsaken_pc/src/audio/sound_openal.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
-input_sdl	forsaken_pc/src/input/input_sdl.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
+controls_3ds	forsaken_3ds/src/platform_3ds/controls_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+input_3ds	forsaken_3ds/src/platform_3ds/input_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+main_3ds	forsaken_3ds/src/platform_3ds/main_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+stubs_3ds	forsaken_3ds/src/platform_3ds/stubs_3ds.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+render_c3d	forsaken_3ds/src/rendering/render_c3d.cpp	cpp	3568753	todo	-	A/B REQUIRED (C->C++ front end changes codegen)	was C (platform/backend TU) until the extern "C" removal
+main_sdl	forsaken_pc/src/main_sdl.cpp	cpp	3568753	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
+music_openal	forsaken_pc/src/audio/music_openal.cpp	cpp	3568753	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
+sound_openal	forsaken_pc/src/audio/sound_openal.cpp	cpp	3568753	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
+input_sdl	forsaken_pc/src/input/input_sdl.cpp	cpp	3568753	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
 net_enet_2	forsaken_pc/src/net/net_enet_2.cpp	cpp	f3dbde2	todo	-	n/a (not in 3DS build)	
 net_tracker	forsaken_pc/src/net/net_tracker.cpp	cpp	961da60	todo	-	n/a (not in 3DS build)	
-render_vulkan	forsaken_pc/src/rendering/render_vulkan.cpp	cpp	46d152e	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal
+render_vulkan	forsaken_pc/src/rendering/render_vulkan.cpp	cpp	3568753	todo	-	n/a (not in 3DS build)	was C (platform/backend TU) until the extern "C" removal

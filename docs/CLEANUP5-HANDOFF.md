@@ -29,7 +29,7 @@ playbook; AGENTS.md is the law where they differ.
   to snake_case, no other project's names or prefixes), plain structs +
   free functions remain the default (they already are: `Ships[]`,
   `Enemies[]`), and member functions only where they earn it — value types
-  (QUAT, done in `872d887`) and modules owning private state (the
+  (QUAT, done in `610fa35`) and modules owning private state (the
   `Hunk`/`StereoMemo` pattern). No namespace around anything a C TU
   calls; if a namespace is introduced for C++-only internals it is
   `forsaken`. Replace local `extern "C"` declarations in `.cpp` files with
@@ -63,15 +63,15 @@ configurations; `tools/verify_o0.sh` where `-O2` scheduling differs):
 - Build: header dependencies are tracked on 3DS again (they never were).
 
 Bugs found (separate, labelled commits): `primary.cpp` indexed
-`ModelHeaders` as an array (1c75966); PC joystick names (5d6474b); the C++
-conversion briefly lost the libctru heap override (088b1f0, now guarded).
+`ModelHeaders` as an array (d55f868); PC joystick names (676a572); the C++
+conversion briefly lost the libctru heap override (15b9397, now guarded).
 
-**On-device play test:** 2026-11-17, owner, build 7b095b6 (remaster .3dsx
+**On-device play test:** 2026-11-17, owner, build 5e662a8 (remaster .3dsx
 via ftpd): title + the subway level play well, no regressions seen -- covers
-46d152e (platform TUs / render_c3d as C++), da7b53a (no tracing) and
-8260103 in general play. Emulator (Mandarine r1.2.1) and PC Vulkan
-(lavapipe) title screens match a 09eeb31 baseline. Still worth a targeted
-check: 1c75966 (spot-FX bullets from models, e.g. the reactor core) and
+3568753 (platform TUs / render_c3d as C++), 38d6d96 (no tracing) and
+1b0036a in general play. Emulator (Mandarine r1.2.1) and PC Vulkan
+(lavapipe) title screens match a 7289ffb baseline. Still worth a targeted
+check: d55f868 (spot-FX bullets from models, e.g. the reactor core) and
 the 3DS Visuals menu (stereo debug row removed).
 
 **Data fix, not in git (romfs/ is gitignored):** the volcano lava floor drew
@@ -112,14 +112,14 @@ romfs/ is ever regenerated, rerun the checker. Owner confirmed on hardware.
    `build_matrix.sh`), `verify_identical.sh`/`verify_o0.sh`.
 8. Support channel: `sdmc:/forsaken_boot.log` (tier/texture-pack lines
 9. Two 1998 expressions whose evident intent differs from what they do
-   (kept as-is, spelled out with parentheses and a comment, e28cfba):
+   (kept as-is, spelled out with parentheses and a comment, fb98678):
    `enemies.cpp` `( !Flags ) & AI_BEHAVIOUR_NOBOB` is always 0, so no
    enemy bobs (intent: `!(Flags & AI_BEHAVIOUR_NOBOB)`); `networking.cpp`
    MSG_FUPDATE / MSG_VERYSHORTFUPDATE always set SHIP_MulFire (intent:
    `Flags & (SHIP_SecFire | SHIP_MulFire)`; on the wire). Fix either?
 10. `title.cpp` weapon-order menu: `if (...) Num_Unused_Weapons++;` then
     `redraw = true;` was indented as if both were guarded; redraw is
-    unconditional and stays so (0d51273). Intended?
+    unconditional and stays so (465203f). Intended?
 
 ### Phase 2 progress, night of 2026-11-17/18 (all on `experimental/cpp-phase2`)
 
@@ -127,22 +127,22 @@ Proof per commit: `verify_identical.sh`; where parameter types change C++
 mangled names, objects are additionally compared with symbol and section
 names stripped (instructions, relocation types, data) -- see the commit
 messages. Behaviour-changing commits are bug fixes, each on its own:
-- Sprite regression root cause and stereo/persist fixes (e480d93, e1a820d,
-  c3b905f, 984a69c, 8033d6f); title model bucket (d572e59); level lists +
-  music by name (b43863e).
+- Sprite regression root cause and stereo/persist fixes (6a51f2f, c86713c,
+  2bb3ab7, 094e320, d00d3a7); title model bucket (89f65a6); level lists +
+  music by name (d32c8e6).
 - Bugs found by the warning pass: Print4x5TextSmall fell off a non-void
-  function (b7b52d9); destroy_image cleared sizeof(pointer) (e0536ab);
-  networking join could index slot -1 (e1c6e78); printf formats vs
-  time_t/unsigned long (6c8bb33); the title font's accented characters had
-  been U+FFFD since the 3DS port (16d1342); the missing-texture fallback
-  wrote into the caller's header name and left the path unset (3efae47);
-  wrapped message lines printed past their width (d638bed).
-- Cleanup: write-only data (c835f8a), empty blocks (7191f9f), D3D comment
-  leftovers (95dcef4), `#pragma once` (940be03), a header comment on every
-  header (e237f74), mangled comment banners (dc89833), explicit parentheses
-  (e28cfba), `register` (0e015b9), small warnings (0d51273), bounded string
-  copies (dc5adcb, 4b25138), the last block-scope externs (525a317),
-  const char * for read-only strings (b9ed8a7, f1ca013, 8a330fa).
+  function (32396f3); destroy_image cleared sizeof(pointer) (a959452);
+  networking join could index slot -1 (9db7f5a); printf formats vs
+  time_t/unsigned long (59f05c6); the title font's accented characters had
+  been U+FFFD since the 3DS port (c90a830); the missing-texture fallback
+  wrote into the caller's header name and left the path unset (ec01354);
+  wrapped message lines printed past their width (a4814ce).
+- Cleanup: write-only data (990b525), empty blocks (5d6ca41), D3D comment
+  leftovers (44b4f7e), `#pragma once` (a135403), a header comment on every
+  header (cf8e549), mangled comment banners (f09cf30), explicit parentheses
+  (fb98678), `register` (fb00f9c), small warnings (465203f), bounded string
+  copies (d5511fb, d1163d1), the last block-scope externs (f4b329f),
+  const char * for read-only strings (2cc9d86, 05755f0, dd67c65).
 - 3DS warnings: 1,122 unique -> 17. Left: 16 -Wformat/-Wstringop-truncation
   notes on deliberately bounded copies, and assign_loader unused (decision 5).
 
@@ -150,28 +150,28 @@ The constexpr sweep and the PC warning pass are done; see the next section.
 
 ### Phase 2 progress, rest of the night of 2026-11-18 (`experimental/cpp-phase2`)
 
-None of this is on hardware yet. The 3DS still has FORSAKEN-TEST4 (c3b905f).
+None of this is on hardware yet. The 3DS still has FORSAKEN-TEST4 (2bb3ab7).
 Behaviour-changing commits are bug fixes, each on its own, listed first.
 
 **Bugs fixed (worth a look in the morning):**
 - `pickups.cpp` FilterPickup let `PickupType == MAXPICKUPTYPES` through and
-  read `PickupValid[128]`, one past the end (8155c1b).
+  read `PickupValid[128]`, one past the end (555063c).
 - PC net `net_enet_2.cpp`:
   - find_free_id counted with an `unsigned char`, so `id <= 255` never
-    ended. With id 255 in use it wrapped and could hand out NO_ID (9d5682c).
+    ended. With id 255 in use it wrapped and could hand out NO_ID (1733f38).
   - peer_connected_to's "already in the game" guard read ENet's own peer
     state instead of the game's, so it never fired. A repeated
     connected-to message re-ran new_player(): duplicate player, second
-    NETWORK_JOIN (c3ce729).
+    NETWORK_JOIN (a0c8f2a).
 - `title.cpp` passed the saved-game info (which contains the pilot name) to
   sprintf as the format string. It is also 256 bytes going into 128
-  (01a7cf2).
+  (baff321).
 - **Needs an on-device listen:** `music_3ds` is now one `MusicStream` class
-  (6f9da6d), the first state-owning module done in the Hunk pattern. The
+  (c58f4b1), the first state-owning module done in the Hunk pattern. The
   checks are track start, loop at end of track, level change, and title.
 
 **Proven identical (3DS objects byte-identical, or the stated -O2 allocation-only difference):**
-- **constexpr sweep complete** (d7dffdd, 5f73328, c390056, 69c1090). A
+- **constexpr sweep complete** (f200cac, 679085e, fd9f567, f52484e). A
   numeric macro stays a macro only when one of these holds:
   - the preprocessor tests it;
   - it has several definitions;
@@ -184,22 +184,22 @@ Behaviour-changing commits are bug fixes, each on its own, listed first.
 - **PC `-Wall -Wextra` pass:**
   - Unique warnings went from 2,252 to 997. What remains is almost
     entirely decision 11 below.
-  - Unused variables (6f830f0) and set-but-never-read locals (3eb0e20,
-    59122ba, 7d61450). The -O2 differences there are register allocation,
+  - Unused variables (b36f7b6) and set-but-never-read locals (5173068,
+    3c493dc, 1a10d1e). The -O2 differences there are register allocation,
     plus the dead calls that were removed.
-  - Unused parameters left unnamed as `TYPE /*name*/` (9baddd5).
-  - [[fallthrough]] (6b7e103); printf casts (bcf02e0); Vulkan narrowing
-    (0512c3f); ENet switch and const (243f9e2, cbc0877); sign compare
-    (8dd99aa); always-false unsigned tests (9b9a297).
+  - Unused parameters left unnamed as `TYPE /*name*/` (0c04303).
+  - [[fallthrough]] (e0e37a3); printf casts (0cdcc6b); Vulkan narrowing
+    (49bc50a); ENet switch and const (b56a1e2, 3204d36); sign compare
+    (509766d); always-false unsigned tests (bd902b2).
   - `-Wno-missing-field-initializers`: the menu tables and Vulkan
-    create-info structs rely on zero-fill (256ed04).
+    create-info structs rely on zero-fill (c63d185).
 - **PC Makefile:**
   - The dead C pipeline is gone: `-std=gnu99`, `-fcommon`, the `%.c` rule,
-    and the doubled `$(FLAGS)` (324ddb7).
+    and the doubled `$(FLAGS)` (e8dda5b).
   - The generated shader header's banner no longer trips `-Wcomment`
-    (944f913).
-- `DebugPrintf` uses gettimeofday; the 3DS `ftime` stub is gone (8fafef1).
-- `TargetingWeaponCheat` is declared in `secondary.h` (5e7a1ad).
+    (dd22724).
+- `DebugPrintf` uses gettimeofday; the 3DS `ftime` stub is gone (2fed697).
+- `TargetingWeaponCheat` is declared in `secondary.h` (0995d74).
 - Gate note: a `@vfp-exempt` pin covers findings up to 800 characters below
   it, not only the next line. The two `ZONE_Sphere` pins in `collision.cpp`
   look orphaned but are not.
@@ -241,7 +241,7 @@ shape for `sound_3ds` and `controls_3ds`.
 
 Owner decisions 1, 2, 4 and 5 are resolved by deletion. The tree now holds
 only code that some build compiles, and that compiled code reaches. About
-15,500 lines went, in 49 commits (5a7aeb7..08503a5), one kind of removal
+15,500 lines went, in 49 commits (8587f40..68a5a8e), one kind of removal
 per commit. Fixed point reached: the four checks below find nothing more,
 apart from `ObjectBob`, which waits on decision 9.
 
