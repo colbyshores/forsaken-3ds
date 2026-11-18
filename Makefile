@@ -3,14 +3,13 @@
 #
 
 # for cross compiling be sure to specify your compiler ex:
-# make CC=i686-mingw32-gcc
-CC=gcc
+# make CXX=i686-w64-mingw32-g++
 
 # general compiler settings
 ifeq ($(M32),1)
   FLAGS+= -m32
 endif
-FLAGS+= -std=gnu99 -pipe -fcommon
+FLAGS+= -pipe
 CFLAGS=$(FLAGS) -Wall -Wextra
 LDFLAGS=$(FLAGS)
 
@@ -86,17 +85,13 @@ endif
 
 # Objects go to $(BUILD_PC)/<basename>.o; basenames are unique across trees.
 BUILD_PC=build_pc
-vpath %.c $(SRC_DIRS)
 vpath %.cpp $(SRC_DIRS)
 INC=$(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.h))
-SRC=$(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.c))))
-OBJ=$(patsubst %.c,$(BUILD_PC)/%.o,$(SRC))
-
-# C-with-classes modules (AGENTS.md S9): same flags as C plus the
-# phase-2 language restrictions - banned constructs must not compile.
+# Every translation unit is C++ (C with classes, AGENTS.md S9); the
+# phase-2 language restrictions mean banned constructs must not compile.
 CXXSRC=$(filter-out render_d3d.cpp breakpad.cpp,$(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp)))))
 CXXOBJ=$(patsubst %.cpp,$(BUILD_PC)/%.o,$(CXXSRC))
-OBJ+=$(CXXOBJ)
+OBJ=$(CXXOBJ)
 CXXFLAGS=$(CFLAGS) -std=gnu++17 -fno-exceptions -fno-rtti -fno-threadsafe-statics
 
 # allows user to override settings
@@ -174,15 +169,11 @@ level-lists:
 	done
 
 $(BIN): $(OBJ)
-	$(if $(CXXOBJ),$(CXX),$(CC)) -o $(BIN) $(OBJ) $(LDFLAGS) $(LIB) $(if $(CXXOBJ),-lstdc++)
-
-$(BUILD_PC)/%.o: %.c $(INC)
-	@mkdir -p $(BUILD_PC)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS) $(LIB)
 
 $(BUILD_PC)/%.o: %.cpp $(INC)
 	@mkdir -p $(BUILD_PC)
-	$(CXX) $(FLAGS) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(OBJ): $(INC)
 
@@ -193,7 +184,7 @@ check:
 	@echo
 	@echo "INC = $(INC)"
 	@echo
-	@echo "SRC = $(SRC)"
+	@echo "SRC = $(CXXSRC)"
 	@echo
 	@echo "OBJ = $(OBJ)"
 	@echo
@@ -205,9 +196,9 @@ check:
 	@echo "SDL = $(SDL)"
 	@echo "SDL_ = $(SDL_)"
 	@echo
-	@echo "CC = $(CC)"
+	@echo "CXX = $(CXX)"
 	@echo "BIN = $(BIN)"
-	@echo "CFLAGS = $(CFLAGS)"
+	@echo "CXXFLAGS = $(CXXFLAGS)"
 	@echo "LDFLAGS = $(LDFLAGS)"
 	@echo "LIB = $(LIB)"
 	@echo
