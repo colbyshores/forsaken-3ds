@@ -720,7 +720,6 @@ typedef struct _HEREIAMMSG
 } HEREIAMMSG;
 
 // later we should probably shove these all into a bit stream
-// all the code is hidden away in the repo in the session description functions (search: dwUser)
 // for now this is much simplar and this message is only sent once to new players
 // converting all the bool's to BYTE's (even with all the new added fields) saved 72 bits...
 

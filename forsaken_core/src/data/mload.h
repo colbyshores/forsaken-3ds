@@ -231,15 +231,6 @@ typedef struct MFACE {
 static_assert( sizeof( MFACE ) == 20, "MFACE is a file record" );
 
 
-typedef struct VISPOLVERTEX {
-	float	x;
-	float	y;
-	float	z;
-	DWORD	dwFlags;
-
-} VISPOLVERTEX;
-
-
 /*
  * fn prototypes
  */

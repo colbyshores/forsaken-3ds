@@ -390,7 +390,7 @@ typedef struct OLDLVERTEX {
 	float	x;
 	float	y;
 	float	z;
-	DWORD	dwReserved;
+	DWORD	reserved;
 	COLOR	color;
 	COLOR	specular;
 	float	tu;
