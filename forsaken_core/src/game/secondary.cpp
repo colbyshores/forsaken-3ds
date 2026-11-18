@@ -41,7 +41,6 @@
 
 constexpr auto MISSILE_SPEED = ( MAXMOVESPEED * 1.6F ); // Ship Speed * 1.6
 
-#define TITANBITS_SEND  1
 
 #include "ui/localtitle.h"
 #include "data/config.h"
@@ -3356,9 +3355,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 				CreateExplosionDonut( &SecBulls[ i ].Pos, (VECTOR *) &SecBulls[ i ].ColPointNormal, SecBulls[ i ].GroupImIn );
 				if( ( ( SecBulls[i].OwnerType == OWNER_SHIP )
-#ifdef TITANBITS_SEND	
 						&& ( SecBulls[i].Owner == WhoIAm )
-#endif
 					) ||
 					( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
 					( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
@@ -7255,13 +7252,11 @@ void CreateTitanStarShrapnel( u_int16_t i, VECTOR * Pos, VECTOR * Dir, u_int16_t
 		}
 	}
 
-#ifdef TITANBITS_SEND
 	if( ( SecBulls[ i ].OwnerType == OWNER_SHIP ) && ( SecBulls[ i ].Owner == WhoIAm ) )
 	{
 		TitanBitsSend( SecBulls[i].OwnerType, SecBulls[i].Owner, FirstID, Group, Pos,
 							&DropVector, &UpVector, &DropVector, TITANSTARSHRAPNEL, &Directions[ 0 ] );
 	}
-#endif
 
 }
 
