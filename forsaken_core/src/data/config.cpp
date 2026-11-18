@@ -91,9 +91,6 @@ USERCONFIG default_config = {
 	{ 0, {}  },										// show statistics
 	{ 0, {}  },										// show network info
 	{ 1, { (VirtualKeycode)SDLK_RETURN } },				// send text message
-#ifdef PLAYER_SPEECH_TAUNTS
-	{ 0, {}  },					// send speech taunt
-#endif
 	// weapon selection priorities and orders
 	{
 			5,							// primary #1 priority
@@ -214,9 +211,6 @@ USERCONFIG my_controls = {
 	{ 0, {} },										// show statistics
 	{ 0, {} },										// show network info
 	{ 1, { (VirtualKeycode)SDLK_RETURN } },					// send text message
-#ifdef PLAYER_SPEECH_TAUNTS
-	{ 0, {}  },					// send speech taunt
-#endif
 
 	// weapon selection priorities and orders
 	{
@@ -623,13 +617,6 @@ read_send_text( FILE *f, USERCONFIG *u, char *last_token )
 	return read_keydef( f, &u->send_msg, last_token );
 }
 
-#ifdef PLAYER_SPEECH_TAUNTS
-static int
-read_send_speech( FILE *f, USERCONFIG *u, char *last_token )
-{
-	return read_keydef( f, &u->send_speech, last_token );
-}
-#endif
 
 static int
 read_full_rearview( FILE *f, USERCONFIG *u, char *last_token )
@@ -1403,9 +1390,6 @@ read_config( USERCONFIG *u, char *cfg_name )
 		{ "show_networkinfo",	read_show_networkinfo	},
 		{ "joystick",  		read_joystick_info			},
 		{ "sendtext",  		read_send_text				},
-#ifdef PLAYER_SPEECH_TAUNTS
-		{ "sendspeech",  	read_send_speech		   	},
-#endif
 		{ "full_rearview",  	read_full_rearview	   	},
 		{ "headlights",  		read_headlights 	   	},
 
@@ -1764,9 +1748,6 @@ write_config( USERCONFIG *u, char *cfg_name )
 	write_keydef( f, "PREV2", &u->select_prev_secondary );
 
 	write_keydef( f, "SENDTEXT", &u->send_msg );
-#ifdef PLAYER_SPEECH_TAUNTS
-	write_keydef( f, "SENDSPEECH", &u->send_speech );
-#endif
 	write_keydef( f, "FULL_REARVIEW", &u->full_rear_view );
 	write_keydef( f, "HEADLIGHTS", &u->headlights );
 

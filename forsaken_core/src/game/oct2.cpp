@@ -2001,9 +2001,6 @@ bool RenderScene( void )
     if ( bSoundEnabled )
     {
       ProcessLoopingSfx();
-#ifdef PLAYER_SPEECH_TAUNTS
-      ProcessTaunt();
-#endif
     }
 
     LevelTimeTaken += timer_run( &level_timer );

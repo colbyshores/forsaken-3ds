@@ -761,9 +761,6 @@ DEFKEY KDshow_messages		= { &Config.show_messages, 0 };
 DEFKEY KDshow_stats			= { &Config.show_stats, 0 };
 DEFKEY KDshow_networkinfo	= { &Config.show_networkinfo, 0 };
 
-#ifdef PLAYER_SPEECH_TAUNTS
-DEFKEY KDsend_speech = { &Config.send_speech, 0 };
-#endif
 
 #define KDEF( PAGE, X, Y, LABEL, KEY )\
 		{ (X) +-100, (Y),0, 0, 0, (LABEL), 0, 0, NULL, (void *)(PAGE), NULL, MenuItemDrawPageName, NULL, 0 },\
@@ -2384,9 +2381,6 @@ MENU	MENU_Keyboard =
 		KDEF( 0, 200, 296, (u_int8_t*)LT_MENU_Keyboard11 /*"Slide Mode"*/, KDmove ),
 		KDEF( 0, 200, 312, (u_int8_t*)LT_MENU_Keyboard12 /*"Roll Mode"*/, KDroll ),
 
-#ifdef PLAYER_SPEECH_TAUNTS
-		KDEF( 0, 200, 328,(u_int8_t*)LT_MENU_Keyboard36 /*"speech taunt"*/, KDsend_speech),
-#endif
 
 		// 2nd page
 

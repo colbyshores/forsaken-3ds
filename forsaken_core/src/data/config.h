@@ -106,9 +106,6 @@ typedef struct {
 	USERKEY show_stats;
 	USERKEY show_networkinfo;
 	USERKEY send_msg;
-#ifdef PLAYER_SPEECH_TAUNTS
-	USERKEY send_speech;
-#endif
 	int16_t primary_priority[MAX_PRIMARY_WEAPONS];
 	int16_t primary_order[MAX_PRIMARY_WEAPONS];
 	int16_t secondary_priority[MAX_SECONDARY_WEAPONS];

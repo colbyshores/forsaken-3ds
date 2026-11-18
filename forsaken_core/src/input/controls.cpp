@@ -782,16 +782,6 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
     MenuRestart( &MENU_QuickTextSend );
   }
 
-#ifdef PLAYER_SPEECH_TAUNTS
-  if( key_pressed( &conf->send_speech )  )
-  {
-    PlaySpecificBikerSpeech( SFX_BIKER_TN, Ships[ WhoIAm ].Object.Group, &Ships[WhoIAm].Object.Pos, 0.0F, player_config->bike, -1, false ); // don't update
-    if( MyGameStatus == STATUS_Normal )
-    {
-		SendBikerTaunt(); // (Sfx.c)
-    }
-  }
-#endif
   
 	if ( JoystickInput )
 	{
