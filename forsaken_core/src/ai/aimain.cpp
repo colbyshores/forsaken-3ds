@@ -580,7 +580,7 @@ void AI_AVOIDCHECK( ENEMY * Enemy )
 	}
 
 	// at 4 blocks away the target needs to be within 10 degrees of center to be hit???
-	Cone *= ( 1024.0F * 4.0F * GLOBAL_SCALE ) / Enemy->LastDistance;
+	Cone *= ( 4.0F * BLOCKSIZE ) / Enemy->LastDistance;
 	if( Cone > 90.0F )
 		Cone = 90.0F;
 	if( Cone < 1.0F )
