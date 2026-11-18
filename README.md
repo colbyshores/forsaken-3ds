@@ -140,6 +140,22 @@ either platform.
   via BFS over the preserved portal graph. Runtime engine reads healthy
   data on every level — no flood-fill, no per-frame BFS.
 
+## Repository layout
+
+```
+forsaken_core/   the game (both platforms)
+forsaken_3ds/    3DS platform layer, citro3d renderer, shaders
+forsaken_pc/     PC platform layer, Vulkan renderer
+tests/           host unit tests (make -C tests)
+tools/           build_matrix.sh, verify_identical.sh, perf/ (gates),
+                 assets/ (extractors, banner audio), texture/ (HD pack,
+                 t3x tools), probe/ (memory-tier CIA), net_test/
+assets/          icons, banners, RSFs, level orderings, 1998 engine files
+scripts/         the game's Lua scripts (shipped in romfs)
+docs/            notes/, OPTIMIZATION-LOG.md, KEX decomp (ai_analysis/)
+Configs/ Data/ Pilots/ Demos/ romfs/   game data (not in git)
+```
+
 ## Quick start
 
 ### Build the 3DSX (homebrew launcher)
