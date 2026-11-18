@@ -1,3 +1,5 @@
+/* bgobjects.cpp -- background objects: doors, lifts and animated level parts; see bgobjects.h. */
+
 /*===================================================================
 	Includes
 ===================================================================*/
@@ -539,10 +541,9 @@ void ProcessBGObjects( bool Collide )
 									 * Trade-off: drone Y-rises straight up at wait_node's
 									 * XZ; lift platform mesh may visually pull away on
 									 * slanted shafts.  Better to look slightly off than
-									 * to break parking.  After lift completion, the
-									 * trigger pair (NodeEnable next-wait / NodeDisable
-									 * current-wait) advances the drone's TNode and the
-									 * spline-pick brings it to the next node correctly. */
+									 * to break parking.  When the animation ends, the
+									 * block below advances the drone's TNode to the
+									 * upper node. */
 									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
 									if( upper_node )
 									{
@@ -821,8 +822,8 @@ void KillAllBGObjects( void )
 	Input		:	BGOBJECT	*	Object
 				:	u_int16_t			Owner Type
 				:	u_int16_t			Owner
-				:	int16_t			How
-				:	bool			Override
+				:	int16_t			How ( BUMP / SHOT )
+				:	float			Damage ( multi-step objects only )
 	Output		:	Nothing
 ===================================================================*/
 void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int16_t How, float Damage )
@@ -1075,8 +1076,8 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 
 /*===================================================================
 	Procedure	:	PreLoad All Background Animating Objects
-	Input		:	int8_t	*	Filename
-	Output		:	bool		true/false
+	Input		:	Nothing ( reads the current level's .BGO file )
+	Output		:	bool		true/false ( true if there is no file )
 ===================================================================*/
 bool PreLoadBGOFiles( void )
 {
@@ -1337,7 +1338,7 @@ bool LoadBGOFiles( void )
 
 /*===================================================================
 	Procedure	:	Load Background Object Data
-	Input		:	int8_t		*	Filename of .BGO data
+	Input		:	int8_t		*	Filename of the object's .cob
 				:	int16_t			Type
 				:	VECTOR		*	Pos
 				:	VECTOR		*	DirVector
@@ -1351,7 +1352,7 @@ bool LoadBGOFiles( void )
 				:	int16_t			Open/Activate By
 				:	int16_t			Destroy At End
 				:	int16_t			GenType
-				:	int16_t			Gen Delay
+				:	float			Gen Delay ( seconds )
 				:	int16_t			Locked
 				:	int32_t			Pickup Needed
 				:	u_int16_t		*	BaseModel
@@ -1875,7 +1876,7 @@ void OpenDoor( u_int16_t Index )
 }
 
 /*===================================================================
-	Procedure	:	Open Door
+	Procedure	:	Close Door
 	Input		:	u_int16_t			Index
 	Output		:	Nothing
 ===================================================================*/
@@ -1907,8 +1908,8 @@ void CloseDoor( u_int16_t Index )
 }
 
 /*===================================================================
-	Procedure	:	Display All Collision Zones
-	Input		:	nothing
+	Procedure	:	Display collision zones of objects and enemies in a group
+	Input		:	u_int16_t	Group
 	Output		:	nothing
 ===================================================================*/
 void ShowAllColZones( u_int16_t Group )
@@ -2017,7 +2018,7 @@ void UpdateBGObjectsClipGroup( CAMERA * Camera )
 	Input		:	VECTOR	*	Pos
 				:	VECTOR	*	TopLeft of bounding Box
 				:	VECTOR	*	BottomRight of bounding Box
-	Output		:	Nothing
+	Output		:	float		Distance from Pos to the farthest corner
 ===================================================================*/
 float CalcObjectRadius( VECTOR * Pos, VECTOR * TopLeft, VECTOR * BottomRight )
 {
@@ -2863,7 +2864,7 @@ bool PreLoadFlyGirl( void )
 }
 
 /*===================================================================
-	Procedure	:	Allocate all Components for Ship
+	Procedure	:	Allocate all Components for FlyGirl
 	Input		:	Nothing
 	Output		:	bool	true/false
 ===================================================================*/

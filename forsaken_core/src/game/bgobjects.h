@@ -1,8 +1,33 @@
-/*===================================================================
-	File	:	bgobjects.h
-	Content	:	bgobjects.cpp include file
-===================================================================*/
 #pragma once
+
+/* bgobjects.h -- background objects: doors, lifts and animated level parts
+ *
+ * bgobjects.cpp owns BGObjects[], a fixed pool of level-placed component
+ * objects (.cob hierarchies, see compobjects.h) on used / free lists.
+ * InitBGObjects empties it in InitScene. PreLoadBGOFiles reads the level's
+ * .BGO file and registers each object's models; LoadBGOFiles then creates
+ * the objects in file order, so a trigger event's door / anim index is the
+ * object's position in the .BGO file. KillAllBGObjects frees them when the
+ * level is released. The pool is per level.
+ *
+ * ProcessBGObjects runs once per frame and advances each object by type:
+ * static, door (closed / opening / open for 3 s / closing, reversible),
+ * looping, one-off (optionally exploded and removed at the end) and
+ * multi-step (driven forward by damage dealt to it). When a moving object
+ * hits the local ship or an enemy it pushes and can damage it, pickups are
+ * pushed and mines destroyed; if a ship, enemy or pickup was in the way the
+ * move is undone for that frame and the object's state is sent to the other
+ * players. Bumping or shooting an object goes through ChangeBGState, which
+ * applies the object's trigger mods and decides whether it opens. Trigger
+ * events reach objects through OpenDoor / CloseDoor / LockDoor / UnlockDoor /
+ * StartBGOAnim / StopBGOAnim by index.
+ *
+ * The module also loads the component models for ships (PreLoadShips /
+ * AllocateCompShip, from BikeCompFiles[]) and the title-screen FlyGirl.
+ * Under EDITION_REMASTER, one-off "lift*" objects carry CargoDrone enemies
+ * parked at a lift-base node (node flag 0x40) up with them.
+ */
+
 #include "game/main.h"
 #include "game/camera.h"
 #include "game/constants.h"
@@ -128,7 +153,7 @@ typedef struct BGOBJECT {
 	u_int32_t		SoundFX_ID;
 
 #ifdef EDITION_REMASTER
-	/* Tagged at LoadBGObjectData when the filename matches "lift*.cob".
+	/* Tagged at LoadBGObjectData when the file name starts with "lift".
 	 * The defend2 CargoDrone Y-lerp gate uses this to distinguish lift
 	 * BGOs from lever/door BGOs that happen to be animating while the
 	 * drone is parked at a wait node.  Geometric gates don't suffice:
@@ -148,7 +173,7 @@ typedef struct BGO_FILE {
 	char		Filename[ 256 ];
 	u_int16_t		BaseModel;
 	u_int16_t		Type;
-	int16_t		open_event;	// renamed cause OpenEvent is part of winapi
+	int16_t		open_event;	// Trigger Mod index applied when the door has opened
 	int16_t		CloseEvent;
 	int16_t		ShotEvent;
 	int16_t		BumpEvent;
