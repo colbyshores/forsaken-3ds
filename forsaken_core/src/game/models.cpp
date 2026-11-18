@@ -1,6 +1,5 @@
 #include "util/platform.h"
 
-#define FAST_RGB_CLAMP
 
 
 /*===================================================================
@@ -2949,14 +2948,10 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
 	COLOR				Colour;
-#ifdef FAST_RGB_CLAMP
 	u_int32_t					tempiA;
 	u_int32_t					carry, clamp;
 	u_int32_t					tempiR, tempiG, tempiB;
 	u_int32_t					col_inc, inc_inv, inc_carry;
-#else
-	int r ,g ,b ,a;
-#endif
 
 
 	R -= (int) rp;
@@ -2970,7 +2965,6 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 	if( B < 0 )
 		B = 0;
 
-#ifdef FAST_RGB_CLAMP
 	tempiR = ( (int) -( R ) ) & 0xFF;
 	tempiG = ( (int) -( G ) ) & 0xFF;
 	tempiB = ( (int) -( B ) ) & 0xFF;
@@ -2978,7 +2972,6 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 	col_inc = ( tempiR << 16 ) + ( tempiG << 8 ) + tempiB;
 	inc_inv = col_inc ^ 0x00FFFFFF;
 	inc_carry = ( ( inc_inv + 0x00010101) ^ ( inc_inv ^ 0x00010101 ) ) & 0x01010100;
-#endif
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
@@ -2994,7 +2987,6 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 			while( Vert-- )
 			{
 				Colour = SrclpD3DLVERTEX->color;
-#ifdef FAST_RGB_CLAMP
 				tempiA = Colour & 0xff000000;
 				// for subtraction, simply add the negative
 				carry = ( ( Colour + col_inc ) ^ ( Colour ^ col_inc ) ) & 0x01010100;
@@ -3005,22 +2997,6 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 				clamp = carry - ( carry >> 8 );
 				Colour = ( Colour & clamp ) & 0x00ffffff;
 				Colour |= tempiA;
-#else
-				r = RGBA_GETRED(Colour);
-				g = RGBA_GETGREEN(Colour);
-				b = RGBA_GETBLUE(Colour);
-				a = RGBA_GETALPHA(Colour);
-				r -= R;
-				g -= G;
-				b -= B;
-				if( r < 0 )
-					r = 0;
-				if( g < 0 )
-					g = 0;
-				if( b < 0 )
-					b = 0;
-				Colour = RGBA_MAKE( r, g, b, a);
-#endif
 				DstlpD3DLVERTEX->color = Colour;
 				DstlpD3DLVERTEX++;
 				SrclpD3DLVERTEX++;
@@ -3048,14 +3024,10 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 	u_int16_t					Vert;
 	u_int16_t					ExecBuf;
 	COLOR				Colour;
-#ifdef FAST_RGB_CLAMP
 	u_int32_t					tempiA;
 	u_int32_t					carry, clamp;
 	u_int32_t					tempiR, tempiG, tempiB;
 	u_int32_t					col_inc, inc_inv, inc_carry;
-#else
-	int r ,g ,b ,a;
-#endif
 
 
 	R -= (int) rp;
@@ -3070,7 +3042,6 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 		B = 0;
 
 
-#ifdef FAST_RGB_CLAMP
 	tempiR = ( (int) -( R ) ) & 0xFF;
 	tempiG = ( (int) -( G ) ) & 0xFF;
 	tempiB = ( (int) -( B ) ) & 0xFF;
@@ -3078,7 +3049,6 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 	col_inc = ( tempiR << 16 ) + ( tempiG << 8 ) + tempiB;
 	inc_inv = col_inc ^ 0x00FFFFFF;
 	inc_carry = ( ( inc_inv + 0x00010101) ^ ( inc_inv ^ 0x00010101 ) ) & 0x01010100;
-#endif
 	for( Group = 0; Group < DstMloadheader->num_groups; Group++ )
 	{
 		for( ExecBuf = 0; ExecBuf < DstMloadheader->Group[ Group ].num_execbufs; ExecBuf++ )
@@ -3095,7 +3065,6 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 			while( Vert-- )
 			{
 				Colour = SrclpD3DLVERTEX->color;
-#ifdef FAST_RGB_CLAMP
 				tempiA = Colour & 0xff000000;
 				// for subtraction, simply add the negative
 				carry = ( ( Colour + col_inc ) ^ ( Colour ^ col_inc ) ) & 0x01010100;
@@ -3106,22 +3075,6 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 				clamp = carry - ( carry >> 8 );
 				Colour = ( Colour & clamp ) & 0x00ffffff;
 				Colour |= tempiA;
-#else
-				r = RGBA_GETRED(Colour);
-				g = RGBA_GETGREEN(Colour);
-				b = RGBA_GETBLUE(Colour);
-				a = RGBA_GETALPHA(Colour);
-				r -= R;
-				g -= G;
-				b -= B;
-				if( r < 0 )
-					r = 0;
-				if( g < 0 )
-					g = 0;
-				if( b < 0 )
-					b = 0;
-				Colour = RGBA_MAKE( r, g, b, a);
-#endif
 				DstlpD3DLVERTEX->color = Colour;
 				DstlpD3DLVERTEX++;
 				SrclpD3DLVERTEX++;
