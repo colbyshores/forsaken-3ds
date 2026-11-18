@@ -28,6 +28,7 @@
 #include "util/timer.h"
 #include "game/goal.h"
 #include "game/oct2.h"
+#include "util/file_reader.h"
 
 constexpr int MSG_VERSION_NUMBER = 1;
 
@@ -881,10 +882,8 @@ bool ReadMsgFile( char *Filename )
 	long			Read_Size;
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	int16_t		*	int16Pnt;
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
-	u_int32_t		* u_int32Pnt;
 	TEXTMSGINFO * Tmi;
 	int i;
 
@@ -914,9 +913,9 @@ bool ReadMsgFile( char *Filename )
 	}
 	OrgBuffer = Buffer;
 
-	u_int32Pnt = (u_int32_t*) Buffer;
-	MagicNumber = *u_int32Pnt++;
-	VersionNumber = *u_int32Pnt++;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != MSG_VERSION_NUMBER  ) )
 	{
@@ -925,8 +924,7 @@ bool ReadMsgFile( char *Filename )
 		return( false );
 	}
 
-	int16Pnt = (int16_t*) u_int32Pnt;
-	if( *int16Pnt++ != NumOfTextMessages )
+	if( in.i16() != NumOfTextMessages )
 	{
 		Msg( "ReadMsgFile : .Msg not compatible with .Txt\n" );
 		return( false );
@@ -942,7 +940,7 @@ bool ReadMsgFile( char *Filename )
 	for( i = 0 ; i < NumOfTextMessages ; i++ )
 	{
 		Tmi->Activated = false;
-		Tmi->Type = *int16Pnt++;
+		Tmi->Type = in.i16();
 		Tmi->ActivatedOrder = -1;
 		Tmi++;
 	}
