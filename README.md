@@ -188,10 +188,10 @@ sudo apt install p7zip-full bchunk ffmpeg
 pip install --user yt-dlp demucs   # only if you want to rebuild banner audio
 
 # From a BIN/CUE (gives you music too)
-python3 extract_assets.py "Forsaken (USA).bin"
+python3 tools/assets/extract_assets.py "Forsaken (USA).bin"
 
 # Or from an ISO (game data only — no CD audio)
-python3 extract_assets.py "Forsaken (USA).iso"
+python3 tools/assets/extract_assets.py "Forsaken (USA).iso"
 ```
 
 The script extracts game data, converts CD audio to DSP-ADPCM (via
@@ -210,7 +210,7 @@ crate-menu banners. Two source-of-truth pipelines, pick one:
 
 ```bash
 sudo apt install p7zip-full bchunk ffmpeg
-python3 extract_remaster_levels.py \
+python3 tools/assets/extract_remaster_levels.py \
     ~/.steam/steam/steamapps/common/Forsaken\ Remastered/ForsakenEX.kpf
 make -f Makefile.3ds EDITION=remaster
 ```
@@ -241,8 +241,8 @@ and is copied automatically.
 
 ```bash
 sudo apt install p7zip-full bchunk ffmpeg
-python3 extract_assets.py "Forsaken (USA).bin"
-python3 extract_remaster_levels.py --skip-bulk --skip-runtime \
+python3 tools/assets/extract_assets.py "Forsaken (USA).bin"
+python3 tools/assets/extract_remaster_levels.py --skip-bulk --skip-runtime \
     ~/.steam/steam/steamapps/common/Forsaken\ Remastered/ForsakenEX.kpf
 make -f Makefile.3ds EDITION=remaster
 ```
@@ -321,7 +321,7 @@ Then:
 
 ```bash
 sudo apt install unrar unzip imagemagick
-./regen_hd_textures_4k.sh
+tools/texture/regen_hd_textures_4k.sh
 ```
 
 The script extracts the pack (one-time, cached at `/tmp/4k_pack/`), then

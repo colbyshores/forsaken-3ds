@@ -17,7 +17,7 @@
 # Reproduces the exact file that ships with the CIA. Re-run after any
 # upstream change to the script or the source video.
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../.."   # repository root
 
 # ── tunables ───────────────────────────────────────────────────────────
 SOURCE_URL="https://www.youtube.com/watch?v=xhlmGpsQNT0"

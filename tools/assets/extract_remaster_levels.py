@@ -921,7 +921,8 @@ def main():
         return 1
 
     steam_dir = args.steam_dir or os.path.dirname(os.path.abspath(args.kpf))
-    repo_root = os.path.dirname(os.path.abspath(__file__))
+    # this script lives in tools/assets/
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     ok = True
     # Bulk first — lays down the full Data/ tree from the KPF.

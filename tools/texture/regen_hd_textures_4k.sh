@@ -31,7 +31,7 @@
 # If found as a .rar, the script extracts it into /tmp/4k_pack/ once; the
 # extracted ~7.5 GB tree is cached there for subsequent runs.
 set -e
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/../.."   # repository root
 
 export MAGICK_THREAD_LIMIT=1
 export OMP_NUM_THREADS=1
