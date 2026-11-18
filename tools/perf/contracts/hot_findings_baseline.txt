@@ -45,6 +45,7 @@ R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
 R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
 R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
 R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
+R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
 R2|2dpolys.cpp|SaveFmPolys|float-to-int cast in loop body
 R2|2dpolys.cpp|SaveFmPolys|float-to-int cast in loop body
 R2|2dpolys.cpp|SaveFmPolys|float-to-int cast in loop body
@@ -78,14 +79,6 @@ R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
 R2|lights.cpp|XLight1Group|float-to-int cast in loop body
-R2|lights.cpp|XLight1Group|float-to-int cast in loop body
-R2|lights.cpp|XLight1Group|float-to-int cast in loop body
-R2|lights.cpp|XLight1Group|float-to-int cast in loop body
-R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.cpp|RenderCurrentCamera|untyped-heuristic: float-to-int cast in loop body
-R2|oct2.cpp|RenderScene|untyped-heuristic: float-to-int cast in loop body
 R2|polys.cpp|PolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|PolyDispGroupClipped|float-to-int cast in loop body
 R2|polys.cpp|PolyDispGroupUnclipped|float-to-int cast in loop body
@@ -99,9 +92,6 @@ R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|polys.cpp|SolidPolyDispGroupUnclipped|float-to-int cast in loop body
 R2|primary.cpp|ProcessPrimaryBullets|float-to-int cast in loop body
 R2|render_c3d.cpp|GetRealLightAmbientWorldSpace|float-to-int cast in loop body
-R2|render_c3d.cpp|replay_display_list|float-to-int cast in loop body
-R2|render_c3d.cpp|replay_display_list|untyped-heuristic: float-to-int cast in loop body
-R2|render_c3d.cpp|replay_display_list|untyped-heuristic: float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispNonSolid|float-to-int cast in loop body
 R2|screenpolys.cpp|ScrPolyDispSolid|float-to-int cast in loop body
@@ -115,22 +105,14 @@ R2|visi.cpp|FindVisible|float-to-int cast in loop body
 R2|visi.cpp|FindVisible|float-to-int cast in loop body
 R2|visi.cpp|FindVisible|float-to-int cast in loop body
 R2|visi.cpp|FindVisible|float-to-int cast in loop body
-R4-D|new3d.cpp|spline|double in hot function spline
-R4-D|new3d.cpp|spline|double in hot function spline
-R4-D|new3d.cpp|spline|double in hot function spline
-R4-D|new3d.cpp|spline|double in hot function spline
-R4-D|new3d.cpp|spline|double in hot function spline
-R4-D|new3d.cpp|spline|double in hot function spline
-R4-D|new3d.cpp|spline|double in hot function spline
-R4|new3d.cpp|spline|double/long double in hot path
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
-R4|new3d.cpp|spline|unsuffixed float literal promotes to double
+R2|visi.cpp|FindVisible|float-to-int cast in loop body
+R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
+R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
+R3|models.cpp|ModelDisp|float comparison driving control flow in hot loop
 R4|new3d.cpp|spline|unsuffixed float literal promotes to double
 R4|new3d.cpp|spline|unsuffixed float literal promotes to double
 R4|new3d.cpp|spline|unsuffixed float literal promotes to double
@@ -184,26 +166,11 @@ R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division in hot loop
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
 R7|aispline.cpp|AI_SPLINE_FOLLOWPATH|float division inner_loop=false
-R7|collision.cpp|BackgroundCollideOneGroup|float division inner_loop=false
-R7|collision.cpp|BackgroundCollideOneGroup|float division inner_loop=false
-R7|collision.cpp|BackgroundCollideOneGroup|float division inner_loop=false
-R7|collision.cpp|BackgroundCollideOneGroup|sqrtf inner_loop=false
-R7|collision.cpp|BackgroundCollideOneGroup|sqrtf inner_loop=false
-R7|collision.cpp|BackgroundCollideOneGroup|sqrtf inner_loop=false
 R7|collision.cpp|BackgroundCollide|float division in hot loop
-R7|collision.cpp|BackgroundCollide|float division in hot loop
-R7|collision.cpp|BackgroundCollide|float division in hot loop
-R7|collision.cpp|BackgroundCollide|sqrtf in hot loop
-R7|collision.cpp|BackgroundCollide|sqrtf in hot loop
 R7|collision.cpp|BackgroundCollide|sqrtf in hot loop
 R7|collision.cpp|ColRayPlaneIntersect|float division inner_loop=false
-R7|collision.cpp|ColRayPolyIntersect|float division inner_loop=false
-R7|collision.cpp|ObjectCollideOnly|float division in hot loop
 R7|collision.cpp|ObjectCollide|float division in hot loop
 R7|collision.cpp|QCollide|float division in hot loop
-R7|collision.cpp|RayPolyIntersect|float division inner_loop=false
-R7|collision.cpp|RayPolyIntersect|float division inner_loop=false
-R7|collision.cpp|RayPolyIntersect|float division inner_loop=false
 R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
 R7|lights.cpp|XLight1Group|float division in hot loop
@@ -227,8 +194,6 @@ R7|oct2.cpp|RenderCurrentCameraInStereo|float division inner_loop=false
 R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|oct2.cpp|RenderScene|float division inner_loop=false
-R7|oct2.cpp|RenderScene|float division inner_loop=false
-R7|oct2.cpp|RenderScene|float division inner_loop=false
 R7|polys.cpp|ProcessPolys|float division in hot loop
 R7|polys.cpp|ProcessPolys|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
@@ -252,16 +217,9 @@ R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
 R7|primary.cpp|ProcessPrimaryBullets|float division in hot loop
-R7|quat.cpp|FromMatrix|float division inner_loop=false
-R7|quat.cpp|FromMatrix|float division inner_loop=false
-R7|quat.cpp|FromMatrix|sqrtf inner_loop=false
-R7|quat.cpp|FromMatrix|sqrtf inner_loop=false
 R7|quat.cpp|From2Vectors|sqrtf inner_loop=false
 R7|quat.cpp|FromVector2|float division inner_loop=false
 R7|quat.cpp|FromVector|float division inner_loop=false
-R7|quat.cpp|Inverse|float division inner_loop=false
-R7|quat.cpp|Slerp|float division inner_loop=false
-R7|quat.cpp|Slerp|float division inner_loop=false
 R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
 R7|render_c3d.cpp|GetRealLightAmbientWorldSpace|float division in hot loop
@@ -278,19 +236,6 @@ R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
 R7|render_c3d.cpp|c3d_update_phong_tint_for_object_pos|float division inner_loop=false
-R7|render_c3d.cpp|do_water_effect|float division inner_loop=false
-R7|render_c3d.cpp|do_whiteout_effect|float division inner_loop=false
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
-R7|render_c3d.cpp|draw_render_object|float division in hot loop
 R7|render_c3d.cpp|proctex_phase_from_path|float division inner_loop=false
 R7|screenpolys.cpp|AddScreenPolyTextScale|float division inner_loop=false
 R7|screenpolys.cpp|AddScreenPolyTextScale|float division inner_loop=false
@@ -351,7 +296,6 @@ R7|ships.cpp|ProcessShips|float division in hot loop
 R7|ships.cpp|ProcessShips|float division in hot loop
 R7|ships.cpp|ProcessShips|float division in hot loop
 R7|ships.cpp|ProcessShips|float division in hot loop
-R7|ships.cpp|ProcessShips|float division in hot loop
 R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division in hot loop
@@ -359,22 +303,3 @@ R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division in hot loop
 R7|visi.cpp|FindVisible|float division inner_loop=false
 R9|build_3ds/2dpolys.o|2dpolys|live VFP s-regs N > N
-# 2026-11-17 (Phase 2 dead-code pass): the 14 entries below are NOT new code.
-# Removing #if 0 blocks (objects proven identical by tools/verify_identical.sh)
-# fixed the gate's function attribution: dead duplicate definitions such as an
-# old ObjectCollide under #if 0 had made it attribute these lines elsewhere.
-# They are shipped hot-path debt the gate could not see before.
-R2|2dpolys.cpp|FmPolyProcess|float-to-int cast in loop body
-R2|visi.cpp|FindVisible|float-to-int cast in loop body
-R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
-R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
-R3|collision.cpp|ObjectCollide|float comparison driving control flow in hot loop
-R3|collision.cpp|ObjectCollideOnly|float comparison driving control flow in hot loop
-R3|collision.cpp|ObjectCollideOnly|float comparison driving control flow in hot loop
-R3|collision.cpp|ObjectCollideOnly|float comparison driving control flow in hot loop
-R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
-R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
-R3|collision.cpp|QCollide|float comparison driving control flow in hot loop
-R3|models.cpp|ModelDisp|float comparison driving control flow in hot loop
-R3|screenpolys.cpp|ScrPolyDispNonSolid|float comparison driving control flow in hot loop
-R3|screenpolys.cpp|ScrPolyDispSolid|float comparison driving control flow in hot loop

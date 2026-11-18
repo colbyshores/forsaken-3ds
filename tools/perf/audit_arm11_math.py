@@ -9,7 +9,7 @@ Two screens, both feeding the SAME baseline ratchet as gates_vfp
 (``contracts/hot_findings_baseline.txt``) under rules TRIG and R4-D:
 
   TRIG   Raw libm trig in a compiled root source must sit in a policy exception
-         (new3d.cpp LUT construction, title.c cold title) or carry an
+         (new3d.cpp LUT construction) or carry an
          ``@vfp-exempt R6`` pin; otherwise it must move to fast_sinf/fast_cosf.
 
   R4-D   ``double`` residue inside a corpus-hot function without an
@@ -56,7 +56,6 @@ DOUBLE_RE = re.compile(r"\bdouble\b")
 # Policy exceptions, keyed by root file name.
 ALLOWED_FILES: dict[str, str] = {
     "new3d.cpp": "ALLOWED-LUT-CONSTRUCTION",  # was new3d.c pre-conversion
-    "title.c": "ALLOWED-COLD-TITLE",
 }
 
 # Files whose gameplay math is ported in DOUBLE on purpose. Empty for now: each

@@ -217,7 +217,6 @@ Standing exemptions (corpus, not source comments):
 | E-LUT-2 | new3d.h:fast_cosf | R2,R3 | yes | Wraps fast_sinf; same range reduction |
 | E-LUT-3 | new3d.cpp:trig_table_init | R4,R6 | yes | COLD table build; libm sinf is the reference |
 | E-LUT-4 | new3d.h:fast_invsqrtf | R7 | yes | 1/sqrtf is the shipped policy (VFPv2 vsqrt) |
-| E-TITLE-1 | title.c | R6 | yes | Title/menu is COLD; ATAND/atan2f at title.c:4697 is one cold site |
 
 **Baseline ≠ exemption.** `contracts/hot_findings_baseline.txt` and
 `contracts/r11_candidates_baseline.txt` are the adoption-day debt list:
