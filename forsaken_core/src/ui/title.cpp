@@ -2677,10 +2677,8 @@ MENU	MENU_InGame = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGameMenu 
 					  OLDMENUITEM( 200, 240, (u_int8_t*)LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
 				
  					  OLDMENUITEM( 200, 256, (u_int8_t*)LT_MENU_InGame24 /*"Watch Player"*/, NULL, &MENU_Watch_Options, MenuChange, MenuItemDrawName),
-#ifndef EXTERNAL_DEMO
 #ifdef DEBUG_ON
 					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
-#endif
 #endif
 					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),
@@ -2710,10 +2708,8 @@ MENU	MENU_InGameSingle = { (u_int8_t*)LT_MENU_InGame0 /*"Forsaken"*/ , InitInGam
 #ifndef __3DS__
 					  OLDMENUITEM( 200, 240, (u_int8_t*)LT_MENU_InGame25 /*"Quit to desktop"			*/,	NULL,						NULL,					SelectQuit,				MenuItemDrawName),
 #endif
-#ifndef EXTERNAL_DEMO
 #ifdef DEBUG_ON
 					  OLDMENUITEM( 200, 272, (u_int8_t*)LT_MENU_InGame11 /*"Debugging"					*/,	&DebugInfo,					(void*)DebugModeChanged,		SelectToggle,			DrawToggle),
-#endif
 #endif
 					  OLDMENUITEM( 200, 304, (u_int8_t*)LT_MENU_InGame14 /*"Save Menu"					*/,	NULL,						&MENU_Save,				MenuChange,				MenuItemDrawName),
 					  OLDMENUITEM( 200, 320, (u_int8_t*)LT_MENU_InGame15 /*"Debug Menu"				*/,	NULL,						&MENU_DebugMode,		MenuChange,				MenuItemDrawName),

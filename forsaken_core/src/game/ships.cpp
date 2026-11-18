@@ -70,9 +70,6 @@ u_int32_t TeamFlagMask[ MAX_TEAMS ] = {
 	SHIP_CarryingFlag4,
 };
 
-#ifdef DEMO_SUPPORT
-extern	LONGLONG	GameElapsedTime;
-#endif
 
 											// this tells the drones what status the host thinks hes in..
 
@@ -576,10 +573,6 @@ bool SetUpShips()
 	return true;
 }
 
-#ifdef DEMO_SUPPORT
-static	LONGLONG	TempTime;
-static	LONGLONG	TempTime2;
-#endif
 
 
 bool ProcessShips()
@@ -1231,46 +1224,6 @@ bool ProcessShips()
 					if( ShipObjPnt->Mode != LIMBO_MODE && ShipObjPnt->Mode != WATCH_MODE)
 					{
 
-#ifdef DEMO_SUPPORT
-
-						// playing demo
-						if( 
-							(MyGameStatus == STATUS_PlayingDemo) &&
-							ShipPnt->DemoInterpolate &&
-							(ShipObjPnt->Mode != GAMEOVER_MODE) 
-						)
-						{
-							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							TempTime = ShipPnt->NextTime - ShipPnt->OldTime;
-							TempTime2 = GameElapsedTime - ShipPnt->OldTime;
-
-							if( TempTime <= 5 )
-							{
-								Interp = 0.0F;
-							}
-							
-							Interp = (float) ( ( 1.0F / (float ) TempTime ) * (float) TempTime2);
-							if( (Interp >= 0.0F) && (Interp <= 1.001F) )
-							{
-								Interp = -Interp;
-								ShipObjPnt->Pos.x = ShipPnt->OldPos.x + ( ( ShipPnt->OldPos.x - ShipPnt->NextPos.x ) * Interp);
-								ShipObjPnt->Pos.y = ShipPnt->OldPos.y + ( ( ShipPnt->OldPos.y - ShipPnt->NextPos.y ) * Interp);
-								ShipObjPnt->Pos.z = ShipPnt->OldPos.z + ( ( ShipPnt->OldPos.z - ShipPnt->NextPos.z ) * Interp);
-								
-								ShipPnt->OldQuat.Slerp(-Interp, &ShipPnt->NextQuat, &ShipObjPnt->Quat, 0);
-								
-								ShipObjPnt->Bank = ShipPnt->OldBank + ( ( ShipPnt->OldBank - ShipPnt->NextBank ) * Interp);
-							}
-							else
-							{
-								Interp = 0.0F;
-							}
-
-						}
-						// not playing a demo
-						else
-
-#endif
 						{
 								// carry out movements
 								Move_Off.x = ShipPnt->Move_Off.x * framelag;

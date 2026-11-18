@@ -45,11 +45,7 @@ bool TintBikeTeamColor;
 bool MyResetKillsPerLevel;
 bool IpOnCLI = false;
 
-#ifdef DEMO_SUPPORT
-#endif
 
-#ifdef DEMO_SUPPORT
-#endif
 
 /*
  * Globals to this module
@@ -172,9 +168,6 @@ void StartAHostSession ( MENUITEM * Item )
 	CopyOfSeed2 = Seed2;
 
 	
-#ifdef DEMO_SUPPORT
-	PlayDemo = false;
-#endif
 
 	IsHost = true;
 
@@ -270,80 +263,6 @@ void StartAHostSession ( MENUITEM * Item )
 	}
 
 
-#ifdef DEMO_SUPPORT
-	if( RecordDemo )
-	{
-		u_int32_t mp_version = MULTIPLAYER_VERSION;
-		u_int32_t flags;
-		time_t now_time;
-		struct tm *now;
-
-		RecordDemo = true;
-		time( &now_time );
-		now = localtime( &now_time );
-#ifndef HOST_CHOOSES_DEMO_NAME
-		if ( now )
-		{
-			sprintf( DemoGameName.text, "%s's Demo %d.%02d %d-%d-%d",
-				biker_name,
-				now->tm_hour, now->tm_min,
-				1 + now->tm_mon, now->tm_mday,
-				1900 + now->tm_year );
-		}
-		else
-		{
-			sprintf( DemoGameName.text, "%s's Demo",
-				biker_name );
-		}
-#endif
-		DemoFp = file_open( DemoFileName( DemoGameName.text ) , "wb" );
-		setvbuf( DemoFp, NULL, _IONBF , 0 );		// size of stream buffer...
-
-		Demo_fwrite( &mp_version, sizeof( mp_version ), 1, DemoFp );
-		flags = 0;
-		if( TeamGame )
-			flags |= TeamGameBit;
-		if( CTF )
-			flags |= CTFGameBit;
-		if( CaptureTheFlag )
-			flags |= FlagGameBit;
-		if ( BountyHunt )
-			flags |= BountyGameBit;
-
-		Demo_fwrite( &CopyOfSeed1, sizeof( CopyOfSeed1 ), 1, DemoFp );
-		Demo_fwrite( &CopyOfSeed2, sizeof( CopyOfSeed2 ), 1, DemoFp );
-		Demo_fwrite( &RandomPickups, sizeof( RandomPickups ), 1, DemoFp );
-		PackPickupInfo( &PackedInfo[ 0 ] );
-		Demo_fwrite( &PackedInfo[ 0 ], sizeof( PackedInfo ), 1, DemoFp );
-
-		Demo_fwrite( &flags, sizeof( flags ), 1, DemoFp );
-		Demo_fwrite( &RandomStartPosModify, sizeof( RandomStartPosModify ), 1, DemoFp );
-		for( i = 0 ; i < 256 ; i++ )
-		{
-			Demo_fwrite( &ShortLevelNames[NewLevelNum][i], sizeof(char), 1, DemoFp );
-			if( ShortLevelNames[NewLevelNum][i] == 0 )
-			{
-				break;
-			}
-		}
-
-		// Best way I can Think of to send the Host Name to the demo file...
-		Temp = 1;
-		ms = 1;
-		Demo_fwrite( &ms, sizeof(LONGLONG), 1, DemoFp );
-		size = sizeof( NAMEMSG );
-		Demo_fwrite( &size, sizeof(int), 1, DemoFp );
-		Demo_fwrite( &Temp, sizeof(DWORD), 1, DemoFp );
-		msg = MSG_NAME;
-		Demo_fwrite( &msg, sizeof(BYTE), 1, DemoFp );
-		msg = 0;
-		Demo_fwrite( &msg, sizeof(BYTE), 1, DemoFp );				// Whos Name it is..
-		Demo_fwrite( &biker_name[0], 7, 1, DemoFp );
-		msg = 0;
-		Demo_fwrite( &msg, sizeof(BYTE), 1, DemoFp );				// terminator for name..
-
-	}
-#endif
 	
 	BrightShips = MyBrightShips;
 

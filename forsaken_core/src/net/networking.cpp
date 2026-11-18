@@ -90,18 +90,9 @@ void SetShipBankAndMat( OBJECT * ShipObjPnt );
 
 int16_t	MaxKills = 0;
 
-#ifdef DEMO_SUPPORT
-extern	LONGLONG	DemoStartedTime;		// when the game started
-extern	LONGLONG	DemoEndedTime;		// when the game started
-extern	int32_t		DemoGameLoops;
-extern	LONGLONG	TimeDiff;
-extern	LONGLONG	Freq;
-#endif
 
 extern	float	DemoAvgFps;
 
-#ifdef DEMO_SUPPORT
-#endif
 
 bool	CanDoDamage[MAX_PLAYERS+1];
 
@@ -117,12 +108,6 @@ SHIPHEALTHMSG PlayerHealths[ MAX_PLAYERS+1 ];
 u_int8_t ShipHealthColour[ MAX_PLAYERS+1 ];
 float ShipHealthColourInterval[ MAX_PLAYERS+1 ];
 
-#ifdef DEMO_SUPPORT
-extern	LONGLONG	GameStartedTime;
-extern	LONGLONG	GameElapsedTime;
-LONGLONG	TempTime;
-LONGLONG	DemoTimeSoFar = 0;
-#endif
 
 int16_t	BikeModels[ MAXBIKETYPES ] = {
 
@@ -811,10 +796,6 @@ void SetupNetworkGame()
 	RealPacketSize[MSG_SHORTREGENSLOT]                 = sizeof(SHORTREGENSLOTMSG);
 	RealPacketSize[MSG_SHORTTRIGGER]                   = sizeof(SHORTTRIGGERMSG);
 	RealPacketSize[MSG_SHORTTRIGVAR]                   = sizeof(SHORTTRIGVARMSG);
-#ifdef DEMO_SUPPORT
-	RealPacketSize[MSG_INTERPOLATE]                    = sizeof(INTERPOLATEMSG);
-	RealPacketSize[MSG_VERYSHORTINTERPOLATE]           = sizeof(VERYSHORTINTERPOLATEMSG);
-#endif
 	RealPacketSize[MSG_BGOUPDATE]                      = sizeof(BGOUPDATEMSG);
 	RealPacketSize[MSG_LONGSTATUS]                     = sizeof(LONGSTATUSMSG);
 	RealPacketSize[MSG_SETTIME]                        = sizeof(SETTIMEMSG);
@@ -1215,17 +1196,6 @@ void network_event_player_joined( network_player_t * player )
 
 void network_event_new_message( network_player_t * from, BYTE * data, int size )
 {
-#ifdef DEMO_SUPPORT
-	QueryPerformanceCounter((LARGE_INTEGER *) &TempTime);
-	if( RecordDemo && ( MyGameStatus == STATUS_Normal ) )
-	{
-		TempTime -= GameStartedTime;
-		Demo_fwrite( &TempTime, sizeof(LONGLONG), 1, DemoFp );
-		Demo_fwrite( &size, sizeof(size), 1, DemoFp );
-		Demo_fwrite( &from_network_id, sizeof(from_network_id), 1, DemoFp );
-		Demo_fwrite( MsgPnt, nBytes , 1, DemoFp );
-	}
-#endif
 	RecPacketSize = size;
 	if ( RecPacketSize > MaxRecPacketSize )
 		MaxRecPacketSize = RecPacketSize;
@@ -1347,10 +1317,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
     LPSHORTTRIGVARMSG				lpShortTrigVar;
     LPSHORTMINEMSG					lpShortMine;
     LPTEXTMSG								lpTextMsg;
-#ifdef DEMO_SUPPORT
-	LPINTERPOLATEMSG					lpInterpolate;
-	LPVERYSHORTINTERPOLATEMSG	lpVeryShortInterpolate;
-#endif
 	LPBIKENUMMSG						lpBikeNumMsg;
 	LPYOUQUITMSG						lpYouQuitMsg;
 	LPNETSETTINGSMSG					lpNetSettingsMsg;
@@ -1450,10 +1416,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	switch (*MsgPnt)
 	{
-#ifdef DEMO_SUPPORT
-	case MSG_INTERPOLATE:
-	case MSG_VERYSHORTINTERPOLATE:
-#endif
 	case MSG_NETSETTINGS:
 	case MSG_TEAMGOALS:
 	case MSG_YOUQUIT:
@@ -1942,24 +1904,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				if( lpVeryShortUpdate->ShortGlobalShip.Flags & SHIP_IsHost  )
 					OverallGameStatus = lpVeryShortUpdate->ShortGlobalShip.Status;
 				
-#ifdef DEMO_SUPPORT
-					if( CheckForName( lpVeryShortUpdate->WhoIAm ) )
-					{
-						if( RecordDemo )
-						{
-							// Best way I can Think of to send the names to the demo file...
-							TempTime = 1;
-							Demo_fwrite( &TempTime, sizeof(LONGLONG), 1, DemoFp );
-							size = sizeof( NAMEMSG );
-							Demo_fwrite( &size, sizeof(int), 1, DemoFp );
-							Demo_fwrite( &my_network_id, sizeof(DPID), 1, DemoFp );
-							msg = MSG_NAME;
-							Demo_fwrite( &msg, sizeof(BYTE), 1, DemoFp );
-							Demo_fwrite( &lpVeryShortUpdate->WhoIAm, sizeof(BYTE), 1, DemoFp );
-							Demo_fwrite( &Names[lpVeryShortUpdate->WhoIAm][0], 8, 1, DemoFp );
-						}
-					}
-#endif
 
 				if( ( ( OldMode == DEATH_MODE ) && ( Ships[lpVeryShortUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
 					( ( OldMode == NORMAL_MODE ) && ( Ships[lpVeryShortUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
@@ -2041,24 +1985,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				if( lpUpdate->ShortGlobalShip.Flags & SHIP_IsHost  )
 					OverallGameStatus = lpUpdate->ShortGlobalShip.Status;
 
-#ifdef DEMO_SUPPORT
-					if( CheckForName( lpUpdate->WhoIAm ) )
-					{
-						if( RecordDemo )
-						{
-							// Best way I can Think of to send the names to the demo file...
-							TempTime = 1;
-							Demo_fwrite( &TempTime, sizeof(LONGLONG), 1, DemoFp );
-							size = sizeof( NAMEMSG );
-							Demo_fwrite( &size, sizeof(int), 1, DemoFp );
-							Demo_fwrite( &my_network_id, sizeof(DPID), 1, DemoFp );
-							msg = MSG_NAME;
-							Demo_fwrite( &msg, sizeof(BYTE), 1, DemoFp );
-							Demo_fwrite( &lpUpdate->WhoIAm, sizeof(BYTE), 1, DemoFp );
-							Demo_fwrite( &Names[lpUpdate->WhoIAm][0], 8, 1, DemoFp );
-						}
-					}
-#endif
 
 				if( ( ( OldMode == DEATH_MODE ) && ( Ships[lpUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
 					( ( OldMode == NORMAL_MODE ) && ( Ships[lpUpdate->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
@@ -2777,27 +2703,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			// update network pointer and name
 			UpdatePlayer( from, lpStatus->WhoIAm );
 
-#ifdef DEMO_SUPPORT
-			if( !PlayDemo )
-			{
-				if( CheckForName( lpStatus->WhoIAm ) )
-				{
-					if( RecordDemo )
-					{
-						// Best way I can Think of to send the names to the demo file...
-						TempTime = 1;
-						Demo_fwrite( &TempTime, sizeof(LONGLONG), 1, DemoFp );
-						size = sizeof( NAMEMSG );
-						Demo_fwrite( &size, sizeof(int), 1, DemoFp );
-						Demo_fwrite( &my_network_id, sizeof(DPID), 1, DemoFp );
-						msg = MSG_NAME;
-						Demo_fwrite( &msg, sizeof(BYTE), 1, DemoFp );
-						Demo_fwrite( &lpStatus->WhoIAm, sizeof(BYTE), 1, DemoFp );
-						Demo_fwrite( &Names[lpStatus->WhoIAm][0], 8, 1, DemoFp );
-					}
-				}
-			}
-#endif
 		}
 
 		return;
@@ -2893,27 +2798,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		// update network pointer and name
 		UpdatePlayer( from, lpLongStatus->WhoIAm );
 
-#ifdef DEMO_SUPPORT
-		if( !PlayDemo )
-		{
-			if( CheckForName( lpLongStatus->WhoIAm ) )
-			{
-				if( RecordDemo )
-				{
-					// Best way I can Think of to send the names to the demo file...
-					TempTime = 1;
-					Demo_fwrite( &TempTime, sizeof(LONGLONG), 1, DemoFp );
-					size = sizeof( NAMEMSG );
-					Demo_fwrite( &size, sizeof(int), 1, DemoFp );
-					Demo_fwrite( &my_network_id, sizeof(DPID), 1, DemoFp );
-					msg = MSG_NAME;
-					Demo_fwrite( &msg, sizeof(BYTE), 1, DemoFp );
-					Demo_fwrite( &lpLongStatus->WhoIAm, sizeof(BYTE), 1, DemoFp );
-					Demo_fwrite( &Names[lpLongStatus->WhoIAm][0], 8, 1, DemoFp );
-				}
-			}
-		}
-#endif
 
 		return;
 
@@ -3115,42 +2999,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		}
 		return;
 
-#ifdef DEMO_SUPPORT
-
-    case MSG_INTERPOLATE:
-
-		lpInterpolate = (LPINTERPOLATEMSG)MsgPnt;
-		Ships[lpInterpolate->WhoIAm].OldPos = Ships[lpInterpolate->WhoIAm].Object.Pos;
-		Ships[lpInterpolate->WhoIAm].NextPos = lpInterpolate->NextPos;
-		Ships[lpInterpolate->WhoIAm].OldQuat = Ships[lpInterpolate->WhoIAm].Object.Quat;
-		Ships[lpInterpolate->WhoIAm].NextQuat = lpInterpolate->NextQuat;
-		Ships[lpInterpolate->WhoIAm].OldBank = Ships[lpInterpolate->WhoIAm].Object.Bank;
-		Ships[lpInterpolate->WhoIAm].NextBank = lpInterpolate->NextBank;
-		Ships[lpInterpolate->WhoIAm].OldTime = DemoTimeSoFar;
-		Ships[lpInterpolate->WhoIAm].NextTime = lpInterpolate->NextTime;
-		Ships[lpInterpolate->WhoIAm].DemoInterpolate = true;
-		return;
-
-    case MSG_VERYSHORTINTERPOLATE:
-
-		lpVeryShortInterpolate = (LPVERYSHORTINTERPOLATEMSG)MsgPnt;
-		Ships[lpVeryShortInterpolate->WhoIAm].NextPos.x		= (float) lpVeryShortInterpolate->NextPos.x;
-		Ships[lpVeryShortInterpolate->WhoIAm].NextPos.y		= (float) lpVeryShortInterpolate->NextPos.y;
-		Ships[lpVeryShortInterpolate->WhoIAm].NextPos.z		= (float) lpVeryShortInterpolate->NextPos.z;
-		Ships[lpVeryShortInterpolate->WhoIAm].NextQuat.w	= (float)(lpVeryShortInterpolate->NextQuat.w * ONEOVER32767 );
-		Ships[lpVeryShortInterpolate->WhoIAm].NextQuat.x	= (float)(lpVeryShortInterpolate->NextQuat.x * ONEOVER32767 );
-		Ships[lpVeryShortInterpolate->WhoIAm].NextQuat.y	= (float)(lpVeryShortInterpolate->NextQuat.y * ONEOVER32767 );
-		Ships[lpVeryShortInterpolate->WhoIAm].NextQuat.z	= (float)(lpVeryShortInterpolate->NextQuat.z * ONEOVER32767 );
-		Ships[lpVeryShortInterpolate->WhoIAm].NextBank		= (float) (lpVeryShortInterpolate->NextBank / SHORTBANKMODIFIER);
-		Ships[lpVeryShortInterpolate->WhoIAm].NextTime		= lpVeryShortInterpolate->NextTime;
-		Ships[lpVeryShortInterpolate->WhoIAm].DemoInterpolate = true;
-		Ships[lpVeryShortInterpolate->WhoIAm].OldPos			= Ships[lpVeryShortInterpolate->WhoIAm].Object.Pos;
-		Ships[lpVeryShortInterpolate->WhoIAm].OldQuat		= Ships[lpVeryShortInterpolate->WhoIAm].Object.Quat;
-		Ships[lpVeryShortInterpolate->WhoIAm].OldBank		= Ships[lpVeryShortInterpolate->WhoIAm].Object.Bank;
-		Ships[lpVeryShortInterpolate->WhoIAm].OldTime		= DemoTimeSoFar;
-		return;
-
-#endif
 
     case MSG_SETTIME:
 
@@ -3987,29 +3835,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 send:
 	
 	// only record if message is sent to whole of the group....
-#ifdef DEMO_SUPPORT
-	if( RecordDemo )
-	{
-		if(
-		   ( MyGameStatus == STATUS_Normal )
-		&& ( !to )
-		&& ( msg != MSG_INIT ) 
-		&& ( msg != MSG_HEREIAM ) 
-		&& ( msg != MSG_SHORTPICKUP    ) 
-		&& ( msg != MSG_SHORTREGENSLOT ) 
-		&& ( msg != MSG_SHORTTRIGGER   ) 
-		&& ( msg != MSG_SHORTTRIGVAR   ) 
-		&& ( msg != MSG_SHORTMINE      ) )
-		{
-			QueryPerformanceCounter((LARGE_INTEGER *) &TempTime);
-			TempTime = TempTime - GameStartedTime;
-			Demo_fwrite( &TempTime, sizeof(LONGLONG), 1, DemoFp );
-			Demo_fwrite( &nBytes, sizeof(int), 1, DemoFp );
-			Demo_fwrite( &my_network_id, sizeof(DPID), 1, DemoFp );
-			Demo_fwrite( &CommBuff[0], nBytes, 1, DemoFp );
-		}
-	}
-#endif
 
 	BytesPerSecSent += nBytes;
 
@@ -4028,70 +3853,6 @@ send:
 
 void DemoPlayingNetworkGameUpdate()
 {
-#ifdef DEMO_SUPPORT
-    DWORD               nBytes;
-	int i;
-	size_t	size;
-
-	while( 1 && DemoFp)
-	{
-		if( DemoTimeSoFar )
-		{
-			if( DemoTimeSoFar > GameElapsedTime )
-			{
-			 	if (ferror(DemoFp) || feof(DemoFp) )
-				{
-					fclose( DemoFp );
-					DemoFp = NULL;
-					SpecialDestroyGame();
-					return;
-				}
-				return;
-			}
-		}else{
-			size = fread( &DemoTimeSoFar , sizeof(LONGLONG), 1, DemoFp );
-			if( size != 1 || ferror(DemoFp) || feof(DemoFp) ) 
-			{
-				PreDemoEndMyGameStatus = MyGameStatus;
-
-				if( Debug )
-					for( i = 0 ; i < 256 ; i++ )
-						if( PacketGot[i] )
-							DebugPrintf("num %3d quantity %12d size %12d\n", i, PacketGot[i] , PacketSize[i] );
-								
-				QueryPerformanceCounter((LARGE_INTEGER *) &DemoEndedTime);
-
-				fclose( DemoFp );
-				DemoFp = NULL;
-
-				SpecialDestroyGame();
-
-				TimeDiff = DemoEndedTime - DemoStartedTime;
-				DemoAvgFps = DemoGameLoops /  ( (float) TimeDiff / (float) Freq );
-//				DebugPrintf("Average Demo Framrate %d.%02d\n",   (int)( DemoAvgFps * 100 ) / 100,
-//															 	(int)( DemoAvgFps * 100 ) % 100 
-//															 	);                       
-//				DebugPrintf("In %d Gameloops\n",DemoGameLoops);
-			
-				
-				return;
-			}
-	
-			if( DemoTimeSoFar > GameElapsedTime )
-				return;
-		}
-		
-		fread( &nBytes , sizeof(DWORD), 1, DemoFp );
-		fread( &from_network_id , sizeof(DPID), 1, DemoFp );
-		fread( &ReceiveCommBuff[0] , nBytes , 1, DemoFp );
-		
-		// During Demo Playback we dont want to interperate any System messages....
-		if ( from_network_id != DPID_SYSMSG ) EvaluateMessage( nBytes , &ReceiveCommBuff[0] );
-		DemoTimeSoFar = 0;
-
-  
-	}
-#endif
 }
 
 
