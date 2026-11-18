@@ -60,7 +60,7 @@ typedef struct CONDITION{
 
 typedef struct EVENT{
 	BYTE	Type;				// Which type of event to trigger..
-	BYTE	Data[MAXDATAPEREVENT];
+	alignas( 2 ) BYTE	Data[MAXDATAPEREVENT];	// event arguments; the handlers read them as u_int16_t
 }EVENT;
 
 typedef struct TRIGGERVAR{

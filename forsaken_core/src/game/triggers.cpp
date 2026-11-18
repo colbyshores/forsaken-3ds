@@ -30,6 +30,7 @@
 #include "util/util.h"
 #include "game/oct2.h"
 #include "world/node.h"
+#include "util/file_reader.h"
 
 
 /*===================================================================
@@ -727,9 +728,6 @@ bool Triggerload( char * Filename )
 	long			Read_Size;
 	char		*	Buffer;
 	char		*	OrgBuffer;
-	int			*	intpnt;
-	u_int8_t		*	byteptr;
-	float		*	floatptr;
 	int			i, j, k;
 	TRIGGERVAR	*	v;
 	TRIGGER		*	t;
@@ -738,7 +736,6 @@ bool Triggerload( char * Filename )
 	CONDITION	*	c;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
-	u_int32_t		*	u_int32Pnt;
 	TRIGGERVAR	*	TVpnt;
 
 
@@ -770,18 +767,15 @@ bool Triggerload( char * Filename )
 	if( Read_Size != File_Size )
 		return false;
 
-	u_int32Pnt = (u_int32_t *) Buffer;
-	MagicNumber = *u_int32Pnt++;
-	VersionNumber = *u_int32Pnt++;
-	Buffer = (char *) u_int32Pnt;
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
 
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != TRG_VERSION_NUMBER  ) )
 	{
 		Msg( "TriggerLoad() Incompatible triggers( .TRG ) file %s", Filename );
 		return( false );
 	}
-
-	intpnt = (int *) Buffer;
 
 	if ( TrigVars )
 	{
@@ -847,12 +841,12 @@ bool Triggerload( char * Filename )
 	}
 	ActiveConditions = NULL;
 
-	NumOfTrigVars = *intpnt++;
-	NumOfTriggers = *intpnt++;
-	NumOfTrigMods = *intpnt++;
+	NumOfTrigVars = in.i32();
+	NumOfTriggers = in.i32();
+	NumOfTrigMods = in.i32();
 	NumOfTrigModQues = NumOfTrigMods * 2; // bodge it and scarper...
-	NumOfEvents = *intpnt++;
-	NumOfConditions = *intpnt++;
+	NumOfEvents = in.i32();
+	NumOfConditions = in.i32();
 	NumOfActiveConditions = 0;
 
 
@@ -946,21 +940,16 @@ bool Triggerload( char * Filename )
 	for ( i = 0; i < NumOfTrigVars; i++ )
 	{
 		v = &TrigVars[ i ];
-		byteptr = (u_int8_t *) intpnt;
-		for ( j = 0; j < (int) sizeof( v->Name ); j++ )
-		{
-			v->Name[ j ] = *byteptr++;
-		}
+		in.bytes( v->Name, sizeof( v->Name ) );
 
 					if( !(strncasecmp( "secret" , &v->Name[0], 6 ) ) )
 					{
 						DebugPrintf("Loaded secret: name=%s\n",v->Name);
 					}
 
-		intpnt = (int *) byteptr;
-		v->InitState = *intpnt++;
+		v->InitState = in.i32();
 		v->State = v->InitState;
-		v->NumOfTriggers = *intpnt++;
+		v->NumOfTriggers = in.i32();
 		if ( v->NumOfTriggers )
 		{
 			v->Triggers = (TRIGGER **) calloc( v->NumOfTriggers, sizeof( TRIGGER * ) );
@@ -975,7 +964,7 @@ bool Triggerload( char * Filename )
 			v->Triggers = NULL;
 		for ( j = 0; j < v->NumOfTriggers; j++ )
 		{
-			k = *intpnt++;
+			k = in.i32();
 			if ( k >= NumOfTriggers )
 				return false;
 			v->Triggers[ j ] = &Triggers[ k ];
@@ -985,16 +974,14 @@ bool Triggerload( char * Filename )
 	for ( i = 0; i < NumOfTriggers; i++ )
 	{
 		t = &Triggers[ i ];
-		byteptr = (u_int8_t *) intpnt;
-		t->Type = *byteptr++;
-		intpnt = (int *) byteptr;
-		j = *intpnt++;
+		t->Type = in.u8();
+		j = in.i32();
 		if ( j >= NumOfTrigVars )
 			return false;
 		t->TrigVar = &TrigVars[ j ];
-		t->ActiveState = *intpnt++;
+		t->ActiveState = in.i32();
 		t->Active = 0;
-		t->NumOfConditions = *intpnt++;
+		t->NumOfConditions = in.i32();
 		if ( t->NumOfConditions )
 		{
 			t->Conditions = (CONDITION **) calloc( t->NumOfConditions, sizeof( CONDITION * ) );
@@ -1009,7 +996,7 @@ bool Triggerload( char * Filename )
 			t->Conditions = NULL;
 		for ( j = 0; j < t->NumOfConditions; j++ )
 		{
-			k = *intpnt++;
+			k = in.i32();
 			if ( k >= NumOfConditions )
 				return false;
 			t->Conditions[ j ] = &Conditions[ k ];
@@ -1019,41 +1006,32 @@ bool Triggerload( char * Filename )
 	for ( i = 0; i < NumOfTrigMods; i++ )
 	{
 		m = &TrigMods[ i ];
-		m->Op = *intpnt++;
-		j = *intpnt++;
+		m->Op = in.i32();
+		j = in.i32();
 		if ( j >= NumOfTrigVars )
 			return false;
 		m->TrigVar = &TrigVars[ j ];
-		m->Val = *intpnt++;
+		m->Val = in.i32();
+		m->Time = in.f32() * 60.0f;
 
-		floatptr = (float*) intpnt;
-		memcpy(&m->Time, floatptr++, 4);
-		m->Time *= 60.0f;
-		intpnt = (int*) floatptr;
-				
-		j = *intpnt++;
+		j = in.i32();
 		if ( j >= NumOfTrigMods )
 			return false;
 		m->Next = ( j < 0 ) ? NULL : &TrigMods[ j ];
 
 	}
 
-	byteptr = (u_int8_t *) intpnt;
 	for ( i = 0; i < NumOfEvents; i++ )
 	{
 		e = &Events[ i ];
-		e->Type = *byteptr++;
-		for ( j = 0; j < MAXDATAPEREVENT; j++ )
-		{
-			e->Data[ j ] = *byteptr++;
-		}
+		e->Type = in.u8();
+		in.bytes( e->Data, MAXDATAPEREVENT );
 	}
 
-	intpnt = (int *) byteptr;
 	for ( i = 0; i < NumOfConditions; i++ )
 	{
 		c = &Conditions[ i ];
-		c->NumOfTriggers = *intpnt++;
+		c->NumOfTriggers = in.i32();
 		if ( c->NumOfTriggers )
 		{
 			c->Triggers =  (TRIGGER **) calloc( c->NumOfTriggers, sizeof( TRIGGER * ) );
@@ -1068,12 +1046,12 @@ bool Triggerload( char * Filename )
 			c->Triggers = NULL;
 		for ( j = 0; j < c->NumOfTriggers; j++ )
 		{
-			k = *intpnt++;
+			k = in.i32();
 			if ( k >= NumOfTriggers )
 				return false;
 			c->Triggers[ j ] = &Triggers[ k ];
 		}
-		c->NumOfEvents = *intpnt++;
+		c->NumOfEvents = in.i32();
 		if ( c->NumOfEvents )
 		{
 			c->Events = (EVENT **) calloc( c->NumOfEvents, sizeof( EVENT * ) );
@@ -1088,7 +1066,7 @@ bool Triggerload( char * Filename )
 			c->Events = NULL;
 		for ( j = 0; j < c->NumOfEvents; j++ )
 		{
-			k = *intpnt++;
+			k = in.i32();
 			if ( k > NumOfEvents )
 				return false;
 			c->Events[ j ] = &Events[ k ];
