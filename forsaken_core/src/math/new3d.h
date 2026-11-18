@@ -159,87 +159,36 @@ static inline float fast_ceilf(float x)
 #define RGBA_GETBLUE(rgb)    ((rgb) & 0xff)
 
 
-/*
-	Pre-DX8 vertex formats
-	taken from http://www.mvps.org/directx/articles/definitions_for_dx7_vertex_types.htm
-*/
+/* Vertex and triangle formats shared by the loaders and renderers, derived
+   from Direct3D 7's D3DLVERTEX / D3DTLVERTEX / D3DTRIANGLE without their
+   reserved and specular fields (the files' 32-byte vertex is OLDLVERTEX,
+   render.h). LVERTEX is a world-space vertex; TLVERTEX a screen-space one
+   (sx/sy/sz and rhw name the same fields as x/y/z/w); TRIANGLE holds three
+   vertex indices. */
 
 typedef struct {
-    union {
-       float x;
-       float dvX;
-    };
-    union {
-       float y;
-        float dvY;
-    };
-    union {
-        float z;
-        float dvZ;
-    };
-    union {
-        COLOR color;
-        COLOR dcColor;
-    };
-    union {
-        float tu;
-        float dvTU;
-    };
-    union {
-        float tv;
-        float dvTV;
-	};
+	float	x;
+	float	y;
+	float	z;
+	COLOR	color;
+	float	tu;
+	float	tv;
 } LVERTEX;
 
 typedef struct {
-    union {
-		float x;
-        float sx;
-        float dvSX;
-    };
-    union {
-		float y;
-        float sy;
-        float dvSY;
-    };
-    union {
-	    float z;
-        float sz;
-        float dvSZ;
-    };
-    union {
-		float w;
-        float rhw;
-        float dvRHW;
-    };
-    union {
-        COLOR color;
-        COLOR dcColor;
-    };
-    union {
-        float tu;
-        float dvTU;
-    };
-    union {
-        float tv;
-        float dvTV;
-    };
-
+	union { float x; float sx; };
+	union { float y; float sy; };
+	union { float z; float sz; };
+	union { float w; float rhw; };
+	COLOR	color;
+	float	tu;
+	float	tv;
 } TLVERTEX;
 
 typedef struct {
-    union {
-        WORD v1;
-        WORD wV1;
-    };
-    union {
-        WORD v2;
-        WORD wV2;
-    };
-    union {
-        WORD v3;
-        WORD wV3;
-    };
+	WORD	v1;
+	WORD	v2;
+	WORD	v3;
 } TRIANGLE;
 
 
