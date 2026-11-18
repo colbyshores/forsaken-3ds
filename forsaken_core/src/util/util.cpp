@@ -114,8 +114,8 @@ void DebugPrintf( const char * format, ... ) // timestamp prefix
 
 	struct timeb now;
 	ftime(&now);
-	sprintf( buf, "%ld.%.3d ",
-		now.time, now.millitm);
+	sprintf( buf, "%lld.%.3d ",
+		(long long) now.time, now.millitm);
 
 	buf2 = strchr(buf,0);
 	buf_length = sizeof(buf)-strlen(buf);

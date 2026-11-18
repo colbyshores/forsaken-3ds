@@ -4013,7 +4013,7 @@ void DisplayNetworkInfo()
 
 			top_offset+=row_height;
 			
-			sprintf( (char*) &buf[0] ,"PING: %d LOSS: %d LOST: %d", 
+			sprintf( (char*) &buf[0] ,"PING: %lu LOSS: %lu LOST: %lu", 
 				Ships[ShipID].network_player->ping,
 				Ships[ShipID].network_player->packet_loss,
 				Ships[ShipID].network_player->packets_lost);
