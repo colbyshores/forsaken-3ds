@@ -250,11 +250,11 @@ Include: root-tree `*.c` / `*.h` compiled by `Makefile.3ds` (scope is
 derived from `EXCLUDE_SRC` in the Makefile, so it follows the build),
 `Makefile.3ds`.
 
-Exclude: `picaGL/**` (vendored), `probe/**`, `tools/**`, `scripts/**`,
-`build_3ds/**`, `romfs*/**`, `docs/**`, data/config directories, and every
-source in `EXCLUDE_SRC` (SDL/DInput/OpenAL/DirectSound/GL1-3 backends,
-enet/net tracker, botai, lua_bot). `breakpad.cpp` and `render_d3d.cpp` are
-not compiled into the 3DS build and are out of scope.
+In scope: every C/C++ source under `forsaken_core/src/` and
+`forsaken_3ds/src/` (what `Makefile.3ds` compiles; `gates_vfp.py`
+`in_scope_files`). Everything else is out of scope: `forsaken_pc/`,
+`tools/`, `tests/`, `scripts/` (Lua), `docs/`, build and romfs staging
+directories, data/config directories.
 
 ---
 

@@ -95,7 +95,6 @@ picaGL/
 *.sh
 
 # ---- Misc ----
-net_test/
 
 # ---- Exceptions: tracked files that match patterns above ----
 # Lua game scripts (code, not assets)
@@ -107,10 +106,6 @@ net_test/
 # CI workflows
 !.github/
 !.github/**
-# HD texture regeneration pipeline (tooling shipped with the port)
-!regen_hd_old_4k.sh
-# Banner audio rebuild (deterministic — fetches YT clip + demucs)
-!build_banner_audio.sh
 
 # CIA build pipeline — fetched binaries (run `make tools-fetch`)
 # Ignore everything in tools/ EXCEPT tracked Python helpers (the
@@ -127,8 +122,21 @@ tools/*
 !tools/perf/
 !tools/perf/**
 !tools/texture/
-!tools/texture/etc2enc.c
-!tools/ralph-pi.sh
+!tools/texture/*.c
+!tools/texture/*.py
+!tools/texture/*.sh
+# Asset pipeline scripts and the small 3DS test programs.
+!tools/assets/
+!tools/assets/**
+!tools/probe/
+!tools/probe/Makefile
+!tools/probe/*.c
+!tools/probe/*.rsf
+tools/probe/build/
+!tools/net_test/
+!tools/net_test/**/
+!tools/net_test/**/Makefile
+!tools/net_test/**/*.c
 tools/perf/logs/
 
 # Nintendo DSP firmware blob. NOT bundled in the CIA — CFW users on real
@@ -180,3 +188,9 @@ forsaken_pc/shaders/*.spv
 forsaken_pc/src/rendering/vulkan_shaders.h
 .build-matrix/
 build_pc/
+
+# Host test binaries and their outputs (tests/Makefile builds them in place).
+tests/*
+!tests/Makefile
+!tests/*.cpp
+!tests/*.c

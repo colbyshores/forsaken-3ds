@@ -35,10 +35,10 @@ CC       := arm-none-eabi-gcc
 APP_TITLE       := Forsaken Probe
 APP_DESCRIPTION := Memory budget probe for OG 3DS diagnostics
 APP_AUTHOR      := Forsaken3DS
-APP_ICON        := $(CURDIR)/../assets/icon.png
+APP_ICON        := $(CURDIR)/../../assets/icon.png
 
 # CIA build needs makerom, banner, RSF
-MAKEROM := $(CURDIR)/../tools/makerom
+MAKEROM := $(CURDIR)/../makerom
 
 OBJS := $(BUILD)/$(SOURCES:.c=.o)
 
@@ -70,13 +70,13 @@ $(TARGET).cia: $(TARGET).elf $(TARGET).smdh probe.rsf | check-banner
 		-target t -exefslogo \
 		-elf $(TARGET).elf \
 		-icon $(TARGET).smdh \
-		-banner ../forsaken3ds.bnr
+		-banner ../../forsaken3ds.bnr
 
 .PHONY: check-banner
 check-banner:
-	@test -f ../forsaken3ds.bnr || { \
-		echo "ERROR: ../forsaken3ds.bnr missing."; \
-		echo "Run 'make -f Makefile.3ds forsaken3ds.bnr' from the project root first."; \
+	@test -f ../../forsaken3ds.bnr || { \
+		echo "ERROR: ../../forsaken3ds.bnr missing."; \
+		echo "Run 'make -f Makefile.3ds cia' from the project root first (it builds the banner)."; \
 		exit 1; \
 	}
 
