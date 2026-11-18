@@ -1,3 +1,5 @@
+/* compobjects.cpp -- component objects: animated model hierarchies (.cob); see compobjects.h. */
+
 /*===================================================================
 	Includes
 ===================================================================*/
@@ -155,11 +157,10 @@ bool PreLoadCompObj( int8_t * path, u_int16_t * BaseModel, bool LevelSpecific )
 				:	u_int16_t			Group
 				:	float		*	Overall Anim Time
 				:	float		*	Mid Time
-				:	u_int16_t		*	BaseModel
-				:	bool			Level Specific?
+				:	u_int16_t		*	BaseModel ( advanced past this file's models )
 				:	u_int16_t			OwnerType
 				:	u_int16_t			OwnerID
-	Output		:	COMP_OBJ	*	Components
+	Output		:	COMP_OBJ	*	Components ( NULL on error )
 ===================================================================*/
 COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Group,
 					    float * OverallTime, float * MidTime, u_int16_t * BaseModel,
@@ -247,7 +248,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 				:	u_int16_t			Group
 				:	float		*	Overall Time ( TBFI )
 				:	float		*	Mid Time ( TBFI )
-				:	u_int16_t		*	BaseModel ( TBU )
+				:	u_int16_t		*	BaseModel
 				:	u_int16_t			OwnerType
 				:	u_int16_t			OwnerID
 	Output		:	FILE		*	Updated File Pointer
@@ -615,8 +616,8 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 				for( Zone = 0; Zone < NumColZones; Zone++ )
 				{
 					fread( &ColZoneType, sizeof( int16_t ), 1, fp );			// 0-sphere 1-Box 2-Convex Shape
-					fread( &ColZoneSensitive, sizeof( int16_t ), 1, fp );		// 0-Do anything 1-Activate door
-					fread( &ColZoneDamage, sizeof( float ), 1, fp );		// Damage ??
+					fread( &ColZoneSensitive, sizeof( int16_t ), 1, fp );		// 1 = touching it bumps the owning BGObject
+					fread( &ColZoneDamage, sizeof( float ), 1, fp );		// Damage per second
 					ColZoneDamage /= ANIM_SECOND;
 
 					ZonesPtr[ Zone ].Type = ColZoneType;
@@ -1226,9 +1227,10 @@ COMP_OBJ * GetCompObjAddress( int16_t ID, int16_t NumChildren, COMP_OBJ * Childr
 }
 
 /*===================================================================
-	Procedure	:	Process components of an object
+	Procedure	:	Use a component's first authored rotation as its
+					user-control axis
 	Input		:	COMP_OBJ	*	Component
-	Output		:	bool			True/False
+	Output		:	bool			True/False ( false if it has no rotation )
 ===================================================================*/
 bool GetCompObjAxis( COMP_OBJ * Comp )
 {
@@ -1405,8 +1407,8 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 				:		int16_t		NumSides
 				:		VECTOR	*	Intersection Point ( TBFI )
 				:		ZONESIDE **	Intersection Side ( TBFI )
-				:		float		Collision Radius
-	Output		:		void
+				:		float		Collision Radius ( sides pushed out by it )
+	Output		:		bool		true if the ray enters the zone
 ===================================================================*/
 bool RayToColZone( VECTOR * StartPos, VECTOR * EndPos, ZONESIDE * StartSide, int16_t StartNumSides, VECTOR * IntPoint, ZONESIDE ** IntSide, float Radius )
 {
@@ -1451,6 +1453,8 @@ bool RayToColZone( VECTOR * StartPos, VECTOR * EndPos, ZONESIDE * StartSide, int
 	Input		:		VECTOR	*	Pos
 				:		ZONESIDE *	Sides
 				:		int16_t		NumSides
+				:		float		Radius ( sides pushed out by it )
+				:		int16_t		Side to skip ( RayToColZone's down-counter )
 	Output		:		bool		true/false
 ===================================================================*/
 bool PointInside( VECTOR * Pos, ZONESIDE * Sides, int16_t NumSides, float Radius, int16_t Side )
@@ -1512,7 +1516,7 @@ void GetCompObjBoundingBox( MATRIX * ParentMatrix, VECTOR * ParentPos,
 }
 
 /*===================================================================
-	Procedure	:	Process components of an object
+	Procedure	:	Grow a bounding box by the components' models at Time
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
 				:	MATRIX		*	Parent Matrix
@@ -1662,7 +1666,7 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 
 
 /*===================================================================
-	Procedure	:	Update components model colours
+	Procedure	:	Update components model colours ( currently does nothing )
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
 				:	int				Red
@@ -1702,6 +1706,8 @@ void UpdateCompObjColours( COMP_OBJ * Children, int16_t NumChildren, int Red, in
 				:	int16_t			NumChildren
 				:	u_int16_t			Flags
 	Output		:	Nothing
+	Notes		:	Replaces each model's flags with Flags, keeping only
+					MODFLAG_SpotFXDisabled.
 ===================================================================*/
 void UpdateCompObjFlags( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Flags )
 {
@@ -1822,14 +1828,11 @@ void MaximizeBoundingBox( VECTOR * TopLeft, VECTOR * BottomRight )
 }
 
 /*===================================================================
-	Procedure	:	Process components of an object
+	Procedure	:	Is any component in an Invulnerable state at Time?
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
-				:	MATRIX		*	Parent Matrix
-				:	VECTOR		*	Parent Position
 				:	float			Time
-				:	u_int16_t			Group
-	Output		:	Nothing
+	Output		:	bool			True/False
 ===================================================================*/
 bool AmIInvulnerable( COMP_OBJ * Children, int16_t NumChildren, float Time )
 {
@@ -2062,7 +2065,8 @@ void GetCompObjColBoundingBox( MATRIX * ParentMatrix, VECTOR * ParentPos,
 }
 
 /*===================================================================
-	Procedure	:	Process components of an object
+	Procedure	:	Grow a bounding box by the components' collision
+					zones at Time
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
 				:	MATRIX		*	Parent Matrix
@@ -2199,7 +2203,8 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 }
 
 /*===================================================================
-	Procedure	:	Process components of an object
+	Procedure	:	Grow a bounding box by one component's box and
+					hull collision zones ( spheres are skipped )
 	Input		:	COMP_OBJ	*	Children
 				:	MATRIX		*	Display Matrix
 				:	VECTOR		*	Display Position
@@ -2247,7 +2252,7 @@ void GetCompObjColZoneBoundingBox( COMP_OBJ * Children, MATRIX * DisplayMatrix, 
 }
 
 /*===================================================================
-	Procedure	:	Process components of an object
+	Procedure	:	Grow a bounding box by the 8 corners of a zone box
 	Input		:	VECTOR		*	Center Offset
 				:	VECTOR		*	HalfSize
 				:	MATRIX		*	Display Matrix
@@ -2322,6 +2327,8 @@ void AddVertToBoundingBox( VECTOR * Vert, MATRIX * Matrix, VECTOR * Pos, VECTOR 
 	TempVert.y += Pos->y;
 	TempVert.z += Pos->z;
 
+	// A box with both corners at the origin counts as empty: the first
+	// vertex replaces it instead of stretching it out to the origin.
 	if( ( TopLeft->x == BottomRight->x ) && ( TopLeft->y == BottomRight->y ) && ( TopLeft->z == BottomRight->z ) &&
 		( TopLeft->x == 0.0F ) && ( TopLeft->y == 0.0F ) && ( TopLeft->z == 0.0F ) )
 	{
@@ -2344,10 +2351,10 @@ void AddVertToBoundingBox( VECTOR * Vert, MATRIX * Matrix, VECTOR * Pos, VECTOR 
 }
 
 /*===================================================================
-	Procedure	:	Clear components model real lighting flag
+	Procedure	:	Set components' stealth model offset
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
-				:	int16_t			Model Offset for stealth
+				:	u_int16_t			Model Offset for stealth
 	Output		:	Nothing
 ===================================================================*/
 void SetStealthOffset( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Offset )
@@ -2405,7 +2412,7 @@ void SetCompObjStealth( COMP_OBJ * Children, int16_t NumChildren )
 }
 
 /*===================================================================
-	Procedure	:	Set Stealthmode
+	Procedure	:	Clear Stealthmode
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
 	Output		:	Nothing

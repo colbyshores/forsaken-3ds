@@ -1,8 +1,36 @@
-/*===================================================================
-	File	:	compobjects.h
-	Content	:	compobjects.cpp include file
-===================================================================*/
 #pragma once
+
+/* compobjects.h -- component objects: animated model hierarchies (.cob)
+ *
+ * A .cob file describes a tree of COMP_OBJ components. Each component may own
+ * one entry in Models[] (ID != -1, model BaseModel + ID), a list of timed
+ * transforms (translate, rotate, morph frame, property: state marks, sounds,
+ * destroy, spot-FX off), collision zones (sphere, box or convex hull of
+ * ZONESIDE planes) and its own children. Background objects, componented
+ * ships, enemies and the title-screen FlyGirl are all built from these.
+ *
+ * Loading is two-step. PreLoadCompObj appends the file's model names to
+ * ModNames (the level or title model table) starting at *BaseModel and
+ * advances it, before models are loaded; LoadCompObj later builds the tree,
+ * allocating Models[] entries, and returns OverallTime and MidTime (the
+ * "open" mark, or half of OverallTime) in ticks of ANIM_SECOND per second.
+ * The tree is malloc'd and lives as long as its owner; FreeCompObjChildren
+ * releases it and its Models[] entries but not the top-level array.
+ *
+ * UpdateCompObjChildren evaluates the tree at a time: every transform that
+ * has started is applied, scaled by how far through it is, and each
+ * component's display matrix / position (and its model) is updated. It keeps
+ * the previous two poses so UndoCompObjAnim can step back one frame after a
+ * blocked move. A component with UserControl set is posed from
+ * UserAngle / UserAxis around UserAxisPoint instead of its authored rotates
+ * (its authored translates still apply); enemies use this for turrets and
+ * aiming parts, found with GetCompObjAddress by authored ID.
+ *
+ * GetCompObjBoundingBox / GetCompObjColBoundingBox sample the animation 100
+ * times and leave the components' display matrices posed as at time 0.
+ * Collision zone and side damage is held per tick; the file stores it per
+ * second.
+ */
 
 #include "game/main.h"
 #include <stdio.h>
@@ -38,8 +66,8 @@ constexpr int MAX_USER_CONT_COMPS = 10;
 ===================================================================*/
 typedef struct ANIM_SEQ {
 
-	float	StartTime;			// Model Filename or Component Filename ( .MX/.MXA or .COB )
-	float	EndTime;			// -1 None ( Not used so far )
+	float	StartTime;			// Start of the sequence, in ticks ( ANIM_SECOND per second )
+	float	EndTime;			// End of the sequence; equal to StartTime holds one pose
 
 } ANIM_SEQ;
 
