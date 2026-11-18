@@ -1,3 +1,10 @@
+/* aiexogenon.cpp -- Exogenon boss brain (ENEMY_CONTROLTYPE_EXOGENON). IDLE
+ * parks it 2560 units above its first spawn point; it then drops in at one
+ * of its Exogenon_StartPos spawn points away from the player (MOVEDOWN).
+ * Without LOS, or by chance, it rises again firing homing missiles (MOVEUP);
+ * otherwise it SCANs, charges and FIREs its primary, SWEEPs, then rises back
+ * to IDLE.
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -260,7 +267,7 @@ void AI_EXOGENON_SWEEP( ENEMY * Enemy )
 
 
 /*===================================================================
-	Procedure	:	Exogenon Sweep
+	Procedure	:	Exogenon Fire homing missiles to the left and right
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/

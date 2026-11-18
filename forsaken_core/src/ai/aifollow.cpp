@@ -1,3 +1,11 @@
+/* aifollow.cpp -- AIMODE_FOLLOWPATH, the default patrol mode.
+ * AI_AIR_FOLLOWPATH flies a FLY_AI enemy from node to node on its network,
+ * laying mines on NODE_DROPMINES nodes. An ATTACK_ONSITE enemy leaves for
+ * DOGFIGHT / MOVETOTARGET when it sees / hears the player, an ATTACKMINES
+ * enemy for KILLMINE on a spotted mine, and it drops to SCAN if it cannot
+ * route back onto its network. AI_CRAWL_FOLLOWPATH walks a crawler along
+ * its TNode / NextTNode chain and never leaves the mode.
+ */
 
 #include <stdio.h>
 #include <math.h>

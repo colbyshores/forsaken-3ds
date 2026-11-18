@@ -1,3 +1,10 @@
+/* aifleshmorph.cpp -- Fleshmorph boss brain (ENEMY_CONTROLTYPE_FLESHMORPH).
+ * IDLE holds it at its home position (FleshmorphPos) until it sees the
+ * player, then it cycles MOVEFORWARDS (16 s) -> STOPFORWARD (15 s, firing) ->
+ * MOVEBACKWARDS (16 s) -> STOPBACKWARD (attack anim, 5 s) -> MOVEFORWARDS,
+ * or back to IDLE if no player is in range. Both moving phases launch
+ * homing missiles or fireball sprays (AI_FLESHMORPH_RANDOMFIREBALL).
+ */
 
 #include <stdio.h>
 #include <math.h>

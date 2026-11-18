@@ -1,3 +1,8 @@
+/* aicrashandburn.cpp -- AIMODE_DEATH_CRASHNBURN, a death mode for killed
+ * FLY_AI enemies: the wreck falls along its group's down vector trailing
+ * burning spot FX, then explodes and is removed when its 3 s Timer runs out
+ * or it collides. Entered from the enemy-kill path in enemies.cpp.
+ */
 
 #include <stdio.h>
 #include <math.h>

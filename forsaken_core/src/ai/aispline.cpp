@@ -1,3 +1,9 @@
+/* aispline.cpp -- SPLINE brain (ENEMY_CONTROLTYPE_SPLINE): every mode slot
+ * runs AI_SPLINE_FOLLOWPATH, which moves the enemy along a spline through
+ * four consecutive path nodes at 65% of MaxMoveRate, picks a random next
+ * node per segment, fires via AI_UPDATEGUNS, and removes the enemy when it
+ * reaches a NODE_TERMINATE node.
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -57,9 +63,9 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 		 * SplineNode2 to NULL then taking &Node2->Pos a few lines down
 		 * dereferences NULL — diagnosed via Luma3DS arm11 crash dump
 		 * (PC=DistanceVector2Vector, FAR=0x0c) on defend2's first
-		 * gameplay frame. Bail out cleanly instead. AI_THINK is still
-		 * called by the per-frame caller; the enemy just won't move
-		 * along a spline this frame. */
+		 * gameplay frame. Bail out cleanly instead: this frame skips
+		 * the spline move, AI_THINK and the guns, and the next frame
+		 * retries the start. */
 		if (!TNode)
 		{
 			return;

@@ -1,3 +1,8 @@
+/* aipingoff.cpp -- AIMODE_DEATH_PINGOFF, a death mode for killed FLY_AI
+ * enemies: the wreck is knocked along the killing shot's direction, spinning
+ * about the impact point and sinking, then explodes after PINGOFFTIME (3 s)
+ * or on collision. Entered from the enemy-kill path in enemies.cpp.
+ */
 
 #include <stdio.h>
 #include <math.h>

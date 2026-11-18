@@ -1,3 +1,10 @@
+/* aiscan.cpp -- AIMODE_SCAN: look for the player. The FLY_AI version goes to
+ * MOVETOTARGET if it sees or hears the player, else IDLE; the turret version
+ * opens and goes to FIRE once a player is in its view cone with LOS, and
+ * drops to IDLE when no player is in range; the crawl version just times out
+ * to IDLE. AI_DO_SCAN is the one-shot target check used by crawl
+ * follow-path and spline enemies.
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -68,7 +75,7 @@ void AI_AIR_SCAN( ENEMY * Enemy )
 
 /*===================================================================
 	Procedure	:	AI for a turret while its SCANNING..
-	Output		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
 void AI_TURRET_SCAN( ENEMY * Enemy )
@@ -122,7 +129,7 @@ void AI_TURRET_SCAN( ENEMY * Enemy )
 
 /*===================================================================
 	Procedure	:	AI for a Crawling Enemy while its SCANNING..
-	Output		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
 void AI_CRAWL_SCAN( ENEMY * Enemy )
@@ -154,7 +161,7 @@ void AI_CRAWL_SCAN( ENEMY * Enemy )
 
 
 /*===================================================================
-	Procedure	:	AI Do a Sacn and find a target...
+	Procedure	:	AI Do a Scan: set TShip if the nearest player is seen or heard...
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/

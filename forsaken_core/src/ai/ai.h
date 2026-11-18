@@ -1,16 +1,41 @@
 #pragma once
 
-/* ai.h -- shared enemy AI vocabulary: modes, flags, targeting, brain entry points
+/* ai.h -- enemy AI: brains, modes, perception flags, targeting helpers
  *
- * Each brain lives in its own ai*.cpp. The AIMODE_* enums index the
- * per-brain mode tables in aimain.cpp (AI_AIR_Mode[] and friends), so
- * their order is load-bearing. AI_* status bits live in ENEMY.AIFlags,
- * AI_BEHAVIOUR_* bits come from the enemy type, AI_CONTROL_* bits are
- * per-frame steering requests.
- * ailib.cpp owns the shared scratch results (TargetInfo behind Tinfo,
- * AimData); every call overwrites them, so read them straight after.
- * Timers count framelag ticks (ONE_SECOND = 60). AimData.Angle is in
- * degrees in the source's local frame: y is yaw, x is pitch.
+ * Each frame ProcessEnemies (enemies.cpp) calls EnemyControlType[
+ * Object.ControlType ], set from EnemyTypes[].ControlType. The *UnderAiControl
+ * wrappers there run one brain -- AI_AIR (FLY_AI), AI_CRAWL, AI_TURRET,
+ * AI_SPLINE, AI_EXOGENON, AI_FLESHMORPH, AI_LITTLEGEEK (aimain.cpp) or
+ * AI_JUMP (aijump.cpp, Remaster) -- then turn the AIMoveFlags / AI_Angle the
+ * brain wrote into movement. The fly, crawl, Exogenon, Fleshmorph and
+ * LittleGeek wrappers apply movement only while AI_ANYPLAYERINRANGE is set
+ * (Boss_Avatar excepted).
+ *
+ * A brain is a table of handlers indexed by Object.AI_Mode; a mode is one
+ * behaviour (follow path, scan, dogfight, ...), mostly one ai<mode>.cpp
+ * each. Modes switch by writing AI_Mode, usually via the AI_Set* helpers in
+ * ailib.cpp, which also reset Timer / TShip / TNode. The first mode is
+ * EnemyTypes[].AiMode (FORMATION for formation-linked enemies); a killed
+ * FLY_AI enemy may get an AIMODE_DEATH_* mode instead of dying at once.
+ * The AIMODE_* enums index the tables, so their order is load-bearing; the
+ * tables are not padded to the whole enum, so a brain must only be put in
+ * modes its table covers. Exogenon and Fleshmorph use their own mode enums.
+ *
+ * AI_THINK (aimain.cpp) is the perception pass: every ThinkTime it rebuilds
+ * ENEMY.AIFlags (AI_* bits: player in range, can see / hear, targeted,
+ * friendly fire) from range, view cone and LOS, and AI_AVOIDCHECK sets
+ * AvoidTimer / AvoidType when the target fires at the enemy. Called with
+ * JustCheckPlayerRange it only refreshes AI_ANYPLAYERINRANGE. Most modes
+ * call AI_THINK first and AI_UPDATEGUNS (aifire.cpp) to aim and fire the
+ * enemy's guns. AI_BEHAVIOUR_* bits come from the enemy type, AI_CONTROL_*
+ * bits are per-frame steering requests.
+ *
+ * ailib.cpp holds the shared helpers (target search, AI_AimAtTarget, LOS
+ * and view-cone tests, look-ahead) and their scratch results (TargetInfo
+ * behind Tinfo, AimData); every call overwrites them, so read them straight
+ * after. Target search only finds the local ship, Ships[WhoIAm]. Timers
+ * count framelag ticks (ONE_SECOND = 60). AimData.Angle is in degrees in
+ * the source's local frame: y is yaw, x is pitch.
  */
 
 #include "game/main.h"
@@ -37,6 +62,7 @@ enum
 	AIMODE_DEATH_PINGOFF,			// Ping off in the dir of the bullet that killed me spinning as I go...
 	AIMODE_DEATH_PSYCHO,			// Twist and turn and shoot and explode...
 
+	// No brain implements the modes from here down; nothing sets them.
 	AIMODE_DEATH_DEADINTHEWATER,	// Float or stop occasionally Spark or explode...
 	
 	AIMODE_STRAFE,					// Do a passing Run at the player firing as I go..
@@ -232,7 +258,7 @@ extern	PRIMARYWEAPONKNOWLEDGE PrimaryKnowledge[];
 // Prototypes
 //--------------------------------------------------------------------------
 
-// AILIB.C
+// ailib.cpp
 
 void AI_GetDistToNearestTarget( ENEMY * Enemy );
 bool AI_InViewCone( VECTOR * Pos, MATRIX * Mat ,VECTOR * TPos, float ViewConeCos );
@@ -252,12 +278,12 @@ void AI_SetKILLMINE( ENEMY * Enemy );
 void AI_GetNearestMINETarget( void );
 void AI_SetRETREAT( ENEMY * Enemy );
 
-// AIMAIN.C
+// aimain.cpp
 void AI_AIR( ENEMY * Enemy );
 void AI_TURRET( ENEMY * Enemy );
 /* Aim solution shared by every brain (defined in ailib.cpp). */
 extern AIMDATA AimData;
-/* Last fleshmorph target position (defined in aifleshmorph.cpp). */
+/* Fleshmorph's home position, set at level load (defined in aifleshmorph.cpp). */
 extern VECTOR FleshmorphPos;
 
 void AI_CRAWL( ENEMY * Enemy );
@@ -267,56 +293,57 @@ void AI_SPLINE( ENEMY * Enemy );
 void AI_EXOGENON( ENEMY * Enemy );
 void AI_LITTLEGEEK( ENEMY * Enemy );
 void AI_FLESHMORPH( ENEMY * Enemy );
+/* The two AI_JUMP entries live in aijump.cpp, defined only in EDITION_REMASTER builds. */
 void AI_JUMP( ENEMY * Enemy );
 void AI_JUMP_FOLLOWPATH( ENEMY * Enemy );
 bool Enemy2EnemyFriendlyFireCheck( ENEMY * SEnemy );
 
-// AIIDLE.C
+// aiidle.cpp
 void AI_AIR_IDLE( ENEMY * Enemy );
 void AI_TURRET_IDLE( ENEMY * Enemy );
 void AI_CRAWL_IDLE( ENEMY * Enemy );
 
-// AISCAN.C
+// aiscan.cpp
 void AI_AIR_SCAN( ENEMY * Enemy );
 void AI_TURRET_SCAN( ENEMY * Enemy );
 void AI_CRAWL_SCAN( ENEMY * Enemy );
 void AI_DO_SCAN( ENEMY * Enemy );
 
-// AIMOVET.C
+// aimovet.cpp
 void AI_AIR_MOVETOTARGET( ENEMY * Enemy );
 
-// AIDOGFIGHT.C
+// aidogfight.cpp
 void AI_AIR_DOGFIGHT( ENEMY * Enemy );
 
-// AIKILLMINE.C
+// aikillmine.cpp
 void AI_AIR_KILLMINE( ENEMY * Enemy );
 
 
-// AIFIRE.C
+// aifire.cpp
 void AI_TURRET_FIREATTARGET( ENEMY * Enemy );
 void AI_UPDATEGUNS( ENEMY * Enemy );
 
-// AIFOLLOW.C
+// aifollow.cpp
 void AI_AIR_FOLLOWPATH( ENEMY * Enemy );
 void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy );
 
 
-// AIRETREAT.C
+// airetreat.cpp
 void AI_AIR_RETREAT( ENEMY * Enemy );
 
-// AIFORMATION.C
+// aiformation.cpp
 void AI_AIR_FORMATION( ENEMY * Enemy );
 void AI_LITTLEGEEK_FORMATION( ENEMY * Enemy );
 
-// AISPLINE.C
+// aispline.cpp
 void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy );
 
 
-// AICRASHANDBURN.C
+// aicrashandburn.cpp
 void AI_AIR_DEATH_CRASHANDBURN( ENEMY * Enemy );
-// AIPINGOFF.C
+// aipingoff.cpp
 void AI_AIR_DEATH_PINGOFF( ENEMY * Enemy );
-// AIPSYCHO.C
+// aipsycho.cpp
 void AI_AIR_DEATH_PSYCHO( ENEMY * Enemy );
 
 

@@ -1,12 +1,9 @@
-/*===================================================================
- * aim_assist.cpp — Subtle aim-assist for player primary bullets.
- *
- * See aim_assist.h for design rationale + parameter rationale.
+/* aim_assist.cpp -- player bullet aim assist; see aim_assist.h.
  *
  * Per-frame, per-player-bullet:
- *   1) Walk Enemies + Ships, build a candidate list of targets in
- *      a narrow forward cone (cosine >= AIM_ASSIST_CONE_COS).
- *   2) Among candidates, pick the one with the highest dot product
+ *   1) Walk Enemies + other Ships for targets within FAR range in the
+ *      forward cone (cosine >= AIM_ASSIST_CONE_COS).
+ *   2) Among candidates, keep the one with the highest dot product
  *      (= smallest angular offset from bullet's current direction).
  *      "Angle-weighted nearest" preserves the player's intent:
  *      assist the target they almost hit, not a different one.
@@ -18,10 +15,10 @@
  *      For the small per-frame angles this operates at, normalized
  *      lerp is an acceptable slerp approximation.
  *
- * Cost: a few dozen float ops per bullet per frame, plus one BSP
+ * Cost: a few dozen float ops per bullet per frame, plus one collision
  * raycast per bullet that found a candidate. Negligible at the
  * single-digit live bullet count typical of normal play.
- *===================================================================*/
+ */
 
 #include "ai/aim_assist.h"
 
@@ -50,7 +47,7 @@ constexpr int AA_NME_POWERLASER = 16;
  * (20° / 3°/frame / 400u-2000u). Multiplied by the user's strength
  * setting (0.0 = off, 1.0 = full).
  *
- * Default is 0.0 (off) — user opts in via the 3DS Controls menu. */
+ * The pilot default is 0.25 (config.cpp); the 3DS Controls menu adjusts it. */
 constexpr float AIM_ASSIST_CONE_COS = 0.9781476F; /* cos(12°) */
 
 constexpr float AIM_ASSIST_TURN_RATE_DEG = 1.5F; /* deg/frame at strength=1 */
@@ -141,7 +138,7 @@ static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
 	if( cos <= *best_cos )
 		return false;
 
-	(void)target_group;  /* group-audible gate handled by caller via SoundInfo if needed */
+	(void)target_group;  /* unused: the caller LOS-checks only the winning candidate */
 
 	/* Defer LOS check to caller — only test the best candidate at the end */
 	*best_cos = cos;

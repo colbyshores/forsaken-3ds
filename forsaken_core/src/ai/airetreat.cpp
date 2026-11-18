@@ -1,3 +1,9 @@
+/* airetreat.cpp -- AIMODE_RETREAT for FLY_AI enemies: flee for RetreatTime
+ * along the node graph, taking the linked node farthest from the target's
+ * (WhichRetreatNode) and still firing via AI_UPDATEGUNS, then go back to
+ * FOLLOWPATH. Entered via AI_SetRETREAT from DOGFIGHT / FORMATION when
+ * scattered or below 15% shield.
+ */
 
 #include <stdio.h>
 #include <math.h>

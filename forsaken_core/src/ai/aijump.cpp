@@ -1,30 +1,27 @@
-/*===================================================================
-	AI_JUMP — port of Forsaken Remastered's kexForsakenAIBrainJump.
-
-	The KEX brain hops along the AI node graph with a parametric
-	parabolic arc instead of crawling. Boss_Ramqan is the only user
-	in the Remaster level set.
-
-	Constants extracted from the Remaster binary (.rodata):
-		duration  = 75 ticks (~1.25 s at 60 Hz)
-		arc scale = 4.0
-		dt        = 1.0 per tick
-
-	The KEX brain's SetupJump runs a 1000-unit downward raycast from
-	the target node to find the floor underneath, then uses:
-		landing  = floor_hit_point   (snapped Y)
-		apex_y   = original_node_Y   (un-snapped, sits above floor)
-		arc_height = (apex_y - landing_y) * 4.0
-	So the boss arcs UP toward the authored node altitude, then drops
-	onto the pad below. Translated to 1998 NODE struct: landing is
-	`SolidPos` (already computed by Nodeload's downward snap = floor +
-	75) and apex is `Pos.y` (original authored). When the two agree
-	(KEX-authored nodes placed flat at pad level), a 30%-of-horizontal
-	fallback arc kicks in so flat-pad rooms still produce a visible
-	hop instead of sliding.
-
-	State lives in 5 ENEMY-struct fields under EDITION_REMASTER.
-===================================================================*/
+/* aijump.cpp -- AI_JUMP, Boss_Ramqan's hopping brain (ENEMY_CONTROLTYPE_JUMP_AI)
+ *
+ * A port of Forsaken Remastered's kexForsakenAIBrainJump; Boss_Ramqan is its
+ * only user, and the whole file is EDITION_REMASTER only. In
+ * AIMODE_FOLLOWPATH the boss dwells, picks a linked node, and hops to it on
+ * a parametric parabolic arc that writes Object.Pos directly (no
+ * Speed-driven movement), firing through AI_UPDATEGUNS throughout. IDLE and
+ * SCAN reuse the crawl handlers.
+ *
+ * Constants from the Remaster binary (.rodata): duration 75 ticks (~1.25 s
+ * at 60 Hz), arc scale 4.0; JumpT advances by framelag. KEX's SetupJump
+ * raycasts 1000 units down from the target node and uses
+ *   landing    = floor hit point
+ *   apex_y     = authored node Y (sits above the floor)
+ *   arc_height = (apex_y - landing_y) * 4.0
+ * so the boss arcs up toward the node altitude, then drops onto the pad.
+ * Here landing is the node's SolidPos (Nodeload's floor snap, floor + 75)
+ * with the 75 taken back off, and apex is Pos.y. When that arc is lower than
+ * 30% of the horizontal distance (nodes placed flat at pad level), the 30%
+ * arc is used so flat-pad rooms still show a hop.
+ *
+ * State lives in 5 ENEMY fields (JumpT, JumpInAir, JumpStart, JumpTarget,
+ * JumpApexY) under EDITION_REMASTER.
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -110,9 +107,9 @@ static void JumpEnterIdle( ENEMY * Enemy )
  * KEX matches `arc = (node[+0x10] - target.z) * 4` where target.z is
  * the post-snap floor hit from a downward raycast in SetupJump and
  * +0x10 is the un-snapped (authored) node Y. Translated to 1998:
- *   landing  = node->SolidPos  (= floor + 75 from Nodeload's snap)
- *   apex_y   = node->Pos.y     (original authored, sits above floor)
- *   arc_height = (apex_y - SolidPos.y) * JUMP_ARC_SCALE
+ *   landing  = node->SolidPos - 75  (Nodeload's floor + 75, offset removed)
+ *   apex_y   = node->Pos.y          (original authored, sits above floor)
+ *   arc_height = (apex_y - landing.y) * JUMP_ARC_SCALE  (in JumpDoMovement)
  * The ramqan boss room's pads are placed with nodes well above the
  * pad surface, so the arc has real altitude. */
 static void JumpBegin( ENEMY * Enemy, NODE * target )
@@ -137,8 +134,8 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 	/* Seq 2 (jump takeoff, 60→78 ticks): KEX calls SetAnimSeq(2) inside
 	 * SetupJump itself (our JumpBegin equivalent). Sets Object.Time = 60
 	 * and clamps to 78 — the rig plays the authored takeoff keyframes
-	 * over the first portion of the arc then the JumpT >= 60 gate above
-	 * transitions to seq 3 (frozen mid-air hold). */
+	 * over the start of the arc, then JumpDoMovement switches to seq 3
+	 * (frozen mid-air hold) once Object.Time reaches 78. */
 	SetCurAnimSeq( 2, &Enemy->Object );
 }
 
@@ -181,9 +178,10 @@ static void JumpDoMovement( ENEMY * Enemy )
 		/* Seq 4 (land, 78→120 ticks): touchdown animation. KEX calls
 		 * SetAnimSeq(4) at landing. SetCurAnimSeq advances time from
 		 * StartTime (78) to EndTime (120) across subsequent frames then
-		 * holds — the rig plays the authored landing flourish and settles.
-		 * JumpEnterIdle (called next from AI_JUMP_FOLLOWPATH after Timer
-		 * expires) will switch to seq 0 (idle rest pose) for the dwell. */
+		 * holds — the rig plays the authored landing flourish and settles,
+		 * and keeps that pose through the dwell below. When the dwell
+		 * ends, AI_JUMP_FOLLOWPATH starts the next hop (seq 2); only if
+		 * no node can be picked does JumpEnterIdle switch to seq 0. */
 		SetCurAnimSeq( 4, &Enemy->Object );
 		/* Stationary fire phase: dwell long enough for AI_UPDATEGUNS
 		 * to cycle through several cooldown periods. Per research,
@@ -202,27 +200,21 @@ static void JumpDoMovement( ENEMY * Enemy )
 		t   = Enemy->JumpT / JUMP_DURATION_TICKS;
 		omt = t - (t * t);
 
-		/* Seq 2 (jump takeoff, 60→78 ticks) plays during the first 60
-		 * ticks of the arc while the rig plays the authored takeoff
-		 * animation. Once the squat anim has played through (JumpT >= 60),
-		 * switch to seq 3 (jump idle, degenerate 78→78): KEX holds the rig
-		 * frozen at the mid-air pose for the remainder of the arc. This is
-		 * what prevents the backward-lean cycle from continuing mid-hop. */
-		/* Once the takeoff anim (seq 2, 60→78) has played through,
-		 * switch to seq 3 (degenerate 78→78) to hold the frozen
-		 * mid-air pose for the rest of the arc. */
+		/* Once the takeoff anim (seq 2, 60→78) has played through
+		 * (Object.Time reaches 1.3 s = 78 ticks), switch to seq 3 (jump
+		 * idle, degenerate 78→78): KEX holds the rig frozen at the
+		 * mid-air pose for the rest of the arc, which keeps the
+		 * backward-lean cycle from playing mid-hop. */
 		if( Enemy->Object.CurAnimSeq == 2 &&
 		    Enemy->Object.Time >= 1.3F * ANIM_SECOND )
 			SetCurAnimSeq( 3, &Enemy->Object );
 
 		/* arc_height = (apex_y - landing_y) * 4 — mirrors KEX's
 		 * `(node[+0x10] - target.z) * _UNK_00b1cb1c`. Landing is
-		 * SolidPos.y (floor+75) and apex is the authored node Y.
-		 * If the node was authored at floor level (KEX-style nodes
-		 * with no apex offset, or pads where the raycast snap landed
-		 * on the same Y as the authored Pos), fall back to
-		 * 30%-of-horizontal so flat-pad rooms still produce a visible
-		 * hop. */
+		 * JumpTarget.y (SolidPos.y - 75) and apex is the authored node Y.
+		 * The larger of that and 30%-of-horizontal is used, so nodes
+		 * authored at floor level (KEX-style nodes with no apex
+		 * offset) still produce a visible hop. */
 		kex_arc = (Enemy->JumpApexY - d->y) * JUMP_ARC_SCALE;
 		horiz = sqrtf( dx * dx + dz * dz );
 		fallback_arc = horiz * 0.30F;
@@ -259,8 +251,8 @@ void AI_JUMP_FOLLOWPATH( ENEMY * Enemy )
 	AI_GetDistToNearestTarget( Enemy );
 	if( Tinfo->TObject ) Enemy->TShip = Tinfo->TObject;
 
-	/* Rotate body toward target BEFORE AI_THINK so AI_THINK's
-	 * viewcone check sees the boss facing the player. */
+	/* No-op: KEX never rotates the body (see JumpFaceTarget); the
+	 * turret comps carry the aim. */
 	JumpFaceTarget( Enemy );
 
 	AI_THINK( Enemy, false, false );

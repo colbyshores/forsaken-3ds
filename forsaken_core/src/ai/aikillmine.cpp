@@ -1,3 +1,8 @@
+/* aikillmine.cpp -- AIMODE_KILLMINE for FLY_AI enemies: turn toward the
+ * player mine at MinePos and shoot it with the primary. Entered from
+ * FOLLOWPATH or DOGFIGHT once AI_AVOIDCHECK has seen a close mine
+ * (AI_MINEAVOID); returns to FOLLOWPATH on the first frame that flag is clear.
+ */
 
 #include <stdio.h>
 #include <math.h>

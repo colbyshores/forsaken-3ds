@@ -1,3 +1,8 @@
+/* ailib.cpp -- shared AI helpers: target search (AI_GetDistToNearestTarget
+ * over the local ship, path nodes and player mines), AI_AimAtTarget, LOS and
+ * view-cone tests, AI_LookAhead target leading, and the AI_Set* mode
+ * switches. Owns the Tinfo / AimData scratch results; see ai.h.
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -95,8 +100,9 @@ void AI_GetNearestSHIPTargetInAnyGROUP( void )
 }
 /*===================================================================
 	Procedure	:	AI Look Ahead and try and predict where someone will be...
-	Output		:	float amount , VECTOR * Pos, OBJECT	* TargetObject , VECTOR * NewPos , float BulletSpeed
-	Output		:	Nothing
+	Input		:	float Accuracy (0 = aim at current position), VECTOR * SPos,
+				:	OBJECT * TObject, VECTOR * NewPos, float SpeedOfBullet
+	Output		:	Nothing..But NewPos gets the predicted target position...
 ===================================================================*/
 void AI_LookAhead( float Accuracy, VECTOR * SPos ,OBJECT * TObject , VECTOR * NewPos , float SpeedOfBullet )
 {

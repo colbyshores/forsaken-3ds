@@ -1,3 +1,9 @@
+/* aimovet.cpp -- AIMODE_MOVETOTARGET for FLY_AI enemies: hunt a player that
+ * was heard or lost from sight by flying the node graph toward the target's
+ * nearest node (off its own network if AI_BEHAVIOUR_LEAVENETWORK). Switches
+ * to DOGFIGHT as soon as it sees the player, and to FOLLOWPATH when
+ * BlindSearchTime runs out or it has no target.
+ */
 
 #include <stdio.h>
 #include <math.h>

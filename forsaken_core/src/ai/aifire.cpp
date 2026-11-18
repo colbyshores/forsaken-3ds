@@ -1,3 +1,11 @@
+/* aifire.cpp -- turret fire mode and the shared gun driver.
+ * AI_TURRET_FIREATTARGET is AIMODE_FIRE for TURRET_AI enemies, entered from
+ * AI_TURRET_SCAN; every RESET_VALIDATE_TIME it rechecks range and LOS and
+ * closes back to SCAN when the player is lost. AI_UPDATEGUNS, called by most
+ * modes, aims each GUNOBJECT at the target with look-ahead and fires it on
+ * reload (single shots or bursts); it fires only while AI_ICANSEEPLAYER is
+ * set, except for SPLINE and JUMP_AI enemies.
+ */
 
 #include	<stdio.h>
 #include <math.h>

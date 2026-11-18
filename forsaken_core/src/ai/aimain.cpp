@@ -1,3 +1,9 @@
+/* aimain.cpp -- brain dispatch and perception: the per-brain mode tables
+ * (AI_AIR_Mode[] ...) and their AI_AIR / AI_TURRET / ... entry points,
+ * AI_THINK (rebuilds AIFlags), AI_AVOIDCHECK (dodge decisions),
+ * Enemy2EnemyFriendlyFireCheck, and the PrimaryKnowledge table enemies use to
+ * judge the player's primary weapons. See ai.h.
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -276,7 +282,7 @@ bool Enemy2EnemyFriendlyFireCheck( ENEMY * SEnemy )
 
 /*===================================================================
 	Procedure	:	AI Do a think and update how I perceive the world..
-	Output		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
 void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange )
@@ -451,7 +457,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 
 /*===================================================================
 	Procedure	:	Check if a target is firing at me... And suggest something to do to avoid it....
-	Output		:	ENEMY	*	Enemy 
+	Input		:	ENEMY	*	Enemy 
 	Output		:	Nothing
 ===================================================================*/
 void AI_AVOIDCHECK( ENEMY * Enemy )

@@ -1,3 +1,8 @@
+/* aiidle.cpp -- AIMODE_IDLE: wait out Timer, then switch to AIMODE_SCAN.
+ * The turret version also holds the closed animation, keeps updating its
+ * guns and only moves on to SCAN while a player is in range. Entered when a
+ * scan mode finds nothing, or as an enemy type's starting AiMode.
+ */
 
 #include <stdio.h>
 #include <math.h>

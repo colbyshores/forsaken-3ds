@@ -1,3 +1,10 @@
+/* aiformation.cpp -- AIMODE_FORMATION. AI_AIR_FORMATION keeps a FLY_AI enemy
+ * at FormationOffset from its FormationLink leader, firing its primary at a
+ * visible player; it breaks to DOGFIGHT / FOLLOWPATH when the leader is gone
+ * or retreating, and to RETREAT when scattered or badly hurt. AI_LITTLEGEEK_FORMATION pins
+ * LittleGeek to BigGeek until BigGeek's shield halves, then makes it a FLY_AI
+ * dogfighter. Links and offsets are set at level load (enemies.cpp).
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -208,7 +215,7 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 	}
 }
 /*===================================================================
-	Procedure	:	AIR Formation Flying
+	Procedure	:	LITTLEGEEK Formation (pinned to BigGeek)
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/

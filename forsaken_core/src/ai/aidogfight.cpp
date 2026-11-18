@@ -1,3 +1,10 @@
+/* aidogfight.cpp -- AIMODE_DOGFIGHT for FLY_AI enemies: aim at the target
+ * (led by AI_LookAhead), fire primary and secondary on their fire rates while
+ * it is in sight, and hold between MinRange and MaxRange, dodging while
+ * AvoidTimer runs. Entered when the player is seen; leaves for MOVETOTARGET
+ * when sight and hearing are lost, FOLLOWPATH with no target, RETREAT when
+ * scattered or below 15% shield, KILLMINE when a close mine is spotted.
+ */
 
 #include <stdio.h>
 #include <math.h>

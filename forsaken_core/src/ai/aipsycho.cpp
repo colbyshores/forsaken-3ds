@@ -1,3 +1,8 @@
+/* aipsycho.cpp -- AIMODE_DEATH_PSYCHO, a death mode for killed FLY_AI
+ * enemies: the wreck spins ever faster while firing its primary at twice its
+ * usual rate, then explodes after 1.5 s or on collision. Entered from the
+ * enemy-kill path in enemies.cpp.
+ */
 
 #include <stdio.h>
 #include <math.h>
@@ -22,9 +27,8 @@
 #include "game/primary.h"
 #include "game/oct2.h"
 
-// Externals
 /*===================================================================
-	Procedure	:	AIR Crash and burn...
+	Procedure	:	AIR Death: Psycho spin and shoot...
 	Input		:	ENEMY * Enemy
 	Output		:	Nothing
 ===================================================================*/
