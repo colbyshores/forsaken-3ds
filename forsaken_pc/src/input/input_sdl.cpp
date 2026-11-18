@@ -30,13 +30,8 @@ void input_grab( bool grab )
 	// window mode
 	input_grabbed = grab;
 
-#ifdef LUA_BOT
-	SDL_SetWindowGrab( render_info.window, SDL_FALSE );
-	SDL_ShowCursor( SDL_ENABLE );
-#else
 	SDL_SetWindowGrab( render_info.window, grab ? SDL_TRUE : SDL_FALSE );
 	SDL_ShowCursor( grab ? SDL_DISABLE : SDL_ENABLE );
-#endif
 
 }
 

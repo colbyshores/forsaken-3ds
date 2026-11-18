@@ -803,9 +803,6 @@ void control_ship( USERCONFIG *conf, SHIPCONTROL *ctrl )
 	}
 
 
-#ifdef LUA_BOT
-	ProcessBot1();
-#endif
 
   MaxMove = MoveAccell * MaxMoveSpeed * framelag;
   MaxTurbo = TurboAccell * MaxTurboSpeed * framelag;

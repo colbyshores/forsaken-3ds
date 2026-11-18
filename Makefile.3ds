@@ -60,14 +60,6 @@ SRC_DIRS    := $(sort $(shell find $(CORE_SRCDIR) $(PLAT_SRCDIR) -type d))
 vpath %.c   $(SRC_DIRS)
 vpath %.cpp $(SRC_DIRS)
 
-# Core sources the 3DS build leaves out: the bot AI and its Lua binding are
-# platform-agnostic but are not shipped on 3DS.
-EXCLUDE_SRC := \
-	botai_actions.cpp \
-	botai_path.cpp \
-	botai_sensors.cpp \
-	lua_bot.cpp
-
 
 #---------------------------------------------------------------------------------
 # Compiler / Linker flags
@@ -103,7 +95,7 @@ CFLAGS += -DGPU_LIGHTING
 CFLAGS += $(VERIFY_CFLAGS)
 
 ALL_SRC := $(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.c))))
-CFILES  := $(filter-out $(EXCLUDE_SRC),$(ALL_SRC))
+CFILES  := $(ALL_SRC)
 OFILES  := $(CFILES:.c=.o)
 
 # C-with-classes (AGENTS.md 9): .cpp files in the source trees compile as C++
@@ -111,7 +103,7 @@ OFILES  := $(CFILES:.c=.o)
 # constructs must not merely be discouraged, they must not compile). There are
 # the gates' "3DS build scope" claim stays true: every .cpp under the core and
 # 3DS trees is in scope for the gates, therefore it must be in the build.
-CXXFILES := $(filter-out $(EXCLUDE_SRC),$(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp)))))
+CXXFILES := $(sort $(notdir $(foreach d,$(SRC_DIRS),$(wildcard $(d)/*.cpp))))
 CXXOFILES := $(CXXFILES:.cpp=.o)
 OFILES += $(CXXOFILES)
 # Link with the C++ driver when any C++ object exists: it pulls libstdc++ and
