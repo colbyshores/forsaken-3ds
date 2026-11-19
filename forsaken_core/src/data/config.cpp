@@ -641,8 +641,8 @@ read_general_macro( FILE *f, char *config_macro, char *last_token, TEXT *macro )
 
 	if( fscanf( f, fmt, tempstr ) != 1 )
 		tempstr[ 0 ] = 0;
-	strncpy( config_macro, tempstr, MAXTEXTMSG );
-	strncpy( macro->text, tempstr, MAXTEXTMSG );
+	copy_string( config_macro, MAXTEXTMSG, tempstr );	// u->macroN: MAXTEXTMSG bytes
+	copy_string( macro->text, sizeof( macro->text ), tempstr );
 
 	file_read_token( f, last_token );
 
@@ -711,8 +711,7 @@ read_name( FILE *f, USERCONFIG *u, char *last_token )
 	file_read_token( f, last_token );
 	if ( ok )
 	{
-		strncpy( u->name, namebuf, MAX_PLAYER_NAME_LENGTH );
-		u->name[ MAX_PLAYER_NAME_LENGTH - 1 ] = 0;
+		copy_string( u->name, MAX_PLAYER_NAME_LENGTH, namebuf );
 		return 1;
 	}
 	else

@@ -1535,8 +1535,7 @@ void JoiningEnter(MENU * /*Menu*/)
 	}
 
 	// convert host
-	strncpy( host_address, TCPAddress.text, sizeof( host_address ) - 1 );
-	host_address[ sizeof( host_address ) - 1 ] = 0;
+	copy_string( host_address, sizeof( host_address ), TCPAddress.text );
 
 	network_join( host_address, host_port );
 }
@@ -1544,8 +1543,7 @@ void JoiningEnter(MENU * /*Menu*/)
 char join_status_msg[255] = "";
 void update_join_status( const char * str )
 {
-	strncpy( join_status_msg, str, 254 );
-	join_status_msg[254] = 0;
+	copy_string( join_status_msg, sizeof( join_status_msg ), str );
 }
 
 char show_f1[100] = "( press F1 to retry )";
@@ -1563,23 +1561,23 @@ void CheckJoinStatus( int * /*i*/ )
 		// at this point network_event will take over and change the screen
 	case NETWORK_CONNECTED:
 		update_join_status("Connected...");
-		strncpy( &show_f1[0], "", 100 );
+		copy_string( show_f1, sizeof( show_f1 ), "" );
 		break;
 	case NETWORK_SYNCHING:
 		update_join_status("Synching with other players please wait...");
-		strncpy( &show_f1[0], "", 100 );
+		copy_string( show_f1, sizeof( show_f1 ), "" );
 		break;
 	case NETWORK_CONNECTING:
 		update_join_status("Connecting to host please wait...");
-		strncpy( &show_f1[0], "", 100 );
+		copy_string( show_f1, sizeof( show_f1 ), "" );
 		break;
 	case NETWORK_DISCONNECTED:
 		update_join_status("Failed to connect to host...");
-		strncpy( &show_f1[0], "( press F1 to retry )", 100 );
+		copy_string( show_f1, sizeof( show_f1 ), "( press F1 to retry )" );
 		break;
 	case NETWORK_SYNCH_FAILED:
 		update_join_status("Failed to synch with other players...");
-		strncpy( &show_f1[0], "( press F1 to retry )", 100 );
+		copy_string( show_f1, sizeof( show_f1 ), "( press F1 to retry )" );
 		break;
 	}
 }
@@ -1632,7 +1630,7 @@ void UpdateGameList( void )
 						"%d. %s %s:%s", x, games_name_at(x), games_ip_at(x), games_port_at(x));
 
 			// set the game name so we can find the index later
-			strncpy(GameName[i], games_name_at(i+1), sizeof(GameName[i]));
+			copy_string( GameName[i], sizeof(GameName[i]), games_name_at(i+1) );
 		}
 		// empty out the game
 		else
@@ -4639,8 +4637,7 @@ void DrawKeyDefHelp3( MENUITEM * Item )
 						&& ( joystick < Num_Joysticks )
 						&& !JoystickInfo[ joystick ].connected )
 					{
-						strncpy( help, JoystickInfo[ KEY_JOYSTICK( keycode ) ].Name, HELP_MAX );
-						help[ HELP_MAX - 1 ] = 0;
+						copy_string( help, HELP_MAX, JoystickInfo[ KEY_JOYSTICK( keycode ) ].Name );
 						if ( strlen( help ) + strlen( UNCONNECTED1 ) < HELP_MAX )
 							append_string( help, sizeof( help ), UNCONNECTED1 );
 						else if ( strlen( help ) + strlen( UNCONNECTED2 ) < HELP_MAX )
@@ -6810,7 +6807,7 @@ void DrawTextItem( MENUITEM *Item )
 	// display each line of text
 	for(z=0; z*MAX < t->insert_pos; z++)
 	{
-		strncpy(&MessageBuff[0],&t->text[MAX*z],MAX);
+		copy_string( MessageBuff, MAX + 1, &t->text[MAX*z] );	// one line: at most MAX characters
 		Print4x5Text( &MessageBuff[0], tx, y + (z*(FontHeight+16)), 1);
 	}
 
@@ -6939,7 +6936,7 @@ void InitBikerName( char *name )
 {
 
 	// copy biker name into biker_name
-	strncpy( biker_name, name, sizeof( biker_name ) );
+	copy_string( biker_name, sizeof( biker_name ), name );
 
 	// set the last character to end of c string
 	biker_name[ sizeof( biker_name ) - 1 ] = 0;
@@ -6996,8 +6993,7 @@ void GetDefaultPilot(void)
 		char * name;
 		if( (name = find_file( "Pilots\\*.txt" )))
 		{
-			strncpy( &pilot_name[0], name, sizeof( pilot_name ) - 1 );
-			pilot_name[ sizeof( pilot_name ) - 1 ] = 0;
+			copy_string( &pilot_name[0], sizeof( pilot_name ), name );
 
 			// remove the .cfg
 			strptr = strrchr( pilot_name , '.' );
@@ -7260,8 +7256,7 @@ void ExitMultiplayerHostVDUPeerPeer ( MENU * /*Menu*/ )
 
 void RedrawMultiplayerHostVDUPeerPeer( int * /*i*/ )
 {
-	strncpy( GameTypeName, GameTypeNameTable[ GameType ], sizeof( GameTypeName ) - 1 );
-	GameTypeName[ sizeof( GameTypeName ) - 1 ] = 0;
+	copy_string( GameTypeName, sizeof( GameTypeName ), GameTypeNameTable[ GameType ] );
 	config_set_str( "LevelName", (char*)LevelList.item[ LevelList.selected_item ] );
 }
 
@@ -7275,7 +7270,7 @@ void LoadLevelText( MENU * /*Menu*/ )
 	if ( !f )
 	{
 		SelectedLevelText[ 0 ] = 0;
-		strncpy( SelectedLevel, (char*)LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
+		copy_string( SelectedLevel, sizeof( SelectedLevel ), (char*)LevelList.item[ NewLevelNum ] );
 		return;
 	}
 
@@ -7286,7 +7281,7 @@ void LoadLevelText( MENU * /*Menu*/ )
 		if ( ferror( f ) != 0 )
 		{
 			SelectedLevel[ 0 ] = 0;
-			strncpy( SelectedLevel, (char*)LevelList.item[ NewLevelNum ], MAX_TEXT_LENGTH );
+			copy_string( SelectedLevel, sizeof( SelectedLevel ), (char*)LevelList.item[ NewLevelNum ] );
 			fclose( f );
 			return;
 		}
@@ -7650,8 +7645,7 @@ void InitDebugMenu( MENU * /*Menu*/ )
 	InitRoomList();
 	if ( RoomList.selected_item >= 0 && RoomList.selected_item < RoomList.items )
 	{
-		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) - 1 );
-		RoomName.text[ sizeof( RoomName.text ) - 1 ] = 0;
+		copy_string( RoomName.text, sizeof( RoomName.text ), (char*)RoomList.item[ RoomList.selected_item ] );
 	}
 }
 
@@ -7666,7 +7660,7 @@ void InitRoomList( void )
 		RoomList.selected_item = -1;
 		for ( j = 0; j < RoomList.items; j++ )
 		{
-			strncpy( (char*)RoomList.item[ j ], Mloadheader.Group[ j ].name, sizeof( RoomList.item[ j ] ) );
+			copy_string( (char*)RoomList.item[ j ], sizeof( RoomList.item[ j ] ), Mloadheader.Group[ j ].name );
 			if ( WhoIAm != (u_int8_t) -1 && Ships[WhoIAm].Object.Group == j )
 				RoomList.selected_item = j;
 		}
@@ -7703,8 +7697,7 @@ void ChooseRoom( MENUITEM * /*item*/ )
 		return; // abort if invalid room
 	if ( GotoRoom( WhoIAm, (char*)(char*)RoomList.item[ RoomList.selected_item ] ) )
 	{
-		strncpy( RoomName.text, (char*)RoomList.item[ RoomList.selected_item ], sizeof( RoomName.text ) - 1 );
-		RoomName.text[ sizeof( RoomName.text ) - 1 ] = 0;
+		copy_string( RoomName.text, sizeof( RoomName.text ), (char*)RoomList.item[ RoomList.selected_item ] );
 		AddColourMessageToQue( SystemMessageColour, "You are now in %s", (char*)RoomList.item[ RoomList.selected_item ] );
 	}
 	else
@@ -7777,8 +7770,7 @@ void InitLoadSavedGameList( MENU * Menu )
 		char *gameinfo;
 
 		gameinfo = SavedGameInfo( LoadSavedGameList.items );
-		strncpy( (char*)LoadSavedGameList.item[ LoadSavedGameList.items ], gameinfo, sizeof( LoadSavedGameList.item[ 0 ] ) - 1 );
-		LoadSavedGameList.item[ LoadSavedGameList.items ][ sizeof( LoadSavedGameList.item[ 0 ] ) - 1 ] = 0;
+		copy_string( (char*)LoadSavedGameList.item[ LoadSavedGameList.items ], sizeof( LoadSavedGameList.item[ 0 ] ), gameinfo );
 		LoadSavedGameList.items++;
 	}
 	if ( LoadSavedGameList.selected_item < 0 || LoadSavedGameList.selected_item >= LoadSavedGameList.items )
@@ -8477,14 +8469,14 @@ void AddToFlatMenuList( MENUITEM *Item )
 		{
 			if (!TextInfo->text)
 			{
-				strncpy( (char*)l->old_item[current] , (char*)l->item[current] , sizeof(l->item[0])  );
+				copy_string( (char*)l->old_item[current], sizeof(l->item[0]), (char*)l->item[current] );
 				TextInfo->text = l->old_item[current];
 				PrintTextItem(TextInfo);
 			}else
 			{
 				if (strcmp( (char*)TextInfo->text, (char*)l->item[current] ) != 0)		// if text has changed
 				{
-					strncpy( (char*)l->old_item[current] , (char*)l->item[current] , sizeof(l->item[0])  );
+					copy_string( (char*)l->old_item[current], sizeof(l->item[0]), (char*)l->item[current] );
 
 					TextInfo->text = l->old_item[current];
 					PrintTextItem(TextInfo);
@@ -8542,7 +8534,7 @@ void DrawFlatMenuList( MENUITEM *Item )
 	for (i=0; i < l->display_items; i++)
 	{
 
-		strncpy( (char*)l->old_item[i] , EmptyString , sizeof(l->item[0])  );
+		copy_string( (char*)l->old_item[i], sizeof(l->item[0]), EmptyString );
 
 		Item->TextInfo[i] = InitTextInfo();
 
@@ -8587,7 +8579,7 @@ void DrawSplitMenuList( MENUITEM *Item )
 		for (i=0; i < l->display_items / 2; i++)
 		{
 
-			strncpy( (char*)l->old_item[i + column * (l->display_items / 2)] , EmptyString , sizeof(l->item[0])  );
+			copy_string( (char*)l->old_item[i + column * (l->display_items / 2)], sizeof(l->item[0]), EmptyString );
 
 			Item->TextInfo[i + column * (l->display_items / 2)] = InitTextInfo();
 
@@ -9534,8 +9526,7 @@ void DrawFlatMenuName( MENUITEM *Item )
 
 	if (Item->highlightflags & TEXTFLAG_CheckForRefresh)
 	{
-		strncpy( (char*)TextInfo->oldtext, (char*)TextInfo->text, sizeof( TextInfo->oldtext ) - 1 );
-		TextInfo->oldtext[ sizeof( TextInfo->oldtext ) - 1 ] = 0;
+		copy_string( (char*)TextInfo->oldtext, sizeof( TextInfo->oldtext ), (char*)TextInfo->text );
 	}
 
 	//add to text stack...
@@ -10586,8 +10577,7 @@ void ProcessTextItems (void)
 			(strncmp((char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, MAX_TEXT_LENGTH) != 0)
 			)
 		{
-			strncpy( (char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, sizeof( TextStack[i]->oldtext ) - 1 );
-			TextStack[i]->oldtext[ sizeof( TextStack[i]->oldtext ) - 1 ] = 0;
+			copy_string( (char*)TextStack[i]->oldtext, sizeof( TextStack[i]->oldtext ), (char*)TextStack[i]->text );
 			PrintTextItem(TextStack[i]);
 		}
 
@@ -11928,10 +11918,8 @@ void SelectConnectionToJoin (MENUITEM *Item)
 		if( index )
 		{
 			// update the host settings
-			strncpy( TCPAddress.text, games_ip_at(index), sizeof( TCPAddress.text ) - 1 );
-			TCPAddress.text[ sizeof( TCPAddress.text ) - 1 ] = 0;
-			strncpy( host_port_str.text, games_port_at(index), sizeof( host_port_str.text ) - 1 );
-			host_port_str.text[ sizeof( host_port_str.text ) - 1 ] = 0;
+			copy_string( TCPAddress.text, sizeof( TCPAddress.text ), games_ip_at(index) );
+			copy_string( host_port_str.text, sizeof( host_port_str.text ), games_port_at(index) );
 		}
 		// game was not found
 		else
@@ -11964,8 +11952,7 @@ void SendTitleMessage(MENUITEM *Item)
 
 	text = (TEXT *)Item->Variable;
 
-	strncpy( &MacroText4.text[0], &text->text[0], MAXTEXTMSG );
-	MacroText4.text[ MAXTEXTMSG - 1 ] = 0;
+	copy_string( MacroText4.text, sizeof( MacroText4.text ), text->text );
 	SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_TitleMessage, 0);
 
 	copy_string ( &TextMsg.Text[0], sizeof( TextMsg.Text ), &MacroText4.text[0] );
@@ -12026,8 +12013,11 @@ void GetTitleMessage(void)
 					copy_string( TitleMessage[j], sizeof( TitleMessage[j] ), TitleMessage[j - 1] );
 				}
 
-				strncpy( &TitleMessage[0][0], (char*)&dummytext.text[dummytext.startpoint[i]], dummytext.endpoint[i] - dummytext.startpoint[i] + 1);
-				TitleMessage[0][dummytext.endpoint[i] - dummytext.startpoint[i] + 1] = '\0';
+				// this line is characters startpoint..endpoint of the message
+				size_t line = dummytext.endpoint[i] - dummytext.startpoint[i] + 2;	// with its NUL
+				if( line > sizeof( TitleMessage[0] ) )
+					line = sizeof( TitleMessage[0] );
+				copy_string( TitleMessage[0], line, (char*)&dummytext.text[dummytext.startpoint[i]] );
 			}
 			TitleMsgQueEnd++;
 			TitleMessageTimer = MAX_TITLE_MSG_TIME;
@@ -12157,7 +12147,7 @@ void InitJoystickList ( MENU * /*Menu*/ )
 	{
 		if ( JoystickInfo[i].connected )
 		{
-			strncpy( (char*)JoystickList.item[j], JoystickInfo[i].Name, sizeof(JoystickList.item[0]));
+			copy_string( (char*)JoystickList.item[j], sizeof(JoystickList.item[0]), JoystickInfo[i].Name );
 			JoystickList.items++;
 			JoystickMap[j] = i;
 			j++;
@@ -12201,10 +12191,10 @@ void InitJoystickAxisConfig ( MENU * /*Menu*/)
 		{
 			if(JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[i].name)
 			{
-				strncpy(
+				copy_string(
 					(char*)JoystickAxisList.item[j],
-					JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[i].name,
-					sizeof(JoystickList.item[0])
+					sizeof(JoystickAxisList.item[0]),
+					JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[i].name
 					);
 			}
 			else
@@ -12443,7 +12433,7 @@ void InitShipActionList( void )
 	ShipActionList.selected_item = 0;
 	for (i = 0; i < NUM_SHIP_ACTIONS; i++)
 	{
-		strncpy( (char*)ShipActionList.item[i], ShipActionText[i], sizeof( ShipActionList.item[0] ) );
+		copy_string( (char*)ShipActionList.item[i], sizeof( ShipActionList.item[0] ), ShipActionText[i] );
 		ShipActionList.items++;
 	}
 
@@ -12453,7 +12443,7 @@ void InitShipActionList( void )
 	AxisActionList.selected_item = 0;
 	for (i = 0; i < NUM_SHIP_AXIS_ACTIONS; i++)
 	{
-		strncpy( (char*)AxisActionList.item[i], ShipAxisText[i], sizeof( AxisActionList.item[0] ) );
+		copy_string( (char*)AxisActionList.item[i], sizeof( AxisActionList.item[0] ), ShipAxisText[i] );
 		AxisActionList.items++;
 	}
 }
@@ -12860,7 +12850,7 @@ bool ListDelete( LIST *l, int item )
 	{
 		while ( ++item < l->items )
 		{
-			strncpy( (char*)l->item[ item - 1 ], (char*)l->item[ item ], sizeof( l->item[ 0 ] ) );
+			copy_string( (char*)l->item[ item - 1 ], sizeof( l->item[ 0 ] ), (char*)l->item[ item ] );
 		}
 		l->items--;
 		if ( l->selected_item >= l->items )
@@ -12878,8 +12868,7 @@ void InGameSaveASinglePlayerGame( MENUITEM *item )
 {
 	if ( InGameSave( item ) )
 	{
-		strncpy( (char*)LoadSavedGameList.item[ LoadSavedGameList.selected_item ], SavedGameInfo( LoadSavedGameList.selected_item ), sizeof( LoadSavedGameList.item[ 0 ] ) - 1 );
-		LoadSavedGameList.item[ LoadSavedGameList.selected_item ][ sizeof( LoadSavedGameList.item[ 0 ] ) - 1 ] = 0;
+		copy_string( (char*)LoadSavedGameList.item[ LoadSavedGameList.selected_item ], sizeof( LoadSavedGameList.item[ 0 ] ), SavedGameInfo( LoadSavedGameList.selected_item ) );
 	}
 }
 
@@ -13362,8 +13351,7 @@ void InitWatchList( MENU * /*Menu*/ )
 	{
 		if ( GameStatus[ i ] == STATUS_Normal || i == WhoIAm )
 		{
-			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 );
-			HostPlayersList.item[ HostPlayersList.items ][ sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 ] = 0;
+			copy_string( (char*)HostPlayersList.item[ HostPlayersList.items ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ), Names[ i ] );
 
 			if(i == WhoIAm)
 				append_string( (char*)HostPlayersList.item[ HostPlayersList.items ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ), " (YOU)");
@@ -13373,7 +13361,7 @@ void InitWatchList( MENU * /*Menu*/ )
 		}
 	}
 
-	strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], "--OBSERVATORY--", sizeof( HostPlayersList.item[ 0 ] ) );
+	copy_string( (char*)HostPlayersList.item[ HostPlayersList.items ], sizeof( HostPlayersList.item[ 0 ] ), "--OBSERVATORY--" );
 	HostGamePlayersWhoIAm[ HostPlayersList.items ] = MAX_PLAYERS+1;
 	HostPlayersList.items++;
 
@@ -13391,8 +13379,7 @@ void RefreshHostPlayersList( LIST * /*List*/ )
 	{
 		if ( GameStatus[ i ] == STATUS_Normal && i != WhoIAm)
 		{
-			strncpy( (char*)HostPlayersList.item[ HostPlayersList.items ], Names[ i ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 );
-			HostPlayersList.item[ HostPlayersList.items ][ sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 ] = 0;
+			copy_string( (char*)HostPlayersList.item[ HostPlayersList.items ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ), Names[ i ] );
 			HostGamePlayersWhoIAm[ HostPlayersList.items ] = i;
 			HostPlayersList.items++;
 		}
@@ -13430,8 +13417,7 @@ void TitleReset( MENUITEM * /*item*/ )
 
 void SetTitleNotify( const char * str )
 {
-	strncpy( NotifyMessage, str, sizeof( NotifyMessage ) - 1 );
-	NotifyMessage[ sizeof( NotifyMessage ) - 1 ] = 0;
+	copy_string( NotifyMessage, sizeof( NotifyMessage ), str );
 	QuickStart = QuickStartMode::Notify;
 }
 

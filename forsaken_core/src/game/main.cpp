@@ -566,7 +566,7 @@ int main( int argc, char* argv[] )
 
 	// build cli string
 	// TODO - cli parsing should be updated
-	strncpy(cli, " ", 500);
+	copy_string( cli, sizeof( cli ), " " );
 	for ( i=1; i<argc; i++ )
 	{
 		if( strlen(cli) + strlen(argv[i]) -1 > 500 )

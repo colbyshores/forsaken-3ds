@@ -31,6 +31,7 @@
  */
 
 #include "game/main.h"
+#include "util/util.h"
 #include "scripting/lua_common.h"
 
 int config_save( void )
@@ -106,7 +107,7 @@ void config_get_strncpy(char* dest, size_t size, const char *opt, const char * _
 		str = _default;
 	else
 		str = luaL_checkstring(L1, -1);
-	strncpy( dest, str, size );
+	copy_string( dest, size, str );
 	lua_pop(L1, 2);
 }
 

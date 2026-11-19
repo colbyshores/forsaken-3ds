@@ -30,8 +30,7 @@ char* convert_path( const char* _str )
 {
 	static char temp[500];
 	char * str = temp;
-	strncpy( temp, _str, sizeof( temp ) - 1 );
-	temp[ sizeof( temp ) - 1 ] = 0;
+	copy_string( temp, sizeof( temp ), _str );
 	while (*str)
 	{
 		if (*str == '\\')
@@ -239,4 +238,14 @@ bool append_string( char * dst, size_t size, const char * src )
 	if( used >= size )
 		return false;	// dst is not terminated within size
 	return copy_string( dst + used, size - used, src );
+}
+
+bool copy_field( char * dst, size_t size, const char * src )
+{
+	bool fits = copy_string( dst, size, src );
+	size_t used = strnlen( dst, size ) + 1;
+
+	if( used < size )
+		memset( dst + used, 0, size - used );
+	return fits;
 }

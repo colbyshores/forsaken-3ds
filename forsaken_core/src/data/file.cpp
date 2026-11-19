@@ -182,8 +182,7 @@ bool delete_file( char * str )
 bool replace_file( const char * from, const char * to )
 {
 	char src[ 500 ];
-	strncpy( src, convert_path( from ), sizeof( src ) - 1 );
-	src[ sizeof( src ) - 1 ] = 0;
+	copy_string( src, sizeof( src ), convert_path( from ) );
 	char * dst = convert_path( to );
 	if( rename( src, dst ) == 0 )
 		return true;

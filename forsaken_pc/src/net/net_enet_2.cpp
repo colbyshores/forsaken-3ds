@@ -408,10 +408,10 @@ static void update_players( void )
 	}
 }
 
+/* target: a NETWORK_MAX_NAME_LENGTH-byte player name */
 static void set_player_name( char * target, const char * source )
 {
-	strncpy( target, source, NETWORK_MAX_NAME_LENGTH-1 );
-	target[NETWORK_MAX_NAME_LENGTH-1] = 0;
+	copy_string( target, NETWORK_MAX_NAME_LENGTH, source );
 }
 
 static network_player_t * create_player( ENetPeer * peer )

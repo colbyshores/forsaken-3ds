@@ -284,8 +284,7 @@ const char* msg_to_str( int msg_type )
 void set_player_name( int BikeNum, char* name )
 {
 	if( !name || BikeNum < 0 || BikeNum >= MAX_PLAYERS ) return;
-	strncpy( &Names[BikeNum][0], name, sizeof( Names[BikeNum] ) - 1 );
-	Names[BikeNum][ sizeof( Names[BikeNum] ) - 1 ] = 0;
+	copy_string( Names[BikeNum], sizeof( Names[BikeNum] ), name );
 	Names[BikeNum][MAXSHORTNAME-1] = 0;
 }
 
@@ -2888,7 +2887,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				// display my version number
 				AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
 				// send my version number back
-				strncpy( QuickText.text, PXVersion , sizeof(QuickText.text) - 1 );
+				copy_string( QuickText.text, sizeof( QuickText.text ), PXVersion );
 				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_QuickTaunt, 0);
 				QuickText.text[0] = 0; // clean message buffer
 			}
@@ -3255,8 +3254,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		memmove( InitMsg->GameStatus,		GameStatus,		sizeof(InitMsg->GameStatus));		// other players game status//memcpy
 		memmove( InitMsg->TeamNumber,		TeamNumber,		sizeof(InitMsg->TeamNumber));		// what team everyone is on//memcpy
 
-		strncpy( InitMsg->LevelName, ShortLevelNames[NewLevelNum], sizeof( InitMsg->LevelName ) - 1 );
-		InitMsg->LevelName[ sizeof( InitMsg->LevelName ) - 1 ] = 0;						// level we are on
+		copy_field( InitMsg->LevelName, sizeof( InitMsg->LevelName ), ShortLevelNames[NewLevelNum] );						// level we are on
 
 		break;
 
@@ -3551,8 +3549,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		LongStatusMsg->Status.Mines			= Ships[WhoIAm].Mines;
 		LongStatusMsg->Status.Triggers		= Ships[WhoIAm].Triggers;
 		LongStatusMsg->Status.TrigVars		= Ships[WhoIAm].TrigVars;
-		strncpy( &LongStatusMsg->LevelName[0], &ShortLevelNames[NewLevelNum][0], sizeof( LongStatusMsg->LevelName ) - 1 );
-		LongStatusMsg->LevelName[ sizeof( LongStatusMsg->LevelName ) - 1 ] = 0;
+		copy_field( LongStatusMsg->LevelName, sizeof( LongStatusMsg->LevelName ), ShortLevelNames[NewLevelNum] );
 		{ // send update if level change
 			static int16_t MyNewLevelNum = 0;
 			if(MyNewLevelNum != NewLevelNum)
@@ -3644,22 +3641,22 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		switch( Type )
 		{
 		case TEXTMSGTYPE_Taunt1:
-			strncpy( &TextMsg->Text[0]	, &MacroText1.text[0] , MAXTEXTMSG );
+			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText1.text[0] );
 			TextMsg->TextMsgType = Type;
 			MessageColour = TauntMessageColour;
 			break;
 		case TEXTMSGTYPE_Taunt2:
-			strncpy( &TextMsg->Text[0]	, &MacroText2.text[0] , MAXTEXTMSG );
+			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText2.text[0] );
 			TextMsg->TextMsgType = Type;
 			MessageColour = TauntMessageColour;
 			break;
 		case TEXTMSGTYPE_Taunt3:
-			strncpy( &TextMsg->Text[0]	, &MacroText3.text[0] , MAXTEXTMSG );
+			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText3.text[0] );
 			TextMsg->TextMsgType = Type;
 			MessageColour = TauntMessageColour;
 			break;
 		case TEXTMSGTYPE_TitleMessage:
-			strncpy( &TextMsg->Text[0]	, &MacroText4.text[0] , MAXTEXTMSG );
+			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText4.text[0] );
 			TextMsg->TextMsgType = Type;
 			MessageColour = SystemMessageColour;
 			break;
@@ -3676,7 +3673,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 			MessageColour = SystemMessageColour;
 			break;
 		case TEXTMSGTYPE_QuickTaunt:
-			strncpy( &TextMsg->Text[0]	, &QuickText.text[0] , MAXTEXTMSG );
+			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickText.text[0] );
 			TextMsg->TextMsgType = Type;
 			MessageColour = MyMessageColour;
 			AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
@@ -3688,14 +3685,14 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 			}
 			break;
 		case TEXTMSGTYPE_QuickTauntWhisper:
-			strncpy( &TextMsg->Text[0]	, &QuickTextWhisper.text[0] , MAXTEXTMSG );
+			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickTextWhisper.text[0] );
 			TextMsg->TextMsgType = Type;
 			MessageColour = MyMessageColour;
 			AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
 			break;
 		case TEXTMSGTYPE_CaptureFlagMessage:
 			TextMsg->TextMsgType = Type;
-			strncpy( &TextMsg->Text[0]	, CTFMessage , MAXTEXTMSG );
+			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), CTFMessage );
 			PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
 			MessageColour = FlagMessageColour;
 			break;

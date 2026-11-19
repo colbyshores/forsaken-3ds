@@ -61,16 +61,13 @@ int glob(const char *pattern, int flags,
 	pglob->gl_pathv = nullptr;
 
 	/* Split pattern into directory and filename parts */
-	strncpy(dirpath, pattern, sizeof(dirpath) - 1);
-	dirpath[sizeof(dirpath) - 1] = 0;
+	copy_string( dirpath, sizeof(dirpath), pattern );
 	slash = strrchr(dirpath, '/');
 	if (slash) {
-		strncpy(match, slash + 1, sizeof(match) - 1);
-		match[sizeof(match) - 1] = 0;
+		copy_string( match, sizeof(match), slash + 1 );
 		*(slash + 1) = 0;
 	} else {
-		strncpy(match, dirpath, sizeof(match) - 1);
-		match[sizeof(match) - 1] = 0;
+		copy_string( match, sizeof(match), dirpath );
 		copy_string(dirpath, sizeof( dirpath ), "./");
 	}
 
@@ -80,10 +77,8 @@ int glob(const char *pattern, int flags,
 	char suffix[256] = "";
 	if (star) {
 		int plen = star - match;
-		strncpy(prefix, match, plen);
-		prefix[plen] = 0;
-		strncpy(suffix, star + 1, sizeof(suffix) - 1);
-		suffix[sizeof(suffix) - 1] = 0;
+		copy_string(prefix, (size_t)plen + 1, match);	// the plen characters before '*' 
+		copy_string( suffix, sizeof(suffix), star + 1 );
 	}
 
 	dir = opendir(dirpath);

@@ -10,7 +10,10 @@
  * copy_string and append_string are the bounded strcpy and strcat: dst
  * holds size bytes and is always left terminated; they return false when
  * src did not fit and was cut short. Pass sizeof the destination array,
- * or the size its owner documents for a pointer.
+ * or the size its owner documents for a pointer. copy_field is copy_string
+ * for a fixed-width record field (a network message or file record): it
+ * also zeroes the bytes after the string, so the record carries no
+ * leftover data.
  */
 
 #include "game/main.h"
@@ -34,6 +37,7 @@ char * convert_char( char from, char to, char* in );
 
 bool copy_string( char * dst, size_t size, const char * src );
 bool append_string( char * dst, size_t size, const char * src );
+bool copy_field( char * dst, size_t size, const char * src );
 
 /* Defined in util.cpp; shared with the modules that use it. */
 extern bool DebugLog;

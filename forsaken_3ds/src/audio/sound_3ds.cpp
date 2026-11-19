@@ -341,7 +341,7 @@ sound_buffer_t *sound_load(char *path)
 	buffer = (sound_buffer_t *)malloc(sizeof(sound_buffer_t));
 	if (!buffer) { fclose(f); return nullptr; }
 	memset(buffer, 0, sizeof(sound_buffer_t));
-	strncpy(buffer->path, file_path, MAX_PATH_LEN - 1);
+	copy_string(buffer->path, sizeof(buffer->path), file_path);
 
 	/* scan chunks */
 	while (fread(&chunk, sizeof(chunk), 1, f) == 1)
@@ -460,8 +460,7 @@ sound_source_t *sound_source(sound_buffer_t *buffer)
 	src->looping = false;
 	src->volume  = 1.0f;
 	src->pan     = 0.0f;
-	strncpy(src->path, buffer->path, MAX_PATH_LEN - 1);
-	src->path[MAX_PATH_LEN - 1] = 0;
+	copy_string( src->path, MAX_PATH_LEN, buffer->path );
 
 	/* configure ndsp channel */
 	ndspChnReset(ch);

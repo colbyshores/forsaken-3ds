@@ -281,7 +281,7 @@ sound_buffer_t * sound_load(char *path)
 		DebugPrintf("sound_load: failed to malloc buffer\n");
 		return 0;
 	}
-	strncpy(buffer->path,file_path,MAX_PATH-1);
+	copy_string( buffer->path, sizeof( buffer->path ), file_path );
 
 	// clear error code
 	alGetError();
@@ -378,7 +378,7 @@ sound_source_t * sound_source( sound_buffer_t * buffer )
 	}
 	source->playing = false;
 	source->buffer = buffer->id;
-	strncpy(source->path,buffer->path,MAX_PATH);
+	copy_string( source->path, sizeof( source->path ), buffer->path );
 
 	// clear errors
 	alGetError();
