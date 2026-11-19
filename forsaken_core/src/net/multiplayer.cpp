@@ -463,13 +463,15 @@ void DistributeTeamsToLists(int * /*dummy*/)
 					}
 					else
 					{
-						strcpy((char*)&TeamList[team].item[TeamList[team].items++][0], (char*)&Names[player][0]);
+						copy_string( (char*)TeamList[team].item[TeamList[team].items], sizeof( TeamList[team].item[0] ), Names[player] );
+						TeamList[team].items++;
 					}
 
 					OkayToStart = false;
 				}else
 				{
-					strcpy((char*)&TeamList[team].item[TeamList[team].items++][0], (char*)&Names[player][0]);
+					copy_string( (char*)TeamList[team].item[TeamList[team].items], sizeof( TeamList[team].item[0] ), Names[player] );
+					TeamList[team].items++;
 				}
 			}
 		}

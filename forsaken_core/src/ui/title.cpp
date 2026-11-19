@@ -2722,7 +2722,7 @@ const char *EmptyString = "";
 const char *UndefinedKey = LT_Undef;
 const char *WaitingForConfirm = LT_SelectWhenReady;
 const char *WaitingForReset = LT_WaitingForReset;
-int MAXSLIDERINFOLENGTH = 32;
+constexpr int MAXSLIDERINFOLENGTH = 32;
 /**********************
 new slider globals
 ***********************/
@@ -4678,7 +4678,7 @@ void DrawKeyDefHelp3( MENUITEM * Item )
 												if ( help_length + 1 < HELP_MAX  )
 													strncat( help, "+" ABBREVIATED, HELP_MAX - 1 - help_length );
 												else
-													strcpy( help + HELP_MAX - 4, ABBREVIATED );
+													copy_string( help + HELP_MAX - 4, 4, ABBREVIATED );
 												help[ HELP_MAX - 1 ] = 0;
 											}
 											break;
@@ -9199,27 +9199,27 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 		switch (slider->value)
 		{
 		case 0:
-			num = sprintf( (char*)TextInfo->text, LT_NoLimit/*"no limit"*/ );
+			num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, LT_NoLimit/*"no limit"*/ );
 			break;
 		case 1:
-			num = sprintf( (char*)TextInfo->text, LT_OneMinute/*"1 min"*/ );
+			num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, LT_OneMinute/*"1 min"*/ );
 			break;
 		default:
-			num = sprintf( (char*)TextInfo->text, LT_ManyMinutes/*"%d mins"*/, slider->value );
+			num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, LT_ManyMinutes/*"%d mins"*/, slider->value );
 			break;
 		}
 		offset = 5;
 		break;
 	case SLIDER_Value:
-		num = sprintf( (char*)TextInfo->text, "%d", slider->value );
+		num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, "%d", slider->value );
 		offset = 5;
 		break;
 	case SLIDER_Percent:
-		num = sprintf( (char*)TextInfo->text, "%d %%", slider->value );
+		num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, "%d %%", slider->value );
 		offset = 58;
 		break;
 	case SLIDER_Sensitivity:
-		num = sprintf( (char*)TextInfo->text, "%d", slider->value );
+		num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, "%d", slider->value );
 		offset = 58;
 		break;
 	case SLIDER_Bike:
@@ -9233,31 +9233,27 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 			uservalue = slider->FuncUser( slider );
 			if ( uservalue )
 			{
-				strncpy( (char*)TextInfo->text, uservalue, MAXSLIDERINFOLENGTH - 1 );
-				TextInfo->text[ MAXSLIDERINFOLENGTH - 1 ] = 0;
+				copy_string( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, uservalue );
 				num = strlen( (char*)TextInfo->text );
 			}
 			else
 			{
-				num = sprintf( (char*)TextInfo->text, LT_NoValue/*"no value" */);
+				num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, LT_NoValue/*"no value" */);
 			}
 		}
 		else
 		{
-			num = sprintf( (char*)TextInfo->text, "no func" );
+			num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, "no func" );
 		}
 		offset = 5;
 		break;
 	default:
-		num = sprintf( (char*)TextInfo->text, "%.0f%%", ((float)slider->value / (float)slider->max) * 100.0F );
+		num = snprintf( (char*)TextInfo->text, MAXSLIDERINFOLENGTH, "%.0f%%", ((float)slider->value / (float)slider->max) * 100.0F );
 		offset = 58;
 		break;
 	}
-	if ( num >= MAXSLIDERINFOLENGTH)
-	{
-		Msg("Title.c: DrawFlatSliderStatus() sprintf trying to write too many chars\n");
-		exit(1);
-	}
+	if ( num >= MAXSLIDERINFOLENGTH )	// the label was cut short to fit
+		Msg( "DrawFlatSliderStatus() slider label longer than %d characters\n", MAXSLIDERINFOLENGTH - 1 );
 	TextInfo->xmin = Item->xmax + offset;
 	TextInfo->ymin = Item->y;
 	TextInfo->xmax = Item->xmax + 100;

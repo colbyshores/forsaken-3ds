@@ -437,8 +437,7 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 	 * switched off) leaves the previous save intact instead of a truncated
 	 * one. The Save* calls hand fp back, or NULL on failure; out is kept to
 	 * close the file either way. */
-	copy_string( (char*)TmpFilename, sizeof( TmpFilename ), (char*)Filename );	// saveNN.SAV -> saveNN.TMP
-	strcpy( strrchr( (char*)TmpFilename, '.' ), ".TMP" );
+	Change_Ext( (char*)Filename, (char*)TmpFilename, sizeof( TmpFilename ), ".TMP" );	// saveNN.SAV -> saveNN.TMP
 	out = fp = file_open( (char*)&TmpFilename[ 0 ], "wb" );
 
 	if( fp != nullptr )

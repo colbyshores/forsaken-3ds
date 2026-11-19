@@ -4602,7 +4602,7 @@ bool PreLoadEnemies( void )
 							if( EnemyTypes[ ModelNum ].StealthMode )
 							{
 								ModelNames[ NextEnemyModel ].Name[ 0 ] = 'S';
-								strcpy( &ModelNames[ NextEnemyModel ].Name[ 1 ], EnemyTypes[ ModelNum ].ModelFilename );
+								copy_string( &ModelNames[ NextEnemyModel ].Name[ 1 ], sizeof( ModelNames[ 0 ].Name ) - 1, EnemyTypes[ ModelNum ].ModelFilename );
 								ModelNames[ NextEnemyModel ].LOD = 0;
 								ModelNames[ NextEnemyModel ].Panel = false;
 								ModelNames[ NextEnemyModel ].DoIMorph = true;
@@ -4646,7 +4646,7 @@ bool PreLoadEnemies( void )
 								if( EnemyTypes[ ModelNum ].StealthMode )
 								{
 									ModelNames[ NextEnemyModel ].Name[ 0 ] = 'S';
-									strcpy( &ModelNames[ NextEnemyModel ].Name[ 1 ], EnemyTypes[ ModelNum ].ModelFilename );
+									copy_string( &ModelNames[ NextEnemyModel ].Name[ 1 ], sizeof( ModelNames[ 0 ].Name ) - 1, EnemyTypes[ ModelNum ].ModelFilename );
 									ModelNames[ NextEnemyModel ].LOD = 0;
 									ModelNames[ NextEnemyModel ].Panel = false;
 									ModelNames[ NextEnemyModel ].DoIMorph = false;
