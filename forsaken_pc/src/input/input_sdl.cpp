@@ -301,7 +301,7 @@ mouse_state_t* read_mouse(void)
 static int get_deadzone( int joy, int axis )
 {
 	// make sure this is a valid joystick/axis
-	if( joy > Num_Joysticks || axis > JoystickInfo[joy].NumAxis )
+	if( joy >= Num_Joysticks || axis >= JoystickInfo[joy].NumAxis )
 		return 0;
 	return JoystickInfo[ joy ].Axis[ axis ].deadzone;
 }
@@ -311,10 +311,10 @@ void app_joy_axis( SDL_JoyAxisEvent * axis )
 	long value;
 	int deadzone;
 
-	if(axis->axis > MAX_JOYSTICK_AXIS)
+	if(axis->axis >= MAX_JOYSTICK_AXIS)
 	{
 		DebugPrintf(
-			"sdl_input: ignoring joy %d axis %d > max axises\n",
+			"sdl_input: ignoring joy %d axis %d >= max axises\n",
 			axis->which, axis->axis);
 		return;
 	}
@@ -338,10 +338,10 @@ void app_joy_ball( SDL_JoyBallEvent * /*ball*/ )
 
 void app_joy_button( SDL_JoyButtonEvent * button )
 {
-	if(button->button > MAX_JOYSTICK_BUTTONS)
+	if(button->button >= MAX_JOYSTICK_BUTTONS)
 	{
 		DebugPrintf(
-			"sdl_input: ignoring joy %d button %d > max buttons\n",
+			"sdl_input: ignoring joy %d button %d >= max buttons\n",
 			button->which, button->button);
 		return;
 	}
@@ -360,10 +360,10 @@ void app_joy_button( SDL_JoyButtonEvent * button )
 
 void app_joy_hat( SDL_JoyHatEvent * hat )
 {
-	if(hat->hat > MAX_JOYSTICK_POVS)
+	if(hat->hat >= MAX_JOYSTICK_POVS)
 	{
 		DebugPrintf(
-			"sdl_input: ignoring joy %d hat %d > max hats\n",
+			"sdl_input: ignoring joy %d hat %d >= max hats\n",
 			hat->which, hat->hat);
 		return;
 	}
