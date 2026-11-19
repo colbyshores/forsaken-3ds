@@ -5,28 +5,34 @@
  * clip space, calls fillclip_tight_bounds, and gets back pixel bounds mapped
  * with the same viewport math as Transform2Viewport.
  *
+ * A portal is an opening, not a surface: the room beyond is seen through
+ * every part of it that is in front of the eye, including the part nearer
+ * than the near plane (rays pass the opening there and hit walls beyond the
+ * near plane). So the polygon is clipped against the eye plane (w > 0) only,
+ * never the near plane; clipping at the near plane would drop the screen
+ * area seen through the near part of the doorway and leave it black.
+ *
  * Contract: given clip-space points (x,y,z,w), compute a screen-pixel
- * bounding box covering exactly the w>0,z>=0-visible fragment. Returns 1
- * with bounds, 0 when the fragment is empty or degenerate (caller keeps
- * its conservative fallback). Bounds are a superset of the true visible
- * pixels (safe direction: never culls wrongly) and tight for ordinary
- * straddles (no slab explosion: z>=0 clipping happens before projection).
+ * bounding box covering the w>0 part of the polygon. Returns 1 with
+ * bounds, 0 when that part is empty or the input degenerate (the caller
+ * keeps its conservative fallback). Points just in front of the eye project
+ * far off screen and clamp to the viewport edges, so the bounds are never
+ * smaller than the visible region.
  */
 #pragma once
 
-/* Scratch capacity: portals are quads; 40 verts covers two
- * Sutherland-Hodgman passes with wide margin. */
+/* Scratch capacity: portals are quads; 40 verts covers the clip pass with
+ * wide margin. */
 constexpr int FILLCLIP_CAP = 40;
 
-/* One Sutherland-Hodgman pass against w>=eps (pass 0) or z>=0 (pass 1).
+/* One Sutherland-Hodgman pass against the eye plane, w >= eps.
  * in:  [n*4] xyzw, out: [cap*4]. Returns out count, or -1 on overflow. */
-inline int fillclip_pass(const float *in_pts, int n, float *out_pts, int cap,
-						 int pass)
+inline int fillclip_eye_plane(const float *in_pts, int n, float *out_pts, int cap)
 {
 	int i, j, k = 0;
 	for (i = 0, j = n - 1; i < n; j = i++) {
-		float di = (pass == 0) ? (in_pts[i * 4 + 3] - 1e-4f) : in_pts[i * 4 + 2];
-		float dj = (pass == 0) ? (in_pts[j * 4 + 3] - 1e-4f) : in_pts[j * 4 + 2];
+		float di = in_pts[i * 4 + 3] - 1e-4f;
+		float dj = in_pts[j * 4 + 3] - 1e-4f;
 		int ini = di >= 0.0f, inj = dj >= 0.0f;
 		if (ini) {
 			if (!inj) {
@@ -73,29 +79,26 @@ inline int fillclip_tight_bounds(const float *clip, int n,
 								 float *out_minx, float *out_miny,
 								 float *out_maxx, float *out_maxy)
 {
-	/* 40 in / 40 out covers portal quads (4 verts) through both planes
-     * with wide margin; over-capacity falls back conservatively. */
-	float buf_a[FILLCLIP_CAP * 4], buf_b[FILLCLIP_CAP * 4];
+	/* Clipping adds at most one vertex per edge; over-capacity input
+	 * falls back conservatively. */
+	float buf[FILLCLIP_CAP * 4];
 	int m, i;
 	float minx, miny, maxx, maxy;
 
 	if (n < 3 || n > 36)
 		return 0;
-	m = fillclip_pass(clip, n, buf_a, FILLCLIP_CAP, 0);
-	if (m <= 0)
-		return 0;
-	m = fillclip_pass(buf_a, m, buf_b, FILLCLIP_CAP, 1);
+	m = fillclip_eye_plane(clip, n, buf, FILLCLIP_CAP);
 	if (m <= 0)
 		return 0;
 	minx = miny = 1e30f;
 	maxx = maxy = -1e30f;
 	for (i = 0; i < m; i++) {
-		float w = buf_b[i * 4 + 3];
+		float w = buf[i * 4 + 3];
 		float nx, ny, px, py;
 		if (!(w > 0.0f))
 			return 0;
-		nx = buf_b[i * 4 + 0] / w;
-		ny = buf_b[i * 4 + 1] / w;
+		nx = buf[i * 4 + 0] / w;
+		ny = buf[i * 4 + 1] / w;
 		if (nx < -1.0F)
 			px = vpx;
 		else if (nx > 1.0F)
