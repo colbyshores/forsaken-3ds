@@ -176,6 +176,22 @@ float	cral = 0.0F;
 
 bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 {
+	int		mesh;
+	int		vert;
+	LVERTEX	*VertBase = NULL;
+	LVERTEX	*LVert = NULL;
+	LVERTEX	*OrigLVert = NULL;
+	COLOR col;
+	float	x,y,z;
+	u_int32_t r,g,b,intWhiteOut;
+	POLYANIM * PolyAnim;
+	int i,e;
+	int		color_already_clean;	/* the group's colours were clean on entry */
+	u_int32_t * u_int32Pnt;
+	TANIMUV * TanimUV;
+	float	intensity;
+#ifndef GPU_LIGHTING
+	/* the CPU light loop's working variables */
 	XLIGHT * XLightPnt;
 	float	blf;
 	float	glf;
@@ -183,12 +199,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	VECTOR	Temp;
 	VECTOR	CellIndex;
 	float	distance;
-	int		mesh;
-	int		vert;
-	LVERTEX	*VertBase = NULL;
-	LVERTEX	*LVert = NULL;
-	LVERTEX	*OrigLVert = NULL;
-	COLOR col;
 	VERTEXCELL * VertexCellPnt;
 	u_int16_t * VertexIndexPnt;
 	u_int16_t * OrgVertexIndexPnt;
@@ -208,7 +218,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	float	CellSize;
 	float	Size,OSize;
 	float	SizeX2;
-	float	x,y,z;
 	float	Posx,Posy,Posz;
 	float	Dirx = 0.0f, Diry = 0.0f, Dirz = 0.0f;
 	float	Cosa,CosArc = 0.0f;
@@ -227,13 +236,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 	u_int32_t inc;
 	u_int32_t carry;
 	u_int32_t clamp;
-	u_int32_t r,g,b,intWhiteOut;
-	POLYANIM * PolyAnim;
-	int i,e;
-	int		color_already_clean;	/* the group's colours were clean on entry */
-	u_int32_t * u_int32Pnt;
-	TANIMUV * TanimUV;
-	float	intensity;
+#endif
 
 
 	intWhiteOut = (int)WhiteOut;
@@ -242,8 +245,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 		intWhiteOut = (256 - (intWhiteOut-256) );
 	}
 
-
+#ifndef GPU_LIGHTING
 	CellSize = Mloadheader->CellSize;
+#endif
 	/* Snapshot and clear the group's clean flag on entry: only a plain
 	 * restore in this call may set it again, so a mesh is never skipped on
 	 * the strength of a flag set earlier in the same call. The skip is only
@@ -270,12 +274,14 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			( ( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB ) && WhiteOut == 0.0F ) ?
 				SMEMO_PASS_UNSET : SMEMO_PASS_PER_FRAME;
 
+#ifndef GPU_LIGHTING
 		VertexCellPnt = Mloadheader->Group[group].vertex_cell_pnt[mesh];
 		OrgVertexIndexPnt = Mloadheader->Group[group].vertex_index_pnt[mesh];
 
 		NumOfxCells = Mloadheader->Group[group].xcells[mesh];
 		NumOfyCells = Mloadheader->Group[group].ycells[mesh];
 		NumOfzCells = Mloadheader->Group[group].zcells[mesh];
+#endif
 
 		if( Mloadheader->Group[group].num_animating_polys[mesh] != 0 )
 		{
@@ -746,9 +752,6 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 ===================================================================*/
 bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radius , MATRIX * Matrix )
 {
-	XLIGHT * XLightPnt;
-	VECTOR	Temp;
-	float	distance;
 	int		group;
 	int		mesh;
 	int		vert;
@@ -756,6 +759,11 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 
 	LVERTEX	*LVert = NULL;
 	LVERTEX	*OrigLVert = NULL;
+#ifndef GPU_LIGHTING
+	/* the CPU light loop's working variables */
+	XLIGHT * XLightPnt;
+	VECTOR	Temp;
+	float	distance;
 	COLOR col;
 	float	Size,OSize;
 	float	SizeX2;
@@ -775,6 +783,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	float	blf;
 	float	glf;
 	float	rlf;
+#endif
 
 
 	group = MXloadheader->num_groups;
@@ -982,9 +991,6 @@ PLOP:
 ===================================================================*/
 bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Radius , MATRIX * Matrix )
 {
-	XLIGHT * XLightPnt;
-	VECTOR	Temp;
-	float	distance;
 	int		group;
 	int		mesh;
 	int		vert;
@@ -992,6 +998,11 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 
 	LVERTEX	*LVert = NULL;
 	LVERTEX	*OrigLVert = NULL;
+#ifndef GPU_LIGHTING
+	/* the CPU light loop's working variables */
+	XLIGHT * XLightPnt;
+	VECTOR	Temp;
+	float	distance;
 	COLOR col;
 	float	Size,OSize;
 	float	SizeX2;
@@ -1011,6 +1022,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	float	blf;
 	float	glf;
 	float	rlf;
+#endif
 
 
 	group = MXloadheader->num_groups;
