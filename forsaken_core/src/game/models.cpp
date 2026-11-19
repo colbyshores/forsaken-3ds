@@ -1412,6 +1412,1048 @@ VECTOR BloodOffsets[] = {
 
 float TomFrame = 0.0F;
 
+/* MODFUNC_Explode */
+[[gnu::always_inline]] static inline void ModelExplode( u_int16_t & i )
+{
+	Models[i].Scale += ( ( Models[i].MaxScale / 40.0F ) * framelag );
+	if( Models[i].Scale <= Models[i].MaxScale )			// 10.0F
+	{
+		ShockWave( &Models[i].Pos, ( Models[i].Scale * BALL_RADIUS ), Models[i].OwnerType, Models[i].Owner, 16.0F, Models[i].Group, Models[i].SecWeapon, i );
+	}
+	else
+	{
+		KillUsedModel( i );
+	}
+}
+
+/* MODFUNC_Scale2 */
+[[gnu::always_inline]] static inline void ModelScale2( u_int16_t & i )
+{
+	Models[i].LifeCount -= framelag;
+	if( Models[i].LifeCount <= 0.0F )
+	{
+		Models[i].LifeCount = 0.0F;
+	}
+
+	Models[i].Scale -= ( framelag * GRAVGON_SCALE_DEC );
+	if( Models[i].Scale < 0.0F )
+	{
+		Models[i].Scale = Models[i].MaxScale;
+		if( Models[i].LifeCount == 0.0F )
+		{
+			KillUsedModel( i );
+			return;
+		}
+	}
+	GravityWave( &Models[i].Pos, ( BALL_RADIUS * Models[i].MaxScale ), 10.0F, Models[i].Group );
+}
+
+/* MODFUNC_BodyPart */
+[[gnu::always_inline]] static inline void ModelBodyPart( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, float & Speed, float & Cos, QUAT & TempQuat, VECTOR & FrameLag_Rot, VECTOR & Pos, VECTOR & TempDir, VECTOR & OffVector, VECTOR *& BloodPtr, MATRIX & UpMatrix, MATRIX & InvUpMatrix )
+{
+	if( Models[i].Group != INDEX_NONE )
+	{
+		TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+	else
+	{
+		TempQuat.From2Vectors(&SlideUp, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+
+	Models[i].LifeCount -= framelag;
+	if( Models[i].LifeCount < 0.0F )
+	{
+		Models[i].LifeCount = 0.0F;
+		KillUsedModel( i );
+		return;
+	}
+	else
+	{
+		if( AmIOutsideGroup( &Mloadheader, &Models[i].Pos, Models[i].Group ) )
+		{
+			Models[i].LifeCount = 0.0F;
+			KillUsedModel( i );
+			return;
+		}
+
+		TempDir.x = ( Models[i].Dir.x * framelag );
+		TempDir.y = ( Models[i].Dir.y * framelag );
+		TempDir.z = ( Models[i].Dir.z * framelag );
+
+		if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+							  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+							  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
+		{
+			Models[i].Pos = Int_Point;
+			CreateBloodSplat( &Int_Point, (VECTOR *) &Int_Normal, Models[i].Group );
+
+			TempVector = Models[i].Dir;
+			NormaliseVector( &TempVector );
+			Speed = VectorLength( &Models[i].Dir );
+			ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+			Speed *= 0.5F;
+
+			PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
+
+			if( Speed < ( 5.0F * GLOBAL_SCALE ) )
+			{
+				KillUsedModel( i );
+				return;
+			}
+
+			Models[i].Dir.x *= Speed;
+			Models[i].Dir.y *= Speed;
+			Models[i].Dir.z *= Speed;
+			Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+			Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+			Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+			Models[i].Rot.x *= Speed;
+			Models[i].Rot.y *= Speed;
+			Models[i].Rot.z *= Speed;
+		}
+		else
+		{
+			Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+			Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+			Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+		}
+
+		ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
+
+		if( TempDir.x )
+		{
+			if( TempDir.x > 0.0F )
+			{
+				TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+			}
+			else
+			{
+				TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+			}
+		}
+		if( TempDir.z )
+		{
+			if( TempDir.z > 0.0F )
+			{
+				TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+			}
+			else
+			{
+				TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+			}
+		}
+		TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+
+		ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
+
+		FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
+		FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
+		FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
+		TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+		TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+		Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
+		MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
+
+		BloodPtr = &BloodOffsets[ 0 ];
+
+		ApplyMatrix( &Models[i].Mat, BloodPtr, &TempVector );
+		NormaliseVector( &TempVector );
+		BloodPtr++;
+		ApplyMatrix( &Models[i].Mat, BloodPtr, &OffVector );
+		Cos = DotProduct( &TempVector, &SlideUp );
+		if( Cos < 0.0F )
+		{
+			if( IsGroupVisible[ Models[i].Group ] )
+			{
+				Models[i].TimeCount += framelag;
+
+				if( Models[i].TimeCount >= Models[i].TimeInterval )
+				{
+					Models[i].TimeCount = 0.0F;
+					Pos.x = ( Models[i].Pos.x + ( OffVector.x * GLOBAL_SCALE ) );
+					Pos.y = ( Models[i].Pos.y + ( OffVector.y * GLOBAL_SCALE ) );
+					Pos.z = ( Models[i].Pos.z + ( OffVector.z * GLOBAL_SCALE ) );
+					CreateBloodTrail( &Pos, &TempVector, Models[i].Group );
+				}
+			}
+		}
+		else
+		{
+			Models[i].TimeCount = 0.0F;
+		}
+	}
+}
+
+/* MODFUNC_TomCruise */
+[[gnu::always_inline]] static inline void ModelTomCruise( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, QUAT & TempQuat, VECTOR & TempDir, MATRIX & UpMatrix, MATRIX & InvUpMatrix )
+{
+	if( Models[i].Group != INDEX_NONE )
+	{
+		TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+	else
+	{
+		TempQuat.From2Vectors(&SlideUp, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+
+	TomFrame += ( framelag * 0.2F );
+	while( TomFrame >= 27.0F ) TomFrame -= 27.0F;
+
+	Models[ i ].ModelNum = (u_int16_t) ( MODEL_Tom0 + TomFrame );
+
+	Models[i].LifeCount -= framelag;
+	if( Models[i].LifeCount < 0.0F )
+	{
+		Models[i].LifeCount = 0.0F;
+		KillUsedModel( i );
+		return;
+	}
+	else
+	{
+		if( AmIOutsideGroup( &Mloadheader, &Models[i].Pos, Models[i].Group ) )
+		{
+			Models[i].LifeCount = 0.0F;
+			KillUsedModel( i );
+			return;
+		}
+
+		TempDir.x = ( Models[i].Dir.x * framelag );
+		TempDir.y = ( Models[i].Dir.y * framelag );
+		TempDir.z = ( Models[i].Dir.z * framelag );
+
+		if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+							  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+							  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
+		{
+			PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
+			NormaliseVector( &Models[i].Dir );
+			ExplodeBody( &Models[i].Pos, &Models[i].Dir, Models[i].Group );
+			KillUsedModel( i );
+			return;
+		}
+		else
+		{
+			Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+			Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+			Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+		}
+
+		ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
+
+		if( TempDir.x )
+		{
+			if( TempDir.x > 0.0F )
+			{
+				TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+			}
+			else
+			{
+				TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+			}
+		}
+		if( TempDir.z )
+		{
+			if( TempDir.z > 0.0F )
+			{
+				TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+			}
+			else
+			{
+				TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+			}
+		}
+		TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+
+		ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
+	}
+}
+
+/* MODFUNC_OrbitPulsar */
+[[gnu::always_inline]] static inline void ModelOrbitPulsar( u_int16_t & i, VECTOR & Rotation, VECTOR & UpVector, VECTOR & DirVector )
+{
+	if( ( ( GameStatus[ Models[ i ].Ship ] == STATUS_SinglePlayer ) || ( GameStatus[ Models[ i ].Ship ] == STATUS_Normal ) ) &&
+		( Ships[ Models[ i ].Ship ].NumMultiples ) )
+	{
+		if( ( Ships[ Models[ i ].Ship ].Object.Flags & SHIP_Stealth ) ) Models[ i ].ModelNum = MODEL_OrbitPulsar_Light;
+		else Models[ i ].ModelNum = MODEL_OrbitPulsar;
+
+		Rotation.x = (float) fast_sinf( D2R( Models[ i ].AxisRot ) );
+		Rotation.y = (float) fast_cosf( D2R( Models[ i ].AxisRot ) );
+		Rotation.z = 0.0F;
+		ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
+		ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
+		Models[i].Quat.FromDirAndUp(&DirVector, &UpVector);					// Create Quat
+		Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Matrix
+		MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Inv Matrix
+		Models[ i ].Pos.x = ( Ships[ Models[ i ].Ship ].Object.Pos.x + ( UpVector.x * ORBIT_RADIUS ) ); //+ ( DirVector.x * ( ORBIT_RADIUS * 0.85F ) ) );
+		Models[ i ].Pos.y = ( Ships[ Models[ i ].Ship ].Object.Pos.y + ( UpVector.y * ORBIT_RADIUS ) ); //+ ( DirVector.y * ( ORBIT_RADIUS * 0.85F ) ) );
+		Models[ i ].Pos.z = ( Ships[ Models[ i ].Ship ].Object.Pos.z + ( UpVector.z * ORBIT_RADIUS ) ); //+ ( DirVector.z * ( ORBIT_RADIUS * 0.85F ) ) );
+		Models[ i ].AxisRot += ( 6.0F * framelag );
+		Models[ i ].Group = Ships[ Models[ i ].Ship ].Object.Group;
+	}
+	else
+	{
+		KillUsedModel( i );
+	}
+}
+
+/* MODFUNC_LargeShrapnel */
+[[gnu::always_inline]] static inline void ModelLargeShrapnel( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, float & Speed, QUAT & TempQuat, VECTOR & FrameLag_Rot, VECTOR & TempDir, MATRIX & UpMatrix, MATRIX & InvUpMatrix, float & WaterDamage )
+{
+	if( Models[i].Group != INDEX_NONE )
+	{
+		TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+	else
+	{
+		TempQuat.From2Vectors(&SlideUp, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+
+	Models[i].LifeCount -= framelag;
+	if( Models[i].LifeCount < 0.0F )
+	{
+		Models[i].LifeCount = 0.0F;
+		KillUsedModel( i );
+		return;
+	}
+	else
+	{
+		TempDir.x = ( Models[i].Dir.x * framelag );
+		TempDir.y = ( Models[i].Dir.y * framelag );
+		TempDir.z = ( Models[i].Dir.z * framelag );
+
+		WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 255 );
+
+		if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+							  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+							  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
+		{
+			if( Random_Range( 3 ) )
+			{
+				TempVector = Models[i].Dir;
+				NormaliseVector( &TempVector );
+				Speed = VectorLength( &Models[i].Dir );
+				ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+				Speed *= 0.8F;
+
+				CreateSpotFXSmallShrapnel( &Int_Point, &Models[i].Dir, Speed, Models[i].Group );
+				KillUsedModel( i );
+				return;
+			}
+			else
+			{
+				Models[i].Pos = Int_Point;
+
+				TempVector = Models[i].Dir;
+				NormaliseVector( &TempVector );
+				Speed = VectorLength( &Models[i].Dir );
+				ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+				Speed *= 0.5F;
+
+				if( Speed < ( 5.0F * GLOBAL_SCALE ) )
+				{
+					KillUsedModel( i );
+					return;
+				}
+
+				Models[i].Dir.x *= Speed;
+				Models[i].Dir.y *= Speed;
+				Models[i].Dir.z *= Speed;
+				Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+				Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+				Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+				Models[i].Rot.x *= Speed;
+				Models[i].Rot.y *= Speed;
+				Models[i].Rot.z *= Speed;
+			}
+		}
+		else
+		{
+			Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+			Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+			Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+		}
+
+		ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
+
+		if( TempDir.x )
+		{
+			if( TempDir.x > 0.0F )
+			{
+				TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+			}
+			else
+			{
+				TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+			}
+		}
+		if( TempDir.z )
+		{
+			if( TempDir.z > 0.0F )
+			{
+				TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+			}
+			else
+			{
+				TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+			}
+		}
+		TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+
+		ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
+
+		FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
+		FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
+		FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
+		TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+		TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+		Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
+		MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
+
+		Models[i].TimeInterval = (float) 1;
+
+		if( IsGroupVisible[ Models[i].Group ] )
+		{
+			Models[i].TimeCount += framelag;
+
+			if( Models[i].TimeCount >= Models[i].TimeInterval )
+			{
+				Models[i].TimeCount = FMOD( Models[i].TimeCount, Models[i].TimeInterval );
+
+				TempDir = Models[i].Dir;
+				NormaliseVector( &TempDir );
+
+				if( !InWater( Models[i].Group, &Models[i].Pos, &WaterDamage ) )
+				{
+					CreateShrapnelTrail( &Models[i].Pos, &TempDir, ( 8.0F * GLOBAL_SCALE ), Models[i].Group, 200, 100, 80 );
+				}
+				else
+				{
+					CreateBubbleTrail( &Models[i].Pos, &TempDir, Models[i].Group, 64, 64, 64 );
+				}
+			}
+		}
+
+	}
+}
+
+/* MODFUNC_SmallShrapnel */
+[[gnu::always_inline]] static inline void ModelSmallShrapnel( u_int16_t & i, VECTOR & Int_Point, NORMAL & Int_Normal, VECTOR & TempVector, float & Speed, QUAT & TempQuat, VECTOR & FrameLag_Rot, VECTOR & TempDir, MATRIX & UpMatrix, MATRIX & InvUpMatrix, float & WaterDamage )
+{
+	if( Models[i].Group != INDEX_NONE )
+	{
+		TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+	else
+	{
+		TempQuat.From2Vectors(&SlideUp, &SlideUp);
+		TempQuat.ToMatrix(&UpMatrix);
+		MatrixTranspose( &UpMatrix, &InvUpMatrix );
+	}
+
+	Models[i].LifeCount -= framelag;
+	if( Models[i].LifeCount < 0.0F )
+	{
+		Models[i].LifeCount = 0.0F;
+		KillUsedModel( i );
+		return;
+	}
+	else
+	{
+		TempDir.x = ( Models[i].Dir.x * framelag );
+		TempDir.y = ( Models[i].Dir.y * framelag );
+		TempDir.z = ( Models[i].Dir.z * framelag );
+
+		WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 128 );
+
+		if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
+							  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
+							  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
+		{
+			Models[i].Pos = Int_Point;
+
+			TempVector = Models[i].Dir;
+			NormaliseVector( &TempVector );
+			Speed = VectorLength( &Models[i].Dir );
+			ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
+			Speed *= 0.5F;
+
+			if( Speed < ( 5.0F * GLOBAL_SCALE ) )
+			{
+				KillUsedModel( i );
+				return;
+			}
+
+			Models[i].Dir.x *= Speed;
+			Models[i].Dir.y *= Speed;
+			Models[i].Dir.z *= Speed;
+			Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+			Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+			Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
+			Models[i].Rot.x *= Speed;
+			Models[i].Rot.y *= Speed;
+			Models[i].Rot.z *= Speed;
+		}
+		else
+		{
+			Models[i].Pos.x += ( Models[i].Dir.x * framelag );
+			Models[i].Pos.y += ( Models[i].Dir.y * framelag );
+			Models[i].Pos.z += ( Models[i].Dir.z * framelag );
+		}
+
+		ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
+
+		if( TempDir.x )
+		{
+			if( TempDir.x > 0.0F )
+			{
+				TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
+			}
+			else
+			{
+				TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
+			}
+		}
+		if( TempDir.z )
+		{
+			if( TempDir.z > 0.0F )
+			{
+				TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
+			}
+			else
+			{
+				TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
+				if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
+			}
+		}
+		TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
+
+		ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
+
+		FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
+		FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
+		FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
+		TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+		TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
+		Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
+		MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
+
+		if( IsGroupVisible[ Models[i].Group ] )
+		{
+			Models[i].TimeCount += framelag;
+
+			if( Models[i].TimeCount >= Models[i].TimeInterval )
+			{
+				Models[i].TimeCount = FMOD( Models[i].TimeCount, Models[i].TimeInterval );
+
+				TempDir = Models[i].Dir;
+				NormaliseVector( &TempDir );
+
+				if( !InWater( Models[i].Group, &Models[i].Pos, &WaterDamage ) )
+				{
+					CreateShrapnelTrail( &Models[i].Pos, &TempDir, ( 4.0F * GLOBAL_SCALE ), Models[i].Group, 200, 100, 80 );
+				}
+				else
+				{
+					CreateBubbleTrail( &Models[i].Pos, &TempDir, Models[i].Group, 64, 64, 64 );
+				}
+			}
+		}
+	}
+}
+
+/* MODFUNC_ProcessSpotFX -- false: ProcessModels returns */
+[[gnu::always_inline]] static inline bool ModelProcessSpotFX( u_int16_t & i, float & Speed, VECTOR & Pos, VECTOR & TempDir, VECTOR & UpVector, VECTOR & DirVector, u_int16_t & NumSpotFX, PVSPOTFX *& SpotFXPtr, int16_t & Count, u_int16_t & SpotFXGroup, int16_t & VisNum, u_int16_t (&VisGroups)[ MAXGROUPS ], int16_t & Count2, float & ShipSpeed )
+{
+	if( Models[i].Flags & MODFLAG_SpotFXDisabled ) return true;
+	if( framelag == 0.0F ) return true;
+
+	SpotFXPtr = nullptr;
+	NumSpotFX = 0;
+
+	if( ModelNames[ Models[i].ModelNum ].DoIMorph )
+	{
+		if( MxaModelHeaders[ Models[i].ModelNum ].NumSpotFX &&
+			MxaModelHeaders[ Models[i].ModelNum ].SpotFX )
+		{
+			SpotFXPtr = MxaModelHeaders[ Models[i].ModelNum ].SpotFX;
+			NumSpotFX = MxaModelHeaders[ Models[i].ModelNum ].NumSpotFX;
+		}
+	}
+	else
+	{
+		if( ModelHeaders[ Models[i].ModelNum ].NumSpotFX &&
+			ModelHeaders[ Models[i].ModelNum ].SpotFX )
+		{
+			SpotFXPtr = ModelHeaders[ Models[i].ModelNum ].SpotFX;
+			NumSpotFX = ModelHeaders[ Models[i].ModelNum ].NumSpotFX;
+		}
+	}
+
+	if( !SpotFXPtr || !NumSpotFX ) return true;
+
+	TempDir.x = ( Models[i].Pos.x - Models[i].OldPos.x );
+	TempDir.y = ( Models[i].Pos.y - Models[i].OldPos.y );
+	TempDir.z = ( Models[i].Pos.z - Models[i].OldPos.z );
+	ApplyMatrix( &Models[i].InvMat, &TempDir, &TempDir );
+	Speed = TempDir.z;
+	ShipSpeed = VectorLength( &Models[i].Dir );
+
+	for( Count = 0; Count < NumSpotFX; Count++ )
+	{
+		if( !( Models[i].Flags & MODFLAG_Stealth ) || ( SpotFXPtr->Type == SPOTFX_SoundFX ) )
+		{
+			Models[i].SpotFXTimeInterval[ Count ] = (float) 1;
+
+			if ( ! CAMERA_VIEW_IS_VALID ) return false;
+			VisNum = VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[i].Group, &VisGroups[ 0 ] );
+
+			switch( Models[i].SpotFXState[ Count ] )
+			{
+			case SPOTFX_STATE_WaitingForDelay:
+				Models[i].SpotFXDelay[ Count ] -= framelag;
+
+				if( Models[i].SpotFXDelay[ Count ] < 0.0F )
+				{
+					Models[i].SpotFXDelay[ Count ] += SpotFXPtr->ActiveDelay;
+					Models[i].SpotFXState[ Count ] = SPOTFX_STATE_Active;
+					Models[i].SpotFXTimeCount[ Count ] = 0.0F;
+				}
+				break;
+
+			case SPOTFX_STATE_Active:
+				if( Models[i].Visible )
+				{
+					switch( SpotFXPtr->Type )
+					{
+					case SPOTFX_Flame:
+					case SPOTFX_Smoke:
+					case SPOTFX_Steam:
+					case SPOTFX_Sparks:
+					case SPOTFX_ElectricBeams:
+					case SPOTFX_GravgonTrail:
+					case SPOTFX_NmeTrail:
+					case SPOTFX_NmeVapourTrail:
+					case SPOTFX_FireWall:
+					case SPOTFX_GravitySparks:
+					case SPOTFX_Bubbles:
+					case SPOTFX_BeardAfterburner:
+					case SPOTFX_Hk5Afterburner:
+					case SPOTFX_SoundFX:
+					default:
+						Models[i].SpotFXTimeCount[ Count ] += framelag;
+
+						if( Models[i].SpotFXTimeCount[ Count ] >= Models[i].SpotFXTimeInterval[ Count ] )
+						{
+							Models[i].SpotFXTimeCount[ Count ] = (float) FMOD( Models[i].SpotFXTimeCount[ Count ], Models[i].SpotFXTimeInterval[ Count ] );
+
+							ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
+							ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
+							ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
+
+							Pos.x += Models[i].Pos.x;
+							Pos.y += Models[i].Pos.y;
+							Pos.z += Models[i].Pos.z;
+
+							SpotFXGroup = Models[i].Group;
+
+							for( Count2 = 0; Count2 < VisNum; Count2++ )
+							{
+								if( Bsp_Header[ 0 ].State )
+								{
+									if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
+									{
+										SpotFXGroup = VisGroups[ Count2 ];
+										break;
+									}
+								}
+								else
+								{
+									if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
+									{
+										SpotFXGroup = VisGroups[ Count2 ];
+										break;
+									}
+								}
+							}
+
+							if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
+							{
+								switch( SpotFXPtr->Type )
+								{
+								case SPOTFX_Flame:
+									CreateSpotFXFlame( &Pos, &DirVector, SpotFXGroup );
+									break;
+
+								case SPOTFX_Smoke:
+									CreateSpotFXSmoke( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+									break;
+
+								case SPOTFX_Steam:
+									CreateSpotFXSteam( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+									break;
+
+								case SPOTFX_Sparks:
+									CreateSpotFXSparks( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+									break;
+
+								case SPOTFX_ElectricBeams:
+									CreateSpotFXElectricBeams( &Pos, &DirVector, &UpVector, SpotFXGroup );
+									break;
+
+								case SPOTFX_GravgonTrail:
+									CreateSpotFXGravgonTrail( &Pos, &DirVector, SpotFXGroup );
+									break;
+
+								case SPOTFX_NmeTrail:
+									CreateSpotFXNmeTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+									break;
+
+								case SPOTFX_NmeVapourTrail:
+									CreateSpotFXNmeVapourTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+									break;
+
+								case SPOTFX_FireWall:
+									CreateSpotFXFireWall( &Pos, &DirVector, &UpVector, SpotFXGroup );
+									break;
+
+								case SPOTFX_GravitySparks:
+									CreateSpotFXRealSparks(  &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+									break;
+
+								case SPOTFX_Bubbles:
+									CreateSpotFXBubbles( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue, ( 2.0F * BLOCKSIZE ) );
+									break;
+
+								case SPOTFX_BeardAfterburner:
+									if( BikeExhausts ) CreateSpotFXBeardAfterburner( &Pos, &DirVector, SpotFXGroup, Speed );
+									break;
+
+								case SPOTFX_Hk5Afterburner:
+									if( BikeExhausts ) CreateSpotFXHk5Afterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed, 32, 32, 128 );
+									break;
+
+								case SPOTFX_SoundFX:
+									if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+									{
+										if( SpotFXPtr->SoundFX != -1 )
+										{
+											if( EngineEnabled( Models[i].OwnerType, Models[i].Owner ) )
+											{
+												if( !Models[ i ].SpotFXSFX_ID[ Count ] )
+												{
+													Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
+																					  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
+													Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+												}
+												else
+												{
+													StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
+													Models[i].SpotFXSFX_ID[ Count ] = 0;
+
+													Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
+																					  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
+													Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+#ifdef DEBUG_SPOTFX_SOUND
+													Msg( "Model:SpotFX_SoundFX Overwriting SFX ID %d\n", Models[i].ModelNum );
+#endif
+												}
+											}
+											else
+											{
+												if( Models[ i ].SpotFXSFX_ID[ Count ] )
+												{
+													StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
+													Models[i].SpotFXSFX_ID[ Count ] = 0;
+												}
+											}
+										}
+
+									}
+									break;
+
+								default:
+									break;
+								}
+							}
+						}
+						break;
+
+					case SPOTFX_Explosion:
+					case SPOTFX_FireSecondary:
+					case SPOTFX_FirePrimary:
+					case SPOTFX_NmeGlow:
+					case SPOTFX_Shrapnel:
+					case SPOTFX_Drip:
+					case SPOTFX_BorgAfterburner:
+					case SPOTFX_ExcopAfterburner:
+					case SPOTFX_TruckerAfterburner:
+					case SPOTFX_NubiaAfterburner:
+					case SPOTFX_CerberoAfterburner:
+					case SPOTFX_FoetoidAfterburner:
+					case SPOTFX_FoetoidSmallAfterburner:
+					case SPOTFX_JapBirdAfterburner:
+					case SPOTFX_JoAfterburner:
+					case SPOTFX_JoSmallAfterburner:
+					case SPOTFX_LaJayAfterburner:
+					case SPOTFX_MofistoAfterburner:
+					case SPOTFX_NutterAfterburner:
+					case SPOTFX_RhesusAfterburner:
+					case SPOTFX_SharkAfterburner:
+					case SPOTFX_SlickAfterburner:
+						ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
+						ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
+						ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
+
+						Pos.x += Models[i].Pos.x;
+						Pos.y += Models[i].Pos.y;
+						Pos.z += Models[i].Pos.z;
+
+						SpotFXGroup = Models[i].Group;
+
+						for( Count2 = 0; Count2 < VisNum; Count2++ )
+						{
+							if( Bsp_Header[ 0 ].State )
+							{
+								if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
+								{
+									SpotFXGroup = VisGroups[ Count2 ];
+									break;
+								}
+							}
+							else
+							{
+								if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
+								{
+									SpotFXGroup = VisGroups[ Count2 ];
+									break;
+								}
+							}
+						}
+
+						if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
+						{
+							switch( SpotFXPtr->Type )
+							{
+							case SPOTFX_Explosion:
+								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+								{
+									CreateSpotFXExplosion( &Pos, &DirVector, SpotFXGroup );
+									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+								}
+								break;
+
+							case SPOTFX_FireSecondary:
+								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+								{
+									CreateSpotFXFireSecondary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Secondary, Models[ i ].OwnerType, Models[ i ].Owner );
+									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+								}
+								break;
+
+							case SPOTFX_FirePrimary:
+								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+								{
+									CreateModelSpotFXFirePrimary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Primary, i, Count );
+									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+								}
+								break;
+
+							case SPOTFX_NmeGlow:
+								CreateSpotFXNmeGlow( &Pos, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+								break;
+
+							case SPOTFX_Shrapnel:
+								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+								{
+									CreateSpotFXShrapnel( &Pos, &DirVector, SpotFXGroup );
+									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+								}
+								break;
+
+							case SPOTFX_Drip:
+								if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
+								{
+									CreateSpotFXDrip( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+									Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
+								}
+								break;
+
+							case SPOTFX_BorgAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_ExcopAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_TruckerAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_NubiaAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_CerberoAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_FoetoidAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_FoetoidSmallAfterburner:
+								if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_JapBirdAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_JoAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_JoSmallAfterburner:
+								if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_LaJayAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_MofistoAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_NutterAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_RhesusAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_SharkAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							case SPOTFX_SlickAfterburner:
+								if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
+								break;
+
+							default:
+								break;
+							}
+						}
+						break;
+					}
+				}
+
+				Models[i].SpotFXDelay[ Count ] -= framelag;
+
+				if( Models[i].SpotFXDelay[ Count ] < 0.0F )
+				{
+					if( SpotFXPtr->InactiveDelay < 0.0F )
+					{
+						Models[i].SpotFXDelay[ Count ] = -1.0F;
+
+						switch( SpotFXPtr->Type )
+						{
+						case SPOTFX_SoundFX:
+							if( ( SpotFXPtr->SoundFX != -1 ) &&
+								( Models[ i ].SpotFXSFX_ID[ Count ] ) )
+							{
+								if( EngineEnabled( Models[i].OwnerType, Models[i].Owner ) )
+								{
+									Models[i].SpotFXSFX_ID[ Count ] = EngineCode( Models[i].OwnerType, Models[i].Owner, Models[i].SpotFXSFX_ID[ Count ], Speed );
+								}
+								else
+								{
+									StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
+									Models[i].SpotFXSFX_ID[ Count ] = 0;
+									Models[i].SpotFXFlags[ Count ] &= ~SPOTFX_FLAGS_DoneOnce;
+								}
+							}
+							break;
+
+						default:
+							break;
+						}
+					}
+					else
+					{
+						if( SpotFXPtr->InactiveDelay == 0.0F )
+						{
+							Models[i].SpotFXDelay[ Count ] += SpotFXPtr->ActiveDelay;
+						}
+						else
+						{
+							if( SpotFXPtr->SoundFX != -1 )
+							{
+								if( Models[i].SpotFXSFX_ID[ Count ] )
+								{
+									StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
+									Models[i].SpotFXSFX_ID[ Count ] = 0;
+								}
+							}
+
+							Models[i].SpotFXDelay[ Count ] += SpotFXPtr->InactiveDelay;
+							Models[i].SpotFXState[ Count ] = SPOTFX_STATE_Inactive;
+						}
+					}
+				}
+				break;
+
+			case SPOTFX_STATE_Inactive:
+				Models[i].SpotFXDelay[ Count ] -= framelag;
+
+				if( Models[i].SpotFXDelay[ Count ] < 0.0F )
+				{
+					Models[i].SpotFXFlags[ Count ] &= ~SPOTFX_FLAGS_DoneOnce;
+					Models[i].SpotFXDelay[ Count ] += SpotFXPtr->ActiveDelay;
+					Models[i].SpotFXState[ Count ] = SPOTFX_STATE_Active;
+					Models[i].SpotFXTimeCount[ Count ] = 0.0F;
+				}
+				break;
+			}
+		}
+
+		SpotFXPtr++;
+	}
+	return true;
+}
+
 void ProcessModels( void )
 {
 	u_int16_t		i;
@@ -1456,15 +2498,7 @@ void ProcessModels( void )
 				break;
 
 			case MODFUNC_Explode:
-				Models[i].Scale += ( ( Models[i].MaxScale / 40.0F ) * framelag );
-				if( Models[i].Scale <= Models[i].MaxScale )			// 10.0F
-				{
-					ShockWave( &Models[i].Pos, ( Models[i].Scale * BALL_RADIUS ), Models[i].OwnerType, Models[i].Owner, 16.0F, Models[i].Group, Models[i].SecWeapon, i );
-				}
-				else
-				{
-					KillUsedModel( i );
-				}
+				ModelExplode( i );
 				break;
 
 			case MODFUNC_Regen:
@@ -1505,280 +2539,17 @@ void ProcessModels( void )
 				// gravgon field 2
 				// each gravgon is really 2 fields
 			case MODFUNC_Scale2:
-				Models[i].LifeCount -= framelag;
-				if( Models[i].LifeCount <= 0.0F )
-				{
-					Models[i].LifeCount = 0.0F;
-				}
-
-				Models[i].Scale -= ( framelag * GRAVGON_SCALE_DEC );
-				if( Models[i].Scale < 0.0F )
-				{
-					Models[i].Scale = Models[i].MaxScale;
-					if( Models[i].LifeCount == 0.0F )
-					{
-						KillUsedModel( i );
-						break;
-					}
-				}
-				GravityWave( &Models[i].Pos, ( BALL_RADIUS * Models[i].MaxScale ), 10.0F, Models[i].Group );
+				ModelScale2( i );
 				break;
 
 			case MODFUNC_BodyPart:
-				if( Models[i].Group != INDEX_NONE )
-				{
-					TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-				else
-				{
-					TempQuat.From2Vectors(&SlideUp, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-
-				Models[i].LifeCount -= framelag;
-				if( Models[i].LifeCount < 0.0F )
-				{
-					Models[i].LifeCount = 0.0F;
-					KillUsedModel( i );
-					break;
-				}
-				else
-				{
-					if( AmIOutsideGroup( &Mloadheader, &Models[i].Pos, Models[i].Group ) )
-					{
-						Models[i].LifeCount = 0.0F;
-						KillUsedModel( i );
-						break;
-					}
-
-					TempDir.x = ( Models[i].Dir.x * framelag );
-					TempDir.y = ( Models[i].Dir.y * framelag );
-					TempDir.z = ( Models[i].Dir.z * framelag );
-
-					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-										  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-										  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
-					{
-						Models[i].Pos = Int_Point;
-						CreateBloodSplat( &Int_Point, (VECTOR *) &Int_Normal, Models[i].Group );
-
-						TempVector = Models[i].Dir;
-						NormaliseVector( &TempVector );
-						Speed = VectorLength( &Models[i].Dir );
-						ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-						Speed *= 0.5F;
-
-						PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
-
-						if( Speed < ( 5.0F * GLOBAL_SCALE ) )
-						{
-							KillUsedModel( i );
-							break;
-						}
-
-						Models[i].Dir.x *= Speed;
-						Models[i].Dir.y *= Speed;
-						Models[i].Dir.z *= Speed;
-						Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-						Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-						Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-						Models[i].Rot.x *= Speed;
-						Models[i].Rot.y *= Speed;
-						Models[i].Rot.z *= Speed;
-					}
-					else
-					{
-						Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-						Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-						Models[i].Pos.z += ( Models[i].Dir.z * framelag );
-					}
-
-					ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
-
-					if( TempDir.x )
-					{
-						if( TempDir.x > 0.0F )
-						{
-							TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-						}
-						else
-						{
-							TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-						}
-					}
-					if( TempDir.z )
-					{
-						if( TempDir.z > 0.0F )
-						{
-							TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-						}
-						else
-						{
-							TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-						}
-					}
-					TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
-
-					ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
-
-					FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
-					FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
-					FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-					TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-					TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
-					Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
-					MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
-
-					BloodPtr = &BloodOffsets[ 0 ];
-
-					ApplyMatrix( &Models[i].Mat, BloodPtr, &TempVector );
-					NormaliseVector( &TempVector );
-					BloodPtr++;
-					ApplyMatrix( &Models[i].Mat, BloodPtr, &OffVector );
-					Cos = DotProduct( &TempVector, &SlideUp );
-					if( Cos < 0.0F )
-					{
-						if( IsGroupVisible[ Models[i].Group ] )
-						{
-							Models[i].TimeCount += framelag;
-
-							if( Models[i].TimeCount >= Models[i].TimeInterval )
-							{
-								Models[i].TimeCount = 0.0F;
-								Pos.x = ( Models[i].Pos.x + ( OffVector.x * GLOBAL_SCALE ) );
-								Pos.y = ( Models[i].Pos.y + ( OffVector.y * GLOBAL_SCALE ) );
-								Pos.z = ( Models[i].Pos.z + ( OffVector.z * GLOBAL_SCALE ) );
-								CreateBloodTrail( &Pos, &TempVector, Models[i].Group );
-							}
-						}
-					}
-					else
-					{
-						Models[i].TimeCount = 0.0F;
-					}
-				}
+				ModelBodyPart( i, Int_Point, Int_Normal, TempVector, Speed, Cos, TempQuat, FrameLag_Rot, Pos, TempDir, OffVector, BloodPtr, UpMatrix, InvUpMatrix );
 				break;
 			case MODFUNC_TomCruise:
-				if( Models[i].Group != INDEX_NONE )
-				{
-					TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-				else
-				{
-					TempQuat.From2Vectors(&SlideUp, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-
-				TomFrame += ( framelag * 0.2F );
-				while( TomFrame >= 27.0F ) TomFrame -= 27.0F;
-
-				Models[ i ].ModelNum = (u_int16_t) ( MODEL_Tom0 + TomFrame );
-
-				Models[i].LifeCount -= framelag;
-				if( Models[i].LifeCount < 0.0F )
-				{
-					Models[i].LifeCount = 0.0F;
-					KillUsedModel( i );
-					break;
-				}
-				else
-				{
-					if( AmIOutsideGroup( &Mloadheader, &Models[i].Pos, Models[i].Group ) )
-					{
-						Models[i].LifeCount = 0.0F;
-						KillUsedModel( i );
-						break;
-					}
-
-					TempDir.x = ( Models[i].Dir.x * framelag );
-					TempDir.y = ( Models[i].Dir.y * framelag );
-					TempDir.z = ( Models[i].Dir.z * framelag );
-
-					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-										  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-										  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
-					{
-						PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
-						NormaliseVector( &Models[i].Dir );
-						ExplodeBody( &Models[i].Pos, &Models[i].Dir, Models[i].Group );
-						KillUsedModel( i );
-						break;
-					}
-					else
-					{
-						Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-						Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-						Models[i].Pos.z += ( Models[i].Dir.z * framelag );
-					}
-
-					ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
-
-					if( TempDir.x )
-					{
-						if( TempDir.x > 0.0F )
-						{
-							TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-						}
-						else
-						{
-							TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-						}
-					}
-					if( TempDir.z )
-					{
-						if( TempDir.z > 0.0F )
-						{
-							TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-						}
-						else
-						{
-							TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-						}
-					}
-					TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
-
-					ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
-				}
+				ModelTomCruise( i, Int_Point, Int_Normal, TempVector, TempQuat, TempDir, UpMatrix, InvUpMatrix );
 				break;
 			case MODFUNC_OrbitPulsar:
-				if( ( ( GameStatus[ Models[ i ].Ship ] == STATUS_SinglePlayer ) || ( GameStatus[ Models[ i ].Ship ] == STATUS_Normal ) ) &&
-					( Ships[ Models[ i ].Ship ].NumMultiples ) )
-				{
-					if( ( Ships[ Models[ i ].Ship ].Object.Flags & SHIP_Stealth ) ) Models[ i ].ModelNum = MODEL_OrbitPulsar_Light;
-					else Models[ i ].ModelNum = MODEL_OrbitPulsar;
-
-					Rotation.x = (float) fast_sinf( D2R( Models[ i ].AxisRot ) );
-					Rotation.y = (float) fast_cosf( D2R( Models[ i ].AxisRot ) );
-					Rotation.z = 0.0F;
-					ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Rotation, &UpVector );	// Calc Up Vector
-					ApplyMatrix( &Ships[ Models[ i ].Ship ].Object.FinalMat, &Forward, &DirVector );	// Calc Dir Vector
-					Models[i].Quat.FromDirAndUp(&DirVector, &UpVector);					// Create Quat
-					Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Matrix
-					MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Inv Matrix
-					Models[ i ].Pos.x = ( Ships[ Models[ i ].Ship ].Object.Pos.x + ( UpVector.x * ORBIT_RADIUS ) ); //+ ( DirVector.x * ( ORBIT_RADIUS * 0.85F ) ) );
-					Models[ i ].Pos.y = ( Ships[ Models[ i ].Ship ].Object.Pos.y + ( UpVector.y * ORBIT_RADIUS ) ); //+ ( DirVector.y * ( ORBIT_RADIUS * 0.85F ) ) );
-					Models[ i ].Pos.z = ( Ships[ Models[ i ].Ship ].Object.Pos.z + ( UpVector.z * ORBIT_RADIUS ) ); //+ ( DirVector.z * ( ORBIT_RADIUS * 0.85F ) ) );
-					Models[ i ].AxisRot += ( 6.0F * framelag );
-					Models[ i ].Group = Ships[ Models[ i ].Ship ].Object.Group;
-				}
-				else
-				{
-					KillUsedModel( i );
-				}
+				ModelOrbitPulsar( i, Rotation, UpVector, DirVector );
 				break;
 
 			case MODFUNC_ReScale:
@@ -1793,737 +2564,16 @@ void ProcessModels( void )
 				break;
 
 			case MODFUNC_LargeShrapnel:
-				if( Models[i].Group != INDEX_NONE )
-				{
-					TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-				else
-				{
-					TempQuat.From2Vectors(&SlideUp, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-
-				Models[i].LifeCount -= framelag;
-				if( Models[i].LifeCount < 0.0F )
-				{
-					Models[i].LifeCount = 0.0F;
-					KillUsedModel( i );
-					break;
-				}
-				else
-				{
-					TempDir.x = ( Models[i].Dir.x * framelag );
-					TempDir.y = ( Models[i].Dir.y * framelag );
-					TempDir.z = ( Models[i].Dir.z * framelag );
-
-					WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 255 );
-
-					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-										  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-										  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
-					{
-						if( Random_Range( 3 ) )
-						{
-							TempVector = Models[i].Dir;
-							NormaliseVector( &TempVector );
-							Speed = VectorLength( &Models[i].Dir );
-							ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-							Speed *= 0.8F;
-
-							CreateSpotFXSmallShrapnel( &Int_Point, &Models[i].Dir, Speed, Models[i].Group );
-							KillUsedModel( i );
-							break;
-						}
-						else
-						{
-							Models[i].Pos = Int_Point;
-
-							TempVector = Models[i].Dir;
-							NormaliseVector( &TempVector );
-							Speed = VectorLength( &Models[i].Dir );
-							ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-							Speed *= 0.5F;
-
-							if( Speed < ( 5.0F * GLOBAL_SCALE ) )
-							{
-								KillUsedModel( i );
-								break;
-							}
-
-							Models[i].Dir.x *= Speed;
-							Models[i].Dir.y *= Speed;
-							Models[i].Dir.z *= Speed;
-							Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-							Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-							Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-							Models[i].Rot.x *= Speed;
-							Models[i].Rot.y *= Speed;
-							Models[i].Rot.z *= Speed;
-						}
-					}
-					else
-					{
-						Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-						Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-						Models[i].Pos.z += ( Models[i].Dir.z * framelag );
-					}
-
-					ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
-
-					if( TempDir.x )
-					{
-						if( TempDir.x > 0.0F )
-						{
-							TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-						}
-						else
-						{
-							TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-						}
-					}
-					if( TempDir.z )
-					{
-						if( TempDir.z > 0.0F )
-						{
-							TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-						}
-						else
-						{
-							TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-						}
-					}
-					TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
-
-					ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
-
-					FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
-					FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
-					FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-					TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-					TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
-					Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
-					MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
-
-					Models[i].TimeInterval = (float) 1;
-
-					if( IsGroupVisible[ Models[i].Group ] )
-					{
-						Models[i].TimeCount += framelag;
-
-						if( Models[i].TimeCount >= Models[i].TimeInterval )
-						{
-							Models[i].TimeCount = FMOD( Models[i].TimeCount, Models[i].TimeInterval );
-
-							TempDir = Models[i].Dir;
-							NormaliseVector( &TempDir );
-
-							if( !InWater( Models[i].Group, &Models[i].Pos, &WaterDamage ) )
-							{
-								CreateShrapnelTrail( &Models[i].Pos, &TempDir, ( 8.0F * GLOBAL_SCALE ), Models[i].Group, 200, 100, 80 );
-							}
-							else
-							{
-								CreateBubbleTrail( &Models[i].Pos, &TempDir, Models[i].Group, 64, 64, 64 );
-							}
-						}
-					}
-
-				}
+				ModelLargeShrapnel( i, Int_Point, Int_Normal, TempVector, Speed, TempQuat, FrameLag_Rot, TempDir, UpMatrix, InvUpMatrix, WaterDamage );
 				break;
 
 			case MODFUNC_SmallShrapnel:
-				if( Models[i].Group != INDEX_NONE )
-				{
-					TempQuat.From2Vectors(&Mloadheader.Group[ Models[i].Group ].up, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-				else
-				{
-					TempQuat.From2Vectors(&SlideUp, &SlideUp);
-					TempQuat.ToMatrix(&UpMatrix);
-					MatrixTranspose( &UpMatrix, &InvUpMatrix );
-				}
-
-				Models[i].LifeCount -= framelag;
-				if( Models[i].LifeCount < 0.0F )
-				{
-					Models[i].LifeCount = 0.0F;
-					KillUsedModel( i );
-					break;
-				}
-				else
-				{
-					TempDir.x = ( Models[i].Dir.x * framelag );
-					TempDir.y = ( Models[i].Dir.y * framelag );
-					TempDir.z = ( Models[i].Dir.z * framelag );
-
-					WaterObjectCollide( Models[i].Group, &Models[i].Pos, &TempDir, &Int_Point, 128 );
-
-					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
-										  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-										  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
-					{
-						Models[i].Pos = Int_Point;
-
-						TempVector = Models[i].Dir;
-						NormaliseVector( &TempVector );
-						Speed = VectorLength( &Models[i].Dir );
-						ReflectVector( &TempVector, &Int_Normal, &Models[i].Dir );
-						Speed *= 0.5F;
-
-						if( Speed < ( 5.0F * GLOBAL_SCALE ) )
-						{
-							KillUsedModel( i );
-							break;
-						}
-
-						Models[i].Dir.x *= Speed;
-						Models[i].Dir.y *= Speed;
-						Models[i].Dir.z *= Speed;
-						Models[i].Rot.x = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-						Models[i].Rot.y = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-						Models[i].Rot.z = ( ( (float) Random_Range( 10000 ) ) / 10000.0F );
-						Models[i].Rot.x *= Speed;
-						Models[i].Rot.y *= Speed;
-						Models[i].Rot.z *= Speed;
-					}
-					else
-					{
-						Models[i].Pos.x += ( Models[i].Dir.x * framelag );
-						Models[i].Pos.y += ( Models[i].Dir.y * framelag );
-						Models[i].Pos.z += ( Models[i].Dir.z * framelag );
-					}
-
-					ApplyMatrix( &UpMatrix, &Models[i].Dir, &TempDir );
-
-					if( TempDir.x )
-					{
-						if( TempDir.x > 0.0F )
-						{
-							TempDir.x -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x < 0.0F ) TempDir.x = 0.0F;
-						}
-						else
-						{
-							TempDir.x += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.x > 0.0F ) TempDir.x = 0.0F;
-						}
-					}
-					if( TempDir.z )
-					{
-						if( TempDir.z > 0.0F )
-						{
-							TempDir.z -= ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z < 0.0F ) TempDir.z = 0.0F;
-						}
-						else
-						{
-							TempDir.z += ( ( 0.000001F * GLOBAL_SCALE ) * framelag );
-							if( TempDir.z > 0.0F ) TempDir.z = 0.0F;
-						}
-					}
-					TempDir.y -= ( ( 0.5F * GLOBAL_SCALE ) * framelag );
-
-					ApplyMatrix( &InvUpMatrix, &TempDir, &Models[i].Dir );
-
-					FrameLag_Rot.x = ( Models[i].Rot.x * framelag );
-					FrameLag_Rot.y = ( Models[i].Rot.y * framelag );
-					FrameLag_Rot.z = ( Models[i].Rot.z * framelag );
-					TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-					TempQuat.Multiply(&Models[i].Quat, &Models[i].Quat);
-					Models[i].Quat.ToMatrix(&Models[i].Mat);							// Create Dir Matrix
-					MatrixTranspose( &Models[i].Mat, &Models[i].InvMat );						// Create Dir Matrix
-
-					if( IsGroupVisible[ Models[i].Group ] )
-					{
-						Models[i].TimeCount += framelag;
-
-						if( Models[i].TimeCount >= Models[i].TimeInterval )
-						{
-							Models[i].TimeCount = FMOD( Models[i].TimeCount, Models[i].TimeInterval );
-
-							TempDir = Models[i].Dir;
-							NormaliseVector( &TempDir );
-
-							if( !InWater( Models[i].Group, &Models[i].Pos, &WaterDamage ) )
-							{
-								CreateShrapnelTrail( &Models[i].Pos, &TempDir, ( 4.0F * GLOBAL_SCALE ), Models[i].Group, 200, 100, 80 );
-							}
-							else
-							{
-								CreateBubbleTrail( &Models[i].Pos, &TempDir, Models[i].Group, 64, 64, 64 );
-							}
-						}
-					}
-				}
+				ModelSmallShrapnel( i, Int_Point, Int_Normal, TempVector, Speed, TempQuat, FrameLag_Rot, TempDir, UpMatrix, InvUpMatrix, WaterDamage );
 				break;
 
 			case MODFUNC_ProcessSpotFX:
-				if( Models[i].Flags & MODFLAG_SpotFXDisabled ) break;
-				if( framelag == 0.0F ) break;
-
-				SpotFXPtr = nullptr;
-				NumSpotFX = 0;
-
-				if( ModelNames[ Models[i].ModelNum ].DoIMorph )
-				{
-					if( MxaModelHeaders[ Models[i].ModelNum ].NumSpotFX &&
-						MxaModelHeaders[ Models[i].ModelNum ].SpotFX )
-					{
-						SpotFXPtr = MxaModelHeaders[ Models[i].ModelNum ].SpotFX;
-						NumSpotFX = MxaModelHeaders[ Models[i].ModelNum ].NumSpotFX;
-					}
-				}
-				else
-				{
-					if( ModelHeaders[ Models[i].ModelNum ].NumSpotFX &&
-						ModelHeaders[ Models[i].ModelNum ].SpotFX )
-					{
-						SpotFXPtr = ModelHeaders[ Models[i].ModelNum ].SpotFX;
-						NumSpotFX = ModelHeaders[ Models[i].ModelNum ].NumSpotFX;
-					}
-				}
-
-				if( !SpotFXPtr || !NumSpotFX ) break;
-
-				TempDir.x = ( Models[i].Pos.x - Models[i].OldPos.x );
-				TempDir.y = ( Models[i].Pos.y - Models[i].OldPos.y );
-				TempDir.z = ( Models[i].Pos.z - Models[i].OldPos.z );
-				ApplyMatrix( &Models[i].InvMat, &TempDir, &TempDir );
-				Speed = TempDir.z;
-				ShipSpeed = VectorLength( &Models[i].Dir );
-
-				for( Count = 0; Count < NumSpotFX; Count++ )
-				{
-					if( !( Models[i].Flags & MODFLAG_Stealth ) || ( SpotFXPtr->Type == SPOTFX_SoundFX ) )
-					{
-						Models[i].SpotFXTimeInterval[ Count ] = (float) 1;
-
-						if ( ! CAMERA_VIEW_IS_VALID ) return;
-						VisNum = VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[i].Group, &VisGroups[ 0 ] );
-
-						switch( Models[i].SpotFXState[ Count ] )
-						{
-						case SPOTFX_STATE_WaitingForDelay:
-							Models[i].SpotFXDelay[ Count ] -= framelag;
-
-							if( Models[i].SpotFXDelay[ Count ] < 0.0F )
-							{
-								Models[i].SpotFXDelay[ Count ] += SpotFXPtr->ActiveDelay;
-								Models[i].SpotFXState[ Count ] = SPOTFX_STATE_Active;
-								Models[i].SpotFXTimeCount[ Count ] = 0.0F;
-							}
-							break;
-
-						case SPOTFX_STATE_Active:
-							if( Models[i].Visible )
-							{
-								switch( SpotFXPtr->Type )
-								{
-								case SPOTFX_Flame:
-								case SPOTFX_Smoke:
-								case SPOTFX_Steam:
-								case SPOTFX_Sparks:
-								case SPOTFX_ElectricBeams:
-								case SPOTFX_GravgonTrail:
-								case SPOTFX_NmeTrail:
-								case SPOTFX_NmeVapourTrail:
-								case SPOTFX_FireWall:
-								case SPOTFX_GravitySparks:
-								case SPOTFX_Bubbles:
-								case SPOTFX_BeardAfterburner:
-								case SPOTFX_Hk5Afterburner:
-								case SPOTFX_SoundFX:
-								default:
-									Models[i].SpotFXTimeCount[ Count ] += framelag;
-
-									if( Models[i].SpotFXTimeCount[ Count ] >= Models[i].SpotFXTimeInterval[ Count ] )
-									{
-										Models[i].SpotFXTimeCount[ Count ] = (float) FMOD( Models[i].SpotFXTimeCount[ Count ], Models[i].SpotFXTimeInterval[ Count ] );
-
-										ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
-										ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
-										ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
-
-										Pos.x += Models[i].Pos.x;
-										Pos.y += Models[i].Pos.y;
-										Pos.z += Models[i].Pos.z;
-
-										SpotFXGroup = Models[i].Group;
-
-										for( Count2 = 0; Count2 < VisNum; Count2++ )
-										{
-											if( Bsp_Header[ 0 ].State )
-											{
-												if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
-												{
-													SpotFXGroup = VisGroups[ Count2 ];
-													break;
-												}
-											}
-											else
-											{
-												if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
-												{
-													SpotFXGroup = VisGroups[ Count2 ];
-													break;
-												}
-											}
-										}
-
-										if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
-										{
-											switch( SpotFXPtr->Type )
-											{
-											case SPOTFX_Flame:
-												CreateSpotFXFlame( &Pos, &DirVector, SpotFXGroup );
-												break;
-
-											case SPOTFX_Smoke:
-												CreateSpotFXSmoke( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-												break;
-
-											case SPOTFX_Steam:
-												CreateSpotFXSteam( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-												break;
-
-											case SPOTFX_Sparks:
-												CreateSpotFXSparks( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-												break;
-
-											case SPOTFX_ElectricBeams:
-												CreateSpotFXElectricBeams( &Pos, &DirVector, &UpVector, SpotFXGroup );
-												break;
-
-											case SPOTFX_GravgonTrail:
-												CreateSpotFXGravgonTrail( &Pos, &DirVector, SpotFXGroup );
-												break;
-
-											case SPOTFX_NmeTrail:
-												CreateSpotFXNmeTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-												break;
-
-											case SPOTFX_NmeVapourTrail:
-												CreateSpotFXNmeVapourTrail( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-												break;
-
-											case SPOTFX_FireWall:
-												CreateSpotFXFireWall( &Pos, &DirVector, &UpVector, SpotFXGroup );
-												break;
-
-											case SPOTFX_GravitySparks:
-												CreateSpotFXRealSparks(  &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-												break;
-
-											case SPOTFX_Bubbles:
-												CreateSpotFXBubbles( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue, ( 2.0F * BLOCKSIZE ) );
-												break;
-
-											case SPOTFX_BeardAfterburner:
-												if( BikeExhausts ) CreateSpotFXBeardAfterburner( &Pos, &DirVector, SpotFXGroup, Speed );
-												break;
-
-											case SPOTFX_Hk5Afterburner:
-												if( BikeExhausts ) CreateSpotFXHk5Afterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed, 32, 32, 128 );
-												break;
-
-											case SPOTFX_SoundFX:
-												if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-												{
-													if( SpotFXPtr->SoundFX != -1 )
-													{
-														if( EngineEnabled( Models[i].OwnerType, Models[i].Owner ) )
-														{
-															if( !Models[ i ].SpotFXSFX_ID[ Count ] )
-															{
-																Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
-																								  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
-																Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-															}
-															else
-															{
-																StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
-																Models[i].SpotFXSFX_ID[ Count ] = 0;
-
-																Models[ i ].SpotFXSFX_ID[ Count ] = PlaySpotSfx( SpotFXPtr->SoundFX, &Models[i].Group, &Models[i].Pos,
-																								  SpotFXPtr->SoundFXSpeed, SpotFXPtr->SoundFXVolume, SPOT_SFX_TYPE_Normal );
-																Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-#ifdef DEBUG_SPOTFX_SOUND
-																Msg( "Model:SpotFX_SoundFX Overwriting SFX ID %d\n", Models[i].ModelNum );
-#endif
-															}
-														}
-														else
-														{
-															if( Models[ i ].SpotFXSFX_ID[ Count ] )
-															{
-																StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
-																Models[i].SpotFXSFX_ID[ Count ] = 0;
-															}
-														}
-													}
-
-												}
-												break;
-
-											default:
-												break;
-											}
-										}
-									}
-									break;
-
-								case SPOTFX_Explosion:
-								case SPOTFX_FireSecondary:
-								case SPOTFX_FirePrimary:
-								case SPOTFX_NmeGlow:
-								case SPOTFX_Shrapnel:
-								case SPOTFX_Drip:
-								case SPOTFX_BorgAfterburner:
-								case SPOTFX_ExcopAfterburner:
-								case SPOTFX_TruckerAfterburner:
-								case SPOTFX_NubiaAfterburner:
-								case SPOTFX_CerberoAfterburner:
-								case SPOTFX_FoetoidAfterburner:
-								case SPOTFX_FoetoidSmallAfterburner:
-								case SPOTFX_JapBirdAfterburner:
-								case SPOTFX_JoAfterburner:
-								case SPOTFX_JoSmallAfterburner:
-								case SPOTFX_LaJayAfterburner:
-								case SPOTFX_MofistoAfterburner:
-								case SPOTFX_NutterAfterburner:
-								case SPOTFX_RhesusAfterburner:
-								case SPOTFX_SharkAfterburner:
-								case SPOTFX_SlickAfterburner:
-									ApplyMatrix( &Models[i].Mat, &SpotFXPtr->Pos, &Pos );
-									ApplyMatrix( &Models[i].Mat, &SpotFXPtr->DirVector, &DirVector );
-									ApplyMatrix( &Models[i].Mat, &SpotFXPtr->UpVector, &UpVector );
-
-									Pos.x += Models[i].Pos.x;
-									Pos.y += Models[i].Pos.y;
-									Pos.z += Models[i].Pos.z;
-
-									SpotFXGroup = Models[i].Group;
-
-									for( Count2 = 0; Count2 < VisNum; Count2++ )
-									{
-										if( Bsp_Header[ 0 ].State )
-										{
-											if( PointInsideSkin( &Pos, VisGroups[ Count2 ] ) )
-											{
-												SpotFXGroup = VisGroups[ Count2 ];
-												break;
-											}
-										}
-										else
-										{
-											if( PointInGroupBoundingBox( &Mloadheader, &Pos, VisGroups[ Count2 ] ) )
-											{
-												SpotFXGroup = VisGroups[ Count2 ];
-												break;
-											}
-										}
-									}
-
-									if( CAMERA_VIEW_IS_VALID && GroupsAreVisible( SpotFXGroup, Ships[ Current_Camera_View ].Object.Group ) )
-									{
-										switch( SpotFXPtr->Type )
-										{
-										case SPOTFX_Explosion:
-											if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												CreateSpotFXExplosion( &Pos, &DirVector, SpotFXGroup );
-												Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-											}
-											break;
-
-										case SPOTFX_FireSecondary:
-											if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												CreateSpotFXFireSecondary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Secondary, Models[ i ].OwnerType, Models[ i ].Owner );
-												Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-											}
-											break;
-
-										case SPOTFX_FirePrimary:
-											if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												CreateModelSpotFXFirePrimary( &Pos, &DirVector, &UpVector, SpotFXGroup, SpotFXPtr->Primary, i, Count );
-												Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-											}
-											break;
-
-										case SPOTFX_NmeGlow:
-											CreateSpotFXNmeGlow( &Pos, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-											break;
-
-										case SPOTFX_Shrapnel:
-											if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												CreateSpotFXShrapnel( &Pos, &DirVector, SpotFXGroup );
-												Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-											}
-											break;
-
-										case SPOTFX_Drip:
-											if( !( Models[ i ].SpotFXFlags[ Count ] & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												CreateSpotFXDrip( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
-												Models[ i ].SpotFXFlags[ Count ] |= SPOTFX_FLAGS_DoneOnce;
-											}
-											break;
-
-										case SPOTFX_BorgAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_ExcopAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_TruckerAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_NubiaAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_CerberoAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_FoetoidAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_FoetoidSmallAfterburner:
-											if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_JapBirdAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_JoAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_JoSmallAfterburner:
-											if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_LaJayAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_MofistoAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_NutterAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_RhesusAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_SharkAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										case SPOTFX_SlickAfterburner:
-											if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
-											break;
-
-										default:
-											break;
-										}
-									}
-									break;
-								}
-							}
-
-							Models[i].SpotFXDelay[ Count ] -= framelag;
-
-							if( Models[i].SpotFXDelay[ Count ] < 0.0F )
-							{
-								if( SpotFXPtr->InactiveDelay < 0.0F )
-								{
-									Models[i].SpotFXDelay[ Count ] = -1.0F;
-
-									switch( SpotFXPtr->Type )
-									{
-									case SPOTFX_SoundFX:
-										if( ( SpotFXPtr->SoundFX != -1 ) &&
-											( Models[ i ].SpotFXSFX_ID[ Count ] ) )
-										{
-											if( EngineEnabled( Models[i].OwnerType, Models[i].Owner ) )
-											{
-												Models[i].SpotFXSFX_ID[ Count ] = EngineCode( Models[i].OwnerType, Models[i].Owner, Models[i].SpotFXSFX_ID[ Count ], Speed );
-											}
-											else
-											{
-												StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
-												Models[i].SpotFXSFX_ID[ Count ] = 0;
-												Models[i].SpotFXFlags[ Count ] &= ~SPOTFX_FLAGS_DoneOnce;
-											}
-										}
-										break;
-
-									default:
-										break;
-									}
-								}
-								else
-								{
-									if( SpotFXPtr->InactiveDelay == 0.0F )
-									{
-										Models[i].SpotFXDelay[ Count ] += SpotFXPtr->ActiveDelay;
-									}
-									else
-									{
-										if( SpotFXPtr->SoundFX != -1 )
-										{
-											if( Models[i].SpotFXSFX_ID[ Count ] )
-											{
-												StopSfx( Models[i].SpotFXSFX_ID[ Count ] );
-												Models[i].SpotFXSFX_ID[ Count ] = 0;
-											}
-										}
-
-										Models[i].SpotFXDelay[ Count ] += SpotFXPtr->InactiveDelay;
-										Models[i].SpotFXState[ Count ] = SPOTFX_STATE_Inactive;
-									}
-								}
-							}
-							break;
-
-						case SPOTFX_STATE_Inactive:
-							Models[i].SpotFXDelay[ Count ] -= framelag;
-
-							if( Models[i].SpotFXDelay[ Count ] < 0.0F )
-							{
-								Models[i].SpotFXFlags[ Count ] &= ~SPOTFX_FLAGS_DoneOnce;
-								Models[i].SpotFXDelay[ Count ] += SpotFXPtr->ActiveDelay;
-								Models[i].SpotFXState[ Count ] = SPOTFX_STATE_Active;
-								Models[i].SpotFXTimeCount[ Count ] = 0.0F;
-							}
-							break;
-						}
-					}
-
-					SpotFXPtr++;
-				}
+				if( !ModelProcessSpotFX( i, Speed, Pos, TempDir, UpVector, DirVector, NumSpotFX, SpotFXPtr, Count, SpotFXGroup, VisNum, VisGroups, Count2, ShipSpeed ) )
+					return;
 				break;
 			}
 
