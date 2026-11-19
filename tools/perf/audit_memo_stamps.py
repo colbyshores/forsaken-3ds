@@ -29,8 +29,6 @@ REQUIRED = {
     "polys.cpp": {
         "PolyDispGroupClipped": "SMEMO_PASS_POLYS_CLIPPED",
         "PolyDispGroupUnclipped": "SMEMO_PASS_POLYS_UNCLIPPED",
-        "SolidPolyDispGroupClipped": "SMEMO_PASS_SOLID_CLIPPED",
-        "SolidPolyDispGroupUnclipped": "SMEMO_PASS_SOLID_UNCLIPPED",
     },
     "2dpolys.cpp": {
         "FmPolyDispGroupClipped": "SMEMO_PASS_FM_CLIPPED",
