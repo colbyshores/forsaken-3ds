@@ -2105,7 +2105,7 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 				if( DebugCount > MAXENEMIES )
 				{
 					Msg( "CheckBGObjectToEnemies() Link list corrupt!!" );
-					return( INDEX_NONE );
+					return( true );	/* treat a corrupt list as a hit: stop the object */
 				}
 
 				DebugCount++;
@@ -2196,7 +2196,7 @@ bool CheckBGObjectToPickups( BGOBJECT * Object )
 			if( DebugCount > MAXPICKUPS )
 			{
 				Msg( "CheckBGObjectToPickups() Link list corrupt!!" );
-				return( INDEX_NONE );
+				return( true );	/* treat a corrupt list as a hit: stop the object */
 			}
 
 			DebugCount++;
