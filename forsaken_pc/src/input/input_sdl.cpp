@@ -534,8 +534,8 @@ bool joysticks_init(void)
 			JoystickInfo[i].Axis[j].name =
 				(char*) malloc (MAX_JOYNAME+1);
 
-			sprintf(
-				JoystickInfo[i].Axis[j].name,
+			snprintf(
+				JoystickInfo[i].Axis[j].name, MAX_JOYNAME + 1,
 				"Axis %d",
 				j
 				);
@@ -548,8 +548,8 @@ bool joysticks_init(void)
 			JoystickInfo[i].Button[j].name =
 				(char *) malloc (MAX_JOYNAME+1);
 
-			sprintf(
-				JoystickInfo[i].Button[j].name,
+			snprintf(
+				JoystickInfo[i].Button[j].name, MAX_JOYNAME + 1,
 				"Button %d",
 				j
 				);
@@ -560,8 +560,8 @@ bool joysticks_init(void)
 			JoystickInfo[i].POV[j].name =
 				(char *) malloc (MAX_JOYNAME+1);
 
-			sprintf(
-				JoystickInfo[i].POV[j].name,
+			snprintf(
+				JoystickInfo[i].POV[j].name, MAX_JOYNAME + 1,
 				"Hat %d",
 				j
 				);
@@ -574,8 +574,8 @@ bool joysticks_init(void)
 				JoystickInfo[i].POV[j].dirname[k] =
 					(char *) malloc (MAX_JOYNAME+1);
 
-				sprintf(
-					JoystickInfo[i].POV[j].dirname[k],
+				snprintf(
+					JoystickInfo[i].POV[j].dirname[k], MAX_JOYNAME + 1,
 					"%s %d",
 					JoystickInfo[i].POV[j].name,
 					k

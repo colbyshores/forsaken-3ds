@@ -60,7 +60,7 @@ static bool parse_chdir( char *cli )
 		Msg("Command line to long!");
 		return false;
 	}
-	strcpy(cmdline,cli);
+	copy_string(cmdline, sizeof( cmdline ),cli);
 
 	option = strtok(cmdline, " -+'\"");
 
@@ -156,7 +156,7 @@ static bool ParseCommandLine(char* args)
 		Msg("Command line to long!");
 		return false;
 	}
-	strcpy(cmdline,args);
+	copy_string(cmdline, sizeof( cmdline ),args);
 
 	//
 	// extract and process tokens from command line
@@ -232,7 +232,7 @@ static bool ParseCommandLine(char* args)
 
 			// extract the address
 			option = strtok(nullptr, " ");
-			strcpy( address, option );
+			copy_string( address, sizeof( address ), option );
 
 			// try to find a port in the address
 			port = strchr(address,':');
@@ -241,16 +241,16 @@ static bool ParseCommandLine(char* args)
 			if( port )
 			{
 				*port = 0; // separate hostname from port
-				strcpy( (char*) host_port_str.text, ++port );
+				copy_string( (char*) host_port_str.text, sizeof( host_port_str.text ), ++port );
 			}
 			// other wise set default port
 			else
 			{
-				sprintf( (char*) host_port_str.text, "%d", NETWORK_DEFAULT_PORT );
+				snprintf( (char*) host_port_str.text, sizeof( host_port_str.text ), "%d", NETWORK_DEFAULT_PORT );
 			}
 
 			// copy in the hostname
-			strcpy( (char*)TCPAddress.text, address );
+			copy_string( (char*)TCPAddress.text, sizeof( TCPAddress.text ), address );
 		}
 
 		// special override to allow setting up of spaceorb
@@ -574,8 +574,8 @@ int main( int argc, char* argv[] )
 			DebugPrintf("Stopped parsing cli options at argc='%s' because greator than 500 characters\n",argv[i]);
 			break;
 		}
-		strcat( cli, " " );
-		strcat( cli, argv[i] );
+		append_string( cli, sizeof( cli ), " " );
+		append_string( cli, sizeof( cli ), argv[i] );
 	}
 	DebugPrintf("cli: %s\n",cli);
 

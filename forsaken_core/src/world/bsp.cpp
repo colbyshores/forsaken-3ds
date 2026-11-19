@@ -116,7 +116,7 @@ static bool BSP_LoadPortals( char *fname )
 
 	Bsp_Portal_Header.state = false;
 
-	Change_Ext( fname, Filename, ".PBS" );
+	Change_Ext( fname, Filename, sizeof( Filename ), ".PBS" );
 
 	File_Size = Get_File_Size( Filename );
 	if( !File_Size )

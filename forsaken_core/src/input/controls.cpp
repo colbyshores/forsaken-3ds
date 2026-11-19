@@ -145,7 +145,7 @@ void FlashMenuText( const char * text, float activetime, u_int16_t sfx )
 {
 	if( text )
 	{
-		strcpy( FlashText, text );
+		copy_string( FlashText, sizeof( FlashText ), text );
 		FlashTextActive = activetime;
 		if( sfx != 0xFF )
 		{

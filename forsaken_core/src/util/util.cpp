@@ -72,35 +72,32 @@ void Get_Ext( u_int8_t * Src, u_int8_t * Dest )
 	}
 }
 
-void Change_Ext( const char * Src, char * Dest, const char * Ext )
+void Change_Ext( const char * Src, char * Dest, size_t size, const char * Ext )
 {
-	u_int8_t	*	Char_Ptr;
-
-	int length = strlen( Src );
+	size_t length = strlen( Src );
+	const char * p;
+	size_t keep;
 
 	if ( ! length )
 	{
-		strcpy( Dest, Ext ); // set the extension
+		copy_string( Dest, size, Ext ); // set the extension
 		Msg("Change_Ext called with Src empty!");
 		return;
 	}
 
-	Char_Ptr = ( (u_int8_t*)Src + length ) - 1;
+	// the extension starts at the last '.' after the last '\\' or ':'
+	p = Src + length - 1;
+	while( p != Src && *p != '\\' && *p != ':' && *p != '.' )
+		p--;
+	keep = ( *p == '.' ) ? (size_t)( p - Src ) : length;
 
-	while( Char_Ptr != (u_int8_t*)Src && *Char_Ptr != '\\' && *Char_Ptr != ':' && *Char_Ptr != '.' ) Char_Ptr--;
-
-	if( *Char_Ptr == '.' )
-	{
-		while( (u_int8_t*)Src != Char_Ptr )
-			*Dest++ = *Src++;
-		strcpy( Dest, Ext );
-	}
-	else
-	{
-		strcpy( (char *)Dest, (const char *)Src );
-		Dest += strlen( Src );
-		strcpy( Dest, Ext );
-	}
+	if( size == 0 )
+		return;
+	if( keep >= size )
+		keep = size - 1;
+	memcpy( Dest, Src, keep );
+	Dest[ keep ] = 0;
+	append_string( Dest, size, Ext );
 }
 
 void DebugPrintf( const char * format, ... ) // timestamp prefix
@@ -115,7 +112,7 @@ void DebugPrintf( const char * format, ... ) // timestamp prefix
 
 	struct timeval now;
 	gettimeofday(&now, nullptr);
-	sprintf( buf, "%lld.%.3d ",
+	snprintf( buf, sizeof( buf ), "%lld.%.3d ",
 		(long long) now.tv_sec, (int)( now.tv_usec / 1000 ));
 
 	buf2 = strchr(buf,0);

@@ -445,7 +445,7 @@ bool SetFOV( float fov )
 void SetViewportError( const char *where, render_viewport_t *vp )
 {
 	static char msg[1024];
-	sprintf( msg,
+	snprintf( msg, sizeof( msg ),
 		"SetViewport failed in %s.\n"
 		"size=%d\n"
 		"xpos=%lu ypos=%lu\n"
@@ -803,7 +803,7 @@ bool InitLevels( const char * levels_list )
 	}
 
 	// path to data\\levels\\<type>.bat
-	sprintf( levels_file, "data\\levels\\%s", levels_list );
+	snprintf( levels_file, sizeof( levels_file ), "data\\levels\\%s", levels_list );
 
 	// set some globals
 	CurrentLevelsList = levels_list;
@@ -825,24 +825,24 @@ bool InitLevels( const char * levels_list )
 
 
 		// get the path to the current mxv file
-		sprintf( LevelNames[ j ], "data\\levels\\%s\\%s.mxv", ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( LevelNames[ j ], sizeof( LevelNames[ j ] ), "data\\levels\\%s\\%s.mxv", ShortLevelNames[ j ], ShortLevelNames[ j ] );
 
 		// check to see if the level mxv file exists
 		if ( !File_Exists( LevelNames[ j ] ) )
 			continue;
 
 		// add paths for a level to the lists
-		sprintf( CollisionNames[ j ],		"data\\levels\\%s\\%s.mc",    ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( CollisionZNames[ j ],		"data\\levels\\%s\\%sz.mc",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( BspNames[ j ],				"data\\levels\\%s\\%s.bsp",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( ZoneNames[ j ],			"data\\levels\\%s\\%s.zon",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( WaterNames[ j ],			"data\\levels\\%s\\%s.wat",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( TextNames[ j ],			"data\\levels\\%s\\%s.txt",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( MsgNames[ j ],				"data\\levels\\%s\\%s.msg",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( ExternalForceNames[ j ],	"data\\levels\\%s\\%s.gf",    ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( TeleportNames[ j ],		"data\\levels\\%s\\%s.tel",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( MissionTextNames[ j ],		"data\\levels\\%s\\%s.mis",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
-		sprintf( MissionTextPics[ j ],		"data\\levels\\%s\\%s.ppm",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( CollisionNames[ j ], sizeof( CollisionNames[ j ] ),		"data\\levels\\%s\\%s.mc",    ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( CollisionZNames[ j ], sizeof( CollisionZNames[ j ] ),		"data\\levels\\%s\\%sz.mc",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( BspNames[ j ], sizeof( BspNames[ j ] ),				"data\\levels\\%s\\%s.bsp",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( ZoneNames[ j ], sizeof( ZoneNames[ j ] ),			"data\\levels\\%s\\%s.zon",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( WaterNames[ j ], sizeof( WaterNames[ j ] ),			"data\\levels\\%s\\%s.wat",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( TextNames[ j ], sizeof( TextNames[ j ] ),			"data\\levels\\%s\\%s.txt",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( MsgNames[ j ], sizeof( MsgNames[ j ] ),				"data\\levels\\%s\\%s.msg",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( ExternalForceNames[ j ], sizeof( ExternalForceNames[ j ] ),	"data\\levels\\%s\\%s.gf",    ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( TeleportNames[ j ], sizeof( TeleportNames[ j ] ),		"data\\levels\\%s\\%s.tel",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( MissionTextNames[ j ], sizeof( MissionTextNames[ j ] ),		"data\\levels\\%s\\%s.mis",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
+		snprintf( MissionTextPics[ j ], sizeof( MissionTextPics[ j ] ),		"data\\levels\\%s\\%s.ppm",   ShortLevelNames[ j ], ShortLevelNames[ j ] );
 
 		// increment counter
 		j++;
@@ -869,7 +869,7 @@ bool InitLevels( const char * levels_list )
 	// add each level to the master list
 	for (j = 0; j < NumLevels; j++)
 	{
-		strcpy( (char*) &LevelList.item[LevelList.items][0] , (char*) &ShortLevelNames[j][0] );
+		copy_string( (char*) &LevelList.item[LevelList.items][0] , sizeof( LevelList.item[LevelList.items] ), (char*) &ShortLevelNames[j][0] );
 		LevelList.items++;
 	}
 
@@ -1043,7 +1043,7 @@ void DrawSimplePanel()
 				// Average Kills Per Minute
 				if(ShowKPMOnHUD)
 				{
-					sprintf( MessageBuff, "KPM: %.2f", (float)
+					snprintf( MessageBuff, sizeof( MessageBuff ), "KPM: %.2f", (float)
 							(GetTotalKills(WhoIAm) - GetFriendlyKills(WhoIAm))
 							/ (LevelTimeTaken / 60.0F) );
 					Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*6, RED);
@@ -1112,7 +1112,7 @@ void DrawSimplePanel()
 			// Game Clock
 			if(ShowClockOnHUD)
 			{
-				sprintf( MessageBuff, "%02d:%02d", (int)(LevelTimeTaken / 60), (int)((int)LevelTimeTaken % 60) );
+				snprintf( MessageBuff, sizeof( MessageBuff ), "%02d:%02d", (int)(LevelTimeTaken / 60), (int)((int)LevelTimeTaken % 60) );
 				Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*5, WHITE);
 			}
 
@@ -1127,7 +1127,7 @@ void DrawSimplePanel()
 					OldPos.y = Ships[WatchPlayerSelect.value].Object.Pos.y;
 					OldPos.z = Ships[WatchPlayerSelect.value].Object.Pos.z;
 				}
-				sprintf( MessageBuff, "%.0f", BikeSpeed/3.0F); // attempt scale 0-100
+				snprintf( MessageBuff, sizeof( MessageBuff ), "%.0f", BikeSpeed/3.0F); // attempt scale 0-100
 				Print4x5Text( &MessageBuff[0], FontWidth, render_info.window_size.cy - FontWidth*8, YELLOW);
 				SpeedInterval -= framelag;
 			}
@@ -1650,7 +1650,7 @@ bool ChangeLevel( void )
 
 	OnceOnlyChangeLevel = true;
 	ChangeLevel_MyGameStatus = MyGameStatus;
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &TriggerName[ 0 ], ".TRG" );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &TriggerName[ 0 ], sizeof( TriggerName ), ".TRG" );
 	if( !Triggerload( TriggerName ) )
 	{
 		SeriousError = true;
@@ -2089,7 +2089,7 @@ bool RenderScene( void )
 			{
 
 				{
-					sprintf( buf, "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
+					snprintf( buf, sizeof( buf ), "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
 					CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_WaitingAfterScore ? 2 : 1 );
 				}
 
@@ -2349,7 +2349,7 @@ bool RenderScene( void )
 		{
 			if( ( GameStatus[i] != STATUS_GetPlayerNum )&& (GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && (GameStatus[i] != STATUS_Null ) )
 			{
-				sprintf( buf, "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
+				snprintf( buf, sizeof( buf ), "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
 				CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_StartingMultiplayerSynch ? 2 : 1 );
 				e++;
 			}
@@ -2443,7 +2443,7 @@ bool RenderScene( void )
 
 		CenterPrint4x5Text( "Requesting Player Number" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , 2 );
 
-		sprintf( &buf[0] , "Attempt %d\n" , GetPlayerNumCount );
+		snprintf( &buf[0] , sizeof( buf ), "Attempt %d\n" , GetPlayerNumCount );
 		CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-(FontHeight>>1) , 2 );
 
 		GetPlayerNumCount1 -= framelag;
@@ -2664,7 +2664,7 @@ bool RenderScene( void )
 
 	case STATUS_ChangeLevelPostInitView:
 		DebugState("STATUS_ChangeLevelPostInitView\n");
-		Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], ".NOD" );
+		Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], sizeof( NodeName ), ".NOD" );
 		if( !Nodeload( NodeName ) )
 		{
 			SeriousError = true;
@@ -2704,7 +2704,7 @@ bool RenderScene( void )
 			return false;
 		}
 
-		Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], ".CAM" );
+		Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NodeName[ 0 ], sizeof( NodeName ), ".CAM" );
 
 		if( !Cameraload( NodeName ) )
 		{
@@ -3851,7 +3851,7 @@ void DisplayNetworkInfo()
 
 		if( Ships[ShipID].network_player != nullptr )
 		{
-			sprintf( (char*) &buf[0] ,"IP: %s PORT: %d",
+			snprintf( (char*) &buf[0] , sizeof( buf ),"IP: %s PORT: %d",
 				Ships[ShipID].network_player->ip,
 				Ships[ShipID].network_player->port);
 
@@ -3859,7 +3859,7 @@ void DisplayNetworkInfo()
 
 			top_offset+=row_height;
 
-			sprintf( (char*) &buf[0] ,"PING: %lu LOSS: %lu LOST: %lu",
+			snprintf( (char*) &buf[0] , sizeof( buf ),"PING: %lu LOSS: %lu LOST: %lu",
 				Ships[ShipID].network_player->ping,
 				Ships[ShipID].network_player->packet_loss,
 				Ships[ShipID].network_player->packets_lost);
@@ -4446,7 +4446,7 @@ bool Our_CalculateFrameRate(void)
 	// display the framerate
 	if( ShowFrameRate )
 	{
-		sprintf(&buf[0], "FPS %d - AVG F %d MS", (int) FPS, avg_time_per_frame );
+		snprintf(&buf[0], sizeof( buf ), "FPS %d - AVG F %d MS", (int) FPS, avg_time_per_frame );
 		CenterPrint4x5Text( (char *) &buf[0] , FontHeight, 2 );
 	}
 
@@ -4454,16 +4454,16 @@ bool Our_CalculateFrameRate(void)
 	{
 
 		// group information
-		sprintf(&buf[0], "Groups Visible %d - Current Group %s", (int) NumGroupsVisible,
+		snprintf(&buf[0], sizeof( buf ), "Groups Visible %d - Current Group %s", (int) NumGroupsVisible,
 			(GroupImIn == INDEX_NONE) ? "(outside)" : Mloadheader.Group[GroupImIn].name );
 		CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*3, 2 );
 
 		// memory information
-		sprintf(&buf[0], "Mem %d",(int)MemUsed );
+		snprintf(&buf[0], sizeof( buf ), "Mem %d",(int)MemUsed );
 		CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*4, 2 );
 
 		// show polygon information
-		sprintf(&buf[0], "Face Me Polys %d - Dynamic? Polys %d - Screen Polys %d - Verts Touched (lighting?) %d",
+		snprintf(&buf[0], sizeof( buf ), "Face Me Polys %d - Dynamic? Polys %d - Screen Polys %d - Verts Touched (lighting?) %d",
 			(int) TotalFmPolysInUse,(int) TotalPolysInUse,(int) TotalScrPolysInUse, NumOfVertsTouched);
 		CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*6, 2 );
 
@@ -4471,14 +4471,14 @@ bool Our_CalculateFrameRate(void)
 		{
 
 			// newtork info
-			sprintf( &buf[0], "Network" );
+			snprintf( &buf[0], sizeof( buf ), "Network" );
 			CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*8, 2 );
 
-			sprintf( &buf[0], "BPS %5d CurSent %5d MaxRec %5d MaxSent %5d",
+			snprintf( &buf[0], sizeof( buf ), "BPS %5d CurSent %5d MaxRec %5d MaxSent %5d",
 				(int)CurrentBytesPerSecRec , (int)CurrentBytesPerSecSent , (int)MaxCurrentBytesPerSecRec , (int)MaxCurrentBytesPerSecSent );
 			CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*9, 2 );
 
-			sprintf( &buf[0], "ReceiveSize %4d MaxReceiveSize %4d", (int)RecPacketSize , (int)MaxRecPacketSize );
+			snprintf( &buf[0], sizeof( buf ), "ReceiveSize %4d MaxReceiveSize %4d", (int)RecPacketSize , (int)MaxRecPacketSize );
 			CenterPrint4x5Text( (char *) &buf[0], (FontHeight+3)*10, 2 );
 
 		}

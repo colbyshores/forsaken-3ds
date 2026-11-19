@@ -2361,12 +2361,12 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					Ships[WhoIAm].Object.Mode = DEATH_MODE;
 					Ships[WhoIAm].Timer = 0.0F;
 					// print up who killed me
-					GetDeathString( ShipHitMsg->ShipHit.WeaponType, ShipHitMsg->ShipHit.Weapon, &methodstr[0] );
+					GetDeathString( ShipHitMsg->ShipHit.WeaponType, ShipHitMsg->ShipHit.Weapon, &methodstr[0], sizeof( methodstr ) );
 
 					if (TeamGame && ( TeamNumber[Ships[WhoIAm].ShipThatLastKilledMe] == TeamNumber[WhoIAm]))
-						strcpy(&teamstr[0], FROM_YOUR_OWN_TEAM );
+						copy_string(&teamstr[0], sizeof( teamstr ), FROM_YOUR_OWN_TEAM );
 					else
-						strcpy(&teamstr[0], "");
+						copy_string(&teamstr[0], sizeof( teamstr ), "");
 
 					AddColourMessageToQue(KillMessageColour, "%s %s %s %s",
 							&Names[Ships[WhoIAm].ShipThatLastKilledMe][0],
@@ -2445,12 +2445,12 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 					Ships[WhoIAm].Object.Mode				= DEATH_MODE;
 					Ships[WhoIAm].Timer						= 0.0F;
 					// print up who killed me
-					GetDeathString( ShortShipHitMsg->ShipHit.WeaponType, ShortShipHitMsg->ShipHit.Weapon, &methodstr[0] );
+					GetDeathString( ShortShipHitMsg->ShipHit.WeaponType, ShortShipHitMsg->ShipHit.Weapon, &methodstr[0], sizeof( methodstr ) );
 
 					if (TeamGame && ( TeamNumber[Ships[WhoIAm].ShipThatLastKilledMe] == TeamNumber[WhoIAm]))
-						strcpy(&teamstr[0], FROM_YOUR_OWN_TEAM );
+						copy_string(&teamstr[0], sizeof( teamstr ), FROM_YOUR_OWN_TEAM );
 					else
-						strcpy(&teamstr[0], "");
+						copy_string(&teamstr[0], sizeof( teamstr ), "");
 
 					// called in TOL OFF multiplayer!!
 					AddColourMessageToQue( KillMessageColour, "%s %s %s %s",
@@ -2473,7 +2473,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		ShipDiedMsg = (SHIPDIEDMSG *)MsgPnt;
 
 		// print a message reflecting the weapon
-		GetDeathString( ShipDiedMsg->WeaponType, ShipDiedMsg->Weapon, &methodstr[0] );
+		GetDeathString( ShipDiedMsg->WeaponType, ShipDiedMsg->Weapon, &methodstr[0], sizeof( methodstr ) );
 
 		// if you killed them
 		if( WhoIAm == ShipDiedMsg->WhoKilledMe )
@@ -2585,9 +2585,9 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			else
 			{
 				if (TeamGame && (TeamNumber[ShipDiedMsg->WhoIAm] == TeamNumber[ShipDiedMsg->WhoKilledMe]))
-					strcpy (&teamstr[0], ON_HIS_OWN_TEAM);
+					copy_string (&teamstr[0], sizeof( teamstr ), ON_HIS_OWN_TEAM);
 				else
-					strcpy (&teamstr[0], "");
+					copy_string (&teamstr[0], sizeof( teamstr ), "");
 
 				// gee someone killed somebody...who cares...
 				AddColourMessageToQue( KillMessageColour, "%s %s %s %s %s" " %s", &Names[ShipDiedMsg->WhoKilledMe][0], "KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH", &methodstr[0], &teamstr[0] );
@@ -2730,7 +2730,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				if( NewLevelNum == -1 )
 				{
 					char buf[ 128 ];
-					sprintf( buf, DID_NOT_HAVE_LEVEL /*"you did not have the level chosen by the host ( %s )"*/,
+					snprintf( buf, sizeof( buf ), DID_NOT_HAVE_LEVEL /*"you did not have the level chosen by the host ( %s )"*/,
 						LongStatusMsg->LevelName );
 					SetTitleNotify( buf );
 					SpecialDestroyGame();

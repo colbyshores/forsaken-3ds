@@ -928,7 +928,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 	if (!*t) {
 		/* ETC2 fast path: build-time-encoded sibling pack. */
 		char ktxpath[256];
-		Change_Ext(path, ktxpath, ".KTX2");
+		Change_Ext(path, ktxpath, sizeof( ktxpath ), ".KTX2");
 		if (s_etc2 && File_Exists(ktxpath)) {
 			texdata = vktex_alloc();
 			if (load_ktx2(texdata, ktxpath, width, height, colorkey)) {
@@ -939,7 +939,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 		}
 	}
 
-	Change_Ext(path, image.path, ".PNG");
+	Change_Ext(path, image.path, sizeof( image.path ), ".PNG");
 	if (!File_Exists((char *)image.path)) {
 		DebugPrintf("Could not find texture file: %s\n", path);
 		return true;

@@ -312,7 +312,7 @@ static void init_key_map( void )
 			default:
 				{
 					char n[255];
-					sprintf(n,"mouse_%d",(i-LEFT_MOUSE));
+					snprintf(n, sizeof( n ),"mouse_%d",(i-LEFT_MOUSE));
 					name = (char*)strdup(n);
 				}
 			}
@@ -637,7 +637,7 @@ read_general_macro( FILE *f, char *config_macro, char *last_token, TEXT *macro )
 	char tempstr[ MAXTEXTMSG ];
 	static char fmt[80];
 
-	sprintf( fmt, " %%%d[^\n]", MAXTEXTMSG - 1 );	// leave room for the NUL
+	snprintf( fmt, sizeof( fmt ), " %%%d[^\n]", MAXTEXTMSG - 1 );	// leave room for the NUL
 
 	if( fscanf( f, fmt, tempstr ) != 1 )
 		tempstr[ 0 ] = 0;
@@ -1036,8 +1036,7 @@ read_joystick_info( FILE *f, USERCONFIG *u, char *last_token )
 			joy = &JoystickInfo[ joynum ];
 			joy->assigned = true;
 			joy->connected = false;
-			joy->Name = (char *)malloc(strlen(tempstr) + 1 );
-			strcpy( joy->Name, tempstr );
+			joy->Name = strdup( tempstr );
 		}
 		else
 			return 1;

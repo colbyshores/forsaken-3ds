@@ -743,7 +743,7 @@ const char *LevelSpecSfxPath = {
 	"data\\sound\\Mapped\\",
 };
 
-void GetSfxPath( int sfxnum, char *path )
+void GetSfxPath( int sfxnum, char *path, size_t size )
 {
 
 	if ( sfxnum > SFX_LEVELSPEC_Start )
@@ -751,23 +751,23 @@ void GetSfxPath( int sfxnum, char *path )
 
 	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_BikeComp )
 	{
-		strcpy( path, BikeCompSfxPath );
+		copy_string( path, size, BikeCompSfxPath );
 		return;
 	}
 
 	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_Biker )
 	{
-		strcpy( path, BikerSfxPath );
+		copy_string( path, size, BikerSfxPath );
 		return;
 	}
 
 	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_LevelSpec )
 	{
-		strcpy( path, LevelSpecSfxPath );
+		copy_string( path, size, LevelSpecSfxPath );
 		return;
 	}
 
-	strcpy( path, GenericSfxPath );
+	copy_string( path, size, GenericSfxPath );
 
 }
 
@@ -858,25 +858,25 @@ void FreeSfxHolder( int index )
 	notes		:		BikeCompSpeechSlider can be zero ( volume ) to indicate no bike computer
 
 *****************************************/
-void GetSfxFileNamePrefix( int sfxnum, char *file )
+void GetSfxFileNamePrefix( int sfxnum, char *file, size_t size )
 {
 	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_BikeComp )
 	{
-		strcpy( file, BikeComputerSpeechNames[ player_config->bikecomp ] );
-		strcat( file, "_" );
-		strcat( file, BikeComputerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
+		copy_string( file, size, BikeComputerSpeechNames[ player_config->bikecomp ] );
+		append_string( file, size, "_" );
+		append_string( file, size, BikeComputerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
 		return;
 	}
 
 	if ( Sfx_Filenames[ sfxnum ].Flags & SFX_Biker )
 	{
-		strcpy( file, BikerSpeechNames[ player_config->bike ] );
-		strcat( file, "_" );
-		strcat( file, BikerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
+		copy_string( file, size, BikerSpeechNames[ player_config->bike ] );
+		append_string( file, size, "_" );
+		append_string( file, size, BikerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
 		return;
 	}
 
-	strcpy( file, Sfx_Filenames[ sfxnum ].Name);
+	copy_string( file, size, Sfx_Filenames[ sfxnum ].Name);
 }
 
 /****************************************
@@ -922,10 +922,10 @@ bool SfxExists( u_int16_t sfx, char *name )
 	// try to find the sfx file
 	// using the standard <name>.wav format
 
-	GetSfxPath( sfx , dirname );  // get path to sfx file
-	strcat( fullpath, dirname );  // set the path
-	strcat( fullpath, name    );  // add the name
-	strcat( fullpath, ".wav"  );  // add the extension
+	GetSfxPath( sfx , dirname, sizeof( dirname ) );  // get path to sfx file
+	append_string( fullpath, sizeof( fullpath ), dirname );  // set the path
+	append_string( fullpath, sizeof( fullpath ), name    );  // add the name
+	append_string( fullpath, sizeof( fullpath ), ".wav"  );  // add the extension
 
 	// success !
 	if(File_Exists(fullpath))
@@ -942,10 +942,10 @@ bool SfxExists( u_int16_t sfx, char *name )
 	// using the <name>01.wav format
 
 	// add the 01
-	strcat( fullpath, "01" );
+	append_string( fullpath, sizeof( fullpath ), "01" );
 
 	// add the extension
-	strcat( fullpath, ".wav" );
+	append_string( fullpath, sizeof( fullpath ), ".wav" );
 
 	// if file exists
 	if( File_Exists ( fullpath ) )
@@ -1047,7 +1047,7 @@ int16_t ReturnSFXIndex( char *file )
 		filelen = strlen( file );
 		if ( ( IsDigit( file[ filelen - 1 ] ) ) && ( IsDigit( file[ filelen - 2 ] ) ) )
 		{
-			strcpy( filetocheck, file );
+			copy_string( filetocheck, sizeof( filetocheck ), file );
 			filetocheck[ filelen - 2 ] = 0;
 			i = 0;
 			while (!( LevelSpecificSfxLookup[ i ].flags & SFX_End ))
@@ -1081,9 +1081,7 @@ int16_t ReturnSFXIndex( char *file )
 		if ( !Sfx_Filenames[ i ].Name  )
 		{
 			Sfx_Filenames[ i ].Flags = level_spec_flags;
-			char *name = (char *)malloc( strlen( file ) + 1 );
-			Sfx_Filenames[ i ].Name = name;
-			strcpy( name, file );
+			Sfx_Filenames[ i ].Name = strdup( file );
 			RequestSfx( i );
 			return i;
 		}
@@ -1199,7 +1197,7 @@ void ReTriggerSfx( void )
 	}
 }
 
-void GetFullBikeSfxPath( char *fullpath, int sfxnum, int variant, int total_variants, int bike )
+void GetFullBikeSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bike )
 {
 	char filename[256];
 	char numstr[12];
@@ -1212,35 +1210,35 @@ void GetFullBikeSfxPath( char *fullpath, int sfxnum, int variant, int total_vari
 	}
 
 	// name of speach file
-	strcpy( filename, BikerSpeechNames[ bike ] );
+	copy_string( filename, sizeof( filename ), BikerSpeechNames[ bike ] );
 
 	// add _
-	strcat( filename, "_" );
+	append_string( filename, sizeof( filename ), "_" );
 
 	//
-	strcat( filename, BikerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
+	append_string( filename, sizeof( filename ), BikerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
 
 	// create filename with no num extension
 	if ( ( total_variants == 0 ) || ( total_variants == 1 ) )
 	{
-		GetSfxPath( sfxnum , fullpath );
-		strcat( fullpath, filename );
-		strcat( fullpath, ".wav" );
+		GetSfxPath( sfxnum , fullpath , size);
+		append_string( fullpath, size, filename );
+		append_string( fullpath, size, ".wav" );
 	}
 
 	// create filename with num extension
 	else
 	{
-		GetSfxPath( sfxnum , fullpath );
-		strcat( fullpath, filename );
+		GetSfxPath( sfxnum , fullpath , size);
+		append_string( fullpath, size, filename );
 		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
-		strcat( fullpath, numstr );
-		strcat( fullpath, ".wav" );
+		append_string( fullpath, size, numstr );
+		append_string( fullpath, size, ".wav" );
 	}
 
 }
 
-void GetFullBikeCompSfxPath( char *fullpath, int sfxnum, int variant, int total_variants, int bikecomp )
+void GetFullBikeCompSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants, int bikecomp )
 {
 	char filename[256];
 	char numstr[12];
@@ -1253,30 +1251,30 @@ void GetFullBikeCompSfxPath( char *fullpath, int sfxnum, int variant, int total_
 	}
 
 
-	strcpy( filename, BikeComputerSpeechNames[ bikecomp ] );
-	strcat( filename, "_" );
-	strcat( filename, BikeComputerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
+	copy_string( filename, sizeof( filename ), BikeComputerSpeechNames[ bikecomp ] );
+	append_string( filename, sizeof( filename ), "_" );
+	append_string( filename, sizeof( filename ), BikeComputerSpeechEffects[ Sfx_Filenames[ sfxnum ].SfxLookup ] );
 
 	if ( ( total_variants == 0 ) || ( total_variants == 1 ) )
 	{
 		// create filename with no num extension
-		GetSfxPath( sfxnum, fullpath );
-		strcat( fullpath, filename );
-		strcat( fullpath, ".wav" );
+		GetSfxPath( sfxnum, fullpath , size);
+		append_string( fullpath, size, filename );
+		append_string( fullpath, size, ".wav" );
 	}else
 	{
 		// create filename with num extension
-		GetSfxPath( sfxnum, fullpath );
-		strcat( fullpath, filename );
+		GetSfxPath( sfxnum, fullpath , size);
+		append_string( fullpath, size, filename );
 		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
-		strcat( fullpath, numstr );
-		strcat( fullpath, ".wav" );
+		append_string( fullpath, size, numstr );
+		append_string( fullpath, size, ".wav" );
 	}
 
 }
 
 
-void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants )
+void GetFullSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants )
 {
 	char filename[256];
 	char numstr[12];
@@ -1288,23 +1286,23 @@ void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants
 		return;
 	}
 
-	GetSfxFileNamePrefix( sfxnum, filename );
+	GetSfxFileNamePrefix( sfxnum, filename, sizeof( filename ) );
 
 	if ( ( total_variants == 0 ) || ( total_variants == 1 ) )
 	{
 		// create filename with no num extension
-		GetSfxPath( sfxnum , fullpath );
-		strcat( fullpath, filename );
-		strcat( fullpath, ".wav" );
+		GetSfxPath( sfxnum , fullpath , size);
+		append_string( fullpath, size, filename );
+		append_string( fullpath, size, ".wav" );
 	}
 	else
 	{
 		// create filename with num extension
-		GetSfxPath( sfxnum , fullpath );
-		strcat( fullpath, filename );
+		GetSfxPath( sfxnum , fullpath , size);
+		append_string( fullpath, size, filename );
 		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
-		strcat( fullpath, numstr );
-		strcat( fullpath, ".wav" );
+		append_string( fullpath, size, numstr );
+		append_string( fullpath, size, ".wav" );
 	}
 
 }
@@ -1366,9 +1364,8 @@ void UpdateSfxForBiker( u_int16_t biker )
 		// apply new biker settings
 		for( j = 0; j < SndLookup[ i + SFX_BIKER_START ].Num_Variants; j++ )
 		{
-			GetFullSfxPath( file, i + SFX_BIKER_START, j, SndLookup[ i + SFX_BIKER_START ].Num_Variants );
-			SfxFullPath[ i + SFX_BIKER_START ][ j ] = ( char * )malloc( strlen( file ) + 1 );
-			strcpy( SfxFullPath[ i + SFX_BIKER_START ][ j ], file );
+			GetFullSfxPath( file, sizeof( file ), i + SFX_BIKER_START, j, SndLookup[ i + SFX_BIKER_START ].Num_Variants );
+			SfxFullPath[ i + SFX_BIKER_START ][ j ] = strdup( file );
 		}
 	}
 }
@@ -1396,9 +1393,8 @@ void UpdateSfxForBikeComputer( u_int16_t bikecomp )
 		// create new settings
 		for( j = 0; j < SndLookup[ i + SFX_BIKECOMP_START ].Num_Variants; j++ )
 		{
-			GetFullSfxPath( file, i + SFX_BIKECOMP_START, j, SndLookup[ i + SFX_BIKECOMP_START ].Num_Variants );
-			SfxFullPath[ i + SFX_BIKECOMP_START ][ j ] = ( char * )malloc( strlen( file ) + 1 );
-			strcpy( SfxFullPath[ i + SFX_BIKECOMP_START ][ j ], file );
+			GetFullSfxPath( file, sizeof( file ), i + SFX_BIKECOMP_START, j, SndLookup[ i + SFX_BIKECOMP_START ].Num_Variants );
+			SfxFullPath[ i + SFX_BIKECOMP_START ][ j ] = strdup( file );
 		}
 	}
 }
@@ -1423,7 +1419,7 @@ void GetBikeVariants( void )
 				BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ] = 0;
 
 				// try filename with no num extension
-				GetFullBikeSfxPath( filename, i, 1, 0, bike );
+				GetFullBikeSfxPath( filename, sizeof( filename ), i, 1, 0, bike );
 
 				if ( File_Exists ( filename ) )
 				{
@@ -1437,9 +1433,9 @@ void GetBikeVariants( void )
 				{
 
 					if ( BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ] < 2 )
-						GetFullBikeSfxPath( filename, i, j++, 2, bike );
+						GetFullBikeSfxPath( filename, sizeof( filename ), i, j++, 2, bike );
 					else
-						GetFullBikeSfxPath( filename, i, j++, BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ], bike );
+						GetFullBikeSfxPath( filename, sizeof( filename ), i, j++, BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ], bike );
 
 					if ( File_Exists( filename ) )
 						BikeSpeechVariants[ i - SFX_BIKER_START ][ bike ]++;
@@ -1470,7 +1466,7 @@ void GetBikeCompVariants( void )
 				BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ] = 0;
 
 				// try filename with no num extension
-				GetFullBikeCompSfxPath( filename, i, 1, 0, bikecomp );
+				GetFullBikeCompSfxPath( filename, sizeof( filename ), i, 1, 0, bikecomp );
 
 				if ( File_Exists ( filename ) )
 				{
@@ -1485,9 +1481,9 @@ void GetBikeCompVariants( void )
 
 					if ( BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ] &&
 						 BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ] < 2 )
-						GetFullBikeCompSfxPath( filename, i, j++, 2, bikecomp );
+						GetFullBikeCompSfxPath( filename, sizeof( filename ), i, j++, 2, bikecomp );
 					else
-						GetFullBikeCompSfxPath( filename, i, j++, BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ], bikecomp );
+						GetFullBikeCompSfxPath( filename, sizeof( filename ), i, j++, BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ], bikecomp );
 
 					if ( File_Exists( filename ) )
 						BikeCompVariants[ i - SFX_BIKECOMP_START ][ bikecomp ]++;
@@ -1520,20 +1516,19 @@ void PreProcessSfx( void )
 
 		SndLookup[ i ].Num_Variants = 0;
 
-		GetSfxFileNamePrefix( i, filename );
+		GetSfxFileNamePrefix( i, filename, sizeof( filename ) );
 
 		// if no filename given, sound is left marked with zero variants
 		if ( !filename[0] )
 			continue;
 
 		// try filename with no num extension
-		GetFullSfxPath( fullpath, i, 1, 0 );
+		GetFullSfxPath( fullpath, sizeof( fullpath ), i, 1, 0 );
 
 		if ( File_Exists ( fullpath ) )
 		{
 			SndLookup[ i ].Num_Variants++;
-			SfxFullPath[ i ][ 0 ] = (char *)malloc( strlen( fullpath ) + 1 );
-			strcpy( SfxFullPath[ i ][ 0 ], fullpath );
+			SfxFullPath[ i ][ 0 ] = strdup( fullpath );
 			continue;
 		}
 
@@ -1542,16 +1537,15 @@ void PreProcessSfx( void )
 		while( 1 )
 		{
 			if ( SndLookup[ i ].Num_Variants < 2 )
-				GetFullSfxPath( fullpath, i, j, 2 );
+				GetFullSfxPath( fullpath, sizeof( fullpath ), i, j, 2 );
 			else
-				GetFullSfxPath( fullpath, i, j, SndLookup[ i ].Num_Variants );
+				GetFullSfxPath( fullpath, sizeof( fullpath ), i, j, SndLookup[ i ].Num_Variants );
 
 			if ( File_Exists( fullpath ) )
 			{
 				SndLookup[ i ].Num_Variants++;
 
-				SfxFullPath[ i ][ j ] = (char *)malloc( strlen( fullpath ) + 1 );
-				strcpy( SfxFullPath[ i ][ j ], fullpath );
+				SfxFullPath[ i ][ j ] = strdup( fullpath );
 				j++;
 			}
 			else
@@ -2534,6 +2528,7 @@ FILE *LoadAllSfx( FILE *fp )
 void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, float Freq, int biker, char variant, bool update )
 {
 	char *last_slash;
+	size_t rest;
 	char numstr[ 12 ];
 
 	if ( !( Sfx_Filenames[ sfx ].Flags & SFX_Biker ) )
@@ -2546,7 +2541,7 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 	if ( !SfxFullPath[ sfx ][ 0 ] )
 		return;
 
-	strcpy( TauntPath, SfxFullPath[ sfx ][ 0 ] );
+	copy_string( TauntPath, sizeof( TauntPath ), SfxFullPath[ sfx ][ 0 ] );
 
 	last_slash = strrchr( TauntPath, 92 );	// look for last slash
 	if( !last_slash )
@@ -2556,26 +2551,27 @@ void PlaySpecificBikerSpeech( int16_t sfx, u_int16_t Group, VECTOR *SfxPos, floa
 	}
 
 	last_slash++;
-	strcpy( last_slash, BikerSpeechNames[ biker ] );
-	strcat( last_slash, "_" );
-	strcat( last_slash, BikerSpeechEffects[ Sfx_Filenames[ sfx ].SfxLookup ] );
+	rest = sizeof( TauntPath ) - (size_t)( last_slash - TauntPath );	// room after the slash
+	copy_string( last_slash, rest, BikerSpeechNames[ biker ] );
+	append_string( last_slash, rest, "_" );
+	append_string( last_slash, rest, BikerSpeechEffects[ Sfx_Filenames[ sfx ].SfxLookup ] );
 
 	if ( variant != -1 )
 	{
 		snprintf( numstr, sizeof( numstr ), "%02d", variant + 1 );	// file convention states that variant sounds start at 01.
-		strcat( last_slash, numstr );
+		append_string( last_slash, rest, numstr );
 	}else
 	{
 		if( BikeSpeechVariants[ sfx - SFX_BIKER_START ][ biker ] > 1 )
 		{
 			CurrentTauntVariant = (char)Random_Range( BikeSpeechVariants[ sfx - SFX_BIKER_START ][ biker ] );
 
-			sprintf( numstr, "%02d", CurrentTauntVariant + 1 );	// file convention states that variant sounds start at 01.
-			strcat( TauntPath, numstr );
+			snprintf( numstr, sizeof( numstr ), "%02d", CurrentTauntVariant + 1 );	// file convention states that variant sounds start at 01.
+			append_string( TauntPath, sizeof( TauntPath ), numstr );
 		}
 	}
 
-	strcat( TauntPath, ".wav" );
+	append_string( TauntPath, sizeof( TauntPath ), ".wav" );
 
 	TauntID =  PlayGeneralPannedSfx( sfx, Group, SfxPos, Freq, false, SPOT_SFX_TYPE_Taunt, 1.0F );
 	TauntUpdatable = update;

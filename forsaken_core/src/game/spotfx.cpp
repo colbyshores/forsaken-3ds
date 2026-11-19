@@ -81,7 +81,7 @@ bool LoadSpotFX( void )
 	int16_t		SFXType;
 	char		SFXFilename[ 128 ];
 
-	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], (char*)NewExt );
+	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], sizeof( Filename ), (char*)NewExt );
 
 
 	fp = file_open( (char*)&Filename[ 0 ], "rb" );

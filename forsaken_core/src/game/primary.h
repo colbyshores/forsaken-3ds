@@ -279,7 +279,7 @@ void	CheckCharging( u_int16_t Ship, u_int32_t OldFlags, u_int32_t NewFlags );
 void	GivemeAllWeapons( void );
 void	LoseAllWeapons( void );
 void	DropPrimary( void );
-void	GetDeathString( BYTE WeaponType, BYTE Weapon, char * DstString );
+void	GetDeathString( BYTE WeaponType, BYTE Weapon, char * DstString, size_t size );
 void	DropShield( void );
 void	DropAmmo( void );
 bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR * Dir );

@@ -4505,7 +4505,7 @@ bool PreLoadEnemies( void )
 
 	for( Count = 0; Count < MAX_ENEMY_TYPES; Count++ ) EnemyTypes[ Count ].ModelNumber = -1;
 
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], sizeof( NewFilename ), NewExt );
 
 	fp = file_open( &NewFilename[ 0 ], "rb" );
 
@@ -4586,7 +4586,7 @@ bool PreLoadEnemies( void )
 						}
 						else
 						{
-							strcpy( &ModelNames[ NextEnemyModel ].Name[ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
+							copy_string( &ModelNames[ NextEnemyModel ].Name[ 0 ], sizeof( ModelNames[ NextEnemyModel ].Name ), EnemyTypes[ ModelNum ].ModelFilename );
 
 							ModelNames[ NextEnemyModel ].LOD = 0;
 							ModelNames[ NextEnemyModel ].Panel = false;
@@ -4630,7 +4630,7 @@ bool PreLoadEnemies( void )
 							}
 							else
 							{
-								strcpy( &ModelNames[ NextEnemyModel ].Name[ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
+								copy_string( &ModelNames[ NextEnemyModel ].Name[ 0 ], sizeof( ModelNames[ NextEnemyModel ].Name ), EnemyTypes[ ModelNum ].ModelFilename );
 
 								ModelNames[ NextEnemyModel ].LOD = 0;
 								ModelNames[ NextEnemyModel ].Panel = false;
@@ -4670,11 +4670,11 @@ bool PreLoadEnemies( void )
 
 								if( EnemyTypes[ ModelNum ].LevelSpecific )
 								{
-									sprintf( &TempFilename[ 0 ], "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
+									snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
 								}
 								else
 								{
-									sprintf( &TempFilename[ 0 ], "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
+									snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
 								}
 
 								if( !PreLoadCompObj( (int8_t*)&TempFilename[ 0 ], (u_int16_t*)&NextEnemyModel, EnemyTypes[ ModelNum ].LevelSpecific ) )
@@ -4755,7 +4755,7 @@ bool LoadEnemies( void )
 		return true;
 	}
 
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], sizeof( NewFilename ), NewExt );
 
 	fp = file_open( &NewFilename[ 0 ], "rb" );
 
@@ -4852,11 +4852,11 @@ bool LoadEnemies( void )
 
 									if( EnemyTypes[ ModelNum ].LevelSpecific )
 									{
-										sprintf( &TempFilename[ 0 ], "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
+										snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], EnemyTypes[ ModelNum ].ModelFilename );
 									}
 									else
 									{
-										sprintf( &TempFilename[ 0 ], "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
+										snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", EnemyTypes[ ModelNum ].ModelFilename );
 									}
 
 									Comp = LoadCompObj( (int8_t*)&TempFilename[ 0 ], &Pos, &DirVector, Group,

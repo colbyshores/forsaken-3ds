@@ -120,8 +120,8 @@ static void hd_texture_path(char *hd_path, size_t size, const char *dir,
 		if (*p >= 'A' && *p <= 'Z') *p += 32;
 	}
 	p = strrchr(hd_path, '.');
-	if (p) strcpy(p, ".t3x");
-	else strcat(hd_path, ".t3x");
+	if (p) copy_string(p, size - (size_t)(p - hd_path), ".t3x");
+	else append_string(hd_path, size, ".t3x");
 }
 
 /* Open the HD .t3x for a texture path: the preferred pack first, then the
@@ -233,7 +233,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path,
 	if (try_load_hd_texture(t, path, width, height, colorkey))
 		return true;
 
-	Change_Ext(path, image.path, ".PNG");
+	Change_Ext(path, image.path, sizeof( image.path ), ".PNG");
 	if (!File_Exists((char*)image.path))
 	{
 		DebugPrintf("Could not find texture file: %s\n", path);
@@ -363,7 +363,7 @@ bool FSTextureExists(const char *fileName)
 	char hd_path[512];
 	FILE *f;
 
-	Change_Ext(fileName, path, ".PNG");
+	Change_Ext(fileName, path, sizeof( path ), ".PNG");
 	if (File_Exists(path))
 		return true;
 	f = open_hd_texture(fileName, hd_path, sizeof(hd_path));

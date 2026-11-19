@@ -494,7 +494,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 				SpotFXPtr->Secondary = (int8_t) in.i16();	// Secondary ( int16_t )
 				Colour = in.u32();
 
-				strcpy( (char*)&SFXFilename[ 0 ], in.cstring() );
+				copy_string( (char*)&SFXFilename[ 0 ], sizeof( SFXFilename ), in.cstring() );
 
 				if( SpotFXPtr->Type == SPOTFX_SoundFX )
 				{
@@ -734,12 +734,12 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 		/*	put the filenames in the tex struct	*/
 		for( i = 0;	 i < Mxaloadheader->num_texture_files; i++)
 		{
-			strcpy( Mxaloadheader->ImageFile[i], in.cstring() );
+			copy_string( Mxaloadheader->ImageFile[i], sizeof( Mxaloadheader->ImageFile[i] ), in.cstring() );
 
 			if( LevelSpecific )
 				GetLevelTexturePath( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), &Mxaloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 			else
-				sprintf( (char*)&TempFilename[ 0 ], "data\\textures\\%s", &Mxaloadheader->ImageFile[i][0] );
+				snprintf( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), "data\\textures\\%s", &Mxaloadheader->ImageFile[i][0] );
 
 			if (Mxaloadheader->AllocateTPage & LOAD_TPAGES)
 				Mxaloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[0] , true ,false, 0, 0 );

@@ -294,7 +294,7 @@ FILE *SaveAllSfx( FILE *fp );
 FILE *LoadAllSfx( FILE *fp );
 void PauseAllSfx( void );
 void ReTriggerSfx( void );
-void GetFullSfxPath( char *fullpath, int sfxnum, int variant, int total_variants );
+void GetFullSfxPath( char *fullpath, size_t size, int sfxnum, int variant, int total_variants );
 bool RestoreSfxData( u_int32_t id, VECTOR *pos, u_int16_t *group );
 void RequestSfx( int16_t sfxnum );
 void RequestMainSfx( void );

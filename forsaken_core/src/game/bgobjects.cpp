@@ -1096,7 +1096,7 @@ bool PreLoadBGOFiles( void )
 	ModNames = &ModelNames[ 0 ];
 	BaseModel = NextNewModel;
 
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &TempFilename[ 0 ], NewExt );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &TempFilename[ 0 ], sizeof( TempFilename ), NewExt );
 
 	fp = file_open( &TempFilename[ 0 ], "rb" );
 
@@ -2672,7 +2672,7 @@ bool PreLoadShips( void )
 	{
 		if( BikeCompFiles[ Count ].Filename[ 0 ] )
 		{
-			sprintf( &TempFilename[ 0 ], "data\\bgobjects\\%s", BikeCompFiles[ Count ].Filename );
+			snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", BikeCompFiles[ Count ].Filename );
 
 			BikeCompFiles[ Count ].BaseModel = BaseModel;
 			BikeModels[ Count ] = BaseModel;
@@ -2683,7 +2683,7 @@ bool PreLoadShips( void )
 				return( false );
 			}
 
-			sprintf( &TempFilename[ 0 ], "data\\bgobjects\\s%s", BikeCompFiles[ Count ].Filename );
+			snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\s%s", BikeCompFiles[ Count ].Filename );
 
 			BikeCompFiles[ Count ].StealthBaseModel = BaseModel;
 
@@ -2718,7 +2718,7 @@ bool AllocateCompShip( u_int16_t Ship )
 
 	if( BikeCompFiles[ Type ].Filename[ 0 ] )
 	{
-		sprintf( &TempFilename[ 0 ], "data\\bgobjects\\%s", BikeCompFiles[ Type ].Filename );
+		snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", BikeCompFiles[ Type ].Filename );
 
 		BaseModel = BikeCompFiles[ Type ].BaseModel;
 		StartModel = BaseModel;
@@ -2853,7 +2853,7 @@ bool PreLoadFlyGirl( void )
 
 	if( FlyGirlCompFile.Filename[ 0 ] )
 	{
-		sprintf( &TempFilename[ 0 ], "data\\bgobjects\\%s", FlyGirlCompFile.Filename );
+		snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", FlyGirlCompFile.Filename );
 
 		FlyGirlCompFile.BaseModel = BaseModel;
 
@@ -2884,7 +2884,7 @@ bool AllocateCompFlyGirl( void )
 
 	if( FlyGirlCompFile.Filename[ 0 ] )
 	{
-		sprintf( &TempFilename[ 0 ], "data\\bgobjects\\%s", FlyGirlCompFile.Filename );
+		snprintf( &TempFilename[ 0 ], sizeof( TempFilename ), "data\\bgobjects\\%s", FlyGirlCompFile.Filename );
 
 		BaseModel = FlyGirlCompFile.BaseModel;
 

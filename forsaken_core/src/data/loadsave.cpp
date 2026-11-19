@@ -87,7 +87,7 @@ char *SaveGameFileName( int slot )
 {
 	static char name[ MAX_SAVEGAME_FILENAME ];
 
-	sprintf( name, SAVEGAME_FOLDER "\\save%02d" SAVEGAME_EXTENSION, slot + 1 );
+	snprintf( name, sizeof( name ), SAVEGAME_FOLDER "\\save%02d" SAVEGAME_EXTENSION, slot + 1 );
 	strtoupper( name );
 	return name;
 }
@@ -97,7 +97,7 @@ char *SaveGamePicFileName( int slot )
 {
 	static char name[ MAX_SAVEGAME_FILENAME ];
 
-	sprintf( name, SAVEGAME_FOLDER "\\save%02d" SAVEGAMEPIC_EXTENSION, slot + 1 );
+	snprintf( name, sizeof( name ), SAVEGAME_FOLDER "\\save%02d" SAVEGAMEPIC_EXTENSION, slot + 1 );
 	strtoupper( name );
 	return name;
 }
@@ -412,8 +412,8 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 		Hours = ( u_int16_t ) ( Minutes / 60 );
 		Minutes = ( u_int16_t ) ( Minutes % 60 );
 
-		strcpy( (char*)Filename, SaveGameFileName( LoadSavedGameList.selected_item ) );
-		strcpy( (char*)SFilename, SaveGamePicFileName( LoadSavedGameList.selected_item ) );
+		copy_string( (char*)Filename, sizeof( Filename ), SaveGameFileName( LoadSavedGameList.selected_item ) );
+		copy_string( (char*)SFilename, sizeof( SFilename ), SaveGamePicFileName( LoadSavedGameList.selected_item ) );
 
 		DebugPrintf( "%s\n", &Filename[ 0 ] );
 	}
@@ -437,7 +437,7 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 	 * switched off) leaves the previous save intact instead of a truncated
 	 * one. The Save* calls hand fp back, or NULL on failure; out is kept to
 	 * close the file either way. */
-	strcpy( (char*)TmpFilename, (char*)Filename );	// saveNN.SAV -> saveNN.TMP
+	copy_string( (char*)TmpFilename, sizeof( TmpFilename ), (char*)Filename );	// saveNN.SAV -> saveNN.TMP
 	strcpy( strrchr( (char*)TmpFilename, '.' ), ".TMP" );
 	out = fp = file_open( (char*)&TmpFilename[ 0 ], "wb" );
 
@@ -575,7 +575,7 @@ char *SavedGameInfo( int slot )
 				Hours * 60 + Minutes, Seconds,
 				KilledEnemiesNum, InitEnemiesNum );
 		else
-			sprintf( info, "%s %hd'%02hd %hd/%hd",
+			snprintf( info, sizeof( info ), "%s %hd'%02hd %hd/%hd",
 				LevelName,
 				Hours * 60 + Minutes, Seconds,
 				KilledEnemiesNum, InitEnemiesNum );
@@ -583,7 +583,7 @@ char *SavedGameInfo( int slot )
 	}
 	else
 	{
-		sprintf( info, "unused slot %d", slot + 1 );
+		snprintf( info, sizeof( info ), "unused slot %d", slot + 1 );
 	}
 
 	return info;

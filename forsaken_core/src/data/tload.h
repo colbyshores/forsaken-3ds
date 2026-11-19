@@ -34,6 +34,8 @@ constexpr int LOAD_TPAGES = 1;
 constexpr int LOAD_TPAGES_PLACEHOLDER = 4;
 constexpr int LOAD_TPAGES_FINISH = 8;
 
+constexpr size_t PLACEHOLDER_FILE_SIZE = 256;	// each PlaceHolderFile buffer
+
 /*
  * structures
  */
@@ -48,7 +50,7 @@ struct TLOADHEADER{
 	TEXTURE_HANDLE			TexHandle[MAXTPAGESPERTLOAD];	// the backend texture
 	bool				MipMap[MAXTPAGESPERTLOAD];		// create a mip chain
 	bool				PlaceHolder[MAXTPAGESPERTLOAD];	// image chosen at run time (see above)
-	char				*PlaceHolderFile[MAXTPAGESPERTLOAD];	// 256-byte buffer: the file now in the placeholder
+	char				*PlaceHolderFile[MAXTPAGESPERTLOAD];	// PLACEHOLDER_FILE_SIZE bytes: the file now in the placeholder
 };
 
 /*

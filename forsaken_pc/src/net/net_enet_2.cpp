@@ -75,7 +75,7 @@ static char* address_to_str( ENetAddress * address )
 	char temp[INET_ADDRSTRLEN+10] = "";
 	static char ip[INET_ADDRSTRLEN+10] = "";
 	enet_address_get_host_ip( address, temp, INET_ADDRSTRLEN );
-	sprintf( ip, "%s:%d", temp, address->port );
+	snprintf( ip, sizeof( ip ), "%s:%d", temp, address->port );
 	return ip;
 }
 

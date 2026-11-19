@@ -289,11 +289,11 @@ void UpdateKillCount(int Killer)
 
 	// name of killer
 	if(Killer == WhoIAm)
-		strcpy(prefix, "YOU ARE");
+		copy_string(prefix, sizeof( prefix ), "YOU ARE");
 	else
 	{
-		strcpy(prefix, (const char *)GetName(Killer));
-		strcat(prefix, " IS");
+		copy_string(prefix, sizeof( prefix ), (const char *)GetName(Killer));
+		append_string(prefix, sizeof( prefix ), " IS");
 	}
 
 	if(Killer == WatchPlayerSelect.value)

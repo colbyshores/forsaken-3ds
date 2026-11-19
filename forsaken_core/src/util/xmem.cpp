@@ -72,9 +72,9 @@ int XMem_FindSame( void * Pnt )
 	return g_mem.find_same(Pnt);
 }
 
-void * X_strdup( const char *str, const char *in_file, int in_line )
+char * X_strdup( const char *str, const char *in_file, int in_line )
 {
-	void * Pnt;
+	char * Pnt;
 	int i;
 
 	i = XMem_FindFree();

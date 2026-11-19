@@ -63,7 +63,7 @@ bool LoadRTLights( void )
 	RT_FLICKERING_LIGHT	*flicker;
 	RT_SPOT_LIGHT		*spot;
 
-	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], (char*)NewExt );
+	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], sizeof( Filename ), (char*)NewExt );
 
 
 	fp = file_open( (char*)&Filename[ 0 ], "rb" );

@@ -24,7 +24,8 @@ void DebugPrintf( const char * format, ... );  // prefix timestamp
 void DebugState( const char * str );           // only prints if str changed
 void DebugPuts( char * str );                  //
 
-void Change_Ext( const char * Src, char * Dest, const char * Ext );
+/* Dest (size bytes) = Src with its extension replaced by Ext (or Ext added). */
+void Change_Ext( const char * Src, char * Dest, size_t size, const char * Ext );
 void Get_Ext( u_int8_t * Src, u_int8_t * Dest );
 
 char* convert_path( const char* _str );

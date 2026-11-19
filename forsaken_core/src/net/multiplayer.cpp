@@ -199,7 +199,7 @@ void StartAHostSession ( MENUITEM * Item )
 				const char * str = "";
 				if( local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
-				sprintf(error_str, "%s %s %s %s",
+				snprintf(error_str, sizeof( error_str ), "%s %s %s %s",
 						"The selected port is in use or invalid.",
 						str,
 						"Disable the program using the port or",
@@ -285,7 +285,7 @@ void GetPlayersInCurrentSession( MENUITEM * /*Item*/ )
 		if( ( GameStatus[ i ] == MyGameStatus ) || ( i == WhoIAm ) )
 		{
 			NumOfPlayersSlider.value++;
-		strcpy( (char*)PlayersList.item[ PlayersList.items++ ], (char*)Names[ i ] );
+		copy_string( (char*)PlayersList.item[ PlayersList.items++ ], sizeof( PlayersList.item[ 0 ] ), (char*)Names[ i ] );
 	}
 
 	if (NumOfPlayersSlider.value != NumOfPlayersSlider.oldvalue)

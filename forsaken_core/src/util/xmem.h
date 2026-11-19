@@ -43,7 +43,7 @@ void XMem_Init( void );
 void * X_calloc( size_t num,size_t size, const char *in_file, int in_line );
 void * X_malloc( size_t size, const char *in_file, int in_line );
 void X_free( void * Pnt, const char *in_file, int in_line );
-void * X_strdup( const char * str , const char *in_file, int in_line );
+char * X_strdup( const char * str , const char *in_file, int in_line );
 int UnMallocedBlocks( void );
 
 

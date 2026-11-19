@@ -567,7 +567,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
 			/*	copy over the groups Name	*/
-			strcpy( Mloadheader->Group[group].name, in.cstring() );
+			copy_string( Mloadheader->Group[group].name, sizeof( Mloadheader->Group[group].name ), in.cstring() );
 
 			// Make sure there are no start points initially in this group..
 			Mloadheader->Group[group].StartPosInThisGroup = INDEX_NONE;
@@ -1215,7 +1215,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 		/*	put the filenames in the tex struct	*/
 		for( i = 0;	 i < Mloadheader->num_texture_files; i++)
 		{
-			strcpy( Mloadheader->ImageFile[i], in.cstring() );
+			copy_string( Mloadheader->ImageFile[i], sizeof( Mloadheader->ImageFile[i] ), in.cstring() );
 
 			GetLevelTexturePath( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), &Mloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 

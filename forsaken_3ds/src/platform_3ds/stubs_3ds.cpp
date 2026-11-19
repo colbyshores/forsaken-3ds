@@ -14,6 +14,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include "game/main.h"
+#include "util/util.h"
 #include "net/net_tracker.h"
 #include "util/platform.h"
 
@@ -70,7 +71,7 @@ int glob(const char *pattern, int flags,
 	} else {
 		strncpy(match, dirpath, sizeof(match) - 1);
 		match[sizeof(match) - 1] = 0;
-		strcpy(dirpath, "./");
+		copy_string(dirpath, sizeof( dirpath ), "./");
 	}
 
 	/* Remove wildcard for simple matching */

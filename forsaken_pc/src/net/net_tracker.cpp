@@ -44,25 +44,25 @@ void send_tracker_update( char* host, int port )
 {
 	int i;
 	char message[ MAX_HOSTING_MSG ];
-	sprintf(message,"hosting %d %s %s",my_local_port,PXVersion,my_player_name);
+	snprintf(message, sizeof( message ),"hosting %d %s %s",my_local_port,PXVersion,my_player_name);
 	for(i=0; i<MAX_PLAYERS; i++)
 	{
 		if ( i != WhoIAm && STATUS_VALID_PLAYER(GameStatus[i]) )
 		{
-			strcat(message,",");
+			append_string(message, sizeof( message ),",");
 			strncat(message,Names[i],MAXSHORTNAME);
 		}
 	}
-	strcat(message," ");
+	append_string(message, sizeof( message )," ");
 	strncat(message,ShortLevelNames[NewLevelNum],MAX_SHORT_LEVEL_NAME);
-	strcat(message,"\n");
+	append_string(message, sizeof( message ),"\n");
 	send_tracker_message( host, port, message );
 }
 
 void send_tracker_finished( char* host, int port )
 {
 	char message[256] = "";
-	sprintf(message,"finished %d\n",my_local_port);
+	snprintf(message, sizeof( message ),"finished %d\n",my_local_port);
 	send_tracker_message( host, port, message );
 }
 

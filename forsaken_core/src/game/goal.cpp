@@ -62,7 +62,7 @@ bool GoalLoad( void )
 	if ( !CaptureTheFlag && !CTF )
 		return true;
 
-	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], (char*)NewExt );
+	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], sizeof( Filename ), (char*)NewExt );
 
 	File_Size = Get_File_Size( (char*)Filename );
 

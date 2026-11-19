@@ -97,7 +97,7 @@ static void InitDebugRays( void )
 	DebugRay ray;
 	u_int16_t line;
 
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], fname, ".ray" );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], fname, sizeof( fname ), ".ray" );
 	rf = file_open( fname, "rb" );
 	if ( !rf )
 		return;
@@ -158,7 +158,7 @@ bool OutputVisiStats( MLOADHEADER *m, char *lname )
 		return false;
 	}
 
-	Change_Ext( lname, fname, ".vis" );
+	Change_Ext( lname, fname, sizeof( fname ), ".vis" );
 
 	f = file_open( fname, "w" );
 	if ( !f )

@@ -1560,14 +1560,14 @@ int16_t DoDamage( bool OverrideInvul )
 					{
 						MessageSFX = SFX_BIKECOMP_SC;
 						TriggerSFX = SFX_BIKER_LE;
-						sprintf( (char*)&Message[0], SHIELD_CRITICAL );
+						snprintf( (char*)&Message[0], sizeof( Message ), SHIELD_CRITICAL );
 						ShieldCritical = true;
 					}
 
 					if ( ( Ships[ WhoIAm].Object.Hull < HULL_CRITICAL_LEVEL ) && !HullCritical )
 					{
 						MessageSFX = SFX_BIKECOMP_HC;
-						sprintf( (char*)&Message[0], HULL_CRITICAL );
+						snprintf( (char*)&Message[0], sizeof( Message ), HULL_CRITICAL );
 						HullCritical = true;
 					}
 				}

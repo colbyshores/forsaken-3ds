@@ -768,7 +768,7 @@ bool CollectPickup( u_int16_t i )
 	bool	ShowTextAnyway = false;
 	bool	Speech = true;
 
-	sprintf( (char*)&Message[0], "%s", PickupMessage( Pickups[i].Type ) );
+	snprintf( (char*)&Message[0], sizeof( Message ), "%s", PickupMessage( Pickups[i].Type ) );
 
 	if( i != INDEX_NONE )
 	{
@@ -786,7 +786,7 @@ bool CollectPickup( u_int16_t i )
 			{
 				PickupEnable = false;
 				MessageSFX = SFX_BIKECOMP_AP;
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
 			}
 			break;
 
@@ -811,7 +811,7 @@ bool CollectPickup( u_int16_t i )
 			{
 				PickupEnable = false;
 				MessageSFX = SFX_BIKECOMP_AP;
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
 			}
 
 			break;
@@ -829,7 +829,7 @@ bool CollectPickup( u_int16_t i )
 			{
 				PickupEnable = false;
 				MessageSFX = SFX_BIKECOMP_AP;
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
 			}
 
 			break;
@@ -852,7 +852,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -868,7 +868,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -893,7 +893,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -917,7 +917,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -932,7 +932,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -949,7 +949,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -965,7 +965,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -986,7 +986,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1002,7 +1002,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1023,7 +1023,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1045,7 +1045,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1062,7 +1062,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1084,7 +1084,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1111,7 +1111,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					PickupEnable = false;
 					MessageSFX = SFX_BIKECOMP_MA;
 				}
@@ -1125,7 +1125,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					PickupEnable = false;
 					MessageSFX = SFX_BIKECOMP_MA;
 				}
@@ -1143,7 +1143,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					PickupEnable = false;
 					MessageSFX = SFX_BIKECOMP_MA;
 				}
@@ -1157,7 +1157,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					PickupEnable = false;
 					MessageSFX = SFX_BIKECOMP_MA;
 				}
@@ -1175,7 +1175,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					PickupEnable = false;
 					MessageSFX = SFX_BIKECOMP_MA;
 				}
@@ -1189,7 +1189,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					PickupEnable = false;
 					MessageSFX = SFX_BIKECOMP_MA;
 				}
@@ -1204,18 +1204,18 @@ bool CollectPickup( u_int16_t i )
 					CopyOfPowerLevel++;
 					if( CopyOfPowerLevel == ( MAXPOWERLEVELS - 1 ) )
 					{
-						sprintf( (char*)&Message[ 0 ], FULL_POWER_LEVEL );
+						snprintf( (char*)&Message[ 0 ], sizeof( Message ), FULL_POWER_LEVEL );
 					}
 					else
 					{
-						sprintf( (char*)&Message[ 0 ], POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
+						snprintf( (char*)&Message[ 0 ], sizeof( Message ), POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
 					}
 					ShowTextAnyway = true;
 					MessageSFX = SFX_Select_PowerPod;
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX_POWER );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX_POWER );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
@@ -1227,18 +1227,18 @@ bool CollectPickup( u_int16_t i )
 					Ships[ WhoIAm ].Object.PowerLevel++;
 					if( Ships[ WhoIAm ].Object.PowerLevel == ( MAXPOWERLEVELS - 1 ) )
 					{
-						sprintf( (char*)&Message[ 0 ], FULL_POWER_LEVEL );
+						snprintf( (char*)&Message[ 0 ], sizeof( Message ), FULL_POWER_LEVEL );
 					}
 					else
 					{
-						sprintf( (char*)&Message[ 0 ], POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
+						snprintf( (char*)&Message[ 0 ], sizeof( Message ), POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
 					}
 					ShowTextAnyway = true;
 					MessageSFX = SFX_Select_PowerPod;
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX_POWER );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX_POWER );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
@@ -1254,7 +1254,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_CANT_HANDLE_ANY_MORE );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_CANT_HANDLE_ANY_MORE );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1272,7 +1272,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1289,7 +1289,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1328,7 +1328,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
@@ -1348,7 +1348,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
@@ -1364,13 +1364,13 @@ bool CollectPickup( u_int16_t i )
 			if( !( NumGoldBars % 10 ) )
 			{
 				Lives += 1;
-				sprintf( (char*)&Message[0], YOUVE_EARNED_EXTRA_LIFE );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOUVE_EARNED_EXTRA_LIFE );
 				PlaySfx( SFX_ExtraLife, 1.0F );
 			}
 			else
 			{
-				if( NumGoldBars == 1 ) sprintf( (char*)&Message[0], YOU_HAVE_ONE_GOLD_BAR, NumGoldBars );
-				else sprintf( (char*)&Message[0], YOU_HAVE_GOLD_BARS, NumGoldBars );
+				if( NumGoldBars == 1 ) snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_GOLD_BAR, NumGoldBars );
+				else snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_GOLD_BARS, NumGoldBars );
 			}
 			MessageSFX = SFX_GoldBarPickup;
 			Speech = false;
@@ -1388,7 +1388,7 @@ bool CollectPickup( u_int16_t i )
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
 				MessageSFX = SFX_BIKECOMP_AP;
 				PickupEnable = false;
 			}
@@ -1399,11 +1399,11 @@ bool CollectPickup( u_int16_t i )
 			CrystalsFound += 1;
 			if( CrystalsFound == 1 )
 			{
-				sprintf( (char*)&Message[0], YOU_HAVE_ONE_CRYSTAL, CrystalsFound );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_CRYSTAL, CrystalsFound );
 			}
 			else
 			{
-				sprintf( (char*)&Message[0], YOU_HAVE_CRYSTALS, CrystalsFound );
+				snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_CRYSTALS, CrystalsFound );
 			}
 			MessageSFX = SFX_PickupCrystal;
 			Speech = false;
@@ -1446,7 +1446,7 @@ bool CollectPickup( u_int16_t i )
 				AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
 					TeamName[ TeamNumber[ WhoIAm ] ] );
 
-				sprintf( CTFMessage, SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
+				snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
 				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
 
 			}
@@ -1520,7 +1520,7 @@ bool CollectPickup( u_int16_t i )
 							AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
 								TeamName[ TeamNumber[ WhoIAm ] ] );
 
-							sprintf( CTFMessage, SOMEONE_HAS_OTHER_TEAM_FLAG,
+							snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_OTHER_TEAM_FLAG,
 								Names[ WhoIAm ],
 								TeamName[ TeamNumber[ WhoIAm ] ],
 								TeamName[ team ] );
@@ -1544,7 +1544,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
@@ -1560,7 +1560,7 @@ bool CollectPickup( u_int16_t i )
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
@@ -2698,7 +2698,7 @@ void SavePickupsPositions( void )
 	float		LifeSpan = -1.0F;
 	u_int16_t		TriggerMod = INDEX_NONE;
 
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], sizeof( NewFilename ), NewExt );
 
 	fp = file_open( &NewFilename[ 0 ], "wb" );
 
@@ -2866,7 +2866,7 @@ bool PreLoadPickups( void )
 			continue;
 		if (NextNewModel >= MAXMODELHEADERS)
 			return false;
-		strcpy( &ModelNames[ NextNewModel ].Name[0], n64_pickup_files[i] );
+		copy_string( &ModelNames[ NextNewModel ].Name[0], sizeof( ModelNames[ NextNewModel ].Name ), n64_pickup_files[i] );
 		ModelNames[ NextNewModel ].LOD             = 0;
 		ModelNames[ NextNewModel ].Panel           = false;
 		ModelNames[ NextNewModel ].DoIMorph        = false;
@@ -2948,7 +2948,7 @@ bool LoadPickupsPositions( void )
 #endif /* EDITION_REMASTER — N64 pickup template block */
 
 	/* convert the level_name into level_name.pic */
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], sizeof( NewFilename ), NewExt );
 
 	/* reset number of pickups in groups to 0 */
 	for( Count = 0; Count < MAXGROUPS; Count++ )

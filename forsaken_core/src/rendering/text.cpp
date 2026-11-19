@@ -106,9 +106,9 @@ int Printint16_t( int16_t num , int x , int y , int color )
 
 	if( num != -32767 )
 	{
-		sprintf( buf, "%hd", num );
+		snprintf( buf, sizeof( buf ), "%hd", num );
 	}else{
-		sprintf( buf, "%hd", 0 );
+		snprintf( buf, sizeof( buf ), "%hd", 0 );
 	}
 	Print4x5Text( buf, x, y, color );
 	return strlen(buf);
@@ -389,7 +389,7 @@ void AddPlayerMessageToQueShort( char ** Text, int Colour )
 	{
 		for(j = 0; j < MAXPERLINE; j++)
 			PlayerMessageBank[x][j] = 0;
-		strcpy((char *)PlayerMessageBank[x], (char *)PlayerMessageBank[x-1]);
+		copy_string((char *)PlayerMessageBank[x], sizeof( PlayerMessageBank[x] ), (char *)PlayerMessageBank[x-1]);
 		PlayerMessageColours[x] = PlayerMessageColours[x-1];
 		PlayerMessageTime[x] = PlayerMessageTime[x-1];
 		PlayerMessageColours[x] = PlayerMessageColours[x-1];
@@ -430,7 +430,7 @@ void AddColourMessageToQueShort( char ** Text, int Colour )
 	{
 		for(j = 0; j < MAXPERLINE; j++)
 			MessageBank[x][j] = 0;
-		strcpy((char *)MessageBank[x], (char *)MessageBank[x-1]);
+		copy_string((char *)MessageBank[x], sizeof( MessageBank[x] ), (char *)MessageBank[x-1]);
 		MessageColour[x] = MessageColour[x-1];
 		MessageTime[x] = MessageTime[x-1];
 	}
@@ -471,7 +471,7 @@ void AddPlayerMessageToQue( int Colour, const char * Text, ... )
 			for(j = 0; j < MAXPERLINE; j++)
 				MessageBankLong[x][j] = 0;
 
-			strcpy((char *)MessageBankLong[x], (char *)MessageBankLong[x-1]);
+			copy_string((char *)MessageBankLong[x], sizeof( MessageBankLong[x] ), (char *)MessageBankLong[x-1]);
 			MessageColourLong[x] = MessageColourLong[x-1];
 		}
 
@@ -511,7 +511,7 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 			for(j = 0; j < MAXPERLINE; j++)
 				MessageBankLong[x][j] = 0;
 
-			strcpy((char *)MessageBankLong[x], (char *)MessageBankLong[x-1]);
+			copy_string((char *)MessageBankLong[x], sizeof( MessageBankLong[x] ), (char *)MessageBankLong[x-1]);
 			MessageColourLong[x] = MessageColourLong[x-1];
 		}
 
@@ -643,13 +643,13 @@ void PrintScoreSort( void )
 					if( Ships[ShipID].network_player != nullptr )
 					{
 						// Show ping
-						sprintf( (char*) &buf[0] ,"%*dms", 4, (u_int16_t) Ships[ShipID].network_player->ping);
+						snprintf( (char*) &buf[0] , sizeof( buf ),"%*dms", 4, (u_int16_t) Ships[ShipID].network_player->ping);
 						Print4x5TextSmall( &buf[0], left_offset, top_offset+((FontHeight-8.0F)/2.0F), ((GameStatus[ShipID] == STATUS_Left) ? DARKGRAY : GREEN) );
 
 						// Show % Health
 						if(ShowPlayerHealthByScores && GameStatus[ShipID] != STATUS_Left)
 						{
-							sprintf( (char*) &buf[0], "H:%d", (u_int16_t) ceilf(((PlayerHealths[ShipID].Shield + PlayerHealths[ShipID].Hull) /2.56F)));
+							snprintf( (char*) &buf[0], sizeof( buf ), "H:%d", (u_int16_t) ceilf(((PlayerHealths[ShipID].Shield + PlayerHealths[ShipID].Hull) /2.56F)));
 							Print4x5TextSmall( &buf[0], left_offset+60.0F, top_offset+((FontHeight-8.0F)/2.0F), ShipHealthColour[ShipID] );
 						}
 

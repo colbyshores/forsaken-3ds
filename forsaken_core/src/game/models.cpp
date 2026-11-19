@@ -577,11 +577,11 @@ bool PreInitModel( MODELNAME *NamePnt )
 			{
 				if( NamePnt->LevelSpecific )
 				{
-					sprintf( (char*)&TempFilename[0], "data\\levels\\%s\\models\\%s", &ShortLevelNames[ LevelNum ][ 0 ], NamePnt->Name );
+					snprintf( (char*)&TempFilename[0], sizeof( TempFilename ), "data\\levels\\%s\\models\\%s", &ShortLevelNames[ LevelNum ][ 0 ], NamePnt->Name );
 				}
 				else
 				{
-					sprintf( (char*)&TempFilename[0], "data\\models\\%s", NamePnt->Name );
+					snprintf( (char*)&TempFilename[0], sizeof( TempFilename ), "data\\models\\%s", NamePnt->Name );
 				}
 
 				Get_Ext( (u_int8_t*)NamePnt->Name, (u_int8_t*)&Ext[ 0 ] );
@@ -637,7 +637,7 @@ bool InitModel( MODELNAME * NamePnt)
 		{
 			if( NamePnt->LoadEnable )
 			{
-				strcpy( (char*)&TempFilename[0], (char*)NamePnt->Name );
+				copy_string( (char*)&TempFilename[0], sizeof( TempFilename ), (char*)NamePnt->Name );
 
 #ifdef __3DS__
 				/* Periodic linear-heap snapshot during model load — every
@@ -4012,7 +4012,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 
 										if( DoDamage( DONT_OVERRIDE_INVUL ) == 1 )						// Did I Die?
 										{
-											GetDeathString( WEPTYPE_Secondary, Weapon, &methodstr[0] );
+											GetDeathString( WEPTYPE_Secondary, Weapon, &methodstr[0], sizeof( methodstr ) );
 
 											Ships[ WhoIAm ].ShipThatLastKilledMe = WhoIAm;
 											Ships[ WhoIAm ].Object.Mode = DEATH_MODE;
@@ -4181,7 +4181,7 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 
 		if( DoDamage( DONT_OVERRIDE_INVUL ) == 1 )		// Did I Die?
 		{
-			GetDeathString( WeaponType, Weapon, &methodstr[0] );
+			GetDeathString( WeaponType, Weapon, &methodstr[0], sizeof( methodstr ) );
 
 			if( OwnerType != OWNER_SHIP ) Ships[ WhoIAm ].ShipThatLastKilledMe = MAX_PLAYERS;
 			else Ships[ WhoIAm ].ShipThatLastKilledMe = (u_int8_t) OwnerID;
@@ -4210,11 +4210,11 @@ void HitMe( u_int16_t OwnerType, u_int16_t OwnerID, float Damage, u_int8_t Weapo
 					{
 						if (TeamGame && ( TeamNumber[Ships[WhoIAm].ShipThatLastKilledMe] == TeamNumber[WhoIAm]))
 						{
-							strcpy(&teamstr[0], FROM_YOUR_OWN_TEAM );
+							copy_string(&teamstr[0], sizeof( teamstr ), FROM_YOUR_OWN_TEAM );
 						}
 						else
 						{
-							strcpy(&teamstr[0], "");
+							copy_string(&teamstr[0], sizeof( teamstr ), "");
 						}
 
 						// somebody killed me

@@ -48,7 +48,7 @@ bool LoadStartPoints( void )
 	u_int32_t		VersionNumber;
 	int16_t		OllyPad;
 
-	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], sizeof( NewFilename ), NewExt );
 
 
 	fp = file_open( &NewFilename[ 0 ], "rb" );

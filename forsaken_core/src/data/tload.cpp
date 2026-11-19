@@ -67,7 +67,7 @@ bool Tload( TLOADHEADER * Tloadheader  )
 		if ( Tloadheader->PlaceHolder[ i ] )
 		{
 			if(!Tloadheader->PlaceHolderFile[ i ])
-				Tloadheader->PlaceHolderFile[ i ] = ( char * )malloc( sizeof( char ) * 256 );
+				Tloadheader->PlaceHolderFile[ i ] = ( char * )malloc( PLACEHOLDER_FILE_SIZE );
 			DebugPrintf( "Tload: Placeholder ( texture %2d )\n", i );
 		}
 	}
@@ -303,7 +303,7 @@ void GetLevelTexturePath( char * destination, size_t size, const char * file, co
 	}
 
 	// convert file extension to new standard
-	Change_Ext( file, new_file, ".PNG" );
+	Change_Ext( file, new_file, sizeof( new_file ), ".PNG" );
 
 	// each candidate is used only if its whole path fitted: a cut path
 	// could name a different file

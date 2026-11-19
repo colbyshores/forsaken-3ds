@@ -68,6 +68,7 @@ constexpr int MAX_SAVEGAME_SLOTS = 16;
 bool SpaceOrbSetup = false;
 
 constexpr int MAX_KEYDEF_PAGES = (4);
+constexpr size_t KEYDEF_LABEL_SIZE = 16;	// a key definition's "selected/total" label
 int CurrentPage = 0;
 int MaxPage = 0;
 bool MissileCameraEnable;
@@ -373,7 +374,7 @@ void KillLines(void);
 void GetVduTextFormattingInfo (TEXT *t);
 void RestoreDefaultControlSettings( MENUITEM *Item );
 void PlayCursorSfx( void );
-void AddBikeArrow( char *name, int num );
+void AddBikeArrow( char *name, size_t size, int num );
 void CheckMenuTimer( void );
 
 /********************
@@ -1519,7 +1520,7 @@ void JoiningEnter(MENU * /*Menu*/)
 				const char * str = "";
 				if( local_port < 1024 )
 					str = "Ports bellow 1024 are normally restricted.";
-				sprintf(error_str, "%s %s %s %s",
+				snprintf(error_str, sizeof( error_str ), "%s %s %s %s",
 						"The selected port is in use or invalid.",
 						str,
 						"Disable the program using the port or",
@@ -4514,17 +4515,17 @@ void DrawKeyDefPage( MENUITEM * Item )
 	int	y;
 	static int col = 0;
 
-	sprintf( page, LT_PageNo, CurrentPage + 1, MaxPage );
+	snprintf( page, sizeof( page ), LT_PageNo, CurrentPage + 1, MaxPage );
 	x = (int) ( ( Item->x >> 1 ) * ModeScaleX );
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 	if ( MaxPage > 1 )
 	{
 		if ( !CurrentPage )
-			strcat( page, LT_PageDown );
+			append_string( page, sizeof( page ), LT_PageDown );
 		else if ( CurrentPage < MaxPage - 1 )
-			strcat( page, LT_PageUpDown );
+			append_string( page, sizeof( page ), LT_PageUpDown );
 		else
-			strcat( page, LT_PageUp );
+			append_string( page, sizeof( page ), LT_PageUp );
 	}
 	Print4x5Text( page, x, y, col );
 }
@@ -4541,7 +4542,7 @@ void DrawKeyDefHelp1( MENUITEM * Item )
 		keyname = (char *) CurrentMenuItem->StrPnt;
 		if ( MenuState == MENUSTATE_Keydef )
 		{
-			sprintf( help, LT_PressKey/*"press key or button for %s"*/, keyname );
+			snprintf( help, sizeof( help ), LT_PressKey/*"press key or button for %s"*/, keyname );
 		}
 		else
 		{
@@ -4551,11 +4552,11 @@ void DrawKeyDefHelp1( MENUITEM * Item )
 			if ( kdef->def->keys > 1 )
 			{
 				if ( kdef->selected_key < 1 )
-					sprintf( help, LT_ViewAlternateKeys, keyname );
+					snprintf( help, sizeof( help ), LT_ViewAlternateKeys, keyname );
 				else if ( kdef->selected_key < kdef->def->keys - 1 )
-					sprintf( help, LT_ViewAlternateKeys/*"[left/right]=view alternate keys for %s"*/, keyname );
+					snprintf( help, sizeof( help ), LT_ViewAlternateKeys/*"[left/right]=view alternate keys for %s"*/, keyname );
 				else
-					sprintf( help, LT_ViewAlternateKeys2, keyname );
+					snprintf( help, sizeof( help ), LT_ViewAlternateKeys2, keyname );
 			}
 			else
 			{
@@ -4565,7 +4566,7 @@ void DrawKeyDefHelp1( MENUITEM * Item )
 	}
 	else
 	{
-		sprintf( help, LT_SelectControl/*"[up/down]=select control"*/ );
+		snprintf( help, sizeof( help ), LT_SelectControl/*"[up/down]=select control"*/ );
 	}
 	y = (int) ( ( Item->y >> 1 ) * ModeScaleY );
 	CenterPrint4x5Text( help, y, col );
@@ -4583,11 +4584,11 @@ void DrawKeyDefHelp2( MENUITEM * Item )
 		keyname = (char *) CurrentMenuItem->StrPnt;
 		if ( MenuState == MENUSTATE_Keydef )
 		{
-			sprintf( help, LT_Cancel/*"[esc]=cancel"*/ );
+			snprintf( help, sizeof( help ), LT_Cancel/*"[esc]=cancel"*/ );
 		}
 		else
 		{
-			sprintf( help, LT_Add/*"[enter]=add, [del]=remove key for %s"*/, keyname );
+			snprintf( help, sizeof( help ), LT_Add/*"[enter]=add, [del]=remove key for %s"*/, keyname );
 		}
 	}
 	else
@@ -4641,9 +4642,9 @@ void DrawKeyDefHelp3( MENUITEM * Item )
 						strncpy( help, JoystickInfo[ KEY_JOYSTICK( keycode ) ].Name, HELP_MAX );
 						help[ HELP_MAX - 1 ] = 0;
 						if ( strlen( help ) + strlen( UNCONNECTED1 ) < HELP_MAX )
-							strcat( help, UNCONNECTED1 );
+							append_string( help, sizeof( help ), UNCONNECTED1 );
 						else if ( strlen( help ) + strlen( UNCONNECTED2 ) < HELP_MAX )
-							strcat( help, UNCONNECTED2 );
+							append_string( help, sizeof( help ), UNCONNECTED2 );
 					}
 					else
 					{
@@ -4651,7 +4652,7 @@ void DrawKeyDefHelp3( MENUITEM * Item )
 						if ( keyword )
 						{
 							duplicates = 0;
-							sprintf( help, LT_AlsoControls/*"[%s] also controls "*/, keyword );
+							snprintf( help, sizeof( help ), LT_AlsoControls/*"[%s] also controls "*/, keyword );
 							for ( item = &MENU_Keyboard.Item[ 0 ]; item->x >= 0; item++ )
 							{
 								if ( item->FuncDraw == DrawKeyDef && item != CurrentMenuItem )
@@ -4668,8 +4669,8 @@ void DrawKeyDefHelp3( MENUITEM * Item )
 											if ( help_length < HELP_MAX )
 											{
 												if ( duplicates++ )
-													strcat( help, DUPLICATE_SEP );
-												strcat( help, keyname );
+													append_string( help, sizeof( help ), DUPLICATE_SEP );
+												append_string( help, sizeof( help ), keyname );
 											}
 											else
 											{
@@ -5678,9 +5679,9 @@ void DrawSlider( MENUITEM *Item )
 
 	// get the slider start/current/stop values
 	s = (SLIDER *) (Item->Variable);
-	sprintf( min, "%d", s->min );
-	sprintf( max, "%d", s->max );
-	sprintf( val, "%d", s->value );
+	snprintf( min, sizeof( min ), "%d", s->min );
+	snprintf( max, sizeof( max ), "%d", s->max );
+	snprintf( val, sizeof( val ), "%d", s->value );
 
 	// slider value
 	Print4x5Text( val, sx + ( ex - sx ) * ( s->value - s->min ) / ( s->max - s->min ), y, RED );
@@ -5948,7 +5949,7 @@ void DrawKeyDef( MENUITEM *Item )
 		}
 		if ( keydef->def->keys > 1 )
 		{
-			sprintf( place, "[%d/%d]", keydef->selected_key + 1, keydef->def->keys );
+			snprintf( place, sizeof( place ), "[%d/%d]", keydef->selected_key + 1, keydef->def->keys );
 			Print4x5Text( place, x - 8 * FontWidth, y, colour );
 		}
 		if ( keycode )
@@ -6063,7 +6064,7 @@ void MoveConfigFile( MENU * /*Menu*/ )
 void InitBikeList( MENU * /*Menu*/ )
 {
 	BikeList.selected_item = ValidBikeSelected( SelectedBike );
-	strcpy(bike_name,(char*)BikeList.item[BikeList.selected_item]);
+	copy_string(bike_name, sizeof( bike_name ),(char*)BikeList.item[BikeList.selected_item]);
 }
 
 
@@ -6073,11 +6074,11 @@ void InitBikeListVDU( MENU *Menu )
 	MenuState = MENUSTATE_SelectBiker;
 	InitBikeList(Menu);
 
-	AddBikeArrow( bike_name, BikeList.selected_item );
+	AddBikeArrow( bike_name, sizeof( bike_name ), BikeList.selected_item );
 
 	OldSelectedBike = BikeList.selected_item;
 
-	strcpy(biker_text,BikerText[BikeList.selected_item]);
+	copy_string(biker_text, sizeof( biker_text ),BikerText[BikeList.selected_item]);
 
 }
 
@@ -6226,10 +6227,10 @@ void InitPilotName( MENU * /*menu*/ )
 {
 
 	// back up current config
-	strcpy( old_config, biker_config );
+	copy_string( old_config, sizeof( old_config ), biker_config );
 
 	// copy in default name
-	strcpy( PilotName.text, DEFAULT_NEWNAME );
+	copy_string( PilotName.text, sizeof( PilotName.text ), DEFAULT_NEWNAME );
 
 	//
 	PilotName.insert_pos = strlen( PilotName.text );
@@ -6288,7 +6289,7 @@ void SetPilotName( MENUITEM * /*item*/ )
 	*player_config = default_config;
 
 	// set the pilot name
-	strcpy( player_config->name, PilotName.text );
+	copy_string( player_config->name, sizeof( player_config->name ), PilotName.text );
 
 	// re-initialize joystick to remove any existing settings
 	ReInitJoysticks();
@@ -6362,7 +6363,7 @@ void SetPilotNameInGame( MENUITEM * /*item*/ )
 
 	InitBikerName( PilotNameInGame.text );
 	*player_config = default_config;
-	strcpy( player_config->name, PilotNameInGame.text );
+	copy_string( player_config->name, sizeof( player_config->name ), PilotNameInGame.text );
 	ReInitJoysticks();
 	DefaultJoystickSettings( player_config );
 	Config = *player_config;
@@ -6383,8 +6384,8 @@ void SetPilotNameInGame( MENUITEM * /*item*/ )
 ===================================================================*/
 void InitPilotReName( MENU * /*menu*/ )
 {
-	strcpy( old_config, biker_config );
-	strcpy( PilotReName.text, DEFAULT_NEWNAME );
+	copy_string( old_config, sizeof( old_config ), biker_config );
+	copy_string( PilotReName.text, sizeof( PilotReName.text ), DEFAULT_NEWNAME );
 	PilotReName.insert_pos = strlen( PilotReName.text );
 	PilotReName.limit_length = MAX_PLAYER_NAME_LENGTH - 1;
 
@@ -6416,7 +6417,7 @@ void RenamePilotName( MENUITEM * /*item*/ )
 		return; // config file already exists with that name (should display error message)
 	}
 	InitBikerName( PilotReName.text );
-	strcpy( player_config->name, PilotReName.text );
+	copy_string( player_config->name, sizeof( player_config->name ), PilotReName.text );
 	Config = *player_config;
 	Config.bike = ValidBikeSelected( Config.bike );
 	write_config( player_config, biker_config );
@@ -6471,7 +6472,7 @@ void GetBikeDetails(int Bike, MENUITEM * /*item*/)
 
 	SelectedBikeFrame = BikeChars[ Bike ];
 	SelectedBikeScale = BikeModelScale[ Bike ];
-	strcpy(bike_name,(char*)BikeList.item[ Bike ]);
+	copy_string(bike_name, sizeof( bike_name ),(char*)BikeList.item[ Bike ]);
 	if ( WhoIAm != (u_int8_t) -1 )
 		Ships[ WhoIAm ].BikeNum = Bike;
 }
@@ -7335,10 +7336,10 @@ void GetSavedGameData( void )
 	CurrentSavedGameTimeLevelPlayed[0] = 0;
 	CurrentSavedGameEnemiesKilled[0] = 0;
 
-	strcpy( (char*)filename, SaveGameFileName( LoadSavedGameList.selected_item ) );
+	copy_string( (char*)filename, sizeof( filename ), SaveGameFileName( LoadSavedGameList.selected_item ) );
 
 	if ( file_time( (char*)filename, &ftime ) )
-		sprintf( CurrentSavedGameDate, "saved %d-%d-%d at %2d:%02d", ftime.month, ftime.day, ftime.year, ftime.hour, ftime.minute );
+		snprintf( CurrentSavedGameDate, sizeof( CurrentSavedGameDate ), "saved %d-%d-%d at %2d:%02d", ftime.month, ftime.day, ftime.year, ftime.hour, ftime.minute );
 	else
 	{
 		snprintf( CurrentSavedGameDate, sizeof( CurrentSavedGameDate ), "%s", SavedGameInfo( LoadSavedGameList.selected_item ) );
@@ -7370,17 +7371,19 @@ void GetSavedGameData( void )
 		}
 		else
 		{
-			sprintf( CurrentSavedGameLevel, LT_LevelName/*"level name: %s"*/, GetMissionName( buf ) );
+			snprintf( CurrentSavedGameLevel, sizeof( CurrentSavedGameLevel ), LT_LevelName/*"level name: %s"*/, GetMissionName( buf ) );
 			if ( strcasecmp( biker, DEFAULT_PLAYER_NAME ) )
 				snprintf( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
 			else
-				sprintf( CurrentSavedGameTimeLevelPlayed, LT_LevelPlayedFor2/*"played for %hd mins %hd secs"*/, Hours * 60 + Minutes, Seconds );
-			sprintf( CurrentSavedGameEnemiesKilled, LT_EnemiesKilled/*"enemies killed: %hd of %hd"*/, KilledEnemiesNum, InitEnemiesNum );
+				snprintf( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor2/*"played for %hd mins %hd secs"*/, Hours * 60 + Minutes, Seconds );
+			snprintf( CurrentSavedGameEnemiesKilled, sizeof( CurrentSavedGameEnemiesKilled ), LT_EnemiesKilled/*"enemies killed: %hd of %hd"*/, KilledEnemiesNum, InitEnemiesNum );
 		}
 	}
 
 	ext = strstr( (char*)filename, SAVEGAME_EXTENSION );
-	strcpy( ext, SAVEGAMEPIC_EXTENSION );
+	if( !ext )
+		return;
+	copy_string( ext, sizeof( filename ) - (size_t)( ext - (char*)filename ), SAVEGAMEPIC_EXTENSION );
 
 	if ( File_Exists( (char*)filename ) )
 	{
@@ -7446,7 +7449,7 @@ void SelectQuitCurrentGame( MENUITEM * /*Item*/ )
 	MyGameStatus = STATUS_QuitCurrentGame;
 }
 
-void AddBikeArrow( char *name, int num )
+void AddBikeArrow( char *name, size_t size, int num )
 {
 	int i;
 	bool leftarrow = false;
@@ -7473,20 +7476,20 @@ void AddBikeArrow( char *name, int num )
 		}
 	}
 
-	strcpy( tempbikename, name );
+	copy_string( tempbikename, sizeof( tempbikename ), name );
 
 	if ( leftarrow )
 	{
-		strcpy( tempbikename, leftarrowchar );
-		strcat( tempbikename, name );
+		copy_string( tempbikename, sizeof( tempbikename ), leftarrowchar );
+		append_string( tempbikename, sizeof( tempbikename ), name );
 	}
 
 	if ( rightarrow )
 	{
-		strcat( tempbikename, rightarrowchar );
+		append_string( tempbikename, sizeof( tempbikename ), rightarrowchar );
 	}
 
-	strcpy( name, tempbikename );
+	copy_string( name, size, tempbikename );
 }
 
 void ExitBikeSelection( MENUITEM * /*item*/ )
@@ -7502,9 +7505,9 @@ void ExitBikeSelection( MENUITEM * /*item*/ )
 	Config.bike = SelectedBike;
 	player_config->bike = Config.bike;
 	write_config( player_config, biker_config );
-	strcpy(bike_name,(char*)BikeList.item[BikeList.selected_item]);
-	AddBikeArrow( bike_name, SelectedBike );
-	strcpy(biker_text,BikerText[BikeList.selected_item]);
+	copy_string(bike_name, sizeof( bike_name ),(char*)BikeList.item[BikeList.selected_item]);
+	AddBikeArrow( bike_name, sizeof( bike_name ), SelectedBike );
+	copy_string(biker_text, sizeof( biker_text ),BikerText[BikeList.selected_item]);
 	if ( WhoIAm != (u_int8_t) -1 )
 	{
 		Ships[ WhoIAm ].BikeNum = ( SelectedBike % MAXBIKETYPES );
@@ -7585,9 +7588,9 @@ void MakeModeList( MENU * /*Menu*/ )
 		{
 			WhichMode[ModeList.items] = i;
 			if(i==0)
-				sprintf( (char*)&ModeList.item[ModeList.items][0], "default");
+				snprintf( (char*)&ModeList.item[ModeList.items][0], sizeof( ModeList.item[ModeList.items] ), "default");
 			else
-				sprintf( (char*)&ModeList.item[ModeList.items][0], "%d x %d" ,
+				snprintf( (char*)&ModeList.item[ModeList.items][0], sizeof( ModeList.item[ModeList.items] ), "%d x %d" ,
 					render_info.Mode[i].w , render_info.Mode[i].h );
 
 			if( (render_info.Mode[i].w == render_info.ThisMode.w) &&
@@ -7719,13 +7722,13 @@ void DebugModeChanged( MENUITEM * /*item*/ )
 {
 	if( DebugInfo )
 	{
-		strcpy( (char*)&MacroText4.text[0], (char*)&DebuggingString[0] );
+		copy_string( (char*)&MacroText4.text[0], sizeof( MacroText4.text ), (char*)&DebuggingString[0] );
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
 		if( !GodMode ) ToggleGodMode( nullptr );
 	}
 	else
 	{
-		strcpy( (char*)&MacroText4.text[0], (char*)&NotDebuggingString[0] );
+		copy_string( (char*)&MacroText4.text[0], sizeof( MacroText4.text ), (char*)&NotDebuggingString[0] );
 		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_Taunt1, 0);
 		if( GodMode ) ToggleGodMode( nullptr );
 	}
@@ -8963,7 +8966,7 @@ void CheckKeysForChanges( void )
 				kdef = (DEFKEY *)(Item->Variable);
 				if ( kdef->def->keys > 1 )
 				{
-					sprintf( (char*)Item->TextInfo[ 0 ]->text, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
+					snprintf( (char*)Item->TextInfo[ 0 ]->text, KEYDEF_LABEL_SIZE, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
 				}
 			}
 		}
@@ -9038,11 +9041,10 @@ void DrawFlatMenuKeyNum( MENUITEM *Item )
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
-		constexpr size_t label_size = 16;	/* "selected/total" */
-		TextInfo->text = (u_int8_t*)malloc( label_size );
+		TextInfo->text = (u_int8_t*)malloc( KEYDEF_LABEL_SIZE );
 		if ( kdef->def->keys > 1 )
 		{
-			snprintf( (char*)TextInfo->text, label_size, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
+			snprintf( (char*)TextInfo->text, KEYDEF_LABEL_SIZE, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
 		}
 		else
 			TextInfo->text[ 0 ] = 0;
@@ -11101,7 +11103,7 @@ void LoadLevelPic(MENUITEM *Item)
 	FRAME_INFO **header;
 	int frame = 0;
 
-	strcpy( Tloadheader.PlaceHolderFile[ Title_LevelPics_Header->vid_tpage_index ], MissionTextPics[ NewLevelNum ] );
+	copy_string( Tloadheader.PlaceHolderFile[ Title_LevelPics_Header->vid_tpage_index ], PLACEHOLDER_FILE_SIZE, MissionTextPics[ NewLevelNum ] );
 
 	if ( !TloadReloadPlaceHolder( &Tloadheader, Title_LevelPics_Header->vid_tpage_index ) )
 		return;
@@ -11124,7 +11126,7 @@ void LoadSavedGamePic( char *file )
 	if ( DummyTextureIndex == -1 )
 		return;
 
-	strcpy( Tloadheader.PlaceHolderFile[ DummyTextureIndex ], file );
+	copy_string( Tloadheader.PlaceHolderFile[ DummyTextureIndex ], PLACEHOLDER_FILE_SIZE, file );
 
 	if ( !TloadReloadPlaceHolder( &Tloadheader, DummyTextureIndex ) )
 		return;
@@ -11970,7 +11972,7 @@ void SendTitleMessage(MENUITEM *Item)
 	MacroText4.text[ MAXTEXTMSG - 1 ] = 0;
 	SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_TitleMessage, 0);
 
-	strcpy ( &TextMsg.Text[0], &MacroText4.text[0] );
+	copy_string ( &TextMsg.Text[0], sizeof( TextMsg.Text ), &MacroText4.text[0] );
 	TextMsg.WhoIAm = WhoIAm;
 	AddTitleMessage(&TextMsg);
 
@@ -12025,7 +12027,7 @@ void GetTitleMessage(void)
 				j = TITLE_TEXT_MSGS_STORED;
 				while (--j)
 				{
-					strcpy( TitleMessage[j], TitleMessage[j - 1] );
+					copy_string( TitleMessage[j], sizeof( TitleMessage[j] ), TitleMessage[j - 1] );
 				}
 
 				strncpy( &TitleMessage[0][0], (char*)&dummytext.text[dummytext.startpoint[i]], dummytext.endpoint[i] - dummytext.startpoint[i] + 1);
@@ -12067,7 +12069,7 @@ void PrintErrorMessage (const char * ErrorStr, int BackBy, MENU *NewMenu, int ty
 	else
 		MENU_NEW_Error.MenuStatus = CurrentMenu->MenuStatus;
 
-	strcpy (ErrorMessage, ErrorStr);
+	copy_string (ErrorMessage, sizeof( ErrorMessage ), ErrorStr);
 	if ( type & ERROR_QUIT )
 		ErrorMoveBackBy = -1;
 	else
@@ -12538,8 +12540,8 @@ void CheckJoyAxis( int * /*dummy*/ )
 		left = ShipAxisSeperateText[AxisActionList.selected_item * 2];
 	}
 
-	strcpy(AxisExtremeLeftText, left);
-	strcpy(AxisExtremeRightText, right);
+	copy_string(AxisExtremeLeftText, sizeof( AxisExtremeLeftText ), left);
+	copy_string(AxisExtremeRightText, sizeof( AxisExtremeRightText ), right);
 
 	// if choosing axis, & selected item has changed...
 	if (CurrentListItem)
@@ -12704,55 +12706,55 @@ void InitCrystalsFoundText( MENU * /*Menu*/ )
 {
 	if ( CrystalsFound == 1 )
 	{
-		sprintf( CrystalsFoundText, LT_OneCrystalFound, CrystalsFound );
+		snprintf( CrystalsFoundText, sizeof( CrystalsFoundText ), LT_OneCrystalFound, CrystalsFound );
 	}
 	else
 	{
-		sprintf( CrystalsFoundText, LT_CrystalsFound, CrystalsFound );
+		snprintf( CrystalsFoundText, sizeof( CrystalsFoundText ), LT_CrystalsFound, CrystalsFound );
 	}
 
 	if ( NumGoldBars == 1 )
 	{
-		sprintf( GoldBarsFoundText, LT_OneGoldBarFound, (int)NumGoldBars );
+		snprintf( GoldBarsFoundText, sizeof( GoldBarsFoundText ), LT_OneGoldBarFound, (int)NumGoldBars );
 	}
 	else
 	{
-		sprintf( GoldBarsFoundText, LT_GoldBarsFound, (int)NumGoldBars );
+		snprintf( GoldBarsFoundText, sizeof( GoldBarsFoundText ), LT_GoldBarsFound, (int)NumGoldBars );
 	}
 
 	if( Secrets == 1 )
 	{
-		sprintf( SecretsFoundText, LT_OneSecretFoundOutOf, Secrets, TotalSecrets );
+		snprintf( SecretsFoundText, sizeof( SecretsFoundText ), LT_OneSecretFoundOutOf, Secrets, TotalSecrets );
 	}
 	else
 	{
-		sprintf( SecretsFoundText, LT_SecretsFoundOutOf, Secrets, TotalSecrets );
+		snprintf( SecretsFoundText, sizeof( SecretsFoundText ), LT_SecretsFoundOutOf, Secrets, TotalSecrets );
 	}
 
 	if( NumKilledEnemies == 1 )
 	{
-		sprintf( EnemiesKilledText, LT_OneEnemyKilled, (int)NumKilledEnemies, (int)NumInitEnemies );
+		snprintf( EnemiesKilledText, sizeof( EnemiesKilledText ), LT_OneEnemyKilled, (int)NumKilledEnemies, (int)NumInitEnemies );
 	}
 	else
 	{
-		sprintf( EnemiesKilledText, LT_EnemysKilled, (int)NumKilledEnemies, (int)NumInitEnemies );
+		snprintf( EnemiesKilledText, sizeof( EnemiesKilledText ), LT_EnemysKilled, (int)NumKilledEnemies, (int)NumInitEnemies );
 	}
 
 	if ( ( ( LevelTimeTaken / 60 ) == 1 ) && ( ( (int)LevelTimeTaken % 60 ) == 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken1/*"time taken %d min %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
+		snprintf( TimeTakenText, sizeof( TimeTakenText ), LT_TimeTaken1/*"time taken %d min %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 	if ( ( ( LevelTimeTaken / 60 ) != 1 ) && ( ( (int)LevelTimeTaken % 60 ) == 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken2/*"time taken %d mins %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
+		snprintf( TimeTakenText, sizeof( TimeTakenText ), LT_TimeTaken2/*"time taken %d mins %d sec"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 	if ( ( ( LevelTimeTaken / 60 ) == 1 ) && ( ( (int)LevelTimeTaken % 60 ) != 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken3/*"time taken %d min %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
+		snprintf( TimeTakenText, sizeof( TimeTakenText ), LT_TimeTaken3/*"time taken %d min %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 	if ( ( ( LevelTimeTaken / 60 ) != 1 ) && ( ( (int)LevelTimeTaken % 60 ) != 1 ) )
 	{
-		sprintf( TimeTakenText, LT_TimeTaken4/*"time taken %d mins %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
+		snprintf( TimeTakenText, sizeof( TimeTakenText ), LT_TimeTaken4/*"time taken %d mins %d secs"*/,	(int)(LevelTimeTaken / 60),	(int)((int)LevelTimeTaken % 60) );
 	}
 }
 
@@ -12798,10 +12800,10 @@ void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 		MyGameStatus = STATUS_WaitingToStartEndGameSequence;
 		return;
 	case GameComplete::Cheated:
-		strcpy( GameCompleteText, GameCompleteWithCheating );
+		copy_string( GameCompleteText, sizeof( GameCompleteText ), GameCompleteWithCheating );
 		break;
 	case GameComplete::GotAllCrystalsSoFar:
-		strcpy( GameCompleteText, GameCompleteGotAllCrystalsSoFar );
+		copy_string( GameCompleteText, sizeof( GameCompleteText ), GameCompleteGotAllCrystalsSoFar );
 		break;
 	case GameComplete::WithAllCrystals:
 		MenuChangeEx( &MENU_NEW_GeneralLoading );
@@ -12888,9 +12890,9 @@ void InGameSaveASinglePlayerGame( MENUITEM *item )
 
 void SaveMacros( MENUITEM * /*Item*/ )
 {
-	strcpy( player_config->macro1, MacroText1.text );
-	strcpy( player_config->macro2, MacroText2.text );
-	strcpy( player_config->macro3, MacroText3.text );
+	copy_string( player_config->macro1, sizeof( player_config->macro1 ), MacroText1.text );
+	copy_string( player_config->macro2, sizeof( player_config->macro2 ), MacroText2.text );
+	copy_string( player_config->macro3, sizeof( player_config->macro3 ), MacroText3.text );
 
 	write_config( player_config, biker_config );
 }
@@ -13322,7 +13324,7 @@ bool DeletePilot( LIST *l, int item )
 {
 	static char fname[ 255 ];
 
-	sprintf( fname, "pilots\\%s.txt", l->item[ item ] );
+	snprintf( fname, sizeof( fname ), "pilots\\%s.txt", l->item[ item ] );
 	if ( l->items > 1 && delete_file( fname ) && ListDelete( l, item ) )
 	{
 		SelectPilot( nullptr );
@@ -13368,7 +13370,7 @@ void InitWatchList( MENU * /*Menu*/ )
 			HostPlayersList.item[ HostPlayersList.items ][ sizeof( HostPlayersList.item[ HostPlayersList.items ] ) - 1 ] = 0;
 
 			if(i == WhoIAm)
-				strcat( (char*)HostPlayersList.item[ HostPlayersList.items ], " (YOU)");
+				append_string( (char*)HostPlayersList.item[ HostPlayersList.items ], sizeof( HostPlayersList.item[ HostPlayersList.items ] ), " (YOU)");
 
 			HostGamePlayersWhoIAm[ HostPlayersList.items ] = i;
 			HostPlayersList.items++;
@@ -14364,7 +14366,7 @@ bool ProcessPlayerList ( int Key )
 	done = false;
 	redraw = false;
 
-	strcpy(old_bike_name, bike_name);
+	copy_string(old_bike_name, sizeof( old_bike_name ), bike_name);
 
 	switch(Key)
 	{

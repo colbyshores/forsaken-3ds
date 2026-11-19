@@ -5624,7 +5624,7 @@ void DispHUDNames( void )
 
 			if( TargetComputerOn && !( Ships[ Ship ].Object.Flags & SHIP_Stealth ) )
 			{
-				sprintf( (char*)&TempString[ 0 ], "%2.0f %2.0f", Ships[ Ship ].Object.Shield, Ships[ Ship ].Object.Hull );
+				snprintf( (char*)&TempString[ 0 ], sizeof( TempString ), "%2.0f %2.0f", Ships[ Ship ].Object.Shield, Ships[ Ship ].Object.Hull );
 				CenterPrint4x5Text2( (char*)&TempString[ 0 ], VisibleShipsPos[ Count ].InfoX, VisibleShipsPos[ Count ].InfoY, TeamColours[ ShipsTeam ] );
 			}
 		}
@@ -5640,7 +5640,7 @@ void DispHUDNames( void )
 				Ship = VisibleShipsPos[ Count ].Ship;
 
 				// format the ship health as a percentage
-				sprintf( (char*) &buf[0] ,"%d", (u_int16_t) fast_ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
+				snprintf( (char*) &buf[0] , sizeof( buf ),"%d", (u_int16_t) fast_ceilf((((PlayerHealths[Ship].Hull + PlayerHealths[Ship].Shield)/2.56F))));
 
 				// display using whatever scaled font player has chosen
 				if(ScaleFontPlayerHealthAboveBikes)
@@ -5661,7 +5661,7 @@ void DispHUDNames( void )
 				{
 					CenterPrint4x5Text2( &Names[ Ship ][ 0 ], VisibleShipsPos[ Count ].ScreenX, VisibleShipsPos[ Count ].ScreenY, ( Ship & 7 ) );
 
-					sprintf( (char*)&TempString[ 0 ], "%2.0f %2.0f", Ships[ Ship ].Object.Shield, Ships[ Ship ].Object.Hull );
+					snprintf( (char*)&TempString[ 0 ], sizeof( TempString ), "%2.0f %2.0f", Ships[ Ship ].Object.Shield, Ships[ Ship ].Object.Hull );
 					CenterPrint4x5Text2( (char*)&TempString[ 0 ], VisibleShipsPos[ Count ].InfoX, VisibleShipsPos[ Count ].InfoY, ( Ship & 7 ) );
 				}
 			}

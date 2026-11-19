@@ -272,12 +272,12 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 
 		for( Count = 0; Count < Num_TPages; Count++ )
 		{
-			sprintf( (char*)&TempFilename[ 0 ], "data\\textures\\%s", Char_Ptr );
+			snprintf( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), "data\\textures\\%s", Char_Ptr );
 
 			if( LoadTPages & LOAD_TPAGES)
 			{
 				Name_Index[ Count ] = AddTexture( &Tloadheader, (char*)&TempFilename[ 0 ], true , false, 0, 0 );
-				strcpy ( tpagename, (char*)Char_Ptr );
+				copy_string ( tpagename, sizeof( tpagename ), (char*)Char_Ptr );
 				*last_tpage = Name_Index[ Count ];
 				if( Name_Index[ Count ] == -1 )
 				{
@@ -291,7 +291,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 		}
 
 		// copy t-page info into Frm_Info - this is only valid if only one t-page is used!
-		strcpy ( Frm_Info->tpage_name, tpagename );
+		copy_string ( Frm_Info->tpage_name, sizeof( Frm_Info->tpage_name ), tpagename );
 		Frm_Info->vid_tpage_index = Name_Index[ 0 ];
 		Frm_Info->sys_tpage_index = -1;
 
@@ -358,11 +358,11 @@ bool Load_All_Off_Files( OFF_FILES * FileInfo )
 	EnableRelevantOffFiles( FileInfo );
 
 	// polytext is default now
-	strcpy( (char*)&FontFile[ 0 ], (char*)Font512File );
-	strcpy( (char*)&FontFileBig [ 0 ], (char*)FontBigFile );
+	copy_string( (char*)&FontFile[ 0 ], sizeof( FontFile ), (char*)Font512File );
+	copy_string( (char*)&FontFileBig [ 0 ], sizeof( FontFileBig ), (char*)FontBigFile );
 
 	// this still uses the old blitted font file
-	strcpy ( (char*)&TitleFontFile[ 0 ], (char*)VduFont512 );
+	copy_string ( (char*)&TitleFontFile[ 0 ], sizeof( TitleFontFile ), (char*)VduFont512 );
 
 	//
 #ifdef __3DS__
@@ -394,7 +394,7 @@ bool Load_All_Off_Files( OFF_FILES * FileInfo )
 				continue;
 			}
 
-			sprintf((char*)TempFilename,"%s%s",OffsetPath,FileInfo->Filename);
+			snprintf((char*)TempFilename, sizeof( TempFilename ),"%s%s",OffsetPath,FileInfo->Filename);
 
 			*FileInfo->InfoPtrAddr = Load_Off_File( &TempFilename[ 0 ], FileInfo->LoadTPages, &last_tpage, FileInfo->xsize, FileInfo->ysize, ( FileInfo->LoadTPages & LOAD_TPAGES_PLACEHOLDER ) );
 			if( *FileInfo->InfoPtrAddr == nullptr )
@@ -502,7 +502,7 @@ FRAME_INFO ** Get_Frm_Info_Address( int16_t Index )
 void EnableRelevantFontOffFiles( void )
 {
 	int8_t path[256];
-	sprintf((char*)path,"%s%s",OffsetPath,FontBigFile);
+	snprintf((char*)path, sizeof( path ),"%s%s",OffsetPath,FontBigFile);
 	if( Get_File_Size( (char*)path ) == 0 )
 	{
 		DisableOffFile( &OffsetFiles[ 0 ], FontBigFile );
