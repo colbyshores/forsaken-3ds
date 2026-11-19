@@ -316,7 +316,7 @@ void ProcessSpotFX( void )
 											break;
 
 										case SPOTFX_NmeGlow:
-											CreateSpotFXNmeGlow( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+											CreateSpotFXNmeGlow( &SpotFX->Pos, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
 											break;
 
 										case SPOTFX_NmeVapourTrail:
@@ -368,31 +368,31 @@ void ProcessSpotFX( void )
 											break;
 
 										case SPOTFX_BorgAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_ExcopAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_TruckerAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_NubiaAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_CerberoAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_FoetoidAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_FoetoidSmallAfterburner:
-											CreateSpotFXSmallAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXSmallAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_Hk5Afterburner:
@@ -400,39 +400,39 @@ void ProcessSpotFX( void )
 											break;
 
 										case SPOTFX_JapBirdAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_JoAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_JoSmallAfterburner:
-											CreateSpotFXSmallAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXSmallAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_LaJayAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_MofistoAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_NutterAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_RhesusAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_SharkAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										case SPOTFX_SlickAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
 											break;
 
 										default:
@@ -1275,14 +1275,13 @@ void CreateSpotFXNmeTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t
 /*===================================================================
 	Procedure	:	Create NME Glow
 	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 				:	u_int8_t		Red
 				:	u_int8_t		Green
 				:	u_int8_t		Blue
 	Output		:	Nothing
 ===================================================================*/
-void CreateSpotFXNmeGlow( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue )
+void CreateSpotFXNmeGlow( VECTOR * Pos, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue )
 {
 	u_int16_t	FmPoly;
 
@@ -2057,12 +2056,11 @@ void CreateSpotFXBeardAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, 
 /*===================================================================
 	Procedure	:	Create SpotFX Borg Afterburner
 	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 				:	float		Speed
 	Output		:	Nothing
 ===================================================================*/
-void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, float Speed )
+void CreateSpotFXBorgAfterburner( VECTOR * Pos, u_int16_t Group, float Speed )
 {
 	u_int16_t	FmPoly;
 	float	Size;
@@ -2097,12 +2095,11 @@ void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Grou
 /*===================================================================
 	Procedure	:	Create SpotFX Small Afterburner
 	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 				:	float		Speed
 	Output		:	Nothing
 ===================================================================*/
-void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group, float Speed )
+void CreateSpotFXSmallAfterburner( VECTOR * Pos, u_int16_t Group, float Speed )
 {
 	u_int16_t	FmPoly;
 	float	Size;

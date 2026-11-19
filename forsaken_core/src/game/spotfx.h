@@ -155,7 +155,7 @@ void CreateSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up, u_int16_t
 void CreateSpotFXElectricBeams( VECTOR * Pos, VECTOR * Dir, VECTOR * Up, u_int16_t Group );
 void CreateSpotFXGravgonTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void CreateSpotFXNmeTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
-void CreateSpotFXNmeGlow( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
+void CreateSpotFXNmeGlow( VECTOR * Pos, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 void CreateSpotFXNmeVapourTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 void CreateSpotFXRealSparks( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 void CreateSpotFXShrapnel( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
@@ -170,11 +170,11 @@ void CreateSpotFXDrip( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red
 void CreateSpotFXDripSplash( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 void CreateSpotFXBurning( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void CreateSpotFXBeardAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed );
-void CreateSpotFXBorgAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed );
+void CreateSpotFXBorgAfterburner( VECTOR * Pos, u_int16_t Group, float Speed );
 void SetupSpotFXGroups( void );
 void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group );
 void CreateNmeGenEffect( VECTOR * Pos, u_int16_t Group );
-void CreateSpotFXSmallAfterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed );
+void CreateSpotFXSmallAfterburner( VECTOR * Pos, u_int16_t Group, float Speed );
 void CreateSpotFXHk5Afterburner( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float Speed, u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 FILE * SaveAllSpotFX( FILE * fp );
 FILE * LoadAllSpotFX( FILE * fp );

@@ -2361,7 +2361,7 @@ void ProcessModels( void )
 															break;
 
 														case SPOTFX_NmeGlow:
-															CreateSpotFXNmeGlow( &Pos, &DirVector, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
+															CreateSpotFXNmeGlow( &Pos, SpotFXGroup, SpotFXPtr->Red, SpotFXPtr->Green, SpotFXPtr->Blue );
 															break;
 
 														case SPOTFX_Shrapnel:
@@ -2381,67 +2381,67 @@ void ProcessModels( void )
 															break;
 
 														case SPOTFX_BorgAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_ExcopAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_TruckerAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_NubiaAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_CerberoAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_FoetoidAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_FoetoidSmallAfterburner:
-															if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_JapBirdAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_JoAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_JoSmallAfterburner:
-															if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXSmallAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_LaJayAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_MofistoAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_NutterAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_RhesusAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_SharkAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														case SPOTFX_SlickAfterburner:
-															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, &DirVector, SpotFXGroup, ShipSpeed );
+															if( BikeExhausts ) CreateSpotFXBorgAfterburner( &Pos, SpotFXGroup, ShipSpeed );
 															break;
 
 														default:
