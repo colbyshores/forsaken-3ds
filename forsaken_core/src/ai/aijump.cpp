@@ -142,20 +142,6 @@ static void JumpBegin( ENEMY * Enemy, NODE * target )
 u_int16_t MoveGroup( MLOADHEADER * m, VECTOR * StartPos,
 							u_int16_t StartGroup, VECTOR * MoveOffset );
 
-/* Body rotation deliberately removed.
- *
- * Per Ghidra decomp of kexForsakenAIBrain::AimAtTarget, KEX does
- * NOT rotate the body — it computes (target - boss) in body-local
- * space (via inverse body matrix), produces yaw + pitch angles, and
- * writes them to the turret comp. The body stays in spawn
- * orientation, the turret swivels. We follow the same shape: the
- * UserContComps[] wired in enemies.cpp carries the aim, body matrix
- * stays static. */
-static void JumpFaceTarget( ENEMY * Enemy )
-{
-	(void) Enemy;
-}
-
 /* Per-frame parametric arc — pure lerp in xz, parabolic in y.
  * Updates Object.Group via MoveGroup so the engine's per-frame
  * AI_THINK / SoundInfo lookups work after a multi-room jump.
@@ -251,9 +237,11 @@ void AI_JUMP_FOLLOWPATH( ENEMY * Enemy )
 	AI_GetDistToNearestTarget( Enemy );
 	if( Tinfo->TObject ) Enemy->TShip = Tinfo->TObject;
 
-	/* No-op: KEX never rotates the body (see JumpFaceTarget); the
-	 * turret comps carry the aim. */
-	JumpFaceTarget( Enemy );
+	/* The body is not turned toward the target. Per Ghidra decomp of
+	 * kexForsakenAIBrain::AimAtTarget, KEX computes (target - boss) in
+	 * body-local space and writes yaw + pitch to the turret comp; the
+	 * body stays in spawn orientation. Here the UserContComps[] wired
+	 * in enemies.cpp carry the aim. */
 
 	AI_THINK( Enemy, false, false );
 

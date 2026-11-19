@@ -1668,7 +1668,7 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 
 
 /*===================================================================
-	Procedure	:	Update components model colours ( currently does nothing )
+	Procedure	:	Light every component model with one ambient colour
 	Input		:	COMP_OBJ	*	Children
 				:	int16_t			NumChildren
 				:	int				Red

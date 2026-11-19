@@ -2656,8 +2656,6 @@ bool RenderScene( void )
 	  return false; // the collision data skin thickness 0
 	}
 
-	SetUpShips();
-
 	InitSoundInfo( &Mloadheader );
 
 	InitShipSpeeds();

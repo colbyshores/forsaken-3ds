@@ -559,16 +559,6 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 		RemoteCameraMode1		// nor 3 (demo playback, removed)
 };
 
-/*===================================================================
-		Init All Ships ...
-===================================================================*/
-
-bool SetUpShips()
-{
-	return true;
-}
-
-
 bool ProcessShips()
 {
 	BYTE	i;

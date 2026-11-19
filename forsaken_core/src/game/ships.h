@@ -82,7 +82,6 @@ typedef struct _BIKEMOD
  * fn prototypes
  */
 
-bool SetUpShips();
 bool ProcessShips();
 void	InitShipsChangeLevel( MLOADHEADER * Mloadheader );
 bool	ENV( MXLOADHEADER * Mloadheader , MATRIX * Mat ,VECTOR * Pos);
