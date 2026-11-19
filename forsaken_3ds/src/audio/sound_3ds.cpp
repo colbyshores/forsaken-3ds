@@ -5,7 +5,7 @@
  * the signed form ndsp expects. sound_source claims an ndsp channel from a
  * pool of MAX_SFX_VOICES (channels 0-7) for the life of the source. When all
  * are taken, the channel claimed longest ago is reset and handed over: the
- * evicted source goes silent but still holds the channel number. Channel 23
+ * evicted source goes silent and is left with no channel (-1). Channel 23
  * belongs to music_3ds.cpp. Volume (millibels) and pan become the channel's
  * left/right mix. The listener calls are no-ops and Sound3D is false, so
  * sfx.cpp pans in software and never calls sound_position.
@@ -76,6 +76,10 @@ constexpr int MAX_SFX_VOICES = 8;
 static bool       channel_used[MAX_CHANNELS];
 static u_int64_t  channel_alloc_time[MAX_CHANNELS];
 static u_int64_t  s_alloc_seq = 0;
+/* The source holding each SFX channel, so an evicted source can be told it
+   no longer has one (otherwise its volume/pan/release calls would act on
+   the sound that took the channel over). */
+static sound_source_t *channel_owner[MAX_SFX_VOICES];
 
 static int alloc_channel(void)
 {
@@ -97,8 +101,11 @@ static int alloc_channel(void)
 		}
 	}
 
-	/* All slots full — evict the oldest. */
+	/* All slots full — evict the oldest. Its source keeps no channel. */
 	ndspChnReset(oldest_idx);
+	if (channel_owner[oldest_idx])
+		channel_owner[oldest_idx]->channel = -1;
+	channel_owner[oldest_idx] = NULL;
 	channel_alloc_time[oldest_idx] = ++s_alloc_seq;
 	return oldest_idx;
 }
@@ -106,7 +113,10 @@ static int alloc_channel(void)
 static void free_channel(int ch)
 {
 	if (ch >= 0 && ch < MAX_SFX_VOICES)
+	{
 		channel_used[ch] = false;
+		channel_owner[ch] = NULL;
+	}
 }
 
 /* ---- init / destroy ---- */
@@ -446,6 +456,7 @@ sound_source_t *sound_source(sound_buffer_t *buffer)
 	memset(src, 0, sizeof(sound_source_t));
 
 	src->channel = ch;
+	channel_owner[ch] = src;
 	src->buffer  = buffer;
 	src->playing = false;
 	src->looping = false;
