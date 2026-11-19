@@ -38,6 +38,7 @@ bool file_time( const char * path, struct filetime *t );
 long Read_File( char * Filename, char * File_Buffer, long Read_Size );
 bool File_Exists( const char * Filename );
 bool delete_file( char * path );
+bool replace_file( const char * from, const char * to );
 
 char* find_file( const char * path );
 char* find_next_file( void );

@@ -176,6 +176,21 @@ bool delete_file( char * str )
 	return (unlink( path )==0);
 }
 
+/* Rename from over to (both through convert_path). Where rename will not
+   replace an existing file (the 3DS SD card), the old to is deleted first
+   and the rename retried. */
+bool replace_file( const char * from, const char * to )
+{
+	char src[ 500 ];
+	strncpy( src, convert_path( from ), sizeof( src ) - 1 );
+	src[ sizeof( src ) - 1 ] = 0;
+	char * dst = convert_path( to );
+	if( rename( src, dst ) == 0 )
+		return true;
+	unlink( dst );
+	return rename( src, dst ) == 0;
+}
+
 /* File search: find_file starts a glob (after convert_path) and returns the
    first match's file name without its folder, find_next_file the next, NULL
    when there are no more; find_close frees the search. Names point into

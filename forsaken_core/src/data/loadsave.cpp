@@ -363,7 +363,9 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 	int16_t		i;
 	int8_t		RealLevelName[ 128 + 1 ];
 	int8_t		Filename[ 256 ];
+	int8_t		TmpFilename[ 256 ];
 	int8_t		SFilename[ 256 ];
+	FILE	*	out;
 	int16_t		Hours, Minutes, Seconds;
 	int8_t		sep = 0;
 	u_int32_t		MagicNumber = MAGIC_NUMBER;
@@ -413,7 +415,14 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 		return false;
 	}
 
-	fp = file_open( (char*)&Filename[ 0 ], "wb" );
+	/* Write to a temporary file and replace the slot's save only once the
+	 * whole state is written, so a failure part way (a full card, the console
+	 * switched off) leaves the previous save intact instead of a truncated
+	 * one. The Save* calls hand fp back, or NULL on failure; out is kept to
+	 * close the file either way. */
+	strcpy( (char*)TmpFilename, (char*)Filename );	// saveNN.SAV -> saveNN.TMP
+	strcpy( strrchr( (char*)TmpFilename, '.' ), ".TMP" );
+	out = fp = file_open( (char*)&TmpFilename[ 0 ], "wb" );
 
 	if( fp != NULL )
 	{
@@ -437,55 +446,71 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 		fwrite( &Lives, sizeof( Lives ), 1, fp );
 
 		fp = SaveShips( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		if( !Enemy_Save( fp ) )
-			return false;
+			goto fail;
 		fp = SaveAllSfx( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveTextureAnimations( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveStartRestartPoints( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveRemoteCameras( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveScreenPolys( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveTriggerAreas( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveExternalForces( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveTeleports( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveRealTimeLights( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveXLights( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveAllTriggers( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveBGObjects( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveAllPickups( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SavePrimBulls( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveSecBulls( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveModels( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SavePolys( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveFmPolys( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveAllSpotFX( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 		fp = SaveAllText( fp );
-		if( !fp ) return false;
+		if( !fp ) goto fail;
 
 		fwrite( &Cheated, sizeof( bool ), 1, fp );
 
-		fclose( fp );
+		if( ferror( out ) )
+			goto fail;
+		if( fclose( out ) != 0 )
+		{
+			delete_file( (char*)TmpFilename );
+			return false;
+		}
+		if( !replace_file( (char*)TmpFilename, (char*)Filename ) )
+		{
+			delete_file( (char*)TmpFilename );
+			return false;
+		}
 		return true;
 	}
+	return false;
+
+fail:
+	fclose( out );
+	delete_file( (char*)TmpFilename );
 	return false;
 }
 

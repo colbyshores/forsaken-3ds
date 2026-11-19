@@ -2812,8 +2812,7 @@ FILE * SaveShips( FILE * fp )
 				TempPtr = NULL;
 			}
 
-			fclose( fp );
-			return( NULL );
+			return( NULL );	// the caller closes fp
 		}
 
 		if( TempPtr )
@@ -2860,8 +2859,7 @@ FILE * SaveShips( FILE * fp )
 		Ships[ i ].Object.Type = OBJECT_TYPE_SHIP;
 		if( !Object_Save( fp , &Ships[ i ].Object ) )
 		{
-			fclose( fp );
-			return( NULL );
+			return( NULL );	// the caller closes fp
 		}
 
 		fwrite( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
