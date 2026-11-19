@@ -7820,7 +7820,7 @@ static int read_NumOfGuns( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %hu", &EnemyTypes[CurrentEnemy].NumOfGuns ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7833,7 +7833,7 @@ static int read_GunType( FILE *f, char *last_token )
 	// as shipped has no GunType keyword, so this is not reached.
 	if ( fscanf( f, " %hu", &EnemyTypes[CurrentEnemy].GunType[CurrentGun] ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7846,7 +7846,7 @@ read_TurnRateAccell( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].TurnRateAccell ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7858,7 +7858,7 @@ read_TurnRateDecell( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].TurnRateDecell ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7870,7 +7870,7 @@ read_MaxTurnRate( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].MaxTurnRate ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7882,7 +7882,7 @@ read_MoveRateAccell( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].MoveRateAccell ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7894,7 +7894,7 @@ read_MoveRateDecell( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].MoveRateDecell ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7906,7 +7906,7 @@ read_MaxMoveRate( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].MaxMoveRate ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7918,7 +7918,7 @@ read_Viewcone( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Viewcone ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7930,7 +7930,7 @@ read_MinRange( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].MinRange ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7942,7 +7942,7 @@ read_MaxRange( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].MaxRange ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7953,7 +7953,7 @@ static int read_Shield( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %hd", &EnemyTypes[CurrentEnemy].Shield ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7969,7 +7969,7 @@ static int read_PowerLevel( FILE *f, char *last_token )
 			EnemyTypes[CurrentEnemy].PowerLevel = 0;
 		if( EnemyTypes[CurrentEnemy].PowerLevel >= 3 )
 			EnemyTypes[CurrentEnemy].PowerLevel = 2;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7981,7 +7981,7 @@ read_MoveRestrictClearTime( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].MoveRestrictClearTime ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -7993,7 +7993,7 @@ read_Radius( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Radius ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8005,7 +8005,7 @@ read_PrimaryFireRate( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].PrimaryFireRate ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8017,7 +8017,7 @@ read_SecondaryFireRate( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].SecondaryFireRate ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8029,7 +8029,7 @@ read_Anticipate_Move( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.Anticipate_Move ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8041,7 +8041,7 @@ read_NetworkRange( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.NetworkRange ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8054,7 +8054,7 @@ static int read_Avoid_Primary( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.Avoid_Primary ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8065,7 +8065,7 @@ static int read_Avoid_Secondary( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.Avoid_Secondary ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8076,7 +8076,7 @@ static int read_AvoidMines( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.Avoid_Mines ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8089,7 +8089,7 @@ read_IdleTime( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.IdleTime ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8101,7 +8101,7 @@ read_ScanTime( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.ScanTime ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8113,7 +8113,7 @@ read_ThinkTime( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.ThinkTime ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8125,7 +8125,7 @@ read_ThinkRange( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.ThinkRange ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8137,7 +8137,7 @@ read_HearRange( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.HearRange ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8149,7 +8149,7 @@ read_BlindSearchTime( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &EnemyTypes[CurrentEnemy].Behave.BlindSearchTime ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8176,7 +8176,7 @@ read_PrimaryWeaponType( FILE *f, char *last_token )
 	if ( fscanf( f, " %d", &temp ) == 1 )
 	{
 		EnemyTypes[CurrentEnemy].PrimaryWeaponType = temp;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8190,7 +8190,7 @@ read_SecondaryWeaponType( FILE *f, char *last_token )
 	if ( fscanf( f, " %d", &temp ) == 1 )
 	{
 		EnemyTypes[CurrentEnemy].SecondaryWeaponType = temp;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8231,7 +8231,7 @@ read_Flags( FILE *f, char *last_token )
 		{ nullptr , 0 } };
 
 	EnemyTypes[CurrentEnemy].Behave.Flags = 0;
-	while ( fscanf( f, " %80s", last_token ) == 1 )
+	while ( file_read_token( f, last_token ) )
 	{
 		i = 0;
 		while( tab[i].keyword )
@@ -8247,7 +8247,7 @@ read_Flags( FILE *f, char *last_token )
 			return 0;
 	}
 
-	fscanf( f, " %80s", last_token );
+	file_read_token( f, last_token );
 	return 1;
 }
 
@@ -8337,7 +8337,7 @@ static int read_EnemyType( FILE *f, char *last_token )
 	 * indexes past the end with the new enum gap (slots 56-99 are
 	 * reserved but have no keyword entries). */
 	const int tab_size = (int)(sizeof(tab) / sizeof(tab[0]));
-	if ( fscanf( f, " %80s", last_token ) == 1 )
+	if ( file_read_token( f, last_token ) )
 	{
 		for( i = 0 ; i < tab_size ; i++ )
 		{
@@ -8352,7 +8352,7 @@ static int read_EnemyType( FILE *f, char *last_token )
 			CurrentEnemy = tab[i].EnemyType;
 		}
 	}
-	fscanf( f, " %80s", last_token );
+	file_read_token( f, last_token );
 	return 1;
 }
 // Read Gun Type
@@ -8360,7 +8360,7 @@ static int read_NewGunType( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %hu", &CurrentGun ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8371,7 +8371,7 @@ static int read_Gun_MaxTurnSpeed( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &GunTypes[CurrentGun].gtMaxTurnSpeed ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8382,7 +8382,7 @@ static int read_Gun_TurnAccell( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &GunTypes[CurrentGun].gtTurnAccell ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8393,7 +8393,7 @@ static int read_Gun_TurnDecell( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &GunTypes[CurrentGun].gtTurnDecell ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8404,7 +8404,7 @@ static int read_Gun_ReloadTime( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &GunTypes[CurrentGun].ReloadTime ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8415,7 +8415,7 @@ static int read_Gun_BurstMasterTime( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &GunTypes[CurrentGun].BurstMasterTime ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8426,7 +8426,7 @@ static int read_Gun_BurstMasterCount( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %d", &GunTypes[CurrentGun].BurstMasterCount ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8437,7 +8437,7 @@ static int read_Gun_BurstAngle( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %f", &GunTypes[CurrentGun].BurstAngle ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8448,7 +8448,7 @@ static int read_Gun_PowerLevel( FILE *f, char *last_token )
 {
 	if ( fscanf( f, " %hd", &GunTypes[CurrentGun].PowerLevel ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8462,7 +8462,7 @@ static int read_Gun_PrimarySecondary( FILE *f, char *last_token )
 	{
 		if( temp ) GunTypes[CurrentGun].PrimarySecondary = true;
 		else GunTypes[CurrentGun].PrimarySecondary = false;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8476,7 +8476,7 @@ static int read_Gun_PreciseRotation( FILE *f, char *last_token )
 	{
 		if( temp ) GunTypes[CurrentGun].PreciseRotation = true;
 		else GunTypes[CurrentGun].PreciseRotation = false;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8490,7 +8490,7 @@ static int read_Gun_WeaponType( FILE *f, char *last_token )
 	if ( fscanf( f, " %d", &temp ) == 1 )
 	{
 		GunTypes[CurrentGun].WeaponType = (BYTE) temp;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -8560,7 +8560,7 @@ bool ReadEnemyTxtFile( const char * Filename )
 		{ nullptr,						nullptr						}
 	};
 	FILE *f;
-	char token[256];
+	char token[ FILE_TOKEN_SIZE ];
 	int j;
 
 	CurrentEnemy = 0;
@@ -8574,21 +8574,24 @@ bool ReadEnemyTxtFile( const char * Filename )
 		return false;
 	}
 
-	if ( fscanf( f, " %80s", token ) == 1 )
+	if ( file_read_token( f, token ) )
 	{
 		do
 		{
+			long start = ftell( f );
+
 			for ( j = 0; jumptab[ j ].keyword; j++ )
 			{
 				if ( !strcasecmp( token, jumptab[ j ].keyword ) )
 					break;
 			}
 			if ( jumptab[ j ].handle )
-			{
 				(jumptab[ j ].handle)( f, token );
-			}
-			else
-				fscanf( f, " %80s", token );
+
+			// an unknown keyword, or one whose value did not parse (its
+			// handler read nothing): move on to the next token
+			if ( ftell( f ) == start )
+				file_read_token( f, token );
 		} while ( !feof( f ) );
 	}
 	fclose( f );

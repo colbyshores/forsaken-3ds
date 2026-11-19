@@ -348,7 +348,8 @@ read_keydef( FILE *f, USERKEY *k, char *last_token )
 
 	char line[256];
 	char * ptr = line;
-	fgets(line,256,f);
+	if( !fgets( line, sizeof( line ), f ) )
+		line[ 0 ] = 0;
 
 	init_key_map();
 
@@ -636,13 +637,14 @@ read_general_macro( FILE *f, char *config_macro, char *last_token, TEXT *macro )
 	char tempstr[ MAXTEXTMSG ];
 	static char fmt[80];
 
-	sprintf( fmt, " %%%d[^\n]", MAXTEXTMSG );
+	sprintf( fmt, " %%%d[^\n]", MAXTEXTMSG - 1 );	// leave room for the NUL
 
-	fscanf( f, fmt, tempstr );
+	if( fscanf( f, fmt, tempstr ) != 1 )
+		tempstr[ 0 ] = 0;
 	strncpy( config_macro, tempstr, MAXTEXTMSG );
 	strncpy( macro->text, tempstr, MAXTEXTMSG );
 
-	fscanf( f, " %80s", last_token );
+	file_read_token( f, last_token );
 
 	return 1;
 }
@@ -694,7 +696,7 @@ read_mouse_sensitivity( FILE *f, USERCONFIG *u, char *last_token )
 		num_read = 0;
 		break;
 	}
-	fscanf( f, " %80s", last_token );
+	file_read_token( f, last_token );
 
 	return num_read;
 }
@@ -702,12 +704,12 @@ read_mouse_sensitivity( FILE *f, USERCONFIG *u, char *last_token )
 static int
 read_name( FILE *f, USERCONFIG *u, char *last_token )
 {
-	char namebuf[80];
-	int ok;
+	char namebuf[ FILE_TOKEN_SIZE ];
+	bool ok;
 
-	ok = fscanf( f, " %80s", namebuf );
-	fscanf( f, " %80s", last_token );
-	if ( ok == 1 )
+	ok = file_read_token( f, namebuf );
+	file_read_token( f, last_token );
+	if ( ok )
 	{
 		strncpy( u->name, namebuf, MAX_PLAYER_NAME_LENGTH );
 		u->name[ MAX_PLAYER_NAME_LENGTH - 1 ] = 0;
@@ -722,7 +724,7 @@ read_invert_pitch( FILE *f, USERCONFIG *u, char *last_token )
 {
 	if ( fscanf( f, " %d", &u->invert_pitch ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -734,7 +736,7 @@ read_invert_turn( FILE *f, USERCONFIG *u, char *last_token )
 {
 	if ( fscanf( f, " %d", &u->invert_turn ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -746,7 +748,7 @@ read_bike( FILE *f, USERCONFIG *u, char *last_token )
 {
 	if ( fscanf( f, " %hd", &u->bike ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -760,7 +762,7 @@ read_bikecomp( FILE *f, USERCONFIG *u, char *last_token )
 	{
 		if( u->bikecomp > ( BikeComputerList.items - 1 ) )
 			u->bikecomp = 0;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -772,7 +774,7 @@ read_autolevel( FILE *f, USERCONFIG *u, char *last_token )
 {
 	if ( fscanf( f, " %f", &u->autolevel_rate ) == 1 )
 	{
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -788,7 +790,7 @@ read_aim_assist( FILE *f, USERCONFIG *u, char *last_token )
 		/* clamp to sane range */
 		if ( u->aim_assist_strength < 0.0F ) u->aim_assist_strength = 0.0F;
 		if ( u->aim_assist_strength > 1.0F ) u->aim_assist_strength = 1.0F;
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		return 1;
 	}
 	else
@@ -819,7 +821,7 @@ read_preferred_primary( FILE *f, USERCONFIG *u, char *last_token )
 			}
 		}
 	}
-	fscanf( f, " %80s", last_token );
+	file_read_token( f, last_token );
 	return 1;
 }
 
@@ -848,7 +850,7 @@ read_preferred_secondary( FILE *f, USERCONFIG *u, char *last_token )
 			}
 		}
 	}
-	fscanf( f, " %80s", last_token );
+	file_read_token( f, last_token );
 	return 1;
 }
 
@@ -1001,12 +1003,11 @@ read_joystick_info( FILE *f, USERCONFIG *u, char *last_token )
 	}while (c != '\n');
 
 	// get joystick name...
-	fgets( tempstr, 255, f );
-	if ( feof( f ) || (strlen(tempstr) == 0))
+	if ( !fgets( tempstr, sizeof( tempstr ), f ) || feof( f ) || (strlen(tempstr) == 0))
 		return 0;
 	tempstr[strlen(tempstr) - 1] = '\0';
 
-	if (fscanf( f, " %80s", last_token ) != 1)
+	if ( !file_read_token( f, last_token ) )
 		return 0;
 
 	// look for matching, joystick. If found, assign actions & set assigned to true
@@ -1054,7 +1055,7 @@ read_joystick_info( FILE *f, USERCONFIG *u, char *last_token )
 					joy->NumButtons = i + 1;
 			}
 		}
-		if (fscanf( f, " %80s", last_token ) != 1)
+		if ( !file_read_token( f, last_token ) )
 			return 0;
 	}
 
@@ -1071,7 +1072,7 @@ read_joystick_info( FILE *f, USERCONFIG *u, char *last_token )
 					joy->NumPOVs = i + 1;
 			}
 		}
-		if (fscanf( f, " %80s", last_token ) != 1)
+		if ( !file_read_token( f, last_token ) )
 			return 0;
 	}
 
@@ -1101,35 +1102,35 @@ read_joystick_info( FILE *f, USERCONFIG *u, char *last_token )
 		}
 		if ( fscanf( f, " %d", &num ) != 1 )
 		{
-			fscanf( f, " %80s", last_token );
+			file_read_token( f, last_token );
 			continue;
 		}
 		joy->Axis[axis].inverted = num;
 		if ( fscanf( f, " %d", &num ) != 1 )
 		{
-			fscanf( f, " %80s", last_token );
+			file_read_token( f, last_token );
 			continue;
 		}
 		joy->Axis[axis].deadzone = num;
 		if ( fscanf( f, " %d", &num ) != 1 )
 		{
-			fscanf( f, " %80s", last_token );
+			file_read_token( f, last_token );
 			continue;
 		}
 		joy->Axis[ axis ].sensitivity = ( num < 100 ) ?
 			1.0F / ( 100 - num ) : 1.0F;
 		if ( fscanf( f, " %d", &num ) != 1 )
 		{
-			fscanf( f, " %80s", last_token );
+			file_read_token( f, last_token );
 			continue;
 		}
 		joy->Axis[ axis ].fine = num;
 		if ( fscanf( f, " %d", &num ) != 1 )
 		{
-			fscanf( f, " %80s", last_token );
+			file_read_token( f, last_token );
 			continue;
 		}
-		fscanf( f, " %80s", last_token );
+		file_read_token( f, last_token );
 		joy->Axis[axis].action = num;
 	}
 
@@ -1339,7 +1340,7 @@ read_config( USERCONFIG *u, char *cfg_name )
 {
 
 	FILE *f;
-	char token[80];
+	char token[ FILE_TOKEN_SIZE ];
 	int j;
 
 	// all the config settings
@@ -1435,26 +1436,25 @@ read_config( USERCONFIG *u, char *cfg_name )
 
 
 	// get a 80 character wide string from file
-	if ( fscanf( f, " %80s", token ) == 1 )
+	if ( file_read_token( f, token ) )
 	{
 		do
 		{
+			long start = ftell( f );
+
 			// find which keyword is equal to the current cfg value
 			for ( j = 0; jumptab[ j ].keyword; j++ )
 				if ( !strcasecmp( token, jumptab[ j ].keyword ) )
 					break;
 
-			// if the handle is valid
+			// run its handler
 			if ( jumptab[ j ].handle )
-
-				// execute the handle
 				(jumptab[ j ].handle)( f, u, token );
 
-			// the handle was not valid
-			else
-
-				// get the next token
-				fscanf( f, " %80s", token );
+			// an unknown keyword, or one whose value did not parse (its
+			// handler read nothing): move on to the next token
+			if ( ftell( f ) == start )
+				file_read_token( f, token );
 
 			// while were not at the end of the file
 		} while ( !feof( f ) );

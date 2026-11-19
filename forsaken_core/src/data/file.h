@@ -18,6 +18,10 @@
  * file_read is fread for the loaders that read a block of fields and then
  * test the stream once (feof/ferror stay set after any short read): the
  * per-call count is deliberately not returned. file_read_ok is that test.
+ * file_read_token reads the next whitespace-delimited word of a text file
+ * (at most 80 characters, so the buffer is FILE_TOKEN_SIZE) the way the
+ * enemies.txt and pilot config parsers step through their keywords; at
+ * the end of the file it leaves the token empty.
  */
 
 #include "game/main.h"
@@ -58,6 +62,16 @@ bool file_read_cstring( FILE * fp, char * dst, size_t size );
 {
 	size_t got = fread( dst, size, count, fp );	/* a short read is reported */
 	(void) got;									/* by the stream's flags     */
+}
+
+constexpr size_t FILE_TOKEN_SIZE = 81;	/* 80 characters and the NUL */
+
+inline bool file_read_token( FILE * fp, char * token )
+{
+	if( fscanf( fp, " %80s", token ) == 1 )
+		return true;
+	token[ 0 ] = 0;
+	return false;
 }
 
 /* True while no read on fp has run past the end of the file or failed. */
