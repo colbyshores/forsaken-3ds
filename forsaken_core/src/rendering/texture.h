@@ -8,7 +8,7 @@
  * treat pure black as transparent. The PNG loader ignores the mipmap argument.
  */
 
-typedef struct {
+struct texture_image_t {
 	int id;			// internal id
 	int w;			// width
 	int h;			// height
@@ -16,7 +16,7 @@ typedef struct {
 	int colorkey;	// bool - requires colorkeying
 	char path[256];	// image path
 	char * data;	// image data (bytes)
-} texture_image_t;
+};
 
 int load_image( texture_image_t * image, int mipmap ); //, float gamma );
 void destroy_image( texture_image_t * image );

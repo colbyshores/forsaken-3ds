@@ -21,7 +21,7 @@ constexpr int GOAL_NONE = (0);
 constexpr int GOAL_SCORED = (1);
 constexpr int GOAL_WRONG = (-1);
 
-typedef struct GOAL
+struct GOAL
 {
 	u_int16_t	state;
 	int		team;
@@ -36,7 +36,7 @@ typedef struct GOAL
 	float	depth;
 	u_int16_t	num_sides;
 	TRIGGER_ZONE	*Zone;
-} GOAL;
+};
 
 
 bool GoalLoad( void );

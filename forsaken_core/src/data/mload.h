@@ -47,35 +47,35 @@ constexpr auto NOT_LEVEL_SPECIFIC = false;
  * structures
  */
 
-typedef struct  {
+struct PROJPOINT {
 	float u, v;
-} PROJPOINT;
+};
 
 
 
-typedef struct MCFACE {
+struct MCFACE {
 	u_int32_t type;
 	float nx;
 	float ny;
 	float nz;
 	float D;
 	PROJPOINT v[ 4 ];
-} MCFACE;
+};
 static_assert( sizeof( MCFACE ) == 52, "MCFACE is a file record" );
 
 
-typedef struct VERTEXCELL{
+struct VERTEXCELL{
 	u_int16_t	num_verts_in_cell;
 	u_int16_t	start_vert_in_cell;
-}VERTEXCELL;
+};
 
 
-typedef struct STARTPOS{
+struct STARTPOS{
 	VECTOR	Pos;
 	VECTOR	Dir;
 	VECTOR	Up;
 	u_int16_t	Group;
-}STARTPOS;
+};
 static_assert( sizeof( STARTPOS ) == 40, "STARTPOS is a file record (2 trailing pad bytes)" );
 
 typedef struct _GAMESTARTPOS{
@@ -86,16 +86,16 @@ typedef struct _GAMESTARTPOS{
 	u_int16_t	NextInGroup;
 }GAMESTARTPOS;
 
-typedef struct PORTALPOLY
+struct PORTALPOLY
 {
 	u_int16_t num_vertices_in_poly;
 	VERT   Verts[MAXVERTSPERPORTALPOLY];
-}PORTALPOLY;
+};
 
 
-typedef struct VISTREE VISTREE;
+struct VISTREE;
 
-typedef struct PORTAL PORTAL;
+struct PORTAL;
 
 
 struct VISTREE
@@ -118,12 +118,12 @@ struct PORTAL{
 };
 
 
-typedef struct  {
+struct TANIMUV {
 	float u, v;
-} TANIMUV;
+};
 
 
-typedef struct  {
+struct POLYANIM {
 	u_int16_t	State;
 	u_int16_t	animation;
 	float	CurrentTime;
@@ -138,7 +138,7 @@ typedef struct  {
 	TANIMUV	* UVs;
 	char	Tag[32];
 	int16_t	WhenStoppedTriggerMod;
-} POLYANIM;
+};
 
 typedef struct _TEXTUREANIMINFOINDEX{
 	u_int16_t	Group;
@@ -148,15 +148,15 @@ typedef struct _TEXTUREANIMINFOINDEX{
 }TEXTUREANIMINFOINDEX;
 
 
-typedef struct  {
+struct ANIMDATA {
 	u_int16_t	num_animating_polys;
 TEXTUREANIMINFOINDEX * TAnimInfoIndex;
 	u_int16_t	num_animations;
 	u_int16_t * AnimSeq[MAXANIMSEQS];
-}ANIMDATA;
+};
 
 
-typedef struct LVLGROUP{
+struct LVLGROUP{
 	u_int16_t	num_meshes;
 	u_int16_t	mesh_type[MAXMESHESPERGROUP];
 	u_int16_t	num_verts_per_mesh[MAXMESHESPERGROUP];
@@ -190,10 +190,10 @@ typedef struct LVLGROUP{
 	u_int32_t				AnimOncePerFrame;					// used for stuff that is displayed more than once in a single frame..
 	u_int8_t		color_clean;						// the meshes hold their baked colours: XLight1Group can skip restoring them
 	u_int8_t		color_clean_pad[3];
-}LVLGROUP;
+};
 
 
-typedef struct MLOADHEADER{
+struct MLOADHEADER{
 	int					state;								// false if not loaded properly...
 	char		*		OrgAddr;							// the .mxv file, from PreMload until Mload has copied it out
 	const char	*		Buffer;								// where Mload starts reading OrgAddr
@@ -204,11 +204,11 @@ typedef struct MLOADHEADER{
 	char                ImageFile[MAXTPAGESPERMLOAD][32];	// Texture Files....
 	float				CellSize;
 	ANIMDATA			AnimData;
-}MLOADHEADER;
+};
 
 
 
-typedef struct MVERT {
+struct MVERT {
 	float x;
 	float y;
 	float z;
@@ -217,9 +217,9 @@ typedef struct MVERT {
 	float nz;
 	float tu;
 	float tv;
-} MVERT;
+};
 
-typedef struct MFACE {
+struct MFACE {
 	u_int16_t v1;
 	u_int16_t v2;
 	u_int16_t v3;
@@ -227,7 +227,7 @@ typedef struct MFACE {
 	float nx;
 	float ny;
 	float nz;
-} MFACE;
+};
 static_assert( sizeof( MFACE ) == 20, "MFACE is a file record" );
 
 

@@ -173,7 +173,7 @@ void input_buffer_reset( void );
 
 constexpr int MAX_MOUSE_BUTTONS = (255);
 
-typedef struct {
+struct mouse_state_t {
 
 	// wheel state -1 (down) 0 (nothing) 1 (up)
 	int wheel;
@@ -185,7 +185,7 @@ typedef struct {
 	int xrel;
 	int yrel;
 
-} mouse_state_t;
+};
 
 // this holds the current state each loop
 extern mouse_state_t mouse_state;
@@ -228,7 +228,7 @@ constexpr int MAX_JOYNAME = 16;
 
 extern int Num_Joysticks;
 
-typedef struct {
+struct JOYSTICKINFO {
 	bool assigned;
 	bool connected;
 #if !defined(__3DS__)
@@ -241,7 +241,7 @@ typedef struct {
 	JOYSTICKPOV POV[MAX_JOYSTICK_POVS];
 	int NumAxis;
 	JOYSTICKAXIS Axis[MAX_JOYSTICK_AXIS];
-} JOYSTICKINFO;
+};
 
 extern JOYSTICKINFO JoystickInfo[MAX_JOYSTICKS];
 

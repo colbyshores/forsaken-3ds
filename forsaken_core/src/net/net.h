@@ -41,23 +41,23 @@
 
 constexpr int NETWORK_DEFAULT_PORT = 2300;
 
-typedef enum {
+enum network_return_t {
 	NETWORK_OK,			// success
 	NETWORK_ERROR_INIT,	// failed to initialize
 	NETWORK_ERROR_BIND	// failed to bind socket
-} network_return_t;
+};
 
 /*
  *  Network State
  */
 
-typedef enum {
+enum network_state_t {
 	NETWORK_CONNECTED,		// in the game
 	NETWORK_CONNECTING,		// connecting to host
 	NETWORK_DISCONNECTED,	// not connect yet
 	NETWORK_SYNCHING,		// connecting to all players
 	NETWORK_SYNCH_FAILED,	// failed to synch with other players
-} network_state_t;
+};
 
 extern network_state_t network_state;
 
@@ -96,11 +96,11 @@ struct  _network_player_t {
 	void* data; // internal use only
 };
 
-typedef struct {
+struct network_players_t {
 	int length;
 	network_player_t * first;
 	network_player_t * last;
-} network_players_t;
+};
 
 extern network_players_t network_players;
 
@@ -137,11 +137,11 @@ void network_set_player_name( char* name );
 // own, so passing it also makes the packet reliable. The enet backend sends
 // at once (flushes) any packet with RELIABLE or SEQUENCED set, and
 // network_broadcast always flushes.
-typedef enum {
+enum network_flags_t {
 	NETWORK_RELIABLE	= 2, // note: reliable is also sequenced
 	NETWORK_SEQUENCED	= 4, //
 	NETWORK_FLUSH		= 6, // = RELIABLE | SEQUENCED (see above)
-} network_flags_t;
+};
 
 // channel 0 is reserved (the enet backend's own handshake traffic)
 // data is copied... so you can free it right after function call
@@ -152,19 +152,19 @@ void network_broadcast( void* data, int size, network_flags_t flags, int channel
  *  Network Events
  */
 
-typedef enum { // data = struct network_player_t or NULL (local player)
+enum network_event_type_t { // data = struct network_player_t or NULL (local player)
 	NETWORK_JOIN	= 2,
 	NETWORK_LEFT	= 4,
 	NETWORK_HOST	= 6,
 	NETWORK_NAME	= 8, // player changed name
 	NETWORK_DATA	= 10, // data = network_packet_t
-} network_event_type_t;
+};
 
-typedef struct {
+struct network_packet_t {
 	int size;
 	void* data;
 	network_player_t* from;
-} network_packet_t;
+};
 
 // implemented by the game (networking.cpp), called by the backend from network_pump
 void network_event( network_event_type_t, void* data );

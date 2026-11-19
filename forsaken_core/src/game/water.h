@@ -42,7 +42,7 @@ enum class WaterStatus : u_int16_t
 	Filling,
 };
 
-typedef struct WATEROBJECT{
+struct WATEROBJECT{
 	u_int32_t	AnimOncePerFrame;	// used for stuff that is displayed more than once in a single frame..or maybe called for multiple cameras..
 	WaterStatus	Status;
 	u_int16_t	Group;
@@ -79,7 +79,7 @@ typedef struct WATEROBJECT{
 	float	Damage;
 
 
-}WATEROBJECT;
+};
 
 
 

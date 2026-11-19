@@ -39,15 +39,15 @@ constexpr int MAXLINES = 2000;
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct MY_RGB {
+struct MY_RGB {
 
 	u_int8_t		R;
 	u_int8_t		G;
 	u_int8_t		B;
 
-} MY_RGB;
+};
 
-typedef struct LINE {
+struct LINE {
 
 	u_int16_t		Next;
 	u_int16_t		Prev;
@@ -59,7 +59,7 @@ typedef struct LINE {
 	u_int8_t		EndTrans;			// End Transparency
 	u_int16_t		Group;				// Group ImIn
 
-} LINE;
+};
 
 
 /*===================================================================

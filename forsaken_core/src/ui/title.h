@@ -58,15 +58,14 @@ constexpr int DIFF_Vhard = 3;
 
 // order of this list must match GameTypeNameTable
 constexpr int MAX_GAMETYPE = 5;
-typedef enum
-{
+enum game_t {
 GAME_Normal,			// 0 free for all
 GAME_FlagChase,			// 1
 GAME_BountyHunt,		// 2
 GAME_TeamBountyHunt,	// 3
 GAME_Team,				// 4
 GAME_CTF,				// 5
-} game_t;
+};
 
 /* How the single-player campaign ended, which picks the end sequence. */
 enum class GameComplete : int
@@ -80,8 +79,7 @@ enum class GameComplete : int
 };
 
 
-typedef enum
-{
+enum MENUSTATE {
 	MENUSTATE_Select,
 	MENUSTATE_Keydef,
 	MENUSTATE_Keydef2,
@@ -98,7 +96,7 @@ typedef enum
 	MENUSTATE_DifficultySet,
 	MENUSTATE_SelectSavedGame,
 	MENUSTATE_SelectKeydef,
-}MENUSTATE;
+};
 
 enum
 {
@@ -218,8 +216,7 @@ enum class HighlightType : int
 	Static,
 };
 
-typedef struct
-{
+struct TEXTINFO {
 	u_int8_t	*text;						// text string
 	u_int8_t	oldtext[MAX_TEXT_LENGTH];	// used for checking if text has changed
 	bool	highlight;					// item highlighted?
@@ -248,7 +245,7 @@ typedef struct
 	float	text_y_max;
 	bool	force_fit;
 	bool	finished[MAXNUMLINES];
-}TEXTINFO;
+};
 
 typedef struct _MENU MENU;
 typedef struct _MENUITEM MENUITEM;
@@ -353,12 +350,11 @@ struct _TITLE_EVENT_TIMER
 
 constexpr int MAXTEXTPERMENUITEM = 32;
 
-typedef struct
-{
+struct SCANLINES {
 	VECTOR start;
 	VECTOR end;
 	TRIANGLE poly;
-} SCANLINES;
+};
 
 
 struct _MENUITEM
@@ -437,12 +433,11 @@ struct _TEXT
 constexpr int EXCLUDE_ALL = -1;
 constexpr int MAXEXCLUDEDVERTICES = 16;
 
-typedef struct
-{	int Group;
+struct EXCLUDEDVERTICES {	int Group;
 	int Mesh;
 	int NumVertices;
 	int VertexPtr[MAXEXCLUDEDVERTICES];
-} EXCLUDEDVERTICES;
+};
 
 // globals
 

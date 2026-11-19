@@ -93,16 +93,16 @@ enum class ScrSeq : int16_t
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef	struct SCRPOLY_RGB {
+struct SCRPOLY_RGB {
 
 	u_int8_t	R;
 	u_int8_t	G;
 	u_int8_t	B;
 	u_int8_t	Trans;
 
-} SCRPOLY_RGB;
+};
 
-typedef struct SCRPOLY {
+struct SCRPOLY {
 
 	u_int16_t			Next;
 	u_int16_t			Prev;
@@ -141,7 +141,7 @@ typedef struct SCRPOLY {
 	SCRPOLY_RGB		Col3;				// Colour 3
 	SCRPOLY_RGB		Col4;				// Colour 4
 
-} SCRPOLY;
+};
 
 /*===================================================================
 	Protptypes

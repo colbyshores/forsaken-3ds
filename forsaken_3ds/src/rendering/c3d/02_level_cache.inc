@@ -24,14 +24,14 @@ constexpr auto PERSIST_SIZE = (1u << PERSIST_BITS);
 constexpr auto PERSIST_MASK = (PERSIST_SIZE - 1u);
 /* Linear memory the cache always leaves free (see persist_store). */
 constexpr auto PERSIST_LINEAR_RESERVE = (2u * 1024u * 1024u);
-typedef struct {
+struct persist_entry_t {
 	uintptr_t ro;
 	int sub;
 	gpu_vertex_t *buf;
 	int cap;
 	int count;
 	unsigned gen;
-} persist_entry_t;
+};
 static persist_entry_t s_persist[PERSIST_SIZE];
 static unsigned s_persistBytes = 0;
 /* Runtime gate (owner policy 2026-11-14): persist pays in mono

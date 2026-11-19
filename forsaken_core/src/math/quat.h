@@ -27,12 +27,12 @@
 	so data that stores quaternions (saves, level and network
 	structures) is unchanged.
 ===================================================================*/
-typedef struct SHORTQUAT {
+struct SHORTQUAT {
 	int16_t	w;
 	int16_t	x;
 	int16_t	y;
 	int16_t	z;
-} SHORTQUAT;
+};
 
 class QUAT {
 public:

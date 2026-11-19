@@ -41,15 +41,15 @@ constexpr int MAXGUNSPERENEMY = 5;
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct FIREPOS {
+struct FIREPOS {
 	int16_t	NumPoints;
 	VECTOR	Points[ 6 ];
 	VECTOR	Dir[ 6 ];
-} FIREPOS;
+};
 
 constexpr auto ENEMY_TAUNT_PAUSE = 600.0F;
 
-typedef struct ENEMY {
+struct ENEMY {
 	bool	Used;
 	bool	Alive;			// Am I Alive or dead
 	bool	CompCollision;
@@ -152,9 +152,9 @@ struct ENEMY * FormationLink;
 	VECTOR	JumpTarget;
 	float	JumpApexY;		/* parabola apex world Y (= target node->Pos.y) */
 #endif
-} ENEMY;
+};
 
-typedef struct AI_BEHAVIOUR{
+struct AI_BEHAVIOUR{
 	u_int32_t	Flags;								// flags to show what stuff I can Do..
 	float	Anticipate_Move;					// when targeting the player how far ahead can I predict where he will be....
 	float	NetworkRange;						// how far from my net work do I Wander...
@@ -168,10 +168,10 @@ typedef struct AI_BEHAVIOUR{
 	float	HearRange;							// How far away does a valid player target have to be before I can hear him..
 	float	BlindSearchTime;					// If I lose my Target how long will I persue him...
 	float	RetreatTime;					// If I lose my Target how long will I persue him...
-} AI_BEHAVIOUR;
+};
 
 
-typedef struct ENEMY_TYPES {
+struct ENEMY_TYPES {
 
 	const char *	ModelFilename;		// Model Filename or Component Filename ( .MX/.MXA or .COB )
 	bool	StealthMode;		// Can use Stealth
@@ -211,7 +211,7 @@ typedef struct ENEMY_TYPES {
 //	bool	DoIBank;					// When Turning Left and Right Do I Bank???
 
 struct	AI_BEHAVIOUR Behave;
-} ENEMY_TYPES;
+};
 
 
 /*===================================================================

@@ -27,7 +27,7 @@
 
 extern bool  bSquareOnly;
 
-typedef struct {
+struct render_viewport_t {
 	DWORD       X;
 	DWORD       Y;            /* Viewport Top left */
 	DWORD       Width;
@@ -36,25 +36,24 @@ typedef struct {
 	float       MaxZ;
 	float	ScaleX;
 	float	ScaleY;
-} render_viewport_t;
+};
 
-typedef struct {
+struct render_display_mode_t {
 	int     w;                /* width */
 	int     h;                /* height */
-} render_display_mode_t;
+};
 
-typedef struct
-{
+struct CLIENTSIZE {
 	long cx;
 	long cy;
-} CLIENTSIZE;
+};
 
 // stereo related enums
-typedef enum { STEREO_MODE_COLOR, STEREO_MODE_HALF_HEIGHT, STEREO_MODE_HALF_WIDTH, STEREO_MODE_3DS } stereo_mode_t;
-typedef enum { ST_CENTER, ST_LEFT, ST_RIGHT } stereo_position_t;
-typedef enum { ST_GREEN, ST_BLUE, ST_CYAN } stereo_right_color_t;
+enum stereo_mode_t { STEREO_MODE_COLOR, STEREO_MODE_HALF_HEIGHT, STEREO_MODE_HALF_WIDTH, STEREO_MODE_3DS };
+enum stereo_position_t { ST_CENTER, ST_LEFT, ST_RIGHT };
+enum stereo_right_color_t { ST_GREEN, ST_BLUE, ST_CYAN };
 
-typedef struct {
+struct render_info_t {
 	int                     NumModes;				/* number of available display modes */
 	int                     CurrMode;				/* number of current display mode (only when fullscreen) */
 	render_display_mode_t * Mode;					/* desc avail modes */
@@ -84,7 +83,7 @@ typedef struct {
 	stereo_position_t     stereo_position;
 	float                 stereo_eye_sep;
 	float                 stereo_focal_dist;
-} render_info_t;
+};
 
 /* The one render state (defined in main.cpp). */
 extern render_info_t render_info;
@@ -102,12 +101,12 @@ void reset_filtering( void );
 void set_whiteout_state( void );
 const char * render_error_description( int error );
 
-typedef struct {
+struct XYRECT {
 	long x1;
 	long y1;
 	long x2;
 	long y2;
-} XYRECT;
+};
 
 bool FSClearBlack(void);
 bool FSClear(XYRECT * rect);
@@ -168,7 +167,7 @@ constexpr int MAX_TEXTURE_GROUPS = 600;
 /* A backend texture (opaque to the engine). */
 typedef void * TEXTURE_HANDLE;
 
-typedef struct TEXTUREGROUP
+struct TEXTUREGROUP
 {
 	int startVert;
 	int startIndex;
@@ -176,7 +175,7 @@ typedef struct TEXTUREGROUP
 	int numTriangles;
 	bool colourkey;
 	TEXTURE_HANDLE texture;
-} TEXTUREGROUP;
+};
 
 /* A backend's vertex, normal or index buffer (opaque to the engine). */
 typedef void * BUFFER_HANDLE;
@@ -202,7 +201,7 @@ typedef void * BUFFER_HANDLE;
  * water, per-slot execs) never stamp: their identity is already unique
  * and the field simply stays put within a frame, which compares equal.
  * Additive fields only — all backends ignore them. */
-typedef enum {
+enum SMEMO_PASS {
 	SMEMO_PASS_UNSET = 0,      /* never stamped (stable identity) */
 	SMEMO_PASS_POLYS_CLIPPED = 1,
 	SMEMO_PASS_POLYS_UNCLIPPED = 2,
@@ -220,7 +219,7 @@ typedef enum {
 	 * stereo memo may reuse it within the frame; the persistent level
 	 * cache must not keep it. Set and cleared per frame by XLight1Group. */
 	SMEMO_PASS_PER_FRAME = 9
-} SMEMO_PASS;
+};
 /* Fill epoch for a whole-scene (unclipped) fill: no single group. */
 constexpr auto SMEMO_WHOLE_GROUP = 0xFFFFFFFFu;
 /* Resume point of a poly/FmPoly fill: the texture page AND the poly it
@@ -243,16 +242,16 @@ constexpr auto SMEMO_CHUNK_STEP = (1u << 28);
  * Set once at buffer-creation time by the owning loader; never changed
  * per frame. Backends may ignore it; the Citro3D bench counters use it
  * to attribute converted verts by owner class. */
-typedef enum {
+enum VERT_OWNER {
 	VERT_OWNER_OTHER = 0,   /* unclassified (billboard temps, execs, HUD) */
 	VERT_OWNER_LEVEL = 1,   /* MLOADHEADER level walls (static candidate) */
 	VERT_OWNER_MODEL = 2,   /* MXLOADHEADER models */
 	VERT_OWNER_MXA = 3,     /* MXALOADHEADER deformable models */
 	VERT_OWNER_SHARED = 4,  /* RenderBufs[*] shared exec slots */
 	VERT_OWNER_WATER = 5    /* water surface objects */
-} VERT_OWNER;
+};
 
-typedef struct RENDEROBJECT
+struct RENDEROBJECT
 {
 	BUFFER_HANDLE	vertexBuffer;
 	BUFFER_HANDLE	normalBuffer;
@@ -264,9 +263,9 @@ typedef struct RENDEROBJECT
 	unsigned int memoEpochGroup;
 	unsigned int memoEpochResume;
 	unsigned int vertOwner;
-} RENDEROBJECT;
+};
 
-typedef struct LEVELRENDEROBJECT
+struct LEVELRENDEROBJECT
 {
 	BUFFER_HANDLE	vertexBuffer;
 	BUFFER_HANDLE	normalBuffer;
@@ -278,9 +277,9 @@ typedef struct LEVELRENDEROBJECT
 	unsigned int memoEpochGroup;
 	unsigned int memoEpochResume;
 	unsigned int vertOwner;
-} LEVELRENDEROBJECT;
+};
 
-typedef struct {
+struct RENDERMATRIX {
 	union {
 		struct {
 			float        _11, _12, _13, _14;
@@ -290,7 +289,7 @@ typedef struct {
 		};
 		float m[4][4];
 	};
-} RENDERMATRIX;
+};
 
 extern int render_lighting_point_lights_only;
 extern int render_light_ambience;
@@ -373,7 +372,7 @@ extern bool g_wall_detail;
 
 /* One vertex as stored in the .mxv, .mx and .mxa files: Direct3D's 32-byte
    D3DLVERTEX record. The loaders convert each one to an LVERTEX. */
-typedef struct OLDLVERTEX {
+struct OLDLVERTEX {
 	float	x;
 	float	y;
 	float	z;
@@ -382,7 +381,7 @@ typedef struct OLDLVERTEX {
 	COLOR	specular;
 	float	tu;
 	float	tv;
-} OLDLVERTEX;
+};
 static_assert( sizeof( OLDLVERTEX ) == 32, "OLDLVERTEX is a file record" );
 
 /* Clip-outcode bits (the Direct3D values); visi.cpp uses them to clip portals. */

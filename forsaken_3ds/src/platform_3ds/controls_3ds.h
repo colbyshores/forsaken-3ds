@@ -28,7 +28,7 @@
  * — a mismatch is exactly the "Next Weapon actually does Thrust Forward"
  * class of bug. Slots 2/3 are thrust (not weapon switch); real weapon
  * switching lives on slots 10-13 and on the D-pad POV (see config.cpp). */
-typedef enum {
+enum controls_action_t {
 	CTRL_FIRE_PRIMARY = 0,    /* slot 0  -> fire primary    */
 	CTRL_FIRE_SECONDARY,      /* slot 1  -> fire secondary  */
 	CTRL_MOVE_FORWARD,        /* slot 2  -> thrust forward  */
@@ -46,9 +46,9 @@ typedef enum {
 	CTRL_SLIDE_UP,            /* slot 14 -> slide up        */
 	CTRL_SLIDE_DOWN,          /* slot 15 -> slide down      */
 	CTRL_NUM_ACTIONS
-} controls_action_t;
+};
 
-typedef struct {
+struct controls_3ds_t {
 	/* KEY_* mask per action (KEY_A, KEY_B, ..., KEY_ZL, KEY_ZR,
 	 * KEY_L, KEY_R, KEY_START, KEY_SELECT). 0 = unbound. */
 	u32 button[CTRL_NUM_ACTIONS];
@@ -61,7 +61,7 @@ typedef struct {
 	int cstick_axis_y;       /* 0..3 = engine axis index for stick Y */
 	int cstick_invert_x;     /* 0 or 1 */
 	int cstick_invert_y;     /* 0 or 1 */
-} controls_3ds_t;
+};
 
 /* Initialize bindings: load defaults (platform-aware), then overlay
  * any saved customisations from sdmc:/3ds/forsaken/controls.cfg.

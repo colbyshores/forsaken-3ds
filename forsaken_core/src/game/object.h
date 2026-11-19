@@ -22,7 +22,7 @@ enum {
 	OBJECT_TYPE_ENEMY,
 };
 
-typedef struct OBJECT
+struct OBJECT
 {
 	u_int32_t				Flags;		// Various Flags....
 	u_int16_t				Type;		// Ship....Enemy....
@@ -87,10 +87,10 @@ typedef struct OBJECT
 	float		Blue;
 
 //struct	COLTYPE	*		ColType;	//
-} OBJECT;
+};
 
 
-typedef struct GUNOBJECT
+struct GUNOBJECT
 {
 	u_int16_t				Type;			// Type of gun
 	struct OBJECT	*	ParentObject;	// Which ship...enemy...Owns Me..
@@ -108,9 +108,9 @@ typedef struct GUNOBJECT
 	float				ReloadTime;			// how long before I am able to fire..
 	float				BurstStartSign;		// did I start this on the left or right side....
 	int16_t				GunNum;
-} GUNOBJECT;
+};
 
-typedef struct GUNTYPE
+struct GUNTYPE
 {
 	float				gtMaxTurnSpeed;
 	float				gtTurnAccell;
@@ -128,4 +128,4 @@ typedef struct GUNTYPE
 	bool				PrimarySecondary;	// False for Primary True for Secondary...
 	BYTE				WeaponType;			// which weapon do I Fire...
 	bool				PreciseRotation;	// How Precies should I rotate...
-} GUNTYPE;
+};

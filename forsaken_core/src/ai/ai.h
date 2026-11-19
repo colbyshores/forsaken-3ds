@@ -178,10 +178,10 @@ constexpr auto PINGOFFTIME = (ONE_SECOND * 3.0F);
 //--------------------------------------------------------------------------
 // Define Primary Weapon Data...
 //--------------------------------------------------------------------------
-typedef struct PRIMARYWEAPONKNOWLEDGE{
+struct PRIMARYWEAPONKNOWLEDGE{
 	float	MinDistance;		// How close should I get to make the weapon less effective....
 	float	AccuracyAngle;		// How accurate does the player have to be to hit me....
-}PRIMARYWEAPONKNOWLEDGE;
+};
 
 
 
@@ -189,7 +189,7 @@ typedef struct PRIMARYWEAPONKNOWLEDGE{
 // Define TARGETTING data structure
 //--------------------------------------------------------------------------
 
-typedef struct {
+struct TARGETDATA {
 
 	VECTOR			Pos;									// Initial search position
 	u_int16_t			Group;									// Initial Search Group..
@@ -199,16 +199,16 @@ typedef struct {
 	void	*		SObject;								// Pointer to targetting SHIP
 	void	*		TObject;								// Pointer to target
 	u_int32_t			TFlags;								// Flags - see below
-} TARGETDATA;
+};
 
 //--------------------------------------------------------------------------
 // Define Aim data structure
 //--------------------------------------------------------------------------
 
-typedef struct {
+struct AIMDATA {
 	int32_t	Flags;								// Flags - Say wether to turn left right etc...
 	VECTOR	Angle;								// The difference in x y z...
-}AIMDATA;
+};
 //--------------------------------------------------------------------------
 // Define TARGETTING flags / macros
 //--------------------------------------------------------------------------

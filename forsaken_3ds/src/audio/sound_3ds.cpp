@@ -291,25 +291,25 @@ bool sound_listener_orientation(
 /* ---- simple WAV loader (replaces SDL_LoadWAV) ---- */
 
 /* minimal WAV header parsing */
-typedef struct {
+struct wav_header_t {
 	char     riff[4];
 	u_int32_t file_size;
 	char     wave[4];
-} wav_header_t;
+};
 
-typedef struct {
+struct wav_chunk_t {
 	char     id[4];
 	u_int32_t size;
-} wav_chunk_t;
+};
 
-typedef struct {
+struct wav_fmt_t {
 	u_int16_t format;
 	u_int16_t channels;
 	u_int32_t sample_rate;
 	u_int32_t byte_rate;
 	u_int16_t block_align;
 	u_int16_t bits_per_sample;
-} wav_fmt_t;
+};
 
 sound_buffer_t *sound_load(char *path)
 {

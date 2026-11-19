@@ -85,23 +85,23 @@ static char* address_to_str( ENetAddress * address )
  *
  */
 
-typedef enum {
+enum network_peer_state_t {
 	PLAYING,    // peer is valid player in game
 	UNUSED,     // unused peer
 	CONNECTED,  // this must match other enum which defines CONNECTED as well
 	CONNECTING, // host told us to connect
 	ACKING,     // waiting for peer to ack my id
 	SYNCHING,   // host telling everyone to synch
-} network_peer_state_t;
+};
 
 // what each ENet peer's peer->data points to
-typedef struct {
+struct network_peer_data_t {
 	peer_id_t id;
 	network_peer_state_t state;
 	network_player_t * player;
 	int connect_port;
 	ENetPeer ** connected_peers; // used by host to keep track of connections
-} network_peer_data_t;
+};
 
 #define PEER_USED( peer )\
 	( ( (network_peer_data_t*) (peer)->data )->state != UNUSED )
@@ -288,10 +288,10 @@ static int enet_connect( char* str_address, int port )
 	return 1;
 }
 
-typedef enum {
+enum flush_t {
 	NO_FLUSH = 0,
 	FLUSH = 2,
-} flush_t;
+};
 
 static void enet_send_packet( ENetPeer* peer, ENetPacket* packet, int channel, flush_t flush )
 {
@@ -562,7 +562,7 @@ static int all_players_on_connected_list( ENetPeer ** connected_list, ENetPeer *
  *
  */
 
-typedef enum {
+enum p2p_event_t {
 
 	// packet types
 	NAME,            // player tells us his name
@@ -585,38 +585,38 @@ typedef enum {
 	// nat punching
 	NAT_PUNCH_THROUGH_LIST, // see explanation in new_connection()
 
-} p2p_event_t;
+};
 
-typedef struct {
+struct p2p_packet_t {
 	p2p_event_t type;
-} p2p_packet_t;
+};
 
-typedef struct {
+struct p2p_name_packet_t {
 	p2p_event_t type;
 	char name[ NETWORK_MAX_NAME_LENGTH ];
-} p2p_name_packet_t;
+};
 
-typedef struct {
+struct p2p_connect_packet_t {
 	p2p_event_t type;
 	ENetAddress address;
 	peer_id_t id;
-} p2p_connect_packet_t;
+};
 
-typedef struct {
+struct p2p_number_packet_t {
 	p2p_event_t type;
 	int number;
-} p2p_number_packet_t;
+};
 
-typedef struct {
+struct p2p_id_packet_t {
 	p2p_event_t type;
 	peer_id_t id;
-} p2p_id_packet_t;
+};
 
-typedef struct {
+struct p2p_punch_packet_t {
 	p2p_event_t type;
 	ENetAddress address; // ip and port as the host see's it
 	unsigned short int connect_port;
-} p2p_punch_packet_t; // see explanation in new_connection()
+}; // see explanation in new_connection()
 
 static void disconnect_all( void )
 {

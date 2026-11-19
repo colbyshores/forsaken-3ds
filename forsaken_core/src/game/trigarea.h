@@ -45,13 +45,13 @@ enum {
 /*
  * Structures
  */
-typedef struct TRIGGER_ZONE
+struct TRIGGER_ZONE
 {
 	VECTOR	normal;
 	float	offset;
-}TRIGGER_ZONE;
+};
 
-typedef struct TRIGGER_AREA
+struct TRIGGER_AREA
 {
 	u_int16_t	state;
 	u_int16_t	group;
@@ -78,7 +78,7 @@ struct	TRIGGER_AREA * NextSameGroup_player;
 struct	TRIGGER_AREA * NextSameGroup_player_shoots;
 struct	TRIGGER_AREA * NextSameGroup_enemy;
 struct	TRIGGER_AREA * NextSameGroup_enemy_shoots;
-}TRIGGER_AREA;
+};
 
 /*
  * fn prototypes

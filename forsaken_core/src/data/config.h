@@ -42,10 +42,10 @@ constexpr auto DIK_JOYSTICK_POV = (0x080);
 
 typedef short VirtualKeycode;
 
-typedef struct {
+struct USERKEY {
 	int keys;
 	VirtualKeycode key[MAX_KEYS_PER_CONTROL];
-} USERKEY;
+};
 
 
 typedef struct _DEFKEY
@@ -55,12 +55,12 @@ typedef struct _DEFKEY
 } DEFKEY;
 
 
-typedef struct {
+struct VIRTUALKEYMAP {
 	const char *keyword;
 	VirtualKeycode keycode;
-} VIRTUALKEYMAP;
+};
 
-typedef struct {
+struct USERCONFIG {
 	char name[MAX_PLAYER_NAME_LENGTH];
 	u_int16_t bike;
 	u_int16_t bikecomp;
@@ -113,7 +113,7 @@ typedef struct {
 	char macro2[ MAXTEXTMSG ];
 	char macro3[ MAXTEXTMSG ];
 	float aim_assist_strength;   /* 0.0 = off, 1.0 = full subtle assist */
-} USERCONFIG;
+};
 
 
 

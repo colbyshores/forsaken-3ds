@@ -111,7 +111,7 @@ constexpr auto SPIRAL_RADIUS = ( 100 * GLOBAL_SCALE );
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef	struct OLDPOS {
+struct OLDPOS {
 
 	VECTOR		Pos;			// Old Position
 	VECTOR		Dir;			// Old Direction
@@ -119,9 +119,9 @@ typedef	struct OLDPOS {
 	u_int8_t		G;				// Green
 	u_int8_t		B;				// Blue
 
-} OLDPOS;
+};
 
-typedef struct SECONDARYWEAPONATTRIB {
+struct SECONDARYWEAPONATTRIB {
 
 	u_int16_t	SecType;			// Missile/Mine
 	u_int16_t	State;				// Starting State
@@ -144,9 +144,9 @@ typedef struct SECONDARYWEAPONATTRIB {
 	float	ColRadius;			// how big is my collide sphere
 	u_int16_t	Flags;				// Various Flags;
 
-} SECONDARYWEAPONATTRIB;
+};
 
-typedef struct SECONDARYWEAPONBULLET {
+struct SECONDARYWEAPONBULLET {
 	bool	Used;
 
 	u_int16_t	Next;				// link list.....
@@ -217,14 +217,14 @@ typedef struct SECONDARYWEAPONBULLET {
 	OLDPOS	OldPos[ MAXTENTOLDPOS ];// Old positions array;
 	float	FramelagAddition;
 
-} SECONDARYWEAPONBULLET;		// sizes and colours of 2d polys and Lights are set up depoending on type...
+};		// sizes and colours of 2d polys and Lights are set up depoending on type...
 
-typedef	struct ENTRY {
+struct ENTRY {
 
 	struct ENTRY	*	Prev;	// Previous Entry ( Used / Free )
 	struct ENTRY	*	Next;	// Next Entry ( Used / Free )
 
-} ENTRY;
+};
 
 /*===================================================================
 	Prototypes

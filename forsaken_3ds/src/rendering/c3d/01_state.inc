@@ -43,12 +43,12 @@ static bool             s_shaderReady   = false;
  * painted source art has no high-frequency content to extract, so
  * derived detail maps were imperceptible. Synthesized noise is more
  * visible, identical RAM footprint on OG and N3DS, no asset pipeline. */
-typedef enum {
+enum material_class_t {
 	MAT_METAL    = 0,
 	MAT_ROCK,
 	MAT_ORGANIC,
 	MAT_COUNT
-} material_class_t;
+};
 
 static C3D_ProcTex          s_wallProcTex[MAT_COUNT];
 static C3D_ProcTexColorLut  s_wallProcColor[MAT_COUNT];
@@ -99,11 +99,11 @@ static s8 s_loc_lights      = -1;
 #define s_colorMask GPU_WRITE_ALL
 
 /* ---- GPU vertex format (all floats, matches shader inputs) ---- */
-typedef struct {
+struct gpu_vertex_t {
 	float pos[3];
 	float color[4];
 	float texcoord[2];
-} gpu_vertex_t;  /* 36 bytes */
+};  /* 36 bytes */
 
 /* ---- Single-pass stereo vertex memo (STEREO_REPLAY) ----
  *
@@ -122,11 +122,11 @@ typedef struct {
  * What runs per eye is UNCHANGED: full traversal, culling, state
  * setup, uniforms, draw order, HUD. Only the vertex-conversion memcpy
  * is skipped on memo hits. Pixel-identical by construction. */
-typedef enum {
+enum smemo_mode_t {
 	SMEMO_OFF = 0,    /* mono / default: memo untouched */
 	SMEMO_RECORD,     /* left eye: convert live + record ranges */
 	SMEMO_LOOKUP      /* right eye: reuse recorded ranges, convert misses */
-} smemo_mode_t;
+};
 static smemo_mode_t s_memoMode = SMEMO_OFF;
 /* c3d_memo_suspend: a nested camera pass (missile inset) runs inside an
  * eye pass and refills the same stamped fills from another camera, so

@@ -89,7 +89,7 @@ extern BYTE GameStatus[];
 /*===================================================================
 	Bodge Structures
 ===================================================================*/
-typedef struct SHORTMINE{
+struct SHORTMINE{
 
 	u_int16_t	OwnerType;
 	u_int16_t	Owner;
@@ -103,30 +103,30 @@ typedef struct SHORTMINE{
 	u_int16_t	Weapon;
 	float	LifeCount;
 
-}SHORTMINE;
+};
 
 /*===================================================================
 	Bodge Structures
 ===================================================================*/
-typedef struct SHORTKILLMINE{
+struct SHORTKILLMINE{
 	u_int16_t	OwnerType;			// Owner ID
 	u_int16_t	Owner;				// Owner ID
 	u_int16_t	ID;					// ID
 	float	ShockwaveSize;		// Size
-}SHORTKILLMINE;
+};
 /*===================================================================
 	Bodge Structures
 ===================================================================*/
 
-typedef struct MISSEDMINEMSG{
+struct MISSEDMINEMSG{
 	int16_t	Type;
 	void *	Struct;
-}MISSEDMINEMSG;
+};
 
 /*===================================================================
 	Bodge Structures
 ===================================================================*/
-typedef struct SHORTPICKUP{
+struct SHORTPICKUP{
 	int16_t	Type;
 	int16_t	Group;
 	u_int16_t	Owner;				// Owner ID
@@ -138,20 +138,20 @@ typedef struct SHORTPICKUP{
 	net_bool_t	Sparkle;
 	float	LifeCount;
 	u_int16_t	TriggerMod;
-}SHORTPICKUP;
+};
 
-typedef struct SHORTTRIGVAR{
+struct SHORTTRIGVAR{
 	int		State;
-}SHORTTRIGVAR;
+};
 
-typedef struct SHORTTRIGGER{
+struct SHORTTRIGGER{
 	int		Active;
-}SHORTTRIGGER;
+};
 
 /*===================================================================
 	Bodge Structures
 ===================================================================*/
-typedef struct SHORTREGENSLOT{
+struct SHORTREGENSLOT{
 
 	u_int16_t	GenType;			// Generation Type
 	u_int16_t	RegenType;			// Regeneration Type
@@ -166,25 +166,25 @@ typedef struct SHORTREGENSLOT{
 	u_int16_t	PickupIndex;		// Pickup Index
 	u_int16_t	PickupID;			// Pickup ID
 
-}SHORTREGENSLOT;
+};
 
 /*===================================================================
 	Bodge Structures
 ===================================================================*/
-typedef struct SHORTKILLPICKUP{
+struct SHORTKILLPICKUP{
 	u_int16_t	Owner;				// Owner ID
 	u_int16_t	ID;					// ID
 	int16_t	Style;				// Style
-}SHORTKILLPICKUP;
+};
 
 /*===================================================================
 	Bodge Structures
 ===================================================================*/
 
-typedef struct MISSEDPICKUPMSG{
+struct MISSEDPICKUPMSG{
 	int16_t	Type;
 	void *	Struct;
-}MISSEDPICKUPMSG;
+};
 
 constexpr int MAXSHORTNAME = 8;
 typedef	char		SHORTNAMETYPE[MAX_PLAYERS][MAXSHORTNAME];

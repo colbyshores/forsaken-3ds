@@ -8182,10 +8182,10 @@ read_SecondaryWeaponType( FILE *f, char *last_token )
 		return 0;
 }
 // Read the Flags
-typedef struct {
+struct READENEMYFLAGS {
 	const char *keyword;
 	u_int32_t Flags;
-} READENEMYFLAGS;
+};
 
 static int
 read_Flags( FILE *f, char *last_token )
@@ -8238,10 +8238,10 @@ read_Flags( FILE *f, char *last_token )
 
 
 // read the enemy type.....
-typedef struct {
+struct READENEMYTYPE {
 	const char *keyword;
 	u_int16_t EnemyType;
-} READENEMYTYPE;
+};
 
 static int read_EnemyType( FILE *f, char *last_token )
 {
@@ -8488,10 +8488,10 @@ static int read_Gun_WeaponType( FILE *f, char *last_token )
 	Output		:	bool true/false
 ===================================================================*/
 typedef int (*ReadEnemy)( FILE *, char * );
-typedef struct {
+struct READENEMYTXTFILE {
 	const char *keyword;
 	ReadEnemy handle;
-} READENEMYTXTFILE;
+};
 
 bool ReadEnemyTxtFile( const char * Filename )
 {

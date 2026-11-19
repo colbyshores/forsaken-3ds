@@ -96,7 +96,7 @@ enum {
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct SPOTFX {
+struct SPOTFX {
 	u_int16_t		Type;
 	u_int16_t		Flags;
 	u_int16_t		State;
@@ -130,7 +130,7 @@ typedef struct SPOTFX {
 	struct	SPOTFX	*	NextInGroup;
 	struct	SPOTFX	*	PrevInGroup;
 
-} SPOTFX;
+};
 
 /*===================================================================
 	Prototypes

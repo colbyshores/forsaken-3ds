@@ -493,7 +493,7 @@ enum {
 /*
  * structures
  */
-typedef struct MODEL{
+struct MODEL{
 	u_int16_t		Next;
 	u_int16_t		Prev;
 	int16_t		Type;
@@ -549,10 +549,10 @@ typedef struct MODEL{
 
 	PLANE		IntersectionPlane;
 
-}MODEL;
+};
 
 
-typedef struct MODELNAME{
+struct MODELNAME{
 	char		Name[128];			// Name of the Model...
 	int			LOD;				// How many of the following Model are Levels Of Detail..
 	bool		Panel;
@@ -563,7 +563,7 @@ typedef struct MODELNAME{
 	bool		LevelSpecific;		// Level Specific?
 	bool		LoadEnable;			// LoadEnable?
 
-}MODELNAME;
+};
 
 /*
  * fn prototypes

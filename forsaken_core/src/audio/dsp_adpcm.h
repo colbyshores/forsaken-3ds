@@ -19,17 +19,17 @@
 #include <stdbool.h>
 
 
-typedef struct {
+struct dsp_header_t {
 	uint16_t coefs[16];       /* predictor coefficients (host order) */
 	int16_t  initial_hist1;   /* newest history sample at stream start */
 	int16_t  initial_hist2;   /* previous history sample */
 	uint16_t initial_index;
-} dsp_header_t;
+};
 
-typedef struct {
+struct dsp_state_t {
 	int32_t hist1;            /* newest decoded sample */
 	int32_t hist2;            /* previous decoded sample */
-} dsp_state_t;
+};
 
 /* Parse the 96-byte .dsp header (big-endian on disk). Fails only on NULL
  * arguments; the header contents are not validated. */

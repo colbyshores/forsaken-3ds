@@ -26,17 +26,17 @@ constexpr int MAX_BSP_MODELS = (1);
 /*
  * Structures
  */
- typedef struct BSP_RAWNODE
+ struct BSP_RAWNODE
  {
 	VECTOR	Normal;
 	float	Offset;
 	int		Front;
 	int		Back;
 	int		Colour;
- }BSP_RAWNODE;
+ };
 static_assert( sizeof( BSP_RAWNODE ) == 28, "BSP_RAWNODE is a file record" );
 
-typedef struct BSP_NODE
+struct BSP_NODE
 {
 	VECTOR	Normal;
 	float	Offset;
@@ -44,20 +44,20 @@ typedef struct BSP_NODE
 struct	BSP_NODE * Parent;
 struct	BSP_NODE * Front;
 struct	BSP_NODE * Back;
-}BSP_NODE;
+};
 
-typedef struct BSP_TREE
+struct BSP_TREE
 {
    int	NumNodes;
    BSP_NODE * Root;
-}BSP_TREE;
+};
 
-typedef struct BSP_HEADER
+struct BSP_HEADER
 {
 	bool	State;
 	int NumGroups;
 	BSP_TREE Bsp_Tree[MAXGROUPS];
-}BSP_HEADER;
+};
 
 
 typedef struct _BSP_PORTAL

@@ -51,48 +51,48 @@ constexpr int TRIGGERTYPE_FlagTest = 7;
  * Structures
  */
 
-typedef struct CONDITION{
+struct CONDITION{
 	int		NumOfTriggers;
 	struct	TRIGGER ** Triggers;
 	int		NumOfEvents;
 	struct	EVENT ** Events;
-}CONDITION;
+};
 
-typedef struct EVENT{
+struct EVENT{
 	BYTE	Type;				// Which type of event to trigger..
 	alignas( 2 ) BYTE	Data[MAXDATAPEREVENT];	// event arguments; the handlers read them as u_int16_t
-}EVENT;
+};
 
-typedef struct TRIGGERVAR{
+struct TRIGGERVAR{
 	int		State;				// true / false ...
 	int		InitState;
 	int		NumOfTriggers;
 	char	Name[32];
 	struct	TRIGGER ** Triggers;
-}TRIGGERVAR;
+};
 
-typedef struct TRIGGER{
+struct TRIGGER{
 	BYTE	Type;
 	TRIGGERVAR *	TrigVar;	// true / false ...
 	int		ActiveState;		// true / false ...
 	int		Active;				// false...true...
 	int		NumOfConditions;
 	CONDITION ** Conditions;
-}TRIGGER;
+};
 
-typedef struct TRIGGERMOD{
+struct TRIGGERMOD{
 	int		Op;
 	int		Val;
 	float	Time;
 	TRIGGERVAR *	TrigVar;
 	struct TRIGGERMOD	*Next;
-}TRIGGERMOD;
+};
 
 
-typedef struct TRIGGERMODQUE{
+struct TRIGGERMODQUE{
 	float	Time;
 	struct TRIGGERMOD	*TriggerMod;
-}TRIGGERMODQUE;
+};
 
 
 

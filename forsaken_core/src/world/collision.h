@@ -53,13 +53,13 @@ constexpr auto COLLISION_FUDGE = (10.0F*GLOBAL_SCALE);
  */
 
 
-typedef struct MCLOADHEADER{
+struct MCLOADHEADER{
 	int		state;
 	char * Buffer;
 	u_int16_t	num_of_groups;
 	u_int16_t	num_of_faces_in_group[MAXCOLGROUPS];
 	MCFACE	*GroupFacePnt[MAXCOLGROUPS];
-}MCLOADHEADER;
+};
 
 
 /*

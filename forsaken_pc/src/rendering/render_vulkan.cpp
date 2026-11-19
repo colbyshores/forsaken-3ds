@@ -271,10 +271,10 @@ static bool create_swapchain(void)
 	return true;
 }
 
-typedef struct {
+struct pipe_entry_t {
 	int ortho, topo, blend, dtest, dwrite, cull;
 	VkPipeline pipe;
-} pipe_entry_t;
+};
 static pipe_entry_t s_pipes[256];
 static int s_npipes;
 
@@ -743,7 +743,7 @@ bool FSClearDepth(XYRECT *rect)
 }
 
 /* ---- vertex/index/normal buffers (plain memory; see the header comment) ---- */
-typedef struct { void *data; size_t size; } membuf_t;
+struct membuf_t { void *data; size_t size; };
 static BUFFER_HANDLE membuf_create(size_t size)
 {
 	membuf_t *m = (membuf_t *)malloc(sizeof(membuf_t));

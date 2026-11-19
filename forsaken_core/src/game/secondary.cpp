@@ -4968,7 +4968,7 @@ void DropMine( void )
 	}
 }
 
-typedef struct VISISHIP {
+struct VISISHIP {
 
 	u_int16_t	Ship;
 	int16_t	ScreenX;
@@ -4976,7 +4976,7 @@ typedef struct VISISHIP {
 	int16_t	InfoX;
 	int16_t	InfoY;
 
-} VISISHIP;
+};
 
 
 VISISHIP	VisibleShipsPos[ MAX_PLAYERS ];

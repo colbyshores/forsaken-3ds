@@ -171,7 +171,7 @@ constexpr int COLPERS_Descent = 1; // Descent Collision ( target Perspective )
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct PRIMARYWEAPONATTRIB {
+struct PRIMARYWEAPONATTRIB {
 
 	float		Speed[ MAXPOWERLEVELS ];		// how fast do I move
 	float		LifeCount;						// how long can I last..
@@ -187,9 +187,9 @@ typedef struct PRIMARYWEAPONATTRIB {
 	int16_t		FmSeq;							// Faceme Sequence
 	FRAME_INFO ** FmFrmInfo;					// Faceme FrameInfo
 
-} PRIMARYWEAPONATTRIB;
+};
 
-typedef struct PRIMARYWEAPONBULLET {
+struct PRIMARYWEAPONBULLET {
 	bool		Used;
 	u_int16_t		Next;							// link list.....
 	u_int16_t		Prev;							// link list.....
@@ -235,7 +235,7 @@ typedef struct PRIMARYWEAPONBULLET {
 	int16_t		SpotFX;
 	float		FramelagAddition;
 
-} PRIMARYWEAPONBULLET;							// sizes and colours of 2d polys and Lights are set up depoending on type...
+};							// sizes and colours of 2d polys and Lights are set up depoending on type...
 
 
 /*===================================================================

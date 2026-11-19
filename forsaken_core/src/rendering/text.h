@@ -33,12 +33,11 @@ constexpr int MAXPERLINE = 512; // message buffer width - line width set in (tex
 /*
  * Typedefs
  */
-typedef struct
-{
+struct TEXTMSGINFO {
 	bool	Activated;
 	int16_t	ActivatedOrder;
 	int16_t	Type;
-} TEXTMSGINFO;
+};
 
 
 /*
@@ -79,7 +78,7 @@ void DisplayConnectionStatus( int num , int x , int y);
 constexpr int MAXFONTCOLOURS = 11;
 
 // must align this enum with rgb values in Colourtrans (text.cpp)
-typedef enum {
+enum colors_t {
  GRAY,
  RED,
  GREEN,
@@ -91,7 +90,7 @@ typedef enum {
  DARKGRAY,
  BLACK,
  WHITE
-} colors_t;
+};
 
 
 /* Defined in text.cpp; shared with the modules that use it. */

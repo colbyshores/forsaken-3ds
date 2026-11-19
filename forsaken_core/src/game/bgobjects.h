@@ -75,7 +75,7 @@ constexpr int ONEOFFANIM_Animating = 2;
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct BGOBJECT {
+struct BGOBJECT {
 
 	int16_t		State;
 	u_int16_t		Type;
@@ -166,9 +166,9 @@ typedef struct BGOBJECT {
 	struct	BGOBJECT	*	PrevFree;
 	struct	BGOBJECT	*	NextFree;
 
-} BGOBJECT;
+};
 
-typedef struct BGO_FILE {
+struct BGO_FILE {
 
 	char		Filename[ 256 ];
 	u_int16_t		BaseModel;
@@ -192,18 +192,18 @@ typedef struct BGO_FILE {
 	float		DamagePerInterval;
 	int16_t		DoorSfxType;
 
-} BGO_FILE;
+};
 
-typedef struct BIKEINFO {
+struct BIKEINFO {
 
 	const char *	Filename;
 	u_int16_t		BaseModel;
 	u_int16_t		StealthBaseModel;
 	float		OverallTime;
 
-} BIKEINFO;
+};
 
-typedef struct DOORTYPESFX {
+struct DOORTYPESFX {
 
 	int16_t		StartOpeningSoundFX;
 	int8_t	*	StartOpeningName;
@@ -222,7 +222,7 @@ typedef struct DOORTYPESFX {
 	int16_t		ClosedSoundFX;
 	int8_t	*	ClosedName;
 
-} DOORTYPESFX;
+};
 
 /*===================================================================
 	Prototypes

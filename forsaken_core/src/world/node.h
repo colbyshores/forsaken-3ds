@@ -29,7 +29,7 @@ constexpr auto NODE_DECISION = (1<<0);
 constexpr auto NODE_DROPMINES = (1<<1);
 constexpr auto NODE_TERMINATE = (1<<4);
 
-typedef struct NODE
+struct NODE
 {
 	bool	LegalGroup;
 	u_int16_t	Flags;
@@ -42,7 +42,7 @@ typedef struct NODE
 	int16_t	NumOfLinks;
 struct	NODE *	NodeLink[MAXLINKSPERNODE];
 struct	NODE *	NextNodeInGroup;
-} NODE;
+};
 
 typedef struct _NODENETWORKHEADER
 {

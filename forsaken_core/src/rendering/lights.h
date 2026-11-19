@@ -53,7 +53,7 @@ constexpr auto MIN_LIGHT_SIZE = ( 1536.0F * GLOBAL_SCALE );
  * structures
  */
 
- typedef struct XLIGHT{
+ struct XLIGHT{
 	int		Type;
 	bool	Visible;
 	u_int16_t	Index;
@@ -70,7 +70,7 @@ constexpr auto MIN_LIGHT_SIZE = ( 1536.0F * GLOBAL_SCALE );
 	VECTOR	Dir;			// Normalised....
 	u_int16_t	Group;
 struct XLIGHT * NextVisible;
- }XLIGHT;
+ };
 
  /*
  * fn prototypes

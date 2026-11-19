@@ -38,7 +38,7 @@ constexpr int LOAD_TPAGES_FINISH = 8;
  * structures
  */
 
-typedef struct TLOADHEADER{
+struct TLOADHEADER{
 	int		state;						// true once Tload has created every page
 	u_int16_t num_texture_files;
 	u_int16_t				Xsize[MAXTPAGESPERTLOAD];		// width and height of the image loaded (for a
@@ -49,7 +49,7 @@ typedef struct TLOADHEADER{
 	bool				MipMap[MAXTPAGESPERTLOAD];		// create a mip chain
 	bool				PlaceHolder[MAXTPAGESPERTLOAD];	// image chosen at run time (see above)
 	char				*PlaceHolderFile[MAXTPAGESPERTLOAD];	// 256-byte buffer: the file now in the placeholder
-}TLOADHEADER;
+};
 
 /*
  * fn prototypes

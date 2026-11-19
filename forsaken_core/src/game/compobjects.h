@@ -64,14 +64,14 @@ constexpr int MAX_USER_CONT_COMPS = 10;
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct ANIM_SEQ {
+struct ANIM_SEQ {
 
 	float	StartTime;			// Start of the sequence, in ticks ( ANIM_SECOND per second )
 	float	EndTime;			// End of the sequence; equal to StartTime holds one pose
 
-} ANIM_SEQ;
+};
 
-typedef struct COMP_OBJ {
+struct COMP_OBJ {
 
 	int16_t		Flags;
 	int16_t		ID;
@@ -116,94 +116,94 @@ typedef struct COMP_OBJ {
 	int16_t		NumColZones;
 	struct ANI_ZONES * ColZones;
 
-} COMP_OBJ;
+};
 
 /*===================================================================
 	Animation Types
 ===================================================================*/
-typedef struct ANI_TRANS {
+struct ANI_TRANS {
 
 	int16_t	Type;
 	float	TimeStart;
 	float	TimeDuration;
 	void *	Data;
 
-} ANI_TRANS;
+};
 
-typedef struct ANI_TRANSLATE {
+struct ANI_TRANSLATE {
 
 	VECTOR	Trans;
 	int16_t	Local;
 
-} ANI_TRANSLATE;
+};
 
-typedef struct ANI_ROTATE {
+struct ANI_ROTATE {
 
 	VECTOR	Axis;
 	VECTOR	Origin;
 	float	Angle;
 	int16_t	Local;
 
-} ANI_ROTATE;
+};
 
-typedef struct ANI_MORPH {
+struct ANI_MORPH {
 
 	int16_t	Frame;
 
-} ANI_MORPH;
+};
 
-typedef struct ANI_PROPERTY {
+struct ANI_PROPERTY {
 
 	int16_t	Type;
 	int16_t	Value;
 
-} ANI_PROPERTY;
+};
 
 /*===================================================================
 	Collision Zone Types
 ===================================================================*/
-typedef struct ZONESIDE {
+struct ZONESIDE {
 
 	VECTOR	Normal;
 	float	PlaneOffset;
 	int16_t	Sensitive;
 	float	Damage;
 
-} ZONESIDE;
+};
 
-typedef struct ANI_ZONES {
+struct ANI_ZONES {
 
 	int16_t	Type;
 	int16_t	Sensitive;
 	float	Damage;
 	void *	Data;
 
-} ANI_ZONES;
+};
 
-typedef struct ANI_ZONE_SPHERE {
-
-	VECTOR	Center;
-	VECTOR	HalfSize;
-
-} ANI_ZONE_SPHERE;
-
-typedef struct ANI_ZONE_BOX {
+struct ANI_ZONE_SPHERE {
 
 	VECTOR	Center;
 	VECTOR	HalfSize;
-	u_int16_t	NumSides;
-	ZONESIDE * Sides;
 
-} ANI_ZONE_BOX;
+};
 
-typedef struct ANI_ZONE_POLYGONAL {
+struct ANI_ZONE_BOX {
 
 	VECTOR	Center;
 	VECTOR	HalfSize;
 	u_int16_t	NumSides;
 	ZONESIDE * Sides;
 
-} ANI_ZONE_POLYGONAL;
+};
+
+struct ANI_ZONE_POLYGONAL {
+
+	VECTOR	Center;
+	VECTOR	HalfSize;
+	u_int16_t	NumSides;
+	ZONESIDE * Sides;
+
+};
 
 /*===================================================================
 	Prototypes

@@ -26,7 +26,7 @@ constexpr int EXTERNALFORCETYPE_Shake = 2;
 /*
  * Structures
  */
-typedef struct EXTERNALFORCE{
+struct EXTERNALFORCE{
 		u_int16_t	Status;
 		u_int16_t	ForceType;
 		u_int16_t	Group;
@@ -44,7 +44,7 @@ typedef struct EXTERNALFORCE{
 		TRIGGER_ZONE	*Zone;
 		u_int16_t	num_sides;
 struct	EXTERNALFORCE * NextInGroup;
-}EXTERNALFORCE;
+};
 
 /*
  * fn prototypes

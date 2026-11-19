@@ -22,11 +22,11 @@
 #include <stdbool.h>
 
 
-typedef enum {
+enum HunkTag {
 	TAG_STARTUP = 0,
 	TAG_LEVEL   = 1,
 	TAG_COUNT
-} HunkTag;
+};
 
 bool   Hunk_Init(size_t bytes);
 

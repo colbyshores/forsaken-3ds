@@ -12,7 +12,7 @@
 /* ---- globals expected by the engine ---- */
 
 
-typedef struct { float anisotropic; } gl_caps_t;
+struct gl_caps_t { float anisotropic; };
 gl_caps_t caps;
 
 /* Forward declarations */
@@ -119,12 +119,12 @@ static bool s_skipAuxProcTex   = false;
 
 /* Track the last TexEnv mode so the combiner stages are reconfigured
  * only when a draw needs a different mode. */
-typedef enum {
+enum texenv_mode_t {
 	TEXENV_MODE_NONE = 0,    /* untextured / vertex-only */
 	TEXENV_MODE_DIFFUSE,     /* single-stage diffuse * vertex */
 	TEXENV_MODE_AUX,         /* wall: diffuse + ADD_SIGNED ProcTex grain */
 	TEXENV_MODE_OBJECT,      /* model: diffuse + Phong specular */
-} texenv_mode_t;
+};
 static texenv_mode_t s_lastTexEnvMode = TEXENV_MODE_NONE;
 
 /* Toggle: enable Phong-shine path for the next textured draw. Set by

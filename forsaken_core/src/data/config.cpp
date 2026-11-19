@@ -21,10 +21,10 @@
 
 typedef int (*ReadConfig)( FILE *, USERCONFIG *, char * );
 
-typedef struct {
+struct READCONFIGTABLE {
 	const char *keyword;
 	ReadConfig handle;
-} READCONFIGTABLE;
+};
 
 USERCONFIG default_config = {
 	"Player",						// player name
@@ -1498,10 +1498,10 @@ const char *key_fullname( int keycode )
 	return nullptr;
 }
 
-typedef struct {
+struct ascii_map_t {
 	const char * name;
 	const char * _char;
-} ascii_map_t;
+};
 
 ascii_map_t key_char_lookup[] =
 {

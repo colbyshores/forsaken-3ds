@@ -24,7 +24,7 @@ static bool s_defaults_is_n3ds = false;  /* platform captured at init, for Reset
 /* Catalog of buttons the user can bind, in the order shown by the
  * rebind menu. Each entry pairs a stable name (used in the cfg
  * file) with the libctru KEY_* mask. */
-typedef struct { const char *name; u32 mask; } button_entry_t;
+struct button_entry_t { const char *name; u32 mask; };
 static const button_entry_t k_buttons[] = {
 	{ "A",       KEY_A      },
 	{ "B",       KEY_B      },

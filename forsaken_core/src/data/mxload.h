@@ -31,16 +31,16 @@ enum {
  * structures
  */
 
-typedef struct PVFIREPOINT{
+struct PVFIREPOINT{
 
 	u_int16_t		ID;
 	VECTOR		Pos;
 	VECTOR		Dir;
 	VECTOR		Up;
 
-} PVFIREPOINT;
+};
 
-typedef struct PVSPOTFX {
+struct PVSPOTFX {
 
 	u_int16_t		Type;
 	int8_t		Primary;
@@ -58,10 +58,10 @@ typedef struct PVSPOTFX {
 	float		SoundFXVolume;
 	float		SoundFXSpeed;
 
-} PVSPOTFX;
+};
 
 
-typedef struct MXGROUP{
+struct MXGROUP{
 	u_int16_t		num_meshes;
 	u_int16_t		mesh_type[MAXMESHESPERGROUP];
 	u_int16_t		num_verts_per_mesh[MAXMESHESPERGROUP];
@@ -75,10 +75,10 @@ typedef struct MXGROUP{
 	u_int16_t		num_animating_polys[MAXMESHESPERGROUP];
 	POLYANIM *	polyanim[MAXMESHESPERGROUP];
 
-}MXGROUP;
+};
 
 
-typedef struct MXLOADHEADER{
+struct MXLOADHEADER{
 	int					state;								// false if not loaded properly...
 	u_int32_t				AnimOncePerFrame;					// used for stuff that is displayed more than once in a single frame..
 	char		*		OrgAddr;							// the .mx file, from PreMxload until Mxload has copied it out
@@ -96,7 +96,7 @@ typedef struct MXLOADHEADER{
 	int					LOD;
 	VECTOR				Center;								// Center Pos
 	VECTOR				Sizes;								// X,Y,Z Sizes
-}MXLOADHEADER;
+};
 
 /*
  * fn prototypes

@@ -2977,11 +2977,11 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			msg_to_str(*MsgPnt), *MsgPnt);
 }
 
-typedef enum {
+enum channel_t {
 	CHANNEL_RESERVED,			// cannot use channel 0 !!!
 	CHANNEL_MAIN,				// default channel send pkts reliable or unreliabe, sequenced or unsequenced
 	CHANNEL_BIKE_POSITIONS,		// position updates are unreliable|sequenced... late pkts will get dropped...
-} channel_t;
+};
 
 void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, BYTE mask )
 {

@@ -199,16 +199,16 @@ inline float ATAND( float y, float x ) { return R2D( atan2f( y, x ) ); }
    (sx/sy/sz and rhw name the same fields as x/y/z/w); TRIANGLE holds three
    vertex indices. */
 
-typedef struct {
+struct LVERTEX {
 	float	x;
 	float	y;
 	float	z;
 	COLOR	color;
 	float	tu;
 	float	tv;
-} LVERTEX;
+};
 
-typedef struct {
+struct TLVERTEX {
 	union { float x; float sx; };
 	union { float y; float sy; };
 	union { float z; float sz; };
@@ -216,86 +216,86 @@ typedef struct {
 	COLOR	color;
 	float	tu;
 	float	tv;
-} TLVERTEX;
+};
 
-typedef struct {
+struct TRIANGLE {
 	WORD	v1;
 	WORD	v2;
 	WORD	v3;
-} TRIANGLE;
+};
 
 
 /*===================================================================
 	2D Vertices
 ===================================================================*/
-typedef struct VERT2D {
+struct VERT2D {
 	float	x;
 	float	y;
-} VERT2D;
+};
 /*===================================================================
 	3D Vertices
 ===================================================================*/
-typedef struct VERT {
+struct VERT {
 	float	x;
 	float	y;
 	float	z;
-} VERT;
+};
 
 /*===================================================================
 	3D Normal
 ===================================================================*/
-typedef struct NORMAL {
+struct NORMAL {
 	union { float nx; float x; };
 	union { float ny; float y; };
 	union { float nz; float z; };
-} NORMAL;
+};
 
 /*===================================================================
 	4 X 4 Matrix
 ===================================================================*/
-typedef struct MATRIX {
+struct MATRIX {
 	float	_11, _12, _13, _14;
 	float	_21, _22, _23, _24;
 	float	_31, _32, _33, _34;
 	float	_41, _42, _43, _44;
-} MATRIX;
+};
 
 /*===================================================================
 	3 X 3 Matrix
 ===================================================================*/
-typedef struct MATRIX3X3 {
+struct MATRIX3X3 {
 	float	_11, _12, _13;
 	float	_21, _22, _23;
 	float	_31, _32, _33;
-} MATRIX3X3;
+};
 
 
 /*===================================================================
 	Vector
 ===================================================================*/
-typedef struct VECTOR {
+struct VECTOR {
 	float	x;
 	float	y;
 	float	z;
-} VECTOR;
+};
 
 /*===================================================================
 	Short Vector
 ===================================================================*/
-typedef struct SHORTVECTOR {
+struct SHORTVECTOR {
 	int16_t	x;
 	int16_t	y;
 	int16_t	z;
-} SHORTVECTOR;
+};
 
 
 /*===================================================================
 	Plane
 ===================================================================*/
-typedef struct PLANE {
+struct PLANE {
 	VECTOR Normal;
 	float Offset;
-} PLANE;
+};
 
 /*===================================================================
 	Prototypes

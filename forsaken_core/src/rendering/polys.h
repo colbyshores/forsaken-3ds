@@ -70,15 +70,15 @@ constexpr int POLY_POWERLASER = 7;
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef	struct POLY_RGB {
+struct POLY_RGB {
 
 	u_int8_t	R;
 	u_int8_t	G;
 	u_int8_t	B;
 
-} POLY_RGB;
+};
 
-typedef struct POLY {
+struct POLY {
 
 	u_int16_t			Next;
 	u_int16_t			Prev;
@@ -110,7 +110,7 @@ typedef struct POLY {
 	QUAT			Quat;				// Quat
 	u_int16_t			Ship;				// Ship
 
-} POLY;
+};
 
 /*===================================================================
 	Prototypes

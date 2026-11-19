@@ -13,47 +13,41 @@
  * world units; spot cone is in degrees, rotation_speed in radians per tick.
  */
 
-typedef enum
-{
+enum LIGHTTYPE {
 	LIGHT_FIXED,
 	LIGHT_PULSING,
 	LIGHT_FLICKERING,
 	LIGHT_SPOT,
-} LIGHTTYPE;
+};
 
-typedef enum
-{
+enum GENTYPE {
 	GENTYPE_Initialised,		// Initialised immediatly
 	GENTYPE_Time,				// Initialised after time
 	GENTYPE_Trigger,			// Initialised by trigger
-} GENTYPE;
+};
 
-typedef enum
-{
+enum LIGHTSTATE {
 	STATE_OFF,
 	STATE_TURNING_ON,
 	STATE_ON,
 	STATE_TURNING_OFF,
-} LIGHTSTATE;
+};
 
-typedef enum
-{
+enum PULSETYPE {
 	PULSE_BLINK,
 	PULSE_RAMP,
 	PULSE_HALFWAVE,
 	PULSE_WAVE,
-} PULSETYPE;
+};
 
-typedef struct
-{
+struct RT_FIXED_LIGHT {
 	PULSETYPE on_type;
 	PULSETYPE off_type;
 	float on_time;
 	float off_time;
-} RT_FIXED_LIGHT;
+};
 
-typedef struct
-{
+struct RT_PULSING_LIGHT {
 	PULSETYPE type;
 	float on_time;
 	float stay_on_time;
@@ -62,25 +56,23 @@ typedef struct
 	float stay_on_point;
 	float off_point;
 	float total_time;
-} RT_PULSING_LIGHT;
+};
 
-typedef struct
-{
+struct RT_FLICKERING_LIGHT {
 	float stay_on_chance;
 	float stay_off_chance;
 	float stay_on_time;
 	float stay_off_time;
-} RT_FLICKERING_LIGHT;
+};
 
-typedef struct
-{
+struct RT_SPOT_LIGHT {
 	VECTOR dir;
 	VECTOR up;
 	float cone;
 	float rotation_period;
 	float rotation_speed;
 	float angle;
-} RT_SPOT_LIGHT;
+};
 
 typedef struct _RTLIGHT
 {

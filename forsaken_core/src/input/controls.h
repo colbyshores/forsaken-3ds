@@ -47,7 +47,7 @@ constexpr float BANKDECELL = 0.03F;
 
 /* ship control structures */
 
-typedef struct {
+struct SHIPCONTROL {
 	float pitch;
 	float yaw;
 	float roll;
@@ -72,9 +72,9 @@ typedef struct {
 	int drop_secondary;
 	int drop_shield;
 	int drop_ammo;
-} SHIPCONTROL;
+};
 
-typedef struct {
+struct JOYSTICKAXIS {
 	bool exists;
 	char *name;
 	int action;
@@ -82,20 +82,20 @@ typedef struct {
 	int deadzone;	// percentage
 	bool inverted;
 	bool fine;
-} JOYSTICKAXIS;
+};
 
-typedef struct {
+struct JOYSTICKBTN {
 	char *name;
 	int action;
-} JOYSTICKBTN;
+};
 
 constexpr int MAX_POV_DIRECTIONS = 4;
 
-typedef struct {
+struct JOYSTICKPOV {
 	char *name;
 	char *dirname[MAX_POV_DIRECTIONS];
 	int action[MAX_POV_DIRECTIONS];
-} JOYSTICKPOV;
+};
 
 enum
 {

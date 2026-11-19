@@ -157,12 +157,11 @@ OFF_FILES Title_OffsetFiles[] = {
 };
 
 
-typedef struct
-{
+struct OFF_BUFFER {
 	BOX_INFO box_info;
 	OFF_INFO off_info;
 	BIT_INFO bit_info;
-} OFF_BUFFER;
+};
 
 /*===================================================================
 	Procedure	:	Load Texture Pages, Offsets and Sizes

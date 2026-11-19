@@ -95,17 +95,17 @@ enum {
 	SFX_BIKECOMP_LOOKUP_TX,  //	-	trojax
 };
 
-typedef struct SFXNAME{
+struct SFXNAME{
 	const char	*Name;			// Name of the Sfx...
 	int			Flags;
 	int			Priority;			// for compound sfx
 	int			SfxLookup;			// for biker / computer speech
-}SFXNAME;
+};
 
-typedef struct{
+struct SNDLOOKUP {
 	u_int16_t Num_Variants;
 	bool Requested;
-} SNDLOOKUP;
+};
 
 SNDLOOKUP SndLookup[ MAX_SFX ];
 
@@ -348,8 +348,7 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 
 };
 
-typedef struct
-{
+struct SFX_HOLDER {
 		bool Used;
 		u_int32_t  UniqueID;
 		int SndObjIndex;
@@ -359,7 +358,7 @@ typedef struct
 		float PauseValue;
 	int SfxBufferIndex;
 	sound_source_t * source;
-} SFX_HOLDER;
+};
 
 SFX_HOLDER	SfxHolder[ MAX_ANY_SFX ];
 bool		NoSFX = false;
@@ -465,11 +464,10 @@ Fn Prototypes
 *****************************************/
 void InitSfxHolders( void );
 
-typedef struct
-{
+struct LEVELSPEC_SFX_FILES {
 	char file[128];
 	int	flags;
-}LEVELSPEC_SFX_FILES;
+};
 
 constexpr int SFX_End = 128; // end of sfx batch
 LEVELSPEC_SFX_FILES LevelSpecificSfxLookup[ 256 ] = {

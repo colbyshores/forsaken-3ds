@@ -27,7 +27,7 @@ constexpr int MAXTELEPORTLINKS = 8;
 /*
  * Structures
  */
-typedef struct TELEPORT{
+struct TELEPORT{
 		u_int16_t	Status;
 		u_int16_t	Group;
 		u_int16_t	Type;					// what stuff can teleport
@@ -42,7 +42,7 @@ typedef struct TELEPORT{
 		u_int16_t	num_links;
 		u_int16_t	Links[MAXTELEPORTLINKS];
 struct	TELEPORT * NextInGroup;
-}TELEPORT;
+};
 
 /*
  * fn prototypes

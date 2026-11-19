@@ -41,7 +41,7 @@ constexpr auto MXA_ANIM_UV = (1 << 2);
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct MXAVERT {
+struct MXAVERT {
 	float x;
 	float y;
 	float z;
@@ -50,18 +50,18 @@ typedef struct MXAVERT {
 	float tu;
 	float tv;
 	int32_t flags;
-} MXAVERT;
+};
 static_assert( sizeof( MXAVERT ) == 32, "MXAVERT is a file record" );
 
 
-typedef struct COLOR_RGBA {
+struct COLOR_RGBA {
 	u_int8_t b;
 	u_int8_t g;
 	u_int8_t r;
 	u_int8_t a;
-} COLOR_RGBA;
+};
 
-typedef struct MXAGROUP{
+struct MXAGROUP{
 	u_int16_t	num_meshes;
 	u_int16_t	mesh_type[MAXMESHESPERGROUP];
 	u_int16_t	num_verts_per_mesh[MAXMESHESPERGROUP];
@@ -72,13 +72,13 @@ typedef struct MXAGROUP{
 	TRIANGLE *poly_ptr	[MAXMESHESPERGROUP];
 	u_int32_t	texture_group_vert_off[MAXMESHESPERGROUP][MAXMXATEXTUREGROUPSPER];
 	char	name[16];
-}MXAGROUP;
+};
 
 
 typedef u_int16_t MXAVERTCOUNT[MAX_MXAGROUPS][MAXMESHESPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...
 typedef	MXAVERT	*MXAVERTFRAME[MAX_MXAGROUPS][MAXMESHESPERGROUP][MAXMXATEXTUREGROUPSPER];		// points to the begining of each set of verts...
 
-typedef struct MXALOADHEADER{
+struct MXALOADHEADER{
 
 	int					state;								// false if not loaded properly...
 	int					CurrentFrame;
@@ -104,7 +104,7 @@ typedef struct MXALOADHEADER{
 	VECTOR				Center;									// Center Pos
 	VECTOR				Sizes;									// X,Y,Z Sizes
 
-}MXALOADHEADER;
+};
 
 /*===================================================================
 	Prototypes

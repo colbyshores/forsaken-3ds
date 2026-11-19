@@ -44,8 +44,8 @@ bool sound_listener_orientation(
 // Buffers
 //
 
-typedef struct sound_source_t sound_source_t;
-typedef struct sound_buffer_t sound_buffer_t;
+struct sound_source_t;
+struct sound_buffer_t;
 
 sound_buffer_t * sound_load(char* file);
 sound_source_t * sound_source( sound_buffer_t * buffer );

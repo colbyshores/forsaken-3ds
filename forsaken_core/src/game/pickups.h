@@ -165,7 +165,7 @@ enum {
 /*===================================================================
 	Structures
 ===================================================================*/
-typedef struct PICKUPATTRIB {
+struct PICKUPATTRIB {
 
 	u_int16_t ModelType;	// if 3D model which one....
 	u_int16_t Light;			// do I produce Light
@@ -174,9 +174,9 @@ typedef struct PICKUPATTRIB {
 	float	G;					// what color does it emit....
 	float	B;					// what color does it emit....
 
-} PICKUPATTRIB;
+};
 
-typedef struct PICKUP {
+struct PICKUP {
 
 	u_int16_t	Next;				// link list.....
 	u_int16_t	Prev;				// link list.....
@@ -223,9 +223,9 @@ typedef struct PICKUP {
 
 	float	PickupTime;			// Life count so far for pickup
 
-} PICKUP;
+};
 
-typedef struct REGENPOINT {
+struct REGENPOINT {
 
 	u_int16_t	GenType;			// Generation Type
 	u_int16_t	RegenType;			// Regeneration Type
@@ -240,9 +240,9 @@ typedef struct REGENPOINT {
 	u_int16_t	PickupIndex;		// Pickup Index
 	u_int16_t	PickupID;			// Pickup ID
 
-} REGENPOINT;
+};
 
-typedef struct QUEDPICKUP {
+struct QUEDPICKUP {
 
 	int16_t	Type;
 	struct	QUEDPICKUP	*	PrevUsed;
@@ -250,9 +250,9 @@ typedef struct QUEDPICKUP {
 	struct	QUEDPICKUP	*	PrevFree;
 	struct	QUEDPICKUP	*	NextFree;
 
-} QUEDPICKUP;
+};
 
-typedef struct FAILEDKILL {
+struct FAILEDKILL {
 
 	int16_t	Next;				// link list.....
 	int16_t	Prev;				// link list.....
@@ -262,7 +262,7 @@ typedef struct FAILEDKILL {
 	int16_t	Style;
 	u_int16_t	NewOwner;
 
-} FAILEDKILL;
+};
 
 /*===================================================================
 	Prototypes

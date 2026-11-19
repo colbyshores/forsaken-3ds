@@ -123,19 +123,19 @@ constexpr int FM_FLAG_RELATIVE = 16; // Direction and Up Vector Relative to came
 /*===================================================================
 		TPage Info Structure for FmPolys/Polys/ScreenPolys
 ===================================================================*/
-typedef struct TPAGEINFO {
+struct TPAGEINFO {
 
 	u_int16_t		FirstPoly;		// Index to first Poly in TPage
 	int16_t		StartVert;		// Filled in by PolyDisp
 	int16_t		NumVerts;		// Filled in by PolyDisp
 	int16_t		NumTris;		// Filled in by PolyDisp
 
-} TPAGEINFO;
+};
 
 /*===================================================================
 	FmPoly Structure
 ===================================================================*/
-typedef struct FMPOLY{
+struct FMPOLY{
 
 	u_int16_t			Next;
 	u_int16_t			Prev;
@@ -168,7 +168,7 @@ typedef struct FMPOLY{
 	float			xsize;				// in world space
 	float			ysize;				// in world space
 
-}FMPOLY;
+};
 
 
 /*===================================================================

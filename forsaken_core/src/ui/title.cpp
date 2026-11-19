@@ -2582,8 +2582,7 @@ MXLOADHEADER * Mxloadheader[6];
 u_int16_t BikerScrPoly;
 u_int16_t LevelScrPoly;
 
-typedef struct
-{
+struct VDUINFO {
 	VECTOR	Pos;
 	VECTOR	Look;
 	VECTOR	View;
@@ -2592,7 +2591,7 @@ typedef struct
 	VECTOR BracketPos;
 	float BracketStartRot;
 	float BracketEndRot;
-}VDUINFO;
+};
 
 
 VECTOR CurrentVDUPos;
@@ -2729,11 +2728,10 @@ new slider globals
 constexpr int MAXSLIDERSPERMENU = 8;
 constexpr auto SLIDERSPEED = 1.0F;
 
-typedef struct
-{
+struct ACTIVESLIDERINFO {
 	MENUITEM *Item;
 	bool	needs_refresh;
-}ACTIVESLIDERINFO;
+};
 
 ACTIVESLIDERINFO ActiveSliderItem[MAXSLIDERSPERMENU];
 /**********************
@@ -2774,11 +2772,10 @@ Multi-player messaging
 constexpr int MAX_TITLE_MSGS = 16;
 constexpr int MAX_TITLE_MSG_SIZE = 128;
 constexpr auto MAX_TITLE_MSG_TIME = 100.0F;
-typedef struct
-{
+struct TITLEMSG {
 	char text[MAX_TITLE_MSG_SIZE];
 	float timer;
-}TITLEMSG;
+};
 TITLEMSG TitleMsgQue[MAX_TITLE_MSGS];
 int		TitleMsgQueStart, TitleMsgQueEnd, TotalTitleMsgs;
 float TitleMessageTimer;

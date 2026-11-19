@@ -31,7 +31,7 @@ constexpr auto BOX_BOTHFLIP = 0xA000;
 /*===================================================================
 	Structures for 2D Texture info
 ===================================================================*/
-typedef struct BOX_INFO {
+struct BOX_INFO {
 
 	int16_t	tpage;
 	float	u1;
@@ -41,27 +41,27 @@ typedef struct BOX_INFO {
 	int16_t	xsize;
 	int16_t	ysize;
 
-} BOX_INFO;
+};
 static_assert( sizeof( BOX_INFO ) == 24, "BOX_INFO is a file record" );
 
-typedef struct OFF_INFO {
+struct OFF_INFO {
 
 	int16_t	xoff;
 	int16_t	yoff;
 	u_int16_t	box;
 
-} OFF_INFO;
+};
 static_assert( sizeof( OFF_INFO ) == 6, "OFF_INFO is a file record" );
 
-typedef struct BIT_INFO {
+struct BIT_INFO {
 
 	int16_t	startbit;
 	int16_t	numbits;
 
-} BIT_INFO;
+};
 static_assert( sizeof( BIT_INFO ) == 4, "BIT_INFO is a file record" );
 
-typedef struct FRAME_INFO {
+struct FRAME_INFO {
 
 	int16_t			Num_Frames;
 	int8_t		*	Tables;			// owns Box_Info, Bit_Info and Off_Info
@@ -73,9 +73,9 @@ typedef struct FRAME_INFO {
 	int16_t			sys_tpage_index;		//					---"---
 	int16_t			NumBoxes;
 
-} FRAME_INFO;
+};
 
-typedef struct OFF_FILES {
+struct OFF_FILES {
 
 	int8_t		*	Filename;
 	FRAME_INFO	**	InfoPtrAddr;
@@ -83,7 +83,7 @@ typedef struct OFF_FILES {
 	int				LoadTPages;
 	int16_t			xsize;
 	int16_t			ysize;
-} OFF_FILES;
+};
 
 /*===================================================================
 	Prototypes

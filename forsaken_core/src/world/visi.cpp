@@ -82,14 +82,13 @@ struct
 } VisiStats[ MAXGROUPS ];
 
 
-typedef struct
-{
+struct DebugRay {
 	u_int16_t group;
 	struct
 	{
 		double x, y, z;
 	} from, to;
-} DebugRay;
+};
 
 static void InitDebugRays( void )
 {

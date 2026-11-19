@@ -33,11 +33,10 @@ enum class CamRendering : int16_t
 /*
  * structures
  */
-typedef struct
-{
+struct EXTENT {
 	VECTOR min;
 	VECTOR max;
-} EXTENT;
+};
 
 
 typedef struct _VISGROUP VISGROUP;
@@ -54,18 +53,17 @@ struct _VISGROUP
 };
 
 
-typedef struct
-{
+struct VISLIST {
 	int			groups;
 	VISGROUP	group[ MAXGROUPS ];
 	VISGROUP	*first_visible;
 	VISGROUP	*last_visible;
 	render_viewport_t	*viewport;
 	RENDERMATRIX	viewproj;
-} VISLIST;
+};
 
 
-typedef struct CAMERA{
+struct CAMERA{
 	bool	enable;
 	bool	UseLowestLOD;
 	int		Type;
@@ -79,7 +77,7 @@ typedef struct CAMERA{
 	void *	CurrentOwner;
 	VISLIST visible;
 	RENDERMATRIX	View;
-}CAMERA;
+};
 
 typedef struct _REMOTECAMERA{
 	bool	enable;
