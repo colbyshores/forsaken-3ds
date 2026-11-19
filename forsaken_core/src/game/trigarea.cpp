@@ -102,11 +102,7 @@ bool TriggerAreaload( char * Filename )
 	u_int32_t	MagicNumber;
 	u_int32_t	VersionNumber;
 
-	if( Zones != NULL )
-	{
-		free(Zones);
-		Zones = NULL;
-	}
+	ReleaseTriggerArea();
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
 		GroupTriggerArea_player[i] = NULL;
@@ -316,6 +312,7 @@ void ReleaseTriggerArea( void )
 		free(Zones);
 		Zones = NULL;
 	}
+	NumZones = 0;
 }
 
 
