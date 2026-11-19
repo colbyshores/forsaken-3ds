@@ -2008,22 +2008,22 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case LASER:
-						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_LASER:
-						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_POWERLASER:
-						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_LIGHTNING:
-						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
@@ -2156,22 +2156,22 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_LIGHTNING:
-						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_LASER:
-						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_POWERLASER:
-						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case LASER:
-						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
@@ -2583,22 +2583,22 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_LIGHTNING:
-						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_LASER:
-						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_POWERLASER:
-						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case LASER:
-						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
@@ -2761,22 +2761,22 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_LIGHTNING:
-						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_LASER:
-						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case NME_POWERLASER:
-						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
 					case LASER:
-						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].GroupImIn, PrimBulls[i].ColGroup );
+						CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
 						Killed = true;
 						break;
 
@@ -5329,11 +5329,10 @@ void CreateSteam( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 	Input		:	u_int16_t		Primary weapon number
 				:	float		Length of laser
 				:	VECTOR	*	Direction
-				:	u_int16_t		Group
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
+void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -5507,11 +5506,10 @@ void CreateLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Gr
 	Input		:	u_int16_t		Primary weapon number
 				:	float		Length of laser
 				:	VECTOR	*	Direction
-				:	u_int16_t		Group
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
+void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -5685,11 +5683,10 @@ void CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /
 	Input		:	u_int16_t		Primary weapon number
 				:	float		Length of laser
 				:	VECTOR	*	Direction
-				:	u_int16_t		Group
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
+void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
 {
 	u_int16_t	poly;
 	u_int16_t	light;
@@ -5817,11 +5814,10 @@ void CreateNmePowerLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int1
 	Input		:	u_int16_t		Primary weapon number
 				:	float		Length of laser
 				:	VECTOR	*	Direction
-				:	u_int16_t		Group
 				:	u_int16_t		EndGroup
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t /*Group*/, u_int16_t EndGroup )
+void CreateNmeLightningPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t EndGroup )
 {
 	u_int16_t	fmpoly;
 	u_int16_t	poly;
