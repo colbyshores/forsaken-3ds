@@ -862,7 +862,7 @@ static void transition(VkCommandBuffer cb, VkImage img, int base_level, int leve
 	b.subresourceRange.layerCount = 1;
 	b.srcAccessMask = src; b.dstAccessMask = dst;
 	VkPipelineStageFlags dst_stage = (new_l == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-	? VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT : VK_PIPELINE_STAGE_TRANSFER_BIT;
+		? VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT : VK_PIPELINE_STAGE_TRANSFER_BIT;
 	vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &b);
 }
 

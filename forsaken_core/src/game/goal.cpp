@@ -339,7 +339,7 @@ void SetTeamGoals( u_int16_t *TeamGoals )
 		if ( Goal[ j ].team >= 0 && Goal[ j ].team < MAX_TEAMS )
 		{
 			Goal[ j ].state = ( Teamgoal[ Goal[ j ].team ] == j )
-			? GOALSTATE_On : GOALSTATE_Off;
+				? GOALSTATE_On : GOALSTATE_Off;
 		}
 		else
 			Goal[ j ].state = GOALSTATE_Off;
@@ -412,7 +412,7 @@ void ProcessGoals( void )
 	for ( j = 0; j < NumGoals; j++ )
 	{
 		Goal[ j ].state = ( Goal[ j ].team >= 0 && GoalTeamMembers[ Goal[ j ].team ] )
-		? GOALSTATE_On : GOALSTATE_Off;
+			? GOALSTATE_On : GOALSTATE_Off;
 	}
 	if ( IsHost )
 	{

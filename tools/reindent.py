@@ -75,6 +75,7 @@ def reindent(text):
     init_delta = 0       # column shift applied to every line of that initialiser
     pp_stack = []        # [state at #if, state at end of first branch]
     ns_depths = []       # brace depth outside each open namespace / extern "C"
+    prev_end = ''        # last character of the previous line of code
     for raw in lines:
         if pp_cont:
             out.append(raw)
@@ -112,6 +113,11 @@ def reindent(text):
                     depth, paren, pending = top[1][0], top[1][1], list(top[1][2])
             continue
         code = code_of(stripped, state).strip()
+        if not in_stmt and prev_end and prev_end not in ';{}:,' \
+                and re.match(r'^(&&|\|\||\?|:(?!:))', code):
+            # an operator-first line continues the previous statement
+            in_stmt = True
+            stmt_code = stmt_code if stmt_code else ''
         if in_stmt and code.startswith('{') and stmt_code.rstrip().endswith('='):
             # "X x =" then the initialiser's brace on its own line
             new = stmt_new
@@ -167,6 +173,7 @@ def reindent(text):
         if not code:
             continue
         ends = code.rstrip()[-1]
+        prev_end = ends
         label = bool(re.match(r'^(case\b|default\s*:|public\s*:|private\s*:|\w+\s*:$)', stmt_code))
         if paren > 0 or (ends in '=+-*/|&?<>!' ) or (ends == ':' and not label and '?' in stmt_code):
             in_stmt = True
