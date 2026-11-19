@@ -4712,6 +4712,452 @@ bool PreLoadEnemies( void )
 	Input		:	Nothing
 	Output		:	bool	True/False
 ===================================================================*/
+/* ENEMY_SnubTurret */
+[[gnu::always_inline]] static inline void LoadEnemySnubTurret( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 2, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 3, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+}
+
+/* ENEMY_BeamTurret */
+[[gnu::always_inline]] static inline void LoadEnemyBeamTurret( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 0, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+		if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+		{
+			TempComp->UserAxis.x = -TempComp->UserAxis.x;
+			TempComp->UserAxis.y = -TempComp->UserAxis.y;
+			TempComp->UserAxis.z = -TempComp->UserAxis.z;
+		}
+	}
+}
+
+/* ENEMY_DuelTurret */
+[[gnu::always_inline]] static inline void LoadEnemyDuelTurret( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+		if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+		{
+			TempComp->UserAxis.x = -TempComp->UserAxis.x;
+			TempComp->UserAxis.y = -TempComp->UserAxis.y;
+			TempComp->UserAxis.z = -TempComp->UserAxis.z;
+		}
+	}
+}
+
+/* ENEMY_PulseTurret */
+[[gnu::always_inline]] static inline void LoadEnemyPulseTurret( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+		if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+		{
+			TempComp->UserAxis.x = -TempComp->UserAxis.x;
+			TempComp->UserAxis.y = -TempComp->UserAxis.y;
+			TempComp->UserAxis.z = -TempComp->UserAxis.z;
+		}
+	}
+}
+
+/* ENEMY_MissileTurret */
+[[gnu::always_inline]] static inline void LoadEnemyMissileTurret( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+		if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+		{
+			TempComp->UserAxis.x = -TempComp->UserAxis.x;
+			TempComp->UserAxis.y = -TempComp->UserAxis.y;
+			TempComp->UserAxis.z = -TempComp->UserAxis.z;
+		}
+	}
+}
+
+/* ENEMY_ShieldTurret */
+[[gnu::always_inline]] static inline void LoadEnemyShieldTurret( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	/* KEX defs/n64Enemies.txt for ShieldTurret:
+	 *   turretBaseComponent_1 = 2  (flat depth-first idx → .cob ID = 1, the pivot)
+	 *   turretGunComponent_1  = 3  (flat idx → .cob ID = 2, the gun)
+	 * cob_dump.py confirms the .cob hierarchy:
+	 *   root id=-1 → id=0 (base) → id=1 (pivot) → id=2 (gun)
+	 * KEX uses flat indices, GetCompObjAddress takes .cob ID — so
+	 * pass 1 (pivot) and 2 (gun), not 2 and 3. */
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ]  = GetCompObjAddress( 2, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		TempComp->UserAxis.x = 0.0F;
+		TempComp->UserAxis.y = 1.0F;
+		TempComp->UserAxis.z = 0.0F;
+		TempComp->UserAxisPoint.x = 0.0F;
+		TempComp->UserAxisPoint.y = 0.0F;
+		TempComp->UserAxisPoint.z = 0.0F;
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		TempComp->UserAxis.x = -1.0F;
+		TempComp->UserAxis.y = 0.0F;
+		TempComp->UserAxis.z = 0.0F;
+		TempComp->UserAxisPoint.x = 0.0F;
+		TempComp->UserAxisPoint.y = 0.0F;
+		TempComp->UserAxisPoint.z = 0.0F;
+	}
+}
+
+/* ENEMY_LEADER_LeviTank, ENEMY_LeviTank */
+[[gnu::always_inline]] static inline void LoadEnemyLeviTank( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+}
+
+/* ENEMY_LEADER_Mekton, ENEMY_Mekton */
+[[gnu::always_inline]] static inline void LoadEnemyMekton( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+
+		if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+		{
+			TempComp->UserAxis.x = -TempComp->UserAxis.x;
+			TempComp->UserAxis.y = -TempComp->UserAxis.y;
+			TempComp->UserAxis.z = -TempComp->UserAxis.z;
+		}
+
+	}
+}
+
+/* ENEMY_GuardBot */
+[[gnu::always_inline]] static inline void LoadEnemyGuardBot( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 3, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 4, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 1.0F;
+			TempComp->UserAxis.y = 0.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+
+		if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+		{
+			TempComp->UserAxis.x = -TempComp->UserAxis.x;
+			TempComp->UserAxis.y = -TempComp->UserAxis.y;
+			TempComp->UserAxis.z = -TempComp->UserAxis.z;
+		}
+
+	}
+}
+
+/* ENEMY_LEADER_Legz, ENEMY_Legz */
+[[gnu::always_inline]] static inline void LoadEnemyLegz( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+}
+
+/* ENEMY_LazerBot, ENEMY_LEADER_LazerBot */
+[[gnu::always_inline]] static inline void LoadEnemyLazerBot( ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+	{
+		TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+		TempComp->UserControl = true;
+		if( !GetCompObjAxis( TempComp ) )
+		{
+			TempComp->UserAxis.x = 0.0F;
+			TempComp->UserAxis.y = 1.0F;
+			TempComp->UserAxis.z = 0.0F;
+			TempComp->UserAxisPoint.x = 0.0F;
+			TempComp->UserAxisPoint.y = 0.0F;
+			TempComp->UserAxisPoint.z = 0.0F;
+		}
+	}
+}
+
+/* ENEMY_Boss_Metatank */
+[[gnu::always_inline]] static inline void LoadEnemyBossMetatank( int16_t & CompCount, ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 2, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 5, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
+
+	for( CompCount = 0; CompCount < 4; CompCount++ )
+	{
+		if( Enemy->Object.UserContComps[ CompCount * 2 ] )
+		{
+			TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
+			TempComp->UserControl = true;
+			if( !GetCompObjAxis( TempComp ) )
+			{
+				TempComp->UserAxis.x = 0.0F;
+				TempComp->UserAxis.y = 1.0F;
+				TempComp->UserAxis.z = 0.0F;
+				TempComp->UserAxisPoint.x = 0.0F;
+				TempComp->UserAxisPoint.y = 0.0F;
+				TempComp->UserAxisPoint.z = 0.0F;
+			}
+		}
+	}
+}
+
+/* ENEMY_Boss_Avatar */
+[[gnu::always_inline]] static inline void LoadEnemyBossAvatar( int16_t & CompCount, ENEMY *& Enemy, COMP_OBJ *& Comp, COMP_OBJ *& TempComp )
+{
+	Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 4, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 5, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 2, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
+	Enemy->Object.UserContComps[ TURRETCOMP_Base + 8 ] = GetCompObjAddress( 1, 1, Comp );
+	Enemy->Object.UserContComps[ TURRETCOMP_Gun + 8 ] = nullptr;
+
+	for( CompCount = 0; CompCount < 5; CompCount++ )
+	{
+		if( Enemy->Object.UserContComps[ CompCount * 2 ] )
+		{
+			TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
+			TempComp->UserControl = true;
+			if( !GetCompObjAxis( TempComp ) )
+			{
+				TempComp->UserAxis.x = 0.0F;
+				TempComp->UserAxis.y = 1.0F;
+				TempComp->UserAxis.z = 0.0F;
+				TempComp->UserAxisPoint.x = 0.0F;
+				TempComp->UserAxisPoint.y = 0.0F;
+				TempComp->UserAxisPoint.z = 0.0F;
+			}
+		}
+	}
+}
+
 bool LoadEnemies( void )
 {
 	FILE	*	fp;
@@ -4929,192 +5375,23 @@ bool LoadEnemies( void )
 					switch( EnemyType )
 					{
 					case ENEMY_SnubTurret:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 2, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 3, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
+						LoadEnemySnubTurret( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_BeamTurret:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 0, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-							{
-								TempComp->UserAxis.x = -TempComp->UserAxis.x;
-								TempComp->UserAxis.y = -TempComp->UserAxis.y;
-								TempComp->UserAxis.z = -TempComp->UserAxis.z;
-							}
-						}
+						LoadEnemyBeamTurret( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_DuelTurret:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-							{
-								TempComp->UserAxis.x = -TempComp->UserAxis.x;
-								TempComp->UserAxis.y = -TempComp->UserAxis.y;
-								TempComp->UserAxis.z = -TempComp->UserAxis.z;
-							}
-						}
+						LoadEnemyDuelTurret( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_PulseTurret:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-							{
-								TempComp->UserAxis.x = -TempComp->UserAxis.x;
-								TempComp->UserAxis.y = -TempComp->UserAxis.y;
-								TempComp->UserAxis.z = -TempComp->UserAxis.z;
-							}
-						}
+						LoadEnemyPulseTurret( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_MissileTurret:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-							{
-								TempComp->UserAxis.x = -TempComp->UserAxis.x;
-								TempComp->UserAxis.y = -TempComp->UserAxis.y;
-								TempComp->UserAxis.z = -TempComp->UserAxis.z;
-							}
-						}
+						LoadEnemyMissileTurret( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_LEADER_SnubBot:
@@ -5160,37 +5437,7 @@ bool LoadEnemies( void )
 
 #ifdef EDITION_REMASTER
 					case ENEMY_ShieldTurret:
-						/* KEX defs/n64Enemies.txt for ShieldTurret:
-						 *   turretBaseComponent_1 = 2  (flat depth-first idx → .cob ID = 1, the pivot)
-						 *   turretGunComponent_1  = 3  (flat idx → .cob ID = 2, the gun)
-						 * cob_dump.py confirms the .cob hierarchy:
-						 *   root id=-1 → id=0 (base) → id=1 (pivot) → id=2 (gun)
-						 * KEX uses flat indices, GetCompObjAddress takes .cob ID — so
-						 * pass 1 (pivot) and 2 (gun), not 2 and 3. */
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ]  = GetCompObjAddress( 2, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							TempComp->UserAxis.x = 0.0F;
-							TempComp->UserAxis.y = 1.0F;
-							TempComp->UserAxis.z = 0.0F;
-							TempComp->UserAxisPoint.x = 0.0F;
-							TempComp->UserAxisPoint.y = 0.0F;
-							TempComp->UserAxisPoint.z = 0.0F;
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							TempComp->UserAxis.x = -1.0F;
-							TempComp->UserAxis.y = 0.0F;
-							TempComp->UserAxis.z = 0.0F;
-							TempComp->UserAxisPoint.x = 0.0F;
-							TempComp->UserAxisPoint.y = 0.0F;
-							TempComp->UserAxisPoint.z = 0.0F;
-						}
+						LoadEnemyShieldTurret( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_Boss_Ramqan:
@@ -5263,203 +5510,34 @@ bool LoadEnemies( void )
 
 					case ENEMY_LEADER_LeviTank:
 					case ENEMY_LeviTank:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
+						LoadEnemyLeviTank( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_LEADER_Mekton:
 					case ENEMY_Mekton:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-
-							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-							{
-								TempComp->UserAxis.x = -TempComp->UserAxis.x;
-								TempComp->UserAxis.y = -TempComp->UserAxis.y;
-								TempComp->UserAxis.z = -TempComp->UserAxis.z;
-							}
-
-						}
+						LoadEnemyMekton( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_GuardBot:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 3, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 4, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 1.0F;
-								TempComp->UserAxis.y = 0.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-
-							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-							{
-								TempComp->UserAxis.x = -TempComp->UserAxis.x;
-								TempComp->UserAxis.y = -TempComp->UserAxis.y;
-								TempComp->UserAxis.z = -TempComp->UserAxis.z;
-							}
-
-						}
+						LoadEnemyGuardBot( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_LEADER_Legz:
 					case ENEMY_Legz:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
+						LoadEnemyLegz( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_LazerBot:
 					case ENEMY_LEADER_LazerBot:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-						{
-							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-							TempComp->UserControl = true;
-							if( !GetCompObjAxis( TempComp ) )
-							{
-								TempComp->UserAxis.x = 0.0F;
-								TempComp->UserAxis.y = 1.0F;
-								TempComp->UserAxis.z = 0.0F;
-								TempComp->UserAxisPoint.x = 0.0F;
-								TempComp->UserAxisPoint.y = 0.0F;
-								TempComp->UserAxisPoint.z = 0.0F;
-							}
-						}
+						LoadEnemyLazerBot( Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_Boss_Metatank:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 2, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 5, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
-
-						for( CompCount = 0; CompCount < 4; CompCount++ )
-						{
-							if( Enemy->Object.UserContComps[ CompCount * 2 ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-						}
+						LoadEnemyBossMetatank( CompCount, Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_Boss_Avatar:
-						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 4, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 5, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 2, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
-						Enemy->Object.UserContComps[ TURRETCOMP_Base + 8 ] = GetCompObjAddress( 1, 1, Comp );
-						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 8 ] = nullptr;
-
-						for( CompCount = 0; CompCount < 5; CompCount++ )
-						{
-							if( Enemy->Object.UserContComps[ CompCount * 2 ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-						}
+						LoadEnemyBossAvatar( CompCount, Enemy, Comp, TempComp );
 						break;
 
 					case ENEMY_Boss_Nukecrane:
