@@ -152,7 +152,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 	float strength;
 	float best_cos;
 	VECTOR target_dir;
-	float target_dist;
+	float target_dist = 0.0F;	/* written whenever found_any is set */
 	bool found_any;
 	ENEMY *enemy;
 	int16_t ship_idx;
