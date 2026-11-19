@@ -120,6 +120,9 @@ void music_play(int track)
 	alGenSources(1, &s_source);
 	alSourcei(s_source, AL_BUFFER, (ALint)s_buffer);
 	alSourcei(s_source, AL_LOOPING, AL_TRUE);
+	/* at the listener, like every sfx source: a world-positioned mono
+	 * source would be panned and attenuated as the ship moves */
+	alSourcei(s_source, AL_SOURCE_RELATIVE, AL_TRUE);
 	alSourcef(s_source, AL_GAIN, s_volume);
 	alSourcePlay(s_source);
 
