@@ -587,9 +587,6 @@ bool ProcessShips()
 
 	RearCameraDisable = false;
 
-/* @vfp-exempt R6 — dead diagnostic block disabled by #if 0, never compiled
-   into any build. measured n/a. Verified 2026-10-25. */
-
 	NumToDo = MAX_PLAYERS;
 
 	// for every player in the game
