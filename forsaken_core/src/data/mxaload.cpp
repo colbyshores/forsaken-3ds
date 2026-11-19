@@ -737,7 +737,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 			strcpy( Mxaloadheader->ImageFile[i], in.cstring() );
 
 			if( LevelSpecific )
-				GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mxaloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
+				GetLevelTexturePath( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), &Mxaloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 			else
 				sprintf( (char*)&TempFilename[ 0 ], "data\\textures\\%s", &Mxaloadheader->ImageFile[i][0] );
 

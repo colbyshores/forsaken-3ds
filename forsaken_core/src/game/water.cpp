@@ -130,7 +130,7 @@ bool PreWaterLoad( char * Filename )
 	FileNamePnt = (char *) &buf[0];
 	while ( ( *FileNamePnt++ = *Buffer++ ) != 0 );
 
-	GetLevelTexturePath( (char*)&TempFilename[ 0 ], &buf[0], &ShortLevelNames[ LevelNum ][ 0 ] );
+	GetLevelTexturePath( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), &buf[0], &ShortLevelNames[ LevelNum ][ 0 ] );
 
 	DebugPrintf("loading water texture: %s\n",TempFilename);
 

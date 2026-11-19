@@ -63,7 +63,7 @@ bool TloadAllTextures(TLOADHEADER * Tloadheader);
 
 int16_t	FindTexture( TLOADHEADER * Tloadheader , const char * Name );
 
-void GetLevelTexturePath( char * destination, char * file, char * level );
+void GetLevelTexturePath( char * destination, size_t size, const char * file, const char * level );
 int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t ColourKey , bool MipMap, int16_t xsize, int16_t ysize );
 int16_t	FindTexture( TLOADHEADER * Tloadheader , const char * Name );
 

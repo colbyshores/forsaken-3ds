@@ -221,3 +221,25 @@ int Msg( const char * msg, ... )
 	// IDOK	OK button was selected.
 	return res;
 }
+
+bool copy_string( char * dst, size_t size, const char * src )
+{
+	size_t len = strlen( src );
+	size_t n;
+
+	if( size == 0 )
+		return false;
+	n = ( len < size ) ? len : size - 1;
+	memcpy( dst, src, n );
+	dst[ n ] = 0;
+	return n == len;
+}
+
+bool append_string( char * dst, size_t size, const char * src )
+{
+	size_t used = strnlen( dst, size );
+
+	if( used >= size )
+		return false;	// dst is not terminated within size
+	return copy_string( dst + used, size - used, src );
+}

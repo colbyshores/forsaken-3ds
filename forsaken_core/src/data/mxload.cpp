@@ -1000,7 +1000,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 			strcpy( Mxloadheader->ImageFile[i], in.cstring() );
 
 			if( LevelSpecific )
-				GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mxloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
+				GetLevelTexturePath( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), &Mxloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 			else
 				sprintf( (char*)&TempFilename[ 0 ], "data\\textures\\%s", &Mxloadheader->ImageFile[i][0] );
 

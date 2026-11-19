@@ -6,6 +6,11 @@
  * stderr only when Debug is set, and also to a timestamped file under Logs/
  * when DebugLog is set. convert_path() lower-cases and converts backslashes
  * into a static buffer that the next call overwrites.
+ *
+ * copy_string and append_string are the bounded strcpy and strcat: dst
+ * holds size bytes and is always left terminated; they return false when
+ * src did not fit and was cut short. Pass sizeof the destination array,
+ * or the size its owner documents for a pointer.
  */
 
 #include "game/main.h"
@@ -25,6 +30,9 @@ void Get_Ext( u_int8_t * Src, u_int8_t * Dest );
 char* convert_path( const char* _str );
 
 char * convert_char( char from, char to, char* in );
+
+bool copy_string( char * dst, size_t size, const char * src );
+bool append_string( char * dst, size_t size, const char * src );
 
 /* Defined in util.cpp; shared with the modules that use it. */
 extern bool DebugLog;

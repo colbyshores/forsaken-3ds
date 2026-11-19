@@ -283,14 +283,14 @@ int16_t	AddTexture( TLOADHEADER * Tloadheader , const char * Name , u_int16_t Co
 
 bool use_original_textures = false;	// UseOriginalTextures in the config
 
-/* Choose the file for a level texture (destination: 256 bytes). The level's
+/* Choose the file for a level texture (destination: size bytes). The level's
    own textures folder wins, then data\textures\original when
    UseOriginalTextures is set, then the shared data\textures, then
    default.png. The name's extension becomes .PNG; pkups.bmp / pkupsa.bmp
    map to titana.png, as in the original game. A candidate counts as present
    when the backend can load it (FSTextureExists): on 3DS that includes an
    HD .t3x whose PNG the romfs does not ship. */
-void GetLevelTexturePath( char * destination, char * file, char * level )
+void GetLevelTexturePath( char * destination, size_t size, const char * file, const char * level )
 {
 	char path[256];
 	char new_file[256];
@@ -298,38 +298,42 @@ void GetLevelTexturePath( char * destination, char * file, char * level )
 	// pkups pkup[sa] is really titana (old game hard coded it that way)
 	if( !strcasecmp( "pkups.bmp", file ) || !strcasecmp( "pkupsa.bmp", file ) )
 	{
-		strncpy(destination,"data\\textures\\titana.png",256);
+		copy_string( destination, size, "data\\textures\\titana.png" );
 		return;
 	}
 
 	// convert file extension to new standard
 	Change_Ext( file, new_file, ".PNG" );
 
+	// each candidate is used only if its whole path fitted: a cut path
+	// could name a different file
+
 	// check for level folder override
-	snprintf(path,sizeof(path),"data\\levels\\%s\\textures\\%s",level,new_file);
-	if( FSTextureExists( path ) )
+	if( snprintf( path, sizeof( path ), "data\\levels\\%s\\textures\\%s", level, new_file ) < (int) sizeof( path )
+		&& FSTextureExists( path ) )
 	{
-		strncpy(destination,path,256);
+		copy_string( destination, size, path );
 		return;
 	}
 
 	// use old textures if requested and available
-	snprintf(path,sizeof(path),"data\\textures\\original\\%s",new_file);
-	if( use_original_textures && FSTextureExists( path ) )
+	if( use_original_textures
+		&& snprintf( path, sizeof( path ), "data\\textures\\original\\%s", new_file ) < (int) sizeof( path )
+		&& FSTextureExists( path ) )
 	{
-		strncpy(destination,path,256);
+		copy_string( destination, size, path );
 		return;
 	}
 
 	// default to data/textures
-	snprintf(path,sizeof(path),"data\\textures\\%s",new_file);
-	if( FSTextureExists( path ) )
+	if( snprintf( path, sizeof( path ), "data\\textures\\%s", new_file ) < (int) sizeof( path )
+		&& FSTextureExists( path ) )
 	{
-		strncpy(destination,path,256);
+		copy_string( destination, size, path );
 		return;
 	}
 
 	// we can't find it so set it to default for safety
-	strncpy(destination,"data\\textures\\default.png",256);
+	copy_string( destination, size, "data\\textures\\default.png" );
 	DebugPrintf("ERROR: GetTexturePath() could not find %s\n",new_file);
 }

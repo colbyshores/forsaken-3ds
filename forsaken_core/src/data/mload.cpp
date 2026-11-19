@@ -1217,7 +1217,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 		{
 			strcpy( Mloadheader->ImageFile[i], in.cstring() );
 
-			GetLevelTexturePath( (char*)&TempFilename[ 0 ], &Mloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
+			GetLevelTexturePath( (char*)&TempFilename[ 0 ], sizeof( TempFilename ), &Mloadheader->ImageFile[i][0], &ShortLevelNames[ LevelNum ][ 0 ] );
 
 			Mloadheader->TloadIndex[i] = AddTexture( &Tloadheader , (char*)&TempFilename[ 0 ], true , true, 0, 0 );
 
