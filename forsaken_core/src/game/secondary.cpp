@@ -2240,6 +2240,720 @@ bool ProcessMines( u_int16_t i )
 	Input		:	u_int16_t		Secondary Weapon Bullet Index
 	Output		:	bool		NotDestroyed/Destroyed?  ( true/false )
 ===================================================================*/
+/* a missile hits a secondary weapon. True: the missile is gone (ProcessMissiles returns false). */
+[[gnu::always_inline]] static inline bool MissileHitSecondary( u_int16_t & i, u_int16_t *& NextMissile, VECTOR & TempVector, u_int16_t & HitSecondary, VECTOR & MInt_Point, VECTOR & NewDir, u_int16_t & TempGroup )
+{
+	if( HitSecondary != INDEX_NONE )							/* Hit Secondary? */
+	{
+		SecBulls[ HitSecondary ].Shield -= SecBulls[i].Damage;
+		if( SecBulls[ HitSecondary ].Shield < 0.0F ) SecBulls[ HitSecondary ].Shield = 0.0F;
+
+		if( SecBulls[ HitSecondary ].Shield == 0.0F )
+		{
+			if( *NextMissile == HitSecondary )
+			{
+				*NextMissile = SecBulls[ HitSecondary ].Prev;
+			}
+
+			switch( SecBulls[ HitSecondary ].Weapon )
+			{
+			case ENEMYSPIRALMISSILE:
+			case ENEMYHOMINGMISSILE:
+			case ENEMYBLUEHOMINGMISSILE:
+			case GRAVGONMISSILE:
+			case MUGMISSILE:
+			case MULTIPLEMISSILE:
+			case SOLARISMISSILE:
+			case ENEMYTENTACLE:
+			case SCATTERMISSILE:
+			default:
+				MissileShockWave( (VECTOR *) &MInt_Point, MISSILE_SHOCKWAVE, SecBulls[ HitSecondary ].Owner,
+								( SecBulls[ HitSecondary ].Damage / 2.5F ), SecBulls[ HitSecondary ].GroupImIn,
+								SecBulls[ HitSecondary ].Weapon );
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case ENEMYFIREBALL:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case ENEMYDEPTHCHARGE:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case THIEFMISSILE:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case PINEMISSILE:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case TITANSTARSHRAPNEL:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case TITANSTARMISSILE:
+				TempVector.x = 0.0F;
+				TempVector.y = 1.0F;
+				TempVector.z = 0.0F;
+				CreateExplosionDonut( &SecBulls[ HitSecondary ].Pos, (VECTOR *) &TempVector, SecBulls[ HitSecondary ].GroupImIn );
+				if( ( ( SecBulls[ HitSecondary ].OwnerType == OWNER_SHIP ) && ( SecBulls[ HitSecondary ].Owner == WhoIAm ) ) ||
+					( ( SecBulls[ HitSecondary ].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
+					( ( SecBulls[ HitSecondary ].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
+				{
+					NewDir.x = ( MInt_Point.x - SecBulls[ HitSecondary ].Pos.x );
+					NewDir.y = ( MInt_Point.y - SecBulls[ HitSecondary ].Pos.y );
+					NewDir.z = ( MInt_Point.z - SecBulls[ HitSecondary ].Pos.z );
+					TempGroup = MoveGroup( &Mloadheader, &SecBulls[ HitSecondary ].Pos, SecBulls[ HitSecondary ].GroupImIn, &NewDir );
+					CreateTitanStarShrapnel( HitSecondary, (VECTOR *) &MInt_Point, &SecBulls[ HitSecondary ].DirVector, TempGroup );
+				}
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case PURGEMINE:
+			case PINEMINE:
+			case QUANTUMMINE:
+			case SPIDERMINE:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+			}
+		}
+
+		switch( SecBulls[ i ].Weapon )
+		{
+		case ENEMYSPIRALMISSILE:
+		case ENEMYHOMINGMISSILE:
+		case ENEMYBLUEHOMINGMISSILE:
+		case GRAVGONMISSILE:
+		case MUGMISSILE:
+		case MULTIPLEMISSILE:
+		case SOLARISMISSILE:
+		case ENEMYTENTACLE:
+		case SCATTERMISSILE:
+		default:
+			MissileShockWave( (VECTOR *) &MInt_Point, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
+			DestroySecondary( i, (VECTOR *) &MInt_Point );
+			break;
+
+		case ENEMYFIREBALL:
+			DestroySecondary( i, (VECTOR *) &MInt_Point );
+			break;
+
+		case ENEMYDEPTHCHARGE:
+			DestroySecondary( i, (VECTOR *) &MInt_Point );
+			break;
+
+		case THIEFMISSILE:
+			DestroySecondary( i, (VECTOR *) &MInt_Point );
+			break;
+
+		case PURGEMINE:
+		case PINEMINE:
+		case QUANTUMMINE:
+		case SPIDERMINE:
+		case PINEMISSILE:
+		case TITANSTARSHRAPNEL:
+			DestroySecondary( i, (VECTOR *) &MInt_Point );
+			break;
+
+		case TITANSTARMISSILE:
+			TempVector.x = 0.0F;
+			TempVector.y = 1.0F;
+			TempVector.z = 0.0F;
+			CreateExplosionDonut( &SecBulls[ i ].Pos, (VECTOR *) &TempVector, SecBulls[ i ].GroupImIn );
+			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[i].Owner == WhoIAm ) ) ||
+				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
+				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
+			{
+				NewDir.x = ( MInt_Point.x - SecBulls[i].Pos.x );
+				NewDir.y = ( MInt_Point.y - SecBulls[i].Pos.y );
+				NewDir.z = ( MInt_Point.z - SecBulls[i].Pos.z );
+				TempGroup = MoveGroup( &Mloadheader, &SecBulls[i].Pos, SecBulls[i].GroupImIn, &NewDir );
+				CreateTitanStarShrapnel( i, (VECTOR *) &MInt_Point, &SecBulls[ i ].DirVector, TempGroup );
+			}
+			DestroySecondary( i, (VECTOR *) &MInt_Point );
+			break;
+		}
+		return true;
+	}
+	return false;
+}
+
+/* a missile hits a ship. True: the missile is gone (ProcessMissiles returns false). */
+[[gnu::always_inline]] static inline bool MissileHitShip( u_int16_t & i, VECTOR & TempVector, u_int16_t & HitTarget, VECTOR & Int_Point, VECTOR & Recoil, VECTOR & NewDir, float & Damage, u_int16_t & TempGroup )
+{
+	if( HitTarget != INDEX_NONE )												/* Hit Target? */
+	{
+		PlayPannedSfx( SFX_ShipHit, Ships[ HitTarget ].Object.Group , &Int_Point, 0.0F );
+
+		switch( ColPerspective )
+		{
+		case COLPERS_Forsaken:
+			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( WhoIAm == SecBulls[i].Owner ) ) || ( SecBulls[i].OwnerType != OWNER_SHIP ) )
+			{
+				Damage = SecBulls[i].Damage;
+
+				Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
+				Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
+				Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
+
+				if( SecBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
+
+				if( HitTarget == WhoIAm )
+				{
+					HitMe( SecBulls[i].OwnerType, SecBulls[i].Owner, Damage, WEPTYPE_Secondary, SecBulls[i].Weapon );
+					ForceExternalOneOff( WhoIAm, &Recoil );
+				}
+				else
+				{
+					IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &SecBulls[i].DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Secondary, SecBulls[i].Weapon, ONEOFF_RECOIL );
+				}
+			}
+			break;
+
+		case COLPERS_Descent:
+			if( HitTarget == WhoIAm )
+			{
+				Damage = SecBulls[i].Damage;
+
+				Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
+				Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
+				Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
+
+				if( SecBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
+
+				HitMe( SecBulls[i].OwnerType, SecBulls[i].Owner, Damage, WEPTYPE_Secondary, SecBulls[i].Weapon );
+				ForceExternalOneOff( WhoIAm, &Recoil );
+			}
+			break;
+		}
+
+		if( ( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) ) )
+		{
+			if( Ships[ HitTarget ].Object.Shield )
+			{
+				switch( SecBulls[ i ].Weapon )
+				{
+				case THIEFMISSILE:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 2, 255, 192, 0 );
+					break;
+
+				case ENEMYSPIRALMISSILE:
+				case ENEMYHOMINGMISSILE:
+				case ENEMYBLUEHOMINGMISSILE:
+				case ENEMYFIREBALL:
+				case ENEMYDEPTHCHARGE:
+				case MUGMISSILE:
+				case SOLARISMISSILE:
+				case ENEMYTENTACLE:
+				case SCATTERMISSILE:
+				case GRAVGONMISSILE:
+				case TITANSTARMISSILE:
+				case PINEMISSILE:
+				case TITANSTARSHRAPNEL:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 5, 255, 255, 255 );
+					break;
+				case MULTIPLEMISSILE:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 255, 255, 255 );
+					break;
+				}
+			}
+			else
+			{
+				switch( SecBulls[ i ].Weapon )
+				{
+				case ENEMYSPIRALMISSILE:
+				case ENEMYHOMINGMISSILE:
+				case ENEMYBLUEHOMINGMISSILE:
+				case ENEMYFIREBALL:
+				case ENEMYDEPTHCHARGE:
+				case MUGMISSILE:
+				case SOLARISMISSILE:
+				case THIEFMISSILE:
+				case ENEMYTENTACLE:
+				case SCATTERMISSILE:
+				case GRAVGONMISSILE:
+				case TITANSTARMISSILE:
+				case PINEMISSILE:
+				case MULTIPLEMISSILE:
+				case TITANSTARSHRAPNEL:
+					TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
+					TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
+					TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
+					NormaliseVector( &TempVector );
+					CreateColSparks( &Int_Point, &TempVector, Ships[ HitTarget ].Object.Group );
+					break;
+				}
+			}
+		}
+
+		switch( SecBulls[ i ].Weapon )
+		{
+		case ENEMYSPIRALMISSILE:
+		case ENEMYHOMINGMISSILE:
+		case ENEMYBLUEHOMINGMISSILE:
+		case ENEMYFIREBALL:
+		case ENEMYDEPTHCHARGE:
+		case MUGMISSILE:
+		case SOLARISMISSILE:
+		case GRAVGONMISSILE:
+		case MULTIPLEMISSILE:
+		case PINEMISSILE:
+		case TITANSTARSHRAPNEL:
+		default:
+			DestroySecondary( i, &Int_Point );
+			return true;
+			break;
+
+		case TITANSTARMISSILE:
+			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[i].Owner == WhoIAm ) ) ||
+				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
+				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
+			{
+				NewDir.x = ( Int_Point.x - SecBulls[ i ].Pos.x );
+				NewDir.y = ( Int_Point.y - SecBulls[ i ].Pos.y );
+				NewDir.z = ( Int_Point.z - SecBulls[ i ].Pos.z );
+				TempGroup = MoveGroup( &Mloadheader, &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, &NewDir );
+				TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
+				TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
+				TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
+				NormaliseVector( &TempVector );
+				CreateTitanStarShrapnel( i, &Int_Point, &TempVector, TempGroup );
+			}
+			DestroySecondary( i, &Int_Point );
+			return true;
+			break;
+
+		case THIEFMISSILE:
+			DestroySecondary( i, &Int_Point );
+			return true;
+			break;
+
+		case ENEMYTENTACLE:
+			SecBulls[ i ].State = MIS_RETRACTTENTACLE;
+			SecBulls[ i ].RetractPos = 0.0F;
+			break;
+
+		case SCATTERMISSILE:
+			switch( ColPerspective )
+			{
+			case COLPERS_Forsaken:
+				break;
+
+			case COLPERS_Descent:
+				if( HitTarget == WhoIAm )
+				{
+					if( !GodMode )
+					{
+						TempVector.x = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.x - Ships[ WhoIAm ].Object.Pos.x );
+						TempVector.y = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.y - Ships[ WhoIAm ].Object.Pos.y );
+						TempVector.z = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.z - Ships[ WhoIAm ].Object.Pos.z );
+						NormaliseVector( &TempVector );
+						ScatterWeapons( &TempVector, MAXSCATTERED );
+						PlayPannedSfx( SFX_Scattered, Ships[ HitTarget ].Object.Group , &Ships[ HitTarget ].Object.Pos, 0.0F );
+					}
+				}
+				break;
+			}
+			DestroySecondary( i, &Int_Point );
+			return true;
+			break;
+		}
+	}
+	return false;
+}
+
+/* a missile hits the background or a background object. True: the missile is gone (ProcessMissiles returns false). */
+[[gnu::always_inline]] static inline bool MissileHitWall( u_int16_t & i, VECTOR & NewPos, VECTOR & DirVector, VECTOR & TempVector, u_int16_t & HitWall, VECTOR & NewDir, u_int16_t & TempGroup )
+{
+	if( HitWall != INDEX_NONE )
+	{
+		switch( SecBulls[ i ].Weapon )
+		{
+		case ENEMYSPIRALMISSILE:
+		case ENEMYHOMINGMISSILE:
+		case ENEMYBLUEHOMINGMISSILE:
+		case GRAVGONMISSILE:
+		case MUGMISSILE:
+		case MULTIPLEMISSILE:
+		case SOLARISMISSILE:
+		case SCATTERMISSILE:
+		default:
+			MissileShockWave( (VECTOR *) &SecBulls[i].ColPoint, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
+			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
+			return true;
+			break;
+
+		case ENEMYTENTACLE:
+			SecBulls[ i ].State = MIS_RETRACTTENTACLE;
+			SecBulls[ i ].RetractPos = 0.0F;
+
+			CreateShockwave( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, SecBulls[i].GroupImIn, TENTACLE_SHOCKWAVE, SecBulls[i].Weapon );
+			break;
+
+		case ENEMYFIREBALL:
+			if( SecBulls[i].NumBounces )
+			{
+				SecBulls[i].NumBounces--;
+				DirVector.x = ( SecBulls[i].ColPoint.x - SecBulls[i].Pos.x );
+				DirVector.y = ( SecBulls[i].ColPoint.y - SecBulls[i].Pos.y );
+				DirVector.z = ( SecBulls[i].ColPoint.z - SecBulls[i].Pos.z );
+				NewPos.x = SecBulls[i].ColPoint.x;
+				NewPos.y = SecBulls[i].ColPoint.y;
+				NewPos.z = SecBulls[i].ColPoint.z;
+				TempVector = SecBulls[i].DirVector;
+				ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
+				SecBulls[i].ColFlag = 0;
+			}
+			else
+			{
+				DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
+			}
+			return true;
+			break;
+
+		case ENEMYDEPTHCHARGE:
+			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
+			return true;
+			break;
+
+		case THIEFMISSILE:
+			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
+			return true;
+			break;
+
+		case PINEMISSILE:
+			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
+			return true;
+			break;
+
+		case TITANSTARSHRAPNEL:
+			if( SecBulls[i].LifeCount < 15.0F )
+			{
+				DirVector.x = ( SecBulls[i].ColPoint.x - SecBulls[i].Pos.x );
+				DirVector.y = ( SecBulls[i].ColPoint.y - SecBulls[i].Pos.y );
+				DirVector.z = ( SecBulls[i].ColPoint.z - SecBulls[i].Pos.z );
+				NewPos.x = SecBulls[i].ColPoint.x;
+				NewPos.y = SecBulls[i].ColPoint.y;
+				NewPos.z = SecBulls[i].ColPoint.z;
+				TempVector = SecBulls[i].DirVector;
+				ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
+				SecBulls[i].ColFlag = 0;
+			}
+			else
+			{
+				DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
+				return true;
+			}
+			break;
+
+		case TITANSTARMISSILE:
+			TempVector = SecBulls[i].DirVector;
+			ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &TempVector );
+
+			CreateExplosionDonut( &SecBulls[ i ].Pos, (VECTOR *) &SecBulls[ i ].ColPointNormal, SecBulls[ i ].GroupImIn );
+			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP )
+					&& ( SecBulls[i].Owner == WhoIAm )
+				) ||
+				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
+				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
+			{
+				NewDir.x = ( SecBulls[ i ].ColPoint.x - SecBulls[ i ].Pos.x );
+				NewDir.y = ( SecBulls[ i ].ColPoint.y - SecBulls[ i ].Pos.y );
+				NewDir.z = ( SecBulls[ i ].ColPoint.z - SecBulls[ i ].Pos.z );
+				TempGroup = MoveGroup( &Mloadheader, &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, &NewDir );
+				CreateTitanStarShrapnel( i, (VECTOR *) &SecBulls[ i ].ColPoint, (VECTOR *) &TempVector, TempGroup );
+			}
+			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
+			return true;
+			break;
+		}
+	}
+	return false;
+}
+
+/* a missile hits an enemy. True: the missile is gone (ProcessMissiles returns false). */
+[[gnu::always_inline]] static inline bool MissileHitEnemy( u_int16_t & i, VECTOR & TempVector, float & Speed, ENEMY		*& HitEnemy, VECTOR & EInt_Point, VECTOR & NewDir, float & LifeCount, u_int16_t & TempGroup )
+{
+	if( HitEnemy != nullptr )
+	{
+		TempVector.x = ( EInt_Point.x - HitEnemy->Object.Pos.x );
+		TempVector.y = ( EInt_Point.y - HitEnemy->Object.Pos.y );
+		TempVector.z = ( EInt_Point.z - HitEnemy->Object.Pos.z );
+		NormaliseVector( &TempVector );
+
+		ReflectVector( &SecBulls[i].DirVector, (NORMAL *) &TempVector, &NewDir );
+
+		if( !( HitEnemy->Object.Flags & SHIP_Invul ) )
+		{
+			if( DamageEnemy( HitEnemy , -SecBulls[i].Damage , &EInt_Point , &SecBulls[i].DirVector , SecBulls[ i ].Speed , SecBulls[ i ].Owner , SecBulls[ i ].OwnerType ) )
+			{
+				CreateNewExplosion( &EInt_Point, &NewDir, SecBulls[i].GroupImIn );
+				KillUsedEnemy( HitEnemy );
+			}
+			else
+			{
+				CreateColSparks( &EInt_Point, &TempVector, HitEnemy->Object.Group );
+			}
+		}
+		else
+		{
+			if( !Random_Range( 4 ) )
+			{
+				PlayPannedSfx( SFX_Ric, SecBulls[i].GroupImIn, (VECTOR *) &EInt_Point, 0.0F );
+			}
+		}
+
+		switch( SecBulls[ i ].Weapon )
+		{
+		case ENEMYSPIRALMISSILE:
+		case ENEMYHOMINGMISSILE:
+		case ENEMYBLUEHOMINGMISSILE:
+		case GRAVGONMISSILE:
+		case MUGMISSILE:
+		case MULTIPLEMISSILE:
+		case SOLARISMISSILE:
+		default:
+			MissileShockWave( &EInt_Point, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+
+		case ENEMYFIREBALL:
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+
+		case ENEMYDEPTHCHARGE:
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+
+		case ENEMYTENTACLE:
+			SecBulls[ i ].State = MIS_RETRACTTENTACLE;
+			SecBulls[ i ].RetractPos = 0.0F;
+			break;
+
+		case SCATTERMISSILE:
+			if( HitEnemy->PickupHeld != INDEX_NONE )
+			{
+				if( !( HitEnemy->Object.Flags & SHIP_Scattered ) )
+				{
+					TempVector.x = Random_Jitter();
+					TempVector.y = Random_Jitter();
+					TempVector.z = Random_Jitter();
+					NormaliseVector( &TempVector );
+					if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
+					else LifeCount = -1.0F;
+					Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+					InitOnePickup( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, Speed, HitEnemy->PickupHeld, INDEX_NONE, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+					if( IsHost ) DropPickupSend( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, 0.0F, HitEnemy->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+					if( HitEnemy->PickupHeld <= LASER ) HitEnemy->Object.Flags |= SHIP_Scattered;
+					HitEnemy->PickupHeld = INDEX_NONE;
+				}
+			}
+			else
+			{
+				TempVector.x = Random_Jitter();
+				TempVector.y = Random_Jitter();
+				TempVector.z = Random_Jitter();
+				NormaliseVector( &TempVector );
+				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
+				else LifeCount = -1.0F;
+				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+				InitOnePickup( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, Speed, PICKUP_Shield, INDEX_NONE, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				if( IsHost ) DropPickupSend( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, 0.0F, PICKUP_Shield, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+			}
+			MissileShockWave( &EInt_Point, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+
+		case THIEFMISSILE:
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+
+		case PINEMISSILE:
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+
+		case TITANSTARSHRAPNEL:
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+
+		case TITANSTARMISSILE:
+			CreateExplosionDonut( &SecBulls[ i ].Pos, &TempVector, SecBulls[ i ].GroupImIn );
+			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[i].Owner == WhoIAm ) ) ||
+				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
+				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
+			{
+				NewDir.x = ( EInt_Point.x - SecBulls[ i ].Pos.x );
+				NewDir.y = ( EInt_Point.y - SecBulls[ i ].Pos.y );
+				NewDir.z = ( EInt_Point.z - SecBulls[ i ].Pos.z );
+				TempGroup = MoveGroup( &Mloadheader, &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, &NewDir );
+				CreateTitanStarShrapnel( i, &EInt_Point, &NewDir, TempGroup );
+			}
+			DestroySecondary( i, &EInt_Point );
+			return true;
+			break;
+		}
+	}
+	return false;
+}
+
+/* the smoke and flame trail of a missile in a visible group */
+[[gnu::always_inline]] static inline void MissileTrails( u_int16_t & i, VECTOR & TempVector, float & Damage, float & NewFramelag )
+{
+	if( IsGroupVisible[ SecBulls[i].GroupImIn ] )
+	{
+		if( ( SecBulls[i].State != MIS_DROP ) &&
+			( ( SecBulls[i].Speed != 0.0F ) || ( SecBulls[i].State == MIS_RETRACTTENTACLE ) ) )	/* No Smoke Trail when Dropping or Stationary */
+		{
+			if( !InWater( SecBulls[i].GroupImIn, &SecBulls[i].Pos, &Damage ) )
+			{
+				switch( SecBulls[i].Weapon )
+				{
+				case ENEMYTENTACLE:
+					CreateTentacle( i );
+					break;
+
+				case SCATTERMISSILE:
+					CreateScatterTrail( i );
+					break;
+
+				case ENEMYSPIRALMISSILE:
+				case ENEMYHOMINGMISSILE:
+				case ENEMYBLUEHOMINGMISSILE:
+				case ENEMYFIREBALL:
+				case ENEMYDEPTHCHARGE:
+				case GRAVGONMISSILE:
+				case SOLARISMISSILE:
+				case THIEFMISSILE:
+				case MUGMISSILE:
+				case MULTIPLEMISSILE:
+				case PINEMISSILE:
+				case TITANSTARMISSILE:
+				case TITANSTARSHRAPNEL:
+
+					SecBulls[i].Time += NewFramelag; //framelag;
+					if( SecBulls[i].Time >= SecBulls[i].Interval )
+					{
+						SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
+
+						switch( SecBulls[i].Weapon )
+						{
+						case GRAVGONMISSILE:
+							CreateGravgonTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
+							break;
+
+						case SOLARISMISSILE:
+							CreateSolarisTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
+							break;
+
+						case ENEMYTENTACLE:
+						case SCATTERMISSILE:
+						case ENEMYHOMINGMISSILE:
+						case ENEMYBLUEHOMINGMISSILE:
+							break;
+
+						case THIEFMISSILE:
+							CreateNewTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
+							break;
+
+						case ENEMYSPIRALMISSILE:
+						case MUGMISSILE:
+						case MULTIPLEMISSILE:
+						case PINEMISSILE:
+						case TITANSTARMISSILE:
+							CreateTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
+							break;
+
+						case TITANSTARSHRAPNEL:
+							CreateNewTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
+							break;
+
+						case ENEMYFIREBALL:
+							CreateFireBall( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
+							break;
+
+						case ENEMYDEPTHCHARGE:
+							break;
+						}
+					}
+
+					break;
+				}
+			}
+			else
+			{
+				switch( SecBulls[i].Weapon )
+				{
+				case ENEMYTENTACLE:
+					CreateTentacle( i );
+					break;
+
+				case SCATTERMISSILE:
+					CreateScatterTrail( i );
+					break;
+
+				case ENEMYSPIRALMISSILE:
+				case ENEMYHOMINGMISSILE:
+				case ENEMYBLUEHOMINGMISSILE:
+				case GRAVGONMISSILE:
+				case SOLARISMISSILE:
+				case THIEFMISSILE:
+				case MUGMISSILE:
+				case MULTIPLEMISSILE:
+				case PINEMISSILE:
+				case TITANSTARMISSILE:
+				case TITANSTARSHRAPNEL:
+				case ENEMYDEPTHCHARGE:
+
+					SecBulls[i].Time += NewFramelag; //framelag;
+					if( SecBulls[i].Time >= SecBulls[i].Interval )
+					{
+						SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
+
+						TempVector.x = ( SecBulls[i].Pos.x + ( -SecBulls[i].DirVector.x * ( 200.0F * GLOBAL_SCALE ) ) );
+						TempVector.y = ( SecBulls[i].Pos.y + ( -SecBulls[i].DirVector.y * ( 200.0F * GLOBAL_SCALE ) ) );
+						TempVector.z = ( SecBulls[i].Pos.z + ( -SecBulls[i].DirVector.z * ( 200.0F * GLOBAL_SCALE ) ) );
+
+						switch( SecBulls[i].Weapon )
+						{
+						case GRAVGONMISSILE:
+						case SOLARISMISSILE:
+						case THIEFMISSILE:
+						case ENEMYSPIRALMISSILE:
+						case ENEMYHOMINGMISSILE:
+						case ENEMYBLUEHOMINGMISSILE:
+						case ENEMYDEPTHCHARGE:
+						case MUGMISSILE:
+						case MULTIPLEMISSILE:
+						case PINEMISSILE:
+						case TITANSTARMISSILE:
+						case TITANSTARSHRAPNEL:
+							CreateBubbleTrail( &TempVector, &SecBulls[i].DirVector, SecBulls[i].GroupImIn, 64, 64, 64 );
+							break;
+						}
+					}
+					break;
+
+				case ENEMYFIREBALL:
+					CreateSpotFXBurning( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+	}
+}
+
 bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 {
 	QUATLERP		qlerp;
@@ -2915,559 +3629,26 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 	/*===================================================================
 				Hit Secondary
 	===================================================================*/
-	if( HitSecondary != INDEX_NONE )							/* Hit Secondary? */
-	{
-		SecBulls[ HitSecondary ].Shield -= SecBulls[i].Damage;
-		if( SecBulls[ HitSecondary ].Shield < 0.0F ) SecBulls[ HitSecondary ].Shield = 0.0F;
-
-		if( SecBulls[ HitSecondary ].Shield == 0.0F )
-		{
-			if( *NextMissile == HitSecondary )
-			{
-				*NextMissile = SecBulls[ HitSecondary ].Prev;
-			}
-
-			switch( SecBulls[ HitSecondary ].Weapon )
-			{
-			case ENEMYSPIRALMISSILE:
-			case ENEMYHOMINGMISSILE:
-			case ENEMYBLUEHOMINGMISSILE:
-			case GRAVGONMISSILE:
-			case MUGMISSILE:
-			case MULTIPLEMISSILE:
-			case SOLARISMISSILE:
-			case ENEMYTENTACLE:
-			case SCATTERMISSILE:
-			default:
-				MissileShockWave( (VECTOR *) &MInt_Point, MISSILE_SHOCKWAVE, SecBulls[ HitSecondary ].Owner,
-								( SecBulls[ HitSecondary ].Damage / 2.5F ), SecBulls[ HitSecondary ].GroupImIn,
-								SecBulls[ HitSecondary ].Weapon );
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-
-			case ENEMYFIREBALL:
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-
-			case ENEMYDEPTHCHARGE:
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-
-			case THIEFMISSILE:
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-
-			case PINEMISSILE:
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-
-			case TITANSTARSHRAPNEL:
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-
-			case TITANSTARMISSILE:
-				TempVector.x = 0.0F;
-				TempVector.y = 1.0F;
-				TempVector.z = 0.0F;
-				CreateExplosionDonut( &SecBulls[ HitSecondary ].Pos, (VECTOR *) &TempVector, SecBulls[ HitSecondary ].GroupImIn );
-				if( ( ( SecBulls[ HitSecondary ].OwnerType == OWNER_SHIP ) && ( SecBulls[ HitSecondary ].Owner == WhoIAm ) ) ||
-					( ( SecBulls[ HitSecondary ].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
-					( ( SecBulls[ HitSecondary ].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
-				{
-					NewDir.x = ( MInt_Point.x - SecBulls[ HitSecondary ].Pos.x );
-					NewDir.y = ( MInt_Point.y - SecBulls[ HitSecondary ].Pos.y );
-					NewDir.z = ( MInt_Point.z - SecBulls[ HitSecondary ].Pos.z );
-					TempGroup = MoveGroup( &Mloadheader, &SecBulls[ HitSecondary ].Pos, SecBulls[ HitSecondary ].GroupImIn, &NewDir );
-					CreateTitanStarShrapnel( HitSecondary, (VECTOR *) &MInt_Point, &SecBulls[ HitSecondary ].DirVector, TempGroup );
-				}
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-
-			case PURGEMINE:
-			case PINEMINE:
-			case QUANTUMMINE:
-			case SPIDERMINE:
-				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-				break;
-			}
-		}
-
-		switch( SecBulls[ i ].Weapon )
-		{
-		case ENEMYSPIRALMISSILE:
-		case ENEMYHOMINGMISSILE:
-		case ENEMYBLUEHOMINGMISSILE:
-		case GRAVGONMISSILE:
-		case MUGMISSILE:
-		case MULTIPLEMISSILE:
-		case SOLARISMISSILE:
-		case ENEMYTENTACLE:
-		case SCATTERMISSILE:
-		default:
-			MissileShockWave( (VECTOR *) &MInt_Point, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
-			DestroySecondary( i, (VECTOR *) &MInt_Point );
-			break;
-
-		case ENEMYFIREBALL:
-			DestroySecondary( i, (VECTOR *) &MInt_Point );
-			break;
-
-		case ENEMYDEPTHCHARGE:
-			DestroySecondary( i, (VECTOR *) &MInt_Point );
-			break;
-
-		case THIEFMISSILE:
-			DestroySecondary( i, (VECTOR *) &MInt_Point );
-			break;
-
-		case PURGEMINE:
-		case PINEMINE:
-		case QUANTUMMINE:
-		case SPIDERMINE:
-		case PINEMISSILE:
-		case TITANSTARSHRAPNEL:
-			DestroySecondary( i, (VECTOR *) &MInt_Point );
-			break;
-
-		case TITANSTARMISSILE:
-			TempVector.x = 0.0F;
-			TempVector.y = 1.0F;
-			TempVector.z = 0.0F;
-			CreateExplosionDonut( &SecBulls[ i ].Pos, (VECTOR *) &TempVector, SecBulls[ i ].GroupImIn );
-			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[i].Owner == WhoIAm ) ) ||
-				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
-				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
-			{
-				NewDir.x = ( MInt_Point.x - SecBulls[i].Pos.x );
-				NewDir.y = ( MInt_Point.y - SecBulls[i].Pos.y );
-				NewDir.z = ( MInt_Point.z - SecBulls[i].Pos.z );
-				TempGroup = MoveGroup( &Mloadheader, &SecBulls[i].Pos, SecBulls[i].GroupImIn, &NewDir );
-				CreateTitanStarShrapnel( i, (VECTOR *) &MInt_Point, &SecBulls[ i ].DirVector, TempGroup );
-			}
-			DestroySecondary( i, (VECTOR *) &MInt_Point );
-			break;
-		}
+	if( MissileHitSecondary( i, NextMissile, TempVector, HitSecondary, MInt_Point, NewDir, TempGroup ) )
 		return( false );
-	}
 
 	/*===================================================================
 				Hit Ship
 	===================================================================*/
-	if( HitTarget != INDEX_NONE )												/* Hit Target? */
-	{
-		PlayPannedSfx( SFX_ShipHit, Ships[ HitTarget ].Object.Group , &Int_Point, 0.0F );
-
-		switch( ColPerspective )
-		{
-		case COLPERS_Forsaken:
-			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( WhoIAm == SecBulls[i].Owner ) ) || ( SecBulls[i].OwnerType != OWNER_SHIP ) )
-			{
-				Damage = SecBulls[i].Damage;
-
-				Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
-				Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
-				Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
-
-				if( SecBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
-
-				if( HitTarget == WhoIAm )
-				{
-					HitMe( SecBulls[i].OwnerType, SecBulls[i].Owner, Damage, WEPTYPE_Secondary, SecBulls[i].Weapon );
-					ForceExternalOneOff( WhoIAm, &Recoil );
-				}
-				else
-				{
-					IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &SecBulls[i].DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Secondary, SecBulls[i].Weapon, ONEOFF_RECOIL );
-				}
-			}
-			break;
-
-		case COLPERS_Descent:
-			if( HitTarget == WhoIAm )
-			{
-				Damage = SecBulls[i].Damage;
-
-				Recoil.x = ( SecBulls[i].DirVector.x * ( Damage / 10.0F ) );
-				Recoil.y = ( SecBulls[i].DirVector.y * ( Damage / 10.0F ) );
-				Recoil.z = ( SecBulls[i].DirVector.z * ( Damage / 10.0F ) );
-
-				if( SecBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
-
-				HitMe( SecBulls[i].OwnerType, SecBulls[i].Owner, Damage, WEPTYPE_Secondary, SecBulls[i].Weapon );
-				ForceExternalOneOff( WhoIAm, &Recoil );
-			}
-			break;
-		}
-
-		if( ( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) ) )
-		{
-			if( Ships[ HitTarget ].Object.Shield )
-			{
-				switch( SecBulls[ i ].Weapon )
-				{
-				case THIEFMISSILE:
-					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 2, 255, 192, 0 );
-					break;
-
-				case ENEMYSPIRALMISSILE:
-				case ENEMYHOMINGMISSILE:
-				case ENEMYBLUEHOMINGMISSILE:
-				case ENEMYFIREBALL:
-				case ENEMYDEPTHCHARGE:
-				case MUGMISSILE:
-				case SOLARISMISSILE:
-				case ENEMYTENTACLE:
-				case SCATTERMISSILE:
-				case GRAVGONMISSILE:
-				case TITANSTARMISSILE:
-				case PINEMISSILE:
-				case TITANSTARSHRAPNEL:
-					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 5, 255, 255, 255 );
-					break;
-				case MULTIPLEMISSILE:
-					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 255, 255, 255 );
-					break;
-				}
-			}
-			else
-			{
-				switch( SecBulls[ i ].Weapon )
-				{
-				case ENEMYSPIRALMISSILE:
-				case ENEMYHOMINGMISSILE:
-				case ENEMYBLUEHOMINGMISSILE:
-				case ENEMYFIREBALL:
-				case ENEMYDEPTHCHARGE:
-				case MUGMISSILE:
-				case SOLARISMISSILE:
-				case THIEFMISSILE:
-				case ENEMYTENTACLE:
-				case SCATTERMISSILE:
-				case GRAVGONMISSILE:
-				case TITANSTARMISSILE:
-				case PINEMISSILE:
-				case MULTIPLEMISSILE:
-				case TITANSTARSHRAPNEL:
-					TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
-					TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
-					TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
-					NormaliseVector( &TempVector );
-					CreateColSparks( &Int_Point, &TempVector, Ships[ HitTarget ].Object.Group );
-					break;
-				}
-			}
-		}
-
-		switch( SecBulls[ i ].Weapon )
-		{
-		case ENEMYSPIRALMISSILE:
-		case ENEMYHOMINGMISSILE:
-		case ENEMYBLUEHOMINGMISSILE:
-		case ENEMYFIREBALL:
-		case ENEMYDEPTHCHARGE:
-		case MUGMISSILE:
-		case SOLARISMISSILE:
-		case GRAVGONMISSILE:
-		case MULTIPLEMISSILE:
-		case PINEMISSILE:
-		case TITANSTARSHRAPNEL:
-		default:
-			DestroySecondary( i, &Int_Point );
-			return( false );
-			break;
-
-		case TITANSTARMISSILE:
-			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[i].Owner == WhoIAm ) ) ||
-				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
-				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
-			{
-				NewDir.x = ( Int_Point.x - SecBulls[ i ].Pos.x );
-				NewDir.y = ( Int_Point.y - SecBulls[ i ].Pos.y );
-				NewDir.z = ( Int_Point.z - SecBulls[ i ].Pos.z );
-				TempGroup = MoveGroup( &Mloadheader, &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, &NewDir );
-				TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
-				TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
-				TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
-				NormaliseVector( &TempVector );
-				CreateTitanStarShrapnel( i, &Int_Point, &TempVector, TempGroup );
-			}
-			DestroySecondary( i, &Int_Point );
-			return( false );
-			break;
-
-		case THIEFMISSILE:
-			DestroySecondary( i, &Int_Point );
-			return( false );
-			break;
-
-		case ENEMYTENTACLE:
-			SecBulls[ i ].State = MIS_RETRACTTENTACLE;
-			SecBulls[ i ].RetractPos = 0.0F;
-			break;
-
-		case SCATTERMISSILE:
-			switch( ColPerspective )
-			{
-			case COLPERS_Forsaken:
-				break;
-
-			case COLPERS_Descent:
-				if( HitTarget == WhoIAm )
-				{
-					if( !GodMode )
-					{
-						TempVector.x = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.x - Ships[ WhoIAm ].Object.Pos.x );
-						TempVector.y = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.y - Ships[ WhoIAm ].Object.Pos.y );
-						TempVector.z = ( Ships[ SecBulls[ i ].Owner ].Object.Pos.z - Ships[ WhoIAm ].Object.Pos.z );
-						NormaliseVector( &TempVector );
-						ScatterWeapons( &TempVector, MAXSCATTERED );
-						PlayPannedSfx( SFX_Scattered, Ships[ HitTarget ].Object.Group , &Ships[ HitTarget ].Object.Pos, 0.0F );
-					}
-				}
-				break;
-			}
-			DestroySecondary( i, &Int_Point );
-			return( false );
-			break;
-		}
-	}
+	if( MissileHitShip( i, TempVector, HitTarget, Int_Point, Recoil, NewDir, Damage, TempGroup ) )
+		return( false );
 
 	/*===================================================================
 				Hit Wall
 	===================================================================*/
-	if( HitWall != INDEX_NONE )
-	{
-		switch( SecBulls[ i ].Weapon )
-		{
-		case ENEMYSPIRALMISSILE:
-		case ENEMYHOMINGMISSILE:
-		case ENEMYBLUEHOMINGMISSILE:
-		case GRAVGONMISSILE:
-		case MUGMISSILE:
-		case MULTIPLEMISSILE:
-		case SOLARISMISSILE:
-		case SCATTERMISSILE:
-		default:
-			MissileShockWave( (VECTOR *) &SecBulls[i].ColPoint, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
-			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
-			return( false );
-			break;
-
-		case ENEMYTENTACLE:
-			SecBulls[ i ].State = MIS_RETRACTTENTACLE;
-			SecBulls[ i ].RetractPos = 0.0F;
-
-			CreateShockwave( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, SecBulls[i].GroupImIn, TENTACLE_SHOCKWAVE, SecBulls[i].Weapon );
-			break;
-
-		case ENEMYFIREBALL:
-			if( SecBulls[i].NumBounces )
-			{
-				SecBulls[i].NumBounces--;
-				DirVector.x = ( SecBulls[i].ColPoint.x - SecBulls[i].Pos.x );
-				DirVector.y = ( SecBulls[i].ColPoint.y - SecBulls[i].Pos.y );
-				DirVector.z = ( SecBulls[i].ColPoint.z - SecBulls[i].Pos.z );
-				NewPos.x = SecBulls[i].ColPoint.x;
-				NewPos.y = SecBulls[i].ColPoint.y;
-				NewPos.z = SecBulls[i].ColPoint.z;
-				TempVector = SecBulls[i].DirVector;
-				ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
-				SecBulls[i].ColFlag = 0;
-			}
-			else
-			{
-				DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
-			}
-			return( false );
-			break;
-
-		case ENEMYDEPTHCHARGE:
-			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
-			return( false );
-			break;
-
-		case THIEFMISSILE:
-			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
-			return( false );
-			break;
-
-		case PINEMISSILE:
-			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
-			return( false );
-			break;
-
-		case TITANSTARSHRAPNEL:
-			if( SecBulls[i].LifeCount < 15.0F )
-			{
-				DirVector.x = ( SecBulls[i].ColPoint.x - SecBulls[i].Pos.x );
-				DirVector.y = ( SecBulls[i].ColPoint.y - SecBulls[i].Pos.y );
-				DirVector.z = ( SecBulls[i].ColPoint.z - SecBulls[i].Pos.z );
-				NewPos.x = SecBulls[i].ColPoint.x;
-				NewPos.y = SecBulls[i].ColPoint.y;
-				NewPos.z = SecBulls[i].ColPoint.z;
-				TempVector = SecBulls[i].DirVector;
-				ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &SecBulls[i].DirVector );
-				SecBulls[i].ColFlag = 0;
-			}
-			else
-			{
-				DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
-				return( false );
-			}
-			break;
-
-		case TITANSTARMISSILE:
-			TempVector = SecBulls[i].DirVector;
-			ReflectVector( &TempVector, &SecBulls[i].ColPointNormal, &TempVector );
-
-			CreateExplosionDonut( &SecBulls[ i ].Pos, (VECTOR *) &SecBulls[ i ].ColPointNormal, SecBulls[ i ].GroupImIn );
-			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP )
-					&& ( SecBulls[i].Owner == WhoIAm )
-				) ||
-				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
-				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
-			{
-				NewDir.x = ( SecBulls[ i ].ColPoint.x - SecBulls[ i ].Pos.x );
-				NewDir.y = ( SecBulls[ i ].ColPoint.y - SecBulls[ i ].Pos.y );
-				NewDir.z = ( SecBulls[ i ].ColPoint.z - SecBulls[ i ].Pos.z );
-				TempGroup = MoveGroup( &Mloadheader, &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, &NewDir );
-				CreateTitanStarShrapnel( i, (VECTOR *) &SecBulls[ i ].ColPoint, (VECTOR *) &TempVector, TempGroup );
-			}
-			DestroySecondary( i, (VECTOR *) &SecBulls[i].ColPoint );
-			return( false );
-			break;
-		}
-	}
+	if( MissileHitWall( i, NewPos, DirVector, TempVector, HitWall, NewDir, TempGroup ) )
+		return( false );
 
 	/*===================================================================
 				Hit Enemy
 	===================================================================*/
-	if( HitEnemy != nullptr )
-	{
-		TempVector.x = ( EInt_Point.x - HitEnemy->Object.Pos.x );
-		TempVector.y = ( EInt_Point.y - HitEnemy->Object.Pos.y );
-		TempVector.z = ( EInt_Point.z - HitEnemy->Object.Pos.z );
-		NormaliseVector( &TempVector );
-
-		ReflectVector( &SecBulls[i].DirVector, (NORMAL *) &TempVector, &NewDir );
-
-		if( !( HitEnemy->Object.Flags & SHIP_Invul ) )
-		{
-			if( DamageEnemy( HitEnemy , -SecBulls[i].Damage , &EInt_Point , &SecBulls[i].DirVector , SecBulls[ i ].Speed , SecBulls[ i ].Owner , SecBulls[ i ].OwnerType ) )
-			{
-				CreateNewExplosion( &EInt_Point, &NewDir, SecBulls[i].GroupImIn );
-				KillUsedEnemy( HitEnemy );
-			}
-			else
-			{
-				CreateColSparks( &EInt_Point, &TempVector, HitEnemy->Object.Group );
-			}
-		}
-		else
-		{
-			if( !Random_Range( 4 ) )
-			{
-				PlayPannedSfx( SFX_Ric, SecBulls[i].GroupImIn, (VECTOR *) &EInt_Point, 0.0F );
-			}
-		}
-
-		switch( SecBulls[ i ].Weapon )
-		{
-		case ENEMYSPIRALMISSILE:
-		case ENEMYHOMINGMISSILE:
-		case ENEMYBLUEHOMINGMISSILE:
-		case GRAVGONMISSILE:
-		case MUGMISSILE:
-		case MULTIPLEMISSILE:
-		case SOLARISMISSILE:
-		default:
-			MissileShockWave( &EInt_Point, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-
-		case ENEMYFIREBALL:
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-
-		case ENEMYDEPTHCHARGE:
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-
-		case ENEMYTENTACLE:
-			SecBulls[ i ].State = MIS_RETRACTTENTACLE;
-			SecBulls[ i ].RetractPos = 0.0F;
-			break;
-
-		case SCATTERMISSILE:
-			if( HitEnemy->PickupHeld != INDEX_NONE )
-			{
-				if( !( HitEnemy->Object.Flags & SHIP_Scattered ) )
-				{
-					TempVector.x = Random_Jitter();
-					TempVector.y = Random_Jitter();
-					TempVector.z = Random_Jitter();
-					NormaliseVector( &TempVector );
-					if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
-					else LifeCount = -1.0F;
-					Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-					InitOnePickup( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, Speed, HitEnemy->PickupHeld, INDEX_NONE, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-					if( IsHost ) DropPickupSend( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, 0.0F, HitEnemy->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-					if( HitEnemy->PickupHeld <= LASER ) HitEnemy->Object.Flags |= SHIP_Scattered;
-					HitEnemy->PickupHeld = INDEX_NONE;
-				}
-			}
-			else
-			{
-				TempVector.x = Random_Jitter();
-				TempVector.y = Random_Jitter();
-				TempVector.z = Random_Jitter();
-				NormaliseVector( &TempVector );
-				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
-				else LifeCount = -1.0F;
-				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-				InitOnePickup( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, Speed, PICKUP_Shield, INDEX_NONE, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-				if( IsHost ) DropPickupSend( &HitEnemy->Object.Pos, HitEnemy->Object.Group, &TempVector, 0.0F, PICKUP_Shield, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-			}
-			MissileShockWave( &EInt_Point, MISSILE_SHOCKWAVE, SecBulls[i].Owner, ( SecBulls[i].Damage / 2.5F ), SecBulls[i].GroupImIn, SecBulls[i].Weapon );
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-
-		case THIEFMISSILE:
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-
-		case PINEMISSILE:
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-
-		case TITANSTARSHRAPNEL:
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-
-		case TITANSTARMISSILE:
-			CreateExplosionDonut( &SecBulls[ i ].Pos, &TempVector, SecBulls[ i ].GroupImIn );
-			if( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[i].Owner == WhoIAm ) ) ||
-				( ( SecBulls[i].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
-				( ( SecBulls[i].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
-			{
-				NewDir.x = ( EInt_Point.x - SecBulls[ i ].Pos.x );
-				NewDir.y = ( EInt_Point.y - SecBulls[ i ].Pos.y );
-				NewDir.z = ( EInt_Point.z - SecBulls[ i ].Pos.z );
-				TempGroup = MoveGroup( &Mloadheader, &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, &NewDir );
-				CreateTitanStarShrapnel( i, &EInt_Point, &NewDir, TempGroup );
-			}
-			DestroySecondary( i, &EInt_Point );
-			return( false );
-			break;
-		}
-	}
+	if( MissileHitEnemy( i, TempVector, Speed, HitEnemy, EInt_Point, NewDir, LifeCount, TempGroup ) )
+		return( false );
 
 	SecBulls[i].GroupImIn = MoveGroup( &Mloadheader, &SecBulls[i].Pos, SecBulls[i].GroupImIn, &DirVector );
 	SecBulls[i].Pos = NewPos;
@@ -3480,150 +3661,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 	/*===================================================================
 				Do Trails
 	===================================================================*/
-	if( IsGroupVisible[ SecBulls[i].GroupImIn ] )
-	{
-		if( ( SecBulls[i].State != MIS_DROP ) &&
-			( ( SecBulls[i].Speed != 0.0F ) || ( SecBulls[i].State == MIS_RETRACTTENTACLE ) ) )	/* No Smoke Trail when Dropping or Stationary */
-		{
-			if( !InWater( SecBulls[i].GroupImIn, &SecBulls[i].Pos, &Damage ) )
-			{
-				switch( SecBulls[i].Weapon )
-				{
-				case ENEMYTENTACLE:
-					CreateTentacle( i );
-					break;
-
-				case SCATTERMISSILE:
-					CreateScatterTrail( i );
-					break;
-
-				case ENEMYSPIRALMISSILE:
-				case ENEMYHOMINGMISSILE:
-				case ENEMYBLUEHOMINGMISSILE:
-				case ENEMYFIREBALL:
-				case ENEMYDEPTHCHARGE:
-				case GRAVGONMISSILE:
-				case SOLARISMISSILE:
-				case THIEFMISSILE:
-				case MUGMISSILE:
-				case MULTIPLEMISSILE:
-				case PINEMISSILE:
-				case TITANSTARMISSILE:
-				case TITANSTARSHRAPNEL:
-
-					SecBulls[i].Time += NewFramelag; //framelag;
-					if( SecBulls[i].Time >= SecBulls[i].Interval )
-					{
-						SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
-
-						switch( SecBulls[i].Weapon )
-						{
-						case GRAVGONMISSILE:
-							CreateGravgonTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
-							break;
-
-						case SOLARISMISSILE:
-							CreateSolarisTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
-							break;
-
-						case ENEMYTENTACLE:
-						case SCATTERMISSILE:
-						case ENEMYHOMINGMISSILE:
-						case ENEMYBLUEHOMINGMISSILE:
-							break;
-
-						case THIEFMISSILE:
-							CreateNewTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
-							break;
-
-						case ENEMYSPIRALMISSILE:
-						case MUGMISSILE:
-						case MULTIPLEMISSILE:
-						case PINEMISSILE:
-						case TITANSTARMISSILE:
-							CreateTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
-							break;
-
-						case TITANSTARSHRAPNEL:
-							CreateNewTrail( (VECTOR *) &SecBulls[i].Pos, (VECTOR *) &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
-							break;
-
-						case ENEMYFIREBALL:
-							CreateFireBall( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
-							break;
-
-						case ENEMYDEPTHCHARGE:
-							break;
-						}
-					}
-
-					break;
-				}
-			}
-			else
-			{
-				switch( SecBulls[i].Weapon )
-				{
-				case ENEMYTENTACLE:
-					CreateTentacle( i );
-					break;
-
-				case SCATTERMISSILE:
-					CreateScatterTrail( i );
-					break;
-
-				case ENEMYSPIRALMISSILE:
-				case ENEMYHOMINGMISSILE:
-				case ENEMYBLUEHOMINGMISSILE:
-				case GRAVGONMISSILE:
-				case SOLARISMISSILE:
-				case THIEFMISSILE:
-				case MUGMISSILE:
-				case MULTIPLEMISSILE:
-				case PINEMISSILE:
-				case TITANSTARMISSILE:
-				case TITANSTARSHRAPNEL:
-				case ENEMYDEPTHCHARGE:
-
-					SecBulls[i].Time += NewFramelag; //framelag;
-					if( SecBulls[i].Time >= SecBulls[i].Interval )
-					{
-						SecBulls[i].Time = FMOD( SecBulls[i].Time, SecBulls[i].Interval );
-
-						TempVector.x = ( SecBulls[i].Pos.x + ( -SecBulls[i].DirVector.x * ( 200.0F * GLOBAL_SCALE ) ) );
-						TempVector.y = ( SecBulls[i].Pos.y + ( -SecBulls[i].DirVector.y * ( 200.0F * GLOBAL_SCALE ) ) );
-						TempVector.z = ( SecBulls[i].Pos.z + ( -SecBulls[i].DirVector.z * ( 200.0F * GLOBAL_SCALE ) ) );
-
-						switch( SecBulls[i].Weapon )
-						{
-						case GRAVGONMISSILE:
-						case SOLARISMISSILE:
-						case THIEFMISSILE:
-						case ENEMYSPIRALMISSILE:
-						case ENEMYHOMINGMISSILE:
-						case ENEMYBLUEHOMINGMISSILE:
-						case ENEMYDEPTHCHARGE:
-						case MUGMISSILE:
-						case MULTIPLEMISSILE:
-						case PINEMISSILE:
-						case TITANSTARMISSILE:
-						case TITANSTARSHRAPNEL:
-							CreateBubbleTrail( &TempVector, &SecBulls[i].DirVector, SecBulls[i].GroupImIn, 64, 64, 64 );
-							break;
-						}
-					}
-					break;
-
-				case ENEMYFIREBALL:
-					CreateSpotFXBurning( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn );
-					break;
-
-				default:
-					break;
-				}
-			}
-		}
-	}
+	MissileTrails( i, TempVector, Damage, NewFramelag );
 
 	return( true );
 }
