@@ -3179,6 +3179,346 @@ enum channel_t {
 	CHANNEL_BIKE_POSITIONS,		// position updates are unreliable|sequenced... late pkts will get dropped...
 };
 
+/* MSG_INIT -- false: SendGameMessage returns */
+[[gnu::always_inline]] static inline bool SendInitMsg( BYTE & msg, network_player_t *& to, BYTE & ShipNum, BYTE & mask, INITMSG *& InitMsg, DWORD & nBytes, int & flags, int & i )
+{
+	DebugPrintf("net_msg: MSG_INIT\n");
+
+	// only host is allowed to send a MSG_INIT
+	if( !IsHost )
+		return false;
+
+	// MSG_INIT only needs to be sent once
+	if( ShipNum != UNASSIGNED_SHIP )
+		return false;
+
+	// MSG_INIT only needs to be sent once
+	for( i = 0; i < MAX_PLAYERS; i++ )
+		if( Ships[i].network_player == to ) // we have already assigned this user
+		{
+			// at this point enet reliability will assure that the last sent message
+			// does reach there...  If it doesn't... Well then the player has some
+			// really bad connection... and the connection will most likely shutdown...
+			// none the less probably better not to let such a problem player in...
+			DebugPrintf("Ignoring MSG_INIT request from player %s (%d) %s\n",
+						Ships[i].network_player->name, i,
+						"because I already replied to him...");
+		return false;
+	}
+
+	// setup the basic message flags
+	flags |= NETWORK_RELIABLE;
+	nBytes = sizeof( INITMSG );
+	InitMsg = (INITMSG *)&CommBuff[0];
+	InitMsg->MsgCode	= msg;
+	InitMsg->WhoIAm  = WhoIAm;
+
+	//
+	// Check player has right version to join the game
+	//
+
+	if( PXMPVINT != mask )
+	{
+		InitMsg->YouAre = MAX_PLAYERS+3; // bad version
+		return true;
+	}
+
+	//
+	//  Assign the player a slot (aka unique player number across all computers)
+	//
+
+	{
+		int new_player_id = -1;
+
+		//
+		// check to see if max players reached
+		//
+
+		int player_count  = 1; // count myself
+		for( i = 0; i < MAX_PLAYERS; i++ )
+			if(	! (GameStatus[i] == STATUS_Left || GameStatus[i] == STATUS_LeftCrashed || GameStatus[i] == STATUS_Null) )
+				player_count++;
+
+		DebugPrintf("MSG_INIT: current player_count %d\n",player_count);
+
+		if( player_count >= MaxPlayersSlider.value )
+		{
+			DebugPrintf("MSG_INIT: game is full... denying connection...\n");
+			InitMsg->YouAre = MAX_PLAYERS+2;
+			return true;
+		}
+
+		//
+		// find a player slot for new player
+		//
+
+		// first look for null slots so we can preserve scores of players who left
+		for( i = 0; i < MAX_PLAYERS; i++ )
+			if(	i != WhoIAm ) // host slot is maintained in MyGameStatus not GameStatus[WhoIAm]
+				if( GameStatus[i] == STATUS_Null )
+				{
+					new_player_id = i; // found an unused slot
+			DebugPrintf("MSG_INIT: player assigned to unused slot\n");
+			break;
+		}
+
+		// if we didn't find a never used slot then assign a slot from a player who left
+		if( new_player_id == -1 )
+			for( i = 0; i < MAX_PLAYERS; i++ )
+				if(	i != WhoIAm ) // host slot is maintained in MyGameStatus not GameStatus[WhoIAm]
+					if(	GameStatus[i] == STATUS_Left || GameStatus[i] == STATUS_LeftCrashed )
+					{
+						new_player_id = i; // found an old slot
+			DebugPrintf("MSG_INIT: player assigned to reused slot\n");
+			break;
+		}
+
+		DebugPrintf("MSG_INIT: new_player_id set to %d\n", new_player_id);
+
+		/* The full-game check above leaves a free slot whenever it
+		 * lets a join through; refuse rather than index slot -1 if
+		 * that ever stops being true. */
+		if( new_player_id == -1 )
+		{
+			InitMsg->YouAre = MAX_PLAYERS+2;
+			return true;
+		}
+
+		InitMsg->YouAre = (BYTE) new_player_id;	// tell new player who he is
+
+		//
+		// setup the new player
+		//
+
+		InitShipStructure( new_player_id, true );							// zero out player and the old score
+		GameStatus[new_player_id]			= STATUS_GetPlayerNum;			// player now goes into "get player number" stage
+		TeamNumber[new_player_id]			= 0;							// starts off on team zero
+		Ships[new_player_id].network_player	= to;							// save network pointer
+		set_player_name( new_player_id, to->name );							// copy in their name
+
+		//
+		// the current game state is saved and propagated to the player over the next few frames
+		// this is why you see the screen that says, "mines left, pickups left, etc..."
+		//
+
+		if(	MyGameStatus == STATUS_Normal ) // should this be here? maybe this info isn't ready unless in game already?
+		{
+			CopyPickups(	(u_int16_t) new_player_id );
+			CopyRegenSlots( (u_int16_t) new_player_id );
+			CopyTriggers(	(u_int16_t) new_player_id );
+			CopyTrigVars(	(u_int16_t) new_player_id );
+			CopyMines(		(u_int16_t) new_player_id );
+		}
+	}
+
+	//
+	//  If they got this far they are allowed into the game
+	//  so tell them everything they need to know about game
+	//
+
+	InitMsg->OverallGameStatus		= MyGameStatus;					// games overall status is equal to host status
+	InitMsg->Seed1					= CopyOfSeed1;
+	InitMsg->Seed2					= CopyOfSeed2;
+	InitMsg->ColPerspective			= (BYTE)ColPerspective;
+	InitMsg->NetUpdateInterval		= NetUpdateInterval;
+	InitMsg->RandomPickups			= RandomPickups;
+	InitMsg->NumPrimaryPickups		= (BYTE)NumPrimaryPickups;
+	InitMsg->MaxKills				= (BYTE)MaxKills;
+	InitMsg->GoalScore				= GoalScore;
+	InitMsg->BountyBonusInterval		= BountyBonusInterval;
+	InitMsg->RandomStartPosModify	= RandomStartPosModify;
+	InitMsg->TeamGame				= TeamGame;
+	InitMsg->CTF						= CTF;
+	InitMsg->CaptureTheFlag			= CaptureTheFlag;
+	InitMsg->BountyHunt				= BountyHunt;
+	InitMsg->ResetKillsPerLevel		= ResetKillsPerLevel;
+	InitMsg->UseShortPackets			= UseShortPackets;
+	InitMsg->CTF_Type				= CTFSlider.value;
+	InitMsg->TimeLimit				= TimeLimit.value;
+
+	PackPickupInfo( InitMsg->PickupFlags );												// currently enabled pickups
+
+	memmove( InitMsg->KillStats,		KillStats,		sizeof(InitMsg->KillStats));			// other players stats stats//memcpy
+	memmove( InitMsg->KillCounter,	KillCounter,	sizeof(InitMsg->KillCounter));		// other players kills counts//memcpy
+	memmove( InitMsg->BonusStats,		BonusStats,		sizeof(InitMsg->KillCounter));		// other players bonus stats//memcpy
+	memmove( InitMsg->PlayerReady,	PlayerReady,	sizeof(InitMsg->PlayerReady));		// other players ready status//memcpy
+	memmove( InitMsg->GameStatus,		GameStatus,		sizeof(InitMsg->GameStatus));		// other players game status//memcpy
+	memmove( InitMsg->TeamNumber,		TeamNumber,		sizeof(InitMsg->TeamNumber));		// what team everyone is on//memcpy
+
+	copy_field( InitMsg->LevelName, sizeof( InitMsg->LevelName ), ShortLevelNames[NewLevelNum] );						// level we are on
+
+	return true;
+}
+
+/* MSG_STATUS */
+[[gnu::always_inline]] static inline void SendStatusMsg( BYTE & msg, STATUSMSG *& StatusMsg, DWORD & nBytes, int & flags )
+{
+	DebugPrintf("net_msg: MSG_STATUS\n");
+
+	StatusMsg							= (STATUSMSG *)&CommBuff[0];
+	StatusMsg->MsgCode					= msg;
+	StatusMsg->WhoIAm					= WhoIAm;
+	StatusMsg->IsHost					= IsHost;
+	StatusMsg->Status					= MyGameStatus;
+	StatusMsg->TeamNumber				= TeamNumber[WhoIAm];
+	StatusMsg->IAmReady					= PlayerReady[WhoIAm];
+	StatusMsg->Pickups					= Ships[WhoIAm].Pickups;
+	StatusMsg->RegenSlots				= Ships[WhoIAm].RegenSlots;
+	StatusMsg->Mines						= Ships[WhoIAm].Mines;
+	StatusMsg->Triggers					= Ships[WhoIAm].Triggers;
+	StatusMsg->TrigVars					= Ships[WhoIAm].TrigVars;
+	nBytes = sizeof( STATUSMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_LONGSTATUS */
+[[gnu::always_inline]] static inline void SendLongStatusMsg( BYTE & msg, LONGSTATUSMSG *& LongStatusMsg, DWORD & nBytes, int & flags )
+{
+	DebugPrintf("net_msg: MSG_LONGSTATUS\n");
+
+	LongStatusMsg = (LONGSTATUSMSG *)&CommBuff[0];
+	LongStatusMsg->MsgCode				= msg;
+	LongStatusMsg->WhoIAm				= WhoIAm;
+	LongStatusMsg->Status.MsgCode		= msg;
+	LongStatusMsg->Status.IsHost			= IsHost;
+	// telling everyone what I am currently doing....
+	LongStatusMsg->Status.Status			= MyGameStatus;
+	LongStatusMsg->Status.TeamNumber		= TeamNumber[WhoIAm];
+	LongStatusMsg->Status.IAmReady		= PlayerReady[WhoIAm];
+	LongStatusMsg->Status.Pickups		= Ships[WhoIAm].Pickups;
+	LongStatusMsg->Status.RegenSlots		= Ships[WhoIAm].RegenSlots;
+	LongStatusMsg->Status.Mines			= Ships[WhoIAm].Mines;
+	LongStatusMsg->Status.Triggers		= Ships[WhoIAm].Triggers;
+	LongStatusMsg->Status.TrigVars		= Ships[WhoIAm].TrigVars;
+	copy_field( LongStatusMsg->LevelName, sizeof( LongStatusMsg->LevelName ), ShortLevelNames[NewLevelNum] );
+	{ // send update if level change
+		static int16_t MyNewLevelNum = 0;
+		if(MyNewLevelNum != NewLevelNum)
+			reset_tracker();
+		MyNewLevelNum = NewLevelNum;
+	}
+	LongStatusMsg->RandomStartPosModify = RandomStartPosModify;
+	nBytes = sizeof( LONGSTATUSMSG );
+	flags |= NETWORK_RELIABLE;
+}
+
+/* MSG_TEXTMSG */
+[[gnu::always_inline]] static inline void SendTextMsg( BYTE & msg, BYTE & Type, TEXTMSG *& TextMsg, DWORD & nBytes, int & flags, int & MessageColour )
+{
+	DebugPrintf("net_msg: MSG_TEXTMSG\n");
+
+	TextMsg = (TEXTMSG *)&CommBuff[0];
+	TextMsg->MsgCode	= msg;
+	TextMsg->WhoIAm	= WhoIAm;
+
+	switch( Type )
+	{
+	case TEXTMSGTYPE_Taunt1:
+		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText1.text[0] );
+		TextMsg->TextMsgType = Type;
+		MessageColour = TauntMessageColour;
+		break;
+	case TEXTMSGTYPE_Taunt2:
+		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText2.text[0] );
+		TextMsg->TextMsgType = Type;
+		MessageColour = TauntMessageColour;
+		break;
+	case TEXTMSGTYPE_Taunt3:
+		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText3.text[0] );
+		TextMsg->TextMsgType = Type;
+		MessageColour = TauntMessageColour;
+		break;
+	case TEXTMSGTYPE_TitleMessage:
+		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText4.text[0] );
+		TextMsg->TextMsgType = Type;
+		MessageColour = SystemMessageColour;
+		break;
+	case TEXTMSGTYPE_JoiningTeamGame:
+		TextMsg->TextMsgType = Type;
+		MessageColour = SystemMessageColour;
+		break;
+	case TEXTMSGTYPE_EnteredWatchMode:
+		TextMsg->TextMsgType = Type;
+		MessageColour = SystemMessageColour;
+		break;
+	case TEXTMSGTYPE_ExitedWatchMode:
+		TextMsg->TextMsgType = Type;
+		MessageColour = SystemMessageColour;
+		break;
+	case TEXTMSGTYPE_QuickTaunt:
+		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickText.text[0] );
+		TextMsg->TextMsgType = Type;
+		MessageColour = MyMessageColour;
+		AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
+		// sending version request
+		if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
+		{
+			// display my version number
+			AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
+		}
+		break;
+	case TEXTMSGTYPE_QuickTauntWhisper:
+		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickTextWhisper.text[0] );
+		TextMsg->TextMsgType = Type;
+		MessageColour = MyMessageColour;
+		AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
+		break;
+	case TEXTMSGTYPE_CaptureFlagMessage:
+		TextMsg->TextMsgType = Type;
+		copy_field( TextMsg->Text, sizeof( TextMsg->Text ), CTFMessage );
+		PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
+		MessageColour = FlagMessageColour;
+		break;
+	case TEXTMSGTYPE_ScoredWithFlag:
+		TextMsg->TextMsgType = Type;
+		TextMsg->Text[0] = 0;
+		PlaySfx( SFX_MyTeamScored, FlagVolume );
+		MessageColour = FlagMessageColour;
+		flags |= NETWORK_RELIABLE;
+		break;
+	case TEXTMSGTYPE_ReturningFlag:
+		TextMsg->TextMsgType = Type;
+		TextMsg->Text[0] = 0;
+		MessageColour = FlagMessageColour;
+		break;
+	case TEXTMSGTYPE_ReturnedFlag:
+		TextMsg->TextMsgType = Type;
+		TextMsg->Text[0] = 0;
+		MessageColour = FlagMessageColour;
+		break;
+	case TEXTMSGTYPE_FlagDriftedIn:
+		TextMsg->TextMsgType = Type;
+		TextMsg->Text[0] = 0;
+		MessageColour = FlagMessageColour;
+		break;
+	case TEXTMSGTYPE_FlagEscaped:
+		TextMsg->TextMsgType = Type;
+		TextMsg->Text[0] = 0;
+		MessageColour = FlagMessageColour;
+		break;
+	case TEXTMSGTYPE_BountyMessage:
+		TextMsg->TextMsgType = Type;
+		TextMsg->Text[0] = 0;
+		PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
+		MessageColour = FlagMessageColour;
+		break;
+	case TEXTMSGTYPE_SpeechTaunt:
+		TextMsg->TextMsgType = Type;
+		TextMsg->Text[0] = CurrentTauntVariant;
+		MessageColour = PlayerMessageColour;
+		break;
+	default:
+		TextMsg->TextMsgType = TEXTMSGTYPE_Taunt1;
+	}
+	// put a null at the end just in case...
+	TextMsg->Text[MAXTEXTMSG-1] = 0;
+	nBytes = sizeof( TEXTMSG );
+
+	// quick taunt already delt with
+	if (MyGameStatus != STATUS_StartingMultiplayer && Type != TEXTMSGTYPE_QuickTaunt && Type != TEXTMSGTYPE_QuickTauntWhisper)
+		AddColourMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
+}
+
 void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, BYTE mask )
 {
 	SHIPHEALTHMSG                     *ShipHealthMsg;
@@ -3288,171 +3628,8 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		// other wise whats the point of sending all this extra stuff...
 
 	case MSG_INIT:
-		DebugPrintf("net_msg: MSG_INIT\n");
-
-		// only host is allowed to send a MSG_INIT
-		if( !IsHost )
+		if( !SendInitMsg( msg, to, ShipNum, mask, InitMsg, nBytes, flags, i ) )
 			return;
-
-		// MSG_INIT only needs to be sent once
-		if( ShipNum != UNASSIGNED_SHIP )
-			return;
-
-		// MSG_INIT only needs to be sent once
-		for( i = 0; i < MAX_PLAYERS; i++ )
-			if( Ships[i].network_player == to ) // we have already assigned this user
-			{
-				// at this point enet reliability will assure that the last sent message
-				// does reach there...  If it doesn't... Well then the player has some
-				// really bad connection... and the connection will most likely shutdown...
-				// none the less probably better not to let such a problem player in...
-				DebugPrintf("Ignoring MSG_INIT request from player %s (%d) %s\n",
-							Ships[i].network_player->name, i,
-							"because I already replied to him...");
-			return;
-		}
-
-		// setup the basic message flags
-		flags |= NETWORK_RELIABLE;
-		nBytes = sizeof( INITMSG );
-		InitMsg = (INITMSG *)&CommBuff[0];
-		InitMsg->MsgCode	= msg;
-		InitMsg->WhoIAm  = WhoIAm;
-
-		//
-		// Check player has right version to join the game
-		//
-
-		if( PXMPVINT != mask )
-		{
-			InitMsg->YouAre = MAX_PLAYERS+3; // bad version
-			goto send;
-		}
-
-		//
-		//  Assign the player a slot (aka unique player number across all computers)
-		//
-
-		{
-			int new_player_id = -1;
-
-			//
-			// check to see if max players reached
-			//
-
-			int player_count  = 1; // count myself
-			for( i = 0; i < MAX_PLAYERS; i++ )
-				if(	! (GameStatus[i] == STATUS_Left || GameStatus[i] == STATUS_LeftCrashed || GameStatus[i] == STATUS_Null) )
-					player_count++;
-
-			DebugPrintf("MSG_INIT: current player_count %d\n",player_count);
-
-			if( player_count >= MaxPlayersSlider.value )
-			{
-				DebugPrintf("MSG_INIT: game is full... denying connection...\n");
-				InitMsg->YouAre = MAX_PLAYERS+2;
-				goto send;
-			}
-
-			//
-			// find a player slot for new player
-			//
-
-			// first look for null slots so we can preserve scores of players who left
-			for( i = 0; i < MAX_PLAYERS; i++ )
-				if(	i != WhoIAm ) // host slot is maintained in MyGameStatus not GameStatus[WhoIAm]
-					if( GameStatus[i] == STATUS_Null )
-					{
-						new_player_id = i; // found an unused slot
-				DebugPrintf("MSG_INIT: player assigned to unused slot\n");
-				break;
-			}
-
-			// if we didn't find a never used slot then assign a slot from a player who left
-			if( new_player_id == -1 )
-				for( i = 0; i < MAX_PLAYERS; i++ )
-					if(	i != WhoIAm ) // host slot is maintained in MyGameStatus not GameStatus[WhoIAm]
-						if(	GameStatus[i] == STATUS_Left || GameStatus[i] == STATUS_LeftCrashed )
-						{
-							new_player_id = i; // found an old slot
-				DebugPrintf("MSG_INIT: player assigned to reused slot\n");
-				break;
-			}
-
-			DebugPrintf("MSG_INIT: new_player_id set to %d\n", new_player_id);
-
-			/* The full-game check above leaves a free slot whenever it
-			 * lets a join through; refuse rather than index slot -1 if
-			 * that ever stops being true. */
-			if( new_player_id == -1 )
-			{
-				InitMsg->YouAre = MAX_PLAYERS+2;
-				goto send;
-			}
-
-			InitMsg->YouAre = (BYTE) new_player_id;	// tell new player who he is
-
-			//
-			// setup the new player
-			//
-
-			InitShipStructure( new_player_id, true );							// zero out player and the old score
-			GameStatus[new_player_id]			= STATUS_GetPlayerNum;			// player now goes into "get player number" stage
-			TeamNumber[new_player_id]			= 0;							// starts off on team zero
-			Ships[new_player_id].network_player	= to;							// save network pointer
-			set_player_name( new_player_id, to->name );							// copy in their name
-
-			//
-			// the current game state is saved and propagated to the player over the next few frames
-			// this is why you see the screen that says, "mines left, pickups left, etc..."
-			//
-
-			if(	MyGameStatus == STATUS_Normal ) // should this be here? maybe this info isn't ready unless in game already?
-			{
-				CopyPickups(	(u_int16_t) new_player_id );
-				CopyRegenSlots( (u_int16_t) new_player_id );
-				CopyTriggers(	(u_int16_t) new_player_id );
-				CopyTrigVars(	(u_int16_t) new_player_id );
-				CopyMines(		(u_int16_t) new_player_id );
-			}
-		}
-
-		//
-		//  If they got this far they are allowed into the game
-		//  so tell them everything they need to know about game
-		//
-
-		InitMsg->OverallGameStatus		= MyGameStatus;					// games overall status is equal to host status
-		InitMsg->Seed1					= CopyOfSeed1;
-		InitMsg->Seed2					= CopyOfSeed2;
-		InitMsg->ColPerspective			= (BYTE)ColPerspective;
-		InitMsg->NetUpdateInterval		= NetUpdateInterval;
-		InitMsg->RandomPickups			= RandomPickups;
-		InitMsg->NumPrimaryPickups		= (BYTE)NumPrimaryPickups;
-		InitMsg->MaxKills				= (BYTE)MaxKills;
-		InitMsg->GoalScore				= GoalScore;
-		InitMsg->BountyBonusInterval		= BountyBonusInterval;
-		InitMsg->RandomStartPosModify	= RandomStartPosModify;
-		InitMsg->TeamGame				= TeamGame;
-		InitMsg->CTF						= CTF;
-		InitMsg->CaptureTheFlag			= CaptureTheFlag;
-		InitMsg->BountyHunt				= BountyHunt;
-		InitMsg->ResetKillsPerLevel		= ResetKillsPerLevel;
-		InitMsg->UseShortPackets			= UseShortPackets;
-		InitMsg->CTF_Type				= CTFSlider.value;
-		InitMsg->TimeLimit				= TimeLimit.value;
-
-		PackPickupInfo( InitMsg->PickupFlags );												// currently enabled pickups
-
-		memmove( InitMsg->KillStats,		KillStats,		sizeof(InitMsg->KillStats));			// other players stats stats//memcpy
-		memmove( InitMsg->KillCounter,	KillCounter,	sizeof(InitMsg->KillCounter));		// other players kills counts//memcpy
-		memmove( InitMsg->BonusStats,		BonusStats,		sizeof(InitMsg->KillCounter));		// other players bonus stats//memcpy
-		memmove( InitMsg->PlayerReady,	PlayerReady,	sizeof(InitMsg->PlayerReady));		// other players ready status//memcpy
-		memmove( InitMsg->GameStatus,		GameStatus,		sizeof(InitMsg->GameStatus));		// other players game status//memcpy
-		memmove( InitMsg->TeamNumber,		TeamNumber,		sizeof(InitMsg->TeamNumber));		// what team everyone is on//memcpy
-
-		copy_field( InitMsg->LevelName, sizeof( InitMsg->LevelName ), ShortLevelNames[NewLevelNum] );						// level we are on
-
 		break;
 
 
@@ -3697,22 +3874,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		break;
 
 	case MSG_STATUS:
-		DebugPrintf("net_msg: MSG_STATUS\n");
-
-		StatusMsg							= (STATUSMSG *)&CommBuff[0];
-		StatusMsg->MsgCode					= msg;
-		StatusMsg->WhoIAm					= WhoIAm;
-		StatusMsg->IsHost					= IsHost;
-		StatusMsg->Status					= MyGameStatus;
-		StatusMsg->TeamNumber				= TeamNumber[WhoIAm];
-		StatusMsg->IAmReady					= PlayerReady[WhoIAm];
-		StatusMsg->Pickups					= Ships[WhoIAm].Pickups;
-		StatusMsg->RegenSlots				= Ships[WhoIAm].RegenSlots;
-		StatusMsg->Mines						= Ships[WhoIAm].Mines;
-		StatusMsg->Triggers					= Ships[WhoIAm].Triggers;
-		StatusMsg->TrigVars					= Ships[WhoIAm].TrigVars;
-		nBytes = sizeof( STATUSMSG );
-		flags |= NETWORK_RELIABLE;
+		SendStatusMsg( msg, StatusMsg, nBytes, flags );
 		break;
 
 	case MSG_NETSETTINGS:
@@ -3730,32 +3892,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		break;
 
 	case MSG_LONGSTATUS:
-		DebugPrintf("net_msg: MSG_LONGSTATUS\n");
-
-		LongStatusMsg = (LONGSTATUSMSG *)&CommBuff[0];
-		LongStatusMsg->MsgCode				= msg;
-		LongStatusMsg->WhoIAm				= WhoIAm;
-		LongStatusMsg->Status.MsgCode		= msg;
-		LongStatusMsg->Status.IsHost			= IsHost;
-		// telling everyone what I am currently doing....
-		LongStatusMsg->Status.Status			= MyGameStatus;
-		LongStatusMsg->Status.TeamNumber		= TeamNumber[WhoIAm];
-		LongStatusMsg->Status.IAmReady		= PlayerReady[WhoIAm];
-		LongStatusMsg->Status.Pickups		= Ships[WhoIAm].Pickups;
-		LongStatusMsg->Status.RegenSlots		= Ships[WhoIAm].RegenSlots;
-		LongStatusMsg->Status.Mines			= Ships[WhoIAm].Mines;
-		LongStatusMsg->Status.Triggers		= Ships[WhoIAm].Triggers;
-		LongStatusMsg->Status.TrigVars		= Ships[WhoIAm].TrigVars;
-		copy_field( LongStatusMsg->LevelName, sizeof( LongStatusMsg->LevelName ), ShortLevelNames[NewLevelNum] );
-		{ // send update if level change
-			static int16_t MyNewLevelNum = 0;
-			if(MyNewLevelNum != NewLevelNum)
-				reset_tracker();
-			MyNewLevelNum = NewLevelNum;
-		}
-		LongStatusMsg->RandomStartPosModify = RandomStartPosModify;
-		nBytes = sizeof( LONGSTATUSMSG );
-		flags |= NETWORK_RELIABLE;
+		SendLongStatusMsg( msg, LongStatusMsg, nBytes, flags );
 		break;
 
 
@@ -3829,124 +3966,10 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		break;
 
 	case MSG_TEXTMSG:
-		DebugPrintf("net_msg: MSG_TEXTMSG\n");
-
-		TextMsg = (TEXTMSG *)&CommBuff[0];
-		TextMsg->MsgCode	= msg;
-		TextMsg->WhoIAm	= WhoIAm;
-
-		switch( Type )
-		{
-		case TEXTMSGTYPE_Taunt1:
-			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText1.text[0] );
-			TextMsg->TextMsgType = Type;
-			MessageColour = TauntMessageColour;
-			break;
-		case TEXTMSGTYPE_Taunt2:
-			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText2.text[0] );
-			TextMsg->TextMsgType = Type;
-			MessageColour = TauntMessageColour;
-			break;
-		case TEXTMSGTYPE_Taunt3:
-			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText3.text[0] );
-			TextMsg->TextMsgType = Type;
-			MessageColour = TauntMessageColour;
-			break;
-		case TEXTMSGTYPE_TitleMessage:
-			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &MacroText4.text[0] );
-			TextMsg->TextMsgType = Type;
-			MessageColour = SystemMessageColour;
-			break;
-		case TEXTMSGTYPE_JoiningTeamGame:
-			TextMsg->TextMsgType = Type;
-			MessageColour = SystemMessageColour;
-			break;
-		case TEXTMSGTYPE_EnteredWatchMode:
-			TextMsg->TextMsgType = Type;
-			MessageColour = SystemMessageColour;
-			break;
-		case TEXTMSGTYPE_ExitedWatchMode:
-			TextMsg->TextMsgType = Type;
-			MessageColour = SystemMessageColour;
-			break;
-		case TEXTMSGTYPE_QuickTaunt:
-			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickText.text[0] );
-			TextMsg->TextMsgType = Type;
-			MessageColour = MyMessageColour;
-			AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
-			// sending version request
-			if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
-			{
-				// display my version number
-				AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
-			}
-			break;
-		case TEXTMSGTYPE_QuickTauntWhisper:
-			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), &QuickTextWhisper.text[0] );
-			TextMsg->TextMsgType = Type;
-			MessageColour = MyMessageColour;
-			AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
-			break;
-		case TEXTMSGTYPE_CaptureFlagMessage:
-			TextMsg->TextMsgType = Type;
-			copy_field( TextMsg->Text, sizeof( TextMsg->Text ), CTFMessage );
-			PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
-			MessageColour = FlagMessageColour;
-			break;
-		case TEXTMSGTYPE_ScoredWithFlag:
-			TextMsg->TextMsgType = Type;
-			TextMsg->Text[0] = 0;
-			PlaySfx( SFX_MyTeamScored, FlagVolume );
-			MessageColour = FlagMessageColour;
-			flags |= NETWORK_RELIABLE;
-			break;
-		case TEXTMSGTYPE_ReturningFlag:
-			TextMsg->TextMsgType = Type;
-			TextMsg->Text[0] = 0;
-			MessageColour = FlagMessageColour;
-			break;
-		case TEXTMSGTYPE_ReturnedFlag:
-			TextMsg->TextMsgType = Type;
-			TextMsg->Text[0] = 0;
-			MessageColour = FlagMessageColour;
-			break;
-		case TEXTMSGTYPE_FlagDriftedIn:
-			TextMsg->TextMsgType = Type;
-			TextMsg->Text[0] = 0;
-			MessageColour = FlagMessageColour;
-			break;
-		case TEXTMSGTYPE_FlagEscaped:
-			TextMsg->TextMsgType = Type;
-			TextMsg->Text[0] = 0;
-			MessageColour = FlagMessageColour;
-			break;
-		case TEXTMSGTYPE_BountyMessage:
-			TextMsg->TextMsgType = Type;
-			TextMsg->Text[0] = 0;
-			PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
-			MessageColour = FlagMessageColour;
-			break;
-		case TEXTMSGTYPE_SpeechTaunt:
-			TextMsg->TextMsgType = Type;
-			TextMsg->Text[0] = CurrentTauntVariant;
-			MessageColour = PlayerMessageColour;
-			break;
-		default:
-			TextMsg->TextMsgType = TEXTMSGTYPE_Taunt1;
-		}
-		// put a null at the end just in case...
-		TextMsg->Text[MAXTEXTMSG-1] = 0;
-		nBytes = sizeof( TEXTMSG );
-
-		// quick taunt already delt with
-		if (MyGameStatus != STATUS_StartingMultiplayer && Type != TEXTMSGTYPE_QuickTaunt && Type != TEXTMSGTYPE_QuickTauntWhisper)
-			AddColourMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
+		SendTextMsg( msg, Type, TextMsg, nBytes, flags, MessageColour );
 		break;
 
 	}
-
-	// goto send if you want to break out of the switch
-	send:
 
 	// only record if message is sent to whole of the group....
 
