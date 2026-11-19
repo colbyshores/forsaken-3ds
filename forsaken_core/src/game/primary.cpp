@@ -1641,12 +1641,14 @@ void ProcessPrimaryBullets( void )
 				goto loop;
 			}
 
-			/* Aim-assist hook: subtle steering on player-fired primary
+			/* Aim-assist hook: subtle steering on this player's primary
 			 * bullets toward the nearest valid target. No-op (single
 			 * float compare + return) when Config.aim_assist_strength
 			 * is 0. Runs BEFORE the position advance below so the
-			 * adjusted Dir is what propels the bullet this frame. */
-			if( PrimBulls[i].OwnerType == OWNER_SHIP )
+			 * adjusted Dir is what propels the bullet this frame.
+			 * Other players' bullets are left alone: they follow their
+			 * own player's setting, not this machine's. */
+			if( PrimBulls[i].OwnerType == OWNER_SHIP && PrimBulls[i].Owner == WhoIAm )
 			{
 				bool aim_assist_steer( VECTOR *pos, VECTOR *dir,
 											  u_int16_t group, int8_t weapon );
