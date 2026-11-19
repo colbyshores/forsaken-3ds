@@ -137,7 +137,7 @@ struct ENEMY * FormationLink;
 
 #ifdef DEBUG_ON
 	// used for finding out where an enemy is killed from...
-	char *	EnemyInFile;
+	const char *	EnemyInFile;
 	int		EnemyInLine;
 #endif
 
@@ -406,7 +406,7 @@ ENEMY * FindFreeEnemy( void );
 
 
 #ifdef DEBUG_ON
-void KillUsedEnemyDebugOn( ENEMY * Object, char *in_file, int in_line );
+void KillUsedEnemyDebugOn( ENEMY * Object, const char *in_file, int in_line );
 #undef KillUsedEnemy
 #define KillUsedEnemy( S )		KillUsedEnemyDebugOn( (S), __FILE__, __LINE__ )
 #else

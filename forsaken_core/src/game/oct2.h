@@ -84,7 +84,7 @@ extern int GetPlayerNumCount;
 extern bool IMustQuit;
 extern VECTOR NullVector;
 extern float pixel_aspect_ratio;
-void SetViewportError( char *where, render_viewport_t *vp );
+void SetViewportError( const char *where, render_viewport_t *vp );
 extern int Secrets;
 extern int TotalSecrets;
 extern char MissionTextPics[ MAXLEVELS ][ 128 ];

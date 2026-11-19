@@ -4054,7 +4054,7 @@ ENEMY * FindFreeEnemy( void )
 	Output		:	nothing
 ===================================================================*/
 #ifdef DEBUG_ON
-void KillUsedEnemyDebugOn( ENEMY * Object, char *in_file, int in_line )
+void KillUsedEnemyDebugOn( ENEMY * Object, const char *in_file, int in_line )
 #else
 void KillUsedEnemy( ENEMY * Object )
 #endif

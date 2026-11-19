@@ -442,7 +442,7 @@ bool SetFOV( float fov )
 	return true;
 }
 
-void SetViewportError( char *where, render_viewport_t *vp )
+void SetViewportError( const char *where, render_viewport_t *vp )
 {
 	static char msg[1024];
 	sprintf( msg,
