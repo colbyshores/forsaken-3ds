@@ -24,17 +24,11 @@
 #include "audio/dsp_adpcm.h"
 #include "audio/music_table.h"
 
+namespace {
+
 constexpr int MUSIC_SAMPLE_RATE = 32000;
 
-static bool  s_initialized = false;
-static bool  s_playing = false;
-static int   s_current_track = -1;
-static float s_volume = 1.0f;
-static ALuint s_source = 0;
-static ALuint s_buffer = 0;
-
-
-static bool load_track_pcm(int track, int16_t **out_pcm, long *out_samples)
+bool load_track_pcm(int track, int16_t **out_pcm, long *out_samples)
 {
 	char path[128];
 	FILE *f = nullptr;
@@ -72,71 +66,98 @@ static bool load_track_pcm(int track, int16_t **out_pcm, long *out_samples)
 	return true;
 }
 
-bool music_init(void)
+/* The one track playing (one instance, g_music): its OpenAL buffer and
+ * source, which track it is, and whether music_init has run. */
+class MusicPlayer {
+	public:
+	bool init();
+	void shutdown();
+	void play(int track);
+	void stop();
+
+	private:
+	bool   initialized = false;
+	bool   playing = false;
+	int    current_track = -1;
+	float  volume = 1.0f;
+	ALuint source = 0;
+	ALuint buffer = 0;
+};
+
+bool MusicPlayer::init()
 {
-	s_initialized = true;
+	initialized = true;
 	return true;
 }
 
-void music_shutdown(void)
+void MusicPlayer::shutdown()
 {
-	music_stop();
-	s_initialized = false;
+	stop();
+	initialized = false;
 }
 
-void music_stop(void)
+void MusicPlayer::stop()
 {
-	if (s_source) {
-		alSourceStop(s_source);
-		alDeleteSources(1, &s_source);
-		s_source = 0;
+	if (source) {
+		alSourceStop(source);
+		alDeleteSources(1, &source);
+		source = 0;
 	}
-	if (s_buffer) {
-		alDeleteBuffers(1, &s_buffer);
-		s_buffer = 0;
+	if (buffer) {
+		alDeleteBuffers(1, &buffer);
+		buffer = 0;
 	}
-	s_playing = false;
-	s_current_track = -1;
+	playing = false;
+	current_track = -1;
 }
 
-void music_play(int track)
+void MusicPlayer::play(int track)
 {
-	if (!s_initialized) return;
+	if (!initialized) return;
 	if (track < MUSIC_FIRST_TRACK || track > MUSIC_LAST_TRACK) return;
-	if (s_current_track == track && s_playing) return;
+	if (current_track == track && playing) return;
 	if (!alcGetCurrentContext()) return;   /* SFX system not up: stay silent */
 
 	int16_t *pcm = nullptr;
 	long samples = 0;
 	if (!load_track_pcm(track, &pcm, &samples)) return;
 
-	music_stop();
+	stop();
 
-	alGenBuffers(1, &s_buffer);
-	alBufferData(s_buffer, AL_FORMAT_MONO16, pcm,
+	alGenBuffers(1, &buffer);
+	alBufferData(buffer, AL_FORMAT_MONO16, pcm,
 				 (ALsizei)(samples * sizeof(int16_t)), MUSIC_SAMPLE_RATE);
 	free(pcm);
 
-	alGenSources(1, &s_source);
-	alSourcei(s_source, AL_BUFFER, (ALint)s_buffer);
-	alSourcei(s_source, AL_LOOPING, AL_TRUE);
+	alGenSources(1, &source);
+	alSourcei(source, AL_BUFFER, (ALint)buffer);
+	alSourcei(source, AL_LOOPING, AL_TRUE);
 	/* at the listener, like every sfx source: a world-positioned mono
 	 * source would be panned and attenuated as the ship moves */
-	alSourcei(s_source, AL_SOURCE_RELATIVE, AL_TRUE);
-	alSourcef(s_source, AL_GAIN, s_volume);
-	alSourcePlay(s_source);
+	alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
+	alSourcef(source, AL_GAIN, volume);
+	alSourcePlay(source);
 
-	s_current_track = track;
-	s_playing = true;
+	current_track = track;
+	playing = true;
 }
+
+MusicPlayer g_music;
+
+} // namespace
+
+bool music_init(void) { return g_music.init(); }
+void music_shutdown(void) { g_music.shutdown(); }
+void music_play(int track) { g_music.play(track); }
+void music_stop(void) { g_music.stop(); }
 
 void music_play_for_level(int level_num)
 {
 	if (level_num < 0) return;
-	music_play(music_track_for_level(level_num));
+	g_music.play(music_track_for_level(level_num));
 }
 
-void music_play_title(void) { music_play(MUSIC_TITLE_TRACK); }
+void music_play_title(void) { g_music.play(MUSIC_TITLE_TRACK); }
 void music_update(void) { /* whole-track buffer: nothing to refill */ }
 
 #endif /* !__3DS__ */
