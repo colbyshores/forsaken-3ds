@@ -298,6 +298,20 @@ mouse_state_t* read_mouse(void)
 // Joystick Events
 //////////////////////////////////////////////
 
+// SDL joystick events carry the joystick's instance id, which is not its
+// device index: ids keep counting up as devices are opened, so they drift
+// from the JoystickInfo slot after a failed open or a re-init. Map the id
+// to the slot that holds that joystick; -1 if none does.
+static int joystick_slot( SDL_JoystickID which )
+{
+	int i;
+	for( i = 0; i < Num_Joysticks; i++ )
+		if( JoystickInfo[i].sdl_joy &&
+			SDL_JoystickInstanceID( JoystickInfo[i].sdl_joy ) == which )
+			return i;
+	return -1;
+}
+
 static int get_deadzone( int joy, int axis )
 {
 	// make sure this is a valid joystick/axis
@@ -319,16 +333,20 @@ void app_joy_axis( SDL_JoyAxisEvent * axis )
 		return;
 	}
 
+	int joy = joystick_slot( axis->which );
+	if( joy < 0 )
+		return;
+
 	// sdl axis value (range: -32768 to 32767)
 	// forsaken expects (range: -100 to 100)
 	value = (long) (((float)axis->value) / 327.67f);
 
 	// get the joystick deadzone
-	deadzone = get_deadzone(axis->which,axis->axis);
+	deadzone = get_deadzone(joy,axis->axis);
 
 	// if movement greater then deadzone then apply
 	// other wise no movement at all is registered
-	joy_axis_state[ axis->which ][ axis->axis ] =
+	joy_axis_state[ joy ][ axis->axis ] =
 		( abs(value) > deadzone ) ? value : 0 ;
 }
 
@@ -346,7 +364,11 @@ void app_joy_button( SDL_JoyButtonEvent * button )
 		return;
 	}
 
-	joy_button_state[ button->which ][ button->button ] =
+	int joy = joystick_slot( button->which );
+	if( joy < 0 )
+		return;
+
+	joy_button_state[ joy ][ button->button ] =
 		(button->type == SDL_JOYBUTTONDOWN);
 
 	// pass down joystick button presses for menu processing
@@ -368,22 +390,26 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 		return;
 	}
 
+	int joy = joystick_slot( hat->which );
+	if( joy < 0 )
+		return;
+
 	if(hat->value == SDL_HAT_CENTERED)
 	{
 		int d;
 		for( d = 0; d < MAX_POV_DIRECTIONS; d++ )
 		{
-			joy_hat_state[ hat->which ][ hat->hat ][ d ] = 0;
+			joy_hat_state[ joy ][ hat->hat ][ d ] = 0;
 		}
 		return;
 	}
 
 	if(hat->value & SDL_HAT_UP)
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_UP ] = 1;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_UP ] = 1;
 		input_buffer_send(
 			JOYSTICK_POVDIR_KEYCODE(
-				hat->which,
+				joy,
 				hat->hat,
 				JOY_HAT_UP
 			)
@@ -391,15 +417,15 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 	}
 	else
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_UP ] = 0;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_UP ] = 0;
 	}
 
 	if(hat->value & SDL_HAT_RIGHT)
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_RIGHT ] = 1;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_RIGHT ] = 1;
 		input_buffer_send(
 			JOYSTICK_POVDIR_KEYCODE(
-				hat->which,
+				joy,
 				hat->hat,
 				JOY_HAT_RIGHT
 			)
@@ -407,15 +433,15 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 	}
 	else
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_RIGHT ] = 0;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_RIGHT ] = 0;
 	}
 
 	if(hat->value & SDL_HAT_DOWN)
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_DOWN ] = 1;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_DOWN ] = 1;
 		input_buffer_send(
 			JOYSTICK_POVDIR_KEYCODE(
-				hat->which,
+				joy,
 				hat->hat,
 				JOY_HAT_DOWN
 			)
@@ -423,15 +449,15 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 	}
 	else
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_DOWN ] = 0;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_DOWN ] = 0;
 	}
 
 	if(hat->value & SDL_HAT_LEFT)
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_LEFT ] = 1;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_LEFT ] = 1;
 		input_buffer_send(
 			JOYSTICK_POVDIR_KEYCODE(
-				hat->which,
+				joy,
 				hat->hat,
 				JOY_HAT_LEFT
 			)
@@ -439,7 +465,7 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 	}
 	else
 	{
-		joy_hat_state[ hat->which ][ hat->hat ][ JOY_HAT_LEFT ] = 0;
+		joy_hat_state[ joy ][ hat->hat ][ JOY_HAT_LEFT ] = 0;
 	}
 }
 
