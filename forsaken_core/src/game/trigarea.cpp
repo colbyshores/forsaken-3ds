@@ -123,7 +123,11 @@ bool TriggerAreaload( char * Filename )
 
 	Read_Size = Read_File( Filename, Buffer, File_Size );
 
-	if( Read_Size != File_Size ) return false;
+	if( Read_Size != File_Size )
+	{
+		free( OrgBuffer );
+		return false;
+	}
 
 	FileReader in( Buffer );
 	MagicNumber = in.u32();
@@ -132,11 +136,18 @@ bool TriggerAreaload( char * Filename )
 	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != ZON_VERSION_NUMBER  ) )
 	{
 		Msg( "TriggerAreaLoad() Incompatible triggerzone( .ZON ) file %s", Filename );
+		free( OrgBuffer );
 		return( false );
 	}
 
 	NumZones = in.u16();
 	Zones = (TRIGGER_AREA*) calloc( NumZones , sizeof(TRIGGER_AREA) );
+	if( !Zones && NumZones )
+	{
+		NumZones = 0;
+		free( OrgBuffer );
+		return false;
+	}
 	AreaPnt = Zones;
 
 	for( i = 0 ; i < NumZones ; i++ )
@@ -161,6 +172,12 @@ bool TriggerAreaload( char * Filename )
 			// convex hull...
 			AreaPnt->num_sides = in.u16();
 			AreaPnt->Zone = (TRIGGER_ZONE*) malloc( AreaPnt->num_sides * sizeof( TRIGGER_ZONE ) );
+			if( !AreaPnt->Zone && AreaPnt->num_sides )
+			{
+				ReleaseTriggerArea();
+				free( OrgBuffer );
+				return false;
+			}
 			ZonePnt = AreaPnt->Zone;
 
 			for( j = 0 ; j < AreaPnt->num_sides ; j++ )
