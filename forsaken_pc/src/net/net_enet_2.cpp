@@ -1449,8 +1449,8 @@ void network_broadcast( void* data, int size, network_flags_t flags, int channel
 		DebugPrintf("network: broadcast received bad pointer.\n");
 		return;
 	}
-	packet = enet_packet_create( data, size, convert_flags( flags ) );
 	if( enet_host == NULL ) return;
+	packet = enet_packet_create( data, size, convert_flags( flags ) );
 	if( packet == NULL )
 	{
 		DebugPrintf("network: broadcast failed to create packet.\n");
@@ -1463,6 +1463,9 @@ void network_broadcast( void* data, int size, network_flags_t flags, int channel
 			enet_send_packet( peer, packet, channel, NO_FLUSH );
 		player = player->next;
 	}
+	// no peer queued it: enet frees a packet only through its references
+	if( packet->referenceCount == 0 )
+		enet_packet_destroy( packet );
 	enet_host_flush( enet_host );
 }
 
@@ -1516,6 +1519,9 @@ void network_set_player_name( char* name )
 			enet_send_packet( peer, packet, system_channel, NO_FLUSH );
 		player = player->next;
 	}
+	// no peer queued it: enet frees a packet only through its references
+	if( packet->referenceCount == 0 )
+		enet_packet_destroy( packet );
 	enet_host_flush( enet_host );
 }
 
