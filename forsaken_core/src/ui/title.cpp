@@ -12770,11 +12770,13 @@ void SelectGoldBarModel( MENU * /*Menu*/ )
 void AfterSpecialMessage( MENUITEM * /*Item*/ )
 {
 	switch( GameCompleted )
-	 {
-	 case GameComplete::GotAllCrystalsSoFar:
-		 MenuChangeEx( &MENU_NEW_BetweenLevels );
-		 return;
-	 }
+	{
+	case GameComplete::GotAllCrystalsSoFar:
+		MenuChangeEx( &MENU_NEW_BetweenLevels );
+		return;
+	default:
+		break;
+	}
 
 	ReleaseView();
 	MyGameStatus = STATUS_Title;
