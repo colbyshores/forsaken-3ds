@@ -1018,6 +1018,347 @@ static void pump_synchers( void )
 	}
 }
 
+/* YOUR_ID */
+[[gnu::always_inline]] static inline void PacketYourId( ENetEvent *& event, ENetPeer *& peer )
+{
+	{
+		if( peer == host )
+		{
+			p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
+			my_id = packet->id;
+			DebugPrintf("network: host says my id is %d\n", my_id );
+			// ack my id
+			{
+				p2p_packet_t packet;
+				packet.type = ACK_MY_ID;
+				enet_send( peer, &packet, sizeof(packet),
+					convert_flags(NETWORK_RELIABLE), system_channel, NO_FLUSH );
+				DebugPrintf("network: acking my id\n");
+			}
+		}
+		else
+		{
+			DebugPrintf("network security: %s tried to give me my id but they aren't the host\n",
+				address_to_str(&peer->address));
+		}
+	}
+}
+
+/* MY_ID */
+[[gnu::always_inline]] static inline void PacketMyId( ENetEvent *& event, ENetPeer *& peer, network_peer_data_t *& peer_data )
+{
+	{
+		p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
+		if ( ! i_am_host )
+		{
+			peer_data->id = packet->id;
+			DebugPrintf("network: %s says their id is %d\n",
+				address_to_str(&peer->address), peer_data->id );
+			// ack the player id
+			{
+				p2p_packet_t packet;
+				packet.type = ACK_ID;
+				enet_send( peer, &packet, sizeof(packet),
+					convert_flags(NETWORK_RELIABLE), system_channel, NO_FLUSH );
+				DebugPrintf("network: acking his id\n");
+			}
+		}
+		else
+		{
+			DebugPrintf("network security: %s is telling me their id (%d) but I'm the host\n",
+				address_to_str(&peer->address), packet->id);
+		}
+	}
+}
+
+/* ACK_ID */
+[[gnu::always_inline]] static inline void PacketAckId( ENetPeer *& peer, network_peer_data_t *& peer_data )
+{
+	DebugPrintf("network: player %d has acked my id\n", peer_data->id);
+	if( peer_data->state == ACKING ) // we were waiting for him to ack so we could tell host
+	{
+		if( peer_data->id == NO_ID )
+		{
+			DebugPrintf("network security: %s has ack'd my id before telling me their id!\n",
+				address_to_str(&peer->address));
+		}
+		else // tell the host that we connected successfully
+		{
+			network_peer_data_t * host_data = (network_peer_data_t*)host->data;
+			p2p_id_packet_t packet;
+			packet.type = CONNECTED_TO;
+			packet.id = peer_data->id;
+			network_send( host_data->player, &packet, sizeof(packet),
+				NETWORK_RELIABLE, system_channel );
+			DebugPrintf("network: telling host that we have connected to new player %d\n",
+				peer_data->id);
+			peer_data->state = CONNECTED;
+		}
+	}
+}
+
+/* ACK_MY_ID */
+[[gnu::always_inline]] static inline void PacketAckMyId( ENetPeer *& peer, network_peer_data_t *& peer_data )
+{
+	if( i_am_host )
+	{
+		DebugPrintf("network: player %d has acked their id\n",
+			peer_data->id);
+		if( peer_data->connect_port )
+		{
+			// tell everyone to connect to new player
+			p2p_connect_packet_t packet;
+			packet.type = CONNECT;
+			packet.id = peer_data->id;
+			packet.address = peer->address;
+			packet.address.port = peer_data->connect_port;
+			network_broadcast( &packet, sizeof(packet),
+				NETWORK_RELIABLE, system_channel );
+			peer_data->state = SYNCHING;
+			DebugPrintf("network: telling everyone to connect to player %d\n",
+				peer_data->id);
+		}
+		else
+		{
+			DebugPrintf("network security: %s acked their id before telling me their connect port!\n",
+				address_to_str(&peer->address));
+		}
+	}
+	else
+	{
+		DebugPrintf("network security: %s acked their id but I'm not the host!\n",
+			address_to_str(&peer->address));
+	}
+}
+
+/* NEW_PLAYER */
+[[gnu::always_inline]] static inline void PacketNewPlayer( ENetEvent *& event, ENetPeer *& peer )
+{
+	if( ! i_am_host )
+	{
+		if( peer == host )
+		{
+			p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
+			ENetPeer * new_peer = find_peer_by_id( packet->id );
+			DebugPrintf("network: host sent us new player event for player %d\n",
+				packet->id);
+			if( new_peer )
+			{
+				new_player( new_peer );
+			}
+			else
+			{
+				DebugPrintf("network security: failed to find new player by id %d\n",
+					packet->id);
+				return;
+			}
+		}
+		// peer is not the host
+		else
+		{
+			DebugPrintf("network security: %s sent us new-player event but they are not the host\n",
+				address_to_str(&peer->address));
+		}
+	}
+	// I am not host
+	else
+	{
+		DebugPrintf("network security: %s sent us new player event but I am the host\n",
+				address_to_str(&peer->address));
+	}
+}
+
+/* NAME */
+[[gnu::always_inline]] static inline void PacketName( ENetEvent *& event, network_peer_data_t *& peer_data )
+{
+	{
+		p2p_name_packet_t* packet = (p2p_name_packet_t*) event->packet->data;
+
+		DebugPrintf("network: player %d has updated their name from '%s'",
+			peer_data->id, peer_data->player->name );
+
+		set_player_name( peer_data->player->name, packet->name );
+
+		DebugPrintf_(" to '%s'\n",
+			peer_data->player->name );
+
+		if( peer_data->state == PLAYING )
+			network_event( NETWORK_NAME, peer_data->player );
+	}
+}
+
+/* DISCONNECT */
+[[gnu::always_inline]] static inline void PacketDisconnect( ENetEvent *& event, ENetPeer *& peer )
+{
+	{
+		// host is telling us to disconnect from someone
+		if( peer == host )
+		{
+			p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
+			ENetPeer * bad_peer = find_peer_by_id( packet->id );
+			// bank if we can't find the peer
+			if(!bad_peer)
+			{
+				DebugPrintf("network security: host told us to disconnect from unknown player %d\n",
+					packet->id );
+				return;
+			}
+			// if not the host
+			else
+			{
+				DebugPrintf("network: host told us to disconnect from player %d\n",
+					packet->id);
+				// dissconnect message will fire and cleanup player
+				enet_peer_disconnect(bad_peer,HOST_SAID_SO);
+			}
+		}
+		else
+		{
+			DebugPrintf("network security: %s told us to disconnect but they are not the host\n",
+				address_to_str(&peer->address));
+		}
+	}
+}
+
+/* LOST_CONNECTION */
+[[gnu::always_inline]] static inline void PacketLostConnection( ENetEvent *& event, network_peer_data_t *& peer_data )
+{
+	{
+		// player is telling the host that he lost connection to someone
+		p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
+		ENetPeer * bad_peer = find_peer_by_id( packet->id );
+		if(!bad_peer)
+		{
+			DebugPrintf("network security: player %d told us he lost connection from unknown player %d\n",
+				peer_data->id, packet->id );
+			return;
+		}
+		if( i_am_host )
+		{
+			if( PEER_STATE(bad_peer) == SYNCHING )
+			{
+				// tell everyone to drop the connection
+				DebugPrintf("network: dropping player %d because they failed to synch with %d\n",
+					packet->id, peer_data->id );
+				// lost connection event will fire
+				// this will send a DISCONNECT message for us to everyone
+				// and will cleanup the peer and everything else
+				enet_peer_disconnect_later(bad_peer,FAILED_SYNCH | peer_data->id << 8);
+			}
+			if( PEER_STATE(bad_peer) == PLAYING )
+			{
+				// tell them to reconnect cause bad_peer is valid
+				p2p_connect_packet_t packet2;
+				packet2.type = CONNECT;
+				packet2.id = packet->id;
+				packet2.address = bad_peer->address;
+				packet2.address.port = PEER_CONNECT_PORT( bad_peer );
+				network_send( peer_data->player, &packet2, sizeof(packet2),
+					NETWORK_RELIABLE, system_channel );
+				DebugPrintf("network: telling player %d to reconnect to valid player %d\n",
+					peer_data->id, packet->id );
+			}
+		}
+		else
+		{
+			DebugPrintf("network security: player %d told us he lost-connection but we are not host\n",
+				peer_data->id);
+		}
+	}
+}
+
+/* CONNECTED_TO */
+[[gnu::always_inline]] static inline void PacketConnectedTo( ENetEvent *& event, ENetPeer *& peer, network_peer_data_t *& peer_data )
+{
+	{
+		p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
+		// player tells host that he successfully connected to new connection
+		if( i_am_host )
+		{
+			// if we are also connected to this connection
+			ENetPeer * target = find_peer_by_id( packet->id );
+			if( target )
+			{
+				DebugPrintf("network: player %d succesfully connected with player %d\n",
+					peer_data->id, packet->id);
+				peer_connected_to( peer, packet->id );
+			}
+			// if we are not connected to this connection
+			else
+			{
+				// tell the player to drop the connection
+				p2p_id_packet_t packet2;
+				packet2.type = DISCONNECT;
+				packet2.id = packet->id;
+				network_send( peer_data->player, &packet2, sizeof(packet2),
+					NETWORK_RELIABLE, system_channel );
+				DebugPrintf("network security: telling player %d to drop unknown player %d\n",
+					peer_data->id, packet->id);
+			}
+		}
+		else
+		{
+			DebugPrintf("network security: %s told me they connected to someone but I'm not the host\n",
+				address_to_str(&peer->address));
+		}
+	}
+}
+
+/* CONNECT */
+[[gnu::always_inline]] static inline void PacketConnect( ENetEvent *& event, ENetPeer *& peer )
+{
+	{
+		p2p_connect_packet_t * packet = (p2p_connect_packet_t*) event->packet->data;
+		ENetAddress * address = &packet->address;
+		// host tells player to connect to a new connection
+		if( ! i_am_host )
+		{
+			ENetPeer* new_peer;
+			network_peer_data_t * new_peer_data;
+			DebugPrintf("network: host told us to connect to player %d address %s\n",
+				packet->id, address_to_str( address ));
+			new_peer = enet_host_connect( enet_host, address, max_channels, 0 );
+			if(!new_peer)
+			{
+				DebugPrintf("network: enet host connect returned NULL.\n");
+			}
+			else
+			{
+				new_peer_data = (network_peer_data_t*)new_peer->data;
+				new_peer_data->state = CONNECTING;
+				new_peer_data->id = packet->id;
+			}
+		}
+		// I'm the host
+		else
+		{
+			DebugPrintf("network: %s just told me to connect to someone but I am the host!\n",
+				address_to_str(&peer->address));
+		}
+	}
+}
+
+/* NAT_PUNCH_THROUGH_LIST */
+[[gnu::always_inline]] static inline void PacketNatPunchThroughList( ENetEvent *& event )
+{
+	{
+		p2p_punch_packet_t * packet = (p2p_punch_packet_t*) event->packet->data;
+		ENetAddress * address  = &packet->address;
+		ENetAddress address2 = packet->address;	// a copy: address keeps the port the host saw
+		address2.port = packet->connect_port;
+		ENetBuffer buffer;
+		buffer.dataLength = 0;
+		int i;
+		for(i=0; i<4; i++)
+		{
+			DebugPrintf("network: sending nat punch through for %s (%d)\n",
+				address_to_str(address), packet->connect_port);
+			enet_socket_send( enet_host->socket, address,  &buffer, 1 ); // as host see's them
+			enet_socket_send( enet_host->socket, &address2, &buffer, 1 ); // their connect port
+		}
+	}
+}
+
 static void new_packet( ENetEvent * event )
 {
 	ENetPeer * peer = event->peer;
@@ -1028,74 +1369,13 @@ static void new_packet( ENetEvent * event )
 		switch( packet->type )
 		{
 		case YOUR_ID:
-			{
-				if( peer == host )
-				{
-					p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
-					my_id = packet->id;
-					DebugPrintf("network: host says my id is %d\n", my_id );
-					// ack my id
-					{
-						p2p_packet_t packet;
-						packet.type = ACK_MY_ID;
-						enet_send( peer, &packet, sizeof(packet),
-							convert_flags(NETWORK_RELIABLE), system_channel, NO_FLUSH );
-						DebugPrintf("network: acking my id\n");
-					}
-				}
-				else
-				{
-					DebugPrintf("network security: %s tried to give me my id but they aren't the host\n",
-						address_to_str(&peer->address));
-				}
-			}
+			PacketYourId( event, peer );
 			break;
 		case MY_ID:
-			{
-				p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
-				if ( ! i_am_host )
-				{
-					peer_data->id = packet->id;
-					DebugPrintf("network: %s says their id is %d\n",
-						address_to_str(&peer->address), peer_data->id );
-					// ack the player id
-					{
-						p2p_packet_t packet;
-						packet.type = ACK_ID;
-						enet_send( peer, &packet, sizeof(packet),
-							convert_flags(NETWORK_RELIABLE), system_channel, NO_FLUSH );
-						DebugPrintf("network: acking his id\n");
-					}
-				}
-				else
-				{
-					DebugPrintf("network security: %s is telling me their id (%d) but I'm the host\n",
-						address_to_str(&peer->address), packet->id);
-				}
-			}
+			PacketMyId( event, peer, peer_data );
 			break;
 		case ACK_ID:
-			DebugPrintf("network: player %d has acked my id\n", peer_data->id);
-			if( peer_data->state == ACKING ) // we were waiting for him to ack so we could tell host
-			{
-				if( peer_data->id == NO_ID )
-				{
-					DebugPrintf("network security: %s has ack'd my id before telling me their id!\n",
-						address_to_str(&peer->address));
-				}
-				else // tell the host that we connected successfully
-				{
-					network_peer_data_t * host_data = (network_peer_data_t*)host->data;
-					p2p_id_packet_t packet;
-					packet.type = CONNECTED_TO;
-					packet.id = peer_data->id;
-					network_send( host_data->player, &packet, sizeof(packet),
-						NETWORK_RELIABLE, system_channel );
-					DebugPrintf("network: telling host that we have connected to new player %d\n",
-						peer_data->id);
-					peer_data->state = CONNECTED;
-				}
-			}
+			PacketAckId( peer, peer_data );
 			break;
 		case CONNECT_PORT:
 			{
@@ -1106,242 +1386,28 @@ static void new_packet( ENetEvent * event )
 			}
 			break;
 		case ACK_MY_ID:
-			if( i_am_host )
-			{
-				DebugPrintf("network: player %d has acked their id\n",
-					peer_data->id);
-				if( peer_data->connect_port )
-				{
-					// tell everyone to connect to new player
-					p2p_connect_packet_t packet;
-					packet.type = CONNECT;
-					packet.id = peer_data->id;
-					packet.address = peer->address;
-					packet.address.port = peer_data->connect_port;
-					network_broadcast( &packet, sizeof(packet),
-						NETWORK_RELIABLE, system_channel );
-					peer_data->state = SYNCHING;
-					DebugPrintf("network: telling everyone to connect to player %d\n",
-						peer_data->id);
-				}
-				else
-				{
-					DebugPrintf("network security: %s acked their id before telling me their connect port!\n",
-						address_to_str(&peer->address));
-				}
-			}
-			else
-			{
-				DebugPrintf("network security: %s acked their id but I'm not the host!\n",
-					address_to_str(&peer->address));
-			}
+			PacketAckMyId( peer, peer_data );
 			break;
 		case NEW_PLAYER:
-			if( ! i_am_host )
-			{
-				if( peer == host )
-				{
-					p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
-					ENetPeer * new_peer = find_peer_by_id( packet->id );
-					DebugPrintf("network: host sent us new player event for player %d\n",
-						packet->id);
-					if( new_peer )
-					{
-						new_player( new_peer );
-					}
-					else
-					{
-						DebugPrintf("network security: failed to find new player by id %d\n",
-							packet->id);
-						break;
-					}
-				}
-				// peer is not the host
-				else
-				{
-					DebugPrintf("network security: %s sent us new-player event but they are not the host\n",
-						address_to_str(&peer->address));
-				}
-			}
-			// I am not host
-			else
-			{
-				DebugPrintf("network security: %s sent us new player event but I am the host\n",
-						address_to_str(&peer->address));
-			}
+			PacketNewPlayer( event, peer );
 			break;
 		case NAME:
-			{
-				p2p_name_packet_t* packet = (p2p_name_packet_t*) event->packet->data;
-
-				DebugPrintf("network: player %d has updated their name from '%s'",
-					peer_data->id, peer_data->player->name );
-
-				set_player_name( peer_data->player->name, packet->name );
-
-				DebugPrintf_(" to '%s'\n",
-					peer_data->player->name );
-
-				if( peer_data->state == PLAYING )
-					network_event( NETWORK_NAME, peer_data->player );
-			}
+			PacketName( event, peer_data );
 			break;
 		case DISCONNECT:
-			{
-				// host is telling us to disconnect from someone
-				if( peer == host )
-				{
-					p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
-					ENetPeer * bad_peer = find_peer_by_id( packet->id );
-					// bank if we can't find the peer
-					if(!bad_peer)
-					{
-						DebugPrintf("network security: host told us to disconnect from unknown player %d\n",
-							packet->id );
-						break;
-					}
-					// if not the host
-					else
-					{
-						DebugPrintf("network: host told us to disconnect from player %d\n",
-							packet->id);
-						// dissconnect message will fire and cleanup player
-						enet_peer_disconnect(bad_peer,HOST_SAID_SO);
-					}
-				}
-				else
-				{
-					DebugPrintf("network security: %s told us to disconnect but they are not the host\n",
-						address_to_str(&peer->address));
-				}
-			}
+			PacketDisconnect( event, peer );
 			break;
 		case LOST_CONNECTION:
-			{
-				// player is telling the host that he lost connection to someone
-				p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
-				ENetPeer * bad_peer = find_peer_by_id( packet->id );
-				if(!bad_peer)
-				{
-					DebugPrintf("network security: player %d told us he lost connection from unknown player %d\n",
-						peer_data->id, packet->id );
-					break;
-				}
-				if( i_am_host )
-				{
-					if( PEER_STATE(bad_peer) == SYNCHING )
-					{
-						// tell everyone to drop the connection
-						DebugPrintf("network: dropping player %d because they failed to synch with %d\n",
-							packet->id, peer_data->id );
-						// lost connection event will fire
-						// this will send a DISCONNECT message for us to everyone
-						// and will cleanup the peer and everything else
-						enet_peer_disconnect_later(bad_peer,FAILED_SYNCH | peer_data->id << 8);
-					}
-					if( PEER_STATE(bad_peer) == PLAYING )
-					{
-						// tell them to reconnect cause bad_peer is valid
-						p2p_connect_packet_t packet2;
-						packet2.type = CONNECT;
-						packet2.id = packet->id;
-						packet2.address = bad_peer->address;
-						packet2.address.port = PEER_CONNECT_PORT( bad_peer );
-						network_send( peer_data->player, &packet2, sizeof(packet2),
-							NETWORK_RELIABLE, system_channel );
-						DebugPrintf("network: telling player %d to reconnect to valid player %d\n",
-							peer_data->id, packet->id );
-					}
-				}
-				else
-				{
-					DebugPrintf("network security: player %d told us he lost-connection but we are not host\n",
-						peer_data->id);
-				}
-			}
+			PacketLostConnection( event, peer_data );
 			break;
 		case CONNECTED_TO:
-			{
-				p2p_id_packet_t * packet = (p2p_id_packet_t*) event->packet->data;
-				// player tells host that he successfully connected to new connection
-				if( i_am_host )
-				{
-					// if we are also connected to this connection
-					ENetPeer * target = find_peer_by_id( packet->id );
-					if( target )
-					{
-						DebugPrintf("network: player %d succesfully connected with player %d\n",
-							peer_data->id, packet->id);
-						peer_connected_to( peer, packet->id );
-					}
-					// if we are not connected to this connection
-					else
-					{
-						// tell the player to drop the connection
-						p2p_id_packet_t packet2;
-						packet2.type = DISCONNECT;
-						packet2.id = packet->id;
-						network_send( peer_data->player, &packet2, sizeof(packet2),
-							NETWORK_RELIABLE, system_channel );
-						DebugPrintf("network security: telling player %d to drop unknown player %d\n",
-							peer_data->id, packet->id);
-					}
-				}
-				else
-				{
-					DebugPrintf("network security: %s told me they connected to someone but I'm not the host\n",
-						address_to_str(&peer->address));
-				}
-			}
+			PacketConnectedTo( event, peer, peer_data );
 			break;
 		case CONNECT:
-			{
-				p2p_connect_packet_t * packet = (p2p_connect_packet_t*) event->packet->data;
-				ENetAddress * address = &packet->address;
-				// host tells player to connect to a new connection
-				if( ! i_am_host )
-				{
-					ENetPeer* new_peer;
-					network_peer_data_t * new_peer_data;
-					DebugPrintf("network: host told us to connect to player %d address %s\n",
-						packet->id, address_to_str( address ));
-					new_peer = enet_host_connect( enet_host, address, max_channels, 0 );
-					if(!new_peer)
-					{
-						DebugPrintf("network: enet host connect returned NULL.\n");
-					}
-					else
-					{
-						new_peer_data = (network_peer_data_t*)new_peer->data;
-						new_peer_data->state = CONNECTING;
-						new_peer_data->id = packet->id;
-					}
-				}
-				// I'm the host
-				else
-				{
-					DebugPrintf("network: %s just told me to connect to someone but I am the host!\n",
-						address_to_str(&peer->address));
-				}
-			}
+			PacketConnect( event, peer );
 			break;
 		case NAT_PUNCH_THROUGH_LIST: // see explanation of this in new_connection()
-			{
-				p2p_punch_packet_t * packet = (p2p_punch_packet_t*) event->packet->data;
-				ENetAddress * address  = &packet->address;
-				ENetAddress address2 = packet->address;	// a copy: address keeps the port the host saw
-				address2.port = packet->connect_port;
-				ENetBuffer buffer;
-				buffer.dataLength = 0;
-				int i;
-				for(i=0; i<4; i++)
-				{
-					DebugPrintf("network: sending nat punch through for %s (%d)\n",
-						address_to_str(address), packet->connect_port);
-					enet_socket_send( enet_host->socket, address,  &buffer, 1 ); // as host see's them
-					enet_socket_send( enet_host->socket, &address2, &buffer, 1 ); // their connect port
-				}
-			}
+			PacketNatPunchThroughList( event );
 			break;
 		default:
 			DebugPrintf("network security: received unknown packet type: %d\n",
