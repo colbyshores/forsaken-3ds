@@ -481,6 +481,14 @@ bool joysticks_init(void)
 		JoystickInfo[i].NumButtons	= SDL_JoystickNumButtons(joy);
 		JoystickInfo[i].NumPOVs		= SDL_JoystickNumHats(joy);
 
+		// use only as many as JOYSTICKINFO has room for
+		if (JoystickInfo[i].NumAxis > MAX_JOYSTICK_AXIS)
+			JoystickInfo[i].NumAxis = MAX_JOYSTICK_AXIS;
+		if (JoystickInfo[i].NumButtons > MAX_JOYSTICK_BUTTONS)
+			JoystickInfo[i].NumButtons = MAX_JOYSTICK_BUTTONS;
+		if (JoystickInfo[i].NumPOVs > MAX_JOYSTICK_POVS)
+			JoystickInfo[i].NumPOVs = MAX_JOYSTICK_POVS;
+
 		JoystickInfo[i].Name = (char *)strdup( SDL_JoystickNameForIndex(i) );
 
 		DebugPrintf(
