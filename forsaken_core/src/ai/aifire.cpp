@@ -64,7 +64,7 @@ void AI_TURRET_FIREATTARGET( ENEMY * Enemy )
 	// Is it time to validate target ?
 	if ( Enemy->Timer == 0.0F )
 	{
-		if( !( Enemy->AIFlags & AI_ANYPLAYERINRANGE ) || !AI_ClearLOS( &Enemy->Object.Pos ,Enemy->Object.Group , &TObject->Pos ) )
+		if( !TObject || !( Enemy->AIFlags & AI_ANYPLAYERINRANGE ) || !AI_ClearLOS( &Enemy->Object.Pos ,Enemy->Object.Group , &TObject->Pos ) )
 		{
 			Enemy->AIFlags &= ~AI_ICANSEEPLAYER;
 			SetCurAnimSeq( TURRETSEQ_Closing, &Enemy->Object );
