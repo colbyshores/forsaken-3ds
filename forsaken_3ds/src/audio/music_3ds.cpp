@@ -34,7 +34,7 @@
 #include "util/util.h"
 #include "audio/music.h"
 #include "platform_3ds/main_3ds.h"
-#include "audio/sound_3ds.h"
+#include "audio/sound.h"
 #include "audio/dsp_adpcm.h"
 #include "audio/music_table.h"
 
@@ -278,11 +278,13 @@ bool MusicStream::init()
 {
 	if (initialized) return true;
 
-	/* Without ndsp (no DSP firmware) the channel never plays, and the
-	 * worker thread would refill all four buffers from romfs every tick
-	 * trying to restart it. Stay off; every other call is a no-op while
-	 * not initialized. */
-	if (!sound_dsp_ready()) {
+	/* Music runs from AppInit, before InitializeSound, so start ndsp here
+	 * (sound_init does nothing if it is already running; only
+	 * sound_destroy at shutdown stops it). Without ndsp (no DSP firmware)
+	 * the channel never plays, and the worker thread would refill all four
+	 * buffers from romfs every tick trying to restart it. Stay off; every
+	 * other call is a no-op while not initialized. */
+	if (!sound_init()) {
 		DebugPrintf("music: ndsp not running, music disabled\n");
 		return false;
 	}

@@ -255,11 +255,6 @@ bool sound_init(void)
 	return true;
 }
 
-bool sound_dsp_ready(void)
-{
-	return ndsp_initialized;
-}
-
 void sound_destroy(void)
 {
 	if (!ndsp_initialized)
