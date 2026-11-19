@@ -1418,6 +1418,1009 @@ void FirePrimary(void)
 ===================================================================*/
 static float PyroCount = 0.0F;
 
+/* a primary bullet hits a secondary weapon (mine, missile). True: the bullet is finished for this frame (skip the rest of its update). */
+[[gnu::always_inline]] static inline bool PrimBullHitSecondary( u_int16_t & i, VECTOR & TempVector, VECTOR & NewDir, float & Damage, VECTOR & NewPos, u_int16_t & HitSecondary, VECTOR & MInt_Point, float & DistToInt, VECTOR & MoveOffsetVector, float & DistToCenter, bool & Killed )
+{
+	if( HitSecondary != INDEX_NONE )
+	{
+		TempVector.x = ( MInt_Point.x - SecBulls[ HitSecondary ].Pos.x );
+		TempVector.y = ( MInt_Point.y - SecBulls[ HitSecondary ].Pos.y );
+		TempVector.z = ( MInt_Point.z - SecBulls[ HitSecondary ].Pos.z );
+		DistToCenter = VectorLength( &TempVector );
+		NormaliseVector( &TempVector );
+
+		ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
+
+		Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
+
+		switch( PrimBulls[ i ].Weapon )
+		{
+		case PULSAR:
+		case NME_PULSAR_BLUE:
+		case NME_BULLET1:
+		case NME_PULSAR:
+		case NME_TROJAX:
+		case NME_PYROLITE:
+		case NME_SUSS_GUN:
+		case TROJAX:
+		case PYROLITE_RIFLE:
+		case SUSS_GUN:
+		case ORBITPULSAR:
+		case FLAMES:
+			break;
+
+		case TRANSPULSE_CANNON:
+		case NME_TRANSPULSE:
+			if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched
+				Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // - unpatched
+			break;
+
+		case LASER:
+		case NME_LASER:
+		case NME_LIGHTNING:
+		case NME_POWERLASER:
+			TempVector.x = ( MInt_Point.x - PrimBulls[ i ].Pos.x );
+			TempVector.y = ( MInt_Point.y - PrimBulls[ i ].Pos.y );
+			TempVector.z = ( MInt_Point.z - PrimBulls[ i ].Pos.z );
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			DistToInt = VectorLength( &TempVector );
+			if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
+			Damage = ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			Damage = ( Damage * ( framelag / 3.0F ) );
+			break;
+		}
+
+		if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
+		{
+			Damage =  ( Damage / 10.0F ) * framelag;
+		}
+
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+		SecBulls[ HitSecondary ].Shield -= Damage;
+		/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+		if( SecBulls[ HitSecondary ].Shield < 0.0F ) SecBulls[ HitSecondary ].Shield = 0.0F;
+		if( SecBulls[ HitSecondary ].Shield == 0.0F )
+		{
+			switch( SecBulls[ HitSecondary ].Weapon )
+			{
+			case ENEMYSPIRALMISSILE:
+			case ENEMYHOMINGMISSILE:
+			case ENEMYBLUEHOMINGMISSILE:
+			case ENEMYDEPTHCHARGE:
+			case GRAVGONMISSILE:
+			case MUGMISSILE:
+			case MULTIPLEMISSILE:
+			case SOLARISMISSILE:
+			case SCATTERMISSILE:
+			case ENEMYTENTACLE:
+			default:
+				MissileShockWave( (VECTOR *) &MInt_Point, MISSILE_SHOCKWAVE, SecBulls[ HitSecondary ].Owner,
+								( SecBulls[ HitSecondary ].Damage / 2.5F ), SecBulls[ HitSecondary ].GroupImIn,
+								SecBulls[ HitSecondary ].Weapon );
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case ENEMYFIREBALL:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case THIEFMISSILE:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case PURGEMINE:
+			case PINEMINE:
+			case QUANTUMMINE:
+			case SPIDERMINE:
+			case PINEMISSILE:
+			case TITANSTARSHRAPNEL:
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+
+			case TITANSTARMISSILE:
+				TempVector.x = 0.0F;
+				TempVector.y = 1.0F;
+				TempVector.z = 0.0F;
+				CreateExplosionDonut( &SecBulls[ HitSecondary ].Pos, (VECTOR *) &TempVector, SecBulls[ HitSecondary ].GroupImIn );
+				if( ( ( SecBulls[ HitSecondary ].OwnerType == OWNER_SHIP ) && ( SecBulls[ HitSecondary ].Owner == WhoIAm ) ) ||
+					( ( SecBulls[ HitSecondary ].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
+					( ( SecBulls[ HitSecondary ].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
+				{
+					CreateTitanStarShrapnel( HitSecondary, (VECTOR *) &MInt_Point, &SecBulls[ HitSecondary ].DirVector, SecBulls[ HitSecondary ].GroupImIn );
+				}
+				DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
+				break;
+			}
+		}
+
+		Killed = false;
+
+		switch( PrimBulls[ i ].Weapon )
+		{
+		case NME_PULSAR_BLUE:
+		case NME_BULLET1:
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_PULSAR:
+			CreateNmePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case PULSAR:
+			CreatePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_PYROLITE:
+		case PYROLITE_RIFLE:
+			NewPos.x = MInt_Point.x;
+			NewPos.y = MInt_Point.y;
+			NewPos.z = MInt_Point.z;
+			MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+			MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+			MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+
+			PrimBulls[i].Dir = NewDir;
+			PrimBulls[i].ColFlag = 0;
+			break;
+
+		case FLAMES:
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+
+		case NME_TROJAX:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				CreateNmeTrojaxExplosion( &MInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+		case TROJAX:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				CreateTrojaxExplosion( &MInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+
+		case NME_TRANSPULSE:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				CreateNmeArcExplosion( &MInt_Point, &TempVector, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+		case TRANSPULSE_CANNON:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				CreateArcExplosion( &MInt_Point, &TempVector, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case NME_SUSS_GUN:
+			CreateNmeShrapnelExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case SUSS_GUN:
+			CreateShrapnelExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case LASER:
+			CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_LASER:
+			CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_POWERLASER:
+			CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_LIGHTNING:
+			CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case ORBITPULSAR:
+			CreatePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+		default:
+			break;
+		}
+
+		if( Killed )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+/* a primary bullet hits the background or a background object. True: the bullet is finished for this frame (skip the rest of its update). */
+[[gnu::always_inline]] static inline bool PrimBullHitWall( u_int16_t & i, VECTOR & NewDir, VECTOR & NewPos, u_int16_t & HitWall, float & DistToInt, VECTOR & MoveOffsetVector, bool & Killed )
+{
+	if( HitWall != INDEX_NONE )
+	{
+		ReflectVector( &PrimBulls[i].Dir, &PrimBulls[i].ColPointNormal, &NewDir );
+
+		Killed = false;
+
+		switch( PrimBulls[i].Weapon )
+		{
+		case NME_PULSAR_BLUE:
+		case NME_BULLET1:
+			CreateSparks( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_PULSAR:
+			CreateNmePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case PULSAR:
+			CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_PYROLITE:
+		case PYROLITE_RIFLE:
+			NewPos.x = PrimBulls[i].ColPoint.x;
+			NewPos.y = PrimBulls[i].ColPoint.y;
+			NewPos.z = PrimBulls[i].ColPoint.z;
+			MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+			MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+			MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			PrimBulls[i].Dir = NewDir;
+			PrimBulls[i].ColFlag = 0;
+			break;
+
+		case FLAMES:
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_TROJAX:
+			CreateNmeTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case TROJAX:
+			CreateTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_TRANSPULSE:
+			CreateNmeArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
+
+			NewPos.x = PrimBulls[i].ColPoint.x;
+			NewPos.y = PrimBulls[i].ColPoint.y;
+			NewPos.z = PrimBulls[i].ColPoint.z;
+			MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+			MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+			MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+
+			if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
+			{
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case TRANSPULSE_CANNON:
+			CreateArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
+
+			NewPos.x = PrimBulls[i].ColPoint.x;
+			NewPos.y = PrimBulls[i].ColPoint.y;
+			NewPos.z = PrimBulls[i].ColPoint.z;
+			MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+			MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+			MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+
+			if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
+			{
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case NME_SUSS_GUN:
+			CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
+			if( !Random_Range( 16 ) )
+			{
+				PlayPannedSfx( SFX_Ric , PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
+			}
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case SUSS_GUN:
+			CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
+			if( !Random_Range( 16 ) )
+			{
+				PlayPannedSfx( SFX_Ric, PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
+			}
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_LIGHTNING:
+			CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_LASER:
+			CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_POWERLASER:
+			CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case LASER:
+			CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case ORBITPULSAR:
+			CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		default:
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+		}
+
+		if( Killed ) return true;
+	}
+	return false;
+}
+
+/* a primary bullet hits a ship. True: the bullet is finished for this frame (skip the rest of its update). */
+[[gnu::always_inline]] static inline bool PrimBullHitShip( u_int16_t & i, VECTOR & TempVector, VECTOR & NewDir, float & Damage, VECTOR & DirVector, VECTOR & NewPos, VECTOR & Int_Point, u_int16_t & HitTarget, float & DistToInt, VECTOR & Recoil, VECTOR & MoveOffsetVector, float & DistToCenter, bool & Killed )
+{
+	if( HitTarget != INDEX_NONE )							/* Hit Target? */
+	{
+
+		TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
+		TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
+		TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
+		DistToCenter = VectorLength( &TempVector );
+
+		PlayPannedSfx( SFX_ShipHit, Ships[ HitTarget ].Object.Group , &Int_Point, 0.0F );
+
+		Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
+
+		switch( PrimBulls[ i ].Weapon )
+		{
+		case TROJAX:
+		case PULSAR:
+		case PYROLITE_RIFLE:
+		case SUSS_GUN:
+		case ORBITPULSAR:
+		case NME_PULSAR_BLUE:
+		case NME_BULLET1:
+		case NME_PULSAR:
+		case NME_TROJAX:
+		case NME_PYROLITE:
+		case NME_SUSS_GUN:
+		case FLAMES:
+			break;
+
+		case NME_TRANSPULSE:
+		case TRANSPULSE_CANNON:
+			if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched
+				Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // -- unpatched
+			break;
+
+		case NME_LIGHTNING:
+		case NME_LASER:
+		case NME_POWERLASER:
+		case LASER:
+			TempVector.x = ( Int_Point.x - PrimBulls[ i ].Pos.x );
+			TempVector.y = ( Int_Point.y - PrimBulls[ i ].Pos.y );
+			TempVector.z = ( Int_Point.z - PrimBulls[ i ].Pos.z );
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			DistToInt = VectorLength( &TempVector );
+			if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
+			Damage =  ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
+			Damage =  ( Damage * ( framelag / 3.0F ) );
+			break;
+		}
+
+		switch( ColPerspective )
+		{
+		case COLPERS_Forsaken:
+			if( ( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) ||
+				  /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+				  ( PrimBulls[i].OwnerType != OWNER_SHIP ) )
+			{
+				if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
+				{
+					Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
+					PrimBulls[i].TrojPower *= 1.0F - ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
+				}
+
+				if( PrimBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
+
+				Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
+				Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
+				Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
+
+				if( HitTarget == WhoIAm )
+				{
+					HitMe( PrimBulls[i].OwnerType, PrimBulls[i].Owner, Damage, WEPTYPE_Primary, PrimBulls[i].Weapon );
+					ForceExternalOneOff( WhoIAm, &Recoil );
+				}
+				else
+				{
+					IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Primary, PrimBulls[i].Weapon, ONEOFF_RECOIL );
+				}
+			}
+			break;
+
+		case COLPERS_Descent:
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			if( HitTarget == WhoIAm )
+			{
+				if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
+				{
+					Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
+					PrimBulls[i].TrojPower *= 1.0F - ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
+				}
+
+				if( PrimBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
+
+				Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
+				Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
+				Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
+
+				HitMe( PrimBulls[i].OwnerType, PrimBulls[i].Owner, Damage, WEPTYPE_Primary, PrimBulls[i].Weapon );
+				ForceExternalOneOff( WhoIAm, &Recoil );
+			}
+			break;
+		}
+
+		if( ( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) ) )
+		{
+			if( Ships[ HitTarget ].Object.Shield || Ships[ HitTarget ].Invul  )
+			{
+				switch( PrimBulls[ i ].Weapon )
+				{
+				case PULSAR:
+				case ORBITPULSAR:
+				case NME_PULSAR:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 2, 0, 255, 0 );
+					break;
+				case NME_TROJAX:
+				case TROJAX:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 4, 128, 128, 255 );
+					break;
+				case NME_TRANSPULSE:
+				case TRANSPULSE_CANNON:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 4, 255, 100, 100 );
+					break;
+				case NME_SUSS_GUN:
+				case SUSS_GUN:
+				case NME_PYROLITE:
+				case PYROLITE_RIFLE:
+				case FLAMES:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 255, 100, 100 );
+					break;
+				case NME_LIGHTNING:
+				case NME_LASER:
+				case NME_POWERLASER:
+				case LASER:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 200, 200, 255 );
+					break;
+				case NME_PULSAR_BLUE:
+				case NME_BULLET1:
+					CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 0, 255, 0 );
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
+				switch( PrimBulls[ i ].Weapon )
+				{
+				case NME_PULSAR_BLUE:
+				case NME_BULLET1:
+				case NME_PULSAR:
+				case NME_TROJAX:
+				case NME_TRANSPULSE:
+				case NME_PYROLITE:
+				case FLAMES:
+				case PULSAR:
+				case ORBITPULSAR:
+				case TROJAX:
+				case TRANSPULSE_CANNON:
+				case PYROLITE_RIFLE:
+					TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
+					TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
+					TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
+					NormaliseVector( &TempVector );
+					CreateColSparks( &Int_Point, &TempVector, Ships[ HitTarget ].Object.Group );
+					break;
+
+				case NME_SUSS_GUN:
+				case NME_LASER:
+				case NME_POWERLASER:
+				case NME_LIGHTNING:
+				case SUSS_GUN:
+				case LASER:
+					TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
+					TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
+					TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
+					NormaliseVector( &TempVector );
+					CreateSmallColSparks( &Int_Point, &TempVector, Ships[ HitTarget ].Object.Group );
+					break;
+				}
+			}
+		}
+
+		TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
+		TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
+		TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
+		NormaliseVector( &TempVector );
+
+		ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
+
+		Killed = false;
+
+		switch( PrimBulls[ i ].Weapon )
+		{
+		case NME_PULSAR_BLUE:
+		case NME_BULLET1:
+			if( Ships[ HitTarget ].Invul )
+			{
+				NewPos = Int_Point;
+				PrimBulls[i].Dir = NewDir;
+				PrimBulls[i].ColFlag = 0;
+				MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+				MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+				MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			}
+			else
+			{
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case NME_PULSAR:
+			if( Ships[ HitTarget ].Invul )
+			{
+				ChangePulsarDir( i, &NewDir );
+				NewPos = Int_Point;
+				MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+				MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+				MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			}
+			else
+			{
+				CreateNmePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case PULSAR:
+			if( Ships[ HitTarget ].Invul )
+			{
+				ChangePulsarDir( i, &NewDir );
+				NewPos = Int_Point;
+				MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+				MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+				MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			}
+			else
+			{
+				CreatePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case NME_PYROLITE:
+		case PYROLITE_RIFLE:
+			NewPos = Int_Point;
+			MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+			MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+			MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			PrimBulls[i].Dir = NewDir;
+			PrimBulls[i].ColFlag = 0;
+			break;
+
+		case FLAMES:
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+
+		case NME_TROJAX:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				if( Ships[ HitTarget ].Invul )
+				{
+					CreateNmeTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+					ChangeTrojaxDir( i, &NewDir );
+					NewPos = Int_Point;
+					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+				}
+				else
+				{
+					CreateNmeTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+					CleanUpPrimBull( i, false );
+					Killed = true;
+				}
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+		case TROJAX:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				if( Ships[ HitTarget ].Invul )
+				{
+					CreateTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+					ChangeTrojaxDir( i, &NewDir );
+					NewPos = Int_Point;
+					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+				}
+				else
+				{
+					CreateTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+					CleanUpPrimBull( i, false );
+					Killed = true;
+				}
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+
+		case NME_TRANSPULSE:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				CreateNmeArcExplosion( &Int_Point, &TempVector, PrimBulls[i].GroupImIn );
+
+				if( Ships[ HitTarget ].Invul )
+				{
+					NewPos = Int_Point;
+					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+
+					if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
+					{
+						CleanUpPrimBull( i, false );
+						Killed = true;
+					}
+				}
+				else
+				{
+					CleanUpPrimBull( i, false );
+					Killed = true;
+				}
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+		case TRANSPULSE_CANNON:
+			if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
+			{
+				CreateArcExplosion( &Int_Point, &TempVector, PrimBulls[i].GroupImIn );
+
+				if( Ships[ HitTarget ].Invul )
+				{
+					NewPos = Int_Point;
+					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+
+					if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
+					{
+						CleanUpPrimBull( i, false );
+						Killed = true;
+					}
+				}
+				else
+				{
+					CleanUpPrimBull( i, false );
+					Killed = true;
+				}
+			}
+			break;
+
+		case NME_SUSS_GUN:
+			if( Ships[ HitTarget ].Invul )
+			{
+				ChangeSussgunDir( i, &NewDir );
+				NewPos = Int_Point;
+				MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+				MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+				MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			}
+			else
+			{
+				CreateNmeShrapnelExplosion( &Int_Point, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case SUSS_GUN:
+			if( Ships[ HitTarget ].Invul )
+			{
+				ChangeSussgunDir( i, &NewDir );
+				NewPos = Int_Point;
+				MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+				MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+				MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			}
+			else
+			{
+				CreateShrapnelExplosion( &Int_Point, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case NME_LIGHTNING:
+			CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_LASER:
+			CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_POWERLASER:
+			CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case LASER:
+			CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case ORBITPULSAR:
+			if( Ships[ HitTarget ].Invul )
+			{
+				ChangeOrbitPulsarDir( i, &NewDir );
+				NewPos = Int_Point;
+				MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+				MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+				MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+			}
+			else
+			{
+				CreatePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+		default:
+			break;
+		}
+
+		if( Killed )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+/* a primary bullet hits an enemy. True: the bullet is finished for this frame (skip the rest of its update). */
+[[gnu::always_inline]] static inline bool PrimBullHitEnemy( u_int16_t & i, VECTOR & TempVector, VECTOR & NewDir, float & Damage, VECTOR & NewPos, float & DistToInt, VECTOR & MoveOffsetVector, float & DistToCenter, ENEMY		*& HitEnemy, VECTOR & EInt_Point, bool & Killed )
+{
+	if( HitEnemy != nullptr )
+	{
+		TempVector.x = ( EInt_Point.x - HitEnemy->Object.Pos.x );
+		TempVector.y = ( EInt_Point.y - HitEnemy->Object.Pos.y );
+		TempVector.z = ( EInt_Point.z - HitEnemy->Object.Pos.z );
+		DistToCenter = VectorLength( &TempVector );
+		NormaliseVector( &TempVector );
+
+		ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
+
+		Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
+		if( ( PrimBulls[ i ].Weapon == LASER ) ||
+			( PrimBulls[ i ].Weapon == NME_LASER ) ||
+			( PrimBulls[ i ].Weapon == NME_POWERLASER ) )
+		{
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			Damage *= ( framelag / 3.0F );
+		}
+
+		if( DistToCenter >= ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) ) Damage = ( Damage / 10.0F ) * framelag;
+
+		if( !( HitEnemy->Object.Flags & SHIP_Invul ) )
+		{
+			if( DamageEnemy( HitEnemy , -Damage , &EInt_Point , &PrimBulls[i].Dir , PrimBulls[ i ].Speed, PrimBulls[ i ].Owner ,PrimBulls[ i ].OwnerType ) )
+			{
+				CreateNewExplosion( &EInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+				KillUsedEnemy( HitEnemy );
+			}
+			else
+			{
+				CreateColSparks( &EInt_Point, &TempVector, HitEnemy->Object.Group );
+			}
+		}
+		else
+		{
+			if( !Random_Range( 4 ) )
+			{
+				PlayPannedSfx( SFX_Ric, PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
+			}
+		}
+
+		Killed = false;
+
+		switch( PrimBulls[ i ].Weapon )
+		{
+		case NME_PULSAR_BLUE:
+		case NME_BULLET1:
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_PULSAR:
+			CreateNmePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case PULSAR:
+			CreatePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_PYROLITE:
+		case PYROLITE_RIFLE:
+			NewPos = EInt_Point;
+			MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
+			MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
+			MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
+
+			PrimBulls[i].Dir = NewDir;
+			PrimBulls[i].ColFlag = 0;
+			break;
+
+		case FLAMES:
+			CleanUpPrimBull( i, false );
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+
+		case NME_TROJAX:
+			if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
+			{
+				CreateNmeTrojaxExplosion( &EInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+
+		case TROJAX:
+			if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
+			{
+				CreateTrojaxExplosion( &EInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+		case NME_TRANSPULSE:
+			if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
+			{
+				CreateNmeArcExplosion( &EInt_Point, &TempVector, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+			break;
+
+		case TRANSPULSE_CANNON:
+			if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
+			{
+				CreateArcExplosion( &EInt_Point, &TempVector, PrimBulls[i].GroupImIn );
+				CleanUpPrimBull( i, false );
+				Killed = true;
+			}
+			break;
+
+		case NME_SUSS_GUN:
+			CreateNmeShrapnelExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case SUSS_GUN:
+			CreateShrapnelExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		case NME_LIGHTNING:
+			CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_LASER:
+			CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case NME_POWERLASER:
+			CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case LASER:
+			CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
+			Killed = true;
+			break;
+
+		case ORBITPULSAR:
+			CreatePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
+			CleanUpPrimBull( i, false );
+			Killed = true;
+			break;
+
+		default:
+			break;
+		}
+
+		if( Killed )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void ProcessPrimaryBullets( void )
 {
 	u_int16_t			i;
@@ -1805,997 +2808,26 @@ void ProcessPrimaryBullets( void )
 			/*===================================================================
 						Hit Secondary Weapon
 			===================================================================*/
-			if( HitSecondary != INDEX_NONE )
-			{
-				TempVector.x = ( MInt_Point.x - SecBulls[ HitSecondary ].Pos.x );
-				TempVector.y = ( MInt_Point.y - SecBulls[ HitSecondary ].Pos.y );
-				TempVector.z = ( MInt_Point.z - SecBulls[ HitSecondary ].Pos.z );
-				DistToCenter = VectorLength( &TempVector );
-				NormaliseVector( &TempVector );
-
-				ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
-
-				Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
-
-				switch( PrimBulls[ i ].Weapon )
-				{
-				case PULSAR:
-				case NME_PULSAR_BLUE:
-				case NME_BULLET1:
-				case NME_PULSAR:
-				case NME_TROJAX:
-				case NME_PYROLITE:
-				case NME_SUSS_GUN:
-				case TROJAX:
-				case PYROLITE_RIFLE:
-				case SUSS_GUN:
-				case ORBITPULSAR:
-				case FLAMES:
-					break;
-
-				case TRANSPULSE_CANNON:
-				case NME_TRANSPULSE:
-					if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched
-						Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // - unpatched
-					break;
-
-				case LASER:
-				case NME_LASER:
-				case NME_LIGHTNING:
-				case NME_POWERLASER:
-					TempVector.x = ( MInt_Point.x - PrimBulls[ i ].Pos.x );
-					TempVector.y = ( MInt_Point.y - PrimBulls[ i ].Pos.y );
-					TempVector.z = ( MInt_Point.z - PrimBulls[ i ].Pos.z );
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					DistToInt = VectorLength( &TempVector );
-					if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
-					Damage = ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					Damage = ( Damage * ( framelag / 3.0F ) );
-					break;
-				}
-
-				if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
-				{
-					Damage =  ( Damage / 10.0F ) * framelag;
-				}
-
-				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				SecBulls[ HitSecondary ].Shield -= Damage;
-				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-				if( SecBulls[ HitSecondary ].Shield < 0.0F ) SecBulls[ HitSecondary ].Shield = 0.0F;
-				if( SecBulls[ HitSecondary ].Shield == 0.0F )
-				{
-					switch( SecBulls[ HitSecondary ].Weapon )
-					{
-					case ENEMYSPIRALMISSILE:
-					case ENEMYHOMINGMISSILE:
-					case ENEMYBLUEHOMINGMISSILE:
-					case ENEMYDEPTHCHARGE:
-					case GRAVGONMISSILE:
-					case MUGMISSILE:
-					case MULTIPLEMISSILE:
-					case SOLARISMISSILE:
-					case SCATTERMISSILE:
-					case ENEMYTENTACLE:
-					default:
-						MissileShockWave( (VECTOR *) &MInt_Point, MISSILE_SHOCKWAVE, SecBulls[ HitSecondary ].Owner,
-										( SecBulls[ HitSecondary ].Damage / 2.5F ), SecBulls[ HitSecondary ].GroupImIn,
-										SecBulls[ HitSecondary ].Weapon );
-						DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-						break;
-
-					case ENEMYFIREBALL:
-						DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-						break;
-
-					case THIEFMISSILE:
-						DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-						break;
-
-					case PURGEMINE:
-					case PINEMINE:
-					case QUANTUMMINE:
-					case SPIDERMINE:
-					case PINEMISSILE:
-					case TITANSTARSHRAPNEL:
-						DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-						break;
-
-					case TITANSTARMISSILE:
-						TempVector.x = 0.0F;
-						TempVector.y = 1.0F;
-						TempVector.z = 0.0F;
-						CreateExplosionDonut( &SecBulls[ HitSecondary ].Pos, (VECTOR *) &TempVector, SecBulls[ HitSecondary ].GroupImIn );
-						if( ( ( SecBulls[ HitSecondary ].OwnerType == OWNER_SHIP ) && ( SecBulls[ HitSecondary ].Owner == WhoIAm ) ) ||
-							( ( SecBulls[ HitSecondary ].OwnerType == OWNER_ENEMY ) && ( IsHost ) ) ||
-							( ( SecBulls[ HitSecondary ].OwnerType == OWNER_NOBODY ) && ( IsHost ) ) )
-						{
-							CreateTitanStarShrapnel( HitSecondary, (VECTOR *) &MInt_Point, &SecBulls[ HitSecondary ].DirVector, SecBulls[ HitSecondary ].GroupImIn );
-						}
-						DestroySecondary( HitSecondary, (VECTOR *) &MInt_Point );
-						break;
-					}
-				}
-
-				Killed = false;
-
-				switch( PrimBulls[ i ].Weapon )
-				{
-				case NME_PULSAR_BLUE:
-				case NME_BULLET1:
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_PULSAR:
-					CreateNmePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case PULSAR:
-					CreatePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_PYROLITE:
-				case PYROLITE_RIFLE:
-					NewPos.x = MInt_Point.x;
-					NewPos.y = MInt_Point.y;
-					NewPos.z = MInt_Point.z;
-					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-
-					PrimBulls[i].Dir = NewDir;
-					PrimBulls[i].ColFlag = 0;
-					break;
-
-				case FLAMES:
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-
-				case NME_TROJAX:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						CreateNmeTrojaxExplosion( &MInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-				case TROJAX:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						CreateTrojaxExplosion( &MInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-
-				case NME_TRANSPULSE:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						CreateNmeArcExplosion( &MInt_Point, &TempVector, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-				case TRANSPULSE_CANNON:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						CreateArcExplosion( &MInt_Point, &TempVector, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case NME_SUSS_GUN:
-					CreateNmeShrapnelExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case SUSS_GUN:
-					CreateShrapnelExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case LASER:
-					CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_LASER:
-					CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_POWERLASER:
-					CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_LIGHTNING:
-					CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case ORBITPULSAR:
-					CreatePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-				default:
-					break;
-				}
-
-				if( Killed )
-				{
-					goto loop;
-				}
-			}
+			if( PrimBullHitSecondary( i, TempVector, NewDir, Damage, NewPos, HitSecondary, MInt_Point, DistToInt, MoveOffsetVector, DistToCenter, Killed ) )
+				goto loop;
 
 			/*===================================================================
 						Hit Background or Background Object
 			===================================================================*/
-			if( HitWall != INDEX_NONE )
-			{
-				ReflectVector( &PrimBulls[i].Dir, &PrimBulls[i].ColPointNormal, &NewDir );
-
-				Killed = false;
-
-				switch( PrimBulls[i].Weapon )
-				{
-				case NME_PULSAR_BLUE:
-				case NME_BULLET1:
-					CreateSparks( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_PULSAR:
-					CreateNmePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case PULSAR:
-					CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_PYROLITE:
-				case PYROLITE_RIFLE:
-					NewPos.x = PrimBulls[i].ColPoint.x;
-					NewPos.y = PrimBulls[i].ColPoint.y;
-					NewPos.z = PrimBulls[i].ColPoint.z;
-					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					PrimBulls[i].Dir = NewDir;
-					PrimBulls[i].ColFlag = 0;
-					break;
-
-				case FLAMES:
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_TROJAX:
-					CreateNmeTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case TROJAX:
-					CreateTrojaxExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].fmpoly, 0, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_TRANSPULSE:
-					CreateNmeArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
-
-					NewPos.x = PrimBulls[i].ColPoint.x;
-					NewPos.y = PrimBulls[i].ColPoint.y;
-					NewPos.z = PrimBulls[i].ColPoint.z;
-					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-
-					if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
-					{
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case TRANSPULSE_CANNON:
-					CreateArcExplosion( (VECTOR *) &PrimBulls[i].ColPoint, (VECTOR *) &PrimBulls[i].ColPointNormal, PrimBulls[i].GroupImIn );
-
-					NewPos.x = PrimBulls[i].ColPoint.x;
-					NewPos.y = PrimBulls[i].ColPoint.y;
-					NewPos.z = PrimBulls[i].ColPoint.z;
-					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-
-					if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
-					{
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case NME_SUSS_GUN:
-					CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
-					if( !Random_Range( 16 ) )
-					{
-						PlayPannedSfx( SFX_Ric , PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
-					}
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case SUSS_GUN:
-					CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
-					if( !Random_Range( 16 ) )
-					{
-						PlayPannedSfx( SFX_Ric, PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
-					}
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_LIGHTNING:
-					CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_LASER:
-					CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_POWERLASER:
-					CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case LASER:
-					CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case ORBITPULSAR:
-					CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				default:
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-				}
-
-				if( Killed ) goto loop;
-			}
+			if( PrimBullHitWall( i, NewDir, NewPos, HitWall, DistToInt, MoveOffsetVector, Killed ) )
+				goto loop;
 
 			/*===================================================================
 						Hit Ship
 			===================================================================*/
-			if( HitTarget != INDEX_NONE )							/* Hit Target? */
-			{
-
-				TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
-				TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
-				TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
-				DistToCenter = VectorLength( &TempVector );
-
-				PlayPannedSfx( SFX_ShipHit, Ships[ HitTarget ].Object.Group , &Int_Point, 0.0F );
-
-				Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
-
-				switch( PrimBulls[ i ].Weapon )
-				{
-				case TROJAX:
-				case PULSAR:
-				case PYROLITE_RIFLE:
-				case SUSS_GUN:
-				case ORBITPULSAR:
-				case NME_PULSAR_BLUE:
-				case NME_BULLET1:
-				case NME_PULSAR:
-				case NME_TROJAX:
-				case NME_PYROLITE:
-				case NME_SUSS_GUN:
-				case FLAMES:
-					break;
-
-				case NME_TRANSPULSE:
-				case TRANSPULSE_CANNON:
-					if( !PrimBulls[i].Bounces ) // Damage /= 4.0F; // -- patched
-						Damage /= ( ( TRANSPULSE_BOUNCES + 1 ) - PrimBulls[i].Bounces ); // -- unpatched
-					break;
-
-				case NME_LIGHTNING:
-				case NME_LASER:
-				case NME_POWERLASER:
-				case LASER:
-					TempVector.x = ( Int_Point.x - PrimBulls[ i ].Pos.x );
-					TempVector.y = ( Int_Point.y - PrimBulls[ i ].Pos.y );
-					TempVector.z = ( Int_Point.z - PrimBulls[ i ].Pos.z );
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					DistToInt = VectorLength( &TempVector );
-					if( DistToInt > LASER_MINDAMAGERANGE ) DistToInt = LASER_MINDAMAGERANGE;
-					Damage =  ( Damage * ( 1.25F - ( ( DistToInt / LASER_MINDAMAGERANGE ) / 2.0F ) ) );
-					Damage =  ( Damage * ( framelag / 3.0F ) );
-					break;
-				}
-
-				switch( ColPerspective )
-				{
-				case COLPERS_Forsaken:
-					if( ( ( PrimBulls[i].OwnerType == OWNER_SHIP ) && ( PrimBulls[i].Owner == WhoIAm ) ) ||
-						  /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-						  ( PrimBulls[i].OwnerType != OWNER_SHIP ) )
-					{
-						if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
-						{
-							Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
-							PrimBulls[i].TrojPower *= 1.0F - ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
-						}
-
-						if( PrimBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
-
-						Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
-						Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
-						Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
-
-						if( HitTarget == WhoIAm )
-						{
-							HitMe( PrimBulls[i].OwnerType, PrimBulls[i].Owner, Damage, WEPTYPE_Primary, PrimBulls[i].Weapon );
-							ForceExternalOneOff( WhoIAm, &Recoil );
-						}
-						else
-						{
-							IHitYou( (BYTE) HitTarget, Damage, &Recoil, &Int_Point, &DirVector, D2R( ( Damage / 10.0F ) ), WEPTYPE_Primary, PrimBulls[i].Weapon, ONEOFF_RECOIL );
-						}
-					}
-					break;
-
-				case COLPERS_Descent:
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					if( HitTarget == WhoIAm )
-					{
-						if( DistToCenter >= ( SHIP_RADIUS + 1.0F ) )
-						{
-							Damage = Damage * ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
-							PrimBulls[i].TrojPower *= 1.0F - ( ( PrimBulls[i].ColRadius - (DistToCenter - SHIP_RADIUS) ) / PrimBulls[i].ColRadius );
-						}
-
-						if( PrimBulls[i].OwnerType == OWNER_ENEMY ) Damage *= NmeDamageModifier;
-
-						Recoil.x = ( PrimBulls[i].Dir.x * ( Damage / 10.0F ) );
-						Recoil.y = ( PrimBulls[i].Dir.y * ( Damage / 10.0F ) );
-						Recoil.z = ( PrimBulls[i].Dir.z * ( Damage / 10.0F ) );
-
-						HitMe( PrimBulls[i].OwnerType, PrimBulls[i].Owner, Damage, WEPTYPE_Primary, PrimBulls[i].Weapon );
-						ForceExternalOneOff( WhoIAm, &Recoil );
-					}
-					break;
-				}
-
-				if( ( ( WhoIAm != HitTarget ) || ( Current_Camera_View != WhoIAm ) ) )
-				{
-					if( Ships[ HitTarget ].Object.Shield || Ships[ HitTarget ].Invul  )
-					{
-						switch( PrimBulls[ i ].Weapon )
-						{
-						case PULSAR:
-						case ORBITPULSAR:
-						case NME_PULSAR:
-							CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 2, 0, 255, 0 );
-							break;
-						case NME_TROJAX:
-						case TROJAX:
-							CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 4, 128, 128, 255 );
-							break;
-						case NME_TRANSPULSE:
-						case TRANSPULSE_CANNON:
-							CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 4, 255, 100, 100 );
-							break;
-						case NME_SUSS_GUN:
-						case SUSS_GUN:
-						case NME_PYROLITE:
-						case PYROLITE_RIFLE:
-						case FLAMES:
-							CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 255, 100, 100 );
-							break;
-						case NME_LIGHTNING:
-						case NME_LASER:
-						case NME_POWERLASER:
-						case LASER:
-							CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 200, 200, 255 );
-							break;
-						case NME_PULSAR_BLUE:
-						case NME_BULLET1:
-							CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 0, 255, 0 );
-							break;
-						default:
-							break;
-						}
-					}
-					else
-					{
-						switch( PrimBulls[ i ].Weapon )
-						{
-						case NME_PULSAR_BLUE:
-						case NME_BULLET1:
-						case NME_PULSAR:
-						case NME_TROJAX:
-						case NME_TRANSPULSE:
-						case NME_PYROLITE:
-						case FLAMES:
-						case PULSAR:
-						case ORBITPULSAR:
-						case TROJAX:
-						case TRANSPULSE_CANNON:
-						case PYROLITE_RIFLE:
-							TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
-							TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
-							TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
-							NormaliseVector( &TempVector );
-							CreateColSparks( &Int_Point, &TempVector, Ships[ HitTarget ].Object.Group );
-							break;
-
-						case NME_SUSS_GUN:
-						case NME_LASER:
-						case NME_POWERLASER:
-						case NME_LIGHTNING:
-						case SUSS_GUN:
-						case LASER:
-							TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
-							TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
-							TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
-							NormaliseVector( &TempVector );
-							CreateSmallColSparks( &Int_Point, &TempVector, Ships[ HitTarget ].Object.Group );
-							break;
-						}
-					}
-				}
-
-				TempVector.x = ( Int_Point.x - Ships[ HitTarget ].Object.Pos.x );
-				TempVector.y = ( Int_Point.y - Ships[ HitTarget ].Object.Pos.y );
-				TempVector.z = ( Int_Point.z - Ships[ HitTarget ].Object.Pos.z );
-				NormaliseVector( &TempVector );
-
-				ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
-
-				Killed = false;
-
-				switch( PrimBulls[ i ].Weapon )
-				{
-				case NME_PULSAR_BLUE:
-				case NME_BULLET1:
-					if( Ships[ HitTarget ].Invul )
-					{
-						NewPos = Int_Point;
-						PrimBulls[i].Dir = NewDir;
-						PrimBulls[i].ColFlag = 0;
-						MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-						MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-						MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					}
-					else
-					{
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case NME_PULSAR:
-					if( Ships[ HitTarget ].Invul )
-					{
-						ChangePulsarDir( i, &NewDir );
-						NewPos = Int_Point;
-						MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-						MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-						MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					}
-					else
-					{
-						CreateNmePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case PULSAR:
-					if( Ships[ HitTarget ].Invul )
-					{
-						ChangePulsarDir( i, &NewDir );
-						NewPos = Int_Point;
-						MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-						MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-						MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					}
-					else
-					{
-						CreatePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case NME_PYROLITE:
-				case PYROLITE_RIFLE:
-					NewPos = Int_Point;
-					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					PrimBulls[i].Dir = NewDir;
-					PrimBulls[i].ColFlag = 0;
-					break;
-
-				case FLAMES:
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-
-				case NME_TROJAX:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						if( Ships[ HitTarget ].Invul )
-						{
-							CreateNmeTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-							ChangeTrojaxDir( i, &NewDir );
-							NewPos = Int_Point;
-							MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-							MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-							MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-						}
-						else
-						{
-							CreateNmeTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-							CleanUpPrimBull( i, false );
-							Killed = true;
-						}
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-				case TROJAX:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						if( Ships[ HitTarget ].Invul )
-						{
-							CreateTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-							ChangeTrojaxDir( i, &NewDir );
-							NewPos = Int_Point;
-							MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-							MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-							MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-						}
-						else
-						{
-							CreateTrojaxExplosion( &Int_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-							CleanUpPrimBull( i, false );
-							Killed = true;
-						}
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-
-				case NME_TRANSPULSE:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						CreateNmeArcExplosion( &Int_Point, &TempVector, PrimBulls[i].GroupImIn );
-
-						if( Ships[ HitTarget ].Invul )
-						{
-							NewPos = Int_Point;
-							MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-							MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-							MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-
-							if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
-							{
-								CleanUpPrimBull( i, false );
-								Killed = true;
-							}
-						}
-						else
-						{
-							CleanUpPrimBull( i, false );
-							Killed = true;
-						}
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-				case TRANSPULSE_CANNON:
-					if( DistToCenter < ( SHIP_RADIUS + 1.0F ) )
-					{
-						CreateArcExplosion( &Int_Point, &TempVector, PrimBulls[i].GroupImIn );
-
-						if( Ships[ HitTarget ].Invul )
-						{
-							NewPos = Int_Point;
-							MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-							MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-							MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-
-							if( !ChangeTranspulseDir( i, &NewPos, &MoveOffsetVector, &NewDir ) )
-							{
-								CleanUpPrimBull( i, false );
-								Killed = true;
-							}
-						}
-						else
-						{
-							CleanUpPrimBull( i, false );
-							Killed = true;
-						}
-					}
-					break;
-
-				case NME_SUSS_GUN:
-					if( Ships[ HitTarget ].Invul )
-					{
-						ChangeSussgunDir( i, &NewDir );
-						NewPos = Int_Point;
-						MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-						MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-						MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					}
-					else
-					{
-						CreateNmeShrapnelExplosion( &Int_Point, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case SUSS_GUN:
-					if( Ships[ HitTarget ].Invul )
-					{
-						ChangeSussgunDir( i, &NewDir );
-						NewPos = Int_Point;
-						MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-						MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-						MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					}
-					else
-					{
-						CreateShrapnelExplosion( &Int_Point, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case NME_LIGHTNING:
-					CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_LASER:
-					CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_POWERLASER:
-					CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case LASER:
-					CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case ORBITPULSAR:
-					if( Ships[ HitTarget ].Invul )
-					{
-						ChangeOrbitPulsarDir( i, &NewDir );
-						NewPos = Int_Point;
-						MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-						MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-						MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-					}
-					else
-					{
-						CreatePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-				default:
-					break;
-				}
-
-				if( Killed )
-				{
-					goto loop;
-				}
-			}
+			if( PrimBullHitShip( i, TempVector, NewDir, Damage, DirVector, NewPos, Int_Point, HitTarget, DistToInt, Recoil, MoveOffsetVector, DistToCenter, Killed ) )
+				goto loop;
 
 			/*===================================================================
 						Hit Enemy
 			===================================================================*/
-			if( HitEnemy != nullptr )
-			{
-				TempVector.x = ( EInt_Point.x - HitEnemy->Object.Pos.x );
-				TempVector.y = ( EInt_Point.y - HitEnemy->Object.Pos.y );
-				TempVector.z = ( EInt_Point.z - HitEnemy->Object.Pos.z );
-				DistToCenter = VectorLength( &TempVector );
-				NormaliseVector( &TempVector );
-
-				ReflectVector( &PrimBulls[i].Dir, (NORMAL *) &TempVector, &NewDir );
-
-				Damage = PrimaryWeaponAttribs[ PrimBulls[i].Weapon ].Damage[ PrimBulls[i].PowerLevel ];
-				if( ( PrimBulls[ i ].Weapon == LASER ) ||
-					( PrimBulls[ i ].Weapon == NME_LASER ) ||
-					( PrimBulls[ i ].Weapon == NME_POWERLASER ) )
-				{
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					Damage *= ( framelag / 3.0F );
-				}
-
-				if( DistToCenter >= ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) ) Damage = ( Damage / 10.0F ) * framelag;
-
-				if( !( HitEnemy->Object.Flags & SHIP_Invul ) )
-				{
-					if( DamageEnemy( HitEnemy , -Damage , &EInt_Point , &PrimBulls[i].Dir , PrimBulls[ i ].Speed, PrimBulls[ i ].Owner ,PrimBulls[ i ].OwnerType ) )
-					{
-						CreateNewExplosion( &EInt_Point, &NewDir, PrimBulls[i].GroupImIn );
-						KillUsedEnemy( HitEnemy );
-					}
-					else
-					{
-						CreateColSparks( &EInt_Point, &TempVector, HitEnemy->Object.Group );
-					}
-				}
-				else
-				{
-					if( !Random_Range( 4 ) )
-					{
-						PlayPannedSfx( SFX_Ric, PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
-					}
-				}
-
-				Killed = false;
-
-				switch( PrimBulls[ i ].Weapon )
-				{
-				case NME_PULSAR_BLUE:
-				case NME_BULLET1:
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_PULSAR:
-					CreateNmePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case PULSAR:
-					CreatePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_PYROLITE:
-				case PYROLITE_RIFLE:
-					NewPos = EInt_Point;
-					MoveOffsetVector.x = ( NewPos.x - PrimBulls[ i ].Pos.x );						/* Dir Vector to NewPosition */
-					MoveOffsetVector.y = ( NewPos.y - PrimBulls[ i ].Pos.y );
-					MoveOffsetVector.z = ( NewPos.z - PrimBulls[ i ].Pos.z );
-
-					PrimBulls[i].Dir = NewDir;
-					PrimBulls[i].ColFlag = 0;
-					break;
-
-				case FLAMES:
-					CleanUpPrimBull( i, false );
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-
-				case NME_TROJAX:
-					if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
-					{
-						CreateNmeTrojaxExplosion( &EInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-
-				case TROJAX:
-					if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
-					{
-						CreateTrojaxExplosion( &EInt_Point, &TempVector, PrimBulls[i].fmpoly, 1, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-				case NME_TRANSPULSE:
-					if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
-					{
-						CreateNmeArcExplosion( &EInt_Point, &TempVector, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					break;
-
-				case TRANSPULSE_CANNON:
-					if( DistToCenter < ( EnemyTypes[ HitEnemy->Type ].Radius + 1.0F ) )
-					{
-						CreateArcExplosion( &EInt_Point, &TempVector, PrimBulls[i].GroupImIn );
-						CleanUpPrimBull( i, false );
-						Killed = true;
-					}
-					break;
-
-				case NME_SUSS_GUN:
-					CreateNmeShrapnelExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case SUSS_GUN:
-					CreateShrapnelExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				case NME_LIGHTNING:
-					CreateNmeLightningPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_LASER:
-					CreateNmeLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case NME_POWERLASER:
-					CreateNmePowerLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case LASER:
-					CreateLaserPulse( i, DistToInt, &NewDir, PrimBulls[i].ColGroup );
-					Killed = true;
-					break;
-
-				case ORBITPULSAR:
-					CreatePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
-					CleanUpPrimBull( i, false );
-					Killed = true;
-					break;
-
-				default:
-					break;
-				}
-
-				if( Killed )
-				{
-					goto loop;
-				}
-			}
+			if( PrimBullHitEnemy( i, TempVector, NewDir, Damage, NewPos, DistToInt, MoveOffsetVector, DistToCenter, HitEnemy, EInt_Point, Killed ) )
+				goto loop;
 
 			/*===================================================================
 						Done all collision checks
