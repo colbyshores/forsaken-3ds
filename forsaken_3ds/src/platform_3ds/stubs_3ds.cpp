@@ -42,7 +42,7 @@ int SDL_EnableUNICODE(int enable)
 
 /* ---- window-resize flag (input_sdl.cpp on PC) ---- */
 
-int bIgnoreWM_SIZE = 0;
+bool bIgnoreWM_SIZE = false;	// input.h declares it bool
 
 /* ---- glob stubs (devkitARM has the header but no implementation) ---- */
 
