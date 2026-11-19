@@ -166,7 +166,11 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 
 				Num_Lines++;
 
-				if( Num_Lines >= 400 ) break;
+				if( Num_Lines >= 400 )
+				{
+					i = Lines[ i ].Prev;	// resume after this line
+					break;
+				}
 			}
 
 			i = Lines[ i ].Prev;
