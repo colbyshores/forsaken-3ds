@@ -43,7 +43,6 @@
 #include "net/net.h"
 #include "game/restart.h"
 #include "ui/version.h"
-#include "game/demo.h"
 #include "game/singleplayer.h"
 #include "util/util.h"
 #include "scripting/lua_config.h"
@@ -234,7 +233,6 @@ void InitSinglePlayerGame( MENU *Menu );
 void InitTitleLoad( MENU *Menu );
 void ExitTitleLoad( MENU *Menu );
 void InitBikerName( char *name );
-void InitMultiplayerHost( MENU *Menu );
 void SetAutolevel( MENUITEM *item );
 void ExitBikeSelection( MENUITEM * menu );
 void ExitBikeComputerSelection( MENUITEM * item );
@@ -569,7 +567,6 @@ LIST BikeList						= { MAXBIKETYPES, 8, 0, 1, { "Lokasenna", "Beard", "L.A. Jay"
 LIST BikeComputerList			= { MAXBIKECOMPTYPES, 8, 0, 1, { "phil 3b", "brenda", "lani-1", "Lepracom", "Roadster" },  0, 0 };
 LIST RoomList						= { 0, 10 };
 LIST *CurrentList					= NULL;
-TEXT DemoGameName			= { 0, 0, "yourdemo", NULL, MAX_DEMONAME_LENGTH, TypeFileName };
 TEXT TitlePlayerMessage		= { 0, 0, "", SendTitleMessage, MAXTEXTMSG, NULL };
 TEXT PilotNameInGame			= { 0, 0, DEFAULT_PLAYER_NAME, SetPilotNameInGame, MAX_PILOTNAME_LENGTH, TypeFileName };
 TEXT PilotName					= { 0, 0, DEFAULT_PLAYER_NAME, SetPilotName, MAX_PILOTNAME_LENGTH, TypeFileName };
@@ -611,12 +608,10 @@ SLIDER TextScaleSlider				= { 0, 5, 1, 1, 0, 0.0F, 0.0F, 0, false, NULL, NULL, S
 
 bool ShowTeamInfo;
 bool NoTeamSelect				= false;
-bool UseNewMenus				= true;
 bool Autoleveling				= true;
 bool DebugInfo					= false;
 bool GodMode					= false;
 bool ShowPlaneRGB				= false;
-bool RecordDemo					= false;
 bool BrightShips;
 bool MyBrightShips;
 bool BikeExhausts;
@@ -2014,13 +2009,6 @@ MENU	MENU_EditMacro3 = {
 };
 
 
-MENU	MENU_SinglePlayer = { (u_int8_t*)"Select Difficulty Level" , NULL, NULL , NULL , 0,
-					{ {	200 , 144, 0, 0, 0, (u_int8_t*)"Easy" , 0, 0, NULL , (void*) DIFF_Easy , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	200 , 160, 0, 0, 0, (u_int8_t*)"Normal" , 0, 0, NULL , (void*) DIFF_Norm , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	200 , 176, 0, 0, 0, (u_int8_t*)"Hard" , 0, 0, NULL , (void*) DIFF_Hard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	200 , 192, 0, 0, 0, (u_int8_t*)"Bronson Mode" , 0, 0, NULL , (void*) DIFF_Vhard , SetDifficulty , MenuItemDrawName, NULL, 0 } ,
-					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL , NULL , NULL , NULL, NULL, 0 } } };
-
 MENU	MENU_Team = {
 	(u_int8_t*)"Select Teams" , InitTeamSelection , NULL , NULL, 0,
 	{
@@ -2089,31 +2077,6 @@ MENU	MENU_NEW_WatchTeamSelect = {
 
 MENUITEM	TeamItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToDoTeamGame", 0, 0,	NULL,	&MENU_Team,	MenuChange,		MenuItemDrawName, NULL, 0 };
 
-MENU	MENU_HostWaitingToStart = {
-	(u_int8_t*)"Hosting a session" , NULL , BailMultiplayer , NULL, 0,
-	{
-		{ 200, 112, 0, 0, 0, (u_int8_t*)"Start", 0, 0, NULL, &MENU_NotYet, GoToSynchup , MenuItemDrawName, NULL, 0 } ,
-		{ 200, 128, 0, 0, 0, (u_int8_t*)"Num of Players ", 0, 0, &NumOfPlayersSlider, NULL, NULL, DrawSlider, NULL, 0 },
-		{ 200, 128, 0, 0, 0, (u_int8_t*)"", 0, 0, &PlayersList, NULL , NULL , GetPlayersInCurrentSession, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-
-MENU	MENU_Host = {
-	(u_int8_t*)"Hosting a MultiPlayer Game" , InitMultiplayerHost , NULL , NULL, 0,
-	{
-		{ 200, 112, 0, 0, 0, (u_int8_t*)"Start", 0, 0, NULL, &MENU_HostWaitingToStart, StartAHostSession , MenuItemDrawName, NULL, 0 } ,
-		{ 200, 128, 0, 0, 0, (u_int8_t*)"Team Game", 0, 0, &TeamGame, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 144, 0, 0, 0, (u_int8_t*)"Record Demo", 0, 0, &RecordDemo, NULL, SelectToggle, DrawToggle, NULL, 0 },
-		{ 200, 160, 0, 0, 0, (u_int8_t*)"Demo Name  ", 0, 0, &DemoGameName, NULL,  SelectText, DrawTextItem, NULL, 0 } ,
-		{ 200, 176, 0, 0, 0, (u_int8_t*)"Time Limit ", 0, 0, &MyTimeLimit, NULL, SelectSlider, DrawSlider, NULL, 0 },
-		{ 200, 192, 0, 0, 0, (u_int8_t*)"Max Players ", 0, 0, &MaxPlayersSlider, NULL, SelectSlider, DrawSlider, NULL, 0 },
-		{ 200, 224, 0, 0, 0, (u_int8_t*)"Level...", 0, 0, &LevelList, NULL , SelectList , DrawList, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
 MENU	MENU_LevelSelect = {
 	(u_int8_t*)LT_MENU_LevelSelect0 /*"Level Selection"*/ , InitInGameLevelSelect , ExitLevelSelect , NULL, 0,
 	{
@@ -2126,22 +2089,6 @@ MENU	MENU_LevelSelect = {
 
 MENUITEM	NewJoinItem = { 0, 0, 0, 0, 0, (u_int8_t*)"GoingToJoinASession", 0, 0,	NULL,	&MENU_NEW_JoinWaitingToStart,	MenuChange,		DrawFlatMenuItem, NULL, 0 };
 
-
-MENU	MENU_ChooseSessionToJoin = {
-	(u_int8_t*)"" , NULL , NULL, NULL, 0,
-	{
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-MENU	MENU_HostOrJoin = {
-	(u_int8_t*)"MultiPlayer" , NULL , NULL, NULL, 0,
-	{
-		{ 200, 112, 0, 0, 0, (u_int8_t*)"Start a Game", 0, 0,	NULL,	&MENU_Host,	MenuChange,		MenuItemDrawName, NULL, 0 },
-		{ 200, 128, 0, 0, 0, (u_int8_t*)"Join a Network Game", 0, 0,	NULL,	&MENU_ChooseSessionToJoin,	MenuChange,		MenuItemDrawName, NULL, 0 },
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
 
 MENU	MENU_SaveGame = {
 	(u_int8_t*)LT_MENU_SaveGame0 /*"Save Game"*/, InitLoadSavedGameList, NULL, NULL, 0,
@@ -2398,19 +2345,9 @@ MENU	MENU_Save = { (u_int8_t*)LT_MENU_Save0 /*"Save Menu"*/ , NULL , NULL , NULL
 					{ {	200 , 176, 0, 0, 0, (u_int8_t*)LT_MENU_Save1 /*"Save Pickups"*/ , 0, 0, NULL, NULL , SavePickups , MenuItemDrawName, NULL, 0 } ,
 					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
 
-MENU	MENU_Start = { (u_int8_t*)"Forsaken" , InitStartMenu , NULL , NULL, 0,
-
-					{ OLDMENUITEM( 200 , 112,  (u_int8_t*)"Set Up Biker  ", (void *)biker_name, &MENU_SetUpBiker, MenuChange, DrawNameVar ),
-					  OLDMENUITEM( 200 , 128, (u_int8_t*)LT_MENU_InGame2,/*Toggle fullscreen*/ NULL, NULL , MenuGoFullScreen , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 144, (u_int8_t*)"Single Player", NULL, &MENU_SinglePlayer , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 160, (u_int8_t*)"Multi Player", NULL, &MENU_HostOrJoin , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 176, (u_int8_t*)"Load Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 192, (u_int8_t*)"Save Game", NULL, &MENU_NotYet , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 240, (u_int8_t*)"Options", NULL, &MENU_Options , MenuChange , MenuItemDrawName ),
-					  OLDMENUITEM( 200 , 256, (u_int8_t*)"Quit", NULL, NULL, SelectQuit , MenuItemDrawName ),
-					{ 200 , 272, 0, 0, 0, (u_int8_t*)"New Menu System" , 0, 0, NULL, &MENU_NEW_Start, MenuChange , MenuItemDrawName, NULL, 0, 0 } ,
-
-					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
+/* The title's first frame (TitleInitDone) copies MENU_NEW_Start, or a
+ * quick-start menu, into this before anything opens it. */
+MENU	MENU_Start;
 
 MENU	MENU_Host_Options = { (u_int8_t*)"HOST OPTIONS FOR THIS GAME" , InitHostMenu , NULL , NULL,	0,
 			{
@@ -4248,8 +4185,7 @@ bool DisplayTitle(void)
 		NoTeamSelect = false;
 		SetFOV( START_FOV );	// in case player was using nitro when finishing level!
 
-		if (UseNewMenus)
-			MENU_Start = MENU_NEW_Start;
+		MENU_Start = MENU_NEW_Start;
 
 		switch ( QuickStart )
 		{
@@ -5016,15 +4952,6 @@ void MenuItemBack( MENUITEM * /*item*/ )
 	MenuBack();
 }
 
-
-/*===================================================================
-	Procedure	:		Draw the Name in a menu item...
-	Input		:		MENUITEM * Item...
-	Output		:		Nothing
-===================================================================*/
-void	SetDifficulty( MENUITEM * /*Item*/ )
-{
-}
 
 /*===================================================================
 	Procedure	:		Draw the Name in a menu item...
@@ -7271,24 +7198,6 @@ void SelectQuit( MENUITEM * /*Item*/ )
 	MenuAbort();
 }
 
-
-void InitMultiplayerHost( MENU * /*Menu*/ )
-{
-	int i;
-
-	LevelList.items = 0;
-	LevelList.top_item = 0;
-	LevelList.display_items = 8;
-	LevelList.selected_item = 0;
-	NewLevelNum = 0;
-
-	for (i = 0; i < NumLevels; i++)
-	{
-		strcpy( (char*) &LevelList.item[LevelList.items][0] , (char*) &ShortLevelNames[i][0] );
-		LevelList.items++;
-	}
-
-}
 
 /* init */
 void InitMultiplayerHostVDUPeerPeer( MENU * /*Menu*/ )
