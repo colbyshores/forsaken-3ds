@@ -722,61 +722,9 @@ void EVENT_EnemySetNextTargetNode( u_int8_t * Data )
 	Input		:		char	*	Filename
 	Output		:		bool	true/false
 ===================================================================*/
-bool Triggerload( char * Filename )
+/* free the previous level's trigger data and reset the per-player trigger state */
+[[gnu::always_inline]] static inline void TriggerloadReleasePrevious( int & i )
 {
-	long			File_Size;
-	long			Read_Size;
-	char		*	Buffer;
-	char		*	OrgBuffer;
-	int			i, j, k;
-	TRIGGERVAR	*	v;
-	TRIGGER		*	t;
-	TRIGGERMOD	*	m;
-	EVENT		*	e;
-	CONDITION	*	c;
-	u_int32_t			MagicNumber;
-	u_int32_t			VersionNumber;
-	TRIGGERVAR	*	TVpnt;
-
-
-	NumOfTrigVars = 0;
-	NumOfTriggers = 0;
-	NumOfTrigMods = 0;
-	NumOfTrigModQues = 0;
-	NumOfEvents = 0;
-	NumOfConditions = 0;
-	Level_End = nullptr;
-	AvatarActivated = nullptr;
-	DecreaseTemperature = nullptr;
-	TimeLimitTrigger = nullptr;
-
-
-	File_Size = Get_File_Size( Filename );
-	if( !File_Size ) {
-		return true;
-	}
-
-	Buffer = (char*)malloc( File_Size );
-
-	if( Buffer == nullptr )
-		return false;
-	OrgBuffer = Buffer;
-
-	Read_Size = Read_File( Filename, Buffer, File_Size );
-
-	if( Read_Size != File_Size )
-		return false;
-
-	FileReader in( Buffer );
-	MagicNumber = in.u32();
-	VersionNumber = in.u32();
-
-	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != TRG_VERSION_NUMBER  ) )
-	{
-		Msg( "TriggerLoad() Incompatible triggers( .TRG ) file %s", Filename );
-		return( false );
-	}
-
 	if ( TrigVars )
 	{
 		for ( i = 0; i < NumOfTrigVars; i++ )
@@ -840,23 +788,18 @@ bool Triggerload( char * Filename )
 		free( ActiveConditions );
 	}
 	ActiveConditions = nullptr;
+}
 
-	NumOfTrigVars = in.i32();
-	NumOfTriggers = in.i32();
-	NumOfTrigMods = in.i32();
-	NumOfTrigModQues = NumOfTrigMods * 2; // bodge it and scarper...
-	NumOfEvents = in.i32();
-	NumOfConditions = in.i32();
-	NumOfActiveConditions = 0;
-
-
+/* allocate this level's trigger arrays. True: Triggerload fails. */
+[[gnu::always_inline]] static inline bool TriggerloadAllocate( int & i )
+{
 	if ( NumOfTrigVars )
 	{
 		TrigVars = (TRIGGERVAR *) calloc( NumOfTrigVars, sizeof( TRIGGERVAR ) );
 		if ( !TrigVars )
 		{
 			Msg( "TriggerLoad() malloc failed for %d triggervars", NumOfTrigVars );
-			return false;
+			return true;
 		}
 		for ( i = 0; i < MAX_PLAYERS; i++ )
 		{
@@ -865,7 +808,7 @@ bool Triggerload( char * Filename )
 			{
 				Msg( "TriggerLoad() malloc failed for %d short triggervars for player %d of %d",
 					NumOfTrigVars, i, MAX_PLAYERS );
-				return false;
+				return true;
 			}
 		}
 	}
@@ -876,7 +819,7 @@ bool Triggerload( char * Filename )
 		if ( !Triggers )
 		{
 			Msg( "TriggerLoad() malloc failed for %d triggers", NumOfTriggers );
-			return false;
+			return true;
 		}
 		for ( i = 0; i < MAX_PLAYERS; i++ )
 		{
@@ -885,7 +828,7 @@ bool Triggerload( char * Filename )
 			{
 				Msg( "TriggerLoad() malloc failed for %d short triggers for player %d of %d",
 					NumOfTriggers, i, MAX_PLAYERS );
-				return false;
+				return true;
 			}
 		}
 	}
@@ -896,13 +839,13 @@ bool Triggerload( char * Filename )
 		if ( !TrigMods )
 		{
 			Msg( "TriggerLoad() malloc failed for %d triggermods", NumOfTrigMods );
-			return false;
+			return true;
 		}
 		TrigModQue = (TRIGGERMODQUE *) calloc( NumOfTrigModQues, sizeof( TRIGGERMODQUE ) );
 		if ( !TrigModQue )
 		{
 			Msg( "TriggerLoad() malloc failed for %d triggermodques", NumOfTrigModQues );
-			return false;
+			return true;
 		}
 		for( i = 0 ; i < NumOfTrigModQues ; i++ )
 		{
@@ -916,7 +859,7 @@ bool Triggerload( char * Filename )
 		if ( !Events )
 		{
 			Msg( "TriggerLoad() malloc failed for %d events", NumOfEvents );
-			return false;
+			return true;
 		}
 	}
 
@@ -926,17 +869,21 @@ bool Triggerload( char * Filename )
 		if ( !Conditions )
 		{
 			Msg( "TriggerLoad() malloc failed for %d conditions", NumOfConditions );
-			return false;
+			return true;
 		}
 		ActiveConditions = (CONDITION **) calloc( NumOfConditions, sizeof( CONDITION ) );
 		if ( !ActiveConditions )
 		{
 			Msg( "TriggerLoad() malloc failed for %d active conditions", NumOfConditions );
-			return false;
+			return true;
 		}
 	}
+	return false;
+}
 
-
+/* read the trigger variables, triggers, trigger mods, events and conditions. True: Triggerload fails. */
+[[gnu::always_inline]] static inline bool TriggerloadRecords( int & i, int & j, int & k, TRIGGERVAR *& v, TRIGGER *& t, TRIGGERMOD *& m, EVENT *& e, CONDITION *& c, FileReader & in )
+{
 	for ( i = 0; i < NumOfTrigVars; i++ )
 	{
 		v = &TrigVars[ i ];
@@ -957,7 +904,7 @@ bool Triggerload( char * Filename )
 			{
 				Msg( "TriggerLoad() malloc failed for %d triggers in trigvar %d of %d",
 					v->NumOfTriggers, i, NumOfTrigVars );
-				return false;
+				return true;
 			}
 		}
 		else
@@ -966,7 +913,7 @@ bool Triggerload( char * Filename )
 		{
 			k = in.i32();
 			if ( k >= NumOfTriggers )
-				return false;
+				return true;
 			v->Triggers[ j ] = &Triggers[ k ];
 		}
 	}
@@ -977,7 +924,7 @@ bool Triggerload( char * Filename )
 		t->Type = in.u8();
 		j = in.i32();
 		if ( j >= NumOfTrigVars )
-			return false;
+			return true;
 		t->TrigVar = &TrigVars[ j ];
 		t->ActiveState = in.i32();
 		t->Active = 0;
@@ -989,7 +936,7 @@ bool Triggerload( char * Filename )
 			{
 				Msg( "TriggerLoad() malloc failed for %d conditions in trigger %d of %d\n",
 					t->NumOfConditions, i, NumOfTriggers );
-				return false;
+				return true;
 			}
 		}
 		else
@@ -998,7 +945,7 @@ bool Triggerload( char * Filename )
 		{
 			k = in.i32();
 			if ( k >= NumOfConditions )
-				return false;
+				return true;
 			t->Conditions[ j ] = &Conditions[ k ];
 		}
 	}
@@ -1009,14 +956,14 @@ bool Triggerload( char * Filename )
 		m->Op = in.i32();
 		j = in.i32();
 		if ( j >= NumOfTrigVars )
-			return false;
+			return true;
 		m->TrigVar = &TrigVars[ j ];
 		m->Val = in.i32();
 		m->Time = in.f32() * 60.0f;
 
 		j = in.i32();
 		if ( j >= NumOfTrigMods )
-			return false;
+			return true;
 		m->Next = ( j < 0 ) ? nullptr : &TrigMods[ j ];
 
 	}
@@ -1039,7 +986,7 @@ bool Triggerload( char * Filename )
 			{
 				Msg( "TriggerLoad() malloc failed for %d triggers in condition %d of %d",
 					c->NumOfTriggers, i, NumOfConditions );
-				return false;
+				return true;
 			}
 		}
 		else
@@ -1048,7 +995,7 @@ bool Triggerload( char * Filename )
 		{
 			k = in.i32();
 			if ( k >= NumOfTriggers )
-				return false;
+				return true;
 			c->Triggers[ j ] = &Triggers[ k ];
 		}
 		c->NumOfEvents = in.i32();
@@ -1059,7 +1006,7 @@ bool Triggerload( char * Filename )
 			{
 				Msg( "TriggerLoad() malloc failed for %d events in condition %d of %d",
 					c->NumOfEvents, i, NumOfConditions );
-				return false;
+				return true;
 			}
 		}
 		else
@@ -1068,11 +1015,16 @@ bool Triggerload( char * Filename )
 		{
 			k = in.i32();
 			if ( k > NumOfEvents )
-				return false;
+				return true;
 			c->Events[ j ] = &Events[ k ];
 		}
 	}
+	return false;
+}
 
+/* find the trigger variables the engine drives itself (level end, boss activation, temperature) */
+[[gnu::always_inline]] static inline void TriggerloadFindSpecialTrigVars( int & i, TRIGGERVAR *& TVpnt )
+{
 	TVpnt =	TrigVars;
 	if( TVpnt )
 	{
@@ -1152,6 +1104,82 @@ bool Triggerload( char * Filename )
 			TVpnt++;
 		}
 	}
+}
+
+bool Triggerload( char * Filename )
+{
+	long			File_Size;
+	long			Read_Size;
+	char		*	Buffer;
+	char		*	OrgBuffer;
+	int			i, j, k;
+	TRIGGERVAR	*	v;
+	TRIGGER		*	t;
+	TRIGGERMOD	*	m;
+	EVENT		*	e;
+	CONDITION	*	c;
+	u_int32_t			MagicNumber;
+	u_int32_t			VersionNumber;
+	TRIGGERVAR	*	TVpnt;
+
+
+	NumOfTrigVars = 0;
+	NumOfTriggers = 0;
+	NumOfTrigMods = 0;
+	NumOfTrigModQues = 0;
+	NumOfEvents = 0;
+	NumOfConditions = 0;
+	Level_End = nullptr;
+	AvatarActivated = nullptr;
+	DecreaseTemperature = nullptr;
+	TimeLimitTrigger = nullptr;
+
+
+	File_Size = Get_File_Size( Filename );
+	if( !File_Size ) {
+		return true;
+	}
+
+	Buffer = (char*)malloc( File_Size );
+
+	if( Buffer == nullptr )
+		return false;
+	OrgBuffer = Buffer;
+
+	Read_Size = Read_File( Filename, Buffer, File_Size );
+
+	if( Read_Size != File_Size )
+		return false;
+
+	FileReader in( Buffer );
+	MagicNumber = in.u32();
+	VersionNumber = in.u32();
+
+	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != TRG_VERSION_NUMBER  ) )
+	{
+		Msg( "TriggerLoad() Incompatible triggers( .TRG ) file %s", Filename );
+		return( false );
+	}
+
+	TriggerloadReleasePrevious( i );
+
+	NumOfTrigVars = in.i32();
+	NumOfTriggers = in.i32();
+	NumOfTrigMods = in.i32();
+	NumOfTrigModQues = NumOfTrigMods * 2; // bodge it and scarper...
+	NumOfEvents = in.i32();
+	NumOfConditions = in.i32();
+	NumOfActiveConditions = 0;
+
+
+	if( TriggerloadAllocate( i ) )
+		return false;
+
+
+	if( TriggerloadRecords( i, j, k, v, t, m, e, c, in ) )
+		return false;
+
+	TriggerloadFindSpecialTrigVars( i, TVpnt );
 
 	for( i = 0 ; i < NumOfTrigModQues ; i++ )
 	{
