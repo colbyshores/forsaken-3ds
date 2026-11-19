@@ -120,7 +120,6 @@ void WatchMode5( GLOBALSHIP * ShipPnt , BYTE i );
 //	Mode Functions...
 void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i );
 void RemoteCameraMode1( GLOBALSHIP * ShipPnt , BYTE i );
-void RemoteCameraMode3( GLOBALSHIP * ShipPnt , BYTE i );
 
 void ReleaseComponentedShips( void );
 

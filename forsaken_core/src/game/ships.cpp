@@ -545,7 +545,7 @@ void (* ModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 		ShipMode0,
 		ShipMode1,
 		ShipMode2,
-		RemoteCameraMode3,			// needed for demo playback!!!!!!!!!
+		ShipMode0,					// 3 was demo playback; no ship enters it
 		ShipMode4,
 		WatchMode5,
 };
@@ -556,7 +556,7 @@ void (* RemoteCameraModeControl[ ])( GLOBALSHIP * ShipPnt , BYTE i ) = {
 		RemoteCameraMode0,
 		RemoteCameraMode1,
 		RemoteCameraMode1,		// there is no remote camera mode 2 so just use mode 1...
-		RemoteCameraMode3
+		RemoteCameraMode1		// nor 3 (demo playback, removed)
 };
 
 /*===================================================================
@@ -768,7 +768,7 @@ bool ProcessShips()
 				}
 
 				// watch mode
-				if(WatchPlayerSelect.value != WhoIAm && ShipObjPnt->Mode != DEMO_MODE	)
+				if( WatchPlayerSelect.value != WhoIAm )
 					ShipObjPnt->Mode = WATCH_MODE;
 
 				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
@@ -2387,49 +2387,6 @@ bool	IsStartPosVacantVisibleGroup( int16_t i , u_int16_t startpos )
 		}
 	}
 	return false;
-}
-
-/*===================================================================
-	Procedure	:	Remote Camera Mode 3	Demo Playback...
-	Input		:	int16_t which Ship
-	Output		:	Nothing
-===================================================================*/
-void RemoteCameraMode3( GLOBALSHIP * ShipPnt , BYTE i )
-{
-	framelag = Oldframelag;
-	if ( DemoEyesSelect.value != MAX_PLAYERS )
-	{
-		int j, k;
-		bool ok;
-
-		// make sure we are looking through the eyes of a valid player in demo playback
-		ok = false;
-		for ( j = 0; j < MAX_PLAYERS; j++ )
-		{
-			k = ( DemoEyesSelect.value + j ) % MAX_PLAYERS;
-			if ( k != MAX_PLAYERS )
-			{
-				switch ( GameStatus[ k ] )
-				{
-				case STATUS_Joining:
-				case STATUS_Left:
-				case STATUS_LeftCrashed:
-				case STATUS_Null:
-					// skip players in invalid modes
-					break;
-				default:
-					// any other mode is OK to use for demo playback
-					DemoEyesSelect.value = k;
-					ok = true;
-				}
-				if ( ok )
-					break;
-			}
-		}
-	}
-	Current_Camera_View = DemoEyesSelect.value;
-	TeamNumber[ i ] = TeamNumber[ Current_Camera_View ];
-	ShipMode0( ShipPnt , i );
 }
 
 /*===================================================================

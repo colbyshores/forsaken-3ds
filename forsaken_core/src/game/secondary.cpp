@@ -1283,14 +1283,7 @@ u_int16_t	InitOneSecBull( u_int16_t OwnerType, u_int16_t Owner, u_int16_t Bullet
 	u_int16_t	fmpoly;
 	u_int16_t	model;
 	int16_t	Count;
-	int Player; // used for watch or demo mode
-
-	// normal missile camera or watch mode camera
-	if(Ships[ WhoIAm ].Object.Mode != DEMO_MODE)
-		Player = WatchPlayerSelect.value;
-	// demo missile camera
-	else
-		Player = DemoEyesSelect.value;
+	int Player = WatchPlayerSelect.value; // the watched ship: its missiles get the missile camera
 
 
 	if( !VectorLength( Dir ) )

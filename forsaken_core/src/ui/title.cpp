@@ -601,7 +601,6 @@ SLIDER CTFSlider							= { 0, CTF_MAX - 1, 1, CTF_STANDARD, -1, 0.0F, 0.0F, 0, f
 SLIDER SfxSlider							= { 0, 10, 1, 10, 0, 0.0F };
 SLIDER BikerSpeechSlider				= { 0, 10, 1, 8, 0, 0.0F };
 SLIDER BikeCompSpeechSlider			= { 0, 10, 1, 8, 0, 0.0F };
-SLIDER DemoEyesSelect				= { 0, MAX_PLAYERS, 1, 0, 0, 0.0F };
 SLIDER FlagSfxSlider						= { 0, 10, 1, 10, 0, 0.0F };
 SLIDER WatchPlayerSelect				= { 0, MAX_PLAYERS+1, 1, 0, 0, 0.0F }; // which player's pov to watch
 SLIDER TextScaleSlider				= { 0, 5, 1, 1, 0, 0.0F, 0.0F, 0, false, NULL, NULL, SetTextScale };

@@ -618,7 +618,6 @@ extern bool ScreenSaving;
 extern MENU MENU_EditMacro1;
 extern MENU MENU_EditMacro2;
 extern MENU MENU_EditMacro3;
-extern SLIDER DemoEyesSelect;
 extern bool ShowWeaponKills;
 extern int16_t SelectedBike;
 extern SLIDER TimeLimit;

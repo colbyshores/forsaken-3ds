@@ -209,7 +209,6 @@ bool  Panel = true;
 bool ChangeLevel( void );
 
 float pixel_aspect_ratio;
-float Oldframelag;
 float framelag = 0.0F;
 float real_framelag = 0.0F;
 
