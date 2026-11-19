@@ -1329,8 +1329,8 @@ static void new_packet( ENetEvent * event )
 			{
 				p2p_punch_packet_t * packet = (p2p_punch_packet_t*) event->packet->data;
 				ENetAddress * address  = &packet->address;
-				ENetAddress * address2 = &packet->address;
-				address2->port = packet->connect_port;
+				ENetAddress address2 = packet->address;	// a copy: address keeps the port the host saw
+				address2.port = packet->connect_port;
 				ENetBuffer buffer;
 				buffer.dataLength = 0;
 				int i;
@@ -1339,7 +1339,7 @@ static void new_packet( ENetEvent * event )
 					DebugPrintf("network: sending nat punch through for %s (%d)\n",
 						address_to_str(address), packet->connect_port);
 					enet_socket_send( enet_host->socket, address,  &buffer, 1 ); // as host see's them
-					enet_socket_send( enet_host->socket, address2, &buffer, 1 ); // their connect port
+					enet_socket_send( enet_host->socket, &address2, &buffer, 1 ); // their connect port
 				}
 			}
 			break;
