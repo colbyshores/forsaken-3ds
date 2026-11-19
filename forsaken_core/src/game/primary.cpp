@@ -109,8 +109,11 @@ int8_t	*	DebugPrimStrings[] = {
 			(int8_t*)"Nme Lightning",
 			(int8_t*)"Flames",
 			(int8_t*)"Nme PowerLaser",
+			(int8_t*)"Nme Pulsar Blue",
 
 };
+static_assert( sizeof( DebugPrimStrings ) / sizeof( DebugPrimStrings[ 0 ] ) == TOTALPRIMARYWEAPONS,
+	"one DebugPrimStrings entry per primary weapon" );
 
 u_int32_t TrojaxChargeID = 0;
 u_int32_t TrojaxOwnersID[ MAX_PLAYERS ] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -1633,7 +1636,7 @@ void ProcessPrimaryBullets( void )
 			if( AmIOutsideGroup( &Mloadheader, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn ) )
 			{
 				DebugPrintf( "Killed %s for getting out of group %s\n", DebugPrimStrings[ PrimBulls[i].Weapon ],
-							 (SecBulls[i].GroupImIn == INDEX_NONE) ? "(outside)" : Mloadheader.Group[ SecBulls[i].GroupImIn ].name );
+							 (PrimBulls[i].GroupImIn == INDEX_NONE) ? "(outside)" : Mloadheader.Group[ PrimBulls[i].GroupImIn ].name );
 				CleanUpPrimBull( i, true );
 				goto loop;
 			}
