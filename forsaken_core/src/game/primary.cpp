@@ -1928,13 +1928,13 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_PULSAR:
-						CreateNmePulsarExplosion( &MInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreateNmePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
 					case PULSAR:
-						CreatePulsarExplosion( &MInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreatePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -1996,13 +1996,13 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_SUSS_GUN:
-						CreateNmeShrapnelExplosion( &MInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreateNmeShrapnelExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
 					case SUSS_GUN:
-						CreateShrapnelExplosion( &MInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreateShrapnelExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -2028,7 +2028,7 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case ORBITPULSAR:
-						CreatePulsarExplosion( &MInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreatePulsarExplosion( &MInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -2061,13 +2061,13 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_PULSAR:
-						CreateNmePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
+						CreateNmePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
 					case PULSAR:
-						CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
+						CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -2136,7 +2136,7 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_SUSS_GUN:
-						CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
+						CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
 						if( !Random_Range( 16 ) )
 						{
 							PlayPannedSfx( SFX_Ric , PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
@@ -2146,7 +2146,7 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case SUSS_GUN:
-						CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
+						CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
 						if( !Random_Range( 16 ) )
 						{
 							PlayPannedSfx( SFX_Ric, PrimBulls[i].ColGroup , (VECTOR *) &PrimBulls[i].ColPoint, 0.0F );
@@ -2176,7 +2176,7 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case ORBITPULSAR:
-						CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, &NewDir, PrimBulls[i].GroupImIn );
+						CreatePulsarExplosion( (VECTOR *) &PrimBulls[i].ColPoint, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -2414,7 +2414,7 @@ void ProcessPrimaryBullets( void )
 						}
 						else
 						{
-							CreateNmePulsarExplosion( &Int_Point, &NewDir, PrimBulls[i].GroupImIn );
+							CreateNmePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
@@ -2431,7 +2431,7 @@ void ProcessPrimaryBullets( void )
 						}
 						else
 						{
-							CreatePulsarExplosion( &Int_Point, &NewDir, PrimBulls[i].GroupImIn );
+							CreatePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
@@ -2559,7 +2559,7 @@ void ProcessPrimaryBullets( void )
 						}
 						else
 						{
-							CreateNmeShrapnelExplosion( &Int_Point, &NewDir, PrimBulls[i].GroupImIn );
+							CreateNmeShrapnelExplosion( &Int_Point, PrimBulls[i].GroupImIn );
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
@@ -2576,7 +2576,7 @@ void ProcessPrimaryBullets( void )
 						}
 						else
 						{
-							CreateShrapnelExplosion( &Int_Point, &NewDir, PrimBulls[i].GroupImIn );
+							CreateShrapnelExplosion( &Int_Point, PrimBulls[i].GroupImIn );
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
@@ -2613,7 +2613,7 @@ void ProcessPrimaryBullets( void )
 						}
 						else
 						{
-							CreatePulsarExplosion( &Int_Point, &NewDir, PrimBulls[i].GroupImIn );
+							CreatePulsarExplosion( &Int_Point, PrimBulls[i].GroupImIn );
 							CleanUpPrimBull( i, false );
 							Killed = true;
 						}
@@ -2683,13 +2683,13 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_PULSAR:
-						CreateNmePulsarExplosion( &EInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreateNmePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
 					case PULSAR:
-						CreatePulsarExplosion( &EInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreatePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -2749,13 +2749,13 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case NME_SUSS_GUN:
-						CreateNmeShrapnelExplosion( &EInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreateNmeShrapnelExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
 
 					case SUSS_GUN:
-						CreateShrapnelExplosion( &EInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreateShrapnelExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -2781,7 +2781,7 @@ void ProcessPrimaryBullets( void )
 						break;
 
 					case ORBITPULSAR:
-						CreatePulsarExplosion( &EInt_Point, &NewDir, PrimBulls[i].GroupImIn );
+						CreatePulsarExplosion( &EInt_Point, PrimBulls[i].GroupImIn );
 						CleanUpPrimBull( i, false );
 						Killed = true;
 						break;
@@ -2882,12 +2882,12 @@ void ProcessPrimaryBullets( void )
 					break;
 
 				case NME_SUSS_GUN:
-					CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].Pos, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn );
+					CreateNmeShrapnelExplosion( (VECTOR *) &PrimBulls[i].Pos, PrimBulls[i].GroupImIn );
 					CleanUpPrimBull( i, false );
 					break;
 
 				case SUSS_GUN:
-					CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].Pos, &PrimBulls[i].Dir, PrimBulls[i].GroupImIn );
+					CreateShrapnelExplosion( (VECTOR *) &PrimBulls[i].Pos, PrimBulls[i].GroupImIn );
 					CleanUpPrimBull( i, false );
 					break;
 
@@ -3142,11 +3142,10 @@ void CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int
 /*===================================================================
 	Procedure	:	Create Pulsar Explosion
 	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreatePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
+void CreatePulsarExplosion( VECTOR * Pos, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 
@@ -3182,11 +3181,10 @@ void CreatePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 /*===================================================================
 	Procedure	:	Create Nme Pulsar Explosion
 	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
+void CreateNmePulsarExplosion( VECTOR * Pos, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 
@@ -3291,11 +3289,10 @@ void CreateNewExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group )
 /*===================================================================
 	Procedure	:	Create Shrapnel Explosion
 	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
+void CreateShrapnelExplosion( VECTOR * Pos, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 
@@ -3331,11 +3328,10 @@ void CreateShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
 /*===================================================================
 	Procedure	:	Create Nme Shrapnel Explosion
 	Input		:	VECTOR	*	Position
-				:	VECTOR	*	Direction
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * /*Dir*/, u_int16_t Group )
+void CreateNmeShrapnelExplosion( VECTOR * Pos, u_int16_t Group )
 {
 	u_int16_t	fmpoly;
 

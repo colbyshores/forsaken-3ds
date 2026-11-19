@@ -252,10 +252,10 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 						int16_t PowerLevel, float PLevel, bool NetFlag );
 void	CreateTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_t Type, u_int16_t Group );
 void	CreateNmeTrojaxExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t FmPoly, int16_t Type, u_int16_t Group );
-void	CreatePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
-void	CreateNmePulsarExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
-void	CreateNmeShrapnelExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
-void	CreateShrapnelExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
+void	CreatePulsarExplosion( VECTOR * Pos, u_int16_t Group );
+void	CreateNmePulsarExplosion( VECTOR * Pos, u_int16_t Group );
+void	CreateNmeShrapnelExplosion( VECTOR * Pos, u_int16_t Group );
+void	CreateShrapnelExplosion( VECTOR * Pos, u_int16_t Group );
 void	CreateNmeArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateArcExplosion( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateNmeLaserPulse( u_int16_t i, float Distance, VECTOR * Dir, u_int16_t Group, u_int16_t EndGroup );
