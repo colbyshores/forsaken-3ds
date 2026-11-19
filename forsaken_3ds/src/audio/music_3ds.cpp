@@ -34,6 +34,7 @@
 #include "util/util.h"
 #include "audio/music.h"
 #include "platform_3ds/main_3ds.h"
+#include "audio/sound_3ds.h"
 #include "audio/dsp_adpcm.h"
 #include "audio/music_table.h"
 
@@ -276,6 +277,15 @@ void MusicStream::thread_loop()
 bool MusicStream::init()
 {
 	if (initialized) return true;
+
+	/* Without ndsp (no DSP firmware) the channel never plays, and the
+	 * worker thread would refill all four buffers from romfs every tick
+	 * trying to restart it. Stay off; every other call is a no-op while
+	 * not initialized. */
+	if (!sound_dsp_ready()) {
+		DebugPrintf("music: ndsp not running, music disabled\n");
+		return false;
+	}
 
 	stream_buf = linearAlloc(STREAM_BUF_BYTES * NUM_WAVEBUFS);
 	if (!stream_buf) {

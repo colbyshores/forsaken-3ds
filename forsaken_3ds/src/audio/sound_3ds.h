@@ -8,9 +8,12 @@
  * sound_show_missing_firmware_warning prints dsp1 instructions on the top
  * screen (libctru console), blocks until A, START or SELECT, then restores
  * the top screen for citro3d; the game then runs without sound.
+ * sound_dsp_ready tells music_3ds.cpp whether ndsp came up, so the music
+ * stream does not start without it.
  */
 
 
 bool sound_check_dsp_firmware_available(void);	/* SD or romfs copy present */
+bool sound_dsp_ready(void);	/* ndspInit succeeded (sound_init); music needs it */
 void sound_show_missing_firmware_warning(void);	/* modal; returns on A/START/SELECT */
 
