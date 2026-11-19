@@ -9045,10 +9045,11 @@ void DrawFlatMenuKeyNum( MENUITEM *Item )
 		//write relevent info into structure
 		TextInfo = Item->TextInfo[0];
 
-		TextInfo->text = (u_int8_t*)malloc( 16 );
+		constexpr size_t label_size = 16;	/* "selected/total" */
+		TextInfo->text = (u_int8_t*)malloc( label_size );
 		if ( kdef->def->keys > 1 )
 		{
-			snprintf( (char*)TextInfo->text, sizeof( TextInfo->text ), "%d/%d", kdef->selected_key + 1, kdef->def->keys );
+			snprintf( (char*)TextInfo->text, label_size, "%d/%d", kdef->selected_key + 1, kdef->def->keys );
 		}
 		else
 			TextInfo->text[ 0 ] = 0;
