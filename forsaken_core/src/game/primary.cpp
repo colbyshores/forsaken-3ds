@@ -759,65 +759,344 @@ float TrojaxChargeRateTable[] = { 1.0F, 1.5F, 2.0F };
 
 constexpr int NO_AMMO_FIRERATE = 120;
 
-void FirePrimary(void)
+/* fire the selected primary weapon this frame (fire held, delay elapsed, ammo available) */
+[[gnu::always_inline]] static inline void FirePrimaryShoot( VECTOR & DownVector, VECTOR & LeftVector, VECTOR & Pos, VECTOR & Dir, VECTOR & UpVector, float & Ammo, int16_t & Count, float & Speed )
 {
-	static int16_t	OnceOnlyFlag = 0;
-	VECTOR	DownVector;
-	VECTOR	LeftVector;
-	VECTOR	Pos;
-	VECTOR	Dir;
-	VECTOR	UpVector;
-	VECTOR	DirVector;
-	VECTOR	Rotation;
-	float	Ammo = 0.0f;
-	int16_t	Count;
-	float	Old_PowerLevel;
-	float	Freq;
-	u_int16_t	Model;
-
-	float	Speed;
-
-	if( WhoIAm == MAX_PLAYERS ) return;
-
-	if( GodModeOnceOnly )
+	if( control.fire_primary )
 	{
-		if( GodMode ) GivemeAllWeapons();
-		GodModeOnceOnly = false;
-	}
+		PrimaryFireDelay += (float) PrimaryWeaponAttribs[ PrimaryToFireLookup[ Ships[WhoIAm].Primary ] ].FireDelay[ Ships[ WhoIAm ].Object.PowerLevel ];
 
+		ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
+		ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideUp, &UpVector );		/* Calc Up Vector */
+		ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );	/* Calc Up Vector */
+		ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
 
-	if( !GodMode )
-	{
-		if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+		if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
 		{
-			Ships[ WhoIAm ].SuperNashramTimer -= framelag;
+			int8_t prm;
+			prm = PrimaryToFireLookup[ Ships[WhoIAm].Primary ];
 
-			if( Ships[ WhoIAm ].SuperNashramTimer < 0.0F )
+			switch( prm )
 			{
-				LoseSuperNashram();
+			case PULSAR:
+				if( GeneralAmmo )
+				{
+					Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+					if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+					else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+					Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+					Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+					if( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+
+					if( ( Toggle ) || ( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
+					{
+						Pos.x = ( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
+						Pos.y = ( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
+						Pos.z = ( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
+						InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+										Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+										Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+					}
+
+					if( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+
+					if( ( !Toggle ) || ( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
+					{
+						Pos.x = -( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
+						Pos.y = -( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
+						Pos.z = -( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
+						InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+										Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+										Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+					}
+					Toggle = !Toggle;
+				}
+				break;
+
+			case TROJAX:								/* Fire on release or when max reached */
+				if( GeneralAmmo )
+				{
+					if( !GodMode && !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+					{
+						Ammo = PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].AmmoUsage[ Ships[ WhoIAm ].Object.PowerLevel ] * framelag;
+						GeneralAmmoUsed += Ammo;
+						GeneralAmmo -= Ammo;
+					}
+					if( GeneralAmmo <= 0.0F )
+					{
+						GeneralAmmo = 0.0F;
+						if( PowerLevel > 10.0F )
+						{
+							VECTOR recoil;
+
+							if( TrojaxChargeID )
+							{
+								StopSfx( TrojaxChargeID );
+							}
+
+							Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+							if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+							else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+							Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+							Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
+							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
+							ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
+
+							Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+							Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+							Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
+							InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+											Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+											Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+							recoil.x = 0.0F;
+							recoil.y = 0.0F;
+							recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
+							ForceInternalOneOff( WhoIAm, &recoil );
+
+							PowerLevel = 0.0F;
+						}
+					}
+				}
+				break;
+
+			case PYROLITE_RIFLE:
+				if( PyroliteAmmo )
+				{
+					Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+					if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+					else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+					Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+					Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+					PyroLightFlag = true;
+
+					Pos.x = ( DownVector.x * ( 100.0F * GLOBAL_SCALE ) );
+					Pos.y = ( DownVector.y * ( 100.0F * GLOBAL_SCALE ) );
+					Pos.z = ( DownVector.z * ( 100.0F * GLOBAL_SCALE ) );
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+					Speed = (float) PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].FireDelay[ Ships[ WhoIAm ].Object.PowerLevel ] * framelag;
+					Speed *= ( ( PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].Speed[ Ships[ WhoIAm ].Object.PowerLevel ] ) * 0.333333F );
+					Pos.x += ( Dir.x * Speed );
+					Pos.y += ( Dir.y * Speed );
+					Pos.z += ( Dir.z * Speed );
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+					Pos.x += ( Dir.x * Speed );
+					Pos.y += ( Dir.y * Speed );
+					Pos.z += ( Dir.z * Speed );
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+				}
+				break;
+
+			case TRANSPULSE_CANNON:
+
+				if( GeneralAmmo )
+				{
+					Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+					if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+					else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+					Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+					Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+					Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+					Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+					Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+				}
+
+				break;
+
+			case SUSS_GUN:
+				if( SussGunAmmo )
+				{
+					Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+					if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+					else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+					Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+					Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+				}
+
+				for( Count = 0; Count < 4; Count++ )
+				{
+					Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+					Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+					Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
+
+					if( SussGunAmmo )
+					{
+						InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+										Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+										Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+					}
+				}
+				break;
+
+			case LASER:
+
+				if( GeneralAmmo && !LaserOverheated )
+				{
+					Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+					if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+					else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+					Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+					Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+					Pos.x = -GUN_SIDE_OFFSET;
+					Pos.y = -GUN_DOWN_OFFSET;
+					Pos.z = 0.0F;
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+					Pos.x = GUN_SIDE_OFFSET;
+					Pos.y = -GUN_DOWN_OFFSET;
+					Pos.z = 0.0F;
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+
+				}
+
+				break;
+
+			case NME_LIGHTNING:
+
+				if( GeneralAmmo && !LaserOverheated )
+				{
+					Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+					if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+					else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+					Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+					Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+					Pos.x = -GUN_SIDE_OFFSET;
+					Pos.y = -GUN_DOWN_OFFSET;
+					Pos.z = 0.0F;
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
+						Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+						Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+				}
+				if( GeneralAmmo && !LaserOverheated )
+				{
+					Pos.x = GUN_SIDE_OFFSET;
+					Pos.y = -GUN_DOWN_OFFSET;
+					Pos.z = 0.0F;
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
+						Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+						Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+				}
+
+				break;
+
+			case NME_POWERLASER:
+
+				if( GeneralAmmo )
+				{
+					Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+					if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+					else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+					Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+					Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+					Pos.x = 0.0F;
+					Pos.y = -GUN_DOWN_OFFSET;
+					Pos.z = 0.0F;
+					InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
+									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+				}
+
+				break;
+
+
+			default:
+				break;
 			}
 		}
 	}
-
-	if( control.drop_primary )
+	else
 	{
-		DropPrimary();
+		if( PrimaryFireDelay < 0.0F ) PrimaryFireDelay = 0.0F;
+
+		if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
+		{
+			switch( Ships[WhoIAm].Primary )
+			{
+			case TROJAX:
+				if( GeneralAmmo )
+				{
+					if( PowerLevel > 10.0F )
+					{
+						VECTOR recoil;
+
+						if( TrojaxChargeID )
+						{
+							StopSfx( TrojaxChargeID );
+						}
+
+						Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
+						if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
+						else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
+						Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
+						Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
+
+						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
+						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
+						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
+
+						Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
+						Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
+						Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
+						InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
+										Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
+										Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
+
+						recoil.x = 0.0F;
+						recoil.y = 0.0F;
+						recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
+						ForceInternalOneOff( WhoIAm, &recoil );
+
+						PowerLevel = 0.0F;
+					}
+				}
+				break;
+
+			case PULSAR:
+			case PYROLITE_RIFLE:
+			case TRANSPULSE_CANNON:
+			case SUSS_GUN:
+			case LASER:
+			case NME_POWERLASER:
+			case NME_LIGHTNING:
+			default:
+				break;
+			}
+		}
 	}
+}
 
-	if( control.drop_shield )
-	{
-		DropShield();
-	}
-
-	if( control.drop_ammo )
-	{
-		DropAmmo();
-	}
-
-	PrimarySelectControl();
-
-	Ships[ WhoIAm ].Object.Flags &= ~SHIP_Charging;
-
+/* a weapon-select key: switch to that primary weapon if the ship has it */
+[[gnu::always_inline]] static inline void FirePrimarySelect( int16_t & OnceOnlyFlag, float & Ammo )
+{
 	if( control.select_primary )
 	{
 		if( PrimaryWeaponsGot[ control.select_primary - 1 ] )
@@ -888,31 +1167,11 @@ void FirePrimary(void)
 	{
 		OnceOnlyFlag = 0;
 	}
+}
 
-	if( control.select_next_primary )
-	{
-		Ships[ WhoIAm ].Primary = GetNextValidPrimaryWeapon();
-		if( BikeCompSpeechSlider.value )
-		{
-			PlaySfx( PrimarySfxLookup[ Ships[ WhoIAm ].Primary ], 1.0F );
-		}else
-		{
-			PlaySfx( SFX_WeaponSelect, 1.0F );
-		}
-	}
-
-	if( control.select_prev_primary )
-	{
-		Ships[ WhoIAm ].Primary = GetPrevValidPrimaryWeapon();
-		if( BikeCompSpeechSlider.value )
-		{
-			PlaySfx( PrimarySfxLookup[ Ships[ WhoIAm ].Primary ], 1.0F );
-		}else
-		{
-			PlaySfx( SFX_WeaponSelect, 1.0F );
-		}
-	}
-
+/* charge the Trojax while fire is held */
+[[gnu::always_inline]] static inline void FirePrimaryTrojaxCharge( float & Old_PowerLevel, float & Freq )
+{
 	if( Ships[ WhoIAm ].Primary == TROJAX )
 	{
 		if( control.fire_primary != 0 && GeneralAmmo )
@@ -945,14 +1204,11 @@ void FirePrimary(void)
 	{
 		PowerLevel = 0.0F;
 	}
+}
 
-	if( ( LaserTemperature && !control.fire_primary ) || ( LaserTemperature && LaserOverheated ) )
-	{
-		LaserTemperature -= ( framelag * 0.5F );
-		if( LaserTemperature < 0.0F ) LaserTemperature = 0.0F;
-		if( LaserTemperature < 30.0F ) LaserOverheated = 0;
-	}
-
+/* fire from the ship's orbit pulsars */
+[[gnu::always_inline]] static inline void FirePrimaryOrbitPulsars( VECTOR & Pos, VECTOR & UpVector, VECTOR & DirVector, VECTOR & Rotation, int16_t & Count, u_int16_t & Model )
+{
 	if( ( Ships[ WhoIAm ].NumMultiples ) )
 	{
 		if( OrbitFireDelay <= 0.0F )
@@ -1024,6 +1280,103 @@ void FirePrimary(void)
 			OrbitFireDelay -= framelag;
 		}
 	}
+}
+
+void FirePrimary(void)
+{
+	static int16_t	OnceOnlyFlag = 0;
+	VECTOR	DownVector;
+	VECTOR	LeftVector;
+	VECTOR	Pos;
+	VECTOR	Dir;
+	VECTOR	UpVector;
+	VECTOR	DirVector;
+	VECTOR	Rotation;
+	float	Ammo = 0.0f;
+	int16_t	Count;
+	float	Old_PowerLevel;
+	float	Freq;
+	u_int16_t	Model;
+
+	float	Speed;
+
+	if( WhoIAm == MAX_PLAYERS ) return;
+
+	if( GodModeOnceOnly )
+	{
+		if( GodMode ) GivemeAllWeapons();
+		GodModeOnceOnly = false;
+	}
+
+
+	if( !GodMode )
+	{
+		if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+		{
+			Ships[ WhoIAm ].SuperNashramTimer -= framelag;
+
+			if( Ships[ WhoIAm ].SuperNashramTimer < 0.0F )
+			{
+				LoseSuperNashram();
+			}
+		}
+	}
+
+	if( control.drop_primary )
+	{
+		DropPrimary();
+	}
+
+	if( control.drop_shield )
+	{
+		DropShield();
+	}
+
+	if( control.drop_ammo )
+	{
+		DropAmmo();
+	}
+
+	PrimarySelectControl();
+
+	Ships[ WhoIAm ].Object.Flags &= ~SHIP_Charging;
+
+	FirePrimarySelect( OnceOnlyFlag, Ammo );
+
+	if( control.select_next_primary )
+	{
+		Ships[ WhoIAm ].Primary = GetNextValidPrimaryWeapon();
+		if( BikeCompSpeechSlider.value )
+		{
+			PlaySfx( PrimarySfxLookup[ Ships[ WhoIAm ].Primary ], 1.0F );
+		}else
+		{
+			PlaySfx( SFX_WeaponSelect, 1.0F );
+		}
+	}
+
+	if( control.select_prev_primary )
+	{
+		Ships[ WhoIAm ].Primary = GetPrevValidPrimaryWeapon();
+		if( BikeCompSpeechSlider.value )
+		{
+			PlaySfx( PrimarySfxLookup[ Ships[ WhoIAm ].Primary ], 1.0F );
+		}else
+		{
+			PlaySfx( SFX_WeaponSelect, 1.0F );
+		}
+	}
+
+	FirePrimaryTrojaxCharge( Old_PowerLevel, Freq );
+
+	if( ( LaserTemperature && !control.fire_primary ) || ( LaserTemperature && LaserOverheated ) )
+	{
+		LaserTemperature -= ( framelag * 0.5F );
+		if( LaserTemperature < 0.0F ) LaserTemperature = 0.0F;
+		if( LaserTemperature < 30.0F ) LaserOverheated = 0;
+	}
+
+	FirePrimaryOrbitPulsars( Pos, UpVector, DirVector, Rotation, Count, Model );
 
 	if( PrimaryFireDelay <= 0.0F )
 	{
@@ -1072,336 +1425,7 @@ void FirePrimary(void)
 			}
 			else
 			{
-				if( control.fire_primary )
-				{
-					PrimaryFireDelay += (float) PrimaryWeaponAttribs[ PrimaryToFireLookup[ Ships[WhoIAm].Primary ] ].FireDelay[ Ships[ WhoIAm ].Object.PowerLevel ];
-
-					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
-					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideUp, &UpVector );		/* Calc Up Vector */
-					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );	/* Calc Up Vector */
-					ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
-
-					if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
-					{
-						int8_t prm;
-						prm = PrimaryToFireLookup[ Ships[WhoIAm].Primary ];
-
-						switch( prm )
-						{
-						case PULSAR:
-							if( GeneralAmmo )
-							{
-								Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-								if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-								else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-								Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-								Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-								if( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-
-								if( ( Toggle ) || ( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
-								{
-									Pos.x = ( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
-									Pos.y = ( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
-									Pos.z = ( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
-									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-								}
-
-								if( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-
-								if( ( !Toggle ) || ( Ships[ WhoIAm ].Object.PowerLevel >= PULSAR2SHOTPOWERLEVEL ) )
-								{
-									Pos.x = -( LeftVector.x * GUN_SIDE_OFFSET ) + ( DownVector.x * GUN_DOWN_OFFSET );
-									Pos.y = -( LeftVector.y * GUN_SIDE_OFFSET ) + ( DownVector.y * GUN_DOWN_OFFSET );
-									Pos.z = -( LeftVector.z * GUN_SIDE_OFFSET ) + ( DownVector.z * GUN_DOWN_OFFSET );
-									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-								}
-								Toggle = !Toggle;
-							}
-							break;
-
-						case TROJAX:								/* Fire on release or when max reached */
-							if( GeneralAmmo )
-							{
-								if( !GodMode && !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-								{
-									Ammo = PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].AmmoUsage[ Ships[ WhoIAm ].Object.PowerLevel ] * framelag;
-									GeneralAmmoUsed += Ammo;
-									GeneralAmmo -= Ammo;
-								}
-								if( GeneralAmmo <= 0.0F )
-								{
-									GeneralAmmo = 0.0F;
-									if( PowerLevel > 10.0F )
-									{
-										VECTOR recoil;
-
-										if( TrojaxChargeID )
-										{
-											StopSfx( TrojaxChargeID );
-										}
-
-										Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-										if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-										else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-										Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-										Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
-										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
-										ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
-
-										Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
-										Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
-										Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
-										InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-														Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-														Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-										recoil.x = 0.0F;
-										recoil.y = 0.0F;
-										recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
-										ForceInternalOneOff( WhoIAm, &recoil );
-
-										PowerLevel = 0.0F;
-									}
-								}
-							}
-							break;
-
-						case PYROLITE_RIFLE:
-							if( PyroliteAmmo )
-							{
-								Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-								if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-								else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-								Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-								Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-								PyroLightFlag = true;
-
-								Pos.x = ( DownVector.x * ( 100.0F * GLOBAL_SCALE ) );
-								Pos.y = ( DownVector.y * ( 100.0F * GLOBAL_SCALE ) );
-								Pos.z = ( DownVector.z * ( 100.0F * GLOBAL_SCALE ) );
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-												Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-												Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-								Speed = (float) PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].FireDelay[ Ships[ WhoIAm ].Object.PowerLevel ] * framelag;
-								Speed *= ( ( PrimaryWeaponAttribs[ Ships[ WhoIAm ].Primary ].Speed[ Ships[ WhoIAm ].Object.PowerLevel ] ) * 0.333333F );
-								Pos.x += ( Dir.x * Speed );
-								Pos.y += ( Dir.y * Speed );
-								Pos.z += ( Dir.z * Speed );
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-												Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-												Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-								Pos.x += ( Dir.x * Speed );
-								Pos.y += ( Dir.y * Speed );
-								Pos.z += ( Dir.z * Speed );
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-												Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-												Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-							}
-							break;
-
-						case TRANSPULSE_CANNON:
-
-							if( GeneralAmmo )
-							{
-								Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-								if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-								else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-								Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-								Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-								Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
-								Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
-								Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-												Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-												Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-							}
-
-							break;
-
-						case SUSS_GUN:
-							if( SussGunAmmo )
-							{
-								Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-								if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-								else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-								Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-								Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-							}
-
-							for( Count = 0; Count < 4; Count++ )
-							{
-								Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
-								Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
-								Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
-
-								if( SussGunAmmo )
-								{
-									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-								}
-							}
-							break;
-
-						case LASER:
-
-							if( GeneralAmmo && !LaserOverheated )
-							{
-								Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-								if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-								else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-								Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-								Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-								Pos.x = -GUN_SIDE_OFFSET;
-								Pos.y = -GUN_DOWN_OFFSET;
-								Pos.z = 0.0F;
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-												Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-												Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-								Pos.x = GUN_SIDE_OFFSET;
-								Pos.y = -GUN_DOWN_OFFSET;
-								Pos.z = 0.0F;
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-												Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-												Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-
-							}
-
-							break;
-
-						case NME_LIGHTNING:
-
-							if( GeneralAmmo && !LaserOverheated )
-							{
-								Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-								if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-								else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-								Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-								Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-								Pos.x = -GUN_SIDE_OFFSET;
-								Pos.y = -GUN_DOWN_OFFSET;
-								Pos.z = 0.0F;
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
-									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-							}
-							if( GeneralAmmo && !LaserOverheated )
-							{
-								Pos.x = GUN_SIDE_OFFSET;
-								Pos.y = -GUN_DOWN_OFFSET;
-								Pos.z = 0.0F;
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
-									Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-									Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-							}
-
-							break;
-
-						case NME_POWERLASER:
-
-							if( GeneralAmmo )
-							{
-								Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-								if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-								else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-								Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-								Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-								Pos.x = 0.0F;
-								Pos.y = -GUN_DOWN_OFFSET;
-								Pos.z = 0.0F;
-								InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, PrimaryToFireLookup[ Ships[WhoIAm].Primary ],
-												Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-												Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-							}
-
-							break;
-
-
-						default:
-							break;
-						}
-					}
-				}
-				else
-				{
-					if( PrimaryFireDelay < 0.0F ) PrimaryFireDelay = 0.0F;
-
-					if( PrimaryWeaponsGot[ Ships[ WhoIAm ].Primary ] )
-					{
-						switch( Ships[WhoIAm].Primary )
-						{
-						case TROJAX:
-							if( GeneralAmmo )
-							{
-								if( PowerLevel > 10.0F )
-								{
-									VECTOR recoil;
-
-									if( TrojaxChargeID )
-									{
-										StopSfx( TrojaxChargeID );
-									}
-
-									Ships[ WhoIAm ].Object.Flags |= SHIP_PrimFire;
-									if( Toggle ) Ships[ WhoIAm ].Object.Flags |= SHIP_PrimToggle;
-									else Ships[ WhoIAm ].Object.Flags &= ~SHIP_PrimToggle;
-									Ships[ WhoIAm ].PrimPowerLevel = PowerLevel;
-									Ships[ WhoIAm ].PrimID = Ships[ WhoIAm ].PrimBullIdCount + 1;
-
-									ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &Forward, &Dir );
-									ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideDown, &DownVector );		/* Calc Up Vector */
-									ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &SlideLeft, &LeftVector );	/* Calc Left Vector */
-
-									Pos.x = ( DownVector.x * GUN_DOWN_OFFSET );
-									Pos.y = ( DownVector.y * GUN_DOWN_OFFSET );
-									Pos.z = ( DownVector.z * GUN_DOWN_OFFSET );
-									InitOnePrimBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].PrimBullIdCount, Ships[ WhoIAm ].Primary,
-													Ships[ WhoIAm ].Object.Group, &Ships[ WhoIAm ].Object.Pos, &Pos, &Dir, &UpVector,
-													Ships[ WhoIAm ].Object.PowerLevel, PowerLevel, false );
-
-									recoil.x = 0.0F;
-									recoil.y = 0.0F;
-									recoil.z = -( ( PowerLevel / 5.0F ) * GLOBAL_SCALE );
-									ForceInternalOneOff( WhoIAm, &recoil );
-
-									PowerLevel = 0.0F;
-								}
-							}
-							break;
-
-						case PULSAR:
-						case PYROLITE_RIFLE:
-						case TRANSPULSE_CANNON:
-						case SUSS_GUN:
-						case LASER:
-						case NME_POWERLASER:
-						case NME_LIGHTNING:
-						default:
-							break;
-						}
-					}
-				}
+				FirePrimaryShoot( DownVector, LeftVector, Pos, Dir, UpVector, Ammo, Count, Speed );
 			}
 		}
 	}
