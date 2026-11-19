@@ -20,11 +20,14 @@ void destroy_image( texture_image_t * image )
 int load_image( texture_image_t * image, int /*mipmap*/ )
 {
   png_byte magic[8];
-  png_structp png_ptr;
-  png_infop info_ptr;
+  png_structp png_ptr = NULL;
+  png_infop info_ptr = NULL;
   int bit_depth, color_type;
-  FILE *fp = NULL;
-  png_bytep *row_pointers = NULL;
+  /* Read on the longjmp path below: volatile keeps their values there
+     (row_pointers and data are assigned after setjmp). */
+  FILE * volatile fp = NULL;
+  png_bytep * volatile row_pointers = NULL;
+  char * volatile data = NULL;
   int i;
 
   /* open image file */
@@ -36,47 +39,28 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 	}
 
   /* read magic number */
-  fread (magic, 1, sizeof (magic), fp);
-
-  /* check for valid magic number */
-  if (!png_check_sig (magic, sizeof (magic)))
+  if (fread (magic, 1, sizeof (magic), fp) != sizeof (magic)
+	  || !png_check_sig (magic, sizeof (magic)))
 	{
 	  fprintf (stderr, "error: \"%s\" is not a valid PNG image!\n",
 		   image->path);
-	  fclose (fp);
-	  return -1;
+	  goto fail;
 	}
 
   /* create a png read struct */
   png_ptr = png_create_read_struct
 	(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (!png_ptr)
-	{
-	  fclose (fp);
-	  return -1;
-	}
+	goto fail;
 
   /* create a png info struct */
   info_ptr = png_create_info_struct (png_ptr);
   if (!info_ptr)
-	{
-	  fclose (fp);
-	  png_destroy_read_struct (&png_ptr, NULL, NULL);
-	  return -1;
-	}
+	goto fail;
 
-  /* initialize the setjmp for returning properly after a libpng
-	 error occured */
+  /* a libpng error longjmps back here */
   if (setjmp (png_jmpbuf (png_ptr)))
-	{
-	  fclose (fp);
-	  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
-
-	  if (row_pointers)
-		free (row_pointers);
-
-	  return -1;
-	}
+	goto fail;
 
   /* setup libpng for using standard C fread() function
 	 with our FILE pointer */
@@ -94,11 +78,11 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 
   // 8 bits per pixel
   if (bit_depth != 8)
-	  return -1;
+	  goto fail;
 
   /* detect if not rgb */
   if (!(color_type & PNG_COLOR_MASK_COLOR))
-	  return -1;
+	  goto fail;
 
   /* "colorkey" here is the flag the downstream create_texture()
    * consults to decide whether to replace pure-black RGB pixels with
@@ -133,17 +117,23 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 		NULL, NULL, NULL);
 
   if(color_type != PNG_COLOR_TYPE_RGB_ALPHA)
-	  return -1;
+	  goto fail;
 
   /* we can now allocate memory for storing pixel data - 4 = rgba */
-  image->data = (char*)malloc (sizeof (char) * image->w * image->h * 4);
+  data = (char*)malloc (sizeof (char) * image->w * image->h * 4);
 
   /* setup a pointer array.  Each one points at the begening of a row. */
   row_pointers = (png_bytep *)malloc (sizeof (png_bytep) * image->h);
 
+  if (!data || !row_pointers)
+	{
+	  fprintf (stderr, "error: out of memory decoding \"%s\"!\n", image->path);
+	  goto fail;
+	}
+
   /* PNG rows are stored top to bottom. */
   for (i = 0; i < image->h; ++i)
-	  row_pointers[i] = (png_bytep)(image->data +
+	  row_pointers[i] = (png_bytep)(data +
 	  (i * image->w * 4));
 
   /* read pixel data using row pointers */
@@ -157,6 +147,14 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
   free (row_pointers);
 
   fclose (fp);
+  image->data = data;
   return 0;
+
+fail:
+  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+  free (row_pointers);
+  free (data);
+  fclose (fp);
+  return -1;
 }
 
