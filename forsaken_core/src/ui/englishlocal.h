@@ -165,6 +165,8 @@
 #define YOU_KILLED_YOURSELF				"you killed yourself"
 #define NO_LIVES_LEFT					"No Lives Left"
 #define SAVED_GAME_DAMAGED				"Saved game damaged: level restarted"
+#define SAVED_GAME_DAMAGED_INFO			"saved game damaged"	// load menu preview
+#define SAVED_GAME_SLOT_DAMAGED			"damaged slot %d"		// %d=slot number
 #define LAST_LIFE						"Last Life"
 #define ONE_LIFE_LEFT					"%d Life Left" // %d=1
 #define LIVES_LEFT						"%d Lives Left" // %d=2, 3, 4...

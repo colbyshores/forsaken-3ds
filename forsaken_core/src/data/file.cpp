@@ -265,15 +265,19 @@ void find_close( void )
 	glob_pos = -1;
 }
 
-void file_read_cstring( FILE * fp, char * dst, size_t size )
+bool file_read_cstring( FILE * fp, char * dst, size_t size )
 {
 	size_t n = 0;
+	bool fits = true;
 	int c;
 
 	while( ( c = getc( fp ) ) != EOF && c != 0 )
 	{
 		if( n + 1 < size )
 			dst[ n++ ] = (char) c;
+		else
+			fits = false;
 	}
 	dst[ n ] = 0;
+	return fits && c == 0;
 }

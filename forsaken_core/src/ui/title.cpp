@@ -7321,10 +7321,9 @@ void GetSavedGameData( void )
 {
 	struct filetime ftime;
 	FILE	*	fp;
-	int8_t		buf[ 256 ];
-	int8_t		biker[ 256 ];
+	char		buf[ 256 ];
+	char		biker[ 256 ];
 	int8_t		filename[ 256 ];
-	int16_t		i;
 	int16_t		Hours, Minutes, Seconds;
 	int16_t		KilledEnemiesNum, InitEnemiesNum;
 	char *ext;
@@ -7355,35 +7354,31 @@ void GetSavedGameData( void )
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n\n");
 
-		i = 0;
-		do
-		{
-			file_read( &buf[i], sizeof(char), 1, fp );
-		}
-		while( buf[ i++ ] != 0 );
-		i = 0;
-		do
-		{
-			file_read( &biker[i], sizeof(char), 1, fp );
-		}
-		while( biker[ i++ ] != 0 );
+		bool ok = file_read_cstring( fp, buf, sizeof( buf ) )
+			&& file_read_cstring( fp, biker, sizeof( biker ) );
 
 		file_read( &Hours, sizeof( Hours ), 1, fp );
 		file_read( &Minutes, sizeof( Minutes ), 1, fp );
 		file_read( &Seconds, sizeof( Seconds ), 1, fp );
 		file_read( &InitEnemiesNum, sizeof( InitEnemiesNum ), 1, fp );
 		file_read( &KilledEnemiesNum, sizeof( KilledEnemiesNum ), 1, fp );
+		ok = ok && file_read_ok( fp );
 
 		fclose( fp );
 
-		sprintf( CurrentSavedGameLevel, LT_LevelName/*"level name: %s"*/, GetMissionName( (char*)buf ) );
-		if ( strcasecmp( (char*)biker, (char*)DEFAULT_PLAYER_NAME ) )
-			snprintf( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
+		if( !ok )
+		{
+			snprintf( CurrentSavedGameLevel, sizeof( CurrentSavedGameLevel ), SAVED_GAME_DAMAGED_INFO );
+		}
 		else
-			sprintf( CurrentSavedGameTimeLevelPlayed, LT_LevelPlayedFor2/*"played for %hd mins %hd secs"*/, Hours * 60 + Minutes, Seconds );
-		sprintf( CurrentSavedGameEnemiesKilled, LT_EnemiesKilled/*"enemies killed: %hd of %hd"*/, KilledEnemiesNum, InitEnemiesNum );
-	}else
-	{
+		{
+			sprintf( CurrentSavedGameLevel, LT_LevelName/*"level name: %s"*/, GetMissionName( buf ) );
+			if ( strcasecmp( biker, DEFAULT_PLAYER_NAME ) )
+				snprintf( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
+			else
+				sprintf( CurrentSavedGameTimeLevelPlayed, LT_LevelPlayedFor2/*"played for %hd mins %hd secs"*/, Hours * 60 + Minutes, Seconds );
+			sprintf( CurrentSavedGameEnemiesKilled, LT_EnemiesKilled/*"enemies killed: %hd of %hd"*/, KilledEnemiesNum, InitEnemiesNum );
+		}
 	}
 
 	ext = strstr( (char*)filename, SAVEGAME_EXTENSION );

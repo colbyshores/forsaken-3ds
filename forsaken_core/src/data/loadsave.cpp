@@ -52,6 +52,7 @@
 
 #include "game/ships.h"
 #include "ui/title.h"
+#include "ui/local.h"
 #include "rendering/2dpolys.h"
 #include "rendering/polys.h"
 #include "rendering/screenpolys.h"
@@ -102,20 +103,6 @@ char *SaveGamePicFileName( int slot )
 }
 
 
-/* Read a NUL-terminated string of at most size bytes, the NUL included,
-   into dst. False at the end of the file or when it does not fit. */
-static bool read_string( FILE * fp, int8_t * dst, size_t size )
-{
-	for( size_t i = 0; i < size; i++ )
-	{
-		if( fread( &dst[ i ], 1, 1, fp ) != 1 )
-			return false;
-		if( dst[ i ] == 0 )
-			return true;
-	}
-	return false;
-}
-
 /* After one module's Load*: false if the module failed (it returns NULL,
    having closed fp) or any read so far ran past the end of the file or
    failed (fp's end-of-file and error flags stay set once a read does), in
@@ -140,7 +127,7 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 {
 	FILE	*	fp;
 	int16_t		i;
-	int8_t		buf[ 256 ];
+	char		buf[ 256 ];
 	u_int32_t		MagicNumber;
 	u_int32_t		VersionNumber;
 
@@ -154,7 +141,7 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
 
-		if( !read_string( fp, buf, sizeof( buf ) ) )
+		if( !file_read_cstring( fp, buf, sizeof( buf ) ) )
 		{
 			fclose( fp );
 			return false;
@@ -163,7 +150,7 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 		for (i = 0; i < NumLevels; i++)
 		{
 
-			if( strcasecmp( (char*) &ShortLevelNames[i][0] , (char*) &buf[0] ) == 0 )
+			if( strcasecmp( ShortLevelNames[i], buf ) == 0 )
 			{
 				NewLevelNum = i;
 				break;
@@ -189,8 +176,8 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 bool InGameLoad( MENUITEM * /*MenuItem*/ )
 {
 	FILE	*	fp;
-	int8_t		buf[ 256 ];
-	int8_t		biker[ 256 ];
+	char		buf[ 256 ];
+	char		biker[ 256 ];
 	int16_t		Hours, Minutes, Seconds;
 	int16_t		KilledEnemiesNum, InitEnemiesNum;
 	u_int32_t		MagicNumber;
@@ -206,7 +193,7 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
 
-		if( !read_string( fp, buf, sizeof( buf ) ) || !read_string( fp, biker, sizeof( biker ) ) )
+		if( !file_read_cstring( fp, buf, sizeof( buf ) ) || !file_read_cstring( fp, biker, sizeof( biker ) ) )
 		{
 			fclose( fp );
 			return false;
@@ -553,8 +540,8 @@ char *SavedGameInfo( int slot )
 {
 	static char info[ 256 ];
 	FILE	*	fp;
-	int8_t		buf[ 256 ];
-	int8_t		biker[ 256 ];
+	char		buf[ 256 ];
+	char		biker[ 256 ];
 	int16_t		Hours, Minutes, Seconds;
 	int16_t		KilledEnemiesNum, InitEnemiesNum;
 	int16_t		Lives;
@@ -572,14 +559,14 @@ char *SavedGameInfo( int slot )
 		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
 			Msg("Save file is in an old format.\nYou will most likely crash...\n");
 
-		if( !read_string( fp, buf, sizeof( buf ) ) || !read_string( fp, biker, sizeof( biker ) ) )
+		if( !file_read_cstring( fp, buf, sizeof( buf ) ) || !file_read_cstring( fp, biker, sizeof( biker ) ) )
 		{
 			fclose( fp );
-			snprintf( info, sizeof( info ), "damaged slot %d", slot + 1 );
+			snprintf( info, sizeof( info ), SAVED_GAME_SLOT_DAMAGED, slot + 1 );
 			return info;
 		}
 
-		LevelName = GetMissionName( (char*)buf );
+		LevelName = GetMissionName( buf );
 
 		file_read( &Hours, sizeof( Hours ), 1, fp );
 		file_read( &Minutes, sizeof( Minutes ), 1, fp );
@@ -587,7 +574,7 @@ char *SavedGameInfo( int slot )
 		file_read( &InitEnemiesNum, sizeof( NumInitEnemies ), 1, fp );
 		file_read( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
 		file_read( &Lives, sizeof( Lives ), 1, fp );
-		if ( strcasecmp( (char*)biker, DEFAULT_PLAYER_NAME ) )
+		if ( strcasecmp( biker, DEFAULT_PLAYER_NAME ) )
 			snprintf( info, sizeof( info ), "%s in %s %hd'%02hd %hd/%hd",
 				biker,
 				LevelName,
