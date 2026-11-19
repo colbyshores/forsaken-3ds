@@ -229,10 +229,29 @@ Behaviour-changing commits are bug fixes, each on its own, listed first.
     is a small checked-reader helper that records the first short read, so
     the loader can refuse the file. That is a behaviour change to the save
     path. Do it, or leave it?
+    **Resolved 2026-11-19 (owner agreed):** saves go to `saveNN.TMP` and
+    replace the slot only when every write and the close succeed
+    (7f1555c4). The loader reads names with a bounded `read_string` and
+    checks the stream after each module; a short or damaged save is
+    refused, the level restarts and the player sees "Saved game damaged:
+    level restarted" (3741c365). The per-field freads stay unchecked:
+    a short read latches the stream's EOF/error flag, so one check per
+    module catches it. The `enemies.txt`/config parsers are unchanged.
 12. Ordinary functions that ignore a parameter: `Create*Explosion` `Dir`,
     the laser-pulse `Group`, `ExplodeSecondary` `Pos`/`Group`,
     `TargetClosestEnemy` `Me`/`MeType`, and a few more. Remove those
     parameters (call-site changes), or keep them as documentation?
+    **Resolved 2026-11-19 (owner agreed): removed**, one family per commit
+    (5004cf56..f1bb7941): the explosion `Dir`s, laser-pulse `Group`s,
+    `ExplodeSecondary` `Pos`/`Group`, `TargetClosestEnemy` `MeType`/`Me`,
+    three spot effects' `Dir`, `GravityWave` `Owner`, `Enemy2EnemyCollide`
+    `Move`, `CreateShieldEffect` `IntPos2` and `ShowGameStats` `mode`. Each
+    was unnamed in its definition and every call passed a side-effect-free
+    argument, so behaviour cannot change. None hid a bug: the 1998 source
+    ignores `GravityWave`'s Owner (the firer is pulled too), `Move` and
+    `IntPos2` the same way, and `TargetClosestEnemy` is only reached for
+    ship-owned weapons. Callbacks and platform seam stubs keep their
+    signatures.
 
 Next (no decision needed): after the music_3ds listen, the same class
 shape for `sound_3ds` and `controls_3ds`.
