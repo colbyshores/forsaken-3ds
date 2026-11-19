@@ -4695,6 +4695,13 @@ bool PreLoadEnemies( void )
 
 		NextNewModel = NextEnemyModel;
 
+		if( !file_read_ok( fp ) )
+		{
+			fclose( fp );
+			Msg( "PreLoadEnemies() Damaged enemy (.NME) file for %s\n", &ShortLevelNames[ LevelNum ][ 0 ] );
+			return( false );
+		}
+
 		fclose( fp );
 	}
 	return( true );
@@ -5500,6 +5507,13 @@ bool LoadEnemies( void )
 			{
 				SetCurAnimSeq( 0, &Enemy->Object );
 			}
+		}
+
+		if( !file_read_ok( fp ) )
+		{
+			fclose( fp );
+			Msg( "LoadEnemies() Damaged enemy (.NME) file for %s\n", &ShortLevelNames[ LevelNum ][ 0 ] );
+			return( false );
 		}
 
 		fclose( fp );

@@ -3075,6 +3075,13 @@ bool LoadPickupsPositions( void )
 		}
 
 		/* done reading file */
+		if( !file_read_ok( fp ) )
+		{
+			fclose( fp );
+			Msg( "LoadPickupsPositions() Damaged pickup (.PIC) file for %s\n", &ShortLevelNames[ LevelNum ][ 0 ] );
+			return( false );
+		}
+
 		fclose( fp );
 
 		/* if not single player */

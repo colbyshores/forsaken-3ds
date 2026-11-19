@@ -99,6 +99,13 @@ bool LoadStartPoints( void )
 
 		}
 
+		if( !file_read_ok( fp ) )
+		{
+			fclose( fp );
+			Msg( "LoadStartPoints() Damaged start point file for %s\n", &ShortLevelNames[ LevelNum ][ 0 ] );
+			return( false );
+		}
+
 		fclose( fp );
 	}
 

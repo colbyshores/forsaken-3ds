@@ -171,7 +171,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 	int16_t			Count;
 	int16_t			NumModels;
 	COMP_OBJ	*	CompsPtr;
-	char			TempChar;
+	char			SkipName[ 256 ];
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 
@@ -198,14 +198,8 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 		{
 			file_read( &NumModels, sizeof( int16_t ), 1, fp );
 
-			for( Count = 0; Count < NumModels; Count++ )
-			{
-				do
-				{
-					file_read( &TempChar, sizeof( int8_t ), 1, fp );		// Skip model filenames
-				}
-				while( TempChar );
-			}
+			for( Count = 0; Count < NumModels; Count++ )		// skip the model filenames
+				file_read_cstring( fp, SkipName, sizeof( SkipName ) );
 
 			fp = LoadCompObjChildren( fp, CompsPtr, 1, Pos, Dir, Group, OverallTime, MidTime, BaseModel,
 									  OwnerType, OwnerID );
@@ -213,6 +207,14 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 			if( !fp )
 			{
 				free( CompsPtr );
+				return( nullptr );
+			}
+
+			if( !file_read_ok( fp ) )
+			{
+				fclose( fp );
+				free( CompsPtr );
+				Msg( "LoadCompObj() Damaged Componented Object (.COB) file %s\n", path );
 				return( nullptr );
 			}
 

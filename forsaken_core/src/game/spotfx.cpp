@@ -154,6 +154,13 @@ bool LoadSpotFX( void )
 			}
 		}
 
+		if( !file_read_ok( fp ) )
+		{
+			fclose( fp );
+			Msg( "LoadSpotFX() Damaged spot effect file for %s\n", &ShortLevelNames[ LevelNum ][ 0 ] );
+			return( false );
+		}
+
 		fclose( fp );
 	}
 

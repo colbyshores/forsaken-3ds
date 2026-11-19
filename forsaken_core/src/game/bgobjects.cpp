@@ -1254,6 +1254,15 @@ bool PreLoadBGOFiles( void )
 
 		NextNewModel = BaseModel;
 
+		if( !file_read_ok( fp ) )
+		{
+			fclose( fp );
+			free( BGOFilesPtr );
+			BGOFilesPtr = nullptr;
+			Msg( "PreLoadBGOFiles() Damaged BGObject (.BGO) file for %s\n", &ShortLevelNames[ LevelNum ][ 0 ] );
+			return( false );
+		}
+
 		fclose( fp );
 	}
 	else
