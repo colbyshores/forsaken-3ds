@@ -682,16 +682,13 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 
 		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
 		{
-			if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
+			if( !( Polys[i].Flags & POLY_FLAG_DONTCLIP ) && ( Polys[i].Group == Group ) )
 			{
-				if( !( Polys[i].Flags & POLY_FLAG_DONTCLIP ) && ( Polys[i].Group == Group ) )
+				if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
 				{
-					if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
-					{
-						Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-						NumTris += ( 2 * Bit_Ptr->numbits );
-						NumVerts += ( 4 * Bit_Ptr->numbits );
-					}
+					Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
+					NumTris += ( 2 * Bit_Ptr->numbits );
+					NumVerts += ( 4 * Bit_Ptr->numbits );
 				}
 			}
 
@@ -744,107 +741,104 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 
 			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
-				if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
+				if( !( Polys[i].Flags & POLY_FLAG_DONTCLIP ) && ( Polys[i].Group == Group ) )
 				{
-					if( !( Polys[i].Flags & POLY_FLAG_DONTCLIP ) && ( Polys[i].Group == Group ) )
+					if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
 					{
-						if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
-						{
-							int ntris = 0;
+						int ntris = 0;
 
-							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+						Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
+						Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
+						Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
+								Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
-							PolyVertPnt->x = Polys[ i ].Pos1.x;
-							PolyVertPnt->y = Polys[ i ].Pos1.y;
-							PolyVertPnt->z = Polys[ i ].Pos1.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
+						PolyVertPnt->x = Polys[ i ].Pos1.x;
+						PolyVertPnt->y = Polys[ i ].Pos1.y;
+						PolyVertPnt->z = Polys[ i ].Pos1.z;
+						PolyVertPnt->tu = Box_Ptr->u1;
+						PolyVertPnt->tv = Box_Ptr->v1;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
 
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
+								Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
-							PolyVertPnt->x = Polys[ i ].Pos2.x;
-							PolyVertPnt->y = Polys[ i ].Pos2.y;
-							PolyVertPnt->z = Polys[ i ].Pos2.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
+						PolyVertPnt->x = Polys[ i ].Pos2.x;
+						PolyVertPnt->y = Polys[ i ].Pos2.y;
+						PolyVertPnt->z = Polys[ i ].Pos2.z;
+						PolyVertPnt->tu = Box_Ptr->u2;
+						PolyVertPnt->tv = Box_Ptr->v1;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
 
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
+								Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
-							PolyVertPnt->x = Polys[ i ].Pos3.x;
-							PolyVertPnt->y = Polys[ i ].Pos3.y;
-							PolyVertPnt->z = Polys[ i ].Pos3.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
+						PolyVertPnt->x = Polys[ i ].Pos3.x;
+						PolyVertPnt->y = Polys[ i ].Pos3.y;
+						PolyVertPnt->z = Polys[ i ].Pos3.z;
+						PolyVertPnt->tu = Box_Ptr->u2;
+						PolyVertPnt->tv = Box_Ptr->v2;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
 
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
+								Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
-							PolyVertPnt->x = Polys[ i ].Pos4.x;
-							PolyVertPnt->y = Polys[ i ].Pos4.y;
-							PolyVertPnt->z = Polys[ i ].Pos4.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
+						PolyVertPnt->x = Polys[ i ].Pos4.x;
+						PolyVertPnt->y = Polys[ i ].Pos4.y;
+						PolyVertPnt->z = Polys[ i ].Pos4.z;
+						PolyVertPnt->tu = Box_Ptr->u1;
+						PolyVertPnt->tv = Box_Ptr->v2;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
 
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 1;
-							PolyFacePnt->v3 = 2;
-							PolyFacePnt++;
-							ntris++;
+						PolyFacePnt->v1 = 0;
+						PolyFacePnt->v2 = 1;
+						PolyFacePnt->v3 = 2;
+						PolyFacePnt++;
+						ntris++;
 
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 2;
-							PolyFacePnt->v3 = 3;
-							PolyFacePnt++;
-							ntris++;
+						PolyFacePnt->v1 = 0;
+						PolyFacePnt->v2 = 2;
+						PolyFacePnt->v3 = 3;
+						PolyFacePnt++;
+						ntris++;
 
-							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
-							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+						renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
+						renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
+						renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
 #ifdef __3DS__
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+						renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
 #else
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+						renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 #endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
-							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-							start_index += ntris*3;
-							StartVert += 4;
+						renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
+						renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
+						start_index += ntris*3;
+						StartVert += 4;
 
 #ifdef __3DS__
-							/* Mid-draw flush: textureGroups is full (one group per
-							 * quad), so draw what is filled and refill from the
-							 * start of the buffers. See polys.h. */
-							renderObject->numTextureGroups++;
-							batchVert += 4;
-							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-								FSUnlockVertexBuffer(renderObject);
-								FSUnlockIndexBuffer(renderObject);
-								draw_billboard_object(renderObject);
-								renderObject->numTextureGroups = 0;
-								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
-								start_index = 0;
-								batchVert = 0;
-								FSLockVertexBuffer(renderObject, &BufStart);
-								FSLockIndexBuffer(renderObject, &Indices);
-								PolyVertPnt = (LVERTEX *) BufStart;
-								PolyFacePnt = (TRIANGLE *) Indices;
-							}
-#else
-							INCREASE_TEXTURE_GROUPS(renderObject);
-#endif
-							Off_Ptr++;
+						/* Mid-draw flush: textureGroups is full (one group per
+						 * quad), so draw what is filled and refill from the
+						 * start of the buffers. See polys.h. */
+						renderObject->numTextureGroups++;
+						batchVert += 4;
+						if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+							FSUnlockVertexBuffer(renderObject);
+							FSUnlockIndexBuffer(renderObject);
+							draw_billboard_object(renderObject);
+							renderObject->numTextureGroups = 0;
+							renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
+							start_index = 0;
+							batchVert = 0;
+							FSLockVertexBuffer(renderObject, &BufStart);
+							FSLockIndexBuffer(renderObject, &Indices);
+							PolyVertPnt = (LVERTEX *) BufStart;
+							PolyFacePnt = (TRIANGLE *) Indices;
 						}
+#else
+						INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
+						Off_Ptr++;
 					}
 				}
 
@@ -925,168 +919,162 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 
 		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
 		{
-			if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
+			if( Polys[i].Flags & POLY_FLAG_DONTCLIP )
+			{
+				if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
+				{
+					Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
+					NumTris += ( 2 * Bit_Ptr->numbits );
+					NumVerts += ( 4 * Bit_Ptr->numbits );
+				}
+			}
+
+			i = Polys[ i ].NextInTPage;
+		}
+
+		PolyTPages[ Count ].StartVert = StartVert;
+		PolyTPages[ Count ].NumVerts = NumVerts;
+		PolyTPages[ Count ].NumTris = NumTris;
+
+		TotalVerts = ( StartVert + NumVerts );
+		if( TotalVerts >= MAXPOLYVERTS ) break;
+	}
+
+	if( !TotalVerts ) return( false );
+
+	renderObject->numTextureGroups = 0;
+
+	if (!(FSLockVertexBuffer(renderObject, &BufStart)))
+	{
+		return false;
+	}
+
+	if (!(FSLockIndexBuffer(renderObject, &Indices)))
+	{
+		return false;
+	}
+
+	PolyFacePnt = (TRIANGLE *) Indices;
+	PolyVertPnt = (LVERTEX *) BufStart;
+
+/*===================================================================
+		Pass 2: fill verts and indices, one texture group per quad
+===================================================================*/
+
+	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
+	{
+		StartVert = PolyTPages[ Count ].StartVert;
+		NumVerts = PolyTPages[ Count ].NumVerts;
+		NumTris = PolyTPages[ Count ].NumTris;
+
+		if( NumVerts )
+		{
+			if( Count == *TPage ) i = *NextPoly;
+			else i = PolyTPages[ Count ].FirstPoly;
+
+			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
 			{
 				if( Polys[i].Flags & POLY_FLAG_DONTCLIP )
 				{
 					if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
 					{
+						int ntris = 0;
+
 						Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-						NumTris += ( 2 * Bit_Ptr->numbits );
-						NumVerts += ( 4 * Bit_Ptr->numbits );
-					}
-				}
-			}
-
-			i = Polys[ i ].NextInTPage;
-		}
-
-		PolyTPages[ Count ].StartVert = StartVert;
-		PolyTPages[ Count ].NumVerts = NumVerts;
-		PolyTPages[ Count ].NumTris = NumTris;
-
-		TotalVerts = ( StartVert + NumVerts );
-		if( TotalVerts >= MAXPOLYVERTS ) break;
-	}
-
-	if( !TotalVerts ) return( false );
-
-	renderObject->numTextureGroups = 0;
-
-	if (!(FSLockVertexBuffer(renderObject, &BufStart)))
-	{
-		return false;
-	}
-
-	if (!(FSLockIndexBuffer(renderObject, &Indices)))
-	{
-		return false;
-	}
-
-	PolyFacePnt = (TRIANGLE *) Indices;
-	PolyVertPnt = (LVERTEX *) BufStart;
-
-/*===================================================================
-		Pass 2: fill verts and indices, one texture group per quad
-===================================================================*/
-
-	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = PolyTPages[ Count ].StartVert;
-		NumVerts = PolyTPages[ Count ].NumVerts;
-		NumTris = PolyTPages[ Count ].NumTris;
-
-		if( NumVerts )
-		{
-			if( Count == *TPage ) i = *NextPoly;
-			else i = PolyTPages[ Count ].FirstPoly;
-
-			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
-			{
-				if( !( Polys[i].Flags & POLY_FLAG_SOLID ) )
-				{
-					if( Polys[i].Flags & POLY_FLAG_DONTCLIP )
-					{
-						if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
-						{
-							int ntris = 0;
-
-							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
+						Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
+						Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
+								Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
-							PolyVertPnt->x = Polys[ i ].Pos1.x;
-							PolyVertPnt->y = Polys[ i ].Pos1.y;
-							PolyVertPnt->z = Polys[ i ].Pos1.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
+						PolyVertPnt->x = Polys[ i ].Pos1.x;
+						PolyVertPnt->y = Polys[ i ].Pos1.y;
+						PolyVertPnt->z = Polys[ i ].Pos1.z;
+						PolyVertPnt->tu = Box_Ptr->u1;
+						PolyVertPnt->tv = Box_Ptr->v1;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
 
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
+								Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
-							PolyVertPnt->x = Polys[ i ].Pos2.x;
-							PolyVertPnt->y = Polys[ i ].Pos2.y;
-							PolyVertPnt->z = Polys[ i ].Pos2.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos3.x;
-							PolyVertPnt->y = Polys[ i ].Pos3.y;
-							PolyVertPnt->z = Polys[ i ].Pos3.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
+						PolyVertPnt->x = Polys[ i ].Pos2.x;
+						PolyVertPnt->y = Polys[ i ].Pos2.y;
+						PolyVertPnt->z = Polys[ i ].Pos2.z;
+						PolyVertPnt->tu = Box_Ptr->u2;
+						PolyVertPnt->tv = Box_Ptr->v1;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
 
 
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
+								Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
-							PolyVertPnt->x = Polys[ i ].Pos4.x;
-							PolyVertPnt->y = Polys[ i ].Pos4.y;
-							PolyVertPnt->z = Polys[ i ].Pos4.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
+						PolyVertPnt->x = Polys[ i ].Pos3.x;
+						PolyVertPnt->y = Polys[ i ].Pos3.y;
+						PolyVertPnt->z = Polys[ i ].Pos3.z;
+						PolyVertPnt->tu = Box_Ptr->u2;
+						PolyVertPnt->tv = Box_Ptr->v2;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
 
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 1;
-							PolyFacePnt->v3 = 2;
-							PolyFacePnt++;
-							ntris++;
 
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 2;
-							PolyFacePnt->v3 = 3;
-							PolyFacePnt++;
-							ntris++;
+								Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
-							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
-							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+						PolyVertPnt->x = Polys[ i ].Pos4.x;
+						PolyVertPnt->y = Polys[ i ].Pos4.y;
+						PolyVertPnt->z = Polys[ i ].Pos4.z;
+						PolyVertPnt->tu = Box_Ptr->u1;
+						PolyVertPnt->tv = Box_Ptr->v2;
+						PolyVertPnt->color = Colour;
+						PolyVertPnt++;
+
+						PolyFacePnt->v1 = 0;
+						PolyFacePnt->v2 = 1;
+						PolyFacePnt->v3 = 2;
+						PolyFacePnt++;
+						ntris++;
+
+						PolyFacePnt->v1 = 0;
+						PolyFacePnt->v2 = 2;
+						PolyFacePnt->v3 = 3;
+						PolyFacePnt++;
+						ntris++;
+
+						renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
+						renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
+						renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
 #ifdef __3DS__
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+						renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
 #else
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+						renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 #endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
-							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-							start_index += ntris*3;
-							StartVert += 4;
+						renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
+						renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
+						start_index += ntris*3;
+						StartVert += 4;
 
 #ifdef __3DS__
-							/* Mid-draw flush: textureGroups is full (one group per
-							 * quad), so draw what is filled and refill from the
-							 * start of the buffers. See polys.h. */
-							renderObject->numTextureGroups++;
-							batchVert += 4;
-							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-								FSUnlockVertexBuffer(renderObject);
-								FSUnlockIndexBuffer(renderObject);
-								draw_billboard_object(renderObject);
-								renderObject->numTextureGroups = 0;
-								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
-								start_index = 0;
-								batchVert = 0;
-								FSLockVertexBuffer(renderObject, &BufStart);
-								FSLockIndexBuffer(renderObject, &Indices);
-								PolyVertPnt = (LVERTEX *) BufStart;
-								PolyFacePnt = (TRIANGLE *) Indices;
-							}
-#else
-							INCREASE_TEXTURE_GROUPS(renderObject);
-#endif
-							Off_Ptr++;
+						/* Mid-draw flush: textureGroups is full (one group per
+						 * quad), so draw what is filled and refill from the
+						 * start of the buffers. See polys.h. */
+						renderObject->numTextureGroups++;
+						batchVert += 4;
+						if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+							FSUnlockVertexBuffer(renderObject);
+							FSUnlockIndexBuffer(renderObject);
+							draw_billboard_object(renderObject);
+							renderObject->numTextureGroups = 0;
+							renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
+							start_index = 0;
+							batchVert = 0;
+							FSLockVertexBuffer(renderObject, &BufStart);
+							FSLockIndexBuffer(renderObject, &Indices);
+							PolyVertPnt = (LVERTEX *) BufStart;
+							PolyFacePnt = (TRIANGLE *) Indices;
 						}
+#else
+						INCREASE_TEXTURE_GROUPS(renderObject);
+#endif
+						Off_Ptr++;
 					}
 				}
 
@@ -1096,541 +1084,6 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 
 		if( StartVert >= MAXPOLYVERTS ) break;
 	}
-
-	if (!(FSUnlockVertexBuffer(renderObject)))
-	{
-		return false;
-	}
-
-	if (!(FSUnlockIndexBuffer(renderObject)))
-	{
-		Msg( "FSUnlockIndexBuffer failed");
-		return false ;
-	}
-
-	*TPage = Count;
-	*NextPoly = i;
-
-	return( true );
-}
-
-bool DisplaySolidGroupClippedPolys( RENDEROBJECT *renderObject, u_int16_t Group )
-{
-	int16_t	TPage;
-	u_int16_t	i;
-
-	TPage = 0;
-	i = PolyTPages[ 0 ].FirstPoly;
-
-	while( 1 )
-	{
-		if( !SolidPolyDispGroupClipped( Group, renderObject, &TPage, &i ) )
-			return( true );
-
-		cull_none();
-
-		if (!draw_billboard_object(renderObject))
-			return false;
-
-		reset_cull();
-	}
-
-	return( false );
-}
-
-bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject )
-{
-	int16_t	TPage;
-	u_int16_t	i;
-
-	TPage = 0;
-	i = PolyTPages[ 0 ].FirstPoly;
-
-	while( 1 )
-	{
-		if( !SolidPolyDispGroupUnclipped( renderObject, &TPage, &i ) )
-			return( true );
-
-		cull_none();
-
-		if (!draw_billboard_object(renderObject))
-			return false;
-
-		reset_cull();
-
-	}
-
-	return( false );
-}
-
-/*===================================================================
-	Procedure	:	Fill one batch of a group's POLY_FLAG_SOLID polys
-	Input		:	u_int16_t						Group
-				:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List (in/out)
-				:	u_int16_t	*					Current Poly (in/out)
-	Output		:	true if a batch was filled and should be drawn
-===================================================================*/
-bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
-{
-	/* opt5b memo epoch: stamp this fill's content identity. */
-	renderObject->memoEpochPass = SMEMO_PASS_SOLID_CLIPPED;
-	renderObject->memoEpochGroup = Group;
-	renderObject->memoEpochResume = smemo_resume(*TPage, *NextPoly);
-	u_int16_t			i;
-	int16_t			Count;
-	int16_t			TotalVerts;
-	int16_t			StartVert;
-#ifdef __3DS__
-	int				batchVert = 0;	/* write position in the current batch */
-#endif
-	int16_t			NumVerts;
-	int16_t			NumTris;
-	BIT_INFO	*	Bit_Ptr;
-	BOX_INFO	*	Box_Ptr;
-	OFF_INFO	*	Off_Ptr;
-	COLOR		Colour;
-	LVERTEX	*PolyVertPnt;
-	TRIANGLE	*PolyFacePnt;
-	LVERTEX	*BufStart;
-	WORD			*Indices = NULL;
-	int				start_index = 0;
-
-/*===================================================================
-		Pass 1: count verts per texture page
-===================================================================*/
-	TotalVerts = 0;
-
-	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = TotalVerts;
-		NumVerts = 0;
-		NumTris = 0;
-
-		if( Count == *TPage ) i = *NextPoly;
-		else i = PolyTPages[ Count ].FirstPoly;
-
-		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
-		{
-			if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
-			{
-				if( !( Polys[i].Flags & POLY_FLAG_DONTCLIP ) && ( Polys[i].Group == Group ) )
-				{
-					if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
-					{
-						Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-						NumTris += ( 2 * Bit_Ptr->numbits );
-						NumVerts += ( 4 * Bit_Ptr->numbits );
-					}
-				}
-			}
-
-			i = Polys[ i ].NextInTPage;
-		}
-
-		PolyTPages[ Count ].StartVert = StartVert;
-		PolyTPages[ Count ].NumVerts = NumVerts;
-		PolyTPages[ Count ].NumTris = NumTris;
-
-		TotalVerts = ( StartVert + NumVerts );
-		if( TotalVerts >= MAXPOLYVERTS ) break;
-	}
-
-	if( !TotalVerts ) return( false );
-
-	renderObject->numTextureGroups = 0;
-
-/*===================================================================
-		Lock the vertex and index buffers
-===================================================================*/
-
-	if (!(FSLockVertexBuffer(renderObject, &BufStart)))
-	{
-		return false;
-	}
-
-	if (!(FSLockIndexBuffer(renderObject, &Indices)))
-	{
-		return false;
-	}
-
-	PolyFacePnt = (TRIANGLE *) Indices;
-	PolyVertPnt = (LVERTEX *) BufStart;
-
-/*===================================================================
-		Pass 2: fill verts and indices, one texture group per quad
-===================================================================*/
-
-	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = PolyTPages[ Count ].StartVert;
-		NumVerts = PolyTPages[ Count ].NumVerts;
-		NumTris = PolyTPages[ Count ].NumTris;
-
-		if( NumVerts )
-		{
-			if( Count == *TPage ) i = *NextPoly;
-			else i = PolyTPages[ Count ].FirstPoly;
-
-			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
-			{
-				if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
-				{
-					if( !( Polys[i].Flags & POLY_FLAG_DONTCLIP ) && ( Polys[i].Group == Group ) )
-					{
-						if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
-						{
-							int ntris = 0;
-
-							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
-
-
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos1.x;
-							PolyVertPnt->y = Polys[ i ].Pos1.y;
-							PolyVertPnt->z = Polys[ i ].Pos1.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos2.x;
-							PolyVertPnt->y = Polys[ i ].Pos2.y;
-							PolyVertPnt->z = Polys[ i ].Pos2.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos3.x;
-							PolyVertPnt->y = Polys[ i ].Pos3.y;
-							PolyVertPnt->z = Polys[ i ].Pos3.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos4.x;
-							PolyVertPnt->y = Polys[ i ].Pos4.y;
-							PolyVertPnt->z = Polys[ i ].Pos4.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 1;
-							PolyFacePnt->v3 = 2;
-							PolyFacePnt++;
-							ntris++;
-
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 2;
-							PolyFacePnt->v3 = 3;
-							PolyFacePnt++;
-							ntris++;
-
-							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = 0;
-							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = NumVerts;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = 0;
-#ifdef __3DS__
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
-#else
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
-#endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
-							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-							start_index += ntris*3; // each triangle has three indexes...
-							StartVert += 4;
-
-#ifdef __3DS__
-							/* Mid-draw flush: textureGroups is full (one group per
-							 * quad), so draw what is filled and refill from the
-							 * start of the buffers. See polys.h. */
-							renderObject->numTextureGroups++;
-							batchVert += 4;
-							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-								FSUnlockVertexBuffer(renderObject);
-								FSUnlockIndexBuffer(renderObject);
-								draw_billboard_object(renderObject);
-								renderObject->numTextureGroups = 0;
-								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
-								start_index = 0;
-								batchVert = 0;
-								FSLockVertexBuffer(renderObject, &BufStart);
-								FSLockIndexBuffer(renderObject, &Indices);
-								PolyVertPnt = (LVERTEX *) BufStart;
-								PolyFacePnt = (TRIANGLE *) Indices;
-							}
-#else
-							INCREASE_TEXTURE_GROUPS(renderObject);
-#endif
-							Off_Ptr++;
-						}
-					}
-				}
-
-				i = Polys[ i ].NextInTPage;
-			}
-		}
-
-		if( StartVert >= MAXPOLYVERTS ) break;
-	}
-
-/*===================================================================
-		Unlock the buffers and return the resume point
-===================================================================*/
-
-	if (!(FSUnlockVertexBuffer(renderObject)))
-	{
-		return false;
-	}
-
-	if (!(FSUnlockIndexBuffer(renderObject)))
-	{
-		Msg( "FSUnlockIndexBuffer failed");
-		return false ;
-	}
-
-	*TPage = Count;
-	*NextPoly = i;
-
-	return( true );
-}
-
-/*===================================================================
-	Procedure	:	Fill one batch of POLY_FLAG_SOLID, POLY_FLAG_DONTCLIP
-				:	polys
-	Input		:	RENDEROBJECT *			Render object
-				:	int16_t	*					Current TPage List (in/out)
-				:	u_int16_t	*					Current Poly (in/out)
-	Output		:	true if a batch was filled and should be drawn
-===================================================================*/
-bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly )
-{
-	/* opt5b memo epoch: whole-scene fill (no single group). */
-	renderObject->memoEpochPass = SMEMO_PASS_SOLID_UNCLIPPED;
-	renderObject->memoEpochGroup = SMEMO_WHOLE_GROUP;
-	renderObject->memoEpochResume = smemo_resume(*TPage, *NextPoly);
-	u_int16_t			i;
-	int16_t			Count;
-	int16_t			TotalVerts;
-	int16_t			StartVert;
-#ifdef __3DS__
-	int				batchVert = 0;	/* write position in the current batch */
-#endif
-	int16_t			NumVerts;
-	int16_t			NumTris;
-	BIT_INFO	*	Bit_Ptr;
-	BOX_INFO	*	Box_Ptr;
-	OFF_INFO	*	Off_Ptr;
-	COLOR		Colour;
-	LVERTEX	*PolyVertPnt;
-	TRIANGLE	*PolyFacePnt;
-	LVERTEX	*BufStart;
-	WORD			*Indices = NULL;
-	int				start_index = 0;
-
-/*===================================================================
-		Pass 1: count verts per texture page
-===================================================================*/
-	TotalVerts = 0;
-
-	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = TotalVerts;
-		NumVerts = 0;
-		NumTris = 0;
-
-		if( Count == *TPage ) i = *NextPoly;
-		else i = PolyTPages[ Count ].FirstPoly;
-
-		while( ( i != INDEX_NONE ) && ( ( StartVert + NumVerts ) < MAXPOLYVERTS ) )
-		{
-			if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
-			{
-				if( Polys[i].Flags & POLY_FLAG_DONTCLIP )
-				{
-					if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
-					{
-						Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-						NumTris += ( 2 * Bit_Ptr->numbits );
-						NumVerts += ( 4 * Bit_Ptr->numbits );
-					}
-				}
-			}
-
-			i = Polys[ i ].NextInTPage;
-		}
-
-		PolyTPages[ Count ].StartVert = StartVert;
-		PolyTPages[ Count ].NumVerts = NumVerts;
-		PolyTPages[ Count ].NumTris = NumTris;
-
-		TotalVerts = ( StartVert + NumVerts );
-		if( TotalVerts >= MAXPOLYVERTS ) break;
-	}
-
-	if( !TotalVerts ) return( false );
-
-	renderObject->numTextureGroups = 0;
-
-/*===================================================================
-		Lock the vertex and index buffers
-===================================================================*/
-
-	if (!(FSLockVertexBuffer(renderObject, &BufStart)))
-	{
-		return false;
-	}
-
-	if (!(FSLockIndexBuffer(renderObject, &Indices)))
-	{
-		return false;
-	}
-
-	PolyFacePnt = (TRIANGLE *) Indices;
-	PolyVertPnt = (LVERTEX *) BufStart;
-
-/*===================================================================
-		Pass 2: fill verts and indices, one texture group per quad
-===================================================================*/
-
-	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
-	{
-		StartVert = PolyTPages[ Count ].StartVert;
-		NumVerts = PolyTPages[ Count ].NumVerts;
-		NumTris = PolyTPages[ Count ].NumTris;
-
-		if( NumVerts )
-		{
-			if( Count == *TPage ) i = *NextPoly;
-			else i = PolyTPages[ Count ].FirstPoly;
-
-			while( ( i != INDEX_NONE ) && ( StartVert < MAXPOLYVERTS ) )
-			{
-				if( ( Polys[i].Flags & POLY_FLAG_SOLID ) )
-				{
-					if( Polys[i].Flags & POLY_FLAG_DONTCLIP )
-					{
-						if( Polys[i].Frm_Info && (*Polys[i].Frm_Info ) )
-						{
-							int ntris = 0;
-
-							Bit_Ptr = ( (*Polys[ i ].Frm_Info)->Bit_Info + (int16_t) Polys[ i ].Frame );
-							Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
-							Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
-
-									Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos1.x;
-							PolyVertPnt->y = Polys[ i ].Pos1.y;
-							PolyVertPnt->z = Polys[ i ].Pos1.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-									Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos2.x;
-							PolyVertPnt->y = Polys[ i ].Pos2.y;
-							PolyVertPnt->z = Polys[ i ].Pos2.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v1;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-									Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos3.x;
-							PolyVertPnt->y = Polys[ i ].Pos3.y;
-							PolyVertPnt->z = Polys[ i ].Pos3.z;
-							PolyVertPnt->tu = Box_Ptr->u2;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-									Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
-
-							PolyVertPnt->x = Polys[ i ].Pos4.x;
-							PolyVertPnt->y = Polys[ i ].Pos4.y;
-							PolyVertPnt->z = Polys[ i ].Pos4.z;
-							PolyVertPnt->tu = Box_Ptr->u1;
-							PolyVertPnt->tv = Box_Ptr->v2;
-							PolyVertPnt->color = Colour;
-							PolyVertPnt++;
-
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 1;
-							PolyFacePnt->v3 = 2;
-							PolyFacePnt++;
-							ntris++;
-
-							PolyFacePnt->v1 = 0;
-							PolyFacePnt->v2 = 2;
-							PolyFacePnt->v3 = 3;
-							PolyFacePnt++;
-							ntris++;
-
-							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
-							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
-#ifdef __3DS__
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
-#else
-							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
-#endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
-							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
-							start_index += ntris*3; // each triangle has three indexes...
-							StartVert += 4;
-
-#ifdef __3DS__
-							/* Mid-draw flush: textureGroups is full (one group per
-							 * quad), so draw what is filled and refill from the
-							 * start of the buffers. See polys.h. */
-							renderObject->numTextureGroups++;
-							batchVert += 4;
-							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-								FSUnlockVertexBuffer(renderObject);
-								FSUnlockIndexBuffer(renderObject);
-								draw_billboard_object(renderObject);
-								renderObject->numTextureGroups = 0;
-								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
-								start_index = 0;
-								batchVert = 0;
-								FSLockVertexBuffer(renderObject, &BufStart);
-								FSLockIndexBuffer(renderObject, &Indices);
-								PolyVertPnt = (LVERTEX *) BufStart;
-								PolyFacePnt = (TRIANGLE *) Indices;
-							}
-#else
-							INCREASE_TEXTURE_GROUPS(renderObject);
-#endif
-							Off_Ptr++;
-						}
-					}
-				}
-				i = Polys[ i ].NextInTPage;
-			}
-		}
-
-		if( StartVert >= MAXPOLYVERTS ) break;
-	}
-
-/*===================================================================
-		Unlock the buffers and return the resume point
-===================================================================*/
 
 	if (!(FSUnlockVertexBuffer(renderObject)))
 	{

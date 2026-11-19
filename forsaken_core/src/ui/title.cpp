@@ -4045,13 +4045,6 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 		return false;
 	}
 
-/*
-	Display 0 solid Clipped Non Faceme Transluecent Polys
-*/
-
-		if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], 0 ) )
-				return false;
-
 	// set all the Translucent execute status flags...
 	set_alpha_states();
 

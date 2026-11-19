@@ -4269,12 +4269,6 @@ bool RenderCurrentCamera( void )
 		set_normal_states();
 	}
 
-/*===================================================================
-  Display Non Group Clipped Non Faceme Transluecent Polys
-===================================================================*/
-	if( !DisplaySolidGroupUnclippedPolys( &RenderBufs[ 2 ] ) )
-		return false;
-
 
   /* Fresh memo generation for this camera's visible-group walk: ModelDisp
    * is called once per group and the per-model visibility predicate is
@@ -4298,14 +4292,6 @@ bool RenderCurrentCamera( void )
 		return false;
 	  }
 
-/*===================================================================
-  Display Group Clipped Non Faceme Transluecent Polys
-===================================================================*/
-
-  if( !DisplaySolidGroupClippedPolys( &RenderBufs[ 2 ], group ) )
-  {
-	return false;
-  }
   }
 
   ClipGroup( &CurrentCamera, CurrentCamera.GroupImIn );

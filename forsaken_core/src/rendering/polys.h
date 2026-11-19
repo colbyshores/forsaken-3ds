@@ -19,8 +19,7 @@
  * at MAXPOLYVERTS and returning the page / poly to resume from; the caller
  * draws each batch with draw_billboard_object, culling off. "Clipped" fills
  * take polys of one group (drawn while that group is clipped); "Unclipped"
- * fills take POLY_FLAG_DONTCLIP polys. The Solid variants take
- * POLY_FLAG_SOLID polys, which nothing currently creates. Vertex alpha is
+ * fills take POLY_FLAG_DONTCLIP polys. Vertex alpha is
  * always 255; Trans1..4 are not used by the fills.
  *
  * On 3DS textureGroups only has MAX_TEXTURE_GROUPS entries, so a fill that
@@ -58,7 +57,6 @@ constexpr int MAXPOLYVERTS = 800;
 constexpr int POLY_FLAG_NOTHING = 0;
 constexpr int POLY_FLAG_TWOSIDED = 1;
 constexpr int POLY_FLAG_DONTCLIP = 2;
-constexpr int POLY_FLAG_SOLID = 4;
 
 constexpr int POLY_NOTHING = 0;
 constexpr int POLY_LASER = 1;
@@ -131,10 +129,6 @@ bool DisplayGroupUnclippedPolys( RENDEROBJECT *renderObject );
 bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly );
 bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly );
 
-bool DisplaySolidGroupClippedPolys( RENDEROBJECT *renderObject, u_int16_t Group );
-bool DisplaySolidGroupUnclippedPolys( RENDEROBJECT *renderObject );
-bool SolidPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly );
-bool SolidPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * NextPoly );
 
 FILE * SavePolys( FILE * fp );
 FILE * LoadPolys( FILE * fp );
