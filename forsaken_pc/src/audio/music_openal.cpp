@@ -50,6 +50,7 @@ static bool load_track_pcm(int track, int16_t **out_pcm, long *out_samples)
 	fseek(f, 0, SEEK_SET);
 	if (sz <= 96) { fclose(f); return false; }
 	uint8_t *data = (uint8_t *)malloc((size_t)sz);
+	if (!data) { fclose(f); return false; }
 	if (fread(data, 1, (size_t)sz, f) != (size_t)sz) { free(data); fclose(f); return false; }
 	fclose(f);
 
