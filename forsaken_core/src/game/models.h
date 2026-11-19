@@ -586,7 +586,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos );
 bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF );
 bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF );
 void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner, float Center_Damage, u_int16_t Group, BYTE Weapon, u_int16_t model );
-void GravityWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center_Grav, u_int16_t Group );
+void GravityWave( VECTOR * Pos, float Radius, float Center_Grav, u_int16_t Group );
 void ExplodeBody( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void ThrowOutRider( u_int16_t Ship );
 void CreateBodyPart( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t ModelNum );

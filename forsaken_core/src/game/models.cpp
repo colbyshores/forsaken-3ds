@@ -1498,7 +1498,7 @@ void ProcessModels( void )
 							break;
 						}
 					}
-					GravityWave( &Models[i].Pos, ( BALL_RADIUS * Models[i].MaxScale ), Models[i].Owner, 10.0F, Models[i].Group );
+					GravityWave( &Models[i].Pos, ( BALL_RADIUS * Models[i].MaxScale ), 10.0F, Models[i].Group );
 					break;
 
 				// gravgon field 2
@@ -1520,7 +1520,7 @@ void ProcessModels( void )
 							break;
 						}
 					}
-					GravityWave( &Models[i].Pos, ( BALL_RADIUS * Models[i].MaxScale ), Models[i].Owner, 10.0F, Models[i].Group );
+					GravityWave( &Models[i].Pos, ( BALL_RADIUS * Models[i].MaxScale ), 10.0F, Models[i].Group );
 					break;
 
 				case MODFUNC_BodyPart:
@@ -3664,12 +3664,11 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 	Procedure	:	Gravity Wave Damage to me
 	Input		:	VECTOR	*	Position
 				:	float		Radius
-				:	u_int16_t		Owner
-				:	float		Damage at center
+				:	float		Pull at center
 				:	u_int16_t		Group
 	Output		:	Nothing
 ===================================================================*/
-void GravityWave( VECTOR * Pos, float Radius, u_int16_t /*Owner*/, float Center_Grav, u_int16_t Group )
+void GravityWave( VECTOR * Pos, float Radius, float Center_Grav, u_int16_t Group )
 {
 	int16_t	Gravity;
 	u_int16_t	EndGroup;
