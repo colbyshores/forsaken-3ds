@@ -169,15 +169,9 @@ bool ScoreDisplay();
 bool InitScoreDisplay();
 bool InitStatsDisplay();
 
-typedef enum {
-	NO_BG,
-	FULL_BG,
-	BOX_BG
-} stats_mode_t;
-
 void ShowInGameStats();
 void ShowDeathModeStats();
-void ShowGameStats(stats_mode_t mode);
+void ShowGameStats();
 void DisplayNetworkInfo();
 
 int Secrets = 0;
@@ -3784,7 +3778,7 @@ void SetCam(int ship, int Cam)
 
 void ShowDeathModeStats()
 {
-	ShowGameStats( BOX_BG );
+	ShowGameStats();
 	if( Ships[ WhoIAm ].Timer < RESPAWN_TIMER )
 		CenterPrint4x5Text( "Press any key to continue" , render_info.window_size.cy - (FontHeight*2) , GREEN );
 }
@@ -3792,7 +3786,7 @@ void ShowDeathModeStats()
 /* Display the Statistics in-game when key is pressed */
 void ShowInGameStats()
 {
-	ShowGameStats( NO_BG );	// don't use BLT background
+	ShowGameStats();
 }
 
 
@@ -3878,7 +3872,7 @@ void DisplayNetworkInfo()
 	}
 }
 
-void ShowGameStats( stats_mode_t mode )
+void ShowGameStats()
 {
 	int active_players = 0;
 	int total_rows = 0;
@@ -4094,7 +4088,7 @@ void ShowGameStats( stats_mode_t mode )
 /* Display the Statistics */
 bool ScoreDisplay()
 {
-	ShowGameStats( FULL_BG ); // use BLT background
+	ShowGameStats();
 	CenterPrint4x5Text( "Press Space to continue" , render_info.window_size.cy - (FontHeight*2) , 0 );
 	return true;
 }
