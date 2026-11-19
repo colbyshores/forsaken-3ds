@@ -86,13 +86,14 @@ constexpr auto MAGIC_NUMBER = 0x584A5250;
 constexpr float GLOBAL_SCALE = (0.25F);
 constexpr float BLOCKSIZE = ( 1024.0F * GLOBAL_SCALE ); // one level block
 
-/* The larger / smaller of two values of one type. On a tie (or a NaN) MAX
- * returns y and MIN returns x, as the macros they replace did; std::max and
+/* The larger / smaller of two values. On a tie (or a NaN) MAX returns y
+ * and MIN returns x, as the macros they replaced did; std::max and
  * std::min differ there. The #undefs drop any system MAX / MIN macro. */
 #undef MAX
 #undef MIN
-template <typename T> constexpr T MAX( T x, T y ) { return x > y ? x : y; }
-template <typename T> constexpr T MIN( T x, T y ) { return x > y ? y : x; }
+constexpr int MAX( int x, int y ) { return x > y ? x : y; }
+constexpr float MAX( float x, float y ) { return x > y ? x : y; }
+constexpr float MIN( float x, float y ) { return x > y ? y : x; }
 
 #undef ZERO_STACK_MEM
 #define ZERO_STACK_MEM(x) memset(&x, 0, sizeof(x))
