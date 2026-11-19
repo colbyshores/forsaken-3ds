@@ -61,18 +61,6 @@ enum
 	AIMODE_DEATH_CRASHNBURN,		// Fall to the ground and Shatter...
 	AIMODE_DEATH_PINGOFF,			// Ping off in the dir of the bullet that killed me spinning as I go...
 	AIMODE_DEATH_PSYCHO,			// Twist and turn and shoot and explode...
-
-	// No brain implements the modes from here down; nothing sets them.
-	AIMODE_DEATH_DEADINTHEWATER,	// Float or stop occasionally Spark or explode...
-
-	AIMODE_STRAFE,					// Do a passing Run at the player firing as I go..
-	AIMODE_GETBEHIND,				// Get behind the player then start dog fighting him again...
-	AIMODE_AVOIDHOMING,				// Avoid a Homing Missile..
-	AIMODE_FINDCOVER,				// Find a 'safe' spot for a while
-	AIMODE_UNLOAD,					// Unload all at PLAYER
-	AIMODE_BACKOFF,					// Back off firing at PLAYER
-	AIMODE_STALK,					// Stalk PLAYER from a distance
-	AIMODE_FLOCK,					// Flock around a point
 };
 enum
 {
