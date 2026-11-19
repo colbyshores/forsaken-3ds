@@ -172,8 +172,10 @@ inline float COSD( double x ) { return fast_cosf( (float) D2R( x ) ); }
 inline float COSD( int x ) { return fast_cosf( D2R( x ) ); }
 /* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 inline float ATAND( float y, float x ) { return R2D( atan2f( y, x ) ); }
-#define FMOD( NUM, DIV )	( (NUM) - (DIV) * fast_floorf( (NUM) / (DIV) ) )
-#define FDIV( NUM, DIV )	( (DIV) * fast_floorf( (NUM) / (DIV) ) )
+/* num modulo div, floored (the result has div's sign), and the multiple
+ * of div at or below num; same expression as the macros they replaced. */
+inline float FMOD( float num, float div ) { return num - div * fast_floorf( num / div ); }
+inline float FDIV( float num, float div ) { return div * fast_floorf( num / div ); }
 
 /*===================================================================
 	Structures
