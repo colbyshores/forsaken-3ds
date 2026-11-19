@@ -34,7 +34,7 @@ struct XMemTracker {
 	int find_free()
 	{
 		for (int i = 0; i < MAXBLOCKS; i++)
-			if (!used[i]) { blocks_used++; return i; }
+			if (!used[i]) return i;
 		return -1;
 	}
 	int find_same(void *p) const
@@ -97,6 +97,7 @@ void * X_strdup( const char *str, const char *in_file, int in_line )
 	BlockInFile[i] = in_file;
 	BlockInLine[i] = in_line;
 	MemUsed += size;
+	BlocksUsed++;
 
 	return Pnt;
 
@@ -124,6 +125,7 @@ void * X_malloc( size_t size, const char *in_file, int in_line )
 	BlockInFile[i] = in_file;
 	BlockInLine[i] = in_line;
 	MemUsed += size;
+	BlocksUsed++;
 
 	memset(Pnt,0,size); // DEBUG_ON builds hand out zeroed blocks; release malloc does not
 
@@ -154,6 +156,7 @@ void * X_calloc( size_t num,size_t size, const char *in_file, int in_line )
 	BlockInFile[i] = in_file;
 	BlockInLine[i] = in_line;
 	MemUsed += num * size;
+	BlocksUsed++;
 
 	memset(Pnt,0,size); // redundant: calloc already zeroed the block (this covers only size bytes)
 
