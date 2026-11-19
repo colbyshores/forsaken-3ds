@@ -782,25 +782,276 @@ void	KillUsedSecBull( u_int16_t i )
 ===================================================================*/
 static	int16_t	Toggle = 0;
 
-void FireSecondary( void )
+/* MUGMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryMugMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
 {
-	static int16_t	OnceOnlyFlag = 0;
-	VECTOR	UpVector;
-	VECTOR	Pos;
-	VECTOR	Dir;
-	VECTOR	DropVector;
-	VECTOR	recoil;
-
-
-	RegenerateQuedMines();
-
-	if( WhoIAm == MAX_PLAYERS ) return;
-
-	if( control.drop_secondary )
+	if( Toggle == 0 )
 	{
-		DropSecondary();
+		Toggle = 1;
+		DropVector.x = -0.7071F;
+		DropVector.y = -0.7071F;
+		DropVector.z = 0.0F;
+	}
+	else
+	{
+		Toggle = 0;
+		DropVector.x = +0.7071F;
+		DropVector.y = -0.7071F;
+		DropVector.z = 0.0F;
 	}
 
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+}
+
+/* SOLARISMISSILE */
+[[gnu::always_inline]] static inline void FireSecondarySolarisMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	if( Toggle == 0 )
+	{
+		Toggle = 1;
+		DropVector.x = -0.7071F;
+		DropVector.y = -0.7071F;
+		DropVector.z = 0.0F;
+	}
+	else
+	{
+		Toggle = 0;
+		DropVector.x = +0.7071F;
+		DropVector.y = -0.7071F;
+		DropVector.z = 0.0F;
+	}
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+}
+
+/* MULTIPLEMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryMultipleMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = ( ( ( (float) Random_Range( 512 ) ) / 640.0F ) - 0.4F );
+	DropVector.y = -( ( ( (float) Random_Range( 512 ) ) / 1024.0F ) + 1.0F );
+	DropVector.z = ( ( (float) Random_Range( 512 ) ) / 512.0F );
+	NormaliseVector( &DropVector );
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+}
+
+/* THIEFMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryThiefMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = -1.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+}
+
+/* SCATTERMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryScatterMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = -1.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+}
+
+/* GRAVGONMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryGravgonMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = -1.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+}
+
+/* TITANSTARMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryTitanStarMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector, VECTOR & recoil )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = -1.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+	recoil.x = 0.0F;
+	recoil.y = 0.0F;
+	recoil.z = -( 20.0F * GLOBAL_SCALE );
+	ForceInternalOneOff( WhoIAm, &recoil );
+}
+
+/* PURGEMINE */
+[[gnu::always_inline]] static inline void FireSecondaryPurgeMine( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = 0.0F;
+	DropVector.z = -1.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+}
+
+/* PINEMINE */
+[[gnu::always_inline]] static inline void FireSecondaryPineMine( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = 0.0F;
+	DropVector.z = -1.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+}
+
+/* QUANTUMMINE */
+[[gnu::always_inline]] static inline void FireSecondaryQuantumMine( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = 0.0F;
+	DropVector.z = -1.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+}
+
+/* SPIDERMINE */
+[[gnu::always_inline]] static inline void FireSecondarySpiderMine( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = 0.0F;
+	DropVector.z = -1.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+}
+
+/* ENEMYSPIRALMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryEnemySpiralMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = 0.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+}
+
+/* ENEMYHOMINGMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryEnemyHomingMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = -1.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+}
+
+/* ENEMYBLUEHOMINGMISSILE */
+[[gnu::always_inline]] static inline void FireSecondaryEnemyBlueHomingMissile( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = -1.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+}
+
+/* ENEMYFIREBALL */
+[[gnu::always_inline]] static inline void FireSecondaryEnemyFireball( VECTOR & UpVector, VECTOR & Pos, VECTOR & Dir, VECTOR & DropVector )
+{
+	DropVector.x = 0.0F;
+	DropVector.y = -1.0F;
+	DropVector.z = 0.0F;
+
+	ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
+	Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
+	Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
+	Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
+	InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
+					Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
+					&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+}
+
+/* a weapon-select key: switch to that secondary weapon if the ship has it */
+[[gnu::always_inline]] static inline void FireSecondarySelect( int16_t & OnceOnlyFlag )
+{
 	if( control.select_secondary )
 	{
 		if( SecondaryWeaponsGot[ ( control.select_secondary - 1 ) ] )
@@ -843,6 +1094,28 @@ void FireSecondary( void )
 	{
 		OnceOnlyFlag = 0;
 	}
+}
+
+void FireSecondary( void )
+{
+	static int16_t	OnceOnlyFlag = 0;
+	VECTOR	UpVector;
+	VECTOR	Pos;
+	VECTOR	Dir;
+	VECTOR	DropVector;
+	VECTOR	recoil;
+
+
+	RegenerateQuedMines();
+
+	if( WhoIAm == MAX_PLAYERS ) return;
+
+	if( control.drop_secondary )
+	{
+		DropSecondary();
+	}
+
+	FireSecondarySelect( OnceOnlyFlag );
 
 	if( control.select_next_secondary )
 	{
@@ -914,279 +1187,102 @@ void FireSecondary( void )
 										Fire bottom Left, then Right, then Left, then...
 						===================================================================*/
 					case MUGMISSILE:
-						if( Toggle == 0 )
-						{
-							Toggle = 1;
-							DropVector.x = -0.7071F;
-							DropVector.y = -0.7071F;
-							DropVector.z = 0.0F;
-						}
-						else
-						{
-							Toggle = 0;
-							DropVector.x = +0.7071F;
-							DropVector.y = -0.7071F;
-							DropVector.z = 0.0F;
-						}
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+						FireSecondaryMugMissile( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Fire bottom Left and Right together
 						===================================================================*/
 					case SOLARISMISSILE:
-						if( Toggle == 0 )
-						{
-							Toggle = 1;
-							DropVector.x = -0.7071F;
-							DropVector.y = -0.7071F;
-							DropVector.z = 0.0F;
-						}
-						else
-						{
-							Toggle = 0;
-							DropVector.x = +0.7071F;
-							DropVector.y = -0.7071F;
-							DropVector.z = 0.0F;
-						}
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+						FireSecondarySolarisMissile( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Fire from bottom center at random trajectories
 						===================================================================*/
 					case MULTIPLEMISSILE:
-						DropVector.x = ( ( ( (float) Random_Range( 512 ) ) / 640.0F ) - 0.4F );
-						DropVector.y = -( ( ( (float) Random_Range( 512 ) ) / 1024.0F ) + 1.0F );
-						DropVector.z = ( ( (float) Random_Range( 512 ) ) / 512.0F );
-						NormaliseVector( &DropVector );
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+						FireSecondaryMultipleMissile( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Fire from center below view
 						===================================================================*/
 					case THIEFMISSILE:
-						DropVector.x = 0.0F;
-						DropVector.y = -1.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+						FireSecondaryThiefMissile( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Fire from center below view
 						===================================================================*/
 					case SCATTERMISSILE:
-						DropVector.x = 0.0F;
-						DropVector.y = -1.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+						FireSecondaryScatterMissile( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Fire from center below view
 						===================================================================*/
 					case GRAVGONMISSILE:
-						DropVector.x = 0.0F;
-						DropVector.y = -1.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
+						FireSecondaryGravgonMissile( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Fire from center below view
 						===================================================================*/
 					case TITANSTARMISSILE:
-						DropVector.x = 0.0F;
-						DropVector.y = -1.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, false );
-						recoil.x = 0.0F;
-						recoil.y = 0.0F;
-						recoil.z = -( 20.0F * GLOBAL_SCALE );
-						ForceInternalOneOff( WhoIAm, &recoil );
+						FireSecondaryTitanStarMissile( UpVector, Pos, Dir, DropVector, recoil );
 						break;
 
 						/*===================================================================
 										Drop Behind
 						===================================================================*/
 					case PURGEMINE:
-						DropVector.x = 0.0F;
-						DropVector.y = 0.0F;
-						DropVector.z = -1.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+						FireSecondaryPurgeMine( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Drop Behind
 						===================================================================*/
 					case PINEMINE:
-						DropVector.x = 0.0F;
-						DropVector.y = 0.0F;
-						DropVector.z = -1.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+						FireSecondaryPineMine( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Drop Behind
 						===================================================================*/
 					case QUANTUMMINE:
-						DropVector.x = 0.0F;
-						DropVector.y = 0.0F;
-						DropVector.z = -1.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+						FireSecondaryQuantumMine( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Drop Behind
 						===================================================================*/
 					case SPIDERMINE:
-						DropVector.x = 0.0F;
-						DropVector.y = 0.0F;
-						DropVector.z = -1.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, Ships[ WhoIAm ].Secondary, true );
+						FireSecondarySpiderMine( UpVector, Pos, Dir, DropVector );
 						break;
 
 						/*===================================================================
 										Spiral Missile
 						===================================================================*/
 					case ENEMYSPIRALMISSILE:
-						DropVector.x = 0.0F;
-						DropVector.y = 0.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+						FireSecondaryEnemySpiralMissile( UpVector, Pos, Dir, DropVector );
 						break;
 						/*===================================================================
 										Photon Missile
 						===================================================================*/
 					case ENEMYHOMINGMISSILE:
-						DropVector.x = 0.0F;
-						DropVector.y = -1.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+						FireSecondaryEnemyHomingMissile( UpVector, Pos, Dir, DropVector );
 						break;
 						/*===================================================================
 										Blue Photon Missile
 						===================================================================*/
 					case ENEMYBLUEHOMINGMISSILE:
-						DropVector.x = 0.0F;
-						DropVector.y = -1.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+						FireSecondaryEnemyBlueHomingMissile( UpVector, Pos, Dir, DropVector );
 						break;
 						/*===================================================================
 										Blue Photon Missile
 						===================================================================*/
 					case ENEMYFIREBALL:
-						DropVector.x = 0.0F;
-						DropVector.y = -1.0F;
-						DropVector.z = 0.0F;
-
-						ApplyMatrix( &Ships[WhoIAm].Object.FinalMat, &DropVector, &DropVector ); /* Calc Drop Vector */
-						Pos.x = ( DropVector.x * SEC_LAUNCH_OFFSET );
-						Pos.y = ( DropVector.y * SEC_LAUNCH_OFFSET );
-						Pos.z = ( DropVector.z * SEC_LAUNCH_OFFSET );
-						InitOneSecBull( OWNER_SHIP, WhoIAm, ++Ships[ WhoIAm ].SecBullIdCount,
-										Ships[WhoIAm].Object.Group, &Ships[ WhoIAm ].Object.Pos,
-										&Pos, &Dir, &UpVector, &DropVector, SecondaryToFireLookup[ Ships[ WhoIAm ].Secondary ], false );
+						FireSecondaryEnemyFireball( UpVector, Pos, Dir, DropVector );
 						break;
 					}
 				}
