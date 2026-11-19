@@ -689,18 +689,26 @@ void c3d_clear_bottom_screen(void)
  * being released. Wait until the GPU has finished every queued draw
  * that may still read them (an empty SYNCDRAW frame waits for the
  * queue, as c3d_clear_bottom_screen does), then free them, so the next
- * level loads with that linear memory back. */
+ * level loads with that linear memory back.
+ *
+ * Not when the app is closing (HOME -> Close Software, power off): the
+ * HOME menu holds the GPU by then, so the empty frame never completes and
+ * teardown hung there with the music still playing. Nothing of ours will
+ * draw again, so the buffers are freed without waiting. */
 void c3d_release_level_cache(void)
 {
 	if (s_persistBytes == 0)
 		return;
-	if (s_inFrame)
+	if (!aptShouldClose())
 	{
+		if (s_inFrame)
+		{
+			C3D_FrameEnd(0);
+			s_inFrame = false;
+		}
+		C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 		C3D_FrameEnd(0);
-		s_inFrame = false;
 	}
-	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-	C3D_FrameEnd(0);
 	persist_free_all();
 }
 
