@@ -158,8 +158,6 @@ void * X_calloc( size_t num,size_t size, const char *in_file, int in_line )
 	MemUsed += num * size;
 	BlocksUsed++;
 
-	memset(Pnt,0,size); // redundant: calloc already zeroed the block (this covers only size bytes)
-
 	return Pnt;
 
 }
