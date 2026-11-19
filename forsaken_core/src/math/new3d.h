@@ -184,6 +184,8 @@ inline float FDIV( float num, float div ) { return div * fast_floorf( num / div 
 // colour packing, as in Direct3D's d3dtypes.h
 #define RGBA_MAKE(r, g, b, a)   ((COLOR) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
 #define	RGB_MAKE(r, g, b)    ((COLOR) (((r) << 16) | ((g) << 8) | (b)))
+// as RGBA_MAKE, but each channel masked to 8 bits
+#define RGBA_MAKE2(r, g, b, a)   ((COLOR) (( (DWORD) ((a) & 0xff) << 24) | ( (DWORD) ((r) & 0xff) << 16) | ( (DWORD) ((g) & 0xff) << 8) | (DWORD) ((b) & 0xff)))
 
 // COLOR is packed bgra
 #define RGBA_GETALPHA(rgb)    ((rgb) >> 24)

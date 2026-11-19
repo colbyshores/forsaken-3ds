@@ -35,7 +35,6 @@ constexpr float THERMAL_DEC = (0.25F);
 	Externs
 ===================================================================*/
 
-#define RGBA_MAKE2(r, g, b, a)   ((COLOR) (( (DWORD) ((a) & 0xff) << 24) | ( (DWORD) ((r) & 0xff) << 16) | ( (DWORD) ((g) & 0xff) << 8) | (DWORD) ((b) & 0xff)))
 constexpr auto CUTOFF = ( 5.0F * BLOCKSIZE );
 
 /*===================================================================

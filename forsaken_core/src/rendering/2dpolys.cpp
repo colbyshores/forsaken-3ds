@@ -33,8 +33,6 @@ TPAGEINFO	FmPolyTPages[ MAXTPAGESPERTLOAD + 1 ];
 
 void FadeColour( u_int8_t * Colour, u_int8_t WantedColour, float Speed );
 
-#define RGBA_MAKE2(r, g, b, a)   ((COLOR) (( (DWORD) ((a) & 0xff) << 24) | ( (DWORD) ((r) & 0xff) << 16) | ( (DWORD) ((g) & 0xff) << 8) | (DWORD) ((b) & 0xff)))
-
 /*===================================================================
 	Procedure	:	Init Faceme poly structures
 	Input		:	Nothing
