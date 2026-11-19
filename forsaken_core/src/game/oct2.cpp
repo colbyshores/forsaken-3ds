@@ -1680,6 +1680,1086 @@ char NodeName[256];
   Output    :   nothing
 ===================================================================*/
 
+/* STATUS_WaitingToStartSinglePlayer -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusWaitingToStartSinglePlayer( int & WaitFrames, bool & done )
+{
+	DebugState("STATUS_WaitingToStartSinglePlayer\n");
+
+	if( DisplayTitle() != true )
+	{
+		SeriousError = true;
+		return false;
+	}
+
+	done = VduFinished( &MENU_NEW_BetweenLevels );
+
+	if ( done )
+		WaitFrames--;
+	if ( !WaitFrames )
+	{
+		WaitFrames = 2;
+		StartASinglePlayerGame( nullptr );
+	}
+
+	return true;
+}
+
+/* STATUS_WaitingToStartEndGameSequence -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusWaitingToStartEndGameSequence( int & WaitFrames, bool & done )
+{
+	DebugState("STATUS_WaitingToStartEndGameSequence\n");
+	if( DisplayTitle() != true )
+	{
+		SeriousError = true;
+		return false;
+	}
+	done = VduFinished( &MENU_NEW_GeneralLoading );
+
+	if ( done )
+		WaitFrames--;
+	if ( !WaitFrames )
+	{
+		WaitFrames = 2;
+		MyGameStatus = STATUS_Title;
+		ReleaseView();
+	}
+	return true;
+}
+
+/* STATUS_WaitingToStartMultiPlayerHost -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusWaitingToStartMultiPlayerHost( int & WaitFrames )
+{
+	DebugState("STATUS_WaitingToStartMultiPlayerHost\n");
+	Browl -= framelag;
+
+	if( Browl <= 0.0F )
+	{
+		Browl = 30.0F;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	}
+	ReceiveGameMessages();
+
+	if( DisplayTitle() != true )
+	{
+		SeriousError = true;
+		return false;
+	}
+	if ( VduFinished( nullptr ) )
+		WaitFrames--;
+	if ( !WaitFrames )
+	{
+		WaitFrames = 2;
+		MyGameStatus = STATUS_StartingMultiplayer;
+		GoToSynchup( nullptr );
+	}
+	return true;
+}
+
+/* STATUS_WaitingToStartMultiPlayerClient -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusWaitingToStartMultiPlayerClient( int & WaitFrames )
+{
+	DebugState("STATUS_WaitingToStartMultiPlayerClient\n");
+	Browl -= framelag;
+
+	if( Browl <= 0.0F )
+	{
+		Browl = 30.0F;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	}
+	ReceiveGameMessages();
+
+	if( DisplayTitle() != true )
+	{
+		SeriousError = true;
+		return false;
+	}
+	if ( VduFinished( nullptr ) )
+		WaitFrames--;
+	if ( !WaitFrames )
+	{
+		WaitFrames = 2;
+		LastMenu = CurrentMenu;
+		VduClear();
+		MenuAbort();
+		ReleaseView();
+		LevelNum = -1;
+
+		MyGameStatus = STATUS_PreStartingMultiplayerSynch;
+		if( !ChangeLevel() )
+			return( false );
+	}
+	return true;
+}
+
+/* STATUS_Normal -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusNormal( u_int16_t & i )
+{
+	DebugState("STATUS_Normal\n");
+
+	if ( !CheatsDisabled )
+		DisableCheats();
+
+	if( IMustQuit )
+		SpecialDestroyGame();
+
+	if( MainGame() != true )
+		return false;
+
+	if ( bSoundEnabled )
+	{
+		ProcessLoopingSfx();
+	}
+
+	LevelTimeTaken += timer_run( &level_timer );
+
+	// if player is quiting nothing should stop him.....
+	if( MyGameStatus != STATUS_QuitCurrentGame )
+	{
+		if( IsHost )
+		{
+			if( NewLevelNum != LevelNum )
+			{
+				for( i = 0 ; i < MAX_PLAYERS ; i++ )
+					if( (GameStatus[i] != STATUS_LeftCrashed ) &&
+						(GameStatus[i] != STATUS_Left        ) &&
+						(GameStatus[i] != STATUS_Null        ) &&
+						(GameStatus[i] != STATUS_Normal      ) &&
+						i != WhoIAm )
+						SendGameMessage(MSG_YOUQUIT, 0, (BYTE) i , 0, 0);
+
+				// the level has ended or changed ..tell everyone to go onto new level
+				MyGameStatus = STATUS_LevelEnd;
+				GameStatus[WhoIAm] = MyGameStatus;
+				RandomStartPosModify += 1;
+				SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+			}
+		}
+		else
+		{
+			if( OverallGameStatus == STATUS_LevelEnd )
+			{
+				// tell the host that I am now in the same state as him....
+				MyGameStatus = OverallGameStatus;
+				GameStatus[WhoIAm] = MyGameStatus;
+				SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+			}
+		}
+	}
+
+	if ( WaitingToQuit )
+	{
+		clear_black();
+		CenterPrint4x5Text( PLEASE_WAIT, (render_info.window_size.cy>>1)-(FontHeight>>1) , 2 );
+		SelectQuitCurrentGame( nullptr );
+	}
+	return true;
+}
+
+/* STATUS_LevelEnd */
+[[gnu::always_inline]] static inline void RenderStatusLevelEnd( u_int16_t & i )
+{
+	DebugState("STATUS_LevelEnd\n");
+
+	clear_black();
+	ReceiveGameMessages();
+	Browl -= framelag;
+
+	if( Browl <= 0.0F )
+	{
+		if( IsHost )
+			SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+		else
+			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+		Browl = 30.0F;
+	}
+	if( IsHost )
+	{
+		// have all the enabled players switched over to STATUS_LevelEnd??
+		for( i = 0 ; i < MAX_PLAYERS ; i++ )
+		{
+			if( ( Ships[i].enable != 0 ) && ( GameStatus[i] != STATUS_LevelEnd ) && ( i != WhoIAm ) )
+				break;
+		}
+		if( i != MAX_PLAYERS )
+			return;  // not yet..
+
+		// un load all graphics
+		ReleaseView();
+		ReleaseLevel();
+
+		// tell them all they can now look at the scores...
+		MyGameStatus = STATUS_ViewingScore;
+		GameStatus[WhoIAm] = MyGameStatus;
+		SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+
+		InitScene();  // STATSTEST
+		InitView();
+
+		NextworkOldBikeNum = -1;
+		HostMultiPlayerTimeout = 60.0F * 60.0F * 2.0F * 2.0F;
+
+	}
+	else
+	{
+		if( MyGameStatus != OverallGameStatus )
+		{
+
+			OutputVisiStats( &Mloadheader, LevelNames[ LevelNum ] );
+			// un load all graphics
+			ReleaseView();
+			ReleaseLevel();
+			// tell the host that I am now in the same state as him....
+			MyGameStatus = STATUS_ViewingScore;
+
+			GameStatus[WhoIAm] = MyGameStatus;
+			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+
+			InitScene();  // STATSTEST
+			InitView();
+
+			NextworkOldBikeNum = -1;
+			HostMultiPlayerTimeout = 60.0F * 60.0F * 2.0F * 2.0F;
+		}
+	}
+}
+
+/* STATUS_ViewingScore -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusViewingScore(  )
+{
+	DebugState("STATUS_ViewingScore\n");
+
+	ReceiveGameMessages();
+
+	Browl -= framelag;
+	if( Browl <= 0.0F )
+	{
+		if( IsHost )
+			SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+		else
+			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+		Browl = 30.0F;
+	}
+
+	if (!FSBeginScene())
+	{
+		Msg( "DisplayTitle() : BeginScene failed\n" );
+		return false;
+	}
+
+	if (ClearBuffers() != true )
+	{
+		Msg( "DisplayTitle() : ClearBuffers failed\n" );
+		return false;
+	}
+
+	ScoreDisplay();
+
+	if( !DisplaySolidScrPolys( &RenderBufs[ 3 ] ) )
+		return false;
+
+	if (!FSEndScene())
+	{
+		Msg( "DisplayTitle() : EndScene failed\n" );
+		return false;
+	}
+
+	ScreenPolyProcess(); // only needed for flashing text
+
+	HostMultiPlayerTimeout -= framelag;
+
+	if( input_buffer_find( SDLK_SPACE ) || ( OverallGameStatus == STATUS_WaitingAfterScore ) )
+	{
+		clear_black();
+		HostMultiPlayerTimeout = 60.0F * 60.0F * 2.0F;
+
+		if( IsHost )
+		{
+			// tell them all I Am waiting
+			ReleaseView();
+			MyGameStatus = STATUS_WaitingAfterScore;
+			GameStatus[WhoIAm] = MyGameStatus;
+			SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+			if( !ChangeLevel() )
+				return( false );
+		}
+		else
+		{
+			// tell the host that I am now Waiting for him to finish viewing the score....
+			ReleaseView();
+			MyGameStatus = STATUS_WaitingAfterScore;
+			GameStatus[WhoIAm] = MyGameStatus;
+			if( !ChangeLevel() )
+				return( false );
+		}
+	}
+	return true;
+}
+
+/* STATUS_WaitingAfterScore */
+[[gnu::always_inline]] static inline void RenderStatusWaitingAfterScore( u_int16_t & i, u_int16_t & e, char (&buf)[256] )
+{
+	DebugState("STATUS_WaitingAfterScore\n");
+
+	clear_black();
+	e = 0;
+
+	if( IsHost )
+	{
+		Printu_int16_t( (u_int16_t) (HostMultiPlayerTimeout / 60.0F) , 0 , 0 , 2 );
+		HostMultiPlayerTimeout -= framelag;
+	}
+
+	// you must clear player scores if MaxKills limit is set...
+	// other wise the game just keeps on changing levels...
+	// cause at the start of each level they already have max kills...
+
+	// reset all player's stats
+	if( MaxKills || ResetKillsPerLevel )
+		ResetAllStats();
+
+	for( i = 0 ; i < MAX_PLAYERS ; i++ )
+	{
+		if( (GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && (GameStatus[i] != STATUS_Null ) )
+		{
+
+			{
+				snprintf( buf, sizeof( buf ), "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
+				CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_WaitingAfterScore ? 2 : 1 );
+			}
+
+			e++;
+		}
+	}
+
+	CenterPrint4x5Text( "waiting for all other players" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , (colourflash>>3) &3);
+
+	Browl -= framelag;
+	if( Browl < 0.0F )
+	{
+		colourflash++;
+		if( IsHost )
+			SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+		else
+			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+		Browl = 30.0F;
+	}
+	ReceiveGameMessages();
+
+	if( IsHost )
+	{
+
+		// have all the enabled players switched over to STATUS_LevelEnd??
+		for( i = 0 ; i < MAX_PLAYERS ; i++ )
+		{
+			if( ( ( ( GameStatus[ i ] >= STATUS_InitView_0 ) && ( GameStatus[ i ] <= STATUS_InitView_9 ) ) || ( GameStatus[i] == STATUS_ViewingScore ) ) && ( i != WhoIAm ) ) break;
+		}
+		if( HostMultiPlayerTimeout >= 0.0F )
+		{
+			if( i != MAX_PLAYERS )
+				return;  // not yet..
+		}
+		// tell them all they can now restart a new level...
+		if( CountDownOn )
+		{
+			CreateCountdownDigits();
+			StartCountDown( (int16_t) TimeLimit.value, 0 );
+		}
+
+		MyGameStatus = STATUS_Normal;
+		GameStatus[WhoIAm] = MyGameStatus;
+		SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+
+	}else{
+		if( OverallGameStatus == STATUS_Normal )
+		{
+			if( CountDownOn )
+			{
+				CreateCountdownDigits();
+				StartCountDown( (int16_t) TimeLimit.value, 0 );
+			}
+			// tell the host that I am now in the same state as him....
+			MyGameStatus = OverallGameStatus;
+			GameStatus[WhoIAm] = MyGameStatus;
+			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+		}
+	}
+}
+
+/* STATUS_StartingMultiplayer -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusStartingMultiplayer(  )
+{
+	DebugState("STATUS_StartingMultiplayer\n");
+
+	Browl -= framelag;
+
+	if( Browl <= 0.0F )
+	{
+		Browl = 30.0F;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	}
+
+	ReceiveGameMessages();
+
+	if( ( MyGameStatus == STATUS_QuitCurrentGame ) || ( MyGameStatus == STATUS_Title ) )
+	{
+		return true;
+	}
+
+	if( ( CurrentMenu ) && ( CurrentMenuItem ) )
+	{
+		if( DisplayTitle() != true )
+			return false;
+	}
+
+	// if status has been changed from titles, should exit this state straight away
+	if ( MyGameStatus != STATUS_StartingMultiplayer )
+		return true;
+
+	if( ( IsHost ) && ( !CurrentMenu ) && ( !CurrentMenuItem ) )
+	{
+		clear_black();
+		ReleaseView();
+		// tell them all to load up a level
+		MyGameStatus = STATUS_StartingMultiplayerSynch;
+		GameStatus[WhoIAm] = MyGameStatus;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+
+		LevelNum = -1;
+		if( !ChangeLevel() ) return( false );
+		HostMultiPlayerTimeout = 60.0F * 15.0F;
+	}
+	else
+	{
+		if( !IsHost )
+		{
+			if( ( OverallGameStatus == STATUS_StartingMultiplayerSynch ) ||
+				( (OverallGameStatus == STATUS_Normal) && (!TeamGame || PlayerReady[WhoIAm]) ) )
+			{
+
+				if ((CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
+				{
+					MenuChangeEx( &MENU_NEW_GeneralLoading );
+					MenuDraw( CurrentMenu );  // because menu processing will not be done when MyGameStatus changes
+				}
+				else
+				{
+					clear_black();
+				}
+
+
+				PreSynchupStatus = MyGameStatus;
+				MyGameStatus = STATUS_WaitingToStartMultiPlayerClient;
+			}
+		}
+	}
+	return true;
+}
+
+/* STATUS_PreStartingMultiplayerSynch */
+[[gnu::always_inline]] static inline void RenderStatusPreStartingMultiplayerSynch(  )
+{
+	DebugState("STATUS_PreStartingMultiplayerSynch\n");
+
+	ReceiveGameMessages();
+	if( IMustQuit )
+	{
+		SpecialDestroyGame();
+		return;
+	}
+	MyGameStatus = STATUS_StartingMultiplayerSynch;
+	if( OverallGameStatus == STATUS_Normal )
+	{
+		initShip( WhoIAm );
+		MyGameStatus = STATUS_Joining;
+		Browl = 0.0F;
+	}else{
+		smallinitShip( WhoIAm );
+		MyGameStatus = STATUS_StartingMultiplayerSynch;
+	}
+	SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	GameStatus[WhoIAm] = MyGameStatus;
+	PrintInitViewStatus( MyGameStatus );
+}
+
+/* STATUS_StartingMultiplayerSynch */
+[[gnu::always_inline]] static inline void RenderStatusStartingMultiplayerSynch( u_int16_t & i, u_int16_t & e, char (&buf)[256] )
+{
+	DebugState("STATUS_StartingMultiplayerSynch\n");
+
+	ReceiveGameMessages();
+
+	if( IMustQuit )
+	{
+		SpecialDestroyGame();
+		return;
+	}
+
+	clear_black();
+	e = 0;
+
+	for( i = 0 ; i < MAX_PLAYERS ; i++ )
+	{
+		if( ( GameStatus[i] != STATUS_GetPlayerNum )&& (GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && (GameStatus[i] != STATUS_Null ) )
+		{
+			snprintf( buf, sizeof( buf ), "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
+			CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_StartingMultiplayerSynch ? 2 : 1 );
+			e++;
+		}
+	}
+
+	CenterPrint4x5Text( "all players synching" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , (colourflash>>3) &3);
+	Browl -= framelag;
+	if( Browl <= 0.0F )
+	{
+		colourflash++;
+		Browl = 30.0F;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	}
+
+	if( CountDownOn )
+	{
+		CreateCountdownDigits();
+		StartCountDown( (int16_t) TimeLimit.value, 0 );
+		IllegalTime = false;
+	}
+
+	if( IsHost )
+	{
+		Printu_int16_t( (u_int16_t) (HostMultiPlayerTimeout / 60.0F) , 0 , 0 , 2 );
+		HostMultiPlayerTimeout -= framelag;
+
+		// have all the enabled players switched over to STATUS_StartingMultiplayer??
+		for( i = 0 ; i < MAX_PLAYERS ; i++ )
+		{
+			if( (GameStatus[i] != STATUS_GetPlayerNum ) &&(GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && ( (GameStatus[i] != STATUS_Null ) && ( GameStatus[i] != STATUS_StartingMultiplayerSynch ) ) && ( i != WhoIAm ) )
+				break;
+		}
+		if( HostMultiPlayerTimeout >= 0.0F )
+		{
+			if( i != MAX_PLAYERS )
+				return;  // not yet..
+		}
+		// tell them all they can now restart a new level...
+		DebugPrintf("STATUS_StartingMultiplayerSynch setting MyGameStatus to STATUS_Normal\n");
+		MyGameStatus = STATUS_Normal;
+		GameStatus[WhoIAm] = STATUS_Normal;
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+
+		// $$$
+		NextworkOldBikeNum = -1;
+
+		input_grab( true );
+
+	}
+	else
+	{
+		if( OverallGameStatus == STATUS_Normal )
+		{
+			MyGameStatus = OverallGameStatus;
+			GameStatus[WhoIAm] = MyGameStatus;
+			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+			// $$$
+			NextworkOldBikeNum = -1;
+		}
+	}
+}
+
+/* STATUS_QuitCurrentGame */
+[[gnu::always_inline]] static inline void RenderStatusQuitCurrentGame(  )
+{
+	DebugState("STATUS_QuitCurrentGame\n");
+
+	OutputVisiStats( &Mloadheader, LevelNames[ LevelNum ] );
+	MenuAbort();
+	MenuRestart( &MENU_Start );
+	DestroyGame();  // DestroyGame changes MyGameStatus..So Set it back
+	MyGameStatus = STATUS_QuitCurrentGame;
+	ReleaseView();
+	ReleaseLevel();
+	MyGameStatus = STATUS_Title;
+#ifdef __3DS__
+	/* Wipe the gameplay HUD off the bottom screen — the title screen
+	 * never draws there, so without this the last HUD frame stays
+	 * frozen until the next gameplay session takes over. */
+	c3d_clear_bottom_screen();
+#endif
+	InitScene();
+	InitView();
+
+}
+
+/* STATUS_GetPlayerNum */
+[[gnu::always_inline]] static inline void RenderStatusGetPlayerNum( char (&buf)[256] )
+{
+	DebugState("STATUS_GetPlayerNum\n");
+
+	clear_black();
+	ReceiveGameMessages();
+
+	CenterPrint4x5Text( "Requesting Player Number" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , 2 );
+
+	snprintf( &buf[0] , sizeof( buf ), "Attempt %d\n" , GetPlayerNumCount );
+	CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-(FontHeight>>1) , 2 );
+
+	GetPlayerNumCount1 -= framelag;
+	GetPlayerNumCount2 -= framelag;
+
+	if( WhoIAm != UNASSIGNED_SHIP )
+	{
+		if(WhoIAm >= MAX_PLAYERS)
+		{
+			switch(WhoIAm)
+			{
+			case MAX_PLAYERS:
+				PrintErrorMessage ( "The Game is Currently Un-Joinable", 3, nullptr, ERROR_USE_MENUFUNCS );
+				MyGameStatus = STATUS_Title;
+				break;
+			case MAX_PLAYERS+1:
+				PrintErrorMessage ( "You Dont have the level they are playing", 3, nullptr, ERROR_USE_MENUFUNCS );
+				MyGameStatus = STATUS_Title;
+				break;
+			case MAX_PLAYERS+2:
+				PrintErrorMessage ( "The Game is Full", 3, nullptr, ERROR_USE_MENUFUNCS );
+				MyGameStatus = STATUS_Title;
+				break;
+			case MAX_PLAYERS+3:
+				PrintErrorMessage ( "You do have the right version", 3, nullptr, ERROR_USE_MENUFUNCS );
+				MyGameStatus = STATUS_Title;
+				break;
+			default:
+				PrintErrorMessage ( "Could not join game host gave no reason why", 3, nullptr, ERROR_USE_MENUFUNCS );
+				MyGameStatus = STATUS_Title;
+			}
+			return; // we are done
+		}
+
+		// go to next menu
+		MenuState = MENUSTATE_Select;
+		MenuChangeEx( GetPlayerNumMenu );
+
+		return;
+	}
+
+	if( GetPlayerNumCount2 <= 0.0F )
+	{
+		// Time is Up No Player Number was got so quit back to the title screen...
+		PrintErrorMessage ( "Couldnt Get a Player Number", 3, nullptr, ERROR_USE_MENUFUNCS );
+		MyGameStatus = STATUS_Title;
+		return;
+	}
+
+	if( GetPlayerNumCount1 <= 0.0F )
+	{
+		GetPlayerNumCount++;
+
+		// Time to send another request for a Player Number...
+		GetPlayerNumCount1 = 60.0F;   // approx 1 Second...
+		SendGameMessage(MSG_HEREIAM, 0, 0, 0, 0); // can I join your game...
+		DebugPrintf("sending MSG_HEREIAM\n");
+	}
+
+}
+
+/* STATUS_InitView_0 -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusInitView0(  )
+{
+	DebugState("STATUS_InitView_0\n");
+
+	if( IsHost )
+	{
+		SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
+	}
+	else
+	{
+		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	}
+
+	clear_black();
+
+	JustExitedMenu = false;
+
+	QuickStart = QuickStartMode::None;
+	WaitingToQuit = false;
+
+	ReceiveGameMessages();
+	if( !SetMatrixViewPort() )
+	{
+		SeriousError = true;
+		Msg( "SetMatrixViewPort() failed\n" );
+		return false;
+	}
+	InitFont();
+
+
+	InitSkinExecs();
+	InitPortalExecs();
+	InitRenderBufs();
+
+	// Init the Texture Handler
+	if( !InitTload( &Tloadheader ) )
+	{
+		SeriousError = true;
+		Msg( "InitTLoad failed\n" );
+		return false;
+	}
+
+	//  Prep the Texture Handler.....
+	if( !PreMload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
+	{
+		SeriousError = true;
+		return false; // the model and visipoly data
+	}
+
+	// Can Cope with no .Wat file!!!
+	PreWaterLoad( (char*) &WaterNames[LevelNum][0] );
+
+	if( OnceOnlyChangeLevel )
+	{
+		OnceOnlyChangeLevel = false;
+		if( !PreLoadShips() )
+		{
+			SeriousError = true;
+			return false;
+		}
+		if( !PreLoadBGOFiles() )
+		{
+			SeriousError = true;
+			return false;
+		}
+		if( !PreLoadEnemies() )
+		{
+			SeriousError = true;
+			return false;
+		}
+#ifdef EDITION_REMASTER
+		/* Reserve ModelNames[] slots for the N64 single-mesh pickups
+		 * (extracted from ForsakenEX.kpf). Must run after PreLoadEnemies
+		 * (which writes back to NextNewModel) so the pickup slots end
+		 * up past the enemy slots. PreInitModel below loads everything
+		 * registered up to NextNewModel. */
+		{
+			if( !PreLoadPickups() )
+			{
+				SeriousError = true;
+				return false;
+			}
+		}
+#endif /* EDITION_REMASTER */
+	}
+
+	EnableRelavantModels( &ModelNames[0] );
+	if( !PreInitModel( &ModelNames[0] ) )
+	{
+		SeriousError = true;
+		return false;
+	}
+	if( !Load_All_Off_Files( &OffsetFiles[ 0 ] ) )
+	{
+		SeriousError = true;
+		return false;
+	}
+	//  Load in And if nescessary ReScale Textures...
+	if( !Tload( &Tloadheader ) )
+	{
+		SeriousError = true;
+		return false;
+	}
+
+	if( !InitModel( &ModelNames[0] ) )
+	{
+		SeriousError = true;
+		return false;               // all 3d models....
+	}
+
+	if( !Mload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
+	{
+		SeriousError = true;
+		return false; // the model and visipoly data
+	}
+
+	InitVisiStats( &Mloadheader );
+
+	if ( !Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 0 ] ) )
+	{
+		SeriousError = true;
+		Msg( "Bspload failed\n" );
+		return false;   // the collision data
+	}
+
+	// might not be any water...
+	WaterLoad();
+
+	ReadTxtFile( (char*) &TextNames[LevelNum][0] );
+
+	ReadMsgFile( (char*) &MsgNames[LevelNum][0] );
+
+	if( !MCload( (char*) &CollisionNames[LevelNum][0] , &MCloadheader ) )
+	{
+		SeriousError = true;
+		Msg( "MCload non zero failed\n" );
+		return false;   // the collision data
+	}
+	if( !MCload( (char*) &CollisionZNames[LevelNum][0] , &MCloadheadert0 ) )
+	{
+		SeriousError = true;
+		Msg( "MCload zero failed\n" );
+		return false; // the collision data skin thickness 0
+	}
+
+	InitSoundInfo( &Mloadheader );
+
+	InitShipSpeeds();
+
+	// this will cause a lovely game loop and crash the game
+	// so don't remove this !!!!!!!!!
+	if( InitView_MyGameStatus != STATUS_InitView_0 )
+		MyGameStatus = InitView_MyGameStatus;
+
+	return true;
+}
+
+/* STATUS_StartingSinglePlayer -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusStartingSinglePlayer(  )
+{
+	DebugState("STATUS_StartingSinglePlayer\n");
+
+	MenuAbort();
+	ReleaseView();
+
+	MyGameStatus = STATUS_PostStartingSinglePlayer;
+	GameStatus[WhoIAm] = MyGameStatus;
+	SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
+	LevelNum = -1;
+	if( !NewLevelNum )
+	{
+		NumGoldBars = 0;
+		CrystalsFound = 0;
+	}
+	GameCompleted = GameComplete::NotComplete;
+	if( !ChangeLevel() ) return( false );
+#ifdef __3DS__
+	/* [3DS] Clear the colour buffer to black after level load completes.
+	 *
+	 * ChangeLevel() contains its own internal render loop (STATUS_InitView_0,
+	 * STATUS_ChangeLevelPostInitView, etc.) that renders loading-screen frames
+	 * into the colour buffer and pumps c3d_present(), updating GX
+	 * display buffer A.  When ChangeLevel returns, one of the two GX display
+	 * buffers (A) still contains the last loading-screen frame.
+	 *
+	 * On the STATUS_StartingSinglePlayer break, c3d_present() is called once
+	 * more by platform_render_present(); this frame uses whatever is currently
+	 * in the colour buffer (the last loading frame).  That result is
+	 * DMA'd into GX display buffer B, contaminating the second buffer too.
+	 *
+	 * Fix: clear the colour buffer to black here so that the
+	 * c3d_present() call at the end of this frame sends black to display B
+	 * instead of the stale loading frame.  STATUS_PostStartingSinglePlayer
+	 * (next frame) clears it again, which sends black to display A.
+	 * Both GX display buffers are now black before the first gameplay frame
+	 * renders, eliminating the alternating stale-frame flicker. */
+	FSClearBlack();
+#endif
+	return true;
+}
+
+/* STATUS_PostStartingSinglePlayer */
+[[gnu::always_inline]] static inline void RenderStatusPostStartingSinglePlayer(  )
+{
+	DebugState("STATUS_PostStartingSinglePlayer\n");
+
+#ifdef __3DS__
+	/* [3DS] Second black-frame clear — flushes the remaining GX display buffer.
+	 *
+	 * The GX double-buffer scheme means there are always two display buffers
+	 * (A and B) alternating each swap.  STATUS_StartingSinglePlayer's
+	 * FSClearBlack() + c3d_present() cleared buffer B.  This frame's
+	 * FSClearBlack() + c3d_present() clears buffer A.  After both frames
+	 * complete, both display buffers contain black and neither holds stale
+	 * loading-screen or title-screen content.  The first STATUS_SinglePlayer
+	 * frame renders real gameplay into clean buffers. */
+	FSClearBlack();
+
+	/* [3DS] Eliminate stale ESCAPE injection that opens MENU_InGameSingle.
+	 *
+	 * Three-step fix:
+	 *
+	 * 1. hidScanInput() — updates the libctru HID "previous state" baseline.
+	 *    ChangeLevel() blocks for several seconds without calling hidScanInput(),
+	 *    so buttons pressed during loading appear as kDown (fresh press) on the
+	 *    first post-load handle_events() scan.  Calling it here means the next
+	 *    handle_events() scan sees those buttons as kHeld, not kDown — so no
+	 *    spurious SDLK_ESCAPE is injected on Frame N+1.
+	 *
+	 * 2. input_buffer_reset() — clears any SDLK_ESCAPE that THIS frame's
+	 *    handle_events() already added before we ran.  handle_events() runs
+	 *    first in the main loop (before RenderScene), so the escape key is
+	 *    already in input_buffer by the time we reach STATUS_PostStartingSinglePlayer.
+	 *    ProcessGameKeys() is only called from STATUS_SinglePlayer (next frame),
+	 *    but we clear the buffer here so the next frame's handle_events()
+	 *    input_buffer_reset() at line 151 has a clean slate.
+	 *
+	 * 3. MenuAbort() — directly sets CurrentMenu = NULL as a hard safety net.
+	 *    Even if SDLK_ESCAPE somehow reached MenuRestart via an earlier code
+	 *    path, this ensures no menu is active when STATUS_SinglePlayer begins.
+	 */
+	hidScanInput();
+	input_buffer_reset();
+	MenuAbort();
+	_gameplay_start_guard = true;  /* arm one-shot for STATUS_SinglePlayer */
+#endif
+
+	smallinitShip( WhoIAm );
+
+	MyGameStatus = STATUS_SinglePlayer;
+	GameStatus[WhoIAm] = MyGameStatus;
+	LevelTimeTaken = 0.0F;
+	timer_run( &level_time );
+
+	input_grab( true );
+
+	if( SavedGameDamaged )
+	{
+		AddColourMessageToQue( SystemMessageColour, SAVED_GAME_DAMAGED );
+		SavedGameDamaged = false;
+	}
+
+}
+
+/* STATUS_SinglePlayer -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusSinglePlayer(  )
+{
+	DebugState("STATUS_SinglePlayer\n");
+
+#ifdef __3DS__
+	/* [3DS] One-shot guard: on the very first STATUS_SinglePlayer frame, clear
+	 * any SDLK_ESCAPE that handle_events() may have injected this frame
+	 * (from stale kDown of buttons held during ChangeLevel), and ensure
+	 * CurrentMenu is NULL.  This fires BEFORE MainGame() / ProcessGameKeys()
+	 * so no spurious MENU_InGameSingle can open on the first gameplay frame. */
+	if (_gameplay_start_guard) {
+		_gameplay_start_guard = false;
+		input_buffer_reset();
+		MenuAbort();
+		/* Flush any accumulated screen polys (menu text, VDU text) that were
+		 * added during the title/loading phase but never killed.  Without this
+		 * they all render on the first gameplay frame producing the hall-of-
+		 * mirrors text overlay. */
+		/* Kill ALL persistent screen polys (menu items, VDU text, level
+		 * description text) left over from the title screen.  VduClear() only
+		 * clears VDU-specific entries; InitScrPolys() resets the entire
+		 * ScrPolys[] linked list so nothing stale renders this frame. */
+
+		InitScrPolys();
+	}
+#endif
+
+	if( MainGame() != true )
+		return false;
+
+	if ( bSoundEnabled && !CurrentMenu )
+	{
+		ProcessLoopingSfx();
+		ProcessEnemyBikerTaunt();
+	}
+
+	LevelTimeTaken += timer_run( &level_timer );
+
+	// if player is quiting nothing should stop him.....
+	if( MyGameStatus != STATUS_QuitCurrentGame )
+	{
+		if( IsHost )
+		{
+			if( NewLevelNum != LevelNum )
+			{
+				clear_black();
+				ReleaseView();
+				// the level has ended or changed...
+				MyGameStatus = STATUS_ViewingStats;
+				GameStatus[WhoIAm] = MyGameStatus;
+				InitView();
+			}
+		}
+	}
+	return true;
+}
+
+/* STATUS_ViewingStats */
+[[gnu::always_inline]] static inline void RenderStatusViewingStats(  )
+{
+	DebugState("STATUS_ViewingStats\n");
+
+	clear_black();
+
+	ReleaseLevel();
+
+	ReleaseView();
+
+	MyGameStatus = STATUS_BetweenLevels;
+	InitScene();
+	InitView();
+	MenuAbort();
+	MenuRestart( &MENU_NEW_NumberOfCrystals );
+	CameraStatus = CAMERA_AtRightVDU;
+}
+
+/* STATUS_TitleLoadGameStartingSinglePlayer -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusTitleLoadGameStartingSinglePlayer(  )
+{
+	DebugState("STATUS_TitleLoadGameStartingSinglePlayer\n");
+
+	MenuAbort();
+	ReleaseView();
+	// tell them all to load up a level
+	MyGameStatus = STATUS_TitleLoadGamePostStartingSinglePlayer;
+	GameStatus[WhoIAm] = MyGameStatus;
+	LevelNum = -1;
+	NumGoldBars = 0;
+	CrystalsFound = 0;
+	GameCompleted = GameComplete::NotComplete;
+	if( !ChangeLevel() ) return( false );
+	return true;
+}
+
+/* STATUS_InGameLoadGameStartingSinglePlayer -- false: RenderScene returns false */
+[[gnu::always_inline]] static inline bool RenderStatusInGameLoadGameStartingSinglePlayer(  )
+{
+	DebugState("STATUS_InGameLoadGameStartingSinglePlayer\n");
+
+	NewLevelNum = InGameLoadGameLevelNum;
+	MenuAbort();
+	ReleaseView();
+	// tell them all to load up a level
+	MyGameStatus = STATUS_TitleLoadGamePostStartingSinglePlayer;
+	GameStatus[WhoIAm] = MyGameStatus;
+	LevelNum = -1;
+	NumGoldBars = 0;
+	CrystalsFound = 0;
+	GameCompleted = GameComplete::NotComplete;
+	if( !ChangeLevel() ) return( false );
+	return true;
+}
+
+/* STATUS_TitleLoadGamePostStartingSinglePlayer */
+[[gnu::always_inline]] static inline void RenderStatusTitleLoadGamePostStartingSinglePlayer(  )
+{
+	DebugState("STATUS_TitleLoadGamePostStartingSinglePlayer\n");
+
+	smallinitShip( WhoIAm );
+	if( !InGameLoad( nullptr ) )
+	{
+		/* The save is truncated or damaged, and part of it may already
+		   be applied over the level. Start its level again from the
+		   beginning instead; STATUS_PostStartingSinglePlayer says why. */
+		SavedGameDamaged = true;
+		StartASinglePlayerGame( nullptr );
+		return;
+	}
+
+
+	MyGameStatus = STATUS_SinglePlayer;
+	GameStatus[WhoIAm] = MyGameStatus;
+}
+
 bool RenderScene( void )
 {
 	u_int16_t  i,e;
@@ -1711,105 +2791,26 @@ bool RenderScene( void )
 		break;
 
 	case STATUS_WaitingToStartSinglePlayer:
-		DebugState("STATUS_WaitingToStartSinglePlayer\n");
-
-		if( DisplayTitle() != true )
-		{
-			SeriousError = true;
+		if( !RenderStatusWaitingToStartSinglePlayer( WaitFrames, done ) )
 			return false;
-		}
-
-		done = VduFinished( &MENU_NEW_BetweenLevels );
-
-		if ( done )
-			WaitFrames--;
-		if ( !WaitFrames )
-		{
-			WaitFrames = 2;
-			StartASinglePlayerGame( nullptr );
-		}
-
 		break;
 
 
 	case STATUS_WaitingToStartEndGameSequence:
-		DebugState("STATUS_WaitingToStartEndGameSequence\n");
-		if( DisplayTitle() != true )
-		{
-			SeriousError = true;
+		if( !RenderStatusWaitingToStartEndGameSequence( WaitFrames, done ) )
 			return false;
-		}
-		done = VduFinished( &MENU_NEW_GeneralLoading );
-
-		if ( done )
-			WaitFrames--;
-		if ( !WaitFrames )
-		{
-			WaitFrames = 2;
-			MyGameStatus = STATUS_Title;
-			ReleaseView();
-		}
 		break;
 
 
 	case STATUS_WaitingToStartMultiPlayerHost:
-		DebugState("STATUS_WaitingToStartMultiPlayerHost\n");
-		Browl -= framelag;
-
-		if( Browl <= 0.0F )
-		{
-			Browl = 30.0F;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		}
-		ReceiveGameMessages();
-
-		if( DisplayTitle() != true )
-		{
-			SeriousError = true;
+		if( !RenderStatusWaitingToStartMultiPlayerHost( WaitFrames ) )
 			return false;
-		}
-		if ( VduFinished( nullptr ) )
-			WaitFrames--;
-		if ( !WaitFrames )
-		{
-			WaitFrames = 2;
-			MyGameStatus = STATUS_StartingMultiplayer;
-			GoToSynchup( nullptr );
-		}
 		break;
 
 
 	case STATUS_WaitingToStartMultiPlayerClient:
-		DebugState("STATUS_WaitingToStartMultiPlayerClient\n");
-		Browl -= framelag;
-
-		if( Browl <= 0.0F )
-		{
-			Browl = 30.0F;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		}
-		ReceiveGameMessages();
-
-		if( DisplayTitle() != true )
-		{
-			SeriousError = true;
+		if( !RenderStatusWaitingToStartMultiPlayerClient( WaitFrames ) )
 			return false;
-		}
-		if ( VduFinished( nullptr ) )
-			WaitFrames--;
-		if ( !WaitFrames )
-		{
-			WaitFrames = 2;
-			LastMenu = CurrentMenu;
-			VduClear();
-			MenuAbort();
-			ReleaseView();
-			LevelNum = -1;
-
-			MyGameStatus = STATUS_PreStartingMultiplayerSynch;
-			if( !ChangeLevel() )
-				return( false );
-		}
 		break;
 
 
@@ -1865,290 +2866,24 @@ bool RenderScene( void )
 
 
 	case STATUS_Normal:
-		DebugState("STATUS_Normal\n");
-
-		if ( !CheatsDisabled )
-			DisableCheats();
-
-		if( IMustQuit )
-			SpecialDestroyGame();
-
-		if( MainGame() != true )
+		if( !RenderStatusNormal( i ) )
 			return false;
-
-		if ( bSoundEnabled )
-		{
-			ProcessLoopingSfx();
-		}
-
-		LevelTimeTaken += timer_run( &level_timer );
-
-		// if player is quiting nothing should stop him.....
-		if( MyGameStatus != STATUS_QuitCurrentGame )
-		{
-			if( IsHost )
-			{
-				if( NewLevelNum != LevelNum )
-				{
-					for( i = 0 ; i < MAX_PLAYERS ; i++ )
-						if( (GameStatus[i] != STATUS_LeftCrashed ) &&
-							(GameStatus[i] != STATUS_Left        ) &&
-							(GameStatus[i] != STATUS_Null        ) &&
-							(GameStatus[i] != STATUS_Normal      ) &&
-							i != WhoIAm )
-							SendGameMessage(MSG_YOUQUIT, 0, (BYTE) i , 0, 0);
-
-					// the level has ended or changed ..tell everyone to go onto new level
-					MyGameStatus = STATUS_LevelEnd;
-					GameStatus[WhoIAm] = MyGameStatus;
-					RandomStartPosModify += 1;
-					SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-				}
-			}
-			else
-			{
-				if( OverallGameStatus == STATUS_LevelEnd )
-				{
-					// tell the host that I am now in the same state as him....
-					MyGameStatus = OverallGameStatus;
-					GameStatus[WhoIAm] = MyGameStatus;
-					SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-				}
-			}
-		}
-
-		if ( WaitingToQuit )
-		{
-			clear_black();
-			CenterPrint4x5Text( PLEASE_WAIT, (render_info.window_size.cy>>1)-(FontHeight>>1) , 2 );
-			SelectQuitCurrentGame( nullptr );
-		}
 		break;
 
 
 	case STATUS_LevelEnd:
-		DebugState("STATUS_LevelEnd\n");
-
-		clear_black();
-		ReceiveGameMessages();
-		Browl -= framelag;
-
-		if( Browl <= 0.0F )
-		{
-			if( IsHost )
-				SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-			else
-				SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-			Browl = 30.0F;
-		}
-		if( IsHost )
-		{
-			// have all the enabled players switched over to STATUS_LevelEnd??
-			for( i = 0 ; i < MAX_PLAYERS ; i++ )
-			{
-				if( ( Ships[i].enable != 0 ) && ( GameStatus[i] != STATUS_LevelEnd ) && ( i != WhoIAm ) )
-					break;
-			}
-			if( i != MAX_PLAYERS )
-				break;  // not yet..
-
-			// un load all graphics
-			ReleaseView();
-			ReleaseLevel();
-
-			// tell them all they can now look at the scores...
-			MyGameStatus = STATUS_ViewingScore;
-			GameStatus[WhoIAm] = MyGameStatus;
-			SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-
-			InitScene();  // STATSTEST
-			InitView();
-
-			NextworkOldBikeNum = -1;
-			HostMultiPlayerTimeout = 60.0F * 60.0F * 2.0F * 2.0F;
-
-		}
-		else
-		{
-			if( MyGameStatus != OverallGameStatus )
-			{
-
-				OutputVisiStats( &Mloadheader, LevelNames[ LevelNum ] );
-				// un load all graphics
-				ReleaseView();
-				ReleaseLevel();
-				// tell the host that I am now in the same state as him....
-				MyGameStatus = STATUS_ViewingScore;
-
-				GameStatus[WhoIAm] = MyGameStatus;
-				SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-
-				InitScene();  // STATSTEST
-				InitView();
-
-				NextworkOldBikeNum = -1;
-				HostMultiPlayerTimeout = 60.0F * 60.0F * 2.0F * 2.0F;
-			}
-		}
+		RenderStatusLevelEnd( i );
 		break;
 
 
 	case STATUS_ViewingScore:
-		DebugState("STATUS_ViewingScore\n");
-
-		ReceiveGameMessages();
-
-		Browl -= framelag;
-		if( Browl <= 0.0F )
-		{
-			if( IsHost )
-				SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-			else
-				SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-			Browl = 30.0F;
-		}
-
-		if (!FSBeginScene())
-		{
-			Msg( "DisplayTitle() : BeginScene failed\n" );
+		if( !RenderStatusViewingScore(  ) )
 			return false;
-		}
-
-		if (ClearBuffers() != true )
-		{
-			Msg( "DisplayTitle() : ClearBuffers failed\n" );
-			return false;
-		}
-
-		ScoreDisplay();
-
-		if( !DisplaySolidScrPolys( &RenderBufs[ 3 ] ) )
-			return false;
-
-		if (!FSEndScene())
-		{
-			Msg( "DisplayTitle() : EndScene failed\n" );
-			return false;
-		}
-
-		ScreenPolyProcess(); // only needed for flashing text
-
-		HostMultiPlayerTimeout -= framelag;
-
-		if( input_buffer_find( SDLK_SPACE ) || ( OverallGameStatus == STATUS_WaitingAfterScore ) )
-		{
-			clear_black();
-			HostMultiPlayerTimeout = 60.0F * 60.0F * 2.0F;
-
-			if( IsHost )
-			{
-				// tell them all I Am waiting
-				ReleaseView();
-				MyGameStatus = STATUS_WaitingAfterScore;
-				GameStatus[WhoIAm] = MyGameStatus;
-				SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-				if( !ChangeLevel() )
-					return( false );
-			}
-			else
-			{
-				// tell the host that I am now Waiting for him to finish viewing the score....
-				ReleaseView();
-				MyGameStatus = STATUS_WaitingAfterScore;
-				GameStatus[WhoIAm] = MyGameStatus;
-				if( !ChangeLevel() )
-					return( false );
-			}
-		}
 		break;
 
 
 	case STATUS_WaitingAfterScore:
-		DebugState("STATUS_WaitingAfterScore\n");
-
-		clear_black();
-		e = 0;
-
-		if( IsHost )
-		{
-			Printu_int16_t( (u_int16_t) (HostMultiPlayerTimeout / 60.0F) , 0 , 0 , 2 );
-			HostMultiPlayerTimeout -= framelag;
-		}
-
-		// you must clear player scores if MaxKills limit is set...
-		// other wise the game just keeps on changing levels...
-		// cause at the start of each level they already have max kills...
-
-		// reset all player's stats
-		if( MaxKills || ResetKillsPerLevel )
-			ResetAllStats();
-
-		for( i = 0 ; i < MAX_PLAYERS ; i++ )
-		{
-			if( (GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && (GameStatus[i] != STATUS_Null ) )
-			{
-
-				{
-					snprintf( buf, sizeof( buf ), "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
-					CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_WaitingAfterScore ? 2 : 1 );
-				}
-
-				e++;
-			}
-		}
-
-		CenterPrint4x5Text( "waiting for all other players" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , (colourflash>>3) &3);
-
-		Browl -= framelag;
-		if( Browl < 0.0F )
-		{
-			colourflash++;
-			if( IsHost )
-				SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-			else
-				SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-			Browl = 30.0F;
-		}
-		ReceiveGameMessages();
-
-		if( IsHost )
-		{
-
-			// have all the enabled players switched over to STATUS_LevelEnd??
-			for( i = 0 ; i < MAX_PLAYERS ; i++ )
-			{
-				if( ( ( ( GameStatus[ i ] >= STATUS_InitView_0 ) && ( GameStatus[ i ] <= STATUS_InitView_9 ) ) || ( GameStatus[i] == STATUS_ViewingScore ) ) && ( i != WhoIAm ) ) break;
-			}
-			if( HostMultiPlayerTimeout >= 0.0F )
-			{
-				if( i != MAX_PLAYERS )
-					break;  // not yet..
-			}
-			// tell them all they can now restart a new level...
-			if( CountDownOn )
-			{
-				CreateCountdownDigits();
-				StartCountDown( (int16_t) TimeLimit.value, 0 );
-			}
-
-			MyGameStatus = STATUS_Normal;
-			GameStatus[WhoIAm] = MyGameStatus;
-			SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-
-		}else{
-			if( OverallGameStatus == STATUS_Normal )
-			{
-				if( CountDownOn )
-				{
-					CreateCountdownDigits();
-					StartCountDown( (int16_t) TimeLimit.value, 0 );
-				}
-				// tell the host that I am now in the same state as him....
-				MyGameStatus = OverallGameStatus;
-				GameStatus[WhoIAm] = MyGameStatus;
-				SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-			}
-		}
+		RenderStatusWaitingAfterScore( i, e, buf );
 		break;
 
 
@@ -2239,426 +2974,33 @@ bool RenderScene( void )
 
 		// in the multiplayer screen waiting for the game to start
 	case STATUS_StartingMultiplayer:
-		DebugState("STATUS_StartingMultiplayer\n");
-
-		Browl -= framelag;
-
-		if( Browl <= 0.0F )
-		{
-			Browl = 30.0F;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		}
-
-		ReceiveGameMessages();
-
-		if( ( MyGameStatus == STATUS_QuitCurrentGame ) || ( MyGameStatus == STATUS_Title ) )
-		{
-			break;
-		}
-
-		if( ( CurrentMenu ) && ( CurrentMenuItem ) )
-		{
-			if( DisplayTitle() != true )
-				return false;
-		}
-
-		// if status has been changed from titles, should exit this state straight away
-		if ( MyGameStatus != STATUS_StartingMultiplayer )
-			break;
-
-		if( ( IsHost ) && ( !CurrentMenu ) && ( !CurrentMenuItem ) )
-		{
-			clear_black();
-			ReleaseView();
-			// tell them all to load up a level
-			MyGameStatus = STATUS_StartingMultiplayerSynch;
-			GameStatus[WhoIAm] = MyGameStatus;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-
-			LevelNum = -1;
-			if( !ChangeLevel() ) return( false );
-			HostMultiPlayerTimeout = 60.0F * 15.0F;
-		}
-		else
-		{
-			if( !IsHost )
-			{
-				if( ( OverallGameStatus == STATUS_StartingMultiplayerSynch ) ||
-					( (OverallGameStatus == STATUS_Normal) && (!TeamGame || PlayerReady[WhoIAm]) ) )
-				{
-
-					if ((CameraStatus == CAMERA_AtLeftVDU) || (CameraStatus == CAMERA_AtRightVDU))
-					{
-						MenuChangeEx( &MENU_NEW_GeneralLoading );
-						MenuDraw( CurrentMenu );  // because menu processing will not be done when MyGameStatus changes
-					}
-					else
-					{
-						clear_black();
-					}
-
-
-					PreSynchupStatus = MyGameStatus;
-					MyGameStatus = STATUS_WaitingToStartMultiPlayerClient;
-				}
-			}
-		}
+		if( !RenderStatusStartingMultiplayer(  ) )
+			return false;
 		break;
 
 
 	case  STATUS_PreStartingMultiplayerSynch:
-		DebugState("STATUS_PreStartingMultiplayerSynch\n");
-
-		ReceiveGameMessages();
-		if( IMustQuit )
-		{
-			SpecialDestroyGame();
-			break;
-		}
-		MyGameStatus = STATUS_StartingMultiplayerSynch;
-		if( OverallGameStatus == STATUS_Normal )
-		{
-			initShip( WhoIAm );
-			MyGameStatus = STATUS_Joining;
-			Browl = 0.0F;
-		}else{
-			smallinitShip( WhoIAm );
-			MyGameStatus = STATUS_StartingMultiplayerSynch;
-		}
-		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		GameStatus[WhoIAm] = MyGameStatus;
-		PrintInitViewStatus( MyGameStatus );
+		RenderStatusPreStartingMultiplayerSynch(  );
 		break;
 
 
 	case  STATUS_StartingMultiplayerSynch:
-		DebugState("STATUS_StartingMultiplayerSynch\n");
-
-		ReceiveGameMessages();
-
-		if( IMustQuit )
-		{
-			SpecialDestroyGame();
-			break;
-		}
-
-		clear_black();
-		e = 0;
-
-		for( i = 0 ; i < MAX_PLAYERS ; i++ )
-		{
-			if( ( GameStatus[i] != STATUS_GetPlayerNum )&& (GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && (GameStatus[i] != STATUS_Null ) )
-			{
-				snprintf( buf, sizeof( buf ), "%-8s status %14s\n", &Names[i][0] , &StatusTab[ GameStatus[i] ][0] );
-				CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-( ( (FontHeight+2) * MAX_PLAYERS ) >> 1 )+ (e * (FontHeight+(FontHeight>>1)) ) , GameStatus[i] == STATUS_StartingMultiplayerSynch ? 2 : 1 );
-				e++;
-			}
-		}
-
-		CenterPrint4x5Text( "all players synching" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , (colourflash>>3) &3);
-		Browl -= framelag;
-		if( Browl <= 0.0F )
-		{
-			colourflash++;
-			Browl = 30.0F;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		}
-
-		if( CountDownOn )
-		{
-			CreateCountdownDigits();
-			StartCountDown( (int16_t) TimeLimit.value, 0 );
-			IllegalTime = false;
-		}
-
-		if( IsHost )
-		{
-			Printu_int16_t( (u_int16_t) (HostMultiPlayerTimeout / 60.0F) , 0 , 0 , 2 );
-			HostMultiPlayerTimeout -= framelag;
-
-			// have all the enabled players switched over to STATUS_StartingMultiplayer??
-			for( i = 0 ; i < MAX_PLAYERS ; i++ )
-			{
-				if( (GameStatus[i] != STATUS_GetPlayerNum ) &&(GameStatus[i] != STATUS_LeftCrashed ) && (GameStatus[i] != STATUS_Left ) && ( (GameStatus[i] != STATUS_Null ) && ( GameStatus[i] != STATUS_StartingMultiplayerSynch ) ) && ( i != WhoIAm ) )
-					break;
-			}
-			if( HostMultiPlayerTimeout >= 0.0F )
-			{
-				if( i != MAX_PLAYERS )
-					break;  // not yet..
-			}
-			// tell them all they can now restart a new level...
-			DebugPrintf("STATUS_StartingMultiplayerSynch setting MyGameStatus to STATUS_Normal\n");
-			MyGameStatus = STATUS_Normal;
-			GameStatus[WhoIAm] = STATUS_Normal;
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-
-			// $$$
-			NextworkOldBikeNum = -1;
-
-			input_grab( true );
-
-		}
-		else
-		{
-			if( OverallGameStatus == STATUS_Normal )
-			{
-				MyGameStatus = OverallGameStatus;
-				GameStatus[WhoIAm] = MyGameStatus;
-				SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-				// $$$
-				NextworkOldBikeNum = -1;
-			}
-		}
+		RenderStatusStartingMultiplayerSynch( i, e, buf );
 		break;
 
 
 	case STATUS_QuitCurrentGame:
-		DebugState("STATUS_QuitCurrentGame\n");
-
-		OutputVisiStats( &Mloadheader, LevelNames[ LevelNum ] );
-		MenuAbort();
-		MenuRestart( &MENU_Start );
-		DestroyGame();  // DestroyGame changes MyGameStatus..So Set it back
-		MyGameStatus = STATUS_QuitCurrentGame;
-		ReleaseView();
-		ReleaseLevel();
-		MyGameStatus = STATUS_Title;
-#ifdef __3DS__
-		/* Wipe the gameplay HUD off the bottom screen — the title screen
-		 * never draws there, so without this the last HUD frame stays
-		 * frozen until the next gameplay session takes over. */
-		c3d_clear_bottom_screen();
-#endif
-		InitScene();
-		InitView();
-
+		RenderStatusQuitCurrentGame(  );
 		break;
 
 	case STATUS_GetPlayerNum:
-		DebugState("STATUS_GetPlayerNum\n");
-
-		clear_black();
-		ReceiveGameMessages();
-
-		CenterPrint4x5Text( "Requesting Player Number" , (render_info.window_size.cy>>1)-(FontHeight>>1) + ( ( FontHeight+2) * (MAX_PLAYERS+1)) , 2 );
-
-		snprintf( &buf[0] , sizeof( buf ), "Attempt %d\n" , GetPlayerNumCount );
-		CenterPrint4x5Text( &buf[0] , (render_info.window_size.cy>>1)-(FontHeight>>1) , 2 );
-
-		GetPlayerNumCount1 -= framelag;
-		GetPlayerNumCount2 -= framelag;
-
-		if( WhoIAm != UNASSIGNED_SHIP )
-		{
-			if(WhoIAm >= MAX_PLAYERS)
-			{
-				switch(WhoIAm)
-				{
-				case MAX_PLAYERS:
-					PrintErrorMessage ( "The Game is Currently Un-Joinable", 3, nullptr, ERROR_USE_MENUFUNCS );
-					MyGameStatus = STATUS_Title;
-					break;
-				case MAX_PLAYERS+1:
-					PrintErrorMessage ( "You Dont have the level they are playing", 3, nullptr, ERROR_USE_MENUFUNCS );
-					MyGameStatus = STATUS_Title;
-					break;
-				case MAX_PLAYERS+2:
-					PrintErrorMessage ( "The Game is Full", 3, nullptr, ERROR_USE_MENUFUNCS );
-					MyGameStatus = STATUS_Title;
-					break;
-				case MAX_PLAYERS+3:
-					PrintErrorMessage ( "You do have the right version", 3, nullptr, ERROR_USE_MENUFUNCS );
-					MyGameStatus = STATUS_Title;
-					break;
-				default:
-					PrintErrorMessage ( "Could not join game host gave no reason why", 3, nullptr, ERROR_USE_MENUFUNCS );
-					MyGameStatus = STATUS_Title;
-				}
-				break; // we are done
-			}
-
-			// go to next menu
-			MenuState = MENUSTATE_Select;
-			MenuChangeEx( GetPlayerNumMenu );
-
-			break;
-		}
-
-		if( GetPlayerNumCount2 <= 0.0F )
-		{
-			// Time is Up No Player Number was got so quit back to the title screen...
-			PrintErrorMessage ( "Couldnt Get a Player Number", 3, nullptr, ERROR_USE_MENUFUNCS );
-			MyGameStatus = STATUS_Title;
-			break;
-		}
-
-		if( GetPlayerNumCount1 <= 0.0F )
-		{
-			GetPlayerNumCount++;
-
-			// Time to send another request for a Player Number...
-			GetPlayerNumCount1 = 60.0F;   // approx 1 Second...
-			SendGameMessage(MSG_HEREIAM, 0, 0, 0, 0); // can I join your game...
-			DebugPrintf("sending MSG_HEREIAM\n");
-		}
-
+		RenderStatusGetPlayerNum( buf );
 		break;
 
 
 	case STATUS_InitView_0:
-		DebugState("STATUS_InitView_0\n");
-
-		if( IsHost )
-		{
-			SendGameMessage(MSG_LONGSTATUS, 0, 0, 0, 0);
-		}
-		else
-		{
-			SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		}
-
-		clear_black();
-
-		JustExitedMenu = false;
-
-		QuickStart = QuickStartMode::None;
-		WaitingToQuit = false;
-
-		ReceiveGameMessages();
-		if( !SetMatrixViewPort() )
-		{
-			SeriousError = true;
-			Msg( "SetMatrixViewPort() failed\n" );
+		if( !RenderStatusInitView0(  ) )
 			return false;
-		}
-		InitFont();
-
-
-		InitSkinExecs();
-		InitPortalExecs();
-		InitRenderBufs();
-
-		// Init the Texture Handler
-		if( !InitTload( &Tloadheader ) )
-		{
-			SeriousError = true;
-			Msg( "InitTLoad failed\n" );
-			return false;
-		}
-
-		//  Prep the Texture Handler.....
-		if( !PreMload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
-		{
-			SeriousError = true;
-			return false; // the model and visipoly data
-		}
-
-		// Can Cope with no .Wat file!!!
-		PreWaterLoad( (char*) &WaterNames[LevelNum][0] );
-
-		if( OnceOnlyChangeLevel )
-		{
-			OnceOnlyChangeLevel = false;
-			if( !PreLoadShips() )
-			{
-				SeriousError = true;
-				return false;
-			}
-			if( !PreLoadBGOFiles() )
-			{
-				SeriousError = true;
-				return false;
-			}
-			if( !PreLoadEnemies() )
-			{
-				SeriousError = true;
-				return false;
-			}
-#ifdef EDITION_REMASTER
-			/* Reserve ModelNames[] slots for the N64 single-mesh pickups
-			 * (extracted from ForsakenEX.kpf). Must run after PreLoadEnemies
-			 * (which writes back to NextNewModel) so the pickup slots end
-			 * up past the enemy slots. PreInitModel below loads everything
-			 * registered up to NextNewModel. */
-			{
-				if( !PreLoadPickups() )
-				{
-					SeriousError = true;
-					return false;
-				}
-			}
-#endif /* EDITION_REMASTER */
-		}
-
-		EnableRelavantModels( &ModelNames[0] );
-		if( !PreInitModel( &ModelNames[0] ) )
-		{
-			SeriousError = true;
-			return false;
-		}
-		if( !Load_All_Off_Files( &OffsetFiles[ 0 ] ) )
-		{
-			SeriousError = true;
-			return false;
-		}
-		//  Load in And if nescessary ReScale Textures...
-		if( !Tload( &Tloadheader ) )
-		{
-			SeriousError = true;
-			return false;
-		}
-
-		if( !InitModel( &ModelNames[0] ) )
-		{
-			SeriousError = true;
-			return false;               // all 3d models....
-		}
-
-		if( !Mload( (char*) &LevelNames[LevelNum][0] , &Mloadheader ) )
-		{
-			SeriousError = true;
-			return false; // the model and visipoly data
-		}
-
-		InitVisiStats( &Mloadheader );
-
-		if ( !Bspload( (char*) &BspNames[LevelNum][0], &Bsp_Header[ 0 ] ) )
-		{
-			SeriousError = true;
-			Msg( "Bspload failed\n" );
-			return false;   // the collision data
-		}
-
-		// might not be any water...
-		WaterLoad();
-
-		ReadTxtFile( (char*) &TextNames[LevelNum][0] );
-
-		ReadMsgFile( (char*) &MsgNames[LevelNum][0] );
-
-		if( !MCload( (char*) &CollisionNames[LevelNum][0] , &MCloadheader ) )
-		{
-			SeriousError = true;
-			Msg( "MCload non zero failed\n" );
-			return false;   // the collision data
-		}
-		if( !MCload( (char*) &CollisionZNames[LevelNum][0] , &MCloadheadert0 ) )
-		{
-			SeriousError = true;
-			Msg( "MCload zero failed\n" );
-			return false; // the collision data skin thickness 0
-		}
-
-		InitSoundInfo( &Mloadheader );
-
-		InitShipSpeeds();
-
-		// this will cause a lovely game loop and crash the game
-		// so don't remove this !!!!!!!!!
-		if( InitView_MyGameStatus != STATUS_InitView_0 )
-			MyGameStatus = InitView_MyGameStatus;
-
 		break;
 
 
@@ -2773,233 +3115,41 @@ bool RenderScene( void )
 
 
 	case  STATUS_StartingSinglePlayer:
-		DebugState("STATUS_StartingSinglePlayer\n");
-
-		MenuAbort();
-		ReleaseView();
-
-		MyGameStatus = STATUS_PostStartingSinglePlayer;
-		GameStatus[WhoIAm] = MyGameStatus;
-		SendGameMessage(MSG_STATUS, 0, 0, 0, 0);
-		LevelNum = -1;
-		if( !NewLevelNum )
-		{
-			NumGoldBars = 0;
-			CrystalsFound = 0;
-		}
-		GameCompleted = GameComplete::NotComplete;
-		if( !ChangeLevel() ) return( false );
-#ifdef __3DS__
-		/* [3DS] Clear the colour buffer to black after level load completes.
-		 *
-		 * ChangeLevel() contains its own internal render loop (STATUS_InitView_0,
-		 * STATUS_ChangeLevelPostInitView, etc.) that renders loading-screen frames
-		 * into the colour buffer and pumps c3d_present(), updating GX
-		 * display buffer A.  When ChangeLevel returns, one of the two GX display
-		 * buffers (A) still contains the last loading-screen frame.
-		 *
-		 * On the STATUS_StartingSinglePlayer break, c3d_present() is called once
-		 * more by platform_render_present(); this frame uses whatever is currently
-		 * in the colour buffer (the last loading frame).  That result is
-		 * DMA'd into GX display buffer B, contaminating the second buffer too.
-		 *
-		 * Fix: clear the colour buffer to black here so that the
-		 * c3d_present() call at the end of this frame sends black to display B
-		 * instead of the stale loading frame.  STATUS_PostStartingSinglePlayer
-		 * (next frame) clears it again, which sends black to display A.
-		 * Both GX display buffers are now black before the first gameplay frame
-		 * renders, eliminating the alternating stale-frame flicker. */
-		FSClearBlack();
-#endif
+		if( !RenderStatusStartingSinglePlayer(  ) )
+			return false;
 		break;
 
 
 	case  STATUS_PostStartingSinglePlayer:
-		DebugState("STATUS_PostStartingSinglePlayer\n");
-
-#ifdef __3DS__
-		/* [3DS] Second black-frame clear — flushes the remaining GX display buffer.
-		 *
-		 * The GX double-buffer scheme means there are always two display buffers
-		 * (A and B) alternating each swap.  STATUS_StartingSinglePlayer's
-		 * FSClearBlack() + c3d_present() cleared buffer B.  This frame's
-		 * FSClearBlack() + c3d_present() clears buffer A.  After both frames
-		 * complete, both display buffers contain black and neither holds stale
-		 * loading-screen or title-screen content.  The first STATUS_SinglePlayer
-		 * frame renders real gameplay into clean buffers. */
-		FSClearBlack();
-
-		/* [3DS] Eliminate stale ESCAPE injection that opens MENU_InGameSingle.
-		 *
-		 * Three-step fix:
-		 *
-		 * 1. hidScanInput() — updates the libctru HID "previous state" baseline.
-		 *    ChangeLevel() blocks for several seconds without calling hidScanInput(),
-		 *    so buttons pressed during loading appear as kDown (fresh press) on the
-		 *    first post-load handle_events() scan.  Calling it here means the next
-		 *    handle_events() scan sees those buttons as kHeld, not kDown — so no
-		 *    spurious SDLK_ESCAPE is injected on Frame N+1.
-		 *
-		 * 2. input_buffer_reset() — clears any SDLK_ESCAPE that THIS frame's
-		 *    handle_events() already added before we ran.  handle_events() runs
-		 *    first in the main loop (before RenderScene), so the escape key is
-		 *    already in input_buffer by the time we reach STATUS_PostStartingSinglePlayer.
-		 *    ProcessGameKeys() is only called from STATUS_SinglePlayer (next frame),
-		 *    but we clear the buffer here so the next frame's handle_events()
-		 *    input_buffer_reset() at line 151 has a clean slate.
-		 *
-		 * 3. MenuAbort() — directly sets CurrentMenu = NULL as a hard safety net.
-		 *    Even if SDLK_ESCAPE somehow reached MenuRestart via an earlier code
-		 *    path, this ensures no menu is active when STATUS_SinglePlayer begins.
-		 */
-		hidScanInput();
-		input_buffer_reset();
-		MenuAbort();
-		_gameplay_start_guard = true;  /* arm one-shot for STATUS_SinglePlayer */
-#endif
-
-		smallinitShip( WhoIAm );
-
-		MyGameStatus = STATUS_SinglePlayer;
-		GameStatus[WhoIAm] = MyGameStatus;
-		LevelTimeTaken = 0.0F;
-		timer_run( &level_time );
-
-		input_grab( true );
-
-		if( SavedGameDamaged )
-		{
-			AddColourMessageToQue( SystemMessageColour, SAVED_GAME_DAMAGED );
-			SavedGameDamaged = false;
-		}
-
+		RenderStatusPostStartingSinglePlayer(  );
 		break;
 
 
 	case STATUS_SinglePlayer:
-		DebugState("STATUS_SinglePlayer\n");
-
-#ifdef __3DS__
-		/* [3DS] One-shot guard: on the very first STATUS_SinglePlayer frame, clear
-		 * any SDLK_ESCAPE that handle_events() may have injected this frame
-		 * (from stale kDown of buttons held during ChangeLevel), and ensure
-		 * CurrentMenu is NULL.  This fires BEFORE MainGame() / ProcessGameKeys()
-		 * so no spurious MENU_InGameSingle can open on the first gameplay frame. */
-		if (_gameplay_start_guard) {
-			_gameplay_start_guard = false;
-			input_buffer_reset();
-			MenuAbort();
-			/* Flush any accumulated screen polys (menu text, VDU text) that were
-			 * added during the title/loading phase but never killed.  Without this
-			 * they all render on the first gameplay frame producing the hall-of-
-			 * mirrors text overlay. */
-			/* Kill ALL persistent screen polys (menu items, VDU text, level
-			 * description text) left over from the title screen.  VduClear() only
-			 * clears VDU-specific entries; InitScrPolys() resets the entire
-			 * ScrPolys[] linked list so nothing stale renders this frame. */
-
-			InitScrPolys();
-		}
-#endif
-
-		if( MainGame() != true )
+		if( !RenderStatusSinglePlayer(  ) )
 			return false;
-
-		if ( bSoundEnabled && !CurrentMenu )
-		{
-			ProcessLoopingSfx();
-			ProcessEnemyBikerTaunt();
-		}
-
-		LevelTimeTaken += timer_run( &level_timer );
-
-		// if player is quiting nothing should stop him.....
-		if( MyGameStatus != STATUS_QuitCurrentGame )
-		{
-			if( IsHost )
-			{
-				if( NewLevelNum != LevelNum )
-				{
-					clear_black();
-					ReleaseView();
-					// the level has ended or changed...
-					MyGameStatus = STATUS_ViewingStats;
-					GameStatus[WhoIAm] = MyGameStatus;
-					InitView();
-				}
-			}
-		}
 		break;
 
 
 	case STATUS_ViewingStats:
-		DebugState("STATUS_ViewingStats\n");
-
-		clear_black();
-
-		ReleaseLevel();
-
-		ReleaseView();
-
-		MyGameStatus = STATUS_BetweenLevels;
-		InitScene();
-		InitView();
-		MenuAbort();
-		MenuRestart( &MENU_NEW_NumberOfCrystals );
-		CameraStatus = CAMERA_AtRightVDU;
+		RenderStatusViewingStats(  );
 		break;
 
 
 	case  STATUS_TitleLoadGameStartingSinglePlayer:
-		DebugState("STATUS_TitleLoadGameStartingSinglePlayer\n");
-
-		MenuAbort();
-		ReleaseView();
-		// tell them all to load up a level
-		MyGameStatus = STATUS_TitleLoadGamePostStartingSinglePlayer;
-		GameStatus[WhoIAm] = MyGameStatus;
-		LevelNum = -1;
-		NumGoldBars = 0;
-		CrystalsFound = 0;
-		GameCompleted = GameComplete::NotComplete;
-		if( !ChangeLevel() ) return( false );
+		if( !RenderStatusTitleLoadGameStartingSinglePlayer(  ) )
+			return false;
 		break;
 
 
 	case  STATUS_InGameLoadGameStartingSinglePlayer:
-		DebugState("STATUS_InGameLoadGameStartingSinglePlayer\n");
-
-		NewLevelNum = InGameLoadGameLevelNum;
-		MenuAbort();
-		ReleaseView();
-		// tell them all to load up a level
-		MyGameStatus = STATUS_TitleLoadGamePostStartingSinglePlayer;
-		GameStatus[WhoIAm] = MyGameStatus;
-		LevelNum = -1;
-		NumGoldBars = 0;
-		CrystalsFound = 0;
-		GameCompleted = GameComplete::NotComplete;
-		if( !ChangeLevel() ) return( false );
+		if( !RenderStatusInGameLoadGameStartingSinglePlayer(  ) )
+			return false;
 		break;
 
 
 	case  STATUS_TitleLoadGamePostStartingSinglePlayer:
-		DebugState("STATUS_TitleLoadGamePostStartingSinglePlayer\n");
-
-		smallinitShip( WhoIAm );
-		if( !InGameLoad( nullptr ) )
-		{
-			/* The save is truncated or damaged, and part of it may already
-			   be applied over the level. Start its level again from the
-			   beginning instead; STATUS_PostStartingSinglePlayer says why. */
-			SavedGameDamaged = true;
-			StartASinglePlayerGame( nullptr );
-			break;
-		}
-
-
-		MyGameStatus = STATUS_SinglePlayer;
-		GameStatus[WhoIAm] = MyGameStatus;
+		RenderStatusTitleLoadGamePostStartingSinglePlayer(  );
 		break;
 
 	default:
