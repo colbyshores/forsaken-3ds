@@ -452,10 +452,10 @@ static void ReadKeyboard( void )
 		return;
 	}
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-	keys = (u_int8_t*)SDL_GetKeyboardState( &nkeys );
+#ifdef __3DS__
+	keys = SDL_GetKeyState( &nkeys );	/* input.h: the 3DS key-state array */
 #else
-	keys = SDL_GetKeyState( &nkeys );
+	keys = (u_int8_t*)SDL_GetKeyboardState( &nkeys );
 #endif
 
 	memset( &key_state[ new_input ], 0, SDLK_LAST );

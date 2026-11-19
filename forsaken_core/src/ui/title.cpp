@@ -6745,11 +6745,8 @@ void MenuEnterTextInputState(int state)
 {
 	MenuState = (MENUSTATE)state;
 // TODO is this right ?
-#if SDL_VERSION_ATLEAST(2,0,0)
+#ifndef __3DS__
 	SDL_StartTextInput();
-#else
-	if(!SDL_EnableUNICODE(-1))
-		SDL_EnableUNICODE(1);
 #endif
 }
 
@@ -14004,11 +14001,9 @@ bool ProcessText( int Key )
 
 // TODO is this right ?
 //      will probably need to support SDL_TextInputEvent
+#ifndef __3DS__
 	if(done)
-#if SDL_VERSION_ATLEAST(2,0,0)
 		SDL_StopTextInput();
-#else
-		SDL_EnableUNICODE(0);
 #endif
 
 	return !done;

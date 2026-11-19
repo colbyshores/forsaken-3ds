@@ -1,12 +1,11 @@
 /* stubs_3ds.cpp -- 3DS stand-ins for symbols the PC layer provides
  *
- * The core is shared with the PC build and still names a few things that
- * the PC platform layer or its libraries define. This file defines them:
- * the net_tracker.h calls (no tracker on 3DS), SDL_EnableUNICODE (an SDL 1.2
- * call title.cpp makes because SDL_VERSION_ATLEAST is always false on 3DS),
- * the bIgnoreWM_SIZE flag (input_sdl.cpp owns it on PC; title.cpp writes it,
- * nothing reads it here), and glob / globfree, which devkitARM declares but
- * does not implement (file.cpp's find_file uses them).
+ * The core is shared with the PC build and still names a few things that the
+ * PC platform layer or its libraries define. This file defines them: the
+ * net_tracker.h calls (no tracker on 3DS), the bIgnoreWM_SIZE flag
+ * (input_sdl.cpp owns it on PC; title.cpp writes it, nothing reads it here),
+ * and glob / globfree, which devkitARM declares but does not implement
+ * (file.cpp's find_file uses them).
  */
 
 #ifdef __3DS__
@@ -30,14 +29,6 @@ void send_tracker_update(char *host, int port)
 void send_tracker_finished(char *host, int port)
 {
 	(void)host; (void)port;
-}
-
-/* ---- SDL stubs ---- */
-
-int SDL_EnableUNICODE(int enable)
-{
-	(void)enable;
-	return 0;
 }
 
 /* ---- window-resize flag (input_sdl.cpp on PC) ---- */
