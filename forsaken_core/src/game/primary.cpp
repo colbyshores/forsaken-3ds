@@ -7586,7 +7586,7 @@ bool ChangeTranspulseDir( u_int16_t i, VECTOR * Pos, VECTOR * MoveOffset, VECTOR
 	{
 		case OWNER_SHIP:
 			Ship = TargetClosestShip( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
-			Enemy = TargetClosestEnemy( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
+			Enemy = TargetClosestEnemy( Pos, Dir, NewGroup, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
 			if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
 			Secondary = TargetClosestSecondary( Pos, Dir, NewGroup, PrimBulls[i].OwnerType, PrimBulls[i].Owner, (float) COSD( TRANSPULSE_VIEWCONE ), &ClosestCos );
 			if( Secondary != INDEX_NONE )

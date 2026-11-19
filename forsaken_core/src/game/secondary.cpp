@@ -2021,8 +2021,7 @@ bool ProcessMines( u_int16_t i )
 											  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 											  &ClosestCos );
 					Enemy = TargetClosestEnemy( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-												SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-												&ClosestCos );
+												SecBulls[i].ViewCone, &ClosestCos );
 					if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
 					Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
 											  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
@@ -2464,8 +2463,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
 												  &ClosestCos );
 						Enemy = TargetClosestEnemy( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-													SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-													&ClosestCos );
+													SecBulls[i].ViewCone, &ClosestCos );
 						if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
 						Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
 												  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
@@ -7293,13 +7291,11 @@ void CreateSplash( VECTOR * Pos, VECTOR * DirVector, u_int16_t Group )
 	Input		:	VECTOR	*	Pos
 				:	VECTOR	*	Dir
 				:	u_int16_t		Group
-				:	u_int16_t		My Type
-				:	u_int16_t		My Index
 				:	float		View Cone Cosine
 				:	float	*	Closest Cos
 	Output		:	u_int16_t		Enemy Index (-1 if none)
 ===================================================================*/
-u_int16_t TargetClosestEnemy( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t /*MeType*/, u_int16_t /*Me*/, float ViewConeCos, float * ClosestCos )
+u_int16_t TargetClosestEnemy( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float ViewConeCos, float * ClosestCos )
 {
 	float		Cos;
 	u_int16_t		ClosestEnemy = INDEX_NONE;
