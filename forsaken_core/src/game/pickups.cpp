@@ -755,6 +755,783 @@ void ClearPickupsGot( void )
 	Input		:	u_int16_t	Pickup to get
 	Output		:	bool	True/False
 ===================================================================*/
+/* PICKUP_Trojax */
+[[gnu::always_inline]] static inline void CollectTrojax( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, int16_t & TriggeredSFX )
+{
+	if( !PrimaryWeaponsGot[ TROJAX ] )
+	{
+		PrimaryWeaponsGot[ TROJAX ] = 1;
+		MessageSFX = SFX_Select_Trojax;
+		TriggeredSFX = SFX_BIKER_BW;
+		NewPrimaryWeapon( TROJAX );
+	}
+	else
+	{
+		PickupEnable = false;
+		MessageSFX = SFX_BIKECOMP_AP;
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+	}
+}
+
+/* PICKUP_Pyrolite */
+[[gnu::always_inline]] static inline void CollectPyrolite( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !PrimaryWeaponsGot[ PYROLITE_RIFLE ] )
+	{
+		PrimaryWeaponsGot[ PYROLITE_RIFLE ] = 1;
+
+		if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+		{
+			CopyOfPyroliteAmmo = MAXPYROLITEAMMO;
+		}
+		else
+		{
+			PyroliteAmmo = MAXPYROLITEAMMO;
+		}
+		NewPrimaryWeapon( PYROLITE_RIFLE );
+		MessageSFX = SFX_Select_Pyrolite;
+	}
+	else
+	{
+		PickupEnable = false;
+		MessageSFX = SFX_BIKECOMP_AP;
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+	}
+
+}
+
+/* PICKUP_Transpulse */
+[[gnu::always_inline]] static inline void CollectTranspulse( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, int16_t & TriggeredSFX )
+{
+	if( !PrimaryWeaponsGot[ TRANSPULSE_CANNON ] )
+	{
+		PrimaryWeaponsGot[ TRANSPULSE_CANNON ] = 1;
+		NewPrimaryWeapon( TRANSPULSE_CANNON );
+		MessageSFX = SFX_Select_Transpulse;
+		TriggeredSFX = SFX_BIKER_BW;
+	}
+	else
+	{
+		PickupEnable = false;
+		MessageSFX = SFX_BIKECOMP_AP;
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+	}
+
+}
+
+/* PICKUP_SussGun */
+[[gnu::always_inline]] static inline void CollectSussGun( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !PrimaryWeaponsGot[ SUSS_GUN ] )
+	{
+		PrimaryWeaponsGot[ SUSS_GUN ] = 1;
+
+		if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+		{
+			CopyOfSussGunAmmo = MAXSUSSGUNAMMO;
+		}
+		else
+		{
+			SussGunAmmo = MAXSUSSGUNAMMO;
+		}
+		NewPrimaryWeapon( SUSS_GUN );
+		MessageSFX = SFX_Select_SussGun;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_Laser */
+[[gnu::always_inline]] static inline void CollectLaser( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !PrimaryWeaponsGot[ LASER ] )
+	{
+		PrimaryWeaponsGot[ LASER ] = 1;
+		NewPrimaryWeapon( LASER );
+		MessageSFX = SFX_Select_BeamLaser;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_Mugs */
+[[gnu::always_inline]] static inline void CollectMugs( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( SecondaryAmmo[ MUGMISSILE ] < 10 )
+	{
+		SecondaryAmmo[ MUGMISSILE ] += 3;
+		if( SecondaryAmmo[ MUGMISSILE ] > 10 )
+		{
+			Temp = ( SecondaryAmmo[ MUGMISSILE ] - 10 );
+			SecAmmoUsed[ MUGMISSILE ] = Temp;
+			SecondaryAmmo[ MUGMISSILE ] = 10;
+		}
+		NewSecondaryWeapon( MUGMISSILE );
+		MessageSFX = SFX_Select_MugMissile;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_HeatseakerPickup */
+[[gnu::always_inline]] static inline void CollectHeatseakerPickup( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( SecondaryAmmo[ SOLARISMISSILE ] < 10 )
+	{
+		SecondaryAmmo[ SOLARISMISSILE ] += 3;
+		if( SecondaryAmmo[ SOLARISMISSILE ] > 10 )
+		{
+			Temp = ( SecondaryAmmo[ SOLARISMISSILE ] - 10 );
+			SecAmmoUsed[ SOLARISMISSILE ] = Temp;
+			SecondaryAmmo[ SOLARISMISSILE ] = 10;
+		}
+		NewSecondaryWeapon( SOLARISMISSILE );
+		MessageSFX = SFX_Select_SolarisMissile;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_Thief */
+[[gnu::always_inline]] static inline void CollectThief( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !SecondaryAmmo[ THIEFMISSILE ] )
+	{
+		SecondaryAmmo[ THIEFMISSILE ] += 1;
+		NewSecondaryWeapon( THIEFMISSILE );
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_Scatter */
+[[gnu::always_inline]] static inline void CollectScatter( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( SecondaryAmmo[ SCATTERMISSILE ] < 3 )
+	{
+		SecondaryAmmo[ SCATTERMISSILE ] += 1;
+		NewSecondaryWeapon( SCATTERMISSILE );
+		MessageSFX = SFX_Select_ScatterMissile;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_Gravgon */
+[[gnu::always_inline]] static inline void CollectGravgon( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !SecondaryAmmo[ GRAVGONMISSILE ] )
+	{
+		SecondaryAmmo[ GRAVGONMISSILE ] += 1;
+		NewSecondaryWeapon( GRAVGONMISSILE );
+		MessageSFX = SFX_Select_GravgonMissile;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_Launcher */
+[[gnu::always_inline]] static inline void CollectLauncher( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( SecondaryAmmo[ MULTIPLEMISSILE ] < 100 )
+	{
+		SecondaryAmmo[ MULTIPLEMISSILE ] += 50;
+		if( SecondaryAmmo[ MULTIPLEMISSILE ] > 100 )
+		{
+			Temp = ( SecondaryAmmo[ MULTIPLEMISSILE ] - 100 );
+			SecAmmoUsed[ MULTIPLEMISSILE ] = Temp;
+			SecondaryAmmo[ MULTIPLEMISSILE ] = 100;
+		}
+		NewSecondaryWeapon( MULTIPLEMISSILE );
+		MessageSFX = SFX_Select_MFRL;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_TitanStar */
+[[gnu::always_inline]] static inline void CollectTitanStar( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, int16_t & TriggeredSFX )
+{
+	if( SecondaryAmmo[ TITANSTARMISSILE ] < 3 )
+	{
+		SecondaryAmmo[ TITANSTARMISSILE ] += 1;
+		NewSecondaryWeapon( TITANSTARMISSILE );
+		MessageSFX = SFX_Select_TitanStarMissile;
+		TriggeredSFX = SFX_BIKER_BW;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_PurgePickup */
+[[gnu::always_inline]] static inline void CollectPurgePickup( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( SecondaryAmmo[ PURGEMINE ] < 10 )
+	{
+		SecondaryAmmo[ PURGEMINE ] += 3;
+		if( SecondaryAmmo[ PURGEMINE ] > 10 )
+		{
+			Temp = ( SecondaryAmmo[ PURGEMINE ] - 10 );
+			SecAmmoUsed[ PURGEMINE ] = Temp;
+			SecondaryAmmo[ PURGEMINE ] = 10;
+		}
+		NewSecondaryWeapon( PURGEMINE );
+		MessageSFX = SFX_Select_PurgeMine;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_PinePickup */
+[[gnu::always_inline]] static inline void CollectPinePickup( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( SecondaryAmmo[ PINEMINE ] < 6 )
+	{
+		SecondaryAmmo[ PINEMINE ] += 3;
+		if( SecondaryAmmo[ PINEMINE ] > 6 )
+		{
+			Temp = ( SecondaryAmmo[ PINEMINE ] - 6 );
+			SecAmmoUsed[ PINEMINE ] = Temp;
+			SecondaryAmmo[ PINEMINE ] = 6;
+		}
+		NewSecondaryWeapon( PINEMINE );
+		MessageSFX = SFX_Select_PineMine;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_QuantumPickup */
+[[gnu::always_inline]] static inline void CollectQuantumPickup( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !SecondaryAmmo[ QUANTUMMINE ] )
+	{
+		SecondaryAmmo[ QUANTUMMINE ] += 1;
+		NewSecondaryWeapon( QUANTUMMINE );
+		MessageSFX = SFX_Select_QuantumMine;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_SpiderPod */
+[[gnu::always_inline]] static inline void CollectSpiderPod( u_int16_t & i, int16_t & PickupEnable, int16_t & Temp, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( SecondaryAmmo[ SPIDERMINE ] < 6 )
+	{
+		SecondaryAmmo[ SPIDERMINE ] += 3;
+		if( SecondaryAmmo[ SPIDERMINE ] > 6 )
+		{
+			Temp = ( SecondaryAmmo[ SPIDERMINE ] - 6 );
+			SecAmmoUsed[ SPIDERMINE ] = Temp;
+			SecondaryAmmo[ SPIDERMINE ] = 6;
+		}
+		NewSecondaryWeapon( SPIDERMINE );
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_GeneralAmmo */
+[[gnu::always_inline]] static inline void CollectGeneralAmmo( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+	{
+		if( CopyOfGeneralAmmo < MAXGENERALAMMO )
+		{
+			CopyOfGeneralAmmo += GENERALAMMOPERPOD;
+			MessageSFX = SFX_Select_Ammo;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			PickupEnable = false;
+			MessageSFX = SFX_BIKECOMP_MA;
+		}
+	}
+	else
+	{
+		if( GeneralAmmo < MAXGENERALAMMO )
+		{
+			GeneralAmmo += GENERALAMMOPERPOD;
+			MessageSFX = SFX_Select_Ammo;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			PickupEnable = false;
+			MessageSFX = SFX_BIKECOMP_MA;
+		}
+	}
+}
+
+/* PICKUP_PyroliteAmmo */
+[[gnu::always_inline]] static inline void CollectPyroliteAmmo( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+	{
+		if( CopyOfPyroliteAmmo < MAXPYROLITEAMMO )
+		{
+			CopyOfPyroliteAmmo += PYROLITEAMMOPERPOD;
+			MessageSFX = SFX_Select_Ammo;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			PickupEnable = false;
+			MessageSFX = SFX_BIKECOMP_MA;
+		}
+	}
+	else
+	{
+		if( PyroliteAmmo < MAXPYROLITEAMMO )
+		{
+			PyroliteAmmo += PYROLITEAMMOPERPOD;
+			MessageSFX = SFX_Select_Ammo;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			PickupEnable = false;
+			MessageSFX = SFX_BIKECOMP_MA;
+		}
+	}
+
+}
+
+/* PICKUP_SussGunAmmo */
+[[gnu::always_inline]] static inline void CollectSussGunAmmo( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+	{
+		if( CopyOfSussGunAmmo < MAXSUSSGUNAMMO )
+		{
+			CopyOfSussGunAmmo += SUSSGUNAMMOPERPOD;
+			MessageSFX = SFX_Select_Ammo;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			PickupEnable = false;
+			MessageSFX = SFX_BIKECOMP_MA;
+		}
+	}
+	else
+	{
+		if( SussGunAmmo < MAXSUSSGUNAMMO )
+		{
+			SussGunAmmo += SUSSGUNAMMOPERPOD;
+			MessageSFX = SFX_Select_Ammo;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			PickupEnable = false;
+			MessageSFX = SFX_BIKECOMP_MA;
+		}
+	}
+}
+
+/* PICKUP_PowerPod */
+[[gnu::always_inline]] static inline void CollectPowerPod( int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, bool & ShowTextAnyway )
+{
+	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+	{
+		if( CopyOfPowerLevel != ( MAXPOWERLEVELS - 1 ) )
+		{
+			CopyOfPowerLevel++;
+			if( CopyOfPowerLevel == ( MAXPOWERLEVELS - 1 ) )
+			{
+				snprintf( (char*)&Message[ 0 ], sizeof( Message ), FULL_POWER_LEVEL );
+			}
+			else
+			{
+				snprintf( (char*)&Message[ 0 ], sizeof( Message ), POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
+			}
+			ShowTextAnyway = true;
+			MessageSFX = SFX_Select_PowerPod;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX_POWER );
+			MessageSFX = SFX_BIKECOMP_AP;
+			PickupEnable = false;
+		}
+	}
+	else
+	{
+		if( Ships[ WhoIAm ].Object.PowerLevel != ( MAXPOWERLEVELS - 1 ) )
+		{
+			Ships[ WhoIAm ].Object.PowerLevel++;
+			if( Ships[ WhoIAm ].Object.PowerLevel == ( MAXPOWERLEVELS - 1 ) )
+			{
+				snprintf( (char*)&Message[ 0 ], sizeof( Message ), FULL_POWER_LEVEL );
+			}
+			else
+			{
+				snprintf( (char*)&Message[ 0 ], sizeof( Message ), POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
+			}
+			ShowTextAnyway = true;
+			MessageSFX = SFX_Select_PowerPod;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX_POWER );
+			MessageSFX = SFX_BIKECOMP_AP;
+			PickupEnable = false;
+		}
+	}
+}
+
+/* PICKUP_GoldenPowerPod */
+[[gnu::always_inline]] static inline void CollectGoldenPowerPod( int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+	{
+		GivemeSuperNashram();
+		MessageSFX = SFX_Select_GoldenPowerPod;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_CANT_HANDLE_ANY_MORE );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_Shield */
+[[gnu::always_inline]] static inline void CollectShield( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( Ships[ WhoIAm ].Object.Shield != MAX_SHIELD )
+	{
+		Ships[ WhoIAm ].Object.Shield += 32.0F;
+		if ( Ships[ WhoIAm ].Object.Shield > SHIELD_CRITICAL_LEVEL )
+			ShieldCritical = false;
+		if( Ships[ WhoIAm ].Object.Shield > MAX_SHIELD ) Ships[ WhoIAm ].Object.Shield = MAX_SHIELD;
+		MessageSFX = SFX_Select_Shield;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+}
+
+/* PICKUP_Inv */
+[[gnu::always_inline]] static inline void CollectInv( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( !Ships[ WhoIAm ].Invul )
+	{
+		Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
+		Ships[ WhoIAm ].Invul = true;
+		PickupInvulnerability = true;
+		MessageSFX = SFX_Select_Invul;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_Nitro */
+[[gnu::always_inline]] static inline void CollectNitro( u_int16_t & i, int16_t & PickupEnable, float & TempFloat, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+	{
+		if( CopyOfNitroFuel < MAX_NITRO_FUEL )
+		{
+			CopyOfNitroFuel += 50.0F;
+			if( CopyOfNitroFuel > MAX_NITRO_FUEL )
+			{
+				TempFloat = ( CopyOfNitroFuel - MAX_NITRO_FUEL );
+				NitroFuelUsed += TempFloat;
+				CopyOfNitroFuel = MAX_NITRO_FUEL;
+			}
+			MessageSFX = SFX_Select_Nitro;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			MessageSFX = SFX_BIKECOMP_AP;
+			PickupEnable = false;
+		}
+	}
+	else
+	{
+		if( NitroFuel < MAX_NITRO_FUEL )
+		{
+			NitroFuel += 50.0F;
+			if( NitroFuel > MAX_NITRO_FUEL )
+			{
+				TempFloat = ( NitroFuel - MAX_NITRO_FUEL );
+				NitroFuelUsed += TempFloat;
+				NitroFuel = MAX_NITRO_FUEL;
+			}
+			MessageSFX = SFX_Select_Nitro;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			MessageSFX = SFX_BIKECOMP_AP;
+			PickupEnable = false;
+		}
+	}
+
+}
+
+/* PICKUP_Gold */
+[[gnu::always_inline]] static inline void CollectGold( u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, bool & ShowTextAnyway, bool & Speech )
+{
+	NumGoldBars ++;
+	if( !( NumGoldBars % 10 ) )
+	{
+		Lives += 1;
+		snprintf( (char*)&Message[0], sizeof( Message ), YOUVE_EARNED_EXTRA_LIFE );
+		PlaySfx( SFX_ExtraLife, 1.0F );
+	}
+	else
+	{
+		if( NumGoldBars == 1 ) snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_GOLD_BAR, NumGoldBars );
+		else snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_GOLD_BARS, NumGoldBars );
+	}
+	MessageSFX = SFX_GoldBarPickup;
+	Speech = false;
+	ShowTextAnyway = true;
+}
+
+/* PICKUP_Mantle */
+[[gnu::always_inline]] static inline void CollectMantle( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, bool & Speech )
+{
+	if( !( Ships[ WhoIAm ].Object.Flags & SHIP_Stealth ) )
+	{
+		Ships[ WhoIAm ].Object.Flags |= SHIP_Stealth;
+		Ships[ WhoIAm ].StealthTime = ( 60.0F * ANIM_SECOND );
+		MessageSFX = SFX_Cloaking;
+		Speech = false;
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
+		MessageSFX = SFX_BIKECOMP_AP;
+		PickupEnable = false;
+	}
+
+}
+
+/* PICKUP_Crystal */
+[[gnu::always_inline]] static inline void CollectCrystal( u_int8_t (&Message)[ 128 ], int16_t & MessageSFX, bool & ShowTextAnyway, bool & Speech )
+{
+	CrystalsFound += 1;
+	if( CrystalsFound == 1 )
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_CRYSTAL, CrystalsFound );
+	}
+	else
+	{
+		snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_CRYSTALS, CrystalsFound );
+	}
+	MessageSFX = SFX_PickupCrystal;
+	Speech = false;
+	ShowTextAnyway = true;
+}
+
+/* PICKUP_Flag */
+[[gnu::always_inline]] static inline void CollectFlag(  )
+{
+	if ( CaptureTheFlag )
+	{
+		// now I have the flag....?
+		Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingFlag;
+		AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+			TeamName[ TeamNumber[ WhoIAm ] ] );
+
+		snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
+		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
+
+	}
+}
+
+/* PICKUP_Bounty */
+[[gnu::always_inline]] static inline void CollectBounty(  )
+{
+	if ( BountyHunt )
+	{
+		// now I have the bounty....?
+		BountyTime = 0.0F;
+		Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingBounty;
+		AddColourMessageToQue(FlagMessageColour, YOU_HAVE_GOT_THE_BOUNTY );
+
+		SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_BountyMessage, 0);
+
+	}
+}
+
+/* PICKUP_Flag1, PICKUP_Flag2, PICKUP_Flag3, PICKUP_Flag4 */
+[[gnu::always_inline]] static inline void CollectFlag1( u_int16_t & i, int16_t & PickupEnable )
+{
+	if ( CTF )
+	{
+		int team;
+
+		for ( team = 0; team < MAX_TEAMS; team++ )
+		{
+			if ( Pickups[i].Type == TeamFlagPickup[ team ] )
+			{
+				if ( team == TeamNumber[ WhoIAm ] )
+				{
+					if ( TeamFlagAtHome[ team ] )
+					{
+						PickupEnable = false;
+					}
+					else if ( OwnFlagTeleportsHome )
+					{
+						GOAL *goal;
+
+						// teleport flag back to own goal
+						PickupEnable = false;
+						goal = TeamGoal( team );
+						if ( goal )
+						{
+							KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
+							KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
+							GenerateFlagAtHome( team );
+							AddColourMessageToQue(FlagMessageColour, TEAM_FLAG_RETURNED,
+								TeamName[ TeamNumber[ WhoIAm ] ] );
+							SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
+						}
+					}
+					else if ( CanCarryOwnFlag )
+					{
+						Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
+						AddColourMessageToQue(FlagMessageColour, RETURN_TEAM_FLAG,
+							TeamName[ TeamNumber[ WhoIAm ] ] );
+						SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturningFlag, 0);
+					}
+					else
+					{
+						AddColourMessageToQue(FlagMessageColour, CANNOT_PICKUP_OWN_FLAG );
+						PickupEnable = false;
+					}
+				}
+				else
+				{
+					// now I have the flag....?
+					Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
+					AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+						TeamName[ TeamNumber[ WhoIAm ] ] );
+
+					snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_OTHER_TEAM_FLAG,
+						Names[ WhoIAm ],
+						TeamName[ TeamNumber[ WhoIAm ] ],
+						TeamName[ team ] );
+					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
+				}
+				break;
+			}
+		}
+
+	}
+}
+
+/* PICKUP_Orb */
+[[gnu::always_inline]] static inline void CollectOrb( u_int16_t & i, int16_t & PickupEnable, u_int8_t (&Message)[ 128 ], int16_t & MessageSFX )
+{
+	if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+	{
+		if( CopyOfOrbitals < MAXMULTIPLES )
+		{
+			CopyOfOrbAmmo[ CopyOfOrbitals ] = MAXMULTIPLEAMMO;
+			CopyOfOrbitals++;
+			MessageSFX = SFX_Orbital;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			MessageSFX = SFX_BIKECOMP_AP;
+			PickupEnable = false;
+		}
+	}
+	else
+	{
+		if( Ships[ WhoIAm ].NumMultiples < MAXMULTIPLES )
+		{
+			Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples ] = MAXMULTIPLEAMMO;
+			Ships[ WhoIAm ].NumMultiples++;
+			CreateOrbitPulsar( WhoIAm );
+			MessageSFX = SFX_Orbital;
+		}
+		else
+		{
+			snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+			MessageSFX = SFX_BIKECOMP_AP;
+			PickupEnable = false;
+		}
+	}
+}
+
 bool CollectPickup( u_int16_t i )
 {
 	int16_t	PickupEnable = true;
@@ -775,320 +1552,73 @@ bool CollectPickup( u_int16_t i )
 		switch( Pickups[i].Type )
 		{
 		case PICKUP_Trojax:
-			if( !PrimaryWeaponsGot[ TROJAX ] )
-			{
-				PrimaryWeaponsGot[ TROJAX ] = 1;
-				MessageSFX = SFX_Select_Trojax;
-				TriggeredSFX = SFX_BIKER_BW;
-				NewPrimaryWeapon( TROJAX );
-			}
-			else
-			{
-				PickupEnable = false;
-				MessageSFX = SFX_BIKECOMP_AP;
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-			}
+			CollectTrojax( i, PickupEnable, Message, MessageSFX, TriggeredSFX );
 			break;
 
 		case PICKUP_Pyrolite:
-
-			if( !PrimaryWeaponsGot[ PYROLITE_RIFLE ] )
-			{
-				PrimaryWeaponsGot[ PYROLITE_RIFLE ] = 1;
-
-				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-				{
-					CopyOfPyroliteAmmo = MAXPYROLITEAMMO;
-				}
-				else
-				{
-					PyroliteAmmo = MAXPYROLITEAMMO;
-				}
-				NewPrimaryWeapon( PYROLITE_RIFLE );
-				MessageSFX = SFX_Select_Pyrolite;
-			}
-			else
-			{
-				PickupEnable = false;
-				MessageSFX = SFX_BIKECOMP_AP;
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-			}
-
+			CollectPyrolite( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Transpulse:
-
-			if( !PrimaryWeaponsGot[ TRANSPULSE_CANNON ] )
-			{
-				PrimaryWeaponsGot[ TRANSPULSE_CANNON ] = 1;
-				NewPrimaryWeapon( TRANSPULSE_CANNON );
-				MessageSFX = SFX_Select_Transpulse;
-				TriggeredSFX = SFX_BIKER_BW;
-			}
-			else
-			{
-				PickupEnable = false;
-				MessageSFX = SFX_BIKECOMP_AP;
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-			}
-
+			CollectTranspulse( i, PickupEnable, Message, MessageSFX, TriggeredSFX );
 			break;
 
 		case PICKUP_SussGun:
-			if( !PrimaryWeaponsGot[ SUSS_GUN ] )
-			{
-				PrimaryWeaponsGot[ SUSS_GUN ] = 1;
-
-				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-				{
-					CopyOfSussGunAmmo = MAXSUSSGUNAMMO;
-				}
-				else
-				{
-					SussGunAmmo = MAXSUSSGUNAMMO;
-				}
-				NewPrimaryWeapon( SUSS_GUN );
-				MessageSFX = SFX_Select_SussGun;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectSussGun( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Laser:
-
-			if( !PrimaryWeaponsGot[ LASER ] )
-			{
-				PrimaryWeaponsGot[ LASER ] = 1;
-				NewPrimaryWeapon( LASER );
-				MessageSFX = SFX_Select_BeamLaser;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectLaser( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Mug:
 			break;
 
 		case PICKUP_Mugs:
-			if( SecondaryAmmo[ MUGMISSILE ] < 10 )
-			{
-				SecondaryAmmo[ MUGMISSILE ] += 3;
-				if( SecondaryAmmo[ MUGMISSILE ] > 10 )
-				{
-					Temp = ( SecondaryAmmo[ MUGMISSILE ] - 10 );
-					SecAmmoUsed[ MUGMISSILE ] = Temp;
-					SecondaryAmmo[ MUGMISSILE ] = 10;
-				}
-				NewSecondaryWeapon( MUGMISSILE );
-				MessageSFX = SFX_Select_MugMissile;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectMugs( i, PickupEnable, Temp, Message, MessageSFX );
 			break;
 
 		case PICKUP_Heatseaker:
 			break;
 
 		case PICKUP_HeatseakerPickup:
-			if( SecondaryAmmo[ SOLARISMISSILE ] < 10 )
-			{
-				SecondaryAmmo[ SOLARISMISSILE ] += 3;
-				if( SecondaryAmmo[ SOLARISMISSILE ] > 10 )
-				{
-					Temp = ( SecondaryAmmo[ SOLARISMISSILE ] - 10 );
-					SecAmmoUsed[ SOLARISMISSILE ] = Temp;
-					SecondaryAmmo[ SOLARISMISSILE ] = 10;
-				}
-				NewSecondaryWeapon( SOLARISMISSILE );
-				MessageSFX = SFX_Select_SolarisMissile;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectHeatseakerPickup( i, PickupEnable, Temp, Message, MessageSFX );
 			break;
 
 		case PICKUP_Thief:
-
-			if( !SecondaryAmmo[ THIEFMISSILE ] )
-			{
-				SecondaryAmmo[ THIEFMISSILE ] += 1;
-				NewSecondaryWeapon( THIEFMISSILE );
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectThief( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Scatter:
-
-			if( SecondaryAmmo[ SCATTERMISSILE ] < 3 )
-			{
-				SecondaryAmmo[ SCATTERMISSILE ] += 1;
-				NewSecondaryWeapon( SCATTERMISSILE );
-				MessageSFX = SFX_Select_ScatterMissile;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectScatter( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Gravgon:
-			if( !SecondaryAmmo[ GRAVGONMISSILE ] )
-			{
-				SecondaryAmmo[ GRAVGONMISSILE ] += 1;
-				NewSecondaryWeapon( GRAVGONMISSILE );
-				MessageSFX = SFX_Select_GravgonMissile;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectGravgon( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Launcher:
-			if( SecondaryAmmo[ MULTIPLEMISSILE ] < 100 )
-			{
-				SecondaryAmmo[ MULTIPLEMISSILE ] += 50;
-				if( SecondaryAmmo[ MULTIPLEMISSILE ] > 100 )
-				{
-					Temp = ( SecondaryAmmo[ MULTIPLEMISSILE ] - 100 );
-					SecAmmoUsed[ MULTIPLEMISSILE ] = Temp;
-					SecondaryAmmo[ MULTIPLEMISSILE ] = 100;
-				}
-				NewSecondaryWeapon( MULTIPLEMISSILE );
-				MessageSFX = SFX_Select_MFRL;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectLauncher( i, PickupEnable, Temp, Message, MessageSFX );
 			break;
 
 		case PICKUP_TitanStar:
-			if( SecondaryAmmo[ TITANSTARMISSILE ] < 3 )
-			{
-				SecondaryAmmo[ TITANSTARMISSILE ] += 1;
-				NewSecondaryWeapon( TITANSTARMISSILE );
-				MessageSFX = SFX_Select_TitanStarMissile;
-				TriggeredSFX = SFX_BIKER_BW;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectTitanStar( i, PickupEnable, Message, MessageSFX, TriggeredSFX );
 			break;
 
 		case PICKUP_PurgePickup:
-			if( SecondaryAmmo[ PURGEMINE ] < 10 )
-			{
-				SecondaryAmmo[ PURGEMINE ] += 3;
-				if( SecondaryAmmo[ PURGEMINE ] > 10 )
-				{
-					Temp = ( SecondaryAmmo[ PURGEMINE ] - 10 );
-					SecAmmoUsed[ PURGEMINE ] = Temp;
-					SecondaryAmmo[ PURGEMINE ] = 10;
-				}
-				NewSecondaryWeapon( PURGEMINE );
-				MessageSFX = SFX_Select_PurgeMine;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectPurgePickup( i, PickupEnable, Temp, Message, MessageSFX );
 			break;
 
 		case PICKUP_PinePickup:
-
-			if( SecondaryAmmo[ PINEMINE ] < 6 )
-			{
-				SecondaryAmmo[ PINEMINE ] += 3;
-				if( SecondaryAmmo[ PINEMINE ] > 6 )
-				{
-					Temp = ( SecondaryAmmo[ PINEMINE ] - 6 );
-					SecAmmoUsed[ PINEMINE ] = Temp;
-					SecondaryAmmo[ PINEMINE ] = 6;
-				}
-				NewSecondaryWeapon( PINEMINE );
-				MessageSFX = SFX_Select_PineMine;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectPinePickup( i, PickupEnable, Temp, Message, MessageSFX );
 			break;
 
 		case PICKUP_QuantumPickup:
-
-			if( !SecondaryAmmo[ QUANTUMMINE ] )
-			{
-				SecondaryAmmo[ QUANTUMMINE ] += 1;
-				NewSecondaryWeapon( QUANTUMMINE );
-				MessageSFX = SFX_Select_QuantumMine;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectQuantumPickup( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_SpiderPod:
-
-			if( SecondaryAmmo[ SPIDERMINE ] < 6 )
-			{
-				SecondaryAmmo[ SPIDERMINE ] += 3;
-				if( SecondaryAmmo[ SPIDERMINE ] > 6 )
-				{
-					Temp = ( SecondaryAmmo[ SPIDERMINE ] - 6 );
-					SecAmmoUsed[ SPIDERMINE ] = Temp;
-					SecondaryAmmo[ SPIDERMINE ] = 6;
-				}
-				NewSecondaryWeapon( SPIDERMINE );
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectSpiderPod( i, PickupEnable, Temp, Message, MessageSFX );
 			break;
 
 		case PICKUP_Parasite:
@@ -1102,198 +1632,31 @@ bool CollectPickup( u_int16_t i )
 			break;
 
 		case PICKUP_GeneralAmmo:
-			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-			{
-				if( CopyOfGeneralAmmo < MAXGENERALAMMO )
-				{
-					CopyOfGeneralAmmo += GENERALAMMOPERPOD;
-					MessageSFX = SFX_Select_Ammo;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_MA;
-				}
-			}
-			else
-			{
-				if( GeneralAmmo < MAXGENERALAMMO )
-				{
-					GeneralAmmo += GENERALAMMOPERPOD;
-					MessageSFX = SFX_Select_Ammo;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_MA;
-				}
-			}
+			CollectGeneralAmmo( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_PyroliteAmmo:
-
-			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-			{
-				if( CopyOfPyroliteAmmo < MAXPYROLITEAMMO )
-				{
-					CopyOfPyroliteAmmo += PYROLITEAMMOPERPOD;
-					MessageSFX = SFX_Select_Ammo;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_MA;
-				}
-			}
-			else
-			{
-				if( PyroliteAmmo < MAXPYROLITEAMMO )
-				{
-					PyroliteAmmo += PYROLITEAMMOPERPOD;
-					MessageSFX = SFX_Select_Ammo;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_MA;
-				}
-			}
-
+			CollectPyroliteAmmo( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_SussGunAmmo:
-			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-			{
-				if( CopyOfSussGunAmmo < MAXSUSSGUNAMMO )
-				{
-					CopyOfSussGunAmmo += SUSSGUNAMMOPERPOD;
-					MessageSFX = SFX_Select_Ammo;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_MA;
-				}
-			}
-			else
-			{
-				if( SussGunAmmo < MAXSUSSGUNAMMO )
-				{
-					SussGunAmmo += SUSSGUNAMMOPERPOD;
-					MessageSFX = SFX_Select_Ammo;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_MA;
-				}
-			}
+			CollectSussGunAmmo( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_PowerPod:
-			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-			{
-				if( CopyOfPowerLevel != ( MAXPOWERLEVELS - 1 ) )
-				{
-					CopyOfPowerLevel++;
-					if( CopyOfPowerLevel == ( MAXPOWERLEVELS - 1 ) )
-					{
-						snprintf( (char*)&Message[ 0 ], sizeof( Message ), FULL_POWER_LEVEL );
-					}
-					else
-					{
-						snprintf( (char*)&Message[ 0 ], sizeof( Message ), POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
-					}
-					ShowTextAnyway = true;
-					MessageSFX = SFX_Select_PowerPod;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX_POWER );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-			}
-			else
-			{
-				if( Ships[ WhoIAm ].Object.PowerLevel != ( MAXPOWERLEVELS - 1 ) )
-				{
-					Ships[ WhoIAm ].Object.PowerLevel++;
-					if( Ships[ WhoIAm ].Object.PowerLevel == ( MAXPOWERLEVELS - 1 ) )
-					{
-						snprintf( (char*)&Message[ 0 ], sizeof( Message ), FULL_POWER_LEVEL );
-					}
-					else
-					{
-						snprintf( (char*)&Message[ 0 ], sizeof( Message ), POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
-					}
-					ShowTextAnyway = true;
-					MessageSFX = SFX_Select_PowerPod;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX_POWER );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-			}
+			CollectPowerPod( PickupEnable, Message, MessageSFX, ShowTextAnyway );
 			break;
 
 		case PICKUP_GoldenPowerPod:
-
-			if( !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-			{
-				GivemeSuperNashram();
-				MessageSFX = SFX_Select_GoldenPowerPod;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_CANT_HANDLE_ANY_MORE );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectGoldenPowerPod( PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Shield:
-			if( Ships[ WhoIAm ].Object.Shield != MAX_SHIELD )
-			{
-				Ships[ WhoIAm ].Object.Shield += 32.0F;
-				if ( Ships[ WhoIAm ].Object.Shield > SHIELD_CRITICAL_LEVEL )
-					ShieldCritical = false;
-				if( Ships[ WhoIAm ].Object.Shield > MAX_SHIELD ) Ships[ WhoIAm ].Object.Shield = MAX_SHIELD;
-				MessageSFX = SFX_Select_Shield;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
+			CollectShield( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_Inv:
-
-			if( !Ships[ WhoIAm ].Invul )
-			{
-				Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
-				Ships[ WhoIAm ].Invul = true;
-				PickupInvulnerability = true;
-				MessageSFX = SFX_Select_Invul;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectInv( i, PickupEnable, Message, MessageSFX );
 			break;
 
 		case PICKUP_ExtraLife:
@@ -1312,102 +1675,22 @@ bool CollectPickup( u_int16_t i )
 			break;
 
 		case PICKUP_Nitro:
-
-			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-			{
-				if( CopyOfNitroFuel < MAX_NITRO_FUEL )
-				{
-					CopyOfNitroFuel += 50.0F;
-					if( CopyOfNitroFuel > MAX_NITRO_FUEL )
-					{
-						TempFloat = ( CopyOfNitroFuel - MAX_NITRO_FUEL );
-						NitroFuelUsed += TempFloat;
-						CopyOfNitroFuel = MAX_NITRO_FUEL;
-					}
-					MessageSFX = SFX_Select_Nitro;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-			}
-			else
-			{
-				if( NitroFuel < MAX_NITRO_FUEL )
-				{
-					NitroFuel += 50.0F;
-					if( NitroFuel > MAX_NITRO_FUEL )
-					{
-						TempFloat = ( NitroFuel - MAX_NITRO_FUEL );
-						NitroFuelUsed += TempFloat;
-						NitroFuel = MAX_NITRO_FUEL;
-					}
-					MessageSFX = SFX_Select_Nitro;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-			}
-
+			CollectNitro( i, PickupEnable, TempFloat, Message, MessageSFX );
 			break;
 
 		case PICKUP_Goggles:
 			break;
 
 		case PICKUP_Gold:
-			NumGoldBars ++;
-			if( !( NumGoldBars % 10 ) )
-			{
-				Lives += 1;
-				snprintf( (char*)&Message[0], sizeof( Message ), YOUVE_EARNED_EXTRA_LIFE );
-				PlaySfx( SFX_ExtraLife, 1.0F );
-			}
-			else
-			{
-				if( NumGoldBars == 1 ) snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_GOLD_BAR, NumGoldBars );
-				else snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_GOLD_BARS, NumGoldBars );
-			}
-			MessageSFX = SFX_GoldBarPickup;
-			Speech = false;
-			ShowTextAnyway = true;
+			CollectGold( Message, MessageSFX, ShowTextAnyway, Speech );
 			break;
 
 		case PICKUP_Mantle:
-
-			if( !( Ships[ WhoIAm ].Object.Flags & SHIP_Stealth ) )
-			{
-				Ships[ WhoIAm ].Object.Flags |= SHIP_Stealth;
-				Ships[ WhoIAm ].StealthTime = ( 60.0F * ANIM_SECOND );
-				MessageSFX = SFX_Cloaking;
-				Speech = false;
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
-				MessageSFX = SFX_BIKECOMP_AP;
-				PickupEnable = false;
-			}
-
+			CollectMantle( i, PickupEnable, Message, MessageSFX, Speech );
 			break;
 
 		case PICKUP_Crystal:
-			CrystalsFound += 1;
-			if( CrystalsFound == 1 )
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_ONE_CRYSTAL, CrystalsFound );
-			}
-			else
-			{
-				snprintf( (char*)&Message[0], sizeof( Message ), YOU_HAVE_CRYSTALS, CrystalsFound );
-			}
-			MessageSFX = SFX_PickupCrystal;
-			Speech = false;
-			ShowTextAnyway = true;
+			CollectCrystal( Message, MessageSFX, ShowTextAnyway, Speech );
 			break;
 
 		case PICKUP_DNA:
@@ -1439,132 +1722,22 @@ bool CollectPickup( u_int16_t i )
 			break;
 
 		case PICKUP_Flag:
-			if ( CaptureTheFlag )
-			{
-				// now I have the flag....?
-				Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingFlag;
-				AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
-					TeamName[ TeamNumber[ WhoIAm ] ] );
-
-				snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
-				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
-
-			}
+			CollectFlag(  );
 			break;
 
 		case PICKUP_Bounty:
-			if ( BountyHunt )
-			{
-				// now I have the bounty....?
-				BountyTime = 0.0F;
-				Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingBounty;
-				AddColourMessageToQue(FlagMessageColour, YOU_HAVE_GOT_THE_BOUNTY );
-
-				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_BountyMessage, 0);
-
-			}
+			CollectBounty(  );
 			break;
 
 		case PICKUP_Flag1:
 		case PICKUP_Flag2:
 		case PICKUP_Flag3:
 		case PICKUP_Flag4:
-			if ( CTF )
-			{
-				int team;
-
-				for ( team = 0; team < MAX_TEAMS; team++ )
-				{
-					if ( Pickups[i].Type == TeamFlagPickup[ team ] )
-					{
-						if ( team == TeamNumber[ WhoIAm ] )
-						{
-							if ( TeamFlagAtHome[ team ] )
-							{
-								PickupEnable = false;
-							}
-							else if ( OwnFlagTeleportsHome )
-							{
-								GOAL *goal;
-
-								// teleport flag back to own goal
-								PickupEnable = false;
-								goal = TeamGoal( team );
-								if ( goal )
-								{
-									KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
-									KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
-									GenerateFlagAtHome( team );
-									AddColourMessageToQue(FlagMessageColour, TEAM_FLAG_RETURNED,
-										TeamName[ TeamNumber[ WhoIAm ] ] );
-									SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
-								}
-							}
-							else if ( CanCarryOwnFlag )
-							{
-								Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
-								AddColourMessageToQue(FlagMessageColour, RETURN_TEAM_FLAG,
-									TeamName[ TeamNumber[ WhoIAm ] ] );
-								SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturningFlag, 0);
-							}
-							else
-							{
-								AddColourMessageToQue(FlagMessageColour, CANNOT_PICKUP_OWN_FLAG );
-								PickupEnable = false;
-							}
-						}
-						else
-						{
-							// now I have the flag....?
-							Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
-							AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
-								TeamName[ TeamNumber[ WhoIAm ] ] );
-
-							snprintf( CTFMessage, sizeof( CTFMessage ), SOMEONE_HAS_OTHER_TEAM_FLAG,
-								Names[ WhoIAm ],
-								TeamName[ TeamNumber[ WhoIAm ] ],
-								TeamName[ team ] );
-							SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
-						}
-						break;
-					}
-				}
-
-			}
+			CollectFlag1( i, PickupEnable );
 			break;
 
 		case PICKUP_Orb:
-			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-			{
-				if( CopyOfOrbitals < MAXMULTIPLES )
-				{
-					CopyOfOrbAmmo[ CopyOfOrbitals ] = MAXMULTIPLEAMMO;
-					CopyOfOrbitals++;
-					MessageSFX = SFX_Orbital;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-			}
-			else
-			{
-				if( Ships[ WhoIAm ].NumMultiples < MAXMULTIPLES )
-				{
-					Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples ] = MAXMULTIPLEAMMO;
-					Ships[ WhoIAm ].NumMultiples++;
-					CreateOrbitPulsar( WhoIAm );
-					MessageSFX = SFX_Orbital;
-				}
-				else
-				{
-					snprintf( (char*)&Message[0], sizeof( Message ), YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-			}
+			CollectOrb( i, PickupEnable, Message, MessageSFX );
 			break;
 		}
 
