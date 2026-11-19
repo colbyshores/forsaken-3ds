@@ -860,15 +860,6 @@ void InitTextMessages( void )
 		MessageBankLong[i][0] = 0;
 	}
 }
-typedef struct {
-	const char *keyword;
-	int  num;
-} MESSAGE_NUM_LOOKUP;
-
-typedef struct {
-	const char *keyword;
-	void *var_ptr;
-} MESSAGE_VAR_LOOKUP;
 
 
 /*===================================================================

@@ -252,8 +252,6 @@ typedef struct
 
 typedef struct _MENU MENU;
 typedef struct _MENUITEM MENUITEM;
-typedef struct _PARAM PARAM;
-typedef struct _STATUS STATUS;
 typedef struct _TITLE_EVENT TITLE_EVENT;
 typedef struct _TITLE_EVENT_TIMER TITLE_EVENT_TIMER;
 typedef struct _TEXT TEXT;
@@ -352,13 +350,6 @@ struct _TITLE_EVENT_TIMER
 	TimerFunc	InitFunc;
 };
 
-typedef struct _LEVEL_LOOKUP
-{
-	char		*name;
-	int			frame_no;
-	FRAME_INFO	**tpage;
-	bool		rotated;
-}LEVEL_LOOKUP;
 
 constexpr int MAXTEXTPERMENUITEM = 32;
 

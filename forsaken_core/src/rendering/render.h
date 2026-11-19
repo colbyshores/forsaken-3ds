@@ -188,13 +188,6 @@ typedef struct TEXTUREGROUP
 typedef void * BUFFER_HANDLE;
 
 
-typedef struct {
-	float r;
-	float g;
-	float b;
-	float a;
-} COLORVALUE;
-
 /* RENDEROBJECT / LEVELRENDEROBJECT: textureGroups is a TAG_LEVEL hunk
  * pointer sized to numTextureGroups at load time. Was an inline
  * MAX_TEXTURE_GROUPS-element array (~2 KB per RENDEROBJECT, ~256 KB

@@ -54,7 +54,6 @@ int input_buffer_count;
 
 #define JOYSTICK_POV_HELD( J, P, D )    ( js_pov[ new_input ][ J ][ P ][ D ] )
 #define JOYSTICK_POV_PRESSED( J, P, D )   ( !( js_pov[ old_input ][ J ][ P ][ D ] ) && ( js_pov[ new_input ][ J ][ P ][ D ] ) )
-#define JOYSTICK_POV_RELEASED( J, P, D )  ( ( js_pov[ old_input ][ J ][ P ][ D ] ) && !( js_pov[ new_input ][ J ][ P ][ D ] ) )
 
 
 bool CheatsEnabled = false;

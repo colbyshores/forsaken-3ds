@@ -165,12 +165,6 @@ LIST	JoystickList = { 0 };
 char	AxisExtremeLeftText[64];
 char	AxisExtremeRightText[64];
 LIST ShipActionList = { 0 };
-typedef struct
-{
-	int type;
-	int num;
-	int dir;
-}PSEUDOJOYBTN;
 LIST JoystickAxisList = { 0 };
 LIST AxisActionList = { 0 };
 bool AxisInvert = false;
@@ -2825,11 +2819,6 @@ ACTIVESLIDERINFO ActiveSliderItem[MAXSLIDERSPERMENU];
 highlight box globals
 ***********************/
 
-typedef struct
-{
-	float xmin;
-	float xmax;
-}HIGHLIGHTPOLYINFO;
 
 bool WasteAFrame = false;
 

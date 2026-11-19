@@ -89,20 +89,6 @@ constexpr auto MAGIC_NUMBER = 0x584A5250;
 constexpr float GLOBAL_SCALE = (0.25F);
 constexpr float BLOCKSIZE = ( 1024.0F * GLOBAL_SCALE ); // one level block
 
-typedef struct
-{
-	long    left;
-	long    top;
-	long    right;
-	long    bottom;
-} rect_t;
-
-typedef struct
-{
-	long  x;
-	long  y;
-} point_t;
-
 #undef MAX
 #define MAX(x, y) ((x) > (y)) ? (x) : (y)
 

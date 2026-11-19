@@ -181,16 +181,6 @@ typedef struct SHORTKILLPICKUP{
 	Bodge Structures
 ===================================================================*/
 
-typedef struct _PLAYERINFO
-{
-	char	IP[16];
-	char	Name[8];
-}PLAYERINFO;
-
-/*===================================================================
-	Bodge Structures
-===================================================================*/
-
 typedef struct MISSEDPICKUPMSG{
 	int16_t	Type;
 	void *	Struct;
@@ -243,16 +233,6 @@ typedef struct _KILLPICKUPINFO
 }KILLPICKUPINFO;
 
 
-typedef struct _EXPSECONDARYINFO
-{
-	u_int16_t		OwnerType;
-	u_int16_t		Owner;
-	u_int16_t		IDCount;
-	float		ShockwaveSize;
-	VECTOR		Pos;
-	u_int16_t		Group;
-
-}EXPSECONDARYINFO;
 
 typedef struct _TEAMGOALSINFO
 {
@@ -610,13 +590,6 @@ constexpr auto MSG_GROUPONLY_VERYSHORTFUPDATE = 0xec;
 constexpr auto MSG_VERYSHORTDROPPICKUP = 0xed;
 constexpr auto MSG_SHIPHEALTH = 0xcc;
 
-typedef struct _SENDBIKENUMMSG
-{
-	BYTE        MsgCode;
-	BYTE        WhoIAm;
-}SENDBIKENUMMSG;
-
-
 typedef struct _YOUQUITMSG
 {
 	BYTE        MsgCode;
@@ -867,16 +840,6 @@ typedef struct _TITANBITSMSG
 	BYTE        WhoIAm;
 	TITANBITS	TitanBits;
 } TITANBITSMSG;
-
-typedef	int16_t		SHORTSTATSTYPE[MAX_PLAYERS];
-
-typedef struct _SHORTSTATSMSG
-{
-	BYTE        MsgCode;
-	BYTE        WhoIAm;
-	BYTE        WhosStats;
-	SHORTSTATSTYPE		ShortStats;
-} SHORTSTATSMSG;
 
 typedef struct _STATUSMSG
 {

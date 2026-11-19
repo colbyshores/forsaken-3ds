@@ -2627,14 +2627,6 @@ NEXT_LIGHT:
 	if (*A > 255.0f) *A = 255.0f;
 }
 
-#define MINUS(X, Y) \
-	tmp = X; tmp -= Y; \
-	X = (tmp < 0) ? 0 : (tmp > 255) ? 255 : tmp
-
-#define ADD(X, Y) MINUS(X, -Y)
-
-#define MIX_COLOR_BLEND_LIGHT(COLOR, BLEND, LIGHT) \
-	ADD(COLOR, LIGHT); MINUS(COLOR, BLEND)
 
 /*===================================================================
 	Draw functions — native citro3d path

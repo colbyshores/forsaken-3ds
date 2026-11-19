@@ -78,12 +78,6 @@ bool MCload( char * /*Filename*/ , MCLOADHEADER * /*MCloadheader*/ )
 }
 
 
-typedef enum
-{
-	X_Axis = 0,
-	Y_Axis = 1,
-	Z_Axis = 2
-} AxisIndex;
 
 
 bool ColRayPlaneIntersect( VECTOR *normal, float offset )

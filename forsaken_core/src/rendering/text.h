@@ -30,22 +30,9 @@ constexpr int MAXTEXTMESSAGES = 128;
 #endif
 constexpr int MAXPERLINE = 512; // message buffer width - line width set in (text.cpp) MessageQuePrint/All
 
-constexpr int MAX_STATS_MESSAGE_VARIATIONS = 16;
-constexpr int MAX_STATS_MESSAGE_LENGTH = 128;
-constexpr int MAX_STATS_FORMATING_VARS = 8;
-
 /*
  * Typedefs
  */
-typedef struct
-{
-	bool valid;
-	bool valid_this_time;
-	u_int16_t num_variations;
-	u_int16_t current_variation;
-	char text[MAX_STATS_MESSAGE_VARIATIONS][MAX_STATS_MESSAGE_LENGTH];
-	void *variable_ptr[MAX_STATS_MESSAGE_VARIATIONS][MAX_STATS_FORMATING_VARS];
-} STATSMESSAGE;
 typedef struct
 {
 	bool	Activated;

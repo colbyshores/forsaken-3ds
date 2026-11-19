@@ -7,7 +7,7 @@
  * v * M with translation in _41.._43. ApplyMatrix uses the transposed 3x3 with
  * the same translation and is not a general transform. Angle units differ:
  * BuildRotMatrix and SIND/COSD take degrees; MatrixFromAxisAndAngle,
- * SINR/COSR and fast_sinf/fast_cosf take radians. COLOR is a u32 0xAARRGGBB.
+ * fast_sinf/fast_cosf take radians. COLOR is a u32 0xAARRGGBB.
  * Random_Range draws from Seed1/Seed2, which a multiplayer host seeds and
  * sends to joining players.
  */
@@ -43,7 +43,7 @@ constexpr float PI = 3.14159265358979323846F;
 
 	Both accessors are static inline for the same reason
 	fast_invsqrtf below is: they are a handful of VFP ops, and the
-	~127 SINR/COSR/SIND/COSD call sites should not each pay a
+	SIND/COSD and fast_sinf/fast_cosf call sites should not each pay a
 	non-leaf `bl fast_sinf` (plus its register spills) to reach them.
 
 	★ The range reduction deliberately does NOT use floorf().  VFPv2
@@ -157,8 +157,6 @@ static inline float fast_ceilf(float x)
 	return (x > t) ? t + 1.0f : t;
 }
 
-#define	SINR(x)				fast_sinf( x )
-#define	COSR(x)				fast_cosf( x )
 #define	SIND(x)				fast_sinf( D2R( x ) )
 #define	COSD(x)				fast_cosf( D2R( x ) )
 /* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
