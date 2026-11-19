@@ -8,6 +8,7 @@
 #include "game/main.h"
 #include "math/new3d.h"
 #include "math/quat.h"
+#include "data/file.h"
 #include "data/mload.h"
 #include "game/compobjects.h"
 #include "game/bgobjects.h"
@@ -78,8 +79,7 @@ bool LoadSpotFX( void )
 	float		Volume;
 	float		Speed;
 	int16_t		SFXType;
-	int16_t		i;
-	int8_t		SFXFilename[ 128 ];
+	char		SFXFilename[ 128 ];
 
 	Change_Ext( (char*)&LevelNames[ LevelNum ][ 0 ], (char*)&Filename[ 0 ], (char*)NewExt );
 
@@ -128,13 +128,7 @@ bool LoadSpotFX( void )
 			fread( &Primary, sizeof( int16_t ), 1, fp );
 			fread( &Secondary, sizeof( int16_t ), 1, fp );
 
-			i = 0;
-			do
-			{
-				fread( &SFXFilename[ i ], sizeof( int8_t ), 1, fp );
-				i++;
-			}
-			while( SFXFilename[ ( i - 1 ) ] != 0 );
+			file_read_cstring( fp, SFXFilename, sizeof( SFXFilename ) );
 
 			fread( &Volume, sizeof( float ), 1, fp );
 			fread( &Speed, sizeof( float ), 1, fp );
@@ -142,7 +136,7 @@ bool LoadSpotFX( void )
 
 			if( Type == SPOTFX_SoundFX )
 			{
-				SoundFX = ReturnSFXIndex( (char*)&SFXFilename[ 0 ] );
+				SoundFX = ReturnSFXIndex( SFXFilename );
 			}
 			else
 			{

@@ -9,6 +9,7 @@
 #include "game/main.h"
 #include "math/new3d.h"
 #include "math/quat.h"
+#include "data/file.h"
 #include "data/mload.h"
 #include "game/compobjects.h"
 #include "game/bgobjects.h"
@@ -287,8 +288,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 	VECTOR				BoxCenter;
 	VECTOR				BoxHalfSize;
 	ZONESIDE		*	SidesPtr;
-	int16_t				i;
-	int8_t				SFXFilename[ 256 ];
+	char				SFXFilename[ 256 ];
 
 	for( CompCount = 0; CompCount < NumComp; CompCount++ )
 	{
@@ -524,15 +524,9 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 										fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
 										break;
 									case PROPTYPE_SFX:
-										i = 0;
-										do
-										{
-											fread( &SFXFilename[ i ], sizeof( int8_t ), 1, fp );
-											i++;
-										}
-										while( SFXFilename[ ( i - 1 ) ] != 0 );
+										file_read_cstring( fp, SFXFilename, sizeof( SFXFilename ) );
 
-										AniPropPtr->Value = ReturnSFXIndex( (char*)&SFXFilename[ 0 ] );
+										AniPropPtr->Value = ReturnSFXIndex( SFXFilename );
 										break;
 
 									case PROPTYPE_Unknown:

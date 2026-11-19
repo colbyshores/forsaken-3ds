@@ -8,6 +8,7 @@
 #include "game/main.h"
 #include "math/new3d.h"
 #include "math/quat.h"
+#include "data/file.h"
 #include "data/mload.h"
 #include "game/compobjects.h"
 #include "game/bgobjects.h"
@@ -1089,7 +1090,6 @@ bool PreLoadBGOFiles( void )
 	const char		*	NewExt = ".BGO";
 	int16_t			NumBGObjects;
 	int16_t			Count;
-	int16_t			i;
 	u_int32_t			MagicNumber;
 	u_int32_t			VersionNumber;
 
@@ -1129,16 +1129,9 @@ bool PreLoadBGOFiles( void )
 
 			for( Count = 0; Count < NumBGObjects; Count++ )
 			{
-				i = 0;
+				file_read_cstring( fp, TempFilename, sizeof( TempFilename ) );
 
-				do
-				{
-					fread( &TempFilename[ i ], sizeof( int8_t ), 1, fp );
-					i++;
-				}
-				while( TempFilename[ ( i - 1 ) ] != 0 );
-
-				sprintf( &FilePtr->Filename[ 0 ], "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], &TempFilename[ 0 ] );
+				snprintf( FilePtr->Filename, sizeof( FilePtr->Filename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], TempFilename );
 
 				fread( &FilePtr->Type, sizeof( int16_t ), 1, fp );
 

@@ -10,7 +10,10 @@
  * the whole file; the size and read helpers return 0 on failure.
  * folder_exists takes a printf-style path and creates the folder if it is
  * missing. find_file / find_next_file walk one glob at a time and return
- * bare file names.
+ * bare file names. file_read_cstring reads a NUL-terminated string from
+ * an open file the way the level loaders store names: up to and including
+ * the NUL, keeping at most size-1 characters (always terminated) and
+ * stopping at end of file, so a bad file cannot overrun the buffer.
  */
 
 #include "game/main.h"
@@ -45,3 +48,4 @@ char* find_next_file( void );
 void find_close( void );
 
 FILE * file_open(const char * filename, const char * mode);
+void file_read_cstring( FILE * fp, char * dst, size_t size );

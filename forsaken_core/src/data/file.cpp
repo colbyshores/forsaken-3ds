@@ -265,3 +265,15 @@ void find_close( void )
 	glob_pos = -1;
 }
 
+void file_read_cstring( FILE * fp, char * dst, size_t size )
+{
+	size_t n = 0;
+	int c;
+
+	while( ( c = getc( fp ) ) != EOF && c != 0 )
+	{
+		if( n + 1 < size )
+			dst[ n++ ] = (char) c;
+	}
+	dst[ n ] = 0;
+}
