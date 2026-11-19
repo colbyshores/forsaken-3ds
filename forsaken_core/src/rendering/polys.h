@@ -25,7 +25,11 @@
  *
  * On 3DS textureGroups only has MAX_TEXTURE_GROUPS entries, so a fill that
  * fills it draws the batch mid-fill (unlock, draw, re-lock) and carries on
- * from the start of the buffers. Only pages 0..MAXTPAGESPERTLOAD-1 are drawn;
+ * from the start of the buffers. Each texture group's startVert is then
+ * the write position within the current batch (batchVert), not the pass-1
+ * PolyTPages[].StartVert offsets, which count from the start of the
+ * unflushed buffer (and reserve every bit of a multi-bit frame although
+ * only one quad is written). Only pages 0..MAXTPAGESPERTLOAD-1 are drawn;
  * the extra PolyTPages slot holds polys whose page is -1.
  */
 

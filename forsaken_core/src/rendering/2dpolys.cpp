@@ -1679,6 +1679,9 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 	int16_t			BitCount;
 	int16_t			TotalVerts;
 	int16_t			StartVert;
+#ifdef __3DS__
+	int				batchVert = 0;	/* write position in the current batch */
+#endif
 	int16_t			NumVerts;
 	int16_t			NumTris;
 	VECTOR			TempVector;
@@ -1963,7 +1966,11 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+#ifdef __3DS__
+							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+#else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+#endif
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 
@@ -1975,6 +1982,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 							 * quad), so draw what is filled and refill from the
 							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
+							batchVert += 4;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
@@ -1982,7 +1990,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 								renderObject->numTextureGroups = 0;
 								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
-								StartVert = 0;
+								batchVert = 0;
 								FSLockVertexBuffer(renderObject, &BufStart);
 								FSLockIndexBuffer(renderObject, &Indices);
 								FmPolyVertPnt = (LVERTEX *) BufStart;
@@ -2043,6 +2051,9 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 	int16_t			BitCount;
 	int16_t			TotalVerts;
 	int16_t			StartVert;
+#ifdef __3DS__
+	int				batchVert = 0;	/* write position in the current batch */
+#endif
 	int16_t			NumVerts;
 	int16_t			NumTris;
 	VECTOR			TempVector;
@@ -2327,7 +2338,11 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
 							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+#ifdef __3DS__
+							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+#else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+#endif
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 
@@ -2339,6 +2354,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 							 * quad), so draw what is filled and refill from the
 							 * start of the buffers. See polys.h. */
 							renderObject->numTextureGroups++;
+							batchVert += 4;
 							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
 								FSUnlockVertexBuffer(renderObject);
 								FSUnlockIndexBuffer(renderObject);
@@ -2346,7 +2362,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 								renderObject->numTextureGroups = 0;
 								renderObject->memoEpochResume += SMEMO_CHUNK_STEP;
 								start_index = 0;
-								StartVert = 0;
+								batchVert = 0;
 								FSLockVertexBuffer(renderObject, &BufStart);
 								FSLockIndexBuffer(renderObject, &Indices);
 								FmPolyVertPnt = (LVERTEX *) BufStart;
