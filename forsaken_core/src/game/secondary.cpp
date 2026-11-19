@@ -1988,6 +1988,312 @@ void ProcessSecondaryBullets( void )
 	Input		:	u_int16_t		Secondary Weapon Bullet Index
 	Output		:	bool		True/False
 ===================================================================*/
+/* PURGEMINE -- false: ProcessMines returns false */
+[[gnu::always_inline]] static inline bool MinePurge( u_int16_t & i, VECTOR & FrameLag_Rot, QUAT & TempQuat, int16_t & Val, float & Height, u_int16_t & Enemy, u_int16_t & Owner, float & Radius )
+{
+	FrameLag_Rot.x = 0.0F;
+	FrameLag_Rot.y = ( 2.0F * framelag );
+	FrameLag_Rot.z = 0.0F;
+	TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+	SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
+	SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
+
+	Val = (int16_t) ( SecBulls[i].LifeCount * 3.0F );
+	Val %= 360;
+	Height = (float) ( COSD( Val ) * ( 200.0F * GLOBAL_SCALE ) );
+	SecBulls[i].Pos.x = SecBulls[i].StartPos.x + ( SecBulls[i].UpVector.x * Height );
+	SecBulls[i].Pos.y = SecBulls[i].StartPos.y + ( SecBulls[i].UpVector.y * Height );
+	SecBulls[i].Pos.z = SecBulls[i].StartPos.z + ( SecBulls[i].UpVector.z * Height );
+
+	if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
+	else Owner = SecBulls[i].Owner;
+
+	if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
+							   SecBulls[i].OwnerType, Owner ) )
+	{
+		DestroySecondary( i, &SecBulls[i].Pos );
+		return( false );
+	}
+	else
+	{
+		Radius = MaxColDistance;
+		Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
+
+		if( Enemy != INDEX_NONE )
+		{
+			if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
+			{
+				if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
+					( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
+				{
+					Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
+					Enemies[ Enemy ].MineDistance = Radius;
+					Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
+					Enemies[ Enemy ].MineNum = i;
+				}
+			}
+			if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
+		}
+	}
+	return true;
+}
+
+/* PINEMINE -- false: ProcessMines returns false */
+[[gnu::always_inline]] static inline bool MinePine( u_int16_t & i, float & Cos, float & Angle, VECTOR & DirVector, QUATLERP & qlerp, VECTOR & DropVector, VECTOR & DropPos, float & ClosestCos, u_int16_t & Ship, u_int16_t & Enemy, u_int16_t & Secondary, u_int16_t & Owner, float & Radius, u_int16_t & BulletID )
+{
+	if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
+	else Owner = SecBulls[i].Owner;
+
+	if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
+							   SecBulls[i].OwnerType, Owner ) )
+	{
+		DestroySecondary( i, &SecBulls[i].Pos );
+		return( false );
+	}
+	else
+	{
+		Radius = MaxColDistance;
+		Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
+
+		if( Enemy != INDEX_NONE )
+		{
+			if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
+			{
+				if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
+					( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
+				{
+					Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
+					Enemies[ Enemy ].MineDistance = Radius;
+					Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
+					Enemies[ Enemy ].MineNum = i;
+				}
+			}
+			if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
+		}
+	}
+
+	Ship = INDEX_NONE;
+	Enemy = INDEX_NONE;
+	Secondary = INDEX_NONE;
+
+	switch( SecBulls[i].OwnerType )
+	{
+	case OWNER_SHIP:
+		Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
+								  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+								  &ClosestCos );
+		Enemy = TargetClosestEnemy( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
+									SecBulls[i].ViewCone, &ClosestCos );
+		if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
+		Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
+								  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+								  &ClosestCos );
+		if( Secondary != INDEX_NONE )
+		{
+			Ship = INDEX_NONE;
+			Enemy = INDEX_NONE;
+		}
+		break;
+
+	case OWNER_ENEMY:
+		Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
+								  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+								  &ClosestCos );
+		Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
+								  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+								  &ClosestCos );
+		if( Secondary != INDEX_NONE )
+		{
+			Ship = INDEX_NONE;
+		}
+		break;
+
+	case OWNER_NOBODY:
+		Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
+								  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+								  &ClosestCos );
+		Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
+								  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
+								  &ClosestCos );
+		if( Secondary != INDEX_NONE )
+		{
+			Ship = INDEX_NONE;
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	if( Ship != INDEX_NONE )
+	{
+		DirVector.x = ( Ships[ Ship ].Object.Pos.x - SecBulls[ i ].Pos.x );
+		DirVector.y = ( Ships[ Ship ].Object.Pos.y - SecBulls[ i ].Pos.y );
+		DirVector.z = ( Ships[ Ship ].Object.Pos.z - SecBulls[ i ].Pos.z );
+	}
+	else
+	{
+		if( Enemy != INDEX_NONE )
+		{
+			DirVector.x = ( Enemies[ Enemy ].Object.Pos.x - SecBulls[ i ].Pos.x );
+			DirVector.y = ( Enemies[ Enemy ].Object.Pos.y - SecBulls[ i ].Pos.y );
+			DirVector.z = ( Enemies[ Enemy ].Object.Pos.z - SecBulls[ i ].Pos.z );
+		}
+		else
+		{
+			if( Secondary != INDEX_NONE )
+			{
+				DirVector.x = ( SecBulls[ Secondary ].Pos.x - SecBulls[ i ].Pos.x );
+				DirVector.y = ( SecBulls[ Secondary ].Pos.y - SecBulls[ i ].Pos.y );
+				DirVector.z = ( SecBulls[ Secondary ].Pos.z - SecBulls[ i ].Pos.z );
+			}
+		}
+	}
+
+	if( ( Ship != INDEX_NONE ) || ( Enemy != INDEX_NONE ) || ( Secondary != INDEX_NONE ) )
+	{
+		NormaliseVector( &DirVector );
+
+		Cos = DotProduct( &DirVector, &SecBulls[ i ].DirVector );
+
+		qlerp.end.From2Vectors(&Forward, &DirVector);
+
+		qlerp.start	= SecBulls[ i ].DirQuat;				/* Current Quaternion */
+		qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
+		qlerp.dir	= qlerp.start.Dot(&qlerp.end);
+
+		if( Cos < -1.0F ) Cos = -1.0F;
+		else if ( Cos > 1.0F ) Cos = 1.0F;
+		/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
+		Angle = (float) acosf( Cos );
+		if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * framelag ) / Angle );
+		else qlerp.time = 1.0F;
+		if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
+
+		qlerp.Step();
+		SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
+		ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &SecBulls[ i ].DirVector );
+		ApplyMatrix( &SecBulls[ i ].Mat, &SlideUp, &SecBulls[ i ].UpVector );
+
+		if( R2D( Angle ) < 1.0F )
+		{
+			if( ( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[ i ].Owner == WhoIAm ) ) ) ||
+				( ( ( SecBulls[i].OwnerType != OWNER_SHIP ) && IsHost ) ) )
+			{
+				BulletID = GetSecondaryBulletID( SecBulls[i].OwnerType, SecBulls[i].Owner );
+
+				if( SecBulls[i].LifeCount > 60.0F )
+				{
+					DropPos.x = ( SecBulls[i].UpVector.x * ( -128.0F * GLOBAL_SCALE ) );
+					DropPos.y = ( SecBulls[i].UpVector.y * ( -128.0F * GLOBAL_SCALE ) );
+					DropPos.z = ( SecBulls[i].UpVector.z * ( -128.0F * GLOBAL_SCALE ) );
+					DropVector.x = 0.0F;
+					DropVector.y = 0.0F;
+					DropVector.z = 0.0F;
+					InitOneSecBull( SecBulls[i].OwnerType, SecBulls[i].Owner, BulletID,
+									SecBulls[i].GroupImIn, &SecBulls[i].Pos, &DropPos,
+									&SecBulls[i].DirVector, &SecBulls[i].UpVector, &DropVector, PINEMISSILE, true );
+					SecBulls[i].LifeCount = 0.0F;
+				}
+			}
+		}
+	}
+	return true;
+}
+
+/* QUANTUMMINE -- false: ProcessMines returns false */
+[[gnu::always_inline]] static inline bool MineQuantum( u_int16_t & i, VECTOR & FrameLag_Rot, QUAT & TempQuat, int16_t & Val, float & Height, u_int16_t & Enemy, u_int16_t & Owner, float & Radius )
+{
+	FrameLag_Rot.x = 0.0F;
+	FrameLag_Rot.y = ( 2.0F * framelag );
+	FrameLag_Rot.z = 0.0F;
+	TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+	SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
+	SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
+
+	Val = (int16_t) ( SecBulls[i].LifeCount * 2.5F );
+	Val %= 360;
+	Height = (float) ( COSD( Val ) * ( 75.0F * GLOBAL_SCALE ) );
+	SecBulls[i].Pos.x = SecBulls[i].StartPos.x + ( SecBulls[i].UpVector.x * Height );
+	SecBulls[i].Pos.y = SecBulls[i].StartPos.y + ( SecBulls[i].UpVector.y * Height );
+	SecBulls[i].Pos.z = SecBulls[i].StartPos.z + ( SecBulls[i].UpVector.z * Height );
+
+	if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
+	else Owner = SecBulls[i].Owner;
+
+	if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
+							   SecBulls[i].OwnerType, Owner ) )
+	{
+		DestroySecondary( i, &SecBulls[i].Pos );
+		return( false );
+	}
+	else
+	{
+		Radius = MaxColDistance;
+		Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
+
+		if( Enemy != INDEX_NONE )
+		{
+			if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
+			{
+				if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
+					( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
+				{
+					Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
+					Enemies[ Enemy ].MineDistance = Radius;
+					Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
+					Enemies[ Enemy ].MineNum = i;
+				}
+			}
+			if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
+		}
+	}
+	return true;
+}
+
+/* SPIDERMINE -- false: ProcessMines returns false */
+[[gnu::always_inline]] static inline bool MineSpider( u_int16_t & i, VECTOR & FrameLag_Rot, QUAT & TempQuat, u_int16_t & Enemy, u_int16_t & Owner, float & Radius )
+{
+	FrameLag_Rot.x = 0.0F;
+	FrameLag_Rot.y = ( 2.0F * framelag );
+	FrameLag_Rot.z = 0.0F;
+	TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
+	SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
+	SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
+
+	if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
+	else Owner = SecBulls[i].Owner;
+
+	if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
+							   SecBulls[i].OwnerType, Owner ) )
+	{
+		DestroySecondary( i, &SecBulls[i].Pos );
+		return( false );
+	}
+	else
+	{
+		Radius = MaxColDistance;
+		Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
+
+		if( Enemy != INDEX_NONE )
+		{
+			if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
+			{
+				if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
+					( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
+				{
+					Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
+					Enemies[ Enemy ].MineDistance = Radius;
+					Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
+					Enemies[ Enemy ].MineNum = i;
+				}
+			}
+			if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
+		}
+	}
+	return true;
+}
+
 bool ProcessMines( u_int16_t i )
 {
 	float		Cos;
@@ -2026,306 +2332,32 @@ bool ProcessMines( u_int16_t i )
 				PURGE MINE, proximity detonation
 		===================================================================*/
 	case PURGEMINE:
-		FrameLag_Rot.x = 0.0F;
-		FrameLag_Rot.y = ( 2.0F * framelag );
-		FrameLag_Rot.z = 0.0F;
-		TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-		SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
-		SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
-
-		Val = (int16_t) ( SecBulls[i].LifeCount * 3.0F );
-		Val %= 360;
-		Height = (float) ( COSD( Val ) * ( 200.0F * GLOBAL_SCALE ) );
-		SecBulls[i].Pos.x = SecBulls[i].StartPos.x + ( SecBulls[i].UpVector.x * Height );
-		SecBulls[i].Pos.y = SecBulls[i].StartPos.y + ( SecBulls[i].UpVector.y * Height );
-		SecBulls[i].Pos.z = SecBulls[i].StartPos.z + ( SecBulls[i].UpVector.z * Height );
-
-		if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
-		else Owner = SecBulls[i].Owner;
-
-		if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
-								   SecBulls[i].OwnerType, Owner ) )
-		{
-			DestroySecondary( i, &SecBulls[i].Pos );
-			return( false );
-		}
-		else
-		{
-			Radius = MaxColDistance;
-			Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
-
-			if( Enemy != INDEX_NONE )
-			{
-				if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
-				{
-					if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
-						( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
-					{
-						Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
-						Enemies[ Enemy ].MineDistance = Radius;
-						Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
-						Enemies[ Enemy ].MineNum = i;
-					}
-				}
-				if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
-			}
-		}
+		if( !MinePurge( i, FrameLag_Rot, TempQuat, Val, Height, Enemy, Owner, Radius ) )
+			return false;
 		break;
 
 		/*===================================================================
 				PINE MINE, Aim at nearest target and fire 1 missile per sec
 		===================================================================*/
 	case PINEMINE:
-		if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
-		else Owner = SecBulls[i].Owner;
-
-		if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
-								   SecBulls[i].OwnerType, Owner ) )
-		{
-			DestroySecondary( i, &SecBulls[i].Pos );
-			return( false );
-		}
-		else
-		{
-			Radius = MaxColDistance;
-			Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
-
-			if( Enemy != INDEX_NONE )
-			{
-				if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
-				{
-					if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
-						( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
-					{
-						Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
-						Enemies[ Enemy ].MineDistance = Radius;
-						Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
-						Enemies[ Enemy ].MineNum = i;
-					}
-				}
-				if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
-			}
-		}
-
-		Ship = INDEX_NONE;
-		Enemy = INDEX_NONE;
-		Secondary = INDEX_NONE;
-
-		switch( SecBulls[i].OwnerType )
-		{
-		case OWNER_SHIP:
-			Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-									  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-									  &ClosestCos );
-			Enemy = TargetClosestEnemy( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-										SecBulls[i].ViewCone, &ClosestCos );
-			if( Enemy != INDEX_NONE ) Ship = INDEX_NONE;
-			Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-									  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-									  &ClosestCos );
-			if( Secondary != INDEX_NONE )
-			{
-				Ship = INDEX_NONE;
-				Enemy = INDEX_NONE;
-			}
-			break;
-
-		case OWNER_ENEMY:
-			Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-									  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-									  &ClosestCos );
-			Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-									  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-									  &ClosestCos );
-			if( Secondary != INDEX_NONE )
-			{
-				Ship = INDEX_NONE;
-			}
-			break;
-
-		case OWNER_NOBODY:
-			Ship = TargetClosestShip( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-									  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-									  &ClosestCos );
-			Secondary = TargetClosestSecondary( &SecBulls[i].Pos, &SecBulls[i].DirVector, SecBulls[i].GroupImIn,
-									  SecBulls[i].OwnerType, SecBulls[i].Owner, SecBulls[i].ViewCone,
-									  &ClosestCos );
-			if( Secondary != INDEX_NONE )
-			{
-				Ship = INDEX_NONE;
-			}
-			break;
-
-		default:
-			break;
-		}
-
-		if( Ship != INDEX_NONE )
-		{
-			DirVector.x = ( Ships[ Ship ].Object.Pos.x - SecBulls[ i ].Pos.x );
-			DirVector.y = ( Ships[ Ship ].Object.Pos.y - SecBulls[ i ].Pos.y );
-			DirVector.z = ( Ships[ Ship ].Object.Pos.z - SecBulls[ i ].Pos.z );
-		}
-		else
-		{
-			if( Enemy != INDEX_NONE )
-			{
-				DirVector.x = ( Enemies[ Enemy ].Object.Pos.x - SecBulls[ i ].Pos.x );
-				DirVector.y = ( Enemies[ Enemy ].Object.Pos.y - SecBulls[ i ].Pos.y );
-				DirVector.z = ( Enemies[ Enemy ].Object.Pos.z - SecBulls[ i ].Pos.z );
-			}
-			else
-			{
-				if( Secondary != INDEX_NONE )
-				{
-					DirVector.x = ( SecBulls[ Secondary ].Pos.x - SecBulls[ i ].Pos.x );
-					DirVector.y = ( SecBulls[ Secondary ].Pos.y - SecBulls[ i ].Pos.y );
-					DirVector.z = ( SecBulls[ Secondary ].Pos.z - SecBulls[ i ].Pos.z );
-				}
-			}
-		}
-
-		if( ( Ship != INDEX_NONE ) || ( Enemy != INDEX_NONE ) || ( Secondary != INDEX_NONE ) )
-		{
-			NormaliseVector( &DirVector );
-
-			Cos = DotProduct( &DirVector, &SecBulls[ i ].DirVector );
-
-			qlerp.end.From2Vectors(&Forward, &DirVector);
-
-			qlerp.start	= SecBulls[ i ].DirQuat;				/* Current Quaternion */
-			qlerp.crnt	= &SecBulls[ i ].DirQuat;				/* Address to store new Quaternion */
-			qlerp.dir	= qlerp.start.Dot(&qlerp.end);
-
-			if( Cos < -1.0F ) Cos = -1.0F;
-			else if ( Cos > 1.0F ) Cos = 1.0F;
-			/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
-			Angle = (float) acosf( Cos );
-			if( Angle ) qlerp.time = ( ( D2R( SecBulls[ i ].TurnSpeed ) * framelag ) / Angle );
-			else qlerp.time = 1.0F;
-			if( qlerp.time > 1.0F ) qlerp.time = 1.0F;
-
-			qlerp.Step();
-			SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);
-			ApplyMatrix( &SecBulls[ i ].Mat, &Forward, &SecBulls[ i ].DirVector );
-			ApplyMatrix( &SecBulls[ i ].Mat, &SlideUp, &SecBulls[ i ].UpVector );
-
-			if( R2D( Angle ) < 1.0F )
-			{
-				if( ( ( ( SecBulls[i].OwnerType == OWNER_SHIP ) && ( SecBulls[ i ].Owner == WhoIAm ) ) ) ||
-					( ( ( SecBulls[i].OwnerType != OWNER_SHIP ) && IsHost ) ) )
-				{
-					BulletID = GetSecondaryBulletID( SecBulls[i].OwnerType, SecBulls[i].Owner );
-
-					if( SecBulls[i].LifeCount > 60.0F )
-					{
-						DropPos.x = ( SecBulls[i].UpVector.x * ( -128.0F * GLOBAL_SCALE ) );
-						DropPos.y = ( SecBulls[i].UpVector.y * ( -128.0F * GLOBAL_SCALE ) );
-						DropPos.z = ( SecBulls[i].UpVector.z * ( -128.0F * GLOBAL_SCALE ) );
-						DropVector.x = 0.0F;
-						DropVector.y = 0.0F;
-						DropVector.z = 0.0F;
-						InitOneSecBull( SecBulls[i].OwnerType, SecBulls[i].Owner, BulletID,
-										SecBulls[i].GroupImIn, &SecBulls[i].Pos, &DropPos,
-										&SecBulls[i].DirVector, &SecBulls[i].UpVector, &DropVector, PINEMISSILE, true );
-						SecBulls[i].LifeCount = 0.0F;
-					}
-				}
-			}
-		}
+		if( !MinePine( i, Cos, Angle, DirVector, qlerp, DropVector, DropPos, ClosestCos, Ship, Enemy, Secondary, Owner, Radius, BulletID ) )
+			return false;
 		break;
 
 		/*===================================================================
 				QUANTUM MINE, proximity detonation
 		===================================================================*/
 	case QUANTUMMINE:
-		FrameLag_Rot.x = 0.0F;
-		FrameLag_Rot.y = ( 2.0F * framelag );
-		FrameLag_Rot.z = 0.0F;
-		TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-		SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
-		SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
-
-		Val = (int16_t) ( SecBulls[i].LifeCount * 2.5F );
-		Val %= 360;
-		Height = (float) ( COSD( Val ) * ( 75.0F * GLOBAL_SCALE ) );
-		SecBulls[i].Pos.x = SecBulls[i].StartPos.x + ( SecBulls[i].UpVector.x * Height );
-		SecBulls[i].Pos.y = SecBulls[i].StartPos.y + ( SecBulls[i].UpVector.y * Height );
-		SecBulls[i].Pos.z = SecBulls[i].StartPos.z + ( SecBulls[i].UpVector.z * Height );
-
-		if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
-		else Owner = SecBulls[i].Owner;
-
-		if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
-								   SecBulls[i].OwnerType, Owner ) )
-		{
-			DestroySecondary( i, &SecBulls[i].Pos );
-			return( false );
-		}
-		else
-		{
-			Radius = MaxColDistance;
-			Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
-
-			if( Enemy != INDEX_NONE )
-			{
-				if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
-				{
-					if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
-						( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
-					{
-						Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
-						Enemies[ Enemy ].MineDistance = Radius;
-						Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
-						Enemies[ Enemy ].MineNum = i;
-					}
-				}
-				if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
-			}
-		}
+		if( !MineQuantum( i, FrameLag_Rot, TempQuat, Val, Height, Enemy, Owner, Radius ) )
+			return false;
 		break;
 
 		/*===================================================================
 				SPIDER MINE, proximity detonation, Moving
 		===================================================================*/
 	case SPIDERMINE:
-		FrameLag_Rot.x = 0.0F;
-		FrameLag_Rot.y = ( 2.0F * framelag );
-		FrameLag_Rot.z = 0.0F;
-		TempQuat.MakeEuler(FrameLag_Rot.x, FrameLag_Rot.y, FrameLag_Rot.z);
-		SecBulls[ i ].DirQuat.Multiply(&TempQuat, &SecBulls[ i ].DirQuat);
-		SecBulls[ i ].DirQuat.ToMatrix(&SecBulls[ i ].Mat);				// Create Dir Matrix
-
-		if( SecBulls[i].LifeCount >= 150.0F ) Owner = INDEX_NONE;
-		else Owner = SecBulls[i].Owner;
-
-		if( CheckProximityToShips( &SecBulls[i].Pos, SecBulls[i].GroupImIn, MINE_TRIGGER_RADIUS,
-								   SecBulls[i].OwnerType, Owner ) )
-		{
-			DestroySecondary( i, &SecBulls[i].Pos );
-			return( false );
-		}
-		else
-		{
-			Radius = MaxColDistance;
-			Enemy = GetClosestEnemy( &SecBulls[i].Pos, SecBulls[i].GroupImIn, &Radius, SecBulls[i].OwnerType, Owner );
-
-			if( Enemy != INDEX_NONE )
-			{
-				if( Radius < ( ( EnemyTypes[ Enemies[ Enemy ].Type ].Radius * 2.0F ) + MINE_TRIGGER_RADIUS ) )
-				{
-					if( !( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) ||
-						( ( Enemies[ Enemy ].AIFlags & AI_MINEISCLOSE ) && ( Radius <= Enemies[ Enemy ].MineDistance ) ) )
-					{
-						Enemies[ Enemy ].MinePos = SecBulls[i].Pos;
-						Enemies[ Enemy ].MineDistance = Radius;
-						Enemies[ Enemy ].AIFlags |= AI_MINEISCLOSE;
-						Enemies[ Enemy ].MineNum = i;
-					}
-				}
-				if( Radius < MINE_TRIGGER_RADIUS ) DestroySecondary( i, &SecBulls[i].Pos );
-			}
-		}
+		if( !MineSpider( i, FrameLag_Rot, TempQuat, Enemy, Owner, Radius ) )
+			return false;
 		break;
 	}
 	return( true );
@@ -4437,6 +4469,201 @@ void KillOwnersSecBulls( u_int16_t Owner )
 				:	int16_t		Max Weapons allowed to throw out.
 	Output		:	Nothing
 ===================================================================*/
+/* drop the flags the ship carries (capture the flag) */
+[[gnu::always_inline]] static inline void ScatterFlags( VECTOR *& Dir, int8_t & PickupNum, VECTOR & DirVector, int16_t & TotalPickups, float & LifeCount, float & Speed, u_int16_t & i, int & team )
+{
+	if ( CTF && Ships[ WhoIAm ].Object.Flags & SHIP_CarryingFlags )
+	{
+		for ( team = 0; team < MAX_TEAMS; team++ )
+		{
+			if ( Ships[ WhoIAm ].Object.Flags & TeamFlagMask[ team ] )
+			{
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
+				NormaliseVector( &DirVector );
+				PickupNum = TeamFlagPickup[ team ];
+				LifeCount = -1.0F;
+				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
+				{
+					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+					TotalPickups++;
+					PickupsGot[ TeamFlagPickup[ team ] ] = 0;
+					Ships[ WhoIAm ].Object.Flags &= ~TeamFlagMask[ team ];
+				}
+				else
+				{
+					DebugPrintf( "Unable to scatter %s flag\n", TeamName[ team ] );
+				}
+			}
+		}
+	}
+}
+
+/* drop the ship's power pods */
+[[gnu::always_inline]] static inline void ScatterPowerPods( VECTOR *& Dir, int16_t & MaxPickupsAllowed, int8_t & PickupNum, VECTOR & DirVector, int16_t & TotalPickups, float & LifeCount, float & Speed, u_int16_t & i )
+{
+	while( Ships[ WhoIAm ].Object.PowerLevel )
+	{
+		if( TotalPickups < MaxPickupsAllowed )
+		{
+			if( Ships[ WhoIAm ].Object.PowerLevel >= 3 )
+			{
+				Ships[ WhoIAm ].Object.PowerLevel -= 3;
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
+				NormaliseVector( &DirVector );
+				PickupNum = PICKUP_GoldenPowerPod;
+				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
+				else LifeCount = -1.0F;
+				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
+				{
+					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+					TotalPickups++;
+				}
+			}
+			else
+			{
+				Ships[ WhoIAm ].Object.PowerLevel--;
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
+				NormaliseVector( &DirVector );
+				PickupNum = PICKUP_PowerPod;
+				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
+				else LifeCount = -1.0F;
+				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
+				{
+					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+					TotalPickups++;
+				}
+			}
+		}
+	}
+}
+
+/* drop the ship's nitro */
+[[gnu::always_inline]] static inline void ScatterNitro( VECTOR *& Dir, int16_t & MaxPickupsAllowed, int8_t & PickupNum, VECTOR & DirVector, int16_t & TotalPickups, float & LifeCount, float & Speed, u_int16_t & i )
+{
+	if( NitroFuel )
+	{
+		if( MyGameStatus == STATUS_SinglePlayer )
+		{
+			while( NitroFuel )
+			{
+				if( TotalPickups < MaxPickupsAllowed )
+				{
+					DirVector.x = ( Dir->x + Random_Jitter() );
+					DirVector.y = ( Dir->y + Random_Jitter() );
+					DirVector.z = ( Dir->z + Random_Jitter() );
+					NormaliseVector( &DirVector );
+					PickupNum = PICKUP_Nitro;
+					if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
+					else LifeCount = -1.0F;
+					Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+					i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+					if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
+					{
+						DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+						TotalPickups++;
+					}
+					NitroFuel -= 50.0F;
+					if( NitroFuel < 0.0F ) NitroFuel = 0.0F;
+				}
+				else
+				{
+					NitroFuelUsed += NitroFuel;
+					NitroFuel = 0.0F;
+				}
+			}
+		}
+		else
+		{
+			NitroFuelUsed += NitroFuel;
+			NitroFuel = 0.0F;
+		}
+	}
+}
+
+/* drop the stealth mantle */
+[[gnu::always_inline]] static inline void ScatterStealthMantle( VECTOR *& Dir, int16_t & MaxPickupsAllowed, int8_t & PickupNum, VECTOR & DirVector, int16_t & TotalPickups, float & LifeCount, float & Speed, u_int16_t & i )
+{
+	if(	( Ships[ WhoIAm ].Object.Flags & SHIP_Stealth ) )
+	{
+		Ships[ WhoIAm ].Object.Flags &= ~SHIP_Stealth;
+		Ships[ WhoIAm ].StealthTime = 0.0F;
+
+		if( TotalPickups < MaxPickupsAllowed )
+		{
+			DirVector.x = ( Dir->x + Random_Jitter() );
+			DirVector.y = ( Dir->y + Random_Jitter() );
+			DirVector.z = ( Dir->z + Random_Jitter() );
+			NormaliseVector( &DirVector );
+			PickupNum = PICKUP_Mantle;
+			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
+			else LifeCount = -1.0F;
+			Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+			i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+			if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
+			{
+				DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				TotalPickups++;
+			}
+		}
+		else
+		{
+			NumStealths++;
+		}
+	}
+}
+
+/* drop the orbit pulsars */
+[[gnu::always_inline]] static inline void ScatterOrbitPulsars( VECTOR *& Dir, int16_t & MaxPickupsAllowed, int16_t & Count, int8_t & PickupNum, VECTOR & DirVector, int16_t & TotalPickups, float & LifeCount, float & Speed, u_int16_t & i )
+{
+	if(	( Ships[ WhoIAm ].NumMultiples ) )
+	{
+		for( Count = 0; Count < Ships[ WhoIAm ].NumMultiples; Count++ )
+		{
+			if( TotalPickups < MaxPickupsAllowed )
+			{
+				DirVector.x = ( Dir->x + Random_Jitter() );
+				DirVector.y = ( Dir->y + Random_Jitter() );
+				DirVector.z = ( Dir->z + Random_Jitter() );
+				NormaliseVector( &DirVector );
+				PickupNum = PICKUP_Orb;
+				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
+				else LifeCount = -1.0F;
+				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
+				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
+				{
+					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+					TotalPickups++;
+				}
+			}
+			else
+			{
+				NumOrbs++;
+			}
+
+			if( Ships[ WhoIAm ].OrbModels[ Count ] != INDEX_NONE )
+			{
+				KillUsedModel( Ships[ WhoIAm ].OrbModels[ Count ] );
+				Ships[ WhoIAm ].OrbModels[ Count ] = INDEX_NONE;
+			}
+		}
+
+		Ships[ WhoIAm ].NumMultiples = 0;
+	}
+}
+
 void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 {
 	int16_t	Count;
@@ -4508,34 +4735,7 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 		Ships[ WhoIAm ].Object.Flags &= ~SHIP_CarryingFlag;
 	}
 
-	if ( CTF && Ships[ WhoIAm ].Object.Flags & SHIP_CarryingFlags )
-	{
-		for ( team = 0; team < MAX_TEAMS; team++ )
-		{
-			if ( Ships[ WhoIAm ].Object.Flags & TeamFlagMask[ team ] )
-			{
-				DirVector.x = ( Dir->x + Random_Jitter() );
-				DirVector.y = ( Dir->y + Random_Jitter() );
-				DirVector.z = ( Dir->z + Random_Jitter() );
-				NormaliseVector( &DirVector );
-				PickupNum = TeamFlagPickup[ team ];
-				LifeCount = -1.0F;
-				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
-				{
-					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group ,&DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-					TotalPickups++;
-					PickupsGot[ TeamFlagPickup[ team ] ] = 0;
-					Ships[ WhoIAm ].Object.Flags &= ~TeamFlagMask[ team ];
-				}
-				else
-				{
-					DebugPrintf( "Unable to scatter %s flag\n", TeamName[ team ] );
-				}
-			}
-		}
-	}
+	ScatterFlags( Dir, PickupNum, DirVector, TotalPickups, LifeCount, Speed, i, team );
 
 	for( Count = 1; Count < MAXPRIMARYWEAPONS; Count++ )
 	{
@@ -4559,48 +4759,7 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 		}
 	}
 
-	while( Ships[ WhoIAm ].Object.PowerLevel )
-	{
-		if( TotalPickups < MaxPickupsAllowed )
-		{
-			if( Ships[ WhoIAm ].Object.PowerLevel >= 3 )
-			{
-				Ships[ WhoIAm ].Object.PowerLevel -= 3;
-				DirVector.x = ( Dir->x + Random_Jitter() );
-				DirVector.y = ( Dir->y + Random_Jitter() );
-				DirVector.z = ( Dir->z + Random_Jitter() );
-				NormaliseVector( &DirVector );
-				PickupNum = PICKUP_GoldenPowerPod;
-				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
-				else LifeCount = -1.0F;
-				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
-				{
-					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-					TotalPickups++;
-				}
-			}
-			else
-			{
-				Ships[ WhoIAm ].Object.PowerLevel--;
-				DirVector.x = ( Dir->x + Random_Jitter() );
-				DirVector.y = ( Dir->y + Random_Jitter() );
-				DirVector.z = ( Dir->z + Random_Jitter() );
-				NormaliseVector( &DirVector );
-				PickupNum = PICKUP_PowerPod;
-				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
-				else LifeCount = -1.0F;
-				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
-				{
-					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-					TotalPickups++;
-				}
-			}
-		}
-	}
+	ScatterPowerPods( Dir, MaxPickupsAllowed, PickupNum, DirVector, TotalPickups, LifeCount, Speed, i );
 
 	Ships[ WhoIAm ].Object.PowerLevel = 0;
 
@@ -4642,72 +4801,9 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 		}
 	}
 
-	if( NitroFuel )
-	{
-		if( MyGameStatus == STATUS_SinglePlayer )
-		{
-			while( NitroFuel )
-			{
-				if( TotalPickups < MaxPickupsAllowed )
-				{
-					DirVector.x = ( Dir->x + Random_Jitter() );
-					DirVector.y = ( Dir->y + Random_Jitter() );
-					DirVector.z = ( Dir->z + Random_Jitter() );
-					NormaliseVector( &DirVector );
-					PickupNum = PICKUP_Nitro;
-					if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
-					else LifeCount = -1.0F;
-					Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-					i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-					if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
-					{
-						DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-						TotalPickups++;
-					}
-					NitroFuel -= 50.0F;
-					if( NitroFuel < 0.0F ) NitroFuel = 0.0F;
-				}
-				else
-				{
-					NitroFuelUsed += NitroFuel;
-					NitroFuel = 0.0F;
-				}
-			}
-		}
-		else
-		{
-			NitroFuelUsed += NitroFuel;
-			NitroFuel = 0.0F;
-		}
-	}
+	ScatterNitro( Dir, MaxPickupsAllowed, PickupNum, DirVector, TotalPickups, LifeCount, Speed, i );
 
-	if(	( Ships[ WhoIAm ].Object.Flags & SHIP_Stealth ) )
-	{
-		Ships[ WhoIAm ].Object.Flags &= ~SHIP_Stealth;
-		Ships[ WhoIAm ].StealthTime = 0.0F;
-
-		if( TotalPickups < MaxPickupsAllowed )
-		{
-			DirVector.x = ( Dir->x + Random_Jitter() );
-			DirVector.y = ( Dir->y + Random_Jitter() );
-			DirVector.z = ( Dir->z + Random_Jitter() );
-			NormaliseVector( &DirVector );
-			PickupNum = PICKUP_Mantle;
-			if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
-			else LifeCount = -1.0F;
-			Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-			i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-			if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
-			{
-				DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-				TotalPickups++;
-			}
-		}
-		else
-		{
-			NumStealths++;
-		}
-	}
+	ScatterStealthMantle( Dir, MaxPickupsAllowed, PickupNum, DirVector, TotalPickups, LifeCount, Speed, i );
 
 	if(	Ships[ WhoIAm ].Invul && PickupInvulnerability )
 	{
@@ -4717,41 +4813,7 @@ void ScatterWeapons( VECTOR * Dir, int16_t MaxPickupsAllowed )
 		PickupInvulnerability = false;
 	}
 
-	if(	( Ships[ WhoIAm ].NumMultiples ) )
-	{
-		for( Count = 0; Count < Ships[ WhoIAm ].NumMultiples; Count++ )
-		{
-			if( TotalPickups < MaxPickupsAllowed )
-			{
-				DirVector.x = ( Dir->x + Random_Jitter() );
-				DirVector.y = ( Dir->y + Random_Jitter() );
-				DirVector.z = ( Dir->z + Random_Jitter() );
-				NormaliseVector( &DirVector );
-				PickupNum = PICKUP_Orb;
-				if( MyGameStatus != STATUS_SinglePlayer ) LifeCount = (float) ( Random_Range( 600 ) + 600 );
-				else LifeCount = -1.0F;
-				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
-				i = InitOnePickup( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, WhoIAm, ++Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-				if( ( i != INDEX_NONE ) && ( i != (u_int16_t) -2 ) )
-				{
-					DropPickupSend( &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group, &DirVector, Speed, PickupNum, Ships[ WhoIAm ].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-					TotalPickups++;
-				}
-			}
-			else
-			{
-				NumOrbs++;
-			}
-
-			if( Ships[ WhoIAm ].OrbModels[ Count ] != INDEX_NONE )
-			{
-				KillUsedModel( Ships[ WhoIAm ].OrbModels[ Count ] );
-				Ships[ WhoIAm ].OrbModels[ Count ] = INDEX_NONE;
-			}
-		}
-
-		Ships[ WhoIAm ].NumMultiples = 0;
-	}
+	ScatterOrbitPulsars( Dir, MaxPickupsAllowed, Count, PickupNum, DirVector, TotalPickups, LifeCount, Speed, i );
 
 	Ships[ WhoIAm ].Primary = PULSAR;
 	Ships[ WhoIAm ].Secondary = MUGMISSILE;
