@@ -15,9 +15,14 @@
  * semaphores. FSBeginScene waits on the fence of the slot it reuses, acquires
  * a swapchain image and opens the render pass; render_flip submits and
  * presents, recreating the swapchain when it is out of date. Vertex, index
- * and normal buffers are host-visible and stay mapped, so the FSLock* calls
- * return the mapping; FSReleaseRenderObject retires them until their frame
- * slot has cycled. Texture and other uploads use one-time command buffers
+ * and normal buffers are plain memory that the FSLock* calls return; each
+ * draw copies the vertex and index ranges it reads into its frame slot's
+ * stream buffer, which is reused once that slot's fence has passed. The
+ * engine rewrites buffers after drawing them (the batchers refill RenderBufs
+ * several times a frame, the CPU lighting rewrites level colours every
+ * frame), so drawing straight from the engine's buffers would let a later
+ * write change a draw already recorded, or one still on the GPU from the
+ * previous frame. Texture and other uploads use one-time command buffers
  * that wait for the queue to go idle. render_mode_select only rebuilds the
  * swapchain: the device, buffers and textures survive a mode change.
  *
@@ -36,6 +41,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include <vulkan/vulkan.h>
 #include <SDL.h>
 #include <SDL_vulkan.h>
@@ -91,6 +97,11 @@ static uint64_t         s_frame_seq;      /* submitted frame counter */
  * have been submitted (their fences waited at slot reuse). */
 typedef struct retire { struct retire *next; vkbuf_t *buf; uint64_t seq; } retire_t;
 static retire_t        *s_retire;
+/* Per-slot stream buffer the draws copy their vertices and indices into;
+ * s_stream_used is the fill of the current slot's buffer. */
+static vkbuf_t         *s_stream[FRAMES_IN_FLIGHT];
+static VkDeviceSize     s_stream_used;
+constexpr VkDeviceSize  STREAM_INITIAL_SIZE = (VkDeviceSize)16 << 20;
 static VkCommandBuffer  s_cur;
 static VkPipelineLayout s_layout;
 static VkDescriptorSetLayout s_dsl;
@@ -553,6 +564,7 @@ void render_cleanup(render_info_t *info)
 		vkDestroyFence(s_dev, s_fence[i], NULL);
 	}
 	while (s_retire) { retire_t *r = s_retire; s_retire = r->next; vkbuf_destroy(r->buf); free(r); }
+	for (int i = 0; i < FRAMES_IN_FLIGHT; i++) { vkbuf_destroy(s_stream[i]); s_stream[i] = NULL; }
 	vkDestroyCommandPool(s_dev, s_pool, NULL);
 	vkDestroyRenderPass(s_dev, s_pass, NULL);
 	vkDestroyDevice(s_dev, NULL);
@@ -632,6 +644,7 @@ bool FSBeginScene(void)
 	if (!s_init_done || s_frame_active) return true;
 	s_slot = (int)(s_frame_seq % FRAMES_IN_FLIGHT);
 	vkWaitForFences(s_dev, 1, &s_fence[s_slot], VK_TRUE, UINT64_MAX);
+	s_stream_used = 0;	// the slot's last frame is done with its stream
 	{
 		retire_t **pp = &s_retire;
 		while (*pp) {
@@ -729,19 +742,38 @@ bool FSClearDepth(XYRECT *rect)
 	return true;
 }
 
-/* ---- vertex/index/normal buffers (host-visible, persistently mapped) ---- */
-bool FSCreateVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * sizeof(LVERTEX), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
+/* ---- vertex/index/normal buffers (plain memory; see the header comment) ---- */
+typedef struct { void *data; size_t size; } membuf_t;
+static BUFFER_HANDLE membuf_create(size_t size)
+{
+	membuf_t *m = (membuf_t *)malloc(sizeof(membuf_t));
+	if (!m) return NULL;
+	m->data = calloc(1, size);
+	if (!m->data) { free(m); return NULL; }
+	m->size = size;
+	return (BUFFER_HANDLE)m;
+}
+static void membuf_free(BUFFER_HANDLE h)
+{
+	membuf_t *m = (membuf_t *)h;
+	if (!m) return;
+	free(m->data);
+	free(m);
+}
+static void *membuf_data(BUFFER_HANDLE h) { return h ? ((membuf_t *)h)->data : NULL; }
+
+bool FSCreateVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = membuf_create((size_t)n * sizeof(LVERTEX)); return ro->vertexBuffer != NULL; }
 bool FSCreateDynamicVertexBuffer(RENDEROBJECT *ro, int n) { return FSCreateVertexBuffer(ro, n); }
-bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * sizeof(TLVERTEX), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
-bool FSCreateNormalBuffer(RENDEROBJECT *ro, int n) { ro->normalBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * sizeof(NORMAL), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT); return true; }
-bool FSCreateIndexBuffer(RENDEROBJECT *ro, int n) { ro->indexBuffer = (BUFFER_HANDLE)vkbuf_create((VkDeviceSize)n * 3 * sizeof(WORD), VK_BUFFER_USAGE_INDEX_BUFFER_BIT); return true; }
+bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = membuf_create((size_t)n * sizeof(TLVERTEX)); return ro->vertexBuffer != NULL; }
+bool FSCreateNormalBuffer(RENDEROBJECT *ro, int n) { ro->normalBuffer = membuf_create((size_t)n * sizeof(NORMAL)); return ro->normalBuffer != NULL; }
+bool FSCreateIndexBuffer(RENDEROBJECT *ro, int n) { ro->indexBuffer = membuf_create((size_t)n * 3 * sizeof(WORD)); return ro->indexBuffer != NULL; }
 bool FSCreateDynamicIndexBuffer(RENDEROBJECT *ro, int n) { return FSCreateIndexBuffer(ro, n); }
 
-bool FSLockVertexBuffer(RENDEROBJECT *ro, LVERTEX **verts) { *verts = (LVERTEX *)((vkbuf_t *)ro->vertexBuffer)->mapped; return *verts != NULL; }
+bool FSLockVertexBuffer(RENDEROBJECT *ro, LVERTEX **verts) { *verts = (LVERTEX *)membuf_data(ro->vertexBuffer); return *verts != NULL; }
 bool FSUnlockVertexBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
-bool FSLockNormalBuffer(RENDEROBJECT *ro, NORMAL **normals) { *normals = (NORMAL *)((vkbuf_t *)ro->normalBuffer)->mapped; return *normals != NULL; }
+bool FSLockNormalBuffer(RENDEROBJECT *ro, NORMAL **normals) { *normals = (NORMAL *)membuf_data(ro->normalBuffer); return *normals != NULL; }
 bool FSUnlockNormalBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
-bool FSLockIndexBuffer(RENDEROBJECT *ro, WORD **indices) { *indices = (WORD *)((vkbuf_t *)ro->indexBuffer)->mapped; return *indices != NULL; }
+bool FSLockIndexBuffer(RENDEROBJECT *ro, WORD **indices) { *indices = (WORD *)membuf_data(ro->indexBuffer); return *indices != NULL; }
 bool FSUnlockIndexBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
 bool FSLockPretransformedVertexBuffer(RENDEROBJECT *ro, TLVERTEX **verts) { return FSLockVertexBuffer(ro, (LVERTEX **)verts); }
 
@@ -755,11 +787,11 @@ static void retire_buf(vkbuf_t *b)
 
 void FSReleaseRenderObject(RENDEROBJECT *ro)
 {
-	/* Buffers may be referenced by in-flight frames: retire them;
-	 * FSBeginScene frees them once their frame slot has cycled. */
-	if (ro->vertexBuffer) { retire_buf((vkbuf_t *)ro->vertexBuffer); ro->vertexBuffer = NULL; }
-	if (ro->normalBuffer) { retire_buf((vkbuf_t *)ro->normalBuffer); ro->normalBuffer = NULL; }
-	if (ro->indexBuffer) { retire_buf((vkbuf_t *)ro->indexBuffer); ro->indexBuffer = NULL; }
+	/* The GPU never reads these (draws read copies in the stream), so
+	 * they can be freed at once. */
+	membuf_free(ro->vertexBuffer); ro->vertexBuffer = NULL;
+	membuf_free(ro->normalBuffer); ro->normalBuffer = NULL;
+	membuf_free(ro->indexBuffer); ro->indexBuffer = NULL;
 	for (int i = 0; i < ro->numTextureGroups; i++) {
 		ro->textureGroups[i].numVerts = 0;
 		ro->textureGroups[i].startVert = 0;
@@ -1103,29 +1135,89 @@ static void push_mvp(int ortho)
 	vkCmdPushConstants(s_cur, s_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, m);
 }
 
+/* Copy size bytes into the current slot's stream buffer and say where they
+ * went. A full buffer is retired (this frame's earlier draws still read it)
+ * and replaced by one twice the size, so the stream settles at the largest
+ * frame seen. */
+static void stream_put(const void *src, VkDeviceSize size, VkBuffer *buf, VkDeviceSize *off)
+{
+	vkbuf_t *st = s_stream[s_slot];
+	VkDeviceSize at = (s_stream_used + 15) & ~(VkDeviceSize)15;
+	if (!st || at + size > st->size) {
+		VkDeviceSize cap = st ? st->size * 2 : STREAM_INITIAL_SIZE;
+		while (cap < size) cap *= 2;
+		retire_buf(st);
+		st = s_stream[s_slot] = vkbuf_create(cap, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+		at = 0;
+	}
+	memcpy((u_int8_t *)st->mapped + at, src, (size_t)size);
+	s_stream_used = at + size;
+	*buf = st->buf;
+	*off = at;
+}
+
 bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool orthographic)
 {
 	if (!s_frame_active || !renderObject->vertexBuffer) return true;
+	membuf_t *vb = (membuf_t *)renderObject->vertexBuffer;
+	membuf_t *ib = (membuf_t *)renderObject->indexBuffer;
+	const WORD *indices = ib ? (const WORD *)ib->data : NULL;
+	const size_t stride = orthographic ? sizeof(TLVERTEX) : sizeof(LVERTEX);
+
+	/* The vertex range [vmin, vmax) and index range [imin, imax) this draw
+	 * reads; an indexed group reads startVert plus each of its indices. */
+	long vmin = LONG_MAX, vmax = 0, imin = LONG_MAX, imax = 0;
+	for (int i = 0; i < renderObject->numTextureGroups; i++) {
+		TEXTUREGROUP *group = &renderObject->textureGroups[i];
+		if (indices) {
+			long n = (long)group->numTriangles * 3;
+			if (n <= 0) continue;
+			long lo = 65535, hi = 0;
+			for (long k = 0; k < n; k++) {
+				long v = indices[group->startIndex + k];
+				if (v < lo) lo = v;
+				if (v > hi) hi = v;
+			}
+			if ((long)group->startVert + lo < vmin) vmin = (long)group->startVert + lo;
+			if ((long)group->startVert + hi + 1 > vmax) vmax = (long)group->startVert + hi + 1;
+			if ((long)group->startIndex < imin) imin = (long)group->startIndex;
+			if ((long)group->startIndex + n > imax) imax = (long)group->startIndex + n;
+		} else {
+			if (group->numVerts <= 0) continue;
+			if ((long)group->startVert < vmin) vmin = (long)group->startVert;
+			if ((long)group->startVert + group->numVerts > vmax) vmax = (long)group->startVert + group->numVerts;
+		}
+	}
+	if (vmin >= vmax) return true;
+	if ((size_t)vmax * stride > vb->size || (indices && (size_t)imax * sizeof(WORD) > ib->size)) {
+		DebugPrintf("draw_render_object: group range past the end of its buffer\n");
+		return false;
+	}
+
 	VkPipeline pipe = get_pipeline(orthographic ? 1 : 0, primitive_type == 1 ? 1 : 0);
 	if (!pipe) return false;
 	vkCmdBindPipeline(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, pipe);
-	VkBuffer vbuf = ((vkbuf_t *)renderObject->vertexBuffer)->buf;
-	VkDeviceSize off = 0;
-	vkCmdBindVertexBuffers(s_cur, 0, 1, &vbuf, &off);
-	if (renderObject->indexBuffer)
-		vkCmdBindIndexBuffer(s_cur, ((vkbuf_t *)renderObject->indexBuffer)->buf, 0, VK_INDEX_TYPE_UINT16);
+	VkBuffer buf;
+	VkDeviceSize off;
+	stream_put((const u_int8_t *)vb->data + (size_t)vmin * stride, (VkDeviceSize)((size_t)(vmax - vmin) * stride), &buf, &off);
+	vkCmdBindVertexBuffers(s_cur, 0, 1, &buf, &off);
+	if (indices) {
+		stream_put(indices + imin, (VkDeviceSize)((size_t)(imax - imin) * sizeof(WORD)), &buf, &off);
+		vkCmdBindIndexBuffer(s_cur, buf, off, VK_INDEX_TYPE_UINT16);
+	}
 	push_mvp(orthographic ? 1 : 0);
 
 	for (int i = 0; i < renderObject->numTextureGroups; i++) {
 		TEXTUREGROUP *group = &renderObject->textureGroups[i];
+		if (indices ? group->numTriangles <= 0 : group->numVerts <= 0) continue;
 		int frag[2] = { group->colourkey ? 1 : 0, group->texture ? 1 : 0 };
 		vkCmdPushConstants(s_cur, s_layout, VK_SHADER_STAGE_FRAGMENT_BIT, 64, 8, frag);
 		vktex_t *tex = group->texture ? (vktex_t *)group->texture : default_tex();
 		vkCmdBindDescriptorSets(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, s_layout, 0, 1, &tex->set, 0, NULL);
-		if (renderObject->indexBuffer)
-			vkCmdDrawIndexed(s_cur, (uint32_t)group->numTriangles * 3, 1, (uint32_t)group->startIndex, (int32_t)group->startVert, 0);
+		if (indices)
+			vkCmdDrawIndexed(s_cur, (uint32_t)group->numTriangles * 3, 1, (uint32_t)(group->startIndex - imin), (int32_t)(group->startVert - vmin), 0);
 		else
-			vkCmdDraw(s_cur, (uint32_t)group->numVerts, 1, (uint32_t)group->startVert, 0);
+			vkCmdDraw(s_cur, (uint32_t)group->numVerts, 1, (uint32_t)(group->startVert - vmin), 0);
 	}
 	return true;
 }
