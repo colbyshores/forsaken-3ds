@@ -69,8 +69,6 @@ typedef struct {
 	bool                    ok_to_render;			/* All objects etc. necessary rendering are in ok */
 	bool					vsync;					/* vertical sync */
 	float					aspect_ratio;			/* screen aspect ratio */
-	bool					force_accel;			/* force 3d acelleration on gl */
-	bool					wireframe;
 
 #ifdef __3DS__
 	/* no window/context handles on 3DS - Citro3D manages the framebuffer */

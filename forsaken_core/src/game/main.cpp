@@ -175,11 +175,6 @@ static bool ParseCommandLine(char* args)
 			break;
 		}
 
-		// sets render_info.force_accel (no renderer reads it)
-		else if (!strcasecmp(option,"ForceAccel")){
-			render_info.force_accel = true;
-		}
-
 		// turn on vertical syncing
 		else if (!strcasecmp(option,"VSync")){
 			render_info.vsync = true;
@@ -256,12 +251,6 @@ static bool ParseCommandLine(char* args)
 
 			// copy in the hostname
 			strcpy( (char*)TCPAddress.text, address );
-		}
-
-		// sets render_info.wireframe (no renderer reads it)
-		else if (!strcasecmp(option, "wireframe"))
-		{
-			render_info.wireframe = true;
 		}
 
 		// special override to allow setting up of spaceorb
