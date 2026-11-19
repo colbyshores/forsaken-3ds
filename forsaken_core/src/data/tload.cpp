@@ -33,7 +33,7 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 	Tloadheader->num_texture_files = 0;
 	for( i = 0 ; i < MAXTPAGESPERTLOAD ; i++ )
 	{
-		Tloadheader->TexHandle[i]     = NULL;
+		Tloadheader->TexHandle[i]     = nullptr;
 
 		Tloadheader->MipMap[i]		  = false;
 		Tloadheader->PlaceHolder[i]	  = false;
@@ -41,7 +41,7 @@ bool InitTload( TLOADHEADER * Tloadheader  )
 		Tloadheader->Xsize[ i ] = 0;
 		Tloadheader->Ysize[ i ] = 0;
 
-		Tloadheader->PlaceHolderFile[ i ] = NULL;
+		Tloadheader->PlaceHolderFile[ i ] = nullptr;
 	}
 	return	true;
 }
@@ -93,9 +93,9 @@ bool Tload( TLOADHEADER * Tloadheader  )
    mip chain, 1 for the base level only. */
 bool TloadTextureSurf( TLOADHEADER * Tloadheader , int n)
 {
-	TEXTURE_HANDLE newTexture = NULL;
+	TEXTURE_HANDLE newTexture = nullptr;
 	release_texture(Tloadheader->TexHandle[n]);
-	Tloadheader->TexHandle[n] = NULL;
+	Tloadheader->TexHandle[n] = nullptr;
 	if ( !Tloadheader->PlaceHolder[ n ] )
 	{
 		if( Tloadheader->MipMap[n] )
@@ -114,7 +114,7 @@ bool TloadTextureSurf( TLOADHEADER * Tloadheader , int n)
 		}
 	}
 	Tloadheader->TexHandle[n] = newTexture;
-	newTexture = NULL;
+	newTexture = nullptr;
 
 	return true;
 }
@@ -155,11 +155,11 @@ void
 TloadReleaseTexture(TLOADHEADER * Tloadheader, int n)
 {
 	release_texture(Tloadheader->TexHandle[n]);
-	Tloadheader->TexHandle[n] = NULL;
+	Tloadheader->TexHandle[n] = nullptr;
 	if ( Tloadheader->PlaceHolder[ n ] )
 	{
 		free( Tloadheader->PlaceHolderFile[ n ] );
-		Tloadheader->PlaceHolderFile[ n ] = NULL;
+		Tloadheader->PlaceHolderFile[ n ] = nullptr;
 	}
 }
 

@@ -109,7 +109,7 @@ void AI_AIR_RETREAT( ENEMY * Enemy )
 
 				if( !TNode )
 				{
-					Enemy->Object.LastNearestNode = NULL;
+					Enemy->Object.LastNearestNode = nullptr;
 					return;
 				}
 

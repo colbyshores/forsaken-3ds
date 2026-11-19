@@ -62,13 +62,13 @@ static persist_entry_t *persist_find(const void *ro, int sub, int create)
 		persist_entry_t *e = &s_persist[(i + n) & PERSIST_MASK];
 		if (e->ro == (uintptr_t)ro && e->sub == sub)
 			return e;
-		if (create && e->buf == NULL) {
+		if (create && e->buf == nullptr) {
 			e->ro = (uintptr_t)ro;
 			e->sub = sub;
 			return e;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 static gpu_vertex_t *persist_lookup(const void *ro, int sub, int *count)
@@ -78,7 +78,7 @@ static gpu_vertex_t *persist_lookup(const void *ro, int sub, int *count)
 		*count = e->count;
 		return e->buf;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /* Retain a freshly converted range. Returns the retained buffer or
@@ -88,12 +88,12 @@ static gpu_vertex_t *persist_store(const void *ro, int sub,
 {
 	persist_entry_t *e = persist_find(ro, sub, 1);
 	if (!e)
-		return NULL;
+		return nullptr;
 	if (e->cap < count) {
 		if (e->buf) {
 			s_persistBytes -= e->cap * sizeof(gpu_vertex_t);
 			linearFree(e->buf);
-			e->buf = NULL;
+			e->buf = nullptr;
 			e->cap = 0;
 		}
 		/* Never let the cache take the linear memory a texture or
@@ -101,10 +101,10 @@ static gpu_vertex_t *persist_store(const void *ro, int sub,
 		 * before) unless PERSIST_LINEAR_RESERVE stays free. Checked
 		 * only when allocating, never on a refill or a hit. */
 		if (linearSpaceFree() < count * sizeof(gpu_vertex_t) + PERSIST_LINEAR_RESERVE)
-			return NULL;
+			return nullptr;
 		e->buf = (gpu_vertex_t *)linearAlloc(count * sizeof(gpu_vertex_t));
 		if (!e->buf)
-			return NULL;
+			return nullptr;
 		e->cap = count;
 		s_persistBytes += count * sizeof(gpu_vertex_t);
 	}
@@ -120,7 +120,7 @@ static void persist_free_all(void)
 	for (i = 0; i < PERSIST_SIZE; i++) {
 		if (s_persist[i].buf) {
 			linearFree(s_persist[i].buf);
-			s_persist[i].buf = NULL;
+			s_persist[i].buf = nullptr;
 			s_persist[i].cap = 0;
 			s_persist[i].count = 0;
 			s_persist[i].gen = 0;
@@ -140,7 +140,7 @@ static void persist_free_all(void)
  * CIA. On OG (22 MB linear heap) this is ~18% of the budget — tight
  * but validated working on real hardware. */
 constexpr auto GPU_SCRATCH_SIZE = (4 * 1024 * 1024);
-static gpu_vertex_t *s_scratch = NULL;
+static gpu_vertex_t *s_scratch = nullptr;
 
 /* Point the vertex attribute buffer at v for the next draw. citro3d
  * re-sends the buffer config only when C3D_GetBufInfo() has marked it

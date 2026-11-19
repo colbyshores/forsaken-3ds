@@ -248,13 +248,13 @@ char* find_file( const char * str )
 			DebugPrintf("file: find_file: unknown return value from glob()\n");
 			break;
 	}
-	return NULL;
+	return nullptr;
 }
 
 char* find_next_file( void )
 {
 	if (glob_pos < 0 || glob_pos >= (int)glob_handle.gl_pathc)
-		return NULL;
+		return nullptr;
 	DebugPrintf("file: found file \"%s\" (%d of %d)\n", glob_handle.gl_pathv[glob_pos], glob_pos+1, glob_handle.gl_pathc);
 	return find_strip_path(glob_handle.gl_pathv[glob_pos++]);
 }

@@ -139,7 +139,7 @@ void InitScrPoly( u_int16_t i )
 		ScrPolys[i].Trans = 255;
 		ScrPolys[i].Frame = 0.0F;
 		ScrPolys[i].FrameRate = 1.0F;
-		ScrPolys[i].Frm_Info = NULL;
+		ScrPolys[i].Frm_Info = nullptr;
 		ScrPolys[i].SeqNum = ScrSeq::Nothing;
 		ScrPolys[i].Xscale = 1.0F;
 		ScrPolys[i].Yscale = 1.0F;
@@ -267,7 +267,7 @@ void KillUsedScrPoly( u_int16_t i )
 	}
 	else
 	{
-		RemoveScrPolyFromTPage( i, GetTPage( NULL, 0 ) );
+		RemoveScrPolyFromTPage( i, GetTPage( nullptr, 0 ) );
 	}
 
 	ScrPolys[i].Prev = INDEX_NONE;
@@ -338,7 +338,7 @@ void ScreenPolyProcess( void )
 		}
 		else
 		{
-			if( ( ScrPolys[i].Frm_Info != NULL ) && ( *ScrPolys[i].Frm_Info != NULL ) )
+			if( ( ScrPolys[i].Frm_Info != nullptr ) && ( *ScrPolys[i].Frm_Info != nullptr ) )
 			{
 				switch( ScrPolys[i].SeqNum )
 				{
@@ -632,7 +632,7 @@ void DoLensflareEffect( void )
 									&CurrentCamera.Pos,
 									CurrentCamera.GroupImIn,
 									&ShipVector, &Int_Point, &Int_Group, &Int_Normal,
-									&TempVector, true, NULL ) )
+									&TempVector, true, nullptr ) )
 						{
 							Conv3DTo2D( &Vert, &NewVert, &FinalMatrix );
 							DirVector.x = ( NewVert.x - Center_X );
@@ -967,7 +967,7 @@ void SecBullLensflare( u_int16_t i )
 					&CurrentCamera.Pos,
 					CurrentCamera.GroupImIn,
 					&BullVector, &Int_Point, &Int_Group, &Int_Normal,
-					&TempVector, true, NULL ) )
+					&TempVector, true, nullptr ) )
 		{
 			Conv3DTo2D( &Vert, &NewVert, &FinalMatrix );
 			DirVector.x = ( NewVert.x - Center_X );
@@ -2053,7 +2053,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	float			u1,v1,u2,v2;
 	float			x1,y1,x3,y3;
 	bool			Textured;
-	WORD			*Indices = NULL;
+	WORD			*Indices = nullptr;
 	int				start_index = 0;
 #ifdef __3DS__
 	int				batchVert = 0;  /* buffer position within current draw batch */
@@ -2149,7 +2149,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		{
 			if( !Textured )
 			{
-				renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
+				renderObject->textureGroups[renderObject->numTextureGroups].texture = nullptr;
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
 			}
 			else
@@ -2516,7 +2516,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 #else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 #endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
+							renderObject->textureGroups[renderObject->numTextureGroups].texture = nullptr;
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
 #ifdef __3DS__
 							renderObject->numTextureGroups++;
@@ -2620,7 +2620,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	float			u1,v1,u2,v2;
 	float			x1,y1,x3,y3;
 	bool			Textured;
-	WORD			*Indices = NULL;
+	WORD			*Indices = nullptr;
 	int				start_index = 0;
 #ifdef __3DS__
 	int				batchVert = 0;
@@ -2715,7 +2715,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		{
 			if( !Textured )
 			{
-				renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
+				renderObject->textureGroups[renderObject->numTextureGroups].texture = nullptr;
 				renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
 			}
 			else
@@ -3088,7 +3088,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 #else
 							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 #endif
-							renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
+							renderObject->textureGroups[renderObject->numTextureGroups].texture = nullptr;
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
 #ifdef __3DS__
 							renderObject->numTextureGroups++;
@@ -3221,7 +3221,7 @@ FILE * LoadScreenPolys( FILE * fp )
 			minutes = Countdown_Float / 6000.0F;
 			seconds = ( Countdown_Float - (minutes * 6000.0F) ) / 100.0F;
 			StartCountDown( minutes, seconds );
-			TimeLimitTrigger = NULL;
+			TimeLimitTrigger = nullptr;
 		}
 	}
 

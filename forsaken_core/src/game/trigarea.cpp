@@ -72,7 +72,7 @@ void TriggerAreaProcess( VECTOR * OldPos , VECTOR * NewPos , TRIGGER_AREA * Area
 		Globals ...
 ===================================================================*/
 u_int16_t	NumZones;
-TRIGGER_AREA * Zones = NULL;
+TRIGGER_AREA * Zones = nullptr;
 
 TRIGGER_AREA * GroupTriggerArea_player[MAXGROUPS];
 TRIGGER_AREA * GroupTriggerArea_player_shoots[MAXGROUPS];
@@ -105,10 +105,10 @@ bool TriggerAreaload( char * Filename )
 	ReleaseTriggerArea();
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
-		GroupTriggerArea_player[i] = NULL;
-		GroupTriggerArea_player_shoots[i] = NULL;
-		GroupTriggerArea_enemy[i] = NULL;
-		GroupTriggerArea_enemy_shoots[i] = NULL;
+		GroupTriggerArea_player[i] = nullptr;
+		GroupTriggerArea_player_shoots[i] = nullptr;
+		GroupTriggerArea_enemy[i] = nullptr;
+		GroupTriggerArea_enemy_shoots[i] = nullptr;
 	}
 
 
@@ -119,7 +119,7 @@ bool TriggerAreaload( char * Filename )
 	Buffer = (char*)malloc( File_Size );
 	OrgBuffer = Buffer;
 
-	if( Buffer == NULL ) return false;
+	if( Buffer == nullptr ) return false;
 
 	Read_Size = Read_File( Filename, Buffer, File_Size );
 
@@ -212,7 +212,7 @@ bool TriggerAreaload( char * Filename )
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
 		AreaPnt = Zones;
-		OldAreaPnt = NULL;
+		OldAreaPnt = nullptr;
 		for( j = 0 ; j < NumZones ; j++ )
 		{
 			if( ( AreaPnt->group == i ) &&( ( AreaPnt->when_player_isin != 0xffff ) ||
@@ -236,7 +236,7 @@ bool TriggerAreaload( char * Filename )
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
 		AreaPnt = Zones;
-		OldAreaPnt = NULL;
+		OldAreaPnt = nullptr;
 		for( j = 0 ; j < NumZones ; j++ )
 		{
 			if( ( AreaPnt->group == i ) &&( AreaPnt->when_player_shoots != 0xffff ) )
@@ -258,7 +258,7 @@ bool TriggerAreaload( char * Filename )
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
 		AreaPnt = Zones;
-		OldAreaPnt = NULL;
+		OldAreaPnt = nullptr;
 		for( j = 0 ; j < NumZones ; j++ )
 		{
 			if( ( AreaPnt->group == i ) &&( ( AreaPnt->when_enemy_isin != 0xffff ) ||
@@ -282,7 +282,7 @@ bool TriggerAreaload( char * Filename )
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
 		AreaPnt = Zones;
-		OldAreaPnt = NULL;
+		OldAreaPnt = nullptr;
 		for( j = 0 ; j < NumZones ; j++ )
 		{
 			if( ( AreaPnt->group == i ) &&( AreaPnt->when_enemy_shoots != 0xffff ) )
@@ -327,7 +327,7 @@ void ReleaseTriggerArea( void )
 			AreaPnt++;
 		}
 		free(Zones);
-		Zones = NULL;
+		Zones = nullptr;
 	}
 	NumZones = 0;
 }
@@ -912,7 +912,7 @@ FILE * LoadTriggerAreas( FILE * fp )
 		if( NumTrigAreas != NumZones )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		TrigAreaPtr = Zones;

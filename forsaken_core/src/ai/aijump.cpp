@@ -57,10 +57,10 @@ static NODE * JumpChooseNextNode( ENEMY * Enemy )
 {
 	NODE * cur  = (NODE*) Enemy->TNode;
 	NODE * prev = (NODE*) Enemy->LastTNode;
-	NODE * pick = NULL;
+	NODE * pick = nullptr;
 	int    pass, i;
 
-	if( !cur ) return NULL;
+	if( !cur ) return nullptr;
 
 	for( pass = 0; pass < 2 && !pick; pass++ )
 	{
@@ -301,18 +301,18 @@ void AI_JUMP_FOLLOWPATH( ENEMY * Enemy )
  * decision. Wire to AI_CRAWL_IDLE/SCAN to avoid duplicating logic. */
 
 void (* AI_JUMP_Mode[ ])( ENEMY * Enemy ) = {
-	NULL,
+	nullptr,
 	AI_JUMP_FOLLOWPATH,	/* AIMODE_FOLLOWPATH */
 	AI_CRAWL_IDLE,		/* AIMODE_IDLE */
 	AI_CRAWL_SCAN,		/* AIMODE_SCAN */
-	NULL,			/* MOVETOTARGET */
-	NULL,			/* FIREATTARGET */
-	NULL,			/* DOGFIGHT */
-	NULL,			/* KILLMINE */
-	NULL,			/* RETREAT */
-	NULL,			/* FORMATION */
-	NULL,			/* DEATH_CRASHNBURN */
-	NULL,			/* DEATH_PINGOFF */
+	nullptr,			/* MOVETOTARGET */
+	nullptr,			/* FIREATTARGET */
+	nullptr,			/* DOGFIGHT */
+	nullptr,			/* KILLMINE */
+	nullptr,			/* RETREAT */
+	nullptr,			/* FORMATION */
+	nullptr,			/* DEATH_CRASHNBURN */
+	nullptr,			/* DEATH_PINGOFF */
 };
 
 void AI_JUMP( ENEMY * Enemy )

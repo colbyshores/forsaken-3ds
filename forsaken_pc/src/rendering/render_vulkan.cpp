@@ -161,14 +161,14 @@ static vkbuf_t *vkbuf_create(VkDeviceSize size, VkBufferUsageFlags usage)
 	b->size = size;
 	VkBufferCreateInfo ci = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
 	ci.size = size; ci.usage = usage; ci.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	vkCreateBuffer(s_dev, &ci, NULL, &b->buf);
+	vkCreateBuffer(s_dev, &ci, nullptr, &b->buf);
 	VkMemoryRequirements mr;
 	vkGetBufferMemoryRequirements(s_dev, b->buf, &mr);
 	VkMemoryAllocateInfo ai = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
 	ai.allocationSize = mr.size;
 	ai.memoryTypeIndex = find_mem_type(mr.memoryTypeBits,
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	vkAllocateMemory(s_dev, &ai, NULL, &b->mem);
+	vkAllocateMemory(s_dev, &ai, nullptr, &b->mem);
 	vkBindBufferMemory(s_dev, b->buf, b->mem, 0);
 	vkMapMemory(s_dev, b->mem, 0, size, 0, &b->mapped);
 	return b;
@@ -177,20 +177,20 @@ static void vkbuf_destroy(vkbuf_t *b)
 {
 	if (!b) return;
 	if (b->mapped) vkUnmapMemory(s_dev, b->mem);
-	vkDestroyBuffer(s_dev, b->buf, NULL);
-	vkFreeMemory(s_dev, b->mem, NULL);
+	vkDestroyBuffer(s_dev, b->buf, nullptr);
+	vkFreeMemory(s_dev, b->mem, nullptr);
 	free(b);
 }
 
 static void destroy_swapchain(void)
 {
-	if (s_fbs) { for (uint32_t i = 0; i < s_swap_count; i++) vkDestroyFramebuffer(s_dev, s_fbs[i], NULL); free(s_fbs); s_fbs = NULL; }
-	if (s_swap_views) { for (uint32_t i = 0; i < s_swap_count; i++) vkDestroyImageView(s_dev, s_swap_views[i], NULL); free(s_swap_views); s_swap_views = NULL; }
-	if (s_depth_view) { vkDestroyImageView(s_dev, s_depth_view, NULL); s_depth_view = VK_NULL_HANDLE; }
-	if (s_depth_img) { vkDestroyImage(s_dev, s_depth_img, NULL); s_depth_img = VK_NULL_HANDLE; }
-	if (s_depth_mem) { vkFreeMemory(s_dev, s_depth_mem, NULL); s_depth_mem = VK_NULL_HANDLE; }
-	if (s_swap_imgs) { free(s_swap_imgs); s_swap_imgs = NULL; }
-	if (s_swap) { vkDestroySwapchainKHR(s_dev, s_swap, NULL); s_swap = VK_NULL_HANDLE; }
+	if (s_fbs) { for (uint32_t i = 0; i < s_swap_count; i++) vkDestroyFramebuffer(s_dev, s_fbs[i], nullptr); free(s_fbs); s_fbs = nullptr; }
+	if (s_swap_views) { for (uint32_t i = 0; i < s_swap_count; i++) vkDestroyImageView(s_dev, s_swap_views[i], nullptr); free(s_swap_views); s_swap_views = nullptr; }
+	if (s_depth_view) { vkDestroyImageView(s_dev, s_depth_view, nullptr); s_depth_view = VK_NULL_HANDLE; }
+	if (s_depth_img) { vkDestroyImage(s_dev, s_depth_img, nullptr); s_depth_img = VK_NULL_HANDLE; }
+	if (s_depth_mem) { vkFreeMemory(s_dev, s_depth_mem, nullptr); s_depth_mem = VK_NULL_HANDLE; }
+	if (s_swap_imgs) { free(s_swap_imgs); s_swap_imgs = nullptr; }
+	if (s_swap) { vkDestroySwapchainKHR(s_dev, s_swap, nullptr); s_swap = VK_NULL_HANDLE; }
 }
 
 static bool create_swapchain(void)
@@ -201,7 +201,7 @@ static bool create_swapchain(void)
 	VkSurfaceCapabilitiesKHR caps;
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(s_phys, s_surface, &caps);
 	uint32_t nfmt = 0;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(s_phys, s_surface, &nfmt, NULL);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(s_phys, s_surface, &nfmt, nullptr);
 	VkSurfaceFormatKHR fmts[16];
 	if (nfmt > 16) nfmt = 16;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(s_phys, s_surface, &nfmt, fmts);
@@ -225,9 +225,9 @@ static bool create_swapchain(void)
 	ci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	ci.presentMode = VK_PRESENT_MODE_FIFO_KHR;
 	ci.clipped = VK_TRUE;
-	if (vkCreateSwapchainKHR(s_dev, &ci, NULL, &s_swap) != VK_SUCCESS) return false;
+	if (vkCreateSwapchainKHR(s_dev, &ci, nullptr, &s_swap) != VK_SUCCESS) return false;
 
-	vkGetSwapchainImagesKHR(s_dev, s_swap, &s_swap_count, NULL);
+	vkGetSwapchainImagesKHR(s_dev, s_swap, &s_swap_count, nullptr);
 	s_swap_imgs = (VkImage *)malloc(sizeof(VkImage) * s_swap_count);
 	vkGetSwapchainImagesKHR(s_dev, s_swap, &s_swap_count, s_swap_imgs);
 	s_swap_views = (VkImageView *)malloc(sizeof(VkImageView) * s_swap_count);
@@ -236,7 +236,7 @@ static bool create_swapchain(void)
 		vi.image = s_swap_imgs[i]; vi.viewType = VK_IMAGE_VIEW_TYPE_2D; vi.format = s_swap_fmt;
 		vi.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		vi.subresourceRange.levelCount = 1; vi.subresourceRange.layerCount = 1;
-		vkCreateImageView(s_dev, &vi, NULL, &s_swap_views[i]);
+		vkCreateImageView(s_dev, &vi, nullptr, &s_swap_views[i]);
 	}
 
 	VkImageCreateInfo di = { VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
@@ -244,19 +244,19 @@ static bool create_swapchain(void)
 	di.extent.width = s_extent.width; di.extent.height = s_extent.height; di.extent.depth = 1;
 	di.mipLevels = 1; di.arrayLayers = 1; di.samples = VK_SAMPLE_COUNT_1_BIT;
 	di.tiling = VK_IMAGE_TILING_OPTIMAL; di.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-	vkCreateImage(s_dev, &di, NULL, &s_depth_img);
+	vkCreateImage(s_dev, &di, nullptr, &s_depth_img);
 	VkMemoryRequirements mr;
 	vkGetImageMemoryRequirements(s_dev, s_depth_img, &mr);
 	VkMemoryAllocateInfo ai = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
 	ai.allocationSize = mr.size;
 	ai.memoryTypeIndex = find_mem_type(mr.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	vkAllocateMemory(s_dev, &ai, NULL, &s_depth_mem);
+	vkAllocateMemory(s_dev, &ai, nullptr, &s_depth_mem);
 	vkBindImageMemory(s_dev, s_depth_img, s_depth_mem, 0);
 	VkImageViewCreateInfo dvi = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	dvi.image = s_depth_img; dvi.viewType = VK_IMAGE_VIEW_TYPE_2D; dvi.format = VK_FORMAT_D32_SFLOAT;
 	dvi.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 	dvi.subresourceRange.levelCount = 1; dvi.subresourceRange.layerCount = 1;
-	vkCreateImageView(s_dev, &dvi, NULL, &s_depth_view);
+	vkCreateImageView(s_dev, &dvi, nullptr, &s_depth_view);
 
 	s_fbs = (VkFramebuffer *)malloc(sizeof(VkFramebuffer) * s_swap_count);
 	for (uint32_t i = 0; i < s_swap_count; i++) {
@@ -264,7 +264,7 @@ static bool create_swapchain(void)
 		VkFramebufferCreateInfo fi = { VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
 		fi.renderPass = s_pass; fi.attachmentCount = 2; fi.pAttachments = atts;
 		fi.width = s_extent.width; fi.height = s_extent.height; fi.layers = 1;
-		vkCreateFramebuffer(s_dev, &fi, NULL, &s_fbs[i]);
+		vkCreateFramebuffer(s_dev, &fi, nullptr, &s_fbs[i]);
 	}
 	render_info.ThisMode.w = (int)s_extent.width;
 	render_info.ThisMode.h = (int)s_extent.height;
@@ -363,7 +363,7 @@ static VkPipeline get_pipeline(int ortho, int topo)
 	gi.layout = s_layout; gi.renderPass = s_pass; gi.subpass = 0;
 
 	VkPipeline pipe;
-	if (vkCreateGraphicsPipelines(s_dev, VK_NULL_HANDLE, 1, &gi, NULL, &pipe) != VK_SUCCESS)
+	if (vkCreateGraphicsPipelines(s_dev, VK_NULL_HANDLE, 1, &gi, nullptr, &pipe) != VK_SUCCESS)
 		return VK_NULL_HANDLE;
 	pipe_entry_t *e = &s_pipes[s_npipes++];
 	e->ortho = ortho; e->topo = topo; e->blend = s_blend;
@@ -377,7 +377,7 @@ static VkShaderModule make_module(const uint32_t *spv, size_t bytes)
 	VkShaderModuleCreateInfo ci = { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO };
 	ci.codeSize = bytes; ci.pCode = spv;
 	VkShaderModule m;
-	vkCreateShaderModule(s_dev, &ci, NULL, &m);
+	vkCreateShaderModule(s_dev, &ci, nullptr, &m);
 	return m;
 }
 
@@ -385,7 +385,7 @@ bool render_init(render_info_t *info)
 {
 	if (s_init_done) return true;
 	unsigned int n_ext = 0;
-	SDL_Vulkan_GetInstanceExtensions(info->window, &n_ext, NULL);
+	SDL_Vulkan_GetInstanceExtensions(info->window, &n_ext, nullptr);
 	const char **exts = (const char **)malloc(sizeof(char *) * (n_ext + 1));
 	SDL_Vulkan_GetInstanceExtensions(info->window, &n_ext, exts);
 
@@ -399,19 +399,19 @@ bool render_init(render_info_t *info)
 	if (getenv("FORSAKEN_VK_VALIDATION")) {
 		ici.enabledLayerCount = 1; ici.ppEnabledLayerNames = &val_layer;
 	}
-	if (vkCreateInstance(&ici, NULL, &s_inst) != VK_SUCCESS) { DebugPrintf("vulkan: instance failed\n"); return false; }
+	if (vkCreateInstance(&ici, nullptr, &s_inst) != VK_SUCCESS) { DebugPrintf("vulkan: instance failed\n"); return false; }
 	free(exts);
 	if (!SDL_Vulkan_CreateSurface(info->window, s_inst, &s_surface)) { DebugPrintf("vulkan: surface failed\n"); return false; }
 
 	uint32_t ndev = 0;
-	vkEnumeratePhysicalDevices(s_inst, &ndev, NULL);
+	vkEnumeratePhysicalDevices(s_inst, &ndev, nullptr);
 	VkPhysicalDevice devs[8];
 	if (ndev > 8) ndev = 8;
 	vkEnumeratePhysicalDevices(s_inst, &ndev, devs);
 	s_phys = devs[0];
 
 	uint32_t nqf = 0;
-	vkGetPhysicalDeviceQueueFamilyProperties(s_phys, &nqf, NULL);
+	vkGetPhysicalDeviceQueueFamilyProperties(s_phys, &nqf, nullptr);
 	VkQueueFamilyProperties qfs[16];
 	if (nqf > 16) nqf = 16;
 	vkGetPhysicalDeviceQueueFamilyProperties(s_phys, &nqf, qfs);
@@ -437,7 +437,7 @@ bool render_init(render_info_t *info)
 	dci.queueCreateInfoCount = 1; dci.pQueueCreateInfos = &qci;
 	dci.enabledExtensionCount = 1; dci.ppEnabledExtensionNames = &dext;
 	dci.pEnabledFeatures = &enabled;
-	if (vkCreateDevice(s_phys, &dci, NULL, &s_dev) != VK_SUCCESS) { DebugPrintf("vulkan: device failed\n"); return false; }
+	if (vkCreateDevice(s_phys, &dci, nullptr, &s_dev) != VK_SUCCESS) { DebugPrintf("vulkan: device failed\n"); return false; }
 	vkGetDeviceQueue(s_dev, s_qfam, 0, &s_queue);
 	{
 		VkPhysicalDeviceProperties dp;
@@ -459,7 +459,7 @@ bool render_init(render_info_t *info)
 	 * renderpass needs the format, so create swapchain-format probe first */
 	{
 		uint32_t nfmt = 0;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(s_phys, s_surface, &nfmt, NULL);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(s_phys, s_surface, &nfmt, nullptr);
 		VkSurfaceFormatKHR fmts[16];
 		if (nfmt > 16) nfmt = 16;
 		vkGetPhysicalDeviceSurfaceFormatsKHR(s_phys, s_surface, &nfmt, fmts);
@@ -475,12 +475,12 @@ bool render_init(render_info_t *info)
 	VkRenderPassCreateInfo rci = { VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO };
 	rci.attachmentCount = 2; rci.pAttachments = atts;
 	rci.subpassCount = 1; rci.pSubpasses = &sub;
-	if (vkCreateRenderPass(s_dev, &rci, NULL, &s_pass) != VK_SUCCESS) { DebugPrintf("vulkan: renderpass failed\n"); return false; }
+	if (vkCreateRenderPass(s_dev, &rci, nullptr, &s_pass) != VK_SUCCESS) { DebugPrintf("vulkan: renderpass failed\n"); return false; }
 
 	VkCommandPoolCreateInfo pci = { VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO };
 	pci.queueFamilyIndex = s_qfam;
 	pci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	vkCreateCommandPool(s_dev, &pci, NULL, &s_pool);
+	vkCreateCommandPool(s_dev, &pci, nullptr, &s_pool);
 	VkCommandBufferAllocateInfo cai = { VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO };
 	cai.commandPool = s_pool; cai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	cai.commandBufferCount = FRAMES_IN_FLIGHT;
@@ -490,9 +490,9 @@ bool render_init(render_info_t *info)
 	VkFenceCreateInfo fci = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
 	fci.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 	for (int i = 0; i < FRAMES_IN_FLIGHT; i++) {
-		vkCreateSemaphore(s_dev, &sci, NULL, &s_img_avail[i]);
-		vkCreateSemaphore(s_dev, &sci, NULL, &s_done[i]);
-		vkCreateFence(s_dev, &fci, NULL, &s_fence[i]);
+		vkCreateSemaphore(s_dev, &sci, nullptr, &s_img_avail[i]);
+		vkCreateSemaphore(s_dev, &sci, nullptr, &s_done[i]);
+		vkCreateFence(s_dev, &fci, nullptr, &s_fence[i]);
 	}
 
 	VkDescriptorSetLayoutBinding db = { 0 };
@@ -500,13 +500,13 @@ bool render_init(render_info_t *info)
 	db.descriptorCount = 1; db.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 	VkDescriptorSetLayoutCreateInfo dli = { VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
 	dli.bindingCount = 1; dli.pBindings = &db;
-	vkCreateDescriptorSetLayout(s_dev, &dli, NULL, &s_dsl);
+	vkCreateDescriptorSetLayout(s_dev, &dli, nullptr, &s_dsl);
 
 	VkDescriptorPoolSize dps = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 512 };
 	VkDescriptorPoolCreateInfo dpi = { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
 	dpi.maxSets = 512; dpi.poolSizeCount = 1; dpi.pPoolSizes = &dps;
 	dpi.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-	vkCreateDescriptorPool(s_dev, &dpi, NULL, &s_dpool);
+	vkCreateDescriptorPool(s_dev, &dpi, nullptr, &s_dpool);
 
 	VkPushConstantRange ranges[2] = {
 		{ VK_SHADER_STAGE_VERTEX_BIT, 0, 64 },
@@ -515,7 +515,7 @@ bool render_init(render_info_t *info)
 	VkPipelineLayoutCreateInfo pli = { VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
 	pli.setLayoutCount = 1; pli.pSetLayouts = &s_dsl;
 	pli.pushConstantRangeCount = 2; pli.pPushConstantRanges = ranges;
-	vkCreatePipelineLayout(s_dev, &pli, NULL, &s_layout);
+	vkCreatePipelineLayout(s_dev, &pli, nullptr, &s_layout);
 
 	VkSamplerCreateInfo samp = { VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO };
 	samp.magFilter = VK_FILTER_LINEAR; samp.minFilter = VK_FILTER_LINEAR;
@@ -528,7 +528,7 @@ bool render_init(render_info_t *info)
 		samp.anisotropyEnable = VK_TRUE;
 		samp.maxAnisotropy = props.limits.maxSamplerAnisotropy > 4.0f ? 4.0f : props.limits.maxSamplerAnisotropy;
 	}
-	vkCreateSampler(s_dev, &samp, NULL, &s_sampler);
+	vkCreateSampler(s_dev, &samp, nullptr, &s_sampler);
 
 	s_vs3d = make_module((const uint32_t *)vulkan3d_vert_spv, vulkan3d_vert_spv_len);
 	s_vs2d = make_module((const uint32_t *)vulkan2d_vert_spv, vulkan2d_vert_spv_len);
@@ -547,29 +547,29 @@ void render_cleanup(render_info_t *info)
 	(void)info;
 	if (!s_init_done) return;
 	vkDeviceWaitIdle(s_dev);
-	if (s_default_tex) { /* destroyed with pool reset below */ s_default_tex = NULL; }
-	for (int i = 0; i < s_npipes; i++) vkDestroyPipeline(s_dev, s_pipes[i].pipe, NULL);
+	if (s_default_tex) { /* destroyed with pool reset below */ s_default_tex = nullptr; }
+	for (int i = 0; i < s_npipes; i++) vkDestroyPipeline(s_dev, s_pipes[i].pipe, nullptr);
 	s_npipes = 0;
 	destroy_swapchain();
-	vkDestroyShaderModule(s_dev, s_vs3d, NULL);
-	vkDestroyShaderModule(s_dev, s_vs2d, NULL);
-	vkDestroyShaderModule(s_dev, s_fs, NULL);
-	vkDestroySampler(s_dev, s_sampler, NULL);
-	vkDestroyDescriptorPool(s_dev, s_dpool, NULL);
-	vkDestroyPipelineLayout(s_dev, s_layout, NULL);
-	vkDestroyDescriptorSetLayout(s_dev, s_dsl, NULL);
+	vkDestroyShaderModule(s_dev, s_vs3d, nullptr);
+	vkDestroyShaderModule(s_dev, s_vs2d, nullptr);
+	vkDestroyShaderModule(s_dev, s_fs, nullptr);
+	vkDestroySampler(s_dev, s_sampler, nullptr);
+	vkDestroyDescriptorPool(s_dev, s_dpool, nullptr);
+	vkDestroyPipelineLayout(s_dev, s_layout, nullptr);
+	vkDestroyDescriptorSetLayout(s_dev, s_dsl, nullptr);
 	for (int i = 0; i < FRAMES_IN_FLIGHT; i++) {
-		vkDestroySemaphore(s_dev, s_img_avail[i], NULL);
-		vkDestroySemaphore(s_dev, s_done[i], NULL);
-		vkDestroyFence(s_dev, s_fence[i], NULL);
+		vkDestroySemaphore(s_dev, s_img_avail[i], nullptr);
+		vkDestroySemaphore(s_dev, s_done[i], nullptr);
+		vkDestroyFence(s_dev, s_fence[i], nullptr);
 	}
 	while (s_retire) { retire_t *r = s_retire; s_retire = r->next; vkbuf_destroy(r->buf); free(r); }
-	for (int i = 0; i < FRAMES_IN_FLIGHT; i++) { vkbuf_destroy(s_stream[i]); s_stream[i] = NULL; }
-	vkDestroyCommandPool(s_dev, s_pool, NULL);
-	vkDestroyRenderPass(s_dev, s_pass, NULL);
-	vkDestroyDevice(s_dev, NULL);
-	vkDestroySurfaceKHR(s_inst, s_surface, NULL);
-	vkDestroyInstance(s_inst, NULL);
+	for (int i = 0; i < FRAMES_IN_FLIGHT; i++) { vkbuf_destroy(s_stream[i]); s_stream[i] = nullptr; }
+	vkDestroyCommandPool(s_dev, s_pool, nullptr);
+	vkDestroyRenderPass(s_dev, s_pass, nullptr);
+	vkDestroyDevice(s_dev, nullptr);
+	vkDestroySurfaceKHR(s_inst, s_surface, nullptr);
+	vkDestroyInstance(s_inst, nullptr);
 	s_init_done = false;
 }
 
@@ -596,7 +596,7 @@ bool render_mode_select(render_info_t *info)
 	return create_swapchain();
 }
 void render_set_filter(bool r, bool g, bool b) { (void)r; (void)g; (void)b; }
-const char *render_error_description(int e) { (void)e; return NULL; }
+const char *render_error_description(int e) { (void)e; return nullptr; }
 
 static u_int8_t gamma_table[256];
 void build_gamma_table(double gamma)
@@ -747,9 +747,9 @@ typedef struct { void *data; size_t size; } membuf_t;
 static BUFFER_HANDLE membuf_create(size_t size)
 {
 	membuf_t *m = (membuf_t *)malloc(sizeof(membuf_t));
-	if (!m) return NULL;
+	if (!m) return nullptr;
 	m->data = calloc(1, size);
-	if (!m->data) { free(m); return NULL; }
+	if (!m->data) { free(m); return nullptr; }
 	m->size = size;
 	return (BUFFER_HANDLE)m;
 }
@@ -760,20 +760,20 @@ static void membuf_free(BUFFER_HANDLE h)
 	free(m->data);
 	free(m);
 }
-static void *membuf_data(BUFFER_HANDLE h) { return h ? ((membuf_t *)h)->data : NULL; }
+static void *membuf_data(BUFFER_HANDLE h) { return h ? ((membuf_t *)h)->data : nullptr; }
 
-bool FSCreateVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = membuf_create((size_t)n * sizeof(LVERTEX)); return ro->vertexBuffer != NULL; }
+bool FSCreateVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = membuf_create((size_t)n * sizeof(LVERTEX)); return ro->vertexBuffer != nullptr; }
 bool FSCreateDynamicVertexBuffer(RENDEROBJECT *ro, int n) { return FSCreateVertexBuffer(ro, n); }
-bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = membuf_create((size_t)n * sizeof(TLVERTEX)); return ro->vertexBuffer != NULL; }
-bool FSCreateNormalBuffer(RENDEROBJECT *ro, int n) { ro->normalBuffer = membuf_create((size_t)n * sizeof(NORMAL)); return ro->normalBuffer != NULL; }
-bool FSCreateIndexBuffer(RENDEROBJECT *ro, int n) { ro->indexBuffer = membuf_create((size_t)n * 3 * sizeof(WORD)); return ro->indexBuffer != NULL; }
+bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *ro, int n) { ro->vertexBuffer = membuf_create((size_t)n * sizeof(TLVERTEX)); return ro->vertexBuffer != nullptr; }
+bool FSCreateNormalBuffer(RENDEROBJECT *ro, int n) { ro->normalBuffer = membuf_create((size_t)n * sizeof(NORMAL)); return ro->normalBuffer != nullptr; }
+bool FSCreateIndexBuffer(RENDEROBJECT *ro, int n) { ro->indexBuffer = membuf_create((size_t)n * 3 * sizeof(WORD)); return ro->indexBuffer != nullptr; }
 bool FSCreateDynamicIndexBuffer(RENDEROBJECT *ro, int n) { return FSCreateIndexBuffer(ro, n); }
 
-bool FSLockVertexBuffer(RENDEROBJECT *ro, LVERTEX **verts) { *verts = (LVERTEX *)membuf_data(ro->vertexBuffer); return *verts != NULL; }
+bool FSLockVertexBuffer(RENDEROBJECT *ro, LVERTEX **verts) { *verts = (LVERTEX *)membuf_data(ro->vertexBuffer); return *verts != nullptr; }
 bool FSUnlockVertexBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
-bool FSLockNormalBuffer(RENDEROBJECT *ro, NORMAL **normals) { *normals = (NORMAL *)membuf_data(ro->normalBuffer); return *normals != NULL; }
+bool FSLockNormalBuffer(RENDEROBJECT *ro, NORMAL **normals) { *normals = (NORMAL *)membuf_data(ro->normalBuffer); return *normals != nullptr; }
 bool FSUnlockNormalBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
-bool FSLockIndexBuffer(RENDEROBJECT *ro, WORD **indices) { *indices = (WORD *)membuf_data(ro->indexBuffer); return *indices != NULL; }
+bool FSLockIndexBuffer(RENDEROBJECT *ro, WORD **indices) { *indices = (WORD *)membuf_data(ro->indexBuffer); return *indices != nullptr; }
 bool FSUnlockIndexBuffer(RENDEROBJECT *ro) { (void)ro; return true; }
 bool FSLockPretransformedVertexBuffer(RENDEROBJECT *ro, TLVERTEX **verts) { return FSLockVertexBuffer(ro, (LVERTEX **)verts); }
 
@@ -789,13 +789,13 @@ void FSReleaseRenderObject(RENDEROBJECT *ro)
 {
 	/* The GPU never reads these (draws read copies in the stream), so
 	 * they can be freed at once. */
-	membuf_free(ro->vertexBuffer); ro->vertexBuffer = NULL;
-	membuf_free(ro->normalBuffer); ro->normalBuffer = NULL;
-	membuf_free(ro->indexBuffer); ro->indexBuffer = NULL;
+	membuf_free(ro->vertexBuffer); ro->vertexBuffer = nullptr;
+	membuf_free(ro->normalBuffer); ro->normalBuffer = nullptr;
+	membuf_free(ro->indexBuffer); ro->indexBuffer = nullptr;
 	for (int i = 0; i < ro->numTextureGroups; i++) {
 		ro->textureGroups[i].numVerts = 0;
 		ro->textureGroups[i].startVert = 0;
-		ro->textureGroups[i].texture = NULL;
+		ro->textureGroups[i].texture = nullptr;
 	}
 	ro->numTextureGroups = 0;
 }
@@ -815,12 +815,12 @@ static void vktex_finish(vktex_t *t, VkFormat fmt, int levels)
 	vi.image = t->image; vi.viewType = VK_IMAGE_VIEW_TYPE_2D; vi.format = fmt;
 	vi.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	vi.subresourceRange.levelCount = (uint32_t)levels; vi.subresourceRange.layerCount = 1;
-	vkCreateImageView(s_dev, &vi, NULL, &t->view);
+	vkCreateImageView(s_dev, &vi, nullptr, &t->view);
 	VkDescriptorImageInfo di = { s_sampler, t->view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
 	VkWriteDescriptorSet w = { VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
 	w.dstSet = t->set; w.dstBinding = 0; w.descriptorCount = 1;
 	w.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; w.pImageInfo = &di;
-	vkUpdateDescriptorSets(s_dev, 1, &w, 0, NULL);
+	vkUpdateDescriptorSets(s_dev, 1, &w, 0, nullptr);
 }
 static VkImage vktex_image(int w, int h, int levels, VkFormat fmt)
 {
@@ -831,7 +831,7 @@ static VkImage vktex_image(int w, int h, int levels, VkFormat fmt)
 	ci.tiling = VK_IMAGE_TILING_OPTIMAL;
 	ci.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	VkImage img;
-	vkCreateImage(s_dev, &ci, NULL, &img);
+	vkCreateImage(s_dev, &ci, nullptr, &img);
 	return img;
 }
 static void vktex_bind_mem(vktex_t *t)
@@ -841,7 +841,7 @@ static void vktex_bind_mem(vktex_t *t)
 	VkMemoryAllocateInfo ai = { VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
 	ai.allocationSize = mr.size;
 	ai.memoryTypeIndex = find_mem_type(mr.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	vkAllocateMemory(s_dev, &ai, NULL, &t->mem);
+	vkAllocateMemory(s_dev, &ai, nullptr, &t->mem);
 	vkBindImageMemory(s_dev, t->image, t->mem, 0);
 }
 static vkbuf_t *staging(const void *data, VkDeviceSize size)
@@ -863,7 +863,7 @@ static void transition(VkCommandBuffer cb, VkImage img, int base_level, int leve
 	b.srcAccessMask = src; b.dstAccessMask = dst;
 	VkPipelineStageFlags dst_stage = (new_l == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 		? VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT : VK_PIPELINE_STAGE_TRANSFER_BIT;
-	vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0, NULL, 0, NULL, 1, &b);
+	vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &b);
 }
 
 static bool load_ktx2(vktex_t *t, const char *path, u_int16_t *width, u_int16_t *height, bool *colorkey)
@@ -1007,7 +1007,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 			b.subresourceRange.baseMipLevel = (uint32_t)(i - 1); b.subresourceRange.levelCount = 1; b.subresourceRange.layerCount = 1;
 			b.srcAccessMask = VK_ACCESS_SHADER_READ_BIT; b.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 			if (i == 1) { b.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; }
-			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &b);
+			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &b);
 			VkImageMemoryBarrier bd = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
 			bd.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED; bd.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 			bd.srcQueueFamilyIndex = bd.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -1015,7 +1015,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 			bd.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			bd.subresourceRange.baseMipLevel = (uint32_t)i; bd.subresourceRange.levelCount = 1; bd.subresourceRange.layerCount = 1;
 			bd.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &bd);
+			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &bd);
 			VkImageBlit blit = { 0 };
 			blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			blit.srcSubresource.mipLevel = (uint32_t)(i - 1); blit.srcSubresource.layerCount = 1;
@@ -1032,7 +1032,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 			ba.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			ba.subresourceRange.baseMipLevel = (uint32_t)(i - 1); ba.subresourceRange.levelCount = 1; ba.subresourceRange.layerCount = 1;
 			ba.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; ba.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, NULL, 0, NULL, 1, &ba);
+			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &ba);
 			VkImageMemoryBarrier bb = { VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER };
 			bb.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL; bb.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			bb.srcQueueFamilyIndex = bb.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -1040,7 +1040,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 			bb.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			bb.subresourceRange.baseMipLevel = (uint32_t)i; bb.subresourceRange.levelCount = 1; bb.subresourceRange.layerCount = 1;
 			bb.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; bb.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, NULL, 0, NULL, 1, &bb);
+			vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &bb);
 			mw = nw; mh = nh;
 		}
 		end_one_time(cb);
@@ -1073,9 +1073,9 @@ void release_texture(TEXTURE_HANDLE texture)
 	vktex_t *t = (vktex_t *)texture;
 	vkDeviceWaitIdle(s_dev);
 	if (t->set) vkFreeDescriptorSets(s_dev, s_dpool, 1, &t->set);
-	if (t->view) vkDestroyImageView(s_dev, t->view, NULL);
-	if (t->image) vkDestroyImage(s_dev, t->image, NULL);
-	if (t->mem) vkFreeMemory(s_dev, t->mem, NULL);
+	if (t->view) vkDestroyImageView(s_dev, t->view, nullptr);
+	if (t->image) vkDestroyImage(s_dev, t->image, nullptr);
+	if (t->mem) vkFreeMemory(s_dev, t->mem, nullptr);
 	free(t);
 }
 
@@ -1161,7 +1161,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	if (!s_frame_active || !renderObject->vertexBuffer) return true;
 	membuf_t *vb = (membuf_t *)renderObject->vertexBuffer;
 	membuf_t *ib = (membuf_t *)renderObject->indexBuffer;
-	const WORD *indices = ib ? (const WORD *)ib->data : NULL;
+	const WORD *indices = ib ? (const WORD *)ib->data : nullptr;
 	const size_t stride = orthographic ? sizeof(TLVERTEX) : sizeof(LVERTEX);
 
 	/* The vertex range [vmin, vmax) and index range [imin, imax) this draw
@@ -1213,7 +1213,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		int frag[2] = { group->colourkey ? 1 : 0, group->texture ? 1 : 0 };
 		vkCmdPushConstants(s_cur, s_layout, VK_SHADER_STAGE_FRAGMENT_BIT, 64, 8, frag);
 		vktex_t *tex = group->texture ? (vktex_t *)group->texture : default_tex();
-		vkCmdBindDescriptorSets(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, s_layout, 0, 1, &tex->set, 0, NULL);
+		vkCmdBindDescriptorSets(s_cur, VK_PIPELINE_BIND_POINT_GRAPHICS, s_layout, 0, 1, &tex->set, 0, nullptr);
 		if (indices)
 			vkCmdDrawIndexed(s_cur, (uint32_t)group->numTriangles * 3, 1, (uint32_t)(group->startIndex - imin), (int32_t)(group->startVert - vmin), 0);
 		else

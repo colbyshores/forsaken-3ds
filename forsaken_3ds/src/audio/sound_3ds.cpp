@@ -103,7 +103,7 @@ static int alloc_channel(void)
 	ndspChnReset(oldest_idx);
 	if (channel_owner[oldest_idx])
 		channel_owner[oldest_idx]->channel = -1;
-	channel_owner[oldest_idx] = NULL;
+	channel_owner[oldest_idx] = nullptr;
 	channel_alloc_time[oldest_idx] = ++s_alloc_seq;
 	return oldest_idx;
 }
@@ -113,7 +113,7 @@ static void free_channel(int ch)
 	if (ch >= 0 && ch < MAX_SFX_VOICES)
 	{
 		channel_used[ch] = false;
-		channel_owner[ch] = NULL;
+		channel_owner[ch] = nullptr;
 	}
 }
 
@@ -186,7 +186,7 @@ bool sound_check_dsp_firmware_available(void)
  * Requires gfxInit() to have run already. */
 void sound_show_missing_firmware_warning(void)
 {
-	consoleInit(GFX_TOP, NULL);
+	consoleInit(GFX_TOP, nullptr);
 
 	printf("\x1b[2J");                 /* clear */
 	printf("\n  FORSAKEN 3DS: AUDIO DISABLED\n");
@@ -325,7 +325,7 @@ sound_buffer_t *sound_load(char *path)
 	if (!f)
 	{
 		DebugPrintf("sound_load: cannot open %s\n", file_path);
-		return NULL;
+		return nullptr;
 	}
 
 	/* read RIFF header */
@@ -335,11 +335,11 @@ sound_buffer_t *sound_load(char *path)
 	{
 		DebugPrintf("sound_load: not a valid WAV file: %s\n", file_path);
 		fclose(f);
-		return NULL;
+		return nullptr;
 	}
 
 	buffer = (sound_buffer_t *)malloc(sizeof(sound_buffer_t));
-	if (!buffer) { fclose(f); return NULL; }
+	if (!buffer) { fclose(f); return nullptr; }
 	memset(buffer, 0, sizeof(sound_buffer_t));
 	strncpy(buffer->path, file_path, MAX_PATH_LEN - 1);
 
@@ -368,14 +368,14 @@ sound_buffer_t *sound_load(char *path)
 				DebugPrintf("sound_load: linearAlloc failed for %u bytes\n", chunk.size);
 				free(buffer);
 				fclose(f);
-				return NULL;
+				return nullptr;
 			}
 			if (fread(buffer->data, 1, chunk.size, f) != chunk.size)
 			{
 				linearFree(buffer->data);
 				free(buffer);
 				fclose(f);
-				return NULL;
+				return nullptr;
 			}
 			/* flush CPU cache so DSP sees correct data */
 			DSP_FlushDataCache(buffer->data, chunk.size);
@@ -399,7 +399,7 @@ sound_buffer_t *sound_load(char *path)
 		DebugPrintf("sound_load: incomplete WAV: %s\n", file_path);
 		if (buffer->data) linearFree(buffer->data);
 		free(buffer);
-		return NULL;
+		return nullptr;
 	}
 
 	/* WAV 8-bit PCM is UNSIGNED (silence = 128), but ndsp's
@@ -439,18 +439,18 @@ sound_source_t *sound_source(sound_buffer_t *buffer)
 	if (!buffer)
 	{
 		DebugPrintf("sound_source: null buffer\n");
-		return NULL;
+		return nullptr;
 	}
 
 	ch = alloc_channel();
 	if (ch < 0)
 	{
 		DebugPrintf("sound_source: no free channels\n");
-		return NULL;
+		return nullptr;
 	}
 
 	src = (sound_source_t *)malloc(sizeof(sound_source_t));
-	if (!src) { free_channel(ch); return NULL; }
+	if (!src) { free_channel(ch); return nullptr; }
 	memset(src, 0, sizeof(sound_source_t));
 
 	src->channel = ch;

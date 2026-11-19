@@ -57,7 +57,7 @@ void adpcm_advance(const u_int8_t *frames, u_int32_t num_frames,
 	dsp_state_t st;
 	st.hist1 = (int16_t)ctx->history0;
 	st.hist2 = (int16_t)ctx->history1;
-	dsp_decode(frames, num_frames, coefs, &st, NULL);
+	dsp_decode(frames, num_frames, coefs, &st, nullptr);
 	ctx->history0 = (int16_t)st.hist1;
 	ctx->history1 = (int16_t)st.hist2;
 }
@@ -95,10 +95,10 @@ private:
 	void thread_loop();
 	static void thread_entry(void *self);
 
-	void        *stream_buf = NULL;            /* linearAlloc'd scratch (DSP DMA) */
+	void        *stream_buf = nullptr;            /* linearAlloc'd scratch (DSP DMA) */
 	ndspWaveBuf  wavebufs[NUM_WAVEBUFS] = {};
 
-	FILE        *file = NULL;
+	FILE        *file = nullptr;
 	char         file_path[128] = {};          /* saved so we can reopen on loop */
 	u_int32_t    data_offset = 0;
 	u_int32_t    data_size = 0;
@@ -114,7 +114,7 @@ private:
 	ndspAdpcmData adpcm_running = {};
 	ndspAdpcmData adpcm_initial = {};
 
-	Thread        thread = NULL;
+	Thread        thread = nullptr;
 	LightLock     lock = 0;
 	volatile bool thread_exit = false;
 };
@@ -224,7 +224,7 @@ bool MusicStream::open_track(int track)
 
 void MusicStream::close_track()
 {
-	if (file) { fclose(file); file = NULL; }
+	if (file) { fclose(file); file = nullptr; }
 	current_track = -1;
 }
 
@@ -324,12 +324,12 @@ void MusicStream::shutdown()
 		thread_exit = true;
 		threadJoin(thread, U64_MAX);
 		threadFree(thread);
-		thread = NULL;
+		thread = nullptr;
 	}
 
 	stop();
 
-	if (stream_buf) { linearFree(stream_buf); stream_buf = NULL; }
+	if (stream_buf) { linearFree(stream_buf); stream_buf = nullptr; }
 
 	initialized = false;
 }

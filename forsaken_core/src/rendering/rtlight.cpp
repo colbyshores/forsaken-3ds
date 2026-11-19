@@ -41,7 +41,7 @@ constexpr auto TWO_PI = (2.0F * PI);
 	Globals
 *******************************************************************************************/
 u_int16_t rt_lights = 0;
-RT_LIGHT *rt_light = NULL;
+RT_LIGHT *rt_light = nullptr;
 
 /******************************************************************************************
 	Load real-time game lights for level
@@ -240,7 +240,7 @@ bool ReleaseRTLights( void )
 
 		free( rt_light );
 	}
-	rt_light = NULL;
+	rt_light = nullptr;
 	rt_lights = 0;
 
 	return true;
@@ -732,7 +732,7 @@ FILE * LoadRealTimeLights( FILE * fp )
 		if( NumLights != rt_lights )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		RTLPtr = rt_light;

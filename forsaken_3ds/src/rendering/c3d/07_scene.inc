@@ -107,7 +107,7 @@ bool render_flip(render_info_t *info)
 const char *render_error_description(int e)
 {
 	(void)e;
-	return NULL;
+	return nullptr;
 }
 
 /*===================================================================
@@ -172,7 +172,7 @@ bool FSBeginScene(void)
 		C3D_DepthMap(true, 1.0f, 1.0f);
 
 		/* Reset TexEnv cache — force first draw to set up GPU state */
-		s_lastBoundTexture = NULL;
+		s_lastBoundTexture = nullptr;
 		s_lastTexEnvTextured = false;
 		s_lastTexEnvMode = TEXENV_MODE_NONE;
 		s_lastMatClass = -1;

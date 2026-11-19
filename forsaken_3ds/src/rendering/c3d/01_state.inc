@@ -21,7 +21,7 @@ constexpr int GPU_MAX_LIGHTS = 8; /* must match .v.pica `lights[24]` (= 8*3) */
 
 /* ---- citro3d state ---- */
 
-static DVLB_s          *s_shaderDVLB    = NULL;
+static DVLB_s          *s_shaderDVLB    = nullptr;
 static shaderProgram_s  s_shaderProgram;
 static bool             s_shaderReady   = false;
 
@@ -74,11 +74,11 @@ static bool          s_objLightReady = false;
 bool g_object_shine = true;
 bool g_wall_detail  = true;
 
-static C3D_RenderTarget *s_targetLeft    = NULL;
-static C3D_RenderTarget *s_targetRight   = NULL;
-static C3D_RenderTarget *s_targetBottom  = NULL;  /* mono 320×240 for HUD */
-static C3D_RenderTarget *s_targetCurrent = NULL;  /* active render target */
-static C3D_RenderTarget *s_targetSaved   = NULL;  /* stashed target for HUD restore */
+static C3D_RenderTarget *s_targetLeft    = nullptr;
+static C3D_RenderTarget *s_targetRight   = nullptr;
+static C3D_RenderTarget *s_targetBottom  = nullptr;  /* mono 320×240 for HUD */
+static C3D_RenderTarget *s_targetCurrent = nullptr;  /* active render target */
+static C3D_RenderTarget *s_targetSaved   = nullptr;  /* stashed target for HUD restore */
 static bool s_hudDrawnThisFrame = false;          /* HUD drawn once per frame */
 /* Saved render_info state during HUD-on-bottom pass (restored on End) */
 static int  s_hudSavedThisModeW = 0;

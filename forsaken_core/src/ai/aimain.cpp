@@ -29,12 +29,12 @@
 #include "game/oct2.h"
 
 void (* AI_AIR_Mode[ ])( ENEMY * Enemy ) = {
-	NULL,
+	nullptr,
 	AI_AIR_FOLLOWPATH,								// Follow Path..
 	AI_AIR_IDLE,
 	AI_AIR_SCAN,
 	AI_AIR_MOVETOTARGET,
-	NULL,											//FIREATTARGET,
+	nullptr,											//FIREATTARGET,
 	AI_AIR_DOGFIGHT,								//AIMODE_DOGFIGHT
 	AI_AIR_KILLMINE,								//AIMODE_KILLMINE
 	AI_AIR_RETREAT,									//AIMODE_RETREAT
@@ -53,33 +53,33 @@ void (* AI_FLESHMORPH_Mode[ ])( ENEMY * Enemy ) = {
 
 
 void (* AI_TURRET_Mode[ ])( ENEMY * Enemy ) = {
-	NULL,
-	NULL,											// Follow Path..
+	nullptr,
+	nullptr,											// Follow Path..
 	AI_TURRET_IDLE,
 	AI_TURRET_SCAN,
-	NULL,											//MOVETOTARGET,
+	nullptr,											//MOVETOTARGET,
 	AI_TURRET_FIREATTARGET,
-	NULL,											//AIMODE_DOGFIGHT
-	NULL,											//AIMODE_KILLMINE
-	NULL,											//AIMODE_RETREAT
-	NULL,											//AIMODE_FORMATION
-	NULL,											//AIMODE_DEATH_CRASHNBURN
-	NULL,											//AIMODE_DEATH_PINGOFF
+	nullptr,											//AIMODE_DOGFIGHT
+	nullptr,											//AIMODE_KILLMINE
+	nullptr,											//AIMODE_RETREAT
+	nullptr,											//AIMODE_FORMATION
+	nullptr,											//AIMODE_DEATH_CRASHNBURN
+	nullptr,											//AIMODE_DEATH_PINGOFF
 };
 
 void (* AI_CRAWL_Mode[ ])( ENEMY * Enemy ) = {
-	NULL,
+	nullptr,
 	AI_CRAWL_FOLLOWPATH,							// Follow Path..
 	AI_CRAWL_IDLE,
 	AI_CRAWL_SCAN,
-	NULL,											//MOVETOTARGET,
-	NULL,											//FIREATTARGET,
-	NULL,											//AIMODE_DOGFIGHT
-	NULL,											//AIMODE_KILLMINE
-	NULL,											//AIMODE_RETREAT
-	NULL,											//AIMODE_FORMATION
-	NULL,											//AIMODE_DEATH_CRASHNBURN
-	NULL,											//AIMODE_DEATH_PINGOFF
+	nullptr,											//MOVETOTARGET,
+	nullptr,											//FIREATTARGET,
+	nullptr,											//AIMODE_DOGFIGHT
+	nullptr,											//AIMODE_KILLMINE
+	nullptr,											//AIMODE_RETREAT
+	nullptr,											//AIMODE_FORMATION
+	nullptr,											//AIMODE_DEATH_CRASHNBURN
+	nullptr,											//AIMODE_DEATH_PINGOFF
 };
 void (* AI_SPLINE_Mode[ ])( ENEMY * Enemy ) = {
 	AI_SPLINE_FOLLOWPATH,//NULL,
@@ -105,19 +105,19 @@ void (* AI_EXOGENON_Mode[ ])( ENEMY * Enemy ) = {
 };
 
 void (* AI_LITTLEGEEK_Mode[ ])( ENEMY * Enemy ) = {
-	NULL,
-	NULL,								// Follow Path..
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,								// Follow Path..
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	AI_LITTLEGEEK_FORMATION,								//AIMODE_FORMATION
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
 };
 
 PRIMARYWEAPONKNOWLEDGE PrimaryKnowledge[] = {
@@ -257,7 +257,7 @@ bool Enemy2EnemyFriendlyFireCheck( ENEMY * SEnemy )
 
 	ApplyMatrix( &SEnemy->Object.Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
 	NormaliseVector( &Move_Dir );
-	while( TEnemy != NULL )
+	while( TEnemy != nullptr )
 	{
 		if( (TEnemy != SEnemy ) && ( TEnemy->Status & ENEMY_STATUS_Enable ) )
 		{
@@ -301,7 +301,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 		{
 			Enemy->TShip = EnemyLink->TShip;
 		}else{
-			Enemy->FormationLink = NULL;
+			Enemy->FormationLink = nullptr;
 		}
 	}
 	if( JustCheckPlayerRange )
@@ -385,7 +385,7 @@ void AI_THINK( ENEMY * Enemy , bool OverideThinkTime , bool JustCheckPlayerRange
 	{
 		if( TObject->Mode != NORMAL_MODE )
 		{
-			Enemy->TShip = NULL;
+			Enemy->TShip = nullptr;
 			return;
 		}
 

@@ -392,11 +392,11 @@ void DisableCheats( void )
 	CheatsDisabled = true;
 
 	if( PrimaryWeaponCheat )
-		JimBeam( NULL );
+		JimBeam( nullptr );
 	if( SecondaryWeaponCheat )
-		Lumberjack( NULL );
+		Lumberjack( nullptr );
 	if( GodMode )
-		ToggleGodMode( NULL );
+		ToggleGodMode( nullptr );
 }
 
 void CheckCheats( int key )

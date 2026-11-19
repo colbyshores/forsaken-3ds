@@ -882,7 +882,7 @@ bool ProcessShips()
 						NumCollides = 0;
 						if ( ShipObjPnt->Group != INDEX_NONE )
 						{
-							BGObject = NULL;
+							BGObject = nullptr;
 
 							if( !Object2Object )
 							{
@@ -1407,7 +1407,7 @@ void InitShipsChangeLevel( MLOADHEADER * Mloadheader )
 		}
 
 		Ships[i].Object.NodeNetwork = 1;
-		Ships[i].Object.NearestNode = NULL;
+		Ships[i].Object.NearestNode = nullptr;
 		Ships[i].Object.Type = OBJECT_TYPE_SHIP;
 
 		Ships[i].Object.Flags = 0;		// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
@@ -1475,7 +1475,7 @@ bool	ENV( MXLOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t mesh;
-	LVERTEX	*LVert = NULL;
+	LVERTEX	*LVert = nullptr;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )
@@ -1631,7 +1631,7 @@ void InitShipRandomPos( int16_t i )
 	VECTOR	MineVec;
 
 	Ships[i].Object.NodeNetwork = 1;
-	Ships[i].Object.NearestNode = NULL;
+	Ships[i].Object.NearestNode = nullptr;
 	Ships[i].Object.Type = OBJECT_TYPE_SHIP;
 
 	Ships[i].Object.Shield = Start_Shield;
@@ -1936,7 +1936,7 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 
 	input_grab(false);
 
-	control_ship( NULL, &control );
+	control_ship( nullptr, &control );
 	// fudge to stop you turboing while your dieing...
 	control.turbo = 0;
 	ShipPnt->Object.CruiseControl = CRUISE_NORMAL;
@@ -1966,7 +1966,7 @@ void ShipMode1( GLOBALSHIP * ShipPnt , BYTE i )
 		Ships[MAX_PLAYERS].Object.Pos = ShipPnt->Object.Pos;
 		Ships[MAX_PLAYERS].Object.Group = ShipPnt->Object.Group;
 
-		ObjectCollide( &Ships[ MAX_PLAYERS ].Object, &Move_Off, SHIP_RADIUS, NULL );
+		ObjectCollide( &Ships[ MAX_PLAYERS ].Object, &Move_Off, SHIP_RADIUS, nullptr );
 		Ships[MAX_PLAYERS].Object.Mode = DEATH_MODE;
 		if( Ships[MAX_PLAYERS].Object.Pos.x == Ships[WhoIAm].Object.Pos.x &&
 			Ships[MAX_PLAYERS].Object.Pos.y == Ships[WhoIAm].Object.Pos.y &&
@@ -2103,12 +2103,12 @@ void ShipMode2( GLOBALSHIP * ShipPnt , BYTE i )
 
 			// so we don't fire from birth
 			clear_last_mouse_state();
-			control_ship( NULL, &control );
+			control_ship( nullptr, &control );
 		}
 		// respawn key not hit
 		else
 		{
-			control_ship( NULL, &control ); // clear ship controls
+			control_ship( nullptr, &control ); // clear ship controls
 		}
 	}
 }
@@ -2221,7 +2221,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		{
 			if( BackgroundCollide( &MCloadheadert0, &Mloadheader,
 										&Ships[WhoIAm].Object.Pos, Ships[WhoIAm].Object.Group, &Move_Dir,
-										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, NULL ) == true )
+										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, nullptr ) == true )
 			{
 				ShipPnt->Object.Pos.x = ImpactPoint.x;
 				ShipPnt->Object.Pos.y = ImpactPoint.y;
@@ -2245,7 +2245,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		{
 			while ( BackgroundCollide( &MCloadheader, &Mloadheader,
 										&temp, ImpactGroup, &Move_Dir,
-										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, NULL ) )
+										&ImpactPoint , &ImpactGroup, &FaceNormal, &Pos_New, true, nullptr ) )
 			{
 				temp = ImpactPoint;
 				Move_Dir.x = Pos_New.x - temp.x;
@@ -2269,7 +2269,7 @@ void RemoteCameraMode0( GLOBALSHIP * ShipPnt , BYTE i )
 		Move_Off.y = ( Move_Off.y * Speed )*framelag;
 		Move_Off.z = ( Move_Off.z * Speed )*framelag;
 		// do collisions to background
-		ObjectCollide( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, NULL );
+		ObjectCollide( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, nullptr );
 	}else{
 
 		ApplyMatrix( &Ships[WhoIAm].Object.Mat, &Forward, &Move_Dir );			/* Calc Direction Vector */
@@ -2596,7 +2596,7 @@ bool CarryonDeathMove( GLOBALSHIP * ShipPnt,BYTE i)
 		Impact = true;
 	}
 
-	BGObject = NULL;
+	BGObject = nullptr;
 	if( ObjectCollide( &ShipPnt->Object, &Move_Off, SHIP_RADIUS, &BGObject ) )
 		Impact = true;
 	if( BGObject ) ChangeBGState( BGObject, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
@@ -2771,7 +2771,7 @@ void ReleaseComponentedShips( void )
 		{
 			FreeCompObjChildren( Ships[ Count ].Object.Components, 1 );
 			free( Ships[ Count ].Object.Components );
-			Ships[ Count ].Object.Components = NULL;
+			Ships[ Count ].Object.Components = nullptr;
 			Ships[ Count ].ModelNum = INDEX_NONE;
 		}
 		else
@@ -2789,7 +2789,7 @@ void ReleaseComponentedShips( void )
 FILE * SaveShips( FILE * fp )
 {
 	u_int16_t			i;
-	COMP_OBJ	*	TempPtr = NULL;
+	COMP_OBJ	*	TempPtr = nullptr;
 
 	if( fp )
 	{
@@ -2801,7 +2801,7 @@ FILE * SaveShips( FILE * fp )
 		if( Ships[ i ].Object.Components )
 		{
 			TempPtr = Ships[ i ].Object.Components;
-			Ships[ i ].Object.Components = NULL;
+			Ships[ i ].Object.Components = nullptr;
 		}
 
 		if( !Object_Save( fp , &Ships[ i ].Object ) )
@@ -2809,16 +2809,16 @@ FILE * SaveShips( FILE * fp )
 			if( TempPtr )
 			{
 				Ships[ i ].Object.Components = TempPtr;
-				TempPtr = NULL;
+				TempPtr = nullptr;
 			}
 
-			return( NULL );	// the caller closes fp
+			return( nullptr );	// the caller closes fp
 		}
 
 		if( TempPtr )
 		{
 			Ships[ i ].Object.Components = TempPtr;
-			TempPtr = NULL;
+			TempPtr = nullptr;
 		}
 
 		fwrite( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
@@ -2859,7 +2859,7 @@ FILE * SaveShips( FILE * fp )
 		Ships[ i ].Object.Type = OBJECT_TYPE_SHIP;
 		if( !Object_Save( fp , &Ships[ i ].Object ) )
 		{
-			return( NULL );	// the caller closes fp
+			return( nullptr );	// the caller closes fp
 		}
 
 		fwrite( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
@@ -2916,7 +2916,7 @@ FILE * LoadShips( FILE * fp )
 		if( !Object_Load( fp , &Ships[ i ].Object ) )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		fread( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );
@@ -2956,7 +2956,7 @@ FILE * LoadShips( FILE * fp )
 		if( !Object_Load( fp , &Ships[ i ].Object ) )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		fread( &Ships[ i ].enable, sizeof( Ships[ i ].enable ), 1, fp );

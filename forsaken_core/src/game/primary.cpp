@@ -1679,7 +1679,7 @@ void ProcessPrimaryBullets( void )
 
 				if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, &PrimBulls[i].Pos,
 										PrimBulls[i].GroupImIn, &temp, (VECTOR *) &PrimBulls[i].ColPoint,
-										&PrimBulls[i].ColGroup, &PrimBulls[i].ColPointNormal, &TempVector, false, NULL ) )
+										&PrimBulls[i].ColGroup, &PrimBulls[i].ColPointNormal, &TempVector, false, nullptr ) )
 				{
 					DebugPrintf( "Primary weapon %d didn't collide with backgroup in group %d\n", PrimBulls[i].Weapon, PrimBulls[i].GroupImIn );
 					if( DebugInfo ) CreateDebugLine( &PrimBulls[i].Pos, &temp, PrimBulls[i].GroupImIn, 255, 64, 64 );
@@ -1759,7 +1759,7 @@ void ProcessPrimaryBullets( void )
 			}
 
 			HitEnemy = CheckHitEnemy( PrimBulls[i].OwnerType, PrimBulls[i].Owner, &PrimBulls[i].Pos, PrimBulls[i].GroupImIn, &DirVector, &PrimBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, PrimBulls[i].ColRadius, PrimBulls[i].ColType );
-			if( HitEnemy != NULL )
+			if( HitEnemy != nullptr )
 			{
 				HitWall = INDEX_NONE;
 				HitTarget = INDEX_NONE;
@@ -1779,7 +1779,7 @@ void ProcessPrimaryBullets( void )
 				}
 			}
 
-			if( ( HitWall != INDEX_NONE ) || ( HitTarget != INDEX_NONE ) || ( HitSecondary != INDEX_NONE ) || ( HitEnemy != NULL ) )
+			if( ( HitWall != INDEX_NONE ) || ( HitTarget != INDEX_NONE ) || ( HitSecondary != INDEX_NONE ) || ( HitEnemy != nullptr ) )
 			{
 				TrigPos.x = PrimBulls[i].Pos.x + ( PrimBulls[i].Dir.x * DistToInt );
 				TrigPos.y = PrimBulls[i].Pos.y + ( PrimBulls[i].Dir.y * DistToInt );
@@ -2631,7 +2631,7 @@ void ProcessPrimaryBullets( void )
 /*===================================================================
 			Hit Enemy
 ===================================================================*/
-			if( HitEnemy != NULL )
+			if( HitEnemy != nullptr )
 			{
 				TempVector.x = ( EInt_Point.x - HitEnemy->Object.Pos.x );
 				TempVector.y = ( EInt_Point.y - HitEnemy->Object.Pos.y );
@@ -3491,7 +3491,7 @@ u_int16_t InitOnePrimBull( u_int16_t OwnerType, u_int16_t OwnerID, u_int16_t Bul
 		PrimBulls[i].line = INDEX_NONE;
 		PrimBulls[i].light = INDEX_NONE;
 		PrimBulls[i].Bounces = 0;
-		PrimBulls[i].EnemyGun = NULL;
+		PrimBulls[i].EnemyGun = nullptr;
 		PrimBulls[i].FramelagAddition = 0.0F;
 		PrimBulls[i].TrojPower = PLevel;
 
@@ -8446,7 +8446,7 @@ FILE * LoadPrimBulls( FILE * fp )
 			}
 			else
 			{
-				PrimBulls[ i ].EnemyGun = NULL;
+				PrimBulls[ i ].EnemyGun = nullptr;
 			}
 
 			fread( &PrimBulls[ i ].ID, sizeof( u_int16_t ), 1, fp );

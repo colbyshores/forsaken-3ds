@@ -90,7 +90,7 @@ static bool s_inFrame = false;
 
 /* TexEnv cache: skip redundant GPU state changes when consecutive
  * draws use the same texture or same untextured mode. */
-static void *s_lastBoundTexture = NULL;  /* last texture_t* passed to C3D_TexBind */
+static void *s_lastBoundTexture = nullptr;  /* last texture_t* passed to C3D_TexBind */
 static bool  s_lastTexEnvTextured = false;  /* last TexEnv was textured vs vertex-only */
 
 /* Per-mesh ProcTex phase variation. draw_render_object writes a

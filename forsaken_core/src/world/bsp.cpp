@@ -47,7 +47,7 @@ static bool BSP_Loadtree( BSP_TREE *t, FileReader & in )
 
 	// initialize first node
 	New = t->Root;
-	New->Parent = NULL;
+	New->Parent = nullptr;
 
 	// pack on node heirachy
 	for( e = 0 ; e < t->NumNodes ; e++ )
@@ -57,12 +57,12 @@ static bool BSP_Loadtree( BSP_TREE *t, FileReader & in )
 		New->Normal = Raw.Normal;
 		New->Offset = Raw.Offset;
 		New->Colour = Raw.Colour;
-		if( !Raw.Front ) New->Front = NULL;
+		if( !Raw.Front ) New->Front = nullptr;
 		else{
 			New->Front = t->Root + Raw.Front;
 			New->Front->Parent = New;
 		}
-		if( !Raw.Back ) New->Back = NULL;
+		if( !Raw.Back ) New->Back = nullptr;
 		else{
 			New->Back  = t->Root + Raw.Back;
 			New->Back->Parent = New;
@@ -128,7 +128,7 @@ static bool BSP_LoadPortals( char *fname )
 	Buffer = (char*)malloc( File_Size );
 	OrgBuffer = Buffer;
 
-	if( Buffer == NULL ) return false;
+	if( Buffer == nullptr ) return false;
 
 	Read_Size = Read_File( Filename, Buffer, File_Size );
 
@@ -186,7 +186,7 @@ bool Bspload( char * Filename, BSP_HEADER *Bsp_Header )
 
 	Buffer = (char*)malloc( File_Size );
 
-	if( Buffer == NULL ) return false;
+	if( Buffer == nullptr ) return false;
 
 	OrgBuffer = Buffer;
 
@@ -240,7 +240,7 @@ void Bspfree( void )
 				if( Bsp_Header[ bsp_num ].Bsp_Tree[i].Root )
 				{
 					free(Bsp_Header[ bsp_num ].Bsp_Tree[i].Root);
-					Bsp_Header[ bsp_num ].Bsp_Tree[i].Root = NULL;
+					Bsp_Header[ bsp_num ].Bsp_Tree[i].Root = nullptr;
 				}
 			}
 			Bsp_Header[ bsp_num ].NumGroups = 0;
@@ -262,11 +262,11 @@ void Bspfree( void )
 				bp = &pg->portal[ j ];
 				if ( bp->bsp.Root )
 					free( bp->bsp.Root );
-				bp->bsp.Root = NULL;
+				bp->bsp.Root = nullptr;
 			}
 			if ( pg->portal )
 				free( pg->portal );
-			pg->portal = NULL;
+			pg->portal = nullptr;
 			pg->portals = 0;
 		}
 		Bsp_Portal_Header.state = false;
@@ -290,7 +290,7 @@ bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *
 	VECTOR EndPos;
 
 	RayLength = VectorLength( Dir );
-	CollideNode = NULL;
+	CollideNode = nullptr;
 	RayPos = *StartPos;
 	RayDir = *Dir;
 	EndPos.x = StartPos->x + Dir->x;

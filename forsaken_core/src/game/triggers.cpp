@@ -43,30 +43,30 @@ constexpr int TRG_VERSION_NUMBER = 1;
 /*===================================================================
 		Globals ...
 ===================================================================*/
-TRIGGERVAR * AvatarActivated = NULL;
-TRIGGERVAR * Level_End = NULL;
-TRIGGERVAR * DecreaseTemperature = NULL;
-TRIGGERVAR * TimeLimitTrigger = NULL;
+TRIGGERVAR * AvatarActivated = nullptr;
+TRIGGERVAR * Level_End = nullptr;
+TRIGGERVAR * DecreaseTemperature = nullptr;
+TRIGGERVAR * TimeLimitTrigger = nullptr;
 int	NumOfTrigMods = 0;
-TRIGGERMOD	*TrigMods = NULL;
+TRIGGERMOD	*TrigMods = nullptr;
 int	NumOfTrigVars = 0;
-TRIGGERVAR	*TrigVars = NULL;
+TRIGGERVAR	*TrigVars = nullptr;
 int	NumOfTriggers = 0;
-TRIGGER	*Triggers = NULL;
+TRIGGER	*Triggers = nullptr;
 int	NumOfEvents = 0;
-EVENT	*Events = NULL;
+EVENT	*Events = nullptr;
 int	NumOfConditions = 0;
-CONDITION *Conditions = NULL;
+CONDITION *Conditions = nullptr;
 
 int init_shortcopy = 0;
 SHORTTRIGGER *ShortTriggerCopy[ MAX_PLAYERS ];
 SHORTTRIGVAR *ShortTrigVarCopy[ MAX_PLAYERS ];
 
 int	NumOfActiveConditions = 0;
-CONDITION ** ActiveConditions = NULL;
+CONDITION ** ActiveConditions = nullptr;
 
 int NumOfTrigModQues = 0;
-TRIGGERMODQUE *TrigModQue = NULL;
+TRIGGERMODQUE *TrigModQue = nullptr;
 
 
 /*===================================================================
@@ -392,20 +392,20 @@ void (* EventList[ ])( u_int8_t * Data ) = {
 		EVENT_EnemySetTargetNode,		// TRIGGEREVENT_EnemySetTargetNode		25
 		EVENT_EnemySetNextTargetNode,	// TRIGGEREVENT_EnemySetNextTargetNode	26
 #else
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 #endif
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
 };
 
 /*===================================================================
@@ -745,10 +745,10 @@ bool Triggerload( char * Filename )
 	NumOfTrigModQues = 0;
 	NumOfEvents = 0;
 	NumOfConditions = 0;
-	Level_End = NULL;
-	AvatarActivated = NULL;
-	DecreaseTemperature = NULL;
-	TimeLimitTrigger = NULL;
+	Level_End = nullptr;
+	AvatarActivated = nullptr;
+	DecreaseTemperature = nullptr;
+	TimeLimitTrigger = nullptr;
 
 
 	File_Size = Get_File_Size( Filename );
@@ -758,7 +758,7 @@ bool Triggerload( char * Filename )
 
 	Buffer = (char*)malloc( File_Size );
 
-	if( Buffer == NULL )
+	if( Buffer == nullptr )
 		return false;
 	OrgBuffer = Buffer;
 
@@ -786,7 +786,7 @@ bool Triggerload( char * Filename )
 		}
 		free( TrigVars );
 	}
-	TrigVars = NULL;
+	TrigVars = nullptr;
 
 	if ( Triggers )
 	{
@@ -797,13 +797,13 @@ bool Triggerload( char * Filename )
 		}
 		free( Triggers );
 	}
-	Triggers = NULL;
+	Triggers = nullptr;
 
 	if ( Events )
 	{
 		free( Events );
 	}
-	Events = NULL;
+	Events = nullptr;
 
 	if ( Conditions )
 	{
@@ -816,22 +816,22 @@ bool Triggerload( char * Filename )
 		}
 		free( Conditions );
 	}
-	Conditions = NULL;
+	Conditions = nullptr;
 
 	if ( TrigModQue )
 	{
 		free( TrigModQue );
 	}
-	TrigModQue = NULL;
+	TrigModQue = nullptr;
 
 	for ( i = 0; i < MAX_PLAYERS; i++ )
 	{
 		if ( init_shortcopy && ShortTriggerCopy[ i ] )
 			free( ShortTriggerCopy[ i ] );
-		ShortTriggerCopy[ i ] = NULL;
+		ShortTriggerCopy[ i ] = nullptr;
 		if ( init_shortcopy && ShortTrigVarCopy[ i ] )
 			free( ShortTrigVarCopy[ i ] );
-		ShortTrigVarCopy[ i ] = NULL;
+		ShortTrigVarCopy[ i ] = nullptr;
 	}
 	init_shortcopy = 1;
 
@@ -839,7 +839,7 @@ bool Triggerload( char * Filename )
 	{
 		free( ActiveConditions );
 	}
-	ActiveConditions = NULL;
+	ActiveConditions = nullptr;
 
 	NumOfTrigVars = in.i32();
 	NumOfTriggers = in.i32();
@@ -961,7 +961,7 @@ bool Triggerload( char * Filename )
 			}
 		}
 		else
-			v->Triggers = NULL;
+			v->Triggers = nullptr;
 		for ( j = 0; j < v->NumOfTriggers; j++ )
 		{
 			k = in.i32();
@@ -993,7 +993,7 @@ bool Triggerload( char * Filename )
 			}
 		}
 		else
-			t->Conditions = NULL;
+			t->Conditions = nullptr;
 		for ( j = 0; j < t->NumOfConditions; j++ )
 		{
 			k = in.i32();
@@ -1017,7 +1017,7 @@ bool Triggerload( char * Filename )
 		j = in.i32();
 		if ( j >= NumOfTrigMods )
 			return false;
-		m->Next = ( j < 0 ) ? NULL : &TrigMods[ j ];
+		m->Next = ( j < 0 ) ? nullptr : &TrigMods[ j ];
 
 	}
 
@@ -1043,7 +1043,7 @@ bool Triggerload( char * Filename )
 			}
 		}
 		else
-			c->Triggers = NULL;
+			c->Triggers = nullptr;
 		for ( j = 0; j < c->NumOfTriggers; j++ )
 		{
 			k = in.i32();
@@ -1063,7 +1063,7 @@ bool Triggerload( char * Filename )
 			}
 		}
 		else
-			c->Events = NULL;
+			c->Events = nullptr;
 		for ( j = 0; j < c->NumOfEvents; j++ )
 		{
 			k = in.i32();
@@ -1184,10 +1184,10 @@ void ReleaseTriggers( void )
 		{
 			if ( ShortTrigVarCopy[ i] )
 				free( ShortTrigVarCopy[ i ] );
-			ShortTrigVarCopy[ i ] = NULL;
+			ShortTrigVarCopy[ i ] = nullptr;
 		}
 	}
-	TrigVars = NULL;
+	TrigVars = nullptr;
 
 	if ( Triggers )
 	{
@@ -1201,16 +1201,16 @@ void ReleaseTriggers( void )
 		{
 			if ( ShortTriggerCopy[ i] )
 				free( ShortTriggerCopy[ i ] );
-			ShortTriggerCopy[ i ] = NULL;
+			ShortTriggerCopy[ i ] = nullptr;
 		}
 	}
-	Triggers = NULL;
+	Triggers = nullptr;
 
 	if ( Events )
 	{
 		free( Events );
 	}
-	Events = NULL;
+	Events = nullptr;
 
 	if ( Conditions )
 	{
@@ -1223,25 +1223,25 @@ void ReleaseTriggers( void )
 		}
 		free( Conditions );
 	}
-	Conditions = NULL;
+	Conditions = nullptr;
 
 	if ( ActiveConditions )
 	{
 		free( ActiveConditions );
 	}
-	ActiveConditions = NULL;
+	ActiveConditions = nullptr;
 
 	if ( TrigMods )
 	{
 		free( TrigMods );
 	}
-	TrigMods = NULL;
+	TrigMods = nullptr;
 
 	if ( TrigModQue )
 	{
 		free( TrigModQue );
 	}
-	TrigModQue = NULL;
+	TrigModQue = nullptr;
 }
 
 /*===================================================================
@@ -1472,7 +1472,7 @@ void CheckTimeLimit( void )
 			CreateCountdownDigits();
 			StartCountDown( 1, 0 );
 			ResetCountDownBombTag( ( TVpnt->State * 100.0F ) );
-			TimeLimitTrigger = NULL;
+			TimeLimitTrigger = nullptr;
 		}
 	}
 }
@@ -1578,7 +1578,7 @@ FILE * LoadAllTriggers( FILE * fp )
 		if( NumOfTrigVars != NumTrigVars )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 		TrigVar = TrigVars;
 
@@ -1596,7 +1596,7 @@ FILE * LoadAllTriggers( FILE * fp )
 		if( NumOfTriggers != NumTrigs )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		Trig = Triggers;
@@ -1615,7 +1615,7 @@ FILE * LoadAllTriggers( FILE * fp )
 		if( NumOfTrigModQues != NumTrigMods )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		TrigQue = TrigModQue;

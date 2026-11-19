@@ -89,8 +89,8 @@ u_int8_t	CharTrans[256];
 
 u_int16_t NumOfTextMessages = 0;
 const char * TextMessagesPnt[MAXTEXTMESSAGES];
-char * TextMessages = NULL;
-TEXTMSGINFO * TextMsgInfo = NULL;
+char * TextMessages = nullptr;
+TEXTMSGINFO * TextMsgInfo = nullptr;
 
 
 /*===================================================================
@@ -407,7 +407,7 @@ void AddPlayerMessageToQueShort( char ** Text, int Colour )
 
 		if( *Pnt == 0 )
 		{
-			*Text = NULL;
+			*Text = nullptr;
 			return;
 		}
 		Pnt++;
@@ -447,7 +447,7 @@ void AddColourMessageToQueShort( char ** Text, int Colour )
 
 		if( *Pnt == 0 )
 		{
-			*Text = NULL;
+			*Text = nullptr;
 			return;
 		}
 		Pnt++;
@@ -639,7 +639,7 @@ void PrintScoreSort( void )
 				// Show pings for everyone except yourself
 				if( ShipID != WhoIAm )
 				{
-					if( Ships[ShipID].network_player != NULL )
+					if( Ships[ShipID].network_player != nullptr )
 					{
 						// Show ping
 						sprintf( (char*) &buf[0] ,"%*dms", 4, (u_int16_t) Ships[ShipID].network_player->ping);
@@ -763,7 +763,7 @@ bool ReadTxtFile( char *Filename )
 	}
 
 
-	TextMessages = NULL;
+	TextMessages = nullptr;
 	File_Size = Get_File_Size( Filename );
 	if( !File_Size )
 	{
@@ -792,7 +792,7 @@ bool ReadTxtFile( char *Filename )
 	while( TextMessagesPnt[NumOfTextMessages] )
 	{
 
-		TextMessagesPnt[++NumOfTextMessages] = strtok( NULL , "\n" );
+		TextMessagesPnt[++NumOfTextMessages] = strtok( nullptr , "\n" );
 	}
 	return true;
 }
@@ -806,7 +806,7 @@ void FreeTxtFile( void )
 	if( TextMessages )
 	{
 		free( TextMessages );
-		TextMessages = NULL;
+		TextMessages = nullptr;
 	}
 	NumOfTextMessages = 0;
 }
@@ -880,7 +880,7 @@ bool ReadMsgFile( char *Filename )
 
 	TextActivatedOrder = 0;
 	CurrentTextActivated = 0;
-	TextMsgInfo = NULL;
+	TextMsgInfo = nullptr;
 	if( !NumOfTextMessages)
 		return true;
 
@@ -948,7 +948,7 @@ void FreeMsgFile( void )
 	if( TextMsgInfo )
 	{
 		free( TextMsgInfo );
-		TextMsgInfo = NULL;
+		TextMsgInfo = nullptr;
 	}
 }
 
@@ -1057,7 +1057,7 @@ FILE *	LoadAllText( FILE * fp )
 
 	fread( &TempNumOfTextMessages, sizeof( NumOfTextMessages ), 1, fp );
 	if( TempNumOfTextMessages != NumOfTextMessages )
-		return NULL;
+		return nullptr;
 
 	fread( &TextActivatedOrder, sizeof( TextActivatedOrder ), 1, fp );
 	fread( &CurrentTextActivated, sizeof( CurrentTextActivated ), 1, fp );
@@ -1092,7 +1092,7 @@ void DisplayConnectionStatus( int num , int x , int y)
 	u_int16_t dot;
 
 	// protect against bad input
-	if( num < 0 || num > MAX_PLAYERS-1 || num == WhoIAm || Ships[num].network_player == NULL )
+	if( num < 0 || num > MAX_PLAYERS-1 || num == WhoIAm || Ships[num].network_player == nullptr )
 		return;
 
 	// calculate which colour flag to use

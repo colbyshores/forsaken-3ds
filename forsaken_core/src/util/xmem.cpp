@@ -81,7 +81,7 @@ void * X_strdup( const char *str, const char *in_file, int in_line )
 	if( i == -1 )
 	{
 		DebugPrintf( "MEM: Ran out of free memory Blocks\n"); // break point
-		return NULL;
+		return nullptr;
 	}
 
 	Pnt = strdup( str );
@@ -111,7 +111,7 @@ void * X_malloc( size_t size, const char *in_file, int in_line )
 	if( i == -1 )
 	{
 		DebugPrintf( "MEM: Ran out of free memory Blocks\n"); // break point
-		return NULL;
+		return nullptr;
 	}
 
 	Pnt = malloc( size );
@@ -142,7 +142,7 @@ void * X_calloc( size_t num,size_t size, const char *in_file, int in_line )
 	if( i == -1 )
 	{
 		DebugPrintf( "MEM: Ran out of free memory Blocks\n"); // break point
-		return NULL;
+		return nullptr;
 	}
 
 	Pnt = calloc( num , size );
@@ -165,7 +165,7 @@ void * X_calloc( size_t num,size_t size, const char *in_file, int in_line )
 void X_free( void * Pnt, const char *in_file, int in_line )
 {
 	int i;
-	static const char *last_file = NULL;
+	static const char *last_file = nullptr;
 	static int last_line = -1;
 
 	if ( !Pnt )
@@ -187,8 +187,8 @@ void X_free( void * Pnt, const char *in_file, int in_line )
 	}
 	free(Pnt);
 	BlockUsed[i] = false;
-	BlockPnts[i] = NULL;
-	BlockInFile[ i ] = NULL;
+	BlockPnts[i] = nullptr;
+	BlockInFile[ i ] = nullptr;
 	BlockInLine[ i ] = 0;
 
 	MemUsed -= BlockSize[i];

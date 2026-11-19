@@ -73,7 +73,7 @@ constexpr int MXA_VERSION_NUMBER = 2;
 		Globals...
 ===================================================================*/
 /* Allocated with ModelHeaders by PreInitModel; see models.cpp. */
-MXALOADHEADER *MxaModelHeaders = NULL;
+MXALOADHEADER *MxaModelHeaders = nullptr;
 
 /*===================================================================
 	Procedure	:		Load .Mx File
@@ -91,8 +91,8 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	u_int16_t			num_triangles;		// number of triangles in group
 	u_int16_t			group_vertex_start; // where in the vert list to start processing
 	LVERTEX	*LVert;
-	WORD			*Indices = NULL;
-	NORMAL		*Normals = NULL;
+	WORD			*Indices = nullptr;
+	NORMAL		*Normals = nullptr;
 	int				ibIndex = 0;
 	u_int16_t			frame;
 	u_int16_t			texgroup;
@@ -122,7 +122,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 
 	DebugPrintf("MxaLoad\n");
 
-	if( Mxaloadheader->Buffer == NULL)
+	if( Mxaloadheader->Buffer == nullptr)
 	{
 		Msg( "Mxaload() Unable to allocate buffer in %s\n", Filename );
 		return false;
@@ -331,7 +331,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 			else
 			{
 				Mxaloadheader->Group[group].num_polys_per_mesh[mesh] = 0;
-				Mxaloadheader->Group[group].poly_ptr[mesh] = NULL;
+				Mxaloadheader->Group[group].poly_ptr[mesh] = nullptr;
 			}
 
 			if (!(FSUnlockVertexBuffer(&Mxaloadheader->Group[group].renderObject[mesh])))
@@ -399,7 +399,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 							}
 			}
 
-			MXAVERT * dst = NULL;
+			MXAVERT * dst = nullptr;
 			if ( total )
 			{
 				dst = (MXAVERT *) malloc( total * sizeof( MXAVERT ) );
@@ -426,8 +426,8 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 		else
 		{
 			Mxaloadheader->num_frames = 0;
-			Mxaloadheader->num_anim_vertices = NULL;
-			Mxaloadheader->frame_pnts = NULL;
+			Mxaloadheader->num_anim_vertices = nullptr;
+			Mxaloadheader->frame_pnts = nullptr;
 		}
 	}
 
@@ -462,7 +462,7 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 		}
 		else
 		{
-			Mxaloadheader->FirePoints = NULL;
+			Mxaloadheader->FirePoints = nullptr;
 			Mxaloadheader->NumFirePoints = 0;
 		}
 
@@ -524,22 +524,22 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 		}
 		else
 		{
-			Mxaloadheader->SpotFX = NULL;
+			Mxaloadheader->SpotFX = nullptr;
 			Mxaloadheader->NumSpotFX = 0;
 		}
 	}
 	else
 	{
 		Mxaloadheader->NumFirePoints = 0;
-		Mxaloadheader->FirePoints = NULL;
+		Mxaloadheader->FirePoints = nullptr;
 		Mxaloadheader->NumSpotFX = 0;
-		Mxaloadheader->SpotFX = NULL;
+		Mxaloadheader->SpotFX = nullptr;
 	}
 
 	/* Everything the model keeps has been copied out of the file. */
 	free( Mxaloadheader->OrgAddr );
-	Mxaloadheader->OrgAddr = NULL;
-	Mxaloadheader->Buffer = NULL;
+	Mxaloadheader->OrgAddr = nullptr;
+	Mxaloadheader->Buffer = nullptr;
 
 	if ( colourkey )
 		DebugPrintf( "Mxaload: %d colourkey triangles found\n", colourkey );
@@ -613,7 +613,7 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 			if (Mxaloadheader->Group[group].poly_ptr[i])
 			{
 				free(Mxaloadheader->Group[group].poly_ptr[i]);
-				Mxaloadheader->Group[group].poly_ptr[i] = NULL;
+				Mxaloadheader->Group[group].poly_ptr[i] = nullptr;
 			}
 
 			/* Per-mesh vertex copy from mxaload.cpp — same leak
@@ -621,7 +621,7 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 			if (Mxaloadheader->Group[group].originalVerts[i])
 			{
 				free(Mxaloadheader->Group[group].originalVerts[i]);
-				Mxaloadheader->Group[group].originalVerts[i] = NULL;
+				Mxaloadheader->Group[group].originalVerts[i] = nullptr;
 			}
 		}
 	}
@@ -629,20 +629,20 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 	if ( Mxaloadheader->OrgAddr )
 	{
 		free( Mxaloadheader->OrgAddr );
-		Mxaloadheader->OrgAddr = NULL;
+		Mxaloadheader->OrgAddr = nullptr;
 	}
 
 	if( Mxaloadheader->SpotFX && Mxaloadheader->NumSpotFX )
 	{
 		free( Mxaloadheader->SpotFX );
-		Mxaloadheader->SpotFX = NULL;
+		Mxaloadheader->SpotFX = nullptr;
 		Mxaloadheader->NumSpotFX = 0;
 	}
 
 	if( Mxaloadheader->FirePoints && Mxaloadheader->NumFirePoints )
 	{
 		free( Mxaloadheader->FirePoints );
-		Mxaloadheader->FirePoints = NULL;
+		Mxaloadheader->FirePoints = nullptr;
 		Mxaloadheader->NumFirePoints = 0;
 	}
 
@@ -650,14 +650,14 @@ void ReleaseMxaloadheader( MXALOADHEADER * Mxaloadheader )
 	{
 		if ( Mxaloadheader->num_anim_vertices )
 			free( Mxaloadheader->num_anim_vertices );
-		Mxaloadheader->num_anim_vertices = NULL;
+		Mxaloadheader->num_anim_vertices = nullptr;
 
 		if ( Mxaloadheader->frame_pnts )
 			free ( Mxaloadheader->frame_pnts );
-		Mxaloadheader->frame_pnts = NULL;
+		Mxaloadheader->frame_pnts = nullptr;
 
 		free( Mxaloadheader->anim_verts );
-		Mxaloadheader->anim_verts = NULL;
+		Mxaloadheader->anim_verts = nullptr;
 	}
 
 	Mxaloadheader->state = false;
@@ -683,7 +683,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 
 	// Mxaloadheader is not valid until everything has been done..
 	Mxaloadheader->state = false;
-	Mxaloadheader->Buffer = NULL;
+	Mxaloadheader->Buffer = nullptr;
 
 	File_Size = Get_File_Size( Filename );
 
@@ -695,7 +695,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 
 	Buffer = (char*)calloc( 1, File_Size + 32 );
 
-	if( Buffer == NULL )
+	if( Buffer == nullptr )
 	{
 		Msg( "PreMxaload() Unable to allocate buffer in %s\n", Filename );
 		return( false );
@@ -765,7 +765,7 @@ bool PreMxaload( char * Filename, MXALOADHEADER * Mxaloadheaders, int header_num
 ===================================================================*/
 bool	InterpFrames( MXALOADHEADER * Mxaloadheader , int FromFrame, int ToFrame , float Interp )
 {
-	LVERTEX	*BufStart = NULL;
+	LVERTEX	*BufStart = nullptr;
 	LVERTEX	*LVert;
 	LVERTEX	*OrigLVert;
 	MXAVERT *		FromVert;

@@ -18,7 +18,7 @@ char * convert_char( char from, char to, char* in )
 	if(!in)
 		return in;
 	pch = strchr( in, from );
-	while( pch != NULL )
+	while( pch != nullptr )
 	{
 		*pch = to;
 		pch = strchr( pch+1, from );
@@ -114,7 +114,7 @@ void DebugPrintf( const char * format, ... ) // timestamp prefix
 		return;
 
 	struct timeval now;
-	gettimeofday(&now, NULL);
+	gettimeofday(&now, nullptr);
 	sprintf( buf, "%lld.%.3d ",
 		(long long) now.tv_sec, (int)( now.tv_usec / 1000 ));
 
@@ -164,7 +164,7 @@ void DebugPuts( char * buf )
 		time_t now;
 		struct tm *ts;
 		char buf[80];
-		now = time(NULL);
+		now = time(nullptr);
 		ts = localtime(&now);
 		strftime(buf,sizeof(buf),"Logs\\%m-%d-%y %H.%M.%S.txt",ts);
 		logfile_fp = file_open( buf, "w" );

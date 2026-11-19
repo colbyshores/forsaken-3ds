@@ -75,9 +75,9 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 		Enemy->SplineNode2 = (void*) TNode;
 		Node1 = (NODE*)Enemy->SplineNode1;
 		Node2 = (NODE*)Enemy->SplineNode2;
-		Enemy->SplineNode3 = (void*) FindSuitableSplineNode( Enemy->Object.NodeNetwork ,Node2 , Node1 , Node2 , NULL , NULL );
+		Enemy->SplineNode3 = (void*) FindSuitableSplineNode( Enemy->Object.NodeNetwork ,Node2 , Node1 , Node2 , nullptr , nullptr );
 		Node3 = (NODE*)Enemy->SplineNode3;
-		Enemy->SplineNode4 = (void*) FindSuitableSplineNode( Enemy->Object.NodeNetwork ,Node3 , Node1 , Node2 , Node3 , NULL );
+		Enemy->SplineNode4 = (void*) FindSuitableSplineNode( Enemy->Object.NodeNetwork ,Node3 , Node1 , Node2 , Node3 , nullptr );
 
 	}
 	Node1 = (NODE*)Enemy->SplineNode1;
@@ -120,7 +120,7 @@ void AI_SPLINE_FOLLOWPATH( ENEMY * Enemy )
 			Time = (Distance / (EnemyTypes[Enemy->Type].MaxMoveRate*0.65F) );
 			Enemy->Timer /= Time;
 
-			Enemy->SplineNode4 = (void*) FindSuitableSplineNodeRandom( Enemy->Object.NodeNetwork ,Node3 , Node1 , Node2 , Node3 , NULL );
+			Enemy->SplineNode4 = (void*) FindSuitableSplineNodeRandom( Enemy->Object.NodeNetwork ,Node3 , Node1 , Node2 , Node3 , nullptr );
 			Node4 = (NODE*)Enemy->SplineNode4;
 			/* Defensive: FindSuitableSplineNodeRandom can return NULL.
 			 * Node4 is dereferenced via &Node4->Pos in spline() below. */

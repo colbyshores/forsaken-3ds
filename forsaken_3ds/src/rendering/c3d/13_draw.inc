@@ -94,7 +94,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	 * extends the vertex count without issuing intermediate draws. */
 	int   batch_startOffset = 0;
 	int   batch_vertCount   = 0;
-	void *batch_texture     = NULL;
+	void *batch_texture     = nullptr;
 	bool  batch_colourkey   = false;
 	bool  batch_hasTexture  = false;
 	/* Eye-2 submit spans: per-texgroup converted ranges for the batch
@@ -243,7 +243,7 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					AttrInfo_AddLoader(ai, 1, GPU_FLOAT, 4);
 					AttrInfo_AddLoader(ai, 2, GPU_FLOAT, 2);
 				}
-				s_lastBoundTexture = NULL;
+				s_lastBoundTexture = nullptr;
 				s_lastTexEnvTextured = false;
 				s_lastTexEnvMode = TEXENV_MODE_NONE;
 				if (!orthographic)

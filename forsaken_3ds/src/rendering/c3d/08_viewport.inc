@@ -80,7 +80,7 @@ static void clear_sub_viewport_via_quad(void)
 	 * draw re-runs configure_texenv_* — otherwise the cache lies and
 	 * subsequent walls render untextured (chase-cam regression). */
 	s_lastTexEnvMode     = TEXENV_MODE_NONE;
-	s_lastBoundTexture   = NULL;
+	s_lastBoundTexture   = nullptr;
 	s_lastTexEnvTextured = false;
 	s_lastMatClass       = -1;
 	s_lastPhaseBucket    = -1;

@@ -48,8 +48,8 @@ struct sound_source_t {
 // sound system load / unload
 //
 
-static ALCdevice* Device = NULL;
-static ALCcontext* Context = NULL;
+static ALCdevice* Device = nullptr;
+static ALCcontext* Context = nullptr;
 
 static void print_info ( void )
 {
@@ -63,20 +63,20 @@ static void print_info ( void )
 	DebugPrintf("EAX2.0 support = %s\n",
 		alIsExtensionPresent("EAX2.0")?"true":"false");
 
-	if(alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT") == AL_TRUE)
+	if(alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT") == AL_TRUE)
 	{
-		DebugPrintf("default playback: %s\n",alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER));
-		DebugPrintf("default capture: %s\n",alcGetString(NULL, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
+		DebugPrintf("default playback: %s\n",alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
+		DebugPrintf("default capture: %s\n",alcGetString(nullptr, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER));
 		{
 			// print all playback devices
-			const char * s = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+			const char * s = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
 			while(s && *s != '\0')
 			{
 				DebugPrintf("playback: %s\n", s);
 				s += strlen(s)+1;
 			}
 			// print all capture devices
-			s = alcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER);
+			s = alcGetString(nullptr, ALC_CAPTURE_DEVICE_SPECIFIER);
 			while(s && *s != '\0')
 			{
 				DebugPrintf("capture: %s\n", s);
@@ -87,8 +87,8 @@ static void print_info ( void )
 	else
 		DebugPrintf("No device enumeration available\n");
 
-	DebugPrintf("Default device: %s\n", alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER));
-	DebugPrintf("Default capture device: %s\n", (alcGetString(NULL, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)));
+	DebugPrintf("Default device: %s\n", alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER));
+	DebugPrintf("Default capture device: %s\n", (alcGetString(nullptr, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER)));
 
 	device = alcGetContextsDevice(alcGetCurrentContext());
 
@@ -127,15 +127,15 @@ bool sound_init( void )
 	if(initialized)
 		return true;
 
-	Device = alcOpenDevice(NULL); // preferred device
+	Device = alcOpenDevice(nullptr); // preferred device
 	if(!Device)
 		return false;
 
-	Context = alcCreateContext(Device,NULL);
+	Context = alcCreateContext(Device,nullptr);
 	if(!Context)
 	{
 		alcCloseDevice(Device);
-		Device = NULL;
+		Device = nullptr;
 		return false;
 	}
 
@@ -169,7 +169,7 @@ void sound_destroy( void )
 {
 	ALCcontext * Context = alcGetCurrentContext();
 	ALCdevice * Device = alcGetContextsDevice(Context);
-	alcMakeContextCurrent(NULL);
+	alcMakeContextCurrent(nullptr);
 	alcDestroyContext(Context);
 	alcCloseDevice(Device);
 }
@@ -292,15 +292,15 @@ sound_buffer_t * sound_load(char *path)
 	{
 		DebugPrintf("alGenBuffers: %s\n", alGetString(error));
 		free(buffer);
-		return NULL;
+		return nullptr;
 	}
 
-	if( SDL_LoadWAV(file_path, &wav_spec, &wav_buffer, &wav_spec.size) == NULL )
+	if( SDL_LoadWAV(file_path, &wav_spec, &wav_buffer, &wav_spec.size) == nullptr )
 	{
 		DebugPrintf("Could not open: %s\n", SDL_GetError());
 		alDeleteBuffers( 1, &buffer->id );
 		free(buffer);
-		return NULL;
+		return nullptr;
 	}
 
 	if(wav_spec.format == AUDIO_U8 || wav_spec.format == AUDIO_S8) // 8 bit
@@ -346,7 +346,7 @@ sound_buffer_t * sound_load(char *path)
 		alDeleteBuffers(1, &buffer->id);
 		free(buffer);
 		SDL_FreeWAV(wav_buffer);
-		return NULL;
+		return nullptr;
 	}
 
 	// data has been coppied
@@ -389,8 +389,8 @@ sound_source_t * sound_source( sound_buffer_t * buffer )
 	{
 		DebugPrintf("alGenSources: %s\n", alGetString(error));
 		free(source);
-		source = NULL;
-		return NULL;
+		source = nullptr;
+		return nullptr;
 	}
 
 	// attach the buffer to the source
@@ -400,8 +400,8 @@ sound_source_t * sound_source( sound_buffer_t * buffer )
 		DebugPrintf("alSourcei AL_BUFFER: %s\n", alGetString(error));
 		alDeleteSources(1,&source->id);
 		free(source);
-		source = NULL;
-		return NULL;
+		source = nullptr;
+		return nullptr;
 	}
 
 	alSourcei(source->id,AL_SOURCE_RELATIVE,AL_TRUE);
@@ -428,7 +428,7 @@ void sound_release_source( sound_source_t * source )
 	free(source);
 	// show stats
 	stats.sources--;
-	source = NULL;
+	source = nullptr;
 }
 
 void sound_release_buffer( sound_buffer_t * buffer )
@@ -446,7 +446,7 @@ void sound_release_buffer( sound_buffer_t * buffer )
 			buffer->id);
 	// clean up resources
 	free(buffer);
-	buffer = NULL;
+	buffer = nullptr;
 	// show stats
 	DebugPrintf("sound_release_buffer: buffers %d sources %d playing %d\n",
 				stats.buffers,stats.sources,stats.playing);

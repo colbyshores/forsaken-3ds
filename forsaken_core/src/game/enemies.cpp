@@ -55,7 +55,7 @@ bool	ShowUntriggeredNMEs = false;
 int		Exogenon_Num_StartPos = 0;
 VECTOR	Exogenon_StartPos[6];
 
-ENEMY * BigGeek = NULL;
+ENEMY * BigGeek = nullptr;
 float	FleshMorphTimer;
 float	Difficulty = 1.0F;
 //float	DifficlutyTab[4] = { 0.5F , 1.25F , 1.75F , 2.75F }; // easy medium hard deathwish....
@@ -461,8 +461,8 @@ GUNTYPE	GunTypes[] = {
 	ENEMY		Enemies[ MAXENEMIES ];
 	ENEMY	*	EnemyGroups[ MAXGROUPS ];
 	u_int16_t		NumEnemiesPerGroup[ MAXGROUPS ];
-	ENEMY	*	FirstEnemyUsed = NULL;
-	ENEMY	*	FirstEnemyFree = NULL;
+	ENEMY	*	FirstEnemyUsed = nullptr;
+	ENEMY	*	FirstEnemyFree = nullptr;
 
 ANIM_SEQ	PulseTurretSeqs[] = {
 	{ 0.0F * ANIM_SECOND, 0.0F * ANIM_SECOND },	// Closed
@@ -1275,7 +1275,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_CRAWL_AI,
@@ -1375,7 +1375,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 //		ENEMY_CONTROLTYPE_SPLINE,
@@ -1427,7 +1427,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_NONE,
@@ -1630,7 +1630,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_NONE,
@@ -1681,7 +1681,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -1731,7 +1731,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -1784,7 +1784,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 //		ENEMY_CONTROLTYPE_SPLINE,
@@ -1836,7 +1836,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 //		ENEMY_CONTROLTYPE_SPLINE,
@@ -1889,7 +1889,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -1941,7 +1941,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 //		ENEMY_CONTROLTYPE_SPLINE,
@@ -2042,7 +2042,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_CRAWL_AI,
@@ -2143,7 +2143,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		COMPONENTCOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&BigGeekFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2192,7 +2192,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2343,7 +2343,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2394,7 +2394,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2444,7 +2444,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2494,7 +2494,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2544,7 +2544,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2594,7 +2594,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2644,7 +2644,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2694,7 +2694,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2744,7 +2744,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2794,7 +2794,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2844,7 +2844,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2894,7 +2894,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2944,7 +2944,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -2993,7 +2993,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3043,7 +3043,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3093,7 +3093,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3142,7 +3142,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3190,7 +3190,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3385,7 +3385,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3434,7 +3434,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3531,7 +3531,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_NONE,
@@ -3629,7 +3629,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_FLY_AI,
@@ -3678,7 +3678,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 		NOT_LEVEL_SPECIFIC,
 		SPHERECOLLISION,
 		-1,
-		NULL,
+		nullptr,
 		&DummyFirePos,
 		&DummyAimPos,
 		ENEMY_CONTROLTYPE_SPLINE,
@@ -3776,7 +3776,7 @@ ENEMY_TYPES	EnemyTypes[ MAX_ENEMY_TYPES ]
 	NOT_LEVEL_SPECIFIC,
 	SPHERECOLLISION,
 	-1,
-	NULL,
+	nullptr,
 	&DummyFirePos,
 	&DummyAimPos,
 	ENEMY_CONTROLTYPE_FLY_AI,
@@ -3857,7 +3857,7 @@ void AutoDisplayMatrix( OBJECT * Object );
 
 
 void (* EnemyControlType[ ])( ENEMY * Enemy ) = {
-	NULL,
+	nullptr,
 	EnemyFlyUnderPlayerControl,
 	EnemyFlyUnderAiControl,
 	EnemyCrawlUnderPlayerControl,
@@ -3980,7 +3980,7 @@ void InitEnemies( void )
 
 	SetupEnemyGroups();
 
-	FirstEnemyUsed = NULL;
+	FirstEnemyUsed = nullptr;
 	FirstEnemyFree = &Enemies[ 0 ];
 
 	for( i = 0; i < MAXENEMIES; i++ )
@@ -3988,19 +3988,19 @@ void InitEnemies( void )
 		memset( &Enemies[ i ], 0, sizeof( ENEMY ) );
 
 		Enemies[ i ].Used = false;
-		Enemies[ i ].NextUsed = NULL;
-		Enemies[ i ].PrevUsed = NULL;
+		Enemies[ i ].NextUsed = nullptr;
+		Enemies[ i ].PrevUsed = nullptr;
 		Enemies[ i ].NextFree = &Enemies[ i + 1 ];
 		Enemies[ i ].PrevFree = &Enemies[ i - 1 ];
 
-		Enemies[ i ].NextInGroup = NULL;
-		Enemies[ i ].PrevInGroup = NULL;
+		Enemies[ i ].NextInGroup = nullptr;
+		Enemies[ i ].PrevInGroup = nullptr;
 		Enemies[ i ].Index = i;
 		Enemies[ i ].Object.Type = OBJECT_TYPE_ENEMY;
 	}
 
-	Enemies[ 0 ].PrevFree = NULL;
-	Enemies[ MAXENEMIES - 1 ].NextFree = NULL;
+	Enemies[ 0 ].PrevFree = nullptr;
+	Enemies[ MAXENEMIES - 1 ].NextFree = nullptr;
 }
 
 /*===================================================================
@@ -4020,26 +4020,26 @@ ENEMY * FindFreeEnemy( void )
 		{
 			// This enemy has been used before....
 			Msg( "An enemy has been allocated more than once\n" );
-			return NULL;
+			return nullptr;
 		}
 
 		FirstEnemyFree = Object->NextFree;
-		if( FirstEnemyFree != NULL )
+		if( FirstEnemyFree != nullptr )
 		{
-			FirstEnemyFree->PrevFree = NULL;
+			FirstEnemyFree->PrevFree = nullptr;
 		}
 
-		if( FirstEnemyUsed != NULL )
+		if( FirstEnemyUsed != nullptr )
 		{
 			FirstEnemyUsed->PrevUsed = Object;
 			Object->NextUsed = FirstEnemyUsed;
 		}
 		else
 		{
-			Object->NextUsed = NULL;
+			Object->NextUsed = nullptr;
 		}
 
-		Object->PrevUsed = NULL;
+		Object->PrevUsed = nullptr;
 		FirstEnemyUsed = Object;
 		Object->Used = true;
 
@@ -4101,7 +4101,7 @@ void KillUsedEnemy( ENEMY * Object )
 		if( Object->Object.FirstGun )
 		{
 			free( Object->Object.FirstGun);
-			Object->Object.FirstGun = NULL;
+			Object->Object.FirstGun = nullptr;
 			Object->Object.HowManyGuns = 0;
 		}
 
@@ -4138,7 +4138,7 @@ void KillUsedEnemy( ENEMY * Object )
 			if( IsHost ) DropPickupSend( &Object->Object.Pos, Object->Object.Group, &Dir, 0.0F, Object->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 		}
 
-		if( Object->TriggerModPtr != NULL )
+		if( Object->TriggerModPtr != nullptr )
 		{
 			ApplyTriggerMod( Object->TriggerModPtr );
 		}
@@ -4149,9 +4149,9 @@ void KillUsedEnemy( ENEMY * Object )
 
 			FirstEnemyUsed = NextObject;
 
-			if( FirstEnemyUsed != NULL )
+			if( FirstEnemyUsed != nullptr )
 			{
-				FirstEnemyUsed->PrevUsed = NULL;
+				FirstEnemyUsed->PrevUsed = nullptr;
 			}
 		}
 		else
@@ -4159,18 +4159,18 @@ void KillUsedEnemy( ENEMY * Object )
 			PrevObject = Object->PrevUsed;
 			NextObject = Object->NextUsed;
 
-			if( PrevObject != NULL )
+			if( PrevObject != nullptr )
 			{
 				PrevObject->NextUsed = NextObject;
 			}
 
-			if( NextObject != NULL )
+			if( NextObject != nullptr )
 			{
 				NextObject->PrevUsed = PrevObject;
 			}
 		}
 
-		if( FirstEnemyFree != NULL )
+		if( FirstEnemyFree != nullptr )
 		{
 			FirstEnemyFree->PrevFree = Object;
 		}
@@ -4187,12 +4187,12 @@ void KillUsedEnemy( ENEMY * Object )
 			if( Object->Object.Components )
 			{
 				free( Object->Object.Components );
-				Object->Object.Components = NULL;
+				Object->Object.Components = nullptr;
 			}
 		}
 
 		Object->NextFree = FirstEnemyFree;
-		Object->PrevFree = NULL;
+		Object->PrevFree = nullptr;
 		FirstEnemyFree = Object;
 		Object->Used = false;
 
@@ -4213,7 +4213,7 @@ void ReleaseAllEnemies( void )
 
 	Object = FirstEnemyUsed;
 
-	while( Object != NULL )
+	while( Object != nullptr )
 	{
 		NextUsedObject = Object->NextUsed;
 
@@ -4222,7 +4222,7 @@ void ReleaseAllEnemies( void )
 		if( Object->Object.FirstGun )
 		{
 			free( Object->Object.FirstGun);
-			Object->Object.FirstGun = NULL;
+			Object->Object.FirstGun = nullptr;
 		}
 
 		if( Object == FirstEnemyUsed )
@@ -4231,9 +4231,9 @@ void ReleaseAllEnemies( void )
 
 			FirstEnemyUsed = NextObject;
 
-			if( FirstEnemyUsed != NULL )
+			if( FirstEnemyUsed != nullptr )
 			{
-				FirstEnemyUsed->PrevUsed = NULL;
+				FirstEnemyUsed->PrevUsed = nullptr;
 			}
 		}
 		else
@@ -4241,18 +4241,18 @@ void ReleaseAllEnemies( void )
 			PrevObject = Object->PrevUsed;
 			NextObject = Object->NextUsed;
 
-			if( PrevObject != NULL )
+			if( PrevObject != nullptr )
 			{
 				PrevObject->NextUsed = NextObject;
 			}
 
-			if( NextObject != NULL )
+			if( NextObject != nullptr )
 			{
 				NextObject->PrevUsed = PrevObject;
 			}
 		}
 
-		if( FirstEnemyFree != NULL )
+		if( FirstEnemyFree != nullptr )
 		{
 			FirstEnemyFree->PrevFree = Object;
 		}
@@ -4269,12 +4269,12 @@ void ReleaseAllEnemies( void )
 			if( Object->Object.Components )
 			{
 				free( Object->Object.Components );
-				Object->Object.Components = NULL;
+				Object->Object.Components = nullptr;
 			}
 		}
 
 		Object->NextFree = FirstEnemyFree;
-		Object->PrevFree = NULL;
+		Object->PrevFree = nullptr;
 		FirstEnemyFree = Object;
 
 		Object = NextUsedObject;
@@ -4491,7 +4491,7 @@ bool PreLoadEnemies( void )
 				for (_i = 0; _i < (int)(sizeof(_n64_ids)/sizeof(_n64_ids[0])); _i++) {
 					int _id = _n64_ids[_i];
 					if (EnemyTypes[_id].ModelFilename &&
-						strchr(EnemyTypes[_id].ModelFilename, '\\') != NULL)
+						strchr(EnemyTypes[_id].ModelFilename, '\\') != nullptr)
 					{
 						EnemyTypes[_id].StealthMode = false;
 					}
@@ -4508,7 +4508,7 @@ bool PreLoadEnemies( void )
 
 	fp = file_open( &NewFilename[ 0 ], "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -4555,7 +4555,7 @@ bool PreLoadEnemies( void )
 			 * substituted spawn looks visually wrong but the entity
 			 * exists for downstream code to find. */
 			if( ModelNum >= MAX_ENEMY_TYPES ||
-				EnemyTypes[ ModelNum ].ModelFilename == NULL )
+				EnemyTypes[ ModelNum ].ModelFilename == nullptr )
 			{
 				int j, fallback = -1;
 				for( j = 0; j < MAX_ENEMY_TYPES; j++ )
@@ -4723,8 +4723,8 @@ bool LoadEnemies( void )
 	ENEMY	*	Enemy;
 	int16_t		TempNum;
 	char		Ext[ 16 ];
-	COMP_OBJ *	Comp = NULL;
-	COMP_OBJ *	TempComp = NULL;
+	COMP_OBJ *	Comp = nullptr;
+	COMP_OBJ *	TempComp = nullptr;
 	float		OverallTime, MidTime;
 	u_int16_t		EnemyType;
 	u_int32_t		MagicNumber;
@@ -4737,7 +4737,7 @@ bool LoadEnemies( void )
 	float		GenerationDelay;
 
 	Exogenon_Num_StartPos = 0;
-	BigGeek = NULL;
+	BigGeek = nullptr;
 	EnemyTypes[ENEMY_Boss_LittleGeek].Radius = 0.0F;
 	EnemyTypes[ENEMY_Boss_BigGeek].Radius = 1200.0F * GLOBAL_SCALE;
 
@@ -4751,7 +4751,7 @@ bool LoadEnemies( void )
 
 	fp = file_open( &NewFilename[ 0 ], "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -4786,7 +4786,7 @@ bool LoadEnemies( void )
 			 * with dangling references that crash on first tick
 			 * (defend2 Protect-Drone case). */
 			if( ModelNum >= MAX_ENEMY_TYPES ||
-				EnemyTypes[ ModelNum ].ModelFilename == NULL )
+				EnemyTypes[ ModelNum ].ModelFilename == nullptr )
 			{
 				int j, fallback = -1;
 				for( j = 0; j < MAX_ENEMY_TYPES; j++ )
@@ -4811,7 +4811,7 @@ bool LoadEnemies( void )
 						if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
 						{
 							ModelNum = EnemyTypes[ ModelNum ].ModelNumber;
-							Comp = NULL;
+							Comp = nullptr;
 						}
 						else
 						{
@@ -4826,7 +4826,7 @@ bool LoadEnemies( void )
 							if( EnemyTypes[ ModelNum ].ModelNumber != -1 )
 							{
 								ModelNum = EnemyTypes[ ModelNum ].ModelNumber;
-								Comp = NULL;
+								Comp = nullptr;
 							}
 							else
 							{
@@ -4879,7 +4879,7 @@ bool LoadEnemies( void )
 
 				Enemy = InitOneEnemy( GenType, &Pos, &DirVector, &UpVector, Group, ModelNum, TriggerMod ,EnemyType , Network , Pickup , (u_int16_t) Formationlink , GenerationDelay ); //-1);
 
-				if( Enemy != NULL )
+				if( Enemy != nullptr )
 				{
 					Enemy->Object.AnimSpeed = 1.0F;
 					Enemy->Object.AnimSeqs = EnemyTypes[EnemyType].AnimSeqs;
@@ -5255,7 +5255,7 @@ bool LoadEnemies( void )
 
 						case ENEMY_LEADER_LeviTank:
 						case ENEMY_LeviTank:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
 							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
 							{
@@ -5396,13 +5396,13 @@ bool LoadEnemies( void )
 
 						case ENEMY_Boss_Metatank:
 							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 2, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 5, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
 
 							for( CompCount = 0; CompCount < 4; CompCount++ )
 							{
@@ -5425,15 +5425,15 @@ bool LoadEnemies( void )
 
 						case ENEMY_Boss_Avatar:
 							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 4, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 5, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 2, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
 							Enemy->Object.UserContComps[ TURRETCOMP_Base + 8 ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 8 ] = NULL;
+							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 8 ] = nullptr;
 
 							for( CompCount = 0; CompCount < 5; CompCount++ )
 							{
@@ -5551,7 +5551,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 
 	Enemy = FindFreeEnemy();
 
-	if( Enemy != NULL )
+	if( Enemy != nullptr )
 	{
 
 #ifdef DEBUG_ON
@@ -5593,12 +5593,12 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 
 		Enemy->Object.Type = OBJECT_TYPE_ENEMY;
 		Enemy->Object.ID = (void*) Enemy;
-		Enemy->Object.Components = NULL;
+		Enemy->Object.Components = nullptr;
 		Enemy->Object.Flags = 0;
 
 		for( Count = 0; Count < MAX_USER_CONT_COMPS; Count++ )
 		{
-			Enemy->Object.UserContComps[ Count ] = NULL;
+			Enemy->Object.UserContComps[ Count ] = nullptr;
 		}
 		Enemy->Object.Pos = *Pos;
 		Enemy->Object.Group = Group;
@@ -5607,21 +5607,21 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		Enemy->TriggerMod = TriggerMod;
 		Enemy->Object.Shield = Difficulty * EnemyTypes[EnemyType].Shield;
 		Enemy->Object.NodeNetwork = Network;
-		Enemy->Object.NearestNode = NULL;
+		Enemy->Object.NearestNode = nullptr;
 		Enemy->PickupHeld = (u_int16_t) PickupHeld;
 
 		Enemy->FirePosCount = 0;
 
-		Enemy->NextTNode = NULL;
-		Enemy->LastTNode = NULL;
+		Enemy->NextTNode = nullptr;
+		Enemy->LastTNode = nullptr;
 		Enemy->ImInNodeTransition = false;
 		Enemy->PickNewNodeNow = false;
 		Enemy->SmokeTime = 0.0F;
 
-		Enemy->SplineNode1 = NULL;
-		Enemy->SplineNode2 = NULL;
-		Enemy->SplineNode3 = NULL;
-		Enemy->SplineNode4 = NULL;
+		Enemy->SplineNode1 = nullptr;
+		Enemy->SplineNode2 = nullptr;
+		Enemy->SplineNode3 = nullptr;
+		Enemy->SplineNode4 = nullptr;
 
 		Enemy->Object.AI_Mode = EnemyTypes[EnemyType].AiMode;
 
@@ -5629,7 +5629,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		{
 			Enemy->FormationLink = &Enemies[FormationLink];
 		}else{
-			Enemy->FormationLink = NULL;
+			Enemy->FormationLink = nullptr;
 		}
 
 
@@ -5646,7 +5646,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		Enemy->Object.Speed.z = 0.0F;
 		Enemy->Object.Autolevel = 0.0F;
 
-		Enemy->Object.FirstGun = NULL;
+		Enemy->Object.FirstGun = nullptr;
 		Enemy->Object.HowManyGuns = 0;
 		if( EnemyTypes[EnemyType].NumOfGuns )
 		{
@@ -5676,7 +5676,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 
 
 		Enemy->TriggerMod = TriggerMod;
-		if( TriggerMod == INDEX_NONE ) Enemy->TriggerModPtr = NULL;
+		if( TriggerMod == INDEX_NONE ) Enemy->TriggerModPtr = nullptr;
 		else Enemy->TriggerModPtr = &TrigMods[ TriggerMod ];
 
 		if( ModelNum != INDEX_NONE )
@@ -5741,7 +5741,7 @@ ENEMY * InitOneEnemy( u_int16_t GenType, VECTOR * Pos, VECTOR * Dir, VECTOR * Up
 		return( Enemy );
 
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 /*===================================================================
@@ -5764,7 +5764,7 @@ void ProcessEnemies( void )
 	Enemy = FirstEnemyUsed;
 
 	/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -5996,7 +5996,7 @@ void DispUntriggeredNMEs( void )
 
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -6053,7 +6053,7 @@ void EnableEnemy( u_int16_t EnemyIndex )
 	{
 		Enemy = &Enemies[ EnemyIndex];
 
-		if( Enemy != NULL )
+		if( Enemy != nullptr )
 		{
 			if( !Enemy->Alive || (Enemy->Status & ENEMY_STATUS_Enable) )
 			{
@@ -6072,7 +6072,7 @@ void EnableEnemy( u_int16_t EnemyIndex )
 			DirVector.z = ( Enemy->Object.Pos.z - Ships[ WhoIAm ].Object.Pos.z );
 
 			if( BackgroundCollide( &MCloadheadert0, &Mloadheader, &Ships[ WhoIAm ].Object.Pos, Ships[ WhoIAm ].Object.Group,
-							   &DirVector, &Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) && !outside_map )
+							   &DirVector, &Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) && !outside_map )
 			{
 				if( Enemy->Object.Components )
 				{
@@ -6506,7 +6506,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 
 		if ( Object->Group != INDEX_NONE )
 		{
-			BGObject = NULL;
+			BGObject = nullptr;
 			if( ObjectCollide( Object, &Move_Off, EnemyTypes[Enemy->Type].Radius, &BGObject ) )
 			{
 				Enemy->AIMoveFlags |= AI_CONTROL_COLLISION;
@@ -6537,8 +6537,8 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 		if( TeleportsAreaCheck( &Object->Pos , &StartPos , OldGroup, Object ) )
 		{
 			FindNearestNode( Object );
-			Enemy->TNode = NULL;
-			Enemy->TShip = NULL;
+			Enemy->TNode = nullptr;
+			Enemy->TShip = nullptr;
 		}
 	}
 /*===================================================================
@@ -6922,7 +6922,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 			NextTNode = (NODE*)Enemy->NextTNode;
 			Enemy->TNode = LastTNode;
 			Enemy->LastTNode = TNode;
-			Enemy->NextTNode = NULL;
+			Enemy->NextTNode = nullptr;
 			Enemy->AIMoveRestrictClearTime = 30.0F + Random_Range_Float (30.0F) ;
 		}
 	}
@@ -6953,7 +6953,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
 								&Object->Pos, Object->Group, &GroundOff,
 								&GroundPos, &GroundGroup, &GroundNormal,
-								&GroundNewTgt, false, NULL ) )
+								&GroundNewTgt, false, nullptr ) )
 		{
 			Object->Pos.y = GroundPos.y + 75.0F;
 		}
@@ -7446,7 +7446,7 @@ void InitGuns( BYTE how_many_guns , u_int16_t * GunType , OBJECT * Object )
 		{
 			GunObject->Next = GunObject+1;
 		}else{
-			GunObject->Next = NULL;
+			GunObject->Next = nullptr;
 		}
 		GunObject->BurstTime = 0.0F;
 		GunObject->ReloadTime = 0.0F;
@@ -7515,7 +7515,7 @@ bool Enemy2EnemyCollide( ENEMY * SEnemy )
 
 	if( !EnemyTypes[SEnemy->Type].Radius )
 		return false;
-	while( TEnemy != NULL )
+	while( TEnemy != nullptr )
 	{
 		if( TEnemy != SEnemy )
 		{
@@ -7567,7 +7567,7 @@ bool Enemy2EnemyCollideSpecial( ENEMY * SEnemy , VECTOR * StartPos)
 
 	TEnemy = FirstEnemyUsed;
 
-	while( TEnemy != NULL )
+	while( TEnemy != nullptr )
 	{
 		if( TEnemy != SEnemy && (TEnemy->Status & ENEMY_STATUS_Enable) && (TEnemy->Object.ControlType == ENEMY_CONTROLTYPE_CRAWL_AI) )
 		{
@@ -7684,7 +7684,7 @@ void SetupEnemyGroups( void )
 
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
-		EnemyGroups[ Count ] = NULL;
+		EnemyGroups[ Count ] = nullptr;
 		NumEnemiesPerGroup[ Count ] = 0;
 	}
 }
@@ -7697,7 +7697,7 @@ void SetupEnemyGroups( void )
 ===================================================================*/
 void AddEnemyToGroup( ENEMY * Enemy, u_int16_t Group )
 {
-	Enemy->PrevInGroup = NULL;
+	Enemy->PrevInGroup = nullptr;
 	Enemy->NextInGroup = EnemyGroups[ Group ];
 	if( Enemy->NextInGroup ) Enemy->NextInGroup->PrevInGroup = Enemy;
 	EnemyGroups[ Group ] = Enemy;
@@ -7715,8 +7715,8 @@ void RemoveEnemyFromGroup( ENEMY * Enemy, u_int16_t Group )
 	if( Enemy->PrevInGroup ) Enemy->PrevInGroup->NextInGroup = Enemy->NextInGroup;
 	else EnemyGroups[ Group ] = Enemy->NextInGroup;
 	if( Enemy->NextInGroup ) Enemy->NextInGroup->PrevInGroup = Enemy->PrevInGroup;
-	Enemy->PrevInGroup = NULL;
-	Enemy->NextInGroup = NULL;
+	Enemy->PrevInGroup = nullptr;
+	Enemy->NextInGroup = nullptr;
 	NumEnemiesPerGroup[ Group ]--;
 }
 
@@ -7749,13 +7749,13 @@ void UpdateEnemiesClipGroup( CAMERA * Camera  )
 
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
 		if( ( Enemy->Status & ENEMY_STATUS_Enable ) )
 		{
-			if( VisibleOverlap( Camera->GroupImIn, Enemy->Object.Group, NULL ) )
+			if( VisibleOverlap( Camera->GroupImIn, Enemy->Object.Group, nullptr ) )
 			{
 				TopLeft.x = ( Enemy->Object.TopLeft.x + Enemy->Object.Pos.x );
 				TopLeft.y = ( Enemy->Object.TopLeft.y + Enemy->Object.Pos.y );
@@ -8213,7 +8213,7 @@ read_Flags( FILE *f, char *last_token )
 		{"AI_BEHAVIOUR_DONTSTOPANDTURN"		 ,AI_BEHAVIOUR_DONTSTOPANDTURN	},
 		{"AI_BEHAVIOUR_PRECISECONTROL"		 ,AI_BEHAVIOUR_PRECISECONTROL	},
 		{"AI_BEHAVIOUR_CLOAK"				 ,AI_BEHAVIOUR_CLOAK			},
-		{ NULL , 0 } };
+		{ nullptr , 0 } };
 
 	EnemyTypes[CurrentEnemy].Behave.Flags = 0;
 	while ( fscanf( f, " %80s", last_token ) == 1 )
@@ -8327,7 +8327,7 @@ static int read_EnemyType( FILE *f, char *last_token )
 		for( i = 0 ; i < tab_size ; i++ )
 		{
 			if (
-				(tab[i].keyword != NULL) &&
+				(tab[i].keyword != nullptr) &&
 				(!strcasecmp( last_token, tab[i].keyword ))
 			)
 				break;
@@ -8542,7 +8542,7 @@ bool ReadEnemyTxtFile( const char * Filename )
 		{ "Gun_PrimarySecondary",	read_Gun_PrimarySecondary 	},
 		{ "Gun_WeaponType",			read_Gun_WeaponType       	},
 		{ "Gun_PreciseRotation",	read_Gun_PreciseRotation 	},
-		{ NULL,						NULL						}
+		{ nullptr,						nullptr						}
 	};
 	FILE *f;
 	char token[256];
@@ -8724,7 +8724,7 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 	}else{
 		if ( Object->Group != INDEX_NONE )
 		{
-			BGObject = NULL;
+			BGObject = nullptr;
 			ObjectCollide( Object, &Move_Off, EnemyTypes[Enemy->Type].Radius, &BGObject );
 			if( BGObject ) ChangeBGState( BGObject, OWNER_ENEMY, Enemy->Index, BUMP, 0.0F );
 		}else{
@@ -8979,7 +8979,7 @@ bool FindPointAboveGround( VECTOR * Pos , u_int16_t Group , VECTOR * NewPos , u_
 	if( LegalGroup )
 	{
 		if(	BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &Move_Off,
-			NewPos , NewGroup, &TempNormal, &TempPos_New, false, NULL ) )
+			NewPos , NewGroup, &TempNormal, &TempPos_New, false, nullptr ) )
 		{
 			VECTOR move;
 			float move_len;
@@ -9225,7 +9225,7 @@ bool Enemy_Load( FILE * fp )
 
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
-		EnemyGroups[i] = NULL;
+		EnemyGroups[i] = nullptr;
 		NumEnemiesPerGroup[i] = 0;
 	}
 
@@ -9236,14 +9236,14 @@ bool Enemy_Load( FILE * fp )
 	fread( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
-		FirstEnemyUsed = NULL;
+		FirstEnemyUsed = nullptr;
 	}else{
 		FirstEnemyUsed = &Enemies[e];
 	}
 	fread( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
-		FirstEnemyFree = NULL;
+		FirstEnemyFree = nullptr;
 	}else{
 		FirstEnemyFree = &Enemies[e];
 	}
@@ -9289,7 +9289,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].TShip = NULL;
+			Enemies[i].TShip = nullptr;
 		}else{
 			Enemies[i].TShip = &Ships[e];
 		}
@@ -9297,7 +9297,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].TNode = NULL;
+			Enemies[i].TNode = nullptr;
 		}else{
 			Enemies[i].TNode = NodeNetworkHeader.FirstNode + e;
 		}
@@ -9305,7 +9305,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].NextTNode = NULL;
+			Enemies[i].NextTNode = nullptr;
 		}else{
 			Enemies[i].NextTNode = NodeNetworkHeader.FirstNode + e;
 		}
@@ -9313,7 +9313,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].LastTNode = NULL;
+			Enemies[i].LastTNode = nullptr;
 		}else{
 			Enemies[i].LastTNode = NodeNetworkHeader.FirstNode + e;
 		}
@@ -9346,14 +9346,14 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].PrevUsed = NULL;
+			Enemies[i].PrevUsed = nullptr;
 		}else{
 			Enemies[i].PrevUsed = &Enemies[e];
 		}
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].NextUsed = NULL;
+			Enemies[i].NextUsed = nullptr;
 		}else{
 			Enemies[i].NextUsed = &Enemies[e];
 		}
@@ -9361,14 +9361,14 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].PrevFree = NULL;
+			Enemies[i].PrevFree = nullptr;
 		}else{
 			Enemies[i].PrevFree = &Enemies[e];
 		}
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].NextFree = NULL;
+			Enemies[i].NextFree = nullptr;
 		}else{
 			Enemies[i].NextFree = &Enemies[e];
 		}
@@ -9376,14 +9376,14 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].NextInGroup = NULL;
+			Enemies[i].NextInGroup = nullptr;
 		}else{
 			Enemies[i].NextInGroup = &Enemies[e];
 		}
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].PrevInGroup = NULL;
+			Enemies[i].PrevInGroup = nullptr;
 		}else{
 			Enemies[i].PrevInGroup = &Enemies[e];
 		}
@@ -9397,7 +9397,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].FormationLink = NULL;
+			Enemies[i].FormationLink = nullptr;
 		}else{
 			Enemies[i].FormationLink = &Enemies[e];
 		}
@@ -9409,7 +9409,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].SplineNode1 = NULL;
+			Enemies[i].SplineNode1 = nullptr;
 		}else if( e == SPECIALENEMYNODENUM ){
 			Enemies[i].SplineNode1 = &Enemies[i].TempSplineNode;
 		}else{
@@ -9418,7 +9418,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].SplineNode2 = NULL;
+			Enemies[i].SplineNode2 = nullptr;
 		}else if( e == SPECIALENEMYNODENUM ){
 			Enemies[i].SplineNode2 = &Enemies[i].TempSplineNode;
 		}else{
@@ -9427,7 +9427,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].SplineNode3 = NULL;
+			Enemies[i].SplineNode3 = nullptr;
 		}else if( e == SPECIALENEMYNODENUM ){
 			Enemies[i].SplineNode3 = &Enemies[i].TempSplineNode;
 		}else{
@@ -9436,7 +9436,7 @@ bool Enemy_Load( FILE * fp )
 		fread( &e, sizeof( e ), 1, fp );
 		if( e == -1 )
 		{
-			Enemies[i].SplineNode4 = NULL;
+			Enemies[i].SplineNode4 = nullptr;
 		}else if( e == SPECIALENEMYNODENUM ){
 			Enemies[i].SplineNode4 = &Enemies[i].TempSplineNode;
 		}else{
@@ -9672,14 +9672,14 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 	fread( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
-		Obj->NearestNode = NULL;
+		Obj->NearestNode = nullptr;
 	}else{
 		Obj->NearestNode = NodeNetworkHeader.FirstNode + e;
 	}
 	fread( &e, sizeof( e ), 1, fp );
 	if( e == -1 )
 	{
-		Obj->LastNearestNode = NULL;
+		Obj->LastNearestNode = nullptr;
 	}else{
 		Obj->LastNearestNode = NodeNetworkHeader.FirstNode + e;
 	}
@@ -9717,7 +9717,7 @@ bool Object_Load( FILE * fp , OBJECT * Obj )
 		{
 			FreeCompObjChildren( Obj->Components, 1 );
 			free( Obj->Components );
-			Obj->Components = NULL;
+			Obj->Components = nullptr;
 		}
 	}
 

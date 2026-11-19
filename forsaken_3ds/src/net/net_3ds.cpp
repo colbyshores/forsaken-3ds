@@ -14,7 +14,7 @@
 #include "util/util.h"
 
 network_state_t network_state = NETWORK_DISCONNECTED;
-network_players_t network_players = {0, NULL, NULL};
+network_players_t network_players = {0, nullptr, nullptr};
 
 network_return_t network_setup(char* player_name, int local_port)
 {

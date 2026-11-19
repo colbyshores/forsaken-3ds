@@ -150,7 +150,7 @@ static bool read_visible( MLOADHEADER * Mloadheader, VISTREE *v, u_int16_t group
 					ok = false;
 			}
 			else
-				v->visible = NULL;
+				v->visible = nullptr;
 		}
 		else
 			ok = false;
@@ -278,9 +278,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	u_int16_t			verts;
 	u_int16_t			portal;
 	LVERTEX	*LVert;
-	LVERTEX	*BufStart = NULL;
-	WORD			*Indices = NULL;
-	NORMAL * Normals = NULL;
+	LVERTEX	*BufStart = nullptr;
+	WORD			*Indices = nullptr;
+	NORMAL * Normals = nullptr;
 	int				indexOffset = 0;
 	int				ibIndex = 0;
 	int				triangleCount = 0;
@@ -309,7 +309,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 	// Mloadheader is not valid until everything has been done..
 	Mloadheader->state = false;
 
-	if( Mloadheader->Buffer == NULL)
+	if( Mloadheader->Buffer == nullptr)
 	{
 		Msg( "Mload : Error Allocating Buffer\n" );
 		return false;
@@ -521,7 +521,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 
 
-			Mloadheader->Group[group].polyanim[mesh] = NULL;
+			Mloadheader->Group[group].polyanim[mesh] = nullptr;
 			Mloadheader->Group[group].num_animating_polys[mesh] = 0;
 
 			// this go here?
@@ -668,7 +668,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					}
 				}
 				else
-					Mloadheader->Group[group].Portal[portal].visible.visible = NULL;
+					Mloadheader->Group[group].Portal[portal].visible.visible = nullptr;
 			}
 		}
 /*===================================================================
@@ -707,7 +707,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					if ( !mesh )
 						Mloadheader->Group[group].colour_cell_pnt[0] = (COLOR*) malloc( Mloadheader->Group[group].numofcells[mesh] * sizeof(COLOR) );
 					else
-						Mloadheader->Group[group].colour_cell_pnt[mesh] = NULL;
+						Mloadheader->Group[group].colour_cell_pnt[mesh] = nullptr;
 					if( !Mloadheader->Group[group].colour_cell_pnt[0] )
 					{
 						Msg( "Mload : Couldnt allocate enough memory for the cell colour info\n" );
@@ -842,8 +842,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 						PolyAnim->frames	=frames;
 						PolyAnim->vertices	=vertices;
 
-						PolyAnim->vert = NULL;
-						PolyAnim->UVs = NULL;
+						PolyAnim->vert = nullptr;
+						PolyAnim->UVs = nullptr;
 
 						PolyAnim->vert = (int *) malloc( vertices * sizeof(int) );
 						if( !PolyAnim->vert)
@@ -912,7 +912,7 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 
 	// Background Poly Info Index Animation Stuff......
-	Mloadheader->AnimData.TAnimInfoIndex = NULL;
+	Mloadheader->AnimData.TAnimInfoIndex = nullptr;
 	Mloadheader->AnimData.num_animating_polys = 0;
 	if( in.u16() )
 	{
@@ -949,8 +949,8 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	/* Everything the level keeps has been copied out of the file. */
 	free( Mloadheader->OrgAddr );
-	Mloadheader->OrgAddr = NULL;
-	Mloadheader->Buffer = NULL;
+	Mloadheader->OrgAddr = nullptr;
+	Mloadheader->Buffer = nullptr;
 
 	DebugPrintf( "Mload: %d colourkey triangles found\n", colourkey );
 	// Mloadheader is valid and can be executed...
@@ -1032,7 +1032,7 @@ void ReleaseVisible( VISTREE *v )
 			ReleaseVisible( &v->visible[ i ] );
 		}
 		free( v->visible );
-		v->visible = NULL;
+		v->visible = nullptr;
 	}
 }
 
@@ -1077,11 +1077,11 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 
 			if ( Mloadheader->Group[group].colour_cell_pnt[i] )
 				free( Mloadheader->Group[group].colour_cell_pnt[i] );
-			Mloadheader->Group[group].colour_cell_pnt[i] = NULL;
+			Mloadheader->Group[group].colour_cell_pnt[i] = nullptr;
 			free( Mloadheader->Group[group].vertex_index_pnt[i] );
-			Mloadheader->Group[group].vertex_index_pnt[i] = NULL;
+			Mloadheader->Group[group].vertex_index_pnt[i] = nullptr;
 			free( Mloadheader->Group[group].vertex_cell_pnt[i] );
-			Mloadheader->Group[group].vertex_cell_pnt[i] = NULL;
+			Mloadheader->Group[group].vertex_cell_pnt[i] = nullptr;
 
 			/* Per-mesh vertex copy allocated at mload.cpp. Without
 			 * this free the buffer leaks every level transition — about
@@ -1091,7 +1091,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 			if ( Mloadheader->Group[group].originalVerts[i] )
 			{
 				free( Mloadheader->Group[group].originalVerts[i] );
-				Mloadheader->Group[group].originalVerts[i] = NULL;
+				Mloadheader->Group[group].originalVerts[i] = nullptr;
 			}
 
 			PolyAnim = Mloadheader->Group[group].polyanim[i];
@@ -1103,12 +1103,12 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 					if( PolyAnim->vert )
 					{
 						free( PolyAnim->vert );
-						PolyAnim->vert = NULL;
+						PolyAnim->vert = nullptr;
 					}
 					if( PolyAnim->UVs )
 					{
 						free( PolyAnim->UVs );
-						PolyAnim->UVs = NULL;
+						PolyAnim->UVs = nullptr;
 					}
 				}
 				PolyAnim++;
@@ -1117,26 +1117,26 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 			if (Mloadheader->Group[group].polyanim[i])
 				free(Mloadheader->Group[group].polyanim[i]);
 
-			Mloadheader->Group[group].polyanim[i] = NULL;
+			Mloadheader->Group[group].polyanim[i] = nullptr;
 		}
 	}
 
 	for( i = 0 ; i < Mloadheader->AnimData.num_animations ; i++ )
 	{
 		free(Mloadheader->AnimData.AnimSeq[i]);
-		Mloadheader->AnimData.AnimSeq[i] = NULL;
+		Mloadheader->AnimData.AnimSeq[i] = nullptr;
 	}
 
 	if( Mloadheader->AnimData.TAnimInfoIndex )
 	{
 		free(Mloadheader->AnimData.TAnimInfoIndex);
-		Mloadheader->AnimData.TAnimInfoIndex = NULL;
+		Mloadheader->AnimData.TAnimInfoIndex = nullptr;
 	}
 
 	if ( Mloadheader->OrgAddr )
 	{
 		free( Mloadheader->OrgAddr );
-		Mloadheader->OrgAddr = NULL;
+		Mloadheader->OrgAddr = nullptr;
 	}
 
 	memset( Mloadheader, 0, sizeof(MLOADHEADER) );
@@ -1163,7 +1163,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	// Mloadheader is not valid until everything has been done..
 	Mloadheader->state = false;
-	Mloadheader->Buffer = NULL;
+	Mloadheader->Buffer = nullptr;
 
 	File_Size = Get_File_Size( Filename );
 
@@ -1175,7 +1175,7 @@ bool PreMload( char * Filename, MLOADHEADER * Mloadheader  )
 
 	Buffer = (char*)calloc( 1, File_Size + sizeof( int ) );
 
-	if( Buffer == NULL )
+	if( Buffer == nullptr )
 	{
 		Msg( "PreMLoad : Unable to allocate buffer\n" );
 		return( false );
@@ -1327,7 +1327,7 @@ u_int16_t * HandleAnimCommands( POLYANIM * PolyAnim , u_int16_t * AnimData , u_i
 			break;
 		case TEXANIM_END:
 			PolyAnim->State = TEXTUREANIM_Stop;
-			return NULL;
+			return nullptr;
 			break;
 		}
 	}

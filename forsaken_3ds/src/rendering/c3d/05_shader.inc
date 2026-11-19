@@ -294,6 +294,6 @@ void c3d_renderer_cleanup(void)
 	if (s_shaderDVLB)
 	{
 		DVLB_Free(s_shaderDVLB);
-		s_shaderDVLB = NULL;
+		s_shaderDVLB = nullptr;
 	}
 }

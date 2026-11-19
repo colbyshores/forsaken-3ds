@@ -20,14 +20,14 @@ void destroy_image( texture_image_t * image )
 int load_image( texture_image_t * image, int /*mipmap*/ )
 {
 	png_byte magic[8];
-	png_structp png_ptr = NULL;
-	png_infop info_ptr = NULL;
+	png_structp png_ptr = nullptr;
+	png_infop info_ptr = nullptr;
 	int bit_depth, color_type;
 	/* Read on the longjmp path below: volatile keeps their values there
 	   (row_pointers and data are assigned after setjmp). */
-	FILE * volatile fp = NULL;
-	png_bytep * volatile row_pointers = NULL;
-	char * volatile data = NULL;
+	FILE * volatile fp = nullptr;
+	png_bytep * volatile row_pointers = nullptr;
+	char * volatile data = nullptr;
 	int i;
 
 	/* open image file */
@@ -48,7 +48,7 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 	}
 
 	/* create a png read struct */
-	png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if (!png_ptr)
 		goto fail;
 
@@ -113,7 +113,7 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 		  (png_uint_32*)(&image->w),
 		  (png_uint_32*)(&image->h),
 		  &bit_depth, &color_type,
-		  NULL, NULL, NULL);
+		  nullptr, nullptr, nullptr);
 
 	if(color_type != PNG_COLOR_TYPE_RGB_ALPHA)
 		goto fail;
@@ -139,8 +139,8 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 	png_read_image (png_ptr, row_pointers);
 
 	/* finish decompression and release memory */
-	png_read_end (png_ptr, NULL);
-	png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+	png_read_end (png_ptr, nullptr);
+	png_destroy_read_struct (&png_ptr, &info_ptr, nullptr);
 
 	/* we don't need row pointers anymore */
 	free (row_pointers);
@@ -150,7 +150,7 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 	return 0;
 
 fail:
-	png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+	png_destroy_read_struct (&png_ptr, &info_ptr, nullptr);
 	free (row_pointers);
 	free (data);
 	fclose (fp);

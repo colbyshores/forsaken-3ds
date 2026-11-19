@@ -65,7 +65,7 @@ bool PreLoadCompObj( int8_t * path, u_int16_t * BaseModel, bool LevelSpecific )
 
 	fp = file_open( (char*)path, "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		if( fread( &MagicNumber, sizeof( u_int32_t ), 1, fp ) != 1 )
 		{
@@ -179,7 +179,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 
 	fp = file_open( (char*)path, "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -188,7 +188,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 		{
 			fclose( fp );
 			Msg( "LoadCompObj() Incompatible Componented Object (.COB) file %s", path );
-			return( NULL );
+			return( nullptr );
 		}
 
 		CompsPtr = (COMP_OBJ*)malloc( sizeof( COMP_OBJ ) );
@@ -212,7 +212,7 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 			if( !fp )
 			{
 				free( CompsPtr );
-				return( NULL );
+				return( nullptr );
 			}
 
 			(*BaseModel) += NumModels;
@@ -220,13 +220,13 @@ COMP_OBJ * LoadCompObj( int8_t * path, VECTOR * Pos, VECTOR * Dir, u_int16_t Gro
 		else
 		{
 			Msg( "LoadCompObj() Unable to alloc CompsPtr in %s\n", path );
-			return( NULL );
+			return( nullptr );
 		}
 	}
 	else
 	{
 		Msg( "LoadCompObj() Unable to load Componented object %s\n", path );
-		return( NULL );
+		return( nullptr );
 	}
 
 	fclose( fp );
@@ -402,7 +402,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			else
 			{
 				Msg( "LoadCompObjChildren() Unable to alloc model\n" );
-				return( NULL );
+				return( nullptr );
 			}
 		}
 		else
@@ -418,7 +418,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 		{
 			TransPtr = (ANI_TRANS*)malloc( sizeof( ANI_TRANS ) * NumTrans );
 
-			if( TransPtr != NULL )
+			if( TransPtr != nullptr )
 			{
 #ifdef DEBUG_COMP
 				DebugPrintf("TRANSFORM	:	Number %d\n", NumTrans );
@@ -439,7 +439,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 					{
 						case TRANS_TRANSLATE:
 							TransPtr[ Count ].Data = malloc( sizeof( ANI_TRANSLATE ) );
-							if( TransPtr[ Count ].Data != NULL )
+							if( TransPtr[ Count ].Data != nullptr )
 							{
 								AniTransPtr = (ANI_TRANSLATE *) TransPtr[ Count ].Data;
 								fread( &AniTransPtr->Trans.x, sizeof( float ), 1, fp );
@@ -455,13 +455,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							else
 							{
 								Msg( "LoadCompObjChildren() Unable to alloc TranslationData\n" );
-								return( NULL );
+								return( nullptr );
 							}
 							break;
 
 						case TRANS_ROTATE:
 							TransPtr[ Count ].Data = malloc( sizeof( ANI_ROTATE ) );
-							if( TransPtr[ Count ].Data != NULL )
+							if( TransPtr[ Count ].Data != nullptr )
 							{
 								AniRotPtr = (ANI_ROTATE *) TransPtr[ Count ].Data;
 								fread( &AniRotPtr->Axis.x, sizeof( float ), 1, fp );
@@ -488,14 +488,14 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							else
 							{
 								Msg( "LoadCompObjChildren() Unable to alloc RotationData\n" );
-								return( NULL );
+								return( nullptr );
 							}
 							break;
 
 						case TRANS_MORPH:
 							NumMorphs++;
 							TransPtr[ Count ].Data = malloc( sizeof( ANI_MORPH ) );
-							if( TransPtr[ Count ].Data != NULL )
+							if( TransPtr[ Count ].Data != nullptr )
 							{
 								AniMorphPtr = (ANI_MORPH *) TransPtr[ Count ].Data;
 								AniMorphPtr->Frame = NumMorphs;
@@ -507,13 +507,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							else
 							{
 								Msg( "LoadCompObjChildren() Unable to alloc MorphData\n" );
-								return( NULL );
+								return( nullptr );
 							}
 							break;
 
 						case TRANS_PROPERTY:
 							TransPtr[ Count ].Data = malloc( sizeof( ANI_PROPERTY ) );
-							if( TransPtr[ Count ].Data != NULL )
+							if( TransPtr[ Count ].Data != nullptr )
 							{
 								AniPropPtr = (ANI_PROPERTY *) TransPtr[ Count ].Data;
 								fread( &AniPropPtr->Type, sizeof( int16_t ), 1, fp );
@@ -584,7 +584,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							else
 							{
 								Msg( "LoadCompObjChildren() Unable to alloc PropertyData\n" );
-								return( NULL );
+								return( nullptr );
 							}
 							break;
 					}
@@ -596,13 +596,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			else
 			{
 				Msg( "LoadCompObjChildren() Unable to alloc Trans\n" );
-				return( NULL );
+				return( nullptr );
 			}
 		}
 		else
 		{
 			Comp->NumTrans = NumTrans;
-			Comp->Trans = NULL;
+			Comp->Trans = nullptr;
 		}
 
 		fread( &NumColZones, sizeof( int16_t ), 1, fp );
@@ -646,7 +646,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							else
 							{
 								Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
-								return( NULL );
+								return( nullptr );
 							}
 							break;
 
@@ -683,13 +683,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								else
 								{
 									Msg( "LoadCompObjChildren() Unable to alloc ColZoneBoxSides\n" );
-									return( NULL );
+									return( nullptr );
 								}
 							}
 							else
 							{
 								Msg( "LoadCompObjChildren() Unable to alloc ColZoneBox\n" );
-								return( NULL );
+								return( nullptr );
 							}
 							break;
 
@@ -726,13 +726,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								else
 								{
 									Msg( "LoadCompObjChildren() Unable to alloc ColZonePolySides\n" );
-									return( NULL );
+									return( nullptr );
 								}
 							}
 							else
 							{
 								Msg( "LoadCompObjChildren() Unable to alloc ColZonePoly\n" );
-								return( NULL );
+								return( nullptr );
 							}
 							break;
 					}
@@ -744,13 +744,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			else
 			{
 				Msg( "LoadCompObjChildren() Unable to alloc ColZonesPtr\n" );
-				return( NULL );
+				return( nullptr );
 			}
 		}
 		else
 		{
 			Comp->NumColZones = 0;
-			Comp->ColZones = NULL;
+			Comp->ColZones = nullptr;
 		}
 
 		fread( &Comp->NumChildren, sizeof( int16_t ), 1, fp );
@@ -768,12 +768,12 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 			else
 			{
 				Msg( "LoadCompObjChildren() Unable to alloc children\n" );
-				return( NULL );
+				return( nullptr );
 			}
 		}
 		else
 		{
-			Comp->Children = NULL;
+			Comp->Children = nullptr;
 		}
 
 		Comp++;
@@ -806,12 +806,12 @@ void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 				for( Trans = 0; Trans < Children->NumTrans; Trans++ )
 				{
 					free( Children->Trans[ Trans ].Data );
-					Children->Trans[ Trans ].Data = NULL;
+					Children->Trans[ Trans ].Data = nullptr;
 				}
 
 				free( Children->Trans );
 				Children->NumTrans = 0;
-				Children->Trans = NULL;
+				Children->Trans = nullptr;
 			}
 
 			if( Children->NumColZones && Children->ColZones )
@@ -847,13 +847,13 @@ void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 					}
 
 					free( ZonesPtr->Data );
-					ZonesPtr->Data = NULL;
+					ZonesPtr->Data = nullptr;
 
 					ZonesPtr++;
 				}
 
 				free( Children->ColZones );
-				Children->ColZones = NULL;
+				Children->ColZones = nullptr;
 				Children->NumColZones = 0;
 			}
 
@@ -861,7 +861,7 @@ void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 			{
 				FreeCompObjChildren( Children->Children, Children->NumChildren );
 				free( Children->Children );
-				Children->Children = NULL;
+				Children->Children = nullptr;
 				Children->NumChildren = 0;
 			}
 
@@ -1223,7 +1223,7 @@ COMP_OBJ * GetCompObjAddress( int16_t ID, int16_t NumChildren, COMP_OBJ * Childr
 			Children++;
 		}
 	}
-	return( NULL );
+	return( nullptr );
 }
 
 /*===================================================================

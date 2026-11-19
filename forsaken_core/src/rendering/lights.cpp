@@ -26,7 +26,7 @@
 		Globals...
 ===================================================================*/
 
-XLIGHT * FirstLightVisible = NULL;
+XLIGHT * FirstLightVisible = nullptr;
 XLIGHT	XLights[MAXXLIGHTS];
 u_int16_t	FirstXLightUsed;
 u_int16_t	FirstXLightFree;
@@ -178,9 +178,9 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 {
 	int		mesh;
 	int		vert;
-	LVERTEX	*VertBase = NULL;
-	LVERTEX	*LVert = NULL;
-	LVERTEX	*OrigLVert = NULL;
+	LVERTEX	*VertBase = nullptr;
+	LVERTEX	*LVert = nullptr;
+	LVERTEX	*OrigLVert = nullptr;
 	COLOR col;
 	float	x,y,z;
 	u_int32_t r,g,b,intWhiteOut;
@@ -755,10 +755,10 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 	int		group;
 	int		mesh;
 	int		vert;
-	LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = nullptr;
 
-	LVERTEX	*LVert = NULL;
-	LVERTEX	*OrigLVert = NULL;
+	LVERTEX	*LVert = nullptr;
+	LVERTEX	*OrigLVert = nullptr;
 #ifndef GPU_LIGHTING
 	/* the CPU light loop's working variables */
 	XLIGHT * XLightPnt;
@@ -994,10 +994,10 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 	int		group;
 	int		mesh;
 	int		vert;
-	LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = nullptr;
 
-	LVERTEX	*LVert = NULL;
-	LVERTEX	*OrigLVert = NULL;
+	LVERTEX	*LVert = nullptr;
+	LVERTEX	*OrigLVert = nullptr;
 #ifndef GPU_LIGHTING
 	/* the CPU light loop's working variables */
 	XLIGHT * XLightPnt;
@@ -1304,13 +1304,13 @@ void BuildVisibleLightList( u_int16_t Group )
 	XLIGHT * XLightPnt;
 
 	light = FirstXLightUsed;
-	FirstLightVisible = NULL;
+	FirstLightVisible = nullptr;
 
 	while( light != INDEX_NONE )
 	{
 		XLightPnt = &XLights[light];
 
-		if( (Group == INDEX_NONE) || (XLightPnt->Visible && VisibleOverlap( Group, XLightPnt->Group , NULL ) ) )
+		if( (Group == INDEX_NONE) || (XLightPnt->Visible && VisibleOverlap( Group, XLightPnt->Group , nullptr ) ) )
 		{
 			XLightPnt->NextVisible = FirstLightVisible;
 			FirstLightVisible = XLightPnt;
@@ -1375,7 +1375,7 @@ FILE * LoadXLights( FILE * fp )
 		fread( &FirstXLightFree, sizeof( u_int16_t ), 1, fp );
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstLightVisible = &XLights[ TempIndex ];
-		else FirstLightVisible = NULL;
+		else FirstLightVisible = nullptr;
 
 		for( i = 0; i < MAXXLIGHTS; i++ )
 		{
@@ -1394,7 +1394,7 @@ FILE * LoadXLights( FILE * fp )
 			fread( &XLights[ i ].Group, sizeof( u_int16_t ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) XLights[ i ].NextVisible = &XLights[ TempIndex ];
-			else XLights[ i ].NextVisible = NULL;
+			else XLights[ i ].NextVisible = nullptr;
 		}
 	}
 

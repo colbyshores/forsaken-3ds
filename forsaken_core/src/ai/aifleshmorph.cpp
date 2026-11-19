@@ -166,7 +166,7 @@ void AI_FLESHMORPH_STOPFORWARD( ENEMY * Enemy )
 
 				EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 					Enemy->Object.Group, &Enemy->Object.Pos, &TempOffset, &TempVector, &TempUpVector,
-					EnemyTypes[Enemy->Type].PowerLevel, (EnemyTypes[Enemy->Type].PowerLevel +1) * 33.0F, false, NULL );
+					EnemyTypes[Enemy->Type].PowerLevel, (EnemyTypes[Enemy->Type].PowerLevel +1) * 33.0F, false, nullptr );
 			}
 
 			if( (Enemy->SecondaryFireTimer == 0.0F) &&

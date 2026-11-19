@@ -303,7 +303,7 @@ bool AI_ClearLOS( VECTOR * SPos, u_int16_t Group , VECTOR * Pos )
 	Dir.z = ( Pos->z - SPos->z );
 
 	if( BackgroundCollide( &MCloadheadert0, &Mloadheader, SPos, Group, &Dir,
-						&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
+						&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) )
 	{
 		return false;
 	}
@@ -372,7 +372,7 @@ void AI_GetDistToNearestTarget( ENEMY * Enemy )
 
 	Tinfo->SObject	= &Enemy->Object;
 
-	Tinfo->TObject	= NULL;
+	Tinfo->TObject	= nullptr;
 
 	// What type of target are we looking for ...
 
@@ -419,7 +419,7 @@ void AI_GetDistToNearestTarget( ENEMY * Enemy )
 void AI_SetRETREAT( ENEMY * Enemy )
 {
 	Enemy->Object.AI_Mode = AIMODE_RETREAT;
-	Enemy->TNode = NULL;
+	Enemy->TNode = nullptr;
 	Enemy->Timer = EnemyTypes[Enemy->Type].Behave.RetreatTime;	// How long I Run for
 }
 /*===================================================================
@@ -431,7 +431,7 @@ void AI_SetMOVETOTARGET( ENEMY * Enemy )
 {
 	Enemy->AIFlags &= ~AI_IHAVESEENPLAYER;
 	Enemy->Object.AI_Mode = AIMODE_MOVETOTARGET;
-	Enemy->TNode = NULL;
+	Enemy->TNode = nullptr;
 }
 /*===================================================================
 	Procedure	:	Set Enemy AI Mode to...
@@ -440,7 +440,7 @@ void AI_SetMOVETOTARGET( ENEMY * Enemy )
 ===================================================================*/
 void AI_SetDOGFIGHT( ENEMY * Enemy )
 {
-	Enemy->TNode = NULL;
+	Enemy->TNode = nullptr;
 	Enemy->Object.AI_Mode = AIMODE_DOGFIGHT;
 	Enemy->Timer  = RESET_VALIDATE_TIME + (float) Random_Range( (u_int16_t) RESET_VALIDATE_TIME );
 }
@@ -461,7 +461,7 @@ void AI_SetKILLMINE( ENEMY * Enemy )
 ===================================================================*/
 void AI_SetIDLE( ENEMY * Enemy )
 {
-	Enemy->TShip = NULL;
+	Enemy->TShip = nullptr;
 	Enemy->Object.AI_Mode = AIMODE_IDLE;
 	Enemy->Timer  = EnemyTypes[Enemy->Type].Behave.IdleTime + (float) Random_Range( (u_int16_t) EnemyTypes[Enemy->Type].Behave.IdleTime);
 }
@@ -472,7 +472,7 @@ void AI_SetIDLE( ENEMY * Enemy )
 ===================================================================*/
 void AI_SetSCAN( ENEMY * Enemy )
 {
-	Enemy->TShip = NULL;
+	Enemy->TShip = nullptr;
 	Enemy->Object.AI_Mode = AIMODE_SCAN;
 	Enemy->Timer  = RESET_SCAN_TIME + (float) Random_Range( (u_int16_t) RESET_SCAN_TIME );
 }
@@ -483,7 +483,7 @@ void AI_SetSCAN( ENEMY * Enemy )
 ===================================================================*/
 void AI_SetFOLLOWPATH( ENEMY * Enemy )
 {
-	Enemy->TShip = NULL;
+	Enemy->TShip = nullptr;
 	Enemy->Object.AI_Mode = AIMODE_FOLLOWPATH;
 	Enemy->Timer  = RESET_SCAN_TIME + (float) Random_Range( (u_int16_t) RESET_SCAN_TIME );
 }

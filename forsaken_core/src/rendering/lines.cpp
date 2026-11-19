@@ -187,7 +187,7 @@ bool LinesDispGroup( u_int16_t Group, RENDEROBJECT *renderObject, u_int16_t * St
 		renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = Num_Lines; // one primitive per line
 		renderObject->textureGroups[renderObject->numTextureGroups].numVerts = Num_Lines * 2; // two verts per line
 		renderObject->textureGroups[renderObject->numTextureGroups].startVert = 0;
-		renderObject->textureGroups[renderObject->numTextureGroups].texture = NULL;
+		renderObject->textureGroups[renderObject->numTextureGroups].texture = nullptr;
 		renderObject->textureGroups[renderObject->numTextureGroups].colourkey = false;
 		renderObject->numTextureGroups = 1;
 

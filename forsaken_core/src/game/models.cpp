@@ -61,7 +61,7 @@ bool	ShowBoundingBoxes = false;
  * ModelNames[] slot, and freed by the next PreInitModel (so the array
  * outlives ReleaseView: level teardown still reads it). It replaced a
  * MAXMODELHEADERS-sized static array to give back ~6 MB of BSS. */
-MXLOADHEADER *ModelHeaders = NULL;
+MXLOADHEADER *ModelHeaders = nullptr;
 
 constexpr auto RETAIN_POLYS = true;
 constexpr auto DISCARD_POLYS = false;
@@ -543,8 +543,8 @@ bool PreInitModel( MODELNAME *NamePnt )
 	 * the preceding ReleaseModels). Any previous allocation is freed
 	 * here, just before we size the new one. */
 	{
-		free(ModelHeaders);    ModelHeaders    = NULL;
-		free(MxaModelHeaders); MxaModelHeaders = NULL;
+		free(ModelHeaders);    ModelHeaders    = nullptr;
+		free(MxaModelHeaders); MxaModelHeaders = nullptr;
 	}
 	if (!ModelHeaders || !MxaModelHeaders)
 	{
@@ -561,8 +561,8 @@ bool PreInitModel( MODELNAME *NamePnt )
 		MxaModelHeaders = (MXALOADHEADER *) calloc(count, sizeof(MXALOADHEADER));
 		if (!ModelHeaders || !MxaModelHeaders)
 		{
-			free(ModelHeaders);    ModelHeaders    = NULL;
-			free(MxaModelHeaders); MxaModelHeaders = NULL;
+			free(ModelHeaders);    ModelHeaders    = nullptr;
+			free(MxaModelHeaders); MxaModelHeaders = nullptr;
 			return false;
 		}
 	}
@@ -798,7 +798,7 @@ void KillAttachedSoundFX( u_int16_t i )
 {
 	int16_t		Count;
 	u_int16_t		NumSpotFX = 0;
-	PVSPOTFX *	SpotFXPtr = NULL;
+	PVSPOTFX *	SpotFXPtr = nullptr;
 
 	switch( Models[i].Func )
 	{
@@ -861,7 +861,7 @@ void KillAttachedSpotFX( u_int16_t i )
 {
 	int16_t		Count;
 	u_int16_t		NumSpotFX = 0;
-	PVSPOTFX *	SpotFXPtr = NULL;
+	PVSPOTFX *	SpotFXPtr = nullptr;
 
 	switch( Models[i].Func )
 	{
@@ -945,7 +945,7 @@ static void ModelVisBucket_Build( int InTitle )
 		int vis = Models[i].Visible &&
 			( InTitle || IsGroupVisible[ Models[i].Group ] || (
 				CAMERA_VIEW_IS_VALID &&
-				VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[i].Group, NULL )
+				VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Models[i].Group, nullptr )
 			) );
 		if( vis )
 		{
@@ -1559,7 +1559,7 @@ void ProcessModels( void )
 
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
 											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+											  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
 						{
 							Models[i].Pos = Int_Point;
 							CreateBloodSplat( &Int_Point, (VECTOR *) &Int_Normal, Models[i].Group );
@@ -1705,7 +1705,7 @@ void ProcessModels( void )
 
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
 											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+											  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
 						{
 							PlayPannedSfx( SFX_Squish, Models[i].Group , &Models[i].Pos, 0.0F );
 							NormaliseVector( &Models[i].Dir );
@@ -1822,7 +1822,7 @@ void ProcessModels( void )
 
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
 											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+											  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
 						{
 							if( Random_Range( 3 ) )
 							{
@@ -1968,7 +1968,7 @@ void ProcessModels( void )
 
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &Models[i].Pos,
 											  Models[i].Group, &TempDir, (VECTOR *) &Int_Point,
-											  &Models[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+											  &Models[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
 						{
 							Models[i].Pos = Int_Point;
 
@@ -2069,7 +2069,7 @@ void ProcessModels( void )
 					if( Models[i].Flags & MODFLAG_SpotFXDisabled ) break;
 					if( framelag == 0.0F ) break;
 
-					SpotFXPtr = NULL;
+					SpotFXPtr = nullptr;
 					NumSpotFX = 0;
 
 					if( ModelNames[ Models[i].ModelNum ].DoIMorph )
@@ -2533,7 +2533,7 @@ void ProcessModels( void )
 			switch( Models[i].Func )
 			{
 				case MODFUNC_ProcessSpotFX:
-					SpotFXPtr = NULL;
+					SpotFXPtr = nullptr;
 					NumSpotFX = 0;
 
 					if( ModelNames[ Models[i].ModelNum ].DoIMorph )
@@ -2605,7 +2605,7 @@ void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 
 	if( Weapon != (u_int8_t) -1 )
 	{
-		i = EnemyFirePrimary( OWNER_MODELSPOTFX, ModelIndex, 0, Weapon, Group, Pos, &TempVector, Dir, Up, 2, 0.0F, false, NULL );
+		i = EnemyFirePrimary( OWNER_MODELSPOTFX, ModelIndex, 0, Weapon, Group, Pos, &TempVector, Dir, Up, 2, 0.0F, false, nullptr );
 
 		if( i != INDEX_NONE )
 		{
@@ -2627,7 +2627,7 @@ void CreateModelSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 ===================================================================*/
 bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					Mesh;
@@ -2689,7 +2689,7 @@ bool ProcessModel( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, i
 ===================================================================*/
 bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					Mesh;
@@ -2753,7 +2753,7 @@ bool ProcessModel2( MXLOADHEADER * DstMloadheader, float Scale, float MaxScale, 
 ===================================================================*/
 bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale, float MaxScale, int8_t R, int8_t G, int8_t B )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	COLOR				Colour;
 	float					Col2;
 	u_int8_t					Col;
@@ -2804,7 +2804,7 @@ bool ProcessModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, float Scale
 ===================================================================*/
 bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u_int8_t R, u_int8_t G, u_int8_t B )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	COLOR				Colour;
 
 		Colour = RGBA_MAKE( R, G, B, 255 );
@@ -2837,7 +2837,7 @@ bool ProcessSphereZoneModelExec( RENDEROBJECT *renderObject, int16_t NumVerts, u
 ===================================================================*/
 bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					Mesh;
@@ -2882,7 +2882,7 @@ bool TintModel( u_int16_t Model, float RF, float GF, float BF, float TF )
 ===================================================================*/
 bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 {
-	LVERTEX	*VertBase = NULL;
+	LVERTEX	*VertBase = nullptr;
 	LVERTEX	*LVert;
 	LVERTEX	*OrigLVert;
 	int		group;
@@ -2934,8 +2934,8 @@ bool UpdateMxaModel( MXALOADHEADER * MXAloadheader )
 ===================================================================*/
 bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
-	LVERTEX			*DstVerts = NULL;
-	LVERTEX			*SrcVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
+	LVERTEX			*SrcVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					Mesh;
@@ -3010,8 +3010,8 @@ bool AmbientLightMxaModel( MXALOADHEADER * DstMloadheader, int R, int G, int B, 
 ===================================================================*/
 bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, int /*A*/ , float rp , float gp , float bp)
 {
-	LVERTEX			*DstVerts = NULL;
-	LVERTEX			*SrcVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
+	LVERTEX			*SrcVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					Mesh;
@@ -3091,7 +3091,7 @@ bool AmbientLightMxModel( MXLOADHEADER * DstMloadheader, int R, int G, int B, in
 ===================================================================*/
 bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Vert;
 	u_int16_t					Mesh;
@@ -3160,7 +3160,7 @@ bool ShadeModel( u_int16_t Model, MATRIX * Matrix, float ZTrans, float Range )
 bool LightModel( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3243,7 +3243,7 @@ bool LightModel( u_int16_t Model, VECTOR * Pos )
 bool LightModel2( u_int16_t Model, VECTOR * Pos )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3330,7 +3330,7 @@ bool LightModel2( u_int16_t Model, VECTOR * Pos )
 bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3415,7 +3415,7 @@ bool LightMxModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, 
 bool LightMxaModel( u_int16_t Model, VECTOR * Pos, float RF, float GF, float BF, float TF )
 {
 	XLIGHT * LightPnt;
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	VECTOR					DistVector;
 	float					Dist;
 	u_int16_t					Group;
@@ -3529,7 +3529,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 					{
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 									  Group, &DistVector, (VECTOR *) &Int_Point,
-									  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+									  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 						{
 							Damage = ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) );
 
@@ -3584,7 +3584,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 			{
 				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 							  Group, &DistVector, (VECTOR *) &Int_Point,
-							  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+							  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 				{
 					Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + MINE_RADIUS ) / Center_Damage ) ) ) * framelag );
 
@@ -3609,7 +3609,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 ===================================================================*/
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -3628,7 +3628,7 @@ void ShockWave( VECTOR * Pos, float Radius, u_int16_t OwnerType, u_int16_t Owner
 					{
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 									  Group, &DistVector, (VECTOR *) &Int_Point,
-									  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+									  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 						{
 							Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) ) * framelag );
 
@@ -3694,7 +3694,7 @@ void GravityWave( VECTOR * Pos, float Radius, float Center_Grav, u_int16_t Group
 			{
 				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 							  Group, &DistVector, (VECTOR *) &Int_Point,
-							  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+							  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 				{
 					Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
 
@@ -3712,7 +3712,7 @@ void GravityWave( VECTOR * Pos, float Radius, float Center_Grav, u_int16_t Group
 ===================================================================*/
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -3729,7 +3729,7 @@ void GravityWave( VECTOR * Pos, float Radius, float Center_Grav, u_int16_t Group
 				{
 					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 								  Group, &DistVector, (VECTOR *) &Int_Point,
-								  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+								  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 					{
 						Gravity = (int16_t) ( Center_Grav - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Grav ) ) );
 
@@ -3988,7 +3988,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 							{
 								if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 											  Group, &DistVector, (VECTOR *) &Int_Point,
-											  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+											  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 								{
 									Damage = ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) );
 
@@ -4049,7 +4049,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 					{
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 									  Group, &DistVector, (VECTOR *) &Int_Point,
-									  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+									  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 						{
 							Damage = ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) );
 
@@ -4091,7 +4091,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 			{
 				if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 							  Group, &DistVector, (VECTOR *) &Int_Point,
-							  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+							  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 				{
 					Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + MINE_RADIUS ) / Center_Damage ) ) ) * framelag );
 					SecBulls[ i ].Shield -= Damage;
@@ -4113,7 +4113,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 ===================================================================*/
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -4130,7 +4130,7 @@ void MissileShockWave( VECTOR * Pos, float Radius, u_int16_t Owner, float Center
 				{
 					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, Pos,	 	/* Hit Background? */
 								  Group, &DistVector, (VECTOR *) &Int_Point,
-								  &EndGroup, &Int_Normal, &TempVector, true, NULL ) != true )
+								  &EndGroup, &Int_Normal, &TempVector, true, nullptr ) != true )
 					{
 						Damage = ( ( Center_Damage - ( DistFromCenter / ( ( Radius + SHIP_RADIUS ) / Center_Damage ) ) ) * framelag );
 
@@ -4394,7 +4394,7 @@ u_int16_t CreateLine( float x1, float y1, float z1, float x2, float y2, float z2
 bool GetMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 					   VECTOR * BottomRight )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					Mesh;
@@ -4471,7 +4471,7 @@ char *GetName(int Player)
 bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, VECTOR * TopLeft,
 						VECTOR * BottomRight )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					Mesh;
@@ -4536,7 +4536,7 @@ bool GetMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR 
 ===================================================================*/
 bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					Mesh;
@@ -4606,7 +4606,7 @@ bool CreateMXBoundingBox( MXLOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR
 ===================================================================*/
 bool CreateMXABoundingBox( MXALOADHEADER * DstMloadheader, MATRIX * Matrix, VECTOR * Pos, u_int16_t * LineArray, u_int16_t Group2 )
 {
-	LVERTEX			*DstVerts = NULL;
+	LVERTEX			*DstVerts = nullptr;
 	u_int16_t					Group;
 	u_int16_t					Count;
 	u_int16_t					Mesh;
@@ -4675,7 +4675,7 @@ void SetupModelSpotFX( u_int16_t i )
 {
 	int16_t		Count;
 	int16_t		NumSpotFX = 0;
-	PVSPOTFX *	SpotFXPtr = NULL;
+	PVSPOTFX *	SpotFXPtr = nullptr;
 
 	if( ModelNames[ Models[i].ModelNum ].DoIMorph )
 	{
@@ -4805,7 +4805,7 @@ void UpdateShipModel( u_int16_t Ship )
 
 				FreeCompObjChildren( Ships[ Ship ].Object.Components, 1 );
 				free( Ships[ Ship ].Object.Components );
-				Ships[ Ship ].Object.Components = NULL;
+				Ships[ Ship ].Object.Components = nullptr;
 			}
 
 			if( Ships[ Ship ].ModelNum == INDEX_NONE )
@@ -4914,7 +4914,7 @@ void UpdateShipModel( u_int16_t Ship )
 
 			FreeCompObjChildren( Ships[ Ship ].Object.Components, 1 );
 			free( Ships[ Ship ].Object.Components );
-			Ships[ Ship ].Object.Components = NULL;
+			Ships[ Ship ].Object.Components = nullptr;
 		}
 	}
 
@@ -5357,7 +5357,7 @@ bool ReinitSpotFXSFX( u_int16_t i )
 {
 	int16_t		Count;
 	u_int16_t		NumSpotFX = 0;
-	PVSPOTFX *	SpotFXPtr = NULL;
+	PVSPOTFX *	SpotFXPtr = nullptr;
 
 	if( ModelNames[ Models[i].ModelNum ].DoIMorph )
 	{
@@ -5565,7 +5565,7 @@ bool	ENVMxa( MXALOADHEADER * Mxloadheader , MATRIX * Mat ,VECTOR * /*Pos*/)
 	u_int16_t group;
 	u_int16_t vert;
 	u_int16_t mesh;
-	LVERTEX	*LVert = NULL;
+	LVERTEX	*LVert = nullptr;
 	float	u,v;
 
 	for( group = 0 ; group < Mxloadheader->num_groups ; group ++ )

@@ -189,13 +189,13 @@ void app_keyboard( SDL_KeyboardEvent * key )
 	{
 		if( key->keysym.sym == SDLK_F12 && key->keysym.mod & KMOD_SHIFT )
 		{
-				MenuGoFullScreen( NULL );
+				MenuGoFullScreen( nullptr );
 		}
 		else if( key->keysym.sym == SDLK_RSHIFT || key->keysym.sym == SDLK_LSHIFT )
 		{
-				const u_int8_t *keystate = SDL_GetKeyboardState(NULL);
+				const u_int8_t *keystate = SDL_GetKeyboardState(nullptr);
 				if ( keystate[SDL_SCANCODE_F12] )
-					MenuGoFullScreen( NULL );
+					MenuGoFullScreen( nullptr );
 		}
 	}
 	if( key->type == SDL_KEYDOWN )
@@ -602,7 +602,7 @@ bool joysticks_cleanup( void )
 		{
 			free(JoystickInfo[i].Name);
 		}
-		JoystickInfo[i].Name = NULL;
+		JoystickInfo[i].Name = nullptr;
 
 		if(JoystickInfo[i].sdl_joy)
 		{
@@ -610,7 +610,7 @@ bool joysticks_cleanup( void )
 				JoystickInfo[i].sdl_joy
 			);
 		}
-		JoystickInfo[i].sdl_joy = NULL;
+		JoystickInfo[i].sdl_joy = nullptr;
 
 		for (j = 0; j < JoystickInfo[i].NumButtons; j++)
 		{
@@ -618,7 +618,7 @@ bool joysticks_cleanup( void )
 			{
 				free(JoystickInfo[i].Button[j].name);
 			}
-			JoystickInfo[i].Button[j].name = NULL;
+			JoystickInfo[i].Button[j].name = nullptr;
 			JoystickInfo[i].Button[j].action = SHIPACTION_Nothing;
 		}
 
@@ -628,14 +628,14 @@ bool joysticks_cleanup( void )
 			{
 				free(JoystickInfo[i].POV[j].name);
 			}
-			JoystickInfo[i].POV[j].name = NULL;
+			JoystickInfo[i].POV[j].name = nullptr;
 			for ( k = 0; k < MAX_POV_DIRECTIONS; k++ )
 			{
 				if ( JoystickInfo[ i ].POV[ j ].dirname[ k ] )
 				{
 					free( JoystickInfo[ i ].POV[ j ].dirname[ k ] );
 				}
-				JoystickInfo[ i ].POV[ j ].dirname[ k ] = NULL;
+				JoystickInfo[ i ].POV[ j ].dirname[ k ] = nullptr;
 				JoystickInfo[ i ].POV[ j ].action[ k ] = SHIPACTION_Nothing;
 			}
 		}
@@ -646,7 +646,7 @@ bool joysticks_cleanup( void )
 			{
 				free(JoystickInfo[i].Axis[j].name);
 			}
-			JoystickInfo[i].Axis[j].name = NULL;
+			JoystickInfo[i].Axis[j].name = nullptr;
 			JoystickInfo[i].Axis[j].exists = false;
 			JoystickInfo[i].Axis[j].action = SHIPACTION_Nothing;
 			JoystickInfo[i].Axis[j].sensitivity = 0.0f;

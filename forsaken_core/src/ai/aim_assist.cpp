@@ -181,7 +181,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 
 	/* Walk live enemies */
 	enemy = FirstEnemyUsed;
-	while( enemy != NULL )
+	while( enemy != nullptr )
 	{
 		if( enemy->Status & ENEMY_STATUS_Enable )
 		{
@@ -220,7 +220,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 	ray_dir.y = target_dir.y * target_dist;
 	ray_dir.z = target_dir.z * target_dist;
 	if( BackgroundCollide( &MCloadheadert0, &Mloadheader, bullet_pos, bullet_group,
-						   &ray_dir, &int_pt, &int_grp, &int_norm, &tmp, true, NULL ) )
+						   &ray_dir, &int_pt, &int_grp, &int_norm, &tmp, true, nullptr ) )
 	{
 		/* Wall between bullet and target — don't assist through walls */
 		return false;

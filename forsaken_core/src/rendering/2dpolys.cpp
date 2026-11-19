@@ -151,7 +151,7 @@ void KillUsedFmPoly( u_int16_t i )
 	FmPolys[i].UpVector.y = 1.0F;
 	FmPolys[i].UpVector.z = 0.0F;
 	FmPolys[i].Speed = 0.0F;
-	FmPolys[i].Frm_Info = NULL;
+	FmPolys[i].Frm_Info = nullptr;
 	FirstFmPolyFree	= i;
 }
 
@@ -988,7 +988,7 @@ void FmPolyProcess( void )
 					if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &FmPolys[i].Pos,
 										  /* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 										  FmPolys[i].Group, &TempDir, (VECTOR *) &Int_Point,
-										  &FmPolys[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+										  &FmPolys[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
 					{
 						FmPolys[i].Pos = Int_Point;
 
@@ -1195,7 +1195,7 @@ void FmPolyProcess( void )
 					{
 						if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &FmPolys[i].Pos,
 											  FmPolys[i].Group, &TempDir, (VECTOR *) &Int_Point,
-											  &FmPolys[i].Group, &Int_Normal, &TempVector, true, NULL ) == true )
+											  &FmPolys[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
 						{
 							CreateSpotFXDripSplash( &Int_Point, &SlideUp, FmPolys[i].Group, FmPolys[i].R, FmPolys[i].G, FmPolys[i].B );
 							KillUsedFmPoly( i );
@@ -1702,7 +1702,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 	LVERTEX	*BufStart;
 	MATRIX			TempMatrix;
 	QUAT			TempQuat;
-	WORD			*Indices = NULL;
+	WORD			*Indices = nullptr;
 	int				start_index = 0;
 
 /*===================================================================
@@ -2074,7 +2074,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 	LVERTEX	*BufStart;
 	MATRIX			TempMatrix;
 	QUAT			TempQuat;
-	WORD			*Indices = NULL;
+	WORD			*Indices = nullptr;
 	int				start_index = 0;
 
 /*===================================================================

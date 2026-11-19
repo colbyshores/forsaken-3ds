@@ -34,8 +34,8 @@ CAMERA	MainCamera;			// the main viewing screen...
 
 
 int32_t	NumOfCams = 0;
-REMOTECAMERA * ActiveRemoteCamera = NULL;
-REMOTECAMERA * RemoteCameras = NULL;
+REMOTECAMERA * ActiveRemoteCamera = nullptr;
+REMOTECAMERA * RemoteCameras = nullptr;
 
 
 /*===================================================================
@@ -55,8 +55,8 @@ bool Cameraload( char * Filename )
 	u_int32_t		VersionNumber;
 	VECTOR	Tempv;
 
-	ActiveRemoteCamera = NULL;
-	RemoteCameras = NULL;
+	ActiveRemoteCamera = nullptr;
+	RemoteCameras = nullptr;
 
 
 	File_Size = Get_File_Size( Filename );
@@ -128,8 +128,8 @@ void CameraRelease( void)
 	if( RemoteCameras )
 	{
 		free( RemoteCameras );
-		ActiveRemoteCamera = NULL;
-		RemoteCameras = NULL;
+		ActiveRemoteCamera = nullptr;
+		RemoteCameras = nullptr;
 	}
 	NumOfCams = 0;
 }
@@ -165,7 +165,7 @@ void DisableRemoteCamera( u_int16_t * Data )
 	CamPnt += *Data;
 	CamPnt->enable = false;
 	if( ActiveRemoteCamera == CamPnt )
-		ActiveRemoteCamera = NULL;
+		ActiveRemoteCamera = nullptr;
 }
 
 /*===================================================================
@@ -216,7 +216,7 @@ FILE * LoadRemoteCameras( FILE * fp )
 		}
 		else
 		{
-			ActiveRemoteCamera = NULL;
+			ActiveRemoteCamera = nullptr;
 		}
 	}
 

@@ -279,72 +279,72 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 	/***********************************************
 	 Bike computer
 	 ************************************************/
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_AM  }, //	-	assassin missile
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_AP  }, //	-	picking up a weapon which is already present
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_BL  }, //	-	beam laser
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_BN  }, //	-	bad navigation
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_CA  }, //	-	camping
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_CD  }, //	-	chaff dispenser
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_CS  }, //	-	chaos shield
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_DY  }, //	-	destroying yourself
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_EA  }, //	-	extra ammo
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_EX  }, //	-	extra, miscellaneous phrases
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_FL  }, //	-	flares
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GK  }, //	-	good kill total
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GL  }, //	-	general ammo low
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GM  }, //	-	gravgon missile
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GP  }, //	-	golden power pod
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_HC  }, //	-	hull critical
-	{ NULL , SFX_BikeComp | SFX_BikeCompNoOveride, 0, SFX_BIKECOMP_LOOKUP_IN  }, //	-	incoming
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_IR  }, //	-	IR goggles
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MA  }, //	-	maximum ammo
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MK  }, //	-	many kills in a short time period
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MR  }, //	-	MRFL
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MU  }, //	-	mug
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NK  }, //	-	no kills for a lengthy time period
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NL  }, //	-	nitro low
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NP  }, //	-	selecting a weapon which is not present
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NT  }, //	-	nitro
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_OP  }, //	-	orbit pulsar
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PG  }, //	-	petro gel
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PK  }, //	-	poor kill total
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PL  }, //	-	pyrolite fuel low
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PM  }, //	-	pine mine
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PO  }, //	-	power pod
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PP  }, //	-	plasma pack
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PR  }, //	-	purge mine
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PS  }, //	-	pulsar
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PY  }, //	-	pyrolite
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_QM  }, //	-	quantum mine
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_RR  }, //	-	resnic reanimator
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SA  }, //	-	scatter missile
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SC  }, //	-	shield critical
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SG  }, //	-	suss-gun
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SH  }, //	-	shield
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SI  }, //	-	scatter missile impact
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SL  }, //	-	suss gun ammo low
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SM  }, //	-	smoke streamer
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SO  }, //	-	spider mine
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SP  }, //	-	solaris heatseaker
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_ST  }, //	-	stealth mantle
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_TI  }, //	-	titan star missile
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_TR  }, //	-	transpulse
-	{ NULL , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_TX  }, //	-	trojax
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_AM  }, //	-	assassin missile
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_AP  }, //	-	picking up a weapon which is already present
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_BL  }, //	-	beam laser
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_BN  }, //	-	bad navigation
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_CA  }, //	-	camping
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_CD  }, //	-	chaff dispenser
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_CS  }, //	-	chaos shield
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_DY  }, //	-	destroying yourself
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_EA  }, //	-	extra ammo
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_EX  }, //	-	extra, miscellaneous phrases
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_FL  }, //	-	flares
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GK  }, //	-	good kill total
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GL  }, //	-	general ammo low
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GM  }, //	-	gravgon missile
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_GP  }, //	-	golden power pod
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_HC  }, //	-	hull critical
+	{ nullptr , SFX_BikeComp | SFX_BikeCompNoOveride, 0, SFX_BIKECOMP_LOOKUP_IN  }, //	-	incoming
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_IR  }, //	-	IR goggles
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MA  }, //	-	maximum ammo
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MK  }, //	-	many kills in a short time period
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MR  }, //	-	MRFL
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_MU  }, //	-	mug
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NK  }, //	-	no kills for a lengthy time period
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NL  }, //	-	nitro low
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NP  }, //	-	selecting a weapon which is not present
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_NT  }, //	-	nitro
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_OP  }, //	-	orbit pulsar
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PG  }, //	-	petro gel
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PK  }, //	-	poor kill total
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PL  }, //	-	pyrolite fuel low
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PM  }, //	-	pine mine
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PO  }, //	-	power pod
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PP  }, //	-	plasma pack
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PR  }, //	-	purge mine
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PS  }, //	-	pulsar
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_PY  }, //	-	pyrolite
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_QM  }, //	-	quantum mine
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_RR  }, //	-	resnic reanimator
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SA  }, //	-	scatter missile
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SC  }, //	-	shield critical
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SG  }, //	-	suss-gun
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SH  }, //	-	shield
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SI  }, //	-	scatter missile impact
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SL  }, //	-	suss gun ammo low
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SM  }, //	-	smoke streamer
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SO  }, //	-	spider mine
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_SP  }, //	-	solaris heatseaker
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_ST  }, //	-	stealth mantle
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_TI  }, //	-	titan star missile
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_TR  }, //	-	transpulse
+	{ nullptr , SFX_BikeComp, 0, SFX_BIKECOMP_LOOKUP_TX  }, //	-	trojax
 
 	/************************************************
 	Biker
 	*************************************************/
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_GP  }, //	-	general
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_VP  }, //	-	victory
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_LP  }, //	-	losing
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_BW  }, //	-	big weapon gain
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_LE  }, //	-	low energy
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_TN  }, //	-	taunt
-	{ NULL, SFX_Biker, 0, SFX_BIKER_LOOKUP_PN  }, //	-	pain
-	{ NULL, SFX_Biker | SFX_BikerSpeechOveride, 0, SFX_BIKER_LOOKUP_DT  }, //	-	death
-	{ NULL, SFX_Biker | SFX_Title, 0, SFX_BIKER_LOOKUP_EX  }, //	-	extra
+	{ nullptr, SFX_Biker, 0, SFX_BIKER_LOOKUP_GP  }, //	-	general
+	{ nullptr, SFX_Biker, 0, SFX_BIKER_LOOKUP_VP  }, //	-	victory
+	{ nullptr, SFX_Biker, 0, SFX_BIKER_LOOKUP_LP  }, //	-	losing
+	{ nullptr, SFX_Biker, 0, SFX_BIKER_LOOKUP_BW  }, //	-	big weapon gain
+	{ nullptr, SFX_Biker, 0, SFX_BIKER_LOOKUP_LE  }, //	-	low energy
+	{ nullptr, SFX_Biker, 0, SFX_BIKER_LOOKUP_TN  }, //	-	taunt
+	{ nullptr, SFX_Biker, 0, SFX_BIKER_LOOKUP_PN  }, //	-	pain
+	{ nullptr, SFX_Biker | SFX_BikerSpeechOveride, 0, SFX_BIKER_LOOKUP_DT  }, //	-	death
+	{ nullptr, SFX_Biker | SFX_Title, 0, SFX_BIKER_LOOKUP_EX  }, //	-	extra
 
-	{ NULL, SFX_LevelSpec, 0, 0 }, // first level spec sfx
+	{ nullptr, SFX_LevelSpec, 0, 0 }, // first level spec sfx
 
 };
 
@@ -391,7 +391,7 @@ sound_buffer_t * sound_buffer_create( char *file, int sfxnum )
 	{
 		SndLookup[ sfxnum ].Num_Variants = 0;
 		DebugPrintf("failed to load sfxnum %d from %s\n",sfxnum,file);
-		return NULL;
+		return nullptr;
 	}
 
 	sound_buffers[ sfxnum ] = buffer;
@@ -408,19 +408,19 @@ sound_buffer_t * sound_buffer_create( char *file, int sfxnum )
 void sound_buffer_delete( int sfx )
 {
 	sound_release_buffer(sound_buffers[sfx]);
-	sound_buffers[sfx] = NULL;
+	sound_buffers[sfx] = nullptr;
 }
 
 sound_source_t * sound_source_create( char *file, int sfxnum )
 {
 	sound_buffer_t * buffer;
-	if(!file) return NULL;
+	if(!file) return nullptr;
 	buffer = sound_buffer_create(file,sfxnum);
 	if(!buffer)
 	{
 		DebugPrintf("sound: failed to create sound buffer %s for sfx %d\n",
 			file, sfxnum);
-		return NULL;
+		return nullptr;
 	}
 	return sound_source(buffer);
 }
@@ -696,7 +696,7 @@ const char *BikeComputerSpeechEffects[MAX_BIKE_COMPUTER_SFX] = {
 	"TI",	//  -	titan star missile
 	"TR",	//  -	transpulse
 	"TX",	//  -	trojax
-	NULL,
+	nullptr,
 };
 
 const char *BikerSpeechNames[MAXBIKETYPES] = {
@@ -839,13 +839,13 @@ void FreeSfxHolder( int index )
 		TauntID = 0;
 		Taunter = 0xFF;
 		TauntUpdatable = false;
-		EnemyTaunter = NULL;
+		EnemyTaunter = nullptr;
 	}
 
 	if(SfxHolder[index].source)
 	{
 		sound_release_source(SfxHolder[index].source);
-		SfxHolder[index].source = NULL;
+		SfxHolder[index].source = nullptr;
 	}
 
 	SfxHolder[ index ].Used = false;
@@ -896,7 +896,7 @@ void ClearLevelSpecSfx( void )
 		if( Sfx_Filenames[ i ].Name )
 		{
 			free( const_cast<char *>( Sfx_Filenames[ i ].Name ) );	/* level-specific names are malloc'd */
-			Sfx_Filenames[ i ].Name = NULL;
+			Sfx_Filenames[ i ].Name = nullptr;
 		}
 		Sfx_Filenames[ i ].Flags = 0;
 	}
@@ -1109,7 +1109,7 @@ void PauseAllSfx( void )
 			temp = SpotSfxList[ i ];
 			// StopSfx will free the source
 			// so we can't leave the old pointer here
-			temp.source = NULL;
+			temp.source = nullptr;
 			StopSfx( SpotSfxList[ i ].uid );
 			SpotSfxList[ i ] = temp;
 		}
@@ -1359,7 +1359,7 @@ void UpdateSfxForBiker( u_int16_t biker )
 			if( SfxFullPath[ i + SFX_BIKER_START ][ j ] )
 			{
 				free( SfxFullPath[ i + SFX_BIKER_START ][ j ] );
-				SfxFullPath[ i + SFX_BIKER_START ][ j ] = NULL;
+				SfxFullPath[ i + SFX_BIKER_START ][ j ] = nullptr;
 			}
 			sound_buffer_delete(i+SFX_BIKER_START);
 		}
@@ -1389,7 +1389,7 @@ void UpdateSfxForBikeComputer( u_int16_t bikecomp )
 			if( SfxFullPath[ i + SFX_BIKECOMP_START ][ j ] )
 			{
 				free( SfxFullPath[ i + SFX_BIKECOMP_START ][ j ] );
-				SfxFullPath[ i + SFX_BIKECOMP_START ][ j ] = NULL;
+				SfxFullPath[ i + SFX_BIKECOMP_START ][ j ] = nullptr;
 			}
 			sound_buffer_delete(i+SFX_BIKECOMP_START);
 		}
@@ -1627,17 +1627,17 @@ bool InitializeSound( int flags )
 
 	// null globals which could have dirty memory
 	for( i = 0; i < MAX_SFX; i++ )
-		sound_buffers[i] = NULL;
+		sound_buffers[i] = nullptr;
 	for( i = 0; i < MAX_ANY_SFX; i++ )
-		SfxHolder[i].source = NULL;
+		SfxHolder[i].source = nullptr;
 	for( i = 0; i < MAX_LOOPING_SFX; i++ )
-		SpotSfxList[i].source = NULL;
+		SpotSfxList[i].source = nullptr;
 
 	// initialise taunt stuff
 	Taunter = 0xFF;
 	TauntID = 0;
 	TauntUpdatable = false;
-	EnemyTaunter = NULL;
+	EnemyTaunter = nullptr;
 
 	InitSfxHolders();
 
@@ -1685,7 +1685,7 @@ void DestroySound( int /*flags*/ )
 		if(SpotSfxList[ i ].source)
 		{
 			sound_release_source((sound_source_t*)SpotSfxList[ i ].source);
-			SpotSfxList[ i ].source = NULL;
+			SpotSfxList[ i ].source = nullptr;
 		}
 		SpotSfxList[i].used = false;
 	}
@@ -1701,7 +1701,7 @@ void DestroySound( int /*flags*/ )
 		if (sound_buffers[i])
 		{
 			sound_release_buffer(sound_buffers[i]);
-			sound_buffers[i] = NULL;
+			sound_buffers[i] = nullptr;
 		}
 	}
 
@@ -1953,7 +1953,7 @@ u_int32_t PlaySfxWithTrigger( int16_t Sfx, int16_t TriggeredSfx )
 	}
 	else
 	{
-		if ( !StartPannedSfx( Sfx, NULL, NULL, 0.0F, SFX_2D, index, 1.0F, 0, false ) )
+		if ( !StartPannedSfx( Sfx, nullptr, nullptr, 0.0F, SFX_2D, index, 1.0F, 0, false ) )
 			FreeSfxHolder( index );
 	}
 
@@ -1984,7 +1984,7 @@ u_int32_t PlaySfx( int16_t Sfx, float Vol )
 	}
 	else
 	{
-		if ( !StartPannedSfx( Sfx, NULL, NULL, 0.0F, SFX_2D, index, Vol, 0, false ) )
+		if ( !StartPannedSfx( Sfx, nullptr, nullptr, 0.0F, SFX_2D, index, Vol, 0, false ) )
 			FreeSfxHolder( index );
 	}
 
@@ -2287,7 +2287,7 @@ int InitLoopingSfx( int16_t Sfx, int variant, u_int16_t *Group, VECTOR *SfxPos, 
 
 	SpotSfxList[ index ].freq = Freq;
 	SpotSfxList[ index ].vol = Volume;
-	SpotSfxList[ index ].source = NULL;
+	SpotSfxList[ index ].source = nullptr;
 	SpotSfxList[ index ].distance = 0.0F;
 	SpotSfxList[ index ].used = true;
 	SpotSfxList[ index ].Effects = Effects;
@@ -2302,7 +2302,7 @@ void StopLoopingSfx( int index )
 	if ( SpotSfxList[ index ].source )
 	{
 		sound_release_source( (sound_source_t*)SpotSfxList[ index ].source );
-		SpotSfxList[ index ].source = NULL;
+		SpotSfxList[ index ].source = nullptr;
 	}
 
 	SpotSfxList[ index ].used = false;
@@ -2414,7 +2414,7 @@ void ProcessLoopingSfx( void )
 			{
 				DebugPrintf("ProcessLoopingSfx: Releasing dynamic looping sfx %d\n", SpotSfxList[ i ].sfxindex);
 				sound_release_source( (sound_source_t*)SpotSfxList[ i ].source );
-				SpotSfxList[ i ].source = NULL;
+				SpotSfxList[ i ].source = nullptr;
 				/* Conditions changed (slot left range with a live source):
 				 * allow an immediate re-attempt on re-entry. */
 				sfx_try_frame[ i ] = 0;
@@ -2642,7 +2642,7 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 		return false;
 	}
 
-	Distance = ReturnDistanceVolumeVector( SfxPos, Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, NULL, &sfxvector );
+	Distance = ReturnDistanceVolumeVector( SfxPos, Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, nullptr, &sfxvector );
 
 	if( Distance < 0.0F )
 	{
@@ -2709,7 +2709,7 @@ void PlayUpdatableBikerTaunt( VECTOR *pos, u_int16_t Group, u_int16_t bike, char
 {
 	float dist;
 
-	dist = ReturnDistanceVolumeVector( pos, Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, NULL, NULL );
+	dist = ReturnDistanceVolumeVector( pos, Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, nullptr, nullptr );
 	if( dist < 0.0F )
 		return;
 

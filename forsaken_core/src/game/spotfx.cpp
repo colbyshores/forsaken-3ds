@@ -48,8 +48,8 @@ constexpr int FX_VERSION_NUMBER = 4;
 	SPOTFX		SpotFX[ MAXSPOTFX ];
 	SPOTFX	*	SpotFXGroups[ MAXGROUPS ];
 	u_int16_t		NumSpotFXPerGroup[ MAXGROUPS ];
-	SPOTFX	*	FirstSpotFXUsed = NULL;
-	SPOTFX	*	FirstSpotFXFree = NULL;
+	SPOTFX	*	FirstSpotFXUsed = nullptr;
+	SPOTFX	*	FirstSpotFXFree = nullptr;
 
 /*===================================================================
 	Procedure	:	Load all SpotFX from the level's .FX file
@@ -86,7 +86,7 @@ bool LoadSpotFX( void )
 
 	fp = file_open( (char*)&Filename[ 0 ], "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -210,7 +210,7 @@ void ProcessSpotFX( void )
 						case SPOTFX_Explosion:
 						case SPOTFX_Shrapnel:
 						case SPOTFX_ElectricBeams:
-							if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, NULL ) )
+							if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, nullptr ) )
 							{
 								switch( SpotFX->Type )
 								{
@@ -261,7 +261,7 @@ void ProcessSpotFX( void )
 						case SPOTFX_Bubbles:
 						case SPOTFX_Drip:
 						default:
-							if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, NULL ) )
+							if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, nullptr ) )
 							{
 								SpotFX->Time += framelag;
 
@@ -559,24 +559,24 @@ void SetupSpotFX( void )
 
 	SetupSpotFXGroups();
 
-	FirstSpotFXUsed = NULL;
+	FirstSpotFXUsed = nullptr;
 	FirstSpotFXFree = &SpotFX[ 0 ];
 
 	for( i = 0; i < MAXSPOTFX; i++ )
 	{
 		memset( &SpotFX[ i ], 0, sizeof( SPOTFX ) );
 
-		SpotFX[ i ].NextUsed = NULL;
-		SpotFX[ i ].PrevUsed = NULL;
+		SpotFX[ i ].NextUsed = nullptr;
+		SpotFX[ i ].PrevUsed = nullptr;
 		SpotFX[ i ].NextFree = &SpotFX[ i + 1 ];
 		SpotFX[ i ].PrevFree = &SpotFX[ i - 1 ];
-		SpotFX[ i ].NextInGroup = NULL;
-		SpotFX[ i ].PrevInGroup = NULL;
+		SpotFX[ i ].NextInGroup = nullptr;
+		SpotFX[ i ].PrevInGroup = nullptr;
 		SpotFX[ i ].Index = i;
 	}
 
-	SpotFX[ 0 ].PrevFree = NULL;
-	SpotFX[ MAXSPOTFX - 1 ].NextFree = NULL;
+	SpotFX[ 0 ].PrevFree = nullptr;
+	SpotFX[ MAXSPOTFX - 1 ].NextFree = nullptr;
 }
 
 /*===================================================================
@@ -672,7 +672,7 @@ SPOTFX * InitOneSpotFX( u_int16_t GenType, float GenDelay, u_int16_t Type, u_int
 		RayVector.z = ( SlideUp.z * MaxColDistance );
 
 		if( BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &RayVector, &Int_Point, &Int_Group,
-								&Int_Normal, &TempVector, false, NULL ) )
+								&Int_Normal, &TempVector, false, nullptr ) )
 		{
 			RayVector.x = ( Int_Point.x - Pos->x );
 			RayVector.y = ( Int_Point.y - Pos->y );
@@ -733,25 +733,25 @@ SPOTFX * FindFreeSpotFX( void )
 
 	Object = FirstSpotFXFree;
 
-	if( Object != NULL )
+	if( Object != nullptr )
 	{
 		FirstSpotFXFree = Object->NextFree;
-		if( FirstSpotFXFree != NULL )
+		if( FirstSpotFXFree != nullptr )
 		{
-			FirstSpotFXFree->PrevFree = NULL;
+			FirstSpotFXFree->PrevFree = nullptr;
 		}
 
-		if( FirstSpotFXUsed != NULL )
+		if( FirstSpotFXUsed != nullptr )
 		{
 			FirstSpotFXUsed->PrevUsed = Object;
 			Object->NextUsed = FirstSpotFXUsed;
 		}
 		else
 		{
-			Object->NextUsed = NULL;
+			Object->NextUsed = nullptr;
 		}
 
-		Object->PrevUsed = NULL;
+		Object->PrevUsed = nullptr;
 		FirstSpotFXUsed = Object;
 	}
 
@@ -1158,7 +1158,7 @@ void CreateSpotFXFirePrimary( VECTOR * Pos, VECTOR * Dir, VECTOR * Up,
 
 	if( Weapon != (u_int8_t) -1 )
 	{
-		EnemyFirePrimary( OWNER_NOBODY, WhoIAm, GlobalSecBullsID++, Weapon, Group, Pos, &TempVector, Dir, Up, 2, 0.0F, false, NULL );
+		EnemyFirePrimary( OWNER_NOBODY, WhoIAm, GlobalSecBullsID++, Weapon, Group, Pos, &TempVector, Dir, Up, 2, 0.0F, false, nullptr );
 	}
 }
 
@@ -2203,7 +2203,7 @@ void SetupSpotFXGroups( void )
 
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
-		SpotFXGroups[ Count ] = NULL;
+		SpotFXGroups[ Count ] = nullptr;
 		NumSpotFXPerGroup[ Count ] = 0;
 	}
 }
@@ -2216,7 +2216,7 @@ void SetupSpotFXGroups( void )
 ===================================================================*/
 void AddSpotFXToGroup( SPOTFX * SpotFX, u_int16_t Group )
 {
-	SpotFX->PrevInGroup = NULL;
+	SpotFX->PrevInGroup = nullptr;
 	SpotFX->NextInGroup = SpotFXGroups[ Group ];
 	if( SpotFX->NextInGroup ) SpotFX->NextInGroup->PrevInGroup = SpotFX;
 	SpotFXGroups[ Group ] = SpotFX;
@@ -2240,14 +2240,14 @@ FILE * SaveAllSpotFX( FILE * fp )
 
 		for( i = 0; i < MAXGROUPS; i++ )
 		{
-			if( SpotFXGroups[ i ] != NULL ) fwrite( &SpotFXGroups[ i ]->Index, sizeof( u_int16_t ), 1, fp );
+			if( SpotFXGroups[ i ] != nullptr ) fwrite( &SpotFXGroups[ i ]->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			fwrite( &NumSpotFXPerGroup[ i ], sizeof( u_int16_t ), 1, fp );
 		}
 
-		if( FirstSpotFXUsed != NULL ) fwrite( &FirstSpotFXUsed->Index, sizeof( u_int16_t ), 1, fp );
+		if( FirstSpotFXUsed != nullptr ) fwrite( &FirstSpotFXUsed->Index, sizeof( u_int16_t ), 1, fp );
 		else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( FirstSpotFXFree != NULL ) fwrite( &FirstSpotFXFree->Index, sizeof( u_int16_t ), 1, fp );
+		if( FirstSpotFXFree != nullptr ) fwrite( &FirstSpotFXFree->Index, sizeof( u_int16_t ), 1, fp );
 		else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 
 		for( i = 0; i < NumSpotFX; i++ )
@@ -2278,17 +2278,17 @@ FILE * SaveAllSpotFX( FILE * fp )
 			fwrite( &SpotFX[ i ].TimeInterval, sizeof( float ), 1, fp );
 			fwrite( &SpotFX[ i ].GenDelay, sizeof( float ), 1, fp );
 			fwrite( &SpotFX[ i ].MaxHeight, sizeof( float ), 1, fp );
-			if( SpotFX[ i ].PrevUsed != NULL ) fwrite( &SpotFX[ i ].PrevUsed->Index, sizeof( u_int16_t ), 1, fp );
+			if( SpotFX[ i ].PrevUsed != nullptr ) fwrite( &SpotFX[ i ].PrevUsed->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( SpotFX[ i ].NextUsed != NULL ) fwrite( &SpotFX[ i ].NextUsed->Index, sizeof( u_int16_t ), 1, fp );
+			if( SpotFX[ i ].NextUsed != nullptr ) fwrite( &SpotFX[ i ].NextUsed->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( SpotFX[ i ].PrevFree != NULL ) fwrite( &SpotFX[ i ].PrevFree->Index, sizeof( u_int16_t ), 1, fp );
+			if( SpotFX[ i ].PrevFree != nullptr ) fwrite( &SpotFX[ i ].PrevFree->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( SpotFX[ i ].NextFree != NULL ) fwrite( &SpotFX[ i ].NextFree->Index, sizeof( u_int16_t ), 1, fp );
+			if( SpotFX[ i ].NextFree != nullptr ) fwrite( &SpotFX[ i ].NextFree->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( SpotFX[ i ].PrevInGroup != NULL ) fwrite( &SpotFX[ i ].PrevInGroup->Index, sizeof( u_int16_t ), 1, fp );
+			if( SpotFX[ i ].PrevInGroup != nullptr ) fwrite( &SpotFX[ i ].PrevInGroup->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( SpotFX[ i ].NextInGroup != NULL ) fwrite( &SpotFX[ i ].NextInGroup->Index, sizeof( u_int16_t ), 1, fp );
+			if( SpotFX[ i ].NextInGroup != nullptr ) fwrite( &SpotFX[ i ].NextInGroup->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		}
 	}
@@ -2315,23 +2315,23 @@ FILE * LoadAllSpotFX( FILE * fp )
 		if( TempNumSpotFX != NumSpotFX )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		for( i = 0; i < MAXGROUPS; i++ )
 		{
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFXGroups[ i ] = &SpotFX[ TempIndex ];
-			else SpotFXGroups[ i ] = NULL;
+			else SpotFXGroups[ i ] = nullptr;
 			fread( &NumSpotFXPerGroup[ i ], sizeof( u_int16_t ), 1, fp );
 		}
 
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstSpotFXUsed = &SpotFX[ TempIndex ];
-		else FirstSpotFXUsed = NULL;
+		else FirstSpotFXUsed = nullptr;
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstSpotFXFree = &SpotFX[ TempIndex ];
-		else FirstSpotFXFree = NULL;
+		else FirstSpotFXFree = nullptr;
 
 		for( i = 0; i < NumSpotFX; i++ )
 		{
@@ -2363,22 +2363,22 @@ FILE * LoadAllSpotFX( FILE * fp )
 			fread( &SpotFX[ i ].MaxHeight, sizeof( float ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevUsed = &SpotFX[ TempIndex ];
-			else SpotFX[ i ].PrevUsed = NULL;
+			else SpotFX[ i ].PrevUsed = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextUsed = &SpotFX[ TempIndex ];
-			else SpotFX[ i ].NextUsed = NULL;
+			else SpotFX[ i ].NextUsed = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevFree = &SpotFX[ TempIndex ];
-			else SpotFX[ i ].PrevFree = NULL;
+			else SpotFX[ i ].PrevFree = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextFree = &SpotFX[ TempIndex ];
-			else SpotFX[ i ].NextFree = NULL;
+			else SpotFX[ i ].NextFree = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].PrevInGroup = &SpotFX[ TempIndex ];
-			else SpotFX[ i ].PrevInGroup = NULL;
+			else SpotFX[ i ].PrevInGroup = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SpotFX[ i ].NextInGroup = &SpotFX[ TempIndex ];
-			else SpotFX[ i ].NextInGroup = NULL;
+			else SpotFX[ i ].NextInGroup = nullptr;
 		}
 	}
 

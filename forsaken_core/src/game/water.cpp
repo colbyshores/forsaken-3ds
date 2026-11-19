@@ -41,9 +41,9 @@ float WATER_CELLSIZE = 64.0F;
 
 u_int16_t	NumOfWaterObjects = 0;
 u_int16_t	WaterTPage = 0;
-WATEROBJECT	* FirstWaterObject = NULL;
-char	* WaterBuffer = NULL;
-char	* OrgWaterBuffer = NULL;
+WATEROBJECT	* FirstWaterObject = nullptr;
+char	* WaterBuffer = nullptr;
+char	* OrgWaterBuffer = nullptr;
 u_int16_t	GroupWaterInfo[MAXGROUPS];
 
 float	GroupDamageInfo[MAXGROUPS];
@@ -85,12 +85,12 @@ bool PreWaterLoad( char * Filename )
 	{
 		GroupDamageInfo[i] = 0.0F;
 		GroupWaterInfo[i] = WATERSTATE_NOWATER;
-		WaterObjectLink[i] = NULL;
+		WaterObjectLink[i] = nullptr;
 	}
 
 	NumOfWaterObjects = 0;
-	FirstWaterObject = NULL;
-	WaterBuffer = NULL;
+	FirstWaterObject = nullptr;
+	WaterBuffer = nullptr;
 
 	File_Size = Get_File_Size( Filename );
 
@@ -153,7 +153,7 @@ bool WaterLoad( void )
 	u_int16_t NumOfGroups = 0;
 	COLOR col;
 
-	FirstWaterObject = NULL;
+	FirstWaterObject = nullptr;
 	Buffer = WaterBuffer;
 	OrgBuffer = OrgWaterBuffer;
 
@@ -290,7 +290,7 @@ load_fail:
 	 * was the first level in the autotest sweep to expose this gap. */
 	if (FirstWaterObject) {
 		free(FirstWaterObject);
-		FirstWaterObject = NULL;
+		FirstWaterObject = nullptr;
 	}
 	NumOfWaterObjects = 0;
 	free(OrgBuffer);
@@ -323,7 +323,7 @@ void WaterRelease( void )
 	if( FirstWaterObject )
 	{
 		free(FirstWaterObject);
-		FirstWaterObject = NULL;
+		FirstWaterObject = nullptr;
 	}
 	NumOfWaterObjects = 0;
 }
@@ -337,7 +337,7 @@ void AddWaterLink(WATEROBJECT * WO)
 	if( !WaterObjectLink[WO->Group] )
 	{
 		WaterObjectLink[WO->Group] = WO;
-		WO->GroupLink = NULL;
+		WO->GroupLink = nullptr;
 	}else{
 		WO->GroupLink = WaterObjectLink[WO->Group];
 		WaterObjectLink[WO->Group] = WO;
@@ -352,9 +352,9 @@ void AddWaterLink(WATEROBJECT * WO)
 bool InitWaterObject(WATEROBJECT * WO)
 {
 	int x,y;
-	TRIANGLE	*FacePnt = NULL;
-	LVERTEX	*LVert = NULL;
-	WORD			*Indices = NULL;
+	TRIANGLE	*FacePnt = nullptr;
+	LVERTEX	*LVert = nullptr;
+	WORD			*Indices = nullptr;
 	int			i;
 	int ntris = 0;
 	int vertsCount = 0;

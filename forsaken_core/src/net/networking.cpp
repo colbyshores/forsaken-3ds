@@ -134,7 +134,7 @@ BYTE					GameStatus[MAX_PLAYERS + 1];	// Game Status for every Ship...
 BYTE					OldGameStatus[MAX_PLAYERS + 1];	// Game Status for every Ship...
 int16_t					Lives = 3;
 
-network_player_t * host_network_player = NULL;
+network_player_t * host_network_player = nullptr;
 
 void CreateReGen( u_int16_t ship );
 
@@ -694,7 +694,7 @@ void	CreateShockwaveSend( u_int16_t /*OwnerShip*/, u_int16_t Owner, VECTOR * Pos
 		if((GameStatus[ i ] ==  STATUS_Normal) && (i != WhoIAm))
 		{
 			// if they are close to me
-			dist = ReturnDistanceVolumeVector( &Ships[ i ].Object.Pos, Ships[ i ].Object.Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, NULL, NULL );
+			dist = ReturnDistanceVolumeVector( &Ships[ i ].Object.Pos, Ships[ i ].Object.Group, &Ships[ Current_Camera_View ].Object.Pos, Ships[ Current_Camera_View ].Object.Group, nullptr, nullptr );
 			if( (dist >= 0.0F) && ( dist <= 500.0F ))
 			{
 				// send them shockwave
@@ -751,7 +751,7 @@ void SetupNetworkGame()
 {
 	int16_t i,Count;
 
-	host_network_player = NULL;
+	host_network_player = nullptr;
 
 	for( i = 0 ; i < 256 ; i++ )
 	{
@@ -907,7 +907,7 @@ void InitShipStructure( int i , bool ResetScore )
 
 	for( Count = 0; Count < 12; Count++ ) Ships[i].TempLines[ Count ] = INDEX_NONE;
 
-	Ships[i].network_player = NULL;
+	Ships[i].network_player = nullptr;
 }
 
 void DestroyGame( void )
@@ -951,7 +951,7 @@ void initShip( u_int16_t i )
 	int16_t	Count;
 
 	Ships[i].Object.NodeNetwork = 0;
-	Ships[i].Object.NearestNode = NULL;
+	Ships[i].Object.NearestNode = nullptr;
 	Ships[i].Object.Type = OBJECT_TYPE_SHIP;
 
 	Ships[i].enable = 1;
@@ -985,7 +985,7 @@ void smallinitShip( u_int16_t i )
 	int16_t	Count;
 
 	Ships[i].Object.NodeNetwork = 0;
-	Ships[i].Object.NearestNode = NULL;
+	Ships[i].Object.NearestNode = nullptr;
 	Ships[i].Object.Type = OBJECT_TYPE_SHIP;
 
 	Ships[i].enable = 1;
@@ -1048,7 +1048,7 @@ void network_event_player_left( network_player_t * player )
 	int i;
 
 	// we have left the game
-	if( player == NULL )
+	if( player == nullptr )
 	{
 		if( MyGameStatus == STATUS_Normal )
 			AddColourMessageToQue(SystemMessageColour, "You have left the game!" );
@@ -1095,12 +1095,12 @@ void network_event_new_host( network_player_t * player )
 	host_network_player = player;
 
 	// we have become the host
-	if( player == NULL)
+	if( player == nullptr)
 	{
 		switch ( MyGameStatus )
 		{
 		case STATUS_StartingMultiplayer:
-			if ( TeamGame )	PrintErrorMessage ( YOU_HAVE_BECOME_THE_HOST , 0, NULL, ERROR_DONTUSE_MENUFUNCS );
+			if ( TeamGame )	PrintErrorMessage ( YOU_HAVE_BECOME_THE_HOST , 0, nullptr, ERROR_DONTUSE_MENUFUNCS );
 			else			PrintErrorMessage ( YOU_HAVE_BECOME_THE_HOST , 1, &MENU_NEW_HostWaitingToStart, ERROR_DONTUSE_MENUFUNCS );
 			break;
 		default:
@@ -1139,7 +1139,7 @@ void network_event_player_joined( network_player_t * player )
 	DebugPrintf("network_event_player_joined\n");
 
 	// we have joined the game
-	if( player == NULL )
+	if( player == nullptr )
 	{
 		DebugPrintf("We have joined the game...\n");
 
@@ -1397,7 +1397,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	case MSG_SHORTREGENSLOT:
 	case MSG_LONGSTATUS:
 
-		if(IsHost || (host_network_player != NULL && host_network_player != from))
+		if(IsHost || (host_network_player != nullptr && host_network_player != from))
 		{
 			DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) because only the host ",
 				from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt);

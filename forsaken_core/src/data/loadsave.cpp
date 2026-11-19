@@ -146,7 +146,7 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 
 	fp = file_open( SaveGameFileName( LoadSavedGameList.selected_item ), "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -198,7 +198,7 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 
 	fp = file_open( SaveGameFileName( LoadSavedGameList.selected_item ), "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -458,7 +458,7 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 	strcpy( strrchr( (char*)TmpFilename, '.' ), ".TMP" );
 	out = fp = file_open( (char*)&TmpFilename[ 0 ], "wb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fwrite( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fwrite( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -564,7 +564,7 @@ char *SavedGameInfo( int slot )
 
 	fp = file_open( SaveGameFileName( slot ), "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );

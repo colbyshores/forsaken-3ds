@@ -96,10 +96,10 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	u_int16_t			num_vertices = 0;		// overall number of verts
 	u_int16_t			num_texture_groups = 0; // number of triangle groups
 	u_int16_t			num_triangles = 0;		// number of triangles in group
-	LVERTEX	*LVert = NULL;
-	LVERTEX	*BufStart = NULL;
-	WORD			*Indices = NULL;
-	NORMAL		*Normals = NULL;
+	LVERTEX	*LVert = nullptr;
+	LVERTEX	*BufStart = nullptr;
+	WORD			*Indices = nullptr;
+	NORMAL		*Normals = nullptr;
 	int				ibIndex = 0;
 	int				i,e,o;
 	u_int16_t			tpage = 0;
@@ -144,14 +144,14 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		// clear out the 3d Panel PolyAnim Data....
 		for( i = 0 ; i < NUMOFPOLYSPER3DPANELITEM ; i++ )
 		{
-			Panel3DPolyAnims_Primary[i]=NULL;
-			Panel3DPolyAnims_Secondary[i]=NULL;
-			Panel3DPolyAnims_Mine[i]=NULL;
-			Panel3DPolyAnims_MineNum[i]=NULL;
+			Panel3DPolyAnims_Primary[i]=nullptr;
+			Panel3DPolyAnims_Secondary[i]=nullptr;
+			Panel3DPolyAnims_Mine[i]=nullptr;
+			Panel3DPolyAnims_MineNum[i]=nullptr;
 		}
 	}
 
-	if( Mxloadheader->Buffer == NULL)
+	if( Mxloadheader->Buffer == nullptr)
 	{
 		Msg( "Mxload() Buffer was not allocated in %s\n", Filename );
 		return false;
@@ -365,7 +365,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 
 				if( Mxloadheader->num_texture_files == 0 )
 				{
-					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = NULL;
+					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = nullptr;
 					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = false;
 				}
 				else
@@ -393,7 +393,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			else
 			{
 				Mxloadheader->Group[group].num_polys_per_mesh[mesh] = 0;
-				Mxloadheader->Group[group].poly_ptr[mesh] = NULL;
+				Mxloadheader->Group[group].poly_ptr[mesh] = nullptr;
 			}
 
 			/*	unlock the vertex buffer	*/
@@ -484,8 +484,8 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 						PolyAnim->frames	=frames;
 						PolyAnim->vertices	=vertices;
 
-						PolyAnim->vert = NULL;
-						PolyAnim->UVs = NULL;
+						PolyAnim->vert = nullptr;
+						PolyAnim->UVs = nullptr;
 
 						PolyAnim->vert = (int *) malloc( vertices * sizeof(int) );
 						if( !PolyAnim->vert)
@@ -566,7 +566,7 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		}
 		else
 		{
-			Mxloadheader->FirePoints = NULL;
+			Mxloadheader->FirePoints = nullptr;
 			Mxloadheader->NumFirePoints = 0;
 		}
 
@@ -627,22 +627,22 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		}
 		else
 		{
-			Mxloadheader->SpotFX = NULL;
+			Mxloadheader->SpotFX = nullptr;
 			Mxloadheader->NumSpotFX = 0;
 		}
 	}
 	else
 	{
 		Mxloadheader->NumFirePoints = 0;
-		Mxloadheader->FirePoints = NULL;
+		Mxloadheader->FirePoints = nullptr;
 		Mxloadheader->NumSpotFX = 0;
-		Mxloadheader->SpotFX = NULL;
+		Mxloadheader->SpotFX = nullptr;
 	}
 
 	/* Everything the model keeps has been copied out of the file. */
 	free( Mxloadheader->OrgAddr );
-	Mxloadheader->OrgAddr = NULL;
-	Mxloadheader->Buffer = NULL;
+	Mxloadheader->OrgAddr = nullptr;
+	Mxloadheader->Buffer = nullptr;
 
 	if ( colourkey )
 		DebugPrintf( "Mxload: %d colourkey triangles found\n", colourkey );
@@ -663,8 +663,8 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 	int		group;
 	RENDERMATRIX Matrix;
 	bool	Display;
-	LVERTEX	*VertBase = NULL;
-	LVERTEX	*LVert = NULL;
+	LVERTEX	*VertBase = nullptr;
+	LVERTEX	*LVert = nullptr;
 	POLYANIM * PolyAnim;
 	u_int32_t * u_int32Pnt;
 	TANIMUV * TanimUV;
@@ -851,7 +851,7 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 			if (Mxloadheader->Group[group].poly_ptr[i])
 			{
 				free(Mxloadheader->Group[group].poly_ptr[i]);
-				Mxloadheader->Group[group].poly_ptr[i] = NULL;
+				Mxloadheader->Group[group].poly_ptr[i] = nullptr;
 			}
 
 			/* Per-mesh vertex copy from mxload.cpp — same leak
@@ -859,7 +859,7 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 			if (Mxloadheader->Group[group].originalVerts[i])
 			{
 				free(Mxloadheader->Group[group].originalVerts[i]);
-				Mxloadheader->Group[group].originalVerts[i] = NULL;
+				Mxloadheader->Group[group].originalVerts[i] = nullptr;
 			}
 
 			PolyAnim = Mxloadheader->Group[group].polyanim[i];
@@ -874,18 +874,18 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 						if( PolyAnim->vert )
 						{
 							free( PolyAnim->vert );
-							PolyAnim->vert = NULL;
+							PolyAnim->vert = nullptr;
 						}
 						if( PolyAnim->UVs )
 						{
 							free( PolyAnim->UVs );
-							PolyAnim->UVs = NULL;
+							PolyAnim->UVs = nullptr;
 						}
 					}
 					PolyAnim++;
 				}
 				free(Mxloadheader->Group[group].polyanim[i]);
-				Mxloadheader->Group[group].polyanim[i] = NULL;
+				Mxloadheader->Group[group].polyanim[i] = nullptr;
 			}
 		}
 	}
@@ -893,27 +893,27 @@ ReleaseMxloadheader( MXLOADHEADER * Mxloadheader )
 	for( i = 0 ; i < Mxloadheader->AnimData.num_animations ; i++ )
 	{
 		free(Mxloadheader->AnimData.AnimSeq[i]);
-		Mxloadheader->AnimData.AnimSeq[i] = NULL;
+		Mxloadheader->AnimData.AnimSeq[i] = nullptr;
 	}
 
 	if( Mxloadheader->SpotFX && Mxloadheader->NumSpotFX )
 	{
 		free( Mxloadheader->SpotFX );
-		Mxloadheader->SpotFX = NULL;
+		Mxloadheader->SpotFX = nullptr;
 		Mxloadheader->NumSpotFX = 0;
 	}
 
 	if( Mxloadheader->FirePoints && Mxloadheader->NumFirePoints )
 	{
 		free( Mxloadheader->FirePoints );
-		Mxloadheader->FirePoints = NULL;
+		Mxloadheader->FirePoints = nullptr;
 		Mxloadheader->NumFirePoints = 0;
 	}
 
 	if ( Mxloadheader->OrgAddr )
 	{
 		free( Mxloadheader->OrgAddr );
-		Mxloadheader->OrgAddr = NULL;
+		Mxloadheader->OrgAddr = nullptr;
 	}
 
 	Mxloadheader->state = false;
@@ -936,7 +936,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 
 	// Mxloadheader is not valid until everything has been done..
 	Mxloadheader->state = false;
-	Mxloadheader->Buffer = NULL;
+	Mxloadheader->Buffer = nullptr;
 
 
 	if( Panel == true )
@@ -958,7 +958,7 @@ bool PreMxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool 
 
 	Buffer = (char*)calloc( 1, File_Size + 32 );
 
-	if( Buffer == NULL )
+	if( Buffer == nullptr )
 	{
 		Msg( "PreMxload() Allocate buffer for %s failed\n", Filename );
 		return( false );
@@ -1117,7 +1117,7 @@ bool RestoreColourMxloadHeader( MXLOADHEADER * Mxloadheader1 )
 {
 	int		i,e;
 	int		group;
-	LVERTEX	*dstVert = NULL;
+	LVERTEX	*dstVert = nullptr;
 	LVERTEX			*VertPtr;
 
 	if( !Mxloadheader1->state )
@@ -1161,7 +1161,7 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim )
 	{
 		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
 		{
-			if( Panel3DPolyAnims_Primary[j] == NULL )
+			if( Panel3DPolyAnims_Primary[j] == nullptr )
 				Panel3DPolyAnims_Primary[j] = PolyAnim;
 		}
 	}
@@ -1169,7 +1169,7 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim )
 	{
 		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
 		{
-			if( Panel3DPolyAnims_Secondary[j] == NULL )
+			if( Panel3DPolyAnims_Secondary[j] == nullptr )
 				Panel3DPolyAnims_Secondary[j] = PolyAnim;
 		}
 	}
@@ -1177,7 +1177,7 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim )
 	{
 		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
 		{
-			if( Panel3DPolyAnims_Mine[j] == NULL )
+			if( Panel3DPolyAnims_Mine[j] == nullptr )
 				Panel3DPolyAnims_Mine[j] = PolyAnim;
 		}
 
@@ -1186,7 +1186,7 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim )
 	{
 		for( j = 0 ; j < NUMOFPOLYSPER3DPANELITEM ; j++ )
 		{
-			if( Panel3DPolyAnims_MineNum[j] == NULL )
+			if( Panel3DPolyAnims_MineNum[j] == nullptr )
 				Panel3DPolyAnims_MineNum[j] = PolyAnim;
 		}
 	}

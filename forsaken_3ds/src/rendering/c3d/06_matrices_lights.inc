@@ -252,7 +252,7 @@ void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 	ab = ab / 255.0f; if (ab < kFloor) ab = kFloor; if (ab > 1.0f) ab = 1.0f;
 
 	/* Find nearest XLight whose radius covers this object position. */
-	struct XLIGHT *nearest = NULL;
+	struct XLIGHT *nearest = nullptr;
 	float          nearest_d2 = 0.0f;
 	for (struct XLIGHT *L = FirstLightVisible; L; L = ((XLIGHT*)L)->NextVisible) {
 		float dx = ((XLIGHT*)L)->Pos.x - world_pos->x;

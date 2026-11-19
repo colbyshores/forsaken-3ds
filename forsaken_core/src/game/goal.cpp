@@ -38,7 +38,7 @@ void ShowGoal( GOAL * Goal, u_int8_t Red, u_int8_t Green, u_int8_t Blue, u_int8_
 
 // globals
 int NumGoals = 0;
-GOAL *Goal = NULL;
+GOAL *Goal = nullptr;
 int TeamFlag[ MAX_TEAMS ];
 int GoalTeamMembers[ MAX_TEAMS ];
 int LastTeamMembers[ MAX_TEAMS ];
@@ -71,7 +71,7 @@ bool GoalLoad( void )
 	Buffer = (char*)malloc( File_Size );
 	OrgBuffer = Buffer;
 
-	if( Buffer == NULL ) return false;
+	if( Buffer == nullptr ) return false;
 
 	Read_Size = Read_File( (char*)Filename, Buffer, File_Size );
 
@@ -117,13 +117,13 @@ bool GoalLoad( void )
 			if ( GoalPnt->num_sides )
 				GoalPnt->Zone = (TRIGGER_ZONE*) malloc( GoalPnt->num_sides * sizeof( TRIGGER_ZONE ) );
 			else
-				GoalPnt->Zone = NULL;
+				GoalPnt->Zone = nullptr;
 			ZonePnt = GoalPnt->Zone;
 			if ( !ZonePnt )
 			{
 				NumGoals = 0;
 				free( Goal );
-				Goal = NULL;
+				Goal = nullptr;
 				return false;
 			}
 
@@ -166,12 +166,12 @@ void ReleaseGoal( void )
 		if ( Goal[ j ].Zone )
 		{
 			free( Goal[ j ].Zone );
-			Goal[ j ].Zone = NULL;
+			Goal[ j ].Zone = nullptr;
 			Goal[ j ].num_sides = 0;
 		}
 	}
 	free( Goal );
-	Goal = NULL;
+	Goal = nullptr;
 	NumGoals = 0;
 }
 
@@ -212,7 +212,7 @@ GOAL *TeamGoal( int team )
 			return &Goal[ j ];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 

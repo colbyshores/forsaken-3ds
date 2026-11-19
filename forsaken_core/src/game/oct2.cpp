@@ -874,7 +874,7 @@ bool InitLevels( const char * levels_list )
 	}
 
 	// Read TXT in of default level
-	LoadLevelText( NULL );
+	LoadLevelText( nullptr );
 
 	// success !
 	return true;
@@ -1267,18 +1267,18 @@ ReleaseScene(void)
 {
 	int16_t Count;
 
-	if( RegenPoints != NULL )
+	if( RegenPoints != nullptr )
 	{
 		free( RegenPoints );
-		RegenPoints = NULL;
+		RegenPoints = nullptr;
 		NumRegenPoints = 0;
 
 		for( Count = 0; Count < MAX_PLAYERS; Count++ )
 		{
-			if( RegenSlotsCopy[ Count ] != NULL )
+			if( RegenSlotsCopy[ Count ] != nullptr )
 			{
 				free( RegenSlotsCopy[ Count ] );
-				RegenSlotsCopy[ Count ] = NULL;
+				RegenSlotsCopy[ Count ] = nullptr;
 			}
 		}
 	}
@@ -1346,12 +1346,12 @@ void ReleaseView(void)
 		if ( MCloadheader.Buffer )
 		{
 			free( MCloadheader.Buffer );
-			MCloadheader.Buffer = NULL;
+			MCloadheader.Buffer = nullptr;
 		}
 		if ( MCloadheadert0.Buffer )
 		{
 			free( MCloadheadert0.Buffer );
-			MCloadheadert0.Buffer = NULL;
+			MCloadheadert0.Buffer = nullptr;
 		}
 		Free_All_Off_Files( &OffsetFiles[ 0 ] );
 		ReleaseSkinExecs();
@@ -1640,7 +1640,7 @@ bool ChangeLevel( void )
 	// $$$
 	NextworkOldBikeNum = -1;
 
-	ActiveRemoteCamera = NULL;
+	ActiveRemoteCamera = nullptr;
 	MissileCameraActive = 0;
 	CameraMissile = INDEX_NONE;
 
@@ -1726,7 +1726,7 @@ bool RenderScene( void )
 		if ( !WaitFrames )
 		{
 			WaitFrames = 2;
-			StartASinglePlayerGame( NULL );
+			StartASinglePlayerGame( nullptr );
 		}
 
 		break;
@@ -1768,13 +1768,13 @@ bool RenderScene( void )
 			SeriousError = true;
 			return false;
 		}
-		if ( VduFinished( NULL ) )
+		if ( VduFinished( nullptr ) )
 			WaitFrames--;
 		if ( !WaitFrames )
 		{
 			WaitFrames = 2;
 			MyGameStatus = STATUS_StartingMultiplayer;
-			GoToSynchup( NULL );
+			GoToSynchup( nullptr );
 		}
 		break;
 
@@ -1795,7 +1795,7 @@ bool RenderScene( void )
 			SeriousError = true;
 			return false;
 		}
-		if ( VduFinished( NULL ) )
+		if ( VduFinished( nullptr ) )
 			WaitFrames--;
 		if ( !WaitFrames )
 		{
@@ -1830,7 +1830,7 @@ bool RenderScene( void )
 			return false;
 		}
 
-		if ( VduFinished( NULL ) )
+		if ( VduFinished( nullptr ) )
 			WaitFrames--;
 		if ( !WaitFrames )
 		{
@@ -1921,7 +1921,7 @@ bool RenderScene( void )
 		{
 			clear_black();
 			CenterPrint4x5Text( PLEASE_WAIT, (render_info.window_size.cy>>1)-(FontHeight>>1) , 2 );
-			SelectQuitCurrentGame( NULL );
+			SelectQuitCurrentGame( nullptr );
 		}
 		break;
 
@@ -2456,23 +2456,23 @@ bool RenderScene( void )
 				switch(WhoIAm)
 				{
 				case MAX_PLAYERS:
-					PrintErrorMessage ( "The Game is Currently Un-Joinable", 3, NULL, ERROR_USE_MENUFUNCS );
+					PrintErrorMessage ( "The Game is Currently Un-Joinable", 3, nullptr, ERROR_USE_MENUFUNCS );
 					MyGameStatus = STATUS_Title;
 					break;
 				case MAX_PLAYERS+1:
-					PrintErrorMessage ( "You Dont have the level they are playing", 3, NULL, ERROR_USE_MENUFUNCS );
+					PrintErrorMessage ( "You Dont have the level they are playing", 3, nullptr, ERROR_USE_MENUFUNCS );
 					MyGameStatus = STATUS_Title;
 					break;
 				case MAX_PLAYERS+2:
-					PrintErrorMessage ( "The Game is Full", 3, NULL, ERROR_USE_MENUFUNCS );
+					PrintErrorMessage ( "The Game is Full", 3, nullptr, ERROR_USE_MENUFUNCS );
 					MyGameStatus = STATUS_Title;
 					break;
 				case MAX_PLAYERS+3:
-					PrintErrorMessage ( "You do have the right version", 3, NULL, ERROR_USE_MENUFUNCS );
+					PrintErrorMessage ( "You do have the right version", 3, nullptr, ERROR_USE_MENUFUNCS );
 					MyGameStatus = STATUS_Title;
 					break;
 				default:
-					PrintErrorMessage ( "Could not join game host gave no reason why", 3, NULL, ERROR_USE_MENUFUNCS );
+					PrintErrorMessage ( "Could not join game host gave no reason why", 3, nullptr, ERROR_USE_MENUFUNCS );
 					MyGameStatus = STATUS_Title;
 				}
 				break; // we are done
@@ -2488,7 +2488,7 @@ bool RenderScene( void )
 		if( GetPlayerNumCount2 <= 0.0F )
 		{
 			// Time is Up No Player Number was got so quit back to the title screen...
-			PrintErrorMessage ( "Couldnt Get a Player Number", 3, NULL, ERROR_USE_MENUFUNCS );
+			PrintErrorMessage ( "Couldnt Get a Player Number", 3, nullptr, ERROR_USE_MENUFUNCS );
 			MyGameStatus = STATUS_Title;
 			break;
 		}
@@ -2987,13 +2987,13 @@ bool RenderScene( void )
 		DebugState("STATUS_TitleLoadGamePostStartingSinglePlayer\n");
 
 		smallinitShip( WhoIAm );
-		if( !InGameLoad( NULL ) )
+		if( !InGameLoad( nullptr ) )
 		{
 			/* The save is truncated or damaged, and part of it may already
 			   be applied over the level. Start its level again from the
 			   beginning instead; STATUS_PostStartingSinglePlayer says why. */
 			SavedGameDamaged = true;
-			StartASinglePlayerGame( NULL );
+			StartASinglePlayerGame( nullptr );
 			break;
 		}
 
@@ -3849,7 +3849,7 @@ void DisplayNetworkInfo()
 
 		left_offset += ( 8 * FontWidth );
 
-		if( Ships[ShipID].network_player != NULL )
+		if( Ships[ShipID].network_player != nullptr )
 		{
 			sprintf( (char*) &buf[0] ,"IP: %s PORT: %d",
 				Ships[ShipID].network_player->ip,
@@ -4020,14 +4020,14 @@ void ShowGameStats()
 
 			// NOT team game
 			if(!TeamGame)
-				names[0] = NULL;
+				names[0] = nullptr;
 
 			// start at left
 			xpos = left_offset;
 
 			// print the names
 			for( col = 0; col < columns; col++ )
-				if( names[col] != NULL )
+				if( names[col] != nullptr )
 					Print4x5Text( names[col], (xpos+=col_width), top_offset, colors[col] );
 
 		}

@@ -100,7 +100,7 @@ void AI_AIR_KILLMINE( ENEMY * Enemy )
 
 			EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 				Enemy->Object.Group, &Enemy->Object.Pos, &TempOffset, &TempVector, &TempUpVector,
-				EnemyTypes[Enemy->Type].PowerLevel, 0.0F, false, NULL );
+				EnemyTypes[Enemy->Type].PowerLevel, 0.0F, false, nullptr );
 		}
 	}
 	Enemy->AI_Angle = AimData.Angle;

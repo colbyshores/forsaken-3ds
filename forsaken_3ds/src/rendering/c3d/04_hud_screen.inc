@@ -88,7 +88,7 @@ void c3d_clear_bottom_screen(void)
 		C3D_FrameEnd(0);
 	}
 
-	s_targetCurrent = NULL;
+	s_targetCurrent = nullptr;
 	s_hudDrawnThisFrame = false;
 }
 
@@ -125,7 +125,7 @@ void c3d_hud_end_bottom(void)
 		return;
 	C3D_FrameDrawOn(s_targetSaved);
 	s_targetCurrent = s_targetSaved;
-	s_targetSaved = NULL;
+	s_targetSaved = nullptr;
 
 	/* Restore saved dimensions. */
 	render_info.ThisMode.w     = s_hudSavedThisModeW;

@@ -37,53 +37,53 @@ int8_t		TitleFontFile[ 16 ];
 float VduScaleX, VduScaleY;
 
 
-	FRAME_INFO	*	Arc_Header = NULL;
-	FRAME_INFO	*	Bits_Header = NULL;
-	FRAME_INFO	*	Exp2_Header = NULL;
-	FRAME_INFO	*	Flare_Header = NULL;
-	FRAME_INFO	*	Laser_Header = NULL;
-	FRAME_INFO	*	Pulsar_Header = NULL;
-	FRAME_INFO	*	Pulsar_Exp_Header = NULL;
-	FRAME_INFO	*	Pulsar_Trail_Header = NULL;
-	FRAME_INFO	*	Shrapnel_Header = NULL;
-	FRAME_INFO	*	Exp_Header = NULL;
-	FRAME_INFO	*	Trojax1_Header = NULL;
-	FRAME_INFO	*	Trojax2_Header = NULL;
-	FRAME_INFO	*	Trojax_Exp_Header = NULL;
-	FRAME_INFO	*	Circle_Header = NULL;
-	FRAME_INFO	*	Blood_Header = NULL;
-	FRAME_INFO	*	LensFlare_Header = NULL;
-	FRAME_INFO	*	AfterBurner_Header = NULL;
-	FRAME_INFO	*	GravgonTrail_Header = NULL;
-	FRAME_INFO	*	SolarisTrail_Header = NULL;
-	FRAME_INFO	*	NewTrail_Header = NULL;
-	FRAME_INFO	*	PickupRegen_Header = NULL;
-	FRAME_INFO	*	ScatterTrail_Header = NULL;
-	FRAME_INFO	*	GreyFlare_Header = NULL;
-	FRAME_INFO	*	BigFlash_Header = NULL;
-	FRAME_INFO	*	BloodSplat_Header = NULL;
-	FRAME_INFO	*	BloodDribble_Header = NULL;
-	FRAME_INFO	*	Target_Header = NULL;
-	FRAME_INFO	*	Numbers_Header = NULL;
-	FRAME_INFO	*	Numbers2_Header = NULL;
-	FRAME_INFO	*	Text512_Header = NULL;
-	FRAME_INFO  * Text512b_Header = NULL;
-	FRAME_INFO	*	Orb_Header = NULL;
-	FRAME_INFO	*	Multiple_Header = NULL;
-	FRAME_INFO	*	Solid_Header = NULL;
-	FRAME_INFO	*	Thermo_Header = NULL;
-	FRAME_INFO	*	NMEBullet_Header = NULL;
-	FRAME_INFO	*	BigExp1_Header = NULL;
-	FRAME_INFO	*	Mushroom_Header = NULL;
-	FRAME_INFO	*	Bubble_Header = NULL;
-	FRAME_INFO	*	EnemyGen_Header = NULL;
-	FRAME_INFO	*	Drip_Header = NULL;
-	FRAME_INFO	*	Restart_Header = NULL;
-	FRAME_INFO	*	BlueSpark_Header = NULL;
-	FRAME_INFO	*	Tentacle_Header = NULL;
-	FRAME_INFO	*	Flag_Header = NULL;
-	FRAME_INFO	*	Flags_Header = NULL;
-	FRAME_INFO	*	CreditsFont_Header = NULL;
+	FRAME_INFO	*	Arc_Header = nullptr;
+	FRAME_INFO	*	Bits_Header = nullptr;
+	FRAME_INFO	*	Exp2_Header = nullptr;
+	FRAME_INFO	*	Flare_Header = nullptr;
+	FRAME_INFO	*	Laser_Header = nullptr;
+	FRAME_INFO	*	Pulsar_Header = nullptr;
+	FRAME_INFO	*	Pulsar_Exp_Header = nullptr;
+	FRAME_INFO	*	Pulsar_Trail_Header = nullptr;
+	FRAME_INFO	*	Shrapnel_Header = nullptr;
+	FRAME_INFO	*	Exp_Header = nullptr;
+	FRAME_INFO	*	Trojax1_Header = nullptr;
+	FRAME_INFO	*	Trojax2_Header = nullptr;
+	FRAME_INFO	*	Trojax_Exp_Header = nullptr;
+	FRAME_INFO	*	Circle_Header = nullptr;
+	FRAME_INFO	*	Blood_Header = nullptr;
+	FRAME_INFO	*	LensFlare_Header = nullptr;
+	FRAME_INFO	*	AfterBurner_Header = nullptr;
+	FRAME_INFO	*	GravgonTrail_Header = nullptr;
+	FRAME_INFO	*	SolarisTrail_Header = nullptr;
+	FRAME_INFO	*	NewTrail_Header = nullptr;
+	FRAME_INFO	*	PickupRegen_Header = nullptr;
+	FRAME_INFO	*	ScatterTrail_Header = nullptr;
+	FRAME_INFO	*	GreyFlare_Header = nullptr;
+	FRAME_INFO	*	BigFlash_Header = nullptr;
+	FRAME_INFO	*	BloodSplat_Header = nullptr;
+	FRAME_INFO	*	BloodDribble_Header = nullptr;
+	FRAME_INFO	*	Target_Header = nullptr;
+	FRAME_INFO	*	Numbers_Header = nullptr;
+	FRAME_INFO	*	Numbers2_Header = nullptr;
+	FRAME_INFO	*	Text512_Header = nullptr;
+	FRAME_INFO  * Text512b_Header = nullptr;
+	FRAME_INFO	*	Orb_Header = nullptr;
+	FRAME_INFO	*	Multiple_Header = nullptr;
+	FRAME_INFO	*	Solid_Header = nullptr;
+	FRAME_INFO	*	Thermo_Header = nullptr;
+	FRAME_INFO	*	NMEBullet_Header = nullptr;
+	FRAME_INFO	*	BigExp1_Header = nullptr;
+	FRAME_INFO	*	Mushroom_Header = nullptr;
+	FRAME_INFO	*	Bubble_Header = nullptr;
+	FRAME_INFO	*	EnemyGen_Header = nullptr;
+	FRAME_INFO	*	Drip_Header = nullptr;
+	FRAME_INFO	*	Restart_Header = nullptr;
+	FRAME_INFO	*	BlueSpark_Header = nullptr;
+	FRAME_INFO	*	Tentacle_Header = nullptr;
+	FRAME_INFO	*	Flag_Header = nullptr;
+	FRAME_INFO	*	Flags_Header = nullptr;
+	FRAME_INFO	*	CreditsFont_Header = nullptr;
 
 OFF_FILES OffsetFiles[] = {
 
@@ -134,7 +134,7 @@ OFF_FILES OffsetFiles[] = {
 	{ (int8_t*)"Flags.off",		&Flags_Header,			DONT_LOAD,	LOAD_TPAGES, 0, 0 },	// Flags
 	{ &FontFile[ 0 ],	&Text512_Header,		DO_LOAD,	LOAD_TPAGES, 0, 0 },	// 512x284 Font/Text
 	{ &FontFileBig[0], &Text512b_Header, DONT_LOAD, LOAD_TPAGES, 0, 0 }, // bigger Font/text
-	{ NULL,				NULL,					DO_LOAD,	LOAD_TPAGES_FINISH, 0, 0 },
+	{ nullptr,				nullptr,					DO_LOAD,	LOAD_TPAGES_FINISH, 0, 0 },
 
 };
 
@@ -153,7 +153,7 @@ OFF_FILES Title_OffsetFiles[] = {
 	{ &TitleFontFile[ 0 ],	&Title_Fonts_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },	// vdu font page
 	{ &FontFile[ 0 ],		&Text512_Header, DO_LOAD, LOAD_TPAGES, 0, 0 },	// 512x284 Font/Text
   { &FontFileBig[ 0 ], &Text512b_Header, DONT_LOAD, LOAD_TPAGES, 0, 0 }, // bigger font/text
-	{ NULL,					NULL, DO_LOAD, LOAD_TPAGES_FINISH, 0, 0 },
+	{ nullptr,					nullptr, DO_LOAD, LOAD_TPAGES_FINISH, 0, 0 },
 };
 
 
@@ -184,7 +184,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 	int16_t			Num_Frames;
 	int16_t			Num_Offsets;
 	OFF_INFO	*	Off_Info;
-	FRAME_INFO	*	Frm_Info = NULL;
+	FRAME_INFO	*	Frm_Info = nullptr;
 	int16_t			Num_TPages;
 	int16_t			Count;
 	char			tpagename[32];
@@ -192,15 +192,15 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 	OFF_BUFFER		*Placeholder_Off_Buffer;
 
 	Frm_Info = (FRAME_INFO*)malloc( sizeof( FRAME_INFO ) );							// Allocate memory for return structure
-	if( Frm_Info == NULL ) return( NULL );
+	if( Frm_Info == nullptr ) return( nullptr );
 
 	if( placeholder )
 	{
 		Placeholder_Off_Buffer = (OFF_BUFFER *)malloc( sizeof( OFF_BUFFER ) );									// Allocate memory
-		if( Placeholder_Off_Buffer == NULL )
+		if( Placeholder_Off_Buffer == nullptr )
 		{
 			free( Frm_Info );
-			return( NULL );
+			return( nullptr );
 		}
 
 		Frm_Info->vid_tpage_index = AddTexture( &Tloadheader, "", true , false, xsize, ysize );	// add dummy texture
@@ -208,7 +208,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 		{
 			free( Frm_Info );
 			free( Placeholder_Off_Buffer );
-			return ( NULL );
+			return ( nullptr );
 		}
 
 		Frm_Info->tpage_name[ 0 ] = 0;
@@ -248,14 +248,14 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 		if( File_Size == 0 )
 		{
 			free( Frm_Info );
-			return( NULL );
+			return( nullptr );
 		}
 
 		Off_Buffer = (int8_t*)malloc( File_Size );
-		if( Off_Buffer == NULL )
+		if( Off_Buffer == nullptr )
 		{
 			free( Frm_Info );
-			return( NULL );
+			return( nullptr );
 		}
 
 		Read_Size = Read_File( (char*)Filename, (char*)Off_Buffer, File_Size );			// Read file
@@ -263,7 +263,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 		{
 			free( Frm_Info );
 			free( Off_Buffer );
-			return( NULL );
+			return( nullptr );
 		}
 
 		FileReader in( Off_Buffer );
@@ -284,7 +284,7 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 				{
 					free( Frm_Info );
 					free( Off_Buffer );
-					return( NULL );
+					return( nullptr );
 				}
 			}
 
@@ -310,11 +310,11 @@ FRAME_INFO * Load_Off_File( int8_t * Filename, int LoadTPages, int16_t *last_tpa
 		Num_Offsets = counts.i16();											// Number of Offsets
 
 		int8_t * Tables = (int8_t*)malloc( Num_Boxes * sizeof( BOX_INFO ) + Num_Frames * sizeof( BIT_INFO ) + Num_Offsets * sizeof( OFF_INFO ) );
-		if( Tables == NULL )
+		if( Tables == nullptr )
 		{
 			free( Frm_Info );
 			free( Off_Buffer );
-			return( NULL );
+			return( nullptr );
 		}
 		Box_Info = (BOX_INFO *) Tables;
 		Bit_Info = (BIT_INFO *) ( Box_Info + Num_Boxes );
@@ -398,7 +398,7 @@ bool Load_All_Off_Files( OFF_FILES * FileInfo )
 			sprintf((char*)TempFilename,"%s%s",OffsetPath,FileInfo->Filename);
 
 			*FileInfo->InfoPtrAddr = Load_Off_File( &TempFilename[ 0 ], FileInfo->LoadTPages, &last_tpage, FileInfo->xsize, FileInfo->ysize, ( FileInfo->LoadTPages & LOAD_TPAGES_PLACEHOLDER ) );
-			if( *FileInfo->InfoPtrAddr == NULL )
+			if( *FileInfo->InfoPtrAddr == nullptr )
 			{
 				Msg( "offset file missing or too many tpages\n%s\n", &TempFilename[ 0 ] );
 				return false;
@@ -419,13 +419,13 @@ void Free_All_Off_Files( OFF_FILES * FileInfo )
 {
 	if( !FileInfo ) return;
 
-	while( FileInfo->InfoPtrAddr != NULL )
+	while( FileInfo->InfoPtrAddr != nullptr )
 	{
-		if( *FileInfo->InfoPtrAddr != NULL )
+		if( *FileInfo->InfoPtrAddr != nullptr )
 		{
 			free( (*FileInfo->InfoPtrAddr)->Tables );
 			free( *FileInfo->InfoPtrAddr );
-			*FileInfo->InfoPtrAddr = NULL;
+			*FileInfo->InfoPtrAddr = nullptr;
 		}
 		FileInfo++;
 	}
@@ -466,7 +466,7 @@ int16_t Get_Frm_Info_Index( FRAME_INFO ** Frame_Info )
 	FileInfo = &OffsetFiles[ 0 ];
 	Count = 0;
 
-	while( FileInfo->InfoPtrAddr != NULL )
+	while( FileInfo->InfoPtrAddr != nullptr )
 	{
 		if( FileInfo->InfoPtrAddr == Frame_Info )
 		{
@@ -487,7 +487,7 @@ int16_t Get_Frm_Info_Index( FRAME_INFO ** Frame_Info )
 ===================================================================*/
 FRAME_INFO ** Get_Frm_Info_Address( int16_t Index )
 {
-	if( Index == -1 ) return( NULL );
+	if( Index == -1 ) return( nullptr );
 
 	return( OffsetFiles[ Index ].InfoPtrAddr );
 }
@@ -558,7 +558,7 @@ void EnableRelevantOffFiles( OFF_FILES * FileInfo )
 ===================================================================*/
 void EnableOffFile( OFF_FILES * FileInfo, int8_t * Filename )
 {
-	while( FileInfo->InfoPtrAddr != NULL )
+	while( FileInfo->InfoPtrAddr != nullptr )
 	{
 		if( !strcasecmp( (char*)&FileInfo->Filename[ 0 ], (char*)Filename ) )
 		{
@@ -578,7 +578,7 @@ void EnableOffFile( OFF_FILES * FileInfo, int8_t * Filename )
 ===================================================================*/
 void DisableOffFile( OFF_FILES * FileInfo, int8_t * Filename )
 {
-	while( FileInfo->InfoPtrAddr != NULL )
+	while( FileInfo->InfoPtrAddr != nullptr )
 	{
 		if( !strcasecmp( (char*)&FileInfo->Filename[ 0 ], (char*)Filename ) )
 		{

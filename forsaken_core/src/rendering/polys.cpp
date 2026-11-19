@@ -54,7 +54,7 @@ void InitPolys( void )
 		Polys[i].NextInTPage = INDEX_NONE;
 		Polys[i].PrevInTPage = INDEX_NONE;
 
-		Polys[i].Frm_Info = NULL;
+		Polys[i].Frm_Info = nullptr;
 	}
 	Polys[ MAXPOLYS - 1 ].Next = INDEX_NONE;
 
@@ -109,7 +109,7 @@ void KillUsedPoly( u_int16_t i )
 
 	Polys[ i ].Prev = INDEX_NONE;
 	Polys[ i ].Next = FirstPolyFree;
-	Polys[ i ].Frm_Info = NULL;
+	Polys[ i ].Frm_Info = nullptr;
 	FirstPolyFree = i;
 }
 
@@ -663,7 +663,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	LVERTEX	*PolyVertPnt;
 	TRIANGLE	*PolyFacePnt;
 	LVERTEX	*BufStart;
-	WORD			*Indices = NULL;
+	WORD			*Indices = nullptr;
 	int				start_index = 0;
 
 /*===================================================================
@@ -899,7 +899,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	LVERTEX	*PolyVertPnt;
 	TRIANGLE	*PolyFacePnt;
 	LVERTEX	*BufStart;
-	WORD			*Indices = NULL;
+	WORD			*Indices = nullptr;
 	int				start_index = 0;
 
 /*===================================================================
@@ -1235,7 +1235,7 @@ FILE * LoadPolys( FILE * fp )
 			Polys[i].Prev = INDEX_NONE;
 			Polys[i].NextInTPage = INDEX_NONE;
 			Polys[i].PrevInTPage = INDEX_NONE;
-			Polys[i].Frm_Info = NULL;
+			Polys[i].Frm_Info = nullptr;
 
 			fread( &Polys[ i ].Next, sizeof( u_int16_t ), 1, fp );
 			i = Polys[ i ].Next;

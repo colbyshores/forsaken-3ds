@@ -270,7 +270,7 @@ char * get_key_name( int i )
 {
 	char * name = (char*)SDL_GetKeyName(i);
 	if(0==strcasecmp(name,"unknown key"))
-		return NULL;
+		return nullptr;
 	return convert_char( ' ', '_',
 		(char*)strdup(name)
 	);
@@ -327,7 +327,7 @@ static void init_key_map( void )
 			// do not attempt to map 1 to "1" etc...
 			// this was the old approach and broke number keys
 			vkey_map[i].keycode = 0x00;
-			vkey_map[i].keyword = NULL;
+			vkey_map[i].keyword = nullptr;
 			continue;
 		}
 		vkey_map[i].keycode = i;
@@ -941,7 +941,7 @@ static USERKEY *action_key( int action, USERCONFIG *u )
 		return &u->drop_ammo;
 		break;
 	default:
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1010,7 +1010,7 @@ read_joystick_info( FILE *f, USERCONFIG *u, char *last_token )
 		return 0;
 
 	// look for matching, joystick. If found, assign actions & set assigned to true
-	joy = NULL;
+	joy = nullptr;
 	for (i = 0; i < Num_Joysticks; i++)
 	{
 		if (strcasecmp( JoystickInfo[i].Name, tempstr ) )
@@ -1302,7 +1302,7 @@ void ReInitJoysticks( void )
 			if ( JoystickInfo[ j ].Name )
 			{
 				free (JoystickInfo[j].Name);
-				JoystickInfo[ j ].Name = NULL;
+				JoystickInfo[ j ].Name = nullptr;
 			}
 		}
 	}
@@ -1396,7 +1396,7 @@ read_config( USERCONFIG *u, char *cfg_name )
 		{ "macro1",  		read_macro1					},
 		{ "macro2",  		read_macro2					},
 		{ "macro3",  		read_macro3					},
-		{ NULL,				NULL						}
+		{ nullptr,				nullptr						}
 	};
 
 	// try to open the config file.
@@ -1495,7 +1495,7 @@ const char *key_fullname( int keycode )
 			return vk->keyword;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 typedef struct {
@@ -1523,7 +1523,7 @@ ascii_map_t key_char_lookup[] =
 	{"equals","="},
 	{"tab","\t"},
 	{"space"," "},
-	{NULL,NULL}
+	{nullptr,nullptr}
 };
 
 const char *key_char( int keycode )
@@ -1621,7 +1621,7 @@ const char *key_name( int keycode )
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 

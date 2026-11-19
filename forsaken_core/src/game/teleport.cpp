@@ -42,7 +42,7 @@ int16_t	NumOfTeleports = 0;
 
 TELEPORT * TeleportsGroupLink[MAXGROUPS];
 
-TELEPORT * Teleports = NULL;
+TELEPORT * Teleports = nullptr;
 
 /*===================================================================
 	Procedure	:	Teleports load...
@@ -65,7 +65,7 @@ bool TeleportsLoad( char * Filename )
 	NumOfTeleports = 0;
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
-		TeleportsGroupLink[i] = NULL;
+		TeleportsGroupLink[i] = nullptr;
 	}
 
 
@@ -121,7 +121,7 @@ bool TeleportsLoad( char * Filename )
 			TeleportsGroupLink[TPpnt->Group] = TPpnt;
 		}else{
 			TeleportsGroupLink[TPpnt->Group] = TPpnt;
-			TPpnt->NextInGroup = NULL;
+			TPpnt->NextInGroup = nullptr;
 		}
 
 		TPpnt->num_links = in.u16();
@@ -165,7 +165,7 @@ bool TeleportsLoad( char * Filename )
 		}
 		else
 		{
-			TPpnt->Zone = NULL;
+			TPpnt->Zone = nullptr;
 		}
 
 		TPpnt++;
@@ -196,7 +196,7 @@ void ReleaseTeleports( void )
 			TPpnt++;
 		}
 		free(Teleports);
-		Teleports = NULL;
+		Teleports = nullptr;
 	}
 	NumOfTeleports = 0;
 }
@@ -385,7 +385,7 @@ FILE * LoadTeleports( FILE * fp )
 		if( NumTeleports != NumOfTeleports )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		TeleportPtr = Teleports;

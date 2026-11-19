@@ -82,7 +82,7 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 
 	if( Enemy->AIFlags & ( AI_ICANSEEPLAYER + AI_ICANHEARPLAYER ) )
 	{
-		Enemy->TNode = NULL;
+		Enemy->TNode = nullptr;
 		if( !(Enemy->Object.Flags & SHIP_Scattered ) && (Enemy->AIFlags & AI_ICANSEEPLAYER) && !(Enemy->AIFlags & AI_FRIENDLYFIRE) )
 		{
 			ApplyMatrix( &SObject->Mat, &Forward, &TempVector );
@@ -93,7 +93,7 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 				Enemy->PrimaryFireTimer = EnemyTypes[Enemy->Type].PrimaryFireRate + (float) Random_Range( (u_int16_t) EnemyTypes[Enemy->Type].PrimaryFireRate );
 				EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, EnemyTypes[Enemy->Type].PrimaryWeaponType,
 					Enemy->Object.Group, &Enemy->Object.Pos, &TempOffset, &TempVector, &TempUpVector,
-					EnemyTypes[Enemy->Type].PowerLevel, 0.0F, false, NULL );
+					EnemyTypes[Enemy->Type].PowerLevel, 0.0F, false, nullptr );
 			}
 		}
 	}
@@ -101,7 +101,7 @@ void AI_AIR_FORMATION( ENEMY * Enemy )
 	if( (Enemy->Object.Flags & SHIP_Scattered ) || ( (EnemyTypes[Enemy->Type].Behave.Flags & AI_BEHAVIOUR_RETREAT) && ( Enemy->Object.Shield <= (EnemyTypes[Enemy->Type].Shield * 0.15 ) ) ) )
 	{
 		// we should get out of hear..
-		Enemy->FormationLink = NULL;
+		Enemy->FormationLink = nullptr;
 		AI_SetRETREAT( Enemy );
 		return;
 	}
@@ -236,7 +236,7 @@ void AI_LITTLEGEEK_FORMATION( ENEMY * Enemy )
 		EnemyTypes[ENEMY_Boss_BigGeek].Radius = 900.0F * GLOBAL_SCALE;
 		AI_SetDOGFIGHT( Enemy );
 		SetCurAnimSeq( LITTLEGEEKSEQ_Open, &Enemy->Object );
-		Enemy->FormationLink = NULL;
+		Enemy->FormationLink = nullptr;
 		return;
 	}
 

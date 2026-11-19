@@ -52,7 +52,7 @@ constexpr int NOD_VERSION_NUMBER = 1;
 NODENETWORKHEADER	NodeNetworkHeader;
 void SetNetworkDistance( void );
 
-float	* NodeArray = NULL;
+float	* NodeArray = nullptr;
 
 NODE *	NodeInGroup[MAXGROUPS];
 
@@ -80,7 +80,7 @@ bool Nodeload( char * Filename )
 
 	for( i = 0 ; i < MAXGROUPS ; i ++ )
 	{
-		NodeInGroup[i] = NULL;
+		NodeInGroup[i] = nullptr;
 	}
 
 	NodeNetworkHeader.State = false;
@@ -219,7 +219,7 @@ _skipped_extra_links: ;
 		if( LegalGroup )
 		{
 			if(	BackgroundCollide( &MCloadheadert0, &Mloadheader, &NodePnt->Pos, NodePnt->Group, &Move_Off,
-				&NodePnt->SolidPos , &TempGroup, &TempNormal, &TempPos_New, false, NULL ) )
+				&NodePnt->SolidPos , &TempGroup, &TempNormal, &TempPos_New, false, nullptr ) )
 			{
 #ifdef DEBUG_ON
 				VECTOR move;
@@ -279,13 +279,13 @@ void NodeRelease( void)
 	if( NodeNetworkHeader.State )
 	{
 		free( NodeNetworkHeader.FirstNode );
-		NodeNetworkHeader.FirstNode = NULL;
+		NodeNetworkHeader.FirstNode = nullptr;
 		NodeNetworkHeader.State = false;
 	}
 	if( NodeArray )
 	{
 		free( NodeArray );
-		NodeArray = NULL;
+		NodeArray = nullptr;
 	}
 }
 
@@ -550,13 +550,13 @@ NODE * WhichNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 	float * na;
 
 	if( !NodeNetworkHeader.State )
-		return NULL;
+		return nullptr;
 
 	if( (NodeFrom == NodeTo) || !NodeFrom || !NodeTo )
 		return NodeFrom;
 
 	Distance = -1.0F;
-	NodeReturn = NULL;
+	NodeReturn = nullptr;
 
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
@@ -594,13 +594,13 @@ NODE * WhichRetreatNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 
 
 	if( !NodeNetworkHeader.State )
-		return NULL;
+		return nullptr;
 
 	if( (NodeFrom == NodeTo) || !NodeFrom || !NodeTo )
 		return NodeFrom;
 
 	Distance = -1.0F;
-	NodeReturn = NULL;
+	NodeReturn = nullptr;
 
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
@@ -619,7 +619,7 @@ NODE * WhichRetreatNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo )
 			else
 			{
 				//if its not on my network but is closer then the one on my network is useless so dont use it..
-				NodeReturn = NULL;
+				NodeReturn = nullptr;
 				Distance = Temp;
 			}
 		}
@@ -641,7 +641,7 @@ NODE * ChooseAlternateNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo 
 	NODE * NodeLink;
 
 	if( !NodeNetworkHeader.State )
-		return NULL;
+		return nullptr;
 
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
@@ -652,7 +652,7 @@ NODE * ChooseAlternateNode( u_int32_t Network , NODE * NodeFrom , NODE * NodeTo 
 			return NodeLink;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 , NODE *Node2 , NODE *Node3 , NODE *Node4 )
@@ -662,7 +662,7 @@ NODE * FindSuitableSplineNode( u_int32_t Network, NODE * NodeFrom , NODE *Node1 
 	NODE * NodeLink;
 
 	if( !NodeNetworkHeader.State )
-		return NULL;
+		return nullptr;
 
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
@@ -709,7 +709,7 @@ NODE * FindSuitableSplineNodeRandom( u_int32_t Network, NODE * NodeFrom , NODE *
 	NODE * NodeLink;
 
 	if( !NodeNetworkHeader.State )
-		return NULL;
+		return nullptr;
 
 	for( i = 0 ; i < NodeFrom->NumOfLinks ; i ++ )
 	{
@@ -830,7 +830,7 @@ float ReturnClosestNode( VECTOR * Pos, VECTOR * NearestNodePos, u_int16_t * Grou
 	int			i;
 	float		Temp;
 	NODE	*	Node;
-	NODE	*	NearestNode = NULL;
+	NODE	*	NearestNode = nullptr;
 	float		Distance = -1.0F;
 
 	if( !NodeNetworkHeader.State )

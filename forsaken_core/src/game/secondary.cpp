@@ -668,8 +668,8 @@ void	InitSecBulls(void)
 		SecBulls[ i ].Used = false;
 		SecBulls[ i ].Next = i + 1;
 		SecBulls[ i ].Prev = INDEX_NONE;
-		SecBulls[ i ].NextInGroup = NULL;
-		SecBulls[ i ].PrevInGroup = NULL;
+		SecBulls[ i ].NextInGroup = nullptr;
+		SecBulls[ i ].PrevInGroup = nullptr;
 		SecBulls[ i ].State = MIS_STRAIGHT;
 		SecBulls[ i ].Flags = SECFLAGS_Nothing;
 		SecBulls[ i ].Index = i;
@@ -2816,7 +2816,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 
 				if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, &SecBulls[i].Pos,
 									SecBulls[i].GroupImIn, &temp, (VECTOR *) &SecBulls[i].ColPoint,
-									&SecBulls[i].ColGroup, &SecBulls[i].ColPointNormal, &TempVector, false, NULL ) )
+									&SecBulls[i].ColGroup, &SecBulls[i].ColPointNormal, &TempVector, false, nullptr ) )
 				{
 					DebugPrintf( "Secondary weapon %d didn't collide with backgroup in group %d\n", SecBulls[i].Weapon, SecBulls[i].GroupImIn );
 					if( DebugInfo ) CreateDebugLine( &SecBulls[i].Pos, &temp, SecBulls[i].GroupImIn, 255, 64, 64 );
@@ -2859,7 +2859,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 		{
 			if( BackgroundCollide( &MCloadheadert0, &Mloadheader, &SecBulls[i].Pos, SecBulls[i].GroupImIn,
 									&DirVector, (VECTOR *) &SecBulls[i].ColPoint, &SecBulls[i].ColGroup, &SecBulls[i].ColPointNormal,
-									&TempVector, true, NULL ) == true )
+									&TempVector, true, nullptr ) == true )
 			{
 				TempVector.x = ( SecBulls[i].ColPoint.x - SecBulls[i].Pos.x );
 				TempVector.y = ( SecBulls[i].ColPoint.y - SecBulls[i].Pos.y );
@@ -2891,7 +2891,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 	if( SecBulls[i].ColRadius )	HitEnemy = CheckHitEnemy( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, SecBulls[i].GroupImIn, &SecBulls[i].DirVector, &SecBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, SecBulls[i].ColRadius, COLTYPE_Sphere );
 	else HitEnemy = CheckHitEnemy( SecBulls[i].OwnerType, SecBulls[i].Owner, &SecBulls[i].Pos, SecBulls[i].GroupImIn, &SecBulls[i].DirVector, &SecBulls[i].UpVector, Length, &EInt_Point, &EInt_Point2, &DistToInt, SecBulls[i].ColRadius, COLTYPE_Point );
 
-	if( HitEnemy != NULL )
+	if( HitEnemy != nullptr )
 	{
 		HitWall = INDEX_NONE;
 		HitTarget = INDEX_NONE;
@@ -3341,7 +3341,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 /*===================================================================
 			Hit Enemy
 ===================================================================*/
-	if( HitEnemy != NULL )
+	if( HitEnemy != nullptr )
 	{
 		TempVector.x = ( EInt_Point.x - HitEnemy->Object.Pos.x );
 		TempVector.y = ( EInt_Point.y - HitEnemy->Object.Pos.y );
@@ -5429,7 +5429,7 @@ void HUDNames( void )
 					if( Cos > 0.0F )
 					{
 						if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, &CurrentCamera.Pos, CurrentCamera.GroupImIn,
-										&DirVector, &Int_Point, &EndGroup, &Int_Normal, &TempVector, true, NULL )  || outside_map )
+										&DirVector, &Int_Point, &EndGroup, &Int_Normal, &TempVector, true, nullptr )  || outside_map )
 						{
 							if( ValidGroupCollision( &Ships[ Count ].Object.Pos, Ships[ Count ].Object.Group, &Ships[ Count ].Object.Pos, &CurrentCamera.Pos, CurrentCamera.GroupImIn ) || outside_map )
 							{
@@ -5503,7 +5503,7 @@ void HUDNames( void )
 					if( Cos > 0.0F )
 					{
 						if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, &CurrentCamera.Pos, CurrentCamera.GroupImIn,
-										&DirVector, &Int_Point, &EndGroup, &Int_Normal, &TempVector, true, NULL )  || outside_map )
+										&DirVector, &Int_Point, &EndGroup, &Int_Normal, &TempVector, true, nullptr )  || outside_map )
 						{
 							if( ( Cos > LookAheadCos ) )
 							{
@@ -5584,7 +5584,7 @@ void DispInGameText( VECTOR * Pos, int8_t * Text )
 	if( ( Cos > 0.0F ) || outside_map )
 	{
 		if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, &CurrentCamera.Pos, CurrentCamera.GroupImIn,
-						&OffVector, &Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) || outside_map )
+						&OffVector, &Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) || outside_map )
 		{
 			Conv3DTo2D( Pos, &TextPos, &FinalMatrix );
 
@@ -5720,7 +5720,7 @@ u_int16_t TargetClosestShip( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int1
 						if( ( Cos >= ViewConeCos ) && ( Cos > *ClosestCos ) )
 						{
 							if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &DirVector,
-											&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
+											&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) )
 							{
 								*ClosestCos = Cos;
 								ClosestShip = Count;
@@ -5773,7 +5773,7 @@ bool StillGotTarget( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t Targ
 					if( Cos >= ViewConeCos )
 					{
 						if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &DirVector,
-										&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
+										&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) )
 						{
 							return( true );
 						}
@@ -5796,7 +5796,7 @@ bool StillGotTarget( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t Targ
 				if( Cos >= ViewConeCos )
 				{
 					if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &DirVector,
-									&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
+									&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) )
 					{
 						return( true );
 					}
@@ -5827,7 +5827,7 @@ bool StillGotTarget( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u_int16_t Targ
 				if( Cos >= ViewConeCos )
 				{
 					if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &DirVector,
-									&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
+									&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) )
 					{
 						return( true );
 					}
@@ -7089,7 +7089,7 @@ void CreateTitanStarShrapnel( u_int16_t i, VECTOR * Pos, VECTOR * Dir, u_int16_t
 
 		// send the rest of baby titans towards any enemies
 		Enemy = FirstEnemyUsed;
-		while( ( Enemy != NULL ) && ( NumLeft ) )
+		while( ( Enemy != nullptr ) && ( NumLeft ) )
 		{
 			NextEnemy = Enemy->NextUsed;
 
@@ -7311,7 +7311,7 @@ u_int16_t TargetClosestEnemy( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float
 
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -7330,7 +7330,7 @@ u_int16_t TargetClosestEnemy( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, float
 				if( ( Cos >= ViewConeCos ) && ( Cos > *ClosestCos ) )
 				{
 					if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &DirVector,
-											&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
+											&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) )
 					{
 						*ClosestCos = Cos;
 						ClosestEnemy = Enemy->Index;
@@ -7420,7 +7420,7 @@ u_int16_t TargetClosestSecondary( VECTOR * Pos, VECTOR * Dir, u_int16_t Group, u
 						if( ( Cos >= ViewConeCos ) && ( Cos > *ClosestCos ) )
 						{
 							if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group, &DirVector,
-													&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, NULL ) )
+													&Int_Point, &Int_Group, &Int_Normal, &TempVector, true, nullptr ) )
 							{
 								*ClosestCos = Cos;
 								ClosestSecondary = SecBull->Index;
@@ -7474,7 +7474,7 @@ bool CheckProximityToShips( VECTOR * Pos, u_int16_t Group, float Radius, u_int16
 					{
 						if( BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group,
 										&DirVector, (VECTOR *) &IntPoint, &EndGroup, &IntPointNormal,
-										&TempVector, true, NULL ) == false )
+										&TempVector, true, nullptr ) == false )
 						{
 							return( true );
 						}
@@ -7510,7 +7510,7 @@ u_int16_t GetClosestEnemy( VECTOR * Pos, u_int16_t Group, float * Radius, u_int1
 
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -7530,7 +7530,7 @@ u_int16_t GetClosestEnemy( VECTOR * Pos, u_int16_t Group, float * Radius, u_int1
 					{
 						if( !BackgroundCollide( &MCloadheadert0, &Mloadheader, Pos, Group,
 										&DirVector, (VECTOR *) &IntPoint, &EndGroup, &IntPointNormal,
-										&TempVector, true, NULL ) )
+										&TempVector, true, nullptr ) )
 						{
 							Closest = Enemy->Index;
 							*Radius = DistToEnemy;
@@ -7656,7 +7656,7 @@ void SetupSecBullGroups( void )
 
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
-		SecBullGroups[ Count ] = NULL;
+		SecBullGroups[ Count ] = nullptr;
 		NumSecBullsPerGroup[ Count ] = 0;
 	}
 }
@@ -7670,7 +7670,7 @@ void SetupSecBullGroups( void )
 void AddSecBullToGroup( u_int16_t i, u_int16_t Group )
 {
 	if( Group == INDEX_NONE ) return;
-	SecBulls[ i ].PrevInGroup = NULL;
+	SecBulls[ i ].PrevInGroup = nullptr;
 	SecBulls[ i ].NextInGroup = SecBullGroups[ Group ];
 	if( SecBulls[ i ].NextInGroup ) SecBulls[ i ].NextInGroup->PrevInGroup = &SecBulls[ i ];
 	SecBullGroups[ Group ] = &SecBulls[ i ];
@@ -7689,8 +7689,8 @@ void RemoveSecBullFromGroup( u_int16_t i, u_int16_t Group )
 	if( SecBulls[ i ].PrevInGroup ) SecBulls[ i ].PrevInGroup->NextInGroup = SecBulls[ i ].NextInGroup;
 	else SecBullGroups[ Group ] = SecBulls[ i ].NextInGroup;
 	if( SecBulls[ i ].NextInGroup ) SecBulls[ i ].NextInGroup->PrevInGroup = SecBulls[ i ].PrevInGroup;
-	SecBulls[ i ].PrevInGroup = NULL;
-	SecBulls[ i ].NextInGroup = NULL;
+	SecBulls[ i ].PrevInGroup = nullptr;
+	SecBulls[ i ].NextInGroup = nullptr;
 	NumSecBullsPerGroup[ Group ]--;
 }
 
@@ -7897,7 +7897,7 @@ FILE * LoadSecBulls( FILE * fp )
 			fread( &NumSecBullsPerGroup[ i ], sizeof( int16_t ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SecBullGroups[ i ] = &SecBulls[ TempIndex ];
-			else SecBullGroups[ i ] = NULL;
+			else SecBullGroups[ i ] = nullptr;
 		}
 
 
@@ -7919,10 +7919,10 @@ FILE * LoadSecBulls( FILE * fp )
 
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SecBulls[ i ].NextInGroup = &SecBulls[ TempIndex ];
-			else SecBulls[ i ].NextInGroup = NULL;
+			else SecBulls[ i ].NextInGroup = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) SecBulls[ i ].PrevInGroup = &SecBulls[ TempIndex ];
-			else SecBulls[ i ].PrevInGroup = NULL;
+			else SecBulls[ i ].PrevInGroup = nullptr;
 
 			fread( &SecBulls[ i ].Flags, sizeof( u_int16_t ), 1, fp );
 			fread( &SecBulls[ i ].Index, sizeof( u_int16_t ), 1, fp );
@@ -7995,8 +7995,8 @@ FILE * LoadSecBulls( FILE * fp )
 		{
 			SecBulls[ i ].Used = false;
 			SecBulls[ i ].Prev = INDEX_NONE;
-			SecBulls[ i ].NextInGroup = NULL;
-			SecBulls[ i ].PrevInGroup = NULL;
+			SecBulls[ i ].NextInGroup = nullptr;
+			SecBulls[ i ].PrevInGroup = nullptr;
 			SecBulls[ i ].State = MIS_STRAIGHT;
 			SecBulls[ i ].Flags = SECFLAGS_Nothing;
 			SecBulls[ i ].Index = i;

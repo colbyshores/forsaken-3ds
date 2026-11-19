@@ -228,7 +228,7 @@ void StartAHostSession ( MENUITEM * Item )
 	}
 
 	WhoIAm = 0;								// I was the first to join...
-	Ships[WhoIAm].network_player = NULL;
+	Ships[WhoIAm].network_player = nullptr;
 
 	if ( TeamGame )
 		MenuChange( &NewTeamItem );
@@ -317,8 +317,8 @@ void GoToSynchup ( MENUITEM * /*Item*/ )
 			VduClear();
 		}
 
-		CurrentMenu = NULL;
-		CurrentMenuItem = NULL;
+		CurrentMenu = nullptr;
+		CurrentMenuItem = nullptr;
 		MenuStackLevel = 0;
 	}
 
@@ -392,7 +392,7 @@ void InitTeamSelection( MENU *Menu )
 	int i;
 	MENUITEM *item;
 
-	InitTeamLists( NULL );
+	InitTeamLists( nullptr );
 
 	for( item = Menu->Item; item->x >=0; item++ )
 	{
@@ -428,7 +428,7 @@ void DistributeTeamsToLists(int * /*dummy*/)
 	bool OkayToStart = true;
 	int16_t TeamScore[MAX_TEAMS];
 
-	UpdateSessions( NULL );
+	UpdateSessions( nullptr );
 	memset(&TeamScore, 0, sizeof(int16_t) * MAX_TEAMS);
 
 	for (team = 0; team < MAX_TEAMS; team++)
@@ -477,6 +477,6 @@ void DistributeTeamsToLists(int * /*dummy*/)
 
 	if ( IsHost && OkayToStart && num_players )
 	{
-		TeamGoToSynchup(NULL);
+		TeamGoToSynchup(nullptr);
 	}
 }

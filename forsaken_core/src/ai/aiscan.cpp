@@ -176,7 +176,7 @@ void AI_DO_SCAN( ENEMY * Enemy )
 	Tinfo->Nearest = BIGDISTANCE;
 	Tinfo->TFlags = 0;
 	Tinfo->SObject	= &Enemy->Object;
-	Tinfo->TObject	= NULL;
+	Tinfo->TObject	= nullptr;
 
 	SET_TARGET_PLAYERS;
 

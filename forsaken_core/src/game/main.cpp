@@ -64,7 +64,7 @@ static bool parse_chdir( char *cli )
 
 	option = strtok(cmdline, " -+'\"");
 
-	while(option != NULL )
+	while(option != nullptr )
 	{
 		// WARNING:	chdir can only be the LAST option !
 		// For running the binary from outside the game folder:
@@ -73,7 +73,7 @@ static bool parse_chdir( char *cli )
 		{
 			// get option enclosed in quotes
 			// this does not consider space as separator
-			option = strtok(NULL, "\"'");
+			option = strtok(nullptr, "\"'");
 
 			if (!option)
 			{
@@ -95,7 +95,7 @@ static bool parse_chdir( char *cli )
 			break;
 		}
 		// get the next token
-		option = strtok(NULL, " -+'\"");
+		option = strtok(nullptr, " -+'\"");
 	}
 
 	return true;
@@ -165,7 +165,7 @@ static bool ParseCommandLine(char* args)
 	option = strtok(cmdline, " -+'\"");
 
 	// loop over every option
-	while(option != NULL )
+	while(option != nullptr )
 	{
 
 		// last option
@@ -231,7 +231,7 @@ static bool ParseCommandLine(char* args)
 			IpOnCLI = true;
 
 			// extract the address
-			option = strtok(NULL, " ");
+			option = strtok(nullptr, " ");
 			strcpy( address, option );
 
 			// try to find a port in the address
@@ -307,7 +307,7 @@ static bool ParseCommandLine(char* args)
 		}
 
 		// get the next token
-		option = strtok(NULL, " -+'\"");
+		option = strtok(nullptr, " -+'\"");
 
 	}
 
@@ -490,7 +490,7 @@ static bool AppInit( char * args )
 	input_grab( render_info.fullscreen );
 
 	//
-	SetSoundLevels( NULL );
+	SetSoundLevels( nullptr );
 
 	// done
 	DebugPrintf("AppInit finished...\n");

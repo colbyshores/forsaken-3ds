@@ -91,7 +91,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 
 	if( Enemy->AIFlags & ( AI_ICANSEEPLAYER + AI_ICANHEARPLAYER ) )
 	{
-		Enemy->TNode = NULL;
+		Enemy->TNode = nullptr;
 		if( !(Enemy->Object.Flags & SHIP_Scattered ) && (Enemy->AIFlags & AI_ICANSEEPLAYER) && !(Enemy->AIFlags & AI_FRIENDLYFIRE) )
 		{
 			ApplyMatrix( &SObject->Mat, &Forward, &TempVector );
@@ -105,7 +105,7 @@ void AI_AIR_DOGFIGHT( ENEMY * Enemy )
 
 				EnemyFirePrimary( OWNER_ENEMY, Enemy->Index, ++Enemy->BulletID, Weapon,
 					Enemy->Object.Group, &Enemy->Object.Pos, &TempOffset, &TempVector, &TempUpVector,
-					EnemyTypes[Enemy->Type].PowerLevel, (EnemyTypes[Enemy->Type].PowerLevel +1) * 33.0F, false, NULL );
+					EnemyTypes[Enemy->Type].PowerLevel, (EnemyTypes[Enemy->Type].PowerLevel +1) * 33.0F, false, nullptr );
 			}
 
 			if( (Enemy->SecondaryFireTimer == 0.0F) &&

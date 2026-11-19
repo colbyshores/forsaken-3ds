@@ -37,7 +37,7 @@ static ALuint s_buffer = 0;
 static bool load_track_pcm(int track, int16_t **out_pcm, long *out_samples)
 {
 	char path[128];
-	FILE *f = NULL;
+	FILE *f = nullptr;
 	const char *dirs[] = { "romfs/music", "data/music", "music" };
 	for (unsigned i = 0; i < sizeof(dirs) / sizeof(dirs[0]) && !f; i++) {
 		snprintf(path, sizeof(path), "%s/track%02d.dsp", dirs[i], track);
@@ -106,7 +106,7 @@ void music_play(int track)
 	if (s_current_track == track && s_playing) return;
 	if (!alcGetCurrentContext()) return;   /* SFX system not up: stay silent */
 
-	int16_t *pcm = NULL;
+	int16_t *pcm = nullptr;
 	long samples = 0;
 	if (!load_track_pcm(track, &pcm, &samples)) return;
 

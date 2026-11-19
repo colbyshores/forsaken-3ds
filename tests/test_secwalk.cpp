@@ -79,7 +79,7 @@ static ENEMY *mk_enemy(void)
 	Tinfo->Nearest = BIGDISTANCE;
 	Tinfo->TFlags = 0;
 	Tinfo->SObject = &e.Object;
-	Tinfo->TObject = NULL;
+	Tinfo->TObject = nullptr;
 	return &e;
 }
 
@@ -98,14 +98,14 @@ int main(void)
 	mk_enemy();
 	Tinfo->Flags = _TARGET_MINES;
 	AI_GetNearestMINETarget();
-	CHECK(Tinfo->TObject == NULL, "bss-zero returns with no target");
+	CHECK(Tinfo->TObject == nullptr, "bss-zero returns with no target");
 
 	/* Case 2: healthy empty list. Must return at once. */
 	FirstSecBullUsed = (u_int16_t)-1;
 	mk_enemy();
 	Tinfo->Flags = _TARGET_MINES;
 	AI_GetNearestMINETarget();
-	CHECK(Tinfo->TObject == NULL, "empty list returns with no target");
+	CHECK(Tinfo->TObject == nullptr, "empty list returns with no target");
 
 	/* Case 3: one live mine is found. */
 	memset(SecBulls, 0, sizeof(SecBulls));

@@ -73,8 +73,8 @@ static void tile_rgba4(const u_int8_t *src, u_int16_t *dst, int w, int h)
  *
  * Single-pack CIAs (LOMEM-only or HIMEM-only) still work — the fallback
  * dir is tried if the preferred one isn't shipped. */
-static const char *s_hd_textures_dir = NULL;
-static const char *s_hd_textures_fallback = NULL;
+static const char *s_hd_textures_dir = nullptr;
+static const char *s_hd_textures_fallback = nullptr;
 
 static void resolve_hd_textures_dirs(void)
 {
@@ -104,7 +104,7 @@ static const char *hd_texture_key(const char *path)
 			(path[i+4] == '\\' || path[i+4] == '/'))
 			return &path[i+5];
 	}
-	return NULL;
+	return nullptr;
 }
 
 /* romfs:/<dir>/<key with .t3x>, lowercased with forward slashes. */
@@ -134,7 +134,7 @@ static FILE *open_hd_texture(const char *path, char *hd_path, size_t size)
 	resolve_hd_textures_dirs();
 	key = hd_texture_key(path);
 	if (!key)
-		return NULL;
+		return nullptr;
 
 	hd_texture_path(hd_path, size, s_hd_textures_dir, key);
 	f = fopen(hd_path, "rb");
@@ -162,7 +162,7 @@ static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
 		return false;
 
 	/* Allocate texture_t wrapper */
-	if (*t == NULL)
+	if (*t == nullptr)
 	{
 		texdata = (texture_t *)malloc(sizeof(texture_t));
 		if (!texdata) { fclose(f); return false; }
@@ -181,13 +181,13 @@ static bool try_load_hd_texture(TEXTURE_HANDLE *t, const char *path,
 	/* Tex3DS handles everything: format detection, decompression,
 	 * tiling, and upload. Use linear memory (vram=false) since 6MB
 	 * VRAM can't hold all HD textures at once. */
-	t3x = Tex3DS_TextureImportStdio(f, &texdata->tex, NULL, false);
+	t3x = Tex3DS_TextureImportStdio(f, &texdata->tex, nullptr, false);
 	fclose(f);
 
 	if (!t3x)
 	{
 		DebugPrintf("HD texture: Tex3DS import failed for %s\n", hd_path);
-		if (*t == NULL) free(texdata);
+		if (*t == nullptr) free(texdata);
 		return false;
 	}
 
@@ -297,7 +297,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path,
 	{
 		texture_t *texdata;
 		u_int8_t *tiled;
-		bool is_new = (*t == NULL);
+		bool is_new = (*t == nullptr);
 
 		if (is_new)
 		{

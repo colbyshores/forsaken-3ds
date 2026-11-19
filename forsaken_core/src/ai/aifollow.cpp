@@ -259,7 +259,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 				/* Pre-fetch NextTNode so slope/aim code has it, but keep TNode. */
 				if( !Enemy->NextTNode )
 					Enemy->NextTNode = FindSuitableSplineNode( Enemy->Object.NodeNetwork,
-						TNode, TNode, (NODE*)Enemy->LastTNode, NULL, (NODE*)Enemy->TNode );
+						TNode, TNode, (NODE*)Enemy->LastTNode, nullptr, (NODE*)Enemy->TNode );
 				return;
 			}
 
@@ -284,7 +284,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 					 * so shaft nodes (whose only links are 0x20) traverse correctly
 					 * without a raw link-walk here. */
 					NODE * next_hop = FindSuitableSplineNode( Enemy->Object.NodeNetwork,
-						TNode, TNode, (NODE*)Enemy->LastTNode, NULL, (NODE*)Enemy->TNode );
+						TNode, TNode, (NODE*)Enemy->LastTNode, nullptr, (NODE*)Enemy->TNode );
 					if( next_hop )
 					{
 						TNode = next_hop;
@@ -318,7 +318,7 @@ void AI_CRAWL_FOLLOWPATH( ENEMY * Enemy )
 	}else{
 		// If no target node has been found yet go to the nearest one...
 		Enemy->TNode = (NODE*)Enemy->Object.NearestNode;
-		Enemy->NextTNode = NULL;
+		Enemy->NextTNode = nullptr;
 	}
 
 

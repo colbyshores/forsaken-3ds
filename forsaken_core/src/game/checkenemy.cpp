@@ -84,12 +84,12 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 	ENEMY	*	Enemy;
 	ENEMY	*	NextEnemy;
 
-	ClosestEnemy = NULL;
+	ClosestEnemy = nullptr;
 	ClosestLength = *Dist;
 
 	Enemy = FirstEnemyUsed;
 
-	while( Enemy != NULL )
+	while( Enemy != nullptr )
 	{
 		NextEnemy = Enemy->NextUsed;
 
@@ -237,7 +237,7 @@ SkipIt:
 		Enemy = NextEnemy;
 	}
 
-	if( ClosestEnemy != NULL ) *Dist = ClosestLength;
+	if( ClosestEnemy != nullptr ) *Dist = ClosestLength;
 
 	return( ClosestEnemy );
 }

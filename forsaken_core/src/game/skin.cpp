@@ -712,7 +712,7 @@ void KillNodeCubeLines( void )
 ===================================================================*/
 bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t	NumVerts, int16_t /*NumTris*/ )
 {
-	LVERTEX	*BufStart = NULL;
+	LVERTEX	*BufStart = nullptr;
 
 	if( Num_Skin_Execs >= MAXSKINEXECS )
 	{
@@ -901,7 +901,7 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 ===================================================================*/
 bool MakeNewPortalExec( LVERTEX *Verts, TRIANGLE * /*Tris*/, int16_t NumVerts, int16_t /*NumTris*/ )
 {
-	LVERTEX	*BufStart = NULL;
+	LVERTEX	*BufStart = nullptr;
 
 	if( Num_Portal_Execs >= MAXPORTALEXECS )
 	{
@@ -1374,8 +1374,8 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 
 	// Code.
 
-	first_free_pin_ptr = NULL;
-	first_pin_ptr = NULL;
+	first_free_pin_ptr = nullptr;
+	first_pin_ptr = nullptr;
 
 	for( i = 0; i < MAX_PINS; i++ )
 	{
@@ -1531,7 +1531,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 
 	// Got the initial poly. Do the intersection business.
 
-	while( NULL != space_ptr )
+	while( nullptr != space_ptr )
 	{
 		if( space_ptr != plane_ptr )
 		{
@@ -1539,7 +1539,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 			// Calculate distance from each pin to the intersecting plane.
 
 			pin_ptr = first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				pin_ptr->dist = side * (	pin_ptr->x * space_ptr->Normal.x +
 											pin_ptr->y * space_ptr->Normal.y +
@@ -1552,10 +1552,10 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 			// Create intersection points.
 
 			pin_ptr = first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
-				if( NULL == next_pin_ptr )
+				if( nullptr == next_pin_ptr )
 				{
 					next_pin_ptr = first_pin_ptr;
 				}
@@ -1566,7 +1566,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 				{
 					// Grab new structure.
 
-					if( NULL != first_free_pin_ptr )
+					if( nullptr != first_free_pin_ptr )
 					{
 						new_pin_ptr = first_free_pin_ptr;
 						first_free_pin_ptr = first_free_pin_ptr->next_ptr;
@@ -1599,7 +1599,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 
 			pin_ptr = first_pin_ptr;
 			prev_pin_ptr_ptr = &first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
 
@@ -1627,7 +1627,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 
 		// Go to Parent plane.
 
-		if( NULL != space_ptr->Parent )
+		if( nullptr != space_ptr->Parent )
 		{
 			if( space_ptr == space_ptr->Parent->Front )
 				side = +1;
@@ -1640,7 +1640,7 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 	count = 0;
 
 	pin_ptr = first_pin_ptr;
-	while( NULL != pin_ptr )
+	while( nullptr != pin_ptr )
 	{
 		out_ptr->x = pin_ptr->x;
 		out_ptr->y = pin_ptr->y;
@@ -1680,8 +1680,8 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 	float	x,y,z;
 	int		SCount;
 
-	first_free_pin_ptr = NULL;
-	first_pin_ptr = NULL;
+	first_free_pin_ptr = nullptr;
+	first_pin_ptr = nullptr;
 
 	for( i = 0; i < MAX_PINS; i++ )
 	{
@@ -1845,7 +1845,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 			// Calculate distance from each pin to the intersecting plane.
 
 			pin_ptr = first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				pin_ptr->dist = side * (	pin_ptr->x * space_ptr->normal.x +
 											pin_ptr->y * space_ptr->normal.y +
@@ -1858,10 +1858,10 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 			// Create intersection points.
 
 			pin_ptr = first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
-				if( NULL == next_pin_ptr )
+				if( nullptr == next_pin_ptr )
 				{
 					next_pin_ptr = first_pin_ptr;
 				}
@@ -1872,7 +1872,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 				{
 					// Grab new structure.
 
-					if( NULL != first_free_pin_ptr )
+					if( nullptr != first_free_pin_ptr )
 					{
 						new_pin_ptr = first_free_pin_ptr;
 						first_free_pin_ptr = first_free_pin_ptr->next_ptr;
@@ -1905,7 +1905,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 
 			pin_ptr = first_pin_ptr;
 			prev_pin_ptr_ptr = &first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
 
@@ -1937,7 +1937,7 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 	count = 0;
 
 	pin_ptr = first_pin_ptr;
-	while( NULL != pin_ptr )
+	while( nullptr != pin_ptr )
 	{
 		out_ptr->x = pin_ptr->x;
 		out_ptr->y = pin_ptr->y;
@@ -1974,8 +1974,8 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 	float	x,y,z;
 	int		SCount;
 
-	first_free_pin_ptr = NULL;
-	first_pin_ptr = NULL;
+	first_free_pin_ptr = nullptr;
+	first_pin_ptr = nullptr;
 
 	for( i = 0; i < MAX_PINS; i++ )
 	{
@@ -2139,7 +2139,7 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 			// Calculate distance from each pin to the intersecting plane.
 
 			pin_ptr = first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				pin_ptr->dist = side * (	pin_ptr->x * space_ptr->Normal.x +
 											pin_ptr->y * space_ptr->Normal.y +
@@ -2152,10 +2152,10 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 			// Create intersection points.
 
 			pin_ptr = first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
-				if( NULL == next_pin_ptr )
+				if( nullptr == next_pin_ptr )
 				{
 					next_pin_ptr = first_pin_ptr;
 				}
@@ -2166,7 +2166,7 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 				{
 					// Grab new structure.
 
-					if( NULL != first_free_pin_ptr )
+					if( nullptr != first_free_pin_ptr )
 					{
 						new_pin_ptr = first_free_pin_ptr;
 						first_free_pin_ptr = first_free_pin_ptr->next_ptr;
@@ -2199,7 +2199,7 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 
 			pin_ptr = first_pin_ptr;
 			prev_pin_ptr_ptr = &first_pin_ptr;
-			while( NULL != pin_ptr )
+			while( nullptr != pin_ptr )
 			{
 				next_pin_ptr = pin_ptr->next_ptr;
 
@@ -2233,7 +2233,7 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 	count = 0;
 
 	pin_ptr = first_pin_ptr;
-	while( NULL != pin_ptr )
+	while( nullptr != pin_ptr )
 	{
 		out_ptr->x = pin_ptr->x;
 		out_ptr->y = pin_ptr->y;

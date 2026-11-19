@@ -42,7 +42,7 @@ int32_t	NumOfExternalForces = 0;
 
 EXTERNALFORCE * ExternalForcesGroupLink[MAXGROUPS];
 
-EXTERNALFORCE * ExternalForces = NULL;
+EXTERNALFORCE * ExternalForces = nullptr;
 
 /*===================================================================
 	Procedure	:	External Forces load...
@@ -66,7 +66,7 @@ bool ExternalForcesLoad( char * Filename )
 	NumOfExternalForces = 0;
 	for( i = 0 ; i < MAXGROUPS ; i++ )
 	{
-		ExternalForcesGroupLink[i] = NULL;
+		ExternalForcesGroupLink[i] = nullptr;
 	}
 
 	File_Size = Get_File_Size( Filename );
@@ -121,7 +121,7 @@ bool ExternalForcesLoad( char * Filename )
 			ExternalForcesGroupLink[EFpnt->Group] = EFpnt;
 		}else{
 			ExternalForcesGroupLink[EFpnt->Group] = EFpnt;
-			EFpnt->NextInGroup = NULL;
+			EFpnt->NextInGroup = nullptr;
 		}
 
 		EFpnt->Origin = in.vec();
@@ -188,7 +188,7 @@ void ReleaseExternalForces( void )
 			EFpnt++;
 		}
 		free(ExternalForces);
-		ExternalForces = NULL;
+		ExternalForces = nullptr;
 	}
 	NumOfExternalForces = 0;
 }
@@ -407,7 +407,7 @@ FILE * LoadExternalForces( FILE * fp )
 		if( NumExtForces != NumOfExternalForces )
 		{
 			fclose( fp );
-			return( NULL );
+			return( nullptr );
 		}
 
 		ExtForcesPtr = ExternalForces;

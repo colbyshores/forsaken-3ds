@@ -184,7 +184,7 @@ bool platform_init(void)
 	{
 		void *probe = mappableAlloc(4096);
 		uintptr_t addr = (uintptr_t)probe;
-		if (probe == NULL || addr < 0x10000000 || addr >= 0x14000000) {
+		if (probe == nullptr || addr < 0x10000000 || addr >= 0x14000000) {
 			svcBreak(USERBREAK_PANIC);
 		}
 		mappableFree(probe);

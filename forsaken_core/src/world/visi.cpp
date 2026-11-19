@@ -240,11 +240,11 @@ bool ReadGroupConnections( MLOADHEADER *m, FileReader & in )
 	for ( g = 0; g < MAXGROUPS; g++ )
 	{
 		ConnectedGroup.list[ g ].groups = 0;
-		ConnectedGroup.list[ g ].group = NULL;
+		ConnectedGroup.list[ g ].group = nullptr;
 		VisibleGroup.list[ g ].groups = 0;
-		VisibleGroup.list[ g ].group = NULL;
+		VisibleGroup.list[ g ].group = nullptr;
 		IndirectVisibleGroup.list[ g ].groups = 0;
-		IndirectVisibleGroup.list[ g ].group = NULL;
+		IndirectVisibleGroup.list[ g ].group = nullptr;
 	}
 
 	InitConnections = true;
@@ -355,34 +355,34 @@ void FreeGroupConnections( void )
 		{
 			free( ConnectedGroup.list[ g ].group );
 		}
-		ConnectedGroup.list[ g ].group = NULL;
+		ConnectedGroup.list[ g ].group = nullptr;
 		VisibleGroup.list[ g ].groups = 0;
 		if ( VisibleGroup.list[ g ].group )
 		{
 			free( VisibleGroup.list[ g ].group );
 		}
-		VisibleGroup.list[ g ].group = NULL;
+		VisibleGroup.list[ g ].group = nullptr;
 		IndirectVisibleGroup.list[ g ].groups = 0;
 		if ( IndirectVisibleGroup.list[ g ].group )
 		{
 			free( IndirectVisibleGroup.list[ g ].group );
 		}
-		IndirectVisibleGroup.list[ g ].group = NULL;
+		IndirectVisibleGroup.list[ g ].group = nullptr;
 	}
 	if ( ConnectedGroup.table )
 	{
 		free( ConnectedGroup.table );
-		ConnectedGroup.table = NULL;
+		ConnectedGroup.table = nullptr;
 	}
 	if ( VisibleGroup.table )
 	{
 		free( VisibleGroup.table );
-		VisibleGroup.table = NULL;
+		VisibleGroup.table = nullptr;
 	}
 	if ( IndirectVisibleGroup.table )
 	{
 		free( IndirectVisibleGroup.table );
-		IndirectVisibleGroup.table = NULL;
+		IndirectVisibleGroup.table = nullptr;
 	}
 }
 
@@ -725,7 +725,7 @@ ProcessVisiblePortal( CAMERA *cam, VISLIST *v, VISTREE *t, EXTENT *e )
 			adj_group->extent = extent;
 			v->last_visible->next_visible = adj_group;
 			v->last_visible = adj_group;
-			adj_group->next_visible = NULL;
+			adj_group->next_visible = nullptr;
 		}
 		adj_group->visible++;
 		for ( vnum = t->num_visible, tvis = t->visible; vnum--; tvis++)
@@ -797,7 +797,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	v->last_visible = g;
 	v->viewport = &cam->Viewport;
 	MatrixMultiply( (MATRIX *) &cam->View, (MATRIX *) &cam->Proj, (MATRIX *) &v->viewproj );
-	g->next_visible = NULL;
+	g->next_visible = nullptr;
 	g->visible = 1;
 	g->extent.min.x = (float) v->viewport->X;
 	g->extent.min.y = (float) v->viewport->Y;
@@ -818,7 +818,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 				g->extent = v->first_visible->extent;
 				v->last_visible->next_visible = g;
 				v->last_visible = g;
-				g->next_visible = NULL;
+				g->next_visible = nullptr;
 				g->visible++;
 			}
 		}
@@ -980,7 +980,7 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 	// sort visible groups in depth order
 	v->last_visible = v->first_visible;
 	g = v->first_visible->next_visible;
-	v->first_visible->next_visible = NULL;
+	v->first_visible->next_visible = nullptr;
 	while ( g )
 	{
 		gnext = g->next_visible;
@@ -1154,7 +1154,7 @@ FindClipGroup( CAMERA *cam, MLOADHEADER *m, VECTOR *min, VECTOR *max )
 	VISGROUP *vg;
 	LVLGROUP *mg;
 	u_int16_t in_groups;
-	EXTENT extent, *e=NULL; ZERO_STACK_MEM(extent);
+	EXTENT extent, *e=nullptr; ZERO_STACK_MEM(extent);
 	float extent_size, min_extent_size;
 
 	if ( outside_map )

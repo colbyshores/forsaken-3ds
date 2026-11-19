@@ -38,23 +38,23 @@
 /*===================================================================
 	Global Variables
 ===================================================================*/
-BGO_FILE	*	BGOFilesPtr = NULL;
-BGOBJECT	*	FirstBGObjectUsed = NULL;
-BGOBJECT	*	FirstBGObjectFree = NULL;
+BGO_FILE	*	BGOFilesPtr = nullptr;
+BGOBJECT	*	FirstBGObjectUsed = nullptr;
+BGOBJECT	*	FirstBGObjectFree = nullptr;
 BGOBJECT		BGObjects[ MAXBGOBJECTS ];
 bool			ShowColZones = false;
 
 DOORTYPESFX DoorTypeSFX[] = {
 
-{ -1, (int8_t*)"gndoorop",	-1, NULL,		-1, (int8_t*)"gndoorst",	-1, NULL,	-1, (int8_t*)"gndoorop",	-1, NULL,		-1, (int8_t*)"gndoorcl",	-1, NULL },
-{ -1, (int8_t*)"stndrstr",	-1, (int8_t*)"stndrmov",	-1, (int8_t*)"stndrstp", -1, NULL,	-1, (int8_t*)"stndrstr",	-1, (int8_t*)"stndrmov",	-1, (int8_t*)"stndrstp", -1, NULL },
-{ -1, (int8_t*)"ffdoropn",	-1, NULL,		-1, NULL,		-1, NULL,	-1, (int8_t*)"ffdorcls",	-1, NULL,		-1, (int8_t*)"ffdorcns",	-1, NULL },
-{ -1, (int8_t*)"lift1str",	-1, (int8_t*)"lift1lp",	-1, (int8_t*)"lift1stp",	-1, NULL,	-1, (int8_t*)"lift1str",	-1, (int8_t*)"lift1lp",	-1, (int8_t*)"lift1stp", -1, NULL },
-{ -1, (int8_t*)"smkdorop",	-1, NULL,		-1, NULL,		-1, NULL,	-1, (int8_t*)"smkdorcl",	-1, NULL,		-1, NULL,		-1, NULL },
-{ -1, (int8_t*)"eled1str",	-1, (int8_t*)"eled1mov",	-1, (int8_t*)"eled1stp",	-1, NULL,	-1, (int8_t*)"eled1str",	-1, (int8_t*)"eled1mov",	-1, (int8_t*)"eled1stp",	-1, NULL },
-{ -1, (int8_t*)"eled2str",	-1, (int8_t*)"eled2mov",	-1, (int8_t*)"eled2stp",	-1, NULL,	-1, (int8_t*)"eled2str",	-1, (int8_t*)"eled2mov",	-1, (int8_t*)"eled2stp",	-1, NULL },
-{ -1, (int8_t*)"eled3str",	-1, (int8_t*)"eled3mov",	-1, (int8_t*)"eled3stp",	-1, NULL,	-1, (int8_t*)"eled3str",	-1, (int8_t*)"eled3mov",	-1, (int8_t*)"eled3stp",	-1, NULL },
-{ -1, (int8_t*)"eled4str",	-1, (int8_t*)"eled4mov",	-1, (int8_t*)"eled4stp",	-1, NULL,	-1, (int8_t*)"eled4str",	-1, (int8_t*)"eled4mov",	-1, (int8_t*)"eled4stp",	-1, NULL },
+{ -1, (int8_t*)"gndoorop",	-1, nullptr,		-1, (int8_t*)"gndoorst",	-1, nullptr,	-1, (int8_t*)"gndoorop",	-1, nullptr,		-1, (int8_t*)"gndoorcl",	-1, nullptr },
+{ -1, (int8_t*)"stndrstr",	-1, (int8_t*)"stndrmov",	-1, (int8_t*)"stndrstp", -1, nullptr,	-1, (int8_t*)"stndrstr",	-1, (int8_t*)"stndrmov",	-1, (int8_t*)"stndrstp", -1, nullptr },
+{ -1, (int8_t*)"ffdoropn",	-1, nullptr,		-1, nullptr,		-1, nullptr,	-1, (int8_t*)"ffdorcls",	-1, nullptr,		-1, (int8_t*)"ffdorcns",	-1, nullptr },
+{ -1, (int8_t*)"lift1str",	-1, (int8_t*)"lift1lp",	-1, (int8_t*)"lift1stp",	-1, nullptr,	-1, (int8_t*)"lift1str",	-1, (int8_t*)"lift1lp",	-1, (int8_t*)"lift1stp", -1, nullptr },
+{ -1, (int8_t*)"smkdorop",	-1, nullptr,		-1, nullptr,		-1, nullptr,	-1, (int8_t*)"smkdorcl",	-1, nullptr,		-1, nullptr,		-1, nullptr },
+{ -1, (int8_t*)"eled1str",	-1, (int8_t*)"eled1mov",	-1, (int8_t*)"eled1stp",	-1, nullptr,	-1, (int8_t*)"eled1str",	-1, (int8_t*)"eled1mov",	-1, (int8_t*)"eled1stp",	-1, nullptr },
+{ -1, (int8_t*)"eled2str",	-1, (int8_t*)"eled2mov",	-1, (int8_t*)"eled2stp",	-1, nullptr,	-1, (int8_t*)"eled2str",	-1, (int8_t*)"eled2mov",	-1, (int8_t*)"eled2stp",	-1, nullptr },
+{ -1, (int8_t*)"eled3str",	-1, (int8_t*)"eled3mov",	-1, (int8_t*)"eled3stp",	-1, nullptr,	-1, (int8_t*)"eled3str",	-1, (int8_t*)"eled3mov",	-1, (int8_t*)"eled3stp",	-1, nullptr },
+{ -1, (int8_t*)"eled4str",	-1, (int8_t*)"eled4mov",	-1, (int8_t*)"eled4stp",	-1, nullptr,	-1, (int8_t*)"eled4str",	-1, (int8_t*)"eled4mov",	-1, (int8_t*)"eled4stp",	-1, nullptr },
 
 };
 
@@ -72,7 +72,7 @@ void InitBGObjects( void )
 {
 	u_int16_t	i;
 
-	FirstBGObjectUsed = NULL;
+	FirstBGObjectUsed = nullptr;
 	FirstBGObjectFree = &BGObjects[ 0 ];
 
 	for( i = 0; i < MAXBGOBJECTS; i++ )
@@ -82,14 +82,14 @@ void InitBGObjects( void )
 		BGObjects[ i ].ModelIndex = INDEX_NONE;
 
 		BGObjects[ i ].Index = i;
-		BGObjects[ i ].NextUsed = NULL;
-		BGObjects[ i ].PrevUsed = NULL;
+		BGObjects[ i ].NextUsed = nullptr;
+		BGObjects[ i ].PrevUsed = nullptr;
 		BGObjects[ i ].NextFree = &BGObjects[ i + 1 ];
 		BGObjects[ i ].PrevFree = &BGObjects[ i - 1 ];
 	}
 
-	BGObjects[ 0 ].PrevFree = NULL;
-	BGObjects[ MAXBGOBJECTS - 1 ].NextFree = NULL;
+	BGObjects[ 0 ].PrevFree = nullptr;
+	BGObjects[ MAXBGOBJECTS - 1 ].NextFree = nullptr;
 }
 
 /*===================================================================
@@ -103,25 +103,25 @@ BGOBJECT * FindFreeBGObject( void )
 
 	Object = FirstBGObjectFree;
 
-	if( Object != NULL )
+	if( Object != nullptr )
 	{
 		FirstBGObjectFree = Object->NextFree;
-		if( FirstBGObjectFree != NULL )
+		if( FirstBGObjectFree != nullptr )
 		{
-			FirstBGObjectFree->PrevFree = NULL;
+			FirstBGObjectFree->PrevFree = nullptr;
 		}
 
-		if( FirstBGObjectUsed != NULL )
+		if( FirstBGObjectUsed != nullptr )
 		{
 			FirstBGObjectUsed->PrevUsed = Object;
 			Object->NextUsed = FirstBGObjectUsed;
 		}
 		else
 		{
-			Object->NextUsed = NULL;
+			Object->NextUsed = nullptr;
 		}
 
-		Object->PrevUsed = NULL;
+		Object->PrevUsed = nullptr;
 		FirstBGObjectUsed = Object;
 	}
 
@@ -138,7 +138,7 @@ void KillUsedBGObject( BGOBJECT * Object )
 	BGOBJECT	*	PrevObject;
 	BGOBJECT	*	NextObject;
 
-	if( Object != NULL )
+	if( Object != nullptr )
 	{
 		if( Object == FirstBGObjectUsed )
 		{
@@ -146,9 +146,9 @@ void KillUsedBGObject( BGOBJECT * Object )
 
 			FirstBGObjectUsed = NextObject;
 
-			if( FirstBGObjectUsed != NULL )
+			if( FirstBGObjectUsed != nullptr )
 			{
-				FirstBGObjectUsed->PrevUsed = NULL;
+				FirstBGObjectUsed->PrevUsed = nullptr;
 			}
 		}
 		else
@@ -156,18 +156,18 @@ void KillUsedBGObject( BGOBJECT * Object )
 			PrevObject = Object->PrevUsed;
 			NextObject = Object->NextUsed;
 
-			if( PrevObject != NULL )
+			if( PrevObject != nullptr )
 			{
 				PrevObject->NextUsed = NextObject;
 			}
 
-			if( NextObject != NULL )
+			if( NextObject != nullptr )
 			{
 				NextObject->PrevUsed = PrevObject;
 			}
 		}
 
-		if( FirstBGObjectFree != NULL )
+		if( FirstBGObjectFree != nullptr )
 		{
 			FirstBGObjectFree->PrevFree = Object;
 		}
@@ -182,12 +182,12 @@ void KillUsedBGObject( BGOBJECT * Object )
 		if( Object->Children )
 		{
 			free( Object->Children );
-			Object->Children = NULL;
+			Object->Children = nullptr;
 			Object->NumChildren = 0;
 		}
 
 		Object->NextFree = FirstBGObjectFree;
-		Object->PrevFree = NULL;
+		Object->PrevFree = nullptr;
 		FirstBGObjectFree = Object;
 	}
 }
@@ -207,7 +207,7 @@ void ProcessBGObjects( bool Collide )
 
 	Object = FirstBGObjectUsed;
 
-	while( Object != NULL )
+	while( Object != nullptr )
 	{
 		NextObject = Object->NextUsed;
 
@@ -244,7 +244,7 @@ void ProcessBGObjects( bool Collide )
 							Object->Time = Object->MidTime;
 							StartOrChangeDoorSoundFX( Object );
 
-							if( Object->OpenTrigModPtr != NULL )
+							if( Object->OpenTrigModPtr != nullptr )
 							{
 								ApplyTriggerMod( Object->OpenTrigModPtr );
 							}
@@ -263,7 +263,7 @@ void ProcessBGObjects( bool Collide )
 							Object->Time = 0.0F;
 							StartOrChangeDoorSoundFX( Object );
 
-							if( Object->CloseTrigModPtr != NULL )
+							if( Object->CloseTrigModPtr != nullptr )
 							{
 								ApplyTriggerMod( Object->CloseTrigModPtr );
 							}
@@ -299,7 +299,7 @@ void ProcessBGObjects( bool Collide )
 							Object->Time = 0.0F;
 							StartOrChangeDoorSoundFX( Object );
 
-							if( Object->CloseTrigModPtr != NULL )
+							if( Object->CloseTrigModPtr != nullptr )
 							{
 								ApplyTriggerMod( Object->CloseTrigModPtr );
 							}
@@ -315,7 +315,7 @@ void ProcessBGObjects( bool Collide )
 							Object->Time = Object->MidTime;
 							StartOrChangeDoorSoundFX( Object );
 
-							if( Object->OpenTrigModPtr != NULL )
+							if( Object->OpenTrigModPtr != nullptr )
 							{
 								ApplyTriggerMod( Object->OpenTrigModPtr );
 							}
@@ -544,7 +544,7 @@ void ProcessBGObjects( bool Collide )
 									 * to break parking.  When the animation ends, the
 									 * block below advances the drone's TNode to the
 									 * upper node. */
-									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
+									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
 									if( upper_node )
 									{
 										float progress = Object->Time / Object->OverallTime;
@@ -557,7 +557,7 @@ void ProcessBGObjects( bool Collide )
 						}
 						else
 						{
-							if( Object->EndTrigModPtr != NULL )
+							if( Object->EndTrigModPtr != nullptr )
 							{
 								ApplyTriggerMod( Object->EndTrigModPtr );
 							}
@@ -591,7 +591,7 @@ void ProcessBGObjects( bool Collide )
 									dx = drone->Object.Pos.x - wait_node->Pos.x;
 									dz = drone->Object.Pos.z - wait_node->Pos.z;
 									if( dx*dx + dz*dz > 200.0F*200.0F ) continue;
-									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : NULL;
+									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
 									if( !upper_node ) continue;
 									/* Always advance the drone's TNode forward — the post-
 									 * lift NodeDisable(wait) + NodeEnable(upper) trigger pair
@@ -599,7 +599,7 @@ void ProcessBGObjects( bool Collide )
 									 * and upper_node is either 0x40 (intermediate shaft wait)
 									 * or 0x00 (regular track). */
 									drone->TNode         = upper_node;
-									drone->NextTNode     = NULL;
+									drone->NextTNode     = nullptr;
 									drone->LastTNode     = wait_node;
 									drone->PickNewNodeNow = true;
 
@@ -633,7 +633,7 @@ void ProcessBGObjects( bool Collide )
 							{
 								ExplodeChildren( Object->Children, 1 );
 								KillUsedBGObject( Object );
-								Object = NULL;
+								Object = nullptr;
 							}
 							else
 							{
@@ -717,7 +717,7 @@ void ProcessBGObjects( bool Collide )
 					{
 						Object->Time = Object->OverallTime;
 
-						if( Object->EndTrigModPtr != NULL )
+						if( Object->EndTrigModPtr != nullptr )
 						{
 							ApplyTriggerMod( Object->EndTrigModPtr );
 						}
@@ -726,12 +726,12 @@ void ProcessBGObjects( bool Collide )
 						{
 							ExplodeChildren( Object->Children, 1 );
 							KillUsedBGObject( Object );
-							Object = NULL;
+							Object = nullptr;
 						}
 					}
 				}
 
-				if( Object != NULL )
+				if( Object != nullptr )
 				{
 					if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
 					{
@@ -749,7 +749,7 @@ void ProcessBGObjects( bool Collide )
 								{
 									if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
 									{
-										if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, NULL ) )
+										if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, nullptr ) )
 										{
 											HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
 										}
@@ -809,7 +809,7 @@ void KillAllBGObjects( void )
 
 	Object = FirstBGObjectUsed;
 
-	while( Object != NULL )
+	while( Object != nullptr )
 	{
 		NextObject = Object->NextUsed;
 		KillUsedBGObject( Object );
@@ -846,7 +846,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 
 			if( How == BUMP )
 			{
-				if( Object->BumpTrigModPtr != NULL )
+				if( Object->BumpTrigModPtr != nullptr )
 				{
 					ApplyTriggerMod( Object->BumpTrigModPtr );
 				}
@@ -875,7 +875,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 			}
 			else
 			{
-				if( Object->ShotTrigModPtr != NULL )
+				if( Object->ShotTrigModPtr != nullptr )
 				{
 					ApplyTriggerMod( Object->ShotTrigModPtr );
 				}
@@ -953,7 +953,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 		case BGOTYPE_Looping_Anim:
 			if( How == BUMP )
 			{
-				if( Object->BumpTrigModPtr != NULL )
+				if( Object->BumpTrigModPtr != nullptr )
 				{
 					if( OwnerType == OWNER_SHIP )
 					{
@@ -963,7 +963,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 			}
 			else
 			{
-				if( Object->ShotTrigModPtr != NULL )
+				if( Object->ShotTrigModPtr != nullptr )
 				{
 					if( OwnerType == OWNER_SHIP )
 					{
@@ -981,7 +981,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 			{
 				if( Object->State != ONEOFFANIM_Animating )
 				{
-					if( Object->BumpTrigModPtr != NULL )
+					if( Object->BumpTrigModPtr != nullptr )
 					{
 						if( OwnerType == OWNER_SHIP )
 						{
@@ -994,7 +994,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 			{
 				if( Object->State != ONEOFFANIM_Animating )
 				{
-					if( Object->ShotTrigModPtr != NULL )
+					if( Object->ShotTrigModPtr != nullptr )
 					{
 						if( OwnerType == OWNER_SHIP )
 						{
@@ -1016,7 +1016,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 				if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerBump ) ) Activate = true;
 				else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyBump ) ) Activate = true;
 
-				if( Object->BumpTrigModPtr != NULL )
+				if( Object->BumpTrigModPtr != nullptr )
 				{
 					if( Activate )
 					{
@@ -1029,7 +1029,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 				if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerShot ) ) Activate = true;
 				else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyShot ) ) Activate = true;
 
-				if( Object->ShotTrigModPtr != NULL )
+				if( Object->ShotTrigModPtr != nullptr )
 				{
 					if( Activate )
 					{
@@ -1081,7 +1081,7 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 ===================================================================*/
 bool PreLoadBGOFiles( void )
 {
-	BGO_FILE	*	FilePtr = NULL;
+	BGO_FILE	*	FilePtr = nullptr;
 	char			TempFilename[ 256 ];
 	u_int16_t			BaseModel;
 	u_int16_t			TempBaseModel = INDEX_NONE;
@@ -1100,7 +1100,7 @@ bool PreLoadBGOFiles( void )
 
 	fp = file_open( &TempFilename[ 0 ], "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
@@ -1123,7 +1123,7 @@ bool PreLoadBGOFiles( void )
 
 		BGOFilesPtr = (BGO_FILE *) malloc( ( NumBGObjects + 1 ) * sizeof( BGO_FILE ) );
 
-		if( BGOFilesPtr != NULL )
+		if( BGOFilesPtr != nullptr )
 		{
 			FilePtr = BGOFilesPtr;
 
@@ -1265,7 +1265,7 @@ bool PreLoadBGOFiles( void )
 	}
 	else
 	{
-		BGOFilesPtr = NULL;
+		BGOFilesPtr = nullptr;
 	}
 
 	RequestDoorTypeSFX( 0 );
@@ -1299,7 +1299,7 @@ bool LoadBGOFiles( void )
 									   FilePtr->OpenedBy, FilePtr->DestroyAtEnd, FilePtr->GenType,
 									   FilePtr->Delay, FilePtr->Locked, FilePtr->PickupNeeded, &BaseModel,
 									   FilePtr->NumIntervals, FilePtr->DamagePerInterval, FilePtr->DoorSfxType );
-			if( Object == NULL )
+			if( Object == nullptr )
 			{
 				return( false );
 			}
@@ -1328,7 +1328,7 @@ bool LoadBGOFiles( void )
 		}
 
 		free( BGOFilesPtr );
-		BGOFilesPtr = NULL;
+		BGOFilesPtr = nullptr;
 	}
 
 	ProcessBGObjects( false );
@@ -1373,7 +1373,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 
 	Object = FindFreeBGObject();
 
-	if( Object != NULL )
+	if( Object != nullptr )
 	{
 		Object->State = DOOR_CLOSED;
 
@@ -1387,11 +1387,11 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 				Object->ShotTrigMod = -1;
 				Object->BumpTrigMod = -1;
 				Object->EndTrigMod = -1;
-				Object->OpenTrigModPtr = NULL;
-				Object->CloseTrigModPtr = NULL;
-				Object->ShotTrigModPtr = NULL;
-				Object->BumpTrigModPtr = NULL;
-				Object->EndTrigModPtr = NULL;
+				Object->OpenTrigModPtr = nullptr;
+				Object->CloseTrigModPtr = nullptr;
+				Object->ShotTrigModPtr = nullptr;
+				Object->BumpTrigModPtr = nullptr;
+				Object->EndTrigModPtr = nullptr;
 				break;
 
 /*	DOOR */
@@ -1399,20 +1399,20 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 			case BGOTYPE_Door:
 				Object->OpenTrigMod = OpenTrigMod;
 				Object->CloseTrigMod = CloseTrigMod;
-				if( OpenTrigMod == -1 ) Object->OpenTrigModPtr = NULL;
+				if( OpenTrigMod == -1 ) Object->OpenTrigModPtr = nullptr;
 				else Object->OpenTrigModPtr = &TrigMods[ OpenTrigMod ];
-				if( CloseTrigMod == -1 ) Object->CloseTrigModPtr = NULL;
+				if( CloseTrigMod == -1 ) Object->CloseTrigModPtr = nullptr;
 				else Object->CloseTrigModPtr = &TrigMods[ CloseTrigMod ];
 				Object->ShotTrigMod = ShotTrigMod;
 				Object->BumpTrigMod = BumpTrigMod;
 				Object->Locked = Locked;
 				Object->PickupNeeded = PickupNeeded;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = NULL;
+				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
 				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = NULL;
+				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
 				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
 				Object->EndTrigMod = -1;
-				Object->EndTrigModPtr = NULL;
+				Object->EndTrigModPtr = nullptr;
 				Object->OpenedBy = OpenedBy;
 				Object->DoorSfxType = DoorSfxType;
 				break;
@@ -1422,16 +1422,16 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 			case BGOTYPE_Looping_Anim:
 				Object->OpenTrigMod = -1;
 				Object->CloseTrigMod = -1;
-				Object->OpenTrigModPtr = NULL;
-				Object->CloseTrigModPtr = NULL;
+				Object->OpenTrigModPtr = nullptr;
+				Object->CloseTrigModPtr = nullptr;
 				Object->ShotTrigMod = ShotTrigMod;
 				Object->BumpTrigMod = BumpTrigMod;
 				Object->EndTrigMod = EndTrigMod;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = NULL;
+				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
 				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = NULL;
+				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
 				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
-				if( EndTrigMod == -1 ) Object->EndTrigModPtr = NULL;
+				if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
 				else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
 				Object->GenType = GenType;
 				Object->Delay = ( Delay * ANIM_SECOND );
@@ -1455,16 +1455,16 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 			case BGOTYPE_OneOff_Anim:
 				Object->OpenTrigMod = -1;
 				Object->CloseTrigMod = -1;
-				Object->OpenTrigModPtr = NULL;
-				Object->CloseTrigModPtr = NULL;
+				Object->OpenTrigModPtr = nullptr;
+				Object->CloseTrigModPtr = nullptr;
 				Object->ShotTrigMod = ShotTrigMod;
 				Object->BumpTrigMod = BumpTrigMod;
 				Object->EndTrigMod = EndTrigMod;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = NULL;
+				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
 				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = NULL;
+				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
 				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
-				if( EndTrigMod == -1 ) Object->EndTrigModPtr = NULL;
+				if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
 				else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
 				Object->GenType = GenType;
 				Object->Delay = ( Delay * ANIM_SECOND );
@@ -1489,16 +1489,16 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 			case BGOTYPE_MultipleStep_Anim:
 				Object->OpenTrigMod = -1;
 				Object->CloseTrigMod = -1;
-				Object->OpenTrigModPtr = NULL;
-				Object->CloseTrigModPtr = NULL;
+				Object->OpenTrigModPtr = nullptr;
+				Object->CloseTrigModPtr = nullptr;
 				Object->ShotTrigMod = ShotTrigMod;
 				Object->BumpTrigMod = BumpTrigMod;
 				Object->EndTrigMod = EndTrigMod;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = NULL;
+				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
 				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = NULL;
+				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
 				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
-				if( EndTrigMod == -1 ) Object->EndTrigModPtr = NULL;
+				if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
 				else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
 				Object->DestroyAtEnd = DestroyAtEnd;
 				Object->OpenedBy = OpenedBy;
@@ -1591,7 +1591,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 		{
 			Msg( "LoadBGObjectData() LoadCompObj() failded in %s\n", Filename );
 			KillUsedBGObject( Object );	/* back to the free list; it has no children */
-			return( NULL );
+			return( nullptr );
 		}
 
 		switch( Type )
@@ -1614,7 +1614,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 	else
 	{
 		Msg( "LoadBGObjectData() unable to allocate bgobject in %s\n", Filename );
-		return( NULL );
+		return( nullptr );
 	}
 
 	return( Object );
@@ -1924,7 +1924,7 @@ void ShowAllColZones( u_int16_t Group )
 	{
 		Object = FirstBGObjectUsed;
 
-		while( Object != NULL )
+		while( Object != nullptr )
 		{
 			NextObject = Object->NextUsed;
 
@@ -1941,7 +1941,7 @@ void ShowAllColZones( u_int16_t Group )
 
 		NMEObject = FirstEnemyUsed;
 
-		while( NMEObject != NULL )
+		while( NMEObject != nullptr )
 		{
 			NextNMEObject = NMEObject->NextUsed;
 
@@ -1996,13 +1996,13 @@ void UpdateBGObjectsClipGroup( CAMERA * Camera )
 
 	Object = FirstBGObjectUsed;
 
-	while( Object != NULL )
+	while( Object != nullptr )
 	{
 		NextObject = Object->NextUsed;
 
 		if( IsGroupVisible[ Object->Group ] || (CAMERA_VIEW_IS_VALID && (
 				IsGroupVisible[ Ships[ Current_Camera_View ].Object.Group ] ||
-				VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Object->Group, NULL )
+				VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Object->Group, nullptr )
 		)))
 		{
 			ClipGroup = FindClipGroup( Camera, &Mloadheader, &Object->TopLeft, &Object->BottomRight );
@@ -2409,9 +2409,9 @@ FILE * SaveBGObjects( FILE * fp )
 
 	if( fp )
 	{
-		if( FirstBGObjectUsed != NULL ) fwrite( &FirstBGObjectUsed->Index, sizeof( u_int16_t ), 1, fp );
+		if( FirstBGObjectUsed != nullptr ) fwrite( &FirstBGObjectUsed->Index, sizeof( u_int16_t ), 1, fp );
 		else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-		if( FirstBGObjectFree != NULL ) fwrite( &FirstBGObjectFree->Index, sizeof( u_int16_t ), 1, fp );
+		if( FirstBGObjectFree != nullptr ) fwrite( &FirstBGObjectFree->Index, sizeof( u_int16_t ), 1, fp );
 		else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 
 		for( i = 0; i < MAXBGOBJECTS; i++ )
@@ -2484,13 +2484,13 @@ FILE * SaveBGObjects( FILE * fp )
 			fwrite( &BGObjects[ i ].DoorSfxType, sizeof( int16_t ), 1, fp );
 			fwrite( &BGObjects[ i ].SoundFX_ID, sizeof( u_int32_t ), 1, fp );
 
-			if( BGObjects[ i ].PrevUsed != NULL ) fwrite( &BGObjects[ i ].PrevUsed->Index, sizeof( u_int16_t ), 1, fp );
+			if( BGObjects[ i ].PrevUsed != nullptr ) fwrite( &BGObjects[ i ].PrevUsed->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( BGObjects[ i ].NextUsed != NULL ) fwrite( &BGObjects[ i ].NextUsed->Index, sizeof( u_int16_t ), 1, fp );
+			if( BGObjects[ i ].NextUsed != nullptr ) fwrite( &BGObjects[ i ].NextUsed->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( BGObjects[ i ].PrevFree != NULL ) fwrite( &BGObjects[ i ].PrevFree->Index, sizeof( u_int16_t ), 1, fp );
+			if( BGObjects[ i ].PrevFree != nullptr ) fwrite( &BGObjects[ i ].PrevFree->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
-			if( BGObjects[ i ].NextFree != NULL ) fwrite( &BGObjects[ i ].NextFree->Index, sizeof( u_int16_t ), 1, fp );
+			if( BGObjects[ i ].NextFree != nullptr ) fwrite( &BGObjects[ i ].NextFree->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		}
 	}
@@ -2513,10 +2513,10 @@ FILE * LoadBGObjects( FILE * fp )
 	{
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstBGObjectUsed = &BGObjects[ TempIndex ];
-		else FirstBGObjectUsed = NULL;
+		else FirstBGObjectUsed = nullptr;
 		fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		if( TempIndex != INDEX_NONE ) FirstBGObjectFree = &BGObjects[ TempIndex ];
-		else FirstBGObjectFree = NULL;
+		else FirstBGObjectFree = nullptr;
 
 		for( i = 0; i < MAXBGOBJECTS; i++ )
 		{
@@ -2557,7 +2557,7 @@ FILE * LoadBGObjects( FILE * fp )
 				{
 					FreeCompObjChildren( BGObjects[ i ].Children, BGObjects[ i ].NumChildren );
 					free( BGObjects[ i ].Children );
-					BGObjects[ i ].Children = NULL;
+					BGObjects[ i ].Children = nullptr;
 					BGObjects[ i ].NumChildren = 0;
 				}
 			}
@@ -2574,15 +2574,15 @@ FILE * LoadBGObjects( FILE * fp )
 			fread( &BGObjects[ i ].ShotTrigMod, sizeof( int16_t ), 1, fp );
 			fread( &BGObjects[ i ].BumpTrigMod, sizeof( int16_t ), 1, fp );
 			fread( &BGObjects[ i ].EndTrigMod, sizeof( int16_t ), 1, fp );
-			if( BGObjects[ i ].OpenTrigMod == -1 ) BGObjects[ i ].OpenTrigModPtr = NULL;
+			if( BGObjects[ i ].OpenTrigMod == -1 ) BGObjects[ i ].OpenTrigModPtr = nullptr;
 			else BGObjects[ i ].OpenTrigModPtr = &TrigMods[ BGObjects[ i ].OpenTrigMod ];
-			if( BGObjects[ i ].CloseTrigMod == -1 ) BGObjects[ i ].CloseTrigModPtr = NULL;
+			if( BGObjects[ i ].CloseTrigMod == -1 ) BGObjects[ i ].CloseTrigModPtr = nullptr;
 			else BGObjects[ i ].CloseTrigModPtr = &TrigMods[ BGObjects[ i ].CloseTrigMod ];
-			if( BGObjects[ i ].ShotTrigMod == -1 ) BGObjects[ i ].ShotTrigModPtr = NULL;
+			if( BGObjects[ i ].ShotTrigMod == -1 ) BGObjects[ i ].ShotTrigModPtr = nullptr;
 			else BGObjects[ i ].ShotTrigModPtr = &TrigMods[ BGObjects[ i ].ShotTrigMod ];
-			if( BGObjects[ i ].BumpTrigMod == -1 ) BGObjects[ i ].BumpTrigModPtr = NULL;
+			if( BGObjects[ i ].BumpTrigMod == -1 ) BGObjects[ i ].BumpTrigModPtr = nullptr;
 			else BGObjects[ i ].BumpTrigModPtr = &TrigMods[ BGObjects[ i ].BumpTrigMod ];
-			if( BGObjects[ i ].EndTrigMod == -1 ) BGObjects[ i ].EndTrigModPtr = NULL;
+			if( BGObjects[ i ].EndTrigMod == -1 ) BGObjects[ i ].EndTrigModPtr = nullptr;
 			else BGObjects[ i ].EndTrigModPtr = &TrigMods[ BGObjects[ i ].EndTrigMod ];
 			fread( &BGObjects[ i ].Locked, sizeof( int16_t ), 1, fp );
 			fread( &BGObjects[ i ].OpenedBy, sizeof( int16_t ), 1, fp );
@@ -2610,16 +2610,16 @@ FILE * LoadBGObjects( FILE * fp )
 
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].PrevUsed = &BGObjects[ TempIndex ];
-			else  BGObjects[ i ].PrevUsed = NULL;
+			else  BGObjects[ i ].PrevUsed = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].NextUsed = &BGObjects[ TempIndex ];
-			else  BGObjects[ i ].NextUsed = NULL;
+			else  BGObjects[ i ].NextUsed = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].PrevFree = &BGObjects[ TempIndex ];
-			else  BGObjects[ i ].PrevFree = NULL;
+			else  BGObjects[ i ].PrevFree = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) BGObjects[ i ].NextFree = &BGObjects[ TempIndex ];
-			else  BGObjects[ i ].NextFree = NULL;
+			else  BGObjects[ i ].NextFree = nullptr;
 		}
 	}
 
@@ -2831,7 +2831,7 @@ void StartOrChangeDoorSoundFX( BGOBJECT * Object )
 }
 
 BIKEINFO FlyGirlCompFile = { "FlyGirl.cob", 0, 0, 0.0F };
-COMP_OBJ * FlyGirlComps = NULL;
+COMP_OBJ * FlyGirlComps = nullptr;
 float FlyGirlAnim;
 
 /*===================================================================
@@ -2845,7 +2845,7 @@ bool PreLoadFlyGirl( void )
 	char	TempFilename[ 256 ];
 
 	ModNames = &TitleModelNames[ 0 ];
-	FlyGirlComps = NULL;
+	FlyGirlComps = nullptr;
 
 	BaseModel = TITLE_MODEL_ExtraModels;
 
@@ -2923,7 +2923,7 @@ void ReleaseFlyGirl( void )
 		if( FlyGirlComps )
 		{
 			free( FlyGirlComps );
-			FlyGirlComps = NULL;
+			FlyGirlComps = nullptr;
 		}
 	}
 }

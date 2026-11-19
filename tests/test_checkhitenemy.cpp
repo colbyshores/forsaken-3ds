@@ -92,7 +92,7 @@ static void mk_enemy(ENEMY *e, int idx, int group, float x, float y, float z, bo
 	if (enable)
 		e->Status |= ENEMY_STATUS_Enable;
 	e->CompCollision = SPHERECOLLISION;
-	e->NextUsed = NULL;
+	e->NextUsed = nullptr;
 }
 
 static int failures;
@@ -134,7 +134,7 @@ int main(void)
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
 	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
-	CHECK(hit == NULL, "sealed-group enemy skipped");
+	CHECK(hit == nullptr, "sealed-group enemy skipped");
 	CHECK(dist == 1000.0f, "Dist untouched on skip");
 
 	/* Case 3: sealed-nearer (dist 40) loses to connected-farther (dist 90).
@@ -158,7 +158,7 @@ int main(void)
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_ENEMY, 5, &pos, 0, &dir, &up, 1000.0f,
 	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
-	CHECK(hit == NULL, "owner self excluded");
+	CHECK(hit == nullptr, "owner self excluded");
 
 	/* Case 5: disabled enemy ignored (connected, on-ray). */
 	memset(SoundInfo, 0, sizeof(SoundInfo));
@@ -167,7 +167,7 @@ int main(void)
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
 	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
-	CHECK(hit == NULL, "disabled enemy ignored");
+	CHECK(hit == nullptr, "disabled enemy ignored");
 
 	/* Case 6: connected but off-ray still misses (gate passes, ray decides). */
 	memset(SoundInfo, 0, sizeof(SoundInfo));
@@ -176,7 +176,7 @@ int main(void)
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
 	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
-	CHECK(hit == NULL, "connected off-ray misses");
+	CHECK(hit == nullptr, "connected off-ray misses");
 
 	/* Case 7: far enemy beyond reach is skipped, Dist untouched.
 	 * dist 100 > DirLength 50 + Radius 10 + WeaponRadius 0. */
@@ -186,7 +186,7 @@ int main(void)
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
 	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
-	CHECK(hit == NULL, "beyond-reach enemy skipped");
+	CHECK(hit == nullptr, "beyond-reach enemy skipped");
 	CHECK(dist == 1000.0f, "Dist untouched on skip");
 
 	/* Case 8: just inside reach still hits (no over-cull at boundary).
@@ -207,7 +207,7 @@ int main(void)
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
 	                    &ip, &ip2, &dist, 5.0f, COLTYPE_Trojax);
-	CHECK(hit == NULL, "trojax far enemy skipped");
+	CHECK(hit == nullptr, "trojax far enemy skipped");
 	CHECK(dist == 1000.0f, "Dist untouched on trojax skip");
 
 	/* Case 10: negative WeaponRadius falls through to old logic (guard). */

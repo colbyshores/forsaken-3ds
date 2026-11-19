@@ -57,7 +57,7 @@ int glob(const char *pattern, int flags,
 	(void)flags; (void)errfunc;
 
 	pglob->gl_pathc = 0;
-	pglob->gl_pathv = NULL;
+	pglob->gl_pathv = nullptr;
 
 	/* Split pattern into directory and filename parts */
 	strncpy(dirpath, pattern, sizeof(dirpath) - 1);
@@ -89,7 +89,7 @@ int glob(const char *pattern, int flags,
 	if (!dir) return GLOB_NOMATCH;
 
 	/* First pass: count matches */
-	while ((entry = readdir(dir)) != NULL) {
+	while ((entry = readdir(dir)) != nullptr) {
 		char *name = entry->d_name;
 		if (star) {
 			int nlen = strlen(name);
@@ -113,7 +113,7 @@ int glob(const char *pattern, int flags,
 	/* Second pass: collect matches */
 	rewinddir(dir);
 	int idx = 0;
-	while ((entry = readdir(dir)) != NULL && idx < count) {
+	while ((entry = readdir(dir)) != nullptr && idx < count) {
 		char *name = entry->d_name;
 		int matched = 0;
 		if (star) {
@@ -135,7 +135,7 @@ int glob(const char *pattern, int flags,
 			idx++;
 		}
 	}
-	pglob->gl_pathv[idx] = NULL;
+	pglob->gl_pathv[idx] = nullptr;
 	pglob->gl_pathc = idx;
 	closedir(dir);
 	return 0;
@@ -148,7 +148,7 @@ void globfree(glob_t *pglob)
 	for (i = 0; i < pglob->gl_pathc; i++)
 		free(pglob->gl_pathv[i]);
 	free(pglob->gl_pathv);
-	pglob->gl_pathv = NULL;
+	pglob->gl_pathv = nullptr;
 	pglob->gl_pathc = 0;
 }
 

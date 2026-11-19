@@ -15,7 +15,7 @@
 bool FSCreateVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
 {
 	renderObject->vertexBuffer = linearAlloc(numVertices * sizeof(LVERTEX));
-	return renderObject->vertexBuffer != NULL;
+	return renderObject->vertexBuffer != nullptr;
 }
 
 bool FSCreateDynamicVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
@@ -26,7 +26,7 @@ bool FSCreateDynamicVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
 bool FSCreateNormalBuffer(RENDEROBJECT *renderObject, int numNormals)
 {
 	renderObject->normalBuffer = linearAlloc(numNormals * sizeof(NORMAL));
-	return renderObject->normalBuffer != NULL;
+	return renderObject->normalBuffer != nullptr;
 }
 
 bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
@@ -40,7 +40,7 @@ bool FSCreateIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
 	 * (800 verts/call), text overlays write tens of quads, load-time
 	 * loops write exactly triangleCount*3 — all far below requested. */
 	renderObject->indexBuffer = linearAlloc(numIndices * sizeof(WORD));
-	return renderObject->indexBuffer != NULL;
+	return renderObject->indexBuffer != nullptr;
 }
 
 bool FSCreateDynamicIndexBuffer(RENDEROBJECT *renderObject, int numIndices)
@@ -74,7 +74,7 @@ bool FSUnlockNormalBuffer(RENDEROBJECT *renderObject) { (void)renderObject; retu
 bool FSCreateDynamic2dVertexBuffer(RENDEROBJECT *renderObject, int numVertices)
 {
 	renderObject->vertexBuffer = linearAlloc(numVertices * sizeof(TLVERTEX));
-	return renderObject->vertexBuffer != NULL;
+	return renderObject->vertexBuffer != nullptr;
 }
 
 bool FSLockPretransformedVertexBuffer(RENDEROBJECT *renderObject, TLVERTEX **verts)
@@ -89,19 +89,19 @@ void FSReleaseRenderObject(RENDEROBJECT *renderObject)
 	if (renderObject->vertexBuffer)
 	{
 		linearFree(renderObject->vertexBuffer);
-		renderObject->vertexBuffer = NULL;
+		renderObject->vertexBuffer = nullptr;
 	}
 	if (renderObject->normalBuffer)
 	{
 		linearFree(renderObject->normalBuffer);
-		renderObject->normalBuffer = NULL;
+		renderObject->normalBuffer = nullptr;
 	}
 	if (renderObject->indexBuffer)
 	{
 		linearFree(renderObject->indexBuffer);
-		renderObject->indexBuffer = NULL;
+		renderObject->indexBuffer = nullptr;
 	}
 	for (i = 0; i < renderObject->numTextureGroups; i++)
-		renderObject->textureGroups[i].texture = NULL;
+		renderObject->textureGroups[i].texture = nullptr;
 	renderObject->numTextureGroups = 0;
 }

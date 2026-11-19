@@ -52,7 +52,7 @@ bool LoadStartPoints( void )
 
 	fp = file_open( &NewFilename[ 0 ], "rb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );

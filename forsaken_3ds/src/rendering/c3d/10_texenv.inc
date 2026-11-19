@@ -228,6 +228,6 @@ static void apply_texenv_untextured(void)
 		return;
 	configure_texenv_none();
 	s_lastTexEnvMode     = TEXENV_MODE_NONE;
-	s_lastBoundTexture   = NULL;
+	s_lastBoundTexture   = nullptr;
 	s_lastTexEnvTextured = false;
 }

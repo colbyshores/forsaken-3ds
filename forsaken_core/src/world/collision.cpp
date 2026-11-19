@@ -562,7 +562,7 @@ bool AmIOutsideGroup( MLOADHEADER * m, VECTOR * EndPos, u_int16_t EndGroup )
 			dv.z > m->Group[ EndGroup ].half_size.z + OUTSIDE_GROUP_TOLERANCE );
 }
 
-static BGOBJECT	*	CurParent = NULL;
+static BGOBJECT	*	CurParent = nullptr;
 
 /* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 /*===================================================================
@@ -591,7 +591,7 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 	float			RayLength;
 
 	ColDist = Distance;
-	ColChild = NULL;
+	ColChild = nullptr;
 	ColCollided = collided;
 	NormDir = ODir;
 	RayLength = VectorLength( &NormDir );
@@ -599,7 +599,7 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 
 	Object = FirstBGObjectUsed;
 
-	while( Object != NULL )
+	while( Object != nullptr )
 	{
 		CurParent = Object;
 
@@ -633,7 +633,7 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 				}
 				else
 				{
-					*BGObject = NULL;
+					*BGObject = nullptr;
 				}
 			}
 		}
@@ -667,7 +667,7 @@ bool CheckBGObjectsCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 	{
 		if( BGObject )
 		{
-			*BGObject = NULL;
+			*BGObject = nullptr;
 		}
 	}
 
@@ -699,13 +699,13 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 	u_int16_t			EnemyHit = INDEX_NONE;
 
 	ColDist = Distance;
-	ColChild = NULL;
+	ColChild = nullptr;
 	ColCollided = collided;
-	CurParent = NULL;
+	CurParent = nullptr;
 
 	Object = FirstEnemyUsed;
 
-	while( Object != NULL )
+	while( Object != nullptr )
 	{
 		if( ( Object->Status & ENEMY_STATUS_Enable ) && ( Object->CompCollision == COMPONENTCOLLISION ) )
 		{
@@ -985,7 +985,7 @@ bool CheckBGObjectCollision( VECTOR * Pos, BGOBJECT * Object, VECTOR * PushVecto
 {
 	float	Speed;
 
-	ColChild = NULL;
+	ColChild = nullptr;
 	ColCollided = 0;
 	Origin = *Pos;
 	ColRadius = Radius;
@@ -1047,7 +1047,7 @@ bool CheckCompObjectCollision( VECTOR * Pos, COMP_OBJ * Comps, VECTOR * PushVect
 {
 	float	Speed;
 
-	ColChild = NULL;
+	ColChild = nullptr;
 	ColCollided = 0;
 	Origin = *Pos;
 	ColRadius = Radius;
@@ -1367,7 +1367,7 @@ bool ObjectCollide( OBJECT *Obj, VECTOR *Move_Off, float radius, BGOBJECT **BGOb
 		Feeler.z += radius * ( dx1 * Right.z + dy1 * Up.z );
 		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
 			&FeelerStart, FeelerGroup, &Feeler,
-			&FeelerImpactPoint , &FeelerImpactGroup, &FeelerFaceNormal, &FeelerPos_New, NoBGObject, ( BGObject ) ? &FeelerBGObject : NULL ) )
+			&FeelerImpactPoint , &FeelerImpactGroup, &FeelerFaceNormal, &FeelerPos_New, NoBGObject, ( BGObject ) ? &FeelerBGObject : nullptr ) )
 		{
 			FeelerPlane = -DotProduct( (VECTOR *)&FeelerFaceNormal, &FeelerImpactPoint ) - radius;
 			Div = DotProduct( &Move_Dir , (VECTOR *)&FeelerFaceNormal );
@@ -1572,7 +1572,7 @@ bool QCollide( VECTOR *Start_Pos, u_int16_t Start_Group, VECTOR *Move_Off, float
 		Feeler.z += radius * ( dx1 * Right.z + dy1 * Up.z );
 		if ( BackgroundCollide( &MCloadheadert0, &Mloadheader,
 			&FeelerStart, FeelerGroup, &Feeler,
-			&FeelerImpactPoint , &FeelerImpactGroup, &FeelerFaceNormal, &FeelerPos_New, true, NULL ) )
+			&FeelerImpactPoint , &FeelerImpactGroup, &FeelerFaceNormal, &FeelerPos_New, true, nullptr ) )
 		{
 			FeelerPlane = -DotProduct( (VECTOR *)&FeelerFaceNormal, &FeelerImpactPoint ) - radius;
 			Div = DotProduct( &Move_Dir , (VECTOR *)&FeelerFaceNormal );

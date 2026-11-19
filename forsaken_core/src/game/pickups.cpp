@@ -57,7 +57,7 @@
 ===================================================================*/
 bool			RandomPickups;
 bool			MyRandomPickups;
-REGENPOINT	*	RegenPoints = NULL;
+REGENPOINT	*	RegenPoints = nullptr;
 int16_t			NumRegenPoints = 0;
 int16_t			NumPickupsPerGroup[ MAXGROUPS ];
 int16_t			NumPickupType[ MAXPICKUPTYPES ];
@@ -701,8 +701,8 @@ void InitPickups( void )
 		Pickups[ i ].Next = i + 1;
 		Pickups[ i ].Prev = INDEX_NONE;
 
-		Pickups[ i ].NextInGroup = NULL;
-		Pickups[ i ].PrevInGroup = NULL;
+		Pickups[ i ].NextInGroup = nullptr;
+		Pickups[ i ].PrevInGroup = nullptr;
 
 		Pickups[ i ].Index = i;
 		Pickups[ i ].LifeCount = -1.0F;
@@ -715,7 +715,7 @@ void InitPickups( void )
 		Pickups[ i ].DirVector = Forward;
 		Pickups[ i ].UpVector = SlideUp;
 		Pickups[ i ].RegenSlot = -1;
-		Pickups[ i ].TriggerModPtr = NULL;
+		Pickups[ i ].TriggerModPtr = nullptr;
 		Pickups[ i ].TriggerMod = INDEX_NONE;
 		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);
@@ -1857,7 +1857,7 @@ void KillUsedPickup( u_int16_t i )
 	u_int16_t	its_prev;
 	u_int16_t	its_next;
 
-	if( Pickups[ i ].TriggerModPtr != NULL )
+	if( Pickups[ i ].TriggerModPtr != nullptr )
 	{
 		ApplyTriggerMod( Pickups[i].TriggerModPtr );
 	}
@@ -2079,7 +2079,7 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		Pickups[ i ].RegenSlot = RegenSlot;
 		Pickups[ i ].ModelType = PickupAttribs[ Type ].ModelType;
 		Pickups[ i ].TriggerMod = TriggerMod;
-		if( TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = NULL;
+		if( TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = nullptr;
 		else Pickups[ i ].TriggerModPtr = &TrigMods[ TriggerMod ];
 		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);			// Create Dir Matrix
@@ -2290,7 +2290,7 @@ u_int16_t InitJoinPickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spe
 		Pickups[ i ].RegenSlot = RegenSlot;
 		Pickups[ i ].ModelType = PickupAttribs[ Type ].ModelType;
 		Pickups[ i ].TriggerMod = TriggerMod;
-		if( TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = NULL;
+		if( TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = nullptr;
 		else Pickups[ i ].TriggerModPtr = &TrigMods[ TriggerMod ];
 		Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 		Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);			// Create Dir Matrix
@@ -2702,7 +2702,7 @@ void SavePickupsPositions( void )
 
 	fp = file_open( &NewFilename[ 0 ], "wb" );
 
-	if( fp != NULL )
+	if( fp != nullptr )
 	{
 		i = FirstPickupUsed;
 		Num_Pickups = 0;
@@ -2974,7 +2974,7 @@ bool LoadPickupsPositions( void )
   fp = file_open( &NewFilename[ 0 ], "rb" );
 
   /* if the file handle is valid */
-  if( fp != NULL )
+  if( fp != nullptr )
   {
 
 	/* read in the magic number */
@@ -2995,7 +2995,7 @@ bool LoadPickupsPositions( void )
 	fread( &NumRegenPoints, sizeof( int16_t ), 1, fp );
 
 	/* if global RegenPoints list of regen points IS set */
-	if( RegenPoints != NULL )
+	if( RegenPoints != nullptr )
 	{
 	  /* free the memory */
 	  free( RegenPoints );
@@ -3004,7 +3004,7 @@ bool LoadPickupsPositions( void )
 	  for( Count = 0; Count < MAX_PLAYERS; Count++ )
 
 		/* if regen slot copy IS set */
-		if( RegenSlotsCopy[ Count ] != NULL )
+		if( RegenSlotsCopy[ Count ] != nullptr )
 
 		  /* free the memory */
 		  free( RegenSlotsCopy[ Count ] );
@@ -3019,7 +3019,7 @@ bool LoadPickupsPositions( void )
 	  RegenSlotsCopy[ Count ] = (REGENPOINT*)malloc( sizeof( REGENPOINT ) * NumRegenPoints );
 
 	/* if the global is not NULL */
-	if( RegenPoints != NULL )
+	if( RegenPoints != nullptr )
 	{
 	  /* loop each regen point in the file */
 	  for( Count = 0; Count < NumRegenPoints; Count++ )
@@ -3798,7 +3798,7 @@ void KillAllPickups( void )
 		NextPickup = Pickups[ i ].Prev;
 
 		/* Reset the pickups triggerMod */
-		Pickups[ i ].TriggerModPtr = NULL;
+		Pickups[ i ].TriggerModPtr = nullptr;
 		Pickups[ i ].TriggerMod    = INDEX_NONE;
 
 		/* cleanup the pickup
@@ -3849,7 +3849,7 @@ void CopyRegenSlots( u_int16_t Player )
 
 	Ptr = RegenSlotsCopy[ Player ];
 
-	if( Ptr != NULL )
+	if( Ptr != nullptr )
 	{
 		memmove( Ptr, RegenPoints, ( NumRegenPoints * sizeof( REGENPOINT ) ) );//memcpy
 	}
@@ -4147,7 +4147,7 @@ void SetupPickupGroups( void )
 
 	for( Count = 0; Count < MAXGROUPS; Count++ )
 	{
-		PickupGroups[ Count ] = NULL;
+		PickupGroups[ Count ] = nullptr;
 		NumPickupsPerGroup[ Count ] = 0;
 	}
 }
@@ -4160,7 +4160,7 @@ void SetupPickupGroups( void )
 ===================================================================*/
 void AddPickupToGroup( u_int16_t i, u_int16_t Group )
 {
-	Pickups[ i ].PrevInGroup = NULL;
+	Pickups[ i ].PrevInGroup = nullptr;
 	Pickups[ i ].NextInGroup = PickupGroups[ Group ];
 	if( Pickups[ i ].NextInGroup ) Pickups[ i ].NextInGroup->PrevInGroup = &Pickups[ i ];
 	PickupGroups[ Group ] = &Pickups[ i ];
@@ -4178,8 +4178,8 @@ void RemovePickupFromGroup( u_int16_t i, u_int16_t Group )
 	if( Pickups[ i ].PrevInGroup ) Pickups[ i ].PrevInGroup->NextInGroup = Pickups[ i ].NextInGroup;
 	else PickupGroups[ Group ] = Pickups[ i ].NextInGroup;
 	if( Pickups[ i ].NextInGroup ) Pickups[ i ].NextInGroup->PrevInGroup = Pickups[ i ].PrevInGroup;
-	Pickups[ i ].PrevInGroup = NULL;
-	Pickups[ i ].NextInGroup = NULL;
+	Pickups[ i ].PrevInGroup = nullptr;
+	Pickups[ i ].NextInGroup = nullptr;
 	NumPickupsPerGroup[ Group ]--;
 }
 
@@ -4290,7 +4290,7 @@ FILE * SaveAllPickups( FILE * fp )
 		for( i = 0; i < MAXGROUPS; i++ )
 		{
 			fwrite( &NumPickupsPerGroup[ i ], sizeof( int16_t ), 1, fp );
-			if( PickupGroups[ i ] != NULL ) fwrite( &PickupGroups[ i ]->Index, sizeof( u_int16_t ), 1, fp );
+			if( PickupGroups[ i ] != nullptr ) fwrite( &PickupGroups[ i ]->Index, sizeof( u_int16_t ), 1, fp );
 			else fwrite( &TempIndex, sizeof( u_int16_t ), 1, fp );
 		}
 
@@ -4415,7 +4415,7 @@ FILE * LoadAllPickups( FILE * fp )
 			fread( &NumPickupsPerGroup[ i ], sizeof( int16_t ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) PickupGroups[ i ] = &Pickups[ TempIndex ];
-			else PickupGroups[ i ] = NULL;
+			else PickupGroups[ i ] = nullptr;
 		}
 
 		for( i = 0; i < MAXPICKUPTYPES; i++ )
@@ -4469,10 +4469,10 @@ FILE * LoadAllPickups( FILE * fp )
 			fread( &Pickups[ i ].Prev, sizeof( u_int16_t ), 1, fp );
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) Pickups[ i ].NextInGroup = &Pickups[ TempIndex ];
-			else Pickups[ i ].NextInGroup = NULL;
+			else Pickups[ i ].NextInGroup = nullptr;
 			fread( &TempIndex, sizeof( u_int16_t ), 1, fp );
 			if( TempIndex != INDEX_NONE ) Pickups[ i ].PrevInGroup = &Pickups[ TempIndex ];
-			else Pickups[ i ].PrevInGroup = NULL;
+			else Pickups[ i ].PrevInGroup = nullptr;
 			fread( &Pickups[ i ].Index, sizeof( u_int16_t ), 1, fp );
 			fread( &Pickups[ i ].Type, sizeof( u_int16_t ), 1, fp );
 			fread( &Pickups[ i ].Owner, sizeof( u_int16_t ), 1, fp );
@@ -4502,7 +4502,7 @@ FILE * LoadAllPickups( FILE * fp )
 			fread( &Pickups[ i ].UpVector, sizeof( VECTOR ), 1, fp );
 			fread( &Pickups[ i ].RegenSlot, sizeof( int16_t ), 1, fp );
 			fread( &Pickups[ i ].TriggerMod, sizeof( u_int16_t ), 1, fp );
-			if( Pickups[ i ].TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = NULL;
+			if( Pickups[ i ].TriggerMod == INDEX_NONE ) Pickups[ i ].TriggerModPtr = nullptr;
 			else Pickups[ i ].TriggerModPtr = &TrigMods[ Pickups[ i ].TriggerMod ];
 			fread( &Pickups[ i ].ColStart, sizeof( VECTOR ), 1, fp );
 			fread( &Pickups[ i ].ColDist, sizeof( float ), 1, fp );
@@ -4520,8 +4520,8 @@ FILE * LoadAllPickups( FILE * fp )
 		{
 			memset( &Pickups[ i ], 0, sizeof( PICKUP ) );
 			Pickups[ i ].Prev = INDEX_NONE;
-			Pickups[ i ].NextInGroup = NULL;
-			Pickups[ i ].PrevInGroup = NULL;
+			Pickups[ i ].NextInGroup = nullptr;
+			Pickups[ i ].PrevInGroup = nullptr;
 			Pickups[ i ].Index = i;
 			Pickups[ i ].LifeCount = -1.0F;
 			Pickups[ i ].Mode = PICKUPMODE_Normal;
@@ -4533,7 +4533,7 @@ FILE * LoadAllPickups( FILE * fp )
 			Pickups[ i ].DirVector = Forward;
 			Pickups[ i ].UpVector = SlideUp;
 			Pickups[ i ].RegenSlot = -1;
-			Pickups[ i ].TriggerModPtr = NULL;
+			Pickups[ i ].TriggerModPtr = nullptr;
 			Pickups[ i ].TriggerMod = INDEX_NONE;
 			Pickups[ i ].DirQuat.From2Vectors(&Forward, &Pickups[ i ].DirVector);
 			Pickups[ i ].DirQuat.ToMatrix(&Pickups[ i ].Mat);
