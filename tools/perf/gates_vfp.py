@@ -150,7 +150,7 @@ EXEMPT_RE = re.compile(
 )
 HOTPATH_ANN_RE = re.compile(r"/\*\s*@hotpath\s*\*/")
 FUNC_RE = re.compile(
-    r"(?P<head>^[\w:<>,\s\*&]+?\b(?P<name>[A-Za-z_]\w*)\s*\([^;{]*\))"
+    r"(?P<head>^(?:\[\[[\w:,\s()]*\]\]\s*)?[\w:<>,\s\*&]+?\b(?P<name>[A-Za-z_]\w*)\s*\([^;{]*\))"
     r"\s*(?:const\s+|volatile\s+|&{1,2}\s*)*\{",
     re.MULTILINE,
 )
@@ -175,7 +175,9 @@ SQRT_RE = re.compile(r"\bsqrtf?\s*\(")
 FAST_TRIG_RE = re.compile(r"\b(?:fast_sinf|fast_cosf|SINR|COSR|SIND|COSD)\b")
 FX_IDENT_RE = re.compile(r"\b([A-Za-z_]\w*(?:_fx|_q16|_q8)|fx_[A-Za-z_]\w*)\b")
 FLOAT_DECL_RE = re.compile(
-    r"\b(?:float|double)\s+(?:const\s+)?(?P<names>[A-Za-z_]\w*(?:\s*,\s*[A-Za-z_]\w*)*)"
+    # also a reference parameter (float & x): the always_inline handlers split
+    # out of hot loops take their caller's floats by reference
+    r"\b(?:float|double)\s+(?:const\s+)?(?:&\s*)?(?P<names>[A-Za-z_]\w*(?:\s*,\s*[A-Za-z_]\w*)*)"
 )
 KEYWORD_STOP = {
     "if", "for", "while", "switch", "return", "sizeof", "static", "const",
@@ -591,10 +593,16 @@ def parse_exemptions(text: str) -> list[Exemption]:
     return found
 
 
-def exemption_for_index(text: str, exemptions: Sequence[Exemption], index: int) -> Exemption | None:
+def exemption_for_index(text: str, exemptions: Sequence[Exemption], index: int,
+                        rule: str | None = None) -> Exemption | None:
+    """The nearest @vfp-exempt comment at most 800 characters before index,
+    considering only comments that name `rule` when one is given (a comment
+    for another rule in between does not hide it)."""
     best: Exemption | None = None
     best_dist = 10**9
     for exemption in exemptions:
+        if rule is not None and rule not in exemption.rules:
+            continue
         pos = 0
         for _ in range(exemption.line - 1):
             nxt = text.find("\n", pos)
@@ -1145,10 +1153,19 @@ def scan_function(
     text: str,
     exemptions: Sequence[Exemption],
     hot_reason: str,
+    *,
+    whole_body_in_loop: bool = False,
+    symbol: str | None = None,
 ) -> list[Finding]:
+    """symbol: the name findings are keyed under (an inlined handler's
+    findings use its caller's, so baseline keys survive the split).
+    whole_body_in_loop: the body runs inside the caller's loop."""
     findings: list[Finding] = []
     float_ids = float_names_in(func.header + "\n" + func.body)
     loops = split_loops(func.body)
+    if whole_body_in_loop:
+        loops = [(0, func.body)]
+    key_symbol = symbol or func.name
 
     def maybe(
         rule: str,
@@ -1158,10 +1175,11 @@ def scan_function(
         *,
         untyped: bool = False,
     ) -> None:
-        abs_index = func.start + rel_off
+        # rel_off is into func.body, which starts after the header and its '{'
+        abs_index = func.start + len(func.header) + 1 + rel_off
         line = line_of(text, abs_index) if 0 <= abs_index < len(text) else func.line
         cover = standing_covers(rel, func.name, rule)
-        local = exemption_for_index(text, exemptions, abs_index)
+        local = exemption_for_index(text, exemptions, abs_index, rule)
         if local and rule in local.rules:
             cover = cover or "inline"
         if cover:
@@ -1169,7 +1187,7 @@ def scan_function(
         sev: Severity = "SHOULD" if untyped and severity == "MUST" else severity
         findings.append(
             Finding(
-                rule, sev, rel, line, func.name, True, hot_reason, None,
+                rule, sev, rel, line, key_symbol, True, hot_reason, None,
                 detail if not untyped else f"untyped-heuristic: {detail}",
             )
         )
@@ -1283,14 +1301,39 @@ def scan_file(
     exemptions = parse_exemptions(text)
     annotated_lines = {line_of(text, m.start()) for m in HOTPATH_ANN_RE.finditer(text)}
     functions = parse_functions(text)
+    hot_funcs: list[tuple[Function, str]] = []
     for func in functions:
         annotated = any(func.line - 3 <= ln <= func.line for ln in annotated_lines)
         hot, reason = classify_hot(rel_key, func, seed, annotated or force_hot, cold)
         if force_hot:
             hot, reason = True, reason or "seed"
-        if not hot:
+        if hot:
+            hot_funcs.append((func, reason))
+    # A [[gnu::always_inline]] handler split out of a hot function runs as part
+    # of it: scan it as hot, as loop code when a call site is inside one of
+    # the caller's loops, and key its findings under the caller (transitively).
+    handlers = {f.name: f for f in functions if "always_inline" in f.header}
+    owner: dict[str, tuple[str, bool, str]] = {}
+    work = [(f, f.name, False, r) for f, r in hot_funcs]
+    while work:
+        caller, root, in_loop, reason = work.pop()
+        spans = [(caller.body.find(lp), caller.body.find(lp) + len(lp)) for _o, lp in split_loops(caller.body)]
+        for name, h in handlers.items():
+            if name in owner or h is caller:
+                continue
+            calls = [m.start() for m in re.finditer(r"\b" + re.escape(name) + r"\s*\(", caller.body)]
+            if not calls:
+                continue
+            looped = in_loop or any(a <= c <= b for c in calls for a, b in spans if a >= 0)
+            owner[name] = (root, looped, f"inlined into {root}")
+            work.append((h, root, looped, reason))
+    for func, reason in hot_funcs:
+        if func.name in owner:
             continue
         findings.extend(scan_function(rel_key, func, text, exemptions, reason))
+    for name, (root, looped, reason) in owner.items():
+        findings.extend(scan_function(rel_key, handlers[name], text, exemptions, reason,
+                                      whole_body_in_loop=looped, symbol=root))
     if force_hot and not functions:
         dummy = Function("body", 0, len(text), strip_comments_keep_lines(text), 1, "")
         findings.extend(scan_function(rel_key, dummy, text, exemptions, "seed"))

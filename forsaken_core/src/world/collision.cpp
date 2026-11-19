@@ -528,6 +528,7 @@ bool OneGroupPortalCol( MLOADHEADER * /*Mloadheader*/ , u_int16_t group ,
 					*Next_Group = bp->group;
 					flag = 1;
 				}else{
+					/* @vfp-exempt R3 — protected hit set: nearest portal-crossing selection; integerizing changes which portal is crossed. measured n/a. Verified 2026-11-19. */
 					if ( IDist < Distance )
 					{
 						Distance = IDist;
@@ -855,6 +856,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 							}
 							else
 							{
+								/* @vfp-exempt R3 — protected hit set: nearest-impact selection; integerizing changes gameplay. measured n/a. Verified 2026-11-19. */
 								if( DistToInt < ColDist )
 								{
 									ColPoint = IntPoint;
@@ -895,6 +897,7 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 							}
 							else
 							{
+								/* @vfp-exempt R3 — protected hit set: nearest-impact selection; integerizing changes gameplay. measured n/a. Verified 2026-11-19. */
 								if( DistToInt < ColDist )
 								{
 									ColPoint = IntPoint;
@@ -1143,6 +1146,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 				NewOrigin = OldOrigin;
 
 				Length = VectorLength( &NewDir );
+				/* @vfp-exempt R3 — protected hit set: degenerate-direction guard on a float length; integerizing changes gameplay. measured n/a. Verified 2026-11-19. */
 				if( Length < 0.065F )
 				{
 					Length = 0.065F;
@@ -1191,6 +1195,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 							}
 							else
 							{
+								/* @vfp-exempt R3 — protected hit set: nearest-impact selection; integerizing changes gameplay. measured n/a. Verified 2026-11-19. */
 								if( DistToInt < ColDist )
 								{
 									ColPoint = IntPoint;
@@ -1232,6 +1237,7 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 							}
 							else
 							{
+								/* @vfp-exempt R3 — protected hit set: nearest-impact selection; integerizing changes gameplay. measured n/a. Verified 2026-11-19. */
 								if( DistToInt < ColDist )
 								{
 									ColPoint = IntPoint;

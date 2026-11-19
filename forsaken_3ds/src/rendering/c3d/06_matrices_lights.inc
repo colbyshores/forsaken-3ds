@@ -260,6 +260,7 @@ void c3d_update_phong_tint_for_object_pos(VECTOR *world_pos)
 		float dz = ((XLIGHT*)L)->Pos.z - world_pos->z;
 		float d2 = dx*dx + dy*dy + dz*dz;
 		float size = ((XLIGHT*)L)->Size;
+		/* @vfp-exempt R3 — light coverage and nearest-light compare; integerizing changes which light tints the object. measured n/a. Verified 2026-11-19. */
 		if (d2 < size * size) {
 			if (!nearest || d2 < nearest_d2) {
 				nearest    = L;

@@ -435,6 +435,7 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 /* FM_FLASH */
 [[gnu::always_inline]] static inline void FmPolyFlash( u_int16_t & i )
 {
+	/* @vfp-exempt R3 — the flash sprite's float lifetime test and size clamps at zero; integerizing changes when it dies and how it shrinks. measured n/a. Verified 2026-11-19. */
 	if( FmPolys[i].LifeCount == 0.0F )
 	{
 		KillUsedFmPoly( i );
@@ -832,6 +833,7 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 		TempDir.y = ( FmPolys[i].Dir.y * framelag );
 		TempDir.z = ( FmPolys[i].Dir.z * framelag );
 
+		/* @vfp-exempt R3 — wall-collision test along the spark's float path; integerizing changes where it bounces. measured n/a. Verified 2026-11-19. */
 		if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &FmPolys[i].Pos,
 							  /* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							  FmPolys[i].Group, &TempDir, (VECTOR *) &Int_Point,
@@ -1010,12 +1012,14 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 			if( FmPolys[ i ].LifeCount >= NMEGEN_STAGE2 )		// stage 1
 			{
 				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				/* @vfp-exempt R7 — constant divisor (NMEGEN_STAGE1_LEN is constexpr), folded at compile time; no division at run time. measured n/a. Verified 2026-11-19. */
 				FmPolys[ i ].xsize -= ( ( ( 6.0F * GLOBAL_SCALE ) / NMEGEN_STAGE1_LEN ) * framelag );
 				FmPolys[ i ].ysize = FmPolys[ i ].xsize;
 				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 			}
 			else												// stage 2
 			{
+				/* @vfp-exempt R7 — constant divisor (NMEGEN_STAGE2_LEN is constexpr), folded at compile time; no division at run time. measured n/a. Verified 2026-11-19. */
 				FmPolys[ i ].xsize -= ( ( ( 8.0F * GLOBAL_SCALE ) / NMEGEN_STAGE2_LEN ) * framelag );
 				FmPolys[ i ].ysize = FmPolys[ i ].xsize;
 			}
@@ -1048,6 +1052,7 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 		}
 		else
 		{
+			/* @vfp-exempt R3 — wall-collision test along the drip's float path; integerizing changes where it lands. measured n/a. Verified 2026-11-19. */
 			if( BackgroundCollide( &MCloadheadert0 ,&Mloadheader, &FmPolys[i].Pos,
 								  FmPolys[i].Group, &TempDir, (VECTOR *) &Int_Point,
 								  &FmPolys[i].Group, &Int_Normal, &TempVector, true, nullptr ) == true )
@@ -1104,6 +1109,7 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 			if( FmPolys[i].UpSpeed > 10.0F ) FmPolys[i].UpSpeed = 10.0F;
 		}
 
+		/* @vfp-exempt R7 — division by 2.0F compiles to an exact multiply by 0.5; no division at run time. measured n/a. Verified 2026-11-19. */
 		FmPolys[i].Frame += ( framelag / 2.0F );
 		if( FmPolys[i].Frame >= (*FmPolys[i].Frm_Info)->Num_Frames )
 		{
@@ -1280,6 +1286,7 @@ static	u_int8_t	SmokeRingShadeTable[ 5 ] = { 255, 200, 150, 100, 50 };
 
 		Speed = FMOD( FmPolys[i].LifeCount, 20.0F );
 
+		/* @vfp-exempt R3 — sparkle pulse threshold on a float phase; integerizing changes the pulse shape. measured n/a. Verified 2026-11-19. */
 		if( Speed > 10.0F )
 		{
 			FmPolys[i].xsize = ( ( 20.0F - Speed ) * 0.05F );
@@ -1398,6 +1405,7 @@ void FmPolyProcess( void )
 			else if( FmPolys[ i ].Rot < 0.0F ) FmPolys[ i ].Rot += 360.0F;
 
 			FmPolys[i].Frame += framelag;
+			/* @vfp-exempt R3 — animation frame clamp on a float frame counter; integerizing changes which frame is drawn. measured n/a. Verified 2026-11-19. */
 			if( FmPolys[i].Frame > 12.0F ) FmPolys[i].Frame = 12.0F;
 			break;
 
@@ -2082,6 +2090,7 @@ bool FmPolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_
 								Distance = VectorLength( &TempVector );
 								NormaliseVector( &TempVector );
 
+								/* @vfp-exempt R3 — explosion size from camera distance; integerizing changes the drawn size. measured n/a. Verified 2026-11-19. */
 								if( Distance >= ( EXPLO_DISTANCE + 110.0F ) )
 								{
 									Distance = EXPLO_DISTANCE;
@@ -2454,6 +2463,7 @@ bool FmPolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_in
 								Distance = VectorLength( &TempVector );
 								NormaliseVector( &TempVector );
 
+								/* @vfp-exempt R3 — explosion size from camera distance; integerizing changes the drawn size. measured n/a. Verified 2026-11-19. */
 								if( Distance >= ( EXPLO_DISTANCE + 110.0F ) )
 								{
 									Distance = EXPLO_DISTANCE;

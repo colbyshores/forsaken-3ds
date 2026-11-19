@@ -2202,6 +2202,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 									Xsize = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xsize );
 									Ysize *= ( ( Xsize ) * pixel_aspect_ratio );
 
+									/* @vfp-exempt R3 — division-by-zero guard on a float offset; integerizing changes the drawn position. measured n/a. Verified 2026-11-19. */
 									if( Xoff != 0.0F ) Yoff = ( Yoff / Xoff );
 									else Yoff = 0.0F;
 									Xoff = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xoff );
@@ -2768,6 +2769,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 									Xsize = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xsize );
 									Ysize *= ( ( Xsize ) * pixel_aspect_ratio );
 
+									/* @vfp-exempt R3 — division-by-zero guard on a float offset; integerizing changes the drawn position. measured n/a. Verified 2026-11-19. */
 									if( Xoff != 0.0F ) Yoff = ( Yoff / Xoff );
 									else Yoff = 0.0F;
 									Xoff = ( ( CurrentCamera.Viewport.Width / 320.0F ) * Xoff );
