@@ -1,16 +1,16 @@
 /* sound_openal.cpp -- sound.h for the PC, on OpenAL (built with SOUND_OPENAL)
  *
- * sound_init opens the default device and makes one context current; it
- * runs once per process (a later call returns true without reopening, even
- * after sound_destroy). Each sound_buffer_t is one OpenAL buffer filled from
- * a WAV through SDL_LoadWAV (8-bit data stored unsigned, 16-bit signed, as
- * OpenAL wants); each sound_source_t is one OpenAL source on that buffer.
- * Millibels become gain 10^(mb/2000). Sound3D is always false, so sources
- * are listener-relative and sound_pan puts the source on the unit circle in
- * the listener's x/y plane (straight above it at centre): pan never changes
- * the distance. z is negated for OpenAL's right-handed axes. The listener
- * gain is fixed at 0.5 to reduce crackling. music_openal.cpp plays on the
- * same context.
+ * sound_init opens the default device and makes one context current; once
+ * that succeeds, later calls return true without reopening (even after
+ * sound_destroy); a failed open is retried by the next call. Each
+ * sound_buffer_t is one OpenAL buffer filled from a WAV through SDL_LoadWAV
+ * (8-bit data stored unsigned, 16-bit signed, as OpenAL wants); each
+ * sound_source_t is one OpenAL source on that buffer. Millibels become gain
+ * 10^(mb/2000). Sound3D is always false, so sources are listener-relative
+ * and sound_pan puts the source on the unit circle in the listener's x/y
+ * plane (straight above it at centre): pan never changes the distance. z is
+ * negated for OpenAL's right-handed axes. The listener gain is fixed at 0.5
+ * to reduce crackling. music_openal.cpp plays on the same context.
  */
 
 #ifdef SOUND_OPENAL
@@ -128,7 +128,6 @@ bool sound_init( void )
 	static int initialized = 0;
 	if(initialized)
 		return true;
-	initialized = 1;
 
 	Device = alcOpenDevice(NULL); // preferred device
 	if(!Device)
@@ -136,9 +135,14 @@ bool sound_init( void )
 
 	Context = alcCreateContext(Device,NULL);
 	if(!Context)
+	{
+		alcCloseDevice(Device);
+		Device = NULL;
 		return false;
+	}
 
 	alcMakeContextCurrent(Context);
+	initialized = 1; // only a successful open counts: a failed one is retried
 
 	// the game's volume maths use DirectSound units, where silence
 	// (DSBVOLUME_MIN) is -10000 millibels; forsaken's floor is 1/3 of that.
