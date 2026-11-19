@@ -117,8 +117,8 @@ int8_t * EnemyNames[] =	{
 	(int8_t*)"LEADER_LazerBot",		// 50
 	(int8_t*)"LEADER_Max",			// 51
 	(int8_t*)"LEADER_AirMoble",		// 52
-	(int8_t*)"Fodder1"				// 53
-	"Boss_LittleGeek",		// 54
+	(int8_t*)"Fodder1",				// 53
+	(int8_t*)"Boss_LittleGeek",		// 54
 	(int8_t*)"Bike_FlyGirl",			// 55
 };
 
@@ -6004,7 +6004,8 @@ void DispUntriggeredNMEs( void )
 		{
 			if( !SoundInfo[ Enemy->Object.Group ][ Ships[ Current_Camera_View ].Object.Group ] || outside_map )
 			{
-				DispInGameText( &Enemy->Object.Pos, EnemyNames[ Enemy->Type ] );
+				if( Enemy->Type < (int) ( sizeof( EnemyNames ) / sizeof( EnemyNames[ 0 ] ) ) )
+					DispInGameText( &Enemy->Object.Pos, EnemyNames[ Enemy->Type ] );
 
 				if( framelag )
 				{
