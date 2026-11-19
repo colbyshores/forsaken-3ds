@@ -7862,11 +7862,9 @@ void LoseSuperNashram( void )
 
 /*===================================================================
 	Procedure	:	Create Shield Effect when Invulnerable
-	Input		:	VECTOR	*	Center of Shield
-				:	VECTOR	*	Intersection Point ( Front of shield )
-				:	VECTOR	*	Intersection Point2 ( Back of shield )
-				:	u_int16_t		ShipHit
+	Input		:	u_int16_t		ShipHit
 				:	int16_t		Number of Spirals
+				:	u_int8_t		RVal, GVal, BVal	Colour
 	Output		:	Nothing
 ===================================================================*/
 float	InvulInterval = 1.0F;
