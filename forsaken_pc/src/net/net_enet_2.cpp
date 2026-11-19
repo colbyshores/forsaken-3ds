@@ -1246,7 +1246,7 @@ static void new_packet( ENetEvent * event )
 						packet2.type = CONNECT;
 						packet2.id = packet->id;
 						packet2.address = bad_peer->address;
-						packet2.address.port = peer_data->connect_port;
+						packet2.address.port = PEER_CONNECT_PORT( bad_peer );
 						network_send( peer_data->player, &packet2, sizeof(packet2),
 							NETWORK_RELIABLE, system_channel );
 						DebugPrintf("network: telling player %d to reconnect to valid player %d\n",
