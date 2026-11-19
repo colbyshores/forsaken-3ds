@@ -2345,8 +2345,14 @@ MENU	MENU_Save = { (u_int8_t*)LT_MENU_Save0 /*"Save Menu"*/ , NULL , NULL , NULL
 					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
 
 /* The title's first frame (TitleInitDone) copies MENU_NEW_Start, or a
- * quick-start menu, into this before anything opens it. */
-MENU	MENU_Start;
+ * quick-start menu, over this. Until then it must still be a valid menu:
+ * InitView (the title load) calls MenuRestart( &MENU_Start ) before that
+ * first frame, and MenuRestart scans the items for a select callback up to
+ * the x = -1 terminator. The header and first item are the 1998 main
+ * menu's, so that early restart does exactly what it always did. */
+MENU	MENU_Start = { (u_int8_t*)"Forsaken" , InitStartMenu , NULL , NULL, 0,
+					{ OLDMENUITEM( 200 , 112,  (u_int8_t*)"Set Up Biker  ", (void *)biker_name, &MENU_SetUpBiker, MenuChange, DrawNameVar ),
+					  {	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 } } };
 
 MENU	MENU_Host_Options = { (u_int8_t*)"HOST OPTIONS FOR THIS GAME" , InitHostMenu , NULL , NULL,	0,
 			{
