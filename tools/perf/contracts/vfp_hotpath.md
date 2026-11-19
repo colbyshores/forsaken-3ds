@@ -48,6 +48,17 @@ static call-graph seed (frame loop + ≥256×/frame), not a profile, and the
 first criterion is dormant. The gate says so on every run. Nothing in this
 contract applies to code that is not HOT PATH. See §5.
 
+**SPLIT HANDLERS** — a long hot function may be split into
+`[[gnu::always_inline]] static inline` handlers (one per message, weapon
+hit, effect type...), which compile back into their caller. The gate treats
+such a handler as part of the hot function that calls it, transitively: it
+is scanned as hot; when a call site lies inside one of the caller's loops,
+its whole body is checked as loop code; and its findings are keyed under
+the calling function's name, so baseline entries are unchanged by the split.
+A handler's floats usually arrive as reference parameters (`float & x`),
+which the gate reads as float declarations. Only `always_inline` handlers
+get this treatment: an ordinary function must be hot in its own right.
+
 **BOUNDARY CROSSING** — any operation that moves a value between the ARM
 integer register file and the VFP register file, or that requires a VFP
 status flag to be read by ARM-side control flow. Includes:
@@ -208,6 +219,14 @@ An exemption is granted inline, this grammar only, no paraphrases:
 An exemption records a reviewed reason to preserve a site (pixels, hit tests,
 rounding, asset output, measured tradeoff). It is not a TODO. Do not strip
 pins to "clean up" a file. Do not add hot-only R-rule pins to cold code.
+
+**Reach.** A pin covers findings of the rules it names that start at most
+800 characters after it in the same file; for each finding the nearest pin
+*naming that finding's rule* counts, so a pin for another rule in between
+does not hide it. Put the pin directly above the line it is about. Before
+2026-11-19 the gate measured a finding's position from the start of its
+function's header rather than its body, which let some pins reach lines
+further away than intended; those lines carry their own pin now.
 
 Standing exemptions (corpus, not source comments):
 
