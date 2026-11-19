@@ -76,6 +76,8 @@ top of that file is the reference; in short:
   things and broke the engine's UV maths.
 - PNGs that have a `.t3x` are left out of the romfs (the loader never opens
   them); `FSTextureExists` lets the level-texture path choice accept either.
+  The original `.bmp` textures are not shipped either: the build converts
+  the ones without a `.t3x` to PNG, and the game only opens `.png` / `.t3x`.
 
 Pipeline: `tools/texture/regen_hd_textures_4k.sh`.
 
