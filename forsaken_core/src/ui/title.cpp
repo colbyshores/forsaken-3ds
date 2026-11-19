@@ -7351,10 +7351,8 @@ void GetSavedGameData( void )
 		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
-		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
-			Msg("Save file is in an old format.\nYou will most likely crash...\n\n");
-
-		bool ok = file_read_cstring( fp, buf, sizeof( buf ) )
+		bool ok = MagicNumber == MAGIC_NUMBER && VersionNumber == LOADSAVE_VERSION_NUMBER
+			&& file_read_cstring( fp, buf, sizeof( buf ) )
 			&& file_read_cstring( fp, biker, sizeof( biker ) );
 
 		file_read( &Hours, sizeof( Hours ), 1, fp );

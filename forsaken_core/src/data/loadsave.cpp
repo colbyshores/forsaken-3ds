@@ -138,10 +138,8 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
-		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
-			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-
-		if( !file_read_cstring( fp, buf, sizeof( buf ) ) )
+		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  )
+			|| !file_read_cstring( fp, buf, sizeof( buf ) ) )
 		{
 			fclose( fp );
 			return false;
@@ -157,7 +155,7 @@ bool PreInGameLoad( MENUITEM * /*MenuItem*/ )
 			}
 		}
 
-		if( ( NewLevelNum == -1 ) || ( i == 256 ) )
+		if( NewLevelNum == -1 )
 		{
 			fclose( fp );
 			return false;
@@ -190,10 +188,8 @@ bool InGameLoad( MENUITEM * /*MenuItem*/ )
 		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
-		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
-			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-
-		if( !file_read_cstring( fp, buf, sizeof( buf ) ) || !file_read_cstring( fp, biker, sizeof( biker ) ) )
+		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  )
+			|| !file_read_cstring( fp, buf, sizeof( buf ) ) || !file_read_cstring( fp, biker, sizeof( biker ) ) )
 		{
 			fclose( fp );
 			return false;
@@ -556,10 +552,8 @@ char *SavedGameInfo( int slot )
 		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
-		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
-			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-
-		if( !file_read_cstring( fp, buf, sizeof( buf ) ) || !file_read_cstring( fp, biker, sizeof( biker ) ) )
+		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  )
+			|| !file_read_cstring( fp, buf, sizeof( buf ) ) || !file_read_cstring( fp, biker, sizeof( biker ) ) )
 		{
 			fclose( fp );
 			snprintf( info, sizeof( info ), SAVED_GAME_SLOT_DAMAGED, slot + 1 );
@@ -596,21 +590,15 @@ char *SavedGameInfo( int slot )
 }
 
 
+/* A slot is used when its file exists, whatever state it is in: the
+   player can always save over it. */
 bool SaveGameSlotUsed( int slot )
 {
 	FILE	*	fp;
-	u_int32_t		MagicNumber;
-	u_int32_t		VersionNumber;
 
 	fp = file_open( SaveGameFileName( slot ), "rb" );
 	if ( fp )
 	{
-		file_read( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-		file_read( &VersionNumber, sizeof( u_int32_t ), 1, fp );
-
-		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != LOADSAVE_VERSION_NUMBER  ) )
-			Msg("Save file is in an old format.\nYou will most likely crash...\n");
-
 		fclose( fp );
 		return true;
 	}
