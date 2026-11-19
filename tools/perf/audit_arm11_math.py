@@ -36,6 +36,7 @@ from gates_vfp import (  # noqa: E402
     Finding,
     Function,
     filter_baseline,
+    gate_key,
     in_scope_files,
     line_of,
     load_corpus,
@@ -107,7 +108,7 @@ def audit(seed: dict[str, object]) -> tuple[list[Finding], list[Finding], list[F
     r4_offenders: list[Finding] = []
     r4_allowed: list[Finding] = []
     for path in in_scope_files():
-        rel = path.name
+        rel = gate_key(path)
         raw = path.read_text(encoding="utf-8", errors="replace")
         clean = strip_comments_keep_lines(raw)
         funcs = parse_functions(clean)

@@ -37,7 +37,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gates_vfp import in_scope_files, load_corpus, source_trees, DEFAULT_CORPUS  # noqa: E402
+from gates_vfp import gate_key, in_scope_files, load_corpus, source_trees, DEFAULT_CORPUS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 BASELINE = Path(__file__).resolve().parent / "contracts" / "r11_candidates_baseline.txt"
@@ -197,7 +197,7 @@ def scan(show_all=False):
                           "static_assert": 0, "pinned": 0}
 
     for path in files:
-        rel = path.name
+        rel = gate_key(path)
         try:
             raw = path.read_text(encoding="utf-8", errors="replace")
         except OSError:

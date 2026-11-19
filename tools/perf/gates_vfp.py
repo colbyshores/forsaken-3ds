@@ -93,15 +93,34 @@ BUILD_TREES_REL = (CORE_SRC_REL, PLAT_3DS_SRC_REL)
 ALL_TREES_REL = (CORE_SRC_REL, PLAT_3DS_SRC_REL, PLAT_PC_SRC_REL)
 
 # The numeric contract (R1-R11) covers C and C++ alike: a converted file cannot
-# slip past R2/R3/R4/R6/R11 by being a .cpp. No .inc fragments (T2K's renderer
-# is split across pasted .inc files; here the renderer is a single render_c3d.c).
+# slip past R2/R3/R4/R6/R11 by being a .cpp. A .inc fragment (a slice of one
+# translation unit, #included in a fixed order, as T2K splits its renderer) is
+# scanned too and keyed by the translation unit its banner names (gate_key), so
+# splitting a file into .inc slices keeps every baseline / corpus / exemption key.
 #
 # Findings, baselines, the hot corpus and exemptions are keyed by source
 # BASENAME ("ships.cpp"), not by path. Both Makefiles already key objects by
 # basename, so basenames are unique across the trees by construction;
 # in_scope_files() fails loudly if that ever stops being true. Basename keys
 # keep every baseline entry valid when a file moves between subdirectories.
-CXX_EXTS = {".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".hh"}
+CXX_EXTS = {".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".hh", ".inc"}
+
+# Banner of a .inc slice: "NN_name.inc -- part of render_c3d.cpp (SINGLE
+# TRANSLATION UNIT)."
+INC_OWNER_RE = re.compile(r"--\s*part of (\S+)\s+\(SINGLE TRANSLATION UNIT\)")
+
+
+def gate_key(path: Path) -> str:
+    """The key a source file's findings, baselines and corpus entries use: its
+    basename, or for a .inc slice the translation unit its banner names."""
+    if path.suffix != ".inc":
+        return path.name
+    head = path.read_text(encoding="utf-8", errors="replace")[:1000]
+    m = INC_OWNER_RE.search(head)
+    if not m:
+        raise SystemExit(f"{path}: .inc slice without a "
+                         "'-- part of X (SINGLE TRANSLATION UNIT)' banner")
+    return m.group(1)
 
 INIT_NAME_RE = re.compile(
     r"(init|load|create|destroy|reset|parse|shutdown|seed)", re.IGNORECASE
@@ -259,7 +278,7 @@ def repo_rel(path: Path) -> str:
     except ValueError:
         return path.as_posix()
     if any(rel.parts[:len(t.parts)] == t.parts for t in ALL_TREES_REL):
-        return path.name
+        return gate_key(path)
     return rel.as_posix()
 
 
@@ -1393,7 +1412,7 @@ def scan_tree(
     findings: list[Finding] = []
     targets = {entry.rel for entry in seed.values()}
     for path in in_scope_files(root):
-        rel = path.name
+        rel = gate_key(path)
         if rel not in targets:
             try:
                 if not HOTPATH_ANN_RE.search(path.read_text(encoding="utf-8", errors="replace")):
