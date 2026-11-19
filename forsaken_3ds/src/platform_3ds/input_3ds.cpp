@@ -136,7 +136,7 @@ bool handle_events(void)
 {
 	circlePosition cpad;
 	circlePosition cstick;
-	u_int32_t kDown, kHeld, kUp;
+	u_int32_t kDown, kHeld;
 	int deadzone;
 
 	/* pump HID */
@@ -144,7 +144,6 @@ bool handle_events(void)
 
 	kDown = hidKeysDown();
 	kHeld = hidKeysHeld();
-	kUp   = hidKeysUp();
 
 	if (!s_n3ds_checked)
 	{
