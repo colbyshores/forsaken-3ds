@@ -87,6 +87,473 @@ void Check3DPanelPolyAnim(POLYANIM * PolyAnim );
 	Input		:		char	*	Filename , MXLOADHEADER *
 	Output		:		Nothing
 ===================================================================*/
+/* load one group's meshes: vertex, index and normal buffers and texture groups. True: Mxload fails. */
+[[gnu::always_inline]] static inline bool MxloadGroupMeshes( char *& Filename, MXLOADHEADER *& Mxloadheader, bool & Panel, bool & StoreTriangles, TRIANGLE & FacePnt, TRIANGLE *& TempFacePnt, u_int16_t & mesh_type, u_int16_t & num_vertices, u_int16_t & num_texture_groups, u_int16_t & num_triangles, LVERTEX *& LVert, LVERTEX *& BufStart, WORD *& Indices, NORMAL *& Normals, int & ibIndex, int & i, int & e, u_int16_t & tpage, int & mesh, int & group, int & r, int & g, int & b, int & a, COLOR & color, int & colourkey, int & triangleCount, int & indexOffset, int & tempInt, FileReader & in )
+{
+	for( mesh=0 ; mesh<Mxloadheader->Group[group].num_meshes; mesh++)
+	{
+		num_texture_groups = 0;
+
+		in.skip( sizeof( u_int16_t ) );	// Direct3D execute-buffer size (unused)
+
+		/*	get the type of execution buffer	*/
+		mesh_type = in.u16();
+
+		/*	get the number of verts in execution buffer	*/
+		num_vertices = in.u16();
+
+		/*	record the mesh's type	*/
+		Mxloadheader->Group[group].mesh_type[mesh] = mesh_type;
+
+		/*	record how many verts the mesh has	*/
+		Mxloadheader->Group[group].num_verts_per_mesh[mesh] = num_vertices;
+
+		/*	create a vertex buffer	*/
+		if (!FSCreateVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], num_vertices))
+		{
+			Msg( "Mxload : FSCreateVertexBuffer failed\n" );
+			return true;
+		}
+		Mxloadheader->Group[group].renderObject[mesh].vertOwner = VERT_OWNER_MODEL;
+
+		DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
+
+		/*	lock the vertex buffer	*/
+		if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &LVert)))
+		{
+			Msg( "Mxload() lock failed in %s\n", Filename );
+			return true;
+		}
+
+		BufStart = LVert;
+
+		/*	copy the vertices into the vertex buffer	*/
+		for ( i=0 ; i<num_vertices; i++)
+		{
+			OLDLVERTEX old;
+			in.bytes( &old, sizeof( old ) );
+
+			LVert[i].x = old.x;
+			LVert[i].y = old.y;
+			LVert[i].z = old.z;
+			LVert[i].tu = old.tu;
+			LVert[i].tv = old.tv;
+
+			color = old.color;
+			a = (color>>24)&255;
+			r = (color>>16)&255;
+			g = (color>>8)&255;
+			b = color&255;
+
+			a = 255;
+
+			color = RGBA_MAKE( r , g , b , a  );
+			LVert[i].color = color;
+
+			// the file's specular colour is unused (LVERTEX has no specular)
+		}
+
+		/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
+		Mxloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
+		memmove(Mxloadheader->Group[group].originalVerts[mesh], &LVert[0], sizeof(LVERTEX) * num_vertices);//memcpy
+
+		//	Stuff to clip if bounding box is off screen
+
+		num_texture_groups = in.u16();
+		DebugPrintf("texture groups: %d\n", num_texture_groups);
+		Mxloadheader->Group[group].num_texture_groups[mesh] = num_texture_groups;
+
+
+		triangleCount = 0;
+		tempInt = 0;
+
+		/* find out how many vertexes we'll need to load into our vertex buffer */
+		{
+			FileReader scan = in;
+			for ( i=0 ; i<num_texture_groups; i++)
+			{
+				scan.skip( 4 * sizeof( u_int16_t ) );
+				u_int16_t numTriangles = scan.u16();
+				scan.skip( numTriangles * sizeof( MFACE ) );
+				triangleCount += numTriangles;
+			}
+		}
+
+		/*	create an index buffer	*/
+		if (!FSCreateIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount * 3))
+		{
+			return true;
+		}
+
+		DebugPrintf("created index buffer to hold :%d incidices\n", triangleCount * 3);
+
+		/*	lock the index buffer	*/
+		if (!(FSLockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Indices)))
+		{
+			Msg( "Mxload() lock failed in %s\n", Filename );
+			return true;
+		}
+
+		if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount))
+		{
+			DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
+			return true;
+		}
+		if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Normals)))
+		{
+			Msg( "Mxload() normal lock failed in %s\n", Filename );
+			return true;
+		}
+
+		/* Allocate this mesh's textureGroups[] from the TAG_LEVEL
+		 * hunk, sized to num_texture_groups. Bulk-freed via
+		 * Hunk_FreeAll(TAG_LEVEL) on level transition. */
+		if ( num_texture_groups > 0 )
+		{
+			Mxloadheader->Group[group].renderObject[mesh].textureGroups =
+				(TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
+											num_texture_groups * sizeof(TEXTUREGROUP));
+			if ( !Mxloadheader->Group[group].renderObject[mesh].textureGroups )
+			{
+				Msg( "Mxload() hunk-alloc failed for textureGroups[%u] %s\n",
+					 (unsigned)num_texture_groups, Filename );
+				return true;
+			}
+		}
+
+		ibIndex = 0;
+		indexOffset = 0;
+
+		for ( i=0 ; i<num_texture_groups; i++)
+		{
+			in.skip( sizeof( u_int16_t ) );	// texture type (unused)
+			in.skip( sizeof( u_int16_t ) );	// first vertex (unused)
+			in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
+			tpage = in.u16();
+			num_triangles = in.u16();
+			DebugPrintf("trinagles %d\n", num_triangles);
+
+			TempFacePnt = (TRIANGLE *) /*LVert*/Indices;
+
+
+			/*	copy the triangles into the index and normal buffers	*/
+			for( e=0; e<num_triangles; e++)
+			{
+				MFACE face;
+				in.bytes( &face, sizeof( face ) );
+				FacePnt.v1 = face.v1;
+				FacePnt.v2 = face.v2;
+				FacePnt.v3 = face.v3;
+
+				Indices[ibIndex] = FacePnt.v1;
+				ibIndex++;
+				Indices[ibIndex] = FacePnt.v2;
+				ibIndex++;
+				Indices[ibIndex] = FacePnt.v3;
+				ibIndex++;
+
+				Normals->nx = face.nx;
+				Normals->ny = face.ny;
+				Normals->nz = face.nz;
+
+				if ( face.pad & 1 )
+				{
+					// colourkey triangle found
+					colourkey++;
+				}
+				if( Mxloadheader->num_texture_files )
+					FixUV( &FacePnt, BufStart, Mxloadheader->TloadIndex[tpage], Mxloadheader->Group[group].originalVerts[mesh]);
+				Normals++;
+				tempInt+=3;
+			}
+
+			// BJD - check this. correct value to place here?
+			Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;//num_triangles * 3;
+			Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numTriangles = num_triangles;
+
+			/* keep track of our offset into our index buffer */
+			Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].startIndex = indexOffset;
+			indexOffset += num_triangles * 3;
+
+			if( Mxloadheader->num_texture_files == 0 )
+			{
+				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = nullptr;
+				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = false;
+			}
+			else
+			{
+				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.TexHandle[Mxloadheader->TloadIndex[tpage]];
+				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxloadheader->TloadIndex[tpage]];
+			}
+		}
+
+		DebugPrintf("put %d indices into IB\n", tempInt);
+
+		// 3D panel models: put the cull state back to the default
+		if( Panel )
+		{
+			reset_cull();
+		}
+
+		if (StoreTriangles)
+		{	Mxloadheader->Group[group].num_polys_per_mesh[mesh] = triangleCount;//num_triangles;
+			Mxloadheader->Group[group].poly_ptr[mesh] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);
+
+			memmove(Mxloadheader->Group[group].poly_ptr[mesh], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
+
+		}
+		else
+		{
+			Mxloadheader->Group[group].num_polys_per_mesh[mesh] = 0;
+			Mxloadheader->Group[group].poly_ptr[mesh] = nullptr;
+		}
+
+		/*	unlock the vertex buffer	*/
+		if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
+		{
+			Msg( "Mxload() vb unlock failed in %s\n", Filename );
+			return true;
+		}
+
+		/*	unlock the index buffer	*/
+		if (!(FSUnlockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
+		{
+			Msg( "Mxload() ib unlock failed in %s\n", Filename );
+			return true;
+		}
+
+		if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
+		{
+			Msg( "Mxload() normal unlock failed in %s\n", Filename );
+			return true;
+		}
+
+		Mxloadheader->Group[group].renderObject[mesh].numTextureGroups = num_texture_groups;
+
+
+		/* update the renderObject */
+
+	}
+	return false;
+}
+
+/* load the model's texture animations. True: Mxload fails. */
+[[gnu::always_inline]] static inline bool MxloadBackgroundAnimations( char *& Filename, MXLOADHEADER *& Mxloadheader, bool & Panel, LVERTEX *& LVert, int & i, int & e, int & o, int & mesh, int & group, u_int16_t & animation, u_int16_t & frames, u_int16_t & vertices, POLYANIM *& PolyAnim, TANIMUV *& TanimUV, int *& intPnt, u_int16_t & num_animations, u_int16_t & animsize, FileReader & in )
+{
+	if( num_animations )
+	{
+		for( i = 0 ; i < num_animations ; i++ )
+		{
+			in.skip( sizeof( u_int16_t ) );	// frames (unused)
+			in.skip( sizeof( u_int16_t ) );	// max loops (unused)
+			animsize = in.u16();
+			Mxloadheader->AnimData.AnimSeq[i] = (u_int16_t *) malloc( animsize * sizeof( u_int16_t ) );
+			in.bytes( Mxloadheader->AnimData.AnimSeq[i], animsize * sizeof( u_int16_t ) );
+		}
+
+		for( group=0 ; group<Mxloadheader->num_groups; group++)
+		{
+			for( mesh=0 ; mesh<Mxloadheader->Group[group].num_meshes; mesh++)
+			{
+				// Animating background polys......
+				Mxloadheader->Group[group].num_animating_polys[mesh] = in.u16();
+				if( Mxloadheader->Group[group].num_animating_polys[mesh] != 0 )
+				{
+					Mxloadheader->Group[group].polyanim[mesh] = (POLYANIM*)malloc( Mxloadheader->Group[group].num_animating_polys[mesh] * sizeof( POLYANIM ) );
+
+
+					PolyAnim = Mxloadheader->Group[group].polyanim[mesh];
+					if( !PolyAnim )
+					{
+						Msg( "Mxload() Polyanim failed in %s\n", Filename );
+						return true;
+					}
+
+					if (!(FSLockVertexBuffer(&Mxloadheader->Group[ group ].renderObject[mesh], &LVert)))
+					{
+						Msg( "Mxload : FSLockVertexBuffer failed\n" );
+						return true;
+					}
+
+					for( i = 0 ; i < Mxloadheader->Group[group].num_animating_polys[mesh] ; i++ )
+					{
+						in.bytes( PolyAnim->Tag, sizeof( PolyAnim->Tag ) );
+
+						animation = in.u16();
+						frames = in.u16();
+						vertices = in.u16();
+
+
+						PolyAnim->State = TEXTUREANIM_Go;
+						PolyAnim->CurrentTime = 0.0F;
+						PolyAnim->MasterTime = 0.0F;
+						PolyAnim->CurrentOffset = 0;
+						PolyAnim->currentframe = INDEX_NONE;
+						PolyAnim->newframe = 0;
+
+						PolyAnim->animation =animation;
+						PolyAnim->frames	=frames;
+						PolyAnim->vertices	=vertices;
+
+						PolyAnim->vert = nullptr;
+						PolyAnim->UVs = nullptr;
+
+						PolyAnim->vert = (int *) malloc( vertices * sizeof(int) );
+						if( !PolyAnim->vert)
+						{
+							Msg( "Mxload() PolyAnim->Vert failed\n", Filename );
+							return true;
+						}
+						PolyAnim->UVs  = (TANIMUV *) malloc( vertices * frames * sizeof(TANIMUV) );
+						if( !PolyAnim->UVs)
+						{
+							Msg( "Mxload() PolyAnim->UVs failed\n", Filename );
+							return true;
+						}
+
+						intPnt = PolyAnim->vert;
+						TanimUV = PolyAnim->UVs;
+
+						for( e = 0 ; e < vertices  ; e++ )
+						{
+							*intPnt++ = in.u16();
+						}
+
+						for( o = 0 ; o < vertices*frames ; o++ )
+						{
+							TanimUV->u = in.f32();
+							TanimUV->v = in.f32();
+							TanimUV++;
+						}
+
+						FixUV_Anim( PolyAnim, LVert, Mxloadheader->Group[group].originalVerts[mesh] );
+
+						if( Panel )
+						{
+							Check3DPanelPolyAnim( PolyAnim );
+						}
+
+						PolyAnim++;
+					}
+
+					if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
+					{
+						Msg( "Mxload : FSUnlockVertexBuffer failed\n" );
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+/* load the model's fire points and spot effects (when present). True: Mxload fails. */
+[[gnu::always_inline]] static inline bool MxloadFirePointsAndSpotFX( MXLOADHEADER *& Mxloadheader, int & i, u_int16_t & NumSpotFX, PVSPOTFX *& SpotFXPtr, u_int16_t & NumFirePoints, PVFIREPOINT *& FirePointPtr, u_int32_t & Colour, int8_t (&SFXFilename)[ 128 ], FileReader & in )
+{
+	if( in.u16() )
+	{
+		NumFirePoints = in.u16();
+
+		if( NumFirePoints )
+		{
+			Mxloadheader->NumFirePoints = NumFirePoints;
+			Mxloadheader->FirePoints = (PVFIREPOINT *) malloc( NumFirePoints * sizeof( PVFIREPOINT ) );
+
+			if( !Mxloadheader->FirePoints )
+			{
+				Mxloadheader->NumFirePoints = 0;
+				return true;
+			}
+
+			FirePointPtr = Mxloadheader->FirePoints;
+
+			for( i = 0; i < NumFirePoints; i++ )
+			{
+				FirePointPtr->ID = in.u16();					// ID ( u_int16_t )
+				FirePointPtr->Pos = in.vec();			// Pos ( 3 floats )
+				FirePointPtr->Dir = in.vec();			// Dir ( 3 floats )
+				FirePointPtr->Up = in.vec();			// Up ( 3 floats )
+				FirePointPtr++;
+			}
+		}
+		else
+		{
+			Mxloadheader->FirePoints = nullptr;
+			Mxloadheader->NumFirePoints = 0;
+		}
+
+		NumSpotFX = in.u16();
+
+		if( NumSpotFX )
+		{
+			Mxloadheader->NumSpotFX = NumSpotFX;
+			Mxloadheader->SpotFX = (PVSPOTFX *) malloc( NumSpotFX * sizeof( PVSPOTFX ) );
+
+			if( !Mxloadheader->SpotFX )
+			{
+				Mxloadheader->NumSpotFX = 0;
+				return true;
+			}
+
+			SpotFXPtr = Mxloadheader->SpotFX;
+
+			for( i = 0; i < NumSpotFX; i++ )
+			{
+				SpotFXPtr->Type = in.u16();					// Type ( u_int16_t )
+				SpotFXPtr->Pos = in.vec();			// Pos ( 3 floats )
+				SpotFXPtr->DirVector = in.vec();	// Dir ( 3 floats )
+				SpotFXPtr->UpVector = in.vec();	// Up ( 3 floats )
+				SpotFXPtr->StartDelay = in.f32() * ANIM_SECOND;		// Start Delay
+				SpotFXPtr->ActiveDelay = in.f32() * ANIM_SECOND;	// Active Delay
+				SpotFXPtr->InactiveDelay = in.f32() * ANIM_SECOND;	// Inactive Delay
+				SpotFXPtr->Primary = (int8_t) in.i16();		// Primary ( int16_t )
+				SpotFXPtr->Secondary = (int8_t) in.i16();	// Secondary ( int16_t )
+				Colour = in.u32();
+
+				copy_string( (char*)&SFXFilename[ 0 ], sizeof( SFXFilename ), in.cstring() );
+
+				if( SpotFXPtr->Type == SPOTFX_SoundFX )
+				{
+					if( ( SpotFXPtr->ActiveDelay == 0.0F ) && ( SpotFXPtr->InactiveDelay == 0.0F ) )
+					{
+						Msg( "PointDirSpotfx (SoundFX) has on and off time of 0" );
+						SpotFXPtr->SoundFX = -1;
+					}
+					else
+					{
+						SpotFXPtr->SoundFX = ReturnSFXIndex( (char*)&SFXFilename[ 0 ] );
+					}
+				}
+				else
+				{
+					SpotFXPtr->SoundFX = -1;
+				}
+
+				SpotFXPtr->SoundFXVolume = in.f32();
+				SpotFXPtr->SoundFXSpeed = in.f32();
+				SpotFXPtr->Red = (u_int8_t) ( ( Colour >> 16 ) & 255 );
+				SpotFXPtr->Green = (u_int8_t) ( ( Colour >> 8 ) & 255 );
+				SpotFXPtr->Blue = (u_int8_t) ( Colour & 255 );
+				SpotFXPtr++;
+			}
+		}
+		else
+		{
+			Mxloadheader->SpotFX = nullptr;
+			Mxloadheader->NumSpotFX = 0;
+		}
+	}
+	else
+	{
+		Mxloadheader->NumFirePoints = 0;
+		Mxloadheader->FirePoints = nullptr;
+		Mxloadheader->NumSpotFX = 0;
+		Mxloadheader->SpotFX = nullptr;
+	}
+	return false;
+}
+
 bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool StoreTriangles )
 {
 
@@ -178,250 +645,8 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 			return false;
 		}
 
-		for( mesh=0 ; mesh<Mxloadheader->Group[group].num_meshes; mesh++)
-		{
-			num_texture_groups = 0;
-
-			in.skip( sizeof( u_int16_t ) );	// Direct3D execute-buffer size (unused)
-
-			/*	get the type of execution buffer	*/
-			mesh_type = in.u16();
-
-			/*	get the number of verts in execution buffer	*/
-			num_vertices = in.u16();
-
-			/*	record the mesh's type	*/
-			Mxloadheader->Group[group].mesh_type[mesh] = mesh_type;
-
-			/*	record how many verts the mesh has	*/
-			Mxloadheader->Group[group].num_verts_per_mesh[mesh] = num_vertices;
-
-			/*	create a vertex buffer	*/
-			if (!FSCreateVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], num_vertices))
-			{
-				Msg( "Mxload : FSCreateVertexBuffer failed\n" );
-				return false;
-			}
-			Mxloadheader->Group[group].renderObject[mesh].vertOwner = VERT_OWNER_MODEL;
-
-			DebugPrintf("created buffer to hold :%d verts\n", num_vertices);
-
-			/*	lock the vertex buffer	*/
-			if (!(FSLockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &LVert)))
-			{
-				Msg( "Mxload() lock failed in %s\n", Filename );
-				return false;
-			}
-
-			BufStart = LVert;
-
-			/*	copy the vertices into the vertex buffer	*/
-			for ( i=0 ; i<num_vertices; i++)
-			{
-				OLDLVERTEX old;
-				in.bytes( &old, sizeof( old ) );
-
-				LVert[i].x = old.x;
-				LVert[i].y = old.y;
-				LVert[i].z = old.z;
-				LVert[i].tu = old.tu;
-				LVert[i].tv = old.tv;
-
-				color = old.color;
-				a = (color>>24)&255;
-				r = (color>>16)&255;
-				g = (color>>8)&255;
-				b = color&255;
-
-				a = 255;
-
-				color = RGBA_MAKE( r , g , b , a  );
-				LVert[i].color = color;
-
-				// the file's specular colour is unused (LVERTEX has no specular)
-			}
-
-			/* Keep the vertices as loaded: lighting restores baked colours from them each frame. */
-			Mxloadheader->Group[group].originalVerts[mesh] = (LVERTEX *)malloc(sizeof(LVERTEX) * num_vertices);
-			memmove(Mxloadheader->Group[group].originalVerts[mesh], &LVert[0], sizeof(LVERTEX) * num_vertices);//memcpy
-
-			//	Stuff to clip if bounding box is off screen
-
-			num_texture_groups = in.u16();
-			DebugPrintf("texture groups: %d\n", num_texture_groups);
-			Mxloadheader->Group[group].num_texture_groups[mesh] = num_texture_groups;
-
-
-			triangleCount = 0;
-			tempInt = 0;
-
-			/* find out how many vertexes we'll need to load into our vertex buffer */
-			{
-				FileReader scan = in;
-				for ( i=0 ; i<num_texture_groups; i++)
-				{
-					scan.skip( 4 * sizeof( u_int16_t ) );
-					u_int16_t numTriangles = scan.u16();
-					scan.skip( numTriangles * sizeof( MFACE ) );
-					triangleCount += numTriangles;
-				}
-			}
-
-			/*	create an index buffer	*/
-			if (!FSCreateIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount * 3))
-			{
-				return false;
-			}
-
-			DebugPrintf("created index buffer to hold :%d incidices\n", triangleCount * 3);
-
-			/*	lock the index buffer	*/
-			if (!(FSLockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Indices)))
-			{
-				Msg( "Mxload() lock failed in %s\n", Filename );
-				return false;
-			}
-
-			if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount))
-			{
-				DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
-				return false;
-			}
-			if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Normals)))
-			{
-				Msg( "Mxload() normal lock failed in %s\n", Filename );
-				return false;
-			}
-
-			/* Allocate this mesh's textureGroups[] from the TAG_LEVEL
-			 * hunk, sized to num_texture_groups. Bulk-freed via
-			 * Hunk_FreeAll(TAG_LEVEL) on level transition. */
-			if ( num_texture_groups > 0 )
-			{
-				Mxloadheader->Group[group].renderObject[mesh].textureGroups =
-					(TEXTUREGROUP *) Hunk_Alloc(TAG_LEVEL,
-												num_texture_groups * sizeof(TEXTUREGROUP));
-				if ( !Mxloadheader->Group[group].renderObject[mesh].textureGroups )
-				{
-					Msg( "Mxload() hunk-alloc failed for textureGroups[%u] %s\n",
-						 (unsigned)num_texture_groups, Filename );
-					return false;
-				}
-			}
-
-			ibIndex = 0;
-			indexOffset = 0;
-
-			for ( i=0 ; i<num_texture_groups; i++)
-			{
-				in.skip( sizeof( u_int16_t ) );	// texture type (unused)
-				in.skip( sizeof( u_int16_t ) );	// first vertex (unused)
-				in.skip( sizeof( u_int16_t ) );	// group vertex count (unused)
-				tpage = in.u16();
-				num_triangles = in.u16();
-				DebugPrintf("trinagles %d\n", num_triangles);
-
-				TempFacePnt = (TRIANGLE *) /*LVert*/Indices;
-
-
-				/*	copy the triangles into the index and normal buffers	*/
-				for( e=0; e<num_triangles; e++)
-				{
-					MFACE face;
-					in.bytes( &face, sizeof( face ) );
-					FacePnt.v1 = face.v1;
-					FacePnt.v2 = face.v2;
-					FacePnt.v3 = face.v3;
-
-					Indices[ibIndex] = FacePnt.v1;
-					ibIndex++;
-					Indices[ibIndex] = FacePnt.v2;
-					ibIndex++;
-					Indices[ibIndex] = FacePnt.v3;
-					ibIndex++;
-
-					Normals->nx = face.nx;
-					Normals->ny = face.ny;
-					Normals->nz = face.nz;
-
-					if ( face.pad & 1 )
-					{
-						// colourkey triangle found
-						colourkey++;
-					}
-					if( Mxloadheader->num_texture_files )
-						FixUV( &FacePnt, BufStart, Mxloadheader->TloadIndex[tpage], Mxloadheader->Group[group].originalVerts[mesh]);
-					Normals++;
-					tempInt+=3;
-				}
-
-				// BJD - check this. correct value to place here?
-				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numVerts = num_vertices;//num_triangles * 3;//num_triangles * 3;
-				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].numTriangles = num_triangles;
-
-				/* keep track of our offset into our index buffer */
-				Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].startIndex = indexOffset;
-				indexOffset += num_triangles * 3;
-
-				if( Mxloadheader->num_texture_files == 0 )
-				{
-					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = nullptr;
-					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = false;
-				}
-				else
-				{
-					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].texture = Tloadheader.TexHandle[Mxloadheader->TloadIndex[tpage]];
-					Mxloadheader->Group[ group ].renderObject[mesh].textureGroups[i].colourkey = Tloadheader.ColourKey[Mxloadheader->TloadIndex[tpage]];
-				}
-			}
-
-			DebugPrintf("put %d indices into IB\n", tempInt);
-
-			// 3D panel models: put the cull state back to the default
-			if( Panel )
-			{
-				reset_cull();
-			}
-
-			if (StoreTriangles)
-			{	Mxloadheader->Group[group].num_polys_per_mesh[mesh] = triangleCount;//num_triangles;
-				Mxloadheader->Group[group].poly_ptr[mesh] = (TRIANGLE *)malloc( sizeof (TRIANGLE) * /*num_triangles*/triangleCount);
-
-				memmove(Mxloadheader->Group[group].poly_ptr[mesh], TempFacePnt, sizeof (TRIANGLE) * /*num_triangles*/triangleCount);//memcpy
-
-			}
-			else
-			{
-				Mxloadheader->Group[group].num_polys_per_mesh[mesh] = 0;
-				Mxloadheader->Group[group].poly_ptr[mesh] = nullptr;
-			}
-
-			/*	unlock the vertex buffer	*/
-			if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
-			{
-				Msg( "Mxload() vb unlock failed in %s\n", Filename );
-				return false ;
-			}
-
-			/*	unlock the index buffer	*/
-			if (!(FSUnlockIndexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
-			{
-				Msg( "Mxload() ib unlock failed in %s\n", Filename );
-				return false ;
-			}
-
-			if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
-			{
-				Msg( "Mxload() normal unlock failed in %s\n", Filename );
-				return false ;
-			}
-
-			Mxloadheader->Group[group].renderObject[mesh].numTextureGroups = num_texture_groups;
-
-
-			/* update the renderObject */
-
-		}
+		if( MxloadGroupMeshes( Filename, Mxloadheader, Panel, StoreTriangles, FacePnt, TempFacePnt, mesh_type, num_vertices, num_texture_groups, num_triangles, LVert, BufStart, Indices, Normals, ibIndex, i, e, tpage, mesh, group, r, g, b, a, color, colourkey, triangleCount, indexOffset, tempInt, in ) )
+			return false;
 	}
 
 	// Background Animation Stuff......
@@ -429,215 +654,14 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 	num_animations = in.u16();
 	Mxloadheader->AnimData.num_animations = num_animations;
 
-	if( num_animations )
-	{
-		for( i = 0 ; i < num_animations ; i++ )
-		{
-			in.skip( sizeof( u_int16_t ) );	// frames (unused)
-			in.skip( sizeof( u_int16_t ) );	// max loops (unused)
-			animsize = in.u16();
-			Mxloadheader->AnimData.AnimSeq[i] = (u_int16_t *) malloc( animsize * sizeof( u_int16_t ) );
-			in.bytes( Mxloadheader->AnimData.AnimSeq[i], animsize * sizeof( u_int16_t ) );
-		}
-
-		for( group=0 ; group<Mxloadheader->num_groups; group++)
-		{
-			for( mesh=0 ; mesh<Mxloadheader->Group[group].num_meshes; mesh++)
-			{
-				// Animating background polys......
-				Mxloadheader->Group[group].num_animating_polys[mesh] = in.u16();
-				if( Mxloadheader->Group[group].num_animating_polys[mesh] != 0 )
-				{
-					Mxloadheader->Group[group].polyanim[mesh] = (POLYANIM*)malloc( Mxloadheader->Group[group].num_animating_polys[mesh] * sizeof( POLYANIM ) );
-
-
-					PolyAnim = Mxloadheader->Group[group].polyanim[mesh];
-					if( !PolyAnim )
-					{
-						Msg( "Mxload() Polyanim failed in %s\n", Filename );
-						return false;
-					}
-
-					if (!(FSLockVertexBuffer(&Mxloadheader->Group[ group ].renderObject[mesh], &LVert)))
-					{
-						Msg( "Mxload : FSLockVertexBuffer failed\n" );
-						return false;
-					}
-
-					for( i = 0 ; i < Mxloadheader->Group[group].num_animating_polys[mesh] ; i++ )
-					{
-						in.bytes( PolyAnim->Tag, sizeof( PolyAnim->Tag ) );
-
-						animation = in.u16();
-						frames = in.u16();
-						vertices = in.u16();
-
-
-						PolyAnim->State = TEXTUREANIM_Go;
-						PolyAnim->CurrentTime = 0.0F;
-						PolyAnim->MasterTime = 0.0F;
-						PolyAnim->CurrentOffset = 0;
-						PolyAnim->currentframe = INDEX_NONE;
-						PolyAnim->newframe = 0;
-
-						PolyAnim->animation =animation;
-						PolyAnim->frames	=frames;
-						PolyAnim->vertices	=vertices;
-
-						PolyAnim->vert = nullptr;
-						PolyAnim->UVs = nullptr;
-
-						PolyAnim->vert = (int *) malloc( vertices * sizeof(int) );
-						if( !PolyAnim->vert)
-						{
-							Msg( "Mxload() PolyAnim->Vert failed\n", Filename );
-							return false;
-						}
-						PolyAnim->UVs  = (TANIMUV *) malloc( vertices * frames * sizeof(TANIMUV) );
-						if( !PolyAnim->UVs)
-						{
-							Msg( "Mxload() PolyAnim->UVs failed\n", Filename );
-							return false;
-						}
-
-						intPnt = PolyAnim->vert;
-						TanimUV = PolyAnim->UVs;
-
-						for( e = 0 ; e < vertices  ; e++ )
-						{
-							*intPnt++ = in.u16();
-						}
-
-						for( o = 0 ; o < vertices*frames ; o++ )
-						{
-							TanimUV->u = in.f32();
-							TanimUV->v = in.f32();
-							TanimUV++;
-						}
-
-						FixUV_Anim( PolyAnim, LVert, Mxloadheader->Group[group].originalVerts[mesh] );
-
-						if( Panel )
-						{
-							Check3DPanelPolyAnim( PolyAnim );
-						}
-
-						PolyAnim++;
-					}
-
-					if (!(FSUnlockVertexBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
-					{
-						Msg( "Mxload : FSUnlockVertexBuffer failed\n" );
-						return false ;
-					}
-				}
-			}
-		}
-	}
+	if( MxloadBackgroundAnimations( Filename, Mxloadheader, Panel, LVert, i, e, o, mesh, group, animation, frames, vertices, PolyAnim, TanimUV, intPnt, num_animations, animsize, in ) )
+		return false;
 
 	/*===================================================================
 		Point Direction Data
 	===================================================================*/
-	if( in.u16() )
-	{
-		NumFirePoints = in.u16();
-
-		if( NumFirePoints )
-		{
-			Mxloadheader->NumFirePoints = NumFirePoints;
-			Mxloadheader->FirePoints = (PVFIREPOINT *) malloc( NumFirePoints * sizeof( PVFIREPOINT ) );
-
-			if( !Mxloadheader->FirePoints )
-			{
-				Mxloadheader->NumFirePoints = 0;
-				return( false );
-			}
-
-			FirePointPtr = Mxloadheader->FirePoints;
-
-			for( i = 0; i < NumFirePoints; i++ )
-			{
-				FirePointPtr->ID = in.u16();					// ID ( u_int16_t )
-				FirePointPtr->Pos = in.vec();			// Pos ( 3 floats )
-				FirePointPtr->Dir = in.vec();			// Dir ( 3 floats )
-				FirePointPtr->Up = in.vec();			// Up ( 3 floats )
-				FirePointPtr++;
-			}
-		}
-		else
-		{
-			Mxloadheader->FirePoints = nullptr;
-			Mxloadheader->NumFirePoints = 0;
-		}
-
-		NumSpotFX = in.u16();
-
-		if( NumSpotFX )
-		{
-			Mxloadheader->NumSpotFX = NumSpotFX;
-			Mxloadheader->SpotFX = (PVSPOTFX *) malloc( NumSpotFX * sizeof( PVSPOTFX ) );
-
-			if( !Mxloadheader->SpotFX )
-			{
-				Mxloadheader->NumSpotFX = 0;
-				return( false );
-			}
-
-			SpotFXPtr = Mxloadheader->SpotFX;
-
-			for( i = 0; i < NumSpotFX; i++ )
-			{
-				SpotFXPtr->Type = in.u16();					// Type ( u_int16_t )
-				SpotFXPtr->Pos = in.vec();			// Pos ( 3 floats )
-				SpotFXPtr->DirVector = in.vec();	// Dir ( 3 floats )
-				SpotFXPtr->UpVector = in.vec();	// Up ( 3 floats )
-				SpotFXPtr->StartDelay = in.f32() * ANIM_SECOND;		// Start Delay
-				SpotFXPtr->ActiveDelay = in.f32() * ANIM_SECOND;	// Active Delay
-				SpotFXPtr->InactiveDelay = in.f32() * ANIM_SECOND;	// Inactive Delay
-				SpotFXPtr->Primary = (int8_t) in.i16();		// Primary ( int16_t )
-				SpotFXPtr->Secondary = (int8_t) in.i16();	// Secondary ( int16_t )
-				Colour = in.u32();
-
-				copy_string( (char*)&SFXFilename[ 0 ], sizeof( SFXFilename ), in.cstring() );
-
-				if( SpotFXPtr->Type == SPOTFX_SoundFX )
-				{
-					if( ( SpotFXPtr->ActiveDelay == 0.0F ) && ( SpotFXPtr->InactiveDelay == 0.0F ) )
-					{
-						Msg( "PointDirSpotfx (SoundFX) has on and off time of 0" );
-						SpotFXPtr->SoundFX = -1;
-					}
-					else
-					{
-						SpotFXPtr->SoundFX = ReturnSFXIndex( (char*)&SFXFilename[ 0 ] );
-					}
-				}
-				else
-				{
-					SpotFXPtr->SoundFX = -1;
-				}
-
-				SpotFXPtr->SoundFXVolume = in.f32();
-				SpotFXPtr->SoundFXSpeed = in.f32();
-				SpotFXPtr->Red = (u_int8_t) ( ( Colour >> 16 ) & 255 );
-				SpotFXPtr->Green = (u_int8_t) ( ( Colour >> 8 ) & 255 );
-				SpotFXPtr->Blue = (u_int8_t) ( Colour & 255 );
-				SpotFXPtr++;
-			}
-		}
-		else
-		{
-			Mxloadheader->SpotFX = nullptr;
-			Mxloadheader->NumSpotFX = 0;
-		}
-	}
-	else
-	{
-		Mxloadheader->NumFirePoints = 0;
-		Mxloadheader->FirePoints = nullptr;
-		Mxloadheader->NumSpotFX = 0;
-		Mxloadheader->SpotFX = nullptr;
-	}
+	if( MxloadFirePointsAndSpotFX( Mxloadheader, i, NumSpotFX, SpotFXPtr, NumFirePoints, FirePointPtr, Colour, SFXFilename, in ) )
+		return false;
 
 	/* Everything the model keeps has been copied out of the file. */
 	free( Mxloadheader->OrgAddr );
