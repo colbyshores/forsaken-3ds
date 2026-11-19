@@ -688,7 +688,7 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 							}
 							else
 							{
-								Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc ColZoneBox\n" );
 								return( NULL );
 							}
 							break;
@@ -725,13 +725,13 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 								}
 								else
 								{
-									Msg( "LoadCompObjChildren() Unable to alloc ColZonePoly\n" );
+									Msg( "LoadCompObjChildren() Unable to alloc ColZonePolySides\n" );
 									return( NULL );
 								}
 							}
 							else
 							{
-								Msg( "LoadCompObjChildren() Unable to alloc ColZonePolySides\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc ColZonePoly\n" );
 								return( NULL );
 							}
 							break;
@@ -1341,6 +1341,7 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 
 							Sides = AniZoneBoxPtr->Sides;
 							NumSides = AniZoneBoxPtr->NumSides;
+							if( NumSides > 64 ) NumSides = 64;	/* ZoneSides[] holds 64 */
 
 							for( Side = 0; Side < NumSides; Side++ )
 							{
@@ -1365,6 +1366,7 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 
 							Sides = AniZonePolyPtr->Sides;
 							NumSides = AniZonePolyPtr->NumSides;
+							if( NumSides > 64 ) NumSides = 64;	/* ZoneSides[] holds 64 */
 
 							for( Side = 0; Side < NumSides; Side++ )
 							{
