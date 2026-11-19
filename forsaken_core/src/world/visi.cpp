@@ -1087,7 +1087,6 @@ DisplayBackground( MLOADHEADER	* Mloadheader, CAMERA *cam )
 		DisplayBSPNode( OldCollideNode );
 
 		CreatePortalExecList( Mloadheader, NumGroupsVisible );
-		CreateSkinExecList( &MCloadheader, NumGroupsVisible );
 
 		ShowAllColZones( GroupImIn );
 		DisplayTeleportsInGroup( GroupImIn );

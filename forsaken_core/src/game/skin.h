@@ -3,8 +3,8 @@
 /* skin.h -- debug views of collision skin, portals, BSP nodes and zones
  *
  * Nothing here affects gameplay; it only draws level data that is otherwise
- * invisible. visi.cpp calls DisplayBSPNode, CreatePortalExecList and
- * CreateSkinExecList once per camera pass, and oct2.cpp draws the resulting
+ * invisible. visi.cpp calls DisplayBSPNode and CreatePortalExecList once
+ * per camera pass, and oct2.cpp draws the resulting
  * Skin_Execs / Portal_Execs vertex buffers when one of the Show* /
  * NodeCube switches is on (debug keys and debug menu toggles). Zone
  * owners (trigarea, extforce, teleport, compobjects for background-object
@@ -20,8 +20,7 @@
  * zones and direction markers borrow entries from Models[].
  *
  * MakeNewSkinExec / MakeNewPortalExec copy vertices only and ignore the
- * triangle list, so the vertex array is drawn as it is laid out. ShowSkin is
- * never set above 0, so CreateSkinExecList currently returns at once.
+ * triangle list, so the vertex array is drawn as it is laid out.
  */
 
 /*===================================================================
@@ -50,7 +49,6 @@ constexpr int MAX_TRIS_PER_EXEC = 300;
 /*===================================================================
 	Prototypes
 ===================================================================*/
-bool CreateSkinExecList( MCLOADHEADER * MCloadheader, int16_t NumVisible );
 bool MakeNewSkinExec( LVERTEX *Verts, TRIANGLE *Tris, int16_t	NumVerts, int16_t NumTris );
 void ReleaseSkinExecs( void );
 void DisplayBSPNode( BSP_NODE * Node );
@@ -81,5 +79,4 @@ extern RENDEROBJECT Skin_Execs[ MAXSKINEXECS ];
 extern bool ShowTeleports;
 extern bool ShowTrigZones;
 extern int16_t ShowPortal;
-extern int16_t ShowSkin;
 void DisplayDirAndUp( VECTOR * Pos, VECTOR * Dir, VECTOR *Up, u_int16_t Group );

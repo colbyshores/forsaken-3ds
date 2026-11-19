@@ -4303,7 +4303,7 @@ bool RenderCurrentCamera( void )
 /*===================================================================
   Display Skin & BSP Node Info
 ===================================================================*/
-  if( ShowSkin || OldNodeCube || NodeCube || ShowTrigZones || ShowColZones || ShowEFZones || ShowTeleports )
+  if( OldNodeCube || NodeCube || ShowTrigZones || ShowColZones || ShowEFZones || ShowTeleports )
   {
 	if( OldNodeCube || NodeCube )
 		ClearZBuffer();
