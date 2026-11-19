@@ -102,7 +102,6 @@ float		TargetedDelay = 0.0F;
 float		MissileDistance = 0.0F;
 u_int16_t		MissileNum;
 
-bool		ShowNamesAnyway = false;
 
 u_int16_t		GlobalSecBullsID = 0;
 
@@ -5627,7 +5626,7 @@ void DispHUDNames( void )
 			Ship = VisibleShipsPos[ Count ].Ship;
 			ShipsTeam = TeamNumber[ Ship ];
 
-			if( ( TeamNumber[ Ship ] == MyTeam ) || ( ShowNamesAnyway && PlayDemo ) )
+			if( TeamNumber[ Ship ] == MyTeam )
 			{
 				CenterPrint4x5Text2( &Names[ Ship ][ 0 ], VisibleShipsPos[ Count ].ScreenX, VisibleShipsPos[ Count ].ScreenY, TeamColours[ ShipsTeam ] );
 			}
@@ -5673,18 +5672,6 @@ void DispHUDNames( void )
 
 					sprintf( (char*)&TempString[ 0 ], "%2.0f %2.0f", Ships[ Ship ].Object.Shield, Ships[ Ship ].Object.Hull );
 					CenterPrint4x5Text2( (char*)&TempString[ 0 ], VisibleShipsPos[ Count ].InfoX, VisibleShipsPos[ Count ].InfoY, ( Ship & 7 ) );
-				}
-			}
-		}
-		else
-		{
-			for( Count = 0; Count < NumVisibleShips; Count++ )
-			{
-				Ship = VisibleShipsPos[ Count ].Ship;
-
-				if( ShowNamesAnyway && PlayDemo )
-				{
-					CenterPrint4x5Text2( &Names[ Ship ][ 0 ], VisibleShipsPos[ Count ].ScreenX, VisibleShipsPos[ Count ].ScreenY, ( Ship & 7 ) );
 				}
 			}
 		}

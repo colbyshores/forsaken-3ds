@@ -29,7 +29,6 @@
 #include "game/primary.h"
 #include "input/controls.h"
 #include "util/util.h"
-#include "game/demo.h"
 #include "string.h"
 #include "util/util.h"
 #include "net/net_tracker.h"

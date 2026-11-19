@@ -600,10 +600,7 @@ bool ProcessShips()
 /* @vfp-exempt R6 — dead diagnostic block disabled by #if 0, never compiled
    into any build. measured n/a. Verified 2026-10-25. */
 
-	if( PlayDemo )
-		NumToDo = MAX_PLAYERS+1;
-	else
-		NumToDo = MAX_PLAYERS;
+	NumToDo = MAX_PLAYERS;
 
 	// for every player in the game
 	for( i=0;i<NumToDo;i++)
@@ -616,29 +613,19 @@ bool ProcessShips()
 		{
 			if( ShipPnt->Invul )
 			{
-				if( !PlayDemo )
+				if( Current_Camera_View != i )
 				{
-					if( Current_Camera_View != i )
+					if( i != WhoIAm )
 					{
-						if( i != WhoIAm )
+						CreateInvEffect( i, 5, 255, 64, 64 );
+					}
+					else
+					{
+						if( Current_Camera_View != WhoIAm )
 						{
 							CreateInvEffect( i, 5, 255, 64, 64 );
 						}
-						else
-						{
-							if( Current_Camera_View != WhoIAm )
-							{
-								CreateInvEffect( i, 5, 255, 64, 64 );
-							}
-						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-						}
-					}
-				}
-				else
-				{
-					if( Current_Camera_View != i )
-					{
-						CreateInvEffect( i, 5, 255, 64, 64 );
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					}
 				}
 			}
@@ -1242,31 +1229,19 @@ bool ProcessShips()
 			ShipPnt->LastMove.z = ShipObjPnt->Pos.z - StartPos.z;
 		}
 
-		if( PlayDemo && ( i == MAX_PLAYERS ) )
-		{
-			if( PauseDemo )
-			{
-				framelag = 0.0F;
-			}else{
-				framelag = Oldframelag * Demoframelag;
-			}
-		}
 		UpdateShipModel( i );
 
 	}
 
-	if( !PlayDemo )
+	if( Ships[MAX_PLAYERS].enable != 0 )
 	{
-		if( Ships[MAX_PLAYERS].enable != 0 )
-		{
-			// we have a remote Camera...
-			Current_Camera_View = MAX_PLAYERS;		// which object is currently using the camera view....
-			Process_Remote_Camera();
-		}
-		else
-		{	// main camera view when alive in multiplayer
-			Current_Camera_View = WatchPlayerSelect.value;//WhoIAm;			// which object is currently using the camera view....
-		}
+		// we have a remote Camera...
+		Current_Camera_View = MAX_PLAYERS;		// which object is currently using the camera view....
+		Process_Remote_Camera();
+	}
+	else
+	{	// main camera view when alive in multiplayer
+		Current_Camera_View = WatchPlayerSelect.value;//WhoIAm;			// which object is currently using the camera view....
 	}
 
 	SetPosVelDir_Listner( &Ships[WhoIAm].Object.Pos , &Ships[WhoIAm].Move_Off , &Ships[WhoIAm].Object.Mat );

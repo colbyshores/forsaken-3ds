@@ -326,5 +326,4 @@ extern px_timer_t last_mine_timer;
 extern u_int16_t HitBox;
 extern u_int16_t TargScrPolys[ 4 ];
 extern int8_t * DebugSecStrings[];
-extern bool ShowNamesAnyway;
 extern bool SecondaryValid[ MAXSECONDARYWEAPONS ];

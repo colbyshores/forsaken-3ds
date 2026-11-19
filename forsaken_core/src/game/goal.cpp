@@ -371,9 +371,7 @@ void ProcessGoals( void )
 	}
 	for ( k = 0; k < MAX_PLAYERS; k++ )
 	{
-		if ( ( ( GameStatus[ k ] == MyGameStatus && !PlayDemo )
-			|| ( GameStatus[ k ] == STATUS_Normal && PlayDemo ) )
-			&& TeamNumber[ k ] < MAX_TEAMS )
+		if ( GameStatus[ k ] == MyGameStatus && TeamNumber[ k ] < MAX_TEAMS )
 		{
 			GoalTeamMembers[ TeamNumber[ k ] ]++;
 			if ( Ships[ k ].Object.Flags & SHIP_CarryingFlags )
@@ -408,8 +406,7 @@ void ProcessGoals( void )
 		if ( NewTeams )
 		{
 			SetTeamGoals( (u_int16_t*)Teamgoal );
-			if ( !PlayDemo )
-				TeamGoalsSend( (u_int16_t*)Teamgoal );
+			TeamGoalsSend( (u_int16_t*)Teamgoal );
 		}
 	}
 	for ( j = 0; j < NumGoals; j++ )
@@ -417,7 +414,7 @@ void ProcessGoals( void )
 		Goal[ j ].state = ( Goal[ j ].team >= 0 && GoalTeamMembers[ Goal[ j ].team ] )
 			? GOALSTATE_On : GOALSTATE_Off;
 	}
-	if ( IsHost && !PlayDemo )
+	if ( IsHost )
 	{
 		if ( NewTeams )
 		{
@@ -447,7 +444,7 @@ void ProcessGoals( void )
 			}
 		}
 	}
-	if ( CTF && !PlayDemo )
+	if ( CTF )
 	{
 		for ( j = 0; j < MAX_TEAMS; j++ )
 		{

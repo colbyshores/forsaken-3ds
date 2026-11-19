@@ -39,7 +39,6 @@ bool LoadASinglePlayerGame( MENUITEM * Item )
 	 * the reload when SP is already active. */
 	if (!CurrentLevelsList || strcmp(CurrentLevelsList, SINGLEPLAYER_LEVELS) != 0)
 		InitLevels( SINGLEPLAYER_LEVELS );
-	PlayDemo = false;
 	IsHost = true;
 	RandomStartPosModify = 0;
 	SetBikeMods( (u_int16_t) (SelectedBike+2) );
@@ -83,7 +82,6 @@ bool StartASinglePlayerGame( MENUITEM * /*Item*/ )
 	if (!CurrentLevelsList || strcmp(CurrentLevelsList, SINGLEPLAYER_LEVELS) != 0)
 		InitLevels( SINGLEPLAYER_LEVELS );
 
-	PlayDemo = false;
 	IsHost = true;
 	// reset all bollocks...
 	TeamGame = false;

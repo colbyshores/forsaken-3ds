@@ -2451,8 +2451,7 @@ void ProcessPickups( void )
 			case PICKUPMODE_Normal:
 				if( ( ( Pickups[ i ].Owner == WhoIAm ) ) ||
 					( ( ( Pickups[ i ].Owner == INDEX_NONE ) && ( IsHost ) ) ) ||
-					( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) ||
-					( PlayDemo ) )
+					( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) )
 				{
 					if( Pickups[ i ].LifeCount != -1.0F )
 					{
@@ -2480,8 +2479,7 @@ void ProcessPickups( void )
 				{
 					if( ( ( Pickups[ i ].Owner == WhoIAm ) ) ||
 						( ( ( Pickups[ i ].Owner == INDEX_NONE ) && ( IsHost ) ) ) ||
-						( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) ||
-						( PlayDemo ) )
+						( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) )
 					{
 						{
 #if DEBUG_PICKUPS

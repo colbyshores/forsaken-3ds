@@ -70,7 +70,6 @@ extern int MissileCameraActive;
 void SpecialDestroyGame( void );
 extern float real_framelag;
 extern float Oldframelag;
-extern float Demoframelag;
 bool InitLevels( const char * levels_list );
 extern const char *CurrentLevelsList;
 extern int Depth;

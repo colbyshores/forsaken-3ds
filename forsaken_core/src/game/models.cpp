@@ -5427,14 +5427,7 @@ void SetShipsVisibleFlag( void )
 		{
 			if( Ship != WhoIAm )
 			{
-				if( PlayDemo && ( Current_Camera_View == Ship ) )
-				{
-					ShipVisible = false;
-				}
-				else
-				{
-					ShipVisible = true;
-				}
+				ShipVisible = true;
 			}
 			else
 			{

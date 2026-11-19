@@ -780,10 +780,7 @@ static int16_t	OnceOnlyFlag = 0;
 
 	if( GodModeOnceOnly )
 	{
-		if( !PlayDemo )
-		{
-			if( GodMode ) GivemeAllWeapons();
-		}
+		if( GodMode ) GivemeAllWeapons();
 		GodModeOnceOnly = false;
 	}
 

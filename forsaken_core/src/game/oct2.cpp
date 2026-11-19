@@ -51,7 +51,6 @@
 #include "data/loadsave.h"
 #include "game/stats.h"
 #include "util/timer.h"
-#include "game/demo.h"
 #include "data/file.h"
 #include "game/singleplayer.h"
 #include "rendering/render.h"
@@ -213,7 +212,6 @@ float pixel_aspect_ratio;
 float Oldframelag;
 float framelag = 0.0F;
 float real_framelag = 0.0F;
-float Demoframelag = 0.5F;
 
 px_timer_t level_timer;
 
@@ -496,27 +494,17 @@ void ProcessGameKeys( void )
 	//   stops going back itno menu from hitting to many times
 	if ( !CurrentMenu && !JustExitedMenu )
 	{
-	  // if were playing a demo
-	  if( PlayDemo )
-			{
-		// show the demo menu
-		MenuRestart( &MENU_DemoPlaying );
-			}
-	  // if were playing the game
-	  else
-		  {
-				// show the multi-player menu
-				if(GameStatus[WhoIAm] != STATUS_PlayingDemo &&
-					GameStatus[WhoIAm] != STATUS_SinglePlayer)
-				{
-					MenuRestart( &MENU_InGame );
-				}
-				// show the single-player menu
-				else
-				{
-					 MenuRestart( &MENU_InGameSingle );
-			  }
-			}
+		// show the multi-player menu
+		if(GameStatus[WhoIAm] != STATUS_PlayingDemo &&
+			GameStatus[WhoIAm] != STATUS_SinglePlayer)
+		{
+			MenuRestart( &MENU_InGame );
+		}
+		// show the single-player menu
+		else
+		{
+			MenuRestart( &MENU_InGameSingle );
+		}
 	// if were not in the menu
 	// and the above check failed
 	// reset variable so 3rd escape takes us back in
@@ -955,7 +943,7 @@ void DrawSimplePanel()
 	u_int8_t b = Colourtrans[HUDColour][2];
 	char MessageBuff[150];
 
-	if( Panel && !PlayDemo )
+	if( Panel )
 	{
 		if( !DrawPanel )
 		{
@@ -1237,30 +1225,7 @@ void DrawSimplePanel()
 			else if( ShowNetworkInfo )
 				DisplayNetworkInfo();
 		}
-	} // end of ( Panel && !PlayDemo )
-	else
-	{
-		if( Panel )
-		{
-			ScoreSort();
-			PrintScoreSort();
-
-			if(ShowMessages)
-				MessageQuePrintAll();
-			else
-			{
-				MessageQuePrint();
-				PlayerMessageQuePrint();
-			}
-
-			if( DemoEyesSelect.value != MAX_PLAYERS )
-			Print4x5Text(
-				Names[DemoEyesSelect.value],
-				render_info.window_size.cx - (FontWidth*9),
-				FontHeight,
-				0 );
-		}
-	}
+	} // end of ( Panel )
 
 	if( Ships[WhoIAm].Object.Mode == GAMEOVER_MODE )
 		CenterPrint4x5Text(
@@ -1987,8 +1952,6 @@ bool RenderScene( void )
 	clear_black();
 	ReceiveGameMessages();
 	Browl -= framelag;
-
-	StopDemoRecording();
 
 	if( Browl <= 0.0F )
 	{
@@ -3069,11 +3032,6 @@ void MainGameDemoRoutines(){
 ===================================================================*/
 void MainRoutines( void )
 {
-  if( PlayDemo )
-  {
-	DemoPlayingNetworkGameUpdate();
-  }
-
   ProcessShips();
 
 
@@ -3083,7 +3041,7 @@ void MainRoutines( void )
   ProcessSpotFX();
   ProcessPrimaryBullets();
   ProcessSecondaryBullets();
-  if( !PlayDemo ) RegeneratePickups();
+  RegeneratePickups();
   ProcessPickups();
   ProcessBGObjects( true );
   ProcessModels();
@@ -3770,8 +3728,7 @@ bool MainGame( void )
 
   CheckLevelEnd();
 
-  if(!PlayDemo)
-	NetworkGameUpdate();
+  NetworkGameUpdate();
 
   return true;
 }
@@ -4650,9 +4607,6 @@ void SpecialDestroyGame( void )
 	IMustQuit = false;
 
 	DebugPrintf("SpecialDestroyGame()\n");
-
-	if ( PlayDemo )
-		PlayDemo = false;
 
 	switch( MyGameStatus )
 	{

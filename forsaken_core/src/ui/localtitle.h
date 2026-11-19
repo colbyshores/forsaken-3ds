@@ -417,13 +417,6 @@
 #define LT_MENU_Options13 "Show Players on HUD"
 
 
-#define LT_MENU_DemoPlaying0 "Demo Playing"
-#define LT_MENU_DemoPlaying1 "Pause Demo "
-#define LT_MENU_DemoPlaying7 "Playback Speed"
-#define LT_MENU_DemoPlaying8 "Watch Player"
-#define LT_MENU_DemoPlaying9 "Options"
-#define LT_MENU_DemoPlaying10 "Debugging"
-#define LT_MENU_DemoPlaying11 "Quit to Title Screen"
 
 
 

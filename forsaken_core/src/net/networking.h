@@ -963,11 +963,9 @@ void	IHitYou( BYTE you, float Damage, VECTOR * Recoil, VECTOR * Point, VECTOR * 
 void	ShipDiedSend( BYTE WeaponType, BYTE Weapon );
 void	UpdateBGObjectSend( u_int16_t BGObject, int16_t State, float Time );
 void	smallinitShip( u_int16_t i );
-void DemoPlayingNetworkGameUpdate(void);
 int FindSameLevel( char * Name );
 void	RequestTime( void  );
 void	SetTime( float Time );
-void StopDemoRecording( void );
 
 void set_my_player_name( void );
 

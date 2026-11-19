@@ -14,7 +14,6 @@
 #include "net/networking.h"
 #include "audio/sfx.h"
 #include "data/config.h"
-#include "game/demo.h"
 #include "game/ships.h"
 #include "util/util.h"
 
@@ -917,9 +916,6 @@ void DestroyGame( void )
 	VECTOR	DirVector = { 0.0F, 0.0F, 0.0F };
 
 	DebugPrintf("DestroyGame()\n");
-
-	if( PlayDemo )
-		return;
 
 	MyGameStatus = STATUS_Left;
 	IsHost = false;
@@ -2042,7 +2038,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	case MSG_HEREIAM:
 
-		if( IsHost && !PlayDemo )
+		if( IsHost )
 		{
 			HEREIAMMSG *msg = (HEREIAMMSG *) MsgPnt;
 			SendGameMessage(MSG_INIT, from, msg->WhoIAm, 0, msg->MPVersion);
@@ -2240,10 +2236,6 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	case MSG_KILLPICKUP:
 
 		KillPickupMsg = (KILLPICKUPMSG *)MsgPnt;
-		if( PlayDemo && ( Current_Camera_View == KillPickupMsg->WhoIAm ) && ( KillPickupMsg->KillPickupInfo.Style == PICKUPKILL_Immediate ) )
-		{
-			SfxForCollectPickup( KillPickupMsg->KillPickupInfo.Owner, KillPickupMsg->KillPickupInfo.IDCount );
-		}
 #if DEBUG_PICKUPS
 		if( KillPickupMsg->KillPickupInfo.Owner != INDEX_NONE ) DebugPrintf( "PACKET OWNER '%s' : Kill Pickup Owner '%s', ID %d\n", &Names[ KillPickupMsg->WhoIAm ][ 0 ], &Names[ KillPickupMsg->KillPickupInfo.Owner ][ 0 ], KillPickupMsg->KillPickupInfo.IDCount );
 		else DebugPrintf( "PACKET OWNER '%s' : Kill Pickup No Owner, ID %d\n", &Names[ KillPickupMsg->WhoIAm ][ 0 ], KillPickupMsg->KillPickupInfo.IDCount );
@@ -2978,22 +2970,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	case MSG_BIKENUM:
 
 		BikeNumMsg = (BIKENUMMSG *)MsgPnt;
-
-		if( PlayDemo )
-		{
-			// if we are playing end game demo, we want to substitute the displayed bike for the players bike
-			switch( GameCompleted )
-			{
-			case GameComplete::WithoutAllCrystals:
-			case GameComplete::WithAllCrystalsExceptLast:
-				Ships[BikeNumMsg->WhoIAm].BikeNum = player_config->bike;
-				break;
-			default:
-				Ships[BikeNumMsg->WhoIAm].BikeNum = (int16_t) BikeNumMsg->BikeNum;
-			}
-		}
-		else
-			Ships[BikeNumMsg->WhoIAm].BikeNum = (int16_t) BikeNumMsg->BikeNum;
+		Ships[BikeNumMsg->WhoIAm].BikeNum = (int16_t) BikeNumMsg->BikeNum;
 
 		return;
 	}
@@ -3058,9 +3035,6 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 	// set flag sfx volume
 	FlagVolume = FlagSfxSlider.value / ( FlagSfxSlider.max / GLOBAL_MAX_SFX );
-
-	if( PlayDemo )
-		return;
 
 	switch( msg )
 	{
@@ -3794,17 +3768,6 @@ send:
 
 }
 
-/*===================================================================
-	Procedure	:		Network update while a demo plays back (empty:
-					nothing reads demo packets; DemoFp is never opened)
-	Input		:		nothing
-	Output		:		nothing
-===================================================================*/
-
-void DemoPlayingNetworkGameUpdate()
-{
-}
-
 
 /*===================================================================
 	Procedure	:		Create a regen effect...
@@ -3865,22 +3828,6 @@ int FindSameLevel( char * Name )
 	return -1;
 }
 
-
-/*===================================================================
-	Procedure	:		StopDemoRecording
-	Input		:		char * Name
-	Output		:		int -1 no level....
-===================================================================*/
-void StopDemoRecording( void )
-{
-	if( DemoFp )	// make sure that changing level stop any demo from recording!!!!
-	{
-		fclose( DemoFp );
-		DemoFp = NULL;
-		RecordDemo = false;
-		PlayDemo = false;
-	}
-}
 
 /*===================================================================
 	Procedure	:		Build Ship Flags...

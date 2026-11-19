@@ -251,7 +251,6 @@ void InitLoadSavedGameList( MENU * Menu );
 void WatchPlayerSelected( MENUITEM *Item);
 
 char *SearchKey( char c );
-void PauseDemoToggle( MENUITEM *Item );
 
 void ExitLevelSelect( MENU * Menu );
 void GoToStats( MENUITEM *Item );
@@ -602,7 +601,6 @@ SLIDER MaxKillsSlider						= { 0, 255, 1, 0, 0, 0.0F };
 SLIDER GoalScoreSlider					= { 1, 10, 1, 5, 0, 0.0F };
 SLIDER BountyBonusSlider				= { 1, 30, 1, 10, 0, 0.0F };
 SLIDER CTFSlider							= { 0, CTF_MAX - 1, 1, CTF_STANDARD, -1, 0.0F, 0.0F, 0, false, CTF_Type };
-SLIDER DemoSpeed						= { 1, 16, 1, 8, 0, 0.0F };
 SLIDER SfxSlider							= { 0, 10, 1, 10, 0, 0.0F };
 SLIDER BikerSpeechSlider				= { 0, 10, 1, 8, 0, 0.0F };
 SLIDER BikeCompSpeechSlider			= { 0, 10, 1, 8, 0, 0.0F };
@@ -618,8 +616,6 @@ bool Autoleveling				= true;
 bool DebugInfo					= false;
 bool GodMode					= false;
 bool ShowPlaneRGB				= false;
-bool PlayDemo					= false;
-bool PauseDemo					= false;
 bool RecordDemo					= false;
 bool BrightShips;
 bool MyBrightShips;
@@ -1491,8 +1487,6 @@ void JoiningEnter(MENU * /*Menu*/)
 		PrintErrorMessage (LT_NoLevelsInstalled, 1, NULL, ERROR_USE_MENUFUNCS );
 		return;
 	}
-
-	PlayDemo = false;
 
 	// this means I need a ship number
 	WhoIAm = UNASSIGNED_SHIP;
@@ -2384,21 +2378,6 @@ MENU	MENU_Options = {
 		{ 200, 336, 0, 0, 0, (u_int8_t*)"Show Health By Scores", 0, 0, &ShowPlayerHealthByScores,NULL,SelectToggle,DrawToggle,NULL, 0 },
 		{ 200, 352, 0, 0, 0, (u_int8_t*)"Scale Font Above Bikes", 0, 0, &ScaleFontPlayerHealthAboveBikes,NULL,SelectToggle,DrawToggle,NULL, 0 },
 		{	-1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
-	}
-};
-
-MENU	MENU_DemoPlaying = {
-	(u_int8_t*)LT_MENU_DemoPlaying0 /*"Demo Playing"*/ , NULL, NULL, NULL, 0,
-	{
-		{ 200 , 128           , 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying1 /*"Pause Demo "*/, 0, 0,	&PauseDemo,	NULL, PauseDemoToggle,	DrawToggle, NULL, 0 },
-		{ 200 , 128 + ( 2*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying7 /*"Playback Speed"*/, 0, 0,	&DemoSpeed,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
-		{ 200 , 128 + ( 4*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying8 /*"Watch Player"*/, 0, 0,		&DemoEyesSelect,		NULL,	SelectSlider,	DrawSlider, NULL, 0 },
-		{ 200 , 128 + ( 5*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying9 /*"Options"*/ , 0, 0, NULL, &MENU_Options , MenuChange , MenuItemDrawName, NULL, 0 } ,
-#ifdef DEBUG_ON
-		{ 200 , 128 + ( 6*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying10 /*"Debugging"*/, 0, 0,	&DebugInfo,	(void*)DebugModeChanged, SelectToggle,	DrawToggle, NULL, 0 },
-#endif
-		{ 200 , 128 + ( 7*16 ), 0, 0, 0, (u_int8_t*)LT_MENU_DemoPlaying11 /*"Quit to Title Screen"*/ , 0, 0, NULL, NULL, SelectQuitCurrentGame , MenuItemDrawName, NULL, 0 } ,
-		{ -1 , -1, 0, 0, 0, (u_int8_t*)"" , 0, 0, NULL, NULL , NULL , NULL, NULL, 0 }
 	}
 };
 
@@ -7936,17 +7915,6 @@ void InitLoadSavedGameList( MENU * Menu )
 	}
 }
 
-/*===================================================================
-	Procedure	:		Demo Pause Compensate
-	Input		:		Nothing
-	Output		:		Nothing
-===================================================================*/
-
-void PauseDemoToggle( MENUITEM *Item )
-{
-	SelectToggle( Item );
-}
-
 void GoToStats( MENUITEM * /*Item*/ )
 {
 	CurrentMenu = NULL;
@@ -9317,7 +9285,6 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 	int num;
 	int slidertype;
 	int offset;
-	float percentage;
 	const char *uservalue;
 
 	slider = GetSlider ( Item, &slidertype );
@@ -9362,17 +9329,6 @@ void DrawFlatSliderStatus( MENUITEM *Item )
 		num = 0;
 		TextInfo->text = (u_int8_t*)EmptyString;
 		offset = 0;
-		break;
-	case SLIDER_Demo:
-		if( DemoSpeed.value > 8 )
-		{
-			// slower or normal playback speed...
-			percentage = (1.0F / (float) ( DemoSpeed.value - 7 )) * 100.0F;
-		}else{
-			percentage = (1.0F * (float) ( 9 - DemoSpeed.value )) * 100.0F;
-		}
-		num = sprintf( (char*)TextInfo->text, "%3.1f%%", percentage );
-		offset = 58;
 		break;
 	case SLIDER_User:
 		if ( slider->FuncUser )
@@ -9534,7 +9490,7 @@ void DrawFlatMenuSlider( MENUITEM *Item )
 		exit(1);
 	}
 
-	if (slidertype == SLIDER_Normal || slidertype == SLIDER_Bike || slidertype == SLIDER_Demo || slidertype == SLIDER_Percent || slidertype == SLIDER_Sensitivity )
+	if (slidertype == SLIDER_Normal || slidertype == SLIDER_Bike || slidertype == SLIDER_Percent || slidertype == SLIDER_Sensitivity )
 	{
 		slider->poly = FindFreeScrPoly();
 
@@ -9645,7 +9601,7 @@ void RedrawFlatMenuSlider( MENUITEM *Item )
 
 	DrawFlatSliderStatus(Item);
 
-	if (slidertype == SLIDER_Normal || slidertype == SLIDER_Demo || slidertype == SLIDER_Percent || slidertype == SLIDER_Sensitivity )
+	if (slidertype == SLIDER_Normal || slidertype == SLIDER_Percent || slidertype == SLIDER_Sensitivity )
 	{
 
 		if (slider->timer < 0.0F)
