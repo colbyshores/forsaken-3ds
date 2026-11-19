@@ -4221,8 +4221,7 @@ bool FilterPickup( u_int16_t PickupType )
 		( ChangeLevel_MyGameStatus == STATUS_WaitingAfterScore ) ||
 		( ChangeLevel_MyGameStatus == STATUS_PreStartingMultiplayerSynch ) ||
 		( ChangeLevel_MyGameStatus == STATUS_StartingMultiplayerSynch ) ||
-		( ChangeLevel_MyGameStatus == STATUS_ChangeLevelPostInitView ) ||
-		( ChangeLevel_MyGameStatus == STATUS_ChangeLevelPostPlayingDemo )
+		( ChangeLevel_MyGameStatus == STATUS_ChangeLevelPostInitView )
 		)
 	{
 		// valid pickup type

@@ -474,12 +474,11 @@ void ProcessGameKeys( void )
 
   static int16_t startpos = 0;
 
-  // if were not (!) in (normal,single,attract or demo) modes
+  // if were not (!) in normal or single-player mode
   // then don't listen to keys...
   if ( ! (
 		   ( MyGameStatus == STATUS_Normal       ) ||
-		   ( MyGameStatus == STATUS_SinglePlayer ) ||
-		   ( MyGameStatus == STATUS_PlayingDemo  )
+		   ( MyGameStatus == STATUS_SinglePlayer )
 	 )   )
   {
 	return;
@@ -494,8 +493,7 @@ void ProcessGameKeys( void )
 	if ( !CurrentMenu && !JustExitedMenu )
 	{
 		// show the multi-player menu
-		if(GameStatus[WhoIAm] != STATUS_PlayingDemo &&
-			GameStatus[WhoIAm] != STATUS_SinglePlayer)
+		if( GameStatus[WhoIAm] != STATUS_SinglePlayer )
 		{
 			MenuRestart( &MENU_InGame );
 		}
@@ -1318,7 +1316,6 @@ void ReleaseView(void)
   case  STATUS_StartingSinglePlayer:
   case  STATUS_QuittingFromTitles:
   case  STATUS_WaitingToStartMultiPlayerClient:
-  case  STATUS_WaitingToStartDemo:        // Added by DC 24/1/98
 	ReleaseFlyGirl();
 	FreeAllLastAFrameScrPolys();
 	ReleaseTitle();
@@ -1738,16 +1735,6 @@ bool RenderScene( void )
 	  StartASinglePlayerGame( NULL );
 	}
 
-	break;
-
-
-  case STATUS_WaitingToStartDemo:
-	DebugState("STATUS_WaitingToStartDemo\n");
-	if( DisplayTitle() != true )
-	{
-	  SeriousError = true;
-	  return false;
-	}
 	break;
 
 

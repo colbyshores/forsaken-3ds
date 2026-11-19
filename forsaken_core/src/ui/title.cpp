@@ -14861,7 +14861,6 @@ void MenuProcess()
 		  case STATUS_WaitingToStartMultiPlayerHost:
 		  case STATUS_WaitingToStartMultiPlayerClient:
 		  case STATUS_WaitingToStartTeamGame:
-		  case STATUS_WaitingToStartDemo:
 			goto end;
 			break;
 		}

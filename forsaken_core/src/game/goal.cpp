@@ -358,7 +358,7 @@ void ProcessGoals( void )
 	int NumFlags[ MAX_TEAMS ];
 	int NewTeams = 0;
 
-	if( ( ( MyGameStatus != STATUS_Normal ) && ( MyGameStatus != STATUS_PlayingDemo ) ) ||
+	if( ( MyGameStatus != STATUS_Normal ) ||
 		( !CaptureTheFlag && !CTF ) || !NumGoals || !Goal ) // paranoia attack...
 		return;
 

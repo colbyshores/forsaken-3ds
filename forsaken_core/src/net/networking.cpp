@@ -1609,10 +1609,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	else
 	{
 		// Some messages should be ignored when im not in normal multiplayer mode
-		if(
-			MyGameStatus != STATUS_Normal &&
-			MyGameStatus != STATUS_PlayingDemo
-		)
+		if( MyGameStatus != STATUS_Normal )
 		{
 			switch (*MsgPnt)
 			{
