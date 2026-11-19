@@ -819,7 +819,7 @@ void EnableTriggerArea( u_int16_t * Data )
 {
 	TRIGGER_AREA * AreaPnt;
 	AreaPnt = Zones;
-	if( !AreaPnt )
+	if( !AreaPnt || *Data >= NumZones )
 		return;
 	AreaPnt += *Data;
 	AreaPnt->state = TRIGGER_AREA_STATE_On;
@@ -835,7 +835,7 @@ void DisableTriggerArea( u_int16_t * Data )
 {
 	TRIGGER_AREA * AreaPnt;
 	AreaPnt = Zones;
-	if( !AreaPnt )
+	if( !AreaPnt || *Data >= NumZones )
 		return;
 	AreaPnt += *Data;
 	AreaPnt->state = TRIGGER_AREA_STATE_Off;
