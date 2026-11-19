@@ -4749,7 +4749,7 @@ int16_t FindFreeFailedKillSlot( void )
 	}
 
 	FirstFailedKillUsed = i;
-	FirstFailedKillFree = Pickups[ i ].Next;
+	FirstFailedKillFree = FailedKill[ i ].Next;
 	return( i );
 }
 
