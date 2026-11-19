@@ -3105,7 +3105,7 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 				switch( SecBulls[ i ].Weapon )
 				{
 					case THIEFMISSILE:
-						CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 2, 255, 192, 0 );
+						CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 2, 255, 192, 0 );
 						break;
 
 					case ENEMYSPIRALMISSILE:
@@ -3121,10 +3121,10 @@ bool ProcessMissiles( u_int16_t i, u_int16_t * NextMissile )
 					case TITANSTARMISSILE:
 					case PINEMISSILE:
 					case TITANSTARSHRAPNEL:
-						CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 5, 255, 255, 255 );
+						CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 5, 255, 255, 255 );
 						break;
 					case MULTIPLEMISSILE:
-						CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 255, 255, 255 );
+						CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 255, 255, 255 );
 						break;
 				}
 			}

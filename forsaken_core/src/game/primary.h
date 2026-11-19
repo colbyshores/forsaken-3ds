@@ -266,7 +266,7 @@ void	CreateTransTrail( u_int16_t i );
 void	RestoreAmmo( void );
 void	RestoreWeapons( void );
 void	InitAmmoUsed( void );
-void	CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * IntPos2, u_int16_t ShipHit, int16_t Num,
+void	CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, u_int16_t ShipHit, int16_t Num,
 							 u_int8_t Red, u_int8_t Green, u_int8_t Blue );
 u_int16_t	CheckHitShip( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR * UpDir, float DirLength, VECTOR * Int_Point, VECTOR * Int_Point2, float * Dist, float WeaponRadius, u_int16_t ColType );
 u_int16_t	CheckHitSecondary( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, VECTOR * UpDir, float DirLength, VECTOR * Int_Point, VECTOR * Int_Point2, float * Dist, float WeaponRadius, u_int16_t ColType );

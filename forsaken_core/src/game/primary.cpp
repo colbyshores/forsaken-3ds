@@ -2304,32 +2304,32 @@ void ProcessPrimaryBullets( void )
 							case PULSAR:
 							case ORBITPULSAR:
 							case NME_PULSAR:
-								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 2, 0, 255, 0 );
+								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 2, 0, 255, 0 );
 								break;
 							case NME_TROJAX:
 							case TROJAX:
-								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 4, 128, 128, 255 );
+								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 4, 128, 128, 255 );
 								break;
 							case NME_TRANSPULSE:
 							case TRANSPULSE_CANNON:
-								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 4, 255, 100, 100 );
+								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 4, 255, 100, 100 );
 								break;
 							case NME_SUSS_GUN:
 							case SUSS_GUN:
 							case NME_PYROLITE:
 							case PYROLITE_RIFLE:
 							case FLAMES:
-								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 255, 100, 100 );
+								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 255, 100, 100 );
 								break;
 							case NME_LIGHTNING:
 							case NME_LASER:
 							case NME_POWERLASER:
 							case LASER:
-								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 200, 200, 255 );
+								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 200, 200, 255 );
 								break;
 							case NME_PULSAR_BLUE:
 							case NME_BULLET1:
-								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, &Int_Point2, HitTarget, 1, 0, 255, 0 );
+								CreateShieldEffect( (VECTOR *) &Ships[HitTarget].Object.Pos, &Int_Point, HitTarget, 1, 0, 255, 0 );
 								break;
 							default:
 								break;
@@ -6161,12 +6161,11 @@ void CreateTransTrail( u_int16_t i )
 	Procedure	:	Create Shield Effect when hit
 	Input		:	VECTOR	*	Center of Shield
 				:	VECTOR	*	Intersection Point ( Front of shield )
-				:	VECTOR	*	Intersection Point2 ( Back of shield )
 				:	u_int16_t		ShipHit
 				:	int16_t		Number of Spirals
 	Output		:	Nothing
 ===================================================================*/
-void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, VECTOR * /*IntPos2*/, u_int16_t ShipHit, int16_t Num,
+void CreateShieldEffect( VECTOR * Pos, VECTOR * IntPos, u_int16_t ShipHit, int16_t Num,
 						  u_int8_t Red, u_int8_t Green, u_int8_t Blue )
 {
 	int16_t	Count;
