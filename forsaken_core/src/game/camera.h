@@ -39,10 +39,10 @@ struct EXTENT {
 };
 
 
-typedef struct _VISGROUP VISGROUP;
+struct VISGROUP;
 
 
-struct _VISGROUP
+struct VISGROUP
 {
 	int			group;
 	int			visible;
@@ -79,7 +79,7 @@ struct CAMERA{
 	RENDERMATRIX	View;
 };
 
-typedef struct _REMOTECAMERA{
+struct REMOTECAMERA{
 	bool	enable;
 	int16_t	Group;
 	VECTOR	Pos;
@@ -87,7 +87,7 @@ typedef struct _REMOTECAMERA{
 	VECTOR	Up;
 	MATRIX	Mat;
 	MATRIX	InvMat;
-}REMOTECAMERA;
+};
 
 
 

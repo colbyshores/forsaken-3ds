@@ -80,9 +80,9 @@ void network_cleanup();	// stop and cleanup networking
 constexpr int NETWORK_MAX_NAME_LENGTH = 15;
 #define INET_ADDRSTRLEN 16 // 255.255.255.255\0
 
-typedef struct _network_player_t network_player_t;
+struct network_player_t;
 
-struct  _network_player_t {
+struct  network_player_t {
 	char name[ NETWORK_MAX_NAME_LENGTH ]; // 14 chars for player name + 1 /0
 	char ip[INET_ADDRSTRLEN];
 	int  port;

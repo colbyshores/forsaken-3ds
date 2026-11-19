@@ -21,13 +21,13 @@
 #endif
 
 
-typedef struct timer {
+struct px_timer_t {
   u_int32_t  last;
   float   best;
   float   worst;
   float   seconds;
   u_int32_t  millis;
-} px_timer_t;
+};
 
 float timer_run   ( px_timer_t* );
 float timer_peek  ( px_timer_t* );

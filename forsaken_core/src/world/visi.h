@@ -23,11 +23,11 @@
 
 class FileReader;
 
-typedef struct _GROUPLIST
+struct GROUPLIST
 {
 	int groups;
 	u_int16_t *group;
-} GROUPLIST;
+};
 
 // indirectly visible groups seen by any active camera
 extern u_int16_t Num_IndirectVisible;

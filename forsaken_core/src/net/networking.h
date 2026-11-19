@@ -189,14 +189,14 @@ struct MISSEDPICKUPMSG{
 constexpr int MAXSHORTNAME = 8;
 typedef	char		SHORTNAMETYPE[MAX_PLAYERS][MAXSHORTNAME];
 
-typedef struct _SHIPDIEDINFO
+struct SHIPDIEDINFO
 {
 	BYTE		WeaponType;
 	BYTE		Weapon;
 
-} SHIPDIEDINFO;
+};
 
-typedef struct _PICKUPINFO
+struct PICKUPINFO
 {
 	u_int16_t		IDCount;
 	int16_t		Type;
@@ -208,9 +208,9 @@ typedef struct _PICKUPINFO
 	net_bool_t		Sparkle;
 	float		LifeCount;
 	u_int16_t		TriggerMod;
-}PICKUPINFO; // 46
+}; // 46
 
-typedef struct _VERYSHORTPICKUPINFO
+struct VERYSHORTPICKUPINFO
 {
 	u_int16_t		IDCount;
 	BYTE		Type;
@@ -222,41 +222,41 @@ typedef struct _VERYSHORTPICKUPINFO
 	float		Speed;
 	float		LifeCount;
 	u_int16_t		TriggerMod;
-}VERYSHORTPICKUPINFO; // 28
+}; // 28
 
 
-typedef struct _KILLPICKUPINFO
+struct KILLPICKUPINFO
 {
 	u_int16_t		Owner;
 	u_int16_t		IDCount;
 	int16_t		Style;
-}KILLPICKUPINFO;
+};
 
 
 
-typedef struct _TEAMGOALSINFO
+struct TEAMGOALSINFO
 {
 	u_int16_t		TeamGoals[ MAX_TEAMS ];
 
-}TEAMGOALSINFO;
+};
 
-typedef struct _SHOCKWAVEINFO
+struct SHOCKWAVEINFO
 {
 	u_int16_t		Owner;
 	u_int16_t		Group;
 	VECTOR		Pos;
 	BYTE		Weapon;
 	float		ShockwaveSize;
-}SHOCKWAVEINFO;
+};
 
-typedef struct _BGOUPDATEINFO
+struct BGOUPDATEINFO
 {
 	u_int16_t		BGObject;
 	int16_t		State;
 	float		Time;
-}BGOUPDATEINFO;
+};
 
-typedef struct _PRIMBULLPOSDIR
+struct PRIMBULLPOSDIR
 {
 	u_int16_t		OwnerType;
 	u_int16_t		OwnerID;
@@ -270,9 +270,9 @@ typedef struct _PRIMBULLPOSDIR
 	int16_t		PowerLevel;
 	float		PLevel;
 
-}PRIMBULLPOSDIR;
+};
 
-typedef struct _SECBULLPOSDIR
+struct SECBULLPOSDIR
 {
 	u_int16_t		OwnerType;
 	u_int16_t		Owner;
@@ -285,9 +285,9 @@ typedef struct _SECBULLPOSDIR
 	VECTOR		DropDir;
 	int8_t		Weapon;
 
-}SECBULLPOSDIR;
+};
 
-typedef struct _TITANBITS
+struct TITANBITS
 {
 	u_int16_t		OwnerType;
 	u_int16_t		Owner;
@@ -300,9 +300,9 @@ typedef struct _TITANBITS
 	VECTOR		Directions[ NUMTITANBITS ];
 	int8_t		Weapon;
 
-}TITANBITS;
+};
 
-typedef struct _SHIPHIT
+struct SHIPHIT
 {
 	float		Damage;
 	VECTOR		Recoil;
@@ -313,10 +313,10 @@ typedef struct _SHIPHIT
 	float		Force;
 	net_bool_t		OneOffExternalForce;
 
-}SHIPHIT;
+};
 
 
-typedef struct _SHORTSHIPHIT
+struct SHORTSHIPHIT
 {
 	float		Damage;
 	float		Force;
@@ -327,16 +327,16 @@ typedef struct _SHORTSHIPHIT
 	BYTE		Weapon;
 	u_int16_t		OneOffExternalForce;
 	u_int16_t		Recoil_Scalar;
-}SHORTSHIPHIT;
+};
 
 
-typedef struct _SETTIME
+struct SETTIME
 {
 	float		Time;
 
-}SETTIME;
+};
 
-typedef struct _GLOBALSHIP
+struct GLOBALSHIP
 {
 	OBJECT				Object;						//
 
@@ -399,11 +399,11 @@ typedef struct _GLOBALSHIP
 	VECTOR		RealPos;
 	u_int16_t		RealGroup;
 
-} GLOBALSHIP;
+};
 
 
 /*		this is all that really needs to be sent	*/
-typedef struct _SHORTGLOBALSHIP
+struct SHORTGLOBALSHIP
 {
 	u_int32_t				Flags;			// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
 	BYTE				Status;			// tells us constantly what this ship is doing...
@@ -414,9 +414,9 @@ typedef struct _SHORTGLOBALSHIP
 	VECTOR				Angle;			// Last Rotation..
 	int16_t				Bank;			// How much Am I banked....
 	QUAT				Quat;			// Final Quat...
-} SHORTGLOBALSHIP;
+};
 
-typedef struct _VERYSHORTGLOBALSHIP
+struct VERYSHORTGLOBALSHIP
 {
 	u_int32_t				Flags;			// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
 	BYTE				Status;			// tells us constantly what this ship is doing...
@@ -427,10 +427,10 @@ typedef struct _VERYSHORTGLOBALSHIP
 	int16_t				Bank;			// How much Am I banked....
 	u_int16_t				Move_Off_Scalar;
 	SHORTQUAT			Quat;			// Final Quat...
-} VERYSHORTGLOBALSHIP;
+};
 
 
-typedef struct _FSHORTGLOBALSHIP
+struct FSHORTGLOBALSHIP
 {
 	u_int32_t				Flags;			// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
 	BYTE				Primary;		// Primary weapon
@@ -442,9 +442,9 @@ typedef struct _FSHORTGLOBALSHIP
 	VECTOR				Angle;			// Last Rotation..
 	int16_t				Bank;		// How much Am I banked....
 	QUAT				Quat;		// Final Quat...
-} FSHORTGLOBALSHIP;
+};
 
-typedef struct _FVERYSHORTGLOBALSHIP
+struct FVERYSHORTGLOBALSHIP
 {
 	u_int32_t				Flags;			// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
 	BYTE				Primary;		// Primary weapon
@@ -457,9 +457,9 @@ typedef struct _FVERYSHORTGLOBALSHIP
 	int16_t				Bank;		// How much Am I banked....
 	u_int16_t				Move_Off_Scalar;
 	SHORTQUAT			Quat;		// Final Quat...
-} FVERYSHORTGLOBALSHIP;
+};
 
-typedef struct _GROUPONLY_FVERYSHORTGLOBALSHIP
+struct GROUPONLY_FVERYSHORTGLOBALSHIP
 {
 	u_int32_t				Flags;			// Flags Enable/Stealth/Turbo/PrimFire/SecFire/PrimToggle/SecToggle
 	BYTE				Primary;		// Primary weapon
@@ -469,7 +469,7 @@ typedef struct _GROUPONLY_FVERYSHORTGLOBALSHIP
 	SHORTVECTOR			Pos;			// x , y , z position
 	SHORTQUAT			Quat;		// Final Quat...
 	int16_t				Bank;		// How much Am I banked....
-} GROUPONLY_FVERYSHORTGLOBALSHIP;
+};
 
 //----------------------------------------------------------
 // Mask Defines for .Flags u_int32_t
@@ -590,113 +590,113 @@ constexpr auto MSG_GROUPONLY_VERYSHORTFUPDATE = 0xec;
 constexpr auto MSG_VERYSHORTDROPPICKUP = 0xed;
 constexpr auto MSG_SHIPHEALTH = 0xcc;
 
-typedef struct _YOUQUITMSG
+struct YOUQUITMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	BYTE		You;
-}YOUQUITMSG;
+};
 
-typedef struct _BIKENUMMSG
+struct BIKENUMMSG
 {
 	BYTE     MsgCode;
 	BYTE     WhoIAm;
 	BYTE		BikeNum;		// which model to display for them...
-}BIKENUMMSG;
+};
 
-typedef struct _SHORTPICKUPMSG
+struct SHORTPICKUPMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	BYTE		HowManyPickups;
 	BYTE		Pickups;
 	struct SHORTPICKUP  ShortPickup[MAXGENPICKUPCOUNT];
-} SHORTPICKUPMSG;
+};
 
-typedef struct _SHORTREGENSLOTMSG
+struct SHORTREGENSLOTMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	BYTE		HowManyRegenSlots;
 	BYTE		RegenSlots;
 	struct SHORTREGENSLOT  ShortRegenSlot[MAXGENREGENSLOTCOUNT];
-} SHORTREGENSLOTMSG;
+};
 
-typedef struct _SHORTTRIGGERMSG
+struct SHORTTRIGGERMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	BYTE		HowManyTriggers;
 	BYTE		Triggers;
 	struct SHORTTRIGGER  ShortTrigger[MAXGENTRIGGERCOUNT];
-} SHORTTRIGGERMSG;
+};
 
-typedef struct _SHORTTRIGVARMSG
+struct SHORTTRIGVARMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	BYTE		HowManyTrigVars;
 	BYTE		TrigVars;
 	struct SHORTTRIGVAR  ShortTrigVar[MAXGENTRIGVARCOUNT];
-} SHORTTRIGVARMSG;
+};
 
-typedef struct _SHORTMINEMSG
+struct SHORTMINEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	BYTE		HowManyMines;
 	BYTE		Mines;
 	struct SHORTMINE  ShortMine[MAXGENMINECOUNT];
-} SHORTMINEMSG;
+};
 
-typedef struct _UPDATEMSG
+struct UPDATEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	SHORTGLOBALSHIP  ShortGlobalShip;
-} UPDATEMSG;
+};
 
-typedef struct _VERYSHORTUPDATEMSG
+struct VERYSHORTUPDATEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	VERYSHORTGLOBALSHIP  ShortGlobalShip;
-} VERYSHORTUPDATEMSG;
+};
 
-typedef struct _FUPDATEMSG
+struct FUPDATEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	FSHORTGLOBALSHIP  ShortGlobalShip;
-} FUPDATEMSG;
+};
 
-typedef struct _VERYSHORTFUPDATEMSG
+struct VERYSHORTFUPDATEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	FVERYSHORTGLOBALSHIP  ShortGlobalShip;
-} VERYSHORTFUPDATEMSG;
+};
 
-typedef struct _GROUPONLY_VERYSHORTFUPDATEMSG
+struct GROUPONLY_VERYSHORTFUPDATEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	GROUPONLY_FVERYSHORTGLOBALSHIP  ShortGlobalShip;
-} GROUPONLY_VERYSHORTFUPDATEMSG;
+};
 
 
-typedef struct _HEREIAMMSG
+struct HEREIAMMSG
 {
 	BYTE		MsgCode;
 	BYTE		WhoIAm;
 	BYTE		MPVersion;
-} HEREIAMMSG;
+};
 
 // later we should probably shove these all into a bit stream
 // for now this is much simplar and this message is only sent once to new players
 // converting all the bool's to BYTE's (even with all the new added fields) saved 72 bits...
 
-typedef struct _INITMSG
+struct INITMSG
 {
 	BYTE	MsgCode;
 
@@ -741,26 +741,26 @@ typedef struct _INITMSG
 	char	LevelName[32];
 
 
-} INITMSG;
+};
 
-typedef struct _SHIPHITMSG
+struct SHIPHITMSG
 {
 	BYTE     MsgCode;
 	BYTE		WhoHitYou;
 	BYTE     You;
 	SHIPHIT	ShipHit;
-} SHIPHITMSG;
+};
 
-typedef struct _SHORTSHIPHITMSG
+struct SHORTSHIPHITMSG
 {
 	BYTE		MsgCode;
 	BYTE		WhoHitYou;
 	BYTE		You;
 	SHORTSHIPHIT	ShipHit;
-} SHORTSHIPHITMSG;
+};
 
 
-typedef struct _SHIPDIEDMSG
+struct SHIPDIEDMSG
 {
 	BYTE     MsgCode;
 	BYTE     WhoIAm;
@@ -769,79 +769,79 @@ typedef struct _SHIPDIEDMSG
 	BYTE		WeaponType;
 	BYTE		Weapon;
 	VECTOR	Pos;
-} SHIPDIEDMSG;
+};
 
 
-typedef struct _KILLPICKUPMSG
+struct KILLPICKUPMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	KILLPICKUPINFO	KillPickupInfo;
 
-} KILLPICKUPMSG;
+};
 
-typedef struct _TEAMGOALSMSG
+struct TEAMGOALSMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	TEAMGOALSINFO	TeamGoalsInfo;
 
-} TEAMGOALSMSG;
+};
 
-typedef struct _SHOCKWAVEMSG
+struct SHOCKWAVEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	SHOCKWAVEINFO	ShockwaveInfo;
 
-} SHOCKWAVEMSG;
+};
 
-typedef struct _BGOUPDATEMSG
+struct BGOUPDATEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	BGOUPDATEINFO	BGOUpdateInfo;
 
-} BGOUPDATEMSG;
+};
 
-typedef struct _DROPPICKUPMSG
+struct DROPPICKUPMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	PICKUPINFO	PickupInfo;
 
-} DROPPICKUPMSG;
+};
 
-typedef struct _VERYSHORTDROPPICKUPMSG
+struct VERYSHORTDROPPICKUPMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	VERYSHORTPICKUPINFO	PickupInfo;
 
-} VERYSHORTDROPPICKUPMSG;
+};
 
-typedef struct _PRIMBULLPOSDIRMSG
+struct PRIMBULLPOSDIRMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	PRIMBULLPOSDIR	PrimBullPosDir;
-} PRIMBULLPOSDIRMSG;
+};
 
-typedef struct _SECBULLPOSDIRMSG
+struct SECBULLPOSDIRMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	SECBULLPOSDIR	SecBullPosDir;
-} SECBULLPOSDIRMSG;
+};
 
-typedef struct _TITANBITSMSG
+struct TITANBITSMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	TITANBITS	TitanBits;
-} TITANBITSMSG;
+};
 
-typedef struct _STATUSMSG
+struct STATUSMSG
 {
 	BYTE     MsgCode;
 	BYTE     WhoIAm;
@@ -854,9 +854,9 @@ typedef struct _STATUSMSG
 	BYTE		Mines;			// tells how much of the mine list I have recieved..
 	BYTE		Triggers;			// tells how much of the mine list I have recieved..
 	BYTE		TrigVars;		// tells how much of the mine list I have recieved..
-} STATUSMSG;
+};
 
-typedef struct _NETSETTINGSMSG
+struct NETSETTINGSMSG
 {
 	BYTE		MsgCode;
 	BYTE		WhoIAm;
@@ -864,16 +864,16 @@ typedef struct _NETSETTINGSMSG
 	float		PacketsPerSecond;
 	net_bool_t		CollisionPerspective;
 	net_bool_t		ShortPackets;
-} NETSETTINGSMSG;
+};
 
-typedef struct _LONGSTATUSMSG
+struct LONGSTATUSMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	STATUSMSG	Status;
 	char		LevelName[32];
 	u_int16_t		RandomStartPosModify;
-} LONGSTATUSMSG;
+};
 
 enum{
 	TEXTMSGTYPE_Taunt1,
@@ -895,38 +895,38 @@ enum{
 	TEXTMSGTYPE_SpeechTaunt,
 };
 
-typedef struct _TEXTMSG
+struct TEXTMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	char		Text[MAXTEXTMSG];
 	BYTE		TextMsgType;
-} TEXTMSG;
+};
 
 
-typedef struct _SETTIMEMSG
+struct SETTIMEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 	SETTIME		TimeInfo;
 
-} SETTIMEMSG;
+};
 
 
-typedef struct _REQTIMEMSG
+struct REQTIMEMSG
 {
 	BYTE        MsgCode;
 	BYTE        WhoIAm;
 
-} REQTIMEMSG;
+};
 
-typedef struct _SHIPHEALTHMSG
+struct SHIPHEALTHMSG
 {
 	BYTE MsgCode;
 	BYTE WhoIAm;
 	u_int8_t Hull;
 	u_int8_t Shield;
-} SHIPHEALTHMSG;
+};
 
 
 // expose Names to all that care

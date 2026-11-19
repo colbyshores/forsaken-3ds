@@ -50,21 +50,21 @@
 
 bool bSquareOnly = true;
 
-typedef struct vkbuf {
+struct vkbuf_t {
 	VkBuffer buf;
 	VkDeviceMemory mem;
 	void *mapped;
 	VkDeviceSize size;
-} vkbuf_t;
+};
 
-typedef struct vktex {
+struct vktex_t {
 	VkImage image;
 	VkDeviceMemory mem;
 	VkImageView view;
 	VkDescriptorSet set;
 	int w, h;
 	bool colorkey;
-} vktex_t;
+};
 
 static VkInstance       s_inst;
 static VkSurfaceKHR     s_surface;
@@ -95,7 +95,7 @@ static int              s_slot;
 static uint64_t         s_frame_seq;      /* submitted frame counter */
 /* Buffers retired during a frame are freed once two later frames
  * have been submitted (their fences waited at slot reuse). */
-typedef struct retire { struct retire *next; vkbuf_t *buf; uint64_t seq; } retire_t;
+struct retire_t { struct retire_t *next; vkbuf_t *buf; uint64_t seq; };
 static retire_t        *s_retire;
 /* Per-slot stream buffer the draws copy their vertices and indices into;
  * s_stream_used is the fill of the current slot's buffer. */

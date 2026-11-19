@@ -48,11 +48,11 @@ struct USERKEY {
 };
 
 
-typedef struct _DEFKEY
+struct DEFKEY
 {
 	USERKEY *def;
 	int selected_key;
-} DEFKEY;
+};
 
 
 struct VIRTUALKEYMAP {

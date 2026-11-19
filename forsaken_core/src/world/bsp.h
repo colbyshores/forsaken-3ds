@@ -60,27 +60,27 @@ struct BSP_HEADER
 };
 
 
-typedef struct _BSP_PORTAL
+struct BSP_PORTAL
 {
 	u_int16_t		group;
 	VECTOR		normal;
 	float		offset;
 	BSP_TREE	bsp;
-} BSP_PORTAL;
+};
 
-typedef struct _BSP_PORTAL_GROUP
+struct BSP_PORTAL_GROUP
 {
 	int			portals;
 	BSP_PORTAL	*portal;
-} BSP_PORTAL_GROUP;
+};
 
 
-typedef struct _BSP_PORTAL_HEADER
+struct BSP_PORTAL_HEADER
 {
 	bool		state;
 	int			groups;
 	BSP_PORTAL_GROUP	group[ MAXGROUPS ];
-} BSP_PORTAL_HEADER;
+};
 
 
 /*

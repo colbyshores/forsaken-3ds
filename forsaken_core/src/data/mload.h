@@ -78,13 +78,13 @@ struct STARTPOS{
 };
 static_assert( sizeof( STARTPOS ) == 40, "STARTPOS is a file record (2 trailing pad bytes)" );
 
-typedef struct _GAMESTARTPOS{
+struct GAMESTARTPOS{
 	VECTOR	Pos;
 	VECTOR	Dir;
 	VECTOR	Up;
 	u_int16_t	Group;
 	u_int16_t	NextInGroup;
-}GAMESTARTPOS;
+};
 
 struct PORTALPOLY
 {
@@ -140,12 +140,12 @@ struct POLYANIM {
 	int16_t	WhenStoppedTriggerMod;
 };
 
-typedef struct _TEXTUREANIMINFOINDEX{
+struct TEXTUREANIMINFOINDEX{
 	u_int16_t	Group;
 	u_int16_t	Mesh;
 	u_int16_t	PolyAnim;
 	u_int16_t	InitState;
-}TEXTUREANIMINFOINDEX;
+};
 
 
 struct ANIMDATA {

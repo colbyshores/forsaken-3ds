@@ -44,12 +44,12 @@ struct	NODE *	NodeLink[MAXLINKSPERNODE];
 struct	NODE *	NextNodeInGroup;
 };
 
-typedef struct _NODENETWORKHEADER
+struct NODENETWORKHEADER
 {
 	bool	State;
 	int32_t	NumOfNodes;
 	NODE *	FirstNode;
-} NODENETWORKHEADER;
+};
 
 
 void NodeRelease(void);

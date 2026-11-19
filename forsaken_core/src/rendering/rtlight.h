@@ -74,7 +74,7 @@ struct RT_SPOT_LIGHT {
 	float angle;
 };
 
-typedef struct _RTLIGHT
+struct RT_LIGHT
 {
 	LIGHTTYPE type;
 	u_int16_t group;
@@ -98,7 +98,7 @@ typedef struct _RTLIGHT
 	float now_time;
 	float delay;
 	float intensity;
-} RT_LIGHT;
+};
 
 
 extern bool LoadRTLights( void );

@@ -247,13 +247,13 @@ struct TEXTINFO {
 	bool	finished[MAXNUMLINES];
 };
 
-typedef struct _MENU MENU;
-typedef struct _MENUITEM MENUITEM;
-typedef struct _TITLE_EVENT TITLE_EVENT;
-typedef struct _TITLE_EVENT_TIMER TITLE_EVENT_TIMER;
-typedef struct _TEXT TEXT;
-typedef struct _SLIDER SLIDER;
-typedef struct _LIST LIST;
+struct MENU;
+struct MENUITEM;
+struct TITLE_EVENT;
+struct TITLE_EVENT_TIMER;
+struct TEXT;
+struct SLIDER;
+struct LIST;
 
 typedef void (* MenuFunc)( MENU * );
 typedef void (* MenuItemFunc)( MENUITEM * );
@@ -320,7 +320,7 @@ enum
 	TITLE_TIMER_ExpandObject,
 };
 
-struct _TITLE_EVENT
+struct TITLE_EVENT
 {
 	EventFunc	InitFunc;
 	EventFunc	ProcessFunc;	//must set EventStatus to TITLE_EVENT_FINISHED when this function is finished
@@ -339,7 +339,7 @@ enum
 	TITLE_EVENT_TIMER_AWAITINGRESET,
 };
 
-struct _TITLE_EVENT_TIMER
+struct TITLE_EVENT_TIMER
 {
 	float		Interval;		//lifespan of timer (secs)
 	float		CurrentTime;	//0 = start, 1 = end
@@ -357,7 +357,7 @@ struct SCANLINES {
 };
 
 
-struct _MENUITEM
+struct MENUITEM
 {
 	int		x;
 	int		y;
@@ -377,7 +377,7 @@ struct _MENUITEM
 };
 
 
-struct _MENU
+struct MENU
 {
 	u_int8_t *			Name;
 	MenuFunc		FuncEntry;
@@ -387,7 +387,7 @@ struct _MENU
 	MENUITEM Item[ MAXMENUITEMS ];
 };
 
-struct _SLIDER
+struct SLIDER
 {
 	int min;
 	int max;
@@ -404,7 +404,7 @@ struct _SLIDER
 };
 
 
-struct _LIST
+struct LIST
 {
 	int items;
 	int display_items;
@@ -420,7 +420,7 @@ struct _LIST
 };
 
 
-struct _TEXT
+struct TEXT
 {
 	int insert_pos;
 	int VDU_insert_pos;

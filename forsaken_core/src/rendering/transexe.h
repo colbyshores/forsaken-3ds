@@ -19,7 +19,7 @@
 
 constexpr int MAXTRANSEXE = 128;
 
-typedef struct _TRANSEXE{
+struct TRANSEXE{
 	int	UseIdentity;
 	RENDERMATRIX  Matrix;
 	RENDEROBJECT renderObject;
@@ -35,7 +35,7 @@ typedef struct _TRANSEXE{
 	int render_color_blend_red;
 	int render_color_blend_green;
 	int render_color_blend_blue;
-}TRANSEXE;
+};
 
 extern int16_t	NumOfTransExe;
 

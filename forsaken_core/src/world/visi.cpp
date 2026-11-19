@@ -47,11 +47,11 @@ static int GTabRowSize;
 
 #define DIV_CEIL( N, D ) ( (int32_t) ( (N) + (D) - 1 ) / (D) )
 
-typedef struct _GROUPRELATION
+struct GROUPRELATION
 {
 	u_int32_t *table;
 	GROUPLIST list[ MAXGROUPS ];
-} GROUPRELATION;
+};
 
 
 static GROUPRELATION ConnectedGroup;

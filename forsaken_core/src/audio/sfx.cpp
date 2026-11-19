@@ -428,7 +428,7 @@ sound_source_t * sound_source_create( char *file, int sfxnum )
 // End
 ////////
 
-typedef struct _SPOT_SFX_LIST
+struct SPOT_SFX_LIST
 {
 	bool     used;       // is sfx in use?
 	int16_t    sfxindex;   // sfx num, from enum list
@@ -446,7 +446,7 @@ typedef struct _SPOT_SFX_LIST
 	int      SfxHolderIndex;
 	u_int16_t   Effects;
 	u_int32_t   uid;
-} SPOT_SFX_LIST;
+};
 
 constexpr int MAX_LOOPING_SFX = 64;
 SPOT_SFX_LIST SpotSfxList[ MAX_LOOPING_SFX ];

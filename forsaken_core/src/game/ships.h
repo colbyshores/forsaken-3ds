@@ -54,7 +54,7 @@ constexpr float HULL_CRITICAL_LEVEL = ( 64.0F );
 /*
  * Structures...
  */
-typedef struct _BIKEMOD
+struct BIKEMOD
 {
 	float	MaxMoveSpeed;
 	float	MoveAccell;
@@ -75,7 +75,7 @@ typedef struct _BIKEMOD
 	float	Start_Hull;
 	float	AutoLevel;
 
-} BIKEMOD;
+};
 
 
 /*

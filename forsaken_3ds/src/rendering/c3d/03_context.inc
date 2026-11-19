@@ -17,8 +17,8 @@ gl_caps_t caps;
 
 /* Forward declarations */
 static void upload_matrices(void);
-typedef struct texture_s texture_t;
-static void apply_texenv_for_texture(struct texture_s *texdata);
+struct texture_t;
+static void apply_texenv_for_texture(struct texture_t *texdata);
 static void apply_texenv_untextured(void);
 
 /* Pick a material class from the source texture filename. Forsaken's
@@ -70,12 +70,12 @@ MATRIX world_matrix;
  * walls of the same material class don't share the same noise tile
  * position — but each individual texture's pattern is identical from
  * one level load to the next (deterministic, no flicker on respawn). */
-typedef struct texture_s {
+struct texture_t {
 	C3D_Tex tex;
 	bool    initialized;
 	u8      material_class;
 	float   proctex_phase;
-} texture_t;
+};
 
 /* bSquareOnly — shared global, always true on 3DS */
 bool bSquareOnly = true;
