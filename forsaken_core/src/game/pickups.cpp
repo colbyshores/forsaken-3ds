@@ -2907,10 +2907,11 @@ bool LoadPickupsPositions( void )
 
 
   /* Populate Remaster N64 pickup slots (100-105) by template-copying
-   * from a similar 1998 pickup (light / glow attribs), then pointing
-   * ModelType at the N64 mesh PreLoadPickups registered, if any.
-   * One-shot — guarded by a static flag, so ModelType keeps the slot
-   * indices from the first level load. */
+   * from a similar 1998 pickup (light / glow attribs) once, then point
+   * ModelType at the N64 mesh PreLoadPickups registered. PreLoadPickups
+   * runs on every level change and the slot indices it gets depend on
+   * the level's background and enemy models, so the ModelType overrides
+   * are reapplied on every load, not only the first. */
 #ifdef EDITION_REMASTER
   {
 	static bool _n64_pickup_init_done = false;
@@ -2918,12 +2919,8 @@ bool LoadPickupsPositions( void )
 	{
 	  _n64_pickup_init_done = true;
 
-	  /* StablizerCrystal (100): glowing crystal pickup → Crystal template
-	   * for light/glow attribs, then override ModelType to the real
-	   * N64 mesh registered by PreLoadPickups. */
+	  /* StablizerCrystal (100): glowing crystal pickup → Crystal template. */
 	  PickupAttribs[ PICKUP_StablizerCrystal ] = PickupAttribs[ PICKUP_Crystal ];
-	  if (s_n64_pickup_model_idx[0] >= 0)
-		PickupAttribs[ PICKUP_StablizerCrystal ].ModelType = s_n64_pickup_model_idx[0];
 
 	  /* ComputerCapsule (101): pickup capsule → Computer template
 	   * (no real mesh extracted — not used by any level in the SP
@@ -2931,20 +2928,24 @@ bool LoadPickupsPositions( void )
 	  PickupAttribs[ PICKUP_ComputerCapsule ] = PickupAttribs[ PICKUP_Computer ];
 
 	  /* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod
-	   * template for light/glow + real per-part N64 mesh. */
+	   * template for light/glow. */
 	  PickupAttribs[ PICKUP_BlackHoleGunPart1 ] = PickupAttribs[ PICKUP_PowerPod ];
 	  PickupAttribs[ PICKUP_BlackHoleGunPart2 ] = PickupAttribs[ PICKUP_PowerPod ];
 	  PickupAttribs[ PICKUP_BlackHoleGunPart3 ] = PickupAttribs[ PICKUP_PowerPod ];
 	  PickupAttribs[ PICKUP_BlackHoleGunPart4 ] = PickupAttribs[ PICKUP_PowerPod ];
-	  if (s_n64_pickup_model_idx[1] >= 0)
-		PickupAttribs[ PICKUP_BlackHoleGunPart1 ].ModelType = s_n64_pickup_model_idx[1];
-	  if (s_n64_pickup_model_idx[2] >= 0)
-		PickupAttribs[ PICKUP_BlackHoleGunPart2 ].ModelType = s_n64_pickup_model_idx[2];
-	  if (s_n64_pickup_model_idx[3] >= 0)
-		PickupAttribs[ PICKUP_BlackHoleGunPart3 ].ModelType = s_n64_pickup_model_idx[3];
-	  if (s_n64_pickup_model_idx[4] >= 0)
-		PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
 	}
+
+	/* This level's model slots for the real N64 meshes. */
+	if (s_n64_pickup_model_idx[0] >= 0)
+	  PickupAttribs[ PICKUP_StablizerCrystal ].ModelType = s_n64_pickup_model_idx[0];
+	if (s_n64_pickup_model_idx[1] >= 0)
+	  PickupAttribs[ PICKUP_BlackHoleGunPart1 ].ModelType = s_n64_pickup_model_idx[1];
+	if (s_n64_pickup_model_idx[2] >= 0)
+	  PickupAttribs[ PICKUP_BlackHoleGunPart2 ].ModelType = s_n64_pickup_model_idx[2];
+	if (s_n64_pickup_model_idx[3] >= 0)
+	  PickupAttribs[ PICKUP_BlackHoleGunPart3 ].ModelType = s_n64_pickup_model_idx[3];
+	if (s_n64_pickup_model_idx[4] >= 0)
+	  PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
   }
 #endif /* EDITION_REMASTER — N64 pickup template block */
 
