@@ -542,7 +542,7 @@ bool InGameSave( MENUITEM * /*MenuItem*/ )
 	}
 	return false;
 
-fail:
+	fail:
 	fclose( out );
 	delete_file( (char*)TmpFilename );
 	return false;

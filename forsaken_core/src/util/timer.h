@@ -22,11 +22,11 @@
 
 
 struct px_timer_t {
-  u_int32_t  last;
-  float   best;
-  float   worst;
-  float   seconds;
-  u_int32_t  millis;
+	u_int32_t  last;
+	float   best;
+	float   worst;
+	float   seconds;
+	u_int32_t  millis;
 };
 
 float timer_run   ( px_timer_t* );

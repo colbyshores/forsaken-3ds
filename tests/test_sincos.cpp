@@ -18,43 +18,43 @@
 static int failures = 0;
 
 #define CHECK(cond, ...) do { \
-    if (!(cond)) { printf("FAIL: "); printf(__VA_ARGS__); \
-        putchar('\n'); failures++; } \
+	if (!(cond)) { printf("FAIL: "); printf(__VA_ARGS__); \
+		putchar('\n'); failures++; } \
 } while (0)
 
 static void sweep(float lo, float hi, int n, float bound, const char *tag)
 {
-    float worst = 0.0f;
-    for (int k = 0; k < n; k++) {
-        float rad = lo + (hi - lo) * ((float)k / (float)(n - 1));
-        float s, c;
-        fast_sincosf(rad, &s, &c);
-        CHECK(s == fast_sinf(rad), "%s sin not bit-identical at %g", tag, rad);
-        {
-            float d = fabsf(c - fast_cosf(rad));
-            if (d > worst)
-                worst = d;
-            CHECK(d <= bound, "%s cos err %g exceeds %g at rad=%g",
-                  tag, d, bound, rad);
-        }
-    }
-    printf("%s: worst cos abs err %.3g (bound %.3g)\n", tag, worst, bound);
-    if (failures)
-        return;
+	float worst = 0.0f;
+	for (int k = 0; k < n; k++) {
+		float rad = lo + (hi - lo) * ((float)k / (float)(n - 1));
+		float s, c;
+		fast_sincosf(rad, &s, &c);
+		CHECK(s == fast_sinf(rad), "%s sin not bit-identical at %g", tag, rad);
+		{
+			float d = fabsf(c - fast_cosf(rad));
+			if (d > worst)
+				worst = d;
+			CHECK(d <= bound, "%s cos err %g exceeds %g at rad=%g",
+				  tag, d, bound, rad);
+		}
+	}
+	printf("%s: worst cos abs err %.3g (bound %.3g)\n", tag, worst, bound);
+	if (failures)
+		return;
 }
 
 int main(void)
 {
-    trig_table_init();
-    /* Game domain: model/billboard angles after degree->radian. */
-    sweep(-10.0f, 10.0f, 200001, 1e-6f, "game-domain");
-    /* Boundary neighborhoods: wrap points, quarter turns, near-zero. */
-    sweep(-3.14159265f - 0.01f, -3.14159265f + 0.01f, 2001, 1e-6f, "wrap-pi");
-    sweep(1.57079633f - 0.01f, 1.57079633f + 0.01f, 2001, 1e-6f, "quarter");
-    sweep(-0.01f, 0.01f, 2001, 1e-6f, "near-zero");
-    /* Wider accumulator range, looser bound (input rounding dominates). */
-    sweep(-1000.0f, 1000.0f, 200001, 1e-4f, "wide");
-    if (failures == 0)
-        printf("test_sincos: all cases pass\n");
-    return failures != 0;
+	trig_table_init();
+	/* Game domain: model/billboard angles after degree->radian. */
+	sweep(-10.0f, 10.0f, 200001, 1e-6f, "game-domain");
+	/* Boundary neighborhoods: wrap points, quarter turns, near-zero. */
+	sweep(-3.14159265f - 0.01f, -3.14159265f + 0.01f, 2001, 1e-6f, "wrap-pi");
+	sweep(1.57079633f - 0.01f, 1.57079633f + 0.01f, 2001, 1e-6f, "quarter");
+	sweep(-0.01f, 0.01f, 2001, 1e-6f, "near-zero");
+	/* Wider accumulator range, looser bound (input rounding dominates). */
+	sweep(-1000.0f, 1000.0f, 200001, 1e-4f, "wide");
+	if (failures == 0)
+		printf("test_sincos: all cases pass\n");
+	return failures != 0;
 }

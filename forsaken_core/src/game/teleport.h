@@ -28,20 +28,20 @@ constexpr int MAXTELEPORTLINKS = 8;
  * Structures
  */
 struct TELEPORT{
-		u_int16_t	Status;
-		u_int16_t	Group;
-		u_int16_t	Type;					// what stuff can teleport
-		u_int16_t	zone_type;				// sphere / box / convex hull
-		VECTOR	Pos;
-		VECTOR	Dir;
-		VECTOR	Up;
-		VECTOR	half_size;
-		TRIGGER_ZONE	*Zone;
-		u_int16_t	num_sides;
+	u_int16_t	Status;
+	u_int16_t	Group;
+	u_int16_t	Type;					// what stuff can teleport
+	u_int16_t	zone_type;				// sphere / box / convex hull
+	VECTOR	Pos;
+	VECTOR	Dir;
+	VECTOR	Up;
+	VECTOR	half_size;
+	TRIGGER_ZONE	*Zone;
+	u_int16_t	num_sides;
 
-		u_int16_t	num_links;
-		u_int16_t	Links[MAXTELEPORTLINKS];
-struct	TELEPORT * NextInGroup;
+	u_int16_t	num_links;
+	u_int16_t	Links[MAXTELEPORTLINKS];
+	struct	TELEPORT * NextInGroup;
 };
 
 /*

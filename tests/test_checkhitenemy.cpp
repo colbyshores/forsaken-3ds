@@ -122,7 +122,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == &eA, "connected on-ray enemy hit");
 	CHECK(WITHIN(dist, 90.0f, 0.01f), "hit distance at sphere surface");
 
@@ -133,7 +133,7 @@ int main(void)
 	FirstEnemyUsed = &eB;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == nullptr, "sealed-group enemy skipped");
 	CHECK(dist == 1000.0f, "Dist untouched on skip");
 
@@ -147,7 +147,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == &eA, "sealed-nearer loses to connected-farther");
 	CHECK(WITHIN(dist, 90.0f, 0.01f), "connected distance wins");
 
@@ -157,7 +157,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_ENEMY, 5, &pos, 0, &dir, &up, 1000.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == nullptr, "owner self excluded");
 
 	/* Case 5: disabled enemy ignored (connected, on-ray). */
@@ -166,7 +166,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == nullptr, "disabled enemy ignored");
 
 	/* Case 6: connected but off-ray still misses (gate passes, ray decides). */
@@ -175,7 +175,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == nullptr, "connected off-ray misses");
 
 	/* Case 7: far enemy beyond reach is skipped, Dist untouched.
@@ -185,7 +185,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == nullptr, "beyond-reach enemy skipped");
 	CHECK(dist == 1000.0f, "Dist untouched on skip");
 
@@ -196,7 +196,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == &eA, "inside-reach enemy hit");
 	CHECK(WITHIN(dist, 49.0f, 0.01f), "inside-reach distance");
 
@@ -206,7 +206,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 50.0f,
-	                    &ip, &ip2, &dist, 5.0f, COLTYPE_Trojax);
+						&ip, &ip2, &dist, 5.0f, COLTYPE_Trojax);
 	CHECK(hit == nullptr, "trojax far enemy skipped");
 	CHECK(dist == 1000.0f, "Dist untouched on trojax skip");
 
@@ -216,7 +216,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 1000.0f,
-	                    &ip, &ip2, &dist, -1.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, -1.0f, COLTYPE_Sphere);
 	CHECK(hit == &eA, "negative weapon radius still hits near");
 	CHECK(WITHIN(dist, 90.0f, 0.01f), "negative-W distance");
 
@@ -226,7 +226,7 @@ int main(void)
 	FirstEnemyUsed = &eA;
 	dist = 1000.0f;
 	hit = CheckHitEnemy(OWNER_SHIP, 0, &pos, 0, &dir, &up, 0.0f,
-	                    &ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
+						&ip, &ip2, &dist, 0.0f, COLTYPE_Sphere);
 	CHECK(hit == &eA, "zero-length overlapping ray hits");
 	CHECK(dist == 0.0f, "inside-start distance zero");
 

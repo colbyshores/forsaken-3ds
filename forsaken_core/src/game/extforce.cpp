@@ -270,12 +270,12 @@ void DisplayExternalForcesInGroup( u_int16_t Group )
 		{
 			switch( EFpnt->ForceType )
 			{
-				case EXTERNALFORCETYPE_Shield:
-				case EXTERNALFORCETYPE_Shake:
-					break;
-				case EXTERNALFORCETYPE_Move:
-					DisplayZoneDirection( &EFpnt->Origin, &EFpnt->Dir, Group );
-					break;
+			case EXTERNALFORCETYPE_Shield:
+			case EXTERNALFORCETYPE_Shake:
+				break;
+			case EXTERNALFORCETYPE_Move:
+				DisplayZoneDirection( &EFpnt->Origin, &EFpnt->Dir, Group );
+				break;
 			}
 
 			if( EFpnt->Type == ZONE_Sphere )

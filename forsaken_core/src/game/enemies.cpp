@@ -456,13 +456,13 @@ GUNTYPE	GunTypes[] = {
 
 //	bool	OnlyOnce = true;// Use this to display an enemy...
 
-	int16_t		NumInitEnemies;
-	int16_t		NumKilledEnemies = 0;
-	ENEMY		Enemies[ MAXENEMIES ];
-	ENEMY	*	EnemyGroups[ MAXGROUPS ];
-	u_int16_t		NumEnemiesPerGroup[ MAXGROUPS ];
-	ENEMY	*	FirstEnemyUsed = nullptr;
-	ENEMY	*	FirstEnemyFree = nullptr;
+int16_t		NumInitEnemies;
+int16_t		NumKilledEnemies = 0;
+ENEMY		Enemies[ MAXENEMIES ];
+ENEMY	*	EnemyGroups[ MAXGROUPS ];
+u_int16_t		NumEnemiesPerGroup[ MAXGROUPS ];
+ENEMY	*	FirstEnemyUsed = nullptr;
+ENEMY	*	FirstEnemyFree = nullptr;
 
 ANIM_SEQ	PulseTurretSeqs[] = {
 	{ 0.0F * ANIM_SECOND, 0.0F * ANIM_SECOND },	// Closed
@@ -4332,171 +4332,171 @@ bool PreLoadEnemies( void )
 #ifdef EDITION_REMASTER
 	{
 
-			/* Each N64-only enemy uses its real Remaster mesh. Asset
-			 * extraction (extract_remaster_levels.py from ForsakenEX.kpf)
-			 * is a hard prereq — if the n64/ files aren't there the
-			 * model loader fails visibly rather than silently falling
-			 * back to the wrong shape. The 1998 template provides AI
-			 * brain + behaviour; ModelFilename overrides the visual. */
+		/* Each N64-only enemy uses its real Remaster mesh. Asset
+		 * extraction (extract_remaster_levels.py from ForsakenEX.kpf)
+		 * is a hard prereq — if the n64/ files aren't there the
+		 * model loader fails visibly rather than silently falling
+		 * back to the wrong shape. The 1998 template provides AI
+		 * brain + behaviour; ModelFilename overrides the visual. */
 
-			/* Boss_Manmech (100): walking boss, 4-part .cob (body +
-			 * cannon + 2 arms). Mekton template = CRAWL_AI. */
-			EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "n64\\manmech.cob";
-			EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
+		/* Boss_Manmech (100): walking boss, 4-part .cob (body +
+		 * cannon + 2 arms). Mekton template = CRAWL_AI. */
+		EnemyTypes[ ENEMY_Boss_Manmech ] = EnemyTypes[ ENEMY_Mekton ];
+		EnemyTypes[ ENEMY_Boss_Manmech ].ModelFilename = "n64\\manmech.cob";
+		EnemyTypes[ ENEMY_Boss_Manmech ].Shield = 6500;
 
-			/* CargoDrone (101): non-combat floor-patrol drone.  KEX
-			 * defs/n64Enemies.txt:
-			 *   brainClass        kexForsakenAIBrainCrawl  (= CRAWL_AI ✓)
-			 *   primaryWeaponDef  (none)
-			 *   secondaryWeaponDef(none)
-			 *   shield            25000  (effectively invulnerable on touch)
-			 *   ai.bAttackOnSite  FALSE  (ignores player)
-			 *   ai.thinkRange     262144 (very far — patrols regardless)
-			 * Mekton template = CRAWL + 1 gun.  Suppress weapons
-			 * (NumOfGuns=0, PrimaryWeaponType=NO_PRIMARY) so the drone
-			 * patrols inertly as KEX intends. */
-			EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "n64\\cargodrone.mx";
-			EnemyTypes[ ENEMY_CargoDrone ].NumOfGuns = 0;
-			EnemyTypes[ ENEMY_CargoDrone ].PrimaryWeaponType = NO_PRIMARY;
-			EnemyTypes[ ENEMY_CargoDrone ].Shield = 25000;
-			EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_ONSITE;
-			EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_FIND;
-			EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_PROVOKE;
+		/* CargoDrone (101): non-combat floor-patrol drone.  KEX
+		 * defs/n64Enemies.txt:
+		 *   brainClass        kexForsakenAIBrainCrawl  (= CRAWL_AI ✓)
+		 *   primaryWeaponDef  (none)
+		 *   secondaryWeaponDef(none)
+		 *   shield            25000  (effectively invulnerable on touch)
+		 *   ai.bAttackOnSite  FALSE  (ignores player)
+		 *   ai.thinkRange     262144 (very far — patrols regardless)
+		 * Mekton template = CRAWL + 1 gun.  Suppress weapons
+		 * (NumOfGuns=0, PrimaryWeaponType=NO_PRIMARY) so the drone
+		 * patrols inertly as KEX intends. */
+		EnemyTypes[ ENEMY_CargoDrone ] = EnemyTypes[ ENEMY_Mekton ];
+		EnemyTypes[ ENEMY_CargoDrone ].ModelFilename = "n64\\cargodrone.mx";
+		EnemyTypes[ ENEMY_CargoDrone ].NumOfGuns = 0;
+		EnemyTypes[ ENEMY_CargoDrone ].PrimaryWeaponType = NO_PRIMARY;
+		EnemyTypes[ ENEMY_CargoDrone ].Shield = 25000;
+		EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_ONSITE;
+		EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_FIND;
+		EnemyTypes[ ENEMY_CargoDrone ].Behave.Flags &= ~AI_BEHAVIOUR_ATTACK_PROVOKE;
 
-			/* Boss_Ramqan (102): 19-part walking boss with parametric-
-			 * arc hop locomotion (kexForsakenAIBrainJump → JUMP_AI,
-			 * see aijump.cpp). */
-			EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
-			EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 15000; /* KEX defs/n64Enemies.txt */
-			EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
-			/* Three guns per KEX defs/n64Enemies.txt:
-			 *   gun 0: body-mounted Pulsar (Gun_RamqanBody, comp 11)
-			 *   gun 1: left  cannon Solaris rocket (comp 14)
-			 *   gun 2: right cannon Suss-bullet cluster ≈ KEX Scatter (comp 13)
-			 * Per-COMP_OBJ aim is wired in LoadEnemies's UserContComps
-			 * switch case, so each gun's matrix actually points at the
-			 * player and the per-gun BurstAngle gates work correctly. */
-			EnemyTypes[ ENEMY_Boss_Ramqan ].NumOfGuns = 3;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[0] = GUN_RamqanBody;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[1] = GUN_Ramqan;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[2] = GUN_RamqanScatter;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[0] = &RamqanBodyFirePos;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[1] = &RamqanLCannonFirePos;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[2] = &RamqanRCannonFirePos;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[0]     = &RamqanBodyAimPos;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[1]     = &RamqanLCannonAimPos;
-			EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[2]     = &RamqanRCannonAimPos;
-			/* Wire the KPF-sourced anim sequences so JumpBegin/JumpDoMovement
-			 * can drive the rig through the correct poses at each phase.
-			 * See RamqanSeqs[] above for the per-index time ranges. */
-			EnemyTypes[ ENEMY_Boss_Ramqan ].AnimSeqs = RamqanSeqs;
+		/* Boss_Ramqan (102): 19-part walking boss with parametric-
+		 * arc hop locomotion (kexForsakenAIBrainJump → JUMP_AI,
+		 * see aijump.cpp). */
+		EnemyTypes[ ENEMY_Boss_Ramqan ] = EnemyTypes[ ENEMY_Mekton ];
+		EnemyTypes[ ENEMY_Boss_Ramqan ].ModelFilename = "n64\\ramqan.cob";
+		EnemyTypes[ ENEMY_Boss_Ramqan ].Shield = 15000; /* KEX defs/n64Enemies.txt */
+		EnemyTypes[ ENEMY_Boss_Ramqan ].ControlType = ENEMY_CONTROLTYPE_JUMP_AI;
+		/* Three guns per KEX defs/n64Enemies.txt:
+		 *   gun 0: body-mounted Pulsar (Gun_RamqanBody, comp 11)
+		 *   gun 1: left  cannon Solaris rocket (comp 14)
+		 *   gun 2: right cannon Suss-bullet cluster ≈ KEX Scatter (comp 13)
+		 * Per-COMP_OBJ aim is wired in LoadEnemies's UserContComps
+		 * switch case, so each gun's matrix actually points at the
+		 * player and the per-gun BurstAngle gates work correctly. */
+		EnemyTypes[ ENEMY_Boss_Ramqan ].NumOfGuns = 3;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[0] = GUN_RamqanBody;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[1] = GUN_Ramqan;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunType[2] = GUN_RamqanScatter;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[0] = &RamqanBodyFirePos;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[1] = &RamqanLCannonFirePos;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunFirePoints[2] = &RamqanRCannonFirePos;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[0]     = &RamqanBodyAimPos;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[1]     = &RamqanLCannonAimPos;
+		EnemyTypes[ ENEMY_Boss_Ramqan ].GunAimPos[2]     = &RamqanRCannonAimPos;
+		/* Wire the KPF-sourced anim sequences so JumpBegin/JumpDoMovement
+		 * can drive the rig through the correct poses at each phase.
+		 * See RamqanSeqs[] above for the per-index time ranges. */
+		EnemyTypes[ ENEMY_Boss_Ramqan ].AnimSeqs = RamqanSeqs;
 
-			/* ShieldTurret (103): 3-part stationary turret per KEX defs/n64Enemies.txt:
-			 *   model bgobjects/n64/shieldturret.cob
-			 *   brainClass kexForsakenAIBrainTurret  (1998 TURRET_AI ✓ via BeamTurret template)
-			 *   gun_1 Gun_ShieldTurret → primaryWeaponDef Pulsar_Enemy_Blue
-			 *   turretBaseComponent_1 = 2 (flat-idx, .cob ID = 1, the pivot)
-			 *   turretGunComponent_1  = 3 (flat-idx, .cob ID = 2, the gun)
-			 *   shield = 256, viewCone 360°, maxRange 8192, reload 6.0, burst 3 @3°
-			 * .cob has 4 ANI_TRANS entries on the gun comp (recoil ROT) which we
-			 * sacrifice in exchange for runtime aim via UserContComps[]. */
-			EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
-			EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "n64\\shieldTurret.cob";
-			EnemyTypes[ ENEMY_ShieldTurret ].Shield = 256;
-			EnemyTypes[ ENEMY_ShieldTurret ].NumOfGuns = 1;
-			EnemyTypes[ ENEMY_ShieldTurret ].GunType[0] = GUN_ShieldTurretGun;
-			EnemyTypes[ ENEMY_ShieldTurret ].GunFirePoints[0] = &ShieldTurretFirePos;
-			EnemyTypes[ ENEMY_ShieldTurret ].GunAimPos[0]     = &ShieldTurretAimPos;
+		/* ShieldTurret (103): 3-part stationary turret per KEX defs/n64Enemies.txt:
+		 *   model bgobjects/n64/shieldturret.cob
+		 *   brainClass kexForsakenAIBrainTurret  (1998 TURRET_AI ✓ via BeamTurret template)
+		 *   gun_1 Gun_ShieldTurret → primaryWeaponDef Pulsar_Enemy_Blue
+		 *   turretBaseComponent_1 = 2 (flat-idx, .cob ID = 1, the pivot)
+		 *   turretGunComponent_1  = 3 (flat-idx, .cob ID = 2, the gun)
+		 *   shield = 256, viewCone 360°, maxRange 8192, reload 6.0, burst 3 @3°
+		 * .cob has 4 ANI_TRANS entries on the gun comp (recoil ROT) which we
+		 * sacrifice in exchange for runtime aim via UserContComps[]. */
+		EnemyTypes[ ENEMY_ShieldTurret ] = EnemyTypes[ ENEMY_BeamTurret ];
+		EnemyTypes[ ENEMY_ShieldTurret ].ModelFilename = "n64\\shieldTurret.cob";
+		EnemyTypes[ ENEMY_ShieldTurret ].Shield = 256;
+		EnemyTypes[ ENEMY_ShieldTurret ].NumOfGuns = 1;
+		EnemyTypes[ ENEMY_ShieldTurret ].GunType[0] = GUN_ShieldTurretGun;
+		EnemyTypes[ ENEMY_ShieldTurret ].GunFirePoints[0] = &ShieldTurretFirePos;
+		EnemyTypes[ ENEMY_ShieldTurret ].GunAimPos[0]     = &ShieldTurretAimPos;
 
-			/* Boss_Maldroid (104): 12-part walking boss. */
-			EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
-			EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "n64\\maldroid.cob";
-			EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
+		/* Boss_Maldroid (104): 12-part walking boss. */
+		EnemyTypes[ ENEMY_Boss_Maldroid ] = EnemyTypes[ ENEMY_Mekton ];
+		EnemyTypes[ ENEMY_Boss_Maldroid ].ModelFilename = "n64\\maldroid.cob";
+		EnemyTypes[ ENEMY_Boss_Maldroid ].Shield = 5000;
 
-			/* Enforcer (105): flying combatant.  KEX
-			 * defs/n64Enemies.txt:
-			 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
-			 *   primaryWeaponDef   "Pulsar"      → NME_PULSAR (red)
-			 *   secondaryWeaponDef "Gravgon"     → no exact 1998
-			 *                                      match; leave Hunter
-			 *                                      template's secondary
-			 *                                      (MULTIPLEMISSILE)
-			 *   shield             320
-			 *   primaryFireRate    8.0
-			 *   maxRange           1024  (Hunter default ✓)
-			 *   ai.bAttackOnSite   TRUE
-			 * Hunter template = FLY_AI + MULTIPLEMISSILE secondary +
-			 * NME_SUSS_GUN primary (green snub bullets).  Override
-			 * primary to NME_PULSAR for KEX-faithful red Pulsar
-			 * shots; FLY_AI brain reads PrimaryWeaponType directly
-			 * (aidogfight.cpp).  Secondary stays Hunter default. */
-			EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
-			EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "n64\\enforcer.mx";
-			EnemyTypes[ ENEMY_Enforcer ].PrimaryWeaponType = NME_PULSAR;
-			EnemyTypes[ ENEMY_Enforcer ].Shield = 320;
+		/* Enforcer (105): flying combatant.  KEX
+		 * defs/n64Enemies.txt:
+		 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
+		 *   primaryWeaponDef   "Pulsar"      → NME_PULSAR (red)
+		 *   secondaryWeaponDef "Gravgon"     → no exact 1998
+		 *                                      match; leave Hunter
+		 *                                      template's secondary
+		 *                                      (MULTIPLEMISSILE)
+		 *   shield             320
+		 *   primaryFireRate    8.0
+		 *   maxRange           1024  (Hunter default ✓)
+		 *   ai.bAttackOnSite   TRUE
+		 * Hunter template = FLY_AI + MULTIPLEMISSILE secondary +
+		 * NME_SUSS_GUN primary (green snub bullets).  Override
+		 * primary to NME_PULSAR for KEX-faithful red Pulsar
+		 * shots; FLY_AI brain reads PrimaryWeaponType directly
+		 * (aidogfight.cpp).  Secondary stays Hunter default. */
+		EnemyTypes[ ENEMY_Enforcer ] = EnemyTypes[ ENEMY_Hunter ];
+		EnemyTypes[ ENEMY_Enforcer ].ModelFilename = "n64\\enforcer.mx";
+		EnemyTypes[ ENEMY_Enforcer ].PrimaryWeaponType = NME_PULSAR;
+		EnemyTypes[ ENEMY_Enforcer ].Shield = 320;
 
-			/* Boss_DreadNaught2 (106): 4-part heavy bomber. Unused by
-			 * current level set — populated for safety / future maps. */
-			EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename = "n64\\dreadnaught.cob";
-			EnemyTypes[ ENEMY_Boss_DreadNaught2 ].Shield = 7500;
+		/* Boss_DreadNaught2 (106): 4-part heavy bomber. Unused by
+		 * current level set — populated for safety / future maps. */
+		EnemyTypes[ ENEMY_Boss_DreadNaught2 ] = EnemyTypes[ ENEMY_Boss_Avatar ];
+		EnemyTypes[ ENEMY_Boss_DreadNaught2 ].ModelFilename = "n64\\dreadnaught.cob";
+		EnemyTypes[ ENEMY_Boss_DreadNaught2 ].Shield = 7500;
 
-			/* Boss_DreadNaught (107): same 4-part heavy bomber, real
-			 * encounter. */
-			EnemyTypes[ ENEMY_Boss_DreadNaught ] = EnemyTypes[ ENEMY_Boss_Avatar ];
-			EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "n64\\dreadnaught.cob";
-			EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
+		/* Boss_DreadNaught (107): same 4-part heavy bomber, real
+		 * encounter. */
+		EnemyTypes[ ENEMY_Boss_DreadNaught ] = EnemyTypes[ ENEMY_Boss_Avatar ];
+		EnemyTypes[ ENEMY_Boss_DreadNaught ].ModelFilename = "n64\\dreadnaught.cob";
+		EnemyTypes[ ENEMY_Boss_DreadNaught ].Shield = 8000;
 
-			/* Ghost (108): flying enemy with blue plasma.  KEX
-			 * defs/n64Enemies.txt:
-			 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
-			 *   primaryWeaponDef   "Pulsar_Enemy_Blue"  → NME_PULSAR_BLUE
-			 *   (no secondary)
-			 *   shield             80
-			 *   primaryFireRate    24.0
-			 *   ai.bAttackOnSite   TRUE
-			 *   bStealth           (not set — KEX Ghost is NOT stealthed
-			 *                       despite the name)
-			 * Shade template = stealth FLY (CLOAK behaviour).  KEX
-			 * Ghost is just a regular flying enemy; clear the cloak
-			 * flag and override primary to the new blue plasma
-			 * weapon (matches KEX particle/pulsar_enemy_blue.particle:
-			 * light_color={0,0,1}, blackColor1={0.25,0.25,1.0}). */
-			EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
-			EnemyTypes[ ENEMY_Ghost ].ModelFilename = "n64\\ghost.mx";
-			EnemyTypes[ ENEMY_Ghost ].PrimaryWeaponType = NME_PULSAR_BLUE;
-			EnemyTypes[ ENEMY_Ghost ].Shield = 80;
-			EnemyTypes[ ENEMY_Ghost ].Behave.Flags &= ~AI_BEHAVIOUR_CLOAK;
+		/* Ghost (108): flying enemy with blue plasma.  KEX
+		 * defs/n64Enemies.txt:
+		 *   brainClass         kexForsakenAIBrainFly  (= FLY_AI ✓)
+		 *   primaryWeaponDef   "Pulsar_Enemy_Blue"  → NME_PULSAR_BLUE
+		 *   (no secondary)
+		 *   shield             80
+		 *   primaryFireRate    24.0
+		 *   ai.bAttackOnSite   TRUE
+		 *   bStealth           (not set — KEX Ghost is NOT stealthed
+		 *                       despite the name)
+		 * Shade template = stealth FLY (CLOAK behaviour).  KEX
+		 * Ghost is just a regular flying enemy; clear the cloak
+		 * flag and override primary to the new blue plasma
+		 * weapon (matches KEX particle/pulsar_enemy_blue.particle:
+		 * light_color={0,0,1}, blackColor1={0.25,0.25,1.0}). */
+		EnemyTypes[ ENEMY_Ghost ] = EnemyTypes[ ENEMY_Shade ];
+		EnemyTypes[ ENEMY_Ghost ].ModelFilename = "n64\\ghost.mx";
+		EnemyTypes[ ENEMY_Ghost ].PrimaryWeaponType = NME_PULSAR_BLUE;
+		EnemyTypes[ ENEMY_Ghost ].Shield = 80;
+		EnemyTypes[ ENEMY_Ghost ].Behave.Flags &= ~AI_BEHAVIOUR_CLOAK;
 
-			/* Disable StealthMode on any N64 template-copy whose
-			 * ModelFilename has a path separator. The PreLoadEnemies
-			 * loader auto-creates a stealth variant by prepending 'S'
-			 * to the filename byte 0 — fine for "Shade.mx" => "SShade.mx"
-			 * (which exists in 1998's models directory), but for
-			 * "n64\\ghost.mx" it produces "Sn64\\ghost.mx" which doesn't
-			 * exist, and PreInitModel returns false on the missing file.
-			 * The Ghost brain handles invisibility separately from the
-			 * model swap, so disabling the second-mesh load only loses
-			 * the visual stealth effect, not the gameplay behaviour. */
-			{
-				int _n64_ids[] = {
-					ENEMY_Boss_Manmech, ENEMY_CargoDrone, ENEMY_Boss_Ramqan,
-					ENEMY_ShieldTurret, ENEMY_Boss_Maldroid, ENEMY_Enforcer,
-					ENEMY_Boss_DreadNaught2, ENEMY_Boss_DreadNaught, ENEMY_Ghost,
-				};
-				int _i;
-				for (_i = 0; _i < (int)(sizeof(_n64_ids)/sizeof(_n64_ids[0])); _i++) {
-					int _id = _n64_ids[_i];
-					if (EnemyTypes[_id].ModelFilename &&
-						strchr(EnemyTypes[_id].ModelFilename, '\\') != nullptr)
-					{
-						EnemyTypes[_id].StealthMode = false;
-					}
+		/* Disable StealthMode on any N64 template-copy whose
+		 * ModelFilename has a path separator. The PreLoadEnemies
+		 * loader auto-creates a stealth variant by prepending 'S'
+		 * to the filename byte 0 — fine for "Shade.mx" => "SShade.mx"
+		 * (which exists in 1998's models directory), but for
+		 * "n64\\ghost.mx" it produces "Sn64\\ghost.mx" which doesn't
+		 * exist, and PreInitModel returns false on the missing file.
+		 * The Ghost brain handles invisibility separately from the
+		 * model swap, so disabling the second-mesh load only loses
+		 * the visual stealth effect, not the gameplay behaviour. */
+		{
+			int _n64_ids[] = {
+				ENEMY_Boss_Manmech, ENEMY_CargoDrone, ENEMY_Boss_Ramqan,
+				ENEMY_ShieldTurret, ENEMY_Boss_Maldroid, ENEMY_Enforcer,
+				ENEMY_Boss_DreadNaught2, ENEMY_Boss_DreadNaught, ENEMY_Ghost,
+			};
+			int _i;
+			for (_i = 0; _i < (int)(sizeof(_n64_ids)/sizeof(_n64_ids[0])); _i++) {
+				int _id = _n64_ids[_i];
+				if (EnemyTypes[_id].ModelFilename &&
+					strchr(EnemyTypes[_id].ModelFilename, '\\') != nullptr)
+				{
+					EnemyTypes[_id].StealthMode = false;
 				}
 			}
+		}
 	}
 #endif /* EDITION_REMASTER — N64 enemy template block */
 
@@ -4920,251 +4920,15 @@ bool LoadEnemies( void )
 
 					switch( EnemyType )
 					{
-						case ENEMY_SnubTurret:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 2, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 3, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+					case ENEMY_SnubTurret:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 2, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 3, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
 							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							break;
-
-						case ENEMY_BeamTurret:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 0, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-								if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-								{
-									TempComp->UserAxis.x = -TempComp->UserAxis.x;
-									TempComp->UserAxis.y = -TempComp->UserAxis.y;
-									TempComp->UserAxis.z = -TempComp->UserAxis.z;
-								}
-							}
-							break;
-
-						case ENEMY_DuelTurret:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-								if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-								{
-									TempComp->UserAxis.x = -TempComp->UserAxis.x;
-									TempComp->UserAxis.y = -TempComp->UserAxis.y;
-									TempComp->UserAxis.z = -TempComp->UserAxis.z;
-								}
-							}
-							break;
-
-						case ENEMY_PulseTurret:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-								if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-								{
-									TempComp->UserAxis.x = -TempComp->UserAxis.x;
-									TempComp->UserAxis.y = -TempComp->UserAxis.y;
-									TempComp->UserAxis.z = -TempComp->UserAxis.z;
-								}
-							}
-							break;
-
-						case ENEMY_MissileTurret:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-								if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-								{
-									TempComp->UserAxis.x = -TempComp->UserAxis.x;
-									TempComp->UserAxis.y = -TempComp->UserAxis.y;
-									TempComp->UserAxis.z = -TempComp->UserAxis.z;
-								}
-							}
-							break;
-
-						case ENEMY_LEADER_SnubBot:
-						case ENEMY_SnubBot:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-
-								if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-								{
-									TempComp->UserAxis.x = -TempComp->UserAxis.x;
-									TempComp->UserAxis.y = -TempComp->UserAxis.y;
-									TempComp->UserAxis.z = -TempComp->UserAxis.z;
-								}
-							}
-							break;
-
-#ifdef EDITION_REMASTER
-						case ENEMY_ShieldTurret:
-							/* KEX defs/n64Enemies.txt for ShieldTurret:
-							 *   turretBaseComponent_1 = 2  (flat depth-first idx → .cob ID = 1, the pivot)
-							 *   turretGunComponent_1  = 3  (flat idx → .cob ID = 2, the gun)
-							 * cob_dump.py confirms the .cob hierarchy:
-							 *   root id=-1 → id=0 (base) → id=1 (pivot) → id=2 (gun)
-							 * KEX uses flat indices, GetCompObjAddress takes .cob ID — so
-							 * pass 1 (pivot) and 2 (gun), not 2 and 3. */
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ]  = GetCompObjAddress( 2, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
 								TempComp->UserAxis.x = 0.0F;
 								TempComp->UserAxis.y = 1.0F;
 								TempComp->UserAxis.z = 0.0F;
@@ -5172,114 +4936,479 @@ bool LoadEnemies( void )
 								TempComp->UserAxisPoint.y = 0.0F;
 								TempComp->UserAxisPoint.z = 0.0F;
 							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
 							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								TempComp->UserAxis.x = -1.0F;
+								TempComp->UserAxis.x = 1.0F;
 								TempComp->UserAxis.y = 0.0F;
 								TempComp->UserAxis.z = 0.0F;
 								TempComp->UserAxisPoint.x = 0.0F;
 								TempComp->UserAxisPoint.y = 0.0F;
 								TempComp->UserAxisPoint.z = 0.0F;
 							}
-							break;
+						}
+						break;
 
-						case ENEMY_Boss_Ramqan:
-							/* KEX defs/n64Enemies.txt for Boss_Ramqan:
-							 *   turretBaseComponent_1   10  (body yaw)
-							 *   turretGunComponent_1    11  (body pitch — Pulsar)
-							 *   turretGunComponent_2    14  (L cannon — Solaris)
-							 *   turretGunComponent_3    13  (R cannon — Suss-bullet cluster)
-							 * The .cob doesn't carry PROPSTATE_UserControl markers
-							 * for these comps, so the loader leaves
-							 * UserContComps[] empty and every gun falls back to the
-							 * body matrix (firing straight forward).  Wire the
-							 * pairs (base/yaw + gun/pitch) here; SetTurretVector
-							 * + UpdateCompObjChildren + GetLastCompDispMatrix then
-							 * give each gun a real aim matrix.  GunNum=i*2 (see
-							 * InitGuns) so:
-							 *   gun 0 (body)    : UserContComps[0]/[1] = comp 10/11
-							 *   gun 1 (L cannon): UserContComps[2]/[3] = comp 10/14
-							 *   gun 2 (R cannon): UserContComps[4]/[5] = comp 10/13
-							 * The body yaw comp is shared across all three since
-							 * KEX only authors one turret base for this rig. */
-							/* Force axes unconditionally — ramqan.cob may carry
-							 * authored RotateAxis properties for these comps
-							 * that GetCompObjAxis would honour and skip our
-							 * fallback, leaving the comp rotating around a
-							 * non-yaw axis that doesn't track. KEX's
-							 * AimAtTarget feeds the turret yaw + pitch directly
-							 * regardless of authored axis, so we mirror that. */
+					case ENEMY_BeamTurret:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 0, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
 							{
-								static const int8_t comp_base[3] = { 10, 10, 10 };
-								static const int8_t comp_gun[3]  = { 11, 14, 13 };
-								int g;
-								for( g = 0; g < 3; g++ )
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+							{
+								TempComp->UserAxis.x = -TempComp->UserAxis.x;
+								TempComp->UserAxis.y = -TempComp->UserAxis.y;
+								TempComp->UserAxis.z = -TempComp->UserAxis.z;
+							}
+						}
+						break;
+
+					case ENEMY_DuelTurret:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+							{
+								TempComp->UserAxis.x = -TempComp->UserAxis.x;
+								TempComp->UserAxis.y = -TempComp->UserAxis.y;
+								TempComp->UserAxis.z = -TempComp->UserAxis.z;
+							}
+						}
+						break;
+
+					case ENEMY_PulseTurret:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+							{
+								TempComp->UserAxis.x = -TempComp->UserAxis.x;
+								TempComp->UserAxis.y = -TempComp->UserAxis.y;
+								TempComp->UserAxis.z = -TempComp->UserAxis.z;
+							}
+						}
+						break;
+
+					case ENEMY_MissileTurret:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+							{
+								TempComp->UserAxis.x = -TempComp->UserAxis.x;
+								TempComp->UserAxis.y = -TempComp->UserAxis.y;
+								TempComp->UserAxis.z = -TempComp->UserAxis.z;
+							}
+						}
+						break;
+
+					case ENEMY_LEADER_SnubBot:
+					case ENEMY_SnubBot:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+
+							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+							{
+								TempComp->UserAxis.x = -TempComp->UserAxis.x;
+								TempComp->UserAxis.y = -TempComp->UserAxis.y;
+								TempComp->UserAxis.z = -TempComp->UserAxis.z;
+							}
+						}
+						break;
+
+#ifdef EDITION_REMASTER
+					case ENEMY_ShieldTurret:
+						/* KEX defs/n64Enemies.txt for ShieldTurret:
+						 *   turretBaseComponent_1 = 2  (flat depth-first idx → .cob ID = 1, the pivot)
+						 *   turretGunComponent_1  = 3  (flat idx → .cob ID = 2, the gun)
+						 * cob_dump.py confirms the .cob hierarchy:
+						 *   root id=-1 → id=0 (base) → id=1 (pivot) → id=2 (gun)
+						 * KEX uses flat indices, GetCompObjAddress takes .cob ID — so
+						 * pass 1 (pivot) and 2 (gun), not 2 and 3. */
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ]  = GetCompObjAddress( 2, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							TempComp->UserAxis.x = 0.0F;
+							TempComp->UserAxis.y = 1.0F;
+							TempComp->UserAxis.z = 0.0F;
+							TempComp->UserAxisPoint.x = 0.0F;
+							TempComp->UserAxisPoint.y = 0.0F;
+							TempComp->UserAxisPoint.z = 0.0F;
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							TempComp->UserAxis.x = -1.0F;
+							TempComp->UserAxis.y = 0.0F;
+							TempComp->UserAxis.z = 0.0F;
+							TempComp->UserAxisPoint.x = 0.0F;
+							TempComp->UserAxisPoint.y = 0.0F;
+							TempComp->UserAxisPoint.z = 0.0F;
+						}
+						break;
+
+					case ENEMY_Boss_Ramqan:
+						/* KEX defs/n64Enemies.txt for Boss_Ramqan:
+						 *   turretBaseComponent_1   10  (body yaw)
+						 *   turretGunComponent_1    11  (body pitch — Pulsar)
+						 *   turretGunComponent_2    14  (L cannon — Solaris)
+						 *   turretGunComponent_3    13  (R cannon — Suss-bullet cluster)
+						 * The .cob doesn't carry PROPSTATE_UserControl markers
+						 * for these comps, so the loader leaves
+						 * UserContComps[] empty and every gun falls back to the
+						 * body matrix (firing straight forward).  Wire the
+						 * pairs (base/yaw + gun/pitch) here; SetTurretVector
+						 * + UpdateCompObjChildren + GetLastCompDispMatrix then
+						 * give each gun a real aim matrix.  GunNum=i*2 (see
+						 * InitGuns) so:
+						 *   gun 0 (body)    : UserContComps[0]/[1] = comp 10/11
+						 *   gun 1 (L cannon): UserContComps[2]/[3] = comp 10/14
+						 *   gun 2 (R cannon): UserContComps[4]/[5] = comp 10/13
+						 * The body yaw comp is shared across all three since
+						 * KEX only authors one turret base for this rig. */
+						/* Force axes unconditionally — ramqan.cob may carry
+						 * authored RotateAxis properties for these comps
+						 * that GetCompObjAxis would honour and skip our
+						 * fallback, leaving the comp rotating around a
+						 * non-yaw axis that doesn't track. KEX's
+						 * AimAtTarget feeds the turret yaw + pitch directly
+						 * regardless of authored axis, so we mirror that. */
+						{
+							static const int8_t comp_base[3] = { 10, 10, 10 };
+							static const int8_t comp_gun[3]  = { 11, 14, 13 };
+							int g;
+							for( g = 0; g < 3; g++ )
+							{
+								int slot_base = g * 2;
+								int slot_gun  = g * 2 + 1;
+								Enemy->Object.UserContComps[ slot_base ] = GetCompObjAddress( comp_base[g], 1, Comp );
+								Enemy->Object.UserContComps[ slot_gun  ] = GetCompObjAddress( comp_gun[g],  1, Comp );
+								if( Enemy->Object.UserContComps[ slot_base ] )
 								{
-									int slot_base = g * 2;
-									int slot_gun  = g * 2 + 1;
-									Enemy->Object.UserContComps[ slot_base ] = GetCompObjAddress( comp_base[g], 1, Comp );
-									Enemy->Object.UserContComps[ slot_gun  ] = GetCompObjAddress( comp_gun[g],  1, Comp );
-									if( Enemy->Object.UserContComps[ slot_base ] )
-									{
-										TempComp = Enemy->Object.UserContComps[ slot_base ];
-										TempComp->UserControl = true;
-										TempComp->UserAxis.x = 0.0F;
-										TempComp->UserAxis.y = 1.0F;
-										TempComp->UserAxis.z = 0.0F;
-										TempComp->UserAxisPoint.x = 0.0F;
-										TempComp->UserAxisPoint.y = 0.0F;
-										TempComp->UserAxisPoint.z = 0.0F;
-									}
-									if( Enemy->Object.UserContComps[ slot_gun ] )
-									{
-										TempComp = Enemy->Object.UserContComps[ slot_gun ];
-										TempComp->UserControl = true;
-										TempComp->UserAxis.x = -1.0F;
-										TempComp->UserAxis.y = 0.0F;
-										TempComp->UserAxis.z = 0.0F;
-										TempComp->UserAxisPoint.x = 0.0F;
-										TempComp->UserAxisPoint.y = 0.0F;
-										TempComp->UserAxisPoint.z = 0.0F;
-									}
+									TempComp = Enemy->Object.UserContComps[ slot_base ];
+									TempComp->UserControl = true;
+									TempComp->UserAxis.x = 0.0F;
+									TempComp->UserAxis.y = 1.0F;
+									TempComp->UserAxis.z = 0.0F;
+									TempComp->UserAxisPoint.x = 0.0F;
+									TempComp->UserAxisPoint.y = 0.0F;
+									TempComp->UserAxisPoint.z = 0.0F;
+								}
+								if( Enemy->Object.UserContComps[ slot_gun ] )
+								{
+									TempComp = Enemy->Object.UserContComps[ slot_gun ];
+									TempComp->UserControl = true;
+									TempComp->UserAxis.x = -1.0F;
+									TempComp->UserAxis.y = 0.0F;
+									TempComp->UserAxis.z = 0.0F;
+									TempComp->UserAxisPoint.x = 0.0F;
+									TempComp->UserAxisPoint.y = 0.0F;
+									TempComp->UserAxisPoint.z = 0.0F;
 								}
 							}
-							break;
+						}
+						break;
 #endif
 
-						case ENEMY_AirMoble:
-						case ENEMY_AmmoDump:
-						case ENEMY_Max:
-							break;
+					case ENEMY_AirMoble:
+					case ENEMY_AmmoDump:
+					case ENEMY_Max:
+						break;
 
-						case ENEMY_LEADER_LeviTank:
-						case ENEMY_LeviTank:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+					case ENEMY_LEADER_LeviTank:
+					case ENEMY_LeviTank:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 1, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
 							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
 							}
-							break;
+						}
+						break;
 
-						case ENEMY_LEADER_Mekton:
-						case ENEMY_Mekton:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+					case ENEMY_LEADER_Mekton:
+					case ENEMY_Mekton:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 2, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
 							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+
+							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+							{
+								TempComp->UserAxis.x = -TempComp->UserAxis.x;
+								TempComp->UserAxis.y = -TempComp->UserAxis.y;
+								TempComp->UserAxis.z = -TempComp->UserAxis.z;
+							}
+
+						}
+						break;
+
+					case ENEMY_GuardBot:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 3, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 4, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 1.0F;
+								TempComp->UserAxis.y = 0.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+
+							if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
+							{
+								TempComp->UserAxis.x = -TempComp->UserAxis.x;
+								TempComp->UserAxis.y = -TempComp->UserAxis.y;
+								TempComp->UserAxis.z = -TempComp->UserAxis.z;
+							}
+
+						}
+						break;
+
+					case ENEMY_LEADER_Legz:
+					case ENEMY_Legz:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						break;
+
+					case ENEMY_LazerBot:
+					case ENEMY_LEADER_LazerBot:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
+						{
+							TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+							TempComp->UserControl = true;
+							if( !GetCompObjAxis( TempComp ) )
+							{
+								TempComp->UserAxis.x = 0.0F;
+								TempComp->UserAxis.y = 1.0F;
+								TempComp->UserAxis.z = 0.0F;
+								TempComp->UserAxisPoint.x = 0.0F;
+								TempComp->UserAxisPoint.y = 0.0F;
+								TempComp->UserAxisPoint.z = 0.0F;
+							}
+						}
+						break;
+
+					case ENEMY_Boss_Metatank:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 2, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 5, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
+
+						for( CompCount = 0; CompCount < 4; CompCount++ )
+						{
+							if( Enemy->Object.UserContComps[ CompCount * 2 ] )
+							{
+								TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
 								TempComp->UserControl = true;
 								if( !GetCompObjAxis( TempComp ) )
 								{
@@ -5291,36 +5420,26 @@ bool LoadEnemies( void )
 									TempComp->UserAxisPoint.z = 0.0F;
 								}
 							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
+						}
+						break;
+
+					case ENEMY_Boss_Avatar:
+						Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 4, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 5, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 2, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
+						Enemy->Object.UserContComps[ TURRETCOMP_Base + 8 ] = GetCompObjAddress( 1, 1, Comp );
+						Enemy->Object.UserContComps[ TURRETCOMP_Gun + 8 ] = nullptr;
+
+						for( CompCount = 0; CompCount < 5; CompCount++ )
+						{
+							if( Enemy->Object.UserContComps[ CompCount * 2 ] )
 							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-
-								if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-								{
-									TempComp->UserAxis.x = -TempComp->UserAxis.x;
-									TempComp->UserAxis.y = -TempComp->UserAxis.y;
-									TempComp->UserAxis.z = -TempComp->UserAxis.z;
-								}
-
-							}
-							break;
-
-						case ENEMY_GuardBot:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 3, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = GetCompObjAddress( 4, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
+								TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
 								TempComp->UserControl = true;
 								if( !GetCompObjAxis( TempComp ) )
 								{
@@ -5332,136 +5451,17 @@ bool LoadEnemies( void )
 									TempComp->UserAxisPoint.z = 0.0F;
 								}
 							}
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Gun ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Gun ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 1.0F;
-									TempComp->UserAxis.y = 0.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
+						}
+						break;
 
-								if( TempComp->UserAxis.x > 0.0F )			// Temp Fix;
-								{
-									TempComp->UserAxis.x = -TempComp->UserAxis.x;
-									TempComp->UserAxis.y = -TempComp->UserAxis.y;
-									TempComp->UserAxis.z = -TempComp->UserAxis.z;
-								}
-
-							}
-							break;
-
-						case ENEMY_LEADER_Legz:
-						case ENEMY_Legz:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							break;
-
-						case ENEMY_LazerBot:
-						case ENEMY_LEADER_LazerBot:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							if( Enemy->Object.UserContComps[ TURRETCOMP_Base ] )
-							{
-								TempComp = Enemy->Object.UserContComps[ TURRETCOMP_Base ];
-								TempComp->UserControl = true;
-								if( !GetCompObjAxis( TempComp ) )
-								{
-									TempComp->UserAxis.x = 0.0F;
-									TempComp->UserAxis.y = 1.0F;
-									TempComp->UserAxis.z = 0.0F;
-									TempComp->UserAxisPoint.x = 0.0F;
-									TempComp->UserAxisPoint.y = 0.0F;
-									TempComp->UserAxisPoint.z = 0.0F;
-								}
-							}
-							break;
-
-						case ENEMY_Boss_Metatank:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 2, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 5, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
-
-							for( CompCount = 0; CompCount < 4; CompCount++ )
-							{
-								if( Enemy->Object.UserContComps[ CompCount * 2 ] )
-								{
-									TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
-									TempComp->UserControl = true;
-									if( !GetCompObjAxis( TempComp ) )
-									{
-										TempComp->UserAxis.x = 0.0F;
-										TempComp->UserAxis.y = 1.0F;
-										TempComp->UserAxis.z = 0.0F;
-										TempComp->UserAxisPoint.x = 0.0F;
-										TempComp->UserAxisPoint.y = 0.0F;
-										TempComp->UserAxisPoint.z = 0.0F;
-									}
-								}
-							}
-							break;
-
-						case ENEMY_Boss_Avatar:
-							Enemy->Object.UserContComps[ TURRETCOMP_Base ] = GetCompObjAddress( 4, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Base + 2 ] = GetCompObjAddress( 5, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 2 ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Base + 4 ] = GetCompObjAddress( 3, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun+ 4 ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Base + 6 ] = GetCompObjAddress( 2, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 6 ] = nullptr;
-							Enemy->Object.UserContComps[ TURRETCOMP_Base + 8 ] = GetCompObjAddress( 1, 1, Comp );
-							Enemy->Object.UserContComps[ TURRETCOMP_Gun + 8 ] = nullptr;
-
-							for( CompCount = 0; CompCount < 5; CompCount++ )
-							{
-								if( Enemy->Object.UserContComps[ CompCount * 2 ] )
-								{
-									TempComp = Enemy->Object.UserContComps[ CompCount * 2 ];
-									TempComp->UserControl = true;
-									if( !GetCompObjAxis( TempComp ) )
-									{
-										TempComp->UserAxis.x = 0.0F;
-										TempComp->UserAxis.y = 1.0F;
-										TempComp->UserAxis.z = 0.0F;
-										TempComp->UserAxisPoint.x = 0.0F;
-										TempComp->UserAxisPoint.y = 0.0F;
-										TempComp->UserAxisPoint.z = 0.0F;
-									}
-								}
-							}
-							break;
-
-						case ENEMY_Boss_Nukecrane:
-						case ENEMY_Supressor:
-						case ENEMY_MineSweeper:
-						case ENEMY_Swarm:
-						case ENEMY_Shade:
-						case ENEMY_MineLayer:
-						case ENEMY_Hunter:
-							break;
+					case ENEMY_Boss_Nukecrane:
+					case ENEMY_Supressor:
+					case ENEMY_MineSweeper:
+					case ENEMY_Swarm:
+					case ENEMY_Shade:
+					case ENEMY_MineLayer:
+					case ENEMY_Hunter:
+						break;
 					}
 				}
 				else
@@ -5798,19 +5798,19 @@ void ProcessEnemies( void )
 						GunObject->BurstTime = 0.0F;
 
 					if( !GetLastCompDispMatrix( &Enemy->Object, &GunObject->Mat, &GunObject->InvMat, &GunObject->FirePos , GunObject->GunNum) )
-				{
-					/* Fallback for a gun with no mount component (neither
-					 * UserContComps[GunNum] nor [GunNum + 1] is set, e.g. a
-					 * single-mesh enemy or a .cob without turret comps).
-					 * InitGuns mallocs the GUNOBJECTs without setting Mat,
-					 * so without this the per-gun BurstAngle gate in
-					 * AI_UPDATEGUNS would read garbage. Use the body matrix:
-					 * the gun fires straight forward from the body centre. */
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-					GunObject->Mat    = Enemy->Object.Mat;
-					GunObject->InvMat = Enemy->Object.InvMat;
-					GunObject->FirePos = Enemy->Object.Pos;
-				}
+					{
+						/* Fallback for a gun with no mount component (neither
+						 * UserContComps[GunNum] nor [GunNum + 1] is set, e.g. a
+						 * single-mesh enemy or a .cob without turret comps).
+						 * InitGuns mallocs the GUNOBJECTs without setting Mat,
+						 * so without this the per-gun BurstAngle gate in
+						 * AI_UPDATEGUNS would read garbage. Use the body matrix:
+						 * the gun fires straight forward from the body centre. */
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+						GunObject->Mat    = Enemy->Object.Mat;
+						GunObject->InvMat = Enemy->Object.InvMat;
+						GunObject->FirePos = Enemy->Object.Pos;
+					}
 					GunObject = GunObject->Next;
 				}
 
@@ -5977,7 +5977,7 @@ void ProcessEnemies( void )
 				}
 			}
 		}
-KilledInAI:
+		KilledInAI:
 		Enemy = NextEnemy;
 	}
 }
@@ -6514,9 +6514,9 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 			}
 			if( BGObject ) ChangeBGState( BGObject, OWNER_ENEMY, Enemy->Index, BUMP, 0.0F );
 		}else{
-				Object->Pos.x += Move_Off.x;
-				Object->Pos.y += Move_Off.y;
-				Object->Pos.z += Move_Off.z;
+			Object->Pos.x += Move_Off.x;
+			Object->Pos.y += Move_Off.y;
+			Object->Pos.z += Move_Off.z;
 		}
 
 		TriggerAreaEnemyCheck( &StartPos , &Object->Pos , Object->Group);
@@ -6541,9 +6541,9 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 			Enemy->TShip = nullptr;
 		}
 	}
-/*===================================================================
-			Set the Banking Matrix
-===================================================================*/
+	/*===================================================================
+				Set the Banking Matrix
+	===================================================================*/
 	StepQuat.MakeEuler(0.0F, 0.0F, Object->Bank);
 	Object->Quat.Multiply(&StepQuat, &Object->FinalQuat);
 	Object->FinalQuat.ToMatrix(&Object->FinalMat);
@@ -6736,9 +6736,9 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 				 * through corners — only pitch is locked. */
 				if( Enemy->Type != ENEMY_CargoDrone )
 #endif
-				if( AimData.Angle.y > -3.0F && AimData.Angle.y < 3.0F )
-				{
-					XRot = (AimData.Angle.x * (0.1F * framelag));
+					if( AimData.Angle.y > -3.0F && AimData.Angle.y < 3.0F )
+					{
+						XRot = (AimData.Angle.x * (0.1F * framelag));
 				}
 			}
 			Enemy->ImInNodeTransition = false;
@@ -6751,128 +6751,128 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 		 * vertically — 3D distance would release the drone as it rises away from
 		 * TNode->SolidPos.y, causing it to fight the lift and go off-track. */
 		{
-		bool _drone_waiting = false;
-		if( Enemy->Type == ENEMY_CargoDrone &&
-			(TNode->Flags & 0x40) && !(TNode->Flags & 0x20) )
-		{
-			float _dx = Object->Pos.x - TNode->SolidPos.x;
-			float _dz = Object->Pos.z - TNode->SolidPos.z;
-			if( _dx*_dx + _dz*_dz < (length + 16.0F) * (length + 16.0F) )
+			bool _drone_waiting = false;
+			if( Enemy->Type == ENEMY_CargoDrone &&
+				(TNode->Flags & 0x40) && !(TNode->Flags & 0x20) )
 			{
-				Object->Speed.z    = 0.0F;
-				/* Also zero the yaw rate AND pitch (XRot) so the drone
-				 * doesn't tilt/pitch trying to look at the wait node
-				 * while the lift Y-lerps it above the wait position.
-				 * Without these the AI keeps aiming at TNode (below)
-				 * and the drone visibly pitches/yaws on the lift.
-				 *
-				 * XRot may have been set earlier in the close-to-TNode
-				 * slope branches; the matrix update at the end of this
-				 * function would apply it.  Suppress it during wait. */
-				Object->Angle.y    = 0.0F;
-				XRot               = 0.0F;
-				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
-				Enemy->PickNewNodeNow = false;
-				_drone_waiting = true;
-
-				/* Level out drone matrix at the wait. Approach to the
-				 * wait can accumulate roll/pitch (the slope branches
-				 * preserve previous-Mat Up in MakeViewMatrix; corner
-				 * turns inject roll that autolevel doesn't fully shed
-				 * before arrival). Once at the wait, the lift only
-				 * moves Y — heading is fixed — so rebuilding the matrix
-				 * from horizontal forward + world-up clears any residual
-				 * tilt without changing what the drone is facing.
-				 *
-				 * Symptom this addresses: final lift on defend2 (BGO 31,
-				 * TNode 138 -> 67) arrives tilted ~22 deg, then the
-				 * Angle.y/XRot zeros above lock that orientation in
-				 * place for the duration of the descent. */
+				float _dx = Object->Pos.x - TNode->SolidPos.x;
+				float _dz = Object->Pos.z - TNode->SolidPos.z;
+				if( _dx*_dx + _dz*_dz < (length + 16.0F) * (length + 16.0F) )
 				{
-					VECTOR fwd, look_at, world_up = { 0.0F, 1.0F, 0.0F };
-					float fwd_len2;
-					ApplyMatrix( &Object->Mat, &Forward, &fwd );
-					fwd.y = 0.0F;
-					fwd_len2 = fwd.x * fwd.x + fwd.z * fwd.z;
-					if( fwd_len2 > 0.0001F )
+					Object->Speed.z    = 0.0F;
+					/* Also zero the yaw rate AND pitch (XRot) so the drone
+					 * doesn't tilt/pitch trying to look at the wait node
+					 * while the lift Y-lerps it above the wait position.
+					 * Without these the AI keeps aiming at TNode (below)
+					 * and the drone visibly pitches/yaws on the lift.
+					 *
+					 * XRot may have been set earlier in the close-to-TNode
+					 * slope branches; the matrix update at the end of this
+					 * function would apply it.  Suppress it during wait. */
+					Object->Angle.y    = 0.0F;
+					XRot               = 0.0F;
+					Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
+					Enemy->PickNewNodeNow = false;
+					_drone_waiting = true;
+
+					/* Level out drone matrix at the wait. Approach to the
+					 * wait can accumulate roll/pitch (the slope branches
+					 * preserve previous-Mat Up in MakeViewMatrix; corner
+					 * turns inject roll that autolevel doesn't fully shed
+					 * before arrival). Once at the wait, the lift only
+					 * moves Y — heading is fixed — so rebuilding the matrix
+					 * from horizontal forward + world-up clears any residual
+					 * tilt without changing what the drone is facing.
+					 *
+					 * Symptom this addresses: final lift on defend2 (BGO 31,
+					 * TNode 138 -> 67) arrives tilted ~22 deg, then the
+					 * Angle.y/XRot zeros above lock that orientation in
+					 * place for the duration of the descent. */
 					{
-						NormaliseVector( &fwd );
-						look_at.x = Object->Pos.x + fwd.x;
-						look_at.y = Object->Pos.y;
-						look_at.z = Object->Pos.z + fwd.z;
-						MakeViewMatrix( &Object->Pos, &look_at,
-										&world_up, &Object->Mat );
+						VECTOR fwd, look_at, world_up = { 0.0F, 1.0F, 0.0F };
+						float fwd_len2;
+						ApplyMatrix( &Object->Mat, &Forward, &fwd );
+						fwd.y = 0.0F;
+						fwd_len2 = fwd.x * fwd.x + fwd.z * fwd.z;
+						if( fwd_len2 > 0.0001F )
+						{
+							NormaliseVector( &fwd );
+							look_at.x = Object->Pos.x + fwd.x;
+							look_at.y = Object->Pos.y;
+							look_at.z = Object->Pos.z + fwd.z;
+							MakeViewMatrix( &Object->Pos, &look_at,
+											&world_up, &Object->Mat );
+						}
 					}
 				}
 			}
-		}
-		if( !_drone_waiting )
+			if( !_drone_waiting )
 #endif
-		{
-		Move_Off.x = Move_Off.x * Object->Speed.z * framelag;
-		Move_Off.y = Move_Off.y * Object->Speed.z * framelag;
-		Move_Off.z = Move_Off.z * Object->Speed.z * framelag;
+			{
+				Move_Off.x = Move_Off.x * Object->Speed.z * framelag;
+				Move_Off.y = Move_Off.y * Object->Speed.z * framelag;
+				Move_Off.z = Move_Off.z * Object->Speed.z * framelag;
 
 #ifdef EDITION_REMASTER
-		/* CargoDrone barrier stop: halt when a CLOSED OneOff_Anim BGObject
-		 * (State == WaitForTrigger, animation not yet played) is within
-		 * stopping distance ahead in the same group.
-		 *
-		 * ObjectCollide was too coarse — it tripped on every wall in tight
-		 * corridors and parked the drone in corners, never reaching the
-		 * next barrier.  Walking the BGObject list directly matches what
-		 * the level designer intended: only ACTUAL barrier doors stop
-		 * the drone, and only while they're still closed.
-		 *
-		 * Open doors (Time >= OverallTime) are skipped so the drone can
-		 * proceed through a barrier the moment a switch trigger animates
-		 * it.
-		 *
-		 * Use bgo->Center (computed bounding-box center) rather than
-		 * bgo->Pos for distance check.  Some barriers (trackBarrier01/02/
-		 * 03 on defend2) are authored with Pos=(0,0,0) and rely on their
-		 * .cob children's authored world coordinates — Pos is at the
-		 * level origin, not the barrier's actual location.  Center
-		 * reflects the world-space bounding box after children transform
-		 * and gives the real barrier position. */
-		if( Enemy->Type == ENEMY_CargoDrone )
-		{
-			float stop_r = EnemyTypes[ Enemy->Type ].Radius + 60.0F;
-			BGOBJECT * bgo;
-			for( bgo = FirstBGObjectUsed; bgo; bgo = bgo->NextUsed )
-			{
-				float bx, by, bz, d2, dot;
-				if( bgo->Type  != BGOTYPE_OneOff_Anim )       continue;
-				if( bgo->State != ONEOFFANIM_WaitForTrigger ) continue;
-				/* Once anim plays, Time == OverallTime and State resets
-				 * to WaitForTrigger — that's an OPEN door, skip it. */
-				if( bgo->Time  >= bgo->OverallTime )          continue;
-				if( bgo->Group != Object->Group )             continue;
-				/* Skip lift BGOs — their Center can lie ahead of the
-				 * drone before it reaches the wait node, but the lift
-				 * IS the path forward, not a barrier to halt at.  Lift
-				 * stopping is handled by the TNode 0x40 wait suppressor
-				 * above. */
-				if( bgo->IsCargoDroneLift )                   continue;
-				bx = bgo->Center.x - Object->Pos.x;
-				by = bgo->Center.y - Object->Pos.y;
-				bz = bgo->Center.z - Object->Pos.z;
-				d2 = bx*bx + by*by + bz*bz;
-				if( d2 >= stop_r * stop_r ) continue;
-				/* Only stop if the barrier is roughly ahead (dot > 0). */
-				dot = bx * Move_Off.x + by * Move_Off.y + bz * Move_Off.z;
-				if( dot <= 0.0F ) continue;
-				Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
-				Object->Speed.z = 0.0F;
-				break;
-			}
-		}
+				/* CargoDrone barrier stop: halt when a CLOSED OneOff_Anim BGObject
+				 * (State == WaitForTrigger, animation not yet played) is within
+				 * stopping distance ahead in the same group.
+				 *
+				 * ObjectCollide was too coarse — it tripped on every wall in tight
+				 * corridors and parked the drone in corners, never reaching the
+				 * next barrier.  Walking the BGObject list directly matches what
+				 * the level designer intended: only ACTUAL barrier doors stop
+				 * the drone, and only while they're still closed.
+				 *
+				 * Open doors (Time >= OverallTime) are skipped so the drone can
+				 * proceed through a barrier the moment a switch trigger animates
+				 * it.
+				 *
+				 * Use bgo->Center (computed bounding-box center) rather than
+				 * bgo->Pos for distance check.  Some barriers (trackBarrier01/02/
+				 * 03 on defend2) are authored with Pos=(0,0,0) and rely on their
+				 * .cob children's authored world coordinates — Pos is at the
+				 * level origin, not the barrier's actual location.  Center
+				 * reflects the world-space bounding box after children transform
+				 * and gives the real barrier position. */
+				if( Enemy->Type == ENEMY_CargoDrone )
+				{
+					float stop_r = EnemyTypes[ Enemy->Type ].Radius + 60.0F;
+					BGOBJECT * bgo;
+					for( bgo = FirstBGObjectUsed; bgo; bgo = bgo->NextUsed )
+					{
+						float bx, by, bz, d2, dot;
+						if( bgo->Type  != BGOTYPE_OneOff_Anim )       continue;
+						if( bgo->State != ONEOFFANIM_WaitForTrigger ) continue;
+						/* Once anim plays, Time == OverallTime and State resets
+						 * to WaitForTrigger — that's an OPEN door, skip it. */
+						if( bgo->Time  >= bgo->OverallTime )          continue;
+						if( bgo->Group != Object->Group )             continue;
+						/* Skip lift BGOs — their Center can lie ahead of the
+						 * drone before it reaches the wait node, but the lift
+						 * IS the path forward, not a barrier to halt at.  Lift
+						 * stopping is handled by the TNode 0x40 wait suppressor
+						 * above. */
+						if( bgo->IsCargoDroneLift )                   continue;
+						bx = bgo->Center.x - Object->Pos.x;
+						by = bgo->Center.y - Object->Pos.y;
+						bz = bgo->Center.z - Object->Pos.z;
+						d2 = bx*bx + by*by + bz*bz;
+						if( d2 >= stop_r * stop_r ) continue;
+						/* Only stop if the barrier is roughly ahead (dot > 0). */
+						dot = bx * Move_Off.x + by * Move_Off.y + bz * Move_Off.z;
+						if( dot <= 0.0F ) continue;
+						Move_Off.x = Move_Off.y = Move_Off.z = 0.0F;
+						Object->Speed.z = 0.0F;
+						break;
+					}
+				}
 #endif
 
-		Object->Pos.x += Move_Off.x;
-		Object->Pos.y += Move_Off.y;
-		Object->Pos.z += Move_Off.z;
-		}
+				Object->Pos.x += Move_Off.x;
+				Object->Pos.y += Move_Off.y;
+				Object->Pos.z += Move_Off.z;
+			}
 #ifdef EDITION_REMASTER
 		} /* close _drone_waiting block */
 #endif
@@ -6890,7 +6890,7 @@ void AutoMovementCrawl( OBJECT * Object , ENEMY * Enemy )
 #ifdef EDITION_REMASTER
 				if( !(Enemy->Type == ENEMY_CargoDrone && (TNode->Flags & 0x40) && !(TNode->Flags & 0x20)) )
 #endif
-				Enemy->PickNewNodeNow = true;
+					Enemy->PickNewNodeNow = true;
 			}
 		}
 
@@ -8145,13 +8145,13 @@ read_BlindSearchTime( FILE *f, char *last_token )
 static int
 read_ControlType( FILE * /*f*/, char * /*last_token*/ )
 {
-		return 0;
+	return 0;
 }
 // Read the AiMode
 static int
 read_AiMode( FILE * /*f*/, char * /*last_token*/ )
 {
-		return 0;
+	return 0;
 }
 // Read the PrimaryWeaponType
 static int
@@ -8329,7 +8329,7 @@ static int read_EnemyType( FILE *f, char *last_token )
 			if (
 				(tab[i].keyword != nullptr) &&
 				(!strcasecmp( last_token, tab[i].keyword ))
-			)
+				)
 				break;
 		}
 		if( i < tab_size )
@@ -8728,9 +8728,9 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 			ObjectCollide( Object, &Move_Off, EnemyTypes[Enemy->Type].Radius, &BGObject );
 			if( BGObject ) ChangeBGState( BGObject, OWNER_ENEMY, Enemy->Index, BUMP, 0.0F );
 		}else{
-				Object->Pos.x += Move_Off.x;
-				Object->Pos.y += Move_Off.y;
-				Object->Pos.z += Move_Off.z;
+			Object->Pos.x += Move_Off.x;
+			Object->Pos.y += Move_Off.y;
+			Object->Pos.z += Move_Off.z;
 		}
 		ExtForce.x = 0.0F;
 		ExtForce.y = 0.0F;

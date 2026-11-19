@@ -308,7 +308,7 @@ static void enet_send_packet( ENetPeer* peer, ENetPacket* packet, int channel, f
 static void enet_send(
 	ENetPeer* peer, void* data, int size,
 	enet_uint32 type, int channel, flush_t flush
-)
+	)
 {
 	ENetPacket * packet = enet_packet_create( data, size, type );
 	enet_send_packet( peer, packet, channel, flush );
@@ -772,17 +772,17 @@ static void lost_connection( ENetPeer * peer, enet_uint32 data )
 			address_to_str(&peer->address));
 		switch(reason[0])
 		{
-			case FAILED_SYNCH:
-				DebugPrintf("network: reason was because you failed to synch with player %d\n", reason[1]);
-				break;
-			case HOST_SAID_SO:
-				DebugPrintf("network: reason was because host told me to disconnect from you\n");
-				break;
-			case I_QUIT:
-				DebugPrintf("network: reason was because I'm leaving the game\n");
-				break;
-			default:
-				DebugPrintf("network: reason was unspecified\n");
+		case FAILED_SYNCH:
+			DebugPrintf("network: reason was because you failed to synch with player %d\n", reason[1]);
+			break;
+		case HOST_SAID_SO:
+			DebugPrintf("network: reason was because host told me to disconnect from you\n");
+			break;
+		case I_QUIT:
+			DebugPrintf("network: reason was because I'm leaving the game\n");
+			break;
+		default:
+			DebugPrintf("network: reason was unspecified\n");
 		}
 	}
 
@@ -1132,8 +1132,8 @@ static void new_packet( ENetEvent * event )
 			}
 			else
 			{
-					DebugPrintf("network security: %s acked their id but I'm not the host!\n",
-						address_to_str(&peer->address));
+				DebugPrintf("network security: %s acked their id but I'm not the host!\n",
+					address_to_str(&peer->address));
 			}
 			break;
 		case NEW_PLAYER:
@@ -1433,7 +1433,7 @@ void network_cleanup( void )
 void network_send(
 	network_player_t* player, void* data, int size,
 	network_flags_t flags, int channel
-)
+	)
 {
 	if( enet_host == nullptr ) return;
 	enet_send( (ENetPeer*) player->data, data, size,

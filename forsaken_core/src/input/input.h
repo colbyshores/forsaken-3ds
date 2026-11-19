@@ -106,22 +106,22 @@ static inline const char* SDL_GetKeyName(int key)
 	static char buf[16];
 	if (key >= 32 && key < 127) { buf[0] = (char)key; buf[1] = 0; return buf; }
 	switch(key) {
-		case SDLK_RETURN: return "return";
-		case SDLK_ESCAPE: return "escape";
-		case SDLK_SPACE:  return "space";
-		case SDLK_UP:     return "up";
-		case SDLK_DOWN:   return "down";
-		case SDLK_LEFT:   return "left";
-		case SDLK_RIGHT:  return "right";
-		case SDLK_BACKSPACE: return "backspace";
-		case SDLK_TAB:    return "tab";
-		case SDLK_LSHIFT: return "left shift";
-		case SDLK_RSHIFT: return "right shift";
-		case SDLK_LCTRL:  return "left ctrl";
-		case SDLK_RCTRL:  return "right ctrl";
-		case SDLK_LALT:   return "left alt";
-		case SDLK_RALT:   return "right alt";
-		default: snprintf(buf, sizeof(buf), "key%d", key); return buf;
+	case SDLK_RETURN: return "return";
+	case SDLK_ESCAPE: return "escape";
+	case SDLK_SPACE:  return "space";
+	case SDLK_UP:     return "up";
+	case SDLK_DOWN:   return "down";
+	case SDLK_LEFT:   return "left";
+	case SDLK_RIGHT:  return "right";
+	case SDLK_BACKSPACE: return "backspace";
+	case SDLK_TAB:    return "tab";
+	case SDLK_LSHIFT: return "left shift";
+	case SDLK_RSHIFT: return "right shift";
+	case SDLK_LCTRL:  return "left ctrl";
+	case SDLK_RCTRL:  return "right ctrl";
+	case SDLK_LALT:   return "left alt";
+	case SDLK_RALT:   return "right alt";
+	default: snprintf(buf, sizeof(buf), "key%d", key); return buf;
 	}
 }
 #else

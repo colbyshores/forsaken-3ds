@@ -38,7 +38,7 @@ bool sound_listener_velocity( float x, float y, float z );
 bool sound_listener_orientation(
 	float fx, float fy, float fz, // forward vector
 	float ux, float uy, float uz  // up vector
-);
+	);
 
 //
 // Buffers

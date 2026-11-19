@@ -95,7 +95,7 @@ void GetRealLightAmbientWorldSpace(VECTOR *Pos, float *R, float *G, float *B, fl
 			*A += 255.0f * intensity;
 		}
 
-NEXT_LIGHT:
+		NEXT_LIGHT:
 		LightPnt = LightPnt->NextVisible;
 	}
 

@@ -155,11 +155,11 @@ bool handle_events(void)
 		controls_3ds_init(s_is_n3ds);
 	}
 
-/* Controls menu input — runs first so menu can intercept B,
-	 * D-pad, A, etc. before the engine's own handlers see them.
-	 * Returns true if menu consumed input, in which case we still
-	 * fall through to update axis/button state but the menu will
-	 * have already absorbed the relevant kDown bits. */
+	/* Controls menu input — runs first so menu can intercept B,
+		 * D-pad, A, etc. before the engine's own handlers see them.
+		 * Returns true if menu consumed input, in which case we still
+		 * fall through to update axis/button state but the menu will
+		 * have already absorbed the relevant kDown bits. */
 	{
 		if (controls_3ds_handle_input(kDown, kHeld)) {
 			/* Menu open — fully suppress input propagation:
@@ -180,10 +180,10 @@ bool handle_events(void)
 		}
 	}
 
-/* check for quit (Start + Select together) — N3DS only.
-	 * On OG 3DS, SELECT is the nitro button so this chord would
-	 * fire any time the player paused while nitroing. The player
-	 * can quit via HOME on OG. */
+	/* check for quit (Start + Select together) — N3DS only.
+		 * On OG 3DS, SELECT is the nitro button so this chord would
+		 * fire any time the player paused while nitroing. The player
+		 * can quit via HOME on OG. */
 	if (s_is_n3ds && (kHeld & KEY_START) && (kHeld & KEY_SELECT))
 	{
 		/* Only SIGNAL quit here — running CleanUpAndPostQuit in the middle
@@ -256,34 +256,34 @@ bool handle_events(void)
 	/* B only injects ESCAPE when a menu is open (go back / close).
 	 * During gameplay B is fire secondary (joy button 1). */
 	{
-	int menu_open = _3ds_is_menu_open();
-	if (kDown & KEY_A)
-		input_buffer[input_buffer_count++] = SDLK_RETURN;
-	if ((kDown & KEY_B) && menu_open)
-		input_buffer[input_buffer_count++] = SDLK_ESCAPE;
-	if (kDown & KEY_DUP)
-		input_buffer[input_buffer_count++] = SDLK_UP;
-	if (kDown & KEY_DDOWN)
-		input_buffer[input_buffer_count++] = SDLK_DOWN;
-	if (kDown & KEY_DLEFT)
-		input_buffer[input_buffer_count++] = SDLK_LEFT;
-	if (kDown & KEY_DRIGHT)
-		input_buffer[input_buffer_count++] = SDLK_RIGHT;
-	/* Only inject ESCAPE from Start when Select is NOT held (N3DS only)
-	 * — Select+Start is a common combo that crashes if the menu opens
-	 * during rear view. On OG 3DS, SELECT is nitro so the player holds
-	 * it constantly; the gate would block all pauses mid-flight. */
-	if ((kDown & KEY_START) && (!s_is_n3ds || !(kHeld & KEY_SELECT)))
-		input_buffer[input_buffer_count++] = SDLK_ESCAPE;
+		int menu_open = _3ds_is_menu_open();
+		if (kDown & KEY_A)
+			input_buffer[input_buffer_count++] = SDLK_RETURN;
+		if ((kDown & KEY_B) && menu_open)
+			input_buffer[input_buffer_count++] = SDLK_ESCAPE;
+		if (kDown & KEY_DUP)
+			input_buffer[input_buffer_count++] = SDLK_UP;
+		if (kDown & KEY_DDOWN)
+			input_buffer[input_buffer_count++] = SDLK_DOWN;
+		if (kDown & KEY_DLEFT)
+			input_buffer[input_buffer_count++] = SDLK_LEFT;
+		if (kDown & KEY_DRIGHT)
+			input_buffer[input_buffer_count++] = SDLK_RIGHT;
+		/* Only inject ESCAPE from Start when Select is NOT held (N3DS only)
+		 * — Select+Start is a common combo that crashes if the menu opens
+		 * during rear view. On OG 3DS, SELECT is nitro so the player holds
+		 * it constantly; the gate would block all pauses mid-flight. */
+		if ((kDown & KEY_START) && (!s_is_n3ds || !(kHeld & KEY_SELECT)))
+			input_buffer[input_buffer_count++] = SDLK_ESCAPE;
 
-	/* populate key_state for any code that reads it.
-	 * D-pad is NOT mapped here — the default keyboard config maps arrow keys
-	 * to camera movement, which would override the D-pad POV hat weapon
-	 * selection.  D-pad menu navigation uses input_buffer (kDown events above). */
-	memset(_3ds_key_state, 0, sizeof(_3ds_key_state));
-	if (kHeld & KEY_A)      _3ds_key_state[SDLK_RETURN] = 1;
-	if ((kHeld & KEY_B) && menu_open)
-		_3ds_key_state[SDLK_ESCAPE] = 1;
+		/* populate key_state for any code that reads it.
+		 * D-pad is NOT mapped here — the default keyboard config maps arrow keys
+		 * to camera movement, which would override the D-pad POV hat weapon
+		 * selection.  D-pad menu navigation uses input_buffer (kDown events above). */
+		memset(_3ds_key_state, 0, sizeof(_3ds_key_state));
+		if (kHeld & KEY_A)      _3ds_key_state[SDLK_RETURN] = 1;
+		if ((kHeld & KEY_B) && menu_open)
+			_3ds_key_state[SDLK_ESCAPE] = 1;
 	}
 	if ((kHeld & KEY_START) && !(kHeld & KEY_SELECT))
 		_3ds_key_state[SDLK_ESCAPE] = 1;

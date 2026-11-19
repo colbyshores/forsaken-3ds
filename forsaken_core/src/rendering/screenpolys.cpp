@@ -40,7 +40,7 @@ constexpr auto CUTOFF = ( 5.0F * BLOCKSIZE );
 /*===================================================================
 	Globals
 ===================================================================*/
-		bool		CountDownOn = false;
+bool		CountDownOn = false;
 static 	bool		Toggle = false;
 static 	float		ScaleInc = 0.0F;
 static	float		Interp_Time = 0.0F;
@@ -131,57 +131,57 @@ u_int16_t	Hun0Digit[ 7 ] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xf
 // defaults a screen poly
 void InitScrPoly( u_int16_t i )
 {
-		ScrPolys[i].Flags = g_scrpoly_route_bottom ? SCRFLAG_BottomHUD : SCRFLAG_Nothing;
-		ScrPolys[i].Type = SCRTYPE_Normal;
-		ScrPolys[i].R = 255;
-		ScrPolys[i].G = 255;
-		ScrPolys[i].B = 255;
-		ScrPolys[i].Trans = 255;
-		ScrPolys[i].Frame = 0.0F;
-		ScrPolys[i].FrameRate = 1.0F;
-		ScrPolys[i].Frm_Info = nullptr;
-		ScrPolys[i].SeqNum = ScrSeq::Nothing;
-		ScrPolys[i].Xscale = 1.0F;
-		ScrPolys[i].Yscale = 1.0F;
+	ScrPolys[i].Flags = g_scrpoly_route_bottom ? SCRFLAG_BottomHUD : SCRFLAG_Nothing;
+	ScrPolys[i].Type = SCRTYPE_Normal;
+	ScrPolys[i].R = 255;
+	ScrPolys[i].G = 255;
+	ScrPolys[i].B = 255;
+	ScrPolys[i].Trans = 255;
+	ScrPolys[i].Frame = 0.0F;
+	ScrPolys[i].FrameRate = 1.0F;
+	ScrPolys[i].Frm_Info = nullptr;
+	ScrPolys[i].SeqNum = ScrSeq::Nothing;
+	ScrPolys[i].Xscale = 1.0F;
+	ScrPolys[i].Yscale = 1.0F;
 
-		ScrPolys[i].NextInTPage = INDEX_NONE;
-		ScrPolys[i].PrevInTPage = INDEX_NONE;
+	ScrPolys[i].NextInTPage = INDEX_NONE;
+	ScrPolys[i].PrevInTPage = INDEX_NONE;
 
-		// Next and Prev are left alone: the caller has already linked the poly
+	// Next and Prev are left alone: the caller has already linked the poly
 
-		ScrPolys[i].x1 = 0.0F;
-		ScrPolys[i].y1 = 0.0F;
-		ScrPolys[i].x2 = 0.0F;
-		ScrPolys[i].y2 = 0.0F;
-		ScrPolys[i].x3 = 0.0F;
-		ScrPolys[i].y3 = 0.0F;
-		ScrPolys[i].x4 = 0.0F;
-		ScrPolys[i].y4 = 0.0F;
+	ScrPolys[i].x1 = 0.0F;
+	ScrPolys[i].y1 = 0.0F;
+	ScrPolys[i].x2 = 0.0F;
+	ScrPolys[i].y2 = 0.0F;
+	ScrPolys[i].x3 = 0.0F;
+	ScrPolys[i].y3 = 0.0F;
+	ScrPolys[i].x4 = 0.0F;
+	ScrPolys[i].y4 = 0.0F;
 
-		ScrPolys[i].Pos.x = 0.0f;
-		ScrPolys[i].Pos.y = 0.0f;
-		ScrPolys[i].Pos.z = 0.0f;
-		ScrPolys[i].LifeCount = 0.0f;
-		ScrPolys[i].FadeRed = 0.0f;
-		ScrPolys[i].FadeGreen = 0.0f;
-		ScrPolys[i].FadeBlue = 0.0f;
-		ScrPolys[i].FadeTrans = 0.0f;
-		ScrPolys[i].Col1.R = 0;
-		ScrPolys[i].Col1.G = 0;
-		ScrPolys[i].Col1.B = 0;
-		ScrPolys[i].Col1.Trans = 0;
-		ScrPolys[i].Col2.R = 0;
-		ScrPolys[i].Col2.G = 0;
-		ScrPolys[i].Col2.B = 0;
-		ScrPolys[i].Col2.Trans = 0;
-		ScrPolys[i].Col3.R = 0;
-		ScrPolys[i].Col3.G = 0;
-		ScrPolys[i].Col3.B = 0;
-		ScrPolys[i].Col3.Trans = 0;
-		ScrPolys[i].Col4.R = 0;
-		ScrPolys[i].Col4.G = 0;
-		ScrPolys[i].Col4.B = 0;
-		ScrPolys[i].Col4.Trans = 0;
+	ScrPolys[i].Pos.x = 0.0f;
+	ScrPolys[i].Pos.y = 0.0f;
+	ScrPolys[i].Pos.z = 0.0f;
+	ScrPolys[i].LifeCount = 0.0f;
+	ScrPolys[i].FadeRed = 0.0f;
+	ScrPolys[i].FadeGreen = 0.0f;
+	ScrPolys[i].FadeBlue = 0.0f;
+	ScrPolys[i].FadeTrans = 0.0f;
+	ScrPolys[i].Col1.R = 0;
+	ScrPolys[i].Col1.G = 0;
+	ScrPolys[i].Col1.B = 0;
+	ScrPolys[i].Col1.Trans = 0;
+	ScrPolys[i].Col2.R = 0;
+	ScrPolys[i].Col2.G = 0;
+	ScrPolys[i].Col2.B = 0;
+	ScrPolys[i].Col2.Trans = 0;
+	ScrPolys[i].Col3.R = 0;
+	ScrPolys[i].Col3.G = 0;
+	ScrPolys[i].Col3.B = 0;
+	ScrPolys[i].Col3.Trans = 0;
+	ScrPolys[i].Col4.R = 0;
+	ScrPolys[i].Col4.G = 0;
+	ScrPolys[i].Col4.B = 0;
+	ScrPolys[i].Col4.Trans = 0;
 
 }
 
@@ -342,27 +342,155 @@ void ScreenPolyProcess( void )
 			{
 				switch( ScrPolys[i].SeqNum )
 				{
-					case ScrSeq::Anim:								// Explosion?
-						ScrPolys[i].Frame += ( framelag / ScrPolys[i].FrameRate );
+				case ScrSeq::Anim:								// Explosion?
+					ScrPolys[i].Frame += ( framelag / ScrPolys[i].FrameRate );
 
-						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-						if( ScrPolys[i].Frame >= (*ScrPolys[i].Frm_Info)->Num_Frames )
-						{
-							KillUsedScrPoly( i );
-						}
-						break;
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+					if( ScrPolys[i].Frame >= (*ScrPolys[i].Frm_Info)->Num_Frames )
+					{
+						KillUsedScrPoly( i );
+					}
+					break;
 
-					case ScrSeq::Fade:								// Fade
+				case ScrSeq::Fade:								// Fade
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+					Speed = ( framelag * 20.0F );
+					ScrPolys[i].LifeCount -= Speed;
+					if( ScrPolys[i].LifeCount <= 0.0F )
+					{
 						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-						Speed = ( framelag * 20.0F );
-						ScrPolys[i].LifeCount -= Speed;
-						if( ScrPolys[i].LifeCount <= 0.0F )
-						{
+						KillUsedScrPoly( i );
+						FlashScreenPoly = INDEX_NONE;
+					}
+					else
+					{
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						ScrPolys[i].FadeRed -= Speed;
+						if( ScrPolys[i].FadeRed < 0.0F ) ScrPolys[i].FadeRed = 0.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						ScrPolys[i].FadeGreen -= Speed;
+						if( ScrPolys[i].FadeGreen < 0.0F ) ScrPolys[i].FadeGreen = 0.0F;
+						ScrPolys[i].FadeBlue -= Speed;
+						if( ScrPolys[i].FadeBlue < 0.0F ) ScrPolys[i].FadeBlue = 0.0F;
+						ScrPolys[i].FadeTrans -= Speed;
+						if( ScrPolys[i].FadeTrans < 0.0F ) ScrPolys[i].FadeTrans = 0.0F;
+						ScrPolys[i].R = (u_int8_t) ScrPolys[i].FadeRed;
+						ScrPolys[i].G = (u_int8_t) ScrPolys[i].FadeGreen;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						ScrPolys[i].B = (u_int8_t) ScrPolys[i].FadeBlue;
+						ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
+					}
+					break;
+				case ScrSeq::FadeUp:								// Fade
+					ScrPolys[i].LifeCount += framelag / ( 60.0F * 10.0F );
+					if( ScrPolys[i].LifeCount >= 1.0F )
+					{
+						ScrPolys[i].LifeCount = 1.0F;
+					}
+
+					ScrPolys[i].R = (u_int8_t) ((float)ScrPolys[i].FadeRed * ScrPolys[i].LifeCount);
+					ScrPolys[i].G = (u_int8_t) ((float)ScrPolys[i].FadeGreen * ScrPolys[i].LifeCount);
+					ScrPolys[i].B = (u_int8_t) ((float)ScrPolys[i].FadeBlue * ScrPolys[i].LifeCount);
+					ScrPolys[i].Trans = (u_int8_t) ((float)ScrPolys[i].FadeTrans * ScrPolys[i].LifeCount);
+					break;
+				case ScrSeq::Thermo:								// Explosion?
+					if( CheckDecreaseTemperature() )
+					{
+						if( WantedThermalTemp > ThermalMinimum )
 							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							KillUsedScrPoly( i );
-							FlashScreenPoly = INDEX_NONE;
+						{
+							WantedThermalTemp -= ( THERMAL_DEC * framelag );
+							if( WantedThermalTemp < ThermalMinimum ) WantedThermalTemp = ThermalMinimum;
 						}
-						else
+					}
+					else
+					{
+						WantedThermalTemp += ( THERMAL_INC * framelag );
+						if( WantedThermalTemp > 100.0F ) WantedThermalTemp = 100.0F;
+					}
+
+					if( ThermalTemp > WantedThermalTemp )
+					{
+						ThermalTemp -= ( THERMAL_STEP * framelag );
+						if( ThermalTemp < WantedThermalTemp )
+						{
+							ThermalTemp = WantedThermalTemp;
+							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						}
+					}
+					else
+					{
+						if( ThermalTemp < WantedThermalTemp )
+						{
+							ThermalTemp += ( THERMAL_STEP * framelag );
+							if( ThermalTemp > WantedThermalTemp )
+							{
+								ThermalTemp = WantedThermalTemp;
+
+								if( WantedThermalTemp > 99.9F )
+								{
+									if( !KilledPlayer )
+									{
+										Ships[WhoIAm].Damage = 512.0F;
+										Lives = 0;
+										DoDamage( OVERRIDE_INVUL );
+
+										Ships[WhoIAm].ShipThatLastKilledMe = WhoIAm;
+
+										if( (Ships[WhoIAm].Object.Mode == DEATH_MODE) || (Ships[WhoIAm].Object.Mode == LIMBO_MODE) )
+										{
+											Ships[WhoIAm].Object.Mode = GAMEOVER_MODE;
+										}else{
+											Ships[WhoIAm].Object.Mode = DEATH_MODE;
+										}
+										AddColourMessageToQue(SystemMessageColour, IF_YOU_CANT_TAKE_THE_HEAT );
+										AddColourMessageToQue(SystemMessageColour, GET_OUT_OF_THE_KITCHEN );
+										Ships[WhoIAm].Timer = 0.0F;
+
+										KilledPlayer = true;
+									}
+									/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+								}
+							}
+						}
+					}
+
+					ScrPolys[i].Frame = ( ThermalTemp / ( 100.0F / ( (float) ( Thermo_Header->Num_Frames - 1 ) ) ) );
+					break;
+
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				case ScrSeq::Logo:								// Logos
+					ScrPolys[i].LifeCount += framelag;
+
+					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+					if( ScrPolys[i].LifeCount >= 600.0F )
+					{
+						ScrPolys[i].Frame += 2.0F;
+						ScrPolys[i].LifeCount = 0.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+					}
+
+					Speed = ( 2.125F * framelag );
+
+					if( ScrPolys[i].LifeCount < 60.0F )
+					{
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						ScrPolys[i].FadeRed += Speed;
+						if( ScrPolys[i].FadeRed > 128.0F ) ScrPolys[i].FadeRed = 128.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						ScrPolys[i].FadeGreen += Speed;
+						if( ScrPolys[i].FadeGreen > 128.0F ) ScrPolys[i].FadeGreen = 128.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						ScrPolys[i].FadeBlue += Speed;
+						if( ScrPolys[i].FadeBlue > 128.0F ) ScrPolys[i].FadeBlue = 128.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+						ScrPolys[i].FadeTrans += Speed;
+						if( ScrPolys[i].FadeTrans > 128.0F ) ScrPolys[i].FadeTrans = 128.0F;
+						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+					}
+					else
+					{
+						if( ScrPolys[i].LifeCount >= ( 600.0F - 60.0F ) )
 						{
 							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
 							ScrPolys[i].FadeRed -= Speed;
@@ -374,153 +502,25 @@ void ScreenPolyProcess( void )
 							if( ScrPolys[i].FadeBlue < 0.0F ) ScrPolys[i].FadeBlue = 0.0F;
 							ScrPolys[i].FadeTrans -= Speed;
 							if( ScrPolys[i].FadeTrans < 0.0F ) ScrPolys[i].FadeTrans = 0.0F;
-							ScrPolys[i].R = (u_int8_t) ScrPolys[i].FadeRed;
-							ScrPolys[i].G = (u_int8_t) ScrPolys[i].FadeGreen;
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							ScrPolys[i].B = (u_int8_t) ScrPolys[i].FadeBlue;
-							ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
-						}
-						break;
-					case ScrSeq::FadeUp:								// Fade
-						ScrPolys[i].LifeCount += framelag / ( 60.0F * 10.0F );
-						if( ScrPolys[i].LifeCount >= 1.0F )
-						{
-							ScrPolys[i].LifeCount = 1.0F;
-						}
-
-						ScrPolys[i].R = (u_int8_t) ((float)ScrPolys[i].FadeRed * ScrPolys[i].LifeCount);
-						ScrPolys[i].G = (u_int8_t) ((float)ScrPolys[i].FadeGreen * ScrPolys[i].LifeCount);
-						ScrPolys[i].B = (u_int8_t) ((float)ScrPolys[i].FadeBlue * ScrPolys[i].LifeCount);
-						ScrPolys[i].Trans = (u_int8_t) ((float)ScrPolys[i].FadeTrans * ScrPolys[i].LifeCount);
-						break;
-					case ScrSeq::Thermo:								// Explosion?
-						if( CheckDecreaseTemperature() )
-						{
-							if( WantedThermalTemp > ThermalMinimum )
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							{
-								WantedThermalTemp -= ( THERMAL_DEC * framelag );
-								if( WantedThermalTemp < ThermalMinimum ) WantedThermalTemp = ThermalMinimum;
-							}
 						}
 						else
 						{
-							WantedThermalTemp += ( THERMAL_INC * framelag );
-							if( WantedThermalTemp > 100.0F ) WantedThermalTemp = 100.0F;
+							ScrPolys[i].FadeRed = 128.0F;
+							ScrPolys[i].FadeGreen = 128.0F;
+							ScrPolys[i].FadeBlue = 128.0F;
+							ScrPolys[i].FadeTrans = 128.0F;
 						}
+					}
 
-						if( ThermalTemp > WantedThermalTemp )
-						{
-							ThermalTemp -= ( THERMAL_STEP * framelag );
-							if( ThermalTemp < WantedThermalTemp )
-							{
-								ThermalTemp = WantedThermalTemp;
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							}
-						}
-						else
-						{
-							if( ThermalTemp < WantedThermalTemp )
-							{
-								ThermalTemp += ( THERMAL_STEP * framelag );
-								if( ThermalTemp > WantedThermalTemp )
-								{
-									ThermalTemp = WantedThermalTemp;
+					ScrPolys[i].R = (u_int8_t) ScrPolys[i].FadeRed;
+					ScrPolys[i].G = (u_int8_t) ScrPolys[i].FadeGreen;
+					ScrPolys[i].B = (u_int8_t) ScrPolys[i].FadeBlue;
+					ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
+					break;
 
-									if( WantedThermalTemp > 99.9F )
-									{
-										if( !KilledPlayer )
-										{
-											Ships[WhoIAm].Damage = 512.0F;
-											Lives = 0;
-											DoDamage( OVERRIDE_INVUL );
-
-											Ships[WhoIAm].ShipThatLastKilledMe = WhoIAm;
-
-											if( (Ships[WhoIAm].Object.Mode == DEATH_MODE) || (Ships[WhoIAm].Object.Mode == LIMBO_MODE) )
-											{
-												Ships[WhoIAm].Object.Mode = GAMEOVER_MODE;
-											}else{
-												Ships[WhoIAm].Object.Mode = DEATH_MODE;
-											}
-											AddColourMessageToQue(SystemMessageColour, IF_YOU_CANT_TAKE_THE_HEAT );
-											AddColourMessageToQue(SystemMessageColour, GET_OUT_OF_THE_KITCHEN );
-											Ships[WhoIAm].Timer = 0.0F;
-
-											KilledPlayer = true;
-										}
-									/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-									}
-								}
-							}
-						}
-
-						ScrPolys[i].Frame = ( ThermalTemp / ( 100.0F / ( (float) ( Thermo_Header->Num_Frames - 1 ) ) ) );
-						break;
-
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					case ScrSeq::Logo:								// Logos
-						ScrPolys[i].LifeCount += framelag;
-
-						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-						if( ScrPolys[i].LifeCount >= 600.0F )
-						{
-							ScrPolys[i].Frame += 2.0F;
-							ScrPolys[i].LifeCount = 0.0F;
-						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-						}
-
-						Speed = ( 2.125F * framelag );
-
-						if( ScrPolys[i].LifeCount < 60.0F )
-						{
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							ScrPolys[i].FadeRed += Speed;
-							if( ScrPolys[i].FadeRed > 128.0F ) ScrPolys[i].FadeRed = 128.0F;
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							ScrPolys[i].FadeGreen += Speed;
-							if( ScrPolys[i].FadeGreen > 128.0F ) ScrPolys[i].FadeGreen = 128.0F;
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							ScrPolys[i].FadeBlue += Speed;
-							if( ScrPolys[i].FadeBlue > 128.0F ) ScrPolys[i].FadeBlue = 128.0F;
-							/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-							ScrPolys[i].FadeTrans += Speed;
-							if( ScrPolys[i].FadeTrans > 128.0F ) ScrPolys[i].FadeTrans = 128.0F;
-						/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-						}
-						else
-						{
-							if( ScrPolys[i].LifeCount >= ( 600.0F - 60.0F ) )
-							{
-								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-								ScrPolys[i].FadeRed -= Speed;
-								if( ScrPolys[i].FadeRed < 0.0F ) ScrPolys[i].FadeRed = 0.0F;
-								/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-								ScrPolys[i].FadeGreen -= Speed;
-								if( ScrPolys[i].FadeGreen < 0.0F ) ScrPolys[i].FadeGreen = 0.0F;
-								ScrPolys[i].FadeBlue -= Speed;
-								if( ScrPolys[i].FadeBlue < 0.0F ) ScrPolys[i].FadeBlue = 0.0F;
-								ScrPolys[i].FadeTrans -= Speed;
-								if( ScrPolys[i].FadeTrans < 0.0F ) ScrPolys[i].FadeTrans = 0.0F;
-							}
-							else
-							{
-								ScrPolys[i].FadeRed = 128.0F;
-								ScrPolys[i].FadeGreen = 128.0F;
-								ScrPolys[i].FadeBlue = 128.0F;
-								ScrPolys[i].FadeTrans = 128.0F;
-							}
-						}
-
-						ScrPolys[i].R = (u_int8_t) ScrPolys[i].FadeRed;
-						ScrPolys[i].G = (u_int8_t) ScrPolys[i].FadeGreen;
-						ScrPolys[i].B = (u_int8_t) ScrPolys[i].FadeBlue;
-						ScrPolys[i].Trans = (u_int8_t) ScrPolys[i].FadeTrans;
-						break;
-
-					case ScrSeq::Nothing:
-					default:
-						break;
+				case ScrSeq::Nothing:
+				default:
+					break;
 				}
 			}
 		}
@@ -1568,9 +1568,9 @@ void AddScreenPolyText( u_int16_t Frame, float XPos, float YPos, u_int8_t Red, u
 
 		// Offset Info
 		if( Text512b_Header && FontHeight > 8.0F )
-				ScrPolys[ i ].Frm_Info = &Text512b_Header;	// bigger font
+			ScrPolys[ i ].Frm_Info = &Text512b_Header;	// bigger font
 		else
-				ScrPolys[ i ].Frm_Info = &Text512_Header;		// original font
+			ScrPolys[ i ].Frm_Info = &Text512_Header;		// original font
 
 		AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 	}
@@ -1671,9 +1671,9 @@ void AddScreenPolyTextScale( u_int16_t Frame, float XPos, float YPos, float XSca
 
 		// Offset Info
 		if(Text512b_Header && FontHeight > 8.0F)
-				ScrPolys[ i ].Frm_Info = &Text512b_Header;	// bigger font
+			ScrPolys[ i ].Frm_Info = &Text512b_Header;	// bigger font
 		else
-				ScrPolys[ i ].Frm_Info = &Text512_Header;		// original font
+			ScrPolys[ i ].Frm_Info = &Text512_Header;		// original font
 
 		AddScrPolyToTPage( i, GetTPage( *ScrPolys[ i ].Frm_Info, 0 ) );
 	}
@@ -2059,9 +2059,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	int				batchVert = 0;  /* buffer position within current draw batch */
 #endif
 
-/*===================================================================
-		Pass 1: count verts per texture page
-===================================================================*/
+	/*===================================================================
+			Pass 1: count verts per texture page
+	===================================================================*/
 	TotalVerts = 0;
 
 	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
@@ -2114,9 +2114,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 	ZValue = 1.0F;
 	RHWValue = ( 1.0F / ZValue );
 
-/*===================================================================
-		Lock Buffer and get ready to fill in...
-===================================================================*/
+	/*===================================================================
+			Lock Buffer and get ready to fill in...
+	===================================================================*/
 
 	if (!(FSLockPretransformedVertexBuffer(renderObject, &BufStart)))
 	{
@@ -2132,9 +2132,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
 	ScrPolyVertPnt = (TLVERTEX *) BufStart;
 
-/*===================================================================
-		Fill in Buffer ( Verts and Faces Simultaneously )
-===================================================================*/
+	/*===================================================================
+			Fill in Buffer ( Verts and Faces Simultaneously )
+	===================================================================*/
 
 	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
 	{
@@ -2209,58 +2209,58 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
 								switch( Off_Ptr->box & BOX_BOTHFLIP )
 								{
-									case BOX_XFLIP:							// X Flip
-										x3 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y1 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x1 = ( x3 - Xsize );
-										y3 = ( y1 + Ysize );
-										u1 = Box_Ptr->u2;
-										v1 = Box_Ptr->v1;
-										u2 = Box_Ptr->u1;
-										v2 = Box_Ptr->v2;
-										break;
+								case BOX_XFLIP:							// X Flip
+									x3 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y1 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x1 = ( x3 - Xsize );
+									y3 = ( y1 + Ysize );
+									u1 = Box_Ptr->u2;
+									v1 = Box_Ptr->v1;
+									u2 = Box_Ptr->u1;
+									v2 = Box_Ptr->v2;
+									break;
 
-									case BOX_YFLIP:							// Y Flip
-										x1 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y3 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x3 = ( x1 + Xsize );
-										y1 = ( y3 - Ysize );
-										u1 = Box_Ptr->u1;
-										v1 = Box_Ptr->v2;
-										u2 = Box_Ptr->u2;
-										v2 = Box_Ptr->v1;
-										break;
+								case BOX_YFLIP:							// Y Flip
+									x1 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y3 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x3 = ( x1 + Xsize );
+									y1 = ( y3 - Ysize );
+									u1 = Box_Ptr->u1;
+									v1 = Box_Ptr->v2;
+									u2 = Box_Ptr->u2;
+									v2 = Box_Ptr->v1;
+									break;
 
-									case BOX_BOTHFLIP:						// X & Y Flip
-										x3 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y3 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x1 = ( x3 - Xsize );
-										y1 = ( y3 - Ysize );
-										u1 = Box_Ptr->u2;
-										v1 = Box_Ptr->v2;
-										u2 = Box_Ptr->u1;
-										v2 = Box_Ptr->v1;
-										break;
+								case BOX_BOTHFLIP:						// X & Y Flip
+									x3 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y3 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x1 = ( x3 - Xsize );
+									y1 = ( y3 - Ysize );
+									u1 = Box_Ptr->u2;
+									v1 = Box_Ptr->v2;
+									u2 = Box_Ptr->u1;
+									v2 = Box_Ptr->v1;
+									break;
 
-									default:								// No Flip
-										x1 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y1 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x3 = ( x1 + Xsize );
-										y3 = ( y1 + Ysize );
-										u1 = Box_Ptr->u1;
-										v1 = Box_Ptr->v1;
-										u2 = Box_Ptr->u2;
-										v2 = Box_Ptr->v2;
-										break;
+								default:								// No Flip
+									x1 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y1 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x3 = ( x1 + Xsize );
+									y3 = ( y1 + Ysize );
+									u1 = Box_Ptr->u1;
+									v1 = Box_Ptr->v1;
+									u2 = Box_Ptr->u2;
+									v2 = Box_Ptr->v2;
+									break;
 
 								}
 							}
 
-/*===================================================================
-		Create Colour Value for polys
-===================================================================*/
+							/*===================================================================
+									Create Colour Value for polys
+							===================================================================*/
 
-									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
+							Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
 
 							ScrPolyVertPnt->sx = x1;
 							ScrPolyVertPnt->sy = y1;
@@ -2340,77 +2340,77 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 
 							renderObject->textureGroups[renderObject->numTextureGroups].numTriangles = ntris;
 							renderObject->textureGroups[renderObject->numTextureGroups].numVerts = 4;
-								renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
+							renderObject->textureGroups[renderObject->numTextureGroups].startIndex = start_index;
 #ifdef __3DS__
-								renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
+							renderObject->textureGroups[renderObject->numTextureGroups].startVert = batchVert;
 #else
-								renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
+							renderObject->textureGroups[renderObject->numTextureGroups].startVert = StartVert;
 #endif
 							renderObject->textureGroups[renderObject->numTextureGroups].texture = Tloadheader.TexHandle[Count];
 							renderObject->textureGroups[renderObject->numTextureGroups].colourkey = Tloadheader.ColourKey[Count];
 #ifdef __3DS__
-								renderObject->numTextureGroups++;
+							renderObject->numTextureGroups++;
 #else
-								INCREASE_TEXTURE_GROUPS(renderObject);
+							INCREASE_TEXTURE_GROUPS(renderObject);
 #endif
 
-								start_index += ntris*3; // each triangle has three indexes...
-								StartVert += 4;
-								/*
-								 * 3DS mid-draw flush — textured quad path (ScrPolyDispSolid).
-								 *
-								 * WHY THIS EXISTS:
-								 *   INCREASE_TEXTURE_GROUPS() asserts
-								 *   numTextureGroups < MAX_TEXTURE_GROUPS, which is 64 on
-								 *   3DS (600 on PC).  Loading screens and menus use one
-								 *   TEXTUREGROUP per sprite quad and easily pass 64.  The
-								 *   batch objects' textureGroups point at fixed scratch
-								 *   arrays of that size (RenderBufs' static scratch and
-								 *   stack arrays in oct2.cpp), so 3DS flushes instead.
-								 *
-								 * WHAT THE FIX DOES:
-								 *   After committing each group we check whether the array is
-								 *   full.  If so, we flush the accumulated batch immediately:
-								 *   unlock vertex/index buffers, issue draw_2d_object, then
-								 *   re-lock.  numTextureGroups, start_index, and batchVert are
-								 *   all reset to 0 so the next group fills the array from the
-								 *   beginning.  Each partial batch is a complete draw call.
-								 *
-								 * WHY batchVert INSTEAD OF StartVert FOR startVert:
-								 *   StartVert is a cumulative counter across the entire function
-								 *   call (unchanged on PC).  After a flush the vertex buffer is
-								 *   re-locked from offset 0, so the next group's vertices land
-								 *   at position 0 in the new buffer — not at whatever StartVert
-								 *   has accumulated.  batchVert tracks position within the
-								 *   current batch only; it resets to 0 on every flush so that
-								 *   textureGroup.startVert indices stay correct.
-								 *
-								 * CRITICAL ORDERING:
-								 *   start_index, StartVert, and batchVert are ALL advanced
-								 *   BEFORE this flush check, so a flush leaves start_index
-								 *   and batchVert at 0 for the first group of the next
-								 *   batch.  Advancing after the reset would offset that
-								 *   group by one quad.  StartVert is never reset: it keeps
-								 *   the MAXSCREENPOLYVERTS bound tied to pass 1's count.
-								 */
+							start_index += ntris*3; // each triangle has three indexes...
+							StartVert += 4;
+							/*
+							 * 3DS mid-draw flush — textured quad path (ScrPolyDispSolid).
+							 *
+							 * WHY THIS EXISTS:
+							 *   INCREASE_TEXTURE_GROUPS() asserts
+							 *   numTextureGroups < MAX_TEXTURE_GROUPS, which is 64 on
+							 *   3DS (600 on PC).  Loading screens and menus use one
+							 *   TEXTUREGROUP per sprite quad and easily pass 64.  The
+							 *   batch objects' textureGroups point at fixed scratch
+							 *   arrays of that size (RenderBufs' static scratch and
+							 *   stack arrays in oct2.cpp), so 3DS flushes instead.
+							 *
+							 * WHAT THE FIX DOES:
+							 *   After committing each group we check whether the array is
+							 *   full.  If so, we flush the accumulated batch immediately:
+							 *   unlock vertex/index buffers, issue draw_2d_object, then
+							 *   re-lock.  numTextureGroups, start_index, and batchVert are
+							 *   all reset to 0 so the next group fills the array from the
+							 *   beginning.  Each partial batch is a complete draw call.
+							 *
+							 * WHY batchVert INSTEAD OF StartVert FOR startVert:
+							 *   StartVert is a cumulative counter across the entire function
+							 *   call (unchanged on PC).  After a flush the vertex buffer is
+							 *   re-locked from offset 0, so the next group's vertices land
+							 *   at position 0 in the new buffer — not at whatever StartVert
+							 *   has accumulated.  batchVert tracks position within the
+							 *   current batch only; it resets to 0 on every flush so that
+							 *   textureGroup.startVert indices stay correct.
+							 *
+							 * CRITICAL ORDERING:
+							 *   start_index, StartVert, and batchVert are ALL advanced
+							 *   BEFORE this flush check, so a flush leaves start_index
+							 *   and batchVert at 0 for the first group of the next
+							 *   batch.  Advancing after the reset would offset that
+							 *   group by one quad.  StartVert is never reset: it keeps
+							 *   the MAXSCREENPOLYVERTS bound tied to pass 1's count.
+							 */
 #ifdef __3DS__
-								batchVert += 4;
-								if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
-									FSUnlockVertexBuffer(renderObject);
-									FSUnlockIndexBuffer(renderObject);
-									disable_zbuff();
-									cull_none();
-									draw_2d_object(renderObject);
-									reset_cull();
-									reset_zbuff();
-									renderObject->numTextureGroups = 0;
-									start_index = 0;
-									batchVert = 0;
-									FSLockPretransformedVertexBuffer(renderObject, &BufStart);
-									FSLockIndexBuffer(renderObject, &Indices);
-									ScrPolyVertPnt = (TLVERTEX *) BufStart;
-									ScrPolyFacePnt = (TRIANGLE *) Indices;
-								}
+							batchVert += 4;
+							if (renderObject->numTextureGroups >= MAX_TEXTURE_GROUPS) {
+								FSUnlockVertexBuffer(renderObject);
+								FSUnlockIndexBuffer(renderObject);
+								disable_zbuff();
+								cull_none();
+								draw_2d_object(renderObject);
+								reset_cull();
+								reset_zbuff();
+								renderObject->numTextureGroups = 0;
+								start_index = 0;
+								batchVert = 0;
+								FSLockPretransformedVertexBuffer(renderObject, &BufStart);
+								FSLockIndexBuffer(renderObject, &Indices);
+								ScrPolyVertPnt = (TLVERTEX *) BufStart;
+								ScrPolyFacePnt = (TRIANGLE *) Indices;
+							}
 #endif
 							Off_Ptr++;
 						}
@@ -2430,7 +2430,7 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 							x3 = ScrPolys[ i ].x3;
 							y3 = ScrPolys[ i ].y3;
 
-									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
+							Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
 
 							ScrPolyVertPnt->sx = x1;
 							ScrPolyVertPnt->sy = y1;
@@ -2569,9 +2569,9 @@ bool ScrPolyDispSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t * 
 		if( StartVert >= MAXSCREENPOLYVERTS ) break;
 	}
 
-/*===================================================================
-		Unlock the buffers and return the resume point
-===================================================================*/
+	/*===================================================================
+			Unlock the buffers and return the resume point
+	===================================================================*/
 
 	if (!FSUnlockVertexBuffer(renderObject))
 	{
@@ -2626,9 +2626,9 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	int				batchVert = 0;
 #endif
 
-/*===================================================================
-		Pass 1: count verts per texture page
-===================================================================*/
+	/*===================================================================
+			Pass 1: count verts per texture page
+	===================================================================*/
 	TotalVerts = 0;
 
 	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
@@ -2681,9 +2681,9 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 	ZValue = 1.0F;
 	RHWValue = ( 1.0F / ZValue );
 
-/*===================================================================
-		Lock the vertex and index buffers
-===================================================================*/
+	/*===================================================================
+			Lock the vertex and index buffers
+	===================================================================*/
 
 	if (!(FSLockPretransformedVertexBuffer(renderObject, &BufStart)))
 	{
@@ -2699,9 +2699,9 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 
 	ScrPolyVertPnt = (TLVERTEX *) BufStart;
 
-/*===================================================================
-		Pass 2: fill verts and indices, one texture group per quad
-===================================================================*/
+	/*===================================================================
+			Pass 2: fill verts and indices, one texture group per quad
+	===================================================================*/
 	for( Count = *TPage; Count <= MAXTPAGESPERTLOAD; Count++ )
 	{
 		if( Count == MAXTPAGESPERTLOAD ) Textured = false;
@@ -2775,57 +2775,57 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 
 								switch( Off_Ptr->box & BOX_BOTHFLIP )
 								{
-									case BOX_XFLIP:							// X Flip
-										x3 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y1 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x1 = ( x3 - Xsize );
-										y3 = ( y1 + Ysize );
-										u1 = Box_Ptr->u2;
-										v1 = Box_Ptr->v1;
-										u2 = Box_Ptr->u1;
-										v2 = Box_Ptr->v2;
-										break;
+								case BOX_XFLIP:							// X Flip
+									x3 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y1 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x1 = ( x3 - Xsize );
+									y3 = ( y1 + Ysize );
+									u1 = Box_Ptr->u2;
+									v1 = Box_Ptr->v1;
+									u2 = Box_Ptr->u1;
+									v2 = Box_Ptr->v2;
+									break;
 
-									case BOX_YFLIP:							// Y Flip
-										x1 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y3 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x3 = ( x1 + Xsize );
-										y1 = ( y3 - Ysize );
-										u1 = Box_Ptr->u1;
-										v1 = Box_Ptr->v2;
-										u2 = Box_Ptr->u2;
-										v2 = Box_Ptr->v1;
-										break;
+								case BOX_YFLIP:							// Y Flip
+									x1 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y3 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x3 = ( x1 + Xsize );
+									y1 = ( y3 - Ysize );
+									u1 = Box_Ptr->u1;
+									v1 = Box_Ptr->v2;
+									u2 = Box_Ptr->u2;
+									v2 = Box_Ptr->v1;
+									break;
 
-									case BOX_BOTHFLIP:						// X & Y Flip
-										x3 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y3 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x1 = ( x3 - Xsize );
-										y1 = ( y3 - Ysize );
-										u1 = Box_Ptr->u2;
-										v1 = Box_Ptr->v2;
-										u2 = Box_Ptr->u1;
-										v2 = Box_Ptr->v1;
-										break;
+								case BOX_BOTHFLIP:						// X & Y Flip
+									x3 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y3 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x1 = ( x3 - Xsize );
+									y1 = ( y3 - Ysize );
+									u1 = Box_Ptr->u2;
+									v1 = Box_Ptr->v2;
+									u2 = Box_Ptr->u1;
+									v2 = Box_Ptr->v1;
+									break;
 
-									default:								// No Flip
-										x1 = ( ScrPolys[ i ].Pos.x + Xoff );
-										y1 = ( ScrPolys[ i ].Pos.y + Yoff );
-										x3 = ( x1 + Xsize );
-										y3 = ( y1 + Ysize );
-										u1 = Box_Ptr->u1;
-										v1 = Box_Ptr->v1;
-										u2 = Box_Ptr->u2;
-										v2 = Box_Ptr->v2;
-										break;
+								default:								// No Flip
+									x1 = ( ScrPolys[ i ].Pos.x + Xoff );
+									y1 = ( ScrPolys[ i ].Pos.y + Yoff );
+									x3 = ( x1 + Xsize );
+									y3 = ( y1 + Ysize );
+									u1 = Box_Ptr->u1;
+									v1 = Box_Ptr->v1;
+									u2 = Box_Ptr->u2;
+									v2 = Box_Ptr->v2;
+									break;
 								}
 							}
 
-/*===================================================================
-		Create Colour Value for polys
-===================================================================*/
+							/*===================================================================
+									Create Colour Value for polys
+							===================================================================*/
 
-									Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
+							Colour = RGBA_MAKE2( ScrPolys[ i ].R, ScrPolys[ i ].G, ScrPolys[ i ].B, 255 );
 
 							ScrPolyVertPnt->sx = x1;
 							ScrPolyVertPnt->sy = y1;
@@ -2996,7 +2996,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							y3 = ScrPolys[ i ].y3;
 
 
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col1.R, ScrPolys[ i ].Col1.G, ScrPolys[ i ].Col1.B, 255 );
+							Colour = RGBA_MAKE2( ScrPolys[ i ].Col1.R, ScrPolys[ i ].Col1.G, ScrPolys[ i ].Col1.B, 255 );
 
 							ScrPolyVertPnt->sx = x1;
 							ScrPolyVertPnt->sy = y1;
@@ -3007,14 +3007,14 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							ScrPolyVertPnt->tv = v1;
 							ScrPolyVertPnt++;
 
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col2.R, ScrPolys[ i ].Col2.G, ScrPolys[ i ].Col2.B, 255 );
+							Colour = RGBA_MAKE2( ScrPolys[ i ].Col2.R, ScrPolys[ i ].Col2.G, ScrPolys[ i ].Col2.B, 255 );
 
 							ScrPolyVertPnt->sz = ZValue;
 							ScrPolyVertPnt->color = Colour;
 							ScrPolyVertPnt->rhw = RHWValue;
 							ScrPolyVertPnt++;
 
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col3.R, ScrPolys[ i ].Col3.G, ScrPolys[ i ].Col3.B, 255 );
+							Colour = RGBA_MAKE2( ScrPolys[ i ].Col3.R, ScrPolys[ i ].Col3.G, ScrPolys[ i ].Col3.B, 255 );
 
 							ScrPolyVertPnt->sx = x3;
 							ScrPolyVertPnt->sy = y3;
@@ -3025,7 +3025,7 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 							ScrPolyVertPnt->tv = v2;
 							ScrPolyVertPnt++;
 
-									Colour = RGBA_MAKE2( ScrPolys[ i ].Col4.R, ScrPolys[ i ].Col4.G, ScrPolys[ i ].Col4.B, 255 );
+							Colour = RGBA_MAKE2( ScrPolys[ i ].Col4.R, ScrPolys[ i ].Col4.G, ScrPolys[ i ].Col4.B, 255 );
 
 							ScrPolyVertPnt->sz = ZValue;
 							ScrPolyVertPnt->color = Colour;
@@ -3142,9 +3142,9 @@ bool ScrPolyDispNonSolid( RENDEROBJECT *renderObject, int16_t * TPage, u_int16_t
 		if( StartVert >= MAXSCREENPOLYVERTS ) break;
 	}
 
-/*===================================================================
-		Unlock the buffers and return the resume point
-===================================================================*/
+	/*===================================================================
+			Unlock the buffers and return the resume point
+	===================================================================*/
 
 	if (!FSUnlockVertexBuffer(renderObject))
 	{

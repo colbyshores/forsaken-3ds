@@ -42,8 +42,8 @@ struct OBJECT
 	QUAT				FinalQuat;	// what my current viewing angles are with the banking...
 
 	VECTOR				DirVector;			// Direction Vector
-//	VECTOR				UpVector; 			// Up Vector
-//	VECTOR				LeftVector; 		// Left Vector
+	//	VECTOR				UpVector; 			// Up Vector
+	//	VECTOR				LeftVector; 		// Left Vector
 	u_int16_t				Group;		// Group the Object...
 	VECTOR				Speed;		// Speed...x , y , z...Ship relative...
 	VECTOR				Angle;		// what my current Step Turn Angles Are...
@@ -86,7 +86,7 @@ struct OBJECT
 	float		Green;
 	float		Blue;
 
-//struct	COLTYPE	*		ColType;	//
+	//struct	COLTYPE	*		ColType;	//
 };
 
 

@@ -97,7 +97,7 @@ enum {
 	MODEL_PowerPod,				// 14
 	MODEL_PowerPod_LOD1,		// 15
 	MODEL_PyroliteAmmo,			// 16
-//	MODEL_PyroliteAmmo_LOD1,	// 17
+	//	MODEL_PyroliteAmmo_LOD1,	// 17
 	MODEL_Shield,				// 18
 	MODEL_Shield_LOD1,			// 19
 	MODEL_SussGunAmmo,			// 20
@@ -110,8 +110,8 @@ enum {
 	MODEL_Mugs_LOD1,			// 27
 	MODEL_Scatter,				// 28
 	MODEL_ScatterSmall,			// 29
-//	MODEL_Thief,				// 30
-//	MODEL_ThiefSmall,			// 31
+	//	MODEL_Thief,				// 30
+	//	MODEL_ThiefSmall,			// 31
 	MODEL_TitanStar,			// 32
 	MODEL_TitanStarSmall,		// 33
 	MODEL_Launcher,				// 34
@@ -128,29 +128,29 @@ enum {
 	MODEL_Quantum_LOD1, 		// 45
 	MODEL_Purge,				// 46
 	MODEL_Purge_LOD1,   		// 47
-//	MODEL_Spider,				// 48
-//	MODEL_Spider_LOD1,			// 49
+	//	MODEL_Spider,				// 48
+	//	MODEL_Spider_LOD1,			// 49
 	MODEL_HeatseakerPickup,		// 50
 	MODEL_HeatseakerPickup_LOD1,// 51
-//	MODEL_Smoke,				// 52
-//	MODEL_Smoke_LOD1,			// 53
+	//	MODEL_Smoke,				// 52
+	//	MODEL_Smoke_LOD1,			// 53
 	MODEL_PurgePickup,			// 54
 	MODEL_PurgePickup_LOD1, 	// 55
-//	MODEL_Parasite,				// 56
-//	MODEL_Parasite_LOD1,		// 57
+	//	MODEL_Parasite,				// 56
+	//	MODEL_Parasite_LOD1,		// 57
 	MODEL_Nitro,				// 58
 	MODEL_Nitro_LOD1,			// 59
-//	MODEL_Goggles,				// 60
-//	MODEL_Goggles_LOD1,			// 61
+	//	MODEL_Goggles,				// 60
+	//	MODEL_Goggles_LOD1,			// 61
 	MODEL_Inv,					// 62
 	MODEL_Inv_LOD1,				// 63
 	MODEL_Gold,					// 64
 	MODEL_Mantle,				// 65
 	MODEL_Mantle_LOD1,			// 66
-//	MODEL_Flare,				// 67
-//	MODEL_Flare_LOD1,			// 68
-//	MODEL_SpiderPod,			// 69
-//	MODEL_SpiderPod_LOD1,		// 70
+	//	MODEL_Flare,				// 67
+	//	MODEL_Flare_LOD1,			// 68
+	//	MODEL_SpiderPod,			// 69
+	//	MODEL_SpiderPod_LOD1,		// 70
 	MODEL_Crystal,				// 71
 	MODEL_Orb,					// 72
 	MODEL_Orb_LOD1,  			// 73
@@ -160,9 +160,9 @@ enum {
 	MODEL_Sphere,				// 77
 	MODEL_Sphere_LOD1,			// 78
 	MODEL_Sphere_LOD2,			// 79
-//	MODEL_Chaf,					// 80
-//	MODEL_Chaf_LOD1,			// 81
-//	MODEL_Panel,				// 82
+	//	MODEL_Chaf,					// 80
+	//	MODEL_Chaf_LOD1,			// 81
+	//	MODEL_Panel,				// 82
 	MODEL_GoldenPowerPod,		// 83
 	MODEL_GoldenPowerPod_LOD1,	// 84
 	MODEL_OrbitPulsar,			// 85
@@ -225,7 +225,7 @@ enum {
 	MODEL_Tom25,
 	MODEL_Tom26,
 
-/*--------------- Bikes -----------------*/
+	/*--------------- Bikes -----------------*/
 
 	MODEL_Borg,					// 127
 	MODEL_Borg_LOD1,
@@ -403,7 +403,7 @@ enum {
 	MODEL_Slick_Stealth_LOD3,
 	MODEL_Slick_Stealth_LOD4,
 
-/*---------------------------------------*/
+	/*---------------------------------------*/
 
 	MODEL_ExtraModels,			// 287
 };

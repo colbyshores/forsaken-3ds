@@ -116,8 +116,8 @@ static bool missing_folders( void )
 			Msg("Could not locate the '%s' folder...\n%s\n%s", folders[x],
 				"exe is most likely in the wrong directory.",
 				"or you just need to create the folder.");
-			return true;
-		}
+		return true;
+	}
 	return false;
 }
 
@@ -645,7 +645,7 @@ int main( int argc, char* argv[] )
 
 	return 0;
 
-FAILURE:
+	FAILURE:
 
 	CleanUpAndPostQuit();
 

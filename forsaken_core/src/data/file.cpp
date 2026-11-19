@@ -109,10 +109,10 @@ long Get_File_Size( char * Filename )
 
 	char * path = convert_path(Filename);
 
-  if ( !stat( path, &st ) )
+	if ( !stat( path, &st ) )
 	{
 		return (long) st.st_size;
-  }
+	}
 	else
 	{
 		DebugPrintf("file '%s' does not exist\n",path);
@@ -230,23 +230,23 @@ char* find_file( const char * str )
 		globfree(&glob_handle);
 	switch( glob(path, 0, find_globerr, &glob_handle) )
 	{
-		case 0:
-			glob_pos = 0;
-			DebugPrintf("file: found file \"%s\" (1 of %d)\n", glob_handle.gl_pathv[0], glob_handle.gl_pathc);
-			return find_strip_path(glob_handle.gl_pathv[glob_pos++]);
-			break;
-		case GLOB_NOSPACE:
-			DebugPrintf("file: find_file: ran out of memory!\n");
-			break;
-		case GLOB_ABORTED:
-			DebugPrintf("file: find_file: read error!\n");
-			break;
-		case GLOB_NOMATCH:
-			DebugPrintf("file: find_file: no match\n");
-			break;
-		default:
-			DebugPrintf("file: find_file: unknown return value from glob()\n");
-			break;
+	case 0:
+		glob_pos = 0;
+		DebugPrintf("file: found file \"%s\" (1 of %d)\n", glob_handle.gl_pathv[0], glob_handle.gl_pathc);
+		return find_strip_path(glob_handle.gl_pathv[glob_pos++]);
+		break;
+	case GLOB_NOSPACE:
+		DebugPrintf("file: find_file: ran out of memory!\n");
+		break;
+	case GLOB_ABORTED:
+		DebugPrintf("file: find_file: read error!\n");
+		break;
+	case GLOB_NOMATCH:
+		DebugPrintf("file: find_file: no match\n");
+		break;
+	default:
+		DebugPrintf("file: find_file: unknown return value from glob()\n");
+		break;
 	}
 	return nullptr;
 }

@@ -89,13 +89,13 @@ static bool weapon_is_assisted( int8_t w )
 {
 	switch( w )
 	{
-		case AA_LASER:
-		case AA_NME_LASER:
-		case AA_NME_LIGHTNING:
-		case AA_NME_POWERLASER:
-			return false;
-		default:
-			return true;
+	case AA_LASER:
+	case AA_NME_LASER:
+	case AA_NME_LIGHTNING:
+	case AA_NME_POWERLASER:
+		return false;
+	default:
+		return true;
 	}
 }
 
@@ -116,8 +116,8 @@ static bool consider_target( const VECTOR *bullet_pos, const VECTOR *bullet_dir,
 	dir_to_target.z = target_pos->z - bullet_pos->z;
 
 	dist_sq = dir_to_target.x*dir_to_target.x
-			+ dir_to_target.y*dir_to_target.y
-			+ dir_to_target.z*dir_to_target.z;
+	+ dir_to_target.y*dir_to_target.y
+	+ dir_to_target.z*dir_to_target.z;
 
 	/* Skip targets past max range — falloff would zero them anyway */
 	if( dist_sq >= AIM_ASSIST_FAR_RANGE * AIM_ASSIST_FAR_RANGE )
@@ -228,7 +228,7 @@ bool aim_assist_steer( VECTOR *bullet_pos, VECTOR *bullet_dir,
 
 	/* Effective per-frame turn = base × falloff × user strength */
 	turn_rad = (AIM_ASSIST_TURN_RATE_DEG * (3.14159265F / 180.0F))
-			 * falloff * strength;
+	* falloff * strength;
 
 	/* How far off is the bullet from the target direction? */
 	{

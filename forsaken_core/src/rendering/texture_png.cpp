@@ -149,7 +149,7 @@ int load_image( texture_image_t * image, int /*mipmap*/ )
 	image->data = data;
 	return 0;
 
-fail:
+	fail:
 	png_destroy_read_struct (&png_ptr, &info_ptr, nullptr);
 	free (row_pointers);
 	free (data);

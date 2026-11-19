@@ -321,109 +321,65 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 			vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 
 			/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-		/* Skip the colour pass when the previous call left the baked
-		 * colours in place and this one would only copy them again, as
-		 * for the second stereo eye of a frame. */
-		if( !( color_already_clean && !ShowPlaneRGB && WhiteOut == 0.0F &&
-		       GroupWaterInfo[group] == WATERSTATE_NOWATER ) )
-		{
-			if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
+			/* Skip the colour pass when the previous call left the baked
+			 * colours in place and this one would only copy them again, as
+			 * for the second stereo eye of a frame. */
+			if( !( color_already_clean && !ShowPlaneRGB && WhiteOut == 0.0F &&
+				   GroupWaterInfo[group] == WATERSTATE_NOWATER ) )
 			{
-				if( WhiteOut == 0.0F )
+				if( GroupWaterInfo[group] == WATERSTATE_NOWATER || ShowPlaneRGB )
 				{
-					if ( ShowPlaneRGB )
+					if( WhiteOut == 0.0F )
 					{
-						while( vert --)
+						if ( ShowPlaneRGB )
 						{
-							LVert++;
-							OrigLVert++;
+							while( vert --)
+							{
+								LVert++;
+								OrigLVert++;
+							}
 						}
+						else
+						{
+							while( vert --)
+							{
+								LVert->color = OrigLVert->color;
+								LVert++;
+								OrigLVert++;
+							}
+							Mloadheader->Group[group].color_clean = 1;
+						}
+
 					}
 					else
 					{
+						//	Special Lighting effects
 						while( vert --)
 						{
-							LVert->color = OrigLVert->color;
+							x = (float)((int) (OrigLVert->x * 0.35F) % 360);
+							y = (float)((int) (OrigLVert->y * 0.35F) % 360);
+							z = (float)((int) (OrigLVert->z * 0.35F) % 360);
+							col = OrigLVert->color;
+							col &= 0xffff;
+							b = (int)  ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+							b+= intWhiteOut;
+							if( b > 255 )
+								b = 255;
+							col |= (b<<24)+(b<<16);
+							LVert->color = col;
 							LVert++;
 							OrigLVert++;
-						}
-						Mloadheader->Group[group].color_clean = 1;
-					}
 
-				}
-				else
+						}
+					}
+				}else if( GroupWaterInfo[group] == WATERSTATE_ALLWATER )
 				{
+					// ****************** Full Water Effect ********************************
+					OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
+					LVert = VertBase;
+					vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
 					//	Special Lighting effects
 					while( vert --)
-					{
-						x = (float)((int) (OrigLVert->x * 0.35F) % 360);
-						y = (float)((int) (OrigLVert->y * 0.35F) % 360);
-						z = (float)((int) (OrigLVert->z * 0.35F) % 360);
-						col = OrigLVert->color;
-						col &= 0xffff;
-						b = (int)  ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
-						b+= intWhiteOut;
-						if( b > 255 )
-							b = 255;
-						col |= (b<<24)+(b<<16);
-						LVert->color = col;
-						LVert++;
-						OrigLVert++;
-
-					}
-				}
-			}else if( GroupWaterInfo[group] == WATERSTATE_ALLWATER )
-			{
-				// ****************** Full Water Effect ********************************
-				OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
-				LVert = VertBase;
-				vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
-				//	Special Lighting effects
-				while( vert --)
-				{
-					int orig_a;
-					x = (float)((int) (OrigLVert->x * 0.35F) % 360);
-					y = (float)((int) (OrigLVert->y * 0.35F) % 360);
-					z = (float)((int) (OrigLVert->z * 0.35F) % 360);
-					col = OrigLVert->color;
-					r = RGBA_GETRED(col);
-					g = RGBA_GETGREEN(col);
-					b = RGBA_GETBLUE(col);
-					orig_a = RGBA_GETALPHA(col);
-
-					r >>=2;
-					g >>=2;
-					b >>=2;
-					intensity = (float) ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
-					r += (int) (GroupWaterIntensity_Red[group] * intensity);
-					if( r > 255 )
-						r = 255;
-					g += (int) (GroupWaterIntensity_Green[group] * intensity);
-					if( g > 255 )
-						g = 255;
-					b += (int) (GroupWaterIntensity_Blue[group] * intensity);
-					if( b > 255 )
-						b = 255;
-					/* Preserve the baked vertex alpha (typically 255 for
-					 * solid level mesh). The citro3d renderer alpha-blends
-					 * every textured surface with the vertex alpha, so a
-					 * fixed 128 here makes underwater walls render 50%
-					 * transparent. */
-					LVert->color = RGBA_MAKE( r ,g ,b , orig_a );
-					LVert++;
-					OrigLVert++;
-				}
-				// ****************** End of Water Effect ******************************
-			}else{
-				// ****************** Partial Water Effect ******************************
-				OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
-				LVert = VertBase;
-				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-				vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
-				//	Special Lighting effects
-				while( vert --)
-				{
-					if( OrigLVert->y < GroupWaterLevel[group] )
 					{
 						int orig_a;
 						x = (float)((int) (OrigLVert->x * 0.35F) % 360);
@@ -448,25 +404,69 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 						b += (int) (GroupWaterIntensity_Blue[group] * intensity);
 						if( b > 255 )
 							b = 255;
-						/* Preserve baked alpha — see ALLWATER branch
-						 * above for the rationale. */
+						/* Preserve the baked vertex alpha (typically 255 for
+						 * solid level mesh). The citro3d renderer alpha-blends
+						 * every textured surface with the vertex alpha, so a
+						 * fixed 128 here makes underwater walls render 50%
+						 * transparent. */
 						LVert->color = RGBA_MAKE( r ,g ,b , orig_a );
-					}else{
-						LVert->color = OrigLVert->color;
+						LVert++;
+						OrigLVert++;
 					}
-					LVert++;
-					OrigLVert++;
+					// ****************** End of Water Effect ******************************
+				}else{
+					// ****************** Partial Water Effect ******************************
+					OrigLVert = Mloadheader->Group[group].originalVerts[mesh];
+					LVert = VertBase;
+					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+					vert = Mloadheader->Group[group].num_verts_per_mesh[mesh];
+					//	Special Lighting effects
+					while( vert --)
+					{
+						if( OrigLVert->y < GroupWaterLevel[group] )
+						{
+							int orig_a;
+							x = (float)((int) (OrigLVert->x * 0.35F) % 360);
+							y = (float)((int) (OrigLVert->y * 0.35F) % 360);
+							z = (float)((int) (OrigLVert->z * 0.35F) % 360);
+							col = OrigLVert->color;
+							r = RGBA_GETRED(col);
+							g = RGBA_GETGREEN(col);
+							b = RGBA_GETBLUE(col);
+							orig_a = RGBA_GETALPHA(col);
+
+							r >>=2;
+							g >>=2;
+							b >>=2;
+							intensity = (float) ( ( fast_sinf( D2R( x + cral ) ) + fast_sinf( D2R( y + cral ) ) + fast_sinf( D2R( z + cral ) ) ) * 127.0F * 0.3333333F + 128.0F ) ;
+							r += (int) (GroupWaterIntensity_Red[group] * intensity);
+							if( r > 255 )
+								r = 255;
+							g += (int) (GroupWaterIntensity_Green[group] * intensity);
+							if( g > 255 )
+								g = 255;
+							b += (int) (GroupWaterIntensity_Blue[group] * intensity);
+							if( b > 255 )
+								b = 255;
+							/* Preserve baked alpha — see ALLWATER branch
+							 * above for the rationale. */
+							LVert->color = RGBA_MAKE( r ,g ,b , orig_a );
+						}else{
+							LVert->color = OrigLVert->color;
+						}
+						LVert++;
+						OrigLVert++;
+					}
+					// ****************** End of Water Effect ******************************
 				}
-				// ****************** End of Water Effect ******************************
 			}
-		}
 		}
 #ifdef GPU_LIGHTING
 		/* Skip the per-vertex CPU dynamic-light loop — the vertex shader
 		 * adds light contribution on top of the baked-color baseline that
 		 * was already restored above. See render_c3d.cpp::c3d_upload_xlights
 		 * and shaders/render_c3d.v.pica. */
-/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+		/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 #else
 		if( WhiteOut == 0.0F )
 		{
@@ -658,7 +658,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 											distance = (x*x) + (y*y) + (z*z);
 
 											if ( distance <  SizeX2  )
-											/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+												/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 											{
 
 												if( distance > 0.0F )
@@ -679,7 +679,7 @@ bool	XLight1Group( MLOADHEADER * Mloadheader, u_int16_t group )
 													{
 														// Lights Are Go....
 														intense = ( ( OSize - distance ) / ( 0.75F * OSize ) ) * ( ( Cosa - CosArc ) / ( 1.0F - CosArc ) );
-													/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+														/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
 													}else{
 														continue;
 													}
@@ -960,7 +960,7 @@ bool	XLightMxloadHeader( MXLOADHEADER * MXloadheader , VECTOR * Pos , float Radi
 									col |= tempiA;
 									LVert->color = col;
 								}
-PLOP:
+								PLOP:
 								LVert++;
 							}
 							break;
@@ -1184,7 +1184,7 @@ bool	XLightMxaloadHeader( MXALOADHEADER * MXloadheader , VECTOR * Pos , float Ra
 									col |= tempiA;
 									LVert->color = col;
 								}
-PLOP2:
+								PLOP2:
 								LVert++;
 							}
 							break;

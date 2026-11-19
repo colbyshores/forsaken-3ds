@@ -193,7 +193,7 @@ bool sound_listener_velocity( float x, float y, float z )
 bool sound_listener_orientation(
 	float fx, float fy, float fz, // forward vector
 	float ux, float uy, float uz  // up vector
-)
+	)
 {
 	float vector[6] = {fx,fy,-fz,ux,uy,-uz};
 	alListenerfv(AL_ORIENTATION, &vector[0]);

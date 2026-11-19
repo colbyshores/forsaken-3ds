@@ -349,13 +349,13 @@ SFXNAME	Sfx_Filenames[MAX_SFX] =
 };
 
 struct SFX_HOLDER {
-		bool Used;
-		u_int32_t  UniqueID;
-		int SndObjIndex;
-		int SfxFlags;
-		int16_t TriggerSfx;
-		bool OnPause;
-		float PauseValue;
+	bool Used;
+	u_int32_t  UniqueID;
+	int SndObjIndex;
+	int SfxFlags;
+	int16_t TriggerSfx;
+	bool OnPause;
+	float PauseValue;
 	int SfxBufferIndex;
 	sound_source_t * source;
 };
@@ -779,13 +779,13 @@ bool SetPosVelDir_Listner( VECTOR * Pos , VECTOR * Velocity , MATRIX * Mat )
 		Pos->x / 128.0F,
 		Pos->y / 128.0F,
 		Pos->z / 128.0F
-	)) return false;
+		)) return false;
 
 	if(!sound_listener_velocity(
 		Velocity->x, // / 128.0F,
 		Velocity->y, // / 128.0F,
 		Velocity->z // / 128.0F,
-	)) return false;
+		)) return false;
 
 	ApplyMatrix( Mat, &SlideUp, &UpVector ); /* Calc Direction Vector */
 	ApplyMatrix( Mat, &Forward, &ForwardVector ); /* Calc Direction Vector */
@@ -797,7 +797,7 @@ bool SetPosVelDir_Listner( VECTOR * Pos , VECTOR * Velocity , MATRIX * Mat )
 		UpVector.x,
 		UpVector.y,
 		UpVector.z
-	)) return false;
+		)) return false;
 
 	return true;
 }
@@ -932,7 +932,7 @@ bool SfxExists( u_int16_t sfx, char *name )
 
 	// get pointer to extension
 	if ( ! (ptr = strstr(fullpath,".wav")))
-	  return false;
+		return false;
 
 	// remove the extension
 	*ptr = 0;
@@ -1015,10 +1015,10 @@ int16_t ReturnSFXIndex( char *file )
 			if ( !strcasecmp( Sfx_Filenames[ i ].Name, file ) )
 			{
 				RequestSfx( i );
-				return i;
-			}
-		}else
-			break;
+			return i;
+		}
+	}else
+	break;
 
 	// look up sfx in table of possible level spec sfx ( neccesary in order to get correct flags )...
 	i = 0;
@@ -1722,9 +1722,9 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 	int flags;
 
 	if( !bSoundEnabled )
-{
+	{
 		return false;
-}
+	}
 
 	flags = Sfx_Filenames[ Sfx ].Flags;
 
@@ -1796,7 +1796,7 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 		SfxHolder[ HolderIndex ].SndObjIndex = sndobj_index;
 		SfxHolder[ HolderIndex ].SfxBufferIndex = InitLoopingSfx(
 			Sfx, offset, Group, SfxPos, Freq, VolModify, type, HolderIndex, Effects, SfxHolder[ HolderIndex ].UniqueID
-		);
+			);
 		if ( SfxHolder[ HolderIndex ].SfxBufferIndex < 0 )
 			return false;
 		return true;
@@ -1890,13 +1890,13 @@ bool StartPannedSfx(int16_t Sfx, u_int16_t *Group , VECTOR * SfxPos, float Freq,
 				Distance,
 				Volume,
 				Effects
-			);
+				);
 		}
 
 		if ( flags & SFX_Looping )
-				sound_play_looping( SfxHolder[ HolderIndex ].source );
+			sound_play_looping( SfxHolder[ HolderIndex ].source );
 		else
-				sound_play( SfxHolder[ HolderIndex ].source );
+			sound_play( SfxHolder[ HolderIndex ].source );
 	}
 
 	return true;
@@ -2464,7 +2464,7 @@ void ProcessLoopingSfx( void )
 				Distance,
 				Volume,
 				SpotSfxList[ i ].Effects
-			);
+				);
 
 			if( ! sound_is_playing( (sound_source_t*)SpotSfxList[ i ].source ) )
 				sound_play_looping((sound_source_t*)SpotSfxList[ i ].source);
@@ -2664,7 +2664,7 @@ bool UpdateTaunt( u_int32_t uid, u_int16_t Group, VECTOR *SfxPos )
 			Distance,
 			Volume,
 			SPOT_SFX_TYPE_Taunt
-		);
+			);
 	}
 	else
 	{
@@ -2745,39 +2745,39 @@ int EnemyBikeNum( u_int16_t type )
 	switch( type )
 	{
 	case ENEMY_Bike_Lokasenna:
-			return 0;
+		return 0;
 	case ENEMY_Bike_Beard:
-			return 1;
+		return 1;
 	case ENEMY_Bike_LAJay:
-			return 2;
+		return 2;
 	case ENEMY_Bike_ExCop:
-			return 3;
+		return 3;
 	case ENEMY_Bike_RexHardy:
-			return 4;
+		return 4;
 	case ENEMY_Bike_Foetoid:
-			return 5;
+		return 5;
 	case ENEMY_Bike_NimSoo:
-			return 6;
+		return 6;
 	case ENEMY_Bike_Nutta:
-			return 7;
+		return 7;
 	case ENEMY_Bike_Sceptre:
-			return 8;
+		return 8;
 	case ENEMY_Bike_Jo:
-			return 9;
+		return 9;
 	case ENEMY_Bike_CuvelClark:
-			return 10;
+		return 10;
 	case ENEMY_Bike_HK5:
-			return 11;
+		return 11;
 	case ENEMY_Bike_Nubia:
-			return 12;
+		return 12;
 	case ENEMY_Bike_Mofisto:
-			return 13;
+		return 13;
 	case ENEMY_Bike_Cerbero:
-			return 14;
+		return 14;
 	case ENEMY_Bike_Slick:
-			return 15;
+		return 15;
 	case ENEMY_Bike_FlyGirl:
-			return 16;
+		return 16;
 	default:
 		return INDEX_NONE;
 	}

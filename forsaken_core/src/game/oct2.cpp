@@ -3531,10 +3531,10 @@ bool MainGameRender(void)
 		 * it can be re-enabled if performance allows. */
 		if( false )
 #else
-			if( RearCameraActive && !RearCameraDisable )
+		if( RearCameraActive && !RearCameraDisable )
 #endif
-			{
-				CameraRendering = CamRendering::Rear;
+		{
+			CameraRendering = CamRendering::Rear;
 
 			CurrentCamera.enable = 1;
 			CurrentCamera.UseLowestLOD = true;

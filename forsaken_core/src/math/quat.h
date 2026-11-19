@@ -35,7 +35,7 @@ struct SHORTQUAT {
 };
 
 class QUAT {
-public:
+	public:
 	float	w;
 	float	x;
 	float	y;
@@ -54,7 +54,7 @@ public:
 };
 
 class QUATLERP {
-public:
+	public:
 	QUAT	start;		// Starting QUATERNION
 	QUAT	end;		// Ending QUATERNION
 	QUAT *	crnt;		// Current QUATERNION to change

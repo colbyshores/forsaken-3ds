@@ -142,227 +142,227 @@ void ProcessPolys( void )
 
 		switch( Polys[i].SeqNum )
 		{
-			case POLY_NOTHING:								// Nothing?
-				break;
+		case POLY_NOTHING:								// Nothing?
+			break;
 
-			case POLY_PULSAR_TRAIL:							// Pulsar Trail?
-				break;
+		case POLY_PULSAR_TRAIL:							// Pulsar Trail?
+			break;
 
-			case POLY_AFTERBURNER:							// Afterburner Trail?
-				break;
+		case POLY_AFTERBURNER:							// Afterburner Trail?
+			break;
 
-			case POLY_LASER:								// Laser?
-				Polys[i].Frame += ( framelag / 4.0F );
-				if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
-				{
-					Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
-										* (*Polys[i].Frm_Info)->Num_Frames );
-				}
-				break;
+		case POLY_LASER:								// Laser?
+			Polys[i].Frame += ( framelag / 4.0F );
+			if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
+			{
+				Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
+									* (*Polys[i].Frm_Info)->Num_Frames );
+			}
+			break;
 
-			case POLY_POWERLASER:							// Laser?
+		case POLY_POWERLASER:							// Laser?
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+			Polys[i].Frame += ( framelag / Polys[i].AnimSpeed );
+			if( Polys[i].Frame >= (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 )  )
+			{
+				Polys[i].Frame = ( (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 ) ) - 0.01F;
+			}
+			break;
+
+		case POLY_INVBITS:								// Bits?
+			Polys[i].Frame += ( framelag / 6.0F );
+			if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
+			{
+				Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
+									/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+									* (*Polys[i].Frm_Info)->Num_Frames );
+			}
+
+			if( Polys[ i ].Qlerp.time != 1.0F )
+			{
 				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-				Polys[i].Frame += ( framelag / Polys[i].AnimSpeed );
-				if( Polys[i].Frame >= (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 )  )
-				{
-					Polys[i].Frame = ( (float) ( (*Polys[i].Frm_Info)->Num_Frames - 2 ) ) - 0.01F;
-				}
-				break;
+				Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
+				if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
 
-			case POLY_INVBITS:								// Bits?
-				Polys[i].Frame += ( framelag / 6.0F );
-				if( Polys[i].Frame >= (*Polys[i].Frm_Info)->Num_Frames )
-				{
-					Polys[i].Frame -= ( ( Polys[i].Frame / (*Polys[i].Frm_Info)->Num_Frames )
-										/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-										* (*Polys[i].Frm_Info)->Num_Frames );
-				}
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col1.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col1.R = 0;
+				else Polys[ i ].Col1.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col2.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col2.R = 0;
+				else Polys[ i ].Col2.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col3.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col3.R = 0;
+				else Polys[ i ].Col3.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col4.R = 0;
+				else Polys[ i ].Col4.R = (u_int8_t) R;
 
-				if( Polys[ i ].Qlerp.time != 1.0F )
-				{
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
-					if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col1.G = 0;
+				else Polys[ i ].Col1.G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col2.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col2.G = 0;
+				else Polys[ i ].Col2.G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col3.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col3.G = 0;
+				else Polys[ i ].Col3.G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col4.G = 0;
+				else Polys[ i ].Col4.G = (u_int8_t) G;
 
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col1.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col1.R = 0;
-					else Polys[ i ].Col1.R = (u_int8_t) R;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col2.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col2.R = 0;
-					else Polys[ i ].Col2.R = (u_int8_t) R;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col3.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col3.R = 0;
-					else Polys[ i ].Col3.R = (u_int8_t) R;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col4.R = 0;
-					else Polys[ i ].Col4.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col1.B = 0;
+				else Polys[ i ].Col1.B = (u_int8_t) B;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col2.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col2.B = 0;
+				else Polys[ i ].Col2.B = (u_int8_t) B;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col3.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col3.B = 0;
+				else Polys[ i ].Col3.B = (u_int8_t) B;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col4.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col4.B = 0;
+				else Polys[ i ].Col4.B = (u_int8_t) B;
 
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col1.G = 0;
-					else Polys[ i ].Col1.G = (u_int8_t) G;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col2.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col2.G = 0;
-					else Polys[ i ].Col2.G = (u_int8_t) G;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col3.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col3.G = 0;
-					else Polys[ i ].Col3.G = (u_int8_t) G;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col4.G = 0;
-					else Polys[ i ].Col4.G = (u_int8_t) G;
+				Polys[ i ].Qlerp.Step();
 
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col1.B = 0;
-					else Polys[ i ].Col1.B = (u_int8_t) B;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col2.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col2.B = 0;
-					else Polys[ i ].Col2.B = (u_int8_t) B;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col3.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col3.B = 0;
-					else Polys[ i ].Col3.B = (u_int8_t) B;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col4.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col4.B = 0;
-					else Polys[ i ].Col4.B = (u_int8_t) B;
+				Polys[ i ].Quat.ToMatrix(&TempMat);
+				MatrixTranspose( &TempMat, &TempInvMat );
+				TempInvMat._41 = Ships[ Polys[ i ].Ship ].Object.Pos.x;
+				TempInvMat._42 = Ships[ Polys[ i ].Ship ].Object.Pos.y;
+				TempInvMat._43 = Ships[ Polys[ i ].Ship ].Object.Pos.z;
 
-					Polys[ i ].Qlerp.Step();
+				NewShieldVerts[ 0 ].x = ShieldVerts[ 0 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 0 ].y = ShieldVerts[ 0 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 0 ].z = ShieldVerts[ 0 ].z;
+				NewShieldVerts[ 1 ].x = ShieldVerts[ 1 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 1 ].y = ShieldVerts[ 1 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 1 ].z = ShieldVerts[ 1 ].z;
+				NewShieldVerts[ 2 ].x = ShieldVerts[ 2 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 2 ].y = ShieldVerts[ 2 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 2 ].z = ShieldVerts[ 2 ].z;
+				NewShieldVerts[ 3 ].x = ShieldVerts[ 3 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 3 ].y = ShieldVerts[ 3 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 3 ].z = ShieldVerts[ 3 ].z;
 
-					Polys[ i ].Quat.ToMatrix(&TempMat);
-					MatrixTranspose( &TempMat, &TempInvMat );
-					TempInvMat._41 = Ships[ Polys[ i ].Ship ].Object.Pos.x;
-					TempInvMat._42 = Ships[ Polys[ i ].Ship ].Object.Pos.y;
-					TempInvMat._43 = Ships[ Polys[ i ].Ship ].Object.Pos.z;
-
-					NewShieldVerts[ 0 ].x = ShieldVerts[ 0 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 0 ].y = ShieldVerts[ 0 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 0 ].z = ShieldVerts[ 0 ].z;
-					NewShieldVerts[ 1 ].x = ShieldVerts[ 1 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 1 ].y = ShieldVerts[ 1 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 1 ].z = ShieldVerts[ 1 ].z;
-					NewShieldVerts[ 2 ].x = ShieldVerts[ 2 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 2 ].y = ShieldVerts[ 2 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 2 ].z = ShieldVerts[ 2 ].z;
-					NewShieldVerts[ 3 ].x = ShieldVerts[ 3 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 3 ].y = ShieldVerts[ 3 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 3 ].z = ShieldVerts[ 3 ].z;
-
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 0 ], &Polys[ i ].Pos1 );
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 1 ], &Polys[ i ].Pos2 );
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 2 ], &Polys[ i ].Pos3 );
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 3 ], &Polys[ i ].Pos4 );
-				}
-				else
-				{
-					KillUsedPoly( i );
-				}
-				break;
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 0 ], &Polys[ i ].Pos1 );
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 1 ], &Polys[ i ].Pos2 );
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 2 ], &Polys[ i ].Pos3 );
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 3 ], &Polys[ i ].Pos4 );
+			}
+			else
+			{
+				KillUsedPoly( i );
+			}
+			break;
 
 			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-			case POLY_SHIELD:								// Ship Shield Effect>
-				if( Polys[ i ].Qlerp.time != 1.0F )
-				{
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
-					if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
+		case POLY_SHIELD:								// Ship Shield Effect>
+			if( Polys[ i ].Qlerp.time != 1.0F )
+			{
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				Polys[ i ].Qlerp.time += ( Polys[ i ].TimeStep * framelag );
+				if( Polys[ i ].Qlerp.time > 1.0F ) Polys[ i ].Qlerp.time = 1.0F;
 
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col1.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col1.R = 0;
-					else Polys[ i ].Col1.R = (u_int8_t) R;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col2.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col2.R = 0;
-					else Polys[ i ].Col2.R = (u_int8_t) R;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col3.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col3.R = 0;
-					else Polys[ i ].Col3.R = (u_int8_t) R;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
-					if( R < 0.0F ) Polys[ i ].Col4.R = 0;
-					else Polys[ i ].Col4.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col1.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col1.R = 0;
+				else Polys[ i ].Col1.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col2.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col2.R = 0;
+				else Polys[ i ].Col2.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col3.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col3.R = 0;
+				else Polys[ i ].Col3.R = (u_int8_t) R;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				R = ( (float) Polys[ i ].Col4.R ) - ( 5.0F * framelag );
+				if( R < 0.0F ) Polys[ i ].Col4.R = 0;
+				else Polys[ i ].Col4.R = (u_int8_t) R;
 
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col1.G = 0;
-					else Polys[ i ].Col1.G = (u_int8_t) G;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col2.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col2.G = 0;
-					else Polys[ i ].Col2.G = (u_int8_t) G;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col3.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col3.G = 0;
-					else Polys[ i ].Col3.G = (u_int8_t) G;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
-					if( G < 0.0F ) Polys[ i ].Col4.G = 0;
-					else Polys[ i ].Col4.G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col1.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col1.G = 0;
+				else Polys[ i ].Col1.G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col2.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col2.G = 0;
+				else Polys[ i ].Col2.G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col3.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col3.G = 0;
+				else Polys[ i ].Col3.G = (u_int8_t) G;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				G = ( (float) Polys[ i ].Col4.G ) - ( 5.0F * framelag );
+				if( G < 0.0F ) Polys[ i ].Col4.G = 0;
+				else Polys[ i ].Col4.G = (u_int8_t) G;
 
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col1.B = 0;
-					else Polys[ i ].Col1.B = (u_int8_t) B;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col2.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col2.B = 0;
-					else Polys[ i ].Col2.B = (u_int8_t) B;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col3.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col3.B = 0;
-					else Polys[ i ].Col3.B = (u_int8_t) B;
-					/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-					B = ( (float) Polys[ i ].Col4.B ) - ( 5.0F * framelag );
-					if( B < 0.0F ) Polys[ i ].Col4.B = 0;
-					else Polys[ i ].Col4.B = (u_int8_t) B;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col1.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col1.B = 0;
+				else Polys[ i ].Col1.B = (u_int8_t) B;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col2.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col2.B = 0;
+				else Polys[ i ].Col2.B = (u_int8_t) B;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col3.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col3.B = 0;
+				else Polys[ i ].Col3.B = (u_int8_t) B;
+				/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+				B = ( (float) Polys[ i ].Col4.B ) - ( 5.0F * framelag );
+				if( B < 0.0F ) Polys[ i ].Col4.B = 0;
+				else Polys[ i ].Col4.B = (u_int8_t) B;
 
-					Polys[ i ].Qlerp.Step();
+				Polys[ i ].Qlerp.Step();
 
-					Polys[ i ].Quat.ToMatrix(&TempMat);
-					MatrixTranspose( &TempMat, &TempInvMat );
-					TempInvMat._41 = Ships[ Polys[ i ].Ship ].Object.Pos.x;
-					TempInvMat._42 = Ships[ Polys[ i ].Ship ].Object.Pos.y;
-					TempInvMat._43 = Ships[ Polys[ i ].Ship ].Object.Pos.z;
+				Polys[ i ].Quat.ToMatrix(&TempMat);
+				MatrixTranspose( &TempMat, &TempInvMat );
+				TempInvMat._41 = Ships[ Polys[ i ].Ship ].Object.Pos.x;
+				TempInvMat._42 = Ships[ Polys[ i ].Ship ].Object.Pos.y;
+				TempInvMat._43 = Ships[ Polys[ i ].Ship ].Object.Pos.z;
 
-					NewShieldVerts[ 0 ].x = ShieldVerts[ 0 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 0 ].y = ShieldVerts[ 0 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 0 ].z = ShieldVerts[ 0 ].z;
-					NewShieldVerts[ 1 ].x = ShieldVerts[ 1 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 1 ].y = ShieldVerts[ 1 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 1 ].z = ShieldVerts[ 1 ].z;
-					NewShieldVerts[ 2 ].x = ShieldVerts[ 2 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 2 ].y = ShieldVerts[ 2 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 2 ].z = ShieldVerts[ 2 ].z;
-					NewShieldVerts[ 3 ].x = ShieldVerts[ 3 ].x * Polys[ i ].Scale;
-					NewShieldVerts[ 3 ].y = ShieldVerts[ 3 ].y * Polys[ i ].Scale;
-					NewShieldVerts[ 3 ].z = ShieldVerts[ 3 ].z;
+				NewShieldVerts[ 0 ].x = ShieldVerts[ 0 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 0 ].y = ShieldVerts[ 0 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 0 ].z = ShieldVerts[ 0 ].z;
+				NewShieldVerts[ 1 ].x = ShieldVerts[ 1 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 1 ].y = ShieldVerts[ 1 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 1 ].z = ShieldVerts[ 1 ].z;
+				NewShieldVerts[ 2 ].x = ShieldVerts[ 2 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 2 ].y = ShieldVerts[ 2 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 2 ].z = ShieldVerts[ 2 ].z;
+				NewShieldVerts[ 3 ].x = ShieldVerts[ 3 ].x * Polys[ i ].Scale;
+				NewShieldVerts[ 3 ].y = ShieldVerts[ 3 ].y * Polys[ i ].Scale;
+				NewShieldVerts[ 3 ].z = ShieldVerts[ 3 ].z;
 
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 0 ], &Polys[ i ].Pos1 );
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 1 ], &Polys[ i ].Pos2 );
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 2 ], &Polys[ i ].Pos3 );
-					VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 3 ], &Polys[ i ].Pos4 );
-				}
-				else
-				{
-					KillUsedPoly( i );
-				}
-				break;
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 0 ], &Polys[ i ].Pos1 );
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 1 ], &Polys[ i ].Pos2 );
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 2 ], &Polys[ i ].Pos3 );
+				VisPolyApplyMatrix( &TempInvMat, &NewShieldVerts[ 3 ], &Polys[ i ].Pos4 );
+			}
+			else
+			{
+				KillUsedPoly( i );
+			}
+			break;
 
-			case POLY_SCATTER_TRAIL:
-				break;
+		case POLY_SCATTER_TRAIL:
+			break;
 
-			default:
-				break;
+		default:
+			break;
 		}
 
 		i = nextpoly;
@@ -666,9 +666,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	WORD			*Indices = nullptr;
 	int				start_index = 0;
 
-/*===================================================================
-		Pass 1: count verts per texture page
-===================================================================*/
+	/*===================================================================
+			Pass 1: count verts per texture page
+	===================================================================*/
 	TotalVerts = 0;
 
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
@@ -707,9 +707,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 
 	renderObject->numTextureGroups = 0;
 
-/*===================================================================
-		Lock the vertex and index buffers
-===================================================================*/
+	/*===================================================================
+			Lock the vertex and index buffers
+	===================================================================*/
 
 	if (!(FSLockVertexBuffer(renderObject, &BufStart)))
 	{
@@ -725,9 +725,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 	PolyFacePnt = (TRIANGLE *) Indices;
 	PolyVertPnt = (LVERTEX *) BufStart;
 
-/*===================================================================
-		Pass 2: fill verts and indices, one texture group per quad
-===================================================================*/
+	/*===================================================================
+			Pass 2: fill verts and indices, one texture group per quad
+	===================================================================*/
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
 	{
 		StartVert = PolyTPages[ Count ].StartVert;
@@ -751,7 +751,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 						Off_Ptr = ( (*Polys[ i ].Frm_Info)->Off_Info + Bit_Ptr->startbit );
 						Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
-								Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos1.x;
 						PolyVertPnt->y = Polys[ i ].Pos1.y;
@@ -761,7 +761,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 						PolyVertPnt->color = Colour;
 						PolyVertPnt++;
 
-								Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos2.x;
 						PolyVertPnt->y = Polys[ i ].Pos2.y;
@@ -771,7 +771,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 						PolyVertPnt->color = Colour;
 						PolyVertPnt++;
 
-								Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos3.x;
 						PolyVertPnt->y = Polys[ i ].Pos3.y;
@@ -781,7 +781,7 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 						PolyVertPnt->color = Colour;
 						PolyVertPnt++;
 
-								Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos4.x;
 						PolyVertPnt->y = Polys[ i ].Pos4.y;
@@ -849,9 +849,9 @@ bool PolyDispGroupClipped( u_int16_t Group, RENDEROBJECT *renderObject, int16_t 
 		if( StartVert >= MAXPOLYVERTS ) break;
 	}
 
-/*===================================================================
-		Unlock the buffers and return the resume point
-===================================================================*/
+	/*===================================================================
+			Unlock the buffers and return the resume point
+	===================================================================*/
 
 	if (!(FSUnlockVertexBuffer(renderObject)))
 	{
@@ -902,9 +902,9 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	WORD			*Indices = nullptr;
 	int				start_index = 0;
 
-/*===================================================================
-		Pass 1: count verts per texture page
-===================================================================*/
+	/*===================================================================
+			Pass 1: count verts per texture page
+	===================================================================*/
 
 	TotalVerts = 0;
 
@@ -957,9 +957,9 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 	PolyFacePnt = (TRIANGLE *) Indices;
 	PolyVertPnt = (LVERTEX *) BufStart;
 
-/*===================================================================
-		Pass 2: fill verts and indices, one texture group per quad
-===================================================================*/
+	/*===================================================================
+			Pass 2: fill verts and indices, one texture group per quad
+	===================================================================*/
 
 	for( Count = *TPage; Count < MAXTPAGESPERTLOAD; Count++ )
 	{
@@ -985,7 +985,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 						Box_Ptr = ( (*Polys[ i ].Frm_Info)->Box_Info + ( Off_Ptr->box & 0x0fff ) );
 
 
-								Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col1.R, Polys[ i ].Col1.G, Polys[ i ].Col1.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos1.x;
 						PolyVertPnt->y = Polys[ i ].Pos1.y;
@@ -995,7 +995,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 						PolyVertPnt->color = Colour;
 						PolyVertPnt++;
 
-								Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col2.R, Polys[ i ].Col2.G, Polys[ i ].Col2.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos2.x;
 						PolyVertPnt->y = Polys[ i ].Pos2.y;
@@ -1006,7 +1006,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 						PolyVertPnt++;
 
 
-								Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col3.R, Polys[ i ].Col3.G, Polys[ i ].Col3.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos3.x;
 						PolyVertPnt->y = Polys[ i ].Pos3.y;
@@ -1017,7 +1017,7 @@ bool PolyDispGroupUnclipped( RENDEROBJECT *renderObject, int16_t * TPage, u_int1
 						PolyVertPnt++;
 
 
-								Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
+						Colour = RGBA_MAKE( Polys[ i ].Col4.R, Polys[ i ].Col4.G, Polys[ i ].Col4.B, 255 );
 
 						PolyVertPnt->x = Polys[ i ].Pos4.x;
 						PolyVertPnt->y = Polys[ i ].Pos4.y;

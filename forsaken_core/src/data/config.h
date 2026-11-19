@@ -126,13 +126,13 @@ extern int
 write_config( USERCONFIG *u, char *cfg_name );
 
 extern const char *
-key_name( int keycode );
+	key_name( int keycode );
 
 const char *
-key_char( int keycode );
+	key_char( int keycode );
 
 extern const char *
-key_fullname( int keycode );
+	key_fullname( int keycode );
 
 /* Defined in config.cpp; shared with the modules that use it. */
 void ConfigureSpaceorbAxis( int joystick );

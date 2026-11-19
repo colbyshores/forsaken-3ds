@@ -79,17 +79,17 @@ constexpr int MAXFONTCOLOURS = 11;
 
 // must align this enum with rgb values in Colourtrans (text.cpp)
 enum colors_t {
- GRAY,
- RED,
- GREEN,
- BLUE,
- YELLOW,
- CYAN,
- PURPLE,
- OFFGREEN,
- DARKGRAY,
- BLACK,
- WHITE
+	GRAY,
+	RED,
+	GREEN,
+	BLUE,
+	YELLOW,
+	CYAN,
+	PURPLE,
+	OFFGREEN,
+	DARKGRAY,
+	BLACK,
+	WHITE
 };
 
 

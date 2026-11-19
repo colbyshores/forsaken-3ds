@@ -150,7 +150,7 @@ struct TEXTUREANIMINFOINDEX{
 
 struct ANIMDATA {
 	u_int16_t	num_animating_polys;
-TEXTUREANIMINFOINDEX * TAnimInfoIndex;
+	TEXTUREANIMINFOINDEX * TAnimInfoIndex;
 	u_int16_t	num_animations;
 	u_int16_t * AnimSeq[MAXANIMSEQS];
 };

@@ -82,13 +82,13 @@ void configure_adpcm_channel(u_int16_t *coefs, float volume)
 }
 
 class MusicStream {
-public:
+	public:
 	bool init();
 	void shutdown();
 	void play(int track);
 	void stop();
 
-private:
+	private:
 	bool fill_buffer(int buf_index);
 	bool open_track(int track);
 	void close_track();

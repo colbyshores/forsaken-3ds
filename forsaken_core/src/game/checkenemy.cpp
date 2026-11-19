@@ -134,37 +134,37 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 
 				switch( ColType )
 				{
-					case COLTYPE_Trojax:
-						TempVector.x = ( Enemy->Object.Pos.x - Pos->x );			// Bul - Enemy
-						TempVector.y = ( Enemy->Object.Pos.y - Pos->y );
-						TempVector.z = ( Enemy->Object.Pos.z - Pos->z );
-						NormaliseVector( &TempVector );
-						Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
-						ColRadius = ( EnemyTypes[Enemy->Type].Radius + ( WeaponRadius * Cos ) );
-						break;
+				case COLTYPE_Trojax:
+					TempVector.x = ( Enemy->Object.Pos.x - Pos->x );			// Bul - Enemy
+					TempVector.y = ( Enemy->Object.Pos.y - Pos->y );
+					TempVector.z = ( Enemy->Object.Pos.z - Pos->z );
+					NormaliseVector( &TempVector );
+					Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
+					ColRadius = ( EnemyTypes[Enemy->Type].Radius + ( WeaponRadius * Cos ) );
+					break;
 
-					case COLTYPE_Transpulse:
-						TempVector.x = ( Enemy->Object.Pos.x - Pos->x );			// Bul - Enemy
-						TempVector.y = ( Enemy->Object.Pos.y - Pos->y );
-						TempVector.z = ( Enemy->Object.Pos.z - Pos->z );
-						NormaliseVector( &TempVector );
-						Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
-						Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, UpDir ) ) ) );
-						ColRadius = ( EnemyTypes[Enemy->Type].Radius + ( WeaponRadius * Cos ) );
-						break;
+				case COLTYPE_Transpulse:
+					TempVector.x = ( Enemy->Object.Pos.x - Pos->x );			// Bul - Enemy
+					TempVector.y = ( Enemy->Object.Pos.y - Pos->y );
+					TempVector.z = ( Enemy->Object.Pos.z - Pos->z );
+					NormaliseVector( &TempVector );
+					Cos = (float) ( 1.0F - fabsf( DotProduct( &TempVector, Dir ) ) );
+					Cos = (float) ( Cos * ( 1.0F - fabsf( DotProduct( &TempVector, UpDir ) ) ) );
+					ColRadius = ( EnemyTypes[Enemy->Type].Radius + ( WeaponRadius * Cos ) );
+					break;
 
-					case COLTYPE_Sphere:
-						ColRadius = ( EnemyTypes[Enemy->Type].Radius + WeaponRadius );
-						break;
+				case COLTYPE_Sphere:
+					ColRadius = ( EnemyTypes[Enemy->Type].Radius + WeaponRadius );
+					break;
 
-					case COLTYPE_Point:
-						ColRadius = EnemyTypes[Enemy->Type].Radius;
-						break;
+				case COLTYPE_Point:
+					ColRadius = EnemyTypes[Enemy->Type].Radius;
+					break;
 				}
 
-/*===================================================================
-	Does Ray hit target directly?
-===================================================================*/
+				/*===================================================================
+					Does Ray hit target directly?
+				===================================================================*/
 				if( RaytoSphere2( (VECTOR *) &Enemy->Object.Pos, EnemyTypes[Enemy->Type].Radius, Pos, Dir,
 									&Int_Temp, &Int_Temp2 ) )
 				{
@@ -184,9 +184,9 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 				}
 				else
 				{
-/*===================================================================
-	Is Starting pos inside sphere already?
-===================================================================*/
+					/*===================================================================
+						Is Starting pos inside sphere already?
+					===================================================================*/
 					if( PointToSphere( (VERT *) &Enemy->Object.Pos, EnemyTypes[Enemy->Type].Radius, (VERT *) Pos ) )
 					{
 						ClosestLength = 0.0F;
@@ -198,9 +198,9 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 					{
 						if( ColRadius > EnemyTypes[Enemy->Type].Radius )
 						{
-/*===================================================================
-	Do i graze sphere?
-===================================================================*/
+							/*===================================================================
+								Do i graze sphere?
+							===================================================================*/
 							if( RaytoSphere2( (VECTOR *) &Enemy->Object.Pos, ColRadius, Pos, Dir,
 											  &Int_Temp, &Int_Temp2 ) )
 							{
@@ -233,7 +233,7 @@ ENEMY * CheckHitEnemy( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int
 				}
 			}
 		}
-SkipIt:
+		SkipIt:
 		Enemy = NextEnemy;
 	}
 

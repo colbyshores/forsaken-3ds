@@ -74,10 +74,10 @@ struct TRIGGER_AREA
 	int16_t	player_secondary;
 	int16_t	enemy_primary;
 	int16_t	enemy_secondary;
-struct	TRIGGER_AREA * NextSameGroup_player;
-struct	TRIGGER_AREA * NextSameGroup_player_shoots;
-struct	TRIGGER_AREA * NextSameGroup_enemy;
-struct	TRIGGER_AREA * NextSameGroup_enemy_shoots;
+	struct	TRIGGER_AREA * NextSameGroup_player;
+	struct	TRIGGER_AREA * NextSameGroup_player_shoots;
+	struct	TRIGGER_AREA * NextSameGroup_enemy;
+	struct	TRIGGER_AREA * NextSameGroup_enemy_shoots;
 };
 
 /*

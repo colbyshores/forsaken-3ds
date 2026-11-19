@@ -53,7 +53,7 @@ constexpr auto MIN_LIGHT_SIZE = ( 1536.0F * GLOBAL_SCALE );
  * structures
  */
 
- struct XLIGHT{
+struct XLIGHT{
 	int		Type;
 	bool	Visible;
 	u_int16_t	Index;
@@ -69,12 +69,12 @@ constexpr auto MIN_LIGHT_SIZE = ( 1536.0F * GLOBAL_SCALE );
 	VECTOR	Pos;
 	VECTOR	Dir;			// Normalised....
 	u_int16_t	Group;
-struct XLIGHT * NextVisible;
- };
+	struct XLIGHT * NextVisible;
+};
 
- /*
- * fn prototypes
- */
+/*
+* fn prototypes
+*/
 
 bool	ProcessXLights( MLOADHEADER * Mloadheader );
 void	InitXLights();

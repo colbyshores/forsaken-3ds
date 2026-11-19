@@ -45,12 +45,12 @@ constexpr int FX_VERSION_NUMBER = 4;
 /*===================================================================
 	Global Variables
 ===================================================================*/
-	int32_t		NumSpotFX;
-	SPOTFX		SpotFX[ MAXSPOTFX ];
-	SPOTFX	*	SpotFXGroups[ MAXGROUPS ];
-	u_int16_t		NumSpotFXPerGroup[ MAXGROUPS ];
-	SPOTFX	*	FirstSpotFXUsed = nullptr;
-	SPOTFX	*	FirstSpotFXFree = nullptr;
+int32_t		NumSpotFX;
+SPOTFX		SpotFX[ MAXSPOTFX ];
+SPOTFX	*	SpotFXGroups[ MAXGROUPS ];
+u_int16_t		NumSpotFXPerGroup[ MAXGROUPS ];
+SPOTFX	*	FirstSpotFXUsed = nullptr;
+SPOTFX	*	FirstSpotFXFree = nullptr;
 
 /*===================================================================
 	Procedure	:	Load all SpotFX from the level's .FX file
@@ -182,359 +182,359 @@ void ProcessSpotFX( void )
 		{
 			switch( SpotFX->State )
 			{
-				case SPOTFX_STATE_WaitingForTrigger:
-					break;
+			case SPOTFX_STATE_WaitingForTrigger:
+				break;
 
-				case SPOTFX_STATE_WaitingForDelay:
-					SpotFX->Delay -= framelag;
+			case SPOTFX_STATE_WaitingForDelay:
+				SpotFX->Delay -= framelag;
 
-					if( SpotFX->Delay < 0.0F )
+				if( SpotFX->Delay < 0.0F )
+				{
+					SpotFX->Delay += SpotFX->ActiveDelay;
+					SpotFX->State = SPOTFX_STATE_Active;
+					SpotFX->Time = 0.0F;
+				}
+				break;
+
+			case SPOTFX_STATE_Active:
+				switch( SpotFX->Type )
+				{
+
+				case SPOTFX_FirePrimary:
+				case SPOTFX_Explosion:
+				case SPOTFX_Shrapnel:
+				case SPOTFX_ElectricBeams:
+					if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, nullptr ) )
 					{
-						SpotFX->Delay += SpotFX->ActiveDelay;
-						SpotFX->State = SPOTFX_STATE_Active;
-						SpotFX->Time = 0.0F;
-					}
-					break;
-
-				case SPOTFX_STATE_Active:
-					switch( SpotFX->Type )
-					{
-
+						switch( SpotFX->Type )
+						{
 						case SPOTFX_FirePrimary:
-						case SPOTFX_Explosion:
-						case SPOTFX_Shrapnel:
-						case SPOTFX_ElectricBeams:
-							if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, nullptr ) )
+							if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
 							{
-								switch( SpotFX->Type )
-								{
-									case SPOTFX_FirePrimary:
-										if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-										{
-											CreateSpotFXFirePrimary( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector,
-																	SpotFX->Group, SpotFX->Primary, OWNER_NOBODY, 0 );
-											SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-										}
-										break;
-
-									case SPOTFX_Explosion:
-										if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-										{
-											CreateSpotFXExplosion( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
-											SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-										}
-										break;
-
-									case SPOTFX_Shrapnel:
-										if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-										{
-											CreateSpotFXShrapnel( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
-											SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-										}
-										break;
-
-									case SPOTFX_ElectricBeams:
-										CreateSpotFXElectricBeams( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector,
-																	SpotFX->Group );
-										break;
-
-								}
+								CreateSpotFXFirePrimary( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector,
+														SpotFX->Group, SpotFX->Primary, OWNER_NOBODY, 0 );
+								SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
 							}
 							break;
 
-						case SPOTFX_Flame:
-						case SPOTFX_Smoke:
-						case SPOTFX_Steam:
-						case SPOTFX_Sparks:
-						case SPOTFX_GravgonTrail:
-						case SPOTFX_NmeTrail:
-						case SPOTFX_NmeGlow:
-						case SPOTFX_NmeVapourTrail:
-						case SPOTFX_FireWall:
-						case SPOTFX_GravitySparks:
-						case SPOTFX_Bubbles:
-						case SPOTFX_Drip:
-						default:
-							if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, nullptr ) )
+						case SPOTFX_Explosion:
+							if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
 							{
-								SpotFX->Time += framelag;
+								CreateSpotFXExplosion( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
+								SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+							}
+							break;
 
-								if( SpotFX->Time >= SpotFX->TimeInterval )
+						case SPOTFX_Shrapnel:
+							if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
+							{
+								CreateSpotFXShrapnel( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
+								SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+							}
+							break;
+
+						case SPOTFX_ElectricBeams:
+							CreateSpotFXElectricBeams( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector,
+														SpotFX->Group );
+							break;
+
+						}
+					}
+					break;
+
+				case SPOTFX_Flame:
+				case SPOTFX_Smoke:
+				case SPOTFX_Steam:
+				case SPOTFX_Sparks:
+				case SPOTFX_GravgonTrail:
+				case SPOTFX_NmeTrail:
+				case SPOTFX_NmeGlow:
+				case SPOTFX_NmeVapourTrail:
+				case SPOTFX_FireWall:
+				case SPOTFX_GravitySparks:
+				case SPOTFX_Bubbles:
+				case SPOTFX_Drip:
+				default:
+					if( IsGroupVisible[ SpotFX->Group ] || VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, SpotFX->Group, nullptr ) )
+					{
+						SpotFX->Time += framelag;
+
+						if( SpotFX->Time >= SpotFX->TimeInterval )
+						{
+							SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
+
+							switch( SpotFX->Type )
+							{
+							case SPOTFX_Flame:
+								CreateSpotFXFlame( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
+								break;
+
+							case SPOTFX_Smoke:
+								CreateSpotFXSmoke( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+								break;
+
+							case SPOTFX_Steam:
+								CreateSpotFXSteam( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+
+								if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
 								{
-									SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
-
-									switch( SpotFX->Type )
+									if( !SpotFX->SoundFX_ID )
 									{
-										case SPOTFX_Flame:
-											CreateSpotFXFlame( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
-											break;
-
-										case SPOTFX_Smoke:
-											CreateSpotFXSmoke( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-											break;
-
-										case SPOTFX_Steam:
-											CreateSpotFXSteam( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-
-											if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												if( !SpotFX->SoundFX_ID )
-												{
-													SpotFX->SoundFX_ID = PlaySpotSfx( SFX_Steam, &SpotFX->Group, &SpotFX->Pos,
-																					  0.25F, 1.0F, SPOT_SFX_TYPE_Normal );
-													SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-												}
-												else
-												{
+										SpotFX->SoundFX_ID = PlaySpotSfx( SFX_Steam, &SpotFX->Group, &SpotFX->Pos,
+																		  0.25F, 1.0F, SPOT_SFX_TYPE_Normal );
+										SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+									}
+									else
+									{
 #ifdef DEBUG_SPOTFX_SOUND
-													Msg( "SpotFX:SpotFX_Steam Overwriting SFX ID %d\n", SpotFX->SoundFX_ID );
+										Msg( "SpotFX:SpotFX_Steam Overwriting SFX ID %d\n", SpotFX->SoundFX_ID );
 #endif
-													StopSfx( SpotFX->SoundFX_ID );
-													SpotFX->SoundFX_ID = PlaySpotSfx( SFX_Steam, &SpotFX->Group, &SpotFX->Pos,
-																					  0.25F, 1.0F, SPOT_SFX_TYPE_Normal );
-													SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-												}
-											}
-											break;
-
-										case SPOTFX_Sparks:
-											CreateSpotFXSparks( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-											break;
-
-										case SPOTFX_GravgonTrail:
-											CreateSpotFXGravgonTrail( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
-											break;
-
-										case SPOTFX_NmeTrail:
-											CreateSpotFXNmeTrail( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-											break;
-
-										case SPOTFX_NmeGlow:
-											CreateSpotFXNmeGlow( &SpotFX->Pos, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-											break;
-
-										case SPOTFX_NmeVapourTrail:
-											CreateSpotFXNmeVapourTrail( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-											break;
-
-										case SPOTFX_FireWall:
-											CreateSpotFXFireWall( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector, SpotFX->Group );
-
-											if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												if( !SpotFX->SoundFX_ID )
-												{
-													SpotFX->SoundFX_ID = PlaySpotSfx( SFX_MedFireBlast, &SpotFX->Group, &SpotFX->Pos,
-																					  0.0F, 1.0F, SPOT_SFX_TYPE_Normal );
-													SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-												}
-												else
-												{
-#ifdef DEBUG_SPOTFX_SOUND
-													Msg( "SpotFX:Firewall Overwriting SFX ID %d\n", SpotFX->SoundFX_ID );
-#endif
-													StopSfx( SpotFX->SoundFX_ID );
-													SpotFX->SoundFX_ID = PlaySpotSfx( SFX_MedFireBlast, &SpotFX->Group, &SpotFX->Pos,
-																					  0.0F, 1.0F, SPOT_SFX_TYPE_Normal );
-													SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-												}
-											}
-											break;
-
-										case SPOTFX_GravitySparks:
-											CreateSpotFXRealSparks( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-											break;
-
-										case SPOTFX_Bubbles:
-											CreateSpotFXBubbles( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue, SpotFX->MaxHeight );
-											break;
-
-										case SPOTFX_Drip:
-											if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-											{
-												CreateSpotFXDrip( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
-												SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-											}
-											break;
-
-										case SPOTFX_BeardAfterburner:
-											CreateSpotFXBeardAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_BorgAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_ExcopAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_TruckerAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_NubiaAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_CerberoAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_FoetoidAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_FoetoidSmallAfterburner:
-											CreateSpotFXSmallAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_Hk5Afterburner:
-											CreateSpotFXHk5Afterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F, 32, 32, 128 );
-											break;
-
-										case SPOTFX_JapBirdAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_JoAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_JoSmallAfterburner:
-											CreateSpotFXSmallAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_LaJayAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_MofistoAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_NutterAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_RhesusAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_SharkAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										case SPOTFX_SlickAfterburner:
-											CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
-											break;
-
-										default:
-											break;
+										StopSfx( SpotFX->SoundFX_ID );
+										SpotFX->SoundFX_ID = PlaySpotSfx( SFX_Steam, &SpotFX->Group, &SpotFX->Pos,
+																		  0.25F, 1.0F, SPOT_SFX_TYPE_Normal );
+										SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
 									}
 								}
-							}
+								break;
 
-							break;
+							case SPOTFX_Sparks:
+								CreateSpotFXSparks( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+								break;
 
+							case SPOTFX_GravgonTrail:
+								CreateSpotFXGravgonTrail( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group );
+								break;
 
-						case SPOTFX_FireSecondary:
-						case SPOTFX_SoundFX:
-							SpotFX->Time += framelag;
+							case SPOTFX_NmeTrail:
+								CreateSpotFXNmeTrail( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+								break;
 
-							if( SpotFX->Time >= SpotFX->TimeInterval )
-							{
-								SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
+							case SPOTFX_NmeGlow:
+								CreateSpotFXNmeGlow( &SpotFX->Pos, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+								break;
 
-								switch( SpotFX->Type )
+							case SPOTFX_NmeVapourTrail:
+								CreateSpotFXNmeVapourTrail( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+								break;
+
+							case SPOTFX_FireWall:
+								CreateSpotFXFireWall( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector, SpotFX->Group );
+
+								if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
 								{
-									case SPOTFX_FireSecondary:
-										if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-										{
-											CreateSpotFXFireSecondary( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector,
-																		SpotFX->Group, SpotFX->Secondary, OWNER_NOBODY, 0 );
-											SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-										}
-										break;
-
-									case SPOTFX_SoundFX:
-										if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
-										{
-											if( SpotFX->SoundFX != -1 )
-											{
-												if( !SpotFX->SoundFX_ID )
-												{
-													SpotFX->SoundFX_ID = PlaySpotSfx( SpotFX->SoundFX, &SpotFX->Group, &SpotFX->Pos,
-																					  SpotFX->SoundFXSpeed, SpotFX->SoundFXVolume,
-																					  SpotFX->SoundFXType );
-												}
-												else
-												{
+									if( !SpotFX->SoundFX_ID )
+									{
+										SpotFX->SoundFX_ID = PlaySpotSfx( SFX_MedFireBlast, &SpotFX->Group, &SpotFX->Pos,
+																		  0.0F, 1.0F, SPOT_SFX_TYPE_Normal );
+										SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+									}
+									else
+									{
 #ifdef DEBUG_SPOTFX_SOUND
-													Msg( "SpotFX:SpotFX_SoundFX Overwriting SFX ID %d\n", SpotFX->SoundFX_ID );
+										Msg( "SpotFX:Firewall Overwriting SFX ID %d\n", SpotFX->SoundFX_ID );
 #endif
-													StopSfx( SpotFX->SoundFX_ID );
-													SpotFX->SoundFX_ID = PlaySpotSfx( SpotFX->SoundFX, &SpotFX->Group, &SpotFX->Pos,
-																					  /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-																					  SpotFX->SoundFXSpeed, SpotFX->SoundFXVolume,
-																					  /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-																					  SpotFX->SoundFXType );
-												}
-											}
-											SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
-										}
-										break;
-
+										StopSfx( SpotFX->SoundFX_ID );
+										SpotFX->SoundFX_ID = PlaySpotSfx( SFX_MedFireBlast, &SpotFX->Group, &SpotFX->Pos,
+																		  0.0F, 1.0F, SPOT_SFX_TYPE_Normal );
+										SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+									}
 								}
+								break;
+
+							case SPOTFX_GravitySparks:
+								CreateSpotFXRealSparks( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+								break;
+
+							case SPOTFX_Bubbles:
+								CreateSpotFXBubbles( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue, SpotFX->MaxHeight );
+								break;
+
+							case SPOTFX_Drip:
+								if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
+								{
+									CreateSpotFXDrip( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, SpotFX->Red, SpotFX->Green, SpotFX->Blue );
+									SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+								}
+								break;
+
+							case SPOTFX_BeardAfterburner:
+								CreateSpotFXBeardAfterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_BorgAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_ExcopAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_TruckerAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_NubiaAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_CerberoAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_FoetoidAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_FoetoidSmallAfterburner:
+								CreateSpotFXSmallAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_Hk5Afterburner:
+								CreateSpotFXHk5Afterburner( &SpotFX->Pos, &SpotFX->DirVector, SpotFX->Group, 0.0F, 32, 32, 128 );
+								break;
+
+							case SPOTFX_JapBirdAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_JoAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_JoSmallAfterburner:
+								CreateSpotFXSmallAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_LaJayAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_MofistoAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_NutterAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_RhesusAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_SharkAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							case SPOTFX_SlickAfterburner:
+								CreateSpotFXBorgAfterburner( &SpotFX->Pos, SpotFX->Group, 0.0F );
+								break;
+
+							default:
+								break;
 							}
-							break;
+						}
 					}
 
-					SpotFX->Delay -= framelag;
+					break;
 
-					/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-					if( SpotFX->Delay < 0.0F )
+
+				case SPOTFX_FireSecondary:
+				case SPOTFX_SoundFX:
+					SpotFX->Time += framelag;
+
+					if( SpotFX->Time >= SpotFX->TimeInterval )
 					{
-						if( SpotFX->InactiveDelay < 0.0F )
+						SpotFX->Time = FMOD( SpotFX->Time, SpotFX->TimeInterval );
+
+						switch( SpotFX->Type )
 						{
-							SpotFX->Flags &= ~SPOTFX_FLAGS_Enabled;
-							SpotFX->Delay += SpotFX->ActiveDelay;
+						case SPOTFX_FireSecondary:
+							if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
+							{
+								CreateSpotFXFireSecondary( &SpotFX->Pos, &SpotFX->DirVector, &SpotFX->UpVector,
+															SpotFX->Group, SpotFX->Secondary, OWNER_NOBODY, 0 );
+								SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+							}
+							break;
+
+						case SPOTFX_SoundFX:
+							if( !( SpotFX->Flags & SPOTFX_FLAGS_DoneOnce ) )
+							{
+								if( SpotFX->SoundFX != -1 )
+								{
+									if( !SpotFX->SoundFX_ID )
+									{
+										SpotFX->SoundFX_ID = PlaySpotSfx( SpotFX->SoundFX, &SpotFX->Group, &SpotFX->Pos,
+																		  SpotFX->SoundFXSpeed, SpotFX->SoundFXVolume,
+																		  SpotFX->SoundFXType );
+									}
+									else
+									{
+#ifdef DEBUG_SPOTFX_SOUND
+										Msg( "SpotFX:SpotFX_SoundFX Overwriting SFX ID %d\n", SpotFX->SoundFX_ID );
+#endif
+										StopSfx( SpotFX->SoundFX_ID );
+										SpotFX->SoundFX_ID = PlaySpotSfx( SpotFX->SoundFX, &SpotFX->Group, &SpotFX->Pos,
+																		  /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+																		  SpotFX->SoundFXSpeed, SpotFX->SoundFXVolume,
+																		  /* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+																		  SpotFX->SoundFXType );
+									}
+								}
+								SpotFX->Flags |= SPOTFX_FLAGS_DoneOnce;
+							}
+							break;
+
+						}
+					}
+					break;
+				}
+
+				SpotFX->Delay -= framelag;
+
+				/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+				if( SpotFX->Delay < 0.0F )
+				{
+					if( SpotFX->InactiveDelay < 0.0F )
+					{
+						SpotFX->Flags &= ~SPOTFX_FLAGS_Enabled;
+						SpotFX->Delay += SpotFX->ActiveDelay;
+						SpotFX->Time = 0.0F;
+					}
+					else
+					{
+						if( SpotFX->InactiveDelay != 0.0F )
+						{
+							if( SpotFX->SoundFX_ID )
+							{
+								StopSfx( SpotFX->SoundFX_ID );
+								SpotFX->SoundFX_ID = 0;
+							}
+
+							SpotFX->Delay += SpotFX->InactiveDelay;
+							/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
+							SpotFX->State = SPOTFX_STATE_Inactive;
 							SpotFX->Time = 0.0F;
 						}
 						else
 						{
-							if( SpotFX->InactiveDelay != 0.0F )
-							{
-								if( SpotFX->SoundFX_ID )
-								{
-									StopSfx( SpotFX->SoundFX_ID );
-									SpotFX->SoundFX_ID = 0;
-								}
-
-								SpotFX->Delay += SpotFX->InactiveDelay;
-								/* @vfp-exempt R3 — light inclusion/attenuation window compare; integerizing changes which lights apply. measured n/a. Verified 2026-10-25. */
-								SpotFX->State = SPOTFX_STATE_Inactive;
-								SpotFX->Time = 0.0F;
-							}
-							else
-							{
-								SpotFX->Delay += SpotFX->ActiveDelay;
-							}
+							SpotFX->Delay += SpotFX->ActiveDelay;
 						}
 					}
-					break;
+				}
+				break;
 
-				case SPOTFX_STATE_Inactive:
-					SpotFX->Delay -= framelag;
+			case SPOTFX_STATE_Inactive:
+				SpotFX->Delay -= framelag;
 
-					if( SpotFX->Delay < 0.0F )
-					{
-						SpotFX->Delay += SpotFX->ActiveDelay;
-						SpotFX->State = SPOTFX_STATE_Active;
+				if( SpotFX->Delay < 0.0F )
+				{
+					SpotFX->Delay += SpotFX->ActiveDelay;
+					SpotFX->State = SPOTFX_STATE_Active;
 					SpotFX->Flags &= ~SPOTFX_FLAGS_DoneOnce;
-						SpotFX->Time = 0.0F;
-					}
-					break;
+					SpotFX->Time = 0.0F;
+				}
+				break;
 			}
 		}
 
@@ -617,24 +617,24 @@ SPOTFX * InitOneSpotFX( u_int16_t GenType, float GenDelay, u_int16_t Type, u_int
 	{
 		switch( GenType )
 		{
-			case SPOTFX_GENTYPE_Initialised:
-				Object->Flags = SPOTFX_FLAGS_Enabled;
-				Object->State = SPOTFX_STATE_Active;
-				Object->Time = 0.0F;
-				Object->Delay = ActiveDelay;
-				break;
+		case SPOTFX_GENTYPE_Initialised:
+			Object->Flags = SPOTFX_FLAGS_Enabled;
+			Object->State = SPOTFX_STATE_Active;
+			Object->Time = 0.0F;
+			Object->Delay = ActiveDelay;
+			break;
 
-			case SPOTFX_GENTYPE_Time:
-				Object->Flags = SPOTFX_FLAGS_Enabled;
-				Object->State = SPOTFX_STATE_WaitingForDelay;
-				Object->Delay = GenDelay;
-				break;
+		case SPOTFX_GENTYPE_Time:
+			Object->Flags = SPOTFX_FLAGS_Enabled;
+			Object->State = SPOTFX_STATE_WaitingForDelay;
+			Object->Delay = GenDelay;
+			break;
 
-			case SPOTFX_GENTYPE_Trigger:
-				Object->Flags = SPOTFX_FLAGS_Enabled;
-				Object->State = SPOTFX_STATE_WaitingForTrigger;
-				Object->Delay = 0.0F;
-				break;
+		case SPOTFX_GENTYPE_Trigger:
+			Object->Flags = SPOTFX_FLAGS_Enabled;
+			Object->State = SPOTFX_STATE_WaitingForTrigger;
+			Object->Delay = 0.0F;
+			break;
 		}
 
 		Object->Type = Type;

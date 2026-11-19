@@ -364,9 +364,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 	if ( in.peek_u16() == 2)				// 2 means .mxa format
 	{
 		in.skip( sizeof( u_int16_t ) );
-/*===================================================================
- *		Particular Stuff Related Anims
-===================================================================*/
+		/*===================================================================
+		 *		Particular Stuff Related Anims
+		===================================================================*/
 		Mxaloadheader->num_frames = in.u16();
 
 		if ( Mxaloadheader->num_frames > 1 )
@@ -394,9 +394,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 							for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[mesh] ; texgroup++)
 							{
 								u_int16_t count = scan.u16();
-								scan.skip( count * sizeof( MXAVERT ) );
-								total += count;
-							}
+					scan.skip( count * sizeof( MXAVERT ) );
+					total += count;
+				}
 			}
 
 			MXAVERT * dst = nullptr;
@@ -417,11 +417,11 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 						for( texgroup=0; texgroup < Mxaloadheader->Group[group].num_texture_groups[mesh] ; texgroup++)
 						{
 							u_int16_t count = in.u16();
-							Mxaloadheader->num_anim_vertices[frame][group][mesh][texgroup] = count;
-							Mxaloadheader->frame_pnts[frame][group][mesh][texgroup] = dst;
-							in.bytes( dst, count * sizeof( MXAVERT ) );
-							dst += count;
-						}
+				Mxaloadheader->num_anim_vertices[frame][group][mesh][texgroup] = count;
+				Mxaloadheader->frame_pnts[frame][group][mesh][texgroup] = dst;
+				in.bytes( dst, count * sizeof( MXAVERT ) );
+				dst += count;
+			}
 		}
 		else
 		{
@@ -431,9 +431,9 @@ bool Mxaload( char * Filename, MXALOADHEADER * Mxaloadheader, bool StoreTriangle
 		}
 	}
 
-/*===================================================================
-	Point Direction Data
-===================================================================*/
+	/*===================================================================
+		Point Direction Data
+	===================================================================*/
 	if( in.u16() )
 	{
 		NumFirePoints = in.u16();

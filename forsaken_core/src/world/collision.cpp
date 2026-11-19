@@ -42,7 +42,7 @@ int no_collision = 0;
 static VECTOR		ColPoint;
 static ZONESIDE	*	ColSide;
 static float		ColDist;
-	COMP_OBJ	*	ColChild;
+COMP_OBJ	*	ColChild;
 static int			ColCollided;
 static float		ColRadius;
 static VECTOR		ColDir;
@@ -85,9 +85,9 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 	float		t;
 	float		Div, Num;
 
-/*===================================================================
-	Calculate T
-===================================================================*/
+	/*===================================================================
+		Calculate T
+	===================================================================*/
 	Div = ( ODir.x * normal->x) +
 		  ( ODir.y * normal->y) +
 		  ( ODir.z * normal->z);
@@ -101,9 +101,9 @@ bool ColRayPlaneIntersect( VECTOR *normal, float offset )
 
 	t = -( Num / Div );
 
-/*===================================================================
-	Do plane collision
-===================================================================*/
+	/*===================================================================
+		Do plane collision
+	===================================================================*/
 
 	if( t < 0.0F ) return false;		/* Intersection behind origin */
 	if( t > 1.0F ) return false;		/* Intersection Greater then ray length */
@@ -214,13 +214,13 @@ bool BackgroundCollide( MCLOADHEADER *c, MLOADHEADER *m,
 							break;
 						}
 					}
-				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 				}
 			}
 			if ( hit_portal )
 			{
 				hit_bg = false;
-			/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 			}
 			else
 			{
@@ -731,7 +731,7 @@ bool CheckEnemyPolyCol( u_int16_t Group, float Distance, VECTOR * ImpactPoint,
 			}
 		}
 
-SkipIt:
+		SkipIt:
 		Object = Object->NextUsed;
 	}
 
@@ -827,23 +827,35 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 				{
 					switch( ZonesPtr->Type )
 					{
-						case ZONE_Sphere:
-							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							break;
+					case ZONE_Sphere:
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+						break;
 
-						case ZONE_Box:
-							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
+					case ZONE_Box:
+						AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
-							if( RayToColZone( &NewOrigin, &NewEnd,
-											  AniZoneBoxPtr->Sides, AniZoneBoxPtr->NumSides,
-											  &IntPoint, &IntSide, ColRadius ) )
+						if( RayToColZone( &NewOrigin, &NewEnd,
+										  AniZoneBoxPtr->Sides, AniZoneBoxPtr->NumSides,
+										  &IntPoint, &IntSide, ColRadius ) )
+						{
+							TempVector.x = ( IntPoint.x - NewOrigin.x );
+							TempVector.y = ( IntPoint.y - NewOrigin.y );
+							TempVector.z = ( IntPoint.z - NewOrigin.z );
+							DistToInt = VectorLength( &TempVector );
+
+							if( !ColCollided )
 							{
-								TempVector.x = ( IntPoint.x - NewOrigin.x );
-								TempVector.y = ( IntPoint.y - NewOrigin.y );
-								TempVector.z = ( IntPoint.z - NewOrigin.z );
-								DistToInt = VectorLength( &TempVector );
-
-								if( !ColCollided )
+								ColPoint = IntPoint;
+								ColSide = IntSide;
+								ColDist = DistToInt;
+								ColChild = Children;
+								ColParent = CurParent;
+								ColZoneNum = Zone;
+								ColCollided++;
+							}
+							else
+							{
+								if( DistToInt < ColDist )
 								{
 									ColPoint = IntPoint;
 									ColSide = IntSide;
@@ -853,61 +865,49 @@ void CollideBGOChildren( COMP_OBJ * Children, int16_t NumChildren )
 									ColZoneNum = Zone;
 									ColCollided++;
 								}
-								else
-								{
-									if( DistToInt < ColDist )
-									{
-										ColPoint = IntPoint;
-										ColSide = IntSide;
-										ColDist = DistToInt;
-										ColChild = Children;
-										ColParent = CurParent;
-										ColZoneNum = Zone;
-										ColCollided++;
-									}
-								}
+							}
 
 							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							}
-							break;
+						}
+						break;
 
-						case ZONE_Polygonal:
-							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
+					case ZONE_Polygonal:
+						AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
-							if( RayToColZone( &NewOrigin, &NewEnd,
-											  AniZonePolyPtr->Sides, AniZonePolyPtr->NumSides,
-											  &IntPoint, &IntSide, ColRadius ) )
+						if( RayToColZone( &NewOrigin, &NewEnd,
+										  AniZonePolyPtr->Sides, AniZonePolyPtr->NumSides,
+										  &IntPoint, &IntSide, ColRadius ) )
+						{
+							TempVector.x = ( IntPoint.x - NewOrigin.x );
+							TempVector.y = ( IntPoint.y - NewOrigin.y );
+							TempVector.z = ( IntPoint.z - NewOrigin.z );
+							DistToInt = VectorLength( &TempVector );
+
+							if( !ColCollided )
 							{
-								TempVector.x = ( IntPoint.x - NewOrigin.x );
-								TempVector.y = ( IntPoint.y - NewOrigin.y );
-								TempVector.z = ( IntPoint.z - NewOrigin.z );
-								DistToInt = VectorLength( &TempVector );
-
-								if( !ColCollided )
+								ColPoint = IntPoint;
+								ColSide = IntSide;
+								ColDist = DistToInt;
+								ColChild = Children;
+								ColParent = CurParent;
+								ColZoneNum = Zone;
+								ColCollided++;
+							}
+							else
+							{
+								if( DistToInt < ColDist )
 								{
 									ColPoint = IntPoint;
 									ColSide = IntSide;
 									ColDist = DistToInt;
 									ColChild = Children;
-									ColParent = CurParent;
 									ColZoneNum = Zone;
+									ColParent = CurParent;
 									ColCollided++;
 								}
-								else
-								{
-									if( DistToInt < ColDist )
-									{
-										ColPoint = IntPoint;
-										ColSide = IntSide;
-										ColDist = DistToInt;
-										ColChild = Children;
-										ColZoneNum = Zone;
-										ColParent = CurParent;
-										ColCollided++;
-									}
-								}
 							}
-							break;
+						}
+						break;
 					}
 
 					ZonesPtr++;
@@ -1162,64 +1162,36 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 				{
 					switch( ZonesPtr->Type )
 					{
-						case ZONE_Sphere:
-							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							break;
+					case ZONE_Sphere:
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+						break;
 
-						case ZONE_Box:
-							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
+					case ZONE_Box:
+						AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
-							if( RayToColZone( &NewOrigin, &NewEnd,
-											  AniZoneBoxPtr->Sides, AniZoneBoxPtr->NumSides,
-											  &IntPoint, &IntSide, ColRadius ) )
+						if( RayToColZone( &NewOrigin, &NewEnd,
+										  AniZoneBoxPtr->Sides, AniZoneBoxPtr->NumSides,
+										  &IntPoint, &IntSide, ColRadius ) )
+						{
+							TempVector.x = ( IntPoint.x - NewOrigin.x );
+							TempVector.y = ( IntPoint.y - NewOrigin.y );
+							TempVector.z = ( IntPoint.z - NewOrigin.z );
+							DistToInt = VectorLength( &TempVector );
+
+							if( !ColCollided )
 							{
-								TempVector.x = ( IntPoint.x - NewOrigin.x );
-								TempVector.y = ( IntPoint.y - NewOrigin.y );
-								TempVector.z = ( IntPoint.z - NewOrigin.z );
-								DistToInt = VectorLength( &TempVector );
-
-								if( !ColCollided )
-								{
-									ColPoint = IntPoint;
-									ColSide = IntSide;
-									ColDist = DistToInt;
-									ColChild = Children;
-									ColDir = NewDir;
-									ColZoneNum = Zone;
-									ColParent = CurParent;
-									ColCollided++;
-								}
-								else
-								{
-									if( DistToInt < ColDist )
-									{
-										ColPoint = IntPoint;
-										ColSide = IntSide;
-										ColDist = DistToInt;
-										ColChild = Children;
-										ColDir = NewDir;
-										ColParent = CurParent;
-										ColZoneNum = Zone;
-									}
-								}
-
+								ColPoint = IntPoint;
+								ColSide = IntSide;
+								ColDist = DistToInt;
+								ColChild = Children;
+								ColDir = NewDir;
+								ColZoneNum = Zone;
+								ColParent = CurParent;
+								ColCollided++;
 							}
-							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-							break;
-
-						case ZONE_Polygonal:
-							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
-
-							if( RayToColZone( &NewOrigin, &NewEnd,
-											  AniZonePolyPtr->Sides, AniZonePolyPtr->NumSides,
-											  &IntPoint, &IntSide, ColRadius ) )
+							else
 							{
-								TempVector.x = ( IntPoint.x - NewOrigin.x );
-								TempVector.y = ( IntPoint.y - NewOrigin.y );
-								TempVector.z = ( IntPoint.z - NewOrigin.z );
-								DistToInt = VectorLength( &TempVector );
-
-								if( !ColCollided )
+								if( DistToInt < ColDist )
 								{
 									ColPoint = IntPoint;
 									ColSide = IntSide;
@@ -1228,23 +1200,51 @@ void CollideBGOToCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 									ColDir = NewDir;
 									ColParent = CurParent;
 									ColZoneNum = Zone;
-									ColCollided++;
-								}
-								else
-								{
-									if( DistToInt < ColDist )
-									{
-										ColPoint = IntPoint;
-										ColSide = IntSide;
-										ColDist = DistToInt;
-										ColChild = Children;
-										ColDir = NewDir;
-										ColParent = CurParent;
-										ColZoneNum = Zone;
-									}
 								}
 							}
-							break;
+
+						}
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+						break;
+
+					case ZONE_Polygonal:
+						AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
+
+						if( RayToColZone( &NewOrigin, &NewEnd,
+										  AniZonePolyPtr->Sides, AniZonePolyPtr->NumSides,
+										  &IntPoint, &IntSide, ColRadius ) )
+						{
+							TempVector.x = ( IntPoint.x - NewOrigin.x );
+							TempVector.y = ( IntPoint.y - NewOrigin.y );
+							TempVector.z = ( IntPoint.z - NewOrigin.z );
+							DistToInt = VectorLength( &TempVector );
+
+							if( !ColCollided )
+							{
+								ColPoint = IntPoint;
+								ColSide = IntSide;
+								ColDist = DistToInt;
+								ColChild = Children;
+								ColDir = NewDir;
+								ColParent = CurParent;
+								ColZoneNum = Zone;
+								ColCollided++;
+							}
+							else
+							{
+								if( DistToInt < ColDist )
+								{
+									ColPoint = IntPoint;
+									ColSide = IntSide;
+									ColDist = DistToInt;
+									ColChild = Children;
+									ColDir = NewDir;
+									ColParent = CurParent;
+									ColZoneNum = Zone;
+								}
+							}
+						}
+						break;
 					}
 
 					ZonesPtr++;

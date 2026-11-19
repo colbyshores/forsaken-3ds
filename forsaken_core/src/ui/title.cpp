@@ -1559,7 +1559,7 @@ void CheckJoinStatus( int * /*i*/ )
 
 	switch( network_state )
 	{
-	// at this point network_event will take over and change the screen
+		// at this point network_event will take over and change the screen
 	case NETWORK_CONNECTED:
 		update_join_status("Connected...");
 		strncpy( &show_f1[0], "", 100 );
@@ -1600,7 +1600,7 @@ MENU	MENU_NEW_Joining = {
 };
 
 MENUITEM MENU_ITEM_JoinMultiplayer =
-		{ 0, 0, 0, 0, 0, (u_int8_t*)"", 0, 0,  nullptr, &MENU_NEW_Joining, MenuChange, nullptr, nullptr, 0  };
+{ 0, 0, 0, 0, 0, (u_int8_t*)"", 0, 0,  nullptr, &MENU_NEW_Joining, MenuChange, nullptr, nullptr, 0  };
 
 constexpr int MAX_GAME_LIST = 7;
 constexpr int MAX_GAME_LENGTH = 100;
@@ -1771,7 +1771,7 @@ MENU	MENU_NEW_SelectBiker = {
 };
 
 MENUITEM BikeCharItem =
-		{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , nullptr, nullptr , nullptr , LoadBikeChar, nullptr, 0};
+{ 125 , 20, 200, 130, 0, (u_int8_t*)"" , FONT_Medium, TEXTFLAG_CentreX | TEXTFLAG_CentreY , nullptr, nullptr , nullptr , LoadBikeChar, nullptr, 0};
 
 
 int16_t InGameLoadGameLevelNum;
@@ -2883,7 +2883,7 @@ bool RenderModeSelect( int mode, bool fullscreen, bool vsync )
 	render_info.default_mode.w    = render_info.Mode[mode].w;
 	render_info.fullscreen        = fullscreen;
 	render_info.vsync             = vsync;
-DebugPrintf("2 vsync = %d\n",render_info.vsync);
+	DebugPrintf("2 vsync = %d\n",render_info.vsync);
 	if(!render_mode_select( &render_info ))
 	{
 		DebugPrintf("RenderModeSelect: failed to change mode\n");
@@ -2903,9 +2903,9 @@ DebugPrintf("2 vsync = %d\n",render_info.vsync);
 	// set default font scaling by resolution
 	TextScaleSlider.value = 1;
 	if(render_info.default_mode.w < 1024)
-			TextScaleSlider.value = 0;
+		TextScaleSlider.value = 0;
 	else if(render_info.default_mode.w >= 1280)
-			TextScaleSlider.value = 2;
+		TextScaleSlider.value = 2;
 	SetTextScale(&TextScaleSlider);
 
 	SetGamePrefs();
@@ -3149,7 +3149,7 @@ bool LoadTitleModels(void)
 			Models[CurrentModel].Func	= MODFUNC_Nothing;
 			Models[CurrentModel].ModelNum	= i;
 		}else
-			return false;
+		return false;
 
 	}
 
@@ -3722,15 +3722,15 @@ void SetUpRotate(int disc)
 {
 	float rnd;
 
-		rot[disc] = 0.0F; RotWiggle[disc] = 0; RotPause[disc] = 0.0F;
-		Turned[disc] = !Turned[disc]; LastTurned[disc] = !Turned[disc];
-		rnd	= (float)Random_Range(2000);
-		if (rnd > 1000.0F)
-		{	rnd = 1000.0F - rnd;
-			rotspeed[disc] = rnd/1000.0F - 1.0F;
-		}else{
-			rotspeed[disc] = 1.0F + rnd/1000.0F;
-		}
+	rot[disc] = 0.0F; RotWiggle[disc] = 0; RotPause[disc] = 0.0F;
+	Turned[disc] = !Turned[disc]; LastTurned[disc] = !Turned[disc];
+	rnd	= (float)Random_Range(2000);
+	if (rnd > 1000.0F)
+	{	rnd = 1000.0F - rnd;
+		rotspeed[disc] = rnd/1000.0F - 1.0F;
+	}else{
+		rotspeed[disc] = 1.0F + rnd/1000.0F;
+	}
 
 }
 
@@ -3784,48 +3784,48 @@ void RotateDiscs(int disc, RotateDisc OneOnly)
 
 	viewangle = -(float)ATAND ( y, x);
 
-		rot[disc] += ( (framelag/ (rotspeed[disc] * DiscSpeed * 60.0F)) * 180.0F);
+	rot[disc] += ( (framelag/ (rotspeed[disc] * DiscSpeed * 60.0F)) * 180.0F);
 
-		if (rot[disc] >= 180.0F)
-			rot[disc] = 180.0F;
-		if (rot[disc] <= -180.0F)
-			rot[disc] = -180.0F;
+	if (rot[disc] >= 180.0F)
+		rot[disc] = 180.0F;
+	if (rot[disc] <= -180.0F)
+		rot[disc] = -180.0F;
 
-		if (Turned[disc] != LastTurned[disc])
-		{	if ( (rot[disc] >= viewangle) || (rot[disc] <= (viewangle - 180.0F)) )
+	if (Turned[disc] != LastTurned[disc])
+	{	if ( (rot[disc] >= viewangle) || (rot[disc] <= (viewangle - 180.0F)) )
+		{
+			switch ( OneOnly )
 			{
-				switch ( OneOnly )
-				{
-				case RotateDisc::All:
-					PolyAnim[disc]->newframe = CurrentTextures[disc];
-					break;
-				case RotateDisc::DifficultyForward:
-					PolyAnim[disc]->newframe = PolyAnim[disc]->currentframe + 2;
-					if (PolyAnim[disc]->newframe > 11)
-						PolyAnim[disc]->newframe = 5;
-					CurrentTextures[disc] = PolyAnim[disc]->newframe - 1;
-					break;
-				case RotateDisc::DifficultyBack:
-					PolyAnim[disc]->newframe = PolyAnim[disc]->currentframe - 2;
-					if (PolyAnim[disc]->newframe < 5)
-						PolyAnim[disc]->newframe = 11;
-					CurrentTextures[disc] = PolyAnim[disc]->newframe - 1;
-					break;
-				}
-				Turned[disc] = (!Turned[disc]);
+			case RotateDisc::All:
+				PolyAnim[disc]->newframe = CurrentTextures[disc];
+				break;
+			case RotateDisc::DifficultyForward:
+				PolyAnim[disc]->newframe = PolyAnim[disc]->currentframe + 2;
+				if (PolyAnim[disc]->newframe > 11)
+					PolyAnim[disc]->newframe = 5;
+				CurrentTextures[disc] = PolyAnim[disc]->newframe - 1;
+				break;
+			case RotateDisc::DifficultyBack:
+				PolyAnim[disc]->newframe = PolyAnim[disc]->currentframe - 2;
+				if (PolyAnim[disc]->newframe < 5)
+					PolyAnim[disc]->newframe = 11;
+				CurrentTextures[disc] = PolyAnim[disc]->newframe - 1;
+				break;
 			}
+			Turned[disc] = (!Turned[disc]);
 		}
+	}
 
-		if ((rot[disc] != 180.0F) && (rot[disc] != -180.0F))
-		{ 	if (Turned[disc])
-				angleoffset = 180.0F;
-			else
-				angleoffset = 0.0F;
+	if ((rot[disc] != 180.0F) && (rot[disc] != -180.0F))
+	{ 	if (Turned[disc])
+			angleoffset = 180.0F;
+		else
+			angleoffset = 0.0F;
 
-			BuildRotMatrix(0.0F, rot[disc] + angleoffset, 0.0F, &Models[BackgroundModel[disc]].Mat);
-			MatrixTranspose(&Models[BackgroundModel[disc]].Mat, &Models[BackgroundModel[disc]].InvMat);
-		}else
-			DiscJudder(disc);
+		BuildRotMatrix(0.0F, rot[disc] + angleoffset, 0.0F, &Models[BackgroundModel[disc]].Mat);
+		MatrixTranspose(&Models[BackgroundModel[disc]].Mat, &Models[BackgroundModel[disc]].InvMat);
+	}else
+	DiscJudder(disc);
 }
 
 /*===================================================================
@@ -3841,46 +3841,46 @@ void RotateAllDiscs(void)
 
 
 	switch (StackStatus)
+	{
+	case DISC_EXPAND:
+		if ( !onceonly )
 		{
-		case DISC_EXPAND:
-			if ( !onceonly )
-			{
-				PlaySfx( SFX_StakAnimates, 1.0F );
-				onceonly = true;
-			}
-			SetTextures(CurrentMenu);
-			ExpandDiscs();
-			break;
-		case DISC_WIGGLE:
-			WiggleDiscs();
-			break;
-		case DISC_ROTATE:
-			if (!RotateSetup)
-			{	for (i = 0; i <=5; i++)
-					SetUpRotate(i);
-				RotateSetup = true;
-			}
-
-			for (i=0; i<=5; i++)
-				RotateDiscs(i, RotateDisc::All );
-
-			count = 0;
-			for (i = 0; i <= 5; i++)
-			{	if (RotWiggle[i] == (Judders - 1))
-				count++;
-			}
-			if (count == 6)
-			{	StackStatus = DISC_RETRACT;
-			}
-			break;
-		case DISC_RETRACT:
-			ExpandDiscs();
-			break;
-		case DISC_NOTHING:
-			StackMode = DISC_MODE_NONE;
-			DiscWiggleDistance = 4.0F;
-			onceonly = false;
+			PlaySfx( SFX_StakAnimates, 1.0F );
+			onceonly = true;
 		}
+		SetTextures(CurrentMenu);
+		ExpandDiscs();
+		break;
+	case DISC_WIGGLE:
+		WiggleDiscs();
+		break;
+	case DISC_ROTATE:
+		if (!RotateSetup)
+		{	for (i = 0; i <=5; i++)
+				SetUpRotate(i);
+			RotateSetup = true;
+		}
+
+		for (i=0; i<=5; i++)
+			RotateDiscs(i, RotateDisc::All );
+
+		count = 0;
+		for (i = 0; i <= 5; i++)
+		{	if (RotWiggle[i] == (Judders - 1))
+				count++;
+		}
+		if (count == 6)
+		{	StackStatus = DISC_RETRACT;
+		}
+		break;
+	case DISC_RETRACT:
+		ExpandDiscs();
+		break;
+	case DISC_NOTHING:
+		StackMode = DISC_MODE_NONE;
+		DiscWiggleDistance = 4.0F;
+		onceonly = false;
+	}
 
 }
 
@@ -3910,8 +3910,8 @@ void RotateOneDisc(int disc)
 		break;
 	case DISC_ROTATE:
 		if (!RotateSetup)
-				SetUpRotate(disc);
-			RotateSetup = true;
+			SetUpRotate(disc);
+		RotateSetup = true;
 
 		RotateDiscs(disc, DifficultyDir );
 
@@ -4052,69 +4052,69 @@ bool RenderCurrentMenu(void) // this renders broken main menu
 	set_alpha_states();
 
 	// display clipped translucencies
-/*===================================================================
-	Display 0 Clipped Non Faceme Transluecent Polys
-===================================================================*/
+	/*===================================================================
+		Display 0 Clipped Non Faceme Transluecent Polys
+	===================================================================*/
 
-		if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], 0 ) )
-				return false;
+	if( !DisplayGroupClippedPolys( &RenderBufs[ 2 ], 0 ) )
+		return false;
 
-/*===================================================================
-Display 0 Clipped Faceme Transluecent Polys
-===================================================================*/
+	/*===================================================================
+	Display 0 Clipped Faceme Transluecent Polys
+	===================================================================*/
 
-		if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], 0 ) )
-				return false;
+	if( !DisplayGroupClippedFmPolys( &RenderBufs[ 2 ], 0 ) )
+		return false;
 
-		ExecuteTransExe( 0 );
-		ExecuteTransExeUnclipped( 0 );
+	ExecuteTransExe( 0 );
+	ExecuteTransExeUnclipped( 0 );
 
-/*===================================================================
-	Display Non 0 Clipped Faceme Transluecent Polys
-===================================================================*/
+	/*===================================================================
+		Display Non 0 Clipped Faceme Transluecent Polys
+	===================================================================*/
 
 	if( !DisplayGroupUnclippedFmPolys( &RenderBufs[ 2 ] ) )
-			return false;
+		return false;
 
-/*===================================================================
-Display Non 0 Clipped Non Faceme Transluecent Polys
-===================================================================*/
+	/*===================================================================
+	Display Non 0 Clipped Non Faceme Transluecent Polys
+	===================================================================*/
 	if( !DisplayGroupUnclippedPolys( &RenderBufs[ 2 ] ) )
-			return false;
+		return false;
 
-/*===================================================================
-	Display Transluecent Screen Polys
-===================================================================*/
+	/*===================================================================
+		Display Transluecent Screen Polys
+	===================================================================*/
 
-		if( !DisplayNonSolidScrPolys( &RenderBufs[ 3 ] ) )
-			return false;
+	if( !DisplayNonSolidScrPolys( &RenderBufs[ 3 ] ) )
+		return false;
 
-//
-// turn off transparency mode
-//
+	//
+	// turn off transparency mode
+	//
 
 	set_normal_states();
 
-/*===================================================================
-	Display Solid Screen Polys
-===================================================================*/
+	/*===================================================================
+		Display Solid Screen Polys
+	===================================================================*/
 
 	if( !DisplaySolidScrPolys( &RenderBufs[ 3 ] ) )
 		return false;
 
-/*===================================================================
-Display Opaque Lines
-===================================================================*/
-		group = INDEX_NONE;
+	/*===================================================================
+	Display Opaque Lines
+	===================================================================*/
+	group = INDEX_NONE;
 
-		ExecuteLines( group, &RenderBufs[ 0 ] );
+	ExecuteLines( group, &RenderBufs[ 0 ] );
 
-/*===================================================================
-Display Solid Lines
-===================================================================*/
-		group = INDEX_NONE;
+	/*===================================================================
+	Display Solid Lines
+	===================================================================*/
+	group = INDEX_NONE;
 
-		ExecuteLines( group, &RenderBufs[ 0 ] );
+	ExecuteLines( group, &RenderBufs[ 0 ] );
 
 	return true;
 }
@@ -4144,7 +4144,7 @@ bool DisplayTitle(void)
 		}
 
 		if ((CurrentDiscHighlight >= 0) && (CurrentDiscHighlight < 6))
-				HighlightDisc(CurrentDiscHighlight);
+			HighlightDisc(CurrentDiscHighlight);
 
 	}
 
@@ -4308,12 +4308,12 @@ bool DisplayTitle(void)
 		break;
 	}
 
-/****************************************/
+	/****************************************/
 	ProcessHoloModel();
 	GetTitleMessage();
-/*******************
-Event handling
-*******************/
+	/*******************
+	Event handling
+	*******************/
 	ProcessTimers();
 	ProcessEvents();
 
@@ -4997,7 +4997,7 @@ void PlayCursorSfx( void )
 		else
 			PlaySfx( SFX_VidText, 1.0F );
 	}else
-		PlaySfx( SFX_VidText, 1.0F );
+	PlaySfx( SFX_VidText, 1.0F );
 }
 
 bool ItemSelectable( MENUITEM *item )
@@ -5059,47 +5059,47 @@ void CursorUp()
 
 void CursorDown()
 {
-		int x;
-		int y;
-		MENUITEM *next;
-		MENUITEM *wrap;
-		MENUITEM *item;
+	int x;
+	int y;
+	MENUITEM *next;
+	MENUITEM *wrap;
+	MENUITEM *item;
 
 
 
-		x = CurrentMenuItem->x;
-		y = CurrentMenuItem->y;
-		next = nullptr;
-		wrap = nullptr;
-		for ( item = CurrentMenu->Item; item->x >= 0; item++ )
+	x = CurrentMenuItem->x;
+	y = CurrentMenuItem->y;
+	next = nullptr;
+	wrap = nullptr;
+	for ( item = CurrentMenu->Item; item->x >= 0; item++ )
+	{
+		if ( item->FuncSelect && ItemSelectable( item ) )
 		{
-			if ( item->FuncSelect && ItemSelectable( item ) )
+			if ( ( item != CurrentMenuItem ) &&	( item->y > y ) &&
+				( !next || ( ( abs( item->y - y ) + ( abs( item->x - x ) ) <= ( abs( next->y - y ) + abs( next->x - x ) ) ) ) ) )
 			{
-				if ( ( item != CurrentMenuItem ) &&	( item->y > y ) &&
-					( !next || ( ( abs( item->y - y ) + ( abs( item->x - x ) ) <= ( abs( next->y - y ) + abs( next->x - x ) ) ) ) ) )
-				{
-					next = item;
-				}
-				if ( !wrap || ( ( item->y <= wrap->y ) && ( abs( item->x - x ) <= abs( wrap->x - x ) ) ) )
-				{
-					wrap = item;
-				}
+				next = item;
+			}
+			if ( !wrap || ( ( item->y <= wrap->y ) && ( abs( item->x - x ) <= abs( wrap->x - x ) ) ) )
+			{
+				wrap = item;
 			}
 		}
-		if ( next )
+	}
+	if ( next )
+	{
+		CurrentMenuItem = next;
+		PlayCursorSfx();
+
+	}
+	else
+	{
+		if ( wrap )
 		{
-			CurrentMenuItem = next;
+			CurrentMenuItem = wrap;
 			PlayCursorSfx();
-
 		}
-		else
-		{
-			if ( wrap )
-			{
-				CurrentMenuItem = wrap;
-				PlayCursorSfx();
-			}
-		}
+	}
 
 }
 
@@ -5785,10 +5785,10 @@ void DrawColToggle( MENUITEM *Item )
 ===================================================================*/
 void SelectMatureContentToggle( MENUITEM *Item )
 {
-		if(*(int *) Item->Variable > 1)
-			*(int *) Item->Variable = 0;
-		else
-			*(int *) Item->Variable =*(int *)Item->Variable + 1;
+	if(*(int *) Item->Variable > 1)
+		*(int *) Item->Variable = 0;
+	else
+		*(int *) Item->Variable =*(int *)Item->Variable + 1;
 }
 
 /*===================================================================
@@ -5809,15 +5809,15 @@ void DrawMatureContentToggle( MENUITEM *Item )
 	{
 		switch(*(int*)(Item->Variable ))
 		{
-			case 0:
-						Print4x5Text( "DISABLED", -1 , y , 1 );
-						break;
-			case 1:
-						Print4x5Text( "TOM CRUISE", -1 , y , 1 );
-						break;
-			case 2:
-						Print4x5Text( "GUTS", -1 , y , 1 );
-						break;
+		case 0:
+			Print4x5Text( "DISABLED", -1 , y , 1 );
+			break;
+		case 1:
+			Print4x5Text( "TOM CRUISE", -1 , y , 1 );
+			break;
+		case 2:
+			Print4x5Text( "GUTS", -1 , y , 1 );
+			break;
 		}
 	}
 }
@@ -5829,10 +5829,10 @@ void DrawMatureContentToggle( MENUITEM *Item )
 ===================================================================*/
 void SelectColourToggle( MENUITEM *Item )
 {
-		if(*(int *) Item->Variable > 7)
-			*(int *) Item->Variable = -1;
-		else
-			*(int *) Item->Variable =*(int *)Item->Variable + 1;
+	if(*(int *) Item->Variable > 7)
+		*(int *) Item->Variable = -1;
+	else
+		*(int *) Item->Variable =*(int *)Item->Variable + 1;
 }
 
 /*===================================================================
@@ -5853,36 +5853,36 @@ void DrawMessagesToggle( MENUITEM *Item )
 	{
 		switch(*(int*)(Item->Variable ))
 		{
-			case -1:
-						Print4x5Text( LT_DISABLED, -1 , y , 1 );
-						break;
-			case 0:
-						Print4x5Text( LT_WHITE, -1 , y , 1 );
-						break;
-			case 1:
-						Print4x5Text( LT_RED, -1 , y , 1 );
-						break;
-			case 2:
-						Print4x5Text( LT_LIGHTGREEN, -1 , y , 1 );
-						break;
-			case 3:
-						Print4x5Text( LT_BLUE, -1 , y , 1 );
-						break;
-			case 4:
-						Print4x5Text( LT_YELLOW, -1 , y , 1 );
-						break;
-			case 5:
-						Print4x5Text( LT_LIGHTBLUE, -1 , y , 1 );
-						break;
-			case 6:
-						Print4x5Text( LT_PINK, -1 , y , 1 );
-						break;
-			case 7:
-						Print4x5Text( LT_TURQUOISE, -1 , y , 1 );
-						break;
-			case 8:
-						Print4x5Text( LT_GREY, -1 , y , 1 );
-						break;
+		case -1:
+			Print4x5Text( LT_DISABLED, -1 , y , 1 );
+			break;
+		case 0:
+			Print4x5Text( LT_WHITE, -1 , y , 1 );
+			break;
+		case 1:
+			Print4x5Text( LT_RED, -1 , y , 1 );
+			break;
+		case 2:
+			Print4x5Text( LT_LIGHTGREEN, -1 , y , 1 );
+			break;
+		case 3:
+			Print4x5Text( LT_BLUE, -1 , y , 1 );
+			break;
+		case 4:
+			Print4x5Text( LT_YELLOW, -1 , y , 1 );
+			break;
+		case 5:
+			Print4x5Text( LT_LIGHTBLUE, -1 , y , 1 );
+			break;
+		case 6:
+			Print4x5Text( LT_PINK, -1 , y , 1 );
+			break;
+		case 7:
+			Print4x5Text( LT_TURQUOISE, -1 , y , 1 );
+			break;
+		case 8:
+			Print4x5Text( LT_GREY, -1 , y , 1 );
+			break;
 		}
 
 	}
@@ -6140,8 +6140,8 @@ void ExitControls( MENU * /*Menu*/ )
 ===================================================================*/
 static int compare( const void *arg1, const void *arg2 )
 {
-   /* Compare all of both strings: */
-   return strcasecmp( ( char* ) arg1, ( char* ) arg2 );
+	/* Compare all of both strings: */
+	return strcasecmp( ( char* ) arg1, ( char* ) arg2 );
 }
 
 
@@ -6189,7 +6189,7 @@ void InitPilotList( void )
 			PilotList.items++;
 		}
 
-	// get the next file
+		// get the next file
 	}while(	(fname = find_next_file()) );
 
 	// sort the pilot list
@@ -6747,7 +6747,7 @@ void CancelListSelection( LIST *l )
 void MenuEnterTextInputState(int state)
 {
 	MenuState = (MENUSTATE)state;
-// TODO is this right ?
+	// TODO is this right ?
 #ifndef __3DS__
 	SDL_StartTextInput();
 #endif
@@ -7094,7 +7094,7 @@ void InitInGameMenu( MENU *Menu )
 		}
 
 		if ( item->FuncSelect == SelectQuitCurrentGame )
-				item->StrPnt = (u_int8_t*)LT_QuitToMainMenu/*"Quit to Main Menu"*/;
+			item->StrPnt = (u_int8_t*)LT_QuitToMainMenu/*"Quit to Main Menu"*/;
 
 		if ( item->Value == &MENU_LevelSelect )
 		{
@@ -7136,7 +7136,7 @@ void InitDebugMode( MENU *Menu )
 			item->Value == &OldNodeCube ||
 			item->Value == &NodeCube ||
 			item->Value == &NodeCubeType
-		)
+			)
 		{
 			if ( DebugInfo )
 			{
@@ -7471,12 +7471,12 @@ void AddBikeArrow( char *name, int num )
 	{
 		if ( i < num )
 		{
-				leftarrow = true;
+			leftarrow = true;
 		}
 
 		if ( i > num )
 		{
-				rightarrow = true;
+			rightarrow = true;
 		}
 	}
 
@@ -7922,9 +7922,9 @@ void GetGamePrefs( void )
 	CLAMP( WaterDetailSlider.value, WaterDetailSlider.max );
 	SetWaterDetail( &WaterDetailSlider );
 
-		TextScaleSlider.value = config_get_int("TextScale", 0.0F);
-		CLAMP(TextScaleSlider.value, TextScaleSlider.max);
-		SetTextScale( &TextScaleSlider );
+	TextScaleSlider.value = config_get_int("TextScale", 0.0F);
+	CLAMP(TextScaleSlider.value, TextScaleSlider.max);
+	SetTextScale( &TextScaleSlider );
 
 	SfxSlider.value                  = config_get_int( "SfxVolume",					(int)(SfxSlider.max				* 1.00F) );
 	FlagSfxSlider.value              = config_get_int( "FlagSfxVolume",				(int)(FlagSfxSlider.max			* 0.80F) );
@@ -7966,9 +7966,9 @@ void GetGamePrefs( void )
 	render_info.default_mode.h  = config_get_int( "ScreenHeight", 0 );
 	render_info.vsync  = config_get_int( "VSync", 0 );
 
-		MatureContent										 = config_get_int( "MatureContent", 2);
-		HUDColour												 = config_get_int( "HUDColour", YELLOW );
-		InGameMenuColour								 = config_get_int( "InGameMenuColour", YELLOW );
+	MatureContent										 = config_get_int( "MatureContent", 2);
+	HUDColour												 = config_get_int( "HUDColour", YELLOW );
+	InGameMenuColour								 = config_get_int( "InGameMenuColour", YELLOW );
 	MilestoneMessagesColour          = config_get_int( "MilestoneMessagesColour",	RED );
 	KillMessageColour                = config_get_int( "KillMessageColour",			GREEN );
 	SystemMessageColour              = config_get_int( "SystemMessageColour",		YELLOW );
@@ -7977,7 +7977,7 @@ void GetGamePrefs( void )
 	PickupMessageColour              = config_get_int( "PickupMessageColour",		GREEN );
 	TauntMessageColour               = config_get_int( "TauntMessageColour",		GREEN );
 	MyMessageColour                  = config_get_int( "MyMessageColour",			  WHITE );
-		MaxMessageTime                   = config_get_float( "MaxMessageTime",    5.0f );
+	MaxMessageTime                   = config_get_float( "MaxMessageTime",    5.0f );
 
 	CLAMP( InGameMenuColour, MAXFONTCOLOURS );
 	CLAMP( MilestoneMessagesColour,	MAXFONTCOLOURS );
@@ -8037,7 +8037,7 @@ void SetGamePrefs( void )
 
 	// booleans
 
-  config_set_bool( "TintBikeTeamColor",     TintBikeTeamColor );
+	config_set_bool( "TintBikeTeamColor",     TintBikeTeamColor );
 	config_set_bool( "ResetKillsPerLevel",		MyResetKillsPerLevel );
 	config_set_bool( "BrightShips",			MyBrightShips );
 	config_set_bool( "MissileCameraEnable",		MissileCameraEnable );
@@ -8284,17 +8284,17 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 
 				for (i=8; i<TotalVerts; i++)	//ignore bounding box, so start at 8...
 				{
-				tempvert.x = VertPtr[i].x * Models[Model].Xscale;
-				tempvert.y = VertPtr[i].y * Models[Model].Yscale;
-				tempvert.z = VertPtr[i].z * Models[Model].Zscale;
+					tempvert.x = VertPtr[i].x * Models[Model].Xscale;
+					tempvert.y = VertPtr[i].y * Models[Model].Yscale;
+					tempvert.z = VertPtr[i].z * Models[Model].Zscale;
 
-				dist = tempvert.z;	// assumes z plane!!!
+					dist = tempvert.z;	// assumes z plane!!!
 
-				if (dist > *maxoffset)
-					*maxoffset = dist;
+					if (dist > *maxoffset)
+						*maxoffset = dist;
 
-				if (dist < *minoffset)
-					*minoffset = dist;
+					if (dist < *minoffset)
+						*minoffset = dist;
 				}
 			}
 		}
@@ -8314,17 +8314,17 @@ void GetExtremeOffsets( u_int16_t Model, PLANE * /*plane*/, float *minoffset, fl
 
 				for (i=8; i<TotalVerts; i++)	//ignore bounding box, so start at 8...
 				{
-				tempvert.x = VertPtr[i].x * Models[Model].Xscale;
-				tempvert.y = VertPtr[i].y * Models[Model].Yscale;
-				tempvert.z = VertPtr[i].z * Models[Model].Zscale;
+					tempvert.x = VertPtr[i].x * Models[Model].Xscale;
+					tempvert.y = VertPtr[i].y * Models[Model].Yscale;
+					tempvert.z = VertPtr[i].z * Models[Model].Zscale;
 
-				dist = tempvert.z;
+					dist = tempvert.z;
 
-				if (dist > *maxoffset)
-					*maxoffset = dist;
+					if (dist > *maxoffset)
+						*maxoffset = dist;
 
-				if (dist < *minoffset)
-					*minoffset = dist;
+					if (dist < *minoffset)
+						*minoffset = dist;
 				}
 			}
 		}
@@ -8392,7 +8392,7 @@ void HighlightDisc(int disc)
 ===================================================================*/
 void ResetDisc(int disc)
 {
-	 PolyAnim[disc]->newframe = CurrentTextures[disc];
+	PolyAnim[disc]->newframe = CurrentTextures[disc];
 }
 
 /*===================================================================
@@ -9355,7 +9355,7 @@ SLIDER *GetSlider( MENUITEM *Item, int *slidertype )
 		feature = *((int *) (Item->Variable));
 		slider = &BikeFeatureSlider[OldSelectedBike][feature];
 	}else
-		slider = (SLIDER *) (Item->Variable);
+	slider = (SLIDER *) (Item->Variable);
 
 	return slider;
 }
@@ -9610,7 +9610,7 @@ static u_int16_t GetNumUsed( int16_t *priority, bool *valid, u_int16_t /*Max*/ )
 	{
 		if ( ( priority[ i ] < 0 ) && ( valid[ i ] ) )
 		{
-			 unused++;
+			unused++;
 		}
 	}
 
@@ -9773,8 +9773,8 @@ void VduClear ( void )
 		if ( TextStack[ i ] )
 		{
 			TextStack[i]->boxdone = false;
-			KillTextInfo( TextStack[i] );
-		}
+		KillTextInfo( TextStack[i] );
+	}
 
 	TextStackLevel = 0;
 
@@ -9796,13 +9796,13 @@ void VduClear ( void )
 		if (ActiveSliderItem[i].Item)
 		{
 			slider = GetSlider ( ActiveSliderItem[i].Item, &slidertype );
-			if (slider->poly != INDEX_NONE)
-			{
-				KillUsedScrPoly( slider->poly );
-				slider->poly = INDEX_NONE;
-			}
-			ActiveSliderItem[i].Item = nullptr;
+		if (slider->poly != INDEX_NONE)
+		{
+			KillUsedScrPoly( slider->poly );
+			slider->poly = INDEX_NONE;
 		}
+		ActiveSliderItem[i].Item = nullptr;
+	}
 
 	PlaySfx( SFX_VduClear, 0.4F );
 
@@ -9903,7 +9903,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 
 	font = GetScreenFont(TextInfo->font);
 
-	 //find total width of word...
+	//find total width of word...
 	WordWidth = 0.0F;
 	TrailingSpace = false;
 	ForceNewLineNext = false;
@@ -9933,7 +9933,7 @@ bool FormatTextItem(int start, int end, TEXTINFO *TextInfo, bool *newline)
 					ForceNewLineNext = true;
 
 			}else
-				WordWidth += TEXTINFO_TextSpace; //add a space between characters
+			WordWidth += TEXTINFO_TextSpace; //add a space between characters
 
 
 			if (Box_Ptr->ysize * VduScaleY > TEXTINFO_currentheight)
@@ -10175,7 +10175,7 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 		if (pos == TextInfo->startpoint[line])
 		{
 			if ( xpos < TextInfo->char1x )
-				 TextInfo->char1x = xpos;
+				TextInfo->char1x = xpos;
 
 			if (line == 0)
 				TextInfo->text_y_min = ypos - TextInfo->height[line] + TEXTINFO_LineSpace;
@@ -10231,15 +10231,15 @@ bool DisplayTextCharacter(TEXTINFO *TextInfo, int line, int pos, int font, float
 			ScrPolys[TempPoly].Yscale = VduScaleY;
 			switch (pos)
 			{
-				case -1:
-					ScrPolys[TempPoly].Frame = TextLookup[font][16];
-					break;
-				case -2:
-					ScrPolys[TempPoly].Frame = TextLookup[font]['*'];
-					ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
-					break;
-				default:
-					ScrPolys[TempPoly].Frame = TextLookup[font][TextInfo->text[pos]];
+			case -1:
+				ScrPolys[TempPoly].Frame = TextLookup[font][16];
+				break;
+			case -2:
+				ScrPolys[TempPoly].Frame = TextLookup[font]['*'];
+				ScrPolys[TempPoly].Type = SCRTYPE_LastAFrame;
+				break;
+			default:
+				ScrPolys[TempPoly].Frame = TextLookup[font][TextInfo->text[pos]];
 			}
 
 			ScrPolys[TempPoly].Frm_Info = &Title_Fonts_Header;
@@ -10469,7 +10469,7 @@ void GetFinalChars( TEXTINFO *TextInfo, int currentpos, int length)
 			TEXTINFO_currentx += Box_Ptr->xsize + TEXTINFO_TextSpace;
 			TEXTINFO_currentendpoint++;
 		}else
-			break;
+		break;
 	}
 
 	TEXTINFO_currentendpoint--;
@@ -10525,7 +10525,7 @@ void PrintTextItem (TEXTINFO *TextInfo)
 				}
 				else
 				{
-				  // need to find out how many chars of last word will fit...
+					// need to find out how many chars of last word will fit...
 					GetFinalChars( TextInfo, TEXTINFO_currentendpoint, length);
 				}
 
@@ -10593,7 +10593,7 @@ void ProcessTextItems (void)
 		if (
 			(TextStack[i]->flags & TEXTFLAG_CheckForRefresh) &&
 			(strncmp((char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, MAX_TEXT_LENGTH) != 0)
-		)
+			)
 		{
 			strncpy( (char*)TextStack[i]->oldtext, (char*)TextStack[i]->text, sizeof( TextStack[i]->oldtext ) - 1 );
 			TextStack[i]->oldtext[ sizeof( TextStack[i]->oldtext ) - 1 ] = 0;
@@ -10633,7 +10633,7 @@ void ProcessTextItems (void)
 		VDU_Ready &&
 		((CameraStatus == CAMERA_AtRightVDU) || (CameraStatus == CAMERA_AtLeftVDU)) &&
 		((LastMenuItem != CurrentMenuItem))
-	)
+		)
 	{
 		LastMenuItem = CurrentMenuItem;
 	}
@@ -10645,7 +10645,7 @@ void ProcessTextItems (void)
 		 CurrentMenuItem->TextInfo[0] &&
 		 !(CurrentMenuItem->TextInfo[0]->flags & TEXTFLAG_SuppressHighlight) &&
 		 !(CurrentMenuItem->TextInfo[0]->highlight)	// ensures item is not highlighted twice
-	)
+		)
 	{
 		HighlightItem[ CurrentHighlightItem ] = CurrentMenuItem->TextInfo[0];
 		HighlightStatus[ CurrentHighlightItem++ ] = CurrentMenuItem->TextInfo[0]->highlighttype;
@@ -10659,9 +10659,9 @@ void ProcessTextItems (void)
 
 	ProcessFlatSliders();
 
-/******************
-Highlight box
-*******************/
+	/******************
+	Highlight box
+	*******************/
 
 	theta += 360.0F * framelag/(60.0F);
 	if (theta > 360.0F)
@@ -10784,24 +10784,24 @@ void InitScreenFonts (void)
 		TextLookup[font][(u_int8_t)'\xd1'] = 69 + offset;
 		TextLookup[font][(u_int8_t)'\xdf'] = TextLookup[font][(u_int8_t)'B'];
 
-/*
-  128  Ç ( 199 )  144  É ( 201 )  160  á ( 225 )
-  129  ü ( 252 )  145  æ ( 230 )  161  í ( 237 )
-  130  é ( 233 )  146  Æ ( 198 )  162  ó ( 243 )
-  131  â ( 226 )  147  ô ( 244 )  163  ú ( 250 )
-  132  ä ( 228 )  148  ö ( 246 )  164  ñ ( 241 )
-  133  à ( 224 )  149  ò ( 242 )  165  Ñ ( 209 )
-  134  å ( 229 )  150  û ( 251 )  166  ª ( 170 )
-  135  ç ( 231 )  151  ù ( 249 )  167  º ( 186 )
-  136  ê ( 234 )  152  ÿ ( 255 )  168  ¿ ( 191 )
-  137  ë ( 235 )  153  Ö ( 214 )  169  _ ( 095 )
-  138  è ( 232 )  154  Ü ( 220 )  170  ¬ ( 172 )
-  139  ï ( 239 )  155  ¢ ( 162 )  171  ½ ( 189 )
-  140  î ( 238 )  156  £ ( 163 )  172  ¼ ( 188 )
-  141  ì ( 236 )  157  ¥ ( 165 )  173  ¡ ( 161 )
-  142  Ä ( 196 )  158  P ( 080 )  174  « ( 171 )
-  143  Å ( 197 )  159   ( 131 )  175  » ( 187 )
-*/
+		/*
+		  128  Ç ( 199 )  144  É ( 201 )  160  á ( 225 )
+		  129  ü ( 252 )  145  æ ( 230 )  161  í ( 237 )
+		  130  é ( 233 )  146  Æ ( 198 )  162  ó ( 243 )
+		  131  â ( 226 )  147  ô ( 244 )  163  ú ( 250 )
+		  132  ä ( 228 )  148  ö ( 246 )  164  ñ ( 241 )
+		  133  à ( 224 )  149  ò ( 242 )  165  Ñ ( 209 )
+		  134  å ( 229 )  150  û ( 251 )  166  ª ( 170 )
+		  135  ç ( 231 )  151  ù ( 249 )  167  º ( 186 )
+		  136  ê ( 234 )  152  ÿ ( 255 )  168  ¿ ( 191 )
+		  137  ë ( 235 )  153  Ö ( 214 )  169  _ ( 095 )
+		  138  è ( 232 )  154  Ü ( 220 )  170  ¬ ( 172 )
+		  139  ï ( 239 )  155  ¢ ( 162 )  171  ½ ( 189 )
+		  140  î ( 238 )  156  £ ( 163 )  172  ¼ ( 188 )
+		  141  ì ( 236 )  157  ¥ ( 165 )  173  ¡ ( 161 )
+		  142  Ä ( 196 )  158  P ( 080 )  174  « ( 171 )
+		  143  Å ( 197 )  159   ( 131 )  175  » ( 187 )
+		*/
 
 		TextLookup[font][1] = 225;	// glowing effect for bike scan
 
@@ -12214,7 +12214,7 @@ void InitJoystickAxisConfig ( MENU * /*Menu*/)
 					(char*)JoystickAxisList.item[j],
 					JoystickInfo[JoystickMap[JoystickList.selected_item]].Axis[i].name,
 					sizeof(JoystickList.item[0])
-				);
+					);
 			}
 			else
 			{
@@ -12223,7 +12223,7 @@ void InitJoystickAxisConfig ( MENU * /*Menu*/)
 					sizeof(JoystickList.item[0]),
 					"Axis %d",
 					j
-				);
+					);
 			}
 			JoystickAxisList.items++;
 			AxisMap[j] = i;
@@ -12558,7 +12558,7 @@ void CheckJoyAxis( int * /*dummy*/ )
 
 void ExitJoySetup( MENU * /*Menu*/ )
 {
-   int joystick, i, j, k;
+	int joystick, i, j, k;
 
 	for ( i = 0; i < JoystickList.items; i++ )
 	{
@@ -12796,31 +12796,31 @@ void NextLevelOrGameComplete( MENUITEM * /*Item*/ )
 	Models[BackgroundModel[TITLE_MODEL_Holopad]].Visible = 0;
 
 	switch( GameCompleted )
-	 {
-	 case GameComplete::NotComplete:
-		 MenuChangeEx( &MENU_NEW_BetweenLevels );
-		 return;
-	 case GameComplete::WithoutAllCrystals:
-		 MenuChangeEx( &MENU_NEW_GeneralLoading );
-		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
-		 return;
-	 case GameComplete::Cheated:
-		 strcpy( GameCompleteText, GameCompleteWithCheating );
-		 break;
-	 case GameComplete::GotAllCrystalsSoFar:
-		 strcpy( GameCompleteText, GameCompleteGotAllCrystalsSoFar );
-		 break;
-	 case GameComplete::WithAllCrystals:
-		 MenuChangeEx( &MENU_NEW_GeneralLoading );
-		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
-		 return;
-	 case GameComplete::WithAllCrystalsExceptLast:
-		 MenuChangeEx( &MENU_NEW_GeneralLoading );
-		 MyGameStatus = STATUS_WaitingToStartEndGameSequence;
-		 return;
-	 }
+	{
+	case GameComplete::NotComplete:
+		MenuChangeEx( &MENU_NEW_BetweenLevels );
+		return;
+	case GameComplete::WithoutAllCrystals:
+		MenuChangeEx( &MENU_NEW_GeneralLoading );
+		MyGameStatus = STATUS_WaitingToStartEndGameSequence;
+		return;
+	case GameComplete::Cheated:
+		strcpy( GameCompleteText, GameCompleteWithCheating );
+		break;
+	case GameComplete::GotAllCrystalsSoFar:
+		strcpy( GameCompleteText, GameCompleteGotAllCrystalsSoFar );
+		break;
+	case GameComplete::WithAllCrystals:
+		MenuChangeEx( &MENU_NEW_GeneralLoading );
+		MyGameStatus = STATUS_WaitingToStartEndGameSequence;
+		return;
+	case GameComplete::WithAllCrystalsExceptLast:
+		MenuChangeEx( &MENU_NEW_GeneralLoading );
+		MyGameStatus = STATUS_WaitingToStartEndGameSequence;
+		return;
+	}
 
-	 MenuChangeEx( &MENU_NEW_SpecialMessage );
+	MenuChangeEx( &MENU_NEW_SpecialMessage );
 }
 
 char TypeFileName( TEXT * /*t*/, char c )
@@ -13451,7 +13451,7 @@ void InitInGameLevelSelect( MENU *menu )
 	for ( item = menu->Item; item->x >= 0; item++ )
 	{
 		if ( item->FuncDraw == DrawToggle )
-				item->Variable = &IsHost;
+			item->Variable = &IsHost;
 	}
 }
 
@@ -13522,7 +13522,7 @@ bool ProcessSelectKeydef( int Key )
 						CheckKeysForChanges();
 				}
 			}else
-				CursorLeft();
+			CursorLeft();
 			break;
 
 		case SDLK_RIGHT:
@@ -13540,7 +13540,7 @@ bool ProcessSelectKeydef( int Key )
 						CheckKeysForChanges();
 				}
 			}else
-				CursorRight();
+			CursorRight();
 			break;
 
 		case SDLK_HOME:
@@ -13560,16 +13560,16 @@ bool ProcessSelectKeydef( int Key )
 					DEFKEY *kdef;
 
 					kdef = (DEFKEY *)(CurrentMenuItem->Variable);
-						if ( kdef->def->keys < MAX_KEYS_PER_CONTROL )
-						{
-							kdef->selected_key = kdef->def->keys++;
-							kdef->def->key[ kdef->selected_key ] = (VirtualKeycode) 0;
-							CurrentMenuItem->FuncSelect( CurrentMenuItem );
-							if ( CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
-								CheckKeysForChanges();
-						}
-						else
-							PlaySfx( SFX_Error, 1.0F );
+					if ( kdef->def->keys < MAX_KEYS_PER_CONTROL )
+					{
+						kdef->selected_key = kdef->def->keys++;
+						kdef->def->key[ kdef->selected_key ] = (VirtualKeycode) 0;
+						CurrentMenuItem->FuncSelect( CurrentMenuItem );
+						if ( CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
+							CheckKeysForChanges();
+					}
+					else
+						PlaySfx( SFX_Error, 1.0F );
 				}
 				else
 					CurrentMenuItem->FuncSelect( CurrentMenuItem );
@@ -13638,7 +13638,7 @@ bool ProcessSelectKeydef( int Key )
 			}
 			break;
 
-		// TODO - need to pass unicode char to this function
+			// TODO - need to pass unicode char to this function
 		}
 	}
 
@@ -13898,12 +13898,12 @@ bool ProcessList( int Key )
 
 	case LEFT_MOUSE:
 	case SDLK_RETURN:
-			FuncSet = (MenuItemFunc) CurrentMenuItem->Value;
-			if ( FuncSet )
-			{
-				FuncSet( CurrentMenuItem );
-			}
-			done = true;
+		FuncSet = (MenuItemFunc) CurrentMenuItem->Value;
+		if ( FuncSet )
+		{
+			FuncSet( CurrentMenuItem );
+		}
+		done = true;
 		break;
 
 	case MIDDLE_MOUSE:
@@ -14005,8 +14005,8 @@ bool ProcessText( int Key )
 		GetVduTextFormattingInfo ( t );
 	}
 
-// TODO is this right ?
-//      will probably need to support SDL_TextInputEvent
+	// TODO is this right ?
+	//      will probably need to support SDL_TextInputEvent
 #ifndef __3DS__
 	if(done)
 		SDL_StopTextInput();
@@ -14031,13 +14031,13 @@ void ProcessSelect( int Key )
 
 
 	if
-	(
-		CurrentMenuItem->Variable &&
 		(
-		   ( CurrentMenuItem->FuncSelect == SelectKey ) ||
-		   ( CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
-		)
-	)
+			CurrentMenuItem->Variable &&
+			(
+			   ( CurrentMenuItem->FuncSelect == SelectKey ) ||
+			   ( CurrentMenuItem->FuncSelect == SelectFlatMenuKey )
+			)
+			)
 	{
 
 		/* delete, backspace, right click */
@@ -14080,18 +14080,18 @@ void ProcessSelect( int Key )
 
 		if (
 			(CurrentMenuItem->FuncSelect == SelectFlatMenuToggle)
-		)
+			)
 		{
 
-				if
+			if
 				(
 					  (CurrentMenuItem->Variable && *(bool *)(CurrentMenuItem->Variable)) &&
 					  CurrentMenuItem->FuncSelect
-				)
-				{
-				  CurrentMenuItem->FuncSelect( CurrentMenuItem );
-				  PlayCursorSfx();
-				}
+					)
+			{
+				CurrentMenuItem->FuncSelect( CurrentMenuItem );
+				PlayCursorSfx();
+			}
 
 		}
 		else
@@ -14108,7 +14108,7 @@ void ProcessSelect( int Key )
 
 		if (
 			(CurrentMenuItem->FuncSelect == SelectFlatMenuToggle)
-		)
+			)
 		{
 
 			if (  CurrentMenuItem->Variable &&
@@ -14296,7 +14296,7 @@ bool ProcessBikerList ( int Key )
 	if (redraw)
 	{
 		LastMenu = CurrentMenu;	// because we are not actually changing menus,
-								// but we still want to clear this menu
+		// but we still want to clear this menu
 		VduClear();
 		OldSelectedBike = BikeList.selected_item;
 		ProcessVduItems(CurrentMenu);
@@ -14349,7 +14349,7 @@ bool ProcessSavedGameList( int Key )
 	{
 		GetSavedGameData();
 		LastMenu = CurrentMenu;	// because we are not actually changing menus,
-								// but we still want to clear this menu
+		// but we still want to clear this menu
 		VduClear();
 		ProcessVduItems(CurrentMenu);
 	}
@@ -14787,7 +14787,7 @@ bool ProcessLevelList ( int Key )
 		if (MenuState == MENUSTATE_SelectLevelSlow)
 		{
 			LastMenu = CurrentMenu;	// because we are not actually changing menus,
-									// but we still want to clear this menu
+			// but we still want to clear this menu
 			LoadLevelText( nullptr );
 			VduClear();
 			ProcessVduItems(CurrentMenu);
@@ -14829,7 +14829,7 @@ void MenuProcess()
 		//
 		CheckCheats( Key );
 
-			// if last key pressed exited from menu system
+		// if last key pressed exited from menu system
 		// do not process any more keys
 		if ( !CurrentMenu )
 			goto end;
@@ -14837,24 +14837,24 @@ void MenuProcess()
 		//  set global to define if we are in a title room
 		switch ( MyGameStatus )
 		{
-			case	STATUS_StartingMultiplayer:
-			case	STATUS_GetPlayerNum:
-			case	STATUS_Title:
-			case	STATUS_BetweenLevels:
-			case	STATUS_StartingSinglePlayer:
-				InTitleRoom = true;
-				break;
-			default:
-				InTitleRoom = false;
+		case	STATUS_StartingMultiplayer:
+		case	STATUS_GetPlayerNum:
+		case	STATUS_Title:
+		case	STATUS_BetweenLevels:
+		case	STATUS_StartingSinglePlayer:
+			InTitleRoom = true;
+			break;
+		default:
+			InTitleRoom = false;
 		}
 
 		// no menu processing done while loading...
 		switch ( MyGameStatus )
 		{
-		  case STATUS_WaitingToStartSinglePlayer:
-		  case STATUS_WaitingToStartMultiPlayerHost:
-		  case STATUS_WaitingToStartMultiPlayerClient:
-		  case STATUS_WaitingToStartTeamGame:
+		case STATUS_WaitingToStartSinglePlayer:
+		case STATUS_WaitingToStartMultiPlayerHost:
+		case STATUS_WaitingToStartMultiPlayerClient:
+		case STATUS_WaitingToStartTeamGame:
 			goto end;
 			break;
 		}
@@ -14884,134 +14884,134 @@ void MenuProcess()
 
 		switch ( MenuState )
 		{
-			case MENUSTATE_SelectKeydef:
-				if ( !ProcessSelectKeydef( Key ) )
-					MenuState = MENUSTATE_Select;
-				break;
-
-
-			case MENUSTATE_Keydef:
-				if ( !ProcessDefKey( Key ) )
-					MenuState = MENUSTATE_SelectKeydef;
-				break;
-
-
-			case MENUSTATE_Keydef2:
-				if ( !ProcessDefKey( Key ) )
-				{
-					MenuState = MENUSTATE_SelectKeydef;
-					CheckKeysForChanges();
-					CurrentMenuItem->TextInfo[0]->highlighttype = HighlightType::Pulsing;
-				}
-				break;
-
-
-			case MENUSTATE_Slider:
-				if ( !ProcessSlider( Key ) )
-					MenuState = MENUSTATE_Select;
-				break;
-
-
-			case MENUSTATE_Slider2:
-				if ( !ProcessSlider2( Key ) )
-					MenuState = MENUSTATE_Select;
-				break;
-
-
-			case MENUSTATE_List:
-				/* process text list keys */
-				if ( !ProcessList( Key ) )
-				{
-					if ( CurrentMenuItem &&
-						(!(CurrentMenuItem->highlightflags & TEXTFLAG_AutoSelect)) )
-					{
-						CurrentList = nullptr;
-						MenuState = MENUSTATE_Select;
-						if (PreListMenu == CurrentMenu)
-							CurrentMenuItem = PreListItem;
-						CurrentListItem = nullptr;
-					}
-				}
+		case MENUSTATE_SelectKeydef:
+			if ( !ProcessSelectKeydef( Key ) )
+				MenuState = MENUSTATE_Select;
 			break;
 
 
-			case MENUSTATE_Text:
-				if ( !ProcessText( Key ) )
+		case MENUSTATE_Keydef:
+			if ( !ProcessDefKey( Key ) )
+				MenuState = MENUSTATE_SelectKeydef;
+			break;
+
+
+		case MENUSTATE_Keydef2:
+			if ( !ProcessDefKey( Key ) )
+			{
+				MenuState = MENUSTATE_SelectKeydef;
+				CheckKeysForChanges();
+				CurrentMenuItem->TextInfo[0]->highlighttype = HighlightType::Pulsing;
+			}
+			break;
+
+
+		case MENUSTATE_Slider:
+			if ( !ProcessSlider( Key ) )
+				MenuState = MENUSTATE_Select;
+			break;
+
+
+		case MENUSTATE_Slider2:
+			if ( !ProcessSlider2( Key ) )
+				MenuState = MENUSTATE_Select;
+			break;
+
+
+		case MENUSTATE_List:
+			/* process text list keys */
+			if ( !ProcessList( Key ) )
+			{
+				if ( CurrentMenuItem &&
+					(!(CurrentMenuItem->highlightflags & TEXTFLAG_AutoSelect)) )
 				{
+					CurrentList = nullptr;
 					MenuState = MENUSTATE_Select;
-					if (CurrentMenu && (CurrentMenuItem->highlightflags & TEXTFLAG_AutoSelect))	// safe to assume only menu item if autoselected
-					{
-						MenuBack();
-					}
+					if (PreListMenu == CurrentMenu)
+						CurrentMenuItem = PreListItem;
+					CurrentListItem = nullptr;
 				}
-				break;
+			}
+			break;
 
 
-			case MENUSTATE_Text2:
-				if ( !ProcessText( Key ) )
+		case MENUSTATE_Text:
+			if ( !ProcessText( Key ) )
+			{
+				MenuState = MENUSTATE_Select;
+				if (CurrentMenu && (CurrentMenuItem->highlightflags & TEXTFLAG_AutoSelect))	// safe to assume only menu item if autoselected
 				{
-					MenuState = MENUSTATE_Select;
-					CurrentMenuItem->TextInfo[0]->highlighttype = HighlightType::Pulsing;
-					if (CurrentMenu && (CurrentMenuItem->highlightflags & TEXTFLAG_AutoSelect))	// safe to assume only menu item if autoselected
-					{
-						MenuBack();
-					}
+					MenuBack();
 				}
-				break;
+			}
+			break;
 
 
-			case MENUSTATE_SelectBiker:
-				if ( !ProcessBikerList ( Key ) )
-				{	MenuState = MENUSTATE_Select;
+		case MENUSTATE_Text2:
+			if ( !ProcessText( Key ) )
+			{
+				MenuState = MENUSTATE_Select;
+				CurrentMenuItem->TextInfo[0]->highlighttype = HighlightType::Pulsing;
+				if (CurrentMenu && (CurrentMenuItem->highlightflags & TEXTFLAG_AutoSelect))	// safe to assume only menu item if autoselected
+				{
+					MenuBack();
 				}
-				break;
+			}
+			break;
 
 
-			case MENUSTATE_SelectSavedGame:
-				if ( !ProcessSavedGameList ( Key ) )
-				{	MenuState = MENUSTATE_Select;
-				}
-				break;
+		case MENUSTATE_SelectBiker:
+			if ( !ProcessBikerList ( Key ) )
+			{	MenuState = MENUSTATE_Select;
+			}
+			break;
 
 
-			case MENUSTATE_SelectPlayer:
-				if ( !ProcessPlayerList ( Key ) )
-				{	MenuState = MENUSTATE_Select;
-				}
-				break;
+		case MENUSTATE_SelectSavedGame:
+			if ( !ProcessSavedGameList ( Key ) )
+			{	MenuState = MENUSTATE_Select;
+			}
+			break;
 
 
-			case MENUSTATE_WeaponOrder:
-				if ( !ProcessWeaponOrder ( Key ) )
-				{	MenuState = MENUSTATE_Select;
-				}
-				break;
+		case MENUSTATE_SelectPlayer:
+			if ( !ProcessPlayerList ( Key ) )
+			{	MenuState = MENUSTATE_Select;
+			}
+			break;
 
 
-			case MENUSTATE_SelectLevelQuick:
-			case MENUSTATE_SelectLevelSlow:
-				if ( !ProcessLevelList ( Key ) )
-					MenuState = MENUSTATE_Select;
-				break;
-
-			case MENUSTATE_DifficultySet:
-				if ( !ProcessDifficultySet ( Key ) )
-					MenuState = MENUSTATE_Select;
-				break;
+		case MENUSTATE_WeaponOrder:
+			if ( !ProcessWeaponOrder ( Key ) )
+			{	MenuState = MENUSTATE_Select;
+			}
+			break;
 
 
-			case MENUSTATE_Select:
-				ProcessSelect( Key );
-				[[fallthrough]];	// the auto-select step runs here too
+		case MENUSTATE_SelectLevelQuick:
+		case MENUSTATE_SelectLevelSlow:
+			if ( !ProcessLevelList ( Key ) )
+				MenuState = MENUSTATE_Select;
+			break;
 
-			default:
-				MenuItemSelect(CurrentMenuItem);
-				break;
+		case MENUSTATE_DifficultySet:
+			if ( !ProcessDifficultySet ( Key ) )
+				MenuState = MENUSTATE_Select;
+			break;
+
+
+		case MENUSTATE_Select:
+			ProcessSelect( Key );
+			[[fallthrough]];	// the auto-select step runs here too
+
+		default:
+			MenuItemSelect(CurrentMenuItem);
+			break;
 
 		} // menustate switch
 	} // for each buffered input
 
-end:
+	end:
 
 	CheckMenuTimer();
 	ProcessMenuFlashText();

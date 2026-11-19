@@ -273,7 +273,7 @@ char * get_key_name( int i )
 		return nullptr;
 	return convert_char( ' ', '_',
 		(char*)strdup(name)
-	);
+		);
 }
 
 // text ,  keydef
@@ -1456,7 +1456,7 @@ read_config( USERCONFIG *u, char *cfg_name )
 				// get the next token
 				fscanf( f, " %80s", token );
 
-		// while were not at the end of the file
+			// while were not at the end of the file
 		} while ( !feof( f ) );
 	}
 	else

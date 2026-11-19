@@ -189,19 +189,19 @@ void CenterPrint4x5Text2( char * Text , int x, int y, int col )
 
 void Print4x5TextSmall( char * Text , int x , int y , int color )
 {
-		int OldFontHeight = FontHeight;
-		int OldFontWidth = FontWidth;
-		int oldScale = TextScaleSlider.value;
+	int OldFontHeight = FontHeight;
+	int OldFontWidth = FontWidth;
+	int oldScale = TextScaleSlider.value;
 
-		FontHeight = 8.0F;
-		FontWidth = 8.0F;
-		TextScaleSlider.value = 0;
+	FontHeight = 8.0F;
+	FontWidth = 8.0F;
+	TextScaleSlider.value = 0;
 
-		Print4x5Text( Text , x , y , color );
+	Print4x5Text( Text , x , y , color );
 
-		FontHeight = OldFontHeight;
-		FontWidth = OldFontWidth;
-		TextScaleSlider.value = oldScale;
+	FontHeight = OldFontHeight;
+	FontWidth = OldFontWidth;
+	TextScaleSlider.value = oldScale;
 }
 
 /*===================================================================
@@ -228,7 +228,7 @@ int Print4x5Text( const char * Text , int x , int y , int color )
 		num = CharTrans[num];
 
 		if ( num )
-				AddScreenPolyText( (u_int16_t) num, (float) PermX , (float) y, r , g , b, 255 );
+			AddScreenPolyText( (u_int16_t) num, (float) PermX , (float) y, r , g , b, 255 );
 
 		PermX += FontWidth;
 	}
@@ -264,13 +264,13 @@ void	PlayerMessageQuePrint( void )
 		}
 		else
 		{
-				for(z=0; z*MAX < MAXPERLINE; z++)
-				{
-					if(strcmp(&PlayerMessageBank[i][MAX*z],(const char*) "\0") != 0)
-						ypos-= FontHeight;
-					else
-						break;
-				}
+			for(z=0; z*MAX < MAXPERLINE; z++)
+			{
+				if(strcmp(&PlayerMessageBank[i][MAX*z],(const char*) "\0") != 0)
+					ypos-= FontHeight;
+				else
+					break;
+			}
 		}
 	}
 
@@ -278,19 +278,19 @@ void	PlayerMessageQuePrint( void )
 	{
 		if( PlayerMessageTime[i] > 0.0F )
 		{
-				for(z=0; z*MAX < MAXPERLINE; z++)
+			for(z=0; z*MAX < MAXPERLINE; z++)
+			{
+				if(strcmp(&PlayerMessageBank[i][MAX*z],(const char*) "\0") != 0)
 				{
-					if(strcmp(&PlayerMessageBank[i][MAX*z],(const char*) "\0") != 0)
-					{
-						strncpy(&MessageBuff[0],&PlayerMessageBank[i][MAX*z],MAX);
-						MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
+					strncpy(&MessageBuff[0],&PlayerMessageBank[i][MAX*z],MAX);
+					MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
 
-						Print4x5Text( &MessageBuff[0], FontWidth*12 , ypos+FontHeight*y , PlayerMessageColours[i] ); // left-aligned
-						y++;
-					}
-					else
-						break;
+					Print4x5Text( &MessageBuff[0], FontWidth*12 , ypos+FontHeight*y , PlayerMessageColours[i] ); // left-aligned
+					y++;
 				}
+				else
+					break;
+			}
 		}
 	}
 }
@@ -320,18 +320,18 @@ void	MessageQuePrint( void )
 		}
 		else
 		{
-				for(z=0; z*MAX < MAXPERLINE; z++)
+			for(z=0; z*MAX < MAXPERLINE; z++)
+			{
+				if(strcmp(&MessageBank[i][MAX*z],(const char*) "\0") != 0)
 				{
-					if(strcmp(&MessageBank[i][MAX*z],(const char*) "\0") != 0)
-					{
-						strncpy(&MessageBuff[0],&MessageBank[i][MAX*z],MAX);
-						MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
-						CenterPrint4x5Text( &MessageBuff[0],((y*(FontHeight+1))+16) , MessageColour[i] );	// original centered
-						y++;
-					}
-					else
-						break;
+					strncpy(&MessageBuff[0],&MessageBank[i][MAX*z],MAX);
+					MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
+					CenterPrint4x5Text( &MessageBuff[0],((y*(FontHeight+1))+16) , MessageColour[i] );	// original centered
+					y++;
 				}
+				else
+					break;
+			}
 		}
 	}
 }
@@ -353,18 +353,18 @@ void	MessageQuePrintAll( void )
 
 	for (i=0, y=0; i < MAX_MESSAGES_LONG; i++)
 	{
-			for(z=0; z*MAX < MAXPERLINE; z++)
+		for(z=0; z*MAX < MAXPERLINE; z++)
+		{
+			if(strcmp(&MessageBankLong[i][MAX*z],(const char*) "\0") != 0)
 			{
-				if(strcmp(&MessageBankLong[i][MAX*z],(const char*) "\0") != 0)
-				{
-					strncpy(&MessageBuff[0],&MessageBankLong[i][MAX*z],MAX);
-					MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
-					Print4x5Text( &MessageBuff[0], FontWidth*23 , ((y*(FontHeight+1))+16) , MessageColourLong[i] );
-					y++;
-				}
-				else
-					break;
+				strncpy(&MessageBuff[0],&MessageBankLong[i][MAX*z],MAX);
+				MessageBuff[MAX] = 0;	// a full-width chunk has no terminator of its own
+				Print4x5Text( &MessageBuff[0], FontWidth*23 , ((y*(FontHeight+1))+16) , MessageColourLong[i] );
+				y++;
 			}
+			else
+				break;
+		}
 	}
 }
 
@@ -395,7 +395,7 @@ void AddPlayerMessageToQueShort( char ** Text, int Colour )
 	}
 
 	for(j = 0; j < MAXPERLINE; j++)
-			PlayerMessageBank[0][j] = 0;
+		PlayerMessageBank[0][j] = 0;
 	PlayerMessageTime[0] = ThisMessageTime;
 	PlayerMessageColours[0] = Colour;
 	MessageColourLong[0] = Colour;
@@ -435,7 +435,7 @@ void AddColourMessageToQueShort( char ** Text, int Colour )
 	}
 
 	for(j = 0; j < MAXPERLINE; j++)
-			MessageBank[0][j] = 0;
+		MessageBank[0][j] = 0;
 	MessageTime[0] = ThisMessageTime;
 	MessageColour[0] = Colour;
 	MessageColourLong[0] = Colour;
@@ -475,7 +475,7 @@ void AddPlayerMessageToQue( int Colour, const char * Text, ... )
 		}
 
 		for(j = 0; j < MAXPERLINE; j++)
-				MessageBankLong[0][j] = 0;
+			MessageBankLong[0][j] = 0;
 
 		va_start( args, Text );
 		vsnprintf( &TempMessage[0], sizeof(TempMessage)-1, Text, args);
@@ -515,7 +515,7 @@ void AddColourMessageToQue( int Colour, const char * Text, ... )
 		}
 
 		for(j = 0; j < MAXPERLINE; j++)
-				MessageBankLong[0][j] = 0;
+			MessageBankLong[0][j] = 0;
 
 		va_start( args, Text );
 		vsnprintf( &TempMessage[0], sizeof(TempMessage)-1, Text, args);
@@ -677,15 +677,15 @@ void PrintScoreSort( void )
 				teamOK[TeamNumber[i]] = true;
 				switch ( GameStatus[i] )
 				{
-					case STATUS_Left:
-					case STATUS_LeftCrashed:
-						break;
-					default:
-						teamleft[TeamNumber[i]] = false;
-						if ( Ships[ i ].Object.Flags & SHIP_CarryingBounty )
-							TeamBounty[ TeamNumber[ i ] ]++;
-						break;
-					}
+				case STATUS_Left:
+				case STATUS_LeftCrashed:
+					break;
+				default:
+					teamleft[TeamNumber[i]] = false;
+					if ( Ships[ i ].Object.Flags & SHIP_CarryingBounty )
+						TeamBounty[ TeamNumber[ i ] ]++;
+					break;
+				}
 			}
 		}
 

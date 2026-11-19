@@ -335,7 +335,7 @@ bool FindCollision( BSP_NODE * node_ptr, VECTOR * start_point_ptr, VECTOR * end_
 
 	Depth++;
 
-start:
+	start:
 
 	/* A crash report from the 1.13 PC build showed this function reached
 	   with a NULL node or point through the recursive call at its end;
@@ -474,7 +474,7 @@ bool PISDistRecursive( VECTOR *Pos, BSP_NODE *node)
 {
 	float d;
 
-start:
+	start:
 	// go down the BSP tree
 	d = node->Normal.x * Pos->x + node->Normal.y * Pos->y + node->Normal.z * Pos->z + node->Offset;
 	if ( d > TOLER  )
@@ -512,4 +512,4 @@ bool PointInsideSkin( VECTOR *Pos, u_int16_t Group )
 		return PISDistRecursive( Pos, Bsp_Header[0].Bsp_Tree[ Group % Bsp_Header[0].NumGroups ].Root );
 	}
 	return !AmIOutsideGroup( &Mloadheader, Pos, Group );
- }
+}

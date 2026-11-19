@@ -139,7 +139,7 @@ void AI_AIR_MOVETOTARGET( ENEMY * Enemy )
 				{
 					// couldnt find a node that will take me to my target so go back to my nearest...
 					Enemy->TNode = Enemy->Object.NearestNode;
-	//			}else if( AI_ClearLOS( &Enemy->Object.Pos,Enemy->Object.Group, &NewNode->Pos ) )
+					//			}else if( AI_ClearLOS( &Enemy->Object.Pos,Enemy->Object.Group, &NewNode->Pos ) )
 				}else if( AI_ClearLOSNonZero( &Enemy->Object, &NewNode->Pos , EnemyTypes[Enemy->Type].Radius  ) )
 				{
 					// I can see a closer node so target it instead...

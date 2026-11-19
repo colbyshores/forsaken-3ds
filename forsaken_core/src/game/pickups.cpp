@@ -774,501 +774,557 @@ bool CollectPickup( u_int16_t i )
 	{
 		switch( Pickups[i].Type )
 		{
-			case PICKUP_Trojax:
-				if( !PrimaryWeaponsGot[ TROJAX ] )
-				{
-					PrimaryWeaponsGot[ TROJAX ] = 1;
-					MessageSFX = SFX_Select_Trojax;
-					TriggeredSFX = SFX_BIKER_BW;
-					NewPrimaryWeapon( TROJAX );
-				}
-				else
-				{
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_AP;
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-				}
-				break;
+		case PICKUP_Trojax:
+			if( !PrimaryWeaponsGot[ TROJAX ] )
+			{
+				PrimaryWeaponsGot[ TROJAX ] = 1;
+				MessageSFX = SFX_Select_Trojax;
+				TriggeredSFX = SFX_BIKER_BW;
+				NewPrimaryWeapon( TROJAX );
+			}
+			else
+			{
+				PickupEnable = false;
+				MessageSFX = SFX_BIKECOMP_AP;
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+			}
+			break;
 
-			case PICKUP_Pyrolite:
+		case PICKUP_Pyrolite:
 
-				if( !PrimaryWeaponsGot[ PYROLITE_RIFLE ] )
-				{
-					PrimaryWeaponsGot[ PYROLITE_RIFLE ] = 1;
-
-					if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-					{
-						CopyOfPyroliteAmmo = MAXPYROLITEAMMO;
-					}
-					else
-					{
-						PyroliteAmmo = MAXPYROLITEAMMO;
-					}
-					NewPrimaryWeapon( PYROLITE_RIFLE );
-					MessageSFX = SFX_Select_Pyrolite;
-				}
-				else
-				{
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_AP;
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-				}
-
-				break;
-
-			case PICKUP_Transpulse:
-
-				if( !PrimaryWeaponsGot[ TRANSPULSE_CANNON ] )
-				{
-					PrimaryWeaponsGot[ TRANSPULSE_CANNON ] = 1;
-					NewPrimaryWeapon( TRANSPULSE_CANNON );
-					MessageSFX = SFX_Select_Transpulse;
-					TriggeredSFX = SFX_BIKER_BW;
-				}
-				else
-				{
-					PickupEnable = false;
-					MessageSFX = SFX_BIKECOMP_AP;
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-				}
-
-				break;
-
-			case PICKUP_SussGun:
-				if( !PrimaryWeaponsGot[ SUSS_GUN ] )
-				{
-					PrimaryWeaponsGot[ SUSS_GUN ] = 1;
-
-					if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-					{
-						CopyOfSussGunAmmo = MAXSUSSGUNAMMO;
-					}
-					else
-					{
-						SussGunAmmo = MAXSUSSGUNAMMO;
-					}
-					NewPrimaryWeapon( SUSS_GUN );
-					MessageSFX = SFX_Select_SussGun;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-				break;
-
-			case PICKUP_Laser:
-
-				if( !PrimaryWeaponsGot[ LASER ] )
-				{
-					PrimaryWeaponsGot[ LASER ] = 1;
-					NewPrimaryWeapon( LASER );
-					MessageSFX = SFX_Select_BeamLaser;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-
-				break;
-
-			case PICKUP_Mug:
-				break;
-
-			case PICKUP_Mugs:
-				if( SecondaryAmmo[ MUGMISSILE ] < 10 )
-				{
-					SecondaryAmmo[ MUGMISSILE ] += 3;
-					if( SecondaryAmmo[ MUGMISSILE ] > 10 )
-					{
-						Temp = ( SecondaryAmmo[ MUGMISSILE ] - 10 );
-						SecAmmoUsed[ MUGMISSILE ] = Temp;
-						SecondaryAmmo[ MUGMISSILE ] = 10;
-					}
-					NewSecondaryWeapon( MUGMISSILE );
-					MessageSFX = SFX_Select_MugMissile;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-				break;
-
-			case PICKUP_Heatseaker:
-				break;
-
-			case PICKUP_HeatseakerPickup:
-				if( SecondaryAmmo[ SOLARISMISSILE ] < 10 )
-				{
-					SecondaryAmmo[ SOLARISMISSILE ] += 3;
-					if( SecondaryAmmo[ SOLARISMISSILE ] > 10 )
-					{
-						Temp = ( SecondaryAmmo[ SOLARISMISSILE ] - 10 );
-						SecAmmoUsed[ SOLARISMISSILE ] = Temp;
-						SecondaryAmmo[ SOLARISMISSILE ] = 10;
-					}
-					NewSecondaryWeapon( SOLARISMISSILE );
-					MessageSFX = SFX_Select_SolarisMissile;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-				break;
-
-			case PICKUP_Thief:
-
-				if( !SecondaryAmmo[ THIEFMISSILE ] )
-				{
-					SecondaryAmmo[ THIEFMISSILE ] += 1;
-					NewSecondaryWeapon( THIEFMISSILE );
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-
-				break;
-
-			case PICKUP_Scatter:
-
-				if( SecondaryAmmo[ SCATTERMISSILE ] < 3 )
-				{
-					SecondaryAmmo[ SCATTERMISSILE ] += 1;
-					NewSecondaryWeapon( SCATTERMISSILE );
-					MessageSFX = SFX_Select_ScatterMissile;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-
-				break;
-
-			case PICKUP_Gravgon:
-				if( !SecondaryAmmo[ GRAVGONMISSILE ] )
-				{
-					SecondaryAmmo[ GRAVGONMISSILE ] += 1;
-					NewSecondaryWeapon( GRAVGONMISSILE );
-					MessageSFX = SFX_Select_GravgonMissile;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-				break;
-
-			case PICKUP_Launcher:
-				if( SecondaryAmmo[ MULTIPLEMISSILE ] < 100 )
-				{
-					SecondaryAmmo[ MULTIPLEMISSILE ] += 50;
-					if( SecondaryAmmo[ MULTIPLEMISSILE ] > 100 )
-					{
-						Temp = ( SecondaryAmmo[ MULTIPLEMISSILE ] - 100 );
-						SecAmmoUsed[ MULTIPLEMISSILE ] = Temp;
-						SecondaryAmmo[ MULTIPLEMISSILE ] = 100;
-					}
-					NewSecondaryWeapon( MULTIPLEMISSILE );
-					MessageSFX = SFX_Select_MFRL;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-				break;
-
-			case PICKUP_TitanStar:
-				if( SecondaryAmmo[ TITANSTARMISSILE ] < 3 )
-				{
-					SecondaryAmmo[ TITANSTARMISSILE ] += 1;
-					NewSecondaryWeapon( TITANSTARMISSILE );
-					MessageSFX = SFX_Select_TitanStarMissile;
-					TriggeredSFX = SFX_BIKER_BW;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-				break;
-
-			case PICKUP_PurgePickup:
-				if( SecondaryAmmo[ PURGEMINE ] < 10 )
-				{
-					SecondaryAmmo[ PURGEMINE ] += 3;
-					if( SecondaryAmmo[ PURGEMINE ] > 10 )
-					{
-						Temp = ( SecondaryAmmo[ PURGEMINE ] - 10 );
-						SecAmmoUsed[ PURGEMINE ] = Temp;
-						SecondaryAmmo[ PURGEMINE ] = 10;
-					}
-					NewSecondaryWeapon( PURGEMINE );
-					MessageSFX = SFX_Select_PurgeMine;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-				break;
-
-			case PICKUP_PinePickup:
-
-				if( SecondaryAmmo[ PINEMINE ] < 6 )
-				{
-					SecondaryAmmo[ PINEMINE ] += 3;
-					if( SecondaryAmmo[ PINEMINE ] > 6 )
-					{
-						Temp = ( SecondaryAmmo[ PINEMINE ] - 6 );
-						SecAmmoUsed[ PINEMINE ] = Temp;
-						SecondaryAmmo[ PINEMINE ] = 6;
-					}
-					NewSecondaryWeapon( PINEMINE );
-					MessageSFX = SFX_Select_PineMine;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-
-				break;
-
-			case PICKUP_QuantumPickup:
-
-				if( !SecondaryAmmo[ QUANTUMMINE ] )
-				{
-					SecondaryAmmo[ QUANTUMMINE ] += 1;
-					NewSecondaryWeapon( QUANTUMMINE );
-					MessageSFX = SFX_Select_QuantumMine;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-
-				break;
-
-			case PICKUP_SpiderPod:
-
-				if( SecondaryAmmo[ SPIDERMINE ] < 6 )
-				{
-					SecondaryAmmo[ SPIDERMINE ] += 3;
-					if( SecondaryAmmo[ SPIDERMINE ] > 6 )
-					{
-						Temp = ( SecondaryAmmo[ SPIDERMINE ] - 6 );
-						SecAmmoUsed[ SPIDERMINE ] = Temp;
-						SecondaryAmmo[ SPIDERMINE ] = 6;
-					}
-					NewSecondaryWeapon( SPIDERMINE );
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-
-				break;
-
-			case PICKUP_Parasite:
-
-				break;
-
-			case PICKUP_Flare:
-
-				MessageSFX = SFX_BIKECOMP_FL;
-
-				break;
-
-			case PICKUP_GeneralAmmo:
-				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
-				{
-					if( CopyOfGeneralAmmo < MAXGENERALAMMO )
-					{
-						CopyOfGeneralAmmo += GENERALAMMOPERPOD;
-						MessageSFX = SFX_Select_Ammo;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						PickupEnable = false;
-						MessageSFX = SFX_BIKECOMP_MA;
-					}
-				}
-				else
-				{
-					if( GeneralAmmo < MAXGENERALAMMO )
-					{
-						GeneralAmmo += GENERALAMMOPERPOD;
-						MessageSFX = SFX_Select_Ammo;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						PickupEnable = false;
-						MessageSFX = SFX_BIKECOMP_MA;
-					}
-				}
-				break;
-
-			case PICKUP_PyroliteAmmo:
+			if( !PrimaryWeaponsGot[ PYROLITE_RIFLE ] )
+			{
+				PrimaryWeaponsGot[ PYROLITE_RIFLE ] = 1;
 
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 				{
-					if( CopyOfPyroliteAmmo < MAXPYROLITEAMMO )
-					{
-						CopyOfPyroliteAmmo += PYROLITEAMMOPERPOD;
-						MessageSFX = SFX_Select_Ammo;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						PickupEnable = false;
-						MessageSFX = SFX_BIKECOMP_MA;
-					}
+					CopyOfPyroliteAmmo = MAXPYROLITEAMMO;
 				}
 				else
 				{
-					if( PyroliteAmmo < MAXPYROLITEAMMO )
-					{
-						PyroliteAmmo += PYROLITEAMMOPERPOD;
-						MessageSFX = SFX_Select_Ammo;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						PickupEnable = false;
-						MessageSFX = SFX_BIKECOMP_MA;
-					}
+					PyroliteAmmo = MAXPYROLITEAMMO;
 				}
+				NewPrimaryWeapon( PYROLITE_RIFLE );
+				MessageSFX = SFX_Select_Pyrolite;
+			}
+			else
+			{
+				PickupEnable = false;
+				MessageSFX = SFX_BIKECOMP_AP;
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+			}
 
-				break;
+			break;
 
-			case PICKUP_SussGunAmmo:
+		case PICKUP_Transpulse:
+
+			if( !PrimaryWeaponsGot[ TRANSPULSE_CANNON ] )
+			{
+				PrimaryWeaponsGot[ TRANSPULSE_CANNON ] = 1;
+				NewPrimaryWeapon( TRANSPULSE_CANNON );
+				MessageSFX = SFX_Select_Transpulse;
+				TriggeredSFX = SFX_BIKER_BW;
+			}
+			else
+			{
+				PickupEnable = false;
+				MessageSFX = SFX_BIKECOMP_AP;
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+			}
+
+			break;
+
+		case PICKUP_SussGun:
+			if( !PrimaryWeaponsGot[ SUSS_GUN ] )
+			{
+				PrimaryWeaponsGot[ SUSS_GUN ] = 1;
+
 				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
 				{
-					if( CopyOfSussGunAmmo < MAXSUSSGUNAMMO )
-					{
-						CopyOfSussGunAmmo += SUSSGUNAMMOPERPOD;
-						MessageSFX = SFX_Select_Ammo;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						PickupEnable = false;
-						MessageSFX = SFX_BIKECOMP_MA;
-					}
+					CopyOfSussGunAmmo = MAXSUSSGUNAMMO;
 				}
 				else
 				{
-					if( SussGunAmmo < MAXSUSSGUNAMMO )
-					{
-						SussGunAmmo += SUSSGUNAMMOPERPOD;
-						MessageSFX = SFX_Select_Ammo;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						PickupEnable = false;
-						MessageSFX = SFX_BIKECOMP_MA;
-					}
+					SussGunAmmo = MAXSUSSGUNAMMO;
 				}
-				break;
+				NewPrimaryWeapon( SUSS_GUN );
+				MessageSFX = SFX_Select_SussGun;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
 
-			case PICKUP_PowerPod:
-				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+		case PICKUP_Laser:
+
+			if( !PrimaryWeaponsGot[ LASER ] )
+			{
+				PrimaryWeaponsGot[ LASER ] = 1;
+				NewPrimaryWeapon( LASER );
+				MessageSFX = SFX_Select_BeamLaser;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_A, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_Mug:
+			break;
+
+		case PICKUP_Mugs:
+			if( SecondaryAmmo[ MUGMISSILE ] < 10 )
+			{
+				SecondaryAmmo[ MUGMISSILE ] += 3;
+				if( SecondaryAmmo[ MUGMISSILE ] > 10 )
 				{
-					if( CopyOfPowerLevel != ( MAXPOWERLEVELS - 1 ) )
-					{
-						CopyOfPowerLevel++;
-						if( CopyOfPowerLevel == ( MAXPOWERLEVELS - 1 ) )
-						{
-							sprintf( (char*)&Message[ 0 ], FULL_POWER_LEVEL );
-						}
-						else
-						{
-							sprintf( (char*)&Message[ 0 ], POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
-						}
-						ShowTextAnyway = true;
-						MessageSFX = SFX_Select_PowerPod;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX_POWER );
-						MessageSFX = SFX_BIKECOMP_AP;
-						PickupEnable = false;
-					}
+					Temp = ( SecondaryAmmo[ MUGMISSILE ] - 10 );
+					SecAmmoUsed[ MUGMISSILE ] = Temp;
+					SecondaryAmmo[ MUGMISSILE ] = 10;
+				}
+				NewSecondaryWeapon( MUGMISSILE );
+				MessageSFX = SFX_Select_MugMissile;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
+
+		case PICKUP_Heatseaker:
+			break;
+
+		case PICKUP_HeatseakerPickup:
+			if( SecondaryAmmo[ SOLARISMISSILE ] < 10 )
+			{
+				SecondaryAmmo[ SOLARISMISSILE ] += 3;
+				if( SecondaryAmmo[ SOLARISMISSILE ] > 10 )
+				{
+					Temp = ( SecondaryAmmo[ SOLARISMISSILE ] - 10 );
+					SecAmmoUsed[ SOLARISMISSILE ] = Temp;
+					SecondaryAmmo[ SOLARISMISSILE ] = 10;
+				}
+				NewSecondaryWeapon( SOLARISMISSILE );
+				MessageSFX = SFX_Select_SolarisMissile;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
+
+		case PICKUP_Thief:
+
+			if( !SecondaryAmmo[ THIEFMISSILE ] )
+			{
+				SecondaryAmmo[ THIEFMISSILE ] += 1;
+				NewSecondaryWeapon( THIEFMISSILE );
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_Scatter:
+
+			if( SecondaryAmmo[ SCATTERMISSILE ] < 3 )
+			{
+				SecondaryAmmo[ SCATTERMISSILE ] += 1;
+				NewSecondaryWeapon( SCATTERMISSILE );
+				MessageSFX = SFX_Select_ScatterMissile;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_Gravgon:
+			if( !SecondaryAmmo[ GRAVGONMISSILE ] )
+			{
+				SecondaryAmmo[ GRAVGONMISSILE ] += 1;
+				NewSecondaryWeapon( GRAVGONMISSILE );
+				MessageSFX = SFX_Select_GravgonMissile;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
+
+		case PICKUP_Launcher:
+			if( SecondaryAmmo[ MULTIPLEMISSILE ] < 100 )
+			{
+				SecondaryAmmo[ MULTIPLEMISSILE ] += 50;
+				if( SecondaryAmmo[ MULTIPLEMISSILE ] > 100 )
+				{
+					Temp = ( SecondaryAmmo[ MULTIPLEMISSILE ] - 100 );
+					SecAmmoUsed[ MULTIPLEMISSILE ] = Temp;
+					SecondaryAmmo[ MULTIPLEMISSILE ] = 100;
+				}
+				NewSecondaryWeapon( MULTIPLEMISSILE );
+				MessageSFX = SFX_Select_MFRL;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
+
+		case PICKUP_TitanStar:
+			if( SecondaryAmmo[ TITANSTARMISSILE ] < 3 )
+			{
+				SecondaryAmmo[ TITANSTARMISSILE ] += 1;
+				NewSecondaryWeapon( TITANSTARMISSILE );
+				MessageSFX = SFX_Select_TitanStarMissile;
+				TriggeredSFX = SFX_BIKER_BW;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
+
+		case PICKUP_PurgePickup:
+			if( SecondaryAmmo[ PURGEMINE ] < 10 )
+			{
+				SecondaryAmmo[ PURGEMINE ] += 3;
+				if( SecondaryAmmo[ PURGEMINE ] > 10 )
+				{
+					Temp = ( SecondaryAmmo[ PURGEMINE ] - 10 );
+					SecAmmoUsed[ PURGEMINE ] = Temp;
+					SecondaryAmmo[ PURGEMINE ] = 10;
+				}
+				NewSecondaryWeapon( PURGEMINE );
+				MessageSFX = SFX_Select_PurgeMine;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
+
+		case PICKUP_PinePickup:
+
+			if( SecondaryAmmo[ PINEMINE ] < 6 )
+			{
+				SecondaryAmmo[ PINEMINE ] += 3;
+				if( SecondaryAmmo[ PINEMINE ] > 6 )
+				{
+					Temp = ( SecondaryAmmo[ PINEMINE ] - 6 );
+					SecAmmoUsed[ PINEMINE ] = Temp;
+					SecondaryAmmo[ PINEMINE ] = 6;
+				}
+				NewSecondaryWeapon( PINEMINE );
+				MessageSFX = SFX_Select_PineMine;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_QuantumPickup:
+
+			if( !SecondaryAmmo[ QUANTUMMINE ] )
+			{
+				SecondaryAmmo[ QUANTUMMINE ] += 1;
+				NewSecondaryWeapon( QUANTUMMINE );
+				MessageSFX = SFX_Select_QuantumMine;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_SpiderPod:
+
+			if( SecondaryAmmo[ SPIDERMINE ] < 6 )
+			{
+				SecondaryAmmo[ SPIDERMINE ] += 3;
+				if( SecondaryAmmo[ SPIDERMINE ] > 6 )
+				{
+					Temp = ( SecondaryAmmo[ SPIDERMINE ] - 6 );
+					SecAmmoUsed[ SPIDERMINE ] = Temp;
+					SecondaryAmmo[ SPIDERMINE ] = 6;
+				}
+				NewSecondaryWeapon( SPIDERMINE );
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_Parasite:
+
+			break;
+
+		case PICKUP_Flare:
+
+			MessageSFX = SFX_BIKECOMP_FL;
+
+			break;
+
+		case PICKUP_GeneralAmmo:
+			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			{
+				if( CopyOfGeneralAmmo < MAXGENERALAMMO )
+				{
+					CopyOfGeneralAmmo += GENERALAMMOPERPOD;
+					MessageSFX = SFX_Select_Ammo;
 				}
 				else
 				{
-					if( Ships[ WhoIAm ].Object.PowerLevel != ( MAXPOWERLEVELS - 1 ) )
-					{
-						Ships[ WhoIAm ].Object.PowerLevel++;
-						if( Ships[ WhoIAm ].Object.PowerLevel == ( MAXPOWERLEVELS - 1 ) )
-						{
-							sprintf( (char*)&Message[ 0 ], FULL_POWER_LEVEL );
-						}
-						else
-						{
-							sprintf( (char*)&Message[ 0 ], POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
-						}
-						ShowTextAnyway = true;
-						MessageSFX = SFX_Select_PowerPod;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX_POWER );
-						MessageSFX = SFX_BIKECOMP_AP;
-						PickupEnable = false;
-					}
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					PickupEnable = false;
+					MessageSFX = SFX_BIKECOMP_MA;
 				}
-				break;
-
-			case PICKUP_GoldenPowerPod:
-
-				if( !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			}
+			else
+			{
+				if( GeneralAmmo < MAXGENERALAMMO )
 				{
-					GivemeSuperNashram();
-					MessageSFX = SFX_Select_GoldenPowerPod;
+					GeneralAmmo += GENERALAMMOPERPOD;
+					MessageSFX = SFX_Select_Ammo;
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_CANT_HANDLE_ANY_MORE );
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					PickupEnable = false;
+					MessageSFX = SFX_BIKECOMP_MA;
+				}
+			}
+			break;
+
+		case PICKUP_PyroliteAmmo:
+
+			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			{
+				if( CopyOfPyroliteAmmo < MAXPYROLITEAMMO )
+				{
+					CopyOfPyroliteAmmo += PYROLITEAMMOPERPOD;
+					MessageSFX = SFX_Select_Ammo;
+				}
+				else
+				{
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					PickupEnable = false;
+					MessageSFX = SFX_BIKECOMP_MA;
+				}
+			}
+			else
+			{
+				if( PyroliteAmmo < MAXPYROLITEAMMO )
+				{
+					PyroliteAmmo += PYROLITEAMMOPERPOD;
+					MessageSFX = SFX_Select_Ammo;
+				}
+				else
+				{
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					PickupEnable = false;
+					MessageSFX = SFX_BIKECOMP_MA;
+				}
+			}
+
+			break;
+
+		case PICKUP_SussGunAmmo:
+			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			{
+				if( CopyOfSussGunAmmo < MAXSUSSGUNAMMO )
+				{
+					CopyOfSussGunAmmo += SUSSGUNAMMOPERPOD;
+					MessageSFX = SFX_Select_Ammo;
+				}
+				else
+				{
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					PickupEnable = false;
+					MessageSFX = SFX_BIKECOMP_MA;
+				}
+			}
+			else
+			{
+				if( SussGunAmmo < MAXSUSSGUNAMMO )
+				{
+					SussGunAmmo += SUSSGUNAMMOPERPOD;
+					MessageSFX = SFX_Select_Ammo;
+				}
+				else
+				{
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					PickupEnable = false;
+					MessageSFX = SFX_BIKECOMP_MA;
+				}
+			}
+			break;
+
+		case PICKUP_PowerPod:
+			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			{
+				if( CopyOfPowerLevel != ( MAXPOWERLEVELS - 1 ) )
+				{
+					CopyOfPowerLevel++;
+					if( CopyOfPowerLevel == ( MAXPOWERLEVELS - 1 ) )
+					{
+						sprintf( (char*)&Message[ 0 ], FULL_POWER_LEVEL );
+					}
+					else
+					{
+						sprintf( (char*)&Message[ 0 ], POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
+					}
+					ShowTextAnyway = true;
+					MessageSFX = SFX_Select_PowerPod;
+				}
+				else
+				{
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX_POWER );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
-
-				break;
-
-			case PICKUP_Shield:
-				if( Ships[ WhoIAm ].Object.Shield != MAX_SHIELD )
+			}
+			else
+			{
+				if( Ships[ WhoIAm ].Object.PowerLevel != ( MAXPOWERLEVELS - 1 ) )
 				{
-					Ships[ WhoIAm ].Object.Shield += 32.0F;
-					if ( Ships[ WhoIAm ].Object.Shield > SHIELD_CRITICAL_LEVEL )
-						ShieldCritical = false;
-					if( Ships[ WhoIAm ].Object.Shield > MAX_SHIELD ) Ships[ WhoIAm ].Object.Shield = MAX_SHIELD;
-					MessageSFX = SFX_Select_Shield;
+					Ships[ WhoIAm ].Object.PowerLevel++;
+					if( Ships[ WhoIAm ].Object.PowerLevel == ( MAXPOWERLEVELS - 1 ) )
+					{
+						sprintf( (char*)&Message[ 0 ], FULL_POWER_LEVEL );
+					}
+					else
+					{
+						sprintf( (char*)&Message[ 0 ], POWER_POD_LEVEL, Ships[ WhoIAm ].Object.PowerLevel+1 );
+					}
+					ShowTextAnyway = true;
+					MessageSFX = SFX_Select_PowerPod;
+				}
+				else
+				{
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX_POWER );
+					MessageSFX = SFX_BIKECOMP_AP;
+					PickupEnable = false;
+				}
+			}
+			break;
+
+		case PICKUP_GoldenPowerPod:
+
+			if( !( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			{
+				GivemeSuperNashram();
+				MessageSFX = SFX_Select_GoldenPowerPod;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_CANT_HANDLE_ANY_MORE );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_Shield:
+			if( Ships[ WhoIAm ].Object.Shield != MAX_SHIELD )
+			{
+				Ships[ WhoIAm ].Object.Shield += 32.0F;
+				if ( Ships[ WhoIAm ].Object.Shield > SHIELD_CRITICAL_LEVEL )
+					ShieldCritical = false;
+				if( Ships[ WhoIAm ].Object.Shield > MAX_SHIELD ) Ships[ WhoIAm ].Object.Shield = MAX_SHIELD;
+				MessageSFX = SFX_Select_Shield;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+			break;
+
+		case PICKUP_Inv:
+
+			if( !Ships[ WhoIAm ].Invul )
+			{
+				Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
+				Ships[ WhoIAm ].Invul = true;
+				PickupInvulnerability = true;
+				MessageSFX = SFX_Select_Invul;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
+
+			break;
+
+		case PICKUP_ExtraLife:
+			Lives += 1;
+			MessageSFX = SFX_ResnicReanimator;
+			PlaySfx( SFX_ExtraLife, 1.0F );
+			break;
+
+		case PICKUP_Computer:
+
+			TargetComputerOn = true;
+
+			break;
+
+		case PICKUP_Smoke:
+			break;
+
+		case PICKUP_Nitro:
+
+			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			{
+				if( CopyOfNitroFuel < MAX_NITRO_FUEL )
+				{
+					CopyOfNitroFuel += 50.0F;
+					if( CopyOfNitroFuel > MAX_NITRO_FUEL )
+					{
+						TempFloat = ( CopyOfNitroFuel - MAX_NITRO_FUEL );
+						NitroFuelUsed += TempFloat;
+						CopyOfNitroFuel = MAX_NITRO_FUEL;
+					}
+					MessageSFX = SFX_Select_Nitro;
 				}
 				else
 				{
@@ -1276,296 +1332,240 @@ bool CollectPickup( u_int16_t i )
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
-				break;
-
-			case PICKUP_Inv:
-
-				if( !Ships[ WhoIAm ].Invul )
+			}
+			else
+			{
+				if( NitroFuel < MAX_NITRO_FUEL )
 				{
-					Ships[ WhoIAm ].InvulTimer = INVULNERABILITY_TIME;
-					Ships[ WhoIAm ].Invul = true;
-					PickupInvulnerability = true;
-					MessageSFX = SFX_Select_Invul;
+					NitroFuel += 50.0F;
+					if( NitroFuel > MAX_NITRO_FUEL )
+					{
+						TempFloat = ( NitroFuel - MAX_NITRO_FUEL );
+						NitroFuelUsed += TempFloat;
+						NitroFuel = MAX_NITRO_FUEL;
+					}
+					MessageSFX = SFX_Select_Nitro;
 				}
 				else
 				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
 					MessageSFX = SFX_BIKECOMP_AP;
 					PickupEnable = false;
 				}
+			}
 
-				break;
+			break;
 
-			case PICKUP_ExtraLife:
+		case PICKUP_Goggles:
+			break;
+
+		case PICKUP_Gold:
+			NumGoldBars ++;
+			if( !( NumGoldBars % 10 ) )
+			{
 				Lives += 1;
-				MessageSFX = SFX_ResnicReanimator;
+				sprintf( (char*)&Message[0], YOUVE_EARNED_EXTRA_LIFE );
 				PlaySfx( SFX_ExtraLife, 1.0F );
-				break;
+			}
+			else
+			{
+				if( NumGoldBars == 1 ) sprintf( (char*)&Message[0], YOU_HAVE_ONE_GOLD_BAR, NumGoldBars );
+				else sprintf( (char*)&Message[0], YOU_HAVE_GOLD_BARS, NumGoldBars );
+			}
+			MessageSFX = SFX_GoldBarPickup;
+			Speech = false;
+			ShowTextAnyway = true;
+			break;
 
-			case PICKUP_Computer:
+		case PICKUP_Mantle:
 
-				TargetComputerOn = true;
+			if( !( Ships[ WhoIAm ].Object.Flags & SHIP_Stealth ) )
+			{
+				Ships[ WhoIAm ].Object.Flags |= SHIP_Stealth;
+				Ships[ WhoIAm ].StealthTime = ( 60.0F * ANIM_SECOND );
+				MessageSFX = SFX_Cloaking;
+				Speech = false;
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
+				MessageSFX = SFX_BIKECOMP_AP;
+				PickupEnable = false;
+			}
 
-				break;
+			break;
 
-			case PICKUP_Smoke:
-				break;
+		case PICKUP_Crystal:
+			CrystalsFound += 1;
+			if( CrystalsFound == 1 )
+			{
+				sprintf( (char*)&Message[0], YOU_HAVE_ONE_CRYSTAL, CrystalsFound );
+			}
+			else
+			{
+				sprintf( (char*)&Message[0], YOU_HAVE_CRYSTALS, CrystalsFound );
+			}
+			MessageSFX = SFX_PickupCrystal;
+			Speech = false;
+			ShowTextAnyway = true;
+			break;
 
-			case PICKUP_Nitro:
+		case PICKUP_DNA:
 
-				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			MessageSFX = SFX_PickupGeneral;
+			Speech = false;
+			ShowTextAnyway = true;
+			break;
+
+		case PICKUP_SkeletonKey:
+
+			MessageSFX = SFX_PickupGeneral;
+			Speech = false;
+			ShowTextAnyway = true;
+			break;
+
+		case PICKUP_Bomb:
+
+			MessageSFX = SFX_PickupGeneral;
+			Speech = false;
+			ShowTextAnyway = true;
+			break;
+
+		case PICKUP_GoldFigure:
+
+			MessageSFX = SFX_PickupGeneral;
+			Speech = false;
+			ShowTextAnyway = true;
+			break;
+
+		case PICKUP_Flag:
+			if ( CaptureTheFlag )
+			{
+				// now I have the flag....?
+				Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingFlag;
+				AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+					TeamName[ TeamNumber[ WhoIAm ] ] );
+
+				sprintf( CTFMessage, SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
+				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
+
+			}
+			break;
+
+		case PICKUP_Bounty:
+			if ( BountyHunt )
+			{
+				// now I have the bounty....?
+				BountyTime = 0.0F;
+				Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingBounty;
+				AddColourMessageToQue(FlagMessageColour, YOU_HAVE_GOT_THE_BOUNTY );
+
+				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_BountyMessage, 0);
+
+			}
+			break;
+
+		case PICKUP_Flag1:
+		case PICKUP_Flag2:
+		case PICKUP_Flag3:
+		case PICKUP_Flag4:
+			if ( CTF )
+			{
+				int team;
+
+				for ( team = 0; team < MAX_TEAMS; team++ )
 				{
-					if( CopyOfNitroFuel < MAX_NITRO_FUEL )
+					if ( Pickups[i].Type == TeamFlagPickup[ team ] )
 					{
-						CopyOfNitroFuel += 50.0F;
-						if( CopyOfNitroFuel > MAX_NITRO_FUEL )
+						if ( team == TeamNumber[ WhoIAm ] )
 						{
-							TempFloat = ( CopyOfNitroFuel - MAX_NITRO_FUEL );
-							NitroFuelUsed += TempFloat;
-							CopyOfNitroFuel = MAX_NITRO_FUEL;
-						}
-						MessageSFX = SFX_Select_Nitro;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						MessageSFX = SFX_BIKECOMP_AP;
-						PickupEnable = false;
-					}
-				}
-				else
-				{
-					if( NitroFuel < MAX_NITRO_FUEL )
-					{
-						NitroFuel += 50.0F;
-						if( NitroFuel > MAX_NITRO_FUEL )
-						{
-							TempFloat = ( NitroFuel - MAX_NITRO_FUEL );
-							NitroFuelUsed += TempFloat;
-							NitroFuel = MAX_NITRO_FUEL;
-						}
-						MessageSFX = SFX_Select_Nitro;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						MessageSFX = SFX_BIKECOMP_AP;
-						PickupEnable = false;
-					}
-				}
-
-				break;
-
-			case PICKUP_Goggles:
-				break;
-
-			case PICKUP_Gold:
-				NumGoldBars ++;
-				if( !( NumGoldBars % 10 ) )
-				{
-					Lives += 1;
-					sprintf( (char*)&Message[0], YOUVE_EARNED_EXTRA_LIFE );
-					PlaySfx( SFX_ExtraLife, 1.0F );
-				}
-				else
-				{
-					if( NumGoldBars == 1 ) sprintf( (char*)&Message[0], YOU_HAVE_ONE_GOLD_BAR, NumGoldBars );
-					else sprintf( (char*)&Message[0], YOU_HAVE_GOLD_BARS, NumGoldBars );
-				}
-				MessageSFX = SFX_GoldBarPickup;
-				Speech = false;
-				ShowTextAnyway = true;
-				break;
-
-			case PICKUP_Mantle:
-
-				if( !( Ships[ WhoIAm ].Object.Flags & SHIP_Stealth ) )
-				{
-					Ships[ WhoIAm ].Object.Flags |= SHIP_Stealth;
-					Ships[ WhoIAm ].StealthTime = ( 60.0F * ANIM_SECOND );
-					MessageSFX = SFX_Cloaking;
-					Speech = false;
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE, Messages[ Pickups[i].Type ] );
-					MessageSFX = SFX_BIKECOMP_AP;
-					PickupEnable = false;
-				}
-
-				break;
-
-			case PICKUP_Crystal:
-				CrystalsFound += 1;
-				if( CrystalsFound == 1 )
-				{
-					sprintf( (char*)&Message[0], YOU_HAVE_ONE_CRYSTAL, CrystalsFound );
-				}
-				else
-				{
-					sprintf( (char*)&Message[0], YOU_HAVE_CRYSTALS, CrystalsFound );
-				}
-				MessageSFX = SFX_PickupCrystal;
-				Speech = false;
-				ShowTextAnyway = true;
-				break;
-
-			case PICKUP_DNA:
-
-				MessageSFX = SFX_PickupGeneral;
-				Speech = false;
-				ShowTextAnyway = true;
-				break;
-
-			case PICKUP_SkeletonKey:
-
-				MessageSFX = SFX_PickupGeneral;
-				Speech = false;
-				ShowTextAnyway = true;
-				break;
-
-			case PICKUP_Bomb:
-
-				MessageSFX = SFX_PickupGeneral;
-				Speech = false;
-				ShowTextAnyway = true;
-				break;
-
-			case PICKUP_GoldFigure:
-
-				MessageSFX = SFX_PickupGeneral;
-				Speech = false;
-				ShowTextAnyway = true;
-				break;
-
-			case PICKUP_Flag:
-				if ( CaptureTheFlag )
-				{
-					// now I have the flag....?
-					Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingFlag;
-					AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
-						TeamName[ TeamNumber[ WhoIAm ] ] );
-
-					sprintf( CTFMessage, SOMEONE_HAS_GOT_THE_FLAG, Names[ WhoIAm ], TeamName[ TeamNumber[ WhoIAm ] ] );
-					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
-
-				}
-				break;
-
-			case PICKUP_Bounty:
-				if ( BountyHunt )
-				{
-					// now I have the bounty....?
-					BountyTime = 0.0F;
-					Ships[ WhoIAm ].Object.Flags |= SHIP_CarryingBounty;
-					AddColourMessageToQue(FlagMessageColour, YOU_HAVE_GOT_THE_BOUNTY );
-
-					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_BountyMessage, 0);
-
-				}
-				break;
-
-			case PICKUP_Flag1:
-			case PICKUP_Flag2:
-			case PICKUP_Flag3:
-			case PICKUP_Flag4:
-				if ( CTF )
-				{
-					int team;
-
-					for ( team = 0; team < MAX_TEAMS; team++ )
-					{
-						if ( Pickups[i].Type == TeamFlagPickup[ team ] )
-						{
-							if ( team == TeamNumber[ WhoIAm ] )
+							if ( TeamFlagAtHome[ team ] )
 							{
-								if ( TeamFlagAtHome[ team ] )
-								{
-									PickupEnable = false;
-								}
-								else if ( OwnFlagTeleportsHome )
-								{
-									GOAL *goal;
+								PickupEnable = false;
+							}
+							else if ( OwnFlagTeleportsHome )
+							{
+								GOAL *goal;
 
-									// teleport flag back to own goal
-									PickupEnable = false;
-									goal = TeamGoal( team );
-									if ( goal )
-									{
-										KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
-										KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
-										GenerateFlagAtHome( team );
-										AddColourMessageToQue(FlagMessageColour, TEAM_FLAG_RETURNED,
-											TeamName[ TeamNumber[ WhoIAm ] ] );
-										SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
-									}
-								}
-								else if ( CanCarryOwnFlag )
+								// teleport flag back to own goal
+								PickupEnable = false;
+								goal = TeamGoal( team );
+								if ( goal )
 								{
-									Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
-									AddColourMessageToQue(FlagMessageColour, RETURN_TEAM_FLAG,
+									KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
+									KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
+									GenerateFlagAtHome( team );
+									AddColourMessageToQue(FlagMessageColour, TEAM_FLAG_RETURNED,
 										TeamName[ TeamNumber[ WhoIAm ] ] );
-									SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturningFlag, 0);
+									SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
 								}
-								else
-								{
-									AddColourMessageToQue(FlagMessageColour, CANNOT_PICKUP_OWN_FLAG );
-									PickupEnable = false;
-								}
+							}
+							else if ( CanCarryOwnFlag )
+							{
+								Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
+								AddColourMessageToQue(FlagMessageColour, RETURN_TEAM_FLAG,
+									TeamName[ TeamNumber[ WhoIAm ] ] );
+								SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturningFlag, 0);
 							}
 							else
 							{
-								// now I have the flag....?
-								Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
-								AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
-									TeamName[ TeamNumber[ WhoIAm ] ] );
-
-								sprintf( CTFMessage, SOMEONE_HAS_OTHER_TEAM_FLAG,
-									Names[ WhoIAm ],
-									TeamName[ TeamNumber[ WhoIAm ] ],
-									TeamName[ team ] );
-								SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
+								AddColourMessageToQue(FlagMessageColour, CANNOT_PICKUP_OWN_FLAG );
+								PickupEnable = false;
 							}
-							break;
 						}
-					}
+						else
+						{
+							// now I have the flag....?
+							Ships[ WhoIAm ].Object.Flags |= TeamFlagMask[ team ];
+							AddColourMessageToQue(FlagMessageColour, TAKE_FLAG_TO_GOAL,
+								TeamName[ TeamNumber[ WhoIAm ] ] );
 
+							sprintf( CTFMessage, SOMEONE_HAS_OTHER_TEAM_FLAG,
+								Names[ WhoIAm ],
+								TeamName[ TeamNumber[ WhoIAm ] ],
+								TeamName[ team ] );
+							SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_CaptureFlagMessage, 0);
+						}
+						break;
+					}
 				}
-				break;
 
-			case PICKUP_Orb:
-				if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			}
+			break;
+
+		case PICKUP_Orb:
+			if( ( Ships[ WhoIAm ].Object.Flags & SHIP_SuperNashram ) )
+			{
+				if( CopyOfOrbitals < MAXMULTIPLES )
 				{
-					if( CopyOfOrbitals < MAXMULTIPLES )
-					{
-						CopyOfOrbAmmo[ CopyOfOrbitals ] = MAXMULTIPLEAMMO;
-						CopyOfOrbitals++;
-						MessageSFX = SFX_Orbital;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						MessageSFX = SFX_BIKECOMP_AP;
-						PickupEnable = false;
-					}
+					CopyOfOrbAmmo[ CopyOfOrbitals ] = MAXMULTIPLEAMMO;
+					CopyOfOrbitals++;
+					MessageSFX = SFX_Orbital;
 				}
 				else
 				{
-					if( Ships[ WhoIAm ].NumMultiples < MAXMULTIPLES )
-					{
-						Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples ] = MAXMULTIPLEAMMO;
-						Ships[ WhoIAm ].NumMultiples++;
-						CreateOrbitPulsar( WhoIAm );
-						MessageSFX = SFX_Orbital;
-					}
-					else
-					{
-						sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
-						MessageSFX = SFX_BIKECOMP_AP;
-						PickupEnable = false;
-					}
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					MessageSFX = SFX_BIKECOMP_AP;
+					PickupEnable = false;
 				}
-				break;
+			}
+			else
+			{
+				if( Ships[ WhoIAm ].NumMultiples < MAXMULTIPLES )
+				{
+					Ships[ WhoIAm ].OrbAmmo[ Ships[ WhoIAm ].NumMultiples ] = MAXMULTIPLEAMMO;
+					Ships[ WhoIAm ].NumMultiples++;
+					CreateOrbitPulsar( WhoIAm );
+					MessageSFX = SFX_Orbital;
+				}
+				else
+				{
+					sprintf( (char*)&Message[0], YOU_ALREADY_HAVE_MAX, Messages[ Pickups[i].Type ] );
+					MessageSFX = SFX_BIKECOMP_AP;
+					PickupEnable = false;
+				}
+			}
+			break;
 		}
 
 		if( PickupEnable || no_collision )
@@ -1698,7 +1698,7 @@ void CheckPickup( void )
 			if( ( ( Pickup->Owner == WhoIAm ) && ( Pickup->Speed == 0.0F ) ) || ( Pickup->Owner != WhoIAm ) )
 			{
 				if( RaytoSphereShort( (VECTOR *) &Pickup->Pos, PICKUP_RADIUS, &Pos, &Dir, Length ) )
-						CollectPickup( Pickup->Index );
+					CollectPickup( Pickup->Index );
 				else
 					Pickup->CouldNotPickup = false;
 			}
@@ -1736,72 +1736,72 @@ void KillPickup( u_int16_t Owner, u_int16_t ID, int16_t Style )
 
 			switch( Style )
 			{
-				case PICKUPKILL_Immediate:
-					if ( CTF )
+			case PICKUPKILL_Immediate:
+				if ( CTF )
+				{
+					int team;
+
+					team = -1;
+					switch ( Pickups[ i ].Type )
 					{
-						int team;
-
-						team = -1;
-						switch ( Pickups[ i ].Type )
-						{
-						case PICKUP_Flag1:
-							team = 0;
-							break;
-						case PICKUP_Flag2:
-							team = 1;
-							break;
-						case PICKUP_Flag3:
-							team = 2;
-							break;
-						case PICKUP_Flag4:
-							team = 3;
-							break;
-						}
-						if ( team >= 0 )
-						{
-							TeamFlagAtHome[ team ] = false;
-						}
+					case PICKUP_Flag1:
+						team = 0;
+						break;
+					case PICKUP_Flag2:
+						team = 1;
+						break;
+					case PICKUP_Flag3:
+						team = 2;
+						break;
+					case PICKUP_Flag4:
+						team = 3;
+						break;
 					}
-					CleanUpPickup( i );
-					Count++;
-					if( Count > 1 )
+					if ( team >= 0 )
 					{
-						Msg( "Killed more than 1 pickup with same type\n" );
+						TeamFlagAtHome[ team ] = false;
 					}
-					break;
+				}
+				CleanUpPickup( i );
+				Count++;
+				if( Count > 1 )
+				{
+					Msg( "Killed more than 1 pickup with same type\n" );
+				}
+				break;
 
-				case PICKUPKILL_Disappear:
-					if( Pickups[ i ].Mode == PICKUPMODE_Disappear ) break;
+			case PICKUPKILL_Disappear:
+				if( Pickups[ i ].Mode == PICKUPMODE_Disappear ) break;
 
-					Pickups[ i ].LifeCount = 0.0F;
-					Pickups[ i ].Mode = PICKUPMODE_Disappear;
-					Pickups[ i ].PickupCount = 32.0F;
+				Pickups[ i ].LifeCount = 0.0F;
+				Pickups[ i ].Mode = PICKUPMODE_Disappear;
+				Pickups[ i ].PickupCount = 32.0F;
 
-					fmpoly = FindFreeFmPoly();
-					if( fmpoly != INDEX_NONE )
-					{
-						FmPolys[ fmpoly ].LifeCount = 1000.0F;
-						FmPolys[ fmpoly ].Pos = Pickups[ i ].Pos;
-						FmPolys[ fmpoly ].SeqNum = FM_PICKUP_REGEN;
-						FmPolys[ fmpoly ].Frame = 0.0F;
-						FmPolys[ fmpoly ].Frm_Info = &PickupRegen_Header;
-						FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-						FmPolys[ fmpoly ].Trans = 192;
-						FmPolys[ fmpoly ].Dir.x = 0.0F;
-						FmPolys[ fmpoly ].Dir.y = 0.0F;
-						FmPolys[ fmpoly ].Dir.z = 0.0F;
-						FmPolys[ fmpoly ].R = 192;
-						FmPolys[ fmpoly ].G = 192;
-						FmPolys[ fmpoly ].B = 192;
-						FmPolys[ fmpoly ].Speed = 0.0F;
-						FmPolys[ fmpoly ].Rot = 0.0F;
-						FmPolys[ fmpoly ].Group = Pickups[ i ].Group;
-						FmPolys[ fmpoly ].RotSpeed = 0.0F;
-						FmPolys[ fmpoly ].xsize = PICKUP_REGEN_SIZE;
-						FmPolys[ fmpoly ].ysize = PICKUP_REGEN_SIZE;
-						AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
-					}
-					break;
+				fmpoly = FindFreeFmPoly();
+				if( fmpoly != INDEX_NONE )
+				{
+					FmPolys[ fmpoly ].LifeCount = 1000.0F;
+					FmPolys[ fmpoly ].Pos = Pickups[ i ].Pos;
+					FmPolys[ fmpoly ].SeqNum = FM_PICKUP_REGEN;
+					FmPolys[ fmpoly ].Frame = 0.0F;
+					FmPolys[ fmpoly ].Frm_Info = &PickupRegen_Header;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+					FmPolys[ fmpoly ].Trans = 192;
+					FmPolys[ fmpoly ].Dir.x = 0.0F;
+					FmPolys[ fmpoly ].Dir.y = 0.0F;
+					FmPolys[ fmpoly ].Dir.z = 0.0F;
+					FmPolys[ fmpoly ].R = 192;
+					FmPolys[ fmpoly ].G = 192;
+					FmPolys[ fmpoly ].B = 192;
+					FmPolys[ fmpoly ].Speed = 0.0F;
+					FmPolys[ fmpoly ].Rot = 0.0F;
+					FmPolys[ fmpoly ].Group = Pickups[ i ].Group;
+					FmPolys[ fmpoly ].RotSpeed = 0.0F;
+					FmPolys[ fmpoly ].xsize = PICKUP_REGEN_SIZE;
+					FmPolys[ fmpoly ].ysize = PICKUP_REGEN_SIZE;
+					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
+				}
+				break;
 			}
 			return;
 		}
@@ -1875,30 +1875,30 @@ void KillUsedPickup( u_int16_t i )
 		{
 			switch( RegenPoints[ Pickups[ i ].RegenSlot ].RegenType )
 			{
-				case PU_REGENTYPE_Random:		// Random each time
-					RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
-					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
-					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
-					RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Free;
-					RegenPoints[ Pickups[ i ].RegenSlot ].Wait = ( 5.0F * ANIM_SECOND );
-					break;
+			case PU_REGENTYPE_Random:		// Random each time
+				RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
+				RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
+				RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
+				RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Free;
+				RegenPoints[ Pickups[ i ].RegenSlot ].Wait = ( 5.0F * ANIM_SECOND );
+				break;
 
-				case PU_REGENTYPE_Const:		// Same each time
-					RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
-					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
-					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
-					RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Free;
-					RegenPoints[ Pickups[ i ].RegenSlot ].Wait = ( 5.0F * ANIM_SECOND );
-					break;
+			case PU_REGENTYPE_Const:		// Same each time
+				RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
+				RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
+				RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
+				RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Free;
+				RegenPoints[ Pickups[ i ].RegenSlot ].Wait = ( 5.0F * ANIM_SECOND );
+				break;
 
-				case PU_REGENTYPE_Onceonly:		// Once only ( Never used again )
-					if( MaxPickupType[ Pickups[ i ].Type ] ) MaxPickupType[ Pickups[ i ].Type ]--;
-					RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
-					RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
-					RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
-					RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Used;
-					RegenPoints[ Pickups[ i ].RegenSlot ].Wait = 0.0F;
-					break;
+			case PU_REGENTYPE_Onceonly:		// Once only ( Never used again )
+				if( MaxPickupType[ Pickups[ i ].Type ] ) MaxPickupType[ Pickups[ i ].Type ]--;
+				RegenPoints[ Pickups[ i ].RegenSlot ].GenType = PU_GENTYPE_Initialised,		// Initialised immediatly
+				RegenPoints[ Pickups[ i ].RegenSlot ].PickupIndex = INDEX_NONE;
+				RegenPoints[ Pickups[ i ].RegenSlot ].TriggerMod = INDEX_NONE;
+				RegenPoints[ Pickups[ i ].RegenSlot ].Status = PU_REGENSTAT_Used;
+				RegenPoints[ Pickups[ i ].RegenSlot ].Wait = 0.0F;
+				break;
 			}
 
 #if DEBUG_PICKUPS
@@ -2007,28 +2007,28 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		{
 			switch( Type )
 			{
-				case PICKUP_Mugs:
-				case PICKUP_Shield:
-				case PICKUP_GeneralAmmo:
-				case PICKUP_SussGunAmmo:
-				case PICKUP_PyroliteAmmo:
-					break;
+			case PICKUP_Mugs:
+			case PICKUP_Shield:
+			case PICKUP_GeneralAmmo:
+			case PICKUP_SussGunAmmo:
+			case PICKUP_PyroliteAmmo:
+				break;
 
-				case PICKUP_Bounty:
-				case PICKUP_Flag:
-				case PICKUP_Flag1:
-				case PICKUP_Flag2:
-				case PICKUP_Flag3:
-				case PICKUP_Flag4:
-					KillAllPickupsOfType( Type, PICKUPKILL_Immediate );
-					break;
+			case PICKUP_Bounty:
+			case PICKUP_Flag:
+			case PICKUP_Flag1:
+			case PICKUP_Flag2:
+			case PICKUP_Flag3:
+			case PICKUP_Flag4:
+				KillAllPickupsOfType( Type, PICKUPKILL_Immediate );
+				break;
 
-				default:
+			default:
 #if DEBUG_PICKUPS
-					DebugPrintf( "pickups: Tried to generated more %s's than allowed\n", Messages[ Type ] );
+				DebugPrintf( "pickups: Tried to generated more %s's than allowed\n", Messages[ Type ] );
 #endif
-					return( (u_int16_t) -2 );
-					break;
+				return( (u_int16_t) -2 );
+				break;
 			}
 		}
 	}
@@ -2222,10 +2222,10 @@ u_int16_t InitOnePickup( VECTOR * Pos, u_int16_t Group, VECTOR * Dir, float Spee
 		}
 
 		if ( BountyHunt && Pickups[ i ].Type == PICKUP_Bounty )
-				Ships[ WhoIAm ].Object.Flags &= ~SHIP_CarryingBounty;
+			Ships[ WhoIAm ].Object.Flags &= ~SHIP_CarryingBounty;
 
 		if ( CaptureTheFlag && Pickups[ i ].Type == PICKUP_Flag )
-				Ships[ WhoIAm ].Object.Flags &= ~SHIP_CarryingFlag;
+			Ships[ WhoIAm ].Object.Flags &= ~SHIP_CarryingFlag;
 	}
 	else
 	{
@@ -2435,77 +2435,77 @@ void ProcessPickups( void )
 
 		switch( Pickups[ i ].Mode )
 		{
-			case PICKUPMODE_Appear:
-				Pickups[ i ].PickupCount -= framelag;
-				if( Pickups[ i ].PickupCount <= 0.0F )
+		case PICKUPMODE_Appear:
+			Pickups[ i ].PickupCount -= framelag;
+			if( Pickups[ i ].PickupCount <= 0.0F )
+			{
+				if( Pickups[ i ].ModelNum != INDEX_NONE )
 				{
-					if( Pickups[ i ].ModelNum != INDEX_NONE )
-					{
-						Models[ Pickups[ i ].ModelNum ].Visible = true;
-					}
-					Pickups[ i ].PickupCount = 0.0F;
-					Pickups[ i ].Mode = PICKUPMODE_Normal;
+					Models[ Pickups[ i ].ModelNum ].Visible = true;
 				}
-				break;
+				Pickups[ i ].PickupCount = 0.0F;
+				Pickups[ i ].Mode = PICKUPMODE_Normal;
+			}
+			break;
 
-			case PICKUPMODE_Normal:
+		case PICKUPMODE_Normal:
+			if( ( ( Pickups[ i ].Owner == WhoIAm ) ) ||
+				( ( ( Pickups[ i ].Owner == INDEX_NONE ) && ( IsHost ) ) ) ||
+				( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) )
+			{
+				if( Pickups[ i ].LifeCount != -1.0F )
+				{
+					Pickups[ i ].LifeCount -= framelag;
+					if( Pickups[ i ].LifeCount <= 0.0F )
+					{
+						{
+#if DEBUG_PICKUPS
+							DebugPrintf( "pickups: Tell %s to dissapear\n", Messages[ Pickups[ i ].Type ] );
+#endif
+						}
+
+						KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Disappear );
+						KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Disappear );
+
+						i = NextPickup;
+					}
+				}
+			}
+			break;
+
+		case PICKUPMODE_Disappear:
+			Pickups[ i ].PickupCount -= framelag;
+			if( Pickups[ i ].PickupCount <= 0.0F )
+			{
 				if( ( ( Pickups[ i ].Owner == WhoIAm ) ) ||
 					( ( ( Pickups[ i ].Owner == INDEX_NONE ) && ( IsHost ) ) ) ||
 					( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) )
 				{
-					if( Pickups[ i ].LifeCount != -1.0F )
 					{
-						Pickups[ i ].LifeCount -= framelag;
-						if( Pickups[ i ].LifeCount <= 0.0F )
-						{
-							{
 #if DEBUG_PICKUPS
-								DebugPrintf( "pickups: Tell %s to dissapear\n", Messages[ Pickups[ i ].Type ] );
+						DebugPrintf( "pickups: Kill %s immediatly\n", Messages[ Pickups[ i ].Type ] );
 #endif
-							}
-
-							KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Disappear );
-							KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Disappear );
-
-							i = NextPickup;
-						}
 					}
+
+					AddPickupToRegen( Pickups[ i ].Type );
+					KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
+					KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
+					i = NextPickup;
+					break;
 				}
-				break;
-
-			case PICKUPMODE_Disappear:
-				Pickups[ i ].PickupCount -= framelag;
-				if( Pickups[ i ].PickupCount <= 0.0F )
+				else
 				{
-					if( ( ( Pickups[ i ].Owner == WhoIAm ) ) ||
-						( ( ( Pickups[ i ].Owner == INDEX_NONE ) && ( IsHost ) ) ) ||
-						( ( ( Pickups[ i ].Owner != INDEX_NONE ) && !Ships[ Pickups[ i ].Owner ].enable && ( IsHost ) ) ) )
+					if( Pickups[ i ].PickupCount < -( ANIM_SECOND * 5.0F ) )
 					{
-						{
-#if DEBUG_PICKUPS
-							DebugPrintf( "pickups: Kill %s immediatly\n", Messages[ Pickups[ i ].Type ] );
-#endif
-						}
-
-						AddPickupToRegen( Pickups[ i ].Type );
-						KillPickupSend( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
 						KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
 						i = NextPickup;
-						break;
-					}
-					else
-					{
-						if( Pickups[ i ].PickupCount < -( ANIM_SECOND * 5.0F ) )
-						{
-							KillPickup( Pickups[ i ].Owner, Pickups[ i ].ID, PICKUPKILL_Immediate );
-							i = NextPickup;
-						}
 					}
 				}
-				break;
+			}
+			break;
 
-			default:
-				break;
+		default:
+			break;
 		}
 
 		if( i != NextPickup )
@@ -2523,9 +2523,9 @@ void ProcessPickups( void )
 
 				OldGroup = Pickups[ i ].Group;
 
-/*===================================================================
-	Do first collision, when initialised or changed direction
-===================================================================*/
+				/*===================================================================
+					Do first collision, when initialised or changed direction
+				===================================================================*/
 				NewPos.x = ( Pickups[ i ].Pos.x + NewDir.x );
 				NewPos.y = ( Pickups[ i ].Pos.y + NewDir.y );
 				NewPos.z = ( Pickups[ i ].Pos.z + NewDir.z );
@@ -2585,75 +2585,75 @@ void ProcessPickups( void )
 
 			switch( Pickups[ i ].Type )
 			{
-				case PICKUP_Flag:
-				case PICKUP_Flag1:
-				case PICKUP_Flag2:
-				case PICKUP_Flag3:
-				case PICKUP_Flag4:
-					if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
+			case PICKUP_Flag:
+			case PICKUP_Flag1:
+			case PICKUP_Flag2:
+			case PICKUP_Flag3:
+			case PICKUP_Flag4:
+				if( Pickups[ i ].ModelNum != INDEX_NONE )								/* 3D Model Attached? */
+				{
+					Speed = ( LevelTimeTaken * 4.0F );
+					Models[ Pickups[ i ].ModelNum ].Frame = (int16_t) ( FMOD( Speed, ( 2.5F * ANIM_SECOND ) ) / ( 0.25F * ANIM_SECOND ) );
+					Models[ Pickups[ i ].ModelNum ].InterpFrame = ( Models[ Pickups[ i ].ModelNum ].Frame + 1 );
+					if( Models[ Pickups[ i ].ModelNum ].InterpFrame == 10 ) Models[ Pickups[ i ].ModelNum ].InterpFrame = 0;
+					Models[ Pickups[ i ].ModelNum ].InterpTime = FMOD( ( FMOD( Speed, ( 2.5F * ANIM_SECOND ) ) / ( 0.25F * ANIM_SECOND ) ), 1.0F );
+				}
+				if ( CTF )
+				{
+					int team;
+
+					team = -1;
+					switch ( Pickups[ i ].Type )
 					{
-						Speed = ( LevelTimeTaken * 4.0F );
-						Models[ Pickups[ i ].ModelNum ].Frame = (int16_t) ( FMOD( Speed, ( 2.5F * ANIM_SECOND ) ) / ( 0.25F * ANIM_SECOND ) );
-						Models[ Pickups[ i ].ModelNum ].InterpFrame = ( Models[ Pickups[ i ].ModelNum ].Frame + 1 );
-						if( Models[ Pickups[ i ].ModelNum ].InterpFrame == 10 ) Models[ Pickups[ i ].ModelNum ].InterpFrame = 0;
-						Models[ Pickups[ i ].ModelNum ].InterpTime = FMOD( ( FMOD( Speed, ( 2.5F * ANIM_SECOND ) ) / ( 0.25F * ANIM_SECOND ) ), 1.0F );
+					case PICKUP_Flag1:
+						team = 0;
+						break;
+					case PICKUP_Flag2:
+						team = 1;
+						break;
+					case PICKUP_Flag3:
+						team = 2;
+						break;
+					case PICKUP_Flag4:
+						team = 3;
+						break;
 					}
-					if ( CTF )
+					if ( team >= 0 )
 					{
-						int team;
+						VECTOR Move;
+						float MoveDist;
 
-						team = -1;
-						switch ( Pickups[ i ].Type )
+						switch ( GoalCheckTeam( &OldPos, &Pickups[ i ].Pos, Pickups[ i ].Group, team ) )
 						{
-						case PICKUP_Flag1:
-							team = 0;
-							break;
-						case PICKUP_Flag2:
-							team = 1;
-							break;
-						case PICKUP_Flag3:
-							team = 2;
-							break;
-						case PICKUP_Flag4:
-							team = 3;
-							break;
-						}
-						if ( team >= 0 )
-						{
-							VECTOR Move;
-							float MoveDist;
-
-							switch ( GoalCheckTeam( &OldPos, &Pickups[ i ].Pos, Pickups[ i ].Group, team ) )
+						case GOAL_SCORED:
+							if ( !TeamFlagAtHome[ team ] )
 							{
-							case GOAL_SCORED:
-								if ( !TeamFlagAtHome[ team ] )
-								{
-									Move.x = Pickups[ i ].Pos.x - OldPos.x;
-									Move.y = Pickups[ i ].Pos.y - OldPos.y;
-									Move.z = Pickups[ i ].Pos.z - OldPos.z;
-									MoveDist = VectorLength( &Move );
-									if ( MoveDist > 0.0F )
-										AddColourMessageToQue(FlagMessageColour, FLAG_DRIFTED_BACK, TeamName[ team ] );
-									TeamFlagAtHome[ team ] = true;
-								}
-								break;
-							default:
-								if ( TeamFlagAtHome[ team ] )
-								{
-									Move.x = Pickups[ i ].Pos.x - OldPos.x;
-									Move.y = Pickups[ i ].Pos.y - OldPos.y;
-									Move.z = Pickups[ i ].Pos.z - OldPos.z;
-									MoveDist = VectorLength( &Move );
-									if ( MoveDist > 0.0F )
-										AddColourMessageToQue(FlagMessageColour, FLAG_ESCAPED, TeamName[ team ] );
-									TeamFlagAtHome[ team ] = false;
-								}
+								Move.x = Pickups[ i ].Pos.x - OldPos.x;
+								Move.y = Pickups[ i ].Pos.y - OldPos.y;
+								Move.z = Pickups[ i ].Pos.z - OldPos.z;
+								MoveDist = VectorLength( &Move );
+								if ( MoveDist > 0.0F )
+									AddColourMessageToQue(FlagMessageColour, FLAG_DRIFTED_BACK, TeamName[ team ] );
+								TeamFlagAtHome[ team ] = true;
+							}
+							break;
+						default:
+							if ( TeamFlagAtHome[ team ] )
+							{
+								Move.x = Pickups[ i ].Pos.x - OldPos.x;
+								Move.y = Pickups[ i ].Pos.y - OldPos.y;
+								Move.z = Pickups[ i ].Pos.z - OldPos.z;
+								MoveDist = VectorLength( &Move );
+								if ( MoveDist > 0.0F )
+									AddColourMessageToQue(FlagMessageColour, FLAG_ESCAPED, TeamName[ team ] );
+								TeamFlagAtHome[ team ] = false;
 							}
 						}
 					}
-					break;
-				default:
-					break;
+				}
+				break;
+			default:
+				break;
 			}
 
 			if( IsGroupVisible[ Pickups[i].Group ] )								// Don't Rotate if not visible
@@ -2684,7 +2684,7 @@ void ProcessPickups( void )
 	Input		:	Nothing
 	Output		:	Nothing
 ===================================================================*/
-	char		NewFilename[ 128 ];
+char		NewFilename[ 128 ];
 
 void SavePickupsPositions( void )
 {
@@ -2890,351 +2890,351 @@ bool PreLoadPickups( void )
 bool LoadPickupsPositions( void )
 {
 
-  /* the extension of the file with pickup data */
-  const char  * NewExt = ".PIC";
+	/* the extension of the file with pickup data */
+	const char  * NewExt = ".PIC";
 
-  FILE    * fp;
-  int16_t   Count;
-  VECTOR  Dir = { 0.0F, 0.0F, 0.0F };
-  u_int16_t  i = 0;
-  u_int32_t  MagicNumber;
-  u_int32_t  VersionNumber;
+	FILE    * fp;
+	int16_t   Count;
+	VECTOR  Dir = { 0.0F, 0.0F, 0.0F };
+	u_int16_t  i = 0;
+	u_int32_t  MagicNumber;
+	u_int32_t  VersionNumber;
 
-  /* wipes out all pickups, so we can load new ones */
-  KillAllPickups();
+	/* wipes out all pickups, so we can load new ones */
+	KillAllPickups();
 
 
-  /* Populate Remaster N64 pickup slots (100-105) by template-copying
-   * from a similar 1998 pickup (light / glow attribs) once, then point
-   * ModelType at the N64 mesh PreLoadPickups registered. PreLoadPickups
-   * runs on every level change and the slot indices it gets depend on
-   * the level's background and enemy models, so the ModelType overrides
-   * are reapplied on every load, not only the first. */
+	/* Populate Remaster N64 pickup slots (100-105) by template-copying
+	 * from a similar 1998 pickup (light / glow attribs) once, then point
+	 * ModelType at the N64 mesh PreLoadPickups registered. PreLoadPickups
+	 * runs on every level change and the slot indices it gets depend on
+	 * the level's background and enemy models, so the ModelType overrides
+	 * are reapplied on every load, not only the first. */
 #ifdef EDITION_REMASTER
-  {
-	static bool _n64_pickup_init_done = false;
-	if (!_n64_pickup_init_done)
 	{
-	  _n64_pickup_init_done = true;
+		static bool _n64_pickup_init_done = false;
+		if (!_n64_pickup_init_done)
+		{
+			_n64_pickup_init_done = true;
 
-	  /* StablizerCrystal (100): glowing crystal pickup → Crystal template. */
-	  PickupAttribs[ PICKUP_StablizerCrystal ] = PickupAttribs[ PICKUP_Crystal ];
+			/* StablizerCrystal (100): glowing crystal pickup → Crystal template. */
+			PickupAttribs[ PICKUP_StablizerCrystal ] = PickupAttribs[ PICKUP_Crystal ];
 
-	  /* ComputerCapsule (101): pickup capsule → Computer template
-	   * (no real mesh extracted — not used by any level in the SP
-	   * mission set, kept for completeness). */
-	  PickupAttribs[ PICKUP_ComputerCapsule ] = PickupAttribs[ PICKUP_Computer ];
+			/* ComputerCapsule (101): pickup capsule → Computer template
+			 * (no real mesh extracted — not used by any level in the SP
+			 * mission set, kept for completeness). */
+			PickupAttribs[ PICKUP_ComputerCapsule ] = PickupAttribs[ PICKUP_Computer ];
 
-	  /* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod
-	   * template for light/glow. */
-	  PickupAttribs[ PICKUP_BlackHoleGunPart1 ] = PickupAttribs[ PICKUP_PowerPod ];
-	  PickupAttribs[ PICKUP_BlackHoleGunPart2 ] = PickupAttribs[ PICKUP_PowerPod ];
-	  PickupAttribs[ PICKUP_BlackHoleGunPart3 ] = PickupAttribs[ PICKUP_PowerPod ];
-	  PickupAttribs[ PICKUP_BlackHoleGunPart4 ] = PickupAttribs[ PICKUP_PowerPod ];
+			/* BlackHoleGun parts (102-105): weapon-component pickups → PowerPod
+			 * template for light/glow. */
+			PickupAttribs[ PICKUP_BlackHoleGunPart1 ] = PickupAttribs[ PICKUP_PowerPod ];
+			PickupAttribs[ PICKUP_BlackHoleGunPart2 ] = PickupAttribs[ PICKUP_PowerPod ];
+			PickupAttribs[ PICKUP_BlackHoleGunPart3 ] = PickupAttribs[ PICKUP_PowerPod ];
+			PickupAttribs[ PICKUP_BlackHoleGunPart4 ] = PickupAttribs[ PICKUP_PowerPod ];
+		}
+
+		/* This level's model slots for the real N64 meshes. */
+		if (s_n64_pickup_model_idx[0] >= 0)
+			PickupAttribs[ PICKUP_StablizerCrystal ].ModelType = s_n64_pickup_model_idx[0];
+		if (s_n64_pickup_model_idx[1] >= 0)
+			PickupAttribs[ PICKUP_BlackHoleGunPart1 ].ModelType = s_n64_pickup_model_idx[1];
+		if (s_n64_pickup_model_idx[2] >= 0)
+			PickupAttribs[ PICKUP_BlackHoleGunPart2 ].ModelType = s_n64_pickup_model_idx[2];
+		if (s_n64_pickup_model_idx[3] >= 0)
+			PickupAttribs[ PICKUP_BlackHoleGunPart3 ].ModelType = s_n64_pickup_model_idx[3];
+		if (s_n64_pickup_model_idx[4] >= 0)
+			PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
 	}
-
-	/* This level's model slots for the real N64 meshes. */
-	if (s_n64_pickup_model_idx[0] >= 0)
-	  PickupAttribs[ PICKUP_StablizerCrystal ].ModelType = s_n64_pickup_model_idx[0];
-	if (s_n64_pickup_model_idx[1] >= 0)
-	  PickupAttribs[ PICKUP_BlackHoleGunPart1 ].ModelType = s_n64_pickup_model_idx[1];
-	if (s_n64_pickup_model_idx[2] >= 0)
-	  PickupAttribs[ PICKUP_BlackHoleGunPart2 ].ModelType = s_n64_pickup_model_idx[2];
-	if (s_n64_pickup_model_idx[3] >= 0)
-	  PickupAttribs[ PICKUP_BlackHoleGunPart3 ].ModelType = s_n64_pickup_model_idx[3];
-	if (s_n64_pickup_model_idx[4] >= 0)
-	  PickupAttribs[ PICKUP_BlackHoleGunPart4 ].ModelType = s_n64_pickup_model_idx[4];
-  }
 #endif /* EDITION_REMASTER — N64 pickup template block */
 
-  /* convert the level_name into level_name.pic */
-  Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
+	/* convert the level_name into level_name.pic */
+	Change_Ext( &LevelNames[ LevelNum ][ 0 ], &NewFilename[ 0 ], NewExt );
 
-  /* reset number of pickups in groups to 0 */
-  for( Count = 0; Count < MAXGROUPS; Count++ )
-	NumPickupsPerGroup[ Count ] = 0;
+	/* reset number of pickups in groups to 0 */
+	for( Count = 0; Count < MAXGROUPS; Count++ )
+		NumPickupsPerGroup[ Count ] = 0;
 
-  /* reset the number of each pickup to 0
-	 and the max number of each to 1000 */
-  for( Count = 0; Count < MAXPICKUPTYPES; Count++ )
-  {
-	NumPickupType[ Count ] = 0;
-	MaxPickupType[ Count ] = 1000;
-  }
-
-  /* counter */
-  NumRegenPoints = 0;
-
-  /* reset number of pickups in current biker */
-  Ships[WhoIAm].PickupIdCount = (u_int16_t) 0;
-
-  /* get the size of the file */
-
-  /* open the file for reading */
-  fp = file_open( &NewFilename[ 0 ], "rb" );
-
-  /* if the file handle is valid */
-  if( fp != nullptr )
-  {
-
-	/* read in the magic number */
-	fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
-
-	/* read in the pic version number */
-	fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
-
-	/* fail if the magic/version numbers are not proper */
-	if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != PIC_VERSION_NUMBER  ) )
+	/* reset the number of each pickup to 0
+	   and the max number of each to 1000 */
+	for( Count = 0; Count < MAXPICKUPTYPES; Count++ )
 	{
-	  fclose( fp );
-	  Msg( "LoadPickupsPositions() Incompatible pickup (.PIC) file %s", &NewFilename[ 0 ] );
-	  return( false );
+		NumPickupType[ Count ] = 0;
+		MaxPickupType[ Count ] = 1000;
 	}
 
-	/* read in the number of regen points contained in the file */
-	fread( &NumRegenPoints, sizeof( int16_t ), 1, fp );
+	/* counter */
+	NumRegenPoints = 0;
 
-	/* if global RegenPoints list of regen points IS set */
-	if( RegenPoints != nullptr )
+	/* reset number of pickups in current biker */
+	Ships[WhoIAm].PickupIdCount = (u_int16_t) 0;
+
+	/* get the size of the file */
+
+	/* open the file for reading */
+	fp = file_open( &NewFilename[ 0 ], "rb" );
+
+	/* if the file handle is valid */
+	if( fp != nullptr )
 	{
-	  /* free the memory */
-	  free( RegenPoints );
 
-	  /* for each possible player */
-	  for( Count = 0; Count < MAX_PLAYERS; Count++ )
+		/* read in the magic number */
+		fread( &MagicNumber, sizeof( u_int32_t ), 1, fp );
 
-		/* if regen slot copy IS set */
-		if( RegenSlotsCopy[ Count ] != nullptr )
+		/* read in the pic version number */
+		fread( &VersionNumber, sizeof( u_int32_t ), 1, fp );
 
-		  /* free the memory */
-		  free( RegenSlotsCopy[ Count ] );
-
-	}
-
-	/* allocate memory for the global which holds the regen points */
-	RegenPoints = (REGENPOINT*)malloc( sizeof( REGENPOINT ) * NumRegenPoints );
-
-	/* allocate memory for each regen slot copy */
-	for( Count = 0; Count < MAX_PLAYERS; Count++ )
-	  RegenSlotsCopy[ Count ] = (REGENPOINT*)malloc( sizeof( REGENPOINT ) * NumRegenPoints );
-
-	/* if the global is not NULL */
-	if( RegenPoints != nullptr )
-	{
-	  /* loop each regen point in the file */
-	  for( Count = 0; Count < NumRegenPoints; Count++ )
-	  {
-		/* reset the regen point */
-		RegenPoints[ Count ].Status = PU_REGENSTAT_Free;
-		RegenPoints[ Count ].Wait = 0.0F;
-
-		/* extract each field for the regen point */
-		fread( &RegenPoints[ Count ].GenType,  sizeof( u_int16_t ), 1, fp );
-		fread( &RegenPoints[ Count ].RegenType,  sizeof( u_int16_t ), 1, fp );
-		fread( &RegenPoints[ Count ].GenDelay,   sizeof( float ),  1, fp );
-		fread( &RegenPoints[ Count ].Lifespan,   sizeof( float ),  1, fp );
-		fread( &RegenPoints[ Count ].Pos.x,    sizeof( float ),  1, fp );
-		fread( &RegenPoints[ Count ].Pos.y,    sizeof( float ),  1, fp );
-		fread( &RegenPoints[ Count ].Pos.z,    sizeof( float ),  1, fp );
-		fread( &RegenPoints[ Count ].Group,    sizeof( u_int16_t ), 1, fp );
-		fread( &RegenPoints[ Count ].Type,     sizeof( u_int16_t ), 1, fp );
-		fread( &RegenPoints[ Count ].TriggerMod, sizeof( u_int16_t ), 1, fp );
-
-		/* if pickup is not valid */
-		if(
-		  /* if pickup is NOT a valid type */
-		  ( RegenPoints[ Count ].Type >= MAXPICKUPTYPES ) ||
-		  /* or */
-		  (
-			 /* triggerMod is set */
-			 /* and is NOT valid */
-			( RegenPoints[ Count ].TriggerMod != INDEX_NONE ) &&
-			( RegenPoints[ Count ].TriggerMod >= NumOfTrigMods )
-		  )
-		)
+		/* fail if the magic/version numbers are not proper */
+		if( ( MagicNumber != MAGIC_NUMBER ) || ( VersionNumber != PIC_VERSION_NUMBER  ) )
 		{
-#ifdef EDITION_REMASTER
-		  /* A Remaster .PIC regen point with a Type >= MAXPICKUPTYPES or a
-		   * TriggerMod past NumOfTrigMods makes the non-Remaster build
-		   * (#else) reject the whole file. Keep the level loadable: the
-		   * point becomes PICKUP_GeneralAmmo (even when only the trigger
-		   * mod was bad) and an invalid TriggerMod is cleared. */
-		  RegenPoints[ Count ].Type = PICKUP_GeneralAmmo;
-		  if (RegenPoints[ Count ].TriggerMod != INDEX_NONE &&
-			  RegenPoints[ Count ].TriggerMod >= NumOfTrigMods) {
-			RegenPoints[ Count ].TriggerMod = INDEX_NONE;
-		  }
-#else
-		  /* quit */
-		  Msg( "Error loading pickups\nIllegal pickup or trigger\n" );
-		  fclose( fp );
-		  return( false );
-#endif
+			fclose( fp );
+			Msg( "LoadPickupsPositions() Incompatible pickup (.PIC) file %s", &NewFilename[ 0 ] );
+			return( false );
 		}
-	  }
-	}
 
-	/* done reading file */
-	fclose( fp );
+		/* read in the number of regen points contained in the file */
+		fread( &NumRegenPoints, sizeof( int16_t ), 1, fp );
 
-	/* if not single player */
-	if( !( ( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
-		 ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
-		 ( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer) ) )
-	  /* if randomize pickups is set and we have more than one regen point */
-	  if( RandomPickups && ( NumRegenPoints > 1 ) )
-		/* shuffle around regen points */
-		RandomizePickups();
+		/* if global RegenPoints list of regen points IS set */
+		if( RegenPoints != nullptr )
+		{
+			/* free the memory */
+			free( RegenPoints );
 
-	/* for each regeneration point */
-	for( Count = 0; Count < NumRegenPoints; Count++ )
-	{
+			/* for each possible player */
+			for( Count = 0; Count < MAX_PLAYERS; Count++ )
 
-	  /* if the regen point is outside of its group
-		 it will be decalred as used and forgetten about
-		 the pickup it holds will be added to the regenerate list */
+				/* if regen slot copy IS set */
+				if( RegenSlotsCopy[ Count ] != nullptr )
 
-	  if( ! CheckValidRegenSlot( Count ) )
-		continue;
+					/* free the memory */
+					free( RegenSlotsCopy[ Count ] );
 
-	  /* if pickup is NOT valid */
-	  if(
-		 !FilterPickup( RegenPoints[ Count ].Type ) &&
-				 (!
-					 (( ( RegenPoints[ Count ].Type == PICKUP_Flag) && CaptureTheFlag) ||
-			   ( (RegenPoints[ Count ].Type == PICKUP_Bounty) && BountyHunt ))
+		}
+
+		/* allocate memory for the global which holds the regen points */
+		RegenPoints = (REGENPOINT*)malloc( sizeof( REGENPOINT ) * NumRegenPoints );
+
+		/* allocate memory for each regen slot copy */
+		for( Count = 0; Count < MAX_PLAYERS; Count++ )
+			RegenSlotsCopy[ Count ] = (REGENPOINT*)malloc( sizeof( REGENPOINT ) * NumRegenPoints );
+
+		/* if the global is not NULL */
+		if( RegenPoints != nullptr )
+		{
+			/* loop each regen point in the file */
+			for( Count = 0; Count < NumRegenPoints; Count++ )
+			{
+				/* reset the regen point */
+				RegenPoints[ Count ].Status = PU_REGENSTAT_Free;
+				RegenPoints[ Count ].Wait = 0.0F;
+
+				/* extract each field for the regen point */
+				fread( &RegenPoints[ Count ].GenType,  sizeof( u_int16_t ), 1, fp );
+				fread( &RegenPoints[ Count ].RegenType,  sizeof( u_int16_t ), 1, fp );
+				fread( &RegenPoints[ Count ].GenDelay,   sizeof( float ),  1, fp );
+				fread( &RegenPoints[ Count ].Lifespan,   sizeof( float ),  1, fp );
+				fread( &RegenPoints[ Count ].Pos.x,    sizeof( float ),  1, fp );
+				fread( &RegenPoints[ Count ].Pos.y,    sizeof( float ),  1, fp );
+				fread( &RegenPoints[ Count ].Pos.z,    sizeof( float ),  1, fp );
+				fread( &RegenPoints[ Count ].Group,    sizeof( u_int16_t ), 1, fp );
+				fread( &RegenPoints[ Count ].Type,     sizeof( u_int16_t ), 1, fp );
+				fread( &RegenPoints[ Count ].TriggerMod, sizeof( u_int16_t ), 1, fp );
+
+				/* if pickup is not valid */
+				if(
+					/* if pickup is NOT a valid type */
+					( RegenPoints[ Count ].Type >= MAXPICKUPTYPES ) ||
+					/* or */
+					(
+					 /* triggerMod is set */
+					 /* and is NOT valid */
+					( RegenPoints[ Count ].TriggerMod != INDEX_NONE ) &&
+					( RegenPoints[ Count ].TriggerMod >= NumOfTrigMods )
 					)
-		)
+					)
+				{
+#ifdef EDITION_REMASTER
+					/* A Remaster .PIC regen point with a Type >= MAXPICKUPTYPES or a
+					 * TriggerMod past NumOfTrigMods makes the non-Remaster build
+					 * (#else) reject the whole file. Keep the level loadable: the
+					 * point becomes PICKUP_GeneralAmmo (even when only the trigger
+					 * mod was bad) and an invalid TriggerMod is cleared. */
+					RegenPoints[ Count ].Type = PICKUP_GeneralAmmo;
+					if (RegenPoints[ Count ].TriggerMod != INDEX_NONE &&
+						RegenPoints[ Count ].TriggerMod >= NumOfTrigMods) {
+						RegenPoints[ Count ].TriggerMod = INDEX_NONE;
+					}
+#else
+					/* quit */
+					Msg( "Error loading pickups\nIllegal pickup or trigger\n" );
+					fclose( fp );
+					return( false );
+#endif
+				}
+			}
+		}
 
-	  continue;
+		/* done reading file */
+		fclose( fp );
 
-	  /* setup regen point
-		 based on its GenType */
+		/* if not single player */
+		if( !( ( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
+			 ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer ) ||
+			 ( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer) ) )
+			/* if randomize pickups is set and we have more than one regen point */
+			if( RandomPickups && ( NumRegenPoints > 1 ) )
+				/* shuffle around regen points */
+				RandomizePickups();
 
-	  switch( RegenPoints[ Count ].GenType )
-	  {
-
-		/* Initialised Regen Point */
-		/* AKA: Regen Points that have their pickups loaded at start */
-		case PU_GENTYPE_Initialised:
-
-		  /* add one to global count for this type of pickup */
-		  MaxPickupType[ RegenPoints[ Count ].Type ]++;
-
-		  /* try to create the pickup */
-		  i = InitOnePickup(
-				&RegenPoints[ Count ].Pos,
-				RegenPoints[ Count ].Group,
-				&Dir,
-				0.0F,
-				RegenPoints[ Count ].Type,
-				INDEX_NONE,
-				++Ships[WhoIAm].PickupIdCount,
-				Count,
-				false,
-				RegenPoints[ Count ].Lifespan,
-				RegenPoints[ Count ].TriggerMod
-			  );
-
-		  break;
-
-		/* timed regen point */
-		/* AKA: The Regen point will continously generate the pickup ever N seconds */
-		case PU_GENTYPE_Time:
-
-		  /* apply the generation delay */
-		  RegenPoints[ Count ].GenDelay = ( RegenPoints[ Count ].GenDelay * ANIM_SECOND );
-
-		  /* add one to global count for this type of pickup */
-		  MaxPickupType[ RegenPoints[ Count ].Type ]++;
-
-		  /* ? */
-		  RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
-
-		  /* set the status of the regen point */
-		  RegenPoints[ Count ].Status = PU_REGENSTAT_TimeGen;
-
-		  /* set timer to regen event */
-		  RegenPoints[ Count ].Wait = RegenPoints[ Count ].GenDelay;
-
-		  break;
-
-		case PU_GENTYPE_Trigger:
-
-		  /* add one to global count for this type of pickup */
-		  MaxPickupType[ RegenPoints[ Count ].Type ]++;
-
-		  /* ? */
-		  RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
-
-		  /* set the status of the regen point */
-		  RegenPoints[ Count ].Status = PU_REGENSTAT_TrigGen;
-
-		  break;
-	  }
-	}
-  }
-
-  /* remove the 1000 headroom added above; it kept InitOnePickup's
-	 NumPickupType >= MaxPickupType cap from refusing pickups while
-	 the level was being seeded */
-
-  for( Count = 0; Count < MAXPICKUPTYPES; Count++ )
-	MaxPickupType[ Count ] -= 1000;
-
-  /* if were not in the blow modes */
-  if(
-	!(
-	  ( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
-	  ( ChangeLevel_MyGameStatus == STATUS_SinglePlayer )			  ||
-	  ( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer)
-	 )
-  )
-  {
-	for( Count = 1; Count < MAXPRIMARYWEAPONS; Count++ )
-	{
-		i = PICKUP_Trojax + ( Count - 1 );
-		if( ! FilterPickup( i ) )
-			continue;
-
-		if( MaxPickupType[ i ] < NumPrimaryPickups && ( MaxPickupType[ i ] != 0 ) )
+		/* for each regeneration point */
+		for( Count = 0; Count < NumRegenPoints; Count++ )
 		{
-			MaxPickupType[ i ] = NumPrimaryPickups;
 
-			if( IsHost )
-				NumPrimWeapons[ Count ] += ( NumPrimaryPickups - NumPickupType [ i ] );
+			/* if the regen point is outside of its group
+			   it will be decalred as used and forgetten about
+			   the pickup it holds will be added to the regenerate list */
+
+			if( ! CheckValidRegenSlot( Count ) )
+				continue;
+
+			/* if pickup is NOT valid */
+			if(
+				!FilterPickup( RegenPoints[ Count ].Type ) &&
+					   (!
+						   (( ( RegenPoints[ Count ].Type == PICKUP_Flag) && CaptureTheFlag) ||
+					 ( (RegenPoints[ Count ].Type == PICKUP_Bounty) && BountyHunt ))
+						  )
+				)
+
+				continue;
+
+			/* setup regen point
+			   based on its GenType */
+
+			switch( RegenPoints[ Count ].GenType )
+			{
+
+				/* Initialised Regen Point */
+				/* AKA: Regen Points that have their pickups loaded at start */
+			case PU_GENTYPE_Initialised:
+
+				/* add one to global count for this type of pickup */
+				MaxPickupType[ RegenPoints[ Count ].Type ]++;
+
+				/* try to create the pickup */
+				i = InitOnePickup(
+					  &RegenPoints[ Count ].Pos,
+					  RegenPoints[ Count ].Group,
+					  &Dir,
+					  0.0F,
+					  RegenPoints[ Count ].Type,
+					  INDEX_NONE,
+					  ++Ships[WhoIAm].PickupIdCount,
+					  Count,
+					  false,
+					  RegenPoints[ Count ].Lifespan,
+					  RegenPoints[ Count ].TriggerMod
+					);
+
+				break;
+
+				/* timed regen point */
+				/* AKA: The Regen point will continously generate the pickup ever N seconds */
+			case PU_GENTYPE_Time:
+
+				/* apply the generation delay */
+				RegenPoints[ Count ].GenDelay = ( RegenPoints[ Count ].GenDelay * ANIM_SECOND );
+
+				/* add one to global count for this type of pickup */
+				MaxPickupType[ RegenPoints[ Count ].Type ]++;
+
+				/* ? */
+				RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
+
+				/* set the status of the regen point */
+				RegenPoints[ Count ].Status = PU_REGENSTAT_TimeGen;
+
+				/* set timer to regen event */
+				RegenPoints[ Count ].Wait = RegenPoints[ Count ].GenDelay;
+
+				break;
+
+			case PU_GENTYPE_Trigger:
+
+				/* add one to global count for this type of pickup */
+				MaxPickupType[ RegenPoints[ Count ].Type ]++;
+
+				/* ? */
+				RegenPoints[ Count ].PickupID = ++Ships[WhoIAm].PickupIdCount;
+
+				/* set the status of the regen point */
+				RegenPoints[ Count ].Status = PU_REGENSTAT_TrigGen;
+
+				break;
+			}
 		}
 	}
-  }
 
-  /* if the minimum ammount of general ammo to allways exist is lower then 3 */
-  if( MaxPickupType[ PICKUP_GeneralAmmo ] < 3 )
-	/* set the minimum of general ammo to to 3 */
-	MaxPickupType[ PICKUP_GeneralAmmo ] = 3;
+	/* remove the 1000 headroom added above; it kept InitOnePickup's
+	   NumPickupType >= MaxPickupType cap from refusing pickups while
+	   the level was being seeded */
 
-  /* if the minimum ammount of pryolite ammo to allways exist is 0 */
-  /* and we currently have a pyro on the level */
-  if( ( MaxPickupType[ PICKUP_PyroliteAmmo ] == 0 ) &&
-	( MaxPickupType[ PICKUP_Pyrolite ] != 0 ) )
-	/* set the minimum of pyro ammo that always exists to 2 */
-	MaxPickupType[ PICKUP_PyroliteAmmo ] = 2;
+	for( Count = 0; Count < MAXPICKUPTYPES; Count++ )
+		MaxPickupType[ Count ] -= 1000;
 
-  /* if the minimum ammount of suss gun ammo to allways exist is 0 */
-  /* and we currently have a suss gun on the level */
-  if( ( MaxPickupType[ PICKUP_SussGunAmmo ] == 0 ) &&
-	( MaxPickupType[ PICKUP_SussGun ] != 0 ) )
-	/* set the minimum of suss gun ammot that allways exists to 2 */
-	MaxPickupType[ PICKUP_SussGunAmmo ] = 2;
+	/* if were not in the blow modes */
+	if(
+		!(
+		( ChangeLevel_MyGameStatus == STATUS_PostStartingSinglePlayer ) ||
+		( ChangeLevel_MyGameStatus == STATUS_SinglePlayer )			  ||
+		( ChangeLevel_MyGameStatus == STATUS_TitleLoadGamePostStartingSinglePlayer)
+		)
+		)
+	{
+		for( Count = 1; Count < MAXPRIMARYWEAPONS; Count++ )
+		{
+			i = PICKUP_Trojax + ( Count - 1 );
+			if( ! FilterPickup( i ) )
+				continue;
 
-  /* if we are in ctf mode */
-  if ( CTF )
-	/* for each team */
-	for ( Count = 0; Count < MAX_TEAMS; Count++ )
-	  /* set the minimum ammount of flags for this team that allways has to exist to 1 */
-	  MaxPickupType[ TeamFlagPickup[ Count ] ] = 1;
+			if( MaxPickupType[ i ] < NumPrimaryPickups && ( MaxPickupType[ i ] != 0 ) )
+			{
+				MaxPickupType[ i ] = NumPrimaryPickups;
 
-  /* finally done */
-  return( true );
+				if( IsHost )
+					NumPrimWeapons[ Count ] += ( NumPrimaryPickups - NumPickupType [ i ] );
+			}
+		}
+	}
+
+	/* if the minimum ammount of general ammo to allways exist is lower then 3 */
+	if( MaxPickupType[ PICKUP_GeneralAmmo ] < 3 )
+		/* set the minimum of general ammo to to 3 */
+		MaxPickupType[ PICKUP_GeneralAmmo ] = 3;
+
+	/* if the minimum ammount of pryolite ammo to allways exist is 0 */
+	/* and we currently have a pyro on the level */
+	if( ( MaxPickupType[ PICKUP_PyroliteAmmo ] == 0 ) &&
+		( MaxPickupType[ PICKUP_Pyrolite ] != 0 ) )
+		/* set the minimum of pyro ammo that always exists to 2 */
+		MaxPickupType[ PICKUP_PyroliteAmmo ] = 2;
+
+	/* if the minimum ammount of suss gun ammo to allways exist is 0 */
+	/* and we currently have a suss gun on the level */
+	if( ( MaxPickupType[ PICKUP_SussGunAmmo ] == 0 ) &&
+		( MaxPickupType[ PICKUP_SussGun ] != 0 ) )
+		/* set the minimum of suss gun ammot that allways exists to 2 */
+		MaxPickupType[ PICKUP_SussGunAmmo ] = 2;
+
+	/* if we are in ctf mode */
+	if ( CTF )
+		/* for each team */
+		for ( Count = 0; Count < MAX_TEAMS; Count++ )
+			/* set the minimum ammount of flags for this team that allways has to exist to 1 */
+			MaxPickupType[ TeamFlagPickup[ Count ] ] = 1;
+
+	/* finally done */
+	return( true );
 
 }
 
@@ -3336,7 +3336,7 @@ void RegeneratePickups( void )
 	if(
 		(MyGameStatus == STATUS_SinglePlayer) ||
 		(RegenDelay != 0.0F)
-	)
+		)
 	{
 		// quit
 		return;
@@ -3348,7 +3348,7 @@ void RegeneratePickups( void )
 		while (
 			(FlagsToGenerate > 0) &&
 			RegeneratePickup( PICKUP_Flag )
-		)
+			)
 			FlagsToGenerate--;
 	}
 
@@ -3386,7 +3386,7 @@ void RegeneratePickups( void )
 	if(
 		NumPowerPods > 0 &&
 		RegeneratePickup( PICKUP_PowerPod )
-	)
+		)
 	{
 		NumPowerPods--;
 	}
@@ -3501,32 +3501,32 @@ void RegenerateQuedPickups( void )
 		(!Ships[ WhoIAm ].Pickups)		&&
 		(!Ships[ WhoIAm ].RegenSlots)	&&
 		(NumMissedPickups)
-	)
+		)
 	{
 		for( Count = 0; Count < NumMissedPickups; Count++ )
 		{
 			switch( MissedPickups[ Count ].Type )
 			{
-				case MPU_TYPE_INIT:
-					IP_Ptr = (SHORTPICKUP *) MissedPickups[ Count ].Struct;
+			case MPU_TYPE_INIT:
+				IP_Ptr = (SHORTPICKUP *) MissedPickups[ Count ].Struct;
 #if DEBUG_PICKUPS
-					DebugPrintf( "pickups: QUED INIT :\n" );
+				DebugPrintf( "pickups: QUED INIT :\n" );
 #endif
-					InitOnePickup( &IP_Ptr->Pos, IP_Ptr->Group,
-								   &IP_Ptr->Dir, IP_Ptr->Speed,
-								   IP_Ptr->Type, IP_Ptr->Owner,
-								   IP_Ptr->ID, IP_Ptr->RegenSlot,
-								   IP_Ptr->Sparkle, IP_Ptr->LifeCount,
-								   IP_Ptr->TriggerMod );
-					break;
+				InitOnePickup( &IP_Ptr->Pos, IP_Ptr->Group,
+							   &IP_Ptr->Dir, IP_Ptr->Speed,
+							   IP_Ptr->Type, IP_Ptr->Owner,
+							   IP_Ptr->ID, IP_Ptr->RegenSlot,
+							   IP_Ptr->Sparkle, IP_Ptr->LifeCount,
+							   IP_Ptr->TriggerMod );
+				break;
 
-				case MPU_TYPE_KILL:
-					KP_Ptr = (SHORTKILLPICKUP *) MissedPickups[ Count ].Struct;
+			case MPU_TYPE_KILL:
+				KP_Ptr = (SHORTKILLPICKUP *) MissedPickups[ Count ].Struct;
 #if DEBUG_PICKUPS
-					DebugPrintf( "pickups: QUED KILL :\n" );
+				DebugPrintf( "pickups: QUED KILL :\n" );
 #endif
-					KillPickup( KP_Ptr->Owner, KP_Ptr->ID, KP_Ptr->Style );
-					break;
+				KillPickup( KP_Ptr->Owner, KP_Ptr->ID, KP_Ptr->Style );
+				break;
 			}
 		}
 
@@ -3567,7 +3567,7 @@ bool RegeneratePickup( u_int16_t Type )
 
 		if( !( ( RegenPoints[ Slot ].Status == PU_REGENSTAT_Free ) &&
 			   ( RegenPoints[ Slot ].Wait == 0.0F ) ))
-		  continue;
+			continue;
 
 		/* if regen point can only accept one type of pickup */
 
@@ -3870,89 +3870,89 @@ void AddPickupToRegen( u_int16_t Type )
 {
 	switch( Type )
 	{
-		case PICKUP_Trojax:
-			NumPrimWeapons[ TROJAX ]++;
-			break;
+	case PICKUP_Trojax:
+		NumPrimWeapons[ TROJAX ]++;
+		break;
 
-		case PICKUP_Pyrolite:
-			NumPrimWeapons[ PYROLITE_RIFLE ]++;
-			break;
+	case PICKUP_Pyrolite:
+		NumPrimWeapons[ PYROLITE_RIFLE ]++;
+		break;
 
-		case PICKUP_Transpulse:
-			NumPrimWeapons[ TRANSPULSE_CANNON ]++;
-			break;
+	case PICKUP_Transpulse:
+		NumPrimWeapons[ TRANSPULSE_CANNON ]++;
+		break;
 
-		case PICKUP_SussGun:
-			NumPrimWeapons[ SUSS_GUN ]++;
-			break;
+	case PICKUP_SussGun:
+		NumPrimWeapons[ SUSS_GUN ]++;
+		break;
 
-		case PICKUP_Laser:
-			NumPrimWeapons[ LASER ]++;
-			break;
+	case PICKUP_Laser:
+		NumPrimWeapons[ LASER ]++;
+		break;
 
-		case PICKUP_PowerPod:
-			NumPowerPods++;
-			break;
+	case PICKUP_PowerPod:
+		NumPowerPods++;
+		break;
 
-		case PICKUP_GoldenPowerPod:
-			NumSuperNashrams++;
-			break;
+	case PICKUP_GoldenPowerPod:
+		NumSuperNashrams++;
+		break;
 
-		case PICKUP_PurgePickup:
-			SecAmmoUsed[ PURGEMINE ] += 3;
-			break;
+	case PICKUP_PurgePickup:
+		SecAmmoUsed[ PURGEMINE ] += 3;
+		break;
 
-		case PICKUP_PinePickup:
-			SecAmmoUsed[ PINEMINE ] += 3;
-			break;
+	case PICKUP_PinePickup:
+		SecAmmoUsed[ PINEMINE ] += 3;
+		break;
 
-		case PICKUP_QuantumPickup:
-			SecAmmoUsed[ QUANTUMMINE ] += 1;
-			break;
+	case PICKUP_QuantumPickup:
+		SecAmmoUsed[ QUANTUMMINE ] += 1;
+		break;
 
-		case PICKUP_SpiderPod:
-			SecAmmoUsed[ SPIDERMINE ] += 3;
-			break;
+	case PICKUP_SpiderPod:
+		SecAmmoUsed[ SPIDERMINE ] += 3;
+		break;
 
-		case PICKUP_Gravgon:
-			SecAmmoUsed[ GRAVGONMISSILE ] += 1;
-			break;
+	case PICKUP_Gravgon:
+		SecAmmoUsed[ GRAVGONMISSILE ] += 1;
+		break;
 
-		case PICKUP_TitanStar:
-			SecAmmoUsed[ TITANSTARMISSILE ] += 1;
-			break;
+	case PICKUP_TitanStar:
+		SecAmmoUsed[ TITANSTARMISSILE ] += 1;
+		break;
 
-		case PICKUP_Scatter:
-			SecAmmoUsed[ SCATTERMISSILE ] += 1;
-			break;
+	case PICKUP_Scatter:
+		SecAmmoUsed[ SCATTERMISSILE ] += 1;
+		break;
 
-		case PICKUP_Thief:
-			SecAmmoUsed[ THIEFMISSILE ] += 1;
-			break;
+	case PICKUP_Thief:
+		SecAmmoUsed[ THIEFMISSILE ] += 1;
+		break;
 
-		case PICKUP_Launcher:
-			SecAmmoUsed[ MULTIPLEMISSILE ] += 50;
-			break;
+	case PICKUP_Launcher:
+		SecAmmoUsed[ MULTIPLEMISSILE ] += 50;
+		break;
 
-		case PICKUP_HeatseakerPickup:
-			SecAmmoUsed[ SOLARISMISSILE ] += 3;
-			break;
+	case PICKUP_HeatseakerPickup:
+		SecAmmoUsed[ SOLARISMISSILE ] += 3;
+		break;
 
-		case PICKUP_Mugs:
-			SecAmmoUsed[ MUGMISSILE ] += 3;
-			break;
+	case PICKUP_Mugs:
+		SecAmmoUsed[ MUGMISSILE ] += 3;
+		break;
 
-		case PICKUP_Mantle:
-			NumStealths++;
-			break;
+	case PICKUP_Mantle:
+		NumStealths++;
+		break;
 
-		case PICKUP_Inv:
-			NumInvuls++;
-			break;
+	case PICKUP_Inv:
+		NumInvuls++;
+		break;
 
-		case PICKUP_Orb:
-			NumOrbs++;
-			break;
+	case PICKUP_Orb:
+		NumOrbs++;
+		break;
 	}
 }
 
@@ -4568,67 +4568,67 @@ void KillAllPickupsOfType( u_int16_t Type, int16_t Style )
 		{
 			switch( Style )
 			{
-				case PICKUPKILL_Immediate:
-					if ( CTF )
+			case PICKUPKILL_Immediate:
+				if ( CTF )
+				{
+					int team;
+
+					team = -1;
+					switch ( Pickups[ i ].Type )
 					{
-						int team;
-
-						team = -1;
-						switch ( Pickups[ i ].Type )
-						{
-						case PICKUP_Flag1:
-							team = 0;
-							break;
-						case PICKUP_Flag2:
-							team = 1;
-							break;
-						case PICKUP_Flag3:
-							team = 2;
-							break;
-						case PICKUP_Flag4:
-							team = 3;
-							break;
-						}
-						if ( team >= 0 )
-						{
-							TeamFlagAtHome[ team ] = false;
-						}
+					case PICKUP_Flag1:
+						team = 0;
+						break;
+					case PICKUP_Flag2:
+						team = 1;
+						break;
+					case PICKUP_Flag3:
+						team = 2;
+						break;
+					case PICKUP_Flag4:
+						team = 3;
+						break;
 					}
-					CleanUpPickup( i );
-					break;
-
-				case PICKUPKILL_Disappear:
-					if( Pickups[ i ].Mode == PICKUPMODE_Disappear ) break;
-
-					Pickups[ i ].LifeCount = 0.0F;
-					Pickups[ i ].Mode = PICKUPMODE_Disappear;
-					Pickups[ i ].PickupCount = 32.0F;
-
-					fmpoly = FindFreeFmPoly();
-					if( fmpoly != INDEX_NONE )
+					if ( team >= 0 )
 					{
-						FmPolys[ fmpoly ].LifeCount = 1000.0F;
-						FmPolys[ fmpoly ].Pos = Pickups[ i ].Pos;
-						FmPolys[ fmpoly ].SeqNum = FM_PICKUP_REGEN;
-						FmPolys[ fmpoly ].Frame = 0.0F;
-						FmPolys[ fmpoly ].Frm_Info = &PickupRegen_Header;
-						FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
-						FmPolys[ fmpoly ].Trans = 192;
-						FmPolys[ fmpoly ].Dir.x = 0.0F;
-						FmPolys[ fmpoly ].Dir.y = 0.0F;
-						FmPolys[ fmpoly ].Dir.z = 0.0F;
-						FmPolys[ fmpoly ].R = 192;
-						FmPolys[ fmpoly ].G = 192;
-						FmPolys[ fmpoly ].B = 192;
-						FmPolys[ fmpoly ].Speed = 0.0F;
-						FmPolys[ fmpoly ].Rot = 0.0F;
-						FmPolys[ fmpoly ].Group = Pickups[ i ].Group;
-						FmPolys[ fmpoly ].RotSpeed = 0.0F;
-						FmPolys[ fmpoly ].xsize = PICKUP_REGEN_SIZE;
-						FmPolys[ fmpoly ].ysize = PICKUP_REGEN_SIZE;
-						AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
+						TeamFlagAtHome[ team ] = false;
 					}
-					break;
+				}
+				CleanUpPickup( i );
+				break;
+
+			case PICKUPKILL_Disappear:
+				if( Pickups[ i ].Mode == PICKUPMODE_Disappear ) break;
+
+				Pickups[ i ].LifeCount = 0.0F;
+				Pickups[ i ].Mode = PICKUPMODE_Disappear;
+				Pickups[ i ].PickupCount = 32.0F;
+
+				fmpoly = FindFreeFmPoly();
+				if( fmpoly != INDEX_NONE )
+				{
+					FmPolys[ fmpoly ].LifeCount = 1000.0F;
+					FmPolys[ fmpoly ].Pos = Pickups[ i ].Pos;
+					FmPolys[ fmpoly ].SeqNum = FM_PICKUP_REGEN;
+					FmPolys[ fmpoly ].Frame = 0.0F;
+					FmPolys[ fmpoly ].Frm_Info = &PickupRegen_Header;
+					FmPolys[ fmpoly ].Flags = FM_FLAG_MOVEOUT;
+					FmPolys[ fmpoly ].Trans = 192;
+					FmPolys[ fmpoly ].Dir.x = 0.0F;
+					FmPolys[ fmpoly ].Dir.y = 0.0F;
+					FmPolys[ fmpoly ].Dir.z = 0.0F;
+					FmPolys[ fmpoly ].R = 192;
+					FmPolys[ fmpoly ].G = 192;
+					FmPolys[ fmpoly ].B = 192;
+					FmPolys[ fmpoly ].Speed = 0.0F;
+					FmPolys[ fmpoly ].Rot = 0.0F;
+					FmPolys[ fmpoly ].Group = Pickups[ i ].Group;
+					FmPolys[ fmpoly ].RotSpeed = 0.0F;
+					FmPolys[ fmpoly ].xsize = PICKUP_REGEN_SIZE;
+					FmPolys[ fmpoly ].ysize = PICKUP_REGEN_SIZE;
+					AddFmPolyToTPage( fmpoly, GetTPage( *FmPolys[ fmpoly ].Frm_Info, 0 ) );
+				}
+				break;
 			}
 		}
 

@@ -437,150 +437,150 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 					switch( TransPtr[ Count ].Type )
 					{
-						case TRANS_TRANSLATE:
-							TransPtr[ Count ].Data = malloc( sizeof( ANI_TRANSLATE ) );
-							if( TransPtr[ Count ].Data != nullptr )
-							{
-								AniTransPtr = (ANI_TRANSLATE *) TransPtr[ Count ].Data;
-								fread( &AniTransPtr->Trans.x, sizeof( float ), 1, fp );
-								fread( &AniTransPtr->Trans.y, sizeof( float ), 1, fp );
-								fread( &AniTransPtr->Trans.z, sizeof( float ), 1, fp );
-								fread( &AniTransPtr->Local, sizeof( int16_t ), 1, fp );
+					case TRANS_TRANSLATE:
+						TransPtr[ Count ].Data = malloc( sizeof( ANI_TRANSLATE ) );
+						if( TransPtr[ Count ].Data != nullptr )
+						{
+							AniTransPtr = (ANI_TRANSLATE *) TransPtr[ Count ].Data;
+							fread( &AniTransPtr->Trans.x, sizeof( float ), 1, fp );
+							fread( &AniTransPtr->Trans.y, sizeof( float ), 1, fp );
+							fread( &AniTransPtr->Trans.z, sizeof( float ), 1, fp );
+							fread( &AniTransPtr->Local, sizeof( int16_t ), 1, fp );
 #ifdef DEBUG_COMP
-								DebugPrintf("	TRANSLATION	:%f:%f: %f, %f, %f\n", TransStart, ( TransStart + TransDuration ),
-												AniTransPtr->Trans.x, AniTransPtr->Trans.y, AniTransPtr->Trans.z );
+							DebugPrintf("	TRANSLATION	:%f:%f: %f, %f, %f\n", TransStart, ( TransStart + TransDuration ),
+											AniTransPtr->Trans.x, AniTransPtr->Trans.y, AniTransPtr->Trans.z );
 #endif
 
-							}
-							else
-							{
-								Msg( "LoadCompObjChildren() Unable to alloc TranslationData\n" );
-								return( nullptr );
-							}
-							break;
+						}
+						else
+						{
+							Msg( "LoadCompObjChildren() Unable to alloc TranslationData\n" );
+							return( nullptr );
+						}
+						break;
 
-						case TRANS_ROTATE:
-							TransPtr[ Count ].Data = malloc( sizeof( ANI_ROTATE ) );
-							if( TransPtr[ Count ].Data != nullptr )
-							{
-								AniRotPtr = (ANI_ROTATE *) TransPtr[ Count ].Data;
-								fread( &AniRotPtr->Axis.x, sizeof( float ), 1, fp );
-								fread( &AniRotPtr->Axis.y, sizeof( float ), 1, fp );
-								fread( &AniRotPtr->Axis.z, sizeof( float ), 1, fp );
-								fread( &AniRotPtr->Origin.x, sizeof( float ), 1, fp );
-								fread( &AniRotPtr->Origin.y, sizeof( float ), 1, fp );
-								fread( &AniRotPtr->Origin.z, sizeof( float ), 1, fp );
-								fread( &AniRotPtr->Angle, sizeof( float ), 1, fp );
-								fread( &AniRotPtr->Local, sizeof( int16_t ), 1, fp );
-								AniRotPtr->Angle = D2R( AniRotPtr->Angle );
+					case TRANS_ROTATE:
+						TransPtr[ Count ].Data = malloc( sizeof( ANI_ROTATE ) );
+						if( TransPtr[ Count ].Data != nullptr )
+						{
+							AniRotPtr = (ANI_ROTATE *) TransPtr[ Count ].Data;
+							fread( &AniRotPtr->Axis.x, sizeof( float ), 1, fp );
+							fread( &AniRotPtr->Axis.y, sizeof( float ), 1, fp );
+							fread( &AniRotPtr->Axis.z, sizeof( float ), 1, fp );
+							fread( &AniRotPtr->Origin.x, sizeof( float ), 1, fp );
+							fread( &AniRotPtr->Origin.y, sizeof( float ), 1, fp );
+							fread( &AniRotPtr->Origin.z, sizeof( float ), 1, fp );
+							fread( &AniRotPtr->Angle, sizeof( float ), 1, fp );
+							fread( &AniRotPtr->Local, sizeof( int16_t ), 1, fp );
+							AniRotPtr->Angle = D2R( AniRotPtr->Angle );
 
-								AniRotPtr->Origin.x = -AniRotPtr->Origin.x;
-								AniRotPtr->Origin.y = -AniRotPtr->Origin.y;
-								AniRotPtr->Origin.z = -AniRotPtr->Origin.z;
+							AniRotPtr->Origin.x = -AniRotPtr->Origin.x;
+							AniRotPtr->Origin.y = -AniRotPtr->Origin.y;
+							AniRotPtr->Origin.z = -AniRotPtr->Origin.z;
 #ifdef DEBUG_COMP
-								DebugPrintf("	ROTATION	:%f:%f: Axis %f, %f, %f, Origin %f, %f, %f, Angle %f, Local %d\n",
-												TransStart, ( TransStart + TransDuration ),
-												AniRotPtr->Axis.x, AniRotPtr->Axis.y, AniRotPtr->Axis.z,
-												AniRotPtr->Origin.x, AniRotPtr->Origin.y, AniRotPtr->Origin.z,
-												AniRotPtr->Angle, AniRotPtr->Local );
+							DebugPrintf("	ROTATION	:%f:%f: Axis %f, %f, %f, Origin %f, %f, %f, Angle %f, Local %d\n",
+											TransStart, ( TransStart + TransDuration ),
+											AniRotPtr->Axis.x, AniRotPtr->Axis.y, AniRotPtr->Axis.z,
+											AniRotPtr->Origin.x, AniRotPtr->Origin.y, AniRotPtr->Origin.z,
+											AniRotPtr->Angle, AniRotPtr->Local );
 #endif
-							}
-							else
-							{
-								Msg( "LoadCompObjChildren() Unable to alloc RotationData\n" );
-								return( nullptr );
-							}
-							break;
+						}
+						else
+						{
+							Msg( "LoadCompObjChildren() Unable to alloc RotationData\n" );
+							return( nullptr );
+						}
+						break;
 
-						case TRANS_MORPH:
-							NumMorphs++;
-							TransPtr[ Count ].Data = malloc( sizeof( ANI_MORPH ) );
-							if( TransPtr[ Count ].Data != nullptr )
-							{
-								AniMorphPtr = (ANI_MORPH *) TransPtr[ Count ].Data;
-								AniMorphPtr->Frame = NumMorphs;
+					case TRANS_MORPH:
+						NumMorphs++;
+						TransPtr[ Count ].Data = malloc( sizeof( ANI_MORPH ) );
+						if( TransPtr[ Count ].Data != nullptr )
+						{
+							AniMorphPtr = (ANI_MORPH *) TransPtr[ Count ].Data;
+							AniMorphPtr->Frame = NumMorphs;
 #ifdef DEBUG_COMP
-								DebugPrintf("	MORPH		:%f:%f: %d\n", TransStart,
-											( TransStart + TransDuration ), AniMorphPtr->Frame );
+							DebugPrintf("	MORPH		:%f:%f: %d\n", TransStart,
+										( TransStart + TransDuration ), AniMorphPtr->Frame );
 #endif
-							}
-							else
-							{
-								Msg( "LoadCompObjChildren() Unable to alloc MorphData\n" );
-								return( nullptr );
-							}
-							break;
+						}
+						else
+						{
+							Msg( "LoadCompObjChildren() Unable to alloc MorphData\n" );
+							return( nullptr );
+						}
+						break;
 
-						case TRANS_PROPERTY:
-							TransPtr[ Count ].Data = malloc( sizeof( ANI_PROPERTY ) );
-							if( TransPtr[ Count ].Data != nullptr )
-							{
-								AniPropPtr = (ANI_PROPERTY *) TransPtr[ Count ].Data;
-								fread( &AniPropPtr->Type, sizeof( int16_t ), 1, fp );
+					case TRANS_PROPERTY:
+						TransPtr[ Count ].Data = malloc( sizeof( ANI_PROPERTY ) );
+						if( TransPtr[ Count ].Data != nullptr )
+						{
+							AniPropPtr = (ANI_PROPERTY *) TransPtr[ Count ].Data;
+							fread( &AniPropPtr->Type, sizeof( int16_t ), 1, fp );
 
-								switch( AniPropPtr->Type )
+							switch( AniPropPtr->Type )
+							{
+							case PROPTYPE_State:
+								fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
+								break;
+							case PROPTYPE_SFX:
+								file_read_cstring( fp, SFXFilename, sizeof( SFXFilename ) );
+
+								AniPropPtr->Value = ReturnSFXIndex( SFXFilename );
+								break;
+
+							case PROPTYPE_Unknown:
+								fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
+								break;
+
+							default:
+								Msg( "Unknown AnimProperty Type %hd\n", AniPropPtr->Type );
+								fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
+								break;
+							}
+
+							switch( AniPropPtr->Type )
+							{
+							case PROPTYPE_State:
+								switch( AniPropPtr->Value )
 								{
-									case PROPTYPE_State:
-										fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
-										break;
-									case PROPTYPE_SFX:
-										file_read_cstring( fp, SFXFilename, sizeof( SFXFilename ) );
+								case PROPSTATE_Open:
+									*MidTime = TransStart;
+									break;
 
-										AniPropPtr->Value = ReturnSFXIndex( SFXFilename );
-										break;
+								case PROPSTATE_Opening:
+								case PROPSTATE_Closing:
+								case PROPSTATE_Closed:
+								case PROPSTATE_UserControl:
+								case PROPSTATE_Invulnerable:
+									break;
 
-									case PROPTYPE_Unknown:
-										fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
-										break;
-
-									default:
-										Msg( "Unknown AnimProperty Type %hd\n", AniPropPtr->Type );
-										fread( &AniPropPtr->Value, sizeof( int16_t ), 1, fp );
-										break;
+								case PROPSTATE_DisableSpotFX:
+									break;
 								}
-
-								switch( AniPropPtr->Type )
-								{
-									case PROPTYPE_State:
-										switch( AniPropPtr->Value )
-										{
-											case PROPSTATE_Open:
-												*MidTime = TransStart;
-												break;
-
-											case PROPSTATE_Opening:
-											case PROPSTATE_Closing:
-											case PROPSTATE_Closed:
-											case PROPSTATE_UserControl:
-											case PROPSTATE_Invulnerable:
-												break;
-
-											case PROPSTATE_DisableSpotFX:
-												break;
-										}
 #ifdef DEBUG_COMP
-										DebugPrintf("	PROPERTY	:%f:%f: %d,%d\n", TransStart, ( TransStart + TransDuration ),
-													AniPropPtr->Type, AniPropPtr->Value );
+								DebugPrintf("	PROPERTY	:%f:%f: %d,%d\n", TransStart, ( TransStart + TransDuration ),
+											AniPropPtr->Type, AniPropPtr->Value );
 #endif
-										break;
+								break;
 
-									case PROPTYPE_SFX:
-										break;
+							case PROPTYPE_SFX:
+								break;
 
-									case PROPTYPE_Unknown:
-									default:
+							case PROPTYPE_Unknown:
+							default:
 #ifdef DEBUG_COMP
-										DebugPrintf("	PROPERTY	:%f:%f:	Unknown Property !!!!\n", TransStart, ( TransStart + TransDuration ) );
+								DebugPrintf("	PROPERTY	:%f:%f:	Unknown Property !!!!\n", TransStart, ( TransStart + TransDuration ) );
 #endif
-										break;
-								}
+								break;
 							}
-							else
-							{
-								Msg( "LoadCompObjChildren() Unable to alloc PropertyData\n" );
-								return( nullptr );
-							}
-							break;
+						}
+						else
+						{
+							Msg( "LoadCompObjChildren() Unable to alloc PropertyData\n" );
+							return( nullptr );
+						}
+						break;
 					}
 				}
 
@@ -628,107 +628,107 @@ FILE * LoadCompObjChildren( FILE * fp, COMP_OBJ * Comp, int16_t NumComp,
 
 					switch( ColZoneType )
 					{
-						case ZONE_Sphere:
-							ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_SPHERE ) );
+					case ZONE_Sphere:
+						ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_SPHERE ) );
 
-							if( ZonesPtr[ Zone ].Data )
+						if( ZonesPtr[ Zone ].Data )
+						{
+							AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr[ Zone ].Data;
+							AniZoneSpherePtr->Center = BoxCenter;
+							AniZoneSpherePtr->HalfSize = BoxHalfSize;
+						}
+						else
+						{
+							Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
+							return( nullptr );
+						}
+						break;
+
+					case ZONE_Box:
+						ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_BOX ) );
+
+						if( ZonesPtr[ Zone ].Data )
+						{
+							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr[ Zone ].Data;
+							AniZoneBoxPtr->Center = BoxCenter;
+							AniZoneBoxPtr->HalfSize = BoxHalfSize;
+
+							fread( &NumSides, sizeof( int16_t ), 1, fp );
+
+							AniZoneBoxPtr->NumSides = NumSides;
+							AniZoneBoxPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
+
+							if( AniZoneBoxPtr->Sides )
 							{
-								AniZoneSpherePtr = (ANI_ZONE_SPHERE *) ZonesPtr[ Zone ].Data;
-								AniZoneSpherePtr->Center = BoxCenter;
-								AniZoneSpherePtr->HalfSize = BoxHalfSize;
-							}
-							else
-							{
-								Msg( "LoadCompObjChildren() Unable to alloc ColZoneSphere\n" );
-								return( nullptr );
-							}
-							break;
+								SidesPtr = AniZoneBoxPtr->Sides;
 
-						case ZONE_Box:
-							ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_BOX ) );
-
-							if( ZonesPtr[ Zone ].Data )
-							{
-								AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr[ Zone ].Data;
-								AniZoneBoxPtr->Center = BoxCenter;
-								AniZoneBoxPtr->HalfSize = BoxHalfSize;
-
-								fread( &NumSides, sizeof( int16_t ), 1, fp );
-
-								AniZoneBoxPtr->NumSides = NumSides;
-								AniZoneBoxPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
-
-								if( AniZoneBoxPtr->Sides )
+								for( Side = 0; Side < NumSides; Side++ )
 								{
-									SidesPtr = AniZoneBoxPtr->Sides;
-
-									for( Side = 0; Side < NumSides; Side++ )
-									{
-										fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
-										fread( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
-										fread( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
-										fread( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
-										fread( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
-										fread( &SidesPtr->Damage, sizeof( float ), 1, fp );
-										SidesPtr->Damage /= ANIM_SECOND;
-										SidesPtr++;
-									}
-								}
-								else
-								{
-									Msg( "LoadCompObjChildren() Unable to alloc ColZoneBoxSides\n" );
-									return( nullptr );
+									fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
+									fread( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
+									fread( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
+									fread( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
+									fread( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
+									fread( &SidesPtr->Damage, sizeof( float ), 1, fp );
+									SidesPtr->Damage /= ANIM_SECOND;
+									SidesPtr++;
 								}
 							}
 							else
 							{
-								Msg( "LoadCompObjChildren() Unable to alloc ColZoneBox\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc ColZoneBoxSides\n" );
 								return( nullptr );
 							}
-							break;
+						}
+						else
+						{
+							Msg( "LoadCompObjChildren() Unable to alloc ColZoneBox\n" );
+							return( nullptr );
+						}
+						break;
 
-						case ZONE_Polygonal:
-							ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_POLYGONAL ) );
+					case ZONE_Polygonal:
+						ZonesPtr[ Zone ].Data = malloc( sizeof( ANI_ZONE_POLYGONAL ) );
 
-							if( ZonesPtr[ Zone ].Data )
+						if( ZonesPtr[ Zone ].Data )
+						{
+							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr[ Zone ].Data;
+							AniZonePolyPtr->Center = BoxCenter;
+							AniZonePolyPtr->HalfSize = BoxHalfSize;
+
+							fread( &NumSides, sizeof( int16_t ), 1, fp );
+
+							AniZonePolyPtr->NumSides = NumSides;
+							AniZonePolyPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
+
+							if( AniZonePolyPtr->Sides )
 							{
-								AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr[ Zone ].Data;
-								AniZonePolyPtr->Center = BoxCenter;
-								AniZonePolyPtr->HalfSize = BoxHalfSize;
+								SidesPtr = AniZonePolyPtr->Sides;
 
-								fread( &NumSides, sizeof( int16_t ), 1, fp );
-
-								AniZonePolyPtr->NumSides = NumSides;
-								AniZonePolyPtr->Sides = (ZONESIDE*)malloc( sizeof( ZONESIDE ) * NumSides );
-
-								if( AniZonePolyPtr->Sides )
+								for( Side = 0; Side < NumSides; Side++ )
 								{
-									SidesPtr = AniZonePolyPtr->Sides;
-
-									for( Side = 0; Side < NumSides; Side++ )
-									{
-										fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
-										fread( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
-										fread( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
-										fread( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
-										fread( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
-										fread( &SidesPtr->Damage, sizeof( float ), 1, fp );
-										SidesPtr->Damage /= ANIM_SECOND;
-										SidesPtr++;
-									}
-								}
-								else
-								{
-									Msg( "LoadCompObjChildren() Unable to alloc ColZonePolySides\n" );
-									return( nullptr );
+									fread( &SidesPtr->Normal.x, sizeof( float ), 1, fp );
+									fread( &SidesPtr->Normal.y, sizeof( float ), 1, fp );
+									fread( &SidesPtr->Normal.z, sizeof( float ), 1, fp );
+									fread( &SidesPtr->PlaneOffset, sizeof( float ), 1, fp );
+									fread( &SidesPtr->Sensitive, sizeof( int16_t ), 1, fp );
+									fread( &SidesPtr->Damage, sizeof( float ), 1, fp );
+									SidesPtr->Damage /= ANIM_SECOND;
+									SidesPtr++;
 								}
 							}
 							else
 							{
-								Msg( "LoadCompObjChildren() Unable to alloc ColZonePoly\n" );
+								Msg( "LoadCompObjChildren() Unable to alloc ColZonePolySides\n" );
 								return( nullptr );
 							}
-							break;
+						}
+						else
+						{
+							Msg( "LoadCompObjChildren() Unable to alloc ColZonePoly\n" );
+							return( nullptr );
+						}
+						break;
 					}
 				}
 
@@ -816,28 +816,28 @@ void FreeCompObjChildren( COMP_OBJ * Children, int16_t NumChildren )
 				{
 					switch( ZonesPtr->Type )
 					{
-						case ZONE_Sphere:
-							break;
+					case ZONE_Sphere:
+						break;
 
-						case ZONE_Box:
-							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
+					case ZONE_Box:
+						AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
-							if( AniZoneBoxPtr->NumSides && AniZoneBoxPtr->Sides )
-							{
-								free( AniZoneBoxPtr->Sides );
-								AniZoneBoxPtr->NumSides = 0;
-							}
-							break;
+						if( AniZoneBoxPtr->NumSides && AniZoneBoxPtr->Sides )
+						{
+							free( AniZoneBoxPtr->Sides );
+							AniZoneBoxPtr->NumSides = 0;
+						}
+						break;
 
-						case ZONE_Polygonal:
-							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
+					case ZONE_Polygonal:
+						AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
-							if( AniZonePolyPtr->NumSides && AniZonePolyPtr->Sides )
-							{
-								free( AniZonePolyPtr->Sides );
-								AniZonePolyPtr->NumSides = 0;
-							}
-							break;
+						if( AniZonePolyPtr->NumSides && AniZonePolyPtr->Sides )
+						{
+							free( AniZonePolyPtr->Sides );
+							AniZonePolyPtr->NumSides = 0;
+						}
+						break;
 					}
 
 					free( ZonesPtr->Data );
@@ -1007,118 +1007,118 @@ void UpdateCompObjChildren( COMP_OBJ * Children, int16_t NumChildren, MATRIX * P
 
 							switch( Children->Trans[ Trans ].Type )
 							{
-								case TRANS_TRANSLATE:
-									TransData = (ANI_TRANSLATE *) Children->Trans[ Trans ].Data;
+							case TRANS_TRANSLATE:
+								TransData = (ANI_TRANSLATE *) Children->Trans[ Trans ].Data;
 
-									NewPos.x += ( TransData->Trans.x * Scale );
-									NewPos.y += ( TransData->Trans.y * Scale );
-									NewPos.z += ( TransData->Trans.z * Scale );
-									break;
+								NewPos.x += ( TransData->Trans.x * Scale );
+								NewPos.y += ( TransData->Trans.y * Scale );
+								NewPos.z += ( TransData->Trans.z * Scale );
+								break;
 
-								case TRANS_ROTATE:
-									RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
+							case TRANS_ROTATE:
+								RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
 
-									if( RotData->Local )
+								if( RotData->Local )
+								{
+									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
+									ApplyMatrix( &Children->LocalMatrix, &RotData->Axis, &NewAxis );
+									MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &NewAxis, &RotMatrix );
+									MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
+									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
+									NewPos.x += ( NewPos2.x - NewOrigin.x );
+									NewPos.y += ( NewPos2.y - NewOrigin.y );
+									NewPos.z += ( NewPos2.z - NewOrigin.z );
+								}
+								else
+								{
+									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
+									MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &RotData->Axis, &RotMatrix );
+									MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
+									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
+									NewPos.x += ( NewPos2.x - NewOrigin.x );
+									NewPos.y += ( NewPos2.y - NewOrigin.y );
+									NewPos.z += ( NewPos2.z - NewOrigin.z );
+								}
+								break;
+
+							case TRANS_MORPH:
+								MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
+
+								if( Scale != 1.0F )
+								{
+									Children->InterpFrame = MorphData->Frame;
+									Children->InterpTime = Scale;
+								}
+								else
+								{
+									Children->Frame = MorphData->Frame;
+								}
+								break;
+
+							case TRANS_PROPERTY:
+								PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
+
+
+								switch( PropData->Type )
+								{
+								case PROPTYPE_State:
+									switch( PropData->Value )
 									{
-										ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
-										ApplyMatrix( &Children->LocalMatrix, &RotData->Axis, &NewAxis );
-										MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &NewAxis, &RotMatrix );
-										MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
-										ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
-										NewPos.x += ( NewPos2.x - NewOrigin.x );
-										NewPos.y += ( NewPos2.y - NewOrigin.y );
-										NewPos.z += ( NewPos2.z - NewOrigin.z );
-									}
-									else
-									{
-										ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
-										MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &RotData->Axis, &RotMatrix );
-										MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
-										ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
-										NewPos.x += ( NewPos2.x - NewOrigin.x );
-										NewPos.y += ( NewPos2.y - NewOrigin.y );
-										NewPos.z += ( NewPos2.z - NewOrigin.z );
-									}
-									break;
+									case PROPSTATE_Destroy:
+										if( Children->ModelIndex != INDEX_NONE )
+										{
+											ApplyMatrix( &Models[ Children->ModelIndex ].Mat,
+														 &ModelHeaders[ Models[ Children->ModelIndex ].ModelNum ].Center, &TempPos );
+											TempPos.x += Models[ Children->ModelIndex ].Pos.x;
+											TempPos.y += Models[ Children->ModelIndex ].Pos.y;
+											TempPos.z += Models[ Children->ModelIndex ].Pos.z;
 
-								case TRANS_MORPH:
-									MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
+											CreateSpotFXShrapnel( &TempPos,
+																  &Models[ Children->ModelIndex ].Dir,
+																  Models[ Children->ModelIndex ].Group );
 
-									if( Scale != 1.0F )
-									{
-										Children->InterpFrame = MorphData->Frame;
-										Children->InterpTime = Scale;
-									}
-									else
-									{
-										Children->Frame = MorphData->Frame;
-									}
-									break;
+											KillUsedModel( Children->ModelIndex );
+											Children->Flags &= ~COMPFLAG_Enable;
+											Children->ModelIndex = INDEX_NONE;
+										}
+										break;
 
-								case TRANS_PROPERTY:
-									PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
-
-
-									switch( PropData->Type )
-									{
-										case PROPTYPE_State:
-											switch( PropData->Value )
+									case PROPSTATE_DisableSpotFX:
+										if( Scale < 1.0F )
+										{
+											if( Children->ModelIndex != INDEX_NONE )
 											{
-												case PROPSTATE_Destroy:
-													if( Children->ModelIndex != INDEX_NONE )
-													{
-														ApplyMatrix( &Models[ Children->ModelIndex ].Mat,
-																	 &ModelHeaders[ Models[ Children->ModelIndex ].ModelNum ].Center, &TempPos );
-														TempPos.x += Models[ Children->ModelIndex ].Pos.x;
-														TempPos.y += Models[ Children->ModelIndex ].Pos.y;
-														TempPos.z += Models[ Children->ModelIndex ].Pos.z;
-
-														CreateSpotFXShrapnel( &TempPos,
-																			  &Models[ Children->ModelIndex ].Dir,
-																			  Models[ Children->ModelIndex ].Group );
-
-														KillUsedModel( Children->ModelIndex );
-														Children->Flags &= ~COMPFLAG_Enable;
-														Children->ModelIndex = INDEX_NONE;
-													}
-													break;
-
-												case PROPSTATE_DisableSpotFX:
-													if( Scale < 1.0F )
-													{
-														if( Children->ModelIndex != INDEX_NONE )
-														{
-															Models[ Children->ModelIndex ].Flags |= MODFLAG_SpotFXDisabled;
-														}
-													}
-													break;
-
-												case PROPSTATE_Open:
-												case PROPSTATE_Opening:
-												case PROPSTATE_Closing:
-												case PROPSTATE_Closed:
-												case PROPSTATE_UserControl:
-												case PROPSTATE_Invulnerable:
-												default:
-													break;
+												Models[ Children->ModelIndex ].Flags |= MODFLAG_SpotFXDisabled;
 											}
-											break;
+										}
+										break;
 
-										case PROPTYPE_SFX:
-											if( PropData->Value != -1 )
-											{
-												if( ( Children->OldOldTime < Start ) && ( Children->OldTime >= Start ) )
-												{
-													PlayPannedSfx( PropData->Value, Group, Center, 0.0F );
-												}
-											}
-											break;
-
-										case PROPTYPE_Unknown:
-										default:
-											break;
+									case PROPSTATE_Open:
+									case PROPSTATE_Opening:
+									case PROPSTATE_Closing:
+									case PROPSTATE_Closed:
+									case PROPSTATE_UserControl:
+									case PROPSTATE_Invulnerable:
+									default:
+										break;
 									}
 									break;
+
+								case PROPTYPE_SFX:
+									if( PropData->Value != -1 )
+									{
+										if( ( Children->OldOldTime < Start ) && ( Children->OldTime >= Start ) )
+										{
+											PlayPannedSfx( PropData->Value, Group, Center, 0.0F );
+										}
+									}
+									break;
+
+								case PROPTYPE_Unknown:
+								default:
+									break;
+								}
+								break;
 							}
 						}
 					}
@@ -1237,22 +1237,22 @@ bool GetCompObjAxis( COMP_OBJ * Comp )
 		{
 			switch( Comp->Trans[ Trans ].Type )
 			{
-				case TRANS_TRANSLATE:
-					break;
+			case TRANS_TRANSLATE:
+				break;
 
-				case TRANS_ROTATE:
-					RotData = (ANI_ROTATE *) Comp->Trans[ Trans ].Data;
+			case TRANS_ROTATE:
+				RotData = (ANI_ROTATE *) Comp->Trans[ Trans ].Data;
 
-					Comp->UserAxisPoint = RotData->Origin;
-					Comp->UserAxis = RotData->Axis;
-					return( true );
-					break;
+				Comp->UserAxisPoint = RotData->Origin;
+				Comp->UserAxis = RotData->Axis;
+				return( true );
+				break;
 
-				case TRANS_MORPH:
-					break;
+			case TRANS_MORPH:
+				break;
 
-				case TRANS_PROPERTY:
-					break;
+			case TRANS_PROPERTY:
+				break;
 			}
 		}
 	}
@@ -1325,60 +1325,60 @@ void ShowCompObjColZones( COMP_OBJ * Children, int16_t NumChildren, u_int16_t Gr
 				{
 					switch( ZonesPtr->Type )
 					{
-						case ZONE_Sphere:
+					case ZONE_Sphere:
 
-							NumSides = 0;
-							break;
+						NumSides = 0;
+						break;
 
-						case ZONE_Box:
-							AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
+					case ZONE_Box:
+						AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
-							Sides = AniZoneBoxPtr->Sides;
-							NumSides = AniZoneBoxPtr->NumSides;
-							if( NumSides > 64 ) NumSides = 64;	/* ZoneSides[] holds 64 */
+						Sides = AniZoneBoxPtr->Sides;
+						NumSides = AniZoneBoxPtr->NumSides;
+						if( NumSides > 64 ) NumSides = 64;	/* ZoneSides[] holds 64 */
 
-							for( Side = 0; Side < NumSides; Side++ )
-							{
-								Vert.x = ( Sides->Normal.x * -Sides->PlaneOffset );
-								Vert.y = ( Sides->Normal.y * -Sides->PlaneOffset );
-								Vert.z = ( Sides->Normal.z * -Sides->PlaneOffset );
-								ApplyMatrix( &ModelMatrix, &Vert, &Vert );
-								Vert.x += Children->DisplayPos.x;
-								Vert.y += Children->DisplayPos.y;
-								Vert.z += Children->DisplayPos.z;
-								ApplyMatrix( &ModelMatrix, &Sides->Normal, &ZoneSides[ Side ].Normal );
-								ZoneSides[ Side ].PlaneOffset = -DotProduct( &Vert, &ZoneSides[ Side ].Normal );
-								ZoneSides[ Side ].Sensitive = Sides->Sensitive;
-								Sides++;
-							}
+						for( Side = 0; Side < NumSides; Side++ )
+						{
+							Vert.x = ( Sides->Normal.x * -Sides->PlaneOffset );
+							Vert.y = ( Sides->Normal.y * -Sides->PlaneOffset );
+							Vert.z = ( Sides->Normal.z * -Sides->PlaneOffset );
+							ApplyMatrix( &ModelMatrix, &Vert, &Vert );
+							Vert.x += Children->DisplayPos.x;
+							Vert.y += Children->DisplayPos.y;
+							Vert.z += Children->DisplayPos.z;
+							ApplyMatrix( &ModelMatrix, &Sides->Normal, &ZoneSides[ Side ].Normal );
+							ZoneSides[ Side ].PlaneOffset = -DotProduct( &Vert, &ZoneSides[ Side ].Normal );
+							ZoneSides[ Side ].Sensitive = Sides->Sensitive;
+							Sides++;
+						}
 
-							DisplayColZone( &ZoneSides[ 0 ], NumSides, Group, ZonesPtr->Sensitive );
-							break;
+						DisplayColZone( &ZoneSides[ 0 ], NumSides, Group, ZonesPtr->Sensitive );
+						break;
 
-						case ZONE_Polygonal:
-							AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
+					case ZONE_Polygonal:
+						AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
-							Sides = AniZonePolyPtr->Sides;
-							NumSides = AniZonePolyPtr->NumSides;
-							if( NumSides > 64 ) NumSides = 64;	/* ZoneSides[] holds 64 */
+						Sides = AniZonePolyPtr->Sides;
+						NumSides = AniZonePolyPtr->NumSides;
+						if( NumSides > 64 ) NumSides = 64;	/* ZoneSides[] holds 64 */
 
-							for( Side = 0; Side < NumSides; Side++ )
-							{
-								Vert.x = ( Sides->Normal.x * -Sides->PlaneOffset );
-								Vert.y = ( Sides->Normal.y * -Sides->PlaneOffset );
-								Vert.z = ( Sides->Normal.z * -Sides->PlaneOffset );
-								ApplyMatrix( &ModelMatrix, &Vert, &Vert );
-								Vert.x += Children->DisplayPos.x;
-								Vert.y += Children->DisplayPos.y;
-								Vert.z += Children->DisplayPos.z;
-								ApplyMatrix( &ModelMatrix, &Sides->Normal, &ZoneSides[ Side ].Normal );
-								ZoneSides[ Side ].PlaneOffset = -DotProduct( &Vert, &ZoneSides[ Side ].Normal );
-								ZoneSides[ Side ].Sensitive = Sides->Sensitive;
-								Sides++;
-							}
+						for( Side = 0; Side < NumSides; Side++ )
+						{
+							Vert.x = ( Sides->Normal.x * -Sides->PlaneOffset );
+							Vert.y = ( Sides->Normal.y * -Sides->PlaneOffset );
+							Vert.z = ( Sides->Normal.z * -Sides->PlaneOffset );
+							ApplyMatrix( &ModelMatrix, &Vert, &Vert );
+							Vert.x += Children->DisplayPos.x;
+							Vert.y += Children->DisplayPos.y;
+							Vert.z += Children->DisplayPos.z;
+							ApplyMatrix( &ModelMatrix, &Sides->Normal, &ZoneSides[ Side ].Normal );
+							ZoneSides[ Side ].PlaneOffset = -DotProduct( &Vert, &ZoneSides[ Side ].Normal );
+							ZoneSides[ Side ].Sensitive = Sides->Sensitive;
+							Sides++;
+						}
 
-							DisplayColZone( &ZoneSides[ 0 ], NumSides, Group, ZonesPtr->Sensitive );
-							break;
+						DisplayColZone( &ZoneSides[ 0 ], NumSides, Group, ZonesPtr->Sensitive );
+						break;
 					}
 
 					ZonesPtr++;
@@ -1567,56 +1567,56 @@ void GetCompObjBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren, MA
 
 						switch( Children->Trans[ Trans ].Type )
 						{
-							case TRANS_TRANSLATE:
-								TransData = (ANI_TRANSLATE *) Children->Trans[ Trans ].Data;
+						case TRANS_TRANSLATE:
+							TransData = (ANI_TRANSLATE *) Children->Trans[ Trans ].Data;
 
-								NewPos.x += ( TransData->Trans.x * Scale );
-								NewPos.y += ( TransData->Trans.y * Scale );
-								NewPos.z += ( TransData->Trans.z * Scale );
-								break;
+							NewPos.x += ( TransData->Trans.x * Scale );
+							NewPos.y += ( TransData->Trans.y * Scale );
+							NewPos.z += ( TransData->Trans.z * Scale );
+							break;
 
-							case TRANS_ROTATE:
-								RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
+						case TRANS_ROTATE:
+							RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
 
-								if( RotData->Local )
-								{
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Axis, &NewAxis );
-									MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &NewAxis, &RotMatrix );
-									MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
-									NewPos.x += ( NewPos2.x - NewOrigin.x );
-									NewPos.y += ( NewPos2.y - NewOrigin.y );
-									NewPos.z += ( NewPos2.z - NewOrigin.z );
-								}
-								else
-								{
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
-									MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &RotData->Axis, &RotMatrix );
-									MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
-									NewPos.x += ( NewPos2.x - NewOrigin.x );
-									NewPos.y += ( NewPos2.y - NewOrigin.y );
-									NewPos.z += ( NewPos2.z - NewOrigin.z );
-								}
-								break;
+							if( RotData->Local )
+							{
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Axis, &NewAxis );
+								MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &NewAxis, &RotMatrix );
+								MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
+								NewPos.x += ( NewPos2.x - NewOrigin.x );
+								NewPos.y += ( NewPos2.y - NewOrigin.y );
+								NewPos.z += ( NewPos2.z - NewOrigin.z );
+							}
+							else
+							{
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
+								MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &RotData->Axis, &RotMatrix );
+								MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
+								NewPos.x += ( NewPos2.x - NewOrigin.x );
+								NewPos.y += ( NewPos2.y - NewOrigin.y );
+								NewPos.z += ( NewPos2.z - NewOrigin.z );
+							}
+							break;
 
-							case TRANS_MORPH:
-								MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
+						case TRANS_MORPH:
+							MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
 
-								if( Scale != 1.0F )
-								{
-									Children->InterpFrame = MorphData->Frame;
-									Children->InterpTime = Scale;
-								}
-								else
-								{
-									Children->Frame = MorphData->Frame;
-								}
-								break;
+							if( Scale != 1.0F )
+							{
+								Children->InterpFrame = MorphData->Frame;
+								Children->InterpTime = Scale;
+							}
+							else
+							{
+								Children->Frame = MorphData->Frame;
+							}
+							break;
 
-							case TRANS_PROPERTY:
-								break;
+						case TRANS_PROPERTY:
+							break;
 						}
 					}
 				}
@@ -1855,39 +1855,39 @@ bool AmIInvulnerable( COMP_OBJ * Children, int16_t NumChildren, float Time )
 					{
 						switch( Children->Trans[ Trans ].Type )
 						{
-							case TRANS_TRANSLATE:
-							case TRANS_ROTATE:
-							case TRANS_MORPH:
-								break;
+						case TRANS_TRANSLATE:
+						case TRANS_ROTATE:
+						case TRANS_MORPH:
+							break;
 
-							case TRANS_PROPERTY:
-								PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
+						case TRANS_PROPERTY:
+							PropData = (ANI_PROPERTY *) Children->Trans[ Trans ].Data;
 
-								switch( PropData->Type )
+							switch( PropData->Type )
+							{
+							case PROPTYPE_State:
+								switch( PropData->Value )
 								{
-									case PROPTYPE_State:
-										switch( PropData->Value )
-										{
-											case PROPSTATE_Open:
-											case PROPSTATE_Opening:
-											case PROPSTATE_Closing:
-											case PROPSTATE_Closed:
-											case PROPSTATE_UserControl:
-												break;
+								case PROPSTATE_Open:
+								case PROPSTATE_Opening:
+								case PROPSTATE_Closing:
+								case PROPSTATE_Closed:
+								case PROPSTATE_UserControl:
+									break;
 
-											case PROPSTATE_Invulnerable:
-												return( true );
-												break;
-										}
-										break;
-
-									case PROPTYPE_SFX:
-									case PROPTYPE_Unknown:
-									default:
-										break;
+								case PROPSTATE_Invulnerable:
+									return( true );
+									break;
 								}
-
 								break;
+
+							case PROPTYPE_SFX:
+							case PROPTYPE_Unknown:
+							default:
+								break;
+							}
+
+							break;
 						}
 					}
 				}
@@ -2117,56 +2117,56 @@ void GetCompObjColBoundingBoxChildren( COMP_OBJ * Children, int16_t NumChildren,
 
 						switch( Children->Trans[ Trans ].Type )
 						{
-							case TRANS_TRANSLATE:
-								TransData = (ANI_TRANSLATE *) Children->Trans[ Trans ].Data;
+						case TRANS_TRANSLATE:
+							TransData = (ANI_TRANSLATE *) Children->Trans[ Trans ].Data;
 
-								NewPos.x += ( TransData->Trans.x * Scale );
-								NewPos.y += ( TransData->Trans.y * Scale );
-								NewPos.z += ( TransData->Trans.z * Scale );
-								break;
+							NewPos.x += ( TransData->Trans.x * Scale );
+							NewPos.y += ( TransData->Trans.y * Scale );
+							NewPos.z += ( TransData->Trans.z * Scale );
+							break;
 
-							case TRANS_ROTATE:
-								RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
+						case TRANS_ROTATE:
+							RotData = (ANI_ROTATE *) Children->Trans[ Trans ].Data;
 
-								if( RotData->Local )
-								{
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Axis, &NewAxis );
-									MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &NewAxis, &RotMatrix );
-									MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
-									NewPos.x += ( NewPos2.x - NewOrigin.x );
-									NewPos.y += ( NewPos2.y - NewOrigin.y );
-									NewPos.z += ( NewPos2.z - NewOrigin.z );
-								}
-								else
-								{
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
-									MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &RotData->Axis, &RotMatrix );
-									MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
-									ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
-									NewPos.x += ( NewPos2.x - NewOrigin.x );
-									NewPos.y += ( NewPos2.y - NewOrigin.y );
-									NewPos.z += ( NewPos2.z - NewOrigin.z );
-								}
-								break;
+							if( RotData->Local )
+							{
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Axis, &NewAxis );
+								MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &NewAxis, &RotMatrix );
+								MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
+								NewPos.x += ( NewPos2.x - NewOrigin.x );
+								NewPos.y += ( NewPos2.y - NewOrigin.y );
+								NewPos.z += ( NewPos2.z - NewOrigin.z );
+							}
+							else
+							{
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewOrigin );
+								MatrixFromAxisAndAngle( ( RotData->Angle * Scale ), &RotData->Axis, &RotMatrix );
+								MatrixMultiply( &RotMatrix, &Children->LocalMatrix, &Children->LocalMatrix );
+								ApplyMatrix( &Children->LocalMatrix, &RotData->Origin, &NewPos2 );
+								NewPos.x += ( NewPos2.x - NewOrigin.x );
+								NewPos.y += ( NewPos2.y - NewOrigin.y );
+								NewPos.z += ( NewPos2.z - NewOrigin.z );
+							}
+							break;
 
-							case TRANS_MORPH:
-								MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
+						case TRANS_MORPH:
+							MorphData = (ANI_MORPH *) Children->Trans[ Trans ].Data;
 
-								if( Scale != 1.0F )
-								{
-									Children->InterpFrame = MorphData->Frame;
-									Children->InterpTime = Scale;
-								}
-								else
-								{
-									Children->Frame = MorphData->Frame;
-								}
-								break;
+							if( Scale != 1.0F )
+							{
+								Children->InterpFrame = MorphData->Frame;
+								Children->InterpTime = Scale;
+							}
+							else
+							{
+								Children->Frame = MorphData->Frame;
+							}
+							break;
 
-							case TRANS_PROPERTY:
-								break;
+						case TRANS_PROPERTY:
+							break;
 						}
 					}
 				}
@@ -2224,22 +2224,22 @@ void GetCompObjColZoneBoundingBox( COMP_OBJ * Children, MATRIX * DisplayMatrix, 
 		{
 			switch( ZonesPtr->Type )
 			{
-				case ZONE_Sphere:
-					break;
+			case ZONE_Sphere:
+				break;
 
-				case ZONE_Box:
-					AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
+			case ZONE_Box:
+				AniZoneBoxPtr = (ANI_ZONE_BOX *) ZonesPtr->Data;
 
-					GetZoneBoundingBox( &AniZoneBoxPtr->Center, &AniZoneBoxPtr->HalfSize,
-										DisplayMatrix, DisplayPos, TopLeft, BottomRight );
-					break;
+				GetZoneBoundingBox( &AniZoneBoxPtr->Center, &AniZoneBoxPtr->HalfSize,
+									DisplayMatrix, DisplayPos, TopLeft, BottomRight );
+				break;
 
-				case ZONE_Polygonal:
-					AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
+			case ZONE_Polygonal:
+				AniZonePolyPtr = (ANI_ZONE_POLYGONAL *) ZonesPtr->Data;
 
-					GetZoneBoundingBox( &AniZonePolyPtr->Center, &AniZonePolyPtr->HalfSize,
-										DisplayMatrix, DisplayPos, TopLeft, BottomRight );
-					break;
+				GetZoneBoundingBox( &AniZonePolyPtr->Center, &AniZonePolyPtr->HalfSize,
+									DisplayMatrix, DisplayPos, TopLeft, BottomRight );
+				break;
 			}
 
 			ZonesPtr++;

@@ -112,12 +112,12 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 	gpu_vertex_t *tg_persist_buf[MAX_TEXTURE_GROUPS] = {0};
 	int   tg_persist_cnt[MAX_TEXTURE_GROUPS] = {0};
 
-/* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
- * exactly as before. Eye 2 in lookup mode: one draw per texgroup range
- * in the batch, in walk order, with the same per-batch state. Splitting
- * only the submit (never state, order or uniforms) keeps pixels
- * identical while tolerating per-eye culling differences: a texgroup
- * the left eye never converted is simply converted live instead. */
+	/* Macro: flush the current batch. Eye 1 (and memo off): one draw call,
+	 * exactly as before. Eye 2 in lookup mode: one draw per texgroup range
+	 * in the batch, in walk order, with the same per-batch state. Splitting
+	 * only the submit (never state, order or uniforms) keeps pixels
+	 * identical while tolerating per-eye culling differences: a texgroup
+	 * the left eye never converted is simply converted live instead. */
 #define FLUSH_BATCH() do { \
 	if (batch_vertCount > 0) { \
 		int _has_persist = 0; \
@@ -277,34 +277,60 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 		} else
 		/* Convert LVERTEX/TLVERTEX → gpu_vertex_t, expanding indices */
 		{
-		if (renderObject->indexBuffer)
-		{
-			WORD *indices = (WORD*)renderObject->indexBuffer + tg->startIndex;
-
-
-			if (orthographic)
+			if (renderObject->indexBuffer)
 			{
-				TLVERTEX *verts = (TLVERTEX*)renderObject->vertexBuffer;
-				for (i = 0; i < numIndices; i++)
+				WORD *indices = (WORD*)renderObject->indexBuffer + tg->startIndex;
+
+
+				if (orthographic)
 				{
-					TLVERTEX *v = &verts[startVert + indices[i]];
-					dst[i].pos[0] = v->x;
-					dst[i].pos[1] = v->y;
-					dst[i].pos[2] = v->z;
-					dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-					dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-					dst[i].color[2] = s_c255[(v->color) & 0xFF];
-					dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
-					dst[i].texcoord[0] = v->tu;
-					dst[i].texcoord[1] = v->tv;
+					TLVERTEX *verts = (TLVERTEX*)renderObject->vertexBuffer;
+					for (i = 0; i < numIndices; i++)
+					{
+						TLVERTEX *v = &verts[startVert + indices[i]];
+						dst[i].pos[0] = v->x;
+						dst[i].pos[1] = v->y;
+						dst[i].pos[2] = v->z;
+						dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
+						dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
+						dst[i].color[2] = s_c255[(v->color) & 0xFF];
+						dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
+						dst[i].texcoord[0] = v->tu;
+						dst[i].texcoord[1] = v->tv;
+					}
 				}
+				else
+				{
+					LVERTEX *verts = (LVERTEX*)renderObject->vertexBuffer;
+					for (i = 0; i < numIndices; i++)
+					{
+						int vi = startVert + indices[i];
+						LVERTEX *v = &verts[vi];
+						dst[i].pos[0] = v->x;
+						dst[i].pos[1] = v->y;
+						dst[i].pos[2] = v->z;
+						dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
+						dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
+						dst[i].color[2] = s_c255[(v->color) & 0xFF];
+						dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
+						dst[i].texcoord[0] = v->tu;
+						dst[i].texcoord[1] = v->tv;
+					}
+					totalVerts = numIndices;
+				}
+				totalVerts = numIndices;
 			}
 			else
 			{
 				LVERTEX *verts = (LVERTEX*)renderObject->vertexBuffer;
-				for (i = 0; i < numIndices; i++)
+				int numVerts = tg->numVerts;
+				if (s_scratchUsed + numVerts > s_scratchMax) {
+					tg_memo_cnt[group] = 0;
+					continue;
+				}
+				for (i = 0; i < numVerts; i++)
 				{
-					int vi = startVert + indices[i];
+					int vi = startVert + i;
 					LVERTEX *v = &verts[vi];
 					dst[i].pos[0] = v->x;
 					dst[i].pos[1] = v->y;
@@ -316,66 +342,40 @@ bool draw_render_object(RENDEROBJECT *renderObject, int primitive_type, bool ort
 					dst[i].texcoord[0] = v->tu;
 					dst[i].texcoord[1] = v->tv;
 				}
-				totalVerts = numIndices;
+				totalVerts = numVerts;
 			}
-			totalVerts = numIndices;
-		}
-		else
-		{
-			LVERTEX *verts = (LVERTEX*)renderObject->vertexBuffer;
-			int numVerts = tg->numVerts;
-			if (s_scratchUsed + numVerts > s_scratchMax) {
-				tg_memo_cnt[group] = 0;
-				continue;
-			}
-			for (i = 0; i < numVerts; i++)
-			{
-				int vi = startVert + i;
-				LVERTEX *v = &verts[vi];
-				dst[i].pos[0] = v->x;
-				dst[i].pos[1] = v->y;
-				dst[i].pos[2] = v->z;
-				dst[i].color[0] = s_c255[(v->color >> 16) & 0xFF];
-				dst[i].color[1] = s_c255[(v->color >> 8) & 0xFF];
-				dst[i].color[2] = s_c255[(v->color) & 0xFF];
-				dst[i].color[3] = s_c255[(v->color >> 24) & 0xFF];
-				dst[i].texcoord[0] = v->tu;
-				dst[i].texcoord[1] = v->tv;
-			}
-			totalVerts = numVerts;
-		}
 
 
-		/* Record the converted range (eye 1). Runs ONLY on the live
-		 * path: on a memo hit the tg arrays already hold the looked-up
-		 * range and must not be overwritten with the cursor. The tg
-		 * fill itself is unconditional on the live path so the
-		 * per-group flush (persist/mono mixes) can always read it. */
-		if (!orthographic) {
-			tg_memo_off[group] = dst - s_scratch;
-			tg_memo_cnt[group] = totalVerts;
-			if (s_memoMode == SMEMO_RECORD && memo_reusable(renderObject)) {
-				smemo_record(renderObject,
+			/* Record the converted range (eye 1). Runs ONLY on the live
+			 * path: on a memo hit the tg arrays already hold the looked-up
+			 * range and must not be overwritten with the cursor. The tg
+			 * fill itself is unconditional on the live path so the
+			 * per-group flush (persist/mono mixes) can always read it. */
+			if (!orthographic) {
+				tg_memo_off[group] = dst - s_scratch;
+				tg_memo_cnt[group] = totalVerts;
+				if (s_memoMode == SMEMO_RECORD && memo_reusable(renderObject)) {
+					smemo_record(renderObject,
+						smemo_sub(sorted_order[group], 0, primitive_type),
+						dst - s_scratch, totalVerts,
+						renderObject->memoEpochPass,
+						renderObject->memoEpochGroup,
+						renderObject->memoEpochResume);
+				}
+			}
+			/* R05: retain this conversion for level walls. On success the
+			 * flush submits the retained buffer instead of scratch. */
+			if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
+				renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
+				gpu_vertex_t *pbuf = persist_store(renderObject,
 					smemo_sub(sorted_order[group], 0, primitive_type),
-					dst - s_scratch, totalVerts,
-					renderObject->memoEpochPass,
-					renderObject->memoEpochGroup,
-					renderObject->memoEpochResume);
+					dst, totalVerts);
+				if (pbuf) {
+					tg_persist_buf[group] = pbuf;
+					tg_persist_cnt[group] = totalVerts;
+					tg_memo_cnt[group] = 0;
+				}
 			}
-		}
-		/* R05: retain this conversion for level walls. On success the
-		 * flush submits the retained buffer instead of scratch. */
-		if (s_persistActive && !orthographic && renderObject->vertOwner == VERT_OWNER_LEVEL &&
-			renderObject->memoEpochPass == SMEMO_PASS_UNSET) {
-			gpu_vertex_t *pbuf = persist_store(renderObject,
-				smemo_sub(sorted_order[group], 0, primitive_type),
-				dst, totalVerts);
-			if (pbuf) {
-				tg_persist_buf[group] = pbuf;
-				tg_persist_cnt[group] = totalVerts;
-				tg_memo_cnt[group] = 0;
-			}
-		}
 		}
 
 		/* Determine effective texture state for this group */

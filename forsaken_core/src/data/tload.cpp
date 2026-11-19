@@ -189,7 +189,7 @@ bool TloadAllTextures(TLOADHEADER * Tloadheader)
 
 	return true;
 
-exit_with_error:
+	exit_with_error:
 	for ( ; i < Tloadheader->num_texture_files; i++) {
 		TloadReleaseTexture( Tloadheader , i);
 	}

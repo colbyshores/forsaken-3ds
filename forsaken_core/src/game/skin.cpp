@@ -26,30 +26,30 @@ constexpr auto NODECUBE_Array = true;
 /*===================================================================
 	Globals variables and structures
 ===================================================================*/
-	static	LVERTEX		PortalVerts[ 310 * 3 ];
-	static	TRIANGLE		PortalTris[ 310 ];
-	static	int16_t			PortalVertCount;
-	static	int16_t			PortalTriCount;
-	RENDEROBJECT			Portal_Execs[ MAXPORTALEXECS ];
-	int16_t					Num_Portal_Execs = 0;
-	int16_t					ShowPortal = 0;
+static	LVERTEX		PortalVerts[ 310 * 3 ];
+static	TRIANGLE		PortalTris[ 310 ];
+static	int16_t			PortalVertCount;
+static	int16_t			PortalTriCount;
+RENDEROBJECT			Portal_Execs[ MAXPORTALEXECS ];
+int16_t					Num_Portal_Execs = 0;
+int16_t					ShowPortal = 0;
 
-	static	LVERTEX		SkinVerts[ 310 * 3 ];
-	static	TRIANGLE		SkinTris[ 310 ];
-	static	int16_t			SkinVertCount;
-	static	int16_t			SkinTriCount;
-	RENDEROBJECT			Skin_Execs[ MAXSKINEXECS ];
-	int16_t					Num_Skin_Execs = 0;
-	bool					ShowTrigZones = false;
-	bool					ShowEFZones = false;
-	bool					ShowTeleports = false;
+static	LVERTEX		SkinVerts[ 310 * 3 ];
+static	TRIANGLE		SkinTris[ 310 ];
+static	int16_t			SkinVertCount;
+static	int16_t			SkinTriCount;
+RENDEROBJECT			Skin_Execs[ MAXSKINEXECS ];
+int16_t					Num_Skin_Execs = 0;
+bool					ShowTrigZones = false;
+bool					ShowEFZones = false;
+bool					ShowTeleports = false;
 
-	static int16_t			NumNodeCubeLines = 0;
-	u_int16_t					NodeCubeLines[ MAXLINES ];
+static int16_t			NumNodeCubeLines = 0;
+u_int16_t					NodeCubeLines[ MAXLINES ];
 
-	VECTOR					TempVerts[ 64 ];
-	u_int16_t					SphereZones[ MAXNUMOFMODELS ];
-	int16_t					NumSphereZones = 0;
+VECTOR					TempVerts[ 64 ];
+u_int16_t					SphereZones[ MAXNUMOFMODELS ];
+int16_t					NumSphereZones = 0;
 
 
 /*===================================================================
@@ -108,140 +108,140 @@ void DisplayBSPNode( BSP_NODE * Node )
 
 	switch( NodeCubeType )
 	{
-		case NODECUBE_Branch:
-			TempNode = Node;
+	case NODECUBE_Branch:
+		TempNode = Node;
 
-			while( TempNode )
+		while( TempNode )
+		{
+			TempNode = TempNode->Parent;
+			NumNodes += 1.0F;
+		}
+
+		while( Node )
+		{
+			D = ( DotProduct( &CurrentCamera.Pos, &Node->Normal ) + Node->Offset );
+			if( D < 0 )
 			{
-				TempNode = TempNode->Parent;
-				NumNodes += 1.0F;
+				tempcolor = Node->Colour;
+				color = ( ( ( ( tempcolor & 0xFF000000 ) >> 1 ) & 0xFF000000 ) |
+						  ( ( ( tempcolor & 0x00FF0000 ) >> 1 ) & 0x00FF0000 ) |
+						  ( ( ( tempcolor & 0x0000FF00 ) >> 1 ) & 0x0000FF00 ) |
+							( ( tempcolor & 0x000000FF ) >> 1 ) );
+			}
+			else
+			{
+				color = Node->Colour;
 			}
 
-			while( Node )
+			TLPos.x = ( Ships[ WhoIAm ].Object.Pos.x - BOXSIZE );
+			TLPos.y = ( Ships[ WhoIAm ].Object.Pos.y - BOXSIZE );
+			TLPos.z = ( Ships[ WhoIAm ].Object.Pos.z - BOXSIZE );
+
+			BRPos.x = ( Ships[ WhoIAm ].Object.Pos.x + BOXSIZE );
+			BRPos.y = ( Ships[ WhoIAm ].Object.Pos.y + BOXSIZE );
+			BRPos.z = ( Ships[ WhoIAm ].Object.Pos.z + BOXSIZE );
+
+			Vnum = PlaneToCubeIntersectionShape( &TLPos, &BRPos, &Node->Normal, Node->Offset, &TempVerts[0] );
+
+			for( Count = 0; Count < Vnum; Count++ )
 			{
-				D = ( DotProduct( &CurrentCamera.Pos, &Node->Normal ) + Node->Offset );
-				if( D < 0 )
-				{
-					tempcolor = Node->Colour;
-					color = ( ( ( ( tempcolor & 0xFF000000 ) >> 1 ) & 0xFF000000 ) |
-							  ( ( ( tempcolor & 0x00FF0000 ) >> 1 ) & 0x00FF0000 ) |
-							  ( ( ( tempcolor & 0x0000FF00 ) >> 1 ) & 0x0000FF00 ) |
-								( ( tempcolor & 0x000000FF ) >> 1 ) );
-				}
-				else
-				{
-					color = Node->Colour;
-				}
-
-				TLPos.x = ( Ships[ WhoIAm ].Object.Pos.x - BOXSIZE );
-				TLPos.y = ( Ships[ WhoIAm ].Object.Pos.y - BOXSIZE );
-				TLPos.z = ( Ships[ WhoIAm ].Object.Pos.z - BOXSIZE );
-
-				BRPos.x = ( Ships[ WhoIAm ].Object.Pos.x + BOXSIZE );
-				BRPos.y = ( Ships[ WhoIAm ].Object.Pos.y + BOXSIZE );
-				BRPos.z = ( Ships[ WhoIAm ].Object.Pos.z + BOXSIZE );
-
-				Vnum = PlaneToCubeIntersectionShape( &TLPos, &BRPos, &Node->Normal, Node->Offset, &TempVerts[0] );
-
-				for( Count = 0; Count < Vnum; Count++ )
-				{
-					SkinVerts[ SkinVertCount ].x = TempVerts[ Count ].x;
-					SkinVerts[ SkinVertCount ].y = TempVerts[ Count ].y;
-					SkinVerts[ SkinVertCount ].z = TempVerts[ Count ].z;
-					SkinVerts[ SkinVertCount ].tu = 0.0F;
-					SkinVerts[ SkinVertCount ].tv = 0.0F;
-					SkinVerts[ SkinVertCount ].color = color;
-					SkinVertCount++;
-				}
-
-				for( Count = 0; Count < ( Vnum - 2 ); Count++ )
-				{
-					SkinTris[ SkinTriCount ].v1 = 0;
-					SkinTris[ SkinTriCount ].v2 = Count+1;
-					SkinTris[ SkinTriCount ].v3 = Count+2;
-					SkinTriCount++;
-
-					SkinTris[ SkinTriCount ].v3 = 0;
-					SkinTris[ SkinTriCount ].v2 = Count+1;
-					SkinTris[ SkinTriCount ].v1 = Count+2;
-					SkinTriCount++;
-				}
-
-				if( SkinTriCount )
-				{
-					MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
-					SkinVertCount = 0;
-					SkinTriCount = 0;
-				}
-
-				Node = Node->Parent;
-				NumNodes--;
+				SkinVerts[ SkinVertCount ].x = TempVerts[ Count ].x;
+				SkinVerts[ SkinVertCount ].y = TempVerts[ Count ].y;
+				SkinVerts[ SkinVertCount ].z = TempVerts[ Count ].z;
+				SkinVerts[ SkinVertCount ].tu = 0.0F;
+				SkinVerts[ SkinVertCount ].tv = 0.0F;
+				SkinVerts[ SkinVertCount ].color = color;
+				SkinVertCount++;
 			}
-			break;
 
-		case NODECUBE_Array:
-			for( NodeNum = 0; NodeNum < Depth; NodeNum++ )
+			for( Count = 0; Count < ( Vnum - 2 ); Count++ )
 			{
-				if(!BSP_Nodes[NodeNum])
-					continue;
+				SkinTris[ SkinTriCount ].v1 = 0;
+				SkinTris[ SkinTriCount ].v2 = Count+1;
+				SkinTris[ SkinTriCount ].v3 = Count+2;
+				SkinTriCount++;
 
-				D = ( DotProduct( &CurrentCamera.Pos, &BSP_Nodes[ NodeNum ]->Normal ) + BSP_Nodes[ NodeNum ]->Offset );
-
-				if( D < 0 )
-				{
-					tempcolor = BSP_Nodes[ NodeNum ]->Colour;
-					color = ( ( ( ( tempcolor & 0xFF000000 ) >> 1 ) & 0xFF000000 ) |
-							  ( ( ( tempcolor & 0x00FF0000 ) >> 1 ) & 0x00FF0000 ) |
-							  ( ( ( tempcolor & 0x0000FF00 ) >> 1 ) & 0x0000FF00 ) |
-								( ( tempcolor & 0x000000FF ) >> 1 ) );
-				}
-				else
-				{
-					color = BSP_Nodes[ NodeNum ]->Colour;
-				}
-
-				TLPos.x = ( Ships[ WhoIAm ].Object.Pos.x - BOXSIZE );
-				TLPos.y = ( Ships[ WhoIAm ].Object.Pos.y - BOXSIZE );
-				TLPos.z = ( Ships[ WhoIAm ].Object.Pos.z - BOXSIZE );
-
-				BRPos.x = ( Ships[ WhoIAm ].Object.Pos.x + BOXSIZE );
-				BRPos.y = ( Ships[ WhoIAm ].Object.Pos.y + BOXSIZE );
-				BRPos.z = ( Ships[ WhoIAm ].Object.Pos.z + BOXSIZE );
-
-				Vnum = PlaneToCubeIntersectionShape( &TLPos, &BRPos, &BSP_Nodes[ NodeNum ]->Normal, BSP_Nodes[ NodeNum ]->Offset, &TempVerts[0] );
-
-				for( Count = 0; Count < Vnum; Count++ )
-				{
-					SkinVerts[ SkinVertCount ].x = TempVerts[ Count ].x;
-					SkinVerts[ SkinVertCount ].y = TempVerts[ Count ].y;
-					SkinVerts[ SkinVertCount ].z = TempVerts[ Count ].z;
-					SkinVerts[ SkinVertCount ].tu = 0.0F;
-					SkinVerts[ SkinVertCount ].tv = 0.0F;
-					SkinVerts[ SkinVertCount ].color = color;
-					SkinVertCount++;
-				}
-
-				for( Count = 0; Count < ( Vnum - 2 ); Count++ )
-				{
-					SkinTris[ SkinTriCount ].v1 = 0;
-					SkinTris[ SkinTriCount ].v2 = Count+1;
-					SkinTris[ SkinTriCount ].v3 = Count+2;
-					SkinTriCount++;
-
-					SkinTris[ SkinTriCount ].v3 = 0;
-					SkinTris[ SkinTriCount ].v2 = Count+1;
-					SkinTris[ SkinTriCount ].v1 = Count+2;
-					SkinTriCount++;
-				}
-
-				if( SkinTriCount )
-				{
-					MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
-					SkinVertCount = 0;
-					SkinTriCount = 0;
-				}
+				SkinTris[ SkinTriCount ].v3 = 0;
+				SkinTris[ SkinTriCount ].v2 = Count+1;
+				SkinTris[ SkinTriCount ].v1 = Count+2;
+				SkinTriCount++;
 			}
-			break;
+
+			if( SkinTriCount )
+			{
+				MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
+				SkinVertCount = 0;
+				SkinTriCount = 0;
+			}
+
+			Node = Node->Parent;
+			NumNodes--;
+		}
+		break;
+
+	case NODECUBE_Array:
+		for( NodeNum = 0; NodeNum < Depth; NodeNum++ )
+		{
+			if(!BSP_Nodes[NodeNum])
+				continue;
+
+			D = ( DotProduct( &CurrentCamera.Pos, &BSP_Nodes[ NodeNum ]->Normal ) + BSP_Nodes[ NodeNum ]->Offset );
+
+			if( D < 0 )
+			{
+				tempcolor = BSP_Nodes[ NodeNum ]->Colour;
+				color = ( ( ( ( tempcolor & 0xFF000000 ) >> 1 ) & 0xFF000000 ) |
+						  ( ( ( tempcolor & 0x00FF0000 ) >> 1 ) & 0x00FF0000 ) |
+						  ( ( ( tempcolor & 0x0000FF00 ) >> 1 ) & 0x0000FF00 ) |
+							( ( tempcolor & 0x000000FF ) >> 1 ) );
+			}
+			else
+			{
+				color = BSP_Nodes[ NodeNum ]->Colour;
+			}
+
+			TLPos.x = ( Ships[ WhoIAm ].Object.Pos.x - BOXSIZE );
+			TLPos.y = ( Ships[ WhoIAm ].Object.Pos.y - BOXSIZE );
+			TLPos.z = ( Ships[ WhoIAm ].Object.Pos.z - BOXSIZE );
+
+			BRPos.x = ( Ships[ WhoIAm ].Object.Pos.x + BOXSIZE );
+			BRPos.y = ( Ships[ WhoIAm ].Object.Pos.y + BOXSIZE );
+			BRPos.z = ( Ships[ WhoIAm ].Object.Pos.z + BOXSIZE );
+
+			Vnum = PlaneToCubeIntersectionShape( &TLPos, &BRPos, &BSP_Nodes[ NodeNum ]->Normal, BSP_Nodes[ NodeNum ]->Offset, &TempVerts[0] );
+
+			for( Count = 0; Count < Vnum; Count++ )
+			{
+				SkinVerts[ SkinVertCount ].x = TempVerts[ Count ].x;
+				SkinVerts[ SkinVertCount ].y = TempVerts[ Count ].y;
+				SkinVerts[ SkinVertCount ].z = TempVerts[ Count ].z;
+				SkinVerts[ SkinVertCount ].tu = 0.0F;
+				SkinVerts[ SkinVertCount ].tv = 0.0F;
+				SkinVerts[ SkinVertCount ].color = color;
+				SkinVertCount++;
+			}
+
+			for( Count = 0; Count < ( Vnum - 2 ); Count++ )
+			{
+				SkinTris[ SkinTriCount ].v1 = 0;
+				SkinTris[ SkinTriCount ].v2 = Count+1;
+				SkinTris[ SkinTriCount ].v3 = Count+2;
+				SkinTriCount++;
+
+				SkinTris[ SkinTriCount ].v3 = 0;
+				SkinTris[ SkinTriCount ].v2 = Count+1;
+				SkinTris[ SkinTriCount ].v1 = Count+2;
+				SkinTriCount++;
+			}
+
+			if( SkinTriCount )
+			{
+				MakeNewSkinExec( &SkinVerts[ 0 ], &SkinTris[ 0 ], SkinVertCount, SkinTriCount );
+				SkinVertCount = 0;
+				SkinTriCount = 0;
+			}
+		}
+		break;
 	}
 }
 
@@ -790,17 +790,17 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 
 	switch( ShowPortal )
 	{
-		case 0:
-			return true;
-			break;
-		case 2:
-		case 4:
-			NumVisible = 1;
-			break;
-		case 1:
-		case 3:
-		default:
-			break;
+	case 0:
+		return true;
+		break;
+	case 2:
+	case 4:
+		NumVisible = 1;
+		break;
+	case 1:
+	case 3:
+	default:
+		break;
 	}
 
 	color = RGBA_MAKE( 192, 0, 0, 128 );
@@ -821,23 +821,23 @@ bool CreatePortalExecList( MLOADHEADER * Mloadheader, int16_t NumVisible )
 				{
 					switch( PolyPtr->type & 6 )
 					{
-						case 0:
-							y = PolyPtr->v[ Count2 ].u;
-							z = PolyPtr->v[ Count2 ].v;
-							x = -( PolyPtr->D + ( y * PolyPtr->ny + z * PolyPtr->nz ) ) / PolyPtr->nx;
-							break;
-						case 2:
-							x = PolyPtr->v[ Count2 ].u;
-							z = PolyPtr->v[ Count2 ].v;
-							y = -( PolyPtr->D + ( x * PolyPtr->nx + z * PolyPtr->nz ) ) / PolyPtr->ny;
-							break;
-						case 4:
-							x = PolyPtr->v[ Count2 ].u;
-							y = PolyPtr->v[ Count2 ].v;
-							z = -( PolyPtr->D + ( x * PolyPtr->nx + y * PolyPtr->ny ) ) / PolyPtr->nz;
-							break;
-						default:
-							break;
+					case 0:
+						y = PolyPtr->v[ Count2 ].u;
+						z = PolyPtr->v[ Count2 ].v;
+						x = -( PolyPtr->D + ( y * PolyPtr->ny + z * PolyPtr->nz ) ) / PolyPtr->nx;
+						break;
+					case 2:
+						x = PolyPtr->v[ Count2 ].u;
+						z = PolyPtr->v[ Count2 ].v;
+						y = -( PolyPtr->D + ( x * PolyPtr->nx + z * PolyPtr->nz ) ) / PolyPtr->ny;
+						break;
+					case 4:
+						x = PolyPtr->v[ Count2 ].u;
+						y = PolyPtr->v[ Count2 ].v;
+						z = -( PolyPtr->D + ( x * PolyPtr->nx + y * PolyPtr->ny ) ) / PolyPtr->nz;
+						break;
+					default:
+						break;
 
 					}
 					Verts[ Count2 ].x = x;
@@ -1019,102 +1019,102 @@ int GetNextSide( int side )
 
 	switch( side )
 	{
-		case 11:
-				 if( PointList[  2 ].flag )	new_side =  2;
-			else if( PointList[  6 ].flag )	new_side =  6;
-			else if( PointList[  7 ].flag )	new_side =  7;
-			else if( PointList[  8 ].flag )	new_side =  8;
-			else if( PointList[  9 ].flag )	new_side =  9;
-			else if( PointList[ 10 ].flag )	new_side = 10;
-			break;
-		case 10:
-				 if( PointList[  9 ].flag )	new_side =  9;
-			else if( PointList[  8 ].flag )	new_side =  8;
-			else if( PointList[ 11 ].flag )	new_side = 11;
-			else if( PointList[  5 ].flag )	new_side =  5;
-			else if( PointList[  6 ].flag )	new_side =  6;
-			else if( PointList[  1 ].flag )	new_side =  1;
-			break;
-		case 9:
-				 if( PointList[  0 ].flag )	new_side =  0;
-			else if( PointList[  5 ].flag )	new_side =  5;
-			else if( PointList[  4 ].flag )	new_side =  4;
-			else if( PointList[  8 ].flag )	new_side =  8;
-			else if( PointList[ 10 ].flag )	new_side = 10;
-			else if( PointList[ 11 ].flag )	new_side = 11;
-			break;
-		case 8:
-				 if( PointList[  9 ].flag )	new_side =  9;
-			else if( PointList[ 10 ].flag )	new_side = 10;
-			else if( PointList[ 11 ].flag )	new_side = 11;
-			else if( PointList[  3 ].flag )	new_side =  3;
-			else if( PointList[  4 ].flag )	new_side =  4;
-			else if( PointList[  7 ].flag )	new_side =  7;
-			break;
-		case 7:
-				 if( PointList[  3 ].flag )	new_side =  3;
-			else if( PointList[  4 ].flag )	new_side =  4;
-			else if( PointList[  8 ].flag )	new_side =  8;
-			else if( PointList[  2 ].flag )	new_side =  2;
-			else if( PointList[  6 ].flag )	new_side =  6;
-			else if( PointList[ 11 ].flag )	new_side = 11;
-			break;
-		case 6:
-				 if( PointList[  1 ].flag )	new_side =  1;
-			else if( PointList[  5 ].flag )	new_side =  5;
-			else if( PointList[ 10 ].flag )	new_side = 10;
-			else if( PointList[  2 ].flag )	new_side =  2;
-			else if( PointList[  7 ].flag )	new_side =  7;
-			else if( PointList[ 11 ].flag )	new_side = 11;
-			break;
-		case 5:
-				 if( PointList[  1 ].flag )	new_side =  1;
-			else if( PointList[  6 ].flag )	new_side =  6;
-			else if( PointList[ 10 ].flag )	new_side = 10;
-			else if( PointList[  0 ].flag )	new_side =  0;
-			else if( PointList[  4 ].flag )	new_side =  4;
-			else if( PointList[  9 ].flag )	new_side =  9;
-			break;
-		case 4:
-				 if( PointList[  0 ].flag )	new_side =  0;
-			else if( PointList[  5 ].flag )	new_side =  5;
-			else if( PointList[  9 ].flag )	new_side =  9;
-			else if( PointList[  3 ].flag )	new_side =  3;
-			else if( PointList[  7 ].flag )	new_side =  7;
-			else if( PointList[  8 ].flag )	new_side =  8;
-			break;
-		case 3:
-				 if( PointList[  4 ].flag )	new_side =  4;
-			else if( PointList[  8 ].flag )	new_side =  8;
-			else if( PointList[  7 ].flag )	new_side =  7;
-			else if( PointList[  0 ].flag )	new_side =  0;
-			else if( PointList[  1 ].flag )	new_side =  1;
-			else if( PointList[  2 ].flag )	new_side =  2;
-			break;
-		case 0:
-				 if( PointList[  1 ].flag )	new_side =  1;
-			else if( PointList[  2 ].flag )	new_side =  2;
-			else if( PointList[  3 ].flag )	new_side =  3;
-			else if( PointList[  4 ].flag )	new_side =  4;
-			else if( PointList[  5 ].flag )	new_side =  5;
-			else if( PointList[  9 ].flag )	new_side =  9;
-			break;
-		case 1:
-				 if( PointList[  0 ].flag )	new_side =  0;
-			else if( PointList[  3 ].flag )	new_side =  3;
-			else if( PointList[  2 ].flag )	new_side =  2;
-			else if( PointList[  5 ].flag )	new_side =  5;
-			else if( PointList[  6 ].flag )	new_side =  6;
-			else if( PointList[ 10 ].flag )	new_side = 10;
-			break;
-		case 2:
-				 if( PointList[  1 ].flag )	new_side =  1;
-			else if( PointList[  0 ].flag )	new_side =  0;
-			else if( PointList[  3 ].flag )	new_side =  3;
-			else if( PointList[  6 ].flag )	new_side =  6;
-			else if( PointList[  7 ].flag )	new_side =  7;
-			else if( PointList[ 11 ].flag )	new_side = 11;
-			break;
+	case 11:
+		if( PointList[  2 ].flag )	new_side =  2;
+		else if( PointList[  6 ].flag )	new_side =  6;
+		else if( PointList[  7 ].flag )	new_side =  7;
+		else if( PointList[  8 ].flag )	new_side =  8;
+		else if( PointList[  9 ].flag )	new_side =  9;
+		else if( PointList[ 10 ].flag )	new_side = 10;
+		break;
+	case 10:
+		if( PointList[  9 ].flag )	new_side =  9;
+		else if( PointList[  8 ].flag )	new_side =  8;
+		else if( PointList[ 11 ].flag )	new_side = 11;
+		else if( PointList[  5 ].flag )	new_side =  5;
+		else if( PointList[  6 ].flag )	new_side =  6;
+		else if( PointList[  1 ].flag )	new_side =  1;
+		break;
+	case 9:
+		if( PointList[  0 ].flag )	new_side =  0;
+		else if( PointList[  5 ].flag )	new_side =  5;
+		else if( PointList[  4 ].flag )	new_side =  4;
+		else if( PointList[  8 ].flag )	new_side =  8;
+		else if( PointList[ 10 ].flag )	new_side = 10;
+		else if( PointList[ 11 ].flag )	new_side = 11;
+		break;
+	case 8:
+		if( PointList[  9 ].flag )	new_side =  9;
+		else if( PointList[ 10 ].flag )	new_side = 10;
+		else if( PointList[ 11 ].flag )	new_side = 11;
+		else if( PointList[  3 ].flag )	new_side =  3;
+		else if( PointList[  4 ].flag )	new_side =  4;
+		else if( PointList[  7 ].flag )	new_side =  7;
+		break;
+	case 7:
+		if( PointList[  3 ].flag )	new_side =  3;
+		else if( PointList[  4 ].flag )	new_side =  4;
+		else if( PointList[  8 ].flag )	new_side =  8;
+		else if( PointList[  2 ].flag )	new_side =  2;
+		else if( PointList[  6 ].flag )	new_side =  6;
+		else if( PointList[ 11 ].flag )	new_side = 11;
+		break;
+	case 6:
+		if( PointList[  1 ].flag )	new_side =  1;
+		else if( PointList[  5 ].flag )	new_side =  5;
+		else if( PointList[ 10 ].flag )	new_side = 10;
+		else if( PointList[  2 ].flag )	new_side =  2;
+		else if( PointList[  7 ].flag )	new_side =  7;
+		else if( PointList[ 11 ].flag )	new_side = 11;
+		break;
+	case 5:
+		if( PointList[  1 ].flag )	new_side =  1;
+		else if( PointList[  6 ].flag )	new_side =  6;
+		else if( PointList[ 10 ].flag )	new_side = 10;
+		else if( PointList[  0 ].flag )	new_side =  0;
+		else if( PointList[  4 ].flag )	new_side =  4;
+		else if( PointList[  9 ].flag )	new_side =  9;
+		break;
+	case 4:
+		if( PointList[  0 ].flag )	new_side =  0;
+		else if( PointList[  5 ].flag )	new_side =  5;
+		else if( PointList[  9 ].flag )	new_side =  9;
+		else if( PointList[  3 ].flag )	new_side =  3;
+		else if( PointList[  7 ].flag )	new_side =  7;
+		else if( PointList[  8 ].flag )	new_side =  8;
+		break;
+	case 3:
+		if( PointList[  4 ].flag )	new_side =  4;
+		else if( PointList[  8 ].flag )	new_side =  8;
+		else if( PointList[  7 ].flag )	new_side =  7;
+		else if( PointList[  0 ].flag )	new_side =  0;
+		else if( PointList[  1 ].flag )	new_side =  1;
+		else if( PointList[  2 ].flag )	new_side =  2;
+		break;
+	case 0:
+		if( PointList[  1 ].flag )	new_side =  1;
+		else if( PointList[  2 ].flag )	new_side =  2;
+		else if( PointList[  3 ].flag )	new_side =  3;
+		else if( PointList[  4 ].flag )	new_side =  4;
+		else if( PointList[  5 ].flag )	new_side =  5;
+		else if( PointList[  9 ].flag )	new_side =  9;
+		break;
+	case 1:
+		if( PointList[  0 ].flag )	new_side =  0;
+		else if( PointList[  3 ].flag )	new_side =  3;
+		else if( PointList[  2 ].flag )	new_side =  2;
+		else if( PointList[  5 ].flag )	new_side =  5;
+		else if( PointList[  6 ].flag )	new_side =  6;
+		else if( PointList[ 10 ].flag )	new_side = 10;
+		break;
+	case 2:
+		if( PointList[  1 ].flag )	new_side =  1;
+		else if( PointList[  0 ].flag )	new_side =  0;
+		else if( PointList[  3 ].flag )	new_side =  3;
+		else if( PointList[  6 ].flag )	new_side =  6;
+		else if( PointList[  7 ].flag )	new_side =  7;
+		else if( PointList[ 11 ].flag )	new_side = 11;
+		break;
 	}
 	return new_side;
 }
@@ -1387,146 +1387,146 @@ int GimmeNodeVertices( BSP_NODE * plane_ptr, BSP_NODE * space_ptr, int side, VEC
 
 	switch( GetMajorAxis( &plane_ptr->Normal ) )
 	{
-		case 0: // major X
-			y = -FAR_AWAY;
-			z = -FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 0: // major X
+		y = -FAR_AWAY;
+		z = -FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y =  FAR_AWAY;
-			z = -FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y =  FAR_AWAY;
+		z = -FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y =  FAR_AWAY;
-			z =  FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y =  FAR_AWAY;
+		z =  FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y = -FAR_AWAY;
-			z =  FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y = -FAR_AWAY;
+		z =  FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 
-		case 1: // major Y
-			x = -FAR_AWAY;
-			z = -FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 1: // major Y
+		x = -FAR_AWAY;
+		z = -FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			z = -FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		z = -FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			z =  FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		z =  FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x = -FAR_AWAY;
-			z =  FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x = -FAR_AWAY;
+		z =  FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->Offset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 
-		case 2: // major Z
-			x = -FAR_AWAY;
-			y = -FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 2: // major Z
+		x = -FAR_AWAY;
+		y = -FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			y = -FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		y = -FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			y =  FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		y =  FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x = -FAR_AWAY;
-			y =  FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x = -FAR_AWAY;
+		y =  FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->Offset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 	}
 
 	// Got the initial poly. Do the intersection business.
@@ -1693,146 +1693,146 @@ int GimmeTriggerZoneVertices( TRIGGER_ZONE * plane_ptr, TRIGGER_ZONE * space_ptr
 
 	switch( GetMajorAxis( &plane_ptr->normal ) )
 	{
-		case 0: // major X
-			y = -FAR_AWAY;
-			z = -FAR_AWAY;
-			x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 0: // major X
+		y = -FAR_AWAY;
+		z = -FAR_AWAY;
+		x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y =  FAR_AWAY;
-			z = -FAR_AWAY;
-			x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y =  FAR_AWAY;
+		z = -FAR_AWAY;
+		x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y =  FAR_AWAY;
-			z =  FAR_AWAY;
-			x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y =  FAR_AWAY;
+		z =  FAR_AWAY;
+		x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y = -FAR_AWAY;
-			z =  FAR_AWAY;
-			x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y = -FAR_AWAY;
+		z =  FAR_AWAY;
+		x = -( plane_ptr->normal.y * y + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 
-		case 1: // major Y
-			x = -FAR_AWAY;
-			z = -FAR_AWAY;
-			y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 1: // major Y
+		x = -FAR_AWAY;
+		z = -FAR_AWAY;
+		y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			z = -FAR_AWAY;
-			y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		z = -FAR_AWAY;
+		y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			z =  FAR_AWAY;
-			y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		z =  FAR_AWAY;
+		y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x = -FAR_AWAY;
-			z =  FAR_AWAY;
-			y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x = -FAR_AWAY;
+		z =  FAR_AWAY;
+		y = -( plane_ptr->normal.x * x + plane_ptr->normal.z * z + plane_ptr->offset ) / plane_ptr->normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 
-		case 2: // major Z
-			x = -FAR_AWAY;
-			y = -FAR_AWAY;
-			z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 2: // major Z
+		x = -FAR_AWAY;
+		y = -FAR_AWAY;
+		z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			y = -FAR_AWAY;
-			z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		y = -FAR_AWAY;
+		z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			y =  FAR_AWAY;
-			z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		y =  FAR_AWAY;
+		z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x = -FAR_AWAY;
-			y =  FAR_AWAY;
-			z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x = -FAR_AWAY;
+		y =  FAR_AWAY;
+		z = -( plane_ptr->normal.x * x + plane_ptr->normal.y * y + plane_ptr->offset ) / plane_ptr->normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 	}
 
 	// Got the initial poly. Do the intersection business.
@@ -1987,146 +1987,146 @@ int GimmeColZoneVertices( ZONESIDE * plane_ptr, ZONESIDE * space_ptr, int NumSid
 
 	switch( GetMajorAxis( &plane_ptr->Normal ) )
 	{
-		case 0: // major X
-			y = -FAR_AWAY;
-			z = -FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 0: // major X
+		y = -FAR_AWAY;
+		z = -FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y =  FAR_AWAY;
-			z = -FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y =  FAR_AWAY;
+		z = -FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y =  FAR_AWAY;
-			z =  FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y =  FAR_AWAY;
+		z =  FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			y = -FAR_AWAY;
-			z =  FAR_AWAY;
-			x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		y = -FAR_AWAY;
+		z =  FAR_AWAY;
+		x = -( plane_ptr->Normal.y * y + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.x;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 
-		case 1: // major Y
-			x = -FAR_AWAY;
-			z = -FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 1: // major Y
+		x = -FAR_AWAY;
+		z = -FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			z = -FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		z = -FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			z =  FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		z =  FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x = -FAR_AWAY;
-			z =  FAR_AWAY;
-			y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x = -FAR_AWAY;
+		z =  FAR_AWAY;
+		y = -( plane_ptr->Normal.x * x + plane_ptr->Normal.z * z + plane_ptr->PlaneOffset ) / plane_ptr->Normal.y;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 
-		case 2: // major Z
-			x = -FAR_AWAY;
-			y = -FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+	case 2: // major Z
+		x = -FAR_AWAY;
+		y = -FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			y = -FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		y = -FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x =  FAR_AWAY;
-			y =  FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x =  FAR_AWAY;
+		y =  FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			x = -FAR_AWAY;
-			y =  FAR_AWAY;
-			z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
-			pin_ptr = first_free_pin_ptr;
-			first_free_pin_ptr = first_free_pin_ptr->next_ptr;
-			pin_ptr->x = x;
-			pin_ptr->y = y;
-			pin_ptr->z = z;
-			pin_ptr->next_ptr = first_pin_ptr;
-			first_pin_ptr = pin_ptr;
+		x = -FAR_AWAY;
+		y =  FAR_AWAY;
+		z = -( plane_ptr->Normal.x * x + plane_ptr->Normal.y * y + plane_ptr->PlaneOffset ) / plane_ptr->Normal.z;
+		pin_ptr = first_free_pin_ptr;
+		first_free_pin_ptr = first_free_pin_ptr->next_ptr;
+		pin_ptr->x = x;
+		pin_ptr->y = y;
+		pin_ptr->z = z;
+		pin_ptr->next_ptr = first_pin_ptr;
+		first_pin_ptr = pin_ptr;
 
-			break;
+		break;
 	}
 
 	// Got the initial poly. Do the intersection business.

@@ -612,7 +612,7 @@ bool ProcessShips()
 						{
 							CreateInvEffect( i, 5, 255, 64, 64 );
 						}
-					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+						/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 					}
 				}
 			}
@@ -631,39 +631,39 @@ bool ProcessShips()
 			StartPos = ShipObjPnt->Pos;
 			OldGroup = ShipObjPnt->Group;
 
-				if(
-					ShipPnt->headlights &&                                    // has headlights on
-					ShipObjPnt->Mode != LIMBO_MODE &&                         // not dead
-					(ShipObjPnt->Mode != DEATH_MODE || Random_Range(2))       // blink 50% while dieing
+			if(
+				ShipPnt->headlights &&                                    // has headlights on
+				ShipObjPnt->Mode != LIMBO_MODE &&                         // not dead
+				(ShipObjPnt->Mode != DEATH_MODE || Random_Range(2))       // blink 50% while dieing
 				)
+			{
+				if( ShipObjPnt->light == INDEX_NONE )
 				{
-					if( ShipObjPnt->light == INDEX_NONE )
-					{
-						ShipObjPnt->light = FindFreeXLight();
-					}
-					if( ShipObjPnt->light != INDEX_NONE )
-					{
-						ShipObjPnt->Flags |= SHIP_Light;
-
-						XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
-						XLights[ShipObjPnt->light].CosArc = (float)fast_cosf(D2R(35));
-
-						ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
-						XLights[ShipObjPnt->light].r = 192.0F;
-						XLights[ShipObjPnt->light].g = 192.0F;
-						XLights[ShipObjPnt->light].b = 192.0F;
-						XLights[ShipObjPnt->light].Type = SPOT_LIGHT;
-						XLights[ShipObjPnt->light].Pos = ShipObjPnt->Pos;
-						XLights[ShipObjPnt->light].Group = ShipObjPnt->Group;
-					}
-				}else{
-					ShipObjPnt->Flags &= ~SHIP_Light;
-					if( ShipObjPnt->light != INDEX_NONE )
-					{
-						KillUsedXLight( ShipObjPnt->light );
-						ShipObjPnt->light = INDEX_NONE;
-					}
+					ShipObjPnt->light = FindFreeXLight();
 				}
+				if( ShipObjPnt->light != INDEX_NONE )
+				{
+					ShipObjPnt->Flags |= SHIP_Light;
+
+					XLights[ShipObjPnt->light].Size = (4096.0F+2048.0F)*GLOBAL_SCALE;
+					XLights[ShipObjPnt->light].CosArc = (float)fast_cosf(D2R(35));
+
+					ApplyMatrix( &ShipObjPnt->FinalMat, &Forward, &XLights[ShipObjPnt->light].Dir );			/* Calc Direction Vector */
+					XLights[ShipObjPnt->light].r = 192.0F;
+					XLights[ShipObjPnt->light].g = 192.0F;
+					XLights[ShipObjPnt->light].b = 192.0F;
+					XLights[ShipObjPnt->light].Type = SPOT_LIGHT;
+					XLights[ShipObjPnt->light].Pos = ShipObjPnt->Pos;
+					XLights[ShipObjPnt->light].Group = ShipObjPnt->Group;
+				}
+			}else{
+				ShipObjPnt->Flags &= ~SHIP_Light;
+				if( ShipObjPnt->light != INDEX_NONE )
+				{
+					KillUsedXLight( ShipObjPnt->light );
+					ShipObjPnt->light = INDEX_NONE;
+				}
+			}
 
 			// processing you
 			if( WhoIAm == i)
@@ -822,7 +822,7 @@ bool ProcessShips()
 					ShipObjPnt->Quat.Normalise();
 					ShipObjPnt->Quat.ToMatrix(&ShipObjPnt->Mat);
 					ShipObjPnt->RotationForce.MakeEuler(0.0F, 0.0F, 0.0F);
-				/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+					/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
 
 					// carry out movements
 					BobShip( i, &Bob );
@@ -975,38 +975,38 @@ bool ProcessShips()
 								|| TeamFlagAtHome[ TeamNumber[ i ] ]
 								|| ShipObjPnt->Flags & TeamFlagMask[ TeamNumber[ i ] ] )
 							{
-									int team;
-									int score;
+								int team;
+								int score;
 
-									score = 0;
-									for ( team = 0; team < MAX_TEAMS; team++ )
+								score = 0;
+								for ( team = 0; team < MAX_TEAMS; team++ )
+								{
+									if ( ShipObjPnt->Flags & TeamFlagMask[ team ] )
 									{
-										if ( ShipObjPnt->Flags & TeamFlagMask[ team ] )
+										PickupsGot[ TeamFlagPickup[ team ] ] = 0;
+										Ships[ i ].Object.Flags &= ~TeamFlagMask[ team ];
+										if ( team != TeamNumber[ i ] )
 										{
-											PickupsGot[ TeamFlagPickup[ team ] ] = 0;
-											Ships[ i ].Object.Flags &= ~TeamFlagMask[ team ];
-											if ( team != TeamNumber[ i ] )
-											{
-												score += GoalScore;
-											}
-											GenerateFlagAtHome( team );
+											score += GoalScore;
 										}
+										GenerateFlagAtHome( team );
 									}
-									if ( score )
-									{
-										// update bonus 3 (stats.cpp) -- CTF scored
-										UpdateBonusStats(i,score);
-										AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
-											TeamName[ TeamNumber[ i ] ] );
+								}
+								if ( score )
+								{
+									// update bonus 3 (stats.cpp) -- CTF scored
+									UpdateBonusStats(i,score);
+									AddColourMessageToQue(FlagMessageColour, TEAM_SCORED,
+										TeamName[ TeamNumber[ i ] ] );
 
-										SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
-									}
-									else
-									{
-										AddColourMessageToQue(FlagMessageColour, OTHER_TEAM_FLAG_RETURNED,
-											TeamName[ TeamNumber[ i ] ] );
-										SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
-									}
+									SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ScoredWithFlag, 0);
+								}
+								else
+								{
+									AddColourMessageToQue(FlagMessageColour, OTHER_TEAM_FLAG_RETURNED,
+										TeamName[ TeamNumber[ i ] ] );
+									SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_ReturnedFlag, 0);
+								}
 
 								IKnowINeedFlag = false;
 							}
@@ -1153,28 +1153,28 @@ bool ProcessShips()
 					{
 
 						{
-								// carry out movements
-								Move_Off.x = ShipPnt->Move_Off.x * framelag;
-								Move_Off.y = ShipPnt->Move_Off.y * framelag;
-								Move_Off.z = ShipPnt->Move_Off.z * framelag;
-								ShipObjPnt->Pos.x += Move_Off.x;
-								ShipObjPnt->Pos.y += Move_Off.y;
-								ShipObjPnt->Pos.z += Move_Off.z;
-								/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
-								StepQuat.MakeEuler(ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel);
-								ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
+							// carry out movements
+							Move_Off.x = ShipPnt->Move_Off.x * framelag;
+							Move_Off.y = ShipPnt->Move_Off.y * framelag;
+							Move_Off.z = ShipPnt->Move_Off.z * framelag;
+							ShipObjPnt->Pos.x += Move_Off.x;
+							ShipObjPnt->Pos.y += Move_Off.y;
+							ShipObjPnt->Pos.z += Move_Off.z;
+							/* @vfp-exempt R3 — protected hit set: swept-window/lethality compare; integerizing changes gameplay. measured n/a. Verified 2026-10-25. */
+							StepQuat.MakeEuler(ShipPnt->LastAngle.x * framelag, ShipPnt->LastAngle.y * framelag, (ShipPnt->LastAngle.z * framelag) + ShipObjPnt->Autolevel);
+							ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->Quat);
 
-								ShipPnt->PacketDelay -= framelag;
-								if( ShipPnt->PacketDelay <= 0.0F )
-								{
-									ShipPnt->PacketDelay = 0.0F;
-									AccellDecell( &ShipPnt->Move_Off.x , MoveDecell );
-									AccellDecell( &ShipPnt->Move_Off.y , MoveDecell );
-									AccellDecell( &ShipPnt->Move_Off.z , MoveDecell );
-									AccellDecell( &ShipPnt->LastAngle.y , TurnDecell );
-									AccellDecell( &ShipPnt->LastAngle.x , TurnDecell );
-									AccellDecell( &ShipPnt->LastAngle.z , RollDecell );
-								}
+							ShipPnt->PacketDelay -= framelag;
+							if( ShipPnt->PacketDelay <= 0.0F )
+							{
+								ShipPnt->PacketDelay = 0.0F;
+								AccellDecell( &ShipPnt->Move_Off.x , MoveDecell );
+								AccellDecell( &ShipPnt->Move_Off.y , MoveDecell );
+								AccellDecell( &ShipPnt->Move_Off.z , MoveDecell );
+								AccellDecell( &ShipPnt->LastAngle.y , TurnDecell );
+								AccellDecell( &ShipPnt->LastAngle.x , TurnDecell );
+								AccellDecell( &ShipPnt->LastAngle.z , RollDecell );
+							}
 						}
 
 						// Still need to update the group....
@@ -1201,10 +1201,10 @@ bool ProcessShips()
 					ShipPnt->JustRecievedPacket = false;
 				}
 			}
-// End of Special Stuff for other players Ship Movement..Carries on even if no new packet arrives..
-/*===================================================================
-			Set the Banking Matrix
-===================================================================*/
+			// End of Special Stuff for other players Ship Movement..Carries on even if no new packet arrives..
+			/*===================================================================
+						Set the Banking Matrix
+			===================================================================*/
 			StepQuat.MakeEuler(0.0F, 0.0F, ShipObjPnt->Bank);
 			ShipObjPnt->Quat.Multiply(&StepQuat, &ShipObjPnt->FinalQuat);
 			ShipObjPnt->FinalQuat.ToMatrix(&ShipObjPnt->FinalMat);

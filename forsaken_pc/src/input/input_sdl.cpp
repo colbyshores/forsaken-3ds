@@ -119,7 +119,7 @@ void app_resize( SDL_WindowEvent * /*window*/ )
 void app_active( SDL_WindowEvent * window )
 {
 
-// SDL2 window events carry the specific gained/lost state
+	// SDL2 window events carry the specific gained/lost state
 	bool gained  = window -> event == SDL_WINDOWEVENT_FOCUS_GAINED;
 	bool lost    = window -> event == SDL_WINDOWEVENT_FOCUS_LOST;
 	bool resized = window -> event == SDL_WINDOWEVENT_RESIZED;
@@ -189,13 +189,13 @@ void app_keyboard( SDL_KeyboardEvent * key )
 	{
 		if( key->keysym.sym == SDLK_F12 && key->keysym.mod & KMOD_SHIFT )
 		{
-				MenuGoFullScreen( nullptr );
+			MenuGoFullScreen( nullptr );
 		}
 		else if( key->keysym.sym == SDLK_RSHIFT || key->keysym.sym == SDLK_LSHIFT )
 		{
-				const u_int8_t *keystate = SDL_GetKeyboardState(nullptr);
-				if ( keystate[SDL_SCANCODE_F12] )
-					MenuGoFullScreen( nullptr );
+			const u_int8_t *keystate = SDL_GetKeyboardState(nullptr);
+			if ( keystate[SDL_SCANCODE_F12] )
+				MenuGoFullScreen( nullptr );
 		}
 	}
 	if( key->type == SDL_KEYDOWN )
@@ -253,9 +253,9 @@ void app_mouse_button( SDL_MouseButtonEvent * _event )
 	switch( _event->button )
 	{
 
-	//
-	// Every other mouse button works like normal
-	//
+		//
+		// Every other mouse button works like normal
+		//
 	default:
 		// save the button state
 		mouse_state.buttons[ button ] = ( _event->type == SDL_MOUSEBUTTONDOWN );
@@ -376,7 +376,7 @@ void app_joy_button( SDL_JoyButtonEvent * button )
 	{
 		input_buffer_send(
 			button->button + DIK_JOYSTICK
-		);
+			);
 	}
 }
 
@@ -413,7 +413,7 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 				hat->hat,
 				JOY_HAT_UP
 			)
-		);
+			);
 	}
 	else
 	{
@@ -429,7 +429,7 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 				hat->hat,
 				JOY_HAT_RIGHT
 			)
-		);
+			);
 	}
 	else
 	{
@@ -445,7 +445,7 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 				hat->hat,
 				JOY_HAT_DOWN
 			)
-		);
+			);
 	}
 	else
 	{
@@ -461,7 +461,7 @@ void app_joy_hat( SDL_JoyHatEvent * hat )
 				hat->hat,
 				JOY_HAT_LEFT
 			)
-		);
+			);
 	}
 	else
 	{
@@ -495,7 +495,7 @@ bool joysticks_init(void)
 			DebugPrintf(
 				"joysticks_init: joystick (%d), '%s' failed to open\n",
 				i, SDL_JoystickNameForIndex(i)
-			);
+				);
 			continue;
 		}
 
@@ -521,7 +521,7 @@ bool joysticks_init(void)
 			"joysticks_init: joystick (%d), name='%s', axises=%d, buttons=%d, hats=%d\n",
 			i, JoystickInfo[i].Name, JoystickInfo[i].NumAxis, JoystickInfo[i].NumButtons,
 			JoystickInfo[i].NumPOVs
-		);
+			);
 
 		for (j = 0; j < JoystickInfo[i].NumAxis; j++)
 		{
@@ -538,7 +538,7 @@ bool joysticks_init(void)
 				JoystickInfo[i].Axis[j].name,
 				"Axis %d",
 				j
-			);
+				);
 		}
 
 		for( j = 0; j < JoystickInfo[i].NumButtons; j++ )
@@ -552,7 +552,7 @@ bool joysticks_init(void)
 				JoystickInfo[i].Button[j].name,
 				"Button %d",
 				j
-			);
+				);
 		}
 
 		for (j = 0; j < JoystickInfo[i].NumPOVs; j++)
@@ -564,14 +564,14 @@ bool joysticks_init(void)
 				JoystickInfo[i].POV[j].name,
 				"Hat %d",
 				j
-			);
+				);
 
 			for (k = 0; k < MAX_POV_DIRECTIONS; k++)
 			{
 				JoystickInfo[i].POV[j].action[k] =
 					SHIPACTION_Nothing;
 
-				 JoystickInfo[i].POV[j].dirname[k] =
+				JoystickInfo[i].POV[j].dirname[k] =
 					(char *) malloc (MAX_JOYNAME+1);
 
 				sprintf(
@@ -579,7 +579,7 @@ bool joysticks_init(void)
 					"%s %d",
 					JoystickInfo[i].POV[j].name,
 					k
-				);
+					);
 			}
 		}
 	}
@@ -608,7 +608,7 @@ bool joysticks_cleanup( void )
 		{
 			SDL_JoystickClose(
 				JoystickInfo[i].sdl_joy
-			);
+				);
 		}
 		JoystickInfo[i].sdl_joy = nullptr;
 
@@ -686,7 +686,7 @@ bool handle_events( void )
 		{
 
 
-// mouse wheel is an x/y axis event in SDL2 (was a button code in SDL1)
+			// mouse wheel is an x/y axis event in SDL2 (was a button code in SDL1)
 		case SDL_MOUSEWHEEL:
 			app_mouse_wheel( &_event.wheel );
 			break;
@@ -732,14 +732,14 @@ bool handle_events( void )
 			app_quit();
 			break;
 
-		// platform specific _event type
-		// must be enabled using SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE)
+			// platform specific _event type
+			// must be enabled using SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE)
 		case SDL_SYSWMEVENT:
 			DebugPrintf("recived a platform specific _event type\n");
 			break;
 
-		// to avoid threading issues timers will add an event to the queue
-		// so that we can call the callbacks from the same thread
+			// to avoid threading issues timers will add an event to the queue
+			// so that we can call the callbacks from the same thread
 		case SDL_USEREVENT:
 			{
 				void (*p) (void*) = (void (*)(void*))_event.user.data1; // callback
@@ -747,7 +747,7 @@ bool handle_events( void )
 			}
 			break;
 
-// TODO
+			// TODO
 		default:
 			printf("Unknown event type: %d\n",_event.type);
 			break;

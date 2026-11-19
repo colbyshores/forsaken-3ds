@@ -30,7 +30,7 @@
 #include "math/new3d.h"
 
 class FileReader {
-public:
+	public:
 	explicit FileReader( const void * start ) : pos_( static_cast<const unsigned char *>( start ) ) {}
 
 	u_int8_t  u8()  { u_int8_t v;  bytes( &v, sizeof( v ) ); return v; }
@@ -68,6 +68,6 @@ public:
 	   later stage. */
 	const unsigned char * pos() const { return pos_; }
 
-private:
+	private:
 	const unsigned char * pos_;
 };

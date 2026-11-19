@@ -27,9 +27,9 @@ enum {
 
 };
 
- /*
- * structures
- */
+/*
+* structures
+*/
 
 struct PVFIREPOINT{
 

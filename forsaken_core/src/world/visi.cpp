@@ -506,7 +506,7 @@ void AddIndirectVisible( u_int16_t g )
 
 #define HUGE_VALUE	(FLT_MAX * 0.5F)
 
- int EmptyXYExtent( EXTENT *e )
+int EmptyXYExtent( EXTENT *e )
 {
 	return ( e->min.x >= e->max.x ) || ( e->min.y >= e->max.y );
 }
@@ -929,48 +929,48 @@ void FindVisible( CAMERA *cam, MLOADHEADER *Mloadheader )
 			&& v->viewport->Height == (long)render_info.ThisMode.h))
 #endif
 		{
-		g->projection._11 = cam->Proj._11 * v->viewport->Width / vp->Width;
-		g->projection._22 = cam->Proj._22 * v->viewport->Height / vp->Height;
-		lr = 2.0F * ( ( v->viewport->X + v->viewport->Width * 0.5F ) - ( vp->X + vp->Width * 0.5F ) );
+			g->projection._11 = cam->Proj._11 * v->viewport->Width / vp->Width;
+			g->projection._22 = cam->Proj._22 * v->viewport->Height / vp->Height;
+			lr = 2.0F * ( ( v->viewport->X + v->viewport->Width * 0.5F ) - ( vp->X + vp->Width * 0.5F ) );
 
 #ifdef __3DS__
-		if (!render_info.stereo_enabled)
+			if (!render_info.stereo_enabled)
 #endif
-		switch( render_info.stereo_position )
-		{
-		case ST_LEFT:
-			lr -= 0.5f * render_info.stereo_focal_dist / render_info.stereo_eye_sep;
-			break;
-		case ST_RIGHT:
-			lr += 0.5f * render_info.stereo_focal_dist / render_info.stereo_eye_sep;
-		default:
-			break;
-		}
+				switch( render_info.stereo_position )
+				{
+				case ST_LEFT:
+					lr -= 0.5f * render_info.stereo_focal_dist / render_info.stereo_eye_sep;
+				break;
+			case ST_RIGHT:
+				lr += 0.5f * render_info.stereo_focal_dist / render_info.stereo_eye_sep;
+			default:
+				break;
+			}
 
-		g->projection._31 = lr / vp->Width;
-		g->projection._32 = -2.0F * ( ( v->viewport->Y + v->viewport->Height * 0.5F )
-									- ( vp->Y + vp->Height * 0.5F ) )
-							/ vp->Height;
+			g->projection._31 = lr / vp->Width;
+			g->projection._32 = -2.0F * ( ( v->viewport->Y + v->viewport->Height * 0.5F )
+										- ( vp->Y + vp->Height * 0.5F ) )
+			/ vp->Height;
 
 #ifdef __3DS__
-		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-		/* citro3d uses scissor + unmagnified cam->Proj only when the
-		 * parent viewport (v->viewport) spans the full screen — the
-		 * main camera's case. Sub-cameras (missile chase, rear view)
-		 * render into an offset sub-rect of the screen, and need the
-		 * engine's per-group _31/_32 offset math to translate their
-		 * geometry into that sub-rect's pixels; the unmagnified
-		 * cam->Proj path centers geometry at NDC origin which lands
-		 * at screen center after the full-screen viewport mapping —
-		 * the scissor then masks everything outside the chase-camera
-		 * inset, leaving the camera looking like it's pointed wrong. */
-		/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
-		if (v->viewport->X == 0 && v->viewport->Y == 0
-			&& v->viewport->Width  == (long)render_info.ThisMode.w
-			&& v->viewport->Height == (long)render_info.ThisMode.h)
-		{
-			g->projection = cam->Proj;
-		}
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+			/* citro3d uses scissor + unmagnified cam->Proj only when the
+			 * parent viewport (v->viewport) spans the full screen — the
+			 * main camera's case. Sub-cameras (missile chase, rear view)
+			 * render into an offset sub-rect of the screen, and need the
+			 * engine's per-group _31/_32 offset math to translate their
+			 * geometry into that sub-rect's pixels; the unmagnified
+			 * cam->Proj path centers geometry at NDC origin which lands
+			 * at screen center after the full-screen viewport mapping —
+			 * the scissor then masks everything outside the chase-camera
+			 * inset, leaving the camera looking like it's pointed wrong. */
+			/* @vfp-exempt R3 — polygon clip/visibility decision; integerizing changes pixel output. measured n/a. Verified 2026-10-25. */
+			if (v->viewport->X == 0 && v->viewport->Y == 0
+				&& v->viewport->Width  == (long)render_info.ThisMode.w
+				&& v->viewport->Height == (long)render_info.ThisMode.h)
+			{
+				g->projection = cam->Proj;
+			}
 #endif
 		}
 

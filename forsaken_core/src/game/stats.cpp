@@ -169,71 +169,71 @@ void UpdateKillStats(int Killer, int Victim, int WeaponType, int Weapon)
 	// should we check for the first kill of the game?
 	if(!FirstBlood)
 	{
-			for(i=0; i<MAX_PLAYERS; i++)
+		for(i=0; i<MAX_PLAYERS; i++)
+		{
+			if(GetTotalKills(i) > 0)
 			{
-					if(GetTotalKills(i) > 0)
-					{
-						FirstBlood = true;
-						break;
-					}
+				FirstBlood = true;
+				break;
+			}
+		}
+
+		// this is the first (non-suicide) kill
+		if(!FirstBlood && Killer != Victim)
+		{
+			FirstBlood = true;
+			if(Killer == WhoIAm)
+				AddColourMessageToQue(MilestoneMessagesColour, "YOU GOT FIRST BLOOD");
+			else
+			{
+				AddColourMessageToQue( MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "GOT FIRST BLOOD" );
 			}
 
-			// this is the first (non-suicide) kill
-			if(!FirstBlood && Killer != Victim)
-			{
-					FirstBlood = true;
-					if(Killer == WhoIAm)
-						AddColourMessageToQue(MilestoneMessagesColour, "YOU GOT FIRST BLOOD");
-					else
-					{
-						AddColourMessageToQue( MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "GOT FIRST BLOOD" );
-					}
-
-					if(Killer == WatchPlayerSelect.value)
-						PlaySfx( SFX_FIRSTBLOOD, 1.0F );
-			}
+			if(Killer == WatchPlayerSelect.value)
+				PlaySfx( SFX_FIRSTBLOOD, 1.0F );
+		}
 	}
 	// should we check for first to fifty kills?
 	if(!FirstToFifty)
 	{
-			for(i=0; i<MAX_PLAYERS; i++)
+		for(i=0; i<MAX_PLAYERS; i++)
+		{
+			if(GetTotalKills(i) >= 50)
 			{
-					if(GetTotalKills(i) >= 50)
-					{
-						FirstToFifty = true;
-						break;
-					}
+				FirstToFifty = true;
+				break;
+			}
+		}
+
+		// this is the person to 50 kills
+		if(!FirstToFifty && Killer!=Victim && GetTotalKills(Killer) == 49)
+		{
+			FirstToFifty = true;
+			if(Killer == WhoIAm)
+				AddColourMessageToQue( MilestoneMessagesColour, "YOU ARE FIRST TO 50 KILLS" );
+			else
+			{
+				AddColourMessageToQue( MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "IS FIRST TO 50 KILLS" );
 			}
 
-			// this is the person to 50 kills
-			if(!FirstToFifty && Killer!=Victim && GetTotalKills(Killer) == 49)
-			{
-					FirstToFifty = true;
-					if(Killer == WhoIAm)
-						AddColourMessageToQue( MilestoneMessagesColour, "YOU ARE FIRST TO 50 KILLS" );
-					else
-					{
-						AddColourMessageToQue( MilestoneMessagesColour, "%s %s", (const char *)GetName(Killer), "IS FIRST TO 50 KILLS" );
-					}
-
-					if(Killer == WatchPlayerSelect.value)
-						PlaySfx( SFX_IMPRESSIVE, 1.0F );
-			}
+			if(Killer == WatchPlayerSelect.value)
+				PlaySfx( SFX_IMPRESSIVE, 1.0F );
+		}
 	}
 
 	// killed with a direct hit of a titan
 	if(WeaponType == WEPTYPE_Secondary && Weapon == 6)
 	{
-			PlaySfx( SFX_HOLYSHIT, 1.0F );
-			AddColourMessageToQue( MilestoneMessagesColour, "HOLY SHIT" );
-			return;
+		PlaySfx( SFX_HOLYSHIT, 1.0F );
+		AddColourMessageToQue( MilestoneMessagesColour, "HOLY SHIT" );
+		return;
 	}
 	// killed with a gravgon
 	if(WeaponType == WEPTYPE_Secondary && Weapon == 4)
 	{
-			if(Victim == WatchPlayerSelect.value) PlaySfx( SFX_HUMILIATION, 1.0F );
-			AddColourMessageToQue( MilestoneMessagesColour, "HUMILIATION" );
-			return;
+		if(Victim == WatchPlayerSelect.value) PlaySfx( SFX_HUMILIATION, 1.0F );
+		AddColourMessageToQue( MilestoneMessagesColour, "HUMILIATION" );
+		return;
 	}
 
 	// note who killed whom

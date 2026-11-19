@@ -221,22 +221,22 @@ float DotProduct( VECTOR * a , VECTOR * b )
 ===================================================================*/
 void ReflectVector( VECTOR * old, NORMAL * normal, VECTOR * new1 )
 {
-   float        lambda;
+	float        lambda;
 
-   lambda= ( -2 * ( (normal->nx * old->x ) + (normal->ny * old->y ) + (normal->nz * old->z ) ) );
+	lambda= ( -2 * ( (normal->nx * old->x ) + (normal->ny * old->y ) + (normal->nz * old->z ) ) );
 
-   if( fabsf( lambda ) < EPS )
-   {
+	if( fabsf( lambda ) < EPS )
+	{
 		new1->x = old->x;
 		new1->y = old->y;
 		new1->z = old->z;
-   }
-   else
-   {
+	}
+	else
+	{
 		new1->x = ( old->x + ( lambda * normal->nx ) );
 		new1->y = ( old->y + ( lambda * normal->ny ) );
 		new1->z = ( old->z + ( lambda * normal->nz ) );
-   }
+	}
 }
 
 
@@ -422,19 +422,19 @@ void CalcViewAxes( VECTOR * viewpos, VECTOR * lookpos, VECTOR * up,
 				   VECTOR * vx, VECTOR * vy, VECTOR * vz )
 {
 
-/*	Calculate camera z axis as normalised vector from viewpos to lookpos */
+	/*	Calculate camera z axis as normalised vector from viewpos to lookpos */
 
 	vz->x = (lookpos->x - viewpos->x);
 	vz->y = (lookpos->y - viewpos->y);
 	vz->z = (lookpos->z - viewpos->z);
 	NormaliseVector( vz );
 
-/*	Calculate camera x axis as normalised cross product of camera z axis and up vector */
+	/*	Calculate camera x axis as normalised cross product of camera z axis and up vector */
 
 	CrossProduct( up, vz, vx);
 	NormaliseVector( vx );
 
-/*	Calculate camera y axis as normalised cross product of camera z and x axes */
+	/*	Calculate camera y axis as normalised cross product of camera z and x axes */
 
 	CrossProduct( vz, vx, vy);
 	NormaliseVector( vy );

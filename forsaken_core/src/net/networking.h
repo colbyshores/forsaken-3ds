@@ -54,9 +54,9 @@ extern int local_port;
 extern int host_port;
 extern char host_address[256];
 
- /*
- * defines
- */
+/*
+* defines
+*/
 
 constexpr auto NOISEFALLOFFFACTOR = ( 1.0F / 120.0F ); // approx 2 seconds....
 constexpr int NORMAL_MODE = 0;

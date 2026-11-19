@@ -110,7 +110,7 @@ struct ENEMY {
 	bool	PickNewNodeNow;
 	float	DistanceToPointOnSlope;
 
-struct ENEMY * FormationLink;
+	struct ENEMY * FormationLink;
 	VECTOR	FormationOffset;
 
 	void * SplineNode1;
@@ -208,9 +208,9 @@ struct ENEMY_TYPES {
 	BYTE	PrimaryWeaponType;			// which Primaryt weapon do I Fire...
 	BYTE	SecondaryWeaponType;		// which Primaryt weapon do I Fire...
 
-//	bool	DoIBank;					// When Turning Left and Right Do I Bank???
+	//	bool	DoIBank;					// When Turning Left and Right Do I Bank???
 
-struct	AI_BEHAVIOUR Behave;
+	struct	AI_BEHAVIOUR Behave;
 };
 
 

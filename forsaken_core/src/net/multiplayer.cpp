@@ -285,8 +285,8 @@ void GetPlayersInCurrentSession( MENUITEM * /*Item*/ )
 		if( ( GameStatus[ i ] == MyGameStatus ) || ( i == WhoIAm ) )
 		{
 			NumOfPlayersSlider.value++;
-			strcpy( (char*)PlayersList.item[ PlayersList.items++ ], (char*)Names[ i ] );
-		}
+		strcpy( (char*)PlayersList.item[ PlayersList.items++ ], (char*)Names[ i ] );
+	}
 
 	if (NumOfPlayersSlider.value != NumOfPlayersSlider.oldvalue)
 		NumOfPlayersSlider.redraw_req = true;

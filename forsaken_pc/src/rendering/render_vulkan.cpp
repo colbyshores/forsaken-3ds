@@ -862,7 +862,7 @@ static void transition(VkCommandBuffer cb, VkImage img, int base_level, int leve
 	b.subresourceRange.layerCount = 1;
 	b.srcAccessMask = src; b.dstAccessMask = dst;
 	VkPipelineStageFlags dst_stage = (new_l == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-		? VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT : VK_PIPELINE_STAGE_TRANSFER_BIT;
+	? VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT : VK_PIPELINE_STAGE_TRANSFER_BIT;
 	vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &b);
 }
 
@@ -958,13 +958,13 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path, u_int16_t *width
 		for (int y = 0; y < image.h; y++)
 			for (int x = 0; x < image.w; x++) {
 				DWORD index = (DWORD)(y * pitch) + (DWORD)(x * 4);
-				image.data[index]     = (char)gamma_table[(u_int8_t)image.data[index]];
-				image.data[index + 1] = (char)gamma_table[(u_int8_t)image.data[index + 1]];
-				image.data[index + 2] = (char)gamma_table[(u_int8_t)image.data[index + 2]];
-				image.data[index + 3] = (char)gamma_table[(u_int8_t)image.data[index + 3]];
-				if ((image.data[index] + image.data[index + 1] + image.data[index + 2]) == 0)
-					image.data[index + 3] = 0;
-			}
+			image.data[index]     = (char)gamma_table[(u_int8_t)image.data[index]];
+			image.data[index + 1] = (char)gamma_table[(u_int8_t)image.data[index + 1]];
+			image.data[index + 2] = (char)gamma_table[(u_int8_t)image.data[index + 2]];
+			image.data[index + 3] = (char)gamma_table[(u_int8_t)image.data[index + 3]];
+			if ((image.data[index] + image.data[index + 1] + image.data[index + 2]) == 0)
+				image.data[index + 3] = 0;
+		}
 	}
 
 	int levels = 1;

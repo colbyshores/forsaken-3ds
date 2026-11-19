@@ -282,16 +282,16 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				return false;
 			}
 
-	  if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount))
-	  {
-		DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
-		return false;
-	  }
-	  if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Normals)))
-	  {
-		Msg( "Mxload() normal lock failed in %s\n", Filename );
-		return false;
-	  }
+			if (!FSCreateNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], triangleCount))
+			{
+				DebugPrintf("Mxload() failed to create normal buffer in %s\n", Filename);
+				return false;
+			}
+			if (!(FSLockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh], &Normals)))
+			{
+				Msg( "Mxload() normal lock failed in %s\n", Filename );
+				return false;
+			}
 
 			/* Allocate this mesh's textureGroups[] from the TAG_LEVEL
 			 * hunk, sized to num_texture_groups. Bulk-freed via
@@ -410,11 +410,11 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 				return false ;
 			}
 
-	  if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
-	  {
-		Msg( "Mxload() normal unlock failed in %s\n", Filename );
-		return false ;
-	  }
+			if (!(FSUnlockNormalBuffer(&Mxloadheader->Group[group].renderObject[mesh])))
+			{
+				Msg( "Mxload() normal unlock failed in %s\n", Filename );
+				return false ;
+			}
 
 			Mxloadheader->Group[group].renderObject[mesh].numTextureGroups = num_texture_groups;
 
@@ -535,9 +535,9 @@ bool Mxload( char * Filename, MXLOADHEADER * Mxloadheader , bool Panel, bool Sto
 		}
 	}
 
-/*===================================================================
-	Point Direction Data
-===================================================================*/
+	/*===================================================================
+		Point Direction Data
+	===================================================================*/
 	if( in.u16() )
 	{
 		NumFirePoints = in.u16();
@@ -738,11 +738,11 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 						}
 						switch( Models[ Model ].Func )
 						{
-							case MODFUNC_ScaleDonut:
-								ProcessModel2( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 1, 1 );
+						case MODFUNC_ScaleDonut:
+							ProcessModel2( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 1, 1 );
 
-							default:
-								break;
+						default:
+							break;
 						}
 					}
 
@@ -774,35 +774,35 @@ bool ExecuteMxloadHeader( MXLOADHEADER * Mxloadheader, u_int16_t Model  )
 
 						switch( Models[ Model ].Func )
 						{
-							case MODFUNC_Explode:
-								ProcessModel( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
-								break;
+						case MODFUNC_Explode:
+							ProcessModel( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
+							break;
 
-							case MODFUNC_Scale:
-							case MODFUNC_Scale2:
-								ProcessModel( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
-								break;
-							case MODFUNC_Regen:
-								ProcessModel( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
-								break;
+						case MODFUNC_Scale:
+						case MODFUNC_Scale2:
+							ProcessModel( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
+							break;
+						case MODFUNC_Regen:
+							ProcessModel( Mxloadheader, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
+							break;
 
-							case MODFUNC_OrbitPulsar:
-								if( ( Ships[ Models[ Model ].Ship ].Object.Flags & SHIP_Stealth ) )
-								{
-									if( !LightModel( Models[ Model ].ModelNum, &Models[ Model ].Pos ) ) Display = false;
-								}
-								break;
+						case MODFUNC_OrbitPulsar:
+							if( ( Ships[ Models[ Model ].Ship ].Object.Flags & SHIP_Stealth ) )
+							{
+								if( !LightModel( Models[ Model ].ModelNum, &Models[ Model ].Pos ) ) Display = false;
+							}
+							break;
 
-							case MODFUNC_ScaleDonut:
-								break;
+						case MODFUNC_ScaleDonut:
+							break;
 
-							case MODFUNC_RestoreColours:
-								RestoreColourMxloadHeader(Mxloadheader );
-								break;
+						case MODFUNC_RestoreColours:
+							RestoreColourMxloadHeader(Mxloadheader );
+							break;
 
-							case MODFUNC_Nothing:
-							default:
-								break;
+						case MODFUNC_Nothing:
+						default:
+							break;
 						}
 					}
 

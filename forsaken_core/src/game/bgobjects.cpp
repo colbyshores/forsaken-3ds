@@ -214,210 +214,438 @@ void ProcessBGObjects( bool Collide )
 
 		switch( Object->Type )
 		{
-/*===================================================================
-			STATIC
-===================================================================*/
-			case BGOTYPE_Static:
-				UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+			/*===================================================================
+						STATIC
+			===================================================================*/
+		case BGOTYPE_Static:
+			UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+			break;
+
+			/*===================================================================
+						DOOR
+			===================================================================*/
+		case BGOTYPE_Door:
+			if( Object->StateChangeDelay )
+			{
+				Object->StateChangeDelay -= framelag;
+				if( Object->StateChangeDelay < 0.0F ) Object->StateChangeDelay = 0.0F;
+			}
+
+			Object->OldOldTime = Object->OldTime;
+			Object->OldTime = Object->Time;
+
+			switch( Object->State )
+			{
+			case DOOR_OPENING:
+				Object->Time += ( framelag * Object->AnimSpeed );
+				if( Object->Time > Object->MidTime )
+				{
+					Object->State = DOOR_OPEN;
+					Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->Time - Object->MidTime );
+					Object->Time = Object->MidTime;
+					StartOrChangeDoorSoundFX( Object );
+
+					if( Object->OpenTrigModPtr != nullptr )
+					{
+						ApplyTriggerMod( Object->OpenTrigModPtr );
+					}
+				}
+				else
+				{
+					break;
+				}
 				break;
 
-/*===================================================================
-			DOOR
-===================================================================*/
-			case BGOTYPE_Door:
-				if( Object->StateChangeDelay )
+			case DOOR_REVERSEOPENING:
+				Object->Time -= ( framelag * Object->AnimSpeed );
+				if( Object->Time < 0.0F )
 				{
-					Object->StateChangeDelay -= framelag;
-					if( Object->StateChangeDelay < 0.0F ) Object->StateChangeDelay = 0.0F;
-				}
+					Object->State = DOOR_CLOSED;
+					Object->Time = 0.0F;
+					StartOrChangeDoorSoundFX( Object );
 
-				Object->OldOldTime = Object->OldTime;
-				Object->OldTime = Object->Time;
-
-				switch( Object->State )
-				{
-					case DOOR_OPENING:
-						Object->Time += ( framelag * Object->AnimSpeed );
-						if( Object->Time > Object->MidTime )
-						{
-							Object->State = DOOR_OPEN;
-							Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->Time - Object->MidTime );
-							Object->Time = Object->MidTime;
-							StartOrChangeDoorSoundFX( Object );
-
-							if( Object->OpenTrigModPtr != nullptr )
-							{
-								ApplyTriggerMod( Object->OpenTrigModPtr );
-							}
-						}
-						else
-						{
-							break;
-						}
-						break;
-
-					case DOOR_REVERSEOPENING:
-						Object->Time -= ( framelag * Object->AnimSpeed );
-						if( Object->Time < 0.0F )
-						{
-							Object->State = DOOR_CLOSED;
-							Object->Time = 0.0F;
-							StartOrChangeDoorSoundFX( Object );
-
-							if( Object->CloseTrigModPtr != nullptr )
-							{
-								ApplyTriggerMod( Object->CloseTrigModPtr );
-							}
-						}
-						else
-						{
-							break;
-						}
-						break;
-
-					case DOOR_OPEN:
-						Object->Timer -= ( framelag * Object->AnimSpeed );
-
-						if( Object->Timer < 0.0F )
-						{
-							Object->Time = Object->MidTime + ( 0.0F - Object->Timer );
-							Object->Timer = 0.0F;
-							Object->State = DOOR_CLOSING;
-							StartOrChangeDoorSoundFX( Object );
-						}
-						else
-						{
-							Object->Time = Object->MidTime;
-							break;
-						}
-						break;
-
-					case DOOR_CLOSING:
-						Object->Time += ( framelag * Object->AnimSpeed );
-						if( Object->Time > Object->OverallTime )
-						{
-							Object->State = DOOR_CLOSED;
-							Object->Time = 0.0F;
-							StartOrChangeDoorSoundFX( Object );
-
-							if( Object->CloseTrigModPtr != nullptr )
-							{
-								ApplyTriggerMod( Object->CloseTrigModPtr );
-							}
-						}
-						break;
-
-					case DOOR_REVERSECLOSING:
-						Object->Time -= ( framelag * Object->AnimSpeed );
-						if( Object->Time < Object->MidTime )
-						{
-							Object->State = DOOR_OPEN;
-							Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->MidTime - Object->Time );
-							Object->Time = Object->MidTime;
-							StartOrChangeDoorSoundFX( Object );
-
-							if( Object->OpenTrigModPtr != nullptr )
-							{
-								ApplyTriggerMod( Object->OpenTrigModPtr );
-							}
-						}
-						break;
-
-					case DOOR_CLOSED:
-						Object->Time = 0.0F;
-						break;
-
-					default:
-						break;
-				}
-
-				if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
-				{
-					UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
-
-					if( Object->Time != Object->OldTime )
+					if( Object->CloseTrigModPtr != nullptr )
 					{
-						Object->UpdateCount = 3;
+						ApplyTriggerMod( Object->CloseTrigModPtr );
+					}
+				}
+				else
+				{
+					break;
+				}
+				break;
 
-						UndoAnim = false;
+			case DOOR_OPEN:
+				Object->Timer -= ( framelag * Object->AnimSpeed );
 
-						if( Collide )
+				if( Object->Timer < 0.0F )
+				{
+					Object->Time = Object->MidTime + ( 0.0F - Object->Timer );
+					Object->Timer = 0.0F;
+					Object->State = DOOR_CLOSING;
+					StartOrChangeDoorSoundFX( Object );
+				}
+				else
+				{
+					Object->Time = Object->MidTime;
+					break;
+				}
+				break;
+
+			case DOOR_CLOSING:
+				Object->Time += ( framelag * Object->AnimSpeed );
+				if( Object->Time > Object->OverallTime )
+				{
+					Object->State = DOOR_CLOSED;
+					Object->Time = 0.0F;
+					StartOrChangeDoorSoundFX( Object );
+
+					if( Object->CloseTrigModPtr != nullptr )
+					{
+						ApplyTriggerMod( Object->CloseTrigModPtr );
+					}
+				}
+				break;
+
+			case DOOR_REVERSECLOSING:
+				Object->Time -= ( framelag * Object->AnimSpeed );
+				if( Object->Time < Object->MidTime )
+				{
+					Object->State = DOOR_OPEN;
+					Object->Timer = ( ANIM_SECOND * 3.0F ) - ( Object->MidTime - Object->Time );
+					Object->Time = Object->MidTime;
+					StartOrChangeDoorSoundFX( Object );
+
+					if( Object->OpenTrigModPtr != nullptr )
+					{
+						ApplyTriggerMod( Object->OpenTrigModPtr );
+					}
+				}
+				break;
+
+			case DOOR_CLOSED:
+				Object->Time = 0.0F;
+				break;
+
+			default:
+				break;
+			}
+
+			if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+			{
+				UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+
+				if( Object->Time != Object->OldTime )
+				{
+					Object->UpdateCount = 3;
+
+					UndoAnim = false;
+
+					if( Collide )
+					{
+						if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
 						{
-							if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
+							if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
 							{
-								if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
+								ChangeBGState( Object, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
+
 								{
-									ChangeBGState( Object, OWNER_SHIP, WhoIAm, BUMP, 0.0F );
-
-									{
-										HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
-									}
-										ForceExternalOneOff( WhoIAm, &PushVector );
-									UndoAnim = true;
+									HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
 								}
-							}
-
-							if( CheckBGObjectToEnemies( Object ) )
-							{
-								ChangeBGState( Object, OWNER_ENEMY, 0, BUMP, 0.0F );
+								ForceExternalOneOff( WhoIAm, &PushVector );
 								UndoAnim = true;
 							}
-
-							if( CheckBGObjectToPickups( Object ) )
-							{
-								UndoAnim = true;
-							}
-
-							CheckBGObjectToMines( Object );
 						}
 
-						if( UndoAnim )
+						if( CheckBGObjectToEnemies( Object ) )
 						{
-							UndoBGObjectAnim( Object );
-							UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+							ChangeBGState( Object, OWNER_ENEMY, 0, BUMP, 0.0F );
+							UndoAnim = true;
 						}
+
+						if( CheckBGObjectToPickups( Object ) )
+						{
+							UndoAnim = true;
+						}
+
+						CheckBGObjectToMines( Object );
+					}
+
+					if( UndoAnim )
+					{
+						UndoBGObjectAnim( Object );
+						UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+					}
+				}
+				else
+				{
+					if( Object->UpdateCount ) Object->UpdateCount--;
+				}
+			}
+			break;
+
+			/*===================================================================
+						LOOPING
+			===================================================================*/
+		case BGOTYPE_Looping_Anim:
+			Object->OldOldTime = Object->OldTime;
+			Object->OldTime = Object->Time;
+
+			switch( Object->State )
+			{
+			case LOOPANIM_WaitForDelay:
+				Object->Delay -= framelag;
+				if( Object->Delay < 0.0F )
+				{
+					Object->Delay = 0.0F;
+					Object->State = LOOPANIM_Animating;
+				}
+				break;
+
+			case LOOPANIM_WaitForTrigger:
+				break;
+
+			case LOOPANIM_Animating:
+				if( Object->OverallTime > 0.001F )
+				{
+					Object->Time += framelag;
+
+					if( Object->Time >= Object->OverallTime )
+					{
+						Object->Time -= ( (float) fast_floorf( Object->Time / Object->OverallTime ) * Object->OverallTime );
+					}
+				}
+				break;
+			}
+
+			if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+			{
+				UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+
+				if( Object->Time != Object->OldTime )
+				{
+					Object->UpdateCount = 3;
+
+					UndoAnim = false;
+
+					if( Collide )
+					{
+						if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
+						{
+							if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
+							{
+								{
+									HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
+								}
+
+								ForceExternalOneOff( WhoIAm, &PushVector );
+								UndoAnim = true;
+							}
+						}
+
+						if( CheckBGObjectToEnemies( Object ) )
+						{
+							UndoAnim = true;
+						}
+
+						if( CheckBGObjectToPickups( Object ) )
+						{
+							UndoAnim = true;
+						}
+
+						CheckBGObjectToMines( Object );
+					}
+
+					if( UndoAnim )
+					{
+						UndoBGObjectAnim( Object );
+						UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+					}
+				}
+				else
+				{
+					if( Object->UpdateCount ) Object->UpdateCount--;
+				}
+			}
+			break;
+
+			/*===================================================================
+						ANIMATE AND STOP AT END
+			===================================================================*/
+		case BGOTYPE_OneOff_Anim:
+			Object->OldOldTime = Object->OldTime;
+			Object->OldTime = Object->Time;
+
+			switch( Object->State )
+			{
+			case ONEOFFANIM_WaitForDelay:
+				Object->Delay -= framelag;
+				if( Object->Delay < 0.0F )
+				{
+					Object->Delay = 0.0F;
+					Object->State = ONEOFFANIM_Animating;
+				}
+				break;
+
+			case ONEOFFANIM_WaitForTrigger:
+				break;
+
+			case ONEOFFANIM_Animating:
+				if( Object->Time < Object->OverallTime )
+				{
+					Object->Time += framelag;
+#ifdef EDITION_REMASTER
+					/* Sync any CargoDrone waiting at a lift-base node (0x40)
+					 * with this BGO's animation progress so the drone rides
+					 * the platform rather than being passed through.
+					 *
+					 * Gate on Object->IsCargoDroneLift so the Y-lerp only
+					 * fires for actual lift BGOs (filename "lift*.cob") —
+					 * not for lever/door/decoration BGOs that happen to be
+					 * animating while the drone sits at a wait node. */
+					if( Object->IsCargoDroneLift )
+					{
+						ENEMY * drone;
+						for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
+						{
+							float dx, dz;
+							NODE * wait_node;
+							NODE * upper_node;
+							if( drone->Type != ENEMY_CargoDrone ) continue;
+							if( !drone->TNode ) continue;
+							wait_node = (NODE*)drone->TNode;
+							if( !( wait_node->Flags & 0x40 ) )
+							{
+								continue;
+							}
+							/* Gate on drone-to-wait-node XZ distance — the drone is
+							 * parked at the wait node when the lift fires, and the
+							 * wait node lives in world coords.  BGO origins are
+							 * level-designer-placed and can be far from their wait
+							 * node (lift 2's BGO is at world origin (0,0,0); lift 5's
+							 * BGO is 380u from its wait node; only lift 1 happens to
+							 * be near its wait at 213u).  A tight wait-node-based
+							 * gate works uniformly for every lift. */
+							dx = drone->Object.Pos.x - wait_node->Pos.x;
+							dz = drone->Object.Pos.z - wait_node->Pos.z;
+							if( dx*dx + dz*dz > 200.0F*200.0F )
+							{
+								continue;
+							}
+							/* Lerp drone Y from wait node to its IMMEDIATE upper
+							 * neighbor (NodeLink[0]) — Y only, not XZ.  Lerping
+							 * X/Z too is geometrically correct for slanted shafts,
+							 * but it breaks the wait suppressor's XZ-distance
+							 * check (drone moves away from wait_node XZ → wait
+							 * disengages → drone tries AI movement → chaos).
+							 *
+							 * Trade-off: drone Y-rises straight up at wait_node's
+							 * XZ; lift platform mesh may visually pull away on
+							 * slanted shafts.  Better to look slightly off than
+							 * to break parking.  When the animation ends, the
+							 * block below advances the drone's TNode to the
+							 * upper node. */
+							upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
+							if( upper_node )
+							{
+								float progress = Object->Time / Object->OverallTime;
+								if( progress > 1.0F ) progress = 1.0F;
+								drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
+							}
+						}
+					}
+#endif
+				}
+				else
+				{
+					if( Object->EndTrigModPtr != nullptr )
+					{
+						ApplyTriggerMod( Object->EndTrigModPtr );
+					}
+#ifdef EDITION_REMASTER
+					/* Lift just finished animating.  EndTrigMod fired the
+					 * Lift<N>Done state change, which fires NodeEnable on
+					 * the upper node and NodeDisable on the wait.  Drone is
+					 * sitting at wait_node.XZ with Y at the lerped top; we
+					 * need to (a) snap drone position to upper_node and
+					 * (b) advance drone TNode to upper_node so its
+					 * subsequent AI behavior aims at the next forward
+					 * neighbor instead of the now-disabled wait below it.
+					 *
+					 * Without this, drone TNode stays at the (now 0x60-
+					 * disabled) wait and AI tries to navigate back down
+					 * to wait.Pos.y, undoing the lift visually. */
+					if( Object->IsCargoDroneLift )
+					{
+						ENEMY * drone;
+						for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
+						{
+							NODE * wait_node;
+							NODE * upper_node;
+							float dx, dz;
+							bool upper_is_intermediate_wait;
+							if( drone->Type != ENEMY_CargoDrone ) continue;
+							if( !drone->TNode ) continue;
+							wait_node = (NODE*)drone->TNode;
+							/* Drone must have been parked at wait associated
+							 * with this lift (XZ-close). */
+							dx = drone->Object.Pos.x - wait_node->Pos.x;
+							dz = drone->Object.Pos.z - wait_node->Pos.z;
+							if( dx*dx + dz*dz > 200.0F*200.0F ) continue;
+							upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
+							if( !upper_node ) continue;
+							/* Always advance the drone's TNode forward — the post-
+							 * lift NodeDisable(wait) + NodeEnable(upper) trigger pair
+							 * has already fired by now, so wait_node is 0x60-disabled
+							 * and upper_node is either 0x40 (intermediate shaft wait)
+							 * or 0x00 (regular track). */
+							drone->TNode         = upper_node;
+							drone->NextTNode     = nullptr;
+							drone->LastTNode     = wait_node;
+							drone->PickNewNodeNow = true;
+
+							/* Only teleport drone POSITION when upper_node is now an
+							 * intermediate shaft wait (0x40 set, e.g. lift 2 shaft).
+							 * For those, the drone must "be there" so the wait
+							 * suppressor parks it and the next switch's
+							 * Drone<N>Wait zone-enter fires.
+							 *
+							 * For single-segment lifts (1, 5, 6, 7, 8 + lift 2's top
+							 * segment) upper_node ends up 0x00 — regular track.
+							 * Don't teleport position there.  Just advancing TNode
+							 * is enough; the AI will walk the drone from the
+							 * wait's XZ over to upper_node naturally, no visible
+							 * jump on lift end. */
+							upper_is_intermediate_wait = (upper_node->Flags & 0x40) != 0;
+							if( upper_is_intermediate_wait )
+							{
+								VECTOR oldPos = drone->Object.Pos;
+								drone->Object.Pos.x = upper_node->SolidPos.x;
+								drone->Object.Pos.y = upper_node->SolidPos.y;
+								drone->Object.Pos.z = upper_node->SolidPos.z;
+								drone->Object.Group = (u_int16_t)upper_node->Group;
+								TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
+							}
+						}
+					}
+#endif
+					Object->Time = Object->OverallTime;
+					if( Object->DestroyAtEnd )
+					{
+						ExplodeChildren( Object->Children, 1 );
+						KillUsedBGObject( Object );
+						Object = nullptr;
 					}
 					else
 					{
-						if( Object->UpdateCount ) Object->UpdateCount--;
+						Object->State = ONEOFFANIM_WaitForTrigger;
 					}
 				}
 				break;
+			}
 
-/*===================================================================
-			LOOPING
-===================================================================*/
-			case BGOTYPE_Looping_Anim:
-				Object->OldOldTime = Object->OldTime;
-				Object->OldTime = Object->Time;
-
-				switch( Object->State )
-				{
-					case LOOPANIM_WaitForDelay:
-						Object->Delay -= framelag;
-						if( Object->Delay < 0.0F )
-						{
-							Object->Delay = 0.0F;
-							Object->State = LOOPANIM_Animating;
-						}
-						break;
-
-					case LOOPANIM_WaitForTrigger:
-						break;
-
-					case LOOPANIM_Animating:
-						if( Object->OverallTime > 0.001F )
-						{
-							Object->Time += framelag;
-
-							if( Object->Time >= Object->OverallTime )
-							{
-								Object->Time -= ( (float) fast_floorf( Object->Time / Object->OverallTime ) * Object->OverallTime );
-							}
-						}
-						break;
-				}
-
+			if( Object )
+			{
 				if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
 				{
 					UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
@@ -467,331 +695,103 @@ void ProcessBGObjects( bool Collide )
 						if( Object->UpdateCount ) Object->UpdateCount--;
 					}
 				}
-				break;
+			}
+			break;
 
-/*===================================================================
-			ANIMATE AND STOP AT END
-===================================================================*/
-			case BGOTYPE_OneOff_Anim:
-				Object->OldOldTime = Object->OldTime;
-				Object->OldTime = Object->Time;
+			/*===================================================================
+						STEPPED ANIM CAUSED BY EXTERNAL CONDITIONS
+			===================================================================*/
+		case BGOTYPE_MultipleStep_Anim:
+			Object->OldOldTime = Object->OldTime;
+			Object->OldTime = Object->Time;
 
-				switch( Object->State )
+			if( Object->Time < Object->WantedTime )
+			{
+				Object->Time += framelag;
+
+				if( Object->Time > Object->WantedTime )
 				{
-					case ONEOFFANIM_WaitForDelay:
-						Object->Delay -= framelag;
-						if( Object->Delay < 0.0F )
-						{
-							Object->Delay = 0.0F;
-							Object->State = ONEOFFANIM_Animating;
-						}
-						break;
-
-					case ONEOFFANIM_WaitForTrigger:
-						break;
-
-					case ONEOFFANIM_Animating:
-						if( Object->Time < Object->OverallTime )
-						{
-							Object->Time += framelag;
-#ifdef EDITION_REMASTER
-							/* Sync any CargoDrone waiting at a lift-base node (0x40)
-							 * with this BGO's animation progress so the drone rides
-							 * the platform rather than being passed through.
-							 *
-							 * Gate on Object->IsCargoDroneLift so the Y-lerp only
-							 * fires for actual lift BGOs (filename "lift*.cob") —
-							 * not for lever/door/decoration BGOs that happen to be
-							 * animating while the drone sits at a wait node. */
-							if( Object->IsCargoDroneLift )
-							{
-								ENEMY * drone;
-								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
-								{
-									float dx, dz;
-									NODE * wait_node;
-									NODE * upper_node;
-									if( drone->Type != ENEMY_CargoDrone ) continue;
-									if( !drone->TNode ) continue;
-									wait_node = (NODE*)drone->TNode;
-									if( !( wait_node->Flags & 0x40 ) )
-									{
-										continue;
-									}
-									/* Gate on drone-to-wait-node XZ distance — the drone is
-									 * parked at the wait node when the lift fires, and the
-									 * wait node lives in world coords.  BGO origins are
-									 * level-designer-placed and can be far from their wait
-									 * node (lift 2's BGO is at world origin (0,0,0); lift 5's
-									 * BGO is 380u from its wait node; only lift 1 happens to
-									 * be near its wait at 213u).  A tight wait-node-based
-									 * gate works uniformly for every lift. */
-									dx = drone->Object.Pos.x - wait_node->Pos.x;
-									dz = drone->Object.Pos.z - wait_node->Pos.z;
-									if( dx*dx + dz*dz > 200.0F*200.0F )
-									{
-										continue;
-									}
-									/* Lerp drone Y from wait node to its IMMEDIATE upper
-									 * neighbor (NodeLink[0]) — Y only, not XZ.  Lerping
-									 * X/Z too is geometrically correct for slanted shafts,
-									 * but it breaks the wait suppressor's XZ-distance
-									 * check (drone moves away from wait_node XZ → wait
-									 * disengages → drone tries AI movement → chaos).
-									 *
-									 * Trade-off: drone Y-rises straight up at wait_node's
-									 * XZ; lift platform mesh may visually pull away on
-									 * slanted shafts.  Better to look slightly off than
-									 * to break parking.  When the animation ends, the
-									 * block below advances the drone's TNode to the
-									 * upper node. */
-									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
-									if( upper_node )
-									{
-										float progress = Object->Time / Object->OverallTime;
-										if( progress > 1.0F ) progress = 1.0F;
-										drone->Object.Pos.y = wait_node->Pos.y + ( upper_node->Pos.y - wait_node->Pos.y ) * progress;
-									}
-								}
-							}
-#endif
-						}
-						else
-						{
-							if( Object->EndTrigModPtr != nullptr )
-							{
-								ApplyTriggerMod( Object->EndTrigModPtr );
-							}
-#ifdef EDITION_REMASTER
-							/* Lift just finished animating.  EndTrigMod fired the
-							 * Lift<N>Done state change, which fires NodeEnable on
-							 * the upper node and NodeDisable on the wait.  Drone is
-							 * sitting at wait_node.XZ with Y at the lerped top; we
-							 * need to (a) snap drone position to upper_node and
-							 * (b) advance drone TNode to upper_node so its
-							 * subsequent AI behavior aims at the next forward
-							 * neighbor instead of the now-disabled wait below it.
-							 *
-							 * Without this, drone TNode stays at the (now 0x60-
-							 * disabled) wait and AI tries to navigate back down
-							 * to wait.Pos.y, undoing the lift visually. */
-							if( Object->IsCargoDroneLift )
-							{
-								ENEMY * drone;
-								for( drone = FirstEnemyUsed; drone; drone = drone->NextUsed )
-								{
-									NODE * wait_node;
-									NODE * upper_node;
-									float dx, dz;
-									bool upper_is_intermediate_wait;
-									if( drone->Type != ENEMY_CargoDrone ) continue;
-									if( !drone->TNode ) continue;
-									wait_node = (NODE*)drone->TNode;
-									/* Drone must have been parked at wait associated
-									 * with this lift (XZ-close). */
-									dx = drone->Object.Pos.x - wait_node->Pos.x;
-									dz = drone->Object.Pos.z - wait_node->Pos.z;
-									if( dx*dx + dz*dz > 200.0F*200.0F ) continue;
-									upper_node = ( wait_node->NumOfLinks > 0 ) ? wait_node->NodeLink[0] : nullptr;
-									if( !upper_node ) continue;
-									/* Always advance the drone's TNode forward — the post-
-									 * lift NodeDisable(wait) + NodeEnable(upper) trigger pair
-									 * has already fired by now, so wait_node is 0x60-disabled
-									 * and upper_node is either 0x40 (intermediate shaft wait)
-									 * or 0x00 (regular track). */
-									drone->TNode         = upper_node;
-									drone->NextTNode     = nullptr;
-									drone->LastTNode     = wait_node;
-									drone->PickNewNodeNow = true;
-
-									/* Only teleport drone POSITION when upper_node is now an
-									 * intermediate shaft wait (0x40 set, e.g. lift 2 shaft).
-									 * For those, the drone must "be there" so the wait
-									 * suppressor parks it and the next switch's
-									 * Drone<N>Wait zone-enter fires.
-									 *
-									 * For single-segment lifts (1, 5, 6, 7, 8 + lift 2's top
-									 * segment) upper_node ends up 0x00 — regular track.
-									 * Don't teleport position there.  Just advancing TNode
-									 * is enough; the AI will walk the drone from the
-									 * wait's XZ over to upper_node naturally, no visible
-									 * jump on lift end. */
-									upper_is_intermediate_wait = (upper_node->Flags & 0x40) != 0;
-									if( upper_is_intermediate_wait )
-									{
-										VECTOR oldPos = drone->Object.Pos;
-										drone->Object.Pos.x = upper_node->SolidPos.x;
-										drone->Object.Pos.y = upper_node->SolidPos.y;
-										drone->Object.Pos.z = upper_node->SolidPos.z;
-										drone->Object.Group = (u_int16_t)upper_node->Group;
-										TriggerAreaEnemyCheck( &oldPos, &drone->Object.Pos, (u_int16_t)upper_node->Group );
-									}
-								}
-							}
-#endif
-							Object->Time = Object->OverallTime;
-							if( Object->DestroyAtEnd )
-							{
-								ExplodeChildren( Object->Children, 1 );
-								KillUsedBGObject( Object );
-								Object = nullptr;
-							}
-							else
-							{
-								Object->State = ONEOFFANIM_WaitForTrigger;
-							}
-						}
-						break;
+					Object->Time = Object->WantedTime;
 				}
 
-				if( Object )
+				if( Object->Time >= Object->OverallTime )
 				{
-					if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+					Object->Time = Object->OverallTime;
+
+					if( Object->EndTrigModPtr != nullptr )
 					{
-						UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+						ApplyTriggerMod( Object->EndTrigModPtr );
+					}
 
-						if( Object->Time != Object->OldTime )
+					if( Object->DestroyAtEnd )
+					{
+						ExplodeChildren( Object->Children, 1 );
+						KillUsedBGObject( Object );
+						Object = nullptr;
+					}
+				}
+			}
+
+			if( Object != nullptr )
+			{
+				if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
+				{
+					UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
+
+					if( Object->Time != Object->OldTime )
+					{
+						Object->UpdateCount = 3;
+
+						UndoAnim = false;
+
+						if( Collide )
 						{
-							Object->UpdateCount = 3;
-
-							UndoAnim = false;
-
-							if( Collide )
+							if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
 							{
-								if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
+								if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
 								{
-									if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
+									if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, nullptr ) )
 									{
-										{
-											HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
-										}
-
-										ForceExternalOneOff( WhoIAm, &PushVector );
-										UndoAnim = true;
+										HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
 									}
-								}
 
-								if( CheckBGObjectToEnemies( Object ) )
-								{
+									ForceExternalOneOff( WhoIAm, &PushVector );
 									UndoAnim = true;
 								}
-
-								if( CheckBGObjectToPickups( Object ) )
-								{
-									UndoAnim = true;
-								}
-
-								CheckBGObjectToMines( Object );
 							}
 
-							if( UndoAnim )
+							if( CheckBGObjectToEnemies( Object ) )
 							{
-								UndoBGObjectAnim( Object );
-								UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+								UndoAnim = true;
 							}
+
+							if( CheckBGObjectToPickups( Object ) )
+							{
+								UndoAnim = true;
+							}
+
+							CheckBGObjectToMines( Object );
 						}
-						else
+
+						if( UndoAnim )
 						{
-							if( Object->UpdateCount ) Object->UpdateCount--;
+							UndoBGObjectAnim( Object );
+							UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
 						}
+					}
+					else
+					{
+						if( Object->UpdateCount ) Object->UpdateCount--;
 					}
 				}
-				break;
+			}
+			break;
 
-/*===================================================================
-			STEPPED ANIM CAUSED BY EXTERNAL CONDITIONS
-===================================================================*/
-			case BGOTYPE_MultipleStep_Anim:
-				Object->OldOldTime = Object->OldTime;
-				Object->OldTime = Object->Time;
-
-				if( Object->Time < Object->WantedTime )
-				{
-					Object->Time += framelag;
-
-					if( Object->Time > Object->WantedTime )
-					{
-						Object->Time = Object->WantedTime;
-					}
-
-					if( Object->Time >= Object->OverallTime )
-					{
-						Object->Time = Object->OverallTime;
-
-						if( Object->EndTrigModPtr != nullptr )
-						{
-							ApplyTriggerMod( Object->EndTrigModPtr );
-						}
-
-						if( Object->DestroyAtEnd )
-						{
-							ExplodeChildren( Object->Children, 1 );
-							KillUsedBGObject( Object );
-							Object = nullptr;
-						}
-					}
-				}
-
-				if( Object != nullptr )
-				{
-					if( Object->UpdateCount || ( Object->Time != Object->OldTime ) )
-					{
-						UpdateCompObjChildren( Object->Children, Object->NumChildren, &Object->Matrix, &Object->Pos, Object->Time, Object->Group, &Object->Center );
-
-						if( Object->Time != Object->OldTime )
-						{
-							Object->UpdateCount = 3;
-
-							UndoAnim = false;
-
-							if( Collide )
-							{
-								if( Ships[ WhoIAm ].Object.Mode != LIMBO_MODE )
-								{
-									if( CheckBGObjectCollision( &Ships[ WhoIAm ].Object.Pos, Object, &PushVector, &Damage, SHIP_RADIUS ) )
-									{
-										if( WouldObjectCollide( &Ships[ WhoIAm ].Object, &PushVector, SHIP_RADIUS, nullptr ) )
-										{
-											HitMe( OWNER_NOBODY, 0, ( Damage * framelag ), WEPTYPE_Various, 0 );
-										}
-
-										ForceExternalOneOff( WhoIAm, &PushVector );
-										UndoAnim = true;
-									}
-								}
-
-								if( CheckBGObjectToEnemies( Object ) )
-								{
-									UndoAnim = true;
-								}
-
-								if( CheckBGObjectToPickups( Object ) )
-								{
-									UndoAnim = true;
-								}
-
-								CheckBGObjectToMines( Object );
-							}
-
-							if( UndoAnim )
-							{
-								UndoBGObjectAnim( Object );
-								UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-							}
-						}
-						else
-						{
-							if( Object->UpdateCount ) Object->UpdateCount--;
-						}
-					}
-				}
-				break;
-
-/*===================================================================
-			SEQUENCE ANIM
-===================================================================*/
-			case BGOTYPE_Sequences:
-				break;
+			/*===================================================================
+						SEQUENCE ANIM
+			===================================================================*/
+		case BGOTYPE_Sequences:
+			break;
 		}
 
 		Object = NextObject;
@@ -833,244 +833,244 @@ void ChangeBGState( BGOBJECT * Object, u_int16_t OwnerType, u_int16_t Owner, int
 
 	switch( Object->Type )
 	{
-/*===================================================================
-			STATIC
-===================================================================*/
-		case BGOTYPE_Static:
-			break;
+		/*===================================================================
+					STATIC
+		===================================================================*/
+	case BGOTYPE_Static:
+		break;
 
-/*===================================================================
-			DOOR
-===================================================================*/
-		case BGOTYPE_Door:
-			Activate = false;
+		/*===================================================================
+					DOOR
+		===================================================================*/
+	case BGOTYPE_Door:
+		Activate = false;
 
-			if( How == BUMP )
+		if( How == BUMP )
+		{
+			if( Object->BumpTrigModPtr != nullptr )
 			{
-				if( Object->BumpTrigModPtr != nullptr )
-				{
-					ApplyTriggerMod( Object->BumpTrigModPtr );
-				}
-
-				if( !Object->Locked )
-				{
-					if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerBump ) ) Activate = true;
-					else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyBump ) ) Activate = true;
-				}
-				else
-				{
-					if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) )
-					{
-						if( Object->PickupNeeded != -1 )
-						{
-							if( PickupsGot[ Object->PickupNeeded ] )
-							{
-								Object->Locked = false;
-								Activate = true;
-								if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupsGot[ Object->PickupNeeded ]--;
-								if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupsGot[ Object->PickupNeeded ]--;
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				if( Object->ShotTrigModPtr != nullptr )
-				{
-					ApplyTriggerMod( Object->ShotTrigModPtr );
-				}
-
-				if( !Object->Locked )
-				{
-					if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerShot ) ) Activate = true;
-					else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyShot ) ) Activate = true;
-				}
-				else
-				{
-					if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) )
-					{
-						if( Object->PickupNeeded != -1 )
-						{
-							if( PickupsGot[ Object->PickupNeeded ] )
-							{
-								Object->Locked = false;
-								Activate = true;
-								if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupsGot[ Object->PickupNeeded ]--;
-								if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupsGot[ Object->PickupNeeded ]--;
-							}
-						}
-					}
-				}
+				ApplyTriggerMod( Object->BumpTrigModPtr );
 			}
 
-			if( Activate && !Object->StateChangeDelay )
-			{
-				switch( Object->State )
-				{
-					case DOOR_CLOSED:
-						Object->State = DOOR_OPENING;
-						if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-						Object->StateChangeDelay = ANIM_SECOND;
-						StartOrChangeDoorSoundFX( Object );
-						break;
-
-					case DOOR_OPEN:
-						Object->State = DOOR_CLOSING;
-						if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-						Object->StateChangeDelay = ANIM_SECOND;
-						StartOrChangeDoorSoundFX( Object );
-						break;
-
-					case DOOR_OPENING:
-						break;
-
-					case DOOR_CLOSING:
-						Object->State = DOOR_REVERSECLOSING;
-						if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-						Object->StateChangeDelay = ANIM_SECOND;
-						StartOrChangeDoorSoundFX( Object );
-						break;
-
-					case DOOR_REVERSEOPENING:
-						Object->State = DOOR_OPENING;
-						if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
-						Object->StateChangeDelay = ANIM_SECOND;
-						StartOrChangeDoorSoundFX( Object );
-						break;
-
-					case DOOR_REVERSECLOSING:
-						break;
-
-					default:
-						break;
-				}
-			}
-			break;
-
-/*===================================================================
-			LOOPING ANIM
-===================================================================*/
-		case BGOTYPE_Looping_Anim:
-			if( How == BUMP )
-			{
-				if( Object->BumpTrigModPtr != nullptr )
-				{
-					if( OwnerType == OWNER_SHIP )
-					{
-						ApplyTriggerMod( Object->BumpTrigModPtr );
-					}
-				}
-			}
-			else
-			{
-				if( Object->ShotTrigModPtr != nullptr )
-				{
-					if( OwnerType == OWNER_SHIP )
-					{
-						ApplyTriggerMod( Object->ShotTrigModPtr );
-					}
-				}
-			}
-			break;
-
-/*===================================================================
-			ONEOFF ANIM
-===================================================================*/
-		case BGOTYPE_OneOff_Anim:
-			if( How == BUMP )
-			{
-				if( Object->State != ONEOFFANIM_Animating )
-				{
-					if( Object->BumpTrigModPtr != nullptr )
-					{
-						if( OwnerType == OWNER_SHIP )
-						{
-							ApplyTriggerMod( Object->BumpTrigModPtr );
-						}
-					}
-				}
-			}
-			else
-			{
-				if( Object->State != ONEOFFANIM_Animating )
-				{
-					if( Object->ShotTrigModPtr != nullptr )
-					{
-						if( OwnerType == OWNER_SHIP )
-						{
-							ApplyTriggerMod( Object->ShotTrigModPtr );
-						}
-					}
-				}
-			}
-			break;
-
-/*===================================================================
-			MULTI-STEP ANIM
-===================================================================*/
-		case BGOTYPE_MultipleStep_Anim:
-			Activate = false;
-
-			if( How == BUMP )
+			if( !Object->Locked )
 			{
 				if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerBump ) ) Activate = true;
 				else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyBump ) ) Activate = true;
+			}
+			else
+			{
+				if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) )
+				{
+					if( Object->PickupNeeded != -1 )
+					{
+						if( PickupsGot[ Object->PickupNeeded ] )
+						{
+							Object->Locked = false;
+							Activate = true;
+							if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupsGot[ Object->PickupNeeded ]--;
+							if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupsGot[ Object->PickupNeeded ]--;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if( Object->ShotTrigModPtr != nullptr )
+			{
+				ApplyTriggerMod( Object->ShotTrigModPtr );
+			}
 
+			if( !Object->Locked )
+			{
+				if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerShot ) ) Activate = true;
+				else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyShot ) ) Activate = true;
+			}
+			else
+			{
+				if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) )
+				{
+					if( Object->PickupNeeded != -1 )
+					{
+						if( PickupsGot[ Object->PickupNeeded ] )
+						{
+							Object->Locked = false;
+							Activate = true;
+							if( Object->PickupNeeded == PICKUP_SkeletonKey ) PickupsGot[ Object->PickupNeeded ]--;
+							if( Object->PickupNeeded == PICKUP_GoldFigure ) PickupsGot[ Object->PickupNeeded ]--;
+						}
+					}
+				}
+			}
+		}
+
+		if( Activate && !Object->StateChangeDelay )
+		{
+			switch( Object->State )
+			{
+			case DOOR_CLOSED:
+				Object->State = DOOR_OPENING;
+				if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+				Object->StateChangeDelay = ANIM_SECOND;
+				StartOrChangeDoorSoundFX( Object );
+				break;
+
+			case DOOR_OPEN:
+				Object->State = DOOR_CLOSING;
+				if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+				Object->StateChangeDelay = ANIM_SECOND;
+				StartOrChangeDoorSoundFX( Object );
+				break;
+
+			case DOOR_OPENING:
+				break;
+
+			case DOOR_CLOSING:
+				Object->State = DOOR_REVERSECLOSING;
+				if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+				Object->StateChangeDelay = ANIM_SECOND;
+				StartOrChangeDoorSoundFX( Object );
+				break;
+
+			case DOOR_REVERSEOPENING:
+				Object->State = DOOR_OPENING;
+				if( ( OwnerType == OWNER_SHIP ) && ( Owner == WhoIAm ) ) UpdateBGObjectSend( Object->Index, Object->State, Object->Time );
+				Object->StateChangeDelay = ANIM_SECOND;
+				StartOrChangeDoorSoundFX( Object );
+				break;
+
+			case DOOR_REVERSECLOSING:
+				break;
+
+			default:
+				break;
+			}
+		}
+		break;
+
+		/*===================================================================
+					LOOPING ANIM
+		===================================================================*/
+	case BGOTYPE_Looping_Anim:
+		if( How == BUMP )
+		{
+			if( Object->BumpTrigModPtr != nullptr )
+			{
+				if( OwnerType == OWNER_SHIP )
+				{
+					ApplyTriggerMod( Object->BumpTrigModPtr );
+				}
+			}
+		}
+		else
+		{
+			if( Object->ShotTrigModPtr != nullptr )
+			{
+				if( OwnerType == OWNER_SHIP )
+				{
+					ApplyTriggerMod( Object->ShotTrigModPtr );
+				}
+			}
+		}
+		break;
+
+		/*===================================================================
+					ONEOFF ANIM
+		===================================================================*/
+	case BGOTYPE_OneOff_Anim:
+		if( How == BUMP )
+		{
+			if( Object->State != ONEOFFANIM_Animating )
+			{
 				if( Object->BumpTrigModPtr != nullptr )
 				{
-					if( Activate )
+					if( OwnerType == OWNER_SHIP )
 					{
 						ApplyTriggerMod( Object->BumpTrigModPtr );
 					}
 				}
 			}
-			else
+		}
+		else
+		{
+			if( Object->State != ONEOFFANIM_Animating )
 			{
-				if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerShot ) ) Activate = true;
-				else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyShot ) ) Activate = true;
-
 				if( Object->ShotTrigModPtr != nullptr )
 				{
-					if( Activate )
+					if( OwnerType == OWNER_SHIP )
 					{
 						ApplyTriggerMod( Object->ShotTrigModPtr );
 					}
 				}
 			}
+		}
+		break;
 
+		/*===================================================================
+					MULTI-STEP ANIM
+		===================================================================*/
+	case BGOTYPE_MultipleStep_Anim:
+		Activate = false;
 
-			if( Activate )
+		if( How == BUMP )
+		{
+			if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerBump ) ) Activate = true;
+			else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyBump ) ) Activate = true;
+
+			if( Object->BumpTrigModPtr != nullptr )
 			{
-				Object->DamageTime += ( Damage * Object->TimePerDamageUnit );
-
-				if( Object->DamageTime > Object->OverallTime )
+				if( Activate )
 				{
-					Object->DamageTime = Object->OverallTime;
-				}
-
-				if( Object->StepInterval > 0.0001F )
-				{
-					Object->WantedTime = FDIV( Object->DamageTime, Object->StepInterval );
-				}
-				else
-				{
-					Object->WantedTime = 0.0F;
+					ApplyTriggerMod( Object->BumpTrigModPtr );
 				}
 			}
-			break;
+		}
+		else
+		{
+			if( ( OwnerType == OWNER_SHIP ) && ( Object->OpenedBy & WHEN_PlayerShot ) ) Activate = true;
+			else if( ( OwnerType == OWNER_ENEMY ) && ( Object->OpenedBy & WHEN_EnemyShot ) ) Activate = true;
 
-/*===================================================================
-			SEQUENCE ANIM
-===================================================================*/
-		case BGOTYPE_Sequences:
-			break;
+			if( Object->ShotTrigModPtr != nullptr )
+			{
+				if( Activate )
+				{
+					ApplyTriggerMod( Object->ShotTrigModPtr );
+				}
+			}
+		}
 
-/*===================================================================
-			UNKNOWN ANIM
-===================================================================*/
-		default:
-			break;
+
+		if( Activate )
+		{
+			Object->DamageTime += ( Damage * Object->TimePerDamageUnit );
+
+			if( Object->DamageTime > Object->OverallTime )
+			{
+				Object->DamageTime = Object->OverallTime;
+			}
+
+			if( Object->StepInterval > 0.0001F )
+			{
+				Object->WantedTime = FDIV( Object->DamageTime, Object->StepInterval );
+			}
+			else
+			{
+				Object->WantedTime = 0.0F;
+			}
+		}
+		break;
+
+		/*===================================================================
+					SEQUENCE ANIM
+		===================================================================*/
+	case BGOTYPE_Sequences:
+		break;
+
+		/*===================================================================
+					UNKNOWN ANIM
+		===================================================================*/
+	default:
+		break;
 
 	}
 }
@@ -1151,69 +1151,69 @@ bool PreLoadBGOFiles( void )
 
 				switch( FilePtr->Type )
 				{
-/*	STATIC ANIM */
+					/*	STATIC ANIM */
 
-					case BGOTYPE_Static:
-						FilePtr->open_event = -1;
-						FilePtr->CloseEvent = -1;
-						break;
+				case BGOTYPE_Static:
+					FilePtr->open_event = -1;
+					FilePtr->CloseEvent = -1;
+					break;
 
-/*	DOOR */
+					/*	DOOR */
 
-					case BGOTYPE_Door:
-						fread( &FilePtr->open_event, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->CloseEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->PickupNeeded, sizeof( int32_t ), 1, fp );
-						fread( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->Locked, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->DoorSfxType, sizeof( int16_t ), 1, fp );
-						RequestDoorTypeSFX( FilePtr->DoorSfxType );
-						break;
+				case BGOTYPE_Door:
+					fread( &FilePtr->open_event, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->CloseEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->PickupNeeded, sizeof( int32_t ), 1, fp );
+					fread( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->Locked, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->DoorSfxType, sizeof( int16_t ), 1, fp );
+					RequestDoorTypeSFX( FilePtr->DoorSfxType );
+					break;
 
-/*	LOOPING ANIM */
+					/*	LOOPING ANIM */
 
-					case BGOTYPE_Looping_Anim:
-						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->Delay, sizeof( float ), 1, fp );
-						break;
+				case BGOTYPE_Looping_Anim:
+					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->Delay, sizeof( float ), 1, fp );
+					break;
 
-/*	ONEOFF ANIM */
+					/*	ONEOFF ANIM */
 
-					case BGOTYPE_OneOff_Anim:
-						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->Delay, sizeof( float ), 1, fp );
-						fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
-						break;
+				case BGOTYPE_OneOff_Anim:
+					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->GenType, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->Delay, sizeof( float ), 1, fp );
+					fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
+					break;
 
-/*	MULTISTEP ANIM */
+					/*	MULTISTEP ANIM */
 
-					case BGOTYPE_MultipleStep_Anim:
-						fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
-						fread( &FilePtr->NumIntervals, sizeof( u_int16_t ), 1, fp );
-						fread( &FilePtr->DamagePerInterval, sizeof( float ), 1, fp );
-						break;
+				case BGOTYPE_MultipleStep_Anim:
+					fread( &FilePtr->ShotEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->BumpEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->EndEvent, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->DestroyAtEnd, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->OpenedBy, sizeof( int16_t ), 1, fp );
+					fread( &FilePtr->NumIntervals, sizeof( u_int16_t ), 1, fp );
+					fread( &FilePtr->DamagePerInterval, sizeof( float ), 1, fp );
+					break;
 
-/*	SEQUENCES ANIM */
+					/*	SEQUENCES ANIM */
 
-					case BGOTYPE_Sequences:
-						break;
+				case BGOTYPE_Sequences:
+					break;
 
-/*	UNKNOWN ANIM */
+					/*	UNKNOWN ANIM */
 
-					default:
-						break;
+				default:
+					break;
 
 				}
 				FilePtr++;
@@ -1240,7 +1240,7 @@ bool PreLoadBGOFiles( void )
 					{
 						Msg( "PreloadBGOFiles() PreloadCompObj() failed on %s\n", &FilePtr->Filename[ 0 ] );
 						return( false );
-				}	}
+					}	}
 
 				FilePtr++;
 			}
@@ -1372,140 +1372,140 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 
 		switch( Type )
 		{
-/*	STATIC ANIM */
+			/*	STATIC ANIM */
 
-			case BGOTYPE_Static:
-				Object->OpenTrigMod = -1;
-				Object->CloseTrigMod = -1;
-				Object->ShotTrigMod = -1;
-				Object->BumpTrigMod = -1;
-				Object->EndTrigMod = -1;
-				Object->OpenTrigModPtr = nullptr;
-				Object->CloseTrigModPtr = nullptr;
-				Object->ShotTrigModPtr = nullptr;
-				Object->BumpTrigModPtr = nullptr;
-				Object->EndTrigModPtr = nullptr;
+		case BGOTYPE_Static:
+			Object->OpenTrigMod = -1;
+			Object->CloseTrigMod = -1;
+			Object->ShotTrigMod = -1;
+			Object->BumpTrigMod = -1;
+			Object->EndTrigMod = -1;
+			Object->OpenTrigModPtr = nullptr;
+			Object->CloseTrigModPtr = nullptr;
+			Object->ShotTrigModPtr = nullptr;
+			Object->BumpTrigModPtr = nullptr;
+			Object->EndTrigModPtr = nullptr;
+			break;
+
+			/*	DOOR */
+
+		case BGOTYPE_Door:
+			Object->OpenTrigMod = OpenTrigMod;
+			Object->CloseTrigMod = CloseTrigMod;
+			if( OpenTrigMod == -1 ) Object->OpenTrigModPtr = nullptr;
+			else Object->OpenTrigModPtr = &TrigMods[ OpenTrigMod ];
+			if( CloseTrigMod == -1 ) Object->CloseTrigModPtr = nullptr;
+			else Object->CloseTrigModPtr = &TrigMods[ CloseTrigMod ];
+			Object->ShotTrigMod = ShotTrigMod;
+			Object->BumpTrigMod = BumpTrigMod;
+			Object->Locked = Locked;
+			Object->PickupNeeded = PickupNeeded;
+			if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
+			else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
+			if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
+			else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
+			Object->EndTrigMod = -1;
+			Object->EndTrigModPtr = nullptr;
+			Object->OpenedBy = OpenedBy;
+			Object->DoorSfxType = DoorSfxType;
+			break;
+
+			/*	LOOPING ANIM */
+
+		case BGOTYPE_Looping_Anim:
+			Object->OpenTrigMod = -1;
+			Object->CloseTrigMod = -1;
+			Object->OpenTrigModPtr = nullptr;
+			Object->CloseTrigModPtr = nullptr;
+			Object->ShotTrigMod = ShotTrigMod;
+			Object->BumpTrigMod = BumpTrigMod;
+			Object->EndTrigMod = EndTrigMod;
+			if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
+			else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
+			if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
+			else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
+			if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
+			else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
+			Object->GenType = GenType;
+			Object->Delay = ( Delay * ANIM_SECOND );
+
+			switch( GenType )
+			{
+			case BGOGENTYPE_Immediate:
+				Object->State = LOOPANIM_Animating;
 				break;
-
-/*	DOOR */
-
-			case BGOTYPE_Door:
-				Object->OpenTrigMod = OpenTrigMod;
-				Object->CloseTrigMod = CloseTrigMod;
-				if( OpenTrigMod == -1 ) Object->OpenTrigModPtr = nullptr;
-				else Object->OpenTrigModPtr = &TrigMods[ OpenTrigMod ];
-				if( CloseTrigMod == -1 ) Object->CloseTrigModPtr = nullptr;
-				else Object->CloseTrigModPtr = &TrigMods[ CloseTrigMod ];
-				Object->ShotTrigMod = ShotTrigMod;
-				Object->BumpTrigMod = BumpTrigMod;
-				Object->Locked = Locked;
-				Object->PickupNeeded = PickupNeeded;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
-				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
-				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
-				Object->EndTrigMod = -1;
-				Object->EndTrigModPtr = nullptr;
-				Object->OpenedBy = OpenedBy;
-				Object->DoorSfxType = DoorSfxType;
+			case BGOGENTYPE_AfterTime:
+				Object->State = LOOPANIM_WaitForDelay;
 				break;
-
-/*	LOOPING ANIM */
-
-			case BGOTYPE_Looping_Anim:
-				Object->OpenTrigMod = -1;
-				Object->CloseTrigMod = -1;
-				Object->OpenTrigModPtr = nullptr;
-				Object->CloseTrigModPtr = nullptr;
-				Object->ShotTrigMod = ShotTrigMod;
-				Object->BumpTrigMod = BumpTrigMod;
-				Object->EndTrigMod = EndTrigMod;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
-				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
-				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
-				if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
-				else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
-				Object->GenType = GenType;
-				Object->Delay = ( Delay * ANIM_SECOND );
-
-				switch( GenType )
-				{
-					case BGOGENTYPE_Immediate:
-						Object->State = LOOPANIM_Animating;
-						break;
-					case BGOGENTYPE_AfterTime:
-						Object->State = LOOPANIM_WaitForDelay;
-						break;
-					case BGOGENTYPE_Triggered:
-						Object->State = LOOPANIM_WaitForTrigger;
-						break;
-				}
+			case BGOGENTYPE_Triggered:
+				Object->State = LOOPANIM_WaitForTrigger;
 				break;
+			}
+			break;
 
-/*	ONEOFF ANIM */
+			/*	ONEOFF ANIM */
 
-			case BGOTYPE_OneOff_Anim:
-				Object->OpenTrigMod = -1;
-				Object->CloseTrigMod = -1;
-				Object->OpenTrigModPtr = nullptr;
-				Object->CloseTrigModPtr = nullptr;
-				Object->ShotTrigMod = ShotTrigMod;
-				Object->BumpTrigMod = BumpTrigMod;
-				Object->EndTrigMod = EndTrigMod;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
-				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
-				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
-				if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
-				else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
-				Object->GenType = GenType;
-				Object->Delay = ( Delay * ANIM_SECOND );
-				Object->DestroyAtEnd = DestroyAtEnd;
+		case BGOTYPE_OneOff_Anim:
+			Object->OpenTrigMod = -1;
+			Object->CloseTrigMod = -1;
+			Object->OpenTrigModPtr = nullptr;
+			Object->CloseTrigModPtr = nullptr;
+			Object->ShotTrigMod = ShotTrigMod;
+			Object->BumpTrigMod = BumpTrigMod;
+			Object->EndTrigMod = EndTrigMod;
+			if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
+			else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
+			if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
+			else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
+			if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
+			else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
+			Object->GenType = GenType;
+			Object->Delay = ( Delay * ANIM_SECOND );
+			Object->DestroyAtEnd = DestroyAtEnd;
 
-				switch( GenType )
-				{
-					case BGOGENTYPE_Immediate:
-						Object->State = ONEOFFANIM_Animating;
-						break;
-					case BGOGENTYPE_AfterTime:
-						Object->State = ONEOFFANIM_WaitForDelay;
-						break;
-					case BGOGENTYPE_Triggered:
-						Object->State = ONEOFFANIM_WaitForTrigger;
-						break;
-				}
+			switch( GenType )
+			{
+			case BGOGENTYPE_Immediate:
+				Object->State = ONEOFFANIM_Animating;
 				break;
-
-/*	MULTISTEP ANIM */
-
-			case BGOTYPE_MultipleStep_Anim:
-				Object->OpenTrigMod = -1;
-				Object->CloseTrigMod = -1;
-				Object->OpenTrigModPtr = nullptr;
-				Object->CloseTrigModPtr = nullptr;
-				Object->ShotTrigMod = ShotTrigMod;
-				Object->BumpTrigMod = BumpTrigMod;
-				Object->EndTrigMod = EndTrigMod;
-				if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
-				else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
-				if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
-				else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
-				if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
-				else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
-				Object->DestroyAtEnd = DestroyAtEnd;
-				Object->OpenedBy = OpenedBy;
+			case BGOGENTYPE_AfterTime:
+				Object->State = ONEOFFANIM_WaitForDelay;
 				break;
-
-/*	SEQUENCES ANIM */
-
-			case BGOTYPE_Sequences:
+			case BGOGENTYPE_Triggered:
+				Object->State = ONEOFFANIM_WaitForTrigger;
 				break;
+			}
+			break;
 
-/*	UNKNOWN ANIM */
+			/*	MULTISTEP ANIM */
 
-			default:
-				break;
+		case BGOTYPE_MultipleStep_Anim:
+			Object->OpenTrigMod = -1;
+			Object->CloseTrigMod = -1;
+			Object->OpenTrigModPtr = nullptr;
+			Object->CloseTrigModPtr = nullptr;
+			Object->ShotTrigMod = ShotTrigMod;
+			Object->BumpTrigMod = BumpTrigMod;
+			Object->EndTrigMod = EndTrigMod;
+			if( ShotTrigMod == -1 ) Object->ShotTrigModPtr = nullptr;
+			else Object->ShotTrigModPtr = &TrigMods[ ShotTrigMod ];
+			if( BumpTrigMod == -1 ) Object->BumpTrigModPtr = nullptr;
+			else Object->BumpTrigModPtr = &TrigMods[ BumpTrigMod ];
+			if( EndTrigMod == -1 ) Object->EndTrigModPtr = nullptr;
+			else Object->EndTrigModPtr = &TrigMods[ EndTrigMod ];
+			Object->DestroyAtEnd = DestroyAtEnd;
+			Object->OpenedBy = OpenedBy;
+			break;
+
+			/*	SEQUENCES ANIM */
+
+		case BGOTYPE_Sequences:
+			break;
+
+			/*	UNKNOWN ANIM */
+
+		default:
+			break;
 		}
 
 		Object->Type = Type;
@@ -1589,18 +1589,18 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 
 		switch( Type )
 		{
-			case BGOTYPE_MultipleStep_Anim:
-				Object->StepInterval = ( Object->OverallTime / NumIntervals );
-				Object->TimePerDamageUnit = ( Object->StepInterval / DamagePerInterval );
-				break;
+		case BGOTYPE_MultipleStep_Anim:
+			Object->StepInterval = ( Object->OverallTime / NumIntervals );
+			Object->TimePerDamageUnit = ( Object->StepInterval / DamagePerInterval );
+			break;
 
-			case BGOTYPE_Static:
-			case BGOTYPE_Door:
-			case BGOTYPE_Looping_Anim:
-			case BGOTYPE_OneOff_Anim:
-			case BGOTYPE_Sequences:
-			default:
-				break;
+		case BGOTYPE_Static:
+		case BGOTYPE_Door:
+		case BGOTYPE_Looping_Anim:
+		case BGOTYPE_OneOff_Anim:
+		case BGOTYPE_Sequences:
+		default:
+			break;
 		}
 
 	}
@@ -1631,15 +1631,15 @@ void UpdateBGObject( u_int16_t BGObject, int16_t State, float Time )
 
 	switch( State )
 	{
-		case DOOR_OPENING:
-			if( OldState != State )
-			{
-				StartOrChangeDoorSoundFX( &BGObjects[ BGObject ] );
-			}
-			break;
+	case DOOR_OPENING:
+		if( OldState != State )
+		{
+			StartOrChangeDoorSoundFX( &BGObjects[ BGObject ] );
+		}
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
@@ -1698,88 +1698,88 @@ void StartBGOAnim( u_int16_t Index )
 
 	switch( Object->Type )
 	{
-/*	STATIC ANIM */
+		/*	STATIC ANIM */
 
-		case BGOTYPE_Static:
+	case BGOTYPE_Static:
+		break;
+
+		/*	DOOR */
+
+	case BGOTYPE_Door:
+		break;
+
+		/*	LOOPING ANIM */
+
+	case BGOTYPE_Looping_Anim:
+		switch( Object->State )
+		{
+		case LOOPANIM_WaitForDelay:
+			Object->State = LOOPANIM_Animating;
+			Object->Delay = 0.0F;
 			break;
 
-/*	DOOR */
-
-		case BGOTYPE_Door:
-			break;
-
-/*	LOOPING ANIM */
-
-		case BGOTYPE_Looping_Anim:
-			switch( Object->State )
+		case LOOPANIM_WaitForTrigger:
+			if( Object->Delay )
 			{
-				case LOOPANIM_WaitForDelay:
-					Object->State = LOOPANIM_Animating;
-					Object->Delay = 0.0F;
-					break;
-
-				case LOOPANIM_WaitForTrigger:
-					if( Object->Delay )
-					{
-						Object->State = LOOPANIM_WaitForDelay;
-					}
-					else
-					{
-						Object->State = LOOPANIM_Animating;
-						Object->Time = 0.0F;
-					}
-					break;
-
-				case LOOPANIM_Animating:
-				default:
-					break;
+				Object->State = LOOPANIM_WaitForDelay;
+			}
+			else
+			{
+				Object->State = LOOPANIM_Animating;
+				Object->Time = 0.0F;
 			}
 			break;
 
-/*	ONEOFF ANIM */
+		case LOOPANIM_Animating:
+		default:
+			break;
+		}
+		break;
 
-		case BGOTYPE_OneOff_Anim:
-			switch( Object->State )
+		/*	ONEOFF ANIM */
+
+	case BGOTYPE_OneOff_Anim:
+		switch( Object->State )
+		{
+		case ONEOFFANIM_WaitForDelay:
+			Object->State = ONEOFFANIM_Animating;
+			Object->Delay = 0.0F;
+			break;
+
+		case ONEOFFANIM_WaitForTrigger:
+			if( Object->Delay )
 			{
-				case ONEOFFANIM_WaitForDelay:
-					Object->State = ONEOFFANIM_Animating;
-					Object->Delay = 0.0F;
-					break;
-
-				case ONEOFFANIM_WaitForTrigger:
-					if( Object->Delay )
-					{
-						Object->State = ONEOFFANIM_WaitForDelay;
-					}
-					else
-					{
-						Object->State = ONEOFFANIM_Animating;
-						Object->Time = 0.0F;
-					}
-					break;
-
-				case ONEOFFANIM_Animating:
-					break;
-
-				default:
-					break;
+				Object->State = ONEOFFANIM_WaitForDelay;
+			}
+			else
+			{
+				Object->State = ONEOFFANIM_Animating;
+				Object->Time = 0.0F;
 			}
 			break;
 
-/*	MULTISTEP ANIM */
-
-		case BGOTYPE_MultipleStep_Anim:
+		case ONEOFFANIM_Animating:
 			break;
-
-/*	SEQUENCES ANIM */
-
-		case BGOTYPE_Sequences:
-			break;
-
-/*	UNKNOWN ANIM */
 
 		default:
 			break;
+		}
+		break;
+
+		/*	MULTISTEP ANIM */
+
+	case BGOTYPE_MultipleStep_Anim:
+		break;
+
+		/*	SEQUENCES ANIM */
+
+	case BGOTYPE_Sequences:
+		break;
+
+		/*	UNKNOWN ANIM */
+
+	default:
+		break;
 	}
 }
 
@@ -1796,42 +1796,42 @@ void StopBGOAnim( u_int16_t Index )
 
 	switch( Object->Type )
 	{
-		case BGOTYPE_Looping_Anim:
-			switch( Object->State )
-			{
-				case LOOPANIM_Animating:
-					Object->State = LOOPANIM_WaitForTrigger;
-					break;
-
-				case LOOPANIM_WaitForDelay:
-				case LOOPANIM_WaitForTrigger:
-				default:
-					break;
-			}
+	case BGOTYPE_Looping_Anim:
+		switch( Object->State )
+		{
+		case LOOPANIM_Animating:
+			Object->State = LOOPANIM_WaitForTrigger;
 			break;
 
-		case BGOTYPE_OneOff_Anim:
-			switch( Object->State )
-			{
-				case ONEOFFANIM_Animating:
-					Object->State = ONEOFFANIM_WaitForTrigger;
-					break;
-
-				case ONEOFFANIM_WaitForDelay:
-				case ONEOFFANIM_WaitForTrigger:
-				default:
-					break;
-			}
-			break;
-
-		case BGOTYPE_Sequences:
-			break;
-
-		case BGOTYPE_Static:
-		case BGOTYPE_Door:
-		case BGOTYPE_MultipleStep_Anim:
+		case LOOPANIM_WaitForDelay:
+		case LOOPANIM_WaitForTrigger:
 		default:
 			break;
+		}
+		break;
+
+	case BGOTYPE_OneOff_Anim:
+		switch( Object->State )
+		{
+		case ONEOFFANIM_Animating:
+			Object->State = ONEOFFANIM_WaitForTrigger;
+			break;
+
+		case ONEOFFANIM_WaitForDelay:
+		case ONEOFFANIM_WaitForTrigger:
+		default:
+			break;
+		}
+		break;
+
+	case BGOTYPE_Sequences:
+		break;
+
+	case BGOTYPE_Static:
+	case BGOTYPE_Door:
+	case BGOTYPE_MultipleStep_Anim:
+	default:
+		break;
 	}
 }
 
@@ -1850,22 +1850,22 @@ void OpenDoor( u_int16_t Index )
 
 	switch( Object->State )
 	{
-		case DOOR_CLOSED:
-			Object->State = DOOR_OPENING;
-			break;
+	case DOOR_CLOSED:
+		Object->State = DOOR_OPENING;
+		break;
 
-		case DOOR_OPEN:
-			break;
+	case DOOR_OPEN:
+		break;
 
-		case DOOR_OPENING:
-			break;
+	case DOOR_OPENING:
+		break;
 
-		case DOOR_CLOSING:
-			Object->State = DOOR_REVERSECLOSING;
-			break;
+	case DOOR_CLOSING:
+		Object->State = DOOR_REVERSECLOSING;
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
@@ -1882,22 +1882,22 @@ void CloseDoor( u_int16_t Index )
 
 	switch( Object->State )
 	{
-		case DOOR_CLOSED:
-			break;
+	case DOOR_CLOSED:
+		break;
 
-		case DOOR_OPEN:
-			Object->State = DOOR_CLOSING;
-			break;
+	case DOOR_OPEN:
+		Object->State = DOOR_CLOSING;
+		break;
 
-		case DOOR_OPENING:
-			Object->State = DOOR_REVERSEOPENING;
-			break;
+	case DOOR_OPENING:
+		Object->State = DOOR_REVERSEOPENING;
+		break;
 
-		case DOOR_CLOSING:
-			break;
+	case DOOR_CLOSING:
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
@@ -1996,7 +1996,7 @@ void UpdateBGObjectsClipGroup( CAMERA * Camera )
 		if( IsGroupVisible[ Object->Group ] || (CAMERA_VIEW_IS_VALID && (
 				IsGroupVisible[ Ships[ Current_Camera_View ].Object.Group ] ||
 				VisibleOverlap( Ships[ Current_Camera_View ].Object.Group, Object->Group, nullptr )
-		)))
+			)))
 		{
 			ClipGroup = FindClipGroup( Camera, &Mloadheader, &Object->TopLeft, &Object->BottomRight );
 			UpdateCompObjClipGroup( Object->Children, Object->NumChildren, ClipGroup );
@@ -2119,28 +2119,28 @@ bool CheckBGObjectToEnemies( BGOBJECT * Object )
 					else
 #endif
 					{
-					HitFlag = true;
+						HitFlag = true;
 
-					{
-						if( Damage != 0.0F )
 						{
-							Enemy->Object.Shield -= Damage;
-							if( Enemy->Object.Shield < 0 ) Enemy->Object.Shield = 0;
-							if( Enemy->Object.Shield == 0 )
+							if( Damage != 0.0F )
 							{
-								CreateNewExplosion( &Enemy->Object.Pos, &PushVector, CurrentGroup );
-								KillUsedEnemy( Enemy );
-							}
-							else
-							{
-								CreateColSparks( &Enemy->Object.Pos, &PushVector, CurrentGroup );
+								Enemy->Object.Shield -= Damage;
+								if( Enemy->Object.Shield < 0 ) Enemy->Object.Shield = 0;
+								if( Enemy->Object.Shield == 0 )
+								{
+									CreateNewExplosion( &Enemy->Object.Pos, &PushVector, CurrentGroup );
+									KillUsedEnemy( Enemy );
+								}
+								else
+								{
+									CreateColSparks( &Enemy->Object.Pos, &PushVector, CurrentGroup );
+								}
 							}
 						}
-					}
 
-					Enemy->Object.ExternalForce.x += PushVector.x;
-					Enemy->Object.ExternalForce.y += PushVector.y;
-					Enemy->Object.ExternalForce.z += PushVector.z;
+						Enemy->Object.ExternalForce.x += PushVector.x;
+						Enemy->Object.ExternalForce.y += PushVector.y;
+						Enemy->Object.ExternalForce.z += PushVector.z;
 					}
 				}
 			}
@@ -2260,17 +2260,17 @@ bool CheckBGObjectToMines( BGOBJECT * Object )
 
 			switch( SecBull->SecType )
 			{
-				case SEC_MINE:
-					if( CheckBGObjectCollision( &SecBull->Pos, Object, &PushVector, &Damage, MINE_RADIUS ) )
-					{
-						DestroySecondary( SecBull->Index, &SecBull->Pos );
-					}
-					break;
+			case SEC_MINE:
+				if( CheckBGObjectCollision( &SecBull->Pos, Object, &PushVector, &Damage, MINE_RADIUS ) )
+				{
+					DestroySecondary( SecBull->Index, &SecBull->Pos );
+				}
+				break;
 
-				case SEC_MISSILE:
-				case SEC_XMISSILE:
-				default:
-					break;
+			case SEC_MISSILE:
+			case SEC_XMISSILE:
+			default:
+				break;
 			}
 
 			SecBull = NextSecBull;
@@ -2776,40 +2776,40 @@ void StartOrChangeDoorSoundFX( BGOBJECT * Object )
 
 	switch( Object->State )
 	{
-		case DOOR_CLOSED:
-			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartClosedSoundFX;
-			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosedSoundFX;
-			break;
+	case DOOR_CLOSED:
+		Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartClosedSoundFX;
+		Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosedSoundFX;
+		break;
 
-		case DOOR_OPEN:
-			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartOpenSoundFX;
-			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpenSoundFX;
-			break;
+	case DOOR_OPEN:
+		Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartOpenSoundFX;
+		Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpenSoundFX;
+		break;
 
-		case DOOR_OPENING:
-			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartOpeningSoundFX;
-			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpeningSoundFX;
-			break;
+	case DOOR_OPENING:
+		Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartOpeningSoundFX;
+		Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpeningSoundFX;
+		break;
 
-		case DOOR_CLOSING:
-			Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartClosingSoundFX;
-			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosingSoundFX;
-			break;
+	case DOOR_CLOSING:
+		Sfx1 = DoorTypeSFX[ Object->DoorSfxType ].StartClosingSoundFX;
+		Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosingSoundFX;
+		break;
 
-		case DOOR_REVERSEOPENING:
-			Sfx1 = -1;
-			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosingSoundFX;
-			break;
+	case DOOR_REVERSEOPENING:
+		Sfx1 = -1;
+		Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].ClosingSoundFX;
+		break;
 
-		case DOOR_REVERSECLOSING:
-			Sfx1 = -1;
-			Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpeningSoundFX;
-			break;
+	case DOOR_REVERSECLOSING:
+		Sfx1 = -1;
+		Sfx2 = DoorTypeSFX[ Object->DoorSfxType ].OpeningSoundFX;
+		break;
 
-		default:
-			Sfx1 = -1;
-			Sfx2 = -1;
-			break;
+	default:
+		Sfx1 = -1;
+		Sfx2 = -1;
+		break;
 	}
 
 	if( Sfx1 != -1 )

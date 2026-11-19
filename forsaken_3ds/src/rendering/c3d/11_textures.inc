@@ -254,14 +254,14 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path,
 			for (x = 0; x < nw; x++)
 			{
 				int si = (y * 2 * image.w + x * 2) * 4;
-				for (c = 0; c < 4; c++)
-					nd[(y * nw + x) * 4 + c] = (
-						(u_int8_t)image.data[si + c] +
-						(u_int8_t)image.data[si + 4 + c] +
-						(u_int8_t)image.data[si + image.w * 4 + c] +
-						(u_int8_t)image.data[si + image.w * 4 + 4 + c]
+			for (c = 0; c < 4; c++)
+				nd[(y * nw + x) * 4 + c] = (
+					(u_int8_t)image.data[si + c] +
+					(u_int8_t)image.data[si + 4 + c] +
+					(u_int8_t)image.data[si + image.w * 4 + c] +
+					(u_int8_t)image.data[si + image.w * 4 + 4 + c]
 					) / 4;
-			}
+		}
 		free(image.data);
 		image.data = nd;
 		image.w = nw;
@@ -280,18 +280,18 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path,
 			for (x = 0; x < image.w; x++)
 			{
 				DWORD idx = y * pitch + x * 4;
-				/* Colourkey: pure black (0,0,0) → alpha=0 for transparency.
-				 * Check BEFORE gamma because gamma_table clamps 0→1,
-				 * turning (0,0,0) into (1,1,1) and breaking R+G+B==0. */
-				bool is_colorkey = (((u_int8_t)image.data[idx] + (u_int8_t)image.data[idx+1] + (u_int8_t)image.data[idx+2]) == 0);
-				image.data[idx]   = (char)gamma_table[(u_int8_t)image.data[idx]];
-				image.data[idx+1] = (char)gamma_table[(u_int8_t)image.data[idx+1]];
-				image.data[idx+2] = (char)gamma_table[(u_int8_t)image.data[idx+2]];
-				if (is_colorkey)
-					image.data[idx+3] = 0;
-				else
-					image.data[idx+3] = (char)gamma_table[(u_int8_t)image.data[idx+3]];
-			}
+			/* Colourkey: pure black (0,0,0) → alpha=0 for transparency.
+			 * Check BEFORE gamma because gamma_table clamps 0→1,
+			 * turning (0,0,0) into (1,1,1) and breaking R+G+B==0. */
+			bool is_colorkey = (((u_int8_t)image.data[idx] + (u_int8_t)image.data[idx+1] + (u_int8_t)image.data[idx+2]) == 0);
+			image.data[idx]   = (char)gamma_table[(u_int8_t)image.data[idx]];
+			image.data[idx+1] = (char)gamma_table[(u_int8_t)image.data[idx+1]];
+			image.data[idx+2] = (char)gamma_table[(u_int8_t)image.data[idx+2]];
+			if (is_colorkey)
+				image.data[idx+3] = 0;
+			else
+				image.data[idx+3] = (char)gamma_table[(u_int8_t)image.data[idx+3]];
+		}
 	}
 
 	{
@@ -342,7 +342,7 @@ static bool create_texture(TEXTURE_HANDLE *t, const char *path,
 
 		texdata->initialized   = true;
 		texdata->material_class = classify_texture(path);
-	texdata->proctex_phase  = proctex_phase_from_path(path);
+		texdata->proctex_phase  = proctex_phase_from_path(path);
 		*t = (TEXTURE_HANDLE)texdata;
 	}
 

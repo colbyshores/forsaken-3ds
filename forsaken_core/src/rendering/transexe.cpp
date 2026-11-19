@@ -97,35 +97,35 @@ void ExecuteTransExe( u_int16_t group )
 
 				switch( Models[ Model ].Func )
 				{
-					case MODFUNC_Explode:
-						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
-						break;
+				case MODFUNC_Explode:
+					ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
+					break;
 
-					case MODFUNC_Regen:
-						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
-						break;
-					case MODFUNC_Scale:
-					case MODFUNC_Scale2:
-						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
-						break;
+				case MODFUNC_Regen:
+					ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
+					break;
+				case MODFUNC_Scale:
+				case MODFUNC_Scale2:
+					ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
+					break;
 
-					case MODFUNC_SphereZone:
-						ProcessSphereZoneModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
-						break;
+				case MODFUNC_SphereZone:
+					ProcessSphereZoneModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
+					break;
 
-					case MODFUNC_OrbitPulsar:
-						if( ( Ships[ Models[ Model ].Ship ].Object.Flags & SHIP_Stealth ) )
-						{
-							if( !LightModel( Model, &Models[ Model ].Pos ) ) Display = false;
-						}
-						break;
+				case MODFUNC_OrbitPulsar:
+					if( ( Ships[ Models[ Model ].Ship ].Object.Flags & SHIP_Stealth ) )
+					{
+						if( !LightModel( Model, &Models[ Model ].Pos ) ) Display = false;
+					}
+					break;
 
-					case MODFUNC_ScaleDonut:
-						break;
+				case MODFUNC_ScaleDonut:
+					break;
 
-					case MODFUNC_Nothing:
-					default:
-						break;
+				case MODFUNC_Nothing:
+				default:
+					break;
 				}
 			}
 
@@ -199,35 +199,35 @@ void ExecuteTransExeUnclipped( u_int16_t group )
 
 				switch( Models[ Model ].Func )
 				{
-					case MODFUNC_Explode:
-						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
-						break;
-					case MODFUNC_Regen:
-						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
-						break;
+				case MODFUNC_Explode:
+					ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 1, 0, 0 );
+					break;
+				case MODFUNC_Regen:
+					ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 1, 0 );
+					break;
 
-					case MODFUNC_Scale:
-					case MODFUNC_Scale2:
-						ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
-						break;
+				case MODFUNC_Scale:
+				case MODFUNC_Scale2:
+					ProcessModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, Models[ Model ].Scale, Models[ Model ].MaxScale, 0, 0, 1 );
+					break;
 
-					case MODFUNC_SphereZone:
-						ProcessSphereZoneModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
-						break;
+				case MODFUNC_SphereZone:
+					ProcessSphereZoneModelExec( &TransExe[i].renderObject, TransExe[i].NumVerts, (u_int8_t) Models[ Model ].Red, (u_int8_t) Models[ Model ].Green, (u_int8_t) Models[ Model ].Blue );
+					break;
 
-					case MODFUNC_OrbitPulsar:
-						if( ( Ships[ Models[ Model ].Ship ].Object.Flags & SHIP_Stealth ) )
-						{
-							if( !LightModel( Model, &Models[ Model ].Pos ) ) Display = false;
-						}
-						break;
+				case MODFUNC_OrbitPulsar:
+					if( ( Ships[ Models[ Model ].Ship ].Object.Flags & SHIP_Stealth ) )
+					{
+						if( !LightModel( Model, &Models[ Model ].Pos ) ) Display = false;
+					}
+					break;
 
-					case MODFUNC_ScaleDonut:
-						break;
+				case MODFUNC_ScaleDonut:
+					break;
 
-					case MODFUNC_Nothing:
-					default:
-						break;
+				case MODFUNC_Nothing:
+				default:
+					break;
 				}
 			}
 			else

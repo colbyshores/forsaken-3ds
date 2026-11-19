@@ -168,14 +168,14 @@ void QUATLERP::Step()
 
 	beta   =	( 1.0F - alpha );
 
-/*===================================================================
-	Check which direction we are going around hypersphere ...
-===================================================================*/
+	/*===================================================================
+		Check which direction we are going around hypersphere ...
+	===================================================================*/
 	if ( dir < 0.0F ) alpha = -alpha;
 
-/*===================================================================
-	Interpolate ...
-===================================================================*/
+	/*===================================================================
+		Interpolate ...
+	===================================================================*/
 
 	result->x = ( ( beta * start->x ) ) + ( ( alpha * end->x ) );
 	result->y = ( ( beta * start->y ) ) + ( ( alpha * end->y ) );
@@ -195,28 +195,28 @@ void QUAT::FromVector( VECTOR * Tv )
 	float	angle;
 	VECTOR	Av;
 
-/*===================================================================
-	Normalise TARGET Vector
-===================================================================*/
+	/*===================================================================
+		Normalise TARGET Vector
+	===================================================================*/
 	NormaliseVector( Tv );
 
-/*===================================================================
-	Create AXIS vector
-===================================================================*/
+	/*===================================================================
+		Create AXIS vector
+	===================================================================*/
 	Av.x = Tv->y;
 	Av.y = -Tv->x;
 	Av.z = 0.0F;
 	NormaliseVector( &Av );
 
-/*===================================================================
-	Calculate ANGLE between TARGET and LOOK vectors
-===================================================================*/
+	/*===================================================================
+		Calculate ANGLE between TARGET and LOOK vectors
+	===================================================================*/
 	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	angle = (float) ( acosf( Tv->z ) / 2 );
 
-/*===================================================================
-	Finally build TARGET QUATERNION
-===================================================================*/
+	/*===================================================================
+		Finally build TARGET QUATERNION
+	===================================================================*/
 	x = (float) ( fast_sinf( angle ) * Av.x );
 	y = (float) ( fast_sinf( angle ) * Av.y );
 	z = 0.0F;
@@ -235,28 +235,28 @@ void QUAT::FromVector2( VECTOR * Tv )
 	float	angle;
 	VECTOR	Av;
 
-/*===================================================================
-	Normalise TARGET Vector
-===================================================================*/
+	/*===================================================================
+		Normalise TARGET Vector
+	===================================================================*/
 	NormaliseVector( Tv );
 
-/*===================================================================
-	Create AXIS vector
-===================================================================*/
+	/*===================================================================
+		Create AXIS vector
+	===================================================================*/
 	Av.x = Tv->y;
 	Av.y = -Tv->x;
 	Av.z = 0.0F;
 	NormaliseVector( &Av );
 
-/*===================================================================
-	Calculate ANGLE between TARGET and LOOK vectors
-===================================================================*/
+	/*===================================================================
+		Calculate ANGLE between TARGET and LOOK vectors
+	===================================================================*/
 	/* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
 	angle = (float) ( acosf( -Tv->z ) / 2 );
 
-/*===================================================================
-	Finally build TARGET QUATERNION
-===================================================================*/
+	/*===================================================================
+		Finally build TARGET QUATERNION
+	===================================================================*/
 	x = (float) ( fast_sinf( angle ) * Av.x );
 	y = (float) ( fast_sinf( angle ) * Av.y );
 	z = 0.0F;
@@ -280,9 +280,9 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 	float	theta;				     /* angle of rotation about axis */
 	float	theta_complement;
 	float	crossProductMagnitude;
-/*
-** Normalize both vectors and take cross product to get rotation axis.
-*/
+	/*
+	** Normalize both vectors and take cross product to get rotation axis.
+	*/
 	u1 = *v1;
 	u2 = *v2;
 
@@ -290,40 +290,40 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 	NormaliseVector( &u2 );
 
 	CrossProduct( &u1 , &u2, &axis );
-/*
-** | u1 X u2 | = |u1||u2|fast_sinf(theta)
-**
-** Since u1 and u2 are normalized,
-**
-**  theta = arcsin(|axis|)
-*/
+	/*
+	** | u1 X u2 | = |u1||u2|fast_sinf(theta)
+	**
+	** Since u1 and u2 are normalized,
+	**
+	**  theta = arcsin(|axis|)
+	*/
 	crossProductMagnitude = (float) sqrtf( DotProduct( &axis , &axis ) );
 
-/*
-** Occasionally, even though the vectors are normalized, the magnitude will
-** be calculated to be slightly greater than one.  If this happens, just
-** set it to 1 or asinf() will barf.
-*/
+	/*
+	** Occasionally, even though the vectors are normalized, the magnitude will
+	** be calculated to be slightly greater than one.  If this happens, just
+	** set it to 1 or asinf() will barf.
+	*/
 	if( crossProductMagnitude > 1.0F )
-	   crossProductMagnitude = 1.0F;
-/*
-** Take arcsin of magnitude of rotation axis to compute rotation angle.
-** Since crossProductMagnitude=[0,1], we will have theta=[0,pi/2].
-*/
+		crossProductMagnitude = 1.0F;
+	/*
+	** Take arcsin of magnitude of rotation axis to compute rotation angle.
+	** Since crossProductMagnitude=[0,1], we will have theta=[0,pi/2].
+	*/
 	/* @vfp-exempt R6 — asinf has no LUT form; quaternion build from vector
 	 * pair, fidelity-sensitive orientation math. measured n/a. Verified 2026-10-25. */
 	theta = (float) asinf( crossProductMagnitude );
 	theta_complement = PI - theta;
-/*
-** If fast_cosf(theta) < 0, use complement of theta as rotation angle.
-*/
+	/*
+	** If fast_cosf(theta) < 0, use complement of theta as rotation angle.
+	*/
 	if( DotProduct( &u1 , &u2 ) < 0.0F )
 	{
 		theta = theta_complement;
 		theta_complement = PI - theta;
 	}
 
-/* if angle is 0, just return identity quaternion   */
+	/* if angle is 0, just return identity quaternion   */
 	if( theta < EPS )
 	{
 		x = 0.0F;
@@ -353,7 +353,7 @@ void QUAT::From2Vectors( const VECTOR * v1, const VECTOR * v2 )
 		NormaliseVector( &axis );
 		MakeAxis( axis.x, axis.y, axis.z, theta ) ;
 		Normalise();
-   }
+	}
 }
 
 

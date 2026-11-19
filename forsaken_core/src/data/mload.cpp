@@ -560,9 +560,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			return false; // error if not in new recursive group/portal visibility tree format
 		}
 
-/*===================================================================
- *		Particular Stuff Related To Visiploys
-===================================================================*/
+		/*===================================================================
+		 *		Particular Stuff Related To Visiploys
+		===================================================================*/
 		for( group=0 ; group<Mloadheader->num_groups; group++)
 		{
 			/*	copy over the groups Name	*/
@@ -671,17 +671,17 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 					Mloadheader->Group[group].Portal[portal].visible.visible = nullptr;
 			}
 		}
-/*===================================================================
- *		End Of Visiploy Stuff
-===================================================================*/
+		/*===================================================================
+		 *		End Of Visiploy Stuff
+		===================================================================*/
 
 		if ( !ReadGroupConnections( Mloadheader, in ) )
 			return false;
 		ReadSoundInfo( Mloadheader, in );
 
-/*===================================================================
- *		Start of Cell Index Stuff
-===================================================================*/
+		/*===================================================================
+		 *		Start of Cell Index Stuff
+		===================================================================*/
 		// is there any cell index info..... (a zero here is not consumed: it
 		// is read again below as the start position count)
 		if ( in.peek_u16() != 0)
@@ -731,9 +731,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 
 		}
-/*===================================================================
- *		Start of Start Pos Stuff
-===================================================================*/
+		/*===================================================================
+		 *		Start of Start Pos Stuff
+		===================================================================*/
 		num_start_positions = in.u16();
 
 		for( i = 0 ; i < MAXGROUPS ; i++ )
@@ -760,9 +760,9 @@ bool Mload( char * Filename, MLOADHEADER * Mloadheader  )
 			}
 		}
 
-/*===================================================================
- *		Start of group up vector Stuff
-===================================================================*/
+		/*===================================================================
+		 *		Start of group up vector Stuff
+		===================================================================*/
 		// is there any up vector info..... (a zero here is not consumed: it is
 		// read again below as the animation count)
 		if ( in.peek_u16() != 0)
@@ -1006,7 +1006,7 @@ bool ExecuteSingleGroupMloadHeader( MLOADHEADER * Mloadheader, u_int16_t group  
 					INDEX_NONE,
 					(u_int16_t) group,
 					Mloadheader->Group[ group ].num_verts_per_mesh[i]
-				);
+					);
 			}
 			else
 			{
@@ -1062,7 +1062,7 @@ ReleaseMloadheader( MLOADHEADER * Mloadheader )
 	c3d_release_level_cache();
 #endif
 
-		for (group = 0; group < Mloadheader->num_groups; group++)
+	for (group = 0; group < Mloadheader->num_groups; group++)
 	{
 		for ( i = 0; i < Mloadheader->Group[ group ].num_portals; i++ )
 		{

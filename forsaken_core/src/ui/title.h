@@ -59,12 +59,12 @@ constexpr int DIFF_Vhard = 3;
 // order of this list must match GameTypeNameTable
 constexpr int MAX_GAMETYPE = 5;
 enum game_t {
-GAME_Normal,			// 0 free for all
-GAME_FlagChase,			// 1
-GAME_BountyHunt,		// 2
-GAME_TeamBountyHunt,	// 3
-GAME_Team,				// 4
-GAME_CTF,				// 5
+	GAME_Normal,			// 0 free for all
+	GAME_FlagChase,			// 1
+	GAME_BountyHunt,		// 2
+	GAME_TeamBountyHunt,	// 3
+	GAME_Team,				// 4
+	GAME_CTF,				// 5
 };
 
 /* How the single-player campaign ended, which picks the end sequence. */
@@ -199,7 +199,7 @@ constexpr int TEXTFLAG_SuppressHighlight = 512; // prevent highlight box from ap
 constexpr int TEXTFLAG_Unselectable = 1024; // do not allow this item to be selected
 constexpr int TEXTFLAG_CheckForRefresh = 2048; // this text item may change - refresh if neccesary
 constexpr int TEXTFLAG_ManualListHighlight = 4096; // I want to specify how a list is highlighted manually
-											// ( default is pulsing when active, static when not active )
+// ( default is pulsing when active, static when not active )
 constexpr int TEXTFLAG_CentreYBunched = 8192; // text is bunched up in centre of bounding box
 constexpr int TEXTFLAG_Pulse = 16384; // pulse text on and off
 constexpr int TEXTFLAG_TeamItem = 32768; // team select item

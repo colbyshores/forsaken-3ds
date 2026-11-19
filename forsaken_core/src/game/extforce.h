@@ -27,23 +27,23 @@ constexpr int EXTERNALFORCETYPE_Shake = 2;
  * Structures
  */
 struct EXTERNALFORCE{
-		u_int16_t	Status;
-		u_int16_t	ForceType;
-		u_int16_t	Group;
-		VECTOR	Origin;
-		VECTOR	Pos;
-		VECTOR	Dir;
-		VECTOR	Up;
-		float	MaxForce;
-		float	MinForce;
-		float	Width;
-		float	Height;
-		float	Range;
-		u_int16_t	Type;				// sphere / box / convex hull
-		VECTOR	half_size;
-		TRIGGER_ZONE	*Zone;
-		u_int16_t	num_sides;
-struct	EXTERNALFORCE * NextInGroup;
+	u_int16_t	Status;
+	u_int16_t	ForceType;
+	u_int16_t	Group;
+	VECTOR	Origin;
+	VECTOR	Pos;
+	VECTOR	Dir;
+	VECTOR	Up;
+	float	MaxForce;
+	float	MinForce;
+	float	Width;
+	float	Height;
+	float	Range;
+	u_int16_t	Type;				// sphere / box / convex hull
+	VECTOR	half_size;
+	TRIGGER_ZONE	*Zone;
+	u_int16_t	num_sides;
+	struct	EXTERNALFORCE * NextInGroup;
 };
 
 /*

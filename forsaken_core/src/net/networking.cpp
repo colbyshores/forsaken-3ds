@@ -130,7 +130,7 @@ SHORTNAMETYPE			Names;	// all the players short Names....
 BYTE					MyGameStatus = STATUS_Normal;//
 BYTE					OverallGameStatus = STATUS_Null;
 BYTE					GameStatus[MAX_PLAYERS + 1];	// Game Status for every Ship...
-														// this tells the drones what status the host thinks hes in..
+// this tells the drones what status the host thinks hes in..
 BYTE					OldGameStatus[MAX_PLAYERS + 1];	// Game Status for every Ship...
 int16_t					Lives = 3;
 
@@ -802,9 +802,9 @@ void SetupNetworkGame()
 		for( i = 0 ; i < 256 ; i++ )
 		{
 			PacketGot[i] = 0;
-			PacketSize[i] = 0;
+		PacketSize[i] = 0;
 
-		}
+	}
 
 	memset(&Ships,			0,				sizeof(Ships) );
 	memset(&Names,			0,				sizeof(SHORTNAMETYPE) );
@@ -1129,8 +1129,8 @@ void network_event_new_host( network_player_t * player )
 			if( player == Ships[i].network_player )
 			{
 				AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[i][0] , "has become the host." );
-				break;
-			}
+			break;
+		}
 	}
 }
 
@@ -1174,30 +1174,30 @@ void network_event_new_message( network_player_t * from, BYTE * data, int size )
 
 void network_event( network_event_type_t type, void* data )
 {
-		network_player_t * player = (network_player_t *) data;  // used by most events
-		switch( type )
-		{
-		case NETWORK_JOIN:
-				network_event_player_joined( player );
-				break;
-		case NETWORK_LEFT:
-				network_event_player_left( player );
-				break;
-		case NETWORK_HOST:
-				network_event_new_host( player );
-				break;
+	network_player_t * player = (network_player_t *) data;  // used by most events
+	switch( type )
+	{
+	case NETWORK_JOIN:
+		network_event_player_joined( player );
+		break;
+	case NETWORK_LEFT:
+		network_event_player_left( player );
+		break;
+	case NETWORK_HOST:
+		network_event_new_host( player );
+		break;
 	case NETWORK_NAME:
-				network_event_player_name( player );
-				break;
-		case NETWORK_DATA:
-				{
-						network_packet_t * packet = (network_packet_t*) data;
-						network_event_new_message( packet->from, (BYTE*)packet->data, packet->size );
-				}
-				break;
-		default:
-			DebugPrintf("network_event: unknown network event type %d\n", type);
+		network_event_player_name( player );
+		break;
+	case NETWORK_DATA:
+		{
+			network_packet_t * packet = (network_packet_t*) data;
+			network_event_new_message( packet->from, (BYTE*)packet->data, packet->size );
 		}
+		break;
+	default:
+		DebugPrintf("network_event: unknown network event type %d\n", type);
+	}
 }
 
 void ReceiveGameMessages( void )
@@ -1303,28 +1303,28 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	switch (*MsgPnt)
 	{
-		case MSG_SHIPHEALTH:
-			DebugPrintf("received msg_shiphealth\n");
-			ShipHealthMsg = (SHIPHEALTHMSG *)MsgPnt;
-			if( ShipHealthMsg->WhoIAm != WhoIAm)
+	case MSG_SHIPHEALTH:
+		DebugPrintf("received msg_shiphealth\n");
+		ShipHealthMsg = (SHIPHEALTHMSG *)MsgPnt;
+		if( ShipHealthMsg->WhoIAm != WhoIAm)
+		{
+			if(ShipHealthMsg->Hull < PlayerHealths[ShipHealthMsg->WhoIAm].Hull ||
+				ShipHealthMsg->Shield < PlayerHealths[ShipHealthMsg->WhoIAm].Shield )
 			{
-				if(ShipHealthMsg->Hull < PlayerHealths[ShipHealthMsg->WhoIAm].Hull ||
-					ShipHealthMsg->Shield < PlayerHealths[ShipHealthMsg->WhoIAm].Shield )
-				{
-					ShipHealthColour[ShipHealthMsg->WhoIAm] = RED;
-					ShipHealthColourInterval[ShipHealthMsg->WhoIAm] = 30.0F;
-				}
-				else if(ShipHealthMsg->Hull > PlayerHealths[ShipHealthMsg->WhoIAm].Hull ||
-					ShipHealthMsg->Shield > PlayerHealths[ShipHealthMsg->WhoIAm].Shield )
-				{
-					ShipHealthColour[ShipHealthMsg->WhoIAm] = GREEN;
-					ShipHealthColourInterval[ShipHealthMsg->WhoIAm] = 30.0F;
-				}
-
-				PlayerHealths[ShipHealthMsg->WhoIAm].Hull = ShipHealthMsg->Hull;
-				PlayerHealths[ShipHealthMsg->WhoIAm].Shield = ShipHealthMsg->Shield;
+				ShipHealthColour[ShipHealthMsg->WhoIAm] = RED;
+				ShipHealthColourInterval[ShipHealthMsg->WhoIAm] = 30.0F;
 			}
-			return;
+			else if(ShipHealthMsg->Hull > PlayerHealths[ShipHealthMsg->WhoIAm].Hull ||
+				ShipHealthMsg->Shield > PlayerHealths[ShipHealthMsg->WhoIAm].Shield )
+			{
+				ShipHealthColour[ShipHealthMsg->WhoIAm] = GREEN;
+				ShipHealthColourInterval[ShipHealthMsg->WhoIAm] = 30.0F;
+			}
+
+			PlayerHealths[ShipHealthMsg->WhoIAm].Hull = ShipHealthMsg->Hull;
+			PlayerHealths[ShipHealthMsg->WhoIAm].Shield = ShipHealthMsg->Shield;
+		}
+		return;
 	}
 
 	// check if it's a valid packet
@@ -1374,7 +1374,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			*MsgPnt != MSG_HEREIAM && // player id not valid yet
 			*MsgPnt != MSG_INIT && *MsgPnt != MSG_STATUS && *MsgPnt != MSG_LONGSTATUS && // will add to following structures
 			(GameStatus[id] == STATUS_Left || GameStatus[id] == STATUS_LeftCrashed || GameStatus[id] == STATUS_Null)
-		){
+			){
 			DebugPrintf("EvaluateMessage: from %s (%s:%d) dropping %s (%d) for using inactive player id: %d\n",
 				from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, id );
 			return;
@@ -1461,149 +1461,149 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 	{
 		switch (*MsgPnt)
 		{
-			case MSG_SECBULLPOSDIR:
-				SecBullPosDirMsg = (SECBULLPOSDIRMSG *)MsgPnt;
+		case MSG_SECBULLPOSDIR:
+			SecBullPosDirMsg = (SECBULLPOSDIRMSG *)MsgPnt;
 
-				if( SecondaryWeaponAttribs[ SecBullPosDirMsg->SecBullPosDir.Weapon ].SecType == SEC_MINE )
+			if( SecondaryWeaponAttribs[ SecBullPosDirMsg->SecBullPosDir.Weapon ].SecType == SEC_MINE )
+			{
+				if( NumMissedMines != MAXMISSEDMINES )
 				{
-					if( NumMissedMines != MAXMISSEDMINES )
-					{
-						DebugPrintf( "MissedInitMine() %d\n", NumMissedMines );
+					DebugPrintf( "MissedInitMine() %d\n", NumMissedMines );
 
-						MissedInitMines[ NumMissedInitMines ].OwnerType	= SecBullPosDirMsg->SecBullPosDir.OwnerType;
-						MissedInitMines[ NumMissedInitMines ].Owner		= SecBullPosDirMsg->SecBullPosDir.Owner;
-						MissedInitMines[ NumMissedInitMines ].BulletID		= SecBullPosDirMsg->SecBullPosDir.BulletID;
-						MissedInitMines[ NumMissedInitMines ].Group			= SecBullPosDirMsg->SecBullPosDir.Group;
-						MissedInitMines[ NumMissedInitMines ].Pos			= SecBullPosDirMsg->SecBullPosDir.Pos;
-						MissedInitMines[ NumMissedInitMines ].Offset		= SecBullPosDirMsg->SecBullPosDir.Offset;
-						MissedInitMines[ NumMissedInitMines ].Dir				= SecBullPosDirMsg->SecBullPosDir.Dir;
-						MissedInitMines[ NumMissedInitMines ].UpVector	= SecBullPosDirMsg->SecBullPosDir.UpVector;
-						MissedInitMines[ NumMissedInitMines ].DropDir		= SecBullPosDirMsg->SecBullPosDir.DropDir;
-						MissedInitMines[ NumMissedInitMines ].Weapon		= SecBullPosDirMsg->SecBullPosDir.Weapon;
-						MissedMines[ NumMissedMines ].Type = MM_TYPE_INIT;
-						MissedMines[ NumMissedMines ].Struct = &MissedInitMines[ NumMissedInitMines ];
-						NumMissedInitMines++;
-						NumMissedMines++;
-					}
-					else
-					{
-						DebugPrintf( "Overflowed mine que ( INIT )\n" );
-					}
-				}
-				return;
-				break;
-
-			case MSG_DROPPICKUP:
-				DropPickupMsg = (DROPPICKUPMSG *)MsgPnt;
-
-				if( NumMissedPickups != MAXMISSEDPICKUPS )
-				{
-					MissedInitPickups[ NumMissedInitPickups ].Pos				= DropPickupMsg->PickupInfo.Pos;
-					MissedInitPickups[ NumMissedInitPickups ].Group			= DropPickupMsg->PickupInfo.Group;
-					MissedInitPickups[ NumMissedInitPickups ].Dir				= DropPickupMsg->PickupInfo.Dir;
-					MissedInitPickups[ NumMissedInitPickups ].Speed			= DropPickupMsg->PickupInfo.Speed;
-					MissedInitPickups[ NumMissedInitPickups ].Type				= DropPickupMsg->PickupInfo.Type;
-					MissedInitPickups[ NumMissedInitPickups ].Owner			= DropPickupMsg->WhoIAm;
-					MissedInitPickups[ NumMissedInitPickups ].ID					= DropPickupMsg->PickupInfo.IDCount;
-					MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= DropPickupMsg->PickupInfo.RegenSlot;
-					MissedInitPickups[ NumMissedInitPickups ].Sparkle			= DropPickupMsg->PickupInfo.Sparkle;
-					MissedInitPickups[ NumMissedInitPickups ].LifeCount		= DropPickupMsg->PickupInfo.LifeCount;
-					MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= DropPickupMsg->PickupInfo.TriggerMod;
-					MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
-					MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
-#if DEBUG_PICKUPS
-					DebugPrintf( "Added Init '%s' to Que\n", Messages[ DropPickupMsg->PickupInfo.Type ] );
-#endif
-					NumMissedInitPickups++;
-					NumMissedPickups++;
+					MissedInitMines[ NumMissedInitMines ].OwnerType	= SecBullPosDirMsg->SecBullPosDir.OwnerType;
+					MissedInitMines[ NumMissedInitMines ].Owner		= SecBullPosDirMsg->SecBullPosDir.Owner;
+					MissedInitMines[ NumMissedInitMines ].BulletID		= SecBullPosDirMsg->SecBullPosDir.BulletID;
+					MissedInitMines[ NumMissedInitMines ].Group			= SecBullPosDirMsg->SecBullPosDir.Group;
+					MissedInitMines[ NumMissedInitMines ].Pos			= SecBullPosDirMsg->SecBullPosDir.Pos;
+					MissedInitMines[ NumMissedInitMines ].Offset		= SecBullPosDirMsg->SecBullPosDir.Offset;
+					MissedInitMines[ NumMissedInitMines ].Dir				= SecBullPosDirMsg->SecBullPosDir.Dir;
+					MissedInitMines[ NumMissedInitMines ].UpVector	= SecBullPosDirMsg->SecBullPosDir.UpVector;
+					MissedInitMines[ NumMissedInitMines ].DropDir		= SecBullPosDirMsg->SecBullPosDir.DropDir;
+					MissedInitMines[ NumMissedInitMines ].Weapon		= SecBullPosDirMsg->SecBullPosDir.Weapon;
+					MissedMines[ NumMissedMines ].Type = MM_TYPE_INIT;
+					MissedMines[ NumMissedMines ].Struct = &MissedInitMines[ NumMissedInitMines ];
+					NumMissedInitMines++;
+					NumMissedMines++;
 				}
 				else
 				{
-#if DEBUG_PICKUPS
-					DebugPrintf( "Overflowed pickup que ( INIT )\n" );
-#endif
+					DebugPrintf( "Overflowed mine que ( INIT )\n" );
 				}
-				return;
-				break;
+			}
+			return;
+			break;
 
-			case MSG_VERYSHORTDROPPICKUP:
-				VeryShortDropPickupMsg = (VERYSHORTDROPPICKUPMSG *)MsgPnt;
+		case MSG_DROPPICKUP:
+			DropPickupMsg = (DROPPICKUPMSG *)MsgPnt;
 
-				if( NumMissedPickups != MAXMISSEDPICKUPS )
-				{
-					MissedInitPickups[ NumMissedInitPickups ].Pos.x			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.x;
-					MissedInitPickups[ NumMissedInitPickups ].Pos.y			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.y;
-					MissedInitPickups[ NumMissedInitPickups ].Pos.z			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.z;
-					MissedInitPickups[ NumMissedInitPickups ].Dir.x				= VeryShortDropPickupMsg->PickupInfo.Dir.x * ONEOVER32767;
-					MissedInitPickups[ NumMissedInitPickups ].Dir.y				= VeryShortDropPickupMsg->PickupInfo.Dir.y * ONEOVER32767;
-					MissedInitPickups[ NumMissedInitPickups ].Dir.z				= VeryShortDropPickupMsg->PickupInfo.Dir.z * ONEOVER32767;
-					MissedInitPickups[ NumMissedInitPickups ].Group			= VeryShortDropPickupMsg->PickupInfo.Group;
-					MissedInitPickups[ NumMissedInitPickups ].Speed			= VeryShortDropPickupMsg->PickupInfo.Speed;
-					MissedInitPickups[ NumMissedInitPickups ].Type				= VeryShortDropPickupMsg->PickupInfo.Type;
-					MissedInitPickups[ NumMissedInitPickups ].Owner			= VeryShortDropPickupMsg->WhoIAm;
-					MissedInitPickups[ NumMissedInitPickups ].ID					= VeryShortDropPickupMsg->PickupInfo.IDCount;
-					MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= VeryShortDropPickupMsg->PickupInfo.RegenSlot;
-					MissedInitPickups[ NumMissedInitPickups ].Sparkle			= VeryShortDropPickupMsg->PickupInfo.Sparkle;
-					MissedInitPickups[ NumMissedInitPickups ].LifeCount		= VeryShortDropPickupMsg->PickupInfo.LifeCount;
-					MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= VeryShortDropPickupMsg->PickupInfo.TriggerMod;
-					MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
-					MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
+			if( NumMissedPickups != MAXMISSEDPICKUPS )
+			{
+				MissedInitPickups[ NumMissedInitPickups ].Pos				= DropPickupMsg->PickupInfo.Pos;
+				MissedInitPickups[ NumMissedInitPickups ].Group			= DropPickupMsg->PickupInfo.Group;
+				MissedInitPickups[ NumMissedInitPickups ].Dir				= DropPickupMsg->PickupInfo.Dir;
+				MissedInitPickups[ NumMissedInitPickups ].Speed			= DropPickupMsg->PickupInfo.Speed;
+				MissedInitPickups[ NumMissedInitPickups ].Type				= DropPickupMsg->PickupInfo.Type;
+				MissedInitPickups[ NumMissedInitPickups ].Owner			= DropPickupMsg->WhoIAm;
+				MissedInitPickups[ NumMissedInitPickups ].ID					= DropPickupMsg->PickupInfo.IDCount;
+				MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= DropPickupMsg->PickupInfo.RegenSlot;
+				MissedInitPickups[ NumMissedInitPickups ].Sparkle			= DropPickupMsg->PickupInfo.Sparkle;
+				MissedInitPickups[ NumMissedInitPickups ].LifeCount		= DropPickupMsg->PickupInfo.LifeCount;
+				MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= DropPickupMsg->PickupInfo.TriggerMod;
+				MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
+				MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
 #if DEBUG_PICKUPS
-					DebugPrintf( "Added Init '%s' to Que\n", Messages[ VeryShortDropPickupMsg->PickupInfo.Type ] );
+				DebugPrintf( "Added Init '%s' to Que\n", Messages[ DropPickupMsg->PickupInfo.Type ] );
 #endif
-					NumMissedInitPickups++;
-					NumMissedPickups++;
-				}
-				else
-				{
+				NumMissedInitPickups++;
+				NumMissedPickups++;
+			}
+			else
+			{
 #if DEBUG_PICKUPS
-					DebugPrintf( "Overflowed pickup que ( INIT )\n" );
+				DebugPrintf( "Overflowed pickup que ( INIT )\n" );
 #endif
-				}
-				return;
-				break;
+			}
+			return;
+			break;
 
-			case MSG_KILLPICKUP:
-				KillPickupMsg = (KILLPICKUPMSG *)MsgPnt;
-				if( NumMissedPickups != MAXMISSEDPICKUPS )
-				{
-					MissedKillPickups[ NumMissedKillPickups ].Owner = KillPickupMsg->KillPickupInfo.Owner;
-					MissedKillPickups[ NumMissedKillPickups ].ID		= KillPickupMsg->KillPickupInfo.IDCount;
-					MissedKillPickups[ NumMissedKillPickups ].Style	= KillPickupMsg->KillPickupInfo.Style;
-					MissedPickups[ NumMissedPickups ].Type			= MPU_TYPE_KILL;
-					MissedPickups[ NumMissedPickups ].Struct		= &MissedKillPickups[ NumMissedKillPickups ];
+		case MSG_VERYSHORTDROPPICKUP:
+			VeryShortDropPickupMsg = (VERYSHORTDROPPICKUPMSG *)MsgPnt;
+
+			if( NumMissedPickups != MAXMISSEDPICKUPS )
+			{
+				MissedInitPickups[ NumMissedInitPickups ].Pos.x			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.x;
+				MissedInitPickups[ NumMissedInitPickups ].Pos.y			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.y;
+				MissedInitPickups[ NumMissedInitPickups ].Pos.z			= (float)VeryShortDropPickupMsg->PickupInfo.Pos.z;
+				MissedInitPickups[ NumMissedInitPickups ].Dir.x				= VeryShortDropPickupMsg->PickupInfo.Dir.x * ONEOVER32767;
+				MissedInitPickups[ NumMissedInitPickups ].Dir.y				= VeryShortDropPickupMsg->PickupInfo.Dir.y * ONEOVER32767;
+				MissedInitPickups[ NumMissedInitPickups ].Dir.z				= VeryShortDropPickupMsg->PickupInfo.Dir.z * ONEOVER32767;
+				MissedInitPickups[ NumMissedInitPickups ].Group			= VeryShortDropPickupMsg->PickupInfo.Group;
+				MissedInitPickups[ NumMissedInitPickups ].Speed			= VeryShortDropPickupMsg->PickupInfo.Speed;
+				MissedInitPickups[ NumMissedInitPickups ].Type				= VeryShortDropPickupMsg->PickupInfo.Type;
+				MissedInitPickups[ NumMissedInitPickups ].Owner			= VeryShortDropPickupMsg->WhoIAm;
+				MissedInitPickups[ NumMissedInitPickups ].ID					= VeryShortDropPickupMsg->PickupInfo.IDCount;
+				MissedInitPickups[ NumMissedInitPickups ].RegenSlot		= VeryShortDropPickupMsg->PickupInfo.RegenSlot;
+				MissedInitPickups[ NumMissedInitPickups ].Sparkle			= VeryShortDropPickupMsg->PickupInfo.Sparkle;
+				MissedInitPickups[ NumMissedInitPickups ].LifeCount		= VeryShortDropPickupMsg->PickupInfo.LifeCount;
+				MissedInitPickups[ NumMissedInitPickups ].TriggerMod		= VeryShortDropPickupMsg->PickupInfo.TriggerMod;
+				MissedPickups[ NumMissedPickups ].Type		= MPU_TYPE_INIT;
+				MissedPickups[ NumMissedPickups ].Struct	= &MissedInitPickups[ NumMissedInitPickups ];
 #if DEBUG_PICKUPS
-					DebugPrintf( "Added Kill pickup of Owner '%s', ID %d, to que\n",
-								&Names[ KillPickupMsg->KillPickupInfo.Owner ][ 0 ],
-								KillPickupMsg->KillPickupInfo.IDCount );
+				DebugPrintf( "Added Init '%s' to Que\n", Messages[ VeryShortDropPickupMsg->PickupInfo.Type ] );
 #endif
-					NumMissedKillPickups++;
-					NumMissedPickups++;
-				}
-				else
-				{
+				NumMissedInitPickups++;
+				NumMissedPickups++;
+			}
+			else
+			{
 #if DEBUG_PICKUPS
-					DebugPrintf( "Overflowed pickup que ( KILL )\n" );
+				DebugPrintf( "Overflowed pickup que ( INIT )\n" );
 #endif
-				}
-				return;
-				break;
+			}
+			return;
+			break;
+
+		case MSG_KILLPICKUP:
+			KillPickupMsg = (KILLPICKUPMSG *)MsgPnt;
+			if( NumMissedPickups != MAXMISSEDPICKUPS )
+			{
+				MissedKillPickups[ NumMissedKillPickups ].Owner = KillPickupMsg->KillPickupInfo.Owner;
+				MissedKillPickups[ NumMissedKillPickups ].ID		= KillPickupMsg->KillPickupInfo.IDCount;
+				MissedKillPickups[ NumMissedKillPickups ].Style	= KillPickupMsg->KillPickupInfo.Style;
+				MissedPickups[ NumMissedPickups ].Type			= MPU_TYPE_KILL;
+				MissedPickups[ NumMissedPickups ].Struct		= &MissedKillPickups[ NumMissedKillPickups ];
+#if DEBUG_PICKUPS
+				DebugPrintf( "Added Kill pickup of Owner '%s', ID %d, to que\n",
+							&Names[ KillPickupMsg->KillPickupInfo.Owner ][ 0 ],
+							KillPickupMsg->KillPickupInfo.IDCount );
+#endif
+				NumMissedKillPickups++;
+				NumMissedPickups++;
+			}
+			else
+			{
+#if DEBUG_PICKUPS
+				DebugPrintf( "Overflowed pickup que ( KILL )\n" );
+#endif
+			}
+			return;
+			break;
 
 
-			case MSG_SHORTREGENSLOT:
-			case MSG_SHORTTRIGGER:
-			case MSG_SHORTTRIGVAR:
-			case MSG_SHORTMINE:
-			case MSG_SHORTPICKUP:
-			case MSG_YOUQUIT:
-			case MSG_BIKENUM:
-			case MSG_STATUS:
-			case MSG_LONGSTATUS:
-			case MSG_TEAMGOALS:
-				break;
+		case MSG_SHORTREGENSLOT:
+		case MSG_SHORTTRIGGER:
+		case MSG_SHORTTRIGVAR:
+		case MSG_SHORTMINE:
+		case MSG_SHORTPICKUP:
+		case MSG_YOUQUIT:
+		case MSG_BIKENUM:
+		case MSG_STATUS:
+		case MSG_LONGSTATUS:
+		case MSG_TEAMGOALS:
+			break;
 
-			default:
-				return;
+		default:
+			return;
 		}
 	}
 	else
@@ -1722,7 +1722,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 			Ships[ VeryShortFUpdateMsg->WhoIAm ].Primary		= ConvPrimToNormWeapon( Ships[ VeryShortFUpdateMsg->WhoIAm ].Primary );
 			Ships[ VeryShortFUpdateMsg->WhoIAm ].Secondary = ConvSecToNormWeapon( Ships[ VeryShortFUpdateMsg->WhoIAm ].Secondary );
 
-/* Added by DC 30/6/98 */
+			/* Added by DC 30/6/98 */
 			if( ( ( OldMode == DEATH_MODE ) && ( Ships[VeryShortFUpdateMsg->WhoIAm].Object.Mode == LIMBO_MODE ) ) ||
 				( ( OldMode == NORMAL_MODE ) && ( Ships[VeryShortFUpdateMsg->WhoIAm].Object.Mode == LIMBO_MODE ) ) )
 			{
@@ -1730,7 +1730,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				PlayPannedSfx( SFX_BikeExplode, Ships[ VeryShortFUpdateMsg->WhoIAm ].Object.Group , &Ships[VeryShortFUpdateMsg->WhoIAm].Object.Pos, 0.0F );
 				StopTaunt();
 			}
-/* ------------------- */
+			/* ------------------- */
 
 			return;
 		}
@@ -2299,23 +2299,23 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		TitanBitsMsg = (TITANBITSMSG *)MsgPnt;
 		for( Count = 0; Count < NUMTITANBITS; Count++ )
 		{
-			 i = InitOneSecBull( TitanBitsMsg->TitanBits.OwnerType,
-								TitanBitsMsg->TitanBits.Owner,
-								(u_int16_t) ( Count + TitanBitsMsg->TitanBits.BulletID ),
-								TitanBitsMsg->TitanBits.Group,
-								&TitanBitsMsg->TitanBits.Pos,
-								&TitanBitsMsg->TitanBits.Offset,
-								&TitanBitsMsg->TitanBits.Directions[ Count ],
-								&TitanBitsMsg->TitanBits.UpVector,
-								&TitanBitsMsg->TitanBits.DropDir,
-								TitanBitsMsg->TitanBits.Weapon, false );
-			 if( i != INDEX_NONE )
-				 SecBulls[i].FramelagAddition = GlobalFramelagAddition;
+			i = InitOneSecBull( TitanBitsMsg->TitanBits.OwnerType,
+							   TitanBitsMsg->TitanBits.Owner,
+							   (u_int16_t) ( Count + TitanBitsMsg->TitanBits.BulletID ),
+							   TitanBitsMsg->TitanBits.Group,
+							   &TitanBitsMsg->TitanBits.Pos,
+							   &TitanBitsMsg->TitanBits.Offset,
+							   &TitanBitsMsg->TitanBits.Directions[ Count ],
+							   &TitanBitsMsg->TitanBits.UpVector,
+							   &TitanBitsMsg->TitanBits.DropDir,
+							   TitanBitsMsg->TitanBits.Weapon, false );
+			if( i != INDEX_NONE )
+				SecBulls[i].FramelagAddition = GlobalFramelagAddition;
 		}
 		return;
 
 
-	// Someone is claiming to have hit me...
+		// Someone is claiming to have hit me...
 	case MSG_SHIPHIT:
 
 		ShipHitMsg = (SHIPHITMSG *)MsgPnt;
@@ -2378,7 +2378,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		return;
 
 
-	// Someone is claiming to have hit me...
+		// Someone is claiming to have hit me...
 	case MSG_SHORTSHIPHIT:
 
 		ShortShipHitMsg = (SHORTSHIPHITMSG *)MsgPnt;
@@ -2416,16 +2416,16 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 				{
 					switch( ColPerspective )
 					{
-						case COLPERS_Forsaken:
-							if( !GodMode )
-							{
-								ScatterWeapons( &NullVector, MAXSCATTERED );
-								PlayPannedSfx( SFX_Scattered, Ships[ WhoIAm ].Object.Group , &Ships[ WhoIAm ].Object.Pos, 0.0F );
-							}
-							break;
+					case COLPERS_Forsaken:
+						if( !GodMode )
+						{
+							ScatterWeapons( &NullVector, MAXSCATTERED );
+							PlayPannedSfx( SFX_Scattered, Ships[ WhoIAm ].Object.Group , &Ships[ WhoIAm ].Object.Pos, 0.0F );
+						}
+						break;
 
-						case COLPERS_Descent:
-							break;
+					case COLPERS_Descent:
+						break;
 					}
 				}
 
@@ -2466,8 +2466,8 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		return;
 
 
-	// Someone has Died....Did I kill Them ??
-	// this is called in multiplayer
+		// Someone has Died....Did I kill Them ??
+		// this is called in multiplayer
 	case MSG_SHIPDIED:
 
 		ShipDiedMsg = (SHIPDIEDMSG *)MsgPnt;
@@ -2521,7 +2521,7 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 						}
 					}
 					else if( !GodMode )
-					// any other team game
+						// any other team game
 					{
 						// you killed someone in a team game
 						AddColourMessageToQue( KillMessageColour, "%s %s %s" "%s", "YOU KILLED", &Names[ShipDiedMsg->WhoIAm][0], "WITH ", &methodstr[0] );
@@ -2599,9 +2599,9 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		return;
 
 
-/*===================================================================
-	This is where the host gets told what state he thinks we are in
-===================================================================*/
+		/*===================================================================
+			This is where the host gets told what state he thinks we are in
+		===================================================================*/
 	case MSG_STATUS:
 		StatusMsg = (STATUSMSG *)MsgPnt;
 
@@ -2659,48 +2659,48 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 
 	case MSG_NETSETTINGS:
 
-			NetSettingsMsg = (NETSETTINGSMSG *)MsgPnt;
+		NetSettingsMsg = (NETSETTINGSMSG *)MsgPnt;
 
-			// clients must update their settings
-			if(!IsHost)
+		// clients must update their settings
+		if(!IsHost)
+		{
+			// only the host can change the settings
+			if(NetSettingsMsg->IsHost)
 			{
-				// only the host can change the settings
-				if(NetSettingsMsg->IsHost)
+				// if in normal mode display text message of changes
+				if( MyGameStatus == STATUS_Normal )
 				{
-					// if in normal mode display text message of changes
-					if( MyGameStatus == STATUS_Normal )
+					// collision perspective changed by the host
+					if( ColPerspective != NetSettingsMsg->CollisionPerspective)
 					{
-						// collision perspective changed by the host
-						if( ColPerspective != NetSettingsMsg->CollisionPerspective)
-						{
-							// shooter decides
-							if( NetSettingsMsg->CollisionPerspective == COLPERS_Forsaken)
-								AddColourMessageToQue(SystemMessageColour, "SHOOTER NOW DECIDES COLLISIONS");
-							// target decides
-							else
-								AddColourMessageToQue(SystemMessageColour, "TARGET NOW DECIDES COLLISIONS");
-						}
-						// packet rate changed by the host
-						if( NetUpdateInterval != NetSettingsMsg->PacketsPerSecond )
-							AddColourMessageToQue(SystemMessageColour, "%.0f %s" , ( 60.0F / NetSettingsMsg->PacketsPerSecond ) , PACKETS_PER_SECOND_SET );
-						// short packets changed by the host
-						if( UseShortPackets != NetSettingsMsg->ShortPackets)
-						{
-							// short packets enabled
-							if( NetSettingsMsg->ShortPackets == true)
-								AddColourMessageToQue(SystemMessageColour, "SHORT PACKETS ENABLED BY HOST");
-							// short packets disabled
-							else
-								AddColourMessageToQue(SystemMessageColour, "SHORT PACKETS DISABLED BY HOST");
-						}
+						// shooter decides
+						if( NetSettingsMsg->CollisionPerspective == COLPERS_Forsaken)
+							AddColourMessageToQue(SystemMessageColour, "SHOOTER NOW DECIDES COLLISIONS");
+						// target decides
+						else
+							AddColourMessageToQue(SystemMessageColour, "TARGET NOW DECIDES COLLISIONS");
 					}
-					ColPerspective = NetSettingsMsg->CollisionPerspective;
-					UseShortPackets = NetSettingsMsg->ShortPackets;
-					NetUpdateInterval = NetSettingsMsg->PacketsPerSecond;
-					PacketsSlider.value = (int) (60.0F / NetUpdateInterval);
+					// packet rate changed by the host
+					if( NetUpdateInterval != NetSettingsMsg->PacketsPerSecond )
+						AddColourMessageToQue(SystemMessageColour, "%.0f %s" , ( 60.0F / NetSettingsMsg->PacketsPerSecond ) , PACKETS_PER_SECOND_SET );
+					// short packets changed by the host
+					if( UseShortPackets != NetSettingsMsg->ShortPackets)
+					{
+						// short packets enabled
+						if( NetSettingsMsg->ShortPackets == true)
+							AddColourMessageToQue(SystemMessageColour, "SHORT PACKETS ENABLED BY HOST");
+						// short packets disabled
+						else
+							AddColourMessageToQue(SystemMessageColour, "SHORT PACKETS DISABLED BY HOST");
+					}
 				}
+				ColPerspective = NetSettingsMsg->CollisionPerspective;
+				UseShortPackets = NetSettingsMsg->ShortPackets;
+				NetUpdateInterval = NetSettingsMsg->PacketsPerSecond;
+				PacketsSlider.value = (int) (60.0F / NetUpdateInterval);
 			}
-			return;
+		}
+		return;
 
 	case MSG_LONGSTATUS:
 
@@ -2853,97 +2853,97 @@ void EvaluateMessage( network_player_t * from, DWORD len , BYTE * MsgPnt )
 		}
 		switch (TextMsg->TextMsgType)
 		{
-			case TEXTMSGTYPE_FlagDriftedIn:
-			case TEXTMSGTYPE_FlagEscaped:
-			case TEXTMSGTYPE_ReturnedFlag:
-			case TEXTMSGTYPE_ReturningFlag:
-			case TEXTMSGTYPE_ScoredWithFlag:
-			case TEXTMSGTYPE_CaptureFlagMessage:
-			case TEXTMSGTYPE_JoiningTeamGame:
-				if(!TeamGame)
-				{
-					DebugPrintf("EvaluateMessage: from %s (%s:%d) %s (%d) dropping team message (%d) because not in team game\n",
-						from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, TextMsg->TextMsgType );
-					return;
-				}
+		case TEXTMSGTYPE_FlagDriftedIn:
+		case TEXTMSGTYPE_FlagEscaped:
+		case TEXTMSGTYPE_ReturnedFlag:
+		case TEXTMSGTYPE_ReturningFlag:
+		case TEXTMSGTYPE_ScoredWithFlag:
+		case TEXTMSGTYPE_CaptureFlagMessage:
+		case TEXTMSGTYPE_JoiningTeamGame:
+			if(!TeamGame)
+			{
+				DebugPrintf("EvaluateMessage: from %s (%s:%d) %s (%d) dropping team message (%d) because not in team game\n",
+					from->name, from->ip, from->port, msg_to_str(*MsgPnt), *MsgPnt, TextMsg->TextMsgType );
+				return;
+			}
 			break;
 		}
 		switch (TextMsg->TextMsgType)
 		{
-			case TEXTMSGTYPE_QuickTauntWhisper:
-				if( TeamNumber[WhoIAm] != TeamNumber[TextMsg->WhoIAm] )
-					return;
-				AddPlayerMessageToQue(PlayerMessageColour, "%s whispers %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
+		case TEXTMSGTYPE_QuickTauntWhisper:
+			if( TeamNumber[WhoIAm] != TeamNumber[TextMsg->WhoIAm] )
 				return;
-			case TEXTMSGTYPE_Taunt1:
-			case TEXTMSGTYPE_Taunt2:
-			case TEXTMSGTYPE_Taunt3:
-				AddColourMessageToQue(TauntMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
-				return;
-			case TEXTMSGTYPE_QuickTaunt:
-				AddPlayerMessageToQue(PlayerMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
-				// received version request
-				if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
-				{
-					// display my version number
-					AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
-					// send my version number back
-					strncpy( QuickText.text, PXVersion , sizeof(QuickText.text) - 1 );
-					SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_QuickTaunt, 0);
-					QuickText.text[0] = 0; // clean message buffer
-				}
-				return;
-			case TEXTMSGTYPE_JoiningTeamGame:
-				AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,IS_JOINING_THE_GAME);
-				return;
-			case TEXTMSGTYPE_EnteredWatchMode:
-				AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"ENTERED WATCH MODE");
-				return;
-			case TEXTMSGTYPE_ExitedWatchMode:
-				AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"EXITED WATCH MODE");
-				return;
-			case TEXTMSGTYPE_TitleMessage:
-				AddTitleMessage(TextMsg);
-				return;
-			case TEXTMSGTYPE_CaptureFlagMessage:
-				// this message is instead formatted by the sender
-				AddColourMessageToQue(FlagMessageColour, "%s", TextMsg->Text );
-				if ( TeamNumber[ WhoIAm ] == TeamNumber[ TextMsg->WhoIAm ] )
-					PlaySfx( SFX_MyTeamGotFlag, FlagVolume );
-				else
-					PlaySfx( SFX_OtherTeamGotFlag , FlagVolume );
-				return;
-			case TEXTMSGTYPE_ScoredWithFlag:
-				AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_HAVE_SCORED, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
-				if ( TeamNumber[ WhoIAm ] == TeamNumber[ TextMsg->WhoIAm ] )
-					PlaySfx( SFX_MyTeamScored, FlagVolume );
-				else
-					PlaySfx( SFX_OtherTeamScored , FlagVolume );
-				// update bonus 6 (stats.cpp) -- someone else scored with flag
-				UpdateBonusStats((int) TextMsg->WhoIAm, GoalScoreSlider.value);
-				return;
-			case TEXTMSGTYPE_ReturningFlag:
-				if ( TextMsg->WhoIAm != WhoIAm )
-					AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_ARE_RETURNING_THEIR_FLAG,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ]);
-				return;
-			case TEXTMSGTYPE_ReturnedFlag:
-				AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_BEEN_RETURNED,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
-				return;
-			case TEXTMSGTYPE_FlagDriftedIn:
-				AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_DRIFTED_INTO_THEIR_GOAL,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
-				return;
-			case TEXTMSGTYPE_FlagEscaped:
-				AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_ESCAPED_FROM_THEIR_GOAL, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
-				return;
-			case TEXTMSGTYPE_BountyMessage:
-				AddColourMessageToQue(FlagMessageColour, "%s %s", Names[ TextMsg->WhoIAm ] , HAS_GOT_THE_BOUNTY);
-				PlaySfx( SFX_OtherTeamGotFlag, FlagVolume );
-				return;
-			case TEXTMSGTYPE_SpeechTaunt:
-				PlayRecievedSpeechTaunt( TextMsg->WhoIAm, TextMsg->Text[ 0 ] );
-				return;
-			default:
-				DebugPrintf("EvaluateMessage: Invalid MSG_TEXTMSG of type: %d\n",TextMsg->TextMsgType);
+			AddPlayerMessageToQue(PlayerMessageColour, "%s whispers %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
+			return;
+		case TEXTMSGTYPE_Taunt1:
+		case TEXTMSGTYPE_Taunt2:
+		case TEXTMSGTYPE_Taunt3:
+			AddColourMessageToQue(TauntMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
+			return;
+		case TEXTMSGTYPE_QuickTaunt:
+			AddPlayerMessageToQue(PlayerMessageColour, "%s says %s", &Names[TextMsg->WhoIAm][0],  &TextMsg->Text[0] );
+			// received version request
+			if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
+			{
+				// display my version number
+				AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
+				// send my version number back
+				strncpy( QuickText.text, PXVersion , sizeof(QuickText.text) - 1 );
+				SendGameMessage(MSG_TEXTMSG, 0, 0, TEXTMSGTYPE_QuickTaunt, 0);
+				QuickText.text[0] = 0; // clean message buffer
+			}
+			return;
+		case TEXTMSGTYPE_JoiningTeamGame:
+			AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,IS_JOINING_THE_GAME);
+			return;
+		case TEXTMSGTYPE_EnteredWatchMode:
+			AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"ENTERED WATCH MODE");
+			return;
+		case TEXTMSGTYPE_ExitedWatchMode:
+			AddColourMessageToQue(SystemMessageColour, "%s %s", &Names[TextMsg->WhoIAm][0] ,"EXITED WATCH MODE");
+			return;
+		case TEXTMSGTYPE_TitleMessage:
+			AddTitleMessage(TextMsg);
+			return;
+		case TEXTMSGTYPE_CaptureFlagMessage:
+			// this message is instead formatted by the sender
+			AddColourMessageToQue(FlagMessageColour, "%s", TextMsg->Text );
+			if ( TeamNumber[ WhoIAm ] == TeamNumber[ TextMsg->WhoIAm ] )
+				PlaySfx( SFX_MyTeamGotFlag, FlagVolume );
+			else
+				PlaySfx( SFX_OtherTeamGotFlag , FlagVolume );
+			return;
+		case TEXTMSGTYPE_ScoredWithFlag:
+			AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_HAVE_SCORED, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+			if ( TeamNumber[ WhoIAm ] == TeamNumber[ TextMsg->WhoIAm ] )
+				PlaySfx( SFX_MyTeamScored, FlagVolume );
+			else
+				PlaySfx( SFX_OtherTeamScored , FlagVolume );
+			// update bonus 6 (stats.cpp) -- someone else scored with flag
+			UpdateBonusStats((int) TextMsg->WhoIAm, GoalScoreSlider.value);
+			return;
+		case TEXTMSGTYPE_ReturningFlag:
+			if ( TextMsg->WhoIAm != WhoIAm )
+				AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_ARE_RETURNING_THEIR_FLAG,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ]);
+			return;
+		case TEXTMSGTYPE_ReturnedFlag:
+			AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_BEEN_RETURNED,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+			return;
+		case TEXTMSGTYPE_FlagDriftedIn:
+			AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_DRIFTED_INTO_THEIR_GOAL,TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+			return;
+		case TEXTMSGTYPE_FlagEscaped:
+			AddColourMessageToQue(FlagMessageColour, THE_COLOUR_TEAM_FLAG_HAS_ESCAPED_FROM_THEIR_GOAL, TeamName[ TeamNumber[ TextMsg->WhoIAm ] ] );
+			return;
+		case TEXTMSGTYPE_BountyMessage:
+			AddColourMessageToQue(FlagMessageColour, "%s %s", Names[ TextMsg->WhoIAm ] , HAS_GOT_THE_BOUNTY);
+			PlaySfx( SFX_OtherTeamGotFlag, FlagVolume );
+			return;
+		case TEXTMSGTYPE_SpeechTaunt:
+			PlayRecievedSpeechTaunt( TextMsg->WhoIAm, TextMsg->Text[ 0 ] );
+			return;
+		default:
+			DebugPrintf("EvaluateMessage: Invalid MSG_TEXTMSG of type: %d\n",TextMsg->TextMsgType);
 		}
 		return;
 
@@ -3084,12 +3084,12 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		break;
 
 
-	// should probably break this up into small MSG_INIT_(N) steps...
-	// instead of MSG_HEREIAM have a MSG_REQUEST_INIT which specifies the INIT (N) to reply with
-	// the host can keep track of where the player is for security
-	// this would reduce the need for one giant paacket instead having smaller ones
-	// and the first thing that should be done is negotiate valid player number and version numbers
-	// other wise whats the point of sending all this extra stuff...
+		// should probably break this up into small MSG_INIT_(N) steps...
+		// instead of MSG_HEREIAM have a MSG_REQUEST_INIT which specifies the INIT (N) to reply with
+		// the host can keep track of where the player is for security
+		// this would reduce the need for one giant paacket instead having smaller ones
+		// and the first thing that should be done is negotiate valid player number and version numbers
+		// other wise whats the point of sending all this extra stuff...
 
 	case MSG_INIT:
 		DebugPrintf("net_msg: MSG_INIT\n");
@@ -3113,8 +3113,8 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 				DebugPrintf("Ignoring MSG_INIT request from player %s (%d) %s\n",
 							Ships[i].network_player->name, i,
 							"because I already replied to him...");
-				return;
-			}
+			return;
+		}
 
 		// setup the basic message flags
 		flags |= NETWORK_RELIABLE;
@@ -3168,9 +3168,9 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 					if( GameStatus[i] == STATUS_Null )
 					{
 						new_player_id = i; // found an unused slot
-						DebugPrintf("MSG_INIT: player assigned to unused slot\n");
-						break;
-					}
+				DebugPrintf("MSG_INIT: player assigned to unused slot\n");
+				break;
+			}
 
 			// if we didn't find a never used slot then assign a slot from a player who left
 			if( new_player_id == -1 )
@@ -3179,9 +3179,9 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 						if(	GameStatus[i] == STATUS_Left || GameStatus[i] == STATUS_LeftCrashed )
 						{
 							new_player_id = i; // found an old slot
-							DebugPrintf("MSG_INIT: player assigned to reused slot\n");
-							break;
-						}
+				DebugPrintf("MSG_INIT: player assigned to reused slot\n");
+				break;
+			}
 
 			DebugPrintf("MSG_INIT: new_player_id set to %d\n", new_player_id);
 
@@ -3278,19 +3278,19 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		UpdateMsg = (UPDATEMSG *)&CommBuff[0];
 		UpdateMsg->MsgCode = msg;
 		UpdateMsg->WhoIAm = WhoIAm;
-				UpdateMsg->ShortGlobalShip = ShortGlobalShip;
+		UpdateMsg->ShortGlobalShip = ShortGlobalShip;
 		nBytes = sizeof( UPDATEMSG );
-				channel = CHANNEL_BIKE_POSITIONS;
-				flags = NETWORK_SEQUENCED;
+		channel = CHANNEL_BIKE_POSITIONS;
+		flags = NETWORK_SEQUENCED;
 		break;
 
-	// following 3 pkts are bullet pkts
-	// they also contain the player position information
-	// so they must be sent on the player position channel
+		// following 3 pkts are bullet pkts
+		// they also contain the player position information
+		// so they must be sent on the player position channel
 
-	// BUG: we should really break apart fire updates and position updates
-	// InitOnePrimBull() and InitOneSecBull() support sending over network
-	// probably just use those and turn off the f updates...
+		// BUG: we should really break apart fire updates and position updates
+		// InitOnePrimBull() and InitOneSecBull() support sending over network
+		// probably just use those and turn off the f updates...
 
 	case MSG_FUPDATE: // short packets off + fire weapon data
 		DebugPrintf("net_msg: MSG_FUPDATE\n");
@@ -3413,7 +3413,7 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 		nBytes = sizeof( PRIMBULLPOSDIRMSG );
 		break;
 
-	// appears to be mines..
+		// appears to be mines..
 
 	case MSG_SECBULLPOSDIR:
 		DebugPrintf("net_msg: MSG_SECBULLPOSDIR\n");
@@ -3643,102 +3643,102 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 		switch( Type )
 		{
-			case TEXTMSGTYPE_Taunt1:
-				strncpy( &TextMsg->Text[0]	, &MacroText1.text[0] , MAXTEXTMSG );
-				TextMsg->TextMsgType = Type;
-				MessageColour = TauntMessageColour;
-				break;
-			case TEXTMSGTYPE_Taunt2:
-				strncpy( &TextMsg->Text[0]	, &MacroText2.text[0] , MAXTEXTMSG );
-				TextMsg->TextMsgType = Type;
-				MessageColour = TauntMessageColour;
-				break;
-			case TEXTMSGTYPE_Taunt3:
-				strncpy( &TextMsg->Text[0]	, &MacroText3.text[0] , MAXTEXTMSG );
-				TextMsg->TextMsgType = Type;
-				MessageColour = TauntMessageColour;
-				break;
-			case TEXTMSGTYPE_TitleMessage:
-				strncpy( &TextMsg->Text[0]	, &MacroText4.text[0] , MAXTEXTMSG );
-				TextMsg->TextMsgType = Type;
-				MessageColour = SystemMessageColour;
-				break;
-			case TEXTMSGTYPE_JoiningTeamGame:
-				TextMsg->TextMsgType = Type;
-				MessageColour = SystemMessageColour;
-				break;
-			case TEXTMSGTYPE_EnteredWatchMode:
-				TextMsg->TextMsgType = Type;
-				MessageColour = SystemMessageColour;
-				break;
-			case TEXTMSGTYPE_ExitedWatchMode:
-				TextMsg->TextMsgType = Type;
-				MessageColour = SystemMessageColour;
-				break;
-			case TEXTMSGTYPE_QuickTaunt:
-				strncpy( &TextMsg->Text[0]	, &QuickText.text[0] , MAXTEXTMSG );
-				TextMsg->TextMsgType = Type;
-				MessageColour = MyMessageColour;
-				AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
-				// sending version request
-				if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
-				{
-					// display my version number
-					AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
-				}
-				break;
-			case TEXTMSGTYPE_QuickTauntWhisper:
-				strncpy( &TextMsg->Text[0]	, &QuickTextWhisper.text[0] , MAXTEXTMSG );
-				TextMsg->TextMsgType = Type;
-				MessageColour = MyMessageColour;
-				AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
-				break;
-			case TEXTMSGTYPE_CaptureFlagMessage:
-				TextMsg->TextMsgType = Type;
-				strncpy( &TextMsg->Text[0]	, CTFMessage , MAXTEXTMSG );
-				PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
-				MessageColour = FlagMessageColour;
-				break;
-			case TEXTMSGTYPE_ScoredWithFlag:
-				TextMsg->TextMsgType = Type;
-				TextMsg->Text[0] = 0;
-				PlaySfx( SFX_MyTeamScored, FlagVolume );
-				MessageColour = FlagMessageColour;
-				flags |= NETWORK_RELIABLE;
-				break;
-			case TEXTMSGTYPE_ReturningFlag:
-				TextMsg->TextMsgType = Type;
-				TextMsg->Text[0] = 0;
-				MessageColour = FlagMessageColour;
-				break;
-			case TEXTMSGTYPE_ReturnedFlag:
-				TextMsg->TextMsgType = Type;
-				TextMsg->Text[0] = 0;
-				MessageColour = FlagMessageColour;
-				break;
-			case TEXTMSGTYPE_FlagDriftedIn:
-				TextMsg->TextMsgType = Type;
-				TextMsg->Text[0] = 0;
-				MessageColour = FlagMessageColour;
-				break;
-			case TEXTMSGTYPE_FlagEscaped:
-				TextMsg->TextMsgType = Type;
-				TextMsg->Text[0] = 0;
-				MessageColour = FlagMessageColour;
-				break;
-			case TEXTMSGTYPE_BountyMessage:
-				TextMsg->TextMsgType = Type;
-				TextMsg->Text[0] = 0;
-				PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
-				MessageColour = FlagMessageColour;
-				break;
-			case TEXTMSGTYPE_SpeechTaunt:
-				TextMsg->TextMsgType = Type;
-				TextMsg->Text[0] = CurrentTauntVariant;
-				MessageColour = PlayerMessageColour;
-				break;
-			default:
-				TextMsg->TextMsgType = TEXTMSGTYPE_Taunt1;
+		case TEXTMSGTYPE_Taunt1:
+			strncpy( &TextMsg->Text[0]	, &MacroText1.text[0] , MAXTEXTMSG );
+			TextMsg->TextMsgType = Type;
+			MessageColour = TauntMessageColour;
+			break;
+		case TEXTMSGTYPE_Taunt2:
+			strncpy( &TextMsg->Text[0]	, &MacroText2.text[0] , MAXTEXTMSG );
+			TextMsg->TextMsgType = Type;
+			MessageColour = TauntMessageColour;
+			break;
+		case TEXTMSGTYPE_Taunt3:
+			strncpy( &TextMsg->Text[0]	, &MacroText3.text[0] , MAXTEXTMSG );
+			TextMsg->TextMsgType = Type;
+			MessageColour = TauntMessageColour;
+			break;
+		case TEXTMSGTYPE_TitleMessage:
+			strncpy( &TextMsg->Text[0]	, &MacroText4.text[0] , MAXTEXTMSG );
+			TextMsg->TextMsgType = Type;
+			MessageColour = SystemMessageColour;
+			break;
+		case TEXTMSGTYPE_JoiningTeamGame:
+			TextMsg->TextMsgType = Type;
+			MessageColour = SystemMessageColour;
+			break;
+		case TEXTMSGTYPE_EnteredWatchMode:
+			TextMsg->TextMsgType = Type;
+			MessageColour = SystemMessageColour;
+			break;
+		case TEXTMSGTYPE_ExitedWatchMode:
+			TextMsg->TextMsgType = Type;
+			MessageColour = SystemMessageColour;
+			break;
+		case TEXTMSGTYPE_QuickTaunt:
+			strncpy( &TextMsg->Text[0]	, &QuickText.text[0] , MAXTEXTMSG );
+			TextMsg->TextMsgType = Type;
+			MessageColour = MyMessageColour;
+			AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
+			// sending version request
+			if(strcmp(&TextMsg->Text[0], (const char *) "version") == 0)
+			{
+				// display my version number
+				AddColourMessageToQue(SystemMessageColour, "%s", YourVersion );
+			}
+			break;
+		case TEXTMSGTYPE_QuickTauntWhisper:
+			strncpy( &TextMsg->Text[0]	, &QuickTextWhisper.text[0] , MAXTEXTMSG );
+			TextMsg->TextMsgType = Type;
+			MessageColour = MyMessageColour;
+			AddPlayerMessageToQue( MessageColour, "%s", (char*) &TextMsg->Text[0] );
+			break;
+		case TEXTMSGTYPE_CaptureFlagMessage:
+			TextMsg->TextMsgType = Type;
+			strncpy( &TextMsg->Text[0]	, CTFMessage , MAXTEXTMSG );
+			PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
+			MessageColour = FlagMessageColour;
+			break;
+		case TEXTMSGTYPE_ScoredWithFlag:
+			TextMsg->TextMsgType = Type;
+			TextMsg->Text[0] = 0;
+			PlaySfx( SFX_MyTeamScored, FlagVolume );
+			MessageColour = FlagMessageColour;
+			flags |= NETWORK_RELIABLE;
+			break;
+		case TEXTMSGTYPE_ReturningFlag:
+			TextMsg->TextMsgType = Type;
+			TextMsg->Text[0] = 0;
+			MessageColour = FlagMessageColour;
+			break;
+		case TEXTMSGTYPE_ReturnedFlag:
+			TextMsg->TextMsgType = Type;
+			TextMsg->Text[0] = 0;
+			MessageColour = FlagMessageColour;
+			break;
+		case TEXTMSGTYPE_FlagDriftedIn:
+			TextMsg->TextMsgType = Type;
+			TextMsg->Text[0] = 0;
+			MessageColour = FlagMessageColour;
+			break;
+		case TEXTMSGTYPE_FlagEscaped:
+			TextMsg->TextMsgType = Type;
+			TextMsg->Text[0] = 0;
+			MessageColour = FlagMessageColour;
+			break;
+		case TEXTMSGTYPE_BountyMessage:
+			TextMsg->TextMsgType = Type;
+			TextMsg->Text[0] = 0;
+			PlaySfx( SFX_MyTeamGotFlag , FlagVolume );
+			MessageColour = FlagMessageColour;
+			break;
+		case TEXTMSGTYPE_SpeechTaunt:
+			TextMsg->TextMsgType = Type;
+			TextMsg->Text[0] = CurrentTauntVariant;
+			MessageColour = PlayerMessageColour;
+			break;
+		default:
+			TextMsg->TextMsgType = TEXTMSGTYPE_Taunt1;
 		}
 		// put a null at the end just in case...
 		TextMsg->Text[MAXTEXTMSG-1] = 0;
@@ -3751,8 +3751,8 @@ void SendGameMessage( BYTE msg, network_player_t * to, BYTE ShipNum, BYTE Type, 
 
 	}
 
-// goto send if you want to break out of the switch
-send:
+	// goto send if you want to break out of the switch
+	send:
 
 	// only record if message is sent to whole of the group....
 

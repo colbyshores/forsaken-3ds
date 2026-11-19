@@ -37,7 +37,7 @@ struct DspDecoder {
 			for (int n = 0; n < 14; n++) {
 				const int byte_idx = 1 + (n >> 1);
 				int32_t nibble = (n & 1) ? (frame[byte_idx] & 0x0F)
-										 : ((frame[byte_idx] >> 4) & 0x0F);
+				: ((frame[byte_idx] >> 4) & 0x0F);
 				if (nibble & 0x08) nibble |= (int32_t)0xFFFFFFF0;
 				const int32_t sample = nibble << scale;
 				const int32_t prediction = (hist1 * c1 + hist2 * c2) >> 11;

@@ -40,8 +40,8 @@ struct NODE
 	u_int16_t	NodeNum;		// what number in the array I am..
 	u_int32_t	NetMask;		// which networks am I in..
 	int16_t	NumOfLinks;
-struct	NODE *	NodeLink[MAXLINKSPERNODE];
-struct	NODE *	NextNodeInGroup;
+	struct	NODE *	NodeLink[MAXLINKSPERNODE];
+	struct	NODE *	NextNodeInGroup;
 };
 
 struct NODENETWORKHEADER

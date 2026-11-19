@@ -191,7 +191,7 @@ bool Nodeload( char * Filename )
 			NodePnt->NodeLink[o] = NodeNetworkHeader.FirstNode + in.i32();
 		}
 #ifdef EDITION_REMASTER
-_skipped_extra_links: ;
+		_skipped_extra_links: ;
 #endif
 
 		NodePnt->SolidPos = NodePnt->Pos;

@@ -184,13 +184,13 @@ static void apply_texenv_for_texture(texture_t *texdata)
 		 * the material class changed. */
 		material_class_t mc = desired_mc;
 		float base_freq = (mc == MAT_ROCK)    ? 13.0f
-						: (mc == MAT_ORGANIC) ? 14.0f
-											  : 16.0f;
+		: (mc == MAT_ORGANIC) ? 14.0f
+		: 16.0f;
 		float amp       = (mc == MAT_ROCK)    ? 0.31f
-						: (mc == MAT_ORGANIC) ? 0.27f
-											  : 0.25f;
+		: (mc == MAT_ORGANIC) ? 0.27f
+		: 0.25f;
 		float phase = ((float)desired_bucket + 0.5f)
-					* (1.0f / (float)ATLAS_PHASE_BUCKETS);
+		* (1.0f / (float)ATLAS_PHASE_BUCKETS);
 		/* Use the low 3 bits of the bucket as an orthogonal frequency
 		 * axis — same phase value × 8 different frequencies = 8× the
 		 * visible variants per phase position. Combined with 64 phase

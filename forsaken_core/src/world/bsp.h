@@ -26,14 +26,14 @@ constexpr int MAX_BSP_MODELS = (1);
 /*
  * Structures
  */
- struct BSP_RAWNODE
- {
+struct BSP_RAWNODE
+{
 	VECTOR	Normal;
 	float	Offset;
 	int		Front;
 	int		Back;
 	int		Colour;
- };
+};
 static_assert( sizeof( BSP_RAWNODE ) == 28, "BSP_RAWNODE is a file record" );
 
 struct BSP_NODE
@@ -41,15 +41,15 @@ struct BSP_NODE
 	VECTOR	Normal;
 	float	Offset;
 	int		Colour;
-struct	BSP_NODE * Parent;
-struct	BSP_NODE * Front;
-struct	BSP_NODE * Back;
+	struct	BSP_NODE * Parent;
+	struct	BSP_NODE * Front;
+	struct	BSP_NODE * Back;
 };
 
 struct BSP_TREE
 {
-   int	NumNodes;
-   BSP_NODE * Root;
+	int	NumNodes;
+	BSP_NODE * Root;
 };
 
 struct BSP_HEADER
@@ -90,9 +90,9 @@ extern	BSP_HEADER Bsp_Header[];
 extern	BSP_PORTAL_HEADER Bsp_Portal_Header;
 
 
- /*
- * fn prototypes
- */
+/*
+* fn prototypes
+*/
 void Bspfree( void );
 bool Bspload( char * Filename,  BSP_HEADER *Bsp_Header );
 bool RayCollide( BSP_HEADER *Bsp_Header, VECTOR *StartPos, VECTOR *Dir, VECTOR *ImpactPoint, VECTOR *ImpactNormal, float *ImpactOffset ,u_int16_t group );

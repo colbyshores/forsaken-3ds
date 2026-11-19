@@ -275,7 +275,7 @@ bool WaterLoad( void )
 	free( OrgBuffer );
 	return true;
 
-load_fail:
+	load_fail:
 	/* Bail-out cleanup. Without this, FirstWaterObject is left malloc'd
 	 * with partially populated WATEROBJECTs (Group, XVerts, YVerts set
 	 * from the file but Verts/Vels/renderObject still NULL because
@@ -574,9 +574,9 @@ void UpdateWaterMesh( WATEROBJECT * WO )
 			if( x > 0 && x < WO->XVerts-1 && y > 0 && y < WO->YVerts-1 )
 			{
 				dx = *(VertPnt+WO->YVerts) - *(VertPnt-WO->YVerts) + 0.25F
-					* ( *(VertPnt+WO->YVerts-1) + *(VertPnt+WO->YVerts+1) - *(VertPnt-WO->YVerts-1) - *(VertPnt-WO->YVerts+1) );
+				* ( *(VertPnt+WO->YVerts-1) + *(VertPnt+WO->YVerts+1) - *(VertPnt-WO->YVerts-1) - *(VertPnt-WO->YVerts+1) );
 				dy = *(VertPnt+1) - *(VertPnt-1) + 0.25F
-					* ( *(VertPnt+WO->YVerts+1) + *(VertPnt-WO->YVerts+1) - *(VertPnt+WO->YVerts-1) - *(VertPnt-WO->YVerts-1) );
+				* ( *(VertPnt+WO->YVerts+1) + *(VertPnt-WO->YVerts+1) - *(VertPnt+WO->YVerts-1) - *(VertPnt-WO->YVerts-1) );
 			}else{
 				dx = 0.0F;
 				dy = 0.0F;
@@ -712,9 +712,9 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 
 
 	WaterOffset = -DotProduct( &WaterNormal, &Pos );
-/*===================================================================
-	Calculate T
-===================================================================*/
+	/*===================================================================
+		Calculate T
+	===================================================================*/
 	Div = ( Offset->x * WaterNormal.x) +
 		  ( Offset->y * WaterNormal.y) +
 		  ( Offset->z * WaterNormal.z);
@@ -724,9 +724,9 @@ bool SingleWaterObjectCollide( WATEROBJECT * Wo, VECTOR *Origin, VECTOR *Offset,
 			( Origin->z * WaterNormal.z ) ) + WaterOffset ;
 	t = -( Num / Div );
 
-/*===================================================================
-	Do Polygon collision
-===================================================================*/
+	/*===================================================================
+		Do Polygon collision
+	===================================================================*/
 
 	if( t < 0.0F ) return false;		/* Intersection behind origin */
 	if( t > 1.0F ) return false;		/* Intersection Greater then ray length */

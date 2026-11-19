@@ -120,9 +120,9 @@ inline int fillclip_tight_bounds(const float *clip, int n,
 		if (py > maxy)
 			maxy = py;
 	}
-    *out_minx = minx;
-    *out_miny = miny;
-    *out_maxx = maxx;
-    *out_maxy = maxy;
+	*out_minx = minx;
+	*out_miny = miny;
+	*out_maxx = maxx;
+	*out_maxy = maxy;
 	return 1;
 }
