@@ -3851,7 +3851,7 @@ void EnemyUnderLittleGeekControl( ENEMY * Enemy );
 void EnemyJumpUnderAiControl( ENEMY * Enemy );
 void InitGuns( BYTE how_many_guns , u_int16_t * GunType , OBJECT * Object );
 void SetWheelPos( VECTOR * DestPos , VECTOR * SourcePos , float xoff , float zoff , VECTOR * Right, VECTOR * Forward, u_int16_t Group , u_int16_t * DestGroup );
-bool Enemy2EnemyCollide( ENEMY * SEnemy , VECTOR * Move );
+bool Enemy2EnemyCollide( ENEMY * SEnemy );
 bool Enemy2EnemyCollideSpecial( ENEMY * SEnemy , VECTOR * StartPos);
 void AutoDisplayMatrix( OBJECT * Object );
 
@@ -6482,7 +6482,7 @@ void AutoMovement( OBJECT * Object , ENEMY * Enemy , bool AngleDecellBefore )
 	Move_Off.z += Object->ExternalForce.z * framelag;
 
 	// Collide with other enemies....
-	Enemy2EnemyCollide( Enemy , &Move_Off );
+	Enemy2EnemyCollide( Enemy );
 
 	// do collisions to background
 
@@ -7503,10 +7503,9 @@ void RestrictMovement( ENEMY * Enemy , VECTOR * Move )
 /*===================================================================
 	Procedure	:	Enemy to Enemy Collide...
 	Input		:	ENEMY * Enemy
-				:	VECTOR * Move offset....
-	Output		:	Nothing
+	Output		:	bool	true if it pushed the enemy away from another
 ===================================================================*/
-bool Enemy2EnemyCollide( ENEMY * SEnemy , VECTOR * /*Move*/ )
+bool Enemy2EnemyCollide( ENEMY * SEnemy )
 {
 	ENEMY * TEnemy;
 	float Move_Length;
@@ -8709,7 +8708,7 @@ bool SplineAutoMovement( OBJECT * Object , ENEMY * Enemy )
 	AccellDecell( &Object->ExternalForce.z , EnemyTypes[Enemy->Type].MoveRateDecell );
 
 	// Collide with other enemies....
-	Enemy2EnemyCollide( Enemy , &Move_Off );
+	Enemy2EnemyCollide( Enemy );
 
 	Move_Off.x += Object->ExternalForce.x * framelag;
 	Move_Off.y += Object->ExternalForce.y * framelag;
