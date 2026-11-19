@@ -736,7 +736,7 @@ void DispGroupTriggerAreas( u_int16_t Group )
 				DisplayTriggerZone( Area->Zone, Area->num_sides, Group, 64, 0, 64 ,128 );
 			}
 		}
-		Area = Area->NextSameGroup_player;
+		Area = Area->NextSameGroup_player_shoots;
 	}
 
 	Area = GroupTriggerArea_enemy[Group];
@@ -764,7 +764,7 @@ void DispGroupTriggerAreas( u_int16_t Group )
 				DisplayTriggerZone( Area->Zone, Area->num_sides, Group, 64, 0, 64 ,128 );
 			}
 		}
-		Area = Area->NextSameGroup_player;
+		Area = Area->NextSameGroup_enemy;
 	}
 
 	Area = GroupTriggerArea_enemy_shoots[Group];
@@ -792,7 +792,7 @@ void DispGroupTriggerAreas( u_int16_t Group )
 				DisplayTriggerZone( Area->Zone, Area->num_sides, Group, 64, 0, 64 ,128 );
 			}
 		}
-		Area = Area->NextSameGroup_player;
+		Area = Area->NextSameGroup_enemy_shoots;
 	}
 }
 
