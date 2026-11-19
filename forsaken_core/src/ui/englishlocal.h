@@ -24,7 +24,6 @@
 #define IS_JOINING_THE_GAME "is joining the game"		// player is joining the games
 #define YOU_HAVE_BECOME_THE_HOST "You Have Become The Host"
 #define HAS_LEFT_THE_GAME "has left the game"
-#define FROM_YOUR_OWN_TEAM "from your own team"
 #define WITH_THE_BOUNTY "with the bounty"
 #define NO_POINTS_FOR_KILLING_PLAYER_WITHOUT_THE_BOUNTY "no points for killing %s without the bounty" // %s= Name of Player
 #define ON_HIS_OWN_TEAM "on his own team"

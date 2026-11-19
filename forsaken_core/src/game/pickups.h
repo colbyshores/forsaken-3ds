@@ -252,13 +252,6 @@ typedef struct QUEDPICKUP {
 
 } QUEDPICKUP;
 
-typedef struct REGENPICKUPINFO {
-
-	int16_t	Required;
-	int16_t	Num;
-
-} REGENPICKUPINFO;
-
 typedef struct FAILEDKILL {
 
 	int16_t	Next;				// link list.....
