@@ -4121,7 +4121,7 @@ void KillUsedEnemy( ENEMY * Object )
 				else LifeCount = -1.0F;
 				Speed = ( (float) Random_Range( (u_int16_t) ( PICKUP_SPEED / 2.0F ) ) ) + ( PICKUP_SPEED / 2.0F );
 				InitOnePickup( &Object->Object.Pos, Object->Object.Group, &Dir, Speed, Pickup, INDEX_NONE, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
-				if( IsHost ) DropPickupSend( &Object->Object.Pos, Object->Object.Group, &Dir, 0.0F, Object->PickupHeld, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
+				if( IsHost ) DropPickupSend( &Object->Object.Pos, Object->Object.Group, &Dir, 0.0F, Pickup, ++Ships[WhoIAm].PickupIdCount, -1, false, LifeCount, INDEX_NONE );
 			}
 		}
 
