@@ -32,8 +32,14 @@ constexpr float PI = 3.14159265358979323846F;
 #ifndef M_PI_2 // pi/2
 #define M_PI_2				1.57079632679489661923
 #endif
-#define	D2R(x)				( ( x ) * ( 1.0F / 57.2957F) )		/* Nick Pelling changed */
-#define	R2D(x)				( ( x ) * 57.2957F )
+/* Degrees <-> radians. One overload per argument type in use, so each
+ * computes in the type the macros they replaced did (an int or float
+ * argument in float, a double in double). */
+constexpr float D2R( float x ) { return x * ( 1.0F / 57.2957F ); }
+constexpr double D2R( double x ) { return x * ( 1.0F / 57.2957F ); }
+constexpr float D2R( int x ) { return x * ( 1.0F / 57.2957F ); }
+constexpr float R2D( float x ) { return x * 57.2957F; }
+constexpr double R2D( double x ) { return x * 57.2957F; }
 
 /*===================================================================
 	Fast sin/cos via a 1024-entry LUT with linear interpolation.
@@ -157,10 +163,15 @@ static inline float fast_ceilf(float x)
 	return (x > t) ? t + 1.0f : t;
 }
 
-#define	SIND(x)				fast_sinf( D2R( x ) )
-#define	COSD(x)				fast_cosf( D2R( x ) )
+/* Sine / cosine of an angle in degrees, and atan2 in degrees. */
+inline float SIND( float x ) { return fast_sinf( D2R( x ) ); }
+inline float SIND( double x ) { return fast_sinf( (float) D2R( x ) ); }
+inline float SIND( int x ) { return fast_sinf( D2R( x ) ); }
+inline float COSD( float x ) { return fast_cosf( D2R( x ) ); }
+inline float COSD( double x ) { return fast_cosf( (float) D2R( x ) ); }
+inline float COSD( int x ) { return fast_cosf( D2R( x ) ); }
 /* @vfp-exempt R6 — inverse trig has no LUT form (fast trig is sin/cos only); LUT-izing is new numeric work needing a fidelity capture. measured n/a. Verified 2026-10-25. */
-#define ATAND(y, x)			R2D( atan2f(y, x) )
+inline float ATAND( float y, float x ) { return R2D( atan2f( y, x ) ); }
 #define FMOD( NUM, DIV )	( (NUM) - (DIV) * fast_floorf( (NUM) / (DIV) ) )
 #define FDIV( NUM, DIV )	( (DIV) * fast_floorf( (NUM) / (DIV) ) )
 
