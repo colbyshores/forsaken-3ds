@@ -4184,14 +4184,13 @@ void CreateShockwave( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int1
 
 /*===================================================================
 	Procedure	:	Explode Secondary Weapon
-	Input		:	VECTOR	*	Pos
-				:	u_int16_t		Group
+	Input		:	u_int16_t		OwnerType
 				:	u_int16_t		Owner
 				:	u_int16_t		ID
 				:	float		ShockwaveSize
-	Output		:	int16_t		Number of generated pickups
+	Output		:	Nothing
 ===================================================================*/
-void ExplodeSecondary( VECTOR * /*Pos*/, u_int16_t /*Group*/, u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize )
+void ExplodeSecondary( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize )
 {
 	u_int16_t	i;
 	u_int16_t	Next;
@@ -6473,7 +6472,7 @@ void DestroySecondary( u_int16_t i, VECTOR * Int_Point )
 
 		case ENEMYDEPTHCHARGE:
 			PlayPannedSfx( SFX_BangBang, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
-			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, DEPTHCHARGE_SHOCKWAVE );
+			ExplodeSecondary( SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, DEPTHCHARGE_SHOCKWAVE );
 			break;
 
 		case MUGMISSILE:
@@ -6526,27 +6525,27 @@ void DestroySecondary( u_int16_t i, VECTOR * Int_Point )
 
 		case TITANSTARSHRAPNEL:
 			PlayPannedSfx( SFX_Exp3, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
-			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, TITANSTAR_SHOCKWAVE );
+			ExplodeSecondary( SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, TITANSTAR_SHOCKWAVE );
 			break;
 
 		case PINEMINE:
 			PlayPannedSfx( SFX_Exp5, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
-			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, ( PINE_SHOCKWAVE + ( SecBulls[ i ].Ammo / 2 ) ) );
+			ExplodeSecondary( SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, ( PINE_SHOCKWAVE + ( SecBulls[ i ].Ammo / 2 ) ) );
 			break;
 
 		case PURGEMINE:
 			PlayPannedSfx( SFX_Exp4, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
-			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, PURGE_SHOCKWAVE );
+			ExplodeSecondary( SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, PURGE_SHOCKWAVE );
 			break;
 
 		case QUANTUMMINE:
 			PlayPannedSfx( SFX_QuantumMineExplode, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
-			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, QUANTUM_SHOCKWAVE );
+			ExplodeSecondary( SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, QUANTUM_SHOCKWAVE );
 			break;
 
 		case SPIDERMINE:
 			PlayPannedSfx( SFX_Exp6, SecBulls[i].GroupImIn , &SecBulls[ i ].Pos, 0.0F );
-			ExplodeSecondary( &SecBulls[ i ].Pos, SecBulls[ i ].GroupImIn, SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, SPIDER_SHOCKWAVE );
+			ExplodeSecondary( SecBulls[ i ].OwnerType, SecBulls[ i ].Owner, SecBulls[ i ].ID, SPIDER_SHOCKWAVE );
 			break;
 
 		default:

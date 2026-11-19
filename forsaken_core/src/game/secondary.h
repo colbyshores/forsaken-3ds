@@ -250,7 +250,7 @@ void	CreateSolarisTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateNewTrail( VECTOR * Pos, VECTOR * Dir, u_int16_t Group );
 void	CreateGravgonField( u_int16_t i );
 void	CreateShockwave( u_int16_t OwnerType, u_int16_t Owner, VECTOR * Pos, u_int16_t Group, float ShockwaveSize, BYTE Weapon );
-void	ExplodeSecondary( VECTOR * Pos, u_int16_t Group, u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize );
+void	ExplodeSecondary( u_int16_t OwnerType, u_int16_t Owner, u_int16_t ID, float ShockwaveSize );
 bool	ProcessMines( u_int16_t i );
 bool	ProcessMissiles( u_int16_t i, u_int16_t * NextMissile );
 void	KillOwnersSecBulls( u_int16_t Owner );
