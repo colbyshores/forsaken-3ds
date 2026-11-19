@@ -7,8 +7,7 @@
  * are taken, the channel claimed longest ago is reset and handed over: the
  * evicted source goes silent and is left with no channel (-1). Channel 23
  * belongs to music_3ds.cpp. Volume (millibels) and pan become the channel's
- * left/right mix. The listener calls are no-ops and Sound3D is false, so
- * sfx.cpp pans in software and never calls sound_position.
+ * left/right mix. The listener calls are no-ops; sfx.cpp pans in software.
  *
  * sound_init first copies romfs:/dspfirm.cdc to sdmc:/3ds/dspfirm.cdc if the
  * SD copy is missing, because ndspInit loads the DSP firmware from there.
@@ -37,7 +36,6 @@
 constexpr int MAX_CHANNELS = 24;
 constexpr int MAX_PATH_LEN = 500;
 
-bool Sound3D = false;
 /* sound_minimum_volume is defined in sfx.cpp (always-compiled owner). */
 
 
@@ -575,36 +573,6 @@ void sound_pan(sound_source_t *src, long _pan)
 
 	mix[0] = left;
 	mix[1] = right;
-	ndspChnSetMix(src->channel, mix);
-}
-
-void sound_position(sound_source_t *src, float x, float y, float z,
-					float min_distance, float max_distance)
-{
-	/* Basic positional audio approximation:
-	   Just do simple left/right panning based on x position
-	   relative to min/max distance */
-	if (!src || src->channel < 0) return;
-
-	float dist = sqrtf(x*x + y*y + z*z);
-	if (dist < min_distance) dist = min_distance;
-
-	/* attenuation */
-	float atten = 1.0f;
-	if (dist > min_distance && max_distance > min_distance)
-	{
-		atten = 1.0f - (dist - min_distance) / (max_distance - min_distance);
-		if (atten < 0.0f) atten = 0.0f;
-	}
-
-	/* pan from x position */
-	float pan = 0.0f;
-	if (dist > 0.001f)
-		pan = x / dist;
-
-	float mix[12] = {0};
-	mix[0] = atten * (1.0f - pan) * 0.5f;
-	mix[1] = atten * (1.0f + pan) * 0.5f;
 	ndspChnSetMix(src->channel, mix);
 }
 

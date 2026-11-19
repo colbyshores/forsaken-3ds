@@ -20,8 +20,7 @@
 #include "data/config.h"
 #include "util/util.h"
 /* Owner for sound.h's sound_minimum_volume extern (was a tentative
-   definition in the header; illegal as C++ TUs now include sound.h).
-   Sound3D stays defined per-backend (sound_3ds.cpp / sound_openal.cpp). */
+   definition in the header; illegal as C++ TUs now include sound.h). */
 int sound_minimum_volume = -10000 / 3;
 
 /*************************************
@@ -2128,68 +2127,49 @@ bool StopSfx( u_int32_t uid )
 				:	VECTOR * Pos
 	Output		:	Nothing
 ===================================================================*/
-void SetPannedSourceParams( void* sound_source, VECTOR *SfxPos, float Freq, VECTOR *Temp, float Distance, long Volume, u_int16_t Effects )
+void SetPannedSourceParams( void* sound_source, VECTOR * /*SfxPos*/, float Freq, VECTOR *Temp, float Distance, long Volume, u_int16_t Effects )
 {
 	if(!sound_source) return;
-	if( Sound3D )
+	VECTOR	Temp2;
+	float	nz;
+	float	sx, sxmod;
+	long	Pan = 0;
+	float mindist = SHIP_RADIUS * 6.0F;
+	float sxmin = 100.0F;
+	float sxmax = 10000.0F;
+	float currentdist;
+	if ( Distance && (!( Effects & SPOT_SFX_TYPE_NoPan )) )
 	{
-		if(!SfxPos)
+		ApplyMatrix( &Ships[ Current_Camera_View ].Object.FinalInvMat , Temp, &Temp2 );
+
+		// we only care about x plane because we only have left/right speakers in panning
+		// z is probably used to adjust for field of view (as things get farther away they
+		// move towards the center of screen)
+		currentdist = (float) sqrtf( ( Temp2.x * Temp2.x ) + ( Temp2.z * Temp2.z ) );
+
+		if( currentdist )
 		{
-			DebugPrintf("SetPannedSourceParams given SfxPos=0\n");
-			return;
+			nz = Temp2.z / currentdist;
+
+			sxmod = ( Temp2.x < 0.0F ) ? -1.0F : 1.0F;
+
+			sx = ( currentdist > mindist ) ? 10000.0F :
+				( ( ( currentdist * ( sxmax - sxmin ) ) / mindist ) + sxmin );
+
+			sx *= sxmod;
+
+			// the bigger z is than x becomes smaller hence sound shrinks into center of
+			// view with distance
+			Pan = (long) ( ( 1.0F - fabsf(nz) )* ( sx ) );
 		}
-		sound_position(
-			(sound_source_t*)sound_source,
-			SfxPos->x / 128.0F,
-			SfxPos->y / 128.0F,
-			SfxPos->z / 128.0F,
-			1.0f,	// min distance
-			100.0f  // max distance
-		);
-	}
-	else
-	{
-		VECTOR	Temp2;
-		float	nz;
-		float	sx, sxmod;
-		long	Pan = 0;
-		float mindist = SHIP_RADIUS * 6.0F;
-		float sxmin = 100.0F;
-		float sxmax = 10000.0F;
-		float currentdist;
-		if ( Distance && (!( Effects & SPOT_SFX_TYPE_NoPan )) )
+		else
 		{
-			ApplyMatrix( &Ships[ Current_Camera_View ].Object.FinalInvMat , Temp, &Temp2 );
-
-			// we only care about x plane because we only have left/right speakers in panning
-			// z is probably used to adjust for field of view (as things get farther away they
-			// move towards the center of screen)
-			currentdist = (float) sqrtf( ( Temp2.x * Temp2.x ) + ( Temp2.z * Temp2.z ) );
-
-			if( currentdist )
-			{
-				nz = Temp2.z / currentdist;
-
-				sxmod = ( Temp2.x < 0.0F ) ? -1.0F : 1.0F;
-
-				sx = ( currentdist > mindist ) ? 10000.0F :
-					( ( ( currentdist * ( sxmax - sxmin ) ) / mindist ) + sxmin );
-
-				sx *= sxmod;
-
-				// the bigger z is than x becomes smaller hence sound shrinks into center of
-				// view with distance
-				Pan = (long) ( ( 1.0F - fabsf(nz) )* ( sx ) );
-			}
-			else
-			{
-				Pan = 0;
-			}
+			Pan = 0;
 		}
-		sound_pan((sound_source_t*)sound_source, Pan);
-		sound_volume( (sound_source_t*)sound_source , Volume );
-		sound_set_pitch( (sound_source_t*)sound_source, Freq );
 	}
+	sound_pan((sound_source_t*)sound_source, Pan);
+	sound_volume( (sound_source_t*)sound_source , Volume );
+	sound_set_pitch( (sound_source_t*)sound_source, Freq );
 }
 
 void SetSoundLevels( int * /*dummy*/ )
@@ -2383,19 +2363,6 @@ void ProcessLoopingSfx( void )
 	{
 		if ( !SpotSfxList[ i ].used )
 			continue;
-
-
-
-//
-// Sound3D
-//
-//           in/out of range will not be needed if we implement a sound stealing algorithm
-//           so if we need to create a new sound and we are the max sounds then we can find
-//           the least significant sound based on distance/volume (attenuation?) and kill
-//           that sound so we can fire off the new one. unless the new one is worse.
-//
-//           volume hacking based on distance calculations will not be needed
-//
 
 		// work out if sound in range, get parameters
 		if( Ships[ Current_Camera_View ].Object.Group != INDEX_NONE )

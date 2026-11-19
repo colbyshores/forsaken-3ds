@@ -6,11 +6,11 @@
  * sound_buffer_t is one OpenAL buffer filled from a WAV through SDL_LoadWAV
  * (8-bit data stored unsigned, 16-bit signed, as OpenAL wants); each
  * sound_source_t is one OpenAL source on that buffer. Millibels become gain
- * 10^(mb/2000). Sound3D is always false, so sources are listener-relative
- * and sound_pan puts the source on the unit circle in the listener's x/y
- * plane (straight above it at centre): pan never changes the distance. z is
- * negated for OpenAL's right-handed axes. The listener gain is fixed at 0.5
- * to reduce crackling. music_openal.cpp plays on the same context.
+ * 10^(mb/2000). Sources are listener-relative and sound_pan puts the source
+ * on the unit circle in the listener's x/y plane (straight above it at
+ * centre): pan never changes the distance. z is negated for OpenAL's
+ * right-handed axes. The listener gain is fixed at 0.5 to reduce crackling.
+ * music_openal.cpp plays on the same context.
  */
 
 #ifdef SOUND_OPENAL
@@ -23,8 +23,6 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <math.h>
-
-bool Sound3D = false; // enable 3d sound
 
 static struct {
 	int buffers;
@@ -200,14 +198,6 @@ bool sound_listener_orientation(
 	float vector[6] = {fx,fy,-fz,ux,uy,-uz};
 	alListenerfv(AL_ORIENTATION, &vector[0]);
 	return true;
-}
-
-// TODO - we'll want to set velocity as well
-void sound_position( sound_source_t * source, float x, float y, float z, float min, float max )
-{
-	alSource3f(source->id, AL_POSITION, x, y, -z);
-	alSourcef(source->id, AL_MAX_DISTANCE, max);
-	alSourcef(source->id, AL_REFERENCE_DISTANCE, min); // is this right?
 }
 
 //
@@ -414,8 +404,7 @@ sound_source_t * sound_source( sound_buffer_t * buffer )
 		return NULL;
 	}
 
-	alSourcei(source->id,AL_SOURCE_RELATIVE,
-		Sound3D ? AL_FALSE : AL_TRUE);
+	alSourcei(source->id,AL_SOURCE_RELATIVE,AL_TRUE);
 
 	stats.sources++;
 

@@ -7,7 +7,7 @@
  * caller. Units keep the 1998 DirectSound conventions: volume in millibels (0 = full,
  * negative attenuates, sound_minimum_volume is the floor and is owned by
  * sfx.cpp), pan in -10000..10000, pitch as a multiplier with 0 meaning
- * as recorded. Each backend defines Sound3D.
+ * as recorded. Sources are 2D: sfx.cpp pans them with sound_pan.
  */
 
 #include "game/main.h"
@@ -18,9 +18,6 @@
 //
 // Globals
 //
-
-// this will eventually be removed but is required right now
-extern bool Sound3D;
 
 // the game appears to need this probably wont in openAL
 extern int sound_minimum_volume;
@@ -61,4 +58,3 @@ void sound_release_buffer( sound_buffer_t * s );
 void sound_set_pitch( sound_source_t * s, float freq );
 void sound_volume( sound_source_t * s, long decibels );
 void sound_pan( sound_source_t * s, long pan );
-void sound_position( sound_source_t * s, float x, float y, float z, float min_distance, float max_distance );
