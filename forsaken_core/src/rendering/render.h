@@ -92,10 +92,6 @@ extern render_info_t render_info;
 typedef bool (*RenderCurrentCameraPt) (void);
 bool RenderCurrentCameraInStereo( RenderCurrentCameraPt );
 
-
-#undef RELEASE
-#define RELEASE(x) {if (x != NULL) {x->Release(); x = NULL;}}
-
 void cull_none( void );
 void reset_cull( void );
 void disable_zbuff( void );

@@ -5037,8 +5037,6 @@ void GetRealLightAmbient( VECTOR * Pos , float * Red , float * Green , float * B
 	*Blue = BF;
 }
 
-#define POINT_TO_PLANE( P, N ) ( (P)->x * (N)->Normal.x + (P)->y * (N)->Normal.y + (P)->z * (N)->Normal.z + ( (N)->Offset) )
-
 constexpr float SHIP_MIN_FREQ = 0.5F;
 constexpr float SHIP_MAX_FREQ = 1.0F;
 constexpr int ENGINEUPDATEPAUSEFRAMES = 5;
