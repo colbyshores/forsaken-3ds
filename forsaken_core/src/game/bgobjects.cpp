@@ -1590,6 +1590,7 @@ BGOBJECT * LoadBGObjectData( int8_t * Filename, int16_t Type, VECTOR * Pos, VECT
 		if( !Object->Children )
 		{
 			Msg( "LoadBGObjectData() LoadCompObj() failded in %s\n", Filename );
+			KillUsedBGObject( Object );	/* back to the free list; it has no children */
 			return( NULL );
 		}
 
