@@ -68,7 +68,7 @@ constexpr int MAX_SAVEGAME_SLOTS = 16;
 bool SpaceOrbSetup = false;
 
 constexpr int MAX_KEYDEF_PAGES = (4);
-constexpr size_t KEYDEF_LABEL_SIZE = 16;	// a key definition's "selected/total" label
+constexpr size_t KEYDEF_LABEL_SIZE = 24;	// a key definition's "selected/total" label: two ints
 int CurrentPage = 0;
 int MaxPage = 0;
 bool MissileCameraEnable;
@@ -6258,7 +6258,11 @@ void SetPilotName( MENUITEM * /*item*/ )
 		return;
 
 	// path to the cfg file
-	snprintf( filepath, sizeof( filepath ), "pilots\\%s.txt", PilotName.text );
+	if( snprintf( filepath, sizeof( filepath ), "pilots\\%s.txt", PilotName.text ) >= (int) sizeof( filepath ) )
+	{
+		PlaySfx( SFX_Error, 1.0F );	// a name too long for its file
+		return;
+	}
 
 	// open the new/existing file to cfg open
 	f = file_open( filepath, "r" );
@@ -6348,7 +6352,11 @@ void SetPilotNameInGame( MENUITEM * /*item*/ )
 	if ( !strlen( PilotNameInGame.text ) )
 		return; // abort if pilot name empty
 
-	snprintf( fname, sizeof( fname ), "pilots\\%s.txt", PilotNameInGame.text );
+	if( snprintf( fname, sizeof( fname ), "pilots\\%s.txt", PilotNameInGame.text ) >= (int) sizeof( fname ) )
+	{
+		PlaySfx( SFX_Error, 1.0F );	// a name too long for its file
+		return;
+	}
 
 	f = file_open( fname, "r" );
 	if ( f )
@@ -6404,7 +6412,11 @@ void RenamePilotName( MENUITEM * /*item*/ )
 	if ( !strlen( PilotReName.text ) )
 		return; // abort if pilot name empty
 
-	snprintf( fname, sizeof( fname ), "pilots\\%s.txt", PilotReName.text );
+	if( snprintf( fname, sizeof( fname ), "pilots\\%s.txt", PilotReName.text ) >= (int) sizeof( fname ) )
+	{
+		PlaySfx( SFX_Error, 1.0F );	// a name too long for its file
+		return;
+	}
 
 	f = file_open( fname, "r" );
 	if ( f )
@@ -6938,11 +6950,9 @@ void InitBikerName( char *name )
 	// copy biker name into biker_name
 	copy_string( biker_name, sizeof( biker_name ), name );
 
-	// set the last character to end of c string
-	biker_name[ sizeof( biker_name ) - 1 ] = 0;
-
-	// set the biker config
-	snprintf( biker_config, sizeof( biker_config ), "pilots\\%s.txt", name );
+	// set the biker config (a pilot file named by hand can be too long)
+	if( snprintf( biker_config, sizeof( biker_config ), "pilots\\%s.txt", name ) >= (int) sizeof( biker_config ) )
+		DebugPrintf( "InitBikerName: pilot name too long for its config path: %s\n", name );
 
 	// remember the pilot in the config (PlayerName)
 	config_set_str("PlayerName",&biker_name[0]);
@@ -7368,7 +7378,7 @@ void GetSavedGameData( void )
 		{
 			snprintf( CurrentSavedGameLevel, sizeof( CurrentSavedGameLevel ), LT_LevelName/*"level name: %s"*/, GetMissionName( buf ) );
 			if ( strcasecmp( biker, DEFAULT_PLAYER_NAME ) )
-				snprintf( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
+				format_display_text( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor1/*"%s played for %hd mins %hd secs"*/, biker, Hours * 60 + Minutes, Seconds );
 			else
 				snprintf( CurrentSavedGameTimeLevelPlayed, sizeof( CurrentSavedGameTimeLevelPlayed ), LT_LevelPlayedFor2/*"played for %hd mins %hd secs"*/, Hours * 60 + Minutes, Seconds );
 			snprintf( CurrentSavedGameEnemiesKilled, sizeof( CurrentSavedGameEnemiesKilled ), LT_EnemiesKilled/*"enemies killed: %hd of %hd"*/, KilledEnemiesNum, InitEnemiesNum );
@@ -11969,7 +11979,7 @@ void AddTitleMessage(TEXTMSG *TextMsg)
 	if (TotalTitleMsgs != MAX_TITLE_MSGS)
 	{
 		char * name = (WhoIAm == TextMsg->WhoIAm) ? biker_name : Names[TextMsg->WhoIAm];
-		snprintf( TitleMsgQue[TitleMsgQueStart].text, MAX_TITLE_MSG_SIZE,
+		format_display_text( TitleMsgQue[TitleMsgQueStart].text, MAX_TITLE_MSG_SIZE,
 			"%s: %s", name, &TextMsg->Text[0] );
 		TitleMsgQue[TitleMsgQueStart].timer = MAX_TITLE_MSG_TIME;
 		TitleMsgQueStart++;

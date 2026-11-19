@@ -1131,7 +1131,15 @@ bool PreLoadBGOFiles( void )
 			{
 				file_read_cstring( fp, TempFilename, sizeof( TempFilename ) );
 
-				snprintf( FilePtr->Filename, sizeof( FilePtr->Filename ), "data\\levels\\%s\\bgobjects\\%s", &ShortLevelNames[ LevelNum ][ 0 ], TempFilename );
+				if( snprintf( FilePtr->Filename, sizeof( FilePtr->Filename ), "data\\levels\\%s\\bgobjects\\%s",
+						&ShortLevelNames[ LevelNum ][ 0 ], TempFilename ) >= (int) sizeof( FilePtr->Filename ) )
+				{
+					fclose( fp );
+					free( BGOFilesPtr );
+					BGOFilesPtr = nullptr;
+					Msg( "PreLoadBGOFiles() BGObject file name too long: %s\n", TempFilename );
+					return( false );
+				}
 
 				file_read( &FilePtr->Type, sizeof( int16_t ), 1, fp );
 

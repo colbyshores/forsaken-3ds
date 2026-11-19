@@ -13,7 +13,8 @@
  * or the size its owner documents for a pointer. copy_field is copy_string
  * for a fixed-width record field (a network message or file record): it
  * also zeroes the bytes after the string, so the record carries no
- * leftover data.
+ * leftover data. format_display_text is snprintf for text that is only
+ * shown on screen, where cutting it to fit is the intended result.
  */
 
 #include "game/main.h"
@@ -38,6 +39,7 @@ char * convert_char( char from, char to, char* in );
 bool copy_string( char * dst, size_t size, const char * src );
 bool append_string( char * dst, size_t size, const char * src );
 bool copy_field( char * dst, size_t size, const char * src );
+[[gnu::format( printf, 3, 4 )]] void format_display_text( char * dst, size_t size, const char * fmt, ... );
 
 /* Defined in util.cpp; shared with the modules that use it. */
 extern bool DebugLog;

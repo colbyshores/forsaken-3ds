@@ -568,13 +568,13 @@ char *SavedGameInfo( int slot )
 		file_read( &KilledEnemiesNum, sizeof( NumKilledEnemies ), 1, fp );
 		file_read( &Lives, sizeof( Lives ), 1, fp );
 		if ( strcasecmp( biker, DEFAULT_PLAYER_NAME ) )
-			snprintf( info, sizeof( info ), "%s in %s %hd'%02hd %hd/%hd",
+			format_display_text( info, sizeof( info ), "%s in %s %hd'%02hd %hd/%hd",
 				biker,
 				LevelName,
 				Hours * 60 + Minutes, Seconds,
 				KilledEnemiesNum, InitEnemiesNum );
 		else
-			snprintf( info, sizeof( info ), "%s %hd'%02hd %hd/%hd",
+			format_display_text( info, sizeof( info ), "%s %hd'%02hd %hd/%hd",
 				LevelName,
 				Hours * 60 + Minutes, Seconds,
 				KilledEnemiesNum, InitEnemiesNum );

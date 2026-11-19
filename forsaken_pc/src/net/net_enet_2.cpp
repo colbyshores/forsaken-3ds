@@ -72,7 +72,7 @@ static int system_channel = 0;
 // returns host:port syntax copy data right away as ip is overwritten next call
 static char* address_to_str( ENetAddress * address )
 {
-	char temp[INET_ADDRSTRLEN+10] = "";
+	char temp[INET_ADDRSTRLEN] = "";	// what enet_address_get_host_ip may write
 	static char ip[INET_ADDRSTRLEN+10] = "";
 	enet_address_get_host_ip( address, temp, INET_ADDRSTRLEN );
 	snprintf( ip, sizeof( ip ), "%s:%d", temp, address->port );

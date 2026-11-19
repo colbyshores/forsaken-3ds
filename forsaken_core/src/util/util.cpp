@@ -249,3 +249,12 @@ bool copy_field( char * dst, size_t size, const char * src )
 		memset( dst + used, 0, size - used );
 	return fits;
 }
+
+void format_display_text( char * dst, size_t size, const char * fmt, ... )
+{
+	va_list args;
+
+	va_start( args, fmt );
+	vsnprintf( dst, size, fmt, args );
+	va_end( args );
+}
