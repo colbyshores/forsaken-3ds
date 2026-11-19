@@ -563,9 +563,6 @@ bool joysticks_cleanup( void )
 
 		JoystickInfo[i].assigned = false;
 		JoystickInfo[i].connected = false;
-		JoystickInfo[i].NumButtons = 0;
-		JoystickInfo[i].NumPOVs = 0;
-		JoystickInfo[i].NumAxis = 0;
 
 		if(JoystickInfo[i].Name)
 		{
@@ -579,8 +576,9 @@ bool joysticks_cleanup( void )
 				JoystickInfo[i].sdl_joy
 			);
 		}
+		JoystickInfo[i].sdl_joy = NULL;
 
-		for (j = 0; j < JoystickInfo[i].NumButtons; i++)
+		for (j = 0; j < JoystickInfo[i].NumButtons; j++)
 		{
 			if(JoystickInfo[i].Button[j].name)
 			{
@@ -622,6 +620,11 @@ bool joysticks_cleanup( void )
 			JoystickInfo[i].Axis[j].inverted = false;
 			JoystickInfo[i].Axis[j].fine = false;
 		}
+
+		// the counts bound the frees above, so clear them last
+		JoystickInfo[i].NumButtons = 0;
+		JoystickInfo[i].NumPOVs = 0;
+		JoystickInfo[i].NumAxis = 0;
 	}
 	return true;
 }
